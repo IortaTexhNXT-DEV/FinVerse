@@ -1,0 +1,98 @@
+/* Remittance screens (BRD-2). Colours and spacing come from the design tokens. */
+
+.remit-totals {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--space-3);
+}
+
+.remit-total {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+}
+
+.remit-total-label {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.remit-total-value {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--color-heading);
+}
+
+.remit-total-strong {
+  border-top: 4px solid var(--brand-blue);
+}
+
+.remit-split {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(260px, 1fr);
+  gap: var(--space-4);
+  align-items: start;
+}
+
+.remit-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--brand-gold);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+}
+
+.remit-panel h3 {
+  margin: 0;
+  font-size: 16px;
+  color: var(--color-heading);
+}
+
+.remit-exclusion {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.remit-exclusion:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.remit-muted {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.remit-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--space-3);
+  align-items: end;
+}
+
+.remit-problems {
+  margin: 0;
+  padding-left: var(--space-5);
+  color: var(--color-danger);
+}
+
+.remit-excluded-row {
+  color: var(--color-placeholder);
+  text-decoration: line-through;
+}
+
+@media (max-width: 1100px) {
+  .remit-split {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,50 @@
+# Production (ap-southeast-1). Build: kubectl kustomize deploy/k8s/overlays/prod
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base
+  - environment.yaml
+components:
+  - ../../components/environment
+images:
+  - name: bibs-backend
+    newName: "<ECR_REGISTRY>/bibs-backend"
+    newTag: "<RELEASE_TAG>"
+  - name: bibs-frontend
+    newName: "<ECR_REGISTRY>/bibs-frontend"
+    newTag: "<RELEASE_TAG>"
+patches:
+  - target: { kind: ConfigMap, name: bibs-backend-config }
+    patch: |-
+      - op: replace
+        path: /data/SPRING_PROFILES_ACTIVE
+        value: prod
+      - op: replace
+        path: /data/BROKERVERSE_ENVIRONMENT
+        value: production
+      - op: replace
+        path: /data/BROKERVERSE_ALLOWED_ORIGINS
+        value: "https://<BIBS_PROD_HOST>"
+      - op: replace
+        path: /data/BROKERVERSE_DB_POOL_SIZE
+        value: "30"
+  # Peak of 429 concurrent users (Core Replacement BRD): 3 to 10 web pods.
+  - target: { kind: HorizontalPodAutoscaler, name: bibs-web }
+    patch: |-
+      - op: replace
+        path: /spec/minReplicas
+        value: 3
+      - op: replace
+        path: /spec/maxReplicas
+        value: 10
+  - target: { kind: Deployment, name: bibs-web }
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 3
+  # Two jobs pods across zones; the Redis job lock keeps one run per schedule.
+  - target: { kind: Deployment, name: bibs-jobs }
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 2

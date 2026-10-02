@@ -1,0 +1,122 @@
+# UX screen documents of the BRD-11 User Access Maintenance set for the BDOI UX Design team: 07 UX Screen Deck, 08
+# UX screen register, 09 image package (docs/deliverables/src/signoff/build_ux_deck.py). The screens, fields,
+# actions, walkthroughs and images come from the pack; this file holds what only the UX documents need: who each
+# persona is, the images taken for the deck only, the changes of the issue and the points to confirm.
+
+issue:
+  version: "2.2"
+  date: 2 October 2026
+  changes:
+    - ref: CHG-UA-2.1-01
+      what: >-
+        One label for a request waiting for its approver, Pending Approval (Pending Second Approval for the second
+        approval), in the status pill, the step bar, the decision, the history, the lists and the status filter
+      screens: [SCR-UA-06, SCR-UA-08, SCR-UA-10, SCR-UA-11]
+      images: [scr-ua-06-01-list, scr-ua-06-02-mine, scr-ua-08-01-pending, scr-ua-08-02-approve, scr-ua-08-03-second,
+               scr-ua-08-04-history, scr-ua-10-01-pending, scr-ua-11-01-list]
+    - ref: CHG-UA-2.1-02
+      what: Requested By and Requested On as two key facts of a request and of a bulk batch
+      screens: [SCR-UA-08, SCR-UA-10]
+      images: [scr-ua-08-01-pending, scr-ua-08-03-second, scr-ua-08-04-history, scr-ua-10-01-pending]
+    - ref: CHG-UA-2.1-03
+      what: The group profiles a request adds or removes as table rows, each marked Added or Removed
+      screens: [SCR-UA-08]
+      images: [scr-ua-08-01-pending, scr-ua-08-03-second, scr-ua-08-04-history]
+    - ref: CHG-UA-2.1-04
+      what: The user a request is about named by the full name, with the user ID in brackets
+      screens: [SCR-UA-08]
+      images: [scr-ua-08-01-pending, scr-ua-08-02-approve, scr-ua-08-03-second, scr-ua-08-04-history,
+               scr-ua-08-05-password]
+    - ref: CHG-UA-2.1-05
+      what: >-
+        The group profiles of a user request grouped by product module, with a search and the count of the profiles
+        selected
+      screens: [SCR-UA-07]
+      images: [scr-ua-07-01-empty, scr-ua-07-02-filled, scr-ua-07-03-error, scr-ua-07-04-modify]
+    - ref: CHG-UA-2.2-01
+      what: >-
+        Lists in the BDO style guide: outlined status pills, alternating white and Background Blue rows, a long
+        list scrolling inside its card with the header row in view, names instead of codes, due dates on one line
+        with the overdue icon and ages in words; every image of the set retaken
+      screens: [SCR-UA-01, SCR-UA-02, SCR-UA-03, SCR-UA-04, SCR-UA-05, SCR-UA-06, SCR-UA-07, SCR-UA-08, SCR-UA-09,
+                SCR-UA-10, SCR-UA-11, SCR-UA-12, SCR-UA-13, SCR-UA-14, SCR-UA-15, SCR-UA-16, SCR-UA-17, SCR-UA-18,
+                SCR-UA-19]
+
+navigation:
+  # The same landing page and menu as in the BRD-3 set (identical images are kept once).
+  shared:
+    ux-nav-04-menu: BRD-03:ux-nav-08-menu
+    ux-nav-05-landing: BRD-03:ux-nav-10-landing
+    ux-nav-05-menu: BRD-03:ux-nav-10-menu
+    ux-nav-06-landing: BRD-03:ux-nav-11-landing
+    ux-nav-06-menu: BRD-03:ux-nav-11-menu
+    ux-nav-08-landing: BRD-03:ux-nav-09-landing
+    ux-nav-08-menu: BRD-03:ux-nav-09-menu
+
+personas:
+  UAM_REQUESTOR: {who: "One of the named user access requestors of the business units"}
+  UAM_APPROVER: {who: "One of the named user access approvers of the business units"}
+  UAM_SECOND_APPROVER: {who: "The second approver of privileged or out-of-hours access changes (Information Security)"}
+  BUSINESS_ADMIN: {who: "The business administrator of BIBS who owns the group profiles"}
+  SYSADMIN: {who: "The system administrator of BIBS (BDOI IT operations)"}
+  AUDITOR: {who: "An internal or external auditor with read access"}
+  INFOSEC_OFFICER: {who: "An officer of BDOI Information Security"}
+  NB_APPROVER: {who: "A New Business approver of Marketing who also approves access requests of the unit"}
+
+classify:
+  scr-ua-01-01-empty: default
+  scr-ua-01-03-locked: read-only
+  scr-ua-02-01-request: filled
+  scr-ua-02-02-sent: success
+  scr-ua-02-03-new_password: default
+  scr-ua-03-01-reset: default
+  scr-ua-04-01-idle: confirmation
+  scr-ua-07-01-empty: default
+  scr-ua-07-04-modify: filled
+  scr-ua-08-01-pending: pending-approval
+  scr-ua-08-02-approve: confirmation
+  scr-ua-08-03-second: pending-approval
+  scr-ua-08-04-history: rejected-returned
+  scr-ua-08-05-password: success
+  scr-ua-09-02-validated: validation-error
+  scr-ua-10-01-pending: pending-approval
+  scr-ua-12-01-new_profile: filled
+  scr-ua-12-02-modify_profile: filled
+  scr-ua-12-03-deactivate: confirmation
+  scr-ua-13-01-permission: read-only
+  scr-ua-13-02-action: read-only
+  scr-ua-15-02-sessions: default
+  scr-ua-16-02-dialog: confirmation
+  scr-ua-17-01-audit_log: read-only
+  scr-ua-17-02-group_profile: read-only
+  scr-ua-17-03-user_access: read-only
+  scr-ua-18-02-approve: pending-approval
+  scr-ua-19-01-list: pending-approval
+  scr-ua-19-02-new: default
+  wt-a-03: pending-approval
+  wt-a-05: default
+  wt-a-07: default
+  wt-a-08: read-only
+  wt-b-05: pending-approval
+  wt-b-06: success
+  wt-b-10: read-only
+  wt-c-06: validation-error
+  wt-c-07: validation-error
+  wt-c-08: success
+  wt-d-01: read-only
+  wt-d-02: read-only
+  wt-d-03: read-only
+  wt-d-04: read-only
+  wt-d-05: default
+
+states:
+  - {screen: SCR-UA-06, state: empty, user: requestor, ux: empty, nocallouts: true, caption: "A search that finds no access request"}
+  # Crop of the notice standard for the design foundation of every deck (ux_foundation.yaml).
+  - {screen: SCR-UA-07, state: cmp-notice, component: true, user: requestor, fill: enrol_invalid, submit: "^submit$", crop: "main .notice", nocallouts: true, caption: "Notice standard"}
+
+confirm:
+  clarifications: [CLR-UA-10, CLR-UA-11, CLR-UA-18, CLR-UA-19, CLR-UA-20]
+  findings:
+    - screens: [SCR-UA-06]
+      observation: The Change column of the request list names the subject user by the user ID only.
+      proposal: Name the user with the full name first and the user ID in brackets, as the request record does.

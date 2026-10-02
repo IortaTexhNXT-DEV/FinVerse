@@ -1,0 +1,204 @@
+# Notifications catalogue of BRD-2 Operations: in-app notices (bell in the page header), alerts (Alert inbox of the
+# administrators and team leads) and e-mails. Texts are those of the platform; <name> is filled in by BIBS.
+# Each user chooses the in-app and e-mail channels of the Operations events on Notification Settings (SCR-OP-06).
+notifications:
+  - id: NT-01
+    channel: In-app
+    trigger: An Operations record moves to another stage by a workflow action (return, hold, release, send back, acknowledge, reject and the other actions of the workflow header)
+    recipient: The creator of the record and its current assignee, unless they made the move themselves
+    template: "Title: <reference>: <new stage name>. Text: <record description> - <comment>"
+    content: The new stage, the record and the comment typed with the action; the notice opens the record
+    screen: Every Operations record with a workflow header
+    frs: [FR-OP-002]
+  - id: NT-02
+    channel: In-app
+    trigger: Work is handed over to a team because the module that would do it is not active (an official receipt to issue, an unapplied item to set up)
+    recipient: The users holding the permission of the team named in the hand-off
+    template: "Title: Work handed over: <work>. Text: <what to do>"
+    content: The hand-off; the notice opens Hand-offs and Extracts
+    screen: Hand-offs and Extracts
+    frs: [FR-OP-130]
+  - id: NT-03
+    channel: In-app
+    trigger: An Operations team sends a payment request to the Disbursement queue (remittance batch approved, refund approved, BIR 2307 batch routed, incentive pass-on posted)
+    recipient: Disbursement
+    template: "Title: Payment request <request no>. Text: <type>, <payee>, <amount>"
+    content: The request; the notice opens the Disbursement Queue
+    screen: Disbursement Queue
+    frs: [FR-OP-120]
+  - id: NT-04
+    channel: In-app, e-mail
+    trigger: Disbursement acknowledges a payment request, assigns its DV number, pays it or returns it; a DV cancelled sends the batch back to review
+    recipient: The user who sent the request and the Remittance Processors of the batch (event Disbursement status)
+    template: "Title: Payment request <request no> <status>; Payment request of <batch> returned; DV of <batch> cancelled - batch back to review"
+    content: The request, its status, DV number or return reason
+    screen: Disbursement Queue, Remittance Batch
+    frs: [FR-OP-036, FR-OP-120]
+  - id: NT-05
+    channel: In-app, alert
+    trigger: An interface run fails or has failed records
+    recipient: The System Administrator (users who manage the interfaces)
+    template: "Title: Interface run <status>. Text: <run no> of <feed>: <counts>"
+    content: The run; the notice opens Interfaces
+    screen: Interfaces
+    frs: [FR-OP-131]
+  - id: NT-06
+    channel: Alert
+    trigger: A receipt series reaches its warning level of numbers left
+    recipient: Cashiering Team Leader
+    template: "<kind> series <prefix> has <n> numbers left"
+    content: The series; the alert opens Receipt Series
+    screen: Receipt Series
+    frs: [FR-OP-010]
+  - id: NT-07
+    channel: In-app, e-mail
+    trigger: A receipt cancellation or reinstatement, a disposition or a payment reversal waits for approval
+    recipient: Cashiering Team Leaders (event Cashiering approval request)
+    template: "Title: <transaction no> for approval / <reference> disposition for approval / <request no>: payment reversal for approval. Text: the action, the reason or the type and amount"
+    content: The request; the notice opens the receipt, the unapplied payment or Incoming Requests
+    screen: Receipt, Unapplied Payment, Incoming Requests
+    frs: [FR-OP-013, FR-OP-014, FR-OP-022]
+  - id: NT-08
+    channel: In-app
+    trigger: Collections asks Cashiering to dispose of an unapplied payment, or Payment Requests asks for a refund validation
+    recipient: Cashiers
+    template: "Title: <request no>: <action> requested by a collector / <task no>: refund validation requested. Text: the unapplied item and the invoice, or: Confirm that the premium of <invoice> is back in the unapplied list"
+    content: The request; the notice opens Incoming Requests
+    screen: Incoming Requests
+    frs: [FR-OP-022]
+  - id: NT-09
+    channel: Alert
+    trigger: A pre-booked payment waits for the booking of its account beyond the ageing threshold
+    recipient: Cashiering Team Leader
+    template: "Payment for <ARN> waits for the booking since <date>"
+    content: The pre-booked payment
+    screen: Pre-booked Payments
+    frs: [FR-OP-018]
+  - id: NT-10
+    channel: In-app, e-mail, alert
+    trigger: A scheduled or manual remittance extraction finishes or fails; a paid AR above the DTIP balance is found
+    recipient: Remittance Processors (event Remittance extraction completed); the alert to the Remittance Team Leader
+    template: "Title: Remittance extraction <run no> / Remittance extraction <run no> failed. Text: <summary of the run>; alert: Paid AR of <invoice> is above its DTIP balance"
+    content: The run with its counts; the notice opens Extraction
+    screen: Extraction
+    frs: [FR-OP-030, FR-OP-031]
+  - id: NT-11
+    channel: In-app, e-mail
+    trigger: A remittance batch or a special remittance is submitted for approval
+    recipient: Remittance Team Leaders (event Remittance batch for approval)
+    template: "Title: Batch <batch no> for approval / Special remittance <request no> for approval"
+    content: The batch or request; the notice opens it
+    screen: Remittance Batch, Special Remittance Request
+    frs: [FR-OP-033, FR-OP-040]
+  - id: NT-12
+    channel: In-app, e-mail
+    trigger: A remittance batch is approved or returned
+    recipient: The processor of the batch (event Remittance batch approved or returned)
+    template: "Title: Batch <batch no> approved / Batch <batch no> returned"
+    content: The batch; the notice opens it
+    screen: Remittance Batch
+    frs: [FR-OP-035, FR-OP-033]
+  - id: NT-13
+    channel: In-app, e-mail
+    trigger: An endorsement request that reduces an invoice is submitted (pending negative adjustment)
+    recipient: Remittance Processors (event Negative adjustment on a remittance invoice)
+    template: "Title: Negative adjustment pending on <invoice>. Text: Request <request no> by <user>; invoice is in batch <batch>"
+    content: The invoice and its batch; the notice opens Invoice 360
+    screen: Invoice 360
+    frs: [FR-OP-031, FR-OP-050]
+  - id: NT-14
+    channel: In-app, e-mail
+    trigger: A hold, its extension or its cancellation is submitted, decided, assigned, released, or expires the next day
+    recipient: Marketing Team Leaders for approval; the requester and the processor for the decision, release and expiry (event Remittance hold expiring)
+    template: "Title: Hold <request no> for approval / extension for approval / cancellation for approval / released / assigned to you / expires on <date>"
+    content: The hold; the notice opens it
+    screen: Remittance Hold
+    frs: [FR-OP-111]
+  - id: NT-15
+    channel: In-app, e-mail
+    trigger: A special remittance is submitted, decided or remitted in its special batch
+    recipient: Remittance Team Leaders for approval; the requester on each change of status
+    template: "Title: Special remittance <request no> for approval / Special remittance batch <batch no>. Text: <invoice> - <assured> (<condition>)"
+    content: The request; the notice opens it
+    screen: Special Remittance Request
+    frs: [FR-OP-040, FR-OP-112]
+  - id: NT-16
+    channel: In-app, e-mail
+    trigger: An endorsement request moves to the next stage, is returned, posted or cancelled
+    recipient: The team of the next stage; the requester on return, posting and cancellation (event Endorsement request status)
+    template: "Title: Endorsement request <request no> <what happened>. Text: <invoice> - <type>: <description>"
+    content: The request; the notice opens it
+    screen: Endorsement Request
+    frs: [FR-OP-053, FR-OP-056]
+  - id: NT-17
+    channel: Alert
+    trigger: A request takes the cumulative adjustments of an invoice above the baseline of its original premium; the adjustments of an invoice exceed its original premium or DTIP in the ledger
+    recipient: Adjustment Team Leader
+    template: "Request <request no> exceeds the adjustment baseline of <percent>% / Adjustments of <invoice> exceed its original premium or DTIP"
+    content: The request or the invoice
+    screen: Endorsement Request, Invoice 360
+    frs: [FR-OP-058]
+  - id: NT-18
+    channel: In-app
+    trigger: The daily endorsement report is produced (18:00 Philippine time) and archived
+    recipient: Adjustment Team Leaders
+    template: "Title: Daily endorsement report <date>. Text: <company>: <file> archived"
+    content: The report file; the notice opens the Report Archive
+    screen: Report Archive
+    frs: [FR-OP-062]
+  - id: NT-19
+    channel: In-app, e-mail, alert
+    trigger: An insurer production feedback is uploaded and matched; a duplicate upload is refused
+    recipient: Production Reconciliation Handlers (event Insurer reconciliation feedback)
+    template: "Title: Insurer feedback uploaded: <cycle no>. Text: <file>: <message>; alert: Duplicate insurer production upload refused: <file>"
+    content: The cycle; the notice opens it
+    screen: Reconciliation Cycle
+    frs: [FR-OP-074]
+  - id: NT-20
+    channel: In-app, e-mail, alert
+    trigger: The daily feedback job finds a DP billing whose insurer answer is overdue (ten working days)
+    recipient: The handler of the billing and the Commission Receivables Team Leaders (event Direct payment feedback overdue)
+    template: "Title: Insurer feedback overdue: <billing no>"
+    content: The billing
+    screen: DP Billing
+    frs: [FR-OP-093]
+  - id: NT-21
+    channel: In-app
+    trigger: A BIR certificate is submitted or resubmitted to Comptrollership
+    recipient: Comptrollership
+    template: "Title: BIR certificate submitted: <submission no> / BIR certificate resubmitted: <submission no>"
+    content: The submission; the notice opens it
+    screen: BIR Certificate
+    frs: [FR-OP-096]
+  - id: NT-22
+    channel: Alert
+    trigger: An incentive run excludes invoices (negative amounts, cancelled or written-off bookings)
+    recipient: Commission Receivables Team Leader
+    template: "<n> invoice(s) excluded from <run no>"
+    content: The run
+    screen: Incentive Runs
+    frs: [FR-OP-095]
+  - id: NT-24
+    channel: E-mail
+    trigger: Send Schedule to Insurer on an approved remittance batch (once per batch)
+    recipient: The insurer's e-mail addresses (To and Cc of the dialog)
+    template: "Subject and message of the dialog; attachment: the remittance schedule in Excel, password protected; a second e-mail carries the password"
+    content: Remittance schedule of the batch (DO-03)
+    screen: Remittance Batch
+    frs: [FR-OP-110]
+  - id: NT-25
+    channel: E-mail
+    trigger: Send to Insurer or Resend of a production register, or the automatic send of a scheduled extract
+    recipient: The insurer's reconciliation contacts or the addresses of the dialog
+    template: "Cover letter of the production register template (insurer, extract number, booking period, production month, rows); attachment: the register workbook, password protected; a second e-mail carries the password"
+    content: Production register (DO-07)
+    screen: Production Extracts
+    frs: [FR-OP-073]
+  - id: NT-26
+    channel: E-mail
+    trigger: Send to Insurer of a DP billing
+    recipient: The insurer's billing contacts or the addresses of the dialog
+    template: "Subject: Direct payment commission billing <billing no>. Text: Dear <insurer>, attached is our billing <billing no> of the commission on <n> direct payment account(s), net commission <amount>. Please confirm each account in the Decision column (APPROVED or REJECTED, with the reason of a rejection) and return the file. The file is password protected; the password is sent in a separate e-mail."
+    content: DP billing workbook (DO-08)
+    screen: DP Billing
+    frs: [FR-OP-092]

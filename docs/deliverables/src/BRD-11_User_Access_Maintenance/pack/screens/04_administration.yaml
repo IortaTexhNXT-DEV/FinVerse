@@ -1,0 +1,237 @@
+# Screen specifications of BRD-11 User Access Maintenance: the evidence of access (matrix and reports) and the
+# System Administrator's screens (users, roles, security parameters). Schema: docs/deliverables/src/signoff/README.md.
+area: Access evidence and administration
+screens:
+  - id: SCR-UA-13
+    title: User Access Matrix
+    route: /user-access/matrix
+    purpose: >-
+      Every group profile against every permission as granted today, or against the functional areas and action
+      classes (view only, create, amend, approve / validate) with the permissions behind each cell, with the number
+      of active users of each profile. Read only; the Excel export holds both views.
+    entry:
+      - The old address Broking Setup › User Access Matrix opens this screen
+    shots:
+      - {state: permission, user: auditor, caption: "User Access Matrix by permission"}
+      - {state: action, user: auditor, tab: By Action, caption: "User Access Matrix by area and action class"}
+    fields:
+      - "Search | Find a permission or area | Text | Part of a permission name, code or area | N | - | Blank | - | - | -"
+      - "Views | By Permission / By Action | Tab | - | - | Fixed | By Permission | - | - | -"
+      - "By Permission | Permission / Area / Action class | Columns | Permission name with the code below in small print; functional area; View only, Create, Amend, Approve / Validate | - | Permission catalogue | - | Read only | - | -"
+      - "Matrix | [Group profile columns] | Columns | Profile name with the number of active users; a tick where the profile holds the permission | - | Role grants | - | Read only | - | -"
+      - "By Action | Area / Action class | Columns | One row per area and action class; each cell lists the names of the permissions the profile holds there | - | Role grants | - | Read only | - | -"
+    actions:
+      - "Export to Excel | Every user of the screen | Always | Downloads the matrix (both views) as an Excel file | - | -"
+    rules:
+      - "The matrix is read from the grants in force; it changes only when a group-profile request is implemented (FR-UA-051)."
+      - "The matrix is open to the holders of the request, approval, role management and audit rights (the Information Security Officer among them); the Requestor and the Second Approver do not have it, as the permissions matrix of the FRS grants them no such right (FR-UA-051)."
+      - "The insurer-only permissions and the insurer roles hidden from BDOI are not listed (FR-UA-051)."
+    outcome: Business, Information Security and audit see in one table which profile can do what, and keep the export as evidence.
+    frs: [FR-UA-051, FR-UA-061]
+    tests: [MATRIX]
+
+  - id: SCR-UA-14
+    title: User Access Reports
+    route: /user-access/reports
+    purpose: >-
+      The five user access reports, each opened in the report runner with its parameters and its PDF, Excel and CSV
+      exports: User Access Report, User Group Profile Report, Group Profile Membership, User Access Audit Log and
+      Access Requests.
+    entry:
+      - Reports › Report Centre, category Control & Audit
+    shots:
+      - {state: list, user: auditor, caption: "User Access Reports"}
+    fields:
+      - "Reports | User Access Report | Link | Users with their group profiles, business unit, level and status, who created and last modified them and the last action | - | Report catalogue | - | Read only | - | -"
+      - "Reports | User Group Profile Report | Link | For each group profile, the modules and tasks With Access or No Access, with created and modified dates and actors | - | Report catalogue | - | Read only | - | -"
+      - "Reports | Group Profile Membership | Link | The members of each group profile on a date, with who added each member and when | - | Report catalogue | - | Read only | - | -"
+      - "Reports | User Access Audit Log | Link | Every access activity with from and to values, done by, approved by and request number; sign-ins and sign-outs on request | - | Report catalogue | - | Read only | - | -"
+      - "Reports | Access Requests | Link | Requests by status, type, requester and approver, with their age in days | - | Report catalogue | - | Read only | - | -"
+    actions:
+      - "[A report] | Holders of the user access report right | Always | Opens the report in the report runner (SCR-UA-17) | - | -"
+    rules:
+      - "The reports are run by the Approver, the Business Administrator, the System Administrator, the Information Security Officer and the Auditor (user access report right) (FR-UA-060, FR-UA-063)."
+    outcome: The evidence of who has which access, who granted it and every access activity is one click away.
+    frs: [FR-UA-060, FR-UA-061, FR-UA-062, FR-UA-063]
+    tests: [UAREP]
+
+  - id: SCR-UA-15
+    title: Users
+    route: /admin/users
+    purpose: >-
+      The System Administrator's list of users with their Windows ID, group profiles, business unit, user level,
+      authorisation limit, last sign-in and status (Active, Online, Disabled, Locked); unlock of a locked account and
+      the sessions of a user, with End Session. Users are created and changed only through access requests: Raise
+      Request, or a row, opens a request.
+    entry:
+      - Setup & Administration › Administration › Users
+    shots:
+      - {state: list, user: admin, caption: "Users with their status"}
+      - {state: sessions, user: admin, caption: "Sessions of a user, with End Session"}
+    fields:
+      - "Search | Search User ID, Name or Windows ID | Text | Part of the user ID, name or Windows ID | N | - | Blank | - | Contains search | -"
+      - "Search | Status | Drop-down | All statuses, Active, Online, Disabled, Locked | N | Fixed list | All statuses | - | - | -"
+      - "List | User ID | Column | User ID | - | User master | - | Read only | - | -"
+      - "List | Windows ID | Column | Windows ID | - | User master | - | Read only | - | -"
+      - "List | Full Name | Column | Name | - | User master | - | Read only | - | -"
+      - "List | Group Profiles | Column | Names of the profiles held | - | User master | - | Read only | - | -"
+      - "List | Business Unit | Column | Business unit group (list label) | - | User master | - | Read only | - | -"
+      - "List | User Level | Column | User level (list label) | - | User master | - | Read only | - | -"
+      - "List | Authorization Limit | Column | Amount in PHP, or Unlimited | - | User master | - | Read only | - | -"
+      - "List | Last Login | Column | dd-MMM-yyyy HH:mm | - | Session log | - | Read only | - | -"
+      - "List | Status | Column | Active, Online (open session), Disabled, Locked | - | User master and session log | - | Read only | - | -"
+      - "Sessions of a user | Signed in / Last activity / Ended / Status | Columns | Date and time; Open, Logout, Idle Timeout, Expired, Admin Ended, Locked | - | Session log | - | Read only | - | -"
+    actions:
+      - "Raise Request | System Administrator | Always | Opens New Request (SCR-UA-07) | - | -"
+      - "[Open a row] | System Administrator | Always | Opens a Modify user request for the user (SCR-UA-07) | - | -"
+      - "Unlock | System Administrator (user management right) | The user is locked | Unlocks the account and resets the failed attempts; written to the access change log | Active | -"
+      - "Sessions | System Administrator | Always | Opens the sessions of the user | - | -"
+      - "End Session | System Administrator | The session is open | Ends the session at once on every server; the user is signed out at the next action. Toast: Session ended | Admin Ended | -"
+      - "New User (Emergency) | System Administrator, only while UAM_DIRECT_ROLE_EDIT is on | Emergency path open | Creates or edits a user directly (audited, alert raised); not offered as delivered | - | Alert UAM_DIRECT_ROLE_EDIT"
+    rules:
+      - "Users, their data and their group profiles change only through an approved access request; the direct edit is an audited emergency path, closed as delivered (UAM_DIRECT_ROLE_EDIT = false) (FR-UA-052)."
+      - "A user is shown Online while a session is open; Locked after 3 failed sign-ins; Disabled after a deactivation, by a request or by the dormant-user job (FR-UA-052, FR-UA-004, FR-UA-006)."
+      - "A deactivated or locked user's open sessions end at once (FR-UA-013, FR-UA-004)."
+      - "Unlock, password reset and the end of a session are written to the access change log or the audit trail with the administrator's name (FR-UA-064)."
+    outcome: The System Administrator sees every user's access and state, unlocks accounts and ends sessions, while every access change still goes through a request.
+    frs: [FR-UA-052, FR-UA-004, FR-UA-064]
+    tests: [USERS]
+
+  - id: SCR-UA-16
+    title: Roles & Permissions
+    route: /admin/roles
+    purpose: >-
+      The group profiles (roles) against the permissions, with the privilege level and the active flag of each
+      profile, read only as delivered; and the approved group-profile requests waiting for the System Administrator,
+      each implemented with Implement Request.
+    entry:
+      - Setup & Administration › Administration › Roles & Permissions
+      - The notice Access request AR-yyyy-nnnnnn to implement
+    shots:
+      - {state: implement, user: admin, caption: "Roles & Permissions with the approved requests to implement"}
+      - {state: dialog, user: admin, click: "^implement request$", caption: "Implement Request dialog with the permissions added and removed"}
+    fields:
+      - "Approved Requests to Implement | Request / Change / Requested By / Approved | Columns | AR-yyyy-nnnnnn; description; name; approver · dd-MMM-yyyy HH:mm | - | Access requests For Implementation | - | Read only | - | -"
+      - "Implement dialog | Permissions added / Permissions removed / Approved by | Text | Permission names; approver's name | - | Access request | - | Read only | - | -"
+      - "Matrix | Permission | Column | Permission name with the code below in small print | - | Permission catalogue | - | Read only | - | -"
+      - "Matrix | [Profile columns] | Check boxes | Profile name · privilege level, (inactive) and the Inactive pill for a deactivated profile | - | Role grants | - | Read only as delivered; editable only on the emergency path | - | -"
+    actions:
+      - "Implement Request | System Administrator (role management right), not the requester | Request For Implementation | Applies the approved change to the group profile now; the request becomes Implemented. Toast: AR-yyyy-nnnnnn implemented | Implemented | Access request AR-yyyy-nnnnnn implemented, to the requester"
+      - "Save | System Administrator, only while UAM_DIRECT_ROLE_EDIT is on | Emergency path open and a profile column changed | Saves the profile directly; audited and alerted | - | Alert UAM_DIRECT_ROLE_EDIT"
+    rules:
+      - "Group profiles change only by implementing an approved group-profile request: Roles are changed through an approved group-profile request; implement the request instead (FR-UA-045)."
+      - "The implementer is never the requester: A request is implemented by someone other than its requester (FR-UA-045)."
+      - "While the emergency path is open the page says so, and every direct edit is audited and raises an alert (FR-UA-045, FR-UA-052)."
+    outcome: The approved profile change is applied by the System Administrator and recorded with the request number, the approver and the implementer.
+    frs: [FR-UA-045, FR-UA-050, FR-UA-051]
+    tests: [ROLES]
+
+  - id: SCR-UA-17
+    title: User access report (report runner)
+    route: /reports/:code
+    parent: /user-access/reports
+    purpose: >-
+      A user access report in the report runner: its parameters with their defaults, Run Report, Print, the PDF,
+      Excel and CSV downloads, and the result with the parameters echoed and the notes of the report.
+    entry:
+      - User Access Reports › a report
+      - Reports › Report Centre › a report of the category Control & Audit
+    shots:
+      - {state: audit_log, user: auditor, path: /reports/UAM-AUDIT-LOG, click: "^run report$", caption: "User Access Audit Log with the from and to values"}
+      - {state: group_profile, user: auditor, path: /reports/UAM-GROUP-PROFILE, fill: report_profile, click: "^run report$", caption: "User Group Profile Report of one profile"}
+      - {state: user_access, user: auditor, path: /reports/UAM-USER-ACCESS, click: "^run report$", caption: "User Access Report as of today"}
+    fields:
+      - "Parameters | As of Date | Date | dd-MMM-yyyy; not in the future | Y | - | Today | Before the run | Not after today | The as-of date cannot be in the future"
+      - "Parameters | Date From / Date To | Date | dd-MMM-yyyy | Y | - | Start of the month / today | Before the run | The end on or after the start | The end date must be on or after the start date"
+      - "Parameters | Business Unit Group | Text | Business unit code | N | - | Blank | Before the run | - | -"
+      - "Parameters | Status | Drop-down | All, Active, Disabled, Locked (users); the request statuses (Access Requests) | N | Fixed list | All | Before the run | - | -"
+      - "Parameters | Group Profile (code) | Text | Profile code | N | - | Blank | Before the run | - | -"
+      - "Parameters | Module (area code) | Text | Area code | N | - | Blank | Before the run | - | -"
+      - "Parameters | Active | Drop-down | All, Yes, No | N | Fixed list | All | Before the run | - | -"
+      - "Parameters | User / Activity / Include Log-ins and Log-outs | Text / Drop-down / Check box | User ID; the access activities; sign-ins and sign-outs of the audit trail | N | - | Blank; All; not ticked | Before the run | - | -"
+      - "Parameters | Request Type | Drop-down | All and the request types | N | Fixed list | All | Before the run | - | -"
+      - "Result | [Columns of the report] | Table | User Access Report: User Name, User ID / Windows ID, User Group Profile, Business Unit / User Level, Status, Created by, Date Created, Modified by, Date Modified, Last Action / by. User Group Profile Report: Module Name, Task Name, Access, Date Created, Created by, Date Modified, Modified by. Group Profile Membership: Member Username, Member User ID, Created by, Date Created, Modified by, Date Modified. User Access Audit Log: Date, Activity, From, To, Done By, Approved By, Request No. Access Requests: Request No., Request Type, User / Group Profile, Requester, Approver, Date Created, Date Decided, Effective Date, Age (days), Requests | - | Access change log, request history, audit trail | - | Read only | - | -"
+    actions:
+      - "Run Report | Holders of the user access report right | Required parameters valid | Runs the report on screen | - | -"
+      - "Print | As Run Report | Required parameters valid | Opens the printable report with the paper, orientation and width chosen | - | -"
+      - "[PDF / Excel / CSV download] | As Run Report | Required parameters valid | Downloads the report; the header carries the report name, the user who generated it, the date coverage and the time generated | - | -"
+    rules:
+      - "The as-of reports show the access held at the end of the as-of date (Philippine time), derived from the access change log (FR-UA-060, FR-UA-062)."
+      - "Created by and Modified by show the approver and the request number, or the user of a direct change (FR-UA-060)."
+      - "The audit log merges the access change log, the request history and, on request, the sign-ins, failed sign-ins and sign-outs (FR-UA-063)."
+    outcome: The reports of the BRD samples A to D, and the request list, are produced with their coverage and exported for audit.
+    frs: [FR-UA-060, FR-UA-061, FR-UA-062, FR-UA-063]
+    tests: [UAREP]
+
+  - id: SCR-UA-18
+    title: System Parameters (sign-in, password and access settings)
+    route: /admin/parameters
+    purpose: >-
+      The list of the business parameters, with the security category holding the sign-in, password, session and
+      access-request settings of this set. The System Administrator changes a value in a dialog, checked by type and
+      range; a change of a security setting waits until the Information Security Officer approves it.
+    entry:
+      - Setup & Administration › Administration › System Parameters
+      - The notice Security setting to approve, and My Approvals (Information Security Officer)
+    shots:
+      - {state: list, user: admin, caption: "System Parameters, security settings"}
+      - {state: approve, user: infosec, caption: "System Parameters as the Information Security Officer sees it"}
+    fields:
+      - "Parameters | Category | Column | Security for the settings of this set | - | Parameters | - | Read only | - | -"
+      - "Parameters | Parameter | Column | LOGIN_MAX_FAILED_ATTEMPTS, SESSION_IDLE_WARNING_MINUTES, SESSION_TIMEOUT_MINUTES, SESSION_EXPIRY_WARNING_MINUTES, AUTH_MODE, USER_ID_PATTERN, USER_ID_FORMAT_TEXT, PASSWORD_HISTORY_COUNT, PASSWORD_MAX_AGE_DAYS, PASSWORD_MIN_AGE_DAYS, UAM_WORKING_HOURS, UAM_ANY_APPROVER, UAM_DIRECT_ROLE_EDIT, UAM_ROLE_APPLY_ON_APPROVAL, UAM_EXTERNAL_USERS, UAM_DORMANT_DAYS, UAM_DORMANT_NOTICE_DAYS, JOB_FAILURE_RECIPIENTS | - | Parameters | - | Read only | - | -"
+      - "Parameters | Value | Column | Value in force; under it, Waiting for approval: <new value>, asked by <name> while a change waits | - | Parameters | - | Read only | - | -"
+      - "Parameters | Description | Column | What the parameter does | - | Parameters | - | Read only | - | -"
+      - "Parameters | Last Changed | Column | Name, dd-MMM-yyyy HH:mm | - | Parameters | - | Read only | - | -"
+      - "Edit dialog | Value | Text | Up to 1,000 characters; the hint gives the type and range; a security setting says that the change applies once another user approves it | Y | - | Current value | System Administrator (parameter management right) | Type and range of the parameter | <parameter> <error of the type or range>"
+      - "Approval dialog | Current value / New value / Requested by / Requested on | Text | The two values; the name of the requester and dd-MMM-yyyy HH:mm | - | Parameters | - | Read only | - | -"
+    actions:
+      - "[Open a row] | System Administrator (parameter management right); Information Security Officer (security setting approval right) | Always | Opens the edit dialog; for a setting whose change waits, the approval dialog | - | -"
+      - "Save | System Administrator (parameter management right) | Value valid | A security setting: keeps the change as waiting for approval and tells the approvers. Toast: <description>: change sent for approval. Another parameter: saves it at once. Toast: <description>: updated | Waiting for approval, or changed | Security setting to approve, to the Information Security Officers"
+      - "Approve | Information Security Officer (security setting approval right), not the requester | A change waits | Applies the new value at once, audited with the requester and the approver. Toast: <description>: change approved | Changed | -"
+      - "Reject | Information Security Officer; Withdraw for the requester | A change waits | Drops the change; the current value stays. Toast: Change rejected | Unchanged | -"
+    rules:
+      - "Only the System Administrator asks for a change of a parameter; every change is written to the audit trail with the old and new value and the user (FR-UA-052)."
+      - "A change of a security setting, the emergency path UAM_DIRECT_ROLE_EDIT included, applies only when a holder of the approval right other than the requester approves it: A change cannot be approved by the user who asked for it (FR-UA-054)."
+      - "One change per setting waits at a time: A change of <setting> already waits for approval; approve or reject it first (FR-UA-054)."
+      - "The session, lock-out and password values are those of chapter 9 and of the configuration input template of the sign-in parameters (FR-UA-001, FR-UA-002, FR-UA-005)."
+    outcome: The security settings agreed with BDOI Information Security change only under four eyes, and every change is kept under audit.
+    frs: [FR-UA-001, FR-UA-002, FR-UA-005, FR-UA-006, FR-UA-052, FR-UA-054]
+    tests: [PARAMS]
+
+  - id: SCR-UA-19
+    title: Separation of Duties
+    route: /user-access/sod-rules
+    purpose: >-
+      The pairs of group profiles that one user may not hold together, with the reason of each. The Business
+      Administrator adds a rule or asks for its deactivation; the Information Security Officer authorises or rejects
+      each change. Every user request and bulk line is checked against the active rules.
+    entry:
+      - Setup & Administration › User Access › Separation of Duties
+      - The notice Separation-of-duties rule <rule> to authorise, and My Approvals (Information Security Officer)
+    shots:
+      - {state: list, user: infosec, caption: "Separation of Duties with a rule to authorise"}
+      - {state: new, user: badmin, click: "^new rule$", caption: "New separation-of-duties rule"}
+    fields:
+      - "Rules | Rule | Column | SOD-nnnnnn | - | Rules | - | Read only | - | -"
+      - "Rules | Group Profile / May Not Be Held With | Columns | Profile names | - | Rules | - | Read only | - | -"
+      - "Rules | Reason | Column | Why one user may not hold both | - | Rules | - | Read only | - | -"
+      - "Rules | Status | Column | Pending Authorization, Active, Inactive; under it New rule to authorise or Deactivation to authorise | - | Rules | - | Read only | - | -"
+      - "Rules | Maker / Authorised | Columns | Name; name and dd-MMM-yyyy HH:mm | - | Rules | - | Read only | - | -"
+      - "Rules | [Row action menu] | Row action menu | Authorise and Reject of a waiting change, Deactivate of an active rule, each confirmed in a dialog | - | - | - | - | - | -"
+      - "New Rule | Group Profile | Drop-down | Active group profiles by name | Y | Group profiles | Blank | New rule | - | Select the first group profile"
+      - "New Rule | May Not Be Held With | Drop-down | Active group profiles by name | Y | Group profiles | Blank | New rule | Different from the first | Choose two different group profiles"
+      - "New Rule | Reason | Text area | Up to 500 characters | Y | - | Blank | New rule | Not blank | Enter why the two profiles are not held together"
+    actions:
+      - "New Rule | Business Administrator (rule maintenance right) | Always | Opens the New Rule dialog | - | -"
+      - "Send for Authorisation | Business Administrator | Both profiles and the reason entered | Saves the rule as pending. Toast: Rule SOD-nnnnnn sent for authorisation | Pending Authorization | Separation-of-duties rule to authorise, to the Information Security Officers"
+      - "Deactivate | Business Administrator | Active rule, nothing waiting | Asks for the deactivation; the rule stays active until authorised | Active (deactivation to authorise) | Separation-of-duties rule to authorise"
+      - "Authorise | Information Security Officer (rule authorisation right), not the maker | A creation or deactivation waits | A new rule becomes active; a deactivated rule becomes inactive. Toast: Rule <rule> authorised | Active or Inactive | -"
+      - "Reject | Information Security Officer, not the maker | A creation or deactivation waits | A new rule is closed; a rule whose deactivation is rejected stays active. Toast: Rule <rule> rejected | Inactive or Active | -"
+    rules:
+      - "A rule applies only once authorised, and the maker never authorises it: A record cannot be authorized by the user who maintained it (FR-UA-053)."
+      - "One rule per pair of profiles, in either order: A rule for these two group profiles already exists (FR-UA-053)."
+      - "A request or bulk line that gives one user both profiles of an active rule is refused, on submission and at approval: One user may not hold both <profile> and <profile> (separation-of-duties rule <rule>) (FR-UA-053)."
+      - "A new rule does not change the users who already hold both profiles; they are found with the User Access Report and changed by requests (FR-UA-053, FR-UA-060)."
+    outcome: The combinations of profiles that Information Security forbids are refused by the system, not found afterwards.
+    frs: [FR-UA-053]
+    tests: [SOD]

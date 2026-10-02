@@ -1,0 +1,34 @@
+// BRD-9 Customer Servicing Facility: interfaces of the csf module (FRS section 7). Dashed grey = parked seam.
+// Left to right: BIBS sources read by CSF, the CSF workspace, outputs.
+digraph csf_integration {
+  graph [rankdir=LR, fontname="Arial", nodesep=0.18, ranksep=1.0, bgcolor="white", pad=0.15];
+  node  [shape=box, style="rounded,filled", fillcolor="@WHITE", color="@HEADER_BLUE", penwidth=1.1,
+         fontname="Arial", fontsize=13, fontcolor="@NEAR_BLACK", width=2.5, height=0.6];
+  edge  [color="@MUTED", arrowsize=0.7, fontname="Arial", fontsize=11, fontcolor="@TEXT"];
+
+  crm  [label="Client master (CRM)"];
+  acc  [label="Accounts, PN numbers\n(BRD-1 account)"];
+  plc  [label="Loan application no.\n(BRD-1 placement)"];
+  iss  [label="E-policies\n(BRD-1 issuance)"];
+  led  [label="Invoices and payments\n(BRD-2 opsledger)"];
+  doc  [label="Documents: RENEWAL_ADVICE,\nCLAIM_REPORT, quotations"];
+
+  subgraph cluster_csf {
+    label="Customer Servicing Facility (BIBS)"; labeljust=l; fontcolor="@HEADER_BLUE"; fontsize=13;
+    style=filled; fillcolor="@BG_BLUE"; color="@BG_BLUE";
+    csf [label="Search, servicing view,\ncontact change, resend,\ndocuments, activity log", fillcolor="@HEADER_BLUE", fontcolor="@WHITE", height=1.6];
+  }
+
+  upd  [label="Contact update\n(client master)"];
+  mail [label="E-mail outbox\n(RA, e-policy resend)"];
+  rpt  [label="Reports: contact changes,\nactivity, audit trail"];
+  leg  [label="QPS / EBIX write-back\n(outbox, CSQ01)", color="@MUTED", fontcolor="@MUTED", style="rounded,dashed"];
+  los  [label="QPS / EBIX / LOS lookup\n(CSQ01, CSQ02)", color="@MUTED", fontcolor="@MUTED", style="rounded,dashed"];
+
+  crm -> csf; acc -> csf; plc -> csf; iss -> csf; led -> csf; doc -> csf;
+  csf -> upd [label="contact only"];
+  csf -> mail;
+  csf -> rpt;
+  csf -> leg [style=dashed, color="@MUTED"];
+  csf -> los [style=dashed, color="@MUTED", dir=back];
+}

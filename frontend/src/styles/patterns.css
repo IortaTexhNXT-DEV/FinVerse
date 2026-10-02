@@ -1,0 +1,1176 @@
+/* ==========================================================================
+   Shared presentation patterns (BDO_UX_GUIDELINES sections 8 and 9): tables, definition grids,
+   status panel, history table, filter bars, file drop zone, skeletons, record header and print.
+   Screens use these classes; they never restyle them locally.
+   ========================================================================== */
+
+/* ---------- Tables ---------------------------------------------------------------------- */
+/* The header row stays visible while a long list scrolls inside its card. */
+.table thead th {
+  z-index: 2;
+}
+
+/* Text kept on one line and cut with an ellipsis at the column width; the full text is in the
+   tooltip (names, record types, units). */
+.truncate {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+
+.table td.col-truncate {
+  max-width: 0;
+  white-space: nowrap;
+}
+
+.table td.col-truncate > .truncate,
+.table td.col-truncate > .user-name {
+  display: block;
+}
+
+/* User names never wrap inside a list cell. */
+.table td .user-name {
+  white-space: nowrap;
+}
+
+/* Row action menu column: as narrow as the menu button. */
+.table th.col-actions,
+.table td.col-actions {
+  width: 1%;
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* A due date or time on one line; past due in red with the warning icon (never colour alone). */
+.due-date {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.due-date.overdue {
+  color: var(--color-danger);
+  font-weight: 700;
+}
+
+.table th.num,
+.table td.num {
+  text-align: right;
+}
+
+.table th.center,
+.table td.center,
+.table th.col-status,
+.table td.col-status {
+  text-align: center;
+}
+
+/* Code and reference columns (ARN, CL, PAY… numbers): fixed width, never wrap, copy button aligned */
+.table th.col-code,
+.table td.col-code {
+  width: var(--code-col-width);
+  min-width: var(--code-col-width);
+  white-space: nowrap;
+}
+
+.table td.col-code .cell-stack > :first-child,
+.table td.col-code > a,
+.table td.col-code > code {
+  white-space: nowrap;
+}
+
+/* References in a cell (links, bold codes, chips) never wrap: PAY-2026-000010 stays on one line */
+.table td > a,
+.table td > strong,
+.table td > code,
+.table td .cell-stack > span:first-child > strong,
+.table td .ref-chip {
+  white-space: nowrap;
+}
+
+/* Labels and dispositions in cells may be longer than a status pill */
+.table td .tag {
+  max-width: 240px;
+}
+
+.table td.col-datetime,
+.table td.col-date {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Amounts never break inside the figure: 1,234,567.89 and (1,234.00) stay on one line */
+.table td.num,
+.table td .num {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Periods, coverage terms and date ranges (PeriodCell): the from date, then "to" the end date on a
+   second line; each line keeps its date whole and the column is wide enough for both. */
+.table th.col-period,
+.table td.col-period {
+  min-width: var(--period-col-width);
+  white-space: nowrap;
+}
+
+.period-cell {
+  display: inline-flex;
+  flex-direction: column;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.period-cell > .period-cell-to {
+  color: var(--color-text-muted);
+}
+
+/* Detail under a row (e.g. the GL lines of a transaction) */
+.table tbody tr.row-expanded > td {
+  background: var(--brand-blue-050);
+  padding: var(--space-3) var(--space-4) var(--space-4) var(--space-6);
+}
+
+/* Every cell: a primary value and at most one muted secondary line under it */
+.table td .cell-stack > .muted {
+  font-size: 12px;
+  line-height: 16px;
+}
+
+/* The selected row: a stronger blue than the alternate rows and the hover, with the CTA Blue bar. */
+.table tbody tr[aria-selected='true'],
+.table tbody tr.selected,
+.table tbody tr[aria-selected='true']:hover,
+.table tbody tr.selected:hover {
+  background: var(--table-row-selected);
+  box-shadow: inset 4px 0 0 var(--brand-blue);
+}
+
+.table tbody tr.clickable:focus-visible {
+  outline: 2px solid var(--brand-blue);
+  outline-offset: -2px;
+}
+
+.table tfoot td,
+.table tr.row-total td {
+  font-weight: 800;
+  border-top: 2px solid var(--brand-gold);
+  background: var(--brand-gold-050);
+}
+
+/* Sortable header: a button that fills the header cell, with the direction chevron */
+.th-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.th-sort:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.th-sort .sort-idle {
+  opacity: 0.55;
+}
+
+/* Remarks columns wrap within a readable width */
+.table td.cell-remarks {
+  min-width: 200px;
+  max-width: 360px;
+  white-space: normal;
+}
+
+/* Rows-per-page selector of the pagination bar */
+.page-size {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text-muted);
+}
+
+.page-size .select {
+  width: auto;
+  height: var(--control-height-sm);
+  padding: 0 var(--space-2);
+}
+
+/* ---------- Skeleton loading (tables, cards, panels) ------------------------------------- */
+.skeleton-line {
+  height: 12px;
+  width: 60%;
+  margin: 6px 0;
+  border-radius: 6px;
+  background: linear-gradient(
+    90deg,
+    var(--color-border) 25%,
+    var(--color-surface-alt) 50%,
+    var(--color-border) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
+.skeleton-line.wide {
+  width: 90%;
+}
+
+.table tr.skeleton-row td {
+  background: var(--color-surface);
+}
+
+@keyframes skeleton-shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-line {
+    animation: none;
+  }
+}
+
+/* ---------- Definition grid (key-value detail blocks) ------------------------------------ */
+.def-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0 var(--space-5);
+  margin: 0;
+}
+
+.def-grid.cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.def-row {
+  display: grid;
+  grid-template-columns: var(--def-label-width) minmax(0, 1fr);
+  gap: var(--space-3);
+  padding: 6px 0;
+  border-bottom: 1px solid var(--color-border);
+  align-items: baseline;
+}
+
+.def-grid.cols-2 .def-row.wide {
+  grid-column: 1 / -1;
+}
+
+.def-row dt {
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+.def-row dd {
+  margin: 0;
+  color: var(--color-heading);
+  overflow-wrap: anywhere;
+}
+
+.def-grid-empty {
+  margin: 0;
+  padding: var(--space-2) 0;
+}
+
+.link-button {
+  border: 0;
+  padding: var(--space-2) 0 0;
+  background: transparent;
+  color: var(--brand-blue);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.link-button:hover {
+  text-decoration: underline;
+}
+
+/* The existing detail lists share the definition grid look: one label width, ruled rows */
+.detail-list {
+  grid-template-columns: var(--def-label-width) minmax(0, 1fr);
+  gap: 0 var(--space-3);
+}
+
+.detail-list dt,
+.detail-list dd {
+  padding: 6px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.detail-list dt {
+  font-weight: 400;
+  font-size: 13px;
+}
+
+.detail-list dd {
+  color: var(--color-heading);
+  overflow-wrap: anywhere;
+}
+
+/* Key facts grids (four columns of label over value) */
+dl.form-grid {
+  margin: 0;
+}
+
+dl.form-grid dt {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+dl.form-grid dd {
+  margin: 0;
+  color: var(--color-heading);
+  font-weight: 600;
+}
+
+/* ---------- Page and record actions: one order everywhere -------------------------------- */
+/* Secondary actions first, then the primary action; a destructive action is separated and last. */
+.page-header .row > .btn-ghost,
+.record-header-actions > .btn-ghost {
+  order: 1;
+}
+
+.page-header .row > .btn-secondary,
+.record-header-actions > .btn-secondary {
+  order: 2;
+}
+
+.page-header .row > .btn-primary,
+.page-header .row > .btn-accent,
+.record-header-actions > .btn-primary,
+.record-header-actions > .btn-accent {
+  order: 3;
+}
+
+.page-header .row > .btn-danger,
+.record-header-actions > .btn-danger {
+  order: 4;
+  margin-left: var(--space-4);
+  position: relative;
+}
+
+.page-header .row > .btn-danger::before,
+.record-header-actions > .btn-danger::before {
+  content: '';
+  position: absolute;
+  left: calc(-1 * var(--space-3));
+  top: 8px;
+  bottom: 8px;
+  width: 1px;
+  background: var(--color-border-strong);
+}
+
+/* ---------- Workflow history ------------------------------------------------------------ */
+.history-table {
+  margin-top: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+/* ---------- Filter, parameter and search bars ------------------------------------------- */
+/*
+ * One layout for every filter bar: labels on one line, inputs of equal height on one line, and
+ * the action buttons aligned to the input line at the right end.
+ */
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-4);
+}
+
+.filter-bar > .field {
+  flex: 0 1 220px;
+}
+
+.filter-bar-actions {
+  display: flex;
+  gap: var(--space-2);
+  margin-left: auto;
+  align-items: flex-end;
+}
+
+.form-grid {
+  align-items: start;
+}
+
+/* Buttons placed as a cell of a form grid line up with the inputs */
+.form-grid > .btn,
+.form-grid > .form-grid-action {
+  align-self: end;
+}
+
+/* Action bar of a form: bottom right, primary last */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+  margin-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+/* Active filters as removable chips */
+.filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+  margin-top: var(--space-3);
+}
+
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  height: 28px;
+  padding: 0 var(--space-2) 0 var(--space-3);
+  border: 1px solid var(--brand-field-blue);
+  border-radius: 14px;
+  background: var(--brand-blue-050);
+  color: var(--brand-navy);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.filter-chip button {
+  display: inline-flex;
+  border: 0;
+  padding: 2px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  border-radius: 50%;
+}
+
+.filter-chip button:hover {
+  background: rgba(0, 78, 168, 0.12);
+}
+
+/* ---------- Date picker (dd-MMM-yyyy) --------------------------------------------------- */
+.date-input {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-width: 150px;
+}
+
+.date-input .input {
+  padding-right: 40px;
+}
+
+.date-input-button {
+  position: absolute;
+  right: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--brand-blue);
+  cursor: pointer;
+}
+
+.date-input-button:hover:not(:disabled) {
+  background: var(--brand-blue-050);
+}
+
+.date-input-button:disabled {
+  color: var(--color-placeholder);
+  cursor: default;
+}
+
+/* The native date input only hosts the calendar; it sits under the button, invisible */
+.date-input-native {
+  position: absolute;
+  right: 4px;
+  bottom: 0;
+  width: 32px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+  border: 0;
+  padding: 0;
+}
+
+/* ---------- Field label info tooltip ----------------------------------------------------- */
+.label-row {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.info-tip {
+  display: inline-flex;
+  color: var(--brand-blue);
+  cursor: help;
+  border: 0;
+  background: transparent;
+  padding: 0;
+}
+
+.field-format {
+  color: var(--color-text-muted);
+  font-size: 12px;
+}
+
+/* ---------- File drop zone --------------------------------------------------------------- */
+.dropzone {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--control-height);
+  padding: var(--space-3) var(--space-4);
+  border: 1px dashed var(--brand-field-blue);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.dropzone.dragging {
+  border-color: var(--brand-blue);
+  background: var(--brand-blue-050);
+}
+
+.dropzone.invalid {
+  border-color: var(--color-danger);
+}
+
+.dropzone.disabled {
+  background: var(--color-bg);
+  border-color: var(--color-border-strong);
+  color: var(--color-placeholder);
+}
+
+.dropzone svg {
+  color: var(--brand-blue);
+  flex: none;
+}
+
+.dropzone-text {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.dropzone-hint {
+  color: var(--color-text-muted);
+  font-size: 12px;
+}
+
+.dropzone-files {
+  list-style: none;
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.dropzone-file {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 4px var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-alt);
+  font-size: 13px;
+}
+
+.dropzone-file-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dropzone-file button {
+  display: inline-flex;
+  border: 0;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 2px;
+}
+
+.dropzone-file button:hover {
+  color: var(--color-danger);
+}
+
+.dropzone-progress {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--color-border);
+  overflow: hidden;
+  margin-top: var(--space-2);
+}
+
+.dropzone-progress > div {
+  height: 100%;
+  background: var(--brand-blue);
+  transition: width 0.2s;
+}
+
+.dropzone-progress.indeterminate > div {
+  width: 40%;
+  animation: dropzone-busy 1.2s ease-in-out infinite;
+}
+
+@keyframes dropzone-busy {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(250%);
+  }
+}
+
+/* ---------- Record header ---------------------------------------------------------------- */
+.record-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.record-header-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+}
+
+.record-header-top h2 {
+  margin: 0;
+  font-size: 22px;
+  line-height: 28px;
+}
+
+.record-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+/* The destructive action is separated from the others and placed last */
+.action-separator {
+  width: 1px;
+  align-self: stretch;
+  background: var(--color-border-strong);
+  margin: 0 var(--space-1);
+}
+
+.completeness {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.completeness-bar {
+  width: 96px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--color-border);
+  overflow: hidden;
+}
+
+.completeness-bar > div {
+  height: 100%;
+  background: var(--color-success);
+}
+
+.completeness-bar.low > div {
+  background: var(--brand-gold);
+}
+
+.labelled-status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 13px;
+}
+
+.completeness-bar > span {
+  display: block;
+  height: 100%;
+  background: var(--color-success);
+}
+
+.completeness-bar.low > span {
+  background: var(--brand-gold);
+}
+
+/* Key facts of a record header: four label-over-value columns */
+.key-facts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-3) var(--space-5);
+  margin: 0;
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+}
+
+.key-facts dt {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.key-facts dt svg {
+  color: var(--brand-blue);
+  flex: none;
+}
+
+.key-facts dd {
+  margin: 2px 0 0;
+  color: var(--color-heading);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 1100px) {
+  .key-facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Detail sections: one card grid with aligned label / value rows */
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--space-4);
+  align-items: start;
+}
+
+.header-user a {
+  display: inline-block;
+  max-width: 220px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: bottom;
+}
+
+.header-role {
+  font-size: 12px;
+  max-width: 220px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- Tabs with counts ------------------------------------------------------------- */
+.tab-count {
+  display: inline-block;
+  min-width: 22px;
+  height: 20px;
+  margin-left: var(--space-2);
+  padding: 0 6px;
+  border-radius: 10px;
+  background: var(--brand-blue-050);
+  color: var(--brand-navy);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 20px;
+  text-align: center;
+}
+
+.tab[aria-selected='true'] .tab-count {
+  background: var(--brand-blue);
+  color: #fff;
+}
+
+/* A short note at the top of a flush card */
+.card-note {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  font-size: 13px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* ---------- Report catalogue cards ------------------------------------------------------- */
+.report-card .report-code {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--brand-navy);
+  margin: 2px 0;
+}
+
+/* ---------- Error notice retry ----------------------------------------------------------- */
+.alert .btn {
+  margin-top: var(--space-2);
+}
+.report-card .report-desc {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ---------- Page subtitle: one short business line --------------------------------------- */
+.page-header p {
+  max-width: 880px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- 403 / 404 pages ------------------------------------------------------------ */
+.status-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  max-width: 560px;
+  margin: var(--space-6) auto;
+  padding: var(--space-6);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-top: 4px solid var(--brand-gold);
+  border-radius: var(--radius-md);
+  text-align: center;
+}
+
+.status-page svg {
+  color: var(--brand-blue);
+}
+
+.status-page h1 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.status-page p {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+/* Active search and filters of a work list toolbar, on their own line */
+.worklist-toolbar .filter-chips {
+  flex-basis: 100%;
+  margin-top: 0;
+}
+
+.link-button.inline {
+  padding: 0;
+  font-size: inherit;
+}
+
+.confirm-record {
+  margin: 0;
+  color: var(--color-heading);
+}
+
+.upload-rule {
+  margin: 0;
+  font-size: 13px;
+}
+
+.dropzone-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+/* A drop zone takes two columns of a form grid */
+.form-grid > .field:has(.dropzone) {
+  grid-column: span 2;
+}
+
+/* ---------- Print: the print layout of the theme pack -------------------------------------------------- */
+@media print {
+  @page {
+    size: A4 landscape;
+    margin: 12mm;
+  }
+
+  body {
+    background: #fff;
+    font-size: 11px;
+  }
+
+  .app-sidebar,
+  .app-header,
+  .page-back,
+  .page-header .row,
+  .record-header-actions,
+  .workflow-actions,
+  .worklist-toolbar,
+  .pagination,
+  .toast-region,
+  .btn,
+  .ref-chip-copy,
+  .filter-chips,
+  .no-print {
+    display: none !important;
+  }
+
+  .app-shell,
+  .app-main {
+    display: block;
+    padding: 0;
+    margin: 0;
+  }
+
+  .card,
+  .workflow-panel {
+    box-shadow: none;
+    border: 1px solid var(--color-border-strong);
+    break-inside: avoid;
+  }
+
+  .table-wrap {
+    max-height: none;
+    overflow: visible;
+  }
+
+  .table th {
+    position: static;
+    background: var(--brand-navy) !important;
+    color: #fff !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .table tbody tr:nth-child(even) {
+    background: var(--table-row-alt) !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .page-header::before {
+    content: var(--print-title);
+    display: block;
+    color: var(--brand-navy);
+    font-weight: 800;
+    border-bottom: 3px solid var(--brand-gold);
+    padding-bottom: 4px;
+    margin-bottom: 8px;
+    width: 100%;
+  }
+
+  .tabs {
+    display: none;
+  }
+}
+
+/* A KPI value that opens its list: same size and colour as the other tiles' values */
+.kpi-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.kpi-link:hover,
+.kpi-link:focus-visible {
+  text-decoration: underline;
+}
+
+/* ---------- Policy transactions (history of a policy with its GL journals) ------------------ */
+.policy-txn-journals > section + section {
+  margin-top: var(--space-3);
+}
+
+.policy-txn-journal-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
+}
+
+/* ---------- Tree table (TreeTable) --------------------------------------------------------- */
+/* Hierarchies (sales organisation): chevron and one indentation step per level in the first column. */
+.tree-table tbody tr:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--brand-blue);
+}
+
+.tree-table .tree-cell-body {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.tree-table .tree-toggle,
+.tree-table .tree-toggle-spacer {
+  flex: 0 0 24px;
+  width: 24px;
+  height: 24px;
+}
+
+.tree-table .tree-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--brand-blue);
+  cursor: pointer;
+}
+
+.tree-table .tree-toggle:hover {
+  background: var(--brand-blue-050);
+}
+
+.tree-table .tree-cell-content {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.tree-table .tree-cell-content > svg {
+  flex: 0 0 auto;
+  color: var(--brand-blue);
+}
+
+.tree-table .tree-code {
+  font-weight: 700;
+  color: var(--color-heading);
+  white-space: nowrap;
+}
+
+/* Inactive records stay listed (Show Inactive) in muted text next to their grey pill. */
+.tree-table tr.row-inactive td:not(.col-status) {
+  color: var(--color-placeholder);
+}
+
+.tree-table tr.row-inactive .tree-code {
+  color: var(--color-placeholder);
+}
+
+.tree-summary {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+/* ---------- Row action menu (RowActionMenu) ------------------------------------------------ */
+.row-menu-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--brand-blue);
+  cursor: pointer;
+}
+
+.row-menu-button:hover,
+.row-menu-button[aria-expanded='true'] {
+  border-color: var(--brand-field-blue);
+  background: var(--color-surface);
+}
+
+.row-menu {
+  position: fixed;
+  z-index: 60;
+  min-width: 200px;
+  padding: var(--space-1) 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-md);
+}
+
+.row-menu-item {
+  display: block;
+  width: 100%;
+  padding: var(--space-2) var(--space-4);
+  border: none;
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.row-menu-item:hover:not(:disabled),
+.row-menu-item:focus-visible {
+  outline: none;
+  background: var(--brand-blue-050);
+  color: var(--brand-navy);
+}
+
+.row-menu-item.danger {
+  color: var(--color-danger);
+}
+
+.row-menu-item.separated {
+  border-top: 1px solid var(--color-border);
+}
+
+.row-menu-item:disabled {
+  color: var(--color-placeholder);
+  cursor: not-allowed;
+}
+
+@media print {
+  .row-menu-button,
+  .tree-table .tree-toggle {
+    display: none;
+  }
+}
+
+/* ---------- Parameter / value rows inside a form (IncentiveParamsTable) -------------------- */
+.param-rows {
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.param-rows > legend {
+  padding: 0;
+  margin-bottom: var(--space-1);
+  font-size: 14px;
+  color: var(--color-heading);
+}
+
+.param-rows .table td {
+  vertical-align: top;
+}
+
+/* The reason next to a disabled button: what is still needed */
+.missing-inputs {
+  font-size: 13px;
+  margin-right: auto;
+}

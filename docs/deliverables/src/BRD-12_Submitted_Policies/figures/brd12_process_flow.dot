@@ -1,0 +1,54 @@
+// BRD-12 Submitted Policies: process by actor (FRS section 2.2; BRD p.6-7, BRIDSP-01-33).
+// Layout: four rows of three steps; the fill colour of a step is its actor (legend at the bottom).
+digraph sp_process {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.45, ranksep=0.5, bgcolor="white", pad=0.15, newrank=true];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.2, fontname="Arial",
+         fontsize=13, fontcolor="@NEAR_BLACK", width=2.6, height=0.9, margin="0.12,0.06"];
+  edge  [color="@HEADER_BLUE", arrowsize=0.8, penwidth=1.2, fontname="Arial", fontsize=11, fontcolor="@MUTED"];
+
+  // Actors: System = @DIRTY_WHITE, Marketing / handlers = @BG_BLUE, TSU / approvers = @WHITE, Renewal / client = @AMBER_BG
+  s1  [label=<<b>1. Intake</b><br/><font point-size="11">LFS, HLS, CIU, SPI, LAMD, manual,<br/>migration; BRIDSP-01, 03, 33</font>>, fillcolor="@DIRTY_WHITE"];
+  s2  [label=<<b>2. Extraction, confirmation</b><br/><font point-size="11">Document fields confirmed<br/>BRIDSP-02</font>>, fillcolor="@BG_BLUE"];
+  s3  [label=<<b>3. Submitted Masterlist</b><br/><font point-size="11">One record per policy; history<br/>BRIDSP-04, 28, 29</font>>, fillcolor="@DIRTY_WHITE"];
+  s4  [label=<<b>4. Processing run</b><br/><font point-size="11">Sanitation, matching vs LAMD<br/>BRIDSP-08, 09</font>>, fillcolor="@DIRTY_WHITE"];
+  s5  [label=<<b>5. Classification, buckets</b><br/><font point-size="11">Inforced / Submitted; buckets<br/>BRIDSP-11-15</font>>, fillcolor="@DIRTY_WHITE"];
+  s6  [label=<<b>6. Fallout</b><br/><font point-size="11">Exceptions with reason codes<br/>BRIDSP-10</font>>, fillcolor="@BG_BLUE"];
+  s7  [label=<<b>7. Policy review, IAAF</b><br/><font point-size="11">Reviewer; approval matrix<br/>BRIDSP-05-07</font>>, fillcolor="@WHITE"];
+  s8  [label=<<b>8. Limits, TOR</b><br/><font point-size="11">TSU approval; hand-over to AO<br/>BRIDSP-16-19</font>>, fillcolor="@WHITE"];
+  s9  [label=<<b>9. Expiry scan, hand-off</b><br/><font point-size="11">Lead days; insurer assigned<br/>BRIDSP-23, 25</font>>, fillcolor="@DIRTY_WHITE"];
+  s10 [label=<<b>10. Renewal (BRD-6)</b><br/><font point-size="11">Account, hold cover, RA, letters<br/>BRIDSP-22, 26, 32</font>>, fillcolor="@AMBER_BG"];
+  s11 [label=<<b>11. Placement, booking</b><br/><font point-size="11">BRD-1; masterlist BOOKED<br/>BRIDSP-26, 27</font>>, fillcolor="@AMBER_BG"];
+  s12 [label=<<b>12. Monitoring</b><br/><font point-size="11">Reports, alerts, notifications<br/>BRIDSP-20, 21, 24, 30</font>>, fillcolor="@BG_BLUE"];
+  hf  [label=<<b>Handling fee</b><br/><font point-size="11">UPP payments tagged by PN / location ref<br/>BRIDSP-31</font>>, fillcolor="@DIRTY_WHITE", color="@MUTED", style="rounded,dashed,filled"];
+
+  { rank=same; s1; s2; s3; }
+  { rank=same; s4; s5; s6; }
+  { rank=same; s7; s8; s9; }
+  { rank=same; s10; s11; s12; }
+  s1 -> s4 -> s7 -> s10 [style=invis, weight=10];
+  s2 -> s5 -> s8 -> s11 [style=invis, weight=10];
+  s3 -> s6 -> s9 -> s12 [style=invis, weight=10];
+
+  s1 -> s2 -> s3;
+  s3 -> s4 [constraint=false];
+  s4 -> s5 -> s6;
+  s5 -> s7 [constraint=false, style=dashed, color="@MUTED", label=" Non-CBG Corporate,\n CBG Fire"];
+  s7 -> s8 [style=dashed, color="@MUTED"];
+  s8 -> s9;
+  s9 -> s10 [constraint=false];
+  s10 -> s11 -> s12;
+
+  legend [shape=plaintext, style="", label=<
+    <table border="0" cellborder="1" cellspacing="4" cellpadding="4">
+      <tr>
+        <td border="0"><font point-size="11" color="@MUTED">Actor:</font></td>
+        <td bgcolor="@DIRTY_WHITE" color="@HEADER_BLUE"><font point-size="11">System</font></td>
+        <td bgcolor="@BG_BLUE" color="@HEADER_BLUE"><font point-size="11">Marketing / handlers</font></td>
+        <td bgcolor="@WHITE" color="@HEADER_BLUE"><font point-size="11">Reviewer / TSU</font></td>
+        <td bgcolor="@AMBER_BG" color="@HEADER_BLUE"><font point-size="11">Renewal and BRD-1</font></td>
+      </tr>
+    </table>>];
+  { rank=same; hf; legend; }
+  s10 -> hf [style=invis];
+  s11 -> legend [style=invis];
+}

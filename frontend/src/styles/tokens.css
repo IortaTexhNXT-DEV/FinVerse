@@ -1,0 +1,83 @@
+/*
+ * iNXT BrokerVerse design tokens. Components use the tokens only. The brand colours, fonts and
+ * print title below are the neutral platform defaults; the theme pack of the deployment
+ * (src/theme/packs/<pack>/tokens.css, loaded after this file) sets the client's.
+ */
+:root {
+  /* Brand colours (platform defaults; the theme pack sets the client's) */
+  --brand-navy: #1f3a5f; /* headers, table heads, section bars */
+  --brand-blue: #2f6db5; /* primary buttons, links, active items */
+  --brand-blue-600: #255a96; /* hover / pressed */
+  --brand-blue-050: #eef3f9; /* highlights, alternate rows */
+  --brand-field-blue: #a9bdd4; /* input borders */
+  --brand-gold: #d9a441; /* accents and breakers, used sparingly */
+  --brand-gold-600: #b8862c;
+  --brand-gold-050: #fbf3e2;
+
+  /* Neutrals (never pure black) */
+  --color-bg: #f6f6f6; /* Dirty White */
+  --color-surface: #ffffff;
+  --color-surface-alt: #f6f6f6;
+  --color-heading: #2e2e2e; /* Near Black */
+  --color-text: #4b4b4b; /* Dark Grey */
+  --color-text-muted: #656565; /* Base Grey */
+  --color-placeholder: #919191; /* Medium Grey: placeholder, disabled text */
+  --color-border: #e4e4e4; /* Dark Grey (elements): dividers, borders */
+  --color-border-strong: #c2c2c1; /* Light Grey: separators, disabled fills */
+
+  --color-success: #1d7f4e;
+  --color-success-bg: #e6f5ec;
+  --color-danger: #d32f2f;
+  --color-danger-bg: #fdecea;
+  --color-warning: #8a5a00;
+  --color-warning-bg: #fff4d6;
+  --color-warning-accent: #e0a100; /* amber accent bar and icon of warnings */
+  --color-info: #2f6db5;
+  --color-info-bg: #eef3f9;
+
+  /* Typography (platform default; the theme pack sets the client's fonts) */
+  --font-heading: system-ui, Arial, sans-serif;
+  --font-body: system-ui, Arial, sans-serif;
+  --font-mono: ui-monospace, 'SFMono-Regular', Consolas, monospace;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --shadow-sm: 0 1px 3px rgba(46, 46, 46, 0.06);
+  --shadow-md: 0 4px 16px rgba(46, 46, 46, 0.08);
+  --shadow-lg: 0 12px 32px rgba(46, 46, 46, 0.16);
+
+  /* 8px baseline grid */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  --control-height: 44px;
+  --control-height-sm: 32px;
+  --header-height: 72px;
+  --sidebar-width: 272px;
+  /* Status pills and flag chips: one size everywhere */
+  --badge-min-width: 112px;
+  --badge-max-width: 184px;
+  --tag-min-width: 88px;
+  /* Fixed width of code and reference columns (ARN, CL, PAY… numbers) */
+  --code-col-width: 168px;
+  /* Period column: "to 20-Oct-2027" on one line (PeriodCell) */
+  --period-col-width: 132px;
+  /* Tables (BDO style guide): one text size, alternating white / Background Blue rows, a subtle
+     hover and a selected row in a stronger blue with the CTA Blue bar */
+  --table-font-size: 14px;
+  --table-row-alt: var(--brand-blue-050);
+  --table-row-hover: color-mix(in srgb, var(--brand-blue) 9%, var(--color-surface));
+  --table-row-selected: color-mix(in srgb, var(--brand-blue) 20%, var(--color-surface));
+  /* Least height of a list that scrolls inside its card */
+  --table-min-height: 240px;
+  /* Label column of definition grids */
+  --def-label-width: 168px;
+  --focus-ring: 0 0 0 3px rgba(47, 109, 181, 0.35);
+  /* Title printed above every page (the theme pack sets the product name) */
+  --print-title: 'iNXT BrokerVerse';
+}

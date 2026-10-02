@@ -1,0 +1,39 @@
+# Voluntary disruptions (node drains, cluster upgrades) keep the user-facing workloads serving.
+# unhealthyPodEvictionPolicy AlwaysAllow: a pod that is not ready (crash loop) never blocks a drain.
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: bibs-web
+spec:
+  unhealthyPodEvictionPolicy: AlwaysAllow
+  minAvailable: 1
+  selector: { matchLabels: { app.kubernetes.io/name: bibs-web } }
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: bibs-frontend
+spec:
+  unhealthyPodEvictionPolicy: AlwaysAllow
+  minAvailable: 1
+  selector: { matchLabels: { app.kubernetes.io/name: bibs-frontend } }
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: bibs-integration
+spec:
+  unhealthyPodEvictionPolicy: AlwaysAllow
+  minAvailable: 1
+  selector: { matchLabels: { app.kubernetes.io/name: bibs-integration } }
+---
+# One jobs pod may always be evicted (a single replica must not block a drain); a job interrupted
+# by the eviction runs again on its next schedule or from the job monitor.
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: bibs-jobs
+spec:
+  unhealthyPodEvictionPolicy: AlwaysAllow
+  maxUnavailable: 1
+  selector: { matchLabels: { app.kubernetes.io/name: bibs-jobs } }

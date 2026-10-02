@@ -1,0 +1,71 @@
+# Legacy history: the archive and its access log (Handbook Part B).
+area: Legacy Inquiry
+screens:
+  - id: SCR-DM-14
+    title: Legacy Inquiry
+    route: /legacy-inquiry
+    purpose: >-
+      The read-only archive of the legacy systems for Audit and Compliance: closed clients, policies, invoices,
+      receipts, remittances, endorsements, claims, GL journals, renewal advices and letters with their documents. The
+      user gives the reason of the inquiry once per session; each search, view, download and export is logged with
+      it. A record opens read-only with all its legacy columns and documents.
+    entry: ["Sidebar › Data Migration › Legacy Inquiry"]
+    shots:
+      - {state: reason, user: legacyaudit, caption: Reason of the Inquiry asked once per session}
+      - {state: results, user: legacyaudit, open: inquiry_results, caption: Search criteria and the legacy records found}
+      - {state: record, user: legacyaudit, open: inquiry_record, caption: A legacy record with its legacy details and documents}
+    fields:
+      - "Reason of the Inquiry | Reason | Drop-down | Reasons of the list | Y | Access reasons | - | - | - | Give the reason for opening the legacy archive"
+      - "Reason of the Inquiry | Details | Text | Audit reference, request or case; up to 500 characters | C | - | - | - | Mandatory for the reason Other | -"
+      - "Search | Client Name or No., Policy / Cover No., Invoice No., Receipt No., Claim No. | Text | - | C | - | - | - | At least one criterion | Give a client, policy, invoice, receipt or claim, a record type or a date range"
+      - "Search | Record Type | Drop-down | All, client, policy, invoice, receipt, remittance, endorsement, claim, GL journal, renewal advice, letter, other | N | - | All | - | - | -"
+      - "Search | Date From, Date To | Date | dd-MMM-yyyy | N | - | - | - | Valid dates | Give the date as yyyy-MM-dd: <value>"
+      - "Legacy Records | Record | Column | Legacy key; source system and record type under it | - | Archive | - | - | - | -"
+      - "Legacy Records | Client | Column | Name; legacy client number under it | - | Archive | - | - | - | -"
+      - "Legacy Records | Policy / Invoice / Receipt | Column | Policy; invoice, receipt and claim under it | - | Archive | - | - | - | -"
+      - "Legacy Records | Date, Amount, Legacy Status, Documents | Column | dd-MMM-yyyy; currency and amount; status; count | - | Archive | - | - | - | -"
+      - "Record | Legacy system, Client, Policy / cover, Invoice, Receipt, Claim | Text | - | - | Archive record | - | - | - | -"
+      - "Record | Date, Period, Amount, Legacy status, Archived | Text | dd-MMM-yyyy; amounts with two decimals | - | Archive record | - | - | - | -"
+      - "Record | Legacy details | Text | Every legacy column with its label | - | Archive record | - | - | - | -"
+      - "Record | File, Document, Size | Columns | Documents archived with the record | - | Archive documents | - | - | - | -"
+    actions:
+      - "Continue | Audit / Compliance user | A reason is chosen (and details for Other) | Keeps the reason for the session and opens the search | - | -"
+      - "Search | Audit / Compliance user | At least one criterion | Lists the matching records; the search is logged | - | -"
+      - "Export | Audit / Compliance user with the export right | Records found | Exports the records to Excel, up to 1,000 at a time; the export is logged | - | Alert Unusual access when a user exports more than 5,000 records in a day"
+      - "[Download a document] | Audit / Compliance user | Record open | Downloads the document; the download is logged | - | -"
+      - "Close | Audit / Compliance user | Record open | Closes the record | - | -"
+    rules:
+      - "The legacy archive is read-only; no record or document is changed (FR-DM-110)."
+      - "A reason is required before the archive is searched and is written with every search, view, download and export (FR-DM-110)."
+      - "An export is limited to 1,000 records; a narrower search is asked for above it (FR-DM-110)."
+      - "The addresses of the read-only legacy applications are shown to the users who still need them until each system is decommissioned (FR-DM-110)."
+    outcome: Legacy history stays retrievable with its documents, and every access is logged with its reason.
+    frs: [FR-DM-110]
+    tests: [INQUIRY]
+
+  - id: SCR-DM-15
+    title: Access Log
+    route: /legacy-inquiry/access-log
+    purpose: >-
+      Every access to the legacy archive with the user, the time and address, the action, the criteria, the records
+      and the reason, for the Compliance reviewer. The log cannot be changed or deleted; a monthly digest is sent to
+      the reviewers.
+    entry: ["Sidebar › Data Migration › Access Log"]
+    shots:
+      - {state: log, user: legacyrev, caption: Access Log with its filters}
+    fields:
+      - "Filters | User | Text | User name | N | - | - | - | - | -"
+      - "Filters | Action | Drop-down | All, Search, View, Download, Export | N | - | All | - | - | -"
+      - "Filters | From, To | Date | dd-MMM-yyyy | N | - | - | - | - | -"
+      - "Log | When | Column | dd-MMM-yyyy HH:mm; source address under it | - | Access log | - | - | - | -"
+      - "Log | User, Action | Column | Name; Search, View, Download or Export | - | Access log | - | - | - | -"
+      - "Log | Criteria / Records | Column | Search criteria; record keys under them | - | Access log | - | - | - | -"
+      - "Log | Count, Reason | Column | Records returned; reason and details | - | Access log | - | - | - | -"
+    actions:
+      - "[Filters] | Compliance reviewer | Always | Narrows the log | - | -"
+    rules:
+      - "No entry of the access log can be changed or deleted (FR-DM-111)."
+      - "The reviewers receive a monthly digest of the log (FR-DM-111)."
+    outcome: Compliance sees who looked at which legacy records, when and why.
+    frs: [FR-DM-111]
+    tests: [ACCLOG]

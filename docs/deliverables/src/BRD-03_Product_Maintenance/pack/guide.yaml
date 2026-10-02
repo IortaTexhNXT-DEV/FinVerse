@@ -1,0 +1,171 @@
+# Guide to the BRD-3 Product Maintenance business sign-off pack: the content of the Sign-off Pack Guide deck
+# (generic guide deck builder) and of the Start Here guide (START_HERE_BRD03.md, ```pack blocks "guide-*").
+# The same layout is used for every BRD set; only this file changes.
+meta:
+  deck_title: Sign-off Pack Guide
+  module: Product Maintenance
+  owner: Product Owner, Marketing Business System (MBS)
+  issued: Mon 2-Nov-2026
+  signoff_date: Mon 30-Nov-2026
+
+# The documents of the set in reading order. kind = doc type of the file name (brand.READING_ORDER).
+documents:
+  - {kind: StartHere, name: Product Maintenance, ext: docx, what: "Start Here: the map of the pack, who reads what, the steps and the dates", readers: Everyone, when: "First, on issue"}
+  - {kind: GuideDeck, name: Product Maintenance, ext: pptx, what: "Sign-off Pack Guide: purpose, approach, the module at a glance, caveats, entry and exit criteria, change control", readers: "Business owner, unit heads; presented at the kick-off", when: "Kick-off session"}
+  - {kind: FRS, name: Product Maintenance, ext: docx, what: "Functional Requirements Specification v2.0: requirements, navigation, 22 screen specifications with screenshots, walkthroughs, messages, notifications, documents, uploads, configuration inputs, cross-BRD contract", readers: "MBS, TSU and Marketing for their screens; Finance and BDOI IT for their chapters", when: "During the review, with the SIT walkthroughs"}
+  - {kind: Signoff, name: Product Maintenance, ext: xlsx, what: "Sign-off workbook: one row per screen, field, rule and message with the BU review columns; comments log, meeting minutes, version history, sign-off certificate", readers: "Every reviewer; the business owner signs it", when: "During the review and at sign-off"}
+  - {kind: TestPlan, name: Product Maintenance, ext: xlsx, what: "Test plan workbook: the test cases traced to the FRs and to the screens, including one screen case and one message case per screen", readers: "Business users who will run UAT; BDOI IT", when: "After the screens; used again in SIT and UAT"}
+  - {kind: TestPlan, name: Product Maintenance Summary, ext: docx, what: "Test plan summary: scope, approach, coverage and the cases by area", readers: "Business owner, BDOI IT", when: "Before sign-off"}
+  - {kind: Templates, name: Configuration Inputs, ext: xlsx, what: "Configuration input templates: product catalogue, coverages and rules, clauses, rate tables, insurers, packages in force, package map, document templates, lists of values, incentive criteria", readers: "MBS, TSU, Operations, Comptrollership (who provide the content)", when: "During the review; filled in for the data migration mocks and the map freeze"}
+  - {kind: UXDeck, name: Product Maintenance, ext: pptx, what: "UX Screen Deck for the BDOI UX Design team: design foundation, navigation and personas, every flow step by step and every screen with all its states", readers: "BDOI UX Design team", when: "From the issue, in parallel with the review; re-issued with each version of the set"}
+  - {kind: UXScreens, name: Product Maintenance, ext: xlsx, what: "UX screen register: one row per screen image with the screen, personas, flow and step, state, FRS section and requirements, UXD status and comments, and the Changed in this issue flag", readers: "BDOI UX Design team", when: "Kept by the UX Design team; the changed rows are flagged at each issue"}
+  - {kind: UXScreens, name: Product Maintenance, ext: zip, what: "Image package: every screen image at twice the screen resolution (PNG), the component crops and the register as CSV", readers: "BDOI UX Design team", when: "Imported into the design tool at each issue"}
+
+# Reading order per role (FRS chapter numbers of v2.0).
+reading:
+  - role: Business owner (Product Owner, Marketing Business System)
+    order: "00 Start Here; 01 Guide deck; FRS chapters 1-3 (context and personas), 22 (proposed rules for confirmation), 14 (walkthroughs), 19 (configuration inputs) and 21 (sign-off); workbook Sign-off certificate"
+  - role: MBS (set-up, versions, masters, incentive criteria)
+    order: "FRS chapter 12 (navigation); chapter 13 screens SCR-PM-08 and SCR-PM-11 to SCR-PM-20; walkthrough A steps 1-2 and 15-19; chapter 19 templates CI-01 to CI-06, CI-09 and CI-10; workbook Screen catalogue, Field register, Business rules and Messages of those screens"
+  - role: TSU (requests, negotiation, requirements, advisories, expiry)
+    order: "FRS chapter 13 screens SCR-PM-01 to SCR-PM-10; walkthroughs A (steps 5-14 and 20) and B; chapter 17 (documents); chapter 19 template CI-07 (package map); workbook rows of those screens"
+  - role: Marketing (requests, approval, client-specific terms, pricing)
+    order: "FRS chapter 13 screens SCR-PM-02 to SCR-PM-04, SCR-PM-21 and SCR-PM-22; walkthrough A steps 3-4 and 21-24; chapter 20 lines IC-01 to IC-03"
+  - role: Finance (Comptrollership)
+    order: "Rates & Taxes (SCR-PM-19), Insurer record commission rates (SCR-PM-18), Incentive Criteria (SCR-PM-16); contract lines IC-10 and IC-11 (chapter 20); templates CI-04 and CI-10"
+  - role: BDOI IT
+    order: "Interfaces and integration (chapter 7), non-functional requirements (chapter 8), menu by persona (chapter 12), cross-BRD contract (chapter 20); product master feed pending specifications (Guide deck, caveats)"
+  - role: BDOI UX Design team
+    order: "07 UX Screen Deck: design foundation and navigation first, then the personas, flows and screens of the design work; 08 UX screen register (filter Changed in this issue at each new issue); 09 image package in the design tool"
+  - role: iorta TechNXT project team
+    order: "All documents; keeps the comments log, the meeting minutes and the version history of the workbook, answers every comment and keeps the traceability to SIT and UAT"
+
+# Approach and step-by-step flow up to closure. raci: R responsible, A accountable, C consulted, I informed.
+steps:
+  - step: 1
+    name: Pack issued
+    who: "R: iorta TechNXT Project Manager; A: iorta TechNXT delivery lead; I: all reviewers"
+    inputs: "FRS v2.0, workbook, test plan, configuration input templates, guide and deck"
+    outputs: "Release set v2.0 in the BRD-03 folder of Drop 0; invitations to the sessions"
+    duration: "Day 0 (Mon 2-Nov-2026)"
+  - step: 2
+    name: Kick-off and screen walkthrough on SIT
+    who: "R: iorta TechNXT Business Analysis; A: BDOI Product Owner; C: MBS, TSU and Marketing heads; I: BDOI IT"
+    inputs: "Guide deck; SIT users with seed data; walkthroughs A and B"
+    outputs: "Screens shown live; first questions logged in the comments log; minutes"
+    duration: "3 sessions, 4 to 6-Nov-2026"
+  - step: 3
+    name: Review with the workbook; configuration inputs started
+    who: "R: business users of MBS, TSU and Marketing; A: unit heads; C: iorta TechNXT (questions)"
+    inputs: "FRS chapters of the area; workbook sheets with the BU review columns; the configuration input templates"
+    outputs: "Every row marked Accept, Change requested or Comment; comments log entries; first drafts of the templates"
+    duration: "8 working days after the walkthroughs, until Wed 18-Nov-2026"
+  - step: 4
+    name: Comments consolidated and a Q&A session
+    who: "R: iorta TechNXT Project Manager and Business Analysis; A: BDOI Product Owner; C: reviewers"
+    inputs: "Returned workbooks"
+    outputs: "One consolidated comments log, each item typed (clarification, correction, change request) and answered; Q&A minutes"
+    duration: "3 working days, Q&A on Mon 23-Nov-2026"
+  - step: 5
+    name: One revision cycle (v2.1)
+    who: "R: iorta TechNXT Business Analysis; A: iorta TechNXT delivery lead; C: reviewers who raised the items"
+    inputs: "Agreed clarifications and corrections"
+    outputs: "Release set v2.1 with the changed rows marked; change requests raised for the rest"
+    duration: "v2.1 on Wed 25-Nov-2026; check by the reviewers until Fri 27-Nov-2026"
+  - step: 6
+    name: Sign-off meeting and signature
+    who: "R: iorta TechNXT Project Manager; A: BDOI Product Owner; C: MBS, TSU, Marketing, Finance, BDOI IT"
+    inputs: "v2.1 (or v2.0 when no revision is needed); open items with their decision"
+    outputs: "Signed sign-off certificate; minutes; open items accepted as assumptions or change requests"
+    duration: "Mon 30-Nov-2026"
+  - step: 7
+    name: Content freeze; configuration and migration inputs
+    who: "R: iorta TechNXT delivery lead; A: BDOI Product Owner; I: BDOI IT, other BRD owners, Data Migration working group"
+    inputs: "Signed set; change requests with mandays; filled configuration input templates"
+    outputs: "Content frozen as signed; approved deltas scheduled in the Change Management Register; templates handed to the data migration mocks"
+    duration: "From Tue 1-Dec-2026; templates final at the map freeze"
+  - step: 8
+    name: Traceability into SIT and UAT
+    who: "R: iorta TechNXT test lead; A: BDOI Product Owner; C: business users"
+    inputs: "Signed FRS rows and test plan"
+    outputs: "SIT and UAT runs traced to the signed screens, rules and messages; results against each row"
+    duration: "SIT Apr - Jul 2027; UAT Aug - Oct 2027"
+
+# The module at a glance: key screenshots (file names in the screenshot folder of the pack).
+key_screens:
+  - {image: scr-pm-01-01-view, caption: "Product Maintenance Home"}
+  - {image: scr-pm-05-01-tab, caption: "Negotiation with the insurers, round by round"}
+  - {image: scr-pm-13-01-draft, caption: "Package version: rate scheme, coverages, panel insurers"}
+  - {image: wt-a-21, caption: "New business priced on the released version"}
+
+# Key business rules and validations (highlights; the full list is in the workbook and FRS chapter 13).
+rules:
+  - "A package request is approved by Marketing, recommended by the TSU Team Lead and approved by the TSU Head, never by its maker, and the TSU Head never approves his own recommendation."
+  - "A quotation slip is approved by a TSU Team Lead or a co-officer, never its preparer, and goes to each insurer by protected e-mail."
+  - "Terms are final only when every insurer of the latest round has an outcome; co-insurance shares total 100."
+  - "ManCom signs off a complete requirements pack with the signed package slip; the slips then lock."
+  - "A package version is validated by the TSU Head or the Business Administrator, never its maker or submitter, with a five-point checklist and a test premium."
+  - "New business is priced on the version in force on the transaction date; a different rate needs an approved rate exception."
+  - "Every product master is maker-checker and never deleted; expired and retired packages stay readable."
+  - "An advisory is sent only with the signed package slip and the ManCom sign-off attached."
+
+# Caveats and possibilities, and how each is handled.
+caveats:
+  - topic: Additional requirements
+    text: "New needs can surface during the review, SIT or UAT."
+    handling: "In-scope clarification when the signed text already covers it; otherwise a change request with mandays."
+    example: "A reviewer asks for a two-level ManCom approval: a new stage, so a change request; asking which documents the advisory checks is a clarification."
+  - topic: Other BRDs change Product Maintenance
+    text: "New Business, Renewal, Employee Benefits, Submitted Policies, Operations, Accounting and Data Migration read the products and package versions."
+    handling: "The change is raised against the other BRD and assessed against the cross-BRD contract; when it touches this set, a delta sign-off of the affected pages only."
+    example: "Renewal asks to renew accounts of an expired package on a new version: the rating purpose changes; the version pages are re-issued and signed as a delta."
+  - topic: Items that belong to other sets
+    text: "The package map (data migration object R06) and the Renewal sanitation check PACKAGE_REMAP belong to the Data Migration and Renewal sets."
+    handling: "Product Maintenance provides the package versions the map names; the map is signed with the Data Migration and Renewal sets."
+    example: "The template CI-07 of this set is the layout TSU prepares; it is loaded with the data migration."
+  - topic: Integrations pending BDOI IT specifications
+    text: "The product master feed to other BDOI systems waits for their specification (PQ16)."
+    handling: "BIBS records each change for the transfer; the transfer is a change request once the specification arrives."
+    example: "When BDOI names the receiving system, each released version is sent to it; the screens do not change."
+  - topic: Open questions and assumptions
+    text: "Open questions of FRS section 10.3 (product matrix, approval chain, ManCom quorum, validator role, CPC2) follow the assumptions of section 10.1; chapter 22 lists the proposed rules for confirmation."
+    handling: "Answered as configuration where possible (lists, parameters, templates, the product matrix itself); otherwise a change request; the assumption stands until then."
+    example: "The service level hours of each stage are parameters: a changed answer to PQ08 is a configuration change, not a change request."
+
+# Entry and exit criteria of the sign-off, and the definition of done.
+entry:
+  - "Every screenshot of the set is taken on the SIT environment with seed data."
+  - "Reviewers have their SIT users and the walkthrough sessions are held."
+  - "The test plan is traced to the FRS and to the screens."
+exit:
+  - "Every row of the workbook reviewed by its unit (Accept, Change requested or Comment)."
+  - "Every comments log item closed: answered, corrected in v2.1, or raised as a change request."
+  - "Open questions closed or accepted as assumptions."
+  - "The sign-off certificate signed by every signatory of the Who signs what matrix: prepared, input, reviewed and approved as on the BRD approval sheet; the Product Owner approves the whole set."
+done:
+  - "Signed certificate filed with the set; version history updated."
+  - "Content frozen as signed; deltas listed in the Change Management Register with mandays."
+  - "Configuration input templates owned and scheduled for the data migration mocks."
+  - "Test plan agreed for SIT and UAT."
+
+# Handover to development / build readiness checklist.
+handover:
+  - "Signed FRS, sign-off workbook and screens"
+  - "Open questions closed or accepted as assumptions"
+  - "Configuration inputs from the business: product catalogue, coverages and rules, clauses, rate tables, insurers, packages in force, package map, document templates, lists of values, incentive criteria"
+  - "Agreed test plan"
+  - "Migration mapping of the product objects (R01, R03-R07) signed with BRD-13"
+handover_note: "After sign-off the content is frozen as signed, the approved deltas are scheduled and the configuration inputs are loaded."
+
+# Governance and contacts.
+governance:
+  - {role: "Business owner and approver", who: "Product Owner, Marketing Business System", does: "Accountable for the sign-off; chairs the sign-off meeting"}
+  - {role: "Input provider and reviewer", who: "Marketing Business System (MBS)", does: "Coordinates the MBS review and the configuration inputs; signs for the business input and its review (BRD approval sheet)"}
+  - {role: "Reviewers", who: "TSU, Marketing, MBS", does: "Review their screens and rows; raise comments; provide the templates they own"}
+  - {role: "Finance and BDOI IT", who: "Comptrollership, BDOI IT", does: "Comptrollership approves rates, commission and incentives; BDOI IT reviews interfaces, access and the Technical Specification, not the business screens"}
+  - {role: "BRD owner", who: "Business Project Services, BDO Unibank ESG", does: "Business Analyst: the BRD as written; Program Manager: traceability and completeness; sign-off coordination"}
+  - {role: "Delivery", who: "iorta TechNXT Project Manager, Business Analysis, test lead", does: "Sessions, answers, comments log, revisions, change requests"}
+next_steps:
+  - "Kick-off and first SIT walkthrough on Wed 4-Nov-2026"
+  - "Workbooks returned by Wed 18-Nov-2026; Q&A on Mon 23-Nov-2026; sign-off on Mon 30-Nov-2026"
+  - "Configuration input templates filled in for the data migration mocks; final at the map freeze"

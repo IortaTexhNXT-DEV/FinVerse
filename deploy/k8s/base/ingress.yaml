@@ -1,0 +1,65 @@
+# Internal Application Load Balancer (AWS Load Balancer Controller), one ALB shared by two Ingress
+# objects of the group "bibs" (ARCHITECTURE_OPTION_DECISION.md 5.1):
+#   users:   BDO network -> Route 53 private zone -> AWS WAF -> ALB -> /api/* bibs-web, /* bibs-frontend
+#   systems: BDO systems -> Apigee X -> private route -> ALB -> /integration/* bibs-integration
+# No public exposure (scheme internal). HTTPS 443 only, certificate from ACM on the BDO domain, TLS
+# 1.2+ policy; HTTPS to the pods as well (backend-protocol HTTPS). The WAF web ACL carries the AWS
+# managed rule groups, the rate-based rule on /api/v1/auth/* and the rule admitting /integration/*
+# only from the Apigee source ranges. The overlay sets the host, certificate, WAF ACL and ranges.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: bibs-users
+  annotations:
+    alb.ingress.kubernetes.io/group.name: bibs
+    alb.ingress.kubernetes.io/group.order: "20"
+    alb.ingress.kubernetes.io/scheme: internal
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/backend-protocol: HTTPS
+    alb.ingress.kubernetes.io/healthcheck-protocol: HTTPS
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]'
+    alb.ingress.kubernetes.io/ssl-policy: ELBSecurityPolicy-TLS13-1-2-2021-06
+    alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:<AWS_REGION>:<AWS_ACCOUNT_ID>:certificate/<ALB_CERTIFICATE_ID>"
+    alb.ingress.kubernetes.io/wafv2-acl-arn: "arn:aws:wafv2:<AWS_REGION>:<AWS_ACCOUNT_ID>:regional/webacl/<WAF_ACL_NAME>/<WAF_ACL_ID>"
+    alb.ingress.kubernetes.io/inbound-cidrs: "<BDO_CLIENT_AND_APIGEE_CIDRS>"
+    alb.ingress.kubernetes.io/load-balancer-attributes: routing.http.drop_invalid_header_fields.enabled=true,idle_timeout.timeout_seconds=300
+spec:
+  ingressClassName: alb
+  rules:
+    - host: "<BIBS_HOST>"
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service: { name: bibs-web, port: { number: 8443 } }
+          - path: /
+            pathType: Prefix
+            backend:
+              service: { name: bibs-frontend, port: { number: 8443 } }
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: bibs-integration
+  annotations:
+    alb.ingress.kubernetes.io/group.name: bibs
+    alb.ingress.kubernetes.io/group.order: "10"
+    alb.ingress.kubernetes.io/scheme: internal
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/backend-protocol: HTTPS
+    alb.ingress.kubernetes.io/healthcheck-protocol: HTTPS
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]'
+    alb.ingress.kubernetes.io/ssl-policy: ELBSecurityPolicy-TLS13-1-2-2021-06
+    alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:<AWS_REGION>:<AWS_ACCOUNT_ID>:certificate/<ALB_CERTIFICATE_ID>"
+    alb.ingress.kubernetes.io/wafv2-acl-arn: "arn:aws:wafv2:<AWS_REGION>:<AWS_ACCOUNT_ID>:regional/webacl/<WAF_ACL_NAME>/<WAF_ACL_ID>"
+spec:
+  ingressClassName: alb
+  rules:
+    - host: "<BIBS_HOST>"
+      http:
+        paths:
+          - path: /integration
+            pathType: Prefix
+            backend:
+              service: { name: bibs-integration, port: { number: 8443 } }

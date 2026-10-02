@@ -1,0 +1,163 @@
+# Guide to the BRD-1 New Business business sign-off pack: the content of the Sign-off Pack Guide deck
+# (signoff/build_guide_deck.py) and of the Start Here guide (START_HERE_BRD01.md, ```pack blocks "guide-*").
+# The same layout is used for every BRD set; only this file changes.
+meta:
+  deck_title: Sign-off Pack Guide
+  module: New Business
+  owner: Marketing Business Services and System Support (MBS)
+  issued: Mon 28-Sep-2026
+  signoff_date: Fri 30-Oct-2026
+
+# The documents of the set in reading order. kind = doc type of the file name (brand.READING_ORDER).
+documents:
+  - {kind: StartHere, name: New Business, ext: docx, what: "Start Here: the map of the pack, who reads what, the steps and the dates", readers: Everyone, when: "First, on issue"}
+  - {kind: GuideDeck, name: New Business, ext: pptx, what: "Sign-off Pack Guide: purpose, approach, the module at a glance, caveats, entry and exit criteria, change control", readers: "Business owner, unit heads; presented at the kick-off", when: "Kick-off session"}
+  - {kind: FRS, name: New Business, ext: docx, what: "Functional Requirements Specification v2.0: requirements, navigation, 46 screen specifications with screenshots, walkthroughs, messages, notifications, documents, uploads, cross-BRD contract", readers: "Business users of each area; Finance, Compliance and BDOI IT for their chapters", when: "During the review, with the SIT walkthroughs"}
+  - {kind: Signoff, name: New Business, ext: xlsx, what: "Sign-off workbook: one row per screen, field, rule and message with the BU review columns; comments log, meeting minutes, version history, sign-off certificate", readers: "Every reviewer; the business owner signs it", when: "During the review and at sign-off"}
+  - {kind: TestPlan, name: New Business, ext: xlsx, what: "Test plan workbook: the test cases traced to the FRs and to the screens, including one screen case and one message case per screen", readers: "Business users who will run UAT; BDOI IT", when: "After the screens; used again in SIT and UAT"}
+  - {kind: TestPlan, name: New Business Summary, ext: docx, what: "Test plan summary: scope, approach, coverage and the cases by area", readers: "Business owner, BDOI IT", when: "Before sign-off"}
+  - {kind: UXDeck, name: New Business, ext: pptx, what: "UX Screen Deck for the BDOI UX Design team: design foundation, navigation and personas, every walkthrough step by step and every screen with all its states", readers: "BDOI UX Design team", when: "From the issue, in parallel with the review; re-issued with each version of the set"}
+  - {kind: UXScreens, name: New Business, ext: xlsx, what: "UX screen register: one row per screen image with the screen, personas, walkthrough and step, state, FRS section and requirements, UXD status and comments, and the Changed in this issue flag", readers: "BDOI UX Design team", when: "Kept by the UX Design team; the changed rows are flagged at each issue"}
+  - {kind: UXScreens, name: New Business, ext: zip, what: "Image package: every screen image at twice the screen resolution (PNG) and the register as CSV", readers: "BDOI UX Design team", when: "Imported into the design tool at each issue"}
+
+# Reading order per role (FRS chapter numbers of v2.0).
+reading:
+  - role: Business owner (Product Owner, Head of MBS)
+    order: "00 Start Here; 01 Guide deck; FRS chapters 1-3 (context and personas), 14 (walkthroughs), 20 (sign-off) and 21 (proposed rules for confirmation); workbook Sign-off certificate"
+  - role: Business users (Marketing, TSU, Processing)
+    order: "FRS chapter 12 (navigation) and the screens of your area in chapter 13; walkthroughs in chapter 14; messages in chapter 15; workbook Screen standards, Screen catalogue, Field register, Business rules and Messages"
+  - role: Finance (Comptrollership)
+    order: "FRS Booking requirements (chapter 4) and generated documents (chapter 17: service invoice); walkthrough A steps 16-17; cross-BRD contract with Operations, Collections and Accounting (chapter 19); workbook Business rules of the booking screens"
+  - role: Compliance
+    order: "Client onboarding and KYC screens (SCR-NB-01 to 04); sanction screening lines of the contract (chapter 19); retention rules; messages of the client screens"
+  - role: BDOI IT
+    order: "Interfaces and integration (chapter 7), non-functional requirements (chapter 8), menu by persona (chapter 12), cross-BRD contract (chapter 19); integrations pending specifications (Guide deck, caveats)"
+  - role: BDOI UX Design team
+    order: "07 UX Screen Deck: design foundation and navigation first, then the personas, walkthroughs and screens of the design work; 08 UX screen register (filter Changed in this issue at each new issue); 09 image package in the design tool"
+  - role: iorta TechNXT project team
+    order: "All documents; keeps the comments log, the meeting minutes and the version history of the workbook, answers every comment and keeps the traceability to SIT and UAT"
+
+# Approach and step-by-step flow up to closure. raci: R responsible, A accountable, C consulted, I informed.
+steps:
+  - step: 1
+    name: Pack issued
+    who: "R: iorta TechNXT Project Manager; A: iorta TechNXT delivery lead; I: all reviewers"
+    inputs: "FRS v2.0, workbook, test plan, guide and deck"
+    outputs: "Release set v2.0 in the BRD-01 folder; invitations to the sessions"
+    duration: "Day 0 (Mon 28-Sep-2026)"
+  - step: 2
+    name: Kick-off and screen walkthrough on SIT
+    who: "R: iorta TechNXT Business Analysis; A: BDOI Product Owner; C: unit heads; I: BDOI IT"
+    inputs: "Guide deck; SIT users with seed data; walkthroughs A, B and C"
+    outputs: "Screens shown live; first questions logged in the comments log; minutes"
+    duration: "4 sessions, 1 to 6-Oct-2026"
+  - step: 3
+    name: Review with the workbook
+    who: "R: business users of each unit; A: unit heads; C: iorta TechNXT (questions)"
+    inputs: "FRS chapters of the area; workbook sheets with the BU review columns"
+    outputs: "Every row marked Accept, Change requested or Comment; comments log entries"
+    duration: "10 working days after the walkthroughs, until Fri 16-Oct-2026"
+  - step: 4
+    name: Comments consolidated and a Q&A session
+    who: "R: iorta TechNXT Project Manager and Business Analysis; A: BDOI Product Owner; C: reviewers"
+    inputs: "Returned workbooks"
+    outputs: "One consolidated comments log, each item typed (clarification, correction, change request) and answered; Q&A minutes"
+    duration: "3 working days, Q&A on Wed 21-Oct-2026"
+  - step: 5
+    name: One revision cycle (v2.1)
+    who: "R: iorta TechNXT Business Analysis; A: iorta TechNXT delivery lead; C: reviewers who raised the items"
+    inputs: "Agreed clarifications and corrections"
+    outputs: "Release set v2.1 with the changed rows marked; change requests raised for the rest"
+    duration: "2 working days, v2.1 on Fri 23-Oct-2026; check by the reviewers until Wed 28-Oct-2026"
+  - step: 6
+    name: Sign-off meeting and signature
+    who: "R: iorta TechNXT Project Manager; A: BDOI Product Owner; C: unit heads, Finance, Compliance, BDOI IT"
+    inputs: "v2.1 (or v2.0 when no revision is needed); open items with their decision"
+    outputs: "Signed sign-off certificate; minutes; open items accepted as assumptions or change requests"
+    duration: "Fri 30-Oct-2026"
+  - step: 7
+    name: Content freeze
+    who: "R: iorta TechNXT delivery lead; A: BDOI Product Owner; I: BDOI IT, other BRD owners"
+    inputs: "Signed set; change requests with mandays"
+    outputs: "Content frozen as signed; approved deltas scheduled in the Change Management Register"
+    duration: "From Mon 2-Nov-2026"
+  - step: 8
+    name: Traceability into SIT and UAT
+    who: "R: iorta TechNXT test lead; A: BDOI Product Owner; C: business users"
+    inputs: "Signed FRS rows and test plan"
+    outputs: "SIT and UAT runs traced to the signed screens, rules and messages; results against each row"
+    duration: "SIT Jan - Jul 2027; UAT Aug - Dec 2027"
+
+# The module at a glance: key screenshots (file names in the screenshot folder of the pack).
+key_screens:
+  - {image: scr-nb-01-01-list, caption: "Clients work list"}
+  - {image: wt-a-08, caption: "Quotation converted into an account"}
+  - {image: scr-nb-18-01-list, caption: "Placement Workbench"}
+  - {image: wt-a-17, caption: "Booked invoice with its journal"}
+
+# Key business rules and validations (highlights; the full list is in the workbook and FRS chapter 13).
+rules:
+  - "A prospect needs only its type and name; the KYC documents and minimum fields are needed before the KYC is submitted, and a second user verifies it."
+  - "Clients are checked for duplicates on TIN, ID and name with birth date (blocking) and on e-mail, mobile and corporate name (warning)."
+  - "A quotation or PRF is approved by someone other than its maker; a quotation is sent only once approved and still valid."
+  - "An account needs a confirmed client; Processing validates it only when every mandatory field and document of the product is there."
+  - "A risk is insured on one live account only (vehicle identifiers; client, location and item for property)."
+  - "Placement needs the payment gate open: CLPC payment matched for CBG Fire, payment or client confirmation for the other lines, or the direct-payment tag."
+  - "Booking posts the journal (receivable, payable to the insurer, commission) and the service invoice; cancellations and endorsements follow the same rules."
+  - "Bulk uploads validate every row before anything is saved; rejected rows come back in the error file."
+
+# Caveats and possibilities, and how each is handled.
+caveats:
+  - topic: Additional requirements
+    text: "New needs can surface during the review, SIT or UAT."
+    handling: "In-scope clarification when the signed text already covers it; otherwise a change request with mandays."
+    example: "A reviewer asks for the KYC risk rating on the Clients list: a new column, so a change request; asking which statuses the list shows is a clarification."
+  - topic: Other BRDs change New Business
+    text: "Product Maintenance, Sanction Screening, User Access, Operations, Collections, Accounting, Renewal, CSF, Submitted Policies, Data Migration and the Core Replacement can change what New Business takes or hands over."
+    handling: "The change is raised against the other BRD and assessed against the cross-BRD contract; when it touches this set, a delta sign-off of the affected pages only."
+    example: "BRD-3 adds a mandatory field to a product: the account field rules change; the affected screen specification pages are re-issued and signed as a delta."
+  - topic: Integrations pending BDOI IT specifications
+    text: "HLS, CLPC transport, electronic channels to insurers (file transfer or system-to-system), directory sign-in and the mail relay depend on specifications from BDOI IT."
+    handling: "A manual or file-based step until the specification arrives; the interface is then a change request."
+    example: "CLPC billing is a download and an upload today; an automatic transfer is added when the CLPC layout and transport are agreed."
+  - topic: Open questions and assumptions
+    text: "Open questions of FRS section 10.3 (product matrix, approval chain, document layouts, TSU thresholds and others) follow the assumptions of section 10.1; chapter 21 lists the proposed rules for confirmation."
+    handling: "Answered as configuration where possible (lists, parameters, templates); otherwise a change request; the assumption stands until then."
+    example: "The approval chain is one approval stage; a two-level chain for large premiums, once BDOI states the limits, is a change request."
+
+# Entry and exit criteria of the sign-off, and the definition of done.
+entry:
+  - "Every screenshot of the set is taken on the SIT environment with seed data."
+  - "Reviewers have their SIT users and the walkthrough sessions are held."
+  - "The test plan is traced to the FRS and to the screens."
+exit:
+  - "Every row of the workbook reviewed by its unit (Accept, Change requested or Comment)."
+  - "Every comments log item closed: answered, corrected in v2.1, or raised as a change request."
+  - "Open questions closed or accepted as assumptions."
+  - "The sign-off certificate signed by every signatory of the Who signs what matrix: prepared, input, reviewed and approved as on the BRD approval sheet; the Product Owner approves the whole set."
+done:
+  - "Signed certificate filed with the set; version history updated."
+  - "Content frozen as signed; deltas listed in the Change Management Register with mandays."
+  - "Test plan agreed for SIT and UAT."
+
+# Handover to development / build readiness checklist.
+handover:
+  - "Signed FRS, sign-off workbook and screens"
+  - "Open questions closed or accepted as assumptions"
+  - "Configuration inputs from the business: lists of values, parameters, document templates, products, users and roles"
+  - "Agreed test plan"
+  - "Migration mapping of the New Business objects signed (BRD-13)"
+handover_note: "After sign-off the content is frozen as signed and the approved deltas are scheduled."
+
+# Governance and contacts.
+governance:
+  - {role: "Business owner and approver", who: "BDOI Product Owner", does: "Accountable for the sign-off; chairs the sign-off meeting"}
+  - {role: "Input provider", who: "Marketing Business Services and System Support (MBS); TSU", does: "Coordinates the units' review; signs for the business input (BRD approval sheet: input)"}
+  - {role: "Reviewers", who: "Marketing, TSU, Processing, Comptrollership", does: "Review their screens and rows; raise comments"}
+  - {role: "Finance, Compliance, BDOI IT", who: "Comptrollership, Compliance, BDOI IT", does: "Comptrollership approves booking and accounting; Compliance reviews KYC and screening; BDOI IT reviews interfaces, access and the Technical Specification"}
+  - {role: "BRD owner", who: "Business Project Services, BDO Unibank ESG", does: "Business Analyst: the BRD as written; Program Manager: traceability and completeness; sign-off coordination"}
+  - {role: "Delivery", who: "iorta TechNXT Project Manager, Business Analysis, test lead", does: "Sessions, answers, comments log, revisions, change requests"}
+next_steps:
+  - "Kick-off and first SIT walkthrough on Thu 1-Oct-2026"
+  - "Workbooks returned by Fri 16-Oct-2026; Q&A on Wed 21-Oct-2026; sign-off on Fri 30-Oct-2026"
+  - "Next release sets: BRD-3 Product Maintenance and BRD-11 User Access (Nov 2026), then BRD-10, 12, 6, 9, then BRD-2, 4, 5, then BRD-13, then BRD-7 and BRD-8"

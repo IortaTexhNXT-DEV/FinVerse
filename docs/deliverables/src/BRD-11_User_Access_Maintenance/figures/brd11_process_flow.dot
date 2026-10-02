@@ -1,0 +1,47 @@
+// BRD-11 User Access Maintenance: the two BRD processes (p.6) by actor, with the BIBS additions. FRS section 2.3.
+// Top: user access request (system grants on approval). Bottom: group-profile request (System Administrator implements).
+digraph ua_process {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.35, ranksep=0.4, bgcolor="white", pad=0.15, newrank=true];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.2, fontname="Arial",
+         fontsize=11, fontcolor="@NEAR_BLACK", width=1.9, height=0.8, margin="0.1,0.05"];
+  edge  [color="@HEADER_BLUE", arrowsize=0.7, penwidth=1.1, fontname="Arial", fontsize=9, fontcolor="@MUTED"];
+
+  // Actors: Requestor / Business Administrator = @BG_BLUE, Approver = @AMBER_BG, System = @DIRTY_WHITE, System Administrator = @WHITE
+  subgraph cluster_user {
+    label="A. User access request (new, modify, deactivate, reactivate, bulk)"; labeljust=l; fontcolor="@HEADER_BLUE"; fontsize=11;
+    style=rounded; color="@HEADER_BLUE";
+    u1 [label=<<b>1. Draft and submit</b><br/><font point-size="9">Requestor; chooses approver<br/>BRD 1.002-1.005, 1.009</font>>, fillcolor="@BG_BLUE"];
+    u2 [label=<<b>2. Checks and risk rules</b><br/><font point-size="9">System; second approval<br/>if privileged / off-hours</font>>, fillcolor="@DIRTY_WHITE"];
+    u3 [label=<<b>3. Review</b><br/><font point-size="9">Approver: approve,<br/>reject or return (2.002)</font>>, fillcolor="@AMBER_BG"];
+    u4 [label=<<b>4. Grant access</b><br/><font point-size="9">System, now or on the<br/>effective date (p.6)</font>>, fillcolor="@DIRTY_WHITE"];
+    { rank=same; u1; u2; }
+    { rank=same; u3; u4; }
+    u1 -> u2; u2 -> u3; u3 -> u4;
+    u3 -> u1 [label="return: correct\nand re-submit (1.006)", style=dashed, color="@MUTED", constraint=false];
+  }
+  subgraph cluster_group {
+    label="B. Group-profile request (new, modify, deactivate, reactivate)"; labeljust=l; fontcolor="@HEADER_BLUE"; fontsize=11;
+    style=rounded; color="@HEADER_BLUE";
+    g1 [label=<<b>1. Draft and submit</b><br/><font point-size="9">Business Administrator;<br/>approvers in order (3.002)</font>>, fillcolor="@BG_BLUE"];
+    g2 [label=<<b>2. Review</b><br/><font point-size="9">Approver(s): approve,<br/>reject or return</font>>, fillcolor="@AMBER_BG"];
+    g3 [label=<<b>3. Implement</b><br/><font point-size="9">System Administrator<br/>creates / modifies (p.6)</font>>, fillcolor="@WHITE"];
+    g4 [label=<<b>4. Reports and logs</b><br/><font point-size="9">Access, group profile,<br/>membership, audit (3.003, 4.003)</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+    { rank=same; g1; g2; }
+    { rank=same; g3; g4; }
+    g1 -> g2; g2 -> g3; g3 -> g4;
+  }
+  u3 -> g1 [style=invis, weight=10];
+  u4 -> g2 [style=invis, weight=10];
+
+  legend [shape=plaintext, style="", label=<
+    <table border="0" cellborder="1" cellspacing="4" cellpadding="4">
+      <tr>
+        <td border="0"><font point-size="9" color="@MUTED">Actor:</font></td>
+        <td bgcolor="@BG_BLUE" color="@HEADER_BLUE"><font point-size="9">Requestor / Business Administrator</font></td>
+        <td bgcolor="@AMBER_BG" color="@HEADER_BLUE"><font point-size="9">Approver</font></td>
+        <td bgcolor="@DIRTY_WHITE" color="@HEADER_BLUE"><font point-size="9">System</font></td>
+        <td bgcolor="@WHITE" color="@HEADER_BLUE"><font point-size="9">System Administrator</font></td>
+      </tr>
+    </table>>];
+  g3 -> legend [style=invis];
+}

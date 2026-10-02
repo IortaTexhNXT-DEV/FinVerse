@@ -1,0 +1,507 @@
+# Screen specifications of BRD-2 Operations: Cashiering (payments, receipts, applications, unapplied payments and
+# dispositions, requests of the other modules, pre-booked payments, payment files, checks, printing, BIR 2307,
+# commission ORs, receipt series and set-up).
+area: Cashiering
+screens:
+  - id: SCR-OP-07
+    title: Cashiering Workbench
+    route: /cashiering
+    purpose: >-
+      The landing page of Cashiering: the work queues of the section counted live (unapplied payments, dispositions
+      and receipt actions for approval, pre-booked payments, post-dated checks, check pick-ups, BIR 2307 to validate,
+      invoices with outstanding or partial premium, hand-offs), each opening its list.
+    entry:
+      - Operations Home › Cashiering › Open
+    shots:
+      - {state: home, user: cashier, caption: "Cashiering Workbench with the work queues of the section"}
+    fields:
+      - "Work Queues | [Work tiles: Unapplied Payments, Dispositions for Approval, Pre-booked Payments, Cancellations and Reinstatements for Approval, Post-dated Checks in the Warehouse, Check Pick-ups Due, BIR 2307 to Validate, Invoices with Outstanding Premium, Partially Paid Invoices, Hand-offs to Complete] | Tile | Live count; Needs attention on the queues waiting for action | - | Cashiering records and the invoice ledger | - | Read only | A tile opens its list | -"
+    actions:
+      - "Search Invoices | Every Cashiering user | Always | Opens Invoice Search | - | -"
+      - "[A work tile] | Every Cashiering user | Always | Opens the list of the queue | - | -"
+    rules:
+      - "The tiles are counted live from the Cashiering records and the invoice ledger (FR-OP-003)."
+    outcome: The cashier sees the work waiting and opens it.
+    frs: [FR-OP-003]
+    tests: [CASHWB]
+
+  - id: SCR-OP-08
+    title: Receive Payment
+    route: /cashiering/receive
+    purpose: >-
+      The over-the-counter payment of a walk-in payor: the references typed are matched on ARN, invoice, policy or
+      PN number, the live preview shows how the money is applied component by component, and Issue AR and Apply
+      issues the acknowledgement receipt, applies the payment and leaves any excess in unapplied collections.
+    entry:
+      - Cashiering Workbench
+    shots:
+      - {state: preview, user: cashier, fill: receive_payment, caption: "Receive Payment with the application preview of an unpaid invoice"}
+      - {state: error, user: cashier, submit: "^issue ar and apply$", caption: "Receive Payment with the field messages of an empty form"}
+    fields:
+      - "Payor and Payment | ARN, Invoice, Policy or PN No. | Text area | One or more references separated by commas or lines; applied oldest first | Y | Invoice ledger, pre-booked accounts | Blank | - | At least one reference | Enter at least one reference, or the payor code for an unmatched payment"
+      - "Payor and Payment | Payor Name | Text | Up to 250 characters | Y | - | Blank | - | Not blank | Payor name is required"
+      - "Payor and Payment | Payor / Client Code | Text | Up to 30 characters | N | Clients (BRD-1) | Blank | - | - | -"
+      - "Payor and Payment | Assured Name | Text | Up to 250 characters | N | - | Blank | - | - | -"
+      - "Payor and Payment | AR Class | Drop-down | Premium payments: Bills Payment, OTC, Trade, CLPC, PDC, Direct Credit; Non-premium payments (insurance payments): Refund, Other expenses, AR Insurance | Y | List of values AR class | OTC | - | - | -"
+      - "Payor and Payment | Amount | Number | Two decimals | Y | - | Blank | - | Above zero | Enter an amount above zero"
+      - "Payor and Payment | Currency | Text | 3 letters | Y | Currencies | PHP | - | Converted at the BOOK rate of the day | -"
+      - "Payor and Payment | Payment Date | Date | dd-MMM-yyyy | Y | - | Today | - | - | -"
+      - "Payor and Payment | Mode of Payment | Drop-down | Cash, Check, Direct Credit, ADA, Credit to Account | Y | Fixed list | Cash | - | - | -"
+      - "Payor and Payment | Check No. / Bank | Text | Up to 40 / 60 characters; shown for a check | Cond.: check number for a check | - | Blank | - | Check number for a check payment | Check number is required for a check payment"
+      - "Application Preview | [Match outcome and BOOK rate] | Status pill and chip | Booked, Pre-booked, Cancelled or No match; <currency> · BOOK <rate> | - | Payment matching | - | Read only | - | Enter an ARN, invoice, policy or PN number to preview the application."
+      - "Application Preview | Component / Balance / Applied | Column | One table per invoice: DST, VAT / Premium Tax, LGT, FST, Other Charges, Basic Premium with the total | - | Invoice ledger | - | Read only | Applied in this order | -"
+      - "Application Preview | Applied / 2% CWT Withheld / Excess to Unapplied | Display | Amount | - | Computed | 0.00 | Read only | A 2% CWT client is applied up to 98% of the premium | -"
+    actions:
+      - "Issue AR and Apply | Cashier | The form is complete | Issues the AR from the branch series, applies the payment by component and opens the receipt; an account not yet booked waits in the pre-booked queue, anything else goes to unapplied collections | AR issued | -"
+      - "Clear | Cashier | Always | Empties the form | - | -"
+    rules:
+      - "A payment is matched at acceptance on the ARN, invoice, policy or PN number: a booked invoice is applied at once, an account not yet booked waits in the pre-booked queue, a cancelled or unknown reference becomes an unapplied payment (FR-OP-018)."
+      - "Payments are applied in the order DST, VAT / premium tax, LGT, fire service tax, other charges, basic premium; the premium due to the insurer is never applied (FR-OP-019)."
+      - "The payment of a 2% CWT client is applied up to 98% of the premium; the 2% waits for the BIR 2307 and anything above it stays unapplied (FR-OP-019)."
+      - "The amount is converted at the BOOK rate of the currency and the AR takes the next number of the branch series (FR-OP-010, FR-OP-011)."
+      - "A non-premium payment of an insurer (refund, other expenses) is received as AR Insurance, apart from premium (FR-OP-020)."
+    outcome: The AR is issued and the payment is applied, waiting for booking or kept unapplied.
+    frs: [FR-OP-011, FR-OP-018, FR-OP-019, FR-OP-020]
+    tests: [RECEIVE]
+
+  - id: SCR-OP-09
+    title: Receipts
+    route: /cashiering/receipts
+    purpose: >-
+      The search over acknowledgement receipts and Head Office official receipts with ten criteria, the open
+      cancellation and reinstatement requests for approval, and the issue of an official receipt for BDOI income
+      (service fee, profit share, commission, incentive, others).
+    entry:
+      - Cashiering Workbench › Cancellations and Reinstatements for Approval tile
+    shots:
+      - {state: list, user: cashier, caption: "Receipts: acknowledgement and official receipts"}
+      - {state: actions, user: cashtl, tab: "Cancellations and Reinstatements", caption: "Cancellations and Reinstatements tab of the Cashiering Team Leader"}
+      - {state: issue_or, user: cashier, fill: issue_or, caption: "Issue Official Receipt dialog for a service fee"}
+    fields:
+      - "Tabs | Receipts / Cancellations and Reinstatements | Tab | - | - | Fixed | Receipts | - | - | -"
+      - "Toolbar | Search Receipt No. | Text | Receipt number | N | Receipts | Blank | - | - | -"
+      - "Filters | Client Code / Invoice No. / Policy No. / Payor Name / Assured Name / Insurer | Text, drop-down | Insurers by name | N | - | Blank | - | Contains | -"
+      - "Filters | Amount / Date From / Date To | Number, Date | dd-MMM-yyyy | N | - | Blank | - | - | -"
+      - "Filters | Kind / Status | Drop-down | All, AR, OR / All, Issued, Cancelled, Reinstated | N | Fixed list | All | - | - | -"
+      - "List | Receipt No. / Date / Payor / Assured / Mode / Amount / Applied / Unapplied / Status | Column | Receipt number with its kind and class; payor with the assured or payor code | - | Receipts | - | Read only | - | No receipts match the search"
+      - "Cancellations and Reinstatements | Transaction No. / Reason / Amount / Requested / Status | Column | CAN-yyyy-n or RIN-yyyy-n with the action; requester name and time | - | Receipt actions | - | Read only | - | -"
+      - "Issue Official Receipt dialog | OR Type | Drop-down | Service fee, profit share, commission, incentive, others | Y | List of values OR type | Blank | - | - | Select the OR type"
+      - "Issue Official Receipt dialog | Payor Name / Payor Code | Text | Up to 250 / 30 characters | Y / N | - | Blank | - | Payor name not blank | Payor name is required"
+      - "Issue Official Receipt dialog | Currency / Mode of Payment / Check No. | Text, Drop-down | Cash, Check, Direct Credit, Credit to Account, Non Cash | Y / N / N | - | PHP / Check | - | - | -"
+      - "Issue Official Receipt dialog | Gross Amount / VAT / Withholding Tax | Number | Two decimals | Y / N / N | - | Blank / 0 / 0 | - | Gross above zero; VAT and withholding tax not negative | Enter the gross amount / VAT and withholding tax cannot be negative"
+      - "Issue Official Receipt dialog | 2307 Certificate Ref. / Description | Text | Up to 60 / 250 characters | N | - | Blank | - | - | -"
+    actions:
+      - "Issue Official Receipt / Issue OR | Cashier (Head Office) | Always | Issues the OR from the Head Office series with its VAT and withholding tax lines and opens it | OR issued | -"
+      - "Search / Filters | Every Cashiering user | Always | Filters the receipts | - | -"
+      - "Open Receipt | Every Cashiering user | Always | Opens the receipt of the request | - | -"
+      - "Approve | Cashiering Team Leader | Request for approval | Asks for confirmation and applies the cancellation or reinstatement to the receipt with its postings | Posted | Workflow notice (NT-01)"
+      - "Resubmit | Cashier who requested it | Request returned to Requested | Sends the request for approval again | For approval | Cashiering approval request (NT-07)"
+    rules:
+      - "An OR is issued only from a Head Office series; an AR from the series of the receiving branch (FR-OP-010, FR-OP-012)."
+      - "The receipt search has ten criteria and every search is logged (FR-OP-024)."
+      - "A cancellation or reinstatement is approved by a Cashiering Team Leader other than its requester (FR-OP-013, FR-OP-014)."
+    outcome: Receipts are found and ORs for BDOI income are issued.
+    frs: [FR-OP-012, FR-OP-013, FR-OP-014, FR-OP-024]
+    tests: [RECEIPTS]
+
+  - id: SCR-OP-10
+    title: Receipt
+    route: /cashiering/receipts/:id
+    parent: /cashiering/receipts
+    purpose: >-
+      One AR or OR: payor, number, status and flags, the amounts applied and unapplied with the BOOK rate, the
+      workflow of an open cancellation or reinstatement, and the tabs Applications, Lines, Journal and History. Print
+      produces the receipt PDF; Cancel Receipt and Reinstate go to the Cashiering Team Leader.
+    entry:
+      - Receipts › open a row
+      - Receive Payment (after Issue AR and Apply)
+      - Unapplied Payment › Open Receipt
+    shots:
+      - {state: record, user: cashier, open_receipt: applied, caption: "Receipt with its applications by component"}
+      - {state: cancel, user: cashier, open_receipt: applied, click: "^cancel receipt$", caption: "Cancel Receipt dialog with the reason"}
+      - {state: approval, user: cashtl, open_receipt: cancel_requested, caption: "Receipt with a cancellation request for approval: workflow header and Approve and Post"}
+    fields:
+      - "Header | [Receipt No. chip and status pill] | Reference chip, status pill | AR or OR number; Issued, Cancelled, Reinstated | - | Receipts | - | Read only | - | -"
+      - "Header | [Flags] | Tag | With Unapplied, Printed <n>x, Reinstated | - | Receipts | - | Read only | - | -"
+      - "Header | Receipt Date / Payor / Amount / Applied / Unapplied / Mode / Currency / BOOK Rate | Display | Amounts with two decimals; mode with the check number | - | Receipts | - | Read only | - | -"
+      - "Workflow | [Receipt action workflow header] | Stepper | Requested, For approval, Posted with the history table | - | Receipt action | - | Read only | - | -"
+      - "Tabs | Applications / Lines / Journal / History | Tab | - | - | Fixed | Applications | - | - | -"
+      - "Applications | Invoice / Reference / By Component / Applied / Commission Realized / Value Date / Status | Column | Invoice with its ARN; the amount by component | - | Applications | - | Read only | - | Nothing applied from this receipt"
+      - "Lines | Invoice / Item / Insurer / Gross / VAT / WTAX / Net | Column | OR lines | - | Receipt lines | - | Read only | - | -"
+      - "Journal | Journal Batch / Posting | Column | Receipt, each application and each action | - | Journals (BRD-5) | - | Read only | - | No journal posted yet"
+      - "History | Transaction No. / Action / Reason / Amount / Requested / Approved / Status | Column | Names and times | - | Receipt actions | - | Read only | - | No cancellation or reinstatement"
+      - "Cancel Receipt dialog | Reason | Drop-down | - | Y | List of values receipt cancellation reason | Blank | Issued, no open request | - | Select a reason"
+      - "Cancel Receipt dialog | Comment | Text area | Mandatory for the reason Others | Cond. | - | Blank | Issued | - | -"
+      - "Reinstate dialog | Full / Partial | Radio | Full = the receipt amount | Y | - | Full | Cancelled, no open request | - | -"
+      - "Reinstate dialog | Reason Group / Reason | Drop-down | Premium or Direct Payment; the reasons of the group | Y | List of values reinstatement reason | Premium (AR) | Cancelled | - | Select a reason"
+      - "Reinstate dialog | Amount to Reinstate | Number | Above zero, at most the receipt amount | Cond.: partial | - | Blank | Cancelled | Within the receipt amount | Enter an amount above zero and at most <amount>"
+      - "Reinstate dialog | Invoice No. / AR / OR No. / Assured / Payor / Account Officer / Unit Head / Team Leader / Remarks | Text | Up to 250 characters; the Account Officer, Unit Head and Team Leader for the premium group | Y (Remarks N) | - | AR / OR number and payor of the receipt | Cancelled | Not blank | <field> is required"
+    actions:
+      - "Print (PDF) | Every Cashiering user | Always | Downloads the receipt PDF; the print count is kept | - | -"
+      - "Cancel Receipt | Cashier | Issued and no request open | Asks for the reason and submits the cancellation for approval | Cancellation for approval | Cashiering approval request (NT-07)"
+      - "Reinstate | Cashier | Cancelled and no request open | Opens the reinstatement dialog and submits it for approval | Reinstatement for approval | Cashiering approval request (NT-07)"
+      - "Approve and Post | Cashiering Team Leader other than the requester | Request for approval | Posts the cancellation (reverses every application and the receipt) or the reinstatement (restores the receipt and applies the amount) | Posted | Workflow notice (NT-01)"
+      - "Return to Requester | Cashiering Team Leader | Request for approval | Asks for the reason and returns the request | Requested | Workflow notice (NT-01)"
+    rules:
+      - "A cancellation reverses every active application, reverses the receipt entry and closes the unapplied balance of the receipt (FR-OP-013, FR-OP-027)."
+      - "A reinstatement restores the receipt for the full or partial amount, applies it to the invoice encoded and leaves the rest unapplied; a bounced check needs no encoded fields (FR-OP-014)."
+      - "The requester never approves the own request (FR-OP-013, FR-OP-014)."
+      - "Every action on a receipt records the receipt number, the user and the time in the audit trail (FR-OP-024)."
+    outcome: The receipt, its applications and its postings are visible; cancellations and reinstatements are approved by a second user.
+    frs: [FR-OP-011, FR-OP-012, FR-OP-013, FR-OP-014, FR-OP-024, FR-OP-025, FR-OP-027]
+    tests: [RECEIPT]
+
+  - id: SCR-OP-11
+    title: Unapplied Payments
+    route: /cashiering/unapplied
+    purpose: >-
+      Payments not applied to an invoice (no match, excess, cancelled reference, adjustment, cancellation, remittance
+      return, re-application, pre-booked and others) by stage: the cashier assigns a disposition, submits it and a
+      second user approves it; selected items are submitted or approved in one action.
+    entry:
+      - Cashiering Workbench › Unapplied Payments and Dispositions for Approval tiles
+    shots:
+      - {state: list, user: cashier, caption: "Unapplied Payments, Unapplied tab"}
+      - {state: approval, user: cashtl, tab: "For Approval", caption: "For Approval tab of the Cashiering Team Leader with Approve Selected"}
+    fields:
+      - "Tabs | Unapplied / Monitoring / For Approval / For Reversal / Done | Tab | - | - | Fixed | Unapplied | - | - | -"
+      - "Toolbar | Search Reference or Payor | Text | - | N | - | Blank | - | Contains | -"
+      - "Toolbar | Origin | Drop-down | All origins, BIBS, Migrated | N | Fixed list | All origins | - | - | -"
+      - "List | Select | Check box | On Monitoring and For Approval | N | - | Not ticked | - | - | -"
+      - "List | Reference / Payor / Client / Unit / Amount / Balance / Disposition / Received / Stage | Column | UNP-yyyy-n with why it is unapplied; the unit by name; the disposition in words with its amount | - | Unapplied payments | - | Read only | - | No items to display"
+      - "Bulk Action Results dialog | [Outcome per item] | Table | Done, or the message of the item | - | - | - | Read only | - | -"
+    actions:
+      - "Submit Selected | Cashier | Monitoring, rows selected | Submits the disposition of each selected item on its own and lists the outcome of each | For approval | Cashiering approval request (NT-07)"
+      - "Approve Selected | Cashiering Team Leader | For Approval, rows selected | Approves each selected disposition on its own (never one's own) and lists the outcome of each | In process or Completed | Workflow notice (NT-01)"
+      - "Open a row | Every Cashiering user | Always | Opens the unapplied payment | - | -"
+    rules:
+      - "Every unapplied balance keeps its origin until it is disposed of (FR-OP-022)."
+      - "Bulk submit and approve process each item on its own, so one failure does not stop the others (FR-OP-022)."
+      - "The approver is never the requester of the disposition (FR-OP-022)."
+    outcome: Unapplied money is followed by stage until it is applied, refunded, reclassed or transferred.
+    frs: [FR-OP-022]
+    tests: [UNAPPLIED]
+
+  - id: SCR-OP-12
+    title: Unapplied Payment
+    route: /cashiering/unapplied/:id
+    parent: /cashiering/unapplied
+    purpose: >-
+      One unapplied payment with its amount and balance, payor, client and unit and its source, the disposition
+      workflow, the disposition form (apply to an invoice, apply to its DST, refund, reclass to another client,
+      transfer to another unit, others) and the disposition history.
+    entry:
+      - Unapplied Payments › open a row
+    shots:
+      - {state: record, user: cashier, open_unapplied: no_match, fill: disposition_refund, caption: "Unapplied payment with the disposition form filled for a refund"}
+      - {state: approval, user: cashtl, open_unapplied: for_approval, caption: "Unapplied payment with a refund for approval: workflow header, Approve and the disposition history"}
+    fields:
+      - "Header | [Reference chip, origin tag and stage pill] | Reference chip, tag, status pill | UNP-yyyy-n; No Match, Excess, Cancelled Reference and the other origins | - | Unapplied payments | - | Read only | - | -"
+      - "Header | Amount / Balance / Payor / Marketing Unit / Source / Received | Display | Amounts with two decimals; the unit by name; the source by its module and document number | - | Unapplied payments | - | Read only | - | -"
+      - "Workflow | [Disposition workflow header] | Stepper | Unapplied, Monitoring, For approval, In process, Completed; For reversal and Closed when reached | - | Disposition | - | Read only | - | -"
+      - "Assign Disposition | Disposition Type | Drop-down | The disposition types with their description | Y | Disposition types | Blank | Unapplied, Monitoring | - | Select the disposition type"
+      - "Assign Disposition | Amount | Number | Above zero, at most the balance; a reclass or transfer moves the whole balance | Y | - | The balance | Unapplied, Monitoring | Within the balance | Enter an amount above zero and at most <balance> / A reclass or transfer moves the whole balance"
+      - "Assign Disposition | Apply to Invoice No. / Reclass to Client Code / Transfer to Marketing Unit / Refund Payee | Text | Shown for the type: apply, reclass, transfer, refund | Cond. | Invoice ledger, clients, sales organisation | Payor for a refund | Unapplied, Monitoring | Required for this disposition type | Required for this disposition type"
+      - "Assign Disposition | Remarks | Text area | Up to 250 characters | N | - | Blank | Unapplied, Monitoring | - | -"
+      - "Disposition History | Disposition / Amount / Target / Requested / Approved / Document / Status | Column | Payment request or journal in Document | - | Dispositions | - | Read only | - | No disposition yet"
+      - "Mark for Reversal dialog | Reason / Comment | Drop-down, text area | - | Y / N | List of values return reason | Blank | Completed | - | -"
+    actions:
+      - "Save Disposition | Cashier | Unapplied or Monitoring | Assigns or updates the disposition | Monitoring | -"
+      - "Submit for Approval | Cashier | Monitoring, the type needs approval | Sends the disposition to a second user | For approval | Cashiering approval request (NT-07)"
+      - "Process Disposition | Cashier | Monitoring, the type needs no approval | Processes the disposition at once | In process or Completed | -"
+      - "Approve | Cashiering Team Leader other than the requester | For approval | Approves and processes it: an application posts at once, a refund is sent to the Disbursement queue, a reclass or transfer moves the balance | In process or Completed | Workflow notice (NT-01)"
+      - "Return to Cashier | Cashiering Team Leader | For approval | Returns the disposition with a reason | Monitoring | Workflow notice (NT-01)"
+      - "Withdraw Disposition | Cashier | For approval | Takes the disposition back | Monitoring | -"
+      - "Mark for Reversal / Approve Reversal | Cashier / Cashiering Team Leader | Completed / For reversal | Reverses a completed disposition on approval; a refund only after Disbursement returned it | For reversal / Unapplied | Workflow notice (NT-01)"
+      - "Open Receipt | Every Cashiering user | The item came from a receipt | Opens the receipt | - | -"
+    rules:
+      - "The disposition type decides the fields to fill and whether a second user approves it (FR-OP-022)."
+      - "A refund goes to the Disbursement queue and is completed when Disbursement pays it (FR-OP-022, FR-OP-120)."
+      - "A balance left after a partial disposition returns to the Unapplied tab (FR-OP-022)."
+      - "Unapplied items up to PHP 10.00 are moved to AP overages by the minimal balance sweep (FR-OP-023)."
+    outcome: The unapplied money is applied, refunded, reclassed or transferred, with a second user's approval where the type needs it.
+    frs: [FR-OP-022, FR-OP-023, FR-OP-120]
+    tests: [UITEM]
+
+  - id: SCR-OP-13
+    title: Incoming Requests
+    route: /cashiering/requests
+    purpose: >-
+      What the other modules ask of Cashiering: collector requests on unapplied payments from Collections (apply,
+      refund, reclass, transfer), refund validations from Payment Requests and payment reversals from ACSL, each queue
+      with its open and decided items.
+    entry:
+      - Cashiering Workbench
+    shots:
+      - {state: list, user: cashier, caption: "Incoming Requests: Collector Requests, To Do"}
+      - {state: accept, user: cashier, select: first_request, click: "^accept request$", caption: "Accept Request dialog of a collector request"}
+    fields:
+      - "Tabs | Collector Requests / Refund Validations / Payment Reversals | Tab | With the number of open items | - | Fixed | Collector Requests | - | - | -"
+      - "Tabs | To Do / Decided | Tab | - | - | Fixed | To Do | - | - | -"
+      - "Collector Requests | Request No. / Collector Asks / Payor / Unapplied / Amount / Requested By / Remarks / Status | Column | CRQ-yyyy-n with the unapplied reference; Whole balance when no amount | - | Collections (BRD-4) | - | Read only | - | -"
+      - "Refund Validations | Validation No. / Cancelled Invoice / AR of the Payment / Refund / Requested By / New AR / Remarks / Status | Column | - | - | Payment Requests (BRD-5) | - | Read only | - | -"
+      - "Payment Reversals | Reversal No. / Invoice No. / Receipt / Amount / Value Date / Reason / Requested By / Status | Column | Whole application when no amount | - | ACSL (BRD-5) | - | Read only | - | -"
+      - "Accept Request dialog | Disposition Type / Amount / Client to Reclass To / Marketing Unit / Refund Payee / Remarks | Drop-down, number, text | Amount above zero and at most the unapplied balance | Cond. | Disposition types | The request's values | Queued | - | Enter the client to reclass to / Enter the marketing unit to transfer to / Enter an amount above zero and at most the unapplied balance"
+      - "Accept Request dialog | Submit the disposition now (an application is processed at once) | Check box | - | N | - | Ticked | Queued | - | -"
+      - "Confirm Validation dialog | Unapplied Item / New AR No. / Remarks | Drop-down, text | The unapplied item holding the returned premium | Y / N / N | Unapplied payments | Blank | Open | - | Choose the unapplied item that holds the returned premium"
+      - "Reject dialog | Reason | Text | - | Y | - | Blank | Open | Not blank | Enter the reason"
+    actions:
+      - "Accept Request | Cashier | Collector request queued, row selected | Creates the disposition of the unapplied item and, when ticked, submits it | Accepted | The collector is told the outcome"
+      - "Reject Request | Cashier | Collector request queued | Rejects the request with a reason | Rejected | The collector is told the outcome"
+      - "Confirm Validation / Reject Validation | Cashier | Refund validation open | Confirms that the premium is back in the unapplied list (with its new AR) or rejects it | Confirmed / Rejected | Payment Requests is told the result"
+      - "Approve Reversal / Reject Reversal | Cashiering Team Leader | Payment reversal open | Asks for confirmation and reverses the application as requested, or rejects it with a reason | Approved / Rejected | ACSL is told the result"
+    rules:
+      - "Collections asks Cashiering to dispose of an unapplied payment; Cashiering decides and the collector sees the outcome (FR-OP-022)."
+      - "A refund validation confirms that the premium of a cancelled invoice is back in the unapplied list before Payment Requests refunds it (FR-OP-022)."
+    outcome: Requests of Collections, Payment Requests and ACSL are decided by Cashiering and answered.
+    frs: [FR-OP-022, FR-OP-130]
+    tests: [INREQ]
+
+  - id: SCR-OP-14
+    title: Pre-booked Payments
+    route: /cashiering/prebooked
+    purpose: >-
+      Payments received for accounts not yet booked: they wait with their age and re-match attempts and are applied
+      automatically once the account is booked; an ageing item can be re-matched now or released to the unapplied
+      payments.
+    entry:
+      - Cashiering Workbench › Pre-booked Payments tile
+    shots:
+      - {state: list, user: cashier, caption: "Pre-booked Payments waiting for booking"}
+    fields:
+      - "Tabs | Waiting for Booking / Applied / Released to Unapplied | Tab | - | - | Fixed | Waiting for Booking | - | - | -"
+      - "List | Account (ARN) / Reference / Amount / Received / Age / Re-match Attempts / Receipt / Status | Column | Age in days, amber after 7 and red after 30 days; Open AR opens the receipt | - | Pre-booked payments | - | Read only | - | No items to display"
+      - "Release dialog | Comment | Text area | - | N | - | Released by cashier | Waiting for booking | - | -"
+    actions:
+      - "Run Matching Now | Cashier with the application permission | Always | Matches every waiting payment and unapplied item again and applies those whose invoice is now booked | Applied | -"
+      - "Open Receipt | Every Cashiering user | Always | Opens the AR of the payment | - | -"
+      - "Re-match Now | Cashier with the application permission | Waiting for booking | Matches the payment again | Applied or unchanged | -"
+      - "Release to Unapplied | Cashier with the application permission | Waiting for booking | Moves the payment to the unapplied payments | Released | -"
+    rules:
+      - "A payment for an account not yet booked waits in the queue and opens the New Business payment gate (FR-OP-018, FR-OP-132)."
+      - "It is applied when the invoice is booked, or by the scheduled re-match every two hours; an ageing item raises an alert (FR-OP-018)."
+    outcome: Payments received before booking are applied as soon as the account is booked.
+    frs: [FR-OP-018, FR-OP-132]
+    tests: [PREBOOKED]
+
+  - id: SCR-OP-15
+    title: Payment Uploads
+    route: /cashiering/uploads
+    purpose: >-
+      The payment files of the banks and channels (Bills Payment, Trade, CLPC, Direct Credit) and the file of
+      post-dated checks, each in its template: every row is validated first, the valid rows become payments with
+      their AR and are matched at once, and the run summary counts applied, unapplied, pre-booked, excess and failed
+      rows.
+    entry:
+      - Cashiering Workbench
+    shots:
+      - {state: wizard, user: cashier, caption: "Payment Uploads, Bills Payment: template and upload steps"}
+    fields:
+      - "Tabs | Bills Payment / Trade / CLPC / Direct Credit / PDC | Tab | One file type per tab | - | Fixed | Bills Payment | - | - | -"
+      - "1. Template | Download Template | Button | The columns of the file type (chapter 18) | - | Upload template | - | - | Headers unchanged | -"
+      - "2. Upload | File | File | Drag and drop or Browse; the accepted types and the maximum size are shown | Y | - | - | - | A file already uploaded is refused | This file was already uploaded"
+      - "Run Summary | Applied / Unapplied / Pre-booked / With Excess / Failed Rows | Tile | Counts of the run | - | Upload run | - | Read only | - | -"
+      - "Run Summary | Row / Reference / Payor / Amount / Applied / Unapplied / Outcome / Message | Column | One row per payment of the run | - | Payments | - | Read only | - | No payment accepted in this run"
+    actions:
+      - "Download Template | Cashier | Always | Downloads the template of the file type | - | -"
+      - "Upload and Validate | Cashier | File chosen | Validates every row and shows Rows Read, Valid and Rejected with the rows | - | -"
+      - "[Process the valid rows] | Cashier | Rows validated | Creates the payments with their ARs and matches them | AR issued per payment | -"
+      - "Download Report | Cashier | Run done | Downloads the run report with the failed rows and their messages | - | -"
+    rules:
+      - "Every row is a payment: an AR is issued and the payment is matched at once; the same file cannot be uploaded twice (FR-OP-015, FR-OP-008)."
+      - "A failed row never stops the run; the failed rows are corrected in the report and uploaded again as a new file (FR-OP-008)."
+      - "The layout of each bank file is set on Cashiering Setup until BDOI confirms the bank layouts (FR-OP-015)."
+    outcome: Bank and channel payments are receipted and applied in bulk.
+    frs: [FR-OP-008, FR-OP-015, FR-OP-016]
+    tests: [PAYUP]
+
+  - id: SCR-OP-16
+    title: PDC Warehouse
+    route: /cashiering/pdc
+    purpose: >-
+      Post-dated checks kept in the warehouse with a PDCW- number, grouped by maturity month; the maturity job turns a
+      matured check into a payment with its AR, and before maturity a check can be returned, replaced or pulled out.
+    entry:
+      - Cashiering Workbench › Post-dated Checks in the Warehouse tile
+    shots:
+      - {state: list, user: cashier, caption: "PDC Warehouse by maturity month"}
+      - {state: add, user: cashier, fill: pdc_check, caption: "Warehouse Post-dated Check dialog"}
+    fields:
+      - "Tabs | In Warehouse / Applied / Matured (Unapplied) / All | Tab | - | - | Fixed | In Warehouse | - | - | -"
+      - "List | [Maturity month and total] | Heading | Month, number of checks and total | - | PDC warehouse | - | Read only | - | -"
+      - "List | Warehouse No. / Payor / Reference / Maturity / Amount / AR / Status | Column | PDCW-yyyy-n with the bank and check number | - | PDC warehouse | - | Read only | - | -"
+      - "Warehouse Post-dated Check dialog | Payor Name / Client Code / ARN, Invoice, Policy or PN No. / Check No. / Bank / Bank Branch / Maturity Date / Amount / Market Segment | Text, date, number | Maturity date dd-MMM-yyyy | Payor, reference, check, bank, maturity date and amount Y | - | Blank | - | Not blank; amount above zero | <field> is required / Enter an amount above zero"
+      - "Release dialog | Outcome / Reason | Drop-down, text | Returned, Replaced, Pulled out | Y | Fixed list | Returned | Warehoused | Reason not blank | Reason is required"
+    actions:
+      - "Warehouse Check | Cashier | Always | Stores the check in the warehouse | Warehoused | -"
+      - "Process Maturities Now | Cashier | Always | Turns every matured check into a payment with its AR, matched at once | Applied or Matured (unapplied) | -"
+      - "Release / Release Check | Cashier | Warehoused | Takes the check out before maturity with the outcome and reason | Returned, Replaced or Pulled out | -"
+    rules:
+      - "A post-dated check waits in the warehouse until its maturity date; the daily maturity job receipts it then (FR-OP-016)."
+    outcome: Post-dated checks are kept until maturity and receipted on the day.
+    frs: [FR-OP-016]
+    tests: [PDC]
+
+  - id: SCR-OP-17
+    title: Check Pick-up
+    route: /cashiering/pickups
+    purpose: >-
+      Checks the collectors pick up from clients, by pick-up date: the requests come from Collections or are imported,
+      and the cashier prints the ARs of the checks picked up in one batch.
+    entry:
+      - Cashiering Workbench › Check Pick-ups Due tile
+    shots:
+      - {state: list, user: cashier, caption: "Check Pick-up, For Pick-up tab"}
+    fields:
+      - "Tabs | For Pick-up / AR Printed / Cancelled | Tab | - | - | Fixed | For Pick-up | - | - | -"
+      - "Toolbar | Pick-up From / Pick-up To | Date | dd-MMM-yyyy | N | - | Blank | - | - | -"
+      - "List | Select | Check box | For Pick-up tab | N | - | Not ticked | - | - | -"
+      - "List | Collection Ref. / Payor / Pick-up Date / Requested By / Check No. / Amount / AR / Status | Column | Collection reference with the ARN | - | Check pick-up requests | - | Read only | - | No items to display"
+    actions:
+      - "Import Pending Requests | Cashier | Always | Takes in the pick-up requests waiting from Collections | For pick-up | -"
+      - "Print ARs | Cashier | Rows selected | Issues and prints the ARs of the selected checks in one batch | AR printed | -"
+      - "Download <batch> | Cashier | After Print ARs | Downloads the merged PDF of the batch | - | -"
+      - "Cancel Check Pick-up | Cashier | For pick-up | Asks for confirmation and cancels the pick-up; the check stays with the client | Cancelled | -"
+    rules:
+      - "The ARs of the checks picked up are issued and printed in one batch (FR-OP-017)."
+    outcome: Checks picked up are receipted and their ARs printed together.
+    frs: [FR-OP-017]
+    tests: [PICKUP]
+
+  - id: SCR-OP-18
+    title: Batch Print
+    route: /cashiering/print
+    purpose: >-
+      Print receipts in one batch: choose them by kind, insurer and date, preview the list, print the selected
+      receipts into one PDF and retry the ones that failed.
+    entry:
+      - Cashiering Workbench
+    shots:
+      - {state: list, user: cashier, caption: "Batch Print: receipts to print and the print batches"}
+    fields:
+      - "Receipts to Print | Kind / Insurer / Date From / Date To | Drop-down, date | All, Acknowledgement Receipt, Official Receipt; insurers by name | N | - | All | - | - | -"
+      - "Receipts to Print | Receipt No. / Date / Payor / Amount / Printed | Column | Printed <n>x or Not yet | - | Receipts | - | Read only | - | No receipts match the criteria"
+      - "Print Batches | Batch No. / Criteria / Progress / Printed / Failed / Created / Status | Column | Progress bar; red when a receipt failed | - | Print batches | - | Read only | - | No print batch yet"
+    actions:
+      - "Preview List | Cashier | Always | Lists the issued receipts of the criteria | - | -"
+      - "Print Selected (n) | Cashier | Receipts selected | Prints the selected receipts into one PDF and records each | Batch done or with failures | -"
+      - "Download | Cashier | Batch printed | Downloads the merged PDF | - | -"
+      - "Retry Failures | Cashier | Batch with failures | Prints the failed receipts again | - | -"
+    rules:
+      - "A batch records each receipt printed, so a failure is retried without printing the others again (FR-OP-025)."
+    outcome: Receipts are printed in one run with a record of what was printed.
+    frs: [FR-OP-025]
+    tests: [PRINT]
+
+  - id: SCR-OP-19
+    title: BIR 2307
+    route: /cashiering/cwt
+    purpose: >-
+      The creditable withholding tax certificates (BIR 2307) of 2% CWT clients: tagged by Marketing, received and
+      checked by Cashiering, validated per insurer into a report batch that is posted, routed to Disbursement and
+      released to the insurer, or settled in cash.
+    entry:
+      - Cashiering Workbench › BIR 2307 to Validate tile
+    shots:
+      - {state: list, user: cashier, caption: "BIR 2307, Tagged by Marketing tab"}
+      - {state: tag, user: mktcoll, fill: cwt_tag, caption: "Tag BIR 2307 dialog of Marketing Collection"}
+    fields:
+      - "Tabs | Tagged by Marketing / Validation / Reports and Routing / Released / Settled | Tab | - | - | Fixed | Tagged by Marketing | - | - | -"
+      - "Tags | Reference / Client / Insurer / Path / Amount / Checklist / Tagged / Stage | Column | CWT-yyyy-n with the invoice and ARN; path Certificate or Cash; checklist CWT Copy, Remitted | - | BIR 2307 tags | - | Read only | - | No items to display"
+      - "Validation | CWT Copy Received | Row action (Mark / Clear CWT Copy Received) | - | N | - | Not received | Validating | - | -"
+      - "Reports and Routing | Batch No. / Insurer / Certificates / Total / Disbursement / Status | Column | - | - | 2307 report batches | - | Read only | - | No 2307 report yet"
+      - "Tag BIR 2307 dialog | Invoice No. | Text | - | Y | Invoice ledger | Blank | - | Not blank | Invoice number is required"
+      - "Tag BIR 2307 dialog | Path | Drop-down | Certificate or Cash | Y | Fixed list | Certificate | - | - | -"
+      - "Tag BIR 2307 dialog | Amount | Number | Blank = the expected 2% | N | - | Blank | - | Above zero when given | Enter an amount above zero, or leave it empty for the expected 2%"
+      - "Tag BIR 2307 dialog | Certificate No. / Period From / Period To / Remarks | Text, date | Certificate number for the certificate path | Cond. | - | Blank | - | Certificate number for a certificate | Certificate number is required for a certificate"
+    actions:
+      - "Tag 2307 | Marketing Collection | Always | Tags the certificate or the cash path of the invoice | Tagged by Marketing | -"
+      - "Receive | Cashier | Tagged | Receives the tag for validation | Validating | -"
+      - "Validate and Post Report | Cashier | Validated certificates of one insurer selected | Asks for confirmation, validates them into a report batch and posts the reclass of the 2% | Report posted | -"
+      - "Settle in Cash | Cashier | Cash path | Issues an AR applied to the withheld 2% | Settled in cash | -"
+      - "Route to Disbursement | Cashier | Report posted | Sends the batch to the Disbursement queue | With Disbursement | Disbursement request received (NT-03)"
+      - "Release to Insurer | Disbursement | Batch paid | Releases the certificates to the insurer and offsets the DTIP | Released to insurer | -"
+      - "Return to Marketing / Cancel Tag | Cashier / Marketing Collection | Tagged or validating | Returns or cancels the tag | Tagged by Marketing / Cancelled | Workflow notice (NT-01)"
+    rules:
+      - "Validation posts the reclass of the 2% from the premium receivable to the PR 2307 component; the release to the insurer offsets it against the DTIP (FR-OP-026, FR-OP-121)."
+      - "A report batch holds the certificates of one insurer (FR-OP-026)."
+    outcome: The 2% CWT of the premium is settled with the insurer through the certificates, or in cash.
+    frs: [FR-OP-026, FR-OP-113, FR-OP-121]
+    tests: [CWT]
+
+  - id: SCR-OP-20
+    title: Commission ORs
+    route: /cashiering/commission-ors
+    purpose: >-
+      The commission payments of the insurers uploaded from the payment details, staged until Issue ORs issues one
+      official receipt per payment with its VAT and withholding tax.
+    entry:
+      - Cashiering Workbench
+    shots:
+      - {state: page, user: cashier, caption: "Commission ORs: upload steps and the staged commission payments"}
+    fields:
+      - "1. Template / 2. Upload | [Commission Payment Details upload] | Upload | Template columns of chapter 18 | Y | Upload template | - | - | Every row checked first | The basic commission must be above zero"
+      - "Staged Commission Payments | Upload / Insurer / Payee / Payment Ref. / Invoice / Gross / VAT / WTAX / Paid / OR / Status | Column | - | - | Staged commission payments | - | Read only | - | No commission payment waiting for an OR"
+    actions:
+      - "Upload and Validate | Cashier | File chosen | Validates and stages the commission payments | Staged | -"
+      - "Issue ORs | Cashier | Staged payments | Issues one OR per staged payment | OR issued | -"
+    rules:
+      - "One OR is issued per staged commission payment (FR-OP-021)."
+    outcome: The insurers' commission payments are receipted.
+    frs: [FR-OP-021]
+    tests: [COMMOR]
+
+  - id: SCR-OP-21
+    title: Receipt Series
+    route: /cashiering/series
+    purpose: >-
+      The AR and OR number ranges per branch with their BIR Authority to Print, the next number and the numbers left
+      before the series runs out; a new series is authorised by a second user before it is used.
+    entry:
+      - Cashiering Workbench
+    shots:
+      - {state: list, user: cashtl, caption: "Receipt Series with the numbers left"}
+      - {state: new, user: cashtl, fill: new_series, caption: "New Receipt Series dialog"}
+    fields:
+      - "Toolbar | Origin | Drop-down | All origins, BIBS, Migrated | N | Fixed list | All origins | - | - | -"
+      - "List | Series / Branch / Range / Next No. / Used / Status | Column | Prefix with the kind and ATP; gauge with the numbers left | - | Receipt series | - | Read only | - | No receipt series yet"
+      - "New Receipt Series dialog | Kind / Branch | Drop-down | AR or OR; an OR series only for the Head Office | Y | Branches | AR | - | - | -"
+      - "New Receipt Series dialog | Prefix | Text | For example AR-HO- | Y | - | Blank | - | Not blank | Prefix is required"
+      - "New Receipt Series dialog | From No. / To No. | Number | The range ends at or after its start | Y | - | Blank | - | Valid range | The range must end at or after its start"
+      - "New Receipt Series dialog | BIR ATP No. / Warn When Remaining At | Text, number | - | N | - | Blank | - | - | -"
+    actions:
+      - "New Series / Save Series | Cashiering Team Leader | Always | Saves the series for authorisation | Pending authorization | -"
+      - "Authorize | A second user with the authorisation permission | Series pending | Asks for confirmation and activates the series | Active | -"
+      - "Deactivate | Cashiering Team Leader | Series active | Asks for confirmation; no more receipts are issued from it | Inactive | -"
+    rules:
+      - "Each receipt takes the next number of its series; a depleted series refuses the receipt (FR-OP-010)."
+      - "When the numbers left reach the warning level, the Cashiering team is alerted (FR-OP-010)."
+      - "ORs are issued only from Head Office series (FR-OP-010)."
+    outcome: Receipt numbers come from authorised series and the team is warned before a series runs out.
+    frs: [FR-OP-010]
+    tests: [SERIES]
+
+  - id: SCR-OP-22
+    title: Cashiering Setup
+    route: /cashiering/setup
+    purpose: >-
+      The layouts of the bank and channel payment files and the minimal balance rules with the manual run of the
+      sweep.
+    entry:
+      - Cashiering Workbench
+    shots:
+      - {state: layouts, user: cashtl, caption: "Cashiering Setup, Payment File Layouts tab"}
+      - {state: minimal, user: cashtl, tab: "Minimal Balance", caption: "Cashiering Setup, Minimal Balance tab with the rules"}
+    fields:
+      - "Tabs | Payment File Layouts / Minimal Balance | Tab | - | - | Fixed | Payment File Layouts | - | - | -"
+      - "Payment File Layouts | File / Kind / Separator / Last Changed | Column | Automatic, delimited or fixed width | - | Payment file layouts | - | Read only | - | -"
+      - "Edit layout dialog | Fields / Separator / Fields (Header:start:length separated by ;, start is 1-based) | Drop-down, text | Fields for a fixed-width file | Y | - | The current layout | - | - | -"
+      - "Minimal Balance | Balance / Up To / Excludes / Action / Status | Column | For example premium balances up to 10.00, excluding the 2% CWT, the DST and the whole premium | - | Minimal balance rules | - | Read only | - | -"
+    actions:
+      - "Edit Layout / Save Layout | Cashiering Team Leader | Always | Changes the layout of a payment file | - | -"
+      - "Run Sweep Now | Cashiering Team Leader | Always | Runs the minimal balance sweep now and reports the balances reversed and the excess moved | - | -"
+    rules:
+      - "Premium balances up to PHP 10.00 are reversed and excess or unapplied amounts up to PHP 10.00 are moved to AP overages by the evening sweep; a balance equal to the 2% CWT, the DST or the whole premium, and an invoice already written off, are skipped (FR-OP-023)."
+    outcome: File layouts and minimal balance rules are kept by the business.
+    frs: [FR-OP-015, FR-OP-023]
+    tests: [CASHSETUP]

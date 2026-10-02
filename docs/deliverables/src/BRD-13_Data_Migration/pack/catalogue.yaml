@@ -1,0 +1,914 @@
+# BRD-13 Data Migration - catalogue of the business sign-off set (release set v2.0): the data objects with their
+# proposed decisions, owners and extract planning, the milestones, the open decisions and the proposed business
+# rules for confirmation, the reconciliation and verification plan per object, and the examples of the Migration
+# Workbook. Read by build_dm_pack.py for the Handbook (```pack blocks), the Migration Workbook and the guide deck.
+#
+# The extract layouts (the load templates), the code map sets, the data-quality rules and the masking rules are not
+# typed here: they are read from the layout definitions that the Migration Console holds and exports (its seed
+# catalogue), so the workbook and the console templates are always the same. build_dm_pack.py --check verifies
+# that every object below agrees with that catalogue (code, category, class, load order, sources, layouts).
+
+decision_classes:
+  - [MIGRATE, "Clean master or reference data needed on Day 1; loaded into BIBS through the service of the owning module"]
+  - [CARRY_FORWARD, "Open operational or financial item at cutover; loaded with its open position and processed in BIBS"]
+  - [CONDITIONAL, "Migrated only when the condition decided by BDOI is met (BRID 4.1; DMQ09, DMQ30)"]
+  - [ARCHIVE, "History kept read-only in legacy or loaded into the BIBS archive for inquiry (BRID 11.1)"]
+  - [EXCLUDED, "Not migrated; set up again in BIBS or not needed"]
+
+milestones:
+  - [M0, "Business sign-off set issued to BDOI (release set v2.0, with the BDOI answers to DMQ36-DMQ39)", "5 Oct 2026"]
+  - [M1, "Scope-shaping decisions (answers that change the migration functions)", "16 Oct 2026"]
+  - [M2, "Owners, stewards, keys and remaining business rules; object decisions signed (gate G1); layouts frozen, version 1 (G2 part 1) - end of requirements and mapping", "30 Oct 2026"]
+  - [M3, "First full extracts in the templates, with control files and volumes (profiling, performance sizing)", "29 Jan 2027"]
+  - [M4, "Extracts for Trial migration 1 (SIT migration starts); reference data and clients first", "9 Apr 2027"]
+  - [M5, "Code maps approved for Trial migration 2 (G2), including the package code map", "18 Jun 2027"]
+  - [M6, "Cut-over date and window, fallback and decommissioning criteria agreed; Comptrollership confirms the year-end option A (DMQ39)", "1 Oct 2027"]
+
+# --------------------------------------------------------------------------------------------------------------
+# Data object register. decision: MIGRATE / CARRY_FORWARD / CONDITIONAL / ARCHIVE / EXCLUDED (proposal; BDOI
+# confirms at gate G1). layouts: template codes; an object without a layout has no extract file.
+objects:
+  - code: R01
+    name: Lists of values and MIS values
+    category: Reference
+    decision: MIGRATE
+    rationale: Every coded field of clients, policies and open items needs its BIBS value on Day 1 (BRID 3.1). Legacy values are mapped to BIBS values; missing values are created through the LOV master with maker-checker.
+    source: QPS, EBIX
+    target: "Lists of Values (maker-checker); MIS field catalogue"
+    owner: Product Owner, Marketing Business System (MBS)
+    steward: MBS data steward (to name)
+    history: Current values and values used by any migrated record
+    delta: None after the map freeze (T-7 days); changes by change request and a new map version
+    format: CSV
+    controls: Row count; count of distinct (list_type, code)
+    due: M3
+    order: 1
+    brd: BRID 3.1
+    questions: DMQ08
+    bound: A few thousand values
+    layouts: [R01]
+  - code: R02
+    name: Branches and invoicing branches
+    category: Reference
+    decision: MIGRATE
+    rationale: Branch codes are mapped only; BIBS branches are configured by Comptrollership before the load.
+    source: EBIX
+    target: "Branches (check only, code map BRANCH)"
+    owner: Head, Comptrollership
+    steward: Comptrollership data steward (to name)
+    history: Current
+    delta: None
+    format: CSV
+    controls: Row count
+    due: M3
+    order: 1
+    brd: BRID 3.1
+    questions: DMQ08
+    bound: Under 100
+    layouts: [R02]
+  - code: R03
+    name: Sales organisation (regions, departments, teams, unit heads, account officers)
+    category: Reference
+    decision: MIGRATE
+    rationale: Clients, policies and open items carry the AO and unit; MIS reporting and Collections assignment need them on Day 1.
+    source: QPS, EBIX
+    target: "Sales organisation: sales units and account officers"
+    owner: Heads, Retail and Corporate Marketing
+    steward: Marketing data steward (to name)
+    history: Current, plus inactive AOs referenced by open items
+    delta: Weekly until the freeze
+    format: CSV
+    controls: Row count per record type
+    due: M3
+    order: 2
+    brd: BRID 3.1
+    questions: DMQ08
+    bound: About 600 AOs (485 Marketing users, BRD-3)
+    layouts: [R03]
+  - code: R04
+    name: Insurers and insurer branches
+    category: Reference
+    decision: MIGRATE
+    rationale: Every open invoice, header and remittance position is owed to or by an insurer.
+    source: QPS, EBIX
+    target: "Insurers and insurer branches (insurer and party records)"
+    owner: Head, Operations
+    steward: Operations data steward (to name)
+    history: Active insurers, and inactive insurers with open items
+    delta: None
+    format: CSV
+    controls: Row count per file
+    due: M3
+    order: 2
+    brd: BRID 3.1
+    questions: DMQ08
+    bound: Under 100 insurers
+    layouts: [R04, R04B]
+  - code: R05
+    name: Product lines, cover types, products and risk codes
+    category: Reference
+    decision: MIGRATE
+    rationale: The risk code decides the premium components, taxes and commission of every open invoice and header.
+    source: QPS, EBIX
+    target: "Product catalogue: product lines, cover types and products"
+    owner: Product Owner, MBS
+    steward: MBS data steward (to name)
+    history: Current, plus codes used by in-force policies and open items
+    delta: None
+    format: CSV
+    controls: Row count
+    due: M3
+    order: 3
+    brd: BRID 3.1
+    questions: DMQ08
+    bound: A few hundred codes
+    layouts: [R05]
+  - code: R06
+    name: Package code map (legacy package and version to BIBS package version)
+    category: Reference
+    decision: MIGRATE
+    rationale: Packages are remapped at sanitation in Renewal, not at migration intake (DMQ36, answered 26-Sep-2026). The migration loads the package code map as reference data only; the Renewal package check uses it and sends unmapped packages to the Exception bucket, worked by the Renewal processing team. The BIBS packages themselves are maintained by TSU in Product Maintenance (BRD-3) and are not migrated.
+    source: QPS (legacy packages); TSU (BIBS package versions)
+    target: "Renewal package map, used by the package check of the Renewal sanitation"
+    owner: Product Owner, MBS (approves); TSU (prepares)
+    steward: TSU (to name)
+    history: Legacy packages of in-force policies
+    delta: New map versions until the map freeze (T-7 days)
+    format: XLSX or CSV
+    controls: Row count; count of distinct (legacy_package_code, legacy_package_version)
+    due: M5; final at T-7
+    order: 3
+    brd: BRID 3.1, 12.1
+    questions: DMQ08, DMQ36
+    bound: Under 200 legacy packages
+    layouts: [R06]
+  - code: R07
+    name: Commission rates by insurer and product
+    category: Reference
+    decision: MIGRATE
+    rationale: Endorsements and renewals of legacy policies compute commission from the rate table.
+    source: QPS, EBIX
+    target: "Commission rates of the product catalogue"
+    owner: Head, Operations
+    steward: Operations data steward (to name)
+    history: Rates effective at cutover and later
+    delta: None
+    format: CSV
+    controls: Row count
+    due: M3
+    order: 3
+    brd: BRID 3.1
+    questions: DMQ30
+    bound: Insurers x products
+    layouts: [R07]
+  - code: R08
+    name: Chart of accounts mapping (legacy GL account to BIBS account)
+    category: Reference
+    decision: MIGRATE
+    rationale: The GL opening trial balance (G01) is loaded through this map; legacy control accounts are mapped to Migration Clearing.
+    source: EBIX, ISYS GL
+    target: "GL account code map to the BIBS chart of accounts (chart configured by Comptrollership)"
+    owner: Head, Comptrollership; Product Owner FRBS and ACSL
+    steward: Comptrollership data steward (to name)
+    history: Current chart
+    delta: None
+    format: XLSX or CSV
+    controls: Row count
+    due: M3
+    order: 3
+    brd: BRID 5.1-8.1; AQ01
+    questions: DMQ18
+    bound: A few thousand accounts
+    layouts: [R08]
+  - code: R09
+    name: Payees
+    category: Reference
+    decision: CONDITIONAL
+    rationale: Payees are loaded through the payee migration upload of Disbursement; in scope if BDOI confirms (AQ11, DMQ30).
+    source: EBIX, Disbursement files
+    target: "Payees (party and payee records, loaded by the payee migration)"
+    owner: Product Owner, Comptrollership - Disbursement
+    steward: Disbursement data steward (to name)
+    history: Active payees
+    delta: None
+    format: CSV
+    controls: Row count
+    due: M3
+    order: 4
+    brd: AQ11
+    questions: DMQ30
+    bound: To supply
+    layouts: [R09]
+  - code: R10
+    name: Users and roles
+    category: Reference
+    decision: EXCLUDED
+    rationale: Users are created through User Access requests and approvals (BRD-11); legacy user IDs are only mapped (user code map) so that the AO, handler and collector fields resolve.
+    source: QPS, EBIX
+    target: "None (code map USER only)"
+    owner: Unit Head, Analytics and Risk Management (User Access)
+    steward: IT security administrator
+    history: "-"
+    delta: "-"
+    format: "-"
+    controls: "-"
+    due: M5 (USER map)
+    order: 0
+    brd: BRD-11
+    questions: DMQ30
+    bound: About 1,344 named users (umbrella p.44)
+    layouts: []
+  - code: R11
+    name: Receipt series in use (AR and OR, ATP and next number)
+    category: Reference
+    decision: CARRY_FORWARD
+    rationale: Receipts issued in BIBS after go-live must continue the BIR-authorised series without gap or overlap.
+    source: EBIX
+    target: "Receipt series of Cashiering"
+    owner: Operations - Financial Transactions
+    steward: Cashiering data steward (to name)
+    history: Series in use at the freeze
+    delta: Final values at the freeze (T-3)
+    format: CSV
+    controls: Row count
+    due: M3; final at T-3
+    order: 4
+    brd: BRID 6.1
+    questions: DMQ14
+    bound: One per branch and kind
+    layouts: [R11]
+  - code: C01
+    name: Client master (individual and corporate)
+    category: Client
+    decision: MIGRATE
+    rationale: Marketing, Operations and Renewal must find and use clients on Day 1 without re-encoding (BRID 2.1); clients are deduplicated before load. Umbrella BRD p.43 asks for clients "2020 to present" and daily client batches (DCR-173).
+    source: QPS, EBIX, CMS
+    target: "Client master, registered as migrated clients"
+    owner: Product Owner, MBS; Heads, Retail and Corporate Marketing
+    steward: Marketing data steward (to name)
+    history: Clients from 2020 to present (umbrella p.43); filter per DMQ05
+    delta: Daily new and changed clients from T-14 days until the freeze
+    format: CSV
+    controls: Row count; count of distinct legacy_client_no
+    due: M3; deltas daily from T-14 days
+    order: 5
+    brd: BRID 2.1
+    questions: DMQ04, DMQ05, DMQ06, DCR-173
+    bound: Loaders sized for 1,000,000 rows
+    layouts: [C01, C02]
+  - code: C03
+    name: Client payout accounts (for refunds)
+    category: Client
+    decision: MIGRATE
+    rationale: Refunds of legacy UPP (BRID 5.4) need the client's payout account.
+    source: EBIX
+    target: "Client payout accounts"
+    owner: Product Owner, Comptrollership - Disbursement
+    steward: Disbursement data steward (to name)
+    history: Active accounts
+    delta: None
+    format: CSV
+    controls: Row count
+    due: M3
+    order: 6
+    brd: BRID 5.4
+    questions: DMQ17
+    bound: To supply
+    layouts: [C03]
+  - code: C04
+    name: KYC documents and IDs
+    category: Client
+    decision: ARCHIVE
+    rationale: Documents stay retrievable for audit; BIBS keeps the KYC status and review date on the client (DMQ07 may change this to MIGRATE).
+    source: QPS, file shares
+    target: "BIBS archive (legacy document attachments)"
+    owner: Compliance
+    steward: Compliance data steward (to name)
+    history: Per retention
+    delta: None
+    format: CSV index plus files
+    controls: Row count; SHA-256 per file
+    due: Before decommissioning
+    order: 16
+    brd: BRID 11.1
+    questions: DMQ07, DMQ24
+    bound: To supply
+    layouts: [H02]
+  - code: C05
+    name: Screening results and risk ratings
+    category: Client
+    decision: EXCLUDED
+    rationale: One full screening run after the client load gives current results (BRD-10); legacy results are archived with the client history.
+    source: Excel, Compliance
+    target: "None (a full periodic screening run after C01)"
+    owner: Compliance
+    steward: "-"
+    history: "-"
+    delta: "-"
+    format: "-"
+    controls: "-"
+    due: "-"
+    order: 0
+    brd: BRID 2.1
+    questions: DMQ06
+    bound: "-"
+    layouts: []
+  - code: P01
+    name: In-force policy headers
+    category: Policy
+    decision: CONDITIONAL
+    rationale: Needed to locate active coverage, to endorse legacy invoices (BRID 9) and to renew in BIBS (BRID 12.1); the scope condition is decided by BDOI (DMQ09). Whatever it is, every policy expiring from T to 31-May-2028 and every renewal term booked in legacy that starts on or after T are in scope, because the go-live renewal extraction works only from the headers (DMQ37). The legacy package is kept as given; it is remapped at Renewal sanitation (DMQ36).
+    source: QPS, EBIX
+    target: "Accounts, imported as legacy policy headers"
+    owner: Head, Operations
+    steward: Operations data steward (to name)
+    history: Policies in force at T (DMQ09); at least every expiry from T to 31-May-2028 and every booked renewal term starting on or after T
+    delta: Single load after the freeze
+    format: CSV
+    controls: Row count; sum of sum_insured and gross_premium per currency; count of distinct legacy_policy_ref
+    due: M3; final at T-2
+    order: 7
+    brd: BRID 4.1
+    questions: DMQ09, DMQ22, DMQ36, DMQ37
+    bound: 250,000-310,000 renewable accounts a year (umbrella p.44-45)
+    layouts: [P01, P01S]
+  - code: P02
+    name: Expired policies and policy history
+    category: Policy
+    decision: ARCHIVE
+    rationale: History is not converted (BRD p.3); kept for inquiry.
+    source: QPS, EBIX
+    target: "BIBS archive, record type POLICY"
+    owner: Head, Operations
+    steward: Operations data steward (to name)
+    history: Per retention (5 years online, 15 years archive, umbrella p.45)
+    delta: None
+    format: CSV
+    controls: Row count and hash total per record type
+    due: Before decommissioning
+    order: 16
+    brd: BRID 11.1
+    questions: DMQ24
+    bound: To supply
+    layouts: [H01]
+  - code: P03
+    name: Renewal advices already sent before go-live (RA-sent file)
+    category: Policy
+    decision: MIGRATE
+    rationale: The January-May 2028 expiries are processed in BIBS after go-live from a go-live extraction of the migrated headers (DMQ37, answered 26-Sep-2026); no renewal candidate is carried. The RAs already sent by hand before go-live, kept in the Excel trackers of the Renewal processing team (DMQ38), are loaded as a small reference file so that BIBS does not send them again.
+    source: Excel RA trackers of the Renewal processing team
+    target: "Renewal Advices already sent, given to Renewal with the policy header in the go-live extraction"
+    owner: Head of the Renewal processing team
+    steward: Renewal processing team - makers (corrections) and checkers (resubmission approval)
+    history: RAs sent before go-live for expiries from T to 31-May-2028
+    delta: One file in every trial migration; final file with the RAs sent up to T-5; resubmissions of corrected rows until T-1 12:00
+    format: XLSX template (P03_template.xlsx) or CSV
+    controls: Row count; count of distinct legacy_policy_ref; sum of proposed_premium per currency
+    due: M4 (Trial migration 1); final at T-5
+    order: 13
+    brd: BRID 12.1
+    questions: DMQ26, DMQ37, DMQ38
+    bound: Small - at most the January-May 2028 expiries with an RA sent before go-live
+    layouts: [P03]
+  - code: P04
+    name: Submitted-policy masterlists
+    category: Policy
+    decision: CONDITIONAL
+    rationale: Loaded through the masterlist upload of Submitted Policies if BDOI confirms (SP SQ16, DMQ30); the layout is issued with that module.
+    source: Excel
+    target: "Submitted Policies masterlist (migration upload)"
+    owner: CBG and Non-CBG Marketing (Submitted Policies)
+    steward: Submitted Policies data steward (to name)
+    history: All active records
+    delta: None
+    format: XLSX
+    controls: Row count per segment
+    due: M3 if in scope
+    order: 14
+    brd: BRIDSP-33
+    questions: DMQ30
+    bound: To supply
+    layouts: []
+  - code: P05
+    name: Employee Benefits programmes
+    category: Policy
+    decision: CONDITIONAL
+    rationale: Loaded through the programme upload of Employee Benefits if BDOI confirms (DMQ30); the layout is issued with that module.
+    source: EBIX
+    target: "Employee Benefits programmes (programme load)"
+    owner: Head, Employee Benefits
+    steward: EB data steward (to name)
+    history: Active programmes
+    delta: None
+    format: XLSX
+    controls: Row count
+    due: M3 if in scope
+    order: 14
+    brd: BRD-8
+    questions: DMQ30
+    bound: To supply
+    layouts: []
+  - code: F01
+    name: Open legacy invoices (premium receivable, paid not remitted, commission receivable, PR2307), with components and insurer shares
+    category: Open item
+    decision: CARRY_FORWARD
+    rationale: Receivables and payables open at cutover must be collected, remitted, reversed and endorsed in BIBS (BRID 5.1-10.1).
+    source: EBIX, QPS
+    target: "Operations invoice ledger (invoices, insurer shares, components) with an opening accounting entry on the legacy sub-ledgers"
+    owner: Operations - Financial Transactions; Head, Comptrollership
+    steward: Operations data steward (to name)
+    history: Every invoice with any open component at T (DMQ10)
+    delta: Single load after the freeze
+    format: CSV with control file
+    controls: Row count per file; sums per component, bucket and currency; count of distinct legacy_invoice_no
+    due: M3; final at T-2
+    order: 8
+    brd: BRID 5.2, 6.1-6.4, 7.1, 7.2, 8.1, 9.1-9.3, 10.1
+    questions: DMQ10, DMQ11, DMQ12, DMQ13, DMQ35
+    bound: Loaders sized for 500,000 rows
+    layouts: [F01, F01S, F01C]
+  - code: F02
+    name: Unapplied premium payments (UPP) with disposition in progress
+    category: Open item
+    decision: CARRY_FORWARD
+    rationale: Unapplied cash must not be lost after cutover (BRID 5.1); it is applied, refunded or reclassified in BIBS.
+    source: EBIX, CMS
+    target: "Cashiering unapplied payments, as migrated items, with an opening accounting entry"
+    owner: Operations - Financial Transactions
+    steward: Cashiering data steward (to name)
+    history: Every UPP item with a balance at T
+    delta: Single load after the freeze
+    format: CSV with control file
+    controls: Row count; sums of amount and balance per currency; count of distinct legacy_upp_ref
+    due: M3; final at T-2
+    order: 9
+    brd: BRID 5.1-5.5, 6.3, 6.4
+    questions: DMQ14, DMQ15, DMQ16
+    bound: To supply
+    layouts: [F02]
+  - code: F03
+    name: Open collection state (dispositions, promises to pay, installment plans, collector assignments)
+    category: Open item
+    decision: CARRY_FORWARD
+    rationale: Collectors continue their follow-up without re-keying (CQ07); only the open state is carried, history is archived (DMQ34).
+    source: CMS
+    target: "Legacy follow-up of the Collections worklist items"
+    owner: Head, Operations (Collections)
+    steward: Collections data steward (to name)
+    history: Open items only
+    delta: Single load after the freeze
+    format: CSV
+    controls: Row count; sum of promise_amount per currency
+    due: M3; final at T-2
+    order: 10
+    brd: CQ07
+    questions: DMQ34
+    bound: 1,200 dispositions a day (umbrella p.42)
+    layouts: [F03]
+  - code: F04
+    name: Remittance in flight (batches not yet paid, holds, special remittances)
+    category: Open item
+    decision: CONDITIONAL
+    rationale: Proposal - complete legacy batches before the freeze; carry only holds and special remittances that cannot complete (DMQ21).
+    source: EBIX
+    target: "Remittance holds and special remittances"
+    owner: Operations - Remittance
+    steward: Remittance data steward (to name)
+    history: Open at T
+    delta: Single load after the freeze
+    format: CSV
+    controls: Row count; sum of amount per currency
+    due: M3; final at T-2
+    order: 11
+    brd: BRID 8.1
+    questions: DMQ21
+    bound: To supply
+    layouts: [F04]
+  - code: F05
+    name: DP billing in process and DP commission receivable
+    category: Open item
+    decision: CARRY_FORWARD
+    rationale: Carried inside F01 (dp_flag and the COMMISSION components of direct-payment invoices); no separate file.
+    source: EBIX, Operations files
+    target: "Part of F01; Commission DP list"
+    owner: Operations - Financial Transactions
+    steward: Operations data steward (to name)
+    history: Open at T
+    delta: "-"
+    format: In F01
+    controls: In F01
+    due: With F01
+    order: 8
+    brd: BRID 7.1
+    questions: DMQ19
+    bound: "-"
+    layouts: []
+  - code: F06
+    name: PDCs in the warehouse, check pick-ups and refunds in process
+    category: Open item
+    decision: CONDITIONAL
+    rationale: Proposal - carry PDCs in the warehouse; complete pick-ups and refunds in legacy before the freeze where possible (DMQ33).
+    source: EBIX
+    target: "Cashiering PDC warehouse and check pick-up"
+    owner: Operations - Cashiering
+    steward: Cashiering data steward (to name)
+    history: Open at T
+    delta: Single load after the freeze
+    format: CSV
+    controls: Row count; sum of amount per currency and record type
+    due: M3; final at T-2
+    order: 11
+    brd: BRID 5.1
+    questions: DMQ33
+    bound: To supply
+    layouts: [F06]
+  - code: F07
+    name: Open claims
+    category: Open item
+    decision: CONDITIONAL
+    rationale: Loaded through the Claims migration if BDOI decides (CLQ14, DMQ30); closed claims are archived.
+    source: EBIX, ISYS
+    target: "Claims, through the claims migration"
+    owner: Unit Head, Claims, RI and TU
+    steward: Claims data steward (to name)
+    history: Open at T
+    delta: Single load after the freeze
+    format: CSV
+    controls: Row count; sum of reserve and claimed amounts per currency
+    due: M3 if in scope
+    order: 14
+    brd: CLQ14
+    questions: DMQ30
+    bound: 55 new claims a day (umbrella p.42)
+    layouts: []
+  - code: G01
+    name: GL trial balance per account, branch and currency (provisional opening; legacy TB at each true-up)
+    category: GL
+    decision: MIGRATE
+    rationale: At the year-end go-live (DMQ39, option A recommended) the BIBS GL opens from the preliminary December 2027 TB - balance-sheet accounts only, the FY2027 net result to retained earnings, legacy control-account lines to Migration Clearing, which the F01 and F02 opening entries clear to 0.00. The opening is provisional; at each true-up the legacy TB after the adjustments is sent again as reconciliation input (G03).
+    source: EBIX GL, ISYS GL
+    target: "General ledger journals of type OPENING (value date 1-Jan-2028); at a true-up, reconciliation input only"
+    owner: Head, Comptrollership
+    steward: Comptrollership data steward (to name)
+    history: Preliminary December 2027 TB after the last legacy EOD; the legacy TB at each true-up
+    delta: Single load after the freeze; one TB per true-up (about 18-Jan-2028 and after the audited FS)
+    format: XLSX or CSV with control file
+    controls: Row count; total debit and total credit per branch and currency (must be equal)
+    due: M3; final at T-2; at each true-up
+    order: 12
+    brd: BRID 1.1b, 5.1-8.1
+    questions: DMQ18, DMQ25, DMQ35, DMQ39
+    bound: A few thousand lines
+    layouts: [G01]
+  - code: G02
+    name: GL history (journals and balances before cutover)
+    category: History
+    decision: ARCHIVE
+    rationale: Kept for audit; BIBS starts from the opening trial balance.
+    source: EBIX GL, ISYS GL
+    target: "BIBS archive, record type GL journal"
+    owner: Head, Comptrollership
+    steward: Comptrollership data steward (to name)
+    history: Per retention
+    delta: None
+    format: CSV
+    controls: Row count and debit / credit totals per period
+    due: Before decommissioning
+    order: 16
+    brd: BRID 11.1
+    questions: DMQ24
+    bound: To supply
+    layouts: [H01]
+  - code: G03
+    name: FY2027 opening-balance true-ups (legacy adjustment journals after the freeze and their open-item detail)
+    category: GL
+    decision: MIGRATE
+    rationale: The legacy GL stays open after the freeze only for the FY2027 closing and audit adjustments of Comptrollership (DMQ39). Each adjustment reaches BIBS as a controlled opening-balance adjustment journal in the opening period - after the legacy year-end close and after the audited FS - with approvals, cut-off controls and a reconciliation to the legacy TB.
+    source: EBIX GL, ISYS GL; FY2027 adjustment register of Comptrollership
+    target: "General ledger journals of type OPENING (reference MIG-TU-<n>); opening adjustments of the legacy open items and unapplied payments"
+    owner: Head, Comptrollership
+    steward: Comptrollership GL lead (prepares each true-up)
+    history: Legacy journals posted after the freeze, dated in FY2027
+    delta: One set per true-up (true-up 1 about 18-Jan-2028; final after the audited FS, about March-April 2028)
+    format: XLSX or CSV with control file
+    controls: Row count; debit and credit totals per branch and currency; count of distinct legacy_journal_no
+    due: T+16 (true-up 1); T+92 (final)
+    order: 17
+    brd: BRID 1.1b, 5.1-8.1
+    questions: DMQ18, DMQ39
+    bound: Tens to a few hundred journal lines per true-up
+    layouts: [G03, G03D]
+  - code: H01
+    name: Closed transactions (paid and remitted invoices, receipts, remittances, endorsements, claims, renewal advices, letters)
+    category: History
+    decision: ARCHIVE
+    rationale: History stays in read-only legacy or the BIBS archive with logged access (BRID 11.1).
+    source: EBIX, QPS, ISYS
+    target: "BIBS archive (Legacy Inquiry)"
+    owner: Audit / Compliance; legacy system owners
+    steward: Compliance data steward (to name)
+    history: Per retention (5 years online, 15 years archive, umbrella p.45)
+    delta: None
+    format: CSV
+    controls: Row count, amount totals and hash total per record type
+    due: Before decommissioning
+    order: 16
+    brd: BRID 11.1
+    questions: DMQ24, DMQ27
+    bound: To supply
+    layouts: [H01]
+  - code: H02
+    name: Legacy documents (policies, SOAs, ORs, certificates, letters)
+    category: History
+    decision: ARCHIVE
+    rationale: Documents are kept with their archive record and a checksum.
+    source: File shares, EBIX
+    target: "Legacy documents attached to the archive records"
+    owner: Audit / Compliance
+    steward: Compliance data steward (to name)
+    history: Per retention
+    delta: None
+    format: CSV index plus files
+    controls: Row count; SHA-256 per file
+    due: Before decommissioning
+    order: 16
+    brd: BRID 11.1
+    questions: DMQ24
+    bound: To supply
+    layouts: [H02]
+
+# --------------------------------------------------------------------------------------------------------------
+# Example control file of F01C (made-up values), in the column order of the control-file template.
+control_example:
+  - [F01C, F01C, EBIX, F01C_EBIX_20271231_01.csv, "2027-12-31 22:00:00", "2028-01-01 00:40:12", bdoi.it.jramos, ROW_COUNT, "", "", "", "184220"]
+  - [F01C, F01C, EBIX, F01C_EBIX_20271231_01.csv, "2027-12-31 22:00:00", "2028-01-01 00:40:12", bdoi.it.jramos, HASH_TOTAL, legacy_invoice_no, "", "", "31207"]
+  - [F01C, F01C, EBIX, F01C_EBIX_20271231_01.csv, "2027-12-31 22:00:00", "2028-01-01 00:40:12", bdoi.it.jramos, AMOUNT_TOTAL, open_balance, PHP, "component=BASIC", "98450221.40"]
+  - [F01C, F01C, EBIX, F01C_EBIX_20271231_01.csv, "2027-12-31 22:00:00", "2028-01-01 00:40:12", bdoi.it.jramos, AMOUNT_TOTAL, open_balance, PHP, "component=DTIP", "-84120775.15"]
+  - [F01C, F01C, EBIX, F01C_EBIX_20271231_01.csv, "2027-12-31 22:00:00", "2028-01-01 00:40:12", bdoi.it.jramos, AMOUNT_TOTAL, open_balance, USD, "component=BASIC", "412330.00"]
+  - [F01C, F01C, EBIX, F01C_EBIX_20271231_01.csv, "2027-12-31 22:00:00", "2028-01-01 00:40:12", bdoi.it.jramos, AMOUNT_TOTAL, booked, PHP, "", "1284533.75"]
+  - [F01C, F01C, EBIX, F01C_EBIX_20271231_01.csv, "2027-12-31 22:00:00", "2028-01-01 00:40:12", bdoi.it.jramos, SHA256, "", "", "", "3a7bd3e2360a3d29eea436fcfb7e44c735d117c42d1c1835420b6b9942dd4f1b"]
+
+# --------------------------------------------------------------------------------------------------------------
+# Example rows of a code map version (made-up values): [set, source, legacy code, legacy description, rows, action,
+# BIBS value, BIBS description, remarks].
+map_example:
+  # Columns: code map, source_system, legacy_code, legacy_description, qualifier, qualifier_value, action,
+  # target_code, remarks, rows using the code (from the profiling). The console exports one sheet per code map.
+  - [INSURER, EBIX, MAL, "Malayan Insurance Co., Inc.", "", "", MAP, INS-MAL, "", "1,240"]
+  - [INSURER, QPS, "0012", Malayan Insurance, "", "", MAP, INS-MAL, QPS numeric code of the same insurer, "310"]
+  - ["LOV:MARKET_SEGMENT", QPS, CBG, Consumer Banking Group, "", "", MAP, CBG, "", "88,410"]
+  - ["LOV:MARKET_SEGMENT", QPS, OLD-RET, Retail (discontinued 2019), "", "", DEFAULT, "", Segment discontinued; the default of the set applies, "12"]
+  - [PRODUCT, EBIX, MC-PC-COMP, Private Car Own Damage and Theft, "", "", MAP, MCPC01, "", "41,002"]
+  - ["STATUS:UPP", EBIX, FOR_MONITORING, For monitoring, "", "", MAP, MONITORING, Monitoring tab of the Unapplied workbench, "815"]
+  - [USER, QPS, mreyes, Maria Reyes, "", "", MAP, maria.reyes, BIBS user created through User Access, "3,112"]
+  - ["MIS:BUSINESS_ORIGIN", QPS, WALKIN, Walk-in, "", "", CREATE, WALK_IN, New MIS value; authorised in the LOV master, "57"]
+  - [PACKAGE, QPS, PKG-MC-PRIV, Private Car Package 2027, SI_BAND, "0.00-2000000.00", MAP, MC-PRIVATE-STD v1, "Sum insured up to 2,000,000.00 (DMQ36)", "18,240"]
+  - [PACKAGE, QPS, PKG-MC-PRIV, Private Car Package 2027, SI_BAND, "2000000.01-999999999.99", MAP, MC-PRIVATE-HV v1, "Sum insured above 2,000,000.00 (DMQ36)", "1,115"]
+  - [PACKAGE, QPS, PKG-HOME-01, Home Protect (withdrawn), "", "", REJECT, "", "No BIBS package; at renewal the candidate goes to the Exception bucket (Renewal processing team)", "96"]
+
+# --------------------------------------------------------------------------------------------------------------
+# Item of the BRD discrepancy and clarification register (v1.2) for each open decision.
+register_refs:
+  DMQ01: DCR-195
+  DMQ02: DCR-192
+  DMQ03: DCR-195
+  DMQ06: DCR-208
+  DMQ09: DCR-194
+  DMQ11: DCR-207
+  DMQ12: DCR-207
+  DMQ14: DCR-204
+  DMQ16: "DCR-198, DCR-205"
+  DMQ18: DCR-197
+  DMQ19: "DCR-198, DCR-206"
+  DMQ22: DCR-194
+  DMQ24: DCR-209
+  DMQ25: "DCR-200, DCR-242"
+  DMQ26: "DCR-199, DCR-240"
+  DMQ36: DCR-241
+  DMQ37: "DCR-199, DCR-240"
+  DMQ38: DCR-243
+  DMQ39: DCR-242
+  DMQ28: DCR-193
+  DMQ29: DCR-193
+  DMQ30: DCR-196
+  DMQ31: DCR-200
+  DMQ32: DCR-200
+  DMQ33: DCR-200
+  DMQ34: DCR-203
+  DCR-173: DCR-173
+  DCR-189: DCR-189
+  DCR-202: DCR-202
+
+# Open decisions: [id, topic, decision needed, what waits for it, needed by, BDOI owner, status, answer].
+decisions:
+  - [DCR-189, BRD sign-off, "The Data Migration BRD is a draft v0.01 without signatures (p.2, p.15-16); when is it walked through and signed, and by whom", "Baseline of this set; Handbook re-issue", M2, Program Manager, OPEN]
+  - [DCR-173, Client migration period and daily client batches, "Umbrella BRD p.43 asks for a one-time client migration 'from Broker and source, 2020 to present' and daily midday / EOD client batches with a modification report. Confirm the period and filter (DMQ05), the source systems, and that the daily batches run only until the freeze (proposal) and not as a feed after go-live", "C01 scope and delta extracts; client migration", M1, "Product Owner, MBS", OPEN]
+  - [DMQ01, Data object inventory, "Confirm the objects, classes and source systems of the register; name the business owner and data steward per object", "All objects; gate G1", M2, Program Manager, OPEN]
+  - [DMQ02, Decision rule, "Confirm who rates the four criteria, who approves, and the rule that turns ratings into a class (proposal in Handbook Part A, the decision gate)", Gate G1, M2, Program Manager, OPEN]
+  - [DMQ03, Source systems, "Confirm the systems in scope (EBIX, QPS, ISYS, CMS, Excel) and the system of record per object where two hold it", All layouts, M1, BDOI IT, OPEN]
+  - [DMQ04, Client dedupe keys, "Agreed keys (is the bank CIF a key?), survivorship per field, who reviews doubtful matches and within what time", C01 matching, M2, "Product Owner, MBS", OPEN]
+  - [DMQ05, Client scope, "All clients since 2020, or only those with an in-force policy, open item or activity since a date; prospects; corporate contacts", C01 volumes; filter, M2, "Product Owner, MBS", PARTIAL]
+  - [DMQ06, Screening of migrated clients, One full screening run after the load instead of per client; legacy results archived, C01 load; cutover task CT-050, M2, Compliance, OPEN]
+  - [DMQ07, KYC documents, Migrate as attachments or archive; KYC status and review dates, "C04, H02", M2, Compliance, OPEN]
+  - [DMQ08, Code map owners, "Owner and signer per map set; MIS fields required", Gate G2; all map sets, M2, "Product Owner, MBS", OPEN]
+  - [DMQ09, In-force header condition, "All in-force policies, or only those with open legacy invoices or that may be endorsed or claimed; the header fields", "P01, P01S; endorsements BRID 9", M1, "Head, Operations", OPEN]
+  - [DMQ10, Legacy invoice scope, "Which invoices carry forward (open PR, paid not remitted, open commission, open PR2307); zero-balance invoices of in-force policies for endorsement; history depth", "F01", M1, Operations - Financial Transactions, OPEN]
+  - [DMQ11, Invoice numbers, Are EBIX and QPS invoice numbers unique across both systems; QPS invoice format, "F01 keys; payment matching", M1, BDOI IT, OPEN]
+  - [DMQ12, Components and shares, Can legacy give open balances per component and per insurer share; if not which split rule, "F01C", M1, BDOI IT; Comptrollership, OPEN]
+  - [DMQ13, Commission state, "Realised / unrealised commission, deferred output VAT, commission collected by remittance, per invoice", F01 opening entry, M1, "Head, Comptrollership", OPEN]
+  - [DMQ14, UPP receipt and statuses, "New BIBS AR, reprint of the legacy AR, or none for a migrated UPP; legacy UPP statuses and dispositions in progress", "F02", M1, Operations - Financial Transactions, OPEN]
+  - [DMQ15, UPP matching references, References held per UPP; automatch rerun frequency after cutover, F02 ref_ columns, M2, Operations - Financial Transactions, OPEN]
+  - [DMQ16, Reclassification to income, "Who is top management; criteria, frequency, GL account, customer notice, reversal", FR-DM-055 configuration, M2, "Head, Comptrollership", OPEN]
+  - [DMQ17, Legacy UPP refunds, Same approvers and Disbursement flow as new UPP refunds, FR-DM-054 configuration, M2, Operations - Financial Transactions, OPEN]
+  - [DMQ18, Legacy sub-ledgers and GL, "Separate legacy control accounts and Migration Clearing; end state after run-off; whole opening TB per branch and currency; GL ageing of legacy PR", "R08, G01; accounting rules", M1, "Head, Comptrollership", OPEN]
+  - [DMQ19, DPPR, "Definition, entries including Commission Receivable, source of the approved list, approver", FR-DM-070 rules, M2, "Head, Comptrollership", OPEN]
+  - [DMQ20, PR2307 reversal, "Entries, evidence, approver", FR-DM-071 rules, M2, "Head, Comptrollership", OPEN]
+  - [DMQ21, Remittance positions, "Batches in process, holds and special remittances at cutover - completed in legacy or carried; insurer ORs outstanding", F04 decision, M2, Operations - Remittance, OPEN]
+  - [DMQ22, Endorsement coexistence, "Confirm legacy invoices are endorsed in BIBS from cutover; types; service invoice numbering; renewal uses BIBS values", "P01 condition", M1, "Head, Operations", OPEN]
+  - [DMQ23, Legacy change report, "Which changes count; fields, period, frequency, recipients", FR-DM-100 report, M2, Operations - Prod Recon, OPEN]
+  - [DMQ24, Read-only legacy or archive, "Per legacy system - read-only (how long, who hosts, access logging) or archived in BIBS before decommissioning; record types, search keys, retention", "H01, H02, C04", M2, Audit / Compliance; BDOI IT, OPEN]
+  - [DMQ25, Cutover date and window, "Go-live month (M1) and exact date (M6); freeze length; last legacy EOD; month-end alignment; blackout dates", "Whole calendar; runbook", "M1 (month), M6 (date)", Program Manager, PARTIAL, "Month answered by the BDOI timeline (26-Sep-2026) - January 2028; full migration and cut-over Nov 2027-Jan 2028. Date 3 January 2028 at the year-end boundary recommended with DMQ39; confirmed by Comptrollership at M6"]
+  - [DMQ26, RMEL transition, "Cohorts already extracted in legacy carried into BIBS or finished in legacy; first cohort extracted by BIBS; path of legacy renewals", "P01 scope; Renewal", M1, "Heads, Retail and Corporate Marketing", ANSWERED, "Answered by DMQ37 (26-Sep-2026) - no cohort is carried; the expiries from T to 31-May-2028 are extracted by BIBS at go-live from the migrated headers; the daily extraction then starts at the expiry of 1-Jun-2028 (extracted 13-Jan-2028)"]
+  - [DMQ27, Decommissioning criteria, "Criteria and owner per legacy system; retention of the legacy data", Decommissioning checklists, M6, Program Manager; BDOI IT, OPEN]
+  - [DMQ28, Volumes and quality, "Row counts per object and source, growth to go-live, known quality issues, history depth, extract owner and delta frequency", Register volumes; performance test, M3, BDOI IT, OPEN]
+  - [DMQ29, Consolidated NFR, "Name, version and owner of the consolidated NFR; cutover window, load time, retention of migration evidence", NFR targets, M2, Program Manager, OPEN]
+  - [DMQ30, Objects not in the BRD, "Open claims, EB programmes, submitted-policy masterlists, payees, open disbursements, PDCs, users - in scope?", "R09, P04, P05, F06, F07", M1, Program Manager, OPEN]
+  - [DMQ31, Rehearsals and test data, "Number of trial migrations and the dress rehearsal; masked production extracts in SIT / UAT; who masks and approves", Migration cycles, M2, Program Manager; Compliance, OPEN]
+  - [DMQ32, Fallback, "Point of no return; fallback to legacy after go-live; who decides", Runbook rollback, M6, Program Manager, OPEN]
+  - [DMQ33, In-flight items at the freeze, "Pending endorsements, un-booked accounts, placements, PDCs, pick-ups and refunds - completed before the freeze, carried or re-keyed", "F06; freeze plan", M2, "Head, Operations", OPEN]
+  - [DMQ34, Collection history, "Carry open dispositions, promises, installment plans and collector assignments", F03, M2, "Head, Operations (Collections)", OPEN]
+  - [DCR-202, Write-back to legacy, "Confirm that no contact or client update is written back to QPS / EBIX after the freeze (legacy read-only; proposal)", "C01 deltas; CSF contact write-back", M1, "Product Owner, MBS", OPEN]
+  - [DMQ35, Foreign currency, "Rate for the openings of USD invoices and UPP (legacy booking rate or cutover BOOK rate); FX difference at collection", "F01, F02, G01", M2, "Head, Comptrollership", OPEN]
+  - [DMQ36, Package remapping, "At upload (migration intake) or during Renewal sanitation; owner of the decision and of the map; legacy packages that split and on which attributes", "R06, P01; package code map; package check of the Renewal sanitation", M1, "Product Owner, MBS; TSU", ANSWERED, "BDOI 26-Sep-2026 - at sanitation in Renewal, not at migration intake. The migration loads the package code map as reference data only (R06); P01 keeps the legacy package; the package check of the Renewal sanitation sends unmapped packages to the Exception bucket, worked by the Renewal processing team"]
+  - [DMQ37, January-May 2028 renewals, "Prepared in legacy and carried at the freeze, or processed in BIBS after go-live", "P01 scope; P03; Renewal go-live extraction", M1, "Heads, Retail and Corporate Marketing", ANSWERED, "BDOI 26-Sep-2026 - processed in BIBS after go-live; no carried candidates. Go-live extraction of every expiry from T to 31-May-2028 from the migrated headers (P01), prioritised by expiry date, January expiries flagged urgent; RAs already sent by hand loaded as a small reference file (P03) and not re-sent"]
+  - [DMQ38, RMEL and disposition sources, "Where the RMEL, dispositions and RAs are kept; who reviews rejected rows", "P03 template and review", M2, "Head of the Renewal processing team", ANSWERED, "BDOI 26-Sep-2026 - RMEL and dispositions are kept in Excel; rejected rows are reviewed by the Renewal processing team, maker and checker. Only the RAs already sent are taken from the trackers (XLSX template, rejection report with correction columns, maker-checker resubmission)"]
+  - [DMQ39, Year-end cut-over, "Go-live at the year-end boundary; last business day; year-end close; late 2027 and audit adjustments after go-live", "Runbook calendar; G01, G03; true-up journals", M6, Program Manager; Head of Comptrollership, RECOMMENDED, "BDOI 26-Sep-2026, recommendation awaiting Comptrollership confirmation - option A - go-live Mon 3-Jan-2028; legacy closes FY2027; provisional opening TB (balance sheet only) from the preliminary December TB; legacy GL open only for FY2027 closing and audit adjustments; true-ups as opening-balance adjustment journals after the legacy close (about mid-late January 2028) and after the audited FS (about March-April 2028); December soft close by about 20-Dec-2027. Options B (April 2028, YTD P&L) and C (two books in Q1 2028) not recommended"]
+
+# --------------------------------------------------------------------------------------------------------------
+# Columns of the control file. The column names and their order are those of the control-file template that the
+# Migration Console exports (Control File Template); the check refuses a difference. [name, what it holds,
+# mandatory, format, example]
+control_fields:
+  - [object, Object code of the data file, Y, Upper case; matches the file name, F01]
+  - [layout, Layout (template) code, Y, Upper case; matches the header row, F01C]
+  - [source_system, "Source system: EBIX, QPS, ISYS, CMS or EXCEL", Y, Upper case; matches the file name, EBIX]
+  - [data_file, Name of the data file the control file belongs to, Y, "<LAYOUT>_<SOURCE>_<yyyyMMdd>_<nn>.csv or .xlsx", F01C_EBIX_20271231_01.csv]
+  - [as_of, Date and time the data represents, Y, "yyyy-MM-dd HH:mm:ss; not earlier than the previous extract of the layout", "2027-12-31 22:00:00"]
+  - [extracted_at, When the extract ran, Y, "yyyy-MM-dd HH:mm:ss; after as_of", "2028-01-01 00:40:12"]
+  - [extracted_by, BDOI IT user who ran the extract, Y, Free text, bdoi.it.jramos]
+  - [measure, "Kind of control: ROW_COUNT, HASH_TOTAL, AMOUNT_TOTAL or SHA256", Y, Upper case, AMOUNT_TOTAL]
+  - [column_name, Column the measure applies to, C, "As in the header; mandatory for HASH_TOTAL and AMOUNT_TOTAL", open_balance]
+  - [currency, Currency of an AMOUNT_TOTAL, C, ISO 4217; mandatory for AMOUNT_TOTAL, PHP]
+  - [filter, Optional filter of the measure, N, column=value, component=BASIC]
+  - [value, Value of the measure, Y, Digits with a dot decimal for amounts; 64 hexadecimal characters for SHA256, "98450221.40"]
+
+# Rules of every extract file that complete the "How to fill" sheet of the console workbook (which the Migration
+# Workbook repeats first, unchanged). [topic, rule]
+file_rules_extra:
+  - [Personal data, "Production extracts are loaded only in production. Every other environment receives masked data: names, addresses, TIN, ID, account and phone numbers, e-mail addresses and birth dates are masked when the file is received. Staged rows and files are deleted within 5 days of the batch sign-off"]
+  - [Layout changes, "A layout is frozen at gate G2. A file whose header does not match the layout in force is rejected. A change of layout is a new layout version agreed with the Data Migration Lead"]
+  - [Load template workbook of P03, "The Renewal processing team may send the RA-sent file in the load template workbook of layout P03 exported by the Migration Console (the template sheet with the guide rows Mandatory, Format, Allowed values and What to enter directly above the header row, and the Lists sheet with the allowed values); the CSV template is also accepted"]
+
+# The BIBS values that each code map set maps to, as the business knows them (the console shows the same set).
+map_labels:
+  INSURER: Insurers
+  INSURER_BRANCH: Insurer branches
+  LINE: Product lines
+  COVER_TYPE: Cover types
+  PRODUCT: Products and risk codes
+  PACKAGE: Package versions (Renewal package map)
+  BRANCH: Branches
+  SALES_UNIT: Sales units
+  AO: Account officers
+  USER: BIBS users (User Access)
+  COST_CENTER: Cost centres
+  GL_ACCOUNT: Chart of accounts
+  BANK: Bank list
+  CURRENCY: Currencies (ISO 4217)
+  DISPOSITION_TYPE: Cashiering disposition types
+  DISPOSITION_CLX: Collections dispositions
+  DOCUMENT_TYPE: Document types of the archive
+  "LOV:*": Lists of values
+  "MIS:*": MIS fields
+  "STATUS:*": Status of the BIBS record
+# Milestone by which the first approved version of each set is due (default M5).
+map_due:
+  default: M5
+  DOCUMENT_TYPE: Before the first archive load
+
+# --------------------------------------------------------------------------------------------------------------
+# Reconciliation and business verification per object group (Handbook Part C; Migration Workbook sheet
+# "Reconciliation sign-off"). objects: object codes of the group. l1..l4: what each level compares; business: the
+# L5 or business check; sample: what the data owner verifies on the BIBS screens (gate G6).
+reconciliation:
+  - objects: [R01, R02, R03, R04, R05, R06, R07, R08, R11]
+    l1: Values received, mapped, created, rejected; package code map entries
+    l2: "-"
+    l3: Distinct keys
+    l4: Created values (name, status, dates); package code map entries in the Renewal package map
+    business: Unmapped-code report empty; every value created in BIBS authorised in its master; the package code map entries in the Renewal package map equal the approved version
+    sample: "Every value created in BIBS; 10 mapped values per code map set; every legacy package with more than one BIBS target; every receipt series. Checked: value, description and status in the master; the package entries of each split in the Renewal package map; next AR / OR number = legacy last used + 1"
+  - objects: [R09]
+    l1: Payees received and loaded
+    l2: "-"
+    l3: Distinct payee codes
+    l4: All loaded fields
+    business: Payee list in Disbursement
+    sample: "20 random payees. Checked: name, TIN, bank and account on the payee record (status Draft until submitted by Disbursement)"
+  - objects: [C01, C03]
+    l1: Legacy clients received, clusters, merged, new, loaded; payout accounts received and loaded
+    l2: "-"
+    l3: Distinct legacy client numbers = key cross-reference entries
+    l4: Identity, contact, segment and KYC fields of the surviving record; payout account fields
+    business: Client review queue empty; each legacy number resolves to one BIBS client
+    sample: "30 random clients per source system; 20 merged clusters; 10 decisions of the review queue; 10 corporate clients. Checked: client search by legacy number; name, identity, contacts, segment, AO, KYC status and review date; the cluster shows every legacy number"
+  - objects: [P01]
+    l1: Headers and share rows received and loaded
+    l2: Sum insured, gross and net premium per currency
+    l3: Distinct legacy policy references
+    l4: All header fields and shares
+    business: Headers linked to their clients and legacy invoices; P01 against the legacy in-force list for every expiry to 31 May 2028
+    sample: "30 random headers; 10 with several insurers; 10 expiring within 140 days. Checked: account search by policy and legacy reference; dates, insurer and shares, sum insured, premium, client link, legacy invoices listed"
+  - objects: [P03]
+    l1: RA-sent rows received, loaded, rejected; resubmitted rows
+    l2: Proposed premium per currency
+    l3: Distinct legacy policy references
+    l4: RA date, reference, channel, sender, tracker
+    business: "At go-live, the extraction check per expiry month January-May 2028: headers expiring from T to 31 May 2028 = candidates + renewals booked in legacy; loaded P03 rows = candidates with the RA already sent; every January candidate urgent"
+    sample: "10 rows per tracker; every resubmitted row; at go-live 20 candidates per expiry month January-May 2028. Checked: RA date, reference and channel against the tracker; the candidate shows the RA already sent; January candidates urgent and in expiry-date order"
+  - objects: [F01]
+    l1: Invoices, share rows, component rows
+    l2: Booked, adjusted, paid, remitted, written off and open per component and currency
+    l3: Distinct invoice numbers
+    l4: Header fields, shares, every component and bucket
+    business: "L5: Premium Receivable, PR 2307, DTIP and Commission Receivable (legacy) against the legacy invoices; Migration Clearing 0.00"
+    sample: "20 largest open balances per currency; 30 random; 10 endorsement or cancellation invoices; 10 direct-payment; 10 with 2307; up to 20 foreign-currency. Checked on Invoice 360: LEGACY badge, source, legacy number, original values, booked / paid / remitted / open per component, shares; the Collections item of an open premium"
+  - objects: [F02]
+    l1: Unapplied payments received and loaded
+    l2: Amount and balance per currency
+    l3: Distinct unapplied payment references
+    l4: All fields, stage and disposition
+    business: "L5: Unapplied Collections (legacy) against the migrated balances"
+    sample: "20 largest balances; 20 random; every item with a disposition in progress (up to 30). Checked on the Unapplied workbench: legacy AR, amount, balance, tab, references, disposition"
+  - objects: [F03, F04, F06]
+    l1: Rows per record type
+    l2: Promise, instalment, hold and cheque amounts per currency
+    l3: Distinct keys
+    l4: All fields
+    business: Worklist items show the carried promises and assignments; holds and cheques visible in Remittance and Cashiering
+    sample: "20 random rows per object. Checked: the promise and assignment on the Collections item; the hold or special request in Remittance; the cheque in the warehouse list"
+  - objects: [G01]
+    l1: Trial balance lines
+    l2: Debit and credit per branch and currency, in currency and in PHP
+    l3: Lines per branch
+    l4: Account, branch, currency and amounts per line
+    business: "Provisional opening: balance sheet in BIBS = preliminary December TB per branch and currency; FY2027 result on retained earnings; P&L accounts 0.00; Migration Clearing 0.00"
+    sample: "Every branch and currency total; the 20 largest account lines; retained earnings per branch. Checked: the BIBS trial balance against the signed preliminary trial balance; P&L accounts at 0.00"
+  - objects: [G03]
+    l1: Journal lines and detail lines per true-up
+    l2: Debit and credit per branch and currency; detail per account
+    l3: Distinct legacy journals
+    l4: Account, branch, currency, amounts; item and component of each detail line
+    business: "True-up reconciliation: cut-off, movement, balance, Migration Clearing and sub-ledgers, opening period"
+    sample: "Every journal of the true-up; every detail line on a legacy control account. Checked: journal inquiry (MIG-TU-n) against the legacy journal and the register; Invoice 360 or the Unapplied workbench for the item adjusted"
+  - objects: [H01, H02]
+    l1: Records per record type; documents
+    l2: Amount per record type and currency
+    l3: Distinct keys per record type; SHA-256 per document
+    l4: Labelled legacy columns
+    business: Samples found in Legacy Inquiry with their documents
+    sample: "10 records per record type; 10 documents. Checked: Legacy Inquiry search by the legacy key; labelled columns; the document opens and matches its checksum"
+
+# --------------------------------------------------------------------------------------------------------------
+# Proposed business rules and clarifications for confirmation (Handbook chapter "Proposed business rules and
+# clarifications for confirmation"; Migration Workbook sheet of the same name, with the BDOI decision columns).
+# [ref, topic, proposed rule, reason, decision requested, decisions of the register it closes, needed by]
+proposals:
+  - [PR-DM-01, "Year-end cut-over: option A or B", "Option A: go live on Monday 3 January 2028 at the year-end boundary. Legacy processes to 31 December 2027 and closes FY2027; BIBS opens with the open items at 31 December and a provisional GL opening (balance sheet only, the FY2027 result in retained earnings). The legacy GL stays open only for the FY2027 closing and audit adjustments of named Comptrollership users; each reaches BIBS as an opening-balance adjustment after the legacy close (about mid-January 2028) and after the audited statements (about March-April 2028). Option B (go-live after the first-quarter close, April 2028, with a year-to-date P&L migration) is not proposed; option C (two sets of books in the first quarter) is not proposed", "One fiscal year per system; no P&L migration; books of accounts and BIR returns are never split inside a year; the go-live stays on the BDOI timeline. Option B moves go-live by three months, splits FY2028 across two systems and needs a month-by-month P&L reconciliation", "Comptrollership confirms option A, or chooses option B, with the date of the December soft close", "DMQ39, DMQ25", "M6 (1 Oct 2027)"]
+  - [PR-DM-02, Legacy control accounts and Migration Clearing, "Separate legacy control accounts hold the positions of the migrated invoices and unapplied payments: Premium Receivable - Legacy (by component), PR 2307 - Legacy, Due to Insurers - Legacy, Commission Receivable - Legacy, Unrealised Commission and Deferred Output VAT - Legacy, Unapplied Collections - Legacy, and a Migration Clearing account that must net to 0.00. The account codes are assigned by Comptrollership in the production chart; the handbook names the accounts only", "The legacy positions run off visibly and apart from new business; Migration Clearing proves that the invoice and payment detail equals the legacy GL", "Comptrollership assigns the codes of the seven accounts in the production chart and confirms the end state of the accounts after the run-off", "DMQ18", "M1 (16 Oct 2026); production set-up at T-25"]
+  - [PR-DM-03, Extract volumes and the secure file drop, "BDOI IT supplies the row count per object and source system with the first full extracts (29 January 2027) and at each trial migration. Files are received through the Extracts screen of the Migration Console until BDOI IT names a secure file drop in the BIBS environment; files are never e-mailed", "The volumes size the load windows and the dress rehearsal; a single agreed transfer path keeps the files encrypted and logged", "BDOI IT confirms the volumes per object, the owner of each extract and whether a secure file drop is set up (host, account, schedule)", "DMQ28", "M3 (29 Jan 2027)"]
+  - [PR-DM-04, Legacy document folder and read-only links, "Legacy documents (policies, SOAs, ORs, certificates, letters, KYC files) are copied by BDOI IT into a transfer folder with an index file (layout H02) and a SHA-256 per file; BIBS archives them with their record. Each legacy application stays available read-only until it is decommissioned; its address is shown in Legacy Inquiry for the users who still need it", "History stays retrievable with logged access without converting it into BIBS transactions", "BDOI IT names the transfer folder and the read-only address of EBIX and QPS; Audit / Compliance confirms per system whether history is archived in BIBS or read in legacy until decommissioning", "DMQ24, DMQ07", "M2 (30 Oct 2026)"]
+  - [PR-DM-05, "Conditional objects F04-F07, P04 and P05", "Remittance in flight (F04): complete the legacy batches before the freeze; carry only holds and special remittances that cannot complete. DP billing in process (F05): carried inside the open invoices (F01), no separate file. PDCs, cheque pick-ups and refunds in process (F06): carry the PDCs in the warehouse; complete pick-ups and refunds in legacy before the freeze. Open claims (F07), submitted-policy masterlists (P04) and Employee Benefits programmes (P05): migrated through the uploads of their own modules only if BDOI brings them into scope", "Each object is either completed before the freeze or carried, so that no item is lost or processed twice; the uploads of Claims, Submitted Policies and Employee Benefits already exist and need no separate migration layout", "Operations, Claims, Marketing and the EB Head decide per object: carried, completed before the freeze, or out of scope", "DMQ21, DMQ30, DMQ33", "M1 (16 Oct 2026)"]
+  - [PR-DM-06, Approval levels of the legacy batches, "Unapplied to Income: requested by a Cashiering user, approved by the Cashiering team lead and then by top management (two different people). Legacy PR 2307 Reversal: requested by a Cashiering user, approved by the Cashiering team lead. DP PR Legacy Reversal: requested by a Commission user, approved by the Commission team lead. In every batch the requester never approves", "The reclassification to income changes the P&L and needs a management approval; the two reversals move balances between the legacy accounts of one invoice and follow the team-lead approval of the other Cashiering and Commission batches", "Comptrollership confirms the approvers per batch, names top management, and gives the income account and the minimum age of an unapplied payment for the reclassification", "DMQ16, DMQ19, DMQ20", "M2 (30 Oct 2026)"]
+  - [PR-DM-07, Decision rule of an object, "Migrate when the object is needed on Day 1 and is master or reference data; Carry forward when it is an open item BDOI must still act on; Conditional when BDOI states the condition; Archive when it is not needed on Day 1 but must be kept; Excluded otherwise. The Data Migration Lead proposes; the business owner of the object approves (gate G1)", "The BRD gives the four criteria but not the rule that turns them into a class", "The Program Manager confirms the rule and the approver", "DMQ02, DMQ01", "M2 (30 Oct 2026)"]
+  - [PR-DM-08, "Client scope: 2020 to present", "Migrate every client created from 1 January 2020, plus older clients with an in-force policy, an open item or activity since 2020; load them two weeks before go-live and keep them current with daily deltas until the freeze; no client feed after go-live", "The umbrella BRD asks for clients from 2020 and daily client batches; after the freeze legacy is read-only and BIBS is the client master", "The Product Owner of MBS confirms the period and the filter, and that the daily batches stop at the freeze", "DMQ05, DCR-173, DCR-202", "M1 (16 Oct 2026)"]
+  - [PR-DM-09, Client matching keys and thresholds, "Keys: TIN; ID type and number; name and birth date; corporate name with registration number; bank CIF if confirmed; e-mail and mobile as soft keys. Pairs scoring 90 or more merge; 60 to 89 go to the Data Steward's review queue; the client load waits until the queue is empty. Per field the first non-blank value wins by source priority (QPS for contact data, EBIX for billing data)", "One client master without duplicates, with every lost value kept for review", "The Product Owner of MBS confirms the keys (is the bank CIF a key?), the thresholds and the source priority", "DMQ04", "M2 (30 Oct 2026)"]
+  - [PR-DM-10, Loading thresholds, "Master data may be loaded with at most 0.5 percent of rows rejected or waived; open invoices, unapplied payments and the trial balance only with no error, or with each excluded row approved by its owner with a manual-entry plan", "Master data can be completed after go-live; a missing financial item would break the ledger and the reconciliation", "Comptrollership and the data owners confirm the two thresholds", DMQ29, "M2 (30 Oct 2026)"]
+  - [PR-DM-11, In-force policy headers, "Migrate the header of every policy in force at go-live (and in every case every expiry from go-live to 31 May 2028 and every renewal term booked in legacy that starts on or after go-live)", "Headers are needed to find active cover, to endorse legacy invoices and to renew in BIBS; the go-live renewal extraction works only from them", "Operations confirms the scope and the header fields", "DMQ09, DMQ22", "M1 (16 Oct 2026)"]
+  - [PR-DM-12, Open invoice content, "Each open invoice is sent with its components (basic premium, DST, premium tax or VAT, LGT, FST, other charges, DTIP, commission, VAT on commission, withholding tax, PR 2307) and their booked, adjusted, paid, remitted and written-off amounts, per insurer share. Invoice numbers are kept; a number found in two source systems is prefixed with the source system", "The open balance in BIBS must equal the legacy open balance per component so that payments, remittances and reversals work on the right amounts", "BDOI IT confirms that legacy can give the components and shares, and that EBIX and QPS numbers are unique; Comptrollership gives the commission state per invoice", "DMQ10, DMQ11, DMQ12, DMQ13", "M1 (16 Oct 2026)"]
+  - [PR-DM-13, Unapplied payments, "A migrated unapplied payment keeps its legacy AR number and date; no new BIBS AR is issued for money already acknowledged in legacy; it is matched by automatch on its references after every payment upload and hourly", "No duplicate receipt for the same cash; the references the payor gave are used again", "Operations - Financial Transactions confirms the receipt handling, the statuses and the matching references", "DMQ14, DMQ15, DMQ17", "M1 (16 Oct 2026)"]
+  - [PR-DM-14, Foreign-currency openings, "USD invoices and unapplied payments open at their legacy booking rate; the difference at collection is an exchange difference as for a BIBS invoice", "The legacy receivable is carried at the value in the legacy books", "Comptrollership confirms the rate", DMQ35, "M2 (30 Oct 2026)"]
+  - [PR-DM-15, "Trial migrations, masking and the dress rehearsal", "Four trial migrations (April, July, August and October 2027) and a dress rehearsal (November 2027) on masked extracts; masking when the file is received in BIBS; unmasked files never leave production", "Every step of the cut-over is timed and proven on full data before production", "The Program Manager and Compliance confirm the number of runs and the masking", DMQ31, "M2 (30 Oct 2026)"]
+  - [PR-DM-16, Point of no return, "Until the go / no-go decision the rollback restores the snapshot and legacy reopens. After go-live, the point of no return is the end of the first business day (18:00); later issues are fixed forward in BIBS", "A clear point after which legacy is never reopened for business", "The Program Manager confirms the point of no return and who decides the rollback", DMQ32, "M6 (1 Oct 2027)"]
+  - [PR-DM-17, Items in process at the freeze, "Endorsements, un-booked accounts, placements, cheque pick-ups and refunds in process are completed in legacy before the freeze; what cannot complete is carried (F04, F06) or keyed in BIBS after go-live from a list signed by its owner", "No item is lost at the freeze or processed in both systems", "Operations confirms the completion drives and the re-keying list", "DMQ33, DMQ21", "M2 (30 Oct 2026)"]
+  - [PR-DM-18, Collection state, "Carry the open dispositions, promises to pay, instalment plans and collector assignments of the open invoices; the history stays in the archive", "Collectors continue their follow-up without re-keying", "Collections confirms", DMQ34, "M2 (30 Oct 2026)"]
+  - [PR-DM-19, Screening of migrated clients, "No screening per migrated client during the load; one full screening run of all migrated clients before go-live; legacy screening results archived", "Current results for every client without thousands of screening requests during the load", "Compliance confirms", DMQ06, "M2 (30 Oct 2026)"]
+  - [PR-DM-20, Retention of the migration evidence, "Staged rows and files are deleted within 5 days of the batch sign-off; counts, hashes, totals, reports and sign-offs are kept 10 years; the archive and its access log follow the retention of historical data (5 years online, 15 years archive)", "The personal data of the extracts is not kept longer than needed while the evidence of the migration stays available for audit", "Compliance confirms the retention of the evidence", "DMQ29, DMQ24", "M2 (30 Oct 2026)"]
+  - [PR-DM-21, Decommissioning of a legacy system, "A legacy system is switched off only against a signed checklist: final extracts reconciled, the final opening-balance adjustment reconciled (EBIX, ISYS), archive loaded and reconciled, Legacy Inquiry verified by Audit / Compliance, no open item or claim needing it, access logs archived, retention covered, owners signed", "History and audit evidence stay available; nothing still open depends on the system", "The Program Manager and BDOI IT confirm the criteria and the owner per system", DMQ27, "M6 (1 Oct 2027)"]
+  - [PR-DM-22, No write-back to legacy, "After the freeze no client or contact change is written back to QPS or EBIX; legacy is read-only", "One system of record per item from the freeze", "The Product Owner of MBS confirms", DCR-202, "M1 (16 Oct 2026)"]
+  - [PR-DM-23, Treatment of a legacy invoice, "A legacy invoice is not re-booked in BIBS: it enters the Operations ledger with its open balances per component and insurer share, keeps its legacy number, and is processed like a BIBS invoice (payments, remittance, reversals, endorsements) with its postings on the legacy control accounts", "The legacy books stay traceable item by item and the processes after go-live are the ones users already learn for BIBS invoices", "Comptrollership and Operations confirm the treatment", "DMQ10, DMQ18", "M1 (16 Oct 2026)"]
+  - [PR-DM-24, Package remapping at Renewal sanitation, "The migration loads the policy headers with the legacy package as given and loads the package code map (object R06) prepared by TSU; each candidate is remapped at the package check of the Renewal sanitation, and a package without a map entry goes to the Exception bucket", "BDOI decision of 26 September 2026; no package is guessed at load", "The Product Owner of Marketing Business System confirms the decision and names the TSU preparer of the map", DMQ36, "M2 (30 Oct 2026)"]
+  - [PR-DM-25, Renewals of the January-May 2028 expiries, "No renewal cohort is carried from legacy: the expiries from go-live to 31 May 2028 are extracted at go-live and processed in BIBS, January expiries first and flagged Urgent; the renewal advices already sent are loaded from the Excel trackers of the Renewal processing team (object P03) with a maker and a checker", "BDOI decisions of 26 September 2026; the renewal lead time of the first months is protected", "The Heads of Retail and Corporate Marketing and the Head of the Renewal processing team confirm", "DMQ26, DMQ37, DMQ38", "M2 (30 Oct 2026)"]
+  - [PR-DM-26, Objects outside the migration, "Open claims, Employee Benefits programmes, the Excel masterlists of submitted policies, payees and users are not migrated until BDOI decides; users are created through User Access requests and legacy user IDs are only mapped; an object brought into scope uses the same layouts, gates and reconciliation", "The scope of these objects is open in the BRD", "The Program Manager decides the scope of each object", DMQ30, "M2 (30 Oct 2026)"]
+  - [PR-DM-27, Loading through the BIBS functions, "Each row is loaded through the same BIBS function that the screens use, so every rule, audit entry and accounting entry applies, without notifications to clients or insurers; each record keeps a cross-reference to its legacy key", "Migrated data meets the same rules as data keyed on the screens and every load is reconcilable", "The Program Manager confirms the approach", "-", "M1 (16 Oct 2026)"]
+  - [PR-DM-28, Reconciliation tolerance, "An amount difference between the control total, staging and BIBS is a break unless it is within the amount tolerance per currency (proposed 0.00); every break is fixed by a rerun or explained with a reason from the list and approved by the reconciliation approver", "Financial objects must reconcile to the centavo; the BRD gives no tolerance", "Comptrollership confirms the tolerance", "-", "M2 (30 Oct 2026)"]

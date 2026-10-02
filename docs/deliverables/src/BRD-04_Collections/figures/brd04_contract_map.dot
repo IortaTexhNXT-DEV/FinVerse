@@ -1,0 +1,30 @@
+digraph contract {
+  graph [rankdir=LR, fontname="Arial", nodesep=0.12, ranksep=0.9, bgcolor="white"];
+  node [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@FIELD_BLUE", fontname="Arial", fontsize=9, fontcolor="@NEAR_BLACK", margin="0.1,0.05"];
+  edge [color="@CTA_BLUE", arrowsize=0.6];
+  core [label="Collections", fillcolor="@HEADER_BLUE", fontcolor="white", fontsize=16, color="@HEADER_BLUE", margin="0.3,0.25"];
+  in0 [label="BRD-1 New Business\n- The account"];
+  in0 -> core;
+  in1 [label="BRD-11 User Access Maintenance\n- Users"];
+  in1 -> core;
+  in2 [label="BRD-13 Data Migration\n- Legacy invoices open at cut-over and the collect"];
+  in2 -> core;
+  in3 [label="BRD-2 Operations (Cashiering)\n- The unapplied payments of Cashiering with their "];
+  in3 -> core;
+  in4 [label="BRD-2 Operations (Commission Receivables)\n- A direct payment account returned by the insurer"];
+  in4 -> core;
+  in5 [label="BRD-2 Operations (invoice ledger)\n- Every booked invoice with its premium receivable"];
+  in5 -> core;
+  in6 [label="BRD-3 Product Maintenance (sales organisation)\n- Market segments"];
+  in6 -> core;
+  out0 [label="BDOI file server (FS04)\n- The daily For Application To Invoice file"];
+  core -> out0;
+  out1 [label="BRD-2 Operations (Adjustment)\n- The cancellation of an account the client will n"];
+  core -> out1;
+  out2 [label="BRD-2 Operations (Cashiering)\n- A check pick-up request (pick-up date\n- A BIR 2307 tag (path"];
+  core -> out2;
+  out3 [label="BRD-2 Operations (Commission Receivables)\n- A direct payment account from the disposition DP"];
+  core -> out3;
+  out4 [label="Client (e-mail)\n- The statement of account of a billing cycle"];
+  core -> out4;
+}

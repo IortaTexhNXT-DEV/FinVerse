@@ -1,0 +1,168 @@
+# Guide to the BRD-11 User Access Maintenance business sign-off pack: the content of the Sign-off Pack Guide deck
+# (generic guide deck builder) and of the Start Here guide (START_HERE_BRD11.md, ```pack blocks "guide-*").
+# The same layout is used for every BRD set; only this file changes.
+meta:
+  deck_title: Sign-off Pack Guide
+  module: User Access Maintenance
+  owner: Product Owner, Marketing Business System, with the Process Owner of User Access Maintenance (Business Administration)
+  issued: Mon 2-Nov-2026
+  signoff_date: Tue 1-Dec-2026
+
+# The documents of the set in reading order. kind = doc type of the file name (brand.READING_ORDER).
+documents:
+  - {kind: StartHere, name: User Access Maintenance, ext: docx, what: "Start Here: the map of the pack, who reads what, the steps and the dates", readers: Everyone, when: "First, on issue"}
+  - {kind: GuideDeck, name: User Access Maintenance, ext: pptx, what: "Sign-off Pack Guide: purpose, approach, the module at a glance, caveats, entry and exit criteria, change control", readers: "Business owner, Business Administration, Information Security, BDOI IT; presented at the kick-off", when: "Kick-off session"}
+  - {kind: FRS, name: User Access Maintenance, ext: docx, what: "Functional Requirements Specification v2.0: requirements, the menu of every persona, 18 screen specifications with screenshots, walkthroughs, messages, notifications, reports, the bulk upload, configuration inputs, cross-BRD contract", readers: "Business Administration for the requests and reports; Information Security for the role matrix and the separation of duties; BDOI IT for sign-in and identity integration", when: "During the review, with the SIT walkthroughs"}
+  - {kind: Signoff, name: User Access Maintenance, ext: xlsx, what: "Sign-off workbook: one row per screen, field, rule and message with the BU review columns; one menu sheet per persona; comments log, meeting minutes, version history, sign-off certificate", readers: "Every reviewer; the signatories sign it", when: "During the review and at sign-off"}
+  - {kind: TestPlan, name: User Access Maintenance, ext: xlsx, what: "Test plan workbook: the test cases traced to the FRs and to the screens, including one screen case and one message case per screen and the access checks by persona", readers: "Business users who will run UAT; Information Security; BDOI IT", when: "After the screens; used again in SIT and UAT"}
+  - {kind: TestPlan, name: User Access Maintenance Summary, ext: docx, what: "Test plan summary: scope, approach, coverage and the cases by area", readers: "Business owner, Information Security, BDOI IT", when: "Before sign-off"}
+  - {kind: Templates, name: Configuration Inputs, ext: xlsx, what: "Configuration input templates: users and roles load, role-to-permission matrix, approval rules and limits, separation-of-duties rules, password and session parameters, lists of values", readers: "Business Administration, Information Security, BDOI IT, the unit heads who name their users", when: "During the review; filled in before the first data migration mock and final before UAT"}
+  - {kind: UXDeck, name: User Access Maintenance, ext: pptx, what: "UX Screen Deck for the BDOI UX Design team: design foundation, navigation and personas, every flow step by step and every screen with all its states", readers: "BDOI UX Design team", when: "From the issue, in parallel with the review; re-issued with each version of the set"}
+  - {kind: UXScreens, name: User Access Maintenance, ext: xlsx, what: "UX screen register: one row per screen image with the screen, personas, flow and step, state, FRS section and requirements, UXD status and comments, and the Changed in this issue flag", readers: "BDOI UX Design team", when: "Kept by the UX Design team; the changed rows are flagged at each issue"}
+  - {kind: UXScreens, name: User Access Maintenance, ext: zip, what: "Image package: every screen image at twice the screen resolution (PNG), the component crops and the register as CSV", readers: "BDOI UX Design team", when: "Imported into the design tool at each issue"}
+
+# Reading order per role (FRS chapter numbers of v2.0).
+reading:
+  - role: Business owner (Product Owner, Marketing Business System)
+    order: "00 Start Here; 01 Guide deck; FRS chapters 1-3 (context and personas), 14 (walkthroughs), 19 (configuration inputs), 21 (sign-off) and 22 (proposed rules for confirmation); workbook Sign-off certificate"
+  - role: Business Administration (process owner of user access)
+    order: "FRS chapter 13 screens SCR-UA-06 to SCR-UA-12, SCR-UA-14 and SCR-UA-17; walkthroughs A and B; chapter 18 (bulk upload); chapter 19 templates CI-01, CI-03 and CI-06; workbook Screen catalogue, Field register, Business rules and Messages of those screens"
+  - role: BDOI Information Security
+    order: "FRS chapter 3 (personas and permissions), chapter 12 (menu of every persona) and its workbook sheets Menu by persona and Menu <role>; chapter 13 rules of SCR-UA-07, SCR-UA-08, SCR-UA-12, SCR-UA-15, SCR-UA-16 and SCR-UA-18 (separation of duties, second approval, emergency path); walkthroughs C and D; templates CI-02, CI-04 and CI-05"
+  - role: BDOI IT
+    order: "FRS chapter 7 (interfaces: EIAM on Entra ID, UIDM-ISC), chapter 8 (non-functional requirements), screens SCR-UA-01 to SCR-UA-05, SCR-UA-15 and SCR-UA-18, chapter 20 lines IC-08 to IC-11; template CI-05; the caveats of the Guide deck"
+  - role: Unit heads of the other BRDs (New Business, Operations, Finance, Compliance, Claims, Employee Benefits)
+    order: "FRS chapter 12, the menu table of their personas, and the workbook sheet Menu <role> of each; walkthrough A (a new user sees exactly the menu of the persona)"
+  - role: BDOI UX Design team
+    order: "07 UX Screen Deck: design foundation and navigation first, then the personas, flows and screens of the design work; 08 UX screen register (filter Changed in this issue at each new issue); 09 image package in the design tool"
+  - role: iorta TechNXT project team
+    order: "All documents; keeps the comments log, the meeting minutes and the version history of the workbook, answers every comment and keeps the traceability to SIT and UAT"
+
+# Approach and step-by-step flow up to closure. raci: R responsible, A accountable, C consulted, I informed.
+steps:
+  - step: 1
+    name: Pack issued
+    who: "R: iorta TechNXT Project Manager; A: iorta TechNXT delivery lead; I: all reviewers"
+    inputs: "FRS v2.0, workbook, test plan, configuration input templates, guide and deck"
+    outputs: "Release set v2.0 in the BRD-11 folder of Drop 0; invitations to the sessions"
+    duration: "Day 0 (Mon 2-Nov-2026)"
+  - step: 2
+    name: Kick-off and screen walkthrough on SIT
+    who: "R: iorta TechNXT Business Analysis; A: BDOI Product Owner; C: Business Administration, Information Security, BDOI IT; I: unit heads of the other BRDs"
+    inputs: "Guide deck; SIT users with seed data; walkthroughs A to D"
+    outputs: "Screens shown live; first questions logged in the comments log; minutes"
+    duration: "2 sessions, Mon 9 and Tue 10-Nov-2026"
+  - step: 3
+    name: Review with the workbook; configuration inputs started
+    who: "R: Business Administration, Information Security, BDOI IT, unit heads for their menus; A: BDOI Product Owner; C: iorta TechNXT (questions)"
+    inputs: "FRS chapters of the area; workbook sheets with the BU review columns; the menu sheet of each persona; the configuration input templates"
+    outputs: "Every row marked Accept, Change requested or Comment; comments log entries; first drafts of the templates (users, role matrix, rules, parameters)"
+    duration: "8 working days after the walkthroughs, until Fri 20-Nov-2026"
+  - step: 4
+    name: Comments consolidated and a Q&A session
+    who: "R: iorta TechNXT Project Manager and Business Analysis; A: BDOI Product Owner; C: reviewers"
+    inputs: "Returned workbooks"
+    outputs: "One consolidated comments log, each item typed (clarification, correction, change request) and answered; Q&A minutes"
+    duration: "3 working days, Q&A on Tue 24-Nov-2026"
+  - step: 5
+    name: One revision cycle (v2.1)
+    who: "R: iorta TechNXT Business Analysis; A: iorta TechNXT delivery lead; C: reviewers who raised the items"
+    inputs: "Agreed clarifications and corrections"
+    outputs: "Release set v2.1 with the changed rows marked; change requests raised for the rest"
+    duration: "v2.1 on Thu 26-Nov-2026; check by the reviewers until Fri 27-Nov-2026"
+  - step: 6
+    name: Sign-off meeting and signature
+    who: "R: iorta TechNXT Project Manager; A: BDOI Product Owner; C: Business Administration, Information Security, BDOI IT"
+    inputs: "v2.1 (or v2.0 when no revision is needed); open items with their decision"
+    outputs: "Signed sign-off certificate; minutes; open items accepted as assumptions or change requests"
+    duration: "Tue 1-Dec-2026"
+  - step: 7
+    name: Content freeze; configuration inputs loaded
+    who: "R: iorta TechNXT delivery lead; A: BDOI Product Owner; I: BDOI IT, Information Security, other BRD owners, Data Migration working group"
+    inputs: "Signed set; change requests with mandays; filled configuration input templates"
+    outputs: "Content frozen as signed; approved deltas scheduled in the Change Management Register; role matrix implemented by group-profile requests; users loaded by bulk requests before the first mock"
+    duration: "From Wed 2-Dec-2026; templates final before UAT"
+  - step: 8
+    name: Traceability into SIT and UAT
+    who: "R: iorta TechNXT test lead; A: BDOI Product Owner; C: business users, Information Security"
+    inputs: "Signed FRS rows and test plan"
+    outputs: "SIT and UAT runs traced to the signed screens, rules, messages and persona menus; results against each row"
+    duration: "SIT Apr - Jul 2027; UAT Aug - Oct 2027"
+
+# The module at a glance: key screenshots (file names in the screenshot folder of the pack).
+key_screens:
+  - {image: scr-ua-07-02-filled, caption: "An enrolment request with its group profile and approver"}
+  - {image: scr-ua-08-02-approve, caption: "The chosen approver decides; nothing changes before"}
+  - {image: scr-ua-16-01-implement, caption: "Group-profile changes implemented by the System Administrator"}
+  - {image: scr-ua-17-01-audit_log, caption: "The User Access Audit Log with from and to values"}
+
+# Key business rules and validations (highlights; the full list is in the workbook and FRS chapter 13).
+rules:
+  - "Access changes only through an approved request: the requester and the user concerned never decide it, and only the approver chosen by the requester does."
+  - "A privileged change (a High or Admin profile) or a change outside working hours needs a second approval by another approver, and raises an alert."
+  - "Group-profile changes are approved in order and implemented by a System Administrator who did not raise them; direct edits are an audited, alerted emergency path, closed as delivered."
+  - "The account locks after 3 failed sign-ins; the session warns at 15 minutes of inactivity and ends at 30."
+  - "Passwords: at least 10 characters with upper and lower case, a digit and a symbol; not one of the last 8; expire after 90 days; changed at the first sign-in after an administrator sets them."
+  - "Every change is logged, never to be changed, with its from and to values, approver and request number; four reports give the BRD samples A to D."
+  - "Every persona sees exactly the menu of its group profiles; the insurer functions are hidden from BDOI."
+
+# Caveats and possibilities, and how each is handled.
+caveats:
+  - topic: Additional requirements
+    text: "New needs can surface during the review, SIT or UAT."
+    handling: "In-scope clarification when the signed text already covers it; configuration when it is a new profile or a changed grant; otherwise a change request with mandays."
+    example: "Information Security asks that the Auditor also sees a new report: a group-profile request (configuration). Asking for a third approval level on all requests is a change request."
+  - topic: Other BRDs change the role matrix
+    text: "Every BRD adds permissions and personas; the menus of chapter 12 follow the grants."
+    handling: "A new persona of an existing permission is a group-profile request under this signed set; a new permission or rule is a change request against the other BRD, and this set's menu pages are re-issued as a delta."
+    example: "Claims adds a Claims Reports viewer: the profile is requested, approved and implemented; the menu sheet of the persona is added in the next version of the set."
+  - topic: Identity integrations owned by BDOI IT
+    text: "Sign-in through EIAM on Microsoft Entra ID and provisioning from UIDM-ISC are named by BDOI for Drop 0; their specifications are open (IQ04, IQ05)."
+    handling: "In this set: local sign-in, and every change as a BIBS request. The integrations are change requests once BDOI IT gives the specifications; the screens of this set do not change."
+    example: "When Entra ID sign-in is enabled, the Login page redirects to BDO's sign-in; the BIBS password rules then apply only to the break-glass administrator."
+  - topic: Points for confirmation
+    text: "A single session per device, an external access-control list and the dormancy values are listed for decision in FRS chapter 22."
+    handling: "Each item is decided with the review; a decision that only sets a value is configuration, a new rule is a change request."
+    example: "Information Security asks for deactivation after 60 days without sign-in instead of 90: a change of the parameter UAM_DORMANT_DAYS under the second approval."
+  - topic: Open questions and assumptions
+    text: "Open questions of FRS section 10.3 (who the requesters and approvers are, the approval chain, privileged profiles, working hours, password values, business units and user levels) follow the assumptions of section 10.1; chapter 22 lists the proposed rules for confirmation."
+    handling: "Answered as configuration where possible (profiles, parameters, lists, the approvers themselves); otherwise a change request; the assumption stands until then."
+    example: "Working hours of 07:00-19:00 instead of 08:00-18:00: a change of the parameter UAM_WORKING_HOURS, not a change request."
+
+# Entry and exit criteria of the sign-off, and the definition of done.
+entry:
+  - "Every screenshot of the set is taken on the SIT environment with seed data."
+  - "Reviewers have their SIT users and the walkthrough sessions are held."
+  - "The test plan is traced to the FRS and to the screens; the persona menus are checked by the persona menu test."
+exit:
+  - "Every row of the workbook reviewed by its unit (Accept, Change requested or Comment), including the menu sheet of every persona."
+  - "Every comments log item closed: answered, corrected in v2.1, or raised as a change request."
+  - "Open questions closed or accepted as assumptions."
+  - "The sign-off certificate signed by every signatory of the Who signs what matrix: prepared, input, reviewed and approved as on the BRD approval sheet; the Product Owner approves the whole set."
+done:
+  - "Signed certificate filed with the set; version history updated."
+  - "Content frozen as signed; deltas listed in the Change Management Register with mandays."
+  - "Role-to-permission matrix and users of the templates loaded by group-profile and bulk requests, and checked with the reports."
+  - "Test plan agreed for SIT and UAT."
+
+# Handover to development / build readiness checklist.
+handover:
+  - "Signed FRS, sign-off workbook and screens"
+  - "Open questions closed or accepted as assumptions"
+  - "Configuration inputs from the business: users and roles, role-to-permission matrix, approval rules, separation-of-duties rules, password and session parameters, lists of values"
+  - "Agreed test plan"
+  - "BDOI IT decisions on EIAM and UIDM-ISC recorded as change requests or assumptions"
+handover_note: "After sign-off the content is frozen as signed, the approved deltas are scheduled and the configuration inputs are loaded through requests."
+
+# Governance and contacts.
+governance:
+  - {role: "Business owner and approver", who: "Product Owner, Marketing Business System", does: "Accountable for the sign-off; chairs the sign-off meeting"}
+  - {role: "Process owner", who: "Business Administration (user access maintenance)", does: "Coordinates the review of the requests and reports and the configuration inputs; signs for the business input with the BU representative of MBS"}
+  - {role: "Information Security", who: "BDOI Information Security", does: "Reviews and signs the role matrix, the menus by persona and the separation-of-duties rules"}
+  - {role: "BDOI IT", who: "BDOI IT", does: "Reviews and signs the sign-in and identity integration assumptions (EIAM, UIDM-ISC) and the System Administrator functions"}
+  - {role: "BRD owner", who: "Business Project Services, BDO Unibank ESG", does: "Business Analyst: the BRD as written; Program Manager: traceability and completeness; sign-off coordination"}
+  - {role: "Delivery", who: "iorta TechNXT Project Manager, Business Analysis, test lead", does: "Sessions, answers, comments log, revisions, change requests"}
+next_steps:
+  - "Kick-off and first SIT walkthrough on Mon 9-Nov-2026"
+  - "Workbooks returned by Fri 20-Nov-2026; Q&A on Tue 24-Nov-2026; sign-off on Tue 1-Dec-2026"
+  - "Configuration input templates filled in: users and role matrix before the first data migration mock; parameters agreed with Information Security before UAT"

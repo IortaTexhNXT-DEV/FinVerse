@@ -1,0 +1,36 @@
+// BRD-13 Data Migration Strategy: the migration pipeline per data object and who does each step.
+digraph dm_pipeline {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.35, ranksep=0.32, bgcolor="white", pad=0.15, newrank=true];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.2, fontname="Arial",
+         fontsize=12, fontcolor="@NEAR_BLACK", width=3.3, height=0.62, margin="0.12,0.05", fillcolor="@WHITE"];
+  edge  [color="@HEADER_BLUE", arrowsize=0.8, penwidth=1.2, fontname="Arial", fontsize=10, fontcolor="@MUTED"];
+
+  subgraph cluster_bdoi {
+    label=<<b>BDOI</b>>; fontname="Arial"; fontsize=12; fontcolor="@HEADER_BLUE"; style="rounded,dashed"; color="@MUTED"; margin=12;
+    s1  [label=<<b>1. Extract</b><br/><font point-size="10">BDOI IT, in the agreed templates,<br/>with a control file</font>>, fillcolor="@AMBER_BG"];
+    s2  [label=<<b>2. Secure transfer</b><br/><font point-size="10">console upload or SFTP; never e-mail</font>>, fillcolor="@AMBER_BG"];
+    s5b [label=<<b>5b. Cleanse at source</b><br/><font point-size="10">data stewards fix legacy records;<br/>the next extract carries the fix</font>>, fillcolor="@AMBER_BG"];
+    s6b [label=<<b>6b. Approve code maps</b><br/><font point-size="10">business owner, gate G2</font>>, fillcolor="@AMBER_BG"];
+    s11 [label=<<b>10. Verify and accept</b><br/><font point-size="10">samples on screen; owner signs G6</font>>, fillcolor="@AMBER_BG"];
+  }
+  subgraph cluster_bibs {
+    label=<<b>BIBS Migration Console, run by iorta TechNXT</b>>; fontname="Arial"; fontsize=12; fontcolor="@HEADER_BLUE"; style="rounded,dashed"; color="@HEADER_BLUE"; margin=12;
+    s3  [label=<<b>3. Intake checks</b><br/><font point-size="10">checksum, layout, counts, totals</font>>, fillcolor="@BG_BLUE"];
+    s4  [label=<<b>4. Staging and profiling</b><br/><font point-size="10">masked outside production;<br/>profiling report to the stewards</font>>, fillcolor="@BG_BLUE"];
+    s5  [label=<<b>5a. Cleanse in mapping</b><br/><font point-size="10">formats, defaults, code maps</font>>, fillcolor="@BG_BLUE"];
+    s6  [label=<<b>6. Map codes</b><br/><font point-size="10">versioned maps; unmapped-code report</font>>, fillcolor="@BG_BLUE"];
+    s7  [label=<<b>7. Validate and match</b><br/><font point-size="10">data-quality rules; client dedupe (G3)</font>>, fillcolor="@BG_BLUE"];
+    s8  [label=<<b>8. Load through BIBS services</b><br/><font point-size="10">approved by the Lead (G4)</font>>, fillcolor="@BG_BLUE"];
+    s9  [label=<<b>9. Reconcile L1-L5</b><br/><font point-size="10">counts, amounts, hash, fields, GL (G5)</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+    s10 [label=<<b>11. Purge staging</b><br/><font point-size="10">within 5 days of sign-off</font>>, fillcolor="@DIRTY_WHITE", color="@MUTED"];
+  }
+  s1 -> s2 -> s3 -> s4 -> s5 -> s6 -> s7 -> s8 -> s9;
+  s4 -> s5b [label=" issues at source", style=dashed];
+  s5b -> s1 [label=" re-extract", style=dashed, constraint=false];
+  s6 -> s6b [style=dashed, dir=both];
+  s9 -> s11;
+  s11 -> s10 [style=dashed];
+  { rank=same; s4; s5b; }
+  { rank=same; s6; s6b; }
+  { rank=same; s9; s11; }
+}

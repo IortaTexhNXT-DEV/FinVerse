@@ -1,0 +1,37 @@
+# Who signs what in the BRD-13 Data Migration sign-off set: one definition, read by 00 Start Here, the 01 guide deck,
+# the sign-off certificate of the 03 Migration Workbook, the Drop 0 closure summary and the drop index
+# (signoff_pack.py, "ownership"). The roles and units are those of the BRD-13 approval pages; a role the set adds is
+# marked "Added for this set". The set holds business content only; the technical content (extract transfer,
+# environments, backup and restore) is in the Technical Specification, reviewed by BDOI IT.
+source: "BRD-13 approval pages p.15-16 (draft V0.01, not yet signed)"
+
+roles:
+  - {id: ITN, short: iorta TechNXT, role: "iorta TechNXT project team: Project Manager, Business Analysis, Migration Lead, test lead", org: iorta TechNXT, capacity: Prepared by, confirms: "The set is complete and consistent as issued, traced to the BRD and to the Migration Console; every comment is answered in the comments log", sheet: Added for this set (author of the Handbook and the Migration Workbook)}
+  - {id: PGM, short: Program Manager (BPS), role: "Program Manager, Enterprise Services Group - Business Project Services (BPS)", org: BDO Unibank ESG, capacity: Prepared by, confirms: "The set states the BRD requirements as written (author of the BRD); traceability of every BRD requirement and completeness of the set; chairs the go / no-go board", sheet: "Prepared by (p.15)"}
+  - {id: DML, short: Data Migration Lead, role: "Data Migration Lead", org: BDOI, capacity: Input provided by, confirms: "The object decisions, the trial migrations, the gates and the cut-over plan match the business input", sheet: Added for this set}
+  - {id: DO, short: Data owners, role: "Data owners of the objects (department representatives named per object)", org: BDOI, capacity: Input provided by, confirms: "Their objects, load templates, code maps and reconciliation", sheet: Added for this set (named per object in the Migration Workbook)}
+  - {id: MBS, short: MBS, role: "Marketing Business System (MBS)", org: BDOI, capacity: Reviewed by, confirms: "The lists of values, products, packages, clients and payout accounts and their code maps", sheet: "Reviewed by (p.15)"}
+  - {id: IT, short: BDOI IT, role: "BDOI Information Technology Group (BDOI IT)", org: BDOI, capacity: Reviewed by, confirms: "Extracts and their transfer, the legacy freeze and read-only access, decommissioning, and the Technical Specification (a separate document); not the business content", sheet: Added for this set}
+  - {id: PO, short: Product Owner (MBS), role: "Product Owner, Marketing Business System", org: BDOI, capacity: Approved by, confirms: "Owns the set and approves all of its contents", sheet: "Approved by (p.15)"}
+  - {id: POD, short: PO Disbursement, role: "Product Owner - Comptrollership - Disbursement", org: BDOI, capacity: Approved by, confirms: "Payees and open disbursements", sheet: "Approved by (p.15)"}
+  - {id: POF, short: PO FRBS and ACSL, role: "Product Owner - Comptrollership - FRBS and ACSL", org: BDOI, capacity: Approved by, confirms: "GL opening, legacy accounts and the subsidiary ledger", sheet: "Approved by (p.15)"}
+  - {id: OPS, short: Operations, role: "Operations: Financial Transactions and Processing", org: BDOI, capacity: Approved by, confirms: "Open invoices, unapplied payments, collection state and remittance", sheet: "Approved by (p.15)"}
+  - {id: HOPS, short: Head Operations, role: "Head - Operations", org: BDOI, capacity: Approved by, confirms: "Insurers, commission rates and policy headers", sheet: "Approved by (p.15)"}
+  - {id: ARM, short: UH Analytics and Risk Management, role: "Unit Head - Analytics and Risk Management", org: BDOI, capacity: Approved by, confirms: "KYC documents, the archive, Legacy Inquiry and its access log", sheet: "Approved by (p.15)"}
+  - {id: CRT, short: UH Claims and TU, role: "Unit Head - Claims, Analytics, Risk Management, Reinsurance and Technical Underwriting", org: BDOI, capacity: Approved by, confirms: "The renewal advices already sent and the day-1 renewal queue", sheet: "Approved by (p.16)"}
+  - {id: CC, short: UH Combank and Corbank, role: "Unit Head - Combank and Corbank", org: BDOI, capacity: Approved by, confirms: "Clients and the sales organisation of Combank and Corbank", sheet: "Approved by (p.16)"}
+  - {id: COMP, short: Head Comptrollership, role: "Head - Comptrollership", org: BDOI, capacity: Approved by, confirms: "Open items, GL opening, reconciliation and the opening-balance adjustments", sheet: "Approved by (p.16)"}
+  - {id: RM, short: Head Retail Marketing, role: "Head - Retail Marketing", org: BDOI, capacity: Approved by, confirms: "Clients and the sales organisation of Retail Marketing", sheet: "Approved by (p.16)"}
+  - {id: CRM, short: Head Corporate and Retail Marketing, role: "Head - Corporate and Retail Marketing", org: BDOI, capacity: Approved by, confirms: "Clients and the sales organisation of Corporate Marketing", sheet: "Approved by (p.16)"}
+
+parts:
+  - {part: "Migration objects, decisions and extract planning (Handbook Part A; workbook Objects, Extract planning)", prepares: [ITN], input: [DML, DO], reviews: [PGM, MBS], approves: [PO, POD, POF, OPS, HOPS, ARM, CRT, CC, COMP, RM, CRM]}
+  - {part: "Load templates, code maps and data-quality rules (the columns BDOI fills in)", prepares: [ITN], input: [DO, IT], reviews: [MBS, PGM], approves: [PO, COMP, HOPS]}
+  - {part: "Screens and fields of the Migration Console and Legacy Inquiry (Handbook Part B)", prepares: [ITN], input: [DML], reviews: [PGM], approves: [PO]}
+  - {part: "UX screen deck, UX screen register and image package (07 to 09, for the BDOI UX Design team; the screens as specified in this set)", prepares: [ITN], input: [DML], reviews: [PGM], approves: [PO]}
+  - {part: "Business rules, validations, messages and notifications", prepares: [ITN], input: [DML, DO], reviews: [PGM], approves: [PO]}
+  - {part: "Reconciliation and migration reports", prepares: [ITN], input: [DO], reviews: [PGM], approves: [PO, COMP, POF]}
+  - {part: "Cut-over plan, go / no-go and rollback", prepares: [ITN], input: [DML, IT], reviews: [PGM, IT], approves: [PO, COMP, HOPS]}
+  - {part: "Proposed business rules and clarifications for confirmation; open decisions", prepares: [ITN], input: [PGM, DML], reviews: [PGM], approves: [PO]}
+  - {part: "Test plan (04 workbook, 05 summary)", prepares: [ITN], input: [DML, DO], reviews: [PGM, IT], approves: [PO]}
+  - {part: "Technical Specification (separate document: extract transfer, environments, backup and restore)", prepares: [ITN], input: [IT], reviews: [IT], approves: [IT]}

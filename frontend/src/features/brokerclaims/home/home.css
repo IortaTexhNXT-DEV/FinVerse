@@ -1,0 +1,42 @@
+/* Claims Handling (BRD-7): ageing bars of the Claims home. Colours from the design tokens only. */
+
+.bcl-ageing {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.bcl-ageing-row {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr) 80px;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: 13px;
+}
+
+.bcl-ageing-label {
+  font-weight: 700;
+  color: var(--color-heading);
+}
+
+.bcl-ageing-track {
+  height: 16px;
+  border-radius: 0 4px 4px 0;
+  background: var(--brand-blue-050);
+}
+
+.bcl-ageing-bar {
+  height: 100%;
+  min-width: 2px;
+  border-radius: 0 4px 4px 0;
+  background: var(--brand-blue);
+}
+
+.bcl-ageing-row:hover .bcl-ageing-bar {
+  background: var(--brand-navy);
+}
+
+.bcl-ageing-value {
+  text-align: right;
+  color: var(--color-text);
+}

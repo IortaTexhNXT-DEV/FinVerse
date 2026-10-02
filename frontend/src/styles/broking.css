@@ -1,0 +1,788 @@
+/* ==========================================================================
+   Broking components: work queues, workflow panel, notifications,
+   action tiles and reference chips (docs/architecture/BROKING_ARCHITECTURE.md §5).
+   ========================================================================== */
+
+.mono {
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.text-danger {
+  color: var(--color-danger);
+  font-weight: 600;
+}
+
+/* Reference chip (ARN, PRF, slip numbers) */
+.ref-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 2px var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--brand-blue-050);
+  font-size: 13px;
+}
+
+.ref-chip code {
+  font-family: var(--font-mono);
+  color: var(--brand-navy);
+  font-weight: 600;
+}
+
+.ref-chip-label {
+  color: var(--color-text-muted);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.ref-chip-copy {
+  border: 0;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 2px;
+}
+
+.ref-chip-copy:hover,
+.ref-chip-copy:focus-visible {
+  color: var(--brand-blue);
+}
+
+/* Workflow header: stage stepper, then the meta row with the actions on the right */
+.workflow-panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4) var(--space-5);
+  box-shadow: var(--shadow-sm);
+}
+
+.workflow-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3) var(--space-5);
+  justify-content: space-between;
+  align-items: center;
+  padding-top: var(--space-3);
+  margin-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+}
+
+.workflow-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-6);
+  margin: 0;
+  flex: 1 1 auto;
+}
+
+.workflow-meta-row dt {
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--color-text-muted);
+  margin-bottom: 2px;
+}
+
+.workflow-meta-row dd {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-heading);
+  font-weight: 600;
+  min-height: 24px;
+}
+
+.workflow-stage-name {
+  color: var(--brand-navy);
+}
+
+.workflow-overdue {
+  color: var(--color-danger);
+}
+
+/* The actions stay together on one row; the whole group moves below the meta row when narrow. */
+.workflow-actions {
+  display: flex;
+  flex-wrap: nowrap;
+  flex: 0 0 auto;
+  gap: var(--space-2);
+  justify-content: flex-end;
+  align-items: center;
+  margin-left: auto;
+}
+
+.workflow-actions .btn {
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .workflow-actions {
+    flex-wrap: wrap;
+    flex: 1 1 100%;
+  }
+}
+
+/* Stage stepper: passed stages checked, the current stage highlighted, stages ahead grey */
+.stage-stepper-wrap {
+  container-type: inline-size;
+}
+
+.stage-stepper {
+  --step-line: var(--color-border-strong);
+  display: flex;
+  align-items: flex-start;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stage-step {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  text-align: center;
+  --marker-bg: var(--color-surface);
+  --marker-border: var(--color-border-strong);
+  --marker-fg: var(--color-placeholder);
+}
+
+/* connectors: each step draws the line on its left half and on its right half */
+.stage-step::before,
+.stage-step::after {
+  content: '';
+  position: absolute;
+  top: 13px;
+  height: 2px;
+  background: var(--step-line);
+}
+
+.stage-step::before {
+  left: 0;
+  right: calc(50% + 18px);
+}
+
+.stage-step::after {
+  left: calc(50% + 18px);
+  right: 0;
+}
+
+.stage-step:first-child::before,
+.stage-step:last-child::after {
+  display: none;
+}
+
+.stage-step.is-done::before,
+.stage-step.is-done::after,
+.stage-step.is-current::before,
+.stage-step.is-returned::before,
+.stage-step.is-ended::before,
+.stage-step.is-complete::before {
+  background: var(--brand-blue);
+}
+
+.stage-marker {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--marker-border);
+  background: var(--marker-bg);
+  color: var(--marker-fg);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.stage-label {
+  max-width: 132px;
+  padding: 0 var(--space-1);
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--color-text-muted);
+  overflow-wrap: anywhere;
+}
+
+.stage-step.is-done {
+  --marker-bg: var(--brand-blue);
+  --marker-border: var(--brand-blue);
+  --marker-fg: var(--color-surface);
+}
+
+.stage-step.is-done .stage-label {
+  color: var(--color-text);
+}
+
+.stage-step.is-current,
+.stage-step.is-returned,
+.stage-step.is-ended,
+.stage-step.is-complete {
+  --marker-bg: var(--color-surface);
+  --marker-border: var(--brand-blue);
+  --marker-fg: var(--brand-blue);
+}
+
+.stage-step.is-current .stage-marker,
+.stage-step.is-returned .stage-marker,
+.stage-step.is-ended .stage-marker {
+  box-shadow: 0 0 0 4px var(--brand-blue-050);
+}
+
+.stage-step.is-current .stage-label,
+.stage-step.is-returned .stage-label,
+.stage-step.is-ended .stage-label,
+.stage-step.is-complete .stage-label {
+  color: var(--color-heading);
+  font-weight: 700;
+}
+
+.stage-step.is-returned {
+  --marker-border: var(--color-warning-accent);
+  --marker-fg: var(--color-warning);
+}
+
+.stage-step.is-returned .stage-marker {
+  box-shadow: 0 0 0 4px var(--color-warning-bg);
+}
+
+.stage-step.is-ended {
+  --marker-border: var(--color-danger);
+  --marker-fg: var(--color-danger);
+}
+
+.stage-step.is-ended .stage-marker {
+  box-shadow: 0 0 0 4px var(--color-danger-bg);
+}
+
+.stage-step.is-complete {
+  --marker-bg: var(--color-success);
+  --marker-border: var(--color-success);
+  --marker-fg: var(--color-surface);
+}
+
+/* The collapsed run of stages: only shown on narrow widths */
+.stage-gap {
+  display: none;
+  flex: 0 0 40px;
+}
+
+.stage-gap .stage-marker {
+  border-style: dashed;
+  color: var(--color-text-muted);
+}
+
+@container (max-width: 760px) {
+  .stage-step.is-far {
+    display: none;
+  }
+
+  .stage-gap {
+    display: flex;
+  }
+
+  .stage-step:not([aria-current]) .stage-label {
+    display: none;
+  }
+}
+
+/* Clickable KPI and stage tiles (My Work) */
+.kpi-button {
+  text-align: left;
+  cursor: pointer;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  font: inherit;
+}
+
+.kpi-button:hover,
+.kpi-button:focus-visible {
+  box-shadow: var(--shadow-md);
+}
+
+.kpi-alert {
+  border-top-color: var(--color-danger);
+}
+
+.stage-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: var(--space-3);
+}
+
+.stage-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-alt);
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+}
+
+.stage-tile:hover,
+.stage-tile:focus-visible,
+.stage-tile.active {
+  border-color: var(--brand-blue);
+  background: var(--brand-blue-050);
+}
+
+.stage-tile-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.stage-tile-count {
+  font-family: var(--font-heading);
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--brand-navy);
+}
+
+.stage-tile-meta {
+  display: flex;
+  gap: var(--space-2);
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.stage-tile-overdue {
+  color: var(--color-danger);
+  font-weight: 600;
+}
+
+/* Action tiles (Bulk Processing, quick actions) */
+.tile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--space-3);
+}
+
+.action-tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-top: 4px solid var(--brand-blue);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  text-decoration: none;
+  box-shadow: var(--shadow-sm);
+}
+
+.action-tile:hover,
+.action-tile:focus-visible {
+  border-top-color: var(--brand-gold);
+  box-shadow: var(--shadow-md);
+}
+
+.action-tile-title {
+  font-weight: 700;
+  color: var(--brand-navy);
+}
+
+.action-tile-meta {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.action-tile-go {
+  position: absolute;
+  right: var(--space-3);
+  top: var(--space-4);
+  color: var(--color-text-muted);
+}
+
+/* Notifications (header bell) */
+.notification-bell {
+  position: relative;
+}
+
+.notification-panel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  z-index: 30;
+  width: 420px;
+  max-width: calc(100vw - 32px);
+  display: flex;
+  flex-direction: column;
+  max-height: 70vh;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+}
+
+.notification-head,
+.notification-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.notification-foot {
+  border-top: 1px solid var(--color-border);
+  border-bottom: 0;
+  justify-content: center;
+  font-weight: 600;
+}
+
+.notification-scroll {
+  overflow: auto;
+  padding: 0 0 var(--space-2);
+}
+
+.notification-day {
+  margin: 0;
+  padding: var(--space-2) var(--space-4) var(--space-1);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+  background: var(--color-surface-alt);
+}
+
+.notification-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.notification-row {
+  display: flex;
+  align-items: flex-start;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.notification-row.unread {
+  background: var(--brand-blue-050);
+}
+
+.notification-item {
+  display: flex;
+  gap: var(--space-3);
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-3) var(--space-4);
+  border: 0;
+  background: transparent;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.notification-item:hover,
+.notification-item:focus-visible {
+  background: #cfeaff;
+}
+
+.notification-icon {
+  flex: none;
+  margin-top: 2px;
+  color: var(--brand-blue);
+}
+
+.notification-icon.returned {
+  color: var(--color-danger);
+}
+
+.notification-icon.approved {
+  color: var(--color-success);
+}
+
+.notification-icon.due {
+  color: var(--color-warning);
+}
+
+.notification-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.notification-title {
+  font-weight: 700;
+  color: var(--color-heading);
+}
+
+.notification-row.unread .notification-title::after {
+  content: '';
+}
+
+.notification-body {
+  font-size: 13px;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.notification-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.notification-ref {
+  padding: 0 6px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background: var(--color-surface);
+  color: var(--brand-navy);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.notification-mark {
+  flex: none;
+  margin: var(--space-3) var(--space-3) 0 0;
+  padding: 6px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+
+.notification-mark:hover,
+.notification-mark:focus-visible {
+  background: rgba(0, 114, 216, 0.12);
+}
+
+.unread-dot {
+  display: block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--brand-blue);
+}
+
+.notification-empty {
+  padding: var(--space-5) var(--space-4);
+  margin: 0;
+  text-align: center;
+}
+
+.notification-page {
+  padding-bottom: var(--space-2);
+}
+
+/* Two-column master / detail layout */
+.split {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) 1fr;
+  gap: var(--space-4);
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .split {
+    grid-template-columns: 1fr;
+  }
+}
+
+.nav-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-list-item {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border: 0;
+  border-bottom: 1px solid var(--color-border);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  color: var(--color-text);
+}
+
+.nav-list-item.active,
+.nav-list-item:hover,
+.nav-list-item:focus-visible {
+  background: var(--brand-blue-050);
+  border-left: 3px solid var(--brand-blue);
+}
+
+.detail-list {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--space-2) var(--space-4);
+  margin: 0 0 var(--space-4);
+}
+
+.detail-list dt {
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.detail-list dd {
+  margin: 0;
+}
+
+.message-body {
+  white-space: pre-wrap;
+  font-family: var(--font-body);
+  font-size: 13px;
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+  margin: 0;
+}
+
+/* Client picker */
+.client-picker {
+  position: relative;
+}
+
+.client-options {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 2px);
+  z-index: 40;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 280px;
+  overflow: auto;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+}
+
+.client-option {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: var(--space-2);
+  align-items: center;
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  color: var(--color-text);
+}
+
+.client-option:hover,
+.client-option:focus-visible {
+  background: var(--brand-blue-050);
+}
+
+.client-option-empty {
+  padding: var(--space-3);
+}
+
+.client-picked {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-alt);
+}
+
+/* Word copy of a downloaded document (client requirement 16), left of the toasts. */
+.word-offer {
+  position: fixed;
+  left: var(--space-5);
+  bottom: var(--space-5);
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  max-width: min(520px, calc(100vw - 2 * var(--space-5)));
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-left: 5px solid var(--brand-blue);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-lg);
+}
+
+.word-offer-icon {
+  flex: none;
+  color: var(--brand-blue);
+}
+
+.word-offer-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.word-offer-text strong,
+.word-offer-text span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------- Multi-select criterion (MultiSelectFilter) ----------------------------------------- */
+.multi-select {
+  position: relative;
+  display: grid;
+  gap: var(--space-1);
+}
+
+.multi-select-toggle {
+  text-align: left;
+}
+
+.multi-select-panel {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 20;
+  display: grid;
+  gap: var(--space-2);
+  min-width: 260px;
+  max-height: 320px;
+  padding: var(--space-3);
+  overflow: auto;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+}
+
+.multi-select-options {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}

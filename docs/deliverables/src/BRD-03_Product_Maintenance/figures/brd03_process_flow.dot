@@ -1,0 +1,52 @@
+// BRD-3 Product Maintenance: package lifecycle by actor (FRS section 2.2; BRD p.12-14, BRPM.008-017).
+// Colour tokens (@HEADER_BLUE ...) are replaced by tools/deliverables before rendering.
+// Layout: three rows of four steps; the fill colour of a step is its actor (legend at the bottom).
+digraph pm_process {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.35, ranksep=0.45, bgcolor="white", pad=0.15, newrank=true];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.2, fontname="Arial",
+         fontsize=11, fontcolor="@NEAR_BLACK", width=1.9, height=0.8, margin="0.1,0.05"];
+  edge  [color="@HEADER_BLUE", arrowsize=0.7, penwidth=1.1, fontname="Arial", fontsize=9, fontcolor="@MUTED"];
+
+  // Actors: Marketing = @BG_BLUE, TSU = @WHITE, ManCom = @AMBER_BG, MBS / validator = @DIRTY_WHITE, all = @SUCCESS_BG
+  s1  [label=<<b>1. Package Request Form</b><br/><font point-size="9">Marketing AO / TSU<br/>BRPM.008</font>>, fillcolor="@BG_BLUE"];
+  s2  [label=<<b>2. Marketing approval</b><br/><font point-size="9">Marketing TL / TH / UH<br/>BRPM.008, 021</font>>, fillcolor="@BG_BLUE"];
+  s3  [label=<<b>3. TSU review, approval</b><br/><font point-size="9">TSU TL, then TSU TH<br/>BRPM.009</font>>, fillcolor="@WHITE"];
+  s4  [label=<<b>4. Negotiation rounds</b><br/><font point-size="9">TSU; QS to insurers<br/>BRPM.010, 012, 013</font>>, fillcolor="@WHITE"];
+  s5  [label=<<b>5. Comparative tables</b><br/><font point-size="9">TSU; master and client view<br/>BRPM.014, PMADD03</font>>, fillcolor="@WHITE"];
+  s6  [label=<<b>6. Marketing review</b><br/><font point-size="9">Client-specific only<br/>BRPM.013</font>>, fillcolor="@BG_BLUE"];
+  s7  [label=<<b>7. Requirements pack</b><br/><font point-size="9">TSU; signed package slip<br/>BRPM.015</font>>, fillcolor="@WHITE"];
+  s8  [label=<<b>8. ManCom sign-off</b><br/><font point-size="9">ManCom<br/>BRPM.015</font>>, fillcolor="@AMBER_BG"];
+  s9  [label=<<b>9. Package set-up</b><br/><font point-size="9">MBS; draft version<br/>BRPM.015</font>>, fillcolor="@DIRTY_WHITE"];
+  s10 [label=<<b>10. Validation, release</b><br/><font point-size="9">TSU Head / Business Admin<br/>PMADD06</font>>, fillcolor="@DIRTY_WHITE"];
+  s11 [label=<<b>11. Advisory</b><br/><font point-size="9">TSU / Operations to all units<br/>BRPM.016</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  s12 [label=<<b>12. Expiry and renewal</b><br/><font point-size="9">TSU Officer, MBS<br/>BRPM.017</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  ins [label=<<b>Insurers</b><br/><font point-size="9">terms, counter-proposals,<br/>declines (PMADD04)</font>>, fillcolor="@WHITE", color="@MUTED", style="rounded,dashed,filled"];
+
+  { rank=same; s1; s2; s3; s4; ins; }
+  { rank=same; s5; s6; s7; s8; }
+  { rank=same; s9; s10; s11; s12; }
+
+  s1 -> s2 -> s3 -> s4;
+  s4 -> ins [dir=both, style=dashed, color="@MUTED"];
+  s4 -> s5 [constraint=false];
+  s1 -> s5 -> s9 [style=invis, weight=10];
+  s2 -> s6 -> s10 [style=invis, weight=10];
+  s3 -> s7 -> s11 [style=invis, weight=10];
+  s4 -> s8 -> s12 [style=invis, weight=10];
+  s5 -> s6 -> s7 -> s8;
+  s8 -> s9 [constraint=false];
+  s9 -> s10 -> s11 -> s12;
+
+  legend [shape=plaintext, style="", label=<
+    <table border="0" cellborder="1" cellspacing="4" cellpadding="4">
+      <tr>
+        <td border="0"><font point-size="9" color="@MUTED">Actor:</font></td>
+        <td bgcolor="@BG_BLUE" color="@HEADER_BLUE"><font point-size="9">Marketing</font></td>
+        <td bgcolor="@WHITE" color="@HEADER_BLUE"><font point-size="9">TSU</font></td>
+        <td bgcolor="@AMBER_BG" color="@HEADER_BLUE"><font point-size="9">ManCom</font></td>
+        <td bgcolor="@DIRTY_WHITE" color="@HEADER_BLUE"><font point-size="9">MBS / validator</font></td>
+        <td bgcolor="@SUCCESS_BG" color="@SUCCESS"><font point-size="9">All units</font></td>
+      </tr>
+    </table>>];
+  s10 -> legend [style=invis];
+}

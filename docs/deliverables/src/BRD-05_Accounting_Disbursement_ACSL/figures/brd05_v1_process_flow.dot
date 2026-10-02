@@ -1,0 +1,41 @@
+// BRD-5 Volume 1: monthly accounting cycle by actor (FRS section 2.2; FRBS 2.2.0-3.6.0).
+digraph acc_process {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.35, ranksep=0.5, bgcolor="white", pad=0.15, newrank=true];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.2, fontname="Arial",
+         fontsize=11, fontcolor="@NEAR_BLACK", width=2.3, height=0.85, margin="0.1,0.05"];
+  edge  [color="@HEADER_BLUE", arrowsize=0.7, penwidth=1.1, fontname="Arial", fontsize=9, fontcolor="@MUTED"];
+
+  s1  [label=<<b>1. Daily posting</b><br/><font point-size="9">All modules, engine<br/>FRBS 2.5.0, 3.1.0, 3.1.1</font>>, fillcolor="@DIRTY_WHITE"];
+  s2  [label=<<b>2. Manual entries</b><br/><font point-size="9">GL Officer; TL posts<br/>FRBS 2.5.x, 2.8.x</font>>, fillcolor="@BG_BLUE"];
+  s3  [label=<<b>3. Accrual reversal</b><br/><font point-size="9">System, 00:05<br/>FRBS 2.8.1</font>>, fillcolor="@DIRTY_WHITE"];
+  s4  [label=<<b>4. Bank reconciliation</b><br/><font point-size="9">GL Officer<br/>FRBS 3.3.x</font>>, fillcolor="@BG_BLUE"];
+  s5  [label=<<b>5. Broking cut-off</b><br/><font point-size="9">System, last day 23:00<br/>FRBS 3.4.x</font>>, fillcolor="@DIRTY_WHITE"];
+  s6  [label=<<b>6. Rate and revaluation</b><br/><font point-size="9">GL Head; GL TL<br/>FRBS 2.2.0, 3.5.0</font>>, fillcolor="@AMBER_BG"];
+  s7  [label=<<b>7. GL close</b><br/><font point-size="9">GL TL (scheduled)<br/>FRBS 2.6.x</font>>, fillcolor="@AMBER_BG"];
+  s8  [label=<<b>8. Service fee</b><br/><font point-size="9">Officer, TL; Disbursement<br/>FRBS 2.10.x</font>>, fillcolor="@BG_BLUE"];
+  s9  [label=<<b>9. Reports</b><br/><font point-size="9">Report pack, BIR<br/>FRBS 2.4.x, 3.2.0</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+
+  { rank=same; s1; s2; s3; }
+  { rank=same; s4; s5; s6; }
+  { rank=same; s7; s8; s9; }
+  s1 -> s2 -> s3;
+  s1 -> s4 -> s7 [style=invis, weight=10];
+  s2 -> s5 -> s8 [style=invis, weight=10];
+  s3 -> s6 -> s9 [style=invis, weight=10];
+  s3 -> s4 [constraint=false];
+  s4 -> s5 -> s6;
+  s6 -> s7 [constraint=false];
+  s7 -> s8 -> s9;
+
+  legend [shape=plaintext, style="", label=<
+    <table border="0" cellborder="1" cellspacing="4" cellpadding="4">
+      <tr>
+        <td border="0"><font point-size="9" color="@MUTED">Actor:</font></td>
+        <td bgcolor="@DIRTY_WHITE" color="@HEADER_BLUE"><font point-size="9">System</font></td>
+        <td bgcolor="@BG_BLUE" color="@HEADER_BLUE"><font point-size="9">GL Officer / TL</font></td>
+        <td bgcolor="@AMBER_BG" color="@HEADER_BLUE"><font point-size="9">GL TL / Head (close)</font></td>
+        <td bgcolor="@SUCCESS_BG" color="@SUCCESS"><font point-size="9">Outputs</font></td>
+      </tr>
+    </table>>];
+  s8 -> legend [style=invis];
+}

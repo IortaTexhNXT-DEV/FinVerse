@@ -1,0 +1,122 @@
+# Cross-BRD dependencies and interface contract of BRD-3 Product Maintenance.
+# direction: Out = another BRD or system takes it from Product Maintenance; In = Product Maintenance takes it.
+# Columns: id | party | direction | what | when / how | owner of the data | PM screens | FR
+change_rule: >-
+  Product Maintenance is the source of the products, package versions and rate schemes that every selling and servicing
+  BRD prices on. A later change in any of those BRDs that touches a line of this contract (a new product attribute, a
+  different version rule, another rating purpose, a new incentive criterion basis) is raised as a change request
+  against this signed set in the Change Management Register, assessed with its mandays and approved by the owners of
+  both BRDs; the affected pages of this set are then re-issued and signed as a delta.
+contract:
+  - id: IC-01
+    party: BRD-1 New Business
+    direction: Out
+    what: Product lines, cover types and products (risk codes) with their flags (package, fleet, mortgage related, direct payment allowed, multi-year and maximum term, Free First Year), market segments, payment gate and TSU review setting
+    how: Read when a quotation, PRF or account is created or saved; only authorised, active and sellable products of the segment are offered
+    owner: MBS (maintained in Product Maintenance, authorised by the Business Administrator or the New Business Approver)
+    screens: Products, Product record
+    frs: [FR-PM-010, FR-PM-050]
+  - id: IC-02
+    party: BRD-1 New Business
+    direction: Out
+    what: The package version in force (rate scheme, minimum premium, commission, TSI limit, panel insurers with their own rates) for new business pricing; the version number is stored on the quotation, the account and the booked invoice
+    how: Every premium computation of a quotation or account prices a package on the version in force on the transaction date; submission is refused for a superseded version or a differing item rate without an approved rate exception
+    owner: MBS (set-up), TSU Head or Business Administrator (validation)
+    screens: Package Version, Premium Calculator, Quotation Rate Exceptions card
+    frs: [FR-PM-051, FR-PM-043]
+  - id: IC-03
+    party: BRD-1 New Business
+    direction: Out
+    what: Rate exceptions approved for one transaction (quotation number or ARN)
+    how: Requested on the quotation, decided in My Approvals by PRODUCT_AUTHORIZE, stored on the quotation and passed to the accounts created from it
+    owner: The approver of the exception
+    screens: Quotation Rate Exceptions card
+    frs: [FR-PM-051]
+  - id: IC-04
+    party: BRD-1 New Business
+    direction: Out
+    what: Field rules and document rules per product (presence, list of values, number range, format), TSU routing rules and the package TSI limit
+    how: Checked when an account or PRF is submitted; the TSI limit and TSU rules decide the TSU route
+    owner: Business Administrator and MBS (authorised)
+    screens: Products (rule tabs), Product record (Field Rules & Documents)
+    frs: [FR-PM-012, FR-PM-013]
+  - id: IC-05
+    party: BRD-1 New Business
+    direction: In
+    what: Clients of client-specific packages; the Document Templates screen that holds the package templates; the workflow, documents, e-mail and report platform
+    how: A client-specific request picks an active client of the client master; package documents are merged from the templates PKG_REQUEST_FORM, PKG_QUOTATION_SLIP, PKG_COMPARATIVE, PKG_SLIP, PKG_ADVISORY and PKG_RENEWAL_ADVISORY
+    owner: Marketing (clients); Business Administrator (templates)
+    screens: New Package Request, Package Request record
+    frs: [FR-PM-020, FR-PM-013]
+  - id: IC-06
+    party: BRD-6 Renewal
+    direction: Out
+    what: Package versions for renewal pricing (purpose Renewal) and the sellable check of a product at renewal
+    how: A renewal priced as is keeps the expiring account's package version while it is released or superseded; an expired package with no current version is refused (check PRODUCT_RENEWABLE); Renewal uses these catalogue rules
+    owner: MBS; TSU
+    screens: Package Version, Product record
+    frs: [FR-PM-050, FR-PM-051, FR-PM-052]
+  - id: IC-07
+    party: BRD-6 Renewal and BRD-13 Data Migration
+    direction: Out
+    what: The BIBS package versions named as targets of the package map (legacy package and version to BIBS package version) that the data migration loads (object R06) and the Renewal sanitation check PACKAGE_REMAP reads
+    how: TSU prepares each map version and the Product Owner of Marketing Business System approves it; every target must be a package version active in Product Maintenance; a legacy package without an entry sends the renewal candidate to the Exception bucket, where the Renewal processing team chooses the package and the choice goes back to TSU for the next map version
+    owner: TSU (map and packages); Product Owner, MBS (approval)
+    screens: Products, Package Version (targets of the map)
+    frs: [FR-PM-050, FR-PM-061]
+  - id: IC-08
+    party: BRD-8 Employee Benefits
+    direction: Out
+    what: EB product lines (HMO, group life, group personal accident), EB products and HMO providers as panel insurers with commission rates
+    how: Configuration only, maintained through Product Maintenance; read when an EB programme is set up and priced
+    owner: MBS; Business Administrator (insurers)
+    screens: Products, Insurers, Insurer record
+    frs: [FR-PM-010, FR-PM-014]
+  - id: IC-09
+    party: BRD-12 Submitted Policies
+    direction: Out
+    what: Products and the package TSI limit of a product
+    how: Read when a submitted policy is recorded and checked against the limit; insurer acceptance limits stay in Submitted Policies until Product Maintenance takes them over
+    owner: MBS
+    screens: Products, Product record
+    frs: [FR-PM-010]
+  - id: IC-10
+    party: BRD-1 Booking and BRD-2 Operations
+    direction: Out
+    what: Incentive criteria (for example CPC2) matched at booking; the package version of the account for endorsements and adjustments
+    how: Booking stores on each invoice the codes of the criteria matching product, cover type, segment, channel, lead insurer and booking date; endorsements and Operations adjustments re-rate with purpose Endorsement on the account's version
+    owner: MBS (criteria, authorised by PRODUCT_AUTHORIZE)
+    screens: Incentive Criteria
+    frs: [FR-PM-080, FR-PM-081]
+  - id: IC-11
+    party: BRD-5 Accounting (remittance and commission)
+    direction: Out
+    what: Incentive criteria codes for commission incentive schemes and the CPC2 remittance incentive; insurer commission rates
+    how: Read by remittance per batch line and by the commission schemes, which reference the criteria code instead of product lists of their own
+    owner: MBS; Business Administrator (commission rates)
+    screens: Incentive Criteria, Insurer record
+    frs: [FR-PM-080, FR-PM-081]
+  - id: IC-12
+    party: BRD-11 User Access Maintenance
+    direction: In
+    what: Users, roles and the role-to-action matrix of Product Maintenance; role-permission change requests
+    how: A role change is requested, approved by someone other than the requester and applied; the User Access Matrix shows Product Maintenance by permission and by action class
+    owner: System Administrator; access approvers
+    screens: Every Product Maintenance screen (menu by persona)
+    frs: [FR-PM-002, FR-PM-003]
+  - id: IC-13
+    party: BRD-13 Data Migration
+    direction: In
+    what: The go-live load of the product masters from the legacy systems (QPS, EBIX) - lists of values (R01), sales organisation (R03), insurers and branches (R04), product lines, cover types and products (R05), commission rates (R07) - through the catalog services under maker-checker; the package map (R06) as in IC-07
+    how: Loaded in the data migration mocks and at cut-over from the extract templates of the Data Requirements Workbook; the BIBS packages themselves are not migrated but set up by TSU and MBS in Product Maintenance before the map freeze
+    owner: Product Owner, MBS (R01, R05, R06); Heads of Marketing (R03); Head of Operations (R04, R07)
+    screens: Products, Insurers, Sales Organisation, Rates & Taxes (records loaded pending authorisation)
+    frs: [FR-PM-010, FR-PM-050]
+  - id: IC-14
+    party: Other BDOI systems (product master feed)
+    direction: Out
+    what: Released, expired and retired package versions
+    how: Published to the product master port on release and expiry; the connection to the BDOI systems waits for their specification, so the port only records the change today
+    owner: BDOI IT (receiving systems)
+    screens: "-"
+    frs: [FR-PM-072]

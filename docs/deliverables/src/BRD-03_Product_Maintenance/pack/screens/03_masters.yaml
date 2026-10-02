@@ -1,0 +1,254 @@
+# Screen specifications of BRD-3 Product Maintenance: insurers, rates and taxes, sales organisation, the premium
+# calculator and the package rate scheme as New Business uses it. Schema: docs/deliverables/src/signoff/README.md.
+area: Insurers, rates and pricing
+screens:
+  - id: SCR-PM-17
+    title: Insurers
+    route: /catalog/insurers
+    purpose: >-
+      The insurer panel of the company: each accredited insurer with its accreditation date, placement channel and
+      placement e-mails, and its credit days. Package versions, quotation slips and placement use this panel. A new
+      insurer also creates its business partner for the ledger; both are authorised together.
+    entry:
+      - Sidebar entry Insurers
+    shots:
+      - {state: list, user: mbs, caption: "Insurers list"}
+      - {state: new, user: badmin, click: "^new insurer$", caption: "New insurer dialog"}
+    fields:
+      - "List | Code | Column | Partner code INS-... | - | Insurer master | - | Read only | - | No insurer on the panel yet."
+      - "List | Name | Column | Registered name | - | Insurer master | - | Read only | - | -"
+      - "List | Accredited Until | Column | dd-MMM-yyyy; (expired) in red once past | - | Insurer master | - | Read only | - | -"
+      - "List | Placement / Placement e-mails | Column | E-mail; addresses | - | Insurer master | - | Read only | - | -"
+      - "List | Credit Days | Column | Days | - | Insurer master | - | Read only | - | -"
+      - "List | Status | Column | Pending Authorization, Active, Inactive | - | Insurer master | - | Read only | - | -"
+      - "New insurer | Partner code | Text | INS- followed by capitals | Y | - | INS- | New insurer only | Unique; an existing party must be an insurer | Party <party code> exists and is not an insurer"
+      - "New insurer | Name / Short name | Text | Registered and short name | Y (name) | - | Blank | Pending, active | - | -"
+      - "New insurer | IC accreditation no. / Accredited until | Text / Date | Insurance Commission accreditation; dd-MMM-yyyy | N | - | Blank | Pending, active | - | -"
+      - "New insurer | Placement channel | Drop-down | E-mail | Y | Fixed list | E-mail | Pending, active | Only e-mail placement is available | Only e-mail placement is available; choose the e-mail placement channel"
+      - "New insurer | Placement e-mails | Text | Addresses separated by commas | N (needed to send quotation slips and placement slips) | - | Blank | Pending, active | - | <name> has no placement e-mail address"
+      - "New insurer | Credit days | Number | 0 to 365 | N | - | 30 | Pending, active | 0 to 365 | Default credit days must be between 0 and 365"
+      - "New insurer | TIN / Address / E-mail / Phone | Text | Business partner details | N | - | Blank | New insurer only | - | -"
+    actions:
+      - "New Insurer | MASTER_MAINTAIN (Business Administrator) | Always | Opens New insurer; Save for Authorization | Pending Authorization | -"
+      - "Authorize | MASTER_AUTHORIZE, not the maker | Pending row | From the row action menu, after the confirmation: authorises the insurer and its business partner | Active | -"
+      - "Deactivate | MASTER_MAINTAIN | Active row | From the row action menu (last, in red); asks the reason, kept in the audit trail; the insurer is no longer offered | Inactive | -"
+      - "[Open a row] | Every user of the screen | Always | Opens the insurer record | - | -"
+    rules:
+      - "Only authorised, active insurers are offered in package requests, package versions and quotation slips (FR-PM-014, FR-PM-030)."
+      - "The insurer master is maintained under New Business rules (BRD-1, insurer panel); Product Maintenance uses it for the package panels (FR-PM-014)."
+    outcome: The insurer panel used by every package is maintained once, with the e-mail addresses the slips are sent to.
+    frs: [FR-PM-014]
+    tests: [INSURERS]
+
+  - id: SCR-PM-18
+    title: Insurer record
+    route: /catalog/insurers/:id
+    parent: /catalog/insurers
+    purpose: >-
+      One insurer: its profile (partner code, accreditation, placement channel and e-mails, credit days, maker and
+      authoriser), its branches with the local government tax rate, and its commission rates by product.
+    entry:
+      - Insurers › a row
+    shots:
+      - {state: record, user: mbs, open: first_insurer, caption: "Insurer record with branches and commission rates"}
+    fields:
+      - "Profile | Partner code / Short name / IC accreditation / Accredited until / Placement channel / Placement e-mails / Credit days / Maker / Authorized by | Detail | As entered | - | Insurer master | - | Read only (Edit opens the insurer dialog) | - | -"
+      - "Branches | Code / Name / City / LGT % / Placement e-mail / Status | Column | Branch of the insurer | - | Insurer branches | - | Read only | - | No branch recorded."
+      - "Commission rates | Product / Commission % / From / To / Status | Column | All products or one product; To shows Open | - | Commission rates | - | Read only | - | No commission rate: the product default applies."
+      - "New Branch | Code / Name | Text | Branch code and name | Y | - | Blank | New branch | Unique per insurer | Insurer branch already exists: <key>"
+      - "New Branch | City | Text | Free text | N | - | Blank | New branch | - | -"
+      - "New Branch | LGT % | Number | Local government tax on premium, up to four decimals | Y | - | 0 | New branch | 0 to 100 | The LGT rate must be between 0 and 100 %"
+      - "New Branch | Placement e-mail | Text | Address | N | - | Blank | New branch | - | -"
+      - "New Commission Rate | Product | Drop-down | All products of the insurer or one active product | N | Active products | All products of the insurer | New rate | - | -"
+      - "New Commission Rate | Commission % | Number | Percentage | Y | - | Blank | New rate | 0 to 100 | The commission rate must be a percentage between 0 and 100"
+      - "New Commission Rate | Effective from / Effective to | Date | dd-MMM-yyyy | Y (from) | - | Today | New rate | To on or after from | Enter the effective-from date / The effective-to date is before the effective-from date"
+    actions:
+      - "Edit | MASTER_MAINTAIN | Always | Opens the insurer dialog (partner code fixed); Save for Authorization | Pending Authorization | -"
+      - "Add branch | MASTER_MAINTAIN | Always | Opens New Branch; Save for Authorization | Pending Authorization | -"
+      - "Add rate | MASTER_MAINTAIN | Always | Opens New Commission Rate; Save for Authorization | Pending Authorization | -"
+      - "Authorize / Deactivate | As on Insurers | As on Insurers | As on Insurers | Active / Inactive | -"
+    rules:
+      - "The commission rate in force on the account's period start applies; without an insurer rate, the product default applies (FR-PM-014)."
+      - "A package version's own insurer rate and minimum premium win over the insurer's general terms for that package (FR-PM-014)."
+    outcome: The business sees and maintains everything that is specific to one insurer.
+    frs: [FR-PM-014]
+    tests: [INSURER]
+
+  - id: SCR-PM-19
+    title: Rates & Taxes
+    route: /catalog/rates
+    purpose: >-
+      The statutory charges and rating tables applied by the premium calculation: documentary stamp tax, premium tax,
+      VAT, fire service tax and the motor own-damage factors; the short-period table; and the bodily injury and property
+      damage limit premiums. Every row is effective-dated and maker-checker.
+    entry:
+      - Sidebar entry Rates & Taxes
+    shots:
+      - {state: list, user: mbs, caption: "Rates & Taxes, Taxes & factors tab"}
+      - {state: new, user: badmin, click: "^new rate$", caption: "New tax or rating factor dialog"}
+    fields:
+      - "Tabs | Taxes & factors / Short-period table / BI / PD limits | Tab | - | - | Fixed | Taxes & factors | - | - | -"
+      - "Taxes & factors | Rate / Line / % / From / To / Status | Column | Rate name; All lines or a line; percentage; dd-MMM-yyyy; Open | - | Rate table | - | Read only | - | -"
+      - "Short-period table | Months Covered (up To) / % of Annual Premium / From / To / Status | Column | Months 1 to 12; percentage | - | Short-period table | - | Read only | - | -"
+      - "BI / PD limits | Coverage / Limit / Premium / From / To / Status | Column | Bodily injury or Property damage; amounts | - | Motor limit table | - | Read only | - | -"
+      - "New rate | Rate | Drop-down | DST, premium tax, VAT, fire service tax and the motor factors | Y | Fixed list | DST | New row | - | -"
+      - "New rate | Line code | Text | Blank = every line | N | Product lines | Blank | New row | - | -"
+      - "New rate | Rate % / % of annual premium | Number | Percentage, up to four decimals | Y | - | Blank | New row | 0 to 100 | The rate must be a percentage between 0 and 100 / The short-period percentage must be a percentage between 0 and 100"
+      - "New rate | Months covered | Number | 1 to 12 | Y (short-period table) | - | Blank | New row | 1 to 12 | Months covered must be between 1 and 12"
+      - "New rate | Coverage / Limit / Premium | Drop-down / Number | Bodily injury (BI) or Property damage (PD); amounts | Y (limit table) | Fixed list | Bodily injury (BI) | New row | Limit greater than zero; premium zero or more | The limit must be greater than zero / The premium cannot be negative"
+      - "New rate | Effective from / Effective to | Date | dd-MMM-yyyy | Y (from) | - | Today | New row | To on or after from | Enter the effective-from date / The effective-to date is before the effective-from date"
+    actions:
+      - "New Rate | MASTER_MAINTAIN (Business Administrator) | Always | Opens the dialog of the current tab; Save for Authorization | Pending Authorization | -"
+      - "Authorize / Deactivate | MASTER_AUTHORIZE / MASTER_MAINTAIN | As on Insurers | Authorises the row or ends its use | Active / Inactive | -"
+    rules:
+      - "The row in force on the rating date applies; statutory rates keep their effective-date look-up and do not follow the package version (FR-PM-051)."
+      - "A period without a short-period row, or a motor limit not in the table, is refused at rating (FR-PM-051)."
+    outcome: Every charge applied to a premium comes from one authorised, effective-dated table.
+    frs: [FR-PM-051]
+    tests: [RATES]
+
+  - id: SCR-PM-20
+    title: Sales Organisation
+    route: /catalog/sales-organisation
+    purpose: >-
+      The sales organisation of the company as one tree table: regions, departments and teams with their cost centres,
+      and the account officers of each team by name, role and assignment date. Accounts are stamped with the creator's
+      units and cost centre when they are created.
+    entry:
+      - Sidebar entry Sales Organisation
+    shots:
+      - {state: tree, user: badmin, caption: "Sales Organisation tree table, every branch expanded"}
+      - {state: actions, user: badmin, caption: "Actions menu of a team"}
+      - {state: deactivate, user: badmin, caption: "Deactivation refused while the team still has active account officers"}
+    fields:
+      - "Toolbar | Search unit code, name or officer | Text | Unit code or name, or the officer's name | N | - | Blank | - | Contains search; the matching branches open | No unit or officer matches the search"
+      - "Toolbar | Expand All / Collapse All | Button | Opens or closes every branch | - | - | Regions and departments open | - | - | -"
+      - "Toolbar | Show Inactive | Check box | Lists deactivated units and removed officers in grey | N | - | Not ticked | - | - | -"
+      - "Toolbar | [Summary] | Text | n regions · n departments · n teams · n officers of the rows shown | - | Sales units and officers | - | Read only | - | -"
+      - "Tree table | Unit | Column | Chevron and indentation per level; code in bold and name; an officer by full name with the role below | - | Sales units; users | - | Read only | - | No sales unit defined yet"
+      - "Tree table | Level | Column | Region, Department, Team or Account Officer | - | Sales units | - | Read only | - | -"
+      - "Tree table | Cost Center | Column | The unit's own cost centre, or the cost centre in force with Inherited from <parent code> below it | - | Sales units | - | Read only | - | -"
+      - "Tree table | Account Officers | Column | Number of active officers of a team | - | Sales officers | - | Read only | - | -"
+      - "Tree table | Assigned Since | Column | dd-MMM-yyyy, date the officer joined the team | - | Sales officers | - | Read only | - | -"
+      - "Tree table | Status | Pill | Active, Pending Authorization, Inactive | - | Sales units and officers | - | Read only | - | -"
+      - "Tree table | [Actions] | Menu | The actions of the row (see Actions) | - | - | - | - | - | -"
+      - "New unit / Add sub-unit | Level | Drop-down | Region, Department, Team; fixed to the level below when opened from a unit | Y | Fixed list | Region | New unit | A department belongs to a region; a team to a department | A <level> must belong to an active <parent level>"
+      - "New unit / Add sub-unit | Code / Name | Text | Unit code and name | Y | - | Blank | New unit | Unique | Sales unit already exists: <key>"
+      - "New unit / Add sub-unit | Cost Center | Text | Blank = inherited from the parent | N | Cost centres | Blank | New unit; edit | A cost centre of the company | -"
+      - "New unit / Add sub-unit | Parent | Drop-down | Active units of the level above | Cond.: department and team | Sales units | The unit the action was opened from | New unit; edit | - | -"
+      - "Unit details | Code, Name, Level, Parent Unit, Cost Center, Unit Head, Sub-units, Account Officers, Status, Status Reason, Created, Last Changed, Authorized | Detail | Names of users, dd-MMM-yyyy HH:mm | - | Sales units | - | Read only; Edit for name, parent and cost centre | - | -"
+      - "Assign Account Officer / Reassign | Team | Drop-down | Active teams | Y | Sales units | The team the action was opened from | New assignment | An existing, active team | Team <team code> is unknown or inactive"
+      - "Assign Account Officer / Reassign | Account Officer | Drop-down | BIBS users by name and role | Y | Users | Select; fixed on Reassign | New assignment | An existing user | Unknown user <user>"
+      - "Deactivate / Reactivate / Remove from Team | Reason | Text | Why the unit or officer changes | Y | - | Blank | Dialog | Not blank | Enter the reason."
+    actions:
+      - "New Unit | MASTER_MAINTAIN | Always | Opens New unit; Save for Authorization | Pending Authorization | -"
+      - "Assign Officer | MASTER_MAINTAIN | Always | Opens Assign Account Officer; Save for Authorization | Pending Authorization | -"
+      - "View / Edit | Every user of the screen; Edit with MASTER_MAINTAIN | Unit row | Opens the unit details; Edit changes name, parent and cost centre, Save for Authorization | Pending Authorization | -"
+      - "Add Department / Add Team | MASTER_MAINTAIN | Active region / department | Opens New unit at the level below, the parent filled | Pending Authorization | -"
+      - "Assign Officer (row) | MASTER_MAINTAIN | Active team | Opens Assign Account Officer with the team filled | Pending Authorization | -"
+      - "Authorize | MASTER_AUTHORIZE, not the maker | Pending unit or officer | From the row action menu, after the confirmation: authorises the record | Active | -"
+      - "Deactivate | MASTER_MAINTAIN | Active or pending unit without active sub-units or officers | Asks the reason and deactivates the unit; refused with a notice while sub-units or officers remain | Inactive | -"
+      - "Reactivate | MASTER_MAINTAIN | Inactive unit whose parent is not inactive | Asks the reason; the unit waits for authorisation again | Pending Authorization | -"
+      - "Reassign / Assign to a Team | MASTER_MAINTAIN | Officer row | Moves the officer to another team (or places a removed officer again) from today | Pending Authorization | -"
+      - "Remove from Team | MASTER_MAINTAIN | Active or pending officer | Asks the reason and ends the officer's assignment | Inactive | -"
+      - "Export to Excel | Every user of the screen | Always | Downloads the tree in tree order with the effective cost centres and the officers by name and role | - | -"
+    rules:
+      - "The sales organisation is a New Business master (BRD-1, sales hierarchy and production reporting) kept in the Product Maintenance section of the menu; it is loaded at go-live by the data migration."
+      - "A unit is deactivated only when none of its sub-units and account officers is still active or pending; a unit is reactivated only under an active or pending parent, and waits for authorisation again."
+      - "Deactivation, reactivation and removal from a team need a reason, kept on the record and in the audit trail with the user and time."
+      - "A team without its own cost centre uses the cost centre of the nearest parent that has one."
+    outcome: Every account and production report is attributed to the right region, department, team and officer.
+    frs: []
+    tests: [SALESORG]
+
+  - id: SCR-PM-21
+    title: Premium Calculator
+    route: /catalog/calculator
+    purpose: >-
+      Rates a product with the charges in force, for an insurer and branch, annual, pro-rata or short period, for a new
+      account or an endorsement over the remaining term, and shows every charge and the commission. For a package it
+      shows the version that priced it; an earlier released version can be chosen for information.
+    entry:
+      - Sidebar entry Premium Calculator
+    shots:
+      - {state: filled, user: ao, fill: calculator_package, submit: "^calculate$", caption: "Premium Calculator: a package priced on its version in force"}
+    fields:
+      - "Cover | Product | Drop-down | Code – name of the active products | Y | Active products | Select | - | - | Choose a product."
+      - "Cover | Insurer | Drop-down | Insurers of the panel | N | Insurers | Product default commission | - | A package with a panel accepts only its panel insurers | Insurer <insurer code> is not on the panel of <product code> version <version no>"
+      - "Cover | Insurer branch (LGT) | Drop-down | Branch name (LGT %) | N | Insurer branches | No LGT | - | An authorised branch of the insurer | Branch <branch code> is not authorized or inactive"
+      - "Cover | Period basis | Drop-down | Annual, Pro-rata (days), Short period (table) | N | Fixed list | Annual | - | Pro-rata and short period need the period | Pro-rata and short-period rating need the period (for endorsements: the remaining term)."
+      - "Cover | From / To | Date | dd-MMM-yyyy | Cond.: pro-rata or short period | - | Blank | - | To after From | The period end must be after the period start"
+      - "Cover | Commission % override | Number | Percentage | N | - | Blank | - | - | -"
+      - "Cover | Package version | Drop-down | Version in force, or an earlier released version | N | Released and superseded versions | Version in force | - | Shown when the package has two or more sold versions | -"
+      - "Cover | Endorsement (remaining term, may return premium) | Check box | - | N | - | Not ticked | - | Only an endorsement may reduce the sum insured | Only an endorsement may reduce the sum insured."
+      - "Cover | Multi-year own damage factor | Check box | Motor multi-year products | N | - | Not ticked | - | - | -"
+      - "Items | Item / Sum insured | Text / Number | Label; amount in PHP | Y (a sum insured for at least one item) | - | Blank | - | Zero or more | Enter the sum insured of at least one item."
+      - "Items | Rate % | Number | Blank = product default (non-motor) | N | - | Blank | - | A rate other than the scheme rate is priced but flagged | Enter the premium rate of <item>"
+      - "Items | Excess BI limit / PD limit | Number | Motor limits of the table | N | Motor limit table | Blank | - | A limit of the table | <coverage> limit <amount> is not in the limit table"
+      - "Result | [Version line] | Banner | Priced on package version n (effective dd-MMM-yyyy, scheme rate r%); not the current version; an item rate differs from the scheme rate | - | Package version | - | Read only | - | -"
+      - "Result | Sum insured / Net premium / Gross premium / Commission | Figure | Amounts in PHP | - | Premium computation | - | Read only | - | -"
+      - "Result | Component / Basis / Amount | Table | Annual premium, net premium, documentary stamp tax, premium tax, VAT, fire service tax, local government tax, total charges, commission, VAT on commission | - | Premium computation | - | Read only | - | -"
+    actions:
+      - "Add Item / Remove | Every user of the screen | Always | Adds or removes an item | - | -"
+      - "Calculate | Every user of the screen | Product chosen and a sum insured entered | Rates the cover and shows the result | - | -"
+    rules:
+      - "New business is priced on the package version in force on the transaction date, not on the period start (FR-PM-051)."
+      - "A version other than the one in force is shown for information only; a quotation needs the current version or an approved rate exception (FR-PM-051)."
+      - "An item rate different from the scheme rate (or the panel insurer's rate) is priced but flagged; a quotation with it needs an approved rate exception (FR-PM-051)."
+      - "An expired or retired package, or a package with no version in force, cannot be priced for new business (FR-PM-052)."
+    outcome: Anyone can check what a package costs today, and on which version, before quoting it.
+    frs: [FR-PM-051, FR-PM-052]
+    tests: [CALC]
+
+  - id: SCR-PM-22
+    title: "Quotation: package rate scheme and rate exception"
+    route: /quotations/:id
+    also: [/catalog/rate-exceptions/:reference]
+    parent: /quotations
+    purpose: >-
+      Where New Business meets the package version: the quotation record of a package product shows the version that
+      priced it and warns when an item rate differs from the scheme rate. The Account Officer then requests a rate
+      exception. The approver opens the exception record from My Approvals, compares the requested rate with the
+      scheme in force and approves it with a comment or rejects it with a reason; the requester is notified and the
+      quotation is submitted with the approved exception. Only the Rate Exceptions card, the Request Rate Exception
+      dialog and the exception record are specified here; the rest of the quotation record is specified in the New
+      Business set (SCR-NB-07).
+    entry:
+      - Quotations › a row (New Business)
+      - New Quotation › Submit for Review refused with the rate scheme message
+      - My Approvals › the rate exception row (the exception record)
+      - Notification of the decision › the exception record
+    shots:
+      - {state: exception, user: ao, open: quotation_deviation, click: "^request rate exception$", caption: "Request Rate Exception dialog"}
+      - {state: deviation, user: ao, open: quotation_deviation, caption: "Rate Exceptions card: an item rate differs from the scheme rate; each exception is a row of the table"}
+      - {state: record, user: approver, open: rate_exception_pending, caption: "Rate exception record opened from My Approvals: the requested rate against the scheme in force, with Approve and Reject"}
+      - {state: reject, user: approver, open: rate_exception_pending, click: "^reject$", caption: "Reject Rate Exception: the reason is required"}
+    fields:
+      - "Rate Exceptions card | [Pricing notice] | Notice | Priced on package version n. An item rate differs from the scheme rate, so submission needs an approved rate exception | - | Quotation pricing | - | Read only | Shown while an item rate differs | Package <product code> is priced on the current rate scheme: <what> needs an approved rate exception"
+      - "Rate Exceptions card | [Rate exceptions table] | Table | One row per exception: Exception No. (opens the exception record), Requested Rate (%), Scheme Rate (%), Difference (%) in percentage points with its sign, Valid Until, Requested By and on, Decided By and on, Status (Pending Authorization, Approved or Rejected) | - | Rate exceptions of the quotation | - | Read only | - | -"
+      - "Request Rate Exception | Item rate % | Number | 0 to 100 | Y | - | The rate of the first item | Draft quotation | 0 to 100 | Enter the item rate between 0 and 100"
+      - "Request Rate Exception | Valid until | Date | dd-MMM-yyyy | N | - | The quotation's valid-until date | Draft quotation | Not in the past | The validity date cannot be in the past"
+      - "Request Rate Exception | Reason | Text | Free text | Y | - | Blank | Draft quotation | Not blank | Explain why the scheme rate cannot be used"
+      - "Exception record | Package | Fact | Risk code – package name | - | Product master | - | Read only | - | -"
+      - "Exception record | Requested rate | Fact | Rate n.nn% (or the version requested) | - | Exception | - | Read only | - | -"
+      - "Exception record | Scheme in force | Fact | Version n, rate n.nn% (or rate per insurer) | - | Package version in force today | - | Read only | - | -"
+      - "Exception record | Quotation | Fact | Quotation number (opens the quotation), client and gross premium | - | Quotation | - | Read only | - | -"
+      - "Exception record | Requested by | Fact | Display name and date and time of the request | - | Exception | - | Read only | - | -"
+      - "Exception record | Reason for the exception | Text | As requested | - | Exception | - | Read only | - | -"
+      - "Exception record | Decision | Detail | Approved by or Rejected by (display name and role), On, Comment or Reason | - | Exception | - | Read only | - | -"
+      - "Approve Rate Exception | Comment | Text | Free text, up to 1,000 characters | N | - | Blank | Pending exception | - | -"
+      - "Reject Rate Exception | Reason for the rejection | Text | Free text, up to 1,000 characters | Y | - | Blank | Pending exception | Not blank | Enter the reason for the rejection"
+    actions:
+      - "Request Rate Exception | Marketing (QUOTE_MAINTAIN) | Draft quotation of a package with an item rate that differs | Opens the dialog; Request Exception records the exception for this quotation, pending approval | Pending Authorization | My Approvals of the approvers"
+      - "[Open from My Approvals] | Business Administrator, New Business Approver (PRODUCT_AUTHORIZE) | Exception pending | The rate exception row of My Approvals opens the exception record | - | -"
+      - "Approve | Business Administrator, New Business Approver (PRODUCT_AUTHORIZE), not the requester | Exception pending | Opens the confirmation with an optional comment; Approve approves the exception, which prices the quotation from then on | Approved | Notification to the requester"
+      - "Reject | Business Administrator, New Business Approver (PRODUCT_AUTHORIZE), not the requester | Exception pending | Opens the confirmation; the reason is required; Reject rejects the exception, which can no longer be used | Rejected | Notification to the requester with the reason"
+    rules:
+      - "Only package rate schemes need an exception; an exception names the rate or the version it approves and the transaction (quotation number or ARN) (FR-PM-051)."
+      - "An exception is approved or rejected by a holder of the product approval permission other than its requester; the requester sees the record without the Approve and Reject buttons (FR-PM-051)."
+      - "A rejection needs its reason; the decision, its maker, date and comment or reason stay on the record and in the audit trail (FR-PM-051)."
+      - "Submission of the quotation (and of the account) is refused until an approved exception covers the differing rate or version (FR-PM-051)."
+      - "The approved exception is stored on the quotation and passed to the accounts created from it (FR-PM-051)."
+    outcome: A package is sold on its approved scheme, and any exception is approved by a second person and kept with the transaction.
+    frs: [FR-PM-051]
+    tests: [QUOTE, APPROVALS]

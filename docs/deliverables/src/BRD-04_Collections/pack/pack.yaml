@@ -1,0 +1,214 @@
+# BRD-4 Collections – Business Sign-off Pack, release set v2.0 (Drop 1, Transactional).
+# Built by docs/deliverables/src/signoff/signoff_pack.py (workbook, checks) and read by the FRS source through
+# ```pack blocks (tools/deliverables/bdoi_docx.py). Schema: docs/deliverables/src/signoff/README.md.
+meta:
+  brd: BRD-04
+  brd_label: BRD-4
+  name: Collections
+  code: CL
+  version: "2.0"
+  date: 1 October 2026
+  status_as_of: 01-Oct-2026
+  release_set: BRD-04 Collections – Business Sign-off Pack
+  frs: FRS_BRD04_COLLECTIONS.md
+  test_plan: brd04_cases.yaml
+  screens_dir: screens
+  screenshot_dir: ../screenshots
+
+# Permissions and roles are shown by their readable names, never by their codes.
+codes: labels
+
+# The Collections personas: role code, name, SIT/UAT user of the seed profile.
+personas:
+  MKT_AO: {name: Marketing Account Officer, user: ao}
+  MKT_TL: {name: Marketing Team Lead, user: mkttl}
+  MKT_HANDLER: {name: Marketing Handler, user: mkthandler}
+  MKT_COLLECTION: {name: Collection Handler, user: clxhandler}
+  CLX_TL: {name: Collection Team Lead, user: clxtl}
+  MKT_SECTION_HEAD: {name: Section Head (Corporate / Retail), user: clxuh}
+  UNAPPLIED_HANDLER: {name: Unapplied Payment Handler, user: upphandler}
+  PROCESSOR: {name: Processing Unit, user: proc}
+  CASHIER: {name: Cashier (read access and exports), user: cashier}
+  DISBURSEMENT: {name: Disbursement (read access and exports), user: disb}
+  COMPTROLLERSHIP: {name: Comptrollership (read access), user: comptrol}
+  BUSINESS_ADMIN: {name: Business Administrator, user: badmin}
+  SYSADMIN: {name: System Administrator, user: admin}
+  AUDITOR: {name: Auditor, user: auditor}
+
+# The other persona whose sidebar the set shows: the authorizer of master data authorizes the escalation rules
+# (walkthrough B); no Collections role holds the authorization of master data (CLR-CL-31).
+menu_personas:
+  AUTHORIZER: {name: Authorizer of master data, user: checker}
+
+# Packs of other BRDs whose screens a walkthrough step may show (Check Pick-up and Incoming Requests of Cashiering).
+foreign_packs: [../../BRD-02_Operations/pack/pack.yaml]
+
+# Sidebar sections that belong to this BRD (navigation/modules.ts module ids) and the BRD of every other section,
+# used to mark each menu entry of a persona.
+own_sections: [collections]
+section_brd:
+  dashboard: Platform
+  nb-dashboard: BRD-1
+  workspace: BRD-1
+  crm: BRD-1
+  csf: BRD-9
+  screening: BRD-10
+  quotations: BRD-1
+  accounts: BRD-1
+  proposals: BRD-1
+  eb: BRD-8
+  placement: BRD-1
+  issuance: BRD-1
+  booking: BRD-1
+  renewal: BRD-6
+  submitted: BRD-12
+  prodrecon: BRD-2
+  adjustment: BRD-2
+  catalog: BRD-3
+  bulk: BRD-1
+  operations: BRD-2
+  collections: BRD-4
+  cashiering: BRD-2
+  remittance: BRD-2
+  commission: BRD-2
+  disbursement: BRD-5
+  payrequest: BRD-5
+  acsl: BRD-5
+  frbs: BRD-5
+  gl: BRD-5
+  receivables: BRD-5
+  payables: BRD-5
+  assets: BRD-5
+  planning: BRD-5
+  tax: BRD-5
+  accounting-engine: BRD-5
+  brokerclaims: BRD-7
+  underwriting: Platform
+  claims: Platform
+  reinsurance: Platform
+  reserves: Platform
+  migration: BRD-13
+  legacy-inquiry: BRD-13
+  nb-reports: BRD-1
+  reports: Platform
+  broking-setup: BRD-1
+  screening-setup: BRD-10
+  setup: Platform
+  user-access: BRD-11
+  admin: Platform / BRD-11
+  help: Platform
+
+# Screen-flow figure: the links between the screens (list → record → action → next screen).
+flow:
+  - [SCR-CL-01, SCR-CL-02, Open PR Worklist]
+  - [SCR-CL-02, SCR-CL-03, open]
+  - [SCR-CL-02, SCR-CL-04, client]
+  - [SCR-CL-04, SCR-CL-03, open]
+  - [SCR-CL-03, SCR-CL-08, promise]
+  - [SCR-CL-03, SCR-CL-11, escalate]
+  - [SCR-CL-01, SCR-CL-14, unapplied tiles]
+  - [SCR-CL-05, SCR-CL-06, open]
+  - [SCR-CL-07, SCR-CL-06, open]
+  - [SCR-CL-06, SCR-CL-10, Generate SOA]
+  - [SCR-CL-09, SCR-CL-10, open]
+  - [SCR-CL-06, SCR-CL-08, Record Promise]
+  - [SCR-CL-08, SCR-CL-11, broken promise]
+  - [SCR-CL-07, SCR-CL-11, overdue installment]
+  - [SCR-CL-13, SCR-CL-11, rules]
+  - [SCR-CL-11, SCR-CL-12, open]
+  - [SCR-CL-14, SCR-CL-15, open]
+  - [SCR-CL-14, SCR-CL-16, Requests to Cashiering]
+  - [SCR-CL-16, SCR-CL-15, open]
+  - [SCR-CL-17, SCR-CL-02, reassigned accounts]
+  - [SCR-CL-02, SCR-CL-18, Export to Files]
+  - [SCR-CL-19, SCR-CL-02, Refresh Worklist Now]
+
+# Elements shared by many screens, described once.
+common:
+  - name: Page header and company
+    text: >-
+      Every page shows its section and title, a one-line description and its actions on the right. The company in the
+      header decides the records shown; lists and files are always of that company.
+  - name: Collections Home and work tiles
+    text: >-
+      The Collections Home shows the collector's work queues as tiles: a Title Case label and the live count; a queue
+      that needs action has a coloured bar and "Needs attention". A tile opens the list behind it. Under the tiles,
+      the open amounts per aging bracket, for all market segments or one.
+  - name: Work lists
+    text: >-
+      Lists show status tabs, a search box, a Filters button for the other criteria and the paged table ("Showing 1
+      to n of N results"). Rows alternate white and Background Blue; a long list scrolls inside its card with the header row in view. A row opens its record. Dates show as dd-MMM-yyyy and times as dd-MMM-yyyy HH:mm in
+      Philippine time. Selecting rows enables the actions of the tab, which apply to every selected row.
+  - name: Collection account and reference chips
+    text: >-
+      A collection account opens with the name of the assured, its reference chips (invoice, ARN), the collection
+      status, the payment and remittance status of the invoice, its flags and the key facts (client, outstanding and
+      PR2307, aging, insurer, handler, account officer and Unit Head). A reference chip copies the reference; Open
+      Invoice 360 opens the invoice in Operations.
+  - name: Statuses and flags of an account
+    text: >-
+      Every collection account has a collection status (Open, Credit, Completed, Excluded) set by the nightly refresh,
+      never by a user, and shows the payment status and the remittance status of its invoice as pills. Flags are tags:
+      Direct Payment, 2% CWT, On Hold, Pending Negative Adjustment, Locked by the Operations team working on the
+      invoice, and Marketing Action or Operations Action (who acts next on the account).
+  - name: Record lock
+    text: >-
+      A user who opens a collection account to work on it holds it for the edit-lock time (15 minutes by default).
+      Another user sees "<name> is editing since <time>" above the account and cannot change it until the lock is
+      released or expires.
+  - name: Workflow header and history
+    text: >-
+      An escalation shows the workflow header under the record header: a stepper of the stages in their order
+      (passed stages ticked in blue, the current stage highlighted, the stages ahead in grey; a returned stage in
+      amber, the last stage in green once reached), and one row with Current Stage, Since, Due (with the Overdue pill)
+      and Assigned To, with the actions the user may take now on the right. The history table lists every step,
+      newest first: Stage, From Stage, Action, By (the user's name; the role under it for the users who may read the
+      roles of others: user administration, access review and audit), Date and Time, Remarks and Duration in Stage.
+      "Workflow notice" in the action tables means the in-app notice NT-01.
+  - name: Maker-checker
+    text: >-
+      An escalation rule applies only once another user than its maker authorizes it; the maker cannot authorize it.
+      A disposition reserved to some roles is refused for the other roles, and updating several accounts at once needs
+      the bulk update permission, whatever other permission the user holds.
+  - name: Status pills and tags
+    text: >-
+      Statuses are outlined pills of one size and colour per state group; a pill never wraps. Statuses show their full label;
+      an agreed short form, with the full label in the tooltip, is used only for a label longer than 21 characters.
+      Dispositions are tags with the category under them.
+  - name: Dates, amounts, periods and names
+    text: >-
+      Dates are entered with one date picker and shown as dd-MMM-yyyy; times as dd-MMM-yyyy HH:mm in Philippine time.
+      Amounts show two decimals and thousand separators, with the currency in the column header or before the amount.
+      A period (a coverage, a billing cycle, the period of a file) is shown in lists on two lines, the start date and
+      "to" the end date. Aging reads in days ("16 days") with its bracket. Lists of values show their labels, and
+      users are shown by their names.
+  - name: Hand-offs to Operations
+    text: >-
+      A disposition with an Operations action is handed over inside BIBS: a check pick-up and a BIR 2307 tag to
+      Cashiering, a direct payment account to the direct payment list of Commission Receivables; a cancellation is
+      raised by the user in Adjustment. A request on an unapplied payment goes to the Incoming Requests of Cashiering.
+      Collections posts no accounting entry; Operations does.
+  - name: Notifications and help
+    text: >-
+      The bell in the header shows the unread count and opens the notifications panel, grouped by day; each notice
+      shows its title, a one-line summary, the record reference and the time, and opens its record. Mark Read, Mark
+      All Read and View All are offered. Each user chooses the channels of the Collections events on Notification
+      Settings. The Help button of each page explains the screen.
+  - name: Messages
+    text: >-
+      Every message follows one notice standard: a white notice with a thin bar and an icon in the colour of its kind
+      (red error, amber warning, blue information, green success), a bold short title, then the business message with
+      one bullet per missing item. Field errors appear under the field. A refusal by a business rule shows the
+      business message only, without codes; only an unexpected system error offers Retry and a reference for support.
+      Success is confirmed by a short message in the same standard.
+  - name: Confirmations and bulk results
+    text: >-
+      Every authorize, deactivate, cancel and resolve asks for confirmation in a dialog that names the record and the
+      effect; actions that need a reason open a dialog with the reason and a comment. An action run on several
+      selected accounts or invoices processes each on its own and lists the outcome of each, so one failure does not
+      stop the others.
+  - name: Files and exports
+    text: >-
+      Scheduled files and exports are published on Collections Files with the time from which they may be
+      downloaded; a file is never shown before that time. Exports run in the background so that the screens stay
+      fast for the other users, and are capped at a maximum number of rows.

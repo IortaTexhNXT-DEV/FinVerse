@@ -401,17 +401,23 @@ async function clearCallouts(page) {
 
 // ------------------------------------------------------------------ capture and optimise
 
-/** Grows the viewport so the whole scrolling content area is in the image (up to MAX_HEIGHT). */
+/**
+ * Grows the viewport so the whole scrolling content area is in the image (up to MAX_HEIGHT). A list that scrolls
+ * inside its card (capped to the room left in the window) counts with the rows hidden in its card: in the taller
+ * window the list lifts its cap and shows every row, so the image holds the whole card.
+ */
 async function fitViewport(page, tall) {
   const extra = await page.evaluate(() => {
     const main = document.querySelector('main.app-main, main');
     const doc = document.documentElement;
     const inner = main ? main.scrollHeight - main.clientHeight : 0;
-    return Math.max(inner, doc.scrollHeight - doc.clientHeight, 0);
+    const cards = [...document.querySelectorAll('main .table-wrap[data-fit]')]
+      .reduce((sum, w) => sum + Math.max(0, w.scrollHeight - w.clientHeight), 0);
+    return Math.max(inner + cards, doc.scrollHeight - doc.clientHeight, 0);
   });
   const height = Math.min(MAX_HEIGHT, HEIGHT + (tall === false ? 0 : extra));
   await page.setViewportSize({ width: WIDTH, height });
-  await page.waitForTimeout(300);
+  await page.waitForTimeout(extra > 0 && tall !== false ? 600 : 300);
 }
 
 /**
@@ -498,8 +504,11 @@ async function cropOf(page, shot, recipe) {
         if (r.width < 1 || r.height < 1 || getComputedStyle(el).visibility === 'hidden') {
           continue;
         }
+        // Rows scrolled out of a list that scrolls inside its card are not drawn below the card.
+        const box = el.parentElement && el.parentElement.closest('.table-wrap');
+        const limit = box ? box.getBoundingClientRect().bottom : Infinity;
         right = Math.max(right, Math.min(r.right, m.right));
-        bottom = Math.max(bottom, r.bottom);
+        bottom = Math.max(bottom, Math.min(r.bottom, limit));
       }
       return { x: m.left, y: m.top, width: right - m.left, height: bottom - m.top };
     });

@@ -171,6 +171,11 @@ class RenewalDocumentWordsTest {
 
     assertThat(DocTemplateService.fill("{{renewalFrom}}", values)).isEqualTo("15-Nov-2027");
     assertThat(DocTemplateService.fill("{{expiryDate}}", values)).isEqualTo("15-Nov-2027");
+    assertThat(LetterContent.fields(values))
+        .filteredOn(f -> f.label().equals("Expiry date"))
+        .singleElement()
+        .extracting(f -> f.value())
+        .isEqualTo("15-Nov-2027");
   }
 
   @Test

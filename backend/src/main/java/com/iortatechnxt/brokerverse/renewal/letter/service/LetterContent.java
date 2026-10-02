@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.account.domain.Account;
 import com.iortatechnxt.brokerverse.account.domain.AccountRepository;
 import com.iortatechnxt.brokerverse.catalog.domain.InsurerProfile;
 import com.iortatechnxt.brokerverse.catalog.domain.InsurerProfileRepository;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.docgen.service.DocTemplateService;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentComposer;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec;
@@ -211,7 +212,13 @@ public class LetterContent {
     return s.product() == null ? EMPTY : or(s.product().productName(), s.product().productCode());
   }
 
-  private List<Field> fields(Map<String, Object> v) {
+  /**
+   * The policy table of a letter, in words (dates as dd-MMM-yyyy).
+   *
+   * @param v values by placeholder
+   * @return fields
+   */
+  public static List<Field> fields(Map<String, Object> v) {
     return List.of(
         new Field("Renewal reference", str(v.get("renewalRef"))),
         new Field("Policy number", str(v.get("policyNo"))),
@@ -261,7 +268,7 @@ public class LetterContent {
   }
 
   private static String str(Object value) {
-    return value == null ? EMPTY : value.toString();
+    return DisplayFormat.value(value);
   }
 
   /**

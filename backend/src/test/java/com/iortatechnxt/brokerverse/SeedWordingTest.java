@@ -109,18 +109,23 @@ class SeedWordingTest {
         if (AUDIT_TRAIL_KEPT.contains(file.getFileName() + ": " + text.strip())) {
           continue;
         }
-        boolean covered =
-            corrected.contains(text)
-                || corrected.contains(text + "%")
-                || marker.matcher("Name" + text).matches()
-                || text.contains("@")
-                || NOT_SHOWN.containsKey(text);
-        if (marked(text) && !covered) {
+        if (marked(text) && !covered(text, corrected, marker)) {
           uncovered.add(file.getFileName() + ": " + text);
         }
       }
     }
     assertThat(uncovered).as("seeded values with a marker that V2090 does not correct").isEmpty();
+  }
+
+  /**
+   * A seeded value V2090 corrects by name or by its marker rule, an e-mail, or a value never shown.
+   */
+  private static boolean covered(String text, Set<String> corrected, Pattern marker) {
+    return corrected.contains(text)
+        || corrected.contains(text + "%")
+        || marker.matcher("Name" + text).matches()
+        || text.contains("@")
+        || NOT_SHOWN.containsKey(text);
   }
 
   @Test

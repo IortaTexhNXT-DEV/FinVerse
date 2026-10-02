@@ -11,3 +11,10 @@ describe('request texts', () => {
     }
   });
 });
+
+describe('disbursement tab', () => {
+  it('names the status of the payment request in business words', async () => {
+    const tabs = (await import('./RequestTabs.tsx?raw')).default;
+    expect(tabs).not.toContain('Gateway');
+  });
+});

@@ -1,6 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
   approveLabel,
+  REFUND_LINE_WIDTHS,
+  disbursementNote,
   preparerOptions,
   validationActions,
   businessActions,
@@ -166,5 +168,20 @@ describe('validation task row menu', () => {
     expect(validationActions({ status: 'PASSED' }, 'FOR_VALIDATION', true, record)).toEqual([]);
     expect(validationActions({ status: 'OPEN' }, 'FOR_APPROVAL', true, record)).toEqual([]);
     expect(validationActions({ status: 'OPEN' }, 'FOR_VALIDATION', false, record)).toEqual([]);
+  });
+});
+
+describe('disbursement note', () => {
+  it('gives the status in Disbursement in words', () => {
+    expect(disbursementNote({ instrumentStatus: 'PENDING' })).not.toContain('PENDING');
+    expect(disbursementNote({})).toBe('');
+  });
+});
+
+describe('accounts to refund columns', () => {
+  it('keep the AR, client, name and reason wide enough to read', () => {
+    for (const key of ['arNo', 'clientCode', 'assuredName', 'reasonCode', 'amount']) {
+      expect(REFUND_LINE_WIDTHS[key]).toBeGreaterThanOrEqual(130);
+    }
   });
 });

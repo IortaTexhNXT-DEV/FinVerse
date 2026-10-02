@@ -132,9 +132,47 @@ async function atdVoucher(ctx) {
   return ctx.one(query);
 }
 
+/** A refund endorsed by the reviewer and waiting for the Marketing approver. */
+async function refundForApproval(ctx) {
+  const query = "select id, stage from prq_request where reference_text = '2026_127 Refund' order by id limit 1";
+  if (ctx.sql(query).length === 0) {
+    await ctx.api('mktao', 'POST', `/payment-requests/requests/refunds?companyId=${COMPANY(ctx)}`, {
+      segment: 'Retail', referenceText: '2026_127 Refund', requestingUnit: 'Marketing - Retail Sales',
+      purpose: 'Refund of the premium decrease of the endorsement of the motor policy', currency: 'PHP',
+      paymentMode: 'CHECK', accountName: 'Jose Miguel L. Reyes',
+      lines: [{ arNo: 'AR-HO-000004', clientCode: 'CL-2026-000002', assuredName: 'Reyes, Jose Miguel Lopez',
+        amount: 1500, reasonCode: 'PREMIUM_DECREASE', branchUnit: 'Head Office' }],
+    });
+  }
+  let [id, stage] = ctx.sql(query)[0];
+  if (stage === 'DRAFT') {
+    await ctx.api('mktao', 'POST', `/payment-requests/requests/${id}/submit`, { comment: 'For review' });
+    [id, stage] = ctx.sql(query)[0];
+  }
+  if (stage === 'FOR_REVIEW') {
+    await ctx.api('mktrev', 'POST', `/payment-requests/requests/${id}/endorse`, { comment: 'Checked against the endorsement' });
+  }
+  return id;
+}
+
+/** The GL accounts of the cash-advance liquidations, kept by the Comptrollership administrator. */
+async function liquidationAccounts(ctx) {
+  const accounts = { PER_DIEM: '5606', REPRESENTATION: '5609', TRANSPORT: '5606', LODGING: '5606', OTHER: '5613', CASH: '1101' };
+  for (const [role, accountCode] of Object.entries(accounts)) {
+    await ctx.api('fmanager', 'PUT', `/payment-requests/liquidation-accounts?companyId=${COMPANY(ctx)}`, { role, accountCode });
+  }
+}
+
 async function prepare(ctx) {
   await walkthrough.prepare(ctx);
   await employees(ctx);
+  await refundForApproval(ctx);
+  await liquidationAccounts(ctx);
+  // The GL-SL reconciliation of the day, run by the ACSL Team Leader.
+  if (ctx.sql('select 1 from acsl_glsl_run').length === 0) {
+    const asOf = new Date(Date.now() + 8 * 3600000).toISOString().slice(0, 10);
+    await ctx.api('acsltl', 'POST', `/acsl/gl-sl/runs?companyId=${COMPANY(ctx)}&asOf=${asOf}`);
+  }
 }
 
 // ------------------------------------------------------------------ records to open
@@ -243,7 +281,7 @@ const fills = {
       await fill(page, 'TIN', '008-412-339-000');
       await fill(page, 'E-mail', 'billing@northpoint-courier.example');
       await fill(page, 'Address', '2/F Pacific Building, 1045 Quirino Avenue, Paco, Manila');
-      await fill(page, 'Default Mode', /check/i);
+      await fill(page, 'Default Mode', /^check$/i);
     },
   ],
   new_funding: [
@@ -268,7 +306,7 @@ const fills = {
     async (page) => {
       await fill(page, 'Employee No.', 'E-2021-0388');
       await fill(page, 'Employee Name', 'Ramon B. Castillo');
-      await fill(page, 'Type', /./);
+      await fill(page, 'Type', /^(?!Select)\S/);
       await fill(page, 'Amount (PHP)', '15000.00');
       await fill(page, 'Purpose', 'Travel to the Cebu branch for the client visits of 12 to 14 October');
       await fill(page, 'Segment', 'Retail');
@@ -300,6 +338,10 @@ const after = {
     await fill(page, 'Period', new RegExp(`^${previousMonth().iso}`), dialogOf(page));
     await settle(page, 800);
   },
+  'scr-ac-43-03-assign': async (page) => {
+    await choose(dialogOf(page).getByLabel(/^Preparer/), /Marco/);
+    await settle(page, 300);
+  },
   'ux-scr-ac-28-actions': async (page) => {
     await page.locator('main table tbody tr').first().getByRole('button', { name: /^Actions for/ }).click();
     await settle(page, 300);
@@ -329,8 +371,7 @@ const documents = {
     render(await ctx.api('accountant', 'GET', `/tax/2307/certificates/${id}/pdf`), 'pdf', out);
   },
   'doc-soa-report': async (ctx, out) => {
-    render(await ctx.api('acsl', 'GET', `/acsl/soa-uploads/${walkthrough.soaUpload(ctx)}/report`), 'xlsx', out, 200,
-      ['Invoice No', 'Assured', 'Result', 'Premium per SOA', 'Premium per Books', 'Variance']);
+    render(await ctx.api('acsl', 'GET', `/acsl/soa-uploads/${walkthrough.soaUpload(ctx)}/report`), 'xlsx', out);
   },
 };
 

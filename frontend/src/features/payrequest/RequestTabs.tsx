@@ -128,7 +128,7 @@ export function DisbursementTab({ request: r }: Readonly<{ request: PayRequest }
       <Facts
         items={[
           ['Payment Request', t.requestNo],
-          ['Gateway Status', t.status ? humanize(t.status) : undefined],
+          ['Request Status', t.status ? humanize(t.status) : undefined],
           ['DV No.', t.dvNo],
           ['DV Stage', t.dvStatus ? humanize(t.dvStatus) : undefined],
           ['Instrument Status', t.instrumentStatus ? humanize(t.instrumentStatus) : undefined],

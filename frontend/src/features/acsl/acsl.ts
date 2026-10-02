@@ -312,3 +312,14 @@ const LINE_ORIGINS: Record<LineOrigin, string> = {
 export function lineOriginLabel(origin: LineOrigin): string {
   return LINE_ORIGINS[origin];
 }
+
+/** A comma-separated list of codes (BASIC,PREMIUM_TAX_VAT) in words; a dash when there is none. */
+export function codesInWords(codes: string | null | undefined): string {
+  if (!codes) {
+    return '—';
+  }
+  return codes
+    .split(',')
+    .map((c) => humanize(c.trim()))
+    .join(', ');
+}

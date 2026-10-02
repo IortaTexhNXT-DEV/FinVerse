@@ -3,6 +3,7 @@ import {
   CASE_TABS,
   assigneeField,
   caseRequestFacts,
+  codesInWords,
   correctionKind,
   lineOriginLabel,
   originalLineActions,
@@ -137,5 +138,12 @@ describe('correction line origin', () => {
   it('names where a correction line comes from in words', () => {
     expect(lineOriginLabel('REVERSAL')).toBe('Reversal');
     expect(lineOriginLabel('REPOST')).toBe('Re-post');
+  });
+});
+
+describe('control account components', () => {
+  it('reads the components in words', () => {
+    expect(codesInWords('BASIC,PREMIUM_TAX_VAT')).toBe('Basic, Premium Tax VAT');
+    expect(codesInWords(undefined)).toBe('—');
   });
 });

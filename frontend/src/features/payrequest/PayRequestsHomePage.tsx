@@ -25,6 +25,7 @@ import { KIND_LABELS, STAGE_TABS, tabOf } from './requestForm';
 import type { StageTab } from './requestForm';
 import { DateInput } from '@/components/ui/DateInput';
 import { UserName } from '@/components/ui/UserName';
+import { disbursementNote } from './requestForm';
 
 const keyOf = (r: RequestSummary) => String(r.id);
 
@@ -57,7 +58,7 @@ const COLUMNS: Column<RequestSummary>[] = [
     render: (r) => (
       <>
         {r.dvNo ?? '—'}
-        <span className="cell-sub">{r.instrumentStatus ?? r.disbursementStatus ?? ''}</span>
+        <span className="cell-sub">{disbursementNote(r)}</span>
       </>
     ),
   },

@@ -1,0 +1,225 @@
+# Screen specifications of BRD-5 Accounting (FRBS): the reports on demand and the report batches, the report pack of
+# Appendix A, the account schedules, the service fee and the BIR forms and books.
+area: Reports, report pack and service fee
+screens:
+  - id: SCR-AC-17
+    title: Report Centre
+    route: /reports
+    purpose: >-
+      Every report the user may run, by category (Accounting, Disbursement, ACSL, Payment Requests, Operations and
+      the other modules), with a search by title; Report Batch runs several reports at once with shared dates and one
+      output, and My report batches lists the batches with their download.
+    shots:
+      - {state: list, user: glofficer, caption: "Report Centre: the reports by category and My report batches"}
+      - {state: batch, user: glofficer, click: "^report batch$", caption: "Report batch: the reports chosen, the dates and the output"}
+    fields:
+      - "Toolbar | Search reports by title | Text | Part of the title | N | Report catalogue | Blank | - | Contains | -"
+      - "Categories | [Report title and description] | Link | The reports of the category the user may run | - | Report catalogue | - | Read only | - | -"
+      - "My report batches | Batch No. / Run At / Output / Status | Column | Batch number, date and time, output format, Queued, Running, Completed or Failed | - | Report batches | - | Read only | - | -"
+      - "Report batch dialog | From / To / as of | Date | dd-MMM-yyyy; shared by the reports chosen | N | - | Start of the month / today | - | - | -"
+      - "Report batch dialog | Output | Drop-down | One ZIP of the files, or one merged PDF | Y | Fixed list | ZIP | - | - | -"
+      - "Report batch dialog | Search reports (n selected) | Text, check boxes | The reports to run together | Y | Report catalogue | None | - | At least one report | -"
+      - "Report batch dialog | Report / Status / Rows / Reason | Column | The outcome of each report of the batch | - | Report batch | - | Read only | - | -"
+    actions:
+      - "[Report title] | Every user who may run the report | Always | Opens the report runner | - | -"
+      - "Report Batch | Report users | Always | Opens the report batch; Run runs the reports in the background | Queued | -"
+      - "Download | Report users | A completed batch | Downloads the batch output | - | -"
+    rules:
+      - "A user sees only the reports of the categories the role may run (FR-AC-020)."
+      - "A batch runs each report on its own; a report that fails is listed with its reason and does not stop the others (FR-AC-022)."
+    outcome: The user finds a report and runs it, alone or with others.
+    frs: [FR-AC-020, FR-AC-022, FR-AS-001, FR-DS-080, FR-PQ-012]
+    tests: [REPORTS, BATCH]
+
+  - id: SCR-AC-18
+    title: Report
+    route: /reports/:code
+    parent: /reports
+    purpose: >-
+      The report runner of one report: its parameters (dates, company, the criteria of the report), saved variants,
+      the result on screen with a filter on every column, the print options and the export to Excel, PDF, ODS, CSV or
+      XML.
+    entry:
+      - Report Centre › a report
+      - Report Pack, Disbursement Reports › a report
+    shots:
+      - {state: result, user: glofficer, open_report: trial_balance, caption: "A report run on screen with its parameters and the column filters"}
+      - {state: export, user: glofficer, open_report: trial_balance, click: "^export$", caption: "Export of a report with the print options: paper, orientation and width"}
+    fields:
+      - "Parameters | [Report parameters] | Date, drop-down, text | The parameters of the report: dates, company, branch, account, party, status | Cond.: report | Report definition | Report defaults | - | Mandatory parameters filled | -"
+      - "Parameters | Saved Variant | Drop-down | The variants saved by the user or shared | N | Report variants | Blank | - | - | -"
+      - "Result | [Report columns] | Column | The columns of the report with a Filter field on each | - | Report | - | Read only | Contains | -"
+      - "Export | Paper / Orientation / Width | Drop-down | A4, Letter or Legal; Automatic (by width), Portrait or Landscape; Fit to page width or Natural column widths | N | Fixed lists | A4, Automatic, Fit to page width | - | - | -"
+      - "Save Report Variant dialog | Variant Name / Share with every user who may run this report | Text, check box | Name of the variant | Y / N | - | Blank | - | - | -"
+    actions:
+      - "Run Report | Report users | Mandatory parameters filled | Runs the report on screen | - | -"
+      - "Print | Report users | A result | Prints the result with the print options | - | -"
+      - "Export | Report users (export permission of the category) | A result | Exports the report in the format chosen | - | -"
+      - "Save Variant / Delete Variant | Report users | Always | Saves or deletes the parameters as a variant | - | -"
+    rules:
+      - "Every column of a report can be filtered on screen; the export takes the filtered rows (FR-AC-021)."
+      - "PDF prints take the paper, orientation and width chosen (FR-AC-023)."
+    outcome: The report is shown, filtered, printed or exported.
+    frs: [FR-AC-020, FR-AC-021, FR-AC-023, FR-AC-051, FR-AS-005]
+    tests: [REPORT]
+
+  - id: SCR-AC-19
+    title: Report Pack
+    route: /frbs
+    purpose: >-
+      The Comptrollership report pack of Appendix A by group (end of day, GARD, subsidiaries, schedules and aging,
+      Mancom, service fee, government): each report opens in the runner and exports to the formats it offers; the
+      counts of the pack and of the Word documents requested.
+    shots:
+      - {state: pack, user: glofficer, caption: "Report Pack: the groups of Appendix A with their reports and formats"}
+    fields:
+      - "Counts | Report Groups / Reports / Account Schedules / Word Documents Requested | Display | Counts of the pack | - | Report pack | - | Read only | - | -"
+      - "Group | Report | Column | Title of the report (a link when available) with its code and source under it | - | Report pack | - | Read only | - | -"
+      - "Group | Formats / Export | Column | The formats offered (Excel, PDF, ODS, CSV, Word requested) and the export of each | - | Report pack | - | Read only | - | -"
+    actions:
+      - "[Report title] | FRBS users (FRBS report view) | Available | Opens the report or the account schedule | - | -"
+      - "[Export format] | FRBS users (FRBS report export) | Available | Exports the report in the format | - | -"
+    rules:
+      - "Reports whose layout BDOI has not confirmed carry the draft layout until confirmed (FR-AC-060)."
+    outcome: The GL team runs the reports of the pack from one place.
+    frs: [FR-AC-060, FR-AC-062]
+    tests: [PACK]
+
+  - id: SCR-AC-20
+    title: Account Schedules
+    route: /frbs/schedules
+    purpose: >-
+      The GARD, subsidiaries and ageing schedules of the report pack, run from their definitions: run a schedule for a
+      date or a period with its figures and the commentary per row; the definitions list with the family, accounts,
+      figures and layout, which the GL Team Lead maintains.
+    entry:
+      - Report Pack › a schedule
+    shots:
+      - {state: run, user: glofficer, fill: run_schedule, caption: "Account Schedules: a schedule run for the month with its figures"}
+      - {state: definitions, user: gltl, tab: "Definitions", caption: "Account Schedules, Definitions: family, accounts, figures and layout"}
+    fields:
+      - "Tabs | Run Schedule / Definitions (n) | Tab | - | - | - | Run Schedule | - | - | -"
+      - "Run a Schedule | Schedule | Drop-down | The schedules grouped by family | Y | Schedule definitions | Blank | - | - | Choose a schedule"
+      - "Run a Schedule | As Of / Period From | Date | dd-MMM-yyyy | Y / Cond.: comparative | - | Month end | - | - | -"
+      - "Result | [Schedule rows and figures] | Column | The rows of the schedule with the figures in column order | - | General ledger | - | Read only | - | -"
+      - "Commentary | Row / Commentary | Column, text | The comment of each row for the period | N | - | Blank | - | - | -"
+      - "Definitions | Schedule / Family / Accounts / Figures / Layout | Column | One row per definition | - | Schedule definitions | - | Read only | - | -"
+      - "Definition form | Code / Title / Family / Source / Accounts By / Accounts / Rows / Currency / Positive Side / Basis / Ageing Buckets / Comparative / Layout | Text, drop-down | The definition of the schedule | Y | Fixed lists, chart | - | - | - | -"
+      - "Definition form | Figures, in column order | Rows | The measure and the heading of each figure column | Y | Fixed list | Balance | - | At least one figure | -"
+    actions:
+      - "Run Schedule | FRBS users | Schedule and date chosen | Runs the schedule | - | -"
+      - "Save Comment | FRBS users | A comment typed | Saves the commentary of the row for the period | - | -"
+      - "New Schedule / [Row] | GL Team Lead (master maintain) | Always | Adds or changes a definition | - | -"
+    rules:
+      - "A schedule is computed from its definition on the posted ledger; its layout is configuration (FR-AC-061)."
+    outcome: The schedules of the pack are run and explained.
+    frs: [FR-AC-061]
+    tests: [SCHED]
+
+  - id: SCR-AC-21
+    title: Service Fee Runs
+    route: /frbs/service-fee
+    purpose: >-
+      The service-fee runs: the referrers' share of the commission fully paid in a period, by status tab (Computed, For
+      Approval, Sent for Payment, Released, Liquidated, Cancelled); Compute Service Fee computes a new run for a
+      period of full payment.
+    entry:
+      - Service Fee Rates › the runs
+    shots:
+      - {state: list, user: glofficer, caption: "Service Fee Runs: the runs with their period, invoices, service fee, approver and status"}
+      - {state: compute, user: glofficer, click: "^compute service fee$", caption: "Compute Service Fee: the period of full payment"}
+    fields:
+      - "Tabs | All / Computed / For Approval / Sent for Payment / Released / Liquidated / Cancelled | Tab | Counts per tab | - | Service-fee runs | All | - | - | -"
+      - "Toolbar | Search Run No. | Text | Run number | N | - | Blank | - | Contains | -"
+      - "List | Run No. / Fully Paid / Invoices / Service Fee / Approved By / Status | Column | Run number; the period of full payment on two lines; count; amount; name | - | Service-fee runs | - | Read only | - | -"
+      - "Compute Service Fee dialog | Fully Paid From / Fully Paid To | Date | dd-MMM-yyyy | Y | - | The previous month | - | To on or after From | -"
+    actions:
+      - "Compute Service Fee | GL Officer, GL Team Lead (service fee manage) | Always | Computes the run of the invoices fully paid in the period | Computed | -"
+      - "[Row] | FRBS users | Always | Opens the run | - | -"
+    rules:
+      - "The service fee is the rate of the segment applied to the commission fully paid in the period, net of withholding tax when the rate says so (FR-AC-052)."
+    outcome: The service fee of the month is computed.
+    frs: [FR-AC-052]
+    tests: [SFRUNS]
+
+  - id: SCR-AC-22
+    title: Service Fee Run
+    route: /frbs/service-fee/runs/:id
+    parent: /frbs/service-fee
+    purpose: >-
+      One service-fee run: the invoices, the service fee and who computed and approved it; the lines per recipient
+      with the base, rate, service fee, the payout to Disbursement and the release and liquidation tags; the invoices
+      of the run. The preparer submits it, another user approves it and sends each payout to Disbursement; the
+      liquidation report is recorded per line.
+    entry:
+      - Service Fee Runs › open a row
+    shots:
+      - {state: run, user: gltl, open_run: approved, caption: "A service-fee run sent for payment: the lines per recipient with the payout and the tags"}
+      - {state: invoices, user: gltl, open_run: approved, tab: "Invoices", caption: "The invoices of the run with the commission, withholding tax, base and service fee"}
+    fields:
+      - "Header | [Run chip, status pill] | Reference chip, status pill | Run number; Computed, For Approval, Sent for Payment, Released, Liquidated or Cancelled | - | Service-fee run | - | Read only | - | -"
+      - "Facts | Invoices / Service Fee / Computed By / Approved By / Released / Liquidated | Display | Count, amount, names, tag counts | - | Service-fee run | - | Read only | - | -"
+      - "Lines | Recipient / Invoices / Base / Rate / Service Fee / Payout / Released / Liquidated / Status | Column | One row per recipient; the payout request and the voucher of Disbursement; the dates tagged | - | Service-fee lines | - | Read only | - | -"
+      - "Invoices | Invoice / Insurer / Segment / Fully Paid / Commission / Withholding Tax / Base / Service Fee | Column | The invoices of the run; insurer by name | - | Service-fee run | - | Read only | - | -"
+      - "Tag Released dialog | Released On | Date | dd-MMM-yyyy, not in the future | Y | - | Today | Sent for payment | Not in the future | -"
+      - "Tag Liquidated dialog | Liquidated On / Liquidation Report / Remarks | Date, file, text | dd-MMM-yyyy; the liquidation report of the recipient | Y / Y / N | - | Today | Released | Not before the release | -"
+    actions:
+      - "Recompute | GL Officer (service fee manage) | Computed | Computes the run again | Computed | -"
+      - "Submit for Approval | Preparer (service fee manage) | Computed | Sends the run for approval with a comment | For Approval | Workflow notice"
+      - "Approve and Send for Payment | GL Team Lead (service fee approve), not the preparer | For approval | Accrues every line and sends each payout to Disbursement as a payment request | Sent for Payment | Workflow notice"
+      - "Tag Released / Tag Liquidated / Send Again | GL Officer, GL Team Lead (service fee tag) | As the line allows | Records the release or the liquidation of the line, or sends a payout again | Released or Liquidated | -"
+    rules:
+      - "A run is approved by another user than its preparer (FR-AC-052)."
+      - "On approval each line is accrued (service fee expense with its cost centre against service fee payable) and its payout becomes a payment request in Disbursement (FR-AC-052, FR-DS-020)."
+      - "The run is Released when every paid line is released and Liquidated when every line is liquidated (FR-AC-053)."
+    outcome: The service fee is approved, paid through Disbursement and tagged.
+    frs: [FR-AC-052, FR-AC-053]
+    tests: [SFRUN]
+
+  - id: SCR-AC-23
+    title: Service Fee Rates
+    route: /frbs/service-fee/setup
+    purpose: >-
+      The rate of each service-fee segment with the market segments it covers, its base and effective dates, and the
+      recipient of each sales unit with the payee and the cost centre of its payouts. The GL Team Lead maintains them;
+      runs already computed keep their rates.
+    shots:
+      - {state: rates, user: gltl, caption: "Service Fee Rates and Recipients: the rates per segment and the recipients per sales unit"}
+      - {state: new_rate, user: gltl, click: "^new rate$", caption: "New Service-Fee Rate: segment, market segments, rate and effective dates"}
+    fields:
+      - "Rates | Segment / Rate / Base / Effective / Status | Column | The segment by name with its market segments under it; rate in %; Fully paid commission, or net of withholding tax; the effective period on two lines | - | Service-fee rates | - | Read only | - | -"
+      - "Recipients | Sales Unit / Recipient / Cost Centre / Status | Column | The payee name with its code; the cost centre or By rule | - | Service-fee recipients | - | Read only | - | -"
+      - "Rate dialog | Service-Fee Segment / Market Segments | Drop-down, check boxes | The segment and the market segments it covers | Y | Service-fee segment and market segment lists | - | - | - | -"
+      - "Rate dialog | Rate (%) / Effective From / Effective To / Commission net of withholding tax / Active | Number, date, check box | Rate above zero; dates dd-MMM-yyyy | Y / Y / N / N / N | - | Active | - | To after From | -"
+      - "Recipient dialog | Sales Unit / Payee Code / Payee Name / Cost Centre / Active | Drop-down, text | The payee of the payouts of the unit; the cost centre, blank for the unit's or the rules' | Y / Y / Y / N / N | Sales organisation, payees | - | - | - | -"
+    actions:
+      - "New Rate / Save Rate | GL Team Lead (service fee approve or manage) | Always | Adds or changes a rate | - | -"
+      - "New Recipient / Save Recipient | GL Team Lead | Always | Adds or changes a recipient | - | -"
+    rules:
+      - "A computed run keeps the rates of its computation; a new rate applies to the runs computed after it (FR-AC-052)."
+    outcome: The rates and recipients of the service fee are kept by the GL team.
+    frs: [FR-AC-052]
+    tests: [SFRATES]
+
+  - id: SCR-AC-24
+    title: BIR Forms & Books
+    route: /tax/bir-outputs
+    purpose: >-
+      The BIR returns, alphalists, books of accounts and the IC broker statement for a year, quarter or month: each
+      output opens in the report runner and exports to Excel or PDF.
+    entry:
+      - Certificates Received › SAWT
+    shots:
+      - {state: outputs, user: glofficer, caption: "BIR Forms and Books: the period and the returns, alphalists and books"}
+    fields:
+      - "Period | Year / Quarter / Month | Number, drop-down | The year; the quarter of 1702-Q, 1603 and SAWT; the month of MAP and 0619-F | Y / N / N | - | Current | - | A valid year | -"
+      - "Period | Books From / Books To / Ledger Account Class | Date, drop-down | The period of the books of accounts and the class of the subsidiary ledger | N | - | The year | - | - | -"
+      - "Outputs | Output / Period / Export | Column | The output with its form number and description; the period it covers; the export formats | - | Tax outputs | - | Read only | - | -"
+    actions:
+      - "[Output title] | Users with tax view | Always | Opens the output in the report runner | - | -"
+      - "[Excel or PDF] | Users with tax view | Always | Exports the output for the period | - | -"
+    rules:
+      - "The returns and books are worksheets and loose-leaf books produced from the ledger; electronic filing files are not produced (FR-AC-063)."
+    outcome: The GL team prepares the BIR returns and books of the period.
+    frs: [FR-AC-063]
+    tests: [TAXFORMS]

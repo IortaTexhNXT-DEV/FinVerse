@@ -1,0 +1,211 @@
+# Screen specifications of BRD-5 ACSL: the cases (investigations, analysis requests, AR refunds and payment
+# reversals), the correction entries, the insurer statements of account and their reconciliation, and the GL-SL
+# reconciliation.
+area: Accounting Controls and Subsidiary Ledger (ACSL)
+screens:
+  - id: SCR-AC-45
+    title: ACSL Cases
+    route: /acsl
+    purpose: >-
+      The cases of ACSL by stage (Received, Assigned, Investigating, Result Provided, Sent for Correction): account
+      investigations, analysis requests of the other units, refunds to validate and payment reversals; the team
+      leader opens a case and assigns it to a processor.
+    shots:
+      - {state: list, user: acsltl, caption: "ACSL Cases: the cases by stage with type, subject, invoice, amount, requester and status"}
+      - {state: new, user: acsltl, fill: open_case, caption: "Open a Case: type, invoice, AR or OR number, subject and details"}
+    fields:
+      - "Tabs | All / Received / Assigned / Investigating / Result Provided / Sent for Correction | Tab | With the count of each | - | Cases | All | - | - | -"
+      - "Toolbar | Search Case No. | Text | Case number | N | - | Blank | - | Contains | -"
+      - "Filters | Case Type | Drop-down | Investigation, Analysis request, Refund validation, Payment reversal | N | Case type list | All | - | - | -"
+      - "List | Case No. / Type / Subject / Invoice / Root / Amount / Requested By / Status | Column | The case number with its date; the invoice with its root invoice; the requester's name | - | Cases | - | Read only | - | -"
+      - "Open a Case dialog | Case Type / Invoice No. / AR / OR No. | Drop-down, text | The account investigated; its whole invoice family is linked | Y / N / N | Case type list, invoice ledger | Blank | - | - | -"
+      - "Open a Case dialog | Subject / Details | Text | The subject and the details of the case | Y / N | - | Blank | - | - | Enter the subject of the case"
+    actions:
+      - "Open a Case / Open Case | ACSL Team Leader, Processor (ACSL process) | Always | Opens a case | Received | -"
+      - "[Row] | ACSL users | Always | Opens the case | - | -"
+    rules:
+      - "Cases also arrive from the other units: the validation of a refund of a cancelled policy and the analysis requests (FR-AS-010, FR-PQ-006)."
+    outcome: ACSL sees every case by stage.
+    frs: [FR-AS-010]
+    tests: [CASES]
+
+  - id: SCR-AC-46
+    title: ACSL Case
+    route: /acsl/cases/:id
+    parent: /acsl
+    purpose: >-
+      One case: the request (subject, details, requesting module and reference, client, insurer, root invoice), the
+      investigation (findings, result, remarks), the follow-up (payment reversal and correction), the cases of the
+      same invoice family and the documents; the actions of the stage: assign, record findings, provide the result,
+      raise a correction entry, request a payment reversal, message the account officer.
+    entry:
+      - ACSL Cases › open a row
+      - Insurer SOA › a line to investigate
+    shots:
+      - {state: case, user: acsl, open_case: investigating, caption: "An ACSL case under investigation: the request, the findings and the actions"}
+      - {state: family, user: acsl, open_case: investigating, tab: "Invoice Family Cases", caption: "Invoice Family Cases: the cases of the same root invoice"}
+    fields:
+      - "Header | [Case and Root Invoice chips, status pill] | Reference chip, status pill | Case number, root invoice; Received, Assigned, Investigating, Result Provided, Sent for Correction | - | Case | - | Read only | - | -"
+      - "Facts | Type / Invoice / AR / OR No. / Amount / Requested By / Received | Display | The type in words; the requester's name | - | Case | - | Read only | - | -"
+      - "Request | Subject / Details / Requesting Module / Requester Reference / Client / Insurer / Root Invoice | Display | The request as received | - | Case | - | Read only | - | -"
+      - "Investigation | Findings / Result / Remarks / Result By / Result Date | Display | The findings; Confirmed, Rejected or No action needed; the name and time | - | Case | - | Read only | - | -"
+      - "Follow-up | Payment Reversal / Reversal Status / Reversal Message | Display | The reversal requested to Cashiering and its status; the correction entry raised | - | Case | - | Read only | - | -"
+      - "Invoice Family Cases | Case No. / Type / Invoice / Subject / Received / Status | Column | The cases of the invoice family | - | Cases | - | Read only | - | -"
+      - "Assign the Case dialog | Processor (User ID) | Text | The ACSL processor | Y | Users | Blank | Received | - | -"
+      - "Provide the Result dialog | Result / Remarks | Drop-down, text | Confirmed, Rejected, No action needed | Y / N | Fixed list | - | Investigating | - | -"
+      - "Raise a Correction Entry dialog | Correction Kind / Journal to Correct / Description | Drop-down, text | Posting to a wrong GL account, Wrong amount, Reclassification, Other correction; the journal batch if known | Y / N / Y | Fixed list | - | Investigating | - | -"
+      - "Request a Payment Reversal dialog | AR / OR No. / Amount / Reason | Text, number | Leave the amount empty to reverse the whole application | Y / N / Y | - | The AR of the case | Investigating | - | -"
+      - "Message the Account Officer dialog | Message | Text area | The short or over payment to settle | Y | - | Blank | Investigating | - | -"
+    actions:
+      - "Assign | ACSL Team Leader (ACSL assign) | Received | Assigns the case to a processor | Assigned | Workflow notice"
+      - "Record Findings | ACSL Processor (ACSL process) | Assigned or investigating | Records the findings | Investigating | -"
+      - "Provide Result | ACSL Processor | Investigating | Gives the result to the requester | Result Provided | Notice to the requester"
+      - "Raise Correction | ACSL Processor | Investigating | Raises a correction entry for the invoice and opens it | Sent for Correction | -"
+      - "Request Payment Reversal | ACSL Processor (ACSL apply) | Investigating, an AR of the case | Asks Cashiering to reverse the application of the payment | - | Request to Cashiering"
+      - "Message AO | ACSL Processor | Investigating | Sends the message to the account officer of the invoice | - | Notice to the AO"
+    rules:
+      - "A case links the whole invoice family through the root invoice (FR-AS-010, FR-AS-026)."
+      - "A payment reversal is approved by a cashiering user who is not the requester (FR-AS-012)."
+      - "The result is sent to the requester and closes the validation of a refund (FR-AS-011, FR-PQ-006)."
+    outcome: The account is investigated and the result, reversal or correction follows.
+    frs: [FR-AS-010, FR-AS-011, FR-AS-012, FR-AS-013, FR-AS-026, FR-DS-093]
+    tests: [CASE]
+
+  - id: SCR-AC-47
+    title: Correction Entries
+    route: /acsl/corrections
+    purpose: >-
+      The correction entries that reverse a wrong posting and post the right one, by stage (To Assign, Draft, For
+      Review, For Approval, Posted, Cancelled); a new correction is raised for an invoice.
+    entry:
+      - GL-SL Reconciliation › a difference to correct
+    shots:
+      - {state: list, user: acsltl, caption: "Correction Entries: the corrections by stage with kind, invoice, journal, raiser and status"}
+    fields:
+      - "Tabs | All / To Assign / Draft / For Review / For Approval / Posted / Cancelled | Tab | With the count of each | - | Corrections | All | - | - | -"
+      - "Toolbar | Search Correction or Invoice No. | Text | - | N | - | Blank | - | Contains | -"
+      - "List | Correction No. / Kind / Invoice / Description / Journal / Raised By / Status | Column | The correction number with its date; the journal posted; the raiser's name | - | Corrections | - | Read only | - | -"
+      - "New Correction dialog | Correction Kind / Invoice No. / Journal to Correct / Description | Drop-down, text | The kind; the invoice; the journal batch if known | Y / Y / N / Y | Fixed list, invoice ledger | Blank | - | - | -"
+    actions:
+      - "New Correction | ACSL Team Leader, Processor (ACSL process) | Always | Raises a correction | To Assign | -"
+      - "[Row] | ACSL users | Always | Opens the correction | - | -"
+    rules:
+      - "A correction is assigned, prepared, reviewed and approved by different users before it posts (FR-AS-020 to FR-AS-024)."
+    outcome: ACSL follows every correction to its posting.
+    frs: [FR-AS-020]
+    tests: [CORRS]
+
+  - id: SCR-AC-48
+    title: Correction Entry
+    route: /acsl/corrections/:id
+    parent: /acsl/corrections
+    purpose: >-
+      One correction entry: its kind, invoice, the journal corrected, total, raiser and date; the posted lines of the
+      invoice family from which the preparer picks the wrong line to reverse and re-post; the correction lines (Dr /
+      Cr, GL account, amount, party, invoice, component, cost centre, narration) that must balance; the workflow
+      (assign the preparer, submit for review, endorse for approval, approve and post).
+    entry:
+      - Correction Entries › open a row
+      - ACSL Case › Raise Correction
+    shots:
+      - {state: draft, user: acsl, open_correction: draft, caption: "A correction in draft: the posted lines of the invoice family and the correction lines"}
+      - {state: posted, user: acslhead, open_correction: posted, caption: "A posted correction with its journal"}
+    fields:
+      - "Header | [Correction, Journal and Root Invoice chips, status pill] | Reference chip, status pill | To Assign, Draft, For Review, For Approval, Posted, Cancelled | - | Correction | - | Read only | - | -"
+      - "Facts | Kind / Invoice / Journal Corrected / Total / Raised By / Raised | Display | The kind in words; the invoice; the journal batch; currency and total debit; the raiser's name | - | Correction | - | Read only | - | -"
+      - "Posted Lines of the Invoice Family | Journal / Account / Party / Dr / Cr / Amount | Column | The posted lines of the invoice and its family | - | General ledger | - | Read only | - | -"
+      - "Correct dialog | Right GL Account / Right Party / Ledger Component / Right Ledger Component | Text | The account, party and component the line should have posted to | Y / N / N / N | Chart, business partners | The line's party | Draft | - | -"
+      - "Correction Lines | [Side] / GL Account / Amount / Party / Invoice / Component / Cost Centre / Narration | Row | The reversal and the re-post; debits equal credits | Y / Y / Y / N / N / N / N / N | Chart | - | Draft | A positive amount with two decimals; balanced | Enter a positive amount with at most two decimals"
+      - "Assign dialog | Preparer (User ID) | Text | The ACSL processor who prepares the correction | Y | Users | Blank | To assign | - | -"
+    actions:
+      - "Assign Preparer | ACSL Team Leader (ACSL assign) | To assign | Assigns the correction to a preparer | Draft | Workflow notice"
+      - "[Correct] | Preparer (ACSL process) | Draft | Adds the reversal of the posted line and its re-post to the right account | Draft | -"
+      - "Add Line / Save Lines | Preparer | Draft | Adds a line or saves the balanced lines | Draft | -"
+      - "Submit for Review | Preparer | Draft with balanced lines | Sends the correction for review | For Review | Workflow notice"
+      - "Endorse for Approval | ACSL Team Leader (ACSL review), not the preparer | For review | Endorses the correction | For Approval | Workflow notice"
+      - "Approve and Post | ACSL Head (ACSL approve), not the maker | For approval | Posts the correction journal and corrects the invoice ledger | Posted | Workflow notice"
+      - "Open the Case | ACSL users | A correction raised from a case | Opens the case | - | -"
+    rules:
+      - "A correction is reviewed by another user than its preparer and approved by another user than its maker (FR-AS-022, FR-AS-023)."
+      - "Approval posts the correction journal at once, with the reversal of the wrong line and the re-post to the right account (FR-AS-024)."
+      - "The lines must balance before the correction is submitted (FR-AS-021)."
+    outcome: The wrong posting is reversed and posted right, with four eyes.
+    frs: [FR-AS-020, FR-AS-021, FR-AS-022, FR-AS-023, FR-AS-024]
+    tests: [CORR]
+
+  - id: SCR-AC-49
+    title: Insurer SOA Reconciliation
+    route: /acsl/soa
+    purpose: >-
+      The statements of account (SOA) uploaded for the insurers, each reconciled line by line with the books: the
+      upload number, insurer, period, file, rows loaded and failed, the lines with a variance and those not found;
+      Upload SOA uploads a new statement and reconciles it.
+    shots:
+      - {state: list, user: acsl, caption: "Insurer SOA Reconciliation: the statements uploaded with their results"}
+      - {state: upload, user: acsl, click: "^upload soa$", caption: "Upload an Insurer SOA: the insurer, the period and the statement file"}
+    fields:
+      - "Toolbar | Search Upload No. or Insurer | Text | - | N | - | Blank | - | Contains | -"
+      - "List | Upload No. / Insurer / Period / File / Loaded / Failed / With Variance / Not Found / Uploaded By | Column | The upload number with its date; the insurer by name; the period on two lines; the uploader's name | - | SOA uploads | - | Read only | - | -"
+      - "Upload dialog | Insurer Code | Text | The insurer of the statement | Y | Insurers | Blank | - | - | Enter the insurer code"
+      - "Upload dialog | Period From / Period To | Date | dd-MMM-yyyy | Y | - | Blank | - | To on or after From | Enter an end on or after the start"
+      - "Upload dialog | Statement File | File | The statement in the standard layout (template) | Y | - | - | - | - | Choose the statement file"
+    actions:
+      - "Upload SOA / Upload and Reconcile | ACSL Processor (ACSL upload) | Insurer, period and file given | Loads the rows and reconciles each line with the books | Reconciled | -"
+      - "Download Template | ACSL users | Always | Downloads the standard layout | - | -"
+      - "[Row] | ACSL users | Always | Opens the upload | - | -"
+    rules:
+      - "A statement is read up to the maximum number of rows of the parameter and reconciled once loaded (FR-AS-002)."
+    outcome: Each insurer's statement is in BIBS with its reconciliation.
+    frs: [FR-AS-002, FR-AS-003]
+    tests: [SOA]
+
+  - id: SCR-AC-50
+    title: Insurer SOA
+    route: /acsl/soa/:id
+    parent: /acsl/soa
+    purpose: >-
+      One uploaded statement with its reconciliation run: the counts per result, the lines by result tab (Outstanding,
+      For Remittance, Remitted, Cancelled, Direct Billed, Not Found) with the premium and balance of the statement and
+      of the books and their variances, the upload log of the rows that failed; Reconcile Again and Download Report.
+    entry:
+      - Insurer SOA Reconciliation › open a row
+    shots:
+      - {state: results, user: acsl, open_soa: latest, caption: "An insurer SOA reconciled: the counts and the lines with their result and variances"}
+      - {state: log, user: acsl, open_soa: latest, tab: "Upload Log", caption: "Upload Log: the rows of the file and those that failed with their error"}
+    fields:
+      - "Run | [Counts per result] | Total | Rows, matched, With variance, Not found | - | Reconciliation run | - | Read only | - | Not reconciled yet"
+      - "Tabs | All Lines / Outstanding / For Remittance / Remitted / Cancelled / Direct Billed / Not Found / Upload Log | Tab | With the count of each | - | Reconciliation | All Lines | - | - | -"
+      - "Lines | Row / Invoice / Policy / Assured / Result / SOA Premium / Book Premium / Premium Variance / SOA Balance / Book Outstanding / Balance Variance / Remittance | Column | One row per statement line; variances highlighted | - | Reconciliation | - | Read only | - | -"
+      - "Upload Log | Row / Status / Invoice / Policy / Assured / Gross Premium / Error | Column | The rows of the file with the error of a row not loaded | - | Upload | - | Read only | - | -"
+    actions:
+      - "Reconcile Again | ACSL Processor (ACSL process) | Always | Reconciles the statement again with the books of today | Reconciled | -"
+      - "Download Report | ACSL users | Always | Downloads the reconciliation report | - | -"
+    rules:
+      - "Each line is matched with the books by invoice number, then policy number; the result is the status of the invoice and the variances of premium and balance (FR-AS-003)."
+    outcome: The differences with the insurer are known line by line.
+    frs: [FR-AS-003]
+    tests: [SOAD]
+
+  - id: SCR-AC-51
+    title: GL-SL Reconciliation
+    route: /acsl/gl-sl
+    purpose: >-
+      Compares the balance of each control account in the general ledger with its sub-ledger: run it now as of a
+      date, the runs with their differences, the balances of a run, and the control accounts with their sub-ledger,
+      components, document types and currency.
+    shots:
+      - {state: runs, user: acsltl, caption: "GL-SL Reconciliation: the runs and the balances of the last run"}
+    fields:
+      - "Run Now | As Of | Date | dd-MMM-yyyy; empty for today | N | - | Today | - | - | -"
+      - "Runs | As Of / Run By / Accounts / Differences / Total Difference | Column | One row per run; the name of the user or System | - | GL-SL runs | - | Read only | - | -"
+      - "Balances | Control Account / Sub-ledger / GL Balance / SL Balance / Difference | Column | One row per control account | - | General ledger, sub-ledgers | - | Read only | - | -"
+      - "Control Accounts | Control Account / Sub-ledger / Components / Document Types / Currency / Status | Column | The accounts reconciled and their sub-ledger | - | GL-SL controls | - | Read only | - | -"
+      - "Control Account dialog | Control Account / Sub-ledger / Ledger Components / Document Types / Currency / Status | Text, drop-down | Party ledger, Open items or Operations ledger | Y / Y / N / N / N / Y | Chart | Active | - | - | -"
+    actions:
+      - "Run Reconciliation | ACSL users (ACSL process) | Always | Runs the reconciliation as of the date | - | Alert on a difference"
+      - "Add Control Account | ACSL Team Leader | Always | Adds or changes a control account | - | -"
+    rules:
+      - "The reconciliation runs every night and at period end; a difference raises an alert to ACSL but does not stop the close (FR-AS-004)."
+    outcome: The GL agrees with the sub-ledgers, or the differences are known.
+    frs: [FR-AS-004]
+    tests: [GLSL]

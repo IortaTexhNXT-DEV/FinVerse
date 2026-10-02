@@ -1,0 +1,402 @@
+# Screen specifications of BRD-5 Disbursement: the workbench of payment requests and vouchers, the encoded request,
+# the disbursement voucher with its entry, instrument and tags, the payees, the uploads, the end of day, the account
+# funding, the bank accounts and check series, the employees, the BIR 2307 certificates and the reports.
+area: Disbursement
+screens:
+  - id: SCR-AC-25
+    title: Disbursement Workbench
+    route: /disbursement
+    purpose: >-
+      The work of Disbursement: the counts For Approval, In Process, Waiting for Payee and Unregularised; the payment
+      requests received from the other units (System Requests) and those waiting for their payee (No Payee); then the
+      vouchers by stage (In Process, For Review, For Approval, Approved, Cancelled / Rejected). A request opens its
+      details with Create Voucher and Return to Source; the approver approves the selected vouchers at once.
+    entry:
+      - Service Fee Run, Request › the payment request sent to Disbursement
+    shots:
+      - {state: requests, user: disb, caption: "Disbursement Workbench: the counts and the system requests received"}
+      - {state: request, user: disb, open_request: received, caption: "Payment Request: source, payee, type, amount and purpose, with Create Voucher and Return to Source"}
+      - {state: approval, user: disbappr, tab: "For Approval", caption: "For Approval: the vouchers waiting for the approver, selected for Approve Selected"}
+    fields:
+      - "Counts | For Approval / In Process / Waiting for Payee / Unregularised | Display | Live counts; Waiting for Payee and Unregularised highlighted when above zero | - | Requests and vouchers | - | Read only | - | -"
+      - "Tabs | System Requests / No Payee / In Process / For Review / For Approval / Approved / Cancelled / Rejected | Tab | With the count of each | - | Requests and vouchers | System Requests | - | - | -"
+      - "Toolbar | Search Request, RFP or Payee / Search DV, Payee or Invoice | Text | Request, RFP, DV, payee or invoice number | N | - | Blank | - | Contains | -"
+      - "Filters | Disbursement Type / Received From / Received To | Drop-down, date | Remittance, Refund, Payment to supplier, Government, Employee-related, Service fee, Other; dd-MMM-yyyy | N | Disbursement type list | All types | - | - | -"
+      - "Requests | Request No. / Source / Type / Payee / Currency / Amount / Received / Status | Column | Request number with the RFP or the source reference under it; the source unit; payee name with its code; date and time | - | Payment requests | - | Read only | - | -"
+      - "Vouchers | DV No. / Type / Payee / Mode / Net Amount / Currency / Flags / Status | Column | DV number with its date; the mode of payment; flags Automatic, Entry Edited, Posting Failed | - | Vouchers | - | Read only | - | -"
+      - "Payment Request dialog | Source / RFP No. / Payee / Type / Amount / Purpose / Root invoice / Status | Display | The request as received | - | Payment request | - | Read only | - | -"
+      - "Return dialog | Reason / Comment | Drop-down, text area | The return reasons of Disbursement | Y / N | Disbursement return reason list | Blank | Received, No payee | - | Choose a reason"
+    actions:
+      - "Encode Request | Disbursement Processor, Team Leader (disbursement process) | Always | Opens Encode Payment Request | - | -"
+      - "Create Voucher | Disbursement Processor (disbursement process) | Received request with its payee maintained | Creates the voucher with its proforma entry and opens it | In Process | -"
+      - "Return to Source | Disbursement Processor | Received or No payee | Returns the request to its source unit with the reason | Returned | Workflow notice to the source"
+      - "Release Documents | Disbursement Processor | A received BIR 2307 request | Releases the documents to the payee | Released | -"
+      - "Approve Selected | Disbursement Approver (disbursement approve) | For Approval tab, vouchers selected | Approves and posts each selected voucher on its own after the confirmation; each failure is reported | Approved | Workflow notice"
+      - "[Row] | Disbursement users | Always | Opens the request or the voucher | - | -"
+    rules:
+      - "A request whose payee is not maintained waits under No Payee; a payee request is raised and the voucher is created once the payee is authorised (FR-DS-020, FR-DS-022)."
+      - "Requests are classified by disbursement type from their source and payee class (FR-DS-021)."
+      - "Approving several vouchers approves each on its own; a voucher that cannot be approved stays pending with its reason (FR-DS-041)."
+    outcome: Disbursement sees every request and voucher by stage and moves them on.
+    frs: [FR-DS-020, FR-DS-021, FR-DS-022, FR-DS-025, FR-DS-040, FR-DS-041, FR-DS-045]
+    tests: [WB]
+
+  - id: SCR-AC-26
+    title: Encode Payment Request
+    route: /disbursement/requests/new
+    purpose: >-
+      A payment that does not come from another module (a request received by e-mail for a supplier, a government
+      agency or an employee): the disbursement type, the payee, currency and amount, the RFP and invoice numbers, the
+      expense account and cost centre and the purpose. Its voucher is created at once when the payee is maintained.
+    entry:
+      - Disbursement Workbench › Encode Request
+    shots:
+      - {state: filled, user: disb, fill: encode_supplier, caption: "Encode Payment Request: a supplier payment with its expense account and cost centre"}
+      - {state: error, user: disb, submit: "^save request$", caption: "The mandatory fields named under each field"}
+    fields:
+      - "Request | Disbursement Type | Drop-down | Remittance, Refund, Payment to supplier, Government, Employee-related, Other | Y | Disbursement type list | Blank | - | - | Select the disbursement type"
+      - "Request | Payee Code / Payee Name | Text | The code of a maintained payee; the name of a payee not yet maintained | Y / N | Payees | Blank | - | - | Enter the payee code"
+      - "Request | Currency | Text | Three-letter currency | Y | Currencies | Base currency | - | Three letters | Enter a 3-letter currency"
+      - "Request | Amount | Number | Above zero, two decimals | Y | - | Blank | - | Above zero | Enter an amount above zero"
+      - "Request | RFP No. / Invoice No. | Text | The Request for Payment and the invoice paid | N | - | Blank | - | - | -"
+      - "Request | Expense Account / Cost Centre | Text | The expense account and the cost centre of an other disbursement | Cond.: Other | Chart, cost centres | Blank | - | - | -"
+      - "Request | Purpose | Text area | Up to 500 characters | Y | - | Blank | - | - | Enter the purpose"
+    actions:
+      - "Save Request | Disbursement Processor (disbursement process) | Mandatory fields filled | Saves the request; its voucher is created at once when the payee is maintained, else the request waits under No Payee | In Process or No payee | -"
+    rules:
+      - "An encoded request gets its request number and follows the same voucher flow as a system request (FR-DS-023)."
+    outcome: The e-mailed request is in BIBS with its voucher.
+    frs: [FR-DS-023]
+    tests: [ENC]
+
+  - id: SCR-AC-27
+    title: Disbursement Voucher
+    route: /disbursement/vouchers/:id
+    parent: /disbursement
+    purpose: >-
+      One disbursement voucher (DV): the payee, type, mode, net amount and paying account; the voucher workflow
+      (submit for review, route to the approver, submit for approval, approve and post, reject, cancel); the tabs
+      Details (the terms), Entry (the proforma entry from the rule, editable before approval, with the expense
+      allocation), Instrument (the payment document and its statuses), OR / AR and CWT (the tags), Documents and
+      E-mails.
+    entry:
+      - Disbursement Workbench › Create Voucher or open a voucher
+      - Encode Payment Request › saved
+    shots:
+      - {state: details, user: disb, open_voucher: in_process, caption: "A voucher in process: the header, the workflow and the terms of the Details tab"}
+      - {state: entry, user: disb, open_voucher: in_process, tab: "Entry", caption: "Entry tab: the proforma entry from the rule, its totals and the expense allocation"}
+      - {state: instrument, user: disb, open_voucher: check, tab: "Instrument", caption: "Instrument tab of a check: status, amount, released to and the status history"}
+      - {state: tags, user: disb, open_voucher: check, tab: "OR / AR and CWT", caption: "OR / AR and CWT tab: the receipts and certificates tagged on the voucher"}
+      - {state: approve, user: disbappr, open_voucher: for_approval, click: "^approve and post$", caption: "Approve and Post: the entry posted and the instrument issued on confirmation"}
+    fields:
+      - "Header | [DV chip, status pill, flags] | Reference chip, status pill, tag | DV number; In Process, For Review, For Approval, Approved, Cancelled, Rejected; Automatic, Entry Edited, posting status | - | Voucher | - | Read only | - | -"
+      - "Facts | Payee / Type / Mode / Net Amount / Paying Account | Display | Payee code; disbursement type; mode of payment; currency and net amount | - | Voucher | - | Read only | - | -"
+      - "Details | Mode of Payment | Drop-down | The modes allowed for the payee: Credit to Account, Authority to Debit, Manager's Check / Demand Draft, Credit Ticket, Telegraphic Transfer, Online Banking, Check | Y | Payee | Default mode of the payee | In process | A mode allowed for the payee | -"
+      - "Details | Paying Account / Payee Account | Drop-down | Active BDOIR account in the voucher currency; the payee account credited | Y / Cond.: credit modes | Bank accounts, payee accounts | Blank | In process | - | Select the payee account credited"
+      - "Details | Withholding Tax / Value Date | Number, date | Zero or more, below the gross; dd-MMM-yyyy | N / Y | Payee tax profile | Today | In process | Below the gross | The withholding tax must be at least zero and below the gross"
+      - "Details | Cost Centre / Expense Account / Purpose | Text | Expense account mandatory for an other disbursement | N / Cond.: other / Y | Chart, cost centres | From the request | In process | - | Enter the expense account of an other disbursement"
+      - "Details | Processor / checker / approver / Journal / reversal / Request | Display | Names of the users; the journal posted and its reversal; the request with its source | - | Voucher | - | Read only | - | -"
+      - "Entry | Side / Account / Party / Cost Centre / Debit / Credit / Origin / Narration | Column | The proforma lines; From rule, or edited by the processor | - | Accounting rule | - | In process | Debits equal credits | Not balanced"
+      - "Allocate Expenses dialog | Account n / Cost Centre / Amount | Text, number | The rows replace the debit of the disbursement type and add up to the gross | Y / N / Y | Chart, cost centres | - | In process | Total equals the gross | -"
+      - "Instrument | Status / Amount / Reference / Released to | Display | The instrument of the mode with its number | - | Instrument | - | Read only | - | The instrument is issued when the voucher is approved"
+      - "Instrument | Status History | Column | Status / Source / By / Date and Time / Remarks | - | Instrument | - | Read only | - | -"
+      - "Request Status Edit dialog | New Status / Reason | Drop-down, text | The status to set and why | Y | Instrument statuses | - | Approved | - | -"
+      - "OR / AR and CWT | Tag / Received / Released / Number / Date / Period / Received / Released On / Amount / Tagged By | Column | The tags of the voucher | - | Tags | - | Read only | - | -"
+      - "Tag dialog | Received / Released / OR / AR No. / Certificate No. / Receipt Date / Period From / Period To / Amount | Drop-down, text, date, number | Received from insurer or Released to supplier | Y | - | - | Approved | - | -"
+    actions:
+      - "Save Terms | Disbursement Processor | In process | Saves the terms; the entry is rebuilt from the rule | In Process | -"
+      - "Save Entry / Rebuild from Rule / Add Line / Allocate Expenses | Disbursement Processor | In process | Saves the edited entry (marked Entry Edited), rebuilds it from the rule, or allocates the expenses by cost centre | In Process | -"
+      - "Submit for Review | Disbursement Processor | In process and nothing missing | Sends the voucher to the team leader | For Review | Workflow notice"
+      - "Route to Approver | Disbursement Processor | In process, refund or remittance | Sends the voucher straight to the approver | For Approval | Workflow notice"
+      - "Submit for Approval | Disbursement Team Leader (disbursement review), not the processor | For review | Sends the voucher to the approver | For Approval | Workflow notice"
+      - "Approve and Post | Disbursement Approver (disbursement approve), not the processor or the checker | For approval | Posts the entry and issues the instrument after the confirmation | Approved | Workflow notice to the source"
+      - "Reject / Cancel Voucher | Approver; Processor or Team Leader before approval; Approver after approval | As the stage allows | Rejects or cancels with the reason; an approved voucher is reversed and its request goes back to its source | Rejected or Cancelled | Workflow notice to the source"
+      - "Print / Release / Email to Branch / Confirm Debit / Receive from Branch / Re-issue Check | Disbursement Processor | As the mode and the status allow | Moves the instrument to its next status | Printed, Released, Emailed, Debited, Received or Stale re-issued | -"
+      - "Request Status Edit / Approve Status Edit | Processor; Team Leader (status approve), not the requester | Approved voucher | Changes the instrument status with approval | As requested | -"
+      - "Tag OR / AR / Tag CWT | Disbursement Processor (disbursement tag) | Approved voucher | Records the receipt or the certificate on the voucher | Regularised | -"
+      - "Download Voucher / Download Form | Disbursement users | Always / instrument with a form | Downloads the voucher or the bank form | - | -"
+    rules:
+      - "A voucher is checked and approved by other users than its processor; refund and remittance vouchers are routed straight to the approver (FR-DS-036, FR-DS-040, FR-DS-041)."
+      - "The proforma entry comes from the accounting rule of the disbursement type; edited lines are marked for the approver and the entry must balance (FR-DS-031)."
+      - "Approval posts the entry and issues the instrument of the mode; a cancelled approved voucher is reversed and its request goes back to its source for regularisation (FR-DS-041, FR-DS-044)."
+      - "An instrument status edit is approved by the team leader, not by the requester (FR-DS-051)."
+      - "A check not negotiated after 180 days becomes stale and is re-issued through a new request (FR-DS-054)."
+      - "Every approved voucher counts as unregularised until its OR / AR is tagged (FR-DS-045, FR-DS-056)."
+    outcome: The voucher is checked, approved, paid and regularised.
+    frs: [FR-DS-025, FR-DS-030, FR-DS-031, FR-DS-032, FR-DS-033, FR-DS-034, FR-DS-035, FR-DS-036, FR-DS-040, FR-DS-041, FR-DS-042, FR-DS-043, FR-DS-044, FR-DS-050, FR-DS-051, FR-DS-052, FR-DS-054, FR-DS-055, FR-DS-056, FR-DS-057, FR-DS-062, FR-DS-063]
+    tests: [DV, DVENTRY, DVINST, DVTAG]
+
+  - id: SCR-AC-28
+    title: Payees
+    route: /disbursement/payees
+    purpose: >-
+      The payee master: the payees by tab (Active, For Authorisation, Drafts, Inactive) with their class, default mode,
+      primary account and source, and the Payee Requests raised by refunds, payment requests without payee and
+      Disbursement users, which the team leader turns into payees or closes.
+    shots:
+      - {state: list, user: disbtl, caption: "Payees: the active payees with class, default mode, primary account and source"}
+      - {state: requests, user: disbtl, tab: "Payee Requests", caption: "Payee Requests: the requests to create a payee, with Create Payee and Close"}
+    fields:
+      - "Tabs | Active / For Authorisation / Drafts / Inactive / Payee Requests | Tab | - | - | Payees | Active | - | - | -"
+      - "Toolbar | Search Payee Code or Name | Text | Code or name | N | - | Blank | - | Contains | -"
+      - "List | Payee Code / Name / Class / Default Mode / Primary Account / Source / Status | Column | Class Supplier, Insurer, Employee, Client or Others; account masked for other units | - | Payees | - | Read only | - | -"
+      - "Payee Requests | Source / Payee Code / Payee Name / Reference / Details / Received | Column | Where the request comes from (a request without payee, a refund, a user) | - | Payee requests | - | Read only | - | -"
+    actions:
+      - "New Payee | Disbursement Team Leader (payee maintain) | Always | Opens the new payee form | Draft | -"
+      - "Create Payee / Close | Disbursement Team Leader (payee maintain) | A payee request | Opens the payee form with the request's code and name, or closes the request after the confirmation | - | -"
+      - "[Row] | Disbursement users | Always | Opens the payee | - | -"
+    rules:
+      - "A payee is used on vouchers only once the approver has authorised it; a request without a payee raises a payee request (FR-DS-010, FR-DS-012)."
+    outcome: Disbursement keeps one master of payees with every request answered.
+    frs: [FR-DS-010, FR-DS-012, FR-DS-014]
+    tests: [PAYEES]
+
+  - id: SCR-AC-29
+    title: Payee
+    route: /disbursement/payees/:id
+    parent: /disbursement/payees
+    purpose: >-
+      One payee: code, class, name, TIN, e-mail, address, default mode, currency, default cost centre, the modes of
+      payment allowed and remarks; its bank accounts; the payee workflow (submit, authorise, request deactivation or
+      reactivation). A payee never used on a payment can be deleted.
+    entry:
+      - Payees › New Payee, Create Payee or open a row
+    shots:
+      - {state: payee, user: disbtl, open_payee: active, caption: "An active payee: details, allowed modes and bank accounts"}
+      - {state: new, user: disbtl, fill: new_payee, caption: "New Payee: the payee saved as a draft and submitted for authorisation"}
+    fields:
+      - "Payee | Payee Code | Text | The party code of the client, insurer, supplier or employee | Y | Business partners | Blank | New | Unique | Enter the payee code"
+      - "Payee | Payee Class | Drop-down | Supplier, Insurer, Employee, Client, Others | Y | Payee class list | Blank | Draft, Active | - | -"
+      - "Payee | Name / TIN / E-mail / Address | Text | The payee details | Y / N / N / N | - | Blank | Draft, Active | A valid e-mail | -"
+      - "Payee | Default Mode / Currency / Default Cost Centre | Drop-down, text | The usual mode, three-letter currency, cost centre | Y / Y / N | - | Check, base currency | Draft, Active | - | -"
+      - "Payee | Allowed Modes | Check boxes | The seven modes of payment | Y | - | All | Draft, Active | At least one; an account for the credit modes | -"
+      - "Payee | Remarks | Text area | Up to 500 characters | N | - | Blank | Draft, Active | - | -"
+      - "Bank Accounts | Bank / Account No. / Account Name / Currency / Mode / Primary / Active | Column | The accounts of the payee; numbers masked for the users without full view | - | Payee accounts | - | Read only | - | -"
+      - "Add Bank Account dialog | Bank / Branch / Account No. / Account Name / Currency / Mode / Primary account | Text, drop-down, check box | The account and the mode it is used for | Y / N / Y / Y / Y / Y / N | - | - | Draft, Active | - | -"
+    actions:
+      - "Save Draft / Save / Save and Send for Authorisation | Disbursement Team Leader (payee maintain) | Draft or active payee | Saves the payee; a change of an active payee goes for authorisation | Draft or For Authorization | -"
+      - "Submit for Authorisation / Authorise | Team Leader; Approver (payee authorize), not the maker | As the stage allows | Sends the payee for authorisation, or authorises it | For Authorization or Active | Workflow notice"
+      - "Request Deactivation / Request Reactivation | Disbursement Team Leader | Active or inactive | Asks the approver to deactivate or reactivate the payee | For Deactivation or For Reactivation | Workflow notice"
+      - "Add Account / [Deactivate] | Disbursement Team Leader | Draft or active payee | Adds a bank account or deactivates one; the payee goes back for authorisation | For Authorization | -"
+      - "Delete Payee | Disbursement Team Leader | The payee was never used | Deletes the payee after the confirmation | - | -"
+    rules:
+      - "A payee is authorised by another user than its maker; a change of an active payee waits for authorisation (FR-DS-010)."
+      - "Only a payee never used on a payment is deleted; any other payee is deactivated with authorisation (FR-DS-013)."
+      - "The credit modes need an active bank account of the payee (FR-DS-011)."
+    outcome: The payee is ready to be paid.
+    frs: [FR-DS-010, FR-DS-011, FR-DS-013]
+    tests: [PAYEE]
+
+  - id: SCR-AC-30
+    title: Disbursement Uploads
+    route: /disbursement/uploads
+    purpose: >-
+      The uploads of Disbursement, each validated row by row before the valid rows are committed: payment requests of
+      other units, the negotiated checks and the credited accounts of the bank, the online banking approvals and the
+      payee migration.
+    shots:
+      - {state: upload, user: disbtl, caption: "Disbursement Uploads: the upload types, the template and the upload"}
+    fields:
+      - "Tabs | Payment Requests / Negotiated Checks / Credited Accounts / BOB Approvals / Payee Migration | Tab | The types the user may upload, with the text of each | - | Upload types | Payment Requests | - | - | -"
+      - "Upload | File | File | The template of the type: Excel, CSV or TXT | Y | Upload template | - | - | Every row checked before anything is committed | -"
+      - "Result | Rows Read / Valid / Rejected | Total | Counts of the rows with the rows and their message | - | Upload | - | Read only | - | -"
+    actions:
+      - "Download Template / Upload and Validate | Disbursement Processor, Team Leader (disbursement upload; payee maintain for the migration) | A file chosen | Checks every row; the valid rows are processed and the rejected rows listed with their message | - | -"
+      - "Download Error File / Upload Corrected File / Discard Upload | Same users | After the upload | Downloads the rejected rows, uploads the corrected file linked to the first, or discards the upload | - | -"
+    rules:
+      - "Uploaded requests with a maintained payee become vouchers at once; the others wait for the payee (FR-DS-024)."
+      - "A negotiated check posts its clearing entry; a credited account and a BOB approval set the instrument status (FR-DS-053)."
+      - "Migrated payees come in for authorisation (FR-DS-014)."
+    outcome: The bank files and the requests of other units are in BIBS without re-keying.
+    frs: [FR-DS-014, FR-DS-024, FR-DS-053]
+    tests: [UPL]
+
+  - id: SCR-AC-31
+    title: Disbursement End of Day
+    route: /disbursement/eod
+    purpose: >-
+      The end of day of a business date: it freezes the approved vouchers of the date and produces the checks, the
+      Direct Credit Transaction File (DCTF), the ATD, MC / DD, credit ticket and TT forms and the end-of-day reports;
+      the payment confirmations are then sent to the payees. The scheduler runs the same steps.
+    shots:
+      - {state: runs, user: disbtl, caption: "End of Day: the runs with their vouchers, checks, credits, forms and confirmations, and the outputs of a run"}
+      - {state: run, user: disbtl, click: "^run end of day$", caption: "Run End of Day: the business date"}
+    fields:
+      - "Runs | Run / Business Date / Vouchers / Checks / Credits / Forms / Confirmations / Run By / Status | Column | One row per run; counts; name | - | End-of-day runs | - | Read only | - | -"
+      - "Run | [Outputs] | Button | The output kind, the file name and its item count: DCTF, check batch, vouchers, forms, end-of-day reports | - | End-of-day run | - | Read only | - | -"
+      - "Run End of Day dialog | Business Date | Date | dd-MMM-yyyy | Y | - | Today | - | - | -"
+    actions:
+      - "Run End of Day | Disbursement Team Leader, Approver (disbursement end of day) | Always | Freezes the approved vouchers of the date and produces the outputs | Completed | -"
+      - "Send Confirmations | Same users | A completed run | E-mails the payment confirmations to the payees | Confirmed | Payment confirmation e-mail"
+      - "[Output] | Disbursement users | Always | Downloads the file | - | -"
+    rules:
+      - "The DCTF holds the credit-to-account payments of the date in the layout of Appendix B (FR-DS-061)."
+      - "Checks take the next leaves of the paying account's check series; the vouchers and forms are printed in batch (FR-DS-062)."
+    outcome: The day's payments are issued and the payees are told.
+    frs: [FR-DS-060, FR-DS-061, FR-DS-062, FR-DS-063, FR-DS-081]
+    tests: [EOD]
+
+  - id: SCR-AC-32
+    title: Account Funding
+    route: /disbursement/funding
+    purpose: >-
+      The transfers between BDOIR bank accounts that fund the main account, by tab (With the Maker, For Verification
+      and Approval, Approved and Closed): a maker requests, another team leader verifies and two approvers approve.
+    shots:
+      - {state: list, user: disbtl, tab: "Approved and Closed", caption: "Account Funding: the transfers with their accounts, value date, amount, requester and status"}
+    fields:
+      - "Tabs | With the Maker / For Verification and Approval / Approved and Closed | Tab | - | - | Funding requests | With the Maker | - | - | -"
+      - "List | Funding No. / From / To / Value Date / Amount / Currency / Requested By / Status | Column | The accounts by code, bank and number; the requester's name | - | Funding requests | - | Read only | - | -"
+    actions:
+      - "New Funding Request | Disbursement Team Leader (funding request) | Always | Opens a new funding request | Created | -"
+      - "[Row] | Disbursement users | Always | Opens the funding request | - | -"
+    rules:
+      - "A funding is verified by another user than its maker and approved by two further users (FR-DS-064)."
+    outcome: The main account is funded with four eyes.
+    frs: [FR-DS-064]
+    tests: [FUND]
+
+  - id: SCR-AC-33
+    title: Funding Request
+    route: /disbursement/funding/:id
+    parent: /disbursement/funding
+    purpose: >-
+      One transfer between two BDOIR bank accounts: the accounts, amount, currency, value date and purpose; the
+      funding workflow (submit, verify, first and second approval with the BOB reference); the second approval posts
+      the transfer entry.
+    entry:
+      - Account Funding › New Funding Request or open a row
+    shots:
+      - {state: approved, user: disbtl, open_funding: approved, caption: "An approved funding: the transfer and the workflow history of maker, verifier and two approvers"}
+      - {state: new, user: disbtl, fill: new_funding, caption: "New Funding Request: from and to accounts, amount, value date and purpose"}
+    fields:
+      - "Transfer | From Account / To Account | Drop-down | Active BDOIR accounts; the target other than the source | Y | Bank accounts | Blank | Created | Different accounts | Select a target account other than the source"
+      - "Transfer | Amount / Currency | Number, text | Above zero; the currency of the accounts | Y | - | Blank | Created | Above zero | Enter an amount above zero"
+      - "Transfer | Value Date / Purpose | Date, text area | dd-MMM-yyyy; the purpose | Y | - | Today | Created | - | Enter the purpose"
+      - "Approve dialog | BOB Reference | Text | The reference of the transaction in BDO Business Online Banking | N | - | Blank | For approval | - | -"
+    actions:
+      - "Save | Disbursement Team Leader (funding request) | Created | Saves the request | Created | -"
+      - "Submit / Verify / Approve | Maker; verifier (funding verify), not the maker; two approvers (funding approve), each another user | As the stage allows | Moves the request; the second approval posts the transfer entry | For Verification, For Approval 1, For Approval 2, Approved | Workflow notice"
+    rules:
+      - "The verifier is not the maker, and the two approvers differ from each other and from the maker (FR-DS-064)."
+      - "The second approval posts the transfer entry between the two accounts (FR-DS-064)."
+    outcome: The transfer is approved and posted.
+    frs: [FR-DS-064]
+    tests: [FUND]
+
+  - id: SCR-AC-34
+    title: Bank Accounts and Checks
+    route: /disbursement/banks
+    purpose: >-
+      The BDOIR paying accounts with their GL account and check leaves, their active or inactive status changed by
+      the team leader and authorised by the approver, and the check series of each account with the next check and
+      the remaining leaves.
+    shots:
+      - {state: banks, user: disbappr, caption: "Bank Accounts and Checks: the paying accounts and the check series of an account"}
+      - {state: series, user: disbtl, fill: add_series, caption: "Add Series: the first and last check numbers of a new check book"}
+    fields:
+      - "Accounts | Code / Bank / Account No. / Currency / GL Account / Check Leaves / Status | Column | One row per paying account; status Active, Inactive or the change waiting | - | Bank accounts | - | Read only | - | -"
+      - "Check Series | Series / Next Check / Remaining / Received / Previous Range / Status | Column | The check books of the account; the range before a correction with who changed it | - | Check series | - | Read only | - | No check series"
+      - "Series dialog | First Check No. / Last Check No. | Number | The range of the book; corrected only before its first check is printed | Y | - | - | Active, unused | Last after first | -"
+    actions:
+      - "Deactivate / Activate | Disbursement Team Leader (disbursement review) | No change waiting | Sends the status change for authorisation after the confirmation | Pending authorization | -"
+      - "Authorise | Disbursement Approver (disbursement approve) | A change waiting | Applies the change | Active or Inactive | -"
+      - "Add Series / Save Series / Edit | Disbursement Team Leader | Always; edit while no check is used | Adds a check series or corrects its range | Active | -"
+    rules:
+      - "A bank account status change takes effect when the approver authorises it (FR-DS-071)."
+      - "A series is corrected only before its first check is printed; the previous range is kept (FR-DS-070)."
+      - "An alert is raised when the leaves of a series run low (FR-DS-070)."
+    outcome: The paying accounts and their checks are kept up to date.
+    frs: [FR-DS-070, FR-DS-071]
+    tests: [BANKS]
+
+  - id: SCR-AC-35
+    title: Employees
+    route: /setup/employees
+    purpose: >-
+      The employees with their number, branch, cost centre, position, e-mail, the payee code used for their payments,
+      hire and separation dates; used by Disbursement to charge employee-related payments to the right cost centre and
+      by the headcount report per cost centre.
+    shots:
+      - {state: list, user: badmin, caption: "Employees: number, name, branch, cost centre, position, hire date and status"}
+    fields:
+      - "Toolbar | Search number, name or cost centre | Text | - | N | - | Blank | - | Contains | -"
+      - "List | Employee No. / Name / Branch / Cost Centre / Position / Hired / Status | Column | One row per employee | - | Employees | - | Read only | - | -"
+      - "Employee form | Employee no. / Full name / Branch / Cost centre | Text, drop-down | Unique number; the branch and cost centre | Y | Branches, cost centres | - | - | Unique | -"
+      - "Employee form | Position / E-mail / Payee party code / Hired on / Separated on | Text, date | The party of type Employee for payments; a separation date makes the employee inactive | N | Business partners | - | - | A valid e-mail | -"
+    actions:
+      - "Add Employee / Save Employee | Business Administrator, Comptrollership administrator (employee maintain) | Always | Adds or changes an employee | Active or Inactive | -"
+    rules:
+      - "An employee-related payment is charged to the cost centre of the employee (FR-DS-037)."
+    outcome: Every employee has the cost centre of the payments.
+    frs: [FR-DS-037]
+    tests: [EMP]
+
+  - id: SCR-AC-36
+    title: Certificates Received
+    route: /tax/received-certificates
+    purpose: >-
+      The register of the BIR 2307 certificates received from the insurers on commission and incentives: the
+      certificate number, withholding agent, period covered, income, tax withheld and the journal that recorded it;
+      a certificate is recorded with its income payments and cancelled with a reason.
+    entry:
+      - Disbursement Voucher › Tag CWT
+    shots:
+      - {state: list, user: disb, caption: "Certificates Received: the BIR 2307 certificates of the insurers with the journal posted"}
+    fields:
+      - "Tabs | All / Recorded / Cancelled | Tab | - | - | Certificates | All | - | - | -"
+      - "Toolbar | Search Certificate No. or Agent | Text | - | N | - | Blank | - | Contains | -"
+      - "List | Certificate No. / Withholding Agent / Period Covered / Income / Tax Withheld / Journal / Status | Column | The agent by name; the period on two lines | - | Certificates received | - | Read only | - | -"
+      - "Record Certificate Received dialog | Certificate No. / Withholding Agent (Insurer Code) / Agent Name / Agent TIN | Text | The certificate and the agent | Y | Insurers | - | - | - | -"
+      - "Record Certificate Received dialog | Period Covered From / Period Covered To / Date Received / Reference (DV / Remittance) | Date, text | dd-MMM-yyyy | Y / Y / Y / N | - | - | - | - | -"
+      - "Record Certificate Received dialog | Income Payments | Rows | Kind, ATC, income and tax withheld of each payment | Y | Tax codes | - | - | At least one row | -"
+    actions:
+      - "Record Certificate | Disbursement Processor, Team Leader (disbursement tag) | Always | Records the certificate and posts its entry | Recorded | -"
+      - "Cancel Certificate | Same users | Recorded | Cancels the certificate with the reason and reverses its entry | Cancelled | -"
+    rules:
+      - "A certificate received posts the tax credit on hand against the tax credit on commission or incentives (FR-DS-057)."
+    outcome: The certificates of the insurers are recorded for the SAWT.
+    frs: [FR-DS-057]
+    tests: [CERTS]
+
+  - id: SCR-AC-37
+    title: BIR Form 2307
+    route: /tax/2307
+    purpose: >-
+      The certificates of creditable tax withheld at source that BDOI issues to its payees per quarter, from the EWT
+      worksheet: generate the batch of a quarter, download its PDF, and the certificate register with each payee.
+    shots:
+      - {state: list, user: disb, caption: "BIR Form 2307: the generation of a quarter, the batches and the certificate register"}
+    fields:
+      - "Generate certificates | Year / Quarter | Number, drop-down | The quarter to generate | Y | - | Current quarter | - | - | -"
+      - "Batches | Batch / Quarter / Certificates / Tax Withheld / Issued / PDF | Column | One row per batch with its PDF | - | Certificate batches | - | Read only | - | -"
+      - "Certificate register | Certificate / Quarter / Payee / TIN / Income / Tax Withheld / Status | Column | One row per certificate | - | Certificates | - | Read only | - | -"
+    actions:
+      - "Generate Batch | Users with tax view | Always | Generates the certificates of the quarter | Issued | -"
+      - "PDF / Cancel | Same users | Issued certificate | Downloads the PDF, or cancels the certificate after the confirmation | Cancelled | -"
+    rules:
+      - "One certificate per payee and quarter, filled from the withholding tax of the payments (FR-DS-058)."
+    outcome: The 2307 certificates of the quarter are issued to the suppliers.
+    frs: [FR-DS-058]
+    tests: [F2307]
+
+  - id: SCR-AC-38
+    title: Disbursement Reports
+    route: /disbursement/reports
+    purpose: >-
+      The reports of Disbursement by group (Payments, Control, End of Day); each opens in the report runner with its
+      exports.
+    shots:
+      - {state: list, user: disb, caption: "Disbursement Reports: the payment, control and end-of-day reports"}
+    fields:
+      - "Payments | Masterlist of Disbursements / Unreleased Checks / Miscellaneous Liability - Stale Checks / Authority to Debit / Disbursement Cash Flow / CWT / BIR 2307 on Commission | Link | Each with its description | - | Reports | - | Read only | - | -"
+      - "Control | Payee Report / Payees Not Matched / Request Upload Fall-out / Unregularised Transactions | Link | Each with its description | - | Reports | - | Read only | - | -"
+      - "End of Day | Remittance End-of-Day / Refund End-of-Day / Payment to Supplier End-of-Day / Employee-related End-of-Day / Other Disbursements End-of-Day / Disbursement Summary End-of-Day | Link | Each with its description | - | Reports | - | Read only | - | -"
+    actions:
+      - "[Report] | Disbursement users (disbursement report view) | Always | Opens the report in the runner | - | -"
+    rules:
+      - "The end-of-day reports are also produced by each end-of-day run (FR-DS-081)."
+      - "The CPC2 incentive report is run from the Report Centre, category Disbursement (FR-DS-092)."
+    outcome: Disbursement runs its reports from one place.
+    frs: [FR-DS-080, FR-DS-081, FR-DS-082, FR-DS-083, FR-DS-092]
+    tests: [DREP]

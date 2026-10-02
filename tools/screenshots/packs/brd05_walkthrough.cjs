@@ -216,6 +216,8 @@ async function refundForm(page, reference) {
   if ((await name.inputValue()) === '') {
     await name.fill('Maria Clara R. Santos');
   }
+  // The table scrolls to the last field typed; show it from its first column.
+  await page.locator('.prq-lines').evaluateAll((els) => els.forEach((e) => e.scrollTo(0, e.scrollTop)));
 }
 
 // ------------------------------------------------------------------ the steps

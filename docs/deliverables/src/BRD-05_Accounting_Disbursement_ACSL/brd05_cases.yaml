@@ -4289,7 +4289,7 @@ frs:
         steps:
           - Upload the same file again for the insurer.
         expected: The upload is refused.
-        msg: ["This file was already uploaded for {INS-LAC} as {SOA-2026-4}", ACSL_SOA_DUPLICATE]
+        msg: ["This file was already uploaded for {Luzon Assurance Co.} as {SOA-2026-000004}", ACSL_SOA_DUPLICATE]
       - c: 3
         type: Negative
         title: File without the layout columns

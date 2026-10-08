@@ -10,11 +10,17 @@
 #       expired_at: 2027-03-31
 vulnerabilities:
   - id: CVE-2026-47884
-    paths: ["app/app.jar"]
     statement: >-
-      Spring Framework XsltView path handling. BrokerVerse registers no XsltView or XSLT view resolver and
-      renders no XSLT views, so the vulnerable code path is not reachable. No fixed 6.2.x release exists
-      yet (fixed only in 7.0.9). Reviewed by D Akash Immanuel, Tech Lead, on 08-Oct-2026; re-check when
-      Spring Framework 6.2.20 is released.
+      spring-webmvc 6.2.19, XsltView path handling. BrokerVerse registers no XsltView or XSLT view resolver and
+      renders no XSLT views, so the vulnerable code path is not reachable. No fixed 6.2.x release exists yet (fixed
+      only in 7.0.9). Reviewed by D Akash Immanuel, Tech Lead, on 08-Oct-2026; re-check when Spring Framework
+      6.2.20 is released.
+    expired_at: 2026-11-30
+  - id: CVE-2026-47890
+    statement: >-
+      spring-webmvc 6.2.19, Server-Sent Events stream corruption with views. BrokerVerse uses no Server-Sent Events
+      (no SseEmitter, ServerSentEvent or text/event-stream responses; the web client opens no event streams), so
+      the vulnerable code path is not reachable. No fixed 6.2.x release exists yet (fixed only in 7.0.9). Reviewed
+      by D Akash Immanuel, Tech Lead, on 08-Oct-2026; re-check when Spring Framework 6.2.20 is released.
     expired_at: 2026-11-30
 secrets: []

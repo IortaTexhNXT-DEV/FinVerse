@@ -3349,7 +3349,7 @@ brd: [DBMID.001 (p.109)]
 actor: Disbursement
 priority: Must have
 screens: Disbursement Queue; BIR 2307 (reports and routing)
-description: Disbursement receives from Marketing Collection the processed BIR 2307 transaction report of one insurer as a CWT2307 request, with the certificates sorted per insurer and the supporting documents attached (FR-OP-113). Disbursement checks that the certificates are sorted and complete and the documents attached, and releases them to the insurer (**Release to Insurer**). Disbursement posts no accounting entry: the reversal was posted by Marketing Collection (CLR-OP-41).
+description: "Disbursement receives from Marketing Collection the processed BIR 2307 transaction report of one insurer as a CWT2307 request, with the certificates sorted per insurer and the supporting documents attached (FR-OP-113). Disbursement checks that the certificates are sorted and complete and the documents attached, and releases them to the insurer (**Release to Insurer**). Disbursement posts no accounting entry; the reversal was posted by Marketing Collection (CLR-OP-41)."
 preconditions:
   - The 2307 report is WITH_DISBURSEMENT.
 main_flow:

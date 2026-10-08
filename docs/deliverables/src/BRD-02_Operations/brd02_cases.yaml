@@ -11,8 +11,8 @@ meta:
   code: OP
   frs: FRS_BRD02_OPERATIONS.md
   summary: TP_BRD02_OPERATIONS.md
-  version: "2.0"
-  date: 28 September 2026
+  version: "2.1"
+  date: 08 October 2026
   signoff: pack/pack.yaml
   verify_messages: true
 
@@ -55,7 +55,6 @@ screens:
   PREBOOKED: Cashiering > Pre-booked Payments
   PAYUP: Cashiering > Payment Uploads
   PDC: Cashiering > PDC Warehouse
-  PICKUP: Cashiering > Check Pick-up
   PRINT: Cashiering > Batch Print
   CWT: Cashiering > BIR 2307
   COMMOR: Cashiering > Commission ORs
@@ -117,11 +116,11 @@ data:
     source: Booking seed data, copied into the invoice ledger by the booking feed
   - id: TD-OP-03
     name: Cashiering storyline
-    content: Receipt series AR-HO, AR-CEB and OR-HO (authorised); a payment without match with a refund disposition for approval; an excess; a pre-booked payment; a post-dated check in the warehouse; a Head Office service fee OR; a receipt cancellation for approval; a BIR 2307 tag; two check pick-up requests from Collection
+    content: Receipt series AR-HO, AR-CEB and OR-HO (authorised); a payment without match with a refund disposition for approval; an excess; a pre-booked payment; a post-dated check in the warehouse; a Head Office service fee OR; a receipt cancellation for approval; a BIR 2307 tag of Marketing Collection
     source: Seed data (cashiering)
   - id: TD-OP-04
     name: Remittance storyline
-    content: A remitted batch of ARN-2026-940001 with its insurer OR; a batch in review with the endorsement invoice; a hold request of ARN-2026-940008 waiting for approval; a special remittance request; incentive rule INS-MGIC Property CBG 2 % within 30 days of inception
+    content: A remitted batch of ARN-2026-940001 with its insurer OR; a batch in review with the endorsement invoice; a hold request of ARN-2026-940008 waiting for approval; a special remittance request; incentive rule INS-MGIC CBG motor and fire 2 % within 30 days of inception
     source: Seed data (remittance)
   - id: TD-OP-05
     name: Production reconciliation storyline
@@ -133,7 +132,7 @@ data:
     source: Seed data (adjustments)
   - id: TD-OP-07
     name: Commission storyline
-    content: DP list HO_DP_20260930 with ARN-2026-940003 confirmed and billed to INS-MGIC (awaiting answer, 10 working days); incentive schemes No Touch, Top Up and Motor Mania inactive without tiers
+    content: DP entry of ARN-2026-940003 (from the DP tagging; fallback list HO_DP_20260930) Valid and billed to INS-MGIC (awaiting answer, follow-up 10 working days); incentive programmes No Touch, Top Up and Motor Mania inactive until the SLA parameters are given
     source: Seed data (commission)
   - id: TD-OP-08
     name: Operations files
@@ -145,7 +144,7 @@ data:
     source: Seed data (BOOK rates from the seed SPOT rates)
   - id: TD-OP-10
     name: Disbursement queue requests
-    content: Payment requests created by the remittance approval, the refund disposition and the 2307 batch of the storylines
+    content: Payment requests created by the remittance approval, the refund disposition and the 2307 report routed by Marketing Collection
     source: Created by the seed storylines above
 
 scenarios:
@@ -159,7 +158,7 @@ scenarios:
     pre: Cashiering storyline TD-OP-03; files TD-OP-08.
   - id: SC-OP-03
     persona: CASHIER
-    title: Unapplied money and BIR 2307. Unapplied payments are dispositioned under approval; minimal balances are swept; receipts are searched and printed; 2307 tags are validated, batched and released.
+    title: Unapplied money. Unapplied payments are dispositioned under approval; minimal balances are cleared when the payment is processed; receipts are searched with their audit trail and printed.
     pre: Cashiering storyline TD-OP-03.
   - id: SC-OP-04
     persona: REMIT_PROCESSOR
@@ -167,7 +166,7 @@ scenarios:
     pre: Remittance storyline TD-OP-04.
   - id: SC-OP-05
     persona: MKT_COLLECTION
-    title: Marketing collection items. Marketing asks for holds, special remittances, BIR 2307 tags and endorsement slips, and has the remittance schedule sent to the insurer.
+    title: Marketing collection items. Marketing asks for holds and special remittances, carries the PR 2307 reversal from the tag to the routing to Disbursement, prints endorsement slips and has the remittance schedule sent to the insurer.
     pre: Remittance storyline TD-OP-04; holdable invoices of TD-OP-02.
   - id: SC-OP-06
     persona: ADJUSTMENT
@@ -179,11 +178,11 @@ scenarios:
     pre: Reconciliation storyline TD-OP-05; feedback file TD-OP-08.
   - id: SC-OP-08
     persona: COMMREC_HANDLER
-    title: Commission receivables. DP lists are taken in and validated, billed per insurer, answered within the SLA, collected with the PR reversed; incentives are computed and BIR certificates submitted to Comptrollership.
+    title: Commission receivables. DP entries come from the tagging and are reviewed read-only; fully paid accounts are billed per insurer with a Statement of Account, answered and aged by invoice, and collected with the PR reversed; SLA incentives are computed and BIR certificates submitted to Comptrollership.
     pre: Commission storyline TD-OP-07.
   - id: SC-OP-09
     persona: DISBURSEMENT
-    title: Disbursement queue and interfaces. Payment requests from Operations are acknowledged, numbered and paid; 2307 certificates released; flow-in feeds run with logs and alerts.
+    title: Disbursement queue and interfaces. Payment requests from Operations are acknowledged, numbered and paid; 2307 certificates of Marketing Collection released; flow-in feeds run with logs and alerts.
     pre: Queue requests TD-OP-10.
 
 frs:
@@ -294,6 +293,7 @@ frs:
       - A booked invoice appears in the ledger with the booked components, status UNPAID and WITH_OUTSTANDING_BALANCE.
       - A payment shows as an APPLIED movement per component; a direct payment invoice shows NOT_APPLICABLE.
       - Replaying an invoice already in the ledger changes nothing; a replay needs a scope and BOOKED movements come only from booking.
+      - The payment history of an invoice (payment date, amount applied, AR number) is visible to every Operations team and view-only outside Cashiering.
     cases:
       - c: 1
         type: Positive
@@ -326,6 +326,23 @@ frs:
           - Send a direct request to replay invoices with no invoice, ARN or company.
         expected: Refused.
         msg: ["Give an invoice number, an ARN or a company to replay", REPLAY_SCOPE]
+      - c: 4
+        type: Positive
+        persona: REMIT_PROCESSOR
+        screen: INV360
+        title: Payment history seen from Remittance
+        steps:
+          - As remit open Invoice 360 of ARN-2026-940001; Movements.
+        expected: Each payment shows its date, the amount applied and the AR number.
+      - c: 4
+        type: Security-access
+        persona: REMIT_PROCESSOR
+        screen: SYS
+        title: Remittance cannot change a payment application
+        steps:
+          - As remit send a direct request to reverse an application of ARN-2026-940001.
+        expected: Refused; the payment history is unchanged.
+        msg: [You are not permitted to perform this action, ACCESS_DENIED]
 
   FR-OP-005:
     scenario: SC-OP-01
@@ -787,37 +804,6 @@ frs:
           - Run the PDC Warehousing report.
         expected: AR date, AR number, maturity, client, amount, bank, branch, check number and segment of each warehoused check.
 
-  FR-OP-017:
-    scenario: SC-OP-02
-    persona: CASHIER
-    screen: PICKUP
-    data: [TD-OP-03]
-    conditions:
-      - Requests due on the selected date print ARs with consecutive numbers; requests due later are not printed.
-      - A collection reference is queued once and a selection with nothing due is refused.
-    cases:
-      - c: 1
-        type: Upload-download
-        title: Print two ARs due today
-        pre: The two seed requests are due today (dates moved in SIT).
-        steps:
-          - Check Pick-up; select today; Print.
-        expected: Two ARs with consecutive numbers in one PDF.
-      - c: 1
-        type: Negative
-        title: Request due next week
-        steps:
-          - Select only a request due next week; Print.
-        expected: Refused.
-        msg: [None of the selected requests is due for printing, PICKUP_NOTHING_DUE]
-      - c: 2
-        type: Negative
-        title: Reference queued twice
-        steps:
-          - Import the same collection reference again.
-        expected: Refused.
-        msg: ["Collection reference <ref> is already queued", PICKUP_DUPLICATE]
-
   FR-OP-018:
     scenario: SC-OP-02
     persona: CASHIER
@@ -1007,33 +993,49 @@ frs:
 
   FR-OP-023:
     scenario: SC-OP-03
-    persona: CASHIER_TL
-    screen: CASHSETUP
+    persona: CASHIER
+    screen: RECEIVE
     conditions:
-      - A PR balance of 10.00 or less is reversed once by the sweep; a balance equal to the DST charged is not.
-      - A small unapplied excess moves to AP overages.
+      - A payment that leaves a premium balance within the threshold clears it in the same posting; no unapplied item or disposition is created; a balance equal to the DST charged is kept.
+      - A minimal excess within the threshold goes to AP overages at processing and never appears in Unapplied Payments; an excess above the threshold becomes an unapplied item.
+      - The safety-net sweep clears only balances left within the threshold by later events and never clears a balance twice.
     cases:
       - c: 1
-        type: Workflow
-        title: Sweep reverses 5.00 once
-        pre: An invoice with a PR balance of 5.00.
+        type: Positive
+        title: Minimal premium balance cleared at payment
+        pre: An unpaid invoice of 10,000.00; threshold 10.00.
         steps:
-          - Run Sweep Now twice; open Invoice 360.
-        expected: One reversal of 5.00; the second run changes nothing.
+          - Receive 9,995.00 on the invoice; Issue AR and Apply; open the receipt (Applications, Journal) and Unapplied Payments.
+        expected: The remaining 5.00 is reversed in the same posting; the invoice is paid; Unapplied Payments shows nothing for it.
       - c: 1
         type: Negative
         title: Balance equal to the DST is kept
-        pre: An invoice whose only balance is its DST of 5.00.
+        pre: An invoice whose DST charged is 5.00.
         steps:
-          - Run Sweep Now.
-        expected: The balance is not reversed.
+          - Receive the premium less 5.00 so that only the DST of 5.00 remains.
+        expected: The 5.00 is not reversed and stays outstanding.
       - c: 2
-        type: Positive
-        title: Small excess to AP overages
-        pre: An unapplied excess of 8.00.
+        type: Boundary
+        title: Minimal excess at payment
+        pre: An unpaid invoice of 10,000.00.
         steps:
-          - Run Sweep Now; open the item.
-        expected: The item is closed with Move to AP Overages.
+          - Receive 10,008.00 on the invoice; open the receipt and Unapplied Payments.
+        expected: The excess of 8.00 is moved to AP overages at once; the Unapplied, Monitoring and For Approval tabs show nothing for it.
+      - c: 2
+        type: Boundary
+        neg: true
+        title: Excess above the threshold
+        steps:
+          - Receive 10,050.00 on an unpaid invoice of 10,000.00.
+        expected: An unapplied item of 50.00 of origin Excess is created and follows the disposition flow.
+      - c: 3
+        type: Workflow
+        persona: CASHIER_TL
+        screen: CASHSETUP
+        title: Safety-net sweep finds nothing after the payments
+        steps:
+          - After the cases above, click Run Sweep Now twice.
+        expected: Nothing is cleared; each balance was cleared once, at payment.
 
   FR-OP-024:
     scenario: SC-OP-03
@@ -1043,6 +1045,7 @@ frs:
     conditions:
       - A search by partial assured name and date range returns the matching ARs.
       - The History tab of a cancelled AR shows creation, request and approval with users and times; audit rows cannot change.
+      - Each audit record holds the user, event type, module, from and to values, origin, date and time and the success or failure indicator.
     cases:
       - c: 1
         type: Positive
@@ -1065,6 +1068,22 @@ frs:
         steps:
           - Look for edit or delete on the receipt's audit rows.
         expected: None is offered; an attempt to change an entry outside the screens is refused.
+      - c: 3
+        type: Positive
+        persona: AUDITOR
+        screen: AUDIT
+        title: Seven items of the IT audit standard
+        steps:
+          - Open the audit record of the AR cancelled in TC-OP-013.1-01.
+        expected: User, event type, module Cashiering, status before and after, origin of the event, date and time and Success are shown.
+      - c: 3
+        type: Security-access
+        persona: AUDITOR
+        screen: AUDIT
+        title: Refused action recorded with Failure
+        steps:
+          - As remit try to cancel an AR (direct request); as auditor open the audit trail.
+        expected: The refused attempt is recorded with the user, origin, date and time and Failure.
 
   FR-OP-025:
     scenario: SC-OP-03
@@ -1096,43 +1115,6 @@ frs:
           - Send a direct request to create a print batch with no receipt.
         expected: Refused.
         msg: [Select between 1 and 500 receipts to print, PRINT_SELECTION]
-
-  FR-OP-026:
-    scenario: SC-OP-03
-    persona: CASHIER
-    screen: CWT
-    data: [TD-OP-03]
-    conditions:
-      - Validating tags posts Dr PR2307 / Cr PR and zeroes the 2 % PR; release after payment posts Dr DTIP / Cr PR2307.
-      - A batch holds the certificates of one insurer; a tag without the CWT copy is not validated.
-      - The cash path issues an AR for the 2 % and closes the tag.
-    cases:
-      - c: 1
-        type: Workflow
-        title: Validate two tags of one insurer
-        steps:
-          - Receive the CWT copy of two tags of INS-MGIC; validate them in a batch.
-        expected: Dr PR2307 / Cr PR posted; the 2 % PR of both invoices is zero.
-      - c: 2
-        type: Negative
-        title: Tags of two insurers in one batch
-        steps:
-          - Select tags of INS-MGIC and INS-LAC; create a batch.
-        expected: Refused.
-        msg: [A 2307 batch holds the certificates of one insurer (CSHID.027), CWT_BATCH_ONE_INSURER]
-      - c: 2
-        type: Negative
-        title: Tag without the CWT copy
-        steps:
-          - Validate a tag whose copy was not received.
-        expected: Refused.
-        msg: ["The CWT copy of <ref> was not received", CWT_COPY_MISSING]
-      - c: 3
-        type: Workflow
-        title: Settle in cash
-        steps:
-          - On a cash-path tag click Settle in Cash.
-        expected: An AR for the 2 % is issued and the tag is SETTLED_CASH.
 
   FR-OP-027:
     scenario: SC-OP-02
@@ -1206,6 +1188,7 @@ frs:
       - The scheduled run puts a paid and cleared invoice into a batch RMB-<insurer>-yyyy-n tagged EXTRACTED and locks it; an invoice on hold is tagged UNEXTRACTED_DUE with ON_HOLD.
       - A manual extraction of an invoice of another insurer, or of an invoice that cannot be extracted, is refused.
       - An invoice queued for the end of day is extracted by the evening run once.
+      - An invoice taken by a manual (ad hoc) extraction keeps the source Manual and is not extracted again by a later run.
     cases:
       - c: 1
         type: Workflow
@@ -1243,6 +1226,12 @@ frs:
         steps:
           - Queue an eligible invoice for the end of day; run the evening extraction twice.
         expected: The invoice is extracted by the first run only.
+      - c: 4
+        type: Workflow
+        title: Ad hoc extraction not taken again
+        steps:
+          - Manual run for one eligible invoice of INS-MGIC; open Invoice 360; run the scheduled extraction.
+        expected: Invoice 360 shows the source Manual with the EXTRACTED tag; the scheduled run does not extract it again.
 
   FR-OP-031:
     scenario: SC-OP-04
@@ -1253,6 +1242,7 @@ frs:
       - A check payment is held 3 banking days and extracted on the third banking day.
       - Paid AR above DTIP is excluded (or capped with CAP) and listed on REM-PAIDAR-OVER-DTIP.
       - Written-off invoices and negative DTIP are never extracted; a negative adjustment on a batched invoice notifies the Remittance team.
+      - Any pending financial endorsement blocks the extraction; a posted adjustment does not.
     cases:
       - c: 1
         type: Boundary
@@ -1292,6 +1282,19 @@ frs:
         steps:
           - Submit a negative adjustment on an invoice in a batch; as remit open the bell.
         expected: A notification names the invoice and the batch.
+      - c: 4
+        type: Negative
+        title: Pending increase in TSI blocks the extraction
+        pre: A paid invoice with a TSI increase request submitted and not yet posted.
+        steps:
+          - Run the extraction; open the tag of the invoice.
+        expected: Not extracted; the tag reads Pending financial endorsement.
+      - c: 4
+        type: Positive
+        title: Posted adjustment no longer blocks
+        steps:
+          - Post the TSI increase; run the extraction again.
+        expected: The invoice is extracted on its new balances.
 
   FR-OP-032:
     scenario: SC-OP-04
@@ -1302,6 +1305,7 @@ frs:
       - The processor cannot change the paid AR or commission of a line.
       - Excluding a line removes it from the totals and unlocks the invoice; a restored line is back.
       - Only remaining lines post on approval; exclusion and restore need a batch that can change.
+      - The extracted accounts show the details of the remittance schedule.
     cases:
       - c: 1
         type: Negative
@@ -1330,6 +1334,12 @@ frs:
           - Submit the batch; try to exclude a line.
         expected: Refused.
         msg: ["Batch <no> is <stage>: lines can no longer change", REMIT_BATCH_STAGE]
+      - c: 4
+        type: Positive
+        title: Extracted accounts with the schedule details
+        steps:
+          - Open the batch in review; Lines.
+        expected: Each account shows insurer, policy number, invoice, assured, remittance type, batch number and the amounts of the schedule.
 
   FR-OP-033:
     scenario: SC-OP-04
@@ -1377,6 +1387,7 @@ frs:
     conditions:
       - The schedule of an approved batch lists each invoice with paid AR, commission, VAT, WTAX, DTIP and net due, with totals equal to the batch.
       - The payment request shows payable, insurer and approver; a regenerated document shows the same content.
+      - Before submission the schedule can be saved or exported marked Draft; the payment request is offered only after submission.
     cases:
       - c: 1
         type: Report-output
@@ -1390,12 +1401,18 @@ frs:
         steps:
           - Download the payment request twice.
         expected: Payable amount, insurer and approver; both downloads are identical.
-      - c: 1
+      - c: 3
+        type: Report-output
+        title: Draft schedule before submission
+        steps:
+          - Open Documents of a batch still in review; save the schedule.
+        expected: The schedule of the current lines is produced and marked Draft; it is not kept as the issued schedule.
+      - c: 3
         type: Negative
-        title: Schedule of a batch in review
+        title: Payment request of a batch in review
         steps:
           - Open Documents of a batch still in review.
-        expected: The schedule and payment request are not offered before submission.
+        expected: The payment request is not offered before submission.
 
   FR-OP-035:
     scenario: SC-OP-04
@@ -1505,17 +1522,17 @@ frs:
     screen: INCRULES
     data: [TD-OP-04]
     conditions:
-      - A CBG property invoice of INS-MGIC remitted within 30 days of inception is in a With Incentives batch with 2 %; after the window it has none.
+      - A CBG motor invoice remitted within 30 days is in a With Incentives batch with 2 % on its own line, the commission unchanged; after the window it has none.
       - A rule ending before it starts is refused.
     cases:
       - c: 1
         type: Positive
         screen: BATCH
         title: Incentive within the window
-        pre: A CBG property invoice of INS-MGIC paid 20 days after inception.
+        pre: A CBG motor invoice of INS-MGIC paid 20 days after inception.
         steps:
           - Run the extraction; open its batch.
-        expected: Remittance type WITH_INCENTIVES; incentive 2 % of the basic premium deducted from the payable.
+        expected: Remittance type WITH_INCENTIVES; incentive 2 % of the basic premium on its own line, deducted from the payable; commission and net due before incentive unchanged.
       - c: 1
         type: Boundary
         screen: BATCH
@@ -1736,6 +1753,7 @@ frs:
       - The processor who validated a request cannot approve it.
       - An extension with additional premium cannot skip the approval.
       - A returned request is not posted and the requester sees the reason; a return needs a reason.
+      - A returned request goes to the Marketing owner of the account, who corrects and resubmits it; the history shows the return and the resubmission.
     cases:
       - c: 1
         type: Negative
@@ -1775,6 +1793,13 @@ frs:
           - Return a request without a reason.
         expected: Refused.
         msg: [Select the return reason, ADJ_RETURN_REASON_REQUIRED]
+      - c: 4
+        type: Workflow
+        title: Returned request corrected by Marketing
+        pre: A request raised by adjust on ARN-2026-940002.
+        steps:
+          - As adjust return it at validation with reason Incorrect request details; as mktcoll open the work; correct and resubmit.
+        expected: The request reaches the Marketing owner of the account with the reason; after resubmission it is For validation and the history shows one return and one resubmission.
 
   FR-OP-054:
     scenario: SC-OP-06
@@ -1785,6 +1810,7 @@ frs:
       - A decrease in TSI of a co-insured invoice shows the change per insurer.
       - A commission increase without premium change issues a service invoice at posting.
       - The recompute of a flat cancellation equals the amounts posted by booking.
+      - A financial endorsement with a missing input (effective date, TSI, rate or term) cannot be submitted.
     cases:
       - c: 1
         type: Positive
@@ -1811,6 +1837,13 @@ frs:
         steps:
           - Open Recompute of a request on its invoice.
         expected: The recompute says which insurer's commission configuration is missing; the request cannot be validated.
+      - c: 4
+        type: Negative
+        title: TSI change without effective date
+        screen: NEWREQ
+        steps:
+          - Raise a TSI change without an effective date; Submit for validation.
+        expected: Refused; nothing is recomputed or stored.
 
   FR-OP-055:
     scenario: SC-OP-06
@@ -1908,6 +1941,7 @@ frs:
     conditions:
       - An increase that takes the adjustments above 100 % of the original premium needs a justification.
       - A decrease that would make the premium negative is refused without justification.
+      - Cumulative adjustments reaching the warning level show a warning; a decrease beyond the original DTIP needs a justification.
     cases:
       - c: 1
         type: Boundary
@@ -1930,6 +1964,18 @@ frs:
           - Raise a decrease larger than the premium; submit.
         expected: Refused without justification.
         msg: ["Cumulative adjustments of <amount> exceed the baseline of {100}% of the original premium <amount>", ADJ_OVER_BASELINE]
+      - c: 3
+        type: Boundary
+        title: Warning at 92 % of the original premium
+        steps:
+          - Raise increases that take the cumulative adjustments to 92 % of the original premium; submit.
+        expected: A warning is shown; the request is submitted without justification.
+      - c: 3
+        type: Negative
+        title: Decrease beyond the original DTIP
+        steps:
+          - Raise a decrease whose cumulative effect exceeds the original DTIP; submit without justification.
+        expected: Refused until a justification is given.
 
   FR-OP-059:
     scenario: SC-OP-06
@@ -1998,7 +2044,7 @@ frs:
     screen: ADJWB
     data: [TD-OP-06]
     conditions:
-      - A request submitted 3 days ago shows ageing 3 days; the History tab shows before and after values.
+      - A request submitted 3 days ago shows ageing 3 days; a posted request ages to its posting date; the History tab shows before and after values.
       - Searching an ARN lists its requests and opens Invoice 360.
       - Searching a policy number lists its requests; the Policy Transactions list the booking and the cancellation with their journals.
     cases:
@@ -2008,6 +2054,12 @@ frs:
         steps:
           - Open the workbench; find a request submitted 3 days ago (date moved in SIT); open its History.
         expected: Aging 3 days; the History shows each change with before and after values.
+      - c: 1
+        type: Boundary
+        title: Ageing stops at the posting date
+        steps:
+          - Open a request submitted on 01-Oct-2026 and posted on 06-Oct-2026.
+        expected: Aging 5 days, kept after posting.
       - c: 2
         type: Positive
         title: Requests of an ARN
@@ -2228,7 +2280,7 @@ frs:
     screen: CYCLE
     data: [TD-OP-05]
     conditions:
-      - A difference of 0.80 is MATCHED and 1.20 is MATCHED_WITH_DISCREPANCY with the field listed.
+      - A difference of 0.80 is MATCHED and 1.20 is MATCHED_WITH_DISCREPANCY with the field listed; a foreign currency difference is converted to pesos before the tolerance.
       - An account the insurer did not return is BDOI_ONLY; booking a waiting insurer-only line matches it.
       - A closed cycle refuses actions.
     cases:
@@ -2238,6 +2290,13 @@ frs:
         steps:
           - Upload feedback where one line's gross premium differs by 0.80 and another by 1.20.
         expected: The first is MATCHED; the second MATCHED_WITH_DISCREPANCY listing gross premium.
+      - c: 1
+        type: Boundary
+        title: USD difference in peso equivalent
+        pre: A USD account; BOOK rate 58.00 on its booking date.
+        steps:
+          - Upload feedback where its gross premium differs by USD 0.01 and, on a second USD account, by USD 0.02.
+        expected: The first (PHP 0.58) is MATCHED; the second (PHP 1.16) is MATCHED_WITH_DISCREPANCY with the difference in USD and in pesos.
       - c: 2
         type: Positive
         title: Account not returned by the insurer
@@ -2289,6 +2348,7 @@ frs:
     conditions:
       - Items filter by AO and the handler records feedback and dispositions singly or in bulk.
       - Manual pairing and splitting follow the rules.
+      - An annotation is linked to its item and never changes policy, invoice or amount data.
     cases:
       - c: 1
         type: Positive
@@ -2316,6 +2376,12 @@ frs:
         steps:
           - Pair the BDOI-only item with the insurer-only line of the same policy.
         expected: The pair shows as matched manually.
+      - c: 3
+        type: Negative
+        title: Annotation does not change the record
+        steps:
+          - On an item enter company concerned Insurer and an instruction; save; compare the item and Invoice 360 before and after.
+        expected: The instruction shows on that item only; policy number, invoice and amounts are unchanged.
 
   FR-OP-078:
     scenario: SC-OP-07
@@ -2330,7 +2396,7 @@ frs:
         type: Positive
         title: Eligible early incentive
         steps:
-          - Open Early Incentive of the INS-MGIC cycle with a CBG property account remitted 20 days after inception.
+          - Open Early Incentive of the INS-MGIC cycle with a CBG motor account remitted 20 days after inception.
         expected: ELIGIBLE at 2 %.
       - c: 2
         type: Negative
@@ -2399,15 +2465,23 @@ frs:
     screen: DPLISTS
     data: [TD-OP-07, TD-OP-08]
     conditions:
-      - A list named by the convention is taken in and appears for its branch.
-      - A list breaking the convention, taken in twice or without the invoice column is refused.
+      - A direct payment invoice confirmed by Marketing Collection becomes a DP account without any upload, once.
+      - A fallback list named by the convention is taken in and appears for its branch; a list breaking the convention or taken in twice is refused.
     cases:
       - c: 1
+        type: Workflow
+        screen: DPITEMS
+        title: DP entry from the tagging
+        pre: A booked invoice tagged direct payment at quotation; Marketing Collection confirms the DP tagging (BRD-4 disposition).
+        steps:
+          - Open DP Accounts; search the invoice; confirm the DP tagging again from Collections.
+        expected: The invoice is a DP account with source Tagging, without any list upload; the second confirmation creates no second account.
+      - c: 2
         type: Upload-download
-        title: Branch list taken in
+        title: Fallback branch list taken in
         steps:
           - Upload CEB_DP_20260930.xlsx.
-        expected: The list appears in the tracker for branch CEB with its rows.
+        expected: The list appears for branch CEB with its rows.
       - c: 2
         type: Negative
         title: Name outside the convention
@@ -2429,34 +2503,42 @@ frs:
     screen: DPITEMS
     data: [TD-OP-07]
     conditions:
-      - An account whose invoice is not tagged direct payment is INVALID with the failed rule; the same invoice on two lists is DUPLICATE.
-      - Confirming a valid account moves it to DP for billing; actions follow the account's tag.
+      - The DP account shows its production record, commission history, remittance status and commission status read-only, with visible inconsistencies highlighted.
+      - Only the approved exclusion rules exclude an entry (negative amount, fully cancelled); the excluded entry stays visible with its rule and is left out of billing, reports and incentives.
+      - An account is eligible for billing only when the payment status upstream is Paid; it then becomes Valid without a user action.
     cases:
       - c: 1
-        type: Negative
-        title: Invoice not tagged DP
+        type: Positive
+        title: Read-only review of a DP account
         steps:
-          - Upload a list with an ordinary invoice; open DP Accounts, Invalid.
-        expected: The account is INVALID and shows the failed rule.
+          - Open the DP account of ARN-2026-940003.
+        expected: Production record, commission movements and adjustments, premium remittance status, commission status, policy number and invoice amount are shown; no field can be changed.
       - c: 1
-        type: Negative
-        title: Same invoice on two lists
+        type: Positive
+        title: Duplicate highlighted
         steps:
-          - Upload a branch list with the invoice of ARN-2026-940003.
-        expected: The second is DUPLICATE.
+          - Take in the invoice of ARN-2026-940003 a second time (fallback list).
+        expected: The entry is highlighted as a duplicate; no second account is billed.
       - c: 2
+        type: Negative
+        title: Fully cancelled entry excluded by rule
+        pre: A DP invoice fully cancelled by Adjustment.
+        steps:
+          - Open DP Accounts; Prepare Billing for its insurer; run CMR-DP-STATUS.
+        expected: The account is Invalid with the rule Fully cancelled, the reason and the time; it is not billed and the report lists it as excluded.
+      - c: 3
+        type: Negative
+        title: Account not fully paid is not eligible
+        pre: A DP account whose invoice is partly paid.
+        steps:
+          - Open the account; Prepare Billing.
+        expected: The account is not eligible and shows the payment status as the basis; it is not billed; no action lets the handler confirm the payment by hand.
+      - c: 3
         type: Workflow
-        title: Confirm a valid account
+        title: Account becomes Valid when paid
         steps:
-          - Confirm a valid, fully paid DP account.
-        expected: The account moves to DP for billing.
-      - c: 2
-        type: Negative
-        title: Confirm an account already billed
-        steps:
-          - Confirm the billed seed account again.
-        expected: Refused.
-        msg: ["Account <invoice> is already <tag>", DP_ITEM_STATE]
+          - Record the remaining payment of the invoice in Cashiering; reopen the account.
+        expected: The account is Valid and ready for billing; the eligibility basis shows the payment status Paid and its date.
 
   FR-OP-092:
     scenario: SC-OP-08
@@ -2464,20 +2546,21 @@ frs:
     screen: DPBILLINGS
     data: [TD-OP-07]
     conditions:
-      - Accounts of two insurers produce two billings; a sent billing is due 10 working days later.
-      - Billing needs confirmed accounts, a recipient and is sent once.
+      - Valid accounts of two insurers produce two billings; a sent billing shows its billing date and its follow-up date 10 working days later.
+      - Billing needs Valid accounts, a recipient and is sent once.
+      - The Statement of Account of an insurer lists its billed invoices with commission, collected amount and balance.
     cases:
       - c: 1
         type: Workflow
         title: Two insurers, two billings
         steps:
-          - Confirm DP accounts of INS-MGIC and INS-LAC; Prepare Billing; send each.
-        expected: Two billings; each sent billing shows its due date 10 working days later.
+          - Take Valid DP accounts of INS-MGIC and INS-LAC; Prepare Billing; send each.
+        expected: Two billings; each sent billing shows its billing date and its follow-up date 10 working days later.
       - c: 2
         type: Negative
         title: Nothing to bill
         steps:
-          - Prepare Billing with no confirmed account.
+          - Prepare Billing with no Valid account.
         expected: Refused.
         msg: [No account is confirmed for billing, DP_NOTHING_TO_BILL]
       - c: 2
@@ -2487,6 +2570,12 @@ frs:
           - Send the seed billing again.
         expected: Refused.
         msg: ["Billing <no> was already sent", DP_BILLING_SENT]
+      - c: 3
+        type: Report-output
+        title: Statement of Account of an insurer
+        steps:
+          - Produce the Statement of Account of INS-MGIC for this month.
+        expected: Each billed invoice with policy, billing date, commission, VAT, withholding tax, net, collected and balance; the totals equal the billings of INS-MGIC.
 
   FR-OP-093:
     scenario: SC-OP-08
@@ -2494,8 +2583,8 @@ frs:
     screen: DPBILLING
     data: [TD-OP-07, TD-OP-08]
     conditions:
-      - A rejection needs the insurer's reason; rejected accounts go to the Collection extract.
-      - A billing without answer after 10 working days is overdue and raises the alert.
+      - A rejection needs the insurer's reason; the account becomes Invalid or Returned with the reason in its history and goes to the Collection extract; an approved account stays Valid.
+      - A billing without answer after the follow-up date is flagged overdue and raises the alert once.
       - Answer files are validated.
     cases:
       - c: 1
@@ -2509,13 +2598,13 @@ frs:
         type: Workflow
         title: Rejected account returned to Collection
         steps:
-          - Record REJECTED with a reason; open Hand-offs and Extracts.
-        expected: The account is in the COLLECTION_DP_RETURNED extract.
+          - Record REJECTED with a reason; open the account history and Hand-offs and Extracts.
+        expected: The account is Invalid with the reason in its history and is in the COLLECTION_DP_RETURNED extract.
       - c: 2
         type: Positive
         persona: SYSTEM
         screen: JOBS
-        title: Overdue after 10 working days
+        title: Overdue after the follow-up date
         pre: The seed billing sent 11 working days ago (date moved in SIT).
         steps:
           - Start the daily DP feedback follow-up; open DP Billings and the bell.
@@ -2572,37 +2661,45 @@ frs:
     screen: SCHEMES
     data: [TD-OP-07]
     conditions:
-      - A Motor Mania scheme with tiers 10,000 / 500 and 50,000 / 1,000 pays 1,000.00 for a basic premium of 60,000.00 and nothing below 10,000.00.
-      - A cancelled invoice is excluded from a run with the reason; schemes and runs are validated.
+      - A programme configured from the insurer's SLA pays its fixed amount or rate only on invoices that meet every criterion (product, branch, minimum premium), are fully paid and are paid within the credit term.
+      - Production targets are never a criterion; an excluded entry (fully cancelled, negative amount) gets no incentive and is listed with its rule.
+      - Programmes and runs are validated and every computed incentive is listed per invoice.
     cases:
       - c: 1
         type: Positive
-        title: Motor Mania tiers
+        title: Fixed amount per policy for one branch
         steps:
-          - Add tiers 10,000 / 500 and 50,000 / 1,000 to Motor Mania; activate; compute a run with policies of 60,000.00 and 9,000.00 basic premium.
-        expected: 1,000.00 for the first; nothing for the second.
+          - Configure a programme of type Motor Mania (list value) paying 1,000.00 per motor policy of basic premium 50,000.00 or more for branch CEB with a credit term of 60 days; activate; compute a run with a fully paid CEB policy of 60,000.00 paid in 30 days and the same policy of branch MNL.
+        expected: 1,000.00 for the CEB policy; nothing for the MNL policy.
+      - c: 1
+        type: Negative
+        screen: RUNS
+        title: Paid after the credit term
+        steps:
+          - Include a CEB policy of 60,000.00 paid 75 days after billing.
+        expected: No incentive; the run lists the invoice as not eligible (credit term).
       - c: 2
         type: Negative
         screen: RUNS
-        title: Cancelled invoice excluded
+        title: Fully cancelled invoice excluded
         steps:
-          - Include a cancelled invoice in the run period.
-        expected: The invoice is excluded and listed with the reason.
-      - c: 2
+          - Include a fully cancelled invoice in the run period.
+        expected: The invoice is excluded and listed with the rule Fully cancelled.
+      - c: 3
         type: Negative
         screen: RUNS
-        title: Run on a scheme without tiers
+        title: Run on a programme without parameters
         steps:
-          - Compute a run of No Touch (no tiers).
+          - Compute a run of No Touch (no rates or amounts yet).
         expected: Refused.
         msg: ["Scheme <name> has no tiers yet: add its targets and amounts first", INCENTIVE_SCHEME_EMPTY]
-      - c: 2
-        type: Negative
-        title: Fixed tier without amount
+      - c: 3
+        type: Report-output
+        screen: REPORTS
+        title: Incentive log per invoice
         steps:
-          - Add a Motor Mania tier with a minimum and no amount.
-        expected: Refused.
-        msg: [Each tier needs a minimum basic premium and a fixed amount above zero, INCENTIVE_TIER_INVALID]
+          - Run CMR-INCENTIVE for the computed run.
+        expected: Every invoice of the run with programme, criteria met, rate or amount and result.
 
   FR-OP-096:
     scenario: SC-OP-08
@@ -2636,8 +2733,8 @@ frs:
         msg: [Give the reason of the rejection, CERT_REASON_REQUIRED]
 
   FR-OP-097:
-    scenario: SC-OP-08
-    persona: COMMREC_HANDLER
+    scenario: SC-OP-07
+    persona: RECON_HANDLER
     screen: ESTIMATED
     data: [TD-OP-02]
     conditions:
@@ -2670,7 +2767,7 @@ frs:
     screen: REPORTS
     data: [TD-OP-07]
     conditions:
-      - A collected DP account and a remitted regular invoice appear in separate groups with their net commission.
+      - A collected DP account and a remitted regular invoice appear in separate groups with their net commission; a Priority direct bill shows Direct Billed (Priority).
       - A user without report rights cannot export.
     cases:
       - c: 1
@@ -2678,7 +2775,7 @@ frs:
         title: Commission receivables report
         steps:
           - Run the CMR report for this month.
-        expected: ARN-2026-940003 in the direct payment group and ARN-2026-940001 in the regular group, each with net commission.
+        expected: ARN-2026-940003 in the direct payment group (Direct Billed (Regular)) and ARN-2026-940001 in the Regular Commission group, each with net commission and the remaining balance.
       - c: 2
         type: Security-access
         persona: MKT_COLLECTION
@@ -2688,6 +2785,36 @@ frs:
           - As mktcoll export the CMR report.
         expected: A direct request is refused with "You are not permitted to perform this action".
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
+
+  FR-OP-099:
+    scenario: SC-OP-08
+    persona: COMMREC_HANDLER
+    screen: DPBILLINGS
+    data: [TD-OP-07]
+    conditions:
+      - The outstanding commission receivable of a billed invoice is aged from its billing date (or Statement of Account date) with the age in days and the bucket, and totalled per insurer.
+      - A partial collection keeps the age of the remaining balance; a collected invoice leaves the ageing on its collection date.
+    cases:
+      - c: 1
+        type: Report-output
+        screen: REPORTS
+        title: Ageing of a billed invoice
+        pre: A DP invoice billed on 01-Aug-2026 and not collected; report date 08-Oct-2026.
+        steps:
+          - Run CMR-AGEING for 08-Oct-2026.
+        expected: The invoice shows the billing date 01-Aug-2026, an age of 68 days and the bucket 61-90; the INS-MGIC total includes it.
+      - c: 2
+        type: Positive
+        title: Partial collection keeps the age
+        steps:
+          - Record a partial collection on the invoice; run the ageing again.
+        expected: The remaining balance keeps the age counted from 01-Aug-2026.
+      - c: 2
+        type: Negative
+        title: Collected invoice leaves the ageing
+        steps:
+          - Collect the remaining balance; run the ageing.
+        expected: The invoice is no longer in the outstanding list; its ageing stopped on the collection date.
 
   FR-OP-110:
     scenario: SC-OP-05
@@ -2813,17 +2940,25 @@ frs:
     scenario: SC-OP-05
     persona: MKT_COLLECTION
     screen: CWT
-    data: [TD-OP-02]
+    data: [TD-OP-02, TD-OP-03]
     conditions:
-      - A certificate tag gets a reference CWT-2026-n that Cashiering finds.
-      - A second tag on the same invoice, an unknown invoice or a certificate tag without number is refused.
+      - A certificate tag gets a reference CWT-2026-n and shows the computed PR 2307 amount, the outstanding PR and the CRU status.
+      - A certificate amount above the computed PR 2307 amount or above the outstanding PR, a second tag in process, an unknown invoice or a tag without certificate number is refused.
+      - Validating and posting tags of one insurer generates one BIR 2307 transaction report, zeroes the PR and routes it directly to Disbursement; a batch of two insurers is refused.
+      - A tag with an outstanding commission receivable is posted and flagged For Commission Receivable; a tag on a remitted payment needs the insurer's written confirmation and sends the amount to Unapplied Payments.
     cases:
       - c: 1
         type: Workflow
         title: Tag a certificate
         steps:
-          - Tag 2307; invoice with 2 % CWT outstanding; path certificate; number, period, amount; save; as cashier search the reference.
-        expected: Reference CWT-2026-n; Cashiering finds the tag.
+          - Tag 2307; invoice with 2 % CWT outstanding; certificate number, period and amount; save.
+        expected: Reference CWT-2026-n; the tag shows the computed PR 2307 amount, the outstanding PR and the CRU status None.
+      - c: 2
+        type: Negative
+        title: Certificate amount above the PR 2307 amount
+        steps:
+          - Tag an invoice whose computed PR 2307 amount is 200.00 with a certificate of 250.00.
+        expected: Refused; both amounts are shown and nothing is saved.
       - c: 2
         type: Negative
         title: Second tag in process
@@ -2833,11 +2968,38 @@ frs:
         msg: ["Invoice <no> already has a 2307 tag in process", CWT_ALREADY_TAGGED]
       - c: 2
         type: Negative
-        title: Certificate path without number
+        title: Certificate tag without number
         steps:
-          - Path certificate without certificate number.
+          - Save a tag without certificate number.
         expected: Refused.
         msg: [A certificate tag needs the BIR 2307 certificate number, CWT_CERTIFICATE_REQUIRED]
+      - c: 3
+        type: Workflow
+        title: Validate, post and route two tags of one insurer
+        steps:
+          - Select two checked tags of INS-MGIC; attach the BIR 2307 copies; Validate and Post Report; Route to Disbursement.
+        expected: One BIR 2307 transaction report for INS-MGIC; the PR of both invoices is zero (proposed entry Dr DTIP / Cr PR); the report is With Disbursement, not through Remittance.
+      - c: 3
+        type: Negative
+        title: Tags of two insurers in one batch
+        steps:
+          - Select tags of INS-MGIC and INS-LAC; Validate and Post Report.
+        expected: Refused.
+        msg: [A 2307 batch holds the certificates of one insurer (CSHID.027), CWT_BATCH_ONE_INSURER]
+      - c: 4
+        type: Workflow
+        title: Outstanding commission receivable flagged
+        pre: An invoice of the direct payment storyline with commission billed and not collected.
+        steps:
+          - Tag, validate and post its 2307; open DP Accounts as commrec.
+        expected: The reversal is posted and released; the tag is flagged For Commission Receivable and listed for the Commission Receivables team.
+      - c: 4
+        type: Negative
+        title: Remitted payment without the insurer's confirmation
+        pre: An invoice whose payment was already remitted.
+        steps:
+          - Validate and post its tag without attaching the insurer's written confirmation; then attach it and post.
+        expected: The first posting is refused; after the attachment the reversed amount is in Unapplied Payments.
 
   FR-OP-114:
     scenario: SC-OP-05
@@ -2897,25 +3059,32 @@ frs:
   FR-OP-121:
     scenario: SC-OP-09
     persona: DISBURSEMENT
-    screen: CWT
-    data: [TD-OP-03]
+    screen: DISBQ
+    data: [TD-OP-03, TD-OP-10]
     conditions:
-      - Releasing a paid 2307 batch posts the DTIP offset for each tag.
-      - A batch already released cannot be released again.
+      - A routed 2307 report of one insurer is received with its certificates and attachments and released without any accounting entry.
+      - A report already released cannot be released again; an incomplete report is returned to Marketing Collection with the reason.
     cases:
       - c: 1
         type: Workflow
-        title: Release a paid batch
+        title: Release a 2307 report
         steps:
-          - Route the validated 2307 batch; pay it in the queue; Release.
-        expected: Dr DTIP / Cr PR2307 is posted per tag.
+          - Open the CWT2307 request routed in TC-OP-113.3-01; acknowledge; check the certificates; Release to Insurer; open the journals of the day.
+        expected: The report is RELEASED; no journal is posted by the release.
       - c: 2
         type: Negative
+        screen: CWT
         title: Release twice
         steps:
-          - Release the same batch again.
+          - Release the same report again.
         expected: Refused.
         msg: ["<batch> is <status>", CWT_BATCH_ROUTED]
+      - c: 2
+        type: Workflow
+        title: Return an incomplete report
+        steps:
+          - Return a CWT2307 request with the reason Certificate missing.
+        expected: The request is RETURNED and Marketing Collection is notified with the reason.
 
   FR-OP-130:
     scenario: SC-OP-09
@@ -3054,6 +3223,12 @@ access:
     allow: [MKT_COLLECTION, MKT_TL]
     deny: [REMIT_PROCESSOR, AUDITOR]
     denied: Tag 2307 is not shown; the request is refused.
+  - action: Validate, post and route PR 2307 reports (proposed for Marketing Collection, CLR-OP-40)
+    screen: CWT
+    permission: CWT_PROCESS
+    allow: [MKT_COLLECTION, MKT_TL]
+    deny: [CASHIER, REMIT_PROCESSOR, AUDITOR]
+    denied: Validate and Post Report and Route to Disbursement are not shown; the request is refused.
   - action: Work production reconciliation cycles and send registers
     screen: CYCLES
     permission: RECON_PROCESS, RECON_SEND

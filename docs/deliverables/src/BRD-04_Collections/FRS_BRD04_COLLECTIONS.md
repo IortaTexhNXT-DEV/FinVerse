@@ -2,14 +2,14 @@
 # Source of the Functional Requirements Specification for BRD-4 Collections.
 # Build: python tools/deliverables/bdoi_docx.py docs/deliverables/src/BRD-04_Collections/FRS_BRD04_COLLECTIONS.md
 title: Collections
-subtitle: BRD-4 Collections (Collection Management System BRD, renumbering addendum and Workshop Addendum)
+subtitle: BRD-4 Collections (Collections (CLXN) Workshop Addendum pack with the walkthrough minutes of 27 April 2026)
 doc_type: Functional Requirements Specification
 doc_code: FRS
 brd: BRD-04
 name: Collections
 doc_id: BIBS-FRS-BRD-04
-version: "2.0"
-date: 1 October 2026
+version: "2.1"
+date: 8 October 2026
 status: Issued for BDOI business sign-off
 header_title: FRS BRD-4 Collections
 control:
@@ -31,12 +31,18 @@ control:
     reviewer: iorta TechNXT Project Manager
     approver: BDOI business units (sign-off)
     change: "Business sign-off pack: navigation by persona, 19 screen specifications with screenshots, five walkthroughs, messages, notifications, document outputs, the upload template, cross-BRD contract, sign-off and change control (chapters 12-20); proposed business rules and clarifications for confirmation extended with the screen presentation items (chapter 21); screen standards (appendix). Messages quoted as the screens show them. Issued 01-Oct-2026. Chapters 1-11 unchanged in substance; FR, BRD and test IDs kept"
+  - version: "2.1"
+    date: 08 Oct 2026
+    author: iorta TechNXT Business Analysis
+    reviewer: iorta TechNXT Project Manager
+    approver: BDOI business units (sign-off)
+    change: "Re-based on the Collections (CLXN)_WS Addendum (96 pages: the minutes of the walkthrough of 27-Apr-2026 in front of the unchanged BRD-4 pack); user-story view and storyboard index added. Billing statements generated and sent by Operations, Collections views them (FR-CL-060 to 062, WT-D); check pick-up removed from scope by the Operations Cashiering annex (FR-CL-030, 032, WT-A); Marketing owns the incentive campaigns (FR-CL-092); home tiles for promises, installments and escalations (FR-CL-085); Collections view of Remittance and the Production Register (FR-CL-001); transaction history limited to financial events (FR-CL-044); 120-day escalation level and archiving rule for open accounts proposed; every BRD page citation follows the new file (two pages added in front); clarifications CLR-CL-32 to CLR-CL-42 added. Issued 08-Oct-2026"
 distribution:
   - {name: "Shellah Marie C. Miranda, AVP, Product Owner", role: Approver, organisation: BDOI, purpose: Review and sign-off}
   - {name: "Jose Melvin Jarin, AVP, Product Owner", role: Approver, organisation: BDOI, purpose: Review and sign-off of the addendum functions}
   - {name: "Mark Joseph C. Makalintal (Combank and Corbank), Edmundante F. Ramirez and Roderick Lim (Retail Marketing)", role: Approver, organisation: BDOI, purpose: Review and sign-off for Marketing}
   - {name: "Ronald Allan E. De Leon, Head - Comptrollership", role: Approver, organisation: BDOI, purpose: "Review and sign-off of the commission receivable rows (section 4.10)"}
-  - {name: "John Benedict S. Santos, VP and Head, BDOI Operations", role: Reviewer, organisation: BDOI, purpose: "Review of the process with Operations and of the exports (caveat p.93)"}
+  - {name: "John Benedict S. Santos, VP and Head, BDOI Operations", role: Reviewer, organisation: BDOI, purpose: "Review of the process with Operations and of the exports (caveat p.95)"}
   - {name: "Collections and Marketing Support, HO Marketing Support BBG, Marketing (Pia Grace M. Pinili, Maria Victoria Evangelista, Grace Tordesillas, Ma. Fides E. Rivera, Arra R. Rivera, Rhommel Mark Galler)", role: Business user, organisation: BDOI, purpose: Review of the screens and rows (input providers of the BRD)}
   - {name: "Operations: Financial Transactions and Processing (Perjelyn Joy Gutierrez); Cashiering and Commission Receivables", role: Business user, organisation: BDOI, purpose: "Review of the hand-offs, the requests on unapplied payments and the reversal files"}
   - {name: "Information Technology Group (IT Core Business Delivery; IT AIO Core Business Delivery - Insurance)", role: Reviewer, organisation: BDOI, purpose: "Review of the scheduled runs, files, access and the Technical Specification"}
@@ -52,7 +58,9 @@ This Functional Requirements Specification (FRS) states how BIBS (BDOI Broker Sy
 
 BDOI uses this document to confirm that the system behaves as the business expects. The project team uses it to test and to prepare user acceptance testing (UAT). Every functional requirement (FR) cites the BRD requirement it meets and the BRD page.
 
-The FRs describe the proposed behaviour of the Collections screens. Where the proposed rule or screen differs from the BRD text, or needs a decision of BDOI, the FR says so in a note and chapter 21 lists each such point for confirmation. Chapters 12 to 19 give the business view of the system: the navigation, the specification of every screen with its screenshots, the walkthroughs, the messages, notifications, documents, the upload template and the contract with the other BRDs; chapter 20 describes the sign-off.
+The FRs describe the proposed behaviour of the Collections screens. Where the proposed rule or screen differs from the BRD text, or needs a decision of BDOI, the FR says so in a note and chapter 21 lists each such point for confirmation. Chapters 12 to 19 give the business view of the system: the navigation, the specification of every screen with its screenshots, the walkthroughs, the messages, notifications, documents, the upload template and the contract with the other BRDs; chapter 20 describes the sign-off. The appendices give the user-story view of every BRD requirement (chapter 22), the storyboard index of the walkthroughs (chapter 23) and the screen standards (chapter 24).
+
+This version 2.1 follows the BRD as BDOI issued it on 8 October 2026: the Collections (CLXN) Workshop Addendum pack, which puts the e-mail and minutes of the walkthrough of 27 April 2026 with the System Analysts and Solution Architecture team in front of the unchanged BRD-4 pack. BDOI states in that e-mail that the BRD is not updated and that the clarifications are recorded in the minutes; this FRS applies them.
 
 ## Scope
 
@@ -66,34 +74,39 @@ The scope is the follow-up of **premium receivables (PR)** and **unapplied payme
 | Collector work | PR collector dispositions and their list, collection efforts, bulk update, reassignment | BRCLXN.016-018, 051, 052 |
 | Installments and promises | Installment plans, payment history, promises to pay and broken promises, policy and co-insurance view, transaction history | BRCLXN.053-057 |
 | Escalation | Escalation rules, automatic and manual escalation, escalation workflow | BRCLXN.049, 050, 055 |
-| Billing statements | Statements of account (SOA) per billing cycle; billing is monitoring only | BRCLXN.058, 060 |
+| Billing statements | Statements of account (SOA) per billing cycle, generated and sent by Operations and viewed by Collections; billing is monitoring only | BRCLXN.058, 060; minutes p.1 |
 | Unapplied payments | Unapplied list, filters, disposition list, collector disposition, request application, invoice validation, history, daily application file | BRCLXN.030-042, 047, 048 |
-| Scheduled files and reports | Monthly and weekly "DP PR for reversal" and "PR 2307 for reversal" files, daily PR reports, Collections reports | BRCLXN.024-029, 045; p.59-61 |
-| Commission receivable | CR billing only after the premium is confirmed paid; draft rows on incentives, refunds and mixed payments | BRCLXN.059; 061-064 (draft) |
+| Scheduled files and reports | Monthly and weekly "DP PR for reversal" and "PR 2307 for reversal" files, daily PR reports, Collections reports | BRCLXN.024-029, 045; p.61-63 |
+| Commission receivable | CR billing only after the premium is confirmed paid; draft rows on incentives, refunds and mixed payments, walked through on 27-Apr-2026 | BRCLXN.059; 061-064 (draft); minutes p.1 |
 
 **Out of scope for this phase:**
 
 - Posting of money. Collections posts no journal and no ledger movement. Payments, BIR 2307 reversals, direct payment (DP) reversals and cancellations are posted by Cashiering, Commission and Adjustment (BRD-2).
 - Holds, special remittances, the send-schedule request and the endorsement slip (MKTID.001-009). The CLXN BRD does not cover them; they stay in Operations as described in the BRD-2 FRS (OQ45).
-- The Marketing Diary kept in ISYS (p.40-42). There is no FR ID for it; the panel is on hold until BDOI answers CQ20.
+- The Marketing Diary kept in ISYS (p.42-44). There is no FR ID for it; the panel is on hold until BDOI answers CQ20.
 - Transport of the daily application file to the BDOI file server FS04. The file is kept in the list of extracts, from which the user downloads it, until OQ17 is answered.
-- BRCLXN.061-064 as confirmed functions. They are in the unsigned draft addendum only (CQ01). Section 4.10 proposes them so that BDOI can confirm them.
+- BRCLXN.061-064 as confirmed functions. They are in the unsigned draft addendum only. The minutes of 27 April 2026 record their intent but do not sign them (CQ01). Section 4.10 proposes them so that BDOI can confirm them.
+- Check pick-up. The Operations Cashiering annex of May 2026 removed CSHID.009 (acceptance of a check for pick-up from Collection) from BDOI's future process (R10). Collections therefore offers no disposition "For check pick-up" and hands no pick-up request to Cashiering (CLR-CL-33).
+- Generation and sending of the billing statements by Collections users. The minutes give the generation to Accounting / Operations; Collections users see the statements (CLR-CL-32).
 
 ## References
 
 <!-- table: widths=1.2,11.4,3.6 caption="Reference documents" -->
 | Ref. | Document | Version / date |
 |---|---|---|
-| R1 | Collection Management System (CMS) BRD, pages 35-61 of the BRD-4 pack (signed printout pp.66-93) | v1, 17-Jan-2025 to 10-Mar-2025; signed Feb to Mar 2025 |
-| R2 | Renumbering addendum (FRID-001-048 to BRCLXN.001-048), pages 23-34 | 17-Dec-2025; approved 19 to 22-Dec-2025 |
-| R3 | Collections Addendum (Workshop), signed version, pages 13-22 (BRCLXN.049-060) | v1.0, 10-Apr-2026; approved 16 to 17-Apr-2026 |
-| R4 | Collections Addendum (Workshop), draft version, pages 1-12 (BRCLXN.049-064; 061-064 only here) | v1.0 draft, 05 to 10-Apr-2026 |
+| R0 | Collections (CLXN)_WS Addendum, pages 1-2: e-mail of BDO ESG - Business Project Services with the minutes of the walkthrough of the Collections BRD Addendum with the System Analysts and Solution Architecture team ("the minutes") | 27-Apr-2026; the BRD is not updated, the clarifications are recorded in the minutes |
+| R1 | Collection Management System (CMS) BRD, pages 37-63 of the BRD-4 pack (signed printout pp.68-95) | v1, 17-Jan-2025 to 10-Mar-2025; signed Feb to Mar 2025 |
+| R2 | Renumbering addendum (FRID-001-048 to BRCLXN.001-048), pages 25-36 | 17-Dec-2025; approved 19 to 22-Dec-2025 |
+| R3 | Collections Addendum (Workshop), signed version, pages 15-24 (BRCLXN.049-060) | v1.0, 10-Apr-2026; approved 16 to 17-Apr-2026 |
+| R4 | Collections Addendum (Workshop), draft version, pages 3-14 (BRCLXN.049-064; 061-064 only here) | v1.0 draft, 05 to 10-Apr-2026 |
 | R5 | BDOI Collections (BRD-4) requirements baseline | current |
 | R7 | Cross-BRD decisions and answered questions | current |
-| R8 | BRD-2 Operations FRS (Cashiering, Commission Receivables, Remittance) | v1.0 |
+| R8 | BRD-2 Operations FRS (Cashiering, Commission Receivables, Remittance) | v2.0 and its re-base on R10 |
 | R9 | BDO UX guidelines (brand, screen patterns) | current |
+| R10 | Operations_WS Addendum: Operations Central Addendum 1, Cashiering (p.1-8; CSHID.009 check pick-up removed, minutes of 05-May-2026, p.4-6) and the re-issued Operations BRD v1.01 (p.71-185) | Approved 08-May-2026; v1.01 of 15-Apr-2026 |
+| R11 | BRD-5 Accounting, Disbursement and ACSL FRS (incentive service invoice, FR-DS-091) | v2.1 |
 
-Page references in this document ("p.26") are pages of the BRD-4 PDF. For BRCLXN.001-048 the first page is the renumbering addendum (R2, the governing wording) and the second page is the FRID table of the CMS BRD (R1), for example "p.26 / 47". For BRCLXN.049-060 the page is the signed addendum (R3); for BRCLXN.061-064 the page is the draft (R4).
+Page references in this document ("p.28") are pages of the Collections (CLXN)_WS Addendum PDF of 96 pages issued on 8 October 2026: pages 1-2 are the minutes (R0) and pages 3-96 are the earlier BRD-4 pack unchanged, so page n of the earlier pack is page n+2. "Minutes p.1" cites R0. For BRCLXN.001-048 the first page is the renumbering addendum (R2, the governing wording) and the second page is the FRID table of the CMS BRD (R1), for example "p.28 / 49". For BRCLXN.049-060 the page is the signed addendum (R3); for BRCLXN.061-064 the page is the draft (R4).
 
 <!-- pagebreak -->
 
@@ -117,12 +130,13 @@ DTIP: Due to insurer (premium payable to the insurer)
 EBIX / QPS: Legacy booking and accounting systems named in the CMS BRD
 FRID: Requirement ID of the CMS BRD before renumbering (FRID-001-048)
 FS04: BDOI file server named in BRCLXN.041-042
-Hand-off: An item Collections places in its outbox for Cashiering or Commission (check pick-up, BIR 2307 tag, DP list)
+Hand-off: An item Collections places in its outbox for Cashiering or Commission (BIR 2307 tag, DP list)
+Minutes: The minutes of the walkthrough of the Collections BRD Addendum of 27 April 2026 (R0, pages 1-2 of the BRD file)
 LOV: List of values maintained by an authorised user
 PR: Premium receivable (outstanding premium of a booked invoice)
 PR2307: The 2% of the premium receivable held open until the client's BIR 2307 certificate is received
 SOA: Statement of account (billing statement per billing cycle)
-Tagging owner: Whether the next action on an account is Marketing's or Operations' (p.41)
+Tagging owner: Whether the next action on an account is Marketing's or Operations' (p.43)
 UH: Unit Head (Marketing)
 UPP: Unapplied payment, a payment Cashiering received but could not apply to an invoice
 ```
@@ -139,7 +153,7 @@ Each FR in section 4 has the same parts:
 - **Notifications**, **audit** and numbered **acceptance criteria**. The acceptance criteria are the basis of the test cases of the BRD-4 test plan.
 
 
-The CMS BRD states that "unless otherwise stated, all requirements are considered high priority and committed for this phase" (p.37). BRCLXN.001-048 therefore carry the priority **High**. The signed addendum gives **Must have** for BRCLXN.049 and 051-060 and no priority for BRCLXN.050.
+The CMS BRD states that "unless otherwise stated, all requirements are considered high priority and committed for this phase" (p.39). BRCLXN.001-048 therefore carry the priority **High**. The signed addendum gives **Must have** for BRCLXN.049 and 051-060 and no priority for BRCLXN.050.
 
 > [!NOTE]
 > Values marked "to confirm" (threshold, disposition values, effort codes, escalation defaults) are placeholders that BDOI confirms through the open questions in section 10.3. They are configuration, so a changed answer does not need a change to the system.
@@ -150,11 +164,11 @@ The CMS BRD states that "unless otherwise stated, all requirements are considere
 
 ## Business context
 
-BDOI Marketing collects premium receivables from clients through Account Officers, Marketing Handlers and dedicated Collection Handlers, with Team Leads, Unit Heads and Section Heads. Today the work runs on EBIX and QPS, on a "Marketing Diary" in ISYS, on e-mail and on Excel lists (p.40-41). The CMS BRD asks for one application in which collectors record their dispositions on premium receivables and unapplied payments, and the workshop addendum adds escalation, bulk update, reassignment, installments, promises, billing statements and the commission receivable gate (p.13-20).
+BDOI Marketing collects premium receivables from clients through Account Officers, Marketing Handlers and dedicated Collection Handlers, with Team Leads, Unit Heads and Section Heads. Today the work runs on EBIX and QPS, on a "Marketing Diary" in ISYS, on e-mail and on Excel lists (p.42-43). The CMS BRD asks for one application in which collectors record their dispositions on premium receivables and unapplied payments, and the workshop addendum adds escalation, bulk update, reassignment, installments, promises, billing statements and the commission receivable gate (p.15-22).
 
 In BIBS the booked invoice and its PR balance by component already live in the Operations invoice ledger. Collections is therefore a BIBS module that reads the ledger and hands work to Cashiering and Commission inside the application. It never keeps a second copy of the money.
 
-<!-- table: widths=1,8,8 caption="Current and envisioned process (BRD p.40-42)" -->
+<!-- table: widths=1,8,8 caption="Current and envisioned process (BRD p.42-44)" -->
 | # | Current process (before) | Envisioned process in BIBS (after) |
 |---|---|---|
 | 1 | The AO records the client's payment instruction in the Marketing Diary (ISYS) | The Marketing Diary stays in ISYS until CQ20 is answered; collection efforts and remarks are kept in BIBS |
@@ -176,9 +190,9 @@ The table lists the steps of the collection cycle, and Figure 1 shows them by ac
 | 1 | Booking | Processing (BRD-1) | The invoice is booked; its PR by component, DTIP, commission and co-insurance shares go to the invoice ledger | - |
 | 2 | Nightly refresh | System | New invoices with PR above the threshold become collection accounts; balances, aging and status are refreshed; paid accounts complete | BRCLXN.001-015, 046 |
 | 3 | Assignment | System, Team Lead | New accounts go to a handler by rule, else to their AO; the TL reassigns permanently or temporarily | BRCLXN.052 |
-| 4 | Follow-up | Collection Handler, AO | Efforts, remarks, category, promises to pay, installment plans and billing statements | BRCLXN.016-023, 053-058 |
+| 4 | Follow-up | Collection Handler, AO; Operations (statements) | Efforts, remarks, category, promises to pay and installment plans; Operations generates and sends the billing statements, which Collections views | BRCLXN.016-023, 053-058 |
 | 5 | Escalation | System, handler, TL, UH | Rules raise escalations for aging, missing commitments, broken promises and overdue installments; users escalate by hand | BRCLXN.049, 050, 055 |
-| 6 | Hand-off to Operations | Handler, then Cashiering / Commission | Check pick-up and BIR 2307 tags to Cashiering; DP accounts to the Commission DP list; cancellations raised in Adjustment | BRCLXN.024-029 |
+| 6 | Hand-off to Operations | Handler, then Cashiering / Commission | BIR 2307 tags to Cashiering; DP accounts to the Commission DP list; cancellations raised in Adjustment (no check pick-up: CSHID.009 removed, R10) | BRCLXN.024-029 |
 | 7 | Unapplied payments | Collection Handler, Unapplied Payment Handler, then Cashiering | Collector disposition; a request to apply the payment to a valid invoice; daily application file | BRCLXN.030-042, 047, 048 |
 | 8 | Files and reports | System | Daily PR reports, weekly and monthly reversal files, Collections reports | BRCLXN.024-029, 045 |
 | 9 | Commission receivable | CRU (Commission) | CR billing only for DP accounts confirmed fully paid to the insurer | BRCLXN.059 |
@@ -206,20 +220,21 @@ An invoice without a client receivable (payment status NOT_APPLICABLE: direct pa
 <!-- table: widths=3.2,4.4,7,2.4 caption="Personas and BIBS roles" size=8.5 -->
 | Persona | BIBS role | Responsibilities in Collections | BRD |
 |---|---|---|---|
-| Marketing AO | MKT_AO | Follows up own accounts; efforts, dispositions, promises, manual escalation; unapplied dispositions | p.43 |
-| Marketing Team Lead | MKT_TL | As the AO, plus bulk update, assignment, billing statements and acting on escalations | p.43; BRCLXN.049-052 |
-| Marketing Handler | MKT_HANDLER | As the AO, plus bulk update | p.43 |
-| Collection Handler | MKT_COLLECTION | Works the assigned accounts, unapplied payments, installment plans and billing statements | p.43; BRCLXN.030-031 |
+| Marketing AO | MKT_AO | Follows up own accounts; efforts, dispositions, promises, manual escalation; unapplied dispositions | p.45 |
+| Marketing Team Lead | MKT_TL | As the AO, plus bulk update, assignment, installment plans, viewing the billing statements and acting on escalations | p.45; BRCLXN.049-052 |
+| Marketing Handler | MKT_HANDLER | As the AO, plus bulk update | p.45 |
+| Collection Handler | MKT_COLLECTION | Works the assigned accounts, unapplied payments and installment plans; views the billing statements, Remittance and the Production Register | p.45; BRCLXN.030-031; minutes p.1 |
 | Collection Team Lead | CLX_TL | As the handler, plus assignment and acting on escalations | BRCLXN.049, 052, 055 |
-| Section Head (Corporate / Retail) | MKT_SECTION_HEAD | As the TL, plus Collections set-up (threshold, disposition options) and the audit log | p.44; BRCLXN.007, 017 |
+| Section Head (Corporate / Retail) | MKT_SECTION_HEAD | As the TL, plus Collections set-up (threshold, disposition options) and the audit log | p.46; BRCLXN.007, 017 |
 | Unapplied Payment Handler | UNAPPLIED_HANDLER | Dispositions and application requests on unapplied payments | BRCLXN.032-033 (CQ10) |
-| Processing Unit | PROCESSOR | Disposition "no / missing policy number" only | p.44 |
-| Operations Cashiering | CASHIER, CASHIER_TL | Read access and exports; executes the application requests on its Incoming Requests screen | p.44 |
-| Disbursement, Comptrollership, ACSL | DISBURSEMENT, COMPTROLLERSHIP, ACSL_PROCESSOR, ACSL_TL, ACSL_HEAD | Read access and reports (Disbursement also exports) | p.45 |
-| Application Support, Business Administrator, DCO | APP_SUPPORT, BUSINESS_ADMIN, DCO | Collections set-up, audit log, interface (sync) view and job runs | p.45-46 |
+| Processing Unit | PROCESSOR | Disposition "no / missing policy number" only | p.46 |
+| Operations Cashiering | CASHIER, CASHIER_TL | Read access and exports; executes the application requests on its Incoming Requests screen; the Cashiering Team Leader / Head is the proposed Operations billing user who generates and sends the billing statements (CLR-CL-32) | p.46; minutes p.1 |
+| Commission Receivables Unit | COMMREC_HANDLER, COMMREC_TL | Confirms direct payment accounts fully paid to the insurer and bills the commission receivable in Commission Receivables (BRD-2); views the Collections accounts | BRCLXN.059, 061-064 |
+| Disbursement, Comptrollership, ACSL | DISBURSEMENT, COMPTROLLERSHIP, ACSL_PROCESSOR, ACSL_TL, ACSL_HEAD | Read access and reports (Disbursement also exports) | p.47 |
+| Application Support, Business Administrator, DCO | APP_SUPPORT, BUSINESS_ADMIN, DCO | Collections set-up, audit log, interface (sync) view and job runs | p.47-48 |
 | System Administrator, Auditor | SYSADMIN, AUDITOR | Read access, set-up (SYSADMIN) and audit log | NFR 4 |
 
-Every new Collections role also holds WORK_VIEW, ATTACHMENT_VIEW, REPORT_VIEW, CLIENT_VIEW, ACCOUNT_VIEW and OPS_VIEW, because the collection account links to Invoice 360. The roles are the project's proposal until BDOI confirms the access matrix (OQ48). Several roles per user are allowed (decision D5 of R7).
+Every new Collections role also holds WORK_VIEW, ATTACHMENT_VIEW, REPORT_VIEW, CLIENT_VIEW, ACCOUNT_VIEW and OPS_VIEW, because the collection account links to Invoice 360. The minutes of 27 April 2026 place the Collections access level in the access matrix of the Operations BRD: log-in by profile, Remittance (search and view) and Production Reconciliation (Production Register viewing and filtering) for the Collections roles; the commission receivable capabilities of that matrix (incentive calculation, Motor Mania plan, production validation and exclusions, commission receivables processing, reports, error handling, auto-match of reversals) are actions of Commission Receivables in BRD-2 that Collections views (CLR-CL-37). The minutes state that no new user profile is needed. The roles are the project's proposal until BDOI confirms the access matrix (OQ48). Several roles per user are allowed (decision D5 of R7).
 
 <!-- pagebreak -->
 
@@ -235,7 +250,8 @@ Every new Collections role also holds WORK_VIEW, ATTACHMENT_VIEW, REPORT_VIEW, C
 | CLX_ESCALATION_HANDLE | APPROVE | Acknowledge, escalate further, return or resolve an escalation |
 | CLX_ASSIGN | AMEND | Assignment rules and reassignment (BRCLXN.052) |
 | CLX_UNAPPLIED_WORK | CREATE | Collector disposition and application request on unapplied payments (BRCLXN.030-033) |
-| CLX_BILLING | CREATE | Installment plans and billing statements (BRCLXN.053, 058) |
+| CLX_BILLING | CREATE | Installment plans (BRCLXN.053) |
+| CLX_SOA_ISSUE | CREATE | Billing run, generation, sending and cancellation of the billing statements (BRCLXN.058; Operations, minutes p.1; proposed, CLR-CL-32) |
 | CLX_SETUP | AMEND | Threshold and other parameters, disposition rules, Unit Heads, escalation rules (BRCLXN.007, 017, 037, 049) |
 | CLX_EXPORT | VIEW | Download of scheduled files and exports |
 | CLX_REPORT_VIEW | VIEW | Collections reports and the Files screen |
@@ -256,12 +272,13 @@ The table below is the role-to-permission matrix provided with the system ("Y" =
 | CLX_ASSIGN | | Y | | | Y | Y | | | | | |
 | CLX_UNAPPLIED_WORK | Y | Y | Y | Y | Y | Y | Y | | | | |
 | CLX_BILLING | | Y | | Y | Y | Y | | | | | |
+| CLX_SOA_ISSUE | | | | | | | | | TL | | |
 | CLX_SETUP | | | | | | Y | | | | | Y |
 | CLX_EXPORT | Y | Y | Y | Y | Y | Y | | | Y | Disb. | |
 | CLX_REPORT_VIEW | Y | Y | Y | Y | Y | Y | Y | | Y | Y | |
 | CLX_AUDIT_VIEW | | | | | | Y | | | | | Y |
 
-"Admin / DCO" is APP_SUPPORT, BUSINESS_ADMIN and DCO; they also hold FLOWIN_MANAGE and SYSTEM_MONITOR for the interface and job views (APP_SUPPORT also LOV_MANAGE). SYSADMIN holds CLX_VIEW, CLX_SETUP, CLX_AUDIT_VIEW and CLX_REPORT_VIEW; AUDITOR holds CLX_VIEW, CLX_REPORT_VIEW and CLX_AUDIT_VIEW.
+"Admin / DCO" is APP_SUPPORT, BUSINESS_ADMIN and DCO; they also hold FLOWIN_MANAGE and SYSTEM_MONITOR for the interface and job views (APP_SUPPORT also LOV_MANAGE). SYSADMIN holds CLX_VIEW, CLX_SETUP, CLX_AUDIT_VIEW and CLX_REPORT_VIEW; AUDITOR holds CLX_VIEW, CLX_REPORT_VIEW and CLX_AUDIT_VIEW. CLX_SOA_ISSUE ("TL" in the Cashier column) is proposed for the Cashiering Team Leader / Head until BDOI names the Operations profile that generates the statements (CLR-CL-32); every Collections role sees the statements with CLX_VIEW.
 
 Segregation of duties enforced by the system: the maker of an escalation rule never authorises it; a disposition reserved to some roles (Disposition Rules) is refused for other roles; updating several accounts at once needs CLX_BULK_UPDATE whatever other permission the user holds.
 
@@ -272,7 +289,7 @@ Segregation of duties enforced by the system: the maker of an escalation rule ne
 ```fr
 id: FR-CL-001
 title: Restrict each Collections action to authorised roles
-brd: [Stakeholder functions (p.43-46), NFR 3.01-3.05 (p.52)]
+brd: [Stakeholder functions (p.45-48), NFR 3.01-3.05 (p.54), Minutes of 27-Apr-2026 on user access (p.1)]
 actor: System
 priority: High
 screens: All Collections screens; User Access Matrix
@@ -280,6 +297,7 @@ description:
   - Every Collections screen, button and action requires a permission (section 3.2). The permissions carry an action class (VIEW, CREATE, AMEND, APPROVE) in the area COLLECTIONS, so the User Access Matrix shows who may view, work, bulk update, assign, escalate and set up.
   - Menus show only the screens the user's roles allow. Collections is a section of the Finance group, listed before Cashiering.
   - Users log in with the platform log-in of BRD-1. After three consecutive failed attempts the account locks (NFR 1.04, 2.02); the lock-out applies to all BIBS users.
+  - Under the access matrix of the Operations BRD (minutes p.1), the Collections roles also open Remittance (search and view) and the Production Register of Production Reconciliation (view and filter) read only; they view the commission receivable records of Commission Receivables and do not process them.
 preconditions:
   - "The user is logged in."
 main_flow:
@@ -294,6 +312,7 @@ rules:
   - [R2, "A user may hold several roles. The BRD rule of one role per user (NFR 3.04) is not applied (decision D5; chapter 21, CLR-CL-18).", Fixed, "-"]
   - [R3, "Lock-out after LOGIN_MAX_FAILED_ATTEMPTS consecutive failed log-ins (default 3).", Configurable, Parameter LOGIN_MAX_FAILED_ATTEMPTS]
   - [R4, "BDO single sign-on with Windows credentials (NFR 1.01) is not part of this phase (Q42).", Fixed, "-"]
+  - [R5, "Collections roles view Remittance and the Production Register of Operations and change nothing there; no new user profile is created (minutes p.1; CLR-CL-37).", Configurable, Role-permission change request]
 validations:
   - [Action without permission, You are not permitted to perform this action, ACCESS_DENIED]
   - [Account locked after failed log-ins (the same message as a wrong password; the lock shows to the System Administrator on Users), Invalid user name or password, AUTHENTICATION_FAILED]
@@ -306,12 +325,13 @@ acceptance:
   - A Marketing AO does not see Collections Setup or Assignments.
   - The User Access Matrix lists the CLX_* permissions under the area COLLECTIONS with their action classes.
   - A user is locked after three consecutive wrong passwords; the correct password is then refused with the same message as a wrong password, and Users shows the lock to the System Administrator.
+  - A Collection Handler searches and opens a remittance and filters the Production Register, read only, without any action to change them.
 ```
 
 ```fr
 id: FR-CL-002
 title: Show who encoded and who updated each record
-brd: [BRCLXN.019 (p.28 / 48), BRCLXN.020 (p.28 / 48)]
+brd: [BRCLXN.019 (p.30 / 50), BRCLXN.020 (p.30 / 50)]
 actor: System
 priority: High
 screens: Collection account (Dispositions & Efforts, History); Promises to Pay; Installment Plans; Escalations; Unapplied Payment
@@ -337,7 +357,7 @@ acceptance:
 ```fr
 id: FR-CL-003
 title: Keep a field-level audit log of Collections changes
-brd: [BRCLXN.043 (p.32 / 49), NFR 4.03 (p.52)]
+brd: [BRCLXN.043 (p.34 / 51), NFR 4.03 (p.54)]
 actor: System
 priority: High
 screens: Collection account (History); Collections Setup
@@ -369,7 +389,7 @@ acceptance:
 ```fr
 id: FR-CL-004
 title: View and extract the Collections audit log
-brd: [BRCLXN.044 (p.32 / 49), NFR 4.05 (p.52)]
+brd: [BRCLXN.044 (p.34 / 51), NFR 4.05 (p.54)]
 actor: Section Head; Application Support; Business Administrator; DCO; Auditor
 priority: High
 screens: Report Centre (Collections Audit Log)
@@ -400,7 +420,7 @@ acceptance:
 ```fr
 id: FR-CL-005
 title: Lock a collection account while a user edits it
-brd: [NFR 9.03 (p.53)]
+brd: [NFR 9.03 (p.55)]
 actor: Collection user; System
 priority: High
 screens: Collection account
@@ -434,7 +454,7 @@ acceptance:
 ```fr
 id: FR-CL-010
 title: Generate the outstanding PR list at invoice level
-brd: [BRCLXN.001 (p.26 / 47), BRCLXN.002 (p.26 / 47), BRCLXN.004 (p.26 / 47)]
+brd: [BRCLXN.001 (p.28 / 49), BRCLXN.002 (p.28 / 49), BRCLXN.004 (p.28 / 49)]
 actor: Collection user
 priority: High
 screens: PR Worklist; Collection account
@@ -472,7 +492,7 @@ acceptance:
 ```fr
 id: FR-CL-011
 title: Apply the minimal balance threshold
-brd: [BRCLXN.005 (p.26 / 47), BRCLXN.008 (p.26 / 47), BRCLXN.009 (p.26 / 47)]
+brd: [BRCLXN.005 (p.28 / 49), BRCLXN.008 (p.28 / 49), BRCLXN.009 (p.28 / 49)]
 actor: System
 priority: High
 screens: PR Worklist
@@ -501,7 +521,7 @@ acceptance:
 ```fr
 id: FR-CL-012
 title: Maintain the threshold and the Collections parameters
-brd: [BRCLXN.006 (p.26 / 47), BRCLXN.007 (p.26 / 47)]
+brd: [BRCLXN.006 (p.28 / 49), BRCLXN.007 (p.28 / 49)]
 actor: Section Head (Corporate); Application Support; Business Administrator; DCO; System Administrator
 priority: High
 screens: Collections Setup (Parameters)
@@ -546,7 +566,7 @@ acceptance:
 ```fr
 id: FR-CL-013
 title: Exclude cancelled negative balances and keep other credits apart
-brd: [BRCLXN.010 (p.27 / 47)]
+brd: [BRCLXN.010 (p.29 / 49)]
 actor: System
 priority: High
 screens: PR Worklist (Excluded, Credit Balances tabs); Collections Home
@@ -575,7 +595,7 @@ acceptance:
 ```fr
 id: FR-CL-014
 title: Total the PR balance by account and by client
-brd: [BRCLXN.003 (p.26 / 47)]
+brd: [BRCLXN.003 (p.28 / 49)]
 actor: Collection user
 priority: High
 screens: PR Worklist (By Account, By Client); Client View
@@ -600,7 +620,7 @@ acceptance:
 ```fr
 id: FR-CL-015
 title: Filter the worklist by market segment, Unit Head and other criteria
-brd: [BRCLXN.011 (p.27 / 47), BRCLXN.012 (p.27 / 47)]
+brd: [BRCLXN.011 (p.29 / 49), BRCLXN.012 (p.29 / 49)]
 actor: Collection user; Section Head (Unit Heads)
 priority: High
 screens: PR Worklist; Collections Setup (Unit Heads)
@@ -644,7 +664,7 @@ acceptance:
 ```fr
 id: FR-CL-016
 title: Show the net PR and its breakdown
-brd: [BRCLXN.046 (p.33 / 50)]
+brd: [BRCLXN.046 (p.35 / 52)]
 actor: Collection user
 priority: High
 screens: Collection account (Summary)
@@ -670,14 +690,14 @@ acceptance:
 ```fr
 id: FR-CL-017
 title: Refresh the worklist every day from the invoice ledger
-brd: [BRCLXN.013 (p.27 / 47), BRCLXN.014 (p.27 / 47), BRCLXN.015 (p.27 / 47; edit p.78)]
+brd: [BRCLXN.013 (p.29 / 49), BRCLXN.014 (p.29 / 49), BRCLXN.015 (p.29 / 49; edit p.80)]
 actor: System; Application Support / DCO (run log)
 priority: High
 screens: PR Worklist; Collection account ("Refresh from Ledger"); Operations > Interfaces and job runs (sync view)
 description:
   - The job CLX_DAILY_REFRESH runs every night at 22:15 (Manila), after the 22:00 end-of-day. It creates accounts for new invoices above the threshold, updates the balances, aging, bracket, Unit Head and flags of the listed accounts, completes accounts at or below the threshold, sets excluded and credit statuses, assigns new accounts by rule (FR-CL-020) and ends expired temporary assignments.
   - Between runs, the balance of a listed account is refreshed after each committed ledger movement or flag change (for example a payment applied), so the worklist shows same-day payments. New invoices wait for the nightly run or "Refresh from Ledger".
-  - The job run history (start, end, counts, result) is the "EBIX/QPS synchronization view" of Application Support and DCO (p.45-46).
+  - The job run history (start, end, counts, result) is the "EBIX/QPS synchronization view" of Application Support and DCO (p.47-48).
 preconditions:
   - "The invoice ledger holds the booked invoices."
 main_flow:
@@ -703,12 +723,12 @@ acceptance:
 ```
 
 > [!NOTE] Difference from the BRD
-> The BRD (p.27, FRID-015 as edited by hand on p.78) describes a nightly extraction from EBIX. In BIBS the booking is internal, so the refresh reads the BIBS ledger. Open EBIX items, their disposition history and unapplied items at go-live need a one-time migration; its scope and format are open (CQ07; chapter 21, CLR-CL-01).
+> The BRD (p.29, FRID-015 as edited by hand on p.80) describes a nightly extraction from EBIX. In BIBS the booking is internal, so the refresh reads the BIBS ledger. Open EBIX items, their disposition history and unapplied items at go-live need a one-time migration; its scope and format are open (CQ07; chapter 21, CLR-CL-01).
 
 ```fr
 id: FR-CL-018
 title: Keep the history of accounts and dispositions
-brd: [BRCLXN.021 (p.28 / 48), BRCLXN.022 (p.28 / 48), BRCLXN.023 (p.28 / 48)]
+brd: [BRCLXN.021 (p.30 / 50), BRCLXN.022 (p.30 / 50), BRCLXN.023 (p.30 / 50)]
 actor: System
 priority: High
 screens: PR Worklist (Completed Collections); Collection account (Timeline, Dispositions & Efforts, History)
@@ -737,7 +757,7 @@ acceptance:
 ```fr
 id: FR-CL-020
 title: Assign new accounts by rule
-brd: [BRCLXN.052 (p.17)]
+brd: [BRCLXN.052 (p.19)]
 actor: System; Collection Team Lead (rules)
 priority: Must have
 screens: Assignments (Default Assignment Rules)
@@ -780,7 +800,7 @@ acceptance:
 ```fr
 id: FR-CL-021
 title: Reassign accounts permanently or temporarily
-brd: [BRCLXN.052 (p.17)]
+brd: [BRCLXN.052 (p.19)]
 actor: Collection Team Lead; Marketing Team Lead; Section Head
 priority: Must have
 screens: Assignments (Reassign by Criteria); PR Worklist (Reassign)
@@ -827,13 +847,13 @@ acceptance:
 ```fr
 id: FR-CL-030
 title: Maintain the PR collector disposition list and its rules
-brd: [BRCLXN.016 (p.27 / 47), BRCLXN.017 (p.27 / 47), BRCLXN.018 (p.28 / 48)]
+brd: [BRCLXN.016 (p.29 / 49), BRCLXN.017 (p.29 / 49), BRCLXN.018 (p.30 / 50)]
 actor: Section Head; Application Support; Business Administrator (LOV maker-checker)
 priority: High
 screens: Lists of Values (CLX_PR_DISPOSITION); Collections Setup (Disposition Rules)
 description:
   - The PR collector dispositions are the list of values CLX_PR_DISPOSITION. Authorised users add values and deactivate them on the LOV screen with maker-checker and effective dates. Deactivated values cannot be selected.
-  - Each value has rules kept on Collections Setup - the category (A, B or C), the tagging owner (Marketing or Operations), the Operations action (none, BIR 2307 reversal, DP reversal, check pick-up, cancellation request) and the roles allowed to use it.
+  - Each value has rules kept on Collections Setup - the category (A, B or C), the tagging owner (Marketing or Operations), the Operations action (none, BIR 2307 reversal, DP reversal, cancellation request) and the roles allowed to use it. Check pick-up is not an Operations action, as the Operations Cashiering annex removed it from scope (R10, CSHID.009).
 preconditions:
   - "The user has LOV_MANAGE (values) or CLX_SETUP (rules)."
 main_flow:
@@ -843,7 +863,7 @@ main_flow:
 alternate_flows:
   - Deactivate. The user sets an end date; after it the value is no longer offered and is refused on save, while old dispositions keep it.
 rules:
-  - [R1, "Values delivered, all to be confirmed by BDOI (CQ08): DP PR for reversal; PR 2307 for reversal; For check pick-up; Cancel account; Coordinate further; Request bank AO assistance; No / missing policy number; DP returned by insurer.", Configurable, LOV CLX_PR_DISPOSITION]
+  - [R1, "Values delivered, all to be confirmed by BDOI (CQ08): DP PR for reversal; PR 2307 for reversal; Cancel account; Coordinate further; Request bank AO assistance; No / missing policy number; DP returned by insurer. For check pick-up is not delivered (check pick-up removed from scope, R10; CLR-CL-33).", Configurable, LOV CLX_PR_DISPOSITION]
   - [R2, "Only active values within their effective dates can be selected.", Fixed, "-"]
   - [R3, "The category A / B / C of each value is not seeded until BDOI gives it (CQ08).", Configurable, Collections Setup (Disposition Rules)]
   - [R4, "No / missing policy number is reserved to Processing, the Collection Handler, the Collection Team Lead and the Section Head.", Configurable, "Disposition Rules (Reserved To)"]
@@ -856,7 +876,7 @@ fields:
   - [Disposition, List, "Yes", LOV CLX_PR_DISPOSITION, Existing value]
   - [Category, List, "No", "A, B, C", "-"]
   - [Tagging Owner, List, "Yes", "Marketing, Operations", "-"]
-  - [Operations Action, List, "Yes", "None, BIR 2307 reversal, DP reversal, Check pick-up, Cancellation request", "-"]
+  - [Operations Action, List, "Yes", "None, BIR 2307 reversal, DP reversal, Cancellation request", "-"]
   - [Reserved To, Check boxes, "No", Roles, None ticked = every collector]
 notifications:
   - "Pending LOV changes appear in My Approvals."
@@ -866,12 +886,13 @@ acceptance:
   - A value added and approved on the LOV screen is offered in Record Disposition.
   - A value ended yesterday is not offered today and a direct call with it is refused.
   - A Collection Handler without an allowed role cannot choose "No / missing policy number" when the value is reserved.
+  - Record Disposition does not offer "For check pick-up", and the Operations Action list of Disposition Rules has no check pick-up.
 ```
 
 ```fr
 id: FR-CL-031
 title: Record a PR collector disposition
-brd: [BRCLXN.016 (p.27 / 47), BRCLXN.018 (p.28 / 48), BRCLXN.021 (p.28 / 48); current process (p.40-41)]
+brd: [BRCLXN.016 (p.29 / 49), BRCLXN.018 (p.30 / 50), BRCLXN.021 (p.30 / 50); current process (p.42-43)]
 actor: Collection Handler; Marketing AO / Handler / TL; Processing Unit (restricted value)
 priority: High
 screens: PR Worklist (Record Disposition); Collection account (Dispositions & Efforts)
@@ -919,20 +940,20 @@ acceptance:
 ```fr
 id: FR-CL-032
 title: Hand dispositions over to Cashiering and Commission
-brd: [BRCLXN.024 (p.28 / 48), BRCLXN.026 (p.29 / 48); current process (p.40-41); MKTID.010 / 012 / 013 (BRD-2)]
+brd: [BRCLXN.024 (p.30 / 50), BRCLXN.026 (p.31 / 50); current process (p.42-43); MKTID.010 / 012 / 013 (BRD-2); CSHID.009 removed (Operations_WS Addendum p.4-6)]
 actor: System; Cashiering; Commission Receivables Unit
 priority: High
-screens: Collection account (Hand-offs to Operations); Cashiering > Check Pick-up; Commission > DP Lists; Collections Home (DP Returned by Insurer)
+screens: Collection account (Hand-offs to Operations); Commission > DP Lists; Collections Home (DP Returned by Insurer)
 description:
   - A disposition with an Operations action places an item in the Collections outbox for the module that owns the money effect. Cashiering and Commission take the items inside BIBS; the item keeps its status (PENDING, TAKEN, CANCELLED).
-  - "Check pick-up: an item for the Cashiering pick-up queue with the pick-up date, address, contact person, check amount, number and bank."
+  - "Check pick-up: removed from scope. The Operations Cashiering annex removed CSHID.009 (a check for pick-up from Collection) from BDOI's future process (R10), so no disposition hands a check pick-up to Cashiering and walkthrough A ends at the collection effort (CLR-CL-33)."
   - "BIR 2307 reversal: an item for Cashiering's 2307 intake. It is queued when the tagging owner is Operations or when the path is CASH; the CERTIFICATE path needs the certificate number."
   - "DP reversal: an item for the Commission DP list with the DP list columns and the invoicing branch."
   - When an insurer returns a DP account, Commission sends it back; BIBS reopens the account, records the disposition "DP returned by insurer" with the reason and notifies the handler.
 preconditions:
   - "A disposition with an Operations action was recorded (FR-CL-031)."
 main_flow:
-  - BIBS creates the outbox item with a unique key (PU, CWT or DP, invoice and disposition).
+  - BIBS creates the outbox item with a unique key (CWT or DP, invoice and disposition).
   - BIBS publishes that the feed has pending items.
   - The consuming module takes the item and processes it with its own rules.
   - The account's Hand-offs to Operations panel shows the status of each item.
@@ -942,23 +963,16 @@ alternate_flows:
   - DP returned. The Commission return reopens the account (FR-CL-018) with the disposition DP_RETURNED.
 rules:
   - [R1, "Collections posts no journal and no ledger movement; Cashiering and Commission post the effects.", Fixed, "-"]
-  - [R2, "The pick-up date is today or later; the check amount is required.", Fixed, "-"]
+  - [R2, "No disposition creates a check pick-up item; the check pick-up hand-off is removed from scope (CSHID.009, R10).", Fixed, "-"]
   - [R3, "The 2307 path is a certificate received or a payment in cash.", Fixed, "-"]
   - [R4, "Stale threshold 1 day.", Configurable, Exception code CLX_OUTBOX_STALE]
 validations:
-  - [Pick-up date in the past, Give a pick-up date from today on for the check pick-up, CLX_PICKUP_DATE]
-  - [Check amount missing, Give the check amount, CLX_PICKUP_AMOUNT]
   - [2307 path not one of the two paths, "Choose the 2307 path: certificate received or paid in cash", CLX_CWT_PATH]
   - [Required detail missing, "Give <detail>", CLX_DISPOSITION_DETAIL]
   - [Detail not a date, "'<value>' is not a date (yyyy-mm-dd)", CLX_DISPOSITION_DETAIL]
   - [Detail not an amount, "'<value>' is not an amount", CLX_DISPOSITION_DETAIL]
 fields_screen: Record Disposition (detail fields)
 fields:
-  - [Pick-up Date, Date, Conditional, "-", "Check pick-up; today or later"]
-  - [Pick-up Address, Text, Conditional, "-", Check pick-up]
-  - [Contact Person, Text, "No", "-", "-"]
-  - [Check Amount, Amount, Conditional, "-", "Check pick-up; > 0"]
-  - [Check No. / Check Bank, Text, "No", "-", "-"]
   - [Path, List, Conditional, "CASH, CERTIFICATE", BIR 2307 reversal]
   - [Certificate No., Text, Conditional, "-", Required for CERTIFICATE]
   - [Certificate Period From / To, Date, "No", "-", From <= To]
@@ -969,18 +983,18 @@ notifications:
 audit:
   - "Outbox and inbox items keep their key, fields, status and times; the consuming module logs the take in its flow-in run."
 acceptance:
-  - A "For check pick-up" disposition creates a request in Cashiering's Check Pick-up queue with the date and address given.
+  - No disposition offers a check pick-up, and no item reaches a Cashiering pick-up queue (removed from scope, CSHID.009).
   - A "DP PR for reversal" disposition appears on the Commission DP list.
   - A DP account returned by the insurer is open again in the handler's worklist with the disposition "DP returned by insurer".
 ```
 
 > [!NOTE] For confirmation
-> Cashiering takes the COLLECTION_CWT2307 items in its 2307 intake; an item not taken within one day raises CLX_OUTBOX_STALE (chapter 21, CLR-CL-06).
+> Cashiering takes the COLLECTION_CWT2307 items in its 2307 intake; an item not taken within one day raises CLX_OUTBOX_STALE (chapter 21, CLR-CL-06). The re-issued Operations BRD v1.01 moves the PR 2307 reversal to Marketing Collection and removes Cashiering from the certificate handling (CSHID.026-027); the receiving step of the 2307 hand-off is confirmed with the BRD-2 re-base (CLR-CL-42).
 
 ```fr
 id: FR-CL-033
 title: Log collection efforts, remarks and the tagging category
-brd: ["Stakeholder functions - manage collection effort transactions (p.43-46)", "Report fields Last Collection Effort Date, Code, Remarks (p.59)", "Categories A, B, C (p.41 / 61)"]
+brd: ["Stakeholder functions - manage collection effort transactions (p.45-48)", "Report fields Last Collection Effort Date, Code, Remarks (p.61)", "Categories A, B, C (p.43 / 63)"]
 actor: Collection Handler; Marketing AO / Handler / TL
 priority: High
 screens: PR Worklist (Log Effort, Update Remarks and Category); Collection account (Dispositions & Efforts)
@@ -1018,12 +1032,12 @@ acceptance:
 ```
 
 > [!NOTE] Capabilities without an FR ID
-> The Marketing Diary (p.40-42) and the credit term extension (CTE, p.38-41) appear only in the process diagrams. The CTE is recorded as an effort with remarks until BDOI decides whether it is tracked in BIBS; the Marketing Diary panel waits for CQ20.
+> The Marketing Diary (p.42-44) and the credit term extension (CTE, p.40-43) appear only in the process diagrams. The CTE is recorded as an effort with remarks until BDOI decides whether it is tracked in BIBS; the Marketing Diary panel waits for CQ20.
 
 ```fr
 id: FR-CL-034
 title: Update several accounts at once
-brd: [BRCLXN.051 (p.17)]
+brd: [BRCLXN.051 (p.19)]
 actor: Collection user with CLX_BULK_UPDATE
 priority: Must have
 screens: PR Worklist (bulk actions); Promises to Pay; Escalations; Bulk Uploads (Collections Bulk Update)
@@ -1075,7 +1089,7 @@ acceptance:
 ```fr
 id: FR-CL-040
 title: Create installment plans for multi-year and installment accounts
-brd: [BRCLXN.053 (p.17-18)]
+brd: [BRCLXN.053 (p.19-20); Minutes of 27-Apr-2026 on BRD 53 (p.1-2)]
 actor: Collection Handler; Collection / Marketing Team Lead; Section Head
 priority: Must have
 screens: Installment Plans (New Installment Plan); Installment Plan; Installments Due
@@ -1098,7 +1112,7 @@ rules:
   - [R1, "One live plan per invoice and per policy-year account.", Fixed, "-"]
   - [R2, "Billing frequencies Annual, Semi-annual, Quarterly, Monthly.", Configurable, LOV CLX_BILLING_FREQUENCY]
   - [R3, "At most 120 installments in one plan.", Fixed, "-"]
-  - [R4, "Installment terms are entered in Collections; taking them from the quotation or the account waits for CQ15.", Fixed, "-"]
+  - [R4, "Installment terms are entered in Collections. The minutes record that schedules are kept in Excel or offline files today, that the requirement does not depend on a source system and that the integration approach is decided in design; the proposal is plans made in BIBS, with a one-time load of the current schedules through the data migration (CQ15; CLR-CL-12).", Fixed, "-"]
 validations:
   - [Account without a booked policy year, "Account <ARN> has no booked policy year", CLX_PLAN_NOT_BOOKED]
   - [Invoice with nothing outstanding, "Invoice <no> has no outstanding premium to schedule", CLX_PLAN_NOTHING_DUE]
@@ -1133,7 +1147,7 @@ acceptance:
 ```fr
 id: FR-CL-041
 title: Allocate payments to installments and show the payment history
-brd: [BRCLXN.054 (p.18)]
+brd: [BRCLXN.054 (p.20)]
 actor: Collection user; System
 priority: Must have
 screens: Collection account (Payments); Installment Plan (Installments); Installment Plans (Refresh Allocation)
@@ -1164,7 +1178,7 @@ acceptance:
 ```fr
 id: FR-CL-042
 title: Record and evaluate promises to pay
-brd: [BRCLXN.055 (p.18), BRCLXN.053 (p.17-18)]
+brd: [BRCLXN.055 (p.20), BRCLXN.053 (p.19-20)]
 actor: Collection user; System (promise check)
 priority: Must have
 screens: Promises to Pay (Record Promise, Withdraw Promise); Installment Plan (Promises)
@@ -1214,7 +1228,7 @@ acceptance:
 ```fr
 id: FR-CL-043
 title: View policy, account, invoice and co-insurance information
-brd: [BRCLXN.056 (p.18-19)]
+brd: [BRCLXN.056 (p.20-21)]
 actor: Collection user
 priority: Must have
 screens: Collection account (Policy & Co-insurance, Summary); Invoice 360 (link)
@@ -1243,11 +1257,11 @@ acceptance:
 ```fr
 id: FR-CL-044
 title: View the complete transaction history of an account
-brd: [BRCLXN.057 (p.19)]
+brd: [BRCLXN.057 (p.21); Minutes of 27-Apr-2026 on BRD 57 (p.1)]
 actor: Collection user
 priority: Must have
 screens: Collection account (Timeline)
-description: The Timeline tab merges in date order the ledger movements of the invoice (applied, adjusted, written off, DP reversal, 2307 reclass) and the Collections actions (assignments, dispositions, efforts, hand-offs, items received from Operations). Each entry shows its date, source, description, amount and user. The history is kept for audit and never deleted.
+description: The Timeline tab merges in date order the financial ledger movements of the invoice (payments applied, financial endorsements and adjustments, written off, DP reversal, 2307 reclass) and the Collections actions (assignments, dispositions, efforts, hand-offs, items received from Operations). Each entry shows its date, source, description, amount and user. The history is kept for audit and never deleted.
 preconditions:
   - "The user has CLX_VIEW."
 main_flow:
@@ -1255,6 +1269,7 @@ main_flow:
   - BIBS shows the merged entries, newest first, with their source (Ledger, Assignment, Disposition, Effort, Hand-off, From Operations).
 rules:
   - [R1, "Entries are never edited or deleted.", Fixed, "-"]
+  - [R2, "The ledger entries are financial events only - payments, financial endorsements and adjustments; a non-financial endorsement is not listed (minutes p.1).", Fixed, "-"]
 validations: []
 notifications:
   - "None."
@@ -1262,6 +1277,7 @@ audit:
   - "Read only."
 acceptance:
   - After a payment, a disposition and a reassignment, the Timeline shows the three entries in date order with their sources.
+  - A non-financial endorsement of the policy (for example a change of address) adds no entry to the Timeline.
 ```
 
 ## Escalation
@@ -1269,7 +1285,7 @@ acceptance:
 ```fr
 id: FR-CL-050
 title: Maintain escalation rules
-brd: [BRCLXN.049 (p.16)]
+brd: [BRCLXN.049 (p.18); Minutes of 27-Apr-2026 on BRD 48-49 (p.1)]
 actor: Collection Team Lead (maker, with CLX_SETUP); authoriser with MASTER_AUTHORIZE
 priority: Must have
 screens: Escalation Rules
@@ -1287,7 +1303,7 @@ alternate_flows:
   - Preview. The maker checks the accounts a rule matches before authorisation.
 rules:
   - [R1, "Bases - aging from booking, aging from inception, no commitment by day N (no open promise), broken promises count, installment overdue days, amount over.", Fixed, "-"]
-  - [R2, "Delivered rules, to be confirmed (CQ14) - broken promise to the team lead; 45 days from booking to the TL; 60th day from inception to the UH; installment overdue 15 days to the TL.", Configurable, Escalation Rules]
+  - [R2, "Delivered rules, to be confirmed (CQ14) - broken promise to the team lead; 45 days from booking to the TL; 60th day from inception to the UH; installment overdue 15 days to the TL; and, from the thresholds of the minutes (45, 60 and 120 days), 120 days from booking to the Section Head (CLR-CL-34).", Configurable, Escalation Rules]
   - [R3, "The maker never authorises the rule.", Fixed, "-"]
 validations:
   - [Company or code missing, Enter the company and the rule code, CLX_RULE_CODE]
@@ -1316,12 +1332,13 @@ acceptance:
   - A rule "aging from booking 45 days to the TL" is not applied until another user authorises it.
   - The maker cannot authorise their own rule.
   - Preview of the authorised rule lists the accounts over 45 days old.
+  - A rule "aging from booking 120 days to the Section Head", once authorised, escalates an account 121 days from booking to the Section Head.
 ```
 
 ```fr
 id: FR-CL-051
 title: Escalate accounts automatically
-brd: [BRCLXN.049 (p.16), BRCLXN.055 (p.18)]
+brd: [BRCLXN.049 (p.18), BRCLXN.055 (p.20)]
 actor: System
 priority: Must have
 screens: Escalations; Escalation; Collections Home
@@ -1357,7 +1374,7 @@ acceptance:
 ```fr
 id: FR-CL-052
 title: Escalate accounts manually
-brd: [BRCLXN.050 (p.16)]
+brd: [BRCLXN.050 (p.18)]
 actor: Collection user with CLX_ESCALATE
 priority: Not stated in the BRD
 screens: Escalations (Escalate Accounts); PR Worklist
@@ -1399,7 +1416,7 @@ acceptance:
 ```fr
 id: FR-CL-053
 title: Act on an escalation
-brd: [BRCLXN.049 (p.16), BRCLXN.050 (p.16)]
+brd: [BRCLXN.049 (p.18), BRCLXN.050 (p.18)]
 actor: Team Lead, Unit Head, Section Head (CLX_ESCALATION_HANDLE); handler (resubmit)
 priority: Must have
 screens: Escalations (inbox per stage); Escalation (workflow panel)
@@ -1439,26 +1456,31 @@ acceptance:
 ```fr
 id: FR-CL-060
 title: Generate billing statements per billing cycle
-brd: [BRCLXN.058 (p.19)]
-actor: Collection Handler; Team Lead (CLX_BILLING)
+brd: [BRCLXN.058 (p.21); Minutes of 27-Apr-2026 on BRD 58 (p.1)]
+actor: Operations billing user (Accounting / Operations; proposed the Cashiering Team Leader / Head, CLX_SOA_ISSUE); Collection user (view)
 priority: Must have
 screens: Billing Statements (Billing Run); Installment Plan (Statements of Account); Statement of Account
 description:
   - BIBS generates a statement of account (SOA) for a billing cycle of a live installment plan. The SOA lists the installment of the cycle (CURRENT) with its coverage period and every earlier installment still unpaid (ARREARS), the payments allocated on the day (FR-CL-041) and the amount due. It is numbered SOA-yyyy-n and rendered to PDF from the template CLX_SOA, whose version is recorded.
   - A billing run generates the SOAs of every cycle of the live plans falling due in a period and not billed yet; a single cycle is billed from its plan.
+  - The minutes of 27 April 2026 give the generation of the billing statements to Accounting / Operations; Collections users have visibility only. The Operations billing user therefore runs the billing and generates the statements; the Collection Handlers and Team Leads see the statements of their plans, their lines and the e-mails sent and download the PDF, read only. The billing frequency of a plan stays with the collector who makes the plan (FR-CL-040).
 preconditions:
-  - "The user has CLX_BILLING; the plan is ACTIVE."
+  - "The user has CLX_SOA_ISSUE (generate) or CLX_VIEW (view); the plan is ACTIVE."
 main_flow:
-  - The user opens Billing Statements and clicks **Billing Run**, entering the due period.
+  - The Operations billing user opens Billing Statements and clicks **Billing Run**, entering the due period.
   - BIBS refreshes the allocation, then generates one SOA per plan cycle due in the period.
   - The user opens a statement and downloads the PDF.
 alternate_flows:
-  - One cycle. From an installment plan the user generates the SOA of one cycle.
+  - One cycle. From an installment plan the Operations billing user generates the SOA of one cycle.
+  - Collections view. A Collection Handler or Team Lead opens Billing Statements, the Statements of Account tab of a plan or a statement, and downloads the PDF; Billing Run, Generate SOA, Send via Email and Cancel Statement are not offered.
 rules:
   - [R1, "One live SOA per plan and billing cycle.", Fixed, "-"]
   - [R2, "Amounts follow the installment of the policy period; multi-year and installment policies are supported.", Fixed, "-"]
-  - [R3, "Layout, recipient and numbering are drafts until BDOI answers CQ18.", Configurable, Document template CLX_SOA]
+  - [R3, "Layout, recipient and numbering are drafts until BDOI answers CQ18 and provides the sample SOA annex announced in the minutes.", Configurable, Document template CLX_SOA]
+  - [R4, "Only CLX_SOA_ISSUE holders generate statements; the Collections roles view them (minutes p.1; CLR-CL-32).", Configurable, Role-permission change request]
+  - [R5, "No new user profile: the permission is granted to an existing Operations profile named by BDOI.", Fixed, "-"]
 validations:
+  - [Collections user starts a billing run or generates a statement, You are not permitted to perform this action, ACCESS_DENIED]
   - [Cycle already billed, "Cycle <n> of <plan> is billed by <SOA>", CLX_SOA_EXISTS]
   - [Plan cancelled, "Plan <no> is cancelled", CLX_PLAN_NOT_ACTIVE]
   - [Period end before start, The period ends before it starts, CLX_SOA_PERIOD]
@@ -1473,18 +1495,19 @@ acceptance:
   - For the three-year seed account with an annual plan, BIBS produces an SOA for each of its three billing cycles.
   - A second SOA for a billed cycle is refused until the first is cancelled.
   - The SOA shows the coverage period of the installment and any unpaid earlier installment as arrears.
+  - A Collection Handler sees the statements of a plan and downloads the PDF, but has no Billing Run or Generate SOA action.
 ```
 
 ```fr
 id: FR-CL-061
 title: Send or cancel a billing statement
-brd: [BRCLXN.058 (p.19)]
-actor: Collection Handler; Team Lead (CLX_BILLING)
+brd: [BRCLXN.058 (p.21); Minutes of 27-Apr-2026 on BRD 58 (p.1)]
+actor: Operations billing user (CLX_SOA_ISSUE); Collection user (view of the e-mails sent)
 priority: Must have
 screens: Statement of Account (Send Statement of Account, Cancel Statement of Account, E-mails Sent)
-description: The user sends a generated SOA by e-mail. The PDF is password-protected and the password goes in a separate e-mail; the send log is kept on the statement (status SENT). A statement can be cancelled so the cycle can be billed again.
+description: The Operations billing user sends a generated SOA by e-mail. The PDF is password-protected and the password goes in a separate e-mail; the send log is kept on the statement (status SENT) and the Collections users see it. A statement can be cancelled so the cycle can be billed again.
 preconditions:
-  - "The user has CLX_BILLING; the statement is GENERATED or SENT."
+  - "The user has CLX_SOA_ISSUE; the statement is GENERATED or SENT."
 main_flow:
   - The user opens a statement and clicks **Send Statement of Account**.
   - The user enters or confirms the recipients.
@@ -1494,7 +1517,9 @@ alternate_flows:
 rules:
   - [R1, "SOAs leave BIBS as password-protected PDF.", Fixed, "-"]
   - [R2, "Recipients (client, bank) are to be confirmed (CQ18).", Configurable, Statement recipient]
+  - [R3, "Only CLX_SOA_ISSUE holders send or cancel a statement; the Collections roles see the status and the e-mails sent (CLR-CL-32).", Configurable, Role-permission change request]
 validations:
+  - [Collections user sends or cancels a statement, You are not permitted to perform this action, ACCESS_DENIED]
   - [No recipient, Enter at least one recipient, CLX_SOA_RECIPIENT]
   - [Statement cancelled, "Statement <SOA> is cancelled", CLX_SOA_CANCELLED]
 fields_screen: Send Statement of Account
@@ -1507,20 +1532,21 @@ audit:
 acceptance:
   - Sending an SOA sends two e-mails (document and password) and sets the statement to SENT.
   - A cancelled statement cannot be sent.
+  - A Collection Handler sees the statement SENT with its e-mails but has no Send via Email or Cancel Statement action.
 ```
 
 ```fr
 id: FR-CL-062
 title: Keep billing as monitoring only
-brd: [BRCLXN.060 (p.20)]
-actor: System; Collection user / Team Lead
+brd: [BRCLXN.060 (p.22); Minutes of 27-Apr-2026 on BRD 59-60 (p.1)]
+actor: System; Collection user / Team Lead (view); Operations billing user
 priority: Must have
 screens: Billing Statements; PR Worklist; Collection account
-description: Billing statements, invoice dates and policy periods are visible to support aging, monitoring and escalation. Generating an SOA creates no receivable, no collection account and no commission receivable billing; the receivable remains the booked invoice in the ledger. Aging counts from the booking or inception date (CLX_AGING_BASIS).
+description: Billing statements, invoice dates and policy periods are visible, read only, to the Collections users to support aging, monitoring and escalation (minutes p.1). Generating an SOA creates no receivable, no collection account and no commission receivable billing; the receivable remains the booked invoice in the ledger. Aging counts from the booking or inception date (CLX_AGING_BASIS).
 preconditions:
   - "None."
 main_flow:
-  - A user generates an SOA (FR-CL-060).
+  - The Operations billing user generates an SOA (FR-CL-060).
   - BIBS stores the statement and its lines only.
   - The worklist and aging are unchanged.
 rules:
@@ -1546,7 +1572,7 @@ Cashiering owns the unapplied payment, its tabs, its disposition workflow OPS_DI
 ```fr
 id: FR-CL-070
 title: View the list of unapplied payments as of today
-brd: [BRCLXN.034 (p.30 / 48), BRCLXN.036 (p.31 / 49)]
+brd: [BRCLXN.034 (p.32 / 50), BRCLXN.036 (p.33 / 51)]
 actor: Collection Handler; Unapplied Payment Handler; Marketing AO; Cashiering (read)
 priority: High
 screens: Unapplied Payments; Unapplied Payment (Payment & Account)
@@ -1589,7 +1615,7 @@ acceptance:
 ```fr
 id: FR-CL-071
 title: Filter unapplied payments by market segment and disposition status
-brd: [BRCLXN.035 (p.30 / 48)]
+brd: [BRCLXN.035 (p.32 / 50)]
 actor: Collection user
 priority: High
 screens: Unapplied Payments (filters)
@@ -1620,7 +1646,7 @@ acceptance:
 ```fr
 id: FR-CL-072
 title: Maintain the unapplied payment disposition list
-brd: [BRCLXN.037 (p.32 / 49), BRCLXN.038 (p.32 / 49), BRCLXN.039 (p.32 / 49)]
+brd: [BRCLXN.037 (p.34 / 51), BRCLXN.038 (p.34 / 51), BRCLXN.039 (p.34 / 51)]
 actor: Section Head; Application Support; Business Administrator
 priority: High
 screens: Lists of Values (CLX_UPP_DISPOSITION); Collections Setup (Disposition Rules)
@@ -1654,7 +1680,7 @@ acceptance:
 ```fr
 id: FR-CL-073
 title: Record a collector disposition on an unapplied payment
-brd: [BRCLXN.031 (p.29 / 48), BRCLXN.033 (p.29 / 48)]
+brd: [BRCLXN.031 (p.31 / 50), BRCLXN.033 (p.31 / 50)]
 actor: Collection Handler; Unapplied Payment Handler; Marketing AO / Handler / TL
 priority: High
 screens: Unapplied Payments (Record Disposition); Unapplied Payment (Collector Dispositions)
@@ -1691,7 +1717,7 @@ acceptance:
 ```fr
 id: FR-CL-074
 title: Request Cashiering to apply, refund, reclass or transfer a payment
-brd: [BRCLXN.030 (p.29 / 48), BRCLXN.032 (p.29 / 48)]
+brd: [BRCLXN.030 (p.31 / 50), BRCLXN.032 (p.31 / 50)]
 actor: Collection Handler; Unapplied Payment Handler; Cashier (accepts)
 priority: High
 screens: Unapplied Payments (Request Application); Requests to Cashiering; Cashiering > Incoming Requests (Collector Requests)
@@ -1731,7 +1757,7 @@ acceptance:
 ```fr
 id: FR-CL-075
 title: Validate the invoice of "for application to invoice"
-brd: [BRCLXN.047 (p.33 / 50), BRCLXN.048 (p.33 / 50)]
+brd: [BRCLXN.047 (p.35 / 52), BRCLXN.048 (p.35 / 52)]
 actor: System
 priority: High
 screens: Record Disposition (unapplied)
@@ -1765,7 +1791,7 @@ acceptance:
 ```fr
 id: FR-CL-076
 title: Keep the history of unapplied payments and dispositions
-brd: [BRCLXN.040 (p.32 / 49)]
+brd: [BRCLXN.040 (p.34 / 51)]
 actor: System; Collection user (read)
 priority: High
 screens: Unapplied Payment (History, Collector Dispositions, Requests to Cashiering)
@@ -1789,12 +1815,12 @@ acceptance:
 ```fr
 id: FR-CL-077
 title: Produce the daily "For Application To Invoice" file
-brd: [BRCLXN.041 (p.32 / 49), BRCLXN.042 (p.32 / 49)]
+brd: [BRCLXN.041 (p.34 / 51), BRCLXN.042 (p.34 / 51)]
 actor: System; Section Head / user with CLX_EXPORT (manual run)
 priority: High
 screens: Requests to Cashiering (File column); Report Centre (For Application To Invoice)
 description:
-  - At 05:00 every day the job CLX_APPLICATION_FILE writes, per company, a pipe-delimited text file FOR_APPLICATION_TO_INVOICE_<yyyyMMdd>_<time>.txt of the application requests made up to the end of the previous day and not yet listed. The fields are payment date, payment file name, transaction no., paid amount, currency, payment type, payor, reference no., assured, invoice no., user ID of the disposition, unapplied reference and request key (p.60).
+  - At 05:00 every day the job CLX_APPLICATION_FILE writes, per company, a pipe-delimited text file FOR_APPLICATION_TO_INVOICE_<yyyyMMdd>_<time>.txt of the application requests made up to the end of the previous day and not yet listed. The fields are payment date, payment file name, transaction no., paid amount, currency, payment type, payor, reference no., assured, invoice no., user ID of the disposition, unapplied reference and request key (p.62).
   - The file is kept in the list of extracts under FS04/CLX_APPLICATION_TO_INVOICE; each request records the file name. The report For Application To Invoice lists the same requests for any period.
 preconditions:
   - "Application requests exist."
@@ -1827,7 +1853,7 @@ acceptance:
 ```fr
 id: FR-CL-080
 title: Produce the "DP PR for reversal" files
-brd: [BRCLXN.024 (p.28 / 48), BRCLXN.025 (p.28 / 48)]
+brd: [BRCLXN.024 (p.30 / 50), BRCLXN.025 (p.30 / 50)]
 actor: System; Collection user, CRU (download)
 priority: High
 screens: Collections Files (Monthly); Report Centre (DP PR for Reversal)
@@ -1857,11 +1883,11 @@ acceptance:
 ```fr
 id: FR-CL-081
 title: Produce the "PR 2307 for reversal" files
-brd: [BRCLXN.026 (p.29 / 48), BRCLXN.027 (p.29 / 48)]
+brd: [BRCLXN.026 (p.31 / 50), BRCLXN.027 (p.31 / 50)]
 actor: System; Collection user, Cashiering (download)
 priority: High
 screens: Collections Files (Monthly); Report Centre (PR 2307 for Reversal)
-description: On the first working day of the month the same job generates the Excel file "PR 2307 for Reversal" of the accounts tagged with that disposition in the previous month, available from 08:00. The columns are the p.59 fields BIBS holds, including the PR2307 amount and the difference between the premium balance and the PR2307.
+description: On the first working day of the month the same job generates the Excel file "PR 2307 for Reversal" of the accounts tagged with that disposition in the previous month, available from 08:00. The columns are the p.61 fields BIBS holds, including the PR2307 amount and the difference between the premium balance and the PR2307.
 preconditions:
   - "Accounts were tagged PR 2307 for reversal in the previous month."
 main_flow:
@@ -1881,7 +1907,7 @@ acceptance:
 ```fr
 id: FR-CL-082
 title: Produce the weekly reversal files per unit and branch
-brd: [BRCLXN.028 (p.29 / 48), BRCLXN.029 (p.29 / 48)]
+brd: [BRCLXN.028 (p.31 / 50), BRCLXN.029 (p.31 / 50)]
 actor: System; Collection user (download)
 priority: High
 screens: Collections Files (Weekly)
@@ -1908,7 +1934,7 @@ acceptance:
 ```fr
 id: FR-CL-083
 title: Produce the daily PR report
-brd: [BRCLXN.045 (p.33 / 50)]
+brd: [BRCLXN.045 (p.35 / 52)]
 actor: System; Collection user (download)
 priority: High
 screens: Collections Files (Daily); Report Centre (Outstanding PR List, Full Production Report)
@@ -1920,7 +1946,7 @@ main_flow:
   - BIBS archives them and notifies the CLX_EXPORT users.
 rules:
   - [R1, "Schedule 22:30 Manila daily.", Configurable, Job schedule (System Administrator)]
-  - [R2, "The p.60-61 fields BIBS holds are filled; legacy fields (cover number, QPS reference, EBIX invoice number) wait for CQ22.", Fixed, "-"]
+  - [R2, "The p.62-63 fields BIBS holds are filled; legacy fields (cover number, QPS reference, EBIX invoice number) wait for CQ22.", Fixed, "-"]
 validations: []
 notifications:
   - CLX_FILE_READY to the CLX_EXPORT users.
@@ -1933,7 +1959,7 @@ acceptance:
 ```fr
 id: FR-CL-084
 title: Export lists on request without slowing the system
-brd: ["Stakeholder functions - export the disposition list and completed collections (p.43-46)", "Caveat of the Operations Head (p.93)"]
+brd: ["Stakeholder functions - export the disposition list and completed collections (p.45-48)", "Caveat of the Operations Head (p.95)"]
 actor: Collection user with CLX_EXPORT
 priority: High
 screens: PR Worklist (Export to Files); Collections Files (Exports); Report Centre (Collections reports)
@@ -1961,11 +1987,13 @@ acceptance:
 ```fr
 id: FR-CL-085
 title: Show the Collections home
-brd: ["Stakeholder functions - view your dashboard (p.43-46)", "Report Dashboard (p.61)"]
+brd: ["Stakeholder functions - view your dashboard (p.45-48)", "Report Dashboard (p.63)", "Minutes of 27-Apr-2026 on BRD 54-55 (p.1)"]
 actor: Every Collections user
 priority: High
 screens: Collections Home
-description: Collections Home shows the user's work as tiles with counts and links - My Open Accounts, All Open Accounts, Unassigned Accounts, DP Returned by Insurer, Credit Balances, Files Ready This Week, and for unapplied-payment users Unapplied Awaiting Disposition and My Requests in Cashiering - and a chart of the open amounts per aging bracket, for all segments or one.
+description:
+  - Collections Home shows the user's work as tiles with counts and links - My Open Accounts, All Open Accounts, Unassigned Accounts, DP Returned by Insurer, Credit Balances, Files Ready This Week, and for unapplied-payment users Unapplied Awaiting Disposition and My Requests in Cashiering - and a chart of the open amounts per aging bracket, for all segments or one.
+  - For the Collection Handlers and the Team Leads the home also shows Broken Promises, Promises Due, Overdue Installments and Open Escalations, because the minutes of 27 April 2026 ask for dashboard views of broken promises and overdue installments for handlers and supervisors (CLR-CL-35). Each tile opens its list (Promises to Pay, Installments Due, Escalations) filtered to the user's accounts, or to the team for a Team Lead.
 preconditions:
   - "The user has CLX_VIEW (or another Collections permission)."
 main_flow:
@@ -1973,7 +2001,7 @@ main_flow:
   - BIBS shows the tiles the user's permissions allow and the aging chart.
   - The user clicks a tile to open the filtered list.
 rules:
-  - [R1, "Dashboard content per role is to be confirmed (CQ21).", Fixed, "-"]
+  - [R1, "The broken-promise, promise, overdue-installment and escalation tiles are shown to the users with CLX_WORK; the other content per role is to be confirmed (CQ21, partly answered by the minutes).", Fixed, "-"]
 validations: []
 notifications:
   - "None."
@@ -1982,19 +2010,20 @@ audit:
 acceptance:
   - A handler with 12 open accounts sees 12 on My Open Accounts; clicking it opens the worklist filtered to them.
   - A user without CLX_UNAPPLIED_WORK does not see the unapplied tiles.
+  - A handler with one broken promise sees 1 on Broken Promises; clicking it opens Promises to Pay on the Broken tab.
 ```
 
-> [!NOTE] Other tiles
-> Tiles for installments due, promises due, broken promises and escalations. These are are also possible for installments due, promises due, broken promises and escalations. These are reached from their own screens (Installments Due, Promises to Pay, Escalations); adding them to the home waits for CQ21.
+> [!NOTE] For confirmation
+> The screenshot of Collections Home in chapter 13 shows the tiles of the SIT environment; the four tiles Broken Promises, Promises Due, Overdue Installments and Open Escalations are proposed for confirmation (CLR-CL-35). Until then the same lists are reached from Promises to Pay, Installments Due and Escalations.
 
 ## Commission receivable and incentives
 
-BRCLXN.059 is signed. BRCLXN.061-064 are only in the unsigned draft of the workshop addendum (p.8-12) and their scope is confirmed through CQ01. The Commission Receivables Unit is the Operations Commission team, so these rows belong to the Commission module of BRD-2, not to Collections. FR-CL-091 to FR-CL-094 are proposed for confirmation (chapter 21, CLR-CL-17); their messages are confirmed with the draft.
+BRCLXN.059 is signed. BRCLXN.061-064 are only in the unsigned draft of the workshop addendum (p.10-14) and their scope is confirmed through CQ01. The walkthrough of 27 April 2026 covered them (minutes p.1): BDOI confirmed their intent but did not sign them, so written confirmation of the scope is still asked. The Commission Receivables Unit is the Operations Commission team, so these rows belong to the Commission module of BRD-2, not to Collections. FR-CL-091 to FR-CL-094 are proposed for confirmation (chapter 21, CLR-CL-17); their messages are confirmed with the draft.
 
 ```fr
 id: FR-CL-090
 title: Bill commission receivable only after the premium is confirmed paid
-brd: [BRCLXN.059 (p.19-20)]
+brd: [BRCLXN.059 (p.21-22); Minutes of 27-Apr-2026 on BRD 59-60 (p.1)]
 actor: Commission Receivables Unit (reviewer)
 priority: Must have
 screens: Commission > DP Accounts; DP Billings
@@ -2011,7 +2040,8 @@ alternate_flows:
   - Not confirmed. An account that is not confirmed cannot be billed.
 rules:
   - [R1, "A CR billing contains only accounts confirmed fully paid to the insurer.", Fixed, "-"]
-  - [R2, "An SOA or a disposition never creates a CR billing.", Fixed, "-"]
+  - [R2, "An SOA or a disposition never creates a CR billing; Collections has read-only visibility and nothing triggers a commission receivable automatically (minutes p.1).", Fixed, "-"]
+  - [R3, "The minutes name Marketing Collections as the team that confirms fully paid accounts and triggers the commission billing; BIBS proposes the CRU reviewer of BRD-2 for that step (CLR-CL-40).", Fixed, "-"]
 validations:
   - [Account not confirmed, "Account <invoice> is not confirmed for billing (<tag>)", DP_ITEM_STATE]
   - [Nothing confirmed, No account is confirmed for billing, DP_NOTHING_TO_BILL]
@@ -2030,15 +2060,16 @@ acceptance:
 ```fr
 id: FR-CL-091
 title: Keep regular commission and incentives as separate receivables
-brd: ["BRCLXN.061 (p.8-9, draft)"]
+brd: ["BRCLXN.061 (p.10-11, draft)", "Minutes of 27-Apr-2026 on BRD 61 (p.1)"]
 actor: System; Commission Receivables Unit
 priority: Must have (draft)
 screens: Commission > DP Accounts, Incentive Runs (to be extended)
 description:
   - BIBS would manage regular commission and incentives as distinct receivable types, each with its own eligibility, billing and accounting. Regular commission is collectible only when the premium is fully paid or confirmed. Incentives are Other Income, generated only when eligibility is met, on an incentive receivable account apart from commission receivable. Negative endorsements recompute both.
   - Receivables would be traceable at policy, invoice, insurer and transaction level.
+  - The minutes of 27 April 2026 confirm the intent - regular commission depends on confirmed premium payment, incentives are other income with their own eligibility, and the manual tagging of today becomes system-driven.
 preconditions:
-  - "BDOI confirms the draft row (CQ01) and the GL treatment (OQ07)."
+  - "BDOI confirms the draft row in writing (CQ01, intent confirmed by the minutes) and the GL treatment (OQ07)."
 main_flow:
   - A commission or incentive becomes due.
   - BIBS creates a receivable of the matching type with its own rule and account.
@@ -2058,19 +2089,22 @@ acceptance:
 ```fr
 id: FR-CL-092
 title: Bill incentive campaigns automatically
-brd: ["BRCLXN.062 (p.9-10, draft)"]
-actor: User (Commission); System
+brd: ["BRCLXN.062 (p.11-12, draft)", "Minutes of 27-Apr-2026 on BRD 62 (p.1)"]
+actor: Marketing (campaign set-up); System (eligibility and billing); Collection user (view of the eligible transactions)
 priority: Must have (draft)
 screens: Commission > Incentive Schemes (to be extended to campaigns)
-description: Incentives would be configured as campaigns with criteria - product or policy type, payment timing (within X days from booking or inception), payment status and exclusions such as pending negative adjustments. A campaign run would identify the qualified invoices, exclude those with unresolved adjustments, cancellations or partial payments, and bill the insurer through a system-generated service invoice with the applicable withholding tax, keeping the campaign and criteria on each line. No manual tagging.
+description:
+  - Incentives would be configured as campaigns with criteria - product or policy type, payment timing (within X days from booking or inception), payment status and exclusions such as pending negative adjustments. A campaign run would identify the qualified invoices, exclude those with unresolved adjustments, cancellations or partial payments, and bill the insurer through a system-generated service invoice with the applicable withholding tax, keeping the campaign and criteria on each line. No manual tagging.
+  - Marketing owns the set-up and configuration of the campaigns; the Collections users see the eligible transactions only; eligibility and incentive billing are system-generated (minutes p.1). The service invoice follows the incentive service invoice of BRD-5 (FR-DS-091, R11).
 preconditions:
-  - "BDOI confirms the draft row (CQ01) and its relation to the early-remittance incentive (CQ24)."
+  - "BDOI confirms the draft row in writing (CQ01) and its relation to the early-remittance incentive (CQ24)."
 main_flow:
-  - A user sets up a campaign with its criteria.
+  - A Marketing user sets up a campaign with its criteria.
   - The campaign run selects the qualified invoices.
   - BIBS generates the service invoice per insurer.
 rules:
   - [R1, "Criteria reference the incentive criteria of Product Maintenance (PMADD07-08).", Configurable, Incentive criteria]
+  - [R2, "Only Marketing sets up and changes campaigns; Collections users view the eligible transactions, read only (minutes p.1; CLR-CL-39).", Fixed, "-"]
 validations:
   - [Invoice with a pending negative adjustment, The invoice has an unresolved adjustment and is excluded, "-"]
 notifications:
@@ -2079,16 +2113,17 @@ audit:
   - "Each billed line keeps its campaign and criteria snapshot."
 acceptance:
   - An invoice paid within the campaign window is billed; one with a pending negative adjustment is excluded.
+  - A Collection Handler sees the eligible transactions of a campaign but cannot set up or change a campaign.
 ```
 
 ```fr
 id: FR-CL-093
 title: Handle commission refunds from negative adjustments apart
-brd: ["BRCLXN.063 (p.10-11, draft)"]
+brd: ["BRCLXN.063 (p.12-13, draft)", "Minutes of 27-Apr-2026 on BRD 63 (p.1)"]
 actor: System; Commission Receivables Unit
 priority: Must have (draft)
 screens: Commission (to be extended)
-description: When a negative adjustment reduces the premium of an invoice whose commission is billed or collected, BIBS would recompute the commission on the final premium and create a commission refund linked to the original commission and the adjustment. Refunds would never be CR-collectible, would be excluded from the CR statement of account, and would be excluded from the CRU dashboards and aging.
+description: When a negative adjustment reduces the premium of an invoice whose commission is billed or collected, BIBS would recompute the commission on the final premium and create a commission refund linked to the original commission and the adjustment. Refunds would never be CR-collectible, would be excluded from the CR statement of account, and would be excluded from the CRU dashboards and aging; they stay traceable to the original commission entries (minutes p.1). Their retention follows the archiving criteria asked under CQ26.
 preconditions:
   - "BDOI confirms the draft row (CQ01)."
 main_flow:
@@ -2108,11 +2143,11 @@ acceptance:
 ```fr
 id: FR-CL-094
 title: Bill only the collectible commission on mixed payments
-brd: ["BRCLXN.064 (p.11-12, draft)"]
+brd: ["BRCLXN.064 (p.13-14, draft)", "Minutes of 27-Apr-2026 on BRD 64 (p.1)"]
 actor: System; Commission Receivables Unit
 priority: Must have (draft)
 screens: Commission (to be extended)
-description: When a client pays part of a premium to BDOI and part directly to the insurer, BIBS would compute the commission receivable only on the portion paid directly and confirmed, after PR confirmation. The statement of account, aging and escalation would include only confirmed collectible portions.
+description: When a client pays part of a premium to BDOI and part directly to the insurer, BIBS would compute the commission receivable only on the portion paid directly and confirmed, after PR confirmation. The statement of account, aging and escalation would include only confirmed collectible portions; unpaid or externally settled portions are excluded (minutes p.1).
 preconditions:
   - "BDOI confirms the draft row (CQ01) and how a partial direct payment is evidenced (CQ19)."
 main_flow:
@@ -2184,7 +2219,7 @@ Figure 3 shows how the refresh moves a collection account between statuses, and 
 | Installment plan | ACTIVE, COMPLETED, CANCELLED | Creation; completion when every installment is paid; cancellation by a CLX_BILLING user |
 | Installment | NOT_DUE, DUE, OVERDUE, PARTIAL, PAID | Allocation of the ledger payments (FR-CL-041) and the business date |
 | Promise to pay | OPEN, KEPT, PARTIALLY_KEPT, BROKEN, CANCELLED | Recording; the nightly promise check; withdrawal or a newer promise |
-| Billing statement | GENERATED, SENT, CANCELLED | Generation, e-mail, cancellation |
+| Billing statement | GENERATED, SENT, CANCELLED | Generation, e-mail and cancellation by the Operations billing user (CLX_SOA_ISSUE) |
 
 ## Requests to Cashiering
 
@@ -2203,7 +2238,7 @@ Figure 3 shows how the refresh moves a collection account between statuses, and 
 
 ## Reports
 
-All Collections reports are in the report category Collections. Viewing needs CLX_REPORT_VIEW, exporting needs CLX_EXPORT (the audit log needs CLX_AUDIT_VIEW); they export to PDF, XLSX, ODS and CSV and are archived. The reports take the company and, where they cover a period, the dates; they filter by market segment, sales unit and invoicing branch. The layouts are those of p.59-61 with the fields BIBS holds; legacy-only fields wait for CQ22.
+All Collections reports are in the report category Collections. Viewing needs CLX_REPORT_VIEW, exporting needs CLX_EXPORT (the audit log needs CLX_AUDIT_VIEW); they export to PDF, XLSX, ODS and CSV and are archived. The reports take the company and, where they cover a period, the dates; they filter by market segment, sales unit and invoicing branch. The layouts are those of p.61-63 with the fields BIBS holds; legacy-only fields wait for CQ22.
 
 <!-- table: widths=4.6,3.6,5.6,2.8 caption="Collections reports" size=8.5 -->
 | Code | Name | Content | BRD |
@@ -2252,9 +2287,9 @@ The account columns above, followed by:
 | Date Tagged / Tagged By / Tag Remarks | Date / Text | The disposition that tagged the account |
 | Basic Commission / VAT on Commission | Amount | Commission figures of the invoice |
 | WTAX Rate | Percent | Withholding tax rate on commission |
-| Diff (Premium Balance less PR2307) | Amount | Premium balance net of the PR2307 (p.59) |
+| Diff (Premium Balance less PR2307) | Amount | Premium balance net of the PR2307 (p.61) |
 
-The p.59 fields that BIBS does not hold (booking category, corporate department, commission invoice no. / date / amount, CR team remarks, PR reversal date) are left out until CQ22 maps them.
+The p.61 fields that BIBS does not hold (booking category, corporate department, commission invoice no. / date / amount, CR team remarks, PR reversal date) are left out until CQ22 maps them.
 
 ### For Application To Invoice (CLX-APPLICATION-TO-INVOICE)
 
@@ -2262,7 +2297,7 @@ The p.59 fields that BIBS does not hold (booking category, corporate department,
 | Column | Format | Content |
 |---|---|---|
 | Requested On | Date | Date of the collector request |
-| Payment Date / Payment File Name / Transaction No. | Date / Text | Payment identification (p.60) |
+| Payment Date / Payment File Name / Transaction No. | Date / Text | Payment identification (p.62) |
 | Paid Amount / Currency / Payment Type | Amount / Text | Payment figures |
 | Payor / Reference No. / Name of Assured | Text | Payor and target account |
 | Invoice No. | Text | Invoice to apply the payment to |
@@ -2290,7 +2325,6 @@ Figure 6 shows the interfaces of Collections. Collections reads the Operations i
 | Invoice ledger | In | Invoices, PR by component, movements, flags, shares; nightly refresh and after each movement | BRCLXN.001-015, 046 | IN SCOPE |
 | Sales organisation | In | Unit Head of each sales unit, department or region | BRCLXN.011 | IN SCOPE |
 | Account, issuance, client master | In | Policy, account and client data of the account page | BRCLXN.056 | IN SCOPE |
-| Cashiering: check pick-up | Out | COLLECTION_CHECK_PICKUP, pulled by the pick-up queue | p.40 | IN SCOPE |
 | Cashiering: BIR 2307 tags | Out | COLLECTION_CWT2307, taken by the Cashiering 2307 intake | BRCLXN.026 | IN SCOPE |
 | Commission: DP list | Out | COLLECTION_DP_LIST, pulled by the DP list intake | BRCLXN.024 | IN SCOPE |
 | Commission: DP returned | In | COLLECTION_DP_RETURNED reopens the account | CMRID.009 | IN SCOPE |
@@ -2299,15 +2333,15 @@ Figure 6 shows the interfaces of Collections. Collections reads the Operations i
 | Cashiering: refunds | In | COLLECTION_REFUND recorded on the collector side | BRCLXN.040 | IN SCOPE |
 | Messaging and alerts | Out | Notifications, SOA e-mails, alerts | BRCLXN.049-058 | IN SCOPE |
 | BDOI file server FS04 | Out | Daily application file; list of extracts until OQ17 | BRCLXN.041-042 | ON HOLD |
-| ISYS Marketing Diary | In | Client payment instructions | p.40-42 | ON HOLD |
+| ISYS Marketing Diary | In | Client payment instructions | p.42-44 | ON HOLD |
 | Legacy EBIX / QPS open items | In | One-time migration of open PRs and dispositions | BRCLXN.013-015 | ON HOLD |
 
 > [!NOTE] Interfaces on hold
-> The FS04 transfer (OQ17, CQ12), the Marketing Diary (CQ20) and the legacy migration (CQ07) wait for the answers of BDOI. Each is a new transfer or a one-time load, with no change to the Collections functions.
+> The FS04 transfer (OQ17, CQ12), the Marketing Diary (CQ20) and the legacy migration (CQ07) wait for the answers of BDOI. Each is a new transfer or a one-time load, with no change to the Collections functions. The check pick-up hand-off to Cashiering is no longer an interface: the Operations Cashiering annex removed it from scope (CSHID.009, R10). Whether BIBS replaces ICS, named in the minutes, or exchanges data with it is asked under CLR-CL-36.
 
 # Non-functional requirements
 
-<!-- table: widths=3,5.6,5.4 caption="Non-functional requirements (BRD p.51-58)" size=8.5 -->
+<!-- table: widths=3,5.6,5.4 caption="Non-functional requirements (BRD p.53-60)" size=8.5 -->
 | Topic | BRD value | BIBS target and approach |
 |---|---|---|
 | Authentication | SSO with Windows credentials; masked password; friendly errors; all attempts logged; lock-out after 3 attempts (NFR 1-2) | Platform log-in of BRD-1; lock-out at 3 for all users (D5); SSO on hold (Q42) |
@@ -2320,9 +2354,9 @@ Figure 6 shows the interfaces of Collections. Collections reads the Operations i
 | Operating hours and locations | 06:00-22:00 Monday to Friday and month-end weekends; head office and six provincial offices (NFR 17) | Web access from every BDOI location; jobs run after 22:00 |
 | Users and volumes | 130 users, 56 concurrent; 1,200 dispositions, applications and handler updates a day (NFR 15.01-15.05) | Worklist on indexed accounts; server-side paging |
 | Response time | Screens under 5 seconds; daily report under 3 minutes; weekly under 10; monthly under 15 (NFR 15) | Online p95 under 3 seconds; files generated off-peak in the background |
-| Exports | Caveat p.93: exports may slow the system | Background exports, row cap, separate permission (FR-CL-084) |
+| Exports | Caveat p.95: exports may slow the system | Background exports, row cap, separate permission (FR-CL-084) |
 | Availability and recovery | RTO 4 hours, RPO 4 hours; DR server (NFR 18) | Same deployment as BRD-1 and BRD-2; one BIBS-wide NFR set is being agreed (XQ08, CQ25) |
-| Retention | 5 years online, 15 years archive; backup every 4 hours, kept 5 years (NFR 16) | Retention framework of BRD-1; records never deleted in Collections |
+| Retention | 5 years online, 15 years archive; backup every 4 hours, kept 5 years (NFR 16); enterprise retention policy, active accounts not archived even when due (minutes p.1-2) | Retention framework of BRD-1; records never deleted in Collections; an open, credit or escalated collection account, or one with an open promise or a live installment plan, is never archived (CLR-CL-38, CQ26) |
 
 # Configuration items owned by the business and the System Administrator
 
@@ -2360,7 +2394,7 @@ The items below are changed in BIBS without a release. Changes to parameters and
 <!-- table: widths=5,11.6 caption="Lists of values" size=8.5 -->
 | List | Values delivered |
 |---|---|
-| CLX_PR_DISPOSITION | DP PR for reversal; PR 2307 for reversal; For check pick-up; Cancel account; Coordinate further; Request bank AO assistance; No / missing policy number; DP returned by insurer (all to confirm, CQ08) |
+| CLX_PR_DISPOSITION | DP PR for reversal; PR 2307 for reversal; Cancel account; Coordinate further; Request bank AO assistance; No / missing policy number; DP returned by insurer (all to confirm, CQ08) |
 | CLX_UPP_DISPOSITION | For application to invoice; For refund; For reclass; For transfer to other unit; Coordinate further (to confirm, CQ08); Handling fee (BRD-12) |
 | CLX_EFFORT_CODE | Phone call; E-mail; Client visit; Statement of account sent; Others (see remarks) (to confirm, CQ08) |
 | CLX_BILLING_FREQUENCY | Annual; Semi-annual; Quarterly; Monthly |
@@ -2392,7 +2426,7 @@ The items below are changed in BIBS without a release. Changes to parameters and
 | Unit Head per sales unit | CLX_SETUP users | FR-CL-015 |
 | Default assignment rules | CLX_ASSIGN users | FR-CL-020 |
 | Escalation rules | CLX_SETUP users (MASTER_AUTHORIZE) | FR-CL-050 |
-| SOA template CLX_SOA | System Administrator | FR-CL-060 |
+| SOA template CLX_SOA | System Administrator (layout from the sample SOA annex of BDOI, CQ18) | FR-CL-060 |
 | Roles and permissions | Business Administrator via access request (approver) | FR-CL-001 |
 
 # Assumptions, dependencies and open questions
@@ -2402,14 +2436,16 @@ The items below are changed in BIBS without a release. Changes to parameters and
 <!-- table: widths=1.8,11,3.8 caption="Assumptions" size=8.5 -->
 | ID | Assumption | Related |
 |---|---|---|
-| A-CL-01 | The renumbering addendum (p.23-34) is the governing wording of BRCLXN.001-048; the signed workshop addendum (p.13-22) governs BRCLXN.049-060 | R2, R3 |
-| A-CL-02 | BRCLXN.061-064 are not approved; they are proposed for confirmation by BDOI | CQ01 |
+| A-CL-01 | The renumbering addendum (p.25-36) is the governing wording of BRCLXN.001-048; the signed workshop addendum (p.15-24) governs BRCLXN.049-060 | R2, R3 |
+| A-CL-02 | BRCLXN.061-064 are not approved; the minutes of 27-Apr-2026 confirm their intent and they are proposed for written confirmation by BDOI | CQ01 |
 | A-CL-03 | EBIX and QPS are replaced by BIBS booking and the Operations ledger; the BRD's extraction is an in-app refresh | OQ01 |
 | A-CL-04 | The list is kept at invoice level; account and client totals are for information | CQ02 |
 | A-CL-05 | Every CLX_VIEW user sees every account and uses filters | CQ06 |
 | A-CL-06 | "Transaction type C" (BRCLXN.010) means cancellation and return invoices | CQ04 |
 | A-CL-07 | Collections posts no accounting entry; the money effects stay in Cashiering, Commission and Adjustment | R6 principle 2 |
-| A-CL-08 | The Processing Unit's only Collections action is the disposition "No / missing policy number" | p.44 |
+| A-CL-08 | The Processing Unit's only Collections action is the disposition "No / missing policy number" | p.46 |
+| A-CL-09 | The minutes of 27-Apr-2026 (R0) are the clarifications of BRCLXN.048-064; BDOI does not update the BRD text | R0 |
+| A-CL-10 | The billing statements are generated and sent by an existing Operations profile; the Collections roles view them | R0; CLR-CL-32 |
 
 ## Dependencies
 
@@ -2422,13 +2458,15 @@ The items below are changed in BIBS without a release. Changes to parameters and
 | D-CL-04 | BDOI provides the SOA layout, recipients and numbering | FR-CL-060, 061 (CQ18) |
 | D-CL-05 | BDOI names the FS04 transport and confirms the application file layout | FR-CL-077 (OQ17, CQ12) |
 | D-CL-06 | BDOI decides the EBIX migration scope and cut-off | FR-CL-017 (CQ07) |
+| D-CL-07 | BDOI names the Operations profile that generates and sends the statements, and provides the sample SOA annex announced in the minutes | FR-CL-060, 061 (CLR-CL-32, CQ18) |
+| D-CL-08 | BDOI documents the archiving criteria for collection data, with open items and retention periods (follow-up of the minutes) | Section 8 (CQ26) |
 
 ## Open questions
 
 <!-- table: widths=1.4,10.1,2.8,2.4 caption="Open questions on BRD-4 (status from the cross-BRD decisions, R7)" status=Status size=8.5 -->
 | ID | Question | Affects | Status |
 |---|---|---|---|
-| CQ01 | Are BRCLXN.061-064 (draft only) in scope, and who owns them? | FR-CL-091-094 | OPEN |
+| CQ01 | Are BRCLXN.061-064 (draft only) in scope, and who owns them? The minutes confirm the intent and name Marketing for the campaigns; written scope confirmation is open | FR-CL-091-094 | PARTIAL |
 | CQ02 | Invoice level confirmed; do account or client totals decide the threshold? | FR-CL-010, 014 | OPEN |
 | CQ03 | Value of the threshold; per currency; net of PR2307? | FR-CL-011 | OPEN |
 | CQ04 | Treatment of negative balances that are not cancellations | FR-CL-013 | OPEN |
@@ -2441,20 +2479,22 @@ The items below are changed in BIBS without a release. Changes to parameters and
 | CQ11 | Definitions of Processing Stage, Business Origin, Client Code Match, System Remarks | FR-CL-070 | OPEN |
 | CQ12 | Is the daily application text file still needed, and its layout | FR-CL-077 | OPEN |
 | CQ13 | Accept EBIX invoice numbers after go-live? | FR-CL-075 | OPEN |
-| CQ14 | Default escalation rules, levels, targets and aging basis | FR-CL-050, 051, 062 | OPEN |
-| CQ15 | Source of installment terms; booking per installment or in full | FR-CL-040 | OPEN |
+| CQ14 | Default escalation rules, levels, targets and aging basis; the minutes give 45, 60 and 120 days as examples | FR-CL-050, 051, 062 | PARTIAL |
+| CQ15 | Source of installment terms; booking per installment or in full; the minutes say Excel today and an integration approach decided in design, with a follow-up on whether a separate system is needed | FR-CL-040 | PARTIAL |
 | CQ16 | When a promise is kept; grace days; partial payment | FR-CL-042 | OPEN |
 | CQ17 | Meaning of delivery date and receipt date | FR-CL-043 | OPEN |
-| CQ18 | SOA layout, recipient, numbering, e-mail | FR-CL-060, 061 | OPEN |
+| CQ18 | SOA layout, recipient, numbering, e-mail; the minutes give the generation to Accounting / Operations and announce a sample SOA annex | FR-CL-060, 061 | PARTIAL |
 | CQ19 | Evidence of a partial direct payment on a non-DP invoice | FR-CL-094 | OPEN |
 | CQ20 | Marketing Diary in ISYS or in BIBS; CTE tracking | FR-CL-033 | OPEN |
-| CQ21 | Dashboard content per role | FR-CL-085 | OPEN |
+| CQ21 | Dashboard content per role; the minutes ask for broken promises and overdue installments for handlers and supervisors | FR-CL-085 | PARTIAL |
 | CQ22 | Mapping of legacy report fields | Section 6.1 | OPEN |
 | CQ23 | Single role, single session, lock-out at 3 | FR-CL-001 | ANSWERED |
 | CQ24 | Relation of draft campaigns to the early-remittance incentive | FR-CL-092 | OPEN |
 | CQ25 | NFR alignment (hours, RPO) across BRDs | Section 8 | OPEN |
+| CQ26 | Archiving criteria for collection data: open items, active accounts not archived, retention periods (follow-up of the minutes) | Section 8 | OPEN |
+| CQ27 | What ICS is (named in the minutes as showing outstanding amounts only) and whether BIBS replaces it | FR-CL-041 | OPEN |
 
-CQ23 is answered by BRD-11 (decision D5), except the single session per device (UQ09).
+CQ23 is answered by BRD-11 (decision D5), except the single session per device (UQ09). The minutes of 27 April 2026 (R0) partly answer CQ01, CQ14, CQ15, CQ18 and CQ21 and raise CQ26 and CQ27.
 
 # Traceability
 
@@ -2470,7 +2510,7 @@ Every BRD-4 requirement is met by at least one FR. The test cases are listed by 
 | BRCLXN.005 | FR-CL-011 | PR Worklist | TC-CL-011.1, 011.2, 011.3 (4 cases) |
 | BRCLXN.006 | FR-CL-012 | Collections Setup | TC-CL-012.1, 012.2, 012.3, 012.4 (7 cases) |
 | BRCLXN.007 | FR-CL-012 | Collections Setup | TC-CL-012.1, 012.2, 012.3, 012.4 (7 cases) |
-| BRCLXN.008 | FR-CL-011, FR-CL-018 | PR Worklist (Completed) | TC-CL-011.1, 011.2, 011.3 (4 cases) |
+| BRCLXN.008 | FR-CL-011, FR-CL-018 | PR Worklist (Completed) | TC-CL-011.1, 011.2, 011.3, 018.1, 018.2, 018.3 (7 cases) |
 | BRCLXN.009 | FR-CL-011 | PR Worklist | TC-CL-011.1, 011.2, 011.3 (4 cases) |
 | BRCLXN.010 | FR-CL-013 | PR Worklist (Excluded, Credit Balances) | TC-CL-013.1, 013.2 (2 cases) |
 | BRCLXN.011 | FR-CL-015 | PR Worklist; Collections Setup (Unit Heads) | TC-CL-015.1, 015.2, 015.3 (4 cases) |
@@ -2478,17 +2518,17 @@ Every BRD-4 requirement is met by at least one FR. The test cases are listed by 
 | BRCLXN.013 | FR-CL-017 | Job runs | TC-CL-017.1, 017.2, 017.3, 017.4 (6 cases) |
 | BRCLXN.014 | FR-CL-017 | Job runs | TC-CL-017.1, 017.2, 017.3, 017.4 (6 cases) |
 | BRCLXN.015 | FR-CL-017 | Collection account (Refresh from Ledger) | TC-CL-017.1, 017.2, 017.3, 017.4 (6 cases) |
-| BRCLXN.016 | FR-CL-030, FR-CL-031 | Lists of Values; Record Disposition | TC-CL-030.1, 030.2, 030.3, 030.4, 031.1, 031.2, 031.3, 031.4 (14 cases) |
-| BRCLXN.017 | FR-CL-030 | Lists of Values; Collections Setup | TC-CL-030.1, 030.2, 030.3, 030.4 (7 cases) |
-| BRCLXN.018 | FR-CL-030, FR-CL-031 | Record Disposition | TC-CL-030.1, 030.2, 030.3, 030.4, 031.1, 031.2, 031.3, 031.4 (14 cases) |
+| BRCLXN.016 | FR-CL-030, FR-CL-031 | Lists of Values; Record Disposition | TC-CL-030.1, 030.2, 030.3, 030.4, 030.5, 031.1, 031.2, 031.3, 031.4 (15 cases) |
+| BRCLXN.017 | FR-CL-030 | Lists of Values; Collections Setup | TC-CL-030.1, 030.2, 030.3, 030.4, 030.5 (8 cases) |
+| BRCLXN.018 | FR-CL-030, FR-CL-031 | Record Disposition | TC-CL-030.1, 030.2, 030.3, 030.4, 030.5, 031.1, 031.2, 031.3, 031.4 (15 cases) |
 | BRCLXN.019 | FR-CL-002 | Account tabs | TC-CL-002.1, 002.2 (3 cases) |
 | BRCLXN.020 | FR-CL-002 | Account tabs | TC-CL-002.1, 002.2 (3 cases) |
 | BRCLXN.021 | FR-CL-018, FR-CL-031 | Dispositions & Efforts | TC-CL-018.1, 018.2, 018.3, 031.1, 031.2, 031.3, 031.4 (10 cases) |
 | BRCLXN.022 | FR-CL-018 | PR Worklist (Completed) | TC-CL-018.1, 018.2, 018.3 (3 cases) |
 | BRCLXN.023 | FR-CL-018 | Timeline | TC-CL-018.1, 018.2, 018.3 (3 cases) |
-| BRCLXN.024 | FR-CL-080, FR-CL-032 | Collections Files; Commission DP Lists | TC-CL-032.1, 032.2, 032.3, 032.4, 032.5, 080.1, 080.2, 080.3 (13 cases) |
+| BRCLXN.024 | FR-CL-080, FR-CL-032 | Collections Files; Commission DP Lists | TC-CL-032.1, 032.2, 032.3, 032.4, 032.5, 080.1, 080.2, 080.3 (11 cases) |
 | BRCLXN.025 | FR-CL-080 | Collections Files | TC-CL-080.1, 080.2, 080.3 (3 cases) |
-| BRCLXN.026 | FR-CL-081, FR-CL-032 | Collections Files | TC-CL-032.1, 032.2, 032.3, 032.4, 032.5, 081.1, 081.2 (12 cases) |
+| BRCLXN.026 | FR-CL-081, FR-CL-032 | Collections Files | TC-CL-032.1, 032.2, 032.3, 032.4, 032.5, 081.1, 081.2 (10 cases) |
 | BRCLXN.027 | FR-CL-081 | Collections Files | TC-CL-081.1, 081.2 (2 cases) |
 | BRCLXN.028 | FR-CL-082 | Collections Files (Weekly) | TC-CL-082.1, 082.2 (2 cases) |
 | BRCLXN.029 | FR-CL-082 | Collections Files (Weekly) | TC-CL-082.1, 082.2 (2 cases) |
@@ -2511,7 +2551,7 @@ Every BRD-4 requirement is met by at least one FR. The test cases are listed by 
 | BRCLXN.046 | FR-CL-016 | Collection account (Summary) | TC-CL-016.1, 016.2 (3 cases) |
 | BRCLXN.047 | FR-CL-075 | Record Disposition (unapplied) | TC-CL-075.1, 075.2, 075.3 (4 cases) |
 | BRCLXN.048 | FR-CL-075 | Record Disposition (unapplied) | TC-CL-075.1, 075.2, 075.3 (4 cases) |
-| BRCLXN.049 | FR-CL-050, FR-CL-051, FR-CL-053 | Escalation Rules; Escalations | TC-CL-050.1, 050.2, 050.3, 050.4, 050.5, 051.1, 051.2, 051.3, 051.4, 053.1, 053.2, 053.3, 053.4 (21 cases) |
+| BRCLXN.049 | FR-CL-050, FR-CL-051, FR-CL-053 | Escalation Rules; Escalations | TC-CL-050.1, 050.2, 050.3, 050.4, 050.5, 050.6, 051.1, 051.2, 051.3, 051.4, 053.1, 053.2, 053.3, 053.4 (22 cases) |
 | BRCLXN.050 | FR-CL-052, FR-CL-053 | Escalations (Escalate Accounts) | TC-CL-052.1, 052.2, 052.3, 052.4, 053.1, 053.2, 053.3, 053.4 (12 cases) |
 | BRCLXN.051 | FR-CL-034 | PR Worklist; Bulk Uploads | TC-CL-034.1, 034.2, 034.3, 034.4 (8 cases) |
 | BRCLXN.052 | FR-CL-020, FR-CL-021 | Assignments | TC-CL-020.1, 020.2, 020.3, 020.4, 021.1, 021.2, 021.3, 021.4 (15 cases) |
@@ -2519,12 +2559,12 @@ Every BRD-4 requirement is met by at least one FR. The test cases are listed by 
 | BRCLXN.054 | FR-CL-041 | Collection account (Payments); Installment Plan | TC-CL-041.1, 041.2, 041.3 (4 cases) |
 | BRCLXN.055 | FR-CL-042, FR-CL-051 | Promises to Pay | TC-CL-042.1, 042.2, 042.3, 042.4, 051.1, 051.2, 051.3, 051.4 (16 cases) |
 | BRCLXN.056 | FR-CL-043 | Collection account (Policy & Co-insurance) | TC-CL-043.1, 043.2 (4 cases) |
-| BRCLXN.057 | FR-CL-044 | Collection account (Timeline) | TC-CL-044.1, 044.2 (2 cases) |
-| BRCLXN.058 | FR-CL-060, FR-CL-061 | Billing Statements | TC-CL-060.1, 060.2, 060.3, 061.1, 061.2, 061.3 (9 cases) |
+| BRCLXN.057 | FR-CL-044 | Collection account (Timeline) | TC-CL-044.1, 044.2, 044.3 (3 cases) |
+| BRCLXN.058 | FR-CL-060, FR-CL-061 | Billing Statements | TC-CL-060.1, 060.2, 060.3, 060.4, 061.1, 061.2, 061.3, 061.4 (12 cases) |
 | BRCLXN.059 | FR-CL-090 | Commission DP Accounts, DP Billings | TC-CL-090.1, 090.2, 090.3 (4 cases) |
 | BRCLXN.060 | FR-CL-062 | Billing Statements | TC-CL-062.1, 062.2 (3 cases) |
 | BRCLXN.061 | FR-CL-091 | - | TC-CL-091.1, 091.2 (2 cases) |
-| BRCLXN.062 | FR-CL-092 | - | TC-CL-092.1, 092.2 (2 cases) |
+| BRCLXN.062 | FR-CL-092 | - | TC-CL-092.1, 092.2, 092.3 (3 cases) |
 | BRCLXN.063 | FR-CL-093 | - | TC-CL-093.1 (2 cases) |
 | BRCLXN.064 | FR-CL-094 | - | TC-CL-094.1 (2 cases) |
 
@@ -2532,14 +2572,16 @@ Every BRD-4 requirement is met by at least one FR. The test cases are listed by 
 <!-- table: widths=5,3,8.6 caption="Capabilities and NFRs without a BRCLXN ID" size=8 -->
 | Source | FR / section | Note |
 |---|---|---|
-| Stakeholder functions (p.43-46), NFR 3 | FR-CL-001 | Role-based access |
+| Stakeholder functions (p.45-48), NFR 3 | FR-CL-001 | Role-based access |
 | NFR 9.03 (record lock) | FR-CL-005 | Edit lock |
-| Collection efforts, categories (p.41, 43-46, 59, 61) | FR-CL-033 | Efforts and categories |
-| Exports and caveat (p.43-46, p.93) | FR-CL-084 | Background exports |
-| Dashboard (p.43-46, p.61) | FR-CL-085 | Collections Home |
-| Check pick-up (p.40) | FR-CL-032 | Hand-off to Cashiering |
-| Marketing Diary, CTE (p.38-42) | FR-CL-033 note | On hold (CQ20) |
-| NFR 1-18 (p.51-58) | Section 8 | NFR table |
+| Collection efforts, categories (p.43, 45-48, 61, 63) | FR-CL-033 | Efforts and categories |
+| Exports and caveat (p.45-48, p.95) | FR-CL-084 | Background exports |
+| Dashboard (p.45-48, p.63) | FR-CL-085 | Collections Home |
+| Check pick-up (p.42) | FR-CL-032 (removed) | Removed from scope by the Operations Cashiering annex (CSHID.009, R10) |
+| Minutes: data retention and archiving (R0 p.1-2) | Section 8; CQ26 | Open accounts not archived (CLR-CL-38) |
+| Minutes: user access under the Operations access matrix (R0 p.1) | FR-CL-001 | Remittance and Production Register view (CLR-CL-37) |
+| Marketing Diary, CTE (p.40-44) | FR-CL-033 note | On hold (CQ20) |
+| NFR 1-18 (p.53-60) | Section 8 | NFR table |
 
 <!-- table: widths=6,2.2,2.2 caption="Coverage summary" size=8.5 -->
 | Group | BRD IDs | Covered |
@@ -2627,7 +2669,7 @@ render: screens
 
 Five walkthroughs follow a case through the screens, persona by persona, with what the user does, what the user sees and the result of each step. They use seed data only and run in this order on the SIT environment: walkthroughs B, D and E work on the account that walkthrough A brings into the worklist. They are the script of the SIT review sessions of the Start Here guide.
 
-## WT-A A new outstanding account from the refresh of the worklist to the check pick-up in Cashiering
+## WT-A A new outstanding account from the refresh of the worklist to the first collection effort
 
 ```pack
 plugin: ../signoff/signoff_pack.py
@@ -2739,16 +2781,16 @@ render: contract
 
 ## What is signed
 
-The business sign-off covers the release set BRD-04 Collections v2.0:
+The business sign-off covers the release set BRD-04 Collections v2.1:
 
 <!-- table: widths=6,11.6 caption="Documents of the release set" -->
 | Document | Content |
 |---|---|
 | 00 Start Here | The map of the pack, the reading order per role, the steps up to closure and the dates |
 | 01 Sign-off Pack Guide (deck) | Purpose, approach and steps with who does what, the module at a glance, caveats and impacts on other modules, entry and exit criteria, handover and change control |
-| 02 This FRS v2.0 | Requirements (chapters 1-11), the business view of the system (chapters 12-19), sign-off (chapter 20), the proposed rules for confirmation (chapter 21) and the screen standards (appendix) |
-| 03 Sign-off workbook v2.0 | The screen standards, screens, fields, actions, rules, messages, notifications, menus, the upload template and the contract of this FRS, one row each, with the BU review columns; the comments log, meeting minutes, version history and sign-off certificate |
-| 04 and 05 Test plan v2.0 and its summary | The test cases traced to the FRs and to the screens of chapter 13 |
+| 02 This FRS v2.1 | Requirements (chapters 1-11), the business view of the system (chapters 12-19), sign-off (chapter 20), the proposed rules for confirmation (chapter 21) and the appendices: user-story view (22), storyboard index (23) and screen standards (24) |
+| 03 Sign-off workbook v2.1 | The screen standards, screens, fields, actions, rules, messages, notifications, menus, the upload template and the contract of this FRS, one row each, with the BU review columns; the comments log, meeting minutes, version history and sign-off certificate |
+| 04 and 05 Test plan v2.1 and its summary | The test cases traced to the FRs and to the screens of chapter 13 |
 
 ```pack
 plugin: ../signoff/signoff_pack.py
@@ -2773,7 +2815,7 @@ Configuration values marked "default" (threshold, aging basis and brackets, edit
 
 ## Change after sign-off
 
-A change to anything frozen is raised in the Change Management Register. The request states the screen, field, rule or message concerned, the reason and the business priority. The project team assesses it, including its effect on the other BRDs through the interface contract of chapter 19 (for example a new disposition with an Operations action changes what Cashiering or Commission Receivables receives), and the owners of every BRD it touches approve it. An approved change is delivered as a new version of this release set (v2.1, v2.2 and so on) with its own Start Here guide, and only the changed pages and rows are reviewed and signed again (delta sign-off).
+A change to anything frozen is raised in the Change Management Register. The request states the screen, field, rule or message concerned, the reason and the business priority. The project team assesses it, including its effect on the other BRDs through the interface contract of chapter 19 (for example a new disposition with an Operations action changes what Cashiering or Commission Receivables receives), and the owners of every BRD it touches approve it. An approved change is delivered as a new version of this release set (v2.2, v2.3 and so on) with its own Start Here guide, and only the changed pages and rows are reviewed and signed again (delta sign-off).
 
 ## Proposed rules for confirmation
 
@@ -2817,25 +2859,25 @@ The table lists each point where the proposed screen or rule differs from the BR
 | CLR-CL-03 | Data scope per user (BRCLXN.012; FR-CL-015) | Every CLX_VIEW user sees every account and narrows it with the filters, which run on the whole list; there is no default scope per user. | The BRD shows only the accounts of the selected segment and UH (CQ06). | Confirm the filters, or give the default scope per role (CQ06). |
 | CLR-CL-04 | Unit Head (BRCLXN.011; FR-CL-015) | The Unit Head is the head of the invoice's sales unit (else of its department or region), maintained on Collections Setup. | The BRD does not say where the Unit Head comes from (CQ05). | Confirm the source of the Unit Head (CQ05). |
 | CLR-CL-05 | Monthly reversal files (BRCLXN.024, 026; FR-CL-032, 080, 081) | A DP PR disposition goes at once to the Commission DP list and a PR 2307 disposition to the Cashiering 2307 intake; the monthly file is the audit copy. | The BRD has the monthly batch generate the file for Operations (OQ16, OQ38). | Confirm the hand-off at the time of the disposition. |
-| CLR-CL-06 | 2307 hand-off (BRCLXN.026; FR-CL-032) | Cashiering takes the PR 2307 hand-offs in its 2307 intake; a hand-off not taken within one day raises the alert CLX_OUTBOX_STALE. | The BRD says the 2307 accounts reach Operations for reversal without naming the step. | Confirm the Cashiering 2307 intake. |
+| CLR-CL-06 | 2307 hand-off (BRCLXN.026; FR-CL-032) | Cashiering takes the PR 2307 hand-offs in its 2307 intake; a hand-off not taken within one day raises the alert CLX_OUTBOX_STALE. | The BRD says the 2307 accounts reach Operations for reversal without naming the step; the re-issued Operations BRD changes the receiving step (CLR-CL-42). | Confirm the Cashiering 2307 intake, or the step of CLR-CL-42. |
 | CLR-CL-07 | Request application of payment (BRCLXN.030, 032; FR-CL-074) | The request goes to Cashiering's Incoming Requests; a cashier accepts it and applies the payment through the Operations disposition workflow and its approvals. A request that Cashiering refuses shows "Rejected by Cashiering: <reason>". | The BRD does not name the Cashiering step (OQ15). | Confirm the Cashiering step (OQ15) and the texts of the refusals Cashiering gives at once (unknown payment, no balance, amount above the balance, no invoice). |
 | CLR-CL-08 | Names on the unapplied list (BRCLXN.036; FR-CL-070) | User names are shown for UH and AO; booker and bank officer names, Business Origin and System Remarks are not shown; "Processing Stage" is the Cashiering tab. | BIBS does not hold the booker, bank officer, Business Origin or System Remarks of an unapplied item (CQ11). | Confirm the columns, or name the source of the other fields (CQ11). |
 | CLR-CL-09 | Daily application file (BRCLXN.041-042; FR-CL-077) | The pipe-delimited file is written at 05:00 and kept in the list of extracts under FS04/CLX_APPLICATION_TO_INVOICE; the transfer to FS04 is added when BDOI names it. | The BRD loads the text file to FS04 before 06:00; the transfer is not specified (OQ17, CQ12). | Name the FS04 transfer and confirm the layout (OQ17, CQ12). |
 | CLR-CL-10 | Invoice number (BRCLXN.047; FR-CL-075) | The pattern CLX_INVOICE_NO_PATTERN accepts the EBIX format and the BIBS format (BI-...), and the invoice must exist in the BIBS ledger. | The BRD gives the number as "I" and 8 digits; BIBS invoices have their own format (CQ13). | Confirm the two formats (CQ13). |
 | CLR-CL-11 | Bulk update (BRCLXN.051; FR-CL-034) | The worklist updates several accounts with a disposition or an effort (with remarks) and reassigns them; promises and escalations are recorded in bulk on their screens. The upload Collections Bulk Update records promises, escalations, dispositions, efforts and remarks, each row on its own. | The BRD asks for bulk update of several invoices without naming the fields. | Confirm the fields of the grid actions and the upload. |
-| CLR-CL-12 | Installment plans (BRCLXN.053; FR-CL-040) | Plans are made in Collections (policy years, generated or manual); installment terms do not come from the quotation or the account. | The BRD does not say where the installment terms come from (CQ15). | Confirm plans made in Collections (CQ15). |
+| CLR-CL-12 | Installment plans (BRCLXN.053; FR-CL-040) | Plans are made in Collections (policy years, generated or manual); installment terms do not come from the quotation or the account. The schedules kept in Excel today are loaded once through the data migration. | The BRD does not say where the installment terms come from; the minutes say the schedules are kept in Excel or offline files, the requirement is capability-based and the integration approach is decided in design, with a follow-up on whether a separate system is needed (CQ15). | Confirm plans made in Collections with a one-time load of the current schedules, or name the system that keeps the schedules (CQ15). |
 | CLR-CL-13 | Broken promises (BRCLXN.055; FR-CL-042) | A promise is KEPT, PARTIALLY_KEPT or BROKEN by the payments applied between the day of the promise and the promised date plus CLX_PROMISE_GRACE_DAYS (0). | The BRD detects broken promises per installment without a grace period (CQ16). | Confirm the rule and the grace days (CQ16). |
 | CLR-CL-14 | Delivery and receipt dates (BRCLXN.056; FR-CL-043) | The first AR date is shown as the receipt date; the delivery date is blank. | BIBS does not record the delivery of the policy (CQ17). | Confirm, or name the source of the delivery date (CQ17). |
 | CLR-CL-15 | PR confirmation for CR billing (BRCLXN.059; FR-CL-090) | Commission bills a DP account only after the CRU reviewer confirms it "fully paid to the insurer" (CMRID.013); there is no separate automatic PR confirmation record. | The confirmation is a Commission step in BRD-2 (OQ38). | Confirm the CRU confirmation (OQ38). |
 | CLR-CL-16 | Aging basis (BRCLXN.060; FR-CL-062) | The aging runs from the booking date or the inception date (CLX_AGING_BASIS); aging from the SOA due date is not proposed. | The BRD mentions billing statements, invoice dates and policy periods (CQ14). | Choose the aging basis (CQ14). |
-| CLR-CL-17 | Draft commission and incentive rows (BRCLXN.061-064; FR-CL-091 to 094) | The four draft rows are proposed as described in section 4.10; their validations and messages are confirmed with the draft. | The rows are in the unsigned draft addendum only (CQ01). | Confirm or withdraw the draft rows (CQ01). |
+| CLR-CL-17 | Draft commission and incentive rows (BRCLXN.061-064; FR-CL-091 to 094) | The four draft rows are proposed as described in section 4.10; their validations and messages are confirmed with the draft. | The rows are in the unsigned draft addendum only; the minutes of 27-Apr-2026 walked through them and record their intent, and BDOI states that the BRD is not updated (CQ01). | Confirm in writing that BRCLXN.061-064 are approved scope, as the minutes describe them, or withdraw them (CQ01). |
 | CLR-CL-18 | Several roles per user (NFR 3.04; FR-CL-001) | A user may hold several roles; segregation of duties is kept by the permission of each action. | Cross-BRD decision D5 of BRD-11. | Confirm decision D5 for Collections. |
 | CLR-CL-19 | Lock-out (NFR 1.04, 2.02; FR-CL-001) | Every BIBS user is locked out after 3 invalid attempts (LOGIN_MAX_FAILED_ATTEMPTS = 3) and the correct password is then refused with the same message as a wrong password ("Invalid user name or password"); the lock shows to the System Administrator. | Cross-BRD decision D5 of BRD-11. | Confirm the lock-out rule. |
-| CLR-CL-20 | Exports (p.93 caveat; FR-CL-084) | Exports run in the background, capped at CLX_EXPORT_MAX_ROWS, under their own permission CLX_EXPORT. | The BRD warns that exports may slow the system. | Confirm the cap and the permission. |
+| CLR-CL-20 | Exports (p.95 caveat; FR-CL-084) | Exports run in the background, capped at CLX_EXPORT_MAX_ROWS, under their own permission CLX_EXPORT. | The BRD warns that exports may slow the system. | Confirm the cap and the permission. |
 | CLR-CL-21 | Edit lock (NFR 9.03; FR-CL-005) | The lock is taken when the user opens the account and is released when the user leaves it or after CLX_EDIT_LOCK_MINUTES (15). Activity on the account does not renew the lock; when it expires, the next user takes it. | The BRD does not say whether work on the account renews the lock. | Confirm the expiry, or ask for renewal while the holder works. |
 | CLR-CL-22 | Refresh after a payment (BRCLXN.013-015; FR-CL-017) | A payment applied in Cashiering updates the outstanding of the account within 5 minutes. | The BRD gives no target for the update after a payment. | Confirm the 5-minute target. |
 | CLR-CL-23 | Report period check (FR-CL-004) | The report parameters check that the end date is on or after the start date; the message text is the one of the Report Centre, confirmed at the first test run. | The Report Centre checks the period for every report. | Confirm the check of the period. |
-| CLR-CL-24 | Details of an Operations action (FR-CL-032) | A check pick-up needs the pick-up date and the check amount; a 2307 disposition needs the path, certificate received or paid in cash; a DP reversal needs no detail. A date detail is checked as yyyy-mm-dd and an amount as a number. | The BRD names the dispositions but not the details each needs. | Confirm the details per action. |
+| CLR-CL-24 | Details of an Operations action (FR-CL-032) | A 2307 disposition needs the path, certificate received or paid in cash; a DP reversal needs no detail; there is no check pick-up (CLR-CL-33). A date detail is checked as yyyy-mm-dd and an amount as a number. | The BRD names the dispositions but not the details each needs. | Confirm the details per action. |
 | CLR-CL-25 | Client on the worklist (screen standards; SCR-CL-02 to 04) | The client of an account is shown by its client code, a link to the client view, with the name of the assured under it; the client's own name is shown on the client view. | The client code is the reference the collectors quote to Cashiering and in the files. | Confirm the client code, or ask for the client's name with the code under it. |
 | CLR-CL-26 | Filters and criteria typed (screen standards; SCR-CL-02, SCR-CL-17) | The filters of the PR Worklist and the criteria of the assignment rules and of Reassign by Criteria are text fields where the user types a segment, unit, Unit Head, handler or account officer; the handler of a reassignment is chosen by name. | The filters were kept as in the BRD's list of filter fields (BRCLXN.011-012). | Confirm, or ask for drop-downs of the segments, units and users by name. |
 | CLR-CL-27 | Collections Setup values (screen standards; SCR-CL-19) | The parameters are listed by name with a business description, and the attributes of a disposition are shown by label and chosen from drop-downs (the reserved roles as check boxes). The Invoice Number Format parameter is kept as the pattern the invoice number is checked against. | The set-up is maintained by the Section Heads and the Business Administrator; the invoice number format follows the numbering of the legacy and the BIBS invoices. | Confirm the names and descriptions of the parameters, and whether the invoice number format stays a pattern kept by the System Administrator or becomes a choice of formats. |
@@ -2843,6 +2885,125 @@ The table lists each point where the proposed screen or rule differs from the BR
 | CLR-CL-29 | Values of the upload template (FR-CL-034; chapter 18) | The Collections Bulk Update template takes the codes of its lists (escalation level TL, UH, SECTION_HEAD or USER; the codes of the escalation reasons, dispositions and efforts), as the template instructions state. | A template is filled in a spreadsheet and read back by the system without interpretation. | Confirm the codes in the template, or ask for the labels. |
 | CLR-CL-30 | Disposition and effort values to confirm (FR-CL-030, 033, 072; CQ08) | The seeded dispositions, effort codes and escalation reasons are the values implied by the BRD; BDOI replaces them with its lists as configuration. | The lists are to be supplied by BDOI (CQ08). | Give the lists of dispositions, effort codes and escalation reasons (CQ08). |
 | CLR-CL-31 | Authorization of escalation rules (BRCLXN.049; FR-CL-050) | A new or changed escalation rule is authorized by an authorizer of master data (the Authorizer role of the platform) other than its maker; no Collections role authorizes master data. | The BRD asks for maker-checker on the rules without naming the checker. | Name the role that authorizes the escalation rules (for example the Section Head), or confirm the authorizers of master data. |
+| CLR-CL-32 | Billing statements generated by Operations (BRCLXN.058, 060; FR-CL-060 to 062; WT-D) | The Operations billing user, with the new permission CLX_SOA_ISSUE, runs the billing, generates, sends and cancels the statements; the proposed holder is the Cashiering Team Leader / Head, an existing Operations profile. The Collection Handlers and Team Leads see the statements, their lines and e-mails and download the PDF, read only; they keep the installment plans (FR-CL-040). In the screenshots of WT-D steps 2 to 4 and of the Billing Statements and Statement of Account screens the statement is generated and sent by the seed user Clara Collection Handler; under this rule the Operations billing user does these steps and is shown as Generated By. | The minutes of 27-Apr-2026 (BRD 58) state that billing generation is handled by Accounting / Operations and that Collections users have visibility only, and that Operations and Marketing Collections handle triggering and criteria with no new user profile. In BIBS the Marketing Collection role of BRD-2 is the Collection Handler of this FRS, so the two statements of the minutes need one owner. | Confirm that Operations generates and sends the statements and name the existing Operations profile that holds CLX_SOA_ISSUE (proposed: the Cashiering Team Leader / Head); confirm that the Collections roles only view them; provide the sample SOA annex (CQ18). |
+| CLR-CL-33 | Check pick-up removed (FR-CL-030, 032; WT-A) | The disposition "For check pick-up" is not delivered, the Operations action "Check pick-up" and its details (pick-up date, address, contact person, check amount, number and bank) are removed, and no item goes to a Cashiering pick-up queue. Walkthrough A ends at the first collection effort (frames WT-A.5 and WT-A.6 are retired); a client who pays by check deposits it or sends it to Cashiering, which receipts it as any other payment. | The Operations Cashiering annex of May 2026 removed CSHID.009 (a check for pick-up from Collection) from the future process of BDOI (Operations_WS Addendum p.4-6, minutes of 05-May-2026). The report images of chapter 17 still show "For check pick-up" as the disposition of two seed accounts recorded earlier. | Confirm that Collections offers no check pick-up, and how a client check is to be followed up when the client cannot deposit it. |
+| CLR-CL-34 | Default escalation levels (BRCLXN.049; FR-CL-050) | The delivered rules add a level of 120 days from booking to the Section Head to the 45-day (Team Lead) and 60th-day (Unit Head) levels; all stay configuration. | The minutes give 45, 60 and 120 days as example thresholds (CQ14). | Confirm the levels and their targets (CQ14). |
+| CLR-CL-35 | Home tiles for promises, installments and escalations (BRCLXN.054-055; FR-CL-085) | Collections Home shows Broken Promises, Promises Due, Overdue Installments and Open Escalations to the handlers and team leads, each opening its list. | The minutes ask for dashboard and report views of broken promises and overdue installments for handlers and supervisors (CQ21). | Confirm the four tiles and who sees them (CQ21). |
+| CLR-CL-36 | ICS (BRCLXN.054; FR-CL-041) | BIBS shows the full chronological payment history of every account until the outstanding is cleared; no exchange with ICS is proposed. | The minutes contrast the BRD with "ICS", which shows outstanding amounts only; the FRS has no other mention of ICS (CQ27). | Say what ICS is and whether BIBS replaces it or exchanges data with it (CQ27). |
+| CLR-CL-37 | Collections access under the Operations access matrix (FR-CL-001) | The Collections roles view Remittance (search and view) and the Production Register (view and filter) of Operations, read only; the commission receivable capabilities of the matrix stay with Commission Receivables (BRD-2), which Collections views. The grants are submitted through the role matrix of BRD-11. | The minutes place the Collections access level in the access matrix of the Operations BRD and ask that viewing and action permissions be documented in line with the BRDs. | Confirm the view access of the Collections roles to Remittance and the Production Register, and that they take no commission receivable action. |
+| CLR-CL-38 | Archiving of open accounts (NFR 16; section 8) | An open, credit or escalated collection account, or one with an open promise or a live installment plan, is never archived even when it is due for archiving; the other criteria follow the enterprise retention policy. | The minutes ask for criteria that identify active accounts that should not be archived, with a follow-up to document the criteria (CQ26). | Confirm the rule and provide the archiving criteria and retention periods (CQ26). |
+| CLR-CL-39 | Incentive campaigns (BRCLXN.062; FR-CL-092) | Marketing sets up and changes the campaigns; the Collections users see the eligible transactions only; the incentive service invoice is the one of BRD-5 (FR-DS-091). | The minutes give the set-up to Marketing and visibility of the eligible transactions to Collections; the relation to the early-remittance incentive is open (CQ24). | Confirm Marketing as owner and the relation of the campaigns to the early-remittance incentive and to the incentive criteria of Product Maintenance (CQ24). |
+| CLR-CL-40 | Confirmation of fully paid accounts for commission billing (BRCLXN.059; FR-CL-090) | The CRU reviewer of BRD-2 confirms an account fully paid to the insurer before it can be billed. | The minutes say that Marketing Collections confirms fully paid accounts and triggers the commission billing. | Confirm that the "Marketing Collections" of the minutes is the Commission Receivables Unit reviewer, or name the role that confirms. |
+| CLR-CL-41 | Numbering in the minutes (BRCLXN.048-049; FR-CL-050, 075) | Escalation is traced to BRCLXN.049 and 050; BRCLXN.048 stays the invoice validation for application (FR-CL-075). | The minutes discuss escalation under "BRD 48-49", while BRCLXN.048 of the renumbering addendum is the invoice validation. | Confirm the numbering behind "BRD 48-49". |
+| CLR-CL-42 | Receiving step of the PR 2307 hand-off (BRCLXN.026; FR-CL-032) | The disposition "PR 2307 for reversal" keeps handing the account to Operations; the step that receives it follows the BRD-2 FRS re-based on the re-issued Operations BRD v1.01. | The re-issued Operations BRD v1.01 removes Cashiering from the BIR 2307 processing (CSHID.026-027) and gives the whole PR 2307 reversal to Marketing Collection (MKTID.013). | Confirm the receiving step of the PR 2307 accounts with the BRD-2 owners. |
+
+# Appendix: User-story view
+
+One row per requirement of the BRD as issued on 8 October 2026: the requirement written as a user story ("As <persona>, I need <capability>, so that <business outcome>"), the functional requirements that meet it, their numbered acceptance criteria (chapter 4) and the test conditions of the test plan with the number of test cases. Where the BRD writes the requirement as a user story, its wording is kept; the personas are those of section 3.1. The traceability of chapter 11 gives the screens.
+
+<!-- table: widths=2.1,7.6,2.3,3.0,3.0 caption="User-story view of the BRD requirements" size=7.5 -->
+| BRD ID | User story | FR IDs | Acceptance criteria | Test cases |
+|---|---|---|---|---|
+| BRCLXN.001 | As a Collection Handler, I need a list of the accounts with outstanding premium receivable at invoice level, so that I follow up every unpaid invoice. | FR-CL-010 | FR-CL-010 AC 1-3 | TC-CL-010.1 to 010.4 (5 cases) |
+| BRCLXN.002 | As a Collection Handler, I need the list built from the booked invoices and their balances, so that the amounts I chase are those of the ledger. | FR-CL-010 | FR-CL-010 AC 1-3 | TC-CL-010.1 to 010.4 (5 cases) |
+| BRCLXN.003 | As a Collection Handler, I need the PR balances added up across the invoices of an account and of a client, so that I see what a client owes in total. | FR-CL-014 | FR-CL-014 AC 1 | TC-CL-014.1 to 014.2 (3 cases) |
+| BRCLXN.004 | As a Collection Handler, I need each account to show its invoice data and outstanding amounts, so that I can discuss the balance with the client. | FR-CL-010 | FR-CL-010 AC 1-3 | TC-CL-010.1 to 010.4 (5 cases) |
+| BRCLXN.005 | As a Collection Handler, I need only the invoices above the minimal balance threshold listed, so that I do not chase immaterial balances. | FR-CL-011 | FR-CL-011 AC 1-2 | TC-CL-011.1 to 011.3 (4 cases) |
+| BRCLXN.006 | As a Section Head (Corporate / Retail), I need the minimal balance threshold stored in the system, so that every list applies the same value. | FR-CL-012 | FR-CL-012 AC 1-3 | TC-CL-012.1 to 012.4 (7 cases) |
+| BRCLXN.007 | As a Section Head (Corporate / Retail), I need to update the threshold and the Collections parameters, so that the worklist follows the current policy. | FR-CL-012 | FR-CL-012 AC 1-3 | TC-CL-012.1 to 012.4 (7 cases) |
+| BRCLXN.008 | As a Collection Handler, I need fully paid invoices and those at or below the threshold left out of the open list, so that my list holds only work to do. | FR-CL-011, FR-CL-018 | FR-CL-011 AC 1-2; FR-CL-018 AC 1-2 | TC-CL-011.1 to 011.3; 018.1 to 018.3 (7 cases) |
+| BRCLXN.009 | As a Collection Handler, I need invoices above the threshold kept in the list until they are paid, so that no receivable is missed. | FR-CL-011 | FR-CL-011 AC 1-2 | TC-CL-011.1 to 011.3 (4 cases) |
+| BRCLXN.010 | As a Collection Handler, I need negative balances of cancelled invoices excluded, so that credits are not chased as receivables. | FR-CL-013 | FR-CL-013 AC 1-2 | TC-CL-013.1 to 013.2 (2 cases) |
+| BRCLXN.011 | As a Collection Handler, I need to filter the list by market segment, Unit Head and other criteria, so that I work the accounts of my segment. | FR-CL-015 | FR-CL-015 AC 1-2 | TC-CL-015.1 to 015.3 (4 cases) |
+| BRCLXN.012 | As a Collection Handler, I need the list to show only the accounts of the selected segment and Unit Head, so that the totals match my selection. | FR-CL-015 | FR-CL-015 AC 1-2 | TC-CL-015.1 to 015.3 (4 cases) |
+| BRCLXN.013 | As a Collection Handler, I need the worklist refreshed every night from the invoice ledger, so that each morning I see the current balances. | FR-CL-017 | FR-CL-017 AC 1-3 | TC-CL-017.1 to 017.4 (6 cases) |
+| BRCLXN.014 | As a Collection Handler, I need new invoices added to the worklist by the nightly refresh, so that new receivables are followed up at once. | FR-CL-017 | FR-CL-017 AC 1-3 | TC-CL-017.1 to 017.4 (6 cases) |
+| BRCLXN.015 | As a Collection Handler, I need existing accounts updated by the nightly refresh, so that payments and adjustments show on my accounts. | FR-CL-017 | FR-CL-017 AC 1-3 | TC-CL-017.1 to 017.4 (6 cases) |
+| BRCLXN.016 | As a Collection Handler, I need a stored list of PR collector dispositions to choose from, so that the outcome of every follow-up is recorded the same way. | FR-CL-030, FR-CL-031 | FR-CL-030 AC 1-4; FR-CL-031 AC 1-3 | TC-CL-030.1 to 030.5; 031.1 to 031.4 (15 cases) |
+| BRCLXN.017 | As a Section Head (Corporate / Retail), I need to add, change and deactivate the disposition values and their rules, so that the list follows the collection practice. | FR-CL-030 | FR-CL-030 AC 1-4 | TC-CL-030.1 to 030.5 (8 cases) |
+| BRCLXN.018 | As a Collection Handler, I need deactivated disposition values refused, so that only current values are used. | FR-CL-030, FR-CL-031 | FR-CL-030 AC 1-4; FR-CL-031 AC 1-3 | TC-CL-030.1 to 030.5; 031.1 to 031.4 (15 cases) |
+| BRCLXN.019 | As a Collection Handler, I need to see who encoded each record, so that I know who did the work. | FR-CL-002 | FR-CL-002 AC 1-2 | TC-CL-002.1 to 002.2 (3 cases) |
+| BRCLXN.020 | As a Collection Handler, I need to see who last updated each record and when, so that every change is accountable. | FR-CL-002 | FR-CL-002 AC 1-2 | TC-CL-002.1 to 002.2 (3 cases) |
+| BRCLXN.021 | As a Collection Handler, I need the history of the dispositions of each account kept, so that I see every earlier outcome. | FR-CL-018, FR-CL-031 | FR-CL-018 AC 1-2; FR-CL-031 AC 1-3 | TC-CL-018.1 to 018.3; 031.1 to 031.4 (10 cases) |
+| BRCLXN.022 | As a Collection Handler, I need completed accounts and their dispositions kept, so that I can answer questions after the account is paid. | FR-CL-018 | FR-CL-018 AC 1-2 | TC-CL-018.1 to 018.3 (3 cases) |
+| BRCLXN.023 | As a Collection Handler, I need the history of the records and dispositions maintained over time, so that the follow-up can be audited. | FR-CL-018 | FR-CL-018 AC 1-2 | TC-CL-018.1 to 018.3 (3 cases) |
+| BRCLXN.024 | As a Collection Handler, I need a monthly file of the accounts tagged DP PR for reversal, so that Operations reverses the direct payments. | FR-CL-032, FR-CL-080 | FR-CL-032 AC 1-3; FR-CL-080 AC 1-2 | TC-CL-032.1 to 032.5; 080.1 to 080.3 (11 cases) |
+| BRCLXN.025 | As a Collection Handler, I need the monthly DP PR for Reversal file available from 08:00 of the first working day, so that Operations can start on time. | FR-CL-080 | FR-CL-080 AC 1-2 | TC-CL-080.1 to 080.3 (3 cases) |
+| BRCLXN.026 | As a Collection Handler, I need a monthly file of the accounts tagged PR 2307 for reversal, so that the 2% withheld is reversed when the certificate is in. | FR-CL-032, FR-CL-081 | FR-CL-032 AC 1-3; FR-CL-081 AC 1 | TC-CL-032.1 to 032.5; 081.1 to 081.2 (10 cases) |
+| BRCLXN.027 | As a Collection Handler, I need the monthly PR 2307 for Reversal file available from 08:00 of the first working day, so that the reversal follows the month-end. | FR-CL-081 | FR-CL-081 AC 1 | TC-CL-081.1 to 081.2 (2 cases) |
+| BRCLXN.028 | As a Collection Handler, I need weekly reversal files per unit and branch generated after Friday, so that each unit sees its own tags. | FR-CL-082 | FR-CL-082 AC 1 | TC-CL-082.1 to 082.2 (2 cases) |
+| BRCLXN.029 | As a Collection Handler, I need to view and download the weekly files from Monday 08:00, so that the week starts with the reversals to do. | FR-CL-082 | FR-CL-082 AC 1 | TC-CL-082.1 to 082.2 (2 cases) |
+| BRCLXN.030 | As a Collection Handler, I need to request the application of an unapplied payment to an invoice, so that Cashiering applies the money. | FR-CL-074 | FR-CL-074 AC 1-3 | TC-CL-074.1 to 074.4 (6 cases) |
+| BRCLXN.031 | As a Collection Handler, I need to record a disposition on an unapplied payment, so that the action agreed with the client is documented. | FR-CL-073 | FR-CL-073 AC 1-2 | TC-CL-073.1 to 073.2 (4 cases) |
+| BRCLXN.032 | As an Unapplied Payment Handler, I need to request the application, refund, reclass or transfer of an unapplied payment, so that Cashiering clears it. | FR-CL-074 | FR-CL-074 AC 1-3 | TC-CL-074.1 to 074.4 (6 cases) |
+| BRCLXN.033 | As an Unapplied Payment Handler, I need to record the disposition of an unapplied payment, so that its follow-up is documented. | FR-CL-073 | FR-CL-073 AC 1-2 | TC-CL-073.1 to 073.2 (4 cases) |
+| BRCLXN.034 | As an Unapplied Payment Handler, I need the list of unapplied payments as of today, so that I see every payment still to clear. | FR-CL-070 | FR-CL-070 AC 1-3 | TC-CL-070.1 to 070.3 (3 cases) |
+| BRCLXN.035 | As an Unapplied Payment Handler, I need to filter the unapplied payments by market segment and disposition status, so that I work my segment and the payments without a disposition. | FR-CL-071 | FR-CL-071 AC 1 | TC-CL-071.1 to 071.2 (3 cases) |
+| BRCLXN.036 | As an Unapplied Payment Handler, I need each unapplied payment shown with its payment, payor and matched account details, so that I can find the invoice it belongs to. | FR-CL-070 | FR-CL-070 AC 1-3 | TC-CL-070.1 to 070.3 (3 cases) |
+| BRCLXN.037 | As a Section Head (Corporate / Retail), I need to add, change and deactivate the unapplied payment dispositions, so that the list follows the practice. | FR-CL-072 | FR-CL-072 AC 1-2 | TC-CL-072.1 to 072.3 (3 cases) |
+| BRCLXN.038 | As an Unapplied Payment Handler, I need deactivated unapplied dispositions refused, so that only current values are used. | FR-CL-072 | FR-CL-072 AC 1-2 | TC-CL-072.1 to 072.3 (3 cases) |
+| BRCLXN.039 | As a Section Head (Corporate / Retail), I need the unapplied payment dispositions stored with their rules, so that each disposition triggers the right Cashiering action. | FR-CL-072 | FR-CL-072 AC 1-2 | TC-CL-072.1 to 072.3 (3 cases) |
+| BRCLXN.040 | As an Unapplied Payment Handler, I need the history of an unapplied payment and its dispositions kept, so that I see how it was cleared. | FR-CL-076 | FR-CL-076 AC 1 | TC-CL-076.1 to 076.2 (2 cases) |
+| BRCLXN.041 | As an Unapplied Payment Handler, I need a daily For Application To Invoice file of the application requests, so that the requests are on record for Cashiering. | FR-CL-077 | FR-CL-077 AC 1-2 | TC-CL-077.1 to 077.3 (4 cases) |
+| BRCLXN.042 | As an Unapplied Payment Handler, I need the daily application file placed where Cashiering takes it, so that it is available before the working day. | FR-CL-077 | FR-CL-077 AC 1-2 | TC-CL-077.1 to 077.3 (4 cases) |
+| BRCLXN.043 | As a Section Head (Corporate / Retail), I need an audit log of every change with the old and new values, so that changes can be traced. | FR-CL-003 | FR-CL-003 AC 1-3 | TC-CL-003.1 to 003.4 (4 cases) |
+| BRCLXN.044 | As a Section Head (Corporate / Retail), I need to view and extract the audit log for a period, so that I can answer audit requests. | FR-CL-004 | FR-CL-004 AC 1-2 | TC-CL-004.1 to 004.3 (4 cases) |
+| BRCLXN.045 | As a Collection Handler, I need the daily PR reports generated after the end of day, so that each morning starts with the current list. | FR-CL-083 | FR-CL-083 AC 1 | TC-CL-083.1 to 083.2 (2 cases) |
+| BRCLXN.046 | As a Collection Handler, I need to see the net outstanding PR and its breakdown, so that I explain the balance to the client. | FR-CL-016 | FR-CL-016 AC 1-2 | TC-CL-016.1 to 016.2 (3 cases) |
+| BRCLXN.047 | As an Unapplied Payment Handler, I need the invoice number of an application checked against the expected format, so that a payment is not applied to a wrong number. | FR-CL-075 | FR-CL-075 AC 1-3 | TC-CL-075.1 to 075.3 (4 cases) |
+| BRCLXN.048 | As an Unapplied Payment Handler, I need a request without a valid invoice number refused, so that only valid applications reach Cashiering. | FR-CL-075 | FR-CL-075 AC 1-3 | TC-CL-075.1 to 075.3 (4 cases) |
+| BRCLXN.049 | As a Collection Team Lead, I need to configure escalation rules based on aging, commitments and broken promises, so that overdue accounts are handled consistently. | FR-CL-050, FR-CL-051, FR-CL-053 | FR-CL-050 AC 1-4; FR-CL-051 AC 1-3; FR-CL-053 AC 1-3 | TC-CL-050.1 to 050.6; 051.1 to 051.4; 053.1 to 053.4 (22 cases) |
+| BRCLXN.050 | As a Collection Handler, I need to escalate an account manually to the team lead or a designated authority, so that difficult or exceptional cases are addressed promptly beyond the automated rules. | FR-CL-052, FR-CL-053 | FR-CL-052 AC 1-3; FR-CL-053 AC 1-3 | TC-CL-052.1 to 052.4; 053.1 to 053.4 (12 cases) |
+| BRCLXN.051 | As a Collection Handler, I need to update several accounts at once, so that large follow-up workloads are handled efficiently with audit traceability. | FR-CL-034 | FR-CL-034 AC 1-4 | TC-CL-034.1 to 034.4 (8 cases) |
+| BRCLXN.052 | As a Collection Team Lead, I need to reassign collection accounts permanently or temporarily, so that the workload is balanced without losing accountability. | FR-CL-020, FR-CL-021 | FR-CL-020 AC 1-2; FR-CL-021 AC 1-3 | TC-CL-020.1 to 020.4; 021.1 to 021.4 (15 cases) |
+| BRCLXN.053 | As a Collection Handler, I need to monitor installment-based premiums per due date, so that missed or delayed payments are detected and acted upon promptly. | FR-CL-040, FR-CL-042 | FR-CL-040 AC 1-4; FR-CL-042 AC 1-3 | TC-CL-040.1 to 040.5; 042.1 to 042.4 (24 cases) |
+| BRCLXN.054 | As a Collection Handler, I need to view the complete payment history and financial summary of an account, so that collection actions are based on accurate and complete information. | FR-CL-041 | FR-CL-041 AC 1-2 | TC-CL-041.1 to 041.3 (4 cases) |
+| BRCLXN.055 | As a Collection Team Lead, I need broken payment promises detected per installment, so that the escalation can be triggered. | FR-CL-042, FR-CL-051 | FR-CL-042 AC 1-3; FR-CL-051 AC 1-3 | TC-CL-042.1 to 042.4; 051.1 to 051.4 (16 cases) |
+| BRCLXN.056 | As a Collection Handler, I need to view the policy, account, invoice and co-insurance information, so that collection actions are based on complete and accurate policy data. | FR-CL-043 | FR-CL-043 AC 1-2 | TC-CL-043.1 to 043.2 (4 cases) |
+| BRCLXN.057 | As a Collection Handler, I need to view the complete financial transaction history of an account, so that prior payments, adjustments and collection actions are clearly understood. | FR-CL-044 | FR-CL-044 AC 1-2 | TC-CL-044.1 to 044.3 (3 cases) |
+| BRCLXN.058 | As Operations Cashiering (the Operations billing user), I need to generate and send billing statements per billing cycle of multi-year and installment policies, so that billing and commissions are handled correctly, while the Collection Handler sees the statements. | FR-CL-060, FR-CL-061 | FR-CL-060 AC 1-4; FR-CL-061 AC 1-3 | TC-CL-060.1 to 060.4; 061.1 to 061.4 (12 cases) |
+| BRCLXN.059 | As the Commission Receivables Unit, I need commission receivable billing blocked until the premium is confirmed fully paid, so that commission is billed only on collected premium. | FR-CL-090 | FR-CL-090 AC 1-2 | TC-CL-090.1 to 090.3 (4 cases) |
+| BRCLXN.060 | As a Collection Handler, I need to see the billing statements, invoice dates and policy periods, so that aging, monitoring and escalation are accurate. | FR-CL-062 | FR-CL-062 AC 1-2 | TC-CL-062.1 to 062.2 (3 cases) |
+| BRCLXN.061 | As the Commission Receivables Unit, I need regular commission and incentives kept as distinct receivable types, so that each follows its own eligibility rules, billing and accounting. | FR-CL-091 | FR-CL-091 AC 1 | TC-CL-091.1 to 091.2 (2 cases) |
+| BRCLXN.062 | As a Marketing Team Lead, I need incentives configured as campaigns with defined criteria, so that the qualified invoices are identified and billed automatically, while the Collection Handler sees the eligible transactions. | FR-CL-092 | FR-CL-092 AC 1-2 | TC-CL-092.1 to 092.3 (3 cases) |
+| BRCLXN.063 | As the Commission Receivables Unit, I need refunds from negative adjustments computed and handled apart from collectible commission, so that they are never chased as receivables. | FR-CL-093 | FR-CL-093 AC 1 | TC-CL-093.1 (2 cases) |
+| BRCLXN.064 | As the Commission Receivables Unit, I need to see only the collectible commission based on the directly billed and paid premium, so that unpaid or externally settled portions are not pursued. | FR-CL-094 | FR-CL-094 AC 1 | TC-CL-094.1 (2 cases) |
+
+<!-- landscape -->
+
+# Appendix: Storyboard index
+
+One row per frame of the walkthroughs of chapter 14: the persona, the screen, what the user does, what the user sees and the outcome, the screenshot of the frame (figure number of this FRS), the functional requirements it shows and the slide of the step in the 07 UX Screen Deck (the deck follows the same frames). A retired frame keeps its number and says why it was retired.
+
+<!-- table: widths=1.3,2.6,3.0,4.6,4.8,1.6,2.2,1.4 caption="Storyboard index of the walkthroughs" size=7.5 -->
+| Frame | Persona | Screen | Action | What the user sees / outcome | Screenshot | FR | UX deck slide |
+|---|---|---|---|---|---|---|---|
+| WT-A.1 | Section Head (Corporate / Retail) | SCR-CL-19 Collections Setup | Clicks Refresh Worklist Now on Collections Setup | Message with the outcome of the refresh: the accounts listed and updated. Outcome: Worklist refreshed | wt-a-01 | FR-CL-012, FR-CL-017 | - |
+| WT-A.2 | Collection Handler | SCR-CL-01 Collections Home | Opens Collections Home | My Open Accounts counts the new account assigned to her by the rule; the open amounts by aging bracket. Outcome: Assigned | wt-a-02 | FR-CL-085, FR-CL-020 | - |
+| WT-A.3 | Collection Handler | SCR-CL-02 PR Worklist | Opens the PR Worklist with Only mine ticked | The new invoice with the client, segment, booking date and aging, outstanding premium, her name as handler and no disposition yet. Outcome: In the worklist | wt-a-03 | FR-CL-010, FR-CL-015 | - |
+| WT-A.4 | Collection Handler | SCR-CL-03 Collection Account | Opens the account and clicks Log Effort: Phone call to the client's finance officer | Message: Effort logged; the Summary tab shows the last effort. Outcome: Effort logged | wt-a-04 | FR-CL-033 | - |
+| WT-A.5 | Collection Handler | SCR-CL-03 Collection Account | Recorded the disposition For check pick-up with the pick-up details | Retired: check pick-up removed from scope by the Operations Cashiering annex (CSHID.009); CLR-CL-33 | - | FR-CL-032 | - |
+| WT-A.6 | Cashier (read access and exports) | SCR-OP-17 Check Pick-up (BRD-2) | Opened Check Pick-up in Cashiering | Retired with WT-A.5 | - | FR-CL-032 | - |
+| WT-B.1 | Collection Handler | SCR-CL-08 Promises to Pay | Clicks Record Promise and enters the invoice, the promised payment date in ten days and half of the outstanding | Promises Recorded: the promise of the invoice recorded; it is on Open Promises. Outcome: Promise open | wt-b-01 | FR-CL-042 | - |
+| WT-B.2 | Collection Handler | SCR-CL-11 Escalations | Clicks Escalate Accounts and enters the invoice, Team Lead and the reason Credit term extension refused by the insurer | Escalation Results: one escalation raised for the account. Outcome: Escalated | wt-b-02 | FR-CL-052 | - |
+| WT-B.3 | Collection Team Lead | SCR-CL-12 Escalation | Opens the escalation from With Team Lead and clicks Acknowledge | The escalation is In action with the step in its history. Outcome: In action | wt-b-03 | FR-CL-053 | - |
+| WT-B.4 | Collection Team Lead | SCR-CL-12 Escalation | Clicks Resolve and gives the resolution | The escalation is Resolved with the resolution. Outcome: Resolved | wt-b-04 | FR-CL-053 | - |
+| WT-B.5 | Authorizer of master data | SCR-CL-13 Escalation Rules | Opens Escalation Rules and, from the row menu of CLX-AMOUNT-1M, authorizes the rule made by the Business Administrator | The rule is Active. Outcome: Rule in force | wt-b-05 | FR-CL-050 | - |
+| WT-C.1 | Unapplied Payment Handler | SCR-CL-14 Unapplied Payments | Selects the payment, clicks Request Application and enters the invoice number | Message: Disposition recorded; request sent to Cashiering. Outcome: Request sent | wt-c-01 | FR-CL-073, FR-CL-074, FR-CL-075 | - |
+| WT-C.2 | Unapplied Payment Handler | SCR-CL-16 Requests to Cashiering | Opens Requests to Cashiering | The request Sent with the Cashiering reference of the request. Outcome: With Cashiering | wt-c-02 | FR-CL-074 | - |
+| WT-C.3 | Cashier (read access and exports) | SCR-OP-13 Incoming Requests | Opens Incoming Requests, selects the collector request and clicks Accept Request with Submit the disposition now | The request accepted; the application of the payment is processed at once. Outcome: Applied | wt-c-03 | FR-CL-074 | - |
+| WT-C.4 | Unapplied Payment Handler | SCR-CL-16 Requests to Cashiering | Opens the Executed tab of Requests to Cashiering | The request Applied with the Cashiering reference. Outcome: Executed | wt-c-04 | FR-CL-074 | - |
+| WT-C.5 | Unapplied Payment Handler | SCR-CL-15 Unapplied Payment | Opens the unapplied payment, History tab | The payment, the collector disposition, the request and its application, kept after the payment is applied. Outcome: History kept | wt-c-05 | FR-CL-076 | - |
+| WT-D.1 | Collection Handler | SCR-CL-05 Installment Plans | Clicks New Installment Plan: installments of one invoice, the invoice, the first due date, 4 installments, Quarterly | Message: <plan> created with 4 installments; the plan opens with its installments. Outcome: Plan active | wt-d-01 | FR-CL-040 | - |
+| WT-D.2 | Operations billing user (Cashiering Team Leader / Head) | SCR-CL-06 Installment Plan | Opens the plan, the row menu of cycle 1 and clicks Generate SOA, then the Statements of Account tab | Message: <SOA> generated; the statement of cycle 1 To Send. Outcome: Billed | wt-d-02 | FR-CL-060 | - |
+| WT-D.3 | Operations billing user (Cashiering Team Leader / Head) | SCR-CL-10 Statement of Account | Opens the statement and clicks Send via Email | The e-mail with the client's address, the proposed subject and message and the protected attachment. Outcome: Ready to send | wt-d-03 | FR-CL-061 | - |
+| WT-D.4 | Operations billing user (Cashiering Team Leader / Head) | SCR-CL-10 Statement of Account | Clicks Send | Message: <SOA> sent to <address>; the statement is Sent and E-mails Sent lists the e-mail; the Collection Handler sees it Sent on the plan. Outcome: Sent | wt-d-04 | FR-CL-061 | - |
+| WT-E.1 | Marketing Account Officer | SCR-CL-03 Collection Account | The account officer records the disposition No / missing policy number on an account | The refusal: the disposition is reserved to other roles. Outcome: Refused | wt-e-01 | FR-CL-030, FR-CL-031 | - |
+| WT-E.2 | Collection Team Lead | SCR-CL-03 Collection Account | Opens the account the Collection Handler is working on | <name> is editing since <time>; Update Remarks, Log Effort and Record Disposition are not offered. Outcome: Read only | wt-e-02 | FR-CL-005 | - |
+| WT-E.3 | Collection Handler | SCR-CL-08 Promises to Pay | Records a promise of an amount above the outstanding of the account | Promises Recorded with the outcome of the invoice: the promised amount is above the outstanding. Outcome: Refused | wt-e-03 | FR-CL-042 | - |
+| WT-E.4 | Unapplied Payment Handler | SCR-CL-14 Unapplied Payments | Requests the application of a payment to an invoice number in the wrong format | Under the field: The invoice number does not have the expected format. Outcome: Refused | wt-e-04 | FR-CL-075 | - |
+
+<!-- portrait -->
 
 # Appendix: Screen standards
 

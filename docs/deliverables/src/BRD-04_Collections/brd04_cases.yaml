@@ -10,8 +10,8 @@ meta:
   code: CL
   frs: FRS_BRD04_COLLECTIONS.md
   summary: TP_BRD04_COLLECTIONS.md
-  version: "2.0"
-  date: 1 October 2026
+  version: "2.1"
+  date: 8 October 2026
   signoff: pack/pack.yaml
   verify_messages: true
 
@@ -25,6 +25,7 @@ personas:
   UNAPPLIED_HANDLER: {name: Unapplied Payment Handler, user: upphandler, short: UPP Hdlr}
   PROCESSOR: {name: Processing Unit, user: proc, short: Proc.}
   CASHIER: {name: Cashier, user: "cashier, cashtl", short: Cashier}
+  CASHIER_TL: {name: Operations billing user (Cashiering Team Leader / Head), user: cashtl, short: Ops billing}
   COMMREC: {name: Commission Receivables Unit, user: "commrec, commtl", short: CRU}
   DISBURSEMENT: {name: Disbursement Processor, user: disb, short: Disb.}
   COMPTROLLERSHIP: {name: Comptrollership, user: comptrol, short: Compt.}
@@ -62,7 +63,8 @@ screens:
   UPPD: Finance > Collections > Unapplied Payments > Unapplied Payment
   CREQ: Finance > Collections > Requests to Cashiering
   CASHREQ: Finance > Cashiering > Incoming Requests (Collector Requests)
-  PICKUP: Finance > Cashiering > Check Pick-up
+  REMIT: Remittance > Remittance Workbench (search and view)
+  PRODREG: Product Reconciliation > Production Register
   DPACC: Finance > Commission Receivables > DP Accounts
   BULK: Client & Policy > Bulk Processing > Bulk Uploads (template Collections Bulk Update)
   LOV: Setup & Administration > Broking Setup > Lists of Values
@@ -82,7 +84,7 @@ data:
     source: Seed data (broking, Operations and Collections users, and the unapplied-payment handler upphandler, with their grants)
   - id: TD-CL-02
     name: Seed worklist
-    content: The unpaid seed invoices listed by the refresh of clxtl and assigned by the seed assignment rules (segment CBG to clxhandler, team T-CORP1 to mkthandler, all others to mktcoll); an effort, dispositions of every kind (Coordinate further, DP PR for reversal, PR 2307 for reversal, For check pick-up, one superseded) and one temporary reassignment recorded
+    content: The unpaid seed invoices listed by the refresh of clxtl and assigned by the seed assignment rules (segment CBG to clxhandler, team T-CORP1 to mkthandler, all others to mktcoll); an effort, dispositions of every kind (Coordinate further, DP PR for reversal, PR 2307 for reversal, one superseded) and one temporary reassignment recorded
     source: Seed data (Collections worklist, on the seed bookings of New Business and Operations)
   - id: TD-CL-03
     name: Collections parameters as delivered
@@ -94,7 +96,7 @@ data:
     source: Seed data (on the seed sales organisation)
   - id: TD-CL-05
     name: Disposition lists
-    content: CLX_PR_DISPOSITION (DP PR for reversal, PR 2307 for reversal, For check pick-up, Cancel account, Coordinate further, Request bank AO assistance, No / missing policy number reserved to PROCESSOR, MKT_COLLECTION, CLX_TL, MKT_SECTION_HEAD, DP returned by insurer); CLX_UPP_DISPOSITION (For application to invoice, For refund, For reclass, For transfer to other unit, Coordinate further); CLX_EFFORT_CODE
+    content: CLX_PR_DISPOSITION (DP PR for reversal, PR 2307 for reversal, Cancel account, Coordinate further, Request bank AO assistance, No / missing policy number reserved to PROCESSOR, MKT_COLLECTION, CLX_TL, MKT_SECTION_HEAD, DP returned by insurer); CLX_UPP_DISPOSITION (For application to invoice, For refund, For reclass, For transfer to other unit, Coordinate further); CLX_EFFORT_CODE
     source: Lists and Disposition Rules attributes as configured for the SIT environment
   - id: TD-CL-06
     name: Escalation rules
@@ -166,6 +168,7 @@ frs:
       - The Collections set-up and assignment screens are not offered to roles without CLX_SETUP or CLX_ASSIGN, and a direct request without the permission is refused.
       - The User Access Matrix lists the CLX_* permissions in the area COLLECTIONS with their action classes.
       - The account locks after LOGIN_MAX_FAILED_ATTEMPTS consecutive wrong passwords.
+      - The Collections roles open Remittance and the Production Register of Operations read only (minutes of 27-Apr-2026).
     cases:
       - c: 1
         type: Security-access
@@ -209,7 +212,7 @@ frs:
         steps:
           - Log in as admin and open Broking Setup > User Access Matrix.
           - Choose the view by action and the area COLLECTIONS.
-        expected: CLX_VIEW (VIEW), CLX_WORK (CREATE / AMEND), CLX_BULK_UPDATE (AMEND), CLX_ESCALATE, CLX_ESCALATION_HANDLE (APPROVE), CLX_ASSIGN, CLX_UNAPPLIED_WORK, CLX_BILLING, CLX_SETUP, CLX_EXPORT, CLX_REPORT_VIEW and CLX_AUDIT_VIEW are listed with the roles of FRS section 3.3.
+        expected: CLX_VIEW (VIEW), CLX_WORK (CREATE / AMEND), CLX_BULK_UPDATE (AMEND), CLX_ESCALATE, CLX_ESCALATION_HANDLE (APPROVE), CLX_ASSIGN, CLX_UNAPPLIED_WORK, CLX_BILLING, CLX_SOA_ISSUE, CLX_SETUP, CLX_EXPORT, CLX_REPORT_VIEW and CLX_AUDIT_VIEW are listed with the roles of FRS section 3.3.
       - c: 4
         type: Boundary
         neg: true
@@ -233,6 +236,25 @@ frs:
           - Enter the correct password.
         expected: The log-in succeeds and the failed-attempt counter resets.
         msg: [Invalid user name or password, AUTHENTICATION_FAILED]
+      - c: 5
+        type: Security-access
+        neg: false
+        persona: MKT_COLLECTION
+        screen: REMIT
+        title: Collection Handler views Remittance and the Production Register
+        steps:
+          - Log in as clxhandler, open Remittance, search a remittance batch and open it.
+          - Open the Production Register and filter it on the insurer of the batch.
+        expected: Both open read only; no action to change a remittance or the register is offered.
+      - c: 5
+        type: Security-access
+        persona: MKT_COLLECTION
+        screen: SYS
+        title: Collection Handler cannot change a remittance
+        steps:
+          - Signed in as clxhandler, send a direct request to submit a remittance batch.
+        expected: The request is refused; the batch is unchanged.
+        msg: [You are not permitted to perform this action, ACCESS_DENIED]
 
   FR-CL-002:
     scenario: SC-CL-01
@@ -912,6 +934,7 @@ frs:
       - A value past its end date is not offered and is refused on save.
       - The rules of a value (category, tagging owner, Operations action, allowed roles) are kept on Collections Setup and validated.
       - A value reserved to roles is refused for other roles.
+      - For check pick-up is not offered and the Operations Action list has no check pick-up (removed from scope).
     cases:
       - c: 1
         type: Positive
@@ -975,6 +998,14 @@ frs:
         steps:
           - Log in as proc, open an account and record "No / missing policy number".
         expected: The disposition is saved.
+      - c: 5
+        type: Negative
+        screen: SETUP
+        title: No check pick-up in the dispositions and their rules
+        steps:
+          - Open Record Disposition on an open account and read the list of dispositions.
+          - Open Collections Setup, Disposition Rules, and the Operations Action list of a value.
+        expected: For check pick-up is not in the list of dispositions; the Operations Action list offers None, BIR 2307 reversal, DP reversal and Cancellation request only.
 
   FR-CL-031:
     scenario: SC-CL-04
@@ -1050,19 +1081,21 @@ frs:
     screen: WL
     data: [TD-CL-02, TD-CL-05]
     conditions:
-      - '"For check pick-up" queues a request in Cashiering''s Check Pick-up with the details given.'
+      - No disposition hands a check pick-up to Cashiering (removed from scope by the Operations Cashiering annex, CSHID.009).
       - '"DP PR for reversal" puts the account on the Commission DP list; "PR 2307 for reversal" queues a 2307 item for Cashiering.'
       - A later disposition withdraws a PENDING hand-off; an item pending for more than a day raises CLX_OUTBOX_STALE.
       - A DP account returned by the insurer reopens with the disposition "DP returned by insurer".
       - The details of a hand-off are validated.
     cases:
       - c: 1
-        type: Workflow
-        title: Check pick-up reaches Cashiering
+        type: Negative
+        screen: SYS
+        title: A check pick-up disposition is refused
         steps:
-          - Record "For check pick-up" on an account with pick-up date tomorrow, address, contact person, check amount 12,000.00, check number and bank.
-          - Log in as cashier and open Check Pick-up.
-        expected: The request is in the pick-up queue with the date and address; the account's Hand-offs tab shows it PENDING, then TAKEN.
+          - Send a direct request to record the disposition For check pick-up on an open account.
+          - Open the Hand-offs to Operations tab of the account.
+        expected: The disposition is refused and no hand-off is created; Cashiering has no pick-up queue.
+        msg: ["{CHECK_PICKUP} is not a value of {CLX_PR_DISPOSITION}", CLX_LOV_VALUE_UNKNOWN]
       - c: 2
         type: Workflow
         persona: COMMREC
@@ -1105,20 +1138,6 @@ frs:
           - As commrec, mark the DP account returned by the insurer with a reason.
           - As clxhandler, open Collections Home and the account.
         expected: The tile DP Returned by Insurer counts it; the account is OPEN with disposition "DP returned by insurer" and the reason; clxhandler is notified.
-      - c: 5
-        type: Negative
-        title: Pick-up date in the past
-        steps:
-          - Record "For check pick-up" with pick-up date yesterday.
-        expected: The disposition is refused.
-        msg: [Give a pick-up date from today on for the check pick-up, CLX_PICKUP_DATE]
-      - c: 5
-        type: Negative
-        title: Check amount missing
-        steps:
-          - Record "For check pick-up" without check amount.
-        expected: The disposition is refused.
-        msg: [Give the check amount, CLX_PICKUP_AMOUNT]
       - c: 5
         type: Negative
         screen: SYS
@@ -1544,6 +1563,7 @@ frs:
     conditions:
       - The Timeline merges ledger movements and Collections actions in date order with source, amount and user.
       - Timeline entries cannot be edited or deleted.
+      - Only financial events of the ledger are listed; a non-financial endorsement adds no entry.
     cases:
       - c: 1
         type: Positive
@@ -1558,6 +1578,13 @@ frs:
         steps:
           - Look for edit or delete actions on the Timeline; send a direct request to delete a Timeline entry.
         expected: No action is offered; a direct request is refused and the entries stay.
+      - c: 3
+        type: Negative
+        title: Non-financial endorsement not on the Timeline
+        steps:
+          - Have a non-financial endorsement (change of the mailing address) issued on the policy of an open account.
+          - Open the Timeline tab of the account.
+        expected: No entry is added for the endorsement; payments, financial endorsements and adjustments remain listed.
 
   FR-CL-050:
     scenario: SC-CL-06
@@ -1570,6 +1597,7 @@ frs:
       - Preview lists the accounts the rule would escalate today.
       - A rule needs a code, positive threshold and SLA, a user for a USER target, dates and amounts in order.
       - A rule is deactivated instead of deleted.
+      - A 120-day rule to the Section Head escalates the accounts beyond 120 days from booking (minutes of 27-Apr-2026).
     cases:
       - c: 1
         type: Workflow
@@ -1641,6 +1669,14 @@ frs:
         steps:
           - Open CLX-AGING-30-TEST and click Deactivate.
         expected: The rule is INACTIVE and kept in the list; it is no longer applied.
+      - c: 6
+        type: Workflow
+        persona: BUSINESS_ADMIN
+        title: 120-day rule to the Section Head
+        steps:
+          - As badmin, click New Rule, code CLX-AGING-120, basis Aging from booking, threshold 120, target Section Head, SLA 24; save.
+          - As checker, authorize the rule in My Approvals; run CLX_ESCALATION and open Escalations as clxuh.
+        expected: Every open account more than 120 days from booking is escalated once to the Section Head with the reason of the rule; younger accounts are not.
 
   FR-CL-051:
     scenario: SC-CL-06
@@ -1796,13 +1832,14 @@ frs:
 
   FR-CL-060:
     scenario: SC-CL-07
-    persona: MKT_COLLECTION
+    persona: CASHIER_TL
     screen: BILL
     data: [TD-CL-07]
     conditions:
       - An SOA per billing cycle of a live plan lists the current installment, arrears and payments, numbered SOA-yyyy-n and rendered from CLX_SOA.
       - A billing run generates the SOAs of the cycles due in a period and not yet billed.
       - A second SOA for a billed cycle, a cancelled plan or a reversed period is refused.
+      - Collections users see the statements and download the PDF but cannot run the billing or generate a statement (minutes of 27-Apr-2026).
     cases:
       - c: 1
         type: Report-output
@@ -1841,16 +1878,34 @@ frs:
           - Generate an SOA from the plan cancelled in FR-CL-040.
         expected: The statement is refused.
         msg: ["Plan {no} is cancelled", CLX_PLAN_NOT_ACTIVE]
+      - c: 4
+        type: Security-access
+        neg: false
+        persona: MKT_COLLECTION
+        title: Collection Handler views the statements of a plan
+        steps:
+          - Log in as clxhandler, open Billing Statements and a statement of the three-year account; click Download PDF.
+        expected: The statement, its installments billed and its e-mails are shown and the PDF downloads; Billing Run is not offered.
+      - c: 4
+        type: Security-access
+        persona: MKT_COLLECTION
+        screen: SYS
+        title: Collection Handler cannot generate a statement
+        steps:
+          - Signed in as clxhandler, send a direct request to generate the statement of the next cycle of a plan.
+        expected: The request is refused; no statement is generated.
+        msg: [You are not permitted to perform this action, ACCESS_DENIED]
 
   FR-CL-061:
     scenario: SC-CL-07
-    persona: MKT_COLLECTION
+    persona: CASHIER_TL
     screen: SOA
     data: [TD-CL-07]
     conditions:
       - Sending an SOA e-mails the password-protected PDF and the password separately and sets it SENT.
       - A statement needs a recipient before it is sent.
       - A cancelled statement cannot be sent and its cycle can be billed again.
+      - Collections users cannot send or cancel a statement.
     cases:
       - c: 1
         type: Upload-download
@@ -1879,6 +1934,15 @@ frs:
           - Open the cancelled SOA and send a direct request to send it.
         expected: The send is refused.
         msg: ["Statement {SOA} is cancelled", CLX_SOA_CANCELLED]
+      - c: 4
+        type: Security-access
+        persona: MKT_COLLECTION
+        screen: SYS
+        title: Collection Handler cannot send a statement
+        steps:
+          - Signed in as clxhandler, open a statement To Send; send a direct request to send it and one to cancel it.
+        expected: Send via Email and Cancel Statement are not offered; both requests are refused.
+        msg: [You are not permitted to perform this action, ACCESS_DENIED]
 
   FR-CL-062:
     scenario: SC-CL-07
@@ -1891,6 +1955,7 @@ frs:
       - c: 1
         type: Positive
         title: SOA of 10,000.00 changes nothing in the ledger
+        persona: CASHIER_TL
         steps:
           - Note the outstanding of the invoice and the number of Open Accounts.
           - Generate an SOA of 10,000.00 for its next cycle.
@@ -2191,7 +2256,7 @@ frs:
         steps:
           - On Monday record an application request.
           - On Tuesday after 05:00 open Requests to Cashiering, column File, and download the file.
-        expected: The request lists FOR_APPLICATION_TO_INVOICE_<yyyyMMdd>_<time>.txt; the file has one pipe-delimited line per request with the p.60 fields and the user ID upphandler.
+        expected: The request lists FOR_APPLICATION_TO_INVOICE_<yyyyMMdd>_<time>.txt; the file has one pipe-delimited line per request with the p.62 fields and the user ID upphandler.
       - c: 2
         type: Negative
         title: The request is not repeated on Wednesday
@@ -2356,6 +2421,7 @@ frs:
       - The home tiles count the user's work and open the worklist filtered to it.
       - The unapplied tiles are shown only to users with CLX_UNAPPLIED_WORK.
       - The chart shows the open amounts per aging bracket for all segments or one.
+      - Handlers and team leads see Broken Promises, Promises Due, Overdue Installments and Open Escalations (minutes of 27-Apr-2026).
     cases:
       - c: 1
         type: Positive
@@ -2384,6 +2450,21 @@ frs:
         steps:
           - Choose segment CBG in the chart.
         expected: The bars show the open amounts of CBG per bracket of CLX_AGING_BRACKETS, in bracket order.
+      - c: 4
+        type: Positive
+        data: [TD-CL-07]
+        title: Broken Promises tile opens the broken promises
+        steps:
+          - Log in as mkttl (the broken promise of the three-year account escalated to mkttl) and open Collections Home.
+          - Click Broken Promises, then go back and click Overdue Installments.
+        expected: Broken Promises counts the broken promise and opens Promises to Pay on the Broken tab; Overdue Installments opens Installments Due on the Overdue tab.
+      - c: 4
+        type: Security-access
+        persona: DISBURSEMENT
+        title: No promise and installment tiles for read-only users
+        steps:
+          - Log in as disb and open Collections Home.
+        expected: Broken Promises, Promises Due, Overdue Installments and Open Escalations are not shown.
 
   FR-CL-090:
     scenario: SC-CL-09
@@ -2452,6 +2533,7 @@ frs:
     conditions:
       - A campaign run bills the qualified invoices through a system-generated service invoice.
       - Invoices with unresolved adjustments, cancellations or partial payments are excluded.
+      - Marketing sets up the campaigns; Collections users see the eligible transactions only.
     cases:
       - c: 1
         type: Positive
@@ -2467,6 +2549,14 @@ frs:
         steps:
           - Run the campaign with a qualified invoice that has a pending negative adjustment.
         expected: The invoice is excluded and listed with the reason.
+      - c: 3
+        type: Security-access
+        persona: MKT_COLLECTION
+        title: Collection Handler cannot set up a campaign (run after CQ01)
+        pre: As above.
+        steps:
+          - Log in as clxhandler and open the eligible transactions of a campaign; look for the campaign set-up.
+        expected: The eligible transactions are shown read only; no action to set up or change a campaign is offered.
 
   FR-CL-093:
     scenario: SC-CL-09
@@ -2555,12 +2645,19 @@ access:
     allow: [MKT_AO, MKT_COLLECTION, CLX_TL, UNAPPLIED_HANDLER]
     deny: [PROCESSOR, CASHIER, DISBURSEMENT]
     denied: Record Disposition is not shown on Unapplied Payments; the request is refused.
-  - action: Create installment plans and billing statements
+  - action: Create installment plans
     screen: PLANS
     permission: CLX_BILLING
     allow: [MKT_TL, MKT_COLLECTION, CLX_TL, MKT_SECTION_HEAD]
     deny: [MKT_AO, MKT_HANDLER, UNAPPLIED_HANDLER]
-    denied: New Installment Plan and Billing Run are not shown; direct requests are refused.
+    denied: New Installment Plan is not shown; direct requests are refused.
+  - action: Generate, send and cancel billing statements
+    screen: BILL
+    permission: CLX_SOA_ISSUE
+    allow: [CASHIER_TL]
+    deny: [MKT_TL, MKT_COLLECTION, CLX_TL, MKT_SECTION_HEAD]
+    allowed: Billing Run, Generate SOA, Send via Email and Cancel Statement are shown to the Operations billing user.
+    denied: The statements are shown read only; Billing Run, Generate SOA, Send via Email and Cancel Statement are not shown and direct requests are refused.
   - action: Collections Setup and escalation rules
     screen: SETUP
     permission: CLX_SETUP

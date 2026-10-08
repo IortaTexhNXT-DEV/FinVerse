@@ -14,7 +14,7 @@ digraph clx_integration {
   upp [label="Collections\nunapplied payments\n(collector side)", fillcolor="@HEADER_BLUE", fontcolor="@WHITE", width=2.6];
 
   comm [label="Commission\nDP list, CR billing"];
-  cash [label="Cashiering\npick-up, 2307, unapplied,\ncollector requests"];
+  cash [label="Cashiering\n2307, unapplied,\ncollector requests"];
   msg  [label="Messaging and alerts\n(SOA e-mails)"];
   fs04 [label="BDOI file server FS04\n(application file)", color="@MUTED", fontcolor="@MUTED", style="rounded,dashed"];
 
@@ -27,7 +27,7 @@ digraph clx_integration {
   org -> clx;
   legacy -> clx [style=dashed, color="@MUTED"];
   clx -> comm [label=" DP list /\n DP returned", dir=both];
-  clx -> cash [label=" pick-up,\n 2307"];
+  clx -> cash [label=" 2307 tags"];
   upp -> cash [label=" requests /\n decisions", dir=both];
   comm -> msg [style=invis];
   clx -> msg [constraint=false, style=dotted];

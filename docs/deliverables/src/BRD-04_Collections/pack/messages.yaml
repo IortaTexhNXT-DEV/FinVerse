@@ -5,8 +5,9 @@
 sources:
   backend_packages: [collections]
   exclude_classes: [LegacyFollowUpService, LegacyFollowUpController]
-  exclude_codes: [NOT_FOUND]
-  exclude_texts: ["^<message>$", "^<errors>$"]
+  # The check pick-up is removed from scope (Operations Cashiering annex, CSHID.009): its messages are not shown.
+  exclude_codes: [NOT_FOUND, CLX_PICKUP_DATE, CLX_PICKUP_AMOUNT]
+  exclude_texts: ["^<message>$", "^<errors>$", "^The pick-up date cannot be in the past$", "pick-up"]
   bulk_handlers: [CollectionsBulkUpdateHandler]
   bulk_screen: "Bulk Uploads (BRD-1 screen SCR-NB-36): Collections Bulk Update"
   frontend_dirs: [features/collections/AccountHistoryTabs.tsx, features/collections/AccountPage.tsx,
@@ -80,8 +81,6 @@ fixes:
   CLX_ITEM_CLOSED: No action; the account is no longer open. Refresh the list.
   CLX_EFFORT_FUTURE: Enter a date and time that is not in the future.
   CLX_CATEGORY: Choose A, B or C, or None.
-  CLX_PICKUP_DATE: Enter a pick-up date from today on.
-  CLX_PICKUP_AMOUNT: Enter the check amount.
   CLX_CWT_PATH: Choose the 2307 path in the drop-down.
   CLX_DISPOSITION_DETAIL: Complete or correct the detail named in the message.
   CLX_DISPOSITION_NOT_ALLOWED: Choose another disposition, or ask a user of the roles named to record it.
@@ -124,7 +123,7 @@ fixes:
   CLX_REASSIGN_KIND: Choose Permanent or Temporary.
   CLX_REASSIGN_END_DATE: Enter an end date after today, or choose Permanent.
   CLX_HANDLER_NOT_ELIGIBLE: Choose another handler from the list.
-  "The pick-up date cannot be in the past": Enter a pick-up date from today on.
+  "The pick-up date cannot be in the past": "None: the check pick-up is removed from scope (chapter 21, CLR-CL-33)."
   "A certificate tag needs the certificate number": Enter the BIR 2307 certificate number.
   "Enter CASH or CERTIFICATE": Choose the 2307 path in the drop-down.
   "A temporary reassignment ends after today": Enter an end date after today, or choose Permanent.

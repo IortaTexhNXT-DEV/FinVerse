@@ -5,10 +5,28 @@
 # changes of the issue and the points for the UX Design team to confirm.
 
 issue:
-  version: "2.0"
-  date: 1 October 2026
-  # First issue of the UX screen documents of the set: every screen is new to the UX Design team.
-  changes: []
+  version: "2.1"
+  date: 8 October 2026
+  # Re-base on the Collections BRD with the minutes of 27 April 2026 and the Operations Cashiering annex.
+  changes:
+    - ref: CHG-CL-2.1-01
+      what: >-
+        Check pick-up removed from scope: no For check pick-up disposition and no pick-up details in Record
+        Disposition; walkthrough A ends at the first collection effort (its steps 5 and 6 are retired)
+      screens: [SCR-CL-02, SCR-CL-03]
+      images: [scr-cl-02-03-reassign, wt-a-04]
+    - ref: CHG-CL-2.1-02
+      what: >-
+        Billing statements generated, sent and cancelled by the Operations billing user; Collections users see the
+        statements read only (Billing Run, Generate SOA, Send via Email and Cancel Statement not offered to them)
+      screens: [SCR-CL-06, SCR-CL-09, SCR-CL-10]
+      images: [scr-cl-06-01-record, scr-cl-06-02-actions, scr-cl-09-01-list, scr-cl-09-02-run, scr-cl-10-01-record,
+               scr-cl-10-02-send, wt-d-02, wt-d-03, wt-d-04]
+    - ref: CHG-CL-2.1-03
+      what: >-
+        Collections Home: tiles Broken Promises, Promises Due, Overdue Installments and Open Escalations for the
+        handlers and team leads (proposed, CLR-CL-35)
+      screens: [SCR-CL-01]
 
 # The personas whose landing page and full menu the deck shows.
 navigation:
@@ -23,12 +41,12 @@ personas:
   MKT_AO: {who: "A Marketing account officer who follows up the premium of the own accounts"}
   MKT_TL: {who: "A Marketing team lead who acts on escalations, reassigns accounts and updates several accounts at once"}
   MKT_HANDLER: {who: "A Marketing handler who follows up the accounts of the unit, also several at once"}
-  MKT_COLLECTION: {who: "A collection handler who works the accounts assigned to her: efforts, dispositions, promises, installment plans and statements"}
+  MKT_COLLECTION: {who: "A collection handler who works the accounts assigned to her: efforts, dispositions, promises and installment plans; she sees the statements"}
   CLX_TL: {who: "The team lead of the collection handlers, who assigns the accounts and acts on the escalations"}
   MKT_SECTION_HEAD: {who: "The head of the Corporate or Retail section, who keeps the Collections set-up and reads the audit log"}
   UNAPPLIED_HANDLER: {who: "A handler of the unapplied payments, who records the dispositions and the requests to Cashiering"}
   PROCESSOR: {who: "A Processing officer, who records the disposition No / missing policy number"}
-  CASHIER: {who: "A cashier who reads the Collections screens and carries out the check pick-ups and the collector requests"}
+  CASHIER: {who: "A cashier who reads the Collections screens and carries out the collector requests; the Cashiering Team Leader / Head generates the statements of account"}
   DISBURSEMENT: {who: "A Disbursement officer with read access to Collections and its files"}
   COMPTROLLERSHIP: {who: "A Comptrollership officer with read access to Collections"}
   BUSINESS_ADMIN: {who: "The business administrator who keeps the Collections set-up and the escalation rules"}
@@ -38,8 +56,7 @@ personas:
 # The UX state of an image when its name does not say it.
 classify:
   scr-cl-02-02-filters: filled
-  scr-cl-02-03-disposition: filled
-  scr-cl-02-04-reassign: filled
+  scr-cl-02-03-reassign: filled
   scr-cl-03-02-dispositions: read-only
   scr-cl-03-03-history: read-only
   scr-cl-03-04-locked: read-only
@@ -62,8 +79,6 @@ classify:
   wt-a-02: default
   wt-a-03: default
   wt-a-04: success
-  wt-a-05: success
-  wt-a-06: default
   wt-b-01: success
   wt-b-02: success
   wt-b-03: success
@@ -114,8 +129,8 @@ confirm:
     - screens: [SCR-CL-03]
       observation: >-
         The Hand-offs to Operations table on the Dispositions & Efforts tab shows the reference of a hand-off as
-        Operations keeps it (PU:BI-HO-2026-000009:5 for a check pick-up request).
-      proposal: Show the number of the Operations record the hand-off created (the check pick-up or reversal request).
+        Operations keeps it (for example CWT:BI-HO-2026-000009:5 for a BIR 2307 tag).
+      proposal: Show the number of the Operations record the hand-off created (the reversal request).
     - screens: [SCR-CL-15]
       observation: >-
         The History tab of an unapplied payment shows, in its Reference column, the internal reference of a

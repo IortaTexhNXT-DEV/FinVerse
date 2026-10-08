@@ -41,7 +41,6 @@ screens:
     shots:
       - {state: list, user: clxtl, caption: "PR Worklist of the Collection Team Lead: open accounts with handler, disposition and status"}
       - {state: filters, user: clxtl, click: "^filters$", caption: "PR Worklist with the Filters panel open"}
-      - {state: disposition, user: clxhandler, fill: pickup_disposition, caption: "Record Disposition of a selected account with the check pick-up details"}
       - {state: reassign, user: clxtl, fill: reassign_temporary, caption: "Reassign Accounts dialog for two selected accounts, temporary until an end date"}
     fields:
       - "Tabs | Open Accounts / Credit Balances / Completed Collections / Excluded / All | Tab | - | - | Collection status | Open Accounts | - | - | -"
@@ -61,7 +60,6 @@ screens:
       - "List | Status | Column | Open, Credit, Completed or Excluded | - | Nightly refresh | Open | Read only | - | -"
       - "Totals | By Client / By Account | Tab | Totals by client or by ARN of the filtered accounts: Accounts and Outstanding | - | Collection accounts | By Client | Read only | - | -"
       - "Record Disposition dialog | Disposition | Drop-down | Active values of the PR collector disposition list; the category, who acts next and the reserved roles show under it | Y | PR collector disposition list | Blank | Open, Credit | Value allowed for the user's role | Choose a disposition"
-      - "Record Disposition dialog | Pick-up Date / Pick-up Address / Contact Person / Check Amount / Check No. / Check Bank | Date, text, number | Shown for a disposition handed to the check pick-up | Y / Y / N / Y / N / N | - | Blank | Open | Date from today on; amount above zero | The pick-up date cannot be in the past"
       - "Record Disposition dialog | 2307 Path / Certificate No. / Certificate Period From / Certificate Period To / 2% Amount | Drop-down, text, date, number | Shown for a disposition handed to BIR 2307: certificate received or paid in cash | Y / Cond.: certificate / N / N / N | - | Blank | Open | Certificate number for a certificate | A certificate tag needs the certificate number"
       - "Record Disposition dialog | Remarks | Text area | Up to 1,000 characters | N | - | Blank | Open, Credit | - | -"
       - "Log Collection Effort dialog | Effort / Channel / Contact Person / Remarks | Drop-down, text | Effort list; channel up to 30 and contact up to 120 characters | Y / N / N / N | Collection effort list | Blank | Open, Credit | - | Choose the effort"
@@ -131,7 +129,7 @@ screens:
       - "Every change is recorded field by field with the old and new value, the user, the time and the source address (FR-CL-003)."
       - "Dispositions are never deleted: a new one supersedes the previous one (FR-CL-018, FR-CL-031)."
       - "The net PR breakdown is read live from the invoice ledger; Collections keeps no second copy of the money (FR-CL-016)."
-      - "A check pick-up and a BIR 2307 tag are handed to Cashiering, a direct payment account to Commission Receivables (FR-CL-032)."
+      - "A BIR 2307 tag is handed to Cashiering and a direct payment account to Commission Receivables; there is no check pick-up, which the Operations Cashiering annex removed from scope (FR-CL-032)."
     outcome: The collector records the work on the account and sees everything that happened to it.
     frs: [FR-CL-002, FR-CL-003, FR-CL-005, FR-CL-016, FR-CL-018, FR-CL-031, FR-CL-032, FR-CL-033, FR-CL-041, FR-CL-043, FR-CL-044]
     tests: [ACC, SUM, DISP, HIST, TIMELINE, PAYTAB, POLTAB, HANDOFF]

@@ -100,7 +100,7 @@ notifications:
     frs: [FR-CL-061]
   - id: NT-13
     channel: Alert
-    trigger: An item handed to Cashiering or Commission Receivables (check pick-up, BIR 2307 tag, direct payment account) is still not taken after the threshold (Collections item not taken)
+    trigger: An item handed to Cashiering or Commission Receivables (BIR 2307 tag, direct payment account) is still not taken after the threshold (Collections item not taken)
     recipient: The administrators who receive the alerts of Collections
     template: "<feed> item of <invoice> not taken by Operations since <date and time>"
     content: The hand-off; it shows on the Dispositions & Efforts tab of the account

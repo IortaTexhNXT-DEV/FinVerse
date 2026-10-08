@@ -8,8 +8,8 @@ doc_code: TestPlan
 brd: BRD-04
 name: Collections Summary
 doc_id: BIBS-TP-BRD-04
-version: "2.0"
-date: 1 October 2026
+version: "2.1"
+date: 8 October 2026
 status: Issued for BDOI business sign-off
 header_title: Test Plan BRD-4 Collections
 h1_page_break: false
@@ -32,6 +32,12 @@ control:
     reviewer: iorta TechNXT Project Manager
     approver: BDOI business units (sign-off)
     change: "Release set v2.0: cases re-traced to FRS v2.0 and its screen specifications (Screen ID on every case, Screens sheet); one screen case per screen and one message case per screen or dialog of the messages catalogue added; message texts as the screens show them. Status as of 01-Oct-2026"
+  - version: "2.1"
+    date: 08 Oct 2026
+    author: iorta TechNXT QA
+    reviewer: iorta TechNXT Project Manager
+    approver: BDOI business units (sign-off)
+    change: "Re-based on the Collections (CLXN)_WS Addendum with the minutes of 27-Apr-2026, with FRS v2.1: check pick-up cases retired and replaced by a case that the pick-up is not offered (FR-CL-030, 032); billing statements generated, sent and cancelled by the Operations billing user and viewed by Collections (FR-CL-060, 061, 062); cases added for the Remittance and Production Register view (FR-CL-001), the financial-only Timeline (FR-CL-044), the 120-day escalation rule (FR-CL-050), the promise and installment tiles (FR-CL-085) and the campaign set-up by Marketing (FR-CL-092). Status as of 08-Oct-2026"
 distribution:
   - {name: "Head, Marketing (Corporate and Retail Section Heads)", role: Approver, organisation: BDOI, purpose: Review and sign-off}
   - {name: "Collection Handlers and Collection Team Leads", role: Business tester, organisation: BDOI, purpose: "Worklist, dispositions, plans, promises, escalations, billing statements"}
@@ -47,13 +53,13 @@ distribution:
 
 ## Purpose
 
-This document summarises the test plan for BRD-4 Collections in BIBS (BDOI Broker System, on iNXT BrokerVerse). It tells the BDOI departments what will be tested, how, with which data and by whom, and when testing is complete. The test conditions, scenarios and cases themselves are in the Excel workbook of the same version, `04_BIBS_TestPlan_BRD-04_Collections_v2.0.xlsx`, which the testers use during execution.
+This document summarises the test plan for BRD-4 Collections in BIBS (BDOI Broker System, on iNXT BrokerVerse). It tells the BDOI departments what will be tested, how, with which data and by whom, and when testing is complete. The test conditions, scenarios and cases themselves are in the Excel workbook of the same version, `04_BIBS_TestPlan_BRD-04_Collections_v2.1.xlsx`, which the testers use during execution.
 
-Every case traces to a functional requirement (FR) of FRS BRD-4 v2.0 and to the BRD requirement IDs (BRCLXN.001-064, NFRs and the stakeholder functions of the CMS BRD) that the FR meets. The expected results quote the messages, with their codes, as BIBS shows them.
+Every case traces to a functional requirement (FR) of FRS BRD-4 v2.1 and to the BRD requirement IDs (BRCLXN.001-064, NFRs and the stakeholder functions of the CMS BRD) that the FR meets. The expected results quote the messages, with their codes, as BIBS shows them.
 
 ## Scope
 
-In scope are all 52 FRs of FRS BRD-4 v2.0 and the BRD references they trace to:
+In scope are all 52 FRs of FRS BRD-4 v2.1 and the BRD references they trace to:
 
 - access, record keeping, the field-level audit log and its extraction, and the record lock (FR-CL-001 to 005);
 - the outstanding PR worklist at invoice level - threshold, exclusions, totals, filters, net PR breakdown, daily refresh and history (FR-CL-010 to 018);
@@ -61,7 +67,7 @@ In scope are all 52 FRs of FRS BRD-4 v2.0 and the BRD references they trace to:
 - PR collector dispositions, hand-offs to Cashiering and Commission, efforts and bulk update (FR-CL-030 to 034);
 - installment plans, payment allocation, promises to pay, policy and transaction views (FR-CL-040 to 044);
 - escalation rules, automatic and manual escalation and the escalation workflow (FR-CL-050 to 053);
-- billing statements per billing cycle, their sending and billing as monitoring only (FR-CL-060 to 062);
+- billing statements per billing cycle generated and sent by the Operations billing user and viewed by Collections, and billing as monitoring only (FR-CL-060 to 062);
 - unapplied payments - list, filters, disposition list, collector disposition, requests to Cashiering, invoice validation, history and the daily application file (FR-CL-070 to 077);
 - scheduled reversal files, daily PR reports, exports and the Collections home (FR-CL-080 to 085);
 - the commission receivable billing gate (FR-CL-090) and the four draft rows on commission and incentives (FR-CL-091 to 094).
@@ -82,9 +88,9 @@ The roles-and-access sheet checks each Collections action against the roles that
 <!-- table: widths=1.2,8.6,4.2 caption="Reference documents" -->
 | Ref. | Document | Version |
 |---|---|---|
-| R1 | Functional Requirements Specification BRD-4 Collections (`02_BIBS_FRS_BRD-04_Collections_v2.0.docx`) | 2.0, 1 Oct 2026 |
+| R1 | Functional Requirements Specification BRD-4 Collections (`02_BIBS_FRS_BRD-04_Collections_v2.1.docx`) | 2.1, 8 Oct 2026 |
 | R2 | Collections (CLXN) BRD pack: CMS BRD, renumbering addendum, signed and draft Collections Addendum | CMS BRD v1 Jan-Mar 2025; addendum v1.0 10-Apr-2026 |
-| R3 | Test plan workbook BRD-4 (`04_BIBS_TestPlan_BRD-04_Collections_v2.0.xlsx`) | 2.0 |
+| R3 | Test plan workbook BRD-4 (`04_BIBS_TestPlan_BRD-04_Collections_v2.1.xlsx`) | 2.1 |
 | R5 | Test plan BRD-2 Operations (Cashiering, Commission) (`04_BIBS_TestPlan_BRD-02_Operations_v2.0.xlsx`) | 2.0 |
 | R6 | BRD discrepancy and clarification register (`BIBS_Register_BRD-00_Discrepancies_and_Clarifications_v1.0.xlsx`) | 1.0 |
 
@@ -118,8 +124,8 @@ The roles-and-access sheet checks each Collections action against the roles that
 | Workflow | A status change of an account, hand-off, plan, promise, escalation, statement or collector request |
 | Report-output | Scheduled files, reports, statements of account and exports; content checked against the screen |
 | Upload-download | The Collections Bulk Update upload, file downloads and e-mailed statements |
-| Screen | The screen matches its specification in FRS v2.0 chapter 13: fields, order, labels, mandatory markers, defaults, lists and buttons (TC-CL-SCR-nn, one per screen) |
-| Message | Every error, validation and warning message of one screen or dialog, word for word with its code (TC-CL-MSG-nn, from the messages catalogue of FRS v2.0 chapter 15) |
+| Screen | The screen matches its specification in FRS v2.1 chapter 13: fields, order, labels, mandatory markers, defaults, lists and buttons (TC-CL-SCR-nn, one per screen) |
+| Message | Every error, validation and warning message of one screen or dialog, word for word with its code (TC-CL-MSG-nn, from the messages catalogue of FRS v2.1 chapter 15) |
 
 ## Reading the workbook
 
@@ -136,7 +142,7 @@ Several cases depend on time: the nightly refresh (22:15), the promise check (22
 |---|---|
 | System test | BIBS is deployed on SIT with the seed data; the Operations seed has booked the seed invoices; the test mailboxes receive mail; this plan is reviewed by the iorta TechNXT project manager. |
 | Persona end-to-end | All High-priority system test cases are run; no open Critical issue; the Cashiering and Commission screens of BRD-2 pass their own entry criteria. |
-| UAT | FRS BRD-4 v2.0 is signed off or its open comments are agreed; the system test exit criteria are met; the UAT environment holds masked data (section 4.1); BDOI testers have user IDs with the roles of section 5; BDOI has given the disposition values, categories and escalation defaults it wants tested (CQ08, CQ14) or accepts the delivered placeholders. |
+| UAT | FRS BRD-4 v2.1 is signed off or its open comments are agreed; the system test exit criteria are met; the UAT environment holds masked data (section 4.1); BDOI testers have user IDs with the roles of section 5; BDOI has given the disposition values, categories and escalation defaults it wants tested (CQ08, CQ14) or accepts the delivered placeholders. |
 
 ## Exit criteria
 
@@ -228,7 +234,7 @@ The BRD references are read from the FR headers of the FRS.
 
 ## Coverage by screen
 
-Every screen of the FRS v2.0 screen specifications has its screen case and the cases that start on it. A case is linked to the screen where the tester starts; the steps may go on to other screens.
+Every screen of the FRS v2.1 screen specifications has its screen case and the cases that start on it. A case is linked to the screen where the tester starts; the steps may go on to other screens.
 
 <!-- tp:screens -->
 

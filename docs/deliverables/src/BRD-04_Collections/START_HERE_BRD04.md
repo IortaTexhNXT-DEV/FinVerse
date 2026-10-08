@@ -1,16 +1,16 @@
 ---
-# Source of "00 Start Here - Guide to the BRD-04 Sign-off Pack" (Word), release set v2.0 of BRD-4 Collections.
+# Source of "00 Start Here - Guide to the BRD-04 Sign-off Pack" (Word), release set v2.1 of BRD-4 Collections.
 # Build: python tools/deliverables/bdoi_docx.py docs/deliverables/src/BRD-04_Collections/START_HERE_BRD04.md
 # The map, the reading order and the steps come from pack/guide.yaml (the same source as the guide deck).
 title: Start Here
-subtitle: Guide to the BRD-04 Collections Sign-off Pack, release set v2.0
+subtitle: Guide to the BRD-04 Collections Sign-off Pack, release set v2.1
 doc_type: Start Here Guide
 doc_code: StartHere
 brd: BRD-04
 name: Collections
 doc_id: BIBS-SH-BRD-04
-version: "2.0"
-date: 1 October 2026
+version: "2.1"
+date: 8 October 2026
 status: Issued for BDOI business sign-off
 header_title: Start Here BRD-4 Collections
 h1_page_break: false
@@ -21,6 +21,12 @@ control:
     reviewer: iorta TechNXT Business Analysis
     approver: ""
     change: First issue with the BRD-4 Collections business sign-off pack (replaces the release note of the set)
+  - version: "2.1"
+    date: 08 Oct 2026
+    author: iorta TechNXT Project Manager
+    reviewer: iorta TechNXT Business Analysis
+    approver: ""
+    change: "Re-based on the Collections (CLXN)_WS Addendum (minutes of 27-Apr-2026); user-story view and storyboard index added to the FRS; billing statements by Operations and check pick-up removed from scope"
 distribution:
   - {name: "Shellah Marie C. Miranda, AVP, Product Owner", role: Approver, organisation: BDOI, purpose: Sign-off}
   - {name: "Jose Melvin Jarin, AVP, Product Owner; Marketing heads (Combank and Corbank, Retail Marketing); Head - Comptrollership", role: Approvers, organisation: BDOI, purpose: Sign-off of the addendum functions and of their units' rows}
@@ -35,6 +41,8 @@ distribution:
 # What this pack is for
 
 This pack shows the proposed BRD-4 Collections of BIBS, screen by screen, so that the Collections and Marketing units can confirm what they will get and sign it off: the PR Worklist and the collection account, assignment, collector dispositions and efforts, promises to pay, installment plans and statements of account, escalations, the collector side of the unapplied payments with the requests to Cashiering, the Collections files and the set-up. Signing freezes the content, the screens and the navigation of Collections; a later change goes through the Change Management Register with its mandays. The screenshots use fictitious seed data only.
+
+**What changed in v2.1.** BDOI issued the Collections BRD again on 8 October 2026 with the minutes of the walkthrough of 27 April 2026 in front of the unchanged BRD. This version applies them: Operations generates and sends the statements of account and Collections sees them (CLR-CL-32); the check pick-up is removed from scope after the Operations Cashiering annex, so walkthrough A ends at the first collection effort (CLR-CL-33); Marketing owns the incentive campaigns; Collections Home gains the promise, installment and escalation tiles; every BRD page cited moves by two pages. The FRS now ends with a user-story view of every BRD requirement and a storyboard index of the walkthrough frames. Chapter 21 lists the new points for confirmation, CLR-CL-32 to CLR-CL-42.
 
 # The pack at a glance
 
@@ -54,7 +62,7 @@ source: pack/pack.yaml
 render: guide-reading
 ```
 
-SIT users of the seed data for the review: clxhandler (Collection Handler), clxtl (Collection Team Lead), clxuh (Section Head), ao (Marketing Account Officer), mkttl (Marketing Team Lead), mkthandler (Marketing Handler), upphandler (Unapplied Payment Handler), proc (Processing), cashier (Cashiering), disb (Disbursement), comptrol (Comptrollership), badmin (Business Administrator), admin (System Administrator) and auditor. The passwords are sent separately to the named reviewers.
+SIT users of the seed data for the review: clxhandler (Collection Handler), clxtl (Collection Team Lead), clxuh (Section Head), ao (Marketing Account Officer), mkttl (Marketing Team Lead), mkthandler (Marketing Handler), upphandler (Unapplied Payment Handler), proc (Processing), cashier (Cashiering), cashtl (Cashiering Team Leader / Head, the proposed Operations billing user), disb (Disbursement), comptrol (Comptrollership), badmin (Business Administrator), admin (System Administrator) and auditor. The passwords are sent separately to the named reviewers.
 
 # Steps up to closure
 
@@ -69,8 +77,8 @@ render: guide-steps
 <!-- table: widths=3.6,2.4,7.2,4.4 caption="SIT walkthrough sessions" -->
 | Date | Time | Session | Units |
 |---|---|---|---|
-| Mon 23-Nov-2026 | 09:30-12:00 | Kick-off; the PR Worklist and the collection account, assignment, efforts and dispositions with the hand-off to Cashiering (walkthrough A, walkthrough E steps 1-2) | Collections and Marketing Support, Marketing, Cashiering |
-| Tue 24-Nov-2026 | 09:30-12:00 | Promises to pay, escalations and escalation rules; installment plans and statements of account (walkthroughs B and D, walkthrough E step 3) | Collections and Marketing Support, Marketing heads |
+| Mon 23-Nov-2026 | 09:30-12:00 | Kick-off; the PR Worklist and the collection account, assignment, efforts and dispositions up to the first collection effort (walkthrough A, walkthrough E steps 1-2) | Collections and Marketing Support, Marketing, Cashiering |
+| Tue 24-Nov-2026 | 09:30-12:00 | Promises to pay, escalations and escalation rules; installment plans and the statements of account generated by Operations (walkthroughs B and D, walkthrough E step 3) | Collections and Marketing Support, Marketing heads, Cashiering |
 | Wed 25-Nov-2026 | 09:30-12:00 | Unapplied payments and the requests to Cashiering; Collections files, set-up, the upload template and the commission receivable rows (walkthrough C, walkthrough E step 4) | Unapplied payment handlers, Cashiering, Commission Receivables, Comptrollership, BDOI IT |
 
 # Who signs what

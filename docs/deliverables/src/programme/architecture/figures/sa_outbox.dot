@@ -1,0 +1,31 @@
+// Transactional outbox to Kafka and the consumers (Solution Architecture, chapter 6).
+digraph sa_outbox {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.3, ranksep=0.42, bgcolor="white", pad=0.2, newrank=true,
+         label=<<font point-size="15" color="@HEADER_BLUE"><b>Event flow: transactional outbox to Kafka</b></font><br/><font point-size="9" color="@MUTED">The event row commits or rolls back with the business change. Delivery is at least once; consumers deduplicate on the event identifier.</font>>,
+         labelloc=t, labeljust=l];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.0, fontname="Arial", fontsize=11,
+         fontcolor="@NEAR_BLACK", margin="0.12,0.06", fillcolor="@WHITE"];
+  edge  [color="@HEADER_BLUE", arrowsize=0.55, penwidth=0.9, fontname="Arial", fontsize=8, fontcolor="@MUTED"];
+
+  subgraph cluster_tx {
+    label=<<b>One database transaction (bibs-web or bibs-jobs)</b>>; fontsize=10; style="rounded"; color="@HEADER_BLUE";
+    biz [label=<<b>Business change</b><br/><font point-size="9.5">e.g. invoice booked, receipt issued</font>>, fillcolor="@BG_BLUE"];
+    gl  [label=<<b>Journal, ledger, open items, audit</b><br/><font point-size="9.5">accounting engine, same transaction</font>>, fillcolor="@BG_BLUE"];
+    out [label=<<b>Outbox row</b><br/><font point-size="9.5">event id, type, key, company,<br/>correlation id, payload (no personal data)</font>>, fillcolor="@AMBER_BG"];
+    biz -> gl; biz -> out [label=" before commit"];
+  }
+  relay [label=<<b>Outbox relay (bibs-integration)</b><br/><font point-size="9.5">woken after commit and every minute; one relay<br/>in the cluster (job lock); in id order per key;<br/>acks=all, producer idempotency; back-off, max 10 attempts</font>>, fillcolor="@DIRTY_WHITE"];
+  kafka [label=<<b>Amazon MSK - Kafka 3.9 KRaft</b><br/><font point-size="9.5">10 topics bibs.&lt;domain&gt;.&lt;event&gt;.v1, 3 partitions,<br/>replication factor 3, SASL_SSL; one .dlt topic each</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  subgraph cluster_cons {
+    label=<<b>Consumers (bibs-integration)</b>>; fontsize=10; style="rounded,dashed"; color="@MUTED";
+    mail [label=<<b>Mail dispatch</b><br/><font point-size="9.5">sends queued e-mail via CCM</font>>];
+    arch [label=<<b>Event archive</b><br/><font point-size="9.5">unique event id: redelivery ignored</font>>];
+    ecm  [label=<<b>ECM archive connector</b><br/><font point-size="9.5">final records to ECM</font>>];
+    dlr  [label=<<b>Dead-letter recorder</b><br/><font point-size="9.5">support screen: retry, discard</font>>];
+  }
+  out -> relay [label=" PENDING rows"];
+  relay -> kafka [label=" publish"];
+  kafka -> mail; kafka -> arch; kafka -> ecm;
+  kafka -> dlr [label=" after 3 retries", style=dashed];
+  {rank=same; mail; arch; ecm; dlr}
+}

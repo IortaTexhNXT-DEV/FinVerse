@@ -1,0 +1,37 @@
+// Release pipeline and promotion of one image through the environments (Deployment Architecture, chapter 8).
+digraph da_pipeline {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.25, ranksep=0.35, bgcolor="white", pad=0.2, newrank=true,
+         label=<<font point-size="15" color="@HEADER_BLUE"><b>Release pipeline and promotion</b></font><br/><font point-size="9" color="@MUTED">Images are packaged once, scanned and promoted by digest; only the overlay of the environment changes.</font>>,
+         labelloc=t, labeljust=l];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.0, fontname="Arial", fontsize=11,
+         fontcolor="@NEAR_BLACK", margin="0.12,0.06", fillcolor="@WHITE"];
+  edge  [color="@HEADER_BLUE", arrowsize=0.55, penwidth=0.9, fontname="Arial", fontsize=8, fontcolor="@MUTED"];
+
+  subgraph cluster_ci {
+    label=<<b>Continuous integration (every change)</b>>; fontsize=10; style="rounded"; color="@HEADER_BLUE";
+    c1 [label=<<b>1. Compile and verify</b><br/><font point-size="9.5">format, compile with warnings as errors, test suites<br/>on PostgreSQL, coverage 80 % lines / 65 % branches,<br/>Checkstyle, PMD, CPD, SpotBugs, architecture rules, SBOM</font>>, fillcolor="@BG_BLUE"];
+    c2 [label=<<b>2. Quality</b><br/><font point-size="9.5">SonarQube quality gate (backend, web client)</font>>, fillcolor="@BG_BLUE"];
+    c3 [label=<<b>3. Security</b><br/><font point-size="9.5">CodeQL / SAST, OWASP dependency-check (CVSS 7+),<br/>npm audit (high+), gitleaks (full history)</font>>, fillcolor="@BG_BLUE"];
+    c4 [label=<<b>4. Images</b><br/><font point-size="9.5">bibs-backend, bibs-frontend on pinned base digests</font>>, fillcolor="@BG_BLUE"];
+    c5 [label=<<b>5. Image scan</b><br/><font point-size="9.5">Trivy: high or critical with a fix fails</font>>, fillcolor="@BG_BLUE"];
+    c1 -> c2 -> c3 -> c4 -> c5;
+  }
+  reg [label=<<b>Release tag and Amazon ECR</b><br/><font point-size="9.5">immutable tags, image digest recorded with the SBOMs<br/>and the release note in the release record</font>>, fillcolor="@AMBER_BG"];
+  subgraph cluster_env {
+    label=<<b>Promotion (same digest, overlay per environment)</b>>; fontsize=10; style="rounded,dashed"; color="@MUTED";
+    sit [label=<<b>SIT</b><br/><font point-size="9.5">smoke and regression;<br/>SIT exit criteria</font>>];
+    uat [label=<<b>UAT</b><br/><font point-size="9.5">business acceptance<br/>and sign-off</font>>];
+    pre [label=<<b>Pre-Prod</b><br/><font point-size="9.5">performance, penetration,<br/>dress rehearsal</font>>];
+    prod [label=<<b>PROD</b><br/><font point-size="9.5">CAB approval, rolling<br/>update, maxUnavailable 0</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+    dr [label=<<b>DR</b><br/><font point-size="9.5">same digest kept<br/>current in standby</font>>];
+    sit -> uat -> pre -> prod -> dr;
+  }
+  {rank=same; c1; dev}
+  {rank=same; c2; sit}
+  {rank=same; c3; uat}
+  {rank=same; c4; pre}
+  {rank=same; c5; prod}
+  {rank=same; reg; dr}
+  dev [label=<<b>DEV</b><br/><font point-size="9.5">every merged change</font>>];
+  c5 -> reg; c1 -> dev [style=dashed, label=" every change"]; reg -> sit [label=" release candidate", constraint=false];
+}

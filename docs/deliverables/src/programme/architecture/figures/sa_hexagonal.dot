@@ -1,0 +1,36 @@
+// Clean / hexagonal architecture of one BIBS module (Solution Architecture, chapter 5).
+digraph sa_hexagonal {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.3, ranksep=0.4, bgcolor="white", pad=0.2, newrank=true,
+         label=<<font point-size="15" color="@HEADER_BLUE"><b>Inside a module: ports and connectors</b></font><br/><font point-size="9" color="@MUTED">Dependencies point inward. The domain knows no framework edge; outbound needs are interfaces (ports) owned by the module and implemented at the edge.</font>>,
+         labelloc=t, labeljust=l];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.0, fontname="Arial", fontsize=11,
+         fontcolor="@NEAR_BLACK", margin="0.12,0.06", fillcolor="@WHITE"];
+  edge  [color="@HEADER_BLUE", arrowsize=0.55, penwidth=0.9, fontname="Arial", fontsize=8, fontcolor="@MUTED"];
+
+  subgraph cluster_in {
+    label=<<b>Inbound side (driving)</b>>; fontsize=10; style="rounded,dashed"; color="@MUTED";
+    rest [label=<<b>api</b><br/><font point-size="9.5">REST controllers, request and<br/>response records, validation,<br/>permission check</font>>, fillcolor="@BG_BLUE"];
+    job  [label=<<b>Managed jobs</b><br/><font point-size="9.5">scheduled and batch work,<br/>run history, failure alert</font>>, fillcolor="@BG_BLUE"];
+    cons [label=<<b>Event consumers</b><br/><font point-size="9.5">Kafka topics, in-process<br/>events, bulk upload handlers</font>>, fillcolor="@BG_BLUE"];
+  }
+  subgraph cluster_core {
+    label=<<b>Module core</b>>; fontsize=10; style="rounded"; color="@HEADER_BLUE";
+    svc [label=<<b>service</b><br/><font point-size="9.5">transactional use cases, business rules,<br/>ports (interfaces) other modules or<br/>external systems implement</font>>, fillcolor="@DIRTY_WHITE"];
+    dom [label=<<b>domain</b><br/><font point-size="9.5">entities with invariants, value records,<br/>enums, repositories</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  }
+  subgraph cluster_out {
+    label=<<b>Outbound side (driven)</b>>; fontsize=10; style="rounded,dashed"; color="@MUTED";
+    db  [label=<<b>PostgreSQL</b><br/><font point-size="9.5">JPA repositories</font>>];
+    ob  [label=<<b>Outbox</b><br/><font point-size="9.5">integration events</font>>];
+    fs  [label=<<b>File store port</b><br/><font point-size="9.5">S3 (local store on<br/>developer machines)</font>>];
+    ext [label=<<b>External system ports</b><br/><font point-size="9.5">bank channel, insurer inbox,<br/>file drop, mail transport,<br/>watchlist feed, quotation source</font>>];
+  }
+  rest -> svc; job -> svc; cons -> svc;
+  svc -> dom;
+  svc -> ob [style=dashed, label="publish"];
+  svc -> fs [style=dashed];
+  svc -> ext [style=dashed, label="port"];
+  dom -> db [style=dashed, label="persist"];
+  {rank=same; rest; job; cons}
+  {rank=same; db; ob; fs; ext}
+}

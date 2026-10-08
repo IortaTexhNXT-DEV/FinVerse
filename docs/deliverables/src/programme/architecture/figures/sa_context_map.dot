@@ -1,0 +1,45 @@
+// Bounded contexts of BIBS grouped by BDOI drop, with the main dependencies (Solution Architecture, chapter 4).
+digraph sa_context_map {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.22, ranksep=0.55, bgcolor="white", pad=0.2, newrank=true, compound=true,
+         label=<<font point-size="16" color="@HEADER_BLUE"><b>Bounded contexts and their dependencies</b></font><br/><font point-size="10" color="@MUTED">An arrow means "uses". Contexts never call upward; call-backs go through ports owned by the caller. Every context uses the platform contexts (bottom).</font>>,
+         labelloc=t, labeljust=l];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.0, fontname="Arial", fontsize=11,
+         fontcolor="@NEAR_BLACK", margin="0.12,0.06", fillcolor="@WHITE", width=2.4];
+  edge  [color="@HEADER_BLUE", arrowsize=0.6, penwidth=1.0, fontname="Arial", fontsize=9, fontcolor="@MUTED"];
+
+  bc12 [label=<<b>BC12 Customer servicing</b><br/><font point-size="9">BRD-09 - Drop 1</font>>, fillcolor="@DIRTY_WHITE"];
+  bc10 [label=<<b>BC10 Claims handling</b><br/><font point-size="9">BRD-07 - Drop 2</font>>, fillcolor="@AMBER_BG"];
+  bc11 [label=<<b>BC11 Employee benefits</b><br/><font point-size="9">BRD-08 - Drop 2</font>>, fillcolor="@AMBER_BG"];
+  bc05 [label=<<b>BC05 Submitted policies</b><br/><font point-size="9">BRD-12 - Drop 1</font>>, fillcolor="@DIRTY_WHITE"];
+  bc04 [label=<<b>BC04 Renewal</b><br/><font point-size="9">BRD-06 - Drop 1</font>>, fillcolor="@DIRTY_WHITE"];
+  bc07 [label=<<b>BC07 Collections</b><br/><font point-size="9">BRD-04 - Drop 1</font>>, fillcolor="@DIRTY_WHITE"];
+  bc08 [label=<<b>BC08 Accounting, disbursement, ACSL</b><br/><font point-size="9">BRD-05 - Drop 1</font>>, fillcolor="@DIRTY_WHITE"];
+  bc03 [label=<<b>BC03 New business broking</b><br/><font point-size="9">BRD-01 - Drop 1</font>>, fillcolor="@DIRTY_WHITE"];
+  bc06 [label=<<b>BC06 Operations</b><br/><font point-size="9">BRD-02 - Drop 1</font>>, fillcolor="@DIRTY_WHITE"];
+  bc13 [label=<<b>BC13 Sanction screening</b><br/><font point-size="9">BRD-10 - Drop 1</font>>, fillcolor="@DIRTY_WHITE"];
+  bc15 [label=<<b>BC15 Data migration</b><br/><font point-size="9">BRD-13 - Drop 0</font>>, fillcolor="@BG_BLUE"];
+  bc01 [label=<<b>BC01 Client management</b><br/><font point-size="9">BRD-01 - Drop 1</font>>, fillcolor="@DIRTY_WHITE"];
+  bc02 [label=<<b>BC02 Product catalogue</b><br/><font point-size="9">BRD-03 - Drop 0</font>>, fillcolor="@BG_BLUE"];
+  bc09 [label=<<b>BC09 Finance core</b><br/><font point-size="9">BRD-05 - Drop 1</font>>, fillcolor="@DIRTY_WHITE"];
+  bc14 [label=<<b>BC14 User access and identity</b><br/><font point-size="9">BRD-11 - Drop 0</font>>, fillcolor="@BG_BLUE"];
+  bc16 [label=<<b>BC16 Platform services</b><br/><font point-size="9">companies, parameters, lists, workflow, bulk, messaging,<br/>documents, files, audit, alerts, approvals, jobs, reports</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS", width=3.4];
+  bc17 [label=<<b>BC17 Integration and shared state</b><br/><font point-size="9">outbox and Kafka, Apigee interface,<br/>Valkey cache and job locks</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS", width=3];
+
+  {rank=same; bc12; bc10; bc11}
+  {rank=same; bc05; bc07; bc08}
+  {rank=same; bc04; bc06; bc13}
+  {rank=same; bc15; bc03}
+  {rank=same; bc01; bc02; bc09}
+  {rank=same; bc14; bc16; bc17}
+  bc12 -> bc05 -> bc04 -> bc15 -> bc01 -> bc14 [style=invis];
+  bc10 -> bc07 -> bc06 -> bc03 -> bc02 -> bc16 [style=invis];
+  bc11 -> bc08 -> bc13 [style=invis]; bc09 -> bc17 [style=invis];
+
+  bc12 -> bc03; bc12 -> bc06; bc10 -> bc03; bc11 -> bc01; bc11 -> bc09;
+  bc05 -> bc04 [label="hand-off"]; bc07 -> bc06; bc08 -> bc06; bc08 -> bc09;
+  bc04 -> bc03; bc06 -> bc03 [label="invoice feed"]; bc06 -> bc09; bc13 -> bc01; bc15 -> bc03; bc15 -> bc01;
+  bc03 -> bc01; bc03 -> bc02; bc03 -> bc09 [label="accounting events"];
+  bc01 -> bc16 [style=dashed, color="@SUCCESS"]; bc02 -> bc16 [style=dashed, color="@SUCCESS"];
+  bc09 -> bc16 [style=dashed, color="@SUCCESS"]; bc14 -> bc17 [style=invis];
+  bc14 -> bc16 [style=invis];
+}

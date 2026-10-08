@@ -1,0 +1,23 @@
+// Request pipeline of a BIBS operation (API Specification, chapter 3).
+digraph api_pipeline {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.3, ranksep=0.3, bgcolor="white", pad=0.2,
+         label=<<font point-size="15" color="@HEADER_BLUE"><b>What every request passes through</b></font><br/><font point-size="9" color="@MUTED">User interface operations (prefix api) on the left; system integration operations (prefix integration) on the right.</font>>,
+         labelloc=t, labeljust=l];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.0, fontname="Arial", fontsize=11,
+         fontcolor="@NEAR_BLACK", margin="0.12,0.05", fillcolor="@WHITE"];
+  edge  [color="@HEADER_BLUE", arrowsize=0.55, penwidth=0.9, fontname="Arial", fontsize=8, fontcolor="@MUTED"];
+  gw [label=<<b>Gateway and WAF</b><br/><font point-size="9.5">TLS, managed rules, rate rule, size rule</font>>, fillcolor="@DIRTY_WHITE"];
+  corr [label=<<b>Correlation id</b><br/><font point-size="9.5">X-Correlation-Id kept or created; in every log line</font>>];
+  size [label=<<b>Body size limit</b><br/><font point-size="9.5">2 MB JSON, 25 MB files (413)</font>>];
+  role [label=<<b>Runtime role filter</b><br/><font point-size="9.5">web: api only; integration: integration only</font>>];
+  ut [label=<<b>User chain</b><br/><font point-size="9.5">BIBS access token (15 min), session check,<br/>user re-loaded (locks apply at once)</font>>, fillcolor="@BG_BLUE"];
+  it [label=<<b>Integration chain</b><br/><font point-size="9.5">Apigee X token: signature, issuer,<br/>audience, scopes per API (401 / 403)</font>>, fillcolor="@BG_BLUE"];
+  perm [label=<<b>Permission</b><br/><font point-size="9.5">permission of the operation (403 ACCESS_DENIED)</font>>, fillcolor="@BG_BLUE"];
+  ds [label=<<b>Data scope</b><br/><font point-size="9.5">company and branch of path, query, body<br/>(403 DATA_SCOPE_DENIED)</font>>, fillcolor="@BG_BLUE"];
+  val [label=<<b>Validation and business rules</b><br/><font point-size="9.5">400 VALIDATION_FAILED, 422 business code,<br/>409 DUPLICATE or CONCURRENT_MODIFICATION</font>>];
+  tx [label=<<b>Transaction</b><br/><font point-size="9.5">record, journal, audit, outbox; commit</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  gw -> corr -> size -> role;
+  role -> ut [label=" api"]; role -> it [label=" integration"];
+  ut -> perm -> ds -> val; it -> val;
+  val -> tx;
+}

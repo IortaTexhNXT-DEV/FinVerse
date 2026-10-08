@@ -2963,11 +2963,14 @@ The items below are changed in BIBS without a release. Changes are audited.
 
 # Traceability
 
-Every BRD-6 requirement ID is met by at least one FR or is out of scope by the BRD itself. Section 11.1 traces the 40 BRRN IDs of the addenda; section 11.2 traces every one of the 1,032 line IDs of the main BRD with its page; section 11.3 lists the nine out-of-scope IDs.
+Every BRD-6 requirement ID is met by at least one FR or is out of scope by the BRD itself. Section 11.1 traces the 42 BRRN IDs of the addenda; section 11.2 traces every one of the 1,032 line IDs of the main BRD with its page; section 11.3 lists the nine out-of-scope IDs.
 
 <!-- table: widths=2.4,10,4.2 caption="Traceability summary" -->
 | Source | IDs | Traced to |
 |---|---|---|
+| Walkthrough addendum BRRN.041-042, restated BRRN.001, 020, 023, 024, 028-030, 033-037 | 2 new, 13 restated | Section 11.1 |
+| Walkthrough addendum BRRN.041-042, restated BRRN.001, 020, 023, 024, 028-030, 033-037 | 2 new, 13 restated | Section 11.1 |
+| Walkthrough addendum BRRN.041-042, restated BRRN.001, 020, 023, 024, 028-030, 033-037 | 2 new, 13 restated | Section 11.1 |
 | Workshop addendum BRRN.020-040 | 21 | Section 11.1 |
 | Addendum 1 BRRN.001-019 | 19 (with the main-BRD IDs they restate) | Section 11.1 |
 | Main BRD 1.001-6.002 | 1,032 line IDs, of which 9 out of scope | Section 11.2 |
@@ -2978,7 +2981,7 @@ Every BRD-6 requirement ID is met by at least one FR or is out of scope by the B
 <!-- table: widths=2,3.4,5.6,5.2 caption="BRRN ID to FR, screen and test cases" size=8 -->
 | BRD ID | FR | Screen | Test cases |
 |---|---|---|---|
-| BRRN.001 (p.48; updated p.15-16) | FR-RN-082 | Letters (NAL) | TC-RN-082.1, 082.2 (3 cases) |
+| BRRN.001 (p.48; updated p.15-16) | FR-RN-082 | Letters (NAL) | TC-RN-082.1, 082.2, 082.4 (4 cases) |
 | BRRN.002 (p.48-49) | FR-RN-011 | Expiry List (Generate Expiry List) | TC-RN-011.1, 011.2, 011.3, 011.4 (6 cases) |
 | BRRN.003 (p.49) | FR-RN-012 | Expiry List (Filters) | TC-RN-012.1, 012.2, 012.3 (4 cases) |
 | BRRN.004 (p.49-50) | FR-RN-013 | Expiry List grid | TC-RN-013.1, 013.2, 013.3, 013.4, 013.5 (5 cases) |
@@ -2997,27 +3000,29 @@ Every BRD-6 requirement ID is met by at least one FR or is out of scope by the B
 | BRRN.017 (p.57) | FR-RN-040 | My Dispositions (name / reference search) | TC-RN-040.3, 040.5 (3 cases) |
 | BRRN.018 (p.57) | FR-RN-060 | Processing Worklist (upload) | TC-RN-060.1, 060.4 (4 cases) |
 | BRRN.019 (p.58-59) | FR-RN-101, FR-RN-103 | Renewal Reports | TC-RN-101.1, 101.2 (2 cases) |
-| BRRN.020 (p.30; p.5, 20-21) | FR-RN-020, FR-RN-028 | Record page (Checks & Bucket) | TC-RN-020.1, 020.2, 020.3, 020.4, 028.1, 028.2, 028.3, 028.4 (11 cases) |
+| BRRN.020 (p.30; p.5, 20-21) | FR-RN-020, FR-RN-028, FR-RN-112 | Record page (Checks & Bucket) | TC-RN-020.1, 020.2, 020.3, 020.4, 020.5, 020.6, 028.1, 028.2, 028.3, 028.4, 112.4 (15 cases) |
 | BRRN.021 (p.30) | FR-RN-015, FR-RN-004 | Expiry List (Initiate) | TC-RN-004.1, 004.2, 004.4, 015.1, 015.2, 015.3, 015.4 (8 cases) |
 | BRRN.022 (p.30) | FR-RN-021, FR-RN-020 | Record page; uploads | TC-RN-020.1, 020.2, 020.3, 020.4, 021.1, 021.2, 021.3 (9 cases) |
-| BRRN.023 (p.30-32; p.5-6, 21) | FR-RN-022, FR-RN-051, FR-RN-112 | Expiry List (pill, Exceptions); record page | TC-RN-022.1, 022.2, 022.3, 022.4, 022.5, 112.1, 112.3 (10 cases) |
+| BRRN.023 (p.30-32; p.5-6, 21) | FR-RN-022, FR-RN-051, FR-RN-112 | Expiry List (pill, Exceptions); record page | TC-RN-022.1, 022.2, 022.3, 022.4, 022.5, 022.6, 051.3, 051.4, 112.1, 112.3, 112.4 (14 cases) |
 | BRRN.024 (p.32; p.6, 21) | FR-RN-002, FR-RN-025 | LAMD Reports | TC-RN-002.2, 002.4, 002.5, 025.3, 025.5 (9 cases) |
 | BRRN.025 (p.32) | FR-RN-083 | Letters (NRNS) | TC-RN-083.1, 083.2 (3 cases) |
 | BRRN.026 (p.32-33) | FR-RN-085 | Follow-ups | TC-RN-085.1, 085.2, 085.3 (4 cases) |
 | BRRN.027 (p.33) | FR-RN-042 | Record page (Account History) | TC-RN-042.1, 042.2, 042.3 (4 cases) |
 | BRRN.028 (p.33-34; p.6-7, 21-23) | FR-RN-026 | Expiry List (KYC chip) | TC-RN-026.1, 026.2, 026.3, 026.4 (4 cases) |
-| BRRN.029 (p.34; p.7-8, 23) | FR-RN-025 | LAMD Reports | TC-RN-025.1, 025.2, 025.3, 025.5 (6 cases) |
-| BRRN.030 (p.34-35; p.8) | FR-RN-010, FR-RN-016, FR-RN-112 | Renewal Home; Renewal Setup | TC-RN-010.1, 010.2, 010.3, 010.4, 010.6, 016.1, 016.2, 016.3, 016.4, 016.5, 112.2 (13 cases) |
-| BRRN.031 (p.35-36) | FR-RN-023, FR-RN-051 | Record page; Renewal Setup | TC-RN-023.1, 023.2, 023.3, 023.4, 023.5 (7 cases) |
+| BRRN.029 (p.34; p.7-8, 23) | FR-RN-025, FR-RN-022 | LAMD Reports | TC-RN-022.7, 025.1, 025.2, 025.3, 025.5 (7 cases) |
+| BRRN.030 (p.34-35; p.8) | FR-RN-010, FR-RN-016, FR-RN-112 | Renewal Home; Renewal Setup | TC-RN-010.1, 010.2, 010.3, 010.4, 010.6, 010.7, 016.1, 016.2, 016.3, 016.4, 016.5, 112.2 (14 cases) |
+| BRRN.031 (p.35-36) | FR-RN-023, FR-RN-051 | Record page; Renewal Setup | TC-RN-023.1, 023.2, 023.3, 023.4, 023.5, 051.3, 051.4 (9 cases) |
 | BRRN.032 (p.36) | FR-RN-027 | Record page (Checks, Account History) | TC-RN-027.1, 027.2, 027.3 (4 cases) |
 | BRRN.033 (p.36; p.8-9) | FR-RN-048 | Record page (Start NB Path) | TC-RN-048.2, 048.3, 048.4 (5 cases) |
-| BRRN.034 (p.37; p.9, 23) | FR-RN-023, FR-RN-112 | Renewal Setup (Decision Matrix) | TC-RN-023.1, 023.3, 023.4, 023.5, 023.6, 112.1 (7 cases) |
-| BRRN.035 (p.37-38; p.9-11, 23-24) | FR-RN-071, FR-RN-051 | Insurer Batches (responses) | TC-RN-071.1, 071.2, 071.3 (7 cases) |
+| BRRN.034 (p.37; p.9, 23) | FR-RN-023, FR-RN-112 | Renewal Setup (Decision Matrix) | TC-RN-023.1, 023.3, 023.4, 023.5, 023.6, 023.7, 112.1 (8 cases) |
+| BRRN.035 (p.37-38; p.9-11, 23-24) | FR-RN-071, FR-RN-051, FR-RN-084 | Insurer Batches (responses) | TC-RN-051.3, 071.1, 071.2, 071.3, 084.3 (9 cases) |
 | BRRN.036 (p.38-39; p.11-12, 24) | FR-RN-102 | Renewal Reports (RNW-LISTING) | TC-RN-102.1, 102.2, 102.3 (3 cases) |
-| BRRN.037 (p.39; p.12, 24-26) | FR-RN-083 | Letters (NRNS) | TC-RN-083.2, 083.3 (2 cases) |
-| BRRN.038 (p.40) | FR-RN-048, FR-RN-064, FR-RN-084 | Record page (Computations, Acceptance) | TC-RN-048.1, 064.2, 064.3 (3 cases) |
+| BRRN.037 (p.39; p.12, 24-26) | FR-RN-083, FR-RN-082, FR-RN-086 | Letters (NRNS) | TC-RN-082.3, 082.4, 083.2, 083.3, 083.4, 086.2 (6 cases) |
+| BRRN.038 (p.40) | FR-RN-048, FR-RN-064, FR-RN-084 | Record page (Computations, Acceptance) | TC-RN-048.1, 064.2, 064.3, 084.4 (4 cases) |
 | BRRN.039 (p.40) | FR-RN-025, FR-RN-023 | LAMD Reports | TC-RN-025.3, 025.4 (4 cases) |
 | BRRN.040 (p.40-41) | FR-RN-084 | Record page (Record Acceptance) | TC-RN-084.1, 084.2, 084.3, 084.4, 084.5 (6 cases) |
+| BRRN.041 (p.12-14) | FR-RN-087 | Booked invoice (incentive indicator) | TC-RN-087.1, 087.2, 087.3 (4 cases) |
+| BRRN.042 (p.14-15) | FR-RN-086 | Record page (Hold Cover) | TC-RN-086.1, 086.2, 086.3 (4 cases) |
 
 
 ## Main BRD line IDs
@@ -3155,9 +3160,257 @@ The table lists every line ID of the main BRD in page order, grouped by BRD func
 | 3.003.4.5 (p.141) | Search via QPS / EBIX reference numbers | Name and BIBS reference search (FR-RN-013) | - |
 | 4.003.1.6 (p.176) | Search via QPS / EBIX reference numbers | Name and BIBS reference search (FR-RN-013) | - |
 
+# Navigation
+
+This chapter shows how each user of Renewal reaches the screens. The sidebar shows a screen only when the user's role holds its permission (section 3.2), so each persona sees a different menu. The tables follow the proposed role grants.
+
+## Screens of Renewal
+
+The 20 screens specified in chapter 13, with the menu path and the roles that can open them. A screen without its own menu entry (a record tab, a dialog) is reached from the screen before it; its path ends with that screen.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: screen-index
+```
+
+## Screen flow
+
+How the screens link: from a list to its record, from a record action to the next screen, and from Marketing to Processing, the insurer and the letters. The walkthroughs of chapter 14 follow these links with real steps.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: flow
+```
+
+<!-- portrait -->
+
+## Menu by persona
+
+For each persona, the SIT and UAT user of the seed data and the sidebar that user sees, section by section. The BRD column shows which BRD owns a section; entries of other BRDs are listed so the business unit sees the whole menu of its users.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: menus
+```
+
+## Common screen elements
+
+Elements that behave the same on every screen of this set are described once here and not repeated in the screen specifications.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: common
+```
+
+<!-- landscape -->
+
+# Screen specifications
+
+One specification per screen, grouped by area: the expiry list and the renewal record; Marketing; Processing and the insurer; letters, acceptance and follow-up; Renewal Setup. Each gives:
+
+- **Purpose**, **who can open it** (personas and the permission), **navigation** (menu path and the other ways in) and the related **FRs**;
+- the **screenshots** taken with seed data; the first carries numbered callouts that match the **Fields** table;
+- the **Fields** table: section, label, type, length or format, mandatory, source list, default, the statuses in which the field can be changed, the validation and the message shown when it fails;
+- the **Actions** table: button, who sees it, when it is enabled, what happens, the resulting status and the notification sent;
+- the **business rules**, the **expected outcome** and the **test cases** of the test plan that exercise the screen.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: screens
+```
+
+<!-- portrait -->
+
+# End-to-end walkthroughs
+
+Five walkthroughs follow a renewal through the screens, persona by persona, with what the user does, what the user sees and the result of each step. They use seed data only and run in this order on the SIT environment. They are the script of the SIT review sessions of the Start Here guide. The storyboard index (appendix) lists every step with its screen, figure and FR.
+
+## WT-A An expiring account from the Expiry List to the Team Leader's post
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: walkthrough
+id: WT-A
+```
+
+## WT-B Processing, the insurer's answer and the Renewal Advice
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: walkthrough
+id: WT-B
+```
+
+## WT-C The Contact Center follow-up and the client's acceptance
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: walkthrough
+id: WT-C
+```
+
+## WT-D Not for Renewal and the closing letter
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: walkthrough
+id: WT-D
+```
+
+## WT-E A transfer to another unit, and the controls the user sees
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: walkthrough
+id: WT-E
+```
+
+<!-- landscape -->
+
+# Messages catalogue
+
+Every message a user of Renewal can see, grouped by the screen or dialog that shows it, with its code, its type and what the user does. The texts are quoted exactly as the screens show them.
+
+- **Validation**: shown on the screen while the user fills in a field or before the form is sent.
+- **Error**: the system refused the action; nothing was saved. The code is shown under the message as the Reference.
+- **Warning**: the action is possible, but the user should check something first.
+- **Confirmation** and **Information**: the outcome of an action, or a hint on the screen.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: messages
+```
+
+# Notifications catalogue
+
+The in-app notifications, alerts and e-mails of Renewal: what triggers each, who receives it and what it contains. Each user chooses the in-app and e-mail channels of the events on Notification Settings. Letters to clients and extracts to insurers are e-mailed protected.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: notifications
+```
+
+<!-- portrait -->
+
+# Document outputs
+
+The documents Renewal generates, with the BDO Insure letterhead, the "Confidential" footer and page numbers on the PDF documents. For each: the template, the format, the screen that produces it, the password protection, where every field comes from and the first page as generated from seed data. The spreadsheets are shown with a selection of their columns.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: documents
+```
+
+# Upload screens
+
+The uploads of Renewal run on the screen of the team that owns them: download the template, upload the filled file, review every row with its message, then process the valid rows. A file uploaded before is refused. Each upload type below has its template columns; the column checks (mandatory, number, date, Y/N) apply to every type, and the row checks listed with each type come on top.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: uploads
+```
+
+<!-- landscape -->
+
+# Cross-BRD dependencies and interface contract
+
+Renewal reads the booked accounts of New Business and Operations, creates the renewal account that New Business places and books, hands accounts to Submitted Policies and reads the claims and the loan reports. The contract below lists each exchange: the BRD or system, the direction, what is exchanged, when and how, and who owns the data. Chapter 7 describes the interfaces with the external systems; the technical detail is in the Technical Specification, reviewed by BDOI IT.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: contract
+```
+
+<!-- portrait -->
+
+# Sign-off and change control
+
+## What is signed
+
+The business sign-off covers the release set BRD-06 Renewal v2.0:
+
+<!-- table: widths=6,11.6 caption="Documents of the release set" -->
+| Document | Content |
+|---|---|
+| 00 Start Here | The map of the pack, the reading order per role, the steps up to closure, who signs what and the dates |
+| 01 Sign-off Pack Guide (deck) | Purpose, approach and steps with who does what, the module at a glance, caveats and impacts on other modules, entry and exit criteria, handover and change control |
+| 02 This FRS v2.0 | Requirements (chapters 1-11), the business view of the system (chapters 12-19), sign-off (chapter 20), the proposed rules for confirmation (chapter 21), the user-story view, the storyboard index and the screen standards (appendices) |
+| 03 Sign-off workbook v2.0 | The screen standards, screens, fields, actions, rules, messages, notifications, menus, upload templates and contract of this FRS, one row each, with the BU review columns; the comments log, meeting minutes, version history and sign-off certificate |
+| 04 and 05 Test plan v2.0 and its summary | The test cases traced to the FRs and to the screens of chapter 13 |
+| 07 to 09 UX screen documents | The UX Screen Deck, the UX screen register and the image package for the BDOI UX Design team, with the screens as specified in this FRS |
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: counts
+```
+
+## How the review is recorded
+
+Each team records its review in the sign-off workbook: Accept, Change requested or Comment on each row of the screen standards, screen catalogue, field register, business rules and messages, with the comment, the reviewer and the date. Questions, corrections and change requests go to the comments log of the workbook, where the project team answers them. The project team answers every Change requested row in the comments log before sign-off: either the row is corrected in the next version of the set, or the change is raised as a change request (below) and the row is signed as specified.
+
+## What signing freezes
+
+Signing this release set freezes, for Renewal:
+
+- the screens and their navigation (chapters 12 and 13), the fields with their order, labels, types, mandatory rules, lists and validations;
+- the actions with their conditions and resulting statuses, and the business rules;
+- the messages (chapter 15), the notifications (chapter 16) and the generated documents and files (chapter 17);
+- the upload templates (chapter 18) and the interface contract with the other BRDs (chapter 19).
+
+Configuration values marked "default" (lead days, thresholds such as the TSI threshold, notice, reminder, waiting and ageing days, hold cover durations, list entries, check settings, classification rules, the decision matrix and the templates, section 9) are not frozen; the Business Administrator and the System Administrator change them in the system without a change request.
+
+## Change after sign-off
+
+A change to anything frozen is raised in the Change Management Register. The request states the screen, field, rule or message concerned, the reason and the business priority. The project team assesses it, including its effect on the other BRDs through the interface contract of chapter 19 (for example a change of the acceptance changes what New Business places and books), and the owners of every BRD it touches approve it. An approved change is delivered as a new version of this release set (v2.1, v2.2 and so on) with its own Start Here guide, and only the changed pages and rows are reviewed and signed again (delta sign-off).
+
+## Proposed rules for confirmation
+
+Chapter 21 lists the proposed business rules and screen behaviour that differ from the BRD or need a decision of BDOI. BDOI records its decision on each item with its review; a decision that changes a screen, field, rule or message is applied in the next version of this set.
+
+<!-- pagebreak -->
+
+## Signatures
+
+By signing, BDOI confirms that this FRS and the sign-off workbook describe the Renewal functions, screens and messages it expects in BIBS, accepts the assumptions in section 10.1 and records its decisions on the items of chapter 21. Open questions in section 10.3 stay open; their answers are applied as configuration or through a change request. The signatories are those of the approval sheets of the Renewal BRD, the Walkthrough addendum of May 2026 included; the Renewal BRD marks the approval of Comptrollership as not required.
+
+```signoff
+rows:
+  - {name: "Zean C. Ibay", role: "Business Analyst, ESG - Business Project Services (prepared by)", organisation: BDO Unibank ESG}
+  - {name: "Rose Marie Lique", role: "Marketing and Processing (input provider)", organisation: BDOI}
+  - {name: "Berna Corpuz", role: "Marketing and Processing (input provider)", organisation: BDOI}
+  - {name: "Rhommel Mark Galler", role: "Marketing Business Services and System Support (reviewer)", organisation: BDOI}
+  - {name: "", role: "Information Technology Group (reviewer)", organisation: BDOI}
+  - {name: "Dan Ace R. Cauton", role: "Program Manager, ESG - Business Project Services (reviewer)", organisation: BDO Unibank ESG}
+  - {name: "Edward Kenneth Cadena", role: "BA Unit Head, ESG - Business Project Services (reviewer)", organisation: BDO Unibank ESG}
+  - {name: "Shellah Marie C. Miranda", role: "AVP, Product Owner", organisation: BDOI}
+  - {name: "Jose Melvin Jarin", role: "AVP, Product Owner", organisation: BDOI}
+  - {name: "Mark Joseph C. Makalintal", role: "SAVP, Unit Head - Combank and Corbank", organisation: BDOI}
+  - {name: "Edmundante F. Ramirez", role: "VP, Head - Retail Marketing", organisation: BDOI}
+  - {name: "Roderick Lim", role: "FVP, Head - Corporate and Retail Marketing (Officer-in-Charge)", organisation: BDOI}
+  - {name: "", role: Project Manager, organisation: iorta TechNXT}
+```
+
+<!-- pagebreak -->
+
 # Proposed business rules and clarifications for confirmation
 
-The table lists each point where the proposed screen or rule differs from the BRD text, fills a gap the BRD leaves open, or rests on a decision that BDOI confirms. The open questions of section 10.3 stay open; each item below gives the proposed rule that applies until BDOI answers. BDOI records its decision with the sign-off of this FRS (chapter 13); a decision that changes a screen, field, rule or message is applied in the next version of the FRS.
+The table lists each point where the proposed screen or rule differs from the BRD text, fills a gap the BRD leaves open, or rests on a decision that BDOI confirms. None of them removes a BRD requirement; most are settled by an answer of BDOI that is applied as configuration. The open questions of section 10.3 stay open; each item gives the proposed rule that applies until BDOI answers. Items CLR-RN-17 to CLR-RN-26 are the screen presentation points found on the screens of this set; items CLR-RN-27 to CLR-RN-40 come from the Walkthrough addendum of May 2026. BDOI records its decision with the review of this set (section 20.5); a decision that changes a screen, field, rule or message is applied in the next version of the FRS.
 
 <!-- table: widths=1.7,2.9,6.1,3.5,3.4 caption="Proposed business rules and clarifications for confirmation" size=8 -->
 | Ref | Topic | Proposed rule or screen behaviour | Reason | Decision requested from BDOI |
@@ -3172,23 +3425,194 @@ The table lists each point where the proposed screen or rule differs from the BR
 | CLR-RN-08 | Endorsements before renewal (BRRN.032; FR-RN-027) | The renewal account is created from the policy as of the last posted endorsement; an endorsement in progress blocks the post and the Renewal Advice. | The BRD asks that endorsements reflect on the mother policy before approval. | Confirm the block while an endorsement is open. |
 | CLR-RN-09 | CBG accounts (FR-RN-030) | CBG accounts are not assigned to AOs and follow straight-through processing when Clean. | The definition of CBG is open (RQ08). | Give the definition of CBG (RQ08). |
 | CLR-RN-10 | Checks and buckets (FR-RN-020, 022, 023) | The checks of section 5 run with the default severities; the decision matrix starts with the proposed content and is maintained by the Business Administrator with maker-checker. | The list of checks, their severities and the matrix content are open (RQ01, RQ24). | Give the checks, severities and matrix content (RQ01, RQ24). |
-| CLR-RN-11 | Claims summary (BRRN.027, 031, 034; FR-RN-042, 043) | The claims section reads the Claims module; until it is connected it shows "claims not connected" and the claims check does not block. Total Loss Claim stays a manual reason until Claims defines a total-loss indicator. | Cross-BRD decision D4; CLQ28. | Confirm the claims summary and the manual Total Loss reason (RQ13). |
+| CLR-RN-11 | Claims summary (BRRN.027, 031, 034; FR-RN-042, 043) | The claims section reads the Claims module; when the claims cannot be read it says so and the claims check does not block. Total Loss Claim stays a manual reason until Claims defines a total-loss indicator. | Cross-BRD decision D4; CLQ28. | Confirm the claims summary and the manual Total Loss reason (RQ13). |
 | CLR-RN-12 | Recipients of the Renewal Advice (FR-RN-081) | Every recipient domain is allowed until BDOI defines the approved domains; RAs are always sent protected, with the password in a separate e-mail. | The approved domains and TLS rule are open (RQ16, Q07). | Give the approved domains and the password convention (RQ16, Q07). |
-| CLR-RN-13 | No Advice Letter (FR-RN-082) | Eligibility comes from the NAL-eligible attribute of the non-renewal reason; no NAL for an account that already has an RA or NFR. | Which accounts are NAL-eligible is open (RQ17). | Confirm the NAL-eligible reasons (RQ17). |
+| CLR-RN-13 | No Advice Letter (FR-RN-082) | Eligibility comes from the NAL-eligible attribute of the non-renewal reason and from the routing at the effective expiry date (CLR-RN-32). | Which accounts are NAL-eligible was open (RQ17). | Confirm the NAL-eligible reasons (RQ17). |
 | CLR-RN-14 | NRNS and non-acceptance (FR-RN-083) | Accounts not yet submitted at the checkpoint (90 days before expiry by default) are NRNS; reminders and non-acceptance letters follow the default days. | The definition, checkpoint and letter timing are open (RQ18). | Confirm the definition and the timing (RQ18). |
 | CLR-RN-15 | Lock after the Renewal Advice (FR-RN-080) | An account is locked for changes once its Renewal Advice is generated; cancelling the RA through the controlled override (RNW_OVERRIDE) unlocks it. | What unlocks an account is open (RQ12). | Confirm the lock and the unlock (RQ12). |
 | CLR-RN-16 | Submitted policies (BRD-12; FR-RN-090) | Renewal takes over the renewal of submitted policies from the hand-off of Submitted Policies, with one candidate per SBM number and the RA 90 days before expiry. | Cross-BRD decision D2. | Confirm decision D2 for Renewal. |
+| CLR-RN-17 | Upload of dispositioned files (BRRN.018; FR-RN-060) | The Upload Dispositions action is on the Processing Worklist, where the Processing team works, and not on My Dispositions of the AO. | The BRD gives the upload to the Processing Team Leader and Officer (BRD 3.004, 4.003). | Confirm the place of the upload. |
+| CLR-RN-18 | Go-live uploads (FR-RN-016) | The Go-live tab of Renewal Setup (upload of the migrated policies and of the Renewal Advices already sent) is open to the Processing team and the Business Administrator; the corrections are approved by a second user. | The BRD does not name who loads the go-live data (DMQ37, DMQ38). | Confirm who loads and who approves the go-live data. |
+| CLR-RN-19 | Contact Center and LAMD on the record (BRRN.024, 026; FR-RN-085) | The Contact Center and LAMD users see the renewal record without the work queue header (stage, due date, owner) and with the actions of their role only (Add Follow-up; the LAMD validation). | Their roles do not read the work queues of Marketing and Processing. | Confirm what these users see on the record. |
+| CLR-RN-20 | Letter names on the screens (BRRN.001; FR-RN-082) | The screens write the letters in full: Renewal Advice, No Advice Letter, Not for Renewal Letter; the tab of the closing letters is "NAL / NFR". | The BRD uses NAL, NFR and NRL; users read the full names. | Confirm the letter names and the tab label (see CLR-RN-32). |
+| CLR-RN-21 | Codes typed in Renewal Setup (FR-RN-024, 112) | The new non-renewable risk code takes the risk code and the line of business as typed codes, checked against the catalogue; the decision matrix shows its segments, lines and products by name. | The set-up dialogs follow the catalogue codes the Business Administrator knows. | Confirm, or ask for drop-downs by name in the set-up dialogs. |
+| CLR-RN-22 | Side stages on the step bar (FR-RN-031, 048, 082) | Transfer Pending, the New Business path and Letter Pending show apart from the main stages of the step bar, after the stage they come from. | They are detours, not steps every renewal passes. | Confirm the step bar. |
+| CLR-RN-23 | Renewal account of a migrated policy (FR-RN-016, 063, 080) | The renewal account of a migrated policy is created from the migrated data; when mandatory fields of the product are missing, the Renewal Advice is refused with the list of fields until Processing completes them. | Migrated policies may lack fields BIBS needs for the RA and the booking. | Confirm that Processing completes the missing fields before the RA. |
+| CLR-RN-24 | Short stage labels in lists (FR-RN-013) | In lists the stage pill shows "Unassigned" for Unassigned Disposition and "For Placement" for For Placement and Booking; the full label is in the tooltip and on the record. | One pill size in the lists (screen standards). | Confirm the short forms. |
+| CLR-RN-25 | Insurer extract (BRD 3.009; FR-RN-070) | The extract per insurer keeps the 28 columns of the BRD in one sheet; on screen the batch shows them in a table that scrolls sideways. | The insurers read the 28 columns; the screen shows the same file. | Confirm the 28 columns, or name the columns to keep on screen. |
+| CLR-RN-26 | Landing page of the Renewal users (FR-RN-100) | After sign-in the Marketing and Processing users land on the New Business dashboard, the Contact Center and LAMD users on My Approvals; Renewal Home is one click away. | The landing page is that of every broking role. | Confirm, or land the Renewal personas on Renewal Home. |
+| CLR-RN-27 | Exception ageing (Annex BRRN.029 R29-05; FR-RN-022) | An exception open beyond 5 working days raises one alert to the owner of the stage; the record is not moved. | The SLA and the recipient of the escalation are not given. | Give the ageing days and the recipients. |
+| CLR-RN-28 | Claims before the Claims module (R23-05, R28-05; FR-RN-020, 023) | Open claims of a booked account fail the claims check with severity Review (manual evaluation, never automatic); for a migrated policy without a BIBS account the check is Not applicable until its claims are migrated. | The annex requires manual evaluation of claims; the claims of migrated policies are not yet in BIBS (decision D4). | Confirm how the claims of migrated policies are found (migrated claims data or a manual flag). |
+| CLR-RN-29 | TSI threshold and TSU (SC-12, SC-13, R23-02, R24-02; FR-RN-020, 023) | Above PHP 250M of total sum insured the renewal is Review and the decision matrix proposes For Proposal to TSU; there is no separate TSU queue or "Pending Insurer Validation" status: a missing insurer answer keeps the renewal With Insurer. Auto / Manual / Proposal (R24-05) is read as the automation of the matrix, not a second classification. | The annex adds the TSU routing, a hold status and a second "bucket" set. | Confirm the threshold, the routing to TSU and the reading of R24-04 and R24-05 (RQ01, RQ10). |
+| CLR-RN-30 | KYC at renewal (BRRN.028 and its annex; FR-RN-026) | KYC stays for visibility only and never blocks the renewal (BRRN.028, scope of the Walkthrough addendum). | The annex KYC-01 to KYC-06 blocks a renewal with a missing, incomplete or expired KYC; BRRN.028 says KYC gating needs a separate approved compliance requirement. | BDOI Compliance and the Product Owner: decide whether KYC blocks the renewal; if it does, the KYC queue, EDD and override are added by change request. |
+| CLR-RN-31 | Structural change and the NB path (BRRN.033; FR-RN-048) | The financial change is the financial-impact check; the NB path starts with Start NB Path by the AO or with a For Quotation or For Proposal disposition. | The BRD asks for routing on "structural changes" when "defined criteria" are met, without defining them. | Define a structural change and say whether the routing must be automatic. |
+| CLR-RN-32 | NAL and NRL (updated BRRN.001, R37-HC-07 to 10; FR-RN-024, 082) | At the effective expiry date an unrenewed account with an RA sent goes to Operations for the NAL; one without RA goes to its Marketing AO for the NRL, which is the Not for Renewal Letter; the two letters exclude each other. | The earlier BRRN.001 sent the NAL when there was no RA; the annex sends it when an RA exists. | Confirm the NAL definition and that the NRL is the Not for Renewal Letter (RQ07, RQ17). |
+| CLR-RN-33 | NRNS waiting period (Annex BRRN.037; FR-RN-083) | NRNS is tagged at the effective expiry date with no waiting period by default; the waiting days are a parameter per segment (CBG, non-CBG). | The annex mentions a waiting period and a CBG / non-CBG variation without values. | Give the waiting days per segment (RQ18). |
+| CLR-RN-34 | Placement and booking after acceptance (BRRN.035, 040; FR-RN-084) | The AO records the client's confirmation; placement and booking are user actions (automatic placement off for renewals); the account moves on without re-keying. | The Workshop addendum moved an accepted renewal to placement and booking automatically; the Walkthrough addendum keeps them under manual control. | Confirm that automatic placement of BRRN.040 is superseded (RQ19). |
+| CLR-RN-35 | Attention flags without escalation (BRRN.036; FR-RN-102) | The listing flags accounts by ageing (escalation days 60 for IBG and Leasing, 30 for the others), overdue and high risk, each with its rule; no alert goes to the unit head. | The annex lists the criteria without thresholds and forbids automatic escalation. | Give the ageing, overdue and high-risk criteria and say whether the AO may be notified (RQ11). |
+| CLR-RN-36 | Hold cover of a renewal (BRRN.042, R37-HC-01; FR-RN-086) | The Marketing AO requests the hold cover from the renewal (30 or 60 days); Processing records the insurer's confirmation; the confirmed end date is the effective expiry date. | The annex has the AO tag the hold cover; New Business gives the request to Processing (FR-NB-082). | Confirm who requests and who records the hold cover, and the durations. |
+| CLR-RN-37 | Incentive eligibility (BRRN.041; FR-RN-087) | One evaluation shared with New Business, run after booking, confirmed acceptance and full payment, on the incentive criteria of Product Maintenance; re-evaluated on endorsement, invalidated on cancellation. | New Business sets the indicator at booking (FR-NB-118); the criteria are not given (Q33). | Confirm the shared evaluation and give the incentive criteria (Q33). |
+| CLR-RN-38 | Insurer renewable list (SC-10; FR-RN-020) | The insurer's renewable list is kept per insurer as a list of risk codes in Renewal Setup; a risk outside it fails INSURER_RENEWABLE_LIST with severity Review. | The annex names the list without its source or format. | Say how the insurers provide the list and who maintains it. |
+| CLR-RN-39 | Filter and export by classification (BRRN.023; FR-RN-022) | The Expiry List keeps the classification filter, the Exceptions tab and the export by classification. | The Walkthrough addendum no longer lists the filter and export by bucket of the Workshop addendum. | Confirm that the filter and export stay. |
+| CLR-RN-40 | Signatories (approval sheets) | The set is signed by the approvers of the Renewal BRD and its addenda; Comptrollership is informed but does not sign, as the approval sheets mark it not required. | A renewal books through the New Business booking and posts nothing itself. | Confirm the signatories. |
 
-# Sign-off
+<!-- landscape -->
 
-By signing, BDOI confirms that this FRS describes the Renewal functions it expects in BIBS, and accepts the assumptions in section 10.1. Open questions in section 10.3 stay open; their answers are applied as configuration or through a change request.
+# Appendix: User-story view
 
-```signoff
-rows:
-  - {name: "", role: "Product Owner, Renewal", organisation: BDOI}
-  - {name: "", role: "Unit Head, Combank and Corbank", organisation: BDOI}
-  - {name: "", role: "Head, Retail Marketing", organisation: BDOI}
-  - {name: "", role: "Head, Corporate and Retail Marketing", organisation: BDOI}
-  - {name: "", role: "Program Manager, Business Project Services", organisation: BDO Unibank ESG}
-  - {name: "", role: Project Manager, organisation: iorta TechNXT}
-```
+One row per requirement of the Renewal BRD issued on 8-Oct-2026: the BRRN requirements of the three addenda, then the functions of the main BRD by persona (each function stands for the line IDs listed in section 11.2). The user story keeps the BRD's own wording where the BRD writes the requirement as a story, and is derived from the FR otherwise. The acceptance criteria are the numbered criteria of the FRs (for example FR-RN-020 AC1-5); the test cases are those of the test plan.
+
+<!-- user-story-view -->
+<!-- table: widths=2.6,9.4,2.6,3.6,4.2 caption="User-story view of the Renewal BRD" size=7.5 -->
+| BRD ID | User story | FR IDs | Acceptance criteria | Test cases |
+|---|---|---|---|---|
+| BRRN.001 (p.48; updated p.15-16) | As a Processing Officer or Marketing AO, I need to generate and send the No Advice Letter, the Non-Renewal Letter and the Renewal Advice to the accounts that meet their criteria, so that every client receives the right letter and the account status follows. | FR-RN-082 | FR-RN-082 AC1-3 | TC-RN-082.1, 082.2, 082.4 (4 cases) |
+| BRRN.002 (p.48-49) | As a Marketing Team Leader or Processing Team Leader, I need to generate the list of expiring accounts for a date range, so that renewals are prepared ahead of expiry. | FR-RN-011 | FR-RN-011 AC1-3 | TC-RN-011.1, 011.2, 011.3, 011.4 (6 cases) |
+| BRRN.003 (p.49) | As a Marketing Team Leader or Processing Team Leader, I need to filter the list with the specified criteria, so that I work only the accounts I need. | FR-RN-012 | FR-RN-012 AC1-3 | TC-RN-012.1, 012.2, 012.3 (4 cases) |
+| BRRN.004 (p.49-50) | As a Renewal user, I need the generated list in one scrollable view with all required columns, so that I review the accounts without paging. | FR-RN-013 | FR-RN-013 AC1-3 | TC-RN-013.1, 013.2, 013.3, 013.4, 013.5 (5 cases) |
+| BRRN.005 (p.50-51) | As a Marketing Team Leader, I need the expiring and expired, booked and unbooked accounts captured, so that no renewal is missed. | FR-RN-010, FR-RN-016 | FR-RN-010 AC1-4; FR-RN-016 AC1-4 | TC-RN-010.1, 010.2, 010.4, 010.5, 010.6, 016.1, 016.2, 016.3, 016.4, 016.5 (14 cases) |
+| BRRN.006 (p.51) | As a Renewal user, I need to filter and search each column of the list, so that I find accounts quickly. | FR-RN-013 | FR-RN-013 AC1-3 | TC-RN-013.2, 013.3, 013.4, 013.5 (5 cases) |
+| BRRN.007 (p.51-52) | As a Renewal user, I need to download and save the list in .xlsx, so that I can share and keep it. | FR-RN-014 | FR-RN-014 AC1-2 | TC-RN-014.1, 014.3, 014.4 (3 cases) |
+| BRRN.008 (p.52) | As a Renewal user, I need a print preview with print settings, so that I print the list as needed. | FR-RN-014 | FR-RN-014 AC1-2 | TC-RN-014.2, 014.3, 014.4 (3 cases) |
+| BRRN.009 (p.52-53) | As a Business Administrator, I need non-renewable risk codes tagged, excluded and maintained with the Not for Renewal Letter sent, so that such accounts are closed without manual work. | FR-RN-024 | FR-RN-024 AC1-3 | TC-RN-024.1, 024.2, 024.3, 024.4 (6 cases) |
+| BRRN.010 (p.53-54) | As a Marketing or Processing user, I need to generate the Renewal Advice (first and second notice) and send it in batch, protected, so that clients receive the renewal terms on time. | FR-RN-080, FR-RN-081 | FR-RN-080 AC1-4; FR-RN-081 AC1-2 | TC-RN-080.1, 080.3, 080.4, 080.5, 081.1, 081.2, 081.3, 081.4 (13 cases) |
+| BRRN.011 (p.54-55) | As a Marketing AO, I need all the accounts assigned to me in one scrollable list, so that I see my whole workload. | FR-RN-040 | FR-RN-040 AC1-4 | TC-RN-040.1, 040.4, 040.5 (3 cases) |
+| BRRN.012 (p.55) | As a Marketing AO, I need to select any account of the list, so that I can work on it. | FR-RN-040 | FR-RN-040 AC1-4 | TC-RN-040.1, 040.5 (2 cases) |
+| BRRN.013 (p.55-56) | As a Marketing AO, I need all renewal fields of the selected account, so that I decide on full information. | FR-RN-041 | FR-RN-041 AC1-2 | TC-RN-041.1, 041.4 (2 cases) |
+| BRRN.014 (p.56) | As a Marketing AO, I need a filter on each column of my list, so that I narrow it down. | FR-RN-040 | FR-RN-040 AC1-4 | TC-RN-040.2, 040.5 (2 cases) |
+| BRRN.015 (p.56) | As a Marketing AO, I need to sort my list on any column, so that I work in the order I choose. | FR-RN-040 | FR-RN-040 AC1-4 | TC-RN-040.2, 040.5 (2 cases) |
+| BRRN.016 (p.56-57) | As a Marketing AO, I need to search my list, so that I find a specific account. | FR-RN-040 | FR-RN-040 AC1-4 | TC-RN-040.2, 040.5 (2 cases) |
+| BRRN.017 (p.57) | As a Marketing AO, I need to search an account by name or unique reference, so that I open it directly. | FR-RN-040 | FR-RN-040 AC1-4 | TC-RN-040.3, 040.5 (3 cases) |
+| BRRN.018 (p.57) | As a Processing Team Leader or Processing Officer, I need to upload the dispositioned files, so that offline dispositions reach the system. | FR-RN-060 | FR-RN-060 AC1-3 | TC-RN-060.1, 060.4 (4 cases) |
+| BRRN.019 (p.58-59) | As a Renewal user, I need comprehensive reports on the renewal status with a summary, so that renewals are monitored. | FR-RN-101, FR-RN-103 | FR-RN-101 AC1-3; FR-RN-103 AC1-2 | TC-RN-101.1, 101.2 (2 cases) |
+| BRRN.020 (p.30; p.5, 20-21) | As a renewal processor, I want data sanitation to occur within the system after extraction or upload, so that renewal eligibility is determined consistently and does not depend on manual pre-cleaning. | FR-RN-020, FR-RN-028, FR-RN-112 | FR-RN-020 AC1-5; FR-RN-028 AC1-3; FR-RN-112 AC1-3 | TC-RN-020.1, 020.2, 020.3, 020.4, 020.5, 020.6, 028.1, 028.2, 028.3, 028.4, 112.4 (15 cases) |
+| BRRN.021 (p.30) | As an authorised user, I need to initiate renewal processing explicitly, in bulk or one by one, so that extraction alone never starts a renewal. | FR-RN-015, FR-RN-004 | FR-RN-015 AC1-3; FR-RN-004 AC1-3 | TC-RN-004.1, 004.2, 004.4, 015.1, 015.2, 015.3, 015.4 (8 cases) |
+| BRRN.022 (p.30) | As a Renewal user, I need every renewal record matched by a unique reference, so that uploads and responses update the right renewal. | FR-RN-021, FR-RN-020 | FR-RN-021 AC1-2; FR-RN-020 AC1-5 | TC-RN-020.1, 020.2, 020.3, 020.4, 021.1, 021.2, 021.3 (9 cases) |
+| BRRN.023 (p.30-32; p.5-6, 21) | As a Renewal user, I want the system to classify renewal records automatically into rule-based buckets (Clean, Review, Exception), so that renewal work is prioritised, straight-through cases are processed efficiently, and exceptions are controlled and isolated. | FR-RN-022, FR-RN-051, FR-RN-112 | FR-RN-022 AC1-4; FR-RN-051 AC1-3; FR-RN-112 AC1-3 | TC-RN-022.1, 022.2, 022.3, 022.4, 022.5, 022.6, 051.3, 051.4, 112.1, 112.3, 112.4 (14 cases) |
+| BRRN.024 (p.32; p.6, 21) | As an authorised user, I want the LAMD role limited to early validation only, so that booking, placement and customer communications remain role-appropriate and controlled. | FR-RN-002, FR-RN-025 | FR-RN-002 AC1-3; FR-RN-025 AC1-3 | TC-RN-002.2, 002.4, 002.5, 025.3, 025.5 (9 cases) |
+| BRRN.025 (p.32) | As a Marketing AO, I need NRNS reminders and non-acceptance letters sent at the checkpoints, so that lapses are prevented and recorded. | FR-RN-083 | FR-RN-083 AC1-4 | TC-RN-083.1, 083.2 (3 cases) |
+| BRRN.026 (p.32-33) | As a Contact Center user, I need to view the renewal lists, record follow-ups and upload client documents, so that the renewal status is followed up with the client. | FR-RN-085 | FR-RN-085 AC1-2 | TC-RN-085.1, 085.2, 085.3 (4 cases) |
+| BRRN.027 (p.33) | As a Marketing AO, I need the full account history before the disposition, so that my disposition is informed. | FR-RN-042 | FR-RN-042 AC1-3 | TC-RN-042.1, 042.2, 042.3 (4 cases) |
+| BRRN.028 (p.33-34; p.6-7, 21-23) | As a Renewal user, I want the system to identify and show the accounts due or upcoming for KYC review, so that compliance monitoring and follow-up are performed without blocking or interrupting the renewal process. | FR-RN-026 | FR-RN-026 AC1-2 | TC-RN-026.1, 026.2, 026.3, 026.4 (4 cases) |
+| BRRN.029 (p.34; p.7-8, 23) | As a LAMD user, I need the LAMD reports ingested and the paid-off and RMU loans matched to the expiring policies by PN, so that renewal eligibility and routing are right. | FR-RN-025, FR-RN-022 | FR-RN-025 AC1-3; FR-RN-022 AC1-4 | TC-RN-022.7, 025.1, 025.2, 025.3, 025.5 (7 cases) |
+| BRRN.030 (p.34-35; p.8) | As a Marketing Team Leader, I need renewal candidates extracted automatically on the policy expiry date with configurable lead days, so that the renewal population is complete without starting any renewal. | FR-RN-010, FR-RN-016, FR-RN-112 | FR-RN-010 AC1-4; FR-RN-016 AC1-4; FR-RN-112 AC1-3 | TC-RN-010.1, 010.2, 010.3, 010.4, 010.6, 010.7, 016.1, 016.2, 016.3, 016.4, 016.5, 112.2 (14 cases) |
+| BRRN.031 (p.35-36) | As a Marketing Team Leader, I need rule-based dispositions for clean cases and manual review for the others, so that straight-through cases move on and risky ones are checked. | FR-RN-023, FR-RN-051 | FR-RN-023 AC1-4; FR-RN-051 AC1-3 | TC-RN-023.1, 023.2, 023.3, 023.4, 023.5, 051.3, 051.4 (9 cases) |
+| BRRN.032 (p.36) | As a Marketing Team Leader, I need endorsements reflected on the mother policy before approval, so that the renewal uses the latest policy terms. | FR-RN-027 | FR-RN-027 AC1-3 | TC-RN-027.1, 027.2, 027.3 (4 cases) |
+| BRRN.033 (p.36; p.8-9) | As a Marketing AO, I need renewals with financial or structural changes to follow the New Business flow, so that they are repriced or restructured and tagged with the reason. | FR-RN-048 | FR-RN-048 AC1-3 | TC-RN-048.2, 048.3, 048.4 (5 cases) |
+| BRRN.034 (p.37; p.9, 23) | As a Business Administrator, I need a configurable decision matrix that defines which renewal scenarios are automated and which are manual, so that decisions are consistent and explainable. | FR-RN-023, FR-RN-112 | FR-RN-023 AC1-4; FR-RN-112 AC1-3 | TC-RN-023.1, 023.3, 023.4, 023.5, 023.6, 023.7, 112.1 (8 cases) |
+| BRRN.035 (p.37-38; p.9-11, 23-24) | As a Renewal user, I want the system to capture insurer responses (Renew As Is, Reject, Revise) and apply them to the renewal workflow, so that the status progression is accurate, controlled and does not rely on manual re-encoding; client confirmation stays required before placement and booking. | FR-RN-071, FR-RN-051, FR-RN-084 | FR-RN-071 AC1-3; FR-RN-051 AC1-3; FR-RN-084 AC1-3 | TC-RN-051.3, 071.1, 071.2, 071.3, 084.3 (9 cases) |
+| BRRN.036 (p.38-39; p.11-12, 24) | As a Marketing Team Leader, I want a centralised and customisable renewal listing that shows renewal exposure and the accounts requiring attention and supports escalation, so that renewals are managed proactively and not by manual tracking. | FR-RN-102 | FR-RN-102 AC1-2 | TC-RN-102.1, 102.2, 102.3 (3 cases) |
+| BRRN.037 (p.39; p.12, 24-26) | As a Marketing AO, I want the system to identify NRNS (No Renew / No Submit) accounts and trigger reminder or non-acceptance letters, so that lapse risk is managed. | FR-RN-083, FR-RN-082, FR-RN-086 | FR-RN-083 AC1-4; FR-RN-082 AC1-3; FR-RN-086 AC1-3 | TC-RN-082.3, 082.4, 083.2, 083.3, 083.4, 086.2 (6 cases) |
+| BRRN.038 (p.40) | As a Processing Officer, I need financial impact between the expiring and renewal terms detected and acknowledged, so that the client accepts the changed terms knowingly. | FR-RN-048, FR-RN-064, FR-RN-084 | FR-RN-048 AC1-3; FR-RN-064 AC1-2; FR-RN-084 AC1-3 | TC-RN-048.1, 064.2, 064.3, 084.4 (4 cases) |
+| BRRN.039 (p.40) | As a LAMD user, I need CBG Motor and Fire accounts matched by PN to follow the straight-through path, so that they renew without AO assignment. | FR-RN-025, FR-RN-023 | FR-RN-025 AC1-3; FR-RN-023 AC1-4 | TC-RN-025.3, 025.4 (4 cases) |
+| BRRN.040 (p.40-41) | As a Marketing AO, I need the accepted renewal to move to placement and booking without re-keying, so that the renewal completes quickly and books as a renewal. | FR-RN-084 | FR-RN-084 AC1-3 | TC-RN-084.1, 084.2, 084.3, 084.4, 084.5 (6 cases) |
+| BRRN.041 (p.12-14) | As a Marketing Team Leader, I need renewals evaluated for incentive eligibility after placement, booking and full payment on rule-based criteria including endorsements, so that incentive processing and reporting are accurate, consistent and auditable. | FR-RN-087 | FR-RN-087 AC1-3 | TC-RN-087.1, 087.2, 087.3 (4 cases) |
+| BRRN.042 (p.14-15) | As a Marketing AO, I want to send a hold cover request to the insurer and record the hold cover confirmation it returns, so that the cover continues while the renewal completes. | FR-RN-086 | FR-RN-086 AC1-3 | TC-RN-086.1, 086.2, 086.3 (4 cases) |
+| 1.001 (p.70) | As a Marketing Team Leader, I want to be able to log in with my user profile, so that only authorised users work on renewals. | FR-RN-001 | FR-RN-001 AC1-3 | TC-RN-001.1, 001.2, 001.3, 001.4, 001.5, 001.6 (13 cases) |
+| 1.002 (p.70) | As a Marketing Team Leader, I want to be able to open the application in several tabs, so that I can work on several accounts at once. | FR-RN-001 | FR-RN-001 AC1-3 | TC-RN-001.1, 001.2, 001.3, 001.4, 001.5, 001.6 (13 cases) |
+| 1.003 (p.70-71) | As a Marketing Team Leader, I want to be able to generate the list of expiring accounts, so that renewals are prepared ahead of expiry. | FR-RN-011 | FR-RN-011 AC1-3 | TC-RN-011.1, 011.2, 011.3, 011.4 (7 cases) |
+| 1.004 (p.77-78) | As a Marketing Team Leader, I want to be able to view an account and its details, so that I decide on full information. | FR-RN-041 | FR-RN-041 AC1-2 | TC-RN-041.1, 041.2, 041.3, 041.4 (8 cases) |
+| 1.005 (p.79-80) | As a Marketing Team Leader, I want to be able to assign the accounts to the officers of my team, so that every account has an owner. | FR-RN-030 | FR-RN-030 AC1-3 | TC-RN-030.1, 030.2, 030.3, 030.4, 030.5 (7 cases) |
+| 1.006 (p.80-81) | As a Marketing Team Leader, I want to be able to transfer an account to another unit, so that the account is handled by the right unit. | FR-RN-031 | FR-RN-031 AC1-2 | TC-RN-031.1, 031.2, 031.3, 031.4 (7 cases) |
+| 1.007 (p.81-82) | As a Marketing Team Leader, I want to be able to receive, accept or decline the accounts transferred to my unit, so that transferred accounts are taken over. | FR-RN-032 | FR-RN-032 AC1-2 | TC-RN-032.1, 032.2, 032.3, 032.4 (6 cases) |
+| 1.008 (p.82) | As a Marketing Team Leader, I want to be able to review, return or post the dispositioned accounts, so that only checked dispositions move to processing. | FR-RN-050 | FR-RN-050 AC1-3 | TC-RN-050.1, 050.2, 050.3, 050.4 (6 cases) |
+| 1.009 (p.84-101) | As a Marketing Team Leader, I want to be able to generate the renewal reports, so that renewals are monitored. | FR-RN-101 | FR-RN-101 AC1-3 | TC-RN-101.1, 101.2, 101.3, 101.4, 101.5 (8 cases) |
+| 1.010 (p.102-103) | As a Marketing Team Leader, I want to be able to generate and send the Renewal Advice, so that clients receive the renewal terms on time. | FR-RN-080 | FR-RN-080 AC1-4 | TC-RN-080.1, 080.2, 080.3, 080.4, 080.5 (12 cases) |
+| 1.011 (p.104) | As a Marketing Team Leader, I want to be able to override the outstanding-balance flag of an account, so that controlled exceptions can proceed. | FR-RN-051 | FR-RN-051 AC1-3 | TC-RN-051.1, 051.2, 051.3, 051.4, 051.5 (8 cases) |
+| 2.001 (p.104-105) | As a Marketing AO, I want to be able to log in with my user profile, so that only authorised users work on renewals. | FR-RN-001 | FR-RN-001 AC1-3 | TC-RN-001.1, 001.2, 001.3, 001.4, 001.5, 001.6 (13 cases) |
+| 2.002 (p.105) | As a Marketing AO, I want to be able to open the application in several tabs, so that I can work on several accounts at once. | FR-RN-001 | FR-RN-001 AC1-3 | TC-RN-001.1, 001.2, 001.3, 001.4, 001.5, 001.6 (13 cases) |
+| 2.003 (p.105) | As a Marketing AO, I want to be able to view the accounts assigned to me for disposition, so that I see my whole workload. | FR-RN-040 | FR-RN-040 AC1-4 | TC-RN-040.1, 040.2, 040.3, 040.4, 040.5 (7 cases) |
+| 2.004 (p.106-109) | As a Marketing AO, I want to be able to give the disposition of an account with its reason and remarks, so that each account has a recorded decision. | FR-RN-043 | FR-RN-043 AC1-3 | TC-RN-043.1, 043.2, 043.3, 043.4, 043.5 (10 cases) |
+| 2.005 (p.110-111) | As a Marketing AO, I want to be able to transfer an account to another unit, so that the account is handled by the right unit. | FR-RN-031 | FR-RN-031 AC1-2 | TC-RN-031.1, 031.2, 031.3, 031.4 (7 cases) |
+| 2.006 (p.111-112) | As a Marketing AO, I want to be able to view the list of my dispositioned accounts, so that I follow their status. | FR-RN-045 | FR-RN-045 AC1-2 | TC-RN-045.1, 045.2, 045.3 (3 cases) |
+| 2.007 (p.113) | As a Marketing AO, I want to be able to update the accounts returned to me, so that returned accounts are corrected and pushed again. | FR-RN-046 | FR-RN-046 AC1-2 | TC-RN-046.1, 046.2, 046.3 (4 cases) |
+| 2.008 (p.115-132) | As a Marketing AO, I want to be able to generate the renewal reports, so that renewals are monitored. | FR-RN-101 | FR-RN-101 AC1-3 | TC-RN-101.1, 101.2, 101.3, 101.4, 101.5 (8 cases) |
+| 2.009 (p.132-133) | As a Marketing AO, I want to be able to generate and send the Renewal Advice, so that clients receive the renewal terms on time. | FR-RN-080 | FR-RN-080 AC1-4 | TC-RN-080.1, 080.2, 080.3, 080.4, 080.5 (12 cases) |
+| 3.001 (p.134) | As a Processing Team Leader, I want to be able to log in with my user profile, so that only authorised users work on renewals. | FR-RN-001 | FR-RN-001 AC1-3 | TC-RN-001.1, 001.2, 001.3, 001.4, 001.5, 001.6 (13 cases) |
+| 3.002 (p.134) | As a Processing Team Leader, I want to be able to open the application in several tabs, so that I can work on several accounts at once. | FR-RN-001 | FR-RN-001 AC1-3 | TC-RN-001.1, 001.2, 001.3, 001.4, 001.5, 001.6 (13 cases) |
+| 3.003 (p.135) | As a Processing Team Leader, I want to be able to generate the list of accounts for processing, so that processing starts on time. | FR-RN-011 | FR-RN-011 AC1-3 | TC-RN-011.1, 011.2, 011.3, 011.4 (7 cases) |
+| 3.004 (p.141-142) | As a Processing Team Leader, I want to be able to upload the dispositioned file, so that offline dispositions reach the system. | FR-RN-060 | FR-RN-060 AC1-3 | TC-RN-060.1, 060.2, 060.3, 060.4 (8 cases) |
+| 3.005 (p.143-144) | As a Processing Team Leader, I want to be able to assign the accounts to the officers of my team, so that every account has an owner. | FR-RN-061 | FR-RN-061 AC1-2 | TC-RN-061.1, 061.2, 061.3 (5 cases) |
+| 3.006 (p.144) | As a Processing Team Leader, I want to be able to view the accounts assigned to me for processing, so that I see my whole workload. | FR-RN-062 | FR-RN-062 AC1-2 | TC-RN-062.1, 062.2 (3 cases) |
+| 3.007 (p.146) | As a Processing Team Leader, I want to be able to update the data of a renewal account, so that the renewal terms are complete and correct. | FR-RN-063 | FR-RN-063 AC1-3 | TC-RN-063.1, 063.2, 063.3, 063.4 (5 cases) |
+| 3.008 (p.147) | As a Processing Team Leader, I want to be able to review the computations and return accounts to Marketing, so that the renewal premium is right before it goes out. | FR-RN-064 | FR-RN-064 AC1-2 | TC-RN-064.1, 064.2, 064.3 (3 cases) |
+| 3.009 (p.148-152) | As a Processing Team Leader, I want to be able to extract the For Renewal accounts per insurer and send them, so that each insurer receives its renewal accounts. | FR-RN-070 | FR-RN-070 AC1-3 | TC-RN-070.1, 070.2, 070.3, 070.4, 070.5 (9 cases) |
+| 3.010 (p.153-171) | As a Processing Team Leader, I want to be able to generate the renewal reports, so that renewals are monitored. | FR-RN-101 | FR-RN-101 AC1-3 | TC-RN-101.1, 101.2, 101.3, 101.4, 101.5 (8 cases) |
+| 3.011 (p.171-173) | As a Processing Team Leader, I want to be able to generate and send the Renewal Advice, so that clients receive the renewal terms on time. | FR-RN-080 | FR-RN-080 AC1-4 | TC-RN-080.1, 080.2, 080.3, 080.4, 080.5 (12 cases) |
+| 4.001 (p.174) | As a Processing Officer, I want to be able to log in with my user profile, so that only authorised users work on renewals. | FR-RN-001 | FR-RN-001 AC1-3 | TC-RN-001.1, 001.2, 001.3, 001.4, 001.5, 001.6 (13 cases) |
+| 4.002 (p.174) | As a Processing Officer, I want to be able to open the application in several tabs, so that I can work on several accounts at once. | FR-RN-001 | FR-RN-001 AC1-3 | TC-RN-001.1, 001.2, 001.3, 001.4, 001.5, 001.6 (13 cases) |
+| 4.003 (p.174) | As a Processing Officer, I want to be able to view the accounts assigned to me for processing, so that I see my whole workload. | FR-RN-062 | FR-RN-062 AC1-2 | TC-RN-062.1, 062.2 (3 cases) |
+| 4.004 (p.176-177) | As a Processing Officer, I want to be able to upload the dispositioned file, so that offline dispositions reach the system. | FR-RN-060 | FR-RN-060 AC1-3 | TC-RN-060.1, 060.2, 060.3, 060.4 (8 cases) |
+| 4.005 (p.177-178) | As a Processing Officer, I want to be able to update the data of a renewal account, so that the renewal terms are complete and correct. | FR-RN-063 | FR-RN-063 AC1-3 | TC-RN-063.1, 063.2, 063.3, 063.4 (5 cases) |
+| 4.006 (p.178) | As a Processing Officer, I want to be able to review the computations and return accounts to Marketing, so that the renewal premium is right before it goes out. | FR-RN-064 | FR-RN-064 AC1-2 | TC-RN-064.1, 064.2, 064.3 (3 cases) |
+| 4.007 (p.179-183) | As a Processing Officer, I want to be able to extract the For Renewal accounts per insurer and send them, so that each insurer receives its renewal accounts. | FR-RN-070 | FR-RN-070 AC1-3 | TC-RN-070.1, 070.2, 070.3, 070.4, 070.5 (9 cases) |
+| 4.008 (p.185-203) | As a Processing Officer, I want to be able to generate the renewal reports, so that renewals are monitored. | FR-RN-101 | FR-RN-101 AC1-3 | TC-RN-101.1, 101.2, 101.3, 101.4, 101.5 (8 cases) |
+| 4.09 (p.203-204) | As a Processing Officer, I want to be able to generate and send the Renewal Advice, so that clients receive the renewal terms on time. | FR-RN-080 | FR-RN-080 AC1-4 | TC-RN-080.1, 080.2, 080.3, 080.4, 080.5 (12 cases) |
+| 5.001 (p.205) | As a Business Administrator, I want to be able to log in with my user profile, so that only authorised users work on renewals. | FR-RN-001 | FR-RN-001 AC1-3 | TC-RN-001.1, 001.2, 001.3, 001.4, 001.5, 001.6 (13 cases) |
+| 5.002 (p.205) | As a Business Administrator, I want to be able to open the application in several tabs, so that I can work on several accounts at once. | FR-RN-001 | FR-RN-001 AC1-3 | TC-RN-001.1, 001.2, 001.3, 001.4, 001.5, 001.6 (13 cases) |
+| 5.003 (p.205-206) | As a Business Administrator, I want to be able to maintain the renewal lists of values, so that the lists stay current without a change to the system. | FR-RN-110 | FR-RN-110 AC1-2 | TC-RN-110.1, 110.2, 110.3, 110.4 (4 cases) |
+| 5.004 (p.206) | As a Business Administrator, I want to be able to assign user profiles, so that users get the right access. | FR-RN-003 | FR-RN-003 AC1-2 | TC-RN-003.1, 003.2, 003.3, 003.4 (6 cases) |
+| 5.005 (p.206) | As a Business Administrator, I want to be able to update the Renewal Advice template, so that letters follow the approved layout. | FR-RN-111 | FR-RN-111 AC1 | TC-RN-111.1, 111.2 (2 cases) |
+| 6.001 (p.206) | As a System Administrator, I want to be able to access the application with my profile, so that only authorised users work on renewals. | FR-RN-001 | FR-RN-001 AC1-3 | TC-RN-001.1, 001.2, 001.3, 001.4, 001.5, 001.6 (13 cases) |
+| 6.002 (p.206-211) | As a System Administrator, I want to be able to define profiles and assign the Renewal functions to them, so that users get the right access. | FR-RN-003 | FR-RN-003 AC1-2 | TC-RN-003.1, 003.2, 003.3, 003.4 (6 cases) |
+
+# Appendix: Storyboard index
+
+One row per step of the five walkthroughs of chapter 14: the frame, the persona, the screen, what the user does, what the user sees, the screenshot (figure number in chapter 14), the FR and the slide of the step in the UX Screen Deck (07).
+
+<!-- storyboard-index -->
+<!-- table: widths=1.5,2.6,3.4,5.6,5.2,1.6,1.8,1.5 caption="Storyboard index of the walkthroughs" size=7.5 -->
+| Frame | Persona | Screen | Action | What the user sees / outcome | Figure | FR | UX slide |
+|---|---|---|---|---|---|---|---|
+| WT-A.1 | Marketing Team Leader | SCR-RN-02 Expiry List | Opens the Expiry List, tab Unassigned Disposition, ticks the renewal of Pacific Harbor Logistics Inc. and clicks Assign Disposition: Arnel Account Officer, then Assign and Push | Message: 1 assigned; the renewal leaves the tab. Assigned | - | FR-RN-030 | - |
+| WT-A.2 | Marketing Account Officer (Account Broker) | SCR-RN-06 My Dispositions | Opens My Dispositions | The renewal assigned to him with its expiry, the Review classification and the flags Outstanding and Claims. For disposition | - | FR-RN-040 | - |
+| WT-A.3 | Marketing Account Officer (Account Broker) | SCR-RN-04 Renewal: Checks, Account History and Computations | Opens the renewal, tab Account History, and clicks View Account History | The payments of the expiring invoice and the open claim; the viewing is recorded. History viewed | - | FR-RN-042 | - |
+| WT-A.4 | Marketing Account Officer (Account Broker) | SCR-RN-07 Set Disposition, Add Remark and Re-open | Clicks Set Disposition: For Renewal with the remarks of the client's call, then Save | Message: Saved; the disposition For Renewal on the renewal. Dispositioned | - | FR-RN-043 | - |
+| WT-A.5 | Marketing Account Officer (Account Broker) | SCR-RN-07 Set Disposition, Add Remark and Re-open | Clicks Push | Message: Pushed to the Team Leader; the status Review in Progress. Pushed | - | FR-RN-043 | - |
+| WT-A.6 | Marketing Team Leader | SCR-RN-08 TL Review | Opens TL Review, tab For Review, ticks the renewal and clicks Post, then confirms | The outcome: 1 refused, the renewal cannot be posted while the claims, endorsement and outstanding premium checks fail. Refused | - | FR-RN-050 | - |
+| WT-A.7 | Marketing Team Leader | SCR-RN-08 TL Review | Clicks Override: Outstanding balance, reason Approved by the Team Leader, with remarks (the open claim and the endorsement are overridden the same way) | Message: 1 overridden; the override kept in the History tab of the renewal. Overridden | - | FR-RN-051 | - |
+| WT-A.8 | Marketing Team Leader | SCR-RN-08 TL Review | Clicks Post again and confirms | Message: 1 posted; the renewal moves to Processing. Posted | - | FR-RN-050 | - |
+| WT-B.1 | Processing Team Leader | SCR-RN-10 Processing Worklist | Opens the Processing Worklist, tab For Processing, ticks the renewal and clicks Assign PO: Paolo Processor, then Assign | Message: 1 assigned; the renewal In Processing. In processing | - | FR-RN-061 | - |
+| WT-B.2 | Processing Officer (Broker) | SCR-RN-11 Insurer Batches | Opens Insurer Batches, clicks New Batch with Luzon Assurance Co. and the expiry date of the renewal, then Create Batch, and opens the batch | The batch Draft with the renewal and the columns of the insurer extract. Batch ready | - | FR-RN-070 | - |
+| WT-B.3 | Processing Officer (Broker) | SCR-RN-11 Insurer Batches | Clicks Send to Insurer and confirms | Message: Batch sent to the insurer; the batch Sent with its reply date. With the insurer | - | FR-RN-070 | - |
+| WT-B.4 | Processing Officer (Broker) | SCR-RN-12 Record Insurer Response | Opens the renewal and clicks Record Insurer Response: Renew as is with the insurer reference, then Record | Message: Saved; the renewal RA Ready. RA ready | - | FR-RN-071 | - |
+| WT-B.5 | Marketing Account Officer (Account Broker) | SCR-RN-13 Letters | Opens Letters, tab RA Ready, ticks the renewal, clicks Generate RA: First notice, then Generate | Message: 1 generated; the renewal in RA Generated, locked on the Marketing side. RA generated | - | FR-RN-080 | - |
+| WT-B.6 | Marketing Account Officer (Account Broker) | SCR-RN-13 Letters | Opens the tab RA Generated, ticks the renewal, clicks Send and confirms | Message: 1 sent; the Renewal Advice e-mailed protected to the client. RA sent | - | FR-RN-081 | - |
+| WT-C.1 | Contact Center | SCR-RN-15 Follow-ups | Opens Follow-ups, tab RA Sent | The renewal waiting for the client's reply. Awaiting response | - | FR-RN-085 | - |
+| WT-C.2 | Contact Center | SCR-RN-15 Follow-ups | Opens the renewal and clicks Add Follow-up: Call, Client will renew, the next action date and the remarks, then Save | Message: Saved; the follow-up on the Remarks & Follow-ups tab. Followed up | - | FR-RN-085 | - |
+| WT-C.3 | Marketing Account Officer (Account Broker) | SCR-RN-14 Record Acceptance | Opens the renewal and clicks Record Acceptance: Payment with the payment reference, then Record | Message: Saved; the renewal For Placement and Booking. Accepted | - | FR-RN-084 | - |
+| WT-C.4 | Marketing Account Officer (Account Broker) | SCR-RN-05 Renewal: Insurer, Letters, Documents, Remarks and History | Opens the tab Letters | The Renewal Advice in the e-mail queue to the client and the acceptance by payment. Kept | - | FR-RN-084 | - |
+| WT-D.1 | Marketing Account Officer (Account Broker) | SCR-RN-07 Set Disposition, Add Remark and Re-open | Opens the renewal, views its account history, clicks Set Disposition: Not for Renewal, reason Loan fully paid, with remarks, then Save | Message: Saved; the disposition Not for Renewal with its reason. Dispositioned | - | FR-RN-043 | - |
+| WT-D.2 | Marketing Team Leader | SCR-RN-08 TL Review | After the Account Officer's push, ticks the renewal on TL Review, clicks Post and confirms | Message: 1 posted; the renewal goes to the closing letters. Letter pending | - | FR-RN-050 | - |
+| WT-D.3 | Marketing Account Officer (Account Broker) | SCR-RN-13 Letters | Opens Letters, tab NAL / NFR, ticks the renewal, clicks Send Letters and confirms | Message: 1 sent; the renewal is closed. Closed | - | FR-RN-082 | - |
+| WT-D.4 | Marketing Account Officer (Account Broker) | SCR-RN-05 Renewal: Insurer, Letters, Documents, Remarks and History | Opens the renewal, tab Letters | The Not for Renewal Letter in the e-mail queue to the client. Letter kept | - | FR-RN-082 | - |
+| WT-E.1 | Marketing Team Leader | SCR-RN-09 Transfers | The Team Leader of Corporate Team 1 opens Transfers, tab Incoming, chooses Accept in the row action menu and confirms with remarks | Message: Transfer accepted; the renewal joins the Unassigned tab of the unit. Transferred | - | FR-RN-032 | - |
+| WT-E.2 | Marketing Account Officer (Account Broker) | SCR-RN-07 Set Disposition, Add Remark and Re-open | Aileen Account Officer gives a disposition on a renewal without opening its account history | Open the Account History before you give the disposition. Refused | - | FR-RN-042 | - |
+| WT-E.3 | Marketing Team Leader | SCR-RN-02 Expiry List | Marites Marketing Lead transfers a renewal of her unit to CBG Team 1, her own unit | The receiving unit must be another unit. Refused | - | FR-RN-031 | - |
+
+<!-- portrait -->
+
+# Appendix: Screen standards
+
+The screens of this set follow the screen standards of BIBS. They are the same standards in every FRS and are listed here so that BDOI can agree the look of the screens once and check the screenshots against it; they are not repeated in each screen specification.
+
+<!-- table: widths=4.2,13.4 caption="Screen standards of BIBS" -->
+| Area | Standard |
+|---|---|
+| Record pages | Back arrow and breadcrumb, title, then the record header: name, reference chips, status pill, flags (for example Urgent, Claims or Locked on a renewal) and the key facts. Page actions on the right in one order: secondary, primary, and the destructive action last and apart. |
+| Workflow header (step bar) | Every record with a workflow shows a stepper under the record header: the stages of the main path in their order, passed stages ticked in blue, the current stage highlighted, the stages ahead in grey with their number. A returned or on-hold stage shows in amber after the stage it came from; a rejected, cancelled or voided record shows that stage in red and the path ends there; the last stage turns green when it is reached. Under the stepper one row gives Current Stage, Since, Due (with the Overdue pill) and Assigned To, with the actions of the stage on the right. The history is a table (Stage, From Stage, Action, By, Date and Time, Remarks, Duration in Stage), newest first. |
+| Messages (notice standard) | One standard for errors, warnings, information and success: a white notice with a thin bar and an icon in the colour of its kind (red, amber, blue, green), a bold short title, then the business message with one bullet per missing item. No codes, internal references or technical terms in what the user reads. Field errors appear under the field; a long form lists its errors at the top with a link to the first field. Only an unexpected system error offers Retry and a reference for support behind Details. Special instructions are one short information notice. |
+| Tables, not highlight boxes | Records and lists of records are rows of a titled table (for example the letters of a renewal: Letter, Type, Status, Generated, Sent, Recipients); key data is a label and value grid. A coloured box carries a short message only, never a record. |
+| Tables | Header row in BDO blue that stays in view; rows alternate white and Background Blue, with a light hover and a stronger blue for the selected row; a list scrolls inside its card, the card as high as its rows and never higher than the window; text left, amounts right, dates in one format; one value per cell with at most one muted line under it; a dash for an empty value; the kind of a mixed list of records in a Type column; a due date on one line, in red with the warning icon once past due; ages and durations in words (for example 3 days); "Showing x to y of n results" with page numbers. A table fits the page: related values share a column (one under the other) rather than scrolling sideways. |
+| Row actions | The actions on a record of a list are in one row action menu at the end of the row (the three-dot button), never buttons or links in the row; a destructive action is listed last, in red, and asks for confirmation. |
+| Status labels | Statuses are outlined pills (a border and text in the colour of the state group on a light tint) of one size and never wrap. The full label is shown (for example For Disposition, With Insurer); an agreed short form, with the full label in the tooltip, only for a label longer than 21 characters. |
+| Labels and names | List values are shown by their label, never by their code; products by name with the code as a second line; insurers by name; users by their names, never by their user ID. |
+| Dates, amounts and rates | One date picker; dates entered and shown as dd-MMM-yyyy, times as dd-MMM-yyyy HH:mm (Philippine time). Amounts with two decimals and thousand separators, negatives in brackets, the currency in the column header or before the amount. Rates as percentages with two to four decimals, as keyed; exchange rates with six decimals. |
+| Period cell | A period (period of cover, the expiry range of an extraction, an effective period) is shown in lists on two lines, the start date and "to" the end date, each date kept whole; an open end reads "to open". In a sentence or a label and value grid it is one line: "01-Sep-2026 to 30-Sep-2026". |
+| Forms | Labels above the fields, fields of one height on one line, required fields marked, the error under the field, and the actions in one place (Cancel, then the main action). Format hints only; other guidance is in the tooltip of the label. |
+| Uploads | Download Template next to the upload; a drop zone with the accepted types and maximum size; every row checked before anything is saved; Rows Read, Valid and Rejected with the rows; valid rows are processed and the rejected rows are returned in the error file (the template layout with an Error column and the wrong cells highlighted); Upload Corrected File keeps the link to the first upload; a file uploaded before is refused. |
+| Confirmations and reasons | Every approve, authorise, post, release, cancel, void or deactivate asks for confirmation in a dialog that names the record and the effect. Every reject, return, cancel and void needs a reason (from its list where there is one) before it can be confirmed. Destructive actions are confirmed with the red button. The reason is kept in the history and sent with the notification. |
+| Notifications | The bell shows the unread count and opens the panel grouped by day (Today, Yesterday, then the date), each notice with its title, one-line summary, record reference and time; Mark Read, Mark All Read and View All; the Notifications page lists every notice with filters. |
+| Documents | Generated documents carry the BDO Insure letterhead, the document name and reference, and a business footer with "Confidential" and page x of y. |
+
+The project team checks each screen against these standards before UAT and records the result in the screen readiness checklist. A screen found not to follow a standard during the review is recorded as Change requested in the sign-off workbook and corrected before UAT without a change request. The presentation choices that BDOI is asked to confirm are items of the clarifications chapter.

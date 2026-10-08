@@ -1,7 +1,6 @@
 package com.iortatechnxt.brokerverse.renewal.candidate.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -9,6 +8,7 @@ import static org.mockito.Mockito.verify;
 import com.iortatechnxt.brokerverse.report.core.CodeSetSource;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
@@ -25,7 +25,7 @@ class RenewalCodeSetsTest {
                 .orElseThrow();
     source.options(1L);
     ArgumentCaptor<String> sql = ArgumentCaptor.forClass(String.class);
-    verify(jdbc).query(sql.capture(), anyMap(), any(RowMapper.class));
+    verify(jdbc).query(sql.capture(), anyMap(), ArgumentMatchers.<RowMapper<Object>>any());
     return sql.getValue();
   }
 

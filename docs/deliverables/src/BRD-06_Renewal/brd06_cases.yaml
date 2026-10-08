@@ -1084,6 +1084,7 @@ frs:
         expected: REFERENCE_MATCH shows MATCHED with the upload job as source.
 
   FR-RN-022:
+    brd: [BRRN.023]
     scenario: SC-RN-03
     persona: MKT_TL
     screen: CHECKS
@@ -2995,6 +2996,7 @@ frs:
         expected: Each send and failure is listed with recipient, time, subject, attachment hash and status.
 
   FR-RN-082:
+    brd: [BRRN.001]
     scenario: SC-RN-09
     persona: MKT_AO
     screen: LETTERS

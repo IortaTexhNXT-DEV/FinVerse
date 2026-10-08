@@ -1,0 +1,15 @@
+// Life cycle of a test incident from SIT to closure.
+digraph ts_incident {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.3, ranksep=0.22, bgcolor="white", pad=0.15];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.2, fontname="Arial",
+         fontsize=10, fontcolor="@NEAR_BLACK", width=6.2, height=0.48, margin="0.12,0.04", fillcolor="@WHITE"];
+  edge  [color="@HEADER_BLUE", arrowsize=0.8, penwidth=1.2, fontname="Arial", fontsize=8, fontcolor="@MUTED"];
+  n  [label=<<b>New</b> - tester logs the case ID, steps, expected and actual result, evidence, proposed severity>, fillcolor="@DIRTY_WHITE"];
+  t  [label=<<b>Triaged</b> - daily triage confirms severity and priority; rejected, duplicate or change request split off>];
+  a  [label=<<b>Assigned</b> - development, configuration, data or interface owner (iorta TechNXT or BDOI IT)>];
+  f  [label=<<b>Fixed</b> - fix in a release candidate, with the unit testing and the release note entry>, fillcolor="@BG_BLUE"];
+  r  [label=<<b>Re-tested</b> - tester re-runs the case and the regression set of the affected FRs>, fillcolor="@BG_BLUE"];
+  c  [label=<<b>Closed</b> - passed; or deferred with a workaround agreed by the BDOI owner (Severity 3 and 4 only)>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  n -> t -> a -> f -> r -> c;
+  r -> a [label=" fails again ", style=dashed];
+}

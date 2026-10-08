@@ -57,13 +57,14 @@ apply, for example, V27 on a database already at V975. `flyway_schema_history` r
 - Alert rule: any increase of `brokerverse_security_store_failures_total` (the token denylist, the
   session log or the rate limit counters cannot be read) is critical: sign-ins are checked against the
   database or refused (HTTP 503 `SIGN_IN_CHECK_UNAVAILABLE`). The application also raises the alert
-  `SECURITY_STORE_UNAVAILABLE`. Check Redis (`BROKERVERSE_REDIS_*`) and the database; nothing to
+  `SECURITY_STORE_UNAVAILABLE`. Check Valkey (`BROKERVERSE_VALKEY_*`) and the database; nothing to
   restart in the application once the store answers.
 - Logs: one line per event, ISO timestamps; CR/LF in messages are neutralised. Alert on `ERROR`.
 - Every HTTP response carries `X-Correlation-Id` (the caller's value when valid, else generated); the
   same id is in the envelope of the integration events the request published (`evt_outbox`,
   `evt_archive`).
-- `/actuator/health` includes Redis when `BROKERVERSE_REDIS_ENABLED=true`. Watch `evt_outbox` rows in
+- `/actuator/health` includes Valkey (component `redis`, named after the client) when
+  `BROKERVERSE_VALKEY_ENABLED=true`. Watch `evt_outbox` rows in
   `PENDING` / `FAILED` and new dead letters (Administration → Integration Events).
 - Every unexpected error returns HTTP 500 with `code=INTERNAL_ERROR` and a `reference` UUID that is
   also written to the log line – ask users for it and search the logs.

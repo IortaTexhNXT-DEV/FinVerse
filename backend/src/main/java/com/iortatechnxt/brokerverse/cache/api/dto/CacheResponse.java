@@ -9,7 +9,7 @@ import java.util.List;
  *
  * @param name cache name
  * @param ttl time to live (ISO-8601 duration)
- * @param store REDIS or IN_MEMORY
+ * @param store VALKEY (shared by every instance) or IN_MEMORY
  * @param readOnlyTransactionsOnly bypassed inside read-write transactions
  * @param invalidatedBy entity types whose changes clear it
  */

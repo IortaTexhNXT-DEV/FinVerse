@@ -36,7 +36,7 @@ import org.springframework.core.env.Profiles;
  *       or weak: the database URL, user and password; the JWT signing key (at least 32 characters
  *       and not a development value); the key of the second-factor secrets (32 random bytes,
  *       Base64); the SMTP host and credentials and the sender address when mail delivery is on; the
- *       Redis password when Redis is on; the Kafka SASL credentials when Kafka is on; the client
+ *       Valkey password when Valkey is on; the Kafka SASL credentials when Kafka is on; the client
  *       secret of the single sign-on provider when one is configured. The allowed web origins and
  *       the password reset page must be set and must not point to the developer's machine, and a
  *       masking key, when set, must not be a development value.
@@ -45,7 +45,7 @@ import org.springframework.core.env.Profiles;
  *       application connects as a different, least-privilege runtime login ({@code
  *       BROKERVERSE_DB_USER}); see DEPLOYMENT.md "Database roles".
  *   <li><b>Encryption in transit.</b> A production start is refused when a connection could run in
- *       plaintext: PostgreSQL without {@code sslmode=verify-full} (or {@code verify-ca}), Redis
+ *       plaintext: PostgreSQL without {@code sslmode=verify-full} (or {@code verify-ca}), Valkey
  *       without TLS, Kafka without {@code SASL_SSL}, the HTTP listener without TLS ({@code
  *       server.ssl.enabled}).
  *   <li><b>Integration tokens.</b> A production instance serving {@code /integration/**} (runtime
@@ -306,7 +306,7 @@ public final class ProductionSafeguards implements EnvironmentPostProcessor, Ord
       }
     }
     if (enabled(env, "brokerverse.redis.enabled", true)) {
-      require(env, "spring.data.redis.password", "BROKERVERSE_REDIS_PASSWORD", problems);
+      require(env, "spring.data.redis.password", "BROKERVERSE_VALKEY_PASSWORD", problems);
     }
     if (enabled(env, "brokerverse.kafka.enabled", true)) {
       require(
@@ -353,7 +353,7 @@ public final class ProductionSafeguards implements EnvironmentPostProcessor, Ord
         && !enabled(env, "spring.data.redis.ssl.enabled", false)
         && env.getProperty("spring.data.redis.ssl.bundle", "").isBlank()) {
       problems.add(
-          "BROKERVERSE_REDIS_TLS must be true in production (ElastiCache in-transit encryption)");
+          "BROKERVERSE_VALKEY_TLS must be true in production (ElastiCache in-transit encryption)");
     }
     if (enabled(env, "brokerverse.kafka.enabled", true)
         && !ENCRYPTED_KAFKA_PROTOCOL

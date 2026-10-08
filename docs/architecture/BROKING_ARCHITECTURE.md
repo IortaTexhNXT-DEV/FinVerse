@@ -211,7 +211,7 @@ BDOI roles, seeded in V750 from the BRD personas:
 The existing `SYSADMIN` role is the System Administrator.
 
 Sessions: every access token carries a `jti`; `POST /api/v1/auth/logout` revokes it on every instance
-(Redis denylist, database fallback) and audits `LOGOUT`. Failed logins are counted on a counter shared
+(Valkey denylist, database fallback) and audits `LOGOUT`. Failed logins are counted on a counter shared
 by the instances (the user record stays the reference for `LOGIN_MAX_FAILED_ATTEMPTS`) and the login
 endpoint is rate limited per client address (HTTP 429). The permissions of each role are cached
 (`security-role-permissions`) and the cache is cleared by any role change. See

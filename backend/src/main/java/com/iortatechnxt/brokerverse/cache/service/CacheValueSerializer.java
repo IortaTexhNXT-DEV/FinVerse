@@ -21,7 +21,7 @@ import org.springframework.data.redis.serializer.SerializationException;
 import org.springframework.util.ClassUtils;
 
 /**
- * JSON serializer of cached values on Redis: {@code {"t": type, "v": value}}, and for lists and
+ * JSON serializer of cached values on Valkey: {@code {"t": type, "v": value}}, and for lists and
  * sets {@code {"t": "list"|"set", "e": element type, "v": [...]}}.
  *
  * <p>Only application types ({@code com.iortatechnxt.brokerverse.*}) and a short allow-list of JDK

@@ -1,0 +1,42 @@
+# HTTPS from the gateway to the pods (Gateway API BackendTLSPolicy, standard channel v1.4 or later):
+# the pod certificate (cert-manager, bibs-*-tls) is verified against the private CA and the service
+# host name. The ConfigMap bibs-private-ca (key ca.crt) holds the private CA certificate:
+#   kubectl -n bibs create configmap bibs-private-ca --from-file=ca.crt=<private CA certificate>
+apiVersion: gateway.networking.k8s.io/v1
+kind: BackendTLSPolicy
+metadata:
+  name: bibs-web
+  namespace: bibs
+spec:
+  targetRefs:
+    - { group: "", kind: Service, name: bibs-web }
+  validation:
+    caCertificateRefs:
+      - { group: "", kind: ConfigMap, name: bibs-private-ca }
+    hostname: bibs-web.bibs.svc
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: BackendTLSPolicy
+metadata:
+  name: bibs-frontend
+  namespace: bibs
+spec:
+  targetRefs:
+    - { group: "", kind: Service, name: bibs-frontend }
+  validation:
+    caCertificateRefs:
+      - { group: "", kind: ConfigMap, name: bibs-private-ca }
+    hostname: bibs-frontend.bibs.svc
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: BackendTLSPolicy
+metadata:
+  name: bibs-integration
+  namespace: bibs
+spec:
+  targetRefs:
+    - { group: "", kind: Service, name: bibs-integration }
+  validation:
+    caCertificateRefs:
+      - { group: "", kind: ConfigMap, name: bibs-private-ca }
+    hostname: bibs-integration.bibs.svc

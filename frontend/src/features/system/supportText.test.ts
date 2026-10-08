@@ -1,4 +1,10 @@
-import { contentAreaName, copiedPercent, durationText, holdActionLabel } from './supportText';
+import {
+  cacheStoreLabel,
+  contentAreaName,
+  copiedPercent,
+  durationText,
+  holdActionLabel,
+} from './supportText';
 
 describe('support screen texts', () => {
   it('reads durations and periods in words', () => {
@@ -16,6 +22,11 @@ describe('support screen texts', () => {
     expect(holdActionLabel('RELEASE')).toBe('Release legal hold');
     expect(copiedPercent({ total: 0, moved: 0 })).toBe(100);
     expect(copiedPercent({ total: 3, moved: 1 })).toBe(33);
+  });
+
+  it('names the cache store', () => {
+    expect(cacheStoreLabel('VALKEY')).toBe('Shared (Valkey)');
+    expect(cacheStoreLabel('IN_MEMORY')).toBe('This Instance');
   });
 
   it('names the content areas in business words', () => {

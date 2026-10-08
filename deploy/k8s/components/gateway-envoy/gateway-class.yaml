@@ -1,0 +1,32 @@
+# Cluster-wide GatewayClass of Envoy Gateway, with the EnvoyProxy settings of the BIBS gateway: the
+# Envoy service is an internal NLB (AWS Load Balancer Controller service annotations) open only to
+# the client networks and the Apigee X route (replaced from environment.yaml; the 192.0.2.x values
+# match nothing).
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: bibs-envoy
+spec:
+  controllerName: gateway.envoyproxy.io/gatewayclass-controller
+  parametersRef:
+    group: gateway.envoyproxy.io
+    kind: EnvoyProxy
+    name: bibs-envoy
+    namespace: bibs
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyProxy
+metadata:
+  name: bibs-envoy
+  namespace: bibs
+spec:
+  provider:
+    type: Kubernetes
+    kubernetes:
+      envoyService:
+        type: LoadBalancer
+        annotations:
+          service.beta.kubernetes.io/aws-load-balancer-type: external
+          service.beta.kubernetes.io/aws-load-balancer-scheme: internal
+          service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
+          service.beta.kubernetes.io/load-balancer-source-ranges: "192.0.2.10/32,192.0.2.11/32"

@@ -21,7 +21,7 @@ import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Component;
 
 /**
- * Job lock on Redis: {@code SET <prefix>joblock:<job> <owner> NX PX <lease>}. The owner value is
+ * Job lock on Valkey: {@code SET <prefix>joblock:<job> <owner> NX PX <lease>}. The owner value is
  * {@code <instance>:<fencing token>}, the token coming from {@code INCR
  * <prefix>joblock:<job>:fence}. While the job runs the lease is renewed every third of its length
  * (compare-and-{@code PEXPIRE}), and it is released with a compare-and-{@code DEL}, so an instance
@@ -106,7 +106,7 @@ public class RedisJobLock implements JobLock, DisposableBean {
     renewer.shutdownNow();
   }
 
-  /** A lease held on Redis. */
+  /** A lease held on Valkey. */
   private final class RedisLease implements Lease {
 
     private final String key;

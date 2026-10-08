@@ -11,7 +11,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { RowActionMenu } from '@/components/ui/RowActionMenu';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
-import { durationText } from './supportText';
+import { cacheStoreLabel, durationText } from './supportText';
 
 /** Which caches the dialog clears: one by name, or all of them. */
 type Clearing = { name: string } | 'ALL';
@@ -62,11 +62,7 @@ export default function CachesPage() {
               header: 'Store',
               kind: 'status',
               render: (c) => (
-                <StatusBadge
-                  status={c.store}
-                  label={c.store === 'REDIS' ? 'Shared (Redis)' : 'This Instance'}
-                  tone="info"
-                />
+                <StatusBadge status={c.store} label={cacheStoreLabel(c.store)} tone="info" />
               ),
             },
             {

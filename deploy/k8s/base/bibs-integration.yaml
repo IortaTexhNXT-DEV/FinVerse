@@ -1,5 +1,5 @@
 # bibs-integration: outbox relay to MSK, Kafka consumers, inbound bank / insurer / watchlist files,
-# and the /integration/** APIs published through Apigee X (ALB path /integration/*). Runtime role
+# and the /integration/** APIs published through Apigee X (gateway route /integration). Runtime role
 # "integration". Two pods across availability zones: the relay is guarded by the job lock and the
 # consumers share their consumer groups.
 apiVersion: apps/v1
@@ -83,8 +83,6 @@ kind: Service
 metadata:
   name: bibs-integration
   labels: { app.kubernetes.io/name: bibs-integration }
-  annotations:
-    alb.ingress.kubernetes.io/healthcheck-path: /readyz
 spec:
   selector: { app.kubernetes.io/name: bibs-integration }
   ports: [{ name: https, port: 8443, targetPort: https }]

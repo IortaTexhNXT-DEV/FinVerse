@@ -4,7 +4,7 @@ import java.time.Duration;
 
 /**
  * Port: the fixed-window counters kept in PostgreSQL ({@code sys_shared_counter}), used by the rate
- * limits when the shared counter store ({@link SharedCounterStore}, Redis) cannot be reached, so a
+ * limits when the shared counter store ({@link SharedCounterStore}, Valkey) cannot be reached, so a
  * limit is never skipped. Implemented in the module {@code sharedstate}.
  */
 public interface FallbackCounterStore {

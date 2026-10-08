@@ -38,7 +38,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  *
  * <p>A change clears each affected cache at once (so a later read in the same transaction goes to
  * the database) and once more when the transaction ends, committed or rolled back (so a value read
- * inside the transaction never outlives it). With Redis the clear reaches every instance. Changes
+ * inside the transaction never outlives it). With Valkey the clear reaches every instance. Changes
  * made outside JPA (SQL scripts, a manual database fix) are not seen: flush the cache with {@code
  * POST /api/v1/admin/caches/{name}/clear} (runbook in PLATFORM_CACHE_AND_EVENTS.md).
  */

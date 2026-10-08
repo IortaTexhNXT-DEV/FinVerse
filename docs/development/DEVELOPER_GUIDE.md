@@ -6,7 +6,7 @@ so the production support team can understand, trace and fix any module the same
 ## 1. Architecture in one page
 
 - **Modular monolith.** One Spring Boot application (`backend/`) and one React SPA (`frontend/`),
-  deployed as two containers against one PostgreSQL database, with Redis 7 (cache, job locks,
+  deployed as two containers against one PostgreSQL database, with Valkey 8 (cache, job locks,
   session state) and Apache Kafka (integration events) as platform services
   ([`PLATFORM_CACHE_AND_EVENTS.md`](../architecture/PLATFORM_CACHE_AND_EVENTS.md)).
 - **Modules = top-level packages** under `com.iortatechnxt.brokerverse`. Each module has the same inner
@@ -378,7 +378,7 @@ use `@Scheduled` (the ArchUnit rule `BACKGROUND_WORK_IS_A_MANAGED_JOB` fails the
 `JobScheduler` schedules it (UTC cron, `"-"` = manual only), `JobRunService`
 records every run in `sys_job_run`, a failure raises `JOB_FAILURE`, and administrators see it on
 *Administration → Scheduled Jobs* with "Run now". Every run holds the cluster-wide `JobLock` of the
-job name (Redis, or a PostgreSQL advisory lock when Redis is disabled): with two or more replicas the
+job name (Valkey, or a PostgreSQL advisory lock when Valkey is disabled): with two or more replicas the
 job runs once, the other instances record `SKIPPED_LOCKED`. Do not add your own locking; do not call
 `JobRunService.execute` for a job name from inside a run of that same job (the lock is not
 re-entrant). For batch runs started from your own screen, wrap
@@ -500,11 +500,11 @@ through the **transactional outbox** and Kafka.
    make the action repeatable) and keep a non-Kafka path when the work must also happen with Kafka off
    (example: `NotificationDeliveryConsumer` and the `MAIL_DISPATCH` job).
 4. Test with Kafka off (`@IntegrationTest`: the row is `LOCAL` in `evt_outbox`) and, for consumers, in
-   a class extending `support.PlatformServicesSupport` (embedded Kafka and Redis).
+   a class extending `support.PlatformServicesSupport` (embedded Kafka and a Redis-protocol test server standing in for Valkey).
 
 Failed events are on *Administration › Integration Events* (dead letters with retry, FAILED outbox rows).
 
-### 10.9 Cached lookups (Redis) – `cache`
+### 10.9 Cached lookups (Valkey) – `cache`
 
 Cache reference data that is read on hot paths and changed rarely by administrators.
 
@@ -535,7 +535,7 @@ Cache reference data that is read on hot paths and changed rarely by administrat
    public TaxRateView rate(String code, LocalDate date) { ... }
    ```
 
-   Keys are the natural lookup keys; the value is stored as JSON on Redis (only application types are
+   Keys are the natural lookup keys; the value is stored as JSON on Valkey (only application types are
    deserialized).
 3. **Evict on write**: the listed entity types already clear the cache; also put
    `@CacheEvict(cacheNames = TaxCaches.RATES, allEntries = true)` on your maintenance service methods so
@@ -607,7 +607,7 @@ and `all` (the default for local runs, tests and seed stacks).
 - **Tests.** `RuntimeRoleContextTest` shows which schedulers, jobs and consumers each role starts;
   `IntegrationApiSecurityIT` signs gateway tokens with a key set it serves itself (copy its helpers for a new
   integration API).
-- **TLS.** Outside the `dev`, `test` and `seed` profiles PostgreSQL (`verify-full`), Redis and Kafka (`SASL_SSL`)
+- **TLS.** Outside the `dev`, `test` and `seed` profiles PostgreSQL (`verify-full`), Valkey and Kafka (`SASL_SSL`)
   default to TLS and production refuses plaintext (CONFIGURATION.md "Runtime role, HTTPS and encryption in
   transit"). Locally nothing changes: the `seed` profile keeps plaintext connections to the compose services.
   To try HTTPS locally set `BROKERVERSE_SERVER_SSL_ENABLED=true` and point `BROKERVERSE_SERVER_SSL_CERTIFICATE` /

@@ -9,8 +9,8 @@ import java.util.Set;
  *
  * <p>Every change (insert, update, delete, collection change) of an entity of {@link
  * #invalidatedBy} clears the whole cache, at once and again when the transaction ends, on every
- * instance when the cache is on Redis. Cached values must be immutable records, strings, numbers or
- * lists of them, never JPA entities.
+ * instance when the cache is on Valkey. Cached values must be immutable records, strings, numbers
+ * or lists of them, never JPA entities.
  *
  * @param name cache name (lower-case, hyphenated: {@code <module>-<content>})
  * @param ttl time to live of an entry (overridable with {@code brokerverse.cache.ttl.<name>})

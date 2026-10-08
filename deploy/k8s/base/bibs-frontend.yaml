@@ -80,8 +80,6 @@ kind: Service
 metadata:
   name: bibs-frontend
   labels: { app.kubernetes.io/name: bibs-frontend }
-  annotations:
-    alb.ingress.kubernetes.io/healthcheck-path: /healthz
 spec:
   selector: { app.kubernetes.io/name: bibs-frontend }
   ports: [{ name: https, port: 8443, targetPort: https }]

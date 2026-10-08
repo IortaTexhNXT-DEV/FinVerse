@@ -168,7 +168,7 @@ class ProductionSafeguardsTest {
             "MAIL_HOST is not set",
             "MAIL_USERNAME is not set",
             "MAIL_PASSWORD is not set",
-            "BROKERVERSE_REDIS_PASSWORD is not set",
+            "BROKERVERSE_VALKEY_PASSWORD is not set",
             "BROKERVERSE_KAFKA_SASL_JAAS_CONFIG is not set")
         .anySatisfy(p -> assertThat(p).contains("SASL_SSL"));
   }
@@ -245,7 +245,7 @@ class ProductionSafeguardsTest {
     assertThat(ProductionSafeguards.problems(env))
         .hasSize(4)
         .anySatisfy(p -> assertThat(p).contains("sslmode=verify-full").endsWith("prefer"))
-        .anySatisfy(p -> assertThat(p).startsWith("BROKERVERSE_REDIS_TLS"))
+        .anySatisfy(p -> assertThat(p).startsWith("BROKERVERSE_VALKEY_TLS"))
         .anySatisfy(p -> assertThat(p).startsWith("BROKERVERSE_KAFKA_SECURITY_PROTOCOL"))
         .anySatisfy(p -> assertThat(p).startsWith("BROKERVERSE_SERVER_SSL_ENABLED"));
   }

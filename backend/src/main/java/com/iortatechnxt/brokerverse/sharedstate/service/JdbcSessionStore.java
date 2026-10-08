@@ -12,7 +12,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 /**
- * Session state on PostgreSQL when Redis is disabled: the token denylist in {@code
+ * Session state on PostgreSQL when Valkey is disabled: the token denylist in {@code
  * sec_revoked_token} and the shared counters in {@code sys_shared_counter} ({@link JdbcCounters}).
  * Expired rows are harmless (every read checks the expiry) and are deleted by the {@code
  * SHARED_STATE_CLEANUP} job.

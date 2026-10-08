@@ -6,7 +6,7 @@ import org.springframework.cache.Cache;
 import org.springframework.cache.interceptor.CacheErrorHandler;
 
 /**
- * Keeps the application working when the cache fails (Redis unreachable, an entry written by an
+ * Keeps the application working when the cache fails (Valkey unreachable, an entry written by an
  * incompatible release): a failed read is a miss, a failed write is skipped. A failed eviction is
  * logged as an error because the entry may stay stale until its time to live ends (see the runbook
  * in PLATFORM_CACHE_AND_EVENTS.md: flush the cache).

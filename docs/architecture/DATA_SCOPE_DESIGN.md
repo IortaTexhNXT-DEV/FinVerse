@@ -101,7 +101,7 @@ A user who starts a job from a screen ("Run now") is still checked on the reques
 - **Records addressed by id only.** An endpoint that loads a record by its id without a `companyId` (for example `GET /claims/{id}`) is not covered by this capability: the record carries its company but the request does not name it. Closing this needs a per-module check on load (follow-up per module, using `requireCompany(record.companyId())`).
 - **Reports and exports** that take a company are covered by the interceptor; whether branch scope must also filter the lines of a company-wide report is a business decision (section 8).
 - **Home branch.** The user's home branch is not forced into the scope; an administrator who narrows the branches should keep it.
-- **Cache staleness.** A narrowed scope applies within one request on the instance that made the change and at once on the others (cache cleared through Redis); a user's open screens show refusals on the next call.
+- **Cache staleness.** A narrowed scope applies within one request on the instance that made the change and at once on the others (cache cleared through Valkey); a user's open screens show refusals on the next call.
 - **Performance.** One cache read per request that names a company; no database read while the entry is cached.
 
 ## 8. Business decisions for the client

@@ -22,6 +22,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { formatDateTime, humanize } from '@/utils/format';
 import { GenerateAdviceDialog, SendAdviceDialog } from './AdviceDialogs';
+import { adviceSending } from './issuanceLogic';
 import { LovLabel } from '@/components/broking/LovLabel';
 
 /**
@@ -126,6 +127,7 @@ export default function InsuranceAdvicePage() {
               render: (a) => `${humanize(a.triggerEvent)}, ${formatDateTime(a.createdAt)}`,
             },
             { key: 'status', header: 'Status', render: (a) => <StatusBadge status={a.status} /> },
+            { key: 'sending', header: 'Sending', render: (a) => adviceSending(a) },
             {
               key: 'sent',
               header: 'Last Sent',

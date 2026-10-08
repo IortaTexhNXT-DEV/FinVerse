@@ -46,6 +46,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -91,6 +92,7 @@ public class InsuranceAdviceService {
   private final SystemParameterService parameters;
   private final AuditTrailService audit;
   private final OrganizationDirectory organization;
+  private final ApplicationEventPublisher events;
   private final Clock clock;
 
   /**
@@ -107,6 +109,7 @@ public class InsuranceAdviceService {
    * @param parameters business parameters
    * @param audit audit trail
    * @param organization company master (letterhead)
+   * @param events event publisher (automatic sending)
    * @param clock clock
    */
   public InsuranceAdviceService(
@@ -121,6 +124,7 @@ public class InsuranceAdviceService {
       SystemParameterService parameters,
       AuditTrailService audit,
       OrganizationDirectory organization,
+      ApplicationEventPublisher events,
       Clock clock) {
     this.advices = advices;
     this.storedFiles = storedFiles;
@@ -133,6 +137,7 @@ public class InsuranceAdviceService {
     this.parameters = parameters;
     this.audit = audit;
     this.organization = organization;
+    this.events = events;
     this.clock = clock;
   }
 
@@ -207,6 +212,7 @@ public class InsuranceAdviceService {
     store(account, saved, pdf);
     audit.record(
         ENTITY, iaNo, AuditAction.CREATE, "Insurance Advice for " + arn + " (" + trigger + ")");
+    events.publishEvent(new InsuranceAdviceGenerated(saved.getId(), account.getMarketSegment()));
     return saved;
   }
 

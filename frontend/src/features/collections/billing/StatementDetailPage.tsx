@@ -167,7 +167,7 @@ export default function StatementDetailPage() {
     return <RecordLoading error={statement.error} />;
   }
   const s = statement.data;
-  const live = s.status !== 'CANCELLED' && can('CLX_BILLING');
+  const live = s.status !== 'CANCELLED' && can('CLX_SOA_ISSUE');
   return (
     <div className="stack">
       <PageHeader

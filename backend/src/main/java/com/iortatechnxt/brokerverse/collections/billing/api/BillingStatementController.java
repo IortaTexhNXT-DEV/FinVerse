@@ -32,12 +32,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Statements of account per billing cycle (BRCLXN.058/060): list, detail, the statements of a plan,
- * generation for one cycle or for the cycles due in a period ({@code CLX_BILLING}), the PDF,
+ * generation for one cycle or for the cycles due in a period ({@code CLX_SOA_ISSUE}), the PDF,
  * sending by e-mail and cancellation.
  */
 @RestController
 @RequestMapping("/api/v1/collections/billing/statements")
 public class BillingStatementController {
+
+  /** Operations prepares the statements; the Collections roles see them (FR-CL-060, 061). */
+  private static final String ISSUE = "hasAuthority('CLX_SOA_ISSUE')";
 
   private static final int MAX_PAGE = 200;
 
@@ -126,7 +129,7 @@ public class BillingStatementController {
    * @return statement
    */
   @PostMapping
-  @PreAuthorize("hasAuthority('CLX_BILLING')")
+  @PreAuthorize(ISSUE)
   @ResponseStatus(HttpStatus.CREATED)
   public StatementResponse generate(@Valid @RequestBody GenerateRequest request) {
     return StatementResponse.detail(statements.generate(request.planId(), request.cycleSeq()));
@@ -139,7 +142,7 @@ public class BillingStatementController {
    * @return statements generated
    */
   @PostMapping("/generate-due")
-  @PreAuthorize("hasAuthority('CLX_BILLING')")
+  @PreAuthorize(ISSUE)
   public List<StatementResponse> generateDue(@Valid @RequestBody GenerateDueRequest request) {
     return statements.generateDue(request.companyId(), request.from(), request.to()).stream()
         .map(StatementResponse::from)
@@ -167,7 +170,7 @@ public class BillingStatementController {
    * @return address
    */
   @GetMapping("/{id}/recipient")
-  @PreAuthorize("hasAuthority('CLX_BILLING')")
+  @PreAuthorize(ISSUE)
   public RecipientResponse recipient(@PathVariable Long id) {
     return new RecipientResponse(dispatch.clientEmail(id).orElse(null));
   }
@@ -180,7 +183,7 @@ public class BillingStatementController {
    * @return statement
    */
   @PostMapping("/{id}/send")
-  @PreAuthorize("hasAuthority('CLX_BILLING')")
+  @PreAuthorize(ISSUE)
   public StatementResponse send(@PathVariable Long id, @Valid @RequestBody SendRequest request) {
     dispatch.send(id, request.toMail());
     return StatementResponse.detail(statements.get(id));
@@ -194,7 +197,7 @@ public class BillingStatementController {
    * @return statement
    */
   @PostMapping("/{id}/cancel")
-  @PreAuthorize("hasAuthority('CLX_BILLING')")
+  @PreAuthorize(ISSUE)
   public StatementResponse cancel(
       @PathVariable Long id, @Valid @RequestBody ReasonRequest request) {
     return StatementResponse.detail(statements.cancel(id, request.reason()));

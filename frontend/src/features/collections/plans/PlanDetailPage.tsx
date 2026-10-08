@@ -145,7 +145,7 @@ export default function PlanDetailPage() {
         plan={p}
         statements={statements.data ?? []}
         actions={{
-          canBill: can('CLX_BILLING'),
+          canBill: can('CLX_SOA_ISSUE'),
           canPromise: live && can('CLX_WORK'),
           busy: bill.isPending,
           onBill: (seq) => bill.mutate(seq),

@@ -184,8 +184,10 @@ public enum Permission {
   CLX_ASSIGN,
   // Collector disposition and application request on unapplied payments (BRCLXN.030-033)
   CLX_UNAPPLIED_WORK,
-  // Installment plans and billing statements (BRCLXN.053/058)
+  // Installment plans of the collectors (BRCLXN.053)
   CLX_BILLING,
+  // Statements of account prepared by Operations: billing run, generate, send, cancel (BRCLXN.058)
+  CLX_SOA_ISSUE,
   // Threshold, escalation rules, billing frequencies, invoice pattern, Collections LOVs
   CLX_SETUP,
   // Export of lists and download of files (caveat p.93); scheduled files and reports; audit log

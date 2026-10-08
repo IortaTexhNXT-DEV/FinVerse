@@ -111,6 +111,7 @@ public class ClaimsRatioPolicyReport implements ReportDefinition {
       rows.add(m);
     }
     return TabularReportBuilder.of(p)
+        .labelCodes("status")
         .columns(columns())
         .groupBy(K_BRANCH, ClaimReportSupport.BRANCH_LABEL)
         .groupBy(K_CLASS, ClaimReportSupport.CLASS_LABEL)

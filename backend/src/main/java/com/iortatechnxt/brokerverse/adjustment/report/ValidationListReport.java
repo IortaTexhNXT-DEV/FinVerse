@@ -67,6 +67,7 @@ public class ValidationListReport implements ReportDefinition {
       }
     }
     return TabularReportBuilder.of(p)
+        .labelCodes("class", "stage")
         .columns(
             ReportColumn.text("kind", "Type of Cancellation / Adjustment"),
             ReportColumn.text("invoice", "Invoice No."),

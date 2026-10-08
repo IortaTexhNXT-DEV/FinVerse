@@ -57,6 +57,7 @@ public class AdjustmentAgingReport implements ReportDefinition {
     List<Map<String, Object>> rows =
         support.created(p, r -> true).stream().map(r -> row(r, now)).toList();
     return TabularReportBuilder.of(p)
+        .labelCodes("class", "stage")
         .columns(
             ReportColumn.text("requestNo", "Request No."),
             ReportColumn.text("invoice", "Invoice No."),

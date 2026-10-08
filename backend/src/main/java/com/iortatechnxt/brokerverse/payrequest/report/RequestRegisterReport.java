@@ -56,6 +56,7 @@ public class RequestRegisterReport implements ReportDefinition {
       }
     }
     return TabularReportBuilder.of(p)
+        .labelCodes(PayRequestReports.KIND, "stage")
         .columns(
             ReportColumn.text("requestNo", "Request No."),
             ReportColumn.date("date", "Request Date"),

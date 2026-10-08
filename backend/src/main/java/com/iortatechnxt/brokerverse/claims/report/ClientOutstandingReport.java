@@ -77,6 +77,7 @@ public class ClientOutstandingReport implements ReportDefinition {
       rows.add(m);
     }
     return TabularReportBuilder.of(p)
+        .labelCodes("status")
         .columns(
             ReportColumn.text(K_CLAIM, "Claim No"),
             ReportColumn.text("status", "Status"),

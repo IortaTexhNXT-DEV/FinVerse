@@ -68,6 +68,7 @@ abstract class ConsolidatedStatementReport {
     complete(balances, rows, notes);
     TabularReportBuilder builder =
         TabularReportBuilder.of(p)
+            .labelCodes(SECTION)
             .columns(
                 ReportColumn.text(ConsolidationReportSupport.CODE, "Account"),
                 ReportColumn.text(ConsolidationReportSupport.NAME, "Particulars"),

@@ -99,6 +99,7 @@ public class PendingTransactionsReport implements ReportDefinition {
             ReportColumn.amount("charges", "Charges"),
             ReportColumn.amount("commission", "Commission")));
     return TabularReportBuilder.of(p)
+        .labelCodes("status")
         .columns(columns)
         .groupBy(K_BRANCH, "Branch")
         .groupBy(K_CLASS, "Class")

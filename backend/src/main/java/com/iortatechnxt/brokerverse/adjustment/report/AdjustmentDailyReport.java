@@ -54,6 +54,7 @@ public class AdjustmentDailyReport implements ReportDefinition {
     List<Map<String, Object>> data =
         rows.values().stream().map(AdjustmentDailyReport::row).toList();
     return TabularReportBuilder.of(p)
+        .labelCodes("class", "stage")
         .columns(
             ReportColumn.text("requestNo", "Request No."),
             ReportColumn.date("date", "Raised"),

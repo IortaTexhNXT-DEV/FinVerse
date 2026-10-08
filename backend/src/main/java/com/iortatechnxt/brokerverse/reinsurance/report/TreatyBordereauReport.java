@@ -84,9 +84,11 @@ public class TreatyBordereauReport implements ReportDefinition {
     TabularReportBuilder builder =
         claims
             ? TabularReportBuilder.of(p)
+                .labelCodes("type")
                 .columns(claimColumns())
                 .rows(claimRows(companyId, treaty, from, to))
             : TabularReportBuilder.of(p)
+                .labelCodes("type")
                 .columns(premiumColumns())
                 .rows(premiumRows(treaty, from, to));
     return builder

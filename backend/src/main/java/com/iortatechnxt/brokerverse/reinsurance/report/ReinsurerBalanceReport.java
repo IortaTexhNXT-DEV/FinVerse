@@ -107,6 +107,7 @@ public class ReinsurerBalanceReport implements ReportDefinition {
     columns.add(ReportColumn.amount(NET, "Net (Dr + / Cr -)"));
     AgeingService.DEFAULT_BUCKETS.forEach(b -> columns.add(ReportColumn.amount(key(b), b.label())));
     return TabularReportBuilder.of(p)
+        .labelCodes("type")
         .columns(columns)
         .rows(new ArrayList<>(rows.values()))
         .presorted()

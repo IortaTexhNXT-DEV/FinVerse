@@ -121,7 +121,8 @@ public abstract class AbstractPdcReceivedReport implements ReportDefinition {
             .map(a -> cells(a, branches))
             .filter(r -> !byDivision || inRanges(r, p))
             .toList();
-    TabularReportBuilder builder = TabularReportBuilder.of(p).columns(columns());
+    TabularReportBuilder builder =
+        TabularReportBuilder.of(p).labelCodes("status").columns(columns());
     if (byDivision) {
       builder
           .groupBy("division", "Division")

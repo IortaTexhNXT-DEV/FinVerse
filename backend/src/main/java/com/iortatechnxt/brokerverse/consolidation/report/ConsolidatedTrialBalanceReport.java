@@ -57,6 +57,7 @@ public class ConsolidatedTrialBalanceReport implements ReportDefinition {
             .map(ConsolidatedTrialBalanceReport::row)
             .toList();
     return TabularReportBuilder.of(p)
+        .labelCodes(ConsolidationReportSupport.CLASS)
         .columns(
             ReportColumn.text(ConsolidationReportSupport.CODE, "Account"),
             ReportColumn.text(ConsolidationReportSupport.NAME, "Account Name"),

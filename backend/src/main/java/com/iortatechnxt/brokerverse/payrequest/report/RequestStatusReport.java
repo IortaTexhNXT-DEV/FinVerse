@@ -48,6 +48,7 @@ public class RequestStatusReport implements ReportDefinition {
     List<Map<String, Object>> rows =
         support.requests(p).stream().map(RequestStatusReport::row).toList();
     return TabularReportBuilder.of(p)
+        .labelCodes(PayRequestReports.KIND, "stage")
         .columns(
             ReportColumn.text("requestNo", "Request No."),
             ReportColumn.date("date", "Request Date"),

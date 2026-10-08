@@ -98,6 +98,7 @@ public class TrialBalanceReport implements ReportDefinition {
             ? "Trial balance is in balance."
             : "WARNING: Trial balance difference of " + totalDebit.subtract(totalCredit);
     return TabularReportBuilder.of(p)
+        .labelCodes(CLASS)
         .columns(
             ReportColumn.text("code", "Account Code"),
             ReportColumn.text("name", "Account Name"),

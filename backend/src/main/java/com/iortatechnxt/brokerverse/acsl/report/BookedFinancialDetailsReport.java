@@ -82,6 +82,7 @@ public class BookedFinancialDetailsReport implements ReportDefinition {
             .map(BookedFinancialDetailsReport::row)
             .toList();
     return TabularReportBuilder.of(p)
+        .labelCodes("kind")
         .columns(
             ReportColumn.text(INSURER, "Insurer"),
             ReportColumn.text("invoiceNo", "Invoice No."),

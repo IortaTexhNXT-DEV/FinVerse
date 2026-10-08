@@ -67,6 +67,7 @@ public class EarlyIncentiveReport implements ReportDefinition {
       }
     }
     return TabularReportBuilder.of(p)
+        .labelCodes("outcome")
         .columns(
             ReportColumn.text("cycle", "Cycle"),
             ReportColumn.text("invoice", "Invoice Number"),

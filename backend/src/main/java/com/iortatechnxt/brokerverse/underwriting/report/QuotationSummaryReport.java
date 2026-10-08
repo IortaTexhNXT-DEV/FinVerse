@@ -70,6 +70,7 @@ public class QuotationSummaryReport implements ReportDefinition {
     }
     TabularReportBuilder builder =
         TabularReportBuilder.of(p)
+            .labelCodes(STATUS)
             .columns(
                 ReportColumn.text(STATUS, "Status"),
                 ReportColumn.text("quotationNo", "Quotation"),

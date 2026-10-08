@@ -81,6 +81,7 @@ public class ClaimMovementStatementReport implements ReportDefinition {
       rows.add(row(l, outstanding));
     }
     return TabularReportBuilder.of(p)
+        .labelCodes("cost")
         .columns(
             ReportColumn.date("date", "Date"),
             ReportColumn.text("reference", "Reference"),

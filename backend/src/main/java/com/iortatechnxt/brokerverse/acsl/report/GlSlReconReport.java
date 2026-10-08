@@ -61,6 +61,7 @@ public class GlSlReconReport implements ReportDefinition {
             .map(GlSlReconReport::row)
             .toList();
     return TabularReportBuilder.of(p)
+        .labelCodes("source")
         .columns(
             ReportColumn.text("account", "Control Account"),
             ReportColumn.text("name", "Account Name"),

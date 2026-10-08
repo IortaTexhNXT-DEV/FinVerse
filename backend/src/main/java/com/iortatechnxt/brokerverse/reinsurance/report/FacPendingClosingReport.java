@@ -79,6 +79,7 @@ public class FacPendingClosingReport implements ReportDefinition {
       }
     }
     return TabularReportBuilder.of(p)
+        .labelCodes("status")
         .columns(
             ReportColumn.text("policyNo", "Policy No"),
             ReportColumn.date("approvalDate", "Approval Date"),

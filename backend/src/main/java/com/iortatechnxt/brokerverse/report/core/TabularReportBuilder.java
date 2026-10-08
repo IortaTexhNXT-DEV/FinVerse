@@ -17,8 +17,9 @@ import java.util.regex.Pattern;
  * total — the standard layout of the GI report book (e.g. Branch &gt; Class &gt; Product). A
  * subtotal names the number of records of its group unless a totalled count column already shows
  * it; a grouped report without totalled columns still ends with a grand total of the records.
- * Status and other code values of the columns named in {@link #labelCodes} are shown as labels
- * (FULLY_REMITTED as "Fully Remitted"), as on the screens.
+ * Status and other code values of the status columns ({@link #STATUS_KEYS}) and of the columns
+ * named in {@link #labelCodes} are shown as labels (FULLY_REMITTED as "Fully Remitted"), as on the
+ * screens.
  *
  * <p>Usage:
  *
@@ -33,6 +34,27 @@ import java.util.regex.Pattern;
  */
 public final class TabularReportBuilder {
 
+  /**
+   * Columns that hold a status, stage or kind in every report: their codes are always shown as
+   * labels.
+   */
+  public static final Set<String> STATUS_KEYS =
+      Set.of(
+          "status",
+          "stage",
+          "kind",
+          "disposition",
+          "remittance_status",
+          "remitted_status",
+          "payment_status",
+          "request_status",
+          "sync_status",
+          "posting_status",
+          "instrument_status",
+          "report_status",
+          "renewal_stage",
+          "policyStatus");
+
   /** A status or other code: capitals, digits and underscores (DIRECT_BILLED, OUTSTANDING). */
   private static final Pattern CODE = Pattern.compile("[A-Z][A-Z0-9_]*");
 
@@ -41,7 +63,7 @@ public final class TabularReportBuilder {
   private final List<Group> groups = new ArrayList<>();
   private final List<Map<String, Object>> details = new ArrayList<>();
   private final List<String> notes = new ArrayList<>();
-  private final Set<String> codeKeys = new HashSet<>();
+  private final Set<String> codeKeys = new HashSet<>(STATUS_KEYS);
   private boolean grandTotal = true;
   private boolean presorted;
 

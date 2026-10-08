@@ -79,6 +79,7 @@ public class ExceptionReport implements ReportDefinition {
             .map(ExceptionReport::row)
             .toList();
     return TabularReportBuilder.of(p)
+        .labelCodes("severity", STATUS)
         .columns(
             ReportColumn.text("raised", "Raised (UTC)"),
             ReportColumn.text("severity", "Severity"),

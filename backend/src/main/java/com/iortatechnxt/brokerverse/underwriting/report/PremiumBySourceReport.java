@@ -97,6 +97,7 @@ public class PremiumBySourceReport implements ReportDefinition {
             ReportColumn.amountNoTotal("commissionFc", "Commission FC"),
             ReportColumn.amount("commissionLc", "Commission LC")));
     return TabularReportBuilder.of(p)
+        .labelCodes(SOURCE)
         .columns(columns)
         .groupBy(SOURCE, "Source Type")
         .groupBy(K_BRANCH, "Branch")

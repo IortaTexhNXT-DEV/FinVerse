@@ -49,6 +49,7 @@ public class ChartOfAccountsReport implements ReportDefinition {
             .map(ChartOfAccountsReport::row)
             .toList();
     return TabularReportBuilder.of(p)
+        .labelCodes("accountClass", "level", "status")
         .columns(
             ReportColumn.text("code", "Code"),
             ReportColumn.text("name", "Name"),

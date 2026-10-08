@@ -25,7 +25,7 @@ Amazon ElastiCache for Valkey.
 | Node.js | 22 LTS | MIT | Build of the web user interface (not a production runtime) |
 | nginx (unprivileged image) | 1.30 | BSD-2-Clause | Serves the web user interface, proxies the API |
 | Kubernetes (managed) | Provider-supported version | Apache 2.0 | Container orchestration |
-| Gateway API controller | Conformant v1 implementation | Apache 2.0 | Ingress and traffic routing |
+| Gateway API controller | Gateway API v1 controller: the managed provider's controller or Envoy Gateway | Apache 2.0 | Ingress and traffic routing |
 
 Support horizon and annual review: [`DEPLOYMENT.md`](../operations/DEPLOYMENT.md) section 7.
 

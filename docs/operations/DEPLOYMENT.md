@@ -214,7 +214,7 @@ Confirmed by the client on 08-Oct-2026. The versions are those the build pins (D
 | Node.js | 22 LTS | MIT | Build of the web user interface (not a production runtime) |
 | nginx (unprivileged image) | 1.30 | BSD-2-Clause | Serves the web user interface, proxies the API |
 | Kubernetes (managed) | Provider-supported version | Apache 2.0 | Container orchestration |
-| Gateway API controller | Conformant v1 implementation | Apache 2.0 | Ingress and traffic routing |
+| Gateway API controller | Gateway API v1 controller: the managed provider's controller or Envoy Gateway | Apache 2.0 | Ingress and traffic routing |
 
 On AWS: Amazon RDS for PostgreSQL 16, Amazon ElastiCache for Valkey 8, Amazon MSK (Kafka 3.9, KRaft), Amazon EKS,
 and the AWS Load Balancer Controller as the default Gateway API controller (Envoy Gateway as the alternative,

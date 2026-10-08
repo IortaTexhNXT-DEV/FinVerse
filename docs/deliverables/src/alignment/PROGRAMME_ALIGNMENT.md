@@ -235,7 +235,7 @@ The client confirmed the component baseline on 8 October 2026. Valkey replaces R
 | Node (JavaScript runtime) | 22 LTS | MIT | Compiles the web user interface for release (not a production runtime) |
 | nginx (unprivileged image) | 1.30 | BSD-2-Clause | Serves the web user interface, proxies the API |
 | Kubernetes (managed) | Provider-supported version | Apache 2.0 | Container orchestration |
-| Gateway API controller | Conformant v1 implementation | Apache 2.0 | Ingress and traffic routing |
+| Gateway API controller | Gateway API v1 controller: the managed provider's controller or Envoy Gateway | Apache 2.0 | Ingress and traffic routing |
 
 **Support horizon.** Each component stays within the support window its upstream project publishes: PostgreSQL 16 until 9 November 2028, Eclipse Temurin 21 until at least December 2029, Node 22 until 30 April 2027, each Kubernetes version on Amazon EKS for 14 months of standard support; the end dates of Valkey 8, Kafka 3.9, Spring Boot 3.5, nginx 1.30 and the gateway controller are to be confirmed at each annual technology review. The baseline is reviewed every year and before go-live, and a component that reaches its support end within the following twelve months is planned for upgrade.
 

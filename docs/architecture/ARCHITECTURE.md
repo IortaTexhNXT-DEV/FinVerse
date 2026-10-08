@@ -76,7 +76,7 @@ elements, confirmed by BDOI on 26-Sep-2026).
 | Node.js | 22 LTS | MIT | Build of the web user interface (not a production runtime) |
 | nginx (unprivileged image) | 1.30 | BSD-2-Clause | Serves the web user interface, proxies the API |
 | Kubernetes (managed) | Provider-supported version | Apache 2.0 | Container orchestration |
-| Gateway API controller | Conformant v1 implementation | Apache 2.0 | Ingress and traffic routing |
+| Gateway API controller | Gateway API v1 controller: the managed provider's controller or Envoy Gateway | Apache 2.0 | Ingress and traffic routing |
 
 Valkey replaces Redis (no longer under the BSD licence from 7.4 on) with the same client and protocol; the edge uses
 the Kubernetes Gateway API (ingress-nginx was retired by the Kubernetes project in March 2026). Support horizon and

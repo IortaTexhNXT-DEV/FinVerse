@@ -20,12 +20,12 @@ class PdfWordBreaksTest {
   @Test
   void theHyphensOfADateAreNotBreakPoints() {
     char[] text = "09-Oct-2026 to 09-Oct-2027".toCharArray();
-    assertThat(PdfWordBreaks.inDate(text, 2, text.length)).isTrue();
-    assertThat(PdfWordBreaks.inDate(text, 6, text.length)).isTrue();
-    assertThat(PdfWordBreaks.inDate(text, 17, text.length)).isTrue();
+    assertThat(PdfWordBreaks.inDate(text, 2)).isTrue();
+    assertThat(PdfWordBreaks.inDate(text, 6)).isTrue();
+    assertThat(PdfWordBreaks.inDate(text, 17)).isTrue();
     char[] reference = "BI-HO-2026-000001".toCharArray();
-    assertThat(PdfWordBreaks.inDate(reference, 2, reference.length)).isFalse();
-    assertThat(PdfWordBreaks.inDate(reference, 10, reference.length)).isFalse();
+    assertThat(PdfWordBreaks.inDate(reference, 2)).isFalse();
+    assertThat(PdfWordBreaks.inDate(reference, 10)).isFalse();
   }
 
   @Test

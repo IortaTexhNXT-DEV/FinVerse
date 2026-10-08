@@ -29,6 +29,8 @@ public final class PdfWordBreaks implements SplitCharacter {
    * @param font font
    * @return phrase
    */
+  // OpenPDF's Phrase extends ArrayList (LooseCoupling false positive).
+  @SuppressWarnings("PMD.LooseCoupling")
   public static Phrase phrase(String text, Font font) {
     Chunk chunk = new Chunk(text == null ? "" : text, font);
     chunk.setSplitCharacter(INSTANCE);
@@ -37,7 +39,7 @@ public final class PdfWordBreaks implements SplitCharacter {
 
   @Override
   public boolean isSplitCharacter(int start, int current, int end, char[] cc, PdfChunk[] ck) {
-    if (cc[current] == '-' && inDate(cc, current, end)) {
+    if (cc[current] == '-' && inDate(cc, current)) {
       return false;
     }
     return DefaultSplitCharacter.DEFAULT.isSplitCharacter(start, current, end, cc, ck);
@@ -48,21 +50,20 @@ public final class PdfWordBreaks implements SplitCharacter {
    *
    * @param cc characters
    * @param at position of the hyphen
-   * @param end end of the characters
    * @return true inside a date
    */
-  static boolean inDate(char[] cc, int at, int end) {
+  static boolean inDate(char[] cc, int at) {
     // The first hyphen of a date: two digits before it, then three letters, a hyphen and a year.
-    if (matches(cc, at - DAY, end)) {
+    if (matches(cc, at - DAY)) {
       return true;
     }
     // The second hyphen: the day and month before it.
     int dayStart = at - MONTH - 1 - DAY;
-    return dayStart >= 0 && matches(cc, dayStart, end);
+    return dayStart >= 0 && matches(cc, dayStart);
   }
 
   /** Whether a dd-MMM-yyyy date starts at {@code from}. */
-  private static boolean matches(char[] cc, int from, int end) {
+  private static boolean matches(char[] cc, int from) {
     int length = DAY + 1 + MONTH + 1 + YEAR;
     if (from < 0 || from + length > cc.length) {
       return false;

@@ -129,7 +129,11 @@ class AcslSoaIT {
                   reports.export("ACSL-SOA-RECON", params, ExportFormat.CSV).content(),
                   StandardCharsets.UTF_8);
             });
-    assertThat(csv).contains(outstanding.getInvoiceNo()).contains("NOT_FOUND");
+    // Buckets are named by their labels, never by their codes.
+    assertThat(csv)
+        .contains(outstanding.getInvoiceNo())
+        .contains("Bucket : Not Found")
+        .doesNotContain("NOT_FOUND");
   }
 
   @Test

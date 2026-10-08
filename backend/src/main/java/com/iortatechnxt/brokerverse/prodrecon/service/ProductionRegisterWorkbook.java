@@ -1,5 +1,7 @@
 package com.iortatechnxt.brokerverse.prodrecon.service;
 
+import com.iortatechnxt.brokerverse.common.excel.SheetColumnWidths;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.messaging.service.DocumentPasswordPolicy;
 import com.iortatechnxt.brokerverse.prodrecon.domain.ReconExtractLine;
 import java.io.ByteArrayOutputStream;
@@ -23,8 +25,10 @@ import org.springframework.stereotype.Component;
 /**
  * Writes the production register workbook sent to an insurer (PRCID.002/006): the Annex IV columns,
  * every cell locked by a sheet protection except the insurer's columns (remarks and incentive), and
- * blank unlocked rows below the register where the insurer adds production BDOI did not send.
- * Opening the file is protected separately by the e-mail password (PRCID.007).
+ * blank unlocked rows below the register where the insurer adds production BDOI did not send. The
+ * statuses are written as their labels ("Fully Remitted"), dates as dd-MMM-yyyy, and every column
+ * is as wide as its content. Opening the file is protected separately by the e-mail password
+ * (PRCID.007).
  */
 @Component
 public class ProductionRegisterWorkbook {
@@ -34,7 +38,6 @@ public class ProductionRegisterWorkbook {
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
   private static final int BLANK_ROWS = 200;
-  private static final int COLUMN_WIDTH = 18 * 256;
   private static final DateTimeFormatter MONTH = DateTimeFormatter.ofPattern("yyyy-MM");
   private static final List<String> EDITABLE =
       List.of(RegisterLayout.INCENTIVE, RegisterLayout.REMARKS);
@@ -66,7 +69,6 @@ public class ProductionRegisterWorkbook {
         Cell cell = header.createCell(c);
         cell.setCellValue(RegisterLayout.HEADERS.get(c));
         cell.setCellStyle(styles.header);
-        sheet.setColumnWidth(c, COLUMN_WIDTH);
       }
       int r = 1;
       for (ReconExtractLine line : lines) {
@@ -76,6 +78,7 @@ public class ProductionRegisterWorkbook {
           write(row.createCell(c), values.get(c), styles, c);
         }
       }
+      SheetColumnWidths.fit(sheet, 0, RegisterLayout.HEADERS.size());
       for (int i = 0; i < BLANK_ROWS; i++) {
         Row row = sheet.createRow(r++);
         for (int c = 0; c < RegisterLayout.HEADERS.size(); c++) {
@@ -113,11 +116,16 @@ public class ProductionRegisterWorkbook {
     v.add(l.getAmountPaid());
     v.add(l.getDatePaid());
     v.add(l.getArNumber());
-    v.add(l.getKind());
-    v.add(l.getRemittanceStatus());
+    v.add(label(l.getKind()));
+    v.add(label(l.getRemittanceStatus()));
     v.add(null);
     v.add(null);
     return v;
+  }
+
+  /** A status code as its label (WITH_OUTSTANDING_BALANCE as "With Outstanding Balance"). */
+  private static String label(String code) {
+    return code == null ? null : DisplayFormat.label(code);
   }
 
   private static void write(Cell cell, Object value, Styles styles, int column) {
@@ -156,6 +164,7 @@ public class ProductionRegisterWorkbook {
       header.setFont(font);
       header.setFillForegroundColor(IndexedColors.DARK_BLUE.getIndex());
       header.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+      header.setWrapText(true);
       header.setLocked(true);
       locked = wb.createCellStyle();
       locked.setLocked(true);
@@ -163,7 +172,8 @@ public class ProductionRegisterWorkbook {
       open.setLocked(false);
       date = wb.createCellStyle();
       date.setLocked(true);
-      date.setDataFormat(wb.getCreationHelper().createDataFormat().getFormat("yyyy-mm-dd"));
+      date.setDataFormat(
+          wb.getCreationHelper().createDataFormat().getFormat(DisplayFormat.SHEET_DATE_FORMAT));
       amount = wb.createCellStyle();
       amount.setLocked(true);
       amount.setDataFormat(wb.getCreationHelper().createDataFormat().getFormat("#,##0.00"));

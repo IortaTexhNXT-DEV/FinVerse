@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.report.render;
 
 import com.iortatechnxt.brokerverse.common.office.BrandAssets;
 import com.iortatechnxt.brokerverse.common.office.PdfBrandFooter;
+import com.iortatechnxt.brokerverse.common.office.PdfColumnWidths;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.report.core.ColumnType;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
@@ -142,29 +143,37 @@ public class PdfReportRenderer implements ReportRenderer {
 
   private static PdfPTable table(ReportResult result, boolean fitToWidth, float pageWidth) {
     List<ReportColumn> cols = result.columns();
-    PdfPTable table = new PdfPTable(cols.size() + 1);
-    float[] widths = new float[cols.size() + 1];
-    widths[0] = LABEL_WEIGHT;
-    float total = LABEL_WEIGHT;
-    for (int i = 0; i < cols.size(); i++) {
-      widths[i + 1] = cols.get(i).type() == ColumnType.TEXT ? TEXT_WEIGHT : NUMBER_WEIGHT;
-      total += widths[i + 1];
+    boolean labels = LabelLayout.needsLabelColumn(result);
+    int first = labels ? 1 : 0;
+    PdfPTable table = new PdfPTable(cols.size() + first);
+    float[] weights = new float[cols.size() + first];
+    if (labels) {
+      weights[0] = LABEL_WEIGHT;
     }
+    float total = labels ? LABEL_WEIGHT : 0;
+    for (int i = 0; i < cols.size(); i++) {
+      weights[i + first] = cols.get(i).type() == ColumnType.TEXT ? TEXT_WEIGHT : NUMBER_WEIGHT;
+      total += weights[i + first];
+    }
+    float width = Math.min(pageWidth, total * NATURAL_POINTS_PER_WEIGHT);
     if (fitToWidth || total * NATURAL_POINTS_PER_WEIGHT >= pageWidth) {
       table.setWidthPercentage(100);
+      width = pageWidth;
     } else {
-      table.setTotalWidth(total * NATURAL_POINTS_PER_WEIGHT);
+      table.setTotalWidth(width);
       table.setLockedWidth(true);
       table.setHorizontalAlignment(Element.ALIGN_LEFT);
     }
-    table.setWidths(widths);
+    table.setWidths(widths(result, weights, first, width));
     table.setHeaderRows(1);
-    table.addCell(headCell(""));
+    if (labels) {
+      table.addCell(headCell(""));
+    }
     cols.forEach(c -> table.addCell(headCell(c.label())));
     int details = 0;
     for (ReportRow row : result.rows()) {
       boolean detail = row.kind() == RowKind.DETAIL;
-      addRow(table, row, cols, detail && details % 2 != 0);
+      addRow(table, row, cols, labels, detail && details % 2 != 0);
       if (detail) {
         details++;
       }
@@ -172,32 +181,64 @@ public class PdfReportRenderer implements ReportRenderer {
     return table;
   }
 
+  /**
+   * Column widths that break headings and values only between words ("Outstanding" never as
+   * "Outstandin g"), shared in proportion to the weights of the column types.
+   */
+  private static float[] widths(ReportResult result, float[] weights, int first, float width) {
+    List<ReportColumn> cols = result.columns();
+    PdfColumnWidths widths = new PdfColumnWidths(weights, 2 * CELL_PADDING);
+    for (int i = 0; i < cols.size(); i++) {
+      ReportColumn c = cols.get(i);
+      widths.heading(i + first, c.label(), HEAD);
+      for (ReportRow row : result.rows()) {
+        widths.value(i + first, CellFormatter.format(row.cells().get(c.key()), c.type()), BODY);
+      }
+    }
+    return widths.fit(width);
+  }
+
   private static void addRow(
-      PdfPTable table, ReportRow row, List<ReportColumn> cols, boolean banded) {
+      PdfPTable table, ReportRow row, List<ReportColumn> cols, boolean labels, boolean banded) {
     if (row.kind() == RowKind.GROUP_HEADER || row.kind() == RowKind.SECTION) {
-      PdfPCell cell = cell(indent(row) + row.label(), BOLD, Element.ALIGN_LEFT, GROUP_BG);
-      cell.setColspan(cols.size() + 1);
+      PdfPCell cell = cell(LabelLayout.label(row), BOLD, Element.ALIGN_LEFT, GROUP_BG);
+      cell.setColspan(cols.size() + (labels ? 1 : 0));
       table.addCell(cell);
     } else {
-      addValueRow(table, row, cols, banded ? ROW_BAND : null);
+      addValueRow(table, row, cols, labels, banded ? ROW_BAND : null);
     }
   }
 
   private static void addValueRow(
-      PdfPTable table, ReportRow row, List<ReportColumn> cols, Color band) {
+      PdfPTable table, ReportRow row, List<ReportColumn> cols, boolean labels, Color band) {
     boolean emphasis = row.kind() == RowKind.SUBTOTAL || row.kind() == RowKind.TOTAL;
     Color bg = emphasis ? SUBTOTAL_BG : band;
     Font font = emphasis ? BOLD : BODY;
-    String label = row.label() == null ? "" : indent(row) + row.label();
-    table.addCell(cell(label, font, Element.ALIGN_LEFT, bg));
-    for (ReportColumn c : cols) {
+    String label = LabelLayout.label(row);
+    int from = 0;
+    if (labels) {
+      table.addCell(cell(label, font, Element.ALIGN_LEFT, bg));
+    } else if (!label.isEmpty()) {
+      // The label spans the leading columns the row leaves empty.
+      from = LabelLayout.leadingEmpty(cols, row.cells());
+      PdfPCell cell = cell(label, font, Element.ALIGN_LEFT, bg);
+      cell.setColspan(from);
+      total(cell, row);
+      table.addCell(cell);
+    }
+    for (ReportColumn c : cols.subList(from, cols.size())) {
       String text = CellFormatter.format(row.cells().get(c.key()), c.type());
       PdfPCell cell = cell(text, font, alignment(c.type()), bg);
-      if (row.kind() == RowKind.TOTAL) {
-        cell.setBorderWidthTop(1f);
-        cell.setBorderColorTop(BRAND_GOLD);
-      }
+      total(cell, row);
       table.addCell(cell);
+    }
+  }
+
+  /** The gold rule above the grand total. */
+  private static void total(PdfPCell cell, ReportRow row) {
+    if (row.kind() == RowKind.TOTAL) {
+      cell.setBorderWidthTop(1f);
+      cell.setBorderColorTop(BRAND_GOLD);
     }
   }
 
@@ -205,10 +246,6 @@ public class PdfReportRenderer implements ReportRenderer {
     return type == ColumnType.TEXT || type == ColumnType.DATE
         ? Element.ALIGN_LEFT
         : Element.ALIGN_RIGHT;
-  }
-
-  private static String indent(ReportRow row) {
-    return "  ".repeat(row.level());
   }
 
   private static PdfPCell headCell(String text) {

@@ -122,6 +122,9 @@ class NbReportsIT {
   void theAccountStatusReportFlagsSlaBreachesAndStalledAccounts() {
     ReportResult all = as.run("ao", () -> reports.run("NB-ACC-STATUS", params()));
     assertThat(details(all)).isNotEmpty();
+    // The age in the stage is a number of whole days (30, not 30.20).
+    assertThat(details(all))
+        .allSatisfy(r -> assertThat(r.cells().get("age")).isInstanceOf(Integer.class));
     assertThat(all.notes()).anyMatch(n -> n.contains("NB_STALLED_DAYS"));
     ReportResult breaches =
         as.run("ao", () -> reports.run("NB-ACC-STATUS", params("exceptions", "SLA_BREACH")));

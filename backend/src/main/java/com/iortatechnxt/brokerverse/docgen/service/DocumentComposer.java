@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.docgen.service;
 
 import com.iortatechnxt.brokerverse.common.office.BrandAssets;
 import com.iortatechnxt.brokerverse.common.office.PdfBrandFooter;
+import com.iortatechnxt.brokerverse.common.office.PdfColumnWidths;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec.Field;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec.Fields;
@@ -168,19 +169,26 @@ public class DocumentComposer {
     }
   }
 
-  private static void heading(Document doc, String heading) {
+  /**
+   * The heading of a section; a section without a heading keeps a gap to the text above, so that
+   * its table never touches the reference line.
+   */
+  private static float heading(Document doc, String heading) {
     if (heading != null && !heading.isBlank()) {
       Paragraph p = new Paragraph(heading, HEADING);
       p.setSpacingBefore(HEADING_SPACING);
       p.setSpacingAfter(PADDING);
       doc.add(p);
+      return 0;
     }
+    return SPACING;
   }
 
   private static void fields(Document doc, Fields f) {
-    heading(doc, f.heading());
+    float gap = heading(doc, f.heading());
     PdfPTable table = new PdfPTable(new float[] {LABEL_WIDTH, VALUE_WIDTH});
     table.setWidthPercentage(100);
+    table.setSpacingBefore(gap);
     for (Field field : f.fields()) {
       table.addCell(cell(field.label(), LABEL, SHADE, Element.ALIGN_LEFT));
       table.addCell(
@@ -190,9 +198,10 @@ public class DocumentComposer {
   }
 
   private static void table(Document doc, Table t) {
-    heading(doc, t.heading());
-    PdfPTable table = new PdfPTable(t.columnWeights());
+    float gap = heading(doc, t.heading());
+    PdfPTable table = new PdfPTable(widths(doc, t));
     table.setWidthPercentage(100);
+    table.setSpacingBefore(gap);
     table.setHeaderRows(1);
     for (int c = 0; c < t.headers().size(); c++) {
       table.addCell(cell(t.headers().get(c), HEAD, NAVY, align(t, c)));
@@ -204,6 +213,19 @@ public class DocumentComposer {
       }
     }
     doc.add(table);
+  }
+
+  /**
+   * Column widths that break headings and values only between words ("Endorsement Number" never as
+   * "Endorseme nt"), shared in proportion to the column weights.
+   */
+  static float[] widths(Document doc, Table t) {
+    PdfColumnWidths widths = new PdfColumnWidths(t.columnWeights(), 2 * PADDING);
+    for (int c = 0; c < t.headers().size(); c++) {
+      widths.heading(c, t.headers().get(c), HEAD);
+    }
+    widths.values(t.rows(), BODY);
+    return widths.fit(doc.getPageSize().getWidth() - doc.leftMargin() - doc.rightMargin());
   }
 
   private static int align(Table t, int column) {

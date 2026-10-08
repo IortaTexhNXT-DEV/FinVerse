@@ -31,7 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class ReportService {
 
-  private static final String DEFAULT_COMPANY = BrandAssets.SYSTEM_NAME;
+  private static final String NO_COMPANY = BrandAssets.SYSTEM_NAME;
   private static final String COMPANY_PARAM = "companyId";
   private static final String ID_SEPARATOR = " – ";
 
@@ -205,8 +205,8 @@ public class ReportService {
       ReportResult result, ExportFormat format, PrintOptions print, Long companyId) {
     String company =
         companyId == null
-            ? DEFAULT_COMPANY
-            : companies.findById(companyId).map(Company::getName).orElse(DEFAULT_COMPANY);
+            ? defaultCompany()
+            : companies.findById(companyId).map(Company::getName).orElseGet(this::defaultCompany);
     ReportContext ctx =
         new ReportContext(
             company,
@@ -288,7 +288,15 @@ public class ReportService {
         .optionalLong(COMPANY_PARAM)
         .flatMap(companies::findById)
         .map(Company::getName)
-        .orElse(DEFAULT_COMPANY);
+        .orElseGet(this::defaultCompany);
+  }
+
+  /**
+   * The company named in the header of a report run without a company: the operating company (the
+   * first company set up), so client documents name the company as every other report does.
+   */
+  private String defaultCompany() {
+    return companies.findFirstByOrderByIdAsc().map(Company::getName).orElse(NO_COMPANY);
   }
 
   private ReportDefinition authorized(String code) {

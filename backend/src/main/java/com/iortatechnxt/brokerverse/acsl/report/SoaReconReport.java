@@ -5,6 +5,8 @@ import com.iortatechnxt.brokerverse.acsl.domain.ReconBucket;
 import com.iortatechnxt.brokerverse.acsl.domain.ReconResult;
 import com.iortatechnxt.brokerverse.acsl.domain.SoaUpload;
 import com.iortatechnxt.brokerverse.acsl.service.AcslQueryService;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
+import com.iortatechnxt.brokerverse.report.core.ColumnType;
 import com.iortatechnxt.brokerverse.report.core.ParameterSpec;
 import com.iortatechnxt.brokerverse.report.core.ParameterType;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
@@ -75,7 +77,7 @@ public class SoaReconReport implements ReportDefinition {
             .toList();
     return TabularReportBuilder.of(p)
         .columns(
-            ReportColumn.count("rowNo", "Row"),
+            new ReportColumn("rowNo", "SOA Row", ColumnType.NUMBER, false),
             ReportColumn.text("invoiceNo", "Invoice No."),
             ReportColumn.text("policyNo", "Policy No."),
             ReportColumn.text("assured", "Assured"),
@@ -93,16 +95,19 @@ public class SoaReconReport implements ReportDefinition {
             ReportColumn.amount("premiumVariance", "Premium Variance"),
             ReportColumn.amount("outstandingVariance", "Outstanding Variance"))
         .groupBy(BUCKET, "Bucket")
+        .labelCodes(BUCKET)
         .rows(rows)
         .note(
-            upload.getInsurerCode() + " " + upload.getPeriodFrom() + " to " + upload.getPeriodTo())
+            upload.getInsurerCode()
+                + " "
+                + DisplayFormat.period(upload.getPeriodFrom(), upload.getPeriodTo()))
         .build();
   }
 
   private static Map<String, Object> row(ReconResult r) {
     BookFigures b = r.bookOrNone();
     Map<String, Object> m = new LinkedHashMap<>();
-    m.put(BUCKET, r.getBucket().name());
+    m.put(BUCKET, r.getBucket());
     m.put("rowNo", r.getRowNo());
     m.put("invoiceNo", r.getInvoiceNo());
     m.put("policyNo", r.getPolicyNo());
@@ -115,7 +120,7 @@ public class SoaReconReport implements ReportDefinition {
     m.put("pr2307", b.pr2307Amount());
     m.put("batch2307", joined(b.pr2307BatchNo(), b.pr2307Date()));
     m.put("cancellation", b.cancellationRef());
-    m.put("directBilled", b.directBilled() ? "Y" : "N");
+    m.put("directBilled", b.directBilled() ? "Yes" : "No");
     m.put("soaPremium", r.getSoaPremium());
     m.put("soaBalance", r.getSoaBalance());
     m.put("premiumVariance", r.getPremiumVariance());
@@ -127,6 +132,6 @@ public class SoaReconReport implements ReportDefinition {
     if (batch == null && date == null) {
       return null;
     }
-    return (batch == null ? "" : batch) + (date == null ? "" : " / " + date);
+    return (batch == null ? "" : batch) + (date == null ? "" : " / " + DisplayFormat.value(date));
   }
 }

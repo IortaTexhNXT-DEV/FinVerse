@@ -78,10 +78,7 @@ const CHIPS: { key: BooleanFlag; label: string; tone: ChipTone }[] = [
 
 /** The flag chips of a renewal, next to its reference (never inside the pill). */
 export function FlagChips({ row }: Readonly<{ row: CandidateRow }>) {
-  const chips = [
-    ...CHIPS.filter((c) => row.flags[c.key] === true).map((c) => ({ ...c, key: String(c.key) })),
-    ...expiryChips(row.flags),
-  ];
+  const chips = [...CHIPS.filter((c) => row.flags[c.key]), ...expiryChips(row.flags)];
   if (chips.length === 0) {
     return null;
   }

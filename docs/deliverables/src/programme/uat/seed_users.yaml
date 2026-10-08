@@ -1,0 +1,2733 @@
+# SIT/UAT users, group profiles and branches of a fresh seed environment (seed profile), queried from it
+# with build_uat_users.SNAPSHOT_QUERY and converted with --snapshot. No password or password hash.
+# The insurer suite (removed from the platform) is left out.
+params:
+  LOGIN_MAX_FAILED_ATTEMPTS: '3'
+  PASSWORD_MAX_AGE_DAYS: '90'
+users:
+- id: a013000101
+  name: SIT Enrolled User
+  roles:
+  - MKT_AO
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: a013000102
+  name: SIT Leaver
+  roles:
+  - MKT_AO
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: a013000103
+  name: SIT Transferee
+  roles:
+  - MKT_AO
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: a013000104
+  name: SIT Team Lead
+  roles:
+  - MKT_AO
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: accountant
+  name: Andy Accountant
+  roles:
+  - ACCOUNTANT
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: acsl
+  name: Arturo ACSL Processor
+  roles:
+  - ACSL_PROCESSOR
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: acslhead
+  name: Antonio ACSL Head
+  roles:
+  - ACSL_HEAD
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: acsltl
+  name: Andrea ACSL Team Leader
+  roles:
+  - ACSL_TL
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: adjtl
+  name: Alfredo Adjustment Lead
+  roles:
+  - ADJUSTMENT_TL
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: adjust
+  name: Adrian Adjustment
+  roles:
+  - ADJUSTMENT
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: admin
+  name: SIT System Administrator
+  roles:
+  - SYSADMIN
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: amlcom1
+  name: Amparo AML Committee
+  roles:
+  - AML_COMMITTEE
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: amlcom2
+  name: Alfredo AML Committee
+  roles:
+  - AML_COMMITTEE
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: amlcom3
+  name: Arturo AML Committee
+  roles:
+  - AML_COMMITTEE
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: amlcom4
+  name: Aurora AML Committee
+  roles:
+  - AML_COMMITTEE
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: amlcom5
+  name: Anselmo AML Committee
+  roles:
+  - AML_COMMITTEE
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: ao
+  name: Aileen Account Officer
+  roles:
+  - MKT_AO
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: ao2
+  name: Arnel Account Officer
+  roles:
+  - MKT_AO
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: approver
+  name: Andres Approver
+  roles:
+  - NB_APPROVER
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: 5000000.0
+  scope: All companies and branches
+- id: appsupport
+  name: Apolinario Application Support
+  roles:
+  - APP_SUPPORT
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: auditor
+  name: Audrey Auditor
+  roles:
+  - AUDITOR
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: badmin
+  name: Bea Business Admin
+  roles:
+  - BUSINESS_ADMIN
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: cashbr
+  name: Benjie Branch Cashier
+  roles:
+  - CASHIER
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Cebu Branch
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: cashier
+  name: Carmela Cashier
+  roles:
+  - CASHIER
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: cashtl
+  name: Cecilia Cashiering Lead
+  roles:
+  - CASHIER_TL
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: checker
+  name: Carla Checker
+  roles:
+  - AUTHORIZER
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: 5000000.0
+  scope: All companies and branches
+- id: clmbranch
+  name: Consuelo Claims Officer (Cebu)
+  roles:
+  - CLM_OFFICER
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Cebu Branch
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: clmofficer
+  name: Clarissa Claims Officer
+  roles:
+  - CLM_OFFICER
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: clmofficer2
+  name: Cedric Claims Officer
+  roles:
+  - CLM_OFFICER
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: clmrisk
+  name: Rosario Claims Risk Analyst
+  roles:
+  - CLM_RISK
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: clmth
+  name: Theresa Claims Team Head
+  roles:
+  - CLM_TH
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: clmtl
+  name: Teodoro Claims Team Lead
+  roles:
+  - CLM_TL
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: clmuh
+  name: Ulysses Claims Unit Head
+  roles:
+  - CLM_UH
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: clxhandler
+  name: Clara Collection Handler
+  roles:
+  - MKT_COLLECTION
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: clxtl
+  name: Carlo Collection Lead
+  roles:
+  - CLX_TL
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: clxuh
+  name: Ursula Section Head
+  roles:
+  - MKT_SECTION_HEAD
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: commrec
+  name: Corazon Commission
+  roles:
+  - COMMREC_HANDLER
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: commtl
+  name: Cristina Commission Lead
+  roles:
+  - COMMREC_TL
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: compchk
+  name: Cesar Compliance Checker
+  roles:
+  - COMPLIANCE_CHECKER
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: compdual
+  name: Dolores Compliance Maker-Checker
+  roles:
+  - COMPLIANCE_CHECKER
+  - COMPLIANCE_OFFICER
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: compoff
+  name: Carmela Compliance Officer
+  roles:
+  - COMPLIANCE_OFFICER
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: comptrol
+  name: Consuelo Comptroller
+  roles:
+  - COMPTROLLERSHIP
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: contactc
+  name: Cecilia Contact Center
+  roles:
+  - CONTACT_CENTER
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: csfagent
+  name: Clarissa Contact Center Agent
+  roles:
+  - CSF_AGENT
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: csfagent2
+  name: Carlos Contact Center Agent
+  roles:
+  - CSF_AGENT
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: csfmgmt
+  name: Manuel Contact Center Head
+  roles:
+  - CSF_MANAGEMENT
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: csfsup
+  name: Soledad Contact Center Supervisor
+  roles:
+  - CSF_SUPERVISOR
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: dco
+  name: Dionisia Data Control Officer
+  roles:
+  - DCO
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: disb
+  name: Dante Disbursement
+  roles:
+  - DISBURSEMENT
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: disbappr
+  name: Daniel Disbursement Approver
+  roles:
+  - DISB_APPROVER
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: disbappr2
+  name: Divina Disbursement Approver
+  roles:
+  - DISB_APPROVER
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: disbtl
+  name: Diego Disbursement Lead
+  roles:
+  - DISB_TL
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: disbtl2
+  name: Dolores Disbursement Verifier
+  roles:
+  - DISB_TL
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: ebao
+  name: Erlinda Benefits Officer
+  roles:
+  - EB_AO
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: ebao2
+  name: Ernesto Benefits Officer
+  roles:
+  - EB_AO
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: ebcoll
+  name: Corazon Benefits Collection
+  roles:
+  - EB_COLLECTION
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: ebmgmt
+  name: Manuel Benefits Management
+  roles:
+  - EB_MANAGEMENT
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: ebproc
+  name: Priscilla Benefits Processor
+  roles:
+  - EB_PROCESSOR
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: ebprocsup
+  name: Porfirio Processing Supervisor
+  roles:
+  - EB_PROC_SUPERVISOR
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: ebtl
+  name: Teresita Benefits Team Lead
+  roles:
+  - EB_TL
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: epol
+  name: Elena E-policy Sender
+  roles:
+  - EPOLICY_SENDER
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: firehandler
+  name: Fernando Fire Handler
+  roles:
+  - SBM_HANDLER
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: fmanager
+  name: Fiona Manager
+  roles:
+  - FIN_ADMIN
+  - FIN_MANAGER
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: glhead
+  name: Graciela GL Section Head
+  roles:
+  - FRBS_HEAD
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: glofficer
+  name: Gloria GL Officer
+  roles:
+  - FRBS_PROCESSOR
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: gltl
+  name: Gerardo GL Team Lead
+  roles:
+  - FRBS_TL
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: holdapprover
+  name: Homer Records Approver
+  roles:
+  - RECORDS_HOLD_APPROVER
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: holdofficer
+  name: Hilda Records Officer
+  roles:
+  - RECORDS_HOLD_OFFICER
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: hrappr
+  name: Helena HR Approver
+  roles:
+  - HR_APPROVER
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: infosec
+  name: Ingrid Security Officer
+  roles:
+  - INFOSEC_OFFICER
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: investigator
+  name: Ivan Investigator
+  roles:
+  - SCR_INVESTIGATOR
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: investigator2
+  name: Isabel Investigator
+  roles:
+  - SCR_INVESTIGATOR
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: lamd
+  name: Leonardo Loan Monitoring
+  roles:
+  - LAMD
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: legacyaudit
+  name: Lara Legacy Auditor
+  roles:
+  - LEGACY_INQUIRY
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: legacyrev
+  name: Ramon Access Reviewer
+  roles:
+  - LEGACY_ACCESS_REVIEWER
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: mancom
+  name: Manuel ManCom Member
+  roles:
+  - MANCOM
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: mbs
+  name: Monica Business Services
+  roles:
+  - MBS
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: mbs2
+  name: Marco Business Services
+  roles:
+  - MBS
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: miggonogo
+  name: Gregorio Go-Live Board
+  roles:
+  - MIGRATION_GONOGO
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: miglead
+  name: Mila Migration Lead
+  roles:
+  - DATA_MIGRATION_LEAD
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: migops
+  name: Oscar Migration Operator
+  roles:
+  - MIGRATION_OPERATOR
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: migowner
+  name: Olivia Data Owner
+  roles:
+  - DATA_OWNER
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: migpm
+  name: Patricio Program Manager
+  roles:
+  - MIGRATION_GONOGO
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: migrecon
+  name: Rosa Reconciliation Approver
+  roles:
+  - MIGRATION_RECON_APPROVER
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: migsteward
+  name: Stefan Data Steward
+  roles:
+  - DATA_STEWARD
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: mktao
+  name: Marco Marketing Processor
+  roles:
+  - PRQ_PROCESSOR
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: mktappr
+  name: Manolo Marketing Approver
+  roles:
+  - PRQ_APPROVER
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: mktcoll
+  name: Miguel Marketing Collection
+  roles:
+  - MKT_COLLECTION
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: mkthandler
+  name: Marco Marketing Handler
+  roles:
+  - MKT_HANDLER
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: mktrev
+  name: Maricel Marketing Reviewer
+  roles:
+  - PRQ_REVIEWER
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: mkttl
+  name: Marites Marketing Lead
+  roles:
+  - MKT_TL
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: polreview
+  name: Rodrigo Policy Reviewer
+  roles:
+  - SBM_POLICY_REVIEWER
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: proc
+  name: Paolo Processor
+  roles:
+  - PROCESSOR
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: proctl
+  name: Patricia Processing Lead
+  roles:
+  - PROCESSING_TL
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: recon
+  name: Regina Reconciliation
+  roles:
+  - RECON_HANDLER
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: remit
+  name: Rafael Remittance
+  roles:
+  - REMIT_PROCESSOR
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: remittl
+  name: Rosario Remittance Lead
+  roles:
+  - REMIT_TL
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: requestor
+  name: Rhea Access Requestor
+  roles:
+  - UAM_REQUESTOR
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: rnwchecker
+  name: Rogelio Renewal Checker
+  roles:
+  - DATA_OWNER
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: rnwmaker
+  name: Rhodora Renewal Maker
+  roles:
+  - DATA_STEWARD
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: rnwtl
+  name: Rosario Renewal Team Lead
+  roles:
+  - MKT_TL
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: sanitation
+  name: Samuel Sanitation Handler
+  roles:
+  - SBM_SANITATION
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: sbmchecker
+  name: Carmela Submitted Checker
+  roles:
+  - SBM_CHECKER
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: sbmfee
+  name: Ursula Fee Handler
+  roles:
+  - SBM_UPP_HANDLER
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: sbmhandler
+  name: Susana Motor Handler
+  roles:
+  - SBM_HANDLER
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: sbmrules
+  name: Rufino Rule Administrator
+  roles:
+  - SBM_RULE_ADMIN
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: sbmtl
+  name: Teodora Submitted Team Lead
+  roles:
+  - SBM_TL
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: scrapprover
+  name: Samuel Screening Approver
+  roles:
+  - SCR_APPROVER
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: scrdual
+  name: Sofia Investigator-Approver
+  roles:
+  - SCR_APPROVER
+  - SCR_INVESTIGATOR
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: secapprover
+  name: Selina Second Approver
+  roles:
+  - UAM_SECOND_APPROVER
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: topmgmt
+  name: Teresa Top Management
+  roles:
+  - TOP_MANAGEMENT_APPROVER
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: tsu
+  name: Teodoro TSU Analyst
+  roles:
+  - TSU
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: tsuhead
+  name: Tomas TSU Head
+  roles:
+  - TSU_HEAD
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: tsulead
+  name: Teresa TSU Lead
+  roles:
+  - TSU
+  - TSU_TL
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: uamapprover
+  name: Ulysses Access Approver
+  roles:
+  - UAM_APPROVER
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: ucc
+  name: Ursula Unit Compliance Coordinator
+  roles:
+  - UNIT_COMPLIANCE_COORD
+  company: BDO Insurance and Reinsurance Brokers, Inc.
+  branch: Head Office - Makati
+  status: Active
+  limit: null
+  scope: All companies and branches
+- id: upphandler
+  name: Paula Unapplied Handler
+  roles:
+  - UNAPPLIED_HANDLER
+  company: null
+  branch: null
+  status: Active
+  limit: null
+  scope: All companies and branches
+roles:
+- code: ACCOUNTANT
+  name: Accountant (Maker)
+  active: true
+  permissions:
+  - ASSET_MANAGE
+  - ATTACHMENT_MANAGE
+  - ATTACHMENT_VIEW
+  - BUDGET_MANAGE
+  - DASHBOARD_VIEW
+  - INVESTMENT_MANAGE
+  - JOURNAL_CREATE
+  - JOURNAL_VIEW
+  - MASTER_MAINTAIN
+  - MASTER_VIEW
+  - RECEIPT_PAYMENT_MAINTAIN
+  - RECONCILIATION_MANAGE
+  - REPORT_FINANCIAL
+  - REPORT_VIEW
+  - TAX_MANAGE
+  - TAX_VIEW
+- code: ACSL_HEAD
+  name: ACSL Team Head (Approver)
+  active: true
+  permissions:
+  - ACSL_APPROVE
+  - ACSL_REPORT_VIEW
+  - ACSL_VIEW
+  - ATTACHMENT_MANAGE
+  - ATTACHMENT_VIEW
+  - CLIENT_VIEW
+  - CLX_REPORT_VIEW
+  - CLX_VIEW
+  - DASHBOARD_VIEW
+  - JOURNAL_VIEW
+  - OPS_REPORT_VIEW
+  - OPS_VIEW
+  - REPORT_VIEW
+  - WORK_VIEW
+- code: ACSL_PROCESSOR
+  name: ACSL Processor
+  active: true
+  permissions:
+  - ACSL_APPLY
+  - ACSL_PROCESS
+  - ACSL_REPORT_EXPORT
+  - ACSL_REPORT_VIEW
+  - ACSL_UPLOAD
+  - ACSL_VIEW
+  - ATTACHMENT_MANAGE
+  - ATTACHMENT_VIEW
+  - BULK_PROCESS
+  - CLIENT_VIEW
+  - CLX_REPORT_VIEW
+  - CLX_VIEW
+  - DASHBOARD_VIEW
+  - JOURNAL_VIEW
+  - OPS_REPORT_VIEW
+  - OPS_VIEW
+  - REPORT_VIEW
+  - WORK_VIEW
+- code: ACSL_TL
+  name: ACSL Team Leader
+  active: true
+  permissions:
+  - ACSL_APPLY
+  - ACSL_ASSIGN
+  - ACSL_PROCESS
+  - ACSL_REPORT_EXPORT
+  - ACSL_REPORT_VIEW
+  - ACSL_REVIEW
+  - ACSL_UPLOAD
+  - ACSL_VIEW
+  - ATTACHMENT_MANAGE
+  - ATTACHMENT_VIEW
+  - BULK_PROCESS
+  - CLIENT_VIEW
+  - CLX_REPORT_VIEW
+  - CLX_VIEW
+  - DASHBOARD_VIEW
+  - JOURNAL_VIEW
+  - OPS_REPORT_VIEW
+  - OPS_VIEW
+  - REMIT_DEDUCTION_CONFIRM
+  - REPORT_VIEW
+  - WORK_VIEW
+- code: ADJUSTMENT
+  name: Adjustment
+  active: true
+  permissions:
+  - ACCOUNT_VIEW
+  - ADJ_POST
+  - ADJ_PROCESS
+  - ATTACHMENT_MANAGE
+  - ATTACHMENT_VIEW
+  - BOOKING_ADJUST
+  - BULK_PROCESS
+  - CLIENT_VIEW
+  - OPS_REPORT_EXPORT
+  - OPS_REPORT_VIEW
+  - OPS_VIEW
+  - REPORT_VIEW
+  - WORK_VIEW
+- code: ADJUSTMENT_TL
+  name: Adjustment Team Leader
+  active: true
+  permissions:
+  - ACCOUNT_VIEW
+  - ADJ_APPROVE
+  - ADJ_POST
+  - ADJ_PROCESS
+  - ATTACHMENT_MANAGE
+  - ATTACHMENT_VIEW
+  - BOOKING_ADJUST
+  - BULK_PROCESS
+  - CLIENT_VIEW
+  - OPS_REPORT_EXPORT
+  - OPS_REPORT_VIEW
+  - OPS_VIEW
+  - REPORT_VIEW
+  - WORK_ASSIGN
+  - WORK_VIEW
+- code: AML_COMMITTEE
+  name: AML Committee Member
+  active: true
+  permissions:
+  - ATTACHMENT_VIEW
+  - CLIENT_VIEW
+  - SCR_COMMITTEE
+  - SCR_VIEW
+- code: APP_SUPPORT
+  name: Application Support
+  active: true
+  permissions:
+  - ACCOUNT_VIEW
+  - ATTACHMENT_VIEW
+  - CLIENT_VIEW
+  - CLX_AUDIT_VIEW
+  - CLX_SETUP
+  - CLX_VIEW
+  - FLOWIN_MANAGE
+  - LOV_MANAGE
+  - OPS_VIEW
+  - REPORT_VIEW
+  - SYSTEM_MONITOR
+  - WORK_VIEW
+- code: AUDITOR
+  name: Auditor
+  active: true
+  permissions:
+  - ACCOUNT_VIEW
+  - ACSL_REPORT_VIEW
+  - ACSL_VIEW
+  - ALERT_VIEW
+  - ATTACHMENT_VIEW
+  - AUDIT_VIEW
+  - BCL_REPORT_VIEW
+  - BCL_VIEW
+  - CLIENT_VIEW
+  - CLX_AUDIT_VIEW
+  - CLX_REPORT_VIEW
+  - CLX_VIEW
+  - DASHBOARD_VIEW
+  - DISB_REPORT_VIEW
+  - DISB_VIEW
+  - EB_REPORT_VIEW
+  - EB_VIEW
+  - FILE_QUARANTINE_VIEW
+  - FRBS_REPORT_VIEW
+  - JOURNAL_VIEW
+  - MASTER_VIEW
+  - MESSAGE_VIEW
+  - MIG_VIEW
+  - OPS_REPORT_VIEW
+  - OPS_VIEW
+  - PKG_REPORT_VIEW
+  - PRODUCT_ARCHIVE_VIEW
+  - PRODUCT_VIEW
+  - PRQ_VIEW
+  - QUOTE_VIEW
+  - REPORT_FINANCIAL
+  - REPORT_VIEW
+  - RNW_REPORT_VIEW
+  - RNW_VIEW
+  - SCR_AUDIT_VIEW
+  - SCR_REPORT_VIEW
+  - SCR_VIEW
+  - SYSTEM_MONITOR
+  - TAX_VIEW
+  - UAM_REPORT_VIEW
+  - UAM_VIEW
+  - WORK_VIEW
+- code: AUTHORIZER
+  name: Accounts Authorizer (Checker)
+  active: true
+  permissions:
+  - ALERT_MANAGE
+  - ALERT_VIEW
+  - ASSET_MANAGE
+  - ATTACHMENT_MANAGE
+  - ATTACHMENT_VIEW
+  - DASHBOARD_VIEW
+  - INVESTMENT_MANAGE
+  - JOURNAL_AUTHORIZE
+  - JOURNAL_REVERSE
+  - JOURNAL_VIEW
+  - MASTER_AUTHORIZE
+  - MASTER_VIEW
+  - RECEIPT_PAYMENT_AUTHORIZE
+  - REPORT_FINANCIAL
+  - REPORT_VIEW
+  - TAX_MANAGE
+  - TAX_VIEW
+- code: BRANCH_FINANCE
+  name: Branch Finance User
+  active: true
+  permissions:
+  - ATTACHMENT_MANAGE
+  - ATTACHMENT_VIEW
+  - DASHBOARD_VIEW
+  - JOURNAL_CREATE
+  - JOURNAL_VIEW
+  - MASTER_VIEW
+  - RECEIPT_PAYMENT_MAINTAIN
+  - REPORT_VIEW
+- code: BUSINESS_ADMIN
+  name: Business Administrator
+  active: true
+  permissions:
+  - ACCESS_REQUEST
+  - AUDIT_VIEW
+  - BULK_PROCESS
+  - CLX_AUDIT_VIEW
+  - CLX_SETUP
+  - CLX_VIEW
+  - EB_REPORT_VIEW
+  - EB_SETUP
+  - EB_VIEW
+  - EMPLOYEE_MAINTAIN
+  - FLOWIN_MANAGE
+  - LOV_MANAGE
+  - MASTER_MAINTAIN
+  - MASTER_VIEW
+  - MESSAGE_VIEW
+  - OPS_VIEW
+  - PKG_REPORT_VIEW
+  - PRODUCT_ARCHIVE_VIEW
+  - PRODUCT_AUTHORIZE
+  - PRODUCT_VALIDATE
+  - PRODUCT_VIEW
+  - REPORT_VIEW
+  - RNW_REPORT_VIEW
+  - RNW_SETUP
+  - RNW_TEMPLATE_MAINTAIN
+  - RNW_VIEW
+  - SYSTEM_MONITOR
+  - UAM_CANCEL
+  - UAM_CORRECT
+  - UAM_DEACTIVATE
+  - UAM_ENROLL
+  - UAM_GROUP_REQUEST
+  - UAM_MODIFY
+  - UAM_REACTIVATE
+  - UAM_REPORT_VIEW
+  - UAM_SOD_MAINTAIN
+  - UAM_VIEW
+  - WORK_VIEW
+- code: CASHIER
+  name: Cashiering (HO / branch)
+  active: true
+  permissions:
+  - ACCOUNT_VIEW
+  - ATTACHMENT_MANAGE
+  - ATTACHMENT_VIEW
+  - BULK_PROCESS
+  - CASH_APPLY
+  - CASH_CANCEL
+  - CASH_DISPOSITION
+  - CASH_PRINT
+  - CASH_RECEIPT
+  - CASH_REINSTATE
+  - CASH_UPLOAD
+  - CASH_UPP_INCOME_REQUEST
+  - CLIENT_VIEW
+  - CLX_EXPORT
+  - CLX_REPORT_VIEW
+  - CLX_VIEW
+  - CWT_PROCESS
+  - LEGACY_REVERSAL_REQUEST
+  - OPS_REPORT_EXPORT
+  - OPS_REPORT_VIEW
+  - OPS_VIEW
+  - REPORT_VIEW
+  - WORK_VIEW
+- code: CASHIER_TL
+  name: Cashiering Team Leader / Head
+  active: true
+  permissions:
+  - ACCOUNT_VIEW
+  - ATTACHMENT_MANAGE
+  - ATTACHMENT_VIEW
+  - BULK_PROCESS
+  - CASH_APPLY
+  - CASH_APPROVE
+  - CASH_CANCEL
+  - CASH_DISPOSITION
+  - CASH_DISPOSITION_APPROVE
+  - CASH_PRINT
+  - CASH_RECEIPT
+  - CASH_REINSTATE
+  - CASH_SERIES_MANAGE
+  - CASH_UPLOAD
+  - CASH_UPP_INCOME_REQUEST
+  - CLIENT_VIEW
+  - CLX_EXPORT
+  - CLX_REPORT_VIEW
+  - CLX_VIEW
+  - CWT_PROCESS
+  - LEGACY_REVERSAL_APPROVE
+  - MASTER_VIEW
+  - OPS_REPORT_EXPORT
+  - OPS_REPORT_VIEW
+  - OPS_VIEW
+  - REPORT_VIEW
+  - WORK_ASSIGN
+  - WORK_VIEW
+- code: CLM_OFFICER
+  name: Claims Officer / Claims Assistant
+  active: true
+  permissions:
+  - ACCOUNT_VIEW
+  - ATTACHMENT_MANAGE
+  - ATTACHMENT_VIEW
+  - BCL_ACTION_PLAN
+  - BCL_AUTHORIZE
+  - BCL_COVER_VIEW
+  - BCL_LOCATION_REF_MAINTAIN
+  - BCL_RECORD
+  - BCL_REPORT_EXPORT
+  - BCL_REPORT_VIEW
+  - BCL_STATUS_UPDATE
+  - BCL_VIEW
+  - BULK_PROCESS
+  - CLIENT_VIEW
+  - OPS_VIEW
+  - REPORT_VIEW
+  - WORK_VIEW
+- code: CLM_RISK
+  name: Claims / Risk Analyst
+  active: true
+  permissions:
+  - ACCOUNT_VIEW
+  - ATTACHMENT_VIEW
+  - BCL_COVER_VIEW
+  - BCL_DATA_EXTRACT
+  - BCL_REPORT_EXPORT
+  - BCL_REPORT_VIEW
+  - BCL_VIEW
+  - CLIENT_VIEW
+  - OPS_VIEW
+  - REPORT_VIEW
+  - WORK_VIEW
+- code: CLM_TH
+  name: Claims Team Head
+  active: true
+  permissions:
+  - ACCOUNT_VIEW
+  - ATTACHMENT_MANAGE
+  - ATTACHMENT_VIEW
+  - BCL_ACTION_PLAN
+  - BCL_ADJUSTER_ASSIGN
+  - BCL_AUTHORIZE
+  - BCL_CLAIMANT_OVERRIDE
+  - BCL_CLOSE
+  - BCL_COVER_VIEW
+  - BCL_FOLLOW_UP_OVERRIDE
+  - BCL_LOCATION_REF_MAINTAIN
+  - BCL_RECORD
+  - BCL_REOPEN
+  - BCL_REPORT_EXPORT
+  - BCL_REPORT_VIEW
+  - BCL_RESERVE_AMEND
+  - BCL_SETTLEMENT_UPDATE
+  - BCL_STATUS_UPDATE
+  - BCL_VIEW
+  - BULK_PROCESS
+  - CLIENT_VIEW
+  - OPS_VIEW
+  - REPORT_VIEW
+  - WORK_ASSIGN
+  - WORK_VIEW
+- code: CLM_TL
+  name: Claims Team Lead
+  active: true
+  permissions:
+  - ACCOUNT_VIEW
+  - ATTACHMENT_MANAGE
+  - ATTACHMENT_VIEW
+  - BCL_ACTION_PLAN
+  - BCL_ADJUSTER_ASSIGN
+  - BCL_AUTHORIZE
+  - BCL_CLAIMANT_OVERRIDE
+  - BCL_CLOSE
+  - BCL_COVER_VIEW
+  - BCL_FOLLOW_UP_OVERRIDE
+  - BCL_LOCATION_REF_MAINTAIN
+  - BCL_RECORD
+  - BCL_REPORT_EXPORT
+  - BCL_REPORT_VIEW
+  - BCL_RESERVE_AMEND
+  - BCL_SETTLEMENT_UPDATE
+  - BCL_STATUS_UPDATE
+  - BCL_VIEW
+  - BULK_PROCESS
+  - CLIENT_VIEW
+  - OPS_VIEW
+  - REPORT_VIEW
+  - WORK_ASSIGN
+  - WORK_VIEW
+- code: CLM_UH
+  name: Claims Unit Head
+  active: true
+  permissions:
+  - ACCOUNT_VIEW
+  - ATTACHMENT_VIEW
+  - BCL_COVER_VIEW
+  - BCL_DATA_EXTRACT
+  - BCL_REOPEN
+  - BCL_REPORT_EXPORT
+  - BCL_REPORT_VIEW
+  - BCL_SETUP
+  - BCL_VIEW
+  - CLIENT_VIEW
+  - OPS_VIEW
+  - REPORT_VIEW
+  - WORK_ASSIGN
+  - WORK_VIEW
+- code: CLX_TL
+  name: Collection Team Lead
+  active: true
+  permissions:
+  - ACCOUNT_VIEW
+  - ATTACHMENT_VIEW
+  - CLIENT_VIEW
+  - CLX_ASSIGN
+  - CLX_BILLING
+  - CLX_BULK_UPDATE
+  - CLX_ESCALATE
+  - CLX_ESCALATION_HANDLE
+  - CLX_EXPORT
+  - CLX_REPORT_VIEW
+  - CLX_UNAPPLIED_WORK
+  - CLX_VIEW
+  - CLX_WORK
+  - OPS_VIEW
+  - REPORT_VIEW
+  - WORK_VIEW
+- code: COMMREC_HANDLER
+  name: Commission Receivables Handler
+  active: true
+  permissions:
+  - ACCOUNT_VIEW
+  - ATTACHMENT_MANAGE
+  - ATTACHMENT_VIEW
+  - BIR_CERT_SUBMIT
+  - BULK_PROCESS
+  - CLIENT_VIEW
+  - COMMREC_PROCESS
+  - LEGACY_REVERSAL_REQUEST
+  - OPS_REPORT_EXPORT
+  - OPS_REPORT_VIEW
+  - OPS_VIEW
+  - REPORT_VIEW
+  - WORK_VIEW
+- code: COMMREC_TL
+  name: Commission Receivables Team Leader / Head
+  active: true
+  permissions:
+  - ACCOUNT_VIEW
+  - ATTACHMENT_MANAGE
+  - ATTACHMENT_VIEW
+  - BIR_CERT_SUBMIT
+  - BULK_PROCESS
+  - CLIENT_VIEW
+  - COMMREC_APPROVE
+  - COMMREC_PROCESS
+  - INCENTIVE_MANAGE
+  - LEGACY_REVERSAL_APPROVE
+  - OPS_REPORT_EXPORT
+  - OPS_REPORT_VIEW
+  - OPS_VIEW
+  - REPORT_VIEW
+  - WORK_ASSIGN
+  - WORK_VIEW
+- code: COMPLIANCE_CHECKER
+  name: Compliance Officer (Checker)
+  active: true
+  permissions:
+  - CLIENT_VIEW
+  - REPORT_VIEW
+  - SCR_CONFIG_APPROVE
+  - SCR_LIST_APPROVE
+  - SCR_REPORT_VIEW
+  - SCR_VIEW
+- code: COMPLIANCE_OFFICER
+  name: Compliance Officer
+  active: true
+  permissions:
+  - ATTACHMENT_VIEW
+  - CLIENT_VIEW
+  - REPORT_VIEW
+  - SCR_AUDIT_VIEW
+  - SCR_CASE_ASSIGN
+  - SCR_COMPLIANCE_REVIEW
+  - SCR_CONFIG_MAINTAIN
+  - SCR_LIST_MAINTAIN
+  - SCR_REPORT_VIEW
+  - SCR_STR_EXTRACT
+  - SCR_VIEW
+  - WORK_VIEW
+- code: COMPTROLLERSHIP
+  name: Comptrollership
+  active: true
+  permissions:
+  - ACCOUNT_VIEW
+  - ACSL_REPORT_VIEW
+  - ACSL_VIEW
+  - ATTACHMENT_VIEW
+  - BIR_CERT_ACK
+  - CLIENT_VIEW
+  - CLX_REPORT_VIEW
+  - CLX_VIEW
+  - DISB_REPORT_VIEW
+  - DISB_VIEW
+  - FRBS_REPORT_VIEW
+  - JOURNAL_VIEW
+  - MIG_TRUEUP_PREPARE
+  - MIG_VIEW
+  - OPS_REPORT_VIEW
+  - OPS_VIEW
+  - REPORT_VIEW
+  - WORK_VIEW
+- code: CONTACT_CENTER
+  name: Contact Center (renewal follow-up)
+  active: true
+  permissions:
+  - ATTACHMENT_MANAGE
+  - ATTACHMENT_VIEW
+  - RNW_FOLLOWUP
+  - RNW_VIEW
+- code: CSF_AGENT
+  name: Contact Center Agent
+  active: true
+  permissions:
+  - ATTACHMENT_VIEW
+  - CSF_CONTACT_UPDATE
+  - CSF_DOCUMENT_UPLOAD
+  - CSF_RESEND
+  - CSF_VIEW
+- code: CSF_MANAGEMENT
+  name: Contact Center Management
+  active: true
+  permissions:
+  - AUDIT_VIEW
+  - CSF_REPORT_VIEW
+  - CSF_VIEW
+  - REPORT_VIEW
+- code: CSF_SUPERVISOR
+  name: Contact Center Supervisor
+  active: true
+  permissions:
+  - ATTACHMENT_VIEW
+  - CSF_CONTACT_UPDATE
+  - CSF_DOCUMENT_UPLOAD
+  - CSF_REPORT_VIEW
+  - CSF_RESEND
+  - CSF_RESEND_OTHER
+  - CSF_VIEW
+  - REPORT_VIEW
+- code: DATA_MIGRATION_LEAD
+  name: Data Migration Lead
+  active: true
+  permissions:
+  - ATTACHMENT_VIEW
+  - MIG_CUTOVER_MANAGE
+  - MIG_LOAD_APPROVE
+  - MIG_OBJECT_MANAGE
+  - MIG_ROLLBACK_REQUEST
+  - MIG_SIGNOFF
+  - MIG_VIEW
+  - REPORT_VIEW
+- code: DATA_OWNER
+  name: Data Owner (migration object)
+  active: true
+  permissions:
+  - ATTACHMENT_VIEW
+  - MIG_DECISION_APPROVE
+  - MIG_DQ_WAIVE
+  - MIG_MAPPING_APPROVE
+  - MIG_RESUBMIT_APPROVE
+  - MIG_SIGNOFF
+  - MIG_VIEW
+  - REPORT_VIEW
+- code: DATA_STEWARD
+  name: Data Steward (migration)
+  active: true
+  permissions:
+  - MIG_DQ_RESOLVE
+  - MIG_MAPPING_EDIT
+  - MIG_MATCH_DECIDE
+  - MIG_VIEW
+  - REPORT_VIEW
+- code: DCO
+  name: Data Control Officer
+  active: true
+  permissions:
+  - ACCOUNT_VIEW
+  - ATTACHMENT_VIEW
+  - CLIENT_VIEW
+  - CLX_AUDIT_VIEW
+  - CLX_SETUP
+  - CLX_VIEW
+  - FLOWIN_MANAGE
+  - OPS_VIEW
+  - REPORT_VIEW
+  - SYSTEM_MONITOR
+  - WORK_VIEW
+- code: DISBURSEMENT
+  name: Disbursement
+  active: true
+  permissions:
+  - ACCOUNT_VIEW
+  - ATTACHMENT_VIEW
+  - CLIENT_VIEW
+  - CLX_EXPORT
+  - CLX_REPORT_VIEW
+  - CLX_VIEW
+  - DISB_PROCESS
+  - DISB_REPORT_EXPORT
+  - DISB_REPORT_VIEW
+  - DISB_TAG
+  - DISB_UPLOAD
+  - DISB_VIEW
+  - OPS_REPORT_VIEW
+  - OPS_VIEW
+  - REPORT_VIEW
+  - TAX_VIEW
+  - WORK_VIEW
+- code: DISB_APPROVER
+  name: Disbursement Approver
+  active: true
+  permissions:
+  - ATTACHMENT_MANAGE
+  - ATTACHMENT_VIEW
+  - CLIENT_VIEW
+  - DASHBOARD_VIEW
+  - DISB_APPROVE
+  - DISB_EOD
+  - DISB_FUNDING_APPROVE
+  - DISB_PAYEE_AUTHORIZE
+  - DISB_PAYEE_VIEW_FULL
+  - DISB_REPORT_EXPORT
+  - DISB_REPORT_VIEW
+  - DISB_VIEW
+  - MASTER_MAINTAIN
+  - MASTER_VIEW
+  - OPS_REPORT_VIEW
+  - OPS_VIEW
+  - REPORT_VIEW
+  - WORK_VIEW
+- code: DISB_TL
+  name: Disbursement Team Leader
+  active: true
+  permissions:
+  - ATTACHMENT_MANAGE
+  - ATTACHMENT_VIEW
+  - BULK_PROCESS
+  - CLIENT_VIEW
+  - DASHBOARD_VIEW
+  - DISB_EOD
+  - DISB_FUNDING_REQUEST
+  - DISB_FUNDING_VERIFY
+  - DISB_PAYEE_MAINTAIN
+  - DISB_PAYEE_VIEW_FULL
+  - DISB_PROCESS
+  - DISB_REPORT_EXPORT
+  - DISB_REPORT_VIEW
+  - DISB_REVIEW
+  - DISB_STATUS_APPROVE
+  - DISB_TAG
+  - DISB_UPLOAD
+  - DISB_VIEW
+  - OPS_REPORT_VIEW
+  - OPS_VIEW
+  - REPORT_VIEW
+  - TAX_VIEW
+  - WORK_VIEW
+- code: EB_AO
+  name: Marketing Account Officer (Employee Benefits)
+  active: true
+  permissions:
+  - ACCOUNT_MAINTAIN
+  - ACCOUNT_VIEW
+  - ATTACHMENT_MANAGE
+  - ATTACHMENT_VIEW
+  - BULK_PROCESS
+  - CLIENT_MAINTAIN
+  - CLIENT_VIEW
+  - EB_MARKET
+  - EB_REPORT_VIEW
+  - EB_VIEW
+  - REPORT_VIEW
+  - WORK_VIEW
+- code: EB_COLLECTION
+  name: Collection (Employee Benefits)
+  active: true
+  permissions:
+  - ACCOUNT_VIEW
+  - ATTACHMENT_VIEW
+  - CLIENT_VIEW
+  - CLX_VIEW
+  - CLX_WORK
+  - EB_COLLECT
+  - EB_REPORT_VIEW
+  - EB_VIEW
+  - REPORT_VIEW
+  - WORK_VIEW
+- code: EB_MANAGEMENT
+  name: BDOI Management (EB threshold approver)
+  active: true
+  permissions:
+  - ACCOUNT_VIEW
+  - ATTACHMENT_VIEW
+  - CLIENT_VIEW
+  - EB_REPORT_VIEW
+  - EB_THRESHOLD_APPROVE
+  - EB_VIEW
+  - REPORT_VIEW
+  - WORK_VIEW
+- code: EB_PROCESSOR
+  name: Processing (Employee Benefits)
+  active: true
+  permissions:
+  - ACCOUNT_MAINTAIN
+  - ACCOUNT_PROCESS
+  - ACCOUNT_VIEW
+  - ATTACHMENT_MANAGE
+  - ATTACHMENT_VIEW
+  - BILLING_MANAGE
+  - BOOKING_PROCESS
+  - BULK_PROCESS
+  - CLIENT_VIEW
+  - CLX_VIEW
+  - CLX_WORK
+  - EB_PROCESS
+  - EB_REPORT_VIEW
+  - EB_VIEW
+  - EPOLICY_MANAGE
+  - OPS_VIEW
+  - PLACEMENT_MANAGE
+  - QUOTE_VIEW
+  - REPORT_VIEW
+  - RNW_ACCEPT
+  - RNW_INSURER
+  - RNW_PACKAGE_REMAP
+  - RNW_PROCESS
+  - RNW_RA_GENERATE
+  - RNW_RA_SEND
+  - RNW_REPORT_VIEW
+  - RNW_UPLOAD
+  - RNW_VIEW
+  - WORK_VIEW
+- code: EB_PROC_SUPERVISOR
+  name: Processing Supervisor (Employee Benefits)
+  active: true
+  permissions:
+  - ACCOUNT_MAINTAIN
+  - ACCOUNT_PROCESS
+  - ACCOUNT_VIEW
+  - ATTACHMENT_MANAGE
+  - ATTACHMENT_VIEW
+  - BILLING_MANAGE
+  - BOOKING_PROCESS
+  - BULK_PROCESS
+  - CLIENT_VIEW
+  - CLX_VIEW
+  - CLX_WORK
+  - EB_PROCESS
+  - EB_REPORT_VIEW
+  - EB_VIEW
+  - EPOLICY_MANAGE
+  - OPS_VIEW
+  - PLACEMENT_MANAGE
+  - QUOTE_VIEW
+  - REPORT_VIEW
+  - RNW_ACCEPT
+  - RNW_INSURER
+  - RNW_PACKAGE_REMAP
+  - RNW_PROCESS
+  - RNW_RA_GENERATE
+  - RNW_RA_SEND
+  - RNW_REPORT_VIEW
+  - RNW_UPLOAD
+  - RNW_VIEW
+  - WORK_ASSIGN
+  - WORK_VIEW
+- code: EB_TL
+  name: Marketing Team Lead / Unit Head (Employee Benefits)
+  active: true
+  permissions:
+  - ACCOUNT_VIEW
+  - ATTACHMENT_VIEW
+  - CLIENT_VIEW
+  - EB_COMPARATIVE_APPROVE
+  - EB_REPORT_VIEW
+  - EB_VIEW
+  - REPORT_VIEW
+  - WORK_ASSIGN
+  - WORK_VIEW
+- code: EPOLICY_SENDER
+  name: E-policy Sender
+  active: true
+  permissions:
+  - ACCOUNT_VIEW
+  - ATTACHMENT_VIEW
+  - CLIENT_VIEW
+  - EPOLICY_SEND
+  - REPORT_VIEW
+  - WORK_VIEW
+- code: FIN_ADMIN
+  name: Finance Administrator
+  active: true
+  permissions:
+  - ACCOUNTING_RULE_MANAGE
+  - ALERT_VIEW
+  - ATTACHMENT_MANAGE
+  - ATTACHMENT_VIEW
+  - BUDGET_MANAGE
+  - DASHBOARD_VIEW
+  - EMPLOYEE_MAINTAIN
+  - JOURNAL_VIEW
+  - MASTER_MAINTAIN
+  - MASTER_VIEW
+  - MODULE_SWITCH_MANAGE
+  - PERIOD_MANAGE
+  - REPORT_FINANCIAL
+  - REPORT_VIEW
+  - TAX_MANAGE
+  - TAX_VIEW
+- code: FIN_MANAGER
+  name: Finance Manager
+  active: true
+  permissions:
+  - ACCOUNT_VIEW
+  - ALERT_MANAGE
+  - ALERT_VIEW
+  - ASSET_MANAGE
+  - ATTACHMENT_MANAGE
+  - ATTACHMENT_VIEW
+  - AUDIT_VIEW
+  - BUDGET_MANAGE
+  - CLIENT_VIEW
+  - DASHBOARD_VIEW
+  - INVESTMENT_MANAGE
+  - JOURNAL_AUTHORIZE
+  - JOURNAL_REVERSE
+  - JOURNAL_VIEW
+  - MASTER_AUTHORIZE
+  - MASTER_VIEW
+  - OPS_REPORT_EXPORT
+  - OPS_REPORT_VIEW
+  - OPS_VIEW
+  - PERIOD_END_RUN
+  - PERIOD_MANAGE
+  - QUOTE_VIEW
+  - RECEIPT_PAYMENT_AUTHORIZE
+  - RECONCILIATION_MANAGE
+  - REPORT_FINANCIAL
+  - REPORT_VIEW
+  - SYSTEM_MONITOR
+  - TAX_MANAGE
+  - TAX_VIEW
+  - WORK_VIEW
+  - YEAR_END_CLOSE
+- code: FRBS_HEAD
+  name: FRBS GL Team Head / Section Head
+  active: true
+  permissions:
+  - ATTACHMENT_VIEW
+  - DASHBOARD_VIEW
+  - FRBS_REPORT_EXPORT
+  - FRBS_REPORT_VIEW
+  - GL_CLOSE_SCHEDULE
+  - JOURNAL_ASSIGN
+  - JOURNAL_AUTHORIZE
+  - JOURNAL_REVERSE
+  - JOURNAL_VIEW
+  - MASTER_AUTHORIZE
+  - MASTER_VIEW
+  - PERIOD_END_RUN
+  - PERIOD_MANAGE
+  - REPORT_FINANCIAL
+  - REPORT_VIEW
+  - REVALUATION_RATE_MAINTAIN
+  - SERVICE_FEE_APPROVE
+  - TAX_VIEW
+  - WORK_VIEW
+- code: FRBS_PROCESSOR
+  name: FRBS GL Officer (Processor)
+  active: true
+  permissions:
+  - ATTACHMENT_VIEW
+  - DASHBOARD_VIEW
+  - FRBS_REPORT_EXPORT
+  - FRBS_REPORT_VIEW
+  - JOURNAL_CREATE
+  - JOURNAL_VIEW
+  - MASTER_VIEW
+  - REPORT_FINANCIAL
+  - REPORT_VIEW
+  - SERVICE_FEE_MANAGE
+  - SERVICE_FEE_TAG
+  - TAX_VIEW
+  - WORK_VIEW
+- code: FRBS_TL
+  name: FRBS GL Team Lead
+  active: true
+  permissions:
+  - ATTACHMENT_VIEW
+  - COA_UPLOAD
+  - DASHBOARD_VIEW
+  - FRBS_REPORT_EXPORT
+  - FRBS_REPORT_VIEW
+  - GL_CLOSE_SCHEDULE
+  - JOURNAL_ASSIGN
+  - JOURNAL_AUTHORIZE
+  - JOURNAL_CREATE
+  - JOURNAL_VIEW
+  - MASTER_MAINTAIN
+  - MASTER_VIEW
+  - PERIOD_END_RUN
+  - PERIOD_MANAGE
+  - REPORT_FINANCIAL
+  - REPORT_VIEW
+  - SERVICE_FEE_APPROVE
+  - SERVICE_FEE_MANAGE
+  - SERVICE_FEE_TAG
+  - TAX_VIEW
+  - WORK_VIEW
+- code: HR_APPROVER
+  name: Human Resources Approver
+  active: true
+  permissions:
+  - ATTACHMENT_VIEW
+  - DASHBOARD_VIEW
+  - PRQ_HR_APPROVE
+  - PRQ_VIEW
+  - REPORT_VIEW
+  - WORK_VIEW
+- code: INFOSEC_OFFICER
+  name: Information Security Officer
+  active: true
+  permissions:
+  - AUDIT_VIEW
+  - FILE_QUARANTINE_VIEW
+  - MFA_RESET_APPROVE
+  - MODULE_SWITCH_APPROVE
+  - REPORT_VIEW
+  - SECURITY_PARAMETER_APPROVE
+  - UAM_REPORT_VIEW
+  - UAM_SOD_AUTHORIZE
+- code: LAMD
+  name: LAMD (loan status validation)
+  active: true
+  permissions:
+  - BULK_PROCESS
+  - RNW_LAMD_UPLOAD
+  - RNW_VALIDATE
+  - RNW_VIEW
+- code: LEGACY_ACCESS_REVIEWER
+  name: Legacy Access Log Reviewer
+  active: true
+  permissions:
+  - LEGACY_ACCESS_LOG_VIEW
+  - REPORT_VIEW
+- code: LEGACY_INQUIRY
+  name: Legacy Inquiry (Audit / Compliance)
+  active: true
+  permissions:
+  - ATTACHMENT_VIEW
+  - LEGACY_INQUIRY_EXPORT
+  - LEGACY_INQUIRY_VIEW
+- code: MANCOM
+  name: Management Committee
+  active: true
+  permissions:
+  - ATTACHMENT_MANAGE
+  - ATTACHMENT_VIEW
+  - CLIENT_VIEW
+  - PKG_MANCOM_SIGNOFF
+  - PRODUCT_VIEW
+  - REPORT_VIEW
+  - WORK_VIEW
+- code: MBS
+  name: Marketing Business Services and System Support
+  active: true
+  permissions:
+  - ATTACHMENT_MANAGE
+  - ATTACHMENT_VIEW
+  - CLIENT_VIEW
+  - INCENTIVE_CRITERIA_MAINTAIN
+  - MASTER_VIEW
+  - PKG_REPORT_VIEW
+  - PRODUCT_ARCHIVE_VIEW
+  - PRODUCT_MAINTAIN
+  - PRODUCT_VIEW
+  - REPORT_VIEW
+  - WORK_VIEW
+- code: MIGRATION_GONOGO
+  name: Go / No-Go Board
+  active: true
+  permissions:
+  - MIG_GONOGO_DECIDE
+  - MIG_VIEW
+  - REPORT_VIEW
+- code: MIGRATION_OPERATOR
+  name: Migration Operator
+  active: true
+  permissions:
+  - MIG_INTAKE
+  - MIG_LOAD_RUN
+  - MIG_VIEW
+  - REPORT_VIEW
+- code: MIGRATION_RECON_APPROVER
+  name: Migration Reconciliation Approver
+  active: true
+  permissions:
+  - ATTACHMENT_VIEW
+  - MIG_RECON_SIGNOFF
+  - MIG_ROLLBACK_APPROVE
+  - MIG_TRUEUP_APPROVE
+  - MIG_VIEW
+  - REPORT_VIEW
+- code: MKT_AO
+  name: Marketing Account Officer
+  active: true
+  permissions:
+  - ACCOUNT_MAINTAIN
+  - ACCOUNT_VIEW
+  - ATTACHMENT_MANAGE
+  - ATTACHMENT_VIEW
+  - BCL_REPORT_VIEW
+  - BULK_PROCESS
+  - CLIENT_MAINTAIN
+  - CLIENT_VIEW
+  - CLX_ESCALATE
+  - CLX_EXPORT
+  - CLX_REPORT_VIEW
+  - CLX_UNAPPLIED_WORK
+  - CLX_VIEW
+  - CLX_WORK
+  - OPS_VIEW
+  - PKG_REQUEST
+  - PRODUCT_VIEW
+  - PROPOSAL_REQUEST
+  - PRQ_CREATE
+  - PRQ_VIEW
+  - QUOTE_MAINTAIN
+  - QUOTE_VIEW
+  - REPORT_VIEW
+  - RNW_ACCEPT
+  - RNW_ASSIGN
+  - RNW_DISPOSE
+  - RNW_EXPORT
+  - RNW_RA_GENERATE
+  - RNW_RA_SEND
+  - RNW_REPORT_VIEW
+  - RNW_VIEW
+  - SBM_MAINTAIN
+  - SBM_VIEW
+  - TOR_PREPARE
+  - WORK_VIEW
+- code: MKT_COLLECTION
+  name: Marketing Collection (HO / branches)
+  active: true
+  permissions:
+  - ACCOUNT_VIEW
+  - ADJ_REQUEST
+  - ATTACHMENT_MANAGE
+  - ATTACHMENT_VIEW
+  - BULK_PROCESS
+  - CLIENT_VIEW
+  - CLX_BILLING
+  - CLX_BULK_UPDATE
+  - CLX_ESCALATE
+  - CLX_EXPORT
+  - CLX_REPORT_VIEW
+  - CLX_UNAPPLIED_WORK
+  - CLX_VIEW
+  - CLX_WORK
+  - CWT_TAG
+  - HOLD_REQUEST
+  - OPS_REPORT_VIEW
+  - OPS_VIEW
+  - REPORT_VIEW
+  - SPECIAL_REMIT_REQUEST
+  - WORK_VIEW
+- code: MKT_HANDLER
+  name: Marketing Handler
+  active: true
+  permissions:
+  - ACCOUNT_VIEW
+  - ATTACHMENT_VIEW
+  - CLIENT_VIEW
+  - CLX_BULK_UPDATE
+  - CLX_ESCALATE
+  - CLX_EXPORT
+  - CLX_REPORT_VIEW
+  - CLX_UNAPPLIED_WORK
+  - CLX_VIEW
+  - CLX_WORK
+  - OPS_VIEW
+  - REPORT_VIEW
+  - WORK_VIEW
+- code: MKT_SECTION_HEAD
+  name: Marketing Section Head (Corporate / Retail)
+  active: true
+  permissions:
+  - ACCOUNT_VIEW
+  - ATTACHMENT_VIEW
+  - CLIENT_VIEW
+  - CLX_ASSIGN
+  - CLX_AUDIT_VIEW
+  - CLX_BILLING
+  - CLX_BULK_UPDATE
+  - CLX_ESCALATE
+  - CLX_ESCALATION_HANDLE
+  - CLX_EXPORT
+  - CLX_REPORT_VIEW
+  - CLX_SETUP
+  - CLX_UNAPPLIED_WORK
+  - CLX_VIEW
+  - CLX_WORK
+  - OPS_VIEW
+  - REPORT_VIEW
+  - WORK_VIEW
+- code: MKT_TL
+  name: Marketing Team Leader / Head (approver)
+  active: true
+  permissions:
+  - ACCOUNT_MAINTAIN
+  - ACCOUNT_VIEW
+  - ADJ_REQUEST
+  - ATTACHMENT_MANAGE
+  - ATTACHMENT_VIEW
+  - BCL_REPORT_EXPORT
+  - BCL_REPORT_VIEW
+  - BULK_PROCESS
+  - CLIENT_APPROVE
+  - CLIENT_MAINTAIN
+  - CLIENT_VIEW
+  - CLX_ASSIGN
+  - CLX_BILLING
+  - CLX_BULK_UPDATE
+  - CLX_ESCALATE
+  - CLX_ESCALATION_HANDLE
+  - CLX_EXPORT
+  - CLX_REPORT_VIEW
+  - CLX_UNAPPLIED_WORK
+  - CLX_VIEW
+  - CLX_WORK
+  - CWT_TAG
+  - HOLD_APPROVE
+  - HOLD_REQUEST
+  - IAAF_APPROVE
+  - OPS_REPORT_VIEW
+  - OPS_VIEW
+  - PKG_REPORT_VIEW
+  - PKG_REQUEST
+  - PKG_REQUEST_APPROVE
+  - PRODUCT_VIEW
+  - PROPOSAL_APPROVE
+  - PROPOSAL_REQUEST
+  - PRQ_ASSIGN
+  - PRQ_REVIEW
+  - PRQ_VIEW
+  - QUOTE_APPROVE
+  - QUOTE_MAINTAIN
+  - QUOTE_VIEW
+  - REPORT_VIEW
+  - RNW_ACCEPT
+  - RNW_ASSIGN
+  - RNW_DISPOSE
+  - RNW_EXPORT
+  - RNW_EXTRACT
+  - RNW_OVERRIDE
+  - RNW_RA_GENERATE
+  - RNW_RA_SEND
+  - RNW_REPORT_VIEW
+  - RNW_REVIEW
+  - RNW_VIEW
+  - SBM_RULE_APPROVE
+  - SBM_VIEW
+  - SPECIAL_REMIT_REQUEST
+  - WORK_ASSIGN
+  - WORK_VIEW
+- code: NB_APPROVER
+  name: Approver (requests, workload)
+  active: true
+  permissions:
+  - ACCESS_APPROVE
+  - ACCOUNT_VIEW
+  - ATTACHMENT_VIEW
+  - CLIENT_VIEW
+  - MASTER_AUTHORIZE
+  - MASTER_VIEW
+  - PRODUCT_AUTHORIZE
+  - PRODUCT_VIEW
+  - QUOTE_APPROVE
+  - QUOTE_VIEW
+  - REPORT_VIEW
+  - UAM_VIEW
+  - WORK_ASSIGN
+  - WORK_VIEW
+- code: PROCESSING_TL
+  name: Processing Team Leader
+  active: true
+  permissions:
+  - ACCOUNT_MAINTAIN
+  - ACCOUNT_PROCESS
+  - ACCOUNT_VIEW
+  - ATTACHMENT_MANAGE
+  - ATTACHMENT_VIEW
+  - BILLING_MANAGE
+  - BOOKING_PROCESS
+  - BULK_PROCESS
+  - CLIENT_VIEW
+  - EPOLICY_MANAGE
+  - OPS_VIEW
+  - PLACEMENT_MANAGE
+  - QUOTE_VIEW
+  - REPORT_VIEW
+  - RNW_ACCEPT
+  - RNW_EXPORT
+  - RNW_EXTRACT
+  - RNW_INSURER
+  - RNW_PACKAGE_REMAP
+  - RNW_PROCESS
+  - RNW_PROCESS_ASSIGN
+  - RNW_RA_GENERATE
+  - RNW_RA_SEND
+  - RNW_REPORT_VIEW
+  - RNW_UPLOAD
+  - RNW_VIEW
+  - WORK_ASSIGN
+  - WORK_VIEW
+- code: PROCESSOR
+  name: Processing
+  active: true
+  permissions:
+  - ACCOUNT_MAINTAIN
+  - ACCOUNT_PROCESS
+  - ACCOUNT_VIEW
+  - ATTACHMENT_MANAGE
+  - ATTACHMENT_VIEW
+  - BILLING_MANAGE
+  - BOOKING_PROCESS
+  - BULK_PROCESS
+  - CLIENT_VIEW
+  - CLX_VIEW
+  - CLX_WORK
+  - EPOLICY_MANAGE
+  - OPS_VIEW
+  - PLACEMENT_MANAGE
+  - QUOTE_VIEW
+  - REPORT_VIEW
+  - RNW_ACCEPT
+  - RNW_INSURER
+  - RNW_PACKAGE_REMAP
+  - RNW_PROCESS
+  - RNW_RA_GENERATE
+  - RNW_RA_SEND
+  - RNW_REPORT_VIEW
+  - RNW_UPLOAD
+  - RNW_VIEW
+  - SBM_VIEW
+  - WORK_VIEW
+- code: PRQ_APPROVER
+  name: Marketing Refund / Cash Advance Approver
+  active: true
+  permissions:
+  - ATTACHMENT_MANAGE
+  - ATTACHMENT_VIEW
+  - CLIENT_VIEW
+  - DASHBOARD_VIEW
+  - OPS_REPORT_VIEW
+  - OPS_VIEW
+  - PRQ_APPROVE
+  - PRQ_VIEW
+  - REPORT_VIEW
+  - WORK_VIEW
+- code: PRQ_PROCESSOR
+  name: Marketing Refund / Cash Advance Processor
+  active: true
+  permissions:
+  - ATTACHMENT_MANAGE
+  - ATTACHMENT_VIEW
+  - CLIENT_VIEW
+  - DASHBOARD_VIEW
+  - OPS_REPORT_VIEW
+  - OPS_VIEW
+  - PRQ_CREATE
+  - PRQ_VIEW
+  - REPORT_VIEW
+  - WORK_VIEW
+- code: PRQ_REVIEWER
+  name: Marketing Refund / Cash Advance Reviewer
+  active: true
+  permissions:
+  - ATTACHMENT_MANAGE
+  - ATTACHMENT_VIEW
+  - CLIENT_VIEW
+  - DASHBOARD_VIEW
+  - OPS_REPORT_VIEW
+  - OPS_VIEW
+  - PRQ_ASSIGN
+  - PRQ_CREATE
+  - PRQ_REVIEW
+  - PRQ_VIEW
+  - REPORT_VIEW
+  - WORK_VIEW
+- code: READ_ONLY
+  name: Read-Only User
+  active: true
+  permissions:
+  - ATTACHMENT_VIEW
+  - DASHBOARD_VIEW
+  - JOURNAL_VIEW
+  - MASTER_VIEW
+  - REPORT_VIEW
+- code: RECON_HANDLER
+  name: Production Reconciliation Handler
+  active: true
+  permissions:
+  - ACCOUNT_VIEW
+  - ATTACHMENT_MANAGE
+  - ATTACHMENT_VIEW
+  - BULK_PROCESS
+  - CLIENT_VIEW
+  - OPS_REPORT_EXPORT
+  - OPS_REPORT_VIEW
+  - OPS_VIEW
+  - RECON_PROCESS
+  - RECON_SEND
+  - REPORT_VIEW
+  - WORK_VIEW
+- code: RECORDS_HOLD_APPROVER
+  name: Records Legal Hold Approver (DOA)
+  active: true
+  permissions:
+  - FILE_LEGAL_HOLD_APPROVE
+- code: RECORDS_HOLD_OFFICER
+  name: Records Legal Hold Officer (DOA)
+  active: true
+  permissions:
+  - FILE_LEGAL_HOLD_REQUEST
+- code: REMIT_PROCESSOR
+  name: Remittance Processor
+  active: true
+  permissions:
+  - ACCOUNT_VIEW
+  - ATTACHMENT_MANAGE
+  - ATTACHMENT_VIEW
+  - BULK_PROCESS
+  - CLIENT_VIEW
+  - OPS_REPORT_EXPORT
+  - OPS_REPORT_VIEW
+  - OPS_VIEW
+  - REMIT_EXCLUDE
+  - REMIT_EXTRACT
+  - REMIT_OR_UPLOAD
+  - REMIT_PROCESS
+  - REPORT_VIEW
+  - WORK_VIEW
+- code: REMIT_TL
+  name: Remittance Team Leader / Head
+  active: true
+  permissions:
+  - ACCOUNT_VIEW
+  - ATTACHMENT_MANAGE
+  - ATTACHMENT_VIEW
+  - BULK_PROCESS
+  - CLIENT_VIEW
+  - OPS_REPORT_EXPORT
+  - OPS_REPORT_VIEW
+  - OPS_VIEW
+  - REMIT_APPROVE
+  - REMIT_EXCLUDE
+  - REMIT_EXTRACT
+  - REMIT_OR_UPLOAD
+  - REMIT_PROCESS
+  - REPORT_VIEW
+  - SPECIAL_REMIT_APPROVE
+  - WORK_ASSIGN
+  - WORK_VIEW
+- code: SBM_CHECKER
+  name: Submitted Checker
+  active: true
+  permissions:
+  - ATTACHMENT_VIEW
+  - IAAF_APPROVE
+  - REPORT_VIEW
+  - SBM_REPORT_VIEW
+  - SBM_VIEW
+  - WORK_VIEW
+- code: SBM_HANDLER
+  name: Submitted Handler
+  active: true
+  permissions:
+  - ATTACHMENT_MANAGE
+  - ATTACHMENT_VIEW
+  - BULK_PROCESS
+  - IAAF_PREPARE
+  - REPORT_VIEW
+  - SBM_EXPORT
+  - SBM_INTAKE
+  - SBM_MAINTAIN
+  - SBM_REPORT_EXPORT
+  - SBM_REPORT_VIEW
+  - SBM_VIEW
+  - TOR_PREPARE
+  - WORK_VIEW
+- code: SBM_POLICY_REVIEWER
+  name: Policy Review Officer
+  active: true
+  permissions:
+  - ATTACHMENT_MANAGE
+  - ATTACHMENT_VIEW
+  - IAAF_PREPARE
+  - REPORT_VIEW
+  - SBM_MAINTAIN
+  - SBM_REPORT_VIEW
+  - SBM_VIEW
+  - WORK_VIEW
+- code: SBM_RULE_ADMIN
+  name: Submitted Policies Rule Administrator
+  active: true
+  permissions:
+  - SBM_RULE_MAINTAIN
+- code: SBM_SANITATION
+  name: Sanitation Handler
+  active: true
+  permissions:
+  - ATTACHMENT_MANAGE
+  - ATTACHMENT_VIEW
+  - BULK_PROCESS
+  - REPORT_VIEW
+  - SBM_EXPORT
+  - SBM_INTAKE
+  - SBM_LETTER_SEND
+  - SBM_MAINTAIN
+  - SBM_PROCESS
+  - SBM_REPORT_EXPORT
+  - SBM_REPORT_VIEW
+  - SBM_VIEW
+  - WORK_VIEW
+- code: SBM_TL
+  name: Submitted Policies Team Lead
+  active: true
+  permissions:
+  - ATTACHMENT_MANAGE
+  - ATTACHMENT_VIEW
+  - BULK_PROCESS
+  - IAAF_APPROVE
+  - IAAF_PREPARE
+  - REPORT_VIEW
+  - SBM_EXPORT
+  - SBM_HANDLING_FEE
+  - SBM_INTAKE
+  - SBM_LETTER_SEND
+  - SBM_MAINTAIN
+  - SBM_MIGRATE
+  - SBM_PROCESS
+  - SBM_REPORT_EXPORT
+  - SBM_REPORT_VIEW
+  - SBM_RULE_MAINTAIN
+  - SBM_VIEW
+  - TOR_PREPARE
+  - WORK_ASSIGN
+  - WORK_VIEW
+- code: SBM_UPP_HANDLER
+  name: Handling Fee Handler (Unapplied Payments)
+  active: true
+  permissions:
+  - SBM_HANDLING_FEE
+  - SBM_VIEW
+- code: SCR_APPROVER
+  name: Screening Approver / Unit Head
+  active: true
+  permissions:
+  - CLIENT_VIEW
+  - SCR_CASE_APPROVE
+  - SCR_CASE_ASSIGN
+  - SCR_VIEW
+  - WORK_VIEW
+- code: SCR_INVESTIGATOR
+  name: Screening Investigator
+  active: true
+  permissions:
+  - ACCOUNT_VIEW
+  - ATTACHMENT_MANAGE
+  - ATTACHMENT_VIEW
+  - CLIENT_VIEW
+  - SCR_INVESTIGATE
+  - SCR_RISK_TAG
+  - SCR_VIEW
+  - WORK_VIEW
+- code: SYSADMIN
+  name: System Administrator
+  active: true
+  permissions:
+  - ACCESS_REQUEST
+  - ACSL_VIEW
+  - ALERT_MANAGE
+  - ALERT_VIEW
+  - ATTACHMENT_VIEW
+  - AUDIT_VIEW
+  - BCL_REPORT_VIEW
+  - BCL_VIEW
+  - BULK_PROCESS
+  - CLX_AUDIT_VIEW
+  - CLX_REPORT_VIEW
+  - CLX_SETUP
+  - CLX_VIEW
+  - DASHBOARD_VIEW
+  - DISB_VIEW
+  - EB_REPORT_VIEW
+  - EB_VIEW
+  - FLOWIN_MANAGE
+  - FRBS_REPORT_VIEW
+  - LOV_MANAGE
+  - MASTER_VIEW
+  - MESSAGE_VIEW
+  - MFA_RESET
+  - MIG_VIEW
+  - MODULE_SWITCH_MANAGE
+  - OPS_REPORT_VIEW
+  - OPS_VIEW
+  - PRODUCT_VIEW
+  - PRQ_VIEW
+  - REPORT_VIEW
+  - ROLE_MANAGE
+  - SCR_VIEW
+  - SYSTEM_MONITOR
+  - SYSTEM_PARAMETER_MANAGE
+  - UAM_CANCEL
+  - UAM_CORRECT
+  - UAM_DEACTIVATE
+  - UAM_ENROLL
+  - UAM_GROUP_REQUEST
+  - UAM_MODIFY
+  - UAM_REACTIVATE
+  - UAM_REPORT_VIEW
+  - UAM_VIEW
+  - USER_MANAGE
+  - WORK_VIEW
+- code: TOP_MANAGEMENT_APPROVER
+  name: Top Management Approver
+  active: true
+  permissions:
+  - CASH_UPP_INCOME_APPROVE
+- code: TSU
+  name: Technical Support Unit
+  active: true
+  permissions:
+  - ACCOUNT_VIEW
+  - ATTACHMENT_MANAGE
+  - ATTACHMENT_VIEW
+  - CLIENT_VIEW
+  - PKG_ADVISORY
+  - PKG_NEGOTIATE
+  - PKG_REQUEST
+  - PRODUCT_VIEW
+  - QUOTE_VIEW
+  - REPORT_VIEW
+  - TOR_APPROVE
+  - TSU_APPROVE
+  - TSU_PROCESS
+  - WORK_VIEW
+- code: TSU_HEAD
+  name: TSU Team Head / Head
+  active: true
+  permissions:
+  - ATTACHMENT_MANAGE
+  - ATTACHMENT_VIEW
+  - CLIENT_VIEW
+  - PKG_REPORT_VIEW
+  - PKG_TSU_APPROVE
+  - PRODUCT_ARCHIVE_VIEW
+  - PRODUCT_VALIDATE
+  - PRODUCT_VIEW
+  - REPORT_VIEW
+  - WORK_ASSIGN
+  - WORK_VIEW
+- code: TSU_TL
+  name: TSU Team Lead
+  active: true
+  permissions:
+  - ATTACHMENT_MANAGE
+  - ATTACHMENT_VIEW
+  - CLIENT_VIEW
+  - PKG_ADVISORY
+  - PKG_NEGOTIATE
+  - PKG_QS_APPROVE
+  - PKG_REPORT_VIEW
+  - PKG_TSU_RECOMMEND
+  - PRODUCT_VIEW
+  - REPORT_VIEW
+  - WORK_ASSIGN
+  - WORK_VIEW
+- code: UAM_APPROVER
+  name: User Access Approver
+  active: true
+  permissions:
+  - ACCESS_APPROVE
+  - REPORT_VIEW
+  - UAM_REPORT_VIEW
+  - UAM_VIEW
+- code: UAM_REQUESTOR
+  name: User Access Requestor
+  active: true
+  permissions:
+  - BULK_PROCESS
+  - UAM_CANCEL
+  - UAM_CORRECT
+  - UAM_DEACTIVATE
+  - UAM_ENROLL
+  - UAM_MODIFY
+  - UAM_REACTIVATE
+  - UAM_VIEW
+- code: UAM_SECOND_APPROVER
+  name: User Access Second Approver
+  active: true
+  permissions:
+  - UAM_SECOND_APPROVE
+  - UAM_VIEW
+- code: UNAPPLIED_HANDLER
+  name: Unapplied Payment Handler
+  active: true
+  permissions:
+  - ACCOUNT_VIEW
+  - ATTACHMENT_VIEW
+  - CLIENT_VIEW
+  - CLX_REPORT_VIEW
+  - CLX_UNAPPLIED_WORK
+  - CLX_VIEW
+  - OPS_VIEW
+  - REPORT_VIEW
+  - WORK_VIEW
+- code: UNIT_COMPLIANCE_COORD
+  name: Unit Compliance Coordinator
+  active: true
+  permissions:
+  - CLIENT_VIEW
+  - REPORT_VIEW
+  - SCR_CASE_ASSIGN
+  - SCR_REPORT_VIEW
+  - SCR_VIEW
+  - WORK_VIEW

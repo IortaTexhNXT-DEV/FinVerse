@@ -2,7 +2,10 @@ package com.iortatechnxt.brokerverse.renewal.alert;
 
 import com.iortatechnxt.brokerverse.alert.domain.AlertFacts;
 import com.iortatechnxt.brokerverse.alert.service.AlertCheck;
+import com.iortatechnxt.brokerverse.catalog.domain.InsurerProfile;
+import com.iortatechnxt.brokerverse.catalog.domain.InsurerProfileRepository;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.renewal.domain.Bucket;
 import com.iortatechnxt.brokerverse.renewal.domain.BucketHistory;
 import com.iortatechnxt.brokerverse.renewal.domain.BucketHistoryRepository;
@@ -48,6 +51,7 @@ public class RenewalAlertCheck implements AlertCheck {
   private final BucketHistoryRepository buckets;
   private final InsurerBatchRepository batches;
   private final RenewalParameters parameters;
+  private final InsurerProfileRepository insurers;
 
   /**
    * Creates the check.
@@ -56,16 +60,19 @@ public class RenewalAlertCheck implements AlertCheck {
    * @param buckets bucket history
    * @param batches insurer batches
    * @param parameters thresholds
+   * @param insurers insurers (the name in the alert)
    */
   public RenewalAlertCheck(
       RenewalCandidateRepository candidates,
       BucketHistoryRepository buckets,
       InsurerBatchRepository batches,
-      RenewalParameters parameters) {
+      RenewalParameters parameters,
+      InsurerProfileRepository insurers) {
     this.candidates = candidates;
     this.buckets = buckets;
     this.batches = batches;
     this.parameters = parameters;
+    this.insurers = insurers;
   }
 
   @Override
@@ -87,11 +94,11 @@ public class RenewalAlertCheck implements AlertCheck {
                   RenewalCodes.ENTITY_BATCH,
                   b.getBatchNo(),
                   "Insurer "
-                      + b.getInsurerCode()
+                      + insurerName(b)
                       + " has not answered batch "
                       + b.getBatchNo()
                       + " due "
-                      + b.getReplyDue(),
+                      + DisplayFormat.date(b.getReplyDue()),
                   null,
                   RenewalCodes.ALERT_INSURER_OVERDUE + ":" + b.getBatchNo())));
     }
@@ -135,10 +142,20 @@ public class RenewalAlertCheck implements AlertCheck {
                 RenewalCodes.ALERT_EXCEPTION_AGEING,
                 facts(
                     c,
-                    "Renewal " + c.getRenewalRef() + " is in the Exception bucket since " + since,
+                    "Renewal "
+                        + c.getRenewalRef()
+                        + " is an Exception since "
+                        + DisplayFormat.date(since),
                     RenewalCodes.ALERT_EXCEPTION_AGEING + ":" + c.getRenewalRef() + ":" + since)));
       }
     }
+  }
+
+  private String insurerName(InsurerBatch b) {
+    return insurers
+        .findByCompanyIdAndPartyCode(b.getCompanyId(), b.getInsurerCode())
+        .map(InsurerProfile::getName)
+        .orElse(b.getInsurerCode());
   }
 
   private static AlertFacts facts(RenewalCandidate c, String message, String key) {

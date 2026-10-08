@@ -52,14 +52,19 @@ public class ClaimsCheck implements RenewalCheck {
     ClaimExperience experience = service.summary(c.getExpiringArn(), c.getPolicyYear());
     if (experience.openCount() > 0) {
       return Verdict.fail(
-          experience.openCount() + " open claim(s) on the expiring term",
+          count(experience.openCount(), "open claim") + " on the expiring term",
           "claims " + experience.claimCount() + ", open " + experience.openCount());
     }
     return experience.withClaim()
         ? new Verdict(
             CheckOutcome.PASS,
-            experience.claimCount() + " claim(s), none open",
+            count(experience.claimCount(), "claim") + ", none open",
             "claims " + experience.claimCount() + ", open 0")
         : Verdict.pass("No claim on the expiring term");
+  }
+
+  /** "1 open claim", "2 open claims". */
+  private static String count(int n, String noun) {
+    return n + " " + noun + (n == 1 ? "" : "s");
   }
 }

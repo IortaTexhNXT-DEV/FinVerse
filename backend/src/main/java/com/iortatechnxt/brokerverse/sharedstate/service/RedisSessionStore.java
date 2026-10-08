@@ -14,7 +14,7 @@ import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Component;
 
 /**
- * Session state on Redis: the token denylist ({@code <prefix>session:revoked:<jti>} with a time to
+ * Session state on Valkey: the token denylist ({@code <prefix>session:revoked:<jti>} with a time to
  * live equal to the token's remaining life) and the shared counters ({@code <prefix>counter:<key>},
  * {@code INCR} and, on the first increment, {@code PEXPIRE} in one script so a counter never lives
  * without its window).

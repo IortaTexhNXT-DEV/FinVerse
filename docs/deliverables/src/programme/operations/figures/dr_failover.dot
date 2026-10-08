@@ -1,0 +1,17 @@
+// Regional failover: decision and recovery steps against the 4-hour RTO.
+digraph dr_failover {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.3, ranksep=0.2, bgcolor="white", pad=0.15];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.2, fontname="Arial",
+         fontsize=11, fontcolor="@NEAR_BLACK", width=6.4, height=0.5, margin="0.12,0.04", fillcolor="@WHITE"];
+  edge  [color="@HEADER_BLUE", arrowsize=0.8, penwidth=1.2];
+  s0 [label=<<b>T0</b> - outage detected (monitoring or Cloud Operations); P1 opened; bridge opened>, fillcolor="@DANGER_BG", color="@DANGER"];
+  s1 [label=<<b>T0 + 30 min</b> - assessment: AZ fault, service fault or region loss; AWS status checked>];
+  s2 [label=<<b>T0 + 60 min</b> - DR decision by the DR authority (Head, BDOI IT with the BIBS Product Owner)>, fillcolor="@AMBER_BG"];
+  s3 [label=<<b>T0 + 1 h 30</b> - promote the RDS replica; S3 replicas confirmed; secrets and keys checked>, fillcolor="@BG_BLUE"];
+  s4 [label=<<b>T0 + 1 h 45 to 2 h 15</b> - create Valkey and MSK; scale the backend in DR, jobs held>, fillcolor="@BG_BLUE"];
+  s5 [label=<<b>T0 + 2 h 30</b> - switch the host name; Apigee target switched by BDOI API team>, fillcolor="@BG_BLUE"];
+  s6 [label=<<b>T0 + 2 h 45</b> - technical smoke test; outbox resend; mail queue released>, fillcolor="@BG_BLUE"];
+  s7 [label=<<b>T0 + 3 h</b> - business verification by key users (receipts, remittance, booking, GL)>, fillcolor="@BG_BLUE"];
+  s8 [label=<<b>T0 + 3 h 15</b> - service open in DR; jobs released; re-keying of the last minutes (RTO 4 h)>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  s0 -> s1 -> s2 -> s3 -> s4 -> s5 -> s6 -> s7 -> s8;
+}

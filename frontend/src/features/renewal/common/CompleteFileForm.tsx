@@ -8,6 +8,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
+import { countOf } from '@/utils/format';
 
 /**
  * Declares a committed disposition file complete for an expiry range and unit (BRD 3.004.4): the
@@ -27,7 +28,7 @@ export function CompleteFileForm({ job }: Readonly<{ job: BulkJob }>) {
         expiryTo: to,
         unit: unit.trim(),
       }),
-    onSuccess: (r) => toast.success(`${String(r.tagged)} renewal(s) tagged not in the file`),
+    onSuccess: (r) => toast.success(`${countOf(r.tagged, 'renewal')} tagged not in the file`),
   });
   return (
     <div className="stack">

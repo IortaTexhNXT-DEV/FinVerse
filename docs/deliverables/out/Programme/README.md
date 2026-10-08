@@ -19,15 +19,61 @@ sign-off per BRD"). Each document is kept once, in its latest version.
 | Document | BRD | Kind | Version | File |
 |---|---|---|---|---|
 | BIBS BDOI FeatureList vs OOTB and Best Practice v1.0 | - | Feature_List | - | [`Feature_List/BIBS_BDOI_FeatureList_vs_OOTB_and_Best_Practice_v1.0.xlsx`](Feature_List/BIBS_BDOI_FeatureList_vs_OOTB_and_Best_Practice_v1.0.xlsx) |
-| Core Replacement | BRD-00 | FRS | 1.0 | [`FRS/BIBS_FRS_BRD-00_Core_Replacement_v1.0.docx`](FRS/BIBS_FRS_BRD-00_Core_Replacement_v1.0.docx) |
+| Core Replacement | BRD-00 | FRS | 1.1 | [`FRS/BIBS_FRS_BRD-00_Core_Replacement_v1.1.docx`](FRS/BIBS_FRS_BRD-00_Core_Replacement_v1.1.docx) |
+| Change Management and Training Framework | BRD-00 | Adoption | 1.0 | [`Adoption/BIBS_Adoption_BRD-00_Change_Management_and_Training_Framework_v1.0.docx`](Adoption/BIBS_Adoption_BRD-00_Change_Management_and_Training_Framework_v1.0.docx) |
+| Knowledge Transfer Plan | BRD-00 | Adoption | 1.0 | [`Adoption/BIBS_Adoption_BRD-00_Knowledge_Transfer_Plan_v1.0.docx`](Adoption/BIBS_Adoption_BRD-00_Knowledge_Transfer_Plan_v1.0.docx) |
+| QRG Account Officer | BRD-00 | Adoption | 1.0 | [`Adoption/BIBS_Adoption_BRD-00_QRG_Account_Officer_v1.0.docx`](Adoption/BIBS_Adoption_BRD-00_QRG_Account_Officer_v1.0.docx) |
+| QRG Accountant FRBS | BRD-00 | Adoption | 1.0 | [`Adoption/BIBS_Adoption_BRD-00_QRG_Accountant_FRBS_v1.0.docx`](Adoption/BIBS_Adoption_BRD-00_QRG_Accountant_FRBS_v1.0.docx) |
+| QRG Auditor | BRD-00 | Adoption | 1.0 | [`Adoption/BIBS_Adoption_BRD-00_QRG_Auditor_v1.0.docx`](Adoption/BIBS_Adoption_BRD-00_QRG_Auditor_v1.0.docx) |
+| QRG Business Administrator | BRD-00 | Adoption | 1.0 | [`Adoption/BIBS_Adoption_BRD-00_QRG_Business_Administrator_v1.0.docx`](Adoption/BIBS_Adoption_BRD-00_QRG_Business_Administrator_v1.0.docx) |
+| QRG Cashier | BRD-00 | Adoption | 1.0 | [`Adoption/BIBS_Adoption_BRD-00_QRG_Cashier_v1.0.docx`](Adoption/BIBS_Adoption_BRD-00_QRG_Cashier_v1.0.docx) |
+| QRG Claims Officer | BRD-00 | Adoption | 1.0 | [`Adoption/BIBS_Adoption_BRD-00_QRG_Claims_Officer_v1.0.docx`](Adoption/BIBS_Adoption_BRD-00_QRG_Claims_Officer_v1.0.docx) |
+| QRG Collection Handler | BRD-00 | Adoption | 1.0 | [`Adoption/BIBS_Adoption_BRD-00_QRG_Collection_Handler_v1.0.docx`](Adoption/BIBS_Adoption_BRD-00_QRG_Collection_Handler_v1.0.docx) |
+| QRG Disbursement | BRD-00 | Adoption | 1.0 | [`Adoption/BIBS_Adoption_BRD-00_QRG_Disbursement_v1.0.docx`](Adoption/BIBS_Adoption_BRD-00_QRG_Disbursement_v1.0.docx) |
+| QRG Marketing Team Lead | BRD-00 | Adoption | 1.0 | [`Adoption/BIBS_Adoption_BRD-00_QRG_Marketing_Team_Lead_v1.0.docx`](Adoption/BIBS_Adoption_BRD-00_QRG_Marketing_Team_Lead_v1.0.docx) |
+| QRG Processing | BRD-00 | Adoption | 1.0 | [`Adoption/BIBS_Adoption_BRD-00_QRG_Processing_v1.0.docx`](Adoption/BIBS_Adoption_BRD-00_QRG_Processing_v1.0.docx) |
+| QRG Renewal Officer | BRD-00 | Adoption | 1.0 | [`Adoption/BIBS_Adoption_BRD-00_QRG_Renewal_Officer_v1.0.docx`](Adoption/BIBS_Adoption_BRD-00_QRG_Renewal_Officer_v1.0.docx) |
+| QRG System Security Administrator | BRD-00 | Adoption | 1.0 | [`Adoption/BIBS_Adoption_BRD-00_QRG_System_Security_Administrator_v1.0.docx`](Adoption/BIBS_Adoption_BRD-00_QRG_System_Security_Administrator_v1.0.docx) |
+| QRG TSU | BRD-00 | Adoption | 1.0 | [`Adoption/BIBS_Adoption_BRD-00_QRG_TSU_v1.0.docx`](Adoption/BIBS_Adoption_BRD-00_QRG_TSU_v1.0.docx) |
+| User Manual Framework | BRD-00 | Adoption | 1.0 | [`Adoption/BIBS_Adoption_BRD-00_User_Manual_Framework_v1.0.docx`](Adoption/BIBS_Adoption_BRD-00_User_Manual_Framework_v1.0.docx) |
 | Drops Integrations Infrastructure | BRD-00 | Alignment pack | 1.0 | [`Alignment/BIBS_Alignment_BRD-00_Drops_Integrations_Infrastructure_v1.0.docx`](Alignment/BIBS_Alignment_BRD-00_Drops_Integrations_Infrastructure_v1.0.docx) |
 | Integration Inventory | BRD-00 | Alignment pack | 1.0 | [`Alignment/BIBS_Alignment_BRD-00_Integration_Inventory_v1.0.xlsx`](Alignment/BIBS_Alignment_BRD-00_Integration_Inventory_v1.0.xlsx) |
+| ADR Log | BRD-00 | Architecture | 1.0 | [`Architecture/BIBS_Architecture_BRD-00_ADR_Log_v1.0.xlsx`](Architecture/BIBS_Architecture_BRD-00_ADR_Log_v1.0.xlsx) |
+| API Catalogue | BRD-00 | Architecture | 1.0 | [`Architecture/BIBS_Architecture_BRD-00_API_Catalogue_v1.0.xlsx`](Architecture/BIBS_Architecture_BRD-00_API_Catalogue_v1.0.xlsx) |
+| API Specification | BRD-00 | Architecture | 1.0 | [`Architecture/BIBS_Architecture_BRD-00_API_Specification_v1.0.docx`](Architecture/BIBS_Architecture_BRD-00_API_Specification_v1.0.docx) |
+| Architecture Decision Records | BRD-00 | Architecture | 1.0 | [`Architecture/BIBS_Architecture_BRD-00_Architecture_Decision_Records_v1.0.docx`](Architecture/BIBS_Architecture_BRD-00_Architecture_Decision_Records_v1.0.docx) |
+| Data Architecture | BRD-00 | Data | 1.0 | [`Data/BIBS_Architecture_BRD-00_Data_Architecture_v1.0.docx`](Data/BIBS_Architecture_BRD-00_Data_Architecture_v1.0.docx) |
+| Deployment Architecture | BRD-00 | Architecture | 1.0 | [`Architecture/BIBS_Architecture_BRD-00_Deployment_Architecture_v1.0.docx`](Architecture/BIBS_Architecture_BRD-00_Deployment_Architecture_v1.0.docx) |
+| Infrastructure Architecture | BRD-00 | Architecture | 1.0 | [`Architecture/BIBS_Architecture_BRD-00_Infrastructure_Architecture_v1.0.docx`](Architecture/BIBS_Architecture_BRD-00_Infrastructure_Architecture_v1.0.docx) |
+| Integration Architecture | BRD-00 | Architecture | 1.0 | [`Architecture/BIBS_Architecture_BRD-00_Integration_Architecture_v1.0.docx`](Architecture/BIBS_Architecture_BRD-00_Integration_Architecture_v1.0.docx) |
+| Security Architecture | BRD-00 | Security | 1.0 | [`Security/BIBS_Architecture_BRD-00_Security_Architecture_v1.0.docx`](Security/BIBS_Architecture_BRD-00_Security_Architecture_v1.0.docx) |
+| Solution Architecture | BRD-00 | Architecture | 1.0 | [`Architecture/BIBS_Architecture_BRD-00_Solution_Architecture_v1.0.docx`](Architecture/BIBS_Architecture_BRD-00_Solution_Architecture_v1.0.docx) |
 | Change Management | BRD-00 | Change register summary (Word) | 1.0 | [`Change_Management/BIBS_Change_Register_BRD-00_Change_Management_Summary_v1.0.docx`](Change_Management/BIBS_Change_Register_BRD-00_Change_Management_Summary_v1.0.docx) |
 | Change Management | BRD-00 | Change register workbook (Excel) | 1.0 | [`Change_Management/BIBS_Change_Register_BRD-00_Change_Management_v1.0.xlsx`](Change_Management/BIBS_Change_Register_BRD-00_Change_Management_v1.0.xlsx) |
+| Disaster Recovery and Business Continuity Plan | BRD-00 | Operations | 1.0 | [`Operations/BIBS_Continuity_BRD-00_Disaster_Recovery_and_Business_Continuity_Plan_v1.0.docx`](Operations/BIBS_Continuity_BRD-00_Disaster_Recovery_and_Business_Continuity_Plan_v1.0.docx) |
+| Data Dictionary | BRD-00 | Data | 1.0 | [`Data/BIBS_Data_BRD-00_Data_Dictionary_v1.0.xlsx`](Data/BIBS_Data_BRD-00_Data_Dictionary_v1.0.xlsx) |
+| Entity Relationship Diagrams | BRD-00 | Data | 1.0 | [`Data/BIBS_Data_BRD-00_Entity_Relationship_Diagrams_v1.0.docx`](Data/BIBS_Data_BRD-00_Entity_Relationship_Diagrams_v1.0.docx) |
 | Business Process AsIs Envisioned BestPractice | BRD-00 | Deck | 1.0 | [`Decks/BIBS_Deck_BRD-00_Business_Process_AsIs_Envisioned_BestPractice_v1.0.pptx`](Decks/BIBS_Deck_BRD-00_Business_Process_AsIs_Envisioned_BestPractice_v1.0.pptx) |
+| Delivery Methodology | BRD-00 | Delivery | 1.0 | [`Delivery/BIBS_Delivery_BRD-00_Delivery_Methodology_v1.0.docx`](Delivery/BIBS_Delivery_BRD-00_Delivery_Methodology_v1.0.docx) |
+| Project Plan Summary | BRD-00 | Delivery | 1.0 | [`Delivery/BIBS_Delivery_BRD-00_Project_Plan_Summary_v1.0.docx`](Delivery/BIBS_Delivery_BRD-00_Project_Plan_Summary_v1.0.docx) |
+| Project Plan | BRD-00 | Delivery | 1.0 | [`Delivery/BIBS_Delivery_BRD-00_Project_Plan_v1.0.xlsx`](Delivery/BIBS_Delivery_BRD-00_Project_Plan_v1.0.xlsx) |
+| RACI Matrix | BRD-00 | Delivery | 1.0 | [`Delivery/BIBS_Delivery_BRD-00_RACI_Matrix_v1.0.xlsx`](Delivery/BIBS_Delivery_BRD-00_RACI_Matrix_v1.0.xlsx) |
+| Risk Register RAID Log | BRD-00 | Delivery | 1.0 | [`Delivery/BIBS_Delivery_BRD-00_Risk_Register_RAID_Log_v1.0.xlsx`](Delivery/BIBS_Delivery_BRD-00_Risk_Register_RAID_Log_v1.0.xlsx) |
+| Cutover and Data Migration Plan | BRD-00 | Go_Live | 1.0 | [`Go_Live/BIBS_GoLive_BRD-00_Cutover_and_Data_Migration_Plan_v1.0.docx`](Go_Live/BIBS_GoLive_BRD-00_Cutover_and_Data_Migration_Plan_v1.0.docx) |
+| Hypercare Warranty and Sign-off Plan | BRD-00 | Go_Live | 1.0 | [`Go_Live/BIBS_Hypercare_BRD-00_Hypercare_Warranty_and_Sign-off_Plan_v1.0.docx`](Go_Live/BIBS_Hypercare_BRD-00_Hypercare_Warranty_and_Sign-off_Plan_v1.0.docx) |
 | BIBS IER Application Architecture | BRD-00 | IER diagram (PNG) | - | [`Alignment/IER/BIBS_IER_Application_Architecture.png`](Alignment/IER/BIBS_IER_Application_Architecture.png) |
 | BIBS IER Infrastructure Deployment | BRD-00 | IER diagram (PNG) | - | [`Alignment/IER/BIBS_IER_Infrastructure_Deployment.png`](Alignment/IER/BIBS_IER_Infrastructure_Deployment.png) |
+| Non Functional Requirements Register | BRD-00 | Requirements | 1.0 | [`Requirements/BIBS_NFR_BRD-00_Non_Functional_Requirements_Register_v1.0.xlsx`](Requirements/BIBS_NFR_BRD-00_Non_Functional_Requirements_Register_v1.0.xlsx) |
+| Non Functional Requirements | BRD-00 | Requirements | 1.0 | [`Requirements/BIBS_NFR_BRD-00_Non_Functional_Requirements_v1.0.docx`](Requirements/BIBS_NFR_BRD-00_Non_Functional_Requirements_v1.0.docx) |
+| Runbook and Observability | BRD-00 | Operations | 1.0 | [`Operations/BIBS_Operations_BRD-00_Runbook_and_Observability_v1.0.docx`](Operations/BIBS_Operations_BRD-00_Runbook_and_Observability_v1.0.docx) |
+| Requirements Traceability Matrix | BRD-00 | Requirements | 1.0 | [`Requirements/BIBS_RTM_BRD-00_Requirements_Traceability_Matrix_v1.0.xlsx`](Requirements/BIBS_RTM_BRD-00_Requirements_Traceability_Matrix_v1.0.xlsx) |
+| Production Readiness Checklist | BRD-00 | Operations | 1.0 | [`Operations/BIBS_Readiness_BRD-00_Production_Readiness_Checklist_v1.0.xlsx`](Operations/BIBS_Readiness_BRD-00_Production_Readiness_Checklist_v1.0.xlsx) |
 | Discrepancies and Clarifications | BRD-00 | Register | 1.2 | [`Registers/BIBS_Register_BRD-00_Discrepancies_and_Clarifications_v1.2.xlsx`](Registers/BIBS_Register_BRD-00_Discrepancies_and_Clarifications_v1.2.xlsx) |
+| System Requirements Specification | BRD-00 | Requirements | 1.0 | [`Requirements/BIBS_SRS_BRD-00_System_Requirements_Specification_v1.0.docx`](Requirements/BIBS_SRS_BRD-00_System_Requirements_Specification_v1.0.docx) |
+| ASVS L2 Control Mapping | BRD-00 | Security | 1.0 | [`Security/BIBS_Security_BRD-00_ASVS_L2_Control_Mapping_v1.0.xlsx`](Security/BIBS_Security_BRD-00_ASVS_L2_Control_Mapping_v1.0.xlsx) |
+| Support Model and Support Guide | BRD-00 | Operations | 1.0 | [`Operations/BIBS_Support_BRD-00_Support_Model_and_Support_Guide_v1.0.docx`](Operations/BIBS_Support_BRD-00_Support_Model_and_Support_Guide_v1.0.docx) |
+| Test Strategy | BRD-00 | Quality | 1.0 | [`Quality/BIBS_TestStrategy_BRD-00_Test_Strategy_v1.0.docx`](Quality/BIBS_TestStrategy_BRD-00_Test_Strategy_v1.0.docx) |
+| Walkthrough Users and Sign-in | BRD-00 | UAT | 1.0 | [`UAT/BIBS_UAT_BRD-00_Walkthrough_Users_and_Sign-in_v1.0.xlsx`](UAT/BIBS_UAT_BRD-00_Walkthrough_Users_and_Sign-in_v1.0.xlsx) |
 
 ## Still to write
 

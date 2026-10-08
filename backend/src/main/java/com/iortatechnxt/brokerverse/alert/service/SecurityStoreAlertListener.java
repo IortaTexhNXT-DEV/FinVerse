@@ -44,7 +44,7 @@ public class SecurityStoreAlertListener {
                 + event.store()
                 + "' cannot be read; "
                 + event.consequence()
-                + ". Check Redis and the database.",
+                + ". Check Valkey and the database.",
             null,
             CODE + ":" + event.store()));
   }

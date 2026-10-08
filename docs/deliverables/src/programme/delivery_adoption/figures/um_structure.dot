@@ -1,0 +1,19 @@
+// User Manual Framework: the user documentation set.
+digraph um_structure {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.22, ranksep=0.3, bgcolor="white", pad=0.1, newrank=true];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", fillcolor="@WHITE", fontname="Arial", fontsize=10.5,
+         fontcolor="@NEAR_BLACK", width=2.6, height=0.6, margin="0.08,0.04"];
+  edge  [color="@HEADER_BLUE", penwidth=1.1, arrowsize=0.7];
+  fw [label=<<b>User Manual Framework</b><br/>structure, standards, upkeep>, fillcolor="@BG_BLUE", width=3.4];
+  um [label=<<b>BIBS User Manual</b><br/>getting started; one part per persona;<br/>module reference; messages>, width=3.4];
+  qrg [label=<<b>Quick-reference guides</b><br/>13 personas, 2-6 pages each>];
+  hc [label=<<b>Help Center</b><br/>in-app help per screen>];
+  frs [label=<<b>FRS walkthroughs</b><br/>step-by-step with screenshots>];
+  tm [label=<<b>Training material</b><br/>learning paths, exercises>];
+  rn [label=<<b>Release notes per persona</b><br/>what changed>];
+  fw -> um; fw -> qrg; fw -> rn;
+  frs -> um [style=dashed]; frs -> qrg [style=dashed]; um -> tm [style=dashed]; qrg -> tm [style=dashed];
+  hc -> qrg [style=dashed, dir=back];
+  { rank=same; um; qrg; rn; }
+  { rank=same; frs; hc; tm; }
+}

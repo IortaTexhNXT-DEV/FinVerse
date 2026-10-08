@@ -14,7 +14,6 @@ import java.util.List;
  * @param netResultYtd net result year to date
  * @param cashPosition cash and bank balances
  * @param receivables insurance receivables
- * @param technicalReserves technical reserves
  * @param totalAssets total assets
  * @param totalEquity total equity including current year result
  * @param pendingJournals journals pending authorization
@@ -31,7 +30,6 @@ public record DashboardSummary(
     BigDecimal netResultYtd,
     BigDecimal cashPosition,
     BigDecimal receivables,
-    BigDecimal technicalReserves,
     BigDecimal totalAssets,
     BigDecimal totalEquity,
     long pendingJournals,

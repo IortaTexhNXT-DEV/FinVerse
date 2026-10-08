@@ -20,7 +20,6 @@ export interface DashboardSummary {
   netResultYtd: number;
   cashPosition: number;
   receivables: number;
-  technicalReserves: number;
   totalAssets: number;
   totalEquity: number;
   pendingJournals: number;
@@ -28,13 +27,6 @@ export interface DashboardSummary {
   monthly: MonthlyPoint[];
   incomeComposition: CompositionItem[];
   expenseComposition: CompositionItem[];
-}
-
-/** A fiscal-year month against the same month one year earlier. */
-export interface TrendPoint {
-  month: string;
-  current: number;
-  priorYear: number;
 }
 
 export interface MonthlyValue {
@@ -45,24 +37,6 @@ export interface MonthlyValue {
 export interface LabelledAmount {
   label: string;
   amount: number;
-}
-
-export interface PremiumWidgetData {
-  asOf: string;
-  yearStart: string;
-  monthToDate: number;
-  monthToDatePriorYear: number;
-  yearToDate: number;
-  yearToDatePriorYear: number;
-  monthly: TrendPoint[];
-}
-
-export interface ClaimsWidgetData {
-  asOf: string;
-  paidMonthToDate: number;
-  paidYearToDate: number;
-  outstanding: number;
-  monthly: TrendPoint[];
 }
 
 export interface CollectionsWidgetData {
@@ -121,10 +95,6 @@ function widget<T>(name: string, companyId: number, branchId?: number): Promise<
 export const dashboardApi = {
   summary: (companyId: number, branchId?: number) =>
     api.get<DashboardSummary>(`/dashboard${toQuery({ companyId, branchId })}`),
-  premium: (companyId: number, branchId?: number) =>
-    widget<PremiumWidgetData>('premium', companyId, branchId),
-  claims: (companyId: number, branchId?: number) =>
-    widget<ClaimsWidgetData>('claims', companyId, branchId),
   collections: (companyId: number, branchId?: number) =>
     widget<CollectionsWidgetData>('collections', companyId, branchId),
   payables: (companyId: number, branchId?: number) =>

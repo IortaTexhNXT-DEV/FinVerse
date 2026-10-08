@@ -8,6 +8,7 @@ import com.iortatechnxt.brokerverse.nbadmin.domain.RolePermissionChange;
 import com.iortatechnxt.brokerverse.security.domain.Permission;
 import com.iortatechnxt.brokerverse.security.domain.Role;
 import com.iortatechnxt.brokerverse.security.domain.RoleRepository;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
@@ -27,7 +28,7 @@ public class RolePermissionChangeValidator {
   private static final int MAX_LIST_LENGTH = 2000;
 
   private static final Set<String> KNOWN =
-      Permission.offered().stream().map(Enum::name).collect(Collectors.toUnmodifiableSet());
+      Arrays.stream(Permission.values()).map(Enum::name).collect(Collectors.toUnmodifiableSet());
 
   private final RoleRepository roles;
 

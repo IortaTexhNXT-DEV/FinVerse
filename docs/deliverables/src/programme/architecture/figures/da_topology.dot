@@ -1,0 +1,22 @@
+// Kubernetes topology of production across three availability zones (Deployment Architecture, chapter 4).
+digraph da_topology {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.3, ranksep=0.45, bgcolor="white", pad=0.2, newrank=true,
+         label=<<font point-size="16" color="@HEADER_BLUE"><b>Production cluster topology (Amazon EKS, ap-southeast-1)</b></font><br/><font point-size="10" color="@MUTED">Pods spread across zones (max skew 1). Pre-Prod has the same layout; DEV, SIT and UAT use fewer nodes and Single-AZ data services.</font>>,
+         labelloc=t, labeljust=l];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.0, fontname="Arial", fontsize=11,
+         fontcolor="@NEAR_BLACK", margin="0.14,0.08", fillcolor="@WHITE", width=2.6];
+  edge  [color="@HEADER_BLUE", arrowsize=0.6, penwidth=1.0];
+
+  lb [label=<<b>Internal Application Load Balancer + AWS WAF</b><br/><font point-size="10">Gateway bibs - nodes in all three zones</font>>, fillcolor="@DIRTY_WHITE", width=6];
+  za [label=<<b>Zone a - worker node(s) m5.2xlarge</b><br/><br/><font point-size="10">bibs-web 1 or more<br/>bibs-frontend 1<br/>bibs-jobs 1<br/>bibs-integration 1</font>>, fillcolor="@BG_BLUE"];
+  zb [label=<<b>Zone b - worker node(s) m5.2xlarge</b><br/><br/><font point-size="10">bibs-web 1 or more<br/>bibs-frontend 1<br/>bibs-jobs 1<br/>bibs-integration 1</font>>, fillcolor="@BG_BLUE"];
+  zc [label=<<b>Zone c - worker node(s) m5.2xlarge</b><br/><br/><font point-size="10">bibs-web 1 or more<br/>cluster add-ons: gateway controller,<br/>cert-manager, metrics server, autoscaler,<br/>Dynatrace, CrowdStrike, CoreDNS</font>>, fillcolor="@BG_BLUE"];
+  da [label=<<b>Data subnet zone a</b><br/><font point-size="10">RDS primary<br/>MSK broker 1<br/>Valkey primary</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  db [label=<<b>Data subnet zone b</b><br/><font point-size="10">RDS standby (synchronous)<br/>MSK broker 2<br/>Valkey replica</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  dc [label=<<b>Data subnet zone c</b><br/><font point-size="10">MSK broker 3</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  lb -> za; lb -> zb; lb -> zc;
+  za -> da; zb -> db; zc -> dc;
+  da -> db [constraint=false, color="@SUCCESS", label=" replication", fontsize=9, fontcolor="@MUTED"];
+  {rank=same; za; zb; zc}
+  {rank=same; da; db; dc}
+}

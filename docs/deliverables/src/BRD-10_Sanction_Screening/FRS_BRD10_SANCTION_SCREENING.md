@@ -8,11 +8,11 @@ doc_code: FRS
 brd: BRD-10
 name: Sanction Screening
 doc_id: BIBS-FRS-BRD-10
-version: "1.0"
-date: 25 September 2026
+version: "1.1"
+date: 08 October 2026
 status: Issued for BDOI review
 header_title: FRS BRD-10 Sanction Screening
-output: FRS/BIBS_FRS_BRD-10_Sanction_Screening_v1.0.docx
+output: FRS/BIBS_FRS_BRD-10_Sanction_Screening_v1.1.docx
 control:
   - version: "0.9"
     date: 18 Sep 2026
@@ -26,6 +26,12 @@ control:
     reviewer: iorta TechNXT Project Manager
     approver: BDOI Product Owner (pending)
     change: First issue for BDOI review; specified from the BRD; aligned with the cross-BRD decisions
+  - version: "1.1"
+    date: 08 Oct 2026
+    author: iorta TechNXT Business Analysis
+    reviewer: iorta TechNXT Project Manager
+    approver: BDOI Product Owner (pending)
+    change: "Re-based on Sanction Screening and Risk Profiling BRD v04172026 (the same document as the BRD of v1.0; page references unchanged); report columns of the Report List of 13-May-2026 applied and the Name Matching Fall-out report added (SCR-NAME-MATCH-FALLOUT); review findings applied (CLR-SS-03 decided before sign-off); user-story view and storyboard index added."
 distribution:
   - {name: "Product Owner, Marketing Business System", role: Approver, organisation: BDOI, purpose: Review and sign-off}
   - {name: Chief Compliance Officer and Compliance unit, role: Business owner, organisation: BDOI, purpose: Review of all FRs}
@@ -74,12 +80,13 @@ The scope is the screening of BDOI clients against sanctions and politically exp
 <!-- table: widths=1.2,11.4,3.6 caption="Reference documents" -->
 | Ref. | Document | Version / date |
 |---|---|---|
-| R1 | Sanction Screening and Risk Profiling Business Requirements Document, 29 pages | Prepared 10-Apr-2026; approved 16 to 17-Apr-2026 |
+| R1 | Sanction Screening and Risk Profiling Business Requirements Document, 29 pages (file Sanction Screening and Risk Profiling BRD v04172026, received again on 08-Oct-2026 unchanged) | Prepared 10-Apr-2026; approved 16 to 17-Apr-2026 |
 | R2 | BDOI Sanction Screening and Risk Profiling (BRD-10) requirements baseline | current |
 | R4 | Cross-BRD decisions and answered questions | current |
 | R5 | BDO UX guidelines (brand, screen patterns) | current |
 | R6 | BRD-1 New Business requirements baseline (client master, KYC review, shared platform) | current |
-| R7 | FRS BRD-11 User Access Maintenance (roles, sign-in, session policy) | v1.0 |
+| R7 | FRS BRD-11 User Access Maintenance (roles, sign-in, session policy) | current version of the business sign-off pack |
+| R8 | BDOI - CoreModernization Report List 05132026, Sanction Screening and RPR reports (p.22-23) | 13-May-2026 |
 
 Page references in this document ("p.14") are pages of the BRD-10 PDF (R1). The requirement table is printed as images on pp.10-21; it was read from the page images.
 
@@ -1794,7 +1801,7 @@ brd: [SNSRP-901 (p.20); p.6-8 reports produced]
 actor: Compliance Officer; UCC; Operations Lead; Auditor
 priority: Must have
 screens: Reports (category Compliance)
-description: Seven reports cover high-risk clients, case status, SLA breaches, sanctioned names, PEP clients, ingestion errors and the STR register (layouts in section 6). The common filters are date, marketing unit / Unit Head, disposition and case status. Every report exports to CSV, XLSX and PDF.
+description: Eight reports cover high-risk clients, case status, SLA breaches, sanctioned names, PEP clients, ingestion errors, the names that matched without opening a case (Name Matching Fall-out) and the STR register (layouts in section 6). The columns of the high-risk clients, case status, name matching fall-out and audit reports follow the Report List of 13-May-2026 (R8), which adds the Account Officer in charge and the Marketing Business Unit to each. The common filters are date, marketing unit / Unit Head, disposition and case status. Every report exports to CSV, XLSX and PDF.
 preconditions:
   - "The user has SCR_REPORT_VIEW."
 main_flow:
@@ -1802,7 +1809,7 @@ main_flow:
   - BIBS generates the report.
   - The user exports it.
 rules:
-  - [R1, "Report columns are the project's proposal until BDOI confirms them (SQ17).", Configurable, Report definition]
+  - [R1, "Report columns as defined in the Report List of 13-May-2026 for the high-risk clients, case status, name matching fall-out and audit reports; the other reports keep the proposed columns until BDOI confirms them (SQ17).", Configurable, Report definition]
 validations:
   - [Date range invalid, The end date must be on or after the start date, "-"]
 notifications:
@@ -1813,6 +1820,7 @@ acceptance:
   - The case status report filtered by marketing unit and case status lists only those cases.
   - Each report exports to CSV, XLSX and PDF with the same rows.
   - A user without SCR_REPORT_VIEW cannot run the reports.
+  - The Name Matching Fall-out report lists the potential matches below the case threshold with the client, the Account Officer in charge and the Marketing Business Unit.
 ```
 
 ```fr
@@ -1953,10 +1961,11 @@ Configuration versions and list changes do not use the case workflow. They follo
 | SCR-SANCTIONED-NAMES | List of Sanctioned Names | Active entries by source and list type; added and delisted in the period | p.6 |
 | SCR-PEP-CLIENTS | List of Approved PEP Clients | Clients tagged PEP after review | p.7 |
 | SCR-INGEST-ERRORS | Unsuccessful Ingestion Records | Failed records by run and source | SNSRP-202 |
+| SCR-NAME-MATCH-FALLOUT | Name Matching Fall-out | Names that match but do not meet the criteria for case creation | SNSRP-301; Report List p.23 |
 | SCR-STR-REGISTER | STR Register | STRs drafted, approved, extracted and filed, with AMLC reference | SNSRP-705, 706 |
 | SCR-AUDIT-LOG | Screening Audit Log | Screening, configuration, list and case events | p.8; SNSRP-902, 903 |
 
-All reports need SCR_REPORT_VIEW (SCR-AUDIT-LOG needs SCR_AUDIT_VIEW), export to CSV, XLSX and PDF, and print the parameters, the user and the time generated in the header. The columns below are the project's proposal until BDOI confirms the layouts (SQ17).
+All reports need SCR_REPORT_VIEW (SCR-AUDIT-LOG needs SCR_AUDIT_VIEW), export to CSV, XLSX and PDF, and print the parameters, the user and the time generated in the header. The columns of SCR-HIGH-RISK-CLIENTS, SCR-CASE-STATUS, SCR-NAME-MATCH-FALLOUT and SCR-AUDIT-LOG follow the Report List of 13-May-2026 (R8); the other columns are the project's proposal until BDOI confirms them (SQ17). Users are shown by name.
 
 ### High-risk Clients (SCR-HIGH-RISK-CLIENTS)
 
@@ -1965,15 +1974,18 @@ Parameters: As-of Date; Risk Category; Marketing Unit; Unit Head; Client Type. L
 <!-- table: widths=3.6,3,10 caption="SCR-HIGH-RISK-CLIENTS columns" size=8.5 -->
 | Column | Format | Content |
 |---|---|---|
-| Client Code / Name | Text | Client master |
+| Client Code / Name | Text | Client master; with the CIF number |
 | Client Type | Text | Individual or corporate |
+| Case No. / Matching Score | Text / Number | Case of the tagging and its matching score |
 | Risk Category | Text | Category of the last tagging |
 | Risk Rating | Text | KYC_RISK_RATING value |
 | Tags | Text | PEP, WATCHLIST_REVIEW |
 | Tagged On / Source | Date / Text | Date and source (rule or manual) of the last change |
 | Open Case | Text | Case number and stage, or "None" |
-| Active Policy | Text | Yes / No |
-| Marketing Unit / Unit Head | Text | Sales organisation of the client |
+| Active Policy | Text | Yes / No; the report has two parts, with and without active policies (Report List p.22) |
+| Account Officer (in charge) | Text | Name of the AO of the client |
+| Marketing Unit / Unit Head | Text | Marketing Business Unit of the client |
+| Date Last Updated / Updated By | Date / Text | Last change and the name of the user |
 
 ### Case Status Monitoring (SCR-CASE-STATUS)
 
@@ -1983,7 +1995,8 @@ Parameters: Date Range (created); Marketing Unit / Unit Head; Disposition; Case 
 | Column | Format | Content |
 |---|---|---|
 | Case No. | Text | SCR-yyyy-nnnnnn |
-| Client | Text | Name and code |
+| Client | Text | Name, code and CIF number |
+| Matching Score | Number | Score of the match that opened the case |
 | Case Type / Risk Category | Text | - |
 | Stage | Text | Current stage |
 | Assignee | Text | Current assignee |
@@ -1991,8 +2004,10 @@ Parameters: Date Range (created); Marketing Unit / Unit Head; Disposition; Case 
 | Days in Stage | Number | Days since stage entry |
 | Due | Date-time | Stage due time |
 | SLA State | Text | On time, due soon, breached |
-| Disposition | Text | Last disposition |
-| Marketing Unit / Unit Head | Text | - |
+| Disposition | Text | Last disposition and its owner |
+| Account Officer (in charge) | Text | Name of the AO of the client |
+| Marketing Unit / Unit Head | Text | Marketing Business Unit of the client |
+| Date Last Updated | Date | - |
 
 ### SLA Reminders and Breaches (SCR-SLA-BREACHES)
 
@@ -2069,6 +2084,21 @@ Parameters: Date Range; Status. Layout: landscape, sorted by STR number.
 | AMLC Reference / Filed On | Text / Date | - |
 | Prepared By | Text | - |
 
+### Name Matching Fall-out (SCR-NAME-MATCH-FALLOUT)
+
+Parameters: Date Range (screening run); List Source; Marketing Unit / Unit Head. Layout: landscape, sorted by score (descending). One row per potential match that scored at or above the matching threshold but below the case threshold (FR-SS-011 R3), so that Compliance can review the names that did not open a case.
+
+<!-- table: widths=3.6,3,10 caption="SCR-NAME-MATCH-FALLOUT columns (Report List p.23)" size=8.5 -->
+| Column | Format | Content |
+|---|---|---|
+| Reference | Text | Match reference (or case number when the match later joined a case) |
+| Matching Score | Number | Score of the pair, four decimals |
+| Ingest Date of Sanction List | Date | Run date of the list file that holds the entry |
+| Name of Sanctioned Individual / Entity | Text | List entry name and list source |
+| Name of Client / Client ID | Text | Client master |
+| Account Officer (in charge) | Text | Name of the AO of the client |
+| Marketing Business Unit | Text | Marketing unit of the client |
+
 ### Screening Audit Log (SCR-AUDIT-LOG)
 
 Parameters: Date Range; Marketing Unit / Unit Head; Disposition; Status; User. Layout: landscape, sorted by date and time.
@@ -2082,7 +2112,8 @@ Parameters: Date Range; Marketing Unit / Unit Head; Disposition; Status; User. L
 | Event | Text | For example ASSIGNED, APPROVED, ACTIVATED |
 | From / To | Text | Before and after values |
 | Reason / Remarks | Text | - |
-| User | Text | User ID |
+| User | Text | Name of the user |
+| Account Officer (in charge) / Marketing Unit | Text | For case events: AO and Marketing Business Unit of the client |
 
 ## Documents
 
@@ -2234,7 +2265,7 @@ The items below are changed in BIBS without a release. Screening rules are maint
 | SQ14 | Meaning of "Form Type" in the naming convention | FR-SS-052 | OPEN |
 | SQ15 | AML Committee decision rule and voting | FR-SS-064 | OPEN |
 | SQ16 | Designated folder for the STR file | FR-SS-071 | OPEN |
-| SQ17 | Columns of the status monitoring, high-risk and audit reports | FR-SS-090, 092 | OPEN |
+| SQ17 | Columns of the status monitoring, high-risk and audit reports | FR-SS-090, 092 | PARTIAL (Report List of 13-May-2026) |
 | SQ18 | Audit retention - 5 + 5 years or AMLA record keeping | FR-SS-091 | OPEN |
 | SQ19 | Who the 287 investigators are; existing roles; load target | Section 3, 8 | OPEN |
 | SQ20 | Adverse-media screening in scope | Section 1.2 | OPEN |
@@ -2282,7 +2313,7 @@ Every BRD-10 requirement is met by at least one FR. The screen column names the 
 | SNSRP-706 | p.19-20 | FR-SS-071, FR-SS-072 | STR | TC-SS-071.1, 071.2, 071.3, 071.4, 072.1, 072.2 (9 cases) |
 | SNSRP-801 | p.20 | FR-SS-080 | Notifications | TC-SS-080.1, 080.2, 080.3 (3 cases) |
 | SNSRP-802 | p.20 | FR-SS-081 | Notifications | TC-SS-081.1, 081.2 (3 cases) |
-| SNSRP-901 | p.20 | FR-SS-090 | Reports | TC-SS-090.1, 090.2, 090.3 (5 cases) |
+| SNSRP-901 | p.20 | FR-SS-090 | Reports | TC-SS-090.1, 090.2, 090.3, 090.4 (6 cases) |
 | SNSRP-902 | p.21 | FR-SS-091 | Case (Timeline); Audit Trail | TC-SS-091.1, 091.2, 091.3 (3 cases) |
 | SNSRP-903 | p.21 | FR-SS-092 | Reports (SCR-AUDIT-LOG) | TC-SS-092.1, 092.2, 092.3 (4 cases) |
 
@@ -2297,7 +2328,7 @@ The table lists each point where the proposed screen or rule fills a gap the BRD
 |---|---|---|---|---|
 | CLR-SS-01 | Lists screened (SNSRP-201; FR-SS-020, 021) | The AML advisory and NLDS-PEP lists are loaded by file upload (CSV or XLSX) on a schedule; system-to-system feeds and a direct NLDS query are added when BDOI names them. | The lists, formats, frequency and transport are not given (SQ01). | Name the lists, formats, frequency and transport (SQ01). |
 | CLR-SS-02 | Matching thresholds (FR-SS-011, 031) | BIBS starts with seed thresholds per method; Compliance enters the production values before go-live. | The BRD gives no values (SQ02). | Give the thresholds and the fields compared (SQ02). |
-| CLR-SS-03 | Screening does not block business (FR-SS-033) | Screening informs and does not block quotation, account submission, placement or booking; a block is added only if BDOI asks. | The BRD does not say whether an open match blocks business (SQ07). | Choose inform or block (SQ07). |
+| CLR-SS-03 | Screening does not block business (FR-SS-033) | Screening informs and does not block quotation, account submission, placement or booking; a block is added only if BDOI asks. | The BRD does not say whether an open match blocks business (SQ07). The choice changes the New Business journey (FRS BRD-1). | BDOI Compliance chooses inform or block before the sign-off of this FRS and of FRS BRD-1 (SQ07). |
 | CLR-SS-04 | Active policy (SNSRP-303; FR-SS-034) | A client has an active policy when one of the client's accounts is POLICY_ISSUED or BOOKED; only such clients require a KYC review or EDD. | The BRD does not define an active policy (SQ10). | Give the definition of an active policy (SQ10). |
 | CLR-SS-05 | Approver (FR-SS-013) | The Approver is the Unit Head of the client's marketing unit. | The BRD does not name the Approver (SQ04). | Confirm the Approver and the matrix dimensions (SQ04). |
 | CLR-SS-06 | AML Committee (FR-SS-064) | The AML Committee decides by majority of five members. | The decision rule is not given (SQ15). | Give the decision rule (SQ15). |
@@ -2320,3 +2351,81 @@ rows:
   - {name: "", role: "Program Manager, Business Project Services", organisation: BDO Unibank ESG}
   - {name: "", role: Project Manager, organisation: iorta TechNXT}
 ```
+
+# Appendix: User-story view
+
+The BRD writes its requirements as user stories ("As a <persona>, I want / I must ... so that ...") with Given / When / Then acceptance criteria (p.10-21). This appendix gives each of the 37 stories (SNSRP-101 to 903) with the FRs that meet it, their acceptance criteria and the test conditions of the test plan with their number of cases. The BRD wording is kept with tidied grammar; where the BRD names the persona "System", the story names the persona of section 3.1 who needs the result. Acceptance criteria are numbered in the order of the FR (AC1 is the first criterion of the FR). The three process items without a requirement ID are traced in chapter 11.
+
+<!-- table: widths=2.4,7.5,2.3,2.8,3.4 caption="User-story view: BRD requirement, user story, FRs, acceptance criteria and test cases" size=8 -->
+| BRD ID | User story | FR IDs | Acceptance criteria | Test cases |
+|---|---|---|---|---|
+| SNSRP-101 | As a Compliance Officer, I want to configure the name-matching criteria (exact, phonetic and fuzzy thresholds), so that screening quality is controlled. | FR-SS-010, FR-SS-011 | FR-SS-010 AC1-3; FR-SS-011 AC1-2 | TC-SS-010.1 to 010.5, 011.1 to 011.3 (14 cases) |
+| SNSRP-102 | As a Compliance Officer, I want to define the risk-profile categories, so that clients can be risk-tagged automatically. | FR-SS-010, FR-SS-012 | FR-SS-010 AC1-3; FR-SS-012 AC1-2 | TC-SS-010.1 to 010.5, 012.1 to 012.4 (14 cases) |
+| SNSRP-103 | As a Compliance Officer, I want to maintain an approval matrix, so that cases route to the right approvers. | FR-SS-010, FR-SS-013 | FR-SS-010 AC1-3; FR-SS-013 AC1-2 | TC-SS-010.1 to 010.5, 013.1 to 013.4 (16 cases) |
+| SNSRP-104 | As a Compliance Officer, I want to maintain review templates, so that there is a standard format that is followed and consistency across reviewers. | FR-SS-010, FR-SS-016 | FR-SS-010 AC1-3; FR-SS-016 AC1-2 | TC-SS-010.1 to 010.5, 016.1 to 016.3 (14 cases) |
+| SNSRP-105 | As a Compliance Officer, I want to maintain STR (Suspicious Transaction Report) templates, so that STR submissions are consistent, compliant with regulatory requirements and easy to maintain when formats change. | FR-SS-010, FR-SS-017 | FR-SS-010 AC1-3; FR-SS-017 AC1-2 | TC-SS-010.1 to 010.5, 017.1 to 017.3 (13 cases) |
+| SNSRP-106 | As a Compliance Officer, I want to configure a case assignment matrix for different scenarios, so that cases are routed automatically to the correct teams or users. | FR-SS-010, FR-SS-014 | FR-SS-010 AC1-3; FR-SS-014 AC1-2 | TC-SS-010.1 to 010.5, 014.1 to 014.5 (16 cases) |
+| SNSRP-107 | As a Compliance Officer, I want to configure the disposition list of values per case stage, so that only valid dispositions are available at each stage of the case lifecycle. | FR-SS-018 | FR-SS-018 AC1-2 | TC-SS-018.1 to 018.3 (5 cases) |
+| SNSRP-108 | As a Compliance Officer, I want to configure an SLA matrix for each case stage, so that turnaround times are clearly defined, monitored and enforced across the case lifecycle. | FR-SS-010, FR-SS-015, FR-SS-044 | FR-SS-010 AC1-3; FR-SS-015 AC1-2; FR-SS-044 AC1-2 | TC-SS-010.1 to 010.5, 015.1 to 015.3, 044.1 to 044.3 (19 cases) |
+| SNSRP-109 | As a Compliance Officer (Checker), I want to approve or reject a drafted configuration, so that four-eyes control is enforced. | FR-SS-019 | FR-SS-019 AC1-3 | TC-SS-019.1 to 019.4 (5 cases) |
+| SNSRP-201 | As a Compliance Officer, I need BIBS to receive the sanctions and NLDS-PEP lists in real time or on an agreed schedule from their sources, so that screening data stays current. | FR-SS-020, FR-SS-082 | FR-SS-020 AC1-3; FR-SS-082 AC1 | TC-SS-020.1 to 020.5, 082.1 to 082.2 (8 cases) |
+| SNSRP-202 | As a Compliance Officer, I want to know the records that were not ingested successfully, so that the failed records and their source are followed up. | FR-SS-021 | FR-SS-021 AC1-2 | TC-SS-021.1 to 021.4 (6 cases) |
+| SNSRP-203 | As a Compliance Officer, I want to add, update and edit sanctioned names and PEP records manually, so that regulatory updates, internal findings or urgent risk actions are captured accurately. | FR-SS-022, FR-SS-001 | FR-SS-022 AC1-2; FR-SS-001 AC1-3 | TC-SS-022.1 to 022.4, 001.1 to 001.5 (13 cases) |
+| SNSRP-204 | As a Compliance Officer (Checker), I want to review, approve or reject the sanctioned-name and PEP changes submitted by a maker, so that all list updates are governed, validated and auditable. | FR-SS-023 | FR-SS-023 AC1-2 | TC-SS-023.1 to 023.4 (5 cases) |
+| SNSRP-301 | As a Compliance Officer, I need BIBS to match client names against the sanction names using configurable criteria, so that true matches are identified. | FR-SS-031, FR-SS-032 | FR-SS-031 AC1-3; FR-SS-032 AC1-2 | TC-SS-031.1 to 031.3, 032.1 to 032.4 (8 cases) |
+| SNSRP-302 | As an Investigator, I need BIBS to tag the client risk profile automatically by rules, so that the identified risk profiles trigger reviews. | FR-SS-033 | FR-SS-033 AC1-3 | TC-SS-033.1 to 033.5 (6 cases) |
+| SNSRP-303 | As a Unit Compliance (User) Coordinator, I need BIBS to create cases automatically for PEP and high-risk clients, so that reviews begin promptly, and to be notified of the clients without an active policy. | FR-SS-034, FR-SS-030 | FR-SS-034 AC1-3; FR-SS-030 AC1-3 | TC-SS-034.1 to 034.4, 030.1 to 030.5 (11 cases) |
+| SNSRP-304 | As an Investigator, I want to update the risk-profile tagging manually with a justification, so that a validated false positive is corrected with its evidence. | FR-SS-035, FR-SS-032 | FR-SS-035 AC1-3; FR-SS-032 AC1-2 | TC-SS-035.1 to 035.3, 032.1 to 032.4 (9 cases) |
+| SNSRP-401 | As an Investigator, I need BIBS to manage the case status, so that the case lifecycle is controlled and every transition is logged. | FR-SS-040 | FR-SS-040 AC1-2 | TC-SS-040.1 to 040.4 (5 cases) |
+| SNSRP-402 | As an Investigator, I want to view the list of all cases created and open the details of each case, so that I can review, track and manage compliance activities. | FR-SS-041, FR-SS-045 | FR-SS-041 AC1-2; FR-SS-045 AC1-2 | TC-SS-041.1 to 041.4, 045.1 to 045.3 (7 cases) |
+| SNSRP-403 | As a Unit Compliance (User) Coordinator, I want to search for cases using relevant criteria, so that I can quickly locate and review specific cases. | FR-SS-042, FR-SS-001 | FR-SS-042 AC1-2; FR-SS-001 AC1-3 | TC-SS-042.1 to 042.3, 001.1 to 001.5 (10 cases) |
+| SNSRP-404 | As an Investigator, I want to re-assign a case or an approval request to another eligible reviewer or approver, so that cases are handled efficiently in situations such as workload balancing, absence or conflict of interest. | FR-SS-043 | FR-SS-043 AC1-3 | TC-SS-043.1 to 043.4 (6 cases) |
+| SNSRP-405 | As a Unit Compliance (User) Coordinator, I need an SLA timer per stage, so that overdue items are visible and escalated. | FR-SS-044, FR-SS-045 | FR-SS-044 AC1-2; FR-SS-045 AC1-2 | TC-SS-044.1 to 044.3, 045.1 to 045.3 (7 cases) |
+| SNSRP-501 | As an Investigator, I want guided KYC and transaction review templates, so that assessments are consistent. | FR-SS-050 | FR-SS-050 AC1-2 | TC-SS-050.1 to 050.3 (4 cases) |
+| SNSRP-502 | As an Investigator, I want to select a disposition from the given list, so that the case advances. | FR-SS-051 | FR-SS-051 AC1-2 | TC-SS-051.1 to 051.4 (5 cases) |
+| SNSRP-601 | As an Investigator, I want to upload KYC and other supporting documents with their details and the file-naming convention, so that evidence is traceable. | FR-SS-052 | FR-SS-052 AC1-2 | TC-SS-052.1 to 052.3 (5 cases) |
+| SNSRP-602 | As a Compliance Officer, I need BIBS to trigger client matching when a new client is created or during a defined period, so that every client is screened without manual action. | FR-SS-030 | FR-SS-030 AC1-3 | TC-SS-030.1 to 030.5 (7 cases) |
+| SNSRP-701 | As an Approver (Unit Head), I need BIBS to validate the dispositioned cases before approval against the set criteria, so that only valid cases are routed for approval. | FR-SS-060 | FR-SS-060 AC1-2 | TC-SS-060.1 to 060.3 (4 cases) |
+| SNSRP-702 | As an Approver (Unit Head), I want to approve or disapprove recommendations with comments, so that decisions are documented. | FR-SS-061, FR-SS-062 | FR-SS-061 AC1-2; FR-SS-062 AC1 | TC-SS-061.1 to 061.3, 062.1 to 062.3 (7 cases) |
+| SNSRP-703 | As a Compliance Officer, I want to review BU escalations, so that policy adherence is ensured. | FR-SS-063, FR-SS-013, FR-SS-062 | FR-SS-063 AC1-2; FR-SS-013 AC1-2; FR-SS-062 AC1 | TC-SS-063.1 to 063.3, 013.1 to 013.4, 062.1 to 062.3 (15 cases) |
+| SNSRP-704 | As an AML Committee Member, I want to review the cases requiring committee decisions, so that governance is met. | FR-SS-064 | FR-SS-064 AC1-3 | TC-SS-064.1 to 064.5 (6 cases) |
+| SNSRP-705 | As a Compliance Officer, I want STR forms prepopulated from case data, so that filing is efficient. | FR-SS-070 | FR-SS-070 AC1-2 | TC-SS-070.1 to 070.4 (6 cases) |
+| SNSRP-706 | As a Compliance Officer, I want to extract the list of AML Committee-approved STR cases in the prescribed AMLC reporting format, so that they are filed with the AMLC. | FR-SS-071, FR-SS-072 | FR-SS-071 AC1-3; FR-SS-072 AC1 | TC-SS-071.1 to 071.4, 072.1 to 072.2 (9 cases) |
+| SNSRP-801 | As an Investigator, I want notifications for new cases assigned to me, so that I can take timely action. | FR-SS-080 | FR-SS-080 AC1-2 | TC-SS-080.1 to 080.3 (3 cases) |
+| SNSRP-802 | As a Unit Compliance (User) Coordinator, I want SLA and document reminders, so that reviews stay on track. | FR-SS-081 | FR-SS-081 AC1 | TC-SS-081.1 to 081.2 (3 cases) |
+| SNSRP-901 | As a Compliance Officer, I want operational and compliance reports, so that I monitor the screening cases by date, marketing unit, disposition and status. | FR-SS-090 | FR-SS-090 AC1-4 | TC-SS-090.1 to 090.4 (6 cases) |
+| SNSRP-902 | As an Auditor, I need BIBS to keep immutable audit logs of all system and user actions, so that there is complete, reliable and tamper-proof evidence for compliance, governance and audit. | FR-SS-091 | FR-SS-091 AC1-2 | TC-SS-091.1 to 091.3 (3 cases) |
+| SNSRP-903 | As a Compliance Officer, I want to access the audit log report as needed, so that I can show what happened to every case, list and configuration. | FR-SS-092 | FR-SS-092 AC1-2 | TC-SS-092.1 to 092.3 (4 cases) |
+
+<!-- landscape -->
+
+# Appendix: Storyboard index
+
+Sanction Screening has no end-to-end walkthroughs with screenshots yet. This index gives the storyboard of one case journey and of the set-up from the process flow of section 2.2 and the case workflow of chapter 5: one frame per step, with the persona, the step, the screen or document used, the outcome and the FRs. The screen-level frames with screenshots follow with the v2.0 business sign-off pack of BRD-10, which adds the walkthroughs and the UX Screen Deck.
+
+<!-- table: widths=1.3,2.8,5.6,3.6,5.2,2.2 caption="Storyboard of the business processes: frame, persona, step, screen or document, outcome and FR" size=8 -->
+| Frame | Persona | Step | Screen or document | Outcome | FR |
+|---|---|---|---|---|---|
+| **P1** | | **Configuration and lists** | | | |
+| P1.1 | Compliance Officer | Drafts the matching criteria, risk rules, matrices, SLAs, templates and dispositions | Configuration Versions; Templates | Draft version with before and after values | FR-SS-010 to FR-SS-018 |
+| P1.2 | Compliance Officer (Checker) | Approves the configuration version with an effective date | My Approvals | Version active from its effective date | FR-SS-019 |
+| P1.3 | Compliance Officer | Uploads the sanctions and PEP list files and reviews the failed records | List Sources and Runs; Unsuccessful Ingestion Records | Lists current; failed records reported to the recipients | FR-SS-020, FR-SS-021 |
+| P1.4 | Compliance Officer | Adds a sanctioned name by hand; the checker approves it | Watchlist; My Approvals | Entry active and screened; Compliance notified of the new name | FR-SS-022, FR-SS-023, FR-SS-082 |
+| **P2** | | **Screening and case creation** | | | |
+| P2.1 | Compliance Officer | Sets the batch window; the window or a new client triggers the matching | Screening Home (runs) | All eligible clients screened with the active rules | FR-SS-030, FR-SS-031 |
+| P2.2 | Investigator | Reviews the potential matches below the case threshold | Matches; Name Matching Fall-out report | Matches confirmed or dismissed with a reason | FR-SS-032, FR-SS-090 |
+| P2.3 | Unit Compliance (User) Coordinator | Receives the case created for a high-risk or PEP client | Cases; notifications | Case assigned by the assignment matrix; client risk-tagged; notice for a client without an active policy | FR-SS-033, FR-SS-034, FR-SS-080 |
+| **P3** | | **Investigation, approval and escalation** | | | |
+| P3.1 | Investigator | Completes the guided review, uploads the KYC documents and updates the risk tag with evidence | Case (Review, Documents) | Mandatory fields complete; documents named by the convention | FR-SS-050, FR-SS-052, FR-SS-035 |
+| P3.2 | Investigator | Selects the disposition and submits | Case (workflow panel) | Case validated and routed by the approval matrix; read only to the investigator | FR-SS-051, FR-SS-060 |
+| P3.3 | Approver (Unit Head) | Approves or disapproves the recommendation with comments | Cases (For Approval); Case | Case advances, or returns to the investigator, who corrects and resubmits | FR-SS-061, FR-SS-062 |
+| P3.4 | Compliance Officer | Reviews the BU escalation and routes it to the AML Committee | Cases (Compliance Review) | Case with the committee, or returned with reasons | FR-SS-063 |
+| P3.5 | AML Committee Member | Records the committee decision | Cases (Committee); Case (Decisions) | Decision recorded; case routed by the governance workflow | FR-SS-064 |
+| P3.6 | Unit Compliance (User) Coordinator | Follows the SLA reminders and re-assigns a case | Screening Home; Case (Re-assign) | Overdue cases escalated; new assignee notified | FR-SS-043, FR-SS-044, FR-SS-081 |
+| **P4** | | **Suspicious Transaction Report** | | | |
+| P4.1 | Compliance Officer | Prepares the STR from the case data | Case (STR) | STR prefilled; completeness checks highlight gaps | FR-SS-070 |
+| P4.2 | Compliance Officer | Extracts the committee-approved STRs and records the AMLC reference | STR | File in the AMLC format saved to the folder; filing reference recorded | FR-SS-071, FR-SS-072 |
+| **P5** | | **Monitoring and audit** | | | |
+| P5.1 | Compliance Officer | Runs the case status, high-risk clients and SLA reports | Reports (Compliance) | Reports with the AO and Marketing Business Unit, in CSV, XLSX and PDF | FR-SS-090, FR-SS-045 |
+| P5.2 | Auditor | Reads a case history and the audit log report | Case (Timeline); Reports (SCR-AUDIT-LOG) | Every action with before and after values, user and time | FR-SS-091, FR-SS-092 |
+

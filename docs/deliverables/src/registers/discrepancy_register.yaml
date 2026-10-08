@@ -2969,7 +2969,7 @@ items:
   desc: 'The IER asks for ElastiCache "cluster" in Pre-Prod and PROD. BIBS is configured for cluster mode disabled (one shard, primary and replica); the cache clear uses SCAN over one node and the job lock uses scripts on single keys.'
   impact: 'Cluster mode enabled would need a code and configuration change.'
   modules: 'Platform (cache, job lock)'
-  resolution: 'ElastiCache Redis 7, cluster mode disabled, Multi-AZ replica.'
+  resolution: 'ElastiCache for Valkey 8 (in place of Redis 7, client decision of 08-Oct-2026), cluster mode disabled, Multi-AZ replica.'
   question: 'Please confirm cluster mode disabled.'
   owner: 'BDO Cloud and Digital Operations Engineering'
   status: Open

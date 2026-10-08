@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.catalog.domain.SalesOfficer;
 import com.iortatechnxt.brokerverse.catalog.service.SalesOrganisationService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalAssignment;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalAssignmentRepository;
@@ -165,7 +166,7 @@ public class RenewalAssignmentService {
             "Give the disposition of the renewal of "
                 + c.getSnapshot().clientName()
                 + ", expiring "
-                + c.getExpiryDate()));
+                + DisplayFormat.date(c.getExpiryDate())));
   }
 
   private void requireAssignable(RenewalCandidate c, AppUser officer) {

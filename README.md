@@ -9,7 +9,7 @@ the BDO Insure visual language.
 
 | | |
 |---|---|
-| Backend | Java 21, Spring Boot 3.5, PostgreSQL 16, Flyway, JWT, Redis, Kafka |
+| Backend | Java 21, Spring Boot 3.5, PostgreSQL 16, Flyway, JWT, Valkey 8, Kafka 3.9 |
 | Frontend | React 19, TypeScript, Vite, TanStack Query |
 | Reports | On screen, PDF, Excel, CSV and Word (one engine for all reports) |
 | Quality | Checkstyle, PMD/CPD, SpotBugs + FindSecBugs, ArchUnit, JaCoCo, SonarJS, security code scanning, SonarQube-ready |

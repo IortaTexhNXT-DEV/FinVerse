@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 /**
  * Rate limits of the anonymous sign-in endpoints on the shared counters (fixed windows): the login
  * per client address, the "Forgot password?" requests per client address and the reset links per
- * user. When the shared counter store (Redis) is unreachable the database counters are used, and
+ * user. When the shared counter store (Valkey) is unreachable the database counters are used, and
  * when neither answers the request is refused: a limit is never skipped. Every outage is reported
  * ({@link SecurityStoreAlarm}).
  */

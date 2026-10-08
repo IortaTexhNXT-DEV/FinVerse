@@ -1,0 +1,28 @@
+// Security Architecture: security gates of the CI pipeline, from a change to a deployable image.
+digraph sa_pipeline {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.25, ranksep=0.35, bgcolor="white", pad=0.15, newrank=true];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", fontname="Arial", fontsize=10, fillcolor="@WHITE", margin="0.10,0.05"];
+  edge  [color="@HEADER_BLUE", arrowsize=0.6, penwidth=1.1];
+  chg [label=<<b>Change</b><br/><font point-size="8">peer review, change reference</font>>, fillcolor="@BG_BLUE"];
+  subgraph cluster_code { label=<<b>Code gates (every push and merge request)</b>>; style="rounded,dashed"; color="@MUTED"; fontcolor="@HEADER_BLUE"; fontsize=11;
+    sast [label=<<b>SAST</b><br/><font point-size="8">CodeQL (Java, TypeScript; also weekly)<br/>SpotBugs security plug-in, PMD, SonarJS</font>>];
+    sca  [label=<<b>SCA</b><br/><font point-size="8">OWASP dependency-check (CVSS 7+ fails)<br/>npm audit (high fails)</font>>];
+    sec  [label=<<b>Secrets</b><br/><font point-size="8">gitleaks over the full history<br/>(any finding fails)</font>>];
+    qa   [label=<<b>Quality</b><br/><font point-size="8">compile -Werror, tests, coverage 80/65 %,<br/>architecture rules, data scope coverage</font>>];
+  }
+  subgraph cluster_img { label=<<b>Image gates</b>>; style="rounded,dashed"; color="@MUTED"; fontcolor="@HEADER_BLUE"; fontsize=11;
+    img  [label=<<b>Images</b><br/><font point-size="8">base images pinned by digest, non-root</font>>];
+    tri  [label=<<b>Trivy</b><br/><font point-size="8">OS and library vulnerabilities, secrets<br/>(high and critical with a fix fail)</font>>];
+    sbom [label=<<b>SBOM</b><br/><font point-size="8">CycloneDX backend and web client</font>>];
+  }
+  subgraph cluster_env { label=<<b>Environment gates</b>>; style="rounded,dashed"; color="@MUTED"; fontcolor="@HEADER_BLUE"; fontsize=11;
+    dast [label=<<b>DAST</b> (plan)<br/><font point-size="8">ZAP baseline nightly in SIT,<br/>authenticated full scan per UAT release</font>>, fillcolor="@AMBER_BG"];
+    pen  [label=<<b>Penetration test</b><br/><font point-size="8">Pre-Prod, Nov - Dec 2027</font>>, fillcolor="@AMBER_BG"];
+  }
+  exc [label=<<b>Exception register</b><br/><font point-size="8">time-boxed (max. 6 months), reason, reviewer</font>>, fillcolor="@DIRTY_WHITE"];
+  rel [label=<<b>Release</b><br/><font point-size="8">ECR, digest-pinned overlays</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  chg -> sast; chg -> sca; chg -> sec; chg -> qa;
+  sast -> img; sca -> img; sec -> img; qa -> img;
+  img -> tri -> sbom -> dast -> pen -> rel;
+  exc -> sca [style=dashed]; exc -> tri [style=dashed];
+}

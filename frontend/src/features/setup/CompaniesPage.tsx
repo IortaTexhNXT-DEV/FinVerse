@@ -63,7 +63,7 @@ export default function CompaniesPage() {
       <PageHeader
         section="Setup"
         title="Companies"
-        description="Each company keeps its own books and can be consolidated at group level. Select a company to maintain its client profile."
+        description="Each company keeps its own books. Select a company to maintain its client profile."
       />
       <ErrorAlert error={authorize.error} />
       <Card flush>

@@ -8,6 +8,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { useCompanyId } from '@/context/workspaceContext';
+import { countOf } from '@/utils/format';
 import { RNW_LOV } from './renewalCodes';
 
 interface BaseProps {
@@ -64,6 +65,29 @@ function Remarks({
   );
 }
 
+/** The Marketing units by name, for a transfer or a Not for Renewal to another unit. */
+export function UnitSelect({
+  id,
+  value,
+  onChange,
+}: Readonly<{ id: string; value: string; onChange: (code: string) => void }>) {
+  const companyId = useCompanyId();
+  const units = useQuery({
+    queryKey: ['renewal', 'code-set', 'renewal.unit', companyId],
+    queryFn: () => renewalApi.codeSet('renewal.unit', companyId),
+  });
+  return (
+    <select id={id} className="select" value={value} onChange={(e) => onChange(e.target.value)}>
+      <option value="">Select the unit</option>
+      {(units.data ?? []).map((u) => (
+        <option key={u.code} value={u.code}>
+          {u.label}
+        </option>
+      ))}
+    </select>
+  );
+}
+
 /** Assign Disposition / Re-assign Officer (FR-RN-030). */
 export function AssignDialog({
   count,
@@ -82,7 +106,7 @@ export function AssignDialog({
   return (
     <Modal
       open
-      title={`Assign ${String(count)} renewal(s)`}
+      title={`Assign ${countOf(count, 'renewal')}`}
       onClose={onClose}
       footer={
         <Footer
@@ -101,7 +125,7 @@ export function AssignDialog({
             <option value="">Select the officer</option>
             {(officers.data ?? []).map((o) => (
               <option key={o.username} value={o.username}>
-                {o.fullName} ({o.unit})
+                {o.fullName}
               </option>
             ))}
           </select>
@@ -174,14 +198,9 @@ export function TransferDialog({
     onConfirm: (toUnit: string, reasonCode: string, remarks: string) => void;
   }
 >) {
-  const companyId = useCompanyId();
   const [unit, setUnit] = useState('');
   const [reason, setReason] = useState('');
   const [remarks, setRemarks] = useState('');
-  const units = useQuery({
-    queryKey: ['renewal', 'code-set', 'renewal.unitsAll', companyId],
-    queryFn: () => renewalApi.codeSet('renewal.unit', companyId),
-  });
   return (
     <Modal
       open
@@ -198,22 +217,9 @@ export function TransferDialog({
       }
     >
       <ErrorAlert error={error} />
-      <Field label="Receiving Unit" required hint="Sales unit code, e.g. T-CORP1">
-        {(id) => (
-          <input
-            id={id}
-            className="input"
-            list="rnw-units"
-            value={unit}
-            onChange={(e) => setUnit(e.target.value)}
-          />
-        )}
+      <Field label="Receiving Unit" required>
+        {(id) => <UnitSelect id={id} value={unit} onChange={setUnit} />}
       </Field>
-      <datalist id="rnw-units">
-        {(units.data ?? []).map((u) => (
-          <option key={u.code} value={u.code} />
-        ))}
-      </datalist>
       <Field label="Reason">
         {(id) => (
           <LovSelect id={id} type={RNW_LOV.transferReason} value={reason} onChange={setReason} />

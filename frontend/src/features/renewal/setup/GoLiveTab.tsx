@@ -9,11 +9,13 @@ import { DataTable } from '@/components/ui/DataTable';
 import { DateInput } from '@/components/ui/DateInput';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
+import { RowActions } from '@/components/ui/RowActions';
 import { UserName } from '@/components/ui/UserName';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate } from '@/utils/format';
+import { countOf, formatDate } from '@/utils/format';
 import { TextDialog } from '../common/ActionDialogs';
+import { decisionActions } from '../common/presentation';
 import { UploadPanel } from '../common/UploadPanel';
 
 function TakeOver() {
@@ -25,7 +27,7 @@ function TakeOver() {
   const run = useMutation({
     mutationFn: () => renewalApi.goLive(companyId, date),
     onSuccess: async (r) => {
-      toast.success(`${String(r.counts.created)} renewal(s) taken over`);
+      toast.success(`${countOf(r.counts.created, 'renewal')} taken over`);
       await queryClient.invalidateQueries({ queryKey: ['renewal'] });
     },
   });
@@ -90,18 +92,13 @@ function Corrections() {
             key: 'act',
             header: '',
             render: (r) => (
-              <span className="rnw-actions">
-                <Button size="sm" onClick={() => setDeciding({ row: r, approve: true })}>
-                  Approve
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => setDeciding({ row: r, approve: false })}
-                >
-                  Reject
-                </Button>
-              </span>
+              <RowActions
+                record={r.legacyRef}
+                actions={decisionActions({
+                  approve: () => setDeciding({ row: r, approve: true }),
+                  reject: () => setDeciding({ row: r, approve: false }),
+                })}
+              />
             ),
           },
         ]}

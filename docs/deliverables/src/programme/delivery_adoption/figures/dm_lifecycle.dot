@@ -1,0 +1,35 @@
+// Delivery Methodology: hybrid delivery - drops, iterations, releases and test stages.
+digraph dm_lifecycle {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.3, ranksep=0.3, bgcolor="white", pad=0.1, newrank=true];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", fillcolor="@WHITE", fontname="Arial", fontsize=11,
+         fontcolor="@NEAR_BLACK", width=2.6, height=0.55, margin="0.08,0.04"];
+  edge  [color="@HEADER_BLUE", penwidth=1.1, arrowsize=0.7];
+  subgraph cluster_plan {
+    label=<<b>Plan-driven frame (per drop)</b>>; fontsize=12; fontcolor="@HEADER_BLUE"; style="rounded"; color="@HEADER_BLUE";
+    brd [label=<BRD and new versions<br/><font point-size="9">BDOI business owner</font>>];
+    frs [label=<FRS, test plan,<br/>sign-off set (Ready)>];
+    sign [label=<Sign-off of the set<br/><font point-size="9">scope baseline</font>>, fillcolor="@BG_BLUE"];
+    brd -> frs -> sign;
+  }
+  subgraph cluster_iter {
+    label=<<b>Iterative delivery (two-week iterations)</b>>; fontsize=12; fontcolor="@HEADER_BLUE"; style="rounded"; color="@HEADER_BLUE";
+    plan [label=<Iteration planning<br/><font point-size="9">items that meet Ready</font>>];
+    dev [label=<Development and<br/>configuration>];
+    gates [label=<Code review and<br/>quality gates>];
+    irev [label=<Iteration review<br/>with key users>];
+    plan -> dev -> gates -> irev;
+    irev -> plan [style=dashed, constraint=false, label=<<font point-size="9">next</font>>];
+  }
+  subgraph cluster_rel {
+    label=<<b>Release and test stages</b>>; fontsize=12; fontcolor="@HEADER_BLUE"; style="rounded"; color="@HEADER_BLUE";
+    rel [label=<Release with<br/>release notes (Done)>];
+    sit [label=<SIT and regression>];
+    uat [label=<UAT on migrated data>];
+    prod [label=<Production at go-live>, fillcolor="@YELLOW", color="@NEAR_BLACK"];
+    rel -> sit -> uat -> prod;
+  }
+  sign -> plan; irev -> rel;
+  cr [label=<Change request<br/><font point-size="9">CCB decides</font>>, fillcolor="@DIRTY_WHITE", color="@MUTED"];
+  sign -> cr [style=dashed, dir=back, color="@MUTED"];
+  cr -> plan [style=dashed, color="@MUTED"];
+}

@@ -12,7 +12,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { UserName } from '@/components/ui/UserName';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDateTime, formatPeriod } from '@/utils/format';
+import { countOf, formatDateTime, formatPeriod } from '@/utils/format';
 import { AssignDialog, TransferDialog } from '../common/ActionDialogs';
 import { CandidateList } from '../common/CandidateList';
 import { ExtractDialog } from '../common/MoreDialogs';
@@ -118,7 +118,7 @@ export default function ExpiryListPage() {
       renewalApi.extract(companyId, range.from, range.to),
     onSuccess: async (run) => {
       close();
-      toast.success(`${String(run.counts.created)} renewal(s) extracted`);
+      toast.success(`${countOf(run.counts.created, 'renewal')} extracted`);
       await queryClient.invalidateQueries({ queryKey: ['renewal'] });
     },
   });

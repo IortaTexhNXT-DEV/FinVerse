@@ -1,6 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Send, Upload } from 'lucide-react';
-import { useState } from 'react';
+import { Send } from 'lucide-react';
 import { renewalApi } from '@/api/renewal';
 import { useAuth } from '@/auth/authContext';
 import { Button } from '@/components/ui/Button';
@@ -9,10 +8,8 @@ import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { TransferDialog } from '../common/ActionDialogs';
 import { CandidateList } from '../common/CandidateList';
-import { CompleteFileForm } from '../common/CompleteFileForm';
 import type { QuickFilter } from '../common/CandidateList';
 import { EXPIRY_TABS, RENEWAL_SECTION } from '../common/renewalCodes';
-import { UploadPanel } from '../common/UploadPanel';
 import { useBatchAction } from '../common/useBatchAction';
 import { useListDialogs } from '../common/useListDialogs';
 import '../renewal.css';
@@ -34,14 +31,14 @@ const QUICK: QuickFilter[] = [
 /**
  * My Dispositions (FR-RN-040-047, 060): the renewals assigned to the officer. Open a renewal to view
  * its account history and set the disposition; Push sends the dispositioned renewals to the Team
- * Leader; Transfer moves one to another unit; the disposition file is uploaded here.
+ * Leader; Transfer moves one to another unit. The dispositioned file is uploaded by Processing on
+ * the Processing Worklist.
  */
 export default function MyDispositionsPage() {
   const companyId = useCompanyId();
   const { can } = useAuth();
   const toast = useToast();
   const queryClient = useQueryClient();
-  const [upload, setUpload] = useState(false);
   const { open, refs, close, done, show } = useListDialogs<'transfer'>();
   const push = useBatchAction<string[]>('Push', 'pushed', (r) => renewalApi.push(companyId, r));
   const transfer = useMutation({
@@ -64,22 +61,7 @@ export default function MyDispositionsPage() {
         section={RENEWAL_SECTION}
         title="My Dispositions"
         description="Renewals assigned to you for a disposition."
-        actions={
-          can('RNW_UPLOAD') && (
-            <Button variant="secondary" icon={<Upload size={16} />} onClick={() => setUpload(true)}>
-              Upload Dispositions
-            </Button>
-          )
-        }
       />
-      {upload && (
-        <UploadPanel
-          label="Upload Dispositions"
-          handler="RNW_DISPOSITION_UPLOAD"
-          onClose={() => setUpload(false)}
-          after={(job) => <CompleteFileForm job={job} />}
-        />
-      )}
       <CandidateList
         tabs={TABS}
         initialTab="ALL"

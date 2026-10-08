@@ -3,12 +3,13 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { renewalApi } from '@/api/renewal';
 import type { TransferView } from '@/api/renewal';
-import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { CellStack } from '@/components/ui/CellStack';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
+import { RowActions } from '@/components/ui/RowActions';
+import { SalesUnitName } from '@/components/broking/LovLabel';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
@@ -17,6 +18,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { formatDate, formatDateTime } from '@/utils/format';
 import { TextDialog } from '../common/ActionDialogs';
+import { transferActions } from '../common/presentation';
 import { RENEWAL_SECTION } from '../common/renewalCodes';
 import '../renewal.css';
 
@@ -96,7 +98,16 @@ export default function TransfersPage() {
             {
               key: 'units',
               header: 'From / To',
-              render: (r) => <CellStack main={r.fromUnit ?? ''} sub={`to ${r.toUnit}`} />,
+              render: (r) => (
+                <CellStack
+                  main={<SalesUnitName code={r.fromUnit} />}
+                  sub={
+                    <>
+                      to <SalesUnitName code={r.toUnit} />
+                    </>
+                  }
+                />
+              ),
             },
             { key: 'remarks', header: 'Remarks', render: (r) => r.remarks },
             {
@@ -118,45 +129,16 @@ export default function TransfersPage() {
             {
               key: 'act',
               header: '',
-              render: (r) =>
-                r.status === 'REQUESTED' && (
-                  <span className="rnw-actions">
-                    {side === 'incoming' ? (
-                      <>
-                        <Button
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            act('accept', r);
-                          }}
-                        >
-                          Accept
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="secondary"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            act('decline', r);
-                          }}
-                        >
-                          Decline
-                        </Button>
-                      </>
-                    ) : (
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          act('cancel', r);
-                        }}
-                      >
-                        Cancel request
-                      </Button>
-                    )}
-                  </span>
-                ),
+              render: (r) => (
+                <RowActions
+                  record={r.renewalRef}
+                  actions={transferActions(side, r.status, {
+                    accept: () => act('accept', r),
+                    decline: () => act('decline', r),
+                    cancel: () => act('cancel', r),
+                  })}
+                />
+              ),
             },
           ]}
         />
@@ -166,7 +148,7 @@ export default function TransfersPage() {
           title="Cancel the transfer request"
           record={decision.transfer.renewalRef}
           effect="The renewal stays with your unit."
-          confirmLabel="Cancel request"
+          confirmLabel="Cancel Request"
           busy={decide.isPending}
           error={decide.error}
           onClose={() => setDecision(undefined)}

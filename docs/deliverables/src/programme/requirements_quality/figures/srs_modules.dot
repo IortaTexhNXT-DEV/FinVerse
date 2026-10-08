@@ -1,0 +1,38 @@
+// BIBS modules (BRDs) grouped by BDOI drop, with the platform services every module uses.
+digraph srs_modules {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.18, ranksep=0.22, bgcolor="white", pad=0.15, newrank=true];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.1, fontname="Arial",
+         fontsize=11, fontcolor="@NEAR_BLACK", width=1.75, height=0.55, margin="0.06,0.04", fillcolor="@WHITE"];
+  edge  [style=invis];
+  subgraph cluster_d0 {
+    label=<<b>Drop 0 - Setup and Data Migration</b>>; fontsize=12; fontcolor="@HEADER_BLUE"; style="rounded,filled"; fillcolor="@BG_BLUE"; color="@HEADER_BLUE";
+    b11 [label=<<b>BRD-11</b><br/>User Access<br/>Maintenance>];
+    b03 [label=<<b>BRD-03</b><br/>Product<br/>Maintenance>];
+    b13 [label=<<b>BRD-13</b><br/>Data<br/>Migration>];
+  }
+  subgraph cluster_d1 {
+    label=<<b>Drop 1 - Transactional (upstream and downstream)</b>>; fontsize=12; fontcolor="@HEADER_BLUE"; style="rounded,filled"; fillcolor="@BG_BLUE"; color="@HEADER_BLUE";
+    b01 [label=<<b>BRD-01</b><br/>New Business>];
+    b12 [label=<<b>BRD-12</b><br/>Submitted<br/>Policies>];
+    b06 [label=<<b>BRD-06</b><br/>Renewal>];
+    b09 [label=<<b>BRD-09</b><br/>Customer<br/>Servicing Facility>];
+    b10 [label=<<b>BRD-10</b><br/>Sanction<br/>Screening>];
+    b02 [label=<<b>BRD-02</b><br/>Operations>];
+    b04 [label=<<b>BRD-04</b><br/>Collections>];
+    b05 [label=<<b>BRD-05</b><br/>Accounting,<br/>Disbursement, ACSL>];
+  }
+  subgraph cluster_d2 {
+    label=<<b>Drop 2 - Independent</b>>; fontsize=12; fontcolor="@HEADER_BLUE"; style="rounded,filled"; fillcolor="@BG_BLUE"; color="@HEADER_BLUE";
+    b07 [label=<<b>BRD-07</b><br/>Claims>];
+    b08 [label=<<b>BRD-08</b><br/>Employee Benefits<br/>(no portal)>];
+    prc [label=<Production Reconciliation<br/>(BRD-02); Marketing<br/>Collection extraction<br/>(BRD-04)>, fillcolor="@DIRTY_WHITE", width=2.4];
+  }
+  ri [label=<<b>Phase 2</b> - Reinsurance module (reinsurance transactions run through Remittance in Drop 1)>, fillcolor="@DIRTY_WHITE", style="rounded,filled,dashed", width=7.4];
+  plat [label=<<b>BRD-00 cross-cutting platform services</b>: persona menus and role home, notifications, audit trail,<br/>reports and documents, lists of values and parameters, workflow, security and data scope, integration>, fillcolor="@HEADER_BLUE", fontcolor="@WHITE", width=7.4];
+  {rank=same; b11; b03; b13}
+  {rank=same; b01; b12; b06; b09}
+  {rank=same; b10; b02; b04; b05}
+  {rank=same; b07; b08; prc}
+  b03 -> b12; b12 -> b02; b02 -> b08; b08 -> ri; ri -> plat;
+  b11 -> b03 -> b13; b01 -> b12 -> b06 -> b09; b10 -> b02 -> b04 -> b05; b07 -> b08 -> prc;
+}

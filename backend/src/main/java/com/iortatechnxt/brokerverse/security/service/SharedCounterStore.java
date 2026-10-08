@@ -6,7 +6,7 @@ import java.time.Duration;
  * Port: fixed-window counters shared by every instance (failed logins, login rate limit). The
  * window starts with the first increment of a key and the counter restarts at 1 once it ends.
  *
- * <p>Implemented on Redis ({@code INCR} with {@code PEXPIRE}) or on the table {@code
+ * <p>Implemented on Valkey ({@code INCR} with {@code PEXPIRE}) or on the table {@code
  * sys_shared_counter} (module {@code sharedstate}).
  */
 public interface SharedCounterStore {

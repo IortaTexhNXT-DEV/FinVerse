@@ -12,23 +12,26 @@ digraph csf_integration {
   iss  [label="E-policies\n(BRD-1 issuance)"];
   led  [label="Invoices and payments\n(BRD-2 opsledger)"];
   doc  [label="Documents: RENEWAL_ADVICE,\nCLAIM_REPORT, quotations"];
+  org  [label="Fulfilment unit members,\naccount officers (BRD-11, BRD-1)"];
 
   subgraph cluster_csf {
     label="Customer Servicing Facility (BIBS)"; labeljust=l; fontcolor="@HEADER_BLUE"; fontsize=13;
     style=filled; fillcolor="@BG_BLUE"; color="@BG_BLUE";
-    csf [label="Search, servicing view,\ncontact change, resend,\ndocuments, activity log", fillcolor="@HEADER_BLUE", fontcolor="@WHITE", height=1.6];
+    csf [label="Search, servicing view,\ncontact change, resend,\ndocuments, activity log,\ncase management", fillcolor="@HEADER_BLUE", fontcolor="@WHITE", height=1.6];
   }
 
   upd  [label="Contact update\n(client master)"];
   mail [label="E-mail outbox\n(RA, e-policy resend)"];
-  rpt  [label="Reports: contact changes,\nactivity, audit trail"];
+  rpt  [label="Reports: contact changes,\nactivity, audit trail, cases"];
+  ntf  [label="Case notifications\n(in-app and e-mail)"];
   leg  [label="QPS / EBIX write-back\n(outbox, CSQ01)", color="@MUTED", fontcolor="@MUTED", style="rounded,dashed"];
   los  [label="QPS / EBIX / LOS lookup\n(CSQ01, CSQ02)", color="@MUTED", fontcolor="@MUTED", style="rounded,dashed"];
 
-  crm -> csf; acc -> csf; plc -> csf; iss -> csf; led -> csf; doc -> csf;
+  crm -> csf; acc -> csf; plc -> csf; iss -> csf; led -> csf; doc -> csf; org -> csf;
   csf -> upd [label="contact only"];
   csf -> mail;
   csf -> rpt;
+  csf -> ntf;
   csf -> leg [style=dashed, color="@MUTED"];
   csf -> los [style=dashed, color="@MUTED", dir=back];
 }

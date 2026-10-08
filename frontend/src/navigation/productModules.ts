@@ -10,7 +10,7 @@ export const MODULE_OFF = 'MODULE_OFF:';
 /**
  * The screens of each product module by path, mirroring the module catalogue of the server
  * (system.domain.ProductModule). Screens outside every list belong to the platform, which is
- * always on. The longest matching prefix wins (the insurer tax schedules inside Tax and Statutory).
+ * always on. The longest matching prefix wins.
  */
 export const PRODUCT_MODULE_PATHS: Readonly<Record<string, readonly string[]>> = {
   NEW_BUSINESS: [
@@ -46,12 +46,6 @@ export const PRODUCT_MODULE_PATHS: Readonly<Record<string, readonly string[]>> =
   ASSETS_INVESTMENTS: ['/assets', '/investments'],
   BUDGET: ['/planning/budgets', '/planning/budget-vs-actual'],
   TAX_STATUTORY: ['/tax'],
-  UNDERWRITING: ['/underwriting'],
-  INSURER_CLAIMS: ['/claims'],
-  REINSURANCE: ['/reinsurance'],
-  ACTUARIAL_RESERVES: ['/reserves'],
-  CONSOLIDATION: ['/planning/consolidation', '/planning/intercompany'],
-  INSURER_TAX: ['/tax/premium-tax', '/tax/dst', '/tax/ic-schedules'],
 };
 
 function matches(path: string, prefix: string): boolean {

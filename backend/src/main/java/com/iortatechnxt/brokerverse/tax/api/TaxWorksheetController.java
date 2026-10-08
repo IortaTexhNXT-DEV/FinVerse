@@ -53,14 +53,14 @@ public class TaxWorksheetController {
   /**
    * Computes a worksheet.
    *
-   * @param kind VAT, EWT, DST, PREMIUM_TAX, LGT or FST
+   * @param kind VAT or EWT
    * @param companyId company
    * @param from period start
    * @param to period end
    * @return worksheet
    */
   @GetMapping("/worksheets/{kind}")
-  @PreAuthorize(TaxAccess.WORKSHEET_VIEW)
+  @PreAuthorize(TaxAccess.VIEW)
   public WorksheetResponse worksheet(
       @PathVariable WorksheetKind kind,
       @RequestParam Long companyId,

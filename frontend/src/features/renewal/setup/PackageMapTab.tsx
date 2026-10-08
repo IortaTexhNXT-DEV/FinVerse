@@ -15,8 +15,10 @@ import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { UploadPanel } from '../common/UploadPanel';
 import { ApprovalCell } from './setupBits';
-import { numberOrNull, pending, textOrNull } from './setupCodes';
-import { ConfirmButton } from '@/components/ui/ConfirmButton';
+import { numberOrNull, textOrNull } from './setupCodes';
+import { RowActions } from '@/components/ui/RowActions';
+import { mapSourceLabel, setupRecordActions, versionText } from '../common/presentation';
+import { InsurerName, ProductName } from '@/components/broking/LovLabel';
 
 const EMPTY: PackageMapData = {
   legacyPackageCode: '',
@@ -196,7 +198,10 @@ export function PackageMapTab() {
               key: 'qual',
               header: 'Risk / Insurer',
               render: (r) => (
-                <CellStack main={r.data.riskCode ?? 'Any'} sub={r.data.insurerCode ?? 'Any'} />
+                <CellStack
+                  main={r.data.riskCode ?? 'Any'}
+                  sub={r.data.insurerCode ? <InsurerName code={r.data.insurerCode} /> : 'Any'}
+                />
               ),
             },
             {
@@ -215,11 +220,16 @@ export function PackageMapTab() {
               key: 'target',
               header: 'Renews on',
               render: (r) =>
-                r.action === 'REJECT'
-                  ? 'Rejected (not renewable as is)'
-                  : `${r.data.productCode ?? ''} v${String(r.data.productVersionNo ?? '')}`,
+                r.action === 'REJECT' ? (
+                  'Rejected (not renewable as is)'
+                ) : (
+                  <CellStack
+                    main={<ProductName code={r.data.productCode} />}
+                    sub={versionText(r.data.productVersionNo)}
+                  />
+                ),
             },
-            { key: 'source', header: 'Source', render: (r) => r.source },
+            { key: 'source', header: 'Source', render: (r) => mapSourceLabel(r.source) },
             {
               key: 'status',
               header: 'Status',
@@ -229,37 +239,14 @@ export function PackageMapTab() {
               key: 'act',
               header: '',
               render: (r) => (
-                <span className="rnw-actions">
-                  {pending(r.approval) && (
-                    <ConfirmButton
-                      size="sm"
-                      confirm={{
-                        title: 'Authorize Package Mapping',
-                        effect: 'The mapping change takes effect.',
-                      }}
-                      onConfirm={() => act.mutateAsync({ id: r.id, action: 'AUTHORIZE' })}
-                    >
-                      Authorize
-                    </ConfirmButton>
-                  )}
-                  <Button size="sm" variant="ghost" onClick={() => setEditing(r)}>
-                    Edit
-                  </Button>
-                  {r.approval.recordStatus === 'ACTIVE' && (
-                    <ConfirmButton
-                      size="sm"
-                      variant="ghost"
-                      confirm={{
-                        title: 'Deactivate Package Mapping',
-                        effect: 'The mapping is no longer used for new renewals.',
-                        destructive: true,
-                      }}
-                      onConfirm={() => act.mutateAsync({ id: r.id, action: 'DEACTIVATE' })}
-                    >
-                      Deactivate
-                    </ConfirmButton>
-                  )}
-                </span>
+                <RowActions
+                  record={r.data.legacyPackageCode}
+                  actions={setupRecordActions(r.approval.recordStatus, true, 'Package Mapping', {
+                    authorize: () => act.mutateAsync({ id: r.id, action: 'AUTHORIZE' }),
+                    edit: () => setEditing(r),
+                    deactivate: () => act.mutateAsync({ id: r.id, action: 'DEACTIVATE' }),
+                  })}
+                />
               ),
             },
           ]}

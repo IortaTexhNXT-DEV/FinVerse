@@ -111,7 +111,7 @@ class PayablesApiIT {
                 get(BASE + "/bank-accounts?companyId=" + company() + "&currency=USD"),
                 null))
         .allSatisfy(a -> assertThat(a.get("currency").asText()).isEqualTo("USD"));
-    call("uw", post(BASE + "/bank-accounts"), body, status().isForbidden());
+    call("norole", post(BASE + "/bank-accounts"), body, status().isForbidden());
   }
 
   @Test

@@ -1,0 +1,16 @@
+// Data Architecture: life cycle of a record from creation to disposal.
+digraph da_retention {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.5, ranksep=0.3, bgcolor="white", pad=0.15];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", fontname="Arial", fontsize=10, fillcolor="@WHITE", margin="0.10,0.05"];
+  edge  [color="@CTA_BLUE", arrowsize=0.6, penwidth=1.0, fontname="Arial", fontsize=8];
+  a [label=<<b>Active</b><br/><font point-size="8">open record, editable<br/>under its workflow</font>>, fillcolor="@BG_BLUE"];
+  b [label=<<b>Closed</b><br/><font point-size="8">final status; read-only;<br/>final documents to ECM</font>>];
+  c [label=<<b>Online retention</b><br/><font point-size="8">searchable in BIBS<br/>(years online)</font>>];
+  d [label=<<b>Review</b><br/><font point-size="8">monthly job lists eligible<br/>records per rule; data owner decides</font>>, fillcolor="@AMBER_BG"];
+  e [label=<<b>Archive</b><br/><font point-size="8">archive store and ECM;<br/>inquiry logged</font>>];
+  f [label=<<b>Disposal</b><br/><font point-size="8">purge or anonymise with<br/>approval and record of disposal</font>>, fillcolor="@DANGER_BG", color="@DANGER"];
+  h [label=<<b>Legal hold</b><br/><font point-size="8">BIR audit, AMLA, litigation:<br/>blocks archive and disposal</font>>, fillcolor="@DIRTY_WHITE"];
+  a -> b -> c -> d -> e -> f;
+  {rank=same; d; h}
+  h -> d [style=dashed, label="blocks"]; h -> f [style=dashed];
+}

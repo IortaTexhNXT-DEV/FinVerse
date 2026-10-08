@@ -135,8 +135,8 @@
       <scope>runtime</scope>
     </dependency>
 
-    <!-- Shared state (Redis 7: caches, job locks, token denylist, counters) and event streaming
-         (Apache Kafka 3.6+: transactional outbox relay, consumers). See
+    <!-- Shared state (Valkey 8 over the Redis protocol: caches, job locks, token denylist, counters) and
+         event streaming (Apache Kafka 3.9: transactional outbox relay, consumers). See
          docs/architecture/PLATFORM_CACHE_AND_EVENTS.md. -->
     <dependency>
       <groupId>org.springframework.boot</groupId>

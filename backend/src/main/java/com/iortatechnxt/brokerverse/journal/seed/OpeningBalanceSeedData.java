@@ -48,9 +48,8 @@ import org.springframework.stereotype.Component;
  * (also OPENING journals): {@code JournalEntryService} accepts only MANUAL, ADJUSTMENT and ACCRUAL
  * journals for maker-checker entry, and a manual journal may not be back-valued beyond the
  * company's window (45 days), so a take-on dated 1 January cannot go through maker-checker. The
- * loader lives in {@code journal} (which already depends on organization) and sets the user itself:
- * {@code underwriting.seed.SeedUserContext} would make journal depend on underwriting, which
- * depends on journal through the accounting engine (a cycle).
+ * loader lives in {@code journal} (which already depends on organization) and sets the user itself,
+ * so {@code journal} depends on no seed helper of a module that depends on journal (a cycle).
  *
  * <p>Idempotent: {@link SystemJournalService} returns the posted journal of the same source
  * reference. When a posting is refused (e.g. January already closed in an existing seed database)

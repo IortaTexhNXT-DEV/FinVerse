@@ -9,10 +9,13 @@ package com.iortatechnxt.brokerverse.security.api.dto;
  * @param passwordSignIn whether the password form is the main sign-in (LOCAL, DIRECTORY); in single
  *     sign-on mode the form stays available for the break-glass administrators
  * @param passwordReset whether "Forgot password?" is offered
+ * @param environment kind of environment (local, sit, uat, training, preprod, production), shown on
+ *     the sign-in page outside production so that testers never mistake it for the live system
  */
 public record SignInOptionsResponse(
     String mode,
     boolean singleSignOn,
     String providerLabel,
     boolean passwordSignIn,
-    boolean passwordReset) {}
+    boolean passwordReset,
+    String environment) {}

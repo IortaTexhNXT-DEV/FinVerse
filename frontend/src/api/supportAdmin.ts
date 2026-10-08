@@ -5,7 +5,8 @@ export interface CacheInfo {
   name: string;
   /** Time to live, ISO-8601 duration (PT15M). */
   ttl: string;
-  store: 'REDIS' | 'IN_MEMORY';
+  /** VALKEY: shared by every instance; IN_MEMORY: this instance only. */
+  store: 'VALKEY' | 'IN_MEMORY';
   readOnlyTransactionsOnly: boolean;
   invalidatedBy: string[];
 }

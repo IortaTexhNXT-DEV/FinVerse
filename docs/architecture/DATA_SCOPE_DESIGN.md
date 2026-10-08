@@ -60,16 +60,14 @@ One mechanism per way a company reaches a controller, instead of 194 hand edits:
 | Path variable `{companyId}` | same interceptor (URI template variables) | same |
 | Query parameter `branchId` (company branches) | same interceptor: `requireBranch(companyId, branchId)` | same |
 | Request body with a `companyId` (and `branchId`) accessor, a list of such items, or a record body with a list component of such items (bulk requests) | `RequestBodyAdvice` after the body is read | `security.api.DataScopeBodyAdvice` (rules in `DataScopeTargets`) |
-| Anything else (a company under another name such as `parentCompanyId`, `companyAId`, `creditorCompanyId`; a multipart part; a header; a parameter bound under another name) | explicit `dataScope.requireCompany(...)` in the method, marked `@CompanyScoped` (consolidation groups, inter-company relationships and transactions) | `common.security.CompanyScoped` |
+| Anything else (a company under another name; a multipart part; a header; a parameter bound under another name) | explicit `dataScope.requireCompany(...)` in the method, marked `@CompanyScoped` | `common.security.CompanyScoped` |
 
 Path variables named `branchId` are not checked as company branches: the insurer branch maintenance (`/catalog/insurers/branches/{branchId}`) uses that name for the branches of an insurer.
 
 **List and search endpoints** that return several companies' data filter on `allowed()` in the service, never only on the screen:
 
 - company list and branch list of a company (`OrganizationService.listCompaniesInScope`, `listBranchesInScope`; the company and branch pickers of every screen; jobs keep using the unfiltered `listCompanies`),
-- approval inbox and counts without a company filter (`ApprovalInboxService`),
-- inter-company relationships and reconciliation: only relationships whose two companies are both allowed (`IntercompanyService.relationships`, used by the reconciliation),
-- consolidation groups: only groups whose parent company is allowed (`ConsolidationController.groups`).
+- approval inbox and counts without a company filter (`ApprovalInboxService`).
 
 **Enforcement.** `ArchitectureTest.companyEndpointsAreDataScoped` fails the build when a controller method takes a company that none of the mechanisms reads and the method is not `@CompanyScoped`. `DataScopeCoverageIT` walks every request mapping of the running application, lists the endpoints that take a company and proves each one is covered (the interceptor is in the handler chain of its path, the body advice reads its body, or the method is `@CompanyScoped`) or exempt; it writes the figures to `target/data-scope-coverage.txt`.
 
@@ -101,7 +99,7 @@ A user who starts a job from a screen ("Run now") is still checked on the reques
 - **Records addressed by id only.** An endpoint that loads a record by its id without a `companyId` (for example `GET /claims/{id}`) is not covered by this capability: the record carries its company but the request does not name it. Closing this needs a per-module check on load (follow-up per module, using `requireCompany(record.companyId())`).
 - **Reports and exports** that take a company are covered by the interceptor; whether branch scope must also filter the lines of a company-wide report is a business decision (section 8).
 - **Home branch.** The user's home branch is not forced into the scope; an administrator who narrows the branches should keep it.
-- **Cache staleness.** A narrowed scope applies within one request on the instance that made the change and at once on the others (cache cleared through Redis); a user's open screens show refusals on the next call.
+- **Cache staleness.** A narrowed scope applies within one request on the instance that made the change and at once on the others (cache cleared through Valkey); a user's open screens show refusals on the next call.
 - **Performance.** One cache read per request that names a company; no database read while the entry is cached.
 
 ## 8. Business decisions for the client

@@ -2,7 +2,7 @@
 # Build: python docs/deliverables/src/testplans/build_test_plan.py docs/deliverables/src/BRD-07_Claims/brd07_cases.yaml
 # Schema: see the header of build_test_plan.py. FR titles, BRD IDs and priorities come from the FRS.
 # Messages are the FRS texts; where a check reuses a platform message, the case quotes the text BIBS shows.
-# The FRS priority "High (BRD p.21)" is read as High by the builder.
+# The FRS priority "High (BRD p.23)" is read as High by the builder.
 
 meta:
   brd: BRD-07
@@ -10,8 +10,8 @@ meta:
   code: CM
   frs: FRS_BRD07_CLAIMS.md
   summary: TP_BRD07_CLAIMS.md
-  version: "1.0"
-  date: 25 September 2026
+  version: "1.1"
+  date: 08 October 2026
   verify_messages: false
 
 personas:
@@ -575,24 +575,24 @@ frs:
     screen: CLAIM
     data: [TD-CM-04]
     conditions:
-      - The claim shows the cover number and version used, the version being the booked endorsements effective on or before the loss date.
-      - A later endorsement of the policy year sets the flag Newer cover version and notifies the handler; the handler may switch to the latest version.
+      - The claim is validated against the latest booked cover version and shows the cover number and version used; endorsements effective after the loss date are marked.
+      - A later endorsement of the policy year sets the flag Newer cover version and notifies the handler; the next validation or Use Latest Version switches the claim to it.
       - The cover panel of the claim has no edit action.
     cases:
       - c: 1
         type: Positive
         brd: [BRCLM.039]
-        title: Cover number and version on the claim
+        title: Claim validated against the latest cover version
         steps:
           - Record a claim on ARN-2026-000706 with a loss date between its first and second endorsement.
-        expected: The summary shows "Cover v1 (<first endorsement no.>)".
+        expected: The summary shows "Cover v2 (<second endorsement no.>)"; the second endorsement is marked as effective after the loss date; the premium check uses version 2.
       - c: 2
         type: Workflow
         brd: [BRCLM.039]
         title: Newer version flag and Use Latest Version
         steps:
           - Book a further endorsement of the policy year; open the claim and the bell; click Use Latest Version.
-        expected: The claim shows "Newer cover version" and the handler has BCL_NEWER_COVER_VERSION; after the switch the version is v2 and the history records old and new version.
+        expected: The claim shows "Newer cover version" and the handler has BCL_NEWER_COVER_VERSION; after the switch the version is v3 and the history records old and new version.
       - c: 3
         type: Negative
         brd: [BRCLM.003]
@@ -600,6 +600,13 @@ frs:
         steps:
           - Open the cover panel of the claim.
         expected: The panel is read only.
+      - c: 2
+        type: Workflow
+        brd: [BRCLM.039]
+        title: Next validation switches to the newer version
+        steps:
+          - Book a further endorsement of the policy year of another claim; on that claim generate the authorization code without clicking Use Latest Version.
+        expected: The premium check runs on the newer version, the version used changes and the history records the switch.
 
   FR-CM-016:
     scenario: SC-CM-02
@@ -701,6 +708,14 @@ frs:
         msg: ["Location {L-000501-1} is not on the cover {ARN-2026-000602}"]
       - c: 2
         type: Negative
+        screen: SYS
+        title: Location not covered by the policy
+        steps:
+          - Send a direct request to link a location of the same client that is not on the cover of ARN-2026-000602.
+        expected: The link is refused; no claim can be made for a location the policy does not cover.
+        msg: ["Location {L-000602-9} is not on the cover {ARN-2026-000602}"]
+      - c: 2
+        type: Negative
         title: Location linked twice
         steps:
           - Add L1 again on the Locations tab.
@@ -727,7 +742,7 @@ frs:
     data: [TD-CM-03, TD-CM-07]
     conditions:
       - A claim holds one insurer line per insurer with share, insurer claim number, date reported, reserve, settled amount and adjuster, proposed from the invoice shares; two insurers show Multi-insurer.
-      - The same insurer claim number twice for the same insurer and claim is refused; reuse on another claim warns and raises an alert.
+      - The same insurer claim number twice for the same insurer is refused, on the same claim and on another claim; the same number of another insurer is accepted.
       - A worklist search by an insurer claim number opens the BDOI claim.
       - Insurer claim numbers can be loaded by upload after every row is validated.
     cases:
@@ -745,12 +760,18 @@ frs:
         expected: The number is refused.
         msg: ["Insurer claim number {C-INSA-9001} is already recorded for {INS-A} on this claim"]
       - c: 2
-        type: Positive
-        screen: NOTIF
-        title: Number used on another claim warns
+        type: Negative
+        title: Number of the same insurer on another claim is refused
         steps:
-          - Add C-INSA-9001 on the INS-A line of another claim; confirm.
-        expected: BIBS shows the other claim and asks for confirmation; after it the number is saved and alert BCL_INSURER_CLAIM_NO_REUSED is raised.
+          - Add C-INSA-9001 on the INS-A line of another claim.
+        expected: The number is refused and the first claim is named.
+        msg: ["Insurer claim number {C-INSA-9001} of {INS-A} is already recorded on claim {CLM-2026-000014}"]
+      - c: 2
+        type: Positive
+        title: Same number for another insurer is accepted
+        steps:
+          - Add C-INSA-9001 on the INS-B line of another claim.
+        expected: The number is saved for INS-B.
       - c: 2
         type: Negative
         title: Insurer not selected and future date
@@ -879,7 +900,7 @@ frs:
         priority: High
         type: Upload-download
         screen: MAILBOX
-        brd: [Process p.24-25]
+        brd: [Process p.26-27]
         title: Loss advice of a Non-Motor claim
         steps:
           - On a claim of ARN-2026-000602 with an adjuster and C-INSA-9001, click Send Loss Advice; select INS-A; preview; confirm.
@@ -906,7 +927,7 @@ frs:
       - c: 3
         priority: High
         type: Negative
-        brd: [Process p.24-25]
+        brd: [Process p.26-27]
         title: Insurer without claims e-mail and an invalid address
         steps:
           - Send the advice to INS-B; enter "claims@" as address.
@@ -915,7 +936,7 @@ frs:
       - c: 3
         priority: High
         type: Negative
-        brd: [Process p.24-25]
+        brd: [Process p.26-27]
         title: No insurer selected
         steps:
           - Click Send Loss Advice and confirm with no insurer ticked.
@@ -982,7 +1003,7 @@ frs:
         title: The 25 adjusters
         steps:
           - Open Lists of Values, BCL_ADJUSTER.
-        expected: The 25 companies of FRS section 9.2 (BRD p.14-15) are listed with their full names, among them Chartered Adjusters, Inc., Crawford & Company Philippines, Inc. and TreborAsia Insurance Adjustment Services.
+        expected: The 25 companies of FRS section 9.2 (BRD p.16-17) are listed with their full names, among them Chartered Adjusters, Inc., Crawford & Company Philippines, Inc. and TreborAsia Insurance Adjustment Services.
       - c: 2
         priority: High
         type: Workflow
@@ -1316,6 +1337,7 @@ frs:
     conditions:
       - A TL or TH sets or changes the settlement type; a settled type needs amount and date, which feed the settled and loss reports.
       - A closing type also needs BCL_CLOSE and closes the claim.
+      - The payment method reported by the insurer is recorded with the settlement.
       - Type missing, amount or date missing, or a future date is refused; an officer does not see the action.
     cases:
       - c: 1
@@ -1335,6 +1357,12 @@ frs:
         steps:
           - On an open claim set "Settled - LOA Issued - For Schedule of Repair", then change it to "Settled - LOA Issued".
         expected: The earlier type stays in the history; the current type is the second.
+      - c: 4
+        type: Positive
+        title: Payment method recorded with the settlement
+        steps:
+          - On a non-motor claim Set Settlement with payment method Fund transfer; on a motor claim with LOA.
+        expected: Each claim shows its payment method in the Reserve & Settlement tab and in the history; nothing is posted.
       - c: 3
         priority: High
         type: Negative
@@ -2023,6 +2051,7 @@ frs:
       - A Marketing AO views the Loss Experience report and the account's loss summary and cannot download.
       - A Marketing TL downloads the report in Excel.
       - Marketing users cannot open a claim record or maintain claims.
+      - Marketing users view the Claims Aging Report read-only.
     cases:
       - c: 1
         type: Positive
@@ -2051,6 +2080,12 @@ frs:
         steps:
           - Type the address of a claim record; send a direct request to open the claim.
         expected: The no-access page is shown; the request is refused.
+      - c: 4
+        type: Report-output
+        title: AO views the Claims Aging Report
+        steps:
+          - As the Marketing AO run BCL-AGEING for the client's accounts.
+        expected: The report is shown read-only; Export is not offered.
 
   FR-CM-066:
     scenario: SC-CM-07

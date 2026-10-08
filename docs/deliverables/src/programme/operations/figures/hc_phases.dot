@@ -1,0 +1,15 @@
+// From go-live to steady-state support: hypercare, handover and warranty.
+digraph hc_phases {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.3, ranksep=0.22, bgcolor="white", pad=0.15];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.2, fontname="Arial",
+         fontsize=11, fontcolor="@NEAR_BLACK", width=6.6, height=0.55, margin="0.12,0.04", fillcolor="@WHITE"];
+  edge  [color="@HEADER_BLUE", arrowsize=0.8, penwidth=1.2];
+  u [label=<<b>UAT acceptance</b> - Drop 0 and Drop 1 by 15 Dec 2027; Drop 2 by 30 Nov 2027<br/><font point-size="9">certificate C1 per drop</font>>, fillcolor="@DIRTY_WHITE"];
+  g [label=<<b>Go-live</b> - Monday 3 January 2028, 08:00 PHT<br/><font point-size="9">certificate C2 after the point of no return (T 18:00)</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  h1 [label=<<b>Hypercare - intensive</b> - T to T+5 (3-8 Jan 2028): command centre, 07:00-20:00, infra 24 x 7>, fillcolor="@BG_BLUE"];
+  h2 [label=<<b>Hypercare - stabilise</b> - T+6 to T+30 (9 Jan-2 Feb 2028): daily stand-up and triage>, fillcolor="@BG_BLUE"];
+  x [label=<<b>Hypercare exit</b> - 2 Feb 2028 after the January month-end close<br/><font point-size="9">certificate C3; extension to the February close if not met</font>>, fillcolor="@AMBER_BG"];
+  s [label=<<b>Steady-state support</b> - L1 BDOI service desk, L2 BDOI application support, L3 iorta TechNXT>, fillcolor="@BG_BLUE"];
+  w [label=<<b>Warranty</b> - 12 months from go-live, to 2 January 2029<br/><font point-size="9">then annual maintenance and support</font>>, fillcolor="@DIRTY_WHITE"];
+  u -> g -> h1 -> h2 -> x -> s -> w;
+}

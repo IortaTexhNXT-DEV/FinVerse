@@ -79,7 +79,7 @@ holistic:
       audit trail and the configuration masters that the business maintains. External parties reach BIBS by e-mail
       with a send log, by file upload, or through the partner portal for Employee Benefits. The HLS, insurer API, CLPC
       transfer and BDO directory (EUA) interfaces are on hold until BDO and the insurers give the specifications.
-      Redis caching, Kafka events and the AWS Singapore hosting are the client technology bill of materials; their
+      Valkey caching, Kafka events and the AWS Singapore hosting are the client technology bill of materials; their
       conformance is tracked in the bill of materials deliverable (item 4) and the technical architecture (item 12).
     externals:
       - {id: x_cli, text: 'Clients and client HR', sub: [e-mail; EB portal]}
@@ -95,7 +95,7 @@ holistic:
       - {title: 'Claims & Insurance', w: 82, modules: 'Claims Handling, insurer-side modules'}
       - {title: Reports, w: 62, modules: 'Report Centre, NB reports'}
       - {title: 'Setup & Admin', w: 91, modules: 'Broking setup, Compliance setup, User Access, Portal users, Admin'}
-    services: ['Workflow and SLA', 'Documents, templates', 'Notifications', 'Reports, exports', 'Audit trail', 'Masters and rules', 'Redis cache', 'Kafka events']
+    services: ['Workflow and SLA', 'Documents, templates', 'Notifications', 'Reports, exports', 'Audit trail', 'Masters and rules', 'Valkey cache', 'Kafka events']
     hosting: 'Hosting: AWS, Singapore region; production and non-production environments (client BOM)'
     links: [[x_cli, 'e-mail, portal'], [x_ins, 'e-mail, files, portal'], [x_bank, 'files'], [x_reg, 'extracts'], [x_dir, 'on hold']]
 

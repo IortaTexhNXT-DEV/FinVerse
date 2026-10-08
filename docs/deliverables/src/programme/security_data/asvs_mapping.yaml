@@ -1,0 +1,2974 @@
+# OWASP ASVS 4.0.3 Level 2 control mapping of BIBS (BRD-00), read by build_secdata_pack.py for the workbook
+# BIBS_Security_BRD-00_ASVS_L2_Control_Mapping and the summary table of the Security Architecture.
+statuses:
+  - {status: Met, meaning: "BIBS meets the requirement with the control and evidence named"}
+  - {status: Partly met, meaning: "A control exists; the gap and its action are named with owner and date"}
+  - {status: Planned, meaning: "No control yet in BIBS; the action is planned with owner and date"}
+  - {status: BDOI, meaning: "Met by a BDOI or BDO platform service (EIAM, Apigee X, PKI, SIEM, DNS); BDOI confirms"}
+  - {status: Not applicable, meaning: "BIBS has no such feature (for example GraphQL, SMS one-time codes)"}
+cover_notes:
+  - "Standard: OWASP Application Security Verification Standard 4.0.3, Level 2 (259 requirements). The requirement texts are those of the standard, published by the OWASP Foundation under the Creative Commons Attribution-ShareAlike 3.0 licence; a few words are adapted to the terms used in BIBS documents."
+  - "Scope: the BIBS application (web client, backend, its Kubernetes deployment and its delivery pipeline) as of 08 October 2026. Infrastructure services run by BDO (EIAM, Apigee X, PKI, DNS, SIEM) are marked BDOI."
+  - "Evidence names the control, the configuration or the pipeline job an assessor checks; the Security Architecture v1.0 explains each control. Gap actions are listed as open points SEC-xx and PRV-xx in chapter 15 of the Security Architecture."
+  - "Use: the penetration test (November to December 2027) and BDOI Information Security's review verify a sample of the Met rows and every Partly met and Planned row."
+owasp_top10:
+  - id: A01
+    name: Broken Access Control
+    controls: "Permission check on every controller method; central company and branch data scope (fail closed); maker-checker and second approval; separation-of-duties rules; authorisation limits; CORS allow list; directory listing off"
+    asvs: V4, V13.1.4, V1.4
+    verify: "Architecture rule and data scope coverage check in the pipeline; negative access cases per persona in the test plans; penetration test"
+  - id: A02
+    name: Cryptographic Failures
+    controls: "TLS 1.2/1.3 on every hop (verify-full to PostgreSQL); HSTS; SSE-KMS with BDOI-owned keys; RDS, Valkey and MSK encryption at rest; AES-256-GCM for second-factor secrets; BCrypt cost 12; no secrets in code"
+    asvs: V6, V8.3.7, V9
+    verify: "Start-up safeguards refuse plaintext in production; TLS scan of the edge; configuration review"
+  - id: A03
+    name: Injection
+    controls: "JPA and bound parameters only (scan of 8 October 2026: no request value concatenated into SQL); Bean Validation on every request; React escaping; CSV formula neutralisation; XML parsers without DTDs; no eval"
+    asvs: V5
+    verify: "CodeQL and the SpotBugs security plug-in on every pipeline; DAST; penetration test"
+  - id: A04
+    name: Insecure Design
+    controls: "STRIDE threat model per trust boundary; security requirements in every FRS; four eyes on money, access and master data; modular monolith with enforced module boundaries"
+    asvs: V1, V11
+    verify: "Threat model review per drop; architecture rules in the pipeline"
+  - id: A05
+    name: Security Misconfiguration
+    controls: "Production start-up safeguards; hardened containers (non-root, read-only, no capabilities, restricted Pod Security); NetworkPolicies deny by default; security headers and CSP; API documentation and seed data refused in production"
+    asvs: V14
+    verify: "Trivy configuration and image scan; kubeconform; DAST baseline scan"
+  - id: A06
+    name: Vulnerable and Outdated Components
+    controls: "OWASP dependency-check (CVSS 7 or higher fails), npm audit (high fails), Trivy (high and critical with a fix fail); weekly update proposals; SBOM per pipeline; time-boxed exceptions"
+    asvs: V14.2, V1.14.3
+    verify: "Pipeline gates; exception register reviewed monthly"
+  - id: A07
+    name: Identification and Authentication Failures
+    controls: "Single sign-on with EIAM (OIDC or SAML 2.0); TOTP second factor; lockout after 3 failures; rate limits; server-side sessions with idle (30 min) and absolute (8 h) limits; refresh token rotation with reuse detection; break-glass accounts with second factor"
+    asvs: V2, V3
+    verify: "Sign-in, single sign-on and second-factor integration checks; penetration test"
+  - id: A08
+    name: Software and Data Integrity Failures
+    controls: "Pipeline actions pinned by content hash; scanners verified by SHA-256; base images pinned by digest; no Java deserialisation of untrusted data; insert-only audit and ledger tables; image signing planned (SEC-11)"
+    asvs: V10, V5.5, V14.2
+    verify: "Pipeline review; gitleaks; Trivy"
+  - id: A09
+    name: Security Logging and Monitoring Failures
+    controls: "Insert-only audit trail; sign-in audit; access change log; security store alarm and alerts; log forging protection; metrics on the management port; forwarding to the BDO SIEM (SEC-07)"
+    asvs: V7, V8.1.4, V11.1.7
+    verify: "Audit reports of BRD-11; SIEM use cases with BDOI Information Security"
+  - id: A10
+    name: Server-Side Request Forgery
+    controls: "No outbound URL from user input; outbound addresses from configuration; egress NetworkPolicies to named subnets and VPC interface connections; file metadata never used as a URL"
+    asvs: V5.2.6, V12.6.1
+    verify: "Code review; penetration test"
+requirements:
+- id: V1.1.1
+  chapter: V1 Architecture, Design and Threat Modeling
+  section: V1.1 Secure Software Development Lifecycle
+  text: Verify the use of a secure software development lifecycle that addresses security in all stages of development.
+  status: Met
+  how: 'The delivery follows a secure development lifecycle: security requirements in the FRS (BRD-11 and the non-functional
+    requirements), threat model (Security Architecture chapter 9), peer review of every change, static and dependency analysis,
+    secret detection and image scanning on every pipeline, penetration test before go-live.'
+  evidence: Security Architecture chapters 9 and 10; quality gates of the CI pipeline; change register
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V1.1.2
+  chapter: V1 Architecture, Design and Threat Modeling
+  section: V1.1 Secure Software Development Lifecycle
+  text: Verify the use of threat modeling for every design change or iteration planning to identify threats, plan for countermeasures,
+    facilitate appropriate risk responses, and guide security testing.
+  status: Partly met
+  how: A STRIDE threat model per trust boundary is kept in the Security Architecture and reviewed at each drop.
+  evidence: Security Architecture chapter 9
+  gap: 'Review of the threat model for every change that adds a trust boundary or an integration: add it to the definition
+    of done of the change register. iorta TechNXT, from 31 Oct 2026'
+  owner: iorta TechNXT
+  due: 31 Oct 2026
+- id: V1.1.3
+  chapter: V1 Architecture, Design and Threat Modeling
+  section: V1.1 Secure Software Development Lifecycle
+  text: Verify that all user stories and features contain functional security constraints, such as "As a user, I should be
+    able to view and edit my profile. I should not be able to view or edit anyone else's profile"
+  status: Met
+  how: Every FRS functional requirement names its permission, data scope and the maker-checker rule; test plans carry negative
+    access cases per persona.
+  evidence: FRS BRD-01 to BRD-13 (preconditions, rules); test plans (access cases); persona menus
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V1.1.4
+  chapter: V1 Architecture, Design and Threat Modeling
+  section: V1.1 Secure Software Development Lifecycle
+  text: Verify documentation and justification of all the application's trust boundaries, components, and significant data
+    flows.
+  status: Met
+  how: Trust boundaries, components and data flows are documented with diagrams.
+  evidence: Security Architecture chapters 2 and 9; Programme Alignment (integration context, deployment)
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V1.1.5
+  chapter: V1 Architecture, Design and Threat Modeling
+  section: V1.1 Secure Software Development Lifecycle
+  text: Verify definition and security analysis of the application's high-level architecture and all connected remote services.
+  status: Met
+  how: The high-level architecture and every connected service (EIAM, UIDM-ISC, Apigee X, S3, Kafka, Valkey, SMTP, bank and
+    insurer files) are analysed in the threat model.
+  evidence: Security Architecture chapters 2 and 9; Integration Inventory
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V1.1.6
+  chapter: V1 Architecture, Design and Threat Modeling
+  section: V1.1 Secure Software Development Lifecycle
+  text: Verify implementation of centralized, simple (economy of design), vetted, secure, and reusable security controls to
+    avoid duplicate, missing, ineffective, or insecure controls.
+  status: Met
+  how: 'Security controls are central and reused: one security filter chain for users, one for system-to-system calls, one
+    permission model, one data scope guard, one audit service, one file store with malware scan.'
+  evidence: Security filter chains; data scope guard and interceptor; architecture rules that fail the pipeline when a company
+    service interface has no scope check
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V1.1.7
+  chapter: V1 Architecture, Design and Threat Modeling
+  section: V1.1 Secure Software Development Lifecycle
+  text: Verify availability of a secure coding checklist, security requirements, guideline, or policy to all developers and
+    testers.
+  status: Met
+  how: The developer guide and the quality gates set the secure coding rules; the static analysis rules enforce them on every
+    change.
+  evidence: Developer Guide; Quality Gates; SpotBugs with its security plug-in, PMD, Checkstyle, SonarJS rule sets
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V1.2.1
+  chapter: V1 Architecture, Design and Threat Modeling
+  section: V1.2 Authentication Architecture
+  text: Verify the use of unique or special low-privilege operating system accounts for all application components, services,
+    and servers.
+  status: Met
+  how: Containers run as dedicated non-root users (backend uid 10001, nginx uid 101) with a read-only root file system, no
+    Linux capabilities, no privilege escalation and the RuntimeDefault seccomp profile; the database runtime login is least-privilege.
+  evidence: Kubernetes deployments (security context); Pod Security level restricted; database roles (DEPLOYMENT, Database
+    roles)
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V1.2.2
+  chapter: V1 Architecture, Design and Threat Modeling
+  section: V1.2 Authentication Architecture
+  text: Verify that communications between application components, including APIs, middleware and data layers, are authenticated.
+    Components should have the least necessary privileges needed.
+  status: Met
+  how: 'Every connection is authenticated: PostgreSQL with its own login, Valkey with an ACL user, Kafka with SASL SCRAM-SHA-512
+    or IAM, AWS services through the IAM role of the pod''s service account, BDO systems through Apigee X tokens.'
+  evidence: Start-up safeguards refuse a missing credential; IRSA service accounts; integration security chain
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V1.2.3
+  chapter: V1 Architecture, Design and Threat Modeling
+  section: V1.2 Authentication Architecture
+  text: Verify that the application uses a single vetted authentication mechanism that is known to be secure, can be extended
+    to include strong authentication, and has sufficient logging and monitoring to detect account abuse or breaches.
+  status: Met
+  how: Users sign in through EIAM (Microsoft Entra ID) with OpenID Connect or SAML 2.0; BIBS then issues its own short-lived
+    access token bound to a server-side session. Local passwords are kept only for break-glass administrators.
+  evidence: Single sign-on module; sign-in session service; parameter AUTH_MODE
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V1.2.4
+  chapter: V1 Architecture, Design and Threat Modeling
+  section: V1.2 Authentication Architecture
+  text: Verify that all authentication pathways and identity management APIs implement consistent authentication security
+    control strength, such that there are no weaker alternatives per the risk of the application.
+  status: Met
+  how: All sign-in paths end in the same session and second-factor rules; break-glass administrators always need the second
+    factor; system calls use a separate chain that refuses user tokens.
+  evidence: Sign-in completion and second-factor step; integration security chain
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V1.4.1
+  chapter: V1 Architecture, Design and Threat Modeling
+  section: V1.4 Access Control Architecture
+  text: Verify that trusted enforcement points, such as access control gateways, servers, and serverless functions, enforce
+    access controls. Never enforce access controls on the client.
+  status: Met
+  how: Access control is enforced on the server for every request (method security with fine-grained permissions); the web
+    client only hides what the server refuses.
+  evidence: Method-level permission checks on every controller; persona menus derived from the same permissions
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V1.4.4
+  chapter: V1 Architecture, Design and Threat Modeling
+  section: V1.4 Access Control Architecture
+  text: Verify the application uses a single and well-vetted access control mechanism for accessing protected data and resources.
+    All requests must pass through this single mechanism to avoid copy and paste or insecure alternative paths.
+  status: Met
+  how: 'One mechanism: the Spring Security filter chain and method security with the BIBS permission model, plus the central
+    data scope guard.'
+  evidence: Security filter chain; data scope interceptor and body advice
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V1.4.5
+  chapter: V1 Architecture, Design and Threat Modeling
+  section: V1.4 Access Control Architecture
+  text: Verify that attribute or feature-based access control is used whereby the application checks the user's authorization
+    for a feature/data item rather than just their role. Permissions should still be allocated using roles.
+  status: Met
+  how: Permissions are checked per function (about 300 permissions bundled into roles) and per data item (company and branch
+    data scope, authorisation limits, maker-checker).
+  evidence: Permission catalogue; data scope design; authorisation limits
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V1.5.1
+  chapter: V1 Architecture, Design and Threat Modeling
+  section: V1.5 Input and Output Architecture
+  text: Verify that input and output requirements clearly define how to handle and process data based on type, content, and
+    applicable laws, regulations, and other policy compliance.
+  status: Met
+  how: Input and output handling is defined per screen and upload template in the FRS (types, lengths, lists of values) and
+    per record class for retention and privacy.
+  evidence: FRS field tables; upload templates; record classes of the file store
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V1.5.2
+  chapter: V1 Architecture, Design and Threat Modeling
+  section: V1.5 Input and Output Architecture
+  text: Verify that serialization is not used when communicating with untrusted clients. If this is not possible, ensure that
+    adequate integrity controls (and possibly encryption if sensitive data is sent) are enforced to prevent deserialization
+    attacks including object injection.
+  status: Met
+  how: No native Java serialisation crosses a trust boundary; clients exchange JSON bound to typed request objects; Kafka
+    events carry a versioned JSON envelope.
+  evidence: Request objects with Bean Validation; event envelope (schema version 1)
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V1.5.3
+  chapter: V1 Architecture, Design and Threat Modeling
+  section: V1.5 Input and Output Architecture
+  text: Verify that input validation is enforced on a trusted service layer.
+  status: Met
+  how: Validation runs in the backend service layer (Bean Validation on every request object, business rules in the services)
+    whatever the client checks.
+  evidence: Request objects; business rule exceptions (status 422)
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V1.5.4
+  chapter: V1 Architecture, Design and Threat Modeling
+  section: V1.5 Input and Output Architecture
+  text: Verify that output encoding occurs close to or by the interpreter for which it is intended.
+  status: Met
+  how: 'Encoding is done by the interpreter: React escapes all rendered text, the database driver binds parameters, the CSV
+    renderer neutralises formulas, the logger neutralises line breaks.'
+  evidence: Web client (no raw HTML insertion); CSV report renderer; log message converter
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V1.6.1
+  chapter: V1 Architecture, Design and Threat Modeling
+  section: V1.6 Cryptographic Architecture
+  text: Verify that there is an explicit policy for management of cryptographic keys and that a cryptographic key lifecycle
+    follows a key management standard such as NIST SP 800-57.
+  status: Partly met
+  how: BDOI owns the customer-managed KMS keys and the rotation policy (decision of 26-Sep-2026); application keys (token
+    signing, second-factor encryption, masking) are in AWS Secrets Manager with a rotation procedure.
+  evidence: Document storage decision 4; Security Architecture chapter 6
+  gap: BDOI to confirm the key management standard and rotation periods (open point SEC-04)
+  owner: BDOI Information Security
+  due: 31 Jan 2027
+- id: V1.6.2
+  chapter: V1 Architecture, Design and Threat Modeling
+  section: V1.6 Cryptographic Architecture
+  text: Verify that consumers of cryptographic services protect key material and other secrets by using key vaults or API
+    based alternatives.
+  status: Met
+  how: Secrets come from AWS Secrets Manager through the secret of the namespace; encryption at rest uses KMS keys that never
+    leave KMS.
+  evidence: External Secrets or release pipeline; KMS key policies
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V1.6.3
+  chapter: V1 Architecture, Design and Threat Modeling
+  section: V1.6 Cryptographic Architecture
+  text: Verify that all keys and passwords are replaceable and are part of a well-defined process to re-encrypt sensitive
+    data.
+  status: Met
+  how: 'Every key and password is replaceable: the second-factor key rotates with a previous-key setting and re-encryption
+    at next use; the token signing key rotates with re-issue through the refresh cookie; KMS keys rotate without data re-encryption
+    by the application.'
+  evidence: Configuration reference (previous MFA key); runbook (key rotation)
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V1.6.4
+  chapter: V1 Architecture, Design and Threat Modeling
+  section: V1.6 Cryptographic Architecture
+  text: Verify that the architecture treats client-side secrets--such as symmetric keys, passwords, or API tokens--as insecure
+    and never uses them to protect or access sensitive data.
+  status: Met
+  how: The web client holds no secret; it receives a short-lived access token only.
+  evidence: Web client token handling (session storage only)
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V1.7.1
+  chapter: V1 Architecture, Design and Threat Modeling
+  section: V1.7 Errors, Logging and Auditing Architecture
+  text: Verify that a common logging format and approach is used across the system.
+  status: Met
+  how: 'One log format for every component: ISO-8601 time with offset, level, thread, logger, message; container output collected
+    by the platform.'
+  evidence: Logging configuration (console pattern)
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V1.7.2
+  chapter: V1 Architecture, Design and Threat Modeling
+  section: V1.7 Errors, Logging and Auditing Architecture
+  text: Verify that logs are securely transmitted to a preferably remote system for analysis, detection, alerting, and escalation.
+  status: BDOI
+  how: BIBS writes to the container output; the platform ships it to the BDO log platform and SIEM.
+  evidence: Deployment (container logging)
+  gap: BDOI IT to name the log platform and SIEM and the log forwarder (open point SEC-07)
+  owner: BDOI IT
+  due: 31 Mar 2027
+- id: V1.8.1
+  chapter: V1 Architecture, Design and Threat Modeling
+  section: V1.8 Data Protection and Privacy Architecture
+  text: Verify that all sensitive data is identified and classified into protection levels.
+  status: Met
+  how: Personal and sensitive data are identified per domain and record class (client KYC, employee benefits members, screening
+    cases, payee bank accounts).
+  evidence: Data Architecture chapter 10 (data classification); record classes
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V1.8.2
+  chapter: V1 Architecture, Design and Threat Modeling
+  section: V1.8 Data Protection and Privacy Architecture
+  text: Verify that all protection levels have an associated set of protection requirements, such as encryption requirements,
+    integrity requirements, retention, privacy and other confidentiality requirements, and that these are applied in the architecture.
+  status: Partly met
+  how: Each protection level has its controls (encryption, access class, masking outside production, retention, download logging).
+  evidence: Data Architecture chapter 10; Security Architecture chapter 12
+  gap: BDOI Information Security to approve the classification and the controls per level (open point SEC-09)
+  owner: BDOI Information Security
+  due: 31 Jan 2027
+- id: V1.9.1
+  chapter: V1 Architecture, Design and Threat Modeling
+  section: V1.9 Communications Architecture
+  text: Verify the application encrypts communications between components, particularly when these components are in different
+    containers, systems, sites, or cloud providers.
+  status: Met
+  how: 'TLS on every hop: load balancer to pods, pods to PostgreSQL (verify-full), Valkey, Kafka, S3 and AWS services, Apigee
+    X and SMTP (STARTTLS).'
+  evidence: Encryption in transit table (DEPLOYMENT); start-up safeguards refuse plaintext in production
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V1.9.2
+  chapter: V1 Architecture, Design and Threat Modeling
+  section: V1.9 Communications Architecture
+  text: Verify that application components verify the authenticity of each side in a communication link to prevent person-in-the-middle
+    attacks. For example, application components should validate TLS certificates and chains.
+  status: Met
+  how: 'Certificates are validated: RDS CA bundle with verify-full, AWS Private CA chain for pod certificates, provider key
+    sets for OIDC and Apigee tokens.'
+  evidence: Database TLS settings; cert-manager certificates
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V1.10.1
+  chapter: V1 Architecture, Design and Threat Modeling
+  section: V1.10 Malicious Software Architecture
+  text: Verify that a version control system is in use, with procedures to ensure that check-ins are accompanied by issues
+    or change tickets. The version control system should have access control and identifiable users to allow traceability
+    of any changes.
+  status: Met
+  how: Version control with access control and named users; every change is reviewed and linked to its change or requirement
+    reference.
+  evidence: Version control and merge rules; change register
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V1.11.1
+  chapter: V1 Architecture, Design and Threat Modeling
+  section: V1.11 Business Logic Architecture
+  text: Verify the definition and documentation of all application components in terms of the business or security functions
+    they provide.
+  status: Met
+  how: Every component and module is documented with its business and security function.
+  evidence: Solution architecture; module guides; Security Architecture chapter 2
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V1.11.2
+  chapter: V1 Architecture, Design and Threat Modeling
+  section: V1.11 Business Logic Architecture
+  text: Verify that all high-value business logic flows, including authentication, session management and access control,
+    do not share unsynchronized state.
+  status: Met
+  how: Authentication, session and access state live in PostgreSQL (session log, data scope) with Valkey only as a cache;
+    checks fail closed when a store does not answer.
+  evidence: Session log; token denylist fallback; fail-closed filter
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V1.12.2
+  chapter: V1 Architecture, Design and Threat Modeling
+  section: V1.12 Secure File Upload Architecture
+  text: Verify that user-uploaded files - if required to be displayed or downloaded from the application - are served by either
+    octet stream downloads, or from an unrelated domain, such as a cloud file storage bucket. Implement a suitable Content
+    Security Policy (CSP) to reduce the risk from XSS vectors or other attacks from the uploaded file.
+  status: Met
+  how: Files are served as downloads (Content-Disposition attachment, no-store) or by short-lived presigned links from the
+    S3 bucket domain.
+  evidence: File downloads; S3 file store
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V1.14.1
+  chapter: V1 Architecture, Design and Threat Modeling
+  section: V1.14 Configuration Architecture
+  text: Verify the segregation of components of differing trust levels through well-defined security controls, firewall rules,
+    API gateways, reverse proxies, cloud-based security groups, or similar mechanisms.
+  status: Met
+  how: 'Network segregation: WAF, internal load balancer, Kubernetes Gateway API routes, NetworkPolicies that deny by default,
+    Apigee X for systems, data services in private subnets.'
+  evidence: Deployment (edge, network policies)
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V1.14.2
+  chapter: V1 Architecture, Design and Threat Modeling
+  section: V1.14 Configuration Architecture
+  text: Verify that binary signatures, trusted connections, and verified service interfaces are used to deploy binaries to
+    remote devices.
+  status: Partly met
+  how: Images are pushed to ECR from the pipeline and deployed by digest-pinned manifests.
+  evidence: Release pipeline; Kustomize overlays
+  gap: Sign the images (cosign or AWS Signer) and verify signatures at admission (open point SEC-11)
+  owner: iorta TechNXT
+  due: 30 Jun 2027
+- id: V1.14.3
+  chapter: V1 Architecture, Design and Threat Modeling
+  section: V1.14 Configuration Architecture
+  text: Verify that the delivery pipeline warns of out-of-date or insecure components and takes appropriate actions.
+  status: Met
+  how: The pipeline fails on vulnerable dependencies (OWASP dependency-check CVSS 7 or higher, npm audit high, Trivy high
+    and critical) and proposes updates weekly.
+  evidence: CI pipeline jobs; dependency update proposals
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V1.14.4
+  chapter: V1 Architecture, Design and Threat Modeling
+  section: V1.14 Configuration Architecture
+  text: Verify that the delivery pipeline contains a pipeline step to automatically package and verify the secure deployment
+    of the application, particularly if the application infrastructure is software defined, such as cloud environment provisioning
+    scripts.
+  status: Met
+  how: The pipeline compiles, tests, scans and packages the images; the Kubernetes manifests are validated and applied from
+    the overlays.
+  evidence: CI pipeline; kustomize and kubeconform checks
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V1.14.5
+  chapter: V1 Architecture, Design and Threat Modeling
+  section: V1.14 Configuration Architecture
+  text: Verify that application deployments adequately isolate, containerize and/or isolate at the network level to delay
+    and deter attackers from attacking other applications, especially when they are performing sensitive or dangerous actions
+    such as deserialization.
+  status: Met
+  how: Each workload runs in its own deployment and service account with NetworkPolicies; pods never call each other; the
+    namespace enforces the restricted Pod Security level.
+  evidence: Deployment (workloads, network policies)
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V1.14.6
+  chapter: V1 Architecture, Design and Threat Modeling
+  section: V1.14 Configuration Architecture
+  text: Verify the application does not use unsupported, insecure, or deprecated client-side technologies such as NSAPI plugins,
+    Flash, Shockwave, ActiveX, Silverlight, NACL, or client-side Java applets.
+  status: Met
+  how: The web client is a React single-page application; no plug-ins or applets.
+  evidence: Web client
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V2.1.1
+  chapter: V2 Authentication
+  section: V2.1 Password Security
+  text: Verify that user set passwords are at least 12 characters in length (after multiple spaces are combined).
+  status: Partly met
+  how: BDO users authenticate at EIAM, which applies the BDO password policy. Local passwords (break-glass only) need at least
+    10 characters with upper and lower case, digit and symbol, as the BRD-11 password rule asks.
+  evidence: Password policy check; parameter set of the password rules
+  gap: Raise the local minimum to 12 characters (open point SEC-02)
+  owner: iorta TechNXT
+  due: 31 Jan 2027
+- id: V2.1.2
+  chapter: V2 Authentication
+  section: V2.1 Password Security
+  text: Verify that passwords of at least 64 characters are permitted, and that passwords of more than 128 characters are
+    denied.
+  status: Met
+  how: Local passwords accept up to 128 characters.
+  evidence: Password change request validation
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V2.1.3
+  chapter: V2 Authentication
+  section: V2.1 Password Security
+  text: Verify that password truncation is not performed. However, consecutive multiple spaces may be replaced by a single
+    space.
+  status: Met
+  how: Passwords are hashed whole; no truncation.
+  evidence: BCrypt encoder
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V2.1.4
+  chapter: V2 Authentication
+  section: V2.1 Password Security
+  text: Verify that any printable Unicode character, including language neutral characters such as spaces and Emojis are permitted
+    in passwords.
+  status: Met
+  how: Any printable Unicode character is accepted.
+  evidence: Password change request validation
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V2.1.5
+  chapter: V2 Authentication
+  section: V2.1 Password Security
+  text: Verify users can change their password.
+  status: Met
+  how: Users change their password on My Profile; the first sign-in forces a change.
+  evidence: My Profile; must-change flag
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V2.1.6
+  chapter: V2 Authentication
+  section: V2.1 Password Security
+  text: Verify that password change functionality requires the user's current and new password.
+  status: Met
+  how: Password change asks for the current and the new password.
+  evidence: Password change request
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V2.1.7
+  chapter: V2 Authentication
+  section: V2.1 Password Security
+  text: Verify that passwords submitted during account registration, login, and password change are checked against a set
+    of breached passwords either locally (such as the top 1,000 or 10,000 most common passwords which match the system's password
+    policy) or using an external API. If using an API a zero knowledge proof or other mechanism should be used to ensure that
+    the plain text password is not sent or used in verifying the breach status of the password. If the password is breached,
+    the application must require the user to set a new non-breached password.
+  status: Planned
+  how: EIAM checks BDO passwords against breached lists (Entra ID password protection).
+  evidence: EIAM configuration
+  gap: Add a breached-password list check for local break-glass passwords (open point SEC-02)
+  owner: iorta TechNXT
+  due: 30 Apr 2027
+- id: V2.1.8
+  chapter: V2 Authentication
+  section: V2.1 Password Security
+  text: Verify that a password strength meter is provided to help users set a stronger password.
+  status: Not applicable
+  how: Passwords are set at EIAM for BDO users; break-glass administrators follow the BDO password standard.
+  evidence: '-'
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V2.1.9
+  chapter: V2 Authentication
+  section: V2.1 Password Security
+  text: Verify that there are no password composition rules limiting the type of characters permitted. There should be no
+    requirement for upper or lower case or numbers or special characters.
+  status: Partly met
+  how: Composition rules apply to local passwords because BRD-11 (UAM-NFR-36) requires them.
+  evidence: Password policy
+  gap: Deviation from ASVS accepted by BDOI for BRD-11 (open point SEC-02)
+  owner: BDOI Information Security
+  due: 31 Jan 2027
+- id: V2.1.10
+  chapter: V2 Authentication
+  section: V2.1 Password Security
+  text: Verify that there are no periodic credential rotation or password history requirements.
+  status: Partly met
+  how: Password history and maximum age apply to local passwords because BRD-11 requires them.
+  evidence: Password history; parameters of the password age
+  gap: Deviation from ASVS accepted by BDOI for BRD-11 (open point SEC-02)
+  owner: BDOI Information Security
+  due: 31 Jan 2027
+- id: V2.1.11
+  chapter: V2 Authentication
+  section: V2.1 Password Security
+  text: Verify that "paste" functionality, browser password helpers, and external password managers are permitted.
+  status: Met
+  how: Paste and password managers are allowed on the sign-in form.
+  evidence: Sign-in screen
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V2.1.12
+  chapter: V2 Authentication
+  section: V2.1 Password Security
+  text: Verify that the user can choose to either temporarily view the entire masked password, or temporarily view the last
+    typed character of the password on platforms that do not have this as built-in functionality.
+  status: Met
+  how: The password field has a show / hide control.
+  evidence: Sign-in screen
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V2.2.1
+  chapter: V2 Authentication
+  section: V2.2 General Authenticator Security
+  text: Verify that anti-automation controls are effective at mitigating breached credential testing, brute force, and account
+    lockout attacks. Such controls include blocking the most common breached passwords, soft lockouts, rate limiting, CAPTCHA,
+    ever increasing delays between attempts, IP address restrictions, or risk-based restrictions such as location, first login
+    on a device, recent attempts to unlock the account, or similar. Verify that no more than 100 failed attempts per hour
+    is possible on a single account.
+  status: Met
+  how: Sign-in steps are rate limited per client address (20 per minute), the account locks after LOGIN_MAX_FAILED_ATTEMPTS
+    (3) wrong passwords or codes, the WAF has a rate rule on the sign-in path, and every attempt is audited.
+  evidence: Login rate limiter (Valkey, database fallback, refuse when neither answers); lockout; WAF rate rule
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V2.2.2
+  chapter: V2 Authentication
+  section: V2.2 General Authenticator Security
+  text: Verify that the use of weak authenticators (such as SMS and email) is limited to secondary verification and transaction
+    approval and not as a replacement for more secure authentication methods. Verify that stronger methods are offered before
+    weak methods, users are aware of the risks, or that proper measures are in place to limit the risks of account compromise.
+  status: Met
+  how: No SMS or e-mail sign-in factor; the second factor is an authenticator app (TOTP) or EIAM's own methods.
+  evidence: Second-factor service
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V2.2.3
+  chapter: V2 Authentication
+  section: V2.2 General Authenticator Security
+  text: Verify that secure notifications are sent to users after updates to authentication details, such as credential resets,
+    email or address changes, logging in from unknown or risky locations. The use of push notifications - rather than SMS
+    or email - is preferred, but in the absence of push notifications, SMS or email is acceptable as long as no sensitive
+    information is disclosed in the notification.
+  status: Partly met
+  how: Users are notified of a second-factor reset and of access changes.
+  evidence: Second-factor reset notices; access change notices
+  gap: Notify the user by e-mail after a password change or reset and after a sign-in from a new device (open point SEC-03)
+  owner: iorta TechNXT
+  due: 30 Apr 2027
+- id: V2.3.1
+  chapter: V2 Authentication
+  section: V2.3 Authenticator Lifecycle
+  text: Verify system generated initial passwords or activation codes SHOULD be securely randomly generated, SHOULD be at
+    least 6 characters long, and MAY contain letters and numbers, and expire after a short period of time. These initial secrets
+    must not be permitted to become the long term password.
+  status: Met
+  how: Initial and reset passwords are random, single use, expire and must be changed at first use; reset links are random,
+    hashed in the database and expire.
+  evidence: Password reset links (SHA-256 stored); must-change flag
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V2.3.2
+  chapter: V2 Authentication
+  section: V2.3 Authenticator Lifecycle
+  text: Verify that enrollment and use of user-provided authentication devices are supported, such as a U2F or FIDO tokens.
+  status: BDOI
+  how: FIDO2 keys and Windows Hello are offered by EIAM for BDO users.
+  evidence: EIAM
+  gap: BDOI IT to confirm the EIAM authentication methods and conditional access (open point SEC-01)
+  owner: BDOI IT
+  due: 30 Nov 2026
+- id: V2.3.3
+  chapter: V2 Authentication
+  section: V2.3 Authenticator Lifecycle
+  text: Verify that renewal instructions are sent with sufficient time to renew time bound authenticators.
+  status: Not applicable
+  how: No time-bound authenticator is issued by BIBS.
+  evidence: '-'
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V2.4.1
+  chapter: V2 Authentication
+  section: V2.4 Credential Storage
+  text: Verify that passwords are stored in a form that is resistant to offline attacks. Passwords SHALL be salted and hashed
+    using an approved one-way key derivation or password hashing function. Key derivation and password hashing functions take
+    a password, a salt, and a cost factor as inputs when generating a password hash.
+  status: Met
+  how: Passwords are stored as salted BCrypt hashes.
+  evidence: BCrypt password encoder
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V2.4.2
+  chapter: V2 Authentication
+  section: V2.4 Credential Storage
+  text: Verify that the salt is at least 32 bits in length and be chosen arbitrarily to minimize salt value collisions among
+    stored hashes. For each credential, a unique salt value and the resulting hash SHALL be stored.
+  status: Met
+  how: BCrypt generates a 128-bit random salt per hash.
+  evidence: BCrypt password encoder
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V2.4.3
+  chapter: V2 Authentication
+  section: V2.4 Credential Storage
+  text: Verify that if PBKDF2 is used, the iteration count SHOULD be as large as verification server performance will allow,
+    typically at least 100,000 iterations.
+  status: Not applicable
+  how: PBKDF2 is not used.
+  evidence: '-'
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V2.4.4
+  chapter: V2 Authentication
+  section: V2.4 Credential Storage
+  text: Verify that if bcrypt is used, the work factor SHOULD be as large as verification server performance will allow, with
+    a minimum of 10.
+  status: Met
+  how: BCrypt work factor 12.
+  evidence: Password encoder configuration
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V2.4.5
+  chapter: V2 Authentication
+  section: V2.4 Credential Storage
+  text: Verify that an additional iteration of a key derivation function is performed, using a salt value that is secret and
+    known only to the verifier. Generate the salt value using an approved random bit generator [SP 800-90Ar1] and provide
+    at least the minimum security strength specified in the latest revision of SP 800-131A. The secret salt value SHALL be
+    stored separately from the hashed passwords (e.g., in a specialized device like a hardware security module).
+  status: Partly met
+  how: No secret pepper is applied to local password hashes.
+  evidence: '-'
+  gap: Add a pepper held in Secrets Manager for the break-glass passwords, or keep the risk accepted given that only break-glass
+    accounts hold local passwords (open point SEC-02)
+  owner: iorta TechNXT
+  due: 30 Apr 2027
+- id: V2.5.1
+  chapter: V2 Authentication
+  section: V2.5 Credential Recovery
+  text: Verify that a system generated initial activation or recovery secret is not sent in clear text to the user.
+  status: Met
+  how: 'Initial secrets are never sent in clear: reset links are single use and short-lived, temporary passwords must be changed
+    at first sign-in.'
+  evidence: Password reset service
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V2.5.2
+  chapter: V2 Authentication
+  section: V2.5 Credential Recovery
+  text: Verify password hints or knowledge-based authentication (so-called "secret questions") are not present.
+  status: Met
+  how: No password hints or secret questions.
+  evidence: Sign-in screens
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V2.5.3
+  chapter: V2 Authentication
+  section: V2.5 Credential Recovery
+  text: Verify password credential recovery does not reveal the current password in any way.
+  status: Met
+  how: Recovery never shows the current password; the reset check returns no user name.
+  evidence: Password reset service
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V2.5.4
+  chapter: V2 Authentication
+  section: V2.5 Credential Recovery
+  text: Verify shared or default accounts are not present (e.g. "root", "admin", or "sa").
+  status: Met
+  how: 'No shared or default account: the initial administrator exists only on an empty installation, from a secret, and must
+    change the password at first sign-in; every user is named.'
+  evidence: Initial administrator bootstrap
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V2.5.5
+  chapter: V2 Authentication
+  section: V2.5 Credential Recovery
+  text: Verify that if an authentication factor is changed or replaced, that the user is notified of this event.
+  status: Partly met
+  how: The user is notified when an administrator resets the second factor.
+  evidence: Second-factor reset notices
+  gap: Notify after own enrolment change and password change (open point SEC-03)
+  owner: iorta TechNXT
+  due: 30 Apr 2027
+- id: V2.5.6
+  chapter: V2 Authentication
+  section: V2.5 Credential Recovery
+  text: Verify forgotten password, and other recovery paths use a secure recovery mechanism, such as time-based OTP (TOTP)
+    or other soft token, mobile push, or another offline recovery mechanism.
+  status: Met
+  how: Forgotten password uses a single-use, time-limited link to the registered e-mail; BDO users recover at EIAM.
+  evidence: Password reset links
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V2.5.7
+  chapter: V2 Authentication
+  section: V2.5 Credential Recovery
+  text: Verify that if OTP or multi-factor authentication factors are lost, that evidence of identity proofing is performed
+    at the same level as during enrollment.
+  status: Met
+  how: A lost authenticator is reset only by an administrator after identity checks, approved by a second administrator (four
+    eyes).
+  evidence: Second-factor reset requests and approvals
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V2.6.1
+  chapter: V2 Authentication
+  section: V2.6 Look-up Secret Verifier
+  text: Verify that lookup secrets can be used only once.
+  status: Met
+  how: Recovery codes are single use.
+  evidence: Second-factor recovery codes
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V2.6.2
+  chapter: V2 Authentication
+  section: V2.6 Look-up Secret Verifier
+  text: Verify that lookup secrets have sufficient randomness (112 bits of entropy), or if less than 112 bits of entropy,
+    salted with a unique and random 32-bit salt and hashed with an approved one-way hash.
+  status: Met
+  how: Ten random recovery codes per user, stored as SHA-256 hashes.
+  evidence: Second-factor recovery codes
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V2.6.3
+  chapter: V2 Authentication
+  section: V2.6 Look-up Secret Verifier
+  text: Verify that lookup secrets are resistant to offline attacks, such as predictable values.
+  status: Met
+  how: Codes come from a cryptographically secure random generator.
+  evidence: Second-factor service
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V2.7.1
+  chapter: V2 Authentication
+  section: V2.7 Out of Band Verifier
+  text: Verify that clear text out of band (NIST "restricted") authenticators, such as SMS or PSTN, are not offered by default,
+    and stronger alternatives such as push notifications are offered first.
+  status: Not applicable
+  how: No out-of-band authenticator (SMS, voice).
+  evidence: '-'
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V2.7.2
+  chapter: V2 Authentication
+  section: V2.7 Out of Band Verifier
+  text: Verify that the out of band verifier expires out of band authentication requests, codes, or tokens after 10 minutes.
+  status: Not applicable
+  how: No out-of-band authenticator.
+  evidence: '-'
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V2.7.3
+  chapter: V2 Authentication
+  section: V2.7 Out of Band Verifier
+  text: Verify that the out of band verifier authentication requests, codes, or tokens are only usable once, and only for
+    the original authentication request.
+  status: Not applicable
+  how: No out-of-band authenticator.
+  evidence: '-'
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V2.7.4
+  chapter: V2 Authentication
+  section: V2.7 Out of Band Verifier
+  text: Verify that the out of band authenticator and verifier communicates over a secure independent channel.
+  status: Not applicable
+  how: No out-of-band authenticator.
+  evidence: '-'
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V2.7.5
+  chapter: V2 Authentication
+  section: V2.7 Out of Band Verifier
+  text: Verify that the out of band verifier retains only a hashed version of the authentication code.
+  status: Not applicable
+  how: No out-of-band authenticator.
+  evidence: '-'
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V2.7.6
+  chapter: V2 Authentication
+  section: V2.7 Out of Band Verifier
+  text: Verify that the initial authentication code is generated by a secure random number generator, containing at least
+    20 bits of entropy (typically a six digital random number is sufficient).
+  status: Not applicable
+  how: No out-of-band authenticator.
+  evidence: '-'
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V2.8.1
+  chapter: V2 Authentication
+  section: V2.8 One Time Verifier
+  text: Verify that time-based OTPs have a defined lifetime before expiring.
+  status: Met
+  how: TOTP codes are valid for 30 seconds with one step of drift.
+  evidence: TOTP (RFC 6238) implementation
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V2.8.2
+  chapter: V2 Authentication
+  section: V2.8 One Time Verifier
+  text: Verify that symmetric keys used to verify submitted OTPs are highly protected, such as by using a hardware security
+    module or secure operating system based key storage.
+  status: Met
+  how: TOTP secrets are encrypted with AES-256-GCM under a key from Secrets Manager, bound to the user name.
+  evidence: Second-factor secret cipher
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V2.8.3
+  chapter: V2 Authentication
+  section: V2.8 One Time Verifier
+  text: Verify that approved cryptographic algorithms are used in the generation, seeding, and verification of OTPs.
+  status: Met
+  how: HMAC-SHA1 TOTP as per RFC 6238, seeds from a secure random generator.
+  evidence: TOTP implementation
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V2.8.4
+  chapter: V2 Authentication
+  section: V2.8 One Time Verifier
+  text: Verify that time-based OTP can be used only once within the validity period.
+  status: Met
+  how: A code is never accepted twice.
+  evidence: Replay protection of the second-factor service
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V2.8.5
+  chapter: V2 Authentication
+  section: V2.8 One Time Verifier
+  text: Verify that if a time-based multi-factor OTP token is re-used during the validity period, it is logged and rejected
+    with secure notifications being sent to the holder of the device.
+  status: Partly met
+  how: A reused code is refused and counts towards the lockout.
+  evidence: Second-factor service
+  gap: Log the reuse as a security event and notify the user (open point SEC-03)
+  owner: iorta TechNXT
+  due: 30 Apr 2027
+- id: V2.8.6
+  chapter: V2 Authentication
+  section: V2.8 One Time Verifier
+  text: Verify physical single-factor OTP generator can be revoked in case of theft or other loss. Ensure that revocation
+    is immediately effective across logged in sessions, regardless of location.
+  status: Met
+  how: An administrator reset (four eyes) removes the authenticator, the recovery codes and the remembered devices and ends
+    the user's sessions at once.
+  evidence: Second-factor reset
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V2.8.7
+  chapter: V2 Authentication
+  section: V2.8 One Time Verifier
+  text: Verify that biometric authenticators are limited to use only as secondary factors in conjunction with either something
+    you have and something you know.
+  status: Not applicable
+  how: No biometric authenticator in BIBS.
+  evidence: '-'
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V2.9.1
+  chapter: V2 Authentication
+  section: V2.9 Cryptographic Verifier
+  text: Verify that cryptographic keys used in verification are stored securely and protected against disclosure, such as
+    using a Trusted Platform Module (TPM) or Hardware Security Module (HSM), or an OS service that can use this secure storage.
+  status: Not applicable
+  how: No cryptographic authenticator is verified by BIBS; EIAM handles device keys.
+  evidence: '-'
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V2.9.2
+  chapter: V2 Authentication
+  section: V2.9 Cryptographic Verifier
+  text: Verify that the challenge nonce is at least 64 bits in length, and statistically unique or unique over the lifetime
+    of the cryptographic device.
+  status: Not applicable
+  how: No cryptographic authenticator.
+  evidence: '-'
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V2.9.3
+  chapter: V2 Authentication
+  section: V2.9 Cryptographic Verifier
+  text: Verify that approved cryptographic algorithms are used in the generation, seeding, and verification.
+  status: Not applicable
+  how: No cryptographic authenticator.
+  evidence: '-'
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V2.10.1
+  chapter: V2 Authentication
+  section: V2.10 Service Authentication
+  text: Verify that intra-service secrets do not rely on unchanging credentials such as passwords, API keys or shared accounts
+    with privileged access.
+  status: Met
+  how: 'Service credentials are not static where the platform allows: AWS access through IAM roles of the service accounts;
+    database, Valkey and Kafka credentials from Secrets Manager with rotation.'
+  evidence: IRSA; secrets of the namespace
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V2.10.2
+  chapter: V2 Authentication
+  section: V2.10 Service Authentication
+  text: Verify that if passwords are required for service authentication, the service account used is not a default credential.
+    (e.g. root/root or admin/admin are default in some services during installation).
+  status: Met
+  how: No default service credentials; production start is refused with development values.
+  evidence: Start-up safeguards
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V2.10.3
+  chapter: V2 Authentication
+  section: V2.10 Service Authentication
+  text: Verify that passwords are stored with sufficient protection to prevent offline recovery attacks, including local system
+    access.
+  status: Met
+  how: Service passwords live only in Secrets Manager and the Kubernetes secret; never in images or configuration files.
+  evidence: Secrets template (no values); start-up safeguards
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V2.10.4
+  chapter: V2 Authentication
+  section: V2.10 Service Authentication
+  text: Verify passwords, integrations with databases and third-party systems, seeds and internal secrets, and API keys are
+    managed securely and not included in the program code or stored within version control. Such storage SHOULD resist offline
+    attacks. The use of a secure software key store (L1), hardware TPM, or an HSM (L3) is recommended for password storage.
+  status: Met
+  how: No secret in program code or version control; secret detection runs over the full history on every pipeline.
+  evidence: CI job Secret detection (gitleaks, full history); reviewed findings list with fingerprints
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V3.1.1
+  chapter: V3 Session Management
+  section: V3.1 Fundamental Session Management Security
+  text: Verify the application never reveals session tokens in URL parameters.
+  status: Met
+  how: Tokens travel in the Authorization header and an HttpOnly cookie; never in URLs. The single sign-on ticket is a one-time
+    value valid 2 minutes.
+  evidence: Token handling; single sign-on ticket
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V3.2.1
+  chapter: V3 Session Management
+  section: V3.2 Session Binding
+  text: Verify the application generates a new session token on user authentication.
+  status: Met
+  how: Each sign-in opens a new session with a new session id, access token and refresh token.
+  evidence: Sign-in session service
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V3.2.2
+  chapter: V3 Session Management
+  section: V3.2 Session Binding
+  text: Verify that session tokens possess at least 64 bits of entropy.
+  status: Met
+  how: Refresh tokens are 256-bit random values; access tokens are signed and carry a random token id.
+  evidence: Refresh cookie; token service
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V3.2.3
+  chapter: V3 Session Management
+  section: V3.2 Session Binding
+  text: Verify the application only stores session tokens in the browser using secure methods such as appropriately secured
+    cookies (see section 3.4) or HTML 5 session storage.
+  status: Met
+  how: The refresh token is in an HttpOnly, Secure, SameSite=Strict cookie limited to the sign-in path; the access token is
+    kept in session storage only, never local storage.
+  evidence: Refresh cookie; web client token store
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V3.2.4
+  chapter: V3 Session Management
+  section: V3.2 Session Binding
+  text: Verify that session tokens are generated using approved cryptographic algorithms.
+  status: Met
+  how: Secure random generator and HMAC-SHA256 signatures.
+  evidence: Token service
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V3.3.1
+  chapter: V3 Session Management
+  section: V3.3 Session Termination
+  text: Verify that logout and expiration invalidate the session token, such that the back button or a downstream relying
+    party does not resume an authenticated session, including across relying parties.
+  status: Met
+  how: Sign-out ends the session in the session log and the token denylist; a refresh after sign-out is refused; tokens without
+    a live session are refused.
+  evidence: Sign-out; fail-closed token filter
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V3.3.2
+  chapter: V3 Session Management
+  section: V3.3 Session Termination
+  text: If authenticators permit users to remain logged in, verify that re-authentication occurs periodically both when actively
+    used or after an idle period.
+  status: Met
+  how: Idle time-out after 30 minutes (warning at 15), absolute session end after 8 hours, access token life 15 minutes.
+  evidence: Parameters SESSION_TIMEOUT_MINUTES, ACCESS_TOKEN_MINUTES; token validity
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V3.3.3
+  chapter: V3 Session Management
+  section: V3.3 Session Termination
+  text: Verify that the application gives the option to terminate all other active sessions after a successful password change
+    (including change via password reset/recovery), and that this is effective across the application, federated login (if
+    present), and any relying parties.
+  status: Partly met
+  how: Deactivation, lock and second-factor reset end every session of the user at once.
+  evidence: User administration service; session sweep
+  gap: Offer 'sign out my other sessions' after a password change and end them after a reset (open point SEC-03)
+  owner: iorta TechNXT
+  due: 30 Apr 2027
+- id: V3.3.4
+  chapter: V3 Session Management
+  section: V3.3 Session Termination
+  text: Verify that users are able to view and (having re-entered login credentials) log out of any or all currently active
+    sessions and devices.
+  status: Partly met
+  how: Administrators see the open sessions of every user and can end them.
+  evidence: Session log; user administration
+  gap: Show the user's own sessions on My Profile with sign-out per session (open point SEC-03)
+  owner: iorta TechNXT
+  due: 30 Jun 2027
+- id: V3.4.1
+  chapter: V3 Session Management
+  section: V3.4 Cookie-based Session Management
+  text: Verify that cookie-based session tokens have the 'Secure' attribute set.
+  status: Met
+  how: Secure attribute on the refresh cookie outside a developer's machine.
+  evidence: Refresh cookie
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V3.4.2
+  chapter: V3 Session Management
+  section: V3.4 Cookie-based Session Management
+  text: Verify that cookie-based session tokens have the 'HttpOnly' attribute set.
+  status: Met
+  how: HttpOnly attribute on the refresh cookie.
+  evidence: Refresh cookie
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V3.4.3
+  chapter: V3 Session Management
+  section: V3.4 Cookie-based Session Management
+  text: Verify that cookie-based session tokens utilize the 'SameSite' attribute to limit exposure to cross-site request forgery
+    attacks.
+  status: Met
+  how: SameSite=Strict on the refresh cookie.
+  evidence: Refresh cookie
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V3.4.4
+  chapter: V3 Session Management
+  section: V3.4 Cookie-based Session Management
+  text: Verify that cookie-based session tokens use the "__Host-" prefix so cookies are only sent to the host that initially
+    set the cookie.
+  status: Partly met
+  how: The cookie is limited to the sign-in path and host-only (no Domain attribute).
+  evidence: Refresh cookie
+  gap: Rename the cookie with the __Host- prefix once its path is widened to / or accept the path restriction (open point
+    SEC-03)
+  owner: iorta TechNXT
+  due: 30 Apr 2027
+- id: V3.4.5
+  chapter: V3 Session Management
+  section: V3.4 Cookie-based Session Management
+  text: Verify that if the application is published under a domain name with other applications that set or use session cookies
+    that might disclose the session cookies, set the path attribute in cookie-based session tokens using the most precise
+    path possible.
+  status: Met
+  how: The cookie path is the narrowest possible (the sign-in path).
+  evidence: Refresh cookie
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V3.5.1
+  chapter: V3 Session Management
+  section: V3.5 Token-based Session Management
+  text: Verify the application allows users to revoke OAuth tokens that form trust relationships with linked applications.
+  status: Not applicable
+  how: BIBS grants no OAuth access to linked applications.
+  evidence: '-'
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V3.5.2
+  chapter: V3 Session Management
+  section: V3.5 Token-based Session Management
+  text: Verify the application uses session tokens rather than static API secrets and keys, except with legacy implementations.
+  status: Met
+  how: Users get session-bound tokens; system calls use Apigee X OAuth access tokens with scopes, not static keys.
+  evidence: Integration security chain
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V3.5.3
+  chapter: V3 Session Management
+  section: V3.5 Token-based Session Management
+  text: Verify that stateless session tokens use digital signatures, encryption, and other countermeasures to protect against
+    tampering, enveloping, replay, null cipher, and key substitution attacks.
+  status: Met
+  how: Access tokens are signed (HS256) with issuer, expiry, token id and session id; the session is checked server-side on
+    every request; Apigee tokens are checked against the key set with asymmetric algorithms only.
+  evidence: Token service; integration token checks
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V3.7.1
+  chapter: V3 Session Management
+  section: V3.7 Defenses Against Session Management Exploits
+  text: Verify the application ensures a full, valid login session or requires re-authentication or secondary verification
+    before allowing any sensitive transactions or account modifications.
+  status: Met
+  how: Sensitive actions need a full session with the second factor where the policy asks; administrator resets and security
+    parameter changes need a second approver.
+  evidence: Second-factor policy; four-eyes approvals
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V4.1.1
+  chapter: V4 Access Control
+  section: V4.1 General Access Control Design
+  text: Verify that the application enforces access control rules on a trusted service layer, especially if client-side access
+    control is present and could be bypassed.
+  status: Met
+  how: Every controller method checks its permission on the server; the data scope is checked before the controller.
+  evidence: Method security; data scope interceptor
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V4.1.2
+  chapter: V4 Access Control
+  section: V4.1 General Access Control Design
+  text: Verify that all user and data attributes and policy information used by access controls cannot be manipulated by end
+    users unless specifically authorized.
+  status: Met
+  how: Roles, permissions and data scope change only through approved access requests or the audited emergency edit; a user
+    never changes his own scope; client values are never trusted for authorisation.
+  evidence: User access requests (four eyes); access change log
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V4.1.3
+  chapter: V4 Access Control
+  section: V4.1 General Access Control Design
+  text: Verify that the principle of least privilege exists - users should only be able to access functions, data files, URLs,
+    controllers, services, and other resources, for which they possess specific authorization. This implies protection against
+    spoofing and elevation of privilege.
+  status: Met
+  how: 'Least privilege: roles are bundles of fine-grained permissions; the insurer-only permissions are withdrawn from every
+    role; metrics and API documentation are closed in production.'
+  evidence: Permission catalogue; role grants; production safeguards
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V4.1.5
+  chapter: V4 Access Control
+  section: V4.1 General Access Control Design
+  text: Verify that access controls fail securely including when an exception occurs.
+  status: Met
+  how: 'Access checks fail closed: unknown user, missing session, store outage or a company outside the scope is refused.'
+  evidence: Fail-closed token filter; data scope guard
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V4.2.1
+  chapter: V4 Access Control
+  section: V4.2 Operation Level Access Control
+  text: Verify that sensitive data and APIs are protected against Insecure Direct Object Reference (IDOR) attacks targeting
+    creation, reading, updating and deletion of records, such as creating or updating someone else's record, viewing everyone's
+    records, or deleting all records.
+  status: Partly met
+  how: Requests that name a company or branch are checked centrally (747 of 747 company-taking request mappings guarded);
+    records loaded by id carry their company.
+  evidence: Data scope coverage check; architecture rule
+  gap: Add the company check on load for the service interfaces that address a record by id only, module by module (open point
+    SEC-05)
+  owner: iorta TechNXT
+  due: 31 Mar 2027
+- id: V4.2.2
+  chapter: V4 Access Control
+  section: V4.2 Operation Level Access Control
+  text: Verify that the application or framework enforces a strong anti-CSRF mechanism to protect authenticated functionality,
+    and effective anti-automation or anti-CSRF protects unauthenticated functionality.
+  status: Met
+  how: The user APIs use a bearer token in the Authorization header (not sent by browsers on their own); the refresh call
+    needs a custom header and the SameSite=Strict cookie; Spring CSRF protection stays on for other cookie paths.
+  evidence: Security filter chain (CSRF configuration)
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V4.3.1
+  chapter: V4 Access Control
+  section: V4.3 Other Access Control Considerations
+  text: Verify administrative interfaces use appropriate multi-factor authentication to prevent unauthorized use.
+  status: Partly met
+  how: Privileged roles (privilege level HIGH or ADMIN) must use the second factor (MFA_POLICY = PRIVILEGED); BDO users sign
+    in through EIAM with its conditional access.
+  evidence: Second-factor policy
+  gap: BDOI to decide ALL or PRIVILEGED for production and the EIAM conditional access for BIBS (open point SEC-01)
+  owner: BDOI Information Security
+  due: 30 Nov 2026
+- id: V4.3.2
+  chapter: V4 Access Control
+  section: V4.3 Other Access Control Considerations
+  text: Verify that directory browsing is disabled unless deliberately desired. Additionally, applications should not allow
+    discovery or disclosure of file or directory metadata, such as Thumbs.db, .DS_Store, .git or .svn folders.
+  status: Met
+  how: No directory listing; nginx serves the client bundle only; hidden files are not packaged.
+  evidence: nginx configuration
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V4.3.3
+  chapter: V4 Access Control
+  section: V4.3 Other Access Control Considerations
+  text: Verify the application has additional authorization (such as step up or adaptive authentication) for lower value systems,
+    and / or segregation of duties for high value applications to enforce anti-fraud controls as per the risk of application
+    and past fraud.
+  status: Met
+  how: 'Segregation of duties: maker-checker on master data and journals, authorisation limits, second approval for privileged
+    access changes and security parameters, separation-of-duties rules between group profiles.'
+  evidence: Approval inbox; SoD rules; authorisation limits
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V5.1.1
+  chapter: V5 Validation, Sanitization and Encoding
+  section: V5.1 Input Validation
+  text: Verify that the application has defenses against HTTP parameter pollution attacks, particularly if the application
+    framework makes no distinction about the source of request parameters (GET, POST, cookies, headers, or environment variables).
+  status: Met
+  how: Parameters bind by name and type from their declared source only.
+  evidence: Typed controller parameters
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V5.1.2
+  chapter: V5 Validation, Sanitization and Encoding
+  section: V5.1 Input Validation
+  text: Verify that frameworks protect against mass parameter assignment attacks, or that the application has countermeasures
+    to protect against unsafe parameter assignment, such as marking fields private or similar.
+  status: Met
+  how: Requests bind to dedicated request objects (records), never to entities; server-owned fields (status, stamps, approver)
+    are not bindable.
+  evidence: Request objects
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V5.1.3
+  chapter: V5 Validation, Sanitization and Encoding
+  section: V5.1 Input Validation
+  text: Verify that all input (HTML form fields, REST requests, URL parameters, HTTP headers, cookies, batch files, RSS feeds,
+    etc) is validated using positive validation (allow lists).
+  status: Met
+  how: 'Positive validation: types, lengths, patterns and lists of values on request objects and upload templates.'
+  evidence: Bean Validation; upload template checks
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V5.1.4
+  chapter: V5 Validation, Sanitization and Encoding
+  section: V5.1 Input Validation
+  text: Verify that structured data is strongly typed and validated against a defined schema including allowed characters,
+    length and pattern (e.g. credit card numbers, e-mail addresses, telephone numbers, or validating that two related fields
+    are reasonable, such as checking that suburb and zip/postcode match).
+  status: Met
+  how: Structured data is typed and validated (dates, amounts, codes, e-mail, TIN, cross-field rules in the services).
+  evidence: Request objects; business rules
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V5.1.5
+  chapter: V5 Validation, Sanitization and Encoding
+  section: V5.1 Input Validation
+  text: Verify that URL redirects and forwards only allow destinations which appear on an allow list, or show a warning when
+    redirecting to potentially untrusted content.
+  status: Met
+  how: 'Redirects are fixed: the single sign-on callback and the configured web client address only; links composed in the
+    client pass a safe-URL check.'
+  evidence: Single sign-on configuration; safe-URL lint rule
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V5.2.1
+  chapter: V5 Validation, Sanitization and Encoding
+  section: V5.2 Sanitization and isolating
+  text: Verify that all untrusted HTML input from WYSIWYG editors or similar is properly sanitized with an HTML sanitizer
+    library or framework feature.
+  status: Not applicable
+  how: No rich-text (HTML) input.
+  evidence: '-'
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V5.2.2
+  chapter: V5 Validation, Sanitization and Encoding
+  section: V5.2 Sanitization and isolating
+  text: Verify that unstructured data is sanitized to enforce safety measures such as allowed characters and length.
+  status: Met
+  how: Free text is limited in length and character set by the request objects and the database column sizes.
+  evidence: Request objects; column sizes (Data Dictionary)
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V5.2.3
+  chapter: V5 Validation, Sanitization and Encoding
+  section: V5.2 Sanitization and isolating
+  text: Verify that the application sanitizes user input before passing to mail systems to protect against SMTP or IMAP injection.
+  status: Met
+  how: E-mails are composed with the mail library's API from templates; header values are not taken from free user input.
+  evidence: Messaging service
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V5.2.4
+  chapter: V5 Validation, Sanitization and Encoding
+  section: V5.2 Sanitization and isolating
+  text: Verify that the application avoids the use of eval() or other dynamic code execution features. Where there is no alternative,
+    any user input being included must be sanitized or isolated before being executed.
+  status: Met
+  how: No eval or dynamic code execution in the backend or the web client (lint rules).
+  evidence: ESLint and SonarJS rules; static analysis
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V5.2.5
+  chapter: V5 Validation, Sanitization and Encoding
+  section: V5.2 Sanitization and isolating
+  text: Verify that the application protects against template injection attacks by ensuring that any user input being included
+    is sanitized or isolated.
+  status: Met
+  how: Document templates are Word templates with fixed merge fields maintained under maker-checker; user input fills values
+    only.
+  evidence: Document generation
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V5.2.6
+  chapter: V5 Validation, Sanitization and Encoding
+  section: V5.2 Sanitization and isolating
+  text: Verify that the application protects against SSRF attacks, by validating or sanitizing untrusted data or HTTP file
+    metadata, such as filenames and URL input fields, and uses allow lists of protocols, domains, paths and ports.
+  status: Met
+  how: Outbound calls go to configured addresses only (provider key sets, Apigee, AWS service interfaces, SMTP); no URL is
+    taken from user input; egress is limited by NetworkPolicies.
+  evidence: Configuration; network policies
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V5.2.7
+  chapter: V5 Validation, Sanitization and Encoding
+  section: V5.2 Sanitization and isolating
+  text: Verify that the application sanitizes, disables, or isolates user-supplied Scalable Vector Graphics (SVG) scriptable
+    content, especially as they relate to XSS resulting from inline scripts, and foreignObject.
+  status: Met
+  how: SVG uploads are not accepted as images to display; files are downloaded as attachments.
+  evidence: File type allow lists; downloads
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V5.2.8
+  chapter: V5 Validation, Sanitization and Encoding
+  section: V5.2 Sanitization and isolating
+  text: Verify that the application sanitizes, disables, or isolates user-supplied scriptable or expression template language
+    content, such as Markdown, CSS or XSL stylesheets, BBCode, or similar.
+  status: Not applicable
+  how: No user-supplied template languages (Markdown, CSS, XSL).
+  evidence: '-'
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V5.3.1
+  chapter: V5 Validation, Sanitization and Encoding
+  section: V5.3 Output Encoding and Injection Prevention
+  text: Verify that output encoding is relevant for the interpreter and context required. For example, use encoders specifically
+    for HTML values, HTML attributes, JavaScript, URL parameters, HTTP headers, SMTP, and others as the context requires,
+    especially from untrusted inputs (e.g. names with Unicode or apostrophes, such as ねこ or O'Hara).
+  status: Met
+  how: 'Context-aware encoding: React for HTML, URL encoding in the API client, CSV formula neutralisation, mail templates
+    escaped.'
+  evidence: Web client; CSV renderer
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V5.3.2
+  chapter: V5 Validation, Sanitization and Encoding
+  section: V5.3 Output Encoding and Injection Prevention
+  text: Verify that output encoding preserves the user's chosen character set and locale, such that any Unicode character
+    point is valid and safely handled.
+  status: Met
+  how: UTF-8 end to end (database, API, files; CSV uploads must be UTF-8).
+  evidence: Database encoding; upload checks
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V5.3.3
+  chapter: V5 Validation, Sanitization and Encoding
+  section: V5.3 Output Encoding and Injection Prevention
+  text: Verify that context-aware, preferably automated - or at worst, manual - output escaping protects against reflected,
+    stored, and DOM based XSS.
+  status: Met
+  how: React escaping; no raw HTML insertion anywhere in the web client; CSP without inline scripts.
+  evidence: Web client scan (no raw HTML insertion); CSP
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V5.3.4
+  chapter: V5 Validation, Sanitization and Encoding
+  section: V5.3 Output Encoding and Injection Prevention
+  text: Verify that data selection or database queries (e.g. SQL, HQL, ORM, NoSQL) use parameterized queries, ORMs, entity
+    frameworks, or are otherwise protected from database injection attacks.
+  status: Met
+  how: All database access uses JPA or bound parameters. A scan of every database call of the backend (8 October 2026) found
+    no value from a request concatenated into SQL text; dynamic SQL joins fixed fragments only.
+  evidence: Security Architecture section 7.2 (scan result); SQL injection rules of the SpotBugs security plug-in
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V5.3.5
+  chapter: V5 Validation, Sanitization and Encoding
+  section: V5.3 Output Encoding and Injection Prevention
+  text: Verify that where parameterized or safer mechanisms are not present, context-specific output encoding is used to protect
+    against injection attacks, such as the use of SQL escaping to protect against SQL injection.
+  status: Not applicable
+  how: Parameterised queries are used everywhere (V5.3.4).
+  evidence: '-'
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V5.3.6
+  chapter: V5 Validation, Sanitization and Encoding
+  section: V5.3 Output Encoding and Injection Prevention
+  text: Verify that the application protects against JSON injection attacks, JSON eval attacks, and JavaScript expression
+    evaluation.
+  status: Met
+  how: JSON is parsed by Jackson on the server and JSON.parse in the browser; no eval.
+  evidence: Jackson; web client
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V5.3.7
+  chapter: V5 Validation, Sanitization and Encoding
+  section: V5.3 Output Encoding and Injection Prevention
+  text: Verify that the application protects against LDAP injection vulnerabilities, or that specific security controls to
+    prevent LDAP injection have been implemented.
+  status: Not applicable
+  how: No LDAP queries; directory access is through EIAM single sign-on.
+  evidence: '-'
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V5.3.8
+  chapter: V5 Validation, Sanitization and Encoding
+  section: V5.3 Output Encoding and Injection Prevention
+  text: Verify that the application protects against OS command injection and that operating system calls use parameterized
+    OS queries or use contextual command line output encoding.
+  status: Met
+  how: No operating system commands are run with user input.
+  evidence: Static analysis (command injection rules)
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V5.3.9
+  chapter: V5 Validation, Sanitization and Encoding
+  section: V5.3 Output Encoding and Injection Prevention
+  text: Verify that the application protects against Local File Inclusion (LFI) or Remote File Inclusion (RFI) attacks.
+  status: Met
+  how: No file inclusion from user input; file names are metadata only and object keys are generated.
+  evidence: File store (generated object keys)
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V5.3.10
+  chapter: V5 Validation, Sanitization and Encoding
+  section: V5.3 Output Encoding and Injection Prevention
+  text: Verify that the application protects against XPath injection or XML injection attacks.
+  status: Met
+  how: XML is parsed with DTDs disabled (SAML responses, OpenDocument uploads).
+  evidence: SAML response validator; OpenDocument reader
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V5.4.1
+  chapter: V5 Validation, Sanitization and Encoding
+  section: V5.4 Memory, String, and Unmanaged Code
+  text: Verify that the application uses memory-safe string, safer memory copy and pointer arithmetic to detect or prevent
+    stack, buffer, or heap overflows.
+  status: Met
+  how: Memory-safe runtime (Java 21, TypeScript).
+  evidence: '-'
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V5.4.2
+  chapter: V5 Validation, Sanitization and Encoding
+  section: V5.4 Memory, String, and Unmanaged Code
+  text: Verify that format strings do not take potentially hostile input, and are constant.
+  status: Met
+  how: Format strings are constants (static analysis).
+  evidence: SpotBugs, PMD
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V5.4.3
+  chapter: V5 Validation, Sanitization and Encoding
+  section: V5.4 Memory, String, and Unmanaged Code
+  text: Verify that sign, range, and input validation techniques are used to prevent integer overflows.
+  status: Met
+  how: Amounts are BigDecimal with range checks; integers are validated by the request objects.
+  evidence: Money handling; request objects
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V5.5.1
+  chapter: V5 Validation, Sanitization and Encoding
+  section: V5.5 Deserialization Prevention
+  text: Verify that serialized objects use integrity checks or are encrypted to prevent hostile object creation or data tampering.
+  status: Met
+  how: No serialized objects are accepted from clients; event payloads are JSON in a versioned envelope over authenticated
+    TLS.
+  evidence: Event envelope
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V5.5.2
+  chapter: V5 Validation, Sanitization and Encoding
+  section: V5.5 Deserialization Prevention
+  text: Verify that the application correctly restricts XML parsers to only use the most restrictive configuration possible
+    and to ensure that unsafe features such as resolving external entities are disabled to prevent XML eXternal Entity (XXE)
+    attacks.
+  status: Met
+  how: XML parsers disallow DOCTYPE and external entities; signature validation uses secure validation.
+  evidence: SAML validator; OpenDocument reader
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V5.5.3
+  chapter: V5 Validation, Sanitization and Encoding
+  section: V5.5 Deserialization Prevention
+  text: Verify that deserialization of untrusted data is avoided or is protected in both custom code and third-party libraries
+    (such as JSON, XML and YAML parsers).
+  status: Met
+  how: Jackson without default typing; no Java deserialization of untrusted data.
+  evidence: Jackson configuration (no default typing)
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V5.5.4
+  chapter: V5 Validation, Sanitization and Encoding
+  section: V5.5 Deserialization Prevention
+  text: Verify that when parsing JSON in browsers or JavaScript-based backends, JSON.parse is used to parse the JSON document.
+    Do not use eval() to parse JSON.
+  status: Met
+  how: JSON.parse only.
+  evidence: Web client
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V6.1.1
+  chapter: V6 Stored Cryptography
+  section: V6.1 Data Classification
+  text: Verify that regulated private data is stored encrypted while at rest, such as Personally Identifiable Information
+    (PII), sensitive personal information, or data assessed likely to be subject to EU's GDPR.
+  status: Met
+  how: 'Personal data is encrypted at rest: RDS storage and snapshots with KMS, S3 with SSE-KMS (BDOI keys), Valkey at-rest
+    encryption, MSK at-rest encryption.'
+  evidence: Infrastructure configuration (IER); storage settings
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V6.1.2
+  chapter: V6 Stored Cryptography
+  section: V6.1 Data Classification
+  text: Verify that regulated health data is stored encrypted while at rest, such as medical records, medical device details,
+    or de-anonymized research records.
+  status: Met
+  how: Employee benefits health-related reports are stored encrypted as above and their downloads are logged.
+  evidence: S3 SSE-KMS; download audit
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V6.1.3
+  chapter: V6 Stored Cryptography
+  section: V6.1 Data Classification
+  text: Verify that regulated financial data is stored encrypted while at rest, such as financial accounts, defaults or credit
+    history, tax records, pay history, beneficiaries, or de-anonymized market or research records.
+  status: Met
+  how: Financial data (bank accounts, tax records) is encrypted at rest as above.
+  evidence: RDS KMS; S3 SSE-KMS
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V6.2.1
+  chapter: V6 Stored Cryptography
+  section: V6.2 Algorithms
+  text: Verify that all cryptographic modules fail securely, and errors are handled in a way that does not enable Padding
+    Oracle attacks.
+  status: Met
+  how: AES-GCM authenticated encryption; failures raise a generic error.
+  evidence: Second-factor secret cipher
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V6.2.2
+  chapter: V6 Stored Cryptography
+  section: V6.2 Algorithms
+  text: Verify that industry proven or government approved cryptographic algorithms, modes, and libraries are used, instead
+    of custom coded cryptography.
+  status: Met
+  how: JDK cryptography, Spring Security, Nimbus JOSE and AWS KMS; no custom algorithms.
+  evidence: Libraries (SBOM)
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V6.2.3
+  chapter: V6 Stored Cryptography
+  section: V6.2 Algorithms
+  text: Verify that encryption initialization vector, cipher configuration, and block modes are configured securely using
+    the latest advice.
+  status: Met
+  how: AES-256-GCM with a random 96-bit IV per encryption.
+  evidence: Second-factor secret cipher
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V6.2.4
+  chapter: V6 Stored Cryptography
+  section: V6.2 Algorithms
+  text: Verify that random number, encryption or hashing algorithms, key lengths, rounds, ciphers or modes, can be reconfigured,
+    upgraded, or swapped at any time, to protect against cryptographic breaks.
+  status: Met
+  how: Algorithms and keys are configuration (JWS algorithm settings, key rotation settings, KMS key ARNs).
+  evidence: Configuration reference
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V6.2.5
+  chapter: V6 Stored Cryptography
+  section: V6.2 Algorithms
+  text: Verify that known insecure block modes (i.e. ECB, etc.), padding modes (i.e. PKCS#1 v1.5, etc.), ciphers with small
+    block sizes (i.e. Triple-DES, Blowfish, etc.), and weak hashing algorithms (i.e. MD5, SHA1, etc.) are not used unless
+    required for backwards compatibility.
+  status: Met
+  how: No ECB, no PKCS#1 v1.5 encryption, no DES or MD5 for security; SHA-1 only inside TOTP (RFC 6238).
+  evidence: Static analysis (SpotBugs security plug-in crypto rules)
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V6.2.6
+  chapter: V6 Stored Cryptography
+  section: V6.2 Algorithms
+  text: Verify that nonces, initialization vectors, and other single use numbers must not be used more than once with a given
+    encryption key. The method of generation must be appropriate for the algorithm being used.
+  status: Met
+  how: IVs are random per message from a secure generator.
+  evidence: Second-factor secret cipher
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V6.3.1
+  chapter: V6 Stored Cryptography
+  section: V6.3 Random Values
+  text: Verify that all random numbers, random file names, random GUIDs, and random strings are generated using the cryptographic
+    module's approved cryptographically secure random number generator when these random values are intended to be not guessable
+    by an attacker.
+  status: Met
+  how: SecureRandom for tokens, codes and keys; UUIDs v4.
+  evidence: Token and code generation
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V6.3.2
+  chapter: V6 Stored Cryptography
+  section: V6.3 Random Values
+  text: Verify that random GUIDs are created using the GUID v4 algorithm, and a Cryptographically-secure Pseudo-random Number
+    Generator (CSPRNG). GUIDs created using other pseudo-random number generators may be predictable.
+  status: Met
+  how: Random UUIDs from the JDK (v4, SecureRandom); object keys use them.
+  evidence: File store object keys
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V6.4.1
+  chapter: V6 Stored Cryptography
+  section: V6.4 Secret Management
+  text: Verify that a secrets management solution such as a key vault is used to securely create, store, control access to
+    and destroy secrets.
+  status: Met
+  how: AWS Secrets Manager for application secrets, KMS for data keys.
+  evidence: Secrets of the namespace; KMS
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V6.4.2
+  chapter: V6 Stored Cryptography
+  section: V6.4 Secret Management
+  text: Verify that key material is not exposed to the application but instead uses an isolated security module like a vault
+    for cryptographic operations.
+  status: Partly met
+  how: Data-at-rest keys stay in KMS; the token signing and second-factor keys are loaded into the application memory.
+  evidence: Configuration reference
+  gap: Move token signing to an asymmetric key in KMS (sign by KMS) when BDOI asks for it (open point SEC-04)
+  owner: iorta TechNXT
+  due: 30 Jun 2027
+- id: V7.1.1
+  chapter: V7 Error Handling and Logging
+  section: V7.1 Log Content
+  text: Verify that the application does not log credentials or payment details. Session tokens should only be stored in logs
+    in an irreversible, hashed form.
+  status: Met
+  how: No passwords, tokens or payment details in logs (masked toString, refresh tokens stored as SHA-256 only).
+  evidence: Request objects (masked); token store
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V7.1.2
+  chapter: V7 Error Handling and Logging
+  section: V7.1 Log Content
+  text: Verify that the application does not log other sensitive data as defined under local privacy laws or relevant security
+    policy.
+  status: Met
+  how: Personal data is not written to the technical log; the audit trail records who did what to which record.
+  evidence: Audit service; logging rules
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V7.1.3
+  chapter: V7 Error Handling and Logging
+  section: V7.1 Log Content
+  text: Verify that the application logs security relevant events including successful and failed authentication events, access
+    control failures, deserialization failures and input validation failures.
+  status: Partly met
+  how: Sign-in success and failure, lockout, sign-out, access changes, second-factor events and validation failures are recorded.
+  evidence: Audit trail; sign-in audit
+  gap: Log access-control denials (status 403 and data scope refusals) as security events (open point SEC-06)
+  owner: iorta TechNXT
+  due: 31 Mar 2027
+- id: V7.1.4
+  chapter: V7 Error Handling and Logging
+  section: V7.1 Log Content
+  text: Verify that each log event includes necessary information that would allow for a detailed investigation of the timeline
+    when an event happens.
+  status: Met
+  how: Each audit entry has time (UTC), user, entity, record id, action and summary; technical logs carry time with offset,
+    thread and logger.
+  evidence: Audit trail structure; log pattern
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V7.2.1
+  chapter: V7 Error Handling and Logging
+  section: V7.2 Log Processing
+  text: Verify that all authentication decisions are logged, without storing sensitive session tokens or passwords. This should
+    include requests with relevant metadata needed for security investigations.
+  status: Met
+  how: Every authentication decision is audited in its own transaction, with the real reason of a refusal (the user sees one
+    message).
+  evidence: Sign-in audit
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V7.2.2
+  chapter: V7 Error Handling and Logging
+  section: V7.2 Log Processing
+  text: Verify that all access control decisions can be logged and all failed decisions are logged. This should include requests
+    with relevant metadata needed for security investigations.
+  status: Partly met
+  how: Refusals are answered with status 403 and a code.
+  evidence: Exception handler
+  gap: Log every refusal with user, path and permission or company, and raise an alert on a threshold (open point SEC-06)
+  owner: iorta TechNXT
+  due: 31 Mar 2027
+- id: V7.3.1
+  chapter: V7 Error Handling and Logging
+  section: V7.3 Log Protection
+  text: Verify that all logging components appropriately encode data to prevent log injection.
+  status: Met
+  how: Line breaks are neutralised in every log message; JSON logging escapes by format.
+  evidence: Log message converter
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V7.3.3
+  chapter: V7 Error Handling and Logging
+  section: V7.3 Log Protection
+  text: Verify that security logs are protected from unauthorized access and modification.
+  status: Met
+  how: The audit trail is insert-only (database triggers refuse UPDATE, DELETE and TRUNCATE; the runtime login cannot disable
+    them); container logs go to the platform log store.
+  evidence: Audit triggers; database roles
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V7.3.4
+  chapter: V7 Error Handling and Logging
+  section: V7.3 Log Protection
+  text: Verify that time sources are synchronized to the correct time and time zone. Strongly consider logging only in UTC
+    if systems are global to assist with post-incident forensic analysis.
+  status: Met
+  how: Servers use the AWS time sync service; times are stored in UTC and shown in Philippine time.
+  evidence: Infrastructure; timestamp columns (TIMESTAMPTZ)
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V7.4.1
+  chapter: V7 Error Handling and Logging
+  section: V7.4 Error Handling
+  text: Verify that a generic message is shown when an unexpected or security sensitive error occurs, potentially with a unique
+    ID which support personnel can use to investigate.
+  status: Met
+  how: Unexpected errors return a generic message with a reference the user quotes to support; no stack traces.
+  evidence: Last-resort exception handler
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V7.4.2
+  chapter: V7 Error Handling and Logging
+  section: V7.4 Error Handling
+  text: Verify that exception handling (or a functional equivalent) is used across the application to account for expected
+    and unexpected error conditions.
+  status: Met
+  how: Business errors are typed exceptions with codes (status 422); framework errors are mapped by one handler.
+  evidence: Exception handler
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V7.4.3
+  chapter: V7 Error Handling and Logging
+  section: V7.4 Error Handling
+  text: Verify that a "last resort" error handler is defined which will catch all unhandled exceptions.
+  status: Met
+  how: A last-resort handler catches every unhandled exception.
+  evidence: Exception handler
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V8.1.1
+  chapter: V8 Data Protection
+  section: V8.1 General Data Protection
+  text: Verify the application protects sensitive data from being cached in server components such as load balancers and application
+    caches.
+  status: Met
+  how: API answers are not cacheable (Spring Security cache headers); downloads are no-store; the load balancer does not cache.
+  evidence: Security headers; file downloads
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V8.1.2
+  chapter: V8 Data Protection
+  section: V8.1 General Data Protection
+  text: Verify that all cached or temporary copies of sensitive data stored on the server are protected from unauthorized
+    access or purged/invalidated after the authorized user accesses the sensitive data.
+  status: Met
+  how: Cached reference data in Valkey holds no personal data; temporary files live in emptyDir volumes deleted with the pod;
+    presigned links expire after 5 minutes.
+  evidence: Platform cache conventions; file link TTL
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V8.1.3
+  chapter: V8 Data Protection
+  section: V8.1 General Data Protection
+  text: Verify the application minimizes the number of parameters in a request, such as hidden fields, Ajax variables, cookies
+    and header values.
+  status: Met
+  how: Requests carry only the fields of their request object.
+  evidence: Request objects
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V8.1.4
+  chapter: V8 Data Protection
+  section: V8.1 General Data Protection
+  text: Verify the application can detect and alert on abnormal numbers of requests, such as by IP, user, total per hour or
+    day, or whatever makes sense for the application.
+  status: Partly met
+  how: Rate limits on sign-in; WAF rate rules; Prometheus metrics of requests.
+  evidence: Rate limiter; WAF; metrics
+  gap: Alert on abnormal request rates per user and on mass exports (open point SEC-06)
+  owner: iorta TechNXT
+  due: 31 Mar 2027
+- id: V8.2.1
+  chapter: V8 Data Protection
+  section: V8.2 Client-side Data Protection
+  text: Verify the application sets sufficient anti-caching headers so that sensitive data is not cached in modern browsers.
+  status: Met
+  how: Anti-caching headers on API answers and downloads.
+  evidence: Security headers
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V8.2.2
+  chapter: V8 Data Protection
+  section: V8.2 Client-side Data Protection
+  text: Verify that data stored in browser storage (such as localStorage, sessionStorage, IndexedDB, or cookies) does not
+    contain sensitive data.
+  status: Partly met
+  how: Session storage holds the access token only; local storage holds the remembered-device token of the second factor,
+    only when the policy allows it (off by default).
+  evidence: Web client storage
+  gap: Keep MFA_REMEMBER_DEVICE_DAYS at 0 in production (open point SEC-01)
+  owner: BDOI Information Security
+  due: 30 Nov 2026
+- id: V8.2.3
+  chapter: V8 Data Protection
+  section: V8.2 Client-side Data Protection
+  text: Verify that authenticated data is cleared from client storage, such as the browser DOM, after the client or session
+    is terminated.
+  status: Met
+  how: Sign-out and session end clear the session storage and the cookie.
+  evidence: Web client sign-out
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V8.3.1
+  chapter: V8 Data Protection
+  section: V8.3 Sensitive Private Data
+  text: Verify that sensitive data is sent to the server in the HTTP message body or headers, and that query string parameters
+    from any HTTP verb do not contain sensitive data.
+  status: Met
+  how: Sensitive data travels in bodies or headers; list filters in query strings carry codes and dates, not personal data.
+  evidence: API conventions
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V8.3.2
+  chapter: V8 Data Protection
+  section: V8.3 Sensitive Private Data
+  text: Verify that users have a method to remove or export their data on demand.
+  status: Partly met
+  how: Client data can be exported by authorised staff; a data subject request is handled by the Compliance Officer through
+    the client record.
+  evidence: Client 360 view; reports
+  gap: Agree the data subject request procedure (access, correction, erasure) and its screens (open point PRV-02)
+  owner: BDOI Information Security
+  due: 31 Mar 2027
+- id: V8.3.3
+  chapter: V8 Data Protection
+  section: V8.3 Sensitive Private Data
+  text: Verify that users are provided clear language regarding collection and use of supplied personal information and that
+    users have provided opt-in consent for the use of that data before it is used in any way.
+  status: BDOI
+  how: Consent and privacy notices are collected by BDOI's channels (KYC forms, portal terms).
+  evidence: '-'
+  gap: BDOI to confirm where consent is captured and whether BIBS stores it (open point PRV-01)
+  owner: BDOI Data Protection Officer
+  due: 31 Jan 2027
+- id: V8.3.4
+  chapter: V8 Data Protection
+  section: V8.3 Sensitive Private Data
+  text: Verify that all sensitive data created and processed by the application has been identified, and ensure that a policy
+    is in place on how to deal with sensitive data.
+  status: Met
+  how: Sensitive data is identified per domain with its policy (Data Architecture chapter 10).
+  evidence: Data Architecture
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V8.3.5
+  chapter: V8 Data Protection
+  section: V8.3 Sensitive Private Data
+  text: Verify accessing sensitive data is audited (without logging the sensitive data itself), if the data is collected under
+    relevant data protection directives or where logging of access is required.
+  status: Partly met
+  how: File downloads (presigned links) and legacy archive inquiries are audited.
+  evidence: File link audit; legacy access log
+  gap: Audit the opening of KYC documents and employee benefits member lists on screen (open point SEC-06)
+  owner: iorta TechNXT
+  due: 31 Mar 2027
+- id: V8.3.6
+  chapter: V8 Data Protection
+  section: V8.3 Sensitive Private Data
+  text: Verify that sensitive information contained in memory is overwritten as soon as it is no longer required to mitigate
+    memory dumping attacks, using zeroes or random data.
+  status: Not applicable
+  how: Managed runtime; secrets are short-lived in memory; no explicit zeroing is possible for Java strings.
+  evidence: '-'
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V8.3.7
+  chapter: V8 Data Protection
+  section: V8.3 Sensitive Private Data
+  text: Verify that sensitive or private information that is required to be encrypted, is encrypted using approved algorithms
+    that provide both confidentiality and integrity.
+  status: Met
+  how: AES-GCM, KMS and TLS 1.2+ provide confidentiality and integrity.
+  evidence: Crypto settings
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V8.3.8
+  chapter: V8 Data Protection
+  section: V8.3 Sensitive Private Data
+  text: Verify that sensitive personal information is subject to data retention classification, such that old or out of date
+    data is deleted automatically, on a schedule, or as the situation requires.
+  status: Partly met
+  how: Retention rules per record type and record class; the monthly review counts eligible records; files are removed by
+    the retention job.
+  evidence: Retention rules; record classes; retention jobs
+  gap: BDOI to confirm the retention periods and the archive or purge action per record type (open points RET-01 to RET-04
+    of the Data Architecture)
+  owner: BDOI Compliance Officer
+  due: 31 Mar 2027
+- id: V9.1.1
+  chapter: V9 Communication
+  section: V9.1 Client Communication Security
+  text: Verify that TLS is used for all client connectivity, and does not fall back to insecure or unencrypted communications.
+  status: Met
+  how: HTTPS only (443 at the load balancer, 8443 to the pods); HSTS one year with sub-domains.
+  evidence: Edge configuration; HSTS
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V9.1.2
+  chapter: V9 Communication
+  section: V9.1 Client Communication Security
+  text: Verify using up to date TLS testing tools that only strong cipher suites are enabled, with the strongest cipher suites
+    set as preferred.
+  status: Met
+  how: Load balancer policy TLS 1.3 / 1.2 with strong suites (ELBSecurityPolicy-TLS13-1-2-2021-06).
+  evidence: Edge configuration
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V9.1.3
+  chapter: V9 Communication
+  section: V9.1 Client Communication Security
+  text: Verify that only the latest recommended versions of the TLS protocol are enabled, such as TLS 1.2 and TLS 1.3. The
+    latest version of the TLS protocol should be the preferred option.
+  status: Met
+  how: TLS 1.3 and 1.2 only.
+  evidence: Edge and pod TLS configuration
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V9.2.1
+  chapter: V9 Communication
+  section: V9.2 Server Communication Security
+  text: Verify that connections to and from the server use trusted TLS certificates. Where internally generated or self-signed
+    certificates are used, the server must be configured to only trust specific internal CAs and specific self-signed certificates.
+    All others should be rejected.
+  status: Met
+  how: Certificates from the BDO PKI or ACM at the edge and AWS Private CA inside the cluster; clients trust only these CAs.
+  evidence: cert-manager issuer; RDS CA bundle
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V9.2.2
+  chapter: V9 Communication
+  section: V9.2 Server Communication Security
+  text: Verify that encrypted communications such as TLS is used for all inbound and outbound connections, including for management
+    ports, monitoring, authentication, API, or web service calls, database, cloud, serverless, mainframe, external, and partner
+    connections. The server must not fall back to insecure or unencrypted protocols.
+  status: Met
+  how: TLS on every inbound and outbound connection, including the management port path, database, cache, Kafka, AWS services
+    and SMTP.
+  evidence: Encryption in transit table
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V9.2.3
+  chapter: V9 Communication
+  section: V9.2 Server Communication Security
+  text: Verify that all encrypted connections to external systems that involve sensitive information or functions are authenticated.
+  status: Met
+  how: External connections are authenticated (Apigee tokens, IAM roles, SASL, database logins).
+  evidence: Integration security
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V9.2.4
+  chapter: V9 Communication
+  section: V9.2 Server Communication Security
+  text: Verify that proper certification revocation, such as Online Certificate Status Protocol (OCSP) Stapling, is enabled
+    and configured.
+  status: BDOI
+  how: Revocation checking at the edge follows the BDO PKI (OCSP).
+  evidence: Edge
+  gap: BDOI IT to confirm OCSP stapling on the load balancer and Apigee (open point SEC-08)
+  owner: BDOI IT
+  due: 31 Mar 2027
+- id: V10.2.1
+  chapter: V10 Malicious Code
+  section: V10.2 Malicious Code Search
+  text: Verify that the application program code and third party libraries do not contain unauthorized phone home or data
+    collection capabilities. Where such functionality exists, obtain the user's permission for it to operate before collecting
+    any data.
+  status: Met
+  how: No telemetry or phone-home; dependencies are scanned and listed in the SBOM; egress is limited by NetworkPolicies.
+  evidence: SBOM; network policies
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V10.2.2
+  chapter: V10 Malicious Code
+  section: V10.2 Malicious Code Search
+  text: Verify that the application does not ask for unnecessary or excessive permissions to privacy related features or sensors,
+    such as contacts, cameras, microphones, or location.
+  status: Not applicable
+  how: No device permissions are requested.
+  evidence: '-'
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V10.3.1
+  chapter: V10 Malicious Code
+  section: V10.3 Application Integrity
+  text: Verify that if the application has a client or server auto-update feature, updates should be obtained over secure
+    channels and digitally signed. The update code must validate the digital signature of the update before installing or
+    executing the update.
+  status: Not applicable
+  how: No auto-update; releases are deployed by the release team.
+  evidence: '-'
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V10.3.2
+  chapter: V10 Malicious Code
+  section: V10.3 Application Integrity
+  text: Verify that the application employs integrity protections, such as code signing or subresource integrity. The application
+    must not load or execute code from untrusted sources, such as loading includes, modules, plugins, code, or libraries from
+    untrusted sources or the Internet.
+  status: Met
+  how: All scripts are served from the BIBS origin (CSP script-src self); no external code; pipeline actions pinned by their
+    content hash and scanners checked against SHA-256.
+  evidence: CSP; pipeline pinning
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V10.3.3
+  chapter: V10 Malicious Code
+  section: V10.3 Application Integrity
+  text: Verify that the application has protection from subdomain takeovers if the application relies upon DNS entries or
+    DNS subdomains, such as expired domain names, out of date DNS pointers or CNAMEs, expired projects at public program code
+    repos, or transient cloud APIs, serverless functions, or storage buckets (*autogen-bucket-id*.cloud.example.com) or similar.
+    Protections can include ensuring that DNS names used by applications are regularly checked for expiry or change.
+  status: BDOI
+  how: DNS is a private Route 53 zone run by BDO.
+  evidence: Edge
+  gap: BDOI IT to own the DNS records (open point SEC-08)
+  owner: BDOI IT
+  due: 31 Mar 2027
+- id: V11.1.1
+  chapter: V11 Business Logic
+  section: V11.1 Business Logic Security
+  text: Verify that the application will only process business logic flows for the same user in sequential step order and
+    without skipping steps.
+  status: Met
+  how: Workflows enforce their stage order (allowed transitions only).
+  evidence: Workflow transitions; state machines
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V11.1.2
+  chapter: V11 Business Logic
+  section: V11.1 Business Logic Security
+  text: Verify that the application will only process business logic flows with all steps being processed in realistic human
+    time, i.e. transactions are not submitted too quickly.
+  status: Partly met
+  how: Sign-in steps are rate limited.
+  evidence: Rate limiter
+  gap: Rate limits on bulk submission and export actions per user (open point SEC-06)
+  owner: iorta TechNXT
+  due: 31 Mar 2027
+- id: V11.1.3
+  chapter: V11 Business Logic
+  section: V11.1 Business Logic Security
+  text: Verify the application has appropriate limits for specific business actions or transactions which are correctly enforced
+    on a per user basis.
+  status: Met
+  how: Authorisation limits per user on journals, payments and approvals; export limits on collection files.
+  evidence: Authorisation limits; export caps
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V11.1.4
+  chapter: V11 Business Logic
+  section: V11.1 Business Logic Security
+  text: Verify that the application has anti-automation controls to protect against excessive calls such as mass data exfiltration,
+    business logic requests, file uploads or denial of service attacks.
+  status: Partly met
+  how: Uploads limited to 25 MB; JSON bodies to 2 MB; WAF rate rule; reports run as background jobs.
+  evidence: Request size limits; WAF
+  gap: Per-user quotas on exports and report runs (open point SEC-06)
+  owner: iorta TechNXT
+  due: 31 Mar 2027
+- id: V11.1.5
+  chapter: V11 Business Logic
+  section: V11.1 Business Logic Security
+  text: Verify the application has business logic limits or validation to protect against likely business risks or threats,
+    identified using threat modeling or similar methodologies.
+  status: Met
+  how: 'Business limits from the threat model: four eyes on payments, access, master data; duplicate payment checks; sanction
+    screening before release.'
+  evidence: Approval rules; screening hand-off
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V11.1.6
+  chapter: V11 Business Logic
+  section: V11.1 Business Logic Security
+  text: Verify that the application does not suffer from "Time Of Check to Time Of Use" (TOCTOU) issues or other race conditions
+    for sensitive operations.
+  status: Met
+  how: Optimistic locking on every record, unique constraints, gapless numbering in transactions, job locks.
+  evidence: Version columns; job lock
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V11.1.7
+  chapter: V11 Business Logic
+  section: V11.1 Business Logic Security
+  text: Verify that the application monitors for unusual events or activity from a business logic perspective. For example,
+    attempts to perform actions out of order or actions which a normal user would never attempt.
+  status: Partly met
+  how: Alerts exist for job failures, security store outages, quarantined files and out-of-hours access changes.
+  evidence: Alert catalogue
+  gap: Business-logic anomaly alerts to the SIEM (open point SEC-07)
+  owner: iorta TechNXT
+  due: 30 Jun 2027
+- id: V11.1.8
+  chapter: V11 Business Logic
+  section: V11.1 Business Logic Security
+  text: Verify that the application has configurable alerting when automated attacks or unusual activity is detected.
+  status: Partly met
+  how: Alert codes and recipients are configurable.
+  evidence: Alert catalogue
+  gap: Configure SIEM use cases with BDOI Information Security (open point SEC-07)
+  owner: BDOI Information Security
+  due: 30 Jun 2027
+- id: V12.1.1
+  chapter: V12 Files and Resources
+  section: V12.1 File Upload
+  text: Verify that the application will not accept large files that could fill up storage or cause a denial of service.
+  status: Met
+  how: Uploads up to 25 MB through BIBS; larger bulk files by presigned upload to S3 up to 5 GB into a quarantine prefix.
+  evidence: Upload limits; storage settings
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V12.1.2
+  chapter: V12 Files and Resources
+  section: V12.1 File Upload
+  text: Verify that the application checks compressed files (e.g. zip, gz, docx, odt) against maximum allowed uncompressed
+    size and against maximum number of files before uncompressing the file.
+  status: Met
+  how: Office and OpenDocument files are read within fixed limits (1,000 parts, 64 MB per part, expansion at most 100 times).
+  evidence: Office file limits
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V12.1.3
+  chapter: V12 Files and Resources
+  section: V12.1 File Upload
+  text: Verify that a file size quota and maximum number of files per user is enforced to ensure that a single user cannot
+    fill up the storage with too many files, or excessively large files.
+  status: Partly met
+  how: Per-file size limits apply.
+  evidence: Upload limits
+  gap: Per-user storage quota (open point SEC-06)
+  owner: iorta TechNXT
+  due: 30 Jun 2027
+- id: V12.2.1
+  chapter: V12 Files and Resources
+  section: V12.2 File Integrity
+  text: Verify that files obtained from untrusted sources are validated to be of expected type based on the file's content.
+  status: Met
+  how: Upload types are checked by content (Office structure, text-only CSV and TXT, UTF-8).
+  evidence: Upload checks
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V12.3.1
+  chapter: V12 Files and Resources
+  section: V12.3 File Execution
+  text: Verify that user-submitted filename metadata is not used directly by system or framework filesystems and that a URL
+    API is used to protect against path traversal.
+  status: Met
+  how: File names are metadata only; object keys are generated (company, entity type, date, UUID).
+  evidence: File store
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V12.3.2
+  chapter: V12 Files and Resources
+  section: V12.3 File Execution
+  text: Verify that user-submitted filename metadata is validated or ignored to prevent the disclosure, creation, updating
+    or removal of local files (LFI).
+  status: Met
+  how: User file names never reach the file system.
+  evidence: File store
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V12.3.3
+  chapter: V12 Files and Resources
+  section: V12.3 File Execution
+  text: Verify that user-submitted filename metadata is validated or ignored to prevent the disclosure or execution of remote
+    files via Remote File Inclusion (RFI) or Server-side Request Forgery (SSRF) attacks.
+  status: Met
+  how: File metadata is never used as a URL.
+  evidence: File store
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V12.3.4
+  chapter: V12 Files and Resources
+  section: V12.3 File Execution
+  text: Verify that the application protects against Reflective File Download (RFD) by validating or ignoring user-submitted
+    filenames in a JSON, JSONP, or URL parameter, the response Content-Type header should be set to text/plain, and the Content-Disposition
+    header should have a fixed filename.
+  status: Met
+  how: Downloads set Content-Type from metadata and Content-Disposition attachment with an encoded file name.
+  evidence: File downloads
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V12.3.5
+  chapter: V12 Files and Resources
+  section: V12.3 File Execution
+  text: Verify that untrusted file metadata is not used directly with system API or libraries, to protect against OS command
+    injection.
+  status: Met
+  how: No system command uses file metadata.
+  evidence: '-'
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V12.3.6
+  chapter: V12 Files and Resources
+  section: V12.3 File Execution
+  text: Verify that the application does not include and execute functionality from untrusted sources, such as unverified
+    content distribution networks, JavaScript libraries, node npm libraries, or server-side DLLs.
+  status: Met
+  how: No code from untrusted sources is loaded at run time; dependencies come from Maven Central and npm through the pipeline
+    with SCA.
+  evidence: SCA; SBOM
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V12.4.1
+  chapter: V12 Files and Resources
+  section: V12.4 File Storage
+  text: Verify that files obtained from untrusted sources are stored outside the web root, with limited permissions.
+  status: Met
+  how: Files live in S3 buckets with public access blocked, outside any web root.
+  evidence: Buckets
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V12.4.2
+  chapter: V12 Files and Resources
+  section: V12.4 File Storage
+  text: Verify that files obtained from untrusted sources are scanned by antivirus scanners to prevent upload and serving
+    of known malicious content.
+  status: Met
+  how: GuardDuty Malware Protection scans every object; a file cannot be downloaded before its result is clean; infected files
+    are quarantined and alerted.
+  evidence: Malware scan policy; scan results job
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V12.5.1
+  chapter: V12 Files and Resources
+  section: V12.5 File Download
+  text: Verify that the web tier is configured to serve only files with specific file extensions to prevent unintentional
+    information and program code leakage. For example, backup files (e.g. .bak), temporary working files (e.g. .swp), compressed
+    files (.zip, .tar.gz, etc) and other extensions commonly used by editors should be blocked unless required.
+  status: Met
+  how: nginx serves the compiled client bundle only.
+  evidence: nginx configuration
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V12.5.2
+  chapter: V12 Files and Resources
+  section: V12.5 File Download
+  text: Verify that direct requests to uploaded files will never be executed as HTML/JavaScript content.
+  status: Met
+  how: Uploaded files are served as attachments from S3 with no-store; never rendered by the BIBS origin.
+  evidence: Downloads
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V12.6.1
+  chapter: V12 Files and Resources
+  section: V12.6 SSRF Protection
+  text: Verify that the web or application server is configured with an allow list of resources or systems to which the server
+    can send requests or load data/files from.
+  status: Met
+  how: Egress allow list by NetworkPolicy (data subnets, VPC interface connections, BDO private route).
+  evidence: Network policies
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V13.1.1
+  chapter: V13 API and Web Service
+  section: V13.1 Generic Web Service Security
+  text: Verify that all application components use the same encodings and parsers to avoid parsing attacks that exploit different
+    URI or file parsing behavior that could be used in SSRF and RFI attacks.
+  status: Met
+  how: One parser stack (Spring, Jackson) for every API.
+  evidence: '-'
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V13.1.3
+  chapter: V13 API and Web Service
+  section: V13.1 Generic Web Service Security
+  text: Verify API URLs do not expose sensitive information, such as the API key, session tokens etc.
+  status: Met
+  how: No keys or tokens in API URLs.
+  evidence: API conventions
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V13.1.4
+  chapter: V13 API and Web Service
+  section: V13.1 Generic Web Service Security
+  text: Verify that authorization decisions are made at both the URI, enforced by programmatic or declarative security at
+    the controller or router, and at the resource level, enforced by model-based permissions.
+  status: Met
+  how: Authorisation at the route (permission per method) and at the resource (data scope, record state, ownership).
+  evidence: Method security; data scope
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V13.1.5
+  chapter: V13 API and Web Service
+  section: V13.1 Generic Web Service Security
+  text: Verify that requests containing unexpected or missing content types are rejected with appropriate headers (HTTP response
+    status 406 Unacceptable or 415 Unsupported Media Type).
+  status: Met
+  how: Unexpected content types are refused with 415 by the framework.
+  evidence: Spring MVC content negotiation
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V13.2.1
+  chapter: V13 API and Web Service
+  section: V13.2 RESTful Web Service
+  text: Verify that enabled RESTful HTTP methods are a valid choice for the user or action, such as preventing normal users
+    using DELETE or PUT on protected API or resources.
+  status: Met
+  how: Only GET, POST and PUT (and OPTIONS) are allowed by CORS; each operation has its permission.
+  evidence: CORS settings; method security
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V13.2.2
+  chapter: V13 API and Web Service
+  section: V13.2 RESTful Web Service
+  text: Verify that JSON schema validation is in place and verified before accepting input.
+  status: Met
+  how: JSON bodies bind to typed request objects with Bean Validation (equivalent to schema validation).
+  evidence: Request objects
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V13.2.3
+  chapter: V13 API and Web Service
+  section: V13.2 RESTful Web Service
+  text: 'Verify that RESTful web services that utilize cookies are protected from Cross-Site Request Forgery via the use of
+    at least one or more of the following: double submit cookie pattern, CSRF nonces, or Origin request header checks.'
+  status: Met
+  how: Cookie-based calls (token renewal) need SameSite=Strict and a custom request header.
+  evidence: Refresh cookie and header
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V13.2.5
+  chapter: V13 API and Web Service
+  section: V13.2 RESTful Web Service
+  text: Verify that REST services explicitly check the incoming Content-Type to be the expected one, such as application/xml
+    or application/json.
+  status: Met
+  how: Controllers declare consumed content types; others are refused.
+  evidence: Controllers
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V13.2.6
+  chapter: V13 API and Web Service
+  section: V13.2 RESTful Web Service
+  text: Verify that the message headers and payload are trustworthy and not modified in transit. Requiring strong encryption
+    for transport (TLS only) may be sufficient in many cases as it provides both confidentiality and integrity protection.
+    Per-message digital signatures can provide additional assurance on top of the transport protections for high-security
+    applications but bring with them additional complexity and risks to weigh against the benefits.
+  status: Met
+  how: TLS on every hop; tokens signed.
+  evidence: Transport
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V13.3.1
+  chapter: V13 API and Web Service
+  section: V13.3 SOAP Web Service
+  text: Verify that XSD schema validation takes place to ensure a properly formed XML document, followed by validation of
+    each input field before any processing of that data takes place.
+  status: Met
+  how: SAML responses are validated against the protocol structure before use; no other SOAP or XML service.
+  evidence: SAML validator
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V13.3.2
+  chapter: V13 API and Web Service
+  section: V13.3 SOAP Web Service
+  text: Verify that the message payload is signed using WS-Security to ensure reliable transport between client and service.
+  status: Not applicable
+  how: No WS-Security service.
+  evidence: '-'
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V13.4.1
+  chapter: V13 API and Web Service
+  section: V13.4 GraphQL
+  text: Verify that a query allow list or a combination of depth limiting and amount limiting is used to prevent GraphQL or
+    data layer expression Denial of Service (DoS) as a result of expensive, nested queries. For more advanced scenarios, query
+    cost analysis should be used.
+  status: Not applicable
+  how: No GraphQL.
+  evidence: '-'
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V13.4.2
+  chapter: V13 API and Web Service
+  section: V13.4 GraphQL
+  text: Verify that GraphQL or other data layer authorization logic should be implemented at the business logic layer instead
+    of the GraphQL layer.
+  status: Not applicable
+  how: No GraphQL.
+  evidence: '-'
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V14.1.1
+  chapter: V14 Configuration
+  section: V14.1 Packaging and Deployment
+  text: Verify that the application packaging and deployment processes are performed in a secure and repeatable way, such
+    as CI / CD automation, automated configuration management, and automated deployment scripts.
+  status: Met
+  how: 'Packaging and deployment are automated and repeatable: CI pipeline, digest-pinned base images, Kustomize overlays.'
+  evidence: CI pipeline; Dockerfiles; overlays
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V14.1.2
+  chapter: V14 Configuration
+  section: V14.1 Packaging and Deployment
+  text: Verify that compiler flags are configured to enable all available buffer overflow protections and warnings, including
+    stack randomization, data execution prevention, and to fail the pipeline if an unsafe pointer, memory, format string,
+    integer, or string operations are found.
+  status: Met
+  how: Compiler warnings are errors (javac -Xlint:all -Werror); TypeScript strict.
+  evidence: Compiler settings
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V14.1.3
+  chapter: V14 Configuration
+  section: V14.1 Packaging and Deployment
+  text: Verify that server configuration is hardened as per the recommendations of the application server and frameworks in
+    use.
+  status: Met
+  how: 'Server hardening: non-root, read-only file system, management port separate, API documentation off in production,
+    start-up safeguards.'
+  evidence: Deployment; production safeguards
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V14.1.4
+  chapter: V14 Configuration
+  section: V14.1 Packaging and Deployment
+  text: Verify that the application, configuration, and all dependencies can be re-deployed using automated deployment scripts,
+    produced from a documented and tested runbook in a reasonable time, or restored from backups in a timely fashion.
+  status: Met
+  how: The platform is redeployed from the overlays and the runbook; databases restored from automated backups and point-in-time
+    recovery (RPO 15 minutes, RTO 4 hours).
+  evidence: Runbook; IER
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V14.2.1
+  chapter: V14 Configuration
+  section: V14.2 Dependency
+  text: Verify that all components are up to date, preferably using a dependency checker in the delivery pipeline.
+  status: Met
+  how: Dependency checks in the pipeline (OWASP dependency-check, npm audit, Trivy) and weekly update proposals.
+  evidence: CI pipeline
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V14.2.2
+  chapter: V14 Configuration
+  section: V14.2 Dependency
+  text: Verify that all unneeded features, documentation, sample applications and configurations are removed.
+  status: Met
+  how: API documentation, developer profiles and seed data are refused in production.
+  evidence: Production safeguards
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V14.2.3
+  chapter: V14 Configuration
+  section: V14.2 Dependency
+  text: Verify that if application assets, such as JavaScript libraries, CSS or web fonts, are hosted externally on a Content
+    Delivery Network (CDN) or external provider, Subresource Integrity (SRI) is used to validate the integrity of the asset.
+  status: Not applicable
+  how: No external CDN; every asset is served from the BIBS origin.
+  evidence: CSP
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V14.2.4
+  chapter: V14 Configuration
+  section: V14.2 Dependency
+  text: Verify that third party components come from pre-defined, trusted and continually maintained repositories.
+  status: Met
+  how: Components come from Maven Central and npm through pinned lock files; base images pinned by digest.
+  evidence: Lock files; Dockerfiles
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V14.2.5
+  chapter: V14 Configuration
+  section: V14.2 Dependency
+  text: Verify that a Software Bill of Materials (SBOM) is maintained of all third party libraries in use.
+  status: Met
+  how: CycloneDX SBOM of the backend and the web client for every pipeline, kept with the release record.
+  evidence: SBOM artefacts
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V14.2.6
+  chapter: V14 Configuration
+  section: V14.2 Dependency
+  text: Verify that the attack surface is reduced by isolating or encapsulating third party libraries to expose only the required
+    behaviour into the application.
+  status: Met
+  how: Libraries are used through narrow ports (file store, mail, events), so the rest of the application does not depend
+    on them.
+  evidence: Module ports
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V14.3.2
+  chapter: V14 Configuration
+  section: V14.3 Unintended Security Disclosure
+  text: Verify that web or application server and application framework debug modes are disabled in production to eliminate
+    debug features, developer consoles, and unintended security disclosures.
+  status: Met
+  how: No debug mode in production; actuator details limited to the management port.
+  evidence: Production profile
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V14.3.3
+  chapter: V14 Configuration
+  section: V14.3 Unintended Security Disclosure
+  text: Verify that the HTTP headers or any part of the HTTP response do not expose detailed version information of system
+    components.
+  status: Met
+  how: nginx server tokens off; error answers carry no version information.
+  evidence: nginx configuration; exception handler
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V14.4.1
+  chapter: V14 Configuration
+  section: V14.4 HTTP Security Headers
+  text: Verify that every HTTP response contains a Content-Type header. Also specify a safe character set (e.g., UTF-8, ISO-8859-1)
+    if the content types are text/*, /+xml and application/xml. Content must match with the provided Content-Type header.
+  status: Met
+  how: Every answer carries its Content-Type with UTF-8 for text.
+  evidence: Spring MVC; nginx
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V14.4.2
+  chapter: V14 Configuration
+  section: V14.4 HTTP Security Headers
+  text: 'Verify that all API responses contain a Content-Disposition: attachment; filename header (or other appropriate filename
+    for the content type).'
+  status: Partly met
+  how: File downloads carry Content-Disposition attachment.
+  evidence: Downloads
+  gap: JSON API answers carry no Content-Disposition; accepted because answers are read by the BIBS client only (open point
+    SEC-10)
+  owner: iorta TechNXT
+  due: 31 Jan 2027
+- id: V14.4.3
+  chapter: V14 Configuration
+  section: V14.4 HTTP Security Headers
+  text: Verify that a Content Security Policy (CSP) response header is in place that helps mitigate impact for XSS attacks
+    like HTML, DOM, JSON, and JavaScript injection vulnerabilities.
+  status: Met
+  how: 'CSP: default-src ''none'' on the API; on the web client default-src ''self'', object-src ''none'', base-uri ''self'',
+    form-action ''self'', frame-ancestors ''none''.'
+  evidence: Security headers; nginx
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V14.4.4
+  chapter: V14 Configuration
+  section: V14.4 HTTP Security Headers
+  text: 'Verify that all responses contain a X-Content-Type-Options: nosniff header.'
+  status: Met
+  how: X-Content-Type-Options nosniff on every answer.
+  evidence: Security headers; nginx
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V14.4.5
+  chapter: V14 Configuration
+  section: V14.4 HTTP Security Headers
+  text: 'Verify that a Strict-Transport-Security header is included on all responses and for all subdomains, such as Strict-Transport-Security:
+    max-age=15724800; includeSubdomains.'
+  status: Met
+  how: HSTS one year with sub-domains.
+  evidence: Security headers; nginx
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V14.4.6
+  chapter: V14 Configuration
+  section: V14.4 HTTP Security Headers
+  text: Verify that a suitable Referrer-Policy header is included to avoid exposing sensitive information in the URL through
+    the Referer header to untrusted parties.
+  status: Met
+  how: Referrer-Policy no-referrer.
+  evidence: Security headers; nginx
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V14.4.7
+  chapter: V14 Configuration
+  section: V14.4 HTTP Security Headers
+  text: 'Verify that the content of a web application cannot be embedded in a third-party site by default and that embedding
+    of the exact resources is only allowed where necessary by using suitable Content-Security-Policy: frame-ancestors and
+    X-Frame-Options response headers.'
+  status: Met
+  how: frame-ancestors 'none' and X-Frame-Options DENY.
+  evidence: Security headers; nginx
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V14.5.1
+  chapter: V14 Configuration
+  section: V14.5 HTTP Request Header Validation
+  text: Verify that the application server only accepts the HTTP methods in use by the application/API, including pre-flight
+    OPTIONS, and logs/alerts on any requests that are not valid for the application context.
+  status: Partly met
+  how: CORS allows GET, POST, PUT and OPTIONS; other methods are refused by the framework.
+  evidence: CORS settings
+  gap: Log refused methods as security events (open point SEC-06)
+  owner: iorta TechNXT
+  due: 31 Mar 2027
+- id: V14.5.2
+  chapter: V14 Configuration
+  section: V14.5 HTTP Request Header Validation
+  text: Verify that the supplied Origin header is not used for authentication or access control decisions, as the Origin header
+    can easily be changed by an attacker.
+  status: Met
+  how: Origin is used only for CORS, never for authentication.
+  evidence: CORS settings
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V14.5.3
+  chapter: V14 Configuration
+  section: V14.5 HTTP Request Header Validation
+  text: Verify that the Cross-Origin Resource Sharing (CORS) Access-Control-Allow-Origin header uses a strict allow list of
+    trusted domains and subdomains to match against and does not support the "null" origin.
+  status: Met
+  how: CORS allow list from configuration; the start is refused when it names localhost outside a developer's machine; null
+    origin not allowed.
+  evidence: Production safeguards
+  gap: null
+  owner: iorta TechNXT
+  due: ''
+- id: V14.5.4
+  chapter: V14 Configuration
+  section: V14.5 HTTP Request Header Validation
+  text: Verify that HTTP headers added by a trusted proxy or SSO devices, such as a bearer token, are authenticated by the
+    application.
+  status: Met
+  how: Apigee X tokens are validated by BIBS (signature, issuer, audience, scopes); no trust in proxy-added identity headers.
+  evidence: Integration security chain
+  gap: null
+  owner: iorta TechNXT
+  due: ''

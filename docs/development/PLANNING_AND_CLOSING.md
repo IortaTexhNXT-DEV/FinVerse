@@ -1,10 +1,11 @@
-# Planning & Closing – budgets, inter-company, consolidation, FX revaluation, year-end
+# Planning & Closing – budgets, FX revaluation, year-end
 
-Modules `budget`, `consolidation` and `closing` (backend) and `features/budget`,
-`features/consolidation`, `features/closing` (frontend, menu section "Planning & Closing").
-Migrations `V400` (FX revaluation, year-end) and `V600` (budgets, inter-company, consolidation);
+Modules `budget` and `closing` (backend) and `features/budget`, `features/closing` (frontend, menu
+section "Planning & Closing"). Migrations `V400` (FX revaluation, year-end) and `V600` (budgets);
 seed data `V960`/`V961` plus the start-up runner `closing.seed.PlanningSeedData` (`seed` profile,
-`@Order(60)`, idempotent).
+`@Order(60)`, idempotent). Inter-company and group consolidation of the original suite were removed
+with the insurer suite (their tables dropped by V2501, see
+[`CODEBASE_RELEVANCE_AUDIT.md`](CODEBASE_RELEVANCE_AUDIT.md) A6).
 
 ## Budgets (`/api/v1/budgets`, permission `BUDGET_MANAGE`)
 
@@ -20,36 +21,6 @@ seed data `V960`/`V961` plus the start-up runner `closing.seed.PlanningSeedData`
   `GET /alerts?threshold=90` ("Budget threshold exceeded": expense accounts at or above the
   threshold). Actuals come from the ledger and exclude year-end `CLOSING` journals.
 - Reports: `GL-BVA` Budget vs Actual, `GL-BUTIL` Budget Utilization.
-
-## Inter-company (`/api/v1/intercompany`, permission `CONSOLIDATION_RUN`)
-
-- A **relationship** per company pair defines each company's due-from and due-to accounts
-  (dedicated to that counterparty). Only active relationships transact.
-- A **transaction** (`CHARGE` or `SETTLEMENT`) posts two mirror system journals (type
-  `CONSOLIDATION`, source `INTERCOMPANY`) with the same `IC-YYYY-nnnnnn` reference and value date
-  in one database transaction – both post or neither does. Base amounts are converted by the
-  journal engine at the value date's SPOT rate (the rate table is quoted against PHP).
-- **Reconciliation** compares due-from with the counterparty's due-to per currency in transaction
-  currency (report `GL-ICREC`).
-
-## Consolidation (`/api/v1/consolidation`, permission `CONSOLIDATION_RUN`)
-
-- **Group**: parent company, consolidation currency, CTA / NCI / goodwill accounts, subsidiaries
-  with ownership %, the parent's investment account and the subsidiary's capital accounts. The
-  group chart of accounts is the parent's chart: members are aggregated by account code.
-- **Run** as of a date: each member's trial balance (cumulative, memorandum accounts excluded) is
-  translated – assets, liabilities and equity at the CLOSING rate, income and expenses at the
-  AVERAGE rate (latest AVERAGE rate of the fiscal year, else the mean of the year's SPOT rates) –
-  and the resulting CTA is booked to the translation reserve. Eliminations:
-  `IC_BALANCE` (due-from vs due-to of every active relationship inside the group, difference to
-  CTA) and `INVESTMENT_EQUITY` (investment vs subsidiary capital, minority share to NCI,
-  remainder to goodwill). Every rule is balanced, so the consolidated TB balances (checked).
-  Company ledgers are never modified. A re-run cancels the previous `DRAFT`; a `FINAL` run blocks
-  duplicates for the same date.
-- Reports: `GL-CON-TB`, `GL-CON-BS`, `GL-CON-PL`, `GL-CON-ELIM` (parameter `groupCode`, optional
-  `asOfDate` → latest run on or before it).
-- Simplifications: equity is translated at the closing rate (no historical rates); IC profit in
-  stock, dividends and interest are not eliminated.
 
 ## FX revaluation (`/api/v1/closing/fx-revaluations`, permission `PERIOD_END_RUN`)
 
@@ -78,11 +49,9 @@ seed data `V960`/`V961` plus the start-up runner `closing.seed.PlanningSeedData`
   but do not block the close or the year-end close; the screen shows them with a *Warning* badge
   and "ready to close, review the warnings".
   The port stays in closing: receivables depends on closing and closing depends on no module that
-  depends on receivables, so no neutral kernel package is needed (unlike the insurance kernel).
+  depends on receivables, so no neutral kernel package is needed.
   Other modules append their own period-end controls through the port
-  `closing.service.PeriodEndCheckProvider` (e.g. actuarial reserves: "Actuarial reserves valued and
-  posted"; it reports "Not applicable" while reserving is not set up, as for BDOI; the insurer-side `reserves`
-  module is listed in `CODEBASE_RELEVANCE_AUDIT.md`).
+  `closing.service.PeriodEndCheckProvider`.
 - **Year-end close** (`YEAR_END_CLOSE`): requires every period CLOSED or CLOSING with the final
   period in CLOSING (it receives the closing journal), no pending journals, a balanced TB, the
   final period revalued (or nothing to revalue) and a valid company retained earnings account;
@@ -101,7 +70,7 @@ seed data `V960`/`V961` plus the start-up runner `closing.seed.PlanningSeedData`
 
 ## Seed data
 
-FVS "BDO Insurance and Reinsurance Brokers (Singapore) Pte. Ltd." (USD, named in V989) with a copy of the seed chart, FY2026 and monthly
-journals; FVI owns 80 % (group `FVGRP`, investment 1506 vs capital 3100); management fees FVI → FVS
-March–August with one settlement (IC accounts 1607 / 2510); FVI FY2026 approved budget; FVI FX
-revaluations July and August with auto-reversal; a consolidation run as of 31 August 2026.
+FVI FY2026 approved budget; FVI FX revaluations July and August with auto-reversal. The second seed
+company FVS "BDO Insurance and Reinsurance Brokers (Singapore) Pte. Ltd." (USD, V960, named in V989)
+keeps its copy of the seed chart and FY2026; it has no journals of its own since inter-company and
+consolidation were removed.

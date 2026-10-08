@@ -1,19 +1,42 @@
-# Platform: Redis cache and shared state, Kafka integration events
+# Platform: Valkey cache and shared state, Kafka integration events
 
-BIBS technology baseline: **Redis 7.x** for caching and session state, **Apache Kafka 3.6+** for event
-streaming and asynchronous integration. Everything else stays as it is (Java 21, Spring Boot 3.5,
-PostgreSQL 16, React). This document is the design, the topic catalogue and the production support
-runbook. Configuration: [`CONFIGURATION.md`](../operations/CONFIGURATION.md) (section *Redis 7 and
-Apache Kafka*). How a module uses both: [Developer Guide §10.8 and §10.9](../development/DEVELOPER_GUIDE.md).
+BIBS uses **Valkey 8.x** for caching and session state and **Apache Kafka 3.9 (KRaft)** for event streaming and
+asynchronous integration, on the component baseline below. This document is the design, the topic catalogue and the
+production support runbook. Configuration: [`CONFIGURATION.md`](../operations/CONFIGURATION.md) (section *Valkey 8
+and Apache Kafka*). How a module uses both: [Developer Guide §10.8 and §10.9](../development/DEVELOPER_GUIDE.md).
+
+Valkey replaces Redis (client decision, 08-Oct-2026): Redis releases from 7.4 on are no longer under the BSD licence,
+Valkey continues the BSD-3-Clause line under the Linux Foundation and speaks the same protocol. The client library
+(Spring Data Redis with Lettuce), its `spring.data.redis.*` keys, the class names of the adapters (`RedisJobLock`,
+`RedisSessionStore`) and the protocol test server keep their names; the server, its images and the deployment
+variables (`BROKERVERSE_VALKEY_*`, former `BROKERVERSE_REDIS_*` still read) are Valkey. On AWS the managed service is
+Amazon ElastiCache for Valkey.
+
+### Component baseline
+
+| Component | Version baseline | Licence | Function |
+|---|---|---|---|
+| PostgreSQL | 16.x | PostgreSQL Licence | Relational data store |
+| Valkey | 8.x | BSD-3-Clause | Cache, job locks, token deny-list, counters |
+| Apache Kafka | 3.9 (KRaft) | Apache 2.0 | Event streaming, transactional outbox |
+| OpenJDK (Eclipse Temurin) | 21 LTS | GPLv2 with Classpath Exception | Application runtime |
+| Spring Boot | 3.5.x | Apache 2.0 | Application framework |
+| React | 19.x | MIT | Web user interface |
+| Node.js | 22 LTS | MIT | Build of the web user interface (not a production runtime) |
+| nginx (unprivileged image) | 1.30 | BSD-2-Clause | Serves the web user interface, proxies the API |
+| Kubernetes (managed) | Provider-supported version | Apache 2.0 | Container orchestration |
+| Gateway API controller | Gateway API v1 controller: the managed provider's controller or Envoy Gateway | Apache 2.0 | Ingress and traffic routing |
+
+Support horizon and annual review: [`DEPLOYMENT.md`](../operations/DEPLOYMENT.md) section 7.
 
 ## 1. Overview
 
-| Function | With Redis / Kafka | Fallback (switch off) | Code |
+| Function | With Valkey / Kafka | Fallback (switch off) | Code |
 |---|---|---|---|
-| Cluster-wide job lock | Redis `SET NX PX`, fencing token, lease renewed while the job runs | PostgreSQL advisory lock on a dedicated connection | `system.service.JobLock` → `sharedstate` |
-| Reference-data cache | Spring Cache on Redis (JSON values, TTL per cache) | In-memory Caffeine cache, same TTL | `cache`, `CacheSpec` beans of the owners |
-| Token denylist (logout) | Redis key per `jti`, TTL = remaining token life | Table `sec_revoked_token` | `security.service.TokenRevocationStore` → `sharedstate` |
-| Failed-login counter, login rate limit | Redis `INCR` + `PEXPIRE` | Table `sys_shared_counter` (upsert) | `security.service.SharedCounterStore` → `sharedstate` |
+| Cluster-wide job lock | Valkey `SET NX PX`, fencing token, lease renewed while the job runs | PostgreSQL advisory lock on a dedicated connection | `system.service.JobLock` → `sharedstate` |
+| Reference-data cache | Spring Cache on Valkey (JSON values, TTL per cache) | In-memory Caffeine cache, same TTL | `cache`, `CacheSpec` beans of the owners |
+| Token denylist (logout) | Valkey key per `jti`, TTL = remaining token life | Table `sec_revoked_token` | `security.service.TokenRevocationStore` → `sharedstate` |
+| Failed-login counter, login rate limit | Valkey `INCR` + `PEXPIRE` | Table `sys_shared_counter` (upsert) | `security.service.SharedCounterStore` → `sharedstate` |
 | Integration events | Transactional outbox `evt_outbox` → relay → Kafka topics `bibs.<domain>.<event>.v1` | Rows recorded `LOCAL` (delivered in-process) | `events`, `integration` |
 | E-mail dispatch | Consumer of `bibs.messaging.notification-requested.v1` | Delivery after commit + `MAIL_DISPATCH` job (unchanged) | `integration.service.NotificationDeliveryConsumer` |
 | Event archive | Consumer → `evt_archive` | – (the outbox is the record) | `events.service.EventArchiveConsumer` |
@@ -26,7 +49,7 @@ instances of an environment must use the same values.
 Packages (ArchUnit keeps them cycle-free: the platform owns the ports, the business modules never
 depend on `sharedstate`, `events` or `integration`):
 
-- `cache` – `CacheSpec`, cache manager (Redis or Caffeine), `CacheInvalidator` (entity-change eviction),
+- `cache` – `CacheSpec`, cache manager (Valkey or Caffeine), `CacheInvalidator` (entity-change eviction),
   cache support API.
 - `sharedstate` – `RedisJobLock` / `AdvisoryJobLock`, `RedisSessionStore` / `JdbcSessionStore`,
   `SHARED_STATE_CLEANUP` job.
@@ -40,7 +63,7 @@ Migration: **V34** `V34__platform_cache_and_events.sql` (platform range V1–V99
 `evt_outbox`, `evt_archive`, `evt_dead_letter`. It depends only on V1/V20 and runs out of order on
 databases that already have later versions.
 
-## 2. Redis
+## 2. Valkey
 
 ### 2.1 Job lock
 
@@ -52,7 +75,7 @@ from a screen) takes `JobLock.tryAcquire(jobName)` before the work:
   cron fires on both pods: one run `SUCCEEDED`, one `SKIPPED_LOCKED`.
 - **lock store unreachable** → the run is recorded `FAILED` ("Job lock unavailable") and `JOB_FAILURE`
   is raised; a job is never run unguarded.
-- **Redis**: key `<prefix>joblock:<job>` = `<instance-uuid>:<fencing token>`, set with `SET NX PX
+- **Valkey**: key `<prefix>joblock:<job>` = `<instance-uuid>:<fencing token>`, set with `SET NX PX
   <lease>` (`brokerverse.jobs.lock-lease`, 2 minutes). The fencing token is `INCR
   <prefix>joblock:<job>:fence` (strictly increasing per job). A daemon thread renews the lease every
   third of it with a compare-and-`PEXPIRE` script; release is a compare-and-`DEL` script, so an
@@ -79,7 +102,7 @@ Eviction ("a change made by the System Administrator shows everywhere right away
    change, whatever the write path: the owning service, another module, a job, the bulk loader) clears
    the whole cache through a Hibernate listener (`CacheInvalidator`): once at the flush, and once more
    when the transaction completes (commit or rollback), so a value read inside the writing transaction
-   never outlives it. With Redis the clear (`SCAN` + `DEL` of `<prefix>cache:<name>::*`) reaches every
+   never outlives it. With Valkey the clear (`SCAN` + `DEL` of `<prefix>cache:<name>::*`) reaches every
    pod.
 2. The maintenance services also carry `@CacheEvict` (LOV, parameters, roles, companies and branches),
    so a read later in the same request never sees the old value.
@@ -89,10 +112,10 @@ Eviction ("a change made by the System Administrator shows everywhere right away
 Caches are whole-master caches (clear all on change), keys are the natural lookup keys; masters are
 small and change rarely. Changes made outside JPA (SQL scripts, a manual fix) are not seen: flush the
 cache (runbook §5.3). The time to live bounds any staleness, including the in-memory fallback on
-several pods (each pod clears only its own memory; do not run several pods with Redis off in
+several pods (each pod clears only its own memory; do not run several pods with Valkey off in
 production).
 
-Values on Redis are JSON (`CacheValueSerializer`): `{"t": type, "v": value}`; only
+Values on Valkey are JSON (`CacheValueSerializer`): `{"t": type, "v": value}`; only
 `com.iortatechnxt.brokerverse.*` types and a short JDK allow-list are ever instantiated (no Java
 serialization, no polymorphic typing), decimals keep their scale and unknown properties are ignored
 (an entry written by the previous release still reads). Cache failures never fail a request
@@ -104,7 +127,7 @@ serialization, no polymorphic typing), decimals keep their scale and unknown pro
   writes the audit entry `AppUser / LOGOUT` (UAM BRD-11, UAM-NFR-35). Every token carries a `jti`;
   `JwtAuthenticationFilter` refuses a token whose `jti` is on the denylist. Tokens issued before this
   release have no `jti` and are accepted until they expire. The web client calls logout when the user
-  signs out. When the denylist cannot be read, the token is accepted and the failure logged (a Redis
+  signs out. When the denylist cannot be read, the token is accepted and the failure logged (a Valkey
   outage does not sign everybody out).
 - **Failed logins** – `LoginAttemptTracker` counts consecutive failures on the shared counter
   `login-failures:<user>`; the count applied is `max(shared counter, recorded + 1)` and
@@ -229,11 +252,11 @@ is disabled the messaging module works exactly as before.
 | Situation | Effect |
 |---|---|
 | `brokerverse.redis.enabled=false` | In-memory caches per pod (TTL-bounded staleness across pods), advisory job locks, denylist and counters in PostgreSQL. Correct on one pod; on several pods only the caches may lag by at most their TTL. |
-| Redis unreachable (enabled) | Cache reads fall back to the database (logged); job runs are recorded FAILED "Job lock unavailable" (JOB_FAILURE alert) and not executed; the denylist check lets tokens through (logged); failed-login counting uses the database count; the login rate limit lets requests through; logout fails with 500 (the client still signs out locally). `/actuator/health` reports Redis DOWN. |
+| Valkey unreachable (enabled) | Cache reads fall back to the database (logged); job runs are recorded FAILED "Job lock unavailable" (JOB_FAILURE alert) and not executed; the denylist check lets tokens through (logged); failed-login counting uses the database count; the login rate limit lets requests through; logout fails with 500 (the client still signs out locally). `/actuator/health` reports Valkey (component `redis`) DOWN. |
 | `brokerverse.kafka.enabled=false` | Outbox rows written `LOCAL`; no consumers; e-mail delivered after commit and by `MAIL_DISPATCH`; the support API refuses retries (`KAFKA_DISABLED`). |
 | Kafka unreachable (enabled) | Business transactions are not affected (they only write the outbox). Rows stay `PENDING` and are retried with back-off, `FAILED` after 10 attempts. E-mails wait (the `MAIL_DISPATCH` job still sends QUEUED mail). |
 | A consumer keeps failing | After the retries the record is in `<topic>.dlt` and on the support screen. |
-| A pod dies during a job | Redis lease expires (≤ 2 min) or the advisory lock goes with the connection; the next run proceeds. |
+| A pod dies during a job | Valkey lease expires (≤ 2 min) or the advisory lock goes with the connection; the next run proceeds. |
 
 ## 5. Runbook (production support)
 
@@ -270,14 +293,14 @@ the consumer group offsets with `kafka-consumer-groups.sh --group bibs-event-arc
 - After a change made outside the application (SQL fix of `sys_parameter`, `lov_value`, `sec_role_permission`,
   `org_company`, catalog tables): `POST /api/v1/admin/caches/{name}/clear` (e.g. `system-parameters`) or
   `POST /api/v1/admin/caches/clear` as a System Administrator.
-- Directly on Redis: `redis-cli --tls -h <endpoint> -a <token> --scan --pattern 'bv:cache:system-parameters::*' | xargs redis-cli … del`.
+- Directly on Valkey: `valkey-cli --tls -h <endpoint> -a <token> --scan --pattern 'bv:cache:system-parameters::*' | xargs valkey-cli … del`.
   Never `FLUSHALL`: it would also drop the job locks and the token denylist.
-- With Redis disabled each pod has its own memory cache: call the endpoint once per pod or wait for the TTL.
+- With Valkey disabled each pod has its own memory cache: call the endpoint once per pod or wait for the TTL.
 
 ### 5.4 Job locks
 
 - A job shows `SKIPPED_LOCKED` on one pod and `SUCCEEDED` on the other: normal.
-- A job skipped on every pod for longer than its run time: a stale lock. Redis:
+- A job skipped on every pod for longer than its run time: a stale lock. Valkey:
   `GET bv:joblock:<JOB>` (owner `<instance>:<token>`), `PTTL` shows the remaining lease; it expires by
   itself within the lease; `DEL bv:joblock:<JOB>` only when the owner instance is gone. PostgreSQL:
   `select * from pg_locks where locktype='advisory' and classid=4869954;` then terminate the holding
@@ -286,19 +309,19 @@ the consumer group offsets with `kafka-consumer-groups.sh --group bibs-event-arc
 ### 5.5 Revoking sessions
 
 A single token is revoked by the user's logout. To sign everybody out rotate `BROKERVERSE_JWT_SECRET`
-(rolling restart). Revoked tokens: Redis `bv:session:revoked:*`, fallback table `sec_revoked_token`.
+(rolling restart). Revoked tokens: Valkey `bv:session:revoked:*`, fallback table `sec_revoked_token`.
 
 ## 6. Tests (no Docker)
 
-- Redis adapters: pure-Java Redis protocol server `com.github.fppt:jedis-mock` (Maven Central, runs Lua
+- Valkey adapters: pure-Java Redis protocol server `com.github.fppt:jedis-mock` (Maven Central, runs Lua
   scripts): `RedisJobLockTest`, `RedisSessionStoreTest`, `RedisCacheTest`; the same behaviour tests
   (`JobLockContract`, `SessionStoreContract`) run on the PostgreSQL fallbacks (`AdvisoryJobLockIT`,
   `JdbcSessionStoreIT`).
 - Kafka: `spring-kafka-test` `@EmbeddedKafka` (KRaft): `KafkaEventsIT` covers outbox → topic → consumers
   (archive, e-mail), order per key, dead-letter topic, retry and discard.
-- The whole application with Redis and Kafka on: `PlatformServicesSupport` (jedis-mock + embedded
-  Kafka): `RedisEnabledPlatformIT` (job lock `SKIPPED_LOCKED`, cache eviction on Redis, logout
+- The whole application with Valkey and Kafka on: `PlatformServicesSupport` (jedis-mock + embedded
+  Kafka): `RedisEnabledPlatformIT` (job lock `SKIPPED_LOCKED`, cache eviction on Valkey, logout
   revocation, shared failed-login counter) and `KafkaEventsIT`.
 - Fallbacks: `ReferenceDataCacheIT` (a write evicts), `LogoutIT`, `IntegrationEventsLocalIT` (every
-  adapter, rollback publishes nothing, LOCAL, support API). The `test` profile needs neither Redis nor
+  adapter, rollback publishes nothing, LOCAL, support API). The `test` profile needs neither Valkey nor
   Kafka.

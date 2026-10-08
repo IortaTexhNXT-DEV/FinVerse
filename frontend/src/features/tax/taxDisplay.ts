@@ -19,13 +19,10 @@ export function dueBadge(state: DueState, daysToDue: number): { tone: string; te
 
 /**
  * Frontend route of the source document of a worksheet row. Supplier invoices have no page of
- * their own: the invoice list opens with that invoice's detail. Policies, endorsements and
- * commissions carry the policy id and open the policy.
+ * their own: the invoice list opens with that invoice's detail.
  */
 export function sourceLink(doc: TaxDocument): string {
-  return doc.sourceType === 'SUPPLIER_INVOICE'
-    ? `/payables/invoices?invoice=${doc.sourceId}`
-    : `/underwriting/policies/${doc.sourceId}`;
+  return `/payables/invoices?invoice=${doc.sourceId}`;
 }
 
 /** Amount of a worksheet summary line (0 when absent). */
@@ -53,7 +50,7 @@ export function worksheetKpis(worksheet: Worksheet): { label: string; value: num
       ];
     default:
       return [
-        { label: 'Premiums', value: f.taxBase },
+        { label: 'Tax base', value: f.taxBase },
         { label: 'Tax due', value: f.taxDue },
         { label: 'Documents', value: worksheet.documents.length },
       ];

@@ -24,13 +24,11 @@ import java.util.TreeSet;
 import org.springframework.stereotype.Component;
 
 /**
- * VAT worksheet (BIR Form 2550Q) with the documents of the Summary Lists of Sales and Purchases.
+ * VAT worksheet (BIR Form 2550Q) with the documents of the Summary List of Purchases.
  *
  * <ul>
- *   <li>Sales: approved premium transactions. With VAT charged the company's net premium is a
- *       VATable sale; without VAT it is zero-rated when the customer's tax profile says so,
- *       otherwise exempt (e.g. business subject to premium tax). Policy fees are not VATable here
- *       because the premium calculator does not charge VAT on them (assumption).
+ *   <li>Sales: the broker's sales are not read from a source document here; the sales lines show
+ *       zero and the amounts are entered on the return.
  *   <li>Purchases: approved supplier invoices by invoice date. With VAT the net is a purchase of
  *       capital goods when a line is booked to an asset account, else a purchase of services;
  *       without VAT it is zero-rated when the supplier's profile says so, otherwise exempt. All
@@ -42,7 +40,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class VatWorksheetBuilder {
 
-  private static final String VATABLE = "VATABLE";
   private static final String ZERO_RATED = "ZERO_RATED";
   private static final String EXEMPT = "EXEMPT";
   private static final String SERVICES = "SERVICES";
@@ -50,7 +47,6 @@ public class VatWorksheetBuilder {
   private static final String SUPPLIER_INVOICE = "SUPPLIER_INVOICE";
   private static final int RATE_SCALE = 8;
 
-  private final PremiumTaxSource premiums;
   private final TaxSourceQueries queries;
   private final TaxpayerDirectory directory;
   private final TaxReturnRepository returns;
@@ -59,19 +55,16 @@ public class VatWorksheetBuilder {
   /**
    * Creates the builder.
    *
-   * @param premiums premium documents
    * @param queries supplier invoices
    * @param directory party tax facts
    * @param returns previous returns (carry-over)
    * @param support shared helpers
    */
   public VatWorksheetBuilder(
-      PremiumTaxSource premiums,
       TaxSourceQueries queries,
       TaxpayerDirectory directory,
       TaxReturnRepository returns,
       WorksheetSupport support) {
-    this.premiums = premiums;
     this.queries = queries;
     this.directory = directory;
     this.returns = returns;
@@ -86,29 +79,25 @@ public class VatWorksheetBuilder {
    * @return worksheet
    */
   public TaxWorksheet build(Long companyId, TaxPeriod period) {
-    List<PremiumDocument> sales = premiums.documents(companyId, period);
     List<InvoiceTaxRow> invoices = queries.supplierInvoices(companyId, period.from(), period.to());
     Set<String> parties = new TreeSet<>();
-    sales.forEach(s -> parties.add(s.customerCode()));
     invoices.forEach(i -> parties.add(i.partyCode()));
     Lookup lookup = directory.lookup(companyId, parties);
     List<TaxDocumentLine> documents = new ArrayList<>();
-    sales.forEach(s -> documents.add(sale(s, lookup)));
     invoices.forEach(i -> documents.add(purchase(i, lookup)));
 
-    List<TaxDocumentLine> salesLines = documents.stream().filter(d -> isSection(d, true)).toList();
-    List<TaxDocumentLine> buyLines = documents.stream().filter(d -> isSection(d, false)).toList();
-    BigDecimal taxable = WorksheetSupport.sum(salesLines, TaxDocumentLine::taxableAmount);
-    BigDecimal outputVat = WorksheetSupport.sum(salesLines, TaxDocumentLine::taxAmount);
+    List<TaxDocumentLine> buyLines = documents;
+    BigDecimal taxable = Money.zero();
+    BigDecimal outputVat = Money.zero();
     BigDecimal inputVat = WorksheetSupport.sum(buyLines, TaxDocumentLine::taxAmount);
     List<String> notes = new ArrayList<>();
     BigDecimal carryOver = carryOver(companyId, period, notes);
     ReturnFigures figures = ReturnFigures.of(taxable, outputVat, inputVat.add(carryOver));
 
     List<ReturnLineValues> lines = new ArrayList<>();
-    lines.add(line("SALES_TAXABLE", "VATable sales (premiums)", null, taxable));
-    lines.add(line("SALES_ZERO_RATED", "Zero-rated sales", null, zeroRated(salesLines)));
-    lines.add(line("SALES_EXEMPT", "Exempt sales", null, exempt(salesLines)));
+    lines.add(line("SALES_TAXABLE", "VATable sales", null, taxable));
+    lines.add(line("SALES_ZERO_RATED", "Zero-rated sales", null, Money.zero()));
+    lines.add(line("SALES_EXEMPT", "Exempt sales", null, Money.zero()));
     lines.add(line("OUTPUT_VAT", "Output VAT", taxable, outputVat));
     lines.add(
         line(
@@ -159,28 +148,6 @@ public class VatWorksheetBuilder {
     return r.getExcessCredit();
   }
 
-  private static TaxDocumentLine sale(PremiumDocument s, Lookup lookup) {
-    Taxpayer t = lookup.taxpayer(s.customerCode(), s.customerName());
-    String vatClass = classify(s.vat(), lookup.vatTreatment(s.customerCode()), VATABLE);
-    return new TaxDocumentLine(
-        TaxDocumentLine.SALES,
-        s.sourceType(),
-        s.policyId(),
-        s.documentNo(),
-        s.date(),
-        s.customerCode(),
-        t.name(),
-        t.formattedTin(),
-        vatClass,
-        null,
-        s.businessLine(),
-        VATABLE.equals(vatClass) ? s.premium() : Money.zero(),
-        EXEMPT.equals(vatClass) ? s.premium() : Money.zero(),
-        ZERO_RATED.equals(vatClass) ? s.premium() : Money.zero(),
-        s.vat(),
-        ReturnFigures.effectiveRate(s.premium(), s.vat()));
-  }
-
   private static TaxDocumentLine purchase(InvoiceTaxRow i, Lookup lookup) {
     Taxpayer t = lookup.taxpayer(i.partyCode(), i.partyName());
     BigDecimal rate = i.basePayable().divide(i.payable(), RATE_SCALE, RoundingMode.HALF_EVEN);
@@ -216,10 +183,6 @@ public class VatWorksheetBuilder {
       return taxableClass;
     }
     return treatment == VatTreatment.ZERO_RATED ? ZERO_RATED : EXEMPT;
-  }
-
-  private static boolean isSection(TaxDocumentLine d, boolean sales) {
-    return d.section().equals(sales ? TaxDocumentLine.SALES : TaxDocumentLine.PURCHASES);
   }
 
   private static BigDecimal net(List<TaxDocumentLine> lines, String vatClass) {

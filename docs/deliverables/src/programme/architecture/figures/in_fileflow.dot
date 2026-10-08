@@ -1,0 +1,16 @@
+// Inbound file processing with control totals and reconciliation (Integration Architecture, chapter 6).
+digraph in_fileflow {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.3, ranksep=0.35, bgcolor="white", pad=0.2,
+         label=<<font point-size="15" color="@HEADER_BLUE"><b>Inbound file: from arrival to reconciliation</b></font><br/><font point-size="9" color="@MUTED">Bank, loan, PDC, watchlist and insurer files follow the same steps; each step is logged in the run history.</font>>,
+         labelloc=t, labeljust=l];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.0, fontname="Arial", fontsize=11,
+         fontcolor="@NEAR_BLACK", margin="0.12,0.06", fillcolor="@WHITE"];
+  edge  [color="@HEADER_BLUE", arrowsize=0.55, penwidth=0.9, fontname="Arial", fontsize=8, fontcolor="@MUTED"];
+  a [label=<<b>1. Arrival</b><br/><font point-size="9.5">presigned upload, managed transfer or user upload<br/>into the incoming prefix of the inbound bucket; SHA-256 declared</font>>, fillcolor="@BG_BLUE"];
+  b [label=<<b>2. Malware scan</b><br/><font point-size="9.5">GuardDuty tag; only NO_THREATS_FOUND continues;<br/>otherwise quarantine and alert to the uploader and security</font>>, fillcolor="@AMBER_BG"];
+  c [label=<<b>3. Structure and control totals</b><br/><font point-size="9.5">layout, encoding, record count and amount totals<br/>against the trailer or control file; duplicate file refused</font>>, fillcolor="@BG_BLUE"];
+  d [label=<<b>4. Row validation and processing</b><br/><font point-size="9.5">one transaction per row; rejected rows with the reason;<br/>accepted rows posted with their accounting</font>>, fillcolor="@BG_BLUE"];
+  e [label=<<b>5. Result and exceptions</b><br/><font point-size="9.5">upload result, unmatched items to the work queues,<br/>JOB_FAILURE alert when the run fails</font>>, fillcolor="@DIRTY_WHITE"];
+  f [label=<<b>6. Reconciliation</b><br/><font point-size="9.5">file totals against postings and the bank or insurer<br/>statement; differences owned by the business unit</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  a -> b -> c -> d -> e -> f;
+}

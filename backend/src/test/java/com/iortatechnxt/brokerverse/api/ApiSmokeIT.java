@@ -8,7 +8,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
-import com.iortatechnxt.brokerverse.consolidation.service.ConsolidationGroupService;
 import com.iortatechnxt.brokerverse.period.service.PeriodService;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.support.SignInPasswords;
@@ -37,7 +36,6 @@ class ApiSmokeIT {
   @Autowired private MockMvc mvc;
   @Autowired private TestData data;
   @Autowired private PeriodService periods;
-  @Autowired private ConsolidationGroupService groups;
   @Autowired private UserDetailsService users;
   @Autowired private SignInPasswords passwords;
 
@@ -58,8 +56,6 @@ class ApiSmokeIT {
         "/api/v1/journals?companyId={c}&status=POSTED&inputter=accountant",
         "/api/v1/reports",
         "/api/v1/dashboard?companyId={c}",
-        "/api/v1/dashboard/premium?companyId={c}",
-        "/api/v1/dashboard/claims?companyId={c}&asOf=2026-06-30",
         "/api/v1/dashboard/collections?companyId={c}",
         "/api/v1/dashboard/payables?companyId={c}",
         "/api/v1/dashboard/cash?companyId={c}",
@@ -103,20 +99,6 @@ class ApiSmokeIT {
         "/api/v1/payables/vouchers/payable-items?companyId={c}&partyCode=S-0001",
         "/api/v1/payables/pdc-issued?companyId={c}",
         "/api/v1/payables/petty-cash/funds?companyId={c}",
-        "/api/v1/underwriting/products?companyId={c}",
-        "/api/v1/underwriting/policies?companyId={c}",
-        "/api/v1/underwriting/policies?companyId={c}&status=APPROVED&q=P-&fromDate=2026-01-01",
-        "/api/v1/underwriting/quotations?companyId={c}",
-        "/api/v1/underwriting/quotations?companyId={c}&status=PENDING_APPROVAL",
-        "/api/v1/underwriting/open-covers?companyId={c}",
-        "/api/v1/claims?companyId={c}",
-        "/api/v1/claims?companyId={c}&status=OPEN&businessLine=FIRE&q=CL-&lossFrom=2026-01-01",
-        "/api/v1/claims/lpos?companyId={c}",
-        "/api/v1/claims/0/reserves",
-        "/api/v1/claims/0/settlements",
-        "/api/v1/claims/0/recoveries",
-        "/api/v1/claims/0/lpos",
-        "/api/v1/claims/0/movements",
         "/api/v1/assets/categories?companyId={c}",
         "/api/v1/assets/register?companyId={c}",
         "/api/v1/assets/register?companyId={c}&status=ACTIVE&q=fa",
@@ -146,11 +128,6 @@ class ApiSmokeIT {
         "/api/v1/budgets?companyId={c}&fiscalYear=2026",
         "/api/v1/budgets/variance?companyId={c}&asOf=2026-06-30&byCostCenter=true",
         "/api/v1/budgets/alerts?companyId={c}&asOf=2026-06-30&threshold=50",
-        "/api/v1/intercompany/relationships",
-        "/api/v1/intercompany/relationships?companyId={c}",
-        "/api/v1/intercompany/transactions?companyId={c}",
-        "/api/v1/intercompany/reconciliation?companyId={c}&asOf=2026-06-30",
-        "/api/v1/consolidation/groups",
         "/api/v1/closing/fx-revaluations?companyId={c}",
         // tax & statutory
         "/api/v1/tax/codes?companyId={c}",
@@ -159,10 +136,6 @@ class ApiSmokeIT {
         "/api/v1/tax/calendar?companyId={c}&year=2026",
         "/api/v1/tax/worksheets/VAT?companyId={c}&from=2026-07-01&to=2026-09-30",
         "/api/v1/tax/worksheets/EWT?companyId={c}&from=2026-09-01&to=2026-09-30",
-        "/api/v1/tax/worksheets/DST?companyId={c}&from=2026-09-01&to=2026-09-30",
-        "/api/v1/tax/worksheets/PREMIUM_TAX?companyId={c}&from=2026-07-01&to=2026-09-30",
-        "/api/v1/tax/worksheets/LGT?companyId={c}&from=2026-07-01&to=2026-09-30",
-        "/api/v1/tax/worksheets/FST?companyId={c}&from=2026-09-01&to=2026-09-30",
         "/api/v1/tax/returns?companyId={c}&year=2026",
         "/api/v1/tax/returns?companyId={c}&year=2026&formCode=2550Q&status=DRAFT",
         "/api/v1/tax/2307/certificates?companyId={c}&year=2026",
@@ -170,24 +143,6 @@ class ApiSmokeIT {
         "/api/v1/tax/exports/SLS?companyId={c}&year=2026&quarter=3",
         "/api/v1/tax/exports/SLP?companyId={c}&year=2026&quarter=3",
         "/api/v1/tax/exports/QAP?companyId={c}&year=2026&quarter=3",
-        "/api/v1/tax/ic/mappings?companyId={c}",
-        "/api/v1/tax/ic/schedules/PREMIUMS?companyId={c}&from=2026-01-01&to=2026-09-30",
-        "/api/v1/tax/ic/schedules/NET_WORTH?companyId={c}&from=2026-01-01&to=2026-09-30",
-        "/api/v1/tax/ic/schedules/RBC?companyId={c}&from=2026-01-01&to=2026-09-30",
-        "/api/v1/reserves/parameters?companyId={c}",
-        "/api/v1/reserves/takaful-setting?companyId={c}",
-        "/api/v1/reserves/runs?companyId={c}",
-        "/api/v1/reserves/summary?companyId={c}&asOf=2026-08-31",
-        "/api/v1/reserves/triangles?companyId={c}&businessLine=FIRE&asOf=2026-08-31",
-        // reinsurance
-        "/api/v1/reinsurance/treaties?companyId={c}",
-        "/api/v1/reinsurance/fac-placements?companyId={c}",
-        "/api/v1/reinsurance/fac-placements?companyId={c}&status=PROVISIONAL",
-        "/api/v1/reinsurance/allocation/preview?companyId={c}&from=2026-09-01&to=2026-09-30",
-        "/api/v1/reinsurance/cessions?companyId={c}&policyNo=NONE",
-        "/api/v1/reinsurance/cessions?companyId={c}&from=2026-09-01&to=2026-09-30",
-        "/api/v1/reinsurance/claims/movements?companyId={c}&from=2026-01-01&to=2026-12-31",
-        "/api/v1/reinsurance/soas?companyId={c}",
       })
   @WithUserDetails("fmanager")
   void readEndpointsRespondOk(String url) throws Exception {
@@ -534,12 +489,10 @@ class ApiSmokeIT {
     mvc.perform(get("/api/v1/closing/fx-revaluations/preview" + c + "&periodId=" + june))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.periodName").value("2026-06"));
-    Long group = groups.getByCode("FVGRP").getId();
-    mvc.perform(get("/api/v1/consolidation/groups/" + group + "/runs")).andExpect(status().isOk());
   }
 
   @Test
-  @WithUserDetails("uw")
+  @WithUserDetails("norole")
   void missingPermissionIsForbiddenNotUnauthorized() throws Exception {
     mvc.perform(get("/api/v1/admin/users"))
         .andExpect(status().isForbidden())

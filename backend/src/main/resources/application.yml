@@ -59,23 +59,25 @@ spring:
   threads:
     virtual:
       enabled: true
-  # ---- Redis 7 (caches, job locks, token denylist, shared counters); brokerverse.redis.enabled ----
+  # ---- Valkey 8 (caches, job locks, token denylist, shared counters); brokerverse.redis.enabled ----
+  # Valkey speaks the Redis protocol: the Spring Data Redis client (Lettuce) and the spring.data.redis.*
+  # keys stay. Variables BROKERVERSE_VALKEY_*; the former BROKERVERSE_REDIS_* names are still read.
   data:
     redis:
       client-type: lettuce
-      host: ${BROKERVERSE_REDIS_HOST:localhost}
-      port: ${BROKERVERSE_REDIS_PORT:6379}
-      username: ${BROKERVERSE_REDIS_USERNAME:}
-      password: ${BROKERVERSE_REDIS_PASSWORD:}
-      database: ${BROKERVERSE_REDIS_DATABASE:0}
-      timeout: ${BROKERVERSE_REDIS_TIMEOUT:2s}
-      connect-timeout: ${BROKERVERSE_REDIS_CONNECT_TIMEOUT:5s}
+      host: ${BROKERVERSE_VALKEY_HOST:${BROKERVERSE_REDIS_HOST:localhost}}
+      port: ${BROKERVERSE_VALKEY_PORT:${BROKERVERSE_REDIS_PORT:6379}}
+      username: ${BROKERVERSE_VALKEY_USERNAME:${BROKERVERSE_REDIS_USERNAME:}}
+      password: ${BROKERVERSE_VALKEY_PASSWORD:${BROKERVERSE_REDIS_PASSWORD:}}
+      database: ${BROKERVERSE_VALKEY_DATABASE:${BROKERVERSE_REDIS_DATABASE:0}}
+      timeout: ${BROKERVERSE_VALKEY_TIMEOUT:${BROKERVERSE_REDIS_TIMEOUT:2s}}
+      connect-timeout: ${BROKERVERSE_VALKEY_CONNECT_TIMEOUT:${BROKERVERSE_REDIS_CONNECT_TIMEOUT:5s}}
       ssl:
-        # AWS ElastiCache with in-transit encryption: on by default, off in the dev/test/seed profiles.
-        enabled: ${BROKERVERSE_REDIS_TLS:true}
+        # ElastiCache for Valkey with in-transit encryption: on by default, off in dev/test/seed.
+        enabled: ${BROKERVERSE_VALKEY_TLS:${BROKERVERSE_REDIS_TLS:true}}
       repositories:
         enabled: false
-  # ---- Apache Kafka 3.6+ (integration events); brokerverse.kafka.enabled ----
+  # ---- Apache Kafka 3.9, KRaft (integration events); brokerverse.kafka.enabled ----
   kafka:
     bootstrap-servers: ${BROKERVERSE_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     client-id: ${BROKERVERSE_KAFKA_CLIENT_ID:brokerverse}
@@ -280,10 +282,10 @@ brokerverse:
       batch-size: ${BROKERVERSE_FILE_BYTEA_MIGRATION_BATCH:20}
   # ---- Platform cache and events, docs/architecture/PLATFORM_CACHE_AND_EVENTS.md ----
   redis:
-    # true: Redis for caches, job locks, token denylist and shared counters (spring.data.redis.*);
+    # true: Valkey for caches, job locks, token denylist and shared counters (spring.data.redis.*);
     # false: in-memory cache, PostgreSQL advisory job locks and the V34 tables.
-    enabled: ${BROKERVERSE_REDIS_ENABLED:true}
-    key-prefix: ${BROKERVERSE_REDIS_KEY_PREFIX:bv:}
+    enabled: ${BROKERVERSE_VALKEY_ENABLED:${BROKERVERSE_REDIS_ENABLED:true}}
+    key-prefix: ${BROKERVERSE_VALKEY_KEY_PREFIX:${BROKERVERSE_REDIS_KEY_PREFIX:bv:}}
   cache:
     # Per-cache time to live (ISO-8601), overriding the defaults of the declarations.
     ttl:
@@ -327,25 +329,18 @@ brokerverse:
     # Spring cron (sec min hour day month weekday), UTC; "-" disables the schedule.
     recurring-journals-cron: ${BROKERVERSE_JOB_RECURRING_CRON:0 0 1 * * *}
     alert-checks-cron: ${BROKERVERSE_JOB_ALERTS_CRON:0 30 1 * * *}
-    # Monthly reserve valuation (previous month); disabled by default.
-    reserve-valuation-cron: ${BROKERVERSE_JOB_RESERVE_VALUATION_CRON:-}
-    # Batch RI allocation run (cedes approved transactions of the year to date not yet ceded); off by default.
-    ri-allocation-cron: ${BROKERVERSE_JOB_RI_ALLOCATION_CRON:-}
     # Post-dated cheques issued whose cheque date is reached become DUE (status only).
     pdc-issued-due-cron: ${BROKERVERSE_JOB_PDC_ISSUED_DUE_CRON:0 15 0 * * *}
-    # Insurer underwriting quotations (draft, pending, approved) past their validity become EXPIRED;
-    # insurer suite, not used by BIBS: disabled by default (V1064, CODEBASE_RELEVANCE_AUDIT.md A1).
-    quotation-expiry-cron: ${BROKERVERSE_JOB_QUOTATION_EXPIRY_CRON:-}
     # Outbox relay: delivers queued e-mails and retries failed attempts.
     mail-dispatch-cron: ${BROKERVERSE_JOB_MAIL_DISPATCH_CRON:0 */2 * * * *}
     # ---- Platform: job lock, integration events, shared state (PLATFORM_CACHE_AND_EVENTS.md) ----
-    # Lease of the Redis job lock, renewed every third of it while the job runs.
+    # Lease of the Valkey job lock, renewed every third of it while the job runs.
     lock-lease: ${BROKERVERSE_JOB_LOCK_LEASE:PT2M}
     # Integration event outbox: sends what the after-commit relay left and the due retries.
     event-outbox-relay-cron: ${BROKERVERSE_JOB_EVENT_OUTBOX_RELAY_CRON:0 * * * * *}
     # Deletes delivered outbox rows, old archived events and resolved dead letters.
     event-housekeeping-cron: ${BROKERVERSE_JOB_EVENT_HOUSEKEEPING_CRON:0 50 0 * * *}
-    # Deletes expired revoked tokens and counters of the database fallback of Redis.
+    # Deletes expired revoked tokens and counters of the database fallback of Valkey.
     shared-state-cleanup-cron: ${BROKERVERSE_JOB_SHARED_STATE_CLEANUP_CRON:0 40 0 * * *}
     # Monthly KYC review (BRNB.110): expires overdue KYC and notifies Account Officers.
     kyc-review-due-cron: ${BROKERVERSE_JOB_KYC_REVIEW_DUE_CRON:0 0 2 1 * *}
@@ -498,8 +493,8 @@ management:
     port: ${BROKERVERSE_MANAGEMENT_PORT:${server.port:8080}}
   health:
     redis:
-      # Reported only when Redis is in use (a disabled Redis must not take readiness down).
-      enabled: ${BROKERVERSE_REDIS_ENABLED:true}
+      # Reported only when Valkey is in use (a disabled Valkey must not take readiness down).
+      enabled: ${BROKERVERSE_VALKEY_ENABLED:${BROKERVERSE_REDIS_ENABLED:true}}
     mail:
       # The SMTP check is meaningful only when real delivery is on; with simulated delivery it would
       # report DOWN and take the whole health endpoint (load balancer checks) down with it.
@@ -561,7 +556,7 @@ brokerverse:
 
 ---
 # Local transports for development, automated tests and seed stacks (INF0): plaintext PostgreSQL,
-# Redis and Kafka unless the environment asks for TLS. Every other profile keeps the TLS defaults.
+# Valkey and Kafka unless the environment asks for TLS. Every other profile keeps the TLS defaults.
 spring:
   config:
     activate:
@@ -573,7 +568,7 @@ spring:
   data:
     redis:
       ssl:
-        enabled: ${BROKERVERSE_REDIS_TLS:false}
+        enabled: ${BROKERVERSE_VALKEY_TLS:${BROKERVERSE_REDIS_TLS:false}}
   kafka:
     properties:
       security.protocol: ${BROKERVERSE_KAFKA_SECURITY_PROTOCOL:PLAINTEXT}

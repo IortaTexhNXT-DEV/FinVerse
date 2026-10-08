@@ -1,12 +1,15 @@
 # User acceptance test environment (ap-southeast-1), with the seed data (SIT/UAT users) of the seed
 # profile. Transport security is the same as production: the base ConfigMap sets TLS for PostgreSQL,
-# Redis and Kafka explicitly, whatever the profile. Build: kubectl kustomize deploy/k8s/overlays/uat
+# Valkey and Kafka explicitly, whatever the profile. Build: kubectl kustomize deploy/k8s/overlays/uat
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - ../../base
   - environment.yaml
 components:
+  # Gateway controller of this environment: gateway-alb (AWS Load Balancer Controller, internal ALB
+  # with AWS WAF) or gateway-envoy (Envoy Gateway). Listed before the environment component.
+  - ../../components/gateway-alb
   - ../../components/environment
 images:
   - name: bibs-backend

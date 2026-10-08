@@ -9,8 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Entry point of the tax computations: builds the worksheet of a kind for a period from posted
- * documents (see {@link VatWorksheetBuilder}, {@link EwtWorksheetBuilder} and {@link
- * LevyWorksheetBuilder} for the rules and assumptions of each).
+ * documents (see {@link VatWorksheetBuilder} and {@link EwtWorksheetBuilder} for the rules and
+ * assumptions of each).
  */
 @Service
 @Transactional(readOnly = true)
@@ -18,20 +18,16 @@ public class TaxWorksheetService {
 
   private final VatWorksheetBuilder vat;
   private final EwtWorksheetBuilder ewt;
-  private final LevyWorksheetBuilder levies;
 
   /**
    * Creates the service.
    *
    * @param vat VAT builder
    * @param ewt withholding builder
-   * @param levies premium levy builder
    */
-  public TaxWorksheetService(
-      VatWorksheetBuilder vat, EwtWorksheetBuilder ewt, LevyWorksheetBuilder levies) {
+  public TaxWorksheetService(VatWorksheetBuilder vat, EwtWorksheetBuilder ewt) {
     this.vat = vat;
     this.ewt = ewt;
-    this.levies = levies;
   }
 
   /**
@@ -51,7 +47,6 @@ public class TaxWorksheetService {
           throw new BusinessRuleException(
               "NO_WORKSHEET",
               "This form is prepared outside " + BrandAssets.SYSTEM_NAME + " and has no worksheet");
-      default -> levies.build(companyId, kind.premiumLevy(), period);
     };
   }
 }

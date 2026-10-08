@@ -159,7 +159,7 @@ const custom = {
     await ctx.settle(page, 300);
     await page.getByLabel('User ID').fill('legacyaudit');
     await page.getByLabel('Password').fill(process.env.SEED_PASSWORD);
-    await page.getByRole('button', { name: /^login$/i }).click();
+    await page.getByRole('button', { name: /^(login|sign in)$/i }).click();
     await ctx.settle(page, 1200);
     await page.goto(`${ctx.BASE}/legacy-inquiry`);
     await ctx.settle(page);

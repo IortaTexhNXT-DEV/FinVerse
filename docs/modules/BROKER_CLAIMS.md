@@ -11,8 +11,8 @@ requirements and their as-built status per BRCLM ID are in
 specification is [`FRS_BRD07_CLAIMS.md`](../deliverables/src/BRD-07_Claims/FRS_BRD07_CLAIMS.md), with
 requirements FR-CM-001 to FR-CM-066.
 
-The insurer-side Claims module (`claims`, `docs/modules/CLAIMS.md`) is a different module. It
-models an insurer's own claims with reserves in the general ledger. BDOI roles never see it.
+The insurer-side Claims module of the original suite (an insurer's own claims with reserves in the
+general ledger) was removed on 8 October 2026 (`docs/development/CODEBASE_RELEVANCE_AUDIT.md` A2).
 
 ## 1. Purpose
 

@@ -9,7 +9,6 @@ const summary = {
   netResultYtd: 0,
   cashPosition: 1,
   receivables: 5000,
-  technicalReserves: 9000,
   totalAssets: 1,
   pendingJournals: 0,
   draftJournals: 0,
@@ -34,14 +33,9 @@ function show(permissions: string[]) {
 }
 
 describe('general ledger KPI tiles', () => {
-  it('hides the insurer technical reserves from BDOI roles and keeps the receivables', () => {
+  it('shows the ledger tiles without an insurer technical reserves tile', () => {
     show(['GL_VIEW']);
     expect(screen.getByText('Insurance receivables')).toBeInTheDocument();
     expect(screen.queryByText('Technical reserves')).not.toBeInTheDocument();
-  });
-
-  it('shows the technical reserves to users of the insurer suite', () => {
-    show(['RESERVE_VIEW']);
-    expect(screen.getByText('Technical reserves')).toBeInTheDocument();
   });
 });

@@ -8,8 +8,8 @@ doc_code: TestPlan
 brd: BRD-07
 name: Claims Summary
 doc_id: BIBS-TP-BRD-07
-version: "1.0"
-date: 25 September 2026
+version: "1.1"
+date: 08 October 2026
 status: Issued for BDOI review
 header_title: Test Plan BRD-7 Claims
 h1_page_break: false
@@ -26,6 +26,12 @@ control:
     reviewer: iorta TechNXT Project Manager
     approver: BDOI Product Owner (pending)
     change: First issue for BDOI review, with the Excel workbook of the same version
+  - version: "1.1"
+    date: 08 Oct 2026
+    author: iorta TechNXT QA
+    reviewer: iorta TechNXT Business Analysis
+    approver: BDOI Product Owner (pending)
+    change: "Re-based on FRS BRD-7 v1.1 (Claims (CLM)_WS Addendum with the minutes of 27-Apr-2026): duplicate insurer claim numbers of the same insurer refused (FR-CM-021), validation on the latest cover version (FR-CM-015), cases for a location not on the cover, the payment method and the Marketing view of the Claims Aging Report; BRD page references moved by 2."
 distribution:
   - {name: "Product Owner, Claims", role: Approver, organisation: BDOI, purpose: Review and sign-off}
   - {name: "Claims Unit Head", role: Approver, organisation: BDOI, purpose: Review and sign-off}
@@ -42,11 +48,11 @@ distribution:
 
 This document summarises the test plan for BRD-7 Claims in BIBS (BDOI Broker System, on iNXT BrokerVerse). It tells the BDOI departments what will be tested, how, with which data and by whom, and when testing is complete. The test conditions, scenarios and cases are in the Excel workbook of the same version, `BIBS_TestPlan_BRD-07_Claims_v1.0.xlsx`, which the testers use during execution.
 
-Every case traces to a functional requirement (FR) of FRS BRD-7 v1.0 and to the BRD requirement IDs (BRCLM.001-043, the NFR items and the process and report pages) that the FR meets. The expected results quote the message texts of the FRS, and the screen paths are those of the FRS. Where a Claims check reuses a message that the platform already shows (log-in, report parameters, e-mail address), the case quotes the text BIBS shows on that screen.
+Every case traces to a functional requirement (FR) of FRS BRD-7 v1.1 and to the BRD requirement IDs (BRCLM.001-043, the NFR items and the process and report pages) that the FR meets. The expected results quote the message texts of the FRS, and the screen paths are those of the FRS. Where a Claims check reuses a message that the platform already shows (log-in, report parameters, e-mail address), the case quotes the text BIBS shows on that screen.
 
 ## Scope
 
-In scope are all 39 FRs of FRS BRD-7 v1.0 and the 52 BRD references they trace to:
+In scope are all 39 FRs of FRS BRD-7 v1.1 and the 52 BRD references they trace to:
 
 - log-in, role-based access and the claim history (FR-CM-001 to 003);
 - the cover lookup, recording a claim, the reported date, policy number, Marketing data, cover version, premium check and authorization code (FR-CM-010 to 016);
@@ -71,11 +77,11 @@ The roles-and-access sheet checks each Claims action against the roles that may 
 <!-- table: widths=1.2,8.6,4.2 caption="Reference documents" -->
 | Ref. | Document | Version |
 |---|---|---|
-| R1 | Functional Requirements Specification BRD-7 Claims (`BIBS_FRS_BRD-07_Claims_v1.0.docx`) | 1.0, 25 Sep 2026 |
-| R2 | Claims BRD pack: Workshop addendum, renumbering addendum and Motor and Non-Motor Claims Logging BRD | BRD v1 22-Jan-2025; addenda 17-Dec-2025 and 8-Apr-2026 |
-| R3 | Test plan workbook BRD-7 (`BIBS_TestPlan_BRD-07_Claims_v1.0.xlsx`) | 1.0 |
-| R5 | BDOI Report List as of 27-Apr-2026 (Claims reports) | 27-Apr-2026 |
-| R6 | BRD discrepancy and clarification register (`BIBS_Register_BRD-00_Discrepancies_and_Clarifications_v1.0.xlsx`) | 1.0 |
+| R1 | Functional Requirements Specification BRD-7 Claims (`BIBS_FRS_BRD-07_Claims_v1.1.docx`) | 1.1, 08 Oct 2026 |
+| R2 | Claims (CLM)_WS Addendum: minutes of the workshop of 27-Apr-2026 (p.1-2), Workshop addendum, renumbering addendum and Motor and Non-Motor Claims Logging BRD | BRD v1 22-Jan-2025; addenda 17-Dec-2025 and 8-Apr-2026; minutes 29-Apr-2026 |
+| R3 | Test plan workbook BRD-7 (`BIBS_TestPlan_BRD-07_Claims_v1.1.xlsx`) | 1.1 |
+| R5 | BDOI - CoreModernization Report List 05132026 (Claims reports p.19-20) | 13-May-2026 |
+| R6 | BRD discrepancy and clarification register (`BIBS_Register_BRD-00_Discrepancies_and_Clarifications_v1.2.xlsx`) | 1.2 |
 
 # Test approach
 
@@ -121,7 +127,7 @@ The workbook has a README sheet that explains every column. Case IDs carry their
 |---|---|
 | System test | The Claims module is deployed on SIT with its jobs (follow-up due, premium re-check, ageing alerts) and the feed CLAIMS_SPECIAL_REMIT; the data sets of section 4.2 are loaded; the insurer test mailboxes receive mail. |
 | Persona end-to-end | All High-priority system test cases are run; no open Critical issue; notifications and the e-mail relay work on SIT; the Remittance screen of BRD-2 reads the feed. |
-| UAT | FRS BRD-7 v1.0 is signed off or its open comments are agreed; the open questions that change expected results (CLQ01, CLQ04, CLQ05, CLQ06, CLQ15) are answered or their test values agreed; the system test exit criteria are met; the UAT environment holds masked data; BDOI testers have user IDs with the roles of section 5. |
+| UAT | FRS BRD-7 v1.1 is signed off or its open comments are agreed; the open questions that change expected results (CLQ01, CLQ04, CLQ05, CLQ06, CLQ15) are answered or their test values agreed; the system test exit criteria are met; the UAT environment holds masked data; BDOI testers have user IDs with the roles of section 5. |
 
 ## Exit criteria
 

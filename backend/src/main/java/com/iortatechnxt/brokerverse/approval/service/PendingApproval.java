@@ -6,7 +6,7 @@ import java.time.Instant;
 /**
  * One item waiting for the viewer's approval, as contributed by a {@link PendingApprovalSource}.
  *
- * @param module owning module code, e.g. "GL", "MASTER_DATA", "UNDERWRITING"
+ * @param module owning module code, e.g. "GL", "MASTER_DATA", "TAX"
  * @param type item type, e.g. "Journal", "Branch", "Policy endorsement"
  * @param reference business reference (document number or code)
  * @param description short description

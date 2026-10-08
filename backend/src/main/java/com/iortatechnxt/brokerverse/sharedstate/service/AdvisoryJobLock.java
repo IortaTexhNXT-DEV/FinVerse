@@ -15,7 +15,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 /**
- * Job lock on PostgreSQL when Redis is disabled: a session-level advisory lock ({@code
+ * Job lock on PostgreSQL when Valkey is disabled: a session-level advisory lock ({@code
  * pg_try_advisory_lock(0x4A4F42, hashtext(<job>))}) held on a dedicated connection for the length
  * of the run. The database releases it when the connection ends, so a crashed instance never leaves
  * a job locked; no lease renewal is needed. The fencing token comes from the sequence {@code

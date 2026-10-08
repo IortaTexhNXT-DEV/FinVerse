@@ -10,7 +10,7 @@ export const SETUP_HELP: HelpSection = {
       name: 'Companies',
       path: '/setup/companies',
       summary:
-        'Legal entities, each with its own books: legal name, TIN, base currency, fiscal year start, back / forward value-date window and retained earnings account. Companies can be consolidated at group level.',
+        'Legal entities, each with its own books: legal name, TIN, base currency, fiscal year start, back / forward value-date window and retained earnings account.',
       controls: [
         'Maker-checker: a new or changed company is authorized by another user.',
         'The value-date window limits how far back or forward journals may be dated; the retained earnings account receives the year-end close.',

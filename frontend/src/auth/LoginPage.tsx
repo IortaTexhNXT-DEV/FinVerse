@@ -58,7 +58,7 @@ function ForgotPassword({ onBack, onSent }: Readonly<{ onBack: () => void; onSen
         Send Reset Link
       </Button>
       <Button variant="secondary" onClick={onBack}>
-        Back to Login
+        Back to Sign in
       </Button>
     </form>
   );
@@ -101,6 +101,8 @@ function PasswordForm({ mode, showForgot, onForgot, onSecondFactor }: Readonly<P
   const { login } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [capsLock, setCapsLock] = useState(false);
   const [error, setError] = useState<unknown>(null);
   const [busy, setBusy] = useState(false);
   const submit = () => {
@@ -146,18 +148,35 @@ function PasswordForm({ mode, showForgot, onForgot, onSecondFactor }: Readonly<P
       </Field>
       <Field label="Password">
         {(id) => (
-          <input
-            id={id}
-            className="input"
-            type="password"
-            autoComplete="current-password"
-            placeholder="Enter password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
+          <div className="password-input">
+            <input
+              id={id}
+              className="input"
+              type={showPassword ? 'text' : 'password'}
+              autoComplete="current-password"
+              placeholder="Enter password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              onKeyUp={(e) => setCapsLock(e.getModifierState('CapsLock'))}
+              required
+            />
+            <button
+              type="button"
+              className="password-toggle"
+              aria-pressed={showPassword}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+              onClick={() => setShowPassword((shown) => !shown)}
+            >
+              {showPassword ? 'Hide' : 'Show'}
+            </button>
+          </div>
         )}
       </Field>
+      {capsLock && (
+        <p className="caps-lock" role="status">
+          Caps Lock is on.
+        </p>
+      )}
       {showForgot && (
         <div className="login-links">
           <Button variant="ghost" className="login-link" onClick={onForgot}>
@@ -166,7 +185,7 @@ function PasswordForm({ mode, showForgot, onForgot, onSecondFactor }: Readonly<P
         </div>
       )}
       <Button type="submit" variant="accent" busy={busy}>
-        Login
+        Sign in
       </Button>
     </form>
   );
@@ -213,7 +232,7 @@ function SignInChoices({ options, mode, onForgot, onSecondFactor }: Readonly<Cho
 }
 
 /**
- * Sign-in screen: photo panel and the sign-in form, with "Forgot password?" (UAM-NFR-37; FR-UA-005)
+ * Sign-in screen: brand panel and the sign-in form, with "Forgot password?" (UAM-NFR-37; FR-UA-005)
  * where the passwords are held by the system. With single sign-on the main button opens the
  * identity provider and the password form stays for the break-glass administrators. After the
  * password the second factor is asked for when required (code of the authenticator app, or its
@@ -252,7 +271,7 @@ export default function LoginPage() {
   }
 
   return (
-    <SignInFrame title={`Welcome to ${BRAND.product}`} subtitle={BRAND.productName}>
+    <SignInFrame title="Sign in" subtitle={`to ${BRAND.product} – ${BRAND.productName}`}>
       <SignInChoices
         options={options.data}
         mode={mode}

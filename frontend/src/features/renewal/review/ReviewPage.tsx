@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/Button';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { useCompanyId } from '@/context/workspaceContext';
+import { countOf } from '@/utils/format';
 import { AssignDialog, ReasonDialog } from '../common/ActionDialogs';
 import { CandidateList } from '../common/CandidateList';
 import { OverrideDialog } from '../common/MoreDialogs';
@@ -106,7 +107,7 @@ export default function ReviewPage() {
       {open === 'post' && (
         <ConfirmDialog
           title="Post to Processing"
-          effect={`${String(refs.length)} renewal(s) move to Processing; renewals not for renewal go to the closing letters.`}
+          effect={`Posts ${countOf(refs.length, 'renewal')}: those for renewal move to Processing, those not for renewal go to the closing letters.`}
           confirmLabel="Post"
           busy={post.mutation.isPending}
           error={post.mutation.error}

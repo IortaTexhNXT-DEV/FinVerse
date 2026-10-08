@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.renewal.letter.service;
 
 import com.iortatechnxt.brokerverse.alert.domain.AlertFacts;
 import com.iortatechnxt.brokerverse.alert.service.AlertService;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.messaging.domain.MessageStatus;
 import com.iortatechnxt.brokerverse.messaging.domain.OutboundMessage;
 import com.iortatechnxt.brokerverse.messaging.domain.OutboundMessageRepository;
@@ -188,7 +189,10 @@ public class LetterSweeps {
         c,
         new RenewalNotices.Text(
             c.getRenewalRef() + " closed: expired without renewal",
-            "The policy of " + c.getSnapshot().clientName() + " expired on " + c.getExpiryDate()));
+            "The policy of "
+                + c.getSnapshot().clientName()
+                + " expired on "
+                + DisplayFormat.date(c.getExpiryDate())));
   }
 
   /**

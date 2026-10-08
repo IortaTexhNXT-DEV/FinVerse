@@ -28,7 +28,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
  * </ul>
  *
  * <p>Other requests get 404, so a {@code jobs} instance serves health and metrics only and the
- * ingress path of one deployment never reaches the endpoints of another.
+ * gateway route of one deployment never reaches the endpoints of another.
  */
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE + 1)

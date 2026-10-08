@@ -1,11 +1,16 @@
 package com.iortatechnxt.brokerverse.renewal.candidate.service;
 
+import com.iortatechnxt.brokerverse.catalog.domain.InsurerProfile;
+import com.iortatechnxt.brokerverse.catalog.domain.InsurerProfileRepository;
+import com.iortatechnxt.brokerverse.common.security.UserDisplayNames;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentComposer;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec.Field;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec.Fields;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec.Table;
 import com.iortatechnxt.brokerverse.docgen.service.SheetSpec;
+import com.iortatechnxt.brokerverse.lov.service.LovService;
 import com.iortatechnxt.brokerverse.messaging.domain.MessageFile;
 import com.iortatechnxt.brokerverse.organization.service.OrganizationService;
 import com.iortatechnxt.brokerverse.renewal.check.service.CheckNames;
@@ -16,6 +21,7 @@ import com.iortatechnxt.brokerverse.renewal.domain.CandidateSnapshot.SnapshotSal
 import com.iortatechnxt.brokerverse.renewal.domain.CheckResult;
 import com.iortatechnxt.brokerverse.renewal.domain.Disposition;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalCandidate;
+import com.iortatechnxt.brokerverse.renewal.service.RenewalCodes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -41,7 +47,7 @@ public class CandidateDocuments {
       List.of(
           "Renewal reference",
           "Status",
-          "Bucket",
+          "Classification",
           "Disposition",
           "Expiring invoice",
           "Expiring ARN",
@@ -71,6 +77,9 @@ public class CandidateDocuments {
   private final CandidateQueryService queries;
   private final DocumentComposer composer;
   private final OrganizationService organization;
+  private final InsurerProfileRepository insurers;
+  private final UserDisplayNames users;
+  private final LovService lovs;
 
   /**
    * Creates the service.
@@ -78,12 +87,23 @@ public class CandidateDocuments {
    * @param queries renewal reads
    * @param composer PDF and spreadsheet writer
    * @param organization companies
+   * @param insurers insurers (names)
+   * @param users user names
+   * @param lovs lists of values (reasons)
    */
   public CandidateDocuments(
-      CandidateQueryService queries, DocumentComposer composer, OrganizationService organization) {
+      CandidateQueryService queries,
+      DocumentComposer composer,
+      OrganizationService organization,
+      InsurerProfileRepository insurers,
+      UserDisplayNames users,
+      LovService lovs) {
     this.queries = queries;
     this.composer = composer;
     this.organization = organization;
+    this.insurers = insurers;
+    this.users = users;
+    this.lovs = lovs;
   }
 
   /**
@@ -100,23 +120,23 @@ public class CandidateDocuments {
     List<Field> fields = new ArrayList<>();
     fields.add(new Field("Renewal reference", c.getRenewalRef()));
     fields.add(new Field("Status", c.getStage().label()));
-    fields.add(new Field("Bucket", text(c.getBucket())));
+    fields.add(new Field("Classification", c.getBucket() == null ? "" : c.getBucket().label()));
     fields.add(new Field("Client", s.clientName()));
     fields.add(new Field("Expiring invoice", c.getExpiringInvoiceNo()));
     fields.add(new Field("Expiring ARN", c.getExpiringArn()));
     fields.add(new Field("Policy number", s.policyNo()));
-    fields.add(new Field("Insurer", s.insurerCode()));
-    fields.add(new Field("Expiry date", String.valueOf(c.getExpiryDate())));
-    fields.add(new Field("Assigned AO", c.getAssignedAo()));
-    fields.add(new Field("Assigned PO", c.getAssignedPo()));
+    fields.add(new Field("Insurer", insurer(c.getCompanyId(), s.insurerCode())));
+    fields.add(new Field("Expiry date", DisplayFormat.date(c.getExpiryDate())));
+    fields.add(new Field("Account Officer", name(c.getAssignedAo())));
+    fields.add(new Field("Processing Officer", name(c.getAssignedPo())));
     if (!hide && s.premium() != null) {
-      fields.add(new Field("Gross premium", text(s.premium().grossPremium())));
-      fields.add(new Field("Sum insured", text(s.premium().totalSumInsured())));
+      fields.add(new Field("Gross premium", DisplayFormat.value(s.premium().grossPremium())));
+      fields.add(new Field("Sum insured", DisplayFormat.value(s.premium().totalSumInsured())));
     }
     List<List<String>> checks =
         queries.latestResults(c).stream().map(CandidateDocuments::checkRow).toList();
     List<List<String>> dispositions =
-        queries.dispositions(c).stream().map(CandidateDocuments::dispositionRow).toList();
+        queries.dispositions(c).stream().map(this::dispositionRow).toList();
     byte[] pdf =
         composer.pdf(
             new DocumentSpec(
@@ -156,7 +176,7 @@ public class CandidateDocuments {
     return new MessageFile("renewals.xlsx", XLSX, xlsx);
   }
 
-  private static List<Object> exportRow(RenewalCandidate c, boolean hide) {
+  private List<Object> exportRow(RenewalCandidate c, boolean hide) {
     CandidateSnapshot s = c.getSnapshot();
     SnapshotProduct product = s.product() == null ? NO_PRODUCT : s.product();
     SnapshotSales sales = s.sales() == null ? NO_SALES : s.sales();
@@ -164,21 +184,21 @@ public class CandidateDocuments {
     return Arrays.asList(
         c.getRenewalRef(),
         c.getStage().label(),
-        text(c.getBucket()),
-        text(c.getDisposition().code()),
+        c.getBucket() == null ? "" : c.getBucket().label(),
+        c.getDisposition().code() == null ? "" : c.getDisposition().code().label(),
         c.getExpiringInvoiceNo(),
         c.getExpiringArn(),
         s.policyNo(),
         s.clientName(),
         product.productCode(),
         product.lineCode(),
-        s.insurerCode(),
+        insurer(c.getCompanyId(), s.insurerCode()),
         product.segment(),
         sales.branchCode(),
         c.getOwnerUnit(),
-        sales.accountOfficer(),
-        c.getAssignedAo(),
-        c.getAssignedPo(),
+        name(sales.accountOfficer()),
+        name(c.getAssignedAo()),
+        name(c.getAssignedPo()),
         c.getExpiryDate(),
         premium.currency(),
         premium.grossPremium(),
@@ -193,17 +213,26 @@ public class CandidateDocuments {
         Objects.toString(r.getMessage(), ""));
   }
 
-  private static List<String> dispositionRow(Disposition d) {
+  private List<String> dispositionRow(Disposition d) {
     return List.of(
         d.getCode().label(),
-        Objects.toString(d.getReasonCode(), ""),
+        Objects.toString(lovs.label(RenewalCodes.LOV_NONRENEWAL_REASON, d.getReasonCode()), ""),
         Objects.toString(d.getRemarks(), ""),
         d.getSource().label(),
-        d.getCreatedBy(),
-        String.valueOf(d.getCreatedAt()));
+        name(d.getCreatedBy()),
+        DisplayFormat.dateTime(d.getCreatedAt()));
   }
 
-  private static String text(Object value) {
-    return value == null ? "" : value.toString();
+  private String insurer(Long companyId, String code) {
+    return code == null
+        ? ""
+        : insurers
+            .findByCompanyIdAndPartyCode(companyId, code)
+            .map(InsurerProfile::getName)
+            .orElse(code);
+  }
+
+  private String name(String username) {
+    return username == null ? "" : Objects.toString(users.displayName(username), username);
   }
 }

@@ -2,17 +2,17 @@
 # Source of the Functional Requirements Specification for BRD-7 Claims.
 # Build: python tools/deliverables/bdoi_docx.py docs/deliverables/src/BRD-07_Claims/FRS_BRD07_CLAIMS.md
 title: Claims
-subtitle: BRD-7 Motor and Non-Motor Claims Logging, Renumbering Addendum and Workshop Addendum
+subtitle: BRD-7 Motor and Non-Motor Claims Logging, Renumbering Addendum, Workshop Addendum and the minutes of the workshop of 27-Apr-2026
 doc_type: Functional Requirements Specification
 doc_code: FRS
 brd: BRD-07
 name: Claims
 doc_id: BIBS-FRS-BRD-07
-version: "1.0"
-date: 25 September 2026
+version: "1.1"
+date: 08 October 2026
 status: Issued for BDOI review
 header_title: FRS BRD-7 Claims
-output: FRS/BIBS_FRS_BRD-07_Claims_v1.0.docx
+output: FRS/BIBS_FRS_BRD-07_Claims_v1.1.docx
 control:
   - version: "0.9"
     date: 18 Sep 2026
@@ -32,6 +32,12 @@ control:
     reviewer: iorta TechNXT Project Manager
     approver: BDOI Product Owner (pending)
     change: "Requirement IDs renumbered from FR-CL-nnn to FR-CM-nnn (assumptions A-CM, dependencies D-CM), because BRD-4 Collections also uses FR-CL-nnn (register DCR-188); no requirement text changed"
+  - version: "1.1"
+    date: 08 Oct 2026
+    author: iorta TechNXT Business Analysis
+    reviewer: iorta TechNXT Project Manager
+    approver: BDOI Product Owner (pending)
+    change: "Re-based on Claims (CLM)_WS Addendum (the BRD-7 pack with the e-mail of 29-Apr-2026 and the minutes of the workshop of 27-Apr-2026 on pages 1-2; page references moved by 2); duplicate insurer claim numbers of the same insurer refused (FR-CM-021); validation on the latest cover version (FR-CM-015); minutes applied to FR-CM-020, 022, 023, 044, 063 and 065; clarifications CLR-CM-13 to 15; user-story view and storyboard index added."
 distribution:
   - {name: "Product Owner, Claims", role: Approver, organisation: BDOI, purpose: Review and sign-off}
   - {name: "SAVP Unit Head, Claims, Risk Management and Analytics", role: Business owner, organisation: BDOI, purpose: Review of all FRs}
@@ -54,14 +60,14 @@ This FRS is written from the BRD and the requirements baseline (R4). It describe
 
 ## Scope
 
-BDOI is a broker. The insurer accepts, evaluates and pays a claim; BDOI files and follows the claim on behalf of the client (p.24-26). The scope is **claims logging and monitoring**: the claim case file on a cover, the premium check, the insurer's claim numbers, reserve and settlement as reported by the insurer, the BDOI claim statuses, follow-up, closure, ageing and the claims reports.
+BDOI is a broker. The insurer accepts, evaluates and pays a claim; BDOI files and follows the claim on behalf of the client (p.26-28). The scope is **claims logging and monitoring**: the claim case file on a cover, the premium check, the insurer's claim numbers, reserve and settlement as reported by the insurer, the BDOI claim statuses, follow-up, closure, ageing and the claims reports.
 
 <!-- table: widths=4,9,4 caption="Scope of this FRS" -->
 | Area | In scope | Source |
 |---|---|---|
-| Access and audit | Role-based access to every Claims function, claim history, log-in and session rules | BRCLM.002, 005, 006, 011, 015, 018, 019, 021, 024; NFR p.32-36 |
+| Access and audit | Role-based access to every Claims function, claim history, log-in and session rules | BRCLM.002, 005, 006, 011, 015, 018, 019, 021, 024; NFR p.34-38 |
 | Cover and premium | Read-only cover lookup, cover number and version, policy number, Marketing unit and branch, premium check and claims authorization code | BRCLM.001-004, 007-009, 016, 039 |
-| Locations and insurers | Several insured locations and several insurer claim numbers per claim, insurer-reported claims and updates, insurer location references, loss advice to the insurer | BRCLM.037, 041-043; p.24-25 |
+| Locations and insurers | Several insured locations and several insurer claim numbers per claim, insurer-reported claims and updates, insurer location references, loss advice to the insurer | BRCLM.037, 041-043; p.26-27 |
 | Claim details | Claimant override, adjuster / appraiser, insurer reserve, catastrophe codes | BRCLM.006, 017, 018, 023, 024, 036 |
 | Status, settlement and closure | 18 claim statuses restricted by role and unit, 10 settlement types, temporary and permanent closure, reopen, claims special remittance | BRCLM.005, 010-015, 035 |
 | Follow-up and ageing | Next follow-up date, next action plan, diary, age overall and per status, pending actions, Claims home | BRCLM.019-022, 025, 027, 034 |
@@ -70,8 +76,9 @@ BDOI is a broker. The insurer accepts, evaluates and pays a claim; BDOI files an
 **Out of scope for this phase:**
 
 - The insurer-side claims function of the platform (reserving, claim payments, recoveries, posting). BDOI records the insurer's reserve and settlement as information and posts nothing (Q44, R6).
-- Claim money through BDOI (receipt of proceeds, payment to a claimant). The BRD has none: the insurer pays the assured or issues an LOA to the repair shop (p.24-26). The flow is described and on hold (CLQ10, section 7).
-- Insurer portals or system-to-system feeds for claims. Insurers are reached by e-mail; their updates are recorded or uploaded (CLQ17).
+- Claim money through BDOI (receipt of proceeds, payment to a claimant). The BRD has none: the insurer pays the assured or issues an LOA to the repair shop (p.26-28). The flow is described and on hold (CLQ10, section 7).
+- Insurer portals or system-to-system feeds for claims. Insurers do not access BIBS; Claims users record the insurer's e-mails, calls and documents on the claim (minutes of 27-Apr-2026, p.1). Integration with insurer systems is a future enhancement.
+- Dashboards of claims by location; the workshop agreed on-demand reports for day one (p.1).
 - Migration of open and historical EBIX / ISYS claims. A migrated claim keeps its legacy reference; scope and format wait for CLQ14.
 
 ## References
@@ -79,15 +86,16 @@ BDOI is a broker. The insurer accepts, evaluates and pays a claim; BDOI files an
 <!-- table: widths=1.2,11.4,3.6 caption="Reference documents" -->
 | Ref. | Document | Version / date |
 |---|---|---|
-| R1 | Claims - Addendum (Workshop), pages 1-9 of the BRD-7 pack (BRCLM.037-043) | v1.0, 08-Apr-2026; signed 10 to 16-Apr-2026 |
-| R2 | Claims - Addendum (renumbering FRID-001-036 to BRCLM.001-036), pages 10-18 | v1.0, 17-Dec-2025; approved 17 to 22-Dec-2025 |
-| R3 | Motor and Non-Motor Claims Logging BRD, pages 19-45 (process, stakeholders, FRID table, NFR, capacity, retention, report list) | v1, 22-Jan-2025; signed 5 to 6-Mar-2025 |
+| R0 | E-mail of 29-Apr-2026 closing the Claims BRD workshop with the minutes of the walkthrough of 27-Apr-2026 with the System Analysts and the Solution Architecture team, pages 1-2 of the file Claims (CLM)_WS Addendum; the clarifications need no addendum to the BRD | 29-Apr-2026 |
+| R1 | Claims - Addendum (Workshop), pages 3-11 of the BRD-7 pack (BRCLM.037-043) | v1.0, 08-Apr-2026; signed 10 to 16-Apr-2026 |
+| R2 | Claims - Addendum (renumbering FRID-001-036 to BRCLM.001-036), pages 12-20 | v1.0, 17-Dec-2025; approved 17 to 22-Dec-2025 |
+| R3 | Motor and Non-Motor Claims Logging BRD, pages 21-47 (process, stakeholders, FRID table, NFR, capacity, retention, report list) | v1, 22-Jan-2025; signed 5 to 6-Mar-2025 |
 | R4 | BDOI Claims (BRD-7) requirements baseline | current |
 | R6 | Cross-BRD decisions and answered questions (BRD-6 to BRD-12) | binding |
-| R7 | BDOI Report List as of 27-Apr-2026 (Claims reports, p.39-42) | 27-Apr-2026 |
+| R7 | BDOI - CoreModernization Report List 05132026 (Claims reports, p.19-20) | 13-May-2026 |
 | R8 | BDO UX guidelines (brand, screen patterns) | current |
 
-Page references in this document ("p.13") are pages of the BRD-7 PDF. BRCLM.001-036 appear twice with the same text, in the renumbering addendum (p.13-16) and as FRID-001-036 in the original BRD (p.29-31); FRs cite both, for example "BRCLM.001 (p.13; p.29)".
+Page references in this document ("p.15") are pages of the file Claims (CLM)_WS Addendum (47 pages) received on 08-Oct-2026: the minutes are on pages 1-2, the Workshop Addendum on pages 3-11, the renumbering addendum on pages 12-20 and the BRD on pages 21-47. Version 1.0 of this FRS cited the same pack without the minutes; its page numbers are 2 lower. BRCLM.001-036 appear twice with the same text, in the renumbering addendum (p.15-18) and as FRID-001-036 in the original BRD (p.31-33); FRs cite both, for example "BRCLM.001 (p.15; p.31)".
 
 ## Definitions and acronyms
 
@@ -96,20 +104,20 @@ AO: Account Officer (Marketing)
 ARN: Account Reference Number; the BIBS account that is the cover of a claim
 BRCLM: Requirement ID prefix of the Claims BRD (BRCLM.001-043)
 CAC: Claims authorization code, numbered CAC-yyyy-nnnnnn (BRCLM.001; meaning to confirm, CLQ01)
-CASA: Accredited repair shop or dealer for motor repairs (p.24)
+CASA: Accredited repair shop or dealer for motor repairs (p.26)
 CLQnn: Open question on BRD-7 raised by the project team (section 10.3)
 CNR: Document in status "With Claimant - For Submission of CNR"; not defined in the BRD (CLQ12)
 Cover: The account (ARN) and policy year a claim is made under; the EBIX "Cover Number" (CLQ02)
 Cover version: The number of booked endorsements of the policy year effective on or before the loss date
-CRF: Claims Reporting Form, completed by Marketing for Non-Motor claims (p.25)
+CRF: Claims Reporting Form, completed by Marketing for Non-Motor claims (p.27)
 EBIX / ISYS: Legacy core system / legacy claims reporting source
 FR: Functional requirement of this document (FR-CM-nnn)
 Insurer claim line: One insurer's part of a claim, with its claim number, share, reserve, settled amount and adjuster (BRCLM.043)
-LOA: Letter of Authority issued by the insurer to the repair shop (p.24)
+LOA: Letter of Authority issued by the insurer to the repair shop (p.26)
 LOV: List of values maintained in BIBS
 O/S: Outstanding loss amount (insurer reserve less paid)
 Phase: One of NEW, IN_PROGRESS, TEMP_CLOSED, CLOSED; each claim status belongs to one phase
-PLA: Preliminary Loss Advice (Motor, p.24)
+PLA: Preliminary Loss Advice (Motor, p.26)
 TH: Team Head
 TL: Team Lead
 UAT: User acceptance testing
@@ -134,11 +142,11 @@ Each FR in section 4 has the same parts:
 
 ## Business context
 
-Claims are filed manually today (p.24-26). For **Motor** claims the client, AO or branch sends a notice of accident or loss; Marketing prepares a Preliminary Loss Advice (PLA) with the assured, policy or reference number, date and location of the loss, the nature of the loss and the initial loss reserve if known. The claim handler validates the PLA, sends it to the insurer and chases the client for documents. The insurer either issues a Letter of Authority (LOA) to an accredited repair shop, or makes a cash offer that the assured signs and the handler returns. For **Non-Motor** claims Marketing completes a Claims Reporting Form (CRF), Claims sends a formal loss advice to the insurer, an adjuster may inspect the site, and the claim closes after the insurer pays the insured.
+Claims are filed manually today (p.26-28). For **Motor** claims the client, AO or branch sends a notice of accident or loss; Marketing prepares a Preliminary Loss Advice (PLA) with the assured, policy or reference number, date and location of the loss, the nature of the loss and the initial loss reserve if known. The claim handler validates the PLA, sends it to the insurer and chases the client for documents. The insurer either issues a Letter of Authority (LOA) to an accredited repair shop, or makes a cash offer that the assured signs and the handler returns. For **Non-Motor** claims Marketing completes a Claims Reporting Form (CRF), Claims sends a formal loss advice to the insurer, an adjuster may inspect the site, and the claim closes after the insurer pays the insured.
 
-The BRD asks for a claims facility with claim authorization tied to premium payment, cover visibility, date management, configurable statuses restricted by role and unit, claimant override, settlement types, adjusters, follow-up dates, action plans, a diary, the insurer reserve, ageing and reports (p.23, p.27). The workshop addendum of April 2026 adds several locations and several insurers per claim, insurer-reported updates, insurer location references, claims-prone location analysis and Marketing access to loss information (p.5-7).
+The BRD asks for a claims facility with claim authorization tied to premium payment, cover visibility, date management, configurable statuses restricted by role and unit, claimant override, settlement types, adjusters, follow-up dates, action plans, a diary, the insurer reserve, ageing and reports (p.25, p.29). The workshop addendum of April 2026 adds several locations and several insurers per claim, insurer-reported updates, insurer location references, claims-prone location analysis and Marketing access to loss information (p.7-9).
 
-<!-- table: widths=1,8,8 caption="Current and envisioned process (BRD p.23-27)" -->
+<!-- table: widths=1,8,8 caption="Current and envisioned process (BRD p.25-29)" -->
 | # | Current process (before) | Envisioned process in BIBS (after) |
 |---|---|---|
 | 1 | The notice of loss arrives by e-mail or call; Marketing prepares the PLA or CRF | The Claims Officer records the claim on the client's cover in BIBS; the claim number is BCL-yyyy-nnnnnn |
@@ -156,10 +164,10 @@ The table lists the steps of a claim, and Figure 1 shows them by actor. Section 
 <!-- table: widths=0.8,3.8,3.4,7.2,2.6 caption="Process steps" -->
 | # | Step | Owner | What happens in BIBS | BRD |
 |---|---|---|---|---|
-| 1 | Notice of loss | Client, AO, branch | The PLA or CRF data reach Claims (by e-mail or call) or the insurer reports the claim first | p.24-25; BRCLM.041 |
+| 1 | Notice of loss | Client, AO, branch | The PLA or CRF data reach Claims (by e-mail or call) or the insurer reports the claim first | p.26-27; BRCLM.041 |
 | 2 | Record claim | Claims Officer | Claim on a cover (ARN, policy year, version) with reported date, loss date, nature, locations and insurers | BRCLM.003, 004, 037, 043 |
 | 3 | Premium check | System | Invoices of the cover read from the ledger; unpaid premium disables the authorization code | BRCLM.001 |
-| 4 | Loss advice | Claims Officer | Loss advice e-mailed to each insurer; insurer claim numbers recorded as they arrive | p.24-25; BRCLM.041, 043 |
+| 4 | Loss advice | Claims Officer | Loss advice e-mailed to each insurer; insurer claim numbers recorded as they arrive | p.26-27; BRCLM.041, 043 |
 | 5 | Handling | Claims Officer, TL, TH | Status within the role / unit matrix, adjuster, insurer reserve, insurer updates | BRCLM.010-013, 017-018, 023-024 |
 | 6 | Follow-up | Claims Officer | Next follow-up date, next action plan, diary entries | BRCLM.019-022 |
 | 7 | Premium remittance | Claims, Remittance | Status "With BDOI - For Premium Remittance"; the special remittance confirms the claim in BIBS | BRCLM.010; OQ46 |
@@ -169,13 +177,13 @@ The table lists the steps of a claim, and Figure 1 shows them by actor. Section 
 | 11 | Ageing and reports | Claims, Unit Head | Age overall and per status, pending actions, claims reports | BRCLM.025-034 |
 | 12 | Loss analytics | Risk, Marketing | Claims-prone locations, loss experience for renewal and pricing | BRCLM.038, 040 |
 
-![Claim lifecycle by actor (BRCLM.001-043, BRD p.24-27)](figures/brd07_process_flow.dot)
+![Claim lifecycle by actor (BRCLM.001-043, BRD p.26-29)](figures/brd07_process_flow.dot)
 
 ## Motor and Non-Motor claims
 
 Motor and Non-Motor claims use the same claim record and the same statuses. They differ in the documents and in the settlement path, which BIBS records through the status and the settlement type.
 
-<!-- table: widths=3,7,7 caption="Motor and Non-Motor handling (BRD p.24-26)" -->
+<!-- table: widths=3,7,7 caption="Motor and Non-Motor handling (BRD p.26-28)" -->
 | Aspect | Motor | Non-Motor |
 |---|---|---|
 | Notice document | Preliminary Loss Advice (PLA), prepared by Marketing | Claims Reporting Form (CRF), completed by Marketing |
@@ -191,16 +199,16 @@ Motor and Non-Motor claims use the same claim record and the same statuses. They
 <!-- table: widths=3.4,3.1,8.1,3 caption="Personas and BIBS roles" -->
 | Persona | BIBS role | Responsibilities in Claims | BRD |
 |---|---|---|---|
-| Claims Officer / Claims Assistant | CLM_OFFICER | Records claims with cover and version; maintains the reported date; records insurer claim numbers and updates; encodes the action plan; tags temporary closures | p.28; BRCLM.003, 004, 021, 035 |
-| Team Lead | CLM_TL | Updates status, settlement type and adjuster; overrides claimant and follow-up date; amends the insurer reserve; closes claims | p.28; BRCLM.005, 006, 011, 015, 018, 019, 024 |
-| Team Head | CLM_TH | As the Team Lead; also reopens permanently closed claims | p.28; as above; CLQ06 |
-| Unit Head | CLM_UH | Maintains statuses, settlement types, adjusters and catastrophe codes; sets the status matrix; grants access to cover numbers and to report data | p.28; BRCLM.002, 010, 012, 014, 017, 033, 036 |
+| Claims Officer / Claims Assistant | CLM_OFFICER | Records claims with cover and version; maintains the reported date; records insurer claim numbers and updates; encodes the action plan; tags temporary closures | p.30; BRCLM.003, 004, 021, 035 |
+| Team Lead | CLM_TL | Updates status, settlement type and adjuster; overrides claimant and follow-up date; amends the insurer reserve; closes claims | p.30; BRCLM.005, 006, 011, 015, 018, 019, 024 |
+| Team Head | CLM_TH | As the Team Lead; also reopens permanently closed claims | p.30; as above; CLQ06 |
+| Unit Head | CLM_UH | Maintains statuses, settlement types, adjusters and catastrophe codes; sets the status matrix; grants access to cover numbers and to report data | p.30; BRCLM.002, 010, 012, 014, 017, 033, 036 |
 | Claims / Risk user | CLM_RISK | Analyses claims-prone locations and loss patterns; uses the data extract | BRCLM.038 |
 | Marketing user | MKT_AO, MKT_TL | Views loss information through the claims reports; exports as the role allows | BRCLM.040 |
-| System Administrator | SYSADMIN | Parameters, roles, users; read access to Claims | NFR p.33 |
-| Auditor | AUDITOR | Read access to claims and reports | NFR p.33-34 |
+| System Administrator | SYSADMIN | Parameters, roles, users; read access to Claims | NFR p.35 |
+| Auditor | AUDITOR | Read access to claims and reports | NFR p.35-36 |
 
-The BRD has no persona column for BRCLM.001-036; the persona comes from the stakeholder matrix (p.28) and the target process (p.27). The roles above are the project's proposal until BDOI confirms the matrix (CLQ04, CLQ06, CLQ15; OQ48).
+The BRD has no persona column for BRCLM.001-036; the persona comes from the stakeholder matrix (p.30) and the target process (p.29). The roles above are the project's proposal until BDOI confirms the matrix (CLQ04, CLQ06, CLQ15; OQ48).
 
 ## Permissions
 
@@ -261,7 +269,7 @@ The officer's status rights are limited by the status access matrix (FR-CM-041):
 ```fr
 id: FR-CM-001
 title: Log in to BIBS with lockout and session rules
-brd: [NFR 1.01-2.03 (p.32-33), NFR 10.01-10.06 (p.35)]
+brd: [NFR 1.01-2.03 (p.34-35), NFR 10.01-10.06 (p.37)]
 actor: All Claims and Marketing users
 priority: Must have
 screens: Login
@@ -298,12 +306,12 @@ acceptance:
 ```fr
 id: FR-CM-002
 title: Restrict each Claims action to authorised roles
-brd: [BRCLM.002 (p.13; p.29), BRCLM.005 (p.13; p.29), BRCLM.006 (p.13; p.29), BRCLM.011 (p.14; p.29), BRCLM.015 (p.14; p.30), BRCLM.018 (p.15; p.30), BRCLM.019 (p.15; p.30), BRCLM.021 (p.15; p.30), BRCLM.024 (p.16; p.30)]
+brd: [BRCLM.002 (p.15; p.31), BRCLM.005 (p.15; p.31), BRCLM.006 (p.15; p.31), BRCLM.011 (p.16; p.31), BRCLM.015 (p.16; p.32), BRCLM.018 (p.17; p.32), BRCLM.019 (p.17; p.32), BRCLM.021 (p.17; p.32), BRCLM.024 (p.18; p.32)]
 actor: System; Unit Head (grants through User Access)
-priority: High (BRD p.21)
+priority: High (BRD p.23)
 screens: All Claims Handling screens
 description:
-  - Nine BRD requirements ask that a user "have the necessary permissions" before an action (p.28). Each Claims screen, button and action requires one of the permissions of section 3.2. Menus show only the screens the user's roles allow; buttons for actions the user may not perform are hidden.
+  - Nine BRD requirements ask that a user "have the necessary permissions" before an action (p.30). Each Claims screen, button and action requires one of the permissions of section 3.2. Menus show only the screens the user's roles allow; buttons for actions the user may not perform are hidden.
   - The permission grants of section 3.3 are changed through User Access Maintenance requests, which another user approves (BRD-11). The Unit Head requests the changes for the Claims roles.
 preconditions:
   - "The user is logged in."
@@ -317,7 +325,7 @@ alternate_flows:
 rules:
   - [R1, "Roles are granted the permissions of section 3.3 until BDOI confirms the matrix (OQ48).", Configurable, User Access Maintenance request]
   - [R2, "Marketing roles receive report permissions only, never claim maintenance (BRCLM.040).", Fixed, "-"]
-  - [R3, "Every action checks the claim's company, so object references cannot be manipulated (NFR access control, p.33).", Fixed, "-"]
+  - [R3, "Every action checks the claim's company, so object references cannot be manipulated (NFR access control, p.35).", Fixed, "-"]
 validations:
   - [Action without permission, You are not permitted to perform this action, ACCESS_DENIED]
 notifications:
@@ -333,7 +341,7 @@ acceptance:
 ```fr
 id: FR-CM-003
 title: Keep a complete claim history and audit trail
-brd: [BRCLM.041 (p.6), BRCLM.042 (p.6), NFR 4.01-4.03 (p.33-34)]
+brd: [BRCLM.041 (p.8), BRCLM.042 (p.8), NFR 4.01-4.03 (p.35-36)]
 actor: System; any user with BCL_VIEW (read)
 priority: Must have
 screens: Claim record (History tab); Claims Activity Log report
@@ -348,7 +356,7 @@ main_flow:
   - The History tab shows the change in time order.
 rules:
   - [R1, "History and audit entries can only be added; no user can change or delete them.", Fixed, "-"]
-  - [R2, "Claims data: 10 years online, 15 years archive, purge after 15 years (p.41); the audit-log archive of 16 years is confirmed under CLQ24.", Configurable, Retention rule for record type BrokerClaim]
+  - [R2, "Claims data: 10 years online, 15 years archive, purge after 15 years (p.43); the audit-log archive of 16 years is confirmed under CLQ24.", Configurable, Retention rule for record type BrokerClaim]
 validations: []
 notifications:
   - "None."
@@ -365,9 +373,9 @@ acceptance:
 ```fr
 id: FR-CM-010
 title: Look up a cover (read-only)
-brd: [BRCLM.002 (p.13; p.29), BRCLM.003 (p.14; p.29)]
+brd: [BRCLM.002 (p.15; p.31), BRCLM.003 (p.16; p.31)]
 actor: Claims Officer / Assistant, TL, TH, Unit Head, Claims / Risk user
-priority: High (BRD p.21)
+priority: High (BRD p.23)
 screens: Cover Lookup
 description:
   - Claims users check the policy coverages of any cover without account maintenance rights. The Cover Lookup shows the account header (client, product and line, insurer, period, currency, sum insured), the risk items and locations, the endorsements of each policy year, the invoices with payment and remittance status, the claims of the cover and the insurer location references.
@@ -404,12 +412,12 @@ acceptance:
 ```fr
 id: FR-CM-011
 title: Record a claim on a cover
-brd: [BRCLM.003 (p.14; p.29), BRCLM.009 (p.13; p.29), BRCLM.041 (p.6)]
+brd: [BRCLM.003 (p.16; p.31), BRCLM.009 (p.15; p.31), BRCLM.041 (p.8)]
 actor: Claims Officer / Assistant (BCL_RECORD)
-priority: High (BRD p.21); BRCLM.041 Must have
+priority: High (BRD p.23); BRCLM.041 Must have
 screens: Record Claim; Claim record
 description:
-  - The Claims Officer records the claim against a cover. The cover number (ARN and policy year) and the cover version are required (BRCLM.003). The record holds the loss data of the PLA or CRF (p.24-25) and becomes one claim reference, whatever the number of locations and insurers.
+  - The Claims Officer records the claim against a cover. The cover number (ARN and policy year) and the cover version are required (BRCLM.003). The record holds the loss data of the PLA or CRF (p.26-27) and becomes one claim reference, whatever the number of locations and insurers.
   - The claim currency defaults to the cover currency, else to Philippine Peso (BRCLM.009). The claim source is BDOI notice, or insurer-reported when the insurer notifies the loss first (BRCLM.041).
   - BIBS takes a snapshot of the cover (policy number, version, period, sum insured, lead insurer, Marketing unit, AO and branch) so that reports keep the values at recording.
 preconditions:
@@ -469,9 +477,9 @@ acceptance:
 ```fr
 id: FR-CM-012
 title: Maintain the reported date
-brd: [BRCLM.004 (p.13; p.29)]
+brd: [BRCLM.004 (p.15; p.31)]
 actor: Claims Officer / Assistant (at recording); BCL_STATUS_UPDATE holder (correction)
-priority: High (BRD p.21)
+priority: High (BRD p.23)
 screens: Record Claim; Claim record (Details tab)
 description: The reported date is the only operational date users maintain on a claim. It is entered at recording and is the start of every claim age (FR-CM-053). Other dates (status changes, closure, updates) are system time stamps. A correction of the reported date on an open claim needs BCL_STATUS_UPDATE and a reason, and is kept in the history.
 preconditions:
@@ -505,9 +513,9 @@ acceptance:
 ```fr
 id: FR-CM-013
 title: Show the policy number without re-keying
-brd: [BRCLM.007 (p.13; p.29), BRCLM.008 (p.13; p.29)]
+brd: [BRCLM.007 (p.15; p.31), BRCLM.008 (p.15; p.31)]
 actor: System
-priority: High (BRD p.21)
+priority: High (BRD p.23)
 screens: Record Claim (cover card); Claim record (summary); invoice screens of BRD-1 and BRD-2
 description:
   - The BRD asks to get the policy number from EBIX and upload it to Claims, and to show it on the invoice because the insurer asks for it when a claim is reported. In BIBS the policy number is recorded on the account by issuance, one per policy year, and printed on every invoice. The claim copies the number of its policy year; nobody uploads or re-keys it.
@@ -537,11 +545,11 @@ acceptance:
 ```fr
 id: FR-CM-014
 title: Show the Marketing team, AO and branch of the policy
-brd: [BRCLM.016 (p.14; p.30)]
+brd: [BRCLM.016 (p.16; p.32)]
 actor: Claims users
-priority: High (BRD p.21)
+priority: High (BRD p.23)
 screens: Record Claim (cover card); Claim record (summary card); Claims reports
-description: The claim shows the Marketing team / unit and the account officer of the policy, and the BDOI branch, taken from the sales stamp of the account and the invoicing branch at recording. Every Claims report carries the Marketing Team and Account Officer columns (p.42-43). The user can refresh the snapshot when the account's sales stamp has changed.
+description: The claim shows the Marketing team / unit and the account officer of the policy, and the BDOI branch, taken from the sales stamp of the account and the invoicing branch at recording. Every Claims report carries the Marketing Team and Account Officer columns (p.44-45). The user can refresh the snapshot when the account's sales stamp has changed.
 preconditions:
   - "The claim is recorded."
 main_flow:
@@ -562,23 +570,24 @@ acceptance:
 
 ```fr
 id: FR-CM-015
-title: Show the cover version and flag a newer version
-brd: [BRCLM.039 (p.5-6), BRCLM.003 (p.14; p.29)]
+title: Validate the claim against the latest cover version and flag a newer version
+brd: [BRCLM.039 (p.7-8), BRCLM.003 (p.16; p.31)]
 actor: Claims user; System
 priority: Must have
 screens: Claim record (summary card, flag "Newer cover version")
 description:
-  - The claim displays the cover number and version used, as "Cover v<n> (<endorsement no.>)". The version is the number of booked endorsements of the policy year effective on or before the loss date. When the policy year has a later endorsement, the claim shows the flag **Newer cover version**; the user reviews the latest terms and may switch the claim to the latest version.
+  - Claims validation always uses the latest policy endorsement or cover version (minutes of 27-Apr-2026). When the claim is recorded, BIBS takes the latest booked version of the policy year - all booked endorsements - and the premium check, the location picker and the authorization code use it. The claim displays the cover number and version used, as "Cover v<n> (<endorsement no.>)", and the endorsements effective after the loss date are marked on the cover panel.
+  - When an endorsement of the policy year is booked after the claim is recorded, the claim shows the flag **Newer cover version** and the handler is notified. The next validation of the claim (premium check, location change, authorization code) uses the newer version and records the switch; the handler may also switch at once with **Use Latest Version**.
   - Policy data stays view-only for Claims users (AC3).
 preconditions:
   - "The claim is recorded."
 main_flow:
-  - BIBS computes the version at recording and on each read.
+  - BIBS takes the latest booked version at recording and validates the claim against it.
   - When an endorsement of the policy year is booked, BIBS sets the flag and notifies the handler.
   - The handler opens the cover panel and reviews the endorsement.
-  - The handler clicks **Use Latest Version**; BIBS updates the version and records the change.
+  - The handler clicks **Use Latest Version**, or the next validation of the claim switches to it; BIBS updates the version used and records the change.
 rules:
-  - [R1, "Version = count of booked endorsements of the policy year effective on or before the loss date.", Fixed, "-"]
+  - [R1, "Version used = the latest booked version of the policy year at the time of the validation (minutes of 27-Apr-2026, BR 39); endorsements effective after the loss date are marked (CLR-CM-14).", Fixed, "-"]
   - [R2, "Location lists are not versioned per endorsement until CLQ02 is answered.", Fixed, "-"]
 validations: []
 notifications:
@@ -586,7 +595,8 @@ notifications:
 audit:
   - "Version change with old and new version, user and time."
 acceptance:
-  - A claim shows the cover number and the version used.
+  - A claim recorded on a cover with two booked endorsements is validated against version 2 and shows the cover number and version used.
+  - An endorsement booked after the loss date is used for the validation and is marked as effective after the loss date.
   - After an endorsement of the policy year is booked, the claim shows "Newer cover version".
   - The cover panel of the claim has no edit action.
 ```
@@ -594,9 +604,9 @@ acceptance:
 ```fr
 id: FR-CM-016
 title: Check premium payment and control the claims authorization code
-brd: [BRCLM.001 (p.13; p.29), NFR 15.05 (p.39)]
+brd: [BRCLM.001 (p.15; p.31), NFR 15.05 (p.41)]
 actor: System; Claims Officer, TL, TH (BCL_AUTHORIZE)
-priority: High (BRD p.21)
+priority: High (BRD p.23)
 screens: Record Claim (cover card); Claim record (flag "Unpaid premium", action Generate Authorization Code)
 description:
   - BIBS identifies unpaid invoices of the cover. It reads the invoices of the ARN and policy year (originals, endorsements and cancellations; cancelled invoices excluded) from the invoice ledger with their payment status. The result is PAID, UNPAID, PARTIALLY_PAID, DIRECT_PAYMENT or NO_INVOICE, with the list of unpaid invoices and their balances.
@@ -637,11 +647,11 @@ acceptance:
 ```fr
 id: FR-CM-020
 title: Link several insured locations to one claim
-brd: [BRCLM.037 (p.5)]
+brd: [BRCLM.037 (p.7)]
 actor: Claims user (BCL_RECORD)
 priority: Must have
 screens: Record Claim (locations picker); Claim record (Locations tab)
-description: A claim can reference more than one insured location of its cover. Locations are chosen only from the location list of the cover (risk items of kind location); BIBS stores each with its address, city, province and normalised location key. The claim keeps one claim number whatever the number of locations. Each linked location shows its insurer location references (FR-CM-023).
+description: A claim can reference more than one insured location of its cover. This applies mainly to non-motor products (property, marine cargo); a motor claim is tied to the insured unit (minutes of 27-Apr-2026, BR 37). Locations are grouped per client and per risk and are chosen only from the location list of the cover (risk items of kind location); a location that the policy does not cover cannot be claimed; BIBS stores each with its address, city, province and normalised location key. The claim keeps one claim number whatever the number of locations. Each linked location shows its insurer location references (FR-CM-023).
 preconditions:
   - The cover has at least one insured location.
 main_flow:
@@ -669,19 +679,19 @@ audit:
   - "Link and removal with user and time."
 acceptance:
   - A claim on a property cover with three locations can link two of them and keeps one claim number.
-  - A location of another account cannot be linked.
+  - A location of another account, or one not on the cover, cannot be linked.
   - Each linked location is viewable on the Locations tab with its address.
 ```
 
 ```fr
 id: FR-CM-021
 title: Record several insurer claim numbers under one claim
-brd: [BRCLM.043 (p.7)]
+brd: [BRCLM.043 (p.9)]
 actor: Claims user (BCL_RECORD)
 priority: Must have
 screens: Claim record (Insurers & Updates tab); Claims worklist (search)
 description:
-  - A claim incident can involve several insurers, each issuing its own claim number. The claim holds one insurer claim line per insurer, with the insurer, its share, the insurer claim number, the date reported to the insurer, the reserve, the settled amount and the adjuster. BIBS proposes the insurers and shares from the invoice shares of the cover.
+  - A claim incident can involve several insurers - 15 to 20 for a property co-insurance - each issuing its own claim number. Incidents are grouped per client and per risk code (minutes of 27-Apr-2026, BR 43). The claim holds one insurer claim line per insurer, with the insurer, its share, the insurer claim number, the date reported to the insurer, the reserve, the settled amount and the adjuster. BIBS proposes the insurers and shares from the invoice shares of the cover.
   - Insurer claim numbers are visible on the claim with the insurer name, searchable from the worklist and listed in the Insurer Claim Numbers report (FR-CM-066). Insurer claim numbers can also be loaded by upload.
 preconditions:
   - The claim is open.
@@ -690,21 +700,22 @@ main_flow:
   - The user enters the number and the date reported to the insurer.
   - BIBS checks for duplicates and saves; the flag **Multi-insurer** shows when two or more insurers have lines.
 alternate_flows:
-  - The same insurer number exists on another claim. BIBS warns, shows the other claim and asks for confirmation; the alert BCL_INSURER_CLAIM_NO_REUSED is raised.
+  - The same insurer claim number is already recorded for the same insurer on another claim. BIBS refuses it and names the other claim; duplicate claim numbers for the same insurer are not allowed (minutes of 27-Apr-2026). The same number of another insurer is accepted.
   - Upload. The user uploads a file of claim numbers (claim no., insurer, insurer claim no., date reported); BIBS validates every row before it applies the file.
 rules:
-  - [R1, "The combination claim, insurer and insurer claim number is unique (AC6).", Fixed, "-"]
+  - [R1, "An insurer claim number is unique per insurer across all claims (AC6; minutes of 27-Apr-2026, BR 43).", Fixed, "-"]
   - [R2, "Each insurer claim number is linked to one insurer (AC2).", Fixed, "-"]
   - [R3, "Shares default from the invoice shares and may be edited; whether one incident can span several ARNs is confirmed under CLQ19.", Configurable, Insurer claim line]
 validations:
   - [Duplicate number for the same insurer and claim, "Insurer claim number <no.> is already recorded for <insurer> on this claim", To be confirmed]
+  - [Number already recorded for the same insurer on another claim, "Insurer claim number <no.> of <insurer> is already recorded on claim <claim no.>", To be confirmed]
   - [Insurer not selected, Select the insurer, "-"]
   - [Date reported to insurer after today, The date cannot be in the future, "-"]
 fields_screen: Insurer claim line
 fields:
   - [Insurer, List, "Yes", Insurers of the cover, Insurer on the invoice shares or added with reason]
   - [Share %, Number, "No", Invoice shares, "0-100"]
-  - [Insurer claim number, Text, "No", "-", "Up to 60 characters; unique per insurer and claim"]
+  - [Insurer claim number, Text, "No", "-", "Up to 60 characters; unique per insurer"]
   - [Date reported to insurer, Date, "No", "-", Not after today]
   - [Adjuster, List, "No", LOV BCL_ADJUSTER, FR-CM-031]
 notifications:
@@ -714,18 +725,19 @@ audit:
 acceptance:
   - A claim with two insurers holds two insurer claim numbers and remains one claim.
   - Entering the same number twice for the same insurer on the same claim is refused.
+  - A number already recorded for the same insurer on another claim is refused and the other claim is named.
   - Searching the worklist by an insurer claim number opens the BDOI claim.
 ```
 
 ```fr
 id: FR-CM-022
 title: Record insurer-reported claims and insurer updates
-brd: [BRCLM.041 (p.6)]
+brd: [BRCLM.041 (p.8)]
 actor: Claims user (BCL_RECORD)
 priority: Must have
 screens: Claim record (Insurers & Updates tab, timeline); Bulk Upload (BCL_INSURER_UPDATE)
 description:
-  - Insurer communications are recorded on the claim so that they are central and auditable. A claim first reported by the insurer is recorded with source "Insurer-reported" (FR-CM-011). Each insurer update captures the date, the source (e-mail, letter, portal, call, file), the insurer's reference, remarks and attachments, and can be linked to an insurer claim line.
+  - Insurers do not access BIBS. Claims users record the insurer's communications - e-mails, calls and documents - on the claim, with date, source and remarks, as part of the claim history, so that they are central and auditable (minutes of 27-Apr-2026, BR 41). A claim first reported by the insurer is recorded with source "Insurer-reported" (FR-CM-011). Each insurer update captures the date, the source (e-mail, letter, call, file), the insurer's reference, remarks and attachments, and can be linked to an insurer claim line.
   - Updates are only added, never changed, and form part of the claim timeline. Insurer bordereaux can be loaded in bulk.
 preconditions:
   - The claim exists.
@@ -738,7 +750,7 @@ alternate_flows:
   - Wrong update. It cannot be edited; the user records a correcting update that refers to it.
 rules:
   - [R1, "Insurer updates are never edited or deleted.", Fixed, "-"]
-  - [R2, "Sources: e-mail, letter, portal, call, file (to confirm, CLQ17).", Configurable, LOV BCL_UPDATE_SOURCE]
+  - [R2, "Sources: e-mail, letter, call, file; no insurer portal (minutes of 27-Apr-2026).", Configurable, LOV BCL_UPDATE_SOURCE]
 validations:
   - [Update date blank or in the future, Enter an update date that is not in the future, "-"]
   - [Remarks blank, Enter the remarks, "-"]
@@ -764,11 +776,11 @@ acceptance:
 ```fr
 id: FR-CM-023
 title: Maintain insurer location references
-brd: [BRCLM.042 (p.6)]
+brd: [BRCLM.042 (p.8)]
 actor: Claims user (BCL_LOCATION_REF_MAINTAIN)
 priority: Must have
 screens: Insurer Location References; Cover Lookup; Claim record (Locations tab); Bulk Upload (BCL_LOCATION_REF)
-description: For each insured location of a cover and each insurer, BIBS holds the location reference the insurer uses, with effective dates. Both the internal location and the insurer references are shown on every claim location. A change closes the current reference and opens a new one, so the mapping history is kept and auditable. References are maintained on screen or loaded by upload.
+description: For each insured location of a cover and each insurer, BIBS holds the location reference the insurer uses, with effective dates. Both the internal location and the insurer references are visible and auditable on every claim location, and the location list is the same one that policy, new business and renewal use (minutes of 27-Apr-2026, BR 42). A change closes the current reference and opens a new one, so the mapping history is kept and auditable. References are maintained on screen or loaded by upload.
 preconditions:
   - The cover has insured locations.
 main_flow:
@@ -778,7 +790,7 @@ main_flow:
 rules:
   - [R1, "One current reference per location and insurer.", Fixed, "-"]
   - [R2, "A change end-dates the previous reference; nothing is deleted.", Fixed, "-"]
-  - [R3, "Where the references come from (policy schedule, placement, the insurer at claim time) is confirmed under CLQ18.", Configurable, Change request after CLQ18]
+  - [R3, "Where the references come from (policy schedule, placement, the insurer at claim time), who maintains the location list across policy, new business, renewal and claims, and the entry control (list, combo box or free text) are confirmed under CLQ18 (follow-ups of the minutes of 27-Apr-2026).", Configurable, Change request after CLQ18]
 validations:
   - [Reference blank, Enter the insurer location reference, "-"]
   - [Effective date before the current reference's start, The effective date must be after <date>, To be confirmed]
@@ -801,12 +813,12 @@ acceptance:
 ```fr
 id: FR-CM-024
 title: Send the loss advice to the insurer
-brd: ["Process p.24-25 (PLA, formal loss advice)", NFR 15.14 (p.40), BRCLM.041 (p.6)]
+brd: ["Process p.26-27 (PLA, formal loss advice)", NFR 15.14 (p.42), BRCLM.041 (p.8)]
 actor: Claims Officer
-priority: High (BRD p.21)
+priority: High (BRD p.23)
 screens: Claim record (action Send Loss Advice; Documents tab; E-mails)
 description:
-  - The loss advice (PLA for Motor, formal loss advice for Non-Motor) is generated from the claim with the fields of p.24-25 (assured, policy or reference number, date and location of loss, nature of loss, initial loss reserve, assigned adjuster) and the insurer claim numbers known so far. It is e-mailed to the claims e-mail of each insurer with a send log.
+  - The loss advice (PLA for Motor, formal loss advice for Non-Motor) is generated from the claim with the fields of p.26-27 (assured, policy or reference number, date and location of loss, nature of loss, initial loss reserve, assigned adjuster) and the insurer claim numbers known so far. It is e-mailed to the claims e-mail of each insurer with a send log.
   - The generated advice is stored with the claim as document type CLAIM_REPORT, linked to the claim, the account and the client, so the contact centre can retrieve it (decision D3; BRCSF-009).
 preconditions:
   - The claim has at least one insurer line.
@@ -837,9 +849,9 @@ acceptance:
 ```fr
 id: FR-CM-030
 title: Override or input the claimant's name
-brd: [BRCLM.006 (p.13; p.29)]
+brd: [BRCLM.006 (p.15; p.31)]
 actor: Team Lead, Team Head (BCL_CLAIMANT_OVERRIDE)
-priority: High (BRD p.21)
+priority: High (BRD p.23)
 screens: Claim record (Details tab, action Override Claimant)
 description: The claimant defaults to the assured of the cover. A TL or TH may override it or input another name (for example a third-party claimant) with a reason. The claim shows the flag "Claimant overridden". Whether a claimant record with contact and payee details is needed is confirmed under CLQ25.
 preconditions:
@@ -870,9 +882,9 @@ acceptance:
 ```fr
 id: FR-CM-031
 title: Maintain adjusters / appraisers and assign them to claims
-brd: [BRCLM.017 (p.14-15; p.30), BRCLM.018 (p.15; p.30)]
+brd: [BRCLM.017 (p.16-17; p.32), BRCLM.018 (p.17; p.32)]
 actor: Unit Head (list); Team Lead, Team Head (assignment)
-priority: High (BRD p.21)
+priority: High (BRD p.23)
 screens: Broking Setup, Lists of values (BCL_ADJUSTER); Claim record (action Assign Adjuster)
 description:
   - The adjuster / appraiser list is a list of values seeded with the 25 companies of the BRD (section 9.2). The Claims Unit Head maintains it, with maker-checker and effective dates.
@@ -907,9 +919,9 @@ acceptance:
 ```fr
 id: FR-CM-032
 title: Record and amend the insurer reserve
-brd: [BRCLM.023 (p.16; p.30), BRCLM.024 (p.16; p.30)]
+brd: [BRCLM.023 (p.18; p.32), BRCLM.024 (p.18; p.32)]
 actor: Claims Officer (initial reserve at recording); Team Lead, Team Head (amend)
-priority: High (BRD p.21)
+priority: High (BRD p.23)
 screens: Claim record (Reserve & Settlement tab, action Amend Reserve)
 description:
   - The insurer reserve is the insurer's own estimate of the loss, recorded by BDOI as information for monitoring and loss experience. It is held per insurer claim line; the initial loss reserve of the PLA is the starting value. BDOI keeps no reserve of its own and posts no journal (Q44).
@@ -946,9 +958,9 @@ acceptance:
 ```fr
 id: FR-CM-033
 title: Maintain catastrophe codes and tag claims
-brd: [BRCLM.036 (p.16; p.31)]
+brd: [BRCLM.036 (p.18; p.33)]
 actor: Unit Head (list); Claims user (tag)
-priority: High (BRD p.21)
+priority: High (BRD p.23)
 screens: Broking Setup, Lists of values (BCL_CATASTROPHE); Record Claim; Claim record (Details tab)
 description: The catastrophe codes of the BRD (Typhoon, Earthquake, Flood, Volcanic Eruption, Landslide, Fire, Others such as pandemic, El Nino or terrorism) are a list of values the Unit Head maintains. A claim can carry one code and a free-text event name (for example the typhoon's name). The claims-prone location report filters on the code (FR-CM-063).
 preconditions:
@@ -978,9 +990,9 @@ acceptance:
 ```fr
 id: FR-CM-040
 title: Maintain the claim status values
-brd: [BRCLM.010 (p.13-14; p.29)]
+brd: [BRCLM.010 (p.15-16; p.31)]
 actor: Unit Head (BCL_SETUP)
-priority: High (BRD p.21)
+priority: High (BRD p.23)
 screens: Broking Setup, Lists of values (BCL_CLAIM_STATUS); Claims Setup (status attributes)
 description:
   - The 18 claim statuses of the BRD (section 5.2) are values of a list maintained by the Unit Head, with maker-checker and effective dates. Each status carries attributes on the Claims Setup screen - the phase it belongs to (NEW, IN_PROGRESS, TEMP_CLOSED), the party the claim waits on, the default follow-up days and whether the claim awaits premium remittance.
@@ -1017,9 +1029,9 @@ acceptance:
 ```fr
 id: FR-CM-041
 title: Restrict status selection by role and unit
-brd: [BRCLM.012 (p.14; p.29), BRCLM.013 (p.14; p.29)]
+brd: [BRCLM.012 (p.16; p.31), BRCLM.013 (p.16; p.31)]
 actor: Unit Head (matrix); System (enforcement)
-priority: High (BRD p.21)
+priority: High (BRD p.23)
 screens: Claims Setup (Status Access Matrix; Claims Handler Register); Claim record (Change Status)
 description:
   - The status access matrix lists, for each status, the roles and units allowed to select it. The claims handler register records each handler's unit (Motor HO, Non-Motor HO or a branch) and team. When a user changes a status, the drop-down shows only the statuses allowed for one of the user's roles and the user's unit, and the service refuses any other status even when called directly.
@@ -1055,9 +1067,9 @@ acceptance:
 ```fr
 id: FR-CM-042
 title: Change the claim status
-brd: [BRCLM.011 (p.14; p.29), BRCLM.027 (p.16; p.31)]
+brd: [BRCLM.011 (p.16; p.31), BRCLM.027 (p.18; p.33)]
 actor: Team Lead, Team Head; Claims Officer within the matrix (BCL_STATUS_UPDATE)
-priority: High (BRD p.21)
+priority: High (BRD p.23)
 screens: Claim record (action Change Status; History tab)
 description:
   - A permitted user changes the claim status with a remark. BIBS records the change in the status history (from, to, time, user, remark, days in the previous status), resets the age in the current status, recomputes the next follow-up date unless it was overridden, and moves the claim to the phase of the new status.
@@ -1096,11 +1108,11 @@ acceptance:
 ```fr
 id: FR-CM-043
 title: Maintain the requested types of settlement
-brd: [BRCLM.014 (p.14; p.30)]
+brd: [BRCLM.014 (p.16; p.32)]
 actor: Unit Head (BCL_SETUP)
-priority: High (BRD p.21)
+priority: High (BRD p.23)
 screens: Broking Setup, Lists of values (BCL_SETTLEMENT_TYPE); Claims Setup (settlement attributes)
-description: The ten settlement types of the BRD (section 5.3) are values of a list maintained by the Unit Head. Each type carries its outcome (SETTLED or CLOSED_WITHOUT_PAYMENT), whether it closes the claim, and whether it needs a settlement amount and date. The BRD values are outcomes rather than requested types; the overview (p.23) and the stakeholder matrix (p.28) also name "Settlement Status" values without an ID (CLQ05).
+description: The ten settlement types of the BRD (section 5.3) are values of a list maintained by the Unit Head. Each type carries its outcome (SETTLED or CLOSED_WITHOUT_PAYMENT), whether it closes the claim, and whether it needs a settlement amount and date. The BRD values are outcomes rather than requested types; the overview (p.25) and the stakeholder matrix (p.30) also name "Settlement Status" values without an ID (CLQ05).
 preconditions:
   - "The user has BCL_SETUP."
 main_flow:
@@ -1129,9 +1141,9 @@ acceptance:
 ```fr
 id: FR-CM-044
 title: Set the requested type of settlement
-brd: [BRCLM.015 (p.14; p.30), BRCLM.029 (p.16; p.31)]
+brd: [BRCLM.015 (p.16; p.32), BRCLM.029 (p.18; p.33)]
 actor: Team Lead, Team Head (BCL_SETTLEMENT_UPDATE)
-priority: High (BRD p.21)
+priority: High (BRD p.23)
 screens: Claim record (Reserve & Settlement tab, action Set Settlement)
 description:
   - A TL or TH sets or changes the requested type of settlement of the claim. For a settled outcome they enter the settlement amount (per insurer line where the insurers settle separately) and the date settled; these values feed the Settled Claims, Loss Experience and Loss Ratio reports.
@@ -1159,6 +1171,7 @@ fields:
   - [Settlement amount, Amount, Cond., "-", "Required when the type needs it; >= 0"]
   - [Settled amount per insurer, Amount, "No", Insurer lines, ">= 0"]
   - [Date settled, Date, Cond., "-", Required when the type needs it; not after today]
+  - [Payment method (as reported by the insurer), List, "No", LOV BCL_PAYMENT_METHOD, "Settlement check, fund transfer, LOA or cash"]
   - [Remark, Text, "No", "-", Up to 500 characters]
 notifications:
   - "BCL_STATUS_CHANGED to the account officer when the claim closes."
@@ -1168,14 +1181,15 @@ acceptance:
   - Setting "Settled" without an amount is refused.
   - A Team Lead sets "Settled - Signed Release Papers Returned" with amount and date; the claim appears in the Settled Claims report.
   - A Claims Officer does not see the Set Settlement action.
+  - The payment method reported by the insurer (for example fund transfer for a non-motor claim, LOA for a motor claim) is recorded with the settlement.
 ```
 
 ```fr
 id: FR-CM-045
 title: Close a claim temporarily or permanently and reopen it
-brd: [BRCLM.005 (p.13; p.29), BRCLM.035 (p.16; p.31)]
+brd: [BRCLM.005 (p.15; p.31), BRCLM.035 (p.18; p.33)]
 actor: Claims Officer (temporary closure); Team Lead, Team Head (permanent closure); Team Head, Unit Head (reopen)
-priority: High (BRD p.21)
+priority: High (BRD p.23)
 screens: Claim record (Change Status, Set Settlement, Reopen); Claims worklist (tabs Temporarily Closed, Closed)
 description:
   - "**Temporary closure** uses the statuses of phase TEMP_CLOSED: 17 \"Temporary Closed Claim - Non-submission of Documents\" and 18 \"Temporary Closed Claim - with Offer\". The claim stays outstanding and ageing continues; any permitted user resumes it by setting an in-progress status."
@@ -1212,9 +1226,9 @@ acceptance:
 ```fr
 id: FR-CM-046
 title: Request the claims special remittance for claims awaiting premium remittance
-brd: [BRCLM.010 (p.13-14; p.29), BRCLM.001 (p.13; p.29)]
+brd: [BRCLM.010 (p.15-16; p.31), BRCLM.001 (p.15; p.31)]
 actor: Claims Officer; Remittance (Operations)
-priority: High (BRD p.21)
+priority: High (BRD p.23)
 screens: Claim record (flag "Awaiting premium remittance", link Request Special Remittance); Special Remittance request (BRD-2)
 description:
   - Status 11 "With BDOI - For Premium Remittance" means the insurer waits for BDOI to remit the premium before it settles. BIBS lists the invoices of the cover that are not fully remitted, and links to the special remittance request of Operations with the invoice and the claims condition pre-filled.
@@ -1248,9 +1262,9 @@ acceptance:
 ```fr
 id: FR-CM-050
 title: Compute and override the next follow-up date
-brd: [BRCLM.019 (p.15; p.30)]
+brd: [BRCLM.019 (p.17; p.32)]
 actor: System; Team Lead, Team Head (BCL_FOLLOW_UP_OVERRIDE)
-priority: High (BRD p.21)
+priority: High (BRD p.23)
 screens: Claim record (summary card; action Override Follow-up Date); Claims worklist (Follow-ups Due)
 description: BIBS sets the next follow-up date at recording and at each status change - the status's follow-up days, else the default parameter, from the change date. A TL or TH may override the date with a reason; the claim shows "Follow-up overridden" and later status changes keep the overridden date until it passes.
 preconditions:
@@ -1281,11 +1295,11 @@ acceptance:
 ```fr
 id: FR-CM-051
 title: Encode the next action plan summary
-brd: [BRCLM.020 (p.15; p.30), BRCLM.021 (p.15; p.30)]
+brd: [BRCLM.020 (p.17; p.32), BRCLM.021 (p.17; p.32)]
 actor: Claims Officer, TL, TH (BCL_ACTION_PLAN)
-priority: High (BRD p.21)
+priority: High (BRD p.23)
 screens: Claim record (Details tab, Next Action Plan); Claims worklist; Outstanding reports
-description: Each claim has a Next Action Plan Summary field of up to 2,000 characters. Permitted users update it; every version is kept in the claim history. The current text is shown in the worklist and printed as "Follow Ups / Remarks" in the outstanding reports (p.42).
+description: Each claim has a Next Action Plan Summary field of up to 2,000 characters. Permitted users update it; every version is kept in the claim history. The current text is shown in the worklist and printed as "Follow Ups / Remarks" in the outstanding reports (p.44).
 preconditions:
   - "The claim is open."
 main_flow:
@@ -1310,9 +1324,9 @@ acceptance:
 ```fr
 id: FR-CM-052
 title: Keep a diary per claim and per handler
-brd: [BRCLM.022 (p.15; p.30), NFR 15.08 (p.39)]
+brd: [BRCLM.022 (p.17; p.32), NFR 15.08 (p.41)]
 actor: Claims handlers
-priority: High (BRD p.21)
+priority: High (BRD p.23)
 screens: Claim record (Diary tab); My Diary
 description: Handlers log and plan activities on a claim. A diary entry has a type (call, e-mail, meeting, note, follow-up), date, optional due date and assignee, text and attachments, and is marked done when completed. My Diary lists the user's open entries across claims by due date. Due entries are notified each morning (FR-CM-054).
 preconditions:
@@ -1348,9 +1362,9 @@ acceptance:
 ```fr
 id: FR-CM-053
 title: Compute the age of claims overall and per status
-brd: [BRCLM.025 (p.16; p.30), BRCLM.027 (p.16; p.31)]
+brd: [BRCLM.025 (p.18; p.32), BRCLM.027 (p.18; p.33)]
 actor: System
-priority: High (BRD p.21)
+priority: High (BRD p.23)
 screens: Claim record (summary card); Claims worklist; ageing reports
 description:
   - "Age overall is the number of calendar days from the reported date to today, or to the closure date for a closed claim (BRCLM.025)."
@@ -1379,9 +1393,9 @@ acceptance:
 ```fr
 id: FR-CM-054
 title: Track pending actions and remind handlers
-brd: [BRCLM.034 (p.16; p.31), BRCLM.019 (p.15; p.30), BRCLM.022 (p.15; p.30)]
+brd: [BRCLM.034 (p.18; p.33), BRCLM.019 (p.17; p.32), BRCLM.022 (p.17; p.32)]
 actor: System; Claims handlers
-priority: High (BRD p.21)
+priority: High (BRD p.23)
 screens: Claims worklist (tab Follow-ups Due); Claims home; Pending Actions report
 description: A pending action is a claim whose next follow-up date is reached or a diary entry that is due and not done. The daily job notifies each handler of the claims and entries due today and raises an alert for past dates. Pending actions are listed in the Follow-ups Due tab and in the Pending Actions report per handler (FR-CM-061).
 preconditions:
@@ -1407,7 +1421,7 @@ acceptance:
 ```fr
 id: FR-CM-055
 title: Claims home and worklist
-brd: [NFR 15.03 (p.39), BRCLM.034 (p.16; p.31), BRCLM.043 (p.7)]
+brd: [NFR 15.03 (p.41), BRCLM.034 (p.18; p.33), BRCLM.043 (p.9)]
 actor: Claims users (BCL_VIEW); TL, TH, UH (reassign)
 priority: Must have
 screens: Claims Home; Claims Worklist
@@ -1439,9 +1453,9 @@ acceptance:
 ```fr
 id: FR-CM-060
 title: Claims ageing reports
-brd: [BRCLM.026 (p.16; p.30), BRCLM.028 (p.16; p.31), "Report list (p.43)"]
+brd: [BRCLM.026 (p.18; p.32), BRCLM.028 (p.18; p.33), "Report list (p.45)"]
 actor: Claims users, Unit Head (BCL_REPORT_VIEW)
-priority: High (BRD p.21)
+priority: High (BRD p.23)
 screens: Reports (category Claims Handling)
 description: The Claims Aging Report lists outstanding claims with the age overall from the reported date and the ageing bucket, with totals per bucket and insurer (BCL-AGEING). The Claims Aging Report per Status groups the outstanding claims by status, then insurer, with age this stage and age overall (BCL-AGEING-STATUS). Both carry the columns of the outstanding claims list (section 6.1).
 preconditions:
@@ -1468,9 +1482,9 @@ acceptance:
 ```fr
 id: FR-CM-061
 title: Outstanding, past due, settled and pending actions reports
-brd: [BRCLM.029 (p.16; p.31), BRCLM.031 (p.16; p.31), BRCLM.034 (p.16; p.31), "Report list (p.42-43)"]
+brd: [BRCLM.029 (p.18; p.33), BRCLM.031 (p.18; p.33), BRCLM.034 (p.18; p.33), "Report list (p.44-45)"]
 actor: Claims users, Unit Head (BCL_REPORT_VIEW)
-priority: High (BRD p.21)
+priority: High (BRD p.23)
 screens: Reports (category Claims Handling)
 description:
   - The List of all Outstanding Claims covers every claim in phase NEW, IN_PROGRESS or TEMP_CLOSED as of the date. The 90 Days Past Due variant keeps the claims whose age overall exceeds the threshold.
@@ -1501,9 +1515,9 @@ acceptance:
 ```fr
 id: FR-CM-062
 title: Loss experience and loss ratio reports
-brd: [BRCLM.030 (p.16; p.31), BRCLM.032 (p.16; p.31), "Report list (p.43-44)"]
+brd: [BRCLM.030 (p.18; p.33), BRCLM.032 (p.18; p.33), "Report list (p.45-46)"]
 actor: Claims users, Unit Head, Marketing (BCL_REPORT_VIEW)
-priority: High (BRD p.21)
+priority: High (BRD p.23)
 screens: Reports (category Claims Handling); account page (Claims tab, loss summary)
 description:
   - "The Loss Experience report lists, per claim and insurer line: insured, claimant, policy number, date of loss, nature and type of loss, deductible, amount of loss paid, outstanding and total, insurer and status, grouped by client, account and policy year. Paid = settled amount; outstanding = insurer reserve less paid while the claim is open, never below zero."
@@ -1532,11 +1546,11 @@ acceptance:
 ```fr
 id: FR-CM-063
 title: Identify claims-prone locations
-brd: [BRCLM.038 (p.5)]
+brd: [BRCLM.038 (p.7)]
 actor: Claims / Risk user (BCL_REPORT_VIEW)
 priority: Must have
 screens: Reports (Claims by Location / Claims-prone Locations)
-description: The report shows, per location key, city and province, the number of claims, paid and outstanding amounts over a period, and flags a location "claims-prone" when it has at least the threshold number of claims in the look-back years. The user filters by catastrophe code, product line and period, and drills down to the claims of a location. It uses the claims and loss data of FR-CM-062 (AC3).
+description: The report shows, per location key, city and province, the number of claims, paid and outstanding amounts over a period, and flags a location "claims-prone" when it has at least the threshold number of claims in the look-back years. The user filters by catastrophe code, product line and period, and drills down to the claims of a location. It uses the claims and loss data of FR-CM-062 (AC3). The workshop agreed on-demand reports of claims by location; a dashboard is a possible future enhancement.
 preconditions:
   - The user has BCL_REPORT_VIEW.
 main_flow:
@@ -1561,9 +1575,9 @@ acceptance:
 ```fr
 id: FR-CM-064
 title: Give authorised users the data for their own analysis
-brd: [BRCLM.033 (p.16; p.31)]
+brd: [BRCLM.033 (p.18; p.33)]
 actor: Unit Head, Claims / Risk user (BCL_DATA_EXTRACT)
-priority: High (BRD p.21)
+priority: High (BRD p.23)
 screens: Reports (Claims Data Extract); saved report variants
 description: The Claims Data Extract gives one row per claim, insurer line and location with every claim field, for analysis outside BIBS. Access needs BCL_DATA_EXTRACT, which the Unit Head requests for the users who need it. Users save their parameter sets as report variants for every Claims report.
 preconditions:
@@ -1588,11 +1602,11 @@ acceptance:
 ```fr
 id: FR-CM-065
 title: Give Marketing controlled access to loss information
-brd: [BRCLM.040 (p.6)]
+brd: [BRCLM.040 (p.8)]
 actor: Marketing AO, Marketing TL
 priority: Must have
 screens: Reports (Claims Handling); account page (Claims tab, loss summary)
-description: Marketing users view loss experience through the existing claims reports, for renewal, pricing and client discussions. They receive BCL_REPORT_VIEW; export is granted per role (proposal - Marketing TL only). The account page shows a loss summary of the account (claim count, open claims, paid, outstanding). Marketing never receives a claim maintenance permission.
+description: Marketing users get controlled, role-based, read-only access to loss information through the existing claims reports - Loss Experience, Loss Ratio and Claims Aging - for renewal, pricing and client discussions; no new report is required (minutes of 27-Apr-2026, BR 40). They receive BCL_REPORT_VIEW; export is granted per role (proposal - Marketing TL only). The account page shows a loss summary of the account (claim count, open claims, paid, outstanding), which BDOI is asked to confirm (CLR-CM-15). Marketing never receives a claim maintenance permission.
 preconditions:
   - "The user has BCL_REPORT_VIEW."
 main_flow:
@@ -1612,12 +1626,13 @@ acceptance:
   - A Marketing AO views the Loss Experience report and cannot download it.
   - A Marketing TL downloads the report in Excel.
   - A Marketing AO cannot open a claim record.
+  - A Marketing AO views the Claims Aging Report.
 ```
 
 ```fr
 id: FR-CM-066
 title: Insurer claim number register and claims activity log
-brd: [BRCLM.043 (p.7), BRCLM.041 (p.6), BRCLM.042 (p.6), NFR 15.08 (p.39)]
+brd: [BRCLM.043 (p.9), BRCLM.041 (p.8), BRCLM.042 (p.8), NFR 15.08 (p.41)]
 actor: Claims users, Unit Head (BCL_REPORT_VIEW)
 priority: Must have
 screens: Reports (category Claims Handling)
@@ -1667,7 +1682,7 @@ Figure 2 shows the phases of a claim. The 18 BDOI statuses are values inside a p
 
 ## Claim statuses
 
-<!-- table: widths=0.8,8.8,3,4 caption="Claim status values (BRCLM.010, p.13-14) and proposed attributes" size=8.5 -->
+<!-- table: widths=0.8,8.8,3,4 caption="Claim status values (BRCLM.010, p.15-16) and proposed attributes" size=8.5 -->
 | # | Status | Phase | Waiting on |
 |---|---|---|---|
 | 1 | Newly Filed Claim - with complete documents | NEW | Insurer |
@@ -1693,7 +1708,7 @@ The phase and the waiting party are the project's proposal; BDOI confirms them w
 
 ## Settlement types
 
-<!-- table: widths=8.2,4.6,3.8 caption="Requested type of settlement (BRCLM.014, p.14) and proposed attributes" size=8.5 -->
+<!-- table: widths=8.2,4.6,3.8 caption="Requested type of settlement (BRCLM.014, p.16) and proposed attributes" size=8.5 -->
 | Settlement type | Outcome | Closes the claim |
 |---|---|---|
 | Closed - Cancelled | CLOSED_WITHOUT_PAYMENT | Yes |
@@ -1702,14 +1717,14 @@ The phase and the waiting party are the project's proposal; BDOI confirms them w
 | Closed - without Payment | CLOSED_WITHOUT_PAYMENT | Yes |
 | Settled | SETTLED | Yes |
 | Settled - Directly Filed | SETTLED | Yes |
-| Settled - LOA Issued | SETTLED | Yes (repair monitored offline, p.24) |
+| Settled - LOA Issued | SETTLED | Yes (repair monitored offline, p.26) |
 | Settled - LOA Issued - For Schedule of Repair | SETTLED | To confirm (CLQ05) |
 | Settled - LOA Issued - Vehicle Under Repair | SETTLED | To confirm (CLQ05) |
 | Settled - Signed Release Papers Returned | SETTLED | Yes |
 
 ## Service levels and escalation
 
-- The BRD sets response times, not handling SLAs: claims booking and premium validation 5 seconds, status and settlement updates 1 minute, activity log and reports 5 minutes (p.39-40).
+- The BRD sets response times, not handling SLAs: claims booking and premium validation 5 seconds, status and settlement updates 1 minute, activity log and reports 5 minutes (p.41-42).
 - The NEW phase has a stage SLA of 24 hours in the workflow (default), so that newly filed claims are picked up. Other phases have no SLA; the follow-up date and the 90-day past due alert (FR-CM-054, FR-CM-061) drive the monitoring.
 - Escalation beyond the handler (to the TL or UH) is not in the BRD and is not proposed (chapter 12, CLR-CM-10). Supervisors see overdue follow-ups on Claims Home.
 
@@ -1737,7 +1752,7 @@ All reports need BCL_REPORT_VIEW to run and BCL_REPORT_EXPORT to download (the e
 
 ### Outstanding claims lists (BCL-OUTSTANDING, BCL-OUTSTANDING-PAST-DUE, BCL-AGEING, BCL-AGEING-STATUS)
 
-Layout: landscape, one row per claim, sorted by age overall (descending); the ageing reports add the bucket or group by status. Columns from the BRD report list (p.42-43), plus the insurer claim numbers.
+Layout: landscape, one row per claim, sorted by age overall (descending); the ageing reports add the bucket or group by status. Columns from the BRD report list (p.44-45), plus the insurer claim numbers.
 
 <!-- table: widths=3.8,2.6,10.2 caption="Columns of the outstanding claims lists" size=8.5 -->
 | Column | Format | Content |
@@ -1763,11 +1778,11 @@ Layout: landscape, one row per claim, sorted by age overall (descending); the ag
 
 ### Settled claims list (BCL-SETTLED)
 
-Parameters: date settled from / to. Layout: landscape, sorted by date settled. Columns as the outstanding list without Claim Type, Follow Ups / Remarks, Age this Stage and Next Follow Up, and with **Date Settled** (date) and **Settlement Amount** (amount) after Deductible (p.42).
+Parameters: date settled from / to. Layout: landscape, sorted by date settled. Columns as the outstanding list without Claim Type, Follow Ups / Remarks, Age this Stage and Next Follow Up, and with **Date Settled** (date) and **Settlement Amount** (amount) after Deductible (p.44).
 
 ### Loss experience and loss ratio (BCL-LOSS-EXPERIENCE, BCL-LOSS-RATIO)
 
-<!-- table: widths=3.8,2.6,10.2 caption="Columns of the loss reports (p.43-44)" size=8.5 -->
+<!-- table: widths=3.8,2.6,10.2 caption="Columns of the loss reports (p.45-46)" size=8.5 -->
 | Column | Format | Content |
 |---|---|---|
 | Insured | Text | Assured of the cover |
@@ -1789,7 +1804,7 @@ Parameters: date settled from / to. Layout: landscape, sorted by date settled. C
 <!-- table: widths=3.6,3.4,9.6 caption="Claims documents" size=8.5 -->
 | Template / type | Output | Content |
 |---|---|---|
-| BCL_LOSS_ADVICE | PDF by e-mail, stored as CLAIM_REPORT | Assured; policy or reference number; date and location of loss; nature of loss and description; initial loss reserve; assigned adjuster; insurer claim numbers; BDOI claim number and handler (p.24-25). Draft layout until BDOI provides its own (CLQ22) |
+| BCL_LOSS_ADVICE | PDF by e-mail, stored as CLAIM_REPORT | Assured; policy or reference number; date and location of loss; nature of loss and description; initial loss reserve; assigned adjuster; insurer claim numbers; BDOI claim number and handler (p.26-27). Draft layout until BDOI provides its own (CLQ22) |
 | CLAIM_REPORT | Attachment type | Claims reports linked to the claim, the account (ARN) and the client, so the contact centre retrieves them (decision D3; BRCSF-009). Which claim documents count as claims reports is open (XQ05) |
 | BCL_DOCUMENT_TYPE | Attachment types on the claim | PLA; CRF; estimate; offer; signed offer; LOA; release papers; others (to confirm, CLQ26) |
 
@@ -1811,12 +1826,12 @@ Figure 3 shows the interfaces of the Claims module. Claims reads the data of the
 | Endorsements (BRD-1 booking) | In | Cover version; newer endorsement event | BRCLM.039 | IN SCOPE |
 | Invoice ledger (BRD-2) | In | Invoices of the cover with payment and remittance status; payment and remittance events | BRCLM.001 | IN SCOPE |
 | Special remittance (BRD-2) | Out | Feed CLAIMS_SPECIAL_REMIT to Operations | BRCLM.010; OQ46 | IN SCOPE |
-| Outgoing e-mail | Out | Loss advice to insurers; send log | p.24-25 | IN SCOPE |
+| Outgoing e-mail | Out | Loss advice to insurers; send log | p.26-27 | IN SCOPE |
 | Documents | Out | Claims reports as CLAIM_REPORT, linked to claim, account and client | BRCSF-009; D3 | IN SCOPE |
 | Client 360 view (CRM) | Out | Claims of the client | BRCLM.040 | IN SCOPE |
 | Renewal (BRD-6) | Out | Loss experience per account and policy year (decision D4) | BRCLM.030, 040 | IN SCOPE |
 | Notifications and alerts | Out | Assignment, status, follow-up, premium, newer version, past due | NFR 15.14 | IN SCOPE |
-| EBIX / ISYS claims | In | Migration of open and historical claims | p.23; BRCLM.007 | ON HOLD |
+| EBIX / ISYS claims | In | Migration of open and historical claims | p.25; BRCLM.007 | ON HOLD |
 | Claim proceeds through BDOI | Out | Cashiering receipt and Disbursement payout, only if CLQ10 is answered yes | BRCLM.010 status 12 | ON HOLD |
 | Insurer channels (portal, system-to-system, bordereaux) | In | Manual recording and upload cover the need today | BRCLM.041, 043 | ON HOLD |
 | Shared drive for report files | Out | Report archive in BIBS; drop to a drive only if BDOI confirms | NFR 15.09-15.13 | ON HOLD |
@@ -1824,7 +1839,7 @@ Figure 3 shows the interfaces of the Claims module. Claims reads the data of the
 
 # Non-functional requirements
 
-<!-- table: widths=3,5.6,5.4 caption="Non-functional requirements (BRD p.32-41)" size=8.5 -->
+<!-- table: widths=3,5.6,5.4 caption="Non-functional requirements (BRD p.34-43)" size=8.5 -->
 | Topic | BRD value | BIBS target and approach |
 |---|---|---|
 | Authentication | Windows credentials; masked password; plain log-on errors; lockout after 3 attempts; password change every 90 days | Platform log-in (FR-CM-001); directory sign-in when BDO supplies the interface (decision D6) |
@@ -1870,11 +1885,12 @@ The items below are changed in BIBS without a release. Changes to parameters and
 |---|---|
 | BCL_CLAIM_STATUS | The 18 statuses of section 5.2 |
 | BCL_SETTLEMENT_TYPE | The 10 types of section 5.3 |
-| BCL_ADJUSTER | Gemini Adjustment Company; Chartered Adjusters, Inc.; BA International Adjusters & Surveyors Company, Inc.; Total Claims Specialist, Inc.; Unified Adjusters and Surveyors (FAR East), Inc.; Top Brass Insurance Adjusters & Surveyors Co., Inc.; Adjustment Standard Corporation (ASCOR); CARES Adjusters & Surveyors, Inc.; Plaridel Adjusters and Appraisers, Inc.; Crawford & Company Philippines, Inc.; Manila Adjusters & Surveyors Company (MASCO); Tan-Gatue Adjustment Company, Inc.; Technical Inspection Group Adjustment & Surveyors Corp.; Esteban Adjusters and Valuers, Inc.; Interclaim Adjustment Co., Inc.; Pacific International Loss Adjusters Co., Inc.; Senon Insurance Adjusters & Appraisers; Audemus Adjustment Corporation; PALM Property Adjusters; McLarens Philippines; Universal Adjuster Appraisers Co., Inc.; Eagle Prosperity Adjustment and Surveyor Corp.; DFM Adjustment Co., Inc.; Optimum Claims Solutions Insurance Adjustment, Inc.; TreborAsia Insurance Adjustment Services (p.14-15) |
-| BCL_CATASTROPHE | Typhoon; Earthquake; Flood; Volcanic Eruption; Landslide; Fire; Others (i.e. Pandemic, El Nino, Terrorism) (p.16) |
+| BCL_ADJUSTER | Gemini Adjustment Company; Chartered Adjusters, Inc.; BA International Adjusters & Surveyors Company, Inc.; Total Claims Specialist, Inc.; Unified Adjusters and Surveyors (FAR East), Inc.; Top Brass Insurance Adjusters & Surveyors Co., Inc.; Adjustment Standard Corporation (ASCOR); CARES Adjusters & Surveyors, Inc.; Plaridel Adjusters and Appraisers, Inc.; Crawford & Company Philippines, Inc.; Manila Adjusters & Surveyors Company (MASCO); Tan-Gatue Adjustment Company, Inc.; Technical Inspection Group Adjustment & Surveyors Corp.; Esteban Adjusters and Valuers, Inc.; Interclaim Adjustment Co., Inc.; Pacific International Loss Adjusters Co., Inc.; Senon Insurance Adjusters & Appraisers; Audemus Adjustment Corporation; PALM Property Adjusters; McLarens Philippines; Universal Adjuster Appraisers Co., Inc.; Eagle Prosperity Adjustment and Surveyor Corp.; DFM Adjustment Co., Inc.; Optimum Claims Solutions Insurance Adjustment, Inc.; TreborAsia Insurance Adjustment Services (p.16-17) |
+| BCL_CATASTROPHE | Typhoon; Earthquake; Flood; Volcanic Eruption; Landslide; Fire; Others (i.e. Pandemic, El Nino, Terrorism) (p.18) |
 | BCL_LOSS_NATURE, BCL_CLAIM_TYPE | Provisional: Motor own damage; Motor third party; Motor theft; Fire; Property; Engineering; Marine; Liability; Personal accident; Others (CLQ12) |
 | BCL_UNIT | Motor HO; Non-Motor HO; branches Angeles, Cebu, CDO, Davao, GenSan (CLQ04) |
-| BCL_UPDATE_SOURCE | E-mail; Letter; Portal; Call; File (CLQ17) |
+| BCL_PAYMENT_METHOD | Settlement check; Fund transfer; LOA; Cash (minutes of 27-Apr-2026; recorded only, CLQ10) |
+| BCL_UPDATE_SOURCE | E-mail; Letter; Call; File (minutes of 27-Apr-2026) |
 | BCL_DIARY_TYPE | Call; E-mail; Meeting; Note; Follow-up |
 | BCL_DOCUMENT_TYPE | PLA; CRF; Estimate; Offer; Signed offer; LOA; Release papers; Others (CLQ26) |
 | BCL_REOPEN_REASON, BCL_OVERRIDE_REASON | Generic values provided; BDOI supplies its own |
@@ -1901,13 +1917,13 @@ The items below are changed in BIBS without a release. Changes to parameters and
 <!-- table: widths=1.8,11,3.8 caption="Assumptions" size=8.5 -->
 | ID | Assumption | Related |
 |---|---|---|
-| A-CM-01 | The workshop addendum (p.1-9), the renumbering addendum (p.10-18) and the original BRD (p.19-45) together are the baseline; BRCLM.001-036 have the text of FRID-001-036 | R1-R3 |
+| A-CM-01 | The workshop addendum (p.3-11), the renumbering addendum (p.12-20) and the original BRD (p.21-47) together are the baseline; BRCLM.001-036 have the text of FRID-001-036 | R1-R3 |
 | A-CM-02 | The EBIX "Cover Number" is the BIBS account (ARN) and policy year; the version is the endorsement sequence | CLQ02 |
 | A-CM-03 | BDOI keeps no reserve and receives no claim money; the insurer's reserve and settlement are information | Q44; CLQ10 |
-| A-CM-04 | The claims facility is a new BIBS module; the BRD's "enhance the existing claims module in eBIX" (p.23) does not apply | p.23 |
-| A-CM-05 | The workshop addendum's seven requirements are in scope, although the addendum says it does not change the scope (p.4) | p.4 |
+| A-CM-04 | The claims facility is a new BIBS module; the BRD's "enhance the existing claims module in eBIX" (p.25) does not apply | p.25 |
+| A-CM-05 | The workshop addendum's seven requirements are in scope, although the addendum says it does not change the scope (p.6) | p.6 |
 | A-CM-06 | Claims Officers tag temporary closures; TL / TH close permanently | CLQ06 |
-| A-CM-07 | The capacity table of p.39-40 is the requirement, although it is headed "sample requirements" | p.39 |
+| A-CM-07 | The capacity table of p.41-42 is the requirement, although it is headed "sample requirements" | p.41 |
 
 ## Dependencies
 
@@ -1927,7 +1943,7 @@ The items below are changed in BIBS without a release. Changes to parameters and
 | ID | Question | Affects | Status |
 |---|---|---|---|
 | CLQ01 | Meaning of the claims authorization code; which unpaid invoices block it; overrides | FR-CM-016 | OPEN |
-| CLQ02 | Cover number and version; location versioning; claims on expired or cancelled covers | FR-CM-010, 011, 015, 020 | OPEN |
+| CLQ02 | Cover number and version; location versioning; claims on expired or cancelled covers | FR-CM-010, 011, 015, 020 | PARTIAL (minutes of 27-Apr-2026: latest version; CLR-CM-14) |
 | CLQ03 | Meaning of "maintain the Reported Date only"; who may correct it | FR-CM-012, 053 | OPEN |
 | CLQ04 | Status matrix by role and unit; claims units; follow-up days per status; allowed sequences | FR-CM-040, 041, 042 | OPEN |
 | CLQ05 | Settlement types versus settlement status; which types close the claim | FR-CM-043, 044 | OPEN |
@@ -1940,11 +1956,11 @@ The items below are changed in BIBS without a release. Changes to parameters and
 | CLQ12 | Claim type and nature of loss values; meaning of CNR | FR-CM-011; section 5.2 | OPEN |
 | CLQ13 | Claim number format; legacy numbers | FR-CM-011 | OPEN |
 | CLQ14 | Migration of EBIX / ISYS claims | Section 7 | OPEN |
-| CLQ15 | Marketing roles, scope and export rights on loss information | FR-CM-065 | OPEN |
+| CLQ15 | Marketing roles, scope and export rights on loss information | FR-CM-065 | PARTIAL (minutes: read-only through the existing reports, export as granted) |
 | CLQ16 | Granularity and threshold of claims-prone areas; hazard data | FR-CM-063 | OPEN |
-| CLQ17 | Channels and sources of insurer updates; bulk upload | FR-CM-022 | OPEN |
-| CLQ18 | Source of insurer location references | FR-CM-023 | OPEN |
-| CLQ19 | Multi-insurer incidents: co-insurance, several policies, several ARNs | FR-CM-021 | OPEN |
+| CLQ17 | Channels and sources of insurer updates; bulk upload | FR-CM-022 | PARTIAL (minutes: manual recording by Claims users; upload to confirm, CLR-CM-08) |
+| CLQ18 | Source of insurer location references; owner of the location list; entry control (follow-ups of the minutes) | FR-CM-020, 023 | OPEN |
+| CLQ19 | Multi-insurer incidents: co-insurance, several policies, several ARNs | FR-CM-021 | PARTIAL (minutes: grouping per client and per risk code; no duplicate number per insurer) |
 | CLQ20 | Loss ratio premium basis, period basis and grouping | FR-CM-062 | OPEN |
 | CLQ21 | BIBS replacing ISYS for claims reporting; buckets; shared drive | FR-CM-060, 061 | OPEN |
 | CLQ22 | Notification events and templates to client, AO and insurer | FR-CM-024, 042 | OPEN |
@@ -1960,7 +1976,7 @@ The items below are changed in BIBS without a release. Changes to parameters and
 
 # Traceability
 
-Every BRD-7 requirement is met by at least one FR. The screen column names the main entry point; the test cases are listed by test condition (TC-CM-nnn.n). The non-functional requirements (p.32-41) are traced in section 8; the loss advice process (p.24-25) in FR-CM-024.
+Every BRD-7 requirement is met by at least one FR. The screen column names the main entry point; the test cases are listed by test condition (TC-CM-nnn.n). The non-functional requirements (p.34-43) are traced in section 8; the loss advice process (p.26-27) in FR-CM-024.
 
 <!-- table: widths=2.2,3.6,5.6,5.2 caption="BRD ID to FR, screen and test cases" size=8 -->
 | BRD ID | FR | Screen | Test cases |
@@ -1979,7 +1995,7 @@ Every BRD-7 requirement is met by at least one FR. The screen column names the m
 | BRCLM.012 | FR-CM-041 | Claims Setup (Status Access Matrix) | TC-CM-041.3, 041.4 (2 cases) |
 | BRCLM.013 | FR-CM-041 | Claim record (Change Status) | TC-CM-041.1, 041.2 (2 cases) |
 | BRCLM.014 | FR-CM-043 | Lists of values; Claims Setup | TC-CM-043.1, 043.2, 043.3 (3 cases) |
-| BRCLM.015 | FR-CM-044, FR-CM-002 | Claim record (Set Settlement) | TC-CM-002.1, 044.1, 044.3, 044.2 (7 cases) |
+| BRCLM.015 | FR-CM-044, FR-CM-002 | Claim record (Set Settlement) | TC-CM-002.1, 044.1, 044.2, 044.3, 044.4 (8 cases) |
 | BRCLM.016 | FR-CM-014 | Claim record (summary) | TC-CM-014.1, 014.2 (4 cases) |
 | BRCLM.017 | FR-CM-031 | Lists of values (BCL_ADJUSTER) | TC-CM-031.1, 031.3 (3 cases) |
 | BRCLM.018 | FR-CM-031, FR-CM-002 | Claim record (Assign Adjuster) | TC-CM-002.1, 031.2, 031.4 (5 cases) |
@@ -1993,7 +2009,7 @@ Every BRD-7 requirement is met by at least one FR. The screen column names the m
 | BRCLM.026 | FR-CM-060 | Reports (BCL-AGEING) | TC-CM-060.1, 060.3 (2 cases) |
 | BRCLM.027 | FR-CM-053, FR-CM-042 | Claim record (History) | TC-CM-042.1, 053.2 (2 cases) |
 | BRCLM.028 | FR-CM-060 | Reports (BCL-AGEING-STATUS) | TC-CM-060.1 (1 case) |
-| BRCLM.029 | FR-CM-061, FR-CM-044 | Reports (BCL-SETTLED) | TC-CM-044.1, 061.3 (2 cases) |
+| BRCLM.029 | FR-CM-061, FR-CM-044 | Reports (BCL-SETTLED) | TC-CM-044.1, 044.4, 061.3 (3 cases) |
 | BRCLM.030 | FR-CM-062 | Reports (BCL-LOSS-EXPERIENCE) | TC-CM-062.1 (2 cases) |
 | BRCLM.031 | FR-CM-061 | Reports (BCL-OUTSTANDING) | TC-CM-061.1, 061.2 (3 cases) |
 | BRCLM.032 | FR-CM-062 | Reports (BCL-LOSS-RATIO) | TC-CM-062.2, 062.4 (2 cases) |
@@ -2001,13 +2017,13 @@ Every BRD-7 requirement is met by at least one FR. The screen column names the m
 | BRCLM.034 | FR-CM-054, FR-CM-061, FR-CM-055 | Follow-ups Due; Claims Home | TC-CM-054.1, 054.3, 055.3, 061.4 (6 cases) |
 | BRCLM.035 | FR-CM-045 | Claim record; worklist tabs | TC-CM-045.1 (2 cases) |
 | BRCLM.036 | FR-CM-033 | Lists of values (BCL_CATASTROPHE) | TC-CM-033.1, 033.2, 033.3 (3 cases) |
-| BRCLM.037 | FR-CM-020 | Record Claim; Locations tab | TC-CM-020.1, 020.2, 020.3 (5 cases) |
+| BRCLM.037 | FR-CM-020 | Record Claim; Locations tab | TC-CM-020.1, 020.2, 020.3 (6 cases) |
 | BRCLM.038 | FR-CM-063 | Reports (BCL-PRONE-LOCATIONS) | TC-CM-063.1, 063.2, 063.3 (3 cases) |
-| BRCLM.039 | FR-CM-015 | Claim record (summary) | TC-CM-015.1, 015.2 (2 cases) |
-| BRCLM.040 | FR-CM-065 | Reports; account page | TC-CM-065.1, 065.2, 065.3 (4 cases) |
+| BRCLM.039 | FR-CM-015 | Claim record (summary) | TC-CM-015.1, 015.2 (3 cases) |
+| BRCLM.040 | FR-CM-065 | Reports; account page | TC-CM-065.1, 065.2, 065.3, 065.4 (5 cases) |
 | BRCLM.041 | FR-CM-022, FR-CM-011, FR-CM-003, FR-CM-066 | Insurers & Updates tab | TC-CM-003.1, 011.4, 022.1, 022.2, 022.3, 022.4, 066.2 (8 cases) |
 | BRCLM.042 | FR-CM-023, FR-CM-003, FR-CM-066 | Insurer Location References | TC-CM-003.2, 023.1, 023.2, 023.3, 066.2 (7 cases) |
-| BRCLM.043 | FR-CM-021, FR-CM-066, FR-CM-055 | Insurers & Updates tab; worklist | TC-CM-021.1, 021.2, 021.3, 021.4, 055.2, 066.1, 066.3 (9 cases) |
+| BRCLM.043 | FR-CM-021, FR-CM-066, FR-CM-055 | Insurers & Updates tab; worklist | TC-CM-021.1, 021.2, 021.3, 021.4, 055.2, 066.1, 066.3 (10 cases) |
 
 
 # Proposed business rules and clarifications for confirmation
@@ -2017,18 +2033,21 @@ The table lists each point where the proposed screen or rule differs from the BR
 <!-- table: widths=1.7,2.9,6.1,3.5,3.4 caption="Proposed business rules and clarifications for confirmation" size=8 -->
 | Ref | Topic | Proposed rule or screen behaviour | Reason | Decision requested from BDOI |
 |---|---|---|---|---|
-| CLR-CM-01 | Claims module (p.23, assumption 1) | Claims is a BIBS module for a broker: BDOI records the insurer's reserve and settlement as information and posts nothing. | The BRD assumed an enhancement of the EBIX claims module; the insurer-side functions do not apply to a broker (Q44). | Confirm the broker claims module. |
+| CLR-CM-01 | Claims module (p.25, assumption 1) | Claims is a BIBS module for a broker: BDOI records the insurer's reserve and settlement as information and posts nothing. | The BRD assumed an enhancement of the EBIX claims module; the insurer-side functions do not apply to a broker (Q44). | Confirm the broker claims module. |
 | CLR-CM-02 | Policy number (BRCLM.007; FR-CM-013) | The policy number is copied from the BIBS account; there is no upload from EBIX. Legacy numbers enter through the migration. | The BRD describes an upload from EBIX (CLQ14). | Confirm the copy from the account. |
-| CLR-CM-03 | Requested type of settlement (BRCLM.014; FR-CM-043) | The values are outcomes; each carries whether it closes the claim and whether it needs a settlement amount and date. The Unit Head maintains them with maker-checker. | The BRD lists the values without their effect; the separate "Settlement Type Status" list (p.28) has no values (CLQ05). | Confirm the outcomes and give the status values (CLQ05). |
+| CLR-CM-03 | Requested type of settlement (BRCLM.014; FR-CM-043) | The values are outcomes; each carries whether it closes the claim and whether it needs a settlement amount and date. The Unit Head maintains them with maker-checker. | The BRD lists the values without their effect; the separate "Settlement Type Status" list (p.30) has no values (CLQ05). | Confirm the outcomes and give the status values (CLQ05). |
 | CLR-CM-04 | Closures (BRCLM.005, 035; FR-CM-045) | Officers set temporary closures; TL / TH close permanently. | The BRD lets officers tag closures and TL / TH close (CLQ06). | Confirm the split (CLQ06). |
 | CLR-CM-05 | Status access matrix (BRCLM.012, 013; FR-CM-041) | The proposed default gives TL and TH every status and officers the newly filed and temporary closure statuses; the Unit Head maintains the matrix. | The allowed statuses per role and unit are open (CLQ04). | Give the matrix (CLQ04). |
 | CLR-CM-06 | Log-in and session (NFR 1.01, 10.01; FR-CM-001) | The BIBS sign-in applies, with lockout after 3 attempts for every user; directory sign-in (Windows ID) is added when BDO supplies the interface. The idle timeout follows the BIBS session policy. | Cross-BRD decisions D5 and D6; the Claims NFR asks for 15 minutes, which differs from other BRDs (CLQ24). | Confirm the sign-in and the idle timeout (CLQ24). |
 | CLR-CM-07 | Branch users (FR-CM-010) | All covers and claims are visible to the Claims roles, with no portfolio or branch restriction. | Whether branch users see only their branch is open (CLQ27). | Confirm the data scope of branch users (CLQ27). |
-| CLR-CM-08 | Insurer updates (BRCLM.041, 043; FR-CM-022) | Insurer updates are recorded by the handler or uploaded; there is no insurer portal or system feed. | The insurer channels are not specified (CLQ17). | Confirm the recording and upload (CLQ17). |
+| CLR-CM-08 | Insurer updates (BRCLM.041, 043; FR-CM-022) | Insurer updates are recorded by the handler; an optional upload of insurer claim numbers and updates is offered; there is no insurer portal or system feed. | The minutes of 27-Apr-2026 confirm manual recording; the BRD does not ask for the upload (CLQ17). | Confirm that the optional upload is kept. |
 | CLR-CM-09 | Claim money through BDOI (BRCLM.010 status 12; section 7) | The insurer pays the assured or the repair shop; BDOI receives and pays no claim money. If BDOI handles proceeds, the Cashiering and Disbursement paths are used with a new receipt type and payee class. | The BRD has no flow for claim money through BDOI (CLQ10). | Confirm that BDOI handles no claim money (CLQ10). |
 | CLR-CM-10 | Escalation (section 5) | The follow-up date and the 90-day past due alert drive the monitoring; supervisors see overdue follow-ups on Claims Home; there is no escalation to the TL or UH. | The BRD sets response times but no handling SLA or escalation. | Confirm, or give the escalation rule. |
-| CLR-CM-11 | Migration of claims (p.23; section 7) | Open and historical EBIX / ISYS claims are migrated with the source "migrated" and their legacy reference. | The scope and format of the migration are open (CLQ14). | Give the scope and format (CLQ14). |
+| CLR-CM-11 | Migration of claims (p.25; section 7) | Open and historical EBIX / ISYS claims are migrated with the source "migrated" and their legacy reference. | The scope and format of the migration are open (CLQ14). | Give the scope and format (CLQ14). |
 | CLR-CM-12 | Claims special remittance (BRCLM.010; FR-CM-046) | Operations refuses a claims special remittance for an invoice without an eligible claim. | Agreed with the Remittance owner (OQ46). | Confirm the refusal (OQ46). |
+| CLR-CM-13 | Duplicate insurer claim numbers (BRCLM.043; FR-CM-021) | An insurer claim number already recorded for the same insurer on another claim is refused; the same number of another insurer is accepted. Version 1.0 only warned. | The minutes of 27-Apr-2026 state that duplicate claim numbers for the same insurer are not allowed. | Confirm that no exception is needed (for example an insurer that reuses numbers across years). |
+| CLR-CM-14 | Latest cover version (BRCLM.039; FR-CM-015) | Every validation of a claim uses the latest booked version of the policy year, including endorsements effective after the loss date, which are marked on the cover panel. Version 1.0 used the version in force at the loss date. | The minutes of 27-Apr-2026 state that validation must always use the latest endorsement or cover version. | Confirm that an endorsement effective after the loss date (for example a location added later) is used for the validation of the claim (CLQ02). |
+| CLR-CM-15 | Marketing loss summary (BRCLM.040; FR-CM-065) | Marketing sees loss information read-only through the Loss Experience, Loss Ratio and Claims Aging reports, and the account page shows a loss summary of the account. | The minutes say that no new report is required; the account-page summary goes slightly beyond the existing reports. | Confirm the loss summary on the account page. |
 
 # Sign-off
 
@@ -2044,3 +2063,86 @@ rows:
   - {name: "", role: "Program Manager, Business Project Services", organisation: BDO Unibank ESG}
   - {name: "", role: Project Manager, organisation: iorta TechNXT}
 ```
+
+# Appendix: User-story view
+
+The Workshop Addendum writes BRCLM.037 to 043 as user stories; BRCLM.001 to 036 are written as system capabilities without a persona. This appendix gives each requirement of the file Claims (CLM)_WS Addendum (received on 08-Oct-2026) as one user story, with the FRs that meet it, their acceptance criteria and the test conditions of the test plan with their number of cases. For BRCLM.037 to 043 the BRD wording is kept with tidied grammar and the clarifications of the minutes of 27-Apr-2026; for BRCLM.001 to 036 the story is derived from the requirement and the actor, title and purpose of the FR, with the persona of section 3.1. Acceptance criteria are numbered in the order of the FR (AC1 is the first criterion of the FR). The table has 43 rows; the non-functional requirements are traced in section 8.
+
+<!-- table: widths=2.4,7.5,2.3,2.8,3.4 caption="User-story view: BRD requirement, user story, FRs, acceptance criteria and test cases" size=8 -->
+| BRD ID | User story | FR IDs | Acceptance criteria | Test cases |
+|---|---|---|---|---|
+| BRCLM.001 | As a Claims Officer / Claims Assistant, I need BIBS to identify the unpaid invoices of the cover and disable the claims authorization code while the premium is unpaid, so that no claim is authorised on unpaid premium. | FR-CM-016, FR-CM-046 | FR-CM-016 AC1-4; FR-CM-046 AC1-3 | TC-CM-016.1 to 016.5, 046.1 to 046.3 (10 cases) |
+| BRCLM.002 | As a Unit Head, I need to give users the permissions to access the cover numbers, so that only authorised Claims users see policy coverages. | FR-CM-010, FR-CM-002 | FR-CM-010 AC1-3; FR-CM-002 AC1-3 | TC-CM-010.1 to 010.4, 002.1 to 002.4 (11 cases) |
+| BRCLM.003 | As a Claims Officer / Claims Assistant, I need view access to all cover numbers and versions and to record the cover number and version on each claim, so that I check the coverage the claim falls under. | FR-CM-010, FR-CM-011, FR-CM-015 | FR-CM-010 AC1-3; FR-CM-011 AC1-4; FR-CM-015 AC1-4 | TC-CM-010.1 to 010.4, 011.1 to 011.5, 015.1 to 015.3 (17 cases) |
+| BRCLM.004 | As a Claims Officer / Claims Assistant, I need to maintain the reported date of the claim, so that ageing is counted from the date the loss was reported. | FR-CM-012 | FR-CM-012 AC1-3 | TC-CM-012.1 to 012.4 (6 cases) |
+| BRCLM.005 | As a Team Lead, I need the permission to update a claim status to Closed, so that only authorised users close claims. | FR-CM-045, FR-CM-002 | FR-CM-045 AC1-3; FR-CM-002 AC1-3 | TC-CM-045.1 to 045.3, 002.1 to 002.4 (13 cases) |
+| BRCLM.006 | As a Team Lead, I need the permission to override or enter the claimant's name, so that the claimant is correct when it differs from the assured. | FR-CM-030, FR-CM-002 | FR-CM-030 AC1-3; FR-CM-002 AC1-3 | TC-CM-030.1 to 030.3, 002.1 to 002.4 (10 cases) |
+| BRCLM.007 | As a Claims Officer / Claims Assistant, I need the policy number of the cover on the claim, taken from the policy record, so that I report the claim to the insurer with it. | FR-CM-013 | FR-CM-013 AC1-2 | TC-CM-013.1 to 013.3 (4 cases) |
+| BRCLM.008 | As a Claims Officer / Claims Assistant, I need the policy number shown once the cover is invoiced, so that the insurer has it when the claim is reported. | FR-CM-013 | FR-CM-013 AC1-2 | TC-CM-013.1 to 013.3 (4 cases) |
+| BRCLM.009 | As a Claims Officer / Claims Assistant, I need Philippine Peso as the default currency of claim amounts, so that amounts are entered consistently. | FR-CM-011 | FR-CM-011 AC1-4 | TC-CM-011.1 to 011.5 (8 cases) |
+| BRCLM.010 | As a Unit Head, I need BIBS to maintain the values of the claim status, so that every claim shows where it stands with the adjuster, claimant, insurer or BDOI. | FR-CM-040, FR-CM-046 | FR-CM-040 AC1-2; FR-CM-046 AC1-3 | TC-CM-040.1 to 040.3, 046.1 to 046.3 (7 cases) |
+| BRCLM.011 | As a Team Lead, I need the permission to update the claim status, so that status changes are made only by authorised users. | FR-CM-042, FR-CM-002 | FR-CM-042 AC1-3; FR-CM-002 AC1-3 | TC-CM-042.1 to 042.4, 002.1 to 002.4 (11 cases) |
+| BRCLM.012 | As a Unit Head, I need role- and unit-based permissions for selecting a claim status, so that each role sets only the statuses of its work. | FR-CM-041 | FR-CM-041 AC1-3 | TC-CM-041.1 to 041.4 (4 cases) |
+| BRCLM.013 | As a Claims Officer / Claims Assistant, I need to select only the claim statuses allowed for my role and unit, so that I cannot set a status outside my remit. | FR-CM-041 | FR-CM-041 AC1-3 | TC-CM-041.1 to 041.4 (4 cases) |
+| BRCLM.014 | As a Unit Head, I need BIBS to maintain the values of the requested type of settlement, so that every claim ends with a defined outcome. | FR-CM-043 | FR-CM-043 AC1-2 | TC-CM-043.1 to 043.3 (3 cases) |
+| BRCLM.015 | As a Team Lead, I need the permission to update the requested type of settlement, so that settlement outcomes are set by authorised users. | FR-CM-044, FR-CM-002 | FR-CM-044 AC1-4; FR-CM-002 AC1-3 | TC-CM-044.1 to 044.4, 002.1 to 002.4 (13 cases) |
+| BRCLM.016 | As a Claims Officer / Claims Assistant, I need to see the Marketing team or unit and the BDOI branch of the policy, so that I know whom to inform about the claim. | FR-CM-014 | FR-CM-014 AC1-2 | TC-CM-014.1 to 014.2 (4 cases) |
+| BRCLM.017 | As a Unit Head, I need BIBS to maintain the list of adjusters and appraisers, so that the adjuster of a claim is chosen from accredited firms. | FR-CM-031 | FR-CM-031 AC1-3 | TC-CM-031.1 to 031.4 (6 cases) |
+| BRCLM.018 | As a Team Lead, I need the permission to update the adjuster or appraiser, so that only authorised users change it. | FR-CM-031, FR-CM-002 | FR-CM-031 AC1-3; FR-CM-002 AC1-3 | TC-CM-031.1 to 031.4, 002.1 to 002.4 (12 cases) |
+| BRCLM.019 | As a Team Lead, I need the permission to override the next follow-up date, so that follow-ups are planned by the right people. | FR-CM-050, FR-CM-054, FR-CM-002 | FR-CM-050 AC1-2; FR-CM-054 AC1-2; FR-CM-002 AC1-3 | TC-CM-050.1 to 050.3, 054.1 to 054.3, 002.1 to 002.4 (14 cases) |
+| BRCLM.020 | As a Claims Officer / Claims Assistant, I need a field for the next action plan summary, so that the next step of each claim is clear. | FR-CM-051 | FR-CM-051 AC1-2 | TC-CM-051.1 to 051.3 (5 cases) |
+| BRCLM.021 | As a Claims Officer / Claims Assistant, I need the permission to encode the next action plan summary, so that the plan is kept up to date by the handler. | FR-CM-051, FR-CM-002 | FR-CM-051 AC1-2; FR-CM-002 AC1-3 | TC-CM-051.1 to 051.3, 002.1 to 002.4 (11 cases) |
+| BRCLM.022 | As a Claims Officer / Claims Assistant, I need a diary function, so that I record and follow my claim activities. | FR-CM-052, FR-CM-054 | FR-CM-052 AC1-2; FR-CM-054 AC1-2 | TC-CM-052.1 to 052.4, 054.1 to 054.3 (8 cases) |
+| BRCLM.023 | As a Team Lead, I need a field to amend the insurer reserve, so that the claim shows the reserve the insurer reported. | FR-CM-032 | FR-CM-032 AC1-3 | TC-CM-032.1 to 032.4 (6 cases) |
+| BRCLM.024 | As a Team Lead, I need the permission to amend the insurer reserve, so that reserve changes are made only by authorised users. | FR-CM-032, FR-CM-002 | FR-CM-032 AC1-3; FR-CM-002 AC1-3 | TC-CM-032.1 to 032.4, 002.1 to 002.4 (12 cases) |
+| BRCLM.025 | As a Claims Officer / Claims Assistant, I need BIBS to calculate the overall age of each claim from the reported date, so that old claims are visible. | FR-CM-053 | FR-CM-053 AC1-3 | TC-CM-053.1 to 053.3 (4 cases) |
+| BRCLM.026 | As a Unit Head, I need the Claims Aging Report with the overall age from the reported date, so that I monitor how long claims stay open. | FR-CM-060 | FR-CM-060 AC1-3 | TC-CM-060.1 to 060.4 (5 cases) |
+| BRCLM.027 | As a Claims Officer / Claims Assistant, I need BIBS to calculate the age of a claim per status, so that I see where claims wait. | FR-CM-053, FR-CM-042 | FR-CM-053 AC1-3; FR-CM-042 AC1-3 | TC-CM-053.1 to 053.3, 042.1 to 042.4 (9 cases) |
+| BRCLM.028 | As a Unit Head, I need the Claims Aging Report per status, so that delays per status are visible. | FR-CM-060 | FR-CM-060 AC1-3 | TC-CM-060.1 to 060.4 (5 cases) |
+| BRCLM.029 | As a Unit Head, I need the Settled Claims report, so that settled claims and amounts are known. | FR-CM-061, FR-CM-044 | FR-CM-061 AC1-3; FR-CM-044 AC1-4 | TC-CM-061.1 to 061.5, 044.1 to 044.4 (13 cases) |
+| BRCLM.030 | As a Unit Head, I need the Loss Experience report, so that losses per client and cover are known. | FR-CM-062 | FR-CM-062 AC1-3 | TC-CM-062.1 to 062.4 (5 cases) |
+| BRCLM.031 | As a Unit Head, I need the Outstanding Claims report, so that open claims are followed up. | FR-CM-061 | FR-CM-061 AC1-3 | TC-CM-061.1 to 061.5 (6 cases) |
+| BRCLM.032 | As a Unit Head, I need the Loss Ratio report, so that losses are compared with the premium. | FR-CM-062 | FR-CM-062 AC1-3 | TC-CM-062.1 to 062.4 (5 cases) |
+| BRCLM.033 | As a Claims / Risk user, I need access to the claims data to produce the reports and analyses I need, so that questions beyond the standard reports are answered. | FR-CM-064 | FR-CM-064 AC1-2 | TC-CM-064.1 to 064.3 (3 cases) |
+| BRCLM.034 | As a Claims Officer / Claims Assistant, I need BIBS to track and report the pending actions of the claims, so that no follow-up is missed. | FR-CM-054, FR-CM-061, FR-CM-055 | FR-CM-054 AC1-2; FR-CM-061 AC1-3; FR-CM-055 AC1-3 | TC-CM-054.1 to 054.3, 061.1 to 061.5, 055.1 to 055.3 (14 cases) |
+| BRCLM.035 | As a Claims Officer / Claims Assistant, I need to tag a closure as temporary or permanent, so that temporarily closed claims can resume. | FR-CM-045 | FR-CM-045 AC1-3 | TC-CM-045.1 to 045.3 (7 cases) |
+| BRCLM.036 | As a Unit Head, I need BIBS to maintain the catastrophe codes, so that claims from one event are grouped and reported. | FR-CM-033 | FR-CM-033 AC1-2 | TC-CM-033.1 to 033.3 (3 cases) |
+| BRCLM.037 | As a Claims Officer / Claims Assistant, I need to link several insured locations of the cover to one claim - mainly for non-motor products, grouped per client and per risk - so that a multi-location loss stays one claim and no location outside the cover is claimed. | FR-CM-020 | FR-CM-020 AC1-3 | TC-CM-020.1 to 020.3 (6 cases) |
+| BRCLM.038 | As a Claims / Risk user, I need on-demand reports of claims by location and of claims-prone locations, so that risk patterns are identified. | FR-CM-063 | FR-CM-063 AC1-3 | TC-CM-063.1 to 063.3 (3 cases) |
+| BRCLM.039 | As a Claims Officer / Claims Assistant, I need every claim validated against the latest endorsement or cover version, with the cover number and version shown and a newer version flagged, while the policy data stays view-only, so that the claim is checked against current terms. | FR-CM-015 | FR-CM-015 AC1-4 | TC-CM-015.1 to 015.3 (4 cases) |
+| BRCLM.040 | As a Marketing user, I need controlled, read-only access to loss information through the existing claims reports (loss experience, loss ratio, claims ageing), so that I use it for renewal, pricing and client discussions. | FR-CM-065 | FR-CM-065 AC1-4 | TC-CM-065.1 to 065.4 (5 cases) |
+| BRCLM.041 | As a Claims Officer / Claims Assistant, I need to record the claims reported by insurers and the insurer's updates (e-mails, calls, documents) with date, source and remarks on the claim, so that insurer communications are central and auditable. | FR-CM-022, FR-CM-011, FR-CM-003, FR-CM-066 | FR-CM-022 AC1-3; FR-CM-011 AC1-4; FR-CM-003 AC1-3; FR-CM-066 AC1-2 | TC-CM-022.1 to 022.4, 011.1 to 011.5, 003.1 to 003.3, 066.1 to 066.3 (19 cases) |
+| BRCLM.042 | As a Claims Officer / Claims Assistant, I need both the internal and the insurer location references visible and auditable on every claim location, so that the insurer's references match ours. | FR-CM-023, FR-CM-003, FR-CM-066 | FR-CM-023 AC1-2; FR-CM-003 AC1-3; FR-CM-066 AC1-2 | TC-CM-023.1 to 023.3, 003.1 to 003.3, 066.1 to 066.3 (11 cases) |
+| BRCLM.043 | As a Claims Officer / Claims Assistant, I need to record the claim number of each insurer of an incident under one claim, with no duplicate number for the same insurer, so that every insurer's number is visible, searchable and reportable. | FR-CM-021, FR-CM-066, FR-CM-055 | FR-CM-021 AC1-4; FR-CM-066 AC1-2; FR-CM-055 AC1-3 | TC-CM-021.1 to 021.4, 066.1 to 066.3, 055.1 to 055.3 (15 cases) |
+
+<!-- landscape -->
+
+# Appendix: Storyboard index
+
+Claims has no end-to-end walkthroughs with screenshots yet. This index gives the storyboard of the claim lifecycle from the process flow of section 2.2 (Figure 1): one frame per step, with the persona, the step, the screen or document used, the outcome and the FRs. The screen-level frames with screenshots follow with the v2.0 business sign-off pack of BRD-7 (Drop 2), which adds the walkthroughs and the UX Screen Deck.
+
+<!-- table: widths=1.3,2.8,5.6,3.6,5.2,2.2 caption="Storyboard of the business processes: frame, persona, step, screen or document, outcome and FR" size=8 -->
+| Frame | Persona | Step | Screen or document | Outcome | FR |
+|---|---|---|---|---|---|
+| **P1** | | **Recording and notice of loss** | | | |
+| P1.1 | Claims Officer / Claims Assistant | Receives the notice of loss and looks up the cover | Cover Lookup | Cover number, latest version, policy number, Marketing unit and branch shown read-only | FR-CM-010, FR-CM-013, FR-CM-014, FR-CM-015 |
+| P1.2 | Claims Officer / Claims Assistant | Records the claim with reported date, loss date, nature, locations and insurers | Record Claim | Claim number; locations of the cover only; Multi-location and Multi-insurer flags | FR-CM-011, FR-CM-012, FR-CM-020, FR-CM-021 |
+| P1.3 | Claims Officer / Claims Assistant | Checks the premium of the cover | Claim record (cover card) | PAID enables the authorization code; unpaid premium disables it | FR-CM-016 |
+| P1.4 | Claims Officer / Claims Assistant | Sends the loss advice to the insurers | Claim record (Send Loss Advice); loss advice document | One e-mail per insurer; the advice stored as claims report | FR-CM-024 |
+| P1.5 | Claims Officer / Claims Assistant | Records the insurer claim numbers and updates | Claim record (Insurers & Updates) | One number per insurer, no duplicate for the same insurer; updates in the timeline | FR-CM-021, FR-CM-022 |
+| **P2** | | **Handling and follow-up** | | | |
+| P2.1 | Team Lead | Assigns the adjuster and amends the insurer reserve | Claim record (Details, Reserve & Settlement) | Adjuster and reserve recorded with history | FR-CM-031, FR-CM-032 |
+| P2.2 | Claims Officer / Claims Assistant | Updates the status within the role and unit matrix | Claim record (Update Status) | New status with age per status; not-allowed statuses are not offered | FR-CM-040, FR-CM-041, FR-CM-042 |
+| P2.3 | Claims Officer / Claims Assistant | Sets the next follow-up date and action plan and writes diary entries | Claim record (Details, Diary); Follow-ups Due | Follow-ups due listed; supervisors see overdue ones | FR-CM-050, FR-CM-051, FR-CM-052, FR-CM-054 |
+| P2.4 | Team Lead | Requests the premium remittance and confirms the special remittance | Claim record; Operations remittance | Status With BDOI - For Premium Remittance; remittance confirmed | FR-CM-046 |
+| **P3** | | **Settlement and closure** | | | |
+| P3.1 | Team Lead | Sets the requested type of settlement with amount, date and payment method | Claim record (Set Settlement) | Settled claim in the Settled Claims report | FR-CM-043, FR-CM-044 |
+| P3.2 | Claims Officer / Claims Assistant | Closes a claim temporarily for missing documents | Claim record | Claim stays outstanding and can resume | FR-CM-045 |
+| P3.3 | Team Head | Closes a claim permanently and reopens one with a reason | Claim record | Closed claim read-only; reopen recorded | FR-CM-045 |
+| **P4** | | **Monitoring and analytics** | | | |
+| P4.1 | Claims Officer / Claims Assistant | Opens the Claims home and the pending actions | Claims Home; Pending Actions | Claims by age and status; pending actions per handler | FR-CM-053, FR-CM-055 |
+| P4.2 | Unit Head | Runs the ageing, outstanding, settled, loss experience and loss ratio reports | Reports (Claims Handling) | Reports in Excel and PDF from the same data | FR-CM-060, FR-CM-061, FR-CM-062 |
+| P4.3 | Claims / Risk user | Runs the claims-prone locations report and the data extract | Reports (BCL-PRONE-LOCATIONS, BCL-DATA-EXTRACT) | Locations flagged claims-prone; extract for analysis | FR-CM-063, FR-CM-064 |
+| P4.4 | Marketing user | Views the loss experience and the claims ageing of a client | Reports; account page | Read-only loss information; export only where the role allows | FR-CM-065 |
+| P4.5 | Unit Head | Reviews the insurer claim numbers and the activity log | Reports (BCL-INSURER-CLAIMS, BCL-ACTIVITY-LOG) | Every insurer number with its claim; every change with user and time | FR-CM-066, FR-CM-003 |
+

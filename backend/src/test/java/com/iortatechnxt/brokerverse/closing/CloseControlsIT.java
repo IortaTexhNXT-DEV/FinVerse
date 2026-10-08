@@ -184,7 +184,7 @@ class CloseControlsIT {
         .isInstanceOf(BusinessRuleException.class);
     assertThat(periods.requirePostingPeriod(company, date, true, null).getId())
         .isEqualTo(january.getId());
-    assertThat(errorCode(() -> publisher.publish(event(company, branch, date, "UNDERWRITING"))))
+    assertThat(errorCode(() -> publisher.publish(event(company, branch, date, "PAYABLES"))))
         .isNotEqualTo("BOOKS_CLOSED");
 
     as.run(
@@ -226,19 +226,19 @@ class CloseControlsIT {
   private static BusinessEvent event(Long company, Long branch, LocalDate date, String module) {
     String key = UUID.randomUUID().toString();
     return new BusinessEvent(
-        "POLICY_ISSUE",
+        "MISC_RECEIPT",
         company,
         branch,
         date,
         "PHP",
         module,
         key,
-        "POL-" + key,
+        "OR-" + key,
         null,
         "FIRE",
         null,
         "Cut-off test",
-        Map.of("GROSS_PREMIUM", new BigDecimal("100.00"), "TOTAL_DUE", new BigDecimal("100.00")),
+        Map.of("AMOUNT", new BigDecimal("100.00")),
         Map.of());
   }
 }

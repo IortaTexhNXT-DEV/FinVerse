@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.renewal.extraction.service;
 
 import com.iortatechnxt.brokerverse.alert.domain.AlertFacts;
 import com.iortatechnxt.brokerverse.alert.service.AlertService;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.organization.domain.Company;
 import com.iortatechnxt.brokerverse.organization.domain.CompanyRepository;
 import com.iortatechnxt.brokerverse.renewal.domain.ExtractionRun;
@@ -85,7 +86,10 @@ public class ExtractionJob implements ManagedJob {
                 null,
                 RenewalCodes.ENTITY,
                 JOB_NAME,
-                "The renewal extraction of " + businessDate + " failed: " + e.getMessage(),
+                "The renewal extraction of "
+                    + DisplayFormat.date(businessDate)
+                    + " failed: "
+                    + e.getMessage(),
                 null,
                 RenewalCodes.ALERT_EXTRACTION_FAILED + ":" + company.getId() + ":" + businessDate));
       }

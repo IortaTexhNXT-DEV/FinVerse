@@ -135,6 +135,8 @@ export interface CandidateRow {
   flags: FlagChips;
   expiry: string;
   daysToExpiry: number;
+  /** Names of the insurer and the owner unit, read by the server for every Renewal user. */
+  names?: { insurer: string | null; ownerUnit: string | null; product?: string | null };
 }
 
 export interface Lifecycle {
@@ -206,7 +208,13 @@ export interface ChecksView {
     by: string;
     at: string;
   }[];
-  endorsements: { reference: string; source: string; status: string; linkedAt: string }[];
+  endorsements: {
+    reference: string;
+    source: string | null;
+    /** The status of the endorsement when it was linked; absent when not known. */
+    status?: string | null;
+    linkedAt: string;
+  }[];
 }
 
 export interface HistoryView {

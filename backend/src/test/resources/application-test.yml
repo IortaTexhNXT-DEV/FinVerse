@@ -1,6 +1,6 @@
 spring:
   flyway:
-    locations: classpath:db/migration,classpath:db/seed
+    locations: classpath:db/migration,classpath:db/seed,classpath:db/testdata
 management:
   health:
     redis:
@@ -17,7 +17,7 @@ brokerverse:
       reset-max-per-address: 100000
   migration:
     masking-key: test-masking-key-for-automated-tests-0123456789
-  # No Redis or Kafka in the test profile: in-memory cache, database fallbacks, events LOCAL.
+  # No Valkey or Kafka in the test profile: in-memory cache, database fallbacks, events LOCAL.
   redis:
     enabled: false
   kafka:

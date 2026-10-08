@@ -3,14 +3,17 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { renewalApi } from '@/api/renewal';
 import type { PackageChoiceView } from '@/api/renewal';
-import { Button } from '@/components/ui/Button';
+import { ProductName } from '@/components/broking/LovLabel';
 import { Card } from '@/components/ui/Card';
+import { CellStack } from '@/components/ui/CellStack';
+import { RowActions } from '@/components/ui/RowActions';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { UserName } from '@/components/ui/UserName';
 import { useToast } from '@/components/ui/toastContext';
 import { formatDateTime } from '@/utils/format';
 import { TextDialog } from '../common/ActionDialogs';
+import { decisionActions, versionText } from '../common/presentation';
 
 interface Pending {
   choice: PackageChoiceView;
@@ -63,34 +66,35 @@ export function PackageChoicesTab() {
           {
             key: 'target',
             header: 'Proposed',
-            render: (r) => `${r.choice.productCode} v${String(r.choice.productVersionNo)}`,
+            render: (r) => (
+              <CellStack
+                main={<ProductName code={r.choice.productCode} />}
+                sub={versionText(r.choice.productVersionNo)}
+              />
+            ),
           },
           { key: 'reason', header: 'Reason', render: (r) => r.choice.reason },
           {
             key: 'maker',
             header: 'Proposed by',
             render: (r) => (
-              <>
-                <UserName login={r.choice.maker} /> {formatDateTime(r.choice.createdAt)}
-              </>
+              <CellStack
+                main={<UserName login={r.choice.maker} />}
+                sub={formatDateTime(r.choice.createdAt)}
+              />
             ),
           },
           {
             key: 'act',
             header: '',
             render: (r) => (
-              <span className="rnw-actions">
-                <Button size="sm" onClick={() => setDeciding({ row: r, approve: true })}>
-                  Approve
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => setDeciding({ row: r, approve: false })}
-                >
-                  Reject
-                </Button>
-              </span>
+              <RowActions
+                record={r.renewalRef}
+                actions={decisionActions({
+                  approve: () => setDeciding({ row: r, approve: true }),
+                  reject: () => setDeciding({ row: r, approve: false }),
+                })}
+              />
             ),
           },
         ]}

@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * Deletes expired rows of the database fallback of the session state ({@code sec_revoked_token},
- * {@code sys_shared_counter}). With Redis the entries expire by themselves and the tables stay
+ * {@code sys_shared_counter}). With Valkey the entries expire by themselves and the tables stay
  * empty.
  */
 @Component
@@ -47,7 +47,7 @@ public class SharedStateCleanupJob implements ManagedJob {
 
   @Override
   public String description() {
-    return "Deletes expired revoked tokens and shared counters (database fallback of Redis)";
+    return "Deletes expired revoked tokens and shared counters (database fallback of Valkey)";
   }
 
   @Override

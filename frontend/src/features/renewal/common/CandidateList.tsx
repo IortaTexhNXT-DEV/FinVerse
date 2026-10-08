@@ -149,7 +149,9 @@ export function CandidateList({
     enabled: companyId > 0,
   });
   const rows = list.data?.content ?? [];
-  const columns = candidateColumns(rows.some((r) => r.money.currency !== null));
+  // The amounts are hidden from the users who may not read them (LAMD, Contact Center): the
+  // server leaves them out of the rows, and the list then has no amount column.
+  const columns = candidateColumns(rows.some((r) => Boolean(r.money.currency)));
   const allColumns = actions
     ? [
         selectionColumn(

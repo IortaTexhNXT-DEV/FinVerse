@@ -1,0 +1,146 @@
+# Data domains of BIBS: the packages (bounded contexts) of the modular monolith grouped by business domain, with the
+# BRD that owns the domain and the BDOI data owner. Used by build_secdata_pack.py for the Data Dictionary sheets, the
+# entity relationship diagrams (one figure per package) and the master data and ownership tables of the Data
+# Architecture. Table prefixes are listed for the tables that have no persistent entity class (read by the
+# platform directly); every other table is placed by the package of its entity class (data/descriptions.json).
+excluded:
+  # Insurer-company modules being removed from BIBS (BIBS is broker-only). Their tables are not part of the
+  # dictionary or the diagrams.
+  prefixes: [uw_, clm_, ri_, rsv_, con_, ic_]
+  packages: [underwriting, claims, reinsurance, reserves, consolidation]
+  meaning:
+    uw_: Insurer underwriting (insurer products, quotations, policies, endorsements, open covers)
+    clm_: Insurer claims (estimates, settlements, recoveries, letters of guarantee, claim movements)
+    ri_: Reinsurance treaty and cession accounting
+    rsv_: Actuarial reserves (unearned premium, IBNR, outstanding loss valuation)
+    con_: Group consolidation (groups, members, consolidation runs)
+    ic_: Inter-company relationships and transactions of group consolidation
+prefix_packages:
+  csh_: cashiering
+  evt_: events
+  fin_: finreport
+  frbs_: frbs
+  gl_: ledger
+  sec_: security
+  sys_: system
+  tax_: tax
+domains:
+  - id: D01
+    name: Security and User Access
+    sheet: D01 Security and Access
+    brd: BRD-11
+    owner: BDOI Information Security (policy); Business Administration (user access requests); System Administrator (role implementation)
+    packages: [security, nbadmin]
+    summary: Users, roles, permissions, data scope (companies and branches), sign-in sessions, second factor, single sign-on requests and tickets, password history, user access requests with their approvers and events, separation-of-duties rules, access change log and the retention rules of the broking records.
+  - id: D02
+    name: Platform Services
+    sheet: D02 Platform Services
+    brd: BRD-00
+    owner: BDOI IT (platform operation); System Administrator (parameters, jobs, templates)
+    packages: [system, sharedstate, audit, lov, workflow, approval, messaging, alert, bulk, attachment, docgen, storage, report, events, common]
+    summary: System parameters and scheduled jobs, the insert-only audit trail, lists of values, workflow cases and history, notifications and messages, alerts, bulk uploads, attachments and file metadata, document templates and renditions, the report framework, the transactional outbox of integration events and the document number sequences.
+  - id: D03
+    name: Organisation and Reference Data
+    sheet: D03 Organisation
+    brd: BRD-00
+    owner: Head - Comptrollership (companies, branches, cost centres, periods, currencies)
+    packages: [organization, currency, dimension, period]
+    summary: Companies, branches (Office Master), employees, holiday calendars, currencies and exchange rates, cost centres and other dimensions, fiscal years and periods.
+  - id: D04
+    name: Client and Party
+    sheet: D04 Client and Party
+    brd: BRD-01
+    owner: Product Owner, Marketing Business System (clients); Head - Comptrollership (business partners)
+    packages: [crm, party]
+    summary: Clients (prospect and confirmed) with KYC documents, contacts, tags, special instructions and note history; the business partner master shared with the finance modules.
+  - id: D05
+    name: Product Catalogue and Maintenance
+    sheet: D05 Product Catalogue
+    brd: BRD-03
+    owner: Product Owner, Marketing Business System (with the Technical Support Unit for package requests)
+    packages: [catalog, productmaint]
+    summary: Insurers and their branches, product lines, products, packages and their versions, rates, commission and incentive set-up, package requests and negotiation.
+  - id: D06
+    name: New Business
+    sheet: D06 New Business
+    brd: BRD-01
+    owner: Product Owner, Marketing Business System; Unit Head - Processing (placement, issuance, booking)
+    packages: [quotation, nonpackage, account, placement, issuance, booking, nbreport]
+    summary: Package quotations, non-package proposal requests, accounts and their risk items, placement with insurers (slips, payment gates, hold covers), policy issuance, booking and the booked invoices, and the saved report variants of New Business.
+  - id: D07
+    name: Operations
+    sheet: D07 Operations
+    brd: BRD-02
+    owner: "Operations: Financial Transactions and Processing"
+    packages: [opsledger, cashiering, remittance, prodrecon, adjustment, commission]
+    summary: The invoice ledger and its movements, cashiering (receipts, payment intake, matching and application, unapplied payments), remittance to insurers, production reconciliation, endorsements and adjustments, and commission receivables with incentive schemes.
+  - id: D08
+    name: Collections
+    sheet: D08 Collections
+    brd: BRD-04
+    owner: Collections and Marketing Support
+    packages: [collections]
+    summary: The collection worklist, collection accounts and items, dispositions, promises to pay, instalments, escalations, billing statements and unapplied payment requests.
+  - id: D09
+    name: General Ledger and Finance
+    sheet: D09 GL and Finance
+    brd: BRD-05
+    owner: Product Owner - Comptrollership - FRBS and ACSL; Head - Comptrollership
+    packages: [coa, journal, ledger, subledger, accounting, closing, budget, finreport, frbs, receivables, fixedasset, investment, tax]
+    summary: Chart of accounts, journals, the immutable ledger and daily balances, open items, the accounting event register and rules, period close and year-end, budgets, financial statements and schedules, the BDOI report pack, bank reconciliation, fixed assets, investments and the BIR tax returns and certificates.
+  - id: D10
+    name: Disbursement and ACSL
+    sheet: D10 Disbursement and ACSL
+    brd: BRD-05
+    owner: Product Owner - Comptrollership - Disbursement; Product Owners - Comptrollership - ACSL
+    packages: [disbursement, payables, payrequest, acsl]
+    summary: Payees, disbursement requests and vouchers with their payment instruments, payables masters, Marketing refund and cash-advance requests, insurer statement of account and GL-SL reconciliation, investigation cases and correction entries.
+  - id: D11
+    name: Renewal
+    sheet: D11 Renewal
+    brd: BRD-06
+    owner: Product Owner, Renewal
+    packages: [renewal]
+    summary: Renewal candidates and their extraction runs, checks, dispositions, renewal letters, insurer quotations and acceptances.
+  - id: D12
+    name: Claims Broking
+    sheet: D12 Claims Broking
+    brd: BRD-07
+    owner: Product Owner, Claims (with the Unit Head - Claims and Risk Management)
+    packages: [brokerclaims]
+    summary: Claims reported by clients and followed with the insurers, insurer lines and updates, reserve changes as advised, status history, diary and documents. BIBS posts no claim journal.
+  - id: D13
+    name: Employee Benefits
+    sheet: D13 Employee Benefits
+    brd: BRD-08
+    owner: Product Owner, Employee Benefits
+    packages: [eb]
+    summary: Employee benefits programmes, proposals, benefit lines and plans, census and member movements, billing cycles, tracked items and turnaround times.
+  - id: D14
+    name: Customer Servicing Facility
+    sheet: D14 Customer Servicing
+    brd: BRD-09
+    owner: Product Owner, Customer Servicing Facility
+    packages: [csf]
+    summary: Client service requests, contact changes with their verification and synchronisation, activities and referrals.
+  - id: D15
+    name: Sanction Screening
+    sheet: D15 Sanction Screening
+    brd: BRD-10
+    owner: Compliance Officer (AMLA), with the Unit Head - Claims and Risk Management for risk profiling
+    packages: [screening]
+    summary: Watchlists and their changes, screening runs and hits, cases with reviews and committee votes, client risk profiles, configuration versions and validation rules, and suspicious transaction reports.
+  - id: D16
+    name: Submitted Policies
+    sheet: D16 Submitted Policies
+    brd: BRD-12
+    owner: Product Owner, Submitted Policies
+    packages: [submitted]
+    summary: The masterlist of policies submitted by insurers and partners, reviews, IAAF and TOR records, letters, fees and the renewal hand-off.
+  - id: D17
+    name: Data Migration
+    sheet: D17 Data Migration
+    brd: BRD-13
+    owner: Data Migration Lead (BDOI), with the data owner of each object
+    packages: [migration]
+    summary: Migration objects, load batches and staging rows, code maps, quality rules and results, reconciliation, sign-off gates, the legacy archive with its access log, and decommissioning.

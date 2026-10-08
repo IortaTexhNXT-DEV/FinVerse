@@ -27,7 +27,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import java.time.Clock;
 import java.time.Instant;
+import java.util.Locale;
 import java.util.Map;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -66,6 +68,7 @@ public class AuthController {
   private final RefreshCookies cookies;
   private final AuthPasswordPolicy passwordPolicy;
   private final SsoProperties sso;
+  private final String environment;
 
   /**
    * Creates the controller.
@@ -79,6 +82,7 @@ public class AuthController {
    * @param cookies refresh token cookie
    * @param passwordPolicy sign-in mode
    * @param sso single sign-on settings
+   * @param environment {@code brokerverse.environment}, shown on the sign-in page
    */
   @SuppressWarnings("java:S107") // endpoints of the sign-in
   public AuthController(
@@ -90,7 +94,8 @@ public class AuthController {
       SignInSessions signInSessions,
       RefreshCookies cookies,
       AuthPasswordPolicy passwordPolicy,
-      SsoProperties sso) {
+      SsoProperties sso,
+      @Value("${brokerverse.environment:local}") String environment) {
     this.authService = authService;
     this.passwords = passwords;
     this.profiles = profiles;
@@ -100,6 +105,7 @@ public class AuthController {
     this.cookies = cookies;
     this.passwordPolicy = passwordPolicy;
     this.sso = sso;
+    this.environment = environment.trim().toLowerCase(Locale.ROOT);
   }
 
   /**
@@ -116,7 +122,8 @@ public class AuthController {
         mode.singleSignOn(),
         mode.singleSignOn() ? sso.label() : null,
         !mode.singleSignOn(),
-        mode == AuthMode.LOCAL);
+        mode == AuthMode.LOCAL,
+        environment);
   }
 
   /**

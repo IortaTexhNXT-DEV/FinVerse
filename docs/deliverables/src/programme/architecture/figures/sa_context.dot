@@ -1,0 +1,37 @@
+// BIBS system context: users, BIBS and the systems it exchanges data with (Solution Architecture, chapter 3).
+digraph sa_context {
+  graph [rankdir=LR, fontname="Arial", nodesep=0.18, ranksep=1.1, bgcolor="white", pad=0.2, newrank=true,
+         label=<<font point-size="16" color="@HEADER_BLUE"><b>BIBS system context</b></font><br/><font point-size="10" color="@MUTED">Users reach BIBS through the BDO network; systems through Apigee X or file exchange. All external touch-points are owned by BDOI IT.</font>>,
+         labelloc=t, labeljust=l];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.0, fontname="Arial", fontsize=11,
+         fontcolor="@NEAR_BLACK", margin="0.14,0.07", fillcolor="@WHITE", width=3.2];
+  edge  [color="@HEADER_BLUE", arrowsize=0.6, penwidth=1.0, fontname="Arial", fontsize=9, fontcolor="@MUTED"];
+
+  subgraph cluster_users {
+    label=<<b>BDOI users</b><br/><font point-size="9">1,344 named, 429 concurrent at peak</font>>; fontsize=11; style="rounded,dashed"; color="@MUTED";
+    u1 [label=<<b>Marketing, TSU, MBS</b><br/><font point-size="9">quotation, PRF, packages</font>>, fillcolor="@BG_BLUE"];
+    u2 [label=<<b>Processing, Operations</b><br/><font point-size="9">placement, booking, cashiering,<br/>remittance, adjustment</font>>, fillcolor="@BG_BLUE"];
+    u3 [label=<<b>Collections, Accounting</b><br/><font point-size="9">collections, disbursement, ACSL, GL</font>>, fillcolor="@BG_BLUE"];
+    u4 [label=<<b>Claims, EB, CSF, Compliance</b><br/><font point-size="9">claims, benefits, servicing, screening</font>>, fillcolor="@BG_BLUE"];
+    u5 [label=<<b>Administrators, auditors</b><br/><font point-size="9">access, parameters, audit</font>>, fillcolor="@BG_BLUE"];
+  }
+
+  bibs [label=<<b>BIBS</b><br/>BDOI Broker System<br/><font point-size="10">on iNXT BrokerVerse<br/><br/>React web client<br/>modular monolith backend<br/><br/>PostgreSQL 16, Valkey 8,<br/>Kafka 3.9, Amazon S3</font>>,
+        fillcolor="@HEADER_BLUE", fontcolor="@WHITE", fontsize=14, margin="0.3,0.3", width=2.6];
+
+  subgraph cluster_sys {
+    label=<<b>BDO systems and external parties</b>>; fontsize=11; style="rounded,dashed"; color="@MUTED";
+    eiam [label=<<b>EIAM (Entra ID)</b><br/><font point-size="9">single sign-on - OIDC</font>>];
+    isc  [label=<<b>UIDM-ISC</b><br/><font point-size="9">provisioning - SCIM</font>>];
+    loans [label=<<b>LMS, HL-LOAS, LFS</b><br/><font point-size="9">loan data, quotation requests</font>>];
+    bank [label=<<b>CMS / New BOB, OBPCS, Old BOB,<br/>AFTS, PMS</b><br/><font point-size="9">payment and collection files</font>>];
+    ins [label=<<b>Insurers</b><br/><font point-size="9">slips, e-policies, SOAs, remittances, claims</font>>];
+    ecm [label=<<b>ECM, CCM, M365</b><br/><font point-size="9">records archive, e-mail</font>>];
+    egl [label=<<b>EGL, EDP</b><br/><font point-size="9">ledger feed, data platform</font>>];
+    reg [label=<<b>BIR, AMLC, watchlists</b><br/><font point-size="9">returns, STRs, PEP lists (manual or files)</font>>];
+  }
+
+  {u1 u2 u3 u4 u5} -> bibs [label="HTTPS"];
+  bibs -> eiam [dir=both]; bibs -> isc [dir=back]; bibs -> loans [dir=back];
+  bibs -> bank [dir=both]; bibs -> ins [dir=both]; bibs -> ecm; bibs -> egl; bibs -> reg [dir=both];
+}

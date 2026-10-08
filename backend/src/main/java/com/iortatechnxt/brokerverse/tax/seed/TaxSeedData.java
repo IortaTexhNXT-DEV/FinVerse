@@ -24,12 +24,11 @@ import org.springframework.stereotype.Component;
 
 /**
  * SEED PROFILE ONLY: tax and statutory seed data of the seed company FVI, created through the
- * services after every other seed runner (the worksheets read their policies, invoices and
- * postings):
+ * services after every other seed runner (the worksheets read their invoices and postings):
  *
  * <ul>
  *   <li>tax codes and ATCs, the filing calendar, tax profiles of the seed suppliers, agents,
- *       brokers and two customers, and the IC schedule mapping ({@link TaxSeedMasters});
+ *       brokers and two customers ({@link TaxSeedMasters});
  *   <li>every tracked return of Q1 and Q2 2026 prepared by "accountant", filed and paid by
  *       "checker" two days before its due date from bank account BDO-CA (remittance journals
  *       posted);

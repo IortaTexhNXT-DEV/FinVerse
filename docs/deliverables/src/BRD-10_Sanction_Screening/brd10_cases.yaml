@@ -11,8 +11,8 @@ meta:
   code: SS
   frs: FRS_BRD10_SANCTION_SCREENING.md
   summary: TP_BRD10_SANCTION_SCREENING.md
-  version: "1.0"
-  date: 25 September 2026
+  version: "1.1"
+  date: 08 October 2026
   verify_messages: false
 
 personas:
@@ -2087,6 +2087,7 @@ frs:
       - The case status report filtered by marketing unit and case status lists only those cases.
       - Each report exports to CSV, XLSX and PDF with the same rows and prints the parameters, user and time in the header.
       - A user without SCR_REPORT_VIEW cannot run the reports; a date range with the end before the start is refused.
+      - The Name Matching Fall-out report lists the potential matches below the case threshold with the Account Officer in charge and the Marketing Business Unit.
     cases:
       - c: 1
         type: Report-output
@@ -2122,6 +2123,12 @@ frs:
           - Run SCR-CASE-STATUS with the end date before the start date.
         expected: Not run.
         msg: [The end date must be on or after the start date]
+      - c: 4
+        type: Report-output
+        title: Name matching fall-out of the month
+        steps:
+          - Run SCR-NAME-MATCH-FALLOUT for the month; export to XLSX.
+        expected: Each potential match that scored at or above the matching threshold and below the case threshold is listed with its score, the ingest date of the list, the sanctioned name, the client, the Account Officer in charge and the Marketing Business Unit; matches that opened a case are not listed.
 
   FR-SS-091:
     scenario: SC-SS-01

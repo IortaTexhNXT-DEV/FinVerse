@@ -7,8 +7,9 @@ import java.util.Optional;
  * them at a time. {@link JobRunService} takes it for every run; a run that finds it taken is
  * recorded as {@code SKIPPED_LOCKED}.
  *
- * <p>Implemented on Redis ({@code SET NX PX} with a fencing token and a lease renewed while the job
- * runs) or, when Redis is disabled, on a PostgreSQL advisory lock (module {@code sharedstate}).
+ * <p>Implemented on Valkey ({@code SET NX PX} with a fencing token and a lease renewed while the
+ * job runs) or, when Valkey is disabled, on a PostgreSQL advisory lock (module {@code
+ * sharedstate}).
  */
 public interface JobLock {
 

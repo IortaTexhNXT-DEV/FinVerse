@@ -84,7 +84,6 @@ public class DashboardService {
         income.subtract(expense),
         sumGroups(position, AccountClass.ASSET, properties.cashGroups()),
         sumGroups(position, AccountClass.ASSET, properties.receivableGroups()),
-        sumGroups(position, AccountClass.LIABILITY, properties.reserveGroups()),
         FinancialStatementService.total(position.lines(), AccountClass.ASSET),
         equity,
         journals.countByCompanyIdAndStatusIn(companyId, EnumSet.of(JournalStatus.PENDING_APPROVAL)),

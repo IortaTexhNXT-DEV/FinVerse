@@ -11,7 +11,6 @@ import com.iortatechnxt.brokerverse.tax.domain.TaxReturn;
 import com.iortatechnxt.brokerverse.tax.seed.TaxSeedData;
 import com.iortatechnxt.brokerverse.tax.seed.TaxSeedMasters;
 import com.iortatechnxt.brokerverse.tax.service.Certificate2307Service;
-import com.iortatechnxt.brokerverse.tax.service.IcMappingService;
 import com.iortatechnxt.brokerverse.tax.service.PartyTaxProfileService;
 import com.iortatechnxt.brokerverse.tax.service.TaxCalendarService;
 import com.iortatechnxt.brokerverse.tax.service.TaxCodeService;
@@ -35,14 +34,13 @@ class TaxSeedDataIT {
   @Autowired private Certificate2307Service certificates;
   @Autowired private TaxCodeService codes;
   @Autowired private PartyTaxProfileService profiles;
-  @Autowired private IcMappingService mappings;
   @Autowired private SeedActor actor;
   @Autowired private TaxFixtures fixtures;
 
   @Test
   void loadsIdempotentTaxSeedData() {
     fixtures.masters();
-    fixtures.firePolicy(LocalDate.of(2026, 2, 16), "40000");
+    fixtures.supplierInvoice(LocalDate.of(2026, 2, 16), "40000");
     fixtures.supplierInvoice(LocalDate.of(2026, 5, 11), "8000");
     TaxSeedData loader =
         new TaxSeedData(organization, masters, calendar, returns, certificates, actor);
@@ -52,7 +50,6 @@ class TaxSeedDataIT {
     Long company = fixtures.companyId();
     assertThat(codes.list(company)).hasSizeGreaterThanOrEqualTo(20);
     assertThat(profiles.list(company)).extracting("partyCode").contains("S-0002", "B-0001");
-    assertThat(mappings.list(company)).hasSizeGreaterThanOrEqualTo(30);
 
     List<TaxReturn> all = returns.list(company, 2026, null, null);
     assertThat(all)
@@ -68,7 +65,7 @@ class TaxSeedDataIT {
 
     List<Certificate2307> issued = certificates.register(company, 2026);
     assertThat(issued).extracting(c -> c.getPeriodStart().getMonthValue()).contains(1, 4);
-    assertThat(issued).extracting(Certificate2307::getPartyCode).contains("B-0001", "S-0002");
+    assertThat(issued).extracting(Certificate2307::getPartyCode).contains("S-0002");
     assertThat(certificates.batchPdf(issued.get(0).getBatch().getId())).isNotEmpty();
   }
 }

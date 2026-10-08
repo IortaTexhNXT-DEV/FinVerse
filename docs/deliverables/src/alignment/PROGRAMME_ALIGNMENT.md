@@ -203,7 +203,7 @@ Figure 2 shows BIBS and the systems BDOI named. All external touch-points are ow
 
 ## What the IER says
 
-The IER (S3) sets RPO 15 minutes and RTO 4 hours; RDS PostgreSQL 16 (Single-AZ in DEV, SIT, UAT; Multi-AZ in Pre-Prod and PROD, 2,000 GB in PROD), ElastiCache Redis 7 and Amazon MSK (Kafka 3.6, three brokers in Pre-Prod, PROD and DR), a GitLab runner and SSM bastion, S3 as document store and EFS as shared volume; a DR standby with asynchronous replication; 15 VDI users; 12 x 5 hours for non-production; 15 % growth a year over 60 months. It matches the BIBS technology baseline for the database, cache and event streaming.
+The IER (S3) sets RPO 15 minutes and RTO 4 hours; RDS PostgreSQL 16 (Single-AZ in DEV, SIT, UAT; Multi-AZ in Pre-Prod and PROD, 2,000 GB in PROD), ElastiCache Redis 7 and Amazon MSK (Kafka 3.6, three brokers in Pre-Prod, PROD and DR), a GitLab runner and SSM bastion, S3 as document store and EFS as shared volume; a DR standby with asynchronous replication; 15 VDI users; 12 x 5 hours for non-production; 15 % growth a year over 60 months. It matches the BIBS technology baseline for the database and event streaming. For the cache, BIBS uses Valkey 8 (Amazon ElastiCache for Valkey) in place of Redis 7, and Kafka 3.9 in place of 3.6 (component baseline below).
 
 It does not match BIBS on the application: the diagram in the "Architecture Diagram" sheet and the Kubernetes sheets describe ten microservices, three tenants, Aurora and MongoDB, Apigee, Istio and EventBridge. BIBS is one modular monolith whose business record, journal and ledger rows commit in one database transaction; splitting it would break that guarantee. The IER should describe the BIBS architecture (IQ25). Figures 3 and 4 are the diagrams for the two "Architecture Diagram" sheets (A6).
 
@@ -219,6 +219,26 @@ It does not match BIBS on the application: the diagram in the "Architecture Diag
 
 <!-- portrait -->
 
+## BIBS component baseline
+
+The client confirmed the component baseline on 8 October 2026. Valkey replaces Redis, whose releases from 7.4 on are no longer under the BSD licence; the Kubernetes Gateway API replaces ingress-nginx, which the Kubernetes project retired in March 2026.
+
+<!-- table: widths=3.4,3.4,3.6,6.6 caption="BIBS component baseline" size=8.5 bold=first -->
+| Component | Version baseline | Licence | Function |
+|---|---|---|---|
+| PostgreSQL | 16.x | PostgreSQL Licence | Relational data store |
+| Valkey | 8.x | BSD-3-Clause | Cache, job locks, token deny-list, counters |
+| Apache Kafka | 3.9 (KRaft) | Apache 2.0 | Event streaming, transactional outbox |
+| OpenJDK (Eclipse Temurin) | 21 LTS | GPLv2 with Classpath Exception | Application runtime |
+| Spring Boot | 3.5.x | Apache 2.0 | Application framework |
+| React | 19.x | MIT | Web user interface |
+| Node (JavaScript runtime) | 22 LTS | MIT | Compiles the web user interface for release (not a production runtime) |
+| nginx (unprivileged image) | 1.30 | BSD-2-Clause | Serves the web user interface, proxies the API |
+| Kubernetes (managed) | Provider-supported version | Apache 2.0 | Container orchestration |
+| Gateway API controller | Gateway API v1 controller: the managed provider's controller or Envoy Gateway | Apache 2.0 | Ingress and traffic routing |
+
+**Support horizon.** Each component stays within the support window its upstream project publishes: PostgreSQL 16 until 9 November 2028, Eclipse Temurin 21 until at least December 2029, Node 22 until 30 April 2027, each Kubernetes version on Amazon EKS for 14 months of standard support; the end dates of Valkey 8, Kafka 3.9, Spring Boot 3.5, nginx 1.30 and the gateway controller are to be confirmed at each annual technology review. The baseline is reviewed every year and before go-live, and a component that reaches its support end within the following twelve months is planned for upgrade.
+
 ## Documents in S3 only
 
 BDOI's instruction (A4) is met by the document storage proposal (S6): option C, S3 for the file content and PostgreSQL for the metadata, 5-minute signed links issued after the BIBS permission check and audit, four buckets per environment (documents, reports, inbound quarantine, migration with 5-day expiry), SSE-KMS, IRSA and a VPC gateway, Object Lock in governance mode with legal hold, and cross-region replication for DR. Existing files are copied and verified before go-live. The table below lists the proposal and the changes in the IER.
@@ -227,7 +247,7 @@ BDOI's instruction (A4) is met by the document storage proposal (S6): option C, 
 
 ## Kubernetes sizing of the BIBS workloads
 
-The IER Kubernetes sheets size ten bv-* services. BIBS runs two deployments. The table below replaces those rows; the values are a starting point to be proved by the performance test at the peak case (429 concurrent sessions until DCR-166 is answered). Scheduled jobs run once per schedule whatever the number of pods, through the Redis job lock. The cluster add-ons of the IER sheets (kube-system, ingress, monitoring and EDR agents) stay; the EFS controller is not needed.
+The IER Kubernetes sheets size ten bv-* services. BIBS runs two deployments. The table below replaces those rows; the values are a starting point to be proved by the performance test at the peak case (429 concurrent sessions until DCR-166 is answered). Scheduled jobs run once per schedule whatever the number of pods, through the Valkey job lock. The cluster add-ons of the IER sheets (kube-system, monitoring and EDR agents) stay, with a Gateway API controller in place of ingress-nginx; the EFS controller is not needed.
 
 <!-- al:k8s -->
 
@@ -236,14 +256,14 @@ The IER Kubernetes sheets size ten bv-* services. BIBS runs two deployments. The
 - **Six environments** are needed: DEV, SIT, UAT, Pre-Prod (dress rehearsal and performance test), PROD and DR. The IER has Kubernetes sheets for DEV, SIT, UAT and PROD only, and its Pre-Prod sheet is titled "UAT ENVIRONMENT" (IQ33).
 - **12 x 5 non-production hours** do not cover the BIBS night jobs (EOD booking and remittance extraction at 20:00, Collections files from 22:15 to 23:00, renewal extraction and screening at 01:00, application file at 05:00). In non-production the schedules are moved into the working window by configuration, and extended hours are booked for batch and month-end test cycles, trial migrations (weekend loads) and the dress rehearsal. MSK and ElastiCache cannot be stopped, so only the EKS nodes and RDS instances follow the 12 x 5 hours (IQ27).
 - **RPO 15 minutes and RTO 4 hours** answer register item DCR-135 (the register proposed the same values); RDS point-in-time recovery and the cross-region replica meet the RPO, and S3 replication with replication time control covers the documents.
-- **DR region.** The HW sheet names a cross-region read replica; the diagram names ap-southeast-1 with a warm standby; the hosting appendix places BIBS in ap-southeast-1 with access restricted to personnel in the Philippines. The DR region and data residency must be confirmed (IQ26). At failover the backend is scaled up in DR, Redis is re-created (caches refill; revoked tokens are lost until they expire, at most 8 hours) and MSK is recreated; events not yet delivered are resent from the database outbox.
+- **DR region.** The HW sheet names a cross-region read replica; the diagram names ap-southeast-1 with a warm standby; the hosting appendix places BIBS in ap-southeast-1 with access restricted to personnel in the Philippines. The DR region and data residency must be confirmed (IQ26). At failover the backend is scaled up in DR, Valkey is re-created (caches refill; revoked tokens are lost until they expire, at most 8 hours) and MSK is recreated; events not yet delivered are resent from the database outbox.
 
 ## Changes needed
 
 <!-- table: widths=2.4,11.6,3 caption="Changes needed" size=8.5 bold=first -->
 | Area | Change | Owner |
 |---|---|---|
-| IER | Replace the architecture diagrams with Figures 3 and 4; restate the Kubernetes sheets with the sizing of section 6.4; add Pre-Prod and DR cluster sheets; retitle the Pre-Prod sheet; replace the template rows of the environment cost sheets; remove EFS; add the S3, KMS, VPC gateway, replication and malware-scanning rows; "RHEL 9.x" removed from the RDS rows; ElastiCache "cluster mode disabled"; VDI software list with Temurin 21, Maven 3.9 and Node 22 | BDOI IT with iorta TechNXT |
+| IER | Replace the architecture diagrams with Figures 3 and 4; restate the Kubernetes sheets with the sizing of section 6.4; add Pre-Prod and DR cluster sheets; retitle the Pre-Prod sheet; replace the template rows of the environment cost sheets; remove EFS; add the S3, KMS, VPC gateway, replication and malware-scanning rows; "RHEL 9.x" removed from the RDS rows; ElastiCache for Valkey 8 with "cluster mode disabled"; MSK Kafka 3.9; a Gateway API controller in place of ingress-nginx; VDI software list with Temurin 21, Maven 3.9 and Node 22 | BDOI IT with iorta TechNXT |
 | BIBS | S3 document store and the copy of the existing files; EIAM OIDC sign-in; UIDM-ISC provisioning; bank channel files; EGL and EDP extracts; non-production schedules by configuration | iorta TechNXT |
 | BIBS deployment | Helm chart or Kustomize overlays per environment (replicas, HPA, PDB, IRSA service account, topology spread); Kafka replication factor 2 on 2-broker MSK in DEV and SIT; pipeline on the BDO toolchain (IQ29) | iorta TechNXT |
 | Documents | Bill of materials and deployment architecture (deliverables 4 and 12) from this chapter; security mapping (deliverable 26) with EIAM, UIDM-ISC and S3 encryption; DR runbook | iorta TechNXT |
@@ -266,6 +286,7 @@ EGL: Enterprise General Ledger
 EIAM: Enterprise Identity Access Management (Entra ID)
 EKS: Amazon Elastic Kubernetes Service
 FFY: Free First Year
+Gateway API: Kubernetes standard for routing traffic into the cluster, successor of Ingress
 HL-LOAS: Home Loan System (Loan Origination and Admin)
 IER: Infrastructure Estimation and Recommendation workbook
 IRSA: IAM Roles for Service Accounts (EKS)
@@ -280,4 +301,5 @@ RMEL: The expiring-policy list extracted for renewal
 RPO / RTO: Recovery point objective / recovery time objective
 TFS: Trade Finance System
 UIDM-ISC: User ID Maintenance - Identity Security Cloud (IGA)
+Valkey: Open-source in-memory data store (BSD-3-Clause, Linux Foundation, continues Redis) used for the cache
 ```

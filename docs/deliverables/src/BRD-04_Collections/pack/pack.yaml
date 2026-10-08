@@ -1,4 +1,4 @@
-# BRD-4 Collections – Business Sign-off Pack, release set v2.0 (Drop 1, Transactional).
+# BRD-4 Collections – Business Sign-off Pack, release set v2.1 (Drop 1, Transactional).
 # Built by docs/deliverables/src/signoff/signoff_pack.py (workbook, checks) and read by the FRS source through
 # ```pack blocks (tools/deliverables/bdoi_docx.py). Schema: docs/deliverables/src/signoff/README.md.
 meta:
@@ -6,9 +6,9 @@ meta:
   brd_label: BRD-4
   name: Collections
   code: CL
-  version: "2.0"
-  date: 1 October 2026
-  status_as_of: 01-Oct-2026
+  version: "2.1"
+  date: 8 October 2026
+  status_as_of: 08-Oct-2026
   release_set: BRD-04 Collections – Business Sign-off Pack
   frs: FRS_BRD04_COLLECTIONS.md
   test_plan: brd04_cases.yaml
@@ -37,10 +37,13 @@ personas:
 
 # The other persona whose sidebar the set shows: the authorizer of master data authorizes the escalation rules
 # (walkthrough B); no Collections role holds the authorization of master data (CLR-CL-31).
+# The Cashiering Team Leader / Head is the proposed Operations billing user who generates and sends the statements
+# of account (walkthrough D; CLR-CL-32).
 menu_personas:
   AUTHORIZER: {name: Authorizer of master data, user: checker}
+  CASHIER_TL: {name: Operations billing user (Cashiering Team Leader / Head), user: cashtl}
 
-# Packs of other BRDs whose screens a walkthrough step may show (Check Pick-up and Incoming Requests of Cashiering).
+# Packs of other BRDs whose screens a walkthrough step may show (Incoming Requests of Cashiering).
 foreign_packs: [../../BRD-02_Operations/pack/pack.yaml]
 
 # Sidebar sections that belong to this BRD (navigation/modules.ts module ids) and the BRD of every other section,
@@ -184,9 +187,9 @@ common:
       users are shown by their names.
   - name: Hand-offs to Operations
     text: >-
-      A disposition with an Operations action is handed over inside BIBS: a check pick-up and a BIR 2307 tag to
-      Cashiering, a direct payment account to the direct payment list of Commission Receivables; a cancellation is
-      raised by the user in Adjustment. A request on an unapplied payment goes to the Incoming Requests of Cashiering.
+      A disposition with an Operations action is handed over inside BIBS: a BIR 2307 tag to Cashiering, a direct
+      payment account to the direct payment list of Commission Receivables; a cancellation is raised by the user in
+      Adjustment. There is no check pick-up hand-off (removed from scope by the Operations Cashiering annex). A request on an unapplied payment goes to the Incoming Requests of Cashiering.
       Collections posts no accounting entry; Operations does.
   - name: Notifications and help
     text: >-

@@ -32,7 +32,7 @@ documents:
   - id: DO-03
     name: Full Production Report
     template: (report layout of the Collections reports)
-    format: Excel; daily after the end-of-day run (BRD p.61)
+    format: Excel; daily after the end-of-day run (BRD p.63)
     produced: Collections Files (daily file); Report Centre › Full Production Report
     protected: "No"
     fields:

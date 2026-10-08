@@ -21,7 +21,7 @@ digraph contract {
   core -> out0;
   out1 [label="BRD-2 Operations (Adjustment)\n- The cancellation of an account the client will n"];
   core -> out1;
-  out2 [label="BRD-2 Operations (Cashiering)\n- A check pick-up request (pick-up date\n- A BIR 2307 tag (path"];
+  out2 [label="BRD-2 Operations (Cashiering)\n- A BIR 2307 tag (path\n- A request on an unapplied payment (apply to an i"];
   core -> out2;
   out3 [label="BRD-2 Operations (Commission Receivables)\n- A direct payment account from the disposition DP"];
   core -> out3;

@@ -396,7 +396,7 @@ screens:
       - "[Report] | Disbursement users (disbursement report view) | Always | Opens the report in the runner | - | -"
     rules:
       - "The end-of-day reports are also produced by each end-of-day run (FR-DS-081)."
-      - "The CPC2 incentive report is run from the Report Centre, category Disbursement (FR-DS-092)."
+      - "The CPC2 incentive report is run from the Report Centre, category Disbursement; it lists only the remitted lines whose booked transaction carries the CPC2 incentive tag (FR-DS-092)."
     outcome: Disbursement runs its reports from one place.
     frs: [FR-DS-080, FR-DS-081, FR-DS-082, FR-DS-083, FR-DS-092]
     tests: [DREP]

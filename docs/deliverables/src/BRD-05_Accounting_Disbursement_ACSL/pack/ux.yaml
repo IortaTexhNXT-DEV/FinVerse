@@ -5,10 +5,16 @@
 # persona), the changes of the issue and the points for the UX Design team to confirm.
 
 issue:
-  version: "2.0"
-  date: 2 October 2026
-  # First issue of the UX screen documents of the set: every screen is new to the UX Design team.
-  changes: []
+  version: "2.1"
+  date: 8 October 2026
+  # Re-base on the WS Addendum v04152026 (minutes of 4 May 2026): no screen of this set changes; the CPC2 report rule
+  # follows the incentive tag of the booked transaction.
+  changes:
+    - ref: CHG-AC-2.1-01
+      what: >-
+        The CPC2 incentive report lists only the remitted lines whose booked transaction carries the CPC2 incentive
+        tag (minutes of 4 May 2026)
+      screens: [SCR-AC-38]
 
 # The personas whose landing page and full menu the deck shows.
 navigation:

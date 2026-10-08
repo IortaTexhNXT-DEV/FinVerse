@@ -1,4 +1,4 @@
-// BRD-4 Collections: collection cycle by actor (FRS section 2.2; BRD p.40-42, BRCLXN.001-060).
+// BRD-4 Collections: collection cycle by actor (FRS section 2.2; BRD p.42-44, BRCLXN.001-060).
 // Colour tokens (@HEADER_BLUE ...) are replaced by tools/deliverables before rendering.
 // Layout: three rows of three steps; the fill colour of a step is its actor (legend at the bottom).
 digraph clx_process {
@@ -12,7 +12,7 @@ digraph clx_process {
   s3 [label=<<b>3. Assignment</b><br/><font point-size="9">Rules; TL reassigns<br/>BRCLXN.052</font>>, fillcolor="@AMBER_BG"];
   s4 [label=<<b>4. Follow-up</b><br/><font point-size="9">Efforts, dispositions,<br/>promises, plans, SOA<br/>BRCLXN.016-058</font>>, fillcolor="@BG_BLUE"];
   s5 [label=<<b>5. Escalation</b><br/><font point-size="9">Rules and manual;<br/>TL / UH act<br/>BRCLXN.049-050</font>>, fillcolor="@AMBER_BG"];
-  s6 [label=<<b>6. Hand-off</b><br/><font point-size="9">Pick-up, 2307 to Cashiering;<br/>DP list to Commission</font>>, fillcolor="@WHITE"];
+  s6 [label=<<b>6. Hand-off</b><br/><font point-size="9">BIR 2307 to Cashiering;<br/>DP list to Commission</font>>, fillcolor="@WHITE"];
   s7 [label=<<b>7. Unapplied payments</b><br/><font point-size="9">Collector disposition;<br/>request to Cashiering<br/>BRCLXN.030-048</font>>, fillcolor="@BG_BLUE"];
   s8 [label=<<b>8. Files and reports</b><br/><font point-size="9">Daily, weekly, monthly<br/>BRCLXN.024-029, 045</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
   s9 [label=<<b>9. CR billing</b><br/><font point-size="9">CRU, confirmed DP only<br/>BRCLXN.059</font>>, fillcolor="@WHITE"];

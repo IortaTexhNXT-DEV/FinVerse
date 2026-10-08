@@ -1,17 +1,17 @@
 ---
-# Source of "00 Start Here - Guide to the BRD-05 Sign-off Pack" (Word), release set v2.0 of BRD-5 Accounting,
+# Source of "00 Start Here - Guide to the BRD-05 Sign-off Pack" (Word), release set v2.1 of BRD-5 Accounting,
 # Disbursement and ACSL.
 # Build: python tools/deliverables/bdoi_docx.py docs/deliverables/src/BRD-05_Accounting_Disbursement_ACSL/START_HERE_BRD05.md
 # The map, the reading order and the steps come from pack/guide.yaml (the same source as the guide deck).
 title: Start Here
-subtitle: Guide to the BRD-05 Accounting, Disbursement and ACSL Sign-off Pack, release set v2.0
+subtitle: Guide to the BRD-05 Accounting, Disbursement and ACSL Sign-off Pack, release set v2.1
 doc_type: Start Here Guide
 doc_code: StartHere
 brd: BRD-05
 name: Accounting Disbursement ACSL
 doc_id: BIBS-SH-BRD-05
-version: "2.0"
-date: 2 October 2026
+version: "2.1"
+date: 8 October 2026
 status: Issued for BDOI business sign-off
 header_title: Start Here BRD-5 Accounting, Disbursement and ACSL
 h1_page_break: false
@@ -22,6 +22,12 @@ control:
     reviewer: iorta TechNXT Business Analysis
     approver: ""
     change: First issue with the BRD-5 Accounting, Disbursement and ACSL business sign-off pack (replaces the cover note of the two FRS volumes)
+  - version: "2.1"
+    date: 08 Oct 2026
+    author: iorta TechNXT Project Manager
+    reviewer: iorta TechNXT Business Analysis
+    approver: ""
+    change: "Re-based on the WS Addendum v04152026 (minutes of 4-May-2026); user-story view and storyboard index added to the FRS; CPC2 by the incentive tag of the booked transaction; granularity of the incentive service invoice for confirmation"
 distribution:
   - {name: "Ronald Allan E. De Leon, VP, Head - Comptrollership", role: Approver, organisation: BDOI, purpose: Sign-off}
   - {name: "Iris S. Marquez (FRBS and ACSL), Rodrigo R. Dela Cruz (Disbursement), Perjelyn Joy R. Gutierrez (Comptrollership and Operations), Shellah Marie C. Miranda (Marketing, Processing and Collections), Roderick L. Lim (Institutional Banking, SM and BDO Accounts)", role: Approvers, organisation: BDOI, purpose: Sign-off of the rows of their units}
@@ -36,6 +42,8 @@ distribution:
 # What this pack is for
 
 This pack shows the proposed BRD-5 Accounting, Disbursement and ACSL of BIBS, screen by screen, so that Comptrollership (the GL team of FRBS, Disbursement and ACSL), Marketing and Human Resources can confirm what they will get and sign it off: the journals, the chart of accounts and the rates, the month-end and year-end closing, the bank reconciliation, the report pack, the account schedules, the service fee and the BIR outputs; the payees, the payment requests and the disbursement vouchers with their entries and instruments, the end of day, the account funding, the bank accounts and checks; the Marketing refund, cash-advance and check-cancellation requests; the insurer statements of account, the GL-SL reconciliation, the ACSL cases and the correction entries. The two volumes of the FRS of version 1.0 are combined into one FRS. Signing freezes the content, the screens and the navigation of the set; a later change goes through the Change Management Register with its mandays. The screenshots use fictitious seed data only.
+
+**What changed in v2.1.** BDOI issued the BRD-5 pack again on 8 October 2026 with the minutes of the walkthrough of the Workshop Addendum with IT on 4 May 2026 in front of the unchanged BRD. This version applies them: the CPC2 incentive and its report follow the incentive tag stored on the booked transaction; the early-incentive service invoice is issued per remittance batch with one line per qualified transaction, and BDOI is asked to confirm the granularity and the trigger (CLR-DS-17); every BRD page cited moves by one page. The FRS now ends with a user-story view of every BRD requirement and a storyboard index of the walkthrough frames. Chapter 21 lists the new points for confirmation, CLR-DS-16 to CLR-DS-18.
 
 # The pack at a glance
 

@@ -19,14 +19,6 @@ contract:
     owner: Processing (BRD-1)
     screens: PR Worklist, Collection Account (Policy & Co-insurance)
     frs: [FR-CL-010, FR-CL-043]
-  - id: IC-03
-    party: BRD-2 Operations (Cashiering)
-    direction: Out
-    what: A check pick-up request (pick-up date, address, contact, check amount, number and bank) from the disposition For check pick-up
-    how: Handed over inside BIBS when the disposition is recorded; it appears on Check Pick-up of Cashiering; the hand-off status shows on the account
-    owner: Collections (request), Cashiering (pick-up)
-    screens: Collection Account (Dispositions & Efforts), PR Worklist
-    frs: [FR-CL-032]
   - id: IC-04
     party: BRD-2 Operations (Cashiering)
     direction: Out

@@ -1,5 +1,5 @@
 ---
-# Word summary of the BRD-5 Accounting, Disbursement and ACSL test plan (release set v2.0). The tables marked
+# Word summary of the BRD-5 Accounting, Disbursement and ACSL test plan (release set v2.1). The tables marked
 # <!-- tp:... --> are filled from brd05_cases.yaml.
 # Build: python docs/deliverables/src/testplans/build_test_plan.py brd05_cases.yaml
 title: Accounting, Disbursement and ACSL Test Plan
@@ -9,8 +9,8 @@ doc_code: TestPlan
 brd: BRD-05
 name: Accounting Disbursement ACSL Summary
 doc_id: BIBS-TP-BRD-05
-version: "2.0"
-date: 2 October 2026
+version: "2.1"
+date: 8 October 2026
 status: Issued for BDOI business sign-off
 header_title: Test Plan BRD-5 Accounting, Disbursement and ACSL
 h1_page_break: false
@@ -33,6 +33,12 @@ control:
     reviewer: iorta TechNXT Project Manager
     approver: BDOI business units (sign-off)
     change: "Business sign-off pack: the two plans in one, traced to FRS v2.0 (one document); one Screen case and one Message case per screen of the screen specifications (chapter 13 of the FRS), a Screen ID on every case and the coverage by screen; FR, BRD and test IDs kept"
+  - version: "2.1"
+    date: 08 Oct 2026
+    author: iorta TechNXT QA
+    reviewer: iorta TechNXT Project Manager
+    approver: BDOI business units (sign-off)
+    change: "Re-based on the WS Addendum v04152026 (minutes of 4-May-2026) with FRS v2.1: cases added for the CPC2 incentive tag of the booked transaction (FR-DS-090, 092) and for the service invoice with one line per qualified transaction (FR-DS-091). Status as of 08-Oct-2026"
 distribution:
   - {name: "Ronald Allan E. De Leon, VP, Head - Comptrollership", role: Approver, organisation: BDOI, purpose: Review and sign-off}
   - {name: "Financial Reporting and Budget Section (GL Officers, Team Lead, Section Head)", role: Business tester, organisation: BDOI, purpose: "Chart, journals, closing, bank reconciliation, reports, service fee"}
@@ -51,11 +57,11 @@ distribution:
 
 This document summarises the test plan of BRD-5 in BIBS (BDOI Broker System, on iNXT BrokerVerse): the accounting of the Financial Reporting and Budget Section (FRBS) and the business and system administration (BASAU), Disbursement, the Marketing refund and cash-advance requests (Payment Requests) and the Accounting Controls and Subsidiary Ledger (ACSL). It tells the BDOI departments what will be tested, how, with which data and by whom, and when testing is complete. The test conditions, scenarios and cases themselves are in the Excel workbook of the same version, `04_BIBS_TestPlan_BRD-05_Accounting_Disbursement_ACSL_v2.0.xlsx`, which the testers use during execution.
 
-Version 1.0 had one plan per FRS volume; this version combines them, as the FRS v2.0 combines the volumes. Every case traces to a functional requirement (FR) of the FRS BRD-5 v2.0 and to the BRD requirement IDs (FRBS, BASAU, DIS, MKT and ACSL n.n.n, Appendix A) that the FR meets, and to the screen of chapter 13 of the FRS it runs on. The expected results quote the messages, with their codes, as BIBS shows them.
+Version 1.0 had one plan per FRS volume; this version combines them, as the FRS v2.0 combined the volumes. Every case traces to a functional requirement (FR) of the FRS BRD-5 v2.1 and to the BRD requirement IDs (FRBS, BASAU, DIS, MKT and ACSL n.n.n, Appendix A) that the FR meets, and to the screen of chapter 13 of the FRS it runs on. The expected results quote the messages, with their codes, as BIBS shows them.
 
 ## Scope
 
-In scope are all 119 FRs of the FRS BRD-5 v2.0 and the BRD references they trace to:
+In scope are all 119 FRs of the FRS BRD-5 v2.1 and the BRD references they trace to:
 
 - access and session warnings (FR-AC-001, 002; FR-DS-001);
 - the monthly revaluation rate and the chart of accounts - maintenance, upload, numbering and short-code search (FR-AC-010 to 014);
@@ -90,10 +96,10 @@ The roles-and-access sheet checks each action against the roles that may and may
 <!-- table: widths=1.2,8.6,4.2 caption="Reference documents" -->
 | Ref. | Document | Version |
 |---|---|---|
-| R1 | Functional Requirements Specification BRD-5 (`02_BIBS_FRS_BRD-05_Accounting_Disbursement_ACSL_v2.0.docx`) | 2.0, 2 Oct 2026 |
+| R1 | Functional Requirements Specification BRD-5 (`02_BIBS_FRS_BRD-05_Accounting_Disbursement_ACSL_v2.1.docx`) | 2.1, 8 Oct 2026 |
 | R2 | BRD-5 Accounting, Disbursement and ACSL with Addenda 1 and 2 | as signed |
-| R3 | Test plan workbook BRD-5 (`04_BIBS_TestPlan_BRD-05_Accounting_Disbursement_ACSL_v2.0.xlsx`) | 2.0 |
-| R4 | Sign-off workbook BRD-5 (`03_BIBS_Signoff_BRD-05_Accounting_Disbursement_ACSL_v2.0.xlsx`) | 2.0 |
+| R3 | Test plan workbook BRD-5 (`04_BIBS_TestPlan_BRD-05_Accounting_Disbursement_ACSL_v2.1.xlsx`) | 2.1 |
+| R4 | Sign-off workbook BRD-5 (`03_BIBS_Signoff_BRD-05_Accounting_Disbursement_ACSL_v2.1.xlsx`) | 2.1 |
 | R5 | Test plan BRD-2 Operations (`04_BIBS_TestPlan_BRD-02_Operations_v2.0.xlsx`) | 2.0 |
 
 # Test approach
@@ -142,7 +148,7 @@ Month-end, year-end and date-driven cases (close schedule, cut-off at 23:00, rev
 |---|---|
 | System test | BIBS is deployed on SIT with the seed data; the periods of the current year are open; the test mailboxes of payees and branches receive mail; this plan is reviewed by the iorta TechNXT project manager. |
 | Persona end-to-end | All High-priority system test cases are run; no open Critical issue; the Cashiering and Remittance steps used by the scenarios pass in the BRD-2 plan. |
-| UAT | The FRS BRD-5 v2.0 is signed off or its open comments are agreed; the system test exit criteria are met; the UAT environment holds masked data (section 4.1); BDOI testers have user IDs with the roles of section 5, including two Disbursement team leaders and two approvers for the funding cases; BDOI's chart and rules are loaded, or BDOI accepts the seed chart for UAT (AQ01, AQ02). |
+| UAT | The FRS BRD-5 v2.1 is signed off or its open comments are agreed; the system test exit criteria are met; the UAT environment holds masked data (section 4.1); BDOI testers have user IDs with the roles of section 5, including two Disbursement team leaders and two approvers for the funding cases; BDOI's chart and rules are loaded, or BDOI accepts the seed chart for UAT (AQ01, AQ02). |
 
 ## Exit criteria
 

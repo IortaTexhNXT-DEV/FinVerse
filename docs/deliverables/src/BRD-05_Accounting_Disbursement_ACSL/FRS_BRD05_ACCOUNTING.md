@@ -1,15 +1,15 @@
 ---
-# Source of the Functional Requirements Specification for BRD-5 Accounting, Disbursement and ACSL (release set v2.0).
+# Source of the Functional Requirements Specification for BRD-5 Accounting, Disbursement and ACSL (release set v2.1).
 # Build: python tools/deliverables/bdoi_docx.py docs/deliverables/src/BRD-05_Accounting_Disbursement_ACSL/FRS_BRD05_ACCOUNTING.md
 title: Accounting, Disbursement and ACSL
-subtitle: BRD-5 Accounting (FRBS), Disbursement, Marketing Refund and Cash-Advance Requests, Accounting Controls and Subsidiary Ledger (ACSL), with Addendum 1 and the Workshop Addendum
+subtitle: BRD-5 Accounting (FRBS), Disbursement, Marketing Refund and Cash-Advance Requests, Accounting Controls and Subsidiary Ledger (ACSL), with Addendum 1, the Workshop Addendum and the walkthrough minutes of 4 May 2026 (WS Addendum v04152026)
 doc_type: Functional Requirements Specification
 doc_code: FRS
 brd: BRD-05
 name: Accounting Disbursement ACSL
 doc_id: BIBS-FRS-BRD-05
-version: "2.0"
-date: 2 October 2026
+version: "2.1"
+date: 8 October 2026
 status: Issued for BDOI business sign-off
 header_title: FRS BRD-5 Accounting, Disbursement and ACSL
 control:
@@ -31,6 +31,12 @@ control:
     reviewer: iorta TechNXT Project Manager
     approver: BDOI business units (sign-off)
     change: "Business sign-off pack: the two volumes and the cover note in one document, chapters 1-11 combined by topic with FR, BRD and test IDs kept; navigation by persona, 51 screen specifications with screenshots, five walkthroughs, messages, notifications, document outputs, upload templates, cross-BRD contract, sign-off and change control (chapters 12-20); proposed business rules and clarifications for confirmation of both volumes, extended with the screen presentation items (chapter 21); screen standards (appendix). Issued 2-Oct-2026"
+  - version: "2.1"
+    date: 08 Oct 2026
+    author: iorta TechNXT Business Analysis
+    reviewer: iorta TechNXT Project Manager
+    approver: BDOI business units (sign-off)
+    change: "Re-based on the Accounting, Disbursement and ACSL WS Addendum v04152026 (268 pages: the minutes of the walkthrough of the Workshop Addendum with IT on 4-May-2026 in front of the unchanged BRD-5 pack); user-story view and storyboard index added. The minutes record FRBS 3.1.1, 3.1.2, DIS 3.29.0, 3.29.1, 3.30.0-3.30.2, 2.2.8 and ACSL 2.9.1, 2.9.2 as walked through without questions. CPC2 follows the incentive tag stored on the booked transaction (FR-DS-090, 092); the early-incentive service invoice is issued per remittance batch with one line per qualified transaction, its granularity and trigger proposed for confirmation (FR-DS-091); DIS 2.17.1 shown as outside BIBS in the coverage summary; every BRD page citation follows the new file (one page added in front); clarifications CLR-DS-16 to CLR-DS-18 added. Issued 08-Oct-2026"
 distribution:
   - {name: "Ronald Allan E. De Leon, VP, Head - Comptrollership", role: Approver, organisation: BDOI, purpose: Review and sign-off}
   - {name: "Iris S. Marquez, Product Owner - Comptrollership - FRBS and ACSL", role: Approver, organisation: BDOI, purpose: "Review and sign-off for FRBS and ACSL"}
@@ -51,7 +57,9 @@ distribution:
 
 This Functional Requirements Specification (FRS) states how BIBS (BDOI Broker System, on iNXT BrokerVerse) meets the requirements of BRD-5 for BDO Insurance and Reinsurance Brokers, Inc. (BDOI): Accounting (the Financial Reporting and Budget Section, FRBS, the GL team of Comptrollership), Disbursement, the Marketing refund and cash-advance requests, Accounting Controls and Subsidiary Ledger (ACSL), and the business and system administration of the BRD. It turns each BRD requirement into functional requirements with actors, flows, rules, validations, screens, fields, notifications, audit and acceptance criteria.
 
-BDOI uses this document to confirm that the system behaves as the business expects. The project team uses it to test and to prepare user acceptance testing (UAT). Every functional requirement (FR) cites the BRD requirement it meets and the BRD page. The FRs describe the proposed behaviour of the screens. Where the proposed rule or screen differs from the BRD text, or needs a decision of BDOI, the FR says so in a note and chapter 21 lists each such point for confirmation. Chapters 12 to 19 give the business view of the system: the navigation, the specification of every screen with its screenshots, the walkthroughs, the messages, notifications, documents, uploads and the contract with the other BRDs; chapter 20 describes the sign-off.
+BDOI uses this document to confirm that the system behaves as the business expects. The project team uses it to test and to prepare user acceptance testing (UAT). Every functional requirement (FR) cites the BRD requirement it meets and the BRD page. The FRs describe the proposed behaviour of the screens. Where the proposed rule or screen differs from the BRD text, or needs a decision of BDOI, the FR says so in a note and chapter 21 lists each such point for confirmation. Chapters 12 to 19 give the business view of the system: the navigation, the specification of every screen with its screenshots, the walkthroughs, the messages, notifications, documents, uploads and the contract with the other BRDs; chapter 20 describes the sign-off. The appendices give the user-story view of every BRD requirement (chapter 22), the storyboard index of the walkthroughs (chapter 23) and the screen standards (chapter 24).
+
+This version 2.1 follows the BRD as BDOI issued it on 8 October 2026: the Accounting, Disbursement and ACSL WS Addendum v04152026, which puts the minutes of the walkthrough of the Workshop Addendum with IT on 4 May 2026 in front of the unchanged BRD-5 pack. The minutes clarify the CPC2 incentive and the service invoices of incentives; this FRS applies them.
 
 ## Scope
 
@@ -92,16 +100,17 @@ BRD-5 has 277 requirement IDs. Version 1.0 was issued in two volumes with a cove
 <!-- table: widths=1.2,11.4,3.6 caption="Reference documents" -->
 | Ref. | Document | Version / date |
 |---|---|---|
-| R1 | Accounting, Disbursement and ACSL BRD (main BRD), pages 40-153 of the BRD-5 pack; signed scan pp.154-267 | v1.0, 23-Jul-2025; approved Jul to Oct 2025 |
-| R2 | Addendum 1 "Accounting, Disbursement and ACSL - Addendum", pages 28-39 (signed copy pp.16-27) | v1.0, 18-Dec-2025; signed 13-Jan-2026 |
-| R3 | Addendum 2 "Financial Reporting, Disbursement and ACSL - Addendum (Workshop)", pages 1-15 (scanned) | v1.0, 10-Apr-2026; signed 8 to 15-Apr-2026 |
+| R0 | Accounting, Disbursement and ACSL WS Addendum v04152026, page 1: minutes of the Financial Reporting, Disbursement and ACSL BRD Addendum walkthrough with IT ("the minutes") | 4-May-2026, sent 5-May-2026; no action items |
+| R1 | Accounting, Disbursement and ACSL BRD (main BRD), pages 41-154 of the BRD-5 pack; signed scan pp.155-268 | v1.0, 23-Jul-2025; approved Jul to Oct 2025 |
+| R2 | Addendum 1 "Accounting, Disbursement and ACSL - Addendum", pages 29-40 (signed copy pp.17-28) | v1.0, 18-Dec-2025; signed 13-Jan-2026 |
+| R3 | Addendum 2 "Financial Reporting, Disbursement and ACSL - Addendum (Workshop)", pages 2-16 (scanned) | v1.0, 10-Apr-2026; signed 8 to 15-Apr-2026 |
 | R4 | BDOI Accounting, Disbursement and ACSL (BRD-5) requirements baseline | current |
 | R6 | Cross-BRD decisions and answered questions | current |
 | R8 | BRD-2 Operations FRS (receipts, remittance, commission, remittance deductions) | v2.0 |
-| R9 | BRD-4 Collections FRS (collector requests to Cashiering) | v2.0 |
+| R9 | BRD-4 Collections FRS (collector requests to Cashiering) | v2.1 |
 | R10 | BRD-11 User Access Maintenance FRS (users, roles and access requests) | v2.0 |
 
-Page references ("p.51") are pages of the BRD-5 PDF. "Add.1" is Addendum 1 (pp.28-39) and "Add.2" is the Workshop Addendum (pp.1-15). The BRD numbers the access rows of each unit "BRD 1.1.0-1.1.3"; this FRS writes them FRBS, DIS, MKT, ACSL and BASAU 1.1.0-1.1.3. The second row numbered FRBS 3.6.0 (item q, p.66) is written FRBS 3.6.0b. Duplicate numbers renamed by Addendum 1 are used in their new form (DIS 2.17.4, DIS 2.24.2, ACSL 2.5.5); the second row printed "DIS 3.30.1" (headcount report) is written DIS 3.30.2.
+Page references ("p.52") are pages of the WS Addendum v04152026 PDF of 268 pages issued on 8 October 2026: page 1 holds the minutes (R0) and pages 2-268 are the earlier BRD-5 pack unchanged, so page n of the earlier pack is page n+1. "Minutes p.1" cites R0. "Add.1" is Addendum 1 (pp.29-40) and "Add.2" is the Workshop Addendum (pp.2-16). The BRD numbers the access rows of each unit "BRD 1.1.0-1.1.3"; this FRS writes them FRBS, DIS, MKT, ACSL and BASAU 1.1.0-1.1.3. The second row numbered FRBS 3.6.0 (item q, p.67) is written FRBS 3.6.0b. Duplicate numbers renamed by Addendum 1 are used in their new form (DIS 2.17.4, DIS 2.24.2, ACSL 2.5.5); the second row printed "DIS 3.30.1" (headcount report) is written DIS 3.30.2.
 
 ## Definitions and acronyms
 
@@ -145,7 +154,7 @@ Root invoice: The original invoice number shared by an invoice's endorsements an
 RRF: Refund Request Form; RRF-yyyy-n
 SAWT: Summary Alphalist of Withholding Taxes
 Schedule engine: Configurable account-schedule report of BIBS (report GL-SCHEDULE)
-Service fee: Referrers' share of fully paid commission (Appendix A VI, p.144)
+Service fee: Referrers' share of fully paid commission (Appendix A VI, p.145)
 Short code: Unique short key of a GL account used for entry and search
 SL: Sub-ledger (open items per party)
 SOA: Statement of account sent by an insurer
@@ -180,7 +189,7 @@ Every BRD-5 row carries the priority **Must have** in the BRD. Where a function 
 
 BDOI is a broker. Its money is of two kinds: trust money (premium collected for insurers and remitted net of commission) and its own income (commission, service fee, profit share, incentives). BRD-1 and BRD-2 cover the front of the cycle - booking, receipts, application, remittance, adjustments and commission receivables. BRD-5 covers the back office of Comptrollership. In BIBS the general ledger is internal: every module posts through the accounting engine, and FRBS closes, reconciles and reports on the same ledger.
 
-<!-- table: widths=1,8,8 caption="Current and envisioned Accounting process (BRD p.44-46)" -->
+<!-- table: widths=1,8,8 caption="Current and envisioned Accounting process (BRD p.45-47)" -->
 | # | Current process (before) | Envisioned process in BIBS (after) |
 |---|---|---|
 | 1 | Input reports and the closing of the broking books depend on IT support | FRBS runs every report on demand; the broking books close automatically at month end |
@@ -193,7 +202,7 @@ BDOI is a broker. Its money is of two kinds: trust money (premium collected for 
 
 Disbursement pays what the other units of BDOI request - remittances to insurers, client refunds, suppliers, government agencies, employees, service fees and incentive pass-ons. Marketing raises client refunds and employee cash advances. ACSL controls the sub-ledgers - it reconciles the insurer statements and the GL with the sub-ledgers, investigates accounts and corrects wrong postings. In BIBS all three work inside the application: a business module asks for a payment through the Operations disbursement gateway, the Disbursement module pays it and reports the status back, and every approval posts to the BIBS ledger.
 
-<!-- table: widths=1,8,8 caption="Current and envisioned process (BRD p.45-48)" -->
+<!-- table: widths=1,8,8 caption="Current and envisioned process (BRD p.46-49)" -->
 | # | Current process (before) | Envisioned process in BIBS (after) |
 |---|---|---|
 | 1 | Some requests arrive on paper or by e-mail | Requests arrive from the BIBS modules, by upload or by encoding; each gets a request number |
@@ -251,12 +260,12 @@ The table lists the monthly cycle of the GL team, and Figure 1 shows it by actor
 <!-- table: widths=3.2,4,7.4,2.4 caption="Personas and BIBS roles" size=8.5 -->
 | Persona | BIBS role | Responsibilities | BRD |
 |---|---|---|---|
-| GL Officer (FRBS Processor) | FRBS_PROCESSOR | Prepares manual entries; monitors the service fee; runs and exports the report pack and government reports | p.66-67 matrix (p.181) |
-| GL Team Lead | FRBS_TL | Assigns and posts entries; schedules and runs the month-end and year-end closes; maintains and uploads the chart; approves the service fee | p.66-67 matrix |
-| GL Team Head / Section Head | FRBS_HEAD | As the TL, plus the monthly revaluation rate, authorisation of masters and reversal of journals | p.66-67 matrix |
-| Business Administrator | BUSINESS_ADMIN | Maintains lists of values; requests user and role changes | BASAU 2.2.x (p.128) |
-| System Administrator | SYSADMIN | Manages users and role profiles through approved requests | BASAU 2.3.x (p.129) |
-| Approver (administration) | Holder of ACCESS_APPROVE or MASTER_AUTHORIZE | Approves, declines or returns LOV and user-management requests | BASAU 2.5.x-2.6.x (p.130-131) |
+| GL Officer (FRBS Processor) | FRBS_PROCESSOR | Prepares manual entries; monitors the service fee; runs and exports the report pack and government reports | p.67-68 matrix (p.182) |
+| GL Team Lead | FRBS_TL | Assigns and posts entries; schedules and runs the month-end and year-end closes; maintains and uploads the chart; approves the service fee | p.67-68 matrix |
+| GL Team Head / Section Head | FRBS_HEAD | As the TL, plus the monthly revaluation rate, authorisation of masters and reversal of journals | p.67-68 matrix |
+| Business Administrator | BUSINESS_ADMIN | Maintains lists of values; requests user and role changes | BASAU 2.2.x (p.129) |
+| System Administrator | SYSADMIN | Manages users and role profiles through approved requests | BASAU 2.3.x (p.130) |
+| Approver (administration) | Holder of ACCESS_APPROVE or MASTER_AUTHORIZE | Approves, declines or returns LOV and user-management requests | BASAU 2.5.x-2.6.x (p.131-132) |
 | Comptrollership, Auditor | COMPTROLLERSHIP, AUDITOR | Read access to journals, reports and closing | - |
 | Disbursement Processor | DISBURSEMENT | Encodes and uploads requests, processes DVs, tags instruments, OR / AR and CWT | DIS 2.4-2.12 |
 | Disbursement Team Leader | DISB_TL | As the processor, plus review, payee maintenance, funding request and verification, end of day, status-edit approval | DIS 2.13-2.17 |
@@ -271,7 +280,7 @@ The table lists the monthly cycle of the GL team, and Figure 1 shows it by actor
 | Cashier | CASHIER (Operations) | Validates refunds of cancelled policies; approves payment reversals | MKT 1.11.0; ACSL 2.6.1 |
 | Comptrollership administrator | FIN_ADMIN, BUSINESS_ADMIN | Employee and cost-centre master; liquidation accounts | DIS 3.30.1 |
 
-The role grants are the project's reading of the scanned role matrix (p.181): only the Section Head inputs the revaluation rate; only the Team Lead closes the month and the year; Processors make manual entries and monitor the service fee. BDOI confirms the matrix through AQ28. Several roles per user are allowed (decision D5 of R6). The Disbursement, Payment Request and ACSL grants follow the matrices of pp.216-217, 227 and 240.
+The role grants are the project's reading of the scanned role matrix (p.182): only the Section Head inputs the revaluation rate; only the Team Lead closes the month and the year; Processors make manual entries and monitor the service fee. BDOI confirms the matrix through AQ28. Several roles per user are allowed (decision D5 of R6). The Disbursement, Payment Request and ACSL grants follow the matrices of pp.217-218, 228 and 241.
 
 ## Permissions
 
@@ -378,7 +387,7 @@ Segregation of duties enforced by the system: a journal is never posted by the u
 ```fr
 id: FR-AC-001
 title: Access Accounting and administration with a user profile
-brd: [FRBS 1.1.0 (p.50), FRBS 1.1.1 (p.50), BASAU 1.1.0 (p.127), BASAU 1.1.1 (p.127)]
+brd: [FRBS 1.1.0 (p.51), FRBS 1.1.1 (p.51), BASAU 1.1.0 (p.128), BASAU 1.1.1 (p.128)]
 actor: FRBS users; Business and System Administrators
 priority: Must have
 screens: Login; Home; menu groups Finance, Planning and Closing, Setup and Administration
@@ -410,7 +419,7 @@ acceptance:
 ```fr
 id: FR-AC-002
 title: Warn before the idle time-out and before the forced log-out
-brd: [FRBS 1.1.2 (p.50), FRBS 1.1.3 (p.50), BASAU 1.1.2 (p.128), BASAU 1.1.3 (p.128)]
+brd: [FRBS 1.1.2 (p.51), FRBS 1.1.3 (p.51), BASAU 1.1.2 (p.129), BASAU 1.1.3 (p.129)]
 actor: System
 priority: Must have
 screens: All screens (session dialog)
@@ -439,7 +448,7 @@ acceptance:
 ```fr
 id: FR-AC-010
 title: Enter the monthly revaluation rate
-brd: [FRBS 2.2.0 (p.51), FRBS 3.6.0 (p.65)]
+brd: [FRBS 2.2.0 (p.52), FRBS 3.6.0 (p.66)]
 actor: GL Team Head / Section Head
 priority: Must have
 screens: Setup > Currencies & Rates (card Monthly revaluation rates)
@@ -480,7 +489,7 @@ acceptance:
 ```fr
 id: FR-AC-011
 title: Set up, view and edit the chart of accounts
-brd: [FRBS 2.3.0 (p.51), FRBS 2.3.4 (p.53), FRBS 2.3.5 (p.53), FRBS 3.6.0 (p.65)]
+brd: [FRBS 2.3.0 (p.52), FRBS 2.3.4 (p.54), FRBS 2.3.5 (p.54), FRBS 3.6.0 (p.66)]
 actor: GL Team Lead (maintain); GL Team Head (authorise)
 priority: Must have
 screens: General Ledger > Chart of Accounts
@@ -523,7 +532,7 @@ acceptance:
 ```fr
 id: FR-AC-012
 title: Upload the chart of accounts
-brd: [FRBS 2.3.1 (p.51)]
+brd: [FRBS 2.3.1 (p.52)]
 actor: GL Team Lead (COA_UPLOAD); GL Team Head (authorise)
 priority: Must have
 screens: General Ledger > Chart Upload (Upload Chart, Upload History)
@@ -561,7 +570,7 @@ acceptance:
 ```fr
 id: FR-AC-013
 title: Generate account numbers and roll child accounts up to their parent
-brd: [FRBS 2.3.2 (p.52)]
+brd: [FRBS 2.3.2 (p.53)]
 actor: GL Team Lead; System
 priority: Must have
 screens: General Ledger > Chart of Accounts (Numbering Schemes)
@@ -599,7 +608,7 @@ acceptance:
 ```fr
 id: FR-AC-014
 title: Search accounts by name, short code or number
-brd: [FRBS 2.3.3 (p.52)]
+brd: [FRBS 2.3.3 (p.53)]
 actor: FRBS users
 priority: Must have
 screens: Chart of Accounts (search); journal lines (account entry)
@@ -628,7 +637,7 @@ acceptance:
 ```fr
 id: FR-AC-020
 title: Select, run, view and copy reports on demand
-brd: [FRBS 2.4.0 (p.53), FRBS 2.4.1 (p.53), FRBS 2.4.2 (p.53), FRBS 2.4.3 (p.54), FRBS 2.4.6 (p.54), FRBS 2.4.8 (p.55), FRBS 2.4.10 (p.55)]
+brd: [FRBS 2.4.0 (p.54), FRBS 2.4.1 (p.54), FRBS 2.4.2 (p.54), FRBS 2.4.3 (p.55), FRBS 2.4.6 (p.55), FRBS 2.4.8 (p.56), FRBS 2.4.10 (p.56)]
 actor: FRBS users
 priority: Must have
 screens: Report Centre; Report; Accounting Reports > Report Pack
@@ -662,7 +671,7 @@ acceptance:
 ```fr
 id: FR-AC-021
 title: Filter every column of a report
-brd: [FRBS 2.4.4 (p.54)]
+brd: [FRBS 2.4.4 (p.55)]
 actor: FRBS users
 priority: Must have
 screens: Report (column filter row)
@@ -687,7 +696,7 @@ acceptance:
 ```fr
 id: FR-AC-022
 title: Download or print several reports at once
-brd: [FRBS 2.4.5 (p.54), FRBS 2.4.7 (p.54)]
+brd: [FRBS 2.4.5 (p.55), FRBS 2.4.7 (p.55)]
 actor: FRBS users
 priority: Must have
 screens: Report Centre > Report Batch
@@ -716,7 +725,7 @@ acceptance:
 ```fr
 id: FR-AC-023
 title: Set the print options of a report
-brd: [FRBS 2.4.9 (p.55)]
+brd: [FRBS 2.4.9 (p.56)]
 actor: FRBS users
 priority: Must have
 screens: Report (Export dialog); Report Batch
@@ -747,7 +756,7 @@ acceptance:
 ```fr
 id: FR-AC-030
 title: Post every financial transaction to the GL and the sub-ledger
-brd: [FRBS 2.5.0 (p.55), FRBS 3.1.0 (p.62)]
+brd: [FRBS 2.5.0 (p.56), FRBS 3.1.0 (p.63)]
 actor: System
 priority: Must have
 screens: Journals; Account Inquiry; Party Statement; Accounting Engine (event log)
@@ -780,7 +789,7 @@ acceptance:
 ```fr
 id: FR-AC-031
 title: Assign manual entries for posting and work the assigned list
-brd: [FRBS 2.5.1 (p.56), FRBS 2.5.2 (p.56), FRBS 2.5.3 (p.56)]
+brd: [FRBS 2.5.1 (p.57), FRBS 2.5.2 (p.57), FRBS 2.5.3 (p.57)]
 actor: GL Team Lead / Head (assign); poster
 priority: Must have
 screens: General Ledger > Journals (Assign, Assigned to me); Journal
@@ -811,7 +820,7 @@ acceptance:
 ```fr
 id: FR-AC-032
 title: Prepare manual entries
-brd: [FRBS 2.8.0 (p.59), FRBS 2.8.1 (p.60), FRBS 2.8.2 (p.60), FRBS 2.8.5 (p.61)]
+brd: [FRBS 2.8.0 (p.60), FRBS 2.8.1 (p.61), FRBS 2.8.2 (p.61), FRBS 2.8.5 (p.62)]
 actor: GL Officer; GL Team Lead
 priority: Must have
 screens: General Ledger > New Journal; Edit Journal
@@ -857,7 +866,7 @@ acceptance:
 ```fr
 id: FR-AC-033
 title: Reverse accruals automatically on their reversal date
-brd: [FRBS 2.8.1 (p.60)]
+brd: [FRBS 2.8.1 (p.61)]
 actor: System
 priority: Must have
 screens: Journals (REVERSAL journals); Scheduled Jobs
@@ -888,7 +897,7 @@ acceptance:
 ```fr
 id: FR-AC-034
 title: Validate entries and refuse errors
-brd: [FRBS 2.5.4 (p.56), FRBS 2.5.5 (p.57), FRBS 2.8.4 (p.61), FRBS 3.6.0b (p.66)]
+brd: [FRBS 2.5.4 (p.57), FRBS 2.5.5 (p.58), FRBS 2.8.4 (p.62), FRBS 3.6.0b (p.67)]
 actor: System
 priority: Must have
 screens: New Journal; Journal; confirmation dialog
@@ -923,7 +932,7 @@ acceptance:
 ```fr
 id: FR-AC-035
 title: Confirm the transaction details before sending them on
-brd: [FRBS 2.5.10 (p.58), FRBS 2.8.3 (p.60)]
+brd: [FRBS 2.5.10 (p.59), FRBS 2.8.3 (p.61)]
 actor: GL Officer; poster
 priority: Must have
 screens: Confirm posting dialog (Journals)
@@ -949,7 +958,7 @@ acceptance:
 ```fr
 id: FR-AC-036
 title: Post or return entries, one or several at a time, with remarks
-brd: [FRBS 2.5.6 (p.57), FRBS 2.5.7 (p.57), FRBS 2.5.8 (p.57), FRBS 2.5.9 (p.57)]
+brd: [FRBS 2.5.6 (p.58), FRBS 2.5.7 (p.58), FRBS 2.5.8 (p.58), FRBS 2.5.9 (p.58)]
 actor: GL Team Lead / Head (JOURNAL_AUTHORIZE)
 priority: Must have
 screens: Journals (bulk posting); Journal (Post, Return to Maker); My Approvals
@@ -985,7 +994,7 @@ acceptance:
 ```fr
 id: FR-AC-037
 title: Edit accounting entries
-brd: [FRBS 2.9.0 (p.61)]
+brd: [FRBS 2.9.0 (p.62)]
 actor: GL Officer (maker)
 priority: Must have
 screens: Edit Journal; Journal (Reverse)
@@ -1015,7 +1024,7 @@ acceptance:
 ```fr
 id: FR-AC-040
 title: Schedule and run the month-end close of the GL books
-brd: [FRBS 2.6.0 (p.58; Add.1 p.35), FRBS 2.6.1 (p.58)]
+brd: [FRBS 2.6.0 (p.59; Add.1 p.36), FRBS 2.6.1 (p.59)]
 actor: GL Team Lead / Head (GL_CLOSE_SCHEDULE); System
 priority: Must have
 screens: Planning & Closing > GL Close & Cut-Off (Month-End Close)
@@ -1058,7 +1067,7 @@ acceptance:
 ```fr
 id: FR-AC-041
 title: Close the year and verify that the nominal accounts are zero
-brd: [FRBS 2.7.0 (p.59), FRBS 2.7.1 (p.59)]
+brd: [FRBS 2.7.0 (p.60), FRBS 2.7.1 (p.60)]
 actor: GL Team Lead
 priority: Must have
 screens: Planning & Closing > Period-End & Year-End (Year-End panel)
@@ -1091,7 +1100,7 @@ acceptance:
 ```fr
 id: FR-AC-042
 title: Close the broking books automatically at month end
-brd: [FRBS 3.4.0 (p.64), FRBS 3.4.1 (p.65)]
+brd: [FRBS 3.4.0 (p.65), FRBS 3.4.1 (p.66)]
 actor: System; GL Team Lead (reopen)
 priority: Must have
 screens: Planning & Closing > GL Close & Cut-Off (Broking Books Cut-Off)
@@ -1131,7 +1140,7 @@ acceptance:
 ```fr
 id: FR-AC-043
 title: Revalue USD balances at the revaluation rate
-brd: [FRBS 3.5.0 (p.65)]
+brd: [FRBS 3.5.0 (p.66)]
 actor: GL Team Lead (PERIOD_END_RUN)
 priority: Must have
 screens: Planning & Closing > FX Revaluation
@@ -1161,7 +1170,7 @@ acceptance:
 ```fr
 id: FR-AC-050
 title: Upload bank files and reconcile automatically
-brd: [FRBS 3.3.0 (p.63), FRBS 3.3.1 (p.63), FRBS 3.3.2 (p.64)]
+brd: [FRBS 3.3.0 (p.64), FRBS 3.3.1 (p.64), FRBS 3.3.2 (p.65)]
 actor: GL Officer; System
 priority: Must have
 screens: Receivables > Bank Statements; Bank Reconciliation; Setup > Bank Statement Layouts
@@ -1201,7 +1210,7 @@ acceptance:
 ```fr
 id: FR-AC-051
 title: Report the unmatched transactions
-brd: [FRBS 3.3.3 (p.64)]
+brd: [FRBS 3.3.3 (p.65)]
 actor: GL Officer
 priority: Must have
 screens: Report Centre; Bank Reconciliation
@@ -1226,12 +1235,12 @@ acceptance:
 ```fr
 id: FR-AC-052
 title: Compute, approve and pay the service fee
-brd: [FRBS 2.10.0 (p.61); Appendix A VI (p.144)]
+brd: [FRBS 2.10.0 (p.62); Appendix A VI (p.145)]
 actor: GL Officer (compute, submit); GL Team Lead / Head (approve)
 priority: Must have
 screens: Accounting Reports > Service Fee Runs; Service Fee Run; Service Fee Rates
 description:
-  - The service fee is the referrers' share of the commission that BDOI has fully collected - 2.5% or 1% of the commission net of the insurer's withholding tax, per market segment (p.144). FRBS computes a run for a period - BIBS takes the invoices whose payment status became paid in the period, are not cancelled, carry commission and are in no live run, and applies the rule of their segment in force on the day paid. It groups them into one line per service-fee segment, sales unit and currency. The payee of a line is the unit's recipient, else the unit; the cost centre is the recipient's, else the unit's, else the invoice's, else the cost-centre rules.
+  - The service fee is the referrers' share of the commission that BDOI has fully collected - 2.5% or 1% of the commission net of the insurer's withholding tax, per market segment (p.145). FRBS computes a run for a period - BIBS takes the invoices whose payment status became paid in the period, are not cancelled, carry commission and are in no live run, and applies the rule of their segment in force on the day paid. It groups them into one line per service-fee segment, sales unit and currency. The payee of a line is the unit's recipient, else the unit; the cost centre is the recipient's, else the unit's, else the invoice's, else the cost-centre rules.
   - The run is submitted and approved by another user. Approval posts the accrual (FRBS_SERVICE_FEE_ACCRUE, expense against service fee payable) per line and sends each payout to Disbursement as a request of type SERVICE_FEE (FR-DS-020).
 preconditions:
   - "Rules exist for the segments; the user has SERVICE_FEE_MANAGE (compute) or SERVICE_FEE_APPROVE (approve)."
@@ -1279,7 +1288,7 @@ acceptance:
 ```fr
 id: FR-AC-053
 title: Record the liquidation report and tag released or liquidated
-brd: [FRBS 2.10.1 (p.62), FRBS 2.10.2 (p.62)]
+brd: [FRBS 2.10.1 (p.63), FRBS 2.10.2 (p.63)]
 actor: GL Officer (SERVICE_FEE_TAG); System
 priority: Must have
 screens: Service Fee Run (lines - Release, Liquidate)
@@ -1317,7 +1326,7 @@ acceptance:
 ```fr
 id: FR-AC-054
 title: Derive and enforce the cost centre of every entry
-brd: [FRBS 3.1.1 (Add.2 p.5-6)]
+brd: [FRBS 3.1.1 (Add.2 p.6-7)]
 actor: Comptrollership (rules); System
 priority: Must have
 screens: Setup > Cost-Centre Rules; Accounting Engine (event log); Alerts
@@ -1354,7 +1363,7 @@ acceptance:
 ```fr
 id: FR-AC-055
 title: Account for early incentives as Other Income
-brd: [FRBS 3.1.2 (Add.2 p.6)]
+brd: [FRBS 3.1.2 (Add.2 p.7)]
 actor: Comptrollership (rules); System
 priority: Must have
 screens: Accounting rules; Chart of Accounts
@@ -1384,7 +1393,7 @@ acceptance:
 ```fr
 id: FR-AC-060
 title: Generate the FRBS report pack
-brd: [FRBS 3.2.0 (p.63); Appendix A (p.142-144)]
+brd: [FRBS 3.2.0 (p.64); Appendix A (p.143-145)]
 actor: FRBS users (FRBS_REPORT_VIEW / EXPORT)
 priority: Must have
 screens: Accounting Reports > Report Pack
@@ -1412,7 +1421,7 @@ acceptance:
 ```fr
 id: FR-AC-061
 title: Run and maintain configurable account schedules
-brd: [FRBS 3.2.0 (p.63); Appendix A II-IV (p.142-143)]
+brd: [FRBS 3.2.0 (p.64); Appendix A II-IV (p.143-144)]
 actor: GL team (run); GL Team Lead (MASTER_MAINTAIN, definitions)
 priority: Must have
 screens: Accounting Reports > Account Schedules (run, commentary, definitions editor)
@@ -1463,7 +1472,7 @@ acceptance:
 ```fr
 id: FR-AC-062
 title: Produce the Mancom, production, GAP, cash-flow and expense reports
-brd: [FRBS 3.2.0 (p.63); Appendix A IV-V (p.143-144)]
+brd: [FRBS 3.2.0 (p.64); Appendix A IV-V (p.144-145)]
 actor: FRBS users
 priority: Must have
 screens: Accounting Reports > Report Pack (groups IV, V, VI)
@@ -1489,7 +1498,7 @@ acceptance:
 ```fr
 id: FR-AC-063
 title: Produce the BIR returns, alphalists, SAWT and books of accounts
-brd: [FRBS 3.2.0 (p.63); Appendix A VII (p.144)]
+brd: [FRBS 3.2.0 (p.64); Appendix A VII (p.145)]
 actor: FRBS users (TAX_VIEW)
 priority: Must have
 screens: Tax & Statutory > BIR Forms & Books; Tax Returns; Certificates Received
@@ -1522,7 +1531,7 @@ acceptance:
 ```fr
 id: FR-AC-070
 title: Maintain lists of values with approval
-brd: [BASAU 2.2.0 (p.128), BASAU 2.2.1 (p.128), BASAU 2.2.2 (p.128), BASAU 2.2.3 (p.128), BASAU 2.2.4 (p.128), BASAU 2.2.5 (p.129)]
+brd: [BASAU 2.2.0 (p.129), BASAU 2.2.1 (p.129), BASAU 2.2.2 (p.129), BASAU 2.2.3 (p.129), BASAU 2.2.4 (p.129), BASAU 2.2.5 (p.130)]
 actor: Business Administrator (LOV_MANAGE); approver (MASTER_AUTHORIZE)
 priority: Must have
 screens: Administration > Lists of Values; My Approvals
@@ -1558,7 +1567,7 @@ acceptance:
 ```fr
 id: FR-AC-071
 title: Manage users and role profiles through approved requests
-brd: [BASAU 2.3.0 (p.129), BASAU 2.3.1 (p.129), BASAU 2.3.2 (p.129), BASAU 2.3.3 (p.129), BASAU 2.4.0 (p.130), BASAU 2.4.2 (p.130)]
+brd: [BASAU 2.3.0 (p.130), BASAU 2.3.1 (p.130), BASAU 2.3.2 (p.130), BASAU 2.3.3 (p.130), BASAU 2.4.0 (p.131), BASAU 2.4.2 (p.131)]
 actor: System Administrator / Business Administrator (ACCESS_REQUEST); approver (ACCESS_APPROVE)
 priority: Must have
 screens: Administration > Access Requests; Users; Roles & Permissions; User Access Matrix
@@ -1599,7 +1608,7 @@ acceptance:
 ```fr
 id: FR-AC-072
 title: Approve, decline or return administration requests
-brd: [BASAU 2.4.1 (p.130), BASAU 2.5.0 (p.130), BASAU 2.5.1 (p.131), BASAU 2.5.2 (p.131), BASAU 2.5.3 (p.131), BASAU 2.6.0 (p.131), BASAU 2.6.1 (p.131), BASAU 2.6.2 (p.131), BASAU 2.6.3 (p.132)]
+brd: [BASAU 2.4.1 (p.131), BASAU 2.5.0 (p.131), BASAU 2.5.1 (p.132), BASAU 2.5.2 (p.132), BASAU 2.5.3 (p.132), BASAU 2.6.0 (p.132), BASAU 2.6.1 (p.132), BASAU 2.6.2 (p.132), BASAU 2.6.3 (p.133)]
 actor: Approver (ACCESS_APPROVE, MASTER_AUTHORIZE)
 priority: Must have
 screens: My Approvals; Access Requests
@@ -1644,7 +1653,7 @@ Section 4.1 covers Disbursement (FR-DS), section 4.2 Payment Requests of Marketi
 ```fr
 id: FR-DS-001
 title: Access Disbursement, Payment Requests and ACSL with a user profile
-brd: [DIS 1.1.0 (p.68), DIS 1.1.1 (p.69), DIS 1.1.2 (p.69), DIS 1.1.3 (p.69), MKT 1.1.0 (p.105), MKT 1.1.1 (p.105), MKT 1.1.2 (p.105), MKT 1.1.3 (p.105), ACSL 1.1.0 (p.114), ACSL 1.1.1 (p.115), ACSL 1.1.2 (p.115), ACSL 1.1.3 (p.115)]
+brd: [DIS 1.1.0 (p.69), DIS 1.1.1 (p.70), DIS 1.1.2 (p.70), DIS 1.1.3 (p.70), MKT 1.1.0 (p.106), MKT 1.1.1 (p.106), MKT 1.1.2 (p.106), MKT 1.1.3 (p.106), ACSL 1.1.0 (p.115), ACSL 1.1.1 (p.116), ACSL 1.1.2 (p.116), ACSL 1.1.3 (p.116)]
 actor: Disbursement, Marketing and ACSL users
 priority: Must have
 screens: Login; menu group Finance (Disbursement, Refund & Cash Advance Requests, ACSL)
@@ -1676,7 +1685,7 @@ acceptance:
 ```fr
 id: FR-DS-010
 title: Maintain payees with authorisation
-brd: [DIS 2.2.0 (p.69), DIS 2.2.3 (p.70), DIS 2.2.6 (p.71), DIS 2.2.7 (p.71)]
+brd: [DIS 2.2.0 (p.70), DIS 2.2.3 (p.71), DIS 2.2.6 (p.72), DIS 2.2.7 (p.72)]
 actor: Disbursement Team Leader (maintain); Disbursement Approver (authorise)
 priority: Must have
 screens: Payees (tabs Active, For Authorisation, Drafts, Inactive, Payee Requests); Payee
@@ -1726,7 +1735,7 @@ acceptance:
 ```fr
 id: FR-DS-011
 title: Classify payees and choose the modes of payment
-brd: [DIS 2.2.2 (p.70), DIS 2.2.5 (p.70)]
+brd: [DIS 2.2.2 (p.71), DIS 2.2.5 (p.71)]
 actor: Disbursement Team Leader
 priority: Must have
 screens: Payee
@@ -1751,7 +1760,7 @@ acceptance:
 ```fr
 id: FR-DS-012
 title: Receive payee maintenance requests
-brd: [DIS 2.2.1 (p.69)]
+brd: [DIS 2.2.1 (p.70)]
 actor: Disbursement Team Leader
 priority: Must have
 screens: Payees (Payee Requests)
@@ -1779,7 +1788,7 @@ acceptance:
 ```fr
 id: FR-DS-013
 title: Delete or deactivate payees
-brd: [DIS 2.2.4 (p.70)]
+brd: [DIS 2.2.4 (p.71)]
 actor: Disbursement Team Leader; Approver
 priority: Must have
 screens: Payee (Delete, Request Deactivation)
@@ -1807,7 +1816,7 @@ acceptance:
 ```fr
 id: FR-DS-014
 title: View all payees and migrate the existing payees
-brd: [DIS 2.2.8 (p.71; Add.1 p.31-32; Add.2 p.11-12)]
+brd: [DIS 2.2.8 (p.72; Add.1 p.32-33; Add.2 p.12-13)]
 actor: Disbursement users; Disbursement Team Leader (migration)
 priority: Must have
 screens: Payees; Disbursement Uploads (Payee Migration); Disbursement Reports (Payee report)
@@ -1837,7 +1846,7 @@ acceptance:
 ```fr
 id: FR-DS-020
 title: Receive system-triggered payment requests
-brd: [DIS 2.6.0 (p.75), DIS 2.6.2 (p.76), DIS 3.25.0 (p.95)]
+brd: [DIS 2.6.0 (p.76), DIS 2.6.2 (p.77), DIS 3.25.0 (p.96)]
 actor: System; Disbursement Processor
 priority: Must have
 screens: Disbursement Workbench (System Requests, No Payee)
@@ -1879,7 +1888,7 @@ acceptance:
 ```fr
 id: FR-DS-021
 title: Classify requests by disbursement type
-brd: [DIS 3.25.1 (p.96)]
+brd: [DIS 3.25.1 (p.97)]
 actor: System
 priority: Must have
 screens: Disbursement Workbench; DV
@@ -1902,7 +1911,7 @@ acceptance:
 ```fr
 id: FR-DS-022
 title: Match the payee and report requests without payee
-brd: [DIS 3.25.2 (p.96)]
+brd: [DIS 3.25.2 (p.97)]
 actor: System
 priority: Must have
 screens: Disbursement Workbench (No Payee); Disbursement Reports
@@ -1926,7 +1935,7 @@ acceptance:
 ```fr
 id: FR-DS-023
 title: Encode requests received by e-mail
-brd: [DIS 2.6.1 (p.76)]
+brd: [DIS 2.6.1 (p.77)]
 actor: Disbursement Processor
 priority: Must have
 screens: Encode Payment Request
@@ -1963,7 +1972,7 @@ acceptance:
 ```fr
 id: FR-DS-024
 title: Upload requests and view the fall-out
-brd: [DIS 2.5.0 (p.75), DIS 2.5.1 (p.75)]
+brd: [DIS 2.5.0 (p.76), DIS 2.5.1 (p.76)]
 actor: Disbursement Processor / Team Leader (DISB_UPLOAD)
 priority: Must have
 screens: Disbursement Uploads (Payment Requests)
@@ -1989,7 +1998,7 @@ acceptance:
 ```fr
 id: FR-DS-025
 title: Work the Disbursement Workbench
-brd: [DIS 2.4.0 (p.73), DIS 2.4.1 (p.73), DIS 2.4.2 (p.74), DIS 2.4.3 (p.74), DIS 2.4.4 (p.74), DIS 2.7.1 (p.77), DIS 2.7.2 (p.78), DIS 2.7.3 (p.78)]
+brd: [DIS 2.4.0 (p.74), DIS 2.4.1 (p.74), DIS 2.4.2 (p.75), DIS 2.4.3 (p.75), DIS 2.4.4 (p.75), DIS 2.7.1 (p.78), DIS 2.7.2 (p.79), DIS 2.7.3 (p.79)]
 actor: Disbursement users
 priority: Must have
 screens: Disbursement Workbench; Disbursement Voucher (tabs Details, Entry, Instrument, OR / AR and CWT, Documents, E-mails)
@@ -2022,7 +2031,7 @@ acceptance:
 ```fr
 id: FR-DS-030
 title: Create the disbursement voucher
-brd: [DIS 2.7.5 (p.79), DIS 2.7.4 (p.78)]
+brd: [DIS 2.7.5 (p.80), DIS 2.7.4 (p.79)]
 actor: System; Disbursement Processor
 priority: Must have
 screens: Disbursement Voucher (Details)
@@ -2064,7 +2073,7 @@ acceptance:
 ```fr
 id: FR-DS-031
 title: Create and edit the proforma entry
-brd: [DIS 2.7.6 (p.80)]
+brd: [DIS 2.7.6 (p.81)]
 actor: System; Disbursement Processor
 priority: Must have
 screens: Disbursement Voucher (Entry)
@@ -2102,7 +2111,7 @@ acceptance:
 ```fr
 id: FR-DS-032
 title: Allocate expenses by cost centre
-brd: [DIS 2.7.10 (p.82), DIS 3.30.0 (Add.2 p.9)]
+brd: [DIS 2.7.10 (p.83), DIS 3.30.0 (Add.2 p.10)]
 actor: Disbursement Processor
 priority: Must have
 screens: Disbursement Voucher (Entry - Apply Allocation)
@@ -2132,7 +2141,7 @@ acceptance:
 ```fr
 id: FR-DS-033
 title: Process the payment by one of the seven modes
-brd: [DIS 2.7.0 (p.77)]
+brd: [DIS 2.7.0 (p.78)]
 actor: Disbursement Processor
 priority: Must have
 screens: Disbursement Voucher (Instrument)
@@ -2160,7 +2169,7 @@ acceptance:
 ```fr
 id: FR-DS-034
 title: Process an Authority to Debit
-brd: [DIS 2.7.7 (p.81)]
+brd: [DIS 2.7.7 (p.82)]
 actor: Disbursement Processor
 priority: Must have
 screens: Disbursement Voucher (Instrument - Print, E-mail, Debited)
@@ -2186,7 +2195,7 @@ acceptance:
 ```fr
 id: FR-DS-035
 title: Process Manager's Checks, Demand Drafts, Credit Tickets and Telegraphic Transfers
-brd: [DIS 2.7.8 (p.81), DIS 2.7.9 (p.82)]
+brd: [DIS 2.7.8 (p.82), DIS 2.7.9 (p.83)]
 actor: Disbursement Processor
 priority: Must have
 screens: Disbursement Voucher (Instrument)
@@ -2214,7 +2223,7 @@ acceptance:
 ```fr
 id: FR-DS-036
 title: Submit the DV for review
-brd: [DIS 2.7.11 (p.82)]
+brd: [DIS 2.7.11 (p.83)]
 actor: Disbursement Processor
 priority: Must have
 screens: Disbursement Voucher (Submit)
@@ -2239,7 +2248,7 @@ acceptance:
 ```fr
 id: FR-DS-037
 title: Maintain the employee and cost-centre master and report the headcount
-brd: [DIS 3.30.1 (Add.2 p.9-10), DIS 3.30.2 (Add.2 p.10-11)]
+brd: [DIS 3.30.1 (Add.2 p.10-11), DIS 3.30.2 (Add.2 p.11-12)]
 actor: Comptrollership administrator (EMPLOYEE_MAINTAIN)
 priority: Must have
 screens: Setup > Employees; Report Centre (Headcount per Cost Centre)
@@ -2277,7 +2286,7 @@ acceptance:
 ```fr
 id: FR-DS-040
 title: Review, return and submit DVs for approval
-brd: [DIS 2.13.0 (p.87), DIS 2.14.0 (p.88), DIS 2.15.0 (p.88)]
+brd: [DIS 2.13.0 (p.88), DIS 2.14.0 (p.89), DIS 2.15.0 (p.89)]
 actor: Disbursement Team Leader (DISB_REVIEW); Approver (return)
 priority: Must have
 screens: Disbursement Workbench (For Review); Disbursement Voucher
@@ -2305,7 +2314,7 @@ acceptance:
 ```fr
 id: FR-DS-041
 title: Approve and post one or several DVs
-brd: [DIS 2.19.0 (p.91)]
+brd: [DIS 2.19.0 (p.92)]
 actor: Disbursement Approver (DISB_APPROVE)
 priority: Must have
 screens: Disbursement Workbench (For Approval - bulk); Disbursement Voucher (Approve)
@@ -2336,7 +2345,7 @@ acceptance:
 ```fr
 id: FR-DS-042
 title: Reject a DV
-brd: [DIS 2.21.0 (p.92)]
+brd: [DIS 2.21.0 (p.93)]
 actor: Disbursement Approver
 priority: Must have
 screens: Disbursement Voucher (Reject)
@@ -2361,7 +2370,7 @@ acceptance:
 ```fr
 id: FR-DS-043
 title: Cancel a DV In Process or For review
-brd: [DIS 2.9.0 (p.85), DIS 2.18.0 (p.91)]
+brd: [DIS 2.9.0 (p.86), DIS 2.18.0 (p.92)]
 actor: Disbursement Processor (In Process); Team Leader (For review)
 priority: Must have
 screens: Disbursement Workbench (search); Disbursement Voucher (Cancel)
@@ -2387,7 +2396,7 @@ acceptance:
 ```fr
 id: FR-DS-044
 title: Cancel an approved DV and regularise the accounting
-brd: [DIS 2.20.0 (p.92)]
+brd: [DIS 2.20.0 (p.93)]
 actor: Disbursement Approver
 priority: Must have
 screens: Disbursement Voucher (Cancel approved DV)
@@ -2416,7 +2425,7 @@ acceptance:
 ```fr
 id: FR-DS-045
 title: Regularise the accounting of every DV and list what is not regularised
-brd: [DIS 3.27.0 (p.99; Add.1 p.31)]
+brd: [DIS 3.27.0 (p.100; Add.1 p.32)]
 actor: System; Disbursement users
 priority: Must have
 screens: Disbursement Workbench (Unregularised); Disbursement Reports
@@ -2445,7 +2454,7 @@ acceptance:
 ```fr
 id: FR-DS-050
 title: Tag instrument statuses
-brd: [DIS 2.8.0 (p.83), DIS 2.8.1 (p.83), DIS 2.8.2 (p.84), DIS 2.8.3 (p.84), DIS 2.8.4 (p.85)]
+brd: [DIS 2.8.0 (p.84), DIS 2.8.1 (p.84), DIS 2.8.2 (p.85), DIS 2.8.3 (p.85), DIS 2.8.4 (p.86)]
 actor: Disbursement Processor
 priority: Must have
 screens: Disbursement Voucher (Instrument)
@@ -2473,7 +2482,7 @@ acceptance:
 ```fr
 id: FR-DS-051
 title: Edit an instrument status with approval
-brd: [DIS 2.8.5 (p.85)]
+brd: [DIS 2.8.5 (p.86)]
 actor: Disbursement Processor (request); Team Leader (DISB_STATUS_APPROVE)
 priority: Must have
 screens: Disbursement Voucher (Instrument - Request Status Edit); status edits list
@@ -2507,7 +2516,7 @@ acceptance:
 ```fr
 id: FR-DS-052
 title: Tag statuses automatically
-brd: [DIS 3.26.0 (p.96), DIS 3.26.3 (p.97), DIS 3.26.5 (p.98), DIS 3.26.6 (p.98), DIS 3.26.7 (p.99)]
+brd: [DIS 3.26.0 (p.97), DIS 3.26.3 (p.98), DIS 3.26.5 (p.99), DIS 3.26.6 (p.99), DIS 3.26.7 (p.100)]
 actor: System
 priority: Must have
 screens: Disbursement Voucher (Instrument - status history)
@@ -2534,7 +2543,7 @@ acceptance:
 ```fr
 id: FR-DS-053
 title: Upload deposited-checks and credited-accounts files
-brd: [DIS 2.22.0 (p.93), DIS 3.26.1 (p.97), DIS 3.26.4 (p.98)]
+brd: [DIS 2.22.0 (p.94), DIS 3.26.1 (p.98), DIS 3.26.4 (p.99)]
 actor: Disbursement Processor / Team Leader (DISB_UPLOAD)
 priority: Must have
 screens: Disbursement Uploads (Negotiated Checks, Credited Accounts, BOB Approvals)
@@ -2562,7 +2571,7 @@ acceptance:
 ```fr
 id: FR-DS-054
 title: Stale checks after 180 days and re-issue them
-brd: [DIS 3.26.2 (p.97)]
+brd: [DIS 3.26.2 (p.98)]
 actor: System (job DISB_CHECK_STALE); Disbursement Processor (re-issue)
 priority: Must have
 screens: Disbursement Voucher (Instrument - Re-issue); Disbursement Reports
@@ -2589,7 +2598,7 @@ acceptance:
 ```fr
 id: FR-DS-055
 title: Post the entries of negotiated and stale checks
-brd: [DIS 3.27.1 (p.100)]
+brd: [DIS 3.27.1 (p.101)]
 actor: System
 priority: Must have
 screens: Disbursement Voucher (Instrument, Entry)
@@ -2614,7 +2623,7 @@ acceptance:
 ```fr
 id: FR-DS-056
 title: Tag the Official Receipt or Acknowledgement Receipt
-brd: [DIS 2.10.0 (p.86), DIS 2.10.1 (p.86), DIS 2.10.2 (p.86)]
+brd: [DIS 2.10.0 (p.87), DIS 2.10.1 (p.87), DIS 2.10.2 (p.87)]
 actor: Disbursement Processor (DISB_TAG)
 priority: Must have
 screens: Disbursement Voucher (OR / AR and CWT)
@@ -2647,7 +2656,7 @@ acceptance:
 ```fr
 id: FR-DS-057
 title: Tag creditable withholding tax received or released
-brd: [DIS 2.11.0 (p.86), DIS 2.11.1 (p.86), DIS 2.11.2 (p.87)]
+brd: [DIS 2.11.0 (p.87), DIS 2.11.1 (p.87), DIS 2.11.2 (p.88)]
 actor: Disbursement Processor (DISB_TAG)
 priority: Must have
 screens: Disbursement Voucher (OR / AR and CWT); Tax & Statutory > Certificates Received
@@ -2683,7 +2692,7 @@ acceptance:
 ```fr
 id: FR-DS-058
 title: Generate BIR Form 2307 for suppliers
-brd: [DIS 2.12.0 (p.87)]
+brd: [DIS 2.12.0 (p.88)]
 actor: Disbursement Processor; Tax users
 priority: Must have
 screens: Tax & Statutory > BIR Form 2307
@@ -2711,7 +2720,7 @@ acceptance:
 ```fr
 id: FR-DS-060
 title: Run the end of day of Disbursement
-brd: [DIS 2.16.0 (p.88), DIS 2.16.3 (p.89), DIS 2.16.4 (p.89), DIS 2.16.5 (p.89)]
+brd: [DIS 2.16.0 (p.89), DIS 2.16.3 (p.90), DIS 2.16.4 (p.90), DIS 2.16.5 (p.90)]
 actor: Disbursement Team Leader / Approver (DISB_EOD)
 priority: Must have
 screens: Disbursement End of Day (Run End of Day, Runs, outputs)
@@ -2737,11 +2746,11 @@ acceptance:
 ```fr
 id: FR-DS-061
 title: Produce the Direct Credit Transaction File
-brd: [DIS 2.16.1 (p.88)]
+brd: [DIS 2.16.1 (p.89)]
 actor: System (end of day); Disbursement Team Leader
 priority: Must have
 screens: Disbursement End of Day (DCTF output)
-description: The end of day writes the DCTF of the credit-to-account DVs - a header with the date (MMddyyyy) and the file name, and one 89-character detail per payment - 12-digit account number, 30-character payee name, 12 blanks, 20-character system reference, amount 000000000000.00, upper case (Appendix B, p.147). Each included payment becomes Extracted. The user forwards the file to TPD for ACA processing.
+description: The end of day writes the DCTF of the credit-to-account DVs - a header with the date (MMddyyyy) and the file name, and one 89-character detail per payment - 12-digit account number, 30-character payee name, 12 blanks, 20-character system reference, amount 000000000000.00, upper case (Appendix B, p.148). Each included payment becomes Extracted. The user forwards the file to TPD for ACA processing.
 preconditions:
   - "Credit-to-account DVs are approved for the date."
 main_flow:
@@ -2761,7 +2770,7 @@ acceptance:
 ```fr
 id: FR-DS-062
 title: Print checks and vouchers
-brd: [DIS 2.16.2 (p.88), DIS 2.16.6 (p.89)]
+brd: [DIS 2.16.2 (p.89), DIS 2.16.6 (p.90)]
 actor: Disbursement Processor / Team Leader
 priority: Must have
 screens: Disbursement End of Day (check batch, vouchers); Disbursement Voucher (Document)
@@ -2786,7 +2795,7 @@ acceptance:
 ```fr
 id: FR-DS-063
 title: E-mail the payment confirmations and the remittance schedule
-brd: [DIS 2.7.12 (p.83)]
+brd: [DIS 2.7.12 (p.84)]
 actor: System; Disbursement Team Leader
 priority: Must have
 screens: Disbursement End of Day (Confirm); Disbursement Voucher (E-mails)
@@ -2812,7 +2821,7 @@ acceptance:
 ```fr
 id: FR-DS-064
 title: Fund the main BDOIR account with a verifier and two approvers
-brd: [DIS 2.17.0 (p.90), DIS 2.17.1 (p.90), DIS 2.17.2 (p.90), DIS 2.17.3 (p.90), DIS 2.17.4 (p.90; Add.1 p.33)]
+brd: [DIS 2.17.0 (p.91), DIS 2.17.1 (p.91), DIS 2.17.2 (p.91), DIS 2.17.3 (p.91), DIS 2.17.4 (p.91; Add.1 p.34)]
 actor: Disbursement Team Leader (maker, verifier); Disbursement Approvers
 priority: Must have
 screens: Account Funding; Funding Request
@@ -2855,7 +2864,7 @@ acceptance:
 ```fr
 id: FR-DS-070
 title: Maintain the check series
-brd: [DIS 2.23.0 (p.93), DIS 2.23.1 (p.93), DIS 2.23.2 (p.93)]
+brd: [DIS 2.23.0 (p.94), DIS 2.23.1 (p.94), DIS 2.23.2 (p.94)]
 actor: Disbursement Approver (MASTER_MAINTAIN)
 priority: Must have
 screens: Bank Accounts and Checks (cheque books)
@@ -2885,7 +2894,7 @@ acceptance:
 ```fr
 id: FR-DS-071
 title: Maintain the BDOIR bank accounts and their status
-brd: [DIS 2.24.0 (p.93), DIS 2.24.1 (p.93), DIS 2.24.2 (p.94; Add.1 p.33)]
+brd: [DIS 2.24.0 (p.94), DIS 2.24.1 (p.94), DIS 2.24.2 (p.95; Add.1 p.34)]
 actor: Disbursement Approver
 priority: Must have
 screens: Bank Accounts and Checks
@@ -2912,7 +2921,7 @@ acceptance:
 ```fr
 id: FR-DS-080
 title: Run Disbursement reports on demand
-brd: [DIS 2.3.0 (p.71), DIS 2.3.1 (p.72), DIS 2.3.2 (p.72), DIS 2.3.3 (p.72), DIS 2.3.4 (p.72), DIS 2.3.5 (p.72), DIS 2.3.6 (p.73), DIS 2.3.7 (p.73), DIS 2.3.8 (p.73), DIS 2.3.9 (p.73)]
+brd: [DIS 2.3.0 (p.72), DIS 2.3.1 (p.73), DIS 2.3.2 (p.73), DIS 2.3.3 (p.73), DIS 2.3.4 (p.73), DIS 2.3.5 (p.73), DIS 2.3.6 (p.74), DIS 2.3.7 (p.74), DIS 2.3.8 (p.74), DIS 2.3.9 (p.74)]
 actor: Disbursement users (DISB_REPORT_VIEW / EXPORT)
 priority: Must have
 screens: Disbursement Reports; Report Centre
@@ -2937,7 +2946,7 @@ acceptance:
 ```fr
 id: FR-DS-081
 title: Generate the end-of-day reports
-brd: [DIS 3.28.0 (p.100), DIS 3.28.2 (p.101)]
+brd: [DIS 3.28.0 (p.101), DIS 3.28.2 (p.102)]
 actor: System (end of day)
 priority: Must have
 screens: Disbursement End of Day (outputs); Disbursement Reports
@@ -2961,7 +2970,7 @@ acceptance:
 ```fr
 id: FR-DS-082
 title: Run the real-time Disbursement reports
-brd: [DIS 3.28.3 (p.101)]
+brd: [DIS 3.28.3 (p.102)]
 actor: Disbursement users
 priority: Must have
 screens: Disbursement Reports
@@ -2984,7 +2993,7 @@ acceptance:
 ```fr
 id: FR-DS-083
 title: Report payees and upload fall-outs
-brd: [DIS 3.28.1 (p.100), DIS 3.28.4 (p.102)]
+brd: [DIS 3.28.1 (p.101), DIS 3.28.4 (p.103)]
 actor: Disbursement users
 priority: Must have
 screens: Disbursement Reports
@@ -3009,21 +3018,22 @@ acceptance:
 ```fr
 id: FR-DS-090
 title: Compute CPC2 incentives per remittance
-brd: [DIS 3.29.2 (Add.2 p.8-9)]
+brd: [DIS 3.29.2 (Add.2 p.9-10); Minutes of 4-May-2026 on DIS 3.29.2 (p.1)]
 actor: System (remittance extraction and approval)
 priority: Must have
 screens: Remittance batch (CPC2 column and totals, Settlement tab); remittance payment request and schedule
 description:
-  - When a remittance batch is extracted, BIBS looks up for each line the active incentive criteria of code CPC2 maintained by TSU on the products matrix (BRD-3 PMADD07-08) - risk code, segment and insurer, effective on the booking date, with a rate and an optional minimum gross premium. For a qualifying line it computes CPC2 as the rate on the basic premium remitted, with output VAT at the invoice's commission VAT ratio, per remittance and not cumulative.
+  - CPC2 follows the incentive tag of the booked transaction (minutes of 4 May 2026). At booking, the incentive criteria of code CPC2 maintained by TSU on the products matrix (BRD-3 PMADD07-08) tag the invoice when it qualifies, and the tag is stored on the booked invoice with the criterion code and rate (FR-PM-081). An endorsement that changes the qualification changes the tag of the transaction in New Business and Operations; CPC2 reads only the tag.
+  - When a remittance batch is extracted, BIBS reads for each line the incentive tag of its booked invoice. A line whose booked transaction carries the CPC2 tag qualifies; CPC2 is the rate of the tag on the basic premium remitted, with output VAT at the invoice's commission VAT ratio, per remittance batch and not cumulative. A line without the tag gets no CPC2, whatever the criteria say on the extraction date. The CPC2 criteria are not those of the other incentives (minutes); their definition is still asked (AQ24).
   - CPC2 and its VAT are deducted from the amount payable to the insurer and shown apart from commission on the line, the batch totals, the payment request and the schedule. On approval BIBS posts OPS_REMIT_CPC2 per batch (reference RMB:<batch>:CPC2; amounts GROSS, CPC2_INCOME, OUTPUT_VAT) to CPC2 incentive income. Each line keeps the criterion code and rate for audit.
 preconditions:
-  - "An active CPC2 criterion with a rate exists for the product, segment and insurer."
+  - "The booked invoices of the batch carry their incentive tag (FR-PM-081)."
 main_flow:
   - The remittance processor extracts the batch.
-  - BIBS computes CPC2 on each qualifying line.
+  - BIBS reads the incentive tag of each booked invoice and computes CPC2 on each line tagged CPC2.
   - On approval BIBS posts OPS_REMIT_CPC2.
 rules:
-  - [R1, "CPC2 applies to the lines matched by an active CPC2 criterion with a RATE basis.", Configurable, Incentive criteria (code CPC2)]
+  - [R1, "CPC2 applies to the lines whose booked transaction carries the CPC2 incentive tag; the rate is the one stored with the tag (minutes p.1; CLR-DS-16).", Configurable, Incentive criteria (code CPC2) applied at booking]
   - [R2, "Optional minimum gross premium per criterion.", Configurable, "Criterion rule parameter minimumPremium"]
   - [R3, "Base (basic premium remitted), VAT treatment and fixed-amount or rule criteria are to be confirmed (AQ24, OQ39, PQ04).", Fixed, "-"]
 validations: []
@@ -3034,16 +3044,20 @@ audit:
 acceptance:
   - A packaged Motor line with a basic premium remitted of 100,000.00 and a CPC2 rate of 2% shows CPC2 2,000.00 plus VAT, and the batch payable is reduced by that amount.
   - Approving the batch posts OPS_REMIT_CPC2 with the CPC2 income.
+  - A line whose booked transaction lost the CPC2 tag through an endorsement gets no CPC2, although the product still matches the CPC2 criteria.
 ```
 
 ```fr
 id: FR-DS-091
 title: Issue the service invoice of the early incentive automatically
-brd: [DIS 3.29.1 (Add.2 p.7-8)]
+brd: [DIS 3.29.1 (Add.2 p.8-9); Minutes of 4-May-2026 on DIS 3.29.2 (p.1)]
 actor: System (remittance approval, booking)
 priority: Must have
 screens: Remittance batch (Settlement tab - SI); Service invoices; Service invoice types (trigger ON_INCENTIVE)
-description: When a remittance batch with an early incentive is approved, BIBS issues once per batch a booking service invoice of type EARLY_INCENTIVE to the insurer - incentive, its VAT and withholding tax at EARLY_INCENTIVE_WTAX_RATE (2%) of the incentive, summed per line - and links it on the batch. The incentive OR carries the same withholding per line and names the service invoice. A manual issue of a service invoice type with trigger ON_INCENTIVE is refused.
+description:
+  - When a remittance batch with an early incentive is approved, BIBS issues once per batch a booking service invoice of type EARLY_INCENTIVE to the insurer - incentive, its VAT and withholding tax at EARLY_INCENTIVE_WTAX_RATE (2%) of the incentive, summed per line - and links it on the batch. The incentive OR carries the same withholding per line and names the service invoice. A manual issue of a service invoice type with trigger ON_INCENTIVE is refused.
+  - The service invoice has one line per qualified transaction of the batch - the invoice, the incentive, its VAT and withholding - so that each qualified transaction stays linked to the service invoice that billed it (DIS 3.29.1). The amount of the invoice is the incentive of the batch with the applicable taxes, as the minutes of 4 May 2026 confirm. The Settlement tab of the batch lists the qualified transactions with the service invoice number, so the users see in one place every transaction that needs, or has, its service invoice.
+  - The proposed position is one service invoice per remittance batch, issued automatically when the batch is approved, with a line per qualified transaction. The minutes also mention a screen listing the transactions that need a service invoice, generated in one click, and individual invoices per qualified transaction; the granularity and the trigger are asked for confirmation (CLR-DS-17).
 preconditions:
   - "The batch has a qualified early incentive (BRD-2)."
 main_flow:
@@ -3052,7 +3066,7 @@ main_flow:
   - The incentive OR names the service invoice.
 rules:
   - [R1, "Withholding tax rate 2%.", Configurable, Parameter EARLY_INCENTIVE_WTAX_RATE]
-  - [R2, "One early-incentive service invoice per batch; a re-sent batch does not issue a second one.", Fixed, "-"]
+  - [R2, "One early-incentive service invoice per batch, with one line per qualified transaction; a re-sent batch does not issue a second one (minutes p.1; CLR-DS-17).", Fixed, "-"]
   - [R3, "The entry of the insurer's 2% withholding (Dr 1611 / Cr 2211) waits for AQ25; until then the incentive is deducted in full from the remittance.", Fixed, "-"]
 validations:
   - [Manual issue of an automatic type, "Service invoices of type <type> are issued automatically with the early remittance incentive", SERVICE_INVOICE_AUTOMATIC_ONLY]
@@ -3063,25 +3077,27 @@ audit:
 acceptance:
   - An early incentive of 5,000.00 produces one service invoice with 100.00 withholding tax, linked to its batch.
   - Issuing an EARLY_INCENTIVE service invoice by hand is refused with SERVICE_INVOICE_AUTOMATIC_ONLY.
+  - A batch with three qualified transactions produces one service invoice with three lines, each naming its invoice and incentive, whose amount is the incentive of the batch with its taxes.
 ```
 
 ```fr
 id: FR-DS-092
 title: Report CPC2 incentives
-brd: [DIS 3.29.0 (Add.2 p.7)]
+brd: [DIS 3.29.0 (Add.2 p.8); Minutes of 4-May-2026 on DIS 3.29.2 (p.1)]
 actor: Disbursement users
 priority: Must have
 screens: Disbursement Reports (CPC2 report)
-description: Disbursement users run the CPC2 report for a period. It lists, per remittance batch line, the user, product and role, the CPC2 code and rate, the basic premium remitted, the CPC2 amount and its VAT, with totals that agree with the CPC2 income posted in the ledger (FR-DS-090). The report exports to Excel and PDF and every run is logged. Its layout is confirmed with the CPC2 definition (AQ24).
+description: Disbursement users run the CPC2 report for a period. It is based only on the incentive tag of the booked transactions (minutes of 4 May 2026) and lists, per remittance batch line of a transaction tagged CPC2, the invoice, the user, product and role, the CPC2 code and rate of the tag, the basic premium remitted, the CPC2 amount and its VAT, with totals that agree with the CPC2 income posted in the ledger (FR-DS-090). It is the report of qualified invoices of the minutes for CPC2; for the early incentive, each qualified transaction is listed with its service invoice on the batch (FR-DS-091; CLR-DS-18). The report exports to Excel and PDF and every run is logged. Its layout is confirmed with the CPC2 definition (AQ24).
 preconditions:
   - "The user holds the Disbursement report permission."
 main_flow:
   - The user opens Disbursement Reports, chooses the CPC2 report and enters the period.
-  - BIBS lists the CPC2 lines of the remittance batches approved in the period, with the breakdown and totals.
+  - BIBS lists the lines tagged CPC2 of the remittance batches approved in the period, with the breakdown and totals.
   - The user exports the report to Excel or PDF.
 rules:
   - [R1, "Layout to be agreed with the CPC2 definition (AQ24).", Configurable, Report layout]
   - [R2, "The totals agree with the CPC2 income posted for the period.", Fixed, "-"]
+  - [R3, "A line is listed only when its booked transaction carries the CPC2 tag (minutes p.1).", Fixed, "-"]
 validations:
   - [Mandatory parameter missing, "Parameter <name> is required", MISSING_PARAMETER]
 notifications:
@@ -3090,12 +3106,13 @@ audit:
   - "Every run and export is archived."
 acceptance:
   - The CPC2 report of September lists every CPC2 line of the September batches and its total equals the CPC2 income posted in September.
+  - A remitted transaction without the CPC2 tag is not on the report.
 ```
 
 ```fr
 id: FR-DS-093
 title: Link related transactions to one invoice number
-brd: [DIS 3.27.2 (p.100)]
+brd: [DIS 3.27.2 (p.101)]
 actor: System; Operations, Disbursement and ACSL users
 priority: Must have
 screens: Invoice Search; Invoice 360 (Invoice Family tab); booking invoice (Root Invoice chip); ACSL Case; Disbursement Voucher
@@ -3126,7 +3143,7 @@ acceptance:
 ```fr
 id: FR-PQ-001
 title: Receive refund and cash-advance requests in Requests Home
-brd: [MKT 1.2.0 (p.105), MKT 1.3.0 (p.106), MKT 1.4.0 (p.106), MKT 1.5.0 (p.106), MKT 1.6.0 (p.106)]
+brd: [MKT 1.2.0 (p.106), MKT 1.3.0 (p.107), MKT 1.4.0 (p.107), MKT 1.5.0 (p.107), MKT 1.6.0 (p.107)]
 actor: Marketing Processor, Reviewer and Approver; HR
 priority: Must have
 screens: Requests Home (tabs by stage with counts); Request
@@ -3156,7 +3173,7 @@ acceptance:
 ```fr
 id: FR-PQ-002
 title: Access the unapplied payment reports
-brd: [MKT 1.7.0 (p.106), MKT 1.7.1 (p.106), MKT 1.7.2 (p.107), MKT 1.7.3 (p.107)]
+brd: [MKT 1.7.0 (p.107), MKT 1.7.1 (p.107), MKT 1.7.2 (p.108), MKT 1.7.3 (p.108)]
 actor: Marketing Processor, Reviewer and Approver
 priority: Must have
 screens: Report Centre (Operations reports)
@@ -3184,7 +3201,7 @@ acceptance:
 ```fr
 id: FR-PQ-003
 title: Fill in the Refund Request Form
-brd: [MKT 1.10.0 (p.107; Appendix D)]
+brd: [MKT 1.10.0 (p.108; Appendix D)]
 actor: Marketing Processor (AO)
 priority: Must have
 screens: New Refund Request; Request (Refund)
@@ -3236,7 +3253,7 @@ acceptance:
 ```fr
 id: FR-PQ-004
 title: Fill in the Request for Payment of a cash advance
-brd: [MKT 1.10.0 (p.107; Appendix D)]
+brd: [MKT 1.10.0 (p.108; Appendix D)]
 actor: Employee / Marketing Processor
 priority: Must have
 screens: New Cash Advance; Request (Cash advance)
@@ -3270,7 +3287,7 @@ acceptance:
 ```fr
 id: FR-PQ-005
 title: Assign, re-assign and return requests
-brd: [MKT 1.8.0 (p.107), MKT 1.9.0 (p.107)]
+brd: [MKT 1.8.0 (p.108), MKT 1.9.0 (p.108)]
 actor: Marketing Reviewer (PRQ_ASSIGN); any handler (return)
 priority: Must have
 screens: Request (Assign, Return)
@@ -3302,7 +3319,7 @@ acceptance:
 ```fr
 id: FR-PQ-006
 title: Validate the refund of a cancelled policy with ACSL and Cashiering
-brd: [MKT 1.11.0 (p.108), ACSL 2.5.5 (p.117; Add.1 p.34)]
+brd: [MKT 1.11.0 (p.109), ACSL 2.5.5 (p.118; Add.1 p.35)]
 actor: Marketing Processor; ACSL Processor; Cashier
 priority: Must have
 screens: Request (Validations); ACSL Cases; Cashiering tasks
@@ -3336,7 +3353,7 @@ acceptance:
 ```fr
 id: FR-PQ-007
 title: Upload and view supporting documents
-brd: [MKT 1.12.0 (p.108), MKT 1.13.0 (p.108), MKT 2.22.0 (p.111)]
+brd: [MKT 1.12.0 (p.109), MKT 1.13.0 (p.109), MKT 2.22.0 (p.112)]
 actor: Marketing users
 priority: Must have
 screens: Request (Documents)
@@ -3364,7 +3381,7 @@ acceptance:
 ```fr
 id: FR-PQ-008
 title: Submit, review and endorse requests
-brd: [MKT 1.14.0 (p.109), MKT 1.15.0 (p.109)]
+brd: [MKT 1.14.0 (p.110), MKT 1.15.0 (p.110)]
 actor: Marketing Processor (submit); Reviewer (endorse)
 priority: Must have
 screens: Request (Submit, Endorse); Requests Home (bulk endorse)
@@ -3391,7 +3408,7 @@ acceptance:
 ```fr
 id: FR-PQ-009
 title: Approve or decline refunds, cash advances and check cancellations
-brd: [MKT 1.16.0 (p.109), MKT 1.16.1 (p.109), MKT 1.16.2 (p.109), MKT 1.16.3 (p.109)]
+brd: [MKT 1.16.0 (p.110), MKT 1.16.1 (p.110), MKT 1.16.2 (p.110), MKT 1.16.3 (p.110)]
 actor: Marketing Approver; HR (cash advances)
 priority: Must have
 screens: Request (Approve, Return); Requests Home (bulk approve)
@@ -3420,7 +3437,7 @@ acceptance:
 ```fr
 id: FR-PQ-010
 title: Cancel a request before approval
-brd: [MKT 1.17.0 (p.110)]
+brd: [MKT 1.17.0 (p.111)]
 actor: Requester, preparer or reviewer
 priority: Must have
 screens: Request (Cancel)
@@ -3444,7 +3461,7 @@ acceptance:
 ```fr
 id: FR-PQ-011
 title: Request the cancellation of a disbursed check
-brd: [MKT 1.19.0 (p.110)]
+brd: [MKT 1.19.0 (p.111)]
 actor: Marketing Processor; Reviewer; Approver
 priority: Must have
 screens: Cancel a Check; Request (Check cancellation)
@@ -3479,7 +3496,7 @@ acceptance:
 ```fr
 id: FR-PQ-012
 title: Track the status of requests and extract them
-brd: [MKT 1.18.0 (p.110), MKT 1.18.1 (p.110), MKT 2.26.0 (p.112)]
+brd: [MKT 1.18.0 (p.111), MKT 1.18.1 (p.111), MKT 2.26.0 (p.113)]
 actor: Marketing users
 priority: Must have
 screens: Requests Home; Request (History, Disbursement); Report Centre
@@ -3503,7 +3520,7 @@ acceptance:
 ```fr
 id: FR-PQ-013
 title: Receive the disbursement confirmation
-brd: [MKT 1.20.0 (p.111)]
+brd: [MKT 1.20.0 (p.112)]
 actor: System
 priority: Must have
 screens: Request (Disbursement tab)
@@ -3527,7 +3544,7 @@ acceptance:
 ```fr
 id: FR-PQ-014
 title: Prevent duplicate refunds by AR number
-brd: [MKT 2.23.0 (p.111)]
+brd: [MKT 2.23.0 (p.112)]
 actor: System
 priority: Must have
 screens: New Refund Request
@@ -3553,7 +3570,7 @@ acceptance:
 ```fr
 id: FR-PQ-015
 title: Send approved requests to Disbursement and to HR
-brd: [MKT 2.24.0 (p.111)]
+brd: [MKT 2.24.0 (p.112)]
 actor: System
 priority: Must have
 screens: Request (Disbursement tab)
@@ -3577,7 +3594,7 @@ acceptance:
 ```fr
 id: FR-PQ-016
 title: Record the client's payout account on approval
-brd: [MKT 2.25.0 (p.112; Add.1 p.34-35), MKT 2.25.1 (p.112)]
+brd: [MKT 2.25.0 (p.113; Add.1 p.35-36), MKT 2.25.1 (p.113)]
 actor: System
 priority: Must have
 screens: Client (Payout accounts); New Refund Request (payout fields)
@@ -3651,7 +3668,7 @@ acceptance:
 ```fr
 id: FR-AS-001
 title: Generate the input files and run ACSL reports on demand
-brd: [ACSL 2.2.0 (p.115), ACSL 2.3.0 (p.115), ACSL 2.3.1 (p.116), ACSL 2.3.2 (p.116), ACSL 2.3.3 (p.116), ACSL 2.3.4 (p.116), ACSL 2.3.5 (p.116), ACSL 2.3.6 (p.116), ACSL 2.14.2 (p.123)]
+brd: [ACSL 2.2.0 (p.116), ACSL 2.3.0 (p.116), ACSL 2.3.1 (p.117), ACSL 2.3.2 (p.117), ACSL 2.3.3 (p.117), ACSL 2.3.4 (p.117), ACSL 2.3.5 (p.117), ACSL 2.3.6 (p.117), ACSL 2.14.2 (p.124)]
 actor: ACSL users (ACSL_REPORT_VIEW / EXPORT)
 priority: Must have
 screens: Report Centre (category ACSL)
@@ -3678,7 +3695,7 @@ acceptance:
 ```fr
 id: FR-AS-002
 title: Upload insurer statements of account
-brd: [ACSL 2.2.1 (p.115), ACSL 2.4.0 (p.117; Add.1 p.33-34)]
+brd: [ACSL 2.2.1 (p.116), ACSL 2.4.0 (p.118; Add.1 p.34-35)]
 actor: ACSL Processor (ACSL_UPLOAD)
 priority: Must have
 screens: Insurer SOA Reconciliation (Upload SOA; uploads list; upload log)
@@ -3719,7 +3736,7 @@ acceptance:
 ```fr
 id: FR-AS-003
 title: Reconcile the SOA against the booked transactions by invoice number
-brd: [ACSL 2.13.0 (p.120), ACSL 2.13.1 (p.121), ACSL 2.14.0 (p.121), ACSL 2.14.1 (p.122)]
+brd: [ACSL 2.13.0 (p.121), ACSL 2.13.1 (p.122), ACSL 2.14.0 (p.122), ACSL 2.14.1 (p.123)]
 actor: System; ACSL Processor
 priority: Must have
 screens: Insurer SOA Reconciliation (upload - Results, Reconcile Again, Report)
@@ -3747,7 +3764,7 @@ acceptance:
 ```fr
 id: FR-AS-004
 title: Reconcile GL and SL balances by GL code
-brd: [ACSL 2.13.2 (p.121)]
+brd: [ACSL 2.13.2 (p.122)]
 actor: System (job ACSL_GL_SL_RECON); ACSL users
 priority: Must have
 screens: GL-SL Reconciliation (runs, rows, control accounts)
@@ -3782,7 +3799,7 @@ acceptance:
 ```fr
 id: FR-AS-005
 title: Produce aging and schedule reports per account family
-brd: [ACSL 2.14.3 (p.124), ACSL 2.14.4 (p.125)]
+brd: [ACSL 2.14.3 (p.125), ACSL 2.14.4 (p.126)]
 actor: ACSL users
 priority: Must have
 screens: Report Centre (category ACSL)
@@ -3810,7 +3827,7 @@ acceptance:
 ```fr
 id: FR-AS-010
 title: Investigate accounts and receive account analysis requests
-brd: [ACSL 2.5.0 (p.117), ACSL 2.5.5 (p.117; Add.1 p.34), ACSL 2.5.1 (p.117), ACSL 2.5.2 (p.118), ACSL 2.5.3 (p.118)]
+brd: [ACSL 2.5.0 (p.118), ACSL 2.5.5 (p.118; Add.1 p.35), ACSL 2.5.1 (p.118), ACSL 2.5.2 (p.119), ACSL 2.5.3 (p.119)]
 actor: ACSL Processor; ACSL Team Leader (assign)
 priority: Must have
 screens: ACSL Cases (tabs by stage); ACSL Case; Invoice Search; Invoice 360 (Invoice Family)
@@ -3849,7 +3866,7 @@ acceptance:
 ```fr
 id: FR-AS-011
 title: Give the result of the investigation to the requester
-brd: [ACSL 2.5.4 (p.118)]
+brd: [ACSL 2.5.4 (p.119)]
 actor: ACSL Processor
 priority: Must have
 screens: ACSL Case (Provide Result)
@@ -3873,7 +3890,7 @@ acceptance:
 ```fr
 id: FR-AS-012
 title: Apply AR refunds and request sub-ledger payment reversals
-brd: [ACSL 2.6.0 (p.118), ACSL 2.6.1 (p.118)]
+brd: [ACSL 2.6.0 (p.119), ACSL 2.6.1 (p.119)]
 actor: ACSL Processor (ACSL_APPLY); Cashier (approval)
 priority: Must have
 screens: ACSL Case (Request Payment Reversal); Cashiering (payment reversals)
@@ -3905,7 +3922,7 @@ acceptance:
 ```fr
 id: FR-AS-013
 title: Coordinate short or over payments with the Account Officer
-brd: [ACSL 2.6.2 (p.119)]
+brd: [ACSL 2.6.2 (p.120)]
 actor: ACSL Processor
 priority: Must have
 screens: ACSL Case (Message the AO)
@@ -3934,7 +3951,7 @@ acceptance:
 ```fr
 id: FR-AS-020
 title: Assign and re-assign correction entries
-brd: [ACSL 2.7.0 (p.119), ACSL 2.8.0 (p.119)]
+brd: [ACSL 2.7.0 (p.120), ACSL 2.8.0 (p.120)]
 actor: ACSL Team Leader (ACSL_ASSIGN)
 priority: Must have
 screens: Correction Entries (To assign); Correction
@@ -3962,7 +3979,7 @@ acceptance:
 ```fr
 id: FR-AS-021
 title: Prepare a correction entry and route it for review
-brd: [ACSL 2.9.0 (p.119), ACSL 2.9.1 (Add.2 p.12-13)]
+brd: [ACSL 2.9.0 (p.120), ACSL 2.9.1 (Add.2 p.13-14)]
 actor: ACSL Processor
 priority: Must have
 screens: Correction (Lines, Propose from journal, Submit)
@@ -4008,7 +4025,7 @@ acceptance:
 ```fr
 id: FR-AS-022
 title: Review and endorse the correction
-brd: [ACSL 2.10.0 (p.119)]
+brd: [ACSL 2.10.0 (p.120)]
 actor: ACSL Team Leader (ACSL_REVIEW)
 priority: Must have
 screens: Correction (Endorse, Return)
@@ -4032,7 +4049,7 @@ acceptance:
 ```fr
 id: FR-AS-023
 title: Approve, decline or return the correction with a comment
-brd: [ACSL 2.11.0 (p.120), ACSL 2.11.1 (p.120), ACSL 2.11.2 (p.120), ACSL 2.12.0 (p.120), ACSL 2.12.1 (p.120), ACSL 2.12.2 (p.120)]
+brd: [ACSL 2.11.0 (p.121), ACSL 2.11.1 (p.121), ACSL 2.11.2 (p.121), ACSL 2.12.0 (p.121), ACSL 2.12.1 (p.121), ACSL 2.12.2 (p.121)]
 actor: ACSL Head (ACSL_APPROVE)
 priority: Must have
 screens: Correction (Approve, Return)
@@ -4063,7 +4080,7 @@ acceptance:
 ```fr
 id: FR-AS-024
 title: Post corrections automatically on approval
-brd: [ACSL 2.15.0 (p.125)]
+brd: [ACSL 2.15.0 (p.126)]
 actor: System
 priority: Must have
 screens: Correction (Journal); Journal
@@ -4088,7 +4105,7 @@ acceptance:
 ```fr
 id: FR-AS-025
 title: Deduct from the remittance on insurer confirmation
-brd: [ACSL 2.9.2 (Add.2 p.13)]
+brd: [ACSL 2.9.2 (Add.2 p.14)]
 actor: ACSL Processor (ACSL_PROCESS); ACSL Team Leader (REMIT_DEDUCTION_CONFIRM); System (remittance approval)
 priority: Must have
 screens: Remittance Deductions (work list); Remittance Deduction (record, batches, insurer confirmation documents); Remittance batch (Settlement tab)
@@ -4137,7 +4154,7 @@ acceptance:
 ```fr
 id: FR-AS-026
 title: Track related transactions per invoice and insurer
-brd: [ACSL 2.16.0 (p.126; Add.1 p.34)]
+brd: [ACSL 2.16.0 (p.127; Add.1 p.35)]
 actor: ACSL users
 priority: Must have
 screens: Invoice 360 (Invoice Family); ACSL Case
@@ -4507,7 +4524,7 @@ Figure 6 shows the interfaces of Accounting. The general ledger is inside BIBS: 
 
 # Non-functional requirements
 
-<!-- table: widths=3,5.6,5.4 caption="Non-functional requirements (BRD p.133-139; Add.1 p.37)" size=8.5 -->
+<!-- table: widths=3,5.6,5.4 caption="Non-functional requirements (BRD p.134-140; Add.1 p.38)" size=8.5 -->
 | Topic | BRD value | BIBS target and approach |
 |---|---|---|
 | Users | Accounting 5 (GL officer, TL, TH); Business / System Admin 7 | Within the BRD-1 sizing (145 concurrent) |
@@ -4717,7 +4734,7 @@ Figure 6 shows the interfaces of Accounting. The general ledger is inside BIBS: 
 | AQ21 | Insurer SOA layouts; matching key; direct-billed indicator | FR-AS-002, 003 | OPEN |
 | AQ22 | Accounts ACSL may correct; effect on sub-ledgers; approvers | FR-AS-021 | OPEN |
 | AQ23 | What is deducted from the remittance; spanning batches; entries | FR-AS-025 | OPEN |
-| AQ24 | CPC2 percentage, base, VAT and WTAX (with OQ39, PQ04) | FR-DS-090, 092 | OPEN |
+| AQ24 | CPC2 percentage, base, VAT and WTAX (with OQ39, PQ04); the minutes confirm that the CPC2 criteria differ from those of the other incentives and follow the incentive tag of the booked transaction | FR-DS-090, 092 | OPEN |
 | AQ25 | Early-incentive SI series, recipient and timing; accounting of the 2% | FR-DS-091 | OPEN |
 | AQ29 | Invoice number of endorsements and cancellations | FR-DS-093, FR-AS-026 | PARTIAL |
 AQ05 and AQ28 are partly answered by the Report List of BRD-12 and the role sections of BRD-6 to BRD-12 (R6).
@@ -4728,7 +4745,7 @@ AQ29 is applied as proposed (new numbers linked to a root invoice) until BDOI de
 
 # Traceability
 
-Every BRD-5 requirement is met by at least one FR, except the login to BDO Business Online Banking (DIS 2.17.1), which is outside BIBS. The test cases are listed by test condition (TC-AC-nnn.n, TC-DS-nnn.n, TC-PQ-nnn.n, TC-AS-nnn.n); the test plan workbook lists each case.
+Every BRD-5 requirement is met by at least one FR, except the login to BDO Business Online Banking (DIS 2.17.1), which is outside BIBS; FR-DS-064 records the BOB reference of the funding. The minutes of 4 May 2026 (R0) record FRBS 3.1.1, FRBS 3.1.2, DIS 3.29.0, DIS 3.29.1, DIS 3.30.0 to 3.30.2, DIS 2.2.8, ACSL 2.9.1 and ACSL 2.9.2 as walked through with IT without questions, and clarify DIS 3.29.2. The test cases are listed by test condition (TC-AC-nnn.n, TC-DS-nnn.n, TC-PQ-nnn.n, TC-AS-nnn.n); the test plan workbook lists each case.
 
 
 ## FRBS (Accounting)
@@ -4736,307 +4753,307 @@ Every BRD-5 requirement is met by at least one FR, except the login to BDO Busin
 <!-- table: widths=2.2,2.2,2.6,4.6,5.2 caption="FRBS requirement IDs to FR, screen and test cases" size=7.5 -->
 | BRD ID | Page | FR | Screen | Test cases |
 |---|---|---|---|---|
-| FRBS 1.1.0 | p.50 | FR-AC-001 | Login; menu | TC-AC-001.1, 001.2 (4 cases) |
-| FRBS 1.1.1 | p.50 | FR-AC-001 | Login; menu | TC-AC-001.1, 001.2 (4 cases) |
-| FRBS 1.1.2 | p.50 | FR-AC-002 | Session dialog | TC-AC-002.1, 002.2 (4 cases) |
-| FRBS 1.1.3 | p.50 | FR-AC-002 | Session dialog | TC-AC-002.1, 002.2 (4 cases) |
-| FRBS 2.2.0 | p.51 | FR-AC-010 | Currencies & Rates | TC-AC-010.1, 010.2, 010.3, 010.4 (5 cases) |
-| FRBS 2.3.0 | p.51 | FR-AC-011 | Chart of Accounts | TC-AC-011.1, 011.2, 011.3, 011.4 (7 cases) |
-| FRBS 2.3.1 | p.51 | FR-AC-012 | Chart Upload | TC-AC-012.1, 012.2, 012.3 (7 cases) |
-| FRBS 2.3.2 | p.52 | FR-AC-013 | Chart of Accounts (Numbering) | TC-AC-013.1, 013.2, 013.3 (5 cases) |
-| FRBS 2.3.3 | p.52 | FR-AC-014 | Chart of Accounts; New Journal | TC-AC-014.1, 014.2 (4 cases) |
-| FRBS 2.3.4 | p.53 | FR-AC-011 | Chart of Accounts | TC-AC-011.1, 011.2, 011.3, 011.4 (7 cases) |
-| FRBS 2.3.5 | p.53 | FR-AC-011 | Chart of Accounts | TC-AC-011.1, 011.2, 011.3, 011.4 (7 cases) |
-| FRBS 3.6.0 | p.65 | FR-AC-010, FR-AC-011 | Currencies & Rates; Chart of Accounts | TC-AC-010.1, 010.2, 010.3, 010.4, 011.1, 011.2, 011.3, 011.4 (12 cases) |
-| FRBS 2.4.0 | p.53 | FR-AC-020 | Report Centre; Report Pack | TC-AC-020.1, 020.2, 020.3, 020.4 (4 cases) |
-| FRBS 2.4.1 | p.53 | FR-AC-020 | Report Centre; Report Pack | TC-AC-020.1, 020.2, 020.3, 020.4 (4 cases) |
-| FRBS 2.4.2 | p.53 | FR-AC-020 | Report Centre; Report Pack | TC-AC-020.1, 020.2, 020.3, 020.4 (4 cases) |
-| FRBS 2.4.3 | p.54 | FR-AC-020 | Report Centre; Report Pack | TC-AC-020.1, 020.2, 020.3, 020.4 (4 cases) |
-| FRBS 2.4.4 | p.54 | FR-AC-021 | Report (column filters) | TC-AC-021.1, 021.2 (2 cases) |
-| FRBS 2.4.5 | p.54 | FR-AC-022 | Report Batch | TC-AC-022.1, 022.2, 022.3 (5 cases) |
-| FRBS 2.4.6 | p.54 | FR-AC-020 | Report Centre; Report Pack | TC-AC-020.1, 020.2, 020.3, 020.4 (4 cases) |
-| FRBS 2.4.7 | p.54 | FR-AC-022 | Report Batch | TC-AC-022.1, 022.2, 022.3 (5 cases) |
-| FRBS 2.4.8 | p.55 | FR-AC-020 | Report Centre; Report Pack | TC-AC-020.1, 020.2, 020.3, 020.4 (4 cases) |
-| FRBS 2.4.9 | p.55 | FR-AC-023 | Report (print options) | TC-AC-023.1, 023.2 (3 cases) |
-| FRBS 2.4.10 | p.55 | FR-AC-020 | Report Centre; Report Pack | TC-AC-020.1, 020.2, 020.3, 020.4 (4 cases) |
-| FRBS 3.2.0 | p.63 | FR-AC-060, FR-AC-061, FR-AC-062, FR-AC-063 | Report Pack; Account Schedules; BIR Forms & Books | TC-AC-060.1, 060.2, 061.1, 061.2, 061.3, 062.1, 062.2, 063.1, 063.2, 063.3 (22 cases) |
-| FRBS 2.5.0 | p.55 | FR-AC-030 | Journals; event log | TC-AC-030.1, 030.2, 030.3 (5 cases) |
-| FRBS 2.5.1 | p.56 | FR-AC-031 | Journals (Assign, Assigned to me) | TC-AC-031.1, 031.2 (4 cases) |
-| FRBS 2.5.2 | p.56 | FR-AC-031 | Journals (Assign, Assigned to me) | TC-AC-031.1, 031.2 (4 cases) |
-| FRBS 2.5.3 | p.56 | FR-AC-031 | Journals (Assign, Assigned to me) | TC-AC-031.1, 031.2 (4 cases) |
-| FRBS 2.5.4 | p.56 | FR-AC-034 | New Journal; Journal | TC-AC-034.1, 034.2, 034.3 (6 cases) |
-| FRBS 2.5.5 | p.57 | FR-AC-034 | New Journal; Journal | TC-AC-034.1, 034.2, 034.3 (6 cases) |
-| FRBS 2.5.6 | p.57 | FR-AC-036 | Journals; My Approvals | TC-AC-036.1, 036.2, 036.3 (6 cases) |
-| FRBS 2.5.7 | p.57 | FR-AC-036 | Journals; My Approvals | TC-AC-036.1, 036.2, 036.3 (6 cases) |
-| FRBS 2.5.8 | p.57 | FR-AC-036 | Journals; My Approvals | TC-AC-036.1, 036.2, 036.3 (6 cases) |
-| FRBS 2.5.9 | p.57 | FR-AC-036 | Journals; My Approvals | TC-AC-036.1, 036.2, 036.3 (6 cases) |
-| FRBS 2.5.10 | p.58 | FR-AC-035 | Confirm posting dialog | TC-AC-035.1, 035.2 (3 cases) |
-| FRBS 2.8.0 | p.59 | FR-AC-032 | New Journal | TC-AC-032.1, 032.2, 032.3, 032.4 (5 cases) |
-| FRBS 2.8.1 | p.60 | FR-AC-032, FR-AC-033 | New Journal; Journals (REVERSAL) | TC-AC-032.1, 032.2, 032.3, 032.4, 033.1, 033.2 (8 cases) |
-| FRBS 2.8.2 | p.60 | FR-AC-032 | New Journal | TC-AC-032.1, 032.2, 032.3, 032.4 (5 cases) |
-| FRBS 2.8.3 | p.60 | FR-AC-035 | Confirm posting dialog | TC-AC-035.1, 035.2 (3 cases) |
-| FRBS 2.8.4 | p.61 | FR-AC-034 | New Journal; Journal | TC-AC-034.1, 034.2, 034.3 (6 cases) |
-| FRBS 2.8.5 | p.61 | FR-AC-032 | New Journal | TC-AC-032.1, 032.2, 032.3, 032.4 (5 cases) |
-| FRBS 2.9.0 | p.61 | FR-AC-037 | Edit Journal | TC-AC-037.1, 037.2 (3 cases) |
-| FRBS 3.1.0 | p.62 | FR-AC-030 | Journals; event log | TC-AC-030.1, 030.2, 030.3 (5 cases) |
-| FRBS 3.6.0b | p.66 | FR-AC-034 | New Journal; Journal | TC-AC-034.1, 034.2, 034.3 (6 cases) |
-| FRBS 2.6.0 | p.58; Add.1 p.35 | FR-AC-040 | GL Close & Cut-Off | TC-AC-040.1, 040.2, 040.3, 040.4 (7 cases) |
-| FRBS 2.6.1 | p.58 | FR-AC-040 | GL Close & Cut-Off | TC-AC-040.1, 040.2, 040.3, 040.4 (7 cases) |
-| FRBS 2.7.0 | p.59 | FR-AC-041 | Period-End & Year-End | TC-AC-041.1, 041.2, 041.3 (5 cases) |
-| FRBS 2.7.1 | p.59 | FR-AC-041 | Period-End & Year-End | TC-AC-041.1, 041.2, 041.3 (5 cases) |
-| FRBS 3.4.0 | p.64 | FR-AC-042 | GL Close & Cut-Off | TC-AC-042.1, 042.2, 042.3 (4 cases) |
-| FRBS 3.4.1 | p.65 | FR-AC-042 | GL Close & Cut-Off | TC-AC-042.1, 042.2, 042.3 (4 cases) |
-| FRBS 3.5.0 | p.65 | FR-AC-043 | FX Revaluation | TC-AC-043.1, 043.2 (4 cases) |
-| FRBS 3.3.0 | p.63 | FR-AC-050 | Bank Statements; Bank Reconciliation; Bank Statement Layouts | TC-AC-050.1, 050.2, 050.3, 050.4 (6 cases) |
-| FRBS 3.3.1 | p.63 | FR-AC-050 | Bank Statements; Bank Reconciliation; Bank Statement Layouts | TC-AC-050.1, 050.2, 050.3, 050.4 (6 cases) |
-| FRBS 3.3.2 | p.64 | FR-AC-050 | Bank Statements; Bank Reconciliation; Bank Statement Layouts | TC-AC-050.1, 050.2, 050.3, 050.4 (6 cases) |
-| FRBS 3.3.3 | p.64 | FR-AC-051 | Report Centre | TC-AC-051.1, 051.2 (2 cases) |
-| FRBS 2.10.0 | p.61 | FR-AC-052 | Service Fee Runs; Service Fee Rates | TC-AC-052.1, 052.2, 052.3, 052.4 (10 cases) |
-| FRBS 2.10.1 | p.62 | FR-AC-053 | Service Fee Run (lines) | TC-AC-053.1, 053.2, 053.3 (6 cases) |
-| FRBS 2.10.2 | p.62 | FR-AC-053 | Service Fee Run (lines) | TC-AC-053.1, 053.2, 053.3 (6 cases) |
-| FRBS 3.1.1 | Add.2 p.5-6 | FR-AC-054 | Cost-Centre Rules | TC-AC-054.1, 054.2, 054.3 (3 cases) |
-| FRBS 3.1.2 | Add.2 p.6 | FR-AC-055 | Accounting rules | TC-AC-055.1, 055.2 (3 cases) |
+| FRBS 1.1.0 | p.51 | FR-AC-001 | Login; menu | TC-AC-001.1, 001.2 (4 cases) |
+| FRBS 1.1.1 | p.51 | FR-AC-001 | Login; menu | TC-AC-001.1, 001.2 (4 cases) |
+| FRBS 1.1.2 | p.51 | FR-AC-002 | Session dialog | TC-AC-002.1, 002.2 (4 cases) |
+| FRBS 1.1.3 | p.51 | FR-AC-002 | Session dialog | TC-AC-002.1, 002.2 (4 cases) |
+| FRBS 2.2.0 | p.52 | FR-AC-010 | Currencies & Rates | TC-AC-010.1, 010.2, 010.3, 010.4 (5 cases) |
+| FRBS 2.3.0 | p.52 | FR-AC-011 | Chart of Accounts | TC-AC-011.1, 011.2, 011.3, 011.4 (7 cases) |
+| FRBS 2.3.1 | p.52 | FR-AC-012 | Chart Upload | TC-AC-012.1, 012.2, 012.3 (7 cases) |
+| FRBS 2.3.2 | p.53 | FR-AC-013 | Chart of Accounts (Numbering) | TC-AC-013.1, 013.2, 013.3 (5 cases) |
+| FRBS 2.3.3 | p.53 | FR-AC-014 | Chart of Accounts; New Journal | TC-AC-014.1, 014.2 (4 cases) |
+| FRBS 2.3.4 | p.54 | FR-AC-011 | Chart of Accounts | TC-AC-011.1, 011.2, 011.3, 011.4 (7 cases) |
+| FRBS 2.3.5 | p.54 | FR-AC-011 | Chart of Accounts | TC-AC-011.1, 011.2, 011.3, 011.4 (7 cases) |
+| FRBS 3.6.0 | p.66 | FR-AC-010, FR-AC-011 | Currencies & Rates; Chart of Accounts | TC-AC-010.1, 010.2, 010.3, 010.4, 011.1, 011.2, 011.3, 011.4 (12 cases) |
+| FRBS 2.4.0 | p.54 | FR-AC-020 | Report Centre; Report Pack | TC-AC-020.1, 020.2, 020.3, 020.4 (4 cases) |
+| FRBS 2.4.1 | p.54 | FR-AC-020 | Report Centre; Report Pack | TC-AC-020.1, 020.2, 020.3, 020.4 (4 cases) |
+| FRBS 2.4.2 | p.54 | FR-AC-020 | Report Centre; Report Pack | TC-AC-020.1, 020.2, 020.3, 020.4 (4 cases) |
+| FRBS 2.4.3 | p.55 | FR-AC-020 | Report Centre; Report Pack | TC-AC-020.1, 020.2, 020.3, 020.4 (4 cases) |
+| FRBS 2.4.4 | p.55 | FR-AC-021 | Report (column filters) | TC-AC-021.1, 021.2 (2 cases) |
+| FRBS 2.4.5 | p.55 | FR-AC-022 | Report Batch | TC-AC-022.1, 022.2, 022.3 (5 cases) |
+| FRBS 2.4.6 | p.55 | FR-AC-020 | Report Centre; Report Pack | TC-AC-020.1, 020.2, 020.3, 020.4 (4 cases) |
+| FRBS 2.4.7 | p.55 | FR-AC-022 | Report Batch | TC-AC-022.1, 022.2, 022.3 (5 cases) |
+| FRBS 2.4.8 | p.56 | FR-AC-020 | Report Centre; Report Pack | TC-AC-020.1, 020.2, 020.3, 020.4 (4 cases) |
+| FRBS 2.4.9 | p.56 | FR-AC-023 | Report (print options) | TC-AC-023.1, 023.2 (3 cases) |
+| FRBS 2.4.10 | p.56 | FR-AC-020 | Report Centre; Report Pack | TC-AC-020.1, 020.2, 020.3, 020.4 (4 cases) |
+| FRBS 3.2.0 | p.64 | FR-AC-060, FR-AC-061, FR-AC-062, FR-AC-063 | Report Pack; Account Schedules; BIR Forms & Books | TC-AC-060.1, 060.2, 061.1, 061.2, 061.3, 062.1, 062.2, 063.1, 063.2, 063.3 (22 cases) |
+| FRBS 2.5.0 | p.56 | FR-AC-030 | Journals; event log | TC-AC-030.1, 030.2, 030.3 (5 cases) |
+| FRBS 2.5.1 | p.57 | FR-AC-031 | Journals (Assign, Assigned to me) | TC-AC-031.1, 031.2 (4 cases) |
+| FRBS 2.5.2 | p.57 | FR-AC-031 | Journals (Assign, Assigned to me) | TC-AC-031.1, 031.2 (4 cases) |
+| FRBS 2.5.3 | p.57 | FR-AC-031 | Journals (Assign, Assigned to me) | TC-AC-031.1, 031.2 (4 cases) |
+| FRBS 2.5.4 | p.57 | FR-AC-034 | New Journal; Journal | TC-AC-034.1, 034.2, 034.3 (6 cases) |
+| FRBS 2.5.5 | p.58 | FR-AC-034 | New Journal; Journal | TC-AC-034.1, 034.2, 034.3 (6 cases) |
+| FRBS 2.5.6 | p.58 | FR-AC-036 | Journals; My Approvals | TC-AC-036.1, 036.2, 036.3 (6 cases) |
+| FRBS 2.5.7 | p.58 | FR-AC-036 | Journals; My Approvals | TC-AC-036.1, 036.2, 036.3 (6 cases) |
+| FRBS 2.5.8 | p.58 | FR-AC-036 | Journals; My Approvals | TC-AC-036.1, 036.2, 036.3 (6 cases) |
+| FRBS 2.5.9 | p.58 | FR-AC-036 | Journals; My Approvals | TC-AC-036.1, 036.2, 036.3 (6 cases) |
+| FRBS 2.5.10 | p.59 | FR-AC-035 | Confirm posting dialog | TC-AC-035.1, 035.2 (3 cases) |
+| FRBS 2.8.0 | p.60 | FR-AC-032 | New Journal | TC-AC-032.1, 032.2, 032.3, 032.4 (5 cases) |
+| FRBS 2.8.1 | p.61 | FR-AC-032, FR-AC-033 | New Journal; Journals (REVERSAL) | TC-AC-032.1, 032.2, 032.3, 032.4, 033.1, 033.2 (8 cases) |
+| FRBS 2.8.2 | p.61 | FR-AC-032 | New Journal | TC-AC-032.1, 032.2, 032.3, 032.4 (5 cases) |
+| FRBS 2.8.3 | p.61 | FR-AC-035 | Confirm posting dialog | TC-AC-035.1, 035.2 (3 cases) |
+| FRBS 2.8.4 | p.62 | FR-AC-034 | New Journal; Journal | TC-AC-034.1, 034.2, 034.3 (6 cases) |
+| FRBS 2.8.5 | p.62 | FR-AC-032 | New Journal | TC-AC-032.1, 032.2, 032.3, 032.4 (5 cases) |
+| FRBS 2.9.0 | p.62 | FR-AC-037 | Edit Journal | TC-AC-037.1, 037.2 (3 cases) |
+| FRBS 3.1.0 | p.63 | FR-AC-030 | Journals; event log | TC-AC-030.1, 030.2, 030.3 (5 cases) |
+| FRBS 3.6.0b | p.67 | FR-AC-034 | New Journal; Journal | TC-AC-034.1, 034.2, 034.3 (6 cases) |
+| FRBS 2.6.0 | p.59; Add.1 p.36 | FR-AC-040 | GL Close & Cut-Off | TC-AC-040.1, 040.2, 040.3, 040.4 (7 cases) |
+| FRBS 2.6.1 | p.59 | FR-AC-040 | GL Close & Cut-Off | TC-AC-040.1, 040.2, 040.3, 040.4 (7 cases) |
+| FRBS 2.7.0 | p.60 | FR-AC-041 | Period-End & Year-End | TC-AC-041.1, 041.2, 041.3 (5 cases) |
+| FRBS 2.7.1 | p.60 | FR-AC-041 | Period-End & Year-End | TC-AC-041.1, 041.2, 041.3 (5 cases) |
+| FRBS 3.4.0 | p.65 | FR-AC-042 | GL Close & Cut-Off | TC-AC-042.1, 042.2, 042.3 (4 cases) |
+| FRBS 3.4.1 | p.66 | FR-AC-042 | GL Close & Cut-Off | TC-AC-042.1, 042.2, 042.3 (4 cases) |
+| FRBS 3.5.0 | p.66 | FR-AC-043 | FX Revaluation | TC-AC-043.1, 043.2 (4 cases) |
+| FRBS 3.3.0 | p.64 | FR-AC-050 | Bank Statements; Bank Reconciliation; Bank Statement Layouts | TC-AC-050.1, 050.2, 050.3, 050.4 (6 cases) |
+| FRBS 3.3.1 | p.64 | FR-AC-050 | Bank Statements; Bank Reconciliation; Bank Statement Layouts | TC-AC-050.1, 050.2, 050.3, 050.4 (6 cases) |
+| FRBS 3.3.2 | p.65 | FR-AC-050 | Bank Statements; Bank Reconciliation; Bank Statement Layouts | TC-AC-050.1, 050.2, 050.3, 050.4 (6 cases) |
+| FRBS 3.3.3 | p.65 | FR-AC-051 | Report Centre | TC-AC-051.1, 051.2 (2 cases) |
+| FRBS 2.10.0 | p.62 | FR-AC-052 | Service Fee Runs; Service Fee Rates | TC-AC-052.1, 052.2, 052.3, 052.4 (10 cases) |
+| FRBS 2.10.1 | p.63 | FR-AC-053 | Service Fee Run (lines) | TC-AC-053.1, 053.2, 053.3 (6 cases) |
+| FRBS 2.10.2 | p.63 | FR-AC-053 | Service Fee Run (lines) | TC-AC-053.1, 053.2, 053.3 (6 cases) |
+| FRBS 3.1.1 | Add.2 p.6-7 | FR-AC-054 | Cost-Centre Rules | TC-AC-054.1, 054.2, 054.3 (3 cases) |
+| FRBS 3.1.2 | Add.2 p.7 | FR-AC-055 | Accounting rules | TC-AC-055.1, 055.2 (3 cases) |
 
 ## Business and system administration (BASAU)
 
 <!-- table: widths=2.2,2.2,2.6,4.6,5.2 caption="BASAU requirement IDs to FR, screen and test cases" size=7.5 -->
 | BRD ID | Page | FR | Screen | Test cases |
 |---|---|---|---|---|
-| BASAU 1.1.0 | p.127 | FR-AC-001 | Login; menu | TC-AC-001.1, 001.2 (4 cases) |
-| BASAU 1.1.1 | p.127 | FR-AC-001 | Login; menu | TC-AC-001.1, 001.2 (4 cases) |
-| BASAU 1.1.2 | p.128 | FR-AC-002 | Session dialog | TC-AC-002.1, 002.2 (4 cases) |
-| BASAU 1.1.3 | p.128 | FR-AC-002 | Session dialog | TC-AC-002.1, 002.2 (4 cases) |
-| BASAU 2.2.0 | p.128 | FR-AC-070 | Lists of Values; My Approvals | TC-AC-070.1, 070.2, 070.3, 070.4 (5 cases) |
-| BASAU 2.2.1 | p.128 | FR-AC-070 | Lists of Values; My Approvals | TC-AC-070.1, 070.2, 070.3, 070.4 (5 cases) |
-| BASAU 2.2.2 | p.128 | FR-AC-070 | Lists of Values; My Approvals | TC-AC-070.1, 070.2, 070.3, 070.4 (5 cases) |
-| BASAU 2.2.3 | p.128 | FR-AC-070 | Lists of Values; My Approvals | TC-AC-070.1, 070.2, 070.3, 070.4 (5 cases) |
-| BASAU 2.2.4 | p.128 | FR-AC-070 | Lists of Values; My Approvals | TC-AC-070.1, 070.2, 070.3, 070.4 (5 cases) |
-| BASAU 2.2.5 | p.129 | FR-AC-070 | Lists of Values; My Approvals | TC-AC-070.1, 070.2, 070.3, 070.4 (5 cases) |
-| BASAU 2.3.0 | p.129 | FR-AC-071 | Access Requests; Users; Roles | TC-AC-071.1, 071.2, 071.3 (8 cases) |
-| BASAU 2.3.1 | p.129 | FR-AC-071 | Access Requests; Users; Roles | TC-AC-071.1, 071.2, 071.3 (8 cases) |
-| BASAU 2.3.2 | p.129 | FR-AC-071 | Access Requests; Users; Roles | TC-AC-071.1, 071.2, 071.3 (8 cases) |
-| BASAU 2.3.3 | p.129 | FR-AC-071 | Access Requests; Users; Roles | TC-AC-071.1, 071.2, 071.3 (8 cases) |
-| BASAU 2.4.0 | p.130 | FR-AC-071 | Access Requests; Users; Roles | TC-AC-071.1, 071.2, 071.3 (8 cases) |
-| BASAU 2.4.1 | p.130 | FR-AC-072 | My Approvals; Access Requests | TC-AC-072.1, 072.2, 072.3, 072.4 (8 cases) |
-| BASAU 2.4.2 | p.130 | FR-AC-071 | Access Requests; Users; Roles | TC-AC-071.1, 071.2, 071.3 (8 cases) |
-| BASAU 2.5.0 | p.130 | FR-AC-072 | My Approvals; Access Requests | TC-AC-072.1, 072.2, 072.3, 072.4 (8 cases) |
-| BASAU 2.5.1 | p.131 | FR-AC-072 | My Approvals; Access Requests | TC-AC-072.1, 072.2, 072.3, 072.4 (8 cases) |
-| BASAU 2.5.2 | p.131 | FR-AC-072 | My Approvals; Access Requests | TC-AC-072.1, 072.2, 072.3, 072.4 (8 cases) |
-| BASAU 2.5.3 | p.131 | FR-AC-072 | My Approvals; Access Requests | TC-AC-072.1, 072.2, 072.3, 072.4 (8 cases) |
-| BASAU 2.6.0 | p.131 | FR-AC-072 | My Approvals; Access Requests | TC-AC-072.1, 072.2, 072.3, 072.4 (8 cases) |
-| BASAU 2.6.1 | p.131 | FR-AC-072 | My Approvals; Access Requests | TC-AC-072.1, 072.2, 072.3, 072.4 (8 cases) |
-| BASAU 2.6.2 | p.131 | FR-AC-072 | My Approvals; Access Requests | TC-AC-072.1, 072.2, 072.3, 072.4 (8 cases) |
-| BASAU 2.6.3 | p.132 | FR-AC-072 | My Approvals; Access Requests | TC-AC-072.1, 072.2, 072.3, 072.4 (8 cases) |
+| BASAU 1.1.0 | p.128 | FR-AC-001 | Login; menu | TC-AC-001.1, 001.2 (4 cases) |
+| BASAU 1.1.1 | p.128 | FR-AC-001 | Login; menu | TC-AC-001.1, 001.2 (4 cases) |
+| BASAU 1.1.2 | p.129 | FR-AC-002 | Session dialog | TC-AC-002.1, 002.2 (4 cases) |
+| BASAU 1.1.3 | p.129 | FR-AC-002 | Session dialog | TC-AC-002.1, 002.2 (4 cases) |
+| BASAU 2.2.0 | p.129 | FR-AC-070 | Lists of Values; My Approvals | TC-AC-070.1, 070.2, 070.3, 070.4 (5 cases) |
+| BASAU 2.2.1 | p.129 | FR-AC-070 | Lists of Values; My Approvals | TC-AC-070.1, 070.2, 070.3, 070.4 (5 cases) |
+| BASAU 2.2.2 | p.129 | FR-AC-070 | Lists of Values; My Approvals | TC-AC-070.1, 070.2, 070.3, 070.4 (5 cases) |
+| BASAU 2.2.3 | p.129 | FR-AC-070 | Lists of Values; My Approvals | TC-AC-070.1, 070.2, 070.3, 070.4 (5 cases) |
+| BASAU 2.2.4 | p.129 | FR-AC-070 | Lists of Values; My Approvals | TC-AC-070.1, 070.2, 070.3, 070.4 (5 cases) |
+| BASAU 2.2.5 | p.130 | FR-AC-070 | Lists of Values; My Approvals | TC-AC-070.1, 070.2, 070.3, 070.4 (5 cases) |
+| BASAU 2.3.0 | p.130 | FR-AC-071 | Access Requests; Users; Roles | TC-AC-071.1, 071.2, 071.3 (8 cases) |
+| BASAU 2.3.1 | p.130 | FR-AC-071 | Access Requests; Users; Roles | TC-AC-071.1, 071.2, 071.3 (8 cases) |
+| BASAU 2.3.2 | p.130 | FR-AC-071 | Access Requests; Users; Roles | TC-AC-071.1, 071.2, 071.3 (8 cases) |
+| BASAU 2.3.3 | p.130 | FR-AC-071 | Access Requests; Users; Roles | TC-AC-071.1, 071.2, 071.3 (8 cases) |
+| BASAU 2.4.0 | p.131 | FR-AC-071 | Access Requests; Users; Roles | TC-AC-071.1, 071.2, 071.3 (8 cases) |
+| BASAU 2.4.1 | p.131 | FR-AC-072 | My Approvals; Access Requests | TC-AC-072.1, 072.2, 072.3, 072.4 (8 cases) |
+| BASAU 2.4.2 | p.131 | FR-AC-071 | Access Requests; Users; Roles | TC-AC-071.1, 071.2, 071.3 (8 cases) |
+| BASAU 2.5.0 | p.131 | FR-AC-072 | My Approvals; Access Requests | TC-AC-072.1, 072.2, 072.3, 072.4 (8 cases) |
+| BASAU 2.5.1 | p.132 | FR-AC-072 | My Approvals; Access Requests | TC-AC-072.1, 072.2, 072.3, 072.4 (8 cases) |
+| BASAU 2.5.2 | p.132 | FR-AC-072 | My Approvals; Access Requests | TC-AC-072.1, 072.2, 072.3, 072.4 (8 cases) |
+| BASAU 2.5.3 | p.132 | FR-AC-072 | My Approvals; Access Requests | TC-AC-072.1, 072.2, 072.3, 072.4 (8 cases) |
+| BASAU 2.6.0 | p.132 | FR-AC-072 | My Approvals; Access Requests | TC-AC-072.1, 072.2, 072.3, 072.4 (8 cases) |
+| BASAU 2.6.1 | p.132 | FR-AC-072 | My Approvals; Access Requests | TC-AC-072.1, 072.2, 072.3, 072.4 (8 cases) |
+| BASAU 2.6.2 | p.132 | FR-AC-072 | My Approvals; Access Requests | TC-AC-072.1, 072.2, 072.3, 072.4 (8 cases) |
+| BASAU 2.6.3 | p.133 | FR-AC-072 | My Approvals; Access Requests | TC-AC-072.1, 072.2, 072.3, 072.4 (8 cases) |
 
 ## Disbursement (DIS)
 
 <!-- table: widths=2.2,2.6,2.6,4.4,5.2 caption="DIS requirement IDs to FR, screen and test cases" size=7.5 -->
 | BRD ID | Page | FR | Screen | Test cases |
 |---|---|---|---|---|
-| DIS 1.1.0 | p.68 | FR-DS-001 | Login | TC-DS-001.1, 001.2, 001.3 (4 cases) |
-| DIS 1.1.1 | p.69 | FR-DS-001 | Login | TC-DS-001.1, 001.2, 001.3 (4 cases) |
-| DIS 1.1.2 | p.69 | FR-DS-001 | Login | TC-DS-001.1, 001.2, 001.3 (4 cases) |
-| DIS 1.1.3 | p.69 | FR-DS-001 | Login | TC-DS-001.1, 001.2, 001.3 (4 cases) |
-| DIS 2.2.0 | p.69 | FR-DS-010 | Payees | TC-DS-010.1, 010.2, 010.3, 010.4 (9 cases) |
-| DIS 2.2.1 | p.69 | FR-DS-012 | Payees | TC-DS-012.1, 012.2 (2 cases) |
-| DIS 2.2.2 | p.70 | FR-DS-011 | Payee | TC-DS-011.1, 011.2 (2 cases) |
-| DIS 2.2.3 | p.70 | FR-DS-010 | Payees | TC-DS-010.1, 010.2, 010.3, 010.4 (9 cases) |
-| DIS 2.2.4 | p.70 | FR-DS-013 | Payee | TC-DS-013.1, 013.2 (3 cases) |
-| DIS 2.2.5 | p.70 | FR-DS-011 | Payee | TC-DS-011.1, 011.2 (2 cases) |
-| DIS 2.2.6 | p.71 | FR-DS-010 | Payees | TC-DS-010.1, 010.2, 010.3, 010.4 (9 cases) |
-| DIS 2.2.7 | p.71 | FR-DS-010 | Payees | TC-DS-010.1, 010.2, 010.3, 010.4 (9 cases) |
-| DIS 2.2.8 | p.71; Add.1 p.31-32; Add.2 p.11-12 | FR-DS-014 | Payees | TC-DS-014.1, 014.2 (3 cases) |
-| DIS 2.3.0 | p.71 | FR-DS-080 | Disbursement Reports | TC-DS-080.1, 080.2 (3 cases) |
-| DIS 2.3.1 | p.72 | FR-DS-080 | Disbursement Reports | TC-DS-080.1, 080.2 (3 cases) |
-| DIS 2.3.2 | p.72 | FR-DS-080 | Disbursement Reports | TC-DS-080.1, 080.2 (3 cases) |
-| DIS 2.3.3 | p.72 | FR-DS-080 | Disbursement Reports | TC-DS-080.1, 080.2 (3 cases) |
-| DIS 2.3.4 | p.72 | FR-DS-080 | Disbursement Reports | TC-DS-080.1, 080.2 (3 cases) |
-| DIS 2.3.5 | p.72 | FR-DS-080 | Disbursement Reports | TC-DS-080.1, 080.2 (3 cases) |
-| DIS 2.3.6 | p.73 | FR-DS-080 | Disbursement Reports | TC-DS-080.1, 080.2 (3 cases) |
-| DIS 2.3.7 | p.73 | FR-DS-080 | Disbursement Reports | TC-DS-080.1, 080.2 (3 cases) |
-| DIS 2.3.8 | p.73 | FR-DS-080 | Disbursement Reports | TC-DS-080.1, 080.2 (3 cases) |
-| DIS 2.3.9 | p.73 | FR-DS-080 | Disbursement Reports | TC-DS-080.1, 080.2 (3 cases) |
-| DIS 3.28.0 | p.100 | FR-DS-081 | Disbursement End of Day | TC-DS-081.1, 081.2 (2 cases) |
-| DIS 3.28.1 | p.100 | FR-DS-083 | Disbursement Reports | TC-DS-083.1 (2 cases) |
-| DIS 3.28.2 | p.101 | FR-DS-081 | Disbursement End of Day | TC-DS-081.1, 081.2 (2 cases) |
-| DIS 3.28.3 | p.101 | FR-DS-082 | Disbursement Reports | TC-DS-082.1, 082.2 (4 cases) |
-| DIS 3.28.4 | p.102 | FR-DS-083 | Disbursement Reports | TC-DS-083.1 (2 cases) |
-| DIS 3.29.0 | Add.2 p.7 | FR-DS-092 | - | TC-DS-092.1, 092.2 (2 cases) |
-| DIS 3.30.2 | Add.2 p.10-11 | FR-DS-037 | Setup > Employees | TC-DS-037.1, 037.2 (6 cases) |
-| DIS 2.4.0 | p.73 | FR-DS-025 | Disbursement Workbench | TC-DS-025.1, 025.2, 025.3 (3 cases) |
-| DIS 2.4.1 | p.73 | FR-DS-025 | Disbursement Workbench | TC-DS-025.1, 025.2, 025.3 (3 cases) |
-| DIS 2.4.2 | p.74 | FR-DS-025 | Disbursement Workbench | TC-DS-025.1, 025.2, 025.3 (3 cases) |
-| DIS 2.4.3 | p.74 | FR-DS-025 | Disbursement Workbench | TC-DS-025.1, 025.2, 025.3 (3 cases) |
-| DIS 2.4.4 | p.74 | FR-DS-025 | Disbursement Workbench | TC-DS-025.1, 025.2, 025.3 (3 cases) |
-| DIS 2.5.0 | p.75 | FR-DS-024 | Disbursement Uploads | TC-DS-024.1, 024.2 (3 cases) |
-| DIS 2.5.1 | p.75 | FR-DS-024 | Disbursement Uploads | TC-DS-024.1, 024.2 (3 cases) |
-| DIS 2.6.0 | p.75 | FR-DS-020 | Disbursement Workbench | TC-DS-020.1, 020.2, 020.3 (5 cases) |
-| DIS 2.6.1 | p.76 | FR-DS-023 | Encode Payment Request | TC-DS-023.1, 023.2 (3 cases) |
-| DIS 2.6.2 | p.76 | FR-DS-020 | Disbursement Workbench | TC-DS-020.1, 020.2, 020.3 (5 cases) |
-| DIS 3.25.0 | p.95 | FR-DS-020 | Disbursement Workbench | TC-DS-020.1, 020.2, 020.3 (5 cases) |
-| DIS 3.25.1 | p.96 | FR-DS-021 | Disbursement Workbench | TC-DS-021.1, 021.2 (2 cases) |
-| DIS 3.25.2 | p.96 | FR-DS-022 | Disbursement Workbench | TC-DS-022.1, 022.2 (3 cases) |
-| DIS 2.7.0 | p.77 | FR-DS-033 | Disbursement Voucher | TC-DS-033.1, 033.2 (4 cases) |
-| DIS 2.7.1 | p.77 | FR-DS-025 | Disbursement Workbench | TC-DS-025.1, 025.2, 025.3 (3 cases) |
-| DIS 2.7.2 | p.78 | FR-DS-025 | Disbursement Workbench | TC-DS-025.1, 025.2, 025.3 (3 cases) |
-| DIS 2.7.3 | p.78 | FR-DS-025 | Disbursement Workbench | TC-DS-025.1, 025.2, 025.3 (3 cases) |
-| DIS 2.7.4 | p.78 | FR-DS-030 | Disbursement Voucher | TC-DS-030.1, 030.2, 030.3 (6 cases) |
-| DIS 2.7.5 | p.79 | FR-DS-030 | Disbursement Voucher | TC-DS-030.1, 030.2, 030.3 (6 cases) |
-| DIS 2.7.6 | p.80 | FR-DS-031 | Disbursement Voucher | TC-DS-031.1, 031.2 (4 cases) |
-| DIS 2.7.7 | p.81 | FR-DS-034 | Disbursement Voucher | TC-DS-034.1, 034.2 (2 cases) |
-| DIS 2.7.8 | p.81 | FR-DS-035 | Disbursement Voucher | TC-DS-035.1, 035.2 (2 cases) |
-| DIS 2.7.9 | p.82 | FR-DS-035 | Disbursement Voucher | TC-DS-035.1, 035.2 (2 cases) |
-| DIS 2.7.10 | p.82 | FR-DS-032 | Disbursement Voucher | TC-DS-032.1 (2 cases) |
-| DIS 2.7.11 | p.82 | FR-DS-036 | Disbursement Voucher | TC-DS-036.1, 036.2 (2 cases) |
-| DIS 2.7.12 | p.83 | FR-DS-063 | Disbursement End of Day | TC-DS-063.1, 063.2 (2 cases) |
-| DIS 3.30.0 | Add.2 p.9 | FR-DS-032 | Disbursement Voucher | TC-DS-032.1 (2 cases) |
-| DIS 3.30.1 | Add.2 p.9-10 | FR-DS-037 | Setup > Employees | TC-DS-037.1, 037.2 (6 cases) |
-| DIS 2.8.0 | p.83 | FR-DS-050 | Disbursement Voucher | TC-DS-050.1, 050.2 (2 cases) |
-| DIS 2.8.1 | p.83 | FR-DS-050 | Disbursement Voucher | TC-DS-050.1, 050.2 (2 cases) |
-| DIS 2.8.2 | p.84 | FR-DS-050 | Disbursement Voucher | TC-DS-050.1, 050.2 (2 cases) |
-| DIS 2.8.3 | p.84 | FR-DS-050 | Disbursement Voucher | TC-DS-050.1, 050.2 (2 cases) |
-| DIS 2.8.4 | p.85 | FR-DS-050 | Disbursement Voucher | TC-DS-050.1, 050.2 (2 cases) |
-| DIS 2.8.5 | p.85 | FR-DS-051 | Disbursement Voucher | TC-DS-051.1, 051.2 (6 cases) |
-| DIS 2.9.0 | p.85 | FR-DS-043 | Disbursement Workbench | TC-DS-043.1, 043.2 (3 cases) |
-| DIS 2.22.0 | p.93 | FR-DS-053 | Disbursement Uploads | TC-DS-053.1, 053.2 (4 cases) |
-| DIS 3.26.0 | p.96 | FR-DS-052 | Disbursement Voucher | TC-DS-052.1, 052.2 (3 cases) |
-| DIS 3.26.1 | p.97 | FR-DS-053 | Disbursement Uploads | TC-DS-053.1, 053.2 (4 cases) |
-| DIS 3.26.2 | p.97 | FR-DS-054 | Disbursement Voucher | TC-DS-054.1, 054.2 (3 cases) |
-| DIS 3.26.3 | p.97 | FR-DS-052 | Disbursement Voucher | TC-DS-052.1, 052.2 (3 cases) |
-| DIS 3.26.4 | p.98 | FR-DS-053 | Disbursement Uploads | TC-DS-053.1, 053.2 (4 cases) |
-| DIS 3.26.5 | p.98 | FR-DS-052 | Disbursement Voucher | TC-DS-052.1, 052.2 (3 cases) |
-| DIS 3.26.6 | p.98 | FR-DS-052 | Disbursement Voucher | TC-DS-052.1, 052.2 (3 cases) |
-| DIS 3.26.7 | p.99 | FR-DS-052 | Disbursement Voucher | TC-DS-052.1, 052.2 (3 cases) |
-| DIS 2.10.0 | p.86 | FR-DS-056 | Disbursement Voucher | TC-DS-056.1, 056.2 (3 cases) |
-| DIS 2.10.1 | p.86 | FR-DS-056 | Disbursement Voucher | TC-DS-056.1, 056.2 (3 cases) |
-| DIS 2.10.2 | p.86 | FR-DS-056 | Disbursement Voucher | TC-DS-056.1, 056.2 (3 cases) |
-| DIS 2.11.0 | p.86 | FR-DS-057 | Disbursement Voucher | TC-DS-057.1, 057.2 (6 cases) |
-| DIS 2.11.1 | p.86 | FR-DS-057 | Disbursement Voucher | TC-DS-057.1, 057.2 (6 cases) |
-| DIS 2.11.2 | p.87 | FR-DS-057 | Disbursement Voucher | TC-DS-057.1, 057.2 (6 cases) |
-| DIS 2.12.0 | p.87 | FR-DS-058 | Tax & Statutory > BIR Form 2307 | TC-DS-058.1, 058.2 (3 cases) |
-| DIS 2.13.0 | p.87 | FR-DS-040 | Disbursement Workbench | TC-DS-040.1, 040.2 (4 cases) |
-| DIS 2.14.0 | p.88 | FR-DS-040 | Disbursement Workbench | TC-DS-040.1, 040.2 (4 cases) |
-| DIS 2.15.0 | p.88 | FR-DS-040 | Disbursement Workbench | TC-DS-040.1, 040.2 (4 cases) |
-| DIS 2.16.0 | p.88 | FR-DS-060 | Disbursement End of Day | TC-DS-060.1, 060.2 (2 cases) |
-| DIS 2.16.1 | p.88 | FR-DS-061 | Disbursement End of Day | TC-DS-061.1, 061.2 (2 cases) |
-| DIS 2.16.2 | p.88 | FR-DS-062 | Disbursement End of Day | TC-DS-062.1, 062.2 (2 cases) |
-| DIS 2.16.3 | p.89 | FR-DS-060 | Disbursement End of Day | TC-DS-060.1, 060.2 (2 cases) |
-| DIS 2.16.4 | p.89 | FR-DS-060 | Disbursement End of Day | TC-DS-060.1, 060.2 (2 cases) |
-| DIS 2.16.5 | p.89 | FR-DS-060 | Disbursement End of Day | TC-DS-060.1, 060.2 (2 cases) |
-| DIS 2.16.6 | p.89 | FR-DS-062 | Disbursement End of Day | TC-DS-062.1, 062.2 (2 cases) |
-| DIS 2.17.0 | p.90 | FR-DS-064 | Account Funding | TC-DS-064.1, 064.2, 064.3 (7 cases) |
-| DIS 2.17.1 | p.90 | FR-DS-064 | Account Funding | TC-DS-064.1, 064.2, 064.3 (7 cases) |
-| DIS 2.17.2 | p.90 | FR-DS-064 | Account Funding | TC-DS-064.1, 064.2, 064.3 (7 cases) |
-| DIS 2.17.3 | p.90 | FR-DS-064 | Account Funding | TC-DS-064.1, 064.2, 064.3 (7 cases) |
-| DIS 2.17.4 | p.90; Add.1 p.33 | FR-DS-064 | Account Funding | TC-DS-064.1, 064.2, 064.3 (7 cases) |
-| DIS 2.18.0 | p.91 | FR-DS-043 | Disbursement Workbench | TC-DS-043.1, 043.2 (3 cases) |
-| DIS 2.19.0 | p.91 | FR-DS-041 | Disbursement Workbench | TC-DS-041.1, 041.2, 041.3 (5 cases) |
-| DIS 2.20.0 | p.92 | FR-DS-044 | Disbursement Voucher | TC-DS-044.1, 044.2, 044.3 (4 cases) |
-| DIS 2.21.0 | p.92 | FR-DS-042 | Disbursement Voucher | TC-DS-042.1, 042.2 (2 cases) |
-| DIS 2.23.0 | p.93 | FR-DS-070 | Bank Accounts and Checks | TC-DS-070.1, 070.2 (4 cases) |
-| DIS 2.23.1 | p.93 | FR-DS-070 | Bank Accounts and Checks | TC-DS-070.1, 070.2 (4 cases) |
-| DIS 2.23.2 | p.93 | FR-DS-070 | Bank Accounts and Checks | TC-DS-070.1, 070.2 (4 cases) |
-| DIS 2.24.0 | p.93 | FR-DS-071 | Bank Accounts and Checks | TC-DS-071.1, 071.2 (2 cases) |
-| DIS 2.24.1 | p.93 | FR-DS-071 | Bank Accounts and Checks | TC-DS-071.1, 071.2 (2 cases) |
-| DIS 2.24.2 | p.94; Add.1 p.33 | FR-DS-071 | Bank Accounts and Checks | TC-DS-071.1, 071.2 (2 cases) |
-| DIS 3.27.0 | p.99; Add.1 p.31 | FR-DS-045 | Disbursement Workbench | TC-DS-045.1, 045.2 (2 cases) |
-| DIS 3.27.1 | p.100 | FR-DS-055 | Disbursement Voucher | TC-DS-055.1, 055.2 (3 cases) |
-| DIS 3.27.2 | p.100 | FR-DS-093 | Invoice Search | TC-DS-093.1, 093.2 (2 cases) |
-| DIS 3.29.1 | Add.2 p.7-8 | FR-DS-091 | Remittance batch | TC-DS-091.1, 091.2 (3 cases) |
-| DIS 3.29.2 | Add.2 p.8-9 | FR-DS-090 | Remittance batch | TC-DS-090.1, 090.2, 090.3 (3 cases) |
+| DIS 1.1.0 | p.69 | FR-DS-001 | Login | TC-DS-001.1, 001.2, 001.3 (4 cases) |
+| DIS 1.1.1 | p.70 | FR-DS-001 | Login | TC-DS-001.1, 001.2, 001.3 (4 cases) |
+| DIS 1.1.2 | p.70 | FR-DS-001 | Login | TC-DS-001.1, 001.2, 001.3 (4 cases) |
+| DIS 1.1.3 | p.70 | FR-DS-001 | Login | TC-DS-001.1, 001.2, 001.3 (4 cases) |
+| DIS 2.2.0 | p.70 | FR-DS-010 | Payees | TC-DS-010.1, 010.2, 010.3, 010.4 (9 cases) |
+| DIS 2.2.1 | p.70 | FR-DS-012 | Payees | TC-DS-012.1, 012.2 (2 cases) |
+| DIS 2.2.2 | p.71 | FR-DS-011 | Payee | TC-DS-011.1, 011.2 (2 cases) |
+| DIS 2.2.3 | p.71 | FR-DS-010 | Payees | TC-DS-010.1, 010.2, 010.3, 010.4 (9 cases) |
+| DIS 2.2.4 | p.71 | FR-DS-013 | Payee | TC-DS-013.1, 013.2 (3 cases) |
+| DIS 2.2.5 | p.71 | FR-DS-011 | Payee | TC-DS-011.1, 011.2 (2 cases) |
+| DIS 2.2.6 | p.72 | FR-DS-010 | Payees | TC-DS-010.1, 010.2, 010.3, 010.4 (9 cases) |
+| DIS 2.2.7 | p.72 | FR-DS-010 | Payees | TC-DS-010.1, 010.2, 010.3, 010.4 (9 cases) |
+| DIS 2.2.8 | p.72; Add.1 p.32-33; Add.2 p.12-13 | FR-DS-014 | Payees | TC-DS-014.1, 014.2 (3 cases) |
+| DIS 2.3.0 | p.72 | FR-DS-080 | Disbursement Reports | TC-DS-080.1, 080.2 (3 cases) |
+| DIS 2.3.1 | p.73 | FR-DS-080 | Disbursement Reports | TC-DS-080.1, 080.2 (3 cases) |
+| DIS 2.3.2 | p.73 | FR-DS-080 | Disbursement Reports | TC-DS-080.1, 080.2 (3 cases) |
+| DIS 2.3.3 | p.73 | FR-DS-080 | Disbursement Reports | TC-DS-080.1, 080.2 (3 cases) |
+| DIS 2.3.4 | p.73 | FR-DS-080 | Disbursement Reports | TC-DS-080.1, 080.2 (3 cases) |
+| DIS 2.3.5 | p.73 | FR-DS-080 | Disbursement Reports | TC-DS-080.1, 080.2 (3 cases) |
+| DIS 2.3.6 | p.74 | FR-DS-080 | Disbursement Reports | TC-DS-080.1, 080.2 (3 cases) |
+| DIS 2.3.7 | p.74 | FR-DS-080 | Disbursement Reports | TC-DS-080.1, 080.2 (3 cases) |
+| DIS 2.3.8 | p.74 | FR-DS-080 | Disbursement Reports | TC-DS-080.1, 080.2 (3 cases) |
+| DIS 2.3.9 | p.74 | FR-DS-080 | Disbursement Reports | TC-DS-080.1, 080.2 (3 cases) |
+| DIS 3.28.0 | p.101 | FR-DS-081 | Disbursement End of Day | TC-DS-081.1, 081.2 (2 cases) |
+| DIS 3.28.1 | p.101 | FR-DS-083 | Disbursement Reports | TC-DS-083.1 (2 cases) |
+| DIS 3.28.2 | p.102 | FR-DS-081 | Disbursement End of Day | TC-DS-081.1, 081.2 (2 cases) |
+| DIS 3.28.3 | p.102 | FR-DS-082 | Disbursement Reports | TC-DS-082.1, 082.2 (4 cases) |
+| DIS 3.28.4 | p.103 | FR-DS-083 | Disbursement Reports | TC-DS-083.1 (2 cases) |
+| DIS 3.29.0 | Add.2 p.8 | FR-DS-092 | - | TC-DS-092.1, 092.2, 092.3 (4 cases) |
+| DIS 3.30.2 | Add.2 p.11-12 | FR-DS-037 | Setup > Employees | TC-DS-037.1, 037.2 (6 cases) |
+| DIS 2.4.0 | p.74 | FR-DS-025 | Disbursement Workbench | TC-DS-025.1, 025.2, 025.3 (3 cases) |
+| DIS 2.4.1 | p.74 | FR-DS-025 | Disbursement Workbench | TC-DS-025.1, 025.2, 025.3 (3 cases) |
+| DIS 2.4.2 | p.75 | FR-DS-025 | Disbursement Workbench | TC-DS-025.1, 025.2, 025.3 (3 cases) |
+| DIS 2.4.3 | p.75 | FR-DS-025 | Disbursement Workbench | TC-DS-025.1, 025.2, 025.3 (3 cases) |
+| DIS 2.4.4 | p.75 | FR-DS-025 | Disbursement Workbench | TC-DS-025.1, 025.2, 025.3 (3 cases) |
+| DIS 2.5.0 | p.76 | FR-DS-024 | Disbursement Uploads | TC-DS-024.1, 024.2 (3 cases) |
+| DIS 2.5.1 | p.76 | FR-DS-024 | Disbursement Uploads | TC-DS-024.1, 024.2 (3 cases) |
+| DIS 2.6.0 | p.76 | FR-DS-020 | Disbursement Workbench | TC-DS-020.1, 020.2, 020.3 (5 cases) |
+| DIS 2.6.1 | p.77 | FR-DS-023 | Encode Payment Request | TC-DS-023.1, 023.2 (3 cases) |
+| DIS 2.6.2 | p.77 | FR-DS-020 | Disbursement Workbench | TC-DS-020.1, 020.2, 020.3 (5 cases) |
+| DIS 3.25.0 | p.96 | FR-DS-020 | Disbursement Workbench | TC-DS-020.1, 020.2, 020.3 (5 cases) |
+| DIS 3.25.1 | p.97 | FR-DS-021 | Disbursement Workbench | TC-DS-021.1, 021.2 (2 cases) |
+| DIS 3.25.2 | p.97 | FR-DS-022 | Disbursement Workbench | TC-DS-022.1, 022.2 (3 cases) |
+| DIS 2.7.0 | p.78 | FR-DS-033 | Disbursement Voucher | TC-DS-033.1, 033.2 (4 cases) |
+| DIS 2.7.1 | p.78 | FR-DS-025 | Disbursement Workbench | TC-DS-025.1, 025.2, 025.3 (3 cases) |
+| DIS 2.7.2 | p.79 | FR-DS-025 | Disbursement Workbench | TC-DS-025.1, 025.2, 025.3 (3 cases) |
+| DIS 2.7.3 | p.79 | FR-DS-025 | Disbursement Workbench | TC-DS-025.1, 025.2, 025.3 (3 cases) |
+| DIS 2.7.4 | p.79 | FR-DS-030 | Disbursement Voucher | TC-DS-030.1, 030.2, 030.3 (6 cases) |
+| DIS 2.7.5 | p.80 | FR-DS-030 | Disbursement Voucher | TC-DS-030.1, 030.2, 030.3 (6 cases) |
+| DIS 2.7.6 | p.81 | FR-DS-031 | Disbursement Voucher | TC-DS-031.1, 031.2 (4 cases) |
+| DIS 2.7.7 | p.82 | FR-DS-034 | Disbursement Voucher | TC-DS-034.1, 034.2 (2 cases) |
+| DIS 2.7.8 | p.82 | FR-DS-035 | Disbursement Voucher | TC-DS-035.1, 035.2 (2 cases) |
+| DIS 2.7.9 | p.83 | FR-DS-035 | Disbursement Voucher | TC-DS-035.1, 035.2 (2 cases) |
+| DIS 2.7.10 | p.83 | FR-DS-032 | Disbursement Voucher | TC-DS-032.1 (2 cases) |
+| DIS 2.7.11 | p.83 | FR-DS-036 | Disbursement Voucher | TC-DS-036.1, 036.2 (2 cases) |
+| DIS 2.7.12 | p.84 | FR-DS-063 | Disbursement End of Day | TC-DS-063.1, 063.2 (2 cases) |
+| DIS 3.30.0 | Add.2 p.10 | FR-DS-032 | Disbursement Voucher | TC-DS-032.1 (2 cases) |
+| DIS 3.30.1 | Add.2 p.10-11 | FR-DS-037 | Setup > Employees | TC-DS-037.1, 037.2 (6 cases) |
+| DIS 2.8.0 | p.84 | FR-DS-050 | Disbursement Voucher | TC-DS-050.1, 050.2 (2 cases) |
+| DIS 2.8.1 | p.84 | FR-DS-050 | Disbursement Voucher | TC-DS-050.1, 050.2 (2 cases) |
+| DIS 2.8.2 | p.85 | FR-DS-050 | Disbursement Voucher | TC-DS-050.1, 050.2 (2 cases) |
+| DIS 2.8.3 | p.85 | FR-DS-050 | Disbursement Voucher | TC-DS-050.1, 050.2 (2 cases) |
+| DIS 2.8.4 | p.86 | FR-DS-050 | Disbursement Voucher | TC-DS-050.1, 050.2 (2 cases) |
+| DIS 2.8.5 | p.86 | FR-DS-051 | Disbursement Voucher | TC-DS-051.1, 051.2 (6 cases) |
+| DIS 2.9.0 | p.86 | FR-DS-043 | Disbursement Workbench | TC-DS-043.1, 043.2 (3 cases) |
+| DIS 2.22.0 | p.94 | FR-DS-053 | Disbursement Uploads | TC-DS-053.1, 053.2 (4 cases) |
+| DIS 3.26.0 | p.97 | FR-DS-052 | Disbursement Voucher | TC-DS-052.1, 052.2 (3 cases) |
+| DIS 3.26.1 | p.98 | FR-DS-053 | Disbursement Uploads | TC-DS-053.1, 053.2 (4 cases) |
+| DIS 3.26.2 | p.98 | FR-DS-054 | Disbursement Voucher | TC-DS-054.1, 054.2 (3 cases) |
+| DIS 3.26.3 | p.98 | FR-DS-052 | Disbursement Voucher | TC-DS-052.1, 052.2 (3 cases) |
+| DIS 3.26.4 | p.99 | FR-DS-053 | Disbursement Uploads | TC-DS-053.1, 053.2 (4 cases) |
+| DIS 3.26.5 | p.99 | FR-DS-052 | Disbursement Voucher | TC-DS-052.1, 052.2 (3 cases) |
+| DIS 3.26.6 | p.99 | FR-DS-052 | Disbursement Voucher | TC-DS-052.1, 052.2 (3 cases) |
+| DIS 3.26.7 | p.100 | FR-DS-052 | Disbursement Voucher | TC-DS-052.1, 052.2 (3 cases) |
+| DIS 2.10.0 | p.87 | FR-DS-056 | Disbursement Voucher | TC-DS-056.1, 056.2 (3 cases) |
+| DIS 2.10.1 | p.87 | FR-DS-056 | Disbursement Voucher | TC-DS-056.1, 056.2 (3 cases) |
+| DIS 2.10.2 | p.87 | FR-DS-056 | Disbursement Voucher | TC-DS-056.1, 056.2 (3 cases) |
+| DIS 2.11.0 | p.87 | FR-DS-057 | Disbursement Voucher | TC-DS-057.1, 057.2 (6 cases) |
+| DIS 2.11.1 | p.87 | FR-DS-057 | Disbursement Voucher | TC-DS-057.1, 057.2 (6 cases) |
+| DIS 2.11.2 | p.88 | FR-DS-057 | Disbursement Voucher | TC-DS-057.1, 057.2 (6 cases) |
+| DIS 2.12.0 | p.88 | FR-DS-058 | Tax & Statutory > BIR Form 2307 | TC-DS-058.1, 058.2 (3 cases) |
+| DIS 2.13.0 | p.88 | FR-DS-040 | Disbursement Workbench | TC-DS-040.1, 040.2 (4 cases) |
+| DIS 2.14.0 | p.89 | FR-DS-040 | Disbursement Workbench | TC-DS-040.1, 040.2 (4 cases) |
+| DIS 2.15.0 | p.89 | FR-DS-040 | Disbursement Workbench | TC-DS-040.1, 040.2 (4 cases) |
+| DIS 2.16.0 | p.89 | FR-DS-060 | Disbursement End of Day | TC-DS-060.1, 060.2 (2 cases) |
+| DIS 2.16.1 | p.89 | FR-DS-061 | Disbursement End of Day | TC-DS-061.1, 061.2 (2 cases) |
+| DIS 2.16.2 | p.89 | FR-DS-062 | Disbursement End of Day | TC-DS-062.1, 062.2 (2 cases) |
+| DIS 2.16.3 | p.90 | FR-DS-060 | Disbursement End of Day | TC-DS-060.1, 060.2 (2 cases) |
+| DIS 2.16.4 | p.90 | FR-DS-060 | Disbursement End of Day | TC-DS-060.1, 060.2 (2 cases) |
+| DIS 2.16.5 | p.90 | FR-DS-060 | Disbursement End of Day | TC-DS-060.1, 060.2 (2 cases) |
+| DIS 2.16.6 | p.90 | FR-DS-062 | Disbursement End of Day | TC-DS-062.1, 062.2 (2 cases) |
+| DIS 2.17.0 | p.91 | FR-DS-064 | Account Funding | TC-DS-064.1, 064.2, 064.3 (7 cases) |
+| DIS 2.17.1 | p.91 | FR-DS-064 | Out of BIBS (BDO Business Online Banking); the BOB reference is recorded on Account Funding | TC-DS-064.1, 064.2, 064.3 (7 cases) |
+| DIS 2.17.2 | p.91 | FR-DS-064 | Account Funding | TC-DS-064.1, 064.2, 064.3 (7 cases) |
+| DIS 2.17.3 | p.91 | FR-DS-064 | Account Funding | TC-DS-064.1, 064.2, 064.3 (7 cases) |
+| DIS 2.17.4 | p.91; Add.1 p.34 | FR-DS-064 | Account Funding | TC-DS-064.1, 064.2, 064.3 (7 cases) |
+| DIS 2.18.0 | p.92 | FR-DS-043 | Disbursement Workbench | TC-DS-043.1, 043.2 (3 cases) |
+| DIS 2.19.0 | p.92 | FR-DS-041 | Disbursement Workbench | TC-DS-041.1, 041.2, 041.3 (5 cases) |
+| DIS 2.20.0 | p.93 | FR-DS-044 | Disbursement Voucher | TC-DS-044.1, 044.2, 044.3 (4 cases) |
+| DIS 2.21.0 | p.93 | FR-DS-042 | Disbursement Voucher | TC-DS-042.1, 042.2 (2 cases) |
+| DIS 2.23.0 | p.94 | FR-DS-070 | Bank Accounts and Checks | TC-DS-070.1, 070.2 (4 cases) |
+| DIS 2.23.1 | p.94 | FR-DS-070 | Bank Accounts and Checks | TC-DS-070.1, 070.2 (4 cases) |
+| DIS 2.23.2 | p.94 | FR-DS-070 | Bank Accounts and Checks | TC-DS-070.1, 070.2 (4 cases) |
+| DIS 2.24.0 | p.94 | FR-DS-071 | Bank Accounts and Checks | TC-DS-071.1, 071.2 (2 cases) |
+| DIS 2.24.1 | p.94 | FR-DS-071 | Bank Accounts and Checks | TC-DS-071.1, 071.2 (2 cases) |
+| DIS 2.24.2 | p.95; Add.1 p.34 | FR-DS-071 | Bank Accounts and Checks | TC-DS-071.1, 071.2 (2 cases) |
+| DIS 3.27.0 | p.100; Add.1 p.32 | FR-DS-045 | Disbursement Workbench | TC-DS-045.1, 045.2 (2 cases) |
+| DIS 3.27.1 | p.101 | FR-DS-055 | Disbursement Voucher | TC-DS-055.1, 055.2 (3 cases) |
+| DIS 3.27.2 | p.101 | FR-DS-093 | Invoice Search | TC-DS-093.1, 093.2 (2 cases) |
+| DIS 3.29.1 | Add.2 p.8-9 | FR-DS-091 | Remittance batch | TC-DS-091.1, 091.2, 091.3 (4 cases) |
+| DIS 3.29.2 | Add.2 p.9-10 | FR-DS-090 | Remittance batch | TC-DS-090.1, 090.2, 090.3 (4 cases) |
 
 ## Payment Requests (MKT)
 
 <!-- table: widths=2.2,2.6,2.6,4.4,5.2 caption="MKT requirement IDs to FR, screen and test cases" size=7.5 -->
 | BRD ID | Page | FR | Screen | Test cases |
 |---|---|---|---|---|
-| MKT 1.1.0 | p.105 | FR-DS-001 | Login | TC-DS-001.1, 001.2, 001.3 (4 cases) |
-| MKT 1.1.1 | p.105 | FR-DS-001 | Login | TC-DS-001.1, 001.2, 001.3 (4 cases) |
-| MKT 1.1.2 | p.105 | FR-DS-001 | Login | TC-DS-001.1, 001.2, 001.3 (4 cases) |
-| MKT 1.1.3 | p.105 | FR-DS-001 | Login | TC-DS-001.1, 001.2, 001.3 (4 cases) |
-| MKT 1.2.0 | p.105 | FR-PQ-001 | Requests Home | TC-PQ-001.1, 001.2, 001.3 (4 cases) |
-| MKT 1.3.0 | p.106 | FR-PQ-001 | Requests Home | TC-PQ-001.1, 001.2, 001.3 (4 cases) |
-| MKT 1.4.0 | p.106 | FR-PQ-001 | Requests Home | TC-PQ-001.1, 001.2, 001.3 (4 cases) |
-| MKT 1.5.0 | p.106 | FR-PQ-001 | Requests Home | TC-PQ-001.1, 001.2, 001.3 (4 cases) |
-| MKT 1.6.0 | p.106 | FR-PQ-001 | Requests Home | TC-PQ-001.1, 001.2, 001.3 (4 cases) |
-| MKT 1.7.0 | p.106 | FR-PQ-002 | Report Centre | TC-PQ-002.1, 002.2 (2 cases) |
-| MKT 1.7.1 | p.106 | FR-PQ-002 | Report Centre | TC-PQ-002.1, 002.2 (2 cases) |
-| MKT 1.7.2 | p.107 | FR-PQ-002 | Report Centre | TC-PQ-002.1, 002.2 (2 cases) |
-| MKT 1.7.3 | p.107 | FR-PQ-002 | Report Centre | TC-PQ-002.1, 002.2 (2 cases) |
-| MKT 1.8.0 | p.107 | FR-PQ-005 | Request | TC-PQ-005.1, 005.2 (4 cases) |
-| MKT 1.9.0 | p.107 | FR-PQ-005 | Request | TC-PQ-005.1, 005.2 (4 cases) |
-| MKT 1.10.0 | p.107 | FR-PQ-003, FR-PQ-004, FR-PQ-017 | New Refund Request; New Cash Advance; Request | TC-PQ-003.1, 003.2, 003.3, 004.1, 004.2, 017.1, 017.2, 017.3 (22 cases) |
-| MKT 1.11.0 | p.108 | FR-PQ-006 | Request | TC-PQ-006.1, 006.2, 006.3 (4 cases) |
-| MKT 1.12.0 | p.108 | FR-PQ-007 | Request | TC-PQ-007.1, 007.2 (2 cases) |
-| MKT 1.13.0 | p.108 | FR-PQ-007 | Request | TC-PQ-007.1, 007.2 (2 cases) |
-| MKT 1.14.0 | p.109 | FR-PQ-008 | Request | TC-PQ-008.1, 008.2, 008.3 (4 cases) |
-| MKT 1.15.0 | p.109 | FR-PQ-008 | Request | TC-PQ-008.1, 008.2, 008.3 (4 cases) |
-| MKT 1.16.0 | p.109 | FR-PQ-009 | Request | TC-PQ-009.1, 009.2, 009.3 (5 cases) |
-| MKT 1.16.1 | p.109 | FR-PQ-009 | Request | TC-PQ-009.1, 009.2, 009.3 (5 cases) |
-| MKT 1.16.2 | p.109 | FR-PQ-009 | Request | TC-PQ-009.1, 009.2, 009.3 (5 cases) |
-| MKT 1.16.3 | p.109 | FR-PQ-009 | Request | TC-PQ-009.1, 009.2, 009.3 (5 cases) |
-| MKT 1.17.0 | p.110 | FR-PQ-010 | Request | TC-PQ-010.1, 010.2 (3 cases) |
-| MKT 1.18.0 | p.110 | FR-PQ-012 | Requests Home | TC-PQ-012.1, 012.2 (3 cases) |
-| MKT 1.18.1 | p.110 | FR-PQ-012 | Requests Home | TC-PQ-012.1, 012.2 (3 cases) |
-| MKT 1.19.0 | p.110 | FR-PQ-011 | Cancel a Check | TC-PQ-011.1, 011.2 (5 cases) |
-| MKT 1.20.0 | p.111 | FR-PQ-013 | Request | TC-PQ-013.1, 013.2 (3 cases) |
-| MKT 2.22.0 | p.111 | FR-PQ-007 | Request | TC-PQ-007.1, 007.2 (2 cases) |
-| MKT 2.23.0 | p.111 | FR-PQ-014 | New Refund Request | TC-PQ-014.1, 014.2 (3 cases) |
-| MKT 2.24.0 | p.111 | FR-PQ-015 | Request | TC-PQ-015.1, 015.2 (2 cases) |
-| MKT 2.25.0 | p.112; Add.1 p.34-35 | FR-PQ-016 | Client | TC-PQ-016.1, 016.2 (3 cases) |
-| MKT 2.25.1 | p.112 | FR-PQ-016 | Client | TC-PQ-016.1, 016.2 (3 cases) |
-| MKT 2.26.0 | p.112 | FR-PQ-012 | Requests Home | TC-PQ-012.1, 012.2 (3 cases) |
+| MKT 1.1.0 | p.106 | FR-DS-001 | Login | TC-DS-001.1, 001.2, 001.3 (4 cases) |
+| MKT 1.1.1 | p.106 | FR-DS-001 | Login | TC-DS-001.1, 001.2, 001.3 (4 cases) |
+| MKT 1.1.2 | p.106 | FR-DS-001 | Login | TC-DS-001.1, 001.2, 001.3 (4 cases) |
+| MKT 1.1.3 | p.106 | FR-DS-001 | Login | TC-DS-001.1, 001.2, 001.3 (4 cases) |
+| MKT 1.2.0 | p.106 | FR-PQ-001 | Requests Home | TC-PQ-001.1, 001.2, 001.3 (4 cases) |
+| MKT 1.3.0 | p.107 | FR-PQ-001 | Requests Home | TC-PQ-001.1, 001.2, 001.3 (4 cases) |
+| MKT 1.4.0 | p.107 | FR-PQ-001 | Requests Home | TC-PQ-001.1, 001.2, 001.3 (4 cases) |
+| MKT 1.5.0 | p.107 | FR-PQ-001 | Requests Home | TC-PQ-001.1, 001.2, 001.3 (4 cases) |
+| MKT 1.6.0 | p.107 | FR-PQ-001 | Requests Home | TC-PQ-001.1, 001.2, 001.3 (4 cases) |
+| MKT 1.7.0 | p.107 | FR-PQ-002 | Report Centre | TC-PQ-002.1, 002.2 (2 cases) |
+| MKT 1.7.1 | p.107 | FR-PQ-002 | Report Centre | TC-PQ-002.1, 002.2 (2 cases) |
+| MKT 1.7.2 | p.108 | FR-PQ-002 | Report Centre | TC-PQ-002.1, 002.2 (2 cases) |
+| MKT 1.7.3 | p.108 | FR-PQ-002 | Report Centre | TC-PQ-002.1, 002.2 (2 cases) |
+| MKT 1.8.0 | p.108 | FR-PQ-005 | Request | TC-PQ-005.1, 005.2 (4 cases) |
+| MKT 1.9.0 | p.108 | FR-PQ-005 | Request | TC-PQ-005.1, 005.2 (4 cases) |
+| MKT 1.10.0 | p.108 | FR-PQ-003, FR-PQ-004, FR-PQ-017 | New Refund Request; New Cash Advance; Request | TC-PQ-003.1, 003.2, 003.3, 004.1, 004.2, 017.1, 017.2, 017.3 (22 cases) |
+| MKT 1.11.0 | p.109 | FR-PQ-006 | Request | TC-PQ-006.1, 006.2, 006.3 (4 cases) |
+| MKT 1.12.0 | p.109 | FR-PQ-007 | Request | TC-PQ-007.1, 007.2 (2 cases) |
+| MKT 1.13.0 | p.109 | FR-PQ-007 | Request | TC-PQ-007.1, 007.2 (2 cases) |
+| MKT 1.14.0 | p.110 | FR-PQ-008 | Request | TC-PQ-008.1, 008.2, 008.3 (4 cases) |
+| MKT 1.15.0 | p.110 | FR-PQ-008 | Request | TC-PQ-008.1, 008.2, 008.3 (4 cases) |
+| MKT 1.16.0 | p.110 | FR-PQ-009 | Request | TC-PQ-009.1, 009.2, 009.3 (5 cases) |
+| MKT 1.16.1 | p.110 | FR-PQ-009 | Request | TC-PQ-009.1, 009.2, 009.3 (5 cases) |
+| MKT 1.16.2 | p.110 | FR-PQ-009 | Request | TC-PQ-009.1, 009.2, 009.3 (5 cases) |
+| MKT 1.16.3 | p.110 | FR-PQ-009 | Request | TC-PQ-009.1, 009.2, 009.3 (5 cases) |
+| MKT 1.17.0 | p.111 | FR-PQ-010 | Request | TC-PQ-010.1, 010.2 (3 cases) |
+| MKT 1.18.0 | p.111 | FR-PQ-012 | Requests Home | TC-PQ-012.1, 012.2 (3 cases) |
+| MKT 1.18.1 | p.111 | FR-PQ-012 | Requests Home | TC-PQ-012.1, 012.2 (3 cases) |
+| MKT 1.19.0 | p.111 | FR-PQ-011 | Cancel a Check | TC-PQ-011.1, 011.2 (5 cases) |
+| MKT 1.20.0 | p.112 | FR-PQ-013 | Request | TC-PQ-013.1, 013.2 (3 cases) |
+| MKT 2.22.0 | p.112 | FR-PQ-007 | Request | TC-PQ-007.1, 007.2 (2 cases) |
+| MKT 2.23.0 | p.112 | FR-PQ-014 | New Refund Request | TC-PQ-014.1, 014.2 (3 cases) |
+| MKT 2.24.0 | p.112 | FR-PQ-015 | Request | TC-PQ-015.1, 015.2 (2 cases) |
+| MKT 2.25.0 | p.113; Add.1 p.35-36 | FR-PQ-016 | Client | TC-PQ-016.1, 016.2 (3 cases) |
+| MKT 2.25.1 | p.113 | FR-PQ-016 | Client | TC-PQ-016.1, 016.2 (3 cases) |
+| MKT 2.26.0 | p.113 | FR-PQ-012 | Requests Home | TC-PQ-012.1, 012.2 (3 cases) |
 
 ## ACSL
 
 <!-- table: widths=2.2,2.6,2.6,4.4,5.2 caption="ACSL requirement IDs to FR, screen and test cases" size=7.5 -->
 | BRD ID | Page | FR | Screen | Test cases |
 |---|---|---|---|---|
-| ACSL 1.1.0 | p.114 | FR-DS-001 | Login | TC-DS-001.1, 001.2, 001.3 (4 cases) |
-| ACSL 1.1.1 | p.115 | FR-DS-001 | Login | TC-DS-001.1, 001.2, 001.3 (4 cases) |
-| ACSL 1.1.2 | p.115 | FR-DS-001 | Login | TC-DS-001.1, 001.2, 001.3 (4 cases) |
-| ACSL 1.1.3 | p.115 | FR-DS-001 | Login | TC-DS-001.1, 001.2, 001.3 (4 cases) |
-| ACSL 2.2.0 | p.115 | FR-AS-001 | Report Centre | TC-AS-001.1, 001.2 (3 cases) |
-| ACSL 2.2.1 | p.115 | FR-AS-002 | Insurer SOA Reconciliation | TC-AS-002.1, 002.2, 002.3 (7 cases) |
-| ACSL 2.3.0 | p.115 | FR-AS-001 | Report Centre | TC-AS-001.1, 001.2 (3 cases) |
-| ACSL 2.3.1 | p.116 | FR-AS-001 | Report Centre | TC-AS-001.1, 001.2 (3 cases) |
-| ACSL 2.3.2 | p.116 | FR-AS-001 | Report Centre | TC-AS-001.1, 001.2 (3 cases) |
-| ACSL 2.3.3 | p.116 | FR-AS-001 | Report Centre | TC-AS-001.1, 001.2 (3 cases) |
-| ACSL 2.3.4 | p.116 | FR-AS-001 | Report Centre | TC-AS-001.1, 001.2 (3 cases) |
-| ACSL 2.3.5 | p.116 | FR-AS-001 | Report Centre | TC-AS-001.1, 001.2 (3 cases) |
-| ACSL 2.3.6 | p.116 | FR-AS-001 | Report Centre | TC-AS-001.1, 001.2 (3 cases) |
-| ACSL 2.4.0 | p.117; Add.1 p.33-34 | FR-AS-002 | Insurer SOA Reconciliation | TC-AS-002.1, 002.2, 002.3 (7 cases) |
-| ACSL 2.13.0 | p.120 | FR-AS-003 | Insurer SOA Reconciliation | TC-AS-003.1, 003.2, 003.3 (3 cases) |
-| ACSL 2.13.1 | p.121 | FR-AS-003 | Insurer SOA Reconciliation | TC-AS-003.1, 003.2, 003.3 (3 cases) |
-| ACSL 2.13.2 | p.121 | FR-AS-004 | GL-SL Reconciliation | TC-AS-004.1, 004.2 (2 cases) |
-| ACSL 2.14.0 | p.121 | FR-AS-003 | Insurer SOA Reconciliation | TC-AS-003.1, 003.2, 003.3 (3 cases) |
-| ACSL 2.14.1 | p.122 | FR-AS-003 | Insurer SOA Reconciliation | TC-AS-003.1, 003.2, 003.3 (3 cases) |
-| ACSL 2.14.2 | p.123 | FR-AS-001 | Report Centre | TC-AS-001.1, 001.2 (3 cases) |
-| ACSL 2.14.3 | p.124 | FR-AS-005 | Report Centre | TC-AS-005.1, 005.2 (2 cases) |
-| ACSL 2.14.4 | p.125 | FR-AS-005 | Report Centre | TC-AS-005.1, 005.2 (2 cases) |
-| ACSL 2.5.0 | p.117 | FR-AS-010 | ACSL Cases | TC-AS-010.1, 010.2, 010.3 (5 cases) |
-| ACSL 2.5.5 | p.117; Add.1 p.34 | FR-PQ-006, FR-AS-010 | Request; ACSL Cases | TC-PQ-006.1, 006.2, 006.3, TC-AS-010.1, TC-AS-010.2, TC-AS-010.3 (9 cases) |
-| ACSL 2.5.1 | p.117 | FR-AS-010 | ACSL Cases | TC-AS-010.1, 010.2, 010.3 (5 cases) |
-| ACSL 2.5.2 | p.118 | FR-AS-010 | ACSL Cases | TC-AS-010.1, 010.2, 010.3 (5 cases) |
-| ACSL 2.5.3 | p.118 | FR-AS-010 | ACSL Cases | TC-AS-010.1, 010.2, 010.3 (5 cases) |
-| ACSL 2.5.4 | p.118 | FR-AS-011 | ACSL Case | TC-AS-011.1, 011.2 (2 cases) |
-| ACSL 2.6.0 | p.118 | FR-AS-012 | ACSL Case | TC-AS-012.1, 012.2 (3 cases) |
-| ACSL 2.6.1 | p.118 | FR-AS-012 | ACSL Case | TC-AS-012.1, 012.2 (3 cases) |
-| ACSL 2.6.2 | p.119 | FR-AS-013 | ACSL Case | TC-AS-013.1, 013.2 (2 cases) |
-| ACSL 2.7.0 | p.119 | FR-AS-020 | Correction Entries | TC-AS-020.1, 020.2 (2 cases) |
-| ACSL 2.8.0 | p.119 | FR-AS-020 | Correction Entries | TC-AS-020.1, 020.2 (2 cases) |
-| ACSL 2.9.0 | p.119 | FR-AS-021 | Correction | TC-AS-021.1, 021.2, 021.3, 021.4 (11 cases) |
-| ACSL 2.9.1 | Add.2 p.12-13 | FR-AS-021 | Correction | TC-AS-021.1, 021.2, 021.3, 021.4 (11 cases) |
-| ACSL 2.9.2 | Add.2 p.13 | FR-AS-025 | Remittance Deductions | TC-AS-025.1, 025.2, 025.3 (7 cases) |
-| ACSL 2.10.0 | p.119 | FR-AS-022 | Correction | TC-AS-022.1, 022.2 (3 cases) |
-| ACSL 2.11.0 | p.120 | FR-AS-023 | Correction | TC-AS-023.1, 023.2 (3 cases) |
-| ACSL 2.11.1 | p.120 | FR-AS-023 | Correction | TC-AS-023.1, 023.2 (3 cases) |
-| ACSL 2.11.2 | p.120 | FR-AS-023 | Correction | TC-AS-023.1, 023.2 (3 cases) |
-| ACSL 2.12.0 | p.120 | FR-AS-023 | Correction | TC-AS-023.1, 023.2 (3 cases) |
-| ACSL 2.12.1 | p.120 | FR-AS-023 | Correction | TC-AS-023.1, 023.2 (3 cases) |
-| ACSL 2.12.2 | p.120 | FR-AS-023 | Correction | TC-AS-023.1, 023.2 (3 cases) |
-| ACSL 2.15.0 | p.125 | FR-AS-024 | Correction | TC-AS-024.1, 024.2 (3 cases) |
-| ACSL 2.16.0 | p.126; Add.1 p.34 | FR-AS-026 | Invoice 360 | TC-AS-026.1, 026.2 (2 cases) |
+| ACSL 1.1.0 | p.115 | FR-DS-001 | Login | TC-DS-001.1, 001.2, 001.3 (4 cases) |
+| ACSL 1.1.1 | p.116 | FR-DS-001 | Login | TC-DS-001.1, 001.2, 001.3 (4 cases) |
+| ACSL 1.1.2 | p.116 | FR-DS-001 | Login | TC-DS-001.1, 001.2, 001.3 (4 cases) |
+| ACSL 1.1.3 | p.116 | FR-DS-001 | Login | TC-DS-001.1, 001.2, 001.3 (4 cases) |
+| ACSL 2.2.0 | p.116 | FR-AS-001 | Report Centre | TC-AS-001.1, 001.2 (3 cases) |
+| ACSL 2.2.1 | p.116 | FR-AS-002 | Insurer SOA Reconciliation | TC-AS-002.1, 002.2, 002.3 (7 cases) |
+| ACSL 2.3.0 | p.116 | FR-AS-001 | Report Centre | TC-AS-001.1, 001.2 (3 cases) |
+| ACSL 2.3.1 | p.117 | FR-AS-001 | Report Centre | TC-AS-001.1, 001.2 (3 cases) |
+| ACSL 2.3.2 | p.117 | FR-AS-001 | Report Centre | TC-AS-001.1, 001.2 (3 cases) |
+| ACSL 2.3.3 | p.117 | FR-AS-001 | Report Centre | TC-AS-001.1, 001.2 (3 cases) |
+| ACSL 2.3.4 | p.117 | FR-AS-001 | Report Centre | TC-AS-001.1, 001.2 (3 cases) |
+| ACSL 2.3.5 | p.117 | FR-AS-001 | Report Centre | TC-AS-001.1, 001.2 (3 cases) |
+| ACSL 2.3.6 | p.117 | FR-AS-001 | Report Centre | TC-AS-001.1, 001.2 (3 cases) |
+| ACSL 2.4.0 | p.118; Add.1 p.34-35 | FR-AS-002 | Insurer SOA Reconciliation | TC-AS-002.1, 002.2, 002.3 (7 cases) |
+| ACSL 2.13.0 | p.121 | FR-AS-003 | Insurer SOA Reconciliation | TC-AS-003.1, 003.2, 003.3 (3 cases) |
+| ACSL 2.13.1 | p.122 | FR-AS-003 | Insurer SOA Reconciliation | TC-AS-003.1, 003.2, 003.3 (3 cases) |
+| ACSL 2.13.2 | p.122 | FR-AS-004 | GL-SL Reconciliation | TC-AS-004.1, 004.2 (2 cases) |
+| ACSL 2.14.0 | p.122 | FR-AS-003 | Insurer SOA Reconciliation | TC-AS-003.1, 003.2, 003.3 (3 cases) |
+| ACSL 2.14.1 | p.123 | FR-AS-003 | Insurer SOA Reconciliation | TC-AS-003.1, 003.2, 003.3 (3 cases) |
+| ACSL 2.14.2 | p.124 | FR-AS-001 | Report Centre | TC-AS-001.1, 001.2 (3 cases) |
+| ACSL 2.14.3 | p.125 | FR-AS-005 | Report Centre | TC-AS-005.1, 005.2 (2 cases) |
+| ACSL 2.14.4 | p.126 | FR-AS-005 | Report Centre | TC-AS-005.1, 005.2 (2 cases) |
+| ACSL 2.5.0 | p.118 | FR-AS-010 | ACSL Cases | TC-AS-010.1, 010.2, 010.3 (5 cases) |
+| ACSL 2.5.5 | p.118; Add.1 p.35 | FR-PQ-006, FR-AS-010 | Request; ACSL Cases | TC-AS-010.1, 010.2, 010.3, 006.1, 006.2, 006.3 (9 cases) |
+| ACSL 2.5.1 | p.118 | FR-AS-010 | ACSL Cases | TC-AS-010.1, 010.2, 010.3 (5 cases) |
+| ACSL 2.5.2 | p.119 | FR-AS-010 | ACSL Cases | TC-AS-010.1, 010.2, 010.3 (5 cases) |
+| ACSL 2.5.3 | p.119 | FR-AS-010 | ACSL Cases | TC-AS-010.1, 010.2, 010.3 (5 cases) |
+| ACSL 2.5.4 | p.119 | FR-AS-011 | ACSL Case | TC-AS-011.1, 011.2 (2 cases) |
+| ACSL 2.6.0 | p.119 | FR-AS-012 | ACSL Case | TC-AS-012.1, 012.2 (3 cases) |
+| ACSL 2.6.1 | p.119 | FR-AS-012 | ACSL Case | TC-AS-012.1, 012.2 (3 cases) |
+| ACSL 2.6.2 | p.120 | FR-AS-013 | ACSL Case | TC-AS-013.1, 013.2 (2 cases) |
+| ACSL 2.7.0 | p.120 | FR-AS-020 | Correction Entries | TC-AS-020.1, 020.2 (2 cases) |
+| ACSL 2.8.0 | p.120 | FR-AS-020 | Correction Entries | TC-AS-020.1, 020.2 (2 cases) |
+| ACSL 2.9.0 | p.120 | FR-AS-021 | Correction | TC-AS-021.1, 021.2, 021.3, 021.4 (11 cases) |
+| ACSL 2.9.1 | Add.2 p.13-14 | FR-AS-021 | Correction | TC-AS-021.1, 021.2, 021.3, 021.4 (11 cases) |
+| ACSL 2.9.2 | Add.2 p.14 | FR-AS-025 | Remittance Deductions | TC-AS-025.1, 025.2, 025.3 (7 cases) |
+| ACSL 2.10.0 | p.120 | FR-AS-022 | Correction | TC-AS-022.1, 022.2 (3 cases) |
+| ACSL 2.11.0 | p.121 | FR-AS-023 | Correction | TC-AS-023.1, 023.2 (3 cases) |
+| ACSL 2.11.1 | p.121 | FR-AS-023 | Correction | TC-AS-023.1, 023.2 (3 cases) |
+| ACSL 2.11.2 | p.121 | FR-AS-023 | Correction | TC-AS-023.1, 023.2 (3 cases) |
+| ACSL 2.12.0 | p.121 | FR-AS-023 | Correction | TC-AS-023.1, 023.2 (3 cases) |
+| ACSL 2.12.1 | p.121 | FR-AS-023 | Correction | TC-AS-023.1, 023.2 (3 cases) |
+| ACSL 2.12.2 | p.121 | FR-AS-023 | Correction | TC-AS-023.1, 023.2 (3 cases) |
+| ACSL 2.15.0 | p.126 | FR-AS-024 | Correction | TC-AS-024.1, 024.2 (3 cases) |
+| ACSL 2.16.0 | p.127; Add.1 p.35 | FR-AS-026 | Invoice 360 | TC-AS-026.1, 026.2 (2 cases) |
 
 ## Coverage summary
 
@@ -5045,10 +5062,10 @@ Every BRD-5 requirement is met by at least one FR, except the login to BDO Busin
 |---|---|---|---|
 | FRBS (Accounting) | 60 | 60 | 0 |
 | Business and system administration (BASAU) | 25 | 25 | 0 |
-| Disbursement (DIS) | 111 | 111 | 1 |
+| Disbursement (DIS) | 111 | 110 | 1 |
 | Payment Requests (MKT) | 36 | 36 | 0 |
 | ACSL | 45 | 45 | 0 |
-| **Total** | **277** | **277** | **1** |
+| **Total** | **277** | **276** | **1** |
 
 # Navigation
 
@@ -5232,16 +5249,16 @@ render: contract
 
 ## What is signed
 
-The business sign-off covers the release set BRD-05 Accounting, Disbursement and ACSL v2.0:
+The business sign-off covers the release set BRD-05 Accounting, Disbursement and ACSL v2.1:
 
 <!-- table: widths=6,11.6 caption="Documents of the release set" -->
 | Document | Content |
 |---|---|
 | 00 Start Here | The map of the pack, the reading order per role, the steps up to closure, who signs what and the dates |
 | 01 Sign-off Pack Guide (deck) | Purpose, approach and steps with who does what, the module at a glance, caveats and impacts on other modules, entry and exit criteria, handover and change control |
-| 02 This FRS v2.0 | Requirements (chapters 1-11), the business view of the system (chapters 12-19), sign-off (chapter 20), the proposed rules for confirmation (chapter 21) and the screen standards (appendix) |
-| 03 Sign-off workbook v2.0 | The screen standards, screens, fields, actions, rules, messages, notifications, menus, upload templates and contract of this FRS, one row each, with the BU review columns; the comments log, meeting minutes, version history and sign-off certificate |
-| 04 and 05 Test plan v2.0 and its summary | The test cases traced to the FRs and to the screens of chapter 13 |
+| 02 This FRS v2.1 | Requirements (chapters 1-11), the business view of the system (chapters 12-19), sign-off (chapter 20), the proposed rules for confirmation (chapter 21) and the appendices: user-story view (22), storyboard index (23) and screen standards (24) |
+| 03 Sign-off workbook v2.1 | The screen standards, screens, fields, actions, rules, messages, notifications, menus, upload templates and contract of this FRS, one row each, with the BU review columns; the comments log, meeting minutes, version history and sign-off certificate |
+| 04 and 05 Test plan v2.1 and its summary | The test cases traced to the FRs and to the screens of chapter 13 |
 | 07 to 09 UX screen documents | The UX Screen Deck, the UX screen register and the image package for the BDOI UX Design team, with the screens as specified in this FRS |
 
 ```pack
@@ -5330,9 +5347,12 @@ The table lists each point where the proposed screen or rule differs from the BR
 | CLR-DS-09 | OR / AR tagging (DIS 2.10.x; FR-DS-056) | Every approved DV counts as unregularised until tagged. | Which DVs need an OR / AR back is open (AQ17). | Name the DV types that need an OR / AR (AQ17). |
 | CLR-DS-10 | CWT tagging (DIS 2.11.x; FR-DS-057) | The tag records the certificate on the DV; the insurer certificates on commission are kept in one register in Tax (Certificates Received). | One register avoids keeping the same certificate twice (AQ16). | Confirm the register (AQ16). |
 | CLR-DS-11 | One invoice number for related transactions (DIS 3.27.2, ACSL 2.16.0; FR-DS-093) | Endorsements and cancellations keep their own BIR invoice number and carry the root invoice number; booking sets the root invoice number and Invoice 360 shows the family. | Each BIR invoice needs its own number (AQ29). | Confirm the root invoice number (AQ29). |
-| CLR-DS-12 | CPC2 incentive (DIS 3.29.2; FR-DS-090) | CPC2 is computed from the TSU CPC2 criteria (rate on the basic premium remitted, output VAT), deducted from the remittance and posted as income. | The base, VAT treatment, fixed-amount and rule criteria are open (AQ24, OQ39, PQ04). | Confirm the base, VAT and criteria (AQ24, OQ39, PQ04). |
+| CLR-DS-12 | CPC2 incentive (DIS 3.29.2; FR-DS-090) | CPC2 is computed at the rate of the CPC2 tag of the booked transaction on the basic premium remitted, with output VAT, deducted from the remittance and posted as income (CLR-DS-16). | The base, VAT treatment, fixed-amount and rule criteria are open (AQ24, OQ39, PQ04). | Confirm the base, VAT and criteria (AQ24, OQ39, PQ04). |
 | CLR-DS-13 | Early-incentive service invoice (DIS 3.29.1; FR-DS-091) | One service invoice per batch with 2% withholding; until AQ25 is answered the incentive is deducted in full from the remittance and the insurer's 2% is not posted. | The accounting of the insurer's 2% withholding is open (AQ25). | Give the accounting of the 2% withholding (AQ25). |
 | CLR-DS-14 | CPC2 report (DIS 3.29.0; FR-DS-092) | A CPC2 report in Disbursement Reports lists the CPC2 lines of a period with the breakdown and totals that agree with the ledger. | The layout depends on the CPC2 definition (AQ24). | Give the CPC2 report layout (AQ24). |
+| CLR-DS-16 | CPC2 follows the incentive tag of the booked transaction (DIS 3.29.2; FR-DS-090, 092) | A remittance line qualifies for CPC2 only when its booked transaction carries the CPC2 incentive tag set at booking by the CPC2 criteria of Product Maintenance; the CPC2 report lists only those lines. An endorsement that changes the qualification re-tags the transaction in New Business and Operations; Disbursement does not re-evaluate the criteria. | The minutes of 4-May-2026 state that CPC2 depends on the transaction tagging, that endorsement impacts are handled through the tagging and documented in the other BRDs, and that the CPC2 report is based only on the incentive tag of the booked transaction; they also confirm that the CPC2 criteria differ from the other incentives without stating them (AQ24, PQ04). | Confirm the tag as the basis of CPC2 and of its report; give the CPC2 criteria, base and rate (AQ24); confirm with the New Business and Operations owners that an endorsement re-evaluates the incentive tag. |
+| CLR-DS-17 | Granularity and trigger of the incentive service invoice (DIS 3.29.1; FR-DS-091) | One EARLY_INCENTIVE service invoice per remittance batch, issued automatically when the batch is approved, with one line per qualified transaction linked to its originating transaction; the amount is the incentive of the batch with VAT and withholding tax. The batch lists its qualified transactions with the service invoice number. | DIS 3.29.1 asks for a service invoice for each qualified transaction, linked to it. The minutes of 4-May-2026 say that service invoices are generated per remittance batch with the amount of the batch incentive and its taxes, and also record a question on a screen that lists the transactions needing a service invoice and generates individual invoices per qualified transaction in one click. The two readings give different numbers of BIR invoices. | Confirm the granularity: one invoice per batch with a line per transaction (proposed), or one invoice per qualified transaction; and the trigger: automatic on approval of the batch (proposed), or generated by a user in one click from the list. |
+| CLR-DS-18 | Report of qualified invoices (DIS 3.29.0; FR-DS-091, 092) | The CPC2 report lists the qualified CPC2 lines per batch; the early-incentive qualified transactions are listed with their service invoice on the remittance batch and its service invoice. No separate report is proposed. | The minutes say that a report of qualified invoices will be generated, without its content. | Confirm that the CPC2 report and the batch listing meet the need, or give the layout of a separate report of qualified incentive transactions and their service invoices. |
 | CLR-DS-15 | Insurer's payment advice (FR-DS-063) | The payment advice of the day is e-mailed to each payee; the remittance schedule is not attached to the insurer's advice. | The BRD does not ask for the schedule with the advice; the insurer receives it from Remittance. | Confirm, or ask for the schedule to be attached. |
 | CLR-PQ-01 | Unapplied payment report for Marketing (MKT 1.7.0; FR-PQ-002) | Marketing runs the Cashiering reports (OPS_REPORT_VIEW) without a segment filter. | A Marketing report per segment needs a layout (AQ18). | Confirm the Cashiering reports, or give the layout of a Marketing report (AQ18). |
 | CLR-PQ-02 | Attachments (MKT 1.12.0, 1.13.0; FR-PQ-007) | .txt is not an accepted attachment type; files open one at a time in the viewer. | The accepted types are those of the document store for all BIBS modules. | Confirm the attachment types and the viewer. |
@@ -5345,6 +5365,334 @@ The table lists each point where the proposed screen or rule differs from the BR
 | CLR-AS-03 | Aging and schedule reports (ACSL 2.14.3, 2.14.4; FR-AS-005) | The ACSL aging and schedule reports age the open items per party in eight slots, in PHP and USD, with the GL balance and the SL-GL difference. | The ageing slots and layouts are not given (OQ43). | Confirm the slots and layouts (OQ43). |
 | CLR-AS-04 | GL-SL reconciliation at period end (ACSL 2.13.2; FR-AS-004) | The reconciliation runs nightly and on demand; a difference raises an alert but does not stop the period close. | The BRD includes a period-end check without saying whether it stops the close. | Confirm the alert, or ask for the close to be stopped. |
 | CLR-AC-15 | Bank reconciliation by the GL team (FRBS 3.3.0; FR-AC-050) | The bank statements, the statement layouts and the bank reconciliation are opened with the bank reconciliation permission, held today by the Accountant and the Finance Manager roles; the GL roles do not hold it. | The FR names the GL Officer as the actor, and the role matrix is to be confirmed (AQ28). | Confirm who reconciles the bank accounts, and the grant of the bank reconciliation permission to the GL Officer and the GL Team Lead. |
+
+# Appendix: User-story view
+
+One row per requirement of the BRD as issued on 8 October 2026: the requirement written as a user story ("As <persona>, I need <capability>, so that <business outcome>"), the functional requirements that meet it, their numbered acceptance criteria (chapter 4) and the test conditions of the test plan with the number of test cases. Where the BRD writes the requirement as a user story, its wording is kept; the personas are those of section 3.1. The traceability of chapter 11 gives the screens.
+
+<!-- table: widths=2.1,7.6,2.3,3.0,3.0 caption="User-story view of the BRD requirements" size=7.5 -->
+| BRD ID | User story | FR IDs | Acceptance criteria | Test cases |
+|---|---|---|---|---|
+| FRBS 1.1.0 | As a GL Officer (FRBS Processor), I need to access the module/application using any BDO issued device, so that only authorised users reach Accounting from BDO devices. | FR-AC-001 | FR-AC-001 AC 1-2 | TC-AC-001.1 to 001.2 (4 cases) |
+| FRBS 1.1.1 | As a GL Officer (FRBS Processor), I need to log in with a specific user profile, so that only authorised users reach Accounting from BDO devices. | FR-AC-001 | FR-AC-001 AC 1-2 | TC-AC-001.1 to 001.2 (4 cases) |
+| FRBS 1.1.2 | As a GL Officer (FRBS Processor), I need to receive the inactivity warning after 15 minutes, so that an unattended session does not stay open. | FR-AC-002 | FR-AC-002 AC 1-2 | TC-AC-002.1 to 002.2 (4 cases) |
+| FRBS 1.1.3 | As a GL Officer (FRBS Processor), I need to receive warning 30 minutes prior to system triggered log out, so that an unattended session does not stay open. | FR-AC-002 | FR-AC-002 AC 1-2 | TC-AC-002.1 to 002.2 (4 cases) |
+| FRBS 2.2.0 | As a GL Team Head / Section Head, I need to input revaluation rate monthly, so that USD balances are revalued at the agreed month-end rate. | FR-AC-010 | FR-AC-010 AC 1-2 | TC-AC-010.1 to 010.4 (5 cases) |
+| FRBS 2.3.0 | As a GL Team Lead, I need to set up chart of accounts, so that the chart of accounts is kept complete and controlled. | FR-AC-011 | FR-AC-011 AC 1-2 | TC-AC-011.1 to 011.4 (7 cases) |
+| FRBS 2.3.1 | As a GL Team Lead, I need to upload file containing the parent and child account details (chart of accounts), so that the chart is loaded and changed in bulk without re-keying. | FR-AC-012 | FR-AC-012 AC 1-2 | TC-AC-012.1 to 012.3 (7 cases) |
+| FRBS 2.3.2 | As a GL Team Lead, I need to view the system generated unique account number for each created parent or child account (no naming convention this depends on the solution), so that every account has a unique number and child accounts roll up to their parent. | FR-AC-013 | FR-AC-013 AC 1-2 | TC-AC-013.1 to 013.3 (5 cases) |
+| FRBS 2.3.3 | As a GL Officer (FRBS Processor), I need to search chart of accounts by Name, Short Code, Account Number, so that the right account is found quickly when entries are made. | FR-AC-014 | FR-AC-014 AC 1-2 | TC-AC-014.1 to 014.2 (4 cases) |
+| FRBS 2.3.4 | As a GL Team Lead, I need to view details of the chart of account, so that the chart of accounts is kept complete and controlled. | FR-AC-011 | FR-AC-011 AC 1-2 | TC-AC-011.1 to 011.4 (7 cases) |
+| FRBS 2.3.5 | As a GL Team Lead, I need to edit chart of account details, so that the chart of accounts is kept complete and controlled. | FR-AC-011 | FR-AC-011 AC 1-2 | TC-AC-011.1 to 011.4 (7 cases) |
+| FRBS 3.6.0 | As a GL Team Head / Section Head, I need the system to maintain Values, so that USD balances are revalued at the agreed month-end rate. | FR-AC-010, FR-AC-011 | FR-AC-010 AC 1-2; FR-AC-011 AC 1-2 | TC-AC-010.1 to 010.4; TC-AC-011.1 to 011.4 (12 cases) |
+| FRBS 2.4.0 | As a GL Officer (FRBS Processor), I need to access system generated reports anytime when needed (user triggered), so that every report is available on demand without IT support. | FR-AC-020 | FR-AC-020 AC 1-2 | TC-AC-020.1 to 020.4 (4 cases) |
+| FRBS 2.4.1 | As a GL Officer (FRBS Processor), I need to select a report, so that every report is available on demand without IT support. | FR-AC-020 | FR-AC-020 AC 1-2 | TC-AC-020.1 to 020.4 (4 cases) |
+| FRBS 2.4.2 | As a GL Officer (FRBS Processor), I need to select a date range of the report, so that every report is available on demand without IT support. | FR-AC-020 | FR-AC-020 AC 1-2 | TC-AC-020.1 to 020.4 (4 cases) |
+| FRBS 2.4.3 | As a GL Officer (FRBS Processor), I need to view the details of the selected report, so that every report is available on demand without IT support. | FR-AC-020 | FR-AC-020 AC 1-2 | TC-AC-020.1 to 020.4 (4 cases) |
+| FRBS 2.4.4 | As a GL Officer (FRBS Processor), I need to filter each column of the report, so that the report shows only the rows needed. | FR-AC-021 | FR-AC-021 AC 1 | TC-AC-021.1 to 021.2 (2 cases) |
+| FRBS 2.4.5 | As a GL Officer (FRBS Processor), I need to download single or multiple reports as needed, so that several reports are produced in one step. | FR-AC-022 | FR-AC-022 AC 1-2 | TC-AC-022.1 to 022.3 (5 cases) |
+| FRBS 2.4.6 | As a GL Officer (FRBS Processor), I need to download in a .xlsx or .ods format, so that every report is available on demand without IT support. | FR-AC-020 | FR-AC-020 AC 1-2 | TC-AC-020.1 to 020.4 (4 cases) |
+| FRBS 2.4.7 | As a GL Officer (FRBS Processor), I need to print single or multiple reports as needed in a .pdf format, so that several reports are produced in one step. | FR-AC-022 | FR-AC-022 AC 1-2 | TC-AC-022.1 to 022.3 (5 cases) |
+| FRBS 2.4.8 | As a GL Officer (FRBS Processor), I need to preview the report as needed, so that every report is available on demand without IT support. | FR-AC-020 | FR-AC-020 AC 1-2 | TC-AC-020.1 to 020.4 (4 cases) |
+| FRBS 2.4.9 | As a GL Officer (FRBS Processor), I need to set printing options, so that reports print in the layout needed. | FR-AC-023 | FR-AC-023 AC 1 | TC-AC-023.1 to 023.2 (3 cases) |
+| FRBS 2.4.10 | As a GL Officer (FRBS Processor), I need to capture data needed from the report, so that every report is available on demand without IT support. | FR-AC-020 | FR-AC-020 AC 1-2 | TC-AC-020.1 to 020.4 (4 cases) |
+| FRBS 3.2.0 | As a GL Officer (FRBS Processor), I need the system to generate reports, so that the report pack of Appendix A is produced from the ledger. | FR-AC-060, FR-AC-061, FR-AC-062, FR-AC-063 | FR-AC-060 AC 1-2; FR-AC-061 AC 1-2; FR-AC-062 AC 1-2; FR-AC-063 AC 1-2 | TC-AC-060.1 to 060.2; TC-AC-061.1 to 061.3; TC-AC-062.1 to 062.2; TC-AC-063.1 to 063.3 (22 cases) |
+| FRBS 2.5.0 | As a GL Officer (FRBS Processor), I need to post transactions to general ledger (GL) and Subsidiary Ledge (SL), so that the GL and the sub-ledger always reflect every financial transaction. | FR-AC-030 | FR-AC-030 AC 1-2 | TC-AC-030.1 to 030.3 (5 cases) |
+| FRBS 2.5.1 | As a GL Team Lead, I need to view the list of manual entries for posting assigned to me, so that every manual entry has an owner until it is posted. | FR-AC-031 | FR-AC-031 AC 1-2 | TC-AC-031.1 to 031.2 (4 cases) |
+| FRBS 2.5.2 | As a GL Team Lead, I need to select a transaction, so that every manual entry has an owner until it is posted. | FR-AC-031 | FR-AC-031 AC 1-2 | TC-AC-031.1 to 031.2 (4 cases) |
+| FRBS 2.5.3 | As a GL Team Lead, I need to view the transaction details for posting, so that every manual entry has an owner until it is posted. | FR-AC-031 | FR-AC-031 AC 1-2 | TC-AC-031.1 to 031.2 (4 cases) |
+| FRBS 2.5.4 | As a GL Officer (FRBS Processor), I need to prevent posting transactions with errors, so that unbalanced or invalid entries never reach the books. | FR-AC-034 | FR-AC-034 AC 1-2 | TC-AC-034.1 to 034.3 (6 cases) |
+| FRBS 2.5.5 | As a GL Officer (FRBS Processor), I need to receive warning and information messages for data entry error, so that unbalanced or invalid entries never reach the books. | FR-AC-034 | FR-AC-034 AC 1-2 | TC-AC-034.1 to 034.3 (6 cases) |
+| FRBS 2.5.6 | As a GL Team Lead, I need to post single or multiple transaction, so that entries are posted or returned with an audit trail. | FR-AC-036 | FR-AC-036 AC 1-2 | TC-AC-036.1 to 036.3 (6 cases) |
+| FRBS 2.5.7 | As a GL Team Lead, I need to return a transaction posting request, so that entries are posted or returned with an audit trail. | FR-AC-036 | FR-AC-036 AC 1-2 | TC-AC-036.1 to 036.3 (6 cases) |
+| FRBS 2.5.8 | As a GL Team Lead, I need to add remarks, so that entries are posted or returned with an audit trail. | FR-AC-036 | FR-AC-036 AC 1-2 | TC-AC-036.1 to 036.3 (6 cases) |
+| FRBS 2.5.9 | As a GL Team Lead, I need to save remarks, so that entries are posted or returned with an audit trail. | FR-AC-036 | FR-AC-036 AC 1-2 | TC-AC-036.1 to 036.3 (6 cases) |
+| FRBS 2.5.10 | As a GL Officer (FRBS Processor), I need to receive transaction details confirmation message prior to pushing the account to the next workflow, so that only checked transactions are sent on. | FR-AC-035 | FR-AC-035 AC 1 | TC-AC-035.1 to 035.2 (3 cases) |
+| FRBS 2.8.0 | As a GL Officer (FRBS Processor), I need to perform Manual entries, so that adjustments and accruals are recorded in the system. | FR-AC-032 | FR-AC-032 AC 1-2 | TC-AC-032.1 to 032.4 (5 cases) |
+| FRBS 2.8.1 | As a GL Officer (FRBS Processor), I need to input the following details. - Transaction Description - Short code - GL Account Number - should be auto populated via the short code - Debit amount - Credit amount - Date for reversal (applicable to accruals), so that adjustments and accruals are recorded in the system. | FR-AC-032, FR-AC-033 | FR-AC-032 AC 1-2; FR-AC-033 AC 1 | TC-AC-032.1 to 032.4; TC-AC-033.1 to 033.2 (8 cases) |
+| FRBS 2.8.2 | As a GL Officer (FRBS Processor), I need to save draft of the manual entries, so that adjustments and accruals are recorded in the system. | FR-AC-032 | FR-AC-032 AC 1-2 | TC-AC-032.1 to 032.4 (5 cases) |
+| FRBS 2.8.3 | As a GL Officer (FRBS Processor), I need to receive details confirmation message prior to pushing the account to the account to next workflow, so that only checked transactions are sent on. | FR-AC-035 | FR-AC-035 AC 1 | TC-AC-035.1 to 035.2 (3 cases) |
+| FRBS 2.8.4 | As a GL Officer (FRBS Processor), I need to receive warning and information message for transactions with data entry errors, so that unbalanced or invalid entries never reach the books. | FR-AC-034 | FR-AC-034 AC 1-2 | TC-AC-034.1 to 034.3 (6 cases) |
+| FRBS 2.8.5 | As a GL Officer (FRBS Processor), I need to submit for review and posting, so that adjustments and accruals are recorded in the system. | FR-AC-032 | FR-AC-032 AC 1-2 | TC-AC-032.1 to 032.4 (5 cases) |
+| FRBS 2.9.0 | As a GL Officer (FRBS Processor), I need to edit accounting entries, so that wrong entries are corrected before posting. | FR-AC-037 | FR-AC-037 AC 1-2 | TC-AC-037.1 to 037.2 (3 cases) |
+| FRBS 3.1.0 | As a GL Officer (FRBS Processor), I need the system to record details of all transactions with financial impact and post to ledger, so that the GL and the sub-ledger always reflect every financial transaction. | FR-AC-030 | FR-AC-030 AC 1-2 | TC-AC-030.1 to 030.3 (5 cases) |
+| FRBS 3.6.0b | As a GL Officer (FRBS Processor), I need to validate the entries before posting and refuse those with errors, so that unbalanced or invalid entries never reach the books. | FR-AC-034 | FR-AC-034 AC 1-2 | TC-AC-034.1 to 034.3 (6 cases) |
+| FRBS 2.6.0 | As a GL Team Lead, I need to perform month-end closing of previous month GL books every 2nd banking day of the current month, so that the GL books close on the agreed date. | FR-AC-040 | FR-AC-040 AC 1-2 | TC-AC-040.1 to 040.4 (7 cases) |
+| FRBS 2.6.1 | As a GL Team Lead, I need to select the closing date of the books, so that the GL books close on the agreed date. | FR-AC-040 | FR-AC-040 AC 1-2 | TC-AC-040.1 to 040.4 (7 cases) |
+| FRBS 2.7.0 | As a GL Team Lead, I need to perform year-end closing of GL books on or before April 15 of the current year, so that the year closes on time with the nominal accounts at zero. | FR-AC-041 | FR-AC-041 AC 1-2 | TC-AC-041.1 to 041.3 (5 cases) |
+| FRBS 2.7.1 | As a GL Team Lead, I need to receive a confirmation that all nominal accounts (income and expenses) are zeroed out and the GL book balance is 0, so that the year closes on time with the nominal accounts at zero. | FR-AC-041 | FR-AC-041 AC 1-2 | TC-AC-041.1 to 041.3 (5 cases) |
+| FRBS 3.4.0 | As a GL Team Lead, I need the system to automatically perform closing of broking books, so that the broking books stop posting into a closed month. | FR-AC-042 | FR-AC-042 AC 1-2 | TC-AC-042.1 to 042.3 (4 cases) |
+| FRBS 3.4.1 | As a GL Team Lead, I need the system to automatically close the current month broking books by month-end at an agreed time, so that the broking books stop posting into a closed month. | FR-AC-042 | FR-AC-042 AC 1-2 | TC-AC-042.1 to 042.3 (4 cases) |
+| FRBS 3.5.0 | As a GL Team Lead, I need the system to automatically revaluate USD transactions with outstanding balance and create corresponding manual entries on the amount difference, so that USD balances show their peso value at month end. | FR-AC-043 | FR-AC-043 AC 1 | TC-AC-043.1 to 043.2 (4 cases) |
+| FRBS 3.3.0 | As a GL Officer (FRBS Processor), I need the system to perform Reconciliation, so that bank reconciliation no longer needs manual matching. | FR-AC-050 | FR-AC-050 AC 1-2 | TC-AC-050.1 to 050.4 (6 cases) |
+| FRBS 3.3.1 | As a GL Officer (FRBS Processor), I need the system to accept file upload containing cash in bank transaction in a .xlsx format, so that bank reconciliation no longer needs manual matching. | FR-AC-050 | FR-AC-050 AC 1-2 | TC-AC-050.1 to 050.4 (6 cases) |
+| FRBS 3.3.2 | As a GL Officer (FRBS Processor), I need the system to reconcile cash balance per books with cash balance per bank, so that bank reconciliation no longer needs manual matching. | FR-AC-050 | FR-AC-050 AC 1-2 | TC-AC-050.1 to 050.4 (6 cases) |
+| FRBS 3.3.3 | As a GL Officer (FRBS Processor), I need the system to generate a report containing the unmatched transactions, so that unmatched items are followed up. | FR-AC-051 | FR-AC-051 AC 1 | TC-AC-051.1 to 051.2 (2 cases) |
+| FRBS 2.10.0 | As a GL Officer (FRBS Processor), I need to monitor Service Fee, so that referrers are paid their service fee correctly. | FR-AC-052 | FR-AC-052 AC 1-3 | TC-AC-052.1 to 052.4 (10 cases) |
+| FRBS 2.10.1 | As a GL Officer (FRBS Processor), I need to receive liquidation report from different units, so that released and liquidated service fees are tracked. | FR-AC-053 | FR-AC-053 AC 1-2 | TC-AC-053.1 to 053.3 (6 cases) |
+| FRBS 2.10.2 | As a GL Officer (FRBS Processor), I need to manually tag the status of the transaction as either "liquidated" or "released", so that released and liquidated service fees are tracked. | FR-AC-053 | FR-AC-053 AC 1-2 | TC-AC-053.1 to 053.3 (6 cases) |
+| FRBS 3.1.1 | As a Comptrollership administrator, I need the system to derive the cost centre of every entry from the cost-centre rules and refuse an entry without it, so that every expense and income line carries its cost centre. | FR-AC-054 | FR-AC-054 AC 1-2 | TC-AC-054.1 to 054.3 (3 cases) |
+| FRBS 3.1.2 | As a Comptrollership administrator, I need the system to account for early incentives as Other Income, separate from commission, so that early incentives are reported as Other Income apart from commission. | FR-AC-055 | FR-AC-055 AC 1 | TC-AC-055.1 to 055.2 (3 cases) |
+| BASAU 1.1.0 | As a Business Administrator, I need to access the module/application using any BDO issued device, so that only authorised users reach Accounting from BDO devices. | FR-AC-001 | FR-AC-001 AC 1-2 | TC-AC-001.1 to 001.2 (4 cases) |
+| BASAU 1.1.1 | As a Business Administrator, I need to log in with a specific user profile, so that only authorised users reach Accounting from BDO devices. | FR-AC-001 | FR-AC-001 AC 1-2 | TC-AC-001.1 to 001.2 (4 cases) |
+| BASAU 1.1.2 | As a Business Administrator, I need to receive the inactivity warning after 15 minutes, so that an unattended session does not stay open. | FR-AC-002 | FR-AC-002 AC 1-2 | TC-AC-002.1 to 002.2 (4 cases) |
+| BASAU 1.1.3 | As a Business Administrator, I need to receive warning 30 minutes prior to system triggered log out, so that an unattended session does not stay open. | FR-AC-002 | FR-AC-002 AC 1-2 | TC-AC-002.1 to 002.2 (4 cases) |
+| BASAU 2.2.0 | As a Business Administrator, I need to maintain LOVs, so that lists of values change only with approval. | FR-AC-070 | FR-AC-070 AC 1-2 | TC-AC-070.1 to 070.4 (5 cases) |
+| BASAU 2.2.1 | As a Business Administrator, I need to view defined LOVs, so that lists of values change only with approval. | FR-AC-070 | FR-AC-070 AC 1-2 | TC-AC-070.1 to 070.4 (5 cases) |
+| BASAU 2.2.2 | As a Business Administrator, I need to add new LOVs, so that lists of values change only with approval. | FR-AC-070 | FR-AC-070 AC 1-2 | TC-AC-070.1 to 070.4 (5 cases) |
+| BASAU 2.2.3 | As a Business Administrator, I need to edit defined LOVs, so that lists of values change only with approval. | FR-AC-070 | FR-AC-070 AC 1-2 | TC-AC-070.1 to 070.4 (5 cases) |
+| BASAU 2.2.4 | As a Business Administrator, I need to deactivate defined LOVs, so that lists of values change only with approval. | FR-AC-070 | FR-AC-070 AC 1-2 | TC-AC-070.1 to 070.4 (5 cases) |
+| BASAU 2.2.5 | As a Business Administrator, I need to select an effectivity date, so that lists of values change only with approval. | FR-AC-070 | FR-AC-070 AC 1-2 | TC-AC-070.1 to 070.4 (5 cases) |
+| BASAU 2.3.0 | As a System Administrator, I need to manage users of the system, so that users and role profiles change only through approved requests. | FR-AC-071 | FR-AC-071 AC 1-2 | TC-AC-071.1 to 071.3 (8 cases) |
+| BASAU 2.3.1 | As a System Administrator, I need to define User Profile/Role, so that users and role profiles change only through approved requests. | FR-AC-071 | FR-AC-071 AC 1-2 | TC-AC-071.1 to 071.3 (8 cases) |
+| BASAU 2.3.2 | As a System Administrator, I need to define specific functionality or capability to a specific user profile/role, so that users and role profiles change only through approved requests. | FR-AC-071 | FR-AC-071 AC 1-2 | TC-AC-071.1 to 071.3 (8 cases) |
+| BASAU 2.3.3 | As a System Administrator, I need to define group profile membership, so that users and role profiles change only through approved requests. | FR-AC-071 | FR-AC-071 AC 1-2 | TC-AC-071.1 to 071.3 (8 cases) |
+| BASAU 2.4.0 | As a System Administrator, I need to request for manage user approval, so that users and role profiles change only through approved requests. | FR-AC-071 | FR-AC-071 AC 1-2 | TC-AC-071.1 to 071.3 (8 cases) |
+| BASAU 2.4.1 | As a System Administrator, I need to receive notification on approved/declined/returned requests, so that administration requests are decided with a trail. | FR-AC-072 | FR-AC-072 AC 1-2 | TC-AC-072.1 to 072.4 (8 cases) |
+| BASAU 2.4.2 | As a System Administrator, I need to view the list of requests for approval, so that users and role profiles change only through approved requests. | FR-AC-071 | FR-AC-071 AC 1-2 | TC-AC-071.1 to 071.3 (8 cases) |
+| BASAU 2.5.0 | As an Approver (administration), I need to approve/decline requests, so that administration requests are decided with a trail. | FR-AC-072 | FR-AC-072 AC 1-2 | TC-AC-072.1 to 072.4 (8 cases) |
+| BASAU 2.5.1 | As an Approver (administration), I need to receive notification for approval requests, so that administration requests are decided with a trail. | FR-AC-072 | FR-AC-072 AC 1-2 | TC-AC-072.1 to 072.4 (8 cases) |
+| BASAU 2.5.2 | As an Approver (administration), I need to view the list for approval request, so that administration requests are decided with a trail. | FR-AC-072 | FR-AC-072 AC 1-2 | TC-AC-072.1 to 072.4 (8 cases) |
+| BASAU 2.5.3 | As an Approver (administration), I need to select single or multiple request, so that administration requests are decided with a trail. | FR-AC-072 | FR-AC-072 AC 1-2 | TC-AC-072.1 to 072.4 (8 cases) |
+| BASAU 2.6.0 | As an Approver (administration), I need to return approval request, so that administration requests are decided with a trail. | FR-AC-072 | FR-AC-072 AC 1-2 | TC-AC-072.1 to 072.4 (8 cases) |
+| BASAU 2.6.1 | As an Approver (administration), I need to return requests, so that administration requests are decided with a trail. | FR-AC-072 | FR-AC-072 AC 1-2 | TC-AC-072.1 to 072.4 (8 cases) |
+| BASAU 2.6.2 | As an Approver (administration), I need to add remarks, so that administration requests are decided with a trail. | FR-AC-072 | FR-AC-072 AC 1-2 | TC-AC-072.1 to 072.4 (8 cases) |
+| BASAU 2.6.3 | As an Approver (administration), I need to save remarks, so that administration requests are decided with a trail. | FR-AC-072 | FR-AC-072 AC 1-2 | TC-AC-072.1 to 072.4 (8 cases) |
+| DIS 1.1.0 | As a Disbursement Processor, I need to access the module/application using any BDO issued device, so that only authorised users reach Disbursement, Payment Requests and ACSL from BDO devices. | FR-DS-001 | FR-DS-001 AC 1-3 | TC-DS-001.1 to 001.3 (4 cases) |
+| DIS 1.1.1 | As a Disbursement Processor, I need to log in with a specific user profile, so that only authorised users reach Disbursement, Payment Requests and ACSL from BDO devices. | FR-DS-001 | FR-DS-001 AC 1-3 | TC-DS-001.1 to 001.3 (4 cases) |
+| DIS 1.1.2 | As a Disbursement Processor, I need to receive the inactivity warning after 15 minutes, so that only authorised users reach Disbursement, Payment Requests and ACSL from BDO devices. | FR-DS-001 | FR-DS-001 AC 1-3 | TC-DS-001.1 to 001.3 (4 cases) |
+| DIS 1.1.3 | As a Disbursement Processor, I need to receive warning 30 minutes prior to system triggered log out, so that only authorised users reach Disbursement, Payment Requests and ACSL from BDO devices. | FR-DS-001 | FR-DS-001 AC 1-3 | TC-DS-001.1 to 001.3 (4 cases) |
+| DIS 2.2.0 | As a Disbursement Team Leader, I need to maintain payees, so that payments go only to authorised payees. | FR-DS-010 | FR-DS-010 AC 1-3 | TC-DS-010.1 to 010.4 (9 cases) |
+| DIS 2.2.1 | As a Disbursement Team Leader, I need to receive request, so that payee changes requested by other units reach Disbursement. | FR-DS-012 | FR-DS-012 AC 1 | TC-DS-012.1 to 012.2 (2 cases) |
+| DIS 2.2.2 | As a Disbursement Team Leader, I need to add payee details, so that each payee is paid by an allowed mode of payment. | FR-DS-011 | FR-DS-011 AC 1 | TC-DS-011.1 to 011.2 (2 cases) |
+| DIS 2.2.3 | As a Disbursement Team Leader, I need to update payee details, so that payments go only to authorised payees. | FR-DS-010 | FR-DS-010 AC 1-3 | TC-DS-010.1 to 010.4 (9 cases) |
+| DIS 2.2.4 | As a Disbursement Team Leader, I need to delete payee details, so that payees no longer used cannot be paid while their history is kept. | FR-DS-013 | FR-DS-013 AC 1 | TC-DS-013.1 to 013.2 (3 cases) |
+| DIS 2.2.5 | As a Disbursement Team Leader, I need to select a payment method, so that each payee is paid by an allowed mode of payment. | FR-DS-011 | FR-DS-011 AC 1 | TC-DS-011.1 to 011.2 (2 cases) |
+| DIS 2.2.6 | As a Disbursement Team Leader, I need to save payee details, so that payments go only to authorised payees. | FR-DS-010 | FR-DS-010 AC 1-3 | TC-DS-010.1 to 010.4 (9 cases) |
+| DIS 2.2.7 | As a Disbursement Team Leader, I need to save draft of the payee details, so that payments go only to authorised payees. | FR-DS-010 | FR-DS-010 AC 1-3 | TC-DS-010.1 to 010.4 (9 cases) |
+| DIS 2.2.8 | As a Disbursement Team Leader, I need to view all maintained payee details, so that every payee is visible and the existing payees are carried over. | FR-DS-014 | FR-DS-014 AC 1-2 | TC-DS-014.1 to 014.2 (3 cases) |
+| DIS 2.3.0 | As a Disbursement Processor, I need to access system generated reports that I need, so that Disbursement gets its reports on demand. | FR-DS-080 | FR-DS-080 AC 1 | TC-DS-080.1 to 080.2 (3 cases) |
+| DIS 2.3.1 | As a Disbursement Processor, I need to select a date range/covered period of the report, so that Disbursement gets its reports on demand. | FR-DS-080 | FR-DS-080 AC 1 | TC-DS-080.1 to 080.2 (3 cases) |
+| DIS 2.3.2 | As a Disbursement Processor, I need to select the needed report, so that Disbursement gets its reports on demand. | FR-DS-080 | FR-DS-080 AC 1 | TC-DS-080.1 to 080.2 (3 cases) |
+| DIS 2.3.3 | As a Disbursement Processor, I need to view the details of the selected report, so that Disbursement gets its reports on demand. | FR-DS-080 | FR-DS-080 AC 1 | TC-DS-080.1 to 080.2 (3 cases) |
+| DIS 2.3.4 | As a Disbursement Processor, I need to capture details from the report, so that Disbursement gets its reports on demand. | FR-DS-080 | FR-DS-080 AC 1 | TC-DS-080.1 to 080.2 (3 cases) |
+| DIS 2.3.5 | As a Disbursement Processor, I need to download report in a .xlsx, .pdf, etc, so that Disbursement gets its reports on demand. | FR-DS-080 | FR-DS-080 AC 1 | TC-DS-080.1 to 080.2 (3 cases) |
+| DIS 2.3.6 | As a Disbursement Processor, I need to save reports in a desired location, so that Disbursement gets its reports on demand. | FR-DS-080 | FR-DS-080 AC 1 | TC-DS-080.1 to 080.2 (3 cases) |
+| DIS 2.3.7 | As a Disbursement Processor, I need to print reports, so that Disbursement gets its reports on demand. | FR-DS-080 | FR-DS-080 AC 1 | TC-DS-080.1 to 080.2 (3 cases) |
+| DIS 2.3.8 | As a Disbursement Processor, I need to preview prior to printing, so that Disbursement gets its reports on demand. | FR-DS-080 | FR-DS-080 AC 1 | TC-DS-080.1 to 080.2 (3 cases) |
+| DIS 2.3.9 | As a Disbursement Processor, I need to set print option, so that Disbursement gets its reports on demand. | FR-DS-080 | FR-DS-080 AC 1 | TC-DS-080.1 to 080.2 (3 cases) |
+| DIS 3.28.0 | As a Disbursement Processor, I need the system to automatically generate reports, so that the end-of-day reports are produced every day. | FR-DS-081 | FR-DS-081 AC 1 | TC-DS-081.1 to 081.2 (2 cases) |
+| DIS 3.28.1 | As a Disbursement Processor, I need the system to generate Payee reports, so that payees and upload fall-outs are reported. | FR-DS-083 | FR-DS-083 AC 1 | TC-DS-083.1 (2 cases) |
+| DIS 3.28.2 | As a Disbursement Processor, I need the system to generate End-of-day reports, so that the end-of-day reports are produced every day. | FR-DS-081 | FR-DS-081 AC 1 | TC-DS-081.1 to 081.2 (2 cases) |
+| DIS 3.28.3 | As a Disbursement Processor, I need the system to generate Real Time Reports, so that the current position is always visible. | FR-DS-082 | FR-DS-082 AC 1 | TC-DS-082.1 to 082.2 (4 cases) |
+| DIS 3.28.4 | As a Disbursement Processor, I need the system to generate a disbursement request upload fall out report, so that payees and upload fall-outs are reported. | FR-DS-083 | FR-DS-083 AC 1 | TC-DS-083.1 (2 cases) |
+| DIS 3.29.0 | As a Disbursement Processor, I need to generate the CPC2 incentive report, so that CPC2 income can be reviewed and agreed with the ledger. | FR-DS-092 | FR-DS-092 AC 1-2 | TC-DS-092.1 to 092.3 (4 cases) |
+| DIS 3.30.2 | As a Comptrollership administrator, I need to generate the headcount report per cost centre, so that employee expenses carry the right cost centre and the headcount is reported. | FR-DS-037 | FR-DS-037 AC 1-2 | TC-DS-037.1 to 037.2 (6 cases) |
+| DIS 2.4.0 | As a Disbursement Processor, I need to view the list of transactions for disbursement processing, so that the team sees all its work in one place. | FR-DS-025 | FR-DS-025 AC 1-2 | TC-DS-025.1 to 025.3 (3 cases) |
+| DIS 2.4.1 | As a Disbursement Processor, I need to select a date range, so that the team sees all its work in one place. | FR-DS-025 | FR-DS-025 AC 1-2 | TC-DS-025.1 to 025.3 (3 cases) |
+| DIS 2.4.2 | As a Disbursement Processor, I need to view and download attached documents, so that the team sees all its work in one place. | FR-DS-025 | FR-DS-025 AC 1-2 | TC-DS-025.1 to 025.3 (3 cases) |
+| DIS 2.4.3 | As a Disbursement Processor, I need to view the captured payee details from the maintained payee list, so that the team sees all its work in one place. | FR-DS-025 | FR-DS-025 AC 1-2 | TC-DS-025.1 to 025.3 (3 cases) |
+| DIS 2.4.4 | As a Disbursement Processor, I need to filter and sort the list of transactions as needed, so that the team sees all its work in one place. | FR-DS-025 | FR-DS-025 AC 1-2 | TC-DS-025.1 to 025.3 (3 cases) |
+| DIS 2.5.0 | As a Disbursement Processor, I need to upload file in a .xlsx or .ods format containing the list of disbursement requests, so that requests arrive in bulk and the rejected rows are visible. | FR-DS-024 | FR-DS-024 AC 1 | TC-DS-024.1 to 024.2 (3 cases) |
+| DIS 2.5.1 | As a Disbursement Processor, I need to view the payee fall out report, so that requests arrive in bulk and the rejected rows are visible. | FR-DS-024 | FR-DS-024 AC 1 | TC-DS-024.1 to 024.2 (3 cases) |
+| DIS 2.6.0 | As a Disbursement Processor, I need to receive requests from other units, so that payment requests from the modules arrive without re-keying. | FR-DS-020 | FR-DS-020 AC 1-2 | TC-DS-020.1 to 020.3 (5 cases) |
+| DIS 2.6.1 | As a Disbursement Processor, I need to manually encode individual receive email requests from different units, so that requests received by e-mail are processed in the system. | FR-DS-023 | FR-DS-023 AC 1 | TC-DS-023.1 to 023.2 (3 cases) |
+| DIS 2.6.2 | As a Disbursement Processor, I need to view system triggered requests, so that payment requests from the modules arrive without re-keying. | FR-DS-020 | FR-DS-020 AC 1-2 | TC-DS-020.1 to 020.3 (5 cases) |
+| DIS 3.25.0 | As a Disbursement Processor, I need the system to receive system triggered disbursement requests, so that payment requests from the modules arrive without re-keying. | FR-DS-020 | FR-DS-020 AC 1-2 | TC-DS-020.1 to 020.3 (5 cases) |
+| DIS 3.25.1 | As a Disbursement Processor, I need the system to automatically classify the transactions, so that each request is processed by its disbursement type. | FR-DS-021 | FR-DS-021 AC 1 | TC-DS-021.1 to 021.2 (2 cases) |
+| DIS 3.25.2 | As a Disbursement Processor, I need the system to automatically match the payee details to the maintained payee details, so that requests without a known payee are caught early. | FR-DS-022 | FR-DS-022 AC 1 | TC-DS-022.1 to 022.2 (3 cases) |
+| DIS 2.7.0 | As a Disbursement Processor, I need to process Disbursement via different modes, so that each payment is made by the chosen mode. | FR-DS-033 | FR-DS-033 AC 1 | TC-DS-033.1 to 033.2 (4 cases) |
+| DIS 2.7.1 | As a Disbursement Processor, I need to view the captured payee details from the maintained payee list, so that the team sees all its work in one place. | FR-DS-025 | FR-DS-025 AC 1-2 | TC-DS-025.1 to 025.3 (3 cases) |
+| DIS 2.7.2 | As a Disbursement Processor, I need to select a transaction, so that the team sees all its work in one place. | FR-DS-025 | FR-DS-025 AC 1-2 | TC-DS-025.1 to 025.3 (3 cases) |
+| DIS 2.7.3 | As a Disbursement Processor, I need to view the details of the selected transaction, so that the team sees all its work in one place. | FR-DS-025 | FR-DS-025 AC 1-2 | TC-DS-025.1 to 025.3 (3 cases) |
+| DIS 2.7.4 | As a Disbursement Processor, I need to update necessary details, so that every payment has a disbursement voucher. | FR-DS-030 | FR-DS-030 AC 1-2 | TC-DS-030.1 to 030.3 (6 cases) |
+| DIS 2.7.5 | As a Disbursement Processor, I need to create a disbursement voucher (DV), so that every payment has a disbursement voucher. | FR-DS-030 | FR-DS-030 AC 1-2 | TC-DS-030.1 to 030.3 (6 cases) |
+| DIS 2.7.6 | As a Disbursement Processor, I need to create Proforma Entry, so that the accounting of each payment is right before approval. | FR-DS-031 | FR-DS-031 AC 1-2 | TC-DS-031.1 to 031.2 (4 cases) |
+| DIS 2.7.7 | As a Disbursement Processor, I need to process Authority to Debit (ATD), so that the main account is debited with authority. | FR-DS-034 | FR-DS-034 AC 1 | TC-DS-034.1 to 034.2 (2 cases) |
+| DIS 2.7.8 | As a Disbursement Processor, I need to process Demand Draft/Manager's check, so that manager's checks, demand drafts and transfers are processed in the system. | FR-DS-035 | FR-DS-035 AC 1 | TC-DS-035.1 to 035.2 (2 cases) |
+| DIS 2.7.9 | As a Disbursement Processor, I need to process Credit Ticket/Telegraphic Transfer, so that manager's checks, demand drafts and transfers are processed in the system. | FR-DS-035 | FR-DS-035 AC 1 | TC-DS-035.1 to 035.2 (2 cases) |
+| DIS 2.7.10 | As a Disbursement Processor, I need to attached file for Expense Allocation, so that expenses are charged to the right cost centres. | FR-DS-032 | FR-DS-032 AC 1 | TC-DS-032.1 (2 cases) |
+| DIS 2.7.11 | As a Disbursement Processor, I need to submit for review/checking, so that vouchers go for review when complete. | FR-DS-036 | FR-DS-036 AC 1 | TC-DS-036.1 to 036.2 (2 cases) |
+| DIS 2.7.12 | As a Disbursement Team Leader, I need the system to automatically send email confirmation and remittance schedule to intended recipient, so that payees know that they have been paid. | FR-DS-063 | FR-DS-063 AC 1 | TC-DS-063.1 to 063.2 (2 cases) |
+| DIS 3.30.0 | As a Disbursement Processor, I need to allocate the expenses of a disbursement by cost centre, so that expenses are charged to the right cost centres. | FR-DS-032 | FR-DS-032 AC 1 | TC-DS-032.1 (2 cases) |
+| DIS 3.30.1 | As a Business Administrator, I need to maintain the employee master with the cost centre of each employee, so that employee expenses carry the right cost centre and the headcount is reported. | FR-DS-037 | FR-DS-037 AC 1-2 | TC-DS-037.1 to 037.2 (6 cases) |
+| DIS 2.8.0 | As a Disbursement Processor, I need to perform disbursement status tagging, so that the status of every payment instrument is known. | FR-DS-050 | FR-DS-050 AC 1 | TC-DS-050.1 to 050.2 (2 cases) |
+| DIS 2.8.1 | As a Disbursement Processor, I need to tag check status, so that the status of every payment instrument is known. | FR-DS-050 | FR-DS-050 AC 1 | TC-DS-050.1 to 050.2 (2 cases) |
+| DIS 2.8.2 | As a Disbursement Processor, I need to tag ATD status, so that the status of every payment instrument is known. | FR-DS-050 | FR-DS-050 AC 1 | TC-DS-050.1 to 050.2 (2 cases) |
+| DIS 2.8.3 | As a Disbursement Processor, I need to change the Credit Ticket/Telegraphic Transfer status, so that the status of every payment instrument is known. | FR-DS-050 | FR-DS-050 AC 1 | TC-DS-050.1 to 050.2 (2 cases) |
+| DIS 2.8.4 | As a Disbursement Processor, I need to change the Demand draft/Manager's check status, so that the status of every payment instrument is known. | FR-DS-050 | FR-DS-050 AC 1 | TC-DS-050.1 to 050.2 (2 cases) |
+| DIS 2.8.5 | As a Disbursement Processor, I need to edit the status tagging, so that status corrections are controlled. | FR-DS-051 | FR-DS-051 AC 1 | TC-DS-051.1 to 051.2 (6 cases) |
+| DIS 2.9.0 | As a Disbursement Processor, I need to cancel "In Process" transaction, so that vouchers not yet approved can be withdrawn. | FR-DS-043 | FR-DS-043 AC 1 | TC-DS-043.1 to 043.2 (3 cases) |
+| DIS 2.22.0 | As a Disbursement Processor, I need to upload files to update status (i.e. text file, .csv, .xlsx., etc.), so that bank confirmations update the statuses in bulk. | FR-DS-053 | FR-DS-053 AC 1-2 | TC-DS-053.1 to 053.2 (4 cases) |
+| DIS 3.26.0 | As a Disbursement Processor, I need the system to perform automatic disbursement status tagging, so that statuses follow the events without manual tagging. | FR-DS-052 | FR-DS-052 AC 1 | TC-DS-052.1 to 052.2 (3 cases) |
+| DIS 3.26.1 | As a Disbursement Processor, I need the system to automatically tag check status as "Negotiated", so that bank confirmations update the statuses in bulk. | FR-DS-053 | FR-DS-053 AC 1-2 | TC-DS-053.1 to 053.2 (4 cases) |
+| DIS 3.26.2 | As a Disbursement Processor, I need the system to automatically tag check status as "Staled", so that old checks are staled and re-issued. | FR-DS-054 | FR-DS-054 AC 1 | TC-DS-054.1 to 054.2 (3 cases) |
+| DIS 3.26.3 | As a Disbursement Processor, I need the system to automatically tag ATD status, so that statuses follow the events without manual tagging. | FR-DS-052 | FR-DS-052 AC 1 | TC-DS-052.1 to 052.2 (3 cases) |
+| DIS 3.26.4 | As a Disbursement Processor, I need the system to automatically tag Credit to Account status, so that bank confirmations update the statuses in bulk. | FR-DS-053 | FR-DS-053 AC 1-2 | TC-DS-053.1 to 053.2 (4 cases) |
+| DIS 3.26.5 | As a Disbursement Processor, I need the system to automatically tag Credit Ticket/Telegraphic Transfer status, so that statuses follow the events without manual tagging. | FR-DS-052 | FR-DS-052 AC 1 | TC-DS-052.1 to 052.2 (3 cases) |
+| DIS 3.26.6 | As a Disbursement Processor, I need the system to automatically tag Demand Draft/Manager's check status, so that statuses follow the events without manual tagging. | FR-DS-052 | FR-DS-052 AC 1 | TC-DS-052.1 to 052.2 (3 cases) |
+| DIS 3.26.7 | As a Disbursement Processor, I need the system to automatically tag Online Banking status, so that statuses follow the events without manual tagging. | FR-DS-052 | FR-DS-052 AC 1 | TC-DS-052.1 to 052.2 (3 cases) |
+| DIS 2.10.0 | As a Disbursement Processor, I need to perform Official Receipt (OR)/ Acknowledgement Receipt (AR)tagging, so that every payment is matched with its official or acknowledgement receipt. | FR-DS-056 | FR-DS-056 AC 1 | TC-DS-056.1 to 056.2 (3 cases) |
+| DIS 2.10.1 | As a Disbursement Processor, I need to receive OR/AR, so that every payment is matched with its official or acknowledgement receipt. | FR-DS-056 | FR-DS-056 AC 1 | TC-DS-056.1 to 056.2 (3 cases) |
+| DIS 2.10.2 | As a Disbursement Processor, I need to tag OR/AR status, so that every payment is matched with its official or acknowledgement receipt. | FR-DS-056 | FR-DS-056 AC 1 | TC-DS-056.1 to 056.2 (3 cases) |
+| DIS 2.11.0 | As a Disbursement Processor, I need to perform CWT tagging, so that creditable withholding tax certificates are tracked. | FR-DS-057 | FR-DS-057 AC 1 | TC-DS-057.1 to 057.2 (6 cases) |
+| DIS 2.11.1 | As a Disbursement Processor, I need to receive the actual Received/Released CWT, so that creditable withholding tax certificates are tracked. | FR-DS-057 | FR-DS-057 AC 1 | TC-DS-057.1 to 057.2 (6 cases) |
+| DIS 2.11.2 | As a Disbursement Processor, I need to tag CWT status, so that creditable withholding tax certificates are tracked. | FR-DS-057 | FR-DS-057 AC 1 | TC-DS-057.1 to 057.2 (6 cases) |
+| DIS 2.12.0 | As a Disbursement Processor, I need to generate CWT, so that suppliers receive their BIR Form 2307. | FR-DS-058 | FR-DS-058 AC 1 | TC-DS-058.1 to 058.2 (3 cases) |
+| DIS 2.13.0 | As a Disbursement Team Leader, I need to review/check transactions, so that every voucher is checked before approval. | FR-DS-040 | FR-DS-040 AC 1 | TC-DS-040.1 to 040.2 (4 cases) |
+| DIS 2.14.0 | As a Disbursement Team Leader, I need to return transactions, so that every voucher is checked before approval. | FR-DS-040 | FR-DS-040 AC 1 | TC-DS-040.1 to 040.2 (4 cases) |
+| DIS 2.15.0 | As a Disbursement Team Leader, I need to submit transaction for approval, so that every voucher is checked before approval. | FR-DS-040 | FR-DS-040 AC 1 | TC-DS-040.1 to 040.2 (4 cases) |
+| DIS 2.16.0 | As a Disbursement Team Leader, I need to perform End-of-day processing, so that the day's payments are closed and handed to the bank. | FR-DS-060 | FR-DS-060 AC 1-2 | TC-DS-060.1 to 060.2 (2 cases) |
+| DIS 2.16.1 | As a Disbursement Team Leader, I need to access the autogenerated Direct Credit Transaction file (DCTF), so that credits to accounts are sent to the bank in its file format. | FR-DS-061 | FR-DS-061 AC 1 | TC-DS-061.1 to 061.2 (2 cases) |
+| DIS 2.16.2 | As a Disbursement Processor, I need to access the autogenerated checks for printing, so that checks and vouchers are printed from the system. | FR-DS-062 | FR-DS-062 AC 1 | TC-DS-062.1 to 062.2 (2 cases) |
+| DIS 2.16.3 | As a Disbursement Team Leader, I need to access the autogenerated Authority to debit (ATD), so that the day's payments are closed and handed to the bank. | FR-DS-060 | FR-DS-060 AC 1-2 | TC-DS-060.1 to 060.2 (2 cases) |
+| DIS 2.16.4 | As a Disbursement Team Leader, I need to access the autogenerated Credit Tickets/Telegraphic Transfer Forms, so that the day's payments are closed and handed to the bank. | FR-DS-060 | FR-DS-060 AC 1-2 | TC-DS-060.1 to 060.2 (2 cases) |
+| DIS 2.16.5 | As a Disbursement Team Leader, I need to access the autogenerated Manager's check/Demand Draft Form, so that the day's payments are closed and handed to the bank. | FR-DS-060 | FR-DS-060 AC 1-2 | TC-DS-060.1 to 060.2 (2 cases) |
+| DIS 2.16.6 | As a Disbursement Processor, I need to print single or multiple voucher, so that checks and vouchers are printed from the system. | FR-DS-062 | FR-DS-062 AC 1 | TC-DS-062.1 to 062.2 (2 cases) |
+| DIS 2.17.0 | As a Disbursement Team Leader, I need to fund the Main BDOIR China bank account, so that the main account is funded with four-eyes control. | FR-DS-064 | FR-DS-064 AC 1-2 | TC-DS-064.1 to 064.3 (7 cases) |
+| DIS 2.17.1 | As a Disbursement Team Leader, I need to log in to BOB, so that the main account is funded with four-eyes control. | FR-DS-064 | FR-DS-064 AC 1-2 | TC-DS-064.1 to 064.3 (7 cases) |
+| DIS 2.17.2 | As a Disbursement Team Leader, I need to route to verifier (another Team Leader), so that the main account is funded with four-eyes control. | FR-DS-064 | FR-DS-064 AC 1-2 | TC-DS-064.1 to 064.3 (7 cases) |
+| DIS 2.17.3 | As a Disbursement Team Leader, I need to verify received request for funding of the Main BDOIR China bank account, so that the main account is funded with four-eyes control. | FR-DS-064 | FR-DS-064 AC 1-2 | TC-DS-064.1 to 064.3 (7 cases) |
+| DIS 2.17.4 | As a Disbursement Team Leader, I need to approve/decline request for funding of the Main BDOIR China bank account, so that the main account is funded with four-eyes control. | FR-DS-064 | FR-DS-064 AC 1-2 | TC-DS-064.1 to 064.3 (7 cases) |
+| DIS 2.18.0 | As a Disbursement Processor, I need to cancel "For review" transaction, so that vouchers not yet approved can be withdrawn. | FR-DS-043 | FR-DS-043 AC 1 | TC-DS-043.1 to 043.2 (3 cases) |
+| DIS 2.19.0 | As a Disbursement Approver, I need to approve/decline transactions, so that approved vouchers are posted at once. | FR-DS-041 | FR-DS-041 AC 1-2 | TC-DS-041.1 to 041.3 (5 cases) |
+| DIS 2.20.0 | As a Disbursement Approver, I need to cancel "Approved" transaction, so that a cancelled payment leaves the books right. | FR-DS-044 | FR-DS-044 AC 1-2 | TC-DS-044.1 to 044.3 (4 cases) |
+| DIS 2.21.0 | As a Disbursement Approver, I need to reject transaction, so that wrong vouchers do not go through. | FR-DS-042 | FR-DS-042 AC 1 | TC-DS-042.1 to 042.2 (2 cases) |
+| DIS 2.23.0 | As a Disbursement Approver, I need to maintain Check Series, so that check numbers are controlled. | FR-DS-070 | FR-DS-070 AC 1 | TC-DS-070.1 to 070.2 (4 cases) |
+| DIS 2.23.1 | As a Disbursement Approver, I need to add beginning check series, so that check numbers are controlled. | FR-DS-070 | FR-DS-070 AC 1 | TC-DS-070.1 to 070.2 (4 cases) |
+| DIS 2.23.2 | As a Disbursement Approver, I need to edit beginning check series, so that check numbers are controlled. | FR-DS-070 | FR-DS-070 AC 1 | TC-DS-070.1 to 070.2 (4 cases) |
+| DIS 2.24.0 | As a Disbursement Approver, I need to maintain BDO Insurance and Reinsurance (BDOIR) bank account, so that only active bank accounts are used for payments. | FR-DS-071 | FR-DS-071 AC 1 | TC-DS-071.1 to 071.2 (2 cases) |
+| DIS 2.24.1 | As a Disbursement Approver, I need to add BDO Insurance and Reinsurance bank account, so that only active bank accounts are used for payments. | FR-DS-071 | FR-DS-071 AC 1 | TC-DS-071.1 to 071.2 (2 cases) |
+| DIS 2.24.2 | As a Disbursement Approver, I need to tag status of BDO Insurance and Reinsurance (BDOIR) bank account, so that only active bank accounts are used for payments. | FR-DS-071 | FR-DS-071 AC 1 | TC-DS-071.1 to 071.2 (2 cases) |
+| DIS 3.27.0 | As a Disbursement Processor, I need the system to automatically regularize accounting entries and records for every disbursement transaction, so that the accounting of every voucher is regularised. | FR-DS-045 | FR-DS-045 AC 1 | TC-DS-045.1 to 045.2 (2 cases) |
+| DIS 3.27.1 | As a Disbursement Processor, I need the system to automatically create a corresponding reversal entry in the GL and flow in to FRBS, so that negotiated and stale checks are reflected in the books. | FR-DS-055 | FR-DS-055 AC 1 | TC-DS-055.1 to 055.2 (3 cases) |
+| DIS 3.27.2 | As a Disbursement Processor, I need the system to automatically link related transactions to a single invoice number, so that related transactions are traced through one invoice number. | FR-DS-093 | FR-DS-093 AC 1 | TC-DS-093.1 to 093.2 (2 cases) |
+| DIS 3.29.1 | As a Disbursement Processor, I need the system to issue the service invoice of each qualified early incentive automatically, with VAT and withholding tax, so that every qualified early incentive is billed to the insurer with its taxes. | FR-DS-091 | FR-DS-091 AC 1-3 | TC-DS-091.1 to 091.3 (4 cases) |
+| DIS 3.29.2 | As a Disbursement Processor, I need the system to account for the CPC2 incentive separately from the basic commission, so that the CPC2 incentive of each remittance is accounted for apart from commission. | FR-DS-090 | FR-DS-090 AC 1-3 | TC-DS-090.1 to 090.3 (4 cases) |
+| MKT 1.1.0 | As a Marketing Processor (AO), I need to access the module/application using any BDO issued device, so that only authorised users reach Disbursement, Payment Requests and ACSL from BDO devices. | FR-DS-001 | FR-DS-001 AC 1-3 | TC-DS-001.1 to 001.3 (4 cases) |
+| MKT 1.1.1 | As a Marketing Processor (AO), I need to log in with a specific user profile, so that only authorised users reach Disbursement, Payment Requests and ACSL from BDO devices. | FR-DS-001 | FR-DS-001 AC 1-3 | TC-DS-001.1 to 001.3 (4 cases) |
+| MKT 1.1.2 | As a Marketing Processor (AO), I need to receive the inactivity warning after 15 minutes, so that only authorised users reach Disbursement, Payment Requests and ACSL from BDO devices. | FR-DS-001 | FR-DS-001 AC 1-3 | TC-DS-001.1 to 001.3 (4 cases) |
+| MKT 1.1.3 | As a Marketing Processor (AO), I need to receive warning 30 minutes prior to system triggered log out, so that only authorised users reach Disbursement, Payment Requests and ACSL from BDO devices. | FR-DS-001 | FR-DS-001 AC 1-3 | TC-DS-001.1 to 001.3 (4 cases) |
+| MKT 1.2.0 | As a Marketing Processor (AO), I need to receive Requests, so that refund and cash-advance requests are handled in one place. | FR-PQ-001 | FR-PQ-001 AC 1-2 | TC-PQ-001.1 to 001.3 (4 cases) |
+| MKT 1.3.0 | As a Marketing Processor (AO), I need to view the list of all received requests, so that refund and cash-advance requests are handled in one place. | FR-PQ-001 | FR-PQ-001 AC 1-2 | TC-PQ-001.1 to 001.3 (4 cases) |
+| MKT 1.4.0 | As a Marketing Processor (AO), I need to select single or multiple requests, so that refund and cash-advance requests are handled in one place. | FR-PQ-001 | FR-PQ-001 AC 1-2 | TC-PQ-001.1 to 001.3 (4 cases) |
+| MKT 1.5.0 | As a Marketing Processor (AO), I need to view the details of the selected request, so that refund and cash-advance requests are handled in one place. | FR-PQ-001 | FR-PQ-001 AC 1-2 | TC-PQ-001.1 to 001.3 (4 cases) |
+| MKT 1.6.0 | As a Marketing Processor (AO), I need to filter requests, so that refund and cash-advance requests are handled in one place. | FR-PQ-001 | FR-PQ-001 AC 1-2 | TC-PQ-001.1 to 001.3 (4 cases) |
+| MKT 1.7.0 | As a Marketing Processor (AO), I need to access the unapplied payment report, so that unapplied payments can be identified for refund. | FR-PQ-002 | FR-PQ-002 AC 1 | TC-PQ-002.1 to 002.2 (2 cases) |
+| MKT 1.7.1 | As a Marketing Processor (AO), I need to download Report, so that unapplied payments can be identified for refund. | FR-PQ-002 | FR-PQ-002 AC 1 | TC-PQ-002.1 to 002.2 (2 cases) |
+| MKT 1.7.2 | As a Marketing Processor (AO), I need to save report in the desired location, so that unapplied payments can be identified for refund. | FR-PQ-002 | FR-PQ-002 AC 1 | TC-PQ-002.1 to 002.2 (2 cases) |
+| MKT 1.7.3 | As a Marketing Processor (AO), I need to print Report, so that unapplied payments can be identified for refund. | FR-PQ-002 | FR-PQ-002 AC 1 | TC-PQ-002.1 to 002.2 (2 cases) |
+| MKT 1.8.0 | As a Marketing Reviewer, I need to return request, so that each request has an owner. | FR-PQ-005 | FR-PQ-005 AC 1 | TC-PQ-005.1 to 005.2 (4 cases) |
+| MKT 1.9.0 | As a Marketing Reviewer, I need to assign or reassign disbursement refund request/s, so that each request has an owner. | FR-PQ-005 | FR-PQ-005 AC 1 | TC-PQ-005.1 to 005.2 (4 cases) |
+| MKT 1.10.0 | As a Marketing Processor (AO), I need to prepare disbursement template, so that client refunds are requested in the system. | FR-PQ-003, FR-PQ-004, FR-PQ-017 | FR-PQ-003 AC 1-2; FR-PQ-004 AC 1; FR-PQ-017 AC 1 | TC-PQ-003.1 to 003.3; TC-PQ-004.1 to 004.2; TC-PQ-017.1 to 017.3 (22 cases) |
+| MKT 1.11.0 | As a Marketing Processor (AO), I need to send request for validation (for refund request due to policy cancellation only), so that refunds of cancelled policies are validated before payment. | FR-PQ-006 | FR-PQ-006 AC 1 | TC-PQ-006.1 to 006.3 (4 cases) |
+| MKT 1.12.0 | As a Marketing Processor (AO), I need to upload supporting documents, so that each request carries its supporting documents. | FR-PQ-007 | FR-PQ-007 AC 1 | TC-PQ-007.1 to 007.2 (2 cases) |
+| MKT 1.13.0 | As a Marketing Processor (AO), I need to access uploaded documents, so that each request carries its supporting documents. | FR-PQ-007 | FR-PQ-007 AC 1 | TC-PQ-007.1 to 007.2 (2 cases) |
+| MKT 1.14.0 | As a Marketing Processor (AO), I need to submit request for review, so that requests are reviewed before approval. | FR-PQ-008 | FR-PQ-008 AC 1 | TC-PQ-008.1 to 008.3 (4 cases) |
+| MKT 1.15.0 | As a Marketing Processor (AO), I need to review Disbursement Requests, so that requests are reviewed before approval. | FR-PQ-008 | FR-PQ-008 AC 1 | TC-PQ-008.1 to 008.3 (4 cases) |
+| MKT 1.16.0 | As a Marketing Approver, I need to approve/Decline Requests, so that only approved requests are paid. | FR-PQ-009 | FR-PQ-009 AC 1 | TC-PQ-009.1 to 009.3 (5 cases) |
+| MKT 1.16.1 | As a Marketing Approver, I need to approve/decline refund request, so that only approved requests are paid. | FR-PQ-009 | FR-PQ-009 AC 1 | TC-PQ-009.1 to 009.3 (5 cases) |
+| MKT 1.16.2 | As Human Resources, I need to approve/decline Cash Advance request, so that only approved requests are paid. | FR-PQ-009 | FR-PQ-009 AC 1 | TC-PQ-009.1 to 009.3 (5 cases) |
+| MKT 1.16.3 | As a Marketing Approver, I need to approve/decline Disbursed check, so that only approved requests are paid. | FR-PQ-009 | FR-PQ-009 AC 1 | TC-PQ-009.1 to 009.3 (5 cases) |
+| MKT 1.17.0 | As a Marketing Processor (AO), I need to cancel request prior to disbursement, so that requests raised by mistake are stopped. | FR-PQ-010 | FR-PQ-010 AC 1 | TC-PQ-010.1 to 010.2 (3 cases) |
+| MKT 1.18.0 | As a Marketing Processor (AO), I need to view the status of all request, so that requesters know where each request stands. | FR-PQ-012 | FR-PQ-012 AC 1 | TC-PQ-012.1 to 012.2 (3 cases) |
+| MKT 1.18.1 | As a Marketing Processor (AO), I need to extract all requests with status, so that requesters know where each request stands. | FR-PQ-012 | FR-PQ-012 AC 1 | TC-PQ-012.1 to 012.2 (3 cases) |
+| MKT 1.19.0 | As a Marketing Processor (AO), I need to request for cancellation of disbursed check, so that a disbursed check can be cancelled through Disbursement. | FR-PQ-011 | FR-PQ-011 AC 1 | TC-PQ-011.1 to 011.2 (5 cases) |
+| MKT 1.20.0 | As a Marketing Processor (AO), I need to receive confirmation of the disbursed refund/cash advance, so that requesters know when the payment is made. | FR-PQ-013 | FR-PQ-013 AC 1 | TC-PQ-013.1 to 013.2 (3 cases) |
+| MKT 2.22.0 | As a Marketing Processor (AO), I need the system to attach uploaded documents to a particular account and request, so that each request carries its supporting documents. | FR-PQ-007 | FR-PQ-007 AC 1 | TC-PQ-007.1 to 007.2 (2 cases) |
+| MKT 2.23.0 | As a Marketing Processor (AO), I need the system to prevent processing of Duplicate Refund, so that the same receipt is never refunded twice. | FR-PQ-014 | FR-PQ-014 AC 1 | TC-PQ-014.1 to 014.2 (3 cases) |
+| MKT 2.24.0 | As a Marketing Processor (AO), I need the system to send disbursement request, so that approved requests reach Disbursement and Human Resources without re-keying. | FR-PQ-015 | FR-PQ-015 AC 1 | TC-PQ-015.1 to 015.2 (2 cases) |
+| MKT 2.25.0 | As a Marketing Processor (AO), I need the system to automatically maintain client CA/SA information, so that refunds go to the client's own account. | FR-PQ-016 | FR-PQ-016 AC 1 | TC-PQ-016.1 to 016.2 (3 cases) |
+| MKT 2.25.1 | As a Marketing Processor (AO), I need the system to prevent addition of duplicate CA/SA information, so that refunds go to the client's own account. | FR-PQ-016 | FR-PQ-016 AC 1 | TC-PQ-016.1 to 016.2 (3 cases) |
+| MKT 2.26.0 | As a Marketing Processor (AO), I need the system to track Status of each request, so that requesters know where each request stands. | FR-PQ-012 | FR-PQ-012 AC 1 | TC-PQ-012.1 to 012.2 (3 cases) |
+| ACSL 1.1.0 | As an ACSL Processor, I need to access the module/application using any BDO issued device, so that only authorised users reach Disbursement, Payment Requests and ACSL from BDO devices. | FR-DS-001 | FR-DS-001 AC 1-3 | TC-DS-001.1 to 001.3 (4 cases) |
+| ACSL 1.1.1 | As an ACSL Processor, I need to log in with a specific user profile, so that only authorised users reach Disbursement, Payment Requests and ACSL from BDO devices. | FR-DS-001 | FR-DS-001 AC 1-3 | TC-DS-001.1 to 001.3 (4 cases) |
+| ACSL 1.1.2 | As an ACSL Processor, I need to receive the inactivity warning after 15 minutes, so that only authorised users reach Disbursement, Payment Requests and ACSL from BDO devices. | FR-DS-001 | FR-DS-001 AC 1-3 | TC-DS-001.1 to 001.3 (4 cases) |
+| ACSL 1.1.3 | As an ACSL Processor, I need to receive warning 30 minutes prior to system triggered log out, so that only authorised users reach Disbursement, Payment Requests and ACSL from BDO devices. | FR-DS-001 | FR-DS-001 AC 1-3 | TC-DS-001.1 to 001.3 (4 cases) |
+| ACSL 2.2.0 | As an ACSL Processor, I need to generate Input files, so that ACSL gets its input files and reports without IT support. | FR-AS-001 | FR-AS-001 AC 1 | TC-AS-001.1 to 001.2 (3 cases) |
+| ACSL 2.2.1 | As an ACSL Processor, I need to receive input files from Insurer, so that insurer statements of account are loaded into the system. | FR-AS-002 | FR-AS-002 AC 1-2 | TC-AS-002.1 to 002.3 (7 cases) |
+| ACSL 2.3.0 | As an ACSL Processor, I need to access system generated reports, so that ACSL gets its input files and reports without IT support. | FR-AS-001 | FR-AS-001 AC 1 | TC-AS-001.1 to 001.2 (3 cases) |
+| ACSL 2.3.1 | As an ACSL Processor, I need to view the list of system generated reports, so that ACSL gets its input files and reports without IT support. | FR-AS-001 | FR-AS-001 AC 1 | TC-AS-001.1 to 001.2 (3 cases) |
+| ACSL 2.3.2 | As an ACSL Processor, I need to select the needed system generated reports, so that ACSL gets its input files and reports without IT support. | FR-AS-001 | FR-AS-001 AC 1 | TC-AS-001.1 to 001.2 (3 cases) |
+| ACSL 2.3.3 | As an ACSL Processor, I need to view the details of the selected report, so that ACSL gets its input files and reports without IT support. | FR-AS-001 | FR-AS-001 AC 1 | TC-AS-001.1 to 001.2 (3 cases) |
+| ACSL 2.3.4 | As an ACSL Processor, I need to download system Generated Reports, so that ACSL gets its input files and reports without IT support. | FR-AS-001 | FR-AS-001 AC 1 | TC-AS-001.1 to 001.2 (3 cases) |
+| ACSL 2.3.5 | As an ACSL Processor, I need to print system generated Reports, so that ACSL gets its input files and reports without IT support. | FR-AS-001 | FR-AS-001 AC 1 | TC-AS-001.1 to 001.2 (3 cases) |
+| ACSL 2.3.6 | As an ACSL Processor, I need to save system generated Reports, so that ACSL gets its input files and reports without IT support. | FR-AS-001 | FR-AS-001 AC 1 | TC-AS-001.1 to 001.2 (3 cases) |
+| ACSL 2.4.0 | As an ACSL Processor, I need to upload input file/s to trigger reconciliation, so that insurer statements of account are loaded into the system. | FR-AS-002 | FR-AS-002 AC 1-2 | TC-AS-002.1 to 002.3 (7 cases) |
+| ACSL 2.13.0 | As an ACSL Processor, I need the system to perform automatic reconciliation, so that differences with the insurers are found by invoice. | FR-AS-003 | FR-AS-003 AC 1-2 | TC-AS-003.1 to 003.3 (3 cases) |
+| ACSL 2.13.1 | As an ACSL Processor, I need the system to automatically reconcile uploaded SOA from Insurer against booked transactions, so that differences with the insurers are found by invoice. | FR-AS-003 | FR-AS-003 AC 1-2 | TC-AS-003.1 to 003.3 (3 cases) |
+| ACSL 2.13.2 | As an ACSL Processor, I need the system to automatically reconcile General Ledger (GL) and Subsidiary Ledger (SL) balance, so that the GL and the sub-ledger agree. | FR-AS-004 | FR-AS-004 AC 1 | TC-AS-004.1 to 004.2 (2 cases) |
+| ACSL 2.14.0 | As an ACSL Processor, I need the system to generate report, so that differences with the insurers are found by invoice. | FR-AS-003 | FR-AS-003 AC 1-2 | TC-AS-003.1 to 003.3 (3 cases) |
+| ACSL 2.14.1 | As an ACSL Processor, I need the system to automatically generate SOA Reconciliation Report, so that differences with the insurers are found by invoice. | FR-AS-003 | FR-AS-003 AC 1-2 | TC-AS-003.1 to 003.3 (3 cases) |
+| ACSL 2.14.2 | As an ACSL Processor, I need the system to automatically generate list of all booked accounts financial details, so that ACSL gets its input files and reports without IT support. | FR-AS-001 | FR-AS-001 AC 1 | TC-AS-001.1 to 001.2 (3 cases) |
+| ACSL 2.14.3 | As an ACSL Processor, I need the system to automatically generate Aging report, so that aged balances are followed up. | FR-AS-005 | FR-AS-005 AC 1 | TC-AS-005.1 to 005.2 (2 cases) |
+| ACSL 2.14.4 | As an ACSL Processor, I need the system to automatically generate Schedule report, so that aged balances are followed up. | FR-AS-005 | FR-AS-005 AC 1 | TC-AS-005.1 to 005.2 (2 cases) |
+| ACSL 2.5.0 | As an ACSL Processor, I need to perform account investigation, so that account questions are investigated in the system. | FR-AS-010 | FR-AS-010 AC 1 | TC-AS-010.1 to 010.3 (5 cases) |
+| ACSL 2.5.5 | As a Marketing Processor (AO), I need to receive account analysis requests, so that refunds of cancelled policies are validated before payment. | FR-AS-010, FR-PQ-006 | FR-AS-010 AC 1; FR-PQ-006 AC 1 | TC-AS-010.1 to 010.3; TC-PQ-006.1 to 006.3 (9 cases) |
+| ACSL 2.5.1 | As an ACSL Processor, I need to search specific transaction, so that account questions are investigated in the system. | FR-AS-010 | FR-AS-010 AC 1 | TC-AS-010.1 to 010.3 (5 cases) |
+| ACSL 2.5.2 | As an ACSL Processor, I need to select a transaction, so that account questions are investigated in the system. | FR-AS-010 | FR-AS-010 AC 1 | TC-AS-010.1 to 010.3 (5 cases) |
+| ACSL 2.5.3 | As an ACSL Processor, I need to view the details of the transaction in the system, so that account questions are investigated in the system. | FR-AS-010 | FR-AS-010 AC 1 | TC-AS-010.1 to 010.3 (5 cases) |
+| ACSL 2.5.4 | As an ACSL Processor, I need to receive account analysis requests, so that requesters receive the result of the investigation. | FR-AS-011 | FR-AS-011 AC 1 | TC-AS-011.1 to 011.2 (2 cases) |
+| ACSL 2.6.0 | As an ACSL Processor, I need to perform Account Receivables (AR) refund payment application, so that refunds and payment reversals are applied correctly. | FR-AS-012 | FR-AS-012 AC 1 | TC-AS-012.1 to 012.2 (3 cases) |
+| ACSL 2.6.1 | As an ACSL Processor, I need to initiate automatic Subsidiary Ledger (SL) payment reversal entry, so that refunds and payment reversals are applied correctly. | FR-AS-012 | FR-AS-012 AC 1 | TC-AS-012.1 to 012.2 (3 cases) |
+| ACSL 2.6.2 | As an ACSL Processor, I need to coordinate short or overpayment to Account Officer (AO), so that short and over payments are resolved with the Account Officer. | FR-AS-013 | FR-AS-013 AC 1 | TC-AS-013.1 to 013.2 (2 cases) |
+| ACSL 2.7.0 | As an ACSL Team Leader, I need to assign journal entry creation to user, so that each correction has an owner. | FR-AS-020 | FR-AS-020 AC 1 | TC-AS-020.1 to 020.2 (2 cases) |
+| ACSL 2.8.0 | As an ACSL Team Leader, I need to reassign journal entry creation to a particular user, so that each correction has an owner. | FR-AS-020 | FR-AS-020 AC 1 | TC-AS-020.1 to 020.2 (2 cases) |
+| ACSL 2.9.0 | As an ACSL Processor, I need to create a correction journal entry assigned to me, so that corrections are prepared and reviewed in the system. | FR-AS-021 | FR-AS-021 AC 1 | TC-AS-021.1 to 021.4 (11 cases) |
+| ACSL 2.9.1 | As an ACSL Processor, I need to prepare a correction entry with its lines and route it for review, so that corrections are prepared and reviewed in the system. | FR-AS-021 | FR-AS-021 AC 1 | TC-AS-021.1 to 021.4 (11 cases) |
+| ACSL 2.9.2 | As an ACSL Processor, I need to deduct from the remittance the amounts the insurer confirmed, so that amounts confirmed by the insurer are deducted from the remittance. | FR-AS-025 | FR-AS-025 AC 1-3 | TC-AS-025.1 to 025.3 (7 cases) |
+| ACSL 2.10.0 | As an ACSL Team Leader, I need to review journal entry, so that corrections are checked before approval. | FR-AS-022 | FR-AS-022 AC 1 | TC-AS-022.1 to 022.2 (3 cases) |
+| ACSL 2.11.0 | As an ACSL Head (Approver), I need to approve/decline journal entry, so that only approved corrections reach the books. | FR-AS-023 | FR-AS-023 AC 1 | TC-AS-023.1 to 023.2 (3 cases) |
+| ACSL 2.11.1 | As an ACSL Head (Approver), I need to add comment, so that only approved corrections reach the books. | FR-AS-023 | FR-AS-023 AC 1 | TC-AS-023.1 to 023.2 (3 cases) |
+| ACSL 2.11.2 | As an ACSL Head (Approver), I need to save comment, so that only approved corrections reach the books. | FR-AS-023 | FR-AS-023 AC 1 | TC-AS-023.1 to 023.2 (3 cases) |
+| ACSL 2.12.0 | As an ACSL Head (Approver), I need to return journal entry to the requestor, so that only approved corrections reach the books. | FR-AS-023 | FR-AS-023 AC 1 | TC-AS-023.1 to 023.2 (3 cases) |
+| ACSL 2.12.1 | As an ACSL Head (Approver), I need to add comment, so that only approved corrections reach the books. | FR-AS-023 | FR-AS-023 AC 1 | TC-AS-023.1 to 023.2 (3 cases) |
+| ACSL 2.12.2 | As an ACSL Head (Approver), I need to save comment, so that only approved corrections reach the books. | FR-AS-023 | FR-AS-023 AC 1 | TC-AS-023.1 to 023.2 (3 cases) |
+| ACSL 2.15.0 | As an ACSL Processor, I need the system to automatically post journal entries, so that approved corrections post without a separate unit. | FR-AS-024 | FR-AS-024 AC 1 | TC-AS-024.1 to 024.2 (3 cases) |
+| ACSL 2.16.0 | As an ACSL Processor, I need the system to automatically link related transactions to a single invoice number, so that related transactions are tracked per invoice and insurer. | FR-AS-026 | FR-AS-026 AC 1 | TC-AS-026.1 to 026.2 (2 cases) |
+
+<!-- landscape -->
+
+# Appendix: Storyboard index
+
+One row per frame of the walkthroughs of chapter 14: the persona, the screen, what the user does, what the user sees and the outcome, the screenshot of the frame (figure number of this FRS), the functional requirements it shows and the slide of the step in the 07 UX Screen Deck. A retired frame keeps its number and says why it was retired.
+
+<!-- table: widths=1.3,2.6,3.0,4.6,4.8,1.6,2.2,1.4 caption="Storyboard index of the walkthroughs" size=7.5 -->
+| Frame | Persona | Screen | Action | What the user sees / outcome | Screenshot | FR | UX deck slide |
+|---|---|---|---|---|---|---|---|
+| WT-A.1 | GL Officer (FRBS) | SCR-AC-02 New Journal and Edit Journal | Enters an accrual on New Journal (value date today, Reverse on the first day of next month, a debit to the expense with its cost centre and a credit to accrued expenses), clicks Save & Submit and confirms | The journal with its batch number, Pending Approval, the lines and the automatic reversal date. Outcome: Submitted | Figure 110 | FR-AC-032, FR-AC-033 | 147 |
+| WT-A.2 | GL Team Lead | SCR-AC-01 Journals | Selects the voucher on Journals, clicks Assign and chooses the GL Section Head | Message: 1 journal(s) assigned; Assigned To shows her name. Outcome: Assigned | Figure 111 | FR-AC-031 | 148 |
+| WT-A.3 | GL Section Head | SCR-AC-01 Journals | Chooses Assigned to me, selects the voucher, clicks Post Selected and confirms | Message: 1 of 1 journal(s) posted; the voucher is Posted. Outcome: Posted | Figure 112 | FR-AC-036 | 149 |
+| WT-A.4 | GL Section Head | SCR-AC-03 Journal | Opens the journal | The posted voucher with Input by, Submitted by and Authorized by, and Automatic reversal on the first day of next month. Outcome: In the ledger | Figure 113 | FR-AC-036, FR-AC-033 | 150 |
+| WT-A.5 | GL Officer (FRBS) | SCR-AC-04 Account Inquiry | Opens Account Inquiry for the expense account of the month | The accrual among the posted lines, with the running balance. Outcome: Reported | Figure 114 | FR-AC-030 | 151 |
+| WT-B.1 | Marketing Processor (AO) | SCR-AC-40 New Refund Request | Fills in New Refund Request (segment, reference, purpose, credit to the client's account) with one account to refund (AR number, client, assured, amount, reason Overpayment) and clicks Save Request | Message: <request> saved; the request opens in Draft with its account to refund. Outcome: Draft | Figure 115 | FR-PQ-003, FR-PQ-014 | 154 |
+| WT-B.2 | Marketing Processor (AO) | SCR-AC-43 Request | Clicks Submit for Review and confirms | The request For Review in the workflow header. Outcome: For review | Figure 116 | FR-PQ-008 | 155 |
+| WT-B.3 | Marketing Reviewer | SCR-AC-43 Request | Opens the request and clicks Endorse for Approval | The request For Approval with the step in its history. Outcome: For approval | Figure 117 | FR-PQ-008 | 156 |
+| WT-B.4 | Marketing Approver | SCR-AC-43 Request | Clicks Approve and Send | The request With Disbursement. Outcome: Sent to Disbursement | Figure 118 | FR-PQ-009, FR-PQ-015 | 157 |
+| WT-B.5 | Disbursement Processor | SCR-AC-25 Disbursement Workbench | Opens For Approval on the Disbursement Workbench | The voucher of the refund, created automatically from the request with the client as payee and routed straight to the approver. Outcome: Voucher created | Figure 119 | FR-DS-020, FR-DS-025 | 158 |
+| WT-B.6 | Disbursement Processor | SCR-AC-27 Disbursement Voucher | Opens the voucher | The voucher For Approval: the client as payee, credit to account, the paying account, the net amount and the history that shows the automatic routing. Outcome: For approval | Figure 120 | FR-DS-030 | 159 |
+| WT-B.7 | Disbursement Approver | SCR-AC-27 Disbursement Voucher | Clicks Approve and Post and confirms | The voucher Approved; the journal posted and the credit to account issued. Outcome: Approved | Figure 121 | FR-DS-041 | 160 |
+| WT-B.8 | Marketing Processor (AO) | SCR-AC-43 Request | Opens the Disbursement tab of the request | The voucher number and its status in Disbursement. Outcome: Followed | Figure 122 | FR-PQ-012, FR-PQ-013 | 161 |
+| WT-C.1 | ACSL Processor | SCR-AC-49 Insurer SOA Reconciliation | Clicks Upload SOA, chooses the insurer, the period and the statement file, and clicks Upload and Reconcile | Message: <upload>: n of n rows loaded; the upload is listed with its results. Outcome: Reconciled | Figure 123 | FR-AS-002, FR-AS-003 | 165 |
+| WT-C.2 | ACSL Processor | SCR-AC-50 Insurer SOA | Opens the upload | The counts per result and the lines with their premium and balance variances. Outcome: Variances known | Figure 124 | FR-AS-003 | 166 |
+| WT-C.3 | ACSL Team Leader | SCR-AC-45 ACSL Cases | Clicks Open a Case: investigation of the invoice with a variance | Message: <case> opened; the case is Received. Outcome: Case opened | Figure 125 | FR-AS-010 | 167 |
+| WT-C.4 | ACSL Team Leader | SCR-AC-46 ACSL Case | Opens the case and assigns it to the ACSL Processor | The case Assigned with the step in its history. Outcome: Assigned | Figure 126 | FR-AS-010 | 168 |
+| WT-C.5 | ACSL Processor | SCR-AC-46 ACSL Case | Clicks Start Investigation, records the findings and clicks Raise Correction (posting to a wrong GL account) | The correction entry opens, raised from the case. Outcome: Correction raised | Figure 127 | FR-AS-011, FR-AS-021 | 169 |
+| WT-C.6 | ACSL Team Leader | SCR-AC-48 Correction Entry | Assigns the correction to the ACSL Processor as its preparer | The correction in Draft. Outcome: Draft | Figure 128 | FR-AS-020 | 170 |
+| WT-C.7 | ACSL Processor | SCR-AC-48 Correction Entry | Picks the wrong line among the posted lines of the invoice family, clicks Correct with the right account, saves the lines and clicks Submit for Review | The correction For Review with its reversal and re-post lines. Outcome: For review | Figure 129 | FR-AS-021 | 173 |
+| WT-C.8 | ACSL Team Leader | SCR-AC-48 Correction Entry | Clicks Endorse for Approval | The correction For Approval. Outcome: For approval | Figure 130 | FR-AS-022 | 176 |
+| WT-C.9 | ACSL Head (approver) | SCR-AC-48 Correction Entry | Clicks Approve and Post and confirms | The correction Posted with its journal. Outcome: Posted | Figure 131 | FR-AS-023, FR-AS-024 | 179 |
+| WT-D.1 | GL Section Head | SCR-AC-08 Currencies & Rates | Enters the month-end rate of USD for the previous month on Monthly revaluation rates and clicks Save Rate | The rate listed with the month end and her name. Outcome: Rate in force | Figure 132 | FR-AC-010 | 184 |
+| WT-D.2 | GL Team Lead | SCR-AC-13 FX Revaluation | Chooses the previous month, checks the preview and clicks Post revaluation | The revaluation run of the month with its journal and its reversal. Outcome: Revalued | Figure 133 | FR-AC-043 | 185 |
+| WT-D.3 | GL Team Lead | SCR-AC-11 GL Close & Cut-Off | Clicks Schedule Close for the previous month at the proposed date and time | Message: the close of the month scheduled; listed as Scheduled. Outcome: Close scheduled | Figure 134 | FR-AC-040 | 186 |
+| WT-D.4 | GL Team Lead | SCR-AC-11 GL Close & Cut-Off | Opens Broking Books Cut-Off | The broking books of each period with who closed them and when. Outcome: Cut-off checked | Figure 135 | FR-AC-042 | 187 |
+| WT-D.5 | GL Officer (FRBS) | SCR-AC-22 Service Fee Run | Opens the service-fee run of the month and tags a line Released with the date the recipient was credited | The line Released with its date. Outcome: Released | Figure 136 | FR-AC-053 | 188 |
+| WT-E.1 | GL Officer (FRBS) | SCR-AC-02 New Journal and Edit Journal | Enters a voucher whose debit and credit differ | Under the lines: Difference with the amount; Save & Submit is not offered. Outcome: Refused | Figure 137 | FR-AC-034 | 191 |
+| WT-E.2 | Marketing Processor (AO) | SCR-AC-40 New Refund Request | Raises a refund with the AR of the refund of walkthrough B | The refusal: the AR is already refunded by the request named. Outcome: Refused | Figure 138 | FR-PQ-014 | 192 |
+| WT-E.3 | ACSL Processor | SCR-AC-49 Insurer SOA Reconciliation | Uploads the statement of walkthrough C again | The refusal: the file was already uploaded for the insurer as the upload named. Outcome: Refused | Figure 139 | FR-AS-002 | 193 |
+| WT-E.4 | Disbursement Processor | SCR-AC-25 Disbursement Workbench | Encodes a payment request for a payee code that is not maintained | The request on the No Payee tab, waiting for its payee; a payee request is raised. Outcome: Waiting for payee | Figure 140 | FR-DS-022 | 194 |
+
+<!-- portrait -->
 
 # Appendix: Screen standards
 

@@ -10,8 +10,8 @@ meta:
   code: NB
   frs: FRS_BRD01_NEW_BUSINESS.md
   summary: TP_BRD01_NEW_BUSINESS.md
-  version: "2.0"
-  date: 26 September 2026
+  version: "2.1"
+  date: 8 October 2026
   signoff: pack/pack.yaml
   verify_messages: true
 
@@ -1533,7 +1533,10 @@ frs:
     data: [TD-NB-04]
     conditions:
       - Approved quotations of several clients sent together produce one protected e-mail and one password e-mail per client.
-      - A batch with a quotation that is not approved is refused and the problems are listed; an empty selection is refused.
+      - A batch is processed quotation by quotation; the quotations that cannot be sent are listed with their reason and the others are sent; a batch where nothing can be sent, or an empty selection, is refused.
+      - Supporting documents ticked in the dialog are sent protected with the quotation, or on their own without changing the quotation's stage, to one or more recipients.
+      - A quotation whose product requires a supporting document for sending is not sent until the document is attached.
+      - Each quotation shows the delivery status of its last sending.
     cases:
       - c: 1
         type: Workflow
@@ -1543,11 +1546,17 @@ frs:
           - Quotations, Approved tab; tick the three; click Send via Email; enter a password hint.
         expected: Two e-mails and two password e-mails are logged; the three quotations are SENT_TO_CLIENT.
       - c: 2
-        type: Negative
-        title: Draft quotation in the batch
+        type: Positive
+        title: Partial success of a batch with a draft quotation
         steps:
-          - Tick QT-2026-900003 and QT-2026-900001 (DRAFT); click Send via Email.
-        expected: Nothing is sent; the problem of QT-2026-900001 is listed.
+          - Tick QT-2026-900003 (APPROVED) and QT-2026-900001 (DRAFT); click Send via Email; confirm.
+        expected: QT-2026-900003 is sent and becomes SENT_TO_CLIENT; the result lists QT-2026-900001 as not sent with the reason that it is not approved.
+      - c: 2
+        type: Negative
+        title: Batch of draft quotations only
+        steps:
+          - Tick QT-2026-900001 and QT-2026-900008 (both DRAFT); click Send via Email.
+        expected: Nothing is sent; the problems of both quotations are listed.
         msg: ["Cannot send: <problems>", QUOTATION_BATCH_INVALID]
       - c: 2
         type: Negative
@@ -1557,6 +1566,37 @@ frs:
           - Send a direct request to send quotations with an empty selection.
         expected: Refused.
         msg: [Select the quotations to send, QUOTATION_BATCH_EMPTY]
+      - c: 3
+        type: Positive
+        screen: QT
+        title: Quotation with two supporting documents to two recipients
+        pre: QT-2026-900003 has a product brochure and a policy wording on its Documents tab.
+        steps:
+          - Open QT-2026-900003; click Send; add a Cc recipient; tick the two documents; send.
+        expected: The client and the Cc recipient receive the quotation and the two documents, protected, and the password separately; the E-mails tab lists the documents sent.
+      - c: 3
+        type: Positive
+        screen: QT
+        title: Send documents only
+        pre: QT-2026-900004 is SENT_TO_CLIENT.
+        steps:
+          - Open QT-2026-900004; click Send; tick one supporting document; choose Send documents only.
+        expected: The document is sent protected with its password e-mail; the quotation stays SENT_TO_CLIENT.
+      - c: 4
+        type: Negative
+        title: Mandatory supporting document missing
+        pre: The product of an approved quotation requires a supporting document for sending; the document is not on the quotation.
+        steps:
+          - Tick that quotation and QT-2026-900003; click Send via Email.
+        expected: QT-2026-900003 is sent; the other quotation is listed as not sent with the missing document named; after the document is attached it is sent.
+      - c: 5
+        type: Report-output
+        screen: QT
+        title: Delivery status of the last sending
+        pre: One quotation was sent to an address the mail server refuses.
+        steps:
+          - Open the quotation sent in TC-NB-044.1-01 and the one with the refused address.
+        expected: The first shows its last sending as Sent with recipients and time; the second as Failed with the reason.
 
   FR-NB-045:
     scenario: SC-NB-04
@@ -1615,6 +1655,7 @@ frs:
     conditions:
       - An upload of rows for one product creates one quotation per row with its own ARN; a new name creates a prospect.
       - The upload needs a product and each row a client code or name.
+      - Bulk creation allows partial success; each quotation is a separate document with its own number.
     cases:
       - c: 1
         type: Upload-download
@@ -1642,6 +1683,12 @@ frs:
           - Include a row with neither client code nor prospect name.
         expected: The row is refused and listed; the others are committed.
         msg: ["Give the client code or the prospect's name", QUOTATION_CLIENT_REQUIRED]
+      - c: 3
+        type: Upload-download
+        title: Partial success with separate documents
+        steps:
+          - Upload 10 rows for MTR10 of which 2 have no sum insured; commit the valid rows; open two of the new quotations and download their documents.
+        expected: 8 quotations are created, each with its own number and its own quotation document; the 2 rows come back in the error file with their reason.
 
   FR-NB-047:
     scenario: SC-NB-04
@@ -2731,6 +2778,47 @@ frs:
         expected: Refused.
         msg: ["'reactivate' is not allowed while ARN-2026-910004 is in stage {Placed with insurer}", WORKFLOW_TRANSITION_NOT_ALLOWED]
 
+  FR-NB-087:
+    scenario: SC-NB-07
+    persona: PROCESSOR
+    screen: PLWB
+    data: [TD-NB-02, TD-NB-07]
+    conditions:
+      - The placement slip carries the EOPT details of each client (taxpayer name, TIN, registered address) from the client record.
+      - EOPT details updated after generation and before sending are on the slip the insurer receives; a slip already sent is not changed.
+      - A client without EOPT details is shown with a notice and the details are not keyed on the slip.
+    cases:
+      - c: 1
+        type: Report-output
+        title: EOPT details on the placement slip
+        pre: ARN-2026-900006 (READY_FOR_PLACEMENT) belongs to a client with TIN, registered name and address on record.
+        steps:
+          - Tick ARN-2026-900006; click For Placement; check the dialog; Generate Slips; open the slip PDF and Excel file.
+        expected: The dialog shows the client's EOPT details; the PDF EOPT block and the Excel EOPT columns show the taxpayer name, TIN and registered address of the client record.
+      - c: 2
+        type: Workflow
+        persona: MKT_AO
+        title: TIN corrected before sending
+        pre: The slip of TC-NB-087.1-01 is generated and not yet sent.
+        steps:
+          - As ao correct the client's TIN on the client record.
+          - As proc open Placement Slips, To Send; tick the slip; Send Slips.
+        expected: The slip is regenerated as version 2 with the corrected TIN and sent; version 1 is superseded; the history gives the reason.
+      - c: 2
+        type: Negative
+        screen: SLIPS
+        title: Client change after sending
+        steps:
+          - Change the client's registered address after the slip of TC-NB-087.2-01 was sent; open the sent slip.
+        expected: The sent slip keeps the details it was sent with; a resend after a return carries the new address.
+      - c: 3
+        type: Negative
+        title: Client without EOPT details
+        pre: ARN-2026-900007 (READY_FOR_PLACEMENT) belongs to a client without TIN.
+        steps:
+          - Tick ARN-2026-900007; click For Placement; look for a field to key the TIN on the slip.
+        expected: The dialog shows that the EOPT details of the client are not on record; the slip offers no field to key them; the slip shows them as not available.
+
   FR-NB-090:
     scenario: SC-NB-07
     persona: PROCESSOR
@@ -2997,16 +3085,17 @@ frs:
     screen: IA
     data: [TD-NB-08]
     conditions:
-      - A user finds an advice by policy number and downloads its PDF.
+      - A user finds an advice by policy number, views its details and downloads its PDF.
       - Advices sent together arrive protected, each with its password e-mail; the selection is 1 to 50.
+      - Several advices selected together are downloaded and saved to the chosen folder.
     cases:
       - c: 1
         type: Upload-download
         persona: MKT_AO
-        title: Find and download an advice
+        title: Find, view and download an advice
         steps:
-          - Insurance Advice register; search policy number MGIC-FI-2026-004411; download.
-        expected: IA-2026-900001 is listed and its PDF downloads.
+          - Insurance Advice register; search policy number MGIC-FI-2026-004411; open the details; download.
+        expected: IA-2026-900001 is listed, its details are shown and its PDF downloads.
       - c: 2
         type: Workflow
         title: Send two advices together
@@ -3030,6 +3119,12 @@ frs:
           - As ao send a direct request to send an Insurance Advice.
         expected: A direct request is refused with "You are not permitted to perform this action".
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
+      - c: 3
+        type: Upload-download
+        title: Download several advices to a chosen folder
+        steps:
+          - Tick IA-2026-900001 and 900002; download; choose a folder in the browser.
+        expected: Both PDFs are saved to the chosen folder.
 
   FR-NB-105:
     scenario: SC-NB-08
@@ -3087,6 +3182,46 @@ frs:
           - As badmin send a direct request to open the dispatch log.
         expected: A direct request is refused with "You are not permitted to perform this action".
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
+
+  FR-NB-107:
+    scenario: SC-NB-08
+    persona: PROCESSOR
+    screen: IA
+    data: [TD-NB-08]
+    conditions:
+      - An advice of a mortgagee enrolled for automatic sending is sent when it is generated, encrypted, with the password separately, and the register shows Automatic.
+      - An advice of a mortgagee that is not enrolled waits for manual sending.
+      - An enrolled mortgagee without a recipient leaves the advice Generated with the reason, and Processing is notified; enrolment changes need a second user.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Automatic sending to the enrolled recipient
+        pre: The mortgagee BDO Home Loans is enrolled for automatic sending with a recipient address in the Insurance Advice recipient set-up.
+        steps:
+          - Confirm the policy of a mortgaged account of BDO Home Loans on the Extraction Review.
+          - Open the Insurance Advice register.
+        expected: The advice is generated and sent at once to the enrolled recipient, encrypted, with the password e-mail; the register shows Automatic and Sent with the time.
+      - c: 2
+        type: Negative
+        title: Mortgagee not enrolled
+        pre: A mortgaged account whose mortgagee is not enrolled.
+        steps:
+          - Confirm its policy; open the register.
+        expected: The advice is Generated and not sent; it waits for manual sending.
+      - c: 3
+        type: Negative
+        title: Enrolled without a recipient
+        pre: A mortgagee enrolled for automatic sending without a recipient address.
+        steps:
+          - Confirm the policy of one of its accounts; open the register and the bell.
+        expected: The advice stays Generated with the reason that no recipient is set up; Processing is notified and sends it from the register.
+      - c: 3
+        type: Negative
+        persona: BUSINESS_ADMIN
+        title: Enrolment needs a second user
+        steps:
+          - As badmin enrol a mortgagee for automatic sending; try to approve the change as badmin.
+        expected: The change waits for a second user; the enrolment applies only after another approver authorises it.
 
   FR-NB-110:
     scenario: SC-NB-09
@@ -3368,6 +3503,7 @@ frs:
       - Booking issues an INSURER_COMMISSION service invoice and e-mails it; numbers are sequential without gaps.
       - A failed dispatch notifies the owner and shows FAILED with its reason.
       - A credit cannot exceed the open amount or credit a credit; an inactive type is refused.
+      - A successful dispatch notifies the owner with the recipients, and the register keeps the status, owner and time.
     cases:
       - c: 1
         type: Positive
@@ -3405,6 +3541,12 @@ frs:
           - Deactivate type SERVICE_INVOICE_NOTE; as proc create a manual service invoice of that type.
         expected: Refused.
         msg: ["Service invoice type {SERVICE_INVOICE_NOTE} is inactive", SERVICE_INVOICE_TYPE_INACTIVE]
+      - c: 4
+        type: Positive
+        title: Notice of a successful dispatch
+        steps:
+          - Book an account; as the owner open the bell and Service Invoices.
+        expected: The owner is notified that the service invoice was sent, with the recipients; the register shows SENT with the owner and the time of the sending.
 
   FR-NB-118:
     scenario: SC-NB-09
@@ -3412,22 +3554,57 @@ frs:
     screen: INVOICE
     data: [TD-NB-09]
     conditions:
-      - An invoice on a product covered by an active criterion shows Incentive = Yes and the criterion code, and the indicator cannot be edited.
-      - The former booking incentive rules cannot be changed.
+      - A booked invoice that is unpaid or partly paid shows the indicator Pending and no criterion code.
+      - When the invoice becomes fully paid, the criteria are evaluated with the endorsements; an invoice on a product covered by an active criterion shows Eligible and the criterion code, and the decision is logged.
+      - A financial endorsement posted after full payment re-evaluates the indicator; a cancellation sets it to Not eligible.
+      - The indicator and the former booking incentive rules cannot be changed by hand.
     cases:
       - c: 1
-        type: Positive
-        title: Incentive indicator on the invoice
+        type: Negative
+        title: Booked and unpaid
         steps:
-          - Book an account on a Motor package covered by CPC2; open the invoice and the Booked Accounts Register.
-        expected: Incentive = Yes with code CPC2; the field is read only.
+          - Book an account on a Motor package covered by CPC2; open the invoice before any payment.
+        expected: The indicator reads Pending (not fully paid); no criterion code is stored.
       - c: 1
         type: Negative
-        title: No criterion, no indicator
+        title: Booked and partly paid
         steps:
-          - Book an account on CGL01 (no criterion).
-        expected: Incentive = No and no code.
+          - Apply a partial payment to the invoice of TC-NB-118.1-01 in Collections; open the invoice.
+        expected: The indicator still reads Pending (not fully paid).
       - c: 2
+        type: Positive
+        title: Fully paid invoice evaluated
+        steps:
+          - Apply the remaining payment so that the invoice is fully paid; open the invoice, its history and the Booked Accounts Register.
+        expected: Incentive = Eligible with code CPC2; the history shows the evaluation at full payment with the criteria applied; the register shows the same indicator.
+      - c: 2
+        type: Negative
+        title: Fully paid without a matching criterion
+        steps:
+          - Book and fully pay an account on CGL01 (no criterion).
+        expected: Incentive = Not eligible and no code.
+      - c: 3
+        type: Workflow
+        persona: ADJUSTMENT
+        screen: NEWENDT
+        title: Endorsement re-evaluates the indicator
+        steps:
+          - Post a financial endorsement on the policy of TC-NB-118.2-01 that changes an attribute of criterion CPC2; open the invoice history.
+        expected: The indicator is evaluated again with the endorsement; the history shows both decisions with the endorsement considered.
+      - c: 3
+        type: Workflow
+        persona: ADJUSTMENT
+        title: Cancellation sets Not eligible
+        steps:
+          - Cancel the booking of TC-NB-118.2-01; open the invoice.
+        expected: The indicator is Not eligible with the cancellation as the reason.
+      - c: 4
+        type: Negative
+        title: Indicator cannot be edited
+        steps:
+          - Open the invoice of TC-NB-118.2-01; look for a way to change the indicator.
+        expected: The indicator is read only.
+      - c: 4
         type: Negative
         persona: BUSINESS_ADMIN
         screen: BOOKSETUP

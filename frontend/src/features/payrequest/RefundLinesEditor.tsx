@@ -8,6 +8,7 @@ import { emptyLine, linesTotal } from './requestForm';
 import type { FieldErrors, LineDraft } from './requestForm';
 import './payrequest.css';
 import { Notice } from '@/components/ui/Notice';
+import { REFUND_LINE_WIDTHS } from './requestForm';
 
 interface RefundLinesEditorProps {
   lines: LineDraft[];
@@ -33,7 +34,7 @@ function TextCell({
   onEdit: (i: number, patch: Partial<LineDraft>) => void;
 }>) {
   return (
-    <td>
+    <td style={{ minWidth: REFUND_LINE_WIDTHS[field] }}>
       <input
         className="input"
         aria-label={`${label} ${String(index + 1)}`}
@@ -104,7 +105,7 @@ export function RefundLinesEditor({ lines, errors, onChange }: Readonly<RefundLi
                   error={errors[`arNo${String(i)}`]}
                   onEdit={edit}
                 />
-                <td>
+                <td style={{ minWidth: REFUND_LINE_WIDTHS.invoiceNo }}>
                   <span className="prq-inline-field">
                     <input
                       className="input"
@@ -139,7 +140,7 @@ export function RefundLinesEditor({ lines, errors, onChange }: Readonly<RefundLi
                   error={errors[`amount${String(i)}`]}
                   onEdit={edit}
                 />
-                <td>
+                <td style={{ minWidth: REFUND_LINE_WIDTHS.reasonCode }}>
                   <LovSelect
                     id={`reason-${String(i)}`}
                     type="REFUND_REASON"
@@ -157,7 +158,7 @@ export function RefundLinesEditor({ lines, errors, onChange }: Readonly<RefundLi
                   label="Branch / Unit"
                   onEdit={edit}
                 />
-                <td>
+                <td style={{ minWidth: REFUND_LINE_WIDTHS.category }}>
                   <LovSelect
                     id={`cat-a-${String(i)}`}
                     type="RRF_CATEGORY_A"

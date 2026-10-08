@@ -26,6 +26,7 @@ import com.iortatechnxt.brokerverse.opsledger.domain.DisbursementRequest.Spec;
 import com.iortatechnxt.brokerverse.opsledger.domain.DisbursementRequest.Status;
 import com.iortatechnxt.brokerverse.opsledger.domain.DisbursementRequest.Type;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
+import java.math.BigDecimal;
 import java.time.Clock;
 import java.util.Locale;
 import java.util.Optional;
@@ -254,7 +255,7 @@ public class RequestIntakeService {
             PayeeRequestSource.NO_MATCH,
             r.getPayeeCode(),
             r.getPayeeName() == null ? r.getPayeeCode() : r.getPayeeName(),
-            r.getDisbursementType() + " " + r.getCurrency() + " " + r.getAmount(),
+            payeeRequestDetails(r.getDisbursementType(), r.getCurrency(), r.getAmount()),
             r.getRequestNo()));
     Notice notice =
         new Notice(
@@ -392,5 +393,21 @@ public class RequestIntakeService {
     return requests
         .findById(id)
         .orElseThrow(() -> new ResourceNotFoundException(DisbursementSettings.REQUEST, id));
+  }
+
+  /**
+   * What a payee request is for, as the Payee Requests list shows it: the disbursement type in
+   * words, the currency and the amount with its thousands separators ("Supplier, PHP 18,450.00").
+   *
+   * @param type disbursement type code
+   * @param currency currency
+   * @param amount amount
+   * @return the details in words
+   */
+  public static String payeeRequestDetails(String type, String currency, BigDecimal amount) {
+    String words = type == null ? "" : type.toLowerCase(Locale.ROOT).replace('_', ' ');
+    String label =
+        words.isEmpty() ? "" : Character.toUpperCase(words.charAt(0)) + words.substring(1);
+    return label + ", " + currency + " " + String.format(Locale.ROOT, "%,.2f", amount);
   }
 }

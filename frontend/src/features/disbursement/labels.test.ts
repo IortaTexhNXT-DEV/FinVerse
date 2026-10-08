@@ -3,9 +3,13 @@ import { toQuery } from './api';
 import type { Line, Payee } from './api';
 import { fundingErrors } from './forms';
 import {
+  BRANCH_EMAIL_HINT,
+  UPLOADS,
   encodeErrors,
+  entryOrigin,
   entryTotals,
   instrumentActions,
+  payeeText,
   requestActions,
   workbenchTab,
   workbenchTabOf,
@@ -184,5 +188,32 @@ describe('funding form', () => {
         fundingErrors({ ...ok, target: '1', amount: '0', purpose: ' ', valueDate: '' }),
       ).sort((a, b) => a.localeCompare(b)),
     ).toEqual(['amount', 'purpose', 'target', 'valueDate']);
+  });
+});
+
+describe('texts of the Disbursement screens', () => {
+  it('names where an entry line comes from in words', () => {
+    expect(entryOrigin('RULE')).toBe('From rule');
+    expect(entryOrigin(undefined)).toBe('From rule');
+    expect(entryOrigin('EDITED')).toBe('Edited');
+    expect(entryOrigin('ALLOCATION')).toBe('Expense allocation');
+  });
+
+  it('describes the uploads and the branch mailbox without requirement references or list codes', () => {
+    for (const u of UPLOADS) {
+      for (const ref of ['DIS ', 'MKT ', 'ACSL ', 'FRBS ']) {
+        expect(u.description).not.toContain(`(${ref}`);
+      }
+    }
+    expect(BRANCH_EMAIL_HINT).not.toMatch(/[A-Z]_[A-Z]/);
+  });
+});
+
+describe('payee of a request', () => {
+  it('reads by name first', () => {
+    expect(payeeText('Mabuhay General Insurance Corp.', 'INS-MGIC')).toBe(
+      'Mabuhay General Insurance Corp. (INS-MGIC)',
+    );
+    expect(payeeText(undefined, 'S-0417')).toBe('S-0417');
   });
 });

@@ -15,12 +15,13 @@ import { PageFooter } from '@/components/ui/Pager';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId, useWorkspace } from '@/context/workspaceContext';
-import { formatDate, humanize } from '@/utils/format';
+import { formatDate } from '@/utils/format';
 import { AssignJournalsDialog } from './AssignJournalsDialog';
 import { ConfirmPostingDialog } from './ConfirmPostingDialog';
 import { JournalFiltersCard } from './JournalFiltersCard';
 import type { ListFilters } from './JournalFiltersCard';
 import { glPlatformApi } from './glPlatformApi';
+import { journalTypeLabel, notPostedText } from './journalForm';
 import type { BulkPostOutcome, FrbsJournal } from './glPlatformApi';
 import { UserName } from '@/components/ui/UserName';
 import { Notice } from '@/components/ui/Notice';
@@ -131,9 +132,7 @@ export default function JournalsPage() {
           tone="warning"
           title="Not posted"
           items={outcomes.map((o) => (
-            <span key={o.id}>
-              Journal {o.id}: {o.message}
-            </span>
+            <span key={o.id}>{notPostedText(o)}</span>
           ))}
         />
       )}
@@ -154,7 +153,7 @@ export default function JournalsPage() {
             ),
             { key: 'no', header: 'Batch No.', render: (j) => <strong>{j.batchNo}</strong> },
             { key: 'date', header: 'Value Date', render: (j) => formatDate(j.valueDate) },
-            { key: 'type', header: 'Type', render: (j) => humanize(j.journalType) },
+            { key: 'type', header: 'Type', render: (j) => journalTypeLabel(j.journalType) },
             { key: 'nar', header: 'Narration', render: (j) => j.narration },
             { key: 'by', header: 'Inputter', render: (j) => <UserName login={j.createdBy} /> },
             {

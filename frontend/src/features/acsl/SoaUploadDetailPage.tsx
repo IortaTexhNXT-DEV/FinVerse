@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { saveFile } from '@/api/client';
 import { useAuth } from '@/auth/authContext';
+import { useInsurerName } from '@/components/broking/useLabels';
 import { Amount } from '@/components/ui/Amount';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -205,6 +206,7 @@ export default function SoaUploadDetailPage() {
   const toast = useToast();
   const queryClient = useQueryClient();
   const [tab, setTab] = useState<SoaTab>('ALL');
+  const insurerName = useInsurerName();
   const upload = useQuery({
     queryKey: ['acsl', 'upload', id],
     queryFn: () => acslApi.getUpload(id),
@@ -234,7 +236,7 @@ export default function SoaUploadDetailPage() {
         backTo="/acsl/soa"
         section="Finance · ACSL"
         title={u.uploadNo}
-        description={`${u.insurerCode} statement ${formatPeriod(u.periodFrom, u.periodTo)} (${u.fileName})`}
+        description={`${insurerName(u.insurerCode)} statement ${formatPeriod(u.periodFrom, u.periodTo)} (${u.fileName})`}
         actions={
           <>
             {can('ACSL_REPORT_EXPORT') && (

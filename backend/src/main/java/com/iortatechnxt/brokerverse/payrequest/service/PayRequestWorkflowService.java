@@ -15,6 +15,7 @@ import com.iortatechnxt.brokerverse.workflow.service.WorkAssignmentService;
 import com.iortatechnxt.brokerverse.workflow.service.WorkflowService;
 import com.iortatechnxt.brokerverse.workflow.service.WorkflowViewService;
 import java.time.Clock;
+import java.util.List;
 import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +31,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class PayRequestWorkflowService {
+
+  /** The permission of the Marketing users a request is assigned to for preparation. */
+  private static final String PREPARER_PERMISSION = "PRQ_CREATE";
 
   private static final String APPROVE = "approve";
 
@@ -86,6 +90,16 @@ public class PayRequestWorkflowService {
   }
 
   /**
+   * The users a request may be assigned to for preparation (MKT 1.9.0): the users who may create
+   * requests, offered by name in the assign dialog.
+   *
+   * @return user IDs
+   */
+  public List<String> preparers() {
+    return users.usersWithPermission(PREPARER_PERMISSION);
+  }
+
+  /**
    * Assigns a draft refund to a preparer (MKT 1.9.0).
    *
    * @param id request
@@ -104,7 +118,7 @@ public class PayRequestWorkflowService {
             .view(PayRequests.ENTITY, key(request))
             .map(v -> v.workCase().getId())
             .orElseThrow(() -> new ResourceNotFoundException(PayRequests.ENTITY, id));
-    assignments.assign(caseId, preparer, users.usersWithPermission("PRQ_CREATE"));
+    assignments.assign(caseId, preparer, users.usersWithPermission(PREPARER_PERMISSION));
     audit.record(
         PayRequests.ENTITY,
         request.getRequestNo(),

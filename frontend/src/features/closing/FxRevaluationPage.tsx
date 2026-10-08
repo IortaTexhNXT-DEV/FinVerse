@@ -63,7 +63,7 @@ export default function FxRevaluationPage() {
       <PageHeader
         section="Planning & Closing"
         title="FX Revaluation"
-        description="Foreign currency balances of revaluation accounts are restated at the CLOSING rate."
+        description="Foreign currency balances of revaluation accounts are restated at the month-end rate."
         actions={
           <Button
             variant="secondary"

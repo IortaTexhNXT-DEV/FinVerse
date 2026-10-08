@@ -5,6 +5,7 @@ import { formatAmount } from '@/utils/format';
 import { balanceStatus, emptyLine, totals } from './journalMath';
 import type { LineProblem } from './journalMath';
 import { useGlLookups } from './useLookups';
+import { LINE_MIN_WIDTHS } from './journalForm';
 
 interface Props {
   lines: JournalLineInput[];
@@ -93,7 +94,7 @@ export function JournalLinesEditor({
                       </div>
                     )}
                   </td>
-                  <td>
+                  <td style={{ minWidth: LINE_MIN_WIDTHS.side }}>
                     <select
                       className="select"
                       aria-label={`Debit or credit for ${rowLabel}`}
@@ -105,7 +106,7 @@ export function JournalLinesEditor({
                       <option value="CREDIT">Credit</option>
                     </select>
                   </td>
-                  <td>
+                  <td style={{ minWidth: LINE_MIN_WIDTHS.amount }}>
                     <input
                       className="input num"
                       type="number"
@@ -118,7 +119,7 @@ export function JournalLinesEditor({
                       onChange={(e) => update(i, { amount: Number(e.target.value) })}
                     />
                   </td>
-                  <td>
+                  <td style={{ minWidth: LINE_MIN_WIDTHS.costCentre }}>
                     <select
                       className="select"
                       aria-label={`Cost centre for ${rowLabel}`}
@@ -134,7 +135,7 @@ export function JournalLinesEditor({
                       ))}
                     </select>
                   </td>
-                  <td>
+                  <td style={{ minWidth: LINE_MIN_WIDTHS.lineOfBusiness }}>
                     <select
                       className="select"
                       aria-label={`Line of business for ${rowLabel}`}
@@ -150,7 +151,7 @@ export function JournalLinesEditor({
                       ))}
                     </select>
                   </td>
-                  <td>
+                  <td style={{ minWidth: LINE_MIN_WIDTHS.reference }}>
                     <input
                       className="input"
                       aria-label={`Reference for ${rowLabel}`}
@@ -159,7 +160,7 @@ export function JournalLinesEditor({
                       onChange={(e) => update(i, { reference: e.target.value })}
                     />
                   </td>
-                  <td>
+                  <td style={{ minWidth: LINE_MIN_WIDTHS.narration }}>
                     <input
                       className="input"
                       aria-label={`Narration for ${rowLabel}`}

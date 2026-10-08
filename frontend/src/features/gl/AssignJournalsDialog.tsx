@@ -5,6 +5,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { glPlatformApi } from './glPlatformApi';
+import { assigneeOptions } from './journalForm';
 
 interface Props {
   open: boolean;
@@ -60,9 +61,9 @@ export function AssignJournalsDialog({
               onChange={(e) => setAssignee(e.target.value)}
             >
               <option value="">No one (clear the assignment)</option>
-              {(users.data ?? []).map((u) => (
-                <option key={u} value={u}>
-                  {u}
+              {assigneeOptions(users.data ?? []).map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
                 </option>
               ))}
             </select>

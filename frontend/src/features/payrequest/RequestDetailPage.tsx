@@ -8,6 +8,7 @@ import { Attachments } from '@/components/attachments/Attachments';
 import { RecordSummary } from '@/components/broking/RecordSummary';
 import type { Fact } from '@/components/broking/RecordSummary';
 import { ReferenceChip } from '@/components/broking/ReferenceChip';
+import { useLovLabel } from '@/components/broking/useLabels';
 import { WorkflowPanel } from '@/components/broking/WorkflowPanel';
 import { Button } from '@/components/ui/Button';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
@@ -40,12 +41,12 @@ function tabsOf(r: PayRequest): { id: TabId; label: string }[] {
   return tabs;
 }
 
-function facts(r: PayRequest): Fact[] {
+function facts(r: PayRequest, modeLabel: (code: string) => string): Fact[] {
   return [
     { icon: Layers, label: 'Kind', value: KIND_LABELS[r.kind] },
     { icon: User, label: 'Payee', value: `${r.payee.name} (${r.payee.code})` },
     { icon: Banknote, label: 'Amount', value: `${r.content.currency} ${formatAmount(r.amount)}` },
-    { icon: Wallet, label: 'Mode of Payment', value: humanize(r.payee.mode) },
+    { icon: Wallet, label: 'Mode of Payment', value: modeLabel(r.payee.mode) },
     { icon: CalendarDays, label: 'Request Date', value: formatDate(r.requestDate) },
     { icon: FileText, label: 'DV No.', value: r.track.dvNo ?? '—' },
   ];
@@ -132,6 +133,7 @@ function HeaderActions({
  * a cash advance and the supporting documents (MKT 1.12.0, 2.22.0).
  */
 export default function RequestDetailPage() {
+  const modeLabel = useLovLabel('PRQ_PAYMENT_MODE');
   const id = Number(useParams().id);
   const queryClient = useQueryClient();
   const [tab, setTab] = useState<TabId>('details');
@@ -183,7 +185,7 @@ export default function RequestDetailPage() {
           </>
         }
         flags={r.validationRequired ? <span className="tag">Cancelled Policy</span> : undefined}
-        facts={facts(r)}
+        facts={facts(r, modeLabel)}
       />
       {r.trail.returnReason && editable && (
         <Notice tone="warning" title="Returned">

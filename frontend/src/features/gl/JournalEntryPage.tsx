@@ -15,7 +15,7 @@ import { formatDate } from '@/utils/format';
 import { ConfirmPostingDialog } from './ConfirmPostingDialog';
 import { JournalHeaderFields } from './JournalHeaderFields';
 import { JournalLinesEditor } from './JournalLinesEditor';
-import { journalValues, newJournalValues, toJournalInput } from './journalForm';
+import { journalSavedText, journalValues, newJournalValues, toJournalInput } from './journalForm';
 import type { JournalFormValues } from './journalForm';
 import { isBlankLine, lineProblems, totals } from './journalMath';
 import { useJournalSave } from './useJournalSave';
@@ -83,7 +83,7 @@ function JournalForm({
 
   const { save, draftId, savedDraft } = useJournalSave(editingId, async (journal: Journal) => {
     await queryClient.invalidateQueries({ queryKey: ['journal', journal.id] });
-    toast.success(`Journal ${journal.batchNo} saved (${journal.status.replace('_', ' ')})`);
+    toast.success(journalSavedText(journal.batchNo, journal.status));
     await navigate(`/gl/journals/${journal.id}`);
   });
   const mode = save.variables?.mode;

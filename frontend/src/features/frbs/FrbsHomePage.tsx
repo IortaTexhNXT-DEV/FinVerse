@@ -80,15 +80,7 @@ export default function FrbsHomePage() {
     {
       key: 'title',
       header: 'Report',
-      render: (e) => (
-        <>
-          {e.available ? <Link to={entryLink(e)}>{e.title}</Link> : e.title}
-          <span className="cell-sub">
-            {e.scheduleCode ?? e.reportCode}
-            {e.sourceRef ? ` · ${e.sourceRef}` : ''}
-          </span>
-        </>
-      ),
+      render: (e) => <>{e.available ? <Link to={entryLink(e)}>{e.title}</Link> : e.title}</>,
     },
     {
       key: 'formats',

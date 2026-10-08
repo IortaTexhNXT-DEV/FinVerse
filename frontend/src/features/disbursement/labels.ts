@@ -170,3 +170,72 @@ export function requestActions(status: RequestStatus, type: string): string[] {
   }
   return status === 'NO_PAYEE' ? ['voucher', 'return'] : [];
 }
+
+/** Where a line of the proforma entry comes from, in words. */
+export function entryOrigin(origin: Line['origin']): string {
+  if (origin === 'EDITED') {
+    return 'Edited';
+  }
+  if (origin === 'ALLOCATION') {
+    return 'Expense allocation';
+  }
+  return 'From rule';
+}
+
+/** Hint of the branch mailbox asked when an authority to debit is e-mailed. */
+export const BRANCH_EMAIL_HINT =
+  'Mailbox of the processing branch, from the list of branch e-mails; several addresses separated by commas.';
+
+export type UploadHandler =
+  | 'DISB_REQUESTS'
+  | 'DISB_CHECKS_NEGOTIATED'
+  | 'DISB_CTA_CREDITED'
+  | 'DISB_BOB_APPROVED'
+  | 'DISB_PAYEE_MIGRATION';
+
+/** The upload types of Disbursement with what each does and the permission it needs. */
+export const UPLOADS: readonly {
+  id: UploadHandler;
+  label: string;
+  description: string;
+  permission: string;
+}[] = [
+  {
+    id: 'DISB_REQUESTS',
+    label: 'Payment Requests',
+    description:
+      'Payment requests of other units. Rows with a maintained payee become vouchers at once; the others wait for the payee.',
+    permission: 'DISB_UPLOAD',
+  },
+  {
+    id: 'DISB_CHECKS_NEGOTIATED',
+    label: 'Negotiated Checks',
+    description:
+      'The checks deposited by payees, from the bank statement; each check becomes Negotiated and its clearing entry posts.',
+    permission: 'DISB_UPLOAD',
+  },
+  {
+    id: 'DISB_CTA_CREDITED',
+    label: 'Credited Accounts',
+    description: 'The credit-to-account confirmation of the bank; each credit becomes Credited.',
+    permission: 'DISB_UPLOAD',
+  },
+  {
+    id: 'DISB_BOB_APPROVED',
+    label: 'BOB Approvals',
+    description: 'The approvals exported from online banking; each payment becomes Debited.',
+    permission: 'DISB_UPLOAD',
+  },
+  {
+    id: 'DISB_PAYEE_MIGRATION',
+    label: 'Payee Migration',
+    description:
+      'Payees and their bank accounts from the former system; they come in for authorisation.',
+    permission: 'DISB_PAYEE_MAINTAIN',
+  },
+];
+
+/** A payee as a request shows it: the name, then the code in brackets (the code alone when unnamed). */
+export function payeeText(name: string | null | undefined, code: string): string {
+  return name ? `${name} (${code})` : code;
+}

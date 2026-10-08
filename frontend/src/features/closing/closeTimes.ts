@@ -86,3 +86,26 @@ export function closeGuards(
       : 'Close Now is only for the previous month',
   };
 }
+
+/**
+ * The date and the time of a datetime-local value ("2026-11-03T17:00"); empty parts when unset.
+ *
+ * @param when datetime-local value
+ * @returns its date (yyyy-mm-dd) and time (HH:mm)
+ */
+export function splitWhen(when: string): { date: string; time: string } {
+  const [date = '', time = ''] = when.split('T');
+  return { date, time: time.slice(0, 5) };
+}
+
+/**
+ * A datetime-local value from its date and time; empty while either is missing, so a half-entered
+ * close time is never sent.
+ *
+ * @param date yyyy-mm-dd
+ * @param time HH:mm
+ * @returns "2026-11-03T17:00", or ''
+ */
+export function joinWhen(date: string, time: string): string {
+  return date !== '' && time !== '' ? `${date}T${time}` : '';
+}

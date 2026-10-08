@@ -23,6 +23,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -108,7 +109,7 @@ public class ClosingChecklistService {
             "Period is open or in soft close",
             period.getStatus() == PeriodStatus.OPEN
                 || RECEIVES_CLOSING.contains(period.getStatus()),
-            "Period " + period.getName() + " is " + period.getStatus()));
+            "Period " + period.getName() + " is " + word(period.getStatus())));
     items.add(pendingJournals(companyId, period.getStartDate(), period.getEndDate()));
     items.add(unreconciled(companyId, period.getEndDate()));
     items.add(revaluation(companyId, period));
@@ -139,16 +140,16 @@ public class ClosingChecklistService {
             "YEAR_OPEN",
             "Fiscal year not yet closed",
             year.getStatus() == FiscalYearStatus.OPEN,
-            "Fiscal year " + year.getYearCode() + " is " + year.getStatus()));
+            "Fiscal year " + year.getYearCode() + " is " + word(year.getStatus())));
     String notDone =
         list.stream()
             .filter(p -> !DONE.contains(p.getStatus()))
-            .map(p -> p.getName() + " " + p.getStatus())
+            .map(p -> p.getName() + " " + word(p.getStatus()))
             .collect(Collectors.joining(", "));
     items.add(
         CheckItem.of(
             "PERIODS_CLOSED",
-            "All periods CLOSED or CLOSING",
+            "All periods closed or closing",
             notDone.isEmpty(),
             notDone.isEmpty() ? "All " + list.size() + " periods are closed or closing" : notDone));
     AccountingPeriod last = list.get(list.size() - 1);
@@ -157,7 +158,7 @@ public class ClosingChecklistService {
             "FINAL_PERIOD_CLOSING",
             "Final period in soft close to receive the closing journal",
             RECEIVES_CLOSING.contains(last.getStatus()),
-            "Period " + last.getName() + " is " + last.getStatus()));
+            "Period " + last.getName() + " is " + word(last.getStatus())));
     items.add(pendingJournals(companyId, year.getStartDate(), year.getEndDate()));
     items.add(trialBalance(companyId, year.getEndDate()));
     items.add(revaluation(companyId, last));
@@ -280,5 +281,15 @@ public class ClosingChecklistService {
     if (!ownerId.equals(companyId)) {
       throw new BusinessRuleException("PERIOD_OTHER_COMPANY", "Period belongs to another company");
     }
+  }
+
+  /**
+   * A status as the checklist reads it: OPEN is "open", SOFT_CLOSE is "soft close".
+   *
+   * @param status status
+   * @return the status in words
+   */
+  static String word(Enum<?> status) {
+    return status.name().toLowerCase(Locale.ROOT).replace('_', ' ');
   }
 }

@@ -148,6 +148,17 @@ public class AcslCaseController {
   }
 
   /**
+   * The ACSL users a case or a correction may be assigned to (team leader).
+   *
+   * @return user IDs
+   */
+  @GetMapping("/processors")
+  @PreAuthorize(AcslAccess.ASSIGN)
+  public List<String> processors() {
+    return cases.processors();
+  }
+
+  /**
    * Assigns a case (team leader).
    *
    * @param id case

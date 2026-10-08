@@ -10,6 +10,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatDate, formatDateTime } from '@/utils/format';
+import { journalTypeLabel } from './journalForm';
 import { JournalActions } from './JournalActions';
 import type { FrbsJournal } from './glPlatformApi';
 import { journalSource } from './journalSource';
@@ -23,7 +24,7 @@ function Summary({ journal: j }: Readonly<{ journal: Journal }>) {
     <div className="grid-4">
       <Card>
         <div className="kpi-label">Type</div>
-        <strong>{j.journalType}</strong>
+        <strong>{journalTypeLabel(j.journalType)}</strong>
       </Card>
       <Card>
         <div className="kpi-label">Value date</div>

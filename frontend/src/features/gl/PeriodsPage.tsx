@@ -15,7 +15,8 @@ import { defaultYear } from '@/features/closing/periodDefaults';
 import { formatDate, formatDateTime, today, statusPhrase } from '@/utils/format';
 import { PeriodActionDialog } from './PeriodActionDialog';
 import type { PendingPeriodAction } from './PeriodActionDialog';
-import { PERIOD_ACTIONS } from './periodActions';
+import { RowActions } from '@/components/ui/RowActions';
+import { periodRowActions } from './rowActions';
 import type { PeriodAction } from './periodActions';
 import { displayNameOf } from '@/api/users';
 
@@ -71,7 +72,7 @@ export default function PeriodsPage() {
       <PageHeader
         section="General Ledger"
         title="Financial Periods"
-        description="Only OPEN periods accept normal postings."
+        description="Only open periods accept normal postings."
         actions={
           can('PERIOD_MANAGE') && (
             <Button
@@ -125,23 +126,14 @@ export default function PeriodsPage() {
             },
             { key: 'r', header: 'Reason', render: (p) => p.statusReason ?? '' },
             {
-              key: 'a',
+              key: 'actions',
               header: 'Actions',
-              render: (p) =>
-                can('PERIOD_MANAGE') && (
-                  <div className="row">
-                    {PERIOD_ACTIONS[p.status].map((a) => (
-                      <Button
-                        key={a.action}
-                        size="sm"
-                        variant="secondary"
-                        onClick={() => ask(p, a.action)}
-                      >
-                        {a.label}
-                      </Button>
-                    ))}
-                  </div>
-                ),
+              render: (p) => (
+                <RowActions
+                  record={p.name}
+                  actions={periodRowActions(p, can('PERIOD_MANAGE'), (a) => ask(p, a))}
+                />
+              ),
             },
           ]}
         />

@@ -13,6 +13,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { formatAmount, formatDate } from '@/utils/format';
 import { computeBrs } from './receivablesMath';
 import { Notice } from '@/components/ui/Notice';
+import { bankOptions } from './useReceivablesLookups';
 
 interface BrsViewProps {
   companyId: number;
@@ -117,7 +118,7 @@ export function BrsView({ companyId, bank, asOf }: Readonly<BrsViewProps>) {
       <ErrorAlert error={action.error} />
       <div className="row">
         <span className="muted">
-          {data.bank.code} - {data.bank.name} ({data.bank.currency}) as of {formatDate(data.asOf)}
+          {bankOptions([data.bank])[0]?.label} as of {formatDate(data.asOf)}
         </span>
         {rec !== undefined && <StatusBadge status={finalized ? 'RECONCILED' : rec.status} />}
         <div className="spacer" />

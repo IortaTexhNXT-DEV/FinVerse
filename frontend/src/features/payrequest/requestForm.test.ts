@@ -1,6 +1,10 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   approveLabel,
+  REFUND_LINE_WIDTHS,
+  disbursementNote,
+  preparerOptions,
+  validationActions,
   businessActions,
   cashAdvanceErrors,
   cashAdvanceInput,
@@ -138,5 +142,46 @@ describe('work list and actions', () => {
     expect(approveLabel('FOR_APPROVAL', 'REFUND')).toBe('Approve and Send');
     expect(isAmount('12.3')).toBe(true);
     expect(isAmount('0')).toBe(false);
+  });
+});
+
+describe('preparer options', () => {
+  it('offers each preparer once, by name, sorted', () => {
+    const options = preparerOptions(['mktrev', 'mktao']);
+    expect(options.map((o) => o.value).sort((a, b) => a.localeCompare(b))).toEqual([
+      'mktao',
+      'mktrev',
+    ]);
+    const labels = options.map((o) => o.label);
+    expect([...labels].sort((a, b) => a.localeCompare(b))).toEqual(labels);
+    expect(labels.every((l) => l.length > 0)).toBe(true);
+  });
+});
+
+describe('validation task row menu', () => {
+  it('records a handed-over result only while the request waits for validation', () => {
+    const record = vi.fn();
+    const actions = validationActions({ status: 'DEFERRED' }, 'FOR_VALIDATION', true, record);
+    expect(actions.map((a) => a.label)).toEqual(['Record Result']);
+    actions[0]?.onSelect('');
+    expect(record).toHaveBeenCalled();
+    expect(validationActions({ status: 'PASSED' }, 'FOR_VALIDATION', true, record)).toEqual([]);
+    expect(validationActions({ status: 'OPEN' }, 'FOR_APPROVAL', true, record)).toEqual([]);
+    expect(validationActions({ status: 'OPEN' }, 'FOR_VALIDATION', false, record)).toEqual([]);
+  });
+});
+
+describe('disbursement note', () => {
+  it('gives the status in Disbursement in words', () => {
+    expect(disbursementNote({ instrumentStatus: 'PENDING' })).not.toContain('PENDING');
+    expect(disbursementNote({})).toBe('');
+  });
+});
+
+describe('accounts to refund columns', () => {
+  it('keep the AR, client, name and reason wide enough to read', () => {
+    for (const key of ['arNo', 'clientCode', 'assuredName', 'reasonCode', 'amount']) {
+      expect(REFUND_LINE_WIDTHS[key]).toBeGreaterThanOrEqual(130);
+    }
   });
 });

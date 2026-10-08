@@ -33,6 +33,8 @@ import type { PayeeForm } from './payeeForm';
 import './disbursement.css';
 import { displayNameOf } from '@/api/users';
 import { ConfirmButton } from '@/components/ui/ConfirmButton';
+import { RowActions } from '@/components/ui/RowActions';
+import { payeeAccountActions } from './rowActions';
 
 const ENTITY = 'DisbursementPayee';
 const ACTIONS: Record<string, string> = {
@@ -67,24 +69,16 @@ function Accounts({ payee, onChanged }: Readonly<{ payee: Payee; onChanged: (p: 
     ? [
         ...ACCOUNT_COLUMNS,
         {
-          key: 'act',
-          header: 'Action',
-          render: (a) =>
-            a.active ? (
-              <ConfirmButton
-                size="sm"
-                variant="secondary"
-                busy={deactivate.isPending}
-                confirm={{
-                  title: 'Deactivate Bank Account',
-                  effect: "The payee's bank account can no longer be used for payments.",
-                  destructive: true,
-                }}
-                onConfirm={() => deactivate.mutateAsync(a.id)}
-              >
-                Deactivate
-              </ConfirmButton>
-            ) : null,
+          key: 'actions',
+          header: 'Actions',
+          render: (a) => (
+            <RowActions
+              record={`${a.bankName} ${a.accountNo}`}
+              actions={payeeAccountActions(a, maintain, {
+                deactivate: () => deactivate.mutateAsync(a.id),
+              })}
+            />
+          ),
         },
       ]
     : ACCOUNT_COLUMNS;

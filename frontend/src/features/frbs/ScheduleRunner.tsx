@@ -49,7 +49,7 @@ function ScheduleSelect({
             <optgroup key={g.family} label={g.label}>
               {g.schedules.map((s) => (
                 <option key={s.code} value={s.code}>
-                  {s.code} · {s.values.name}
+                  {s.values.name}
                 </option>
               ))}
             </optgroup>
@@ -88,8 +88,7 @@ function SelectedNote({ schedule }: Readonly<{ schedule?: Schedule }>) {
   }
   return (
     <p className="frbs-muted">
-      {schedule.values.sourceRef ?? schedule.code} ·{' '}
-      <StatusBadge status={schedule.values.layoutStatus} />
+      Layout <StatusBadge status={schedule.values.layoutStatus} />
       {schedule.values.boardDocument &&
         ' · Board document: exported to Word as well as Excel and PDF.'}
     </p>

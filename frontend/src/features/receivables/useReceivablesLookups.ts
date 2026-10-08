@@ -20,5 +20,11 @@ export function useReceivablesLookups() {
 
 /** Options for a bank account select. */
 export function bankOptions(accounts: { code: string; name: string; currency: string }[]) {
-  return accounts.map((a) => ({ value: a.code, label: `${a.code} - ${a.name} (${a.currency})` }));
+  // The account name often ends with its currency already ("... Current Account (PHP)").
+  return accounts.map((a) => ({
+    value: a.code,
+    label: a.name.endsWith(`(${a.currency})`)
+      ? `${a.code} - ${a.name}`
+      : `${a.code} - ${a.name} (${a.currency})`,
+  }));
 }

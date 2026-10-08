@@ -87,7 +87,7 @@ function ReadOnly({ voucher }: Readonly<{ voucher: Voucher }>) {
 /**
  * The details of a voucher (DIS 2.7.1-2.7.4, 3.30.0): mode of payment, paying and payee accounts,
  * withholding tax, purpose, value date, cost centre and expense account; editable by the processor
- * while the voucher is in process, with field errors. Saving rebuilds the entry from the rule.
+ * while the voucher is in process, with field errors. Saving prepares the entry again from the rule.
  */
 export function VoucherDetailsTab({
   voucher,
@@ -111,7 +111,7 @@ export function VoucherDetailsTab({
   const save = useMutation({
     mutationFn: () => disbursementApi.terms(voucher.summary.id, terms),
     onSuccess: (v) => {
-      toast.success('Terms saved; the entry was rebuilt from the rule');
+      toast.success('Terms saved; the entry was prepared again from the rule');
       onSaved(v);
     },
   });

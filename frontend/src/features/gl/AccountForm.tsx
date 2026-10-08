@@ -3,6 +3,7 @@ import type { AccountClass, AccountLevel, SubLedgerType } from '@/api/gl';
 import { Field } from '@/components/ui/Field';
 import type { FrbsAccountRequest, NegativeBalancePolicy } from './glPlatformApi';
 import { DateInput } from '@/components/ui/DateInput';
+import { accountWord } from './rowActions';
 
 const CLASSES: AccountClass[] = ['ASSET', 'LIABILITY', 'EQUITY', 'INCOME', 'EXPENSE', 'MEMORANDUM'];
 const LEVELS: AccountLevel[] = ['GROUP', 'MAIN', 'SUB', 'MICRO'];
@@ -100,7 +101,9 @@ export function AccountForm({ value, editing, onChange }: Readonly<Props>) {
               onChange={(e) => set('accountClass', e.target.value as AccountClass)}
             >
               {CLASSES.map((c) => (
-                <option key={c}>{c}</option>
+                <option key={c} value={c}>
+                  {accountWord(c)}
+                </option>
               ))}
             </select>
           )}
@@ -115,7 +118,9 @@ export function AccountForm({ value, editing, onChange }: Readonly<Props>) {
               onChange={(e) => set('level', e.target.value as AccountLevel)}
             >
               {LEVELS.map((l) => (
-                <option key={l}>{l}</option>
+                <option key={l} value={l}>
+                  {accountWord(l)}
+                </option>
               ))}
             </select>
           )}
@@ -140,7 +145,9 @@ export function AccountForm({ value, editing, onChange }: Readonly<Props>) {
               onChange={(e) => set('subLedgerType', e.target.value as SubLedgerType)}
             >
               {SUB_LEDGERS.map((s) => (
-                <option key={s}>{s}</option>
+                <option key={s} value={s}>
+                  {accountWord(s)}
+                </option>
               ))}
             </select>
           )}

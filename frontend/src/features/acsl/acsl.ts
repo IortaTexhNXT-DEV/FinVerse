@@ -1,4 +1,9 @@
+import type { RowAction } from '@/components/ui/RowActions';
+import { displayNameOf } from '@/api/users';
+import type { DialogField } from './FormDialog';
+import { humanize } from '@/utils/format';
 import type {
+  AcslCase,
   CaseStage,
   CaseType,
   CorrectionLine,
@@ -223,4 +228,98 @@ export function correctionActions(actions: readonly string[]): CorrectionAction[
 /** Whether a variance is worth highlighting (not zero). */
 export function hasVariance(value: number | undefined): boolean {
   return value !== undefined && Math.abs(value) >= 0.005;
+}
+
+/** Labels of the kinds of correction, as the dialogs offer them. */
+export const CORRECTION_KINDS: readonly { value: string; label: string }[] = [
+  { value: 'WRONG_ACCOUNT', label: 'Posting to a wrong GL account' },
+  { value: 'AMOUNT', label: 'Wrong amount' },
+  { value: 'RECLASS', label: 'Reclassification' },
+  { value: 'OTHER', label: 'Other correction' },
+];
+
+/** The kind of a correction in words. */
+export function correctionKind(kind: string): string {
+  return CORRECTION_KINDS.find((k) => k.value === kind)?.label ?? kind;
+}
+
+/**
+ * The user a case or a correction is assigned to, chosen by name among the ACSL users who may
+ * process the work (never typed as a user ID).
+ */
+export function assigneeField(label: string, users: readonly string[]): DialogField {
+  const options = users
+    .map((u) => ({ value: u, label: displayNameOf(u) || u }))
+    .sort((a, b) => a.label.localeCompare(b.label));
+  return { key: 'username', label, required: true, options };
+}
+
+/** The row menu of a posted line of the invoice family: the preparer corrects it in the draft. */
+export function originalLineActions(editable: boolean, correct: () => void): RowAction[] {
+  return editable ? [{ label: 'Correct', onSelect: correct }] : [];
+}
+
+type SoaKey = 'insurer' | 'from' | 'to' | 'file';
+
+/** What is missing on an insurer statement upload; the insurer is chosen by name. */
+export function soaUploadProblems(
+  insurer: string,
+  from: string,
+  to: string,
+  file: File | undefined,
+) {
+  const found: Partial<Record<SoaKey, string>> = {};
+  if (insurer.trim() === '') {
+    found.insurer = 'Select the insurer';
+  }
+  if (from === '') {
+    found.from = 'Enter the start of the period';
+  }
+  if (to === '' || (from !== '' && to < from)) {
+    found.to = 'Enter an end on or after the start';
+  }
+  if (!file) {
+    found.file = 'Choose the statement file';
+  }
+  return found;
+}
+
+/**
+ * The request facts of a case; the insurer is shown by name (the given lookup), never by its code.
+ */
+export function caseRequestFacts(
+  c: AcslCase,
+  insurerName: (code: string) => string,
+): [string, string | undefined][] {
+  return [
+    ['Subject', c.subject],
+    ['Details', c.details],
+    ['Requesting Module', c.requesterModule ? humanize(c.requesterModule) : undefined],
+    ['Requester Reference', c.requesterRef],
+    ['Client', c.account.clientCode],
+    ['Insurer', c.account.insurerCode ? insurerName(c.account.insurerCode) : undefined],
+    ['Root Invoice', c.account.rootInvoiceNo],
+  ];
+}
+
+const LINE_ORIGINS: Record<LineOrigin, string> = {
+  REVERSAL: 'Reversal',
+  REPOST: 'Re-post',
+  MANUAL: 'Manual line of the preparer',
+};
+
+/** Where a correction line comes from, in words. */
+export function lineOriginLabel(origin: LineOrigin): string {
+  return LINE_ORIGINS[origin];
+}
+
+/** A comma-separated list of codes (BASIC,PREMIUM_TAX_VAT) in words; a dash when there is none. */
+export function codesInWords(codes: string | null | undefined): string {
+  if (!codes) {
+    return '—';
+  }
+  return codes
+    .split(',')
+    .map((c) => humanize(c.trim()))
+    .join(', ');
 }

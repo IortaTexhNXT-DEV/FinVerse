@@ -143,8 +143,8 @@ public class FrbsSeedData implements ApplicationRunner {
         companyId,
         new Facts(
             "2307-9-" + today.getYear() + "Q" + TaxPeriod.quarterNumber(today),
-            "INS-MAPFRE",
-            "Insurer (withholding agent)",
+            "INS-MGIC",
+            "Mabuhay General Insurance Corp.",
             "000-111-222-000",
             quarter.from(),
             today,

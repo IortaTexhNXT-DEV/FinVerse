@@ -24,7 +24,8 @@ import type { PayeeRequest, PayeeSummary } from './api';
 import { MODE_LABELS, PAYEE_TABS } from './labels';
 import type { PayeeTab } from './labels';
 import './disbursement.css';
-import { ConfirmButton } from '@/components/ui/ConfirmButton';
+import { RowActions } from '@/components/ui/RowActions';
+import { payeeRequestActions, payeeRequestSource } from './rowActions';
 
 const PAYEE_COLUMNS: Column<PayeeSummary>[] = [
   {
@@ -63,47 +64,27 @@ function RequestsTable({ companyId }: Readonly<{ companyId: number }>) {
     },
   });
   const columns: Column<PayeeRequest>[] = [
-    {
-      key: 'source',
-      header: 'Source',
-      render: (r) => (r.source === 'NO_MATCH' ? 'No match' : r.source),
-    },
+    { key: 'source', header: 'Source', render: (r) => payeeRequestSource(r.source) },
     { key: 'code', header: 'Payee Code', render: (r) => r.payeeCode ?? '—' },
     { key: 'name', header: 'Payee Name', render: (r) => r.payeeName },
     { key: 'ref', header: 'Reference', render: (r) => r.sourceRef ?? '' },
     { key: 'details', header: 'Details', render: (r) => r.details ?? '' },
     { key: 'at', header: 'Received', render: (r) => formatDateTime(r.createdAt) },
     {
-      key: 'act',
-      header: 'Action',
-      render: (r) =>
-        can('DISB_PAYEE_MAINTAIN') ? (
-          <div className="dsb-actions">
-            <Button
-              size="sm"
-              onClick={() =>
-                void navigate(
-                  `/disbursement/payees/new${toQuery({ code: r.payeeCode, name: r.payeeName })}`,
-                )
-              }
-            >
-              Create Payee
-            </Button>
-            <ConfirmButton
-              size="sm"
-              variant="secondary"
-              busy={close.isPending}
-              confirm={{
-                title: 'Close Payee Request',
-                effect: 'The request is closed without creating a payee.',
-                destructive: true,
-              }}
-              onConfirm={() => close.mutateAsync(r.id)}
-            >
-              Close
-            </ConfirmButton>
-          </div>
-        ) : null,
+      key: 'actions',
+      header: 'Actions',
+      render: (r) => (
+        <RowActions
+          record={r.payeeName}
+          actions={payeeRequestActions(r, can('DISB_PAYEE_MAINTAIN'), {
+            create: () =>
+              void navigate(
+                `/disbursement/payees/new${toQuery({ code: r.payeeCode, name: r.payeeName })}`,
+              ),
+            close: () => close.mutateAsync(r.id),
+          })}
+        />
+      ),
     },
   ];
   return (

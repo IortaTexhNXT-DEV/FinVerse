@@ -69,6 +69,14 @@ kind is stored in the PNG (text `bibs-crop`); the Word builder puts `full` shots
 26 pixels with bold 15-pixel digits, so they stay legible in print. Generated documents are rendered at 200 dpi
 (`DOC_DPI`). The PNG keeps a 256-colour palette without dither for flat screens and full colour for photo-like images.
 
+**Generated documents.** `packs/brd01_documents.cjs` `render` (with `doc_render.py`) turns a downloaded file into
+its image. A PDF shows its first page. A workbook prints landscape at the width of the page, each column as wide as
+its content: `keep` names the columns of a wide workbook to show, under the report header of the workbook (logo,
+title, parameters; the logo keeps its own size), `options.rows` keeps an extract of the rows (the rows of one value
+of a column, at most `max`), and `options.above: 'drop'` leaves out the guide band of a template. A text file is
+drawn in a monospace font without wrapping; a file of delimited records is shown field by field. An image that is an
+extract says so in its caption (`shot_caption` of documents.yaml).
+
 **Order on a fresh database.** The walkthroughs change seed records that some screen states need, so each pack runs in
 this order, BRD-01 first:
 

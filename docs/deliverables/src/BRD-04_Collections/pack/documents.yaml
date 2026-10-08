@@ -28,6 +28,7 @@ documents:
       - "Ownership: Market Segment, Sales Unit, Unit Head, Account Officer, Collection Handler – from the sales organisation and the assignments"
       - "Collection work: Client Payment Status, Invoice Category, Disposition, Category (A/B/C), Tagging Owner, Last Collection Effort Date, Last Collection Effort Code, Remarks, Status – from the collection account"
     shot: doc-outstanding-pr
+    shot_caption: "first page as generated: the report header and a selection of the columns"
     frs: [FR-CL-083, FR-CL-084]
   - id: DO-03
     name: Full Production Report
@@ -38,6 +39,7 @@ documents:
     fields:
       - "Every collection account of the invoices booked in the period, any status, with the columns of the Outstanding PR List"
     shot: doc-full-production
+    shot_caption: "first page as generated: the report header and a selection of the columns"
     frs: [FR-CL-083]
   - id: DO-04
     name: DP PR for Reversal and PR 2307 for Reversal files
@@ -50,6 +52,7 @@ documents:
       - "Tagging: Date Tagged, Tagged By, Tag Remarks – from the disposition"
       - "Commission: Basic Commission, VAT on Commission, WTAX Rate and Diff (Premium Balance less PR2307) – from the invoice ledger"
     shot: doc-dp-reversal
+    shot_caption: "first page as generated: the report header and a selection of the columns"
     frs: [FR-CL-080, FR-CL-081, FR-CL-082]
   - id: DO-05
     name: For Application To Invoice file
@@ -60,4 +63,5 @@ documents:
     fields:
       - "One line per application request: Requested On, Payment Date, Payment File Name, Transaction No., Paid Amount, Currency, Payment Type, Payor, Reference No., Name of Assured, Invoice No., User ID (who made the disposition), Unapplied Reference, Status, Cashiering Reference – from the requests and Cashiering"
     shot: doc-application-file
+    shot_caption: "the file as generated, shown field by field (its first line names the fields)"
     frs: [FR-CL-077]

@@ -1,0 +1,624 @@
+# UAT walkthrough users workbook (programme level, BRD-00): BRD -> personas -> UAT sign-in IDs.
+# Built by build_uat_users.py into Programme/UAT/BIBS_UAT_BRD-00_Walkthrough_Users_and_Sign-in_v<version>.xlsx.
+#
+# Per BRD, the personas in the order of the business flow (maker before checker). Each persona:
+#   persona  the business role as named in the persona table of the FRS (BRD-13: of the handbook)
+#   role     the group profile code the persona's users hold (the profile name is read from seed_users.yaml)
+#   users    the sign-in IDs, each a string or {id, note}; the first is the one the walkthrough script uses
+#   unit     the unit of the user (default: units below, by group profile)
+#   does     what the user does in the walkthrough (default: the responsibilities of the FRS persona table)
+#   scope    the approval limits or data scope beyond what seed_users.yaml gives (authorisation limit, companies)
+#   remarks  anything the business needs to know about the user
+#   no_user  the reason why the persona has no UAT sign-in (a decision of BDOI); such a persona has no role/users
+# menus gives the menu path to start of a sign-in ID (default: the menu entry of the user's first walkthrough step, or
+# the first entry of the user's menu in the sections of the BRD); the builder checks that the user's menu has it.
+# extra_steps adds the steps of an FRS process flow that the storyboard does not show.
+# aliases maps the persona names of the walkthrough storyboards to the persona of the sheet when they differ.
+# step_users gives the sign-in ID of a walkthrough step whose user is not the first user of its persona.
+# exclude_steps drops steps of the insurer suite (removed from the platform). The persona list of each BRD is checked
+# against seed_users.yaml (the users and group profiles of a fresh seed environment) by the builder, and by the
+# backend integration test UatWalkthroughUsersIT.
+
+version: "1.0"
+date: 08 October 2026
+password_text: UAT seed password (provided separately)
+
+units:
+  MKT_AO: Marketing
+  MKT_TL: Marketing
+  MKT_HANDLER: Marketing
+  MKT_COLLECTION: Marketing - Collection
+  CLX_TL: Marketing - Collection
+  MKT_SECTION_HEAD: Marketing - Collection
+  UNAPPLIED_HANDLER: Marketing - Collection
+  TSU: Technical Support Unit
+  TSU_TL: Technical Support Unit
+  TSU_HEAD: Technical Support Unit
+  MBS: Marketing Business Services
+  MANCOM: Management Committee
+  PROCESSOR: Processing
+  PROCESSING_TL: Processing
+  NB_APPROVER: New Business
+  EPOLICY_SENDER: Processing
+  ADJUSTMENT: Operations - Adjustment
+  ADJUSTMENT_TL: Operations - Adjustment
+  CASHIER: Operations - Cashiering
+  CASHIER_TL: Operations - Cashiering
+  REMIT_PROCESSOR: Operations - Remittance
+  REMIT_TL: Operations - Remittance
+  RECON_HANDLER: Operations - Production Reconciliation
+  COMMREC_HANDLER: Operations - Commission Receivables
+  COMMREC_TL: Operations - Commission Receivables
+  COMPTROLLERSHIP: Comptrollership
+  FIN_ADMIN: Comptrollership
+  ACCOUNTANT: Comptrollership
+  AUTHORIZER: Comptrollership
+  FRBS_PROCESSOR: Comptrollership - General Ledger (FRBS)
+  FRBS_TL: Comptrollership - General Ledger (FRBS)
+  FRBS_HEAD: Comptrollership - General Ledger (FRBS)
+  DISBURSEMENT: Disbursement
+  DISB_TL: Disbursement
+  DISB_APPROVER: Disbursement
+  PRQ_PROCESSOR: Marketing
+  PRQ_REVIEWER: Marketing
+  PRQ_APPROVER: Marketing
+  HR_APPROVER: Human Resources
+  ACSL_PROCESSOR: ACSL
+  ACSL_TL: ACSL
+  ACSL_HEAD: ACSL
+  LAMD: Loans Administration and Monitoring (LAMD)
+  CONTACT_CENTER: Contact Center
+  CLM_OFFICER: Claims
+  CLM_TL: Claims
+  CLM_TH: Claims
+  CLM_UH: Claims
+  CLM_RISK: Claims - Risk
+  EB_AO: Marketing - Employee Benefits
+  EB_TL: Marketing - Employee Benefits
+  EB_MANAGEMENT: BDOI Management
+  EB_PROCESSOR: Processing - Employee Benefits
+  EB_PROC_SUPERVISOR: Processing - Employee Benefits
+  EB_COLLECTION: Collection - Employee Benefits
+  CSF_AGENT: BDO Insure Contact Center
+  CSF_SUPERVISOR: BDO Insure Contact Center
+  CSF_MANAGEMENT: BDO Insure Contact Center
+  COMPLIANCE_OFFICER: Compliance
+  COMPLIANCE_CHECKER: Compliance
+  UNIT_COMPLIANCE_COORD: Compliance
+  SCR_INVESTIGATOR: Compliance - Investigation
+  SCR_APPROVER: Compliance - Investigation
+  AML_COMMITTEE: AML Committee
+  UAM_REQUESTOR: User Access Maintenance
+  UAM_APPROVER: User Access Maintenance
+  UAM_SECOND_APPROVER: User Access Maintenance
+  INFOSEC_OFFICER: Information Security
+  BUSINESS_ADMIN: Business Administration
+  SYSADMIN: IT - System Administration
+  AUDITOR: Internal Audit
+  APP_SUPPORT: IT - Application Support
+  DCO: Data Control
+  SBM_HANDLER: Submitted Policies
+  SBM_CHECKER: Submitted Policies
+  SBM_SANITATION: Submitted Policies
+  SBM_TL: Submitted Policies
+  SBM_POLICY_REVIEWER: Submitted Policies (Non-CBG Corporate)
+  SBM_RULE_ADMIN: Submitted Policies
+  SBM_UPP_HANDLER: Admin Team (UPP)
+  DATA_MIGRATION_LEAD: Data Migration
+  DATA_STEWARD: Data Migration
+  DATA_OWNER: Data Migration
+  MIGRATION_OPERATOR: Data Migration
+  MIGRATION_RECON_APPROVER: Comptrollership
+  MIGRATION_GONOGO: Business Project Services
+  LEGACY_INQUIRY: Audit and Compliance
+  LEGACY_ACCESS_REVIEWER: Compliance
+  TOP_MANAGEMENT_APPROVER: Top Management
+  RECORDS_HOLD_OFFICER: Records Management
+  RECORDS_HOLD_APPROVER: Records Management
+  FIN_MANAGER: Comptrollership
+
+brds:
+  - brd: BRD-00
+    module: Core Replacement (cross-cutting)
+    drop: Programme
+    menus:
+      badmin: "Setup & Administration › Broking Setup › Lists of Values"
+      checker: "My Approvals"
+      infosec: "Setup & Administration › User Access › Separation of Duties"
+      holdofficer: "Setup & Administration › Administration › Legal Holds"
+      holdapprover: "Setup & Administration › Administration › Legal Holds"
+    personas:
+      - {persona: Business Administrator, role: BUSINESS_ADMIN, users: [badmin],
+         does: "Maintains the lists of values and the masters with approval; raises group-profile requests; runs the reports"}
+      - {persona: Authorized User (authorizer of master data), role: AUTHORIZER, users: [checker],
+         does: "Authorizes the master data and the set-up maintained by another user (four eyes)"}
+      - {persona: System Administrator, role: SYSADMIN, users: [admin],
+         does: "Users, group profiles, parameters and jobs; unlocks locked users"}
+      - {persona: Information Security Officer, role: INFOSEC_OFFICER, users: [infosec],
+         does: "Authorizes the separation-of-duties rules and the changes of the security settings; reviews the access evidence"}
+      - {persona: Records officer (legal hold), role: RECORDS_HOLD_OFFICER, users: [holdofficer],
+         does: "Places and lifts the legal hold on stored documents"}
+      - {persona: Records approver (legal hold), role: RECORDS_HOLD_APPROVER, users: [holdapprover],
+         does: "Approves the legal hold placed or lifted by the records officer"}
+      - {persona: Auditor, role: AUDITOR, users: [auditor],
+         does: "Read access to the records, the audit logs and the reports of every module"}
+    aliases:
+      "UAM requestor, approver, implementer": [requestor, uamapprover, admin]
+      "TSU Officer": [tsu]
+      "Marketing AO": [ao]
+      "Processing Officer": [proc]
+      "Collection user and TL": [clxhandler, clxtl]
+      "Cashiering, Remittance, Prod Recon, Adjustment, Commission users": [cashier, remit, recon, adjust, commrec]
+      "FRBS, Disbursement, ACSL users": [glofficer, disb, acsl]
+      "Claims Officer, Assistant, Unit Head": [clmofficer, clmuh]
+      "CSF Agent, Supervisor": [csfagent, csfsup]
+      "EB AO, Processing, Collection": [ebao, ebproc, ebcoll]
+      "Compliance officer, investigator": [compoff, investigator]
+      "Business Administrator, System Administrator": [badmin, admin]
+    exclude_frames: [J4.6, J5.3]
+
+  - brd: BRD-01
+    module: New Business
+    drop: Drop 1
+    menus:
+      proctl: "My Work"
+      approver: "My Approvals"
+      adjust: "Client & Policy › Adjustment › Adjustment Workbench"
+      badmin: "Setup & Administration › Broking Setup › Lists of Values"
+      admin: "Setup & Administration › Administration › Users"
+      auditor: "Reports › Reports › Report Centre"
+    personas:
+      - persona: Marketing AO
+        role: MKT_AO
+        users: [ao, {id: ao2, note: "Second account officer, for the transfer and four-eyes cases"}]
+      - {persona: Marketing TL / TH / UH, role: MKT_TL, users: [mkttl]}
+      - persona: TSU
+        role: TSU
+        users: [tsu, {id: tsulead, note: "Second TSU officer: approves the slips the first officer prepared (never both on the same slip)"}]
+      - {persona: Processing, role: PROCESSOR, users: [proc]}
+      - {persona: E-policy Sender, role: EPOLICY_SENDER, users: [epol]}
+      - {persona: Processing TL, role: PROCESSING_TL, users: [proctl]}
+      - {persona: Approver, role: NB_APPROVER, users: [approver]}
+      - {persona: Adjustment, role: ADJUSTMENT, users: [adjust]}
+      - {persona: Business Administrator, role: BUSINESS_ADMIN, users: [badmin]}
+      - {persona: System Administrator, role: SYSADMIN, users: [admin]}
+      - {persona: Auditor, role: AUDITOR, users: [auditor]}
+    step_users:
+      WT-B.5: [tsulead]
+      WT-B.7: [tsu, tsulead]
+
+  - brd: BRD-02
+    module: Operations
+    drop: Drop 1
+    menus:
+      cashbr: "Finance › Cashiering › Receive Payment"
+      commtl: "Finance › Commission Receivables › Incentive Runs"
+      comptrol: "Finance › General Ledger › Journals"
+      admin: "Operations › Operations › Interfaces"
+      auditor: "Reports › Reports › Report Centre"
+    personas:
+      - {persona: Processing (books the account, BRD-1), role: PROCESSOR, users: [proc],
+         does: "Books the account on New Business; the invoice then reaches Operations"}
+      - persona: Cashier, HO (11) and branches (5)
+        role: CASHIER
+        users: [cashier, {id: cashbr, note: "Branch cashier (Cebu): issues acknowledgement receipts"}]
+      - {persona: Cashiering TL / TH, role: CASHIER_TL, users: [cashtl]}
+      - {persona: Marketing Collection (HO / branches), role: MKT_COLLECTION, users: [mktcoll]}
+      - {persona: Marketing TL / UH, role: MKT_TL, users: [mkttl]}
+      - {persona: Remittance Processor (4), role: REMIT_PROCESSOR, users: [remit]}
+      - {persona: Remittance TL / TH, role: REMIT_TL, users: [remittl]}
+      - {persona: Adjustment Processor (6), role: ADJUSTMENT, users: [adjust]}
+      - {persona: Adjustment TL, role: ADJUSTMENT_TL, users: [adjtl]}
+      - {persona: Commission Handler / Processor, role: COMMREC_HANDLER, users: [commrec]}
+      - {persona: Commission TL / TH, role: COMMREC_TL, users: [commtl]}
+      - {persona: Production Reconciliation Handler (4), role: RECON_HANDLER, users: [recon]}
+      - {persona: Disbursement, role: DISBURSEMENT, users: [disb]}
+      - {persona: Comptrollership, role: COMPTROLLERSHIP, users: [comptrol]}
+      - {persona: System Administrator, role: SYSADMIN, users: [admin]}
+      - {persona: Auditor, role: AUDITOR, users: [auditor]}
+
+  - brd: BRD-03
+    module: Product Maintenance
+    drop: Drop 0
+    menus:
+      admin: "Setup & Administration › Broking Setup › Lists of Values"
+    personas:
+      - persona: MBS
+        role: MBS
+        users: [mbs, {id: mbs2, note: "Second MBS user, for the four-eyes set-up of package versions"}]
+      - {persona: Marketing AO, role: MKT_AO, users: [ao]}
+      - {persona: Marketing TL / TH / UH, role: MKT_TL, users: [mkttl]}
+      - {persona: TSU Team Lead, role: TSU_TL, users: [tsulead]}
+      - {persona: TSU Team Head / Head, role: TSU_HEAD, users: [tsuhead]}
+      - {persona: TSU Officer, role: TSU, users: [tsu]}
+      - {persona: ManCom, role: MANCOM, users: [mancom]}
+      - {persona: Business Administrator, role: BUSINESS_ADMIN, users: [badmin]}
+      - {persona: New Business Approver, role: NB_APPROVER, users: [approver],
+         does: "Approves the new insurer record and the master records used by the package"}
+      - {persona: System Administrator, role: SYSADMIN, users: [admin]}
+      - {persona: Auditor, role: AUDITOR, users: [auditor]}
+
+  - brd: BRD-04
+    module: Collections
+    drop: Drop 1
+    menus:
+      commrec: "Finance › Commission Receivables › DP Accounts"
+      commtl: "Finance › Commission Receivables › DP Accounts"
+      appsupport: "Finance › Collections › Collections Setup"
+      dco: "Finance › Collections › Collections Setup"
+      badmin: "Finance › Collections › Collections Setup"
+    personas:
+      - {persona: Section Head (Corporate / Retail), role: MKT_SECTION_HEAD, users: [clxuh]}
+      - {persona: Collection Handler, role: MKT_COLLECTION, users: [clxhandler]}
+      - {persona: Collection Team Lead, role: CLX_TL, users: [clxtl]}
+      - {persona: Authorizer of master data (escalation rules), role: AUTHORIZER, users: [checker],
+         does: "Authorizes the escalation rules maintained in the Collections set-up (no Collections profile authorizes master data)"}
+      - {persona: Unapplied Payment Handler, role: UNAPPLIED_HANDLER, users: [upphandler]}
+      - {persona: Operations Cashiering (Cashier), role: CASHIER, users: [cashier]}
+      - {persona: Operations Cashiering (Cashiering Team Leader / Head), role: CASHIER_TL, users: [cashtl],
+         does: "Executes the application requests; as the proposed Operations billing user, generates and sends the statements of account"}
+      - {persona: Marketing AO, role: MKT_AO, users: [ao]}
+      - {persona: Marketing Team Lead, role: MKT_TL, users: [mkttl]}
+      - {persona: Marketing Handler, role: MKT_HANDLER, users: [mkthandler]}
+      - {persona: Processing Unit, role: PROCESSOR, users: [proc]}
+      - {persona: Commission Receivables Unit (handler), role: COMMREC_HANDLER, users: [commrec]}
+      - {persona: Commission Receivables Unit (team lead), role: COMMREC_TL, users: [commtl]}
+      - {persona: Disbursement, role: DISBURSEMENT, users: [disb], does: "Read access, reports and exports"}
+      - {persona: Comptrollership, role: COMPTROLLERSHIP, users: [comptrol], does: "Read access and reports"}
+      - {persona: ACSL (processor), role: ACSL_PROCESSOR, users: [acsl], does: "Read access and reports"}
+      - {persona: ACSL (team leader), role: ACSL_TL, users: [acsltl], does: "Read access and reports"}
+      - {persona: ACSL (head), role: ACSL_HEAD, users: [acslhead], does: "Read access and reports"}
+      - {persona: Application Support, role: APP_SUPPORT, users: [appsupport],
+         does: "Collections set-up, audit log, interface (sync) view and job runs"}
+      - {persona: DCO, role: DCO, users: [dco], does: "Collections set-up, audit log, interface (sync) view and job runs"}
+      - {persona: Business Administrator, role: BUSINESS_ADMIN, users: [badmin],
+         does: "Collections set-up, audit log, interface (sync) view and job runs"}
+      - {persona: System Administrator, role: SYSADMIN, users: [admin], does: "Read access, set-up and audit log"}
+      - {persona: Auditor, role: AUDITOR, users: [auditor], does: "Read access and audit log"}
+
+  - brd: BRD-05
+    module: Accounting, Disbursement and ACSL
+    drop: Drop 1
+    menus:
+      cashier: "My Approvals"
+      disbtl: "Finance › Disbursement › Account Funding"
+      disbtl2: "Finance › Disbursement › Account Funding"
+      disbappr2: "Finance › Disbursement › Disbursement Workbench"
+      accountant: "Finance › Receivables & Banking › Bank Reconciliation"
+      fmanager: "Setup & Administration › Setup › Employees"
+      checker: "My Approvals"
+      badmin: "Setup & Administration › Broking Setup › Lists of Values"
+      admin: "Setup & Administration › Administration › Users"
+      auditor: "Reports › Reports › Report Centre"
+    personas:
+      - {persona: GL Officer (FRBS Processor), role: FRBS_PROCESSOR, users: [glofficer]}
+      - {persona: GL Team Lead, role: FRBS_TL, users: [gltl]}
+      - {persona: GL Team Head / Section Head, role: FRBS_HEAD, users: [glhead]}
+      - {persona: Marketing Processor (AO), role: PRQ_PROCESSOR, users: [mktao]}
+      - {persona: Marketing Reviewer, role: PRQ_REVIEWER, users: [mktrev]}
+      - {persona: Marketing Approver, role: PRQ_APPROVER, users: [mktappr]}
+      - {persona: Human Resources, role: HR_APPROVER, users: [hrappr]}
+      - {persona: Cashier, role: CASHIER, users: [cashier]}
+      - {persona: Disbursement Processor, role: DISBURSEMENT, users: [disb]}
+      - persona: Disbursement Team Leader
+        role: DISB_TL
+        users: [disbtl, {id: disbtl2, note: "Second team leader: verifies the funding request and the end of day prepared by the first"}]
+      - persona: Disbursement Approver
+        role: DISB_APPROVER
+        users: [disbappr, {id: disbappr2, note: "Second approver, for the approvals that need two signatories"}]
+      - {persona: ACSL Processor, role: ACSL_PROCESSOR, users: [acsl]}
+      - {persona: ACSL Team Leader, role: ACSL_TL, users: [acsltl]}
+      - {persona: ACSL Head (Approver), role: ACSL_HEAD, users: [acslhead]}
+      - {persona: Accountant (bank reconciliation), role: ACCOUNTANT, users: [accountant],
+         does: "Bank reconciliation and the accounting reports"}
+      - {persona: Comptrollership administrator, role: FIN_ADMIN, users: [fmanager]}
+      - {persona: Comptrollership, role: COMPTROLLERSHIP, users: [comptrol]}
+      - {persona: Approver (administration), role: AUTHORIZER, users: [checker],
+         does: "Approves, declines or returns the list-of-values and master-data requests of another user"}
+      - {persona: Business Administrator, role: BUSINESS_ADMIN, users: [badmin]}
+      - {persona: System Administrator, role: SYSADMIN, users: [admin]}
+      - {persona: Auditor, role: AUDITOR, users: [auditor]}
+
+  - brd: BRD-06
+    module: Renewal
+    drop: Drop 1
+    menus:
+      lamd: "Client & Policy › Renewal › LAMD Reports"
+      admin: "Setup & Administration › Administration › Roles & Permissions"
+    personas:
+      - persona: Marketing Team Leader
+        role: MKT_TL
+        users: [mkttl, {id: rnwtl, note: "Second team leader, for the transfer of an account to another unit"}]
+      - persona: Marketing AO / Admin, Account Broker
+        role: MKT_AO
+        users: [ao, {id: ao2, note: "Account officer of the receiving unit in a transfer"}]
+      - {persona: Processing Team Leader, role: PROCESSING_TL, users: [proctl]}
+      - {persona: Processing Officer / Broker, role: PROCESSOR, users: [proc]}
+      - {persona: LAMD user, role: LAMD, users: [lamd]}
+      - {persona: Contact Center user, role: CONTACT_CENTER, users: [contactc]}
+      - {persona: Business Administrator, role: BUSINESS_ADMIN, users: [badmin]}
+      - {persona: System Administrator, role: SYSADMIN, users: [admin]}
+      - {persona: Auditor, role: AUDITOR, users: [auditor], does: "Read access to the renewal records and reports"}
+
+  - brd: BRD-07
+    module: Claims
+    drop: Drop 2
+    personas:
+      - persona: Claims Officer / Claims Assistant
+        role: CLM_OFFICER
+        users: [clmofficer, {id: clmofficer2, note: "Second claims officer of Head Office"},
+                {id: clmbranch, note: "Claims officer of the Cebu branch: sees the claims of the branch"}]
+      - {persona: Team Lead, role: CLM_TL, users: [clmtl]}
+      - {persona: Team Head, role: CLM_TH, users: [clmth]}
+      - {persona: Unit Head, role: CLM_UH, users: [clmuh]}
+      - {persona: Claims / Risk user, role: CLM_RISK, users: [clmrisk]}
+      - {persona: Marketing user (account officer), role: MKT_AO, users: [ao],
+         does: "Views the loss information of the clients through the claims reports"}
+      - {persona: Marketing user (team lead), role: MKT_TL, users: [mkttl],
+         does: "Views the loss information through the claims reports and exports them"}
+      - {persona: System Administrator, role: SYSADMIN, users: [admin]}
+      - {persona: Auditor, role: AUDITOR, users: [auditor]}
+    aliases:
+      "Marketing user": [ao]
+
+  - brd: BRD-08
+    module: Employee Benefits
+    drop: Drop 2
+    personas:
+      - persona: Marketing AO (EB)
+        role: EB_AO
+        users: [ebao, {id: ebao2, note: "Second EB account officer"}]
+      - {persona: Marketing TL / UH (EB), role: EB_TL, users: [ebtl]}
+      - {persona: BDOI Management, role: EB_MANAGEMENT, users: [ebmgmt]}
+      - {persona: Processing (EB), role: EB_PROCESSOR, users: [ebproc]}
+      - {persona: Processing Supervisor, role: EB_PROC_SUPERVISOR, users: [ebprocsup]}
+      - {persona: Collection (EB), role: EB_COLLECTION, users: [ebcoll]}
+      - {persona: Business Administrator, role: BUSINESS_ADMIN, users: [badmin]}
+      - {persona: Insurer user (partner portal), no_user: portal}
+      - {persona: Client HR user (partner portal), no_user: portal}
+    aliases:
+      "Insurer user": "Insurer user (partner portal)"
+      "Client HR user": "Client HR user (partner portal)"
+
+  - brd: BRD-09
+    module: Customer Servicing Facility
+    drop: Drop 1
+    menus:
+      admin: "Setup & Administration › Administration › Users"
+    personas:
+      - persona: BDO Insure Contact Center Agent
+        role: CSF_AGENT
+        users: [csfagent, {id: csfagent2, note: "Second agent, for the reassignment of a case"}]
+      - {persona: "Contact Center Supervisor, BDO Contact Center personnel", role: CSF_SUPERVISOR, users: [csfsup]}
+      - {persona: "Contact Center Management, Leads / Heads", role: CSF_MANAGEMENT, users: [csfmgmt]}
+      - {persona: Fulfilment Unit, no_user: fulfilment}
+      - {persona: System Administrator, role: SYSADMIN, users: [admin]}
+    aliases:
+      "Contact Center Supervisor": "Contact Center Supervisor, BDO Contact Center personnel"
+      "Contact Center Management": "Contact Center Management, Leads / Heads"
+
+  - brd: BRD-10
+    module: Sanction Screening
+    drop: Drop 1
+    personas:
+      - persona: Compliance Officer
+        role: COMPLIANCE_OFFICER
+        users: [compoff, {id: compdual, note: "Holds both compliance profiles: shows that a maker cannot approve his own change"}]
+      - {persona: Compliance Officer (Checker), role: COMPLIANCE_CHECKER, users: [compchk]}
+      - {persona: Unit Compliance (User) Coordinator, role: UNIT_COMPLIANCE_COORD, users: [ucc]}
+      - persona: Investigator
+        role: SCR_INVESTIGATOR
+        users: [investigator, {id: investigator2, note: "Second investigator, for the re-assignment of a case"},
+                {id: scrdual, note: "Holds the investigator and approver profiles: shows that an investigator cannot approve his own recommendation"}]
+      - {persona: Approver (Unit Head), role: SCR_APPROVER, users: [scrapprover]}
+      - persona: AML Committee Member
+        role: AML_COMMITTEE
+        users: [amlcom1, amlcom2, amlcom3, amlcom4, amlcom5]
+      - {persona: Operations Lead, no_user: operations_lead}
+      - {persona: Auditor, role: AUDITOR, users: [auditor]}
+      - {persona: System Administrator, role: SYSADMIN, users: [admin]}
+
+  - brd: BRD-11
+    module: User Access Maintenance
+    drop: Drop 0
+    menus:
+      a013000101: "Client & Policy › Clients › Clients"
+      a013000102: "Client & Policy › Clients › Clients"
+      a013000103: "Client & Policy › Clients › Clients"
+      a013000104: "Client & Policy › Clients › Clients"
+    personas:
+      - {persona: Requestor, role: UAM_REQUESTOR, users: [requestor]}
+      - {persona: Approver, role: UAM_APPROVER, users: [uamapprover]}
+      - {persona: Approver (New Business Approver, keeps its approval right), role: NB_APPROVER, users: [approver],
+         does: "Approves the access and group-profile requests assigned to him or her, as the second approver in order"}
+      - {persona: Second approver, role: UAM_SECOND_APPROVER, users: [secapprover]}
+      - {persona: Business Administrator, role: BUSINESS_ADMIN, users: [badmin]}
+      - {persona: System Administrator, role: SYSADMIN, users: [admin]}
+      - {persona: Information Security Officer, role: INFOSEC_OFFICER, users: [infosec]}
+      - {persona: Auditor, role: AUDITOR, users: [auditor]}
+      - persona: Subject users of the requests (Marketing AO)
+        role: MKT_AO
+        users: [a013000101, a013000102, a013000103, a013000104]
+        does: "Users whose access the requests enrol, change, deactivate or unlock; a013000101 is locked and unlocked in walkthrough C"
+    created_in_walkthrough: [a013000196]
+    step_users:
+      WT-A.5: [a013000196]
+      WT-A.6: [a013000196]
+      WT-A.7: [a013000196]
+      WT-C.8: [a013000101]
+      WT-C.10: [a013000196]
+    exclude_steps: [WT-D.4, WT-D.5]
+    titles:
+      WT-D: The evidence of access
+
+  - brd: BRD-12
+    module: Submitted Policies
+    drop: Drop 1
+    menus:
+      mkttl: "Client & Policy › Submitted Policies › Reviews & IAAF"
+    personas:
+      - persona: Submitted Handler (CBG)
+        role: SBM_HANDLER
+        users: [sbmhandler, {id: firehandler, note: "Handler of the Fire policies (sbmhandler handles Motor)"}]
+      - {persona: Submitted Checker, role: SBM_CHECKER, users: [sbmchecker]}
+      - {persona: Sanitation Handler, role: SBM_SANITATION, users: [sanitation]}
+      - {persona: Team Lead, role: SBM_TL, users: [sbmtl]}
+      - {persona: Policy Review Officer (Non-CBG Corporate), role: SBM_POLICY_REVIEWER, users: [polreview]}
+      - {persona: Rule administrator, role: SBM_RULE_ADMIN, users: [sbmrules]}
+      - {persona: Admin Team UPP handler, role: SBM_UPP_HANDLER, users: [sbmfee]}
+      - {persona: Marketing AO / MAO, role: MKT_AO, users: [ao]}
+      - {persona: NB Team Lead, role: MKT_TL, users: [mkttl]}
+      - {persona: TSU, role: TSU, users: [tsu]}
+      - {persona: Placement and Booking users, role: PROCESSOR, users: [proc]}
+    aliases:
+      "Placement and Booking user": "Placement and Booking users"
+
+  - brd: BRD-13
+    module: Data Migration
+    drop: Drop 0
+    menus:
+      rnwmaker: "Data Migration › Data Migration › Batches"
+      rnwchecker: "Data Migration › Data Migration › Batches"
+      migpm: "Data Migration › Data Migration › Cutover"
+      topmgmt: "Finance › Cashiering › Unapplied to Income"
+      cashtl: "Finance › Cashiering › Unapplied to Income"
+      commtl: "Finance › Commission Receivables › DP PR Legacy Reversal"
+      clxhandler: "Finance › Collections › PR Worklist"
+      clxtl: "Finance › Collections › PR Worklist"
+      accountant: "Finance › Receivables & Banking › Bank Reconciliation"
+      remit: "Finance › Remittance › Extraction"
+      recon: "Client & Policy › Production Reconciliation › Reconciliation Workbench"
+      clmofficer: "Claims & Insurance › Claims Handling › Claims Worklist"
+      proc: "Client & Policy › Placement & Booking › Placement Workbench"
+    personas:
+      - {persona: Data Migration Lead, role: DATA_MIGRATION_LEAD, users: [miglead]}
+      - {persona: Data owner (business owner of an object), role: DATA_OWNER, users: [migowner]}
+      - {persona: Data Steward, role: DATA_STEWARD, users: [migsteward]}
+      - {persona: Migration Operator, role: MIGRATION_OPERATOR, users: [migops]}
+      - {persona: Reconciliation approver (Head of Comptrollership for financial objects), role: MIGRATION_RECON_APPROVER,
+         users: [migrecon]}
+      - {persona: Comptrollership GL lead, role: COMPTROLLERSHIP, users: [comptrol]}
+      - {persona: Program Manager (Business Project Services), role: MIGRATION_GONOGO, users: [migpm],
+         does: "Chairs the go / no-go board; owns the cut-over plan and the transition model by renewal expiry month",
+         remarks: "Holds the Go / no-go board profile; the cut-over plan is maintained with the Data Migration Lead profile"}
+      - {persona: Go / no-go board, role: MIGRATION_GONOGO, users: [miggonogo]}
+      - {persona: Renewal processing team (maker), role: DATA_STEWARD, users: [rnwmaker],
+         does: "Corrects the rejected rows of the renewal advices already sent and prepares the resubmission"}
+      - {persona: Renewal processing team (checker), role: DATA_OWNER, users: [rnwchecker],
+         does: "Reviews each correction against the tracker and approves or returns the resubmission (never its maker)"}
+      - {persona: Audit / Compliance user, role: LEGACY_INQUIRY, users: [legacyaudit]}
+      - {persona: Compliance reviewer, role: LEGACY_ACCESS_REVIEWER, users: [legacyrev]}
+      - {persona: Cashiering user, role: CASHIER, users: [cashier],
+         does: "Unapplied to Income and Legacy PR 2307 Reversal batches; payments and dispositions on legacy items"}
+      - {persona: Cashiering team lead, role: CASHIER_TL, users: [cashtl],
+         does: "Reviews and posts the Unapplied to Income and Legacy PR 2307 Reversal batches"}
+      - {persona: Top management (Finance Approver), role: TOP_MANAGEMENT_APPROVER, users: [topmgmt]}
+      - {persona: Commission user (DP PR Legacy Reversal), role: COMMREC_HANDLER, users: [commrec],
+         does: "Prepares the DP PR Legacy Reversal batches"}
+      - {persona: Commission team lead (DP PR Legacy Reversal), role: COMMREC_TL, users: [commtl],
+         does: "Posts the DP PR Legacy Reversal batches"}
+      - {persona: Collections user (Legacy PR 2307 Reversal), role: MKT_COLLECTION, users: [clxhandler],
+         remarks: "BRD V0.03 gives the Legacy PR 2307 Reversal to Collections; this set shows it with the Cashiering user and team lead (CLR-DM-16)"}
+      - {persona: Collections team lead (Legacy PR 2307 Reversal), role: CLX_TL, users: [clxtl],
+         remarks: "See CLR-DM-16"}
+      - {persona: Accounting User (Comptrollership), role: ACCOUNTANT, users: [accountant]}
+      - {persona: Marketing user, role: MKT_AO, users: [ao],
+         does: "Finds and uses the migrated clients, policies and invoices on the usual screens"}
+      - {persona: Operations user, role: CASHIER, users: [cashier],
+         does: "Finds and uses the migrated invoices on Invoice Search and Invoice 360"}
+      - {persona: Remittance user, role: REMIT_PROCESSOR, users: [remit],
+         does: "Finds the migrated invoices in the remittance extraction and history"}
+      - {persona: Prod Recon user, role: RECON_HANDLER, users: [recon],
+         does: "Finds the migrated invoices in the production register"}
+      - {persona: Claims User, role: CLM_OFFICER, users: [clmofficer]}
+      - {persona: Placement User, role: PROCESSOR, users: [proc]}
+    aliases:
+      "Reconciliation approver (Head of Comptrollership)": "Reconciliation approver (Head of Comptrollership for financial objects)"
+      "Compliance reviewer of the access log": "Compliance reviewer"
+      "Marketing Account Officer": "Marketing user"
+      "Top management approver": "Top management (Finance Approver)"
+      "Commission user": "Commission user (DP PR Legacy Reversal)"
+    step_users:
+      UF-B.3: [migpm, miggonogo]
+    # FR-DM-125 (renewal advices already sent before go-live), main flow: the steps of the renewal processing team.
+    extra_steps:
+      - {step: FR-DM-125.1, flow: FR-DM-125 Renewal advices already sent before go-live, persona: Renewal processing team (maker),
+         action: "Compiles the renewal advices already sent from the Excel trackers in the template of layout P03, one row per expiring term",
+         result: "The file is ready for the checker"}
+      - {step: FR-DM-125.2, flow: FR-DM-125 Renewal advices already sent before go-live, persona: Renewal processing team (checker),
+         action: "Compares the file with the trackers (row counts per tracker and 10 sample rows) and releases it",
+         result: "The file goes to the Migration Operator"}
+      - {step: FR-DM-125.3, flow: FR-DM-125 Renewal advices already sent before go-live, persona: Migration Operator,
+         action: "Uploads the file with its control file on Extracts, plans the batch and validates it",
+         result: "The batch is validated; the rejected rows are on the batch with an Excel rejection report and correction columns"}
+      - {step: FR-DM-125.4, flow: FR-DM-125 Renewal advices already sent before go-live, persona: Renewal processing team (maker),
+         action: "Corrects each rejected row in the correction columns and prepares the resubmission with the corrected rows only (Resubmit Corrected Rows)",
+         result: "The resubmission waits for the checker on the Resubmissions tab of Batches"}
+      - {step: FR-DM-125.5, flow: FR-DM-125 Renewal advices already sent before go-live, persona: Renewal processing team (checker),
+         action: "Reviews each correction against the tracker and approves the resubmission, or returns it with a reason",
+         result: "Approved, or Returned to the maker; the maker of a resubmission cannot approve it: A record cannot be authorized by the user who maintained it"}
+      - {step: FR-DM-125.6, flow: FR-DM-125 Renewal advices already sent before go-live, persona: Migration Operator,
+         action: "Loads the approved resubmission as a rerun batch after the load approval (G4)",
+         result: "The valid rows are loaded; the go-live renewal extraction records the advices already sent, so that no advice is sent twice"}
+
+# Personas without a UAT sign-in, and why (Gaps fixed sheet, BDOI decision).
+no_user:
+  portal: >-
+    No UAT sign-in: insurers and client HR take part by e-mail, because the BDOI drop plan has no partner portal for
+    Drop 2. A portal sign-in is added if BDOI brings the portal into a drop.
+  fulfilment: >-
+    No UAT sign-in: the Fulfilment Unit group profile and the membership of the 53 units are set up when BDOI
+    confirms the units, their members and the first routing table (CLR-CSF-10).
+  operations_lead: >-
+    No UAT sign-in: BDOI names the existing team-lead group profile that monitors the screening SLAs and escalations
+    (SQ19); the users of that profile then take this part.
+
+# Gaps fixed sheet: personas of a BRD / FRS that had no UAT user, or no user with exactly that group profile, or no
+# second user where the flow needs four eyes, before 08-Oct-2026, and what was done.
+gaps:
+  - brd: BRD-04
+    persona: Application Support
+    role: APP_SUPPORT
+    before: No UAT user held the Application Support group profile
+    added: [appsupport]
+  - brd: BRD-04
+    persona: DCO
+    role: DCO
+    before: No UAT user held the Data Control Officer group profile
+    added: [dco]
+  - brd: BRD-12
+    persona: Rule administrator
+    role: SBM_RULE_ADMIN
+    before: >-
+      No UAT user held the rule administrator group profile, so the rule sets (maker) could not be shown with their
+      approval by the NB Team Lead (checker)
+    added: [sbmrules]
+  - brd: BRD-13
+    persona: Renewal processing team (maker)
+    role: DATA_STEWARD
+    before: >-
+      No UAT user for the renewal processing team, which corrects the rejected rows of the renewal advices already sent
+      (maker) and approves the resubmission (checker)
+    added: [rnwmaker]
+  - brd: BRD-13
+    persona: Renewal processing team (checker)
+    role: DATA_OWNER
+    before: No checker of the renewal processing team, distinct from the maker (four eyes)
+    added: [rnwchecker]
+  - brd: BRD-13
+    persona: Program Manager (Business Project Services)
+    role: MIGRATION_GONOGO
+    before: No UAT user for the Program Manager, who chairs the go / no-go board
+    added: [migpm]
+  - brd: BRD-08
+    persona: Insurer user and Client HR user (partner portal)
+    before: No UAT sign-in for the external portal users
+    decision: portal
+  - brd: BRD-09
+    persona: Fulfilment Unit
+    before: No UAT sign-in for the Fulfilment Unit of the case management addendum
+    decision: fulfilment
+  - brd: BRD-10
+    persona: Operations Lead
+    before: No group profile named for the Operations Lead
+    decision: operations_lead

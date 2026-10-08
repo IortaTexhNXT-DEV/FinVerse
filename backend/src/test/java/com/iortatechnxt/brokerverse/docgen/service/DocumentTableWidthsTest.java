@@ -19,7 +19,7 @@ class DocumentTableWidthsTest {
   private static final Font BODY = new Font(Font.HELVETICA, 9, Font.NORMAL, Color.BLACK);
 
   @Test
-  void everyHeadingWordAndDateFitsItsColumn() {
+  void headingWordsAmountsAndCodesFitTheirColumns() {
     List<String> headers =
         List.of(
             "Invoice Number",
@@ -62,15 +62,31 @@ class DocumentTableWidthsTest {
         sum += widths[c];
         assertThat(widths[c])
             .as(headers.get(c))
-            .isGreaterThan(PdfColumnWidths.longestWord(headers.get(c), HEAD));
-        if (row.get(c).matches("\\d{2}-\\w{3}-\\d{4}|[\\d,.]+")) {
-          // Dates and amounts stay on one line.
-          assertThat(widths[c])
-              .as(row.get(c))
-              .isGreaterThan(PdfColumnWidths.longestWord(row.get(c), BODY));
-        }
+            .isGreaterThan(PdfColumnWidths.longestWord(headers.get(c), HEAD) + 2 * 4f);
+        // Amounts and codes are never cut; a date or reference may break only after a hyphen.
+        assertThat(widths[c])
+            .as(row.get(c))
+            .isGreaterThan(PdfColumnWidths.longestPart(row.get(c), BODY) + 2 * 4f);
       }
       assertThat(sum).isCloseTo(PageSize.A4.getHeight() - 80, within(1f));
+    }
+    byte[] pdf =
+        new DocumentComposer(
+                java.time.Clock.systemUTC(),
+                org.mockito.Mockito.mock(DocumentRenditionService.class))
+            .pdf(
+                new DocumentSpec(
+                    "BDO Insurance and Reinsurance Brokers, Inc.",
+                    "Remittance Schedule",
+                    "RMB-INS-MGIC-2026-000001",
+                    List.of(table),
+                    List.of(),
+                    null));
+    try (com.lowagie.text.pdf.PdfReader reader = new com.lowagie.text.pdf.PdfReader(pdf)) {
+      String page = new com.lowagie.text.pdf.parser.PdfTextExtractor(reader).getTextFromPage(1);
+      assertThat(page).contains("Realized", "Commission", "Endorsement", "14,601.14", "MTR10");
+    } catch (java.io.IOException e) {
+      throw new AssertionError(e);
     }
   }
 }

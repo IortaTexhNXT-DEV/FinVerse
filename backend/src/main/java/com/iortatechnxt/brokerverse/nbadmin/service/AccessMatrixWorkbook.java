@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.nbadmin.service;
 
 import com.iortatechnxt.brokerverse.common.excel.SheetColumnWidths;
+import com.iortatechnxt.brokerverse.common.excel.SheetLogo;
 import com.iortatechnxt.brokerverse.common.office.BrandAssets;
 import com.iortatechnxt.brokerverse.common.office.PdfBrandFooter;
 import java.awt.Color;
@@ -17,11 +18,9 @@ import org.apache.poi.ss.usermodel.PrintSetup;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
-import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.DefaultIndexedColorMap;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
-import org.apache.poi.xssf.usermodel.XSSFClientAnchor;
 import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -49,8 +48,6 @@ final class AccessMatrixWorkbook {
 
   private static final float LOGO_HEIGHT_POINTS = 22f;
   private static final float LOGO_ROW_POINTS = 30f;
-  private static final double LOGO_PIXEL_HEIGHT = 77;
-  private static final double PIXELS_PER_POINT = 96 / 72.0;
   private static final short TITLE_POINTS = 12;
   private static final short UPRIGHT = 90;
   private static final int PROFILE_CHARS = 4;
@@ -138,15 +135,9 @@ final class AccessMatrixWorkbook {
     return r + 1;
   }
 
-  /** The BDO Insure logo in the first row, scaled to the height of the other report headers. */
+  /** The BDO Insure logo in the first row, at the height of the other report headers. */
   private static void logo(XSSFWorkbook wb, Sheet sheet) {
-    int picture = wb.addPicture(BrandAssets.logoPng(), Workbook.PICTURE_TYPE_PNG);
-    XSSFClientAnchor anchor = wb.getCreationHelper().createClientAnchor();
-    anchor.setCol1(0);
-    anchor.setRow1(0);
-    anchor.setAnchorType(XSSFClientAnchor.AnchorType.MOVE_DONT_RESIZE);
-    double scale = LOGO_HEIGHT_POINTS * PIXELS_PER_POINT / LOGO_PIXEL_HEIGHT;
-    sheet.createDrawingPatriarch().createPicture(anchor, picture).resize(scale);
+    SheetLogo.place(wb, sheet, LOGO_HEIGHT_POINTS);
   }
 
   private static void printSetup(Sheet sheet, Grid g, int headRow, int lead) {
@@ -198,12 +189,14 @@ final class AccessMatrixWorkbook {
       headFont.setBold(true);
       headFont.setColor(color("FFFFFF"));
       head = heading(wb, headFont, brand);
+      head.setIndention(SheetColumnWidths.TEXT_INDENT);
       XSSFCellStyle up = heading(wb, headFont, brand);
       up.setRotation(UPRIGHT);
       up.setAlignment(HorizontalAlignment.CENTER);
       up.setVerticalAlignment(VerticalAlignment.BOTTOM);
       upright = up;
       body = bordered(wb);
+      body.setIndention(SheetColumnWidths.TEXT_INDENT);
       mark = bordered(wb);
       mark.setAlignment(HorizontalAlignment.CENTER);
       wrapped = bordered(wb);

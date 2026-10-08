@@ -7,23 +7,28 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * Column widths of a PDF table that break text only between words: every column is at least as wide
- * as the longest word of its heading and, as far as the page allows, as its longest value word (a
- * date or reference stays on one line); the rest of the width is shared in proportion to the column
- * weights. When the words of the headings do not fit the page, the widths follow the weights as
- * before.
+ * Column widths of a PDF table that break text only where a reader expects it: every column is at
+ * least as wide as the longest word of its heading and as the longest part of its values that has
+ * no space or hyphen (an amount such as 14,601.14 or a code such as MTR10 is never cut; a date or a
+ * reference may break after a hyphen). As far as the page allows, whole value words are kept on one
+ * line too (a date before a long reference). The rest of the width is shared in proportion to the
+ * column weights. When even the headings do not fit the page, the widths follow the weights.
  */
 public final class PdfColumnWidths {
 
   /** A value word wider than this share of the table does not widen its column. */
   private static final float LONGEST_VALUE_SHARE = 0.3f;
 
+  /** Room left beside a word that just fits (borders and rounding of the line layout). */
+  private static final float SLACK = 3f;
+
   /** Guards the division when every column is fixed at its minimum. */
   private static final float MIN_WEIGHT = 1e-6f;
 
   private final float[] weights;
   private final float[] headMinimum;
-  private final float[] valueMinimum;
+  private final float[] partMinimum;
+  private final float[] wordMinimum;
   private final float padding;
 
   /**
@@ -35,7 +40,8 @@ public final class PdfColumnWidths {
   public PdfColumnWidths(float[] weights, float padding) {
     this.weights = weights.clone();
     this.headMinimum = new float[weights.length];
-    this.valueMinimum = new float[weights.length];
+    this.partMinimum = new float[weights.length];
+    this.wordMinimum = new float[weights.length];
     this.padding = padding;
   }
 
@@ -61,7 +67,8 @@ public final class PdfColumnWidths {
    * @return this
    */
   public PdfColumnWidths value(int column, String value, Font font) {
-    valueMinimum[column] = Math.max(valueMinimum[column], longestWord(value, font));
+    wordMinimum[column] = Math.max(wordMinimum[column], longestWord(value, font));
+    partMinimum[column] = Math.max(partMinimum[column], longestPart(value, font));
     return this;
   }
 
@@ -90,30 +97,35 @@ public final class PdfColumnWidths {
   public float[] fit(float total) {
     float cap = total * LONGEST_VALUE_SHARE;
     float[] minimum = new float[weights.length];
-    float[] value = new float[weights.length];
+    float[] whole = new float[weights.length];
     for (int i = 0; i < weights.length; i++) {
-      minimum[i] = headMinimum[i] > 0 ? headMinimum[i] + padding : 0;
-      value[i] = valueMinimum[i] > 0 ? Math.min(valueMinimum[i], cap) + padding : 0;
+      minimum[i] = Math.max(room(headMinimum[i], cap), room(partMinimum[i], cap));
+      whole[i] = Math.max(minimum[i], room(wordMinimum[i], cap));
     }
     if (sum(minimum) > total) {
       return share(new float[weights.length], total);
     }
-    // Value words are kept whole column by column, the columns needing the least extra width
-    // first (a date before a long reference, which may still break at its hyphens).
+    // Whole value words are kept column by column, the columns needing the least extra width
+    // first (a date before a long reference, which may still break after its hyphens).
     Integer[] order = new Integer[weights.length];
     for (int i = 0; i < order.length; i++) {
       order[i] = i;
     }
-    Arrays.sort(order, Comparator.comparingDouble(i -> value[i] - minimum[i]));
+    Arrays.sort(order, Comparator.comparingDouble(i -> whole[i] - minimum[i]));
     float used = sum(minimum);
     for (int i : order) {
-      float extra = value[i] - minimum[i];
+      float extra = whole[i] - minimum[i];
       if (extra > 0 && used + extra <= total) {
-        minimum[i] = value[i];
+        minimum[i] = whole[i];
         used += extra;
       }
     }
     return share(minimum, total);
+  }
+
+  /** The width a text of this width needs in a cell, at most the cap; 0 for no text. */
+  private float room(float text, float cap) {
+    return text > 0 ? Math.min(text, cap) + padding + SLACK : 0;
   }
 
   /**
@@ -168,13 +180,29 @@ public final class PdfColumnWidths {
    * @return width in points, 0 for an empty text
    */
   public static float longestWord(String text, Font font) {
+    return longest(text, font, "\\s+");
+  }
+
+  /**
+   * The width of the longest part of a text that a line may not break: words, and the parts of a
+   * hyphenated word up to and with their hyphen.
+   *
+   * @param text text, may be null
+   * @param font font
+   * @return width in points, 0 for an empty text
+   */
+  public static float longestPart(String text, Font font) {
+    return longest(text, font, "\\s+|(?<=-)");
+  }
+
+  private static float longest(String text, Font font, String separators) {
     if (text == null || text.isBlank()) {
       return 0;
     }
     BaseFont base = font.getCalculatedBaseFont(false);
     float size = font.getCalculatedSize();
     return (float)
-        Arrays.stream(text.strip().split("\\s+"))
+        Arrays.stream(text.strip().split(separators))
             .mapToDouble(w -> base.getWidthPoint(w, size))
             .max()
             .orElse(0);

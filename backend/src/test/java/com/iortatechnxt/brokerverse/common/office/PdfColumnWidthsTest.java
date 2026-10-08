@@ -17,7 +17,7 @@ class PdfColumnWidthsTest {
         new PdfColumnWidths(new float[] {1, 10}, 4f)
             .heading(0, "Realized Commission", FONT)
             .fit(200);
-    assertThat(widths[0]).isCloseTo(word + 4f, within(0.01f));
+    assertThat(widths[0]).isCloseTo(word + 4f + 3f, within(0.01f));
     assertThat(widths[0] + widths[1]).isCloseTo(200f, within(0.01f));
   }
 
@@ -32,6 +32,6 @@ class PdfColumnWidthsTest {
   void aVeryLongValueDoesNotTakeTheWholeTable() {
     float[] widths =
         new PdfColumnWidths(new float[] {1, 9}, 4f).value(0, "A".repeat(200), FONT).fit(300);
-    assertThat(widths[0]).isCloseTo(300 * 0.3f + 4f, within(0.01f));
+    assertThat(widths[0]).isCloseTo(300 * 0.3f + 4f + 3f, within(0.01f));
   }
 }

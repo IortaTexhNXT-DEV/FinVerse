@@ -46,6 +46,8 @@ class ProductionRegisterWorkbookTest {
       DataFormatter shown = new DataFormatter();
       int status = RegisterLayout.HEADERS.indexOf(RegisterLayout.REMITTANCE);
       assertThat(row.getCell(status).getStringCellValue()).isEqualTo("With Outstanding Balance");
+      assertThat(row.getCell(status).getCellStyle().getIndention())
+          .isEqualTo(SheetColumnWidths.TEXT_INDENT);
       int booking = RegisterLayout.HEADERS.indexOf(RegisterLayout.BOOKING_DATE);
       assertThat(shown.formatCellValue(row.getCell(booking))).isEqualTo("02-Oct-2026");
       for (int c = 0; c < head.getLastCellNum(); c++) {

@@ -39,6 +39,9 @@ class SheetWriterTest {
       assertThat(sheet.getColumnWidth(2))
           .isGreaterThanOrEqualTo(("14,315.88".length() + SheetColumnWidths.MARGIN) * 256);
       assertThat(sheet.getRow(0).getCell(0).getCellStyle().getWrapText()).isTrue();
+      // The borrower's name starts one indent from the date before it.
+      assertThat(sheet.getRow(1).getCell(1).getCellStyle().getIndention())
+          .isEqualTo(SheetColumnWidths.TEXT_INDENT);
     }
   }
 }

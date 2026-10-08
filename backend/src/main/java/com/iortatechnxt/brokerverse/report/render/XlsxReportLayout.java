@@ -1,17 +1,15 @@
 package com.iortatechnxt.brokerverse.report.render;
 
 import com.iortatechnxt.brokerverse.common.excel.SheetColumnWidths;
+import com.iortatechnxt.brokerverse.common.excel.SheetLogo;
 import com.iortatechnxt.brokerverse.common.office.BrandAssets;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
 import com.iortatechnxt.brokerverse.report.core.ReportResult;
 import com.iortatechnxt.brokerverse.report.core.ReportRow;
 import com.iortatechnxt.brokerverse.report.core.RowKind;
 import java.util.List;
-import org.apache.poi.ss.usermodel.ClientAnchor;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.util.Units;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
 /** Column widths and the logo of the Excel export of a report (see {@link XlsxReportRenderer}). */
@@ -64,27 +62,7 @@ final class XlsxReportLayout {
   static void logo(SXSSFWorkbook wb, Sheet sheet, double sheetPoints) {
     Row row = sheet.createRow(0);
     row.setHeightInPoints(LOGO_ROW_POINTS);
-    int picture = wb.addPicture(BrandAssets.logoPng(), Workbook.PICTURE_TYPE_PNG);
-    ClientAnchor anchor = wb.getCreationHelper().createClientAnchor();
-    double remaining = Math.min(LOGO_POINTS * BrandAssets.LOGO_RATIO, sheetPoints);
-    int col = 0;
-    double colPoints = columnPoints(sheet, col);
-    while (remaining > colPoints) {
-      remaining -= colPoints;
-      col++;
-      colPoints = columnPoints(sheet, col);
-    }
-    anchor.setCol1(0);
-    anchor.setRow1(0);
-    anchor.setCol2(col);
-    anchor.setRow2(0);
-    anchor.setDx2(Units.toEMU(remaining));
-    anchor.setDy2(Units.toEMU(LOGO_POINTS));
-    anchor.setAnchorType(ClientAnchor.AnchorType.MOVE_DONT_RESIZE);
-    sheet.createDrawingPatriarch().createPicture(anchor, picture);
-  }
-
-  static double columnPoints(Sheet sheet, int col) {
-    return sheet.getColumnWidth(col) / (double) UNITS_PER_CHAR * POINTS_PER_CHAR;
+    double height = Math.min(LOGO_POINTS, sheetPoints / BrandAssets.LOGO_RATIO);
+    SheetLogo.place(wb, sheet, height);
   }
 }

@@ -121,6 +121,9 @@ class ReportLayoutTest {
       }
       assertThat(firstColumn)
           .contains("Stage : Draft", "ARN-2026-000001", "Total Stage : Draft (2 records)");
+      Row detail = sheet.getRow(head.getRowNum() + 2);
+      assertThat(detail.getCell(2).getCellStyle().getIndention())
+          .isEqualTo(SheetColumnWidths.TEXT_INDENT);
       // The date column is wider than "02-Oct-2026" by the margin, so it never touches the
       // handler's name next to it.
       assertThat(sheet.getColumnWidth(1))

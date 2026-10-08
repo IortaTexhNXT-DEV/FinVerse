@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.prodrecon.service;
 
 import com.iortatechnxt.brokerverse.common.excel.SheetColumnWidths;
+import com.iortatechnxt.brokerverse.common.office.BrandAssets;
 import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.messaging.service.DocumentPasswordPolicy;
 import com.iortatechnxt.brokerverse.prodrecon.domain.ReconExtractLine;
@@ -18,6 +19,9 @@ import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.DefaultIndexedColorMap;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Component;
@@ -157,19 +161,29 @@ public class ProductionRegisterWorkbook {
     private final CellStyle amount;
 
     Styles(XSSFWorkbook wb) {
-      header = wb.createCellStyle();
+      XSSFCellStyle head = wb.createCellStyle();
+      header = head;
       Font font = wb.createFont();
       font.setBold(true);
       font.setColor(IndexedColors.WHITE.getIndex());
       header.setFont(font);
-      header.setFillForegroundColor(IndexedColors.DARK_BLUE.getIndex());
+      java.awt.Color brand = BrandAssets.color(BrandAssets.HEADER);
+      head.setFillForegroundColor(
+          new XSSFColor(
+              new byte[] {(byte) brand.getRed(), (byte) brand.getGreen(), (byte) brand.getBlue()},
+              new DefaultIndexedColorMap()));
       header.setFillPattern(FillPatternType.SOLID_FOREGROUND);
       header.setWrapText(true);
       header.setLocked(true);
+      header.setIndention(SheetColumnWidths.TEXT_INDENT);
+      // Texts start one indent from the cell border, so a date or amount of the column before
+      // never runs into them.
       locked = wb.createCellStyle();
       locked.setLocked(true);
+      locked.setIndention(SheetColumnWidths.TEXT_INDENT);
       open = wb.createCellStyle();
       open.setLocked(false);
+      open.setIndention(SheetColumnWidths.TEXT_INDENT);
       date = wb.createCellStyle();
       date.setLocked(true);
       date.setDataFormat(

@@ -26,6 +26,7 @@ MARGIN = 3
 MIN_CHARS = 6
 MAX_CHARS = 50
 ONE_LINE_HEADING = 20
+LOGO_HEIGHT_EMU = 22 * 12700  # the logo of the report header, 22 pt high
 
 
 def _clean(value) -> str:
@@ -64,6 +65,23 @@ def _header_row(ws, keep: list[str]) -> int | None:
     return None
 
 
+def _fix_images(ws) -> None:
+    """Anchors every picture (the logo) to its top left cell with its own size, so that a column widened or hidden
+    for the image never stretches it."""
+    from openpyxl.drawing.spreadsheet_drawing import OneCellAnchor
+    from openpyxl.drawing.xdr import XDRPositiveSize2D
+
+    for image in getattr(ws, "_images", []):
+        anchor = image.anchor
+        start = getattr(anchor, "_from", None)
+        if start is None or not image.height:
+            continue
+        to = getattr(anchor, "to", None)
+        cy = to.rowOff if to is not None and to.row == start.row and to.rowOff else LOGO_HEIGHT_EMU
+        cx = round(cy * image.width / image.height)
+        image.anchor = OneCellAnchor(_from=start, ext=XDRPositiveSize2D(cx, cy))
+
+
 def prepare_xlsx(path: str, options: dict) -> None:
     import openpyxl
     from openpyxl.utils import get_column_letter
@@ -100,10 +118,8 @@ def prepare_xlsx(path: str, options: dict) -> None:
             for image in getattr(ws, "_images", []):
                 anchor = getattr(image.anchor, "_from", None)
                 if anchor is not None and anchor.col < first_shown - 1:
-                    to = getattr(image.anchor, "to", None)
-                    if to is not None:
-                        to.col += first_shown - 1 - anchor.col
                     anchor.col = first_shown - 1
+        _fix_images(ws)
         for c in range(1, ws.max_column + 1):
             ws.column_dimensions[get_column_letter(c)].hidden = c not in shown
         start = (hr or 0) + 1
@@ -137,7 +153,8 @@ def prepare_xlsx(path: str, options: dict) -> None:
                 if not ws.row_dimensions[r].hidden:
                     chars = max(chars, max((len(x) for x in _shown(ws.cell(r, c)).split("\n")), default=0))
             dim = ws.column_dimensions[get_column_letter(c)]
-            if keep or (dim.width or 0) < min(chars + MARGIN, MAX_CHARS):
+            # A column only widens (the workbook sizes its columns from their content already).
+            if (dim.width or 0) < min(chars + MARGIN, MAX_CHARS):
                 dim.width = max(MIN_CHARS, min(chars + MARGIN, MAX_CHARS))
         ws.print_title_rows = None
         ws.print_title_cols = None

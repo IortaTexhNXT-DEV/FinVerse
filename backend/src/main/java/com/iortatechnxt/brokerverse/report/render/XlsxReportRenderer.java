@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.report.render;
 
+import com.iortatechnxt.brokerverse.common.excel.SheetColumnWidths;
 import com.iortatechnxt.brokerverse.common.office.BrandAssets;
 import com.iortatechnxt.brokerverse.common.office.PdfBrandFooter;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
@@ -244,14 +245,19 @@ public class XlsxReportRenderer implements ReportRenderer {
       headStyle.setBorderBottom(BorderStyle.THIN);
       headStyle.setWrapText(true);
       headStyle.setVerticalAlignment(VerticalAlignment.TOP);
+      headStyle.setIndention(SheetColumnWidths.TEXT_INDENT);
       head = headStyle;
       Font bodyFont = font(wb);
+      // Texts start one indent from the cell border, so a date or amount of the column before
+      // never runs into them.
       body = wb.createCellStyle();
       body.setFont(bodyFont);
+      body.setIndention(SheetColumnWidths.TEXT_INDENT);
       Font boldFont = font(wb);
       boldFont.setBold(true);
       bold = wb.createCellStyle();
       bold.setFont(boldFont);
+      bold.setIndention(SheetColumnWidths.TEXT_INDENT);
       date = wb.createCellStyle();
       date.setFont(bodyFont);
       date.setDataFormat(wb.createDataFormat().getFormat("dd-mmm-yyyy"));

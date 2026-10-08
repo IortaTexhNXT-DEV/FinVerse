@@ -47,13 +47,18 @@ final class SheetWriter {
       head.setFillPattern(FillPatternType.SOLID_FOREGROUND);
       head.setWrapText(true);
       head.setVerticalAlignment(VerticalAlignment.TOP);
+      head.setIndention(SheetColumnWidths.TEXT_INDENT);
+      // Texts start one indent from the cell border, so a date or amount of the column before never
+      // runs into them.
+      CellStyle text = wb.createCellStyle();
+      text.setIndention(SheetColumnWidths.TEXT_INDENT);
       CellStyle date = wb.createCellStyle();
       date.setDataFormat(
           wb.getCreationHelper().createDataFormat().getFormat(DisplayFormat.SHEET_DATE_FORMAT));
       CellStyle amount = wb.createCellStyle();
       amount.setDataFormat(
           wb.getCreationHelper().createDataFormat().getFormat(DisplayFormat.SHEET_AMOUNT_FORMAT));
-      CellStyles styles = new CellStyles(head, date, amount);
+      CellStyles styles = new CellStyles(head, text, date, amount);
       for (SheetSpec spec : specs) {
         writeSheet(wb.createSheet(spec.sheetName()), spec, styles);
       }
@@ -65,8 +70,8 @@ final class SheetWriter {
     }
   }
 
-  /** Cell styles of a workbook: heading row, dates and amounts. */
-  private record CellStyles(CellStyle head, CellStyle date, CellStyle amount) {}
+  /** Cell styles of a workbook: heading row, texts, dates and amounts. */
+  private record CellStyles(CellStyle head, CellStyle text, CellStyle date, CellStyle amount) {}
 
   private static void writeSheet(Sheet sheet, SheetSpec spec, CellStyles styles) {
     Row header = sheet.createRow(0);
@@ -109,8 +114,14 @@ final class SheetWriter {
         cell.setCellValue(d);
         cell.setCellStyle(styles.date());
       }
-      case Boolean b -> cell.setCellValue(Boolean.TRUE.equals(b) ? "Y" : "N");
-      default -> cell.setCellValue(value.toString());
+      case Boolean b -> {
+        cell.setCellValue(Boolean.TRUE.equals(b) ? "Y" : "N");
+        cell.setCellStyle(styles.text());
+      }
+      default -> {
+        cell.setCellValue(value.toString());
+        cell.setCellStyle(styles.text());
+      }
     }
   }
 }

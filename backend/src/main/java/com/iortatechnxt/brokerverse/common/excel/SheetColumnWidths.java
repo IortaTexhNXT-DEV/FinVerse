@@ -13,6 +13,9 @@ import org.apache.poi.ss.usermodel.Sheet;
  */
 public final class SheetColumnWidths {
 
+  /** Indent of the texts of a sheet: a text never touches the date or amount before it. */
+  public static final short TEXT_INDENT = 1;
+
   /** Characters added to the longest value (the gap to the next column). */
   public static final int MARGIN = 3;
 

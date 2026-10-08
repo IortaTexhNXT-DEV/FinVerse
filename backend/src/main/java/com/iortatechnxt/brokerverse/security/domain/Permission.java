@@ -457,6 +457,8 @@ public enum Permission {
   SBM_INTAKE,
   // Processing runs, fallout, manual disposition, renewal hand-off, insurer re-assignment (09, 32)
   SBM_PROCESS,
+  // Renewal proposals with nominated rates and the preferred insurer (BRIDSP-18, 19)
+  SBM_PROPOSAL,
   // Rule sets, limit, insurer and letter rules, approval matrices: maker and checker (08)
   SBM_RULE_MAINTAIN,
   SBM_RULE_APPROVE,

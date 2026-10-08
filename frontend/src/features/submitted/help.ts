@@ -5,7 +5,7 @@ export const SUBMITTED_HELP: HelpSection = {
   id: 'submitted',
   module: 'Submitted Policies',
   intro:
-    'Submitted Policies keeps the masterlist of the policies the bank submits: the uploads of each source and the documents read by extraction, the processing run (sanitation, matching with the LAMD loan report, classification, disposition and insurer limits), the policy reviews with their IAAF, the Terms of Reference of the policies above the limits, the hand-off to Renewal, the letters, the handling fees and the No Touch billing. The reports are in the Report Centre under Submitted Policies.',
+    'Submitted Policies keeps the masterlist of the policies the bank submits: the uploads of each source and the documents read by extraction, the processing run (sanitation, matching with the loan files of the bank - LAMD, LMS and LAD - on the PN number then the loan application number, classification, disposition and insurer limits), the policy reviews with their IAAF, the Terms of Reference of the policies above the limits, the hand-off to Renewal, the letters, the handling fees and the No Touch billing. The reports are in the Report Centre under Submitted Policies.',
   screens: [
     {
       name: 'Submitted Policies Home',
@@ -44,7 +44,7 @@ export const SUBMITTED_HELP: HelpSection = {
       name: 'Upload & Intake',
       path: '/submitted/intake',
       summary:
-        'The uploads of the sources (LFS, HLS, CIU, SPI, Loan Booking, IA masterlist), the LAMD loan snapshot and the migration of the Excel masterlists, with the intake runs.',
+        'The uploads of the sources (LFS, HLS, CIU, SPI, Loan Booking, IA masterlist), the loan files (LAMD, LMS or LAD) and the migration of the Excel masterlists, with the intake runs.',
       workflow: [
         'Choose the source, download its template, upload the file, check the validation and commit.',
         'A committed intake starts a processing run of the new records.',
@@ -69,8 +69,14 @@ export const SUBMITTED_HELP: HelpSection = {
       path: '/submitted/runs',
       summary:
         'The processing runs with their counts and the result of every step for each record.',
-      workflow: ['Open a run to see its results; the Fallout filter shows the records to fix.'],
-      controls: ['The rules applied are the active rule sets approved in Setup.'],
+      workflow: [
+        'Open a run to see its results; the Fallout filter shows the records to fix.',
+        'Loan File Results shows, for each record, the loan file and the key that matched it (PN number, then loan application number); Unmatched Loans lists the records no loan file holds, with the reason.',
+      ],
+      controls: [
+        'The rules applied are the active rule sets approved in Setup.',
+        'When two loan reports of the same day hold the same loan, LAMD is used first, then LMS, then LAD.',
+      ],
     },
     {
       name: 'Reviews & IAAF',
@@ -108,6 +114,23 @@ export const SUBMITTED_HELP: HelpSection = {
         'Re-assign the insurer while its hold cover is not accepted.',
       ],
       controls: ['A hand-off Renewal did not take is offered again by the next scan.'],
+    },
+    {
+      name: 'Renewal Proposals',
+      path: '/submitted/proposals',
+      summary:
+        'Renewal proposals of the policies for renewal at the nominated package rates, grouped in batches for the Team Lead, and the nominated rates.',
+      workflow: [
+        'Select policies for renewal and click Create Proposals: the insurer of the rules and its nominated rate are proposed with the premium.',
+        'Edit the rate for all selected policies, or only for a vehicle classification or an insurer, with a reason, then Generate: one proposal per policy in a batch, For Review.',
+        'The Team Lead releases a proposal or returns it with a reason; a returned proposal is generated again as its next version.',
+        'Assign a preferred insurer to proposals for review: its nominated rate is applied again.',
+      ],
+      controls: [
+        'A proposal is released by someone other than its maker.',
+        'Every edited rate is kept with the nominated rate and the reason.',
+        'Nominated rates are authorized by a second user before they are proposed.',
+      ],
     },
     {
       name: 'Letters & Print Batches',

@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.report.render;
 import com.iortatechnxt.brokerverse.common.office.BrandAssets;
 import com.iortatechnxt.brokerverse.common.office.PdfBrandFooter;
 import com.iortatechnxt.brokerverse.common.office.PdfColumnWidths;
+import com.iortatechnxt.brokerverse.common.office.PdfWordBreaks;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.report.core.ColumnType;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
@@ -268,7 +269,7 @@ public class PdfReportRenderer implements ReportRenderer {
   }
 
   private static PdfPCell cell(String text, Font font, int align, Color bg) {
-    PdfPCell cell = new PdfPCell(new Phrase(text, font));
+    PdfPCell cell = new PdfPCell(PdfWordBreaks.phrase(text, font));
     cell.setHorizontalAlignment(align);
     cell.setPadding(CELL_PADDING);
     cell.setBorderColor(GRID);

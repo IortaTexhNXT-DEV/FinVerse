@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.docgen.service;
 import com.iortatechnxt.brokerverse.common.office.BrandAssets;
 import com.iortatechnxt.brokerverse.common.office.PdfBrandFooter;
 import com.iortatechnxt.brokerverse.common.office.PdfColumnWidths;
+import com.iortatechnxt.brokerverse.common.office.PdfWordBreaks;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec.Field;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec.Fields;
@@ -260,7 +261,7 @@ public class DocumentComposer {
   }
 
   private static PdfPCell cell(String text, Font font, Color background, int alignment) {
-    PdfPCell c = new PdfPCell(new Phrase(text, font));
+    PdfPCell c = new PdfPCell(PdfWordBreaks.phrase(text, font));
     c.setPadding(PADDING);
     c.setBorderColor(GRID);
     c.setHorizontalAlignment(alignment);

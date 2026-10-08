@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.util.List;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -47,10 +48,12 @@ final class SheetWriter {
       head.setFillPattern(FillPatternType.SOLID_FOREGROUND);
       head.setWrapText(true);
       head.setVerticalAlignment(VerticalAlignment.TOP);
+      head.setAlignment(HorizontalAlignment.LEFT);
       head.setIndention(SheetColumnWidths.TEXT_INDENT);
       // Texts start one indent from the cell border, so a date or amount of the column before never
       // runs into them.
       CellStyle text = wb.createCellStyle();
+      text.setAlignment(HorizontalAlignment.LEFT);
       text.setIndention(SheetColumnWidths.TEXT_INDENT);
       CellStyle date = wb.createCellStyle();
       date.setDataFormat(

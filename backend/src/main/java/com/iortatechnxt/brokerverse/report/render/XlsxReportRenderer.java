@@ -25,6 +25,7 @@ import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.Footer;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.PrintSetup;
 import org.apache.poi.ss.usermodel.Row;
@@ -245,6 +246,7 @@ public class XlsxReportRenderer implements ReportRenderer {
       headStyle.setBorderBottom(BorderStyle.THIN);
       headStyle.setWrapText(true);
       headStyle.setVerticalAlignment(VerticalAlignment.TOP);
+      headStyle.setAlignment(HorizontalAlignment.LEFT);
       headStyle.setIndention(SheetColumnWidths.TEXT_INDENT);
       head = headStyle;
       Font bodyFont = font(wb);
@@ -252,11 +254,13 @@ public class XlsxReportRenderer implements ReportRenderer {
       // never runs into them.
       body = wb.createCellStyle();
       body.setFont(bodyFont);
+      body.setAlignment(HorizontalAlignment.LEFT);
       body.setIndention(SheetColumnWidths.TEXT_INDENT);
       Font boldFont = font(wb);
       boldFont.setBold(true);
       bold = wb.createCellStyle();
       bold.setFont(boldFont);
+      bold.setAlignment(HorizontalAlignment.LEFT);
       bold.setIndention(SheetColumnWidths.TEXT_INDENT);
       date = wb.createCellStyle();
       date.setFont(bodyFont);

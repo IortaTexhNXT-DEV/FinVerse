@@ -189,6 +189,7 @@ final class AccessMatrixWorkbook {
       headFont.setBold(true);
       headFont.setColor(color("FFFFFF"));
       head = heading(wb, headFont, brand);
+      head.setAlignment(HorizontalAlignment.LEFT);
       head.setIndention(SheetColumnWidths.TEXT_INDENT);
       XSSFCellStyle up = heading(wb, headFont, brand);
       up.setRotation(UPRIGHT);
@@ -196,6 +197,7 @@ final class AccessMatrixWorkbook {
       up.setVerticalAlignment(VerticalAlignment.BOTTOM);
       upright = up;
       body = bordered(wb);
+      body.setAlignment(HorizontalAlignment.LEFT);
       body.setIndention(SheetColumnWidths.TEXT_INDENT);
       mark = bordered(wb);
       mark.setAlignment(HorizontalAlignment.CENTER);

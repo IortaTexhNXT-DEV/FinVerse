@@ -17,6 +17,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.DefaultIndexedColorMap;
@@ -175,14 +176,17 @@ public class ProductionRegisterWorkbook {
       header.setFillPattern(FillPatternType.SOLID_FOREGROUND);
       header.setWrapText(true);
       header.setLocked(true);
+      header.setAlignment(HorizontalAlignment.LEFT);
       header.setIndention(SheetColumnWidths.TEXT_INDENT);
       // Texts start one indent from the cell border, so a date or amount of the column before
       // never runs into them.
       locked = wb.createCellStyle();
       locked.setLocked(true);
+      locked.setAlignment(HorizontalAlignment.LEFT);
       locked.setIndention(SheetColumnWidths.TEXT_INDENT);
       open = wb.createCellStyle();
       open.setLocked(false);
+      open.setAlignment(HorizontalAlignment.LEFT);
       open.setIndention(SheetColumnWidths.TEXT_INDENT);
       date = wb.createCellStyle();
       date.setLocked(true);

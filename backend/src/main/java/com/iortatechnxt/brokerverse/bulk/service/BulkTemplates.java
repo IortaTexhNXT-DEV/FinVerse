@@ -58,7 +58,10 @@ final class BulkTemplates {
         handler.filledBy(),
         handler.uploadPath()
             + ": download this template, fill it in, upload it, check the validation result of"
-            + " every row, then commit the valid rows.",
+            + (handler.approvePermission() == null
+                ? " every row, then commit the valid rows."
+                : " every row and whether it adds or updates a record, then submit it; the valid"
+                    + " rows are applied when a second user approves the upload."),
         rules(handler, maxRows),
         List.of(sheet),
         maxRows);

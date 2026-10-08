@@ -189,6 +189,50 @@ public interface BulkImportHandler {
   }
 
   /**
+   * Permission of the second user who approves an upload before its rows are applied (the
+   * configuration uploads). Null (the default): the uploader commits the valid rows himself.
+   *
+   * @return approval permission or null
+   */
+  default String approvePermission() {
+    return null;
+  }
+
+  /**
+   * What applying a valid row would do, shown in the preview: {@code ADD} a new record or {@code
+   * UPDATE} the existing record with the same natural key. Null (the default) when the handler does
+   * not tell.
+   *
+   * @param row valid row
+   * @param context run context
+   * @return ADD, UPDATE or null
+   */
+  default String previewAction(BulkRow row, BulkContext context) {
+    return null;
+  }
+
+  /**
+   * Whether the current data can be downloaded in the layout of the template (round trip of the
+   * configuration uploads).
+   *
+   * @return true when {@link #exportRows} is implemented
+   */
+  default boolean exportable() {
+    return false;
+  }
+
+  /**
+   * The current data of the company in the layout of the template: one map of values by header per
+   * row, as they would be uploaded.
+   *
+   * @param companyId company
+   * @return rows
+   */
+  default List<java.util.Map<String, String>> exportRows(Long companyId) {
+    return List.of();
+  }
+
+  /**
    * Upper-cases and removes spaces (helper for identifiers such as plate or engine numbers).
    *
    * @param value value

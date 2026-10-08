@@ -121,6 +121,15 @@
     <Package name="com.iortatechnxt.brokerverse.configpromo.engine"/>
     <Bug pattern="SQL_INJECTION_SPRING_JDBC"/>
   </Match>
+  <!--
+    The uploads of the configuration screens write the records of a row by natural key: the table
+    and column names come from the upload handlers (constants) and are checked against the schema
+    read from the database; every value is a bound parameter.
+  -->
+  <Match>
+    <Class name="com.iortatechnxt.brokerverse.configpromo.upload.UploadSupport"/>
+    <Bug pattern="SQL_INJECTION_SPRING_JDBC"/>
+  </Match>
   <!-- Generated/test code is not part of the production artefact. -->
   <Match>
     <Class name="~.*Test.*"/>

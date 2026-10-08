@@ -69,6 +69,8 @@ final class BulkWorkbooks {
   private static String statusText(BulkJobStatus status) {
     return switch (status) {
       case VALIDATED -> "Validated, waiting for commit";
+      case SUBMITTED -> "Submitted, waiting for approval";
+      case REJECTED -> "Rejected";
       case COMPLETED -> "Completed";
       case CANCELLED -> "Cancelled";
     };

@@ -21,6 +21,11 @@ import java.time.Instant;
  * @param createdAt uploaded at
  * @param completedAt completed or cancelled at
  * @param fileSha256 SHA-256 of the uploaded file
+ * @param submittedBy user who submitted the upload for approval
+ * @param submittedAt time of the submission
+ * @param decidedBy approver or rejecter
+ * @param decidedAt time of the decision
+ * @param decisionNote remarks of the decision
  * @param reprocessCount times the failed rows were reprocessed
  */
 public record BulkJobResponse(
@@ -38,7 +43,12 @@ public record BulkJobResponse(
     Instant createdAt,
     Instant completedAt,
     String fileSha256,
-    int reprocessCount) {
+    int reprocessCount,
+    String submittedBy,
+    Instant submittedAt,
+    String decidedBy,
+    Instant decidedAt,
+    String decisionNote) {
 
   /**
    * Maps a job.
@@ -62,6 +72,11 @@ public record BulkJobResponse(
         j.getCreatedAt(),
         j.getCompletedAt(),
         j.getFileSha256(),
-        j.getReprocessCount());
+        j.getReprocessCount(),
+        j.getSubmittedBy(),
+        j.getSubmittedAt(),
+        j.getDecidedBy(),
+        j.getDecidedAt(),
+        j.getDecisionNote());
   }
 }

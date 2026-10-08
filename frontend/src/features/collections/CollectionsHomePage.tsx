@@ -49,13 +49,16 @@ function AgingChart({ cells }: Readonly<{ cells: AgingCell[] }>) {
               title={`${b.bracket} days: ${countOf(b.items, 'account')}, ${formatAmount(b.amount)}`}
             >
               <span className="clx-aging-label" role="rowheader">
-                {b.bracket}
+                {b.bracket} days
               </span>
               <span className="clx-aging-track" role="cell" aria-hidden="true">
                 <span className="clx-aging-bar" style={{ width: `${b.share * 100}%` }} />
               </span>
               <span className="clx-aging-value" role="cell">
-                {formatAmount(b.amount)} · {b.items}
+                {formatAmount(b.amount)}
+              </span>
+              <span className="clx-aging-count" role="cell">
+                {countOf(b.items, 'account')}
               </span>
             </div>
           ))}

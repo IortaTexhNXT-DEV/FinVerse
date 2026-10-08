@@ -5,6 +5,7 @@ import {
   nounFor,
   pluralOf,
   sentenceCase,
+  readableText,
   splitTrailingAmount,
 } from './wording';
 
@@ -61,5 +62,17 @@ describe('wording', () => {
       text: 'Funding PHP 500.00: payroll',
     });
     expect(splitTrailingAmount('PHP 500.00')).toEqual({ text: 'PHP 500.00' });
+  });
+
+  it('writes dates in texts as dd-MMM-yyyy', () => {
+    expect(readableText('Jose Miguel Reyes - PAR01 - expires 2027-12-01')).toBe(
+      'Jose Miguel Reyes - PAR01 - expires 01-Dec-2027',
+    );
+    expect(readableText('loss of 2026-10-06, PHP 12500.50')).toBe(
+      'loss of 06-Oct-2026, PHP 12,500.50',
+    );
+    expect(splitTrailingAmount('Renewal - expires 2026-11-28').text).toBe(
+      'Renewal - expires 28-Nov-2026',
+    );
   });
 });

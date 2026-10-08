@@ -319,7 +319,7 @@
 .stage-groups {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: var(--space-2);
 }
 
 /* One line per workflow: its name, then its stage tiles */
@@ -331,7 +331,7 @@
 }
 
 .stage-group + .stage-group {
-  padding-top: var(--space-3);
+  padding-top: var(--space-2);
   border-top: 1px solid var(--color-border);
 }
 
@@ -344,16 +344,20 @@
 
 .stage-tiles {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(184px, 1fr));
-  gap: var(--space-3);
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--space-2);
 }
 
 .stage-tile {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'name count'
+    'meta count';
+  align-items: center;
+  column-gap: var(--space-2);
   min-width: 0;
-  min-height: 84px;
+  min-height: 56px;
   padding: var(--space-2) var(--space-3);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
@@ -371,6 +375,7 @@
 }
 
 .stage-tile-name {
+  grid-area: name;
   font-size: 13px;
   font-weight: 600;
   color: var(--color-text-muted);
@@ -380,6 +385,7 @@
 }
 
 .stage-tile-count {
+  grid-area: count;
   font-family: var(--font-heading);
   font-size: 24px;
   line-height: 30px;
@@ -389,6 +395,7 @@
 }
 
 .stage-tile-meta {
+  grid-area: meta;
   display: flex;
   gap: var(--space-2);
   min-height: 16px;
@@ -829,4 +836,10 @@
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+/* My Work: the description keeps one line at the column width (full text in the tooltip) */
+.queue-description {
+  display: block;
+  max-width: 320px;
 }

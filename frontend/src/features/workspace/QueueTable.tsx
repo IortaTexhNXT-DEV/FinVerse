@@ -8,6 +8,7 @@ import {
   useSalesUnitNameOrNull,
 } from '@/components/broking/useLabels';
 import { DataTable } from '@/components/ui/DataTable';
+import { CellStack } from '@/components/ui/CellStack';
 import { DueDate } from '@/components/ui/DueDate';
 import { RowActions } from '@/components/ui/RowActions';
 import { StatusBadge } from '@/components/ui/StatusBadge';
@@ -26,8 +27,9 @@ interface QueueTableProps {
 }
 
 /**
- * Work items with reference, record type, description (the name, one line) and its amount in a
- * right-aligned column of its own ("PHP 2,500.00"), stage, origin, age, due time, assignee, and
+ * Work items with reference, record type, description (the name, one line, with the unit it comes
+ * from under it) and its amount in a right-aligned column of its own ("PHP 2,500.00"), stage, due
+ * time with the time in stage under it, assignee, and
  * Claim / Assign in the row action menu (screen standard: one menu button at the end of the
  * row). The record type has its own column, never a word beside the stage pill.
  */
@@ -50,21 +52,32 @@ export function QueueTable(p: Readonly<QueueTableProps>) {
         {
           key: 'type',
           header: 'Type',
-          width: '160px',
+          width: '128px',
           truncate: true,
           render: (i) => workflowRecordType(i.workflowCode),
         },
         {
           key: 'title',
-          header: 'Description',
-          truncate: true,
-          render: (i) => splitTrailingAmount(i.title).text,
+          header: 'Description / From',
+          width: '240px',
+          render: (i) => (
+            <CellStack
+              main={<TruncatedText text={splitTrailingAmount(i.title).text} />}
+              sub={
+                i.originatingUnit ? (
+                  <OriginUnit code={i.originatingUnit} />
+                ) : (
+                  <UserName login={i.createdBy} truncate />
+                )
+              }
+            />
+          ),
         },
         {
           key: 'amount',
           header: 'Amount',
           kind: 'amount',
-          width: '152px',
+          width: '136px',
           render: (i) => {
             const { currency, amount } = splitTrailingAmount(i.title);
             return amount === undefined ? '' : formatMoney(currency, amount);
@@ -77,34 +90,20 @@ export function QueueTable(p: Readonly<QueueTableProps>) {
           render: (i) => <StatusBadge status={i.stageCode} workflow={i.workflowCode} />,
         },
         {
-          key: 'unit',
-          header: 'From',
-          width: '180px',
-          truncate: true,
-          render: (i) =>
-            i.originatingUnit ? (
-              <OriginUnit code={i.originatingUnit} />
-            ) : (
-              <UserName login={i.createdBy} truncate />
-            ),
-        },
-        {
-          key: 'age',
-          header: 'In Stage',
-          kind: 'amount',
-          width: '96px',
-          render: (i) => ageText(i.stageEnteredAt),
-        },
-        {
           key: 'due',
-          header: 'Due',
+          header: 'Due / In Stage',
           kind: 'datetime',
-          render: (i) => <DueDate at={i.dueAt} overdue={i.overdue} />,
+          render: (i) => (
+            <CellStack
+              main={<DueDate at={i.dueAt} overdue={i.overdue} />}
+              sub={<span className="num">{ageText(i.stageEnteredAt)} in stage</span>}
+            />
+          ),
         },
         {
           key: 'assignee',
           header: 'Assignee',
-          width: '180px',
+          width: '150px',
           truncate: true,
           render: (i) => <UserName login={i.assignee} empty="Unassigned" truncate />,
         },
@@ -156,6 +155,15 @@ function OriginUnit({ code }: Readonly<{ code: string }>) {
   return (
     <span className="truncate" title={name}>
       {name}
+    </span>
+  );
+}
+
+/** A text kept on one line, cut at the column width with the full text in the tooltip. */
+function TruncatedText({ text }: Readonly<{ text: string }>) {
+  return (
+    <span className="truncate queue-description" title={text}>
+      {text}
     </span>
   );
 }

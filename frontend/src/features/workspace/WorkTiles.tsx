@@ -1,4 +1,6 @@
-import { AlarmClock } from 'lucide-react';
+import { AlarmClock, ChevronDown, ChevronUp } from 'lucide-react';
+import { useState } from 'react';
+import { Button } from '@/components/ui/Button';
 import { WORKFLOW_NAMES, workflowRecordType } from '@/api/workflow';
 import type { QueueCount } from '@/api/workflow';
 import { Card } from '@/components/ui/Card';
@@ -68,35 +70,59 @@ function workflowTitle(workflow: string): string {
   return name === '' ? humanize(workflow) : titleCase(name);
 }
 
+/** Number of workflows from which the stage tiles start folded. */
+const FOLDED_FROM = 3;
+
 /**
- * The stages the user works, in one card: one line per workflow with its name, then a compact
+ * The stages the user works, in one card (folded when the user works more than three workflows): one line per workflow with its name, then a compact
  * tile per stage (open count, overdue and mine) that filters the queue below.
  */
 export function StageTiles({ counts, filters, onFilter }: Readonly<TilesProps>) {
+  const [shown, setShown] = useState<boolean>();
   const groups = new Map<string, QueueCount[]>();
   counts.forEach((c) => groups.set(c.workflowCode, [...(groups.get(c.workflowCode) ?? []), c]));
   if (groups.size === 0) {
     return null;
   }
+  // Many queues: the stages fold away by default so the queue itself starts on the first screen.
+  const open = shown ?? groups.size <= FOLDED_FROM;
   return (
-    <Card title="Queues by Stage" callout="queues-by-stage">
-      <div className="stage-groups">
-        {[...groups.entries()].map(([workflow, stages]) => (
-          <div key={workflow} className="stage-group">
-            <h3 className="stage-group-name">{workflowTitle(workflow)}</h3>
-            <div className="stage-tiles">
-              {stages.map((s) => (
-                <StageTile
-                  key={s.stageCode}
-                  count={s}
-                  active={filters.workflow === workflow && filters.stage === s.stageCode}
-                  onClick={() => onFilter({ workflow, stage: s.stageCode, scope: 'ALL' })}
-                />
-              ))}
+    <Card
+      title="Queues by Stage"
+      callout="queues-by-stage"
+      actions={
+        groups.size > FOLDED_FROM && (
+          <Button
+            variant="ghost"
+            size="sm"
+            aria-expanded={open}
+            icon={open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+            onClick={() => setShown(!open)}
+          >
+            {open ? 'Hide Stages' : `Show ${countOf(counts.length, 'Stage')}`}
+          </Button>
+        )
+      }
+    >
+      {open && (
+        <div className="stage-groups">
+          {[...groups.entries()].map(([workflow, stages]) => (
+            <div key={workflow} className="stage-group">
+              <h3 className="stage-group-name">{workflowTitle(workflow)}</h3>
+              <div className="stage-tiles">
+                {stages.map((s) => (
+                  <StageTile
+                    key={s.stageCode}
+                    count={s}
+                    active={filters.workflow === workflow && filters.stage === s.stageCode}
+                    onClick={() => onFilter({ workflow, stage: s.stageCode, scope: 'ALL' })}
+                  />
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </Card>
   );
 }

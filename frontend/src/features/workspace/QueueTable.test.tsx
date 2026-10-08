@@ -171,8 +171,9 @@ describe('QueueTable', () => {
       item({ id: 3, reference: 'PRF-2026-900005' }),
     ]);
     vi.useRealTimers();
-    const age = screen.getByText('22 days');
-    expect(age.closest('td')).toHaveClass('num');
+    // The time in stage is the second line of the due cell, in tabular figures.
+    const age = screen.getByText('22 days in stage');
+    expect(age).toHaveClass('num');
     const late = screen.getByText('10-Sep-2026 10:00').closest('.due-date');
     expect(late).toHaveClass('overdue');
     expect(late?.textContent).toContain('Overdue');
@@ -189,11 +190,14 @@ describe('QueueTable', () => {
     setUserDirectory([{ username: 'ao', displayName: 'Aileen Account Officer' }]);
     show([item({ id: 1, assignee: 'ao' })]);
     const names = screen.getAllByText('Aileen Account Officer');
+    // The assignee column and the "from" line under the description.
+    expect(names).toHaveLength(2);
     for (const name of names) {
       expect(name).toHaveClass('truncate');
       expect(name).toHaveAttribute('title', 'Aileen Account Officer (ao)');
-      expect(name.closest('td')).toHaveClass('col-truncate');
     }
+    expect(names.some((n) => n.closest('td')?.classList.contains('col-truncate'))).toBe(true);
+    expect(screen.getByText('Bayside Builders Co.')).toHaveAttribute('title', 'Bayside Builders Co.');
     setUserDirectory([]);
   });
 

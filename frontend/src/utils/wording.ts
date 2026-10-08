@@ -1,5 +1,5 @@
 import { acronymOf } from './acronyms';
-import { formatAmount } from './format';
+import { formatAmount, formatDate } from './format';
 
 /**
  * Wording helpers for counts, names and amounts inside texts: the noun of a count in the right
@@ -92,6 +92,19 @@ export function formatMoneyInText(text: string): string {
   );
 }
 
+/** A calendar date written in a text as yyyy-MM-dd. */
+const ISO_DATE_IN_TEXT = /\b(\d{4}-\d{2}-\d{2})(?![\d:T])/g;
+
+/** Dates written in a text as yyyy-MM-dd read dd-MMM-yyyy ("expires 2027-12-01" → "expires 01-Dec-2027"). */
+export function formatDatesInText(text: string): string {
+  return text.replace(ISO_DATE_IN_TEXT, (iso: string) => formatDate(iso));
+}
+
+/** A text from the server as users read it: dates dd-MMM-yyyy and amounts with separators. */
+export function readableText(text: string): string {
+  return formatMoneyInText(formatDatesInText(text));
+}
+
 /** A text split into its words and the amount it ends with ("Maria Clara Santos PHP 500.00"). */
 export interface TextWithAmount {
   text: string;
@@ -110,7 +123,7 @@ export function splitTrailingAmount(description: string): TextWithAmount {
   const match = TRAILING_MONEY.exec(description.trim());
   const amount = match === null ? Number.NaN : Number((match[3] ?? '').replace(/,/g, ''));
   if (match === null || (match[1] ?? '').trim() === '' || !Number.isFinite(amount)) {
-    return { text: formatMoneyInText(description) };
+    return { text: readableText(description) };
   }
-  return { text: formatMoneyInText((match[1] ?? '').trim()), currency: match[2], amount };
+  return { text: readableText((match[1] ?? '').trim()), currency: match[2], amount };
 }

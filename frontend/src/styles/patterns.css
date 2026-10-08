@@ -1181,9 +1181,13 @@ dl.form-grid dd {
 .kpi-tile {
   display: flex;
   flex-direction: column;
-  min-height: 168px;
+  min-height: 112px;
   padding: var(--space-4) var(--space-5);
   border-top: 4px solid var(--brand-blue);
+}
+
+.kpi-tile:has(.kpi-tile-detail) {
+  min-height: 168px;
 }
 
 .kpi-tile-alert {
@@ -1317,7 +1321,8 @@ a.kpi-list-row:focus-visible {
   min-width: 200px;
 }
 
-.filter-toggle {
+.filter-toggle,
+.worklist-toolbar label.checkbox {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
@@ -1333,20 +1338,23 @@ a.kpi-list-row:focus-visible {
   cursor: pointer;
 }
 
-.filter-toggle input {
+.filter-toggle input,
+.worklist-toolbar label.checkbox input {
   width: 16px;
   height: 16px;
   margin: 0;
   accent-color: var(--brand-blue);
 }
 
-.filter-toggle.checked {
+.filter-toggle.checked,
+.worklist-toolbar label.checkbox:has(input:checked) {
   border-color: var(--brand-blue);
   background: var(--brand-blue-050);
   color: var(--brand-blue);
 }
 
-.filter-toggle:focus-within {
+.filter-toggle:focus-within,
+.worklist-toolbar label.checkbox:focus-within {
   box-shadow: var(--focus-ring);
 }
 
@@ -1723,4 +1731,16 @@ a.card.kpi:focus-visible .kpi-label {
   white-space: normal;
   overflow-wrap: normal;
   text-wrap: balance;
+}
+
+/* ---------- Column widths: a code column keeps its width, a text column keeps readable lines --- */
+/* The second line of a code cell (the name under a programme or request number) wraps within the
+   code column instead of widening it; a two-line text cell (client, risk and insurer) is never
+   squeezed to one word per line. */
+.table td.col-code .cell-stack > :not(:first-child):not(.nowrap) {
+  white-space: normal;
+}
+
+.table td:has(> .cell-stack):not(.col-code, .num, .col-status, .col-date, .col-datetime) {
+  min-width: 152px;
 }

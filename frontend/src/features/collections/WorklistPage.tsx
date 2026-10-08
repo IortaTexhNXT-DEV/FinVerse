@@ -3,6 +3,7 @@ import { FileSpreadsheet } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/auth/authContext';
+import { LovLabel, SalesUnitName } from '@/components/broking/LovLabel';
 import { selectionColumn, useRowSelection } from '@/components/broking/rowSelection';
 import { WorklistToolbar } from '@/components/broking/WorklistToolbar';
 import { Button } from '@/components/ui/Button';
@@ -84,7 +85,12 @@ const COLUMNS: Column<CollectionItem>[] = [
   {
     key: 'segment',
     header: 'Segment / Unit',
-    render: (i) => [i.segment, i.salesUnit].filter(Boolean).join(' / '),
+    render: (i) => (
+      <CellStack
+        main={i.segment ? <LovLabel type="MARKET_SEGMENT" code={i.segment} /> : ''}
+        sub={i.salesUnit ? <SalesUnitName code={i.salesUnit} /> : undefined}
+      />
+    ),
   },
   {
     key: 'aging',

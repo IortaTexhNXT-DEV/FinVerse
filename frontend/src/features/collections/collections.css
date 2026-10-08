@@ -58,7 +58,7 @@
 
 .clx-aging-row {
   display: grid;
-  grid-template-columns: 72px minmax(0, 1fr) 140px;
+  grid-template-columns: 96px minmax(0, 1fr) 128px 96px;
   align-items: center;
   gap: var(--space-3);
   font-size: 13px;
@@ -70,12 +70,14 @@
 }
 
 .clx-aging-track {
+  display: block;
   height: 16px;
   border-radius: 0 4px 4px 0;
   background: var(--brand-blue-050);
 }
 
 .clx-aging-bar {
+  display: block;
   height: 100%;
   min-width: 2px;
   border-radius: 0 4px 4px 0;
@@ -88,7 +90,15 @@
 
 .clx-aging-value {
   text-align: right;
-  color: var(--color-text);
+  color: var(--color-heading);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.clx-aging-count {
+  text-align: right;
+  color: var(--color-text-muted);
+  white-space: nowrap;
 }
 
 .clx-lock-banner {

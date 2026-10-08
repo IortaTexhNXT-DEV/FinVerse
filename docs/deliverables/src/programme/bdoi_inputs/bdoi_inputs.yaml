@@ -1,0 +1,333 @@
+# Source of the two BDOI input workbooks of the programme (request of the BDOI product owner, 8 October 2026):
+#   (A) BIBS_Inputs_BRD-00_BDOI_Requirements_and_Inputs_by_BRD_v1.0.xlsx - what the project needs from the BDOI
+#       business users, one tab per BRD;
+#   (B) BIBS_Templates_BRD-00_Master_Data_and_Configuration_Upload_Templates_v1.0.xlsx and its short Word guide
+#       (MASTER_DATA_GUIDE.md) - every master, reference and configuration dataset BIBS needs before go-live.
+# Built by build_bdoi_inputs.py (same folder):
+#   python docs/deliverables/src/programme/bdoi_inputs/build_bdoi_inputs.py            # both workbooks and the guide
+#   python docs/deliverables/src/programme/bdoi_inputs/build_bdoi_inputs.py --check    # checks only
+#
+# What is typed here and what is read:
+#   * typed: the tabs, owners and default dates of workbook A, the rules that give each row its type, the
+#     reinsurance (phase 2) rows, the test-data and sign-off rows, and for workbook B the groups, the extra
+#     templates, the dependencies between the templates of the different sources and the gap notes;
+#   * read: the proposed rules and clarifications and the open questions of every FRS and of the BRD-13 handbook
+#     (pack/catalogue.yaml), the discrepancy and clarification register, the Drop 0 configuration register
+#     (Drop-0_Closure/drop0.yaml), the earlier Drop 0 requirements list (drop0_requirements.yaml), the NFR
+#     catalogue, the project plan (milestones, sign-offs, dependencies) and, for workbook B, the configuration input
+#     templates of BRD-03, BRD-11 and Drop 0, the Migration Console layouts and the upload definitions of the
+#     platform.
+
+meta:
+  version: "1.0"
+  date: 8 October 2026
+  today: 2026-10-08
+  title_a: BDOI Requirements and Inputs by BRD
+  title_b: Master Data and Configuration Upload Templates
+  title_guide: Master Data Upload Guide
+
+# ------------------------------------------------------------------------------------------- workbook A: tabs
+# brd: tab key; sheet: tab name; owner: BDOI owner (role) of the BRD; due: default Needed by (the FRS or sign-off
+# set sign-off of the project plan); drop.
+tabs:
+  - {brd: BRD-00, sheet: "BRD-00 Cross-cutting", name: "Core Replacement and cross-cutting points", drop: Programme,
+     owner: "BIBS Product Owner with the Program Manager, Business Project Services", due: 2026-11-30}
+  - {brd: BRD-01, sheet: "BRD-01 New Business", name: New Business, drop: "Drop 1",
+     owner: "Product Owner, New Business", due: 2026-11-30}
+  - {brd: BRD-02, sheet: "BRD-02 Operations", name: Operations, drop: "Drop 1",
+     owner: "Head, Operations Services", due: 2026-11-30}
+  - {brd: BRD-03, sheet: "BRD-03 Product Maintenance", name: Product Maintenance, drop: "Drop 0",
+     owner: "Product Owner, Marketing Business System (MBS)", due: 2026-11-30}
+  - {brd: BRD-04, sheet: "BRD-04 Collections", name: Collections, drop: "Drop 1",
+     owner: "VP and Head, BDOI Operations (Collections)", due: 2026-11-30}
+  - {brd: BRD-05, sheet: "BRD-05 Accounting and ACSL", name: "Accounting, Disbursement and ACSL", drop: "Drop 1",
+     owner: "Head, Comptrollership", due: 2026-11-30}
+  - {brd: BRD-06, sheet: "BRD-06 Renewal", name: Renewal, drop: "Drop 1",
+     owner: "Product Owner, Renewal", due: 2026-11-30}
+  - {brd: BRD-07, sheet: "BRD-07 Claims", name: Claims, drop: "Drop 2",
+     owner: "Product Owner, Claims", due: 2027-02-26}
+  - {brd: BRD-08, sheet: "BRD-08 Employee Benefits", name: Employee Benefits, drop: "Drop 2",
+     owner: "Product Owner, Employee Benefits", due: 2027-02-26}
+  - {brd: BRD-09, sheet: "BRD-09 Customer Servicing", name: Customer Servicing Facility, drop: "Drop 1",
+     owner: "Product Owner, Customer Servicing Facility", due: 2026-11-30}
+  - {brd: BRD-10, sheet: "BRD-10 Sanction Screening", name: Sanction Screening and Risk Profiling, drop: "Drop 1",
+     owner: "Chief Compliance Officer (Compliance)", due: 2026-11-30}
+  - {brd: BRD-11, sheet: "BRD-11 User Access", name: User Access Maintenance, drop: "Drop 0",
+     owner: "Product Owner, MBS, with Business Administration (User Access)", due: 2026-12-01}
+  - {brd: BRD-12, sheet: "BRD-12 Submitted Policies", name: Submitted Policies, drop: "Drop 1",
+     owner: "Product Owner, Submitted Policies", due: 2026-11-30}
+  - {brd: BRD-13, sheet: "BRD-13 Data Migration", name: Data Migration, drop: "Drop 0",
+     owner: "Program Manager, Business Project Services (Data Migration)", due: 2026-10-30}
+  - {brd: RI, sheet: "RI Reinsurance (phase 2)", name: "ReInsurance (phase 2)", drop: "Phase 2",
+     owner: "BIBS Product Owner with the Head, Operations (Remittance)", due: 2026-11-30}
+
+# BRD of the module codes of the Drop 0 configuration register (drop0.yaml modules) that are not a BRD of their own.
+module_tab: {PLATFORM: BRD-00, ORG: BRD-05, SEC: BRD-11}
+
+# Home BRD of the question ID prefixes (the BRD whose FRS answers the question).
+question_home:
+  CRQ: BRD-00
+  IQ: BRD-00
+  XQ: BRD-00
+  DSQ: BRD-00
+  Q: BRD-01
+  OQ: BRD-02
+  PQ: BRD-03
+  CQ: BRD-04
+  AQ: BRD-05
+  RQ: BRD-06
+  CLQ: BRD-07
+  EBQ: BRD-08
+  CSQ: BRD-09
+  SANC-SQ: BRD-10
+  UQ: BRD-11
+  SP-SQ: BRD-12
+  DMQ: BRD-13
+
+# Rows of the reinsurance tab: register items and questions moved there, and the rows of this file.
+ri_ids: [DCR-210, DCR-132, IQ20, Q44]
+ri_rows:
+  - ref: RI-01
+    type: Decision
+    need: "Confirm that ReInsurance stays phase 2 and give the planned date of the ReInsurance BRD, so that its FRS can be scheduled after go-live."
+    why: "The BDOI drop plan names a Reinsurance BRD for Remittance in Drop 1; BDOI answer A3 places the reinsurance module in phase 2. Without a date, phase 2 cannot be planned or sized."
+    proposal: "ReInsurance (treaty and facultative processing) is phase 2; its BRD is walked through after the go-live of January 2028."
+    source: "BDOI answer A3 (26-Sep-2026); programme assumption A-02; drop plan item 1.D3"
+    owner: "BIBS Product Owner"
+    due: 2026-11-30
+    priority: Medium
+    status: Partly answered
+    remarks: "Answer: BDOI answer A3 of 26-Sep-2026 (reinsurance module in phase 2); the BRD date is still open."
+  - ref: RI-02
+    type: Master data
+    need: "Name the reinsurers and reinsurance brokers that Remittance pays or collects from in Drop 1, with their codes, TIN, address, bank details and contacts, so that they exist as business partners at go-live."
+    why: "Remittance can only record a reinsurance transaction against a counterparty kept as a business partner (type Reinsurer or Reinsurance broker)."
+    proposal: "The counterparties are entered on Business Partners from template MD-01 of the master data workbook, with maker-checker."
+    source: "Programme alignment IQ20; business partner types of the platform (Reinsurer, Reinsurance broker)"
+    owner: "Head, Operations (Remittance) with the Head, Comptrollership"
+    due: 2027-07-16
+    priority: Medium
+    status: Open
+    remarks: "Template MD-01 Business partners of the Master Data and Configuration Upload Templates workbook."
+  - ref: RI-03
+    type: Report layout
+    need: "Confirm that the four Reinsurance reports of the Report List (#112 to #115) are phase 2, or name those needed at go-live with their layouts."
+    why: "The Report List asks for Reinsurance reports although no BRD of the current scope covers them."
+    proposal: "The four Reinsurance reports move to phase 2 with the ReInsurance BRD."
+    source: "Report List as of 27-Apr-2026, #112 to #115; register DCR-132"
+    owner: "BIBS Product Owner"
+    due: 2026-11-30
+    priority: Low
+    status: Open
+    remarks: ""
+
+# --------------------------------------------------------------------------------- workbook A: classification
+# The type of a row comes from the text of what is asked (first rule that matches, in this order); a source may
+# also set it. [type, pattern, scope]: the pattern is a regular expression, case-insensitive; scope "ask" applies it
+# to what is asked (after the topic), "all" to the topic and what is asked.
+types:
+  - Decision
+  - Clarification
+  - Business rule confirmation
+  - Configuration value
+  - Master data
+  - Sample document or template
+  - Report layout
+  - Integration detail
+  - Test data
+  - Sign-off
+type_rules:
+  - [Test data, '\b(test data|UAT testers?|test users?|testers|test cases? data)\b', all]
+  - [Decision, '^(please )?(decide|choose|select)\b', ask]
+  - [Integration detail, '\b(interfaces?|integrations?|feeds?|file layouts?|transport|EIAM|UIDM|ISC|SCIM|CCM|Apigee|HLS|LFS|OBPCS|AFTS|EGL|EDP|CARMS|Bridger|NLDS|ECM|TFS|M365|portal|secure file|connector|bank channels?|channel layouts?|directory sign-in)\b', all]
+  - [Report layout, '\b(reports?|extract layouts?|counters?|dashboards?|columns|variants?)\b', all]
+  - [Sample document or template, '\b(letters?|templates?|slips?|certificates?|cover letter|layouts? of the (letter|advice|slip|form|documents?)|document layouts?|forms? (layout|template)|sample (letter|advice|form)s?)\b', all]
+  - [Master data, '^(please )?(give|provide|name|list|supply|send|share|prepare)\b[^.]*\b(insurers?|branches|banks?|employees|products?|clients?|payees|partners|adjusters|account officers|cost cent(re|er)s|reinsurers|chart of accounts|master data|group profiles)\b', ask]
+  - [Master data, '\b(chart of accounts|holiday calendar|opening (balances|trial balance)|user access matrix|role matrix)\b', all]
+  - [Configuration value, '\b(thresholds?|limits?|days|hours|minutes|rates?|percent(age)?|prefix(es)?|parameters?|SLA|turnaround|TAT|lead days|tolerances?|frequenc(y|ies)|schedules?|numbering|lists? of values|brackets|buckets|ageing|aging|reminders?|cut-off|values)\b', all]
+  - [Decision, '^(which|whether|is|are|should|may|can|does|do|will|option)\b|\b(decide|choose|option [A-C]\b|in or out of scope|in scope|or not)\b', ask]
+  - [Business rule confirmation, '\bconfirms?\b', all]
+  - [Clarification, '.', all]
+# Drop 0 list categories and register types that fix the type of a row.
+category_type:
+  Decision: Decision
+  Confirmation: Business rule confirmation
+  Clarification: Clarification
+  Conflict in BRD: Clarification
+  Dependency: Integration detail
+  Data or input needed: Configuration value
+
+# Needed by of a row, by type, when the source gives none (otherwise the BRD default of the tab).
+type_due:
+  Integration detail: 2027-01-31
+  Test data: 2027-07-16
+
+# Milestones of the BRD-13 set (pack/catalogue.yaml) and of the Drop 0 register used in the Needed by texts.
+needed_by_text:
+  "Before Drop 0 sign-off": 2026-11-30
+
+# Rows of each BRD tab beyond the clarifications: the UAT test data (programme dependency DEP-20, milestone MS-20)
+# and the sign-off of the set, its test plan and its UAT certificate (project plan, sign-offs).
+test_data:
+  need: "Name the UAT testers of {name} (at least two per business unit, with their user IDs and group profiles) and provide the business data of the UAT scenarios: the clients, policies, insurers and amounts each scenario of the test plan uses, from the migrated data of Trial migration 3 or as additional cases."
+  why: "UAT of {drop} runs on migrated data and the production values; testers without access or scenarios without data stop the UAT."
+  proposal: "The test plan (04 workbook of the set) names the scenarios; the BDOI testers choose the cases from the migrated data and add the cases the legacy data does not hold."
+  source: "Project plan: dependency DEP-20 (UAT testers), milestone MS-20 (UAT plans, values for UAT and testers, 16-Jul-2027)"
+signoff_rows:
+  # brd -> list of [what, due, signatories]; Drop 1 and Drop 2 BRDs follow the plan rows.
+  BRD-00:
+    - ["Approve the Drop 0 closure summary and the configuration inputs at the steering committee", 2026-12-09, "Steering committee (chair: Program Manager, Business Project Services)"]
+    - ["Approve the ORR / PRR evidence pack (operational and production readiness)", 2027-12-31, "Head, BDOI IT; Head, BDOI Information Security"]
+    - ["Take the go / no-go decision for the go-live of Monday 3 January 2028", 2028-01-02, "Go / no-go board"]
+    - ["Sign the hypercare exit and the hand-over to production support", 2028-02-02, "Go / no-go board; BDOI application support; BDO IT operations"]
+  BRD-03:
+    - ["Sign the BRD-03 Product Maintenance sign-off set", 2026-11-30, "Product Owner, Marketing Business System; MBS; TSU; Business Project Services"]
+  BRD-11:
+    - ["Sign the BRD-11 User Access Maintenance sign-off set", 2026-12-01, "Product Owner, Marketing Business System; BDOI Information Security; BDOI IT; Business Administrators"]
+  BRD-13:
+    - ["Sign the BRD-13 Data Migration sign-off set (re-based on BRD V0.03)", 2026-10-30, "Program Manager, Business Project Services; Data Migration Lead; Head, Comptrollership; Head, Operations; BDOI IT"]
+    - ["Sign the dress rehearsal report", 2027-11-26, "Data Migration Lead"]
+    - ["Sign the reconciliation of the go-live migration and of each true-up", 2028-01-02, "Head, Comptrollership; Data Migration Lead"]
+signoff_drop:
+  "Drop 1":
+    - ["Sign the FRS and sign-off set of {brd} {name}", 2026-11-30, "{owner}; Business Project Services (traceability)"]
+    - ["Approve the test plan of {brd} {name}", 2026-12-18, "{owner}"]
+    - ["Sign the UAT sign-off certificate of {brd} {name}", 2027-12-17, "{owner}; BIBS Product Owner"]
+  "Drop 2":
+    - ["Sign the FRS of {brd} {name}", 2027-02-26, "{owner}; Business Project Services"]
+    - ["Approve the test plan of {brd} {name}", 2027-06-30, "{owner}"]
+    - ["Sign the UAT sign-off certificate of {brd} {name}", 2027-11-30, "{owner}"]
+  "Drop 0":
+    - ["Approve the test plan of {brd} {name}", 2026-12-18, "{owner}"]
+    - ["Sign the UAT sign-off certificate of {brd} {name}", 2027-12-17, "{owner}; BIBS Product Owner"]
+
+# Programme dependencies of the project plan that BDOI provides (rows on the BRD-00 tab, or on the named tab).
+dependency_tab: {DEP-01: BRD-13, DEP-02: BRD-13, DEP-03: BRD-09, DEP-05: BRD-05, DEP-09: BRD-13, DEP-16: BRD-11, DEP-17: BRD-13, DEP-26: BRD-00}
+dependency_type:
+  Decision: Decision
+  Data: Master data
+  Integration: Integration detail
+  Environment: Integration detail
+  Resource: Test data
+dependency_skip: [DEP-04, DEP-14, DEP-20]   # DEP-04 and DEP-20 are the sign-off and test-data rows; DEP-14 is a project decision
+
+# ----------------------------------------------------------------------------------------- workbook B
+# Groups of the index, in this order, and the templates of each group. A template ID is a Drop 0 template (D0-nn),
+# a BRD-03 or BRD-11 configuration template (PM-nn, UA-nn), a Migration Console layout (R01 ...) or a template of
+# this workbook (MD-nn: entered on a screen; UP-nn: a screen upload of the platform).
+groups:
+  - name: Organisation
+    templates: [D0-01, D0-02, R02, D0-03, D0-04, D0-05, R03]
+  - name: Users, access and approvals
+    templates: [UA-06, UA-02, UA-01, UA-03, UA-04, UA-05, D0-15]
+  - name: Chart of accounts, tax and accounting
+    templates: [D0-07, D0-06, R08, D0-09, D0-08, D0-10, G01]
+  - name: Banks, bank accounts and cheque books
+    templates: [D0-11, D0-12, D0-13, D0-14, R11]
+  - name: Products, packages and rates
+    templates: [PM-09, R05, PM-01, PM-02, PM-03, PM-04, PM-06, R06, PM-10, PM-08]
+  - name: Insurers, partners, intermediaries and payees
+    templates: [R04, R04B, R07, MD-01, UP-02]
+  - name: Clients and KYC
+    templates: [R01, C01, C02, C03, UP-01]
+  - name: Compliance
+    templates: [UP-03]
+
+# Templates of the Drop 0 workbook replaced here by the layout the platform loads (same content).
+replaced:
+  PM-05: [R04, R04B, R07]
+  PM-07: [R06]
+
+# Dependencies between templates of different sources (codes one uses from the other), added to their own.
+depends:
+  R02: [D0-02]
+  R03: [D0-02, D0-04]
+  R04B: [R04]
+  R05: [PM-09]
+  R07: [R04, R05]
+  R06: [R05, PM-06]
+  R08: [D0-06]
+  R11: [D0-02]
+  G01: [R08, D0-02]
+  C01: [R01, R03, D0-02]
+  C02: [C01]
+  C03: [C01]
+  PM-01: [R05]
+  PM-06: [R04]
+  MD-01: [D0-02]
+  UP-01: [R01]
+  UP-02: [MD-01]
+  UP-03: []
+
+# Due of the templates of this workbook (milestones of the Drop 0 register, drop0.yaml due).
+due:
+  MD-01: D3
+  UP-01: D5
+  UP-02: D3
+  UP-03: D5
+
+# Upload definitions of the platform used as templates: ID -> upload code, name, provided by, load text.
+uploads:
+  UP-01:
+    handler: ClientBulkHandler
+    name: Clients not held in the legacy systems
+    sheet: Clients (upload)
+    owner: "Heads, Retail and Corporate Marketing; Product Owner, MBS"
+    purpose: "One row per individual or corporate client that is not in the legacy client master (for example a bank-referred prospect), with the KYC values BIBS keeps on the client: ID type and number, nationality, source of funds and risk rating. The legacy clients come through the Migration Console (C01 to C03); this upload also updates a client found by code, TIN, ID or name and birth date."
+    load: "Screen upload: Client & Policy › Clients › Clients, button Bulk Upload (upload type Bulk client creation and update); every row is checked and the result is shown per row"
+  UP-02:
+    handler: PayeeMigrationHandler
+    name: Payees
+    sheet: Payees (upload)
+    owner: "Product Owner, Comptrollership - Disbursement"
+    purpose: "One row per payee of Disbursement (suppliers, service providers, employees, government agencies and other payees) with the payment modes, currency and bank account. This is also the layout of the payees of the legacy systems (migration object R09, in scope if BDOI confirms it)."
+    load: "Screen upload: Finance › Disbursement › Disbursement Uploads, upload type Payee Migration; the payees and their bank accounts come in for authorisation"
+  UP-03:
+    handler: ListRecord
+    name: Watchlist entries (sanctions, PEP and internal lists)
+    sheet: Watchlist entries (upload)
+    owner: "Compliance (Chief Compliance Officer)"
+    purpose: "One row per listed person or entity of a sanctions, PEP or internal list that BIBS screens clients against; the BDO negative list and the lists BDOI keeps itself. A known reference changes the entry, a new one adds it; aliases are separated by semicolons."
+    load: "Screen upload: Setup & Administration › Compliance Setup › List Sources and Runs, action Upload List File for the list source; the changes wait for a Compliance checker before screening uses them"
+    codes:
+      Entity Type: [[INDIVIDUAL, Individual], [ENTITY, Entity]]
+      List Type: [[SANCTION, Sanctions list], [PEP, Politically exposed persons], [INTERNAL, Internal list]]
+
+# Templates entered on a screen that this workbook adds (no upload or migration layout exists for them).
+screen_templates:
+  MD-01:
+    name: Business partners (reinsurers, intermediaries, suppliers)
+    sheet: Business partners
+    owner: "Head, Comptrollership; Head, Operations for the reinsurers and intermediaries"
+    purpose: "One row per business partner other than an insurer or a client: agents and brokers (intermediaries), reinsurers and reinsurance brokers, co-insurers, suppliers, garages, surveyors and banks. Insurers come from R04; clients from C01 and the client upload."
+    load: "Configuration screen: Setup & Administration › Setup › Business Partners, one partner at a time, authorised by a second user"
+    source: "BDOI partner lists; legacy supplier masters"
+    columns:
+      - [Party code, "Y", "Text, up to 30; capitals, digits, - and .", "Code of the partner, unique", "RI-0001", "text:30"]
+      - [Party type, "Y", "Code of the list", "Kind of partner", "REINSURER", "list:PARTY_TYPE"]
+      - [Name, "Y", "Text, up to 200", "Registered name", "Asia Pacific Reinsurance Corp.", "text:200"]
+      - ["TIN / tax id", "N", "000-000-000-000", "Tax identification number", "123-456-789-000", "text:30"]
+      - [Address, "N", "Text, up to 300", "Registered address", "Makati City", "text:300"]
+      - [E-mail, "N", "E-mail address", "E-mail for advices and statements", "treaty@apre.example.ph", "text:120"]
+      - [Phone, "N", "Text, up to 40", "Phone number", "+63 2 8888 0000", "text:40"]
+      - [Default currency, "Y", "ISO currency code, 3 letters", "Currency of the partner's transactions", "PHP", "list:CURRENCY"]
+      - [Bank name, "N", "Text, up to 120", "Bank of the partner's account", "BDO Unibank", "text:120"]
+      - [Bank account no., "N", "Text, up to 40", "Account number for payments", "001234567890", "text:40"]
+      - [Licence no., "Cond.: intermediaries (agent, broker, reinsurance broker)", "Text, up to 40", "Insurance Commission licence number of an intermediary", "IC-RB-2026-015", "text:40"]
+      - [Credit days, "N", "Whole number", "Credit days of the partner's items (0 when none)", "30", "whole:0-365"]
+      - [Commission rate %, "N", "Number, 0 to 100", "Commission rate of an intermediary", "", "number:0-100"]
+      - [Withholding tax rate %, "N", "Number, 0 to 100", "Withholding tax rate applied to the partner", "2", "number:0-100"]
+    lists:
+      PARTY_TYPE:
+        name: Business partner type
+        values: [[AGENT, Agent], [BROKER, Broker], [REINSURER, Reinsurer], [RI_BROKER, Reinsurance broker],
+                 [COINSURER, Co-insurer], [SUPPLIER, Supplier], [GARAGE, Garage], [SURVEYOR, Surveyor or adjuster],
+                 [BANK, Bank], [EMPLOYEE, Employee], [GOVERNMENT, Government agency], [OTHER_PAYEE, Other payee]]
+      CURRENCY:
+        name: Currency
+        values: [[PHP, Philippine peso], [USD, US dollar], [EUR, Euro], [JPY, Japanese yen], [GBP, Pound sterling],
+                 [SGD, Singapore dollar], [HKD, Hong Kong dollar], [AUD, Australian dollar], [CNY, Chinese yuan]]
+        strict: false
+
+# Notes on the gaps: datasets with a template whose rows the platform cannot take by file, keyed on the screen.
+gap_note: "No new upload is provided for these datasets. The BDOI owner fills in the template; the BIBS configuration team keys the rows on the screen named, a second user authorises each record (maker-checker), and the owner checks the result against the template before the dress rehearsal."

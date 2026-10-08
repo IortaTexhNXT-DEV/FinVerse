@@ -51,6 +51,13 @@ class SecondFactorIT {
   @Autowired private JdbcTemplate jdbc;
   @Autowired private UserAdminService admin;
   @Autowired private AsUser as;
+
+  /**
+   * Time step of the code that confirmed the last enrolment (the replay check reuses exactly that
+   * code).
+   */
+  private long enrolStep;
+
   @Autowired private Api api;
   @Autowired private SystemParameterService parameters;
 
@@ -120,13 +127,14 @@ class SecondFactorIT {
         .contains("issuer=");
     byte[] secret = secret(enrolment);
     post(MFA + "/enrolment/confirm", Map.of("challenge", challenge, "code", "000000"), 422);
+    enrolStep = Totp.step(Instant.now());
     MvcResult confirmed =
         mvc.perform(
                 MockMvcRequestBuilders.post(MFA + "/enrolment/confirm")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         json.writeValueAsString(
-                            Map.of("challenge", challenge, "code", code(secret, 0)))))
+                            Map.of("challenge", challenge, "code", Totp.code(secret, enrolStep)))))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.recoveryCodes.length()").value(10))
             .andExpect(jsonPath("$.signIn.accessToken").isNotEmpty())
@@ -159,13 +167,17 @@ class SecondFactorIT {
         .as(withChallenge.getResponse().getContentAsString())
         .isEqualTo(401);
     // The code of the enrolment was used: it is never accepted again. A wrong code counts.
-    post(MFA + "/verify", Map.of("challenge", challenge, "code", code(secret, 0)), 401);
+    post(
+        MFA + "/verify", Map.of("challenge", challenge, "code", Totp.code(secret, enrolStep)), 401);
     Integer failed =
         jdbc.queryForObject(
             "select failed_attempts from sec_user where username = ?", Integer.class, username);
     assertThat(failed).isEqualTo(1);
     JsonNode verified =
-        post(MFA + "/verify", Map.of("challenge", challenge, "code", code(secret, 1)), 200);
+        post(
+            MFA + "/verify",
+            Map.of("challenge", challenge, "code", Totp.code(secret, enrolStep + 1)),
+            200);
     String access = verified.get("accessToken").asText();
     mvc.perform(get(MFA + "/me").header(HttpHeaders.AUTHORIZATION, BEARER + access))
         .andExpect(status().isOk())

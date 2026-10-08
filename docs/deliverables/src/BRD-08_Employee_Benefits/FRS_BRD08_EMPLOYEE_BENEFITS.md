@@ -8,11 +8,11 @@ doc_code: FRS
 brd: BRD-08
 name: Employee Benefits
 doc_id: BIBS-FRS-BRD-08
-version: "1.0"
-date: 25 September 2026
+version: "1.1"
+date: 08 October 2026
 status: Issued for BDOI review
 header_title: FRS BRD-8 Employee Benefits
-output: FRS/BIBS_FRS_BRD-08_Employee_Benefits_v1.0.docx
+output: FRS/BIBS_FRS_BRD-08_Employee_Benefits_v1.1.docx
 control:
   - version: "0.9"
     date: 18 Sep 2026
@@ -26,6 +26,12 @@ control:
     reviewer: iorta TechNXT Project Manager
     approver: BDOI Product Owner (pending)
     change: First issue for BDOI review; aligned with the cross-BRD decisions D1, D3 and D7
+  - version: "1.1"
+    date: 08 Oct 2026
+    author: iorta TechNXT Business Analysis
+    reviewer: iorta TechNXT Project Manager
+    approver: BDOI Product Owner (pending)
+    change: "Re-based on the Employee Benefits BRD v1.0 with the Addendum of 23-Feb-2026 (unchanged; page references unchanged); report frequencies and Placement report fields of the Report List of 13-May-2026 applied; review findings applied (CLR-EB-01 to 03 restated, CLR-EB-09 added); user-story view and storyboard index added."
 distribution:
   - {name: "Product Owner, Employee Benefits", role: Approver, organisation: BDOI, purpose: Review and sign-off}
   - {name: "Marketing, Employee Benefits teams", role: Business owner, organisation: BDOI, purpose: Review of all FRs}
@@ -79,6 +85,7 @@ The EB desk of Marketing places group benefit programmes (HMO, Group Life Insura
 | R3 | BDOI Employee Benefits (BRD-8) requirements baseline | current |
 | R5 | Cross-BRD decisions and answered questions (BRD-6 to BRD-12) | binding |
 | R7 | BDO UX guidelines (brand, screen patterns) | current |
+| R8 | BDOI - CoreModernization Report List 05132026, Employee Benefits reports (p.27) | 13-May-2026 |
 
 Page references: "Add. p.n" is page n of the addendum (PDF page n). "p.n" is page n of the main BRD, which is PDF page n + 17; for example BRID-001 (p.7) is on PDF page 24. The addendum overrides the main BRD; BRID-025 and BRID-026 are cited with the addendum text.
 
@@ -1537,7 +1544,7 @@ actor: Marketing, Processing, Collection, Management (EB_REPORT_VIEW)
 priority: Must have
 screens: Reports (category Employee Benefits)
 description:
-  - Reports are generated on request or on a schedule - Production (premium and commission by team, AO, line, insurer and business type), Renewal (programmes due with expiry, RA sent date, status, proposals, comparative result, client changes, BOR, TOR and remarketing actions), Placement (confirmation, insurer selected, coverage, commission, counter-proposals and revisions, final terms, document uploads and confirmation dates), Pending Items and Franchise.
+  - Reports are generated on request or on a schedule. The Report List of 13-May-2026 sets the schedules - Production, Renewal and New Business weekly, Placement monthly, all also as needed; each scheduled run is sent to its subscribers. Production (premium and commission by team, AO, line, insurer and business type), Renewal (programmes due with expiry, RA sent date, status, proposals, comparative result, client changes, BOR, TOR and remarketing actions), Placement (confirmation, insurer selected, coverage, commission, counter-proposals and revisions, final terms, document uploads and confirmation dates), Pending Items and Franchise.
   - Parameters include activity, team, AO, client, benefit line, insurer, business type and date range. Reports read live data, can be viewed, downloaded, printed and shared by e-mail from the report runner, and saved as variants.
 preconditions:
   - The user has EB_REPORT_VIEW.
@@ -1546,7 +1553,8 @@ main_flow:
   - BIBS runs it and shows the result.
   - The user exports it or e-mails the export.
 rules:
-  - [R1, "Layouts confirmed under EBQ21; columns of section 6.1 until then.", Configurable, Report definitions]
+  - [R1, "Placement columns from the Report List of 13-May-2026; Renewal and New Business share the columns of the EB sales report template that BDOI supplies (CLR-EB-09); columns of section 6.1 until then.", Configurable, Report definitions]
+  - [R2, "Schedules - Production, Renewal and New Business weekly; Placement monthly.", Configurable, Report schedules (subscriptions)]
 validations:
   - [Date range end before start, The end date must be on or after the start date, INVALID_REPORT_PARAMETERS]
 notifications:
@@ -1556,6 +1564,7 @@ audit:
 acceptance:
   - The Renewal report lists a programme with its RA sent date and the number of proposals received.
   - The Production report filtered by team BDO shows only that team's programmes.
+  - The weekly Renewal report and the monthly Placement report reach their subscribers on schedule.
 ```
 
 ```fr
@@ -1720,16 +1729,16 @@ The TAT annex (p.42) gives the targets below. They are parameters; the TAT repor
 <!-- table: widths=3.8,4,6.6,2.2 caption="Employee Benefits reports (category Employee Benefits)" size=8.5 -->
 | Code | Name | Purpose | BRD |
 |---|---|---|---|
-| EB-PRODUCTION | Production | Premium and commission by team, AO, line, insurer and business type | BRID-022 |
-| EB-RENEWAL | Renewal | Programmes due for renewal and their progress | BRID-022 |
-| EB-PLACEMENT | Placement | Placed programmes, terms and confirmation dates | BRID-022 |
-| EB-NEW-BUSINESS | New Business | New client programmes of a period | BRID-022.01 |
+| EB-PRODUCTION | Production | Premium and commission by team, AO, line, insurer and business type; weekly and as needed | BRID-022 |
+| EB-RENEWAL | Renewal | Programmes due for renewal and their progress; weekly and as needed | BRID-022 |
+| EB-PLACEMENT | Placement | Placed programmes, terms and confirmation dates; monthly and as needed | BRID-022 |
+| EB-NEW-BUSINESS | New Business | New client programmes of a period, from prospecting to placement; weekly and as needed | BRID-022.01 |
 | EB-TAT | Turn-around Time | Days and breaches per TAT activity | BRID-022 |
 | EB-PENDING-ITEMS | Pending Items | Contracts, cards and billing pending, age, follow-ups | BRID-030 |
 | EB-FRANCHISE | Franchise | Franchise requests, outcomes and response times per insurer | BRID-026, 027 |
 | NB-BOOKED-REG, NB-PRODUCTION, NB-PLC-UPDATE (existing) | BRD-1 reports | Gain the business type filter | BRID-022.01 |
 
-All EB reports need EB_REPORT_VIEW, export to PDF, XLSX, CSV, ODS and Word, support saved variants, and take the common parameters company, date range, team, AO, client, benefit line, insurer and business type. Layouts are the project's proposal until BDOI supplies its own (EBQ21).
+All EB reports need EB_REPORT_VIEW, export to PDF, XLSX, CSV, ODS and Word, support saved variants, and take the common parameters company, date range, team, AO, client, benefit line, insurer and business type. The frequencies and the Placement fields are those of the Report List of 13-May-2026 (R8); the Renewal and New Business reports share the fields of the template "EB Sales Report N_2026 PRODUCTION" named in the Report List, which BDOI supplies (CLR-EB-09). Until then the layouts below are the project's proposal (EBQ21).
 
 ### Renewal report (EB-RENEWAL)
 
@@ -1749,7 +1758,7 @@ All EB reports need EB_REPORT_VIEW, export to PDF, XLSX, CSV, ODS and Word, supp
 
 ### Placement report (EB-PLACEMENT)
 
-<!-- table: widths=3.8,2.6,10.2 caption="EB-PLACEMENT columns (BRID-022 AC6)" size=8.5 -->
+<!-- table: widths=3.8,2.6,10.2 caption="EB-PLACEMENT columns (BRID-022 AC6; Report List p.27)" size=8.5 -->
 | Column | Format | Content |
 |---|---|---|
 | Programme / Client | Text | Programme number and client name |
@@ -1761,6 +1770,12 @@ All EB reports need EB_REPORT_VIEW, export to PDF, XLSX, CSV, ODS and Word, supp
 | Final terms | Text | Chosen proposal version |
 | Document uploads | Date | Last upload per required document |
 | ARN / Stage | Text | Accounts created and their stage |
+| Cover No. / Version No. | Text | Cover of the placed account (Report List) |
+| Line of insurance / Comm. rate / Inception date | Text / Rate / Date | Report List key fields |
+| BIR 2303, masterlist, BDOI proposal to client, COC | Text | Availability of each document (Yes / No, date) |
+| ISACOM | Text | Where needed |
+| GM / TH approval | Text | Approval of a commission deviation or late placement |
+| Status | Text | Placement status |
 
 ### New Business report (EB-NEW-BUSINESS)
 
@@ -1978,7 +1993,7 @@ Every BRD-8 requirement is met by at least one FR, except BRID-028, which the ad
 | BRID-019 | FR-EB-051, 046 | Account page (BRD-1) | TC-EB-046.2, 046.3, 046.4, 051.1 (4 cases) |
 | BRID-020 | FR-EB-052 | Book Account | TC-EB-052.1, 052.3, 052.2 (3 cases) |
 | BRID-021 | FR-EB-053 | SOA Register | TC-EB-053.1, 053.2, 053.3 (4 cases) |
-| BRID-022 | FR-EB-060, 062 | Reports; EB Home | TC-EB-060.1, 060.2, 060.3, 062.2 (6 cases) |
+| BRID-022 | FR-EB-060, 062 | Reports; EB Home | TC-EB-060.1, 060.2, 060.3, 060.4, 062.2 (7 cases) |
 | BRID-022.01 | FR-EB-061, 021 | Reports | TC-EB-021.2, 021.3, 061.1, 061.2, 061.3 (7 cases) |
 | BRID-023 | FR-EB-001 | All | TC-EB-001.1, 001.2 (3 cases) |
 | BRID-024 | FR-EB-003 | History tab | TC-EB-003.1, 003.2, 003.3 (3 cases) |
@@ -1997,14 +2012,15 @@ The table lists each point where the proposed screen or rule differs from the BR
 <!-- table: widths=1.7,2.9,6.1,3.5,3.4 caption="Proposed business rules and clarifications for confirmation" size=8 -->
 | Ref | Topic | Proposed rule or screen behaviour | Reason | Decision requested from BDOI |
 |---|---|---|---|---|
-| CLR-EB-01 | BOR on renewal (BRID-008; FR-EB-031) | A BOR is required for new business and for renewals that remarket. | The negative scenario of BRID-008 calls a BOR for a renewal invalid, while both flow charts ask for a BOR in the renewal lane (EBQ05). | Confirm when a renewal needs a BOR (EBQ05). |
-| CLR-EB-02 | BOR signature (BRID-008; FR-EB-031) | The validator attests the signature with a checklist; e-signature verification is added if BDOI specifies it. | The BRD asks the system to validate the signature; the verification method is open (EBQ06). | Confirm the attestation, or give the verification method (EBQ06). |
-| CLR-EB-03 | Renewal Advice lead time (BRID-001; FR-EB-022) | The Renewal Advice is sent 135 days before expiry (default from the TAT annex). | The BRD gives 180 days as an example; the TAT annex gives 135 (EBQ02). | Choose the lead time (EBQ02). |
+| CLR-EB-01 | BOR on renewal (BRID-008; FR-EB-031) | A BOR is required for new business and for renewals that remarket. | The negative scenario of BRID-008 calls a BOR for a renewal invalid, while both flow charts ask for a BOR in the renewal lane (EBQ05). | Confirm when a renewal needs a BOR (EBQ05) before the Drop 2 sign-off; FR-EB-031 is aligned to the answer. |
+| CLR-EB-02 | BOR signature (BRID-008; FR-EB-031) | The validator attests the signature with a checklist; e-signature verification is added if BDOI specifies it. | The BRD asks the system to validate the signature; the verification method is open (EBQ06). | Confirm the attestation, or give the verification method (EBQ06), before the Drop 2 sign-off. |
+| CLR-EB-03 | Renewal Advice lead time (BRID-001; FR-EB-022) | The Renewal Advice is sent 135 days before expiry (default from the TAT annex). | The BRD gives 180 days as an example; the TAT annex gives 135 (EBQ02). | Choose the lead time (EBQ02); it is a parameter, so the answer needs no change to the system. |
 | CLR-EB-04 | Secure portal or system-to-system interface (BRID-005; FR-EB-010) | Insurers and clients use the secure partner portal; a system-to-system interface is added when an insurer asks for it. | No insurer has asked for a system interface. | Confirm the portal. |
 | CLR-EB-05 | Booking (TAT annex; FR-EB-052) | Booking is done in BIBS. | The TAT annex refers to booking in EBIX, which BIBS replaces. | Confirm booking in BIBS. |
 | CLR-EB-06 | Portal users | Portal users are provisioned through User Access requests of user type External. | The BRD does not say how portal users are created (decision D7). | Confirm the provisioning (decision D7). |
 | CLR-EB-07 | High-risk accounts (BRID-028) | Out of scope; there is no high-risk handling for EB. | The addendum states that high-risk accounts do not apply to Employee Benefits (Add. p.13; EBQ26). | Confirm the exclusion (EBQ26). |
 | CLR-EB-08 | EB renewals (FR-EB-022) | EB programmes are renewed in this module; EB lines are excluded from the general Renewal lists. | Cross-BRD decision D3. | Confirm decision D3. |
+| CLR-EB-09 | EB report layouts (BRID-022; FR-EB-060) | Production, Renewal and New Business run weekly and Placement monthly, each also on request. Placement shows the key fields of the Report List. Renewal and New Business share one layout, the template "EB Sales Report N_2026 PRODUCTION"; until BDOI supplies it, the columns of section 6.1 apply. | The Report List of 13-May-2026 changes the frequencies and the source to BIBS and refers to a template the project has not received (EBQ21). | Supply the template and confirm the schedules. |
 
 # Sign-off
 
@@ -2020,3 +2036,78 @@ rows:
   - {name: "", role: "Program Manager, Business Project Services", organisation: BDO Unibank ESG}
   - {name: "", role: Project Manager, organisation: iorta TechNXT}
 ```
+
+# Appendix: User-story view
+
+The Employee Benefits BRD and its Addendum give each requirement a persona ("User", "System", "Client", "Insurer"), an expected result, acceptance criteria and a negative scenario, but write the requirement as a statement, not as a user story. This appendix gives each requirement (BRID-001 to 030 with 005.01 to 005.03 and 022.01) as one user story, with the FRs that meet it, their acceptance criteria and the test conditions of the test plan with their number of cases. The story keeps the BRD statement and names the persona of section 3.1 who acts or needs the result. Acceptance criteria are numbered in the order of the FR (AC1 is the first criterion of the FR). The table has 34 rows; BRID-028 is out of scope by the Addendum (p.13).
+
+<!-- table: widths=2.4,7.5,2.3,2.8,3.4 caption="User-story view: BRD requirement, user story, FRs, acceptance criteria and test cases" size=8 -->
+| BRD ID | User story | FR IDs | Acceptance criteria | Test cases |
+|---|---|---|---|---|
+| BRID-001 | As a Marketing AO (EB), I need BIBS to send the renewal advice before the programme expires, so that the client prepares the renewal in time. | FR-EB-022 | FR-EB-022 AC1-3 | TC-EB-022.1 to 022.3 (5 cases) |
+| BRID-002 | As a Marketing AO (EB), I need to collect the client's feedback and upload it, so that the renewal reflects what the client wants. | FR-EB-023 | FR-EB-023 AC1-2 | TC-EB-023.1 to 023.2 (3 cases) |
+| BRID-003 | As a Marketing AO (EB), I need to send the client an initial renewal proposal based on the incumbent rates, so that the client sees the renewal terms early. | FR-EB-024 | FR-EB-024 AC1-2 | TC-EB-024.1 to 024.2 (3 cases) |
+| BRID-004 | As a Marketing AO (EB), I need to remarket the programme to other insurers for better options, so that the client gets the best terms. | FR-EB-035 | FR-EB-035 AC1-3 | TC-EB-035.1 to 035.3 (5 cases) |
+| BRID-005 | As an Insurer user, I need to access and work with BIBS only through a secure portal, not the core system, so that I upload, view and manage the records assigned to me within my role and scope. | FR-EB-010, FR-EB-011, FR-EB-014, FR-EB-001 | FR-EB-010 AC1-3; FR-EB-011 AC1-3; FR-EB-014 AC1-3; FR-EB-001 AC1-3 | TC-EB-010.1 to 010.4, 011.1 to 011.4, 014.1 to 014.3, 001.1 to 001.3 (20 cases) |
+| BRID-005.01 | As a Business Administrator, I need the portal to enforce authentication and role-based access, so that insurers and clients reach only their own records and every access is logged. | FR-EB-010, FR-EB-012, FR-EB-013, FR-EB-051 | FR-EB-010 AC1-3; FR-EB-012 AC1-3; FR-EB-013 AC1-3; FR-EB-051 AC1-2 | TC-EB-010.1 to 010.4, 012.1 to 012.3, 013.1 to 013.3, 051.1 to 051.2 (18 cases) |
+| BRID-005.02 | As an Insurer user, I need to access BIBS securely through the portal and never directly, so that I answer requests and submit proposals and documents safely. | FR-EB-010, FR-EB-014, FR-EB-040 | FR-EB-010 AC1-3; FR-EB-014 AC1-3; FR-EB-040 AC1-2 | TC-EB-010.1 to 010.4, 014.1 to 014.3, 040.1 to 040.3 (15 cases) |
+| BRID-005.03 | As a Marketing AO (EB), I need to review, validate and approve the documents insurers upload, so that only valid documents enter the programme. | FR-EB-013, FR-EB-040 | FR-EB-013 AC1-3; FR-EB-040 AC1-2 | TC-EB-013.1 to 013.3, 040.1 to 040.3 (10 cases) |
+| BRID-006 | As a Marketing AO (EB), I need to capture new clients and tag them as prospect or account, so that new EB business is tracked from the start. | FR-EB-020, FR-EB-021 | FR-EB-020 AC1-2; FR-EB-021 AC1-3 | TC-EB-020.1 to 020.2, 021.1 to 021.3 (8 cases) |
+| BRID-007 | As a Marketing AO (EB), I need to upload the Terms of Reference, the master list and the utilization report, so that the insurers receive complete information. | FR-EB-030, FR-EB-004 | FR-EB-030 AC1-2; FR-EB-004 AC1-2 | TC-EB-030.1 to 030.3, 004.1 to 004.2 (6 cases) |
+| BRID-008 | As a Marketing AO (EB), I need to upload the signed Broker on Record, which BIBS checks before proposal requests proceed, so that BDOI is authorised to act for the client. | FR-EB-031 | FR-EB-031 AC1-2 | TC-EB-031.1 to 031.3 (5 cases) |
+| BRID-009 | As a Marketing AO (EB), I need to distribute the TOR, the unnamed master list and the utilization report to the insurers, so that they can quote. | FR-EB-035 | FR-EB-035 AC1-3 | TC-EB-035.1 to 035.3 (5 cases) |
+| BRID-010 | As a Marketing TL / UH (EB), I need BIBS to generate the comparative analysis of the renewal proposals, so that the best offer is identified and signed off. | FR-EB-041, FR-EB-040 | FR-EB-041 AC1-3; FR-EB-040 AC1-2 | TC-EB-041.1 to 041.3, 040.1 to 040.3 (10 cases) |
+| BRID-011 | As a Marketing AO (EB), I need to present the comparative report to the client, so that the client chooses an insurer. | FR-EB-043, FR-EB-015 | FR-EB-043 AC1-2; FR-EB-015 AC1-3 | TC-EB-043.1 to 043.3, 015.1 to 015.3 (8 cases) |
+| BRID-012 | As a Marketing AO (EB), I need to capture the client's changes, additions and amendment requests and relay them to the insurers, so that proposals follow the client's needs. | FR-EB-044 | FR-EB-044 AC1-2 | TC-EB-044.1 to 044.2 (3 cases) |
+| BRID-013 | As a Marketing AO (EB), I need to enter and upload employee benefit changes, additions and amendments (for example new hires for HMO, GPA, GLI), so that the member roster stays current. | FR-EB-054, FR-EB-055 | FR-EB-054 AC1-2; FR-EB-055 AC1-3 | TC-EB-054.1 to 054.2, 055.1 to 055.3 (7 cases) |
+| BRID-014 | As a Client HR user, I need to access BIBS only through a secure portal to upload master lists and utilization reports and view my policy details, so that I work with BDOI without direct access to the core system. | FR-EB-015, FR-EB-010, FR-EB-011, FR-EB-012, FR-EB-054 | FR-EB-015 AC1-3; FR-EB-010 AC1-3; FR-EB-011 AC1-3; FR-EB-012 AC1-3; FR-EB-054 AC1-2 | TC-EB-015.1 to 015.3, 010.1 to 010.4, 011.1 to 011.4, 012.1 to 012.3, 054.1 to 054.2 (23 cases) |
+| BRID-015 | As an Insurer user, I need to update my proposals for the client's changes, additions and amendments, so that the comparative uses current terms. | FR-EB-045 | FR-EB-045 AC1-2 | TC-EB-045.1 to 045.2 (2 cases) |
+| BRID-016 | As BDOI Management, I need an approval when a transaction meets or exceeds a defined value threshold (total sum insured or premium), so that large programmes are approved at the right level. | FR-EB-042 | FR-EB-042 AC1-3 | TC-EB-042.1 to 042.3 (5 cases) |
+| BRID-017 | As a Marketing AO (EB), I need to trigger the placement after the client confirms, so that Processing places the programme with the chosen insurer. | FR-EB-046 | FR-EB-046 AC1-3 | TC-EB-046.1 to 046.4 (5 cases) |
+| BRID-018 | As a Processing Supervisor, I need to assign, re-assign and return work and give remarks, so that the EB work is distributed and followed. | FR-EB-050 | FR-EB-050 AC1-2 | TC-EB-050.1 to 050.2 (3 cases) |
+| BRID-019 | As Processing (EB), I need to complete the policy issuance after a valid placement confirmation, with every required document received and tracked, so that the policy is issued correctly. | FR-EB-051, FR-EB-046 | FR-EB-051 AC1-2; FR-EB-046 AC1-3 | TC-EB-051.1 to 051.2, 046.1 to 046.4 (8 cases) |
+| BRID-020 | As Processing (EB), I need to submit the booking, so that the programme is booked and billed. | FR-EB-052 | FR-EB-052 AC1-2 | TC-EB-052.1 to 052.3 (3 cases) |
+| BRID-021 | As Collection (EB), I need to manage billing, statements of account and payment tracking after placement, so that premiums are collected and documents reach the right teams. | FR-EB-053 | FR-EB-053 AC1-3 | TC-EB-053.1 to 053.3 (4 cases) |
+| BRID-022 | As BDOI Management, I need EB reports generated automatically or on request, so that production, renewals and placements are monitored. | FR-EB-060, FR-EB-062 | FR-EB-060 AC1-3; FR-EB-062 AC1-2 | TC-EB-060.1 to 060.4, 062.1 to 062.3 (9 cases) |
+| BRID-022.01 | As BDOI Management, I need a New Business report of the EB accounts, so that new business is tracked from prospecting to placement. | FR-EB-061, FR-EB-021 | FR-EB-061 AC1-2; FR-EB-021 AC1-3 | TC-EB-061.1 to 061.3, 021.1 to 021.3 (9 cases) |
+| BRID-023 | As a Marketing AO (EB), I need only authorised users to view, download, print or access EB documents and reports, so that client data stays confidential. | FR-EB-001 | FR-EB-001 AC1-3 | TC-EB-001.1 to 001.3 (4 cases) |
+| BRID-024 | As BDOI Management, I need BIBS to log every key action (renewal advice, feedback, proposals, documents, approvals, client confirmation) with time and user, so that the EB work is auditable. | FR-EB-003 | FR-EB-003 AC1-3 | TC-EB-003.1 to 003.3 (3 cases) |
+| BRID-025 | As a Marketing AO (EB), I need to upload the insurer's direct billing documents for member changes, linked to the right transaction and endorsement type, so that billing matches the changes. | FR-EB-002, FR-EB-056, FR-EB-055 | FR-EB-002 AC1-3; FR-EB-056 AC1-2; FR-EB-055 AC1-3 | TC-EB-002.1 to 002.3, 056.1 to 056.2, 055.1 to 055.3 (10 cases) |
+| BRID-026 | As a Marketing AO (EB), I need to submit the necessary documents to the insurer for a franchise request, so that the insurer can accredit the account. | FR-EB-034, FR-EB-032 | FR-EB-034 AC1-2; FR-EB-032 AC1-3 | TC-EB-034.1 to 034.3, 032.1 to 032.3 (9 cases) |
+| BRID-027 | As an Insurer user, I need to approve or reject the franchise request to BDOI Marketing, so that the account can proceed or stop. | FR-EB-032 | FR-EB-032 AC1-3 | TC-EB-032.1 to 032.3 (5 cases) |
+| BRID-028 | As an Insurer user, I need to present the required documents for high-risk accounts; the Addendum states that high-risk accounts do not apply to Employee Benefits. | Out of scope (Add. p.13) | - | - |
+| BRID-029 | As a Marketing AO (EB), I need to advise the client of the franchise approval or rejection, so that the client knows the outcome. | FR-EB-033 | FR-EB-033 AC1-2 | TC-EB-033.1 to 033.2 (2 cases) |
+| BRID-030 | As Processing (EB), I need BIBS to monitor and tag the pending items automatically, so that contracts, cards and billing pending are followed up. | FR-EB-057 | FR-EB-057 AC1-3 | TC-EB-057.1 to 057.3 (4 cases) |
+
+<!-- landscape -->
+
+# Appendix: Storyboard index
+
+Employee Benefits has no end-to-end walkthroughs with screenshots yet. This index gives the storyboard of the EB cycle from the process flow of section 2.2 and the cycle workflow of chapter 5: one frame per step, with the persona, the step, the screen or document used, the outcome and the FRs. The screen-level frames with screenshots, including the insurer and client portal journeys, follow with the v2.0 business sign-off pack of BRD-8 (Drop 2), which adds the walkthroughs and the UX Screen Deck.
+
+<!-- table: widths=1.3,2.8,5.6,3.6,5.2,2.2 caption="Storyboard of the business processes: frame, persona, step, screen or document, outcome and FR" size=8 -->
+| Frame | Persona | Step | Screen or document | Outcome | FR |
+|---|---|---|---|---|---|
+| **P1** | | **Programme start and portal access** | | | |
+| P1.1 | Marketing AO (EB) | Creates the client and the programme (new business) or receives the renewal due list | Clients; New Programme; Programmes (Renewal Due) | Programme with business type; renewal advice sent at the lead time | FR-EB-020, FR-EB-021, FR-EB-022 |
+| P1.2 | Business Administrator | Approves the portal users of the insurer and the client | Portal user requests | Insurer and client HR users can sign in to the portal | FR-EB-010, FR-EB-011 |
+| P1.3 | Client HR user | Uploads the master list and utilization report and gives feedback | Portal - client HR | Uploads waiting for review | FR-EB-015, FR-EB-012, FR-EB-023 |
+| P1.4 | Marketing AO (EB) | Reviews and approves the portal uploads | Portal Uploads queue | Valid documents attached to the programme | FR-EB-013 |
+| **P2** | | **Documents, BOR, franchise and TOR** | | | |
+| P2.1 | Marketing AO (EB) | Uploads the TOR, master list, utilization report and the signed BOR | Documents tab; BOR tab | BOR attested; documents complete | FR-EB-030, FR-EB-031 |
+| P2.2 | Marketing AO (EB) | Submits the franchise request; the insurer decides | Franchise tab; Portal - Franchise Requests | Franchise approved or rejected; the client is advised | FR-EB-032, FR-EB-033, FR-EB-034 |
+| P2.3 | Marketing AO (EB) | Distributes the TOR and requests proposals from the insurers | TOR and Insurer Requests tabs | Requests sent to the incumbent and, when remarketing, other insurers | FR-EB-035, FR-EB-014 |
+| **P3** | | **Proposals, comparative and client decision** | | | |
+| P3.1 | Insurer user | Submits the proposal and updates it for client changes | Portal - Requests for Proposal | Proposal versions received | FR-EB-040, FR-EB-045 |
+| P3.2 | Marketing TL / UH (EB) | Signs the comparative of the validated proposals | Comparative page | Comparative ready; approval above the threshold by BDOI Management | FR-EB-041, FR-EB-042 |
+| P3.3 | Client HR user | Comments on and confirms the comparative | Portal - comparative | Client decision recorded; revisions if requested | FR-EB-043, FR-EB-044 |
+| P3.4 | Marketing AO (EB) | Triggers the placement | Programme page (Trigger Placement) | Placement work created for Processing | FR-EB-046 |
+| **P4** | | **Processing, booking, billing and members** | | | |
+| P4.1 | Processing Supervisor | Assigns the placement work | My Work | Work assigned with remarks | FR-EB-050 |
+| P4.2 | Processing (EB) | Completes issuance and books the accounts | Account page (BRD-1); Book Account | Accounts booked by line | FR-EB-051, FR-EB-052 |
+| P4.3 | Collection (EB) | Records the SOA and tracks payment | SOA Register | SOA validated; payments tracked | FR-EB-053 |
+| P4.4 | Marketing AO (EB) | Records member changes and uploads the insurer's billing documents | Members; Member Changes | Roster updated; billing linked to the change | FR-EB-054, FR-EB-055, FR-EB-056 |
+| **P5** | | **Monitoring** | | | |
+| P5.1 | BDOI Management | Receives the weekly Renewal and New Business reports and the monthly Placement report | Reports (Employee Benefits); EB Home | Reports on schedule with the Report List fields | FR-EB-060, FR-EB-061, FR-EB-062 |
+| P5.2 | Processing (EB) | Follows the pending items | Pending Items | Contracts, cards and billing pending with age and follow-ups | FR-EB-057 |
+

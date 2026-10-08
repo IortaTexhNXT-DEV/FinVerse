@@ -8,8 +8,8 @@ doc_code: TestPlan
 brd: BRD-08
 name: Employee Benefits Summary
 doc_id: BIBS-TP-BRD-08
-version: "1.0"
-date: 25 September 2026
+version: "1.1"
+date: 08 October 2026
 status: Issued for BDOI review
 header_title: Test Plan BRD-8 Employee Benefits
 h1_page_break: false
@@ -26,6 +26,12 @@ control:
     reviewer: iorta TechNXT Project Manager
     approver: BDOI Product Owner (pending)
     change: First issue for BDOI review, with the Excel workbook of the same version
+  - version: "1.1"
+    date: 08 Oct 2026
+    author: iorta TechNXT QA
+    reviewer: iorta TechNXT Business Analysis
+    approver: BDOI Product Owner (pending)
+    change: "Re-based on FRS BRD-8 v1.1 (Employee Benefits BRD and Addendum, unchanged; Report List of 13-May-2026): case for the weekly and monthly report schedules and the Placement report fields added."
 distribution:
   - {name: "Product Owner, Employee Benefits", role: Approver, organisation: BDOI, purpose: Review and sign-off}
   - {name: "Marketing, Employee Benefits teams", role: Business tester, organisation: BDOI, purpose: "Programmes, RA, BOR, franchise, TOR, proposals, comparative, placement trigger"}
@@ -40,13 +46,13 @@ distribution:
 
 ## Purpose
 
-This document summarises the test plan for BRD-8 Employee Benefits (EB) in BIBS (BDOI Broker System, on iNXT BrokerVerse), including the partner portal for insurers and client HR users. It tells the BDOI departments what will be tested, how, with which data and by whom, and when testing is complete. The test conditions, scenarios and cases are in the Excel workbook of the same version, `BIBS_TestPlan_BRD-08_Employee_Benefits_v1.0.xlsx`, which the testers use during execution.
+This document summarises the test plan for BRD-8 Employee Benefits (EB) in BIBS (BDOI Broker System, on iNXT BrokerVerse), including the partner portal for insurers and client HR users. It tells the BDOI departments what will be tested, how, with which data and by whom, and when testing is complete. The test conditions, scenarios and cases are in the Excel workbook of the same version, `BIBS_TestPlan_BRD-08_Employee_Benefits_v1.1.xlsx`, which the testers use during execution.
 
-Every case traces to a functional requirement (FR) of FRS BRD-8 v1.0 and to the BRD requirement IDs (BRID-001 to 030, 005.01-005.03, 022.01 and the TAT annex) that the FR meets. The expected results quote the message texts of the FRS, and the screen paths are those of the FRS. Where an EB check reuses a message that the platform already shows (attachment rules, client duplicate, workflow reason, report parameters), the case quotes the text BIBS shows on that screen.
+Every case traces to a functional requirement (FR) of FRS BRD-8 v1.1 and to the BRD requirement IDs (BRID-001 to 030, 005.01-005.03, 022.01 and the TAT annex) that the FR meets. The expected results quote the message texts of the FRS, and the screen paths are those of the FRS. Where an EB check reuses a message that the platform already shows (attachment rules, client duplicate, workflow reason, report parameters), the case quotes the text BIBS shows on that screen.
 
 ## Scope
 
-In scope are all 39 FRs of FRS BRD-8 v1.0 and the 34 BRD references they trace to:
+In scope are all 39 FRs of FRS BRD-8 v1.1 and the 34 BRD references they trace to:
 
 - access by department, document links and access classes, audit and versions, protected outbound files (FR-EB-001 to 004);
 - the partner portal: separate sign-in, provisioning through User Access, staged uploads, review, the insurer task inbox and proposal form, the client HR portal (FR-EB-010 to 015);
@@ -71,10 +77,10 @@ The roles-and-access sheet checks each EB and portal action against the roles th
 <!-- table: widths=1.2,8.6,4.2 caption="Reference documents" -->
 | Ref. | Document | Version |
 |---|---|---|
-| R1 | Functional Requirements Specification BRD-8 Employee Benefits (`BIBS_FRS_BRD-08_Employee_Benefits_v1.0.docx`) | 1.0, 25 Sep 2026 |
+| R1 | Functional Requirements Specification BRD-8 Employee Benefits (`BIBS_FRS_BRD-08_Employee_Benefits_v1.1.docx`) | 1.1, 08 Oct 2026 |
 | R2 | Employee Benefits BRD and Addendum | BRD v1.0 14-Nov-2025; addendum 23-Feb-2026 |
-| R3 | Test plan workbook BRD-8 (`BIBS_TestPlan_BRD-08_Employee_Benefits_v1.0.xlsx`) | 1.0 |
-| R6 | BRD discrepancy and clarification register (`BIBS_Register_BRD-00_Discrepancies_and_Clarifications_v1.0.xlsx`) | 1.0 |
+| R3 | Test plan workbook BRD-8 (`BIBS_TestPlan_BRD-08_Employee_Benefits_v1.1.xlsx`) | 1.1 |
+| R6 | BRD discrepancy and clarification register (`BIBS_Register_BRD-00_Discrepancies_and_Clarifications_v1.2.xlsx`) | 1.2 |
 
 # Test approach
 
@@ -120,7 +126,7 @@ The workbook has a README sheet that explains every column. Case IDs carry their
 |---|---|
 | System test | The EB module and the portal are deployed on SIT, with the RA and follow-up jobs; the business type BT0 and the User Access External request type are available; the virus scan of portal uploads is active; the data sets of section 4.2 are loaded; test mailboxes receive mail. |
 | Persona end-to-end | All High-priority system test cases are run; no open Critical issue; portal users of TD-EB-02 are provisioned; the e-mail relay and one-time codes work on SIT. |
-| UAT | FRS BRD-8 v1.0 is signed off or its open comments are agreed; the open questions that change expected results (EBQ02, EBQ05, EBQ07, EBQ11, EBQ13) are answered or their test values agreed; BDO Information Security has approved the portal hosting for UAT; the UAT environment holds masked data; BDOI testers have user IDs with the roles of section 5. |
+| UAT | FRS BRD-8 v1.1 is signed off or its open comments are agreed; the open questions that change expected results (EBQ02, EBQ05, EBQ07, EBQ11, EBQ13) are answered or their test values agreed; BDO Information Security has approved the portal hosting for UAT; the UAT environment holds masked data; BDOI testers have user IDs with the roles of section 5. |
 
 ## Exit criteria
 

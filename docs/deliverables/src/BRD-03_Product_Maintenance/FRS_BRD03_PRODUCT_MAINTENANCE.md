@@ -2415,7 +2415,7 @@ One row per requirement of the Product Maintenance BRD. The BRD writes its requi
 
 One row per step of the end-to-end walkthroughs (chapter End-to-end walkthroughs). Frame WT-A.3 is step 3 of walkthrough WT-A; the screenshot is the figure of the step in this FRS and the UX deck slide is the first slide of the step in the UX Screen Deck (file 07).
 
-<!-- table: widths=1.3,2.3,2.6,4.2,4.2,1.5,2.2,1.2 caption="Storyboard index: one row per step" size=7 -->
+<!-- table: widths=1.3,2.2,2.5,4.0,4.0,1.9,2.2,1.3 caption="Storyboard index: one row per step" size=7 -->
 | Frame | Persona | Screen | Action | What the user sees / outcome | Screenshot | FR | UX deck slide |
 |---|---|---|---|---|---|---|---|
 | WT-A.1 | MBS | SCR-PM-15 Coverages & Clauses | Opens Coverages & Clauses › Clause Library, clicks New Clause, enters the code FLEET_REPAIR, kind, line Motor, title, effective date and wording, and clicks Save for Authorization | Toast: Clause FLEET_REPAIR saved – pending authorization; the row shows Pending Authorization (Clause pending authorisation) | Figure 61 | FR-PM-010, FR-PM-011 | 88 |

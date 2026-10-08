@@ -3575,7 +3575,7 @@ One row per requirement of the Data Migration BRD V0.03. The BRD writes its requ
 
 The handbook has no walkthrough chapter: its storyboard is the four end-to-end flows of the UX Screen Deck (file 07), UF-A to UF-D, each step shown with a screenshot of the screen specifications of Part B. Frame UF-A.3 is step 3 of flow UF-A; the UX deck slide is the first slide of the step.
 
-<!-- table: widths=1.3,2.3,2.6,4.2,4.2,1.5,2.2,1.2 caption="Storyboard index: one row per step" size=7 -->
+<!-- table: widths=1.3,2.2,2.5,4.0,4.0,1.9,2.2,1.3 caption="Storyboard index: one row per step" size=7 -->
 | Frame | Persona | Screen | Action | What the user sees / outcome | Screenshot | FR | UX deck slide |
 |---|---|---|---|---|---|---|---|
 | UF-A.1 | Data Migration Lead | SCR-DM-02 Data Objects and the decision of an object | Opens Data Objects, finds the object and submits the proposed class for decision | The object in the register with its class and status. Shows the decision as For decision and notifies the business owner | Figure 7 | FR-DM-001, FR-DM-002, FR-DM-003 | 92 |

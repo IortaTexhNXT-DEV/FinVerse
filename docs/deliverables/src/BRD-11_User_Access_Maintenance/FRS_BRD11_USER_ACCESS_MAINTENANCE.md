@@ -2557,7 +2557,7 @@ One row per requirement of the User Access Maintenance BRD. The BRD writes its r
 
 One row per step of the end-to-end walkthroughs (chapter End-to-end walkthroughs). Frame WT-A.3 is step 3 of walkthrough WT-A; the screenshot is the figure of the step in this FRS and the UX deck slide is the first slide of the step in the UX Screen Deck (file 07).
 
-<!-- table: widths=1.3,2.3,2.6,4.2,4.2,1.5,2.2,1.2 caption="Storyboard index: one row per step" size=7 -->
+<!-- table: widths=1.3,2.2,2.5,4.0,4.0,1.9,2.2,1.3 caption="Storyboard index: one row per step" size=7 -->
 | Frame | Persona | Screen | Action | What the user sees / outcome | Screenshot | FR | UX deck slide |
 |---|---|---|---|---|---|---|---|
 | WT-A.1 | Requestor | SCR-UA-07 New Request and Edit Request (user requests) | Opens User Access › Access Requests › New Request, keeps Enrol new user, enters the user ID a013000196, the full name, e-mail, Windows ID and home branch, ticks Marketing Account Officer, chooses the approver Ulysses Access Approver, writes the justification and clicks Save Draft | Toast: AR-yyyy-nnnnnn saved as a draft; the request opens as Draft with Approver Chosen on submission (Draft request) | Figure 47 | FR-UA-010, FR-UA-011, FR-UA-012, FR-UA-013, FR-UA-014, FR-UA-015, FR-UA-016, FR-UA-020, FR-UA-053 | 71 |

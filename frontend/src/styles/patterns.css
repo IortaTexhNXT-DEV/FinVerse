@@ -1756,3 +1756,105 @@ a.card.kpi:focus-visible .kpi-label {
   padding-left: 10px;
   padding-right: 10px;
 }
+
+/* ---------- Wide lists: tools, sticky first column, compact rows ------------------------------ */
+.table-tools {
+  position: relative;
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4) 0;
+}
+
+.column-chooser {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: var(--space-4);
+  z-index: 30;
+  width: 320px;
+  max-height: 420px;
+  overflow: auto;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-lg);
+}
+
+.column-chooser ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.column-chooser li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: 2px 0;
+}
+
+.column-chooser .checkbox.fixed {
+  color: var(--color-text-muted);
+}
+
+.column-chooser-move {
+  display: flex;
+  gap: 2px;
+}
+
+.column-chooser footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+}
+
+.table-sticky .sticky-col {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+}
+
+.table-sticky .sticky-col-1 {
+  left: var(--sticky-left-1, 0);
+}
+
+.table-sticky thead th.sticky-col {
+  z-index: 3;
+}
+
+.table-sticky tbody td.sticky-col {
+  background: var(--color-surface);
+}
+
+.table-sticky tbody tr:nth-child(even) td.sticky-col {
+  background: var(--table-row-alt);
+}
+
+.table-sticky tbody tr:hover td.sticky-col {
+  background: var(--table-row-hover);
+}
+
+.table-sticky tbody tr[aria-selected='true'] td.sticky-col {
+  background: var(--table-row-selected);
+}
+
+/* A thin rule on the right of the sticky column while the list scrolls sideways */
+.table-sticky .sticky-last {
+  box-shadow: inset -1px 0 0 var(--color-border);
+}
+
+.table-compact th,
+.table-compact td {
+  padding-top: 5px;
+  padding-bottom: 5px;
+  font-size: 13px;
+}
+
+.table-compact .cell-stack > .muted {
+  font-size: 12px;
+}

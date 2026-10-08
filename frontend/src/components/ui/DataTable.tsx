@@ -3,6 +3,9 @@ import { Fragment, useRef } from 'react';
 import type { KeyboardEvent, ReactNode } from 'react';
 import { EmptyState } from './EmptyState';
 import { PeriodCell } from './PeriodCell';
+import { stickyCount, useStickyOffsets, withSticky } from './stickyColumns';
+import { TableTools } from './TableTools';
+import { useColumnChoice } from './useColumnChoice';
 import { useFitHeight } from './useFitHeight';
 
 /**
@@ -28,6 +31,13 @@ export interface Column<T> {
    * tooltip (names, record types, units), instead of wrapping.
    */
   truncate?: boolean;
+  /**
+   * Left out of the default view of a wide list (the column chooser shows it on demand); the
+   * column stays in the Excel export.
+   */
+  defaultHidden?: boolean;
+  /** Name of the column in the column chooser when the header is not a plain text. */
+  label?: string;
 }
 
 export type SortDirection = 'asc' | 'desc';
@@ -62,6 +72,13 @@ interface DataTableProps<T> {
   renderExpanded?: (row: T) => ReactNode;
   /** Keys of the expanded rows. */
   expanded?: ReadonlySet<string | number>;
+  /**
+   * Name of the list under which the user's column choice is kept (defaults to the callout). Lists
+   * of eight columns or more, or with a column hidden by default, get the column chooser, the
+   * density toggle and a sticky first column; `chooser` forces them on or off.
+   */
+  list?: string;
+  chooser?: boolean;
 }
 
 const KIND_CLASS: Record<ColumnKind, string | undefined> = {
@@ -126,6 +143,57 @@ function keepTogether(value: ReactNode): ReactNode {
  */
 function headerOf<T>(c: Column<T>): ReactNode {
   return c.header === '' ? 'Actions' : c.header;
+}
+
+/** A header cell: its label, or the sort button where the API sorts the column. */
+function HeaderCell<T>({
+  column: c,
+  className,
+  sort,
+  onSort,
+}: Readonly<{
+  column: Column<T>;
+  className: string | undefined;
+  sort?: SortState;
+  onSort?: (sort: SortState) => void;
+}>) {
+  return (
+    <th
+      className={className}
+      // A truncating column keeps its width as its least width: its cells carry no width of their
+      // own, so a crowded table would otherwise squeeze it to a few letters.
+      style={{ width: c.width, minWidth: c.truncate ? c.width : undefined }}
+      aria-sort={ariaSort(c, sort)}
+      scope="col"
+    >
+      {onSort !== undefined && c.sortKey !== undefined ? (
+        <SortHeader column={c} sort={sort} onSort={onSort} />
+      ) : (
+        headerOf(c)
+      )}
+    </th>
+  );
+}
+
+/** Whether the totals footer shows: a loaded list with rows. */
+function showFooter(footer: ReactNode, loading: boolean, rows: number): boolean {
+  return footer !== undefined && !loading && rows > 0;
+}
+
+/** The class of the table: sticky first column and compact rows for a list with the chooser. */
+function tableClassOf(chooser: boolean, density: string): string {
+  if (!chooser) {
+    return 'table';
+  }
+  return density === 'compact' ? 'table table-sticky table-compact' : 'table table-sticky';
+}
+
+/** The name of a column in the chooser: its header text, else its label, else its key. */
+function chooserName<T>(c: Column<T>): string {
+  if (typeof c.header === 'string' && c.header !== '') {
+    return c.header;
+  }
+  return c.label ?? (c.header === '' ? 'Actions' : c.key);
 }
 
 function cellClass<T>(c: Column<T>): string | undefined {
@@ -196,7 +264,7 @@ type BodyProps<T> = Pick<
   | 'selectedKey'
   | 'renderExpanded'
   | 'expanded'
-> & { loading: boolean; skeletonRows: number };
+> & { loading: boolean; skeletonRows: number; sticky?: number };
 
 function SkeletonRows<T>({ columns, count }: Readonly<{ columns: Column<T>[]; count: number }>) {
   return (
@@ -231,6 +299,7 @@ function TableBody<T>({
   skeletonRows,
   renderExpanded,
   expanded,
+  sticky = 0,
 }: Readonly<BodyProps<T>>) {
   if (loading) {
     return (
@@ -270,8 +339,8 @@ function TableBody<T>({
               onKeyDown={onRowClick ? keyDown(row) : undefined}
               tabIndex={onRowClick ? 0 : undefined}
             >
-              {columns.map((c) => (
-                <td key={c.key} className={cellClass(c)}>
+              {columns.map((c, i) => (
+                <td key={c.key} className={withSticky(cellClass(c), i, sticky)}>
                   {c.truncate ? truncated(c.render(row)) : keepTogether(c.render(row))}
                 </td>
               ))}
@@ -312,49 +381,60 @@ export function DataTable<T>({
   renderExpanded,
   expanded,
   callout,
+  list,
+  chooser,
 }: Readonly<DataTableProps<T>>) {
   const ref = useRef<HTMLDivElement>(null);
   useFitHeight(ref);
+  const choice = useColumnChoice(columns, list ?? callout, chooser);
+  const shown = choice.visible;
+  const sticky = choice.on ? stickyCount(shown) : 0;
+  useStickyOffsets(ref, sticky);
+  const tableClass = tableClassOf(choice.on, choice.choice.density);
   return (
-    <div ref={ref} className="table-wrap" data-fit="" data-callout={callout}>
-      <table className="table" aria-busy={loading || undefined}>
-        {caption !== undefined && <caption className="visually-hidden">{caption}</caption>}
-        <thead>
-          <tr>
-            {columns.map((c) => (
-              <th
-                key={c.key}
-                className={cellClass(c)}
-                // A truncating column keeps its width as its least width: its cells carry no width
-                // of their own, so a crowded table would otherwise squeeze it to a few letters.
-                style={{ width: c.width, minWidth: c.truncate ? c.width : undefined }}
-                aria-sort={ariaSort(c, sort)}
-                scope="col"
-              >
-                {onSort !== undefined && c.sortKey !== undefined ? (
-                  <SortHeader column={c} sort={sort} onSort={onSort} />
-                ) : (
-                  headerOf(c)
-                )}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <TableBody
-          columns={columns}
-          rows={rows}
-          rowKey={rowKey}
-          onRowClick={onRowClick}
-          emptyMessage={emptyMessage}
-          emptyAction={emptyAction}
-          loading={loading}
-          selectedKey={selectedKey}
-          skeletonRows={skeletonRows}
-          renderExpanded={renderExpanded}
-          expanded={expanded}
+    <>
+      {choice.on && (
+        <TableTools
+          columns={columns.map((c) => ({ key: c.key, header: chooserName(c) }))}
+          choice={choice.choice}
+          locked={choice.locked}
+          onChange={choice.change}
+          onReset={choice.reset}
         />
-        {footer !== undefined && !loading && rows.length > 0 && <tfoot>{footer}</tfoot>}
-      </table>
-    </div>
+      )}
+      <div ref={ref} className="table-wrap" data-fit="" data-callout={callout}>
+        <table className={tableClass} aria-busy={loading || undefined}>
+          {caption !== undefined && <caption className="visually-hidden">{caption}</caption>}
+          <thead>
+            <tr>
+              {shown.map((c, i) => (
+                <HeaderCell
+                  key={c.key}
+                  column={c}
+                  className={withSticky(cellClass(c), i, sticky)}
+                  sort={sort}
+                  onSort={onSort}
+                />
+              ))}
+            </tr>
+          </thead>
+          <TableBody
+            columns={shown}
+            sticky={sticky}
+            rows={rows}
+            rowKey={rowKey}
+            onRowClick={onRowClick}
+            emptyMessage={emptyMessage}
+            emptyAction={emptyAction}
+            loading={loading}
+            selectedKey={selectedKey}
+            skeletonRows={skeletonRows}
+            renderExpanded={renderExpanded}
+            expanded={expanded}
+          />
+          {showFooter(footer, loading, rows.length) && <tfoot>{footer}</tfoot>}
+        </table>
+      </div>
+    </>
   );
 }

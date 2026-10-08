@@ -513,7 +513,7 @@ screen_templates_more:
         values: [[MONTHLY, Monthly], [QUARTERLY, Quarterly], [MONTHLY_EXCEPT_QUARTER_END, "Monthly except the quarter-end month"], [ANNUAL, Annual]]
       TAX_WORKSHEET:
         name: Tax worksheet
-        values: [[VAT, VAT worksheet], [EWT, Withholding tax worksheet], [DST, Documentary stamp tax worksheet], [PREMIUM_TAX, Premium tax worksheet], [LGT, Local government tax worksheet], [FST, Fire service tax worksheet], [NONE, "Prepared outside BIBS (reminder only)"]]
+        values: [[VAT, VAT worksheet], [EWT, Withholding tax worksheet], [NONE, "Prepared outside BIBS (reminder only)"]]
 depends_more:
   MD-03: [MD-02]
   TX-01: [D0-10, R04, C01, MD-01, UP-02]
@@ -605,7 +605,7 @@ tax_checklist:
   - [Top withholding agent clients, "Withholding by a client is recorded as a 2307 received; BIBS has no top withholding agent flag on the client.", "Not held (sheet Gaps)", "Whether a flag is needed and what it must do", "No", TX-Q09]
   - [Final tax on bank interest, "BIBS has no final withholding tax type; bank interest is posted by journal.", "Not held (sheet Gaps)", "Whether BIBS must record it as a tax", "No", TX-Q06]
   - [Percentage tax on BDOI's own receipts, "The premium tax type is a charge on premiums; BIBS has no percentage tax on BDOI's own receipts.", "Not held (sheet Gaps)", "Whether any BDOI income is subject to percentage tax", "No", TX-Q06]
-  - [Tax returns and the filing calendar, "BIBS knows the forms 2550Q, 0619-E, 1601-EQ, 1601-C (prepared outside BIBS, reminder only) and the premium-levy returns 2000 (DST), 2551Q (premium tax), local business tax and FST, which the insurers file.", "TX-02", "The forms BDOI files, their due dates and accounts", "Yes", TX-Q07]
+  - [Tax returns and the filing calendar, "BIBS prepares the VAT return 2550Q and the withholding tax forms 0619-E and 1601-EQ from its worksheets and reminds of 1601-C (prepared in the payroll system). The premium-levy returns (DST, premium tax, local business tax, FST) are the insurers' returns and are not kept in BIBS.", "TX-02", "The forms BDOI files, their due dates and accounts", "Yes", TX-Q07]
   - [Tax exemption certificates of clients, "BIBS keeps no exemption certificate number or validity.", "Not held (sheet Gaps)", "Whether they must be kept and checked", "No", TX-Q09]
   - [Company tax registration, "BIBS keeps the TIN with its branch code (D0-01) only; no RDO, VAT registration, CAS or e-invoicing permit.", "D0-01; not held (sheet Gaps)", "The registration details needed on the forms and receipts", "No", TX-Q08]
 
@@ -721,8 +721,7 @@ extra_rows_more:
     tab: BRD-05
     type: Clarification
     need: 'Tax forms: confirm the forms BDOI files and their due dates and accounts (2550Q, 0619-E, 1601-EQ, 1601-C and others),
-      and confirm that the premium-levy returns BIBS also knows (2000 DST, 2551Q premium tax, local business tax, FST) are
-      filed by the insurers, not by BDOI (template TX-02).'
+      and confirm that the premium-levy returns (DST, premium tax, local business tax, FST) are filed by the insurers, not by BDOI, so that BIBS keeps no worksheet for them (template TX-02).'
     why: The tax calendar warns before each deadline only for the forms set up.
     proposal: BDOI files the VAT and withholding tax forms; the premium levies are the insurers' returns.
     source: Templates workbook, TX-02 and D0-10 Tax checklist

@@ -91,8 +91,12 @@ def dm_module():
 
 
 def drop_closure():
+    """The Drop 0 closure module, without the insurer-company configuration items (insurer_exclusions)."""
     import drop_closure as dc  # noqa: PLC0415
 
+    skip = set((cfg().get("insurer_exclusions") or {}).get("config_items") or [])
+    items = dc.data()["items"]
+    items[:] = [it for it in items if it["id"] not in skip]
     return dc
 
 
@@ -1730,8 +1734,10 @@ def data_gap_rows() -> list[dict[str, Any]]:
     items = ([(x[0], x[1], x[5]) for x in cfg()["charges_checklist"] if x[4] == "No"]
              + [(x[0], x[1], x[5]) for x in cfg()["tax_checklist"] if x[4] == "No"]
              + [(x[0], x[3], x[4]) for x in cfg()["coverage"] if x[2] in ("No", "Partly") and x[4]])
-    for name, why, ref in items:
-        if name in seen:
+    checklist_refs = {x[5] for key in ("charges_checklist", "tax_checklist") for x in cfg()[key] if x[4] == "No"}
+    n_checklist = sum(1 for key in ("charges_checklist", "tax_checklist") for x in cfg()[key] if x[4] == "No")
+    for i, (name, why, ref) in enumerate(items):
+        if name in seen or (i >= n_checklist and ref in checklist_refs):
             continue
         seen.add(name)
         q = a.get(ref)
@@ -1948,7 +1954,7 @@ def render(doc: Any, render: str, **_: Any) -> None:  # noqa: A002 - block key
                   caption="Load routes", size=8.5)
         return
     if render == "order":
-        rows = [[r["Step"], r["ID"], r["Dataset"], r["Load route"], r["Loads after"], r["Due"]] for r in index_rows()]
+        rows = [[r["Step"], r["ID"], r["Dataset"], route_of(r["ID"]), r["Loads after"], r["Due"]] for r in index_rows()]
         doc.table(["Step", "ID", "Dataset", "Route", "Loads after", "Due"], rows, widths=[0.9, 1.2, 5.6, 2.6, 2.5, 4.8],
                   caption="Load order of the datasets (dependencies first)", size=7.5, keep_rows=False)
         return

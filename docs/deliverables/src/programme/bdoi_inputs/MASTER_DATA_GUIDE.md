@@ -81,12 +81,7 @@ Seven review sheets list what the platform delivers and ask for the value BDOI w
 
 # Taxes and charges
 
-Two checklists make sure no tax or charge is missed. The template **PM-04 Rate tables** carries one row per premium charge billed to clients (documentary stamp tax, premium tax, VAT on premium, fire service tax, VAT on BDOI's commission and the motor factors); BDOI gives the rate per line and the dates, and adds a row where a line has another rate. The local government tax is the rate of each insurer branch in **R04B**. The sheet **PM-04 Charges checklist** states the rule BIBS applies to each charge, for BDOI to confirm.
-
-```pack
-plugin: build_bdoi_inputs.py
-render: charges
-```
+Two checklists make sure no tax or charge is missed. The template **PM-04 Rate tables** carries one row per premium charge billed to clients (documentary stamp tax, premium tax, VAT on premium, fire service tax, VAT on BDOI's commission and the motor factors); BDOI gives the rate per line and the dates, and adds a row where a line has another rate. The local government tax is the rate of each insurer branch in **R04B**. The sheet **PM-04 Charges checklist** states the rule BIBS applies to each charge, for BDOI to confirm: every charge is a rate of the net premium after the minimum premium, computed independently of the others; DST is rounded up to the next half peso and the other charges to centavos. Charges other than these taxes (CTPL COCAF or LTO authentication, notarial or documentation fees) have no field in BIBS and are asked as questions.
 
 The template **D0-10 Tax codes** carries one row per kind of BDOI's own tax: output VAT on commission and service fees, zero-rated and exempt sales, input VAT, the withholding tax insurers and clients withhold on BDOI's income (2307 received) and the withholding taxes BDOI deducts from suppliers, one row per ATC. BDOI gives the codes, ATCs, rates and accounts as its tax adviser confirms them; the workbook proposes none. The sheet **D0-10 Tax checklist** says what BIBS does with each and what it does not hold (final taxes, government and top withholding agent flags, exemption certificates). The tax details of each party (TIN, branch code, payee class, VAT treatment, default ATC) are given in **TX-01 Party tax profiles**, and the returns BDOI files with their due dates in **TX-02 Tax forms**.
 

@@ -85,10 +85,11 @@ screens:
       - "Split Pairing | Production Reconciliation Handler | Manually paired item | Splits the pair back into its two sides | BDOI Only and Insurer Only | -"
       - "Close Cycle | Production Reconciliation Handler | Reconciling | Closes the cycle with a comment; the cycle also closes by itself when every item is matched or for closure | Closed | Workflow notice (NT-01)"
     rules:
-      - "Lines are paired on the match keys in order (by default the invoice number, then the policy number); commission, basic and gross premium match within 1.00; policy, reference and PN numbers and the period must be equal; names are compared ignoring case and spacing (FR-OP-075)."
+      - "Lines are paired on the match keys in order (by default the invoice number, then the policy number); commission, basic and gross premium match within 1.00 peso equivalent (a foreign currency difference is converted to pesos first); policy, reference and PN numbers and the period must be equal; names are compared ignoring case and spacing (FR-OP-075)."
       - "An item with any difference is Matched with Discrepancy and lists the fields that differ (FR-OP-075)."
       - "A BDOI-only item can be paired with an insurer-only line, and a wrong pair split (FR-OP-077)."
-      - "The early incentive claimed by the insurer is checked against the rate and window of the Remittance incentive rules (FR-OP-078)."
+      - "The early incentive applied by the insurer is checked against the rate and window of the Remittance incentive rules (FR-OP-078)."
+      - "Annotations (company concerned, instruction, feedback) are linked to the item and never change policy, invoice or amount data (FR-OP-077)."
       - "The history of the cycle and of each item is kept (FR-OP-079)."
     outcome: Every difference between BDOI's and the insurer's production is followed to closure.
     frs: [FR-OP-075, FR-OP-077, FR-OP-078, FR-OP-079]

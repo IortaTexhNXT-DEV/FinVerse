@@ -51,6 +51,7 @@ screens:
       - "An invoice on hold, with a pending negative adjustment, written off, locked by another team, with a payment younger than the check holding period, or whose paid AR is above its DTIP balance is not extracted and is tagged with the reason (FR-OP-031)."
       - "The scheduled extraction runs every day at noon; each insurer is processed on its own (FR-OP-030)."
       - "An invoice covered by an early remittance incentive rule goes to a With Incentives batch (FR-OP-038)."
+      - "In v2.1 any pending or unresolved financial endorsement also blocks the extraction; an extracted invoice is never taken again by a later run, and it keeps its source (scheduled, manual or special) (FR-OP-030, FR-OP-031)."
     outcome: The premium due to each insurer is grouped into batches with the reasons for every invoice left out.
     frs: [FR-OP-030, FR-OP-031, FR-OP-038]
     tests: [EXTRACTION]
@@ -131,6 +132,7 @@ screens:
       - "Approval posts the remittance: DTIP, commission, VAT and withholding tax remitted, the incentive income of a With Incentives batch, and the payment request of the payable to Disbursement (FR-OP-035, FR-OP-038)."
       - "The DV number of Disbursement makes each invoice Fully or Partially Remitted and releases its lock (FR-OP-036)."
       - "The schedule is sent to the insurer once per batch (FR-OP-110)."
+      - "In v2.1 the schedule can be saved or exported before submission, marked Draft (FR-OP-034, CLR-OP-45)."
       - "Deductions confirmed by the insurer are taken from the amount due of its next batch (FR-OP-035)."
     outcome: The batch is reviewed, approved, paid through Disbursement and closed by the insurer's OR.
     frs: [FR-OP-032, FR-OP-033, FR-OP-034, FR-OP-035, FR-OP-036, FR-OP-038, FR-OP-110]
@@ -388,7 +390,8 @@ screens:
       - "New Rule / Save Rule | Remittance Team Leader | Always | Saves the rule | Active | -"
     rules:
       - "An invoice whose insurer, product line and segment a rule covers, remitted within the window, goes to a With Incentives batch; the incentive is the rate of the basic premium share and carries VAT (FR-OP-038)."
-      - "Production Reconciliation validates the early incentive claimed by an insurer against the same rules (FR-OP-078)."
+      - "The incentive applies to qualified CLG / CBG motor and fire accounts remitted within the window, as a separate line that never changes the commission or the remitted amounts (RMTID.041, FR-OP-038)."
+      - "Production Reconciliation checks the early incentive applied by an insurer against the same rules (FR-OP-078)."
     outcome: The early remittance incentives agreed with the insurers are applied automatically.
     frs: [FR-OP-038, FR-OP-078]
     tests: [INCRULES]

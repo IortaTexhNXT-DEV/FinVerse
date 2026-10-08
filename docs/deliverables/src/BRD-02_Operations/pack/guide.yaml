@@ -5,14 +5,14 @@ meta:
   deck_title: Sign-off Pack Guide
   module: Operations
   owner: "Operations: Financial Transactions and Processing (FT&P)"
-  issued: Mon 28-Sep-2026
+  issued: Thu 08-Oct-2026
   signoff_date: Fri 18-Dec-2026
 
 # The documents of the set in reading order. kind = doc type of the file name (brand.READING_ORDER).
 documents:
   - {kind: StartHere, name: Operations, ext: docx, what: "Start Here: the map of the pack, who reads what, the steps and the dates", readers: Everyone, when: "First, on issue"}
   - {kind: GuideDeck, name: Operations, ext: pptx, what: "Sign-off Pack Guide: purpose, approach, the module at a glance, caveats and impacts on other modules, entry and exit criteria, change control", readers: "Business owner, unit heads; presented at the kick-off", when: "Kick-off session"}
-  - {kind: FRS, name: Operations, ext: docx, what: "Functional Requirements Specification v2.0: requirements, navigation, 64 screen specifications with screenshots, walkthroughs, messages, notifications, documents, uploads, cross-BRD contract", readers: "Business users of each Operations team; Comptrollership, Disbursement and BDOI IT for their chapters", when: "During the review, with the SIT walkthroughs"}
+  - {kind: FRS, name: Operations, ext: docx, what: "Functional Requirements Specification v2.1 on the Operations BRD v1.01 and the May 2026 annexes: requirements, navigation, 63 screen specifications with screenshots, walkthroughs, messages, notifications, documents, uploads, cross-BRD contract, user-story view and storyboard index", readers: "Business users of each Operations team; Comptrollership, Disbursement and BDOI IT for their chapters", when: "During the review, with the SIT walkthroughs"}
   - {kind: Signoff, name: Operations, ext: xlsx, what: "Sign-off workbook: one row per screen, field, rule and message with the BU review columns; comments log, meeting minutes, version history, sign-off certificate", readers: "Every reviewer; the business owner signs it", when: "During the review and at sign-off"}
   - {kind: TestPlan, name: Operations, ext: xlsx, what: "Test plan workbook: the test cases traced to the FRs and to the screens, including one screen case and one message case per screen", readers: "Business users who will run UAT; BDOI IT", when: "After the screens; used again in SIT and UAT"}
   - {kind: TestPlan, name: Operations Summary, ext: docx, what: "Test plan summary: scope, approach, coverage and the cases by area", readers: "Business owner, BDOI IT", when: "Before sign-off"}
@@ -20,10 +20,10 @@ documents:
   - {kind: UXScreens, name: Operations, ext: xlsx, what: "UX screen register: one row per screen image with the screen, personas, walkthrough and step, state, FRS section and requirements, UXD status and comments, and the Changed in this issue flag", readers: "BDOI UX Design team", when: "Kept by the UX Design team; the changed rows are flagged at each issue"}
   - {kind: UXScreens, name: Operations, ext: zip, what: "Image package: every screen image at twice the screen resolution (PNG), the component crops and the register as CSV", readers: "BDOI UX Design team", when: "Imported into the design tool at each issue"}
 
-# Reading order per role (FRS chapter numbers of v2.0).
+# Reading order per role (FRS chapter numbers of v2.1).
 reading:
   - role: Business owner (Product Owner; Operations FT&P)
-    order: "00 Start Here; 01 Guide deck; FRS chapters 1-3 (context and personas), 14 (walkthroughs), 20 (sign-off) and 21 (proposed rules for confirmation); workbook Sign-off certificate"
+    order: "00 Start Here; 01 Guide deck; FRS chapters 1-3 (context and personas), 14 (walkthroughs), 20 (sign-off), 21 (proposed rules for confirmation, CLR-OP-36 to 62 new in v2.1) and 22 (user-story view); workbook Sign-off certificate"
   - role: Cashiering (cashiers and Team Leader)
     order: "FRS chapter 4 Cashiering; the Cashiering screens of chapter 13 (SCR-OP-07 to 22); walkthroughs A (steps 3-4), B (steps 8-9) and D (steps 3-4); messages in chapter 15; documents DO-01 and DO-02 in chapter 17; upload templates in chapter 18"
   - role: Remittance (processors and Team Leader)
@@ -33,7 +33,7 @@ reading:
   - role: Production Reconciliation and Commission Receivables
     order: "FRS chapter 4 Production Reconciliation and Commission Receivables; screens SCR-OP-43 to 60; walkthrough C; documents DO-07 and DO-08"
   - role: Marketing Collection and Marketing Team Leader
-    order: "Holds, special remittance, BIR 2307 tags and endorsement requests (SCR-OP-19, 28 to 31, 38); walkthrough B steps 1-3 and D steps 1-2"
+    order: "The PR 2307 reversal now owned by Marketing Collection (FR-OP-113, SCR-OP-19, CLR-OP-40 to 43); holds, special remittance and endorsement requests with their returns (SCR-OP-28 to 31, 38, 39); walkthrough B steps 1-3 and D steps 1-2; the Marketing rows of the user-story view (chapter 22)"
   - role: Comptrollership, Disbursement and ACSL (BRD-5)
     order: "Accounting events (chapter 5); Disbursement Queue and Remittance Deductions (SCR-OP-33, 34, 36); BIR certificates (SCR-OP-58, 59); cross-BRD contract (chapter 19)"
   - role: BDOI IT
@@ -48,9 +48,9 @@ steps:
   - step: 1
     name: Pack issued
     who: "R: iorta TechNXT Project Manager; A: iorta TechNXT delivery lead; I: all reviewers"
-    inputs: "FRS v2.0, workbook, test plan, guide and deck"
-    outputs: "Release set v2.0 in the BRD-02 folder; invitations to the sessions"
-    duration: "Day 0 (Mon 28-Sep-2026); sessions scheduled after the BRD-10, 12, 6 and 9 sign-offs"
+    inputs: "FRS v2.1, workbook, test plan, guide and deck"
+    outputs: "Release set v2.1 in the BRD-02 folder (re-based on the BRD v1.01 and the May 2026 annexes; v2.0 was issued on Mon 28-Sep-2026); invitations to the sessions"
+    duration: "Day 0 (Thu 08-Oct-2026); sessions scheduled after the BRD-10, 12, 6 and 9 sign-offs"
   - step: 2
     name: Kick-off and screen walkthrough on SIT
     who: "R: iorta TechNXT Business Analysis; A: BDOI Product Owner; C: Operations FT&P unit heads; I: BDOI IT"
@@ -70,15 +70,15 @@ steps:
     outputs: "One consolidated comments log, each item typed (clarification, correction, change request) and answered; Q&A minutes"
     duration: "3 working days, Q&A on Wed 9-Dec-2026"
   - step: 5
-    name: One revision cycle (v2.1)
+    name: One revision cycle (v2.2)
     who: "R: iorta TechNXT Business Analysis; A: iorta TechNXT delivery lead; C: reviewers who raised the items"
     inputs: "Agreed clarifications and corrections"
-    outputs: "Release set v2.1 with the changed rows marked; change requests raised for the rest"
-    duration: "2 working days, v2.1 on Fri 11-Dec-2026; check by the reviewers until Wed 16-Dec-2026"
+    outputs: "Release set v2.2 with the changed rows marked; change requests raised for the rest"
+    duration: "2 working days, v2.2 on Fri 11-Dec-2026; check by the reviewers until Wed 16-Dec-2026"
   - step: 6
     name: Sign-off meeting and signature
     who: "R: iorta TechNXT Project Manager; A: BDOI Product Owner; C: Operations FT&P, Comptrollership, BDOI IT"
-    inputs: "v2.1 (or v2.0 when no revision is needed); open items with their decision"
+    inputs: "v2.2 (or v2.1 when no revision is needed); open items with their decision"
     outputs: "Signed sign-off certificate; minutes; open items accepted as assumptions or change requests"
     duration: "Fri 18-Dec-2026"
   - step: 7
@@ -110,7 +110,8 @@ rules:
   - "An invoice worked by one team is locked to the others (Remittance, Adjustment, Cashiering) until that team is done."
   - "An endorsement or cancellation is recomputed per insurer, validated by Adjustment and approved by its Team Leader before posting; posting books the invoice, re-applies payments and sets up the AR Insurer."
   - "The insurer's production is matched to the booked invoices within tolerance; differences get feedback and a disposition before the cycle is closed."
-  - "Direct payment commission is billed to the insurer, confirmed by its answer and collected; late answers are flagged after ten working days."
+  - "Direct payment entries come from the system tagging; only fully paid accounts are billed to the insurer, the answers are recorded and the receivables are aged by invoice; incentives follow each insurer's SLA per invoice."
+  - "Minimal balances are cleared when the payment is processed and never reach Unapplied Payments; the PR 2307 reversal is done by Marketing Collection and Disbursement only releases the certificates."
 
 # Caveats and possibilities, and how each is handled.
 caveats:
@@ -138,6 +139,10 @@ caveats:
     text: "Bank payment files, insurer file transfers, the mail relay and the flow-in feeds depend on specifications from BDOI IT."
     handling: "A file upload or download step until the specification arrives; the automatic transfer is then a change request. The technical detail is in the Technical Specification, reviewed by BDOI IT."
     example: "Insurer ORs are uploaded from the insurer's file today; an automatic pick-up from the insurer's file transfer folder is added when the transport is agreed."
+  - topic: New BRD versions of April and May 2026
+    text: "BRD v1.01 and the five May 2026 annexes remove check pick-up and the Cashiering 2307 steps, and change Remittance, Production Reconciliation, Adjustment and Commission Receivables. The screens of this set were captured before these changes."
+    handling: "The FRS states each changed rule as proposed in v2.1 and lists what BDOI confirms in CLR-OP-36 to 62; the screens follow the confirmed rules in the next issue of the set."
+    example: "The BIR 2307 screen still shows the Cashier's Validate and Post Report button; in v2.1 Marketing Collection performs it (CLR-OP-40)."
   - topic: Open questions and assumptions
     text: "Open questions of FRS section 10.3 follow the assumptions of section 10.1; chapter 21 lists the proposed rules and clarifications for confirmation."
     handling: "Answered as configuration where possible (lists of values, parameters, templates); otherwise a change request; the assumption stands until then."
@@ -151,7 +156,7 @@ entry:
   - "The BRD-1 New Business set is signed (booked invoices are the input of Operations)."
 exit:
   - "Every row of the workbook reviewed by its team (Accept, Change requested or Comment)."
-  - "Every comments log item closed: answered, corrected in v2.1, or raised as a change request."
+  - "Every comments log item closed: answered, corrected in v2.2, or raised as a change request."
   - "Open questions closed or accepted as assumptions."
   - "The sign-off certificate signed by every signatory of the Who signs what matrix: prepared, input, reviewed and approved as on the Operations BRD approval sheet; the Product Owner approves the whole set."
 done:
@@ -172,6 +177,7 @@ handover_note: "After sign-off the content is frozen as signed and the approved 
 governance:
   - {role: "Business owner and approver", who: "Shellah Marie C. Miranda, AVP, Product Owner", does: "Accountable for the sign-off; chairs the sign-off meeting"}
   - {role: "Business owner of Operations", who: "Jose Melvin M. Jarin, Operations: Financial Transactions and Processing", does: "Approves for Operations; coordinates the teams' review"}
+  - {role: "Business owner of the Marketing Collection items", who: "Pia Grace M. Pinili, Collections and Marketing Support", does: "Approves the Marketing Collection items, including the PR 2307 reversal and the direct payment tagging"}
   - {role: "Reviewers", who: "Shirley Catapang and Perjelyn Joy Gutierrez (FT&P, input providers of the BRD); Cashiering, Remittance, Adjustment, Production Reconciliation and Commission Receivables teams", does: "Review their screens and rows; raise comments"}
   - {role: "BDOI IT", who: "Information Technology Group", does: "Reviews interfaces, jobs, access and the Technical Specification"}
   - {role: "BRD owner", who: "Dan Ace Cauton, Program Manager, and Zean C. Ibay, Business Analyst, ESG-BPS", does: "Traceability to the BRD; sign-off coordination"}

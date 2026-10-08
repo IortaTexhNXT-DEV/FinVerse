@@ -46,8 +46,9 @@ screens:
       - "Upload DP List / Upload and Validate | Commission Handler | File chosen | Takes in the list and validates every account | DP for confirmation | -"
       - "Pull from Collection | Commission Handler | Always | Takes the lists waiting in the collection feed | DP for confirmation | -"
     rules:
-      - "The file name follows <Branch>_DP_<yyyyMMdd> and a file with the same content as an earlier one is refused (FR-OP-090)."
-      - "The branch tracker shows which branches submitted their list for the period (FR-OP-090)."
+      - "In v2.1 the DP entries come from the DP tagging confirmed by Marketing Collection, with no upload; the list upload shown here stays as a fallback until BDOI withdraws it (FR-OP-090, CLR-OP-54)."
+      - "A fallback file is named <Branch>_DP_<yyyyMMdd> and a file with the same content as an earlier one is refused (FR-OP-090)."
+      - "The branch tracker shows which branches had DP entries for the period (FR-OP-090)."
     outcome: Direct payment accounts from every branch are taken in and validated.
     frs: [FR-OP-090, FR-OP-091]
     tests: [DPLISTS]
@@ -79,8 +80,9 @@ screens:
       - "Validate Again | Commission Handler | Invalid or incomplete | Runs the validation rules again | Unchanged or valid | -"
       - "Reinstate PR / Reverse PR Again | Commission Handler | PR reversed / reinstated | Reinstates the premium receivable with a reason, or reverses it again | Reinstated / PR reversed | -"
     rules:
-      - "An account passes when the invoice is booked, tagged direct payment, not cancelled, of the listed insurer and premium, has no pending negative adjustment and still has commission open; the same invoice active on another list is a duplicate (FR-OP-091)."
-      - "The rule results are kept per account (FR-OP-091)."
+      - "In v2.1 the account review is read-only: the checks against the ledger shown here become highlighted inconsistencies and no longer set a result; only the approved exclusion rules (Negative amount, Fully cancelled) exclude an account (FR-OP-091, CLR-OP-55, CLR-OP-56)."
+      - "In v2.1 an account is eligible for billing when the payment status upstream is Paid; Confirm Paid to Insurer and Exclude are withdrawn, and the statuses are Valid, Invalid and Returned (FR-OP-091, CLR-OP-60, CLR-OP-62)."
+      - "The same invoice entered twice is highlighted as a duplicate (FR-OP-091)."
       - "The commission party of a co-insured direct payment account is the lead insurer (FR-OP-092)."
     outcome: Valid direct payment accounts are confirmed and billed to their insurers.
     frs: [FR-OP-091, FR-OP-092, FR-OP-094]
@@ -103,9 +105,9 @@ screens:
     actions:
       - "Open a row | Every Commission user | Always | Opens the billing | - | -"
     rules:
-      - "The insurer's answer is due ten working days after sending, on the head office calendar (FR-OP-093)."
+      - "The follow-up date of the insurer's answer is ten working days after sending, on the head office calendar; in v2.1 it is a reminder and the receivables are aged by invoice from the billing or Statement of Account date (FR-OP-092, FR-OP-099, CLR-OP-61)."
     outcome: The team follows every billing to its collection.
-    frs: [FR-OP-092, FR-OP-093]
+    frs: [FR-OP-092, FR-OP-093, FR-OP-099]
     tests: [DPBILLINGS]
 
   - id: SCR-OP-54
@@ -138,7 +140,7 @@ screens:
       - "Record Collection | Commission Handler | Approved by insurer | Posts the collection (cash, withholding tax, commission and output VAT), reverses the premium receivable of each approved account and requests the OR from Cashiering | Commission collected, then Closed - PR reversed | -"
       - "Cancel Billing | Commission Handler or Team Leader | Before sending | Asks for the reason and cancels the billing | Cancelled | -"
     rules:
-      - "A billing holds the confirmed accounts of one insurer (FR-OP-092)."
+      - "A billing holds the Valid accounts of one insurer; a Statement of Account per insurer is produced besides the billing (FR-OP-092, CLR-OP-59)."
       - "Answers are entered on screen or uploaded on Insurer Responses; a rejection needs its reason (FR-OP-093)."
       - "An overdue answer raises the Direct payment feedback overdue notice (FR-OP-093)."
       - "The collection reverses the premium receivable and DTIP of each approved account in the ledger (FR-OP-094)."
@@ -192,8 +194,8 @@ screens:
       - "New Scheme / Save Scheme | Commission Team Leader | Always | Saves the scheme | Active or Inactive | -"
       - "Add Tier / Remove | Commission Team Leader | Scheme dialog open | Adds or removes a tier | - | -"
     rules:
-      - "The rate of the highest production target reached (times the multiplier) applies to every eligible invoice; Motor Mania pays each policy the fixed amount of the highest minimum basic premium it meets (FR-OP-095)."
-      - "The seed schemes stay inactive without tiers until BDOI gives the targets and amounts (FR-OP-095)."
+      - "In v2.1 a programme follows the insurer's SLA per invoice: the invoice must meet the criteria (product, period, branch, marketing unit, minimum premium), be fully paid and be paid within the credit term; the incentive is the SLA rate with its multiplier or the fixed amount. Production targets are not used; the tiers of the screenshot are read as SLA rates and amounts (FR-OP-095, CLR-OP-58)."
+      - "The programmes stay inactive until BDOI gives the SLA parameters (FR-OP-095)."
     outcome: The incentive programmes are maintained by the business.
     frs: [FR-OP-095]
     tests: [SCHEMES]
@@ -218,7 +220,8 @@ screens:
       - "Post Incentive | Commission Team Leader | Computed | Posts the incentive per insurer; for a branch scheme also the pass-on per sales unit with its payment request | Posted | Disbursement request received (NT-03)"
       - "Cancel Run | Commission Team Leader | Computed | Cancels the run | Cancelled | -"
     rules:
-      - "Negative amounts and erroneous bookings (cancelled or written off) are excluded when the exclusion rule is active, and raise an alert (FR-OP-095)."
+      - "Entries with a negative amount and fully cancelled transactions are excluded by the exclusion rules and listed with their rule; they raise an alert (FR-OP-095, CLR-OP-56)."
+      - "Every computed incentive is listed per invoice for review and audit (FR-OP-095)."
     outcome: Incentives are computed, reviewed and posted with the pass-on to the branches.
     frs: [FR-OP-095]
     tests: [RUNS]
@@ -294,6 +297,7 @@ screens:
       - "Clear Estimate | Commission Handler | Flagged | Clears the flag once the final premium is known | - | -"
     rules:
       - "The Estimated flag is kept on the invoice ledger and shows on the production register and the yearly production report (FR-OP-097)."
+      - "In v2.1 the estimated items belong to Production Reconciliation (RMTID.037 moved by the Remittance annex); the flag is proposed to be set by the Production Reconciliation Handler (FR-OP-097, CLR-OP-47)."
     outcome: Estimated premiums are followed until they are final.
     frs: [FR-OP-097]
     tests: [ESTIMATED]

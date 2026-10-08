@@ -8,7 +8,7 @@ screens:
     route: /cashiering
     purpose: >-
       The landing page of Cashiering: the work queues of the section counted live (unapplied payments, dispositions
-      and receipt actions for approval, pre-booked payments, post-dated checks, check pick-ups, BIR 2307 to validate,
+      and receipt actions for approval, pre-booked payments, post-dated checks, BIR 2307 to validate,
       invoices with outstanding or partial premium, hand-offs), each opening its list.
     entry:
       - Operations Home › Cashiering › Open
@@ -21,6 +21,7 @@ screens:
       - "[A work tile] | Every Cashiering user | Always | Opens the list of the queue | - | -"
     rules:
       - "The tiles are counted live from the Cashiering records and the invoice ledger (FR-OP-003)."
+      - "The Check Pick-ups Due tile of the screenshot is withdrawn with check pick-up (CSHID.009 removed from scope, FR-OP-017, CLR-OP-38); the BIR 2307 to Validate tile moves to the Marketing Collection work with the PR 2307 reversal (FR-OP-113, CLR-OP-40)."
     outcome: The cashier sees the work waiting and opens it.
     frs: [FR-OP-003]
     tests: [CASHWB]
@@ -218,7 +219,7 @@ screens:
       - "The disposition type decides the fields to fill and whether a second user approves it (FR-OP-022)."
       - "A refund goes to the Disbursement queue and is completed when Disbursement pays it (FR-OP-022, FR-OP-120)."
       - "A balance left after a partial disposition returns to the Unapplied tab (FR-OP-022)."
-      - "Unapplied items up to PHP 10.00 are moved to AP overages by the minimal balance sweep (FR-OP-023)."
+      - "Minimal excess amounts within the threshold (default PHP 10.00) never reach this list: they are moved to AP overages when the payment is processed (FR-OP-023)."
     outcome: The unapplied money is applied, refunded, reclassed or transferred, with a second user's approval where the type needs it.
     frs: [FR-OP-022, FR-OP-023, FR-OP-120]
     tests: [UITEM]
@@ -342,32 +343,6 @@ screens:
     frs: [FR-OP-016]
     tests: [PDC]
 
-  - id: SCR-OP-17
-    title: Check Pick-up
-    route: /cashiering/pickups
-    purpose: >-
-      Checks the collectors pick up from clients, by pick-up date: the requests come from Collections or are imported,
-      and the cashier prints the ARs of the checks picked up in one batch.
-    entry:
-      - Cashiering Workbench › Check Pick-ups Due tile
-    shots:
-      - {state: list, user: cashier, caption: "Check Pick-up, For Pick-up tab"}
-    fields:
-      - "Tabs | For Pick-up / AR Printed / Cancelled | Tab | - | - | Fixed | For Pick-up | - | - | -"
-      - "Toolbar | Pick-up From / Pick-up To | Date | dd-MMM-yyyy | N | - | Blank | - | - | -"
-      - "List | Select | Check box | For Pick-up tab | N | - | Not ticked | - | - | -"
-      - "List | Collection Ref. / Payor / Pick-up Date / Requested By / Check No. / Amount / AR / Status | Column | Collection reference with the ARN | - | Check pick-up requests | - | Read only | - | No items to display"
-    actions:
-      - "Import Pending Requests | Cashier | Always | Takes in the pick-up requests waiting from Collections | For pick-up | -"
-      - "Print ARs | Cashier | Rows selected | Issues and prints the ARs of the selected checks in one batch | AR printed | -"
-      - "Download <batch> | Cashier | After Print ARs | Downloads the merged PDF of the batch | - | -"
-      - "Cancel Check Pick-up | Cashier | For pick-up | Asks for confirmation and cancels the pick-up; the check stays with the client | Cancelled | -"
-    rules:
-      - "The ARs of the checks picked up are issued and printed in one batch (FR-OP-017)."
-    outcome: Checks picked up are receipted and their ARs printed together.
-    frs: [FR-OP-017]
-    tests: [PICKUP]
-
   - id: SCR-OP-18
     title: Batch Print
     route: /cashiering/print
@@ -397,9 +372,11 @@ screens:
     title: BIR 2307
     route: /cashiering/cwt
     purpose: >-
-      The creditable withholding tax certificates (BIR 2307) of 2% CWT clients: tagged by Marketing, received and
-      checked by Cashiering, validated per insurer into a report batch that is posted, routed to Disbursement and
-      released to the insurer, or settled in cash.
+      The PR 2307 reversal of 2% CWT clients: tagged by Marketing Collection with the BIR 2307 certificate, checked
+      against the computed PR 2307 amount, the outstanding premium and any commission receivable, validated per insurer
+      into a report that is posted and routed to Disbursement, and released to the insurer. In v2.1 Marketing
+      Collection performs every step up to the routing; the screenshots show the v2.0 screen, where the Cashier
+      receives, validates and routes (CLR-OP-40).
     entry:
       - Cashiering Workbench › BIR 2307 to Validate tile
     shots:
@@ -416,17 +393,19 @@ screens:
       - "Tag BIR 2307 dialog | Certificate No. / Period From / Period To / Remarks | Text, date | Certificate number for the certificate path | Cond. | - | Blank | - | Certificate number for a certificate | Certificate number is required for a certificate"
     actions:
       - "Tag 2307 | Marketing Collection | Always | Tags the certificate or the cash path of the invoice | Tagged by Marketing | -"
-      - "Receive | Cashier | Tagged | Receives the tag for validation | Validating | -"
-      - "Validate and Post Report | Cashier | Validated certificates of one insurer selected | Asks for confirmation, validates them into a report batch and posts the reclass of the 2% | Report posted | -"
-      - "Settle in Cash | Cashier | Cash path | Issues an AR applied to the withheld 2% | Settled in cash | -"
-      - "Route to Disbursement | Cashier | Report posted | Sends the batch to the Disbursement queue | With Disbursement | Disbursement request received (NT-03)"
-      - "Release to Insurer | Disbursement | Batch paid | Releases the certificates to the insurer and offsets the DTIP | Released to insurer | -"
-      - "Return to Marketing / Cancel Tag | Cashier / Marketing Collection | Tagged or validating | Returns or cancels the tag | Tagged by Marketing / Cancelled | Workflow notice (NT-01)"
+      - "Receive | Marketing Collection (Cashier in v2.0) | Tagged and checked | Takes the tag into validation against the certificates | Validating | -"
+      - "Validate and Post Report | Marketing Collection (Cashier in v2.0) | Validated certificates of one insurer selected | Asks for confirmation, generates the BIR 2307 transaction report, posts the reversal and zeroes the premium receivable (proposed entry Dr DTIP / Cr PR, CLR-OP-41) | Report posted | -"
+      - "Settle in Cash | - | Withdrawn in v2.1 | A 2% paid in cash is received as an ordinary payment (CLR-OP-40) | - | -"
+      - "Route to Disbursement | Marketing Collection (Cashier in v2.0) | Report posted | Sends the report and the certificates sorted per insurer to the Disbursement queue | With Disbursement | Disbursement request received (NT-03)"
+      - "Release to Insurer | Disbursement | Report received and checked | Releases the certificates to the insurer; no accounting entry (CLR-OP-41) | Released to insurer | -"
+      - "Return to Marketing / Cancel Tag | Disbursement / Marketing Collection | With Disbursement or tagged | Returns the report for completion or cancels the tag | Validating / Cancelled | Workflow notice (NT-01)"
     rules:
-      - "Validation posts the reclass of the 2% from the premium receivable to the PR 2307 component; the release to the insurer offsets it against the DTIP (FR-OP-026, FR-OP-121)."
-      - "A report batch holds the certificates of one insurer (FR-OP-026)."
-    outcome: The 2% CWT of the premium is settled with the insurer through the certificates, or in cash.
-    frs: [FR-OP-026, FR-OP-113, FR-OP-121]
+      - "At tagging the certificate amount is checked against the computed PR 2307 amount and the outstanding premium receivable, and an outstanding commission receivable flags the tag For Commission Receivable (FR-OP-113)."
+      - "Posting the report zeroes the premium receivable; the release to the insurer posts nothing (FR-OP-113, FR-OP-121, CLR-OP-41)."
+      - "A report holds the certificates of one insurer (FR-OP-113)."
+      - "A payment already remitted goes to Unapplied Payments with the insurer's written confirmation of refund attached (FR-OP-113)."
+    outcome: The 2% CWT of the premium is reversed by Marketing Collection and the certificates are released to the insurer.
+    frs: [FR-OP-113, FR-OP-121]
     tests: [CWT]
 
   - id: SCR-OP-20
@@ -485,8 +464,8 @@ screens:
     title: Cashiering Setup
     route: /cashiering/setup
     purpose: >-
-      The layouts of the bank and channel payment files and the minimal balance rules with the manual run of the
-      sweep.
+      The layouts of the bank and channel payment files and the minimal balance rules (thresholds and exceptions),
+      with the manual run of the safety-net sweep.
     entry:
       - Cashiering Workbench
     shots:
@@ -499,9 +478,10 @@ screens:
       - "Minimal Balance | Balance / Up To / Excludes / Action / Status | Column | For example premium balances up to 10.00, excluding the 2% CWT, the DST and the whole premium | - | Minimal balance rules | - | Read only | - | -"
     actions:
       - "Edit Layout / Save Layout | Cashiering Team Leader | Always | Changes the layout of a payment file | - | -"
-      - "Run Sweep Now | Cashiering Team Leader | Always | Runs the minimal balance sweep now and reports the balances reversed and the excess moved | - | -"
+      - "Run Sweep Now | Cashiering Team Leader | Always | Runs the safety-net sweep now and reports the balances cleared that later events left within the threshold | - | -"
     rules:
-      - "Premium balances up to PHP 10.00 are reversed and excess or unapplied amounts up to PHP 10.00 are moved to AP overages by the evening sweep; a balance equal to the 2% CWT, the DST or the whole premium, and an invoice already written off, are skipped (FR-OP-023)."
+      - "Premium balances and excess amounts within the threshold (default PHP 10.00) are cleared when the payment is processed, never routed to Unapplied Payments; a balance equal to the 2% CWT, the DST or the whole premium, and an invoice already written off, are skipped (FR-OP-023)."
+      - "The thresholds are configurable; the daily sweep is only a safety net for balances that later events leave within the threshold (FR-OP-023)."
     outcome: File layouts and minimal balance rules are kept by the business.
     frs: [FR-OP-015, FR-OP-023]
     tests: [CASHSETUP]

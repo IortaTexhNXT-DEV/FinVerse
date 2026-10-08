@@ -27,7 +27,7 @@ brds:
   BRD-07: {short: 'BRD-7 CLM', name: 'Claims (CLM)', file: 'Claims (CLM).PDF', spec: BDOI_CLM_BRD_SPEC.md}
   BRD-08: {short: 'BRD-8 EB', name: 'Employee Benefits (EB)', file: 'Employee Benefits.pdf', spec: BDOI_EB_BRD_SPEC.md}
   BRD-09: {short: 'BRD-9 CSF', name: 'Customer Servicing Facility (CSF)', file: 'Customer Servicing Facility.PDF', spec: BDOI_CSF_BRD_SPEC.md}
-  BRD-10: {short: 'BRD-10 SANC', name: 'Sanction Screening and Risk Profiling', file: 'Sanction Screening and Risk Profiling BRD.pdf', spec: BDOI_SANC_BRD_SPEC.md}
+  BRD-10: {short: 'BRD-10 SANC', name: 'Sanction Screening and Risk Profiling', file: 'Sanction Screening and Risk Profiling BRD v04172026.pdf', spec: BDOI_SANC_BRD_SPEC.md}
   BRD-11: {short: 'BRD-11 UAM', name: 'User Access Maintenance (UAM)', file: 'User Access Maintenance.pdf', spec: BDOI_UAM_BRD_SPEC.md}
   BRD-12: {short: 'BRD-12 SP', name: 'Submitted Policies (SP)', file: 'BRD - Submitted Policies (with e-sig MCM 4.24.2026).pdf', spec: BDOI_SP_BRD_SPEC.md}
   BRD-13: {short: 'BRD-13 DM', name: 'Data Migration (draft v0.01)', file: 'BRD - Data Migration - draft V0.01.pdf', spec: BDOI_DM_BRD_SPEC.md}

@@ -8,7 +8,7 @@ File references in this document are relative to `backend/src/main/java/com/iort
 
 ## 1. Source documents
 
-Source: `docs/source-documents/Sanction Screening and Risk Profiling BRD.pdf` (29 pages, text layer on pp.1-27; pp.28-29 are scans; the process diagrams on pp.6-8 were read as images).
+Source: `docs/source-documents/Sanction Screening and Risk Profiling BRD v04172026.pdf` (29 pages, text layer on pp.1-27; pp.28-29 are scans; the process diagrams on pp.6-8 were read as images).
 
 | Pages | Content |
 |---|---|

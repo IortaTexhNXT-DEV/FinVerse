@@ -6,38 +6,16 @@
 # issue, and the points for the UX Design team to confirm.
 
 issue:
-  version: "2.2"
-  date: 2 October 2026
+  version: "2.1"
+  date: 8 October 2026
   changes:
     - ref: CHG-DM-2.1-01
-      what: The migration roles land on Migration Home after sign-in; My Approvals stays one click away in the header
-      screens: [NAV-DM-01, NAV-DM-02, NAV-DM-03, NAV-DM-04, NAV-DM-05, NAV-DM-06]
-    - ref: CHG-DM-2.1-02
       what: >-
-        Upload and Check (Extracts) and Create (New Cutover Plan) say what is still needed while they are disabled
-      screens: [SCR-DM-05, SCR-DM-12]
-      images: [scr-dm-05-01-list, scr-dm-12-03-new]
-    - ref: CHG-DM-2.1-03
-      what: >-
-        A rejected extract lists every failed intake check with its own reason, in an error notice next to the upload
-        card and in the Rejection Reason column
-      screens: [SCR-DM-05]
-      images: [scr-dm-05-01-list, scr-dm-05-02-rejected]
-    - ref: CHG-DM-2.1-04
-      what: The Rows column of the extracts replaced by Rows Received and Rows Staged
-      screens: [SCR-DM-05]
-      images: [scr-dm-05-01-list, scr-dm-05-02-rejected]
-    - ref: CHG-DM-2.1-05
-      what: Day counts in words on the tiles of My Approvals ("0 days", "1 day")
-      screens: [NAV-DM-01]
-    - ref: CHG-DM-2.2-01
-      what: >-
-        Lists in the BDO style guide: outlined status pills, alternating white and Background Blue rows, a long
-        list scrolling inside its card with the header row in view, names instead of codes, due dates on one line
-        with the overdue icon and ages in words; every image of the set retaken
-      screens: [SCR-DM-01, SCR-DM-02, SCR-DM-03, SCR-DM-04, SCR-DM-05, SCR-DM-06, SCR-DM-07, SCR-DM-08, SCR-DM-09,
-                SCR-DM-10, SCR-DM-11, SCR-DM-12, SCR-DM-13, SCR-DM-14, SCR-DM-15, SCR-DM-16, SCR-DM-17, SCR-DM-18,
-                SCR-DM-19, SCR-DM-20]
+        Re-based on the Data Migration BRD V0.03: the DP PR Legacy Reversal is requested by a Cashiering or Support
+        Team user and approved by the Cashiering team lead, the Legacy PR 2307 Reversal is requested by a Collections
+        user and approved by the Collections team lead (for BDOI confirmation, CLR-DM-16). The screens are unchanged;
+        the menu entry and the persona of the slides follow the role once confirmed
+      screens: [SCR-DM-19, SCR-DM-20]
 
 # Who each persona is (the what they do comes from the persona table of the handbook unless given here).
 navigation:
@@ -65,7 +43,9 @@ personas:
   TOP_MANAGEMENT_APPROVER:
     who: "A member of top management named for the reclassification of unapplied payments to income"
     does: "Gives the second approval of an Unapplied to Income batch, or returns it with the reason"
-  COMMREC_HANDLER: {who: "A Commission officer of Operations"}
+  COMMREC_HANDLER:
+    who: "A Commission officer of Operations"
+    does: "Requests the DP PR Legacy Reversal batches in the screens of this set; BRD V0.03 gives them to a Cashiering or Support Team user (CLR-DM-16)"
   COMMREC_TL:
     who: "The team lead of Commission"
     does: "Approves or returns the DP PR Legacy Reversal batches of the Commission users"
@@ -171,5 +151,5 @@ states:
 
 # Points for the UX Design team to confirm with BDOI.
 confirm:
-  clarifications: [PR-DM-04, PR-DM-06, PR-DM-09, PR-DM-10]
+  clarifications: [PR-DM-04, PR-DM-06, PR-DM-09, PR-DM-10, CLR-DM-12, CLR-DM-16]
   findings: []

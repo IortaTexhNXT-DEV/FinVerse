@@ -1,4 +1,4 @@
-# BRD-13 Data Migration - Business Sign-off Pack, release set v2.0 (Drop 0, Setup and Data Migration).
+# BRD-13 Data Migration - Business Sign-off Pack, release set v2.1 (Drop 0, Setup and Data Migration).
 # One set for the whole of BRD-13: 00 Start Here, 01 Guide deck, 02 Data Migration Handbook, 03 Migration Workbook,
 # 04 and 05 Test plan. Built by docs/deliverables/src/signoff/signoff_pack.py (screens, messages, menus, guide tables)
 # and by ../build_dm_pack.py (the migration catalogue, the cut-over plan and the Migration Workbook). Schema:
@@ -8,9 +8,9 @@ meta:
   brd_label: BRD-13
   name: Data Migration
   code: DM
-  version: "2.0"
-  date: 5 October 2026
-  status_as_of: 05-Oct-2026
+  version: "2.1"
+  date: 8 October 2026
+  status_as_of: 08-Oct-2026
   release_set: BRD-13 Data Migration – Business Sign-off Pack
   frs: HANDBOOK_BRD13_DATA_MIGRATION.md
   source_doc: Data Migration Handbook
@@ -28,7 +28,7 @@ meta:
     comment_columns: true   # the Comments log names the load template and the column of a question
     cover_notes:
       - >-
-        Issued on 05-Oct-2026 with the Data Migration Handbook v2.0. The load template sheets are the layouts of the
+        Issued on 08-Oct-2026 with the Data Migration Handbook v2.1, re-based on the Data Migration BRD V0.03. The load template sheets are the layouts of the
         Migration Console column for column, each with its guide above the header row; the sheet Load templates
         lists them in load order. The console exports the same templates (Layouts and Rules).
       - >-

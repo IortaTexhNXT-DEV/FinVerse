@@ -4,43 +4,16 @@
 # persona is, the images taken for the deck only, the changes of the issue and the points to confirm.
 
 issue:
-  version: "2.2"
-  date: 2 October 2026
+  version: "2.1"
+  date: 8 October 2026
   changes:
-    - ref: CHG-UA-2.1-01
+    - ref: CHG-UA-2.1-SSO
       what: >-
-        One label for a request waiting for its approver, Pending Approval (Pending Second Approval for the second
-        approval), in the status pill, the step bar, the decision, the history, the lists and the status filter
-      screens: [SCR-UA-06, SCR-UA-08, SCR-UA-10, SCR-UA-11]
-      images: [scr-ua-06-01-list, scr-ua-06-02-mine, scr-ua-08-01-pending, scr-ua-08-02-approve, scr-ua-08-03-second,
-               scr-ua-08-04-history, scr-ua-10-01-pending, scr-ua-11-01-list]
-    - ref: CHG-UA-2.1-02
-      what: Requested By and Requested On as two key facts of a request and of a bulk batch
-      screens: [SCR-UA-08, SCR-UA-10]
-      images: [scr-ua-08-01-pending, scr-ua-08-03-second, scr-ua-08-04-history, scr-ua-10-01-pending]
-    - ref: CHG-UA-2.1-03
-      what: The group profiles a request adds or removes as table rows, each marked Added or Removed
-      screens: [SCR-UA-08]
-      images: [scr-ua-08-01-pending, scr-ua-08-03-second, scr-ua-08-04-history]
-    - ref: CHG-UA-2.1-04
-      what: The user a request is about named by the full name, with the user ID in brackets
-      screens: [SCR-UA-08]
-      images: [scr-ua-08-01-pending, scr-ua-08-02-approve, scr-ua-08-03-second, scr-ua-08-04-history,
-               scr-ua-08-05-password]
-    - ref: CHG-UA-2.1-05
-      what: >-
-        The group profiles of a user request grouped by product module, with a search and the count of the profiles
-        selected
-      screens: [SCR-UA-07]
-      images: [scr-ua-07-01-empty, scr-ua-07-02-filled, scr-ua-07-03-error, scr-ua-07-04-modify]
-    - ref: CHG-UA-2.2-01
-      what: >-
-        Lists in the BDO style guide: outlined status pills, alternating white and Background Blue rows, a long
-        list scrolling inside its card with the header row in view, names instead of codes, due dates on one line
-        with the overdue icon and ages in words; every image of the set retaken
-      screens: [SCR-UA-01, SCR-UA-02, SCR-UA-03, SCR-UA-04, SCR-UA-05, SCR-UA-06, SCR-UA-07, SCR-UA-08, SCR-UA-09,
-                SCR-UA-10, SCR-UA-11, SCR-UA-12, SCR-UA-13, SCR-UA-14, SCR-UA-15, SCR-UA-16, SCR-UA-17, SCR-UA-18,
-                SCR-UA-19]
+        Login with single sign-on through EIAM: in the sign-in mode OIDC or SAML the Login page shows Sign in with
+        the BDO identity provider, and only the break-glass administrators keep the user ID and password form
+        (FR-UA-003, CLR-UA-01, CLR-UA-24). The images show the local sign-in of SIT; the single sign-on state is
+        captured once BIBS is registered in EIAM
+      screens: [SCR-UA-01]
 
 navigation:
   # The same landing page and menu as in the BRD-3 set (identical images are kept once).
@@ -115,7 +88,7 @@ states:
   - {screen: SCR-UA-07, state: cmp-notice, component: true, user: requestor, fill: enrol_invalid, submit: "^submit$", crop: "main .notice", nocallouts: true, caption: "Notice standard"}
 
 confirm:
-  clarifications: [CLR-UA-10, CLR-UA-11, CLR-UA-18, CLR-UA-19, CLR-UA-20]
+  clarifications: [CLR-UA-01, CLR-UA-10, CLR-UA-11, CLR-UA-18, CLR-UA-19, CLR-UA-20, CLR-UA-24]
   findings:
     - screens: [SCR-UA-06]
       observation: The Change column of the request list names the subject user by the user ID only.

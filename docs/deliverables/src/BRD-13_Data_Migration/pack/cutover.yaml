@@ -1,4 +1,4 @@
-# BRD-13 Data Migration - the production cutover plan (BRID 12.1).
+# BRD-13 Data Migration - the production cutover plan (BRID_MIG 12.1).
 # Read by build_dm_pack.py for the cut-over sheets of the Migration Workbook and Part D of the Handbook.
 # T = go-live. BDOI timeline: January 2028 (DMQ25); Monday 3 January 2028 at the year-end boundary, option A of DMQ39
 # (recommended, awaiting Comptrollership confirmation): provisional GL opening and FY2027 true-ups to T+120. Days are calendar days. Times are Philippine time (PHT). Durations are elapsed hours.

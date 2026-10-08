@@ -47,7 +47,7 @@ documents:
   - {kind: UXScreens, name: Data Migration, ext: xlsx, what: "UX screen register: one row per screen image with the screen, personas, flow and step, state, FRS section and requirements, UXD status and comments, and the Changed in this issue flag", readers: "BDOI UX Design team", when: "Kept by the UX Design team; the changed rows are flagged at each issue"}
   - {kind: UXScreens, name: Data Migration, ext: zip, what: "Image package: every screen image at twice the screen resolution (PNG), the component crops and the register as CSV", readers: "BDOI UX Design team", when: "Imported into the design tool at each issue"}
 
-# Reading order per role (Handbook parts and chapter numbers of v2.0).
+# Reading order per role (Handbook parts and chapter numbers of v2.1).
 reading:
   - role: "Approver (Product Owner, Marketing Business System) and Program Manager, Business Project Services"
     order: "00 Start Here; 01 Guide deck; Handbook Part A (approach, objects and decisions, cycles, cut-over) and the chapter Proposed business rules and clarifications for confirmation; workbook sheets Object catalogue, Proposed rules and Sign-off certificate"
@@ -70,8 +70,8 @@ steps:
     name: Set issued
     who: "R: iorta TechNXT Project Manager; A: iorta TechNXT delivery lead; I: all reviewers"
     inputs: "Handbook, Migration Workbook, test plan, guide and deck"
-    outputs: "Release set v2.0 in the BRD-13 folder of Drop 0; invitations to the sessions"
-    duration: "Day 0 (Mon 5-Oct-2026)"
+    outputs: "Release set v2.0 in the BRD-13 folder of Drop 0; invitations to the sessions; release set v2.1 re-based on the Data Migration BRD V0.03 on Thu 8-Oct-2026"
+    duration: "Day 0 (Mon 5-Oct-2026); v2.1 on Thu 8-Oct-2026"
   - step: 2
     name: Kick-off and walkthrough of the Migration Console on SIT
     who: "R: iorta TechNXT Business Analysis; A: Program Manager; C: data owners, Comptrollership, BDOI IT, Renewal processing team"
@@ -91,15 +91,15 @@ steps:
     outputs: "One consolidated comments log, each item typed (clarification, correction, change request) and answered; Q&A minutes"
     duration: "3 working days, Q&A on Mon 26-Oct-2026"
   - step: 5
-    name: One revision cycle (v2.1)
+    name: One revision cycle (v2.2)
     who: "R: iorta TechNXT Business Analysis; A: iorta TechNXT delivery lead; C: reviewers who raised the items"
     inputs: "Agreed clarifications and corrections; decisions on the proposed rules"
-    outputs: "Release set v2.1 with the changed rows marked and the decided rules applied; change requests raised for the rest"
-    duration: "v2.1 on Wed 28-Oct-2026; check by the reviewers until Thu 29-Oct-2026"
+    outputs: "Release set v2.2 with the changed rows marked and the decided rules and clarifications applied; change requests raised for the rest"
+    duration: "v2.2 on Wed 28-Oct-2026; check by the reviewers until Thu 29-Oct-2026"
   - step: 6
     name: Sign-off meeting and signature
     who: "R: iorta TechNXT Project Manager; A: Product Owner, Marketing Business System; C: Program Manager, data owners, Comptrollership, BDOI IT"
-    inputs: "v2.1 (or v2.0 when no revision is needed); open decisions with their date"
+    inputs: "v2.2 (or v2.1 when no revision is needed); open decisions with their date"
     outputs: "Signed sign-off certificate; minutes; objects decided (G1) and layouts frozen, version 1 (M2)"
     duration: "Fri 30-Oct-2026 (M2)"
   - step: 7
@@ -214,7 +214,7 @@ caveats:
     handling: "In-scope clarification when the signed text already covers it; otherwise a change request with mandays."
     example: "A data owner asks for an extra column in the client template: a new layout version, so a change request; asking which rule rejects a row is a clarification."
   - topic: Decisions still open
-    text: "The year-end option, the codes of the legacy accounts, the conditional objects and the approvers of the legacy batches wait for BDOI."
+    text: "The year-end option, the codes of the legacy accounts, the conditional objects, the approvers of the legacy batches and the clarifications raised by BRD V0.03 (renewals in progress, claims, e-policies, history, tolerance) wait for BDOI."
     handling: "Each is a proposed rule with its decision date; the proposal stands until BDOI decides, and most answers are configuration."
     example: "If Comptrollership chooses option B, go-live moves to April 2028 and the opening loads the year-to-date P&L: a change request with its mandays."
   - topic: Legacy data quality
@@ -238,8 +238,8 @@ entry:
 exit:
   - "Every row of the workbook reviewed by its unit (Accept, Change requested or Comment)."
   - "Every proposed rule decided, or accepted as the working assumption with its decision date."
-  - "Every comments log item closed: answered, corrected in v2.1, or raised as a change request."
-  - "The sign-off certificate signed as on the BRD-13 approval pages: prepared by iorta TechNXT and the Program Manager, input from the Data Migration Lead and the data owners, reviewed by MBS and BDOI IT, approved by the Product Owner and the approvers."
+  - "Every comments log item closed: answered, corrected in v2.2, or raised as a change request."
+  - "The sign-off certificate signed as on the BRD-13 approval pages: prepared by iorta TechNXT and the Program Manager, input from the Data Migration Lead and the data owners, reviewed by the BA Unit Head of Business Project Services, MBS and BDOI IT, approved by the Product Owner and the approvers."
 done:
   - "Signed certificate filed with the set; version history updated."
   - "Objects decided (G1) and layouts frozen, version 1, in the Migration Console (M2)."

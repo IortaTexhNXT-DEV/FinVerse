@@ -7,7 +7,7 @@ digraph contract {
   in0 -> core;
   in1 [label="BRD-13 Data Migration\n- The users and group profiles of go-live. Users a"];
   in1 -> core;
-  in2 [label="EIAM (BDO Enterprise Identity Access Management on Microsoft Entra ID), owned by BDOI IT\n- The target sign-in of BDO users with OpenID Conn"];
+  in2 [label="EIAM (BDO Enterprise Identity Access Management on Microsoft Entra ID), owned by BDOI IT\n- The sign-in of BDO users through single sign-on "];
   in2 -> core;
   in3 [label="UIDM-ISC (BDO identity governance), owned by BDOI IT\n- Joiner"];
   in3 -> core;

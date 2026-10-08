@@ -1,16 +1,16 @@
 ---
-# Source of "00 Start Here - Guide to the BRD-13 Data Migration sign-off set" (Word), release set v2.0.
+# Source of "00 Start Here - Guide to the BRD-13 Data Migration sign-off set" (Word), release set v2.1.
 # Build: python tools/deliverables/bdoi_docx.py docs/deliverables/src/BRD-13_Data_Migration/START_HERE_BRD13.md
 # The map, the reading order and the steps come from pack/guide.yaml (the same source as the guide deck).
 title: Start Here
-subtitle: Guide to the BRD-13 Data Migration sign-off set, release set v2.0
+subtitle: Guide to the BRD-13 Data Migration sign-off set, release set v2.1
 doc_type: Start Here Guide
 doc_code: StartHere
 brd: BRD-13
 name: Data Migration
 doc_id: BIBS-SH-BRD-13
-version: "2.0"
-date: 5 October 2026
+version: "2.1"
+date: 8 October 2026
 status: Issued for BDOI business sign-off
 header_title: Start Here BRD-13 Data Migration
 h1_page_break: false
@@ -21,6 +21,12 @@ control:
     reviewer: iorta TechNXT Business Analysis
     approver: ""
     change: First issue with the BRD-13 Data Migration business sign-off set (one handbook, one workbook and the test plan in place of the separate migration documents)
+  - version: "2.1"
+    date: 8 Oct 2026
+    author: iorta TechNXT Project Manager
+    reviewer: iorta TechNXT Business Analysis
+    approver: ""
+    change: "Re-based on the Data Migration BRD V0.03 (signed 15-19 May 2026); user-story view and storyboard index added to the handbook; clarifications CLR-DM-01 to CLR-DM-20"
 distribution:
   - {name: "Product Owner, Marketing Business System, and the approvers of the BRD-13 approval pages", role: Approvers, organisation: BDOI, purpose: Sign-off}
   - {name: "Program Manager, Business Project Services", role: "BRD author; reviewer of traceability and completeness", organisation: BDO Unibank ESG, purpose: "Review; owner of the cut-over"}
@@ -77,11 +83,12 @@ render: guide-steps
 | Date | What |
 |---|---|
 | Mon 5-Oct-2026 | Set issued (release set v2.0) |
+| Thu 8-Oct-2026 | Release set v2.1 re-based on BRD V0.03, with the clarifications CLR-DM-01 to CLR-DM-20 |
 | 7 to 9-Oct-2026 | Kick-off and SIT walkthroughs |
 | Fri 16-Oct-2026 | Decisions on the proposed rules marked M1 |
 | Wed 21-Oct-2026 | Reviewed workbooks returned to the project team |
 | Mon 26-Oct-2026 | Q&A session on the consolidated comments log |
-| Wed 28-Oct-2026 | Release set v2.1 with the agreed corrections, when needed |
+| Wed 28-Oct-2026 | Release set v2.2 with the agreed corrections and the BDOI decisions on the clarifications, when needed |
 | Fri 30-Oct-2026 | Sign-off meeting (M2): objects decided, layouts frozen, owners named |
 
 # Who signs what

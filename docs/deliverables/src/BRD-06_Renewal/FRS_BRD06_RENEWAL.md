@@ -1,18 +1,17 @@
 ---
-# Source of the Functional Requirements Specification for BRD-6 Renewal.
+# Source of the Functional Requirements Specification for BRD-6 Renewal (release set v2.0).
 # Build: python tools/deliverables/bdoi_docx.py docs/deliverables/src/BRD-06_Renewal/FRS_BRD06_RENEWAL.md
 title: Renewal
-subtitle: BRD-6 Renewal (RMEL Phase 2 Online Dispositioning, Addendum 1 and Workshop Addendum)
+subtitle: BRD-6 Renewal (RMEL Phase 2 Online Dispositioning, Addendum 1, the Workshop Addendum and the Walkthrough Addendum)
 doc_type: Functional Requirements Specification
 doc_code: FRS
 brd: BRD-06
 name: Renewal
 doc_id: BIBS-FRS-BRD-06
-version: "1.1"
-date: 26 September 2026
-status: Issued for BDOI review
+version: "2.0"
+date: 8 October 2026
+status: Issued for BDOI business sign-off
 header_title: FRS BRD-6 Renewal
-output: FRS/BIBS_FRS_BRD-06_Renewal_v1.1.docx
 control:
   - version: "0.9"
     date: 18 Sep 2026
@@ -32,13 +31,22 @@ control:
     reviewer: iorta TechNXT Solution Architect
     approver: BDOI Product Owner (pending)
     change: "Go-live transition from the BDOI answers of 26-Sep-2026 (DMQ36-DMQ38): go-live extraction of the expiries up to 31 May 2028 with January expiries urgent and the record of renewal advices already sent (FR-RN-016); package remapping at sanitation, check PACKAGE_REMAP (FR-RN-028); early renewal concept paper superseded (single go-live in January 2028)"
+  - version: "2.0"
+    date: 8 Oct 2026
+    author: iorta TechNXT Business Analysis
+    reviewer: iorta TechNXT Project Manager
+    approver: BDOI business units (sign-off)
+    change: "Business sign-off pack, re-based on the Renewal BRD pack issued by BDOI on 8-Oct-2026 (215 pages), which adds the Renewal Addendum (Walkthrough) v01.01 approved 14 to 15-May-2026 in front of the earlier content: every BRD page reference moved by 26 pages; the restated BRRN.020-037 traced to both addenda; new FRs for the hold cover request (BRRN.042, FR-RN-086) and the incentive eligibility (BRRN.041, FR-RN-087); the annex rules applied to the checks, buckets, NRNS and letters, the client confirmation and the listings (FR-RN-020, 022, 082, 083, 084, 102, 112). Navigation by persona, 20 screen specifications with screenshots, five walkthroughs, messages, notifications, document outputs, upload screens, cross-BRD contract, sign-off and change control (chapters 12-20); proposed business rules and clarifications for confirmation (chapter 21); user-story view, storyboard index and screen standards (appendices). Issued 8-Oct-2026"
 distribution:
-  - {name: "Product Owner, Renewal", role: Approver, organisation: BDOI, purpose: Review and sign-off}
-  - {name: "Unit Head, Combank and Corbank", role: Approver, organisation: BDOI, purpose: Review and sign-off}
-  - {name: "Retail and Corporate Marketing (Team Leaders, Account Officers)", role: Business user, organisation: BDOI, purpose: "Review of extraction, assignment, disposition and review"}
-  - {name: "Processing (Team Leaders, Processing Officers)", role: Business user, organisation: BDOI, purpose: "Review of processing, insurer and Renewal Advice steps"}
-  - {name: Marketing Business Services and System Support (MBS), role: Business owner, organisation: BDOI, purpose: "Review of administration, lists of values and templates"}
-  - {name: Business Project Services, role: BRD owner, organisation: BDO Unibank ESG, purpose: Traceability check against the BRD}
+  - {name: "Shellah Marie C. Miranda, AVP, Product Owner", role: Approver, organisation: BDOI, purpose: Review and sign-off}
+  - {name: "Jose Melvin Jarin, AVP, Product Owner", role: Approver, organisation: BDOI, purpose: "Review and sign-off (on leave at the May 2026 approval)"}
+  - {name: "Mark Joseph C. Makalintal, SAVP, Unit Head - Combank and Corbank", role: Approver, organisation: BDOI, purpose: Review and sign-off}
+  - {name: "Edmundante F. Ramirez, VP, Head - Retail Marketing", role: Approver, organisation: BDOI, purpose: Review and sign-off}
+  - {name: "Roderick Lim, FVP, Head - Corporate and Retail Marketing (Officer-in-Charge)", role: Approver, organisation: BDOI, purpose: Review and sign-off}
+  - {name: "Rose Marie Lique, Jackie Lyn Serrano, Marie Grace Mendiola, Berna Corpuz, Maria Cecilia Remodo and the other Marketing and Processing input providers", role: Business user, organisation: BDOI, purpose: "Review of the extraction, disposition, review, processing, insurer, letter and acceptance screens"}
+  - {name: "Rhommel Mark Galler, Marketing Business Services and System Support (MBS)", role: Reviewer, organisation: BDOI, purpose: "Review of administration, lists of values and templates"}
+  - {name: "Information Technology Group (Angela Villamarzo Ramirez, Ma. Carmela Austria Morfe)", role: Reviewer, organisation: BDOI, purpose: "Review of the scheduled runs, uploads, protected e-mails and access"}
+  - {name: "Dan Ace R. Cauton, Program Manager, Edward Kenneth Cadena, BA Unit Head, Zean C. Ibay, Roda Lyn D. Gallardo and Jane Tagle, Business Analysts, ESG - Business Project Services", role: BRD owner, organisation: BDO Unibank ESG, purpose: Traceability check against the BRD}
   - {name: Project team, role: Delivery, organisation: iorta TechNXT, purpose: "Delivery, test and UAT preparation"}
 ---
 
@@ -48,15 +56,15 @@ distribution:
 
 This Functional Requirements Specification (FRS) states how BIBS (BDOI Broker System, on iNXT BrokerVerse) meets the Renewal business requirements of BDO Insurance and Reinsurance Brokers, Inc. (BDOI). It turns each BRD requirement into functional requirements with actors, flows, rules, validations, screens, fields, notifications, audit and acceptance criteria.
 
-BDOI uses this document to confirm that the system will behave as the business expects. The project team uses it to deliver and test the Renewal functions and to prepare user acceptance testing (UAT). Every functional requirement (FR) cites the BRD requirements it meets and their BRD pages.
+BDOI uses this document to confirm that the system will behave as the business expects. The project team uses it to test the Renewal functions and to prepare user acceptance testing (UAT). Every functional requirement (FR) cites the BRD requirements it meets and their BRD pages.
 
 Every module goes live together in January 2028 (BDOI, 26-Sep-2026); the early renewal release of the concept paper *Advance Implementation of Renewal Processing* is superseded. Renewals expiring from go-live to 31 May 2028 are processed in BIBS after go-live (FR-RN-016).
 
-The FRs describe the proposed behaviour of the Renewal screens. Where the proposed rule or screen differs from the BRD text, or needs a decision of BDOI, chapter 12 lists each such point for confirmation. Messages are given with their text; a code is quoted where it is confirmed, and "To be confirmed" marks the others.
+The FRs describe the proposed behaviour of the Renewal screens. Where the proposed rule or screen differs from the BRD text, or needs a decision of BDOI, the FR says so in a note and chapter 21 lists each such point for confirmation. Chapters 12 to 19 give the business view of the system: the navigation, the specification of every screen with its screenshots, the walkthroughs, the messages, notifications, documents, uploads and the contract with the other BRDs; chapter 20 describes the sign-off. The appendices give the user-story view of every BRD requirement and the storyboard index of the walkthroughs. Messages are given with their text; a code is quoted where it is confirmed, and "To be confirmed" marks the others.
 
 ## Scope
 
-The scope is the renewal of **client policies placed and booked by BDOI**: from the extraction of the expiring accounts (the legacy "RMEL" list) to the disposition by Marketing, the processing and insurer round-trip, the Renewal Advice and other letters, the client's acceptance, and the placement and booking of the renewal. Packaged and non-packaged accounts follow one process (p.43).
+The scope is the renewal of **client policies placed and booked by BDOI**: from the extraction of the expiring accounts (the legacy "RMEL" list) to the disposition by Marketing, the processing and insurer round-trip, the Renewal Advice and other letters, the client's acceptance, and the placement and booking of the renewal. Packaged and non-packaged accounts follow one process (p.69).
 
 <!-- table: widths=4,9,4 caption="Scope of this FRS" -->
 | Area | In scope | Source |
@@ -66,13 +74,14 @@ The scope is the renewal of **client policies placed and booked by BDOI**: from 
 | Governance rules | In-system sanitation, unique reference, Clean / Review / Exception buckets, decision matrix, explicit initiation, non-renewable risk codes, LAMD reports, KYC flag, endorsements on the mother policy | BRRN.009, 020-023, 028-032, 034, 039 |
 | Marketing | Assignment, re-assignment, transfer between units, disposition with reasons and remarks, account history, TL review, return and post, outstanding-balance override, New Business path | BRD 1.004-1.008, 1.011, 2.003-2.007; BRRN.011-017, 027, 033 |
 | Processing and insurer | Dispositioned-file upload, assignment to Processing Officers, data update, computations, return to Marketing, extract per insurer, insurer responses | BRD 3.004-3.009, 4.003-4.007; BRRN.018, 035, 038 |
-| Letters and acceptance | Renewal Advice (first and second notice), NAL, NFR, NRNS reminder and non-acceptance letters, Contact Center follow-up, acceptance and automatic progression to placement and booking | BRRN.001, 010, 025, 026, 037, 040 |
+| Letters and acceptance | Renewal Advice (first and second notice), NAL, NRL / NFR, NRNS reminder and non-acceptance letters on the effective expiry date, Contact Center follow-up, client confirmation through Marketing and the progression to placement and booking | BRRN.001, 010, 025, 026, 035, 037, 040 |
+| Hold cover and incentive | Hold cover request to the insurer and its confirmation from the renewal; incentive eligibility evaluated after booking and full payment | BRRN.041, 042 |
 | Monitoring | Renewal home and dashboards, renewal status report with 34-line summary, centralised listings with escalation, other renewal reports | BRD 1.009, 2.008, 3.010, 4.008; BRRN.019, 036 |
 | Submitted policies | Renewal of submitted policies handed over by BRD-12 (renewal hand-off) | Cross-BRD decision D2 |
 
 **Out of scope for this phase:**
 
-- Requirements that reference BDOIsys, EBIX or QPS (Addendum 1, p.34): the nine BRD IDs of section 11.3. The BIBS renewal reference and invoice number replace those references, and the reports stay.
+- Requirements that reference BDOIsys, EBIX or QPS (Addendum 1, p.60): the nine BRD IDs of section 11.3. The BIBS renewal reference and invoice number replace those references, and the reports stay.
 - Renewal of Employee Benefits programmes. They are renewed in the EB module (BRD-8) and excluded from the renewal lists (decision D3).
 - Renewal of **package products** (the insurer agreement). This is BRD-3 (BRPM.017); BRD-6 renews the client policies sold on them.
 - Accounting entries of their own. A renewal books through the BRD-1 booking with business type RENEWAL; Renewal posts nothing itself.
@@ -82,17 +91,18 @@ The scope is the renewal of **client policies placed and booked by BDOI**: from 
 <!-- table: widths=1.2,11.4,3.6 caption="Reference documents" -->
 | Ref. | Document | Version / date |
 |---|---|---|
-| R1 | Renewal Addendum (Workshop), BRRN.020-040, pages 1-18 of the BRD-6 pack | v1.0, 8 to 10-Apr-2026; approved 16-Apr-2026 |
-| R2 | Renewal Addendum 1, BRRN.001-019 and the out-of-scope list, pages 19-38 | v1.0, 18-Nov-2025 / 16-Dec-2025; approved 20 to 23-Jan-2026 |
-| R3 | RMEL Phase 2 - Online Dispositioning BRD (main BRD, persona IDs 1.xxx to 6.xxx), pages 39-189 | v1.0, 9-May-2025; signed 9 to 27-May-2025 |
+| R0 | Renewal Addendum (Walkthrough): restated BRRN.020, 023, 024, 028-030, 033-037, new BRRN.041 and 042, updated BRRN.001 and the annex of rules and scenarios, pages 1-26 of the BRD-6 pack issued 8-Oct-2026 (Renewal (RN) BRD, 215 pages) | v01.01, 8 to 12-May-2026; approved 14 to 15-May-2026 |
+| R1 | Renewal Addendum (Workshop), BRRN.020-040, pages 27-44 | v1.0, 8 to 10-Apr-2026; approved 16-Apr-2026 |
+| R2 | Renewal Addendum 1, BRRN.001-019 and the out-of-scope list, pages 45-64 | v1.0, 18-Nov-2025 / 16-Dec-2025; approved 20 to 23-Jan-2026 |
+| R3 | RMEL Phase 2 - Online Dispositioning BRD (main BRD, persona IDs 1.xxx to 6.xxx), pages 65-215 | v1.0, 9-May-2025; signed 9 to 27-May-2025 |
 | R4 | BDOI Renewal (BRD-6) requirements baseline | current |
 | R6 | Cross-BRD decisions and answered questions (BRD-6 to BRD-12) | current |
 | R8 | BDO UX guidelines (brand, screen patterns) | current |
 | R9 | BRD-1 New Business requirements baseline (shared platform capabilities) | current |
 
-Page references in this document ("p.27") are PDF page numbers of the BRD-6 pack (R1 to R3). The main BRD also carries its own page footer ("x of 151"); this document does not use it.
+Page references in this document ("p.53") are PDF page numbers of the BRD-6 pack issued on 8-Oct-2026 (R0 to R3, 215 pages). The pages of the earlier pack of 189 pages moved down by 26 pages; their content is unchanged. The main BRD also carries its own page footer ("x of 151"); this document does not use it.
 
-**Order of precedence.** The Workshop addendum (R1) is the latest signed layer. Where a BRRN ID of Addendum 1 (R2) restates a main-BRD ID, the BRRN governs and both IDs are traced to the same FR. The main BRD (R3) governs the persona IDs that no BRRN restates.
+**Order of precedence.** The Walkthrough addendum (R0) is the latest signed layer: where it restates a BRRN of the Workshop addendum (R1), its wording governs and the trace cites both pages. The Workshop addendum governs the BRRN it alone states. Where a BRRN ID of Addendum 1 (R2) restates a main-BRD ID, the BRRN governs and both IDs are traced to the same FR. The main BRD (R3) governs the persona IDs that no BRRN restates. Where the annex of R0 and a requirement of R0 differ (KYC), the requirement is applied and the point is listed for confirmation (CLR-RN-30).
 
 ## Definitions and acronyms
 
@@ -100,7 +110,7 @@ Page references in this document ("p.27") are PDF page numbers of the BRD-6 pack
 AO: Account Officer (Marketing); "Marketing AO / Admin" in the BRD, with the Account Broker
 ARN: Account Reference Number of a BIBS account (BRD-1)
 BRD: Business Requirements Document
-BRRN: Requirement ID prefix of the two Renewal addenda (BRRN.001-019 Addendum 1, BRRN.020-040 Workshop addendum)
+BRRN: Requirement ID prefix of the Renewal addenda (BRRN.001-019 Addendum 1, BRRN.020-040 Workshop addendum, BRRN.041-042 and the restated IDs of the Walkthrough addendum)
 Bucket: Classification of a renewal candidate after the checks (Clean, Review or Exception; BRRN.023)
 Candidate: A renewal record created for one expiring root invoice and policy year; it exists before any renewal account
 CBG: Consumer Banking Group segment of the bank (definition to confirm, RQ08)
@@ -114,7 +124,11 @@ LAMD: Bank loan unit that supplies the paid-off and RMU loan reports (the BRD do
 LOV: List of values maintained by the Business Administrator
 NAL: No Advice Letter, for expiring policies that need neither an RA nor an NFR (BRRN.001)
 NB path: A renewal with financial or structural changes processed as a New Business quotation or PRF (BRRN.033)
-NFR: Not for Renewal Letter; the addendum also writes NRL
+Effective expiry date: The expiry date used for NRNS and the closing letters: the end of a confirmed hold cover, otherwise the policy expiry date (Walkthrough addendum R37-HC-01 to 04)
+HC: Hold cover, the insurer's temporary extension of cover while the renewal completes (BRRN.042)
+NFR: Not for Renewal Letter; the Walkthrough addendum writes NRL (Non-Renewal Letter) for the letter sent by the Marketing AO when no RA exists
+TSI: Total sum insured of the policy; above the threshold (PHP 250M) a renewal goes to TSU or proposal handling
+TSU: Technical Services Unit
 NRNS: No Renew / No Submit account (BRRN.037)
 PN: Promissory note number of the bank loan; the key of LAMD matching
 PO: Processing Officer
@@ -123,6 +137,7 @@ RA: Renewal Advice, the letter that offers the renewal terms to the client (firs
 RMEL: Legacy name of the list of expiring accounts (not expanded in the BRD)
 RMU: Remedial Management Unit (BRD 2.004.4.1)
 RQnn: Open question on BRD-6 raised by the project team (section 10.3)
+CLR-RN-nn: Proposed business rule or clarification for confirmation by BDOI (chapter 21)
 STP: Straight-through processing, a renewal that proceeds without manual action (BRRN.031, 039)
 TL: Team Leader (Marketing or Processing)
 UAT: User acceptance testing
@@ -152,9 +167,9 @@ The main BRD repeats most capabilities once per persona (for example report gene
 
 ## Business context
 
-BDOI renews the policies it has placed. Today IT extracts the list of expiring accounts, Marketing records its dispositions in spreadsheets, communication runs by e-mail, and the upload to QPS and the text file for Renewal Advices work for packaged accounts only; non-packaged accounts and exceptions are handled by hand (p.42). The BRD asks for one online process in which the Business Units extract the list themselves, disposition online with a staged workflow, export the accounts per insurer and monitor each renewal (p.41-43). The Workshop addendum adds rule-based governance: in-system sanitation, a mandatory reference, buckets, a decision matrix and automatic progression to booking (p.3-15).
+BDOI renews the policies it has placed. Today IT extracts the list of expiring accounts, Marketing records its dispositions in spreadsheets, communication runs by e-mail, and the upload to QPS and the text file for Renewal Advices work for packaged accounts only; non-packaged accounts and exceptions are handled by hand (p.68). The BRD asks for one online process in which the Business Units extract the list themselves, disposition online with a staged workflow, export the accounts per insurer and monitor each renewal (p.67-69). The Workshop addendum adds rule-based governance: in-system sanitation, a mandatory reference, buckets, a decision matrix and automatic progression to booking (p.29-41). The Walkthrough addendum of May 2026 sets the rules of that framework (sanitation criteria, the TSI threshold, KYC, exception routing, NRNS on the effective expiry date and the NAL / NRL routing), keeps client confirmation, placement and booking under manual control, and adds the hold cover request and the incentive eligibility (p.1-26).
 
-<!-- table: widths=1,8,8 caption="Current and envisioned process (BRD p.42-43, workshop p.3)" -->
+<!-- table: widths=1,8,8 caption="Current and envisioned process (BRD p.68-69, workshop p.29)" -->
 | # | Current process (before) | Envisioned process in BIBS (after) |
 |---|---|---|
 | 1 | IT extracts the expiring list (RMEL) | A daily job extracts the expiring accounts at the lead days; users also generate the list for any date range |
@@ -164,7 +179,7 @@ BDOI renews the policies it has placed. Today IT extracts the list of expiring a
 | 5 | Accounts are sent to insurers by e-mail from Excel | BIBS creates the extract per insurer and sends it protected; the insurer's decision file is uploaded and applied |
 | 6 | RAs come from an IT text file for packaged accounts only | Users generate RAs (first and second notice) for any account from the latest template and send them in batch, protected |
 | 7 | Renewal status is monitored by hand | Renewal home, status report with summary counters, listings by unit and segment with escalation |
-| 8 | Accepted renewals are re-keyed for placement and booking | Acceptance moves the renewal account to placement and booking without re-keying; it books as business type RENEWAL |
+| 8 | Accepted renewals are re-keyed for placement and booking | The client's confirmation, recorded by the Marketing AO, moves the renewal account to placement and booking without re-keying; placement and booking stay a user action; it books as business type RENEWAL |
 
 <!-- pagebreak -->
 
@@ -185,8 +200,9 @@ The table lists the steps of the renewal, and Figure 1 shows them by actor. Each
 | 8 | Processing | Processing TL / Officer | Uploads dispositioned files; assigns to a PO; updates the renewal account; reviews computations; returns to Marketing | BRD 3.004-3.008, 4.003-4.006; BRRN.018 |
 | 9 | Insurer | Processing | Extract per insurer, sent protected; the insurer's file is uploaded; Renew As Is advances, Reject or Revise stops or reroutes | BRD 3.009, 4.007; BRRN.035 |
 | 10 | Renewal Advice | Marketing / Processing | RA generated (first or second notice) and sent in batch, protected; the account locks on the Marketing side | BRRN.010 |
-| 11 | Follow-up and letters | System, Contact Center | NRNS reminders and non-acceptance letters; NAL and NFR; Contact Center remarks and client documents | BRRN.001, 009, 025, 026, 037 |
-| 12 | Acceptance, placement, booking | Client, System | Acceptance recorded; the renewal account is placed and queued for booking; it books as RENEWAL | BRRN.038, 040 |
+| 11 | Follow-up and letters | System, Contact Center, Operations, Marketing AO | NRNS reminders on the effective expiry date (the hold cover end when there is one); NAL by Operations when an RA was sent, NRL by the Marketing AO when none was; Contact Center remarks and client documents | BRRN.001, 009, 025, 026, 037 |
+| 12 | Acceptance, placement, booking | Client, Marketing AO, Processing | The AO records the client's confirmation; the renewal account goes to placement and booking without re-keying, placed and booked by user action; it books as RENEWAL. A hold cover is requested when the renewal will not complete by expiry | BRRN.035, 038, 040, 042 |
+| 12a | Incentive eligibility | System | After booking, confirmed acceptance and full payment, the renewal is evaluated for incentive eligibility | BRRN.041 |
 | 13 | New Business path | Marketing | A renewal with financial or structural changes becomes a quotation or PRF tagged "For Proposal / New Business Path" | BRRN.033, 038 |
 | 14 | Monitoring | All | Home, reports, summary counters, listings with escalation | BRD 1.009, 2.008, 3.010, 4.008; BRRN.019, 036 |
 
@@ -196,7 +212,7 @@ The table lists the steps of the renewal, and Figure 1 shows them by actor. Each
 
 The disposition decides the path of the account after the TL posts it. The codes are fixed because they drive the workflow; their labels are maintained in the list RNW_DISPOSITION.
 
-<!-- table: widths=3,4.6,9 caption="Dispositions (BRD 2.004.3, p.81)" -->
+<!-- table: widths=3,4.6,9 caption="Dispositions (BRD 2.004.3, p.107)" -->
 | Code | Label | Path after posting |
 |---|---|---|
 | FOR_RENEWAL | For Renewal | Processing (FOR_PROCESSING), insurer round-trip, Renewal Advice, acceptance, placement and booking |
@@ -223,11 +239,11 @@ The disposition decides the path of the account after the TL posts it. The codes
 | Client | - (external) | Receives the RA and letters; accepts by e-mail, signed RA or payment | BRRN.010, 040 |
 | Insurer | - (external) | Receives the renewal extract; returns its decision file | BRD 3.009; BRRN.035 |
 
-The Processing Officer section of the BRD says "Log in with a Operations Team Leader user profile" (4.001.1.1, p.148). BIBS reads it as the Processing Officer profile. The final role-to-function matrix is open (OQ48, RQ20, RQ21).
+The Processing Officer section of the BRD says "Log in with a Operations Team Leader user profile" (4.001.1.1, p.174). BIBS reads it as the Processing Officer profile. The final role-to-function matrix is open (OQ48, RQ20, RQ21).
 
 ## Permissions
 
-The BRD lists 25 functions that the System Administrator assigns to profiles (6.002.2.1-25, p.181-185). BIBS gives each function a permission.
+The BRD lists 25 functions that the System Administrator assigns to profiles (6.002.2.1-25, p.207-211). BIBS gives each function a permission.
 
 <!-- table: widths=4.6,7.2,4.8 caption="Renewal permissions and the BRD functions they carry" -->
 | Permission | Allows | BRD function (6.002.2.n) |
@@ -300,8 +316,8 @@ The table is the proposed role-to-permission matrix ("Y" = granted; "T" = transf
 id: FR-RN-001
 title: Log in, session warnings and multiple tabs
 brd:
-  - BRD 1.001.1-1.001.3.1, 2.001.1-2.001.1.3, 3.001.1-3.001.1.3, 4.001.1-4.001.1.3, 5.001.1-5.001.1.3, 6.001.1-6.001.1.1 (p.44, 78-79, 108, 148, 179-180)
-  - BRD 1.002.1, 2.002.1, 3.002.1, 4.002.1, 5.002.1 (p.44, 79, 109, 148, 179)
+  - BRD 1.001.1-1.001.3.1, 2.001.1-2.001.1.3, 3.001.1-3.001.1.3, 4.001.1-4.001.1.3, 5.001.1-5.001.1.3, 6.001.1-6.001.1.1 (p.70, 104-105, 134, 174, 205-206)
+  - BRD 1.002.1, 2.002.1, 3.002.1, 4.002.1, 5.002.1 (p.70, 105, 135, 174, 205)
 actor: All Renewal personas
 priority: Must have
 screens: Login; session warning dialog; any Renewal screen in a second tab
@@ -338,9 +354,9 @@ acceptance:
 id: FR-RN-002
 title: Restrict each function and each record to authorised users
 brd:
-  - BRD 6.002.2.1-6.002.2.24 (p.181-185)
-  - BRRN.024 (p.6)
-  - BRD p.43 key capability (Team Leaders view only their team's accounts)
+  - BRD 6.002.2.1-6.002.2.24 (p.207-211)
+  - BRRN.024 (p.32; p.6, 21)
+  - BRD p.69 key capability (Team Leaders view only their team's accounts)
 actor: System
 priority: Must have
 screens: All Renewal screens; User Access Matrix
@@ -378,9 +394,9 @@ acceptance:
 id: FR-RN-003
 title: Define profiles and assign Renewal functions
 brd:
-  - BRD 6.002.1, 6.002.1.2-6.002.1.6 (p.180-181)
-  - BRD 6.002.2, 6.002.2.1-6.002.2.25 (p.181-185)
-  - BRD 5.004.1 (p.180)
+  - BRD 6.002.1, 6.002.1.2-6.002.1.6 (p.206-207)
+  - BRD 6.002.2, 6.002.2.1-6.002.2.25 (p.207-211)
+  - BRD 5.004.1 (p.206)
 actor: System Administrator; Business Administrator (requester); access approver
 priority: Must have
 screens: Access Requests; User Access Matrix; Roles
@@ -414,12 +430,12 @@ acceptance:
 id: FR-RN-004
 title: Keep a complete audit trail of renewal actions
 brd:
-  - BRRN.021 (p.4)
-  - BRRN.022 (p.4)
-  - BRRN.023 (p.4-6)
-  - BRRN.031 (p.9-10)
-  - BRRN.035 (p.11-12)
-  - BRRN.040 (p.14-15)
+  - BRRN.021 (p.30)
+  - BRRN.022 (p.30)
+  - BRRN.023 (p.30-32; p.5-6, 21)
+  - BRRN.031 (p.35-36)
+  - BRRN.035 (p.37-38; p.9-11, 23-24)
+  - BRRN.040 (p.40-41)
 actor: System; any user with RNW_VIEW (read)
 priority: Must have
 screens: Record page (History tab); Renewal Reports (RNW-DECISIONS, RNW-SANITATION)
@@ -452,8 +468,8 @@ acceptance:
 id: FR-RN-010
 title: Extract renewal candidates automatically at the lead days
 brd:
-  - BRRN.030 (p.8-9)
-  - BRRN.005 (p.24-25), restating BRD 1.003.4.1.2, 3.003.4.2 (p.50, 114)
+  - BRRN.030 (p.34-35; p.8)
+  - BRRN.005 (p.50-51), restating BRD 1.003.4.1.2, 3.003.4.2 (p.76, 140)
 actor: System (job RNW_EXTRACTION)
 priority: Must have
 screens: Renewal Home (extraction runs); Expiry List
@@ -486,14 +502,15 @@ acceptance:
   - A policy expiring 140 days after the business date becomes a candidate that day, with a renewal reference, and does not appear twice after a second run.
   - A change of the lead days to 150 takes effect at the next run without a release.
   - An HMO policy is not extracted.
+  - The extraction run records its date, time and trigger, and a policy is never extracted twice in the same cycle (BRRN.030, Walkthrough addendum p.8).
 ```
 
 ```fr
 id: FR-RN-011
 title: Generate the list of expiring accounts for a date range
 brd:
-  - BRRN.002 (p.22-23), restating BRD 1.003.1, 1.003.1.1, 1.003.2, 3.003.1, 3.003.1.1, 3.003.2 (p.44-45, 109)
-  - BRD 3.003.4, 3.003.4.1 (p.111)
+  - BRRN.002 (p.48-49), restating BRD 1.003.1, 1.003.1.1, 1.003.2, 3.003.1, 3.003.1.1, 3.003.2 (p.70-71, 135)
+  - BRD 3.003.4, 3.003.4.1 (p.137)
 actor: Marketing TL; Processing TL
 priority: Must have
 screens: Expiry List (Generate Expiry List dialog)
@@ -533,7 +550,7 @@ acceptance:
 id: FR-RN-012
 title: Filter the expiring list with multi-select criteria
 brd:
-  - BRRN.003 (p.23), restating BRD 1.003.3, 1.003.3.1-1.003.3.1.13, 3.003.3, 3.003.3.1-3.003.3.13 (p.45-47, 109-111)
+  - BRRN.003 (p.49), restating BRD 1.003.3, 1.003.3.1-1.003.3.1.13, 3.003.3, 3.003.3.1-3.003.3.13 (p.71-73, 135-137)
 actor: Marketing TL; Processing TL
 priority: Must have
 screens: Expiry List (Filters panel)
@@ -571,8 +588,8 @@ acceptance:
 id: FR-RN-013
 title: Show the expiring list in one scrollable grid with column filters and search
 brd:
-  - BRRN.004 (p.23-24), restating BRD 1.003.4.1, 1.003.4.1.1, 1.003.4.1.1.2-1.003.4.1.1.24, 3.003.4.1, 3.003.4.1.2-3.003.4.1.21 (p.47-50, 111-114)
-  - BRRN.006 (p.25), restating BRD 1.003.4.1.3, 1.003.4.1.4, 3.003.4.3, 3.003.4.4, 3.006.1.5, 4.003.1.5 (p.50, 114-115, 119, 149-150)
+  - BRRN.004 (p.49-50), restating BRD 1.003.4.1, 1.003.4.1.1, 1.003.4.1.1.2-1.003.4.1.1.24, 3.003.4.1, 3.003.4.1.2-3.003.4.1.21 (p.73-76, 137-140)
+  - BRRN.006 (p.51), restating BRD 1.003.4.1.3, 1.003.4.1.4, 3.003.4.3, 3.003.4.4, 3.006.1.5, 4.003.1.5 (p.76, 140-141, 145, 175-176)
 actor: Marketing TL; Processing TL; Processing Officer
 priority: Must have
 screens: Expiry List (tabs Unassigned Disposition, For Renewal, For Quotation, For Proposal, Not for Renewal, Lost Business, Exceptions, All)
@@ -618,8 +635,8 @@ acceptance:
 id: FR-RN-014
 title: Export and print the expiring list
 brd:
-  - BRRN.007 (p.25-26), restating BRD 1.003.5, 1.003.6, 1.003.7, 3.003.5, 3.003.6, 3.003.7 (p.50-51, 115)
-  - BRRN.008 (p.26), restating BRD 1.003.7.1, 1.003.7.2, 3.003.7.1, 3.003.7.2 (p.51, 115)
+  - BRRN.007 (p.51-52), restating BRD 1.003.5, 1.003.6, 1.003.7, 3.003.5, 3.003.6, 3.003.7 (p.76-77, 141)
+  - BRRN.008 (p.52), restating BRD 1.003.7.1, 1.003.7.2, 3.003.7.1, 3.003.7.2 (p.77, 141)
 actor: Marketing TL; Processing TL
 priority: Must have
 screens: Expiry List (Export, Print)
@@ -650,7 +667,7 @@ acceptance:
 id: FR-RN-015
 title: Initiate renewal processing explicitly
 brd:
-  - BRRN.021 (p.4)
+  - BRRN.021 (p.30)
 actor: Authorised user (Marketing TL, Processing TL with RNW_EXTRACT)
 priority: Must have
 screens: Expiry List (Initiate); record page
@@ -684,8 +701,8 @@ acceptance:
 id: FR-RN-016
 title: Take over the expiries of the go-live window
 brd:
-  - BRRN.005 (p.24-25)
-  - BRRN.030 (p.8-9)
+  - BRRN.005 (p.50-51)
+  - BRRN.030 (p.34-35; p.8)
 actor: Processing TL (runs the go-live extraction from the cut-over runbook); Renewal processing team
 priority: Must have
 screens: Renewal Home (extraction runs); Expiry List (Urgent pill); Processing Worklist (Upload RA already sent)
@@ -734,14 +751,15 @@ acceptance:
 id: FR-RN-020
 title: Run the sanitation, matching and eligibility checks
 brd:
-  - BRRN.020 (p.4)
-  - BRRN.022 (p.4)
+  - BRRN.020 (p.30; p.5, 20-21)
+  - BRRN.022 (p.30)
 actor: System (check engine); Renewal processor (view)
 priority: Must have
 screens: Record page (Checks & Bucket tab); Renewal Reports (RNW-SANITATION)
 description:
-  - After extraction, after every upload and on every relevant event, BIBS runs the checks of section 5.3 on the candidate - reference match, PN present, risk code renewable, LAMD status, claims, pending endorsement, outstanding premium, financial impact, insurer response match, mandatory fields, product renewable, insurer usable, duplicate candidate and KYC due. Eligibility no longer depends on manual pre-cleaning of the list.
+  - After extraction, after every upload and on every relevant event, BIBS runs the checks of section 5.3 on the candidate - reference match, PN present, risk code renewable, risk code defined, insurer renewable list, TSI threshold, LAMD status, claims, pending endorsement, outstanding premium, financial impact, insurer response match, mandatory fields, product renewable, insurer usable, duplicate candidate and KYC due. Eligibility no longer depends on manual pre-cleaning of the list.
   - Each check writes a result PASS, WARN, FAIL, INFO or NOT_APPLICABLE with its detail. The Checks & Bucket tab shows the latest results, and the RNW-SANITATION report lists them for any range.
+  - The sanitation criteria of the Walkthrough addendum (SC-01 to SC-13, p.20-21) are the defaults of the check settings: missing key fields make an exception record (MANDATORY_FIELDS, REFERENCE_MATCH); a risk code that is not renewable, such as Bonds or CAR, is excluded (RISK_CODE_RENEWABLE); a risk code not defined in the criteria goes to manual review (RISK_CODE_DEFINED, Review); a risk not on the insurer's renewable list stops the continuation (INSURER_RENEWABLE_LIST, Review); a total sum insured above PHP 250M goes to TSU or proposal handling (TSI_THRESHOLD, Review, with the decision matrix proposing For Proposal). The criteria are configurable, changed only by the authorised group with an effective date, applied at policy level, and a change never affects a candidate already initiated.
 preconditions:
   - "A candidate exists."
 main_flow:
@@ -749,9 +767,12 @@ main_flow:
   - BIBS runs every active check and stores the run and its results.
   - BIBS recomputes the bucket (FR-RN-022).
 alternate_flows:
-  - The Claims module is not connected. The claims check reports INFO "claims not connected" and does not block (decision D4).
+  - Claims cannot be read for the candidate (a migrated policy without a BIBS account, or the Claims module not reachable). The claims check reports Not applicable or INFO and does not block (decision D4); how claims of migrated policies are found is listed for confirmation (CLR-RN-28).
+  - An existing claims record requires manual evaluation (Walkthrough addendum R23-05, R28-05): open claims fail the check with severity Review, so the candidate is never disposed automatically.
 rules:
-  - [R1, "Checks and their default severities are those of section 5.3; the list is to be confirmed (RQ01).", Configurable, Check settings (Renewal Setup)]
+  - [R1, "Checks and their default severities are those of section 5.3, set from the sanitation criteria of the Walkthrough addendum (RQ01 answered in part).", Configurable, Check settings (Renewal Setup)]
+  - [R4, "TSI threshold PHP 250,000,000.00; above it the candidate is Review and the matrix proposes For Proposal to TSU (SC-12, SC-13, R23-02, R24-02).", Configurable, Check setting TSI_THRESHOLD (parameter amount)]
+  - [R5, "A change of the check settings applies to the candidates not yet initiated; candidates in progress keep their results until their next event.", Fixed, "-"]
   - [R2, "Re-evaluation when an invoice is booked or moves, when the account status changes, after every upload and nightly (job RNW_REEVALUATE).", Fixed, "-"]
   - [R3, "KYC due is information only and never blocks (BRRN.028).", Fixed, "-"]
 validations: []
@@ -763,14 +784,16 @@ acceptance:
   - A candidate with an open endorsement request on the expiring invoice shows ENDORSEMENT_PENDING = FAIL on the Checks & Bucket tab.
   - When the endorsement is posted, the check turns PASS at the next event without user action.
   - The RNW-SANITATION report lists the failed checks of a date range with the candidate and detail.
+  - A candidate with a total sum insured of PHP 300M fails TSI_THRESHOLD, is Review and is proposed For Proposal; one of PHP 200M passes the check.
+  - A candidate on a risk code that is not in the check criteria fails RISK_CODE_DEFINED and is Review (manual review).
 ```
 
 ```fr
 id: FR-RN-021
 title: Use a unique renewal reference as the matching key
 brd:
-  - BRRN.022 (p.4)
-  - BRD 1.003.4.1.1.2 (p.47)
+  - BRRN.022 (p.30)
+  - BRD 1.003.4.1.1.2 (p.73)
 actor: System; Renewal user
 priority: Must have
 screens: Expiry List; record page; every upload
@@ -804,13 +827,16 @@ acceptance:
 id: FR-RN-022
 title: Classify candidates into Clean, Review and Exception buckets
 brd:
-  - BRRN.023 (p.4-6)
+  - BRRN.023 (p.30-32; p.5-6, 21)
+  - BRRN.029 (p.34; p.7-8, 23; rule R29-05, exception ageing)
 actor: System; authorised user (override)
 priority: Must have
 screens: Expiry List (Classification pill, Exceptions tab, Bucket filter); record page (Checks & Bucket tab, Override Bucket)
 description:
   - After each check run BIBS computes the bucket from the active bucket rule set. By default any check that fails with severity FAIL_EXCEPTION gives Exception; any FAIL_REVIEW or WARN gives Review; otherwise Clean. Records move between buckets when conditions change.
   - Users filter and export by bucket. A bucket is changed by hand only through a controlled override with mandatory remarks, and an override can never make a record with a failed check Clean (BRRN.023 negative scenario).
+  - "Classification is immediate after the checks, deterministic and explainable: the record shows the rule and rule-set version that set its bucket (Walkthrough addendum p.5-6). The annex rules R23-01 to R23-05 (p.21) are the default rule set: TSI up to the threshold with a renewable risk code is eligible (Clean when no other check fails); TSI above the threshold goes to TSU or proposal handling (Review); a non-renewable risk code is not eligible; missing mandatory data is a sanitation failure (Exception); an existing claims record requires manual evaluation (Review)."
+  - An exception that stays open beyond the exception ageing days raises the alert RNW_EXCEPTION_AGEING to the owner of the stage, for follow-up by the business (R29-05); no record is moved by the alert.
 preconditions:
   - "A check run exists."
 main_flow:
@@ -822,6 +848,7 @@ rules:
   - [R1, "Default rule set: FAIL_EXCEPTION gives EXCEPTION; FAIL_REVIEW or WARN gives REVIEW; otherwise CLEAN.", Configurable, "Bucket rule sets (versioned, maker-checker; content RQ01)"]
   - [R2, "A failed check never gives CLEAN, by rule or by override.", Fixed, "-"]
   - [R3, "Every bucket change is logged with the rule-set version, rule, check run, cause and user.", Fixed, "-"]
+  - [R4, "Exception ageing: 5 working days by default (R29-05; days and recipients to confirm, CLR-RN-27).", Configurable, Parameter RNW_EXCEPTION_AGEING_DAYS]
 validations:
   - [Override to Clean with a failed check, "Renewal <ref> has failed checks and cannot be Clean", To be confirmed]
   - [Override without remarks, Enter the remarks of the override, "-"]
@@ -837,14 +864,15 @@ acceptance:
   - A candidate with an open claim is Review, never Clean.
   - When the claim closes, the candidate becomes Clean at the next re-evaluation and the bucket history shows both entries.
   - An override to Clean on a record with a failed check is refused.
+  - The Checks & Bucket tab shows, for each bucket change, the rule-set version and the rule that set it.
 ```
 
 ```fr
 id: FR-RN-023
 title: Apply the decision matrix and rule-based disposition
 brd:
-  - BRRN.031 (p.9-10)
-  - BRRN.034 (p.11)
+  - BRRN.031 (p.35-36)
+  - BRRN.034 (p.37; p.9, 23)
 actor: System; Business Administrator (matrix); authorised user (override)
 priority: Must have
 screens: Renewal Setup (Decision Matrix); record page (disposition proposal); Renewal Reports (RNW-DECISIONS)
@@ -891,13 +919,14 @@ acceptance:
   - A Clean CBG Motor candidate matching an AUTO rule receives disposition For Renewal with source MATRIX and moves on without user action.
   - A candidate with an open claim is not disposed automatically and shows the proposal to the AO.
   - The RNW-DECISIONS report shows, for each system disposition, the matrix version and rule.
+  - The scenarios of the Walkthrough addendum (Annex BRRN.034, p.23) hold - a Clean renewal answered Renew As Is moves forward without user action; a rejected or revised insurer answer stops or reroutes the renewal; a failed rule sends it to manual handling; an unresolved endorsement blocks it.
 ```
 
 ```fr
 id: FR-RN-024
 title: Tag non-renewable risk codes and send the NFR
 brd:
-  - BRRN.009 (p.26-27), restating BRD 1.003.7.3, 1.003.7.3.1 (p.51)
+  - BRRN.009 (p.52-53), restating BRD 1.003.7.3, 1.003.7.3.1 (p.77)
 actor: System; Business Administrator (codes)
 priority: Must have
 screens: Renewal Setup (Non-renewable Risk Codes); Letters (NFR tab)
@@ -938,9 +967,9 @@ acceptance:
 id: FR-RN-025
 title: Ingest LAMD reports and route paid-off and RMU accounts
 brd:
-  - BRRN.029 (p.8)
-  - BRRN.039 (p.14)
-  - BRRN.024 (p.6)
+  - BRRN.029 (p.34; p.7-8, 23)
+  - BRRN.039 (p.40)
+  - BRRN.024 (p.32; p.6, 21)
 actor: LAMD user (upload); System (matching)
 priority: Must have
 screens: LAMD Reports (upload, match results, routing)
@@ -984,12 +1013,13 @@ acceptance:
 id: FR-RN-026
 title: Flag accounts due for KYC review
 brd:
-  - BRRN.028 (p.7-8)
+  - BRRN.028 (p.33-34; p.6-7, 21-23)
 actor: System; any list user
 priority: Must have
 screens: Expiry List (flag chip KYC due); record page; Renewal Reports
 description:
   - BIBS flags candidates whose client is due or upcoming for KYC review, using the client's KYC review date and the KYC due window. The flag shows as a chip in the lists and a column in the reports, with the date it was first identified. It is for visibility and reporting only and never blocks, stops or reroutes the renewal.
+  - "Note: the annex of the Walkthrough addendum describes a KYC determination process in which a missing, incomplete or expired KYC blocks the renewal (KYC-01 to KYC-06, p.22-23), while BRRN.028 (p.6-7) and the scope statement (p.4) keep KYC for visibility, non-blocking. This FR applies BRRN.028; the point is listed for confirmation with BDOI Compliance (CLR-RN-30)."
 preconditions:
   - "None."
 main_flow:
@@ -1013,8 +1043,8 @@ acceptance:
 id: FR-RN-027
 title: Reflect endorsements on the mother policy before approval
 brd:
-  - BRRN.032 (p.10)
-  - BRD 1.008.1.4 (p.56)
+  - BRRN.032 (p.36)
+  - BRD 1.008.1.4 (p.82)
 actor: System
 priority: Must have
 screens: Record page (Checks & Bucket, Account History); TL Review
@@ -1045,7 +1075,7 @@ acceptance:
 id: FR-RN-028
 title: Resolve the package of a migrated policy at sanitation
 brd:
-  - BRRN.020 (p.4)
+  - BRRN.020 (p.30; p.5, 20-21)
 actor: System (check PACKAGE_REMAP); Renewal processing team (Processing TL, Processing Officer)
 priority: Must have
 screens: Record page (Checks & Bucket, Package panel); Expiry List (bucket Exception)
@@ -1085,8 +1115,8 @@ acceptance:
 id: FR-RN-030
 title: Assign and re-assign accounts to Marketing AOs
 brd:
-  - BRD 1.005.1, 1.005.1.1, 1.005.1.1.1, 1.005.1.1.2, 1.005.1.2, 1.005.1.2.1-1.005.1.2.4 (p.53-54)
-  - BRD 1.005.2 (p.54)
+  - BRD 1.005.1, 1.005.1.1, 1.005.1.1.1, 1.005.1.1.2, 1.005.1.2, 1.005.1.2.1-1.005.1.2.4 (p.79-80)
+  - BRD 1.005.2 (p.80)
 actor: Marketing TL
 priority: Must have
 screens: Expiry List (tab Unassigned Disposition; Assign Disposition, Re-assign Officer)
@@ -1128,9 +1158,9 @@ acceptance:
 id: FR-RN-031
 title: Transfer an account to another Marketing unit
 brd:
-  - BRD 1.006.1-1.006.5 (p.54-55)
-  - BRD 2.005.1, 2.005.2, 2.005.3, 2.005.3.1, 2.005.3.2, 2.005.4, 2.005.5 (p.84-85)
-  - BRD 2.004.4.8 (p.83)
+  - BRD 1.006.1-1.006.5 (p.80-81)
+  - BRD 2.005.1, 2.005.2, 2.005.3, 2.005.3.1, 2.005.3.2, 2.005.4, 2.005.5 (p.110-111)
+  - BRD 2.004.4.8 (p.109)
 actor: Marketing TL; Marketing AO (request)
 priority: Must have
 screens: Expiry List and My Dispositions (Transfer); Transfers (Outgoing)
@@ -1171,7 +1201,7 @@ acceptance:
 id: FR-RN-032
 title: Receive, accept or decline transferred accounts
 brd:
-  - BRD 1.007.1, 1.007.2, 1.007.3, 1.007.3.1, 1.007.4, 1.007.4.1, 1.007.4.2, 1.007.5 (p.55-56)
+  - BRD 1.007.1, 1.007.2, 1.007.3, 1.007.3.1, 1.007.4, 1.007.4.1, 1.007.4.2, 1.007.5 (p.81-82)
 actor: Marketing TL (receiving unit)
 priority: Must have
 screens: Transfers (Incoming)
@@ -1208,12 +1238,12 @@ acceptance:
 id: FR-RN-040
 title: View all my accounts in one scrollable list
 brd:
-  - BRRN.011 (p.28-29), restating BRD 2.003.1 (p.79)
-  - BRRN.012 (p.29), restating BRD 2.003.1.1 (p.79)
-  - BRRN.014 (p.30), restating BRD 2.003.1.3 (p.79)
-  - BRRN.015 (p.30), restating BRD 2.003.1.4 (p.80)
-  - BRRN.016 (p.30-31), restating BRD 2.003.1.5 (p.80)
-  - BRRN.017 (p.31), restating BRD 2.003.1.6 without the QPS / EBIX references (p.80)
+  - BRRN.011 (p.54-55), restating BRD 2.003.1 (p.105)
+  - BRRN.012 (p.55), restating BRD 2.003.1.1 (p.105)
+  - BRRN.014 (p.56), restating BRD 2.003.1.3 (p.105)
+  - BRRN.015 (p.56), restating BRD 2.003.1.4 (p.106)
+  - BRRN.016 (p.56-57), restating BRD 2.003.1.5 (p.106)
+  - BRRN.017 (p.57), restating BRD 2.003.1.6 without the QPS / EBIX references (p.106)
 actor: Marketing AO
 priority: Must have
 screens: My Dispositions (quick filters Returned to me, Due in 30 days, NRNS)
@@ -1250,9 +1280,9 @@ acceptance:
 id: FR-RN-041
 title: View a renewal account and download its details
 brd:
-  - BRRN.013 (p.29-30), restating BRD 2.003.1.2 (p.79)
-  - BRD 1.004.1, 1.004.1.1, 1.004.1.2, 1.008.1.2, 1.008.1.3, 3.006.1.1, 3.006.1.2, 4.003.1.1, 4.003.1.2 (p.51-52, 56, 118-119, 149)
-  - BRD 1.004.1.3-1.004.1.5.2, 2.003.2, 2.003.3, 2.003.3.1, 2.003.3.2, 3.006.2, 3.006.3, 3.006.3.1, 3.006.3.2, 4.003.2, 4.003.3, 4.003.3.1, 4.003.3.2 (p.52-53, 80, 119-120, 150)
+  - BRRN.013 (p.55-56), restating BRD 2.003.1.2 (p.105)
+  - BRD 1.004.1, 1.004.1.1, 1.004.1.2, 1.008.1.2, 1.008.1.3, 3.006.1.1, 3.006.1.2, 4.003.1.1, 4.003.1.2 (p.77-78, 82, 144-145, 175)
+  - BRD 1.004.1.3-1.004.1.5.2, 2.003.2, 2.003.3, 2.003.3.1, 2.003.3.2, 3.006.2, 3.006.3, 3.006.3.1, 3.006.3.2, 4.003.2, 4.003.3, 4.003.3.1, 4.003.3.2 (p.78-79, 106, 145-146, 176)
 actor: Marketing TL / AO; Processing TL / Officer
 priority: Must have
 screens: Renewal record page (tabs Details, Checks & Bucket, Account History, Computations, Insurer, Letters, Documents, Remarks & Follow-ups, History)
@@ -1281,7 +1311,7 @@ acceptance:
 id: FR-RN-042
 title: View the full account history before the disposition
 brd:
-  - BRRN.027 (p.7)
+  - BRRN.027 (p.33)
 actor: Renewal user (Marketing, Processing)
 priority: Must have
 screens: Record page (Account History tab)
@@ -1315,9 +1345,9 @@ acceptance:
 id: FR-RN-043
 title: Give the disposition of an account
 brd:
-  - BRD 2.004.1, 2.004.2, 2.004.3, 2.004.3.1-2.004.3.5 (p.80-81)
-  - BRD 2.004.4, 2.004.4.1-2.004.4.10 (p.82-83)
-  - BRD 2.004.5, 2.004.5.1, 2.004.5.2, 2.004.5.3 (p.83-84)
+  - BRD 2.004.1, 2.004.2, 2.004.3, 2.004.3.1-2.004.3.5 (p.106-107)
+  - BRD 2.004.4, 2.004.4.1-2.004.4.10 (p.108-109)
+  - BRD 2.004.5, 2.004.5.1, 2.004.5.2, 2.004.5.3 (p.109-110)
 actor: Marketing AO
 priority: Must have
 screens: Record page (Disposition panel); My Dispositions
@@ -1369,8 +1399,8 @@ acceptance:
 id: FR-RN-044
 title: Add remarks to an account
 brd:
-  - BRD 2.004.6, 2.004.7, 2.004.8 (p.84)
-  - BRD 2.006.1.5, 2.006.1.5.1, 2.006.1.5.2, 2.006.1.6 (p.86-87)
+  - BRD 2.004.6, 2.004.7, 2.004.8 (p.110)
+  - BRD 2.006.1.5, 2.006.1.5.1, 2.006.1.5.2, 2.006.1.6 (p.112-113)
 actor: Marketing AO; Marketing TL; Processing
 priority: Must have
 screens: Record page (Remarks & Follow-ups tab); Disposition panel
@@ -1401,7 +1431,7 @@ acceptance:
 id: FR-RN-045
 title: List my dispositioned accounts with status, flags and lock
 brd:
-  - BRD 2.006.1, 2.006.1.1, 2.006.1.1.1, 2.006.1.1.2, 2.006.1.3, 2.006.1.4, 2.006.1.5.3 (p.85-87)
+  - BRD 2.006.1, 2.006.1.1, 2.006.1.1.1, 2.006.1.1.2, 2.006.1.3, 2.006.1.4, 2.006.1.5.3 (p.111-113)
 actor: Marketing AO
 priority: Must have
 screens: My Dispositions (Dispositioned view)
@@ -1429,7 +1459,7 @@ acceptance:
 id: FR-RN-046
 title: Update returned accounts
 brd:
-  - BRD 2.007.1, 2.007.2, 2.007.3, 2.007.4, 2.007.4.2-2.007.4.7, 2.007.5 (p.87-89)
+  - BRD 2.007.1, 2.007.2, 2.007.3, 2.007.4, 2.007.4.2-2.007.4.7, 2.007.5 (p.113-115)
 actor: Marketing AO
 priority: Must have
 screens: My Dispositions (quick filter Returned to me); record page
@@ -1460,8 +1490,8 @@ acceptance:
 id: FR-RN-047
 title: Re-open accounts tagged Not for Renewal
 brd:
-  - BRD 2.004.10 (p.84)
-  - BRD 3.004.5 (p.117)
+  - BRD 2.004.10 (p.110)
+  - BRD 3.004.5 (p.143)
 actor: Marketing AO; Processing TL
 priority: Must have
 screens: Record page (Re-open Disposition)
@@ -1491,12 +1521,13 @@ acceptance:
 id: FR-RN-048
 title: Route renewals with financial or structural changes to the New Business path
 brd:
-  - BRRN.033 (p.10)
-  - BRRN.038 (p.14)
+  - BRRN.033 (p.36; p.8-9)
+  - BRRN.038 (p.40)
 actor: Marketing AO; System
 priority: Must have
 screens: Record page (Start NB Path); Quotation; Proposal (PRF)
 description:
+  - "Note: the Walkthrough addendum asks BIBS to tell a renewal as-is from one that needs a proposal or the New Business flow, on financial or structural changes, and to route it when the defined criteria are met (BRRN.033, p.8-9). The financial change is the FINANCIAL_IMPACT check; a structural change (insured, risk or cover) and whether the routing is automatic are listed for confirmation (CLR-RN-31)."
   - A renewal takes the New Business path when the disposition is For Quotation or For Proposal, or when the financial-impact check finds a change in premium, sum insured, rate or charges beyond the tolerance (BRRN.038). The account is tagged "For Proposal / New Business Path" and the audit trail records the reason of the conversion.
   - "**Start NB Path** creates a package quotation or a non-package PRF pre-filled from the expiring account and linked by the renewal reference. The accounts it produces have business type RENEWAL and point to the expiring ARN (shared change BT0, decision D1). The candidate follows the quotation or PRF and closes RENEWED on booking or LOST on decline."
   - When the financial-impact check fails, the acceptance of the client must be recorded with its method (e-mail, signed RA or payment), whichever path the renewal takes (BRRN.038 AC3).
@@ -1530,9 +1561,9 @@ acceptance:
 id: FR-RN-050
 title: Review, return and post dispositioned accounts
 brd:
-  - BRD 1.008.1, 1.008.1.1, 1.008.1.4 (p.56)
-  - BRD 1.008.2, 1.008.2.1-1.008.2.7 (p.57)
-  - BRD 1.008.3, 1.008.3.1-1.008.3.4 (p.57-58)
+  - BRD 1.008.1, 1.008.1.1, 1.008.1.4 (p.82)
+  - BRD 1.008.2, 1.008.2.1-1.008.2.7 (p.83)
+  - BRD 1.008.3, 1.008.3.1-1.008.3.4 (p.83-84)
 actor: Marketing TL (non-CBG)
 priority: Must have
 screens: TL Review (Review in progress list; Return, Post)
@@ -1572,8 +1603,8 @@ acceptance:
 id: FR-RN-051
 title: Override the outstanding-balance flag and other controlled overrides
 brd:
-  - BRD 1.011.1, 1.011.1.1, 1.011.1.2, 1.011.1.3 (p.78)
-  - BRRN.023 AC5 (p.5), BRRN.031 AC4 (p.10), BRRN.035 negative scenario 2d (p.12)
+  - BRD 1.011.1, 1.011.1.1, 1.011.1.2, 1.011.1.3 (p.104)
+  - BRRN.023 AC5 (p.31), BRRN.031 AC4 (p.36), BRRN.035 negative scenario 2d (p.38)
 actor: Marketing TL (RNW_OVERRIDE)
 priority: Must have
 screens: TL Review (Override Outstanding Balance); record page (Override)
@@ -1614,9 +1645,9 @@ acceptance:
 id: FR-RN-060
 title: Upload dispositioned files
 brd:
-  - BRRN.018 (p.31), restating BRD 3.004.1, 3.004.1.1, 3.004.1.2, 4.004.1, 4.004.1.1, 4.004.1.2 (p.115-116, 150-151)
-  - BRD 3.004.2, 3.004.3, 3.004.3.1, 4.004.2, 4.004.3, 4.004.3.1 (p.116, 151)
-  - BRD 3.004.4 (p.116)
+  - BRRN.018 (p.57), restating BRD 3.004.1, 3.004.1.1, 3.004.1.2, 4.004.1, 4.004.1.1, 4.004.1.2 (p.141-142, 176-177)
+  - BRD 3.004.2, 3.004.3, 3.004.3.1, 4.004.2, 4.004.3, 4.004.3.1 (p.142, 177)
+  - BRD 3.004.4 (p.142)
 actor: Processing TL; Processing Officer
 priority: Must have
 screens: Processing Worklist (Upload Dispositioned File); bulk upload wizard RNW_DISPOSITION_UPLOAD
@@ -1660,7 +1691,7 @@ acceptance:
 id: FR-RN-061
 title: Assign accounts to Processing Officers
 brd:
-  - BRD 3.005.1, 3.005.1.1, 3.005.1.1.1, 3.005.1.1.2, 3.005.1.2, 3.005.1.2.1, 3.005.1.2.2, 3.005.1.3, 3.005.1.4, 3.005.1.5, 3.005.1.6 (p.117-118)
+  - BRD 3.005.1, 3.005.1.1, 3.005.1.1.1, 3.005.1.1.2, 3.005.1.2, 3.005.1.2.1, 3.005.1.2.2, 3.005.1.3, 3.005.1.4, 3.005.1.5, 3.005.1.6 (p.143-144)
 actor: Processing TL
 priority: Must have
 screens: Processing Worklist (Assign PO, Assign to Me)
@@ -1692,8 +1723,8 @@ acceptance:
 id: FR-RN-062
 title: Work the processing list
 brd:
-  - BRD 3.006.1, 3.006.1.3, 3.006.1.4 (p.118-119)
-  - BRD 4.003.1, 4.003.1.3, 4.003.1.4 (p.149)
+  - BRD 3.006.1, 3.006.1.3, 3.006.1.4 (p.144-145)
+  - BRD 4.003.1, 4.003.1.3, 4.003.1.4 (p.175)
 actor: Processing TL; Processing Officer
 priority: Must have
 screens: Processing Worklist (tabs For Processing, In Processing, With Insurer, Insurer Responded, Returned)
@@ -1720,8 +1751,8 @@ acceptance:
 id: FR-RN-063
 title: Update data on the renewal account
 brd:
-  - BRD 3.007.1, 3.007.2, 3.007.3, 3.007.3.1-3.007.3.4 (p.120-121)
-  - BRD 4.005.1, 4.005.2, 4.005.3, 4.005.3.1-4.005.3.4 (p.151-152)
+  - BRD 3.007.1, 3.007.2, 3.007.3, 3.007.3.1-3.007.3.4 (p.146-147)
+  - BRD 4.005.1, 4.005.2, 4.005.3, 4.005.3.1-4.005.3.4 (p.177-178)
 actor: Processing TL; Processing Officer
 priority: Must have
 screens: Record page (Renewal Account); Account (BRD-1 draft edit)
@@ -1758,9 +1789,9 @@ acceptance:
 id: FR-RN-064
 title: Review computations and the financial impact
 brd:
-  - BRD 3.008.1, 3.008.1.1 (p.121)
-  - BRD 4.006.1, 4.006.1.1 (p.152)
-  - BRRN.038 (p.14)
+  - BRD 3.008.1, 3.008.1.1 (p.147)
+  - BRD 4.006.1, 4.006.1.1 (p.178)
+  - BRRN.038 (p.40)
 actor: Processing TL; Processing Officer; System
 priority: Must have
 screens: Record page (Computations tab)
@@ -1789,8 +1820,8 @@ acceptance:
 id: FR-RN-065
 title: Return accounts to Marketing
 brd:
-  - BRD 3.008.2, 3.008.2.1-3.008.2.7 (p.121-122)
-  - BRD 4.006.2, 4.006.2.1-4.006.2.7 (p.152-153)
+  - BRD 3.008.2, 3.008.2.1-3.008.2.7 (p.147-148)
+  - BRD 4.006.2, 4.006.2.1-4.006.2.7 (p.178-179)
 actor: Processing TL; Processing Officer
 priority: Must have
 screens: Processing Worklist; record page (Return to Marketing)
@@ -1826,9 +1857,9 @@ acceptance:
 id: FR-RN-070
 title: Extract For Renewal accounts per insurer and send them
 brd:
-  - BRD 3.009.1, 3.009.1.1-3.009.1.4, 3.009.1.4.1-3.009.1.4.28 (p.122-126)
-  - BRD 4.007.1, 4.007.1.1-4.007.1.4, 4.007.1.4.1-4.007.1.4.28 (p.153-158)
-  - BRD 3.009.2-3.009.5.1, 4.007.2-4.007.5.1 (p.126-127, 158-159)
+  - BRD 3.009.1, 3.009.1.1-3.009.1.4, 3.009.1.4.1-3.009.1.4.28 (p.148-152)
+  - BRD 4.007.1, 4.007.1.1-4.007.1.4, 4.007.1.4.1-4.007.1.4.28 (p.179-184)
+  - BRD 3.009.2-3.009.5.1, 4.007.2-4.007.5.1 (p.152-153, 184-185)
 actor: Processing TL; Processing Officer
 priority: Must have
 screens: Insurer Batches (create, preview, download, send)
@@ -1870,13 +1901,14 @@ acceptance:
 id: FR-RN-071
 title: Receive and apply insurer responses
 brd:
-  - BRD 3.009.6, 3.009.6.1, 3.009.6.2 (p.127)
-  - BRD 4.007.6, 4.007.6.1, 4.007.6.2 (p.159)
-  - BRRN.035 (p.11-12)
+  - BRD 3.009.6, 3.009.6.1, 3.009.6.2 (p.153)
+  - BRD 4.007.6, 4.007.6.1, 4.007.6.2 (p.185)
+  - BRRN.035 (p.37-38; p.9-11, 23-24)
 actor: Processing TL; Processing Officer; System
 priority: Must have
 screens: Insurer Batches (Upload Response, Match Review); record page (Insurer tab)
 description:
+  - "The insurer's answer is captured once and drives the workflow; a Renew As Is that matches moves the renewal on without user action, a Reject or Revise stops or reroutes it, and a mismatch or a conflicting answer (data conflict) stops it for review (Walkthrough addendum p.9-11, 23-24). Where the automation does not apply, an authorised user moves the renewal on by hand with remarks (manual push, the insurer-mismatch override of FR-RN-051); every change is logged."
   - Processing uploads the insurer's dispositioned file and views it. Each row carries the renewal reference and the expiring policy number, the response (Renew As Is / Approve, Revise, Reject), the insurer reference and, for Revise, the revised premium, sum insured, rate or terms. The response is captured once and is the single source of truth of the renewal's progress.
   - A matched Renew As Is advances the account to RA_READY without re-keying and without changing terms, price or structure. Revise returns it to processing and runs the financial-impact check. Reject tags it Not for Renewal (reason insurer declined) or sends it back to Marketing to re-market.
   - Late, conflicting or revised responses block straight-through progress, RA and booking, and route the account to Review or Exception on the latest valid response. A mismatch (reference, policy number, ambiguous row) never progresses the account; only an explicit override with remarks does.
@@ -1921,8 +1953,8 @@ acceptance:
 id: FR-RN-080
 title: Generate the Renewal Advice
 brd:
-  - BRRN.010 (p.27-28), restating BRD 1.010.1-1.010.7, 2.009.1-2.009.7.1, 3.011.1-3.011.7.1, 4.09.1-4.09.7 (p.76-78, 106-108, 146-148, 177-179)
-  - BRD 2.004.9 (p.84)
+  - BRRN.010 (p.53-54), restating BRD 1.010.1-1.010.7, 2.009.1-2.009.7.1, 3.011.1-3.011.7.1, 4.09.1-4.09.7 (p.102-104, 132-134, 172-174, 203-205)
+  - BRD 2.004.9 (p.110)
 actor: Marketing TL / AO; Processing TL / Officer (RNW_RA_GENERATE)
 priority: Must have
 screens: Letters (tabs RA Ready, RA Generated, RA Sent; Generate, Preview, Download ZIP)
@@ -1969,7 +2001,7 @@ acceptance:
 id: FR-RN-081
 title: Send Renewal Advices in batch, encrypted and password-protected
 brd:
-  - BRRN.010 (p.27-28), restating BRD 1.010.6, 1.010.7, 2.009.6, 2.009.7, 2.009.7.1, 3.011.6, 3.011.7, 3.011.7.1, 4.09.6, 4.09.7 (p.77-78, 107-108, 147-148, 178-179)
+  - BRRN.010 (p.53-54), restating BRD 1.010.6, 1.010.7, 2.009.6, 2.009.7, 2.009.7.1, 3.011.6, 3.011.7, 3.011.7.1, 4.09.6, 4.09.7 (p.103-104, 133-134, 173-174, 204-205)
 actor: Marketing TL / AO; Processing TL / Officer (RNW_RA_SEND)
 priority: Must have
 screens: Letters (tab RA Generated; Send in Batch, Extract Details)
@@ -2003,46 +2035,54 @@ acceptance:
 
 ```fr
 id: FR-RN-082
-title: Generate and send the No Advice Letter
+title: Generate and send the closing letters (NAL and NRL)
 brd:
-  - BRRN.001 (p.22)
-actor: Marketing / Processing user (RNW_RA_GENERATE, RNW_RA_SEND)
+  - BRRN.001 (p.48; updated p.15-16)
+  - BRRN.037 (p.39; p.12, 24-26), rules R37-HC-07 to R37-HC-12
+actor: Operations / Processing user (NAL); Marketing AO (NRL / NFR); System (eligibility)
 priority: Must have
-screens: Letters (NAL tab)
+screens: Letters (NAL / NFR tab, with the period, segment, unit head and status filters)
 description:
-  - For expiring policies that need neither an RA nor an NFR, the user selects one or several eligible accounts and generates the No Advice Letter (NAL) from its template. BIBS sends it to the client's registered e-mail, stores it, updates the account status to NAL Sent and shows a confirmation.
+  - The Letters screen lists the accounts eligible for each letter on its criteria - Renewal Advice (FR-RN-080), No Advice Letter (NAL) and Non-Renewal Letter (NRL, the Not for Renewal Letter of FR-RN-024) - with the filters period, market segment and unit head (updated BRRN.001). The user selects one or several accounts and generates and sends the letters from the approved templates; BIBS stores them, updates the account status (NAL Sent or NRL Sent), confirms the result and notifies the user of letters that could not be produced or sent.
+  - An account that reaches its effective expiry date without renewal (FR-RN-083) is routed by the letter it needs. When a Renewal Advice was sent, the account goes to Operations for the NAL (R37-HC-07); when no RA exists, it goes to the Marketing AO for the NRL (R37-HC-08). The two letters are mutually exclusive: an account that qualifies for one can never receive the other (R37-HC-09, 10).
+  - "Note: the earlier BRRN.001 described the NAL for accounts that need neither an RA nor an NFR; the Walkthrough addendum sends the NAL when an RA exists. The NAL and NRL definitions are listed for confirmation (CLR-RN-32)."
 preconditions:
-  - The accounts are eligible - no RA or NFR on the candidate and a disposition or reason marked NAL-eligible.
+  - The accounts are eligible for the letter; the user holds the letter permission of his unit.
 main_flow:
-  - The user opens the NAL tab, which lists eligible accounts.
-  - The user selects accounts and clicks **Generate and Send NAL**.
-  - BIBS generates, stores and sends the letters and confirms.
+  - The user opens the Letters tab of the letter, which lists the eligible accounts, and filters them.
+  - The user selects accounts and clicks **Send Letters**.
+  - BIBS generates, stores and sends the letters, updates each account status and confirms.
+alternate_flows:
+  - A letter cannot be generated or sent. The account stays in the tab with the failure, and the user receives the alert RNW_LETTER_FAILED.
 rules:
-  - [R1, "Eligibility from the NAL-eligible attribute of the reason; definition to confirm (RQ17).", Configurable, LOV RNW_NONRENEWAL_REASON attribute]
-  - [R2, "No NAL for an account that already has an RA or NFR.", Fixed, "-"]
+  - [R1, "NAL when the account is unrenewed at its effective expiry date and an RA was sent; NRL when no RA exists (R37-HC-07, 08); eligibility to confirm (RQ17, CLR-RN-32).", Configurable, LOV RNW_NONRENEWAL_REASON attribute; letter routing]
+  - [R2, "NAL and NRL are mutually exclusive for an account (R37-HC-09, 10).", Fixed, "-"]
+  - [R3, "No closing letter before the effective expiry date (R37-HC-05).", Fixed, "-"]
 validations:
   - [Ineligible account selected, "Renewal <ref> already has a <letter> and cannot receive a NAL", To be confirmed]
 notifications:
-  - "NAL to the client's registered e-mail."
+  - "The letter to the client's registered e-mail; RNW_LETTER_FAILED to the user for a letter that failed."
 audit:
-  - "Generation and sending with user, time, account and recipient."
+  - "Routing, generation and sending with user, time, account, letter and recipient (R37-HC-11, 12)."
 acceptance:
   - A NAL is sent to an eligible account and the account shows NAL Sent.
-  - An account with an RA cannot receive a NAL.
+  - An account with a NAL cannot receive an NRL, and an account with an NRL cannot receive a NAL.
+  - An unrenewed account without RA at its effective expiry date is listed for its Marketing AO for the NRL; one with an RA sent is listed for Operations for the NAL.
 ```
 
 ```fr
 id: FR-RN-083
 title: NRNS reminders and non-acceptance letters
 brd:
-  - BRRN.025 (p.6)
-  - BRRN.037 (p.13)
+  - BRRN.025 (p.32)
+  - BRRN.037 (p.39; p.12, 24-26)
 actor: System (job RNW_NRNS_LETTERS, RNW_EXPIRY_SWEEP)
 priority: Must have
 screens: Letters (NRNS tab); Expiry List (NRNS chip)
 description:
   - BIBS classifies as NRNS (No Renew / No Submit) the accounts that are not yet submitted at the checkpoint (no disposition, or For Renewal without RA acceptance). At the checkpoint (90 days before expiry by default) the daily job generates a reminder letter; policies already submitted or in progress are excluded.
-  - At the non-acceptance point (expiry by default) BIBS sends the non-acceptance letter, closes the candidate as EXPIRED_UNRENEWED and notifies the owners.
+  - The NRNS tag and the closing letters use the **effective expiry date**: the end date of a confirmed hold cover (FR-RN-086), otherwise the policy expiry date (R37-HC-01 to 04). Before that date no account is tagged NRNS and no closing letter is sent (R37-HC-05). An account that reaches it without renewal becomes an unrenewed NRNS candidate (R37-HC-06); after the waiting period it is tagged NRNS and routed to its closing letter, NAL or NRL (FR-RN-082), for the AO's follow-up and final disposition (Annex BRRN.037, p.24-25).
+  - At the non-acceptance point (the effective expiry date by default) BIBS sends the non-acceptance letter, closes the candidate as EXPIRED_UNRENEWED and notifies the owners. CBG and non-CBG accounts may follow different waiting periods (to confirm, CLR-RN-33).
 preconditions:
   - "None."
 main_flow:
@@ -2053,6 +2093,8 @@ rules:
   - [R1, "Reminder checkpoint 90 days before expiry (the BRD also writes '+90 days'; RQ18).", Configurable, Parameter RNW_NRNS_REMINDER_DAYS]
   - [R2, "Non-acceptance at expiry (0 days) by default.", Configurable, Parameter RNW_NON_ACCEPTANCE_DAYS]
   - [R3, "One reminder per candidate and checkpoint.", Fixed, "-"]
+  - [R4, "Waiting period after the effective expiry date before the NRNS tag: 0 days by default, per segment (CBG, non-CBG; CLR-RN-33).", Configurable, Parameter RNW_NRNS_WAITING_DAYS]
+  - [R5, "Effective expiry date = end of the confirmed hold cover, otherwise the policy expiry date.", Fixed, "-"]
 validations: []
 notifications:
   - "Reminder and non-acceptance letters to the client; owners notified of closures."
@@ -2062,20 +2104,23 @@ acceptance:
   - A candidate without disposition 90 days before expiry gets one reminder letter and the NRNS chip.
   - A candidate already disposed For Renewal and accepted gets no reminder.
   - At expiry without acceptance the candidate closes EXPIRED_UNRENEWED with a non-acceptance letter.
+  - A candidate with a confirmed 30-day hold cover is not tagged NRNS and gets no closing letter until the hold cover ends.
 ```
 
 ```fr
 id: FR-RN-084
 title: Record client acceptance and proceed to placement and booking
 brd:
-  - BRRN.040 (p.14-15)
-  - BRRN.038 AC3 (p.14)
-actor: Marketing / Processing user (RNW_ACCEPT); System
+  - BRRN.040 (p.40-41)
+  - BRRN.038 AC3 (p.40)
+  - BRRN.035 (p.37-38; p.9-11, 23-24), client confirmation and manual placement and booking
+actor: Marketing AO (confirmation, RNW_ACCEPT); Processing (placement); booking user (BRD-1); System
 priority: Must have
 screens: Record page (Record Acceptance); bulk upload RNW_ACCEPTANCE
 description:
   - The user records the client's acceptance of the RA with its method - e-mail (attachment RA_ACCEPTANCE), signed RA (attachment SIGNED_RA) or payment (the payment gate's evidence) - and the evidence. BIBS marks the renewal Accepted.
-  - When there is no unresolved exception and the payment rules are satisfied, BIBS moves the renewal account through the account workflow without resubmission (system fast track), places it (slip generated and sent when automatic placement is on) and, on policy issuance, queues it for booking. The booked invoice carries business type RENEWAL and the candidate closes RENEWED. Standard placement, booking and issuance SLAs apply.
+  - When there is no unresolved exception and the payment rules are satisfied, BIBS moves the renewal account through the account workflow without resubmission (system fast track) to placement and booking. The client's confirmation is recorded through Marketing (the AO), and placement, booking and the completion of the renewal stay under manual control: the Processing user places the account and the booking user books it, without re-keying (Walkthrough addendum p.4, p.9-11). The booked invoice carries business type RENEWAL and the candidate closes RENEWED. Standard placement, booking and issuance SLAs apply.
+  - "Note: the Workshop addendum moved an accepted renewal to placement and booking automatically (BRRN.040). The Walkthrough addendum keeps the automated progression up to the confirmation and leaves placement and booking to the user; automatic placement is therefore off by default for renewals, and the point is listed for confirmation (CLR-RN-34)."
 preconditions:
   - The candidate is RA_SENT; the user has RNW_ACCEPT.
 main_flow:
@@ -2084,12 +2129,12 @@ main_flow:
   - BIBS moves the account to awaiting payment; the payment gate, placement, issuance and booking follow.
   - When the renewal account is booked, the candidate closes RENEWED.
 alternate_flows:
-  - Payment as acceptance. A payment on the renewal account records the acceptance with source SYSTEM.
+  - Payment received before the confirmation. A payment on the renewal account is shown to the AO as evidence; the AO records the acceptance with method Payment.
   - Account incomplete. The fast track fails with the account's message; the account stays in draft for Processing.
   - Bulk acceptance by e-mail list through the upload RNW_ACCEPTANCE.
 rules:
   - [R1, "No duplicate proposal, resubmission or new initiation: the renewal account is the one created at processing.", Fixed, "-"]
-  - [R2, "Automatic placement on (default).", Configurable, Parameter RNW_AUTO_PLACEMENT]
+  - [R2, "Automatic placement off by default for renewals: placement and booking are user actions (Walkthrough addendum p.4).", Configurable, Parameter RNW_AUTO_PLACEMENT]
   - [R3, "Evidence is mandatory when FINANCIAL_IMPACT failed (BRRN.038).", Fixed, "-"]
   - [R4, "Payment rules are the BRD-1 payment gate (RQ19).", Fixed, "-"]
 validations:
@@ -2107,7 +2152,7 @@ notifications:
 audit:
   - "Acceptance with method, evidence, user or SYSTEM and time; payment-rule outcome; every status change and its trigger."
 acceptance:
-  - After the acceptance is recorded and the payment gate passes, the renewal account is placed and booked without re-keying.
+  - After the AO records the acceptance and the payment gate passes, the Processing user places and the booking user books the renewal account without re-keying; nothing is placed without a user action.
   - The booked invoice shows business type RENEWAL and the candidate is RENEWED.
   - Acceptance of a renewal with a failed financial-impact check needs evidence.
 ```
@@ -2116,7 +2161,7 @@ acceptance:
 id: FR-RN-085
 title: Contact Center follow-up
 brd:
-  - BRRN.026 (p.6-7)
+  - BRRN.026 (p.32-33)
 actor: Contact Center user
 priority: Must have
 screens: Follow-ups (list); record page (Remarks & Follow-ups, Documents)
@@ -2149,6 +2194,89 @@ acceptance:
   - A Contact Center user cannot see the premium columns.
 ```
 
+```fr
+id: FR-RN-086
+title: Request and confirm a hold cover from the renewal
+brd:
+  - BRRN.042 (p.14-15)
+  - BRRN.037 (p.39; p.12, 24-26; rules R37-HC-01 to 04)
+actor: Marketing AO (request, tag); Processing (insurer confirmation); System
+priority: Must have
+screens: Record page (Hold Cover panel of the renewal account, Request Hold Cover, Record Confirmation, Cancel Hold Cover); Expiry List and Letters (HC confirmed chip)
+description:
+  - When a renewal will not complete before the policy expires, the user sends a hold cover request to the insurer from the renewal, with the insurer, the coverage start date (the policy expiry date by default), the duration (30 or 60 days), the expiring policy number and remarks. BIBS records the request date, the requester and, when known, the insurer reference, and e-mails the request from the hold cover template (the request of FR-NB-082, opened from the renewal account).
+  - When the insurer confirms, the user records the confirmation date, the validity period, the conditions and the insurer's reference (FR-NB-083). The renewal lists and the record show the chip HC confirmed, and the end of the confirmed hold cover becomes the effective expiry date of the renewal (FR-RN-083).
+  - A second request for the same renewal is refused while a hold cover is requested or confirmed; it is allowed once the previous hold cover has expired or been cancelled. A requested or confirmed hold cover can be cancelled with a reason.
+  - "Note: the annex has the Marketing AO tag the hold cover, while the New Business placement gives the request to Processing (FR-NB-082). Who requests the hold cover of a renewal is listed for confirmation (CLR-RN-36)."
+preconditions:
+  - The renewal has a renewal account and an insurer; the user holds the hold cover permission of the account.
+main_flow:
+  - The user opens the renewal, clicks **Request Hold Cover**, completes the request and sends it.
+  - The insurer answers; the user clicks **Record Confirmation** and records the confirmation.
+  - The HC confirmed chip shows on the renewal and the effective expiry date moves to the end of the hold cover.
+alternate_flows:
+  - The insurer declines. The user records the decline; the effective expiry date stays the policy expiry date.
+  - The hold cover is no longer needed. The user clicks **Cancel Hold Cover** with a reason.
+rules:
+  - [R1, "Durations 30 or 60 days; default 30.", Configurable, Parameter RNW_HOLD_COVER_DAYS (values)]
+  - [R2, "One open hold cover per renewal; a new request needs the previous one expired or cancelled.", Fixed, "-"]
+  - [R3, "The effective expiry date is the end of the confirmed hold cover, otherwise the policy expiry date.", Fixed, "-"]
+validations:
+  - [Hold cover already open, "Account <arn> already has a hold cover requested or confirmed", HOLD_COVER_OPEN]
+  - [Duration not chosen, Select the duration of the hold cover, "-"]
+  - [Confirmation without reference or validity, Enter the insurer reference and the validity period, "-"]
+fields_screen: Request Hold Cover
+fields:
+  - [Insurer, Display, "Yes", Insurer of the renewal account, "-"]
+  - [Coverage start date, Date, "Yes", "-", Policy expiry date by default]
+  - [Duration, Option, "Yes", "30 days, 60 days", "-"]
+  - [Expiring policy number, Display, "Yes", Expiring policy, "-"]
+  - [Remarks, Text, "No", "-", Up to 200 characters]
+notifications:
+  - "The request e-mail to the insurer; the hold cover expiring alert of FR-NB-083 to Processing."
+audit:
+  - "Each request, confirmation, decline and cancellation with user, time, dates, reference and remarks."
+acceptance:
+  - A hold cover of 60 days requested from a renewal is e-mailed to the insurer and the request shows its date and requester.
+  - After the confirmation is recorded, the renewal shows HC confirmed and its effective expiry date is the end of the hold cover.
+  - A second request while the first is confirmed is refused; after it is cancelled, a new request is accepted.
+```
+
+```fr
+id: FR-RN-087
+title: Evaluate the incentive eligibility of a renewal after booking and full payment
+brd:
+  - BRRN.041 (p.12-14)
+actor: System (incentive evaluation); report and invoice users (view)
+priority: Must have
+screens: Booked Invoice (incentive indicator); Booked Accounts Register; renewal record (Details); Renewal Reports
+description:
+  - A renewal is evaluated for incentive eligibility only when all of these hold - the renewal account is placed and booked, the client's acceptance is confirmed through Marketing (FR-RN-084), the payment status is Fully Paid and no payment rule is unmet. No evaluation is made at the insurer response, processing or pre-booking stages.
+  - The evaluation uses the active incentive criteria of New Business (FR-NB-118, Incentive Criteria of BRD-3) on the policy attributes, the renewal details and the endorsements of the term. BIBS stores the indicator with the matched criteria after booking, full payment and endorsement consideration, and shows it on the transaction details, in the reports and to the downstream processes.
+  - An endorsement of the term re-evaluates the indicator; a renewal cancelled after booking invalidates it. The indicator is never set before booking or full payment and never assigned by hand without the rule evaluation.
+  - "Note: New Business sets the indicator at booking (FR-NB-118); the Walkthrough addendum sets it after full payment and confirmed acceptance for renewals, and the New Business walkthrough addendum asks the same (BRNB.107). One evaluation shared by New Business and Renewal is proposed; the criteria are those of BDOI's answer to Q33 (CLR-RN-37)."
+preconditions:
+  - Active incentive criteria exist.
+main_flow:
+  - The renewal account is booked; the acceptance is confirmed; the payment becomes Fully Paid.
+  - BIBS evaluates the criteria and stores the indicator with the matched criteria and the time.
+  - An endorsement or a cancellation re-evaluates or invalidates the indicator.
+rules:
+  - [R1, "Evaluation only after booking, confirmed acceptance and full payment, with no unmet payment rule.", Fixed, "-"]
+  - [R2, "The indicator cannot be set or changed by hand.", Fixed, "-"]
+  - [R3, "Criteria content from the incentive criteria of Product Maintenance (Q33).", Configurable, Incentive Criteria (BRD-3)]
+validations:
+  - [Manual change of the indicator, The incentive indicator is set by the incentive rules and cannot be changed by hand, To be confirmed]
+notifications:
+  - "None."
+audit:
+  - "Each evaluation with the trigger (booking, full payment, endorsement, cancellation), the criteria matched, the result and the time."
+acceptance:
+  - A booked renewal not yet fully paid has no incentive indicator; when it becomes Fully Paid and the acceptance is confirmed, the indicator is set from the matching criteria.
+  - A renewal cancelled after booking shows the indicator invalidated, with the reason in the history.
+  - No user can set the indicator by hand.
+```
+
 ## Submitted policies hand-off
 
 ```fr
@@ -2156,7 +2284,7 @@ id: FR-RN-090
 title: Renew submitted policies handed over by Submitted Policies
 brd:
   - Cross-BRD decision D2 (R6); BRD-12 BRIDSP-22, 23, 25, 26 (BRD-12 p.11)
-  - BRRN.021 (p.4), BRRN.010 (p.27-28)
+  - BRRN.021 (p.30), BRRN.010 (p.53-54)
 actor: System (hand-off from Submitted Policies); Marketing AO (Non-CBG Retail)
 priority: Must have
 screens: Record page (source Submitted Policy); Letters
@@ -2194,8 +2322,8 @@ acceptance:
 id: FR-RN-100
 title: Renewal home and officer dashboards
 brd:
-  - BRD 1.009.7 (p.75-76)
-  - BRD 3.010.7 (p.145)
+  - BRD 1.009.7 (p.101-102)
+  - BRD 3.010.7 (p.171)
 actor: Marketing TL; Processing TL; all Renewal users
 priority: Must have
 screens: Renewal Home
@@ -2222,8 +2350,8 @@ acceptance:
 id: FR-RN-101
 title: Renewal status report with summary
 brd:
-  - BRRN.019 (p.32-33), restating BRD 1.009.3.1.6, 2.008.3.1.6, 3.010.3.1.6, 4.008.3.1.6
-  - BRD 1.009.1-1.009.6, 2.008.1-2.008.6, 3.010.1-3.010.6, 4.008.1-4.008.6 with their sub-IDs (p.58-75, 89-106, 128-145, 159-177)
+  - BRRN.019 (p.58-59), restating BRD 1.009.3.1.6, 2.008.3.1.6, 3.010.3.1.6, 4.008.3.1.6
+  - BRD 1.009.1-1.009.6, 2.008.1-2.008.6, 3.010.1-3.010.6, 4.008.1-4.008.6 with their sub-IDs (p.84-101, 115-132, 154-171, 185-203)
 actor: All report users (RNW_REPORT_VIEW)
 priority: Must have
 screens: Renewal Reports (RNW-STATUS)
@@ -2254,40 +2382,42 @@ acceptance:
 
 ```fr
 id: FR-RN-102
-title: Centralised renewal listings with escalation
+title: Centralised renewal listings with attention flags
 brd:
-  - BRRN.036 (p.12-13)
-actor: User (Marketing TL, Unit Head); System (escalation)
+  - BRRN.036 (p.38-39; p.11-12, 24)
+actor: User (Marketing TL, Unit Head, Marketing AO); System (attention flags)
 priority: Must have
 screens: Renewal Reports (RNW-LISTING); Renewal Home (At risk tile)
 description:
-  - Users generate renewal listings by unit and segment (for example UH, IBG, Leasing), by expiry window (current month, prior month, future or chosen months) and by status (Renewed, Unrenewed, Expired). The listings are live, viewed on screen and extracted, with the ageing to expiry.
-  - For IBG and Leasing the listing supports escalation. Accounts not disposed or not accepted within the escalation days before expiry raise the alert RNW_RENEWAL_AT_RISK to the unit head and appear flagged as at risk.
+  - Users generate one centralised renewal listing, filtered by unit and segment (for example UH, IBG, Leasing), by expiry window (current month, prior month, future or chosen months) and by status (Renewed, Unrenewed, Expired). The listing is live, viewed on screen and extracted, with the ageing to expiry, and the user acts on the listed accounts from it (open, assign, disposition).
+  - The listing shows the accounts that require attention, each with the rule that flagged it: ageing (not progressing within the escalation days before expiry), overdue (past the expected processing time), high risk, and the portfolio priority of IBG and Leasing (Annex BRRN.036, p.24).
+  - Escalation is supported by visibility only: the AO escalates outside the system, and BIBS never escalates an account by itself (Walkthrough addendum p.11-12). The at-risk tile of Renewal Home counts the flagged accounts.
 preconditions:
   - The user has RNW_REPORT_VIEW.
 main_flow:
   - The user chooses unit, segment, window and status, and runs the listing.
-  - The daily alert check raises RNW_RENEWAL_AT_RISK for accounts inside the escalation days.
+  - The daily job sets the attention flags with their rule; the user reviews the flagged accounts and acts on them.
 rules:
-  - [R1, "Escalation days IBG 60, Leasing 60, others 30 (default).", Configurable, Parameter RNW_ESCALATION_DAYS (RQ11)]
+  - [R1, "Ageing days IBG 60, Leasing 60, others 30 (default); overdue and high-risk criteria to confirm (RQ11, CLR-RN-35).", Configurable, Parameter RNW_ESCALATION_DAYS (RQ11)]
+  - [R3, "No automatic escalation: no alert is sent to the unit head without a user action (BRRN.036 negative scenario).", Fixed, "-"]
   - [R2, "Status groups: Renewed = closed RENEWED; Unrenewed = open; Expired = past expiry and not renewed.", Fixed, "-"]
 validations: []
 notifications:
-  - "RNW_RENEWAL_AT_RISK to the unit head of the account."
+  - "None to the unit head; the attention flags show in the listing and on Renewal Home."
 audit:
   - "Runs, exports and alerts."
 acceptance:
   - A listing of IBG for the next month shows each account with its status and days to expiry.
-  - An IBG account not disposed 59 days before expiry raises the at-risk alert once.
+  - An IBG account not disposed 59 days before expiry shows the ageing flag with its rule in the listing, and no alert is sent to the unit head.
 ```
 
 ```fr
 id: FR-RN-103
 title: Operational renewal reports
 brd:
-  - BRRN.020 (p.4), BRRN.023 (p.4-6), BRRN.029 (p.8), BRRN.031 (p.9-10), BRRN.034 (p.11)
-  - BRD 3.009.2-3.009.4.2, 4.007.2-4.007.4.2 (p.126-127, 158)
-  - BRRN.001, 010, 025, 037 (p.6, 13, 22, 27-28)
+  - BRRN.020 (p.30; p.5, 20-21), BRRN.023 (p.30-32; p.5-6, 21), BRRN.029 (p.34; p.7-8, 23), BRRN.031 (p.35-36), BRRN.034 (p.37; p.9, 23)
+  - BRD 3.009.2-3.009.4.2, 4.007.2-4.007.4.2 (p.152-153, 184)
+  - BRRN.001, 010, 025, 037 (p.32, 39, 48, 53-54)
 actor: Report users (RNW_REPORT_VIEW)
 priority: Must have
 screens: Renewal Reports
@@ -2315,8 +2445,8 @@ acceptance:
 id: FR-RN-110
 title: Maintain the renewal lists of values
 brd:
-  - BRD 5.003.1, 5.003.2, 5.003.3, 5.003.4, 5.003.5 (p.179-180)
-  - BRD 6.002.2.23 (p.185)
+  - BRD 5.003.1, 5.003.2, 5.003.3, 5.003.4, 5.003.5 (p.205-206)
+  - BRD 6.002.2.23 (p.211)
 actor: Business Administrator (LOV_MANAGE)
 priority: Must have
 screens: Lists of Values (Broking Setup)
@@ -2352,8 +2482,8 @@ acceptance:
 id: FR-RN-111
 title: Update the Renewal Advice and letter templates
 brd:
-  - BRD 5.005.1 (p.180)
-  - BRD 6.002.2.25 (p.185)
+  - BRD 5.005.1 (p.206)
+  - BRD 6.002.2.25 (p.211)
 actor: Business Administrator (RNW_TEMPLATE_MAINTAIN)
 priority: Must have
 screens: Document Templates
@@ -2380,7 +2510,8 @@ acceptance:
 id: FR-RN-112
 title: Maintain renewal rules and parameters
 brd:
-  - BRRN.023 (p.4-6), BRRN.030 (p.8-9), BRRN.034 (p.11), BRRN.009 (p.26-27)
+  - BRRN.023 (p.30-32; p.5-6, 21), BRRN.030 (p.34-35; p.8), BRRN.034 (p.37; p.9, 23), BRRN.009 (p.52-53)
+  - BRRN.020 (p.30; p.5, 20-21; sanitation criteria SC-05 to SC-07)
 actor: Business Administrator (RNW_SETUP); checker (MASTER_AUTHORIZE)
 priority: Must have
 screens: Renewal Setup (Check Settings, Bucket Rules, Decision Matrix, Non-renewable Risk Codes, Parameters)
@@ -2394,6 +2525,7 @@ main_flow:
 rules:
   - [R1, "Lead days must be configurable, never hard-coded (BRRN.030 AC2).", Fixed, "-"]
   - [R2, "A bucket rule can never map a failed check to Clean (checked whenever a rule is saved and whenever it is applied).", Fixed, "-"]
+  - [R3, "Rules are changed only by the authorised group, effective-dated, and a new version applies to the candidates not yet initiated; candidates in progress are not affected (Annex BRRN.020, p.20).", Fixed, "-"]
 validations:
   - [Rule maps a failure to Clean, A failed check cannot give the Clean bucket, To be confirmed]
   - [Activation by the maker, A version is activated by someone other than its maker, To be confirmed]
@@ -2404,6 +2536,7 @@ audit:
 acceptance:
   - Changing the lead days from 140 to 120 applies from the next extraction run.
   - A bucket rule that maps a failed check to Clean cannot be saved.
+  - A user without RNW_SETUP who tries to change a check setting is refused (SC-07).
 ```
 
 # Workflow and status model
@@ -2474,14 +2607,17 @@ Figure 4 shows how a trigger runs the checks, how the bucket rule set turns the 
 
 ![Checks, buckets and decision matrix (BRRN.020, 023, 031, 034)](figures/brd06_rules.dot)
 
-<!-- table: widths=4.2,3.4,5.6,3.4 caption="Checks and default severities (list to confirm, RQ01)" size=8 -->
+<!-- table: widths=4.2,3.4,5.6,3.4 caption="Checks and default severities (sanitation criteria SC-01 to SC-13 of the Walkthrough addendum; RQ01 answered in part)" size=8 -->
 | Check | BRD | Source | Default severity |
 |---|---|---|---|
 | REFERENCE_MATCH | BRRN.022 | Candidate against expiring invoice, ARN and policy | FAIL_EXCEPTION |
 | PN_PRESENT | BRRN.029, 031, 039 | PN on the account or invoice (mortgaged and CBG lines) | FAIL_EXCEPTION |
-| RISK_CODE_RENEWABLE | BRRN.009 | Non-renewable risk codes | System Not for Renewal |
+| RISK_CODE_RENEWABLE | BRRN.009; SC-08, SC-09 | Non-renewable risk codes (for example Bonds, CAR) | System Not for Renewal |
+| RISK_CODE_DEFINED | BRRN.020; SC-11 | Risk code defined in the check criteria | FAIL_REVIEW (manual review) |
+| INSURER_RENEWABLE_LIST | BRRN.020; SC-10 | Risk in the renewable list given by the insurer | FAIL_REVIEW |
+| TSI_THRESHOLD | BRRN.020, 023, 024; SC-12, SC-13, R23-02, R24-02 | Total sum insured against the threshold (PHP 250M) | FAIL_REVIEW; For Proposal to TSU by the matrix |
 | LAMD_STATUS | BRRN.029, 039 | LAMD lines matched by PN | System Not for Renewal / RMU routing |
-| CLAIMS | BRRN.031, 034 | Claims module summary (INFO while not connected) | FAIL_REVIEW when claims are open |
+| CLAIMS | BRRN.031, 034; R23-05, R28-05 | Claims of the expiring term (Not applicable when they cannot be read) | FAIL_REVIEW when claims are open (manual evaluation) |
 | ENDORSEMENT_PENDING | BRRN.032 | Open endorsement requests on the invoice family | FAIL_REVIEW |
 | OUTSTANDING_PREMIUM | BRD 1.011; BRRN.031 | Invoice family balance above the threshold | FAIL_REVIEW (TL override) |
 | FINANCIAL_IMPACT | BRRN.038 | Renewal account or insurer revision against the expiring invoice | FAIL_REVIEW; NB path by the matrix |
@@ -2509,7 +2645,7 @@ Figure 4 shows how a trigger runs the checks, how the bucket rule set turns the 
 
 ## SLA and escalation
 
-- A renewal's urgency is its days to expiry. The at-risk alert RNW_RENEWAL_AT_RISK uses RNW_ESCALATION_DAYS per segment (FR-RN-102); alert RNW_EXCEPTION_AGEING flags exceptions that stay open.
+- A renewal's urgency is its days to expiry, counted to the effective expiry date (FR-RN-083). The attention flags of the listing use RNW_ESCALATION_DAYS per segment (FR-RN-102); BIBS never escalates by itself. Alert RNW_EXCEPTION_AGEING flags exceptions that stay open beyond RNW_EXCEPTION_AGEING_DAYS (FR-RN-022).
 - Insurer batches past their reply date raise RNW_INSURER_OVERDUE; failed letters raise RNW_LETTER_FAILED; failed extraction runs raise RNW_EXTRACTION_FAILED.
 - After acceptance, the standard BRD-1 placement, booking and issuance SLAs apply (BRRN.040 AC5).
 - The BRD gives no stage SLA in hours; none is configured until BDOI states one.
@@ -2539,12 +2675,12 @@ Every report needs RNW_REPORT_VIEW, applies the user's scope, exports to PDF, XL
 
 ## Expiring list columns
 
-<!-- table: widths=1,5.2,1.9,1.9,6.6 caption="Expiring list columns (BRD 1.003.4.1.1.1-24, p.47-50; 3.003.4.1.1-21, p.111-114)" size=8 -->
+<!-- table: widths=1,5.2,1.9,1.9,6.6 caption="Expiring list columns (BRD 1.003.4.1.1.1-24, p.73-76; 3.003.4.1.1-21, p.137-140)" size=8 -->
 | # | Column | Marketing | Processing | Content in BIBS |
 |---|---|---|---|---|
-| 1 | Expiring EBIX Invoice No. | OUT | OUT | Replaced by the BIBS expiring invoice number (p.34) |
+| 1 | Expiring EBIX Invoice No. | OUT | OUT | Replaced by the BIBS expiring invoice number (p.60) |
 | 2 | Renewal Reference No. | Y | Y | RNW-yyyy-nnnnnn |
-| 3 | BDOIsys Reference No. | OUT | OUT | Replaced by the renewal reference and ARN (p.34) |
+| 3 | BDOIsys Reference No. | OUT | OUT | Replaced by the renewal reference and ARN (p.60) |
 | 4-5 | Cover No.; Version No. | Y | Y | From the expiring invoice |
 | 6-9 | Invoicing Branch; Department Code; Department Name; Unit Head | Y | Y | Sales organisation of the account |
 | 10-13 | Client Name; Assured's Name; Business Origin; Account Officer | Y | Y | Account and client master |
@@ -2576,11 +2712,11 @@ Columns 1-37 are in every variant; 38-40 only in the Processing variant (BRD 1.0
 | 13 | Expiring Invoice Policy Number | 27 | Branch |  |  |
 | 14 | Account Type | 28 | Insurer |  |  |
 
-Hold Cover and HC End Date are read from the hold cover of the renewal account. The Expiring Ebix Invoice No. of the BRD is the BIBS expiring invoice number (BRRN.019, p.34).
+Hold Cover and HC End Date are read from the hold cover of the renewal account. The Expiring Ebix Invoice No. of the BRD is the BIBS expiring invoice number (BRRN.019, p.60).
 
 ## Insurer extract columns
 
-<!-- table: widths=1,5.6,1,5.6,1,5.6 caption="RNW-INSURER-EXTRACT columns (BRD 3.009.1.4.1-28, p.122-126)" size=8 -->
+<!-- table: widths=1,5.6,1,5.6,1,5.6 caption="RNW-INSURER-EXTRACT columns (BRD 3.009.1.4.1-28, p.148-152)" size=8 -->
 | # | Column | # | Column | # | Column |
 |---|---|---|---|---|---|
 | 1 | Insurance Company | 11 | Is Mortgaged (Yes / No) | 21 | Branch |
@@ -2598,7 +2734,7 @@ Hold Cover and HC End Date are read from the hold cover of the renewal account. 
 
 The mapping below is the project's proposal; BDOI confirms each counter under RQ10. Counters marked "pending" have no disposition, reason or step in the BRD that produces them and show 0 until defined.
 
-<!-- table: widths=0.9,6.2,9.5 caption="RNW-STATUS summary counters (BRD 1.009.3.2.1-34, p.70-74)" size=8 -->
+<!-- table: widths=0.9,6.2,9.5 caption="RNW-STATUS summary counters (BRD 1.009.3.2.1-34, p.96-100)" size=8 -->
 | # | Counter | Predicate in BIBS |
 |---|---|---|
 | 1 | Booked | Candidate closed RENEWED |
@@ -2667,7 +2803,7 @@ Figure 6 shows the interfaces of Renewal. Renewal reads the expiring population 
 
 # Non-functional requirements
 
-<!-- table: widths=3,5.6,5.4 caption="Non-functional requirements (BRD p.186-188)" size=8.5 -->
+<!-- table: widths=3,5.6,5.4 caption="Non-functional requirements (BRD p.212-214)" size=8.5 -->
 | Topic | BRD value | BIBS target and approach |
 |---|---|---|
 | Users | Marketing TL 75 (23 concurrent); AO / Account Broker 319 (50); Processing TL 50 (15) for lists, 9 (3) for assignment and upload; Processing Officer / Broker 73 (22); reports and RA 485 (145) | Within the BRD-1 sizing of 145 concurrent users; Renewal adds load, not users |
@@ -2704,10 +2840,14 @@ The items below are changed in BIBS without a release. Changes are audited.
 | RNW_NRNS_REMINDER_DAYS | 90 | Days before expiry of the NRNS reminder |
 | RNW_NON_ACCEPTANCE_DAYS | 0 | Days after expiry of the non-acceptance letter and closure |
 | RNW_REOPEN_DAYS | 30 | Days after expiry during which Not for Renewal can be re-opened |
-| RNW_ESCALATION_DAYS | IBG=60, LEASING=60, *=30 | Days to expiry of the at-risk alert per segment |
+| RNW_ESCALATION_DAYS | IBG=60, LEASING=60, *=30 | Days to expiry of the ageing attention flag per segment (no automatic escalation) |
+| RNW_EXCEPTION_AGEING_DAYS | 5 | Working days an exception stays open before its ageing alert (R29-05) |
+| RNW_NRNS_WAITING_DAYS | CBG=0, *=0 | Days after the effective expiry date before the NRNS tag (R37 annex) |
+| RNW_HOLD_COVER_DAYS | 30 (30 or 60) | Duration of a renewal hold cover (BRRN.042, R37-HC-01) |
+| TSI_THRESHOLD (check setting) | 250,000,000.00 | Total sum insured above which a renewal goes to TSU or proposal handling (SC-12, SC-13) |
 | RNW_KYC_SEGMENTS | empty (all) | Segments where the KYC flag applies |
 | RNW_RMU_UNIT | empty | Unit that receives RMU accounts (empty = tag only) |
-| RNW_AUTO_PLACEMENT | true | Slip generated and sent automatically after acceptance |
+| RNW_AUTO_PLACEMENT | false | Slip generated and sent automatically after acceptance; off for renewals, placement is a user action (Walkthrough addendum) |
 | RNW_REFERENCE_PREFIX | RNW-<yyyy> | Prefix of renewal references |
 | RNW_EXCLUDED_LINES | HMO, GLI, GPA | Lines excluded from extraction (Employee Benefits) |
 | Job schedules | 01:00, 01:30, 06:00 PHT; sweep 00:15 PHT | RNW_EXTRACTION, RNW_REEVALUATE, RNW_NRNS_LETTERS, RNW_EXPIRY_SWEEP |
@@ -2748,7 +2888,7 @@ The items below are changed in BIBS without a release. Changes are audited.
 <!-- table: widths=1.8,11,3.8 caption="Assumptions" size=8.5 -->
 | ID | Assumption | Related |
 |---|---|---|
-| A-RN-01 | The Workshop addendum (R1) is the latest layer; a BRRN of Addendum 1 governs the main-BRD IDs it restates; the main BRD governs the rest | R1-R3 |
+| A-RN-01 | The Walkthrough addendum (R0) is the latest layer and governs the BRRN it restates; the Workshop addendum (R1) governs the other BRRN.020-040; a BRRN of Addendum 1 governs the main-BRD IDs it restates; the main BRD governs the rest | R0-R3 |
 | A-RN-02 | The expiring population is the booked root invoices in BIBS; one candidate per root invoice and policy year | BRRN.005, RQ06 |
 | A-RN-03 | The "unique reference number" is the renewal reference generated by BIBS; the expiring invoice number is the alternate key | BRRN.022, RQ03 |
 | A-RN-04 | Online disposition (main BRD) and dispositioned-file upload (BRRN.018) are both needed and write the same history | RQ14 |
@@ -2756,9 +2896,11 @@ The items below are changed in BIBS without a release. Changes are audited.
 | A-RN-06 | CBG accounts skip AO assignment and TL review; non-CBG accounts follow the manual path | BRD 1.005, 1.008, RQ08 |
 | A-RN-07 | The NRNS checkpoint is 90 days **before** expiry (the BRD also writes "+90 days") | BRRN.025, RQ18 |
 | A-RN-08 | The renewal is a new BRD-1 account of business type RENEWAL; the expiring invoice is never endorsed to renew it | Decision D1 |
-| A-RN-09 | The payment rules of BRRN.040 are the BRD-1 payment gate | RQ19 |
+| A-RN-09 | The payment rules of BRRN.040 and BRRN.041 are the BRD-1 payment gate | RQ19 |
+| A-RN-12 | KYC stays for visibility only (BRRN.028, Walkthrough addendum scope) until BDOI Compliance confirms otherwise | CLR-RN-30 |
+| A-RN-13 | The hold cover of a renewal uses the hold cover request and confirmation of New Business on the renewal account | BRRN.042; FR-NB-082, 083 |
 | A-RN-10 | "Approved domains" for RA e-mails is a recipient policy that BDOI will define; until then any well-formed address is accepted with protection | RQ16 |
-| A-RN-11 | Renewal volume is 25,800 transactions a month per process, growing 20% a year | NFR p.186 |
+| A-RN-11 | Renewal volume is 25,800 transactions a month per process, growing 20% a year | NFR p.212 |
 
 ## Dependencies
 
@@ -2772,30 +2914,32 @@ The items below are changed in BIBS without a release. Changes are audited.
 | D-RN-05 | BDOI provides the letter layouts, insurer and LAMD file layouts and the password convention | FR-RN-025, 071, 080-083 (RQ15, RQ20, RQ26, Q07) |
 | D-RN-06 | The e-mail relay of the BIBS environment is available for client and insurer e-mails | FR-RN-070, 081 |
 | D-RN-07 | The Operations ledger carries the business type of booked invoices for ACSL (requested of the Operations owner) | Section 7 |
+| D-RN-08 | The incentive criteria of Product Maintenance (BRD-3) and the incentive indicator of New Business booking (FR-NB-118) | FR-RN-087 (Q33) |
+| D-RN-09 | The hold cover request and confirmation of New Business placement (FR-NB-082, 083) | FR-RN-086 |
 
 ## Open questions
 
 <!-- table: widths=1.4,10.1,2.8,2.4 caption="Open questions on BRD-6 (status from the cross-BRD decisions, R6)" status=Status size=8.5 -->
 | ID | Question | Affects | Status |
 |---|---|---|---|
-| RQ01 | List of sanitation, matching and eligibility checks and, for each, Review or Exception on failure | FR-RN-020, 022 | OPEN |
+| RQ01 | List of sanitation, matching and eligibility checks and, for each, Review or Exception on failure | FR-RN-020, 022 | PARTIAL (Walkthrough addendum annex: SC-01 to SC-13, R23-01 to 05; TSI above PHP 250M to TSU) |
 | RQ02 | Segments initiated in bulk and individually; who initiates; is CBG STP initiated automatically | FR-RN-015 | OPEN |
 | RQ03 | Meaning of the "unique reference number"; key carried by insurer and LAMD files | FR-RN-021 | OPEN |
 | RQ04 | Lead days per segment or line; daily or monthly extraction; on-demand ranges | FR-RN-010, 011 | OPEN |
 | RQ05 | One scrollable view without pagination against the UX pager rule (UX-6) | FR-RN-013 | OPEN |
 | RQ06 | Meaning of "unbooked" accounts in the expiring list | FR-RN-010 | OPEN |
-| RQ07 | NFR sent automatically on the system tag; NFR after the "not in file" tag; NFR vs NRL | FR-RN-024, 060 | OPEN |
+| RQ07 | NFR sent automatically on the system tag; NFR after the "not in file" tag; NFR vs NRL | FR-RN-024, 060, 082 | PARTIAL (NRL by the Marketing AO when no RA exists, R37-HC-08; CLR-RN-32) |
 | RQ08 | Definition of CBG and non-CBG; does CBG skip assignment and review | FR-RN-025, 030 | OPEN |
 | RQ09 | Threshold and scope of the outstanding-balance flag; who overrides | FR-RN-051 | OPEN |
 | RQ10 | Definition of the 34 summary counters, including For ARF, Renew to TSU, Disapproved, to Other Bank | FR-RN-101 | OPEN |
-| RQ11 | IBG and Leasing escalation thresholds, recipients and "high-risk renewals" | FR-RN-102 | OPEN |
+| RQ11 | IBG and Leasing escalation thresholds, recipients and "high-risk renewals" | FR-RN-102 | PARTIAL (criteria of Annex BRRN.036, escalation by the AO outside the system; thresholds open, CLR-RN-35) |
 | RQ12 | What unlocks an account after RA generation; may Processing still edit | FR-RN-080 | OPEN |
 | RQ13 | Claims summary sufficiency; total-loss flag (CLQ28); legacy history | FR-RN-042, 043 | OPEN |
 | RQ14 | Online vs offline disposition; file layout; scope of the "not in file" tag | FR-RN-060 | OPEN |
 | RQ15 | Insurer response file layout, codes, late cut-off; Reject followed by re-marketing or Not for Renewal | FR-RN-070, 071 | OPEN |
 | RQ16 | RA recipients and "approved domains"; TLS on the BDO relay | FR-RN-081 | OPEN |
-| RQ17 | Which accounts are NAL-eligible | FR-RN-082 | OPEN |
-| RQ18 | Definition of "not yet submitted"; checkpoint; timing and recipients of non-acceptance letters | FR-RN-083 | OPEN |
+| RQ17 | Which accounts are NAL-eligible | FR-RN-082 | PARTIAL (NAL when an RA exists, R37-HC-07; CLR-RN-32) |
+| RQ18 | Definition of "not yet submitted"; checkpoint; timing and recipients of non-acceptance letters | FR-RN-083 | PARTIAL (effective expiry date and waiting period, Annex BRRN.037; CLR-RN-33) |
 | RQ19 | Approved acceptance inputs; payment rules; renewal e-policy | FR-RN-084 | OPEN |
 | RQ20 | LAMD organisation, log-in, report layouts and frequency (XQ01: one or two LAMD intakes) | FR-RN-025 | OPEN |
 | RQ21 | Contact Center lists, statuses and outcome codes (XQ02) | FR-RN-085 | OPEN |
@@ -2813,6 +2957,9 @@ The items below are changed in BIBS without a release. Changes are audited.
 | RQ30 | Renewal of an account whose package version is expired with no current version | FR-RN-063 | OPEN |
 | SP SQ10 | Renewal of submitted policies | FR-RN-090 | ANSWERED |
 | OOS-1 | Renewal overrides deferred by BRD-1 | FR-RN-051 | ANSWERED |
+| RQ31 | KYC at renewal: blocking (annex KYC-01 to 06) or visibility only (BRRN.028) | FR-RN-026 | OPEN (CLR-RN-30) |
+| RQ32 | Who requests the hold cover of a renewal; durations | FR-RN-086 | OPEN (CLR-RN-36) |
+| RQ33 | Incentive criteria and the shared evaluation with New Business (Q33) | FR-RN-087 | OPEN (CLR-RN-37) |
 
 # Traceability
 
@@ -2824,189 +2971,189 @@ Every BRD-6 requirement ID is met by at least one FR or is out of scope by the B
 | Workshop addendum BRRN.020-040 | 21 | Section 11.1 |
 | Addendum 1 BRRN.001-019 | 19 (with the main-BRD IDs they restate) | Section 11.1 |
 | Main BRD 1.001-6.002 | 1,032 line IDs, of which 9 out of scope | Section 11.2 |
-| Usage requirements (NFR) p.186-188 | 10 topics | Section 8 |
+| Usage requirements (NFR) p.212-214 | 10 topics | Section 8 |
 
 ## BRRN requirements
 
 <!-- table: widths=2,3.4,5.6,5.2 caption="BRRN ID to FR, screen and test cases" size=8 -->
 | BRD ID | FR | Screen | Test cases |
 |---|---|---|---|
-| BRRN.001 (p.22) | FR-RN-082 | Letters (NAL) | TC-RN-082.1, 082.2 (3 cases) |
-| BRRN.002 (p.22-23) | FR-RN-011 | Expiry List (Generate Expiry List) | TC-RN-011.1, 011.2, 011.3, 011.4 (6 cases) |
-| BRRN.003 (p.23) | FR-RN-012 | Expiry List (Filters) | TC-RN-012.1, 012.2, 012.3 (4 cases) |
-| BRRN.004 (p.23-24) | FR-RN-013 | Expiry List grid | TC-RN-013.1, 013.2, 013.3, 013.4, 013.5 (5 cases) |
-| BRRN.005 (p.24-25) | FR-RN-010, FR-RN-016 | Expiry List; Renewal Home | TC-RN-010.1, 010.2, 010.4, 010.5, 010.6, 016.1, 016.2, 016.3, 016.4, 016.5 (14 cases) |
-| BRRN.006 (p.25) | FR-RN-013 | Expiry List (column filters, search) | TC-RN-013.2, 013.3, 013.4, 013.5 (5 cases) |
-| BRRN.007 (p.25-26) | FR-RN-014 | Expiry List (Export) | TC-RN-014.1, 014.3, 014.4 (3 cases) |
-| BRRN.008 (p.26) | FR-RN-014 | Expiry List (Print) | TC-RN-014.2, 014.3, 014.4 (3 cases) |
-| BRRN.009 (p.26-27) | FR-RN-024 | Renewal Setup; Letters (NFR) | TC-RN-024.1, 024.2, 024.3, 024.4 (6 cases) |
-| BRRN.010 (p.27-28) | FR-RN-080, FR-RN-081 | Letters | TC-RN-080.1, 080.3, 080.4, 080.5, 081.1, 081.2, 081.3, 081.4 (13 cases) |
-| BRRN.011 (p.28-29) | FR-RN-040 | My Dispositions | TC-RN-040.1, 040.4, 040.5 (3 cases) |
-| BRRN.012 (p.29) | FR-RN-040 | My Dispositions | TC-RN-040.1, 040.5 (2 cases) |
-| BRRN.013 (p.29-30) | FR-RN-041 | Record page | TC-RN-041.1, 041.4 (2 cases) |
-| BRRN.014 (p.30) | FR-RN-040 | My Dispositions (column filters) | TC-RN-040.2, 040.5 (2 cases) |
-| BRRN.015 (p.30) | FR-RN-040 | My Dispositions (sort) | TC-RN-040.2, 040.5 (2 cases) |
-| BRRN.016 (p.30-31) | FR-RN-040 | My Dispositions (search) | TC-RN-040.2, 040.5 (2 cases) |
-| BRRN.017 (p.31) | FR-RN-040 | My Dispositions (name / reference search) | TC-RN-040.3, 040.5 (3 cases) |
-| BRRN.018 (p.31) | FR-RN-060 | Processing Worklist (upload) | TC-RN-060.1, 060.4 (4 cases) |
-| BRRN.019 (p.32-33) | FR-RN-101, FR-RN-103 | Renewal Reports | TC-RN-101.1, 101.2 (2 cases) |
-| BRRN.020 (p.4) | FR-RN-020, FR-RN-028 | Record page (Checks & Bucket) | TC-RN-020.1, 020.2, 020.3, 020.4, 028.1, 028.2, 028.3, 028.4 (11 cases) |
-| BRRN.021 (p.4) | FR-RN-015, FR-RN-004 | Expiry List (Initiate) | TC-RN-004.1, 004.2, 004.4, 015.1, 015.2, 015.3, 015.4 (8 cases) |
-| BRRN.022 (p.4) | FR-RN-021, FR-RN-020 | Record page; uploads | TC-RN-020.1, 020.2, 020.3, 020.4, 021.1, 021.2, 021.3 (9 cases) |
-| BRRN.023 (p.4-6) | FR-RN-022, FR-RN-051, FR-RN-112 | Expiry List (pill, Exceptions); record page | TC-RN-022.1, 022.2, 022.3, 022.4, 022.5, 112.1, 112.3 (10 cases) |
-| BRRN.024 (p.6) | FR-RN-002, FR-RN-025 | LAMD Reports | TC-RN-002.2, 002.4, 002.5, 025.3, 025.5 (9 cases) |
-| BRRN.025 (p.6) | FR-RN-083 | Letters (NRNS) | TC-RN-083.1, 083.2 (3 cases) |
-| BRRN.026 (p.6-7) | FR-RN-085 | Follow-ups | TC-RN-085.1, 085.2, 085.3 (4 cases) |
-| BRRN.027 (p.7) | FR-RN-042 | Record page (Account History) | TC-RN-042.1, 042.2, 042.3 (4 cases) |
-| BRRN.028 (p.7-8) | FR-RN-026 | Expiry List (KYC chip) | TC-RN-026.1, 026.2, 026.3, 026.4 (4 cases) |
-| BRRN.029 (p.8) | FR-RN-025 | LAMD Reports | TC-RN-025.1, 025.2, 025.3, 025.5 (6 cases) |
-| BRRN.030 (p.8-9) | FR-RN-010, FR-RN-016, FR-RN-112 | Renewal Home; Renewal Setup | TC-RN-010.1, 010.2, 010.3, 010.4, 010.6, 016.1, 016.2, 016.3, 016.4, 016.5, 112.2 (13 cases) |
-| BRRN.031 (p.9-10) | FR-RN-023, FR-RN-051 | Record page; Renewal Setup | TC-RN-023.1, 023.2, 023.3, 023.4, 023.5 (7 cases) |
-| BRRN.032 (p.10) | FR-RN-027 | Record page (Checks, Account History) | TC-RN-027.1, 027.2, 027.3 (4 cases) |
-| BRRN.033 (p.10) | FR-RN-048 | Record page (Start NB Path) | TC-RN-048.2, 048.3, 048.4 (5 cases) |
-| BRRN.034 (p.11) | FR-RN-023, FR-RN-112 | Renewal Setup (Decision Matrix) | TC-RN-023.1, 023.3, 023.4, 023.5, 023.6, 112.1 (7 cases) |
-| BRRN.035 (p.11-12) | FR-RN-071, FR-RN-051 | Insurer Batches (responses) | TC-RN-071.1, 071.2, 071.3 (7 cases) |
-| BRRN.036 (p.12-13) | FR-RN-102 | Renewal Reports (RNW-LISTING) | TC-RN-102.1, 102.2, 102.3 (3 cases) |
-| BRRN.037 (p.13) | FR-RN-083 | Letters (NRNS) | TC-RN-083.2, 083.3 (2 cases) |
-| BRRN.038 (p.14) | FR-RN-048, FR-RN-064, FR-RN-084 | Record page (Computations, Acceptance) | TC-RN-048.1, 064.2, 064.3 (3 cases) |
-| BRRN.039 (p.14) | FR-RN-025, FR-RN-023 | LAMD Reports | TC-RN-025.3, 025.4 (4 cases) |
-| BRRN.040 (p.14-15) | FR-RN-084 | Record page (Record Acceptance) | TC-RN-084.1, 084.2, 084.3, 084.4, 084.5 (6 cases) |
+| BRRN.001 (p.48; updated p.15-16) | FR-RN-082 | Letters (NAL) | TC-RN-082.1, 082.2 (3 cases) |
+| BRRN.002 (p.48-49) | FR-RN-011 | Expiry List (Generate Expiry List) | TC-RN-011.1, 011.2, 011.3, 011.4 (6 cases) |
+| BRRN.003 (p.49) | FR-RN-012 | Expiry List (Filters) | TC-RN-012.1, 012.2, 012.3 (4 cases) |
+| BRRN.004 (p.49-50) | FR-RN-013 | Expiry List grid | TC-RN-013.1, 013.2, 013.3, 013.4, 013.5 (5 cases) |
+| BRRN.005 (p.50-51) | FR-RN-010, FR-RN-016 | Expiry List; Renewal Home | TC-RN-010.1, 010.2, 010.4, 010.5, 010.6, 016.1, 016.2, 016.3, 016.4, 016.5 (14 cases) |
+| BRRN.006 (p.51) | FR-RN-013 | Expiry List (column filters, search) | TC-RN-013.2, 013.3, 013.4, 013.5 (5 cases) |
+| BRRN.007 (p.51-52) | FR-RN-014 | Expiry List (Export) | TC-RN-014.1, 014.3, 014.4 (3 cases) |
+| BRRN.008 (p.52) | FR-RN-014 | Expiry List (Print) | TC-RN-014.2, 014.3, 014.4 (3 cases) |
+| BRRN.009 (p.52-53) | FR-RN-024 | Renewal Setup; Letters (NFR) | TC-RN-024.1, 024.2, 024.3, 024.4 (6 cases) |
+| BRRN.010 (p.53-54) | FR-RN-080, FR-RN-081 | Letters | TC-RN-080.1, 080.3, 080.4, 080.5, 081.1, 081.2, 081.3, 081.4 (13 cases) |
+| BRRN.011 (p.54-55) | FR-RN-040 | My Dispositions | TC-RN-040.1, 040.4, 040.5 (3 cases) |
+| BRRN.012 (p.55) | FR-RN-040 | My Dispositions | TC-RN-040.1, 040.5 (2 cases) |
+| BRRN.013 (p.55-56) | FR-RN-041 | Record page | TC-RN-041.1, 041.4 (2 cases) |
+| BRRN.014 (p.56) | FR-RN-040 | My Dispositions (column filters) | TC-RN-040.2, 040.5 (2 cases) |
+| BRRN.015 (p.56) | FR-RN-040 | My Dispositions (sort) | TC-RN-040.2, 040.5 (2 cases) |
+| BRRN.016 (p.56-57) | FR-RN-040 | My Dispositions (search) | TC-RN-040.2, 040.5 (2 cases) |
+| BRRN.017 (p.57) | FR-RN-040 | My Dispositions (name / reference search) | TC-RN-040.3, 040.5 (3 cases) |
+| BRRN.018 (p.57) | FR-RN-060 | Processing Worklist (upload) | TC-RN-060.1, 060.4 (4 cases) |
+| BRRN.019 (p.58-59) | FR-RN-101, FR-RN-103 | Renewal Reports | TC-RN-101.1, 101.2 (2 cases) |
+| BRRN.020 (p.30; p.5, 20-21) | FR-RN-020, FR-RN-028 | Record page (Checks & Bucket) | TC-RN-020.1, 020.2, 020.3, 020.4, 028.1, 028.2, 028.3, 028.4 (11 cases) |
+| BRRN.021 (p.30) | FR-RN-015, FR-RN-004 | Expiry List (Initiate) | TC-RN-004.1, 004.2, 004.4, 015.1, 015.2, 015.3, 015.4 (8 cases) |
+| BRRN.022 (p.30) | FR-RN-021, FR-RN-020 | Record page; uploads | TC-RN-020.1, 020.2, 020.3, 020.4, 021.1, 021.2, 021.3 (9 cases) |
+| BRRN.023 (p.30-32; p.5-6, 21) | FR-RN-022, FR-RN-051, FR-RN-112 | Expiry List (pill, Exceptions); record page | TC-RN-022.1, 022.2, 022.3, 022.4, 022.5, 112.1, 112.3 (10 cases) |
+| BRRN.024 (p.32; p.6, 21) | FR-RN-002, FR-RN-025 | LAMD Reports | TC-RN-002.2, 002.4, 002.5, 025.3, 025.5 (9 cases) |
+| BRRN.025 (p.32) | FR-RN-083 | Letters (NRNS) | TC-RN-083.1, 083.2 (3 cases) |
+| BRRN.026 (p.32-33) | FR-RN-085 | Follow-ups | TC-RN-085.1, 085.2, 085.3 (4 cases) |
+| BRRN.027 (p.33) | FR-RN-042 | Record page (Account History) | TC-RN-042.1, 042.2, 042.3 (4 cases) |
+| BRRN.028 (p.33-34; p.6-7, 21-23) | FR-RN-026 | Expiry List (KYC chip) | TC-RN-026.1, 026.2, 026.3, 026.4 (4 cases) |
+| BRRN.029 (p.34; p.7-8, 23) | FR-RN-025 | LAMD Reports | TC-RN-025.1, 025.2, 025.3, 025.5 (6 cases) |
+| BRRN.030 (p.34-35; p.8) | FR-RN-010, FR-RN-016, FR-RN-112 | Renewal Home; Renewal Setup | TC-RN-010.1, 010.2, 010.3, 010.4, 010.6, 016.1, 016.2, 016.3, 016.4, 016.5, 112.2 (13 cases) |
+| BRRN.031 (p.35-36) | FR-RN-023, FR-RN-051 | Record page; Renewal Setup | TC-RN-023.1, 023.2, 023.3, 023.4, 023.5 (7 cases) |
+| BRRN.032 (p.36) | FR-RN-027 | Record page (Checks, Account History) | TC-RN-027.1, 027.2, 027.3 (4 cases) |
+| BRRN.033 (p.36; p.8-9) | FR-RN-048 | Record page (Start NB Path) | TC-RN-048.2, 048.3, 048.4 (5 cases) |
+| BRRN.034 (p.37; p.9, 23) | FR-RN-023, FR-RN-112 | Renewal Setup (Decision Matrix) | TC-RN-023.1, 023.3, 023.4, 023.5, 023.6, 112.1 (7 cases) |
+| BRRN.035 (p.37-38; p.9-11, 23-24) | FR-RN-071, FR-RN-051 | Insurer Batches (responses) | TC-RN-071.1, 071.2, 071.3 (7 cases) |
+| BRRN.036 (p.38-39; p.11-12, 24) | FR-RN-102 | Renewal Reports (RNW-LISTING) | TC-RN-102.1, 102.2, 102.3 (3 cases) |
+| BRRN.037 (p.39; p.12, 24-26) | FR-RN-083 | Letters (NRNS) | TC-RN-083.2, 083.3 (2 cases) |
+| BRRN.038 (p.40) | FR-RN-048, FR-RN-064, FR-RN-084 | Record page (Computations, Acceptance) | TC-RN-048.1, 064.2, 064.3 (3 cases) |
+| BRRN.039 (p.40) | FR-RN-025, FR-RN-023 | LAMD Reports | TC-RN-025.3, 025.4 (4 cases) |
+| BRRN.040 (p.40-41) | FR-RN-084 | Record page (Record Acceptance) | TC-RN-084.1, 084.2, 084.3, 084.4, 084.5 (6 cases) |
 
 
 ## Main BRD line IDs
 
-The table lists every line ID of the main BRD in page order, grouped by BRD function. Where a BRRN restates the ID, the FR is the one of that BRRN (section 11.1). The label numbers printed next to some IDs in the BRD are shifted (for example 1.003.4.1.1.21-24 all read "1.21", p.50); the table uses the IDs of the BR ID column.
+The table lists every line ID of the main BRD in page order, grouped by BRD function. Where a BRRN restates the ID, the FR is the one of that BRRN (section 11.1). The label numbers printed next to some IDs in the BRD are shifted (for example 1.003.4.1.1.21-24 all read "1.21", p.76); the table uses the IDs of the BR ID column.
 
 <!-- table: widths=3.3,8.4,1.7,3.2,5.2 caption="Main BRD line IDs to FR (every line ID of pages 44-185) and test cases" size=7.5 -->
 | BRD function | Line IDs | Pages | FR | Test cases |
 |---|---|---|---|---|
-| 1.001 Log in | 1.001.1, 1.001.1.1, 1.001.2.1, 1.001.3.1 | p.44 | FR-RN-001 | TC-RN-001.1, 001.2, 001.3, 001.4, 001.5, 001.6 (13 cases) |
-| 1.002 Open in several tabs | 1.002.1 | p.44 | FR-RN-001 | TC-RN-001.1, 001.2, 001.3, 001.4, 001.5, 001.6 (13 cases) |
-| 1.003 Generate the list of expiring accounts | 1.003.1, 1.003.1.1, 1.003.2 | p.44-45 | FR-RN-011 | TC-RN-011.1, 011.2, 011.3, 011.4 (7 cases) |
-|  | 1.003.3, 1.003.3.1, 1.003.3.1.2, 1.003.3.1.3, 1.003.3.1.4, 1.003.3.1.5, 1.003.3.1.6, 1.003.3.1.7, 1.003.3.1.8, 1.003.3.1.9, 1.003.3.1.10, 1.003.3.1.11, 1.003.3.1.12, 1.003.3.1.13 | p.45-47 | FR-RN-012 | TC-RN-012.1, 012.2, 012.3 (6 cases) |
-|  | 1.003.4.1, 1.003.4.1.1 | p.47 | FR-RN-013 | TC-RN-013.1, 013.2, 013.3, 013.4, 013.5 (9 cases) |
-|  | 1.003.4.1.1.1 | p.47 | OUT (p.34) | - |
-|  | 1.003.4.1.1.2 | p.47 | FR-RN-013 | TC-RN-013.1, 013.2, 013.3, 013.4, 013.5 (9 cases) |
-|  | 1.003.4.1.1.3 | p.47 | OUT (p.34) | - |
-|  | 1.003.4.1.1.4, 1.003.4.1.1.5, 1.003.4.1.1.6, 1.003.4.1.1.7, 1.003.4.1.1.8, 1.003.4.1.1.9, 1.003.4.1.1.10, 1.003.4.1.1.11, 1.003.4.1.1.12, 1.003.4.1.1.13, 1.003.4.1.1.14, 1.003.4.1.1.15, 1.003.4.1.1.16, 1.003.4.1.1.17, 1.003.4.1.1.18, 1.003.4.1.1.19, 1.003.4.1.1.20, 1.003.4.1.1.21, 1.003.4.1.1.22, 1.003.4.1.1.23, 1.003.4.1.1.24 | p.48-50 | FR-RN-013 | TC-RN-013.1, 013.2, 013.3, 013.4, 013.5 (9 cases) |
-|  | 1.003.4.1.2 | p.50 | FR-RN-010 | TC-RN-010.1, 010.2, 010.3, 010.4, 010.5, 010.6 (7 cases) |
-|  | 1.003.4.1.3, 1.003.4.1.4 | p.50 | FR-RN-013 | TC-RN-013.1, 013.2, 013.3, 013.4, 013.5 (9 cases) |
-|  | 1.003.5, 1.003.6, 1.003.7, 1.003.7.1, 1.003.7.2 | p.50-51 | FR-RN-014 | TC-RN-014.1, 014.2, 014.3, 014.4 (6 cases) |
-|  | 1.003.7.3, 1.003.7.3.1 | p.51 | FR-RN-024 | TC-RN-024.1, 024.2, 024.3, 024.4 (6 cases) |
-| 1.004 View account | 1.004.1, 1.004.1.1, 1.004.1.2, 1.004.1.3, 1.004.1.4, 1.004.1.5, 1.004.1.5.1, 1.004.1.5.2 | p.51-52 | FR-RN-041 | TC-RN-041.1, 041.2, 041.3, 041.4 (8 cases) |
-| 1.005 Assign accounts | 1.005.1, 1.005.1.1, 1.005.1.1.1, 1.005.1.1.2, 1.005.1.2, 1.005.1.2.1, 1.005.1.2.2, 1.005.1.2.3, 1.005.1.2.4, 1.005.2 | p.53-54 | FR-RN-030 | TC-RN-030.1, 030.2, 030.3, 030.4, 030.5 (7 cases) |
-| 1.006 Transfer account to other units | 1.006.1, 1.006.2, 1.006.3, 1.006.4, 1.006.5 | p.54-55 | FR-RN-031 | TC-RN-031.1, 031.2, 031.3, 031.4 (7 cases) |
-| 1.007 Receive account transfer | 1.007.1, 1.007.2, 1.007.3, 1.007.3.1, 1.007.4, 1.007.4.1, 1.007.4.2, 1.007.5 | p.55-56 | FR-RN-032 | TC-RN-032.1, 032.2, 032.3, 032.4 (6 cases) |
-| 1.008 Review and post | 1.008.1, 1.008.1.1 | p.56 | FR-RN-050 | TC-RN-050.1, 050.2, 050.3, 050.4 (6 cases) |
-|  | 1.008.1.2, 1.008.1.3 | p.56 | FR-RN-050, FR-RN-041 | TC-RN-041.1, 041.2, 041.3, 041.4, 050.1, 050.2, 050.3, 050.4 (14 cases) |
-|  | 1.008.1.4 | p.56 | FR-RN-050, FR-RN-027 | TC-RN-027.1, 027.2, 027.3, 050.1, 050.2, 050.3, 050.4 (10 cases) |
-|  | 1.008.2, 1.008.2.1, 1.008.2.2, 1.008.2.3, 1.008.2.4, 1.008.2.5, 1.008.2.6, 1.008.2.7, 1.008.3, 1.008.3.1, 1.008.3.2, 1.008.3.3, 1.008.3.4 | p.56-58 | FR-RN-050 | TC-RN-050.1, 050.2, 050.3, 050.4 (6 cases) |
-| 1.009 Generate report | 1.009.1, 1.009.1.1, 1.009.1.2, 1.009.2, 1.009.2.1, 1.009.2.2, 1.009.2.3, 1.009.2.4, 1.009.2.5, 1.009.2.6, 1.009.2.7, 1.009.2.8, 1.009.2.9, 1.009.2.10, 1.009.2.11, 1.009.2.12, 1.009.2.13, 1.009.2.14, 1.009.2.15, 1.009.2.16, 1.009.2.17, 1.009.2.18, 1.009.2.19, 1.009.2.20, 1.009.2.21, 1.009.2.22, 1.009.2.23, 1.009.2.24, 1.009.2.25, 1.009.2.26, 1.009.2.27, 1.009.2.28, 1.009.2.29, 1.009.2.30, 1.009.2.31, 1.009.2.32, 1.009.2.33, 1.009.2.34, 1.009.2.35, 1.009.2.36, 1.009.2.37, 1.009.2.38, 1.009.2.39, 1.009.2.40, 1.009.3, 1.009.3.1, 1.009.3.1.1, 1.009.3.1.2, 1.009.3.1.3, 1.009.3.1.4, 1.009.3.1.5, 1.009.3.1.6, 1.009.3.1.7, 1.009.3.1.8, 1.009.3.1.9, 1.009.3.1.10, 1.009.3.1.11, 1.009.3.1.12, 1.009.3.1.13, 1.009.3.1.14, 1.009.3.1.15, 1.009.3.1.16, 1.009.3.1.17, 1.009.3.1.18, 1.009.3.1.19, 1.009.3.1.20, 1.009.3.1.21, 1.009.3.1.22, 1.009.3.1.23, 1.009.3.1.24, 1.009.3.1.25, 1.009.3.1.26, 1.009.3.1.27, 1.009.3.1.28, 1.009.3.1.29, 1.009.3.1.30, 1.009.3.1.31, 1.009.3.1.32, 1.009.3.1.33, 1.009.3.1.34, 1.009.3.1.35, 1.009.3.1.36, 1.009.3.1.37, 1.009.3.2, 1.009.3.2.1, 1.009.3.2.2, 1.009.3.2.3, 1.009.3.2.4, 1.009.3.2.5, 1.009.3.2.6, 1.009.3.2.7, 1.009.3.2.8, 1.009.3.2.9, 1.009.3.2.10, 1.009.3.2.11, 1.009.3.2.12, 1.009.3.2.13, 1.009.3.2.14, 1.009.3.2.15, 1.009.3.2.16, 1.009.3.2.17, 1.009.3.2.18, 1.009.3.2.19, 1.009.3.2.20, 1.009.3.2.21, 1.009.3.2.22, 1.009.3.2.23, 1.009.3.2.24, 1.009.3.2.25, 1.009.3.2.26, 1.009.3.2.27, 1.009.3.2.28, 1.009.3.2.29, 1.009.3.2.30, 1.009.3.2.31, 1.009.3.2.32, 1.009.3.2.33, 1.009.3.2.34, 1.009.4, 1.009.4.1, 1.009.4.2, 1.009.5, 1.009.5.1, 1.009.5.2, 1.009.6 | p.58-75 | FR-RN-101 | TC-RN-101.1, 101.2, 101.3, 101.4, 101.5 (8 cases) |
-|  | 1.009.7 | p.75 | FR-RN-100 | TC-RN-100.1, 100.2, 100.3 (4 cases) |
-| 1.010 Generate Renewal Advice | 1.010.1, 1.010.2, 1.010.2.1, 1.010.2.2, 1.010.3, 1.010.3.1, 1.010.3.2, 1.010.3.3, 1.010.4, 1.010.4.1, 1.010.4.2, 1.010.5, 1.010.5.1, 1.010.5.2 | p.76-77 | FR-RN-080 | TC-RN-080.1, 080.2, 080.3, 080.4, 080.5 (12 cases) |
-|  | 1.010.6, 1.010.7 | p.77 | FR-RN-081 | TC-RN-081.1, 081.2, 081.3, 081.4 (8 cases) |
-| 1.011 Override accounts | 1.011.1, 1.011.1.1, 1.011.1.2, 1.011.1.3 | p.78 | FR-RN-051 | TC-RN-051.1, 051.2, 051.3, 051.4, 051.5 (8 cases) |
-| 2.001 Log in | 2.001.1, 2.001.1.1, 2.001.1.2, 2.001.1.3 | p.78-79 | FR-RN-001 | TC-RN-001.1, 001.2, 001.3, 001.4, 001.5, 001.6 (13 cases) |
-| 2.002 Open in several tabs | 2.002.1 | p.79 | FR-RN-001 | TC-RN-001.1, 001.2, 001.3, 001.4, 001.5, 001.6 (13 cases) |
-| 2.003 View accounts for disposition | 2.003.1, 2.003.1.1 | p.79 | FR-RN-040 | TC-RN-040.1, 040.2, 040.3, 040.4, 040.5 (7 cases) |
-|  | 2.003.1.2 | p.79 | FR-RN-040, FR-RN-041 | TC-RN-040.1, 040.2, 040.3, 040.4, 040.5, 041.1, 041.2, 041.3, 041.4 (15 cases) |
-|  | 2.003.1.3, 2.003.1.4, 2.003.1.5 | p.79-80 | FR-RN-040 | TC-RN-040.1, 040.2, 040.3, 040.4, 040.5 (7 cases) |
-|  | 2.003.1.6 | p.80 | OUT (p.34) | - |
-|  | 2.003.2, 2.003.3, 2.003.3.1, 2.003.3.2 | p.80 | FR-RN-041 | TC-RN-041.1, 041.2, 041.3, 041.4 (8 cases) |
-| 2.004 Provide disposition | 2.004.1, 2.004.2, 2.004.3, 2.004.3.1, 2.004.3.2, 2.004.3.3, 2.004.3.4, 2.004.3.5, 2.004.4, 2.004.4.1, 2.004.4.2, 2.004.4.3, 2.004.4.4, 2.004.4.5, 2.004.4.6, 2.004.4.7 | p.80-83 | FR-RN-043 | TC-RN-043.1, 043.2, 043.3, 043.4, 043.5 (10 cases) |
-|  | 2.004.4.8 | p.83 | FR-RN-043, FR-RN-031 | TC-RN-031.1, 031.2, 031.3, 031.4, 043.1, 043.2, 043.3, 043.4, 043.5 (17 cases) |
-|  | 2.004.4.9, 2.004.4.10, 2.004.5, 2.004.5.1, 2.004.5.2, 2.004.5.3 | p.83-84 | FR-RN-043 | TC-RN-043.1, 043.2, 043.3, 043.4, 043.5 (10 cases) |
-|  | 2.004.6, 2.004.7, 2.004.8 | p.84 | FR-RN-044 | TC-RN-044.1, 044.2 (5 cases) |
-|  | 2.004.9 | p.84 | FR-RN-080 | TC-RN-080.1, 080.2, 080.3, 080.4, 080.5 (12 cases) |
-|  | 2.004.10 | p.84 | FR-RN-047 | TC-RN-047.1, 047.2, 047.3 (6 cases) |
-| 2.005 Transfer account to other units | 2.005.1, 2.005.2, 2.005.3, 2.005.3.1, 2.005.3.2, 2.005.4, 2.005.5 | p.84-85 | FR-RN-031 | TC-RN-031.1, 031.2, 031.3, 031.4 (7 cases) |
-| 2.006 View the list of dispositioned accounts | 2.006.1, 2.006.1.1, 2.006.1.1.1, 2.006.1.1.2 | p.85-86 | FR-RN-045 | TC-RN-045.1, 045.2, 045.3 (3 cases) |
-|  | 2.006.1.2 | p.86 | OUT (p.34) | - |
-|  | 2.006.1.3, 2.006.1.4 | p.86 | FR-RN-045 | TC-RN-045.1, 045.2, 045.3 (3 cases) |
-|  | 2.006.1.5, 2.006.1.5.1, 2.006.1.5.2, 2.006.1.5.3, 2.006.1.6 | p.86-87 | FR-RN-044 | TC-RN-044.1, 044.2 (5 cases) |
-| 2.007 Update the returned accounts | 2.007.1, 2.007.2, 2.007.3, 2.007.4 | p.87 | FR-RN-046 | TC-RN-046.1, 046.2, 046.3 (4 cases) |
-|  | 2.007.4.1 | p.88 | OUT (p.34) | - |
-|  | 2.007.4.2, 2.007.4.3, 2.007.4.4, 2.007.4.5, 2.007.4.6, 2.007.4.7, 2.007.5 | p.88 | FR-RN-046 | TC-RN-046.1, 046.2, 046.3 (4 cases) |
-| 2.008 Generate report | 2.008.1, 2.008.1.1, 2.008.1.2, 2.008.2, 2.008.2.1, 2.008.2.2, 2.008.2.3, 2.008.2.4, 2.008.2.5, 2.008.2.6, 2.008.2.7, 2.008.2.8, 2.008.2.9, 2.008.2.10, 2.008.2.11, 2.008.2.12, 2.008.2.13, 2.008.2.14, 2.008.2.15, 2.008.2.16, 2.008.2.17, 2.008.2.18, 2.008.2.19, 2.008.2.20, 2.008.2.21, 2.008.2.22, 2.008.2.23, 2.008.2.24, 2.008.2.25, 2.008.2.26, 2.008.2.27, 2.008.2.28, 2.008.2.29, 2.008.2.30, 2.008.2.31, 2.008.2.32, 2.008.2.33, 2.008.2.34, 2.008.2.35, 2.008.2.36, 2.008.2.37, 2.008.2.38, 2.008.2.39, 2.008.2.40, 2.008.3, 2.008.3.1, 2.008.3.1.1, 2.008.3.1.2, 2.008.3.1.3, 2.008.3.1.4, 2.008.3.1.5, 2.008.3.1.6, 2.008.3.1.7, 2.008.3.1.8, 2.008.3.1.9, 2.008.3.1.10, 2.008.3.1.11, 2.008.3.1.12, 2.008.3.1.13, 2.008.3.1.14, 2.008.3.1.15, 2.008.3.1.16, 2.008.3.1.17, 2.008.3.1.18, 2.008.3.1.19, 2.008.3.1.20, 2.008.3.1.21, 2.008.3.1.22, 2.008.3.1.23, 2.008.3.1.24, 2.008.3.1.25, 2.008.3.1.26, 2.008.3.1.27, 2.008.3.1.28, 2.008.3.1.29, 2.008.3.1.30, 2.008.3.1.31, 2.008.3.1.32, 2.008.3.1.33, 2.008.3.1.34, 2.008.3.1.35, 2.008.3.1.36, 2.008.3.1.37, 2.008.3.2, 2.008.3.2.1, 2.008.3.2.2, 2.008.3.2.3, 2.008.3.2.4, 2.008.3.2.5, 2.008.3.2.6, 2.008.3.2.7, 2.008.3.2.8, 2.008.3.2.9, 2.008.3.2.10, 2.008.3.2.11, 2.008.3.2.12, 2.008.3.2.13, 2.008.3.2.14, 2.008.3.2.15, 2.008.3.2.16, 2.008.3.2.17, 2.008.3.2.18, 2.008.3.2.19, 2.008.3.2.20, 2.008.3.2.21, 2.008.3.2.22, 2.008.3.2.23, 2.008.3.2.24, 2.008.3.2.25, 2.008.3.2.26, 2.008.3.2.27, 2.008.3.2.28, 2.008.3.2.29, 2.008.3.2.30, 2.008.3.2.31, 2.008.3.2.32, 2.008.3.2.33, 2.008.3.2.34, 2.008.4, 2.008.4.1, 2.008.4.2, 2.008.5, 2.008.5.1, 2.008.5.2, 2.008.6 | p.89-106 | FR-RN-101 | TC-RN-101.1, 101.2, 101.3, 101.4, 101.5 (8 cases) |
-| 2.009 Generate Renewal Advice | 2.009.1, 2.009.2, 2.009.2.1, 2.009.2.2, 2.009.3, 2.009.3.1, 2.009.3.2, 2.009.3.3, 2.009.4, 2.009.4.1, 2.009.4.2, 2.009.5, 2.009.5.1, 2.009.5.2 | p.106-107 | FR-RN-080 | TC-RN-080.1, 080.2, 080.3, 080.4, 080.5 (12 cases) |
-|  | 2.009.6, 2.009.7, 2.009.7.1 | p.108 | FR-RN-081 | TC-RN-081.1, 081.2, 081.3, 081.4 (8 cases) |
-| 3.001 Log in | 3.001.1, 3.001.1.1, 3.001.1.2, 3.001.1.3 | p.108 | FR-RN-001 | TC-RN-001.1, 001.2, 001.3, 001.4, 001.5, 001.6 (13 cases) |
-| 3.002 Open in several tabs | 3.002.1 | p.108 | FR-RN-001 | TC-RN-001.1, 001.2, 001.3, 001.4, 001.5, 001.6 (13 cases) |
-| 3.003 Generate list of accounts for processing | 3.003.1, 3.003.1.1, 3.003.2 | p.109 | FR-RN-011 | TC-RN-011.1, 011.2, 011.3, 011.4 (7 cases) |
-|  | 3.003.3, 3.003.3.1, 3.003.3.2, 3.003.3.3, 3.003.3.4, 3.003.3.5, 3.003.3.6, 3.003.3.7, 3.003.3.8, 3.003.3.9, 3.003.3.10, 3.003.3.11, 3.003.3.12, 3.003.3.13 | p.109-111 | FR-RN-012 | TC-RN-012.1, 012.2, 012.3 (6 cases) |
-|  | 3.003.4, 3.003.4.1 | p.111 | FR-RN-013 | TC-RN-013.1, 013.2, 013.3, 013.4, 013.5 (9 cases) |
-|  | 3.003.4.1.1 | p.111 | OUT (p.34) | - |
-|  | 3.003.4.1.2 | p.112 | FR-RN-013 | TC-RN-013.1, 013.2, 013.3, 013.4, 013.5 (9 cases) |
-|  | 3.003.4.1.3 | p.112 | OUT (p.34) | - |
-|  | 3.003.4.1.4, 3.003.4.1.5, 3.003.4.1.6, 3.003.4.1.7, 3.003.4.1.8, 3.003.4.1.9, 3.003.4.1.10, 3.003.4.1.11, 3.003.4.1.12, 3.003.4.1.13, 3.003.4.1.14, 3.003.4.1.15, 3.003.4.1.16, 3.003.4.1.17, 3.003.4.1.18, 3.003.4.1.19, 3.003.4.1.20, 3.003.4.1.21 | p.112-114 | FR-RN-013 | TC-RN-013.1, 013.2, 013.3, 013.4, 013.5 (9 cases) |
-|  | 3.003.4.2 | p.114 | FR-RN-010 | TC-RN-010.1, 010.2, 010.3, 010.4, 010.5, 010.6 (7 cases) |
-|  | 3.003.4.3, 3.003.4.4 | p.114 | FR-RN-013 | TC-RN-013.1, 013.2, 013.3, 013.4, 013.5 (9 cases) |
-|  | 3.003.4.5 | p.115 | OUT (p.34) | - |
-|  | 3.003.5, 3.003.6, 3.003.7, 3.003.7.1, 3.003.7.2 | p.115 | FR-RN-014 | TC-RN-014.1, 014.2, 014.3, 014.4 (6 cases) |
-| 3.004 Upload dispositioned file | 3.004.1, 3.004.1.1, 3.004.1.2, 3.004.2, 3.004.3, 3.004.3.1, 3.004.4 | p.115-116 | FR-RN-060 | TC-RN-060.1, 060.2, 060.3, 060.4 (8 cases) |
-|  | 3.004.5 | p.117 | FR-RN-047 | TC-RN-047.1, 047.2, 047.3 (6 cases) |
-| 3.005 Assign accounts | 3.005.1, 3.005.1.1, 3.005.1.1.1, 3.005.1.1.2, 3.005.1.2, 3.005.1.2.1, 3.005.1.2.2, 3.005.1.3, 3.005.1.4, 3.005.1.5, 3.005.1.6 | p.117-118 | FR-RN-061 | TC-RN-061.1, 061.2, 061.3 (5 cases) |
-| 3.006 View accounts for processing | 3.006.1 | p.118 | FR-RN-062 | TC-RN-062.1, 062.2 (3 cases) |
-|  | 3.006.1.1, 3.006.1.2 | p.118 | FR-RN-062, FR-RN-041 | TC-RN-041.1, 041.2, 041.3, 041.4, 062.1, 062.2 (11 cases) |
-|  | 3.006.1.3, 3.006.1.4 | p.119 | FR-RN-062 | TC-RN-062.1, 062.2 (3 cases) |
-|  | 3.006.1.5 | p.119 | FR-RN-013 | TC-RN-013.1, 013.2, 013.3, 013.4, 013.5 (9 cases) |
-|  | 3.006.1.6 | p.119 | FR-RN-062 | TC-RN-062.1, 062.2 (3 cases) |
-|  | 3.006.2, 3.006.3, 3.006.3.1, 3.006.3.2 | p.119 | FR-RN-041 | TC-RN-041.1, 041.2, 041.3, 041.4 (8 cases) |
-| 3.007 Update data on an account | 3.007.1, 3.007.2, 3.007.3, 3.007.3.1, 3.007.3.2, 3.007.3.3, 3.007.3.4 | p.120 | FR-RN-063 | TC-RN-063.1, 063.2, 063.3, 063.4 (5 cases) |
-| 3.008 Review computations; return | 3.008.1, 3.008.1.1 | p.121 | FR-RN-064 | TC-RN-064.1, 064.2, 064.3 (3 cases) |
-|  | 3.008.2, 3.008.2.1, 3.008.2.2, 3.008.2.3, 3.008.2.4, 3.008.2.5, 3.008.2.6, 3.008.2.7 | p.121-122 | FR-RN-065 | TC-RN-065.1, 065.2 (4 cases) |
-| 3.009 Extract accounts per insurer | 3.009.1, 3.009.1.1, 3.009.1.2, 3.009.1.3, 3.009.1.4, 3.009.1.4.1, 3.009.1.4.2, 3.009.1.4.3, 3.009.1.4.4, 3.009.1.4.5, 3.009.1.4.6, 3.009.1.4.7, 3.009.1.4.8, 3.009.1.4.9, 3.009.1.4.10, 3.009.1.4.11, 3.009.1.4.12, 3.009.1.4.13, 3.009.1.4.14, 3.009.1.4.15, 3.009.1.4.16, 3.009.1.4.17, 3.009.1.4.18, 3.009.1.4.19, 3.009.1.4.20, 3.009.1.4.21, 3.009.1.4.22, 3.009.1.4.23, 3.009.1.4.24, 3.009.1.4.25, 3.009.1.4.26, 3.009.1.4.27, 3.009.1.4.28 | p.122-126 | FR-RN-070 | TC-RN-070.1, 070.2, 070.3, 070.4, 070.5 (9 cases) |
-|  | 3.009.2, 3.009.3, 3.009.4, 3.009.4.1, 3.009.4.2 | p.126-127 | FR-RN-070, FR-RN-103 | TC-RN-070.1, 070.2, 070.3, 070.4, 070.5, 103.1, 103.2, 103.3 (17 cases) |
-|  | 3.009.5, 3.009.5.1 | p.127 | FR-RN-070 | TC-RN-070.1, 070.2, 070.3, 070.4, 070.5 (9 cases) |
-|  | 3.009.6, 3.009.6.1, 3.009.6.2 | p.127 | FR-RN-071 | TC-RN-071.1, 071.2, 071.3, 071.4 (9 cases) |
-| 3.010 Generate report | 3.010.1, 3.010.1.1, 3.010.1.2, 3.010.2, 3.010.2.1, 3.010.2.2, 3.010.2.3, 3.010.2.4, 3.010.2.5, 3.010.2.6, 3.010.2.7, 3.010.2.8, 3.010.2.9, 3.010.2.10, 3.010.2.11, 3.010.2.12, 3.010.2.13, 3.010.2.14, 3.010.2.15, 3.010.2.16, 3.010.2.17, 3.010.2.18, 3.010.2.19, 3.010.2.20, 3.010.2.21, 3.010.2.22, 3.010.2.23, 3.010.2.24, 3.010.2.25, 3.010.2.26, 3.010.2.27, 3.010.2.28, 3.010.2.29, 3.010.2.30, 3.010.2.31, 3.010.2.32, 3.010.2.33, 3.010.2.34, 3.010.2.35, 3.010.2.36, 3.010.2.37, 3.010.2.38, 3.010.2.39, 3.010.2.40, 3.010.3, 3.010.3.1, 3.010.3.1.1, 3.010.3.1.2, 3.010.3.1.3, 3.010.3.1.4, 3.010.3.1.5, 3.010.3.1.6, 3.010.3.1.7, 3.010.3.1.8, 3.010.3.1.9, 3.010.3.1.10, 3.010.3.1.11, 3.010.3.1.12, 3.010.3.1.13, 3.010.3.1.14, 3.010.3.1.15, 3.010.3.1.16, 3.010.3.1.17, 3.010.3.1.18, 3.010.3.1.19, 3.010.3.1.20, 3.010.3.1.21, 3.010.3.1.22, 3.010.3.1.23, 3.010.3.1.24, 3.010.3.1.25, 3.010.3.1.26, 3.010.3.1.27, 3.010.3.1.28, 3.010.3.1.29, 3.010.3.1.30, 3.010.3.1.31, 3.010.3.1.32, 3.010.3.1.33, 3.010.3.1.34, 3.010.3.1.35, 3.010.3.1.36, 3.010.3.1.37, 3.010.3.1.38, 3.010.3.1.39, 3.010.3.1.40, 3.010.3.2, 3.010.3.2.1, 3.010.3.2.2, 3.010.3.2.3, 3.010.3.2.4, 3.010.3.2.5, 3.010.3.2.6, 3.010.3.2.7, 3.010.3.2.8, 3.010.3.2.9, 3.010.3.2.10, 3.010.3.2.11, 3.010.3.2.12, 3.010.3.2.13, 3.010.3.2.14, 3.010.3.2.15, 3.010.3.2.16, 3.010.3.2.17, 3.010.3.2.18, 3.010.3.2.19, 3.010.3.2.20, 3.010.3.2.21, 3.010.3.2.22, 3.010.3.2.23, 3.010.3.2.24, 3.010.3.2.25, 3.010.3.2.26, 3.010.3.2.27, 3.010.3.2.28, 3.010.3.2.29, 3.010.3.2.30, 3.010.3.2.31, 3.010.3.2.32, 3.010.3.2.33, 3.010.3.2.34, 3.010.4, 3.010.4.1, 3.010.4.2, 3.010.5, 3.010.5.1, 3.010.5.2, 3.010.6 | p.127-145 | FR-RN-101 | TC-RN-101.1, 101.2, 101.3, 101.4, 101.5 (8 cases) |
-|  | 3.010.7 | p.145 | FR-RN-100 | TC-RN-100.1, 100.2, 100.3 (4 cases) |
-| 3.011 Generate Renewal Advice | 3.011.1, 3.011.2, 3.011.2.1, 3.011.2.2, 3.011.3, 3.011.3.1, 3.011.3.2, 3.011.3.3, 3.011.4, 3.011.4.1, 3.011.4.2, 3.011.5, 3.011.5.1, 3.011.5.2 | p.145-147 | FR-RN-080 | TC-RN-080.1, 080.2, 080.3, 080.4, 080.5 (12 cases) |
-|  | 3.011.6, 3.011.7, 3.011.7.1 | p.147 | FR-RN-081 | TC-RN-081.1, 081.2, 081.3, 081.4 (8 cases) |
-| 4.001 Log in | 4.001.1, 4.001.1.1, 4.001.1.2, 4.001.1.3 | p.148 | FR-RN-001 | TC-RN-001.1, 001.2, 001.3, 001.4, 001.5, 001.6 (13 cases) |
-| 4.002 Open in several tabs | 4.002.1 | p.148 | FR-RN-001 | TC-RN-001.1, 001.2, 001.3, 001.4, 001.5, 001.6 (13 cases) |
-| 4.003 View accounts for processing | 4.003.1 | p.148 | FR-RN-062 | TC-RN-062.1, 062.2 (3 cases) |
-|  | 4.003.1.1, 4.003.1.2 | p.149 | FR-RN-062, FR-RN-041 | TC-RN-041.1, 041.2, 041.3, 041.4, 062.1, 062.2 (11 cases) |
-|  | 4.003.1.3, 4.003.1.4 | p.149 | FR-RN-062 | TC-RN-062.1, 062.2 (3 cases) |
-|  | 4.003.1.5 | p.149 | FR-RN-013 | TC-RN-013.1, 013.2, 013.3, 013.4, 013.5 (9 cases) |
-|  | 4.003.1.6 | p.149 | OUT (p.34) | - |
-|  | 4.003.2, 4.003.3, 4.003.3.1, 4.003.3.2 | p.150 | FR-RN-041 | TC-RN-041.1, 041.2, 041.3, 041.4 (8 cases) |
-| 4.004 Upload dispositioned file | 4.004.1, 4.004.1.1, 4.004.1.2, 4.004.2, 4.004.3, 4.004.3.1 | p.150-151 | FR-RN-060 | TC-RN-060.1, 060.2, 060.3, 060.4 (8 cases) |
-| 4.005 Update data on an account | 4.005.1, 4.005.2, 4.005.3, 4.005.3.1, 4.005.3.2, 4.005.3.3, 4.005.3.4 | p.151-152 | FR-RN-063 | TC-RN-063.1, 063.2, 063.3, 063.4 (5 cases) |
-| 4.006 Review computations; return | 4.006.1, 4.006.1.1 | p.152 | FR-RN-064 | TC-RN-064.1, 064.2, 064.3 (3 cases) |
-|  | 4.006.2, 4.006.2.1, 4.006.2.2, 4.006.2.3, 4.006.2.4, 4.006.2.5, 4.006.2.6, 4.006.2.7 | p.152-153 | FR-RN-065 | TC-RN-065.1, 065.2 (4 cases) |
-| 4.007 Extract accounts per insurer | 4.007.1, 4.007.1.1, 4.007.1.2, 4.007.1.3, 4.007.1.4, 4.007.1.4.1, 4.007.1.4.2, 4.007.1.4.3, 4.007.1.4.4, 4.007.1.4.5, 4.007.1.4.6, 4.007.1.4.7, 4.007.1.4.8, 4.007.1.4.9, 4.007.1.4.10, 4.007.1.4.11, 4.007.1.4.12, 4.007.1.4.13, 4.007.1.4.14, 4.007.1.4.15, 4.007.1.4.16, 4.007.1.4.17, 4.007.1.4.18, 4.007.1.4.19, 4.007.1.4.20, 4.007.1.4.21, 4.007.1.4.22, 4.007.1.4.23, 4.007.1.4.24, 4.007.1.4.25, 4.007.1.4.26, 4.007.1.4.27, 4.007.1.4.28 | p.153-157 | FR-RN-070 | TC-RN-070.1, 070.2, 070.3, 070.4, 070.5 (9 cases) |
-|  | 4.007.2, 4.007.3, 4.007.4, 4.007.4.1, 4.007.4.2 | p.158 | FR-RN-070, FR-RN-103 | TC-RN-070.1, 070.2, 070.3, 070.4, 070.5, 103.1, 103.2, 103.3 (17 cases) |
-|  | 4.007.5, 4.007.5.1 | p.158 | FR-RN-070 | TC-RN-070.1, 070.2, 070.3, 070.4, 070.5 (9 cases) |
-|  | 4.007.6, 4.007.6.1, 4.007.6.2 | p.159 | FR-RN-071 | TC-RN-071.1, 071.2, 071.3, 071.4 (9 cases) |
-| 4.008 Generate report | 4.008.1, 4.008.1.1, 4.008.1.2, 4.008.2, 4.008.2.1, 4.008.2.2, 4.008.2.3, 4.008.2.4, 4.008.2.5, 4.008.2.6, 4.008.2.7, 4.008.2.8, 4.008.2.9, 4.008.2.10, 4.008.2.11, 4.008.2.12, 4.008.2.13, 4.008.2.14, 4.008.2.15, 4.008.2.16, 4.008.2.17, 4.008.2.18, 4.008.2.19, 4.008.2.20, 4.008.2.21, 4.008.2.22, 4.008.2.23, 4.008.2.24, 4.008.2.25, 4.008.2.26, 4.008.2.27, 4.008.2.28, 4.008.2.29, 4.008.2.30, 4.008.2.31, 4.008.2.32, 4.008.2.33, 4.008.2.34, 4.008.2.35, 4.008.2.36, 4.008.2.37, 4.008.2.38, 4.008.2.39, 4.008.2.40, 4.008.3, 4.008.3.1, 4.008.3.1.1, 4.008.3.1.2, 4.008.3.1.3, 4.008.3.1.4, 4.008.3.1.5, 4.008.3.1.6, 4.008.3.1.7, 4.008.3.1.8, 4.008.3.1.9, 4.008.3.1.10, 4.008.3.1.11, 4.008.3.1.12, 4.008.3.1.13, 4.008.3.1.14, 4.008.3.1.15, 4.008.3.1.16, 4.008.3.1.17, 4.008.3.1.18, 4.008.3.1.19, 4.008.3.1.20, 4.008.3.1.21, 4.008.3.1.22, 4.008.3.1.23, 4.008.3.1.24, 4.008.3.1.25, 4.008.3.1.26, 4.008.3.1.27, 4.008.3.1.28, 4.008.3.1.29, 4.008.3.1.30, 4.008.3.1.31, 4.008.3.1.32, 4.008.3.1.33, 4.008.3.1.34, 4.008.3.1.35, 4.008.3.1.36, 4.008.3.1.37, 4.008.3.1.38, 4.008.3.1.39, 4.008.3.1.40, 4.008.3.2, 4.008.3.2.1, 4.008.3.2.2, 4.008.3.2.3, 4.008.3.2.4, 4.008.3.2.5, 4.008.3.2.6, 4.008.3.2.7, 4.008.3.2.8, 4.008.3.2.9, 4.008.3.2.10, 4.008.3.2.11, 4.008.3.2.12, 4.008.3.2.13, 4.008.3.2.14, 4.008.3.2.15, 4.008.3.2.16, 4.008.3.2.17, 4.008.3.2.18, 4.008.3.2.19, 4.008.3.2.20, 4.008.3.2.21, 4.008.3.2.22, 4.008.3.2.23, 4.008.3.2.24, 4.008.3.2.25, 4.008.3.2.26, 4.008.3.2.27, 4.008.3.2.28, 4.008.3.2.29, 4.008.3.2.30, 4.008.3.2.31, 4.008.3.2.32, 4.008.3.2.33, 4.008.3.2.34, 4.008.4, 4.008.4.1, 4.008.4.2, 4.008.5, 4.008.5.1, 4.008.5.2, 4.008.6 | p.159-177 | FR-RN-101 | TC-RN-101.1, 101.2, 101.3, 101.4, 101.5 (8 cases) |
-| 4.09 Generate Renewal Advice | 4.09.1, 4.09.2, 4.09.2.1, 4.09.2.2, 4.09.2.3, 4.09.3, 4.09.3.1, 4.09.3.2, 4.09.4, 4.09.4.1, 4.09.4.2, 4.09.5, 4.09.5.1, 4.09.5.2 | p.177-178 | FR-RN-080 | TC-RN-080.1, 080.2, 080.3, 080.4, 080.5 (12 cases) |
-|  | 4.09.6, 4.09.7 | p.178-179 | FR-RN-081 | TC-RN-081.1, 081.2, 081.3, 081.4 (8 cases) |
-| 5.001 Log in | 5.001.1, 5.001.1.1, 5.001.1.2, 5.001.1.3 | p.179 | FR-RN-001 | TC-RN-001.1, 001.2, 001.3, 001.4, 001.5, 001.6 (13 cases) |
-| 5.002 Open in several tabs | 5.002.1 | p.179 | FR-RN-001 | TC-RN-001.1, 001.2, 001.3, 001.4, 001.5, 001.6 (13 cases) |
-| 5.003 Maintain lists of values | 5.003.1, 5.003.2, 5.003.3, 5.003.4, 5.003.5 | p.179-180 | FR-RN-110 | TC-RN-110.1, 110.2, 110.3, 110.4 (4 cases) |
-| 5.004 Maintain users | 5.004.1 | p.180 | FR-RN-003 | TC-RN-003.1, 003.2, 003.3, 003.4 (6 cases) |
-| 5.005 Update the RA template | 5.005.1 | p.180 | FR-RN-111 | TC-RN-111.1, 111.2 (2 cases) |
-| 6.001 Access the application | 6.001.1, 6.001.1.1 | p.180 | FR-RN-001 | TC-RN-001.1, 001.2, 001.3, 001.4, 001.5, 001.6 (13 cases) |
-| 6.002 Manage users, profiles and functions | 6.002.1, 6.002.1.2, 6.002.1.3, 6.002.1.4, 6.002.1.5, 6.002.1.6, 6.002.2, 6.002.2.1, 6.002.2.2, 6.002.2.3, 6.002.2.4, 6.002.2.5, 6.002.2.6, 6.002.2.7, 6.002.2.8, 6.002.2.9, 6.002.2.10, 6.002.2.11, 6.002.2.12, 6.002.2.13, 6.002.2.14, 6.002.2.15, 6.002.2.16, 6.002.2.17, 6.002.2.18, 6.002.2.19, 6.002.2.20, 6.002.2.21, 6.002.2.22 | p.180-185 | FR-RN-003 | TC-RN-003.1, 003.2, 003.3, 003.4 (6 cases) |
-|  | 6.002.2.23 | p.185 | FR-RN-003, FR-RN-110 | TC-RN-003.1, 003.2, 003.3, 003.4, 110.1, 110.2, 110.3, 110.4 (10 cases) |
-|  | 6.002.2.24 | p.185 | FR-RN-003 | TC-RN-003.1, 003.2, 003.3, 003.4 (6 cases) |
-|  | 6.002.2.25 | p.185 | FR-RN-003, FR-RN-111 | TC-RN-003.1, 003.2, 003.3, 003.4, 111.1, 111.2 (8 cases) |
+| 1.001 Log in | 1.001.1, 1.001.1.1, 1.001.2.1, 1.001.3.1 | p.70 | FR-RN-001 | TC-RN-001.1, 001.2, 001.3, 001.4, 001.5, 001.6 (13 cases) |
+| 1.002 Open in several tabs | 1.002.1 | p.70 | FR-RN-001 | TC-RN-001.1, 001.2, 001.3, 001.4, 001.5, 001.6 (13 cases) |
+| 1.003 Generate the list of expiring accounts | 1.003.1, 1.003.1.1, 1.003.2 | p.70-71 | FR-RN-011 | TC-RN-011.1, 011.2, 011.3, 011.4 (7 cases) |
+|  | 1.003.3, 1.003.3.1, 1.003.3.1.2, 1.003.3.1.3, 1.003.3.1.4, 1.003.3.1.5, 1.003.3.1.6, 1.003.3.1.7, 1.003.3.1.8, 1.003.3.1.9, 1.003.3.1.10, 1.003.3.1.11, 1.003.3.1.12, 1.003.3.1.13 | p.71-73 | FR-RN-012 | TC-RN-012.1, 012.2, 012.3 (6 cases) |
+|  | 1.003.4.1, 1.003.4.1.1 | p.73 | FR-RN-013 | TC-RN-013.1, 013.2, 013.3, 013.4, 013.5 (9 cases) |
+|  | 1.003.4.1.1.1 | p.73 | OUT (p.60) | - |
+|  | 1.003.4.1.1.2 | p.73 | FR-RN-013 | TC-RN-013.1, 013.2, 013.3, 013.4, 013.5 (9 cases) |
+|  | 1.003.4.1.1.3 | p.73 | OUT (p.60) | - |
+|  | 1.003.4.1.1.4, 1.003.4.1.1.5, 1.003.4.1.1.6, 1.003.4.1.1.7, 1.003.4.1.1.8, 1.003.4.1.1.9, 1.003.4.1.1.10, 1.003.4.1.1.11, 1.003.4.1.1.12, 1.003.4.1.1.13, 1.003.4.1.1.14, 1.003.4.1.1.15, 1.003.4.1.1.16, 1.003.4.1.1.17, 1.003.4.1.1.18, 1.003.4.1.1.19, 1.003.4.1.1.20, 1.003.4.1.1.21, 1.003.4.1.1.22, 1.003.4.1.1.23, 1.003.4.1.1.24 | p.74-76 | FR-RN-013 | TC-RN-013.1, 013.2, 013.3, 013.4, 013.5 (9 cases) |
+|  | 1.003.4.1.2 | p.76 | FR-RN-010 | TC-RN-010.1, 010.2, 010.3, 010.4, 010.5, 010.6 (7 cases) |
+|  | 1.003.4.1.3, 1.003.4.1.4 | p.76 | FR-RN-013 | TC-RN-013.1, 013.2, 013.3, 013.4, 013.5 (9 cases) |
+|  | 1.003.5, 1.003.6, 1.003.7, 1.003.7.1, 1.003.7.2 | p.76-77 | FR-RN-014 | TC-RN-014.1, 014.2, 014.3, 014.4 (6 cases) |
+|  | 1.003.7.3, 1.003.7.3.1 | p.77 | FR-RN-024 | TC-RN-024.1, 024.2, 024.3, 024.4 (6 cases) |
+| 1.004 View account | 1.004.1, 1.004.1.1, 1.004.1.2, 1.004.1.3, 1.004.1.4, 1.004.1.5, 1.004.1.5.1, 1.004.1.5.2 | p.77-78 | FR-RN-041 | TC-RN-041.1, 041.2, 041.3, 041.4 (8 cases) |
+| 1.005 Assign accounts | 1.005.1, 1.005.1.1, 1.005.1.1.1, 1.005.1.1.2, 1.005.1.2, 1.005.1.2.1, 1.005.1.2.2, 1.005.1.2.3, 1.005.1.2.4, 1.005.2 | p.79-80 | FR-RN-030 | TC-RN-030.1, 030.2, 030.3, 030.4, 030.5 (7 cases) |
+| 1.006 Transfer account to other units | 1.006.1, 1.006.2, 1.006.3, 1.006.4, 1.006.5 | p.80-81 | FR-RN-031 | TC-RN-031.1, 031.2, 031.3, 031.4 (7 cases) |
+| 1.007 Receive account transfer | 1.007.1, 1.007.2, 1.007.3, 1.007.3.1, 1.007.4, 1.007.4.1, 1.007.4.2, 1.007.5 | p.81-82 | FR-RN-032 | TC-RN-032.1, 032.2, 032.3, 032.4 (6 cases) |
+| 1.008 Review and post | 1.008.1, 1.008.1.1 | p.82 | FR-RN-050 | TC-RN-050.1, 050.2, 050.3, 050.4 (6 cases) |
+|  | 1.008.1.2, 1.008.1.3 | p.82 | FR-RN-050, FR-RN-041 | TC-RN-041.1, 041.2, 041.3, 041.4, 050.1, 050.2, 050.3, 050.4 (14 cases) |
+|  | 1.008.1.4 | p.82 | FR-RN-050, FR-RN-027 | TC-RN-027.1, 027.2, 027.3, 050.1, 050.2, 050.3, 050.4 (10 cases) |
+|  | 1.008.2, 1.008.2.1, 1.008.2.2, 1.008.2.3, 1.008.2.4, 1.008.2.5, 1.008.2.6, 1.008.2.7, 1.008.3, 1.008.3.1, 1.008.3.2, 1.008.3.3, 1.008.3.4 | p.82-84 | FR-RN-050 | TC-RN-050.1, 050.2, 050.3, 050.4 (6 cases) |
+| 1.009 Generate report | 1.009.1, 1.009.1.1, 1.009.1.2, 1.009.2, 1.009.2.1, 1.009.2.2, 1.009.2.3, 1.009.2.4, 1.009.2.5, 1.009.2.6, 1.009.2.7, 1.009.2.8, 1.009.2.9, 1.009.2.10, 1.009.2.11, 1.009.2.12, 1.009.2.13, 1.009.2.14, 1.009.2.15, 1.009.2.16, 1.009.2.17, 1.009.2.18, 1.009.2.19, 1.009.2.20, 1.009.2.21, 1.009.2.22, 1.009.2.23, 1.009.2.24, 1.009.2.25, 1.009.2.26, 1.009.2.27, 1.009.2.28, 1.009.2.29, 1.009.2.30, 1.009.2.31, 1.009.2.32, 1.009.2.33, 1.009.2.34, 1.009.2.35, 1.009.2.36, 1.009.2.37, 1.009.2.38, 1.009.2.39, 1.009.2.40, 1.009.3, 1.009.3.1, 1.009.3.1.1, 1.009.3.1.2, 1.009.3.1.3, 1.009.3.1.4, 1.009.3.1.5, 1.009.3.1.6, 1.009.3.1.7, 1.009.3.1.8, 1.009.3.1.9, 1.009.3.1.10, 1.009.3.1.11, 1.009.3.1.12, 1.009.3.1.13, 1.009.3.1.14, 1.009.3.1.15, 1.009.3.1.16, 1.009.3.1.17, 1.009.3.1.18, 1.009.3.1.19, 1.009.3.1.20, 1.009.3.1.21, 1.009.3.1.22, 1.009.3.1.23, 1.009.3.1.24, 1.009.3.1.25, 1.009.3.1.26, 1.009.3.1.27, 1.009.3.1.28, 1.009.3.1.29, 1.009.3.1.30, 1.009.3.1.31, 1.009.3.1.32, 1.009.3.1.33, 1.009.3.1.34, 1.009.3.1.35, 1.009.3.1.36, 1.009.3.1.37, 1.009.3.2, 1.009.3.2.1, 1.009.3.2.2, 1.009.3.2.3, 1.009.3.2.4, 1.009.3.2.5, 1.009.3.2.6, 1.009.3.2.7, 1.009.3.2.8, 1.009.3.2.9, 1.009.3.2.10, 1.009.3.2.11, 1.009.3.2.12, 1.009.3.2.13, 1.009.3.2.14, 1.009.3.2.15, 1.009.3.2.16, 1.009.3.2.17, 1.009.3.2.18, 1.009.3.2.19, 1.009.3.2.20, 1.009.3.2.21, 1.009.3.2.22, 1.009.3.2.23, 1.009.3.2.24, 1.009.3.2.25, 1.009.3.2.26, 1.009.3.2.27, 1.009.3.2.28, 1.009.3.2.29, 1.009.3.2.30, 1.009.3.2.31, 1.009.3.2.32, 1.009.3.2.33, 1.009.3.2.34, 1.009.4, 1.009.4.1, 1.009.4.2, 1.009.5, 1.009.5.1, 1.009.5.2, 1.009.6 | p.84-101 | FR-RN-101 | TC-RN-101.1, 101.2, 101.3, 101.4, 101.5 (8 cases) |
+|  | 1.009.7 | p.101 | FR-RN-100 | TC-RN-100.1, 100.2, 100.3 (4 cases) |
+| 1.010 Generate Renewal Advice | 1.010.1, 1.010.2, 1.010.2.1, 1.010.2.2, 1.010.3, 1.010.3.1, 1.010.3.2, 1.010.3.3, 1.010.4, 1.010.4.1, 1.010.4.2, 1.010.5, 1.010.5.1, 1.010.5.2 | p.102-103 | FR-RN-080 | TC-RN-080.1, 080.2, 080.3, 080.4, 080.5 (12 cases) |
+|  | 1.010.6, 1.010.7 | p.103 | FR-RN-081 | TC-RN-081.1, 081.2, 081.3, 081.4 (8 cases) |
+| 1.011 Override accounts | 1.011.1, 1.011.1.1, 1.011.1.2, 1.011.1.3 | p.104 | FR-RN-051 | TC-RN-051.1, 051.2, 051.3, 051.4, 051.5 (8 cases) |
+| 2.001 Log in | 2.001.1, 2.001.1.1, 2.001.1.2, 2.001.1.3 | p.104-105 | FR-RN-001 | TC-RN-001.1, 001.2, 001.3, 001.4, 001.5, 001.6 (13 cases) |
+| 2.002 Open in several tabs | 2.002.1 | p.105 | FR-RN-001 | TC-RN-001.1, 001.2, 001.3, 001.4, 001.5, 001.6 (13 cases) |
+| 2.003 View accounts for disposition | 2.003.1, 2.003.1.1 | p.105 | FR-RN-040 | TC-RN-040.1, 040.2, 040.3, 040.4, 040.5 (7 cases) |
+|  | 2.003.1.2 | p.105 | FR-RN-040, FR-RN-041 | TC-RN-040.1, 040.2, 040.3, 040.4, 040.5, 041.1, 041.2, 041.3, 041.4 (15 cases) |
+|  | 2.003.1.3, 2.003.1.4, 2.003.1.5 | p.105-106 | FR-RN-040 | TC-RN-040.1, 040.2, 040.3, 040.4, 040.5 (7 cases) |
+|  | 2.003.1.6 | p.106 | OUT (p.60) | - |
+|  | 2.003.2, 2.003.3, 2.003.3.1, 2.003.3.2 | p.106 | FR-RN-041 | TC-RN-041.1, 041.2, 041.3, 041.4 (8 cases) |
+| 2.004 Provide disposition | 2.004.1, 2.004.2, 2.004.3, 2.004.3.1, 2.004.3.2, 2.004.3.3, 2.004.3.4, 2.004.3.5, 2.004.4, 2.004.4.1, 2.004.4.2, 2.004.4.3, 2.004.4.4, 2.004.4.5, 2.004.4.6, 2.004.4.7 | p.106-109 | FR-RN-043 | TC-RN-043.1, 043.2, 043.3, 043.4, 043.5 (10 cases) |
+|  | 2.004.4.8 | p.109 | FR-RN-043, FR-RN-031 | TC-RN-031.1, 031.2, 031.3, 031.4, 043.1, 043.2, 043.3, 043.4, 043.5 (17 cases) |
+|  | 2.004.4.9, 2.004.4.10, 2.004.5, 2.004.5.1, 2.004.5.2, 2.004.5.3 | p.109-110 | FR-RN-043 | TC-RN-043.1, 043.2, 043.3, 043.4, 043.5 (10 cases) |
+|  | 2.004.6, 2.004.7, 2.004.8 | p.110 | FR-RN-044 | TC-RN-044.1, 044.2 (5 cases) |
+|  | 2.004.9 | p.110 | FR-RN-080 | TC-RN-080.1, 080.2, 080.3, 080.4, 080.5 (12 cases) |
+|  | 2.004.10 | p.110 | FR-RN-047 | TC-RN-047.1, 047.2, 047.3 (6 cases) |
+| 2.005 Transfer account to other units | 2.005.1, 2.005.2, 2.005.3, 2.005.3.1, 2.005.3.2, 2.005.4, 2.005.5 | p.110-111 | FR-RN-031 | TC-RN-031.1, 031.2, 031.3, 031.4 (7 cases) |
+| 2.006 View the list of dispositioned accounts | 2.006.1, 2.006.1.1, 2.006.1.1.1, 2.006.1.1.2 | p.111-112 | FR-RN-045 | TC-RN-045.1, 045.2, 045.3 (3 cases) |
+|  | 2.006.1.2 | p.112 | OUT (p.60) | - |
+|  | 2.006.1.3, 2.006.1.4 | p.112 | FR-RN-045 | TC-RN-045.1, 045.2, 045.3 (3 cases) |
+|  | 2.006.1.5, 2.006.1.5.1, 2.006.1.5.2, 2.006.1.5.3, 2.006.1.6 | p.112-113 | FR-RN-044 | TC-RN-044.1, 044.2 (5 cases) |
+| 2.007 Update the returned accounts | 2.007.1, 2.007.2, 2.007.3, 2.007.4 | p.113 | FR-RN-046 | TC-RN-046.1, 046.2, 046.3 (4 cases) |
+|  | 2.007.4.1 | p.114 | OUT (p.60) | - |
+|  | 2.007.4.2, 2.007.4.3, 2.007.4.4, 2.007.4.5, 2.007.4.6, 2.007.4.7, 2.007.5 | p.114 | FR-RN-046 | TC-RN-046.1, 046.2, 046.3 (4 cases) |
+| 2.008 Generate report | 2.008.1, 2.008.1.1, 2.008.1.2, 2.008.2, 2.008.2.1, 2.008.2.2, 2.008.2.3, 2.008.2.4, 2.008.2.5, 2.008.2.6, 2.008.2.7, 2.008.2.8, 2.008.2.9, 2.008.2.10, 2.008.2.11, 2.008.2.12, 2.008.2.13, 2.008.2.14, 2.008.2.15, 2.008.2.16, 2.008.2.17, 2.008.2.18, 2.008.2.19, 2.008.2.20, 2.008.2.21, 2.008.2.22, 2.008.2.23, 2.008.2.24, 2.008.2.25, 2.008.2.26, 2.008.2.27, 2.008.2.28, 2.008.2.29, 2.008.2.30, 2.008.2.31, 2.008.2.32, 2.008.2.33, 2.008.2.34, 2.008.2.35, 2.008.2.36, 2.008.2.37, 2.008.2.38, 2.008.2.39, 2.008.2.40, 2.008.3, 2.008.3.1, 2.008.3.1.1, 2.008.3.1.2, 2.008.3.1.3, 2.008.3.1.4, 2.008.3.1.5, 2.008.3.1.6, 2.008.3.1.7, 2.008.3.1.8, 2.008.3.1.9, 2.008.3.1.10, 2.008.3.1.11, 2.008.3.1.12, 2.008.3.1.13, 2.008.3.1.14, 2.008.3.1.15, 2.008.3.1.16, 2.008.3.1.17, 2.008.3.1.18, 2.008.3.1.19, 2.008.3.1.20, 2.008.3.1.21, 2.008.3.1.22, 2.008.3.1.23, 2.008.3.1.24, 2.008.3.1.25, 2.008.3.1.26, 2.008.3.1.27, 2.008.3.1.28, 2.008.3.1.29, 2.008.3.1.30, 2.008.3.1.31, 2.008.3.1.32, 2.008.3.1.33, 2.008.3.1.34, 2.008.3.1.35, 2.008.3.1.36, 2.008.3.1.37, 2.008.3.2, 2.008.3.2.1, 2.008.3.2.2, 2.008.3.2.3, 2.008.3.2.4, 2.008.3.2.5, 2.008.3.2.6, 2.008.3.2.7, 2.008.3.2.8, 2.008.3.2.9, 2.008.3.2.10, 2.008.3.2.11, 2.008.3.2.12, 2.008.3.2.13, 2.008.3.2.14, 2.008.3.2.15, 2.008.3.2.16, 2.008.3.2.17, 2.008.3.2.18, 2.008.3.2.19, 2.008.3.2.20, 2.008.3.2.21, 2.008.3.2.22, 2.008.3.2.23, 2.008.3.2.24, 2.008.3.2.25, 2.008.3.2.26, 2.008.3.2.27, 2.008.3.2.28, 2.008.3.2.29, 2.008.3.2.30, 2.008.3.2.31, 2.008.3.2.32, 2.008.3.2.33, 2.008.3.2.34, 2.008.4, 2.008.4.1, 2.008.4.2, 2.008.5, 2.008.5.1, 2.008.5.2, 2.008.6 | p.115-132 | FR-RN-101 | TC-RN-101.1, 101.2, 101.3, 101.4, 101.5 (8 cases) |
+| 2.009 Generate Renewal Advice | 2.009.1, 2.009.2, 2.009.2.1, 2.009.2.2, 2.009.3, 2.009.3.1, 2.009.3.2, 2.009.3.3, 2.009.4, 2.009.4.1, 2.009.4.2, 2.009.5, 2.009.5.1, 2.009.5.2 | p.132-133 | FR-RN-080 | TC-RN-080.1, 080.2, 080.3, 080.4, 080.5 (12 cases) |
+|  | 2.009.6, 2.009.7, 2.009.7.1 | p.134 | FR-RN-081 | TC-RN-081.1, 081.2, 081.3, 081.4 (8 cases) |
+| 3.001 Log in | 3.001.1, 3.001.1.1, 3.001.1.2, 3.001.1.3 | p.134 | FR-RN-001 | TC-RN-001.1, 001.2, 001.3, 001.4, 001.5, 001.6 (13 cases) |
+| 3.002 Open in several tabs | 3.002.1 | p.134 | FR-RN-001 | TC-RN-001.1, 001.2, 001.3, 001.4, 001.5, 001.6 (13 cases) |
+| 3.003 Generate list of accounts for processing | 3.003.1, 3.003.1.1, 3.003.2 | p.135 | FR-RN-011 | TC-RN-011.1, 011.2, 011.3, 011.4 (7 cases) |
+|  | 3.003.3, 3.003.3.1, 3.003.3.2, 3.003.3.3, 3.003.3.4, 3.003.3.5, 3.003.3.6, 3.003.3.7, 3.003.3.8, 3.003.3.9, 3.003.3.10, 3.003.3.11, 3.003.3.12, 3.003.3.13 | p.135-137 | FR-RN-012 | TC-RN-012.1, 012.2, 012.3 (6 cases) |
+|  | 3.003.4, 3.003.4.1 | p.137 | FR-RN-013 | TC-RN-013.1, 013.2, 013.3, 013.4, 013.5 (9 cases) |
+|  | 3.003.4.1.1 | p.137 | OUT (p.60) | - |
+|  | 3.003.4.1.2 | p.138 | FR-RN-013 | TC-RN-013.1, 013.2, 013.3, 013.4, 013.5 (9 cases) |
+|  | 3.003.4.1.3 | p.138 | OUT (p.60) | - |
+|  | 3.003.4.1.4, 3.003.4.1.5, 3.003.4.1.6, 3.003.4.1.7, 3.003.4.1.8, 3.003.4.1.9, 3.003.4.1.10, 3.003.4.1.11, 3.003.4.1.12, 3.003.4.1.13, 3.003.4.1.14, 3.003.4.1.15, 3.003.4.1.16, 3.003.4.1.17, 3.003.4.1.18, 3.003.4.1.19, 3.003.4.1.20, 3.003.4.1.21 | p.138-140 | FR-RN-013 | TC-RN-013.1, 013.2, 013.3, 013.4, 013.5 (9 cases) |
+|  | 3.003.4.2 | p.140 | FR-RN-010 | TC-RN-010.1, 010.2, 010.3, 010.4, 010.5, 010.6 (7 cases) |
+|  | 3.003.4.3, 3.003.4.4 | p.140 | FR-RN-013 | TC-RN-013.1, 013.2, 013.3, 013.4, 013.5 (9 cases) |
+|  | 3.003.4.5 | p.141 | OUT (p.60) | - |
+|  | 3.003.5, 3.003.6, 3.003.7, 3.003.7.1, 3.003.7.2 | p.141 | FR-RN-014 | TC-RN-014.1, 014.2, 014.3, 014.4 (6 cases) |
+| 3.004 Upload dispositioned file | 3.004.1, 3.004.1.1, 3.004.1.2, 3.004.2, 3.004.3, 3.004.3.1, 3.004.4 | p.141-142 | FR-RN-060 | TC-RN-060.1, 060.2, 060.3, 060.4 (8 cases) |
+|  | 3.004.5 | p.143 | FR-RN-047 | TC-RN-047.1, 047.2, 047.3 (6 cases) |
+| 3.005 Assign accounts | 3.005.1, 3.005.1.1, 3.005.1.1.1, 3.005.1.1.2, 3.005.1.2, 3.005.1.2.1, 3.005.1.2.2, 3.005.1.3, 3.005.1.4, 3.005.1.5, 3.005.1.6 | p.143-144 | FR-RN-061 | TC-RN-061.1, 061.2, 061.3 (5 cases) |
+| 3.006 View accounts for processing | 3.006.1 | p.144 | FR-RN-062 | TC-RN-062.1, 062.2 (3 cases) |
+|  | 3.006.1.1, 3.006.1.2 | p.144 | FR-RN-062, FR-RN-041 | TC-RN-041.1, 041.2, 041.3, 041.4, 062.1, 062.2 (11 cases) |
+|  | 3.006.1.3, 3.006.1.4 | p.145 | FR-RN-062 | TC-RN-062.1, 062.2 (3 cases) |
+|  | 3.006.1.5 | p.145 | FR-RN-013 | TC-RN-013.1, 013.2, 013.3, 013.4, 013.5 (9 cases) |
+|  | 3.006.1.6 | p.145 | FR-RN-062 | TC-RN-062.1, 062.2 (3 cases) |
+|  | 3.006.2, 3.006.3, 3.006.3.1, 3.006.3.2 | p.145 | FR-RN-041 | TC-RN-041.1, 041.2, 041.3, 041.4 (8 cases) |
+| 3.007 Update data on an account | 3.007.1, 3.007.2, 3.007.3, 3.007.3.1, 3.007.3.2, 3.007.3.3, 3.007.3.4 | p.146 | FR-RN-063 | TC-RN-063.1, 063.2, 063.3, 063.4 (5 cases) |
+| 3.008 Review computations; return | 3.008.1, 3.008.1.1 | p.147 | FR-RN-064 | TC-RN-064.1, 064.2, 064.3 (3 cases) |
+|  | 3.008.2, 3.008.2.1, 3.008.2.2, 3.008.2.3, 3.008.2.4, 3.008.2.5, 3.008.2.6, 3.008.2.7 | p.147-148 | FR-RN-065 | TC-RN-065.1, 065.2 (4 cases) |
+| 3.009 Extract accounts per insurer | 3.009.1, 3.009.1.1, 3.009.1.2, 3.009.1.3, 3.009.1.4, 3.009.1.4.1, 3.009.1.4.2, 3.009.1.4.3, 3.009.1.4.4, 3.009.1.4.5, 3.009.1.4.6, 3.009.1.4.7, 3.009.1.4.8, 3.009.1.4.9, 3.009.1.4.10, 3.009.1.4.11, 3.009.1.4.12, 3.009.1.4.13, 3.009.1.4.14, 3.009.1.4.15, 3.009.1.4.16, 3.009.1.4.17, 3.009.1.4.18, 3.009.1.4.19, 3.009.1.4.20, 3.009.1.4.21, 3.009.1.4.22, 3.009.1.4.23, 3.009.1.4.24, 3.009.1.4.25, 3.009.1.4.26, 3.009.1.4.27, 3.009.1.4.28 | p.148-152 | FR-RN-070 | TC-RN-070.1, 070.2, 070.3, 070.4, 070.5 (9 cases) |
+|  | 3.009.2, 3.009.3, 3.009.4, 3.009.4.1, 3.009.4.2 | p.152-153 | FR-RN-070, FR-RN-103 | TC-RN-070.1, 070.2, 070.3, 070.4, 070.5, 103.1, 103.2, 103.3 (17 cases) |
+|  | 3.009.5, 3.009.5.1 | p.153 | FR-RN-070 | TC-RN-070.1, 070.2, 070.3, 070.4, 070.5 (9 cases) |
+|  | 3.009.6, 3.009.6.1, 3.009.6.2 | p.153 | FR-RN-071 | TC-RN-071.1, 071.2, 071.3, 071.4 (9 cases) |
+| 3.010 Generate report | 3.010.1, 3.010.1.1, 3.010.1.2, 3.010.2, 3.010.2.1, 3.010.2.2, 3.010.2.3, 3.010.2.4, 3.010.2.5, 3.010.2.6, 3.010.2.7, 3.010.2.8, 3.010.2.9, 3.010.2.10, 3.010.2.11, 3.010.2.12, 3.010.2.13, 3.010.2.14, 3.010.2.15, 3.010.2.16, 3.010.2.17, 3.010.2.18, 3.010.2.19, 3.010.2.20, 3.010.2.21, 3.010.2.22, 3.010.2.23, 3.010.2.24, 3.010.2.25, 3.010.2.26, 3.010.2.27, 3.010.2.28, 3.010.2.29, 3.010.2.30, 3.010.2.31, 3.010.2.32, 3.010.2.33, 3.010.2.34, 3.010.2.35, 3.010.2.36, 3.010.2.37, 3.010.2.38, 3.010.2.39, 3.010.2.40, 3.010.3, 3.010.3.1, 3.010.3.1.1, 3.010.3.1.2, 3.010.3.1.3, 3.010.3.1.4, 3.010.3.1.5, 3.010.3.1.6, 3.010.3.1.7, 3.010.3.1.8, 3.010.3.1.9, 3.010.3.1.10, 3.010.3.1.11, 3.010.3.1.12, 3.010.3.1.13, 3.010.3.1.14, 3.010.3.1.15, 3.010.3.1.16, 3.010.3.1.17, 3.010.3.1.18, 3.010.3.1.19, 3.010.3.1.20, 3.010.3.1.21, 3.010.3.1.22, 3.010.3.1.23, 3.010.3.1.24, 3.010.3.1.25, 3.010.3.1.26, 3.010.3.1.27, 3.010.3.1.28, 3.010.3.1.29, 3.010.3.1.30, 3.010.3.1.31, 3.010.3.1.32, 3.010.3.1.33, 3.010.3.1.34, 3.010.3.1.35, 3.010.3.1.36, 3.010.3.1.37, 3.010.3.1.38, 3.010.3.1.39, 3.010.3.1.40, 3.010.3.2, 3.010.3.2.1, 3.010.3.2.2, 3.010.3.2.3, 3.010.3.2.4, 3.010.3.2.5, 3.010.3.2.6, 3.010.3.2.7, 3.010.3.2.8, 3.010.3.2.9, 3.010.3.2.10, 3.010.3.2.11, 3.010.3.2.12, 3.010.3.2.13, 3.010.3.2.14, 3.010.3.2.15, 3.010.3.2.16, 3.010.3.2.17, 3.010.3.2.18, 3.010.3.2.19, 3.010.3.2.20, 3.010.3.2.21, 3.010.3.2.22, 3.010.3.2.23, 3.010.3.2.24, 3.010.3.2.25, 3.010.3.2.26, 3.010.3.2.27, 3.010.3.2.28, 3.010.3.2.29, 3.010.3.2.30, 3.010.3.2.31, 3.010.3.2.32, 3.010.3.2.33, 3.010.3.2.34, 3.010.4, 3.010.4.1, 3.010.4.2, 3.010.5, 3.010.5.1, 3.010.5.2, 3.010.6 | p.153-171 | FR-RN-101 | TC-RN-101.1, 101.2, 101.3, 101.4, 101.5 (8 cases) |
+|  | 3.010.7 | p.171 | FR-RN-100 | TC-RN-100.1, 100.2, 100.3 (4 cases) |
+| 3.011 Generate Renewal Advice | 3.011.1, 3.011.2, 3.011.2.1, 3.011.2.2, 3.011.3, 3.011.3.1, 3.011.3.2, 3.011.3.3, 3.011.4, 3.011.4.1, 3.011.4.2, 3.011.5, 3.011.5.1, 3.011.5.2 | p.171-173 | FR-RN-080 | TC-RN-080.1, 080.2, 080.3, 080.4, 080.5 (12 cases) |
+|  | 3.011.6, 3.011.7, 3.011.7.1 | p.173 | FR-RN-081 | TC-RN-081.1, 081.2, 081.3, 081.4 (8 cases) |
+| 4.001 Log in | 4.001.1, 4.001.1.1, 4.001.1.2, 4.001.1.3 | p.174 | FR-RN-001 | TC-RN-001.1, 001.2, 001.3, 001.4, 001.5, 001.6 (13 cases) |
+| 4.002 Open in several tabs | 4.002.1 | p.174 | FR-RN-001 | TC-RN-001.1, 001.2, 001.3, 001.4, 001.5, 001.6 (13 cases) |
+| 4.003 View accounts for processing | 4.003.1 | p.174 | FR-RN-062 | TC-RN-062.1, 062.2 (3 cases) |
+|  | 4.003.1.1, 4.003.1.2 | p.175 | FR-RN-062, FR-RN-041 | TC-RN-041.1, 041.2, 041.3, 041.4, 062.1, 062.2 (11 cases) |
+|  | 4.003.1.3, 4.003.1.4 | p.175 | FR-RN-062 | TC-RN-062.1, 062.2 (3 cases) |
+|  | 4.003.1.5 | p.175 | FR-RN-013 | TC-RN-013.1, 013.2, 013.3, 013.4, 013.5 (9 cases) |
+|  | 4.003.1.6 | p.175 | OUT (p.60) | - |
+|  | 4.003.2, 4.003.3, 4.003.3.1, 4.003.3.2 | p.176 | FR-RN-041 | TC-RN-041.1, 041.2, 041.3, 041.4 (8 cases) |
+| 4.004 Upload dispositioned file | 4.004.1, 4.004.1.1, 4.004.1.2, 4.004.2, 4.004.3, 4.004.3.1 | p.176-177 | FR-RN-060 | TC-RN-060.1, 060.2, 060.3, 060.4 (8 cases) |
+| 4.005 Update data on an account | 4.005.1, 4.005.2, 4.005.3, 4.005.3.1, 4.005.3.2, 4.005.3.3, 4.005.3.4 | p.177-178 | FR-RN-063 | TC-RN-063.1, 063.2, 063.3, 063.4 (5 cases) |
+| 4.006 Review computations; return | 4.006.1, 4.006.1.1 | p.178 | FR-RN-064 | TC-RN-064.1, 064.2, 064.3 (3 cases) |
+|  | 4.006.2, 4.006.2.1, 4.006.2.2, 4.006.2.3, 4.006.2.4, 4.006.2.5, 4.006.2.6, 4.006.2.7 | p.178-179 | FR-RN-065 | TC-RN-065.1, 065.2 (4 cases) |
+| 4.007 Extract accounts per insurer | 4.007.1, 4.007.1.1, 4.007.1.2, 4.007.1.3, 4.007.1.4, 4.007.1.4.1, 4.007.1.4.2, 4.007.1.4.3, 4.007.1.4.4, 4.007.1.4.5, 4.007.1.4.6, 4.007.1.4.7, 4.007.1.4.8, 4.007.1.4.9, 4.007.1.4.10, 4.007.1.4.11, 4.007.1.4.12, 4.007.1.4.13, 4.007.1.4.14, 4.007.1.4.15, 4.007.1.4.16, 4.007.1.4.17, 4.007.1.4.18, 4.007.1.4.19, 4.007.1.4.20, 4.007.1.4.21, 4.007.1.4.22, 4.007.1.4.23, 4.007.1.4.24, 4.007.1.4.25, 4.007.1.4.26, 4.007.1.4.27, 4.007.1.4.28 | p.179-183 | FR-RN-070 | TC-RN-070.1, 070.2, 070.3, 070.4, 070.5 (9 cases) |
+|  | 4.007.2, 4.007.3, 4.007.4, 4.007.4.1, 4.007.4.2 | p.184 | FR-RN-070, FR-RN-103 | TC-RN-070.1, 070.2, 070.3, 070.4, 070.5, 103.1, 103.2, 103.3 (17 cases) |
+|  | 4.007.5, 4.007.5.1 | p.184 | FR-RN-070 | TC-RN-070.1, 070.2, 070.3, 070.4, 070.5 (9 cases) |
+|  | 4.007.6, 4.007.6.1, 4.007.6.2 | p.185 | FR-RN-071 | TC-RN-071.1, 071.2, 071.3, 071.4 (9 cases) |
+| 4.008 Generate report | 4.008.1, 4.008.1.1, 4.008.1.2, 4.008.2, 4.008.2.1, 4.008.2.2, 4.008.2.3, 4.008.2.4, 4.008.2.5, 4.008.2.6, 4.008.2.7, 4.008.2.8, 4.008.2.9, 4.008.2.10, 4.008.2.11, 4.008.2.12, 4.008.2.13, 4.008.2.14, 4.008.2.15, 4.008.2.16, 4.008.2.17, 4.008.2.18, 4.008.2.19, 4.008.2.20, 4.008.2.21, 4.008.2.22, 4.008.2.23, 4.008.2.24, 4.008.2.25, 4.008.2.26, 4.008.2.27, 4.008.2.28, 4.008.2.29, 4.008.2.30, 4.008.2.31, 4.008.2.32, 4.008.2.33, 4.008.2.34, 4.008.2.35, 4.008.2.36, 4.008.2.37, 4.008.2.38, 4.008.2.39, 4.008.2.40, 4.008.3, 4.008.3.1, 4.008.3.1.1, 4.008.3.1.2, 4.008.3.1.3, 4.008.3.1.4, 4.008.3.1.5, 4.008.3.1.6, 4.008.3.1.7, 4.008.3.1.8, 4.008.3.1.9, 4.008.3.1.10, 4.008.3.1.11, 4.008.3.1.12, 4.008.3.1.13, 4.008.3.1.14, 4.008.3.1.15, 4.008.3.1.16, 4.008.3.1.17, 4.008.3.1.18, 4.008.3.1.19, 4.008.3.1.20, 4.008.3.1.21, 4.008.3.1.22, 4.008.3.1.23, 4.008.3.1.24, 4.008.3.1.25, 4.008.3.1.26, 4.008.3.1.27, 4.008.3.1.28, 4.008.3.1.29, 4.008.3.1.30, 4.008.3.1.31, 4.008.3.1.32, 4.008.3.1.33, 4.008.3.1.34, 4.008.3.1.35, 4.008.3.1.36, 4.008.3.1.37, 4.008.3.1.38, 4.008.3.1.39, 4.008.3.1.40, 4.008.3.2, 4.008.3.2.1, 4.008.3.2.2, 4.008.3.2.3, 4.008.3.2.4, 4.008.3.2.5, 4.008.3.2.6, 4.008.3.2.7, 4.008.3.2.8, 4.008.3.2.9, 4.008.3.2.10, 4.008.3.2.11, 4.008.3.2.12, 4.008.3.2.13, 4.008.3.2.14, 4.008.3.2.15, 4.008.3.2.16, 4.008.3.2.17, 4.008.3.2.18, 4.008.3.2.19, 4.008.3.2.20, 4.008.3.2.21, 4.008.3.2.22, 4.008.3.2.23, 4.008.3.2.24, 4.008.3.2.25, 4.008.3.2.26, 4.008.3.2.27, 4.008.3.2.28, 4.008.3.2.29, 4.008.3.2.30, 4.008.3.2.31, 4.008.3.2.32, 4.008.3.2.33, 4.008.3.2.34, 4.008.4, 4.008.4.1, 4.008.4.2, 4.008.5, 4.008.5.1, 4.008.5.2, 4.008.6 | p.185-203 | FR-RN-101 | TC-RN-101.1, 101.2, 101.3, 101.4, 101.5 (8 cases) |
+| 4.09 Generate Renewal Advice | 4.09.1, 4.09.2, 4.09.2.1, 4.09.2.2, 4.09.2.3, 4.09.3, 4.09.3.1, 4.09.3.2, 4.09.4, 4.09.4.1, 4.09.4.2, 4.09.5, 4.09.5.1, 4.09.5.2 | p.203-204 | FR-RN-080 | TC-RN-080.1, 080.2, 080.3, 080.4, 080.5 (12 cases) |
+|  | 4.09.6, 4.09.7 | p.204-205 | FR-RN-081 | TC-RN-081.1, 081.2, 081.3, 081.4 (8 cases) |
+| 5.001 Log in | 5.001.1, 5.001.1.1, 5.001.1.2, 5.001.1.3 | p.205 | FR-RN-001 | TC-RN-001.1, 001.2, 001.3, 001.4, 001.5, 001.6 (13 cases) |
+| 5.002 Open in several tabs | 5.002.1 | p.205 | FR-RN-001 | TC-RN-001.1, 001.2, 001.3, 001.4, 001.5, 001.6 (13 cases) |
+| 5.003 Maintain lists of values | 5.003.1, 5.003.2, 5.003.3, 5.003.4, 5.003.5 | p.205-206 | FR-RN-110 | TC-RN-110.1, 110.2, 110.3, 110.4 (4 cases) |
+| 5.004 Maintain users | 5.004.1 | p.206 | FR-RN-003 | TC-RN-003.1, 003.2, 003.3, 003.4 (6 cases) |
+| 5.005 Update the RA template | 5.005.1 | p.206 | FR-RN-111 | TC-RN-111.1, 111.2 (2 cases) |
+| 6.001 Access the application | 6.001.1, 6.001.1.1 | p.206 | FR-RN-001 | TC-RN-001.1, 001.2, 001.3, 001.4, 001.5, 001.6 (13 cases) |
+| 6.002 Manage users, profiles and functions | 6.002.1, 6.002.1.2, 6.002.1.3, 6.002.1.4, 6.002.1.5, 6.002.1.6, 6.002.2, 6.002.2.1, 6.002.2.2, 6.002.2.3, 6.002.2.4, 6.002.2.5, 6.002.2.6, 6.002.2.7, 6.002.2.8, 6.002.2.9, 6.002.2.10, 6.002.2.11, 6.002.2.12, 6.002.2.13, 6.002.2.14, 6.002.2.15, 6.002.2.16, 6.002.2.17, 6.002.2.18, 6.002.2.19, 6.002.2.20, 6.002.2.21, 6.002.2.22 | p.206-211 | FR-RN-003 | TC-RN-003.1, 003.2, 003.3, 003.4 (6 cases) |
+|  | 6.002.2.23 | p.211 | FR-RN-003, FR-RN-110 | TC-RN-003.1, 003.2, 003.3, 003.4, 110.1, 110.2, 110.3, 110.4 (10 cases) |
+|  | 6.002.2.24 | p.211 | FR-RN-003 | TC-RN-003.1, 003.2, 003.3, 003.4 (6 cases) |
+|  | 6.002.2.25 | p.211 | FR-RN-003, FR-RN-111 | TC-RN-003.1, 003.2, 003.3, 003.4, 111.1, 111.2 (8 cases) |
 
 ## Out-of-scope IDs
 
-<!-- table: widths=2.8,7.8,6,5.2 caption="IDs out of scope (Addendum 1, p.34) and test cases" size=8.5 -->
+<!-- table: widths=2.8,7.8,6,5.2 caption="IDs out of scope (Addendum 1, p.60) and test cases" size=8.5 -->
 | BRD ID | Requirement | Replaced by | Test cases |
 |---|---|---|---|
-| 1.003.4.1.1.1 (p.47) | Expiring EBIX Invoice No. column | BIBS expiring invoice no. (FR-RN-013) | - |
-| 1.003.4.1.1.3 (p.47) | BDOIsys Reference No. column | Renewal reference and ARN (FR-RN-013) | - |
-| 2.003.1.6 (p.80) | Search via QPS / EBIX reference numbers | Name and BIBS reference search (FR-RN-040) | - |
-| 2.006.1.2 (p.86) | Search via QPS / EBIX reference numbers | As above | - |
-| 2.007.4.1 (p.88) | Search via QPS / EBIX reference numbers | As above | - |
-| 3.003.4.1.1 (p.111) | Expiring EBIX Invoice No. column | BIBS expiring invoice no. (FR-RN-013) | - |
-| 3.003.4.1.3 (p.112) | BDOIsys Reference No. column | Renewal reference and ARN (FR-RN-013) | - |
-| 3.003.4.5 (p.115) | Search via QPS / EBIX reference numbers | Name and BIBS reference search (FR-RN-013) | - |
-| 4.003.1.6 (p.150) | Search via QPS / EBIX reference numbers | Name and BIBS reference search (FR-RN-013) | - |
+| 1.003.4.1.1.1 (p.73) | Expiring EBIX Invoice No. column | BIBS expiring invoice no. (FR-RN-013) | - |
+| 1.003.4.1.1.3 (p.73) | BDOIsys Reference No. column | Renewal reference and ARN (FR-RN-013) | - |
+| 2.003.1.6 (p.106) | Search via QPS / EBIX reference numbers | Name and BIBS reference search (FR-RN-040) | - |
+| 2.006.1.2 (p.112) | Search via QPS / EBIX reference numbers | As above | - |
+| 2.007.4.1 (p.114) | Search via QPS / EBIX reference numbers | As above | - |
+| 3.003.4.1.1 (p.137) | Expiring EBIX Invoice No. column | BIBS expiring invoice no. (FR-RN-013) | - |
+| 3.003.4.1.3 (p.138) | BDOIsys Reference No. column | Renewal reference and ARN (FR-RN-013) | - |
+| 3.003.4.5 (p.141) | Search via QPS / EBIX reference numbers | Name and BIBS reference search (FR-RN-013) | - |
+| 4.003.1.6 (p.176) | Search via QPS / EBIX reference numbers | Name and BIBS reference search (FR-RN-013) | - |
 
 # Proposed business rules and clarifications for confirmation
 

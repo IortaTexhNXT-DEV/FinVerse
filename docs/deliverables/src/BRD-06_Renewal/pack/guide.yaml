@@ -5,7 +5,7 @@ meta:
   deck_title: Sign-off Pack Guide
   module: Renewal
   owner: "Marketing (Retail, Corporate and Commercial), Processing and Marketing Business Services and System Support"
-  issued: Fri 2-Oct-2026
+  issued: Thu 8-Oct-2026
   signoff_date: Fri 27-Nov-2026
 
 # The documents of the set in reading order. kind = doc type of the file name (brand.READING_ORDER).
@@ -48,7 +48,7 @@ steps:
     who: "R: iorta TechNXT Project Manager; A: iorta TechNXT delivery lead; I: all reviewers"
     inputs: "FRS v2.0, workbook, test plan, guide and deck"
     outputs: "Release set v2.0 in the BRD-06 folder; invitations to the sessions"
-    duration: "Day 0 (Fri 2-Oct-2026); sessions in the Drop 1 window of November 2026"
+    duration: "Day 0 (Thu 8-Oct-2026); sessions in the Drop 1 window of November 2026"
   - step: 2
     name: Kick-off and screen walkthrough on SIT
     who: "R: iorta TechNXT Business Analysis; A: BDOI Product Owner; C: Marketing and Processing input providers, MBS; I: Contact Center, LAMD, BDOI IT"

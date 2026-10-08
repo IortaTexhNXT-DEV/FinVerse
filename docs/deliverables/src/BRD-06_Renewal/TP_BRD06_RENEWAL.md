@@ -72,7 +72,7 @@ The main BRD repeats most capabilities once per persona. The FRS traces its 1,03
 
 ## Out of scope
 
-- The nine BRD IDs that reference BDOIsys, EBIX or QPS (Addendum 1, p.34; FRS section 11.3). Negative cases confirm that no EBIX or QPS search or column is offered.
+- The nine BRD IDs that reference BDOIsys, EBIX or QPS (Addendum 1, p.60; FRS section 11.3). Negative cases confirm that no EBIX or QPS search or column is offered.
 - Renewal of Employee Benefits programmes (BRD-8, decision D3). A case confirms that HMO lines are not extracted.
 - Renewal of package products (BRD-3). Placement, issuance and booking of the renewal account are BRD-1 functions; the cases stop at the booked invoice of business type RENEWAL.
 - Performance and volume testing beyond the two timing cases (20,000-row list, 30,000-row report). The NFRs of FRS section 8 are tested in the BIBS-wide performance test plan (deliverable 28).

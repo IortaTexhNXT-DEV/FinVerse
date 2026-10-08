@@ -2,14 +2,21 @@ package com.iortatechnxt.brokerverse.nbadmin.service;
 
 import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
-import com.iortatechnxt.brokerverse.docgen.service.DocumentComposer;
-import com.iortatechnxt.brokerverse.docgen.service.SheetSpec;
+import com.iortatechnxt.brokerverse.common.office.BrandAssets;
+import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
+import com.iortatechnxt.brokerverse.nbadmin.service.AccessMatrixWorkbook.Grid;
+import com.iortatechnxt.brokerverse.nbadmin.service.AccessMatrixWorkbook.Header;
 import com.iortatechnxt.brokerverse.nbadmin.service.PermissionActions.PermissionAction;
+import com.iortatechnxt.brokerverse.organization.domain.Company;
+import com.iortatechnxt.brokerverse.organization.domain.CompanyRepository;
 import com.iortatechnxt.brokerverse.security.domain.AppUser;
 import com.iortatechnxt.brokerverse.security.domain.Permission;
 import com.iortatechnxt.brokerverse.security.domain.Role;
 import com.iortatechnxt.brokerverse.security.service.UserAdminService;
+import com.iortatechnxt.brokerverse.security.service.UserDirectory;
 import com.iortatechnxt.brokerverse.system.service.ProductModules;
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -32,32 +39,52 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class AccessMatrixService {
 
+  private static final String TITLE = "User Access Matrix";
+
   private final UserAdminService userAdmin;
   private final PermissionActions actions;
-  private final DocumentComposer composer;
   private final AuditTrailService audit;
   private final ProductModules modules;
+  private final Printing printing;
+
+  /**
+   * Who and what the header of the exported workbook names.
+   *
+   * @param companies companies (the operating company in the header)
+   * @param currentUser the user exporting
+   * @param users display names
+   * @param clock clock (run date)
+   */
+  public record Printing(
+      CompanyRepository companies, CurrentUser currentUser, UserDirectory users, Clock clock) {}
 
   /**
    * Creates the service.
    *
    * @param userAdmin users and roles
    * @param actions permission action classes
-   * @param composer spreadsheet composer
    * @param audit audit trail
    * @param modules product module switches (permissions of switched-off modules are not shown)
+   * @param companies companies (the operating company in the header of the export)
+   * @param currentUser the user exporting
+   * @param users display names
+   * @param clock clock
    */
+  @SuppressWarnings("java:S107") // constructor injection
   public AccessMatrixService(
       UserAdminService userAdmin,
       PermissionActions actions,
-      DocumentComposer composer,
       AuditTrailService audit,
-      ProductModules modules) {
+      ProductModules modules,
+      CompanyRepository companies,
+      CurrentUser currentUser,
+      UserDirectory users,
+      Clock clock) {
     this.modules = modules;
     this.userAdmin = userAdmin;
     this.actions = actions;
-    this.composer = composer;
     this.audit = audit;
+    this.printing = new Printing(companies, currentUser, users, clock);
   }
 
   /**
@@ -143,9 +170,9 @@ public class AccessMatrixService {
   }
 
   /**
-   * The matrix as an Excel workbook: a sheet by permission (Y where granted, with the area and
-   * action classes) and a sheet by action (the permissions each role holds per area and action).
-   * The export is audited.
+   * The matrix as an Excel workbook in the report layout: a sheet by permission (Y where granted,
+   * with the area and action classes, the enabled users of each profile in the first row) and a
+   * sheet by action (the permissions each role holds per area and action). The export is audited.
    *
    * @return XLSX bytes
    */
@@ -164,12 +191,30 @@ public class AccessMatrixService {
             + " permissions, "
             + byAction.rows().size()
             + " area / action rows");
-    return composer.xlsx(List.of(permissionSheet(m), actionSheet(byAction)));
+    return AccessMatrixWorkbook.write(List.of(permissionSheet(m), actionSheet(byAction)));
   }
 
-  private static SheetSpec permissionSheet(AccessMatrix m) {
-    List<String> headers = new ArrayList<>(List.of("Permission", "Area", "Action class"));
-    m.roles().forEach(r -> headers.add(r.code()));
+  private Header header(String legend) {
+    String company =
+        printing
+            .companies()
+            .findFirstByOrderByIdAsc()
+            .map(Company::getName)
+            .orElse(BrandAssets.SYSTEM_NAME);
+    String user = printing.currentUser().username();
+    String name = printing.users().displayName(user);
+    return new Header(
+        company,
+        TITLE,
+        "Run By: "
+            + (name == null ? user : name)
+            + "   Run Date: "
+            + DisplayFormat.dateTime(printing.clock().instant()),
+        legend);
+  }
+
+  private Grid permissionSheet(AccessMatrix m) {
+    List<String> profiles = m.roles().stream().map(AccessMatrix.RoleColumn::code).toList();
     List<List<Object>> rows = new ArrayList<>();
     List<Object> users = new ArrayList<>(List.of("Enabled users", "", ""));
     m.roles().forEach(r -> users.add(r.enabledUsers()));
@@ -182,12 +227,23 @@ public class AccessMatrixService {
       m.roles().forEach(r -> line.add(row.roles().contains(r.code()) ? "Y" : ""));
       rows.add(line);
     }
-    return new SheetSpec("User Access Matrix", headers, rows);
+    String legend =
+        m.permissions().size()
+            + " permissions x "
+            + profiles.size()
+            + " group profiles. Y: the group profile holds the permission. First row: the enabled"
+            + " users of each group profile.";
+    return new Grid(
+        TITLE,
+        header(legend),
+        List.of("Permission", "Area", "Action class"),
+        profiles,
+        rows,
+        false);
   }
 
-  private static SheetSpec actionSheet(AccessMatrix.ByAction m) {
-    List<String> headers = new ArrayList<>(List.of("Area", "Action class", "Permissions"));
-    m.roles().forEach(r -> headers.add(r.code()));
+  private Grid actionSheet(AccessMatrix.ByAction m) {
+    List<String> profiles = m.roles().stream().map(AccessMatrix.RoleColumn::code).toList();
     List<List<Object>> rows = new ArrayList<>();
     for (AccessMatrix.ActionRow row : m.rows()) {
       List<Object> line = new ArrayList<>();
@@ -199,6 +255,17 @@ public class AccessMatrixService {
               r -> line.add(String.join(", ", row.grants().getOrDefault(r.code(), List.of()))));
       rows.add(line);
     }
-    return new SheetSpec("By Action", headers, rows);
+    String legend =
+        m.rows().size()
+            + " area and action class rows x "
+            + profiles.size()
+            + " group profiles. Each cell lists the permissions of the row the group profile holds.";
+    return new Grid(
+        "By Action",
+        header(legend),
+        List.of("Area", "Action class", "Permissions"),
+        profiles,
+        rows,
+        true);
   }
 }

@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 /**
  * Validated, typed access to report parameter values.
@@ -30,6 +31,10 @@ public final class ReportParameters {
 
   private final ReportMetadata metadata;
   private final Map<String, String> values;
+
+  /** An option code of a drop-down: capitals, digits and underscores. */
+  private static final Pattern OPTION_CODE = Pattern.compile("[A-Z][A-Z0-9_]*");
+
   private final ParameterDisplay display;
 
   private ReportParameters(
@@ -195,8 +200,18 @@ public final class ReportParameters {
     return lines;
   }
 
-  /** A parameter value as users read it: dates as dd-MMM-yyyy, ids by their name. */
+  /**
+   * A parameter value as users read it: dates as dd-MMM-yyyy, yes / no for a tick box, the option
+   * of a drop-down as its label (DIRECT_BILLED as "Direct Billed", ALL as "All"), ids by their
+   * name.
+   */
   private String shown(ParameterSpec spec, String value) {
+    if (spec.type() == ParameterType.BOOLEAN) {
+      return Boolean.parseBoolean(value.strip()) ? "Yes" : "No";
+    }
+    if (spec.type() == ParameterType.SELECT && OPTION_CODE.matcher(value).matches()) {
+      return DisplayFormat.label(value);
+    }
     if (spec.type() == ParameterType.DATE) {
       try {
         return DisplayFormat.date(LocalDate.parse(value));

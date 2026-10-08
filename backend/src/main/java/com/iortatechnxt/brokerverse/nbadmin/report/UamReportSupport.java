@@ -45,7 +45,7 @@ final class UamReportSupport {
   static final String NULL_TEXT = "Null";
 
   private static final DateTimeFormatter DATE_TIME =
-      DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm", Locale.ENGLISH);
+      DateTimeFormatter.ofPattern("dd-MMM-yyyy HH:mm", Locale.ENGLISH);
 
   /** Activity of a change log row as the audit report sample D words it (BRD 4.003.1). */
   private static final Map<String, String> ACTIVITIES =

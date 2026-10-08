@@ -57,6 +57,24 @@ class ReportParametersTest {
   }
 
   @Test
+  void tickBoxesPrintAsYesOrNoAndDropDownOptionsAsTheirLabels() {
+    ReportMetadata m =
+        metadata(
+            ParameterSpec.optional(
+                "signIns", "Include Log-ins and Log-outs", ParameterType.BOOLEAN),
+            ParameterSpec.select("bucket", "Bucket", List.of("ALL", "DIRECT_BILLED"), "ALL"),
+            ParameterSpec.optional("profile", "Group Profile", ParameterType.TEXT));
+    ReportParameters params =
+        ReportParameters.validate(
+            m, Map.of("signIns", "true", "bucket", "DIRECT_BILLED", "profile", "MKT_AO"), CLOCK);
+    assertThat(params.echo())
+        .containsExactly(
+            "Include Log-ins and Log-outs : Yes",
+            "Bucket : Direct Billed",
+            "Group Profile : MKT_AO");
+  }
+
+  @Test
   void requiredParameterSentBlankIsRejectedInsteadOfDefaulted() {
     Map<String, String> raw = new HashMap<>();
     raw.put("toDate", " ");

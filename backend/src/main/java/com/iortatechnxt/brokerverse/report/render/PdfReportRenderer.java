@@ -166,6 +166,8 @@ public class PdfReportRenderer implements ReportRenderer {
     }
     table.setWidths(widths(result, weights, first, width));
     table.setHeaderRows(1);
+    // A tall row continues on the next page instead of leaving the rest of the page empty.
+    table.setSplitLate(false);
     if (labels) {
       table.addCell(headCell(""));
     }

@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.common.office;
 import com.lowagie.text.Font;
 import com.lowagie.text.pdf.BaseFont;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -85,20 +86,31 @@ public final class PdfColumnWidths {
    */
   public float[] fit(float total) {
     float cap = total * LONGEST_VALUE_SHARE;
-    float[] both = new float[weights.length];
-    float[] head = new float[weights.length];
+    float[] minimum = new float[weights.length];
+    float[] value = new float[weights.length];
     for (int i = 0; i < weights.length; i++) {
-      head[i] = headMinimum[i] > 0 ? headMinimum[i] + padding : 0;
-      float value = valueMinimum[i] > 0 ? Math.min(valueMinimum[i], cap) + padding : 0;
-      both[i] = Math.max(head[i], value);
+      minimum[i] = headMinimum[i] > 0 ? headMinimum[i] + padding : 0;
+      value[i] = valueMinimum[i] > 0 ? Math.min(valueMinimum[i], cap) + padding : 0;
     }
-    if (sum(both) <= total) {
-      return share(both, total);
+    if (sum(minimum) > total) {
+      return share(new float[weights.length], total);
     }
-    if (sum(head) <= total) {
-      return share(head, total);
+    // Value words are kept whole column by column, the columns needing the least extra width
+    // first (a date before a long reference, which may still break at its hyphens).
+    Integer[] order = new Integer[weights.length];
+    for (int i = 0; i < order.length; i++) {
+      order[i] = i;
     }
-    return share(new float[weights.length], total);
+    Arrays.sort(order, Comparator.comparingDouble(i -> value[i] - minimum[i]));
+    float used = sum(minimum);
+    for (int i : order) {
+      float extra = value[i] - minimum[i];
+      if (extra > 0 && used + extra <= total) {
+        minimum[i] = value[i];
+        used += extra;
+      }
+    }
+    return share(minimum, total);
   }
 
   /**

@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { render, screen, within } from '@testing-library/react';
 import { StageStepper } from './StageStepper';
 import { stageSteps } from './stageSteps';
@@ -80,6 +82,36 @@ describe('optional detour stages', () => {
       'AWAITING_REAPPLICATION:current',
       'POSTED:upcoming',
     ]);
+  });
+});
+
+describe('detours of the renewal path', () => {
+  const RENEWAL: StageDef[] = [
+    { code: 'UNASSIGNED', name: 'Unassigned Disposition', initial: true, terminal: false },
+    { code: 'TRANSFER_PENDING', name: 'Transfer Pending', terminal: false },
+    { code: 'FOR_DISPOSITION', name: 'For Disposition', terminal: false },
+    { code: 'NB_PATH', name: 'For Proposal / New Business Path', terminal: false },
+    { code: 'FOR_PROCESSING', name: 'For Processing', terminal: false },
+    { code: 'LETTER_PENDING', name: 'Letter Pending', terminal: false },
+    { code: 'RENEWED', name: 'Renewed', terminal: true },
+  ];
+  it('leaves the transfer, the New Business path and the closing letter out of the renewal path', () => {
+    expect(stageSteps(RENEWAL, 'FOR_DISPOSITION').map((s) => s.code)).toEqual([
+      'UNASSIGNED',
+      'FOR_DISPOSITION',
+      'FOR_PROCESSING',
+      'RENEWED',
+    ]);
+    expect(stageSteps(RENEWAL, 'TRANSFER_PENDING').map((s) => s.code)).toContain(
+      'TRANSFER_PENDING',
+    );
+  });
+
+  it('wraps a stage name between its words, never inside a word that fits', () => {
+    const css = readFileSync(resolve(__dirname, '../../styles/broking.css'), 'utf8');
+    const label = /\.stage-label \{([^}]*)\}/.exec(css)?.[1] ?? '';
+    expect(label).toContain('overflow-wrap: break-word');
+    expect(label).not.toContain('anywhere');
   });
 });
 

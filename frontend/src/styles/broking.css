@@ -207,7 +207,8 @@
   font-size: 12px;
   line-height: 16px;
   color: var(--color-text-muted);
-  overflow-wrap: anywhere;
+  /* A stage name wraps between its words; a word is cut only when it cannot fit at all. */
+  overflow-wrap: break-word;
 }
 
 .stage-step.is-done {

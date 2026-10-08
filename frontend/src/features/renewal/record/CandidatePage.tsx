@@ -18,8 +18,15 @@ import { Tabs } from '@/components/ui/Tabs';
 import { useTabParam } from '@/components/ui/useTabParam';
 import { useCompanyId } from '@/context/workspaceContext';
 import { formatAmount, formatDate } from '@/utils/format';
-import { BucketPill, FlagChips } from '../common/RenewalBits';
+import {
+  BucketPill,
+  FlagChips,
+  RenewalInsurer,
+  RenewalProduct,
+  RenewalUnit,
+} from '../common/RenewalBits';
 import { RENEWAL_SECTION, dispositionLabel } from '../common/renewalCodes';
+import { WORKFLOW_VIEW } from '../common/presentation';
 import { RecordActions } from './RecordActions';
 import { DetailsTab } from './DetailsTab';
 import { AccountHistoryTab, HistoryTab, NotesTab } from './HistoryTabs';
@@ -47,8 +54,8 @@ function facts(d: CandidateDetail): Fact[] {
   const { row } = d;
   return [
     { icon: User, label: 'Client', value: row.parties.clientName },
-    { icon: Layers, label: 'Product', value: row.policy.productCode ?? '' },
-    { icon: Building2, label: 'Insurer', value: row.policy.insurerCode ?? '' },
+    { icon: Layers, label: 'Product', value: <RenewalProduct row={row} /> },
+    { icon: Building2, label: 'Insurer', value: <RenewalInsurer row={row} /> },
     {
       icon: CalendarClock,
       label: 'Expiry',
@@ -62,7 +69,7 @@ function facts(d: CandidateDetail): Fact[] {
           ? ''
           : `${row.money.currency ?? ''} ${formatAmount(row.money.grossPremium)}`,
     },
-    { icon: Users, label: 'Unit', value: row.parties.ownerUnit ?? '' },
+    { icon: Users, label: 'Unit', value: <RenewalUnit row={row} /> },
   ];
 }
 
@@ -149,9 +156,9 @@ export default function CandidatePage() {
         title={d.row.parties.clientName}
         chips={
           <>
-            {d.row.policy.expiringArn !== null && (
+            {d.row.policy.expiringArn ? (
               <ReferenceChip label="ARN" value={d.row.policy.expiringArn} />
-            )}
+            ) : null}
             <StatusBadge status={d.row.stage} label={d.row.stageLabel} />
             <BucketPill bucket={d.row.bucket} />
             {d.row.disposition !== null && (
@@ -165,14 +172,22 @@ export default function CandidatePage() {
       {d.blocking.length > 0 && (
         <Notice tone="warning" title="Blocking checks" items={d.blocking} />
       )}
-      <WorkflowPanel
-        entityType={ENTITY}
-        entityId={d.lifecycle.id}
-        recordStatus={d.row.stage}
-        showHistory={false}
-        onChanged={refresh}
-        renderBusinessActions={() => <RecordActions detail={d} />}
-      />
+      {WORKFLOW_VIEW.some((p) => can(p)) ? (
+        <WorkflowPanel
+          entityType={ENTITY}
+          entityId={d.lifecycle.id}
+          recordStatus={d.row.stage}
+          showHistory={false}
+          onChanged={refresh}
+          renderBusinessActions={() => <RecordActions detail={d} />}
+        />
+      ) : (
+        // Users who do not read the work queues (Contact Center, LAMD) still have the actions of
+        // their role on the renewal.
+        <div className="rnw-actions">
+          <RecordActions detail={d} />
+        </div>
+      )}
       <Tabs tabs={TABS} active={tab} onChange={setTab} />
       <Body tab={tab} detail={d} />
     </div>

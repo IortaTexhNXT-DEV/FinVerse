@@ -1,4 +1,5 @@
 import type { BatchOutcome, CandidateRow } from '@/api/renewal';
+import { InsurerName, ProductName, SalesUnitName } from '@/components/broking/LovLabel';
 import { Button } from '@/components/ui/Button';
 import { DataTable } from '@/components/ui/DataTable';
 import { Kpi } from '@/components/ui/Kpi';
@@ -13,9 +14,37 @@ const BUCKET_LABELS: Record<string, string> = {
   EXCEPTION: 'Exception',
 };
 
+/** The insurer of a renewal by name (the name the server gives, else the catalogue's). */
+export function RenewalInsurer({ row }: Readonly<{ row: CandidateRow }>) {
+  return row.names?.insurer ? (
+    <>{row.names.insurer}</>
+  ) : (
+    <InsurerName code={row.policy.insurerCode} />
+  );
+}
+
+/** The owner unit of a renewal by name (the name the server gives, else the organisation's). */
+export function RenewalUnit({ row }: Readonly<{ row: CandidateRow }>) {
+  return row.names?.ownerUnit ? (
+    <>{row.names.ownerUnit}</>
+  ) : (
+    <SalesUnitName code={row.parties.ownerUnit} />
+  );
+}
+
+/** The product of a renewal by name (the name kept with the renewal, else the catalogue's). */
+export function RenewalProduct({ row }: Readonly<{ row: CandidateRow }>) {
+  const p = row.policy;
+  const name = p.productName ?? row.names?.product;
+  if (name) {
+    return <span title={p.productCode ?? undefined}>{name}</span>;
+  }
+  return <ProductName code={p.productCode} />;
+}
+
 /** The Classification pill of a renewal. */
-export function BucketPill({ bucket }: Readonly<{ bucket: string | null }>) {
-  if (bucket === null) {
+export function BucketPill({ bucket }: Readonly<{ bucket?: string | null }>) {
+  if (!bucket) {
     return null;
   }
   return (

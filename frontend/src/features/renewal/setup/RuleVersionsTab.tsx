@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
+import type { ReactNode } from 'react';
 import type { VersionView } from '@/api/renewal';
 import { useAuth } from '@/auth/authContext';
 import { Button } from '@/components/ui/Button';
@@ -15,7 +16,9 @@ import { UserName } from '@/components/ui/UserName';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { formatDate } from '@/utils/format';
-import { ConfirmButton } from '@/components/ui/ConfirmButton';
+import { RowActions } from '@/components/ui/RowActions';
+import { versionActions } from '../common/presentation';
+import { ruleValue } from './ruleFields';
 
 /** An editable column of a rule. */
 export interface RuleField<R> {
@@ -26,6 +29,8 @@ export interface RuleField<R> {
   /** Choices; an input when absent. */
   options?: { code: string; label: string }[];
   numeric?: boolean;
+  /** The value in words in the list of rules (a name for a code); the value itself when absent. */
+  display?: (code: string) => ReactNode;
 }
 
 interface Api<R> {
@@ -259,45 +264,17 @@ export function RuleVersionsTab<R>({
             {
               key: 'act',
               header: '',
-              render: (v) =>
-                maintain && (
-                  <span className="rnw-actions">
-                    {v.status === 'DRAFT' && (
-                      <Button size="sm" onClick={() => step.mutate({ id: v.id, name: 'SUBMIT' })}>
-                        Submit
-                      </Button>
-                    )}
-                    {v.status === 'SUBMITTED' && (
-                      <>
-                        <ConfirmButton
-                          size="sm"
-                          confirm={{
-                            title: `Activate Version ${String(v.versionNo)}`,
-                            effect: 'The version replaces the active one from its effective date.',
-                          }}
-                          onConfirm={() => step.mutateAsync({ id: v.id, name: 'ACTIVATE' })}
-                        >
-                          Activate
-                        </ConfirmButton>
-                        <ConfirmButton
-                          size="sm"
-                          variant="ghost"
-                          confirm={{
-                            title: `Reject Version ${String(v.versionNo)}`,
-                            effect: 'The version is rejected and returns to its maker.',
-                            destructive: true,
-                            reason: 'required',
-                          }}
-                          onConfirm={(reason) =>
-                            step.mutateAsync({ id: v.id, name: 'REJECT', remarks: reason })
-                          }
-                        >
-                          Reject
-                        </ConfirmButton>
-                      </>
-                    )}
-                  </span>
-                ),
+              render: (v) => (
+                <RowActions
+                  record={`Version ${String(v.versionNo)}`}
+                  actions={versionActions(v.status, v.versionNo, maintain, {
+                    submit: () => step.mutate({ id: v.id, name: 'SUBMIT' }),
+                    activate: () => step.mutateAsync({ id: v.id, name: 'ACTIVATE' }),
+                    reject: (reason) =>
+                      step.mutateAsync({ id: v.id, name: 'REJECT', remarks: reason }),
+                  })}
+                />
+              ),
             },
           ]}
         />
@@ -311,7 +288,7 @@ export function RuleVersionsTab<R>({
             columns={fields.map((f) => ({
               key: f.key,
               header: f.label,
-              render: (r: R) => f.options?.find((o) => o.code === f.get(r))?.label ?? f.get(r),
+              render: (r: R) => ruleValue(f, r),
             }))}
           />
         </Card>

@@ -14,9 +14,9 @@ import { Modal } from '@/components/ui/Modal';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { formatDate } from '@/utils/format';
+import { RowActions } from '@/components/ui/RowActions';
+import { setupRecordActions } from '../common/presentation';
 import { ApprovalCell } from './setupBits';
-import { pending } from './setupCodes';
-import { ConfirmButton } from '@/components/ui/ConfirmButton';
 import { LineLabel } from '@/components/broking/LovLabel';
 
 function blankToUndefined(value: string): string | undefined {
@@ -182,40 +182,16 @@ export function RiskCodesTab() {
           {
             key: 'act',
             header: '',
-            render: (r) =>
-              maintain && (
-                <span className="rnw-actions">
-                  {pending(r.approval) && (
-                    <ConfirmButton
-                      size="sm"
-                      confirm={{
-                        title: 'Authorize Risk Code',
-                        effect: 'The risk code change takes effect.',
-                      }}
-                      onConfirm={() => act.mutateAsync({ id: r.id, action: 'AUTHORIZE' })}
-                    >
-                      Authorize
-                    </ConfirmButton>
-                  )}
-                  <Button size="sm" variant="ghost" onClick={() => setEditing(r)}>
-                    Edit
-                  </Button>
-                  {r.approval.recordStatus === 'ACTIVE' && (
-                    <ConfirmButton
-                      size="sm"
-                      variant="ghost"
-                      confirm={{
-                        title: 'Deactivate Risk Code',
-                        effect: 'The risk code is no longer used for new renewals.',
-                        destructive: true,
-                      }}
-                      onConfirm={() => act.mutateAsync({ id: r.id, action: 'DEACTIVATE' })}
-                    >
-                      Deactivate
-                    </ConfirmButton>
-                  )}
-                </span>
-              ),
+            render: (r) => (
+              <RowActions
+                record={r.riskCode}
+                actions={setupRecordActions(r.approval.recordStatus, maintain, 'Risk Code', {
+                  authorize: () => act.mutateAsync({ id: r.id, action: 'AUTHORIZE' }),
+                  edit: () => setEditing(r),
+                  deactivate: () => act.mutateAsync({ id: r.id, action: 'DEACTIVATE' }),
+                })}
+              />
+            ),
           },
         ]}
       />

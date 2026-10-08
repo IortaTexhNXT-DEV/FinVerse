@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.renewal.check.service;
 
 import com.iortatechnxt.brokerverse.account.domain.Account;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.renewal.domain.CandidateSnapshot.SnapshotPremium;
 import com.iortatechnxt.brokerverse.renewal.domain.InsurerResponse;
 import com.iortatechnxt.brokerverse.renewal.domain.InsurerResponseCode;
@@ -76,12 +77,12 @@ public class FinancialImpactCheck implements RenewalCheck {
       changes.add(
           what
               + " "
-              + before.toPlainString()
+              + DisplayFormat.amount(before)
               + " to "
-              + after.toPlainString()
+              + DisplayFormat.amount(after)
               + " ("
               + (difference.signum() > 0 ? "+" : "")
-              + difference.toPlainString()
+              + DisplayFormat.amount(difference)
               + ")");
     }
   }

@@ -7,6 +7,7 @@ import com.iortatechnxt.brokerverse.booking.domain.BookedInvoice;
 import com.iortatechnxt.brokerverse.booking.domain.BookedInvoiceRepository;
 import com.iortatechnxt.brokerverse.catalog.domain.InsurerProfile;
 import com.iortatechnxt.brokerverse.catalog.domain.InsurerProfileRepository;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.renewal.check.service.OutstandingPremiumCheck;
 import com.iortatechnxt.brokerverse.renewal.domain.CandidateSnapshot;
 import com.iortatechnxt.brokerverse.renewal.domain.CandidateSnapshot.SnapshotPremium;
@@ -215,6 +216,6 @@ public class InsurerExtract {
   }
 
   private static String text(Object value) {
-    return value == null ? null : value.toString();
+    return value == null ? null : DisplayFormat.value(value);
   }
 }

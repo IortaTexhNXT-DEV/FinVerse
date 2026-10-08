@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.renewal.check.service;
 
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.crm.domain.Client;
 import com.iortatechnxt.brokerverse.crm.domain.ClientRepository;
 import com.iortatechnxt.brokerverse.crm.service.KycReviewPolicy;
@@ -52,8 +53,9 @@ public class KycDueCheck implements RenewalCheck {
     }
     LocalDate due = clients.findById(clientId).map(Client::getKycReviewDue).orElse(null);
     if (due != null && !due.isAfter(kyc.dueHorizon(context.today()))) {
-      return Verdict.info("KYC review due on " + due);
+      return Verdict.info("KYC review due on " + DisplayFormat.date(due));
     }
-    return Verdict.pass(due == null ? "No KYC review date" : "KYC review due on " + due);
+    return Verdict.pass(
+        due == null ? "No KYC review date" : "KYC review due on " + DisplayFormat.date(due));
   }
 }

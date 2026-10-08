@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { useCompanyId } from '@/context/workspaceContext';
+import { countOf } from '@/utils/format';
 import { CandidateList } from '../common/CandidateList';
 import { GenerateRaDialog } from '../common/MoreDialogs';
 import { LETTER_TABS, RENEWAL_SECTION, tabOf } from '../common/renewalCodes';
@@ -19,7 +20,7 @@ type Open = 'generate' | 'send' | 'closing';
 
 /**
  * Letters (FR-RN-080-084): Generate Renewal Advice (first or second notice) for the renewals with
- * their terms, Send them protected to the client, send the Not Acceptable (NAL) and Not for
+ * their terms, Send them protected to the client, send the No Advice (NAL) and Not for
  * Renewal (NFR) letters, and follow the renewals with no reply (NRNS). Client acceptances are
  * recorded on the renewal or uploaded here.
  */
@@ -47,7 +48,7 @@ export default function LettersPage() {
       <PageHeader
         section={RENEWAL_SECTION}
         title="Letters"
-        description="Renewal Advices, Not Acceptable and Not for Renewal letters, and the replies."
+        description="Renewal Advices, No Advice and Not for Renewal letters, and the replies."
         actions={
           can('RNW_ACCEPT') && (
             <Button variant="secondary" icon={<Upload size={16} />} onClick={() => setUpload(true)}>
@@ -114,7 +115,7 @@ export default function LettersPage() {
       {open === 'send' && (
         <ConfirmDialog
           title="Send Renewal Advice"
-          effect={`The Renewal Advice of ${String(refs.length)} renewal(s) is e-mailed protected to the client.`}
+          effect={`The Renewal Advice of ${countOf(refs.length, 'renewal')} is e-mailed protected to the client.`}
           confirmLabel="Send"
           busy={send.mutation.isPending}
           error={send.mutation.error}
@@ -125,7 +126,7 @@ export default function LettersPage() {
       {open === 'closing' && (
         <ConfirmDialog
           title="Send closing letters"
-          effect={`The Not Acceptable or Not for Renewal letter of ${String(refs.length)} renewal(s) is generated and e-mailed; the renewals are closed.`}
+          effect={`The No Advice or Not for Renewal letter of ${countOf(refs.length, 'renewal')} is generated and e-mailed; the renewals are closed.`}
           confirmLabel="Send"
           busy={closing.mutation.isPending}
           error={closing.mutation.error}

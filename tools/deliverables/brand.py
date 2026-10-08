@@ -262,8 +262,8 @@ def out_path(brd: str, kind: str, filename: str) -> Path:
 # Business sign-off release sets issued so far: BRD -> version of the set. The documents of such a set carry a
 # two-digit prefix so that they sort in reading order in the BRD folder (deliverables README, "Release and sign-off
 # per BRD").
-SIGNOFF_SETS = {"BRD-01": "2.1", "BRD-02": "2.1", "BRD-03": "2.1", "BRD-04": "2.1", "BRD-05": "2.1", "BRD-11": "2.1",
-                "BRD-13": "2.1"}
+SIGNOFF_SETS = {"BRD-01": "2.1", "BRD-02": "2.1", "BRD-03": "2.1", "BRD-04": "2.1", "BRD-05": "2.1", "BRD-06": "2.0",
+                "BRD-11": "2.1", "BRD-13": "2.1"}
 READING_ORDER = {"StartHere": "00", "GuideDeck": "01", "FRS": "02", "Signoff": "03", "TestPlan": "04",
                  "TestPlanSummary": "05"}
 # Further documents of a set that only some BRDs have (not required by check_pack): the configuration input templates
@@ -277,7 +277,7 @@ READING_ORDER_EXTRA = {"Templates": "06", "Handbook": "02", "Workbook": "03"}
 READING_ORDER_UX = {("UXDeck", "pptx"): "07", ("UXScreens", "xlsx"): "08", ("UXScreens", "zip"): "09"}
 # Sign-off sets that carry the UX screen documents (07 to 09): the Drop 0 sets, BRD-02 Operations, BRD-04 Collections
 # and BRD-01 New Business first; the other Drop 1 sets follow when they are re-issued.
-UX_SETS = {"BRD-01", "BRD-02", "BRD-03", "BRD-04", "BRD-05", "BRD-11", "BRD-13"}
+UX_SETS = {"BRD-01", "BRD-02", "BRD-03", "BRD-04", "BRD-05", "BRD-06", "BRD-11", "BRD-13"}
 
 
 def output_name(doc_type: str, brd: str, name: str, version: str, ext: str) -> str:

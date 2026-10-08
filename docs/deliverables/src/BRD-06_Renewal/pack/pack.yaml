@@ -1,0 +1,203 @@
+# BRD-6 Renewal – Business Sign-off Pack, release set v2.0 (Drop 1, Transactional).
+# Built by docs/deliverables/src/signoff/signoff_pack.py (workbook, checks) and read by the FRS source through
+# ```pack blocks (tools/deliverables/bdoi_docx.py). Schema: docs/deliverables/src/signoff/README.md.
+meta:
+  brd: BRD-06
+  brd_label: BRD-6
+  name: Renewal
+  code: RN
+  version: "2.0"
+  date: 8 October 2026
+  status_as_of: 08-Oct-2026
+  release_set: BRD-06 Renewal – Business Sign-off Pack
+  frs: FRS_BRD06_RENEWAL.md
+  test_plan: brd06_cases.yaml
+  screens_dir: screens
+  screenshot_dir: ../screenshots
+
+# Permissions and roles are shown by their readable names, never by their codes.
+codes: labels
+
+# The Renewal personas: role code, name, SIT/UAT user of the seed profile.
+personas:
+  MKT_TL: {name: Marketing Team Leader, user: mkttl}
+  MKT_AO: {name: Marketing Account Officer (Account Broker), user: ao}
+  PROCESSING_TL: {name: Processing Team Leader, user: proctl}
+  PROCESSOR: {name: Processing Officer (Broker), user: proc}
+  CONTACT_CENTER: {name: Contact Center, user: contactc}
+  LAMD: {name: LAMD (loan status reports), user: lamd}
+  BUSINESS_ADMIN: {name: Business Administrator, user: badmin}
+  SYSADMIN: {name: System Administrator, user: admin}
+  AUDITOR: {name: Auditor, user: auditor}
+
+# Packs of other BRDs whose screens a walkthrough step may show (the renewal account of New Business).
+foreign_packs: [../../BRD-01_New_Business/pack/pack.yaml]
+
+# Sidebar sections that belong to this BRD (navigation/modules.ts module ids) and the BRD of every other section,
+# used to mark each menu entry of a persona.
+own_sections: [renewal]
+section_brd:
+  dashboard: Platform
+  nb-dashboard: BRD-1
+  workspace: BRD-1
+  crm: BRD-1
+  csf: BRD-9
+  screening: BRD-10
+  quotations: BRD-1
+  accounts: BRD-1
+  proposals: BRD-1
+  eb: BRD-8
+  placement: BRD-1
+  issuance: BRD-1
+  booking: BRD-1
+  renewal: BRD-6
+  submitted: BRD-12
+  prodrecon: BRD-2
+  adjustment: BRD-2
+  catalog: BRD-3
+  bulk: BRD-1
+  operations: BRD-2
+  collections: BRD-4
+  cashiering: BRD-2
+  remittance: BRD-2
+  commission: BRD-2
+  disbursement: BRD-5
+  payrequest: BRD-5
+  acsl: BRD-5
+  frbs: BRD-5
+  gl: BRD-5
+  receivables: BRD-5
+  payables: BRD-5
+  assets: BRD-5
+  planning: BRD-5
+  tax: BRD-5
+  accounting-engine: BRD-5
+  brokerclaims: BRD-7
+  underwriting: Platform
+  claims: Platform
+  reinsurance: Platform
+  reserves: Platform
+  migration: BRD-13
+  legacy-inquiry: BRD-13
+  nb-reports: BRD-1
+  reports: Platform
+  broking-setup: BRD-1
+  screening-setup: BRD-10
+  setup: Platform
+  user-access: BRD-11
+  admin: Platform / BRD-11
+  help: Platform
+
+# Screen-flow figure: the links between the screens (list → record → action → next screen).
+flow:
+  - [SCR-RN-01, SCR-RN-02, tiles and statuses]
+  - [SCR-RN-02, SCR-RN-03, open]
+  - [SCR-RN-02, SCR-RN-09, Transfer]
+  - [SCR-RN-06, SCR-RN-03, open]
+  - [SCR-RN-03, SCR-RN-04, "Checks, Account History"]
+  - [SCR-RN-04, SCR-RN-07, Set Disposition]
+  - [SCR-RN-07, SCR-RN-08, Push]
+  - [SCR-RN-08, SCR-RN-10, Post (For Renewal)]
+  - [SCR-RN-08, SCR-RN-13, Post (Not for Renewal)]
+  - [SCR-RN-08, SCR-RN-06, Return]
+  - [SCR-RN-10, SCR-RN-11, New Batch]
+  - [SCR-RN-11, SCR-RN-12, insurer reply]
+  - [SCR-RN-12, SCR-RN-13, RA Ready]
+  - [SCR-RN-13, SCR-RN-15, RA Sent]
+  - [SCR-RN-15, SCR-RN-14, Record Acceptance]
+  - [SCR-RN-14, SCR-RN-05, Letters tab]
+  - [SCR-RN-16, SCR-RN-08, past-due loan]
+  - [SCR-RN-17, SCR-RN-02, checks on Initiate]
+  - [SCR-RN-18, SCR-RN-04, classification]
+  - [SCR-RN-19, SCR-RN-03, package choice]
+  - [SCR-RN-20, SCR-RN-02, go-live renewals]
+
+# Elements shared by many screens, described once.
+common:
+  - name: Page header and company
+    text: >-
+      Every page shows its section (Client & Policy · Renewal) and title, a one-line description and its actions on
+      the right. The company in the header decides the renewals shown, and each user sees the renewals of the scope
+      of the role: the own unit for Marketing, the processing stages for Processing.
+  - name: Renewal Home and work tiles
+    text: >-
+      The Renewal Home shows the renewals due in 30, 60, 90 and 140 days as figures, then the work queues as tiles:
+      a Title Case label and the live count; a queue that needs action has a coloured bar and "Needs attention". A
+      tile opens the list behind it. Under the tiles, the renewals by status and by classification and the workload
+      of the officers.
+  - name: Renewal lists
+    text: >-
+      The Expiry List, My Dispositions, TL Review, Processing Worklist, Letters and Follow-ups are one list with the
+      tabs of the screen: a search box (renewal reference, policy, PN or client), a Filters button for the
+      multi-select criteria and the expiry range, quick filters, the actions of the tab for the rows ticked and
+      Download. Rows alternate white and Background Blue; a long list scrolls inside its card with the header row in
+      view; "Showing 1 to n of N results" pages the list by 200 rows. A row opens its renewal.
+  - name: Renewal reference, classification and flags
+    text: >-
+      Each renewal has its renewal reference (RNW-yyyy-nnnnnn), its status (the stage of the renewal workflow) as an
+      outlined pill, its classification (Clean, Review or Exception) as a pill of its own, and its flags as tags next
+      to the reference: Urgent, Returned, Transferred, Endorsed, Claims, Outstanding, KYC due, NRNS, Straight-through,
+      NFR sent and Locked.
+  - name: Renewal record and workflow header
+    text: >-
+      A renewal opens with the client as the title, the ARN chip, the status, classification and disposition, its
+      flags and the key facts (client, product, insurer, expiry with the days left, gross premium, unit). The
+      blocking checks are listed in an amber notice. Under the header, the workflow header of the renewal: a stepper
+      of the stages in their order (passed stages ticked in blue, the current stage highlighted, the stages ahead in
+      grey; a returned stage in amber, the last stage in green once reached), and one row with Current Stage, Since,
+      Due and Assigned To, with the actions the user may take now on the right. The record has the tabs Details,
+      Checks, Account History, Computations, Insurer, Letters, Documents, Remarks & Follow-ups and History.
+  - name: Bulk actions and their outcome
+    text: >-
+      Assign, Push, Post, Return, Override, Initiate, Generate RA and Send act on every renewal ticked. Each renewal
+      is processed on its own: the message gives the count done and refused, and a dialog lists every refused
+      renewal with the reason, so one refusal never stops the others.
+  - name: Maker-checker
+    text: >-
+      A non-renewable risk code, a check setting and a package mapping apply only once another user authorizes them;
+      the maker cannot authorize. The classification rules and the decision matrix are versions: a draft is
+      submitted, then activated or rejected by another user, and activation retires the active version. A package
+      choice for a migrated policy and a correction of a Renewal Advice already sent are approved by a second
+      member of the Renewal processing team.
+  - name: Status pills and tags
+    text: >-
+      Statuses are outlined pills of one size and colour per state group; a pill never wraps. The renewal statuses
+      read as the stages of the renewal (Unassigned Disposition, For Disposition, Review in Progress, For Processing,
+      With Insurer, RA Ready, RA Sent / Awaiting Response and so on); an agreed short form, with the full label in
+      the tooltip, is used only for a label longer than 21 characters. Flags are tags next to the reference, never
+      inside the pill.
+  - name: Dates, amounts and names
+    text: >-
+      Dates are entered with one date picker and shown as dd-MMM-yyyy; times as dd-MMM-yyyy HH:mm in Philippine time.
+      Amounts show two decimals and thousand separators. The expiry reads with the days left ("45 days"). Insurers,
+      products, units and lists of values show their names, and users are shown by their names.
+  - name: Letters and protected e-mails
+    text: >-
+      Renewal Advices and the other letters are generated from versioned templates with the BDO Insure letterhead,
+      kept in the documents of the renewal, and e-mailed to the client as a password-protected PDF with the password
+      in a separate e-mail. The extract sent to an insurer is protected the same way.
+  - name: Notifications and help
+    text: >-
+      The bell in the header shows the unread count and opens the notifications panel, grouped by day; each notice
+      shows its title, a one-line summary, the renewal reference and the time, and opens the renewal. Mark Read, Mark
+      All Read and View All are offered. Each user chooses the channels of the Renewal events on Notification
+      Settings. The Help button of each page explains the screen.
+  - name: Messages
+    text: >-
+      Every message follows one notice standard: a white notice with a thin bar and an icon in the colour of its kind
+      (red error, amber warning, blue information, green success), a bold short title, then the business message with
+      one bullet per missing item. Field errors appear under the field. A refusal by a business rule shows the
+      business message only, without codes; only an unexpected system error offers Retry and a reference for support.
+      Success is confirmed by a short message in the same standard.
+  - name: Confirmations and reasons
+    text: >-
+      Every post, send, authorize, activate, deactivate and cancel asks for confirmation in a dialog that names the
+      record and the effect; a return, an override, a transfer and a re-open need a reason or remarks (up to 200
+      characters) before they can be confirmed. The reason is kept in the history of the renewal and sent with the
+      notification.
+  - name: Uploads
+    text: >-
+      The uploads of Renewal (dispositioned file, insurer responses, acceptances, LAMD reports, package map, migrated
+      policies, Renewal Advices already sent) use the upload wizard: download the template, upload the filled file,
+      review every row with its message, then process the valid rows; the rejected rows come back in the error file.
+      A file uploaded before is refused.

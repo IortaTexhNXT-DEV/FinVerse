@@ -19,7 +19,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { UserName } from '@/components/ui/UserName';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate, formatDateTime } from '@/utils/format';
+import { countOf, formatDate, formatDateTime } from '@/utils/format';
 import { RENEWAL_SECTION } from '../common/renewalCodes';
 import { UploadPanel } from '../common/UploadPanel';
 import '../renewal.css';
@@ -41,7 +41,7 @@ function CreateBatchDialog({ onClose }: Readonly<{ onClose: () => void }>) {
       renewalApi.createBatch(companyId, { insurerCode: insurer, expiryFrom: from, expiryTo: to }),
     onSuccess: async (b) => {
       onClose();
-      toast.success(`Batch ${b.batchNo} created with ${String(b.lineCount)} renewal(s)`);
+      toast.success(`Batch ${b.batchNo} created with ${countOf(b.lineCount, 'renewal')}`);
       await queryClient.invalidateQueries({ queryKey: ['renewal'] });
     },
   });
@@ -160,7 +160,9 @@ function BatchDetail({ batchNo, onClose }: Readonly<{ batchNo: string; onClose: 
                 <tr key={l.renewalRef ?? String(i)}>
                   <td>{l.responded ? 'Yes' : 'No'}</td>
                   {l.columns.map((c, j) => (
-                    <td key={d.headers[j] ?? String(j)}>{c ?? ''}</td>
+                    <td key={d.headers[j] ?? String(j)}>
+                      <span className="nowrap">{c ?? ''}</span>
+                    </td>
                   ))}
                 </tr>
               ))}

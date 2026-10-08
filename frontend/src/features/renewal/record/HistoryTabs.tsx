@@ -1,3 +1,4 @@
+import { claimsText } from '../common/candidateColumns';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { History } from 'lucide-react';
 import { renewalApi } from '@/api/renewal';
@@ -5,12 +6,14 @@ import type { CandidateDetail } from '@/api/renewal';
 import { Amount } from '@/components/ui/Amount';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import { CellStack } from '@/components/ui/CellStack';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { UserName } from '@/components/ui/UserName';
 import { useCompanyId } from '@/context/workspaceContext';
 import { formatDate, formatDateTime, humanize } from '@/utils/format';
+import { dispositionSourceLabel, overrideChange, overrideKindLabel } from '../common/presentation';
 import { RNW_LOV, dispositionLabel } from '../common/renewalCodes';
 import { LovLabel } from '@/components/broking/LovLabel';
 
@@ -58,7 +61,7 @@ export function AccountHistoryTab({ detail }: Props) {
             {
               key: 'arn',
               header: 'Expiring / Renewal ARN',
-              render: (r) => `${r.expiringArn ?? ''} → ${r.renewalArn ?? ''}`,
+              render: (r) => <CellStack main={r.expiringArn ?? ''} sub={r.renewalArn ?? ''} />,
             },
             {
               key: 'out',
@@ -121,8 +124,8 @@ export function AccountHistoryTab({ detail }: Props) {
       <Card title="Claims">
         <p>
           {h.claims.connected
-            ? `${String(h.claims.count)} claim(s), ${String(h.claims.open)} open`
-            : 'Claims are not connected yet; the claims shown on the renewal come from the extraction.'}
+            ? `${claimsText(h.claims.count)}, ${String(h.claims.open)} open`
+            : 'The claims of the expiring term are those read when the renewal was extracted: see the Claims flag and the claims check on the Checks tab.'}
         </p>
       </Card>
     </div>
@@ -213,8 +216,13 @@ export function HistoryTab({ detail }: Props) {
           columns={[
             { key: 'at', header: 'When', kind: 'datetime', render: (d) => formatDateTime(d.at) },
             { key: 'code', header: 'Disposition', render: (d) => dispositionLabel(d.code) },
-            { key: 'reason', header: 'Reason', render: (d) => d.reason ?? '' },
-            { key: 'src', header: 'Source', render: (d) => d.source },
+            {
+              key: 'reason',
+              header: 'Reason',
+              render: (d) =>
+                d.reason ? <LovLabel type={RNW_LOV.nonRenewalReason} code={d.reason} /> : '',
+            },
+            { key: 'src', header: 'Source', render: (d) => dispositionSourceLabel(d.source) },
             { key: 'rem', header: 'Remarks', render: (d) => d.remarks ?? '' },
             { key: 'cur', header: 'Current', render: (d) => (d.superseded ? '' : 'Yes') },
             { key: 'by', header: 'By', render: (d) => <UserName login={d.by} /> },
@@ -250,9 +258,13 @@ export function HistoryTab({ detail }: Props) {
           emptyMessage="No overrides"
           columns={[
             { key: 'at', header: 'When', kind: 'datetime', render: (o) => formatDateTime(o.at) },
-            { key: 'kind', header: 'Override', render: (o) => o.kind },
-            { key: 'chg', header: 'Change', render: (o) => `${o.from ?? ''} → ${o.to ?? ''}` },
-            { key: 'reason', header: 'Reason', render: (o) => o.reason },
+            { key: 'kind', header: 'Override', render: (o) => overrideKindLabel(o.kind) },
+            { key: 'chg', header: 'Change', render: (o) => overrideChange(o.from, o.to) },
+            {
+              key: 'reason',
+              header: 'Reason',
+              render: (o) => <LovLabel type={RNW_LOV.overrideReason} code={o.reason} />,
+            },
             { key: 'rem', header: 'Remarks', render: (o) => o.remarks },
             { key: 'by', header: 'By', render: (o) => <UserName login={o.by} /> },
           ]}

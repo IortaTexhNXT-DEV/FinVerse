@@ -1,9 +1,19 @@
+import { createElement } from 'react';
+import type { ReactNode } from 'react';
 import type { BucketRuleData, CheckSettingView, DecisionRuleData } from '@/api/renewal';
+import { LineLabel, LovLabel, ProductName } from '@/components/broking/LovLabel';
 import { DISPOSITION_OPTIONS } from '../common/renewalCodes';
 import type { RuleField } from './RuleVersionsTab';
 import { SEVERITIES, numberOrNull, textOrNull } from './setupCodes';
 
 const ANY = { code: '', label: 'Any' };
+
+/** A rule value in words: the choice's label, the name of a code, Any when the criterion is blank. */
+export function ruleValue<R>(f: RuleField<R>, rule: R): ReactNode {
+  const v = f.get(rule);
+  const text = f.options?.find((o) => o.code === v)?.label ?? (v === '' ? 'Any' : undefined);
+  return text ?? (f.display ? f.display(v) : v);
+}
 
 function priority<R extends { priority: number }>(): RuleField<R> {
   return {
@@ -68,6 +78,7 @@ function criterion(
   key: keyof Criteria,
   label: string,
   options?: { code: string; label: string }[],
+  display?: (code: string) => ReactNode,
 ): RuleField<DecisionRuleData> {
   const numeric = key === 'daysFrom' || key === 'daysTo';
   return {
@@ -75,10 +86,9 @@ function criterion(
     label,
     options: options ? [ANY, ...options] : undefined,
     numeric,
-    get: (r) => {
-      const v = r.criteria[key];
-      return v === null ? '' : String(v);
-    },
+    display,
+    // A criterion the rule leaves blank may be absent from the stored rule: blank either way.
+    get: (r) => String(r.criteria[key] ?? ''),
     set: (r, v) => {
       let value: string | number | boolean | null = numeric ? numberOrNull(v) : textOrNull(v);
       if (key === 'mortgaged') value = v === '' ? null : v === 'true';
@@ -90,9 +100,11 @@ function criterion(
 /** Columns of a decision matrix rule (BRRN.031, 034). */
 export const MATRIX_FIELDS: RuleField<DecisionRuleData>[] = [
   priority<DecisionRuleData>(),
-  criterion('segment', 'Segment'),
-  criterion('lineCode', 'Line'),
-  criterion('productCode', 'Product'),
+  criterion('segment', 'Segment', undefined, (code) =>
+    createElement(LovLabel, { type: 'MARKET_SEGMENT', code }),
+  ),
+  criterion('lineCode', 'Line', undefined, (code) => createElement(LineLabel, { code })),
+  criterion('productCode', 'Product', undefined, (code) => createElement(ProductName, { code })),
   criterion('mortgaged', 'Mortgaged', [
     { code: 'true', label: 'Yes' },
     { code: 'false', label: 'No' },
@@ -143,7 +155,7 @@ export const MATRIX_FIELDS: RuleField<DecisionRuleData>[] = [
       { code: '', label: 'None' },
       { code: 'RA', label: 'Renewal Advice' },
       { code: 'NFR', label: 'Not for Renewal' },
-      { code: 'NAL', label: 'Not Acceptable' },
+      { code: 'NAL', label: 'No Advice Letter' },
     ],
     get: (r) => r.letterHint ?? '',
     set: (r, v) => ({ ...r, letterHint: textOrNull(v) }),

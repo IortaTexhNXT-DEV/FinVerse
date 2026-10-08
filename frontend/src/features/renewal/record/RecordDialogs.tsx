@@ -5,6 +5,7 @@ import { DateInput } from '@/components/ui/DateInput';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
+import { UnitSelect } from '../common/ActionDialogs';
 import { DISPOSITION_OPTIONS, RNW_LOV } from '../common/renewalCodes';
 import { DialogFooter, TextArea } from './dialogParts';
 import type { DialogProps } from './dialogParts';
@@ -96,14 +97,7 @@ function NotForRenewalFields({
       )}
       {reason === TRANSFER && (
         <Field label="Receiving Unit" required>
-          {(id) => (
-            <input
-              id={id}
-              className="input"
-              value={unit}
-              onChange={(e) => onUnit(e.target.value)}
-            />
-          )}
+          {(id) => <UnitSelect id={id} value={unit} onChange={onUnit} />}
         </Field>
       )}
     </>
@@ -283,7 +277,7 @@ export function ResponseDialog({
             checked={remarket}
             onChange={(e) => setRemarket(e.target.checked)}
           />
-          Re-market to another insurer (otherwise the renewal goes to the Not Acceptable letter)
+          Re-market to another insurer (otherwise the renewal goes to the No Advice Letter)
         </label>
       )}
       <TextArea label="Remarks" value={remarks} onChange={setRemarks} />

@@ -1,0 +1,38 @@
+digraph contract {
+  graph [rankdir=LR, fontname="Arial", nodesep=0.12, ranksep=0.9, bgcolor="white"];
+  node [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@FIELD_BLUE", fontname="Arial", fontsize=9, fontcolor="@NEAR_BLACK", margin="0.1,0.05"];
+  edge [color="@CTA_BLUE", arrowsize=0.6];
+  core [label="Renewal", fillcolor="@HEADER_BLUE", fontcolor="white", fontsize=16, color="@HEADER_BLUE", margin="0.3,0.25"];
+  in0 [label="BRD-1 New Business (account)\n- The expiring account"];
+  in0 -> core;
+  in1 [label="BRD-1 New Business (client)\n- The KYC review date of the client"];
+  in1 -> core;
+  in2 [label="BRD-11 User Access Maintenance\n- The users"];
+  in2 -> core;
+  in3 [label="BRD-12 Submitted Policies\n- The renewal of a submitted policy handed over by"];
+  in3 -> core;
+  in4 [label="BRD-13 Data Migration\n- The migrated in-force policies of the go-live wi"];
+  in4 -> core;
+  in5 [label="BRD-2 Operations (Adjustment)\n- The open endorsement requests of the expiring in"];
+  in5 -> core;
+  in6 [label="BRD-2 Operations (invoice ledger)\n- The booked root invoices of the expiring policie"];
+  in6 -> core;
+  in7 [label="BRD-3 Product Maintenance\n- The product and package version of the expiring "];
+  in7 -> core;
+  in8 [label="BRD-7 Claims\n- The claims summary of the account and policy yea"];
+  in8 -> core;
+  in9 [label="Clients (outside BIBS)\n- The Renewal Advice and the closing letters"];
+  in9 -> core;
+  in10 [label="Insurers (outside BIBS)\n- The insurer extract of the renewals (28 columns)"];
+  in10 -> core;
+  in11 [label="LAMD of the bank (outside BIBS)\n- The monthly paid-off and past-due (RMU) loan rep"];
+  in11 -> core;
+  out0 [label="BRD-1 New Business (account, placement, issuance, booking)\n- The renewal account (business type Renewal)"];
+  core -> out0;
+  out1 [label="BRD-1 New Business (quotation and proposal request)\n- A quotation (For Quotation) or a proposal reques"];
+  core -> out1;
+  out2 [label="Clients (outside BIBS)\n- The Renewal Advice and the closing letters"];
+  core -> out2;
+  out3 [label="Insurers (outside BIBS)\n- The insurer extract of the renewals (28 columns)"];
+  core -> out3;
+}

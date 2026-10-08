@@ -117,11 +117,13 @@ public class RenewalCodeSets {
         "select distinct account_type, account_type from rnw_candidate"
             + " where company_id = :co and account_type is not null order by 1";
     static final String REGION =
-        "select distinct region_code, region_code from rnw_candidate"
-            + " where company_id = :co and region_code is not null order by 1";
+        "select distinct c.region_code, coalesce(s.name, c.region_code) from rnw_candidate c"
+            + " left join cat_sales_unit s on s.code = c.region_code and s.company_id = c.company_id"
+            + " where c.company_id = :co and c.region_code is not null order by 2";
     static final String DEPARTMENT =
-        "select distinct department_code, department_code from rnw_candidate"
-            + " where company_id = :co and department_code is not null order by 1";
+        "select distinct c.department_code, coalesce(s.name, c.department_code) from rnw_candidate c"
+            + " left join cat_sales_unit s on s.code = c.department_code and s.company_id = c.company_id"
+            + " where c.company_id = :co and c.department_code is not null order by 2";
     static final String BRANCH =
         "select distinct branch_code, branch_code from rnw_candidate"
             + " where company_id = :co and branch_code is not null order by 1";
@@ -129,11 +131,13 @@ public class RenewalCodeSets {
         "select distinct product_code, product_code || coalesce(' - ' || product_name, '')"
             + " from rnw_candidate where company_id = :co and product_code is not null order by 1";
     static final String SEGMENT =
-        "select distinct segment, segment from rnw_candidate"
-            + " where company_id = :co and segment is not null order by 1";
+        "select distinct c.segment, coalesce((select min(l.label) from lov_value l"
+            + " where l.type_code = 'MARKET_SEGMENT' and l.code = c.segment), c.segment)"
+            + " from rnw_candidate c where c.company_id = :co and c.segment is not null order by 2";
     static final String UNIT =
-        "select distinct owner_unit, owner_unit from rnw_candidate"
-            + " where company_id = :co and owner_unit is not null order by 1";
+        "select distinct c.owner_unit, coalesce(s.name, c.owner_unit) from rnw_candidate c"
+            + " left join cat_sales_unit s on s.code = c.owner_unit and s.company_id = c.company_id"
+            + " where c.company_id = :co and c.owner_unit is not null order by 2";
 
     private Sql() {}
   }

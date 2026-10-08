@@ -113,7 +113,7 @@ export function AcceptanceDialog({
           {(id) => <DateInput id={id} value={on} onChange={(e) => setOn(e.target.value)} />}
         </Field>
       </div>
-      <label className="checkbox">
+      <label className="checkbox rnw-ack">
         <input type="checkbox" checked={ack} onChange={(e) => setAck(e.target.checked)} />
         The client acknowledged the change of premium from the expiring terms
       </label>

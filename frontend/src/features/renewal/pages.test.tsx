@@ -199,6 +199,8 @@ describe('Renewal screens', () => {
     render(renewalWrapper(ALL)(<InsurerBatchesPage />));
     fireEvent.click(await screen.findByText('RIB-1'));
     expect(await screen.findByText('POL-1')).toBeInTheDocument();
+    // A value of the extract stays on one line; the extract scrolls sideways as a whole.
+    expect(screen.getByText('POL-1')).toHaveClass('nowrap');
     expect(screen.getByRole('button', { name: 'Send to Insurer' })).toBeInTheDocument();
   });
 

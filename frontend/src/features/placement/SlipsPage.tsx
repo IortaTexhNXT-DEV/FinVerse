@@ -11,7 +11,7 @@ import { PageFooter } from '@/components/ui/Pager';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDateTime } from '@/utils/format';
+import { countOf, formatDateTime } from '@/utils/format';
 import { placementLink } from './placementLogic';
 import { SlipActions } from './SlipActions';
 import { InsurerWithBranch } from '@/components/broking/LovLabel';
@@ -95,7 +95,7 @@ export default function SlipsPage() {
                   <span>
                     {formatDateTime(s.sentAt)}
                     <span className="cell-sub">
-                      {s.recipients} · {s.sendCount} send(s)
+                      {s.recipients} · {countOf(s.sendCount, 'send')}
                     </span>
                   </span>
                 ) : (

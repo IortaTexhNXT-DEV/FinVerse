@@ -29,7 +29,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
-import { formatAmount, formatDateTime } from '@/utils/format';
+import { countOf, formatAmount, formatDateTime } from '@/utils/format';
 import { remittanceApi } from './api';
 import type { Batch, DocumentKind } from './api';
 import { ApproveDialog, PreviewDialog, SendScheduleDialog } from './BatchDialogs';
@@ -271,7 +271,7 @@ export default function BatchDetailPage() {
         section="Remittance · Batches"
         backTo="/remittance/batches"
         title={s.batchNo}
-        description={`${b.insurerName} · ${s.lineCount} account(s) · extracted ${formatDateTime(s.createdAt)}`}
+        description={`${b.insurerName} · ${countOf(s.lineCount, 'account')} · extracted ${formatDateTime(s.createdAt)}`}
         actions={
           canSend ? (
             <Button variant="secondary" icon={<Mail size={16} />} onClick={() => setDialog('send')}>

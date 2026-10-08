@@ -19,7 +19,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { today } from '@/utils/format';
+import { countOf, today } from '@/utils/format';
 import { frbsApi } from './api';
 import type { ServiceFeeRun, StageCounts } from './api';
 import { RUN_TABS, periodErrors, tabOf } from './serviceFee';
@@ -202,7 +202,7 @@ export default function ServiceFeeRunsPage() {
           onClose={() => setComputing(false)}
           onDone={(run) => {
             setComputing(false);
-            toast.success(`${run.runNo} computed: ${String(run.invoiceCount)} invoice(s)`);
+            toast.success(`${run.runNo} computed: ${countOf(run.invoiceCount, 'invoice')}`);
             void queryClient.invalidateQueries({ queryKey: ['frbs'] });
             void navigate(`/frbs/service-fee/runs/${String(run.id)}`);
           }}

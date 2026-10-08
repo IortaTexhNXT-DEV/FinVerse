@@ -32,9 +32,9 @@ function ExpiryWarning({ minutes, onClose }: Readonly<{ minutes: number; onClose
       }
     >
       <p role="timer" aria-live="polite">
-        For your security the system signs you out in <strong>{minutes}</strong> minute(s), at{' '}
-        {formatDateTime(tokenStore.expiresAt())}, whatever your activity. Save your work; you can
-        sign in again afterwards.
+        For your security the system signs you out in <strong>{minutes}</strong>{' '}
+        {minutes === 1 ? 'minute' : 'minutes'}, at {formatDateTime(tokenStore.expiresAt())},
+        whatever your activity. Save your work; you can sign in again afterwards.
       </p>
     </Modal>
   );

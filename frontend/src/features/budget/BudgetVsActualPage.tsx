@@ -23,7 +23,7 @@ import { Field } from '@/components/ui/Field';
 import { Kpi } from '@/components/ui/Kpi';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatAmount, formatCompact, today } from '@/utils/format';
+import { countOf, formatAmount, formatCompact, today } from '@/utils/format';
 import { MONTH_LABELS, sum, utilizationLevel } from './budgetMath';
 import { DateInput } from '@/components/ui/DateInput';
 
@@ -132,7 +132,7 @@ export default function BudgetVsActualPage() {
         <Kpi
           label="Expense actual (YTD)"
           value={formatCompact(sum(byClass('EXPENSE').map((l) => l.actualYtd)))}
-          hint={`${alerts.data?.length ?? 0} account(s) over ${threshold}% of the annual budget`}
+          hint={`${countOf(alerts.data?.length ?? 0, 'account')} over ${threshold}% of the annual budget`}
           accent
         />
       </div>

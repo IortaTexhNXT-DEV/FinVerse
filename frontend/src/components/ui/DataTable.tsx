@@ -120,6 +120,14 @@ function keepTogether(value: ReactNode): ReactNode {
   return content;
 }
 
+/**
+ * The header of a column as shown: a column without a header of its own holds the row actions
+ * (menu or buttons), so it reads "Actions" — no column of a list is left without a header.
+ */
+function headerOf<T>(c: Column<T>): ReactNode {
+  return c.header === '' ? 'Actions' : c.header;
+}
+
 function cellClass<T>(c: Column<T>): string | undefined {
   let kind: string | undefined = c.kind === undefined ? undefined : KIND_CLASS[c.kind];
   if (c.numeric) {
@@ -326,7 +334,7 @@ export function DataTable<T>({
                 {onSort !== undefined && c.sortKey !== undefined ? (
                   <SortHeader column={c} sort={sort} onSort={onSort} />
                 ) : (
-                  c.header
+                  headerOf(c)
                 )}
               </th>
             ))}

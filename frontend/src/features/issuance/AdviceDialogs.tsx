@@ -7,6 +7,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { addresses } from './issuanceLogic';
+import { countOf } from '@/utils/format';
 
 /**
  * Sends the selected Insurance Advices (BRNB.060/035): one e-mail per advice to the mortgagee bank
@@ -33,7 +34,7 @@ export function SendAdviceDialog({
   return (
     <Modal
       open
-      title={`Send ${advices.length} Insurance Advice(s)`}
+      title={`Send ${countOf(advices.length, 'Insurance Advice')}`}
       onClose={onClose}
       footer={
         <>

@@ -18,7 +18,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate, humanize, today } from '@/utils/format';
+import { countOf, formatDate, humanize, today } from '@/utils/format';
 import { DialogFooter, InputField } from '../plans/Parts';
 import type { Statement } from './api';
 import { billingApi } from './api';
@@ -128,7 +128,7 @@ export default function BillingStatementsPage() {
     onSuccess: async (generated) => {
       setRunning(false);
       await queryClient.invalidateQueries({ queryKey: ['collections', 'statements'] });
-      toast.success(`${generated.length} statement(s) of account generated`);
+      toast.success(`${countOf(generated.length, 'statement')} of account generated`);
     },
   });
   return (

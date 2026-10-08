@@ -20,7 +20,7 @@ import { adviceActions } from './issuanceRowActions';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDateTime, humanize } from '@/utils/format';
+import { countOf, formatDateTime, humanize } from '@/utils/format';
 import { GenerateAdviceDialog, SendAdviceDialog } from './AdviceDialogs';
 import { LovLabel } from '@/components/broking/LovLabel';
 
@@ -153,7 +153,7 @@ export default function InsuranceAdvicePage() {
           onSent={(sent) => {
             setSending(false);
             selection.clear();
-            toast.success(`${sent.length} Insurance Advice(s) sent`);
+            toast.success(`${countOf(sent.length, 'Insurance Advice')} sent`);
             refresh();
           }}
         />

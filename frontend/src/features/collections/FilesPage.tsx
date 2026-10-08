@@ -15,7 +15,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDateTime, today } from '@/utils/format';
+import { countOf, formatDateTime, today } from '@/utils/format';
 import { collectionsApi } from './api';
 import type { ScheduledFile } from './api';
 import { reportTitle } from './collectionsLogic';
@@ -122,7 +122,9 @@ export default function FilesPage() {
       setGenerating(false);
       await queryClient.invalidateQueries({ queryKey: ['collections', 'files'] });
       toast.success(
-        out.length === 0 ? 'Nothing to publish for that date' : `${out.length} file(s) published`,
+        out.length === 0
+          ? 'Nothing to publish for that date'
+          : `${countOf(out.length, 'file')} published`,
       );
     },
   });

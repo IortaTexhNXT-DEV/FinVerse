@@ -30,7 +30,7 @@ function rowsOf(r: Review): Row[] {
   const a = r.account;
   return [
     {
-      field: 'Policy number(s)',
+      field: 'Policy Numbers',
       extracted: e.extractedPolicyNumbers.join(', '),
       account: a.policyNumbers.join(', ') || `${a.termYears} expected`,
     },

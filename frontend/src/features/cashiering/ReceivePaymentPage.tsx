@@ -10,7 +10,7 @@ import { Field } from '@/components/ui/Field';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId, useDefaultBranchId, useBaseCurrency } from '@/context/workspaceContext';
-import { today } from '@/utils/format';
+import { countOf, today } from '@/utils/format';
 import { CodeSelect, TextField } from './CashFields';
 import { cashieringApi } from './cashieringApi';
 import type { IntakeResult, PaymentMode } from './cashieringApi';
@@ -62,7 +62,7 @@ function resultMessage(r: IntakeResult): string {
   if (r.unappliedRef) {
     return `${r.receiptNo} issued; ${r.unappliedRef} left in unapplied collections`;
   }
-  return `${r.receiptNo} issued and applied to ${r.applications.length} invoice(s)`;
+  return `${r.receiptNo} issued and applied to ${countOf(r.applications.length, 'invoice')}`;
 }
 
 /**

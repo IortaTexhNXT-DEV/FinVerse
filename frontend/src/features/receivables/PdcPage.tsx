@@ -16,7 +16,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
-import { formatDate, humanize, today } from '@/utils/format';
+import { countOf, formatDate, humanize, today } from '@/utils/format';
 import { pdcActions } from './receivablesMath';
 import { useReceivablesLookups } from './useReceivablesLookups';
 import { DateInput } from '@/components/ui/DateInput';
@@ -110,7 +110,7 @@ export default function PdcPage() {
               onClick={() =>
                 action.mutate(async () => {
                   const due = await receivablesApi.markDue(companyId, asOf);
-                  return { label: `${due.length} cheque(s) marked due` };
+                  return { label: `${countOf(due.length, 'cheque')} marked due` };
                 })
               }
             >

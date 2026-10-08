@@ -34,6 +34,15 @@ const ROWS: Row[] = [
 describe('DataTable list presentation', () => {
   afterEach(() => vi.unstubAllGlobals());
 
+  it('heads the row actions column "Actions": no column is left without a header', () => {
+    render(<DataTable rows={ROWS} rowKey={(r) => r.id} columns={COLUMNS} />);
+    expect(screen.getAllByRole('columnheader').map((h) => h.textContent)).toEqual([
+      'Type',
+      'Name',
+      'Actions',
+    ]);
+  });
+
   it('fits the card to its rows when the page has room: no fixed-height box', () => {
     expect(fittedHeight({ wrap: 300, table: 300, overflow: -200, min: 240 })).toBeNull();
     expect(fittedHeight({ wrap: 300, table: 300, overflow: 0, min: 240 })).toBeNull();
@@ -44,8 +53,10 @@ describe('DataTable list presentation', () => {
     // A capped list grows again when the window grows, up to its rows.
     expect(fittedHeight({ wrap: 800, table: 1500, overflow: -300, min: 240 })).toBe(1100);
     expect(fittedHeight({ wrap: 800, table: 1000, overflow: -300, min: 240 })).toBeNull();
-    // Never smaller than the least list height.
-    expect(fittedHeight({ wrap: 400, table: 1500, overflow: 380, min: 240 })).toBe(240);
+    // Less room than the least list height: no cap, the page scrolls as a whole (never a list
+    // scrolling inside a page that scrolls too).
+    expect(fittedHeight({ wrap: 400, table: 1500, overflow: 380, min: 240 })).toBeNull();
+    expect(fittedHeight({ wrap: 400, table: 1500, overflow: 160, min: 240 })).toBe(240);
   });
 
   it('scrolls inside its card with the cap set from the page, the header sticky inside it', () => {

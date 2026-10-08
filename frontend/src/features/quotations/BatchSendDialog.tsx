@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/Button';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
+import { countOf } from '@/utils/format';
 
 interface BatchSendDialogProps {
   references: string[];
@@ -35,7 +36,7 @@ export function BatchSendDialog({
             Cancel
           </Button>
           <Button variant="accent" busy={busy} onClick={() => onSend(hint.trim() || undefined)}>
-            Send {references.length} Quotation(s)
+            Send {countOf(references.length, 'Quotation')}
           </Button>
         </>
       }

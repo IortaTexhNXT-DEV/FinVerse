@@ -16,7 +16,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { UserName } from '@/components/ui/UserName';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate, formatDateTime } from '@/utils/format';
+import { countOf, formatDate, formatDateTime } from '@/utils/format';
 import { ebLabel } from '../common/ebCodes';
 import { currentCycleOf, useCycleList } from '../common/useCycleList';
 import { useEbMutation } from '../common/useEbMutation';
@@ -172,7 +172,7 @@ function CycleStepDialog({
   const trigger = useEbMutation(
     (c, id: number) => ebMarketApi.triggerPlacement(c, id),
     (accounts: CycleAccount[]) =>
-      `${String(accounts.length)} account(s) submitted for placement: ${accounts.map((a) => a.arn).join(', ')}`,
+      `${countOf(accounts.length, 'account')} submitted for placement: ${accounts.map((a) => a.arn).join(', ')}`,
     onClose,
   );
   if (mode === 'void') {

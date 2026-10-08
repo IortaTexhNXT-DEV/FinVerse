@@ -8,7 +8,7 @@ import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate, today } from '@/utils/format';
+import { countOf, formatDate, today } from '@/utils/format';
 import { RecurringHistory } from './RecurringHistory';
 import { RecurringTemplateForm } from './RecurringTemplateForm';
 import { templateProblems, toTemplateInput } from './recurringModel';
@@ -21,7 +21,7 @@ function RunResult({ result }: Readonly<{ result: GenerationResult }>) {
   return (
     <div className="stack">
       <Notice tone={tone}>
-        {result.journals.length} journal(s) generated
+        {countOf(result.journals.length, 'journal')} generated
         {result.errors.length > 0 && `, ${result.errors.length} failed`}.
       </Notice>
       <ul>

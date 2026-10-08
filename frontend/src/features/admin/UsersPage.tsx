@@ -16,6 +16,8 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { ProfilePicker } from '@/components/broking/ProfilePicker';
+import { useSodRules } from '@/components/broking/useSodRules';
 import { RowActionMenu } from '@/components/ui/RowActionMenu';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
@@ -97,6 +99,11 @@ const EMPTY: UserInput = { username: '', fullName: '', email: '', roleCodes: [],
  * ("Raise Request"); the direct edit stays for the System Administrator in an emergency
  * (UAM_DIRECT_ROLE_EDIT).
  */
+/** The profiles a user holds now (none for a new user). */
+function heldRoles(users: readonly UserProfile[] | undefined, id: number | undefined): string[] {
+  return id === undefined ? [] : (users?.find((u) => u.id === id)?.roles ?? []);
+}
+
 export default function UsersPage() {
   const toast = useToast();
   const navigate = useNavigate();
@@ -108,6 +115,7 @@ export default function UsersPage() {
   const [sessionsOf, setSessionsOf] = useState<string | null>(null);
   const [dataAccessOf, setDataAccessOf] = useState<UserProfile | null>(null);
   const users = useQuery({ queryKey: ['users'], queryFn: adminApi.users });
+  const sodRules = useSodRules();
   const onlineUsers = useQuery({
     queryKey: ['online-users'],
     queryFn: authApi.online,
@@ -153,17 +161,9 @@ export default function UsersPage() {
       },
     });
 
-  const toggleRole = (code: string) =>
-    editing &&
-    setEditing({
-      ...editing,
-      user: {
-        ...editing.user,
-        roleCodes: editing.user.roleCodes.includes(code)
-          ? editing.user.roleCodes.filter((r) => r !== code)
-          : [...editing.user.roleCodes, code],
-      },
-    });
+  const setRoles = (roleCodes: string[]) =>
+    editing && setEditing({ ...editing, user: { ...editing.user, roleCodes } });
+  const held = heldRoles(users.data, editing?.id);
 
   return (
     <div className="stack">
@@ -383,19 +383,14 @@ export default function UsersPage() {
                 </Field>
               )}
             </div>
-            <fieldset className="row" style={{ border: 'none', padding: 0 }}>
-              <legend className="kpi-label">Roles</legend>
-              {(roles.data ?? []).map((r) => (
-                <label key={r.code} className="checkbox">
-                  <input
-                    type="checkbox"
-                    checked={editing.user.roleCodes.includes(r.code)}
-                    onChange={() => toggleRole(r.code)}
-                  />
-                  {r.name}
-                </label>
-              ))}
-            </fieldset>
+            <ProfilePicker
+              legend="Group Profiles"
+              profiles={roles.data ?? []}
+              selected={editing.user.roleCodes}
+              current={held}
+              rules={sodRules}
+              onChange={setRoles}
+            />
             <label className="checkbox">
               <input
                 type="checkbox"

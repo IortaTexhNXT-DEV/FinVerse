@@ -23,6 +23,7 @@ import type { DpItem, DpTag } from './commissionApi';
 import { bulkActions, failedRules, TAG_TABS, withCount } from './commissionLogic';
 import { DpItemDialog, ReasonDialog } from './DpItemDialogs';
 import { BranchName } from '@/components/broking/LovLabel';
+import { countOf } from '@/utils/format';
 
 function columnsOf(rows: DpItem[], selection: RowSelection | undefined): Column<DpItem>[] {
   return [
@@ -164,7 +165,7 @@ function ItemsDialogs({
       )}
       {dialog?.kind === 'exclude' && (
         <ReasonDialog
-          title={`Exclude ${String(ids.length)} Account(s)`}
+          title={`Exclude ${countOf(ids.length, 'Account')}`}
           action="Exclude"
           label="Reason"
           busy={act.isPending}
@@ -173,7 +174,7 @@ function ItemsDialogs({
           onConfirm={(reason) =>
             act.mutate({
               run: () => commissionApi.exclude(ids, reason),
-              done: `${String(ids.length)} account(s) excluded`,
+              done: `${countOf(ids.length, 'account')} excluded`,
             })
           }
         />
@@ -225,7 +226,7 @@ export default function DpItemsPage() {
     onSuccess: async (billings) => {
       selection.clear();
       await queryClient.invalidateQueries({ queryKey: ['commission'] });
-      toast.success(`${String(billings.length)} billing(s) prepared`);
+      toast.success(`${countOf(billings.length, 'billing')} prepared`);
       if (billings.length === 1 && billings[0] !== undefined) {
         void navigate(`/commission/dp/billings/${String(billings[0].id)}`);
       }
@@ -270,7 +271,7 @@ export default function DpItemsPage() {
                 onConfirm={() =>
                   act.mutate({
                     run: () => commissionApi.confirm(ids),
-                    done: `${String(ids.length)} account(s) confirmed for billing`,
+                    done: `${countOf(ids.length, 'account')} confirmed for billing`,
                   })
                 }
                 onBill={() => prepare.mutate()}

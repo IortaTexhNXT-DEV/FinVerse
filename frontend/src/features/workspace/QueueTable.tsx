@@ -13,6 +13,7 @@ import { RowActions } from '@/components/ui/RowActions';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { ageText } from './age';
 import { UserName } from '@/components/ui/UserName';
+import { formatMoney, splitTrailingAmount } from '@/utils/wording';
 
 interface QueueTableProps {
   items: WorkItem[];
@@ -25,8 +26,9 @@ interface QueueTableProps {
 }
 
 /**
- * Work items with reference, record type, description, stage, origin, age, due time, assignee,
- * and Claim / Assign in the row action menu (screen standard: one menu button at the end of the
+ * Work items with reference, record type, description (the name, one line) and its amount in a
+ * right-aligned column of its own ("PHP 2,500.00"), stage, origin, age, due time, assignee, and
+ * Claim / Assign in the row action menu (screen standard: one menu button at the end of the
  * row). The record type has its own column, never a word beside the stage pill.
  */
 export function QueueTable(p: Readonly<QueueTableProps>) {
@@ -52,7 +54,22 @@ export function QueueTable(p: Readonly<QueueTableProps>) {
           truncate: true,
           render: (i) => workflowRecordType(i.workflowCode),
         },
-        { key: 'title', header: 'Description', render: (i) => i.title },
+        {
+          key: 'title',
+          header: 'Description',
+          truncate: true,
+          render: (i) => splitTrailingAmount(i.title).text,
+        },
+        {
+          key: 'amount',
+          header: 'Amount',
+          kind: 'amount',
+          width: '152px',
+          render: (i) => {
+            const { currency, amount } = splitTrailingAmount(i.title);
+            return amount === undefined ? '' : formatMoney(currency, amount);
+          },
+        },
         {
           key: 'stage',
           header: 'Stage',
@@ -93,7 +110,7 @@ export function QueueTable(p: Readonly<QueueTableProps>) {
         },
         {
           key: 'actions',
-          header: '',
+          header: 'Actions',
           kind: 'actions',
           render: (i) => (
             <RowActions

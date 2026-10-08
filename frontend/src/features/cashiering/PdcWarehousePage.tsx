@@ -15,7 +15,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId, useDefaultBranchId } from '@/context/workspaceContext';
-import { formatDate } from '@/utils/format';
+import { countOf, formatDate } from '@/utils/format';
 import { cashieringApi } from './cashieringApi';
 import type { PdcItem, PdcStatus } from './cashieringApi';
 import { byMaturityMonth, monthLabel } from './cashieringLogic';
@@ -129,7 +129,7 @@ export default function PdcWarehousePage() {
             <div className="csh-month">
               <strong>{monthLabel(m.month)}</strong>
               <span>
-                {m.items.length} check(s) · <Amount value={m.total} />
+                {countOf(m.items.length, 'check')} · <Amount value={m.total} />
               </span>
             </div>
             <DataTable

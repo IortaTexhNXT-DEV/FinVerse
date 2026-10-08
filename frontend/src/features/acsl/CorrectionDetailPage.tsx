@@ -14,7 +14,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
-import { formatAmount, formatDate } from '@/utils/format';
+import { countOf, formatAmount, formatDate } from '@/utils/format';
 import {
   CORRECTION_LABELS,
   assigneeField,
@@ -168,8 +168,8 @@ export default function CorrectionDetailPage() {
       )}
       {c.stage === 'POSTED' && (
         <Notice tone="success" title="Posted">
-          Posted as {c.journalBatchNo ?? '—'} with {String(c.openItems)} open item(s) and{' '}
-          {String(c.ledgerMovements)} ledger movement(s).
+          Posted as {c.journalBatchNo ?? '—'} with {countOf(c.openItems, 'open item')} and{' '}
+          {countOf(c.ledgerMovements, 'ledger movement')}.
         </Notice>
       )}
       <WorkflowPanel

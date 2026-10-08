@@ -19,7 +19,7 @@ import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { NumberInput } from '@/features/assets/FormControls';
-import { formatDate, formatDays } from '@/utils/format';
+import { countOf, formatDate, formatDays } from '@/utils/format';
 import { expiryRows, expiryTone } from './packageRequest';
 import type { ExpiryTab } from './packageRequest';
 import { CellStack } from '@/components/ui/CellStack';
@@ -134,7 +134,7 @@ export default function PackageExpiryPage() {
       await queryClient.invalidateQueries({ queryKey: ['package-expiry'] });
       await queryClient.invalidateQueries({ queryKey: ['package-requests'] });
       const created = results.filter((r) => r.created).length;
-      toast.success(`${created} renewal request(s) drafted`);
+      toast.success(`${countOf(created, 'renewal request')} drafted`);
       if (results.length === 1 && results[0] !== undefined) {
         void navigate(`/product-maintenance/requests/${results[0].requestId}`);
       }
@@ -178,7 +178,7 @@ export default function PackageExpiryPage() {
           }}
         />
         <div className="worklist-toolbar">
-          <span className="muted">{rows.length} package(s)</span>
+          <span className="muted">{countOf(rows.length, 'package')}</span>
           {tab === 'expiring' && can('PKG_NEGOTIATE') && (
             <div className="worklist-actions">
               <Button

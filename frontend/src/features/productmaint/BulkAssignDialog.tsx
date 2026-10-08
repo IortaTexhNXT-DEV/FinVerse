@@ -9,6 +9,7 @@ import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { useToast } from '@/components/ui/toastContext';
 import { StatusBadge } from '@/components/ui/StatusBadge';
+import { countOf } from '@/utils/format';
 
 interface BulkAssignDialogProps {
   /** Selected requests, all in the same stage. */
@@ -47,8 +48,8 @@ export function BulkAssignDialog({ requests, onClose, onDone }: Readonly<BulkAss
       await onDone();
       toast.success(
         assignee
-          ? `${requests.length} request(s) assigned to ${assignee}`
-          : `${requests.length} request(s) returned to the team queue`,
+          ? `${countOf(requests.length, 'request')} assigned to ${assignee}`
+          : `${countOf(requests.length, 'request')} returned to the team queue`,
       );
       onClose();
     },

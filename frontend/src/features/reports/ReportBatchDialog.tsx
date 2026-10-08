@@ -10,7 +10,7 @@ import { Modal } from '@/components/ui/Modal';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { today } from '@/utils/format';
+import { countOf, today } from '@/utils/format';
 import { FORMAT_LABELS } from './exportFormats';
 import { PrintOptionsFields } from './PrintOptionsFields';
 import { DEFAULT_PRINT, downloadBatch, reportOptionsApi } from './reportOptions';
@@ -101,7 +101,7 @@ export function ReportBatchDialog({ open, entries, onClose }: Readonly<Props>) {
             disabled={codes.length === 0 || codes.length > MAX_REPORTS}
             onClick={() => run.mutate()}
           >
-            Run {codes.length} Report(s)
+            Run {countOf(codes.length, 'Report')}
           </Button>
         </>
       }

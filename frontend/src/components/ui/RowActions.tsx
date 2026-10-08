@@ -76,7 +76,8 @@ export function RowActions({ record, actions }: Readonly<RowActionsProps>) {
     setOpen((o) => !o);
   };
   if (shown.length === 0) {
-    return <span className="muted">—</span>;
+    // No action is open to the user on this row: the action cell stays empty (no dash, no button).
+    return null;
   }
   const stop = (e: MouseEvent | KeyboardEvent) => e.stopPropagation();
   const onKey = (e: KeyboardEvent<HTMLDivElement>) => {

@@ -13,6 +13,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { FileDropZone } from '@/components/ui/FileDropZone';
 import { matchText } from './issuanceLogic';
+import { countOf } from '@/utils/format';
 
 function ArnCell({
   batch,
@@ -109,7 +110,7 @@ export function BulkEpolicyUpload({ companyId }: Readonly<{ companyId: number }>
           <>
             <div className="row">
               <StatusBadge status={batch.status} />
-              <span className="muted">{batch.fileCount} file(s)</span>
+              <span className="muted">{countOf(batch.fileCount, 'file')}</span>
               <span className="spacer" />
               {batch.status === 'REVIEW' && (
                 <>

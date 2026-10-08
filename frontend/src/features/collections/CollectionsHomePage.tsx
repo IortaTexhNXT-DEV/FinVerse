@@ -10,7 +10,7 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatAmount } from '@/utils/format';
+import { countOf, formatAmount } from '@/utils/format';
 import { collectionsApi } from './api';
 import type { AgingCell } from './api';
 import { agingBars, agingSegments } from './collectionsLogic';
@@ -46,7 +46,7 @@ function AgingChart({ cells }: Readonly<{ cells: AgingCell[] }>) {
               key={b.bracket}
               className="clx-aging-row"
               role="row"
-              title={`${b.bracket} days: ${b.items} account(s), ${formatAmount(b.amount)}`}
+              title={`${b.bracket} days: ${countOf(b.items, 'account')}, ${formatAmount(b.amount)}`}
             >
               <span className="clx-aging-label" role="rowheader">
                 {b.bracket}

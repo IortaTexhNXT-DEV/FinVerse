@@ -314,9 +314,35 @@
   border-top-color: var(--color-danger);
 }
 
+.stage-groups {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* One line per workflow: its name, then its stage tiles */
+.stage-group {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: var(--space-4);
+  align-items: center;
+}
+
+.stage-group + .stage-group {
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+}
+
+.stage-group-name {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-heading);
+}
+
 .stage-tiles {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(184px, 1fr));
   gap: var(--space-3);
 }
 
@@ -324,7 +350,9 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
-  padding: var(--space-3);
+  min-width: 0;
+  min-height: 84px;
+  padding: var(--space-2) var(--space-3);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-surface-alt);
@@ -344,18 +372,24 @@
   font-size: 13px;
   font-weight: 600;
   color: var(--color-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .stage-tile-count {
   font-family: var(--font-heading);
-  font-size: 26px;
+  font-size: 24px;
+  line-height: 30px;
   font-weight: 700;
   color: var(--brand-navy);
+  font-variant-numeric: tabular-nums;
 }
 
 .stage-tile-meta {
   display: flex;
   gap: var(--space-2);
+  min-height: 16px;
   font-size: 12px;
   color: var(--color-text-muted);
 }
@@ -363,6 +397,13 @@
 .stage-tile-overdue {
   color: var(--color-danger);
   font-weight: 600;
+}
+
+@media (max-width: 900px) {
+  .stage-group {
+    grid-template-columns: 1fr;
+    gap: var(--space-2);
+  }
 }
 
 /* Action tiles (Bulk Processing, quick actions) */

@@ -1,4 +1,5 @@
 import type { ProgrammeTab } from '@/api/eb';
+import { countOf } from '@/utils/format';
 
 /** Status tabs of the Programmes work list (design 10.1). */
 export const PROGRAMME_TABS: readonly { id: ProgrammeTab; label: string }[] = [
@@ -41,6 +42,6 @@ export function sendRaSummary(results: readonly { sent: boolean }[]): string {
   const sent = results.filter((r) => r.sent).length;
   const refused = results.length - sent;
   return refused === 0
-    ? `Renewal advice sent for ${String(sent)} programme(s)`
-    : `Renewal advice sent for ${String(sent)} programme(s); ${String(refused)} not sent`;
+    ? `Renewal advice sent for ${countOf(sent, 'programme')}`
+    : `Renewal advice sent for ${countOf(sent, 'programme')}; ${String(refused)} not sent`;
 }

@@ -16,14 +16,17 @@ export interface FitMeasures {
 /**
  * The height cap of a list that scrolls inside its card (BDO style guide), or null for none: the
  * list is as high as its rows unless the page would then scroll too, in which case it takes just
- * the room left in the window (never less than `min`), so the page keeps one vertical scroll bar.
+ * the room left in the window, so the page keeps one vertical scroll bar. When less than `min` is
+ * left (much content above the list), the list is not capped and the page scrolls as a whole.
  */
 export function fittedHeight(m: FitMeasures): number | null {
   const target = m.wrap - m.overflow;
-  if (target >= m.table) {
+  if (target >= m.table || target < m.min) {
+    // The rows fit, or the room left is under the least list height: a capped list would then
+    // scroll inside a page that scrolls too (two scroll bars), so the page scrolls as a whole.
     return null;
   }
-  return Math.max(m.min, Math.floor(target));
+  return Math.floor(target);
 }
 
 const DEFAULT_MIN = 240;

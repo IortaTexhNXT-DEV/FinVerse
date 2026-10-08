@@ -12,7 +12,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate } from '@/utils/format';
+import { countOf, formatDate } from '@/utils/format';
 import { CellStack } from '@/components/ui/CellStack';
 import { InsurerName } from '@/components/broking/LovLabel';
 import { cashieringApi } from './cashieringApi';
@@ -54,7 +54,9 @@ export default function CommissionOrsPage() {
     mutationFn: () => cashieringApi.issueCommissionOrs(companyId),
     onSuccess: async (ors) => {
       toast.success(
-        ors.length === 0 ? 'No OR to issue' : `${ors.length} OR(s) issued: ${ors.join(', ')}`,
+        ors.length === 0
+          ? 'No OR to issue'
+          : `${countOf(ors.length, 'OR')} issued: ${ors.join(', ')}`,
       );
       await queryClient.invalidateQueries({ queryKey: ['cashiering'] });
     },

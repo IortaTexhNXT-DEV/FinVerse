@@ -15,7 +15,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
-import { formatDate, formatDateTime, humanize, today } from '@/utils/format';
+import { countOf, formatDate, formatDateTime, humanize, today } from '@/utils/format';
 import { DateReasonModal } from './DateReasonModal';
 import { daysBetween } from './payablesMath';
 import { usePayablesLookups } from './usePayablesLookups';
@@ -68,7 +68,7 @@ export default function PdcIssuedPage() {
     mutationFn: () => payablesApi.refreshDue(today()),
     onSuccess: async (n) => {
       await refresh();
-      toast.success(`${n} cheque(s) marked due`);
+      toast.success(`${countOf(n, 'cheque')} marked due`);
     },
   });
   const act = useMutation({

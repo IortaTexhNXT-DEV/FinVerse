@@ -11,19 +11,24 @@ import type { Column } from '@/components/ui/DataTable';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
+import { KpiTile } from '@/components/ui/KpiTile';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { useCompanyId, useWorkspace, useBaseCurrency } from '@/context/workspaceContext';
-import { formatAmount, formatDate, today } from '@/utils/format';
+import { inCurrency } from '@/utils/currencyLabel';
+import { formatAmount, formatDate, titleCase, today } from '@/utils/format';
 import { AgeingChart, ProductionChart } from './DashboardCharts';
-import { BarList, DrillTile } from './DashboardParts';
+import { BarList } from './DashboardParts';
 import {
   accountsPath,
   funnelPath,
   funnelShare,
   groupName,
-  overdueHint,
+  monthStartOf,
+  overdueBreakdown,
+  overdueQualifier,
+  overdueQueuePath,
   requestPath,
-  requestsHint,
+  requestsBreakdown,
   total,
 } from './dashboardData';
 import './nbreports.css';
@@ -34,32 +39,57 @@ function Tiles({ d }: Readonly<{ d: NbDashboard }>) {
   const baseCurrency = useBaseCurrency();
   const newRequests = d.requests.find((r) => r.group === 'REQUEST' && r.code === 'NEW');
   const overdue = total(d.overdue);
+  const since = `Since ${monthStartOf(d.asOf)}`;
   return (
-    <div className="grid-4">
-      <DrillTile
+    <div className="grid-4 kpi-row">
+      <KpiTile
         label="New Requests"
         value={newRequests?.count ?? 0}
-        hint={requestsHint(d)}
         to="/quotations/requests"
+        qualifier="Waiting to be quoted"
+        breakdown={{ label: 'In progress', items: requestsBreakdown(d) }}
       />
-      <DrillTile
+      <KpiTile
         label="Quotations Sent This Month"
         value={d.quotationsSent}
-        hint={`${String(d.awaitingClient)} waiting for the client's answer`}
         to="/quotations?tab=sent"
+        qualifier={since}
+        breakdown={{
+          label: 'Client answer',
+          items: [
+            {
+              key: 'awaiting',
+              label: "Waiting for the client's answer",
+              count: d.awaitingClient,
+              to: '/quotations?tab=sent',
+            },
+          ],
+        }}
       />
-      <DrillTile
+      <KpiTile
         label="Overdue (SLA Breaches)"
         value={overdue}
-        hint={overdueHint(d.overdue)}
-        to="/reports/NB-ACC-STATUS"
+        to={overdueQueuePath()}
+        qualifier={overdueQualifier(d.overdue)}
         alert={overdue > 0}
+        breakdown={{
+          label: 'Overdue items by type',
+          items: overdueBreakdown(d.overdue),
+          allTo: overdueQueuePath(),
+        }}
       />
-      <DrillTile
+      <KpiTile
         label="Booked This Month"
         value={d.booked.count}
-        hint={`Premium ${baseCurrency} ${formatAmount(d.booked.premium)} · Commission ${baseCurrency} ${formatAmount(d.booked.commission)}`}
         to="/booking?tab=BOOKED"
+        qualifier={since}
+        pairs={[
+          { label: inCurrency('Premium', baseCurrency), value: formatAmount(d.booked.premium) },
+          {
+            label: inCurrency('Commission', baseCurrency),
+            value: formatAmount(d.booked.commission),
+          },
+        ]}
       />
     </div>
   );
@@ -76,7 +106,8 @@ function Sections({ d }: Readonly<{ d: NbDashboard }>) {
             label="Requests, quotations and proposal requests by status"
             items={d.requests.map((r) => ({
               key: `${r.group}-${r.code}`,
-              label: `${groupName(r.group)} · ${r.label}`,
+              group: groupName(r.group),
+              label: titleCase(r.label),
               value: r.count,
               to: requestPath(r),
             }))}
@@ -91,7 +122,7 @@ function Sections({ d }: Readonly<{ d: NbDashboard }>) {
             label="Accounts by stage"
             items={d.accounts.map((a) => ({
               key: a.code,
-              label: a.label,
+              label: titleCase(a.label),
               value: a.count,
               to: accountsPath(a.code),
             }))}
@@ -107,7 +138,7 @@ function Sections({ d }: Readonly<{ d: NbDashboard }>) {
           label="Quotation to booking funnel"
           items={d.funnel.map((f) => ({
             key: f.code,
-            label: f.label,
+            label: titleCase(f.label),
             value: f.count,
             to: funnelPath(f.code),
             note: `${String(funnelShare(d.funnel, f.code))} %`,

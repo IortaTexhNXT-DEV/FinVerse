@@ -5,6 +5,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { claimsHomeApi } from '../home/api';
+import { countOf } from '@/utils/format';
 
 /** Reassign the selected claims to another handler (NFR p.37, FR-CM-055; WORK_ASSIGN). */
 export function ReassignDialog({
@@ -30,7 +31,7 @@ export function ReassignDialog({
   return (
     <Modal
       open
-      title={`Reassign ${count} Claim(s)`}
+      title={`Reassign ${countOf(count, 'Claim')}`}
       onClose={onClose}
       footer={
         <>

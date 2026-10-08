@@ -20,7 +20,7 @@ import { Tag } from '@/components/ui/Tag';
 import { UserName } from '@/components/ui/UserName';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatAmount, formatDate, formatDays, humanize } from '@/utils/format';
+import { countOf, formatAmount, formatDate, formatDays, humanize } from '@/utils/format';
 import { collectionsApi } from './api';
 import type { CollectionItem, DispositionInput, EffortInput, ReassignInput } from './api';
 import { WORKLIST_TABS, filtersFromSearch, tabFromSearch, worklistQuery } from './collectionsLogic';
@@ -130,15 +130,15 @@ function useBulkActions(companyId: number, done: () => void) {
   return {
     dispose: useMutation({
       mutationFn: (input: DispositionInput) => collectionsApi.dispose(companyId, input),
-      onSuccess: (r) => onSuccess(`Disposition recorded on ${r.length} account(s)`),
+      onSuccess: (r) => onSuccess(`Disposition recorded on ${countOf(r.length, 'account')}`),
     }),
     effort: useMutation({
       mutationFn: (input: EffortInput) => collectionsApi.effort(companyId, input),
-      onSuccess: (r) => onSuccess(`Effort logged on ${r.length} account(s)`),
+      onSuccess: (r) => onSuccess(`Effort logged on ${countOf(r.length, 'account')}`),
     }),
     reassign: useMutation({
       mutationFn: (input: ReassignInput) => collectionsApi.reassign(companyId, input),
-      onSuccess: (r) => onSuccess(`${r.moved} account(s) reassigned`),
+      onSuccess: (r) => onSuccess(`${countOf(r.moved, 'account')} reassigned`),
     }),
     exportList: useMutation({
       mutationFn: (f: WorklistFilters) =>

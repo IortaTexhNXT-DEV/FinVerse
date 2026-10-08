@@ -23,7 +23,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
-import { formatAmount, formatDate, formatDateTime } from '@/utils/format';
+import { countOf, formatAmount, formatDate, formatDateTime } from '@/utils/format';
 import { AnswersDialog, CollectDialog, SendBillingDialog } from './BillingDialogs';
 import { BILLING_ENTITY, commissionApi } from './commissionApi';
 import type { DpBilling, DpItem } from './commissionApi';
@@ -205,7 +205,7 @@ export default function DpBillingPage() {
         section="Commission Receivables · DP Billings"
         backTo="/commission/dp/billings"
         title={b.billingNo}
-        description={`${insurerName(b.insurerCode)} · ${String(b.itemCount)} account(s)`}
+        description={`${insurerName(b.insurerCode)} · ${countOf(b.itemCount, 'account')}`}
         actions={<Actions billing={b} onDialog={setDialog} />}
       />
       <Summary billing={b} />

@@ -15,7 +15,7 @@ import { RowActionMenu } from '@/components/ui/RowActionMenu';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { UserName } from '@/components/ui/UserName';
 import { useToast } from '@/components/ui/toastContext';
-import { formatDateTime } from '@/utils/format';
+import { countOf, formatDateTime } from '@/utils/format';
 import { isPending, moduleActions, moduleStatus } from './moduleRows';
 import type { Pending } from './moduleRows';
 
@@ -39,7 +39,7 @@ function PendingDialog({ pending, onClose }: Readonly<{ pending: Pending; onClos
           return `${pending.module.name}: request withdrawn`;
         default: {
           const changed = await modulesApi.applyProfile(pending.profile.code, reason);
-          return `${pending.profile.name}: ${changed.length} module change(s) sent for approval`;
+          return `${pending.profile.name}: ${countOf(changed.length, 'module change')} sent for approval`;
         }
       }
     },
@@ -156,7 +156,7 @@ export default function ProductModulesPage() {
       />
       {waiting > 0 && (
         <Notice tone="info" title="Changes waiting for approval">
-          {`${waiting} module change(s) wait for approval by a user other than the requester.`}
+          {`${countOf(waiting, 'module change')} wait for approval by a user other than the requester.`}
         </Notice>
       )}
       <Card title="Modules" flush>

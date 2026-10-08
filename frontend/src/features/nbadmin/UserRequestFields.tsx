@@ -1,14 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
 import { nbadminApi } from '@/api/nbadmin';
 import type { UserAccess } from '@/api/nbadmin';
 import { LovSelect } from '@/components/broking/LovSelect';
+import { ProfilePicker } from '@/components/broking/ProfilePicker';
+import { useSodRules } from '@/components/broking/useSodRules';
 import { Field } from '@/components/ui/Field';
 import { useWorkspace, useBaseCurrency } from '@/context/workspaceContext';
-import { countOf, formatAmount } from '@/utils/format';
+import { formatAmount } from '@/utils/format';
 import { usersFor } from './accessUsers';
 import { DataAccessFields } from './DataAccessFields';
-import { profileGroups } from './profileGroups';
 import type { AccessRequestErrors, AccessRequestForm } from './accessRequest';
 import { inCurrency } from '@/utils/currencyLabel';
 
@@ -159,53 +159,22 @@ function DataFields({ form, set, errors, users }: Readonly<FieldsProps>) {
 
 function RolePicker({ form, set, errors, users }: Readonly<FieldsProps>) {
   const roles = useQuery({ queryKey: ['nbadmin', 'roles'], queryFn: nbadminApi.roles });
-  const [search, setSearch] = useState('');
-  const held = users.find((u) => u.username === form.username)?.roleCodes ?? [];
-  const toggle = (code: string, on: boolean) =>
-    set({ roleCodes: on ? [...form.roleCodes, code] : form.roleCodes.filter((r) => r !== code) });
-  const groups = profileGroups(roles.data ?? [], search, form.roleCodes);
+  const rules = useSodRules();
+  const held =
+    form.type === 'MODIFY_USER'
+      ? (users.find((u) => u.username === form.username)?.roleCodes ?? [])
+      : [];
   return (
-    <fieldset className="stack permission-picker">
-      <legend className={form.type === 'CREATE_USER' ? 'required' : undefined}>
-        Group Profiles
-      </legend>
-      <p className="muted" style={{ margin: 0 }}>
-        {countOf(form.roleCodes.length, 'profile')} selected
-      </p>
-      <input
-        type="search"
-        className="input"
-        aria-label="Search group profiles"
-        placeholder="Search by profile or module"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-      />
-      {groups.length === 0 && <p className="muted">No group profile matches the search.</p>}
-      {groups.map((g) => (
-        <div key={g.module} role="group" aria-label={g.module}>
-          <div className="permission-area">{g.module}</div>
-          <div className="form-grid">
-            {g.roles.map((r) => (
-              <label key={r.code} className="checkbox-field" htmlFor={`role-${r.code}`}>
-                <input
-                  id={`role-${r.code}`}
-                  type="checkbox"
-                  checked={form.roleCodes.includes(r.code)}
-                  onChange={(e) => toggle(r.code, e.target.checked)}
-                />
-                {r.name}
-                {held.includes(r.code) ? ' (current)' : ''}
-              </label>
-            ))}
-          </div>
-        </div>
-      ))}
-      {errors.roleCodes && (
-        <span className="field-error" role="alert">
-          {errors.roleCodes}
-        </span>
-      )}
-    </fieldset>
+    <ProfilePicker
+      legend="Group Profiles"
+      required={form.type === 'CREATE_USER'}
+      profiles={roles.data ?? []}
+      selected={form.roleCodes}
+      current={held}
+      rules={rules}
+      onChange={(roleCodes) => set({ roleCodes })}
+      error={errors.roleCodes}
+    />
   );
 }
 

@@ -20,7 +20,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { useAuth } from '@/auth/authContext';
 import { DetailList } from '@/features/catalog/DetailList';
-import { formatDate, formatDateTime, formatRate, versionLabel } from '@/utils/format';
+import { countOf, formatDate, formatDateTime, formatRate, versionLabel } from '@/utils/format';
 import { DocumentChecklist, InsurerChoices } from './ProposalFormParts';
 import { SLIP_EDIT_STAGES, slipSent } from './proposalList';
 import { archivedSlipActions } from './responseActions';
@@ -106,7 +106,7 @@ export function QuotationSlipTab({ proposal: p }: Readonly<{ proposal: Proposal 
     mutationFn: () => proposalsApi.selectInsurers(p.id, insurers),
     onSuccess: async (saved) => {
       queryClient.setQueryData(['proposal', p.id], saved);
-      toast.success(`${saved.insurers.length} insurer(s) selected for the quotation slip`);
+      toast.success(`${countOf(saved.insurers.length, 'insurer')} selected for the quotation slip`);
       await queryClient.invalidateQueries({ queryKey: ['proposals'] });
     },
   });

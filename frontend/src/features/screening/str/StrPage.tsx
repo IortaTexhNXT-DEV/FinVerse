@@ -15,7 +15,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate, formatDateTime } from '@/utils/format';
+import { countOf, formatDate, formatDateTime } from '@/utils/format';
 import { strApi } from './api';
 import type { StrExtraction, StrRow, StrStatus } from './api';
 import { ExtractDialog } from './StrDialogs';
@@ -208,7 +208,7 @@ export default function StrPage() {
           onClose={() => setExtracting(false)}
           onDone={(x) => {
             setExtracting(false);
-            toast.success(`${x.batchNo}: ${x.strCount} STR(s) extracted to ${x.fileName}`);
+            toast.success(`${x.batchNo}: ${countOf(x.strCount, 'STR')} extracted to ${x.fileName}`);
             void queryClient.invalidateQueries({ queryKey: ['screening', 'str'] });
           }}
         />

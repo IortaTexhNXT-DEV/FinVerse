@@ -28,6 +28,7 @@ import type { QuickFilter, QuotationTab } from './quotationList';
 import { QUOTATION_COLUMNS } from './quotationColumns';
 import { selectionColumn } from './selection';
 import '@/styles/quotation.css';
+import { countOf } from '@/utils/format';
 
 const EXPIRY_WARNING_DAYS = 7;
 
@@ -68,7 +69,9 @@ export default function QuotationsPage() {
       setSending(false);
       setSelected(new Set());
       await queryClient.invalidateQueries({ queryKey: ['quotations'] });
-      toast.success(`${result.quotations} quotation(s) sent in ${result.clients} e-mail(s)`);
+      toast.success(
+        `${countOf(result.quotations, 'quotation')} sent in ${countOf(result.clients, 'e-mail')}`,
+      );
     },
   });
   const choose = (next: QuotationTab, q?: QuickFilter) => {

@@ -37,9 +37,10 @@ screens:
     rules:
       - "A placement slip is generated only when every prerequisite of the account is met (FR-NB-080)."
       - "One slip is generated per insurer branch; the accounts of the same branch share it (FR-NB-080)."
+      - "Each slip carries the EOPT details of its clients (taxpayer name, TIN, registered address) from the client record; a client without them is shown with a notice (FR-NB-087, CLR-NB-45)."
       - "Each account of a bulk action is processed on its own; a failure does not stop the others (FR-NB-085, FR-NB-086)."
     outcome: Processing places the accounts with the insurers in batches and follows returns and hold covers.
-    frs: [FR-NB-080, FR-NB-081, FR-NB-084, FR-NB-085, FR-NB-086]
+    frs: [FR-NB-080, FR-NB-081, FR-NB-084, FR-NB-085, FR-NB-086, FR-NB-087]
     tests: [PLWB]
 
   - id: SCR-NB-19
@@ -117,8 +118,9 @@ screens:
     rules:
       - "The send log of each slip is kept with the message and its outcome (FR-NB-081)."
       - "Insurers have no access to BIBS; slips reach them by e-mail only (FR-NB-081)."
+      - "A slip whose client EOPT details changed after generation is regenerated with the current details before it is sent (FR-NB-087)."
     outcome: Every slip sent to an insurer is traceable by version, recipient and time.
-    frs: [FR-NB-080, FR-NB-081]
+    frs: [FR-NB-080, FR-NB-081, FR-NB-087]
     tests: [SLIPS]
 
   - id: SCR-NB-21

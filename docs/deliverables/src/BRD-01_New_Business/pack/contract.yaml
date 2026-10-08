@@ -22,7 +22,7 @@ contract:
     party: BRD-3 Product Maintenance
     direction: In
     what: Field rules and mandatory documents per product, TSU routing rules, incentive criteria
-    how: Field and document rules are checked at submission; TSU rules decide the PRF route and TSU clearance; incentive criteria set the incentive flag at booking
+    how: Field and document rules are checked at submission; TSU rules decide the PRF route and TSU clearance; incentive criteria set the incentive indicator when the booked invoice is fully paid and again when an endorsement is posted
     owner: Business Administrator and MBS (authorised)
     screens: New Account (review), New Proposal Request (checklist), Pre-booking Confirmation
     frs: [FR-NB-002, FR-NB-003, FR-NB-005, FR-NB-118]
@@ -74,6 +74,14 @@ contract:
     owner: Collections (BRD-4)
     screens: Pre-booking Confirmation (flags), Direct Payment
     frs: [FR-NB-069, FR-NB-110]
+  - id: IC-20
+    party: BRD-4 Collections
+    direction: In
+    what: The payment status of each booked invoice (unpaid, partly paid, fully paid), which starts the incentive eligibility evaluation (BRNB.107)
+    how: When Collections applies the payment that brings the invoice balance to zero, the invoice is marked Fully Paid and New Business evaluates the incentive indicator; a reversal of that payment evaluates it again
+    owner: Collections (BRD-4)
+    screens: Booked Invoice, Booked Accounts Register
+    frs: [FR-NB-118]
   - id: IC-10
     party: BRD-5 Accounting, Disbursement and ACSL
     direction: Out
@@ -98,6 +106,14 @@ contract:
     owner: Renewal team; Processing for placement and booking
     screens: Quotations, Proposal Requests, Placement Workbench, Booking Workbench
     frs: [FR-NB-041, FR-NB-050, FR-NB-080, FR-NB-110]
+  - id: IC-21
+    party: BRD-6 Renewal
+    direction: Out
+    what: The incentive eligibility rule of booked and fully paid transactions, with the endorsements considered (one rule for New Business BRNB.107 and Renewal BRRN.041)
+    how: Renewal bookings use the same evaluation at full payment, after the client's acceptance is confirmed, with re-evaluation on endorsement and cancellation
+    owner: MBS (rule); Product Maintenance (criteria)
+    screens: Booked Invoice, Booked Accounts Register
+    frs: [FR-NB-118]
   - id: IC-13
     party: BRD-9 Customer Servicing Facility
     direction: Out
@@ -125,11 +141,11 @@ contract:
   - id: IC-16
     party: Insurers (external)
     direction: Out / In
-    what: Quotation slips, placement slips, hold cover requests and service invoices by e-mail; insurer terms, confirmations and e-policies received by e-mail and keyed in or uploaded
+    what: Quotation slips, placement slips with the EOPT details of the client, hold cover requests and service invoices by e-mail; insurer terms, confirmations and e-policies received by e-mail and keyed in or uploaded
     how: E-mail to the insurer branch placement address; electronic channels (file transfer or system-to-system) wait for the channel specification; insurers have no access to BIBS
     owner: Insurer master (Business Administrator)
     screens: PRF record, Placement Slips, Account Placement, E-policy Upload, Service Invoices
-    frs: [FR-NB-053, FR-NB-081, FR-NB-082, FR-NB-100, FR-NB-117]
+    frs: [FR-NB-053, FR-NB-081, FR-NB-087, FR-NB-082, FR-NB-100, FR-NB-117]
   - id: IC-17
     party: CLPC (BDO Unibank)
     direction: Out / In
@@ -149,11 +165,11 @@ contract:
   - id: IC-19
     party: Clients and mortgagee banks (external)
     direction: Out
-    what: Quotations, proposals, e-policies and Insurance Advices by e-mail, password protected, with the password in a separate e-mail
+    what: Quotations with their supporting documents, proposals, e-policies and Insurance Advices by e-mail, password protected, with the password in a separate e-mail; Insurance Advices sent automatically to the recipients enrolled in the MIS set-up
     how: E-mail from BIBS; delivery outcome in Outbound Messages
     owner: Marketing, E-policy Sender, Processing
     screens: Quotation record, PRF record, E-policy Dispatch, Insurance Advice
-    frs: [FR-NB-013, FR-NB-044, FR-NB-057, FR-NB-104, FR-NB-105]
+    frs: [FR-NB-013, FR-NB-044, FR-NB-057, FR-NB-104, FR-NB-105, FR-NB-107]
 change_rule: >-
   This contract is part of the signed BRD-1 set. A later change in BRD-2, BRD-3, BRD-4, BRD-5, BRD-6, BRD-9, BRD-10,
   BRD-11, BRD-12 or BRD-13, or in an external interface, that changes what New Business takes or hands over as listed

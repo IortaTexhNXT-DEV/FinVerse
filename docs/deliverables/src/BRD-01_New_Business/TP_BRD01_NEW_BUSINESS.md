@@ -2,14 +2,14 @@
 # Word summary of the BRD-1 New Business test plan. The tables marked <!-- tp:... --> are filled
 # from brd01_cases.yaml. Build: python docs/deliverables/src/testplans/build_test_plan.py brd01_cases.yaml
 title: New Business Test Plan
-subtitle: BRD-1 New Business (Fire, Motor, Other Lines and Non-Package) and Workshop Addendum - test conditions, scenarios and cases
+subtitle: BRD-1 New Business (Fire, Motor, Other Lines and Non-Package), Workshop Addendum and IT Walkthrough Addendum - test conditions, scenarios and cases
 doc_type: Test Plan
 doc_code: TestPlan
 brd: BRD-01
 name: New Business Summary
 doc_id: BIBS-TP-BRD-01
-version: "2.0"
-date: 26 September 2026
+version: "2.1"
+date: 8 October 2026
 status: Issued for BDOI business sign-off
 header_title: Test Plan BRD-1 New Business
 h1_page_break: false
@@ -32,6 +32,12 @@ control:
     reviewer: iorta TechNXT Project Manager
     approver: BDOI business units (sign-off)
     change: "Release set v2.0: cases re-traced to FRS v2.0 and its screen specifications (Screen ID on every case, Screens sheet); one screen case per screen and one message case per screen or dialog of the messages catalogue added. Status as of 26-Sep-2026"
+  - version: "2.1"
+    date: 08-Oct-2026
+    author: iorta TechNXT QA
+    reviewer: iorta TechNXT Project Manager
+    approver: BDOI business units (sign-off)
+    change: "Re-based on New Business (NB) BRD 05132026 and FRS BRD-1 v2.1; user-story view and storyboard index added to the FRS. Cases added for FR-NB-087 (EOPT details on the placement) and FR-NB-107 (automatic sending of the Insurance Advice); cases changed or added for FR-NB-044 (partial success, supporting documents, delivery status), FR-NB-046, FR-NB-104, FR-NB-117 (notice of every sending) and FR-NB-118 (incentive indicator at full payment, endorsements, cancellation)"
 distribution:
   - {name: "Product Owner, BDOI", role: Approver, organisation: BDOI, purpose: Review and sign-off}
   - {name: "Retail, Commercial, Corporate and Institutional Marketing", role: Business tester, organisation: BDOI, purpose: "Clients, quotations, PRFs, accounts"}
@@ -47,13 +53,13 @@ distribution:
 
 ## Purpose
 
-This document summarises the test plan for BRD-1 New Business in BIBS (BDOI Broker System, on iNXT BrokerVerse). It tells the BDOI departments what will be tested, how, with which data and by whom, and when testing is complete. The test conditions, scenarios and cases are in the Excel workbook of the same version, `04_BIBS_TestPlan_BRD-01_New_Business_v2.0.xlsx`, which the testers use during execution.
+This document summarises the test plan for BRD-1 New Business in BIBS (BDOI Broker System, on iNXT BrokerVerse). It tells the BDOI departments what will be tested, how, with which data and by whom, and when testing is complete. The test conditions, scenarios and cases are in the Excel workbook of the same version, `04_BIBS_TestPlan_BRD-01_New_Business_v2.1.xlsx`, which the testers use during execution.
 
-Every case traces to a functional requirement (FR) of FRS BRD-1 v1.0 and to the BRD requirement IDs (BRNB.nnn) and BRD sections that the FR meets. The expected results quote the messages, with their codes, as BIBS shows them.
+Every case traces to a functional requirement (FR) of FRS BRD-1 v2.1 and to the BRD requirement IDs (BRNB.nnn) and BRD sections that the FR meets. The expected results quote the messages, with their codes, as BIBS shows them.
 
 ## Scope
 
-In scope are all 93 FRs of FRS BRD-1 v1.0, grouped as in the FRS:
+In scope are all 95 FRs of FRS BRD-1 v2.1, grouped as in the FRS:
 
 - product lines, product-specific fields and validations, intake templates and TSU routing (FR-NB-001 to 005);
 - common controls: stages and history, work queues, void, document protection, approval before sending, notifications, audit, documents, bulk uploads and the authoritative source of data (FR-NB-010 to 020);
@@ -61,9 +67,9 @@ In scope are all 93 FRs of FRS BRD-1 v1.0, grouped as in the FRS:
 - package quotation: requests, quotations and versions, approval, sending, acceptance, bulk quotations and the ARN (FR-NB-040 to 047);
 - non-package placement: PRF, Marketing approval, TSU queue, quotation slip, insurer terms, comparative table, proposal slip and acceptance (FR-NB-050 to 057);
 - accounts: search, creation, premium of Appendix A, duplicates, submission and validation, bulk accounts, contacts, returns, FFY and direct payment (FR-NB-060 to 069);
-- placement and hold cover, CLPC billing, payment reports and the payment gate (FR-NB-080 to 092);
-- issuance: e-policy receipt, extraction, document triggers, Insurance Advice and e-policy dispatch (FR-NB-100 to 106);
-- booking: individual, batch, automatic and direct booking, multi-year, endorsements, cancellation, service invoices, incentive indicator and cost center (FR-NB-110 to 119);
+- placement with the EOPT details of the client, hold cover, CLPC billing, payment reports and the payment gate (FR-NB-080 to 092);
+- issuance: e-policy receipt, extraction, document triggers, Insurance Advice with its automatic sending and e-policy dispatch (FR-NB-100 to 107);
+- booking: individual, batch, automatic and direct booking, multi-year, endorsements, cancellation, service invoices, incentive indicator of booked and fully paid transactions and cost center (FR-NB-110 to 119);
 - the NB dashboard and reports (FR-NB-120 to 126);
 - administration: log-in and session, browser tabs, lists of values, approvals, profiles, access requests, audit log and retention (FR-NB-130 to 137).
 
@@ -84,11 +90,11 @@ The roles-and-access sheet checks each New Business action against the roles tha
 <!-- table: widths=1.2,8.6,4.2 caption="Reference documents" -->
 | Ref. | Document | Version |
 |---|---|---|
-| R1 | Functional Requirements Specification BRD-1 New Business (`02_BIBS_FRS_BRD-01_New_Business_v2.0.docx`) | 2.0, 1 Oct 2026 |
+| R1 | Functional Requirements Specification BRD-1 New Business (`02_BIBS_FRS_BRD-01_New_Business_v2.1.docx`) | 2.1, 8 Oct 2026 |
 | R2 | New Business BRD pack | Addendum signed Apr-2026; Other Lines Dec-2025; Fire and Motor V06162025 |
-| R3 | Test plan workbook BRD-1 (`04_BIBS_TestPlan_BRD-01_New_Business_v2.0.xlsx`) | 2.0 |
+| R3 | Test plan workbook BRD-1 (`04_BIBS_TestPlan_BRD-01_New_Business_v2.1.xlsx`) | 2.1 |
 | R5 | Test plan BRD-3 Product Maintenance (catalogue, versions, incentive criteria) | 1.0 |
-| R6 | BRD discrepancy and clarification register (`BIBS_Register_BRD-00_Discrepancies_and_Clarifications_v1.0.xlsx`) | 1.0 |
+| R6 | BRD discrepancy and clarification register (`BIBS_Register_BRD-00_Discrepancies_and_Clarifications_v1.2.xlsx`) | 1.2 |
 
 # Test approach
 
@@ -120,12 +126,12 @@ The roles-and-access sheet checks each New Business action against the roles tha
 | Workflow | A stage transition, return or closure of NB_CLIENT, NB_QUOTATION, NB_PROPOSAL or NB_ACCOUNT |
 | Report-output | Reports, registers, comparative tables and exports; content checked against the screen |
 | Upload-download | Bulk uploads, documents, e-policies, billing and payment files, downloads and protected e-mails |
-| Screen | The screen matches its specification in FRS v2.0 chapter 13: fields, order, labels, mandatory markers, defaults, lists and buttons (TC-NB-SCR-nn, one per screen) |
-| Message | Every error, validation and warning message of one screen or dialog, word for word with its code (TC-NB-MSG-nn, from the messages catalogue of FRS v2.0 chapter 15) |
+| Screen | The screen matches its specification in FRS v2.1 chapter 13: fields, order, labels, mandatory markers, defaults, lists and buttons (TC-NB-SCR-nn, one per screen) |
+| Message | Every error, validation and warning message of one screen or dialog, word for word with its code (TC-NB-MSG-nn, from the messages catalogue of FRS v2.1 chapter 15) |
 
 ## Reading the workbook
 
-The workbook has a README sheet that explains every column. The sheets are Document Control, Test Conditions, Scenarios, Test Cases, Coverage, Screens, Test Data, Roles and Access. Case IDs carry their condition: TC-NB-061.3-01 is the first case of condition 3 of FR-NB-061. The Screen ID column of Test Cases links each case to the screen specification of FRS v2.0 (SCR-NB-01 to SCR-NB-46); the Screens sheet lists the cases of each screen. Screen and message cases are numbered TC-NB-SCR-nn and TC-NB-MSG-nn and trace to the first FR of their screen. Status starts as Not run; testers fill Status, Actual result, Tester, Date and Issue ID.
+The workbook has a README sheet that explains every column. The sheets are Document Control, Test Conditions, Scenarios, Test Cases, Coverage, Screens, Test Data, Roles and Access. Case IDs carry their condition: TC-NB-061.3-01 is the first case of condition 3 of FR-NB-061. The Screen ID column of Test Cases links each case to the screen specification of FRS v2.1 (SCR-NB-01 to SCR-NB-46); the Screens sheet lists the cases of each screen. Screen and message cases are numbered TC-NB-SCR-nn and TC-NB-MSG-nn and trace to the first FR of their screen. Status starts as Not run; testers fill Status, Actual result, Tester, Date and Issue ID.
 
 # Entry and exit criteria
 
@@ -136,7 +142,7 @@ The workbook has a README sheet that explains every column. The sheets are Docum
 |---|---|
 | System test | BIBS is deployed on SIT with the seed data; the test mailboxes for clients and the four seed insurers receive mail; the booking accounting rule of the seed data is active; this plan is reviewed by the iorta TechNXT project manager. |
 | Persona end-to-end | All High-priority system test cases are run; no open Critical issue; e-mail relay, scheduled jobs (MAIL_DISPATCH, BOOKING_BATCH, HOLD_COVER_EXPIRY, KYC_REVIEW_DUE, PAYMENT_CONFIRMATION_SWEEP) run on SIT. |
-| UAT | FRS BRD-1 v1.0 is signed off or its open comments are agreed; the system test exit criteria are met; the UAT environment holds masked data (section 4.1); BDOI testers have user IDs with the roles of section 5; Comptrollership has confirmed the GL accounts of the booking rule for UAT (OQ07). |
+| UAT | FRS BRD-1 v2.1 is signed off or its open comments are agreed; the system test exit criteria are met; the UAT environment holds masked data (section 4.1); BDOI testers have user IDs with the roles of section 5; Comptrollership has confirmed the GL accounts of the booking rule for UAT (OQ07). |
 
 ## Exit criteria
 
@@ -226,7 +232,7 @@ Every FR has at least one positive and one negative case, and every BRD ID is co
 
 ## Coverage by screen
 
-Every screen of the FRS v2.0 screen specifications has its screen case and the cases that start on it. A case is linked to the screen where the tester starts; the steps may go on to other screens.
+Every screen of the FRS v2.1 screen specifications has its screen case and the cases that start on it. A case is linked to the screen where the tester starts; the steps may go on to other screens.
 
 <!-- tp:screens -->
 

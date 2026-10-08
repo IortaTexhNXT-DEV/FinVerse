@@ -5,10 +5,37 @@
 # changes of the issue and the points for the UX Design team to confirm.
 
 issue:
-  version: "2.0"
-  date: 1 October 2026
-  # First issue of the UX screen documents of the set: every screen is new to the UX Design team.
-  changes: []
+  version: "2.1"
+  date: 8 October 2026
+  # Re-issue on the New Business BRD of 13 May 2026 (IT Walkthrough Addendum): the screens whose specification changes.
+  changes:
+    - ref: CHG-NB-2.1-01
+      what: >-
+        Send via Email of quotations: one or more quotations to one or more recipients with the supporting documents
+        ticked in the dialog or sent on their own; a batch sends the valid quotations and lists the others with their
+        reason; each quotation shows the delivery status of its last sending (FR-NB-044, BRNB.042)
+      screens: [SCR-NB-05, SCR-NB-07]
+    - ref: CHG-NB-2.1-02
+      what: >-
+        Placement slips carry the EOPT details of each client (taxpayer name, TIN, registered address); the Generate
+        Placement Slips dialog shows them or a notice when they are not on record; a slip whose details changed is
+        regenerated before sending (FR-NB-087, BRNB.100)
+      screens: [SCR-NB-18, SCR-NB-20]
+    - ref: CHG-NB-2.1-03
+      what: >-
+        Insurance Advice register: the sending of each advice shows Manual or Automatic; advices of a mortgagee enrolled in
+        the MIS set-up are sent when they are generated (FR-NB-107, BRNB.060)
+      screens: [SCR-NB-26]
+    - ref: CHG-NB-2.1-04
+      what: >-
+        Incentive indicator: Pending until the booked invoice is fully paid, then Eligible or Not eligible with the
+        criterion code; evaluated again on endorsement and cancellation (FR-NB-118, BRNB.107)
+      screens: [SCR-NB-29, SCR-NB-30]
+    - ref: CHG-NB-2.1-05
+      what: >-
+        Service Invoices: the owner is notified of every sending, successful or failed, and the register keeps the status,
+        owner and time (FR-NB-117, BRNB.100.1)
+      screens: [SCR-NB-32]
 
 # The personas whose landing page and full menu the deck shows.
 navigation:
@@ -67,7 +94,7 @@ states:
 
 # Points for the UX Design team to confirm with BDOI.
 confirm:
-  clarifications: [CLR-NB-38, CLR-NB-39, CLR-NB-40, CLR-NB-41, CLR-NB-42, CLR-NB-43]
+  clarifications: [CLR-NB-38, CLR-NB-39, CLR-NB-40, CLR-NB-41, CLR-NB-42, CLR-NB-43, CLR-NB-45, CLR-NB-47, CLR-NB-48]
   findings:
     - screens: [SCR-NB-37]
       observation: >-

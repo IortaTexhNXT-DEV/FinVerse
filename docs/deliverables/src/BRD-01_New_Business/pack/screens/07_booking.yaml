@@ -73,7 +73,7 @@ screens:
     rules:
       - "Nothing is posted until Book Account (FR-NB-110)."
       - "Every booking carries its cost center and business type (New Business or Renewal) (FR-NB-119)."
-      - "The incentive eligibility flag comes from the incentive criteria of Product Maintenance (FR-NB-118)."
+      - "The incentive eligibility indicator is evaluated against the incentive criteria of Product Maintenance only when the booked invoice is fully paid, with the endorsements considered; until then it reads Pending (FR-NB-118, CLR-NB-46)."
       - "A multi-year account books year 1 now and schedules the later years (FR-NB-114)."
     outcome: The account is booked; its invoice is available to Operations, Collections and Accounting.
     frs: [FR-NB-110, FR-NB-113, FR-NB-114, FR-NB-117, FR-NB-118, FR-NB-119]
@@ -113,8 +113,9 @@ screens:
     rules:
       - "A cancellation returns premium; the return cannot exceed the premium in force of the policy year (FR-NB-116)."
       - "Cancellation and negative endorsements are posted by the Adjustment role only (FR-NB-115, FR-NB-116)."
+      - "A posted financial endorsement re-evaluates the incentive indicator of a fully paid booking; a cancellation sets it to Not eligible (FR-NB-118)."
     outcome: The booking, its endorsements and cancellation are visible with their GL effect.
-    frs: [FR-NB-110, FR-NB-115, FR-NB-116, FR-NB-117]
+    frs: [FR-NB-110, FR-NB-115, FR-NB-116, FR-NB-117, FR-NB-118]
     tests: [INVOICE]
 
   - id: SCR-NB-31
@@ -176,7 +177,7 @@ screens:
       - "Send via Email | Every user of the screen | Always | Sends the service invoice e-mail again to the billing e-mail | Unchanged | E-mail to the recipient"
       - "Credit | BOOKING_ADJUST | Service invoice not a credit, amount left | Issues a credit note for the amounts | Unchanged (credit issued) | E-mail to the insurer"
     rules:
-      - "Service invoices are issued automatically at booking by the active service invoice types; the owner team is notified of the dispatch (FR-NB-117)."
+      - "Service invoices are issued automatically at booking by the active service invoice types; the owner team is notified of every sending, successful or failed, and the register keeps the status, owner and time (FR-NB-117)."
       - "Service invoices of the early remittance incentive type are issued automatically only (FR-NB-117)."
     outcome: Insurers receive their commission service invoices; credits are traceable to the original.
     frs: [FR-NB-117]

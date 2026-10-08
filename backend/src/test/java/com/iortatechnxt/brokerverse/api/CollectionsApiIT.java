@@ -52,7 +52,7 @@ class CollectionsApiIT {
     api.doGet("clxtl", BASE + "/worklist/totals" + company() + "&groupBy=ARN")
         .andExpect(status().isOk())
         .andExpect(jsonPath("$[0].key").exists());
-    api.doGet("uw", BASE + "/worklist" + company()).andExpect(status().isForbidden());
+    api.doGet("norole", BASE + "/worklist" + company()).andExpect(status().isForbidden());
 
     api.doGet("clxhandler", account)
         .andExpect(status().isOk())
@@ -218,7 +218,7 @@ class CollectionsApiIT {
         .andExpect(jsonPath("$.aging").isArray());
     api.doGet("clxtl", BASE + "/home" + company())
         .andExpect(jsonPath("$.tiles[?(@.key == 'unassigned')]").exists());
-    api.doGet("uw", BASE + "/home" + company()).andExpect(status().isForbidden());
+    api.doGet("norole", BASE + "/home" + company()).andExpect(status().isForbidden());
 
     api.doPost("clxhandler", BASE + "/exports" + company(), Map.of("segment", "CBG"))
         .andExpect(status().isOk())
@@ -238,7 +238,7 @@ class CollectionsApiIT {
     api.doGet("cashier", BASE + "/files" + company() + "&frequency=DAILY&frequency=ON_REQUEST")
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.content[0].reportRunId").isNumber());
-    api.doGet("uw", BASE + "/files" + company()).andExpect(status().isForbidden());
+    api.doGet("norole", BASE + "/files" + company()).andExpect(status().isForbidden());
 
     api.doGet("clxuh", BASE + "/setup" + company())
         .andExpect(status().isOk())

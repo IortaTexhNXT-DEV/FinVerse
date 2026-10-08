@@ -223,7 +223,7 @@ class AdminScreensApiIT {
         .andExpect(header().string("Content-Disposition", containsString("FIN-TB-MAIN")));
     mvc.perform(
             post("/api/v1/reports/FIN-TB-MAIN/run")
-                .with(as("uw"))
+                .with(as("norole"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(params))
         .andExpect(status().isForbidden());

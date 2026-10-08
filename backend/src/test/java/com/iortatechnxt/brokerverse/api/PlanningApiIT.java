@@ -28,7 +28,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
-/** Write endpoints of budgets, inter-company, consolidation and closing through the HTTP stack. */
+/** Write endpoints of budgets and closing through the HTTP stack. */
 @IntegrationTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class PlanningApiIT {
@@ -42,14 +42,11 @@ class PlanningApiIT {
   @Autowired private TestCompanies companies;
 
   private Long parent;
-  private Long subsidiary;
 
   @BeforeAll
   void setUp() {
     parent = companies.create("TAPA", "PHP").getId();
-    subsidiary = companies.create("TAPB", "USD").getId();
     companies.openYear(parent, 2026);
-    companies.openYear(subsidiary, 2026);
   }
 
   private RequestPostProcessor as(String username) {
@@ -150,64 +147,7 @@ class PlanningApiIT {
   }
 
   @Test
-  void intercompanyConsolidationAndClosingOverHttp() throws Exception {
-    Map<String, Object> relationship =
-        map(
-            "companyAId", parent,
-            "aDueFromAccount", "1607",
-            "aDueToAccount", "2510",
-            "companyBId", subsidiary,
-            "bDueFromAccount", "1607",
-            "bDueToAccount", "2510");
-    JsonNode rel = send(postJson("/api/v1/intercompany/relationships", relationship), MANAGER, 201);
-    String relUrl = "/api/v1/intercompany/relationships/" + rel.get("id").asLong();
-    send(post(relUrl + "/active?active=true"), MANAGER, 200);
-    Map<String, Object> charge =
-        map(
-            "type", "CHARGE",
-            "creditorCompanyId", parent,
-            "debtorCompanyId", subsidiary,
-            "valueDate", "2026-04-15",
-            "currency", "USD",
-            "amount", 250,
-            "creditorAccount", "4700",
-            "debtorAccount", "5605",
-            "narration", "Fee",
-            "costCenter", "FIN");
-    send(postJson("/api/v1/intercompany/transactions", charge), MANAGER, 201);
-
-    Map<String, Object> member =
-        map(
-            "companyId",
-            subsidiary,
-            "ownershipPct",
-            100,
-            "investmentAccount",
-            "1506",
-            "equityAccounts",
-            List.of("3100"));
-    Map<String, Object> group =
-        map(
-            "code", "TAPG",
-            "name", "API group",
-            "parentCompanyId", parent,
-            "currency", "PHP",
-            "ctaAccount", "3450",
-            "nciAccount", "3600",
-            "goodwillAccount", "1850",
-            "active", true,
-            "members", List.of(member));
-    long groupId =
-        send(postJson("/api/v1/consolidation/groups", group), MANAGER, 201).get("id").asLong();
-    send(putJson("/api/v1/consolidation/groups/" + groupId, group), MANAGER, 200);
-    String runs = "/api/v1/consolidation/groups/" + groupId + "/runs?asOf=2026-05-31";
-    long runId = send(post(runs), MANAGER, 201).get("id").asLong();
-    // Consolidation is read with CONSOLIDATION_RUN only since V1064 (no longer REPORT_FINANCIAL).
-    mvc.perform(get("/api/v1/consolidation/runs/" + runId).with(as(MANAGER)))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.trialBalance").isArray());
-    send(post("/api/v1/consolidation/runs/" + runId + "/finalize"), MANAGER, 200);
-
+  void closingOverHttp() throws Exception {
     AccountingPeriod april = companies.period(parent, LocalDate.of(2026, 4, 30));
     Map<String, Object> revaluation =
         map("companyId", parent, "periodId", april.getId(), "autoReverse", false);

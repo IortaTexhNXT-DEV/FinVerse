@@ -13,7 +13,6 @@ import { renewalModule } from '@/features/renewal/module';
 import { submittedModule } from '@/features/submitted/module';
 import { bulkModule } from '@/features/bulk/module';
 import { assetsModule } from '@/features/assets/module';
-import { claimsModule } from '@/features/claims/module';
 import { collectionsModule } from '@/features/collections/module';
 import { commissionModule } from '@/features/commission/module';
 import { crmModule } from '@/features/crm/module';
@@ -40,15 +39,12 @@ import { placementModule } from '@/features/placement/module';
 import { prodreconModule } from '@/features/prodrecon/module';
 import { withPackageRequests } from '@/features/productmaint/module';
 import { receivablesModule } from '@/features/receivables/module';
-import { reinsuranceModule } from '@/features/reinsurance/module';
 import { remittanceModule } from '@/features/remittance/module';
 import { reportsModule } from '@/features/reports/module';
-import { reservesModule } from '@/features/reserves/module';
 import { screeningModule } from '@/features/screening/module';
 import { screeningSetupModule } from '@/features/screening/setupModule';
 import { setupModule } from '@/features/setup/module';
 import { taxModule } from '@/features/tax/module';
-import { underwritingModule } from '@/features/underwriting/module';
 import { workspaceModule } from '@/features/workspace/module';
 import { withProductModules } from './productModules';
 import type { FeatureModule, NavGroup } from './types';
@@ -128,10 +124,6 @@ export const NAV_GROUPS: NavGroup[] = withProductModules([
     modules: [
       // Claims Handling (BRD-7) first, CLAIMS_BROKING_DESIGN section 11.
       brokerClaimsModule,
-      underwritingModule,
-      claimsModule,
-      reinsuranceModule,
-      reservesModule,
     ],
   },
   // Data Migration (BRD-13), DATA_MIGRATION_DESIGN section 22.

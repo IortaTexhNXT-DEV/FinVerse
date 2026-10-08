@@ -176,7 +176,7 @@ Phase 1 must not preclude:
 | RI premium collection, application, remittance schedule, proof of remittance, net settlement (FRID-039-052) | `cashiering`, `remittance`, `subledger/service/OpenItemService.match` | Keep remittance schedule and proof-of-remittance templates configurable; netting through open-item matching |
 | RI claims: PLA, RCRF, FLA, cash call, debit note, claims proceeds (FRID-058-105) | `brokerclaims` records claims and loss advice (`LossAdviceService`) | Keep the claim party model open to reinsurers; claim money flow decided by CRQ03 and CLQ10 |
 | Accounting entries (FRID-031, 042, 066) | `accounting` event rules by event type | New RI event types only; no change to existing posting rules |
-| Insurer-side `reinsurance` module (treaties, cessions, FAC, `SoaDialog`) | Built for the insurer suite; not a broker model | Stay hidden from BDOI roles; reuse only its SOA statement layout ideas |
+| Insurer-side `reinsurance` module (treaties, cessions, FAC, `SoaDialog`) | Built for the insurer suite; not a broker model | Removed on 8 October 2026 (`CODEBASE_RELEVANCE_AUDIT.md` A3); its SOA statement layout is in git history |
 
 Dependencies seen in the ReInsurance BRD: BDOI TSU (request initiation), Comptrollership (remittance to cedant,
 FRID-039), Operations (booking, FRID-028-030), Claims handlers (RCRF, PLA), e-mail and notifications, report

@@ -15,15 +15,11 @@ export type TaxType =
   | 'EWT';
 export type PayeeClass = 'INDIVIDUAL' | 'CORPORATE';
 export type VatTreatment = 'REGULAR' | 'ZERO_RATED' | 'EXEMPT';
-export type WorksheetKind = 'VAT' | 'EWT' | 'DST' | 'PREMIUM_TAX' | 'LGT' | 'FST' | 'NONE';
+export type WorksheetKind = 'VAT' | 'EWT' | 'NONE';
 export type FilingFrequency = 'MONTHLY' | 'QUARTERLY' | 'MONTHLY_EXCEPT_QUARTER_END' | 'ANNUAL';
 export type TaxAuthority = 'BIR' | 'LGU' | 'BFP';
 export type ReturnStatus = 'DRAFT' | 'FILED' | 'PAID' | 'CANCELLED';
 export type DueState = 'PAID' | 'OVERDUE' | 'DUE_SOON' | 'UPCOMING' | 'REMINDER';
-export type IcSchedule =
-  'PREMIUMS' | 'LOSSES' | 'COMMISSIONS' | 'NET_WORTH' | 'RBC' | 'RESERVES' | 'INVESTMENTS';
-export type NormalBalance = 'DEBIT' | 'CREDIT';
-export type IcMeasure = 'BALANCE' | 'MOVEMENT';
 export type BirList = 'SLS' | 'SLP' | 'QAP';
 
 interface Maintained {
@@ -82,24 +78,6 @@ export interface PartyTaxProfile extends Maintained {
 
 export type PartyTaxProfileRequest = Omit<PartyTaxProfile, 'id' | 'recordStatus' | 'maker'>;
 
-export interface IcLine extends Maintained {
-  schedule: IcSchedule;
-  lineCode: string;
-  description: string;
-  lineOrder: number;
-  accountFrom?: string;
-  accountTo?: string;
-  reportGroup?: string;
-  normalBalance: NormalBalance;
-  signFactor: number;
-  measure: IcMeasure;
-  rbcFactor?: number;
-}
-
-export type IcLineRequest = Omit<IcLine, 'id' | 'recordStatus' | 'maker' | 'measure'> & {
-  measure?: IcMeasure;
-};
-
 export interface WorksheetLine {
   code: string;
   description: string;
@@ -116,8 +94,8 @@ export interface ReturnFigures {
 }
 
 export interface TaxDocument {
-  section: 'SALES' | 'PURCHASES' | 'WITHHOLDING' | 'PREMIUMS';
-  sourceType: 'POLICY' | 'ENDORSEMENT' | 'COMMISSION' | 'SUPPLIER_INVOICE';
+  section: 'SALES' | 'PURCHASES' | 'WITHHOLDING';
+  sourceType: 'SUPPLIER_INVOICE';
   sourceId: number;
   documentNo: string;
   documentDate: string;
@@ -289,10 +267,4 @@ export const taxApi = {
     api.post<Certificate>(`${base}/2307/certificates/${id}/cancel`, { reason }),
   certificatePdf: (id: number) => api.getFile(`${base}/2307/certificates/${id}/pdf`),
   batchPdf: (id: number) => api.getFile(`${base}/2307/batches/${id}/pdf`),
-  icMappings: (companyId: number) =>
-    api.get<IcLine[]>(`${base}/ic/mappings${toQuery({ companyId })}`),
-  createIcLine: (body: IcLineRequest) => api.post<IcLine>(`${base}/ic/mappings`, body),
-  updateIcLine: (id: number, body: IcLineRequest) =>
-    api.put<IcLine>(`${base}/ic/mappings/${id}`, body),
-  authorizeIcLine: (id: number) => api.post<IcLine>(`${base}/ic/mappings/${id}/authorize`),
 };

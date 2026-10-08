@@ -60,16 +60,14 @@ One mechanism per way a company reaches a controller, instead of 194 hand edits:
 | Path variable `{companyId}` | same interceptor (URI template variables) | same |
 | Query parameter `branchId` (company branches) | same interceptor: `requireBranch(companyId, branchId)` | same |
 | Request body with a `companyId` (and `branchId`) accessor, a list of such items, or a record body with a list component of such items (bulk requests) | `RequestBodyAdvice` after the body is read | `security.api.DataScopeBodyAdvice` (rules in `DataScopeTargets`) |
-| Anything else (a company under another name such as `parentCompanyId`, `companyAId`, `creditorCompanyId`; a multipart part; a header; a parameter bound under another name) | explicit `dataScope.requireCompany(...)` in the method, marked `@CompanyScoped` (consolidation groups, inter-company relationships and transactions) | `common.security.CompanyScoped` |
+| Anything else (a company under another name; a multipart part; a header; a parameter bound under another name) | explicit `dataScope.requireCompany(...)` in the method, marked `@CompanyScoped` | `common.security.CompanyScoped` |
 
 Path variables named `branchId` are not checked as company branches: the insurer branch maintenance (`/catalog/insurers/branches/{branchId}`) uses that name for the branches of an insurer.
 
 **List and search endpoints** that return several companies' data filter on `allowed()` in the service, never only on the screen:
 
 - company list and branch list of a company (`OrganizationService.listCompaniesInScope`, `listBranchesInScope`; the company and branch pickers of every screen; jobs keep using the unfiltered `listCompanies`),
-- approval inbox and counts without a company filter (`ApprovalInboxService`),
-- inter-company relationships and reconciliation: only relationships whose two companies are both allowed (`IntercompanyService.relationships`, used by the reconciliation),
-- consolidation groups: only groups whose parent company is allowed (`ConsolidationController.groups`).
+- approval inbox and counts without a company filter (`ApprovalInboxService`).
 
 **Enforcement.** `ArchitectureTest.companyEndpointsAreDataScoped` fails the build when a controller method takes a company that none of the mechanisms reads and the method is not `@CompanyScoped`. `DataScopeCoverageIT` walks every request mapping of the running application, lists the endpoints that take a company and proves each one is covered (the interceptor is in the handler chain of its path, the body advice reads its body, or the method is `@CompanyScoped`) or exempt; it writes the figures to `target/data-scope-coverage.txt`.
 

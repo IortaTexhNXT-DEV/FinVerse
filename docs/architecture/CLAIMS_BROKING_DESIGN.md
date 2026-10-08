@@ -32,7 +32,7 @@ Requirements baseline: [`BDOI_CLM_BRD_SPEC.md`](../requirements/BDOI_CLM_BRD_SPE
 
 ### 2.2 What is reused
 
-- **Nothing from `claims` at code level.** It stays as built, and no BDOI role receives `CLAIM_VIEW`.
+- **Nothing from `claims` at code level.** No BDOI role received `CLAIM_VIEW`; the insurer-side module was removed on 8 October 2026 (`CODEBASE_RELEVANCE_AUDIT.md` A2).
 - **Its patterns**: the loss details shape (loss date, notification date, nature, description), the alert dedup keys, the report support style, the seed scenario runner.
 - **The platform**: LOV (with the Collections attribute-table pattern), workflow (queues, assignment, case history), audit, attachments and document naming, messaging (outbox, notifications), docgen, bulk, report framework (view / export split, archive, saved variants), alerts, managed jobs, system parameters, retention framework.
 
@@ -205,7 +205,7 @@ The matrix follows the stakeholder table (p.28). The officer's status rights are
 | `clmuh` | CLM_UH | - |
 | `clmrisk` | CLM_RISK | - |
 
-The existing insurer SIT/UAT user `claims` is unrelated and keeps its insurer roles.
+The former insurer SIT/UAT user `claims` was unrelated; it was removed with the insurer suite (seed V2510).
 
 ## 8. Status model and workflow
 
@@ -337,7 +337,7 @@ Outside the module (frontend only, owned by their modules, section 12.2): a **Cl
 | `report` | `ReportCategory.CLAIMS_HANDLING("Claims Handling")`; `ReportMetadata.claimsHandling(code, title, …)` factory (view `BCL_REPORT_VIEW`, export `BCL_REPORT_EXPORT`), as `ReportMetadata.collections(...)` | Section 10 | `report/core/ReportCategory.java`, `report/core/ReportMetadata.java` (CL0) |
 | `lov` (optional, recommended) | `lov_type.owner_permission` (nullable): when set, maintaining the type's values requires that permission instead of `LOV_MANAGE`; claims LOV types set it to `BCL_SETUP`. Without this change the Claims Unit Head needs the global `LOV_MANAGE` | BRCLM.010/014/017/036: the Unit Head maintains the values (p.28) | `lov/domain/LovType.java`, `lov/service/LovService.java`, V1020 (CL0); applies to Collections LOVs too if they want it |
 | `workflow`, `messaging`, `docgen`, `attachment`, `bulk`, `alert`, `system`, `audit` | None (seed rows only, in V1020) | - | - |
-| `claims` (insurer-side) | None. Stays hidden from BDOI roles | Section 2 | - |
+| `claims` (insurer-side) | None. Removed with the insurer suite (V2501) | Section 2 | - |
 | GL (`accounting`, `journal`, `ledger`, `subledger`, `coa`, `period`), `payables`, `receivables`, `tax` | None | Section 6 | - |
 | Navigation and help | Section `Claims Handling` first in group `insurance` | Section 11 | `frontend/src/navigation/modules.ts`, `frontend/src/features/help/helpContent.ts` (CL0) |
 | Configuration | Crons `brokerverse.jobs.bcl-follow-up-due-cron`, `bcl-premium-recheck-cron`, `bcl-ageing-alerts-cron` | Section 9.1 | `application.yml`, `docs/operations/CONFIGURATION.md` (CL0) |
@@ -480,7 +480,7 @@ compile only against it.
 - **Domain `brokerclaims.domain`.** `Claim` (JPA entity name `BrokerClaim`, since `claims.domain.Claim` exists;
   constructor `Claim(companyId, claimNo, Claim.Origin(source, handler, unitCode, branchId, legacyRef), CoverSnapshot,
   LossDetails)` starts in phase NEW without status; `assignTo(handler, unitCode)`; `isClosed()`), repository
-  `BrokerClaimRepository` (not `ClaimRepository`: the insurer-side module owns the bean `claimRepository`) with
+  `BrokerClaimRepository` (not `ClaimRepository`: the insurer-side module owned the bean `claimRepository` when it was built) with
   `findByIdAndCompanyId`, `findByCompanyIdAndClaimNo`, `findByCompanyIdAndCoverArnAndCoverPolicyYearOrderByIdDesc`.
   Embeddables with protected constructors and getters only: `CoverSnapshot` (cover columns **and** the premium check /
   authorization columns, CL1-A), `LossDetails` (loss **and** claimant columns, CL1-A), `ClaimProgress` (progress

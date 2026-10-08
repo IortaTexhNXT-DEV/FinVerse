@@ -83,7 +83,7 @@ class OperationsFoundationApiIT {
 
   @ParameterizedTest
   @CsvSource({
-    "uw, /api/v1/ops/home?companyId={c}",
+    "norole, /api/v1/ops/home?companyId={c}",
     "cashier, /api/v1/ops/disbursements?companyId={c}",
     "cashier, /api/v1/ops/flow-in/feeds",
     "ao, /api/v1/ops/flow-in/runs",

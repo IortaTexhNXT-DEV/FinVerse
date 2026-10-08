@@ -25,10 +25,6 @@ import { WorksheetTables } from './WorksheetTables';
 const REPORTS: Record<WorksheetKind, string> = {
   VAT: 'TAX-VAT-2550Q',
   EWT: 'TAX-EWT-1601EQ',
-  DST: 'TAX-DST-2000',
-  PREMIUM_TAX: 'TAX-PREMTAX',
-  LGT: 'TAX-PREMTAX',
-  FST: 'TAX-PREMTAX',
   NONE: 'TAX-REMIT',
 };
 

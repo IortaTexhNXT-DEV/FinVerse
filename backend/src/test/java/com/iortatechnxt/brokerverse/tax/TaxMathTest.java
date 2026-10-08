@@ -6,14 +6,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.tax.domain.FilingFrequency;
 import com.iortatechnxt.brokerverse.tax.domain.FilingSchedule;
-import com.iortatechnxt.brokerverse.tax.domain.IcLineItem;
-import com.iortatechnxt.brokerverse.tax.domain.IcSchedule;
 import com.iortatechnxt.brokerverse.tax.domain.NormalBalance;
 import com.iortatechnxt.brokerverse.tax.domain.ReturnFigures;
 import com.iortatechnxt.brokerverse.tax.domain.TaxPeriod;
 import com.iortatechnxt.brokerverse.tax.domain.TaxType;
 import com.iortatechnxt.brokerverse.tax.domain.Taxpayer;
-import com.iortatechnxt.brokerverse.tax.domain.WorksheetKind;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -140,31 +137,13 @@ class TaxMathTest {
   }
 
   @Test
-  void icLinesMatchRangesAndReportGroups() {
-    IcLineItem line = new IcLineItem(1L, IcSchedule.INVESTMENTS, "FA");
-    line.setAccountFrom("1500");
-    line.setAccountTo("1599");
-    assertThat(line.matches("1501", null)).isTrue();
-    assertThat(line.matches("1600", null)).isFalse();
-    assertThat(line.mappingText()).isEqualTo("1500-1599");
-    line.setReportGroup("Financial Assets");
-    assertThat(line.matches("1120", "Financial Assets")).isTrue();
-    assertThat(line.mappingText()).isEqualTo("1500-1599, group Financial Assets");
-    IcLineItem single = new IcLineItem(1L, IcSchedule.RESERVES, "UPR");
-    single.setAccountFrom("2101");
-    single.setAccountTo("2101");
-    assertThat(single.mappingText()).isEqualTo("2101");
+  void normalBalancePresentsTheSignOfItsSide() {
     assertThat(NormalBalance.CREDIT.present(new BigDecimal("-50"))).isEqualByComparingTo("50");
     assertThat(NormalBalance.DEBIT.present(new BigDecimal("-50"))).isEqualByComparingTo("-50");
   }
 
   @Test
-  void worksheetKindsKnowTheirLevies() {
-    assertThat(WorksheetKind.ofLevy(TaxType.DST)).isEqualTo(WorksheetKind.DST);
-    assertThat(WorksheetKind.ofLevy(TaxType.FST).premiumLevy()).isEqualTo(TaxType.FST);
-    assertThat(WorksheetKind.VAT.premiumLevy()).isNull();
-    assertThatThrownBy(() -> WorksheetKind.ofLevy(TaxType.EWT))
-        .isInstanceOf(IllegalArgumentException.class);
+  void taxTypesKnowThePremiumLevies() {
     assertThat(TaxType.LGT.isPremiumLevy()).isTrue();
     assertThat(TaxType.VAT_OUTPUT.isPremiumLevy()).isFalse();
   }

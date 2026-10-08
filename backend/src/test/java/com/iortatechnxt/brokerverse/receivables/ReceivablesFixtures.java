@@ -100,7 +100,7 @@ public class ReceivablesFixtures {
     int n = SEQ.incrementAndGet();
     BigDecimal total = new BigDecimal(amount);
     return as.run(
-        "uw",
+        "accountant",
         () ->
             tx.execute(
                 s -> {

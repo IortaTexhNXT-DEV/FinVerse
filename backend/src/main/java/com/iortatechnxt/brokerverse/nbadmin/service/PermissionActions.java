@@ -1,6 +1,5 @@
 package com.iortatechnxt.brokerverse.nbadmin.service;
 
-import com.iortatechnxt.brokerverse.security.domain.Permission;
 import com.iortatechnxt.brokerverse.system.service.ProductModules;
 import java.util.List;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -54,7 +53,6 @@ public class PermissionActions {
             area,
             area)
         .stream()
-        .filter(a -> Permission.isOffered(a.permission()))
         .filter(a -> modules.isPermissionActive(a.permission()))
         .toList();
   }

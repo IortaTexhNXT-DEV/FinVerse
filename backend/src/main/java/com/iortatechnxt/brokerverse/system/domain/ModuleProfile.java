@@ -13,9 +13,9 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * A named set of module switches (for example the profile of an insurance broker, which does not
- * use the insurer suite). Applying a profile requests the changes of every module whose switch
- * differs; each change takes effect on approval like a single switch.
+ * A named set of module switches (for example the profile of an insurance broker). Applying a
+ * profile requests the changes of every module whose switch differs; each change takes effect on
+ * approval like a single switch.
  */
 @Entity
 @Table(name = "sys_module_profile")

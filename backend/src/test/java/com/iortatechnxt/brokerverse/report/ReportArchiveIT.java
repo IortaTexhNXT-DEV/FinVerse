@@ -79,7 +79,7 @@ class ReportArchiveIT {
 
   @Test
   void usersWithoutTheReportSeeNoRuns() {
-    assertThat(as.run("uw", () -> archive.runs(TestArchivedReport.CODE, PageRequest.of(0, 5))))
+    assertThat(as.run("norole", () -> archive.runs(TestArchivedReport.CODE, PageRequest.of(0, 5))))
         .isEmpty();
   }
 }

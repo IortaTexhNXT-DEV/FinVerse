@@ -35,6 +35,12 @@ class TaxReturnLifecycleIT {
   private static final LocalDate SEPT_1 = LocalDate.of(2026, 9, 1);
   private static final LocalDate SEPT_30 = LocalDate.of(2026, 9, 30);
   private static final String BANK = "BDO-CA";
+  private static final String EWT_PAYABLE = "2508";
+  private static final String OUTPUT_VAT = "2504";
+  private static final String INPUT_VAT = "1603";
+  private static final String EWT_FORM = "EWT-M-TEST";
+  private static final String CANCEL_FORM = "EWT-M-CANCEL";
+  private static final String VAT_FORM = "VAT-M-TEST";
 
   @Autowired private TaxReturnService returns;
   @Autowired private TaxFormService forms;
@@ -47,15 +53,16 @@ class TaxReturnLifecycleIT {
   }
 
   @Test
-  void dstReturnIsFiledByAnotherUserAndItsPaymentClearsThePayable() {
-    fixtures.firePolicy(LocalDate.of(2026, 9, 12), "80000");
+  void ewtReturnIsFiledByAnotherUserAndItsPaymentClearsThePayable() {
+    fixtures.supplierInvoice(LocalDate.of(2026, 9, 12), "80000");
     Long company = fixtures.companyId();
-    TaxReturn draft = as.run("accountant", () -> returns.create(company, "2000", SEPT_1));
+    String code = testForm(company, EWT_FORM, WorksheetKind.EWT, EWT_PAYABLE, null).getCode();
+    TaxReturn draft = as.run("accountant", () -> returns.create(company, code, SEPT_1));
     assertThat(draft.getStatus()).isEqualTo(ReturnStatus.DRAFT);
-    assertThat(draft.getDueDate()).isEqualTo(LocalDate.of(2026, 10, 5));
+    assertThat(draft.getDueDate()).isEqualTo(LocalDate.of(2026, 10, 10));
     assertThat(draft.getAmountPayable()).isPositive();
     assertThat(draft.getLines()).isNotEmpty();
-    assertThatThrownBy(() -> as.run("accountant", () -> returns.create(company, "2000", SEPT_1)))
+    assertThatThrownBy(() -> as.run("accountant", () -> returns.create(company, code, SEPT_1)))
         .isInstanceOf(DuplicateResourceException.class);
 
     TaxReturn refreshed = as.run("accountant", () -> returns.refresh(draft.getId()));
@@ -68,7 +75,7 @@ class TaxReturnLifecycleIT {
     TaxReturn filed = as.run("checker", () -> returns.file(draft.getId(), SEPT_30, "EFPS-1"));
     assertThat(filed.getStatus()).isEqualTo(ReturnStatus.FILED);
     assertThat(filed.getFiledBy()).isEqualTo("checker");
-    BigDecimal ledgerBefore = fixtures.creditMovement("2503", SEPT_1, SEPT_30);
+    BigDecimal ledgerBefore = fixtures.creditMovement(EWT_PAYABLE, SEPT_1, SEPT_30);
 
     TaxReturn paid =
         as.run(
@@ -80,11 +87,11 @@ class TaxReturnLifecycleIT {
     assertThat(remittance.getAmount()).isEqualByComparingTo(amount);
     assertThat(remittance.getPayableCleared()).isEqualByComparingTo(amount);
     assertThat(remittance.isLate()).isFalse();
-    assertThat(fixtures.posted(remittance.getJournalBatchNo(), "2503"))
+    assertThat(fixtures.posted(remittance.getJournalBatchNo(), EWT_PAYABLE))
         .isEqualByComparingTo(amount);
     assertThat(fixtures.posted(remittance.getJournalBatchNo(), "1111"))
         .isEqualByComparingTo(amount.negate());
-    assertThat(fixtures.creditMovement("2503", SEPT_1, SEPT_30))
+    assertThat(fixtures.creditMovement(EWT_PAYABLE, SEPT_1, SEPT_30))
         .isEqualByComparingTo(ledgerBefore.subtract(amount));
     assertThat(returns.remittances(company, SEPT_1, SEPT_30))
         .extracting(TaxRemittance::getReturnId)
@@ -94,37 +101,33 @@ class TaxReturnLifecycleIT {
   }
 
   @Test
-  void vatStyleFormAppliesInputVatAndPaysTheBalance() {
-    fixtures.firePolicy(LocalDate.of(2026, 9, 20), "50000");
+  void vatReturnCarriesTheExcessInputVatOver() {
     fixtures.supplierInvoice(LocalDate.of(2026, 9, 20), "20000");
     Long company = fixtures.companyId();
-    TaxForm monthlyVat = testVatForm(company);
+    TaxForm monthlyVat = testForm(company, VAT_FORM, WorksheetKind.VAT, OUTPUT_VAT, INPUT_VAT);
     TaxReturn r = as.run("accountant", () -> returns.create(company, monthlyVat.getCode(), SEPT_1));
     assertThat(r.getTaxCredits()).isPositive();
+    assertThat(r.getAmountPayable()).isEqualByComparingTo("0");
+    assertThat(r.getExcessCredit()).isEqualByComparingTo(r.getTaxCredits());
     as.run("checker", () -> returns.file(r.getId(), SEPT_30, "EFPS-VAT"));
     as.run("checker", () -> returns.pay(r.getId(), new RemittanceFacts(SEPT_30, BANK, "PAY-VAT")));
 
     TaxRemittance remittance = returns.remittance(r.getId()).orElseThrow();
-    String batch = remittance.getJournalBatchNo();
-    assertThat(remittance.getPayableCleared()).isEqualByComparingTo(r.getTaxDue());
-    assertThat(remittance.getCreditApplied().add(remittance.getAmount()))
-        .isEqualByComparingTo(r.getTaxDue());
-    assertThat(fixtures.posted(batch, "2504")).isEqualByComparingTo(r.getTaxDue());
-    assertThat(fixtures.posted(batch, "1603"))
-        .isEqualByComparingTo(remittance.getCreditApplied().negate());
-    assertThat(fixtures.posted(batch, "1111")).isEqualByComparingTo(r.getAmountPayable().negate());
+    assertThat(remittance.getAmount()).isEqualByComparingTo("0");
+    assertThat(remittance.getJournalBatchNo()).isNull();
   }
 
   @Test
   void draftsCanBeCancelledAndPreparedAgain() {
     Long company = fixtures.companyId();
-    TaxReturn first = as.run("accountant", () -> returns.create(company, "FST", SEPT_1));
+    String code = testForm(company, CANCEL_FORM, WorksheetKind.EWT, EWT_PAYABLE, null).getCode();
+    TaxReturn first = as.run("accountant", () -> returns.create(company, code, SEPT_1));
     TaxReturn cancelled = as.run("accountant", () -> returns.cancel(first.getId(), "recompute"));
     assertThat(cancelled.getStatus()).isEqualTo(ReturnStatus.CANCELLED);
     assertThat(cancelled.getStatusReason()).isEqualTo("recompute");
-    TaxReturn second = as.run("accountant", () -> returns.create(company, "FST", SEPT_1));
+    TaxReturn second = as.run("accountant", () -> returns.create(company, code, SEPT_1));
     assertThat(second.getId()).isNotEqualTo(first.getId());
-    assertThat(returns.list(company, 2026, "FST", ReturnStatus.CANCELLED))
+    assertThat(returns.list(company, 2026, code, ReturnStatus.CANCELLED))
         .extracting(TaxReturn::getId)
         .contains(first.getId());
     assertThatThrownBy(
@@ -147,8 +150,8 @@ class TaxReturnLifecycleIT {
         .isInstanceOf(BusinessRuleException.class);
   }
 
-  private TaxForm testVatForm(Long company) {
-    String code = "VAT-M-TEST";
+  private TaxForm testForm(
+      Long company, String code, WorksheetKind kind, String payable, String credit) {
     return forms.list(company).stream()
         .filter(f -> f.getCode().equals(code))
         .findFirst()
@@ -162,14 +165,14 @@ class TaxReturnLifecycleIT {
                               new TaxFormCommand(
                                   company,
                                   code,
-                                  "Monthly VAT (test form)",
+                                  "Monthly " + kind + " (test form)",
                                   TaxAuthority.BIR,
                                   FilingFrequency.MONTHLY,
-                                  WorksheetKind.VAT,
+                                  kind,
                                   1,
-                                  25,
-                                  "2504",
-                                  "1603",
+                                  kind == WorksheetKind.EWT ? 10 : 25,
+                                  payable,
+                                  credit,
                                   true,
                                   LocalDate.of(2026, 9, 1))));
               return as.run("checker", () -> forms.authorize(created.getId()));

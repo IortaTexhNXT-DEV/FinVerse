@@ -5,7 +5,7 @@ export const TAX_HELP: HelpSection = {
   id: 'tax',
   module: 'Tax & Statutory',
   intro:
-    'BIR, LGU and BFP returns computed from posted documents, BIR Form 2307 certificates and the Insurance Commission schedules.',
+    "BIR returns computed from posted documents, BIR Form 2307 certificates, the BIR forms and books and the broker's annual statement for the Insurance Commission.",
   screens: [
     {
       name: 'Tax Calendar',
@@ -22,7 +22,7 @@ export const TAX_HELP: HelpSection = {
       name: 'VAT Worksheet',
       path: '/tax/vat',
       summary:
-        'Quarterly VAT (2550Q): output VAT on the net premium of approved policies and endorsements, input VAT on approved supplier invoices, reconciled with the VAT accounts of the ledger.',
+        'Quarterly VAT (2550Q): input VAT on approved supplier invoices, reconciled with the VAT accounts of the ledger; the sales lines are entered on the return.',
       workflow: [
         'Pick the period, review the return lines and the reconciliation difference.',
         'Open a source document from the drill-down table when a figure needs checking.',
@@ -36,25 +36,10 @@ export const TAX_HELP: HelpSection = {
       name: 'Withholding Tax',
       path: '/tax/ewt',
       summary:
-        'Expanded withholding tax (0619-E monthly, 1601-EQ quarterly): income payments and tax withheld per ATC and payee from supplier invoices and commissions, with the QAP export per quarter.',
+        'Expanded withholding tax (0619-E monthly, 1601-EQ quarterly): income payments and tax withheld per ATC and payee from supplier invoices, with the QAP export per quarter.',
       controls: [
         'Payees without an authorized default ATC are listed as UNMAPPED and are not certified on 2307.',
         'For a quarter, tax still due = total withheld − the monthly 0619-E returns filed or paid in the quarter.',
-      ],
-    },
-    {
-      name: 'Documentary Stamp Tax',
-      path: '/tax/dst',
-      summary:
-        'Monthly DST (BIR 2000) on the policies and endorsements approved in the month, by line of business; return premiums reduce the month in which they are approved.',
-    },
-    {
-      name: 'Premium Tax, LGT & FST',
-      path: '/tax/premium-tax',
-      summary:
-        'Premium tax (2551Q) on business not subject to VAT, local government tax (quarterly, LGU) and fire service tax on fire premiums (monthly, BFP), from the levies of approved policies and endorsements.',
-      controls: [
-        'LGT is computed on the quarter’s premiums; enter the LGU assessment as a manual adjustment if it differs.',
       ],
     },
     {
@@ -102,12 +87,6 @@ export const TAX_HELP: HelpSection = {
       ],
     },
     {
-      name: 'IC Statutory Schedules',
-      path: '/tax/ic-schedules',
-      summary:
-        'Premiums, losses and commissions by line of business, net worth, RBC, reserves and investments from the ledger.',
-    },
-    {
       name: 'Tax Codes & Forms',
       path: '/tax/codes',
       summary:
@@ -126,13 +105,6 @@ export const TAX_HELP: HelpSection = {
         'Maker-checker: a profile is used only once authorized.',
         'Payees without an authorized default ATC are listed as UNMAPPED on the worksheets.',
       ],
-    },
-    {
-      name: 'IC Mapping',
-      path: '/tax/ic-mapping',
-      summary:
-        'Which ledger accounts (account range or report group) feed each Insurance Commission schedule line, with the natural side, sign, measure (balance or movement) and the RBC factor.',
-      controls: ['Maker-checker: mapping changes are authorized before the schedules use them.'],
     },
   ],
 };

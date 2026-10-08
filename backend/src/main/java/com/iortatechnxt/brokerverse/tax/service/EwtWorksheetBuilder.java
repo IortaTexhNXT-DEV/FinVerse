@@ -32,10 +32,9 @@ import org.springframework.stereotype.Component;
  * Expanded (creditable) withholding tax worksheet: 0619-E for a month, 1601-EQ for a quarter.
  *
  * <ul>
- *   <li>Income payments: approved supplier invoices with EWT (net amount, by invoice date) and
- *       commissions of approved policies and endorsements with withholding tax (by approval date).
- *       The liability to withhold arises when the income is payable (accrual), not when it is paid
- *       — the conservative BIR rule "whichever comes first" (assumption).
+ *   <li>Income payments: approved supplier invoices with EWT (net amount, by invoice date). The
+ *       liability to withhold arises when the income is payable (accrual), not when it is paid —
+ *       the conservative BIR rule "whichever comes first" (assumption).
  *   <li>ATC: the payee's default ATC on the party tax profile; payees without one appear under
  *       "UNMAPPED". The tax withheld is the amount actually withheld on the document; when it
  *       differs from the ATC rate the worksheet lists a note so the rate can be corrected.
@@ -47,14 +46,12 @@ import org.springframework.stereotype.Component;
 public class EwtWorksheetBuilder {
 
   private static final String SUPPLIER_INVOICE = "SUPPLIER_INVOICE";
-  private static final String COMMISSION = "COMMISSION";
   private static final String ATC_PREFIX = "ATC:";
   private static final int RATE_SCALE = 8;
 
   /** Parameter: tolerance in percentage points between a document rate and the ATC rate. */
   private static final String RATE_TOLERANCE = "EWT_RATE_TOLERANCE";
 
-  private final PremiumTaxSource premiums;
   private final TaxSourceQueries queries;
   private final TaxpayerDirectory directory;
   private final TaxReturnRepository returns;
@@ -64,7 +61,6 @@ public class EwtWorksheetBuilder {
   /**
    * Creates the builder.
    *
-   * @param premiums premium documents (commissions)
    * @param queries supplier invoices
    * @param directory payee facts
    * @param returns monthly remittances of the quarter
@@ -72,13 +68,11 @@ public class EwtWorksheetBuilder {
    * @param parameters business parameters
    */
   public EwtWorksheetBuilder(
-      PremiumTaxSource premiums,
       TaxSourceQueries queries,
       TaxpayerDirectory directory,
       TaxReturnRepository returns,
       WorksheetSupport support,
       SystemParameterService parameters) {
-    this.premiums = premiums;
     this.queries = queries;
     this.directory = directory;
     this.returns = returns;
@@ -98,17 +92,11 @@ public class EwtWorksheetBuilder {
         queries.supplierInvoices(companyId, period.from(), period.to()).stream()
             .filter(i -> i.withholding().signum() != 0)
             .toList();
-    List<PremiumDocument> commissions =
-        premiums.documents(companyId, period).stream()
-            .filter(d -> d.intermediaryCode() != null && d.withholding().signum() != 0)
-            .toList();
     Set<String> parties = new TreeSet<>();
     invoices.forEach(i -> parties.add(i.partyCode()));
-    commissions.forEach(c -> parties.add(c.intermediaryCode()));
     Lookup lookup = directory.lookup(companyId, parties);
     List<TaxDocumentLine> documents = new ArrayList<>();
     invoices.forEach(i -> documents.add(invoiceLine(i, lookup)));
-    commissions.forEach(c -> documents.add(commissionLine(c, lookup)));
 
     BigDecimal base = WorksheetSupport.sum(documents, TaxDocumentLine::taxableAmount);
     BigDecimal withheld = WorksheetSupport.sum(documents, TaxDocumentLine::taxAmount);
@@ -192,20 +180,6 @@ public class EwtWorksheetBuilder {
             i.partyName(),
             Money.convert(i.net(), rate),
             Money.convert(i.withholding(), rate)),
-        lookup);
-  }
-
-  private static TaxDocumentLine commissionLine(PremiumDocument c, Lookup lookup) {
-    return line(
-        new Payment(
-            COMMISSION,
-            c.policyId(),
-            c.documentNo(),
-            c.date(),
-            c.intermediaryCode(),
-            c.intermediaryName(),
-            c.commission(),
-            c.withholding()),
         lookup);
   }
 

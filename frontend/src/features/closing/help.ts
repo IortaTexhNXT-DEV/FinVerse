@@ -4,8 +4,7 @@ import type { HelpSection } from '@/features/help/helpContent';
 export const PLANNING_HELP: HelpSection = {
   id: 'planning',
   module: 'Planning & Closing',
-  intro:
-    'Budgets and budget monitoring, inter-company transactions, group consolidation, FX revaluation and the period-end and year-end close.',
+  intro: 'Budgets and budget monitoring, FX revaluation and the period-end and year-end close.',
   screens: [
     {
       name: 'Budgets',
@@ -32,36 +31,6 @@ export const PLANNING_HELP: HelpSection = {
         'Open report GL-BVA for the printable version; GL-BUTIL shows budget utilization.',
       ],
       controls: ['Actuals come from the posted ledger and exclude year-end closing journals.'],
-    },
-    {
-      name: 'Inter-company',
-      path: '/planning/intercompany',
-      summary:
-        'Due-to / due-from relationships between group companies, inter-company charges and settlements, and their reconciliation.',
-      workflow: [
-        'Define the relationship of a company pair with each company’s due-from and due-to accounts.',
-        'Post a charge or settlement: mirror journals in both companies with one IC-… reference and value date.',
-        'Reconcile due-from against the counterparty’s due-to per currency (report GL-ICREC).',
-      ],
-      controls: [
-        'Both journals post in one transaction, or neither does. Only active relationships transact.',
-        'Base amounts use the SPOT rate of the value date. ',
-      ],
-    },
-    {
-      name: 'Consolidation',
-      path: '/planning/consolidation',
-      summary:
-        'Group consolidation as of a date: translation of each member, elimination of inter-company balances and of the investment against the subsidiary’s equity.',
-      workflow: [
-        'Set up the group: parent, consolidation currency, CTA, NCI and goodwill accounts, subsidiaries with ownership %.',
-        'Run it: balance sheet at the CLOSING rate, income and expenses at the AVERAGE rate, the difference to the translation reserve (CTA).',
-        'Review the consolidated trial balance and eliminations, then finalize the run; reports GL-CON-TB, GL-CON-BS, GL-CON-PL, GL-CON-ELIM.',
-      ],
-      controls: [
-        'Company ledgers are never changed; every elimination is balanced and the consolidated trial balance is checked.',
-        'A re-run replaces the previous draft; a final run blocks another run for the same date.',
-      ],
     },
     {
       name: 'FX Revaluation',

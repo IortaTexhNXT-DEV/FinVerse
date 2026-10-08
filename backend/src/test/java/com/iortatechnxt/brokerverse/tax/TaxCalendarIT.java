@@ -37,9 +37,10 @@ class TaxCalendarIT {
     CalendarEntry vatQ4 = entry(entries, "2550Q", "2026-Q4");
     assertThat(vatQ4.dueDate()).isEqualTo(LocalDate.of(2027, 1, 25));
     assertThat(vatQ4.dueState()).isEqualTo(CalendarEntry.UPCOMING);
-    CalendarEntry dstSeptember = entry(entries, "2000", "2026-09");
-    assertThat(dstSeptember.dueDate()).isEqualTo(LocalDate.of(2026, 10, 5));
-    assertThat(dstSeptember.daysToDue()).isEqualTo(12);
+    CalendarEntry ewtAugust = entry(entries, "0619-E", "2026-08");
+    assertThat(ewtAugust.dueDate()).isEqualTo(LocalDate.of(2026, 9, 10));
+    assertThat(ewtAugust.daysToDue()).isEqualTo(-13);
+    assertThat(entries).extracting(CalendarEntry::formCode).doesNotContain("2000", "2551Q", "FST");
     assertThat(entry(entries, "1601-C", "2026-01").dueState()).isEqualTo(CalendarEntry.REMINDER);
     assertThat(entries)
         .filteredOn(e -> e.formCode().equals("0619-E"))

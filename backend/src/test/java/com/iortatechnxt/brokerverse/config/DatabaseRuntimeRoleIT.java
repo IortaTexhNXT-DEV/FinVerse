@@ -43,8 +43,7 @@ class DatabaseRuntimeRoleIT {
           "bcl_status_history",
           "csf_activity",
           "crm_client_note_history",
-          "ops_invoice_origin_snapshot",
-          "clm_movement");
+          "ops_invoice_origin_snapshot");
 
   @Autowired private DataSource dataSource;
   @Autowired private JdbcTemplate jdbc;

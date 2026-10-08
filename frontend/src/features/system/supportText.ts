@@ -76,3 +76,8 @@ const CONTENT_AREAS: Readonly<Record<string, string>> = {
 export function contentAreaName(table: string): string {
   return CONTENT_AREAS[table] ?? table;
 }
+
+/** Where a cache keeps its entries: shared by every instance (Valkey) or in this instance only. */
+export function cacheStoreLabel(store: string): string {
+  return store === 'VALKEY' ? 'Shared (Valkey)' : 'This Instance';
+}

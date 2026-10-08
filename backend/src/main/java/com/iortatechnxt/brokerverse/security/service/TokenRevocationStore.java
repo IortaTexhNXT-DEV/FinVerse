@@ -6,7 +6,7 @@ import java.time.Instant;
  * Port: the denylist of revoked access tokens, shared by every instance. An entry lives until the
  * token would have expired anyway, so the list never grows beyond the tokens still valid.
  *
- * <p>Implemented on Redis ({@code brokerverse.redis.enabled=true}) or on the table {@code
+ * <p>Implemented on Valkey ({@code brokerverse.redis.enabled=true}) or on the table {@code
  * sec_revoked_token} (module {@code sharedstate}).
  */
 public interface TokenRevocationStore {

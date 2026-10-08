@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component;
 
 /**
  * Fixed-window counters in {@code sys_shared_counter} (an atomic upsert that restarts an expired
- * window). They are the shared counters when Redis is disabled ({@link JdbcSessionStore}) and the
- * fallback of the rate limits when Redis is enabled but unreachable. Expired rows are harmless
+ * window). They are the shared counters when Valkey is disabled ({@link JdbcSessionStore}) and the
+ * fallback of the rate limits when Valkey is enabled but unreachable. Expired rows are harmless
  * (every read checks the expiry) and are deleted by the {@code SHARED_STATE_CLEANUP} job.
  */
 @Component

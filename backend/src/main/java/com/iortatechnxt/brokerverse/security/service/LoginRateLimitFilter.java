@@ -20,7 +20,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
  * (error code {@code LOGIN_RATE_LIMITED}) and {@code POST /api/v1/auth/password-reset/**} (error
  * code {@code RESET_RATE_LIMITED}). Over the limit the request is answered with HTTP 429 and a
  * {@code Retry-After} header. The client address is the request's remote address (behind the
- * ingress, set {@code server.forward-headers-strategy} so it is the caller's).
+ * gateway, set {@code server.forward-headers-strategy} so it is the caller's).
  */
 public class LoginRateLimitFilter extends OncePerRequestFilter {
 

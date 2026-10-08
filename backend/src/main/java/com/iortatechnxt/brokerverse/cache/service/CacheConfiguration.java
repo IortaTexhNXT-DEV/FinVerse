@@ -26,10 +26,10 @@ import org.springframework.data.redis.serializer.RedisSerializationContext.Seria
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 /**
- * Builds the application cache manager from the {@link CacheSpec} beans: Redis caches (JSON values,
- * per-cache time to live, keys {@code <prefix>cache:<name>::<key>}) when {@code
+ * Builds the application cache manager from the {@link CacheSpec} beans: Valkey caches (JSON
+ * values, per-cache time to live, keys {@code <prefix>cache:<name>::<key>}) when {@code
  * brokerverse.redis.enabled} is true, otherwise bounded in-memory Caffeine caches with the same
- * time to live. Unknown cache names fail fast. Cache errors (Redis down, unreadable entry) are
+ * time to live. Unknown cache names fail fast. Cache errors (Valkey down, unreadable entry) are
  * logged and read as a miss, so the application keeps working from the database.
  */
 @Configuration(proxyBeanMethods = false)
@@ -44,8 +44,8 @@ public class CacheConfiguration implements CachingConfigurer {
    *
    * @param specs cache declarations of every module
    * @param properties cache settings
-   * @param redis Redis switch and key prefix
-   * @param connectionFactory Redis connection (used only when Redis is enabled)
+   * @param redis Valkey switch and key prefix
+   * @param connectionFactory Valkey connection (used only when Valkey is enabled)
    * @param mapper application object mapper
    * @return cache manager
    */

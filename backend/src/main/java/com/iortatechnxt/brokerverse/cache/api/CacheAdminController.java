@@ -37,7 +37,7 @@ public class CacheAdminController {
    *
    * @param caches cache registry
    * @param properties cache settings
-   * @param redis Redis switch
+   * @param redis Valkey switch
    */
   public CacheAdminController(
       CacheInvalidator caches, CacheProperties properties, RedisSettings redis) {
@@ -53,7 +53,7 @@ public class CacheAdminController {
    */
   @GetMapping
   public List<CacheResponse> list() {
-    String store = redis.enabled() ? "REDIS" : "IN_MEMORY";
+    String store = redis.enabled() ? "VALKEY" : "IN_MEMORY";
     return caches.specs().stream()
         .map(s -> CacheResponse.from(s, properties.ttlOf(s), store))
         .toList();

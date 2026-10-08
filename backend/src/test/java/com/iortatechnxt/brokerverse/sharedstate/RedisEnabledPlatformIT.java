@@ -54,7 +54,7 @@ class RedisEnabledPlatformIT extends PlatformServicesSupport {
     assertThat(jobLock).isInstanceOf(RedisJobLock.class);
     api.doGet("admin", "/api/v1/admin/caches")
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$[0].store").value("REDIS"));
+        .andExpect(jsonPath("$[0].store").value("VALKEY"));
   }
 
   @Test

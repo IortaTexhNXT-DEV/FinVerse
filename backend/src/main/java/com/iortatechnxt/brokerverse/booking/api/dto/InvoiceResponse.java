@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.booking.domain.BookedInvoice;
 import com.iortatechnxt.brokerverse.booking.domain.BookingSource;
 import com.iortatechnxt.brokerverse.booking.domain.InvoiceFacts;
 import com.iortatechnxt.brokerverse.booking.domain.InvoiceFlags;
+import com.iortatechnxt.brokerverse.booking.domain.InvoiceIncentive;
 import com.iortatechnxt.brokerverse.booking.domain.InvoiceKind;
 import com.iortatechnxt.brokerverse.booking.domain.InvoiceStatus;
 import java.time.Instant;
@@ -33,6 +34,7 @@ import java.util.List;
  * @param premium premium by component
  * @param commission commission terms
  * @param flags direct payment, CWT 2 %, incentive, business type
+ * @param incentive incentive indicator with the time and reason of its latest evaluation
  * @param source how it was booked
  * @param serviceInvoiceNo first service invoice
  * @param bookedBy user
@@ -62,6 +64,7 @@ public record InvoiceResponse(
     PremiumDto premium,
     CommissionDto commission,
     InvoiceFlags flags,
+    InvoiceIncentive incentive,
     BookingSource source,
     String serviceInvoiceNo,
     String bookedBy,
@@ -98,6 +101,7 @@ public record InvoiceResponse(
         PremiumDto.from(i.getPremium()),
         CommissionDto.from(i.getCommission()),
         i.getFlags(),
+        i.getIncentive(),
         i.getSource(),
         i.getServiceInvoiceNo(),
         i.getBookedBy(),

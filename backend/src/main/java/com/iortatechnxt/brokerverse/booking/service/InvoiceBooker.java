@@ -5,6 +5,7 @@ import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.booking.domain.BookedInvoice;
 import com.iortatechnxt.brokerverse.booking.domain.BookedInvoiceRepository;
 import com.iortatechnxt.brokerverse.booking.domain.BookingSource;
+import com.iortatechnxt.brokerverse.booking.domain.IncentiveTrigger;
 import com.iortatechnxt.brokerverse.booking.domain.InvoiceKind;
 import com.iortatechnxt.brokerverse.booking.domain.ServiceInvoice;
 import com.iortatechnxt.brokerverse.booking.domain.SiTrigger;
@@ -41,6 +42,7 @@ public class InvoiceBooker {
   private final ServiceInvoiceTriggers serviceInvoices;
   private final BookingSettings settings;
   private final ApplicationEventPublisher events;
+  private final IncentiveEvaluationService incentives;
   private final AuditTrailService audit;
   private final CurrentUser currentUser;
   private final Clock clock;
@@ -54,6 +56,7 @@ public class InvoiceBooker {
    * @param serviceInvoices service invoices
    * @param settings booking branch
    * @param events event publisher
+   * @param incentives incentive indicator of the transaction (FR-NB-118)
    * @param audit audit trail
    * @param currentUser current user
    * @param clock clock
@@ -65,6 +68,7 @@ public class InvoiceBooker {
       ServiceInvoiceTriggers serviceInvoices,
       BookingSettings settings,
       ApplicationEventPublisher events,
+      IncentiveEvaluationService incentives,
       AuditTrailService audit,
       CurrentUser currentUser,
       Clock clock) {
@@ -74,9 +78,19 @@ public class InvoiceBooker {
     this.serviceInvoices = serviceInvoices;
     this.settings = settings;
     this.events = events;
+    this.incentives = incentives;
     this.audit = audit;
     this.clock = clock;
     this.currentUser = currentUser;
+  }
+
+  /** The incentive evaluation a booking makes (FR-NB-118): pending, re-evaluated or invalidated. */
+  private static IncentiveTrigger incentiveTrigger(InvoiceKind kind) {
+    return switch (kind) {
+      case ENDORSEMENT_PLUS, ENDORSEMENT_MINUS -> IncentiveTrigger.ENDORSEMENT;
+      case CANCELLATION -> IncentiveTrigger.CANCELLATION;
+      default -> IncentiveTrigger.BOOKING;
+    };
   }
 
   /**
@@ -102,6 +116,7 @@ public class InvoiceBooker {
     if (!issued.isEmpty()) {
       saved.linkServiceInvoice(issued.get(0).getSiNo());
     }
+    incentives.evaluate(saved.getInvoiceNo(), incentiveTrigger(saved.getKind()));
     events.publishEvent(InvoiceBooked.of(saved));
     audit.record(
         ENTITY,

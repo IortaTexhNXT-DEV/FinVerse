@@ -97,18 +97,7 @@ final class AccessMatrixWorkbook {
     }
     head.setHeightInPoints(longest * POINTS_PER_UPRIGHT_CHAR + HEADING_PADDING_POINTS);
     for (List<Object> values : g.rows()) {
-      Row row = sheet.createRow(r++);
-      for (int c = 0; c < values.size(); c++) {
-        Object v = values.get(c);
-        Cell cell = row.createCell(c);
-        if (v instanceof Number n) {
-          cell.setCellValue(n.doubleValue());
-          cell.setCellStyle(s.mark);
-        } else {
-          cell.setCellValue(v == null ? "" : v.toString());
-          cell.setCellStyle(c < lead ? s.body : g.wrapProfiles() ? s.wrapped : s.mark);
-        }
-      }
+      values(sheet.createRow(r++), values, lead, g.wrapProfiles(), s);
     }
     // Widths of the first columns from their content; profile columns narrow (Y marks) or, for
     // lists of permissions, wide enough to wrap.
@@ -122,6 +111,20 @@ final class AccessMatrixWorkbook {
     sheet.createFreezePane(lead, headRow + 1);
     sheet.setAutoFilter(new CellRangeAddress(headRow, Math.max(headRow, r - 1), 0, columns - 1));
     printSetup(sheet, g, headRow, lead);
+  }
+
+  private static void values(Row row, List<Object> values, int lead, boolean wrap, Styles s) {
+    for (int c = 0; c < values.size(); c++) {
+      Object v = values.get(c);
+      Cell cell = row.createCell(c);
+      if (v instanceof Number n) {
+        cell.setCellValue(n.doubleValue());
+        cell.setCellStyle(s.mark);
+      } else {
+        cell.setCellValue(v == null ? "" : v.toString());
+        cell.setCellStyle(c < lead ? s.body : wrap ? s.wrapped : s.mark);
+      }
+    }
   }
 
   /** Logo, company, title, run line and legend; returns the row of the headings. */

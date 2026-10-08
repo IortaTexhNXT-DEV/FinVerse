@@ -146,20 +146,16 @@ public class PdfReportRenderer implements ReportRenderer {
     boolean labels = LabelLayout.needsLabelColumn(result);
     int first = labels ? 1 : 0;
     PdfPTable table = new PdfPTable(cols.size() + first);
-    float[] weights = new float[cols.size() + first];
-    if (labels) {
-      weights[0] = LABEL_WEIGHT;
+    float[] weights = weights(cols, labels);
+    float total = 0;
+    for (float w : weights) {
+      total += w;
     }
-    float total = labels ? LABEL_WEIGHT : 0;
-    for (int i = 0; i < cols.size(); i++) {
-      weights[i + first] = cols.get(i).type() == ColumnType.TEXT ? TEXT_WEIGHT : NUMBER_WEIGHT;
-      total += weights[i + first];
-    }
-    float width = Math.min(pageWidth, total * NATURAL_POINTS_PER_WEIGHT);
+    float width = pageWidth;
     if (fitToWidth || total * NATURAL_POINTS_PER_WEIGHT >= pageWidth) {
       table.setWidthPercentage(100);
-      width = pageWidth;
     } else {
+      width = total * NATURAL_POINTS_PER_WEIGHT;
       table.setTotalWidth(width);
       table.setLockedWidth(true);
       table.setHorizontalAlignment(Element.ALIGN_LEFT);
@@ -181,6 +177,19 @@ public class PdfReportRenderer implements ReportRenderer {
       }
     }
     return table;
+  }
+
+  /** Weights of the columns by type, after the label column when there is one. */
+  private static float[] weights(List<ReportColumn> cols, boolean labels) {
+    int first = labels ? 1 : 0;
+    float[] weights = new float[cols.size() + first];
+    if (labels) {
+      weights[0] = LABEL_WEIGHT;
+    }
+    for (int i = 0; i < cols.size(); i++) {
+      weights[i + first] = cols.get(i).type() == ColumnType.TEXT ? TEXT_WEIGHT : NUMBER_WEIGHT;
+    }
+    return weights;
   }
 
   /**

@@ -35,6 +35,7 @@ import org.springframework.stereotype.Component;
 public class TreatyBordereauReport implements ReportDefinition {
 
   private static final String TREATY = "treatyCode";
+  private static final String MOVEMENT = "type";
   private static final String TYPE = "bordereau";
   private static final String PARTICIPANT = "participant";
   private static final String POLICY = "policyNo";
@@ -84,11 +85,11 @@ public class TreatyBordereauReport implements ReportDefinition {
     TabularReportBuilder builder =
         claims
             ? TabularReportBuilder.of(p)
-                .labelCodes("type")
+                .labelCodes(MOVEMENT)
                 .columns(claimColumns())
                 .rows(claimRows(companyId, treaty, from, to))
             : TabularReportBuilder.of(p)
-                .labelCodes("type")
+                .labelCodes(MOVEMENT)
                 .columns(premiumColumns())
                 .rows(premiumRows(treaty, from, to));
     return builder
@@ -132,7 +133,7 @@ public class TreatyBordereauReport implements ReportDefinition {
           row.put("date", m.getMovementDate());
           row.put("claimNo", m.getClaimNo());
           row.put("lossDate", m.getLossDate());
-          row.put("type", m.getMovementType().name());
+          row.put(MOVEMENT, m.getMovementType().name());
           row.put("layer", s.getLayerNo() == null ? s.getLayer().name() : "XOL L" + s.getLayerNo());
           row.put("amount", m.signedLoss());
           row.put(SHARE_PCT, s.getSharePct());
@@ -164,7 +165,7 @@ public class TreatyBordereauReport implements ReportDefinition {
         ReportColumn.date("date", "Date"),
         ReportColumn.text("claimNo", "Claim No"),
         ReportColumn.date("lossDate", "Loss Date"),
-        ReportColumn.text("type", "Movement"),
+        ReportColumn.text(MOVEMENT, "Movement"),
         ReportColumn.text("layer", "Layer"),
         ReportColumn.amountNoTotal("amount", "Claim Amount"),
         ReportColumn.percent(SHARE_PCT, "Share %"),

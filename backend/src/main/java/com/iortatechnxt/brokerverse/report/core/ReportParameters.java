@@ -206,20 +206,23 @@ public final class ReportParameters {
    * name.
    */
   private String shown(ParameterSpec spec, String value) {
-    if (spec.type() == ParameterType.BOOLEAN) {
-      return Boolean.parseBoolean(value.strip()) ? "Yes" : "No";
+    return switch (spec.type()) {
+      case BOOLEAN -> Boolean.parseBoolean(value.strip()) ? "Yes" : "No";
+      case SELECT ->
+          OPTION_CODE.matcher(value).matches()
+              ? DisplayFormat.label(value)
+              : display.display(spec, value);
+      case DATE -> shownDate(value);
+      default -> display.display(spec, value);
+    };
+  }
+
+  private static String shownDate(String value) {
+    try {
+      return DisplayFormat.date(LocalDate.parse(value));
+    } catch (DateTimeParseException ex) {
+      return value;
     }
-    if (spec.type() == ParameterType.SELECT && OPTION_CODE.matcher(value).matches()) {
-      return DisplayFormat.label(value);
-    }
-    if (spec.type() == ParameterType.DATE) {
-      try {
-        return DisplayFormat.date(LocalDate.parse(value));
-      } catch (DateTimeParseException ex) {
-        return value;
-      }
-    }
-    return display.display(spec, value);
   }
 
   public ReportMetadata metadata() {

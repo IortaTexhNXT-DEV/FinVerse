@@ -18,6 +18,9 @@ public final class PdfColumnWidths {
   /** A value word wider than this share of the table does not widen its column. */
   private static final float LONGEST_VALUE_SHARE = 0.3f;
 
+  /** Guards the division when every column is fixed at its minimum. */
+  private static final float MIN_WEIGHT = 1e-6f;
+
   private final float[] weights;
   private final float[] headMinimum;
   private final float[] valueMinimum;
@@ -123,17 +126,9 @@ public final class PdfColumnWidths {
     boolean changed = true;
     while (changed) {
       changed = false;
-      float free = total;
-      float freeWeight = 0;
+      float[] free = free(minimum, fixed, total);
       for (int i = 0; i < width.length; i++) {
-        if (fixed[i]) {
-          free -= minimum[i];
-        } else {
-          freeWeight += weights[i];
-        }
-      }
-      for (int i = 0; i < width.length; i++) {
-        width[i] = fixed[i] ? minimum[i] : free * weights[i] / Math.max(freeWeight, 1e-6f);
+        width[i] = fixed[i] ? minimum[i] : free[0] * weights[i] / Math.max(free[1], MIN_WEIGHT);
         if (!fixed[i] && width[i] < minimum[i]) {
           fixed[i] = true;
           changed = true;
@@ -141,6 +136,20 @@ public final class PdfColumnWidths {
       }
     }
     return width;
+  }
+
+  /** The width and the weight of the columns not fixed at their minimum. */
+  private float[] free(float[] minimum, boolean[] fixed, float total) {
+    float free = total;
+    float freeWeight = 0;
+    for (int i = 0; i < weights.length; i++) {
+      if (fixed[i]) {
+        free -= minimum[i];
+      } else {
+        freeWeight += weights[i];
+      }
+    }
+    return new float[] {free, freeWeight};
   }
 
   private static float sum(float[] values) {

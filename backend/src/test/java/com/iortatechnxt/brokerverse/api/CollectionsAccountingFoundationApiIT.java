@@ -54,7 +54,7 @@ class CollectionsAccountingFoundationApiIT {
         .andExpect(jsonPath("$[0].keys.invoiceNo").value(no))
         .andExpect(jsonPath("$[0].keys.rootInvoiceNo").value(no));
     api.doGet("mktcoll", "/api/v1/ops/invoices/" + no).andExpect(status().isOk());
-    api.doGet("uw", "/api/v1/ops/invoices/" + no + "/family").andExpect(status().isForbidden());
+    api.doGet("norole", "/api/v1/ops/invoices/" + no + "/family").andExpect(status().isForbidden());
     api.doGet("cashier", "/api/v1/ops/invoices/NO-SUCH/family")
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.length()").value(0));

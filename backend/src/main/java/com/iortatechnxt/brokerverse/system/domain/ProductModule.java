@@ -72,28 +72,7 @@ public enum ProductModule {
   /** Budgets and budget against actual. */
   BUDGET("Budgets", List.of("budget"), List.of(), List.of()),
   /** Tax and statutory returns. */
-  TAX_STATUTORY("Tax and Statutory", List.of("tax"), List.of(), List.of()),
-  /** Insurer suite: insurer products, quotations and policies. */
-  UNDERWRITING("Underwriting (insurer)", List.of("underwriting"), List.of(), List.of()),
-  /** Insurer suite: claims of an insurer with reserves and settlements. */
-  INSURER_CLAIMS("Claims (insurer)", List.of("claims"), List.of(), List.of(Codes.UNDERWRITING)),
-  /** Insurer suite: treaties, cessions and facultative placements. */
-  REINSURANCE(
-      "Reinsurance (insurer)", List.of("reinsurance"), List.of(), List.of(Codes.UNDERWRITING)),
-  /** Insurer suite: technical reserves. */
-  ACTUARIAL_RESERVES(
-      "Actuarial Reserves (insurer)",
-      List.of("reserves", "insurance"),
-      List.of(),
-      List.of(Codes.UNDERWRITING, "INSURER_CLAIMS")),
-  /** Group consolidation and inter-company. */
-  CONSOLIDATION("Consolidation", List.of("consolidation"), List.of(), List.of()),
-  /** Insurer suite: premium tax, documentary stamp tax and the insurer IC schedules. */
-  INSURER_TAX(
-      "Insurer Tax Schedules",
-      List.of(),
-      List.of("INSURER_TAX_VIEW"),
-      List.of("TAX_STATUTORY", Codes.UNDERWRITING));
+  TAX_STATUTORY("Tax and Statutory", List.of("tax"), List.of(), List.of());
 
   private static final String ROOT = "com.iortatechnxt.brokerverse.";
 
@@ -193,12 +172,5 @@ public enum ProductModule {
    */
   public static Optional<ProductModule> byCode(String code) {
     return Arrays.stream(values()).filter(m -> m.name().equals(code)).findFirst();
-  }
-
-  /** Module codes named by other modules (their dependencies). */
-  private static final class Codes {
-    static final String UNDERWRITING = "UNDERWRITING";
-
-    private Codes() {}
   }
 }

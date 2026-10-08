@@ -123,8 +123,7 @@ engine of the report.
 * They are system journals posted by the finance manager, like the take-on of fixed assets and
   investments: manual journals (maker-checker) are limited to MANUAL, ADJUSTMENT and ACCRUAL and to
   the company's back-value window, so a 1 January take-on cannot be entered as one. The loader sits
-  in `journal` with its own run-as helper; `underwriting.seed.SeedUserContext` would create the cycle
-  journal → underwriting → accounting → journal.
+  in `journal` with its own run-as helper, so `journal` depends on no seed helper of another module.
 * **Statements.** `SeedBankStatements` builds the 1111 statements from the book entries; the
   January statement opens with one *BALANCE BROUGHT FORWARD* credit of 150,000,000.00, matched to the
   three branch opening entries by their common reference `OPENING-BANK-2026`, so the statement's

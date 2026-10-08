@@ -54,7 +54,7 @@ async function ownPage(ctx, user, password) {
   await settle(page, 300);
   await page.getByLabel('User ID').fill(user);
   await page.getByLabel('Password').fill(password);
-  await page.getByRole('button', { name: /^login$/i }).click();
+  await page.getByRole('button', { name: /^(login|sign in)$/i }).click();
   await settle(page, 1500);
   return page;
 }

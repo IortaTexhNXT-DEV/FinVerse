@@ -153,7 +153,16 @@ class SingleSignOnIT {
   void anOpenIdConnectSignInOpensTheSessionOfTheLinkedUser() throws Exception {
     String username = newUser("ssoo" + IDS.incrementAndGet());
     mode(AuthMode.OIDC);
-    mvc.perform(get("/api/v1/auth/sign-in-options")).andExpect(status().isOk()).andReturn();
+    JsonNode options =
+        json.readTree(
+            mvc.perform(get("/api/v1/auth/sign-in-options"))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString());
+    assertThat(options.get("singleSignOn").asBoolean()).isTrue();
+    // The sign-in page labels every environment except production.
+    assertThat(options.get("environment").asText()).isNotBlank().isNotEqualTo("production");
     String location = oidcSignIn(username);
     assertThat(location).startsWith(CALLBACK + "?ticket=");
     MvcResult signedIn = complete(location);

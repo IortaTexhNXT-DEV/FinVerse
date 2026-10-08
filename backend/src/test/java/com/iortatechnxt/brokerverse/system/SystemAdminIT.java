@@ -90,14 +90,10 @@ class SystemAdminIT {
               assertThat(s.job().name()).isEqualTo("PDC_ISSUED_DUE");
               assertThat(s.job().cron()).isEqualTo("0 15 0 * * *");
               assertThat(s.nextRun()).isNotNull();
-            })
-        .anySatisfy(
-            s -> {
-              // Insurer suite job, disabled by default (V1064).
-              assertThat(s.job().name()).isEqualTo("QUOTATION_EXPIRY");
-              assertThat(s.job().cron()).isEqualTo(JobRegistry.DISABLED);
-              assertThat(s.nextRun()).isNull();
             });
+    assertThat(jobs.statuses())
+        .extracting(s -> s.job().name())
+        .doesNotContain("QUOTATION_EXPIRY", "RESERVE_VALUATION", "RI_ALLOCATION");
     assertThat(jobs.nextRun(JobRegistry.DISABLED)).isNull();
     assertThatThrownBy(() -> jobs.run("NO_SUCH_JOB", JobTrigger.MANUAL))
         .isInstanceOf(ResourceNotFoundException.class);

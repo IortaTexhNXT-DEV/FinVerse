@@ -155,7 +155,7 @@ class PersonaMenusIT {
   }
 
   @Test
-  void marketingReachesTheClaimsReportsOnlyAndClaimsRolesNotTheInsurerClaims() throws Exception {
+  void marketingReachesTheClaimsReportsOnlyAndTheInsurerClaimsAreGone() throws Exception {
     String company = data.company().getId().toString();
     for (String user : new String[] {"ao", "mkttl"}) {
       Map<String, Boolean> claimsReports = new TreeMap<>();
@@ -175,7 +175,7 @@ class PersonaMenusIT {
           .andExpect(status().isForbidden());
     }
     for (String user : new String[] {"clmofficer", "clmth", "clmuh", "clmrisk"}) {
-      api.doGet(user, "/api/v1/claims?companyId=" + company).andExpect(status().isForbidden());
+      api.doGet(user, "/api/v1/claims?companyId=" + company).andExpect(status().isNotFound());
     }
   }
 

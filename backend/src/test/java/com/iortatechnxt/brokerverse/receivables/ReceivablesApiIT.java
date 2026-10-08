@@ -100,7 +100,7 @@ class ReceivablesApiIT {
     call("checker", postJson(BASE + "/receipts/" + id + "/cancel", reason(JULY.plusDays(2))))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.summary.status").value("CANCELLED"));
-    call("uw", get(BASE + "/receipts/" + id)).andExpect(status().isForbidden());
+    call("norole", get(BASE + "/receipts/" + id)).andExpect(status().isForbidden());
 
     long rejected = createReceipt("CASH", "10.00", "NONE", "[]");
     call("checker", postJson(BASE + "/receipts/" + rejected + "/reject", reason(JULY)))
@@ -302,7 +302,7 @@ class ReceivablesApiIT {
         .andExpect(jsonPath("$.status").value("FINALIZED"));
     call("fmanager", get(BASE + "/bank-rec/reconciliations?companyId=" + fx.company()))
         .andExpect(status().isOk());
-    call("uw", get(BASE + "/bank-rec/brs" + query)).andExpect(status().isForbidden());
+    call("norole", get(BASE + "/bank-rec/brs" + query)).andExpect(status().isForbidden());
   }
 
   @Test

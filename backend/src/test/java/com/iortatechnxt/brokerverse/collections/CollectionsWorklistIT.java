@@ -344,7 +344,7 @@ class CollectionsWorklistIT {
                         assignments.reassign(
                             fx.company(),
                             selection,
-                            new Reassign("uw", AssignmentKind.PERMANENT, null, "Wrong user"))))
+                            new Reassign("norole", AssignmentKind.PERMANENT, null, "Wrong user"))))
         .hasMessageContaining("not an active collection handler");
 
     as.run(CollectionsFixtures.LEAD, () -> defaults.revertExpired(fx.company(), today.plusDays(3)));

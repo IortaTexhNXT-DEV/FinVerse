@@ -13,7 +13,6 @@ import { BROKING_SETUP_HELP } from '@/features/brokingsetup/help';
 import { BULK_HELP } from '@/features/bulk/help';
 import { CASHIERING_HELP } from '@/features/cashiering/help';
 import { CATALOG_HELP } from '@/features/catalog/help';
-import { CLAIMS_HELP } from '@/features/claims/help';
 import { COLLECTIONS_HELP } from '@/features/collections/help';
 import { COMMISSION_HELP } from '@/features/commission/help';
 import { CRM_HELP } from '@/features/crm/help';
@@ -36,13 +35,10 @@ import { PLACEMENT_HELP } from '@/features/placement/help';
 import { PRODRECON_HELP } from '@/features/prodrecon/help';
 import { withPackageRequestHelp } from '@/features/productmaint/help';
 import { RECEIVABLES_HELP } from '@/features/receivables/help';
-import { REINSURANCE_HELP } from '@/features/reinsurance/help';
 import { REMITTANCE_HELP } from '@/features/remittance/help';
-import { RESERVES_HELP } from '@/features/reserves/help';
 import { SCREENING_HELP, SCREENING_SETUP_HELP } from '@/features/screening/help';
 import { SETUP_HELP } from '@/features/setup/help';
 import { TAX_HELP } from '@/features/tax/help';
-import { UNDERWRITING_HELP } from '@/features/underwriting/help';
 import { WORKSPACE_HELP } from '@/features/workspace/help';
 
 /**
@@ -86,7 +82,7 @@ export const HELP_SECTIONS: HelpSection[] = [
         ],
         controls: [
           'You never see your own submissions (maker-checker).',
-          'Journals, payables documents and claim reserves or settlements above your authorization limit are not offered to you.',
+          'Journals and payables documents above your authorization limit are not offered to you.',
           'Items waiting longer than the threshold raise a PENDING_APPROVAL_AGEING alert.',
         ],
       },
@@ -94,7 +90,7 @@ export const HELP_SECTIONS: HelpSection[] = [
         name: 'Dashboard',
         path: '/',
         summary:
-          'Executive view of the selected company and branch: ledger KPIs, gross written premium against the prior year, claims paid and outstanding, collections and receivables ageing, payables due in 7 and 30 days, cash and bank position, expense budget against actual, open alerts and your pending approvals.',
+          'Executive view of the selected company and branch: ledger KPIs, collections and receivables ageing, payables due in 7 and 30 days, cash and bank position, expense budget against actual, open alerts and your pending approvals.',
         workflow: [
           'Choose the company and branch in the header; every widget follows the selection (the budget is company-wide).',
           'Click the pending approvals or open alerts figure to open the inbox or the alert list.',
@@ -152,10 +148,6 @@ export const HELP_SECTIONS: HelpSection[] = [
   TAX_HELP,
   ACCOUNTING_ENGINE_HELP,
   BROKER_CLAIMS_HELP,
-  UNDERWRITING_HELP,
-  CLAIMS_HELP,
-  REINSURANCE_HELP,
-  RESERVES_HELP,
   MIGRATION_HELP,
   LEGACY_INQUIRY_HELP,
   NB_REPORTS_HELP,
@@ -177,7 +169,7 @@ export const HELP_SECTIONS: HelpSection[] = [
           'Any generated document downloaded as PDF (slips, letters, statements, forms) can also be downloaded as Word: after the download, choose Download Word in the prompt at the bottom of the screen.',
         ],
         controls: [
-          'Each report has its own permission (e.g. POLICY_VIEW for underwriting reports, CLAIM_VIEW for claims, REPORT_FINANCIAL for financial statements); the catalogue lists only the reports you may run.',
+          'Each report has its own permission (e.g. TAX_VIEW for tax reports, BCL_REPORT_VIEW for claims handling, REPORT_FINANCIAL for financial statements); the catalogue lists only the reports you may run.',
         ],
       },
     ],

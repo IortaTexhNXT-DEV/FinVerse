@@ -9,28 +9,30 @@ records:
 - its dependants and the Flyway migrations it owns;
 - the risk of removing it, and the recommended action.
 
-**This audit changes no code.** The recommendations need a decision from the project lead, and the reinsurance items
-also need BDOI's phase 2 scope.
+**Decision (8 October 2026).** The client decided that BIBS must be specific to BDOI as an insurance broker: every
+function retained from the insurer-company suite is removed, the reinsurance items included (BDOI's phase 2
+ReInsurance BRD is a broker model and will be built on the kept seams, section 3 A3).
 
-**Status.** Step 1 (hide) is done in the backend with migration V1064 and seed V1961; see section 4.1. The code
-removal (steps 2-6) is still open.
+**Status.** Steps 1 to 6 are done: step 1 (hide) with migration V1064 and seed V1961 (section 4.1), steps 2-6
+(removal) with migrations V2500-V2502 and seed V2510 (section 4.2). Step 7 (P1 / P2, `payables` and `receivables`)
+stays open.
 
-Audit date: 26-Sep-2026, on commit `61b1df8`. Sizes are counted as files / lines under
+Audit date: 26-Sep-2026, on commit `61b1df8`; removal 8-Oct-2026, from commit `d7e51be`. Sizes are counted as files / lines under
 `backend/src/main/java/com/iortatechnxt/brokerverse/<package>`, `backend/src/test/...` and `frontend/src/features/<feature>`.
 
 ## 1. Summary
 
 | # | Item | Used by BDOI? | Visible to BDOI roles today | Recommendation | Size (main + test + UI) | Risk |
 |---|---|---|---|---|---|---|
-| A1 | `underwriting` (insurer policies, quotations, open covers, UW reports, `QUOTATION_EXPIRY` job) | No | Menu: not for BDOI-specific roles, yes for the shared `FIN_MANAGER` / `AUDITOR` roles. Access matrix: yes (permissions `POLICY_*`) | Hide now; remove after A2-A4 and T1 | 108 / 11,489 + 12 / 2,146 + 31 / 3,748 | Medium (tax depends on it) |
-| A2 | `claims` (insurer claims, reserves, settlements, recoveries, LPOs) | No; BDOI claims are `brokerclaims` | As A1 (`CLAIM_*`) | Hide now; remove | 100 / 9,187 + 10 / 1,713 + 27 / 2,599 | Low |
-| A3 | `reinsurance` (treaties, cessions, FAC, RI recoveries, RI SOA) | No in phase 1; the ReInsurance BRD is phase 2 and is a broker model | As A1 (`REINSURANCE_*`) | Hide now; decide at phase 2 (remove, reuse only the SOA layout ideas) | 87 / 10,575 + 9 / 1,822 + 20 / 2,122 | Low |
-| A4 | `reserves` (UPR, DAC, OSLR, IBNR, takaful surplus) | No; BDOI does no reserving (Q44) | **Yes**: Reserve Summary (`REPORT_FINANCIAL`), Reserve Parameters (`MASTER_VIEW`), 7 reserve reports in the Report Centre, run approval (`PERIOD_END_RUN`), a row in the period-end checklist | Hide now (priority); remove | 74 / 7,398 + 10 / 1,505 + 16 / 1,846 | Low |
-| A5 | `insurance` shared kernel (claim movement ports) | No | No | Remove with A2-A4 | 7 / 177 | Low |
-| A6 | `consolidation` (inter-company, consolidation groups, consolidated statements) | No BDOI requirement | **Yes**: 5 consolidation reports in the Report Centre (`REPORT_FINANCIAL`); the screens need `CONSOLIDATION_RUN` (no BDOI role holds it) | Hide the reports now; remove after the BRD-5 report pack is confirmed | 41 / 3,890 + 2 / 425 + 9 / 1,030 | Low-medium (`closing` seed and a test use it) |
-| T1 | Insurer parts of `tax`: premium tax, DST, the insurer IC schedules | No; BDOI uses BIR forms, books, 2307 and `IC-BROKER-ASBO` | **Yes**: Tax & Statutory screens with `TAX_VIEW` (FRBS, Disbursement roles) | Hide the insurer screens and reports; then remove `PremiumTaxSource` | part of `tax` (134 / 13,015) | Medium |
-| D1 | Executive dashboard widgets "gross written premium" and "claims paid and outstanding" | No (insurer KPIs) | **Yes**: home screen `/` with `DASHBOARD_VIEW` | Hide the two widgets; the BRD-00 role home replaces the page | 2 widgets | Low |
-| R1 | Insurer roles and SIT/UAT users (`UNDERWRITER`, `CLAIMS_OFFICER`, `RI_OFFICER`; `uw`, `claims`, `reinsurer`) | No | Roles exist in every database (V1 / V2 are not seed) | Deactivate the three roles in a new migration; keep the SIT/UAT users until the tests move | - | Low |
+| A1 | `underwriting` (insurer policies, quotations, open covers, UW reports, `QUOTATION_EXPIRY` job) | No | Menu: not for BDOI-specific roles, yes for the shared `FIN_MANAGER` / `AUDITOR` roles. Access matrix: yes (permissions `POLICY_*`) | **Removed** (step 4) | 108 / 11,489 + 12 / 2,146 + 31 / 3,748 | Medium (tax depends on it) |
+| A2 | `claims` (insurer claims, reserves, settlements, recoveries, LPOs) | No; BDOI claims are `brokerclaims` | As A1 (`CLAIM_*`) | **Removed** (step 3) | 100 / 9,187 + 10 / 1,713 + 27 / 2,599 | Low |
+| A3 | `reinsurance` (treaties, cessions, FAC, RI recoveries, RI SOA) | No in phase 1; the ReInsurance BRD is phase 2 and is a broker model | As A1 (`REINSURANCE_*`) | **Removed** (step 5) | 87 / 10,575 + 9 / 1,822 + 20 / 2,122 | Low |
+| A4 | `reserves` (UPR, DAC, OSLR, IBNR, takaful surplus) | No; BDOI does no reserving (Q44) | **Yes**: Reserve Summary (`REPORT_FINANCIAL`), Reserve Parameters (`MASTER_VIEW`), 7 reserve reports in the Report Centre, run approval (`PERIOD_END_RUN`), a row in the period-end checklist | **Removed** (step 3) | 74 / 7,398 + 10 / 1,505 + 16 / 1,846 | Low |
+| A5 | `insurance` shared kernel (claim movement ports) | No | No | **Removed** (step 3) | 7 / 177 | Low |
+| A6 | `consolidation` (inter-company, consolidation groups, consolidated statements) | No BDOI requirement | **Yes**: 5 consolidation reports in the Report Centre (`REPORT_FINANCIAL`); the screens need `CONSOLIDATION_RUN` (no BDOI role holds it) | **Removed** (step 6) | 41 / 3,890 + 2 / 425 + 9 / 1,030 | Low-medium (`closing` seed and a test use it) |
+| T1 | Insurer parts of `tax`: premium tax, DST, the insurer IC schedules | No; BDOI uses BIR forms, books, 2307 and `IC-BROKER-ASBO` | **Yes**: Tax & Statutory screens with `TAX_VIEW` (FRBS, Disbursement roles) | **Removed** (step 2) | part of `tax` (134 / 13,015) | Medium |
+| D1 | Executive dashboard widgets "gross written premium" and "claims paid and outstanding" | No (insurer KPIs) | **Yes**: home screen `/` with `DASHBOARD_VIEW` | **Removed** (with the technical reserves tile) | 2 widgets | Low |
+| R1 | Insurer roles and SIT/UAT users (`UNDERWRITER`, `CLAIMS_OFFICER`, `RI_OFFICER`; `uw`, `claims`, `reinsurer`) | No | Roles exist in every database (V1 / V2 are not seed) | **Removed**: roles, insurer permissions, `SIT_INS_*` roles and the SIT/UAT users `uw`, `claims`, `reinsurer` | - | Low |
 | P1 | `payables` documents (supplier invoices, payment vouchers, PDC issued, petty cash) | **Unsure**: BRD-5 disbursement pays through `disbursement` and `payrequest`; bank accounts and cheque books of `payables` are used | Yes (`JOURNAL_VIEW`: FRBS, ACSL, Comptrollership) | Keep the code; ask Comptrollership, then hide the document screens | - | Medium |
 | P2 | `receivables` receipts, deposits and PDC received | **Unsure**: Operations re-uses the patterns, not the entity (BDOI_OPS_BRD_SPEC, platform table); cashiering issues BDOI's AR / OR | Yes (`JOURNAL_VIEW`) | Keep bank statements and reconciliation (BRD-5, FIT); hide the receipt screens after confirmation | - | Medium |
 
@@ -278,17 +280,17 @@ modules themselves.
     `JOURNAL_VIEW`) duplicate cashiering (BRD-2 CSHID.001-002).
   - Hide them from BDOI roles once Operations confirms.
 
-## 4. Proposed order of work
+## 4. Order of work
 
-| Step | Change | Size | Risk |
-|---|---|---|---|
-| 1 | Hide: remove `reservesModule`, `underwritingModule`, `claimsModule` and `reinsuranceModule` from `NAV_GROUPS` (the "Claims & Insurance" group keeps `brokerClaimsModule`); dedicated permissions for the reserve, consolidation, premium-tax / DST / insurer IC reports; drop the D1 widgets; empty the `QUOTATION_EXPIRY` cron; exclude the insurer permissions from the User Access catalogue (R1) | S (1-2 days) | Low |
-| 2 | Tax: remove `PremiumTaxSource` and the premium branches (T1) | S | Medium |
-| 3 | Remove `reserves`, `claims`, `insurance` (A4, A2, A5) with their UI, API clients, help, tests and seed runners; drop migrations V201 and V422 | M (2-3 days) | Low |
-| 4 | Remove `underwriting` (A1) and its seed runner; drop migration V102; re-capture the screenshots | M | Medium |
-| 5 | Remove `reinsurance` (A3) at phase 2 design; drop migration V302 | M | Low |
-| 6 | Remove `consolidation` (A6) after FRBS confirms the report pack; drop migration V601 | S | Low-medium |
-| 7 | Decide P1 / P2 with Comptrollership and Operations | - | - |
+| Step | Change | Size | Risk | Status |
+|---|---|---|---|---|
+| 1 | Hide: remove `reservesModule`, `underwritingModule`, `claimsModule` and `reinsuranceModule` from `NAV_GROUPS` (the "Claims & Insurance" group keeps `brokerClaimsModule`); dedicated permissions for the reserve, consolidation, premium-tax / DST / insurer IC reports; drop the D1 widgets; empty the `QUOTATION_EXPIRY` cron; exclude the insurer permissions from the User Access catalogue (R1) | S (1-2 days) | Low | Done (4.1; web client with 4.2) |
+| 2 | Tax: remove `PremiumTaxSource` and the premium branches (T1) | S | Medium | Done (4.2) |
+| 3 | Remove `reserves`, `claims`, `insurance` (A4, A2, A5) with their UI, API clients, help, tests and seed runners; drop their tables | M (2-3 days) | Low | Done (4.2) |
+| 4 | Remove `underwriting` (A1) and its seed runner; drop its tables; re-capture the screenshots | M | Medium | Done (4.2); screenshots to re-capture |
+| 5 | Remove `reinsurance` (A3); drop its tables | M | Low | Done (4.2) |
+| 6 | Remove `consolidation` (A6); drop its tables | S | Low-medium | Done (4.2) |
+| 7 | Decide P1 / P2 with Comptrollership and Operations | - | - | Open |
 
 ### 4.1 Step 1 as built (backend)
 
@@ -305,7 +307,7 @@ modules themselves.
 | Seed (V1961) | Seed-only roles `SIT_INS_<role>` give the SIT/UAT users the insurer access they had before, so the insurer seed runners and tests keep running until the removal waves |
 | Test | `nbadmin/service/InsurerSuiteHiddenIT` |
 
-Still open in step 1: the web client (menu entries of `NAV_GROUPS` and the D1 widgets).
+The web client part of step 1 (menu entries of `NAV_GROUPS` and the D1 widgets) was done with the removal (4.2).
 
 In total about 42,700 lines of main code (A1-A6), 7,600 of tests and 11,300 of UI, plus the API clients `underwriting.ts`,
 `claims.ts`, `reinsurance.ts`, `reserves.ts` and `consolidation.ts` (about 1,350 lines).
@@ -319,6 +321,31 @@ In total about 42,700 lines of main code (A1-A6), 7,600 of tests and 11,300 of U
 - Update `ArchitectureTest`, `ApiSmokeIT`, `docs/architecture/ARCHITECTURE.md`, `docs/operations/CONFIGURATION.md`
   and `RUNBOOK.md` (the `reserve-valuation-cron`, `ri-allocation-cron` and `quotation-expiry-cron` settings), and
   `features/help/helpContent.ts` in the same change.
+
+### 4.2 Steps 2-6 as built (removal, 8 October 2026)
+
+| Area | Removed |
+|---|---|
+| Backend packages | `underwriting` (108 files, 11,504 lines), `claims` (100 / 9,188), `reinsurance` (87 / 10,580), `reserves` (74 / 7,402), `insurance` (7 / 177), `consolidation` (41 / 3,933); their tests (43 files, 7,614 lines) |
+| Tax (T1) | `PremiumTaxSource`, `PremiumDocument`, `LevyWorksheetBuilder`, the premium branches of the VAT and EWT worksheets (the VAT sales lines show zero and are entered on the return), the worksheet kinds `DST`, `PREMIUM_TAX`, `LGT`, `FST`, the IC schedules of an insurer with their mapping and reports (`TAX-PREMTAX`, `TAX-DST-2000`, `IC-*` except `IC-BROKER-ASBO`), the seed forms 2000, 2551Q, LBT and FST and the IC seed mapping |
+| Dashboard (D1) | The premium and claims widgets and their endpoints, the technical reserves tile and the `reserve-groups` mapping |
+| Security (R1) | The insurer-only `Permission` values and the hiding helpers (`isInsurerOnly`, `offered`, `holdsInsurerPermission`, `PERMISSION_NOT_OFFERED`) |
+| Platform | The product modules `UNDERWRITING`, `INSURER_CLAIMS`, `REINSURANCE`, `ACTUARIAL_RESERVES`, `CONSOLIDATION`, `INSURER_TAX` and the profile `COMPLETE_SUITE`; report categories Underwriting, Claims, Reinsurance and Processing & Reserves; the jobs `QUOTATION_EXPIRY`, `RESERVE_VALUATION`, `RI_ALLOCATION` and their settings |
+| Seed runners | The insurer runners went with their packages; `PlanningSeedData` keeps the budget and the FX revaluation (the subsidiary journals and the consolidation run are gone; the seed company FVS stays) |
+| Web client | `features/underwriting`, `claims`, `reinsurance`, `reserves`, `consolidation` (103 files, 11,499 lines), the API clients (1,357 lines), the menu entries, help sections, tax screens (DST, premium tax, IC schedules, IC mapping) and the insurer dashboard widgets |
+| Migrations | V2500 tax (drops `tax_ic_line_item`, the premium levy forms and their returns, `IC_RBC_HURDLE_PERCENT`), V2501 the `uw_*`, `clm_*`, `ri_*`, `rsv_*`, `ic_*`, `con_*` tables (budget tables of V600 kept), V2502 the insurer event types and rules, exception codes and alerts, parameters, job history, permissions, roles (`UNDERWRITER`, `CLAIMS_OFFICER`, `RI_OFFICER`, `SIT_INS_*`) and module switches; seed V2510 the SIT/UAT users `uw`, `claims`, `reinsurer` |
+| Tests | `InsurerSuiteRemovedIT` replaces `InsurerSuiteHiddenIT`; tests that used the insurer users run as `norole` (test data, no role) or as the finance users |
+
+**Migration versions.** The plan above named versions in the owners' ranges (V102, V201, V302, V422, V601). On a new
+SIT/UAT database Flyway runs the migration and seed locations together in version order, and the seed scripts
+V910-V961, V1961 and V2020 write to the insurer tables, roles and switches; a drop with a lower version would make
+those seed scripts fail. The drops therefore use the new block V2500-V2509, above every seed script.
+
+**Kept on purpose.** Party types `REINSURER` and `RI_BROKER`, generic SOA and open-item netting (phase 2 seams);
+`budget`; the event types used by `receivables`, `payables` and their tests (for example `POLICY_ISSUE`,
+`PREMIUM_RECEIPT`, `CLAIM_PAYMENT`, `RI_SETTLEMENT_*`); the tax codes of the premium taxes (premium components the
+broker collects); the seed company FVS and the insurer chart of FVI; document number counters and the journals the
+insurer modules posted (ledger history); the applied migrations V100-V961 and V1064 / V1961 / V2020 (Flyway checksums).
 
 ## 5. Document clean-up done with this audit
 

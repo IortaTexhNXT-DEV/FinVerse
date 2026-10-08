@@ -15,6 +15,6 @@ describe('journal source', () => {
       label: 'Recurring journal',
       reference: 'REC:4:2026-09-15',
     });
-    expect(journalSource({ sourceModule: 'UNDERWRITING' }).label).toBe('Underwriting');
+    expect(journalSource({ sourceModule: 'PAYABLES' }).label).toBe('Payables');
   });
 });

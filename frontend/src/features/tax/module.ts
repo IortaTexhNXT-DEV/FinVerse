@@ -1,25 +1,20 @@
 import {
   Award,
-  BookOpenCheck,
   CalendarClock,
   FileSpreadsheet,
   Inbox,
-  Landmark,
   Library,
   Receipt,
   ScrollText,
   Settings2,
-  Stamp,
   Users,
 } from 'lucide-react';
 import { lazy } from 'react';
 import type { FeatureModule } from '@/navigation/types';
 
-/** Insurer tax worksheets and IC schedules: no BDOI role holds it (V1064). */
-const INSURER_TAX = 'INSURER_TAX_VIEW';
 const VIEW = 'TAX_VIEW';
 
-/** Tax & Statutory: BIR / LGU / BFP returns, 2307 certificates and Insurance Commission schedules. */
+/** Tax & Statutory: BIR returns and worksheets, 2307 certificates and the BIR forms and books. */
 export const taxModule: FeatureModule = {
   id: 'tax',
   section: 'Tax & Statutory',
@@ -44,22 +39,6 @@ export const taxModule: FeatureModule = {
       icon: FileSpreadsheet,
       permission: VIEW,
       component: lazy(() => import('./EwtWorksheetPage')),
-    },
-    {
-      path: '/tax/dst',
-      label: 'Documentary Stamp Tax',
-      icon: Stamp,
-      permission: VIEW,
-      requiresAll: [INSURER_TAX],
-      component: lazy(() => import('./DstWorksheetPage')),
-    },
-    {
-      path: '/tax/premium-tax',
-      label: 'Premium Tax, LGT & FST',
-      icon: Landmark,
-      permission: VIEW,
-      requiresAll: [INSURER_TAX],
-      component: lazy(() => import('./PremiumTaxWorksheetPage')),
     },
     {
       path: '/tax/returns',
@@ -91,14 +70,6 @@ export const taxModule: FeatureModule = {
       component: lazy(() => import('./BirOutputsPage')),
     },
     {
-      path: '/tax/ic-schedules',
-      label: 'IC Schedules',
-      icon: BookOpenCheck,
-      permission: VIEW,
-      requiresAll: [INSURER_TAX],
-      component: lazy(() => import('./IcSchedulesPage')),
-    },
-    {
       path: '/tax/codes',
       label: 'Tax Codes & Forms',
       icon: Settings2,
@@ -111,13 +82,6 @@ export const taxModule: FeatureModule = {
       icon: Users,
       permission: VIEW,
       component: lazy(() => import('./PartyProfilesPage')),
-    },
-    {
-      path: '/tax/ic-mapping',
-      label: 'IC Mapping',
-      icon: Settings2,
-      permission: VIEW,
-      component: lazy(() => import('./IcMappingPage')),
     },
   ],
 };

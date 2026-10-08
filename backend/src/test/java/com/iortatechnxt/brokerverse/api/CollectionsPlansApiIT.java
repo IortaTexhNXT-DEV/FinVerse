@@ -44,7 +44,7 @@ class CollectionsPlansApiIT {
     BookedInvoice year1 = fx.threeYearAccount();
     Long company = fx.company();
     api.doPost(
-            "uw",
+            "norole",
             PLANS + "/policy-years",
             Map.of("companyId", company, "arn", year1.getArn(), "frequency", "ANNUAL"))
         .andExpect(status().isForbidden());
@@ -72,7 +72,7 @@ class CollectionsPlansApiIT {
     api.doGet(TEAM_LEAD, PLANS + "/installments/due?companyId=" + company + "&overdueOnly=true")
         .andExpect(status().isOk());
     api.doPost(HANDLER, PLANS + "/" + planId + "/refresh", null).andExpect(status().isOk());
-    api.doGet("uw", PLANS + "?companyId=" + company).andExpect(status().isForbidden());
+    api.doGet("norole", PLANS + "?companyId=" + company).andExpect(status().isForbidden());
 
     JsonNode soa =
         api.read(
@@ -187,7 +187,7 @@ class CollectionsPlansApiIT {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.status").value("CANCELLED"));
     api.doPost(
-            "uw",
+            "norole",
             PROMISES,
             Map.of(
                 "companyId", company,
@@ -224,7 +224,7 @@ class CollectionsPlansApiIT {
             Map.of("reasonCode", "AGING", "comment", "Needs the unit head"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.status").value("WITH_UH"));
-    api.doPost("uw", ESCALATIONS + "/" + id + "/actions/resolve", Map.of("comment", "x"))
+    api.doPost("norole", ESCALATIONS + "/" + id + "/actions/resolve", Map.of("comment", "x"))
         .andExpect(status().isForbidden());
     api.doPost(
             TEAM_LEAD,

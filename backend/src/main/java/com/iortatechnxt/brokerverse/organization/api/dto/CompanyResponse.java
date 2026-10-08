@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.organization.api.dto;
 
 import com.iortatechnxt.brokerverse.common.domain.RecordStatus;
 import com.iortatechnxt.brokerverse.organization.domain.Company;
+import com.iortatechnxt.brokerverse.organization.domain.TaxRegistration;
 
 /**
  * Company view.
@@ -21,6 +22,7 @@ import com.iortatechnxt.brokerverse.organization.domain.Company;
  * @param logoRef logo reference of documents
  * @param headOfficeCode head-office code in files and for records without a branch
  * @param defaultBankCode default bank account code
+ * @param taxRegistration RDO, VAT registration, CAS and e-invoicing permits
  * @param recordStatus maker-checker status
  * @param createdBy creator
  * @param maker user who created or last maintained the record (unchanged by authorization)
@@ -42,6 +44,7 @@ public record CompanyResponse(
     String logoRef,
     String headOfficeCode,
     String defaultBankCode,
+    TaxRegistration taxRegistration,
     RecordStatus recordStatus,
     String createdBy,
     String maker,
@@ -70,6 +73,7 @@ public record CompanyResponse(
         c.getLogoRef(),
         c.getHeadOfficeCode(),
         c.getDefaultBankCode(),
+        c.getTaxRegistration(),
         c.getRecordStatus(),
         c.getCreatedBy(),
         c.getMaker(),

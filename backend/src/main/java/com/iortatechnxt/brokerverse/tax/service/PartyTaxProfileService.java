@@ -10,6 +10,7 @@ import com.iortatechnxt.brokerverse.party.domain.Party;
 import com.iortatechnxt.brokerverse.party.service.PartyService;
 import com.iortatechnxt.brokerverse.tax.domain.PartyTaxProfile;
 import com.iortatechnxt.brokerverse.tax.domain.PartyTaxProfileRepository;
+import com.iortatechnxt.brokerverse.tax.domain.PartyTaxStatus;
 import com.iortatechnxt.brokerverse.tax.domain.PayeeClass;
 import com.iortatechnxt.brokerverse.tax.domain.TaxCode;
 import com.iortatechnxt.brokerverse.tax.domain.TaxCodeRepository;
@@ -151,6 +152,7 @@ public class PartyTaxProfileService {
     profile.setZipCode(TaxMasterSupport.blankToNull(c.zipCode()));
     profile.setVatTreatment(c.vatTreatment() == null ? VatTreatment.REGULAR : c.vatTreatment());
     profile.setDefaultAtcCode(atc);
+    profile.setTaxStatus(c.taxStatus() == null ? PartyTaxStatus.NONE : c.taxStatus().checked());
   }
 
   /** Individuals are listed by last, first and middle name; corporations by registered name. */

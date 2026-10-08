@@ -18,6 +18,7 @@ import { formatRate, today } from '@/utils/format';
 import { AuthorizeButton, SelectField, TextField } from './MasterControls';
 import { TaxFormsPanel } from './TaxFormsPanel';
 import { awaitsOtherChecker } from '@/utils/makerChecker';
+import { taxTypeLabel } from './taxDisplay';
 
 const TAX_TYPES: readonly TaxType[] = [
   'VAT_OUTPUT',
@@ -29,6 +30,9 @@ const TAX_TYPES: readonly TaxType[] = [
   'LGT',
   'FST',
   'EWT',
+  'FWT',
+  'FINAL_VAT',
+  'PERCENTAGE_TAX',
 ];
 const PAYEE_CLASSES: readonly PayeeClass[] = ['INDIVIDUAL', 'CORPORATE'];
 const TABS = [
@@ -110,7 +114,7 @@ function TaxCodesPanel() {
           columns={[
             { key: 'c', header: 'Code', render: (c) => <strong>{c.code}</strong> },
             { key: 'n', header: 'Name', render: (c) => c.name },
-            { key: 't', header: 'Type', render: (c) => c.taxType },
+            { key: 't', header: 'Type', render: (c) => taxTypeLabel(c.taxType) },
             { key: 'p', header: 'Payee', render: (c) => c.payeeClass ?? '' },
             { key: 'r', header: 'Rate %', numeric: true, render: (c) => formatRate(c.rate) },
             { key: 'g', header: 'GL', render: (c) => c.glAccountCode },

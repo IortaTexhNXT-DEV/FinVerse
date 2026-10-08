@@ -8,6 +8,7 @@ import com.iortatechnxt.brokerverse.catalog.domain.InsurerBranchRepository;
 import com.iortatechnxt.brokerverse.catalog.domain.InsurerProfile;
 import com.iortatechnxt.brokerverse.catalog.domain.InsurerProfile.InsurerDetails;
 import com.iortatechnxt.brokerverse.catalog.domain.InsurerProfileRepository;
+import com.iortatechnxt.brokerverse.catalog.domain.InsurerTaxStatus;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.DuplicateResourceException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
@@ -99,6 +100,21 @@ public class InsurerService {
     return insurers
         .findByCompanyIdAndPartyCode(companyId, partyCode)
         .orElseThrow(() -> new ResourceNotFoundException(CatalogKind.INSURER.label(), partyCode));
+  }
+
+  /**
+   * The tax status of an insurer (BDOI inputs TX-Q02).
+   *
+   * @param companyId company
+   * @param partyCode insurer party code
+   * @return status, null when the insurer has none or is not in the catalogue
+   */
+  @Transactional(readOnly = true)
+  public InsurerTaxStatus taxStatus(Long companyId, String partyCode) {
+    return insurers
+        .findByCompanyIdAndPartyCode(companyId, partyCode)
+        .map(InsurerProfile::getTaxStatus)
+        .orElse(null);
   }
 
   /**

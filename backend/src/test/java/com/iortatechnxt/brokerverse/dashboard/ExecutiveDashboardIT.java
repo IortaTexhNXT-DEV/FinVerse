@@ -7,15 +7,12 @@ import com.iortatechnxt.brokerverse.approval.service.ApprovalInboxService;
 import com.iortatechnxt.brokerverse.coa.domain.BalanceSide;
 import com.iortatechnxt.brokerverse.dashboard.service.BudgetWidget;
 import com.iortatechnxt.brokerverse.dashboard.service.CashWidget;
-import com.iortatechnxt.brokerverse.dashboard.service.ClaimsWidget;
 import com.iortatechnxt.brokerverse.dashboard.service.CollectionsWidget;
 import com.iortatechnxt.brokerverse.dashboard.service.DashboardService;
 import com.iortatechnxt.brokerverse.dashboard.service.LabelledAmount;
 import com.iortatechnxt.brokerverse.dashboard.service.LedgerDashboardService;
 import com.iortatechnxt.brokerverse.dashboard.service.OperationsDashboardService;
 import com.iortatechnxt.brokerverse.dashboard.service.PayablesWidget;
-import com.iortatechnxt.brokerverse.dashboard.service.PremiumWidget;
-import com.iortatechnxt.brokerverse.dashboard.service.TrendPoint;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.support.TestCompanies;
@@ -88,32 +85,6 @@ class ExecutiveDashboardIT {
   }
 
   @Test
-  void premiumIsComparedWithTheSamePeriodOfThePriorYear() {
-    PremiumWidget p = ledger.premium(companyId, null, AS_OF);
-    assertThat(p.yearStart()).isEqualTo(LocalDate.of(2026, 1, 1));
-    assertThat(p.monthToDate()).isEqualByComparingTo("250");
-    assertThat(p.monthToDatePriorYear()).isEqualByComparingTo("100");
-    assertThat(p.yearToDate()).isEqualByComparingTo("1250");
-    assertThat(p.yearToDatePriorYear()).isEqualByComparingTo("500");
-    assertThat(p.monthly()).hasSize(9);
-    assertThat(p.monthly().get(2))
-        .isEqualTo(new TrendPoint("2026-03", new BigDecimal("1000.00"), new BigDecimal("400.00")));
-    assertThat(p.monthly().get(0).current()).isEqualByComparingTo("0");
-    Long headOffice = companies.headOffice(companyId);
-    assertThat(ledger.premium(companyId, headOffice, AS_OF).yearToDate())
-        .isEqualByComparingTo("1250");
-  }
-
-  @Test
-  void claimsPaidAndOutstandingComeFromTheClaimAccounts() {
-    ClaimsWidget c = ledger.claims(companyId, null, AS_OF);
-    assertThat(c.paidYearToDate()).isEqualByComparingTo("300");
-    assertThat(c.paidMonthToDate()).isEqualByComparingTo("0");
-    assertThat(c.outstanding()).isEqualByComparingTo("700");
-    assertThat(c.monthly().get(3).current()).isEqualByComparingTo("300");
-  }
-
-  @Test
   void cashPositionListsTheBankAccountsAndTheMonthEndTrend() {
     CashWidget cash = ledger.cash(companyId, null, AS_OF);
     assertThat(cash.total()).isEqualByComparingTo("1450");
@@ -138,10 +109,6 @@ class ExecutiveDashboardIT {
 
   @Test
   void aCompanyWithoutDataGetsZerosEverywhere() {
-    PremiumWidget p = ledger.premium(emptyCompanyId, null, AS_OF);
-    assertThat(p.yearToDate()).isEqualByComparingTo("0");
-    assertThat(p.monthly()).allSatisfy(m -> assertThat(m.priorYear()).isEqualByComparingTo("0"));
-    assertThat(ledger.claims(emptyCompanyId, null, AS_OF).outstanding()).isEqualByComparingTo("0");
     CashWidget cash = ledger.cash(emptyCompanyId, null, AS_OF);
     assertThat(cash.accounts()).isEmpty();
     assertThat(cash.total()).isEqualByComparingTo("0");
@@ -181,6 +148,5 @@ class ExecutiveDashboardIT {
     var workload = as.run("checker", () -> operations.workload(seed));
     assertThat(workload.pendingApprovals())
         .isEqualTo(as.run("checker", () -> inbox.counts(seed)).total());
-    assertThat(ledger.premium(seed, null, today).monthly()).isNotEmpty();
   }
 }

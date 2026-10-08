@@ -128,7 +128,7 @@ export const ADMIN_HELP: HelpSection = {
       name: 'Product Modules',
       path: '/admin/modules',
       summary:
-        'The modules of the product in use in this deployment (New Business, Operations, Collections, Renewal and the others) and the module profiles, such as the insurance broker profile without the insurer suite.',
+        'The modules of the product in use in this deployment (New Business, Operations, Collections, Renewal and the others) and the module profiles, such as the insurance broker profile.',
       workflow: [
         'The System Administrator chooses Switch Off or Switch On in the row menu of a module, or Apply Profile in the row menu of a profile, and gives the reason.',
         'Another user with the approval right approves or rejects the change from the row menu; the requester may withdraw it.',

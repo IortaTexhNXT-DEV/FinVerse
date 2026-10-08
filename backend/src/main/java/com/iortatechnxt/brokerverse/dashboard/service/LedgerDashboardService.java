@@ -18,8 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Executive dashboard widgets computed from the general ledger and the open-item sub-ledger only:
- * gross written premium, claims, vendor payables and the cash position. Accounts are selected
- * through {@link DashboardProperties}, so no business module is read.
+ * vendor payables and the cash position. Accounts are selected through {@link DashboardProperties},
+ * so no business module is read.
  */
 @Service
 @Transactional(readOnly = true)
@@ -47,48 +47,6 @@ public class LedgerDashboardService {
     this.queries = queries;
     this.calendar = calendar;
     this.properties = properties;
-  }
-
-  /**
-   * Gross written premium month and year to date against the same period of the prior year.
-   *
-   * @param companyId company
-   * @param branchId branch, null for the whole company
-   * @param asOf reference date, null for today
-   * @return premium widget
-   */
-  public PremiumWidget premium(Long companyId, Long branchId, LocalDate asOf) {
-    Period p = period(companyId, branchId, asOf);
-    Accounts premium = Accounts.ofGroups(properties.premiumGroups());
-    // Income is credit natural: negate the debit-minus-credit net.
-    return new PremiumWidget(
-        p.asOf(),
-        p.yearStart(),
-        p.net(premium, p.monthStart(), p.asOf()).negate(),
-        p.net(premium, p.monthStart().minusYears(1), p.asOf().minusYears(1)).negate(),
-        p.net(premium, p.yearStart(), p.asOf()).negate(),
-        p.net(premium, p.yearStart().minusYears(1), p.asOf().minusYears(1)).negate(),
-        p.trend(premium, true));
-  }
-
-  /**
-   * Claims paid month and year to date with the outstanding claims reserve.
-   *
-   * @param companyId company
-   * @param branchId branch, null for the whole company
-   * @param asOf reference date, null for today
-   * @return claims widget
-   */
-  public ClaimsWidget claims(Long companyId, Long branchId, LocalDate asOf) {
-    Period p = period(companyId, branchId, asOf);
-    Accounts paid = Accounts.ofPrefixes(properties.claimsPaidAccounts());
-    Accounts reserve = Accounts.ofPrefixes(properties.outstandingClaimsAccounts());
-    return new ClaimsWidget(
-        p.asOf(),
-        p.net(paid, p.monthStart(), p.asOf()),
-        p.net(paid, p.yearStart(), p.asOf()),
-        p.net(reserve, DashboardLedgerQueries.BEGINNING, p.asOf()).negate(),
-        p.trend(paid, false));
   }
 
   /**
@@ -167,10 +125,6 @@ public class LedgerDashboardService {
       return yearStart;
     }
 
-    LocalDate monthStart() {
-      return asOf.withDayOfMonth(1);
-    }
-
     /** Months of the fiscal year up to the reference month. */
     List<YearMonth> months() {
       List<YearMonth> months = new ArrayList<>();
@@ -184,33 +138,6 @@ public class LedgerDashboardService {
 
     BigDecimal net(Accounts accounts, LocalDate from, LocalDate to) {
       return Money.round(queries.net(new Scope(companyId, branchId, from, to), accounts));
-    }
-
-    /**
-     * Monthly amounts of the fiscal year against the same months of the prior year (full months).
-     *
-     * @param accounts account selection
-     * @param creditNatural true for income and liabilities (credit minus debit)
-     * @return trend
-     */
-    List<TrendPoint> trend(Accounts accounts, boolean creditNatural) {
-      Map<YearMonth, BigDecimal> net =
-          queries.monthlyNet(
-              new Scope(companyId, branchId, yearStart.minusYears(1), asOf), accounts);
-      List<TrendPoint> points = new ArrayList<>();
-      for (YearMonth m : months()) {
-        points.add(
-            new TrendPoint(
-                m.toString(),
-                natural(net.get(m), creditNatural),
-                natural(net.get(m.minusYears(1)), creditNatural)));
-      }
-      return points;
-    }
-
-    private BigDecimal natural(BigDecimal debitMinusCredit, boolean creditNatural) {
-      BigDecimal value = Money.round(Money.nz(debitMinusCredit));
-      return creditNatural ? value.negate() : value;
     }
   }
 }

@@ -11,8 +11,6 @@ import com.iortatechnxt.brokerverse.tax.service.LedgerControl;
 import com.iortatechnxt.brokerverse.tax.service.TaxDocumentLine;
 import com.iortatechnxt.brokerverse.tax.service.TaxWorksheet;
 import com.iortatechnxt.brokerverse.tax.service.TaxWorksheetService;
-import com.iortatechnxt.brokerverse.underwriting.domain.Policy;
-import com.iortatechnxt.brokerverse.underwriting.domain.PremiumBreakdown;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -22,8 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Worksheets built from real documents: a fire policy through a broker (VAT, DST, LGT, FST and
- * commission withholding) and a supplier invoice with input VAT and 2 % EWT, both in September
+ * Worksheets built from real documents: a supplier invoice with input VAT and 2 % EWT in September
  * 2026. The shared test database may hold other documents of the month, so every assertion compares
  * the worksheet after the scenario with the worksheet before it.
  */
@@ -45,53 +42,26 @@ class TaxWorksheetIT {
   void everyWorksheetPicksUpTheScenarioDocuments() {
     TaxWorksheet vatBefore = compute(WorksheetKind.VAT);
     TaxWorksheet ewtBefore = compute(WorksheetKind.EWT);
-    TaxWorksheet dstBefore = compute(WorksheetKind.DST);
-    TaxWorksheet lgtBefore = compute(WorksheetKind.LGT);
-    TaxWorksheet fstBefore = compute(WorksheetKind.FST);
-    TaxWorksheet ptBefore = compute(WorksheetKind.PREMIUM_TAX);
 
-    Policy policy = fixtures.firePolicy(DAY, "100000");
     SupplierInvoice invoice = fixtures.supplierInvoice(DAY, "10000");
-    PremiumBreakdown p = policy.getPremium();
 
     TaxWorksheet vat = compute(WorksheetKind.VAT);
-    assertThat(delta(vat, vatBefore, "OUTPUT_VAT")).isEqualByComparingTo(p.getVat());
-    assertThat(delta(vat, vatBefore, "SALES_TAXABLE")).isEqualByComparingTo(p.getOurNetPremium());
+    assertThat(line(vat, "OUTPUT_VAT")).isEqualByComparingTo("0");
+    assertThat(line(vat, "SALES_TAXABLE")).isEqualByComparingTo("0");
     assertThat(delta(vat, vatBefore, "INPUT_VAT")).isEqualByComparingTo("1200.00");
     assertThat(delta(vat, vatBefore, "PURCHASES_SERVICES")).isEqualByComparingTo("10000.00");
-    assertThat(p.getVat()).isEqualByComparingTo("12000.00");
-    TaxDocumentLine sale = document(vat, policy.getPolicyNo());
-    assertThat(sale.taxCode()).isEqualTo("VATABLE");
-    assertThat(sale.tin()).isEqualTo("301-222-333-000");
     assertThat(document(vat, invoice.getDocumentNo()).taxCode()).isEqualTo("SERVICES");
     assertControlsMoveWithDocuments(vat, vatBefore);
 
     TaxWorksheet ewt = compute(WorksheetKind.EWT);
-    BigDecimal withheld = new BigDecimal("200.00").add(p.getWithholdingTax());
+    BigDecimal withheld = new BigDecimal("200.00");
     assertThat(delta(ewt, ewtBefore, "TOTAL_WITHHELD")).isEqualByComparingTo(withheld);
     assertThat(delta(ewt, ewtBefore, "EWT_PAYABLE")).isEqualByComparingTo(withheld);
     TaxDocumentLine supplier = document(ewt, invoice.getDocumentNo());
     assertThat(supplier.taxCode()).isEqualTo("WC160");
     assertThat(supplier.taxableAmount()).isEqualByComparingTo("10000.00");
     assertThat(supplier.rate()).isEqualByComparingTo("2.00");
-    TaxDocumentLine commission = document(ewt, policy.getPolicyNo());
-    assertThat(commission.taxCode()).isEqualTo("WC515");
-    assertThat(commission.sourceType()).isEqualTo("COMMISSION");
-    assertThat(commission.taxAmount()).isEqualByComparingTo(p.getWithholdingTax());
     assertControlsMoveWithDocuments(ewt, ewtBefore);
-
-    assertThat(delta(compute(WorksheetKind.DST), dstBefore, "TAX_DUE"))
-        .isEqualByComparingTo(p.getDst());
-    assertThat(delta(compute(WorksheetKind.LGT), lgtBefore, "TAX_DUE"))
-        .isEqualByComparingTo(p.getLgt());
-    TaxWorksheet fst = compute(WorksheetKind.FST);
-    assertThat(delta(fst, fstBefore, "TAX_DUE")).isEqualByComparingTo(p.getFst());
-    assertThat(delta(fst, fstBefore, "LOB:FIRE")).isEqualByComparingTo(p.getFst());
-    assertControlsMoveWithDocuments(fst, fstBefore);
-    assertThat(delta(compute(WorksheetKind.PREMIUM_TAX), ptBefore, "TAX_DUE"))
-        .isEqualByComparingTo("0");
-    assertThat(p.getDst()).isEqualByComparingTo("12500.00");
-    assertThat(p.getFst()).isEqualByComparingTo("2000.00");
   }
 
   @Test

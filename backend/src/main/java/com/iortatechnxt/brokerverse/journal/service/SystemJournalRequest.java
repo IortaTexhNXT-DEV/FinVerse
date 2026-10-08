@@ -19,7 +19,7 @@ import java.util.List;
  * @param currency header currency
  * @param narration narration
  * @param reference business reference (policy, claim, receipt no...)
- * @param sourceModule originating module, e.g. "UNDERWRITING"
+ * @param sourceModule originating module, e.g. "PAYABLES"
  * @param sourceReference unique key of the business event
  * @param lines lines
  * @param correctsBatchId journal corrected by this one (ACSL 2.9.1), may be null

@@ -12,6 +12,7 @@ import com.iortatechnxt.brokerverse.report.core.TabularReportBuilder;
 import com.iortatechnxt.brokerverse.security.domain.Permission;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -129,7 +130,7 @@ public class GroupProfileReport implements ReportDefinition {
     } else {
       modules.add(area.trim().toUpperCase(Locale.ROOT));
     }
-    return Permission.offered().stream()
+    return Arrays.stream(Permission.values())
         .map(Permission::name)
         .filter(pm -> modules.contains(areas.getOrDefault(pm, OTHER)))
         .sorted(

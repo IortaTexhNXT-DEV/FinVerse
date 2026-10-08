@@ -1,9 +1,6 @@
 package com.iortatechnxt.brokerverse.tax.seed;
 
 import com.iortatechnxt.brokerverse.tax.domain.FilingFrequency;
-import com.iortatechnxt.brokerverse.tax.domain.IcMeasure;
-import com.iortatechnxt.brokerverse.tax.domain.IcSchedule;
-import com.iortatechnxt.brokerverse.tax.domain.NormalBalance;
 import com.iortatechnxt.brokerverse.tax.domain.PayeeClass;
 import com.iortatechnxt.brokerverse.tax.domain.TaxAuthority;
 import com.iortatechnxt.brokerverse.tax.domain.TaxType;
@@ -14,9 +11,8 @@ import java.util.List;
 /**
  * Reference values of the tax seed data for the seed chart of accounts (V900): tax codes and ATCs
  * with the rates of RR 11-2018 as understood at the time of writing, the filing calendar, tax
- * profiles of the seed suppliers, intermediaries and two customers, and the IC schedule mapping.
- * Rates and ATCs are seed values: a tax officer confirms them against the current BIR issuances
- * before go-live.
+ * profiles of the seed suppliers, intermediaries and two customers. Rates and ATCs are seed values:
+ * a tax officer confirms them against the current BIR issuances before go-live.
  */
 final class TaxSeedCatalog {
 
@@ -102,42 +98,6 @@ final class TaxSeedCatalog {
               EWT_PAYABLE,
               null),
           new FormSpec(
-              "2000",
-              "Documentary stamp tax declaration (policies)",
-              TaxAuthority.BIR,
-              FilingFrequency.MONTHLY,
-              WorksheetKind.DST,
-              5,
-              "2503",
-              null),
-          new FormSpec(
-              "2551Q",
-              "Quarterly percentage (premium) tax return",
-              TaxAuthority.BIR,
-              FilingFrequency.QUARTERLY,
-              WorksheetKind.PREMIUM_TAX,
-              25,
-              "2507",
-              null),
-          new FormSpec(
-              "LBT",
-              "Local business tax on premiums",
-              TaxAuthority.LGU,
-              FilingFrequency.QUARTERLY,
-              WorksheetKind.LGT,
-              20,
-              "2505",
-              null),
-          new FormSpec(
-              "FST",
-              "Fire service tax remittance",
-              TaxAuthority.BFP,
-              FilingFrequency.MONTHLY,
-              WorksheetKind.FST,
-              20,
-              "2506",
-              null),
-          new FormSpec(
               "1601-C",
               "Withholding tax on compensation (payroll system)",
               TaxAuthority.BIR,
@@ -189,264 +149,6 @@ final class TaxSeedCatalog {
               VatTreatment.ZERO_RATED,
               null));
 
-  /** IC schedule mapping. */
-  static final List<IcSpec> IC_LINES =
-      List.of(
-          ic(
-              IcSchedule.PREMIUMS,
-              "GROSS_WRITTEN",
-              "Gross premiums written",
-              "4100",
-              NormalBalance.CREDIT,
-              1,
-              null),
-          ic(
-              IcSchedule.PREMIUMS,
-              "RI_CEDED",
-              "Less: reinsurance premiums ceded",
-              "4200",
-              NormalBalance.DEBIT,
-              -1,
-              null),
-          ic(
-              IcSchedule.LOSSES,
-              "LOSSES_PAID",
-              "Gross losses and claims paid",
-              "5100",
-              NormalBalance.DEBIT,
-              1,
-              null),
-          ic(
-              IcSchedule.LOSSES,
-              "RESERVE_CHANGE",
-              "Change in claims reserves",
-              "5200",
-              NormalBalance.DEBIT,
-              1,
-              null),
-          ic(
-              IcSchedule.LOSSES,
-              "RI_SHARE",
-              "Less: reinsurers' share of losses",
-              "5300",
-              NormalBalance.CREDIT,
-              -1,
-              null),
-          ic(
-              IcSchedule.COMMISSIONS,
-              "COMMISSION_EXPENSE",
-              "Commissions incurred",
-              "5400",
-              NormalBalance.DEBIT,
-              1,
-              null),
-          ic(
-              IcSchedule.COMMISSIONS,
-              "RI_COMMISSION",
-              "Less: reinsurance commissions earned",
-              "4400",
-              NormalBalance.CREDIT,
-              -1,
-              null),
-          range(
-              IcSchedule.NET_WORTH,
-              "TOTAL_ASSETS",
-              "Total assets",
-              "1000",
-              "1999",
-              NormalBalance.DEBIT,
-              1),
-          ic(
-              IcSchedule.NET_WORTH,
-              "NON_ADMITTED_PREPAID",
-              "Less: prepaid expenses (non-admitted)",
-              "1601",
-              NormalBalance.DEBIT,
-              -1,
-              null),
-          ic(
-              IcSchedule.NET_WORTH,
-              "NON_ADMITTED_ADVANCES",
-              "Less: advances to employees (non-admitted)",
-              "1604",
-              NormalBalance.DEBIT,
-              -1,
-              null),
-          ic(
-              IcSchedule.NET_WORTH,
-              "NON_ADMITTED_SUSPENSE",
-              "Less: suspense account (non-admitted)",
-              "1606",
-              NormalBalance.DEBIT,
-              -1,
-              null),
-          range(
-              IcSchedule.NET_WORTH,
-              "TOTAL_LIABILITIES",
-              "Less: total liabilities",
-              "2000",
-              "2999",
-              NormalBalance.CREDIT,
-              -1),
-          ic(
-              IcSchedule.RESERVES,
-              "UPR",
-              "Reserve for unearned premiums",
-              "2101",
-              NormalBalance.CREDIT,
-              1,
-              null),
-          ic(
-              IcSchedule.RESERVES,
-              "OSLR",
-              "Outstanding losses reserve",
-              "2102",
-              NormalBalance.CREDIT,
-              1,
-              null),
-          ic(
-              IcSchedule.RESERVES,
-              "IBNR",
-              "Claims incurred but not reported",
-              "2103",
-              NormalBalance.CREDIT,
-              1,
-              null),
-          ic(
-              IcSchedule.RESERVES,
-              "PDR",
-              "Premium deficiency reserve",
-              "2104",
-              NormalBalance.CREDIT,
-              1,
-              null),
-          ic(
-              IcSchedule.RESERVES,
-              "RI_UPR",
-              "Less: reinsurers' share of UPR",
-              "1301",
-              NormalBalance.DEBIT,
-              -1,
-              null),
-          ic(
-              IcSchedule.RESERVES,
-              "RI_OSLR",
-              "Less: reinsurers' share of outstanding losses",
-              "1302",
-              NormalBalance.DEBIT,
-              -1,
-              null),
-          ic(
-              IcSchedule.RESERVES,
-              "RI_IBNR",
-              "Less: reinsurers' share of IBNR",
-              "1303",
-              NormalBalance.DEBIT,
-              -1,
-              null),
-          ic(
-              IcSchedule.INVESTMENTS,
-              "PLACEMENTS",
-              "Short-term placements",
-              "1120",
-              NormalBalance.DEBIT,
-              1,
-              null),
-          ic(
-              IcSchedule.INVESTMENTS,
-              "FVPL",
-              "Financial assets at FVPL",
-              "1501",
-              NormalBalance.DEBIT,
-              1,
-              null),
-          ic(
-              IcSchedule.INVESTMENTS,
-              "FVOCI",
-              "Financial assets at FVOCI",
-              "1502",
-              NormalBalance.DEBIT,
-              1,
-              null),
-          ic(
-              IcSchedule.INVESTMENTS,
-              "AMORTISED_COST",
-              "Government securities at amortised cost",
-              "1503",
-              NormalBalance.DEBIT,
-              1,
-              null),
-          ic(
-              IcSchedule.INVESTMENTS,
-              "ACCRUED_INTEREST",
-              "Accrued interest receivable",
-              "1504",
-              NormalBalance.DEBIT,
-              1,
-              null),
-          ic(
-              IcSchedule.INVESTMENTS,
-              "SECURITY_FUND",
-              "Security fund deposit",
-              "1505",
-              NormalBalance.DEBIT,
-              1,
-              null),
-          ic(
-              IcSchedule.RBC,
-              "EQUITY_RISK",
-              "Investment risk - FVPL securities",
-              "1501",
-              NormalBalance.DEBIT,
-              1,
-              "30"),
-          ic(
-              IcSchedule.RBC,
-              "FVOCI_RISK",
-              "Investment risk - FVOCI securities",
-              "1502",
-              NormalBalance.DEBIT,
-              1,
-              "15"),
-          ic(
-              IcSchedule.RBC,
-              "PLACEMENT_RISK",
-              "Investment risk - placements",
-              "1120",
-              NormalBalance.DEBIT,
-              1,
-              "1"),
-          range(
-                  IcSchedule.RBC,
-                  "CREDIT_RISK",
-                  "Credit risk - insurance receivables",
-                  "1201",
-                  "1206",
-                  NormalBalance.DEBIT,
-                  1)
-              .withFactor("10"),
-          range(
-                  IcSchedule.RBC,
-                  "RI_CREDIT_RISK",
-                  "Credit risk - reinsurance assets",
-                  "1301",
-                  "1303",
-                  NormalBalance.DEBIT,
-                  1)
-              .withFactor("5"),
-          movement("PREMIUM_RISK", "Premium risk - gross premiums written", "4100", "15"),
-          movement("PREMIUM_RISK_CEDED", "Premium risk - less ceded premiums", "4200", "15"),
-          range(
-                  IcSchedule.RBC,
-                  "RESERVE_RISK",
-                  "Reserve risk - claims reserves",
-                  "2102",
-                  "2103",
-                  NormalBalance.CREDIT,
-                  1)
-              .withFactor("10"),
-          movement("OPERATIONAL_RISK", "Operational risk - gross premiums written", "4100", "2"));
-
   private TaxSeedCatalog() {}
 
   private static CodeSpec code(
@@ -462,45 +164,6 @@ final class TaxSeedCatalog {
   private static ProfileSpec corporate(String party, String name, String atc, String zip) {
     return new ProfileSpec(
         party, PayeeClass.CORPORATE, name, null, null, null, zip, VatTreatment.REGULAR, atc);
-  }
-
-  private static IcSpec ic(
-      IcSchedule schedule,
-      String code,
-      String description,
-      String account,
-      NormalBalance side,
-      int sign,
-      String factor) {
-    return new IcSpec(schedule, code, description, account, account, side, sign, null, factor);
-  }
-
-  private static IcSpec range(
-      IcSchedule schedule,
-      String code,
-      String description,
-      String from,
-      String to,
-      NormalBalance side,
-      int sign) {
-    return new IcSpec(schedule, code, description, from, to, side, sign, null, null);
-  }
-
-  /**
-   * RBC premium line: the period movement presented as a credit, so ceded premiums (a debit
-   * balance) come out negative and reduce the premium risk base.
-   */
-  private static IcSpec movement(String code, String description, String account, String factor) {
-    return new IcSpec(
-        IcSchedule.RBC,
-        code,
-        description,
-        account,
-        account,
-        NormalBalance.CREDIT,
-        1,
-        IcMeasure.MOVEMENT,
-        factor);
   }
 
   /** Tax code values. */
@@ -536,21 +199,4 @@ final class TaxSeedCatalog {
       String zip,
       VatTreatment vat,
       String atc) {}
-
-  /** IC mapping line values. */
-  record IcSpec(
-      IcSchedule schedule,
-      String code,
-      String description,
-      String from,
-      String to,
-      NormalBalance side,
-      int sign,
-      IcMeasure measure,
-      String factor) {
-
-    IcSpec withFactor(String rbcFactor) {
-      return new IcSpec(schedule, code, description, from, to, side, sign, measure, rbcFactor);
-    }
-  }
 }

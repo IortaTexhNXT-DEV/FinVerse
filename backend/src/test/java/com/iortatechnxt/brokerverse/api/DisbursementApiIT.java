@@ -53,7 +53,7 @@ class DisbursementApiIT {
     api.doGet("disb", BASE + "/summary" + company())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.inProcess").isNumber());
-    api.doGet("uw", BASE + "/summary" + company()).andExpect(status().isForbidden());
+    api.doGet("norole", BASE + "/summary" + company()).andExpect(status().isForbidden());
 
     Map<String, Object> encode = new HashMap<>();
     encode.put("companyId", fx.company());

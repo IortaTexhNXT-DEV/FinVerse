@@ -15,7 +15,7 @@ function item(patch: Partial<OpenItem>): OpenItem {
     settledAmount: 0,
     outstanding: 1000,
     status: 'OPEN',
-    sourceModule: 'UNDERWRITING',
+    sourceModule: 'RECEIVABLES',
     ...patch,
   };
 }

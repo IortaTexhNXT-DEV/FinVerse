@@ -73,6 +73,7 @@ sign-off per BRD"). Each document is kept once, in its latest version.
 | ASVS L2 Control Mapping | BRD-00 | Security | 1.0 | [`Security/BIBS_Security_BRD-00_ASVS_L2_Control_Mapping_v1.0.xlsx`](Security/BIBS_Security_BRD-00_ASVS_L2_Control_Mapping_v1.0.xlsx) |
 | Support Model and Support Guide | BRD-00 | Operations | 1.0 | [`Operations/BIBS_Support_BRD-00_Support_Model_and_Support_Guide_v1.0.docx`](Operations/BIBS_Support_BRD-00_Support_Model_and_Support_Guide_v1.0.docx) |
 | Test Strategy | BRD-00 | Quality | 1.0 | [`Quality/BIBS_TestStrategy_BRD-00_Test_Strategy_v1.0.docx`](Quality/BIBS_TestStrategy_BRD-00_Test_Strategy_v1.0.docx) |
+| Walkthrough Users and Sign-in | BRD-00 | UAT | 1.0 | [`UAT/BIBS_UAT_BRD-00_Walkthrough_Users_and_Sign-in_v1.0.xlsx`](UAT/BIBS_UAT_BRD-00_Walkthrough_Users_and_Sign-in_v1.0.xlsx) |
 
 ## Still to write
 

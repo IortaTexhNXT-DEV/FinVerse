@@ -1,16 +1,12 @@
 package com.iortatechnxt.brokerverse.tax.seed;
 
 import com.iortatechnxt.brokerverse.payables.seed.SeedActor;
-import com.iortatechnxt.brokerverse.tax.domain.IcLineItem;
 import com.iortatechnxt.brokerverse.tax.domain.PartyTaxProfile;
 import com.iortatechnxt.brokerverse.tax.domain.TaxCode;
 import com.iortatechnxt.brokerverse.tax.domain.TaxForm;
 import com.iortatechnxt.brokerverse.tax.seed.TaxSeedCatalog.CodeSpec;
 import com.iortatechnxt.brokerverse.tax.seed.TaxSeedCatalog.FormSpec;
-import com.iortatechnxt.brokerverse.tax.seed.TaxSeedCatalog.IcSpec;
 import com.iortatechnxt.brokerverse.tax.seed.TaxSeedCatalog.ProfileSpec;
-import com.iortatechnxt.brokerverse.tax.service.IcLineCommand;
-import com.iortatechnxt.brokerverse.tax.service.IcMappingService;
 import com.iortatechnxt.brokerverse.tax.service.PartyTaxProfileCommand;
 import com.iortatechnxt.brokerverse.tax.service.PartyTaxProfileService;
 import com.iortatechnxt.brokerverse.tax.service.TaxCodeCommand;
@@ -30,8 +26,8 @@ import org.springframework.stereotype.Component;
 /**
  * Creates the tax masters of a company from {@link TaxSeedCatalog} through the services, as maker
  * "accountant" with authorization by "checker", so the maker-checker trail is real. Idempotent:
- * only missing codes, forms, profiles and mapping lines are created; parties absent from the
- * company are skipped. Used by the seed runner and by the tests.
+ * only missing codes, forms and profiles are created; parties absent from the company are skipped.
+ * Used by the seed runner and by the tests.
  */
 @Component
 @Profile({"seed", "test"})
@@ -43,7 +39,6 @@ public class TaxSeedMasters {
   private final TaxCodeService codes;
   private final TaxFormService forms;
   private final PartyTaxProfileService profiles;
-  private final IcMappingService mappings;
   private final TaxSourceQueries queries;
   private final SeedActor actor;
 
@@ -53,7 +48,6 @@ public class TaxSeedMasters {
    * @param codes tax codes
    * @param forms tax forms
    * @param profiles party tax profiles
-   * @param mappings IC mapping
    * @param queries party facts
    * @param actor SIT/UAT users
    */
@@ -61,13 +55,11 @@ public class TaxSeedMasters {
       TaxCodeService codes,
       TaxFormService forms,
       PartyTaxProfileService profiles,
-      IcMappingService mappings,
       TaxSourceQueries queries,
       SeedActor actor) {
     this.codes = codes;
     this.forms = forms;
     this.profiles = profiles;
-    this.mappings = mappings;
     this.queries = queries;
     this.actor = actor;
   }
@@ -95,7 +87,6 @@ public class TaxSeedMasters {
       }
     }
     ensureProfiles(companyId);
-    ensureMappings(companyId);
   }
 
   private void ensureProfiles(Long companyId) {
@@ -112,22 +103,6 @@ public class TaxSeedMasters {
         PartyTaxProfile created =
             actor.as(SeedActor.MAKER, () -> profiles.create(command(companyId, p, party)));
         actor.as(SeedActor.CHECKER, () -> profiles.authorize(created.getId()));
-      }
-    }
-  }
-
-  private void ensureMappings(Long companyId) {
-    Set<String> existing =
-        mappings.list(companyId).stream()
-            .map(i -> i.getSchedule() + "/" + i.getLineCode())
-            .collect(Collectors.toSet());
-    int order = 0;
-    for (IcSpec s : TaxSeedCatalog.IC_LINES) {
-      order += 10;
-      if (!existing.contains(s.schedule() + "/" + s.code())) {
-        IcLineCommand cmd = command(companyId, s, order);
-        IcLineItem created = actor.as(SeedActor.MAKER, () -> mappings.create(cmd));
-        actor.as(SeedActor.CHECKER, () -> mappings.authorize(created.getId()));
       }
     }
   }
@@ -178,21 +153,5 @@ public class TaxSeedMasters {
         p.zip(),
         p.vat(),
         p.atc());
-  }
-
-  private static IcLineCommand command(Long companyId, IcSpec s, int order) {
-    return new IcLineCommand(
-        companyId,
-        s.schedule(),
-        s.code(),
-        s.description(),
-        order,
-        s.from(),
-        s.to(),
-        null,
-        s.side(),
-        s.sign(),
-        s.measure(),
-        s.factor() == null ? null : new BigDecimal(s.factor()));
   }
 }

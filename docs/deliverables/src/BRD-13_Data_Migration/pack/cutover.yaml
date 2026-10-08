@@ -229,7 +229,7 @@ rollback:
   - [RB-1, Stop, "The go / no-go board records NO-GO (or a failure before T 18:00 that the board judges unrecoverable). The Program Manager announces the rollback on the bridge.", GNG]
   - [RB-2, Lock BIBS, "Disable business logins to BIBS; stop the scheduled jobs (payment automatch, payment file uploads, Renewal extraction, e-mail dispatch).", IDO]
   - [RB-3, Capture, "If business transactions were keyed in BIBS after 08:00 on T, export them (receipts, applications, bookings) with the Cutover Runbook Status report and the Operations reports for re-keying in legacy.", IML]
-  - [RB-4, Restore, "Restore production to the rollback-point backup (CT-037); restore the stored attachments of the same time; verify the restore (record counts of the key records, application start).", IDO]
+  - [RB-4, Restore, "Restore production to the rollback-point backup (CT-040); restore the stored attachments of the same time; verify the restore (record counts of the key records, application start).", IDO]
   - [RB-5, Reopen legacy, "Set EBIX, QPS and CMS back to read-write; lift the GL restriction; re-enable the legacy batch jobs; confirm the last legacy EOD is intact.", BIT]
   - [RB-6, Re-key, "Operations re-keys in legacy the transactions captured in RB-3, with the BIBS AR numbers voided in the receipt register.", OPS]
   - [RB-7, Communicate, "Send the rollback notice to users, branches, insurers and bank channels (communication plan item 7).", PM]

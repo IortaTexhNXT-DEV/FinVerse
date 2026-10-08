@@ -5,8 +5,10 @@ import com.iortatechnxt.brokerverse.quotation.domain.QuotationStatus;
 import com.iortatechnxt.brokerverse.quotation.service.QuotationDiff;
 import com.iortatechnxt.brokerverse.quotation.service.QuotationDispatchService.BatchResult;
 import com.iortatechnxt.brokerverse.quotation.service.QuotationDispatchService.EmailRequest;
+import com.iortatechnxt.brokerverse.quotation.service.QuotationDispatchService.NotSent;
 import com.iortatechnxt.brokerverse.quotation.service.QuotationService.Preview;
 import com.iortatechnxt.brokerverse.quotation.service.QuotationSummary;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -55,20 +57,24 @@ public final class QuotationActionDtos {
    * @param subject subject, default when blank
    * @param body message, default when blank
    * @param passwordHint password hint
+   * @param to further recipients of every e-mail, besides each client's e-mail, may be null
+   * @param cc copy recipients of every e-mail, may be null
    */
   public record BatchSendRequest(
       @NotEmpty @Size(max = 200) List<Long> ids,
       @Size(max = 300) String subject,
       @Size(max = 10000) String body,
-      @Size(max = 300) String passwordHint) {
+      @Size(max = 300) String passwordHint,
+      @Size(max = 20) List<@Email String> to,
+      @Size(max = 20) List<@Email String> cc) {
 
     /**
      * The message.
      *
-     * @return e-mail without recipients (each client's e-mail is used)
+     * @return e-mail with the further recipients (each client's e-mail is added)
      */
     public EmailRequest email() {
-      return new EmailRequest(List.of(), List.of(), subject, body, passwordHint);
+      return new EmailRequest(to, cc, subject, body, passwordHint);
     }
   }
 
@@ -77,9 +83,11 @@ public final class QuotationActionDtos {
    *
    * @param quotations quotations sent
    * @param clients clients e-mailed
-   * @param references quotation numbers
+   * @param references quotation numbers sent
+   * @param notSent quotations not sent with their reason
    */
-  public record BatchSendResponse(int quotations, int clients, List<String> references) {
+  public record BatchSendResponse(
+      int quotations, int clients, List<String> references, List<NotSent> notSent) {
 
     /**
      * Maps a batch result.
@@ -88,7 +96,7 @@ public final class QuotationActionDtos {
      * @return response
      */
     public static BatchSendResponse from(BatchResult r) {
-      return new BatchSendResponse(r.quotations(), r.emails(), r.references());
+      return new BatchSendResponse(r.quotations(), r.emails(), r.references(), r.notSent());
     }
   }
 

@@ -3,7 +3,7 @@ import { Inbox, Plus, Send, Upload } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { quotationsApi } from '@/api/quotations';
-import type { QuotationListItem } from '@/api/quotations';
+import type { BatchRecipients, QuotationListItem } from '@/api/quotations';
 import { useAuth } from '@/auth/authContext';
 import { WorklistToolbar } from '@/components/broking/WorklistToolbar';
 import { Button } from '@/components/ui/Button';
@@ -16,6 +16,7 @@ import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { BatchSendDialog } from './BatchSendDialog';
+import { batchSendSummary } from './batchSend';
 import {
   criteriaOf,
   QUICK_FILTERS,
@@ -59,16 +60,16 @@ export default function QuotationsPage() {
   const rows = list.data?.content ?? [];
   const ready = sendable(rows, selected);
   const batch = useMutation({
-    mutationFn: (hint?: string) =>
+    mutationFn: (recipients: BatchRecipients) =>
       quotationsApi.batchSend(
         ready.map((r) => r.id),
-        hint,
+        recipients,
       ),
     onSuccess: async (result) => {
       setSending(false);
       setSelected(new Set());
       await queryClient.invalidateQueries({ queryKey: ['quotations'] });
-      toast.success(`${result.quotations} quotation(s) sent in ${result.clients} e-mail(s)`);
+      toast.success(batchSendSummary(result));
     },
   });
   const choose = (next: QuotationTab, q?: QuickFilter) => {
@@ -190,7 +191,7 @@ export default function QuotationsPage() {
           busy={batch.isPending}
           error={batch.error}
           onClose={() => setSending(false)}
-          onSend={(hint) => batch.mutate(hint)}
+          onSend={(recipients) => batch.mutate(recipients)}
         />
       )}
     </div>

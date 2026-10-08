@@ -1,4 +1,4 @@
-# BRD-3 Product Maintenance – Business Sign-off Pack, release set v2.0 (Drop 0, Setup and Data Migration).
+# BRD-3 Product Maintenance – Business Sign-off Pack, release set v2.1 (Drop 0, Setup and Data Migration).
 # Built by docs/deliverables/src/signoff/signoff_pack.py (workbook, checks) and read by the FRS source through
 # ```pack blocks (tools/deliverables/bdoi_docx.py). Schema: docs/deliverables/src/signoff/README.md.
 meta:
@@ -6,8 +6,8 @@ meta:
   brd_label: BRD-3
   name: Product Maintenance
   code: PM
-  version: "2.0"
-  date: 27 September 2026
+  version: "2.1"
+  date: 8 October 2026
   status_as_of: 27-Sep-2026
   release_set: BRD-03 Product Maintenance – Business Sign-off Pack
   frs: FRS_BRD03_PRODUCT_MAINTENANCE.md

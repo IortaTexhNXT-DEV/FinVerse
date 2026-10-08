@@ -1,16 +1,16 @@
 ---
-# Source of "00 Start Here - Guide to the BRD-03 Sign-off Pack" (Word), release set v2.0 of BRD-3 Product Maintenance.
+# Source of "00 Start Here - Guide to the BRD-03 Sign-off Pack" (Word), release set v2.1 of BRD-3 Product Maintenance.
 # Build: python tools/deliverables/bdoi_docx.py docs/deliverables/src/BRD-03_Product_Maintenance/START_HERE_BRD03.md
 # The map, the reading order and the steps come from pack/guide.yaml (the same source as the guide deck).
 title: Start Here
-subtitle: Guide to the BRD-03 Product Maintenance Sign-off Pack, release set v2.0
+subtitle: Guide to the BRD-03 Product Maintenance Sign-off Pack, release set v2.1
 doc_type: Start Here Guide
 doc_code: StartHere
 brd: BRD-03
 name: Product Maintenance
 doc_id: BIBS-SH-BRD-03
-version: "2.0"
-date: 27 September 2026
+version: "2.1"
+date: 8 October 2026
 status: Issued for BDOI business sign-off
 header_title: Start Here BRD-3 Product Maintenance
 h1_page_break: false
@@ -21,6 +21,12 @@ control:
     reviewer: iorta TechNXT Business Analysis
     approver: ""
     change: First issue with the BRD-3 Product Maintenance business sign-off pack
+  - version: "2.1"
+    date: 8 Oct 2026
+    author: iorta TechNXT Project Manager
+    reviewer: iorta TechNXT Business Analysis
+    approver: ""
+    change: "Re-based on the Product Maintenance BRD and Addendum (unchanged) and the Drop 0 decisions; sign-in follows BRD-11; packages in force at go-live and automatic renewal drafting as clarifications; user-story view and storyboard index added to the FRS"
 distribution:
   - {name: "Product Owner, Marketing Business System", role: Approver, organisation: BDOI, purpose: Sign-off}
   - {name: Marketing Business Services and System Support (MBS), role: Business owner of the set-up, organisation: BDOI, purpose: Review and sign-off; configuration inputs}

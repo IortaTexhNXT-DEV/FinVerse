@@ -8,8 +8,8 @@ doc_code: TestPlan
 brd: BRD-03
 name: Product Maintenance Summary
 doc_id: BIBS-TP-BRD-03
-version: "2.0"
-date: 27 September 2026
+version: "2.1"
+date: 8 October 2026
 status: Issued for BDOI business sign-off
 header_title: Test Plan BRD-3 Product Maintenance
 h1_page_break: false
@@ -32,6 +32,12 @@ control:
     reviewer: iorta TechNXT Project Manager
     approver: BDOI business units (sign-off)
     change: "Release set v2.0: cases re-traced to FRS v2.0 and its screen specifications (Screen ID on every case, Screens sheet); one screen case per screen and one message case per screen or dialog of the messages catalogue added. Status as of 27-Sep-2026"
+  - version: "2.1"
+    date: 8 Oct 2026
+    author: iorta TechNXT QA
+    reviewer: iorta TechNXT Project Manager
+    approver: BDOI business units (sign-off)
+    change: "Traced to FRS v2.1: cases for the sign-in through BRD-11 (FR-PM-001), the packages in force at go-live set up through package requests (FR-PM-050) and the automatic drafting of renewal requests (FR-PM-060)"
 distribution:
   - {name: "Product Owner, Marketing Business System", role: Approver, organisation: BDOI, purpose: Review and sign-off}
   - {name: Marketing Business Services and System Support (MBS), role: Business tester, organisation: BDOI, purpose: "Set-up, versions, masters, incentive criteria"}
@@ -114,8 +120,8 @@ The roles-and-access sheet checks each Product Maintenance action against the ro
 | Workflow | A stage transition, return or closure of PM_PACKAGE_REQUEST or of a package version |
 | Report-output | Reports, comparative outputs and exports; content checked against the screen |
 | Upload-download | Documents uploaded to a request and files downloaded or e-mailed from it |
-| Screen | The screen matches its specification in FRS v2.0 chapter 13: fields, order, labels, mandatory markers, defaults, lists and buttons (TC-PM-SCR-nn, one per screen) |
-| Message | Every error, validation and warning message of one screen or dialog, word for word with its code (TC-PM-MSG-nn, from the messages catalogue of FRS v2.0 chapter 15) |
+| Screen | The screen matches its specification in FRS v2.1 chapter 13: fields, order, labels, mandatory markers, defaults, lists and buttons (TC-PM-SCR-nn, one per screen) |
+| Message | Every error, validation and warning message of one screen or dialog, word for word with its code (TC-PM-MSG-nn, from the messages catalogue of FRS v2.1 chapter 15) |
 
 ## Reading the workbook
 
@@ -220,7 +226,7 @@ Every FR has at least one positive and one negative case, and every BRD ID is co
 
 ## Coverage by screen
 
-Every screen of the FRS v2.0 screen specifications has its screen case and the cases that start on it. A case is linked to the screen where the tester starts; the steps may go on to other screens.
+Every screen of the FRS v2.1 screen specifications has its screen case and the cases that start on it. A case is linked to the screen where the tester starts; the steps may go on to other screens.
 
 <!-- tp:screens -->
 

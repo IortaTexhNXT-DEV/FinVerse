@@ -5,47 +5,19 @@
 # each persona), the changes of the issue and the points for the UX Design team to confirm.
 
 issue:
-  version: "2.2"
-  date: 2 October 2026
+  version: "2.1"
+  date: 8 October 2026
   changes:
-    - ref: CHG-PM-2.1-01
-      what: The Details of the validation checks name the cover type, the coverages and the insurers by their names
-      screens: [SCR-PM-13]
-      images: [scr-pm-13-05-validation, scr-pm-13-06-released, wt-a-16, wt-a-17]
-    - ref: CHG-PM-2.1-02
+    - ref: CHG-PM-2.1-21
       what: >-
-        A released version shows its rate scheme, dates and terms as values: amounts with separators, rates with their
-        decimals, a dash when empty and long texts wrapped
-      screens: [SCR-PM-13]
-      images: [scr-pm-13-06-released, wt-a-17]
-    - ref: CHG-PM-2.1-03
+        The packages in force at go-live are set up through package requests (type New package or Update) and
+        validated before the map freeze, not loaded as version 1 (CLR-PM-21); the screens are unchanged
+      screens: [SCR-PM-03, SCR-PM-13]
+    - ref: CHG-PM-2.1-22
       what: >-
-        The coverages of a request are chosen by name from the coverages of the product line, and the hint Before
-        submitting is an information notice
-      screens: [SCR-PM-03]
-      images: [scr-pm-03-01-empty, scr-pm-03-02-filled, scr-pm-03-03-error, ux-scr-pm-03-saved]
-    - ref: CHG-PM-2.1-04
-      what: >-
-        The actions of the step bar stay on one row, and an action that closes the request off its path (Not
-        Proceeded) is shown in red
-      screens: [SCR-PM-04, SCR-PM-05]
-      images: [scr-pm-04-01-record, scr-pm-04-02-approval, scr-pm-05-01-tab, ux-scr-pm-04-cmp-stepper]
-    - ref: CHG-PM-2.1-05
-      what: >-
-        Authorize and Deactivate of the catalog records (products, coverages and clauses, incentive criteria,
-        insurers, rates) through the row action menu, each confirmed in a dialog; a deactivation asks the reason, kept
-        in the audit trail; the required documents of a product as a table
-      screens: [SCR-PM-11, SCR-PM-12, SCR-PM-15, SCR-PM-16, SCR-PM-17, SCR-PM-18, SCR-PM-19]
-      images: [scr-pm-11-01-list, scr-pm-12-01-record, scr-pm-15-01-list, scr-pm-15-02-clauses, scr-pm-16-01-list,
-               scr-pm-17-01-list, scr-pm-18-01-record, scr-pm-19-01-list]
-    - ref: CHG-PM-2.2-01
-      what: >-
-        Lists in the BDO style guide: outlined status pills, alternating white and Background Blue rows, a long
-        list scrolling inside its card with the header row in view, names instead of codes, due dates on one line
-        with the overdue icon and ages in words; every image of the set retaken
-      screens: [SCR-PM-01, SCR-PM-02, SCR-PM-03, SCR-PM-04, SCR-PM-05, SCR-PM-06, SCR-PM-07, SCR-PM-08, SCR-PM-09,
-                SCR-PM-10, SCR-PM-11, SCR-PM-12, SCR-PM-13, SCR-PM-14, SCR-PM-15, SCR-PM-16, SCR-PM-17, SCR-PM-18,
-                SCR-PM-19, SCR-PM-20, SCR-PM-21, SCR-PM-22]
+        Automatic drafting of package renewal requests at the first expiry alert, proposed on (CLR-PM-22); the
+        Package Expiry screen is unchanged
+      screens: [SCR-PM-10]
 
 personas:
   MKT_AO: {who: "An account officer of Retail, Corporate or Combank / Corbank Marketing who serves the clients"}
@@ -125,7 +97,7 @@ states:
   - {screen: SCR-PM-20, state: cmp-tree, component: true, user: badmin, crop: ".tree-table", nocallouts: true, caption: "Tree table"}
 
 confirm:
-  clarifications: [CLR-PM-11, CLR-PM-12, CLR-PM-17, CLR-PM-18, CLR-PM-19, CLR-PM-20]
+  clarifications: [CLR-PM-11, CLR-PM-12, CLR-PM-17, CLR-PM-18, CLR-PM-19, CLR-PM-20, CLR-PM-21, CLR-PM-22]
   findings:
     - screens: [SCR-PM-03]
       observation: >-

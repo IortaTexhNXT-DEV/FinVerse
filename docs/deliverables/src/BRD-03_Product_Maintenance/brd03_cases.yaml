@@ -10,8 +10,8 @@ meta:
   code: PM
   frs: FRS_BRD03_PRODUCT_MAINTENANCE.md
   summary: TP_BRD03_PRODUCT_MAINTENANCE.md
-  version: "2.0"
-  date: 27 September 2026
+  version: "2.1"
+  date: 8 October 2026
   signoff: pack/pack.yaml
   verify_messages: true
 
@@ -176,6 +176,7 @@ frs:
       - Wrong credentials are refused and no session is created.
       - The account locks after the configured number of failed attempts and the System Administrator unlocks it.
       - Log-ins and failed attempts are recorded in the audit trail.
+      - With single sign-on switched on under BRD-11, a Product Maintenance user signs in with the BDO account and gets the same menu.
     cases:
       - c: 1
         type: Positive
@@ -227,6 +228,15 @@ frs:
           - Log in as auditor and open Administration > Audit Trail.
           - Filter on today's date and the users ao and ao2.
         expected: Each successful and failed log-in shows the user, time and source address.
+      - c: 5
+        type: Positive
+        persona: TSU
+        title: Single sign-on of a TSU Officer (BRD-11)
+        pre: Single sign-on through EIAM switched on in the test environment (BRD-11 FR-UA-003); the EIAM test account of tsu.
+        steps:
+          - Open BIBS and click Sign in with the BDO identity provider; sign in at EIAM with the test account of tsu.
+          - Open the side menu.
+        expected: The home page opens with the Product Maintenance section of the TSU Officer, as after a local sign-in.
 
   FR-PM-002:
     scenario: SC-PM-01
@@ -1758,6 +1768,7 @@ frs:
       - A rate change creates version n+1 and version n stays in force until n+1 takes effect.
       - The Versions tab shows every version with status and effective dates and compares two versions.
       - A versioned field cannot be edited on the product and a second draft is refused.
+      - A package in force at go-live is set up through a package request with its signed slip and ManCom reference, and its version is validated before it is used (proposed, CLR-PM-21).
     cases:
       - c: 1
         type: Workflow
@@ -1797,6 +1808,26 @@ frs:
           - As tsuhead send a direct request to create a version of MTR12.
         expected: A direct request is refused with "You are not permitted to perform this action".
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
+      - c: 4
+        type: Workflow
+        persona: TSU
+        screen: NEWREQ
+        title: Set up a package in force at go-live through a package request
+        pre: A package in force in legacy, with its signed package slip and ManCom reference (template CI-06).
+        steps:
+          - As tsu create a package request of type Update for its existing risk code, with the terms of the signed slip; have it approved by Marketing and the TSU Team Lead.
+          - Upload the signed slip and record the ManCom reference; as mbs set up the version; as tsuhead validate and release it.
+        expected: The package has a released version with the terms of the slip, linked to the request, the slip and the ManCom reference; its validator differs from the maker.
+      - c: 4
+        type: Negative
+        persona: MKT_AO
+        screen: QUOTE
+        title: Package not yet set up cannot be sold
+        pre: A legacy package whose request is still With MBS for set-up.
+        steps:
+          - Start a quotation on its risk code.
+        expected: The quotation is refused because the package has no released version.
+        msg: ["Package <code> has no released version in force on <date>", PRODUCT_NOT_SELLABLE]
 
   FR-PM-051:
     scenario: SC-PM-06
@@ -1940,6 +1971,7 @@ frs:
       - A package ending in 45 days appears in the Expiring tab with 45 days left.
       - The alert is raised once at each threshold (60, 30 and 7 days), never twice.
       - The list is exported for a date range and the days filter is validated.
+      - With automatic drafting switched on, the first alert of a package also drafts its renewal request, and no second request is drafted while it is open (proposed, CLR-PM-22).
     cases:
       - c: 1
         type: Positive
@@ -1985,6 +2017,16 @@ frs:
           - As ao send a direct request to open Package Expiry.
         expected: The request is refused; the screen is not in ao's menu.
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
+      - c: 4
+        type: Positive
+        persona: SYSTEM
+        screen: JOBS
+        title: First alert drafts the renewal request
+        pre: PACKAGE_RENEWAL_AUTODRAFT true; PAR25 reaches the 60-day threshold.
+        steps:
+          - Run PACKAGE_EXPIRY_MONITOR; run it again the next day.
+          - As tsu open Package Expiry, tab Renewal in Progress.
+        expected: One renewal request of PAR25 is drafted from its current version at the first run; the second run drafts none; PAR25 shows the open request.
 
   FR-PM-061:
     scenario: SC-PM-07

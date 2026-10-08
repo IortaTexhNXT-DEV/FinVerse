@@ -33,15 +33,21 @@ import org.springframework.stereotype.Component;
 @Component
 public class SlipDocuments {
 
+  private static final String ARN = "ARN";
   private static final List<String> RISK_HEADERS =
-      List.of("ARN", "Insured", "Product", "Period", "Sum insured", "Gross premium");
+      List.of(ARN, "Insured", "Product", "Period", "Sum insured", "Gross premium");
   private static final List<Integer> AMOUNT_COLUMNS = List.of(4, 5);
+  private static final List<String> TAX_HEADERS =
+      List.of(ARN, "Taxpayer name", "TIN", "Registered address");
   private static final List<String> SHEET_HEADERS =
       List.of(
           "Slip No.",
-          "ARN",
+          ARN,
           "Client Code",
           "Insured",
+          "Taxpayer Name",
+          "TIN",
+          "Registered Address",
           "Product",
           "Line",
           "Cover Type",
@@ -57,6 +63,7 @@ public class SlipDocuments {
   private final CompanyRepository companies;
   private final CatalogNames names;
   private final UserDirectory users;
+  private final ClientTaxDetails taxDetails;
 
   /**
    * Creates the renderer.
@@ -65,16 +72,19 @@ public class SlipDocuments {
    * @param companies companies (letterhead)
    * @param names product names
    * @param users user names (signatures)
+   * @param taxDetails tax details of the clients (Ease of Paying Taxes)
    */
   public SlipDocuments(
       DocumentComposer composer,
       CompanyRepository companies,
       CatalogNames names,
-      UserDirectory users) {
+      UserDirectory users,
+      ClientTaxDetails taxDetails) {
     this.composer = composer;
     this.companies = companies;
     this.names = names;
     this.users = users;
+    this.taxDetails = taxDetails;
   }
 
   /**
@@ -97,6 +107,7 @@ public class SlipDocuments {
             new Field("Accounts", String.valueOf(accounts.size())),
             new Field("Total gross premium", DisplayFormat.amount(total)));
     List<List<String>> risks = accounts.stream().map(this::riskRow).toList();
+    List<List<String>> taxes = accounts.stream().map(this::taxRow).toList();
     return composer.pdf(
         new DocumentSpec(
             companyName(header.companyId()),
@@ -105,7 +116,8 @@ public class SlipDocuments {
             List.of(
                 new Fields("Placement", facts),
                 new Text(null, header.text().text()),
-                new Table("Risks", RISK_HEADERS, risks, AMOUNT_COLUMNS)),
+                new Table("Risks", RISK_HEADERS, risks, AMOUNT_COLUMNS),
+                new Table("EOPT details of the insured", TAX_HEADERS, taxes, List.of())),
             signatures(header),
             header.text().versionLabel()));
   }
@@ -118,27 +130,30 @@ public class SlipDocuments {
    * @return XLSX bytes
    */
   public byte[] slipXlsx(String slipNo, List<Account> accounts) {
-    List<List<Object>> rows =
-        accounts.stream()
-            .map(
-                a ->
-                    Arrays.<Object>asList(
-                        slipNo,
-                        a.getArn(),
-                        a.getClientCode(),
-                        a.getClientName(),
-                        a.getProductCode(),
-                        a.getLineCode(),
-                        a.getCoverTypeCode(),
-                        a.getPeriodFrom(),
-                        a.getPeriodTo(),
-                        a.getTotalSumInsured(),
-                        a.getPremium().netPremium(),
-                        a.getPremium().grossPremium(),
-                        a.getMortgageeBank(),
-                        items(a)))
-            .toList();
+    List<List<Object>> rows = accounts.stream().map(a -> sheetRow(slipNo, a)).toList();
     return composer.xlsx(new SheetSpec("Placement slip", SHEET_HEADERS, rows));
+  }
+
+  private List<Object> sheetRow(String slipNo, Account a) {
+    ClientTaxDetails.TaxDetails tax = taxDetails.of(a);
+    return Arrays.<Object>asList(
+        slipNo,
+        a.getArn(),
+        a.getClientCode(),
+        a.getClientName(),
+        tax.taxpayerName(),
+        tax.tin(),
+        tax.registeredAddress(),
+        a.getProductCode(),
+        a.getLineCode(),
+        a.getCoverTypeCode(),
+        a.getPeriodFrom(),
+        a.getPeriodTo(),
+        a.getTotalSumInsured(),
+        a.getPremium().netPremium(),
+        a.getPremium().grossPremium(),
+        a.getMortgageeBank(),
+        items(a));
   }
 
   /**
@@ -154,7 +169,7 @@ public class SlipDocuments {
       SlipHeader header, Account account, LocalDate start, LocalDate expiry) {
     List<Field> facts =
         List.of(
-            new Field("ARN", account.getArn()),
+            new Field(ARN, account.getArn()),
             new Field("Insured", account.getClientName()),
             new Field("Product", names.product(account.getProductCode())),
             new Field("Insurer", header.address().insurerName()),
@@ -168,6 +183,26 @@ public class SlipDocuments {
             List.of(new Text(null, header.text().text()), new Fields("Risk", facts)),
             signatures(header),
             header.text().versionLabel()));
+  }
+
+  /**
+   * Taxpayer details of the client of an account, as printed on the slip.
+   *
+   * @param account account
+   * @return details
+   */
+  public ClientTaxDetails.TaxDetails taxDetails(Account account) {
+    return taxDetails.of(account);
+  }
+
+  /**
+   * Fingerprint of the taxpayer details of the accounts printed on a slip.
+   *
+   * @param accounts accounts on the slip
+   * @return fingerprint
+   */
+  public String taxFingerprint(List<Account> accounts) {
+    return taxDetails.fingerprint(accounts);
   }
 
   /** "Prepared by: <name>" of the user who generated the document, and "Approved by". */
@@ -185,6 +220,11 @@ public class SlipDocuments {
         DisplayFormat.period(a.getPeriodFrom(), a.getPeriodTo()),
         DisplayFormat.amount(a.getTotalSumInsured()),
         DisplayFormat.amount(a.getPremium().grossPremium()));
+  }
+
+  private List<String> taxRow(Account a) {
+    ClientTaxDetails.TaxDetails tax = taxDetails.of(a);
+    return List.of(a.getArn(), tax.taxpayerName(), tax.tin(), tax.registeredAddress());
   }
 
   private static String items(Account a) {

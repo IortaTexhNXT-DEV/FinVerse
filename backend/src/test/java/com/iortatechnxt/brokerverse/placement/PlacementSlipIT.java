@@ -28,6 +28,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 /** Placement slips, sending, insurer returns, cancel and reactivate (BRNB.033/034/062/069/071). */
 @IntegrationTest
@@ -43,6 +44,7 @@ class PlacementSlipIT {
   @Autowired private PlacementTestData fx;
   @Autowired private AsUser as;
   @Autowired private StoredDownloads downloads;
+  @Autowired private JdbcTemplate jdbc;
 
   private AccountStatus status(String arn) {
     return accounts.requireByArn(arn).getStatus();
@@ -140,6 +142,38 @@ class PlacementSlipIT {
     assertThat(status(arn)).isEqualTo(AccountStatus.PLACED);
     assertThat(queries.slipsFor(arn)).hasSize(2);
     assertThat(queries.currentSlip(arn).orElseThrow().getVersionNo()).isEqualTo(2);
+  }
+
+  @Test
+  void aSlipIsGeneratedAgainBeforeSendingWhenTheTaxpayerDetailsChanged() {
+    String arn = fx.ready(fx.fire());
+    Readiness readiness = slips.readiness(fx.company(), List.of(arn)).get(0);
+    assertThat(readiness.taxDetails()).isNotNull();
+    assertThat(readiness.taxDetails().taxpayerName()).isNotBlank();
+    PlacementSlip first = as.run("proc", () -> slips.generate(fx.company(), List.of(arn))).get(0);
+    assertThat(first.getEoptFingerprint()).hasSize(64);
+
+    Long clientId = accounts.requireByArn(arn).getClientId();
+    String address =
+        jdbc.queryForObject(
+            "select address_line from crm_client where id = ?", String.class, clientId);
+    jdbc.update("update crm_client set address_line = 'Ayala Avenue' where id = ?", clientId);
+    PlacementSlip sending;
+    try {
+      sending = as.run("proc", () -> slips.send(first.getId(), slips.draft(first.getId())));
+    } finally {
+      jdbc.update("update crm_client set address_line = ? where id = ?", address, clientId);
+    }
+    PlacementSlip sent = sending;
+
+    assertThat(sent.getVersionNo()).isEqualTo(first.getVersionNo() + 1);
+    assertThat(sent.getStatus()).isEqualTo(SlipStatus.SENT);
+    assertThat(slips.get(first.getId()).getStatus()).isEqualTo(SlipStatus.SUPERSEDED);
+    assertThat(status(arn)).isEqualTo(AccountStatus.PLACED);
+    assertThat(
+            downloads.fileName(
+                as.run("proc", () -> slips.file(sent.getId(), PlacementSlipService.XLSX))))
+        .endsWith(".xlsx");
   }
 
   @Test

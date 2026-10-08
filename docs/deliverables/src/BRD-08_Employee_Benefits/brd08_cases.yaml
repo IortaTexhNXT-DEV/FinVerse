@@ -10,8 +10,8 @@ meta:
   code: EB
   frs: FRS_BRD08_EMPLOYEE_BENEFITS.md
   summary: TP_BRD08_EMPLOYEE_BENEFITS.md
-  version: "1.0"
-  date: 25 September 2026
+  version: "1.1"
+  date: 08 October 2026
   verify_messages: false
 
 personas:
@@ -1607,6 +1607,7 @@ frs:
       - The Production, Renewal, Placement, Pending Items and Franchise reports run on request with their parameters and show the columns of FRS section 6.1.
       - Reports are viewed, downloaded, printed, e-mailed from the runner and saved as variants.
       - A date range with the end before the start is refused.
+      - The Production, Renewal and New Business reports run weekly and the Placement report monthly for their subscribers; Placement shows the key fields of the Report List.
     cases:
       - c: 1
         type: Report-output
@@ -1634,6 +1635,14 @@ frs:
           - Run EB-FRANCHISE from 31 March to 1 March.
         expected: The report does not run.
         msg: ["{Date to} must not be before {Date from}"]
+      - c: 4
+        type: Report-output
+        persona: EB_MANAGEMENT
+        screen: MAILBOX
+        title: Weekly and monthly report subscriptions
+        steps:
+          - Subscribe eb.mgmt to EB-RENEWAL weekly and EB-PLACEMENT monthly; let the schedules run.
+        expected: The Renewal report arrives each week and the Placement report each month; the Placement report shows cover and version, line, commission rate, inception date, BIR 2303, masterlist, proposal, COC, ISACOM, GM / TH approval and status.
 
   FR-EB-061:
     scenario: SC-EB-07

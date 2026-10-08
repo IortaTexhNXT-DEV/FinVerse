@@ -8,8 +8,8 @@ doc_code: TestPlan
 brd: BRD-12
 name: Submitted Policies Summary
 doc_id: BIBS-TP-BRD-12
-version: "1.0"
-date: 25 September 2026
+version: "1.1"
+date: 08 October 2026
 status: Issued for BDOI review
 header_title: Test Plan BRD-12 Submitted Policies
 h1_page_break: false
@@ -26,6 +26,12 @@ control:
     reviewer: iorta TechNXT Project Manager
     approver: BDOI Product Owner (pending)
     change: First issue for BDOI review, with the Excel workbook of the same version
+  - version: "1.1"
+    date: 08 Oct 2026
+    author: iorta TechNXT QA
+    reviewer: iorta TechNXT Business Analysis
+    approver: BDOI Product Owner (pending)
+    change: "Re-based on FRS BRD-12 v1.1 (BRD issue of 8-Oct-2026, BRIDSP-01 to 36; Report List of 13-May-2026): cases of FR-SP-035, 066, 067 and 083 added; cases of FR-SP-001, 003, 010, 022, 030, 032, 040, 061, 080 and 082 changed; FR-SP-002 cases moved to Release 2; data sets TD-SP-11 to 13 added."
 distribution:
   - {name: "Product Owner, Submitted Policies", role: Approver, organisation: BDOI, purpose: Review and sign-off}
   - {name: "Unit Head, Combank and Corbank", role: Approver, organisation: BDOI, purpose: Review and sign-off}
@@ -40,25 +46,25 @@ distribution:
 
 ## Purpose
 
-This document summarises the test plan for BRD-12 Submitted Policies in BIBS (BDOI Broker System, on iNXT BrokerVerse). It tells the CBG Admin and Marketing teams, the Non-CBG policy reviewers and the Admin Team what will be tested, how, with which data and by whom, and when testing is complete. The test conditions, scenarios and cases themselves are in the Excel workbook of the same version, `BIBS_TestPlan_BRD-12_Submitted_Policies_v1.0.xlsx`, which the testers use during execution.
+This document summarises the test plan for BRD-12 Submitted Policies in BIBS (BDOI Broker System, on iNXT BrokerVerse). It tells the CBG Admin and Marketing teams, the Non-CBG policy reviewers and the Admin Team what will be tested, how, with which data and by whom, and when testing is complete. The test conditions, scenarios and cases themselves are in the Excel workbook of the same version, `BIBS_TestPlan_BRD-12_Submitted_Policies_v1.1.xlsx`, which the testers use during execution.
 
-Every case traces to a functional requirement (FR) of FRS BRD-12 v1.0 and to the BRD requirement IDs (BRIDSP-nn) that the FR meets.
+Every case traces to a functional requirement (FR) of FRS BRD-12 v1.1 and to the BRD requirement IDs (BRIDSP-01 to 36 of the BRD issue received on 08-Oct-2026) that the FR meets.
 
 The cases are written from the FRS: the expected results quote the message texts of the FRS, and the screen paths and button labels are those of the FRS. They are checked against the screens before the system test starts.
 
 ## Scope
 
-In scope are all 31 FRs of FRS BRD-12 v1.0 and the BRD IDs they trace to:
+In scope are all 35 FRs of FRS BRD-12 v1.1 and the BRD IDs they trace to:
 
-- intake from the approved sources, extraction with confirmation, manual entry and the migration of the Excel masterlists (FR-SP-001 to 004);
+- intake by upload (Excel, CSV, ODS, PDF), manual entry and the migration of the Excel masterlists (FR-SP-001, 003, 004); extraction with confirmation in Release 2 (FR-SP-002, cases titled Release 2);
 - the Submitted Masterlist, its role-based view and extract, handler, conversion status and remarks (FR-SP-010 to 012);
 - rule sets under maker-checker, the processing run and the fallout (FR-SP-020 to 022);
-- classification, qualification and non-renewal buckets, the RA template and inforced buckets (FR-SP-030 to 034);
+- classification, qualification and non-renewal buckets, the RA template and inforced buckets (FR-SP-030 to 034); loan files LAMD, LMS and LAD matched automatically (FR-SP-035);
 - policy reviews and the IAAF with its approval matrix (FR-SP-040, 041);
 - limit breaches and the TOR with its TSU approval and hand-over (FR-SP-050 to 053);
-- the expiry scan and hand-off to Renewal, the renewal work list, letters, insurer re-assignment, placement and booking status (FR-SP-060 to 065);
+- the expiry scan and hand-off to Renewal, the renewal work list, letters, insurer re-assignment, placement and booking status (FR-SP-060 to 065); individual and batch proposals with nominated rates and a preferred insurer (FR-SP-066, 067);
 - handling-fee tagging in the Unapplied Payment List (FR-SP-070);
-- reports, export formats, notifications and alerts (FR-SP-080 to 082).
+- reports, export formats, notifications and alerts with definable recipients, and the monthly expiring and uninsured-loan report (FR-SP-080 to 083).
 
 The roles-and-access sheet checks each Submitted Policies action against the roles that may and may not perform it (the matrix of FRS section 3.3).
 
@@ -66,7 +72,8 @@ The roles-and-access sheet checks each Submitted Policies action against the rol
 
 - The renewal itself after the hand-off - renewal account, hold cover request, RA, NRNS, NAL and SFU letters - which belongs to the Renewal module (decision D2) and its BRD-6 test plan. The cases here check the hand-off, the insurer re-assignment and the status that comes back.
 - Placement and booking screens (BRD-1); the cases check only that the masterlist follows the account and invoice events.
-- System-to-system feeds from LFS, HLS, CIU, SPI, LAMD and the mail house (COG), and OCR of scanned documents; they are outside this phase. The cases use uploads and text PDFs.
+- System-to-system feeds from the bank systems and the mail house (COG), and OCR of scanned documents; they are outside this phase. The cases use uploads.
+- Document extraction (BRIDSP-04), marked Release 2 in the BRD; its cases (titled Release 2) run when Release 2 is tested.
 - Qualified e-signature of the IAAF and TOR (on hold); the cases check the stamped signature.
 - The accounting entries of the handling fee (SP SQ13); the cases stop at the tag and the OR.
 - Performance and volume testing, including the 2-second target of the NFRs. They are tested in the BIBS-wide performance test plan (deliverable 28).
@@ -76,11 +83,11 @@ The roles-and-access sheet checks each Submitted Policies action against the rol
 <!-- table: widths=1.2,8.6,4.2 caption="Reference documents" -->
 | Ref. | Document | Version |
 |---|---|---|
-| R1 | Functional Requirements Specification BRD-12 Submitted Policies (`BIBS_FRS_BRD-12_Submitted_Policies_v1.0.docx`) | 1.0, 25 Sep 2026 |
-| R2 | BDOI Submitted Policies BRD | v1.3, 20-Apr-2026 |
-| R3 | BDOI Report List, Submitted Policies rows #133-#164 | 27-Apr-2026 |
-| R4 | Test plan workbook BRD-12 (`BIBS_TestPlan_BRD-12_Submitted_Policies_v1.0.xlsx`) | 1.0 |
-| R6 | BRD discrepancy and clarification register (`BIBS_Register_BRD-00_Discrepancies_and_Clarifications_v1.0.xlsx`) | 1.0 |
+| R1 | Functional Requirements Specification BRD-12 Submitted Policies (`BIBS_FRS_BRD-12_Submitted_Policies_v1.1.docx`) | 1.1, 08 Oct 2026 |
+| R2 | Business Requirements Document (BRD) Template - Submitted Policies, received on 08-Oct-2026 | Revision log v1.3; signed 22-Apr to 12-May-2026 |
+| R3 | BDOI - CoreModernization Report List 05132026, Submitted Policies reports p.21-26 | 13-May-2026 |
+| R4 | Test plan workbook BRD-12 (`BIBS_TestPlan_BRD-12_Submitted_Policies_v1.1.xlsx`) | 1.1 |
+| R6 | BRD discrepancy and clarification register (`BIBS_Register_BRD-00_Discrepancies_and_Clarifications_v1.2.xlsx`) | 1.2 |
 
 # Test approach
 
@@ -126,7 +133,7 @@ The workbook has a README sheet that explains every column. The sheets are Docum
 |---|---|
 | System test | Submitted Policies is deployed on SIT with its roles, user scopes, parameters, lists, jobs and seed rule sets; the seed data is loaded; screen labels and messages have been compared with this plan and differences recorded; the test mailboxes receive mail. |
 | Persona end-to-end | All High-priority system test cases are run; no open Critical issue; the Renewal module is available, or the hand-offs are recorded as pending; Collections and Cashiering run on SIT for the handling-fee cases. |
-| UAT | FRS BRD-12 v1.0 is signed off or its open comments are agreed; the answers to SP SQ04 to SQ08 are applied as rule sets, matrices and templates; the system test exit criteria are met; the UAT environment holds masked masterlists (section 4.1); BDOI testers have user IDs with the roles and scopes of section 5 and attended the walkthrough. |
+| UAT | FRS BRD-12 v1.1 is signed off or its open comments are agreed; the answers to SP SQ04 to SQ08 are applied as rule sets, matrices and templates; the system test exit criteria are met; the UAT environment holds masked masterlists (section 4.1); BDOI testers have user IDs with the roles and scopes of section 5 and attended the walkthrough. |
 
 ## Exit criteria
 
@@ -146,14 +153,14 @@ The workbook has a README sheet that explains every column. The sheets are Docum
 <!-- table: widths=2.6,6.4,5.4 caption="Test environments" -->
 | Environment | Use | Data |
 |---|---|---|
-| SIT | System test and persona end-to-end runs by iorta TechNXT QA | Seed data (users and rules, masterlist and LAMD snapshot, reviews, TOR, letters and handling fees) and the data sets of section 4.2; test mailboxes |
-| UAT | Acceptance by BDOI testers | Masked copies of the segment masterlists and of a LAMD snapshot; no real borrower names, PNs, CIFs, addresses or e-mail addresses |
+| SIT | System test and persona end-to-end runs by iorta TechNXT QA | Seed data (users and rules, masterlist and loan files, reviews, TOR, letters and handling fees) and the data sets of section 4.2; test mailboxes |
+| UAT | Acceptance by BDOI testers | Masked copies of the segment masterlists and of the loan files; no real borrower names, PNs, CIFs, addresses or e-mail addresses |
 
 Non-production data is always masked. Borrower and assured names, PN and loan numbers, CIFs, addresses, e-mail addresses and phone numbers are replaced before data is loaded into SIT or UAT. Bank counterpart, client and insurer e-mail addresses point to test mailboxes, so no letter, IAAF or hold cover request can reach a real party.
 
 ## Named data sets
 
-The cases refer to named data sets. The seed data holds the users and rules, the masterlist and LAMD snapshot, and reviews, TOR, letters and handling fees; the test lead prepares the other sets on SIT as their source column says.
+The cases refer to named data sets. The seed data holds the users and rules, the masterlist and loan files, and reviews, TOR, letters and handling fees; the test lead prepares the other sets on SIT as their source column says.
 
 <!-- tp:data -->
 
@@ -225,6 +232,7 @@ The table shows the actions checked per role. Each Y and N is one row of the Rol
 <!-- table: widths=5.4,2,7.2 caption="Test risks and mitigations" -->
 | Risk | Impact | Mitigation |
 |---|---|---|
+| The LMS and LAD layouts, the nominated rate table and the vehicle classifications are not supplied in time (SP SQ27, SQ29) | High | The cases of FR-SP-035 and FR-SP-066 run with the layouts and rates of TD-SP-05 and TD-SP-11 and are re-run when BDOI supplies them |
 | Screen names, labels or messages change after BDOI's review of the FRS | Medium | Compare the screens with this plan before the system test; re-issue the workbook with the confirmed texts |
 | BDOI answers to open questions change expected results (SP SQ04 classification, SQ05 bucket precedence, SQ06 RA template, SQ07 IAAF matrix, SQ08 TOR and Released, SQ12 acceptance window) | Medium | The values are rule sets, matrices and parameters; the affected cases name them and are re-run after the change without a change to the system |
 | The Renewal module is not available when Submitted Policies is tested | High | Test the pending hand-off (TC-SP-060.3-01); re-run the renewal cases of SC-SP-07 when the Renewal module is available |

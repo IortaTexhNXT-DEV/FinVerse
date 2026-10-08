@@ -1,4 +1,4 @@
-// BRD-12: workflow SBM_TOR (FRS section 5.4; BRIDSP-16-19). Each approval moves the TOR to the next level of the TSU matrix.
+// BRD-12: workflow SBM_TOR (FRS section 5.4; BRIDSP-20 to 23). Each approval moves the TOR to the next level of the TSU matrix.
 digraph sp_tor {
   graph [rankdir=TB, fontname="Arial", nodesep=0.8, ranksep=0.45, bgcolor="white", pad=0.1];
   node  [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@HEADER_BLUE", penwidth=1.1,

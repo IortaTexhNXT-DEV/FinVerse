@@ -8,11 +8,11 @@ doc_code: FRS
 brd: BRD-00
 name: Core Replacement
 doc_id: BIBS-FRS-BRD-00
-version: "1.0"
-date: 26 September 2026
+version: "1.1"
+date: 08 October 2026
 status: Issued for BDOI review
 header_title: FRS BRD-00 Core Replacement
-output: FRS/BIBS_FRS_BRD-00_Core_Replacement_v1.0.docx
+output: FRS/BIBS_FRS_BRD-00_Core_Replacement_v1.1.docx
 control:
   - version: "0.9"
     date: 26 Sep 2026
@@ -26,6 +26,12 @@ control:
     reviewer: iorta TechNXT Project Manager
     approver: BDOI Program Manager (pending)
     change: First issue for BDOI review
+  - version: "1.1"
+    date: 08 Oct 2026
+    author: iorta TechNXT Business Analysis
+    reviewer: iorta TechNXT Project Manager
+    approver: BDOI Program Manager (pending)
+    change: "Re-based on BDOI Core Replacement BRD v01 (v1.0, unchanged) and the function BRDs received on 08-Oct-2026; references, traceability IDs (BRNB.100.1, MKTID.013, MKTID.019, BRCSFCM) and CSF case resolution (CLR-CR-03) updated; BR-181 to BR-183 traced to the walkthroughs and the UX hand-over; user-story view and storyboard index (journey index) added."
 distribution:
   - {name: "Program Manager, Business Project Services", role: Approver, organisation: BDO Unibank ESG, purpose: Review and sign-off of the umbrella scope}
   - {name: "Head, Comptrollership", role: Approver, organisation: BDOI, purpose: Review of the finance and data-management requirements}
@@ -73,14 +79,15 @@ The function FRS (BRD-1 to BRD-12) remain the specifications of the business pro
 |---|---|---|
 | R1 | BDOI Core Replacement BRD (48 pages) | v1.0, approved 21-Nov to 1-Dec-2025 |
 | R2 | Core Replacement requirements baseline (rows CORE-nn.mm, XC-nn; questions CRQnn) | current |
-| R4 | FRS BRD-1 to BRD-12 (BRD-5 in two volumes) | v1.0 |
+| R4 | FRS BRD-1 to BRD-12 (BRD-5 in two volumes) and the Data Migration Handbook (BRD-13) | The versions re-issued on the BRD versions of 08-Oct-2026: the next version of each business sign-off pack (v2.1) and of each FRS-only BRD (v1.1 or v1.2) |
 | R5 | Cross-BRD decisions and answered questions | current |
-| R6 | BRD discrepancy and clarification register | v1.0 |
+| R6 | BRD discrepancy and clarification register | v1.2 |
 | R7 | ReInsurance BRD (phase 2) | 11-Mar-2025 |
-| R8 | Data Migration BRD | draft v0.01 |
+| R8 | BDO Insure Core Modernization - Data Migration - Business Requirements Document (BRD) | V0.03 (received 08-Oct-2026) |
 | R9 | BDO UX guidelines and BDOI UX design | current |
+| R10 | Function BRD versions received on 08-Oct-2026: New Business BRD 05132026, Operations WS Addendum (re-issued BRD v1.01), Collections WS Addendum, Accounting WS Addendum v04152026, Renewal BRD, Claims WS Addendum, Customer Servicing Facility with the Case Management Addendum, Submitted Policies BRD, Report List 05132026 | 08-Oct-2026 |
 
-Page references ("p.14") are pages of the umbrella BRD (R1).
+Page references ("p.14") are pages of the umbrella BRD (R1). The umbrella BRD itself is unchanged; the requirement IDs of the function BRDs in chapter 10 are those of the versions of R10.
 
 ## Definitions and acronyms
 
@@ -140,13 +147,13 @@ Figure 1 shows the flow of the umbrella BRD (p.26) with the BIBS BRD of each ste
 | 5 Claims | BRD-7, FR-CM (BRD-7) | Claim recording and insurer updates merged |
 | 6 Operations | BRD-2, FR-OP | Capabilities 9-13 |
 | 7 Reinsurance | ReInsurance BRD | Phase 2 - BRD received |
-| 8 Customer Service Facility | BRD-9, FR-CSF | Capability 16 |
+| 8 Customer Service Facility | BRD-9, FR-CSF | Capability 16, with the Case Management Addendum |
 | 9 Product Maintenance | BRD-3, FR-PM | Capability 20 |
 | 10 Employee Benefits | BRD-8, FR-EB | Capability 19 |
 | Not listed | BRD-10 Sanction Screening, FR-SS | Screening of clients (capability 1) |
 | Not listed | BRD-11 User Access Maintenance, FR-UA | BR-000 to BR-003 |
 | Not listed | BRD-12 Submitted Policies, FR-SP | Submitted policies of the bank (capability 3) |
-| Not listed | Data Migration BRD | Draft; client migration volumes (p.43) |
+| Not listed | Data Migration BRD V0.03, Data Migration Handbook (BRD-13) | Client migration volumes (p.43) |
 
 # Personas, navigation and capability map
 
@@ -190,7 +197,7 @@ The umbrella BRD names four generic personas (System, User, Administrator, Autho
 | CORE-13 Collection of Commission Receivables (Direct Payment) | 8 | 8 | 0 | BRD-2 |
 | CORE-14 Claims | 13 | 13 | 0 | BRD-7 |
 | CORE-15 Reinsurance | 10 | 0 | 10 | ReInsurance BRD |
-| CORE-16 Customer Service Facility | 6 | 5 | 1 | BRD-9 |
+| CORE-16 Customer Service Facility | 6 | 6 | 0 | BRD-9 |
 | CORE-17 Data Management | 5 | 5 | 0 | none, BRD-1, BRD-3 |
 | CORE-18 Emerging Capabilities | 1 | 0 | 1 | none |
 | CORE-19 Employee Benefits | 12 | 12 | 0 | BRD-8 |
@@ -202,8 +209,8 @@ The row-level map (every bullet, BR ID, BRD requirement ID and FR) is in section
 <!-- table: widths=6.4,2.4,2.4,2 caption="Rows in and out of phase 1" -->
 | Scope | Capability rows | Cross-cutting rows | Total |
 |---|---|---|---|
-| Phase 1 | 180 | 21 | 201 |
-| Out of phase 1 scope | 12 | 2 | 14 |
+| Phase 1 | 181 | 21 | 202 |
+| Out of phase 1 scope | 11 | 2 | 13 |
 | **Total** | **192** | **23** | **215** |
 
 # Cross-cutting functional requirements
@@ -974,13 +981,14 @@ acceptance:
 ```fr
 id: FR-CR-092
 title: Apply the BDO brand, design system and user journeys on every screen
-brd: [BR-178 (p.23), BR-179 (p.23), BR-180 (p.23), BR-181 (p.23)]
+brd: [BR-178 (p.23), BR-179 (p.23), BR-180 (p.23), BR-181 (p.23), BR-183 (p.23)]
 actor: Every user
 priority: Must have
 screens: All screens and documents
 description:
   - Screens use the BDO Insure colours (Header Blue, CTA Blue, Yellow), logo and typography of the UX guidelines; documents, reports and exports carry the logo, blue table headers and the "Confidential" footer. A screen-by-screen alignment pass against the BDOI UX design (deliverable 18) is made before FRS v1.1.
-  - BDO's prescribed icons and illustrations are used when BDOI supplies them (CRQ17). The persona journeys are shown with the end-to-end persona deck (deliverable 7).
+  - BDO's prescribed icons and illustrations are used when BDOI supplies them (CRQ17). The identified user journeys (BR-181) are the end-to-end walkthroughs of the function FRS and the swimlanes of their UX Screen Decks; the Storyboard index of this FRS maps each capability to them.
+  - The design hand-over to the BDOI UX Design team (BR-183, the use of Figma for design execution) is made through the UX documents of each business sign-off pack - the 07 UX Screen Deck, the 08 UX screen register and the 09 image package of every screen and state at twice the screen resolution - which the UX Design team imports into its design tool (CLR-CR-17).
 preconditions:
   - None.
 main_flow:
@@ -998,6 +1006,7 @@ audit:
   - None.
 acceptance:
   - The alignment review finds no screen outside the BDO colour and layout rules.
+  - Each business sign-off pack carries the 07, 08 and 09 UX documents for the BDOI UX Design team.
 ```
 
 ```fr
@@ -1037,7 +1046,7 @@ The umbrella BRD has requirements that no function BRD owns, or that conflict wi
 |---|---|---|---|---|
 | CLR-CR-01 | Reinsurance (CORE-15.01-15.10) | Phase 2: the ReInsurance BRD is received; phase 1 keeps party types, templates, subscriptions, open-item matching and event types open for the phase 2 module (section 6). | The insurer-side reinsurance module does not fit the broker model. | Confirm reinsurance in phase 2. |
 | CLR-CR-02 | Claims cheque safekeeping (CORE-14.08-14.10) | No cheque custody in phase 1; if BDOI holds claim settlement cheques, a cheque custody register is added in Claims with hand-over to and from Cashiering. | Whether BDOI holds claim cheques is open (CRQ03, CLQ10). | Answer CRQ03. |
-| CLR-CR-03 | CSF case resolution (CORE-16.06) | Out of phase 1; case logging stays in SharePoint. | BRD-9 keeps case logging in SharePoint (CRQ04). | Confirm (CRQ04). |
+| CLR-CR-03 | CSF case resolution (CORE-16.06) | Case resolution is BDOI scope: the signed CSF Addendum - Case Management (BRCSFCM.001-012) is specified in FRS BRD-9 (FR-CSF-050 to 061). Its delivery drop and plan follow the decision of BDOI and the Change Control Board (FRS BRD-9 CLR-CSF-07). | The addendum answers CRQ04 and the cross-BRD conflict XQ12 (DCR-163); change request CR-0005 kept case resolution out of phase 1. | Decide the delivery drop of the Case Management module (CLR-CSF-07); close DCR-163 and CR-0005 against it. |
 | CLR-CR-04 | Master data change log (CORE-17.01; FR-CR-031) | A field-level log of registered master data. | No function BRD owns the log. | Confirm the master data in the log (CRQ07). |
 | CLR-CR-05 | Insurer management (CORE-17.02; FR-CR-061) | An insurer page with the attributes the function BRDs do not hold. | No function BRD owns the insurer record. | Confirm the insurer attributes (CRQ08). |
 | CLR-CR-06 | MIS field definition (CORE-17.04; FR-CR-062) | A catalogue names the MIS fields of the existing data; users do not add data fields. | No function BRD owns MIS fields. | Confirm the catalogue (CRQ09). |
@@ -1051,6 +1060,7 @@ The umbrella BRD has requirements that no function BRD owns, or that conflict wi
 | CLR-CR-14 | Client migration and daily client batches (XC-20; FR-CR-082) | Clients are loaded and fed through the Data Migration programme with the duplicate check. | The migration scope and coexistence are decided by the Data Migration BRD (CRQ19). | Confirm (CRQ19). |
 | CLR-CR-15 | SOA at booking (XC-10; FR-CR-093) | Booking issues the service invoice; the SOA is issued at booking once BDOI says which SOA is meant. | The SOA of the placement report and booking is open (CRQ12). | Answer CRQ12. |
 | CLR-CR-16 | Directory sign-in (FR-CR-070) | Users sign in with user ID and password; directory sign-in is added when BDO supplies the interface. | Cross-BRD decision D6. | Confirm decision D6. |
+| CLR-CR-17 | Design hand-over (BR-183; XC-16; FR-CR-092) | The design hand-over to the BDOI UX Design team is the 07 UX Screen Deck, the 08 UX screen register and the 09 image package of each business sign-off pack, which the team imports into its design tool; the project team does not keep the screens in Figma. | BR-183 asks the vendor to use Figma for design execution; BIBS screens follow the platform design system. | Confirm that the UX documents meet BR-183, or name the Figma deliverables expected. |
 
 # Reinsurance (phase 2)
 
@@ -1099,7 +1109,7 @@ Phase 1 keeps these points open so that the phase 2 module can reuse them: party
 | A-CR-02 | "Non-Package Management" (capability 4) is the non-package placement of New Business | CRQ02 |
 | A-CR-03 | "Delete" of a prospect or a user means deactivation, with purge under the retention rules | CRQ05 |
 | A-CR-04 | Reinsurance is phase 2; the insurer-side reinsurance module is not used for BDOI | Section 6 |
-| A-CR-05 | BR-178 to BR-183 are vendor-qualification items; they are met by the design system, the alignment pass and the persona walk-throughs | XC-14 to XC-16 |
+| A-CR-05 | BR-178 to BR-183 are met by the design system, the alignment pass, the walkthroughs of the function FRS and the UX documents 07 to 09 of each business sign-off pack | XC-14 to XC-16 |
 | A-CR-06 | The MIS field catalogue names existing data; users do not add data fields | CRQ09 |
 
 ## Dependencies
@@ -1122,7 +1132,7 @@ Phase 1 keeps these points open so that the phase 2 module can reuse them: party
 | CRQ01 | Is the umbrella over all twelve BRDs, Data Migration and ReInsurance? Who owns Data Management (capability 17)? | Scope | OPEN |
 | CRQ02 | Is Non-Package Management the NB non-package placement (no BR ID, added 20-Nov-2025)? | CORE-04 | OPEN |
 | CRQ03 | Does BDOI hold claim settlement cheques (safekeeping, hand-over to and retrieval from Cashiering, BR-146-148)? | CLR-CR-02 | OPEN |
-| CRQ04 | Is CSF case resolution (BR-165) in phase 1, given BRD-9 keeps it in SharePoint? | CLR-CR-03 | OPEN |
+| CRQ04 | Is CSF case resolution (BR-165) in phase 1, given BRD-9 keeps it in SharePoint? | CLR-CR-03 | PARTIAL (in scope by the Case Management Addendum; drop open, CLR-CSF-07) |
 | CRQ05 | Is deactivation acceptable for "delete of prospect" (BR-008)? | A-CR-03 | OPEN |
 | CRQ06 | Which figures does each role see on its home page (BR-125, 152, 160)? | FR-CR-010 | OPEN |
 | CRQ07 | Which master data is in the change log; old and new values; approver; who views it? | FR-CR-031 | OPEN |
@@ -1134,7 +1144,7 @@ Phase 1 keeps these points open so that the phase 2 module can reuse them: party
 | CRQ13 | Is the Invoice Master List the Operations invoice ledger; columns and owner? | FR-CR-090 | OPEN |
 | CRQ14 | Letter name: Non-Renewal Letter (NRL) or Not for Renewal Letter (NFR)? | CORE-06.07 | OPEN |
 | CRQ15 | What does "Bank Account Operations" cover? | CORE-08.21 | OPEN |
-| CRQ16 | Do CSF agents also resend e-policies (BR-164)? | CORE-16.04 | OPEN |
+| CRQ16 | Do CSF agents also resend e-policies (BR-164)? | CORE-16.04 | ANSWERED (BRD-9 e-mail item 9; FR-CSF-031) |
 | CRQ17 | Supply the BDO icon set and design or Figma files | FR-CR-092 | OPEN |
 | CRQ18 | Insurer invoice batch: file format, file transfer addresses, replaces e-mail? | FR-CR-081 | OPEN |
 | CRQ19 | Client migration source, period (2020 to present) and duration of daily batches | FR-CR-082 | OPEN |
@@ -1157,7 +1167,7 @@ Every capability bullet and cross-cutting row of the umbrella BRD, the BRD that 
 | CORE-01.01 | Create prospect / record (p.6) | BR-005 | BRD-1 BRNB.090, BRNB.101, BRNB.048 | FR-NB-034, FR-NB-031 |
 | CORE-01.02 | Update prospect / record (p.6) | BR-006 | BRD-1 BRNB.049, BRNB.047 | FR-NB-032, FR-NB-035 |
 | CORE-01.03 | Convert prospect into client record (p.6) | BR-007 | BRD-1 BRNB.090, BRNB.101 | FR-NB-034 |
-| CORE-01.04 | Delete prospect / record (p.6) | BR-008 | BRD-1 BRNB.019, BRNB.106 | FR-NB-012, FR-NB-137 |
+| CORE-01.04 | Delete prospect / record (p.6) | BR-008 | BRD-1 BRNB.019, BRNB.106 (BIBS voids instead of deleting: FRS BRD-1 CLR-NB-04) | FR-NB-012, FR-NB-137 |
 | CORE-01.05 | Upload and validate client documents (p.6) | BR-009, BR-010, BR-011 | BRD-1 BRNB.030, BRNB.049, BRNB.026 | FR-NB-031, FR-NB-032, FR-NB-033, FR-NB-034 ... |
 | CORE-01.06 | Client search (p.6) | BR-012 | BRD-1 BRNB.046 | FR-NB-030 |
 | CORE-01.07 | Generate client code (p.6) | BR-013 | BRD-1 BRNB.030, BRNB.101 | FR-NB-031, FR-NB-032, FR-NB-033, FR-NB-034 |
@@ -1219,7 +1229,7 @@ Every capability bullet and cross-cutting row of the umbrella BRD, the BRD that 
 | CORE-06.09 | Track renewal status (BR table only) | BR-064 | BRD-6 BRRN.036 | FR-RN-102 |
 | CORE-07.01 | Premium Receivable (PR) management (p.8) | BR-044, BR-045 | BRD-4 BRCLXN.001, BRCLXN.011, BRCLXN.046 | FR-CL-010, FR-CL-015, FR-CL-016 |
 | CORE-07.02 | Disposition tracking and management (p.8) | BR-048 | BRD-4 BRCLXN.016, BRCLXN.021, BRCLXN.023 | FR-CL-030, FR-CL-031, FR-CL-018 |
-| CORE-07.03 | Tag CWT, premium / PR2307 (p.8) | BR-118, BR-139 | BRD-4 BRCLXN.026, BRCLXN.027, CSHID.026 | FR-CL-032, FR-CL-081, FR-OP-026 |
+| CORE-07.03 | Tag CWT, premium / PR2307 (p.8) | BR-118, BR-139 | BRD-4 BRCLXN.026, BRCLXN.027; BRD-2 MKTID.013 (CSHID.026 removed from the Operations BRD) | FR-CL-032, FR-CL-081, FR-OP-113 |
 | CORE-07.04 | Unapplied payment disposition (excess payment) (p.8) | BR-046, BR-047, BR-090 | BRD-4 BRCLXN.030, BRCLXN.034, BRCLXN.041 | FR-CL-074, FR-CL-070, FR-CL-077 |
 | CORE-07.05 | Reporting and audit (p.8) | BR-053, BR-054 | BRD-4 BRCLXN.028, BRCLXN.043, BRCLXN.045 | FR-CL-082, FR-CL-003, FR-CL-083 |
 | CORE-07.06 | Batch processing and automation (capability matrix p.27) | BR-049 | BRD-4 BRCLXN.013, BRCLXN.024, BRCLXN.041 | FR-CL-017, FR-CL-032, FR-CL-080, FR-CL-077 |
@@ -1237,14 +1247,14 @@ Every capability bullet and cross-cutting row of the umbrella BRD, the BRD that 
 | CORE-08.12 | Receive and release CWT (commission / supplier) (p.8) | BR-075, BR-076 | BRD-5 DIS 2.11.0, DIS 2.12.0 | FR-DS-057, FR-DS-058 |
 | CORE-08.13 | Disbursement to insurer, client, supplier, BDO subsidiaries (p.8) | BR-077 | BRD-5 DIS 2.7.0 | FR-DS-033 |
 | CORE-08.14 | Reporting and documentation (p.8) | BR-078, BR-084 | BRD-5 DIS 3.28.0, FRBS 3.2.0 | FR-DS-081, FR-AC-060, FR-AC-061, FR-AC-062 ... |
-| CORE-08.15 | Release BIR 2307 on premiums (PR2307) to insurer (p.8) | BR-078 | BRD-2 CSHID.027 | FR-OP-026 |
+| CORE-08.15 | Release BIR 2307 on premiums (PR2307) to insurer (p.8) | BR-078 | BRD-2 MKTID.013 (CSHID.027 removed from the Operations BRD) | FR-OP-113 |
 | CORE-08.16 | Generate Direct Credit transactions file (p.8) | BR-077 | BRD-5 DIS 2.7.0 | FR-DS-033 |
 | CORE-08.17 | Disbursement to government agencies and employees (p.8) | BR-077 | BRD-5 DIS 2.7.0 | FR-DS-033 |
 | CORE-08.18 | Payee management (p.8) | BR-079 | BRD-5 DIS 2.2.0 | FR-DS-010 |
 | CORE-08.19 | Check printing and series management (p.8) | BR-080 | BRD-5 DIS 2.7.0 | FR-DS-033 |
 | CORE-08.20 | Status tagging and tracking (p.8) | BR-081, BR-082 | BRD-5 DIS 2.8.0, DIS 3.26.0 | FR-DS-050, FR-DS-052 |
 | CORE-08.21 | Bank account operations (p.9) | - | BRD-5 DIS 2.7.0 | FR-DS-033 |
-| CORE-08.22 | Generate manual service invoice (Other Income) (p.9) | BR-085 | BRD-1 BRNB.100 | FR-NB-117 |
+| CORE-08.22 | Generate manual service invoice (Other Income) (p.9) | BR-085 | BRD-1 BRNB.100.1 (BRNB.100 now holds the EOPT details of the placement) | FR-NB-117 |
 | CORE-09.01 | Manual issuance of AR, OR, invoice, cash and cheque OTC payment (p.9) | BR-086 | BRD-2 CSHID.001, CSHID.002 | FR-OP-011, FR-OP-013, FR-OP-014, FR-OP-012 |
 | CORE-09.02 | Automated accounting entries (p.9) | BR-087 | BRD-2 CSHID.012, CSHID.014 | FR-OP-013, FR-OP-027 |
 | CORE-09.03 | Batch payment files processing (automatching) (p.9) | BR-089 | BRD-2 CSHID.008 | FR-OP-015, FR-OP-016 |
@@ -1273,7 +1283,7 @@ Every capability bullet and cross-cutting row of the umbrella BRD, the BRD that 
 | CORE-12.02 | Automated accounting entries (p.9) | BR-127, BR-132 | BRD-2 ADJID.011, ADJID.012 | FR-OP-056, FR-OP-057 |
 | CORE-12.03 | Traceability and auditability (p.10) | BR-128, BR-129 | BRD-2 ADJID.020, ADJID.022 | FR-OP-050, FR-OP-061 |
 | CORE-12.04 | Reporting and monitoring (p.10) | - | BRD-2 ADJID.016, ADJID.019, ADJID.021 | FR-OP-062, FR-OP-061 |
-| CORE-12.05 | Search and document management (p.10) | BR-130, BR-131 | BRD-2 ADJID.024, ADJID.025 | FR-OP-005, FR-OP-061, FR-OP-052 |
+| CORE-12.05 | Search and document management (p.10) | BR-130, BR-131 | BRD-2 ADJID.024, MKTID.019 (was ADJID.025) | FR-OP-005, FR-OP-061, FR-OP-052 |
 | CORE-12.06 | Sending and uploading of files (p.10) | - | BRD-2 ADJID.026 | FR-OP-059 |
 | CORE-12.07 | Batch posting (p.10) | - | BRD-2 ADJID.006 | FR-OP-056 |
 | CORE-13.01 | Automated incentive calculation (p.10) | BR-166, BR-167 | BRD-2 CMRID.005 | FR-OP-095 |
@@ -1283,7 +1293,7 @@ Every capability bullet and cross-cutting row of the umbrella BRD, the BRD that 
 | CORE-13.05 | Comprehensive production reporting (p.10) | BR-134 | BRD-2 CMRID.014, PRCID.035 | FR-OP-097, FR-OP-080 |
 | CORE-13.06 | Risk mitigation and error handling (p.10) | BR-135 | BRD-2 CMRID.008 | FR-OP-091, FR-OP-093 |
 | CORE-13.07 | Collection of commission receivables (direct payment) (p.10) | BR-052, BR-136, BR-137, BR-140 | BRD-2 CMRID.002, CMRID.004 | FR-OP-091, FR-OP-098 |
-| CORE-13.08 | Auto-match reversals (p.10) | BR-138, BR-139 | BRD-2 CMRID.007, CSHID.027 | FR-OP-091, FR-OP-026 |
+| CORE-13.08 | Auto-match reversals (p.10) | BR-138, BR-139 | BRD-2 CMRID.007, MKTID.013 (CSHID.027 removed) | FR-OP-091, FR-OP-113 |
 | CORE-14.01 | Process claims advice from BDOI Marketing (p.10) | BR-141 | BRD-7 BRCLM.003, BRCLM.016 | FR-CM-010, FR-CM-011, FR-CM-015, FR-CM-014 |
 | CORE-14.02 | Process claims advice from client (p.10) | BR-141 | BRD-7 BRCLM.003, BRCLM.006 | FR-CM-010, FR-CM-011, FR-CM-015, FR-CM-002 ... |
 | CORE-14.03 | Process claims advice from insurer (p.10) | BR-141 | BRD-7 BRCLM.041, BRCLM.043 | FR-CM-003, FR-CM-011, FR-CM-022, FR-CM-024 ... |
@@ -1312,7 +1322,7 @@ Every capability bullet and cross-cutting row of the umbrella BRD, the BRD that 
 | CORE-16.03 | View mode of payment (history) and current status (p.11) | BR-163 | BRD-9 BRCSF-005 | FR-CSF-012, FR-CSF-013 |
 | CORE-16.04 | View and resend RA (and e-policy) (p.11) | BR-164 | BRD-9 BRCSF-006, BRCSF-009 | FR-CSF-030, FR-CSF-033 |
 | CORE-16.05 | Upload supporting documents (p.11) | - | BRD-9 BRCSF-007 | FR-CSF-032 |
-| CORE-16.06 | Case resolution: add / edit case details and status (p.11) | BR-165 | BRD-9 | CLR-CR-03 (CRQ04) |
+| CORE-16.06 | Case resolution: add / edit case details and status (p.11) | BR-165 | BRD-9 BRCSFCM.001-012 (CSF Addendum - Case Management) | FR-CSF-050, FR-CSF-052, FR-CSF-056, FR-CSF-058, FR-CSF-060; CLR-CR-03 |
 | CORE-17.01 | Master data change logging (user, product, insurer, LOVs) (p.11) | BR-170 | None (BRNB.016, BRNB.083, BRPM.024, BRCLXN.043 related) | FR-CR-031; FR-NB-016, FR-NB-132, FR-PM-005, FR-CL-003 |
 | CORE-17.02 | Insurer management (p.11) | BR-171 | None (BRNB.008 related) | FR-CR-061; FR-NB-053 |
 | CORE-17.03 | LOV maintenance (p.11) | BR-004, BR-172 | BRD-1 BRNB.083, BASAU 2.2.0 | FR-CR-060; FR-NB-132, FR-AC-070 |
@@ -1355,17 +1365,17 @@ Every capability bullet and cross-cutting row of the umbrella BRD, the BRD that 
 | XC-07 | Currency selection and multi-currency support (p.15, p.18) | BR-027, BR-088 | None (BRCLM.009 related) | FR-CR-091; FR-CM-011 |
 | XC-08 | 30-day hold cover request, assigned to a role (p.14) | BR-034 | BRD-1 BRNB.072, BRNB.103 | FR-NB-082, FR-NB-083 |
 | XC-09 | Tag direct payment (DP) accounts (p.14) | BR-035 | BRD-1 BRNB.114 | FR-NB-069, FR-NB-092 |
-| XC-10 | SOA generated with placement report and Insurance Advice; service invoice to insurer issued with the SOA at booking (p.14-15) | BR-039, BR-043 | BRD-1 BRNB.100, BRCLXN.058 | FR-CR-093; FR-NB-117, FR-CL-060, FR-CL-061 |
+| XC-10 | SOA generated with placement report and Insurance Advice; service invoice to insurer issued with the SOA at booking (p.14-15) | BR-039, BR-043 | BRD-1 BRNB.100.1, BRCLXN.058 | FR-CR-093; FR-NB-117, FR-CL-060, FR-CL-061 |
 | XC-11 | Billing reports with premium and loan details; payment reports matched to accounts (p.15) | BR-049, BR-050 | BRD-1 BRNB.067, BRNB.068 | FR-NB-090, FR-NB-091, FR-NB-092 |
 | XC-12 | BIR standard books (sales, purchase, cash receipts, cash disbursements, general journal) (p.17) | BR-084 | BRD-5 FRBS 3.2.0 | FR-CR-040; FR-AC-060, FR-AC-061, FR-AC-062, FR-AC-063 |
 | XC-13 | Invoice Master List across workflows (p.23) | BR-175 | None (BRCLXN.001, ACSL 2.16.0 related) | FR-CR-090; FR-CL-010, FR-AS-026 |
 | XC-14 | BDO brand colours, logos, icons and design system (p.23) | BR-178, BR-179, BR-180 | None | FR-CR-092 |
-| XC-15 | Identified user journeys and customisable interaction flows (with a walkthrough) (p.23) | BR-181, BR-182 | None | FR-CR-001 |
-| XC-16 | Vendor uses Figma for design execution (p.23) | BR-183 | None | - |
+| XC-15 | Identified user journeys and customisable interaction flows (with a walkthrough) (p.23) | BR-181, BR-182 | Walkthroughs of FRS BRD-1, 2, 3, 4, 5 and 11; UX Screen Decks; SIT walkthrough sessions (Storyboard index of this FRS) | FR-CR-001, FR-CR-080, FR-CR-092 |
+| XC-16 | Vendor uses Figma for design execution (p.23) | BR-183 | UX documents 07 to 09 of each business sign-off pack (CLR-CR-17) | FR-CR-092 |
 | XC-17 | Regulatory compliance: BIR and Insurance Commission reportorial requirements (p.4) | - | BRD-5 FRBS 3.2.0 | FR-CR-040; FR-AC-060, FR-AC-061, FR-AC-062, FR-AC-063 |
 | XC-18 | Retail and wholesale business (p.4) | - | BRD-1 BRNB.001 | FR-CR-001; FR-NB-001 |
-| XC-19 | Invoice batch printing, delivery to insurers by file transfer and delivery report (daily, per insurer) (p.43) | - | None (BRNB.100 related) | FR-CR-081; FR-NB-117 |
-| XC-20 | Client migration (one-time, 2020 to present) and daily midday / EOD client batches with modification report (p.43) | - | Data Migration BRD | FR-CR-082 |
+| XC-19 | Invoice batch printing, delivery to insurers by file transfer and delivery report (daily, per insurer) (p.43) | - | None (BRNB.100.1 related) | FR-CR-081; FR-NB-117 |
+| XC-20 | Client migration (one-time, 2020 to present) and daily midday / EOD client batches with modification report (p.43) | - | Data Migration BRD V0.03; Data Migration Handbook (BRD-13) | FR-CR-082 |
 | XC-21 | ALeA e-mail address encoding (as needed) (p.43) | - | None | CLR-CR-10 (CRQ20) |
 | XC-22 | Daily synchronisation from source systems (CMS, Reinsurance) (p.42-43) | - | BRD-4 BRCLXN.013, BRCLXN.014, BRCLXN.015 | FR-CR-082; FR-CL-017 |
 | XC-23 | MIS LOV, QPS insurer, LGT rates and insurer branch maintenance (MILB, 24 a year) (p.45) | - | BRD-1 BRNB.083 | FR-CR-060; FR-NB-132 |
@@ -1384,3 +1394,259 @@ rows:
   - {name: "", role: "Product Owner, Marketing Business System", organisation: BDOI}
   - {name: "", role: Project Manager, organisation: iorta TechNXT}
 ```
+
+# Appendix: User-story view
+
+The umbrella BRD lists its requirements as capability bullets and cross-cutting rows with generic personas (User, System, Administrator, Authorized User); its acceptance criteria are left to the function BRDs. This appendix restates each requirement (BR-000 to BR-208) as one user story with the business persona of section 3.1 who needs it, the FRs that meet it - the cross-cutting FR-CR of this FRS and the FRs of the function FRS - their acceptance criteria and the test conditions of the function test plans with their number of cases. The capability and the persona come from the traceability chapter; where a BR ID appears in several rows, the story joins their capabilities. Acceptance criteria are numbered in the order of each FR in its own FRS. The table has 209 rows.
+
+<!-- table: widths=2.4,7.5,2.3,2.8,3.4 caption="User-story view: BRD requirement, user story, FRs, acceptance criteria and test cases" size=8 -->
+| BRD ID | User story | FR IDs | Acceptance criteria | Test cases |
+|---|---|---|---|---|
+| BR-000 | As a System Administrator, I need log-in, password reset, several types of user access, user administration, so that only authorised users reach BIBS. | FR-CR-070, FR-NB-130, FR-NB-134 | FR-CR-070 AC1; FR-NB-130 AC1-3; FR-NB-134 AC1-2 | TC-NB-130.1 to 130.3, 134.1 to 134.2 (8 cases) |
+| BR-001 | As a System Administrator, I need log-in, password reset, several types of user access, user administration, so that only authorised users reach BIBS. | FR-CR-070, FR-NB-130, FR-NB-134 | FR-CR-070 AC1; FR-NB-130 AC1-3; FR-NB-134 AC1-2 | TC-NB-130.1 to 130.3, 134.1 to 134.2 (8 cases) |
+| BR-002 | As a System Administrator, I need log-in, password reset, several types of user access, user administration, so that only authorised users reach BIBS. | FR-CR-070, FR-NB-130, FR-NB-134 | FR-CR-070 AC1; FR-NB-130 AC1-3; FR-NB-134 AC1-2 | TC-NB-130.1 to 130.3, 134.1 to 134.2 (8 cases) |
+| BR-003 | As a System Administrator, I need log-in, password reset, several types of user access, user administration, so that only authorised users reach BIBS. | FR-CR-070, FR-NB-130, FR-NB-134 | FR-CR-070 AC1; FR-NB-130 AC1-3; FR-NB-134 AC1-2 | TC-NB-130.1 to 130.3, 134.1 to 134.2 (8 cases) |
+| BR-004 | As a Business Administrator, I need LOV maintenance, so that master data is consistent and controlled across BIBS. | FR-CR-060, FR-NB-132, FR-AC-070 | FR-CR-060 AC1; FR-NB-132 AC1-2; FR-AC-070 AC1-2 | TC-NB-132.1 to 132.2, TC-AC-070.1 to 070.4 (10 cases) |
+| BR-005 | As a Marketing AO, I need to create prospect / record, so that every client is onboarded once, verified and found again quickly. | FR-NB-034, FR-NB-031 | FR-NB-034 AC1-4; FR-NB-031 AC1-3 | TC-NB-034.1 to 034.4, 031.1 to 031.4 (15 cases) |
+| BR-006 | As a Marketing AO, I need to update prospect / record, so that every client is onboarded once, verified and found again quickly. | FR-NB-032, FR-NB-035 | FR-NB-032 AC1-2; FR-NB-035 AC1-2 | TC-NB-032.1 to 032.2, 035.1 to 035.2 (6 cases) |
+| BR-007 | As a Marketing AO, I need to convert prospect into client record, so that every client is onboarded once, verified and found again quickly. | FR-NB-034 | FR-NB-034 AC1-4 | TC-NB-034.1 to 034.4 (7 cases) |
+| BR-008 | As a Marketing AO, I need to delete prospect / record, so that every client is onboarded once, verified and found again quickly. | FR-NB-012, FR-NB-137 | FR-NB-012 AC1-3; FR-NB-137 AC1-2 | TC-NB-012.1 to 012.3, 137.1 to 137.2 (7 cases) |
+| BR-009 | As a Marketing AO, I need to upload and validate client documents, so that every client is onboarded once, verified and found again quickly. | FR-NB-031, FR-NB-032, FR-NB-033, FR-NB-034 | FR-NB-031 AC1-3; FR-NB-032 AC1-2; FR-NB-033 AC1-2; FR-NB-034 AC1-4 | TC-NB-031.1 to 031.4, 032.1 to 032.2, 033.1 to 033.2, 034.1 to 034.4 (21 cases) |
+| BR-010 | As a Marketing AO, I need to upload and validate client documents, so that every client is onboarded once, verified and found again quickly. | FR-NB-031, FR-NB-032, FR-NB-033, FR-NB-034 | FR-NB-031 AC1-3; FR-NB-032 AC1-2; FR-NB-033 AC1-2; FR-NB-034 AC1-4 | TC-NB-031.1 to 031.4, 032.1 to 032.2, 033.1 to 033.2, 034.1 to 034.4 (21 cases) |
+| BR-011 | As a Marketing AO, I need to upload and validate client documents, so that every client is onboarded once, verified and found again quickly. | FR-NB-031, FR-NB-032, FR-NB-033, FR-NB-034 | FR-NB-031 AC1-3; FR-NB-032 AC1-2; FR-NB-033 AC1-2; FR-NB-034 AC1-4 | TC-NB-031.1 to 031.4, 032.1 to 032.2, 033.1 to 033.2, 034.1 to 034.4 (21 cases) |
+| BR-012 | As a Marketing AO, I need client search, so that every client is onboarded once, verified and found again quickly. | FR-NB-030 | FR-NB-030 AC1-2 | TC-NB-030.1 to 030.3 (4 cases) |
+| BR-013 | As a Marketing AO, I need to generate client code, so that every client is onboarded once, verified and found again quickly. | FR-NB-031, FR-NB-032, FR-NB-033, FR-NB-034 | FR-NB-031 AC1-3; FR-NB-032 AC1-2; FR-NB-033 AC1-2; FR-NB-034 AC1-4 | TC-NB-031.1 to 031.4, 032.1 to 032.2, 033.1 to 033.2, 034.1 to 034.4 (21 cases) |
+| BR-014 | As a Marketing AO, I need to receive request for quotation / proposal, so that clients receive approved quotations and proposals on time. | FR-NB-040 | FR-NB-040 AC1-3 | TC-NB-040.1 to 040.3 (5 cases) |
+| BR-015 | As a Marketing AO, I need to create quotation / proposal (individual or bulk), so that clients receive approved quotations and proposals on time. | FR-NB-041, FR-NB-044, FR-NB-046 | FR-NB-041 AC1-3; FR-NB-044 AC1-5; FR-NB-046 AC1-3 | TC-NB-041.1 to 041.3, 044.1 to 044.5, 046.1 to 046.3 (20 cases) |
+| BR-016 | As a Marketing AO, I need to create quotation / proposal (individual or bulk), so that clients receive approved quotations and proposals on time. | FR-NB-041, FR-NB-044, FR-NB-046 | FR-NB-041 AC1-3; FR-NB-044 AC1-5; FR-NB-046 AC1-3 | TC-NB-041.1 to 041.3, 044.1 to 044.5, 046.1 to 046.3 (20 cases) |
+| BR-017 | As a Marketing AO, I need to track proposal status, so that clients receive approved quotations and proposals on time. | FR-NB-010, FR-NB-122, FR-NB-120 | FR-NB-010 AC1-3; FR-NB-122 AC1-3; FR-NB-120 AC1-2 | TC-NB-010.1 to 010.3, 122.1 to 122.3, 120.1 to 120.3 (12 cases) |
+| BR-018 | As a Marketing AO, I need to edit quotation / proposal, so that clients receive approved quotations and proposals on time. | FR-NB-042 | FR-NB-042 AC1-2 | TC-NB-042.1 to 042.3 (4 cases) |
+| BR-019 | As a Marketing AO, I need to approve quotation / proposal, so that clients receive approved quotations and proposals on time. | FR-NB-043, FR-NB-014, FR-NB-051 | FR-NB-043 AC1-3; FR-NB-014 AC1-3; FR-NB-051 AC1-2 | TC-NB-043.1 to 043.3, 014.1 to 014.3, 051.1 to 051.2 (11 cases) |
+| BR-020 | As a Marketing AO, I need to print quotation / proposal, so that clients receive approved quotations and proposals on time. | FR-NB-041, FR-NB-044 | FR-NB-041 AC1-3; FR-NB-044 AC1-5 | TC-NB-041.1 to 041.3, 044.1 to 044.5 (15 cases) |
+| BR-021 | As a Marketing AO, I need to upload documents, so that clients receive approved quotations and proposals on time. | FR-NB-017 | FR-NB-017 AC1-4 | TC-NB-017.1 to 017.4 (9 cases) |
+| BR-022 | As a Marketing AO, I need to send quotation / proposal, so that clients receive approved quotations and proposals on time. | FR-NB-041, FR-NB-044, FR-NB-046 | FR-NB-041 AC1-3; FR-NB-044 AC1-5; FR-NB-046 AC1-3 | TC-NB-041.1 to 041.3, 044.1 to 044.5, 046.1 to 046.3 (20 cases) |
+| BR-023 | As a Marketing AO, I need to create account (manual, bulk upload, system), so that every policy is held as an account linked to its client and ready for placement. | FR-NB-061, FR-NB-062, FR-NB-063, FR-NB-065 | FR-NB-061 AC1-3; FR-NB-062 AC1-3; FR-NB-063 AC1-3; FR-NB-065 AC1-3 | TC-NB-061.1 to 061.3, 062.1 to 062.3, 063.1 to 063.2, 065.1 to 065.2 (21 cases) |
+| BR-024 | As a Marketing AO, I need to create account (manual, bulk upload, system), so that every policy is held as an account linked to its client and ready for placement. | FR-NB-061, FR-NB-062, FR-NB-063, FR-NB-065 | FR-NB-061 AC1-3; FR-NB-062 AC1-3; FR-NB-063 AC1-3; FR-NB-065 AC1-3 | TC-NB-061.1 to 061.3, 062.1 to 062.3, 063.1 to 063.2, 065.1 to 065.2 (21 cases) |
+| BR-025 | As a Marketing AO, I need to create account (manual, bulk upload, system), so that every policy is held as an account linked to its client and ready for placement. | FR-NB-061, FR-NB-062, FR-NB-063, FR-NB-065 | FR-NB-061 AC1-3; FR-NB-062 AC1-3; FR-NB-063 AC1-3; FR-NB-065 AC1-3 | TC-NB-061.1 to 061.3, 062.1 to 062.3, 063.1 to 063.2, 065.1 to 065.2 (21 cases) |
+| BR-026 | As a Marketing AO, I need rules-based sanitation of accounts (bulk / individual), so that expiring policies are renewed on time. | FR-RN-020, FR-RN-103, FR-RN-004, FR-RN-022 | FR-RN-020 AC1-3; FR-RN-103 AC1-2; FR-RN-004 AC1-3; FR-RN-022 AC1-3 | TC-RN-020.1 to 020.4, 103.1 to 103.3, 004.1 to 004.4, 022.1 to 022.5 (25 cases) |
+| BR-027 | As an FRBS user, I need currency selection and multi-currency support, so that foreign currency business is recorded correctly. | FR-CR-091, FR-CM-011 | FR-CR-091 AC1; FR-CM-011 AC1-4 | TC-CM-011.1 to 011.5 (8 cases) |
+| BR-028 | As a Marketing AO, I need to create account (manual, bulk upload, system), so that every policy is held as an account linked to its client and ready for placement. | FR-NB-061, FR-NB-062, FR-NB-063, FR-NB-065 | FR-NB-061 AC1-3; FR-NB-062 AC1-3; FR-NB-063 AC1-3; FR-NB-065 AC1-3 | TC-NB-061.1 to 061.3, 062.1 to 062.3, 063.1 to 063.2, 065.1 to 065.2 (21 cases) |
+| BR-029 | As a Marketing AO, I need to update account, so that every policy is held as an account linked to its client and ready for placement. | FR-NB-064, FR-NB-065 | FR-NB-064 AC1-3; FR-NB-065 AC1-3 | TC-NB-064.1 to 064.3, 065.1 to 065.2 (10 cases) |
+| BR-030 | As a Marketing AO, I need to link to client record, so that every policy is held as an account linked to its client and ready for placement. | FR-NB-061, FR-NB-062, FR-NB-063, FR-NB-037 | FR-NB-061 AC1-3; FR-NB-062 AC1-3; FR-NB-063 AC1-3; FR-NB-037 AC1-2 | TC-NB-061.1 to 061.3, 062.1 to 062.3, 063.1 to 063.2, 037.1 to 037.2 (18 cases) |
+| BR-031 | As a Marketing AO, I need to approve account, so that every policy is held as an account linked to its client and ready for placement. | FR-NB-010, FR-NB-122, FR-NB-133 | FR-NB-010 AC1-3; FR-NB-122 AC1-3; FR-NB-133 AC1-2 | TC-NB-010.1 to 010.3, 122.1 to 122.3, 133.1 to 133.2 (12 cases) |
+| BR-032 | As a Processing Officer, I need to submit for placement and booking, so that accounts are placed with the insurers and booked without re-keying. | FR-NB-010, FR-NB-122, FR-NB-011, FR-NB-064 | FR-NB-010 AC1-3; FR-NB-122 AC1-3; FR-NB-011 AC1-3; FR-NB-064 AC1-3 | TC-NB-010.1 to 010.3, 122.1 to 122.3, 011.1 to 011.3, 064.1 to 064.3 (19 cases) |
+| BR-033 | As a Marketing AO, I need to initiate placement request, so that every policy is held as an account linked to its client and ready for placement. | FR-NB-080 | FR-NB-080 AC1-3 | TC-NB-080.1 to 080.3 (5 cases) |
+| BR-034 | As a Processing Officer, I need 30-day hold cover request, assigned to a role, so that risks are covered while the policy is placed. | FR-NB-082, FR-NB-083 | FR-NB-082 AC1-2; FR-NB-083 AC1-2 | TC-NB-082.1 to 082.2, 083.1 to 083.3 (8 cases) |
+| BR-035 | As a Marketing AO, I need to tag direct payment (DP) accounts, so that direct-payment accounts are billed and followed correctly. | FR-NB-069, FR-NB-092 | FR-NB-069 AC1-3; FR-NB-092 AC1-3 | TC-NB-069.1 to 069.2, 092.1 to 092.3 (8 cases) |
+| BR-036 | As a Processing Officer, I need to generate placement slip, so that accounts are placed with the insurers and booked without re-keying. | FR-NB-080 | FR-NB-080 AC1-3 | TC-NB-080.1 to 080.3 (5 cases) |
+| BR-037 | As a Processing Officer, I need to send placement slip to insurer, so that accounts are placed with the insurers and booked without re-keying. | FR-NB-081 | FR-NB-081 AC1-2 | TC-NB-081.1 to 081.2 (3 cases) |
+| BR-038 | As a Marketing AO, I need client confirmation, so that every policy is held as an account linked to its client and ready for placement. | FR-NB-045, FR-NB-057 | FR-NB-045 AC1-3; FR-NB-057 AC1-2 | TC-NB-045.1 to 045.3, 057.1 to 057.2 (9 cases) |
+| BR-039 | As a Processing Officer, I need to generate placement report; to generate Insurance Advice; SOA generated with placement report and Insurance Advice; service invoice to insurer issued with the SOA at booking, so that accounts are placed with the insurers and booked without re-keying. | FR-NB-121, FR-NB-122, FR-NB-103, FR-NB-104, FR-CR-093, FR-NB-117, FR-CL-060, FR-CL-061 | FR-NB-121 AC1-2; FR-NB-122 AC1-3; FR-NB-103 AC1-2; FR-NB-104 AC1-3; FR-CR-093 AC1; FR-NB-117 AC1-3; FR-CL-060 AC1-3; FR-CL-061 AC1-2 | TC-NB-121.1 to 121.2, 122.1 to 122.3, 103.1 to 103.2, 104.1 to 104.3, 117.1 to 117.4, TC-CL-060.1 to 060.3, 061.1 to 061.3 (30 cases) |
+| BR-040 | As a Processing Officer, I need to receive e-policy (individual or batch), so that accounts are placed with the insurers and booked without re-keying. | FR-NB-100 | FR-NB-100 AC1-2 | TC-NB-100.1 to 100.3 (4 cases) |
+| BR-041 | As a Processing Officer, I need to send e-policy to client (individual or batch), so that accounts are placed with the insurers and booked without re-keying. | FR-NB-105 | FR-NB-105 AC1-2 | TC-NB-105.1 to 105.2 (3 cases) |
+| BR-042 | As a Processing Officer, I need to update client record with the e-policy and policy number, so that accounts are placed with the insurers and booked without re-keying. | FR-NB-101 | FR-NB-101 AC1-2 | TC-NB-101.1 to 101.2 (4 cases) |
+| BR-043 | As a Processing Officer, I need SOA generated with placement report and Insurance Advice; service invoice to insurer issued with the SOA at booking, so that the insurer and the client receive the right statements at booking. | FR-CR-093, FR-NB-117, FR-CL-060, FR-CL-061 | FR-CR-093 AC1; FR-NB-117 AC1-3; FR-CL-060 AC1-3; FR-CL-061 AC1-2 | TC-NB-117.1 to 117.4, TC-CL-060.1 to 060.3, 061.1 to 061.3 (15 cases) |
+| BR-044 | As a Collection user, I need premium Receivable (PR) management, so that premium receivables are collected and followed up. | FR-CL-010, FR-CL-015, FR-CL-016 | FR-CL-010 AC1-3; FR-CL-015 AC1-2; FR-CL-016 AC1-2 | TC-CL-010.1 to 010.4, 015.1 to 015.3, 016.1 to 016.2 (12 cases) |
+| BR-045 | As a Collection user, I need premium Receivable (PR) management, so that premium receivables are collected and followed up. | FR-CL-010, FR-CL-015, FR-CL-016 | FR-CL-010 AC1-3; FR-CL-015 AC1-2; FR-CL-016 AC1-2 | TC-CL-010.1 to 010.4, 015.1 to 015.3, 016.1 to 016.2 (12 cases) |
+| BR-046 | As a Collection user, I need unapplied payment disposition (excess payment), so that premium receivables are collected and followed up. | FR-CL-074, FR-CL-070, FR-CL-077 | FR-CL-074 AC1-3; FR-CL-070 AC1-3; FR-CL-077 AC1-2 | TC-CL-074.1 to 074.4, 070.1 to 070.3, 077.1 to 077.3 (13 cases) |
+| BR-047 | As a Collection user, I need unapplied payment disposition (excess payment), so that premium receivables are collected and followed up. | FR-CL-074, FR-CL-070, FR-CL-077 | FR-CL-074 AC1-3; FR-CL-070 AC1-3; FR-CL-077 AC1-2 | TC-CL-074.1 to 074.4, 070.1 to 070.3, 077.1 to 077.3 (13 cases) |
+| BR-048 | As a Collection user, I need disposition tracking and management, so that premium receivables are collected and followed up. | FR-CL-030, FR-CL-031, FR-CL-018 | FR-CL-030 AC1-3; FR-CL-031 AC1-3; FR-CL-018 AC1-2 | TC-CL-030.1 to 030.4, 031.1 to 031.4, 018.1 to 018.3 (17 cases) |
+| BR-049 | As a Collection user, I need batch processing and automation; billing reports with premium and loan details; payment reports matched to accounts, so that premium receivables are collected and followed up. | FR-CL-017, FR-CL-032, FR-CL-080, FR-CL-077, FR-NB-090, FR-NB-091, FR-NB-092 | FR-CL-017 AC1-3; FR-CL-032 AC1-3; FR-CL-080 AC1-2; FR-CL-077 AC1-2; FR-NB-090 AC1-2; FR-NB-091 AC1-3; FR-NB-092 AC1-3 | TC-CL-017.1 to 017.4, 032.1 to 032.5, 080.1 to 080.3, 077.1 to 077.3, TC-NB-090.1 to 090.2, 091.1 to 091.3, 092.1 to 092.3 (37 cases) |
+| BR-050 | As a Processing Officer, I need billing reports with premium and loan details; payment reports matched to accounts, so that bank-financed accounts are billed and payments matched. | FR-NB-090, FR-NB-091, FR-NB-092 | FR-NB-090 AC1-2; FR-NB-091 AC1-3; FR-NB-092 AC1-3 | TC-NB-090.1 to 090.2, 091.1 to 091.3, 092.1 to 092.3 (14 cases) |
+| BR-051 | As a Business Administrator, I need workflow maintained at the back end; data flows to the next process by rules, so that work moves to the next process by rules. | FR-CR-080, FR-NB-011, FR-NB-064, FR-NB-010, FR-NB-122 | FR-CR-080 AC1; FR-NB-011 AC1-3; FR-NB-064 AC1-3; FR-NB-010 AC1-3; FR-NB-122 AC1-3 | TC-NB-011.1 to 011.3, 064.1 to 064.3, 010.1 to 010.3, 122.1 to 122.3 (19 cases) |
+| BR-052 | As a Commission user, I need collection of commission receivables (direct payment), so that commissions on direct payments are collected. | FR-OP-091, FR-OP-098 | FR-OP-091 AC1-3; FR-OP-098 AC1 | TC-OP-091.1 to 091.2, 098.1 to 098.2 (6 cases) |
+| BR-053 | As a Marketing AO, I need to generate and customise report; reporting and audit; to create tailored reports by parameters, filters and business requirements; dynamic customisation: data fields, charts and summaries, so that clients receive approved quotations and proposals on time. | FR-NB-123, FR-NB-122, FR-CL-082, FR-CL-003, FR-CL-083, FR-CR-041, FR-CR-042 | FR-NB-123 AC1-2; FR-NB-122 AC1-3; FR-CL-082 AC1; FR-CL-003 AC1-3; FR-CL-083 AC1; FR-CR-041 AC1; FR-CR-042 AC1-2 | TC-NB-123.1 to 123.2, 122.1 to 122.3, TC-CL-082.1 to 082.2, 003.1 to 003.4, 083.1 to 083.2 (15 cases) |
+| BR-054 | As a Collection user, I need reporting and audit; to generate standard reports for operational and analytical purposes; scheduled or on-demand report generation, so that premium receivables are collected and followed up. | FR-CL-082, FR-CL-003, FR-CL-083, FR-CR-040, FR-NB-123, FR-NB-122, FR-CR-043, FR-DS-081 | FR-CL-082 AC1; FR-CL-003 AC1-3; FR-CL-083 AC1; FR-CR-040 AC1-2; FR-NB-123 AC1-2; FR-NB-122 AC1-3; FR-CR-043 AC1-2; FR-DS-081 AC1 | TC-CL-082.1 to 082.2, 003.1 to 003.4, 083.1 to 083.2, TC-NB-123.1 to 123.2, 122.1 to 122.3, TC-AC-081.1 to 081.2 (17 cases) |
+| BR-055 | As a Marketing AO, I need to generate RMEL (list of expiring accounts), so that expiring policies are renewed on time. | FR-RN-011, FR-RN-010, FR-RN-112 | FR-RN-011 AC1-3; FR-RN-010 AC1-3; FR-RN-112 AC1-2 | TC-RN-011.1 to 011.4, 010.1 to 010.6, 112.1 to 112.3 (18 cases) |
+| BR-056 | As a Marketing AO, I need filter and distribute RMEL, so that expiring policies are renewed on time. | FR-RN-012, FR-RN-040, FR-RN-102 | FR-RN-012 AC1-3; FR-RN-040 AC1-4; FR-RN-102 AC1-2 | TC-RN-012.1 to 012.3, 040.1 to 040.5, 102.1 to 102.3 (16 cases) |
+| BR-057 | As a Marketing AO, I need rules-based sanitation of accounts (bulk / individual), so that expiring policies are renewed on time. | FR-RN-020, FR-RN-103, FR-RN-004, FR-RN-022 | FR-RN-020 AC1-3; FR-RN-103 AC1-2; FR-RN-004 AC1-3; FR-RN-022 AC1-3 | TC-RN-020.1 to 020.4, 103.1 to 103.3, 004.1 to 004.4, 022.1 to 022.5 (25 cases) |
+| BR-058 | As a Marketing AO, I need provide disposition (online or by upload), so that expiring policies are renewed on time. | FR-RN-004, FR-RN-023, FR-RN-051, FR-RN-103 | FR-RN-004 AC1-3; FR-RN-023 AC1-3; FR-RN-051 AC1-3; FR-RN-103 AC1-2 | TC-RN-004.1 to 004.4, 023.1 to 023.6, 051.1 to 051.5, 103.1 to 103.3 (29 cases) |
+| BR-059 | As a Marketing AO, I need provide disposition (online or by upload), so that expiring policies are renewed on time. | FR-RN-004, FR-RN-023, FR-RN-051, FR-RN-103 | FR-RN-004 AC1-3; FR-RN-023 AC1-3; FR-RN-051 AC1-3; FR-RN-103 AC1-2 | TC-RN-004.1 to 004.4, 023.1 to 023.6, 051.1 to 051.5, 103.1 to 103.3 (29 cases) |
+| BR-060 | As a Marketing AO, I need to generate and send Renewal Advice; to send No Advice Letter (NAL) and Non-Renewal Letter (NRL), so that expiring policies are renewed on time. | FR-RN-080, FR-RN-081, FR-RN-090, FR-RN-082, FR-RN-103, FR-RN-024, FR-RN-112 | FR-RN-080 AC1-4; FR-RN-081 AC1-2; FR-RN-090 AC1-3; FR-RN-082 AC1-2; FR-RN-103 AC1-2; FR-RN-024 AC1-3; FR-RN-112 AC1-2 | TC-RN-080.1 to 080.5, 081.1 to 081.4, 090.1 to 090.5, 082.1 to 082.2, 103.1 to 103.3, 024.1 to 024.4, 112.1 to 112.3 (47 cases) |
+| BR-061 | As a Marketing AO, I need to generate and send Renewal Advice; to send No Advice Letter (NAL) and Non-Renewal Letter (NRL), so that expiring policies are renewed on time. | FR-RN-080, FR-RN-081, FR-RN-090, FR-RN-082, FR-RN-103, FR-RN-024, FR-RN-112 | FR-RN-080 AC1-4; FR-RN-081 AC1-2; FR-RN-090 AC1-3; FR-RN-082 AC1-2; FR-RN-103 AC1-2; FR-RN-024 AC1-3; FR-RN-112 AC1-2 | TC-RN-080.1 to 080.5, 081.1 to 081.4, 090.1 to 090.5, 082.1 to 082.2, 103.1 to 103.3, 024.1 to 024.4, 112.1 to 112.3 (47 cases) |
+| BR-062 | As a Marketing AO, I need check renewal payment, so that expiring policies are renewed on time. | FR-RN-042 | FR-RN-042 AC1-3 | TC-RN-042.1 to 042.3 (4 cases) |
+| BR-063 | As a Processing Officer, I need batch and individual processing; concurrent users and high-volume bulk uploads, so that high volumes are processed in batches as well as one by one. | FR-CR-083, FR-NB-019, FR-NB-065, FR-OP-008 | FR-CR-083 AC1; FR-NB-019 AC1-3; FR-NB-065 AC1-3; FR-OP-008 AC1-3 | TC-NB-019.1 to 019.4, 065.1 to 065.2, TC-OP-008.1 to 008.3 (16 cases) |
+| BR-064 | As a Marketing AO, I need to track renewal status (BR table only), so that expiring policies are renewed on time. | FR-RN-102 | FR-RN-102 AC1-2 | TC-RN-102.1 to 102.3 (3 cases) |
+| BR-065 | As an FRBS user, I need daily financial report reconciliation, so that the books, disbursements and subsidiary ledgers are complete and correct. | FR-AS-003, FR-AS-004 | FR-AS-003 AC1-2; FR-AS-004 AC1 | TC-AC-003.1 to 003.3, 004.1 to 004.2 (5 cases) |
+| BR-066 | As an FRBS user, I need to generate financial reports, so that the books, disbursements and subsidiary ledgers are complete and correct. | FR-AC-060, FR-AC-061, FR-AC-062, FR-AC-063 | FR-AC-060 AC1-2; FR-AC-061 AC1-2; FR-AC-062 AC1-2; FR-AC-063 AC1-2 | TC-AC-060.1 to 060.2, 061.1 to 061.3, 062.1 to 062.2, 063.1 to 063.3 (22 cases) |
+| BR-067 | As an FRBS user, I need daily cash movement reconciliation, so that the books, disbursements and subsidiary ledgers are complete and correct. | FR-AC-050 | FR-AC-050 AC1-2 | TC-AC-050.1 to 050.4 (6 cases) |
+| BR-068 | As an FRBS user, I need insurer's statement of accounts (SOA) reconciliation, so that the books, disbursements and subsidiary ledgers are complete and correct. | FR-AS-003 | FR-AS-003 AC1-2 | TC-AC-003.1 to 003.3 (3 cases) |
+| BR-069 | As an FRBS user, I need to generate automated journal entries, so that the books, disbursements and subsidiary ledgers are complete and correct. | FR-AS-024, FR-AC-030 | FR-AS-024 AC1; FR-AC-030 AC1-2 | TC-AC-024.1 to 024.2, 030.1 to 030.3 (8 cases) |
+| BR-070 | As an FRBS user, I need to perform manual entries, so that the books, disbursements and subsidiary ledgers are complete and correct. | FR-AC-032 | FR-AC-032 AC1-2 | TC-AC-032.1 to 032.4 (5 cases) |
+| BR-071 | As an FRBS user, I need to perform manual / invoice adjustments, so that the books, disbursements and subsidiary ledgers are complete and correct. | FR-AS-021 | FR-AS-021 AC1 | TC-AC-021.1 to 021.4 (11 cases) |
+| BR-072 | As an FRBS user, I need to perform accrual, so that the books, disbursements and subsidiary ledgers are complete and correct. | FR-AC-032, FR-AC-033 | FR-AC-032 AC1-2; FR-AC-033 AC1 | TC-AC-032.1 to 032.4, 033.1 to 033.2 (8 cases) |
+| BR-073 | As an FRBS user, I need to perform revaluation, so that the books, disbursements and subsidiary ledgers are complete and correct. | FR-AC-010, FR-AC-043 | FR-AC-010 AC1-2; FR-AC-043 AC1 | TC-AC-010.1 to 010.4, 043.1 to 043.2 (9 cases) |
+| BR-074 | As an FRBS user, I need accounts analysis, so that the books, disbursements and subsidiary ledgers are complete and correct. | FR-AS-010 | FR-AS-010 AC1 | TC-AC-010.1 to 010.3 (5 cases) |
+| BR-075 | As an FRBS user, I need to receive and release CWT (commission / supplier), so that the books, disbursements and subsidiary ledgers are complete and correct. | FR-DS-057, FR-DS-058 | FR-DS-057 AC1; FR-DS-058 AC1 | TC-AC-057.1 to 057.2, 058.1 to 058.2 (9 cases) |
+| BR-076 | As an FRBS user, I need to receive and release CWT (commission / supplier), so that the books, disbursements and subsidiary ledgers are complete and correct. | FR-DS-057, FR-DS-058 | FR-DS-057 AC1; FR-DS-058 AC1 | TC-AC-057.1 to 057.2, 058.1 to 058.2 (9 cases) |
+| BR-077 | As an FRBS user, I need disbursement to insurer, client, supplier, BDO subsidiaries; to generate Direct Credit transactions file; disbursement to government agencies and employees, so that the books, disbursements and subsidiary ledgers are complete and correct. | FR-DS-033 | FR-DS-033 AC1 | TC-AC-033.1 to 033.2 (4 cases) |
+| BR-078 | As an FRBS user, I need reporting and documentation; to release BIR 2307 on premiums (PR2307) to insurer; to extract, download and print reports in multiple formats, so that the books, disbursements and subsidiary ledgers are complete and correct. | FR-DS-081, FR-AC-060, FR-AC-061, FR-AC-062, FR-OP-113, FR-CR-040, FR-NB-124, FR-NB-125 | FR-DS-081 AC1; FR-AC-060 AC1-2; FR-AC-061 AC1-2; FR-AC-062 AC1-2; FR-OP-113 AC1-2; FR-CR-040 AC1-2; FR-NB-124 AC1-2; FR-NB-125 AC1-2 | TC-AC-081.1 to 081.2, 060.1 to 060.2, 061.1 to 061.3, 062.1 to 062.2, TC-OP-113.1 to 113.2, TC-NB-124.1 to 124.2, 125.1 to 125.2 (24 cases) |
+| BR-079 | As an FRBS user, I need payee management, so that the books, disbursements and subsidiary ledgers are complete and correct. | FR-DS-010 | FR-DS-010 AC1-3 | TC-AC-010.1 to 010.4 (9 cases) |
+| BR-080 | As an FRBS user, I need check printing and series management, so that the books, disbursements and subsidiary ledgers are complete and correct. | FR-DS-033 | FR-DS-033 AC1 | TC-AC-033.1 to 033.2 (4 cases) |
+| BR-081 | As an FRBS user, I need status tagging and tracking, so that the books, disbursements and subsidiary ledgers are complete and correct. | FR-DS-050, FR-DS-052 | FR-DS-050 AC1; FR-DS-052 AC1 | TC-AC-050.1 to 050.2, 052.1 to 052.2 (5 cases) |
+| BR-082 | As an FRBS user, I need status tagging and tracking, so that the books, disbursements and subsidiary ledgers are complete and correct. | FR-DS-050, FR-DS-052 | FR-DS-050 AC1; FR-DS-052 AC1 | TC-AC-050.1 to 050.2, 052.1 to 052.2 (5 cases) |
+| BR-083 | As a Marketing AO, I need automated notifications, approvals and feedback tracking, so that approvals and feedback do not wait on e-mail. | FR-CR-020, FR-NB-015, FR-OP-040 | FR-CR-020 AC1-2; FR-NB-015 AC1-2; FR-OP-040 AC1-2 | TC-NB-015.1 to 015.2, TC-OP-040.1 to 040.2 (6 cases) |
+| BR-084 | As an FRBS user, I need reporting and documentation; BIR standard books (sales, purchase, cash receipts, cash disbursements, general journal), so that the books, disbursements and subsidiary ledgers are complete and correct. | FR-DS-081, FR-AC-060, FR-AC-061, FR-AC-062, FR-CR-040, FR-AC-063 | FR-DS-081 AC1; FR-AC-060 AC1-2; FR-AC-061 AC1-2; FR-AC-062 AC1-2; FR-CR-040 AC1-2; FR-AC-063 AC1-2 | TC-AC-081.1 to 081.2, 060.1 to 060.2, 061.1 to 061.3, 062.1 to 062.2, 063.1 to 063.3 (24 cases) |
+| BR-085 | As an FRBS user, I need to generate manual service invoice (Other Income), so that the books, disbursements and subsidiary ledgers are complete and correct. | FR-NB-117 | FR-NB-117 AC1-3 | TC-NB-117.1 to 117.4 (6 cases) |
+| BR-086 | As a Cashiering user, I need manual issuance of AR, OR, invoice, cash and cheque OTC payment, so that every payment is received, applied and receipted correctly. | FR-OP-011, FR-OP-013, FR-OP-014, FR-OP-012 | FR-OP-011 AC1-3; FR-OP-013 AC1-3; FR-OP-014 AC1-3; FR-OP-012 AC1-2 | TC-OP-011.1 to 011.3, 013.1 to 013.3, 014.1 to 014.3, 012.1 to 012.2 (16 cases) |
+| BR-087 | As a Cashiering user, I need automated accounting entries, so that every payment is received, applied and receipted correctly. | FR-OP-013, FR-OP-027 | FR-OP-013 AC1-3; FR-OP-027 AC1-2 | TC-OP-013.1 to 013.3, 027.1 to 027.2 (7 cases) |
+| BR-088 | As an FRBS user, I need currency selection and multi-currency support, so that foreign currency business is recorded correctly. | FR-CR-091, FR-CM-011 | FR-CR-091 AC1; FR-CM-011 AC1-4 | TC-CM-011.1 to 011.5 (8 cases) |
+| BR-089 | As a Cashiering user, I need batch payment files processing (automatching), so that every payment is received, applied and receipted correctly. | FR-OP-015, FR-OP-016 | FR-OP-015 AC1-3; FR-OP-016 AC1-3 | TC-OP-015.1 to 015.3, 016.1 to 016.3 (8 cases) |
+| BR-090 | As a Collection user, I need unapplied payment disposition (excess payment); unapplied payment management (excess payment), so that premium receivables are collected and followed up. | FR-CL-074, FR-CL-070, FR-CL-077, FR-OP-022 | FR-CL-074 AC1-3; FR-CL-070 AC1-3; FR-CL-077 AC1-2; FR-OP-022 AC1-4 | TC-CL-074.1 to 074.4, 070.1 to 070.3, 077.1 to 077.3, TC-OP-022.1 to 022.3 (19 cases) |
+| BR-091 | As a Cashiering user, I need payment auto matching, so that every payment is received, applied and receipted correctly. | FR-OP-018, FR-OP-132 | FR-OP-018 AC1-4; FR-OP-132 AC1 | TC-OP-018.1 to 018.3, 132.1 to 132.2 (7 cases) |
+| BR-092 | As a Cashiering user, I need batch processing and automation (automatch re-run), so that every payment is received, applied and receipted correctly. | FR-OP-018, FR-OP-132 | FR-OP-018 AC1-4; FR-OP-132 AC1 | TC-OP-018.1 to 018.3, 132.1 to 132.2 (7 cases) |
+| BR-093 | As a Cashiering user, I need unapplied payment management (excess payment), so that every payment is received, applied and receipted correctly. | FR-OP-022 | FR-OP-022 AC1-4 | TC-OP-022.1 to 022.3 (6 cases) |
+| BR-094 | As a Cashiering user, I need to generate acknowledgement receipt, official receipt, invoice, so that every payment is received, applied and receipted correctly. | FR-OP-011, FR-OP-013, FR-OP-014, FR-OP-010 | FR-OP-011 AC1-3; FR-OP-013 AC1-3; FR-OP-014 AC1-3; FR-OP-010 AC1-4 | TC-OP-011.1 to 011.3, 013.1 to 013.3, 014.1 to 014.3, 010.1 to 010.3 (18 cases) |
+| BR-095 | As a Cashiering user, I need to generate acknowledgement receipt, official receipt, invoice, so that every payment is received, applied and receipted correctly. | FR-OP-011, FR-OP-013, FR-OP-014, FR-OP-010 | FR-OP-011 AC1-3; FR-OP-013 AC1-3; FR-OP-014 AC1-3; FR-OP-010 AC1-4 | TC-OP-011.1 to 011.3, 013.1 to 013.3, 014.1 to 014.3, 010.1 to 010.3 (18 cases) |
+| BR-096 | As a Cashiering user, I need to generate acknowledgement receipt, official receipt, invoice, so that every payment is received, applied and receipted correctly. | FR-OP-011, FR-OP-013, FR-OP-014, FR-OP-010 | FR-OP-011 AC1-3; FR-OP-013 AC1-3; FR-OP-014 AC1-3; FR-OP-010 AC1-4 | TC-OP-011.1 to 011.3, 013.1 to 013.3, 014.1 to 014.3, 010.1 to 010.3 (18 cases) |
+| BR-097 | As a Cashiering user, I need premium payment monitoring, so that every payment is received, applied and receipted correctly. | FR-OP-028, FR-OP-009 | FR-OP-028 AC1-2; FR-OP-009 AC1-3 | TC-OP-028.1 to 028.2, 009.1 to 009.2 (5 cases) |
+| BR-098 | As a Cashiering user, I need commission fee collection, so that every payment is received, applied and receipted correctly. | FR-OP-021, FR-OP-091 | FR-OP-021 AC1-2; FR-OP-091 AC1-3 | TC-OP-021.1 to 021.2, 091.1 to 091.2 (8 cases) |
+| BR-099 | As a Cashiering user, I need commission fee collection, so that every payment is received, applied and receipted correctly. | FR-OP-021, FR-OP-091 | FR-OP-021 AC1-2; FR-OP-091 AC1-3 | TC-OP-021.1 to 021.2, 091.1 to 091.2 (8 cases) |
+| BR-100 | As a Cashiering user, I need PDC management, so that every payment is received, applied and receipted correctly. | FR-OP-015, FR-OP-016 | FR-OP-015 AC1-3; FR-OP-016 AC1-3 | TC-OP-015.1 to 015.3, 016.1 to 016.3 (8 cases) |
+| BR-101 | As a Business Administrator, I need workflow maintained at the back end; data flows to the next process by rules, so that work moves to the next process by rules. | FR-CR-080, FR-NB-011, FR-NB-064, FR-NB-010, FR-NB-122 | FR-CR-080 AC1; FR-NB-011 AC1-3; FR-NB-064 AC1-3; FR-NB-010 AC1-3; FR-NB-122 AC1-3 | TC-NB-011.1 to 011.3, 064.1 to 064.3, 010.1 to 010.3, 122.1 to 122.3 (19 cases) |
+| BR-102 | As a Remittance user, I need extraction and remittance processing (scheduled or manual), so that premiums are remitted to the insurers in full and on time. | FR-OP-030 | FR-OP-030 AC1-4 | TC-OP-030.1 to 030.3 (5 cases) |
+| BR-103 | As a Remittance user, I need extraction and remittance processing (scheduled or manual); scheduled or on-demand report generation, so that premiums are remitted to the insurers in full and on time. | FR-OP-030, FR-CR-043, FR-DS-081, FR-CL-082 | FR-OP-030 AC1-4; FR-CR-043 AC1-2; FR-DS-081 AC1; FR-CL-082 AC1 | TC-OP-030.1 to 030.3, TC-AC-081.1 to 081.2, TC-CL-082.1 to 082.2 (9 cases) |
+| BR-104 | As a Remittance user, I need sending and uploading of files, so that premiums are remitted to the insurers in full and on time. | FR-OP-034, FR-OP-037 | FR-OP-034 AC1-2; FR-OP-037 AC1-3 | TC-OP-034.1 to 034.2, 037.1 to 037.2 (7 cases) |
+| BR-105 | As a Remittance user, I need sending and uploading of files, so that premiums are remitted to the insurers in full and on time. | FR-OP-034, FR-OP-037 | FR-OP-034 AC1-2; FR-OP-037 AC1-3 | TC-OP-034.1 to 034.2, 037.1 to 037.2 (7 cases) |
+| BR-106 | As a Remittance user, I need validation and filtering criteria, so that premiums are remitted to the insurers in full and on time. | FR-OP-031 | FR-OP-031 AC1-4 | TC-OP-031.1 to 031.3 (5 cases) |
+| BR-107 | As a Remittance user, I need validation and filtering criteria, so that premiums are remitted to the insurers in full and on time. | FR-OP-031 | FR-OP-031 AC1-4 | TC-OP-031.1 to 031.3 (5 cases) |
+| BR-108 | As a Remittance user, I need validation and filtering criteria, so that premiums are remitted to the insurers in full and on time. | FR-OP-031 | FR-OP-031 AC1-4 | TC-OP-031.1 to 031.3 (5 cases) |
+| BR-109 | As a Remittance user, I need to search and view, so that premiums are remitted to the insurers in full and on time. | FR-OP-039, FR-OP-005 | FR-OP-039 AC1-2; FR-OP-005 AC1-3 | TC-OP-039.1 to 039.2, 005.1 to 005.3 (7 cases) |
+| BR-110 | As a Remittance user, I need hold remittance management, so that premiums are remitted to the insurers in full and on time. | FR-OP-031, FR-OP-005 | FR-OP-031 AC1-4; FR-OP-005 AC1-3 | TC-OP-031.1 to 031.3, 005.1 to 005.3 (9 cases) |
+| BR-111 | As a Remittance user, I need notifications and tracking; automated notifications, approvals and feedback tracking, so that premiums are remitted to the insurers in full and on time. | FR-OP-040, FR-OP-031, FR-OP-036, FR-CR-020, FR-NB-015 | FR-OP-040 AC1-2; FR-OP-031 AC1-4; FR-OP-036 AC1-2; FR-CR-020 AC1-2; FR-NB-015 AC1-2 | TC-OP-040.1 to 040.2, 031.1 to 031.3, 036.1 to 036.2, TC-NB-015.1 to 015.2 (14 cases) |
+| BR-112 | As a Remittance user, I need hold remittance management, so that premiums are remitted to the insurers in full and on time. | FR-OP-031, FR-OP-005 | FR-OP-031 AC1-4; FR-OP-005 AC1-3 | TC-OP-031.1 to 031.3, 005.1 to 005.3 (9 cases) |
+| BR-113 | As a Remittance user, I need hold remittance management, so that premiums are remitted to the insurers in full and on time. | FR-OP-031, FR-OP-005 | FR-OP-031 AC1-4; FR-OP-005 AC1-3 | TC-OP-031.1 to 031.3, 005.1 to 005.3 (9 cases) |
+| BR-114 | As a Remittance user, I need hold remittance management, so that premiums are remitted to the insurers in full and on time. | FR-OP-031, FR-OP-005 | FR-OP-031 AC1-4; FR-OP-005 AC1-3 | TC-OP-031.1 to 031.3, 005.1 to 005.3 (9 cases) |
+| BR-115 | As a Remittance user, I need hold remittance management, so that premiums are remitted to the insurers in full and on time. | FR-OP-031, FR-OP-005 | FR-OP-031 AC1-4; FR-OP-005 AC1-3 | TC-OP-031.1 to 031.3, 005.1 to 005.3 (9 cases) |
+| BR-116 | As a Remittance user, I need hold remittance management, so that premiums are remitted to the insurers in full and on time. | FR-OP-031, FR-OP-005 | FR-OP-031 AC1-4; FR-OP-005 AC1-3 | TC-OP-031.1 to 031.3, 005.1 to 005.3 (9 cases) |
+| BR-117 | As a Remittance user, I need special remittance request and processing, so that premiums are remitted to the insurers in full and on time. | FR-OP-040 | FR-OP-040 AC1-2 | TC-OP-040.1 to 040.2 (3 cases) |
+| BR-118 | As a Collection user, I need to tag CWT, premium / PR2307, so that premium receivables are collected and followed up. | FR-CL-032, FR-CL-081, FR-OP-113 | FR-CL-032 AC1-3; FR-CL-081 AC1; FR-OP-113 AC1-2 | TC-CL-032.1 to 032.5, 081.1 to 081.2, TC-OP-113.1 to 113.2 (15 cases) |
+| BR-119 | As a Production Reconciliation user, I need data extraction and file management, so that BDOI production agrees with the insurers' records. | FR-OP-070, FR-OP-074 | FR-OP-070 AC1; FR-OP-074 AC1-2 | TC-OP-070.1 to 070.2, 074.1 to 074.2 (6 cases) |
+| BR-120 | As a Production Reconciliation user, I need data extraction and file management, so that BDOI production agrees with the insurers' records. | FR-OP-070, FR-OP-074 | FR-OP-070 AC1; FR-OP-074 AC1-2 | TC-OP-070.1 to 070.2, 074.1 to 074.2 (6 cases) |
+| BR-121 | As a Production Reconciliation user, I need production register viewing and filtering, so that BDOI production agrees with the insurers' records. | FR-OP-071, FR-OP-077 | FR-OP-071 AC1-2; FR-OP-077 AC1-2 | TC-OP-071.1 to 071.2, 077.1 to 077.2 (7 cases) |
+| BR-122 | As a Production Reconciliation user, I need matching and automation, so that BDOI production agrees with the insurers' records. | FR-OP-076, FR-OP-075 | FR-OP-076 AC1-2; FR-OP-075 AC1-3 | TC-OP-076.1 to 076.2, 075.1 to 075.3 (6 cases) |
+| BR-123 | As a Production Reconciliation user, I need matching and automation, so that BDOI production agrees with the insurers' records. | FR-OP-076, FR-OP-075 | FR-OP-076 AC1-2; FR-OP-075 AC1-3 | TC-OP-076.1 to 076.2, 075.1 to 075.3 (6 cases) |
+| BR-124 | As a Production Reconciliation user, I need tracking and monitoring; audit logs and full transaction history, so that BDOI production agrees with the insurers' records. | FR-OP-079, FR-OP-075, FR-OP-074, FR-CR-030, FR-NB-016, FR-NB-136 | FR-OP-079 AC1-2; FR-OP-075 AC1-3; FR-OP-074 AC1-2; FR-CR-030 AC1-2; FR-NB-016 AC1-2; FR-NB-136 AC1 | TC-OP-079.1 to 079.2, 075.1 to 075.3, 074.1 to 074.2, TC-NB-016.1 to 016.2, 136.1 to 136.2 (14 cases) |
+| BR-125 | As a Marketing TL, I need centralised, real-time dashboards for all roles; details invoked from the dashboard, so that every role sees its work and figures in real time. | FR-CR-010, FR-CR-011, FR-NB-120, FR-OP-003, FR-PM-070 | FR-CR-010 AC1-3; FR-CR-011 AC1; FR-NB-120 AC1-2; FR-OP-003 AC1-3; FR-PM-070 AC1-2 | TC-NB-120.1 to 120.3, TC-OP-003.1 to 003.3, TC-PM-070.1 to 070.3 (11 cases) |
+| BR-126 | As an Adjustment user, I need transaction management (endorsements, cancellations), so that endorsements and cancellations are processed and accounted for correctly. | FR-OP-050, FR-OP-053 | FR-OP-050 AC1-4; FR-OP-053 AC1-3 | TC-OP-050.1 to 050.4, 053.1 to 053.3 (12 cases) |
+| BR-127 | As an Adjustment user, I need automated accounting entries, so that endorsements and cancellations are processed and accounted for correctly. | FR-OP-056, FR-OP-057 | FR-OP-056 AC1-2; FR-OP-057 AC1-2 | TC-OP-056.1 to 056.2, 057.1 to 057.2 (6 cases) |
+| BR-128 | As an Adjustment user, I need traceability and auditability, so that endorsements and cancellations are processed and accounted for correctly. | FR-OP-050, FR-OP-061 | FR-OP-050 AC1-4; FR-OP-061 AC1-5 | TC-OP-050.1 to 050.4, 061.1 to 061.3 (12 cases) |
+| BR-129 | As an Adjustment user, I need traceability and auditability; audit logs and full transaction history, so that endorsements and cancellations are processed and accounted for correctly. | FR-OP-050, FR-OP-061, FR-CR-030, FR-NB-016, FR-NB-136 | FR-OP-050 AC1-4; FR-OP-061 AC1-5; FR-CR-030 AC1-2; FR-NB-016 AC1-2; FR-NB-136 AC1 | TC-OP-050.1 to 050.4, 061.1 to 061.3, TC-NB-016.1 to 016.2, 136.1 to 136.2 (17 cases) |
+| BR-130 | As an Adjustment user, I need to search and document management, so that endorsements and cancellations are processed and accounted for correctly. | FR-OP-005, FR-OP-061, FR-OP-052 | FR-OP-005 AC1-3; FR-OP-061 AC1-5; FR-OP-052 AC1 | TC-OP-005.1 to 005.3, 061.1 to 061.3, 052.1 to 052.2 (11 cases) |
+| BR-131 | As an Adjustment user, I need to search and document management, so that endorsements and cancellations are processed and accounted for correctly. | FR-OP-005, FR-OP-061, FR-OP-052 | FR-OP-005 AC1-3; FR-OP-061 AC1-5; FR-OP-052 AC1 | TC-OP-005.1 to 005.3, 061.1 to 061.3, 052.1 to 052.2 (11 cases) |
+| BR-132 | As an Adjustment user, I need automated accounting entries, so that endorsements and cancellations are processed and accounted for correctly. | FR-OP-056, FR-OP-057 | FR-OP-056 AC1-2; FR-OP-057 AC1-2 | TC-OP-056.1 to 056.2, 057.1 to 057.2 (6 cases) |
+| BR-133 | As a Commission user, I need automated commission receivables processing, so that commissions on direct payments are collected. | FR-OP-091 | FR-OP-091 AC1-3 | TC-OP-091.1 to 091.2 (4 cases) |
+| BR-134 | As a Commission user, I need comprehensive production reporting, so that commissions on direct payments are collected. | FR-OP-097, FR-OP-080 | FR-OP-097 AC1-2; FR-OP-080 AC1-2 | TC-OP-097.1 to 097.2, 080.1 to 080.2 (6 cases) |
+| BR-135 | As a Commission user, I need risk mitigation and error handling, so that commissions on direct payments are collected. | FR-OP-091, FR-OP-093 | FR-OP-091 AC1-3; FR-OP-093 AC1-3 | TC-OP-091.1 to 091.2, 093.1 to 093.3 (8 cases) |
+| BR-136 | As a Commission user, I need collection of commission receivables (direct payment), so that commissions on direct payments are collected. | FR-OP-091, FR-OP-098 | FR-OP-091 AC1-3; FR-OP-098 AC1 | TC-OP-091.1 to 091.2, 098.1 to 098.2 (6 cases) |
+| BR-137 | As a Commission user, I need collection of commission receivables (direct payment), so that commissions on direct payments are collected. | FR-OP-091, FR-OP-098 | FR-OP-091 AC1-3; FR-OP-098 AC1 | TC-OP-091.1 to 091.2, 098.1 to 098.2 (6 cases) |
+| BR-138 | As a Commission user, I need auto-match reversals, so that commissions on direct payments are collected. | FR-OP-091, FR-OP-113 | FR-OP-091 AC1-3; FR-OP-113 AC1-2 | TC-OP-091.1 to 091.2, 113.1 to 113.2 (7 cases) |
+| BR-139 | As a Collection user, I need to tag CWT, premium / PR2307; auto-match reversals, so that premium receivables are collected and followed up. | FR-CL-032, FR-CL-081, FR-OP-113, FR-OP-091 | FR-CL-032 AC1-3; FR-CL-081 AC1; FR-OP-113 AC1-2; FR-OP-091 AC1-3 | TC-CL-032.1 to 032.5, 081.1 to 081.2, TC-OP-113.1 to 113.2, 091.1 to 091.2 (19 cases) |
+| BR-140 | As a Commission user, I need collection of commission receivables (direct payment), so that commissions on direct payments are collected. | FR-OP-091, FR-OP-098 | FR-OP-091 AC1-3; FR-OP-098 AC1 | TC-OP-091.1 to 091.2, 098.1 to 098.2 (6 cases) |
+| BR-141 | As a Claims Officer, I need to process claims advice from BDOI Marketing; to process claims advice from client; to process claims advice from insurer, so that claims are filed and followed until settled. | FR-CM-010, FR-CM-011, FR-CM-015, FR-CM-014, FR-CM-002, FR-CM-003, FR-CM-022, FR-CM-024 | FR-CM-010 AC1-3; FR-CM-011 AC1-4; FR-CM-015 AC1-4; FR-CM-014 AC1-2; FR-CM-002 AC1-3; FR-CM-003 AC1-3; FR-CM-022 AC1-3; FR-CM-024 AC1-2 | TC-CM-010.1 to 010.4, 011.1 to 011.5, 015.1 to 015.3, 014.1 to 014.2, 002.1 to 002.4, 003.1 to 003.3, 022.1 to 022.4, 024.1 to 024.3 (40 cases) |
+| BR-142 | As a Claims Officer, I need to process LOA from insurer, so that claims are filed and followed until settled. | FR-CM-043, FR-CM-040, FR-CM-046 | FR-CM-043 AC1-2; FR-CM-040 AC1-2; FR-CM-046 AC1-3 | TC-CM-043.1 to 043.3, 040.1 to 040.3, 046.1 to 046.3 (10 cases) |
+| BR-143 | As a Claims Officer, I need to process settlement offer from insurer, so that claims are filed and followed until settled. | FR-CM-040, FR-CM-046, FR-CM-043 | FR-CM-040 AC1-2; FR-CM-046 AC1-3; FR-CM-043 AC1-2 | TC-CM-040.1 to 040.3, 046.1 to 046.3, 043.1 to 043.3 (10 cases) |
+| BR-144 | As a Claims Officer, I need to tag permanent closure, so that claims are filed and followed until settled. | FR-CM-045, FR-CM-002 | FR-CM-045 AC1-3; FR-CM-002 AC1-3 | TC-CM-045.1 to 045.3, 002.1 to 002.4 (13 cases) |
+| BR-145 | As a Claims Officer, I need to tag temporary closure, so that claims are filed and followed until settled. | FR-CM-045 | FR-CM-045 AC1-3 | TC-CM-045.1 to 045.3 (7 cases) |
+| BR-146 | As a Claims Officer, I need unclaimed checks safekeeping, so that claims are filed and followed until settled. | CLR-CR-02 (CRQ03) | - | - |
+| BR-147 | As a Claims Officer, I need handover of settlement checks to Cashiering, so that claims are filed and followed until settled. | CLR-CR-02 (CRQ03) | - | - |
+| BR-148 | As a Claims Officer, I need retrieval of checks from Cashiering for release, so that claims are filed and followed until settled. | CLR-CR-02 (CRQ03) | - | - |
+| BR-149 | As a Claims Officer, I need reports and analytics viewing, so that claims are filed and followed until settled. | FR-CM-060, FR-CM-044, FR-CM-061, FR-CM-062 | FR-CM-060 AC1-3; FR-CM-044 AC1-4; FR-CM-061 AC1-3; FR-CM-062 AC1-3 | TC-CM-060.1 to 060.4, 044.1 to 044.4, 061.1 to 061.5, 062.1 to 062.4 (23 cases) |
+| BR-150 | As a Claims Officer, I need to encode / override the next follow-up date, so that claims are filed and followed until settled. | FR-CM-002, FR-CM-050, FR-CM-054 | FR-CM-002 AC1-3; FR-CM-050 AC1-2; FR-CM-054 AC1-2 | TC-CM-002.1 to 002.4, 050.1 to 050.3, 054.1 to 054.3 (14 cases) |
+| BR-151 | As a Claims Officer, I need to maintain full claims history for audit and compliance; audit logs and full transaction history, so that claims are filed and followed until settled. | FR-CM-012, FR-CM-052, FR-CM-054, FR-CR-030, FR-NB-016, FR-NB-136 | FR-CM-012 AC1-3; FR-CM-052 AC1-2; FR-CM-054 AC1-2; FR-CR-030 AC1-2; FR-NB-016 AC1-2; FR-NB-136 AC1 | TC-CM-012.1 to 012.4, 052.1 to 052.4, 054.1 to 054.3, TC-NB-016.1 to 016.2, 136.1 to 136.2 (19 cases) |
+| BR-152 | As a Claims Officer, I need reports and analytics viewing; centralised, real-time dashboards for all roles; details invoked from the dashboard, so that claims are filed and followed until settled. | FR-CM-060, FR-CM-044, FR-CM-061, FR-CM-062, FR-CR-010, FR-CR-011, FR-NB-120, FR-OP-003, FR-PM-070 | FR-CM-060 AC1-3; FR-CM-044 AC1-4; FR-CM-061 AC1-3; FR-CM-062 AC1-3; FR-CR-010 AC1-3; FR-CR-011 AC1; FR-NB-120 AC1-2; FR-OP-003 AC1-3; FR-PM-070 AC1-2 | TC-CM-060.1 to 060.4, 044.1 to 044.4, 061.1 to 061.5, 062.1 to 062.4, TC-NB-120.1 to 120.3, TC-OP-003.1 to 003.3, TC-PM-070.1 to 070.3 (34 cases) |
+| BR-153 | As a Claims Unit Head, I need placement request initiation, so that reinsurance placements are managed (phase 2). | Phase 2 (ReInsurance BRD) | - | - |
+| BR-154 | As a Claims Unit Head, I need placement slip management, so that reinsurance placements are managed (phase 2). | Phase 2 (ReInsurance BRD) | - | - |
+| BR-155 | As a Claims Unit Head, I need statement of Account (SOA) generation, so that reinsurance placements are managed (phase 2). | Phase 2 (ReInsurance BRD) | - | - |
+| BR-156 | As a Claims Unit Head, I need statement of Account (SOA) generation, so that reinsurance placements are managed (phase 2). | Phase 2 (ReInsurance BRD) | - | - |
+| BR-157 | As a Claims Unit Head, I need claims reporting and settlement, so that reinsurance placements are managed (phase 2). | Phase 2 (ReInsurance BRD) | - | - |
+| BR-158 | As a Claims Unit Head, I need claims payment processing, so that reinsurance placements are managed (phase 2). | Phase 2 (ReInsurance BRD) | - | - |
+| BR-159 | As a Claims Unit Head, I need direct client claims payment, so that reinsurance placements are managed (phase 2). | Phase 2 (ReInsurance BRD) | - | - |
+| BR-160 | As a Marketing TL, I need centralised, real-time dashboards for all roles; details invoked from the dashboard, so that every role sees its work and figures in real time. | FR-CR-010, FR-CR-011, FR-NB-120, FR-OP-003, FR-PM-070 | FR-CR-010 AC1-3; FR-CR-011 AC1; FR-NB-120 AC1-2; FR-OP-003 AC1-3; FR-PM-070 AC1-2 | TC-NB-120.1 to 120.3, TC-OP-003.1 to 003.3, TC-PM-070.1 to 070.3 (11 cases) |
+| BR-161 | As a CSF Agent, I need to search, retrieve and display client contact and insurance account details, so that callers are served from one view of their client and policies and every inquiry is tracked to closure. | FR-CSF-011, FR-CSF-021, FR-CSF-022, FR-CSF-010 | FR-CSF-011 AC1-3; FR-CSF-021 AC1-4; FR-CSF-022 AC1-2; FR-CSF-010 AC1-4 | TC-CSF-011.1 to 011.5, 021.1 to 021.6, 022.1 to 022.4, 010.1 to 010.8 (35 cases) |
+| BR-162 | As a CSF Agent, I need to view, add and update client contact information, so that callers are served from one view of their client and policies and every inquiry is tracked to closure. | FR-CSF-020, FR-CSF-021 | FR-CSF-020 AC1-2; FR-CSF-021 AC1-4 | TC-CSF-020.1 to 020.5, 021.1 to 021.6 (19 cases) |
+| BR-163 | As a CSF Agent, I need to view mode of payment (history) and current status, so that callers are served from one view of their client and policies and every inquiry is tracked to closure. | FR-CSF-012, FR-CSF-013 | FR-CSF-012 AC1-3; FR-CSF-013 AC1-2 | TC-CSF-012.1 to 012.4, 013.1 to 013.5 (11 cases) |
+| BR-164 | As a CSF Agent, I need to view and resend RA (and e-policy), so that callers are served from one view of their client and policies and every inquiry is tracked to closure. | FR-CSF-030, FR-CSF-033 | FR-CSF-030 AC1-3; FR-CSF-033 AC1-3 | TC-CSF-030.1 to 030.6, 033.1 to 033.5 (15 cases) |
+| BR-165 | As a CSF Agent, I need case resolution: add / edit case details and status, so that callers are served from one view of their client and policies and every inquiry is tracked to closure. | FR-CSF-050, FR-CSF-052, FR-CSF-056, FR-CSF-058, FR-CSF-060 | FR-CSF-050 AC1-6; FR-CSF-052 AC1-4; FR-CSF-056 AC1-4; FR-CSF-058 AC1-3; FR-CSF-060 AC1-4 | TC-CSF-050.1 to 050.6, 052.1 to 052.4, 056.1 to 056.4, 058.1 to 058.3, 060.1 to 060.4 (28 cases) |
+| BR-166 | As a Commission user, I need automated incentive calculation, so that commissions on direct payments are collected. | FR-OP-095 | FR-OP-095 AC1-2 | TC-OP-095.1 to 095.2 (4 cases) |
+| BR-167 | As a Commission user, I need automated incentive calculation, so that commissions on direct payments are collected. | FR-OP-095 | FR-OP-095 AC1-2 | TC-OP-095.1 to 095.2 (4 cases) |
+| BR-168 | As a Commission user, I need motor Mania incentive plan, so that commissions on direct payments are collected. | FR-OP-095 | FR-OP-095 AC1-2 | TC-OP-095.1 to 095.2 (4 cases) |
+| BR-169 | As a Commission user, I need production data validation and exclusion handling, so that commissions on direct payments are collected. | FR-OP-095 | FR-OP-095 AC1-2 | TC-OP-095.1 to 095.2 (4 cases) |
+| BR-170 | As a Business Administrator, I need master data change logging (user, product, insurer, LOVs), so that master data is consistent and controlled across BIBS. | FR-CR-031, FR-NB-016, FR-NB-132, FR-PM-005, FR-CL-003 | FR-CR-031 AC1-2; FR-NB-016 AC1-2; FR-NB-132 AC1-2; FR-PM-005 AC1-3; FR-CL-003 AC1-3 | TC-NB-016.1 to 016.2, 132.1 to 132.2, TC-PM-005.1 to 005.3, TC-CL-003.1 to 003.4 (14 cases) |
+| BR-171 | As a Business Administrator, I need insurer management, so that master data is consistent and controlled across BIBS. | FR-CR-061, FR-NB-053 | FR-CR-061 AC1-2; FR-NB-053 AC1-3 | TC-NB-053.1 to 053.3 (5 cases) |
+| BR-172 | As a Business Administrator, I need LOV maintenance, so that master data is consistent and controlled across BIBS. | FR-CR-060, FR-NB-132, FR-AC-070 | FR-CR-060 AC1; FR-NB-132 AC1-2; FR-AC-070 AC1-2 | TC-NB-132.1 to 132.2, TC-AC-070.1 to 070.4 (10 cases) |
+| BR-173 | As a Business Administrator, I need MIS field definition, so that master data is consistent and controlled across BIBS. | FR-CR-062, FR-NB-110, FR-NB-119 | FR-CR-062 AC1; FR-NB-110 AC1-3; FR-NB-119 AC1-2 | TC-NB-110.1 to 110.3, 119.1 to 119.2 (7 cases) |
+| BR-174 | As a Business Administrator, I need MIS field definition, so that master data is consistent and controlled across BIBS. | FR-CR-062, FR-NB-110, FR-NB-119 | FR-CR-062 AC1; FR-NB-110 AC1-3; FR-NB-119 AC1-2 | TC-NB-110.1 to 110.3, 119.1 to 119.2 (7 cases) |
+| BR-175 | As an FRBS user, I need invoice Master List across workflows, so that every invoice is visible across the workflows. | FR-CR-090, FR-CL-010, FR-AS-026 | FR-CR-090 AC1; FR-CL-010 AC1-3; FR-AS-026 AC1 | TC-CL-010.1 to 010.4, TC-AC-026.1 to 026.2 (7 cases) |
+| BR-176 | As a Business Administrator, I need to include other or additional system capabilities when BDOI defines them, so that BIBS can grow with the business. | CLR-CR-09 (CRQ10) | - | - |
+| BR-177 | As a Business Administrator, I need workflow maintained at the back end; data flows to the next process by rules, so that work moves to the next process by rules. | FR-CR-080, FR-NB-011, FR-NB-064, FR-NB-010, FR-NB-122 | FR-CR-080 AC1; FR-NB-011 AC1-3; FR-NB-064 AC1-3; FR-NB-010 AC1-3; FR-NB-122 AC1-3 | TC-NB-011.1 to 011.3, 064.1 to 064.3, 010.1 to 010.3, 122.1 to 122.3 (19 cases) |
+| BR-178 | As a Business Administrator, I need BDO brand colours, logos, icons and design system, so that every screen and document carries the BDO brand. | FR-CR-092 | FR-CR-092 AC1-2 | - |
+| BR-179 | As a Business Administrator, I need BDO brand colours, logos, icons and design system, so that every screen and document carries the BDO brand. | FR-CR-092 | FR-CR-092 AC1-2 | - |
+| BR-180 | As a Business Administrator, I need BDO brand colours, logos, icons and design system, so that every screen and document carries the BDO brand. | FR-CR-092 | FR-CR-092 AC1-2 | - |
+| BR-181 | As a Business Administrator, I need BIBS to follow the identified user journeys, shown in a walkthrough, so that every persona works through screens that match the way BDOI works. | FR-CR-001, FR-CR-080, FR-CR-092 | FR-CR-001 AC1-3; FR-CR-080 AC1; FR-CR-092 AC1-2 | - |
+| BR-182 | As a Business Administrator, I need the interaction flows to be customisable, shown in a walkthrough, so that the screens follow the identified user journeys. | FR-CR-080, FR-NB-011, FR-NB-064, FR-NB-010, FR-NB-122, FR-CR-001, FR-CR-092 | FR-CR-080 AC1; FR-NB-011 AC1-3; FR-NB-064 AC1-3; FR-NB-010 AC1-3; FR-NB-122 AC1-3; FR-CR-001 AC1-3; FR-CR-092 AC1-2 | TC-NB-011.1 to 011.3, 064.1 to 064.3, 010.1 to 010.3, 122.1 to 122.3 (19 cases) |
+| BR-183 | As a Business Administrator, I need the vendor's designs delivered for the BDOI design tool (Figma), so that the BDOI UX Design team works from the delivered designs. | FR-CR-092 | FR-CR-092 AC1-2 | - |
+| BR-184 | As an EB AO, I need automated renewal notifications, so that employee benefit programmes are placed, renewed and serviced. | FR-EB-022 | FR-EB-022 AC1-3 | TC-EB-022.1 to 022.3 (5 cases) |
+| BR-185 | As an EB AO, I need manual and system-based proposal generation, so that employee benefit programmes are placed, renewed and serviced. | FR-EB-024 | FR-EB-024 AC1-2 | TC-EB-024.1 to 024.2 (3 cases) |
+| BR-186 | As an EB AO, I need document and data upload management, so that employee benefit programmes are placed, renewed and serviced. | FR-EB-001, FR-EB-010, FR-EB-011, FR-EB-014 | FR-EB-001 AC1-3; FR-EB-010 AC1-3; FR-EB-011 AC1-3; FR-EB-014 AC1-3 | TC-EB-001.1 to 001.3, 010.1 to 010.4, 011.1 to 011.4, 014.1 to 014.3 (20 cases) |
+| BR-187 | As an EB AO, I need broker on record management, so that employee benefit programmes are placed, renewed and serviced. | FR-EB-031 | FR-EB-031 AC1-2 | TC-EB-031.1 to 031.3 (5 cases) |
+| BR-188 | As an EB AO, I need terms of Reference generation and distribution, so that employee benefit programmes are placed, renewed and serviced. | FR-EB-004, FR-EB-030, FR-EB-035 | FR-EB-004 AC1-2; FR-EB-030 AC1-2; FR-EB-035 AC1-3 | TC-EB-004.1 to 004.2, 030.1 to 030.3, 035.1 to 035.3 (11 cases) |
+| BR-189 | As an EB AO, I need comparative report management, so that employee benefit programmes are placed, renewed and serviced. | FR-EB-040, FR-EB-041, FR-EB-015, FR-EB-043 | FR-EB-040 AC1-2; FR-EB-041 AC1-3; FR-EB-015 AC1-3; FR-EB-043 AC1-2 | TC-EB-040.1 to 040.3, 041.1 to 041.3, 015.1 to 015.3, 043.1 to 043.3 (18 cases) |
+| BR-190 | As an EB AO, I need client feedback, change, additional or amendment request capture and relay, so that employee benefit programmes are placed, renewed and serviced. | FR-EB-023, FR-EB-044, FR-EB-054, FR-EB-055 | FR-EB-023 AC1-2; FR-EB-044 AC1-2; FR-EB-054 AC1-2; FR-EB-055 AC1-3 | TC-EB-023.1 to 023.2, 044.1 to 044.2, 054.1 to 054.2, 055.1 to 055.3 (13 cases) |
+| BR-191 | As an EB AO, I need automated and manual sending of proposals, so that employee benefit programmes are placed, renewed and serviced. | FR-EB-024, FR-EB-035 | FR-EB-024 AC1-2; FR-EB-035 AC1-3 | TC-EB-024.1 to 024.2, 035.1 to 035.3 (8 cases) |
+| BR-192 | As an EB AO, I need approval workflow based on defined thresholds, so that employee benefit programmes are placed, renewed and serviced. | FR-EB-042 | FR-EB-042 AC1-3 | TC-EB-042.1 to 042.3 (5 cases) |
+| BR-193 | As an EB AO, I need placement and booking management, so that employee benefit programmes are placed, renewed and serviced. | FR-EB-046, FR-EB-051, FR-EB-052 | FR-EB-046 AC1-3; FR-EB-051 AC1-2; FR-EB-052 AC1-2 | TC-EB-046.1 to 046.4, 051.1 to 051.2, 052.1 to 052.3 (11 cases) |
+| BR-194 | As an EB AO, I need centralised reporting and analytics, so that employee benefit programmes are placed, renewed and serviced. | FR-EB-060, FR-EB-062, FR-EB-001, FR-EB-003 | FR-EB-060 AC1-3; FR-EB-062 AC1-2; FR-EB-001 AC1-3; FR-EB-003 AC1-3 | TC-EB-060.1 to 060.4, 062.1 to 062.3, 001.1 to 001.3, 003.1 to 003.3 (16 cases) |
+| BR-195 | As an EB AO, I need to manage franchise requests and approvals, so that employee benefit programmes are placed, renewed and serviced. | FR-EB-032, FR-EB-034, FR-EB-033 | FR-EB-032 AC1-3; FR-EB-034 AC1-2; FR-EB-033 AC1-2 | TC-EB-032.1 to 032.3, 034.1 to 034.3, 033.1 to 033.2 (11 cases) |
+| BR-196 | As an EB AO, I need automated renewal notifications, so that employee benefit programmes are placed, renewed and serviced. | FR-EB-022 | FR-EB-022 AC1-3 | TC-EB-022.1 to 022.3 (5 cases) |
+| BR-197 | As an EB AO, I need manual and system-based proposal generation, so that employee benefit programmes are placed, renewed and serviced. | FR-EB-024 | FR-EB-024 AC1-2 | TC-EB-024.1 to 024.2 (3 cases) |
+| BR-198 | As an EB AO, I need document and data upload management, so that employee benefit programmes are placed, renewed and serviced. | FR-EB-001, FR-EB-010, FR-EB-011, FR-EB-014 | FR-EB-001 AC1-3; FR-EB-010 AC1-3; FR-EB-011 AC1-3; FR-EB-014 AC1-3 | TC-EB-001.1 to 001.3, 010.1 to 010.4, 011.1 to 011.4, 014.1 to 014.3 (20 cases) |
+| BR-199 | As a TSU Officer, I need automated request handling, so that products and packages are maintained in one place for all modules. | FR-PM-020, FR-PM-024, FR-PM-045, FR-PM-021 | FR-PM-020 AC1-4; FR-PM-024 AC1-3; FR-PM-045 AC1-2; FR-PM-021 AC1-3 | TC-PM-020.1 to 020.5, 024.1 to 024.4, 045.1 to 045.3, 021.1 to 021.3 (27 cases) |
+| BR-200 | As a TSU Officer, I need automatic reference numbers, so that products and packages are maintained in one place for all modules. | FR-PM-020, FR-PM-021 | FR-PM-020 AC1-4; FR-PM-021 AC1-3 | TC-PM-020.1 to 020.5, 021.1 to 021.3 (16 cases) |
+| BR-201 | As a TSU Officer, I need quotation / proposal management, so that products and packages are maintained in one place for all modules. | FR-PM-030, FR-PM-031, FR-PM-034, FR-PM-036 | FR-PM-030 AC1-4; FR-PM-031 AC1-3; FR-PM-034 AC1-3; FR-PM-036 AC1-2 | TC-PM-030.1 to 030.5, 031.1 to 031.3, 034.1 to 034.4, 036.1 to 036.3 (24 cases) |
+| BR-202 | As a TSU Officer, I need automatic comparison tables, so that products and packages are maintained in one place for all modules. | FR-PM-034, FR-PM-035 | FR-PM-034 AC1-3; FR-PM-035 AC1-2 | TC-PM-034.1 to 034.4, 035.1 to 035.3 (10 cases) |
+| BR-203 | As a TSU Officer, I need real-time dashboard / reports; centralised, real-time dashboards for all roles; details invoked from the dashboard, so that products and packages are maintained in one place for all modules. | FR-PM-070, FR-PM-071, FR-CR-010, FR-CR-011, FR-NB-120, FR-OP-003 | FR-PM-070 AC1-2; FR-PM-071 AC1-3; FR-CR-010 AC1-3; FR-CR-011 AC1; FR-NB-120 AC1-2; FR-OP-003 AC1-3 | TC-PM-070.1 to 070.3, 071.1 to 071.3, TC-NB-120.1 to 120.3, TC-OP-003.1 to 003.3 (16 cases) |
+| BR-204 | As a TSU Officer, I need automatic checks and approvals in the package workflow, so that products and packages are maintained in one place for all modules. | FR-PM-021, FR-PM-073, FR-PM-043 | FR-PM-021 AC1-3; FR-PM-073 AC1-2; FR-PM-043 AC1-3 | TC-PM-021.1 to 021.3, 073.1 to 073.3, 043.1 to 043.4 (19 cases) |
+| BR-205 | As a TSU Officer, I need secure document sharing, so that products and packages are maintained in one place for all modules. | FR-PM-004, FR-PM-002 | FR-PM-004 AC1-2; FR-PM-002 AC1-3 | TC-PM-004.1 to 004.3, 002.1 to 002.4 (10 cases) |
+| BR-206 | As a TSU Officer, I need BIBS that works with existing systems; automated notifications, approvals and feedback tracking, so that products and packages are maintained in one place for all modules. | FR-PM-072, FR-CR-020, FR-NB-015, FR-OP-040 | FR-PM-072 AC1-2; FR-CR-020 AC1-2; FR-NB-015 AC1-2; FR-OP-040 AC1-2 | TC-PM-072.1 to 072.2, TC-NB-015.1 to 015.2, TC-OP-040.1 to 040.2 (10 cases) |
+| BR-207 | As a TSU Officer, I need to track all changes; audit logs and full transaction history, so that products and packages are maintained in one place for all modules. | FR-PM-005, FR-CR-030, FR-NB-016, FR-NB-136 | FR-PM-005 AC1-3; FR-CR-030 AC1-2; FR-NB-016 AC1-2; FR-NB-136 AC1 | TC-PM-005.1 to 005.3, TC-NB-016.1 to 016.2, 136.1 to 136.2 (8 cases) |
+| BR-208 | As a TSU Officer, I need expiring packages monitoring, so that products and packages are maintained in one place for all modules. | FR-PM-044, FR-PM-060, FR-PM-061, FR-PM-071 | FR-PM-044 AC1-3; FR-PM-060 AC1-2; FR-PM-061 AC1-2; FR-PM-071 AC1-3 | TC-PM-044.1 to 044.4, 060.1 to 060.3, 061.1 to 061.3, 071.1 to 071.3 (22 cases) |
+
+<!-- landscape -->
+
+# Appendix: Storyboard index
+
+The umbrella FRS has no screens of its own. Its storyboard is the journey index asked for by BR-181 and BR-182: one frame per capability of the end-to-end journey (Figure 1), with the persona, the step, the walkthrough of the function FRS that shows it on screen (and the matching swimlane of its UX Screen Deck), the outcome and the main FRs. Where a function FRS has no walkthroughs yet, the frame points to the process storyboard of its Storyboard index; the screen-level frames follow with its v2.0 business sign-off pack.
+
+<!-- table: widths=1.3,2.8,5.6,3.6,5.2,2.2 caption="Storyboard of the business processes: frame, persona, step, screen or document, outcome and FR" size=8 -->
+| Frame | Persona | Step | Screen or document | Outcome | FR |
+|---|---|---|---|---|---|
+| **J1** | | **Access and set-up** | | | |
+| J1.1 | UAM requestor, approver, implementer | Enrol a new user and give the persona its menus | FRS BRD-11 walkthrough WT-A (A.1-A.8) | The user signs in and sees only the menus of the persona | FR-CR-001, FR-CR-070 |
+| J1.2 | TSU Officer | Capability 20 Product Maintenance: a new package from request to first quotation | FRS BRD-3 walkthrough WT-A | Package released and used by New Business | FR-CR-060 |
+| J1.3 | Business Administrator | Capability 17 Data Management: lists of values, insurer record, MIS fields, change log | Lists of Values; insurer page (FR-CR-031, 060 to 062) | Master data maintained with approval and a change log | FR-CR-031, FR-CR-060, FR-CR-061, FR-CR-062 |
+| **J2** | | **New business** | | | |
+| J2.1 | Marketing AO | Capability 1 Client Onboarding: prospect, KYC, verified client; sanction screening | FRS BRD-1 walkthrough WT-A (A.1-A.4); FRS BRD-10 storyboard P2 | Client confirmed and screened | FR-NB-031, FR-NB-034 |
+| J2.2 | Marketing AO | Capability 2 Quotation or Proposal: quotation approved and sent | FRS BRD-1 walkthrough WT-A (A.5-A.8) | Quotation accepted; accounts created | FR-NB-041, FR-NB-043, FR-NB-044 |
+| J2.3 | TSU Officer | Capability 4 Non-Package Management: PRF, quotation slip, insurer terms, proposal slip | FRS BRD-1 walkthrough WT-B (B.1-B.9) | Proposal accepted; account created with the chosen insurer | FR-NB-050, FR-NB-053, FR-NB-055, FR-NB-056 |
+| J2.4 | Marketing AO | Capability 3 Account Creation and Maintenance; submitted policies of the bank | FRS BRD-1 walkthrough WT-A (A.9-A.10); FRS BRD-12 storyboard P1 | Account validated for placement; submitted policies in the masterlist | FR-NB-064, FR-SP-001 |
+| J2.5 | Processing Officer | Capability 5 Placement and Booking: CLPC billing, placement, e-policy, booking | FRS BRD-1 walkthrough WT-A (A.11-A.17) | Account booked; invoice and GL entries created | FR-NB-080, FR-NB-100, FR-NB-110 |
+| J2.6 | Processing Officer | Returns and corrections across New Business | FRS BRD-1 walkthrough WT-C | Returned records corrected and resubmitted | FR-NB-034, FR-NB-043, FR-NB-067, FR-NB-084 |
+| **J3** | | **Money and accounting** | | | |
+| J3.1 | Collection user and TL | Capability 7 Marketing Collection: worklist, promise to pay, unapplied payment, installment SOA | FRS BRD-4 walkthroughs WT-A to WT-E | Receivables followed and collected | FR-CL-010, FR-CL-032 |
+| J3.2 | Cashiering, Remittance, Prod Recon, Adjustment, Commission users | Capabilities 9 and 10 Cashiering and Remittance: payment to the insurer's official receipt | FRS BRD-2 walkthrough WT-A | Payment applied, receipted and remitted | FR-OP-011, FR-OP-018, FR-OP-040 |
+| J3.3 | Cashiering, Remittance, Prod Recon, Adjustment, Commission users | Capability 12 Adjustment / Cancellation: cancellation of a paid and remitted policy to the refund | FRS BRD-2 walkthrough WT-B | Cancellation posted; refund paid | FR-OP-050, FR-OP-053, FR-OP-056 |
+| J3.4 | Cashiering, Remittance, Prod Recon, Adjustment, Commission users | Capabilities 11 and 13 Production Reconciliation and Commission Receivables (direct payment) | FRS BRD-2 walkthrough WT-C | Production reconciled; DP commission collected | FR-OP-090, FR-OP-091 |
+| J3.5 | FRBS, Disbursement, ACSL users | Capability 8 Accounting, GL, Disbursement and ACSL: accrual, refund, insurer SOA, month end | FRS BRD-5 walkthroughs WT-A to WT-E | Books closed with reconciled subsidiary ledgers | FR-CR-040 |
+| **J4** | | **Lifecycle services** | | | |
+| J4.1 | Marketing AO | Capability 6 Renewal | FRS BRD-6 storyboard (process flow) | Expiring policies renewed or closed with their letters | FR-SP-060 |
+| J4.2 | Claims Officer, Assistant, Unit Head | Capability 14 Claims: recording to settlement and closure | FRS BRD-7 storyboard P1 to P4 | Claim followed to settlement; insurer numbers and updates recorded | FR-CM-011, FR-CM-021, FR-CM-044 |
+| J4.3 | CSF Agent, Supervisor | Capability 16 Customer Service Facility: servicing contact and case management | FRS BRD-9 storyboard P1 and P2 | Caller served; inquiry logged as a case and closed | FR-CSF-010, FR-CSF-050, FR-CSF-060 |
+| J4.4 | EB AO, Processing, Collection | Capability 19 Employee Benefits: programme to booking, billing and member changes | FRS BRD-8 storyboard P1 to P5 | Programme placed, booked and serviced | FR-EB-022, FR-EB-046, FR-EB-052 |
+| J4.5 | Compliance officer, investigator | Sanction screening of clients (capability 1) | FRS BRD-10 storyboard P2 to P4 | Matches investigated and decided; STR filed where needed | FR-SS-031, FR-SS-051, FR-SS-071 |
+| J4.6 | Claims Officer, Assistant, Unit Head | Capability 15 Reinsurance (phase 2) | ReInsurance BRD (phase 2) | Not in phase 1 | - |
+| **J5** | | **Platform services** | | | |
+| J5.1 | Marketing AO | Role dashboards, notifications and audit | Home page of each persona (FR-CR-010); notifications (FR-CR-020) | Each role sees its work; approvals notified; every change logged | FR-CR-010, FR-CR-020, FR-CR-030 |
+| J5.2 | Business Administrator, System Administrator | Capability 21 Report Generation: standard, customised and scheduled reports | Report Centre (FR-CR-040 to 043) | Reports in Excel, PDF and Word, saved as variants and scheduled | FR-CR-040, FR-CR-042, FR-CR-043 |
+| J5.3 | Business Administrator, System Administrator | Capability 18 Emerging Capabilities | Not defined (CLR-CR-09) | Added when BDOI lists them | - |
+

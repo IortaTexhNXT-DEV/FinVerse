@@ -8,8 +8,8 @@ doc_code: TestPlan
 brd: BRD-09
 name: Customer Servicing Facility Summary
 doc_id: BIBS-TP-BRD-09
-version: "1.0"
-date: 25 September 2026
+version: "1.1"
+date: 08 October 2026
 status: Issued for BDOI review
 header_title: Test Plan BRD-9 Customer Servicing Facility
 h1_page_break: false
@@ -26,10 +26,17 @@ control:
     reviewer: iorta TechNXT Project Manager
     approver: BDOI Product Owner (pending)
     change: First issue for BDOI review, with the Excel workbook of the same version
+  - version: "1.1"
+    date: 08 Oct 2026
+    author: iorta TechNXT QA
+    reviewer: iorta TechNXT Business Analysis
+    approver: BDOI Product Owner (pending)
+    change: "Re-based on FRS BRD-9 v1.1 (Customer Servicing Facility_Case Management): cases of the Case Management FRs FR-CSF-050 to FR-CSF-061, scenarios SC-CSF-09 to SC-CSF-12, data sets TD-CSF-11 to TD-CSF-14 and the Fulfilment Unit persona added; BRD page references moved by 17 pages."
 distribution:
   - {name: "Product Owner, Customer Servicing Facility", role: Approver, organisation: BDOI, purpose: Review and sign-off}
   - {name: Alternative Distribution Head, role: Approver, organisation: BDOI, purpose: Review and sign-off}
   - {name: BDO Insure Contact Center Management, role: Business tester, organisation: BDOI, purpose: "Search, servicing view, contact changes, resends, reports"}
+  - {name: Fulfilment units named in the case lists of values, role: Business tester, organisation: BDOI, purpose: Case routing, resolution and return}
   - {name: Marketing Business Services and System Support (MBS), role: Business tester, organisation: BDOI, purpose: Status mapping and contact rules}
   - {name: Business Project Services, role: UAT coordinator, organisation: BDO Unibank ESG, purpose: UAT planning and traceability}
   - {name: Project team, role: Delivery, organisation: iorta TechNXT, purpose: "System test, issue resolution, UAT support"}
@@ -39,28 +46,29 @@ distribution:
 
 ## Purpose
 
-This document summarises the test plan for BRD-9 Customer Servicing Facility (CSF) in BIBS (BDOI Broker System, on iNXT BrokerVerse). It tells the BDO Insure Contact Center and the other BDOI departments what will be tested, how, with which data and by whom, and when testing is complete. The test conditions, scenarios and cases themselves are in the Excel workbook of the same version, `BIBS_TestPlan_BRD-09_Customer_Servicing_Facility_v1.0.xlsx`, which the testers use during execution.
+This document summarises the test plan for BRD-9 Customer Servicing Facility (CSF) in BIBS (BDOI Broker System, on iNXT BrokerVerse). It tells the BDO Insure Contact Center and the other BDOI departments what will be tested, how, with which data and by whom, and when testing is complete. The test conditions, scenarios and cases themselves are in the Excel workbook of the same version, `BIBS_TestPlan_BRD-09_Customer_Servicing_Facility_v1.1.xlsx`, which the testers use during execution.
 
-Every case traces to a functional requirement (FR) of FRS BRD-9 v1.0 and to the BRD requirement IDs (BRCSF-nnn, the process steps nnn.nnn, and the e-mail items CSF-EM07 and CSF-EM09) that the FR meets.
+Every case traces to a functional requirement (FR) of FRS BRD-9 v1.1 and to the BRD requirement IDs (BRCSF-nnn, the process steps nnn.nnn, the e-mail items CSF-EM07 and CSF-EM09, and the Case Management requirements BRCSFCM.001 to 012 with the case lists of values) that the FR meets.
 
 The cases are written from the FRS: the expected results quote the message texts of the FRS, and the screen paths and button labels are those of the FRS. They are checked against the screens before the system test starts.
 
 ## Scope
 
-In scope are all 17 FRs of FRS BRD-9 v1.0 and the BRD IDs they trace to:
+In scope are all 29 FRs of FRS BRD-9 v1.1 and the BRD IDs they trace to:
 
 - log-in and role-based access for agents, supervisors and management (FR-CSF-001, 002);
 - the Customer Search by name, client ID, account number, PN number and application number (FR-CSF-010);
 - the Servicing View with client information, accounts, CSF status and payment history (FR-CSF-011 to 013);
 - verification of the caller, contact-only update and the legacy sync outbox for QPS and EBIX (FR-CSF-020 to 022);
 - renewal advice and e-policy resend, document upload and retrieval (FR-CSF-030 to 033);
-- the audit trail, the CSF reports, the agent activity log and the 15-minute backup (FR-CSF-040 to 043).
+- the audit trail, the CSF reports, the agent activity log and the 15-minute backup (FR-CSF-040 to 043);
+- case management from the Case Management Addendum: case logging with Case ID and duplicate check, case type and turnaround time, lifecycle statuses, notes, attachments, case audit trail, reassignment and escalation, SLA ageing and notifications, closure and linked follow-up cases, the dashboard and case reports, fulfilment unit routing, resolution and return, and the case lists (FR-CSF-050 to 061).
 
 The roles-and-access sheet checks each CSF action against the roles that may and may not perform it (the matrix of FRS section 3.3).
 
 ## Out of scope
 
-- Case management and inquiry logging, deferred by the e-mail of 13-Feb-2026 (CSF-EM10).
+- The migration of the cases tracked in SharePoint (CSQ23). The case management cases run in the drop that BDOI and the Change Control Board decide for the module (FRS CLR-CSF-07).
 - Changes other than contact details (name, civil status, ID); the cases check only that BIBS refuses them and names the fulfilment unit.
 - The transport of contact changes to QPS and EBIX and the lookup of accounts that exist only there (CSQ01, CSQ02). The cases check the outbox with sync disabled; the sending cases run only when a test interface exists.
 - The production of renewal advices, e-policies and claims reports; they belong to BRD-6, BRD-8, BRD-1 and BRD-7. The CSF cases read and resend them.
@@ -71,10 +79,10 @@ The roles-and-access sheet checks each CSF action against the roles that may and
 <!-- table: widths=1.2,8.6,4.2 caption="Reference documents" -->
 | Ref. | Document | Version |
 |---|---|---|
-| R1 | Functional Requirements Specification BRD-9 Customer Servicing Facility (`BIBS_FRS_BRD-09_Customer_Servicing_Facility_v1.0.docx`) | 1.0, 25 Sep 2026 |
-| R2 | Customer Servicing Facility BRD and e-mail thread | BRD v1.0 09-Jun-2025; e-mail 13-Feb-2026 |
-| R3 | Test plan workbook BRD-9 (`BIBS_TestPlan_BRD-09_Customer_Servicing_Facility_v1.0.xlsx`) | 1.0 |
-| R5 | BRD discrepancy and clarification register (`BIBS_Register_BRD-00_Discrepancies_and_Clarifications_v1.0.xlsx`) | 1.0 |
+| R1 | Functional Requirements Specification BRD-9 Customer Servicing Facility (`BIBS_FRS_BRD-09_Customer_Servicing_Facility_v1.1.docx`) | 1.1, 08 Oct 2026 |
+| R2 | Customer Servicing Facility_Case Management: CSF Addendum - Case Management (p.1-17), CSF BRD (p.18-33) and e-mail thread (p.34-35) | Addendum v1.0 signed 31-Mar to 22-Apr-2026; BRD v1.0 09-Jun-2025; e-mail 13-Feb-2026 |
+| R3 | Test plan workbook BRD-9 (`BIBS_TestPlan_BRD-09_Customer_Servicing_Facility_v1.1.xlsx`) | 1.1 |
+| R5 | BRD discrepancy and clarification register (`BIBS_Register_BRD-00_Discrepancies_and_Clarifications_v1.2.xlsx`) | 1.2 |
 
 # Test approach
 
@@ -84,7 +92,7 @@ The roles-and-access sheet checks each CSF action against the roles that may and
 | Level | What is tested | Who | When |
 |---|---|---|---|
 | System test | Every case of the workbook, screen by screen, with the SIT data sets | iorta TechNXT QA | After the CSF is deployed on SIT |
-| Persona end-to-end | The eight scenarios from start to finish by the persona that owns each step, with e-mails checked in the test mailboxes | iorta TechNXT QA with the Contact Center testers | After the system test passes |
+| Persona end-to-end | The twelve scenarios from start to finish by the persona that owns each step, with e-mails checked in the test mailboxes | iorta TechNXT QA with the Contact Center testers | After the system test passes |
 | User acceptance test (UAT) | The scenarios and the High-priority cases, run by Contact Center testers on masked production-like data | BDO Insure Contact Center agents, supervisors and management | After the entry criteria of section 3 are met |
 
 
@@ -103,7 +111,7 @@ The roles-and-access sheet checks each CSF action against the roles that may and
 | Negative | Invalid data, a missing item or a broken rule is refused with its message |
 | Boundary | Values at, below and above a limit |
 | Security-access | Screens, buttons and system functions are open only to the roles that hold the permission |
-| Workflow | A contact change, a resend or an unlock that moves a record to its next state |
+| Workflow | A contact change, a resend, an unlock or a case action (submit, return, reassign, escalate, close) that moves a record to its next state |
 | Report-output | Reports and exports; content checked against the screen |
 | Upload-download | Documents uploaded to the client or an account and files downloaded or previewed |
 
@@ -120,7 +128,7 @@ The workbook has a README sheet that explains every column. The sheets are Docum
 |---|---|
 | System test | The CSF is deployed on SIT with its roles, parameters and lists; screen labels and messages have been compared with this plan and differences recorded; the data sets of section 4.2 are loaded; the test mailboxes receive mail. |
 | Persona end-to-end | All High-priority system test cases are run; no open Critical issue; renewal advices of at least one source module (or loaded RENEWAL_ADVICE documents) are available. |
-| UAT | FRS BRD-9 v1.0 is signed off or its open comments are agreed; the answers to CSQ03, CSQ04 and CSQ10 are applied as configuration; the system test exit criteria are met; the UAT environment holds masked data (section 4.1); Contact Center testers have user IDs with the roles of section 5 and attended the walkthrough of the CSF screens. |
+| UAT | FRS BRD-9 v1.1 is signed off or its open comments are agreed; the answers to CSQ03, CSQ04, CSQ10 and, for case management, CSQ17 to CSQ21 are applied as configuration; the case lists and the routing table are loaded; the system test exit criteria are met; the UAT environment holds masked data (section 4.1); Contact Center testers have user IDs with the roles of section 5 and attended the walkthrough of the CSF screens. |
 
 ## Exit criteria
 
@@ -128,7 +136,7 @@ The workbook has a README sheet that explains every column. The sheets are Docum
 | Level | Criteria |
 |---|---|
 | System test | 100 % of cases run (the legacy sync cases may be Blocked until CSQ01 is answered); 100 % of High-priority cases passed; no open Critical or High issue; open Medium and Low issues have an agreed fix date. |
-| Persona end-to-end | All eight scenarios passed end to end with the expected e-mails and activity log rows. |
+| Persona end-to-end | All twelve scenarios passed end to end with the expected e-mails, notifications and activity log rows. |
 | UAT | All scenarios and High-priority cases passed or accepted by the BDOI process owner; no open Critical or High issue; open issues listed with an agreed plan in the UAT sign-off; the sign-off of section 9 is signed. |
 
 **Suspension.** Testing of a scenario stops when a Critical issue blocks it, when the environment is down for more than half a day, or when the test data is corrupted. It resumes after the fix is deployed and the blocked cases are re-run from their first step.
@@ -162,11 +170,11 @@ Some cases change the state of a test client (for example the contact changes on
 | System testers | iorta TechNXT QA | Run the system test and the persona end-to-end scenarios; raise issues with evidence |
 | Developers | iorta TechNXT | Resolve issues; support triage |
 | Infrastructure team | BDO Unibank ITIO with iorta TechNXT | Run the backup and restore cases of FR-CSF-043 and provide the restore log |
-| BDOI department testers | BDO Insure Contact Center (agents, supervisors, management) | Run the UAT scenarios; confirm the expected results match the way they serve clients; raise issues |
+| BDOI department testers | BDO Insure Contact Center (agents, supervisors, management) and members of the fulfilment units | Run the UAT scenarios; confirm the expected results match the way they serve clients; raise issues |
 | BDOI process owner | Product Owner, Customer Servicing Facility | Decides on disputed expected results and accepted issues; signs off UAT |
 | UAT coordinator | Business Project Services, BDO Unibank ESG | Plans the UAT sessions; checks traceability to the BRD |
 
-Agents run the search, servicing, verification, resend and upload scenarios (SC-CSF-02 to 06); supervisors run the resends to another address and the activity report; management runs the audit and report scenario (SC-CSF-07). The personas are:
+Agents run the search, servicing, verification, resend and upload scenarios (SC-CSF-02 to 06); supervisors run the resends to another address and the activity report; management runs the audit and report scenario (SC-CSF-07). For case management, agents log and close cases (SC-CSF-09), fulfilment unit members resolve and return them (SC-CSF-10), supervisors reassign, escalate and follow the SLA (SC-CSF-11) and management follows the dashboard and reports (SC-CSF-12). The personas are:
 
 <!-- tp:personas -->
 
@@ -227,6 +235,8 @@ The table shows the actions checked per role. Each Y and N is one row of the Rol
 | Test mailboxes not reachable from SIT or UAT | High | Check the relay before the cycle (entry criterion); resend cases read the outbox when the mailbox is down and are re-run later |
 | Time-based cases (verification validity, payment window, failed verifications per day) need the clock to pass | Medium | The test lead sets verification and receipt times in the test environment, as the preconditions describe |
 | The restore test needs an infrastructure environment | Medium | The infrastructure team runs FR-CSF-043 on its restore environment and hands the log to QA |
+| Turnaround times, ageing and the SLA check need working days to pass (FR-CSF-051, 057) | Medium | The test lead logs the cases of TD-CSF-13 with creation dates set in the test environment and runs the SLA check on request |
+| BDOI answers on case statuses, turnaround times and routing (CSQ17 to CSQ20) change expected results | Medium | Status labels, turnaround times, thresholds and the routing table are lists and parameters; the affected cases are re-run after the change |
 | Contact Center testers are not available in the UAT window (24 agents share the hotline) | High | Agree named testers and dates outside the peak hours 10:00-12:00 and 14:00-16:00 in the UAT plan (deliverable 30) |
 
 <!-- pagebreak -->

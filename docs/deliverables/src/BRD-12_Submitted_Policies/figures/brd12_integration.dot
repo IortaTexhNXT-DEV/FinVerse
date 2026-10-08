@@ -6,7 +6,7 @@ digraph sp_integration {
   edge  [color="@MUTED", arrowsize=0.7, fontname="Arial", fontsize=11, fontcolor="@TEXT"];
 
   src    [label="Bank sources (upload)\nLFS, HLS, CIU, SPI,\nLoan Booking, IA masterlist"];
-  lamd   [label="LAMD loan snapshot\n(upload)"];
+  lamd   [label="Loan files LAMD, LMS, LAD\n(upload or pick-up)"];
   docs   [label="Policy documents\n(extraction; OCR on hold)"];
   legacy [label="Excel masterlists\n(migration)"];
 

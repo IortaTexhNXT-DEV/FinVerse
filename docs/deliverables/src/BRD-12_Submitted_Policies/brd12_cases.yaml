@@ -10,8 +10,8 @@ meta:
   code: SP
   frs: FRS_BRD12_SUBMITTED_POLICIES.md
   summary: TP_BRD12_SUBMITTED_POLICIES.md
-  version: "1.0"
-  date: 25 September 2026
+  version: "1.1"
+  date: 08 October 2026
   verify_messages: false
 
 personas:
@@ -48,6 +48,9 @@ screens:
   LETTERS: Submitted Policies > Letters & Print Batches
   HF: Submitted Policies > Handling Fees
   SETUP: Submitted Policies > Submitted Policies Setup
+  PROPOSALS: Submitted Policies > Renewal Work List > Create Proposals
+  BATCH: Submitted Policies > Proposal Batch page
+  UNMATCHED: Submitted Policies > Masterlist > Unmatched tab
   APPROVALS: My Approvals
   REPORTS: Reports > Report Centre (category Submitted Policies)
   PLACEMENT: Placement & Booking > Placement (BRD-1 screens)
@@ -68,7 +71,7 @@ data:
     source: Seed data; firehandler and ao2 created by the test lead with their user scope
   - id: TD-SP-02
     name: Source files
-    content: LFS insurance report of 300 CBG Motor rows; the same file again; an LFS file with 5 rows without PN; an LFS file with one row that updates an existing policy (new premium); a CSV without header row; a PDF file.
+    content: LFS insurance report of 300 CBG Motor rows; the same file again; the same report saved as ODS; an LFS file with 5 rows without PN; an LFS file with one row that updates an existing policy (new premium); a CSV without header row; a PDF policy document; an .exe file.
     source: Prepared by the test lead from the upload template of the LFS source; masked data
   - id: TD-SP-03
     name: Policy documents
@@ -79,8 +82,8 @@ data:
     content: NB Motor legacy Excel file of 1,000 rows, of which 12 are invalid (status not in the map, blank PN, blank expiry).
     source: Masked extract of a BDOI masterlist prepared by the test lead
   - id: TD-SP-05
-    name: LAMD snapshot
-    content: PN rows with active non-amortised loans (FFY and generic), fully paid loans, RMU (remedial) and open-market loans; one row without PN.
+    name: Loan files
+    content: LAMD file with PN rows of active non-amortised loans (FFY and generic), fully paid loans, RMU (remedial) and open-market loans and one row without PN or application number; LMS file whose rows carry only the loan application number, one of them for a loan without any policy in the masterlist; the LAMD file loaded a second time.
     source: Seed data; masked rows added by the test lead
   - id: TD-SP-06
     name: Rules and masters
@@ -102,11 +105,23 @@ data:
     name: Parameters and jobs at their defaults
     content: "SBM_RENEWAL_LEAD_DAYS CBG_FIRE=150, CBG_MOTOR=120; SBM_MASTERLIST_DAYS_FROM_EXTRACTION 30; SBM_INSURER_ACCEPT_DAYS 5; SBM_HOLD_COVER_UNBOOKED_ALERT_DAYS 5; jobs SBM_PROCESSING 21:30, SBM_EXPIRY_SCAN 22:00, SBM_LETTER_DISPATCH 06:30, SBM_HOLD_COVER_WATCH 07:00 PHT, SBM_HANDLING_FEE_TAGGER every 30 minutes."
     source: Configuration of the SIT environment (FRS section 9.1)
+  - id: TD-SP-11
+    name: Nominated rates and proposal candidates
+    content: Approved nominated rate table for CBG Motor packages by vehicle classification (Private Car, Light Commercial) and insurer (INS-A, INS-B); 20 For Renewal CBG Motor records, 12 Private Car and 8 Light Commercial, assigned to INS-A by the insurer rules; one record of a vehicle classification without a nominated rate; accredited insurers INS-A and INS-B for Motor, INS-C not accredited for Motor.
+    source: Keyed in Submitted Policies Setup by the rule administrator and approved by mkttl; records from the seed data
+  - id: TD-SP-12
+    name: Monthly report data
+    content: Masterlist accounts expiring in March of the test year; active LAMD and LMS loans at the end of March, one without any policy, one whose policy expired in February and one whose policy runs to June.
+    source: Prepared by the test lead from the masked seed data and the loan files of TD-SP-05
+  - id: TD-SP-13
+    name: Notification recipients and IAAF regions
+    content: Recipient set-up of SBM_TOR_RELEASED for CBG Fire with the named user firehandler; referring branch of the review record in region NCR.
+    source: Keyed in Submitted Policies Setup by the rule administrator
 
 scenarios:
   - id: SC-SP-01
     persona: SBM_HANDLER
-    title: Intake. Handlers upload source files, confirm extracted policy details, create records by hand and migrate the Excel masterlists.
+    title: Intake. Handlers upload source files (Excel, CSV, ODS, PDF), create records by hand and migrate the Excel masterlists; extracted policy details are confirmed in Release 2.
     pre: Files TD-SP-02, documents TD-SP-03, legacy file TD-SP-04.
   - id: SC-SP-02
     persona: SBM_HANDLER
@@ -115,11 +130,11 @@ scenarios:
   - id: SC-SP-03
     persona: SBM_SANITATION
     title: Rules and processing. Rule sets are approved by a checker; processing runs after intake, on schedule and on demand; fallout is reported and resolved.
-    pre: Rules TD-SP-06; LAMD TD-SP-05.
+    pre: Rules TD-SP-06; loan files TD-SP-05.
   - id: SC-SP-04
     persona: SYSTEM
-    title: Classification and buckets. Policies are classified Inforced or Submitted, bucketed, excluded or made ready for renewal with the RA template.
-    pre: Records TD-SP-07; LAMD TD-SP-05; rules TD-SP-06.
+    title: Loan files and classification. Loan files (LAMD, LMS) are matched to the policies automatically; policies are classified Inforced or Submitted, bucketed, excluded or made ready for renewal with the RA template.
+    pre: Records TD-SP-07; loan files TD-SP-05; rules TD-SP-06.
   - id: SC-SP-05
     persona: SBM_POLICY_REVIEWER
     title: Policy review and IAAF. The reviewer records reviews, generates one IAAF per policy and routes it through the approval matrix to the bank counterpart.
@@ -130,8 +145,8 @@ scenarios:
     pre: Flagged record TD-SP-08; TSU matrix TD-SP-06.
   - id: SC-SP-07
     persona: SBM_SANITATION
-    title: Renewal. Expiring policies are handed to Renewal with the assigned insurer; letters are sent; the insurer is re-assigned while a hold cover is open; placement and booking update the masterlist.
-    pre: Renewal candidates TD-SP-09; parameters TD-SP-10.
+    title: Proposals and renewal. Proposals are created one by one or in batches with nominated rates and a preferred insurer; expiring policies are handed to Renewal; letters are sent; the insurer is re-assigned while a hold cover is open; placement and booking update the masterlist.
+    pre: Renewal candidates TD-SP-09; parameters TD-SP-10; nominated rates TD-SP-11.
   - id: SC-SP-08
     persona: SBM_UPP_HANDLER
     title: Handling fee. Handling-fee payments are tagged in the Unapplied Payment List and applied by Cashiering.
@@ -151,8 +166,9 @@ frs:
       - An LFS report of 300 rows creates 300 CBG Motor records with status RECEIVED, numbered SBM-yyyy-nnnnnn, and an intake run SBI-yyyy-nnnnnn.
       - Loading the same file a second time is refused and names the earlier run.
       - A row updating an existing policy changes the record and writes the history.
-      - Invalid rows are listed with the reason and valid rows are committed; a file of a wrong type or without header row is refused.
+      - Invalid rows are listed with the reason and valid rows are committed; a file of a type not allowed or without header row is refused.
       - The handlers of the segment are notified of new records.
+      - An ODS file is accepted like Excel; a PDF policy document is attached to its record for manual entry.
     cases:
       - c: 1
         type: Upload-download
@@ -191,11 +207,18 @@ frs:
         msg: [The file has no header row]
       - c: 4
         type: Negative
-        title: PDF uploaded as a source file
+        title: Executable file refused
         steps:
-          - Upload the PDF.
+          - Upload the .exe file.
         expected: Refused.
         msg: [The file type is not allowed]
+      - c: 6
+        type: Upload-download
+        title: ODS report and PDF policy document
+        steps:
+          - Upload the LFS report saved as ODS; confirm.
+          - Upload the PDF policy document for an existing CBG Fire record.
+        expected: The ODS rows are committed like the Excel file; the PDF is attached to the record (Documents) and the record is listed for manual entry.
       - c: 5
         type: Positive
         screen: NOTIF
@@ -217,33 +240,33 @@ frs:
     cases:
       - c: 1
         type: Upload-download
-        title: Extract and confirm a motor policy
+        title: Release 2 - Extract and confirm a motor policy
         steps:
           - Upload the text PDF as a new record; check each proposed value and its confidence; correct the plate number; Confirm.
         expected: The record shows the confirmed values, including the corrected plate, and status VALIDATED.
       - c: 2
         type: Negative
         screen: ML
-        title: Masterlist unchanged before confirmation
+        title: Release 2 - Masterlist unchanged before confirmation
         steps:
           - Upload the PDF; before confirming, search the masterlist for its policy number.
         expected: No record with the proposed values; handlers receive the manual-validation notice.
       - c: 3
         type: Negative
-        title: Scanned document without text
+        title: Release 2 - Scanned document without text
         steps:
           - Upload the scanned PDF.
         expected: Extraction returns "not readable"; the user is sent to manual entry.
       - c: 3
         type: Negative
-        title: Reject without a reason
+        title: Release 2 - Reject without a reason
         steps:
           - Open a proposal; Reject without a reason.
         expected: Not rejected.
         msg: [Enter the reason of the rejection]
       - c: 4
         type: Negative
-        title: Confirm with the expiry blank
+        title: Release 2 - Confirm with the expiry blank
         steps:
           - Clear the expiry date; Confirm.
         expected: Not confirmed.
@@ -259,6 +282,7 @@ frs:
       - A record tagged Non-Renewable shows the chip and appears in the Non-Renewal filter and report; the tag needs a reason.
       - A later processing run does not change a manual tag.
       - Mandatory fields per segment are required and a policy already in the masterlist is refused.
+      - The manual renewal tag is offered only for the defined segments (Non-CBG Corporate).
     cases:
       - c: 1
         type: Positive
@@ -304,6 +328,22 @@ frs:
           - New Policy with the policy number of an existing record; save.
         expected: Refused.
         msg: ["Policy {PC-12345} is already in the masterlist ({SBM-2026-000031})"]
+      - c: 5
+        type: Negative
+        persona: SBM_HANDLER
+        screen: REC
+        title: No manual renewal tag on a CBG Motor record
+        steps:
+          - Open a CBG Motor record; look for Tag Renewable and Tag Non-Renewable; send a tag request for the record signed in as sbmhandler.
+        expected: The tag actions are not shown; the request is refused.
+        msg: ["The renewal tag is not used for segment {CBG Motor}"]
+      - c: 5
+        type: Positive
+        screen: REC
+        title: Manual renewal tag on a Non-CBG Corporate record
+        steps:
+          - Open the Non-CBG Corporate record of TC-SP-003.1-01; Tag Renewable; save.
+        expected: The Renewable chip shows and the tag is available in the filters and reports.
 
   FR-SP-004:
     scenario: SC-SP-01
@@ -360,6 +400,7 @@ frs:
       - After a record is updated by an upload, the masterlist shows the new values at once.
       - Filters by segment, business type, bucket, expiry month, insurer, handler, conversion status and Migrated return only the matching records.
       - The policy record shows the summary card with flag chips and the tabs; every change writes the history and the audit trail.
+      - Each market segment can be extracted on its own with only its records.
     cases:
       - c: 1
         type: Positive
@@ -386,6 +427,13 @@ frs:
         steps:
           - Open a record; change the remarks; open History and Administration > Audit Trail.
         expected: The summary card shows the chips; the tabs Details to History are present; the remarks change is in the history and the audit trail.
+      - c: 4
+        type: Report-output
+        persona: SBM_TL
+        title: Extract per market segment
+        steps:
+          - Filter the masterlist on CBG Fire; Export as Excel.
+        expected: The file holds only the CBG Fire records, with the masterlist columns of the Report List.
 
   FR-SP-011:
     scenario: SC-SP-02
@@ -581,7 +629,7 @@ frs:
     conditions:
       - A run with five records without PN produces a fallout list and report with the five records and their reason code, and raises the fallout alert.
       - A corrected record leaves the fallout after the next run.
-      - Intake and extraction failures are listed in the document fallout report.
+      - Intake failures are listed in the process fallout report with the masterlist columns and their reason.
     cases:
       - c: 1
         type: Negative
@@ -599,10 +647,10 @@ frs:
       - c: 3
         type: Report-output
         screen: REPORTS
-        title: Document fallout report
+        title: Intake failures in the fallout report
         steps:
-          - Run SBM-DOC-FALLOUT for today.
-        expected: The unreadable scanned PDF and the invalid intake rows are listed with their reasons.
+          - Run SBM-PROCESS-FALLOUT for today.
+        expected: The invalid intake rows are listed with the masterlist columns of the Report List and their reasons.
 
   FR-SP-030:
     scenario: SC-SP-04
@@ -610,8 +658,8 @@ frs:
     screen: LOAN
     data: [TD-SP-05]
     conditions:
-      - A record whose PN matches an active LAMD loan is Submitted.
-      - A record whose PN is not in LAMD is Inforced.
+      - A record whose PN matches an active loan of the loan files (LAMD or LMS) is Submitted.
+      - A record whose PN is in none of the loan files is Inforced.
     cases:
       - c: 1
         type: Positive
@@ -621,9 +669,9 @@ frs:
         expected: Classification SUBMITTED with the matched loan.
       - c: 2
         type: Negative
-        title: PN not in LAMD
+        title: PN in none of the loan files
         steps:
-          - Open a record whose PN is not in the snapshot.
+          - Open a record whose PN is in neither the LAMD nor the LMS file.
         expected: Classification INFORCED; no loan matched.
 
   FR-SP-031:
@@ -675,14 +723,14 @@ frs:
     data: [TD-SP-05]
     conditions:
       - An FFY account with an active non-amortised loan gets the FFY RA template; a generic account gets the Generic RA template.
-      - A snapshot row without PN is refused.
+      - A loan file row without PN and loan application number is refused.
     cases:
       - c: 1
         type: Positive
         screen: LOAN
         title: FFY RA template
         steps:
-          - Upload the LAMD snapshot; run processing; open the FFY record.
+          - Upload the LAMD loan file; run processing; open the FFY record.
         expected: RA template FFY on the record.
       - c: 1
         type: Positive
@@ -693,11 +741,11 @@ frs:
         expected: RA template Generic.
       - c: 2
         type: Negative
-        title: Snapshot row without PN
+        title: Loan file row without PN
         steps:
-          - Upload the snapshot; read the row errors.
+          - Upload the LAMD loan file; read the row errors.
         expected: The row is refused.
-        msg: ["Row {9}: PN is required"]
+        msg: ["Row {9}: PN number or loan application number is required"]
 
   FR-SP-033:
     scenario: SC-SP-04
@@ -764,6 +812,53 @@ frs:
           - Run the expiry scan.
         expected: No hand-off.
 
+  FR-SP-035:
+    scenario: SC-SP-04
+    persona: SBM_SANITATION
+    screen: INTAKE
+    data: [TD-SP-05]
+    conditions:
+      - A loan file is received and processed to the end without any user action after the upload.
+      - LMS rows that carry only the loan application number are matched to the policies with that number and the matched accounts are categorised.
+      - A loan record without a matching policy is flagged Unmatched with its reason and listed for review.
+      - Every processed record is logged with file source, time stamp, key used, matching outcome and category; the same file cannot be loaded twice.
+    cases:
+      - c: 1
+        type: Upload-download
+        title: LAMD file processed without manual steps
+        steps:
+          - Choose loan report LAMD; upload the LAMD file; confirm.
+          - Open Processing Runs after the run ends.
+        expected: The run ends without any further action; matched, unmatched and failed counts are shown and the matched records carry their bucket.
+      - c: 2
+        type: Positive
+        screen: LOAN
+        title: Matching on the loan application number
+        steps:
+          - Upload the LMS file; open the Loan & Matching tab of a record whose application number is in the file.
+        expected: The record is matched on the key Loan application number to the LMS loan and is classified Submitted with its bucket.
+      - c: 3
+        type: Negative
+        screen: UNMATCHED
+        title: Loan without a policy flagged Unmatched
+        steps:
+          - Open the Unmatched tab after the LMS run.
+        expected: The LMS loan without a policy is listed as Unmatched with the reason No matching policy; the Sanitation Handlers are notified.
+      - c: 4
+        type: Positive
+        screen: RUNS
+        title: Processing log of a record
+        steps:
+          - Open the run; open the log of one matched and one unmatched record.
+        expected: Each log row shows the file source, file name, time stamp, key used, matching outcome and category.
+      - c: 4
+        type: Negative
+        title: Same loan file twice
+        steps:
+          - Upload the LAMD file a second time.
+        expected: Refused; no record changes.
+        msg: ["This file was already loaded in run {SBI-2026-000007}"]
+
   FR-SP-040:
     scenario: SC-SP-05
     persona: SBM_POLICY_REVIEWER
@@ -774,6 +869,7 @@ frs:
       - A second IAAF for the same policy is refused.
       - An IAAF linked to the previous term's record shows the link.
       - The adequacy is required, and an IAAF cannot be generated while the last review has findings.
+      - The IAAF reference follows Region Code-Year-Counter with the region of the referring branch.
     cases:
       - c: 1
         type: Workflow
@@ -781,7 +877,7 @@ frs:
         steps:
           - Record review 1 With findings; send the findings to the bank counterpart.
           - Record review 2 Adequate; Generate IAAF.
-        expected: The findings e-mail reaches the test mailbox. The IAAF (IAAF-yyyy-nnnnnn) shows two reviews and a review count of 2.
+        expected: The findings e-mail reaches the test mailbox. The IAAF shows two reviews and a review count of 2.
       - c: 2
         type: Negative
         title: Second IAAF
@@ -810,6 +906,13 @@ frs:
           - Record a review With findings; Generate IAAF.
         expected: Refused.
         msg: [The last review has findings; record an adequate review first]
+      - c: 5
+        type: Positive
+        data: [TD-SP-08, TD-SP-13]
+        title: IAAF number by region
+        steps:
+          - Generate the IAAF of a record referred by a branch of region NCR; generate a second IAAF for another NCR record.
+        expected: The references are NCR-<year>-<counter> with consecutive counters.
 
   FR-SP-041:
     scenario: SC-SP-05
@@ -1051,7 +1154,7 @@ frs:
         type: Report-output
         title: Export and assign AO
         steps:
-          - Assign ao to three records; export SBM-RENEWABLE.
+          - Assign ao to three records; export the Renewal Status Report of SBM-CONVERSION.
         expected: The file matches the screen; ao is notified.
       - c: 3
         type: Security-access
@@ -1200,6 +1303,103 @@ frs:
           - Decline the renewal in the Renewal module; open the record.
         expected: NOT_RENEWED with the reason.
 
+  FR-SP-066:
+    scenario: SC-SP-07
+    persona: SBM_SANITATION
+    screen: PROPOSALS
+    data: [TD-SP-11]
+    conditions:
+      - A batch creates one proposal per selected record with the nominated rate of its vehicle classification and insurer.
+      - A rate edited for a vehicle classification and insurer changes only the proposals of those records, and needs a reason.
+      - A record without a nominated rate is listed with its reason and is not generated until a rate is entered.
+      - Generated proposals are For Review and become available to the hand-off after the Team Lead releases them; the maker cannot release them.
+    cases:
+      - c: 1
+        type: Positive
+        title: Batch of 20 proposals with nominated rates
+        steps:
+          - Open the Renewal Work List; select the 20 CBG Motor records; Create Proposals; package Motor Own Damage and Theft; Generate.
+        expected: One batch SBP-yyyy-nnnnnn with 20 proposals; each shows the nominated rate of its vehicle classification and of INS-A and the premium.
+      - c: 1
+        type: Positive
+        title: Individual proposal
+        steps:
+          - Select one record; Create Proposals; Generate.
+        expected: One proposal with the nominated rate of the record.
+      - c: 2
+        type: Workflow
+        title: Edit the rate of Private Car for INS-A
+        steps:
+          - In Create Proposals choose Apply rate to Vehicle classification and insurer; Private Car; INS-A; enter the new rate and the reason; apply; Generate.
+        expected: Only the 12 Private Car proposals carry the edited rate and new premium; the 8 Light Commercial proposals keep the nominated rate; the edit is logged with the old and new rate and the reason.
+      - c: 2
+        type: Negative
+        title: Edited rate without reason
+        steps:
+          - Edit the rate of one record; leave the reason blank; apply.
+        expected: The rate is not applied.
+        msg: [Enter the reason for changing the nominated rate]
+      - c: 3
+        type: Negative
+        title: Record without nominated rate
+        steps:
+          - Add the record of the vehicle classification without a nominated rate; Generate.
+        expected: The record is listed with the reason No nominated rate and is not generated.
+        msg: ["Policy {SBM-2026-000052} has no nominated rate. Enter the rate or remove the policy"]
+      - c: 4
+        type: Workflow
+        persona: SBM_TL
+        screen: BATCH
+        title: Team Lead releases the batch
+        steps:
+          - As sbmtl open the batch from the notice; Release.
+        expected: The proposals are Released and shown on the Renewal tab of their records for the hand-off.
+      - c: 4
+        type: Negative
+        persona: SBM_TL
+        screen: BATCH
+        title: Maker cannot release
+        steps:
+          - As sbmtl create a batch and try to release it.
+        expected: Not released.
+        msg: [A proposal is released by someone other than its maker]
+
+  FR-SP-067:
+    scenario: SC-SP-07
+    persona: SBM_SANITATION
+    screen: BATCH
+    data: [TD-SP-11]
+    conditions:
+      - Assigning an insurer to selected proposals of a batch sets it on all of them and recomputes their nominated rates.
+      - A single proposal can be assigned to an insurer different from the batch.
+      - Only accredited insurers of the line are offered and a released proposal is not re-assigned.
+    cases:
+      - c: 1
+        type: Positive
+        title: Assign INS-B to 15 proposals
+        steps:
+          - Select 15 proposals of the batch; Assign Insurer; INS-B; confirm.
+        expected: The 15 proposals show INS-B and the nominated rates of INS-B; the history shows the default INS-A and the chosen INS-B.
+      - c: 2
+        type: Positive
+        title: Single proposal to another insurer
+        steps:
+          - Select one other proposal; Assign Insurer; INS-B.
+        expected: Only that proposal changes.
+      - c: 3
+        type: Negative
+        title: Insurer not accredited for Motor
+        steps:
+          - Open the insurer list of Assign Insurer.
+        expected: INS-C is not offered.
+      - c: 3
+        type: Negative
+        title: Released proposal
+        steps:
+          - Select a released proposal; Assign Insurer.
+        expected: Refused.
+        msg: ["Proposal {SBP-2026-000001-01} is released. Ask the Team Lead to return it first"]
+
   FR-SP-070:
     scenario: SC-SP-08
     persona: SBM_UPP_HANDLER
@@ -1245,7 +1445,7 @@ frs:
     screen: REPORTS
     data: [TD-SP-07]
     conditions:
-      - The Sanitation Report of a month shows the counts per the grouping of Report List row 156.
+      - The Sanitation Report of a month lists one row per invoice with the columns of the Report List; the Conversion report offers its four parts for a covered period and as of a date.
       - The process fallout report of a run lists every fallout record with its reason code; each home tile opens its filtered list.
       - A date range with the end before the start is refused; reports follow the user's scope.
     cases:
@@ -1254,7 +1454,13 @@ frs:
         title: Sanitation Report
         steps:
           - Run SBM-SANITATION for the month.
-        expected: Counts under Expiring accounts, For renewal, Not for renewal and Other with the lines of row 156.
+        expected: One row per invoice with EBIX invoice number, QPS and BDOI system references, cover number and version, branch, department, unit head, AO, client, CIF, insured, PN, mortgagee, insurer, policy number, inception and expiry dates.
+      - c: 1
+        type: Report-output
+        title: Conversion report in four parts
+        steps:
+          - Run SBM-CONVERSION for last month, then as of today.
+        expected: The Renewal Status, Monthly Status, Account Classification and Persistency and Conversion parts, with the statuses Renewed, Unrenewed, Process Placement by group, For Issuance of SFU Letter, For Issuance of NAL Letter and Accounts for Review.
       - c: 2
         type: Report-output
         screen: HOME
@@ -1310,6 +1516,7 @@ frs:
       - The approvers of level 1 are notified when an IAAF is submitted.
       - A confirmed hold cover whose account is not booked 5 days before it ends raises the unbooked alert; one booked is not alerted.
       - Users follow their in-app and e-mail preferences per event type.
+      - The recipients defined for an event type receive its notices.
     cases:
       - c: 1
         type: Positive
@@ -1338,6 +1545,46 @@ frs:
         steps:
           - Set the preference for new submissions to e-mail; upload a file.
         expected: The notice arrives by e-mail.
+      - c: 4
+        type: Positive
+        persona: SBM_RULE_ADMIN
+        screen: SETUP
+        data: [TD-SP-13]
+        title: Named recipient of the TOR hand-over
+        steps:
+          - Add firehandler as recipient of SBM_TOR_RELEASED for CBG Fire; save and have it approved.
+          - TSU approves the TOR of a CBG Fire record; firehandler opens the bell.
+        expected: firehandler receives the TOR hand-over notice in addition to the assigned AO.
+
+  FR-SP-083:
+    scenario: SC-SP-09
+    persona: SBM_SANITATION
+    screen: REPORTS
+    data: [TD-SP-12]
+    conditions:
+      - Part 1 lists every account in scope whose policy expires in the reporting month.
+      - Part 2 lists the active loans without a policy in force on the last day of the month; a loan whose policy runs beyond the month is not listed.
+      - The reporting month is required.
+    cases:
+      - c: 1
+        type: Report-output
+        title: Expiring accounts of March
+        steps:
+          - Run SBM-EXPIRING-UNINSURED for March, all segments in scope; export to Excel.
+        expected: Part 1 lists every masterlist account expiring in March in scope; the file holds the same rows.
+      - c: 2
+        type: Report-output
+        title: Active loans without an active policy
+        steps:
+          - Read part 2 of the same run.
+        expected: The LMS loan without any policy and the loan whose policy expired in February are listed with PN number and loan application number; the loan whose policy runs to June is not listed.
+      - c: 3
+        type: Negative
+        title: Reporting month blank
+        steps:
+          - Run the report without a reporting month.
+        expected: Not run.
+        msg: [Select the reporting month]
 
 access:
   - action: View the masterlist and records
@@ -1352,7 +1599,7 @@ access:
     allow: [SBM_HANDLER, SBM_SANITATION, SBM_TL, SBM_POLICY_REVIEWER, MKT_AO]
     deny: [SBM_CHECKER, MKT_TL, PROCESSOR]
     denied: New Policy, Edit and the tag actions are not shown; the request is refused.
-  - action: Upload sources and LAMD snapshots
+  - action: Upload sources and loan files
     screen: INTAKE
     permission: SBM_INTAKE
     allow: [SBM_HANDLER, SBM_SANITATION, SBM_TL]
@@ -1430,3 +1677,9 @@ access:
     allow: [SBM_HANDLER, SBM_CHECKER, SBM_SANITATION, SBM_TL, SBM_POLICY_REVIEWER]
     deny: [SBM_UPP_HANDLER, MKT_AO, TSU]
     denied: The Submitted Policies category is not listed; a direct run request is refused.
+  - action: Create proposals, edit nominated rates, assign the insurer
+    screen: PROPOSALS
+    permission: SBM_PROPOSAL
+    allow: [SBM_SANITATION, SBM_TL, MKT_AO]
+    deny: [SBM_HANDLER, SBM_CHECKER]
+    denied: Create Proposals is not shown; the request is refused.

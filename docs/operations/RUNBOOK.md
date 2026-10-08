@@ -131,3 +131,47 @@ apply, for example, V27 on a database already at V975. `flyway_schema_history` r
   not).
 - Rotating the JWT key signs every user out once (access tokens are refused; the refresh cookies still
   renew them, so users continue working after one renewal).
+
+## 9. Promote configuration between environments
+
+Configuration (masters, configuration, rules and validations, never transactions) moves from one environment to the
+next as a signed package: development → SIT → UAT → production. Guide:
+[`CONFIG_PROMOTION.md`](../modules/CONFIG_PROMOTION.md).
+
+Before the first promotion:
+
+- Set the same `BROKERVERSE_CONFIG_PROMOTION_SIGNING_KEY` (from the secret store) in every environment of the path;
+  Environment Overrides shows the key identifier, which must be the same on both sides.
+- In production, set the change window `CONFIG_PROMOTION_PRODUCTION_WINDOW` on System Parameters and give the
+  Configuration Release Approver profile to the approvers (never to the System Administrators: rule SOD-CFG-01).
+- Source and target run the same release (the import refuses datasets whose fields differ).
+
+Each promotion:
+
+1. **Source** - System Administration › Configuration Promotion › Export Configuration: keep the default selection
+   (or the datasets of the change, or only the datasets changed since a baseline), give the purpose, export and
+   download the package. Users are included only when asked.
+2. **Target** - Import Configuration › Upload a Package with the change request number and the reason (mandatory in
+   production). Read the findings: blockers must be solved first (a missing reference, an item in use that would be
+   deactivated); warnings are read and accepted. Open each dataset to see the differences field by field; clear
+   Import to leave a dataset out, tick Deactivate for the items only in the target that must go, Check Again.
+3. **Submit** for approval. The Configuration Release Approver opens the import (notification or My Approvals),
+   reviews the same differences and approves, which applies it - only inside the change window in production, and
+   not while a period close or a batch job runs (`CONFIG_IMPORT_JOB_RUNNING`: try again after the run).
+4. **Check** the reconciliation of each dataset (all Matched) and the audit trail. Mark a baseline after an accepted
+   promotion (Baselines and Drift) so the next package can be incremental and drift is visible.
+
+When something goes wrong:
+
+| Symptom | Action |
+|---|---|
+| `CONFIG_PACKAGE_INVALID` (signature or checksum) | The package was changed or signed with another key: export again; check that both environments have the same key identifier |
+| Finding "has other fields here than in the source environment" (import not compatible) | Source and target run different releases: promote after the release reaches the target |
+| `CONFIG_OUTSIDE_CHANGE_WINDOW` | Production only: approve inside the change window set in `CONFIG_PROMOTION_PRODUCTION_WINDOW` |
+| Import Failed | Nothing of it was kept (one transaction). Read the message, correct the cause in the source or the target, Check Again |
+| Wrong configuration applied | Import Configuration › the applied import › Roll Back: prepares an import of the snapshot taken before the apply, approved like any import |
+| Drift found in production | Baselines and Drift › the dataset: shows what changed since the baseline; promote the change through the path or correct it on its screen |
+
+A deployment pipeline uses the same API with a service user (`CONFIG_IMPORT_PREPARE`): it uploads with
+`pipeline=true`, reads the findings and submits; outside production, when `CONFIG_PROMOTION_PIPELINE_APPLY` is true,
+it may apply its own clean dry run (`apply=true`).

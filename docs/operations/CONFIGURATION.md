@@ -16,6 +16,7 @@ are for local development only.
 | `BROKERVERSE_DB_RUNTIME_ROLE` | no | `brokerverse_runtime` | Flyway placeholder `runtime_role`: the group role that migration V1190 grants row access to (SELECT, INSERT, UPDATE, DELETE, sequences; no DDL, no TRUNCATE, no triggers, read-only migration history), also for the tables of later migrations (default privileges). V1190 creates it (`NOLOGIN`) when the schema owner may create roles; otherwise the DBA creates it first. Set it before the first start; changing it later needs the grants repeated for the new role. |
 | `BROKERVERSE_DB_POOL_SIZE` | no | `20` | Hikari maximum pool size per instance. |
 | `BROKERVERSE_JWT_SECRET` | yes (every environment but local) | none (the automated tests and the local docker compose stack carry local values; the `seed` profile has none) | HMAC key for access tokens, ≥ 32 random characters. Rotating it makes every access token invalid; the refresh cookies renew them. |
+| `BROKERVERSE_CONFIG_PROMOTION_SIGNING_KEY` | yes (where configuration is promoted) | none (the automated tests carry a local value) | `brokerverse.config-promotion.signing-key`: HMAC-SHA256 key that signs and verifies the configuration packages of Configuration Promotion, at least 32 random characters, from the secret store. The **same value in every environment of one promotion path** (development, SIT, UAT, production), or a package exported in one is refused in the next. Blank: exports and imports are refused and the screens say so. Rotating it makes the packages signed before unusable; export again after the rotation. See `docs/modules/CONFIG_PROMOTION.md`. |
 | `BROKERVERSE_TOKEN_VALIDITY` | no | `PT8H` | Maximum life of a sign-in session (ISO-8601 duration): the access token is renewed until then. |
 | `BROKERVERSE_ACCESS_TOKEN_VALIDITY` | no | `PT15M` | Life of an access token when the security parameter `ACCESS_TOKEN_MINUTES` (15, between 5 and 60) is missing. |
 | `BROKERVERSE_REFRESH_GRACE` | no | `PT30S` | Time a replaced refresh token is still accepted (a second browser tab renewing at the same moment); later it ends the session (`TOKEN_REUSED`). |
@@ -141,6 +142,18 @@ Legacy documents of the archive (object H02) are read through the port `LegacyDo
 folder is connected (DMQ24) they are staged in the console (`POST /api/v1/migration/archive/documents/{system}`,
 permission `MIG_INTAKE`) under the short-lived record class `MIGRATION_EXTRACT`, and the archive keeps its own copy as
 an attachment `LEGACY_DOCUMENT`.
+
+## Configuration Promotion parameters
+
+Business parameters (System Parameters, category `CONFIG_PROMOTION`, V1320). They are values of each environment:
+an import never changes them.
+
+| Parameter | Default | Purpose |
+|---|---|---|
+| `CONFIG_PROMOTION_PRODUCTION_WINDOW` | empty | Change window in which a configuration package may be applied in production, for example `SAT-SUN 20:00-06:00` (days, then hours; an end before the start runs into the next day). Empty: production imports are prepared but not applied. |
+| `CONFIG_PROMOTION_NOTIFY` | `CONFIG_IMPORT_APPROVE,CONFIG_BASELINE_MANAGE` | Permissions whose holders are told when an import waits for approval, is applied, rejected or fails. |
+| `CONFIG_PROMOTION_MAX_PACKAGE_MB` | `50` | Largest package accepted, once unpacked (1 to 500). |
+| `CONFIG_PROMOTION_PIPELINE_APPLY` | `false` | Outside production only: the deployment pipeline may apply its own clean dry run without a second user. Production always needs the approval of a second user. |
 
 ## Valkey 8 and Apache Kafka (platform cache and events)
 

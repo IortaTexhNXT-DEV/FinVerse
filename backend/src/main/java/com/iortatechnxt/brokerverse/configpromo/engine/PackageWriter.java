@@ -60,11 +60,11 @@ public final class PackageWriter {
    */
   public static List<String> expand(CatalogueModel model, Collection<String> selected) {
     Set<String> all = new LinkedHashSet<>();
-    Deque<String> todo = new ArrayDeque<>(selected);
-    while (!todo.isEmpty()) {
-      String code = todo.removeFirst();
+    Deque<String> pending = new ArrayDeque<>(selected);
+    while (!pending.isEmpty()) {
+      String code = pending.removeFirst();
       if (model.has(code) && all.add(code)) {
-        todo.addAll(model.collectionsOf(code));
+        pending.addAll(model.collectionsOf(code));
       }
     }
     return model.loadOrder(all);

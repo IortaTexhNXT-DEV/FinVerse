@@ -1,4 +1,4 @@
-# BRD-1 New Business – Business Sign-off Pack, release set v2.0.
+# BRD-1 New Business – Business Sign-off Pack, release set v2.1.
 # Built by docs/deliverables/src/signoff/signoff_pack.py (workbook, checks) and read by the FRS source through
 # ```pack blocks (tools/deliverables/bdoi_docx.py). Schema: docs/deliverables/src/signoff/README.md.
 meta:
@@ -6,9 +6,9 @@ meta:
   brd_label: BRD-1
   name: New Business
   code: NB
-  version: "2.0"
-  date: 1 October 2026
-  status_as_of: 1-Oct-2026
+  version: "2.1"
+  date: 8 October 2026
+  status_as_of: 8-Oct-2026
   release_set: BRD-01 New Business – Business Sign-off Pack
   frs: FRS_BRD01_NEW_BUSINESS.md
   test_plan: brd01_cases.yaml

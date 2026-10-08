@@ -12,7 +12,7 @@ meta:
 documents:
   - {kind: StartHere, name: New Business, ext: docx, what: "Start Here: the map of the pack, who reads what, the steps and the dates", readers: Everyone, when: "First, on issue"}
   - {kind: GuideDeck, name: New Business, ext: pptx, what: "Sign-off Pack Guide: purpose, approach, the module at a glance, caveats, entry and exit criteria, change control", readers: "Business owner, unit heads; presented at the kick-off", when: "Kick-off session"}
-  - {kind: FRS, name: New Business, ext: docx, what: "Functional Requirements Specification v2.0: requirements, navigation, 46 screen specifications with screenshots, walkthroughs, messages, notifications, documents, uploads, cross-BRD contract", readers: "Business users of each area; Finance, Compliance and BDOI IT for their chapters", when: "During the review, with the SIT walkthroughs"}
+  - {kind: FRS, name: New Business, ext: docx, what: "Functional Requirements Specification v2.1 (re-based on the New Business BRD of 13 May 2026): requirements, navigation, 46 screen specifications with screenshots, walkthroughs, messages, notifications, documents, uploads, cross-BRD contract, user-story view and storyboard index", readers: "Business users of each area; Finance, Compliance and BDOI IT for their chapters", when: "During the review, with the SIT walkthroughs"}
   - {kind: Signoff, name: New Business, ext: xlsx, what: "Sign-off workbook: one row per screen, field, rule and message with the BU review columns; comments log, meeting minutes, version history, sign-off certificate", readers: "Every reviewer; the business owner signs it", when: "During the review and at sign-off"}
   - {kind: TestPlan, name: New Business, ext: xlsx, what: "Test plan workbook: the test cases traced to the FRs and to the screens, including one screen case and one message case per screen", readers: "Business users who will run UAT; BDOI IT", when: "After the screens; used again in SIT and UAT"}
   - {kind: TestPlan, name: New Business Summary, ext: docx, what: "Test plan summary: scope, approach, coverage and the cases by area", readers: "Business owner, BDOI IT", when: "Before sign-off"}
@@ -20,10 +20,10 @@ documents:
   - {kind: UXScreens, name: New Business, ext: xlsx, what: "UX screen register: one row per screen image with the screen, personas, walkthrough and step, state, FRS section and requirements, UXD status and comments, and the Changed in this issue flag", readers: "BDOI UX Design team", when: "Kept by the UX Design team; the changed rows are flagged at each issue"}
   - {kind: UXScreens, name: New Business, ext: zip, what: "Image package: every screen image at twice the screen resolution (PNG) and the register as CSV", readers: "BDOI UX Design team", when: "Imported into the design tool at each issue"}
 
-# Reading order per role (FRS chapter numbers of v2.0).
+# Reading order per role (FRS chapter numbers of v2.1).
 reading:
   - role: Business owner (Product Owner, Head of MBS)
-    order: "00 Start Here; 01 Guide deck; FRS chapters 1-3 (context and personas), 14 (walkthroughs), 20 (sign-off) and 21 (proposed rules for confirmation); workbook Sign-off certificate"
+    order: "00 Start Here; 01 Guide deck; FRS chapters 1-3 (context and personas), 14 (walkthroughs), 20 (sign-off) and 21 (proposed rules for confirmation, CLR-NB-44 to 50 new in v2.1); appendices User-story view and Storyboard index; workbook Sign-off certificate"
   - role: Business users (Marketing, TSU, Processing)
     order: "FRS chapter 12 (navigation) and the screens of your area in chapter 13; walkthroughs in chapter 14; messages in chapter 15; workbook Screen standards, Screen catalogue, Field register, Business rules and Messages"
   - role: Finance (Comptrollership)
@@ -42,8 +42,8 @@ steps:
   - step: 1
     name: Pack issued
     who: "R: iorta TechNXT Project Manager; A: iorta TechNXT delivery lead; I: all reviewers"
-    inputs: "FRS v2.0, workbook, test plan, guide and deck"
-    outputs: "Release set v2.0 in the BRD-01 folder; invitations to the sessions"
+    inputs: "FRS v2.0, workbook, test plan, guide and deck; re-issued as v2.1 on Thu 8-Oct-2026 on the New Business BRD of 13 May 2026"
+    outputs: "Release set v2.1 in the BRD-01 folder (the changed screens flagged in the UX register); invitations to the sessions"
     duration: "Day 0 (Mon 28-Sep-2026)"
   - step: 2
     name: Kick-off and screen walkthrough on SIT
@@ -64,15 +64,15 @@ steps:
     outputs: "One consolidated comments log, each item typed (clarification, correction, change request) and answered; Q&A minutes"
     duration: "3 working days, Q&A on Wed 21-Oct-2026"
   - step: 5
-    name: One revision cycle (v2.1)
+    name: One revision cycle (v2.2)
     who: "R: iorta TechNXT Business Analysis; A: iorta TechNXT delivery lead; C: reviewers who raised the items"
     inputs: "Agreed clarifications and corrections"
-    outputs: "Release set v2.1 with the changed rows marked; change requests raised for the rest"
-    duration: "2 working days, v2.1 on Fri 23-Oct-2026; check by the reviewers until Wed 28-Oct-2026"
+    outputs: "Release set v2.2 with the changed rows marked; change requests raised for the rest"
+    duration: "2 working days, v2.2 on Fri 23-Oct-2026; check by the reviewers until Wed 28-Oct-2026"
   - step: 6
     name: Sign-off meeting and signature
     who: "R: iorta TechNXT Project Manager; A: BDOI Product Owner; C: unit heads, Finance, Compliance, BDOI IT"
-    inputs: "v2.1 (or v2.0 when no revision is needed); open items with their decision"
+    inputs: "v2.2 (or v2.1 when no revision is needed); open items with their decision"
     outputs: "Signed sign-off certificate; minutes; open items accepted as assumptions or change requests"
     duration: "Fri 30-Oct-2026"
   - step: 7
@@ -120,6 +120,10 @@ caveats:
     text: "HLS, CLPC transport, electronic channels to insurers (file transfer or system-to-system), directory sign-in and the mail relay depend on specifications from BDOI IT."
     handling: "A manual or file-based step until the specification arrives; the interface is then a change request."
     example: "CLPC billing is a download and an upload today; an automatic transfer is added when the CLPC layout and transport are agreed."
+  - topic: New version of the BRD
+    text: "BDOI re-issued the New Business BRD on 13 May 2026 with the Addendum after the IT walkthrough, which restates five requirements (BRNB.042, 060, 100, 100.1 and 107)."
+    handling: "The set is re-based as v2.1: the FRs, test cases and screens concerned are changed, the new rules are listed for confirmation (CLR-NB-44 to 50) and the changed screens are flagged; the review covers the changed rows as a delta."
+    example: "The incentive indicator is now set only when the booked invoice is fully paid, after the endorsements are considered; the Booking FRs, test cases and screen rules show the new rule, and CLR-NB-46 asks BDOI to confirm what fully paid means."
   - topic: Open questions and assumptions
     text: "Open questions of FRS section 10.3 (product matrix, approval chain, document layouts, TSU thresholds and others) follow the assumptions of section 10.1; chapter 21 lists the proposed rules for confirmation."
     handling: "Answered as configuration where possible (lists, parameters, templates); otherwise a change request; the assumption stands until then."
@@ -132,7 +136,7 @@ entry:
   - "The test plan is traced to the FRS and to the screens."
 exit:
   - "Every row of the workbook reviewed by its unit (Accept, Change requested or Comment)."
-  - "Every comments log item closed: answered, corrected in v2.1, or raised as a change request."
+  - "Every comments log item closed: answered, corrected in v2.2, or raised as a change request."
   - "Open questions closed or accepted as assumptions."
   - "The sign-off certificate signed by every signatory of the Who signs what matrix: prepared, input, reviewed and approved as on the BRD approval sheet; the Product Owner approves the whole set."
 done:

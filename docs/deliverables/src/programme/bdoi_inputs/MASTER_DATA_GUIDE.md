@@ -93,14 +93,10 @@ plugin: build_bdoi_inputs.py
 render: dues
 ```
 
-<!-- landscape -->
-
 ```pack
 plugin: build_bdoi_inputs.py
 render: order
 ```
-
-<!-- portrait -->
 
 # Validation of the master data
 
@@ -130,12 +126,7 @@ plugin: build_bdoi_inputs.py
 render: gaps
 ```
 
-The set-up below is decided by BDOI in working sessions and entered directly on the screens; there is no template to fill in, and the decisions are recorded in BDOI comments on the sheet Configured on screens.
-
-```pack
-plugin: build_bdoi_inputs.py
-render: screens
-```
+The rules, matrices, schedules and other set-up listed on the sheet **Configured on screens** are decided by BDOI in working sessions and entered directly on the screens named there; there is no template to fill in, and the decisions are recorded in BDOI comments on that sheet.
 
 # Questions and contacts
 

@@ -1081,7 +1081,7 @@ def _summary(ws, wb, sheets) -> None:
     ws.freeze_panes = ws.cell(row=first, column=2)
     # owners
     row += 2
-    _cell(ws, row, 1, "Items per BDOI owner (role), as issued", 12, True, brand.HEADER_BLUE, wrap=False)
+    _cell(ws, row, 1, "Items per BDOI owner (role), as issued (owners with five items or more)", 12, True, brand.HEADER_BLUE, wrap=False)
     row += 1
     for c, h in enumerate(["Owner (role)", None, None, None, "Items", "Open", "Partly answered", "Answered",
                            "First needed by", "BRDs"], start=1):
@@ -1091,7 +1091,12 @@ def _summary(ws, wb, sheets) -> None:
     by_owner: dict[str, list[Item]] = defaultdict(list)
     for r in consolidated():
         by_owner[r.owner].append(r)
-    for owner, items in sorted(by_owner.items(), key=lambda kv: (-len(kv[1]), kv[0])):
+    ranked = sorted(by_owner.items(), key=lambda kv: (-len(kv[1]), kv[0]))
+    main_ = [kv for kv in ranked if len(kv[1]) >= 5]
+    rest = [i for kv in ranked if len(kv[1]) < 5 for i in kv[1]]
+    if rest:
+        main_.append((f"Other owners ({len(ranked) - len(main_)} roles with fewer than 5 items each)", rest))
+    for owner, items in main_:
         row += 1
         st = Counter(i.status for i in items)
         brds = sorted({i.tab for i in items})
@@ -1769,12 +1774,12 @@ def render(doc: Any, render: str, **_: Any) -> None:  # noqa: A002 - block key
                 [ROUTE_SCREEN, "The owner fills in the template; the BIBS configuration team keys the rows on the "
                                "named screen and a second user authorises each record. These datasets are listed on "
                                "the sheet Gaps.", routes[ROUTE_SCREEN]]]
-        doc.table(["Route", "How the data gets into BIBS", "Templates"], rows, widths=[3.4, 12.4, 1.8],
+        doc.table(["Route", "How the data gets into BIBS", "Templates"], rows, widths=[3.2, 12.2, 2.2],
                   caption="Load routes", size=8.5)
         return
     if render == "order":
         rows = [[r["Step"], r["ID"], r["Dataset"], r["Load route"], r["Loads after"], r["Due"]] for r in index_rows()]
-        doc.table(["Step", "ID", "Dataset", "Route", "Loads after", "Due"], rows, widths=[1.0, 1.4, 6.0, 2.8, 2.8, 3.6],
+        doc.table(["Step", "ID", "Dataset", "Route", "Loads after", "Due"], rows, widths=[0.9, 1.2, 5.6, 2.6, 2.5, 4.8],
                   caption="Load order of the datasets (dependencies first)", size=7.5, keep_rows=False)
         return
     if render == "gaps":
@@ -1789,15 +1794,20 @@ def render(doc: Any, render: str, **_: Any) -> None:  # noqa: A002 - block key
         return
     if render == "dues":
         dc = drop_closure()
-        per: dict[str, int] = Counter()
+        labels = {x["date"]: (c, x["label"]) for c, x in dc.dues().items()}
+        for code, label, date in catalogue()["milestones"]:
+            labels.setdefault(as_date(date), (code, label))
+        per: dict[dt.date, list[str]] = defaultdict(list)
         for t in templates:
             d = due_of(t.due)
-            for code, x in dc.dues().items():
-                if d == x["date"]:
-                    per[code] += 1
-        rows = [[c, x["label"], dc.fmt(x["date"]), f"T-{x['weeks']} weeks", per.get(c, 0)] for c, x in dc.dues().items()]
-        doc.table(["Due", "Milestone", "Date", "Before go-live", "Templates due"], rows, widths=[1.2, 8.0, 2.6, 2.8, 3.0],
-                  caption="Due milestones (go-live T = Monday 3 January 2028)", size=8.5)
+            if d:
+                per[d].append(t.id)
+        go = dc.go_live()
+        rows = [[labels.get(d, ("-", ""))[0], labels.get(d, ("-", ""))[1], dc.fmt(d), f"T-{(go - d).days // 7} weeks",
+                 ", ".join(ids)] for d, ids in sorted(per.items())]
+        doc.table(["Due", "Milestone", "Date", "Before go-live", "Templates due"], rows,
+                  widths=[1.0, 6.0, 2.2, 2.2, 6.2], caption="Due dates of the templates (go-live T = Monday 3 January "
+                                                          "2028)", size=8, keep_rows=False)
         return
     raise ValueError(f"unknown render {render}")
 

@@ -1,0 +1,2849 @@
+# The Drop 0 requirements and questions list for BDOI (v1.0, 8 October 2026: BRD-03, BRD-11 and BRD-13 items
+# PM-Qnn, UA-Qnn and DM-Qnn), kept here as a source of the BDOI requirements and inputs workbook
+# (build_bdoi_inputs.py). One entry per item: category, area, the requirement or question, background,
+# proposal, impact, priority, BDOI owner, needed by, status and the source references.
+BRD-03:
+- ref: PM-Q01
+  category: Conflict in BRD
+  area: BRD document and approvals
+  need: Please confirm that the approval pages of the addendum and of the main BRD apply to Product Maintenance, and correct
+    the copied headings in the next BRD revision?
+  background: The addendum is headed 'Business Requirements for New Business' (p.3) and 'Table of New Business Requirements'
+    (p.4), and its approval page says 'New Business Fire and Motor' (p.8). The main BRD approval says 'for the OPERATIONS
+    request' (p.34). The revision log reads 'Added BRID PMADD07 and PMADD07' (p.2, presumably PMADD07 and PMADD08) and a
+    preparer date reads '11/06/205' (p.34).
+  proposal: The signatures on pp.8-9 and pp.34-35 are taken as the approval of the Product Maintenance BRD and its addendum;
+    the headings are corrected by Business Project Services in the next revision or recorded in minutes of meeting.
+  impact: The approval record of the baseline refers to other BRD titles; the traceability and the sign-off of the FRS rest
+    on that approval.
+  priority: Low
+  owner: Business Analyst, Business Project Services; Product Owner, Marketing Business System
+  needed_by: Before Drop 0 sign-off
+  status: Open
+  sources: BRD Product Maintenance p.2, p.3, p.4, p.8, p.34; Discrepancy register DCR-031
+- ref: PM-Q02
+  category: Conflict in BRD
+  area: BRD document and approvals
+  need: Please confirm which main BRD requirements each addendum requirement refines, since the 'Source BRD ID' column of
+    the addendum is empty?
+  background: The 'Source BRD ID' column is blank for PMADD01 to PMADD08 (pp.4-7). Read against the main BRD, we take PMADD03
+    as refining BRPM.014, PMADD04 as refining BRPM.010 and BRPM.013, PMADD05 as refining BRPM.002 and PMADD06 as refining
+    BRPM.015; PMADD01, PMADD02, PMADD07 and PMADD08 are new.
+  proposal: Accept the mapping above; where an addendum row and a main BRD row differ, the addendum (April 2026) prevails.
+  impact: Acceptance tests could be run against superseded wording; traceability of the FRS to the BRD is not confirmed.
+  priority: Medium
+  owner: Business Analyst, Business Project Services
+  needed_by: Before Drop 0 sign-off
+  status: Open
+  sources: BRD Product Maintenance pp.4-7; FRS BRD-03 v2.0 section 1.2 and chapter 11; Discrepancy register DCR-032
+- ref: PM-Q03
+  category: Conflict in BRD
+  area: BRD document and approvals
+  need: Please confirm the priority of BRPM.003 and the acceptance criteria of BRPM.013?
+  background: BRPM.003 (capture, store and validate product-specific fields, p.16) has no priority level. BRPM.013 asks
+    for keying in insurer terms and feedback (p.23), but its acceptance criteria describe comparative tables and a monitoring
+    sheet.
+  proposal: BRPM.003 is a Must have. BRPM.013 is tested on the capture of insurer responses with their outcome and history
+    (FR-PM-031); the comparative-table criteria are tested under BRPM.014 (FR-PM-034).
+  impact: Test cases of BRPM.013 would not test the requirement; the priority of BRPM.003 is unknown for planning.
+  priority: Low
+  owner: Product Owner, Marketing Business System
+  needed_by: Before Drop 0 sign-off
+  status: Open
+  sources: BRD Product Maintenance p.16, p.23; FRS BRD-03 v2.0 FR-PM-012, FR-PM-031; Discrepancy register DCR-033
+- ref: PM-Q04
+  category: Conflict in BRD
+  area: BRD document and approvals
+  need: Please confirm that no requirement is missing at BRPM.023, which does not appear in the BRD?
+  background: BRPM.022 is followed by BRPM.024 (p.31). The earlier signed version (pp.36-61) also skips BRQID.023.
+  proposal: Treat the gap as a numbering gap only (FRS assumption A-PM-07).
+  impact: A requirement could be missing from the baseline and from the test plan.
+  priority: Low
+  owner: Business Analyst, Business Project Services
+  needed_by: Before Drop 0 sign-off
+  status: Open
+  sources: BRD Product Maintenance p.31, pp.36-61; FRS BRD-03 v2.0 A-PM-07 (PQ20); Discrepancy register DCR-029
+- ref: PM-Q05
+  category: Confirmation
+  area: BRD document and approvals
+  need: Please confirm that the earlier rule requiring documented client negotiation before a new rate scheme applies to
+    a renewal already advised (BRQID.008 of the earlier signed version) was dropped on purpose, and that the Renewal BRD
+    rule BRRN.038 now governs it?
+  background: The pack contains an earlier signed version of the BRD (pp.36-61). Its BRQID.008 is not in the final version,
+    which keeps only 'old packages locked for new business but accessible for renewals' (BRPM.007, p.17-18); the revision
+    log does not record the removal. The Renewal BRD (BRRN.038 AC 3) requires acceptance evidence when a renewal has a financial
+    impact.
+  proposal: BRQID.008 was removed on purpose; the acceptance evidence of BRRN.038 AC 3 in Renewal covers it, and Product
+    Maintenance adds no separate control.
+  impact: Renewals could be repriced after the renewal advice without client evidence if the Renewal control does not cover
+    the case.
+  priority: Medium
+  owner: Product Owner, Marketing Business System; Product Owner, Renewal
+  needed_by: Before Drop 0 sign-off
+  status: Open
+  sources: BRD Product Maintenance pp.17-18, pp.36-61; FRS BRD-03 v2.0 FR-PM-051 (PQ10); Discrepancy register DCR-030
+- ref: PM-Q06
+  category: Confirmation
+  area: Scope
+  need: Please confirm that maintenance of non-package products is out of scope for this phase, and that 'Non-Package Management'
+    in the Core Replacement BRD means the non-package placement of New Business?
+  background: The revision log of 27-Oct-2025 says 'Exclude Non-Package and include this as part of an addendum' (p.11),
+    but the April 2026 addendum does not add it, and PMADD01 refers to non-package items 'if/when added' (p.4). BRD-00 capability
+    4 'Non-Package Management' has no requirement rows.
+  proposal: Non-package product maintenance is out of this phase (FRS assumption A-PM-06). Non-package products are held
+    in the same product catalogue and hierarchy, and non-package placement (request form, quotation slip, comparative table,
+    proposal slip) stays in New Business (BRD-1).
+  impact: Scope of the module and of the BRD-00 capability is undefined; a later request would be a change request.
+  priority: High
+  owner: Product Owner, Marketing Business System
+  needed_by: Before Drop 0 sign-off
+  status: Open
+  sources: BRD Product Maintenance p.4 (PMADD01), p.11; FRS BRD-03 v2.0 section 1.2, A-PM-06 (PQ19); Discrepancy register
+    DCR-036; Core Replacement BRD capability 4 (CRQ02)
+- ref: PM-Q07
+  category: Confirmation
+  area: Scope
+  need: Please confirm that a package is a catalogue product (risk code) flagged as packaged, either generic for a market
+    segment or specific to one client, and that every package has its own risk code?
+  background: The BRD uses 'package', 'product', 'policies/packages' and 'insurance packages' without a definition (pp.12-31).
+    The FRS models a package as a product with pre-negotiated terms, rates and insurers, changed only through numbered versions.
+  proposal: Accept the definition (FRS assumption A-PM-02). One risk code may carry several panel insurers, each with its
+    own terms, but not several packages.
+  impact: The product catalogue structure, the package map of the data migration and the pricing of New Business depend
+    on this definition.
+  priority: High
+  owner: Product Owner, Marketing Business System; Head, Technical Support Unit
+  needed_by: Before Drop 0 sign-off
+  status: Open
+  sources: BRD Product Maintenance pp.12-31; FRS BRD-03 v2.0 section 1.4, A-PM-02 (PQ01)
+- ref: PM-Q08
+  category: Confirmation
+  area: Scope
+  need: Please confirm that the master screens added to this set beyond the package lifecycle (Insurers, Rates & Taxes,
+    Sales Organisation, Premium Calculator, Coverages & Clauses, Incentive Criteria) are reviewed and signed under BRD-03,
+    with the owners named for each?
+  background: 'The BRD covers package products, their approval, set-up, versions, expiry and incentive criteria. The sign-off
+    workbook also lists the shared catalogue screens SCR-PM-17 to SCR-PM-21 (insurers and branches, statutory rates and
+    taxes, sales organisation, premium calculator), which New Business, Operations and Accounting use. Their data owners
+    differ: Head of Operations (insurers, commission rates), Heads of Marketing (sales organisation), Comptrollership (taxes).'
+  proposal: Sign these screens with BRD-03 as the single home of the product and pricing masters; each owner reviews the
+    rows of its screens in the sign-off workbook.
+  impact: Without an agreed home and owner, these masters have no signed specification before SIT.
+  priority: Medium
+  owner: Product Owner, Marketing Business System; Head, Operations; Head, Comptrollership
+  needed_by: Before Drop 0 sign-off
+  status: Open
+  sources: Sign-off workbook BRD-03 v2.0, Screen catalogue SCR-PM-17 to SCR-PM-21; Cross-BRD contract IC-01 to IC-13; Drop
+    0 closure, set BRD-03 'confirms'
+- ref: PM-Q09
+  category: Confirmation
+  area: BRD document and approvals
+  need: Please confirm the signatories of the BRD-03 sign-off set, in particular whether the Head of Comptrollership signs,
+    given that the addendum approval page marks that signature as not required?
+  background: The sign-off certificate follows the BRD approval sheets (pp.8-9, pp.34-35) and adds BDOI IT as reviewer of
+    interfaces and access. The Head of Comptrollership signs the main BRD (p.35) but is marked not required on the addendum
+    (p.9), while this set includes rates and taxes, commission rates and incentive criteria.
+  proposal: The Head of Comptrollership signs the set for rates and taxes, commission rates and incentive criteria; BDOI
+    IT reviews interfaces, user access and the Technical Specification.
+  impact: Sign-off on 30-Nov-2026 could be incomplete or contested for the financial masters.
+  priority: Medium
+  owner: Product Owner, Marketing Business System
+  needed_by: 23-Nov-2026
+  status: Open
+  sources: BRD Product Maintenance p.9, p.35; Sign-off workbook BRD-03 v2.0, Sign-off certificate; Start Here BRD-03 v2.0,
+    Who signs what
+- ref: PM-Q10
+  category: Data or input needed
+  area: Access and roles
+  need: Please provide the final role-to-action matrix of Product Maintenance (create, amend, approve, view-only per role),
+    including the definition of the MBS, ManCom and Business Administrator roles, or confirm the proposed matrix?
+  background: PMADD05 asks for a role-to-action matrix (p.5), but the addendum persona 'User' says roles 'will be further
+    defined in succeeding documentations' (p.4, footnote 2); MBS and ManCom are not defined as personas in the final version.
+    The BIBS-wide access matrix is still a BDOI deliverable (OQ48). How role changes are approved is answered by BRD-11
+    (PQ17).
+  proposal: Adopt the proposed matrix of FRS section 3.3 (15 permissions over 10 roles, with fixed segregation-of-duties
+    rules) as the go-live matrix; later changes go through approved role-permission requests.
+  impact: Access tests and the menus by persona cannot be finalised; users cannot be loaded with their roles for SIT and
+    UAT.
+  priority: High
+  owner: Product Owner, Marketing Business System; Business Administration
+  needed_by: 30-Nov-2026
+  status: Open
+  sources: BRD Product Maintenance p.4 footnote 2, p.5 (PMADD05); FRS BRD-03 v2.0 sections 3.1-3.3, FR-PM-002 (PQ17, OQ48);
+    Discrepancy register DCR-035
+- ref: PM-Q11
+  category: Dependency
+  area: Access and roles
+  need: Please confirm that Product Maintenance users sign in through the BIBS-wide directory sign-in decided under BRD-11
+    User Access Maintenance (Entra ID), with no separate log-in rules for this module?
+  background: BRPM.001 and BRPM.002 ask for log-in with valid credentials (p.15). FRS FR-PM-001 rule R2 still states that
+    BDO single sign-on is not part of this phase, whereas BRD-11 has since required directory sign-in (answered Q42) and
+    the drop plan lists Entra ID as a Drop 0 integration.
+  proposal: Product Maintenance follows the sign-in, session and lock-out rules of BRD-11; FR-PM-001 is aligned in the next
+    version of the set.
+  impact: Inconsistent sign-in rules between the BRD-03 and BRD-11 sets; access testing of BRPM.001-002 depends on the BRD-11
+    interface.
+  priority: Medium
+  owner: BDOI IT; BDOI Information Security
+  needed_by: 01-Dec-2026
+  status: Open
+  sources: BRD Product Maintenance p.15 (BRPM.001, 002); FRS BRD-03 v2.0 FR-PM-001 R2 (Q42); BDOI drop plan, Drop 0 integrations;
+    Drop 0 closure DEC-05
+- ref: PM-Q12
+  category: Dependency
+  area: Access and roles
+  need: When a change to the permissions of a Product Maintenance role is approved, should BIBS apply it at once, or should
+    the System Administrator implement it as for other group-profile changes under BRD-11?
+  background: PMADD05 asks that the Admin maintains roles and that changes are auditable (p.5). BRD-11 (p.6) shows group-profile
+    changes requested, approved, then implemented by the System Administrator; the question of applying on approval is open
+    under BRD-11 (UQ03).
+  proposal: 'Follow BRD-11: the approved change waits for implementation by the System Administrator (one rule for every
+    module).'
+  impact: Role changes in Product Maintenance would behave differently from other modules.
+  priority: Low
+  owner: Business Administration; BDOI Information Security
+  needed_by: 01-Dec-2026
+  status: Open
+  sources: BRD Product Maintenance p.5 (PMADD05); FRS BRD-03 v2.0 FR-PM-003 (PQ17); BRD User Access Maintenance p.6 (UQ03)
+- ref: PM-Q13
+  category: Decision
+  area: Package request and approvals
+  need: Is a Package Request Form approved by any one of the Marketing TL, TH or UH, or is there an approval chain or limit
+    by segment, amount or product?
+  background: BRPM.008 says the form is 'reviewed and approved by the Marketing Team Lead (TL), Team Head (TH), or Marketing
+    Unit Head (UH)' (p.18) and BRPM.021 asks for 'multi-level approvals' (p.30), without an order or a limit.
+  proposal: One Marketing approval by any holder of the approval permission other than the maker (FRS assumption A-PM-03,
+    CLR-PM-03).
+  impact: The workflow stages and the approval tests depend on the answer; a chain added later is a change request.
+  priority: High
+  owner: Head, Retail Marketing; Head, Corporate and Retail Marketing; Unit Head, Combank and Corbank
+  needed_by: 30-Nov-2026
+  status: Open
+  sources: BRD Product Maintenance p.18 (BRPM.008), p.30 (BRPM.021); FRS BRD-03 v2.0 FR-PM-021, CLR-PM-03, A-PM-03 (PQ08,
+    Q05); Drop 0 closure DEC-08
+- ref: PM-Q14
+  category: Clarification
+  area: Package request and approvals
+  need: Must a package request raised by TSU (for example a package renewal drafted from the expiry monitor, or a retirement)
+    also be approved by Marketing before the TSU Team Lead reviews it?
+  background: BRPM.008 names 'Marketing AO / TSU' as submitters of an approved Package Request Form (p.18). In the proposed
+    workflow every request, whoever raises it, goes to Marketing approval first (FRS section 5.2).
+  proposal: 'Keep one path: every request, including those raised by TSU, is approved by Marketing before the TSU review.'
+  impact: TSU-raised renewals and retirements could be delayed by an approval Marketing does not need to give, or skip an
+    approval BDOI expects.
+  priority: Medium
+  owner: Head, Technical Support Unit; Product Owner, Marketing Business System
+  needed_by: 23-Nov-2026
+  status: Open
+  sources: BRD Product Maintenance p.18 (BRPM.008); FRS BRD-03 v2.0 FR-PM-020, FR-PM-021, section 5.2
+- ref: PM-Q15
+  category: Data or input needed
+  area: Package request and approvals
+  need: Please give the mandatory fields of the Package Request Form, and confirm that a generic programme needs no client
+    while a client-specific package names a client (or prospect) from the client master?
+  background: BRPM.008 asks that mandatory fields are 'clearly indicated' (p.18) but does not list them.
+  proposal: 'Use the proposed mandatory fields of FR-PM-020: request type, scope, package or programme name, product line,
+    cover type (new package) or existing package, reason, requested terms, package end date and, when negotiated, at least
+    one target insurer; a client only for client-specific packages.'
+  impact: Field validations of the form and their test cases are not confirmed.
+  priority: Medium
+  owner: Head, Retail Marketing; Head, Technical Support Unit
+  needed_by: 30-Nov-2026
+  status: Open
+  sources: BRD Product Maintenance p.18 (BRPM.008); FRS BRD-03 v2.0 FR-PM-020 (PQ14)
+- ref: PM-Q16
+  category: Confirmation
+  area: Package request and approvals
+  need: Please confirm the six request types (new, amend terms, update details, renew, reactivate, retire), the difference
+    between 'amend' and 'update', and that 'deletion' of a package means its retirement after the approvals and ManCom sign-off,
+    with no record ever deleted?
+  background: BRPM.011 speaks of requests for 'product creation, amend, updating, or deletion' (p.21) without defining them;
+    BRPM.006 requires that records are archived, not deleted (p.17). The BRD does not say which approvals a retirement needs.
+  proposal: Amend changes negotiated terms and always negotiates; update changes other package details and negotiates only
+    when chosen; deletion is a retirement request that follows the Marketing, TSU and ManCom approvals without negotiation
+    (CLR-PM-04, A-PM-05).
+  impact: Request types, their workflow and the retirement path are fixed at sign-off.
+  priority: Medium
+  owner: Head, Technical Support Unit; Product Owner, Marketing Business System
+  needed_by: 30-Nov-2026
+  status: Open
+  sources: BRD Product Maintenance p.17 (BRPM.006), p.21 (BRPM.011); FRS BRD-03 v2.0 section 2.3, FR-PM-045, CLR-PM-04,
+    A-PM-05 (PQ13)
+- ref: PM-Q17
+  category: Data or input needed
+  area: Workflow, service levels and escalation
+  need: Please give the turnaround time of each stage of a package request (Marketing approval, TSU review, TSU approval,
+    negotiation, ManCom sign-off, MBS set-up, validation), the insurer reply time for a quotation slip, and the timeframes
+    for advisories and reports?
+  background: The BRD refers to an 'agreed turn-around-time' (BRPM.012, p.22; BRPM.013, p.23), a 'defined SLA' (BRPM.018,
+    p.29; BRPM.021, p.30) and a 'required timeframe' for advisories (BRPM.016, p.27) without values.
+  proposal: 'Use the configurable defaults: 24 hours for each approval stage, 120 hours for negotiation, 72 hours for ManCom,
+    48 hours for MBS set-up, requirements and Marketing review, 24 hours for validation; insurer reply within 5 days. BDOI
+    can change them as parameters without a change request.'
+  impact: Overdue indicators, SLA alerts and the home page tiles would run on unconfirmed values.
+  priority: Medium
+  owner: Head, Technical Support Unit; Product Owner, Marketing Business System
+  needed_by: 16-Jul-2027
+  status: Open
+  sources: BRD Product Maintenance pp.22-31; FRS BRD-03 v2.0 sections 5.1, 5.4, 9.1 (PQ08)
+- ref: PM-Q18
+  category: Decision
+  area: Workflow, service levels and escalation
+  need: Should a request past its service level be escalated to a higher level (for example the unit head), or is an alert
+    to the owners of its stage enough?
+  background: BRPM.021 asks that approvals are tracked 'within the SLA' (p.30-31) but does not ask for escalation.
+  proposal: Alert the stage owners and show the request in the red tiles of the Product Maintenance home; no escalation
+    to a higher level (CLR-PM-16).
+  impact: Escalation added after sign-off is a change request.
+  priority: Low
+  owner: Head, Technical Support Unit; Product Owner, Marketing Business System
+  needed_by: 30-Nov-2026
+  status: Open
+  sources: BRD Product Maintenance pp.30-31 (BRPM.021); FRS BRD-03 v2.0 FR-PM-073, section 5.4, CLR-PM-16
+- ref: PM-Q19
+  category: Clarification
+  area: Negotiation and quotation slips
+  need: Who is the 'co-Officer' who may approve a quotation slip instead of the TSU Team Lead, and can the TSU Head also
+    approve it?
+  background: BRPM.012 says the quotation slip is 'approved by TL or co-Officer' (p.22) and remains editable by TSU TL/TH
+    until ManCom sign-off.
+  proposal: Any TSU user holding the quotation-slip approval permission other than the preparer may approve it; the permission
+    is given to the TSU Team Lead role by default.
+  impact: The quotation slip approval rights and their test cases are not confirmed.
+  priority: Medium
+  owner: Head, Technical Support Unit
+  needed_by: 30-Nov-2026
+  status: Open
+  sources: BRD Product Maintenance p.22 (BRPM.012); FRS BRD-03 v2.0 FR-PM-030 (PQ08)
+- ref: PM-Q20
+  category: Confirmation
+  area: Negotiation and quotation slips
+  need: Please confirm that one quotation slip is produced per negotiation round and e-mailed separately to each insurer,
+    and that no package brochure is produced by the system?
+  background: BRPM.012 asks that terms are sent to insurers 'directly from the system (e.g., via email, system message,
+    or integrated portal)' (p.22). The BRD does not mention a brochure.
+  proposal: One quotation slip per round, one protected e-mail per insurer; insurers are reached by e-mail only (no insurer
+    portal); no brochure (CLR-PM-02).
+  impact: The documents and channels to insurers are fixed at sign-off.
+  priority: Low
+  owner: Head, Technical Support Unit
+  needed_by: 30-Nov-2026
+  status: Open
+  sources: BRD Product Maintenance p.22 (BRPM.012); FRS BRD-03 v2.0 FR-PM-030, chapter 7, CLR-PM-02
+- ref: PM-Q21
+  category: Data or input needed
+  area: Negotiation and quotation slips
+  need: Please give the full list of insurer response outcomes, the maximum number of negotiation rounds (if any), and whether
+    the outcome states and revision rounds also apply to non-package placement requests in New Business?
+  background: PMADD04 asks for exception states such as 'Approved w/ Changes, Declined, etc.' and revision loops (p.5) without
+    the full list or a limit.
+  proposal: 'Outcomes: Pending, Accepted as requested, Approved with changes, Counter-proposal, Declined, No response; no
+    maximum number of rounds; the rule applies to package requests only, New Business keeps its own placement outcomes.'
+  impact: The outcome list drives the comparative tables, the 'terms final' check and the not-proceeded path.
+  priority: Medium
+  owner: Head, Technical Support Unit
+  needed_by: 16-Jul-2027
+  status: Open
+  sources: BRD Product Maintenance p.5 (PMADD04), p.20 (BRPM.010), p.23 (BRPM.013); FRS BRD-03 v2.0 FR-PM-031, FR-PM-032
+    (PQ05)
+- ref: PM-Q22
+  category: Clarification
+  area: Insurer-specific terms
+  need: Which package terms may differ by insurer (coverages included, limits, deductibles, warranties and clauses, rate,
+    minimum premium, commission), and can a package have several panel insurers or co-insurance with shares?
+  background: PMADD02 asks for insurer-specific coverage, deductible and warranty mappings maintained without IT (p.4) but
+    does not list the attributes or say how several insurers share a package.
+  proposal: Every attribute listed may differ by insurer; insurers have the role Lead, Participant or Panel; shares, when
+    used, total 100%; a new-business transaction with an insurer outside the panel is refused.
+  impact: The package version data model and the pricing of New Business depend on the answer.
+  priority: High
+  owner: Head, Technical Support Unit; Product Owner, Marketing Business System
+  needed_by: 30-Nov-2026
+  status: Open
+  sources: BRD Product Maintenance p.4 (PMADD02); FRS BRD-03 v2.0 FR-PM-014 (PQ03, OQ33)
+- ref: PM-Q23
+  category: Decision
+  area: Comparative tables
+  need: Please confirm the fields that may be shown in a client-tailored comparative view, whether a view must have at least
+    one field, and who may produce and send client views?
+  background: PMADD03 asks that users 'include/exclude fields and insurers per output' while the system keeps an audit master
+    (p.4), without listing the fields or the users.
+  proposal: TSU produces client views from the current master, choosing from eight fields (Outcome, Rate %, Minimum Premium,
+    Coverages, Deductibles, Conditions / Warranties, Valid Until, Remarks); a view needs a title, at least one insurer and
+    at least one field; Marketing views them read-only (CLR-PM-11, CLR-PM-12).
+  impact: The client view screen and its document layout are fixed at sign-off.
+  priority: Medium
+  owner: Head, Technical Support Unit; Head, Retail Marketing
+  needed_by: 30-Nov-2026
+  status: Open
+  sources: BRD Product Maintenance p.4 (PMADD03), pp.24-25 (BRPM.014); FRS BRD-03 v2.0 FR-PM-035, CLR-PM-11, CLR-PM-12 (PQ06)
+- ref: PM-Q24
+  category: Confirmation
+  area: Comparative tables
+  need: Please confirm that the comparative master can be compiled as soon as the quotation slip of the round is sent, showing
+    Pending rows for insurers that have not replied, and that each new round supersedes the previous master?
+  background: BRPM.014 asks for one consolidated comparative table per package, accurate and reflecting the latest feedback
+    (pp.24-25), but does not say when it can first be compiled.
+  proposal: Allow the master after the slip is sent; a master with Pending rows may be shared as a status view; only one
+    current master per request, earlier masters kept as superseded (CLR-PM-13).
+  impact: Rule and screen behaviour of the comparative tab.
+  priority: Low
+  owner: Head, Technical Support Unit
+  needed_by: 30-Nov-2026
+  status: Open
+  sources: BRD Product Maintenance pp.24-25 (BRPM.014); FRS BRD-03 v2.0 FR-PM-034, CLR-PM-13
+- ref: PM-Q25
+  category: Clarification
+  area: Comparative tables
+  need: Please confirm that the 'secure dashboard' for sharing comparative tables and reports is for BDOI users only, and
+    that clients and insurers receive documents only as password-protected e-mail attachments, with no external access to
+    BIBS?
+  background: The envisioned process says comparative tables and reports are shared 'via a secure dashboard' (p.13, item
+    4) and BRPM.012 mentions an 'integrated portal' (p.22).
+  proposal: The Product Maintenance home and lists are internal; external parties receive protected PDF or XLSX files by
+    e-mail, with the password sent separately.
+  impact: An external portal would be new scope with its own security and hosting.
+  priority: Medium
+  owner: Product Owner, Marketing Business System; BDOI Information Security
+  needed_by: 30-Nov-2026
+  status: Open
+  sources: BRD Product Maintenance p.13, p.22 (BRPM.012), p.29 (BRPM.019, BRPM.020); FRS BRD-03 v2.0 FR-PM-004, FR-PM-070,
+    chapter 7
+- ref: PM-Q26
+  category: Decision
+  area: ManCom sign-off
+  need: Who are the ManCom members for package sign-off, does the sign-off of one member complete the step or is a quorum
+    or all members needed, and is the sign-off given in the system or on a physically signed sheet uploaded to it?
+  background: BRPM.015 requires a mandatory ManCom review and sign-off in the system before MBS receives the requirements,
+    while noting that 'some manual steps (like physical signatures) may still occur' (p.25). Membership, quorum and turnaround
+    are not stated.
+  proposal: One ManCom member's sign-off in BIBS completes the step; an uploaded signed sheet is linked to the request,
+    otherwise BIBS creates a sign-off record (A-PM-04, CLR-PM-05).
+  impact: A quorum or multi-member sign-off added after sign-off is a change request; ManCom users must be set up for SIT.
+  priority: High
+  owner: Product Owner, Marketing Business System; ManCom secretariat
+  needed_by: 30-Nov-2026
+  status: Open
+  sources: BRD Product Maintenance pp.25-26 (BRPM.015); FRS BRD-03 v2.0 FR-PM-041, CLR-PM-05, A-PM-04 (PQ07); Drop 0 closure
+    DEC-08
+- ref: PM-Q27
+  category: Clarification
+  area: Requirements pack and set-up
+  need: Please confirm the content of the requirements pack that TSU submits to ManCom ('computation and details that Marketing
+    needed'), who signs the package slip, and whether any package needs a premium formula other than the property, motor
+    and generic rating methods?
+  background: BRPM.015 speaks of 'product requirements ... computation and details' (p.25) and BRPM.016 of a 'Package slip
+    (signed)' (p.26) without content. The usage table names 'Prepare QS/PS' for TSU (p.33).
+  proposal: The pack holds the effective date, package end date, scheme rate or rate per insurer, minimum premium, commission,
+    TSI limit, computation basis, insurers and the signed package slip; 'PS' is the package slip, signed by the insurer(s)
+    and TSU; packages use the platform rating methods.
+  impact: A package formula outside the rating methods needs development; MBS set-up and validation rest on the pack content.
+  priority: High
+  owner: Head, Technical Support Unit; Product Owner, Marketing Business System
+  needed_by: 30-Nov-2026
+  status: Open
+  sources: BRD Product Maintenance pp.25-26 (BRPM.015, BRPM.016), p.33; FRS BRD-03 v2.0 FR-PM-040, FR-PM-042 (PQ12)
+- ref: PM-Q28
+  category: Decision
+  area: Validation and release
+  need: Who performs the post-set-up validation of a package version (TSU Head, Business Administrator, or either), and
+    what items must the validation checklist contain?
+  background: PMADD06 asks for an explicit validation checkpoint 'e.g., by TSU Head / Business Administrator role' before
+    a configuration is ready (p.5), without fixing the role or the checklist.
+  proposal: 'Either the TSU Head or the Business Administrator validates, never the maker or submitter of the version; checklist:
+    hierarchy complete, every panel insurer has terms for each included coverage, rates and minimum premiums match the signed-off
+    terms, dates and term correct, test premium reviewed.'
+  impact: No package can be released for sale until the validator role is granted; the checklist is fixed in the system
+    until answered.
+  priority: High
+  owner: Head, Technical Support Unit; Business Administration
+  needed_by: 30-Nov-2026
+  status: Open
+  sources: BRD Product Maintenance p.5 (PMADD06); FRS BRD-03 v2.0 FR-PM-043, section 9.3 (PQ09)
+- ref: PM-Q29
+  category: Data or input needed
+  area: Advisories and notifications
+  need: Please name the units that receive package advisories, the channel (in-app notice, e-mail or both) and the timeframe,
+    and confirm that expiry and incentive alerts reach TSU and MBS as in-app notices?
+  background: BRPM.016 asks that advisories are sent automatically 'to relevant units' within a 'required timeframe' (pp.26-27);
+    BRPM.017 and PMADD08 do not name the alert channel.
+  proposal: Default advisory groups Marketing, TSU, MBS and Operations (Processing optional); in-app notice to every user
+    of each group, plus the protected PDF by e-mail when addresses are entered; expiry and incentive alerts as in-app notices
+    to TSU and MBS (CLR-PM-06, CLR-PM-07).
+  impact: Advisory recipients and notification set-up for UAT.
+  priority: Medium
+  owner: Product Owner, Marketing Business System; Head, Technical Support Unit
+  needed_by: 16-Jul-2027
+  status: Open
+  sources: BRD Product Maintenance pp.26-28 (BRPM.016, BRPM.017); FRS BRD-03 v2.0 FR-PM-044, FR-PM-060, CLR-PM-06, CLR-PM-07
+    (PQ12); Drop 0 closure DEC-14
+- ref: PM-Q30
+  category: Clarification
+  area: Expiry and renewal of packages
+  need: BRPM.017 says 'MBS/Operations can accept or reject renewal documentation'; is an Operations step needed, or is the
+    MBS acceptance at set-up enough?
+  background: BRPM.017 acceptance criterion 5 (p.27) names MBS and Operations. In the proposed workflow MBS accepts or returns
+    the renewal documentation at the set-up step; Operations only receives the advisory.
+  proposal: MBS accepts or returns the renewal documentation; Operations is informed by the renewal advisory and has no
+    approval step.
+  impact: An Operations approval step would add a workflow stage.
+  priority: Medium
+  owner: Head, Operations; Product Owner, Marketing Business System
+  needed_by: 30-Nov-2026
+  status: Open
+  sources: BRD Product Maintenance pp.27-28 (BRPM.017); FRS BRD-03 v2.0 FR-PM-061, FR-PM-044
+- ref: PM-Q31
+  category: Decision
+  area: Versions, rate schemes and pricing
+  need: What does a 'rate scheme' cover (the package rate, minimum premium, commission and TSI limit only, or also statutory
+    charges), who approves the use of a non-current rate, how long an approved exception stays valid, and are manual item
+    rates allowed on package products?
+  background: BRPM.007 requires the latest approved rate scheme for new business and that 'any attempt to use a non-current
+    rate triggers an approval workflow' (pp.17-18), without naming the approver or the scope.
+  proposal: The rate scheme is the package rate, minimum premium, commission and TSI limit of the version in force; statutory
+    charges keep their own effective dates; a deviating rate needs an exception approved by the Business Administrator or
+    New Business Approver (not the requester), valid 30 days; no manual item rate without an approved exception.
+  impact: New Business pricing, the rate exception flow and their tests depend on the answer.
+  priority: High
+  owner: Product Owner, Marketing Business System; Head, Comptrollership
+  needed_by: 30-Nov-2026
+  status: Open
+  sources: BRD Product Maintenance pp.17-18 (BRPM.007); FRS BRD-03 v2.0 FR-PM-050, FR-PM-051 (PQ10); Cross-BRD contract
+    IC-02, IC-03
+- ref: PM-Q32
+  category: Confirmation
+  area: Versions, rate schemes and pricing
+  need: Please confirm that a rate exception compares the requested rate with the package rate of the version in force (not
+    the panel insurer's rate), and that the difference is shown in percentage points with its sign?
+  background: The BRD does not describe the exception record. The proposed Rate Exceptions table shows Requested Rate, Scheme
+    Rate and Difference.
+  proposal: Compare with the package scheme rate of the version that priced the quotation; show the difference in percentage
+    points with two decimals and its sign, for example -0.10 (CLR-PM-18, CLR-PM-19).
+  impact: Screen behaviour of the quotation rate exception card.
+  priority: Low
+  owner: Product Owner, Marketing Business System
+  needed_by: 30-Nov-2026
+  status: Open
+  sources: FRS BRD-03 v2.0 FR-PM-051, CLR-PM-18, CLR-PM-19; Sign-off workbook BRD-03 v2.0, SCR-PM-22
+- ref: PM-Q33
+  category: Clarification
+  area: Archive of expired packages
+  need: Please confirm that the archive of BRPM.006 applies to package products and their versions (client policies being
+    kept by New Business and Renewal), and that only MBS, TSU Head, Business Administrator and Auditor see expired and retired
+    packages?
+  background: BRPM.006 speaks of 'expired insurance products (policies/packages)' kept for reference or 'potential reactivation',
+    with access 'restricted to authorized personnel' (p.17).
+  proposal: The archive covers packages; nothing is deleted; reactivation only through a reactivation request that releases
+    a new version; archive access with the archive-view permission only (Marketing AO does not see expired packages).
+  impact: Scope of the archive and its access rules.
+  priority: Medium
+  owner: Product Owner, Marketing Business System
+  needed_by: 30-Nov-2026
+  status: Open
+  sources: BRD Product Maintenance p.17 (BRPM.006); FRS BRD-03 v2.0 FR-PM-052
+- ref: PM-Q34
+  category: Decision
+  area: Packages in force at go-live
+  need: 'How should the packages in force at go-live be created in BIBS: set up one by one through package requests by TSU
+    and MBS before the map freeze, or loaded as version 1 by the data migration?'
+  background: The configuration inputs and the cross-BRD contract say packages are not migrated but set up by TSU and MBS
+    through package requests (template CI-06). Rules R3 of FR-PM-050 and R4 of FR-PM-051 still describe packages 'existing
+    at go-live' or 'migrated as version 1'. The BRD does not address the transition.
+  proposal: Set up each package in force through a package request (type New or Update) with its signed slip and ManCom
+    reference, validated before the map freeze; FR-PM-050 and FR-PM-051 are aligned in the next version of the set. BDOI
+    confirms the number of packages so that TSU and MBS can plan the effort.
+  impact: The go-live readiness of New Business and Renewal pricing, and the package map, depend on every package being
+    in BIBS before 27-Dec-2027.
+  priority: High
+  owner: Head, Technical Support Unit; Product Owner, Marketing Business System
+  needed_by: 30-Nov-2026
+  status: Open
+  sources: FRS BRD-03 v2.0 FR-PM-050 R3, FR-PM-051 R4, chapter 19; Configuration inputs CI-06; Cross-BRD contract IC-13
+- ref: PM-Q35
+  category: Confirmation
+  area: Packages in force at go-live
+  need: Please confirm that legacy packages are remapped at Renewal sanitation using the package map (legacy package to
+    BIBS package version) prepared by TSU and approved by the Product Owner, and name the TSU preparer of the map?
+  background: BDOI answered on 26-Sep-2026 that legacy packages are remapped at Renewal sanitation, not at upload (DMQ36).
+    Product Maintenance provides the package versions the map names (CLR-PM-14).
+  proposal: The map (migration object R06, template CI-07) is prepared by TSU, approved per map version by the Product Owner,
+    Marketing Business System, and loaded with the data migration; unmapped packages go to the Renewal Exception bucket.
+  impact: Trial migration 2 needs the approved code maps by 18-Jun-2027; renewals of migrated policies cannot be priced
+    on BIBS packages without the map.
+  priority: High
+  owner: Product Owner, Marketing Business System; Head, Technical Support Unit
+  needed_by: 30-Oct-2026
+  status: Open
+  sources: FRS BRD-03 v2.0 CLR-PM-14; Cross-BRD contract IC-07; Configuration inputs CI-07; Drop 0 closure DEC-10; Programme
+    alignment IQ03 (DMQ36)
+- ref: PM-Q36
+  category: Confirmation
+  area: Packages in force at go-live
+  need: Please confirm that no bulk upload of product masters is needed after go-live, the go-live load running through
+    the data migration and later changes being made on the screens under maker-checker?
+  background: The BRD asks for maintenance without IT but does not ask for bulk uploads; package volumes after go-live are
+    expected to be low (FRS A-PM-08).
+  proposal: No bulk upload screen in Product Maintenance (CLR-PM-15).
+  impact: A bulk upload added later is a change request.
+  priority: Low
+  owner: Product Owner, Marketing Business System
+  needed_by: 30-Nov-2026
+  status: Open
+  sources: FRS BRD-03 v2.0 CLR-PM-15, A-PM-08
+- ref: PM-Q37
+  category: Conflict in BRD
+  area: Expiry and renewal of packages
+  need: Should BIBS draft the renewal request of an expiring package automatically, as the envisioned process says, or only
+    when the TSU Officer starts it?
+  background: The envisioned process says 'Automated renewal workflow is triggered for packages approaching expiry' (p.13,
+    item 9), while BRPM.017 says the TSU Officer 'can start renewal requests on time' (p.27). The FRS has automatic drafting
+    off by default.
+  proposal: 'Switch automatic drafting on: at the first expiry alert BIBS drafts the renewal request from the current version
+    and the TSU Officer completes and submits it; the parameter lets BDOI switch it off.'
+  impact: Without a decision, BIBS does not meet the envisioned process item 9 as written.
+  priority: Medium
+  owner: Head, Technical Support Unit
+  needed_by: 30-Nov-2026
+  status: Open
+  sources: BRD Product Maintenance p.13, pp.27-28 (BRPM.017); FRS BRD-03 v2.0 FR-PM-060 R3, FR-PM-061, parameter PACKAGE_RENEWAL_AUTODRAFT
+    (PQ11)
+- ref: PM-Q38
+  category: Data or input needed
+  area: Expiry and renewal of packages
+  need: What are the 'expiry' and 'anniversary' dates of a package (the term of the insurer agreement?), and how many days
+    before them should the first alert and the reminders be raised?
+  background: BRPM.017 asks TSU to monitor 'the expiry or anniversary date of each insurance package' (p.27) without defining
+    them or a notice period.
+  proposal: Package end date = end of the agreed term with the insurers; anniversary date optional; first alert 60 days
+    before, reminders at 30 and 7 days (parameters).
+  impact: Expiry monitoring and the Package Expiry report run on unconfirmed values.
+  priority: Medium
+  owner: Head, Technical Support Unit
+  needed_by: 16-Jul-2027
+  status: Open
+  sources: BRD Product Maintenance pp.27-28 (BRPM.017); FRS BRD-03 v2.0 FR-PM-060, section 9.1 (PQ11)
+- ref: PM-Q39
+  category: Conflict in BRD
+  area: Expiry and renewal of packages
+  need: Please confirm that key capabilities 12 and 13 ('renewal negotiation and documentation', 'renewal reporting and
+    analytics') are met by the renewal request following the normal negotiation workflow and by the Package Expiry and Package
+    Status reports, since no requirement row details them?
+  background: The key capabilities list renewal negotiation, documentation, reporting and analytics (p.14), but only BRPM.017
+    addresses package renewal (pp.27-28).
+  proposal: Accept the renewal request (with optional negotiation) and the two package reports as the scope of capabilities
+    12 and 13; no separate renewal analytics.
+  impact: Renewal reporting expectations not covered by a requirement could surface in UAT as new scope.
+  priority: Medium
+  owner: Head, Technical Support Unit; Product Owner, Marketing Business System
+  needed_by: 30-Nov-2026
+  status: Open
+  sources: BRD Product Maintenance p.14, pp.27-28 (BRPM.017); FRS BRD-03 v2.0 FR-PM-061, FR-PM-071
+- ref: PM-Q40
+  category: Confirmation
+  area: Expiry and renewal of packages
+  need: Please confirm that 'package renewal' in this BRD is the renewal of the package terms with the insurers, distinct
+    from the renewal of client policies covered by the Renewal BRD?
+  background: BRPM.017 and key capabilities 11-13 (p.14) use 'renewal' for packages; the Renewal BRD uses it for client
+    policies.
+  proposal: 'Keep the two apart: ''package renewal'' in Product Maintenance, ''policy renewal'' in Renewal.'
+  impact: Test scenarios and training material could mix the two processes.
+  priority: Low
+  owner: Product Owner, Marketing Business System
+  needed_by: 30-Nov-2026
+  status: Open
+  sources: BRD Product Maintenance p.14, pp.27-28; FRS BRD-03 v2.0 section 1.2; Discrepancy register DCR-038
+- ref: PM-Q41
+  category: Dependency
+  area: Expiry and renewal of packages
+  need: When a client policy sold on a package comes up for renewal after that package has expired with no current version,
+    should the renewal be routed to the New Business path automatically, or kept on the old terms with an approval?
+  background: BRPM.007 says old packages 'can be referenced for renewals until updated' (p.18). The Renewal BRD keeps the
+    expiring terms on Renew As Is and takes the New Business path for repricing; the expired-version case is open under
+    Renewal (RQ30).
+  proposal: Renewals use the version of the original account while it is released or superseded; an expired package with
+    no current version sends the renewal to the New Business path for repricing.
+  impact: Renewal pricing of accounts on expired packages; the decision is taken with the Renewal set.
+  priority: Medium
+  owner: Product Owner, Renewal; Product Owner, Marketing Business System
+  needed_by: 30-Nov-2026
+  status: Open
+  sources: BRD Product Maintenance pp.17-18 (BRPM.007); FRS BRD-03 v2.0 FR-PM-051 (PQ11); Cross-BRD contract IC-06; Renewal
+    open question RQ30
+- ref: PM-Q42
+  category: Data or input needed
+  area: Incentive criteria
+  need: Please define CPC2 and the other incentive criteria to be maintained (type, value or rule, base, applicable products,
+    segments, channels, insurers, effective dates), name the 'Incentive Maintenance user' and the approver, and say what
+    happens to active criteria when a product expires or is retired?
+  background: PMADD07 and PMADD08 ask for a facility to maintain incentive criteria '(i.e. CPC2)' on the maintained products
+    matrix (pp.5-7) but define neither CPC2 nor the attributes or the user. The Accounting BRD describes CPC2 as a package
+    Fire and Motor incentive computed per remittance; values are not given.
+  proposal: MBS maintains the criteria with the incentive-maintenance permission, the Business Administrator authorises
+    them; criteria on an expired or retired product are flagged for review and never deleted; the incentive types list is
+    completed from BDOI's answer (today Others and Migrated).
+  impact: Incentive criteria cannot be configured or tested; Remittance and Commission cannot reference them.
+  priority: High
+  owner: Head, Comptrollership; Product Owner, Marketing Business System
+  needed_by: 16-Jul-2027
+  status: Open
+  sources: BRD Product Maintenance pp.5-7 (PMADD07, PMADD08); FRS BRD-03 v2.0 FR-PM-080, FR-PM-081 (PQ04, Q33); Configuration
+    inputs CI-10; Discrepancy register DCR-037
+- ref: PM-Q43
+  category: Dependency
+  area: Incentive criteria
+  need: Please confirm that the computation and payout of incentives are outside Product Maintenance, which keeps the criteria
+    once, while Remittance (CPC2, early incentive), Commission schemes and Collections campaigns reference the criteria
+    codes?
+  background: 'Incentives are specified in four BRDs: criteria on the products matrix (BRD-3, pp.5-7), CPC2 and early incentive
+    computed per remittance (BRD-5), No Touch, Top Up and Motor Mania schemes (BRD-2) and incentive campaigns (BRD-4 draft).
+    No BRD gives rates, tiers or targets.'
+  proposal: Criteria are kept only in Product Maintenance; computation and payout are specified in the Accounting, Operations
+    and Collections sets, which reference the criteria codes (FR-PM-081 R2).
+  impact: Without one model, incentives could be configured in several places with different product lists; income and pass-on
+    to branches are at risk.
+  priority: High
+  owner: BIBS Product Owner, with the Heads of Comptrollership and Operations
+  needed_by: 30-Nov-2026
+  status: Open
+  sources: BRD Product Maintenance pp.5-7; FRS BRD-03 v2.0 section 1.2, FR-PM-081 (Q33, OQ39); Cross-BRD contract IC-10,
+    IC-11; Discrepancy register DCR-037
+- ref: PM-Q44
+  category: Conflict in BRD
+  area: Reports and dashboard
+  need: Please confirm that BRPM.018 is a package report (Package Status Update Report) distinct from the New Business Placement
+    Update Report, and give its name, columns and production timeframe?
+  background: BRPM.018 is titled 'Placement Update Reports' but its expected result speaks of 'Package Status Update Reports'
+    on package creation (pp.28-29). BRD-1 already has a Placement Update Report (BRNB.011); the Report List names a 'Placement
+    Summary Report - Product Maintenance'.
+  proposal: Report PM-PKG-STATUS 'Package Status Update Report' with the draft columns of FRS section 6.1, for one request
+    or all, exportable to PDF and Excel (CLR-PM-08).
+  impact: Two reports with one name; the wrong report could be built or tested.
+  priority: Medium
+  owner: Product Owner, Marketing Business System; Head, Technical Support Unit
+  needed_by: 30-Nov-2026
+  status: Open
+  sources: BRD Product Maintenance pp.28-29 (BRPM.018); FRS BRD-03 v2.0 FR-PM-071, section 6.1, CLR-PM-08 (PQ15); Discrepancy
+    register DCR-034; Report List item 75
+- ref: PM-Q45
+  category: Decision
+  area: Integration with BDOI systems
+  need: Which BDOI systems must receive product and package changes ('synchronization of updates across all relevant systems',
+    'integrates with BDOI tracking/reporting'), in which format and how often, or is no outbound feed needed at go-live?
+  background: The executive summary (p.12), key capability 8 'Works with existing systems' (p.14) and BRPM.022 (p.31) ask
+    for synchronisation without naming the systems. The Data Migration BRD says the legacy systems are read-only after cut-over.
+  proposal: 'No outbound product feed at go-live: BIBS records every release, expiry and retirement in the product master
+    log; a transfer to systems named later by BDOI IT is added as a change request without changing the package workflow
+    (CLR-PM-10).'
+  impact: BRPM.022 stays partly on hold; an integration named late needs specification, build and testing time.
+  priority: Medium
+  owner: BDOI IT; Product Owner, Marketing Business System
+  needed_by: 30-Nov-2026
+  status: Open
+  sources: BRD Product Maintenance p.12, p.14, p.31 (BRPM.022); FRS BRD-03 v2.0 FR-PM-072, chapter 7, CLR-PM-10, D-PM-04
+    (PQ16, Q08)
+- ref: PM-Q46
+  category: Dependency
+  area: Integration with BDOI systems
+  need: Please confirm the e-mail channel BIBS uses to send quotation slips, comparative outputs and advisories to insurers
+    and internal units (Centralized Communications Management or the M365 Exchange relay), and provide the sender mailbox
+    and connection details?
+  background: BRPM.012 and BRPM.016 require sending from the system with a record of each transmission (pp.22, 26). The
+    drop plan lists CCM (e-mail sending) and M365 among the Drop 0 integrations owned by BDOI IT.
+  proposal: Use CCM as the outbound channel with a dedicated BDOI sender mailbox; BIBS keeps the send log and the separate
+    password e-mail.
+  impact: Insurer e-mails cannot be tested in SIT without the channel; manual sending would break the audit trail.
+  priority: High
+  owner: BDOI IT
+  needed_by: 04-Jan-2027
+  status: Open
+  sources: BRD Product Maintenance p.22 (BRPM.012), p.26 (BRPM.016); FRS BRD-03 v2.0 D-PM-06, FR-PM-030, FR-PM-044; BDOI
+    drop plan, Drop 0 integrations
+- ref: PM-Q47
+  category: Decision
+  area: Document security
+  need: 'Which Product Maintenance documents leave BDOI protected (quotation slips to insurers, comparative views to clients,
+    advisories), and what password convention applies: a password created by the system for each e-mail, or a standard password
+    or syntax defined by BDOI?'
+  background: BRPM.020 requires that all shared documents are password protected or encrypted (p.29). The Employee Benefits
+    BRD allows a standard or system-created password sent separately, but the convention is still not given (Q07).
+  proposal: Every document e-mailed outside BIBS is a protected PDF (AES) or protected XLSX; BIBS creates a password for
+    each e-mail and sends it in a separate e-mail (CLR-PM-09).
+  impact: Messaging settings stay on the default until answered; the convention must be the same for every module.
+  priority: Medium
+  owner: BDOI Information Security; Product Owner, Marketing Business System
+  needed_by: 30-Nov-2026
+  status: Open
+  sources: BRD Product Maintenance p.13, pp.29-30 (BRPM.020); FRS BRD-03 v2.0 FR-PM-004, CLR-PM-09 (Q07, PQ21)
+- ref: PM-Q48
+  category: Data or input needed
+  area: Non-functional requirements
+  need: 'Please confirm the non-functional values for Product Maintenance: monthly package request volumes and growth, the
+    availability window (07:00-18:30 here, 07:00-22:00 in New Business), the maintenance window ''as per bank standard'',
+    and the data retention period?'
+  background: The usage table leaves volumes and growth blank, gives the same Marketing user counts as BRD-1 (485 / 145),
+    availability 99.9%, use 07:00-18:30, RTO 4 hours and RPO 24 hours, and maintenance 'as per bank standard' (p.33). Retention
+    is not stated. A single BIBS-wide NFR set is being agreed (XQ08).
+  proposal: Tens of package requests a month; the BIBS-wide window and maintenance window decided for New Business govern;
+    retention 5 years online and 15 years archive, package versions never purged.
+  impact: Sizing, the support window and archiving rules are not confirmed for the module.
+  priority: Medium
+  owner: BDOI IT; Program Manager, Business Project Services
+  needed_by: 30-Nov-2026
+  status: Open
+  sources: BRD Product Maintenance p.33; FRS BRD-03 v2.0 chapter 8, FR-PM-005 R2, A-PM-08 (PQ18, OQ44, XQ08)
+- ref: PM-Q49
+  category: Data or input needed
+  area: Product structure and master data
+  need: 'Please provide the product matrix: the product lines, the subline / type / subtype values, the coverages and perils
+    of each line, every product (risk code) with its features, and the naming convention of risk codes per line?'
+  background: PMADD01 requires the hierarchy levels (LOB, Subline/Type/Subtype, Coverage/Peril) and the naming and classification
+    rules to be stated as requirements (p.4); the BRD does not give them. The product matrix files (MTR / PAR risk codes)
+    referenced by New Business are still not provided (Q01).
+  proposal: MBS completes template CI-01 from the QPS and EBIX product lists; until a naming convention is given, any well-formed
+    code is accepted (CLR-PM-01).
+  impact: Trial migration 1 needs the product reference data on 09-Apr-2027; New Business quotations and package set-up
+    cannot be configured without it.
+  priority: High
+  owner: Product Owner, Marketing Business System
+  needed_by: 09-Apr-2027
+  status: Open
+  sources: BRD Product Maintenance p.4 (PMADD01); FRS BRD-03 v2.0 FR-PM-010, CLR-PM-01, D-PM-01 (PQ02, Q01); Configuration
+    inputs CI-01; Drop 0 closure DEC-09, CFG-090
+- ref: PM-Q50
+  category: Data or input needed
+  area: Product structure and master data
+  need: Please provide the mandatory and product-specific fields per product line or cover type, with their validation rules,
+    and the documents each product needs on an account?
+  background: BRPM.003 and BRPM.004 ask to capture and validate 'all mandatory, critical and product-specific fields' with
+    rules 'based on product type' (p.16) without listing them; New Business question Q02 asks the same for the Annex II
+    lines.
+  proposal: MBS completes template CI-02 (coverages, field rules, document rules); BIBS supports presence, list, range and
+    format checks per line or product.
+  impact: Account capture in New Business and the product field rules cannot be configured for UAT.
+  priority: High
+  owner: Product Owner, Marketing Business System; Head, Technical Support Unit
+  needed_by: 16-Jul-2027
+  status: Open
+  sources: BRD Product Maintenance p.16 (BRPM.003, BRPM.004); FRS BRD-03 v2.0 FR-PM-012 (Q02); Configuration inputs CI-02;
+    Drop 0 closure CFG-091
+- ref: PM-Q51
+  category: Data or input needed
+  area: Product structure and master data
+  need: 'Please provide the clause library: the warranties, clauses, exclusions and deductible wordings used in the insurer
+    terms of packages, with their effective dates?'
+  background: PMADD02 requires insurer-specific coverage, deductible and warranty mappings (p.4); the wordings are held
+    once and referred to by code.
+  proposal: TSU supplies the wordings from the current package slips in template CI-03; MBS enters them, a second user authorises
+    them.
+  impact: Package versions cannot carry insurer terms with clauses for UAT.
+  priority: Medium
+  owner: Head, Technical Support Unit
+  needed_by: 16-Jul-2027
+  status: Open
+  sources: BRD Product Maintenance p.4 (PMADD02); FRS BRD-03 v2.0 FR-PM-011; Configuration inputs CI-03; Drop 0 closure
+    CFG-092
+- ref: PM-Q52
+  category: Data or input needed
+  area: Insurers, rates and taxes
+  need: Please provide the insurer panel (accreditation, placement e-mails, credit days), the insurer branches with their
+    local government tax rate, and the commission rates by insurer and product in force at cut-over?
+  background: Package versions, quotation slips and placement use the insurer panel; quotation slips are e-mailed to the
+    placement addresses of each insurer (BRPM.012, p.22).
+  proposal: The Head of Operations completes template CI-05 from the QPS and EBIX insurer masters; MBS adds the commission
+    per package; loaded by the data migration (objects R04, R07).
+  impact: Trial migration 1 needs the insurer reference data on 09-Apr-2027.
+  priority: High
+  owner: Head, Operations; Product Owner, Marketing Business System
+  needed_by: 09-Apr-2027
+  status: Open
+  sources: BRD Product Maintenance p.22 (BRPM.012); FRS BRD-03 v2.0 FR-PM-014; Configuration inputs CI-05; Cross-BRD contract
+    IC-13; Drop 0 closure CFG-100, CFG-101
+- ref: PM-Q53
+  category: Data or input needed
+  area: Insurers, rates and taxes
+  need: Please provide the statutory charges and rating tables (documentary stamp tax, premium tax, VAT, fire service tax,
+    local government tax, motor factors, short-period table, motor bodily injury and property damage limit premiums), and
+    confirm for Fire which taxes apply on which base and, for Motor, when the own-damage base is 81% or 90% of the sum insured?
+  background: The rate scheme of BRPM.007 sits on top of statutory charges. The New Business BRD Appendix A gives premium
+    tax as '12% of the Net Premium' for Fire (12% is the VAT rate) and two own-damage bases (81% and 90% of TSI) for Motor
+    without saying when each applies.
+  proposal: Comptrollership confirms the taxes and bases in template CI-04; tax rates are seeded only after that confirmation;
+    the own-damage base is a parameter per product and policy year until confirmed.
+  impact: Premiums on quotations and invoices would be wrong; expected values of the test cases cannot be set.
+  priority: High
+  owner: Head, Comptrollership; Product Owner, Marketing Business System
+  needed_by: 16-Jul-2027
+  status: Open
+  sources: BRD Product Maintenance pp.17-18 (BRPM.007); FRS BRD-03 v2.0 FR-PM-051 R5 (PQ10); Configuration inputs CI-04;
+    Discrepancy register DCR-005, DCR-006 (Q43)
+- ref: PM-Q54
+  category: Data or input needed
+  area: Lists of values and parameters
+  need: Please confirm or change the delivered values of the Product Maintenance lists (request reasons, response outcomes,
+    advisory groups, not-proceeded reasons, coverage and clause kinds, document types, market segments) and parameters (numbering
+    prefixes, insurer reply days, expiry notice and reminders, service level hours)?
+  background: The BRD does not give list values. The FRS delivers defaults (sections 9.1 and 9.2) that BDOI confirms.
+  proposal: Keep the delivered values; BDOI changes them in template CI-09 before UAT; the System Administrator enters them.
+  impact: UAT would run on unconfirmed list values and parameters.
+  priority: Medium
+  owner: Product Owner, Marketing Business System; System Administrator
+  needed_by: 16-Jul-2027
+  status: Open
+  sources: FRS BRD-03 v2.0 sections 9.1, 9.2; Configuration inputs CI-09; Drop 0 closure CFG-097
+- ref: PM-Q55
+  category: Data or input needed
+  area: Document templates
+  need: Please provide BDOI's layouts and texts for the Package Request Form, package quotation slip, comparative table,
+    package slip, package advisory and package renewal advisory?
+  background: BRPM.005 asks for shared templates with product-specific fields for CGL, Equipment Floater, Marine Cargo,
+    Fire, Motor and other lines (p.16). BIBS uses draft layouts until BDOI's are provided (Q03).
+  proposal: TSU and MBS provide the texts in template CI-08; they are loaded as new template versions effective from a date;
+    the draft layouts of FRS section 6.2 are used until then (CLR-PM-02).
+  impact: Documents shown in UAT and sent to insurers would not follow BDOI's layouts.
+  priority: Medium
+  owner: Head, Technical Support Unit; Product Owner, Marketing Business System
+  needed_by: 16-Jul-2027
+  status: Open
+  sources: BRD Product Maintenance pp.16-17 (BRPM.005); FRS BRD-03 v2.0 FR-PM-013, section 6.2, CLR-PM-02, D-PM-02 (Q03);
+    Configuration inputs CI-08; Drop 0 closure DEC-09, CFG-098
+- ref: PM-Q56
+  category: Data or input needed
+  area: Packages in force at go-live
+  need: Please provide, for every package sold at go-live, its terms as they will be set up in BIBS (rate scheme, dates,
+    coverages, panel insurers and their terms, signed slip and ManCom reference)?
+  background: Packages are not migrated; TSU raises a package request per package and MBS sets up and validates the version
+    before the map freeze (see the decision on packages in force).
+  proposal: TSU prepares template CI-06 from the signed package slips and ManCom sign-offs in force; the Product Owner approves
+    it.
+  impact: Without every package in BIBS before the map freeze (27-Dec-2027), New Business and Renewal cannot price on BIBS
+    packages at go-live.
+  priority: High
+  owner: Head, Technical Support Unit; Product Owner, Marketing Business System
+  needed_by: 01-Nov-2027
+  status: Open
+  sources: FRS BRD-03 v2.0 chapter 19; Configuration inputs CI-06; Drop 0 closure CFG-094
+- ref: PM-Q57
+  category: Dependency
+  area: Products used by other modules
+  need: Please confirm that the Employee Benefits product lines (HMO, group life, group personal accident) and the HMO providers
+    are held in the Product Maintenance catalogue and insurer panel, and that insurer acceptance limits stay in Submitted
+    Policies for now?
+  background: Product Maintenance is the source of products and insurers for New Business, Renewal, Employee Benefits and
+    Submitted Policies (cross-BRD contract). HMO providers are not insurance companies; the Employee Benefits BRD lists
+    them as placement counterparties.
+  proposal: Hold EB lines and products in the catalogue and HMO providers in the insurer master with a provider type; insurer
+    acceptance limits stay in Submitted Policies until Product Maintenance takes them over.
+  impact: The catalogue structure for EB and the limit checks of Submitted Policies.
+  priority: Medium
+  owner: Product Owner, Employee Benefits; Product Owner, Submitted Policies
+  needed_by: 30-Nov-2026
+  status: Open
+  sources: Cross-BRD contract IC-08, IC-09; Discrepancy register DCR-097 (EBQ01)
+- ref: PM-Q58
+  category: Confirmation
+  area: Screens and labels
+  need: Please confirm the stage list shown on the package request step bar (Draft Request to Released) and that stages
+    and statuses show their full labels, with a short form and tooltip only for labels longer than 21 characters?
+  background: The BRD does not define the screen presentation. The step bar shows the main path; returned stages show in
+    amber, voided or not-proceeded requests end in red.
+  proposal: Accept the stage list of FRS section 5.1 and full labels (CLR-PM-17, CLR-PM-20).
+  impact: Screen labels are frozen at sign-off.
+  priority: Low
+  owner: Product Owner, Marketing Business System
+  needed_by: 30-Nov-2026
+  status: Open
+  sources: FRS BRD-03 v2.0 section 5.1, CLR-PM-17, CLR-PM-20; Drop 0 closure DEC-15
+BRD-11:
+- ref: UA-Q01
+  category: Confirmation
+  area: Scope
+  need: 'Please confirm that BRD-11, written in April 2025 for the QPS User Access Maintenance Module, governs user access
+    for the whole of BIBS: every module, persona and user uses the same users, group profiles and permissions.'
+  background: The BRD cover, purpose and overview (p.1, p.4-5) refer to QPS only. The FRS applies it system-wide (FRS section
+    1.2, assumption A-UA-01, open question UQ19); this is built, but BDOI has not confirmed it formally.
+  proposal: BRD-11 applies to all of BIBS; the QPS references are read as BIBS.
+  impact: Without it, the menus of the personas of the other BRDs (FRS chapter 12) and the BIBS-wide role matrix have no
+    agreed requirement basis.
+  priority: High
+  owner: Product Owner, Marketing Business System
+  needed_by: 01-Dec-2026
+  status: Open
+  sources: BRD User Access Maintenance p.1, p.4-5; FRS BRD-11 v2.0 section 1.2, A-UA-01, UQ19; Discrepancy register DCR-114;
+    Change register CR-0164
+- ref: UA-Q02
+  category: Clarification
+  area: Scope
+  need: Drop 0 items 0.1 Accessibility & Login, 0.2 Authorization and 0.3 User Maintenance have no BRD named in the drop
+    plan. Please confirm that they are accepted against BRD-11 plus the EIAM sign-in, and state whether 'Accessibility'
+    also means screen accessibility for impaired vision (WCAG).
+  background: The drop plan leaves the BRD column empty for these items. BRD-11 asks for accessibility options for impaired
+    vision or colour blindness only as 'Follow existing QPS set up' (p.12, UAM-NFR-05).
+  proposal: Items 0.1 to 0.3 are accepted against BRD-11 and the EIAM sign-in decisions of this list; screen accessibility
+    is covered by the BIBS accessibility statement and the BDO UX contrast rules.
+  impact: The acceptance basis of three Drop 0 items stays undefined, and the Drop 0 closure cannot list them as signed.
+  priority: Medium
+  owner: Program Manager, Business Project Services (BDO Unibank ESG)
+  needed_by: 01-Dec-2026
+  status: Open
+  sources: BDOI drop plan, Drop 0 items 1-3; Programme alignment IQ24; Discrepancy register DCR-214; FRS BRD-11 v2.0 UAM-NFR-05
+- ref: UA-Q03
+  category: Confirmation
+  area: Sign-off
+  need: Please confirm the signatories of the BRD-11 set. The BRD approval sheet (p.38-39) was signed by the Product Owner,
+    the Unit Heads of Claims and Risk Management, Combank and Corbank Marketing / Corporate Processing (by e-mail on 28-Apr-2025),
+    Comptrollership, Retail Marketing and Corporate and Retail Marketing; the FRS sign-off block adds BDOI Information Security
+    and BDOI IT and does not list the unit heads.
+  background: Information Security signs the role matrix, separation of duties and security values; BDOI IT signs the sign-in
+    and identity integration assumptions (FRS chapter 21). The unit heads who approved the BRD are reviewers of their personas'
+    menus only.
+  proposal: 'Signatories: Product Owner (approver), Process Owner Business Administration, Head of Information Security,
+    Head of BDOI IT, Program Manager Business Project Services; the BRD approvers of the other units review the menus of
+    their personas and may sign as reviewers.'
+  impact: The sign-off of 1-Dec-2026 may be challenged if an approver of the BRD is not part of the FRS sign-off.
+  priority: Medium
+  owner: Program Manager, Business Project Services (BDO Unibank ESG)
+  needed_by: 24-Nov-2026
+  status: Open
+  sources: BRD User Access Maintenance p.38-39 (approval sheet and e-mail sign-off); FRS BRD-11 v2.0 sections 21.3 and 21.6;
+    Start Here BRD-11 'Who signs what'
+- ref: UA-Q04
+  category: Confirmation
+  area: Requirement baseline
+  need: Please concur with the acceptance criteria and the NFR numbering written by the project team, and confirm that BRD
+    rows without a Mandatory flag are treated as 'Must have'.
+  background: The 160 BRD lines have no acceptance criteria and the NFR ID column is empty (p.8-17). Rows without a flag
+    include the System Administrator log-in rows 4.001.1.x, the reject remarks 2.002.6.1-2 and the approver and remark rows
+    of 3.002.x. Duplicate IDs 2.002.7.1 and 3.003.1.1 are kept and marked '(2nd)'.
+  proposal: Acceptance criteria as written in each FR; NFR IDs UAM-NFR-01 to 41; unflagged rows are 'Must have'; duplicate
+    IDs marked '(2nd)'.
+  impact: UAT acceptance could be disputed for rows whose priority or criteria were not agreed.
+  priority: Low
+  owner: Program Manager, Business Project Services (BDO Unibank ESG)
+  needed_by: 01-Dec-2026
+  status: Open
+  sources: BRD User Access Maintenance p.8-17; FRS BRD-11 v2.0 section 1.5, A-UA-08; Discrepancy register DCR-115, DCR-116
+- ref: UA-Q05
+  category: Conflict in BRD
+  area: Sign-in (EIAM)
+  need: The BRD asks for the Windows ID and password to be checked by BDO EUA, with LDAP / Active Directory or single sign-on
+    (p.13-14, p.17); the drop plan names EIAM on Microsoft Entra ID. Please confirm that EIAM replaces the EUA password
+    check and the LDAP / AD sign-in for every BDO user of BIBS, so that the EUA and LDAP interfaces are withdrawn.
+  background: With EIAM the user signs in on the BDO sign-in page and the password never reaches BIBS; EUA passes the password
+    through the application. BRD-4, BRD-7 and BRD-9 also describe Windows-credential or user-ID sign-in. The FRS still lists
+    EUA and LDAP / AD as ON HOLD (FRS chapter 7).
+  proposal: EIAM (Entra ID) is the only directory sign-in; the EUA and LDAP / AD rows are closed as replaced by EIAM; BIBS
+    local sign-in is kept only for break-glass administrators.
+  impact: The sign-in build and its SIT cannot start; FR-UA-003 stays without a target.
+  priority: High
+  owner: Head, BDOI IT (identity and access team)
+  needed_by: 01-Dec-2026
+  status: Open
+  sources: BRD User Access Maintenance p.13 (NFR 1.h), p.14 (EUA), p.17 (Other BU NFR 4); FRS BRD-11 v2.0 FR-UA-003, chapter
+    7, CLR-UA-01; Discrepancy register DCR-143, DCR-230; Programme alignment INT-01, IQ04
+- ref: UA-Q06
+  category: Decision
+  area: Sign-in (EIAM)
+  need: Single sign-on with OpenID Connect and with SAML 2.0 is already available in BIBS and is switched on by configuration.
+    Please choose the protocol for EIAM (we propose OpenID Connect, authorisation code with PKCE) and confirm that the FRS
+    interface table is updated from 'SSO ON HOLD' to 'IN SCOPE (configuration)' in version 2.1.
+  background: The FRS interface table (chapter 7) and the guide deck caveat still treat SSO as on hold and as a later change
+    request; the BIBS sign-in already supports both protocols, linking a directory identity to an existing active BIBS user
+    only (no user is created by sign-in).
+  proposal: OpenID Connect against the BDO Entra ID tenant; SAML 2.0 kept as the fall-back if BDOI IT standards require
+    it; FRS v2.1 records SSO as configuration, not a change request.
+  impact: The FRS would sign a gap that no longer exists, and BDOI IT may register the application with the wrong protocol.
+  priority: High
+  owner: Head, BDOI IT (identity and access team)
+  needed_by: 01-Dec-2026
+  status: Open
+  sources: FRS BRD-11 v2.0 chapter 7 (interfaces), FR-UA-003; User access design section 10.1 and platform sign-in section;
+    Programme alignment INT-01, IQ04
+- ref: UA-Q07
+  category: Data or input needed
+  area: Sign-in (EIAM)
+  need: 'Please provide the EIAM set-up for each environment (DEV, SIT, UAT, Production, DR): the Entra ID tenant and issuer,
+    the application registration (client ID and the way the client secret or certificate is delivered), the redirect and
+    sign-out addresses to register, and test accounts in a non-production tenant for SIT and UAT.'
+  background: BIBS needs the issuer, client registration and redirect addresses before the directory sign-in can be switched
+    on. Until then BIBS signs users in locally with the Windows ID captured on every user (risk RSK-04, dependency DEP-04
+    of the Drop 0 closure).
+  proposal: BDOI IT registers BIBS once per environment; SIT and UAT use a test tenant or test accounts; local sign-in is
+    used in SIT only until the registration is ready.
+  impact: Sign-in through EIAM is tested late or not before UAT; UAT would run on local passwords.
+  priority: High
+  owner: Head, BDOI IT (identity and access team)
+  needed_by: 04-Jan-2027
+  status: Open
+  sources: FRS BRD-11 v2.0 FR-UA-003, CLR-UA-01; Sign-off workbook BRD-11 Cross-BRD contract IC-08; Drop 0 closure DEC-05,
+    CFG-075, DEP-04, RSK-04; Programme alignment IQ04
+- ref: UA-Q08
+  category: Decision
+  area: Sign-in (EIAM)
+  need: 'Which claim identifies the user returned by EIAM: the Windows ID (on-premises account name), the user principal
+    name (UPN), or the employee number? Please also give the format of the Windows ID and how it relates to the BIBS user
+    ID (a999999999).'
+  background: BIBS matches the signed-in identity to the BIBS user by the Windows ID or the UPN (FRS chapter 7). The BRD
+    names the Windows ID as the sign-in key (p.14) and a separate user ID of format a999999999 (p.13). Entra ID gives the
+    UPN by default; the Windows ID needs an extra claim.
+  proposal: EIAM sends the Windows ID in a dedicated claim (or the UPN where the Windows ID is not released); BIBS matches
+    it to the Windows ID held on each user; the BIBS user ID stays the employee-number format.
+  impact: Users cannot be linked to their BDO identity; the users list (CI-01) cannot be prepared with the right key.
+  priority: High
+  owner: Head, BDOI IT (identity and access team)
+  needed_by: 01-Dec-2026
+  status: Open
+  sources: BRD User Access Maintenance p.13 (NFR 1.j), p.14; FRS BRD-11 v2.0 FR-UA-003, FR-UA-052, chapter 7; Programme
+    alignment IQ04; Discrepancy register DCR-230
+- ref: UA-Q09
+  category: Decision
+  area: Sign-in (EIAM)
+  need: Please confirm that roles and permissions stay in BIBS (group profiles) and are not taken from Entra ID groups,
+    and decide whether EIAM should also restrict who may reach BIBS through an Entra ID group or application assignment.
+  background: Authorisation is held in BIBS in every sign-in mode (FR-UA-003 rule R2). BIBS can optionally accept a sign-on
+    only when the identity provider asserts an agreed group.
+  proposal: Roles stay in BIBS; EIAM assigns the BIBS application only to a 'BIBS users' group maintained by BDOI IT; no
+    group-to-role mapping.
+  impact: Two places could grant access, and the BRD-11 four-eyes rule could be bypassed.
+  priority: Medium
+  owner: Head, BDOI IT (identity and access team)
+  needed_by: 01-Dec-2026
+  status: Open
+  sources: FRS BRD-11 v2.0 FR-UA-003 rule R2; User access design section 10.1; Programme alignment INT-01, IQ04
+- ref: UA-Q10
+  category: Decision
+  area: Sign-in (EIAM)
+  need: 'Please set the multi-factor and conditional access rules: is MFA enforced by Entra ID for every BIBS user; does
+    a conditional access policy enforce access ''using any BDO issued device'' (BRD 1.001.1); and should BIBS ask its own
+    authenticator code after the single sign-on or for local accounts?'
+  background: The BRD requires access from BDO-issued devices only (p.8) but BIBS cannot see the device; the FRS leaves
+    this to the BDO network and device policy (CLR-UA-17). BIBS has its own second factor (authenticator app) whose policy
+    is ALL, PRIVILEGED (HIGH and ADMIN profiles) or OFF.
+  proposal: Entra ID enforces MFA and the BDO-device rule through conditional access; BIBS does not ask a second code after
+    the single sign-on; the BIBS second factor is always asked of break-glass and other local accounts.
+  impact: The BDO-device requirement has no control owner; users may be asked for two second factors, or none.
+  priority: High
+  owner: Head, BDOI Information Security
+  needed_by: 01-Dec-2026
+  status: Open
+  sources: BRD User Access Maintenance p.8 (BRD 1.001.1); FRS BRD-11 v2.0 FR-UA-001, FR-UA-003, CLR-UA-17; Programme alignment
+    IQ04; Discrepancy register DCR-230
+- ref: UA-Q11
+  category: Decision
+  area: Session
+  need: How must the Entra ID session and token lifetimes work with the BRD rule of a 15-minute inactivity warning and a
+    30-minute sign-out? After BIBS signs a user out for inactivity, must the user re-enter credentials at EIAM, or may Entra
+    ID sign the user back in silently? Please also give the maximum length of a BIBS session (the 'fixed session expiry'
+    before which BIBS warns 30 minutes ahead).
+  background: BIBS keeps its own inactivity warning (15 minutes) and sign-out (30 minutes) in every mode (FR-UA-002). If
+    the Entra ID session is still open, a user returning after the BIBS time-out would be signed in again without a password,
+    which weakens the 30-minute rule. The FRS does not state the value of the fixed session expiry.
+  proposal: BIBS asks EIAM to re-authenticate the user after an inactivity sign-out; BIBS inactivity 15 / 30 minutes; maximum
+    session length 10 hours (one working day), to be confirmed by Information Security.
+  impact: The session rule cannot be tested end to end with EIAM; the fixed session expiry has no agreed value.
+  priority: High
+  owner: Head, BDOI Information Security
+  needed_by: 01-Dec-2026
+  status: Open
+  sources: BRD User Access Maintenance p.8, p.17 (Other BU NFR 5); FRS BRD-11 v2.0 FR-UA-002, section 9.1 (SESSION_EXPIRY_WARNING_MINUTES);
+    Programme alignment IQ04
+- ref: UA-Q12
+  category: Decision
+  area: Session
+  need: Should Log Out in BIBS also end the user's EIAM (Entra ID) session? Note that ending the Entra ID session also signs
+    the user out of the other BDO applications opened with the same session.
+  background: The FRS interface table states that 'log-out also ends the EIAM session' (chapter 7), but BDOI has not confirmed
+    it. The BRD asks for log-in and log-out to be logged (p.17).
+  proposal: Log Out ends the BIBS session, records it in the session log and sends the user to the Entra ID sign-out page;
+    BDOI IT confirms that single sign-out is acceptable to the other BDO applications.
+  impact: Users may stay signed in at EIAM on shared or unattended devices, or be signed out of other applications unexpectedly.
+  priority: Medium
+  owner: Head, BDOI IT (identity and access team)
+  needed_by: 01-Dec-2026
+  status: Open
+  sources: BRD User Access Maintenance p.17 (Other BU NFR 6); FRS BRD-11 v2.0 FR-UA-004, chapter 7; Programme alignment
+    IQ04
+- ref: UA-Q13
+  category: Decision
+  area: Sign-in (EIAM)
+  need: 'Are local break-glass administrator accounts allowed when EIAM is the sign-in? If yes: how many, who holds them,
+    how the credentials are kept, and how each use is reviewed.'
+  background: When EIAM is down, nobody can sign in to administer BIBS unless a local account exists (FR-UA-003, UQ04).
+    BIBS keeps a local password plus a mandatory authenticator code for named break-glass users. The System Administrator
+    profile is exempt from the dormant-user job.
+  proposal: Two named break-glass System Administrator accounts, local password plus authenticator code, credentials sealed
+    by Information Security, every sign-in alerted to Information Security and reviewed monthly; the switch to EIAM is made
+    only once these accounts exist.
+  impact: There is no recovery path if EIAM is unavailable, or an unreviewed local account remains.
+  priority: High
+  owner: Head, BDOI Information Security
+  needed_by: 01-Dec-2026
+  status: Open
+  sources: FRS BRD-11 v2.0 FR-UA-003, UQ04, FR-UA-006 rule R3; Discrepancy register DCR-143; Programme alignment IQ04
+- ref: UA-Q14
+  category: Clarification
+  area: Sign-in (EIAM)
+  need: Is every BIBS user in BDO's Entra ID, including Contact Center agents, contractual or agency staff, vendor support
+    staff and external auditors? How do users without a BDO account sign in (guest accounts in Entra ID, or local BIBS accounts)?
+  background: BRD-9 asks agents to sign in with a user ID and password; EIAM covers BDO identities. External portal users
+    are switched off (CLR-UA-04). Any user outside EIAM would need a local password under the LOCAL password policy.
+  proposal: Every user has a BDO Entra ID account (guest accounts for vendors and auditors); no local accounts other than
+    the break-glass administrators.
+  impact: Some users may be unable to sign in at go-live, or local accounts remain outside the BDO identity controls.
+  priority: High
+  owner: Head, BDOI IT (identity and access team)
+  needed_by: 01-Dec-2026
+  status: Open
+  sources: FRS BRD-11 v2.0 FR-UA-003, CLR-UA-04; Discrepancy register DCR-143; Programme alignment IQ04
+- ref: UA-Q15
+  category: Conflict in BRD
+  area: Sign-in (EIAM)
+  need: The BRD requires users to be locked out after 3 invalid attempts (p.14). With EIAM, password checks and lock-out
+    happen in Entra ID, whose lock-out threshold is set by BDO IT. Please confirm whether the Entra ID lock-out policy meets
+    this requirement, or state the threshold Entra ID must apply for BIBS users.
+  background: BIBS applies LOGIN_MAX_FAILED_ATTEMPTS = 3 to local sign-in (answered, DCR-142). Once sign-in is through EIAM,
+    BIBS never sees a wrong password, so the BIBS counter applies only to local accounts and to failed second-factor codes.
+  proposal: The BDO Entra ID lock-out policy is accepted as meeting the BRD rule for directory users; the BIBS limit of
+    3 stays for local accounts.
+  impact: The BRD lock-out requirement (UAM-NFR-19) cannot be shown as met in UAT.
+  priority: Medium
+  owner: Head, BDOI Information Security
+  needed_by: 01-Dec-2026
+  status: Open
+  sources: BRD User Access Maintenance p.14 (lock-out); FRS BRD-11 v2.0 FR-UA-001 rule R1, UAM-NFR-19; Discrepancy register
+    DCR-142, DCR-230
+- ref: UA-Q16
+  category: Decision
+  area: Password policy
+  need: 'Please confirm the password policy for local accounts (break-glass administrators and any user not signing in through
+    EIAM): at least 10 characters with upper and lower case, a digit and a symbol; history of 8; change every 90 days; minimum
+    age 1 day; forced change after a reset; self-service reset by an e-mailed single-use link valid 30 minutes.'
+  background: BRD-11 asks to 'enforce strong password policies' and self-service reset without values (p.17). BRD-4 and
+    BRD-7 give minimum 8 characters, 12 for administrators, history 8, 90 days and minimum age 1 day. The length and complexity
+    rule is fixed in BIBS; the other values are parameters (template CI-05).
+  proposal: As listed above; the minimum length of 10 covers the BRD-4 administrator rule of 12 only if Information Security
+    accepts 10, otherwise 12 for every local account.
+  impact: Local accounts are signed off without an agreed password policy; the fixed length rule cannot change after sign-off
+    without a change request.
+  priority: Medium
+  owner: Head, BDOI Information Security
+  needed_by: 01-Dec-2026
+  status: Open
+  sources: BRD User Access Maintenance p.17 (Other BU NFR 1, 7, 8); FRS BRD-11 v2.0 FR-UA-005, UQ08; Configuration input
+    templates BRD-11 CI-05; Discrepancy register DCR-144; Drop 0 closure DEC-06
+- ref: UA-Q17
+  category: Clarification
+  area: User profile
+  need: 'Which profile fields may users update themselves on My Profile (proposed: e-mail address and mobile number), and
+    must such a change be approved? Once EIAM is used, should the name and e-mail be taken from Entra ID instead?'
+  background: The BRD asks that 'a defined user can update profile information' (p.17) without naming the fields (UQ17).
+  proposal: Users update their mobile number themselves without approval; name and e-mail come from the user record (and
+    from EIAM once enabled) and change only through a Modify user request.
+  impact: Notices and reset links could go to an address that was changed without control.
+  priority: Low
+  owner: Process Owner, User Access Maintenance (Business Administration)
+  needed_by: 01-Dec-2026
+  status: Open
+  sources: BRD User Access Maintenance p.17 (Other BU NFR 8); FRS BRD-11 v2.0 FR-UA-005, UQ17
+- ref: UA-Q18
+  category: Decision
+  area: Provisioning (UIDM-ISC)
+  need: 'BRD-11 makes an approved request in BIBS the only way to change a user or a group profile (p.6); the drop plan
+    adds UIDM-ISC (identity governance). Please choose the provisioning option: (a) UIDM-ISC provisions user accounts (create,
+    deactivate, reactivate) while group-profile assignments stay BIBS requests under four eyes; (b) UIDM-ISC provisions
+    users and their group profiles, and BIBS applies them; or (c) no provisioning, UIDM-ISC only reads accounts and roles
+    for certification.'
+  background: Options (a) and (b) are delivered through a SCIM 2.0 interface (or the connector UIDM-ISC offers), each change
+    being recorded in the BIBS access-change log with the UIDM-ISC request number so the BRD-11 audit reports keep working.
+    In this set every change is a BIBS request (CLR-UA-03).
+  proposal: 'Option (a): joiners and leavers from UIDM-ISC; role and data-access changes stay BIBS requests under four eyes;
+    aggregation export for certification.'
+  impact: The scope of the BIBS request screens, the provisioning interface and the bulk load at go-live cannot be fixed;
+    DCR-229 stays open.
+  priority: High
+  owner: Head, BDOI IT (identity and access team)
+  needed_by: 01-Dec-2026
+  status: Open
+  sources: BRD User Access Maintenance p.6; FRS BRD-11 v2.0 chapter 7, CLR-UA-03, IQ05; Discrepancy register DCR-229; Change
+    register CR-0161; Programme alignment INT-02, IQ05; Drop 0 closure DEC-05
+- ref: UA-Q19
+  category: Clarification
+  area: Provisioning (UIDM-ISC)
+  need: 'Please confirm that UIDM-ISC is the SailPoint Identity Security Cloud product, and which connector it will use
+    for BIBS: SCIM 2.0 (Users and Groups), a web-service connector, or a flat file. Please also state how often accounts
+    and entitlements are aggregated.'
+  background: The product name is read as SailPoint Identity Security Cloud (to confirm). The connector type decides the
+    interface BIBS exposes and its security set-up.
+  proposal: SCIM 2.0 with OAuth client credentials; daily aggregation of accounts, group profiles and last sign-in.
+  impact: The provisioning interface cannot be specified in the Technical Specification.
+  priority: Medium
+  owner: Head, BDOI IT (identity and access team)
+  needed_by: 04-Jan-2027
+  status: Open
+  sources: Programme alignment INT-02, IQ05; User access design section 10.1; FRS BRD-11 v2.0 IQ05
+- ref: UA-Q20
+  category: Decision
+  area: Provisioning (UIDM-ISC)
+  need: 'If UIDM-ISC provisions changes, which approval and controls apply in BIBS: are UIDM-ISC-approved changes applied
+    directly (as system requests with the UIDM-ISC number) or do they still need a BIBS approver; does BIBS refuse a change
+    that breaks a BIBS separation-of-duties rule; how soon must a leaver be deactivated; and how are movers (change of unit
+    or branch) handled?'
+  background: BIBS checks separation-of-duties rules on every request and bulk line (FR-UA-053) and needs a second approval
+    for privileged or out-of-hours changes (FR-UA-034). An IGA normally owns approvals; two approvals of the same change
+    would duplicate work.
+  proposal: Changes approved in UIDM-ISC are applied as system requests without a second BIBS approval; BIBS still refuses
+    separation-of-duties conflicts and reports the refusal back; leavers are deactivated on receipt (same day); movers change
+    only the unit data, and their group profiles change by BIBS request.
+  impact: The four-eyes, separation-of-duties and second-approval rules signed in this set may conflict with the IGA flow.
+  priority: High
+  owner: Head, BDOI Information Security
+  needed_by: 01-Dec-2026
+  status: Open
+  sources: FRS BRD-11 v2.0 FR-UA-034, FR-UA-053, IQ05; Discrepancy register DCR-229; Programme alignment IQ05
+- ref: UA-Q21
+  category: Decision
+  area: Access certification
+  need: 'How will access certification work: frequency, who certifies (unit heads or Information Security), the content
+    of the extract (users, group profiles, data access, last sign-in), and how revocations decided in a certification campaign
+    come back to BIBS (UIDM-ISC de-provisioning or BIBS requests)?'
+  background: The BIBS reports give the user and profile lists for certification (User Access Report, Group Profile Membership).
+    The BRD does not ask for certification; UIDM-ISC brings it.
+  proposal: Quarterly certification by unit heads in UIDM-ISC using the daily aggregation; revocations are sent back as
+    deactivation or modification requests and recorded with the campaign reference.
+  impact: Certification results may not be applied in BIBS, or be applied without an audit trail.
+  priority: Medium
+  owner: Head, BDOI Information Security
+  needed_by: 16-Jul-2027
+  status: Open
+  sources: FRS BRD-11 v2.0 FR-UA-060, FR-UA-062, IQ05; Sign-off workbook BRD-11 Cross-BRD contract IC-09; Programme alignment
+    INT-02
+- ref: UA-Q22
+  category: Decision
+  area: Integration security (Apigee)
+  need: Is Apigee X the BDO standard gateway in front of BIBS? If yes, please confirm (1) that the users' browser traffic
+    does not pass through Apigee; (2) that the UIDM-ISC provisioning and aggregation interface is exposed through Apigee;
+    and (3) the OAuth scopes, client and quotas for it.
+  background: The infrastructure workbook shows Apigee X validating OpenID Connect tokens; BIBS issues its own session token
+    after sign-in and protects system-to-system interfaces separately (Programme alignment IQ25).
+  proposal: Browser traffic through the load balancer and web application firewall, not Apigee; the provisioning interface
+    through Apigee with one client for UIDM-ISC and two scopes (provisioning write, aggregation read only), which BIBS checks
+    as well.
+  impact: The provisioning interface and the network path of the sign-in cannot be designed or penetration tested.
+  priority: Medium
+  owner: Head, BDOI IT (identity and access team)
+  needed_by: 04-Jan-2027
+  status: Open
+  sources: Programme alignment IQ25 (edge and ingress), INT-02; BDOI IER workbook (architecture diagram)
+- ref: UA-Q23
+  category: Confirmation
+  area: Authorisation
+  need: Please confirm that authorisation stays in BIBS group profiles and permissions and that no external access-control
+    list (ACL) is used, or name the external ACL system the BRD refers to.
+  background: NFR 1.i asks that BIBS 'can support authorisation of users by interfacing with an external ACL' (p.13) without
+    naming it (UQ14). It may be covered by UIDM-ISC.
+  proposal: No external ACL; authorisation in BIBS; UIDM-ISC (if chosen) provisions assignments only.
+  impact: UAM-NFR-12 stays open in the traceability.
+  priority: Low
+  owner: Head, BDOI IT (identity and access team)
+  needed_by: 01-Dec-2026
+  status: Open
+  sources: BRD User Access Maintenance p.13 (NFR 1.i); FRS BRD-11 v2.0 CLR-UA-02, UQ14; Change register CR-0162; Discrepancy
+    register DCR-120
+- ref: UA-Q24
+  category: Confirmation
+  area: External users
+  need: Please confirm that external (portal) users of insurers and client HR stay switched off, since BDOI's drop plan
+    has Employee Benefits without a portal.
+  background: BIBS refuses requests of user type External while no portal is installed (parameter UAM_EXTERNAL_USERS = false;
+    CLR-UA-04). Hosting, MFA and approval of external users were never defined (DCR-096).
+  proposal: External users stay off; turning them on later needs Information Security approval and a change request for
+    the portal.
+  impact: Employee Benefits and User Access could be built for users who will not exist.
+  priority: Medium
+  owner: Product Owner, Marketing Business System
+  needed_by: 01-Dec-2026
+  status: Open
+  sources: FRS BRD-11 v2.0 CLR-UA-04, chapter 7 (portal users); Programme alignment IQ22; Discrepancy register DCR-096
+- ref: UA-Q25
+  category: Conflict in BRD
+  area: User ID
+  need: Please confirm the user ID format. The BRD asks for 'at least ten (10) alphanumeric characters' and 'supports a999999999
+    format' (p.13). BIBS checks new user IDs against a letter followed by nine digits (for example a013000196). Is the user
+    ID the employee number, and how does it relate to the Windows ID? Embedded service accounts follow p_appname_description
+    (p.12-13).
+  background: '''At least ten characters'' and an exact a999999999 pattern are not the same rule. The parameter USER_ID_PATTERN
+    sets the check; existing service and test users are exempt.'
+  proposal: The user ID is the employee number, letter plus nine digits; the Windows ID is held separately for EIAM; service
+    accounts follow the BDO naming convention and are exempt from the pattern.
+  impact: Users of template CI-01 cannot be prepared and the request screens' check cannot be frozen.
+  priority: High
+  owner: Process Owner, User Access Maintenance (Business Administration)
+  needed_by: 01-Dec-2026
+  status: Open
+  sources: BRD User Access Maintenance p.12-13 (NFR 1.j, embedded IDs); FRS BRD-11 v2.0 FR-UA-011 rule R1, FR-UA-052, UQ05;
+    Discrepancy register DCR-118; Change register CR-0163
+- ref: UA-Q26
+  category: Data or input needed
+  area: Lists of values
+  need: Please provide the values of the business unit groups and user levels, and confirm the deactivation reasons (Resigned;
+    Transferred to another unit; Long leave; Security; Others).
+  background: The BRD names the fields Business Unit Group and User Level (p.14) without values; the lists are delivered
+    empty and not checked until filled (CLR-UA-05). The reason 'No sign-in for the dormancy period' is used by the dormant-user
+    job.
+  proposal: BDOI fills template CI-06; deactivation reasons as listed.
+  impact: Users cannot be loaded with their unit and level; reports cannot be filtered by business unit.
+  priority: Medium
+  owner: Process Owner, User Access Maintenance (Business Administration)
+  needed_by: 09-Apr-2027
+  status: Open
+  sources: BRD User Access Maintenance p.14; FRS BRD-11 v2.0 section 9.2, CLR-UA-05, UQ05; Configuration input templates
+    BRD-11 CI-06; Drop 0 closure DEC-07
+- ref: UA-Q27
+  category: Data or input needed
+  area: Users at go-live
+  need: 'Please provide the list of BIBS users: for the SIT and UAT reviewers first, then every user at go-live, with user
+    ID, full name, e-mail, Windows ID, home branch, business unit group, user level and group profiles (template CI-01).'
+  background: Users are not migrated from the legacy systems (data migration object R10 excluded); they are loaded with
+    the bulk request and approved like single requests (IC-07).
+  proposal: SIT and UAT reviewers by 9-Apr-2027; production users by 1-Nov-2027 for the dress rehearsal.
+  impact: Drop 1 SIT and UAT cannot run with named BDOI users; go-live users are not ready for the dress rehearsal.
+  priority: High
+  owner: Process Owner, User Access Maintenance (Business Administration)
+  needed_by: 09-Apr-2027
+  status: Open
+  sources: FRS BRD-11 v2.0 FR-UA-019; Configuration input templates BRD-11 CI-01; Sign-off workbook BRD-11 Cross-BRD contract
+    IC-07; Drop 0 closure CFG-110, DEP-05
+- ref: UA-Q28
+  category: Confirmation
+  area: Users at go-live
+  need: Please confirm that legacy user accounts are not migrated, that the go-live users are loaded with an approved bulk
+    request, and that legacy user IDs are only mapped so that migrated history shows who did what.
+  background: The BRD marks user migration 'N/A' (p.12); the Data Migration set excludes users (DMQ30).
+  proposal: As stated.
+  impact: Duplicate or unapproved accounts could reach production through the migration.
+  priority: Medium
+  owner: Product Owner, Marketing Business System
+  needed_by: 01-Dec-2026
+  status: Open
+  sources: BRD User Access Maintenance p.12 (Migration); FRS BRD-11 v2.0 section 1.2; Drop 0 closure CFG-110; Sign-off workbook
+    BRD-11 Cross-BRD contract IC-07
+- ref: UA-Q29
+  category: Data or input needed
+  area: Role catalogue
+  need: The BRD assumes 'there's a defined User Access Matrix in place' (p.5), but no BIBS-wide matrix was supplied. Please
+    provide it, or approve the proposed role catalogue (the group profiles and menus of every persona in FRS chapter 12
+    and the menu sheets of the sign-off workbook), including which profiles are High or Admin privilege.
+  background: Each BRD gives its own personas; the project proposes about fifty group profiles across the modules. The privilege
+    level of a profile decides when a second approval is required (UQ07).
+  proposal: BDOI approves the proposed catalogue at sign-off; System Administrator and Information Security Officer profiles
+    are Admin; approver, Business Administrator and finance-posting profiles are High; the others Standard or Low.
+  impact: Menus cannot be signed and the second-approval rule has no list of privileged profiles.
+  priority: High
+  owner: Head, BDOI Information Security
+  needed_by: 01-Dec-2026
+  status: Open
+  sources: BRD User Access Maintenance p.5 (assumption); FRS BRD-11 v2.0 chapter 3, chapter 12, A-UA-03, UQ01, UQ07; Discrepancy
+    register DCR-121
+- ref: UA-Q30
+  category: Data or input needed
+  area: Role catalogue
+  need: 'Please complete the role-to-permission matrix (template CI-02): the group profiles BDOI keeps and the permissions
+    of each, starting from the User Access Matrix as delivered.'
+  background: The matrix is implemented by group-profile requests and checked with the User Group Profile Report; it is
+    needed before the first trial migration.
+  proposal: Business Administration fills CI-02 with the unit heads; Information Security reviews and signs it.
+  impact: Trial migration 1 and Drop 1 SIT run on the proposed matrix instead of BDOI's.
+  priority: High
+  owner: Process Owner, User Access Maintenance (Business Administration)
+  needed_by: 09-Apr-2027
+  status: Open
+  sources: Configuration input templates BRD-11 CI-02; Drop 0 closure CFG-111, DEP-05; FRS BRD-11 v2.0 chapter 19
+- ref: UA-Q31
+  category: Data or input needed
+  area: Segregation of duties
+  need: 'Please provide the separation-of-duties rules (template CI-04): the pairs of group profiles one user may not hold
+    together. Please also confirm the fixed rules (the requester and the subject user never decide a request; the second
+    approver differs from the first; the implementer differs from the requester), that the Requestor and the Business Administrator
+    are separate persons, and that one user may hold several profiles.'
+  background: BRD-11 allows several roles per user (p.13), which BRD-4's single-role rule contradicted (answered, DCR-045).
+    A new rule applies to later requests; users who already hold both profiles are found with the User Access Report and
+    corrected by request (CLR-UA-15).
+  proposal: 'Fixed rules as listed; first combinations proposed: Requestor with Approver, Business Administrator with System
+    Administrator, maker and checker profiles of the same module; Information Security reviews existing holders after each
+    new rule.'
+  impact: Conflicting access can be granted at go-live without detection.
+  priority: High
+  owner: Head, BDOI Information Security
+  needed_by: 16-Jul-2027
+  status: Open
+  sources: BRD User Access Maintenance p.13 (NFR 1.c-d), p.17 (Other BU NFR 11); FRS BRD-11 v2.0 FR-UA-053, CLR-UA-15, UQ01;
+    Configuration input templates BRD-11 CI-04; Discrepancy register DCR-045; Drop 0 closure CFG-113
+- ref: UA-Q32
+  category: Decision
+  area: Role catalogue
+  need: Should Requestors (and Second Approvers) be able to open the User Access Matrix, to choose the right group profile
+    for a request?
+  background: The BRD's view function (4.002.2.7) does not name the matrix. As built, the matrix serves the request-approval,
+    role-management and audit rights only (CLR-UA-11).
+  proposal: Requestors may read the matrix (read only); no export.
+  impact: Requestors choose profiles without seeing their content, leading to returned requests.
+  priority: Low
+  owner: Process Owner, User Access Maintenance (Business Administration)
+  needed_by: 01-Dec-2026
+  status: Open
+  sources: BRD User Access Maintenance p.10 (4.002.2.7); FRS BRD-11 v2.0 FR-UA-051, CLR-UA-11
+- ref: UA-Q33
+  category: Data or input needed
+  area: Approval matrix
+  need: 'Please name the users of each user-access role (template CI-03): the Requestors (BRD p.11: 14 users), Approvers
+    (8), Business Administrators (4), the System Administrator (1), the Second Approvers, the Information Security Officers
+    and the Auditors, with the unit each requests or approves for.'
+  background: 'UQ01 is open: who the 14 Requestors and 8 Approvers are, and whether the Requestor is separate from the Business
+    Administrator. The UAT entry criteria need the answers to UQ01, UQ02, UQ05 and UQ07 applied.'
+  proposal: BDOI fills CI-03; the SIT and UAT reviewers are named first.
+  impact: UAT cannot start (test plan entry criteria); approvals cannot be routed.
+  priority: High
+  owner: Process Owner, User Access Maintenance (Business Administration)
+  needed_by: 16-Jul-2027
+  status: Open
+  sources: BRD User Access Maintenance p.7, p.11; FRS BRD-11 v2.0 UQ01; Configuration input templates BRD-11 CI-03; Test
+    plan BRD-11 v2.0 section 3; Drop 0 closure CFG-112
+- ref: UA-Q34
+  category: Decision
+  area: Approval matrix
+  need: 'Which users may be chosen as approver of a user access request: any holder of the approval right, or only the approver(s)
+    of the requester''s unit? May any approver decide a request, or only the one chosen? For group-profile requests, do
+    the chosen approvers decide in sequence or in parallel, and must all approve?'
+  background: 'The BRD lets the requester select the approver (1.002.1.3) and ''approver/s'' for group profiles (3.002.x)
+    without rules (UQ02). BIBS default: the chosen approver only (UAM_ANY_APPROVER = false); group-profile approvers in
+    sequence, all required (A-UA-05).'
+  proposal: Approvers limited to holders of the approval right for the requester's unit; only the chosen approver decides;
+    group-profile approvers in the order chosen, all required.
+  impact: The approval routing and the configuration of CI-03 cannot be finalised.
+  priority: High
+  owner: Process Owner, User Access Maintenance (Business Administration)
+  needed_by: 01-Dec-2026
+  status: Open
+  sources: BRD User Access Maintenance p.8-9 (1.002.1.3, 3.002.1.2); FRS BRD-11 v2.0 FR-UA-015, FR-UA-044, A-UA-05, UQ02
+- ref: UA-Q35
+  category: Data or input needed
+  area: Approval matrix
+  need: Please provide the authorisation limits (amount in PHP) of the users who approve by amount in other modules (journals,
+    payables and similar), held on each user record.
+  background: The authorisation limit is carried on Create user and Modify user requests and used by the modules that approve
+    by amount (template CI-03).
+  proposal: Comptrollership provides the limits per user or per user level; blank means no amount approval.
+  impact: Amount-based approvals in Accounting and Disbursement cannot be tested with real limits.
+  priority: Medium
+  owner: Head, Comptrollership
+  needed_by: 16-Jul-2027
+  status: Open
+  sources: FRS BRD-11 v2.0 FR-UA-011, FR-UA-012; Configuration input templates BRD-11 CI-03; Drop 0 closure CFG-112
+- ref: UA-Q36
+  category: Confirmation
+  area: Request workflow
+  need: 'Please confirm the request stages and the implementation step: user requests go Draft, Pending Approval, Second
+    approval (only where needed), Approved (Scheduled while waiting for an effective date); group-profile requests end with
+    For implementation and Implemented, the System Administrator implementing every approved change for every module (including
+    Product Maintenance); full status labels are shown.'
+  background: The BRD diagram (p.6) has the system grant user access on approval but the System Administrator create or
+    modify group profiles after approval (PQ17 answered; UQ03 open). BIBS can instead apply group-profile changes on approval
+    (parameter UAM_ROLE_APPLY_ON_APPROVAL).
+  proposal: As stated; UAM_ROLE_APPLY_ON_APPROVAL = false.
+  impact: The stepper, statuses and the System Administrator workload cannot be frozen.
+  priority: Medium
+  owner: Process Owner, User Access Maintenance (Business Administration)
+  needed_by: 01-Dec-2026
+  status: Open
+  sources: BRD User Access Maintenance p.6; FRS BRD-11 v2.0 FR-UA-041, FR-UA-045, CLR-UA-12, CLR-UA-18, CLR-UA-19, CLR-UA-20,
+    UQ03; Discrepancy register DCR-117; Drop 0 closure DEC-04, DEC-15
+- ref: UA-Q37
+  category: Decision
+  area: Second approval
+  need: Please set the working hours used to flag out-of-hours changes for a second approval (proposed 08:00-18:00, Monday
+    to Friday, Philippine time), say whether public holidays count as out of hours, and confirm who gives the second approval.
+  background: BRD Other BU NFR 11 asks that changes 'done outside working hours or from low privilege to high-privilege
+    access' are escalated for additional review (p.17). The working-hours parameter has no holiday calendar (CLR-UA-14).
+  proposal: 08:00-18:00 Monday to Friday; public holidays of the BIBS holiday calendar count as out of hours; second approval
+    by Information Security Officers holding the Second Approver profile.
+  impact: The escalation rule cannot be tested with BDOI values; out-of-hours changes on holidays pass without review.
+  priority: Medium
+  owner: Head, BDOI Information Security
+  needed_by: 16-Jul-2027
+  status: Open
+  sources: BRD User Access Maintenance p.17 (Other BU NFR 11); FRS BRD-11 v2.0 FR-UA-034, CLR-UA-14, UQ07; Drop 0 closure
+    DEC-06
+- ref: UA-Q38
+  category: Decision
+  area: Emergency access
+  need: May the System Administrator ever edit a group profile or a user directly in an emergency, outside the request flow?
+    If yes, who must approve opening that path and who reviews each edit afterwards?
+  background: Direct edits are refused unless the parameter UAM_DIRECT_ROLE_EDIT is switched on; switching it on needs the
+    second approval of Information Security, and each edit is audited and alerted (FR-UA-045, FR-UA-054).
+  proposal: Off by default; opened only with Information Security approval for a stated incident; Information Security reviews
+    every edit within one working day and closes the path.
+  impact: The emergency path signed in this set has no agreed owner or review.
+  priority: Medium
+  owner: Head, BDOI Information Security
+  needed_by: 01-Dec-2026
+  status: Open
+  sources: FRS BRD-11 v2.0 FR-UA-045, FR-UA-054, section 9.1 (UAM_DIRECT_ROLE_EDIT); User access design section 15
+- ref: UA-Q39
+  category: Decision
+  area: Effective dates
+  need: Is temporary access with an end date needed (for example a group profile given until a date)? May a scheduled request
+    be cancelled before its effective date? And for an enrolment with a future effective date, is it acceptable that the
+    System Administrator resets the password on that date (the temporary password is shown only once, at approval)?
+  background: The BRD asks for an effective date for user and role changes (NFR 1.k, p.13) without saying whether it covers
+    start and end dates (UQ06, CLR-UA-13). Scheduled enrolments are handled as in CLR-UA-06.
+  proposal: Start dates only, no end date; a scheduled request can be cancelled until its date; scheduled enrolments as
+    proposed (with EIAM no BIBS password is needed).
+  impact: Temporary access for projects or cover would need manual removal.
+  priority: Medium
+  owner: Process Owner, User Access Maintenance (Business Administration)
+  needed_by: 01-Dec-2026
+  status: Open
+  sources: BRD User Access Maintenance p.13 (NFR 1.k); FRS BRD-11 v2.0 FR-UA-017, FR-UA-020, CLR-UA-06, CLR-UA-13, UQ06
+- ref: UA-Q40
+  category: Decision
+  area: Group profiles
+  need: May a group profile that still has members be deactivated (the members lose its screens when the request is implemented
+    and are each notified), or must its members be moved to another profile first?
+  background: The BRD does not say (3.002.3; UQ16, CLR-UA-07).
+  proposal: Deactivation allowed; the request lists the affected members and they are notified.
+  impact: Users may lose access unexpectedly, or deactivations are blocked.
+  priority: Medium
+  owner: Process Owner, User Access Maintenance (Business Administration)
+  needed_by: 01-Dec-2026
+  status: Open
+  sources: BRD User Access Maintenance p.9 (3.002.3); FRS BRD-11 v2.0 FR-UA-042, CLR-UA-07, UQ16
+- ref: UA-Q41
+  category: Decision
+  area: Bulk requests
+  need: 'Please give the bulk request settings: the maximum number of rows per file, whether the approver decides the batch
+    as a whole or line by line, and whether one file may mix enrolments, modifications, deactivations and reactivations.
+    Please also confirm the template columns.'
+  background: The BRD asks for bulk creation, modification, deactivation and reactivation (1.009, p.8; Other BU NFR 9, p.17)
+    without limits (UQ10, CLR-UA-16). As built a batch is decided as a whole.
+  proposal: Up to 500 rows; batch decided as a whole; mixed actions allowed; columns as in the Upload templates sheet.
+  impact: The go-live user load (CI-01) and the bulk screen cannot be frozen.
+  priority: Medium
+  owner: Process Owner, User Access Maintenance (Business Administration)
+  needed_by: 01-Dec-2026
+  status: Open
+  sources: BRD User Access Maintenance p.8 (1.009), p.17; FRS BRD-11 v2.0 FR-UA-019, CLR-UA-16, UQ10; Sign-off workbook
+    BRD-11 Upload templates
+- ref: UA-Q42
+  category: Decision
+  area: Dormant users
+  need: 'Please confirm the dormant-user rules: deactivate users with no sign-in for 90 days, with a notice 7 days before;
+    System Administrator holders exempt. Should users on long leave or the break-glass accounts be exempt, and, if UIDM-ISC
+    provisions accounts, should BIBS or UIDM-ISC deactivate dormant users?'
+  background: The BRD does not ask for this; it is an information security practice proposed by the project (CLR-UA-08).
+    Each deactivation is a system request with reason 'No sign-in for the dormancy period'.
+  proposal: 90 days and 7 days; System Administrator and break-glass accounts exempt but reviewed monthly by Information
+    Security; BIBS keeps the job even with UIDM-ISC.
+  impact: Accounts of leavers or inactive users stay open, or active users are deactivated unexpectedly.
+  priority: Medium
+  owner: Head, BDOI Information Security
+  needed_by: 16-Jul-2027
+  status: Open
+  sources: FRS BRD-11 v2.0 FR-UA-006, CLR-UA-08; Configuration input templates BRD-11 CI-05; Drop 0 closure DEC-06
+- ref: UA-Q43
+  category: Conflict in BRD
+  area: Session
+  need: Please confirm that one inactivity rule (warning at 15 minutes, sign-out at 30 minutes) applies to every BIBS user.
+    BRD-4 Collections and BRD-7 Claims state 'session timeout is set to 15 minutes'.
+  background: BRD-11 (p.8, p.17) and BRD-1 give the 15 / 30-minute rule, applied BIBS-wide (answered for BRD-1, DCR-008);
+    the conflict with BRD-4 and BRD-7 (DCR-140) is still open.
+  proposal: 'BRD-11 governs: 15-minute warning, 30-minute sign-out for all users.'
+  impact: Collections and Claims could reject the session behaviour in their UAT.
+  priority: Medium
+  owner: Product Owner, Marketing Business System
+  needed_by: 01-Dec-2026
+  status: Open
+  sources: BRD User Access Maintenance p.8, p.17; FRS BRD-11 v2.0 FR-UA-002; Discrepancy register DCR-008, DCR-140; Change
+    register CR-0024
+- ref: UA-Q44
+  category: Conflict in BRD
+  area: Session
+  need: Must BIBS allow only one session per user (a new sign-in on another device ends the old one), as BRD-4 asks, or
+    allow concurrent sessions, as BRD-7 asks? Should it apply to all users or only some?
+  background: BRD-11 is silent. BIBS records every session (session log) and does not enforce a single session (UQ09, CLR-UA-09).
+  proposal: Concurrent sessions allowed for all users; the session log and the System Administrator's End Session function
+    cover misuse.
+  impact: Collections or Claims requirements remain in conflict at UAT.
+  priority: Medium
+  owner: Head, BDOI Information Security
+  needed_by: 01-Dec-2026
+  status: Open
+  sources: FRS BRD-11 v2.0 FR-UA-004, CLR-UA-09, UQ09; Discrepancy register DCR-141; Change register CR-0025
+- ref: UA-Q45
+  category: Decision
+  area: Data scope
+  need: 'Every user can be limited to some companies and, within a company, to some branches; by default each user sees
+    all companies and all branches. Who may narrow a user''s data access: any user with the user-maintenance right through
+    an approved Create or Modify user request (as built), or only holders of a dedicated permission?'
+  background: Data access travels on the Create user and Modify user requests and is applied on approval with the request
+    number and approver; nobody can grant beyond his own data access or change his own. The BRD does not cover data access.
+  proposal: Through approved requests as built; no dedicated permission.
+  impact: Data access rules for branches cannot be agreed or tested.
+  priority: Medium
+  owner: Head, BDOI Information Security
+  needed_by: 01-Dec-2026
+  status: Open
+  sources: Data scope design sections 2, 5 and 8 (decision 1); FRS BRD-11 v2.0 FR-UA-011, FR-UA-012
+- ref: UA-Q46
+  category: Decision
+  area: Data scope
+  need: Must a user limited to some branches see only those branches' lines in company-wide reports and inquiries, or does
+    the branch limit apply only where a screen or report is run for a named branch (as built)?
+  background: The branch check applies where a request names a branch; company-wide reports show all branches of the allowed
+    companies.
+  proposal: Branch-limited users see only their branches in reports and inquiries that list branch data; Head Office users
+    keep all branches.
+  impact: Branch users may see other branches' data in reports, or reports may need rework later.
+  priority: Medium
+  owner: Head, BDOI Information Security
+  needed_by: 01-Dec-2026
+  status: Open
+  sources: Data scope design section 7 and section 8 (decision 2)
+- ref: UA-Q47
+  category: Decision
+  area: Data scope
+  need: Must a user's home branch always be included in the branches the user may access?
+  background: The home branch is captured on each user (FR-UA-011) but is not forced into the data access as built.
+  proposal: 'Yes: BIBS refuses a data access that excludes the user''s home branch.'
+  impact: A user could be unable to work on his own branch's records.
+  priority: Low
+  owner: Process Owner, User Access Maintenance (Business Administration)
+  needed_by: 01-Dec-2026
+  status: Open
+  sources: Data scope design section 7 and section 8 (decision 3); FRS BRD-11 v2.0 FR-UA-011
+- ref: UA-Q48
+  category: Decision
+  area: Data scope
+  need: Should a change of a user's data access (company or branch) be flagged for a second approval, as a change to a high-privilege
+    profile is?
+  background: Today only privilege increases and out-of-hours changes need the second approval (FR-UA-034).
+  proposal: Yes for widening a limited user to all companies or all branches; no for narrowing.
+  impact: Widening of data access would pass with one approval.
+  priority: Low
+  owner: Head, BDOI Information Security
+  needed_by: 01-Dec-2026
+  status: Open
+  sources: Data scope design section 8 (decision 4); FRS BRD-11 v2.0 FR-UA-034
+- ref: UA-Q49
+  category: Data or input needed
+  area: Data scope
+  need: Please identify which users must be limited to certain companies or branches and give their data access. The users
+    template (CI-01) and the bulk request template have no data access column today; we propose to add one.
+  background: Without an entry every user keeps access to all companies and branches.
+  proposal: Add a Data Access column to CI-01 and the bulk template (blank = all); BDOI fills it with the users list.
+  impact: All users would go live with access to every branch.
+  priority: Medium
+  owner: Process Owner, User Access Maintenance (Business Administration)
+  needed_by: 09-Apr-2027
+  status: Open
+  sources: Configuration input templates BRD-11 CI-01; Sign-off workbook BRD-11 Upload templates; Data scope design section
+    5
+- ref: UA-Q50
+  category: Clarification
+  area: Reports
+  need: Please confirm the module and task names of the User Group Profile Report (BIBS shows the module as the permission
+    area and the task as the permission name) and the meaning of 'as of' in the report samples (BIBS shows the access held
+    at the end of that date).
+  background: The samples (p.18) use QPS task names; samples B and C share one title (UQ11, CLR-UA-10).
+  proposal: As stated; sample C is titled Group Profile Membership.
+  impact: The report layouts cannot be frozen.
+  priority: Low
+  owner: Process Owner, User Access Maintenance (Business Administration)
+  needed_by: 01-Dec-2026
+  status: Open
+  sources: BRD User Access Maintenance p.18; FRS BRD-11 v2.0 FR-UA-060, FR-UA-061, CLR-UA-10, UQ11; Discrepancy register
+    DCR-116
+- ref: UA-Q51
+  category: Clarification
+  area: Reports
+  need: The NFR volume table (p.11) lists an Event / Incident Report, a Device Status Report (daily, weekly, monthly, yearly),
+    a Historical Events Report (weekly, monthly, yearly) and an Audit Log Report (weekly, monthly, yearly), which are not
+    among the report samples (p.18). Are these reports required for BIBS, and must any report be produced on a schedule
+    and sent to named recipients?
+  background: The FRS covers the four sampled reports, run on demand, and a requests report. 'Device status' reports do
+    not fit an application; they may be copied from another template.
+  proposal: Only the four sampled reports plus the requests report, on demand; the User Access Audit Log also produced monthly
+    for Information Security if required.
+  impact: A BRD line could be found untraced at UAT.
+  priority: Medium
+  owner: Process Owner, User Access Maintenance (Business Administration)
+  needed_by: 01-Dec-2026
+  status: Open
+  sources: BRD User Access Maintenance p.11 (Projected volume table), p.18; FRS BRD-11 v2.0 chapter 6, UAM-NFR-02, UAM-NFR-41
+- ref: UA-Q52
+  category: Data or input needed
+  area: Notifications
+  need: 'Please name the recipients of the operational notices: failed batch runs (BRD p.15; parameter JOB_FAILURE_RECIPIENTS,
+    empty as delivered), the privileged-change alert, the summary of dormant-user deactivations, and any unit mailbox that
+    must receive access-change notices besides the users concerned.'
+  background: The BRD asks that failed batch runs are e-mailed to 'designated users' (p.15) without naming them.
+  proposal: Failed batch runs to the BIBS application support mailbox and the System Administrator; privileged-change alerts
+    to Information Security; dormant summaries to the Business Administrators.
+  impact: Failed jobs (for example the effective-date job) go unnoticed.
+  priority: Medium
+  owner: Process Owner, User Access Maintenance (Business Administration)
+  needed_by: 16-Jul-2027
+  status: Open
+  sources: BRD User Access Maintenance p.15; FRS BRD-11 v2.0 FR-UA-006, FR-UA-034, FR-UA-071; Drop 0 closure CFG-080
+- ref: UA-Q53
+  category: Data or input needed
+  area: Retention
+  need: Please give the retention periods for access requests, the access-change log, the session log and the audit trail.
+    The BRD says 'Follow QPS retention policy' (p.11, p.14), but the QPS values are not in the pack and the other BRDs give
+    different periods.
+  background: BIBS keeps these records at least as long as the audit trail; other BRDs give 5 years online and 15 years
+    archive, or 10 and 15 (DCR-136).
+  proposal: 5 years online and 15 years in the archive for every user-access record; no purge before the audit trail.
+  impact: Retention rules cannot be configured; the Data Privacy Act exposure stays open.
+  priority: Medium
+  owner: Head, Compliance (Data Protection Officer)
+  needed_by: 16-Jul-2027
+  status: Open
+  sources: BRD User Access Maintenance p.11, p.14; FRS BRD-11 v2.0 FR-UA-064, UQ12; Discrepancy register DCR-115, DCR-136,
+    DCR-139; Drop 0 closure CFG-074
+- ref: UA-Q54
+  category: Clarification
+  area: BRD text gaps
+  need: 'Please clarify two incomplete BRD lines: the audit-trail requirement ''allow automatic save option'' (p.14), and
+    the documentation requirement ''instruction guide on how to manage users and extract users list and group profile list
+    for ...'' which is cut off (p.17).'
+  background: Both lines are open (UQ15, UQ18).
+  proposal: '''Automatic save option'' read as the audit trail being saved automatically with every change; the guide covers
+    user administration and the extraction of the users and group profile lists for audit.'
+  impact: Two BRD lines cannot be traced to a test.
+  priority: Low
+  owner: Program Manager, Business Project Services (BDO Unibank ESG)
+  needed_by: 01-Dec-2026
+  status: Open
+  sources: BRD User Access Maintenance p.14, p.17; FRS BRD-11 v2.0 UAM-NFR-22, UAM-NFR-29, UQ15, UQ18; Discrepancy register
+    DCR-120
+- ref: UA-Q55
+  category: Decision
+  area: Data protection (masking)
+  need: 'Please confirm the masking rules for user data: (1) in DEV, SIT and UAT, names, Windows IDs, e-mail addresses and
+    mobile numbers of BDO staff are replaced and e-mails go to test mailboxes; (2) in production, the user-access screens
+    and reports show the Windows ID, e-mail and mobile number in full to their authorised viewers only, or must some be
+    masked (for example for the Auditor)?'
+  background: The BRD lists the Data Privacy Act 2012 (p.12) without masking rules. The test plan requires masked user data
+    in non-production; the security and data-protection mapping of Drop 0 covers masking.
+  proposal: (1) as stated; (2) no masking in production for holders of the report right; exports limited to the same viewers.
+  impact: UAT data preparation and the report layouts cannot be finalised; Data Privacy Act exposure.
+  priority: Medium
+  owner: Head, BDOI Information Security
+  needed_by: 16-Jul-2027
+  status: Open
+  sources: BRD User Access Maintenance p.12 (Regulatory and compliance); Test plan BRD-11 v2.0 section 4.1; Programme alignment
+    item 26 (security and data-protection mapping)
+- ref: UA-Q56
+  category: Dependency
+  area: Notifications
+  need: 'Please confirm the e-mail channel for user-access e-mails (access-changed notices, password reset links, dormant
+    notices, batch failures): BDO Centralized Communications Management (CCM) or the M365 Exchange relay, with the sender
+    address and the relay details for each environment.'
+  background: BIBS queues and sends e-mails through the relay of its environment (dependency D-UA-05, contract line IC-10).
+    CCM and M365 are both Drop 0 integrations.
+  proposal: M365 Exchange relay for system notices, one sender address per environment.
+  impact: Notices and reset links cannot be tested in SIT.
+  priority: Medium
+  owner: Head, BDOI IT (identity and access team)
+  needed_by: 04-Jan-2027
+  status: Open
+  sources: FRS BRD-11 v2.0 D-UA-05, FR-UA-005, FR-UA-070, FR-UA-071; Sign-off workbook BRD-11 Cross-BRD contract IC-10;
+    BDOI drop plan (integrations CCM, M365)
+- ref: UA-Q57
+  category: Confirmation
+  area: Non-functional
+  need: Please confirm that the infrastructure answers 'Follow existing QPS set up' (p.11-17) are replaced by the BIBS-wide
+    standards agreed for all BRDs (availability, recovery, environments, response times, logging to the BDO log server),
+    as specified in the Technical Specification reviewed by BDOI IT.
+  background: QPS is replaced by BIBS and its values are not in the pack (A-UA-07). The BRD-11 targets (10 seconds per screen,
+    20 seconds per report, p.11) are met by the BIBS targets.
+  proposal: BIBS-wide non-functional standards apply.
+  impact: The non-functional acceptance of BRD-11 has no measurable target.
+  priority: Low
+  owner: Head, BDOI IT (identity and access team)
+  needed_by: 01-Dec-2026
+  status: Open
+  sources: BRD User Access Maintenance p.11-17; FRS BRD-11 v2.0 chapter 8, A-UA-07; Discrepancy register DCR-134, DCR-137,
+    DCR-139
+BRD-13:
+- ref: DM-Q01
+  category: Confirmation
+  area: BRD baseline
+  need: 'Please confirm that the Data Migration BRD V0.03 shared on 8 October 2026 (signed by the approvers between 15 and
+    19 May 2026) is the approved baseline of BRD-13 and replaces draft V0.01, and confirm its version number: the revision
+    log shows 0.01 (14-Apr-2026), 0.02 (14-May-2026) and an entry of 15-May-2026 without a version number.'
+  background: New in BRD V0.03. Our handbook and workbook v2.0 were built on draft V0.01 of 14-Apr-2026, recorded as not
+    signed (Handbook 'Scope and basis', assumption A-DM-01; register DCR-189, open decision 'BRD sign-off'). V0.03 p.19-20
+    carries the signatures of all preparers, reviewers and approvers dated 15 to 19 May 2026; the Head of Operations signature
+    has no date and one approver date is handwritten. V0.03 renumbers the requirements (BRID_MIG 1.1 to 14.2) and adds 1.3,
+    1.4, 10.2, a second 12.1, 13.1, 14.1 and 14.2.
+  proposal: V0.03 is the baseline. iorta TechNXT re-issues the handbook, workbook and test plan as release set v2.1 traced
+    to the BRID_MIG numbers, adds the new requirements (items below) and closes DCR-189 and DCR-191.
+  impact: Traceability, test cases and the sign-off of the BRD-13 set on 30-Oct-2026 rest on the wrong baseline until confirmed.
+  priority: High
+  owner: Program Manager, Business Project Services (BRD author)
+  needed_by: 16-Oct-2026
+  status: Open
+  sources: BRD Data Migration V0.03 p.2, p.19-20; BRD Data Migration draft V0.01 p.2, p.15-16; Data Migration Handbook v2.0
+    'Scope and basis', Assumptions A-DM-01, A-DM-02; Discrepancy register DCR-189, DCR-191
+- ref: DM-Q02
+  category: Decision
+  area: BRD baseline
+  need: 'Please confirm how the agreed deviations from the BRD text will be formalised: the BDOI answers of 26 September
+    2026 (package remapping, January-May 2028 renewals, RMEL sources, year-end cut-over) and the decisions BDOI records
+    on the Proposed rules sheet. We ask that they are recorded in a signed annex to V0.03 (or in a V0.04) and that, where
+    they differ from the BRD, the annex prevails.'
+  background: V0.03 p.20 states that after sign-off a BRD revision or signed-off annex may be completed for changes agreed
+    during the walkthrough. V0.03 was signed in May 2026, before the BDOI answers of 26-Sep-2026 (DMQ36-DMQ39), several
+    of which differ from its text (see the items on in-progress renewals and accounting data). The handbook lists 28 proposed
+    rules (PR-DM-01 to PR-DM-28) that fill gaps in or differ from the BRD.
+  proposal: One signed annex to V0.03, issued with the BRD-13 sign-off on 30-Oct-2026, listing each agreed deviation with
+    its BRID_MIG reference; the annex prevails over the BRD text.
+  impact: Without a signed record, the BRD text and the BDOI answers conflict and test cases cannot be accepted against
+    either.
+  priority: High
+  owner: Program Manager, Business Project Services; Product Owner, Marketing Business System
+  needed_by: 30-Oct-2026
+  status: Open
+  sources: BRD Data Migration V0.03 p.20 (note on walkthrough and annex); Data Migration Handbook v2.0 'Proposed business
+    rules and clarifications for confirmation'; Migration Workbook v2.0 sheet Proposed rules; BDOI drop plan, answers of
+    26-Sep-2026
+- ref: DM-Q03
+  category: Conflict in BRD
+  area: BRD numbering and structure
+  need: 'Please correct or confirm the numbering of V0.03: two requirements are numbered BRID_MIG 12.1 (cut-over aligned
+    to RMEL; migration of work-in-progress renewal data), and BRID_MIG 14.2 (e-policy linking) sits under capability 15,
+    which is not in the list of key capabilities (1 to 14). Please also confirm that capability 7 is now ''Operations Adjustments''
+    (it was ''Accounting Adjustments'' in V0.01).'
+  background: New in BRD V0.03, p.6 (capability list 1-14), p.13 (two rows BRID_MIG 12.1), p.15 (capability 15, BRID_MIG
+    14.2). The V0.01 duplicate 'BRID 1.1' is resolved in V0.03 as BRID_MIG 1.1 and 1.2. The cover still reads 'Business
+    Requirements Document (BRD) Template' (register DCR-190).
+  proposal: The BIBS documents read the second 12.1 as BRID_MIG 12.2 and add capability 15 'E-policy linking to migrated
+    accounts'; the handbook's 1.1a / 1.1b become 1.1 / 1.2. BDOI confirms or gives the correct numbers in the annex.
+  impact: Traceability and test cases cannot be keyed on a requirement ID that is used twice.
+  priority: Low
+  owner: Program Manager, Business Project Services (BRD author)
+  needed_by: 30-Oct-2026
+  status: Open
+  sources: BRD Data Migration V0.03 p.1, p.6, p.13, p.15; Discrepancy register DCR-190, DCR-191; Data Migration Handbook
+    v2.0 'How to read this handbook', Traceability
+- ref: DM-Q04
+  category: Decision
+  area: Migration scope and principle
+  need: 'Please confirm that the selective, continuity-focused principle of the BRD still applies (migrate clean master
+    and reference data, carry forward only open financial positions, keep history in read-only legacy or the archive), and
+    that the new V0.03 requirements that mention history are read within it: 1.3 ''other data maintained outside the legacy
+    systems'', 10.1 ''all data from the legacy system should be considered'', 13.1 ''transaction history and open/closed
+    statuses'' and 14.1 ''no loss of historical information''.'
+  background: 'New in BRD V0.03. The executive summary (V0.03 p.3) and target state (p.5) are unchanged from V0.01 and say
+    that historical transactions stay in read-only legacy or an archive. The new or changed BRID_MIG 1.3 (p.7-8), 10.1 (p.12),
+    13.1 (p.14) and 14.1 (p.15) can be read as asking for closed history in BIBS. The handbook is built on the selective
+    principle (Part A ''Principles'' 1-2 and ''What this migration does not do'': no conversion of closed transactions,
+    GL history or expired policies).'
+  proposal: The selective principle stands. 'History' in 13.1 and 14.1 means the movements of the items that are still open
+    (booked, paid, remitted, adjusted per component), loaded with each item; closed transactions, expired policies and GL
+    history go to the BIBS archive or stay in read-only legacy and are searched in Legacy Inquiry (BRID_MIG 11.1).
+  impact: The object register, volumes, loaders, reconciliation and the trial-migration timeline change materially if closed
+    history must be loaded into the business tables.
+  priority: High
+  owner: Program Manager, Business Project Services; Head, Comptrollership; Head, Operations
+  needed_by: 16-Oct-2026
+  status: Open
+  sources: BRD Data Migration V0.03 p.3, p.5, p.7-8, p.12, p.14, p.15; Data Migration Handbook v2.0 Part A 'Objectives and
+    principles', 'What this migration does not do'
+- ref: DM-Q05
+  category: Clarification
+  area: Accounting data migration
+  need: 'For BRID_MIG 13.1, please confirm what ''GL Beginning Balances'' and the subsidiary-ledger ''transaction history''
+    mean: (a) is the GL beginning balance the balance-sheet trial balance at 31 December 2027 per branch and currency (provisional
+    opening, trued up after the legacy year-end close and the audited statements)? (b) is the DTIP, Commission Receivable
+    and Premium Receivable history limited to the movements of the open items, with settled items archived? (c) which ''client-related
+    data'' beyond the client master is meant?'
+  background: New in BRD V0.03 p.14 (BRID_MIG 13.1, added in revision 0.02). The handbook proposes year-end option A (go-live
+    3-Jan-2028; provisional opening, balance-sheet accounts only, FY2027 result in retained earnings; true-ups as opening-balance
+    adjustments; object G01, G03; DMQ39, PR-DM-01) and loads open legacy invoices per component with booked, paid, remitted,
+    adjusted and written-off amounts (F01C), with the open balances on separate legacy sub-ledgers. GL history (G02) and
+    closed transactions (H01) are archived.
+  proposal: (a) Yes, provisional balance-sheet opening at 31-Dec-2027 per branch and currency, with true-ups; (b) yes, open
+    items with their per-component movements; settled items and GL journals archived; (c) the client master, payout accounts
+    and the client link on every open item.
+  impact: Scope of objects G01, F01, F02 and H01; the reconciliation of the GL against the sub-ledgers; the cut-over calendar.
+  priority: High
+  owner: Head, Comptrollership; Product Owner, Comptrollership - FRBS and ACSL
+  needed_by: 16-Oct-2026
+  status: Open
+  sources: BRD Data Migration V0.03 p.14 (BRID_MIG 13.1); Data Migration Handbook v2.0 'Year-end cut-over options (DMQ39)',
+    'Legacy sub-ledgers'; Migration Workbook v2.0 objects G01, G02, G03, F01
+- ref: DM-Q06
+  category: Conflict in BRD
+  area: Claims data migration
+  need: 'BRID_MIG 14.1 makes the migration of legacy claims a Must have; our set treats open claims as conditional and out
+    of scope until BDOI decides. Please confirm: (a) which claims migrate (open at the freeze only, or also closed claims
+    and for how many years); (b) the source (EBIX, ISYS, files kept outside the legacy systems per 1.3); (c) whether claims
+    on policies that have already expired must be linked to a legacy policy record in BIBS; (d) the data owner.'
+  background: New in BRD V0.03 p.15 (BRID_MIG 14.1, capability 14, added in revision 0.02). Handbook 'Scope and basis' lists
+    open claims as out of scope until BDOI decides (DMQ30, PR-DM-05, PR-DM-26); object F07 'Open claims' is Conditional;
+    closed claims are archived (H01). The Claims module (BRD-07) is in Drop 2, built Mar-Apr 2027 with SIT Jul-Sep 2027.
+    Policy headers (P01) are proposed for in-force policies only, so a claim on an expired policy would have no header to
+    link to.
+  proposal: Open claims at the freeze are carried forward through the claims migration upload of the Claims module (F07
+    becomes Carry forward), each with its notification, reserve, payments and documents; the policy details of each open
+    claim are loaded as a legacy policy header even if the policy has expired; closed claims are archived and searched in
+    Legacy Inquiry. Claims are first loaded in Trial migration 3 (August 2027), after Claims SIT.
+  impact: The claims layout, loader, reconciliation and the Claims test scope cannot be planned; the P01 header scope is
+    incomplete.
+  priority: High
+  owner: Unit Head - Claims, Analytics, Risk Management, Reinsurance and Technical Underwriting
+  needed_by: 16-Oct-2026
+  status: Open
+  sources: BRD Data Migration V0.03 p.6, p.7-8 (1.3), p.15 (14.1); Data Migration Handbook v2.0 'Scope and basis', object
+    F07; Discrepancy register DCR-081, DCR-157, DCR-196; BDOI drop plan (Claims in Drop 2)
+- ref: DM-Q07
+  category: Clarification
+  area: E-policy linking
+  need: 'For BRD_MIG 14.2, please tell us: (a) what the e-policies are and where they are held today (e-mail, file shares,
+    insurer portals, a document management system); (b) whether they cover in-force migrated accounts only or also expired
+    ones; (c) the ''unique reference number'' to match on (insurer policy number, cover number, account reference number
+    or another key); (d) the volume; (e) whether linking is a one-time load at migration or also applies to e-policies received
+    after go-live for migrated accounts.'
+  background: 'New in BRD V0.03 p.15-16 (BRID_MIG 14.2, persona Placement User, added in revision 0.03). Not covered by
+    the handbook: legacy documents are archived through layout H02 (index file with SHA-256) and shown in Legacy Inquiry,
+    not attached to the migrated accounts. BDOI decided on 26-Sep-2026 that documents are stored in the S3 document store
+    only. Placement and e-policy is a Drop 1 function.'
+  proposal: One-time load of the e-policies of in-force migrated accounts from an index file (legacy account reference,
+    insurer, insurer policy number, file name, SHA-256) into the BIBS document store, matched on insurer and insurer policy
+    number; unmatched or ambiguous files listed on an exception report with no link made, and an audit report of linked
+    and failed files. E-policies received after go-live are attached through the normal Placement and e-policy function.
+  impact: A new object, layout, matching rule and report are needed; without the answers they cannot be specified or sized.
+  priority: High
+  owner: Head, Operations (Placement)
+  needed_by: 16-Oct-2026
+  status: Open
+  sources: BRD Data Migration V0.03 p.15-16 (BRID_MIG 14.2); Data Migration Handbook v2.0 'History, archive and read-only
+    access', layout H02; BDOI drop plan (Drop 1 'Placement & ePolicy'; documents in S3 only)
+- ref: DM-Q08
+  category: Conflict in BRD
+  area: In-progress renewals
+  need: 'The second BRID_MIG 12.1 (and 1.3) asks that all work-in-progress renewal records are migrated from the ''legacy
+    renewal tracking system'' and continued in BIBS from their last stage (disposition, approval, payment processing). BDOI
+    answered on 26 September 2026 that no renewal candidate is carried: the January-May 2028 expiries are extracted at go-live
+    from the migrated policy headers and only the renewal advices already sent are loaded from the Excel trackers. Please
+    confirm that the answer of 26 September 2026 prevails, or list the stages and data that must be carried and their source.'
+  background: 'New in BRD V0.03 p.7-8 (1.3 ''in-progress renewal data'') and p.13-14 (second 12.1, added in revision 0.03,
+    signed May 2026). Handbook ''Renewal by RMEL cohort'' and objects P01 and P03 apply the BDOI answers to DMQ37 and DMQ38
+    (26-Sep-2026; registers DCR-240, DCR-243): go-live extraction at 04:00 on 3-Jan-2028 of every expiry to 31-May-2028,
+    January expiries flagged urgent; RMEL and dispositions kept in Excel; RA-sent file reviewed maker-checker. Renewal premiums
+    already paid in legacy for a renewal not yet booked would sit in legacy unapplied payments.'
+  proposal: 'The 26-Sep-2026 answer prevails and is recorded in the annex: renewals whose new term starts before go-live
+    are placed and booked in legacy before the freeze; the January-May 2028 expiries are processed in BIBS from the go-live
+    extraction with the RAs already sent (P03); renewal premiums received in legacy are carried as unapplied payments (F02);
+    the P03 batch gives the audit trail of loaded, rejected and resubmitted rows.'
+  impact: Renewal readiness for January 2028 (about 25,800 accounts a month), the P03 layout and the Renewal go-live extraction
+    depend on it.
+  priority: High
+  owner: Heads, Retail and Corporate Marketing; Head of the Renewal processing team
+  needed_by: 16-Oct-2026
+  status: Open
+  sources: BRD Data Migration V0.03 p.7-8, p.13-14; Data Migration Handbook v2.0 'Renewal by RMEL cohort', objects P01,
+    P03, PR-DM-25; Discrepancy register DCR-240, DCR-243; BDOI drop plan, answers of 26-Sep-2026
+- ref: DM-Q09
+  category: Clarification
+  area: Submitted policies
+  need: BRID_MIG 1.3 names submitted policies among the data to migrate. Please confirm that the Excel masterlists of submitted
+    policies are in scope, which records (active only or also expired), the business owner per segment (CBG and Non-CBG),
+    and that they are loaded through the masterlist upload of the Submitted Policies module.
+  background: New in BRD V0.03 p.7-8 (BRID_MIG 1.3). The handbook keeps object P04 'Submitted-policy masterlists' Conditional
+    and out of scope until BDOI decides (DMQ30, PR-DM-05, PR-DM-26). The Submitted Policies BRD requires their migration
+    (BRIDSP-33; register DCR-157, DCR-196). V0.03 2.1 also lists 'clients with submitted policy' among the clients to migrate.
+  proposal: 'P04 becomes Migrate: active submitted-policy records loaded through the Submitted Policies masterlist upload
+    with the same reconciliation and gates; the clients of those records are part of the client load (C01).'
+  impact: Submitted Policies go-live data, the client scope and the trial-migration scope.
+  priority: High
+  owner: CBG and Non-CBG Marketing (Submitted Policies)
+  needed_by: 16-Oct-2026
+  status: Open
+  sources: BRD Data Migration V0.03 p.7-8 (1.3), p.8-9 (2.1); Data Migration Handbook v2.0 object P04; Discrepancy register
+    DCR-157, DCR-196
+- ref: DM-Q10
+  category: Clarification
+  area: Endorsements kept outside legacy
+  need: 'BRID_MIG 1.3 names ''identified endorsements/adjustments'' maintained outside the legacy systems. Please identify
+    these records (which files, kept by which unit, how many, in which state: requested, approved, not yet booked) and confirm
+    how they should be treated at the freeze.'
+  background: 'New in BRD V0.03 p.7-8 (BRID_MIG 1.3). The handbook treats endorsements in process at the freeze as in-flight
+    items: completed in legacy before the freeze, or keyed in BIBS after go-live from a list signed by the business owner
+    (DMQ33, PR-DM-17); no separate layout exists.'
+  proposal: Endorsements and adjustments kept outside the legacy systems are completed in legacy before the freeze where
+    possible; the rest are keyed in BIBS after go-live against the migrated policy header from a list signed by the Head
+    of Operations; no migration layout.
+  impact: If a load is required, a new layout and reconciliation must be added before the layouts freeze.
+  priority: Medium
+  owner: Head, Operations
+  needed_by: 30-Oct-2026
+  status: Open
+  sources: BRD Data Migration V0.03 p.7-8 (1.3); Data Migration Handbook v2.0 'In-flight items at the freeze', PR-DM-17
+- ref: DM-Q11
+  category: Conflict in BRD
+  area: Payees
+  need: BRID_MIG 3.1 now includes the 'List of Payee details' among the data to map and migrate for disbursement. Please
+    confirm that payees are in scope, which payees (active payees; insurers, clients for refunds, suppliers), their source
+    (EBIX, Disbursement files) and the owner.
+  background: 'Changed in BRD V0.03 p.9 (BRID_MIG 3.1: ''all identified data (LOV, insurer/product/package/risk codes, MIS,
+    identified List of Payee details)'' and ''disbursement''); V0.01 p.7 named reference tables only. The handbook keeps
+    object R09 ''Payees'' Conditional (DMQ30, PR-DM-26; Drop 0 decision DEC-03).'
+  proposal: 'R09 becomes Migrate: active payees loaded through the payee migration of Disbursement with status Draft until
+    Disbursement submits them; bank account numbers masked outside production; owner Product Owner, Comptrollership - Disbursement.'
+  impact: Disbursement go-live readiness and the configuration input CFG-103 (Payees) depend on it.
+  priority: Medium
+  owner: Product Owner, Comptrollership - Disbursement
+  needed_by: 16-Oct-2026
+  status: Open
+  sources: BRD Data Migration V0.03 p.9 (3.1); BRD Data Migration draft V0.01 p.7 (3.1); Data Migration Handbook v2.0 object
+    R09; Drop 0 Closure Summary DEC-03
+- ref: DM-Q12
+  category: Decision
+  area: Conditional objects and in-flight items
+  need: 'For the objects that V0.03 still does not mention, please decide whether each is carried, completed in legacy before
+    the freeze, or out of scope: Employee Benefits programmes (P05), remittance batches in flight, holds and special remittances
+    (F04), PDCs in the warehouse, cheque pick-ups and refunds in process (F06), open disbursements, and other items in process
+    at the freeze (pending endorsements, un-booked accounts, placements).'
+  background: Handbook objects P05, F04, F06 are Conditional (DMQ21, DMQ30, DMQ33; PR-DM-05, PR-DM-17; Drop 0 decision DEC-03
+    due M1 and M2). Users are excluded (created through User Access requests).
+  proposal: 'F04: complete legacy batches before the freeze; carry only holds and special remittances. F06: carry PDCs in
+    the warehouse; complete pick-ups and refunds in legacy. P05: loaded through the Employee Benefits programme upload only
+    if BDOI brings it into scope. Other in-flight items completed before the freeze or re-keyed from a signed list.'
+  impact: Layouts, trial-migration scope and the completion drives of the runbook (from T-12) cannot be fixed.
+  priority: High
+  owner: Program Manager, Business Project Services; Head, Operations; Head, Employee Benefits
+  needed_by: 16-Oct-2026
+  status: Open
+  sources: Data Migration Handbook v2.0 objects F04, F06, P05, 'In-flight items at the freeze', PR-DM-05, PR-DM-17, PR-DM-26;
+    Drop 0 Closure Summary DEC-03
+- ref: DM-Q13
+  category: Data or input needed
+  area: Source systems
+  need: Please confirm the legacy systems in scope and the system of record per object. V0.03 states that the declared client
+    master is EBIX but that client data also resides in 'Broker, iSys and QPS'. Please tell us what 'Broker' is, which client
+    data ISYS holds, and confirm that 'CMS' in the migration sources means the Collection Management System.
+  background: Partly new in BRD V0.03 p.8-9 (note to BRID_MIG 2.1). The handbook source list is EBIX, QPS, ISYS (described
+    as a reporting system), the Collection Management System and Excel masterlists (DMQ03, DCR-195); 'Broker' is not in
+    it, although the umbrella BRD p.43 also sizes a 'one-time migration from Broker and source'. 'CMS' is also used for
+    the Cash Management System in the drop plan (DCR-221).
+  proposal: 'Sources: EBIX (system of record for clients and billing), QPS, ISYS, the Collection Management System and Excel;
+    ''Broker'' added as a source once BDOI IT describes it; one extract per source system per object, matched across systems.'
+  impact: Layouts, extract ownership and the client matching cannot be finalised; an unlisted source means clients or items
+    are missed.
+  priority: High
+  owner: BDOI IT
+  needed_by: 16-Oct-2026
+  status: Open
+  sources: BRD Data Migration V0.03 p.3, p.8-9; BRD BDOI Core Replacement p.43; Data Migration Handbook v2.0 'Legacy systems
+    in scope'; Discrepancy register DCR-173, DCR-195, DCR-221
+- ref: DM-Q14
+  category: Data or input needed
+  area: Extracts BDOI supplies
+  need: 'Please complete the Extract planning sheet: for each object the extract owner, the volume per source system, the
+    history depth, the delta frequency, the file format (CSV or XLSX in the load template, with its control file) and confirm
+    the delivery dates: first full extracts by 29 January 2027 (M3), extracts for Trial migration 1 by 9 April 2027 (M4),
+    fresh extracts for each later cycle. Please also confirm the transfer path (Extracts screen of the Migration Console,
+    or a secure file drop named by BDOI IT; never e-mail).'
+  background: Handbook 'Extract templates', 'Secure transfer and staging', Dependencies D6 and D8 (DMQ28, PR-DM-03). The
+    Migration Workbook sheet Extract planning has a 'Volume (BDOI to fill)' column that is empty for every object. The BRD
+    gives no volumes; V0.03 p.17 refers to the consolidated NFR and p.17 notes that data extract requirements are agreed
+    with the IT partner.
+  proposal: BDOI IT owns every extract; volumes with the first full extracts (M3); loaders sized for 1,000,000 client rows
+    and 500,000 open-item rows until then; transfer through the Migration Console until a secure file drop is named.
+  impact: Load windows, the dress-rehearsal sizing and the trial-migration plan rest on assumptions; a late M3 delays Trial
+    migration 1.
+  priority: High
+  owner: BDOI IT
+  needed_by: 30-Oct-2026
+  status: Open
+  sources: BRD Data Migration V0.03 p.17; Data Migration Handbook v2.0 'Extract templates', 'Secure transfer and staging',
+    Dependencies D6, D8, PR-DM-03; Migration Workbook v2.0 sheets Extract planning, File rules, Control file
+- ref: DM-Q15
+  category: Conflict in BRD
+  area: Client scope and cut-off
+  need: Please confirm which clients migrate. V0.03 2.1 says 'clients with submitted policy and previous and current clients
+    availed of insurance product via BDOI', which has no date limit; the umbrella BRD sizes '2020 to present'; our proposal
+    is every client created from 1 January 2020 plus older clients with an in-force policy, an open item or activity since
+    2020. Please also confirm whether prospects and corporate contacts are included, that daily client deltas run only until
+    the freeze, and that no client or contact change is written back to QPS or EBIX after the freeze.
+  background: 'Changed in BRD V0.03 p.8-9 (expected result of BRID_MIG 2.1). Handbook ''Client migration 2020 to present
+    and daily client batches'' (DMQ05 partial, PR-DM-08, DCR-173; Drop 0 decision DEC-11). No write-back proposal: PR-DM-22,
+    DCR-202 (Customer Servicing Facility BRD asks for contact write-back during coexistence).'
+  proposal: Clients created from 1-Jan-2020, plus older clients with an in-force policy, an open item, a submitted policy
+    or activity since 2020; prospects excluded; one-time load two weeks before go-live with daily deltas until the freeze
+    31-Dec-2027 22:00; no feed and no write-back after the freeze.
+  impact: Client volumes, the C01 filter, the matching workload and the client delta job depend on it.
+  priority: High
+  owner: Product Owner, Marketing Business System
+  needed_by: 16-Oct-2026
+  status: Open
+  sources: BRD Data Migration V0.03 p.8-9 (2.1); BRD BDOI Core Replacement p.43; Data Migration Handbook v2.0 PR-DM-08,
+    PR-DM-22; Discrepancy register DCR-173, DCR-202; Drop 0 Closure Summary DEC-11
+- ref: DM-Q16
+  category: Decision
+  area: Client matching and survivorship
+  need: Please confirm the client matching keys (TIN; ID type and number; name and birth date; corporate name with registration
+    number; is the bank CIF a key?), the thresholds (90 or more merge automatically; 60 to 89 to the data steward's review
+    queue), who reviews doubtful pairs and within what time, and the source priority per field. As V0.03 declares EBIX the
+    client master, should EBIX win for every field rather than our proposal of QPS for contact data and EBIX for billing
+    data?
+  background: 'Changed context in BRD V0.03 p.8-9 (note: EBIX is the declared client master). Handbook ''Client matching
+    and survivorship'' (DMQ04, PR-DM-09; Drop 0 decision DEC-11). The client batch cannot be approved while the review queue
+    has open pairs.'
+  proposal: Keys and thresholds as proposed; bank CIF used as a key only if BDOI confirms it is reliable; EBIX first for
+    identity and billing fields, QPS first for contact fields only where its value is more recent; every losing value kept
+    for review.
+  impact: The deduplicated client master (BRID_MIG 2.1) and the client review workload cannot be finalised.
+  priority: High
+  owner: Product Owner, Marketing Business System
+  needed_by: 30-Oct-2026
+  status: Open
+  sources: BRD Data Migration V0.03 p.8-9; Data Migration Handbook v2.0 'Client matching and survivorship', PR-DM-09; Drop
+    0 Closure Summary DEC-11
+- ref: DM-Q17
+  category: Confirmation
+  area: Screening and KYC of migrated clients
+  need: Please confirm that migrated clients are not screened one by one during the load but in one full screening run before
+    go-live, that legacy screening results and risk ratings are archived, and whether KYC documents are attached to the
+    migrated clients or archived (with the KYC status and review date kept on the client).
+  background: Handbook objects C04 (Archive) and C05 (Excluded); DMQ06, DMQ07, PR-DM-19; register DCR-208 (the Sanction
+    Screening BRD screens every client at creation).
+  proposal: One full screening run after the client load (cut-over task before GNG-3); legacy results archived; KYC documents
+    archived with checksums and shown in Legacy Inquiry; KYC status and review date loaded on the client.
+  impact: Screening coverage at go-live and the load time of the client batch.
+  priority: Medium
+  owner: Compliance (Chief Compliance Officer)
+  needed_by: 30-Oct-2026
+  status: Open
+  sources: Data Migration Handbook v2.0 objects C04, C05, PR-DM-19; Discrepancy register DCR-208
+- ref: DM-Q18
+  category: Confirmation
+  area: Marking of migrated data
+  need: 'Please confirm that our marking of migrated records meets BRID_MIG 1.3: every migrated record carries the origin
+    ''Migrated'', its source system, its legacy reference and its migration batch; lists and records show a LEGACY badge;
+    lists that hold migrated records have an Origin filter. Please say whether the flag must also appear on printed documents
+    (statements, receipts) or on specific reports.'
+  background: 'New in BRD V0.03 p.7-8 (BRID_MIG 1.3: ''clear migration identifier (i.e. migrated flag)'' and ''originating
+    legacy system source''). Handbook ''How migrated records are marked'' already provides this.'
+  proposal: As designed; the flag is shown on screens, lists and exports; printed client documents do not show it.
+  impact: Screen and report layouts of the migrated records.
+  priority: Medium
+  owner: Product Owner, Marketing Business System
+  needed_by: 30-Oct-2026
+  status: Open
+  sources: BRD Data Migration V0.03 p.7-8 (1.3); Data Migration Handbook v2.0 'How migrated records are marked'
+- ref: DM-Q19
+  category: Confirmation
+  area: Remigration of fall-out records
+  need: 'Please confirm that our rerun function meets BRID_MIG 1.4: rejected rows are corrected (new extract, new code map
+    version or waiver) and loaded again in a rerun batch linked to the original batch, with counts, timestamps and error
+    details in the batch log and the reconciliation. Please confirm the row status labels you want (for example ''Migrated
+    on rerun'' and ''Failed again'') and until when a rerun is allowed: we propose until the object is accepted (G6) in
+    each cycle; after go-live a financial row that still fails is keyed in BIBS from the manual-entry plan approved by its
+    owner.'
+  background: New in BRD V0.03 p.8 (BRID_MIG 1.4, remigration of fall-out records 'during or after initial migration').
+    Handbook 'Load through the BIBS services', functional requirement 'Rerun and roll back a batch', Part C 'Breaks, waivers
+    and exclusions'.
+  proposal: As stated, with the labels BDOI confirms.
+  impact: Status values, messages and the test cases of the rerun function.
+  priority: Medium
+  owner: Data Migration Lead (BDOI)
+  needed_by: 30-Oct-2026
+  status: Open
+  sources: BRD Data Migration V0.03 p.8 (1.4); Data Migration Handbook v2.0 'Load through the BIBS services', 'Breaks, waivers
+    and exclusions'
+- ref: DM-Q20
+  category: Decision
+  area: Decision gate per data object
+  need: Please confirm who rates the four criteria of BRID_MIG 1.1 (Day-1 need, compliance need, read-only / archival option,
+    data trust) for each object, who approves the class, and the rule that turns the ratings into Migrate, Carry forward,
+    Conditional, Archive or Excluded.
+  background: BRD Data Migration V0.03 p.7 (BRID_MIG 1.1, unchanged); Handbook 'The decision gate' (DMQ02, PR-DM-07; register
+    DCR-192).
+  proposal: The Data Migration Lead proposes the class from the rule in the handbook; the business owner of the object approves
+    it (gate G1); a later change needs a new approval.
+  impact: Gate G1 of every object cannot be signed.
+  priority: Medium
+  owner: Program Manager, Business Project Services
+  needed_by: 30-Oct-2026
+  status: Open
+  sources: BRD Data Migration V0.03 p.7 (1.1); Data Migration Handbook v2.0 'The decision gate', PR-DM-07; Discrepancy register
+    DCR-192
+- ref: DM-Q21
+  category: Data or input needed
+  area: Data owners and stewards
+  need: Please name the business owner and the data steward of each data object and of each code map set (Data owners sheet),
+    including owners for the objects V0.03 adds (claims, payees, submitted policies, e-policies, in-progress renewals),
+    and name the TSU preparer of the package code map.
+  background: Handbook 'Business owners and data stewards' (DMQ01, DMQ08; Dependency D7, due M2). The Migration Workbook
+    sheet Data owners has the 'Named business owner' and 'Named data steward' columns empty for every object. The package
+    map preparer is part of Drop 0 decision DEC-10 (package remapping at Renewal sanitation, answered 26-Sep-2026).
+  proposal: Owners as proposed on the Data owners sheet; one named steward per object by 30-Oct-2026.
+  impact: Gates G1, G2 and G6 cannot be signed; cleansing and code maps have no owner.
+  priority: High
+  owner: Program Manager, Business Project Services
+  needed_by: 30-Oct-2026
+  status: Open
+  sources: Data Migration Handbook v2.0 'Business owners and data stewards', Dependency D7; Migration Workbook v2.0 sheet
+    Data owners; Drop 0 Closure Summary DEC-10
+- ref: DM-Q22
+  category: Data or input needed
+  area: Migration roles and signatories
+  need: 'Please name the BDOI Data Migration Lead, the members of the go / no-go board (proposed: Program Manager as chair,
+    Heads of Operations, Comptrollership, Marketing and Compliance, the BDOI IT head, the iorta TechNXT Project Manager)
+    and the reconciliation approver per object. Please also confirm the signatories of the BRD-13 sign-off certificate against
+    the V0.03 approval page: the Unit Head, Analytics and Risk Management is no longer an approver in V0.03, and the BA
+    Unit Head of Business Project Services is added as reviewer.'
+  background: Changed in BRD V0.03 p.19-20 (approval page) compared with V0.01 p.15-16. Handbook 'Migration organisation'
+    and RACI; Migration Workbook sheet Sign-off certificate (still lists the V0.01 approvers, including the Unit Head, Analytics
+    and Risk Management for the archive and Legacy Inquiry).
+  proposal: Signatories aligned to the V0.03 approval page; archive and Legacy Inquiry signed by Compliance; claims objects
+    by the Unit Head, Claims; go / no-go board as proposed.
+  impact: Sign-off of the set on 30-Oct-2026 and the RACI of the cut-over.
+  priority: High
+  owner: Program Manager, Business Project Services
+  needed_by: 30-Oct-2026
+  status: Open
+  sources: BRD Data Migration V0.03 p.19-20; BRD Data Migration draft V0.01 p.15-16; Data Migration Handbook v2.0 'Migration
+    organisation', RACI; Migration Workbook v2.0 sheet Sign-off certificate
+- ref: DM-Q23
+  category: Data or input needed
+  area: Code maps and code translation
+  need: 'Please confirm the code map sets and their owners (lists of values, MIS fields, insurers and insurer branches,
+    product lines, products and risk codes, package versions, branches, sales units, account officers, users, cost centres,
+    GL accounts, banks, currencies, dispositions, statuses), which MIS fields are mandatory, and the dates: drafts from
+    the profiling of the first full extracts, approved versions by 18 June 2027 (M5), map freeze 7 days before go-live.
+    Please also formally confirm that legacy packages are remapped at Renewal sanitation and the migration loads the package
+    code map only.'
+  background: 'BRD Data Migration V0.03 p.9 (BRID_MIG 3.1: approved mapping list, unmapped codes reported, mapping versions
+    controlled and signed off) is met by the Code Maps function (maker-checker versions, gate G2). Handbook ''Mapping and
+    code maps'', ''Package remapping'' (DMQ08, DMQ36 answered 26-Sep-2026, PR-DM-24).'
+  proposal: Map sets and owners as on the Code maps sheet; data steward prepares, business owner approves; values created
+    in BIBS authorised in their master first; package map prepared by TSU and approved by the Product Owner, MBS.
+  impact: Trial migration 2 needs approved maps; unmapped codes block every dependent batch.
+  priority: Medium
+  owner: Product Owner, Marketing Business System; data owners per map set
+  needed_by: 30-Oct-2026
+  status: Open
+  sources: BRD Data Migration V0.03 p.9 (3.1); Data Migration Handbook v2.0 'Mapping and code maps', 'Package remapping',
+    PR-DM-24; Migration Workbook v2.0 sheets Code maps, Code map template
+- ref: DM-Q24
+  category: Confirmation
+  area: Data cleansing ownership
+  need: 'Please confirm the split of cleansing work: BDOI data stewards correct wrong or missing business data in the legacy
+    systems before the next extract; BDOI IT with iorta TechNXT handles format differences in the extract; duplicates are
+    resolved through client matching; out-of-scope records are excluded by the business owner. Please also confirm the loading
+    thresholds: master data loads with at most 0.5 percent of rows rejected or waived; open invoices, unapplied payments
+    and the trial balance load with no error, or with each excluded row approved by its owner with a manual-entry plan.'
+  background: 'Handbook ''Cleansing: who fixes what'', ''Profiling'' (profiling report after M3 and each cycle); PR-DM-10
+    (DMQ29); risk 11 (steward capacity).'
+  proposal: As stated; stewards close the issues of the profiling report before the extracts of the next cycle.
+  impact: Data quality at each trial migration and the go / no-go criterion on financial rejects.
+  priority: Medium
+  owner: Data Migration Lead (BDOI); data owners
+  needed_by: 30-Oct-2026
+  status: Open
+  sources: 'Data Migration Handbook v2.0 ''Cleansing: who fixes what'', PR-DM-10, risk 11'
+- ref: DM-Q25
+  category: Decision
+  area: In-force policy headers
+  need: 'Please confirm the scope of the policy headers: every policy in force at go-live, and in every case every expiry
+    from go-live to 31 May 2028 and every renewal term booked in legacy that starts on or after go-live; plus, if claims
+    are in scope, the policy of every open claim even if expired. Please confirm the header fields (status, key dates, insurer
+    and shares, line of business, sum insured, premium, client link).'
+  background: BRD Data Migration V0.03 p.9 (BRID_MIG 4.1, unchanged; capability 4 still 'conditional', capability 9 'subject
+    to coexistence decision'). Handbook 'In-force policy headers' (DMQ09, DMQ22, PR-DM-11; register DCR-194; Drop 0 decision
+    DEC-12). The Renewal go-live extraction works only from the migrated headers; new 14.1 needs legacy policy details for
+    claims.
+  proposal: As stated; header fields as in layouts P01 and P01S.
+  impact: Renewals, endorsements and claims on legacy policies cannot be processed for policies without a header.
+  priority: High
+  owner: Head, Operations
+  needed_by: 16-Oct-2026
+  status: Open
+  sources: BRD Data Migration V0.03 p.6, p.9 (4.1), p.15 (14.1); Data Migration Handbook v2.0 'In-force policy headers',
+    PR-DM-11; Discrepancy register DCR-194; Drop 0 Closure Summary DEC-12
+- ref: DM-Q26
+  category: Clarification
+  area: Endorsements on legacy invoices
+  need: BRID_MIG 9.2 now includes negative endorsements 'even those with zero Premium Receivables'. Our open-invoice object
+    carries only invoices with an open component, so a fully settled legacy invoice is not in BIBS to be endorsed. Please
+    confirm whether the settled invoices of in-force policies must also be loaded, and confirm that endorsements of legacy
+    invoices are processed in BIBS from go-live, the endorsement types, and the numbering of the service invoice.
+  background: Changed in BRD V0.03 p.12 (BRID_MIG 9.2, revision 0.02 'endorsements include even those with zero PR'). Handbook
+    object F01 scope 'every invoice with any open component at T' (DMQ10, DMQ22; register DCR-194); worked example (endorsement
+    invoice with a BI- number whose parent is the legacy invoice).
+  proposal: Load, for every migrated policy header, the legacy invoices of its current term even when fully settled, with
+    zero open balance and no opening entry, so positive, negative (including zero-PR) and non-financial endorsements can
+    reference them; endorsements processed only in BIBS from go-live.
+  impact: F01 scope and volumes, the endorsement test cases and renewal on net endorsements.
+  priority: High
+  owner: Head, Operations; Operations - Financial Transactions and Processing
+  needed_by: 16-Oct-2026
+  status: Open
+  sources: BRD Data Migration V0.03 p.12 (9.1-9.3); BRD Data Migration draft V0.01 p.11; Data Migration Handbook v2.0 object
+    F01, 'Payments, reversals, remittance, endorsements and Prod Recon'; Discrepancy register DCR-194
+- ref: DM-Q27
+  category: Clarification
+  area: Legacy invoice numbering
+  need: BRID_MIG 6.2 now says the acknowledgment receipt is issued using the legacy invoice number, 'which must be properly
+    linked to the new core system invoice number'. Our design keeps the legacy number as the BIBS invoice number (prefixed
+    with the source system only if EBIX and QPS numbers collide) and does not re-book the invoice. Please confirm whether
+    a separate BIBS invoice number is expected for each legacy invoice, whether EBIX and QPS invoice numbers are unique
+    across both systems, and the QPS invoice format.
+  background: Changed in BRD V0.03 p.10-11 (BRID_MIG 6.2, revision 0.02 'added legacy invoice to be used in the issued AR').
+    Handbook 'What a legacy invoice is' (DMQ11, PR-DM-12, PR-DM-23; register DCR-207; Drop 0 decision DEC-12); the Collections
+    BRD gives the EBIX format I00622656 (DCR-046).
+  proposal: 'No new number: the legacy number is the BIBS invoice key and is printed on the AR; the key cross-reference
+    holds the source system and legacy number. If BDOI requires a BIBS number, one is assigned at load and both numbers
+    are printed on the AR and searchable.'
+  impact: Payment matching (OTC and autopay), AR layout and the F01 key rule.
+  priority: High
+  owner: Operations - Financial Transactions and Processing; BDOI IT
+  needed_by: 16-Oct-2026
+  status: Open
+  sources: BRD Data Migration V0.03 p.10-11 (6.2); Data Migration Handbook v2.0 'What a legacy invoice is', PR-DM-12, PR-DM-23;
+    Discrepancy register DCR-046, DCR-207
+- ref: DM-Q28
+  category: Data or input needed
+  area: Legacy invoice components and commission
+  need: Please confirm that the legacy extract can give, per open invoice, the components (basic premium, DST, premium tax
+    or VAT, LGT, FST, other charges, DTIP, commission, VAT on commission, withholding tax, PR 2307) with booked, adjusted,
+    paid, remitted and written-off amounts per insurer share, and the commission state (realised or unrealised, deferred
+    output VAT, commission already collected through remittance). If not, please say which split rule applies.
+  background: Handbook 'What a legacy invoice is', worked example, layouts F01, F01S, F01C (DMQ12, DMQ13, PR-DM-12; register
+    DCR-207); risk 1 (legacy cannot give components; fallback open-balance mode).
+  proposal: Load by component and share; where legacy cannot split, load the open balance as booked ('open-balance mode',
+    shown on the invoice) with split rules agreed with Comptrollership.
+  impact: Payments, remittances and reversals on legacy invoices use the wrong amounts; Migration Clearing cannot be proven
+    at 0.00.
+  priority: High
+  owner: BDOI IT; Head, Comptrollership
+  needed_by: 16-Oct-2026
+  status: Open
+  sources: Data Migration Handbook v2.0 'What a legacy invoice is', PR-DM-12, risk 1; Migration Workbook v2.0 layouts F01,
+    F01S, F01C; Discrepancy register DCR-207
+- ref: DM-Q29
+  category: Clarification
+  area: Direct-payment invoices
+  need: V0.03 notes that the legacy invoice does not differentiate direct-payment transactions from regular bookings. Please
+    tell us how a direct-payment invoice can be identified in legacy (if at all), confirm the meaning of 'DPPR' (premium
+    receivable of an invoice paid by the client directly to the insurer), and the source of the list of DPPR invoices 'approved
+    for reversal'.
+  background: New in BRD V0.03 p.10 (note to BRID_MIG 6.1). The handbook carries a direct-payment flag on each open invoice
+    (F01; DP billing F05 carried inside F01) and builds the DP PR Legacy Reversal batch from the invoices tagged 'DP PR
+    for reversal' by Collections (DMQ19; registers DCR-198, DCR-206; assumption A-DM-06).
+  proposal: The direct-payment flag is optional in F01; the DP PR reversal list comes from the Collections 'DP PR for reversal'
+    tag or an approved upload, not from a legacy flag.
+  impact: The DP PR reversal batch, the DP commission receivable and OTC application rules.
+  priority: High
+  owner: Head, Comptrollership; Operations - Financial Transactions and Processing
+  needed_by: 30-Oct-2026
+  status: Open
+  sources: BRD Data Migration V0.03 p.10 (6.1 note), p.11 (7.1); Data Migration Handbook v2.0 'Definitions' (DP PR), object
+    F05, assumption A-DM-06; Discrepancy register DCR-198, DCR-206
+- ref: DM-Q30
+  category: Conflict in BRD
+  area: DP PR and PR 2307 reversal roles
+  need: 'V0.03 changes the personas of the batch reversals: DPPR reversal (7.1) by ''Cashiering/Support Team'' and PR2307
+    reversal (7.2) by ''Collections''. Our set has DP PR Legacy Reversal requested by a Commission user and approved by
+    the Commission team lead, and Legacy PR 2307 Reversal requested by a Cashiering user and approved by the Cashiering
+    team lead. Please confirm the requester and approver of each batch, and the accounting entries including Commission
+    Receivable.'
+  background: Changed in BRD V0.03 p.11 (7.1, 7.2 'Updated user'; capability 7 renamed 'Operations Adjustments'); V0.01
+    p.10 had 'Accounting User' for both. Handbook 'Payments, reversals, remittance, endorsements and Prod Recon', PR-DM-06
+    (DMQ19, DMQ20).
+  proposal: 'Align to V0.03: DP PR Legacy Reversal requested by Cashiering or the Support Team and approved by the Cashiering
+    team lead; Legacy PR 2307 Reversal requested by Collections and approved by the Collections team lead; the requester
+    never approves; entries as in the handbook (DTIP against Premium Receivable; Commission Receivable effect per Comptrollership).'
+  impact: Roles, permissions, menus and test cases of the two batches.
+  priority: Medium
+  owner: Head, Comptrollership; Head, Operations
+  needed_by: 30-Oct-2026
+  status: Open
+  sources: BRD Data Migration V0.03 p.6, p.11 (7.1, 7.2); BRD Data Migration draft V0.01 p.10; Data Migration Handbook v2.0
+    PR-DM-06
+- ref: DM-Q31
+  category: Clarification
+  area: Legacy sub-ledgers
+  need: V0.03 no longer writes '(legacy)' after the Premium Receivable, Commission Receivable, DTIP and UPP sub-ledgers
+    in 6.1, 6.2, 6.4, 7.1, 7.2 and 8.1. Please confirm that BDOI still wants the legacy positions held on separate legacy
+    control accounts with a Migration Clearing account (our proposal), assign their account codes, and state the end state
+    of these accounts after the run-off.
+  background: Changed in BRD V0.03 p.10-12 compared with V0.01 p.9-10 ('sub-ledger (legacy)', 'sub-ledgers (legacy and new)').
+    Handbook 'Legacy sub-ledgers', assumption A-DM-04, PR-DM-02 (DMQ18; register DCR-197; Drop 0 decision DEC-02; configuration
+    template D0-09).
+  proposal: Seven separate legacy control accounts and Migration Clearing (must net to 0.00); codes assigned by Comptrollership;
+    accounts closed by Comptrollership when no legacy item is open.
+  impact: Accounting rules of every legacy-invoice process, the GL opening and the go / no-go criteria on Migration Clearing.
+  priority: High
+  owner: Head, Comptrollership
+  needed_by: 16-Oct-2026
+  status: Open
+  sources: BRD Data Migration V0.03 p.10-12; BRD Data Migration draft V0.01 p.9-10; Data Migration Handbook v2.0 'Legacy
+    sub-ledgers', PR-DM-02; Drop 0 Closure Summary DEC-02
+- ref: DM-Q32
+  category: Conflict in BRD
+  area: Unapplied premium payments
+  need: BRID_MIG 5.1 still says the system 'can issue acknowledgment receipt' for a migrated UPP item. The cash was already
+    acknowledged in legacy; we propose no new AR for a migrated UPP item (the legacy AR number and date are shown). Please
+    confirm, and confirm the legacy UPP statuses and dispositions in progress, the payor references held per item for automatch,
+    the automatch rerun frequency, and that legacy UPP refunds follow the same approvers and Disbursement flow as new UPP
+    refunds.
+  background: BRD Data Migration V0.03 p.9 (5.1, unchanged), p.9-10 (5.2-5.4). Handbook 'Unapplied premium payments (UPP)',
+    assumption A-DM-08, PR-DM-13 (DMQ14, DMQ15, DMQ17; register DCR-204).
+  proposal: No new AR; automatch after every payment upload and hourly on the references the payor gave; refunds through
+    the normal UPP refund approvals and Disbursement.
+  impact: A second AR for the same cash would duplicate the receipt series reported to the BIR; the F02 layout and automatch
+    depend on the references.
+  priority: High
+  owner: Operations - Financial Transactions and Processing
+  needed_by: 16-Oct-2026
+  status: Open
+  sources: BRD Data Migration V0.03 p.9-10 (5.1-5.4); Data Migration Handbook v2.0 'Unapplied premium payments (UPP)', PR-DM-13;
+    Discrepancy register DCR-204
+- ref: DM-Q33
+  category: Decision
+  area: Reclassification of legacy UPP to income
+  need: For BRID_MIG 5.5, please name 'top management' (role and delegation), and give the criteria (minimum age, amount,
+    client not found), the frequency of the batch, the income GL account, whether the client is notified, and how a reclassification
+    is reversed.
+  background: BRD Data Migration V0.03 p.10 (5.5, unchanged). Handbook 'Unapplied premium payments (UPP)' example (unclaimed
+    for more than 2 years), PR-DM-06 (DMQ16; registers DCR-198, DCR-205).
+  proposal: Batch requested by a Cashiering user, approved by the Cashiering team lead and then by a named top-management
+    approver; minimum age and GL account set by Comptrollership; reversal only by a new approved batch.
+  impact: Configuration of the Unapplied to Income batch.
+  priority: Medium
+  owner: Head, Comptrollership
+  needed_by: 30-Oct-2026
+  status: Open
+  sources: BRD Data Migration V0.03 p.10 (5.5); Data Migration Handbook v2.0 PR-DM-06; Discrepancy register DCR-205
+- ref: DM-Q34
+  category: Decision
+  area: Foreign-currency openings
+  need: 'Please confirm the rate at which USD legacy invoices and unapplied payments are opened in BIBS: the legacy booking
+    rate (our proposal) or the cut-over BOOK rate, and that the difference at collection is an exchange difference as for
+    a BIBS invoice.'
+  background: Handbook risk 13, PR-DM-14 (DMQ35).
+  proposal: Legacy booking rate, carried in the extract; reconciliation per currency.
+  impact: Opening entries and Migration Clearing per currency.
+  priority: Medium
+  owner: Head, Comptrollership
+  needed_by: 30-Oct-2026
+  status: Open
+  sources: Data Migration Handbook v2.0 PR-DM-14, risk 13
+- ref: DM-Q35
+  category: Confirmation
+  area: Collection state and receipt series
+  need: Please confirm that the open collection state of legacy invoices (dispositions, promises to pay, instalment plans,
+    collector assignments) is carried with the open invoices while its history is archived, and that the AR and OR series
+    in use (BIR authority to print and next number per branch) are carried so receipts continue without gap or overlap.
+  background: Handbook objects F03 (DMQ34, PR-DM-18; register DCR-203) and R11 (receipt series, final values at T-3).
+  proposal: As stated.
+  impact: Collectors' follow-up from day 1 and the continuity of the receipt series.
+  priority: Medium
+  owner: Head, Operations (Collections); Operations - Financial Transactions and Processing
+  needed_by: 30-Oct-2026
+  status: Open
+  sources: Data Migration Handbook v2.0 objects F03, R11, PR-DM-18; Discrepancy register DCR-203
+- ref: DM-Q36
+  category: Conflict in BRD
+  area: Prod Recon legacy change report
+  need: 'BRID_MIG 10.1 now adds ''All data from the legacy system should be considered'' and the Reporting User persona.
+    Please explain what this covers: do legacy invoices have to appear in the production register (our design excludes them
+    because they were reconciled in legacy), and which changes count in the legacy change report (endorsements, corrections,
+    reversals, write-offs, non-financial changes; also payments and remittances?), with the period, frequency and recipients.'
+  background: Changed in BRD V0.03 p.12 (10.1, revision 0.03). Handbook functional requirement FR-DM-100 (report Changes
+    to Legacy Invoices; payments and remittances only if BDOI asks, DMQ23) and the open-invoice rule 'legacy invoices are
+    not part of the production register extract'.
+  proposal: The legacy change report covers every change to a legacy invoice after load, including payments and remittances,
+    with original, updated and delta values, exportable; the production register covers BIBS bookings only, with legacy
+    invoices available on a separate filter if BDOI requires.
+  impact: The report design, the production register extract and Production Reconciliation test cases.
+  priority: High
+  owner: Operations - Production Reconciliation
+  needed_by: 30-Oct-2026
+  status: Open
+  sources: BRD Data Migration V0.03 p.12 (10.1); BRD Data Migration draft V0.01 p.11; Data Migration Handbook v2.0 FR-DM-100,
+    'Payments, reversals, remittance, endorsements and Prod Recon'
+- ref: DM-Q37
+  category: Clarification
+  area: Reports on migrated and new data
+  need: 'For new BRID_MIG 10.2, please list the reports that must combine migrated and newly created data (for example from
+    the Report List of 13 May 2026), and confirm how periods before go-live are reported: our proposal is that position
+    reports (receivables, DTIP, commission receivable, UPP, in-force policies, clients) include migrated records by default
+    with an Origin column and filter, while transaction-period reports (production, BIR books and returns) cover BIBS transactions
+    from go-live and FY2027 figures come from legacy.'
+  background: New in BRD V0.03 p.13 (BRID_MIG 10.2, added in revision 0.03). The handbook provides the Origin filter only;
+    year-end option A keeps FY2027 books, BIR returns and audit in legacy (assumption A-DM-12); the drop plan lists 'Reports
+    BIR / regulatory (ACCT, Data Migration)' in Drop 1.
+  proposal: As stated; each report's specification in its module states how migrated records are included.
+  impact: Report specifications of every module must be checked against the rule; BIR reports may otherwise mix FY2027 and
+    FY2028 figures.
+  priority: High
+  owner: Product Owner, Marketing Business System; Head, Comptrollership (BIR reports)
+  needed_by: 30-Oct-2026
+  status: Open
+  sources: BRD Data Migration V0.03 p.13 (10.2); Data Migration Handbook v2.0 'How migrated records are marked', assumption
+    A-DM-12; BDOI drop plan (Drop 1 downstream item 6); Report List 05132026
+- ref: DM-Q38
+  category: Decision
+  area: Year-end cut-over and go-live date
+  need: 'Please confirm year-end option A: go-live on Monday 3 January 2028; legacy processes to 31 December 2027 and closes
+    FY2027; BIBS opens with the open items at 31 December and a provisional balance-sheet opening from the preliminary December
+    trial balance; the legacy GL stays open only for FY2027 closing and audit adjustments by named Comptrollership users;
+    each adjustment reaches BIBS as an opening-balance adjustment (about mid-January 2028 and after the audited statements,
+    about March-April 2028); December soft close by about 20 December 2027.'
+  background: Handbook 'Year-end cut-over options (DMQ39)', 'True-ups and their controls', PR-DM-01 (DMQ25, DMQ39; registers
+    DCR-217, DCR-242); BDOI recommendation of 26-Sep-2026 awaiting Comptrollership confirmation; Drop 0 decision DEC-01
+    (final by M6, 1-Oct-2027; confirmation asked with the Drop 0 closure). V0.03 13.1 (GL beginning balances) is consistent
+    with option A.
+  proposal: Option A; options B (go-live April 2028 with a year-to-date P&L migration) and C (two books in the first quarter)
+    not proposed.
+  impact: Cut-over calendar, G01 and G03, true-up controls, FY2027 BIR returns and audit.
+  priority: High
+  owner: Head, Comptrollership; Program Manager, Business Project Services
+  needed_by: 30-Oct-2026
+  status: Open
+  sources: BRD Data Migration V0.03 p.14 (13.1); Data Migration Handbook v2.0 'Cutover strategy - Approach', PR-DM-01; Drop
+    0 Closure Summary DEC-01; Discrepancy register DCR-242
+- ref: DM-Q39
+  category: Decision
+  area: Cut-over window and freeze
+  need: 'Please confirm the cut-over window and the freezes: reference-data and code map freeze on 27 December 2027 (T-7);
+    last legacy business day Wednesday 29 December 2027; last legacy EOD and business freeze on Friday 31 December 2027
+    at 22:00 (T-3); production load and provisional GL opening on 1 January 2028; go / no-go on Sunday 2 January 2028 at
+    18:00; go-live Monday 3 January 2028 08:00. Please confirm that the cut-over team, Comptrollership, BDOI IT and the
+    Renewal processing team are available on the holidays of 31 December to 2 January, and the communication to branches,
+    insurers and bank channels from 13 December 2027.'
+  background: Handbook 'Freeze windows', Part D calendar and task list (DMQ25); risk 15 (cut-over over the year-end holidays).
+    V0.03 12.1 (p.13) asks for a cut-over plan aligned to RMEL without dates.
+  proposal: As stated; final confirmation of the date and window at M6 (1-Oct-2027).
+  impact: The runbook, the staffing roster and the dress rehearsal timings.
+  priority: High
+  owner: Program Manager, Business Project Services; Head, Operations; BDOI IT
+  needed_by: 30-Oct-2026
+  status: Open
+  sources: BRD Data Migration V0.03 p.13 (12.1); Data Migration Handbook v2.0 'Freeze windows', Part D 'Calendar', risk
+    15
+- ref: DM-Q40
+  category: Decision
+  area: Trial migrations and dress rehearsal
+  need: 'Please confirm the number and dates of the rehearsals and BDOI''s participation in each: Trial migration 1 on SIT
+    19-30 April 2027, Trial migration 2 on SIT 5-16 July 2027, Trial migration 3 (UAT load) 2-13 August 2027, Trial migration
+    4 (UAT refresh, timed as a cut-over) 4-15 October 2027, dress rehearsal on a production-sized environment 15-26 November
+    2027 (reserve 6-10 December 2027). Each needs fresh extracts from BDOI IT and sample verification by the data owners.'
+  background: 'Handbook ''Migration cycles'' with entry and exit criteria (DMQ31, PR-DM-15). BDOI drop plan: SIT migration
+    Apr-Jul 2027, UAT migration Aug-Oct 2027, full migration and cut-over Nov 2027-Jan 2028.'
+  proposal: Four trial migrations and one dress rehearsal as listed, within the drop-plan windows.
+  impact: Readiness evidence for go / no-go and the UAT of Drop 1 on migrated data.
+  priority: High
+  owner: Program Manager, Business Project Services
+  needed_by: 30-Oct-2026
+  status: Open
+  sources: Data Migration Handbook v2.0 'Trial migrations, dress rehearsal and production', PR-DM-15; BDOI drop plan and
+    timeline
+- ref: DM-Q41
+  category: Dependency
+  area: Environments for trial migrations
+  need: Please confirm that extended hours of the non-production environments can be booked for the weekend trial-migration
+    loads and the dress rehearsal (the infrastructure estimate assumes 12 hours a day, 5 days a week), and that a production-sized
+    environment is available for the dress rehearsal in November 2027.
+  background: IER workbook v20, Assumptions item 3 (non-production 12 x 5); register DCR-226; programme alignment question
+    IQ27; Handbook Dependencies D2, D3.
+  proposal: Extended hours booked per trial migration and for the dress rehearsal; dress rehearsal on the Pre-Prod environment.
+  impact: Trial migrations cannot run as timed rehearsals; dress-rehearsal timings would not hold for production.
+  priority: Medium
+  owner: BDOI IT; BDO Cloud and Digital Operations Engineering
+  needed_by: 29-Jan-2027
+  status: Open
+  sources: BDOI IER Workbook v20, Assumptions 3; Discrepancy register DCR-226; Programme Alignment IQ27; Data Migration
+    Handbook v2.0 Dependencies D2, D3
+- ref: DM-Q42
+  category: Decision
+  area: Masking of personal data in non-production
+  need: 'Please confirm the protection of personal data outside production: SIT and UAT receive masked data only; names,
+    addresses, TIN, ID, bank account and phone numbers, e-mail addresses and birth dates are masked with a repeatable method
+    so matching still works; amounts, codes and dates are not masked. Please confirm whether BDO data privacy policy allows
+    the BIBS intake to receive the files and mask them on receipt, or whether BDOI IT must mask the files before transfer,
+    and who approves the masked data sets.'
+  background: V0.03 p.18 answers the anonymisation question with 'Not Applicable - refer to the consolidated NFR'. Handbook
+    'Test data and masking', 'Data security' (DMQ31, PR-DM-15); Migration Workbook sheet Masking lists the masked columns;
+    staging purged within 5 days; access only from the Philippines.
+  proposal: Masking on receipt as designed, with the masked columns of the Masking sheet; Compliance approves the masking
+    rules before Trial migration 1.
+  impact: No trial migration can start without an approved masking approach.
+  priority: High
+  owner: Compliance; BDOI Information Security
+  needed_by: 30-Oct-2026
+  status: Open
+  sources: BRD Data Migration V0.03 p.18; Data Migration Handbook v2.0 'Test data and masking', 'Data security'; Migration
+    Workbook v2.0 sheet Masking
+- ref: DM-Q43
+  category: Decision
+  area: 'History: read-only legacy or archive'
+  need: 'For each legacy system, please decide how history stays available for BRID_MIG 11.1: kept read-only in legacy (for
+    how long, hosted by whom, with what access logging) or loaded into the BIBS archive before decommissioning; and name
+    the record types, search keys and the transfer folder for legacy documents.'
+  background: BRD Data Migration V0.03 p.13 (11.1, unchanged). Handbook 'History, archive and read-only access', PR-DM-04
+    (DMQ24, DMQ07; register DCR-209).
+  proposal: Each legacy application read-only until decommissioned, its address shown in Legacy Inquiry; closed transactions,
+    expired policies, GL history and documents loaded into the BIBS archive before decommissioning; every access logged
+    and reviewed monthly by Compliance.
+  impact: Archive layouts H01 and H02, Legacy Inquiry and the decommissioning checklists.
+  priority: Medium
+  owner: Audit / Compliance; BDOI IT
+  needed_by: 30-Oct-2026
+  status: Open
+  sources: BRD Data Migration V0.03 p.13 (11.1); Data Migration Handbook v2.0 'History, archive and read-only access', PR-DM-04;
+    Discrepancy register DCR-209
+- ref: DM-Q44
+  category: Data or input needed
+  area: Retention
+  need: 'V0.03 refers retention and archiving to the consolidated NFR and to ''relevant bank policies''. Please send the
+    applicable bank retention policy and confirm: archive records and access logs kept 5 years online and 15 years in the
+    archive (umbrella BRD); migration evidence (counts, hashes, totals, reports, sign-offs) kept 10 years; staged rows and
+    extract files deleted within 5 days of the batch sign-off.'
+  background: BRD Data Migration V0.03 p.18 (retention 'Not Applicable - refer to consolidated NFR'; 'Refer to relevant
+    bank policies'). Handbook 'History, archive and read-only access' (retention), Part C 'Evidence and retention', PR-DM-20
+    (DMQ29, DMQ24; register DCR-209); BRD BDOI Core Replacement p.45.
+  proposal: As stated, unless the bank policy sets other periods.
+  impact: Archive retention settings, staging purge and the decommissioning criterion 'retention covered'.
+  priority: Medium
+  owner: Compliance; Program Manager, Business Project Services
+  needed_by: 30-Oct-2026
+  status: Open
+  sources: BRD Data Migration V0.03 p.18; BRD BDOI Core Replacement p.45; Data Migration Handbook v2.0 PR-DM-20; Discrepancy
+    register DCR-209
+- ref: DM-Q45
+  category: Data or input needed
+  area: Consolidated NFR
+  need: 'Every usage table of V0.03 (volume and performance, availability, retention) refers to ''the consolidated NFR requirements
+    for BDO Insure Core Modernization project''. Please send that document (name, version, owner) and confirm the targets
+    that apply to the migration: maximum cut-over window, load-time target, and availability of the legacy systems in read-only
+    mode.'
+  background: 'BRD Data Migration V0.03 p.17-18 (unchanged from V0.01 p.13-14). Handbook planning assumptions: 50,000 rows
+    an hour per partition, dress rehearsal with at least 20 percent margin, 1,000,000 client rows and 500,000 open-item
+    rows (DMQ29; register DCR-193).'
+  proposal: Plan on the handbook assumptions until the NFR document is received; confirm them against the volumes of the
+    first full extracts.
+  impact: Performance targets of the dress rehearsal and the length of the cut-over window.
+  priority: Medium
+  owner: Program Manager, Business Project Services
+  needed_by: 30-Oct-2026
+  status: Open
+  sources: BRD Data Migration V0.03 p.17-18; Data Migration Handbook v2.0 'Load through the BIBS services'; Discrepancy
+    register DCR-193
+- ref: DM-Q46
+  category: Decision
+  area: Go / no-go, rollback and point of no return
+  need: Please confirm the go / no-go criteria (Day-1 objects accepted; counts reconciled; no financial reject without an
+    approved manual-entry plan; amounts and Migration Clearing 0.00; client review queue empty and screening complete; smoke
+    test passed; snapshot taken; hypercare roster; signed preliminary December trial balance; headers to 31 May 2028 and
+    RA-sent file loaded), that a rollback restores the production snapshot and reopens legacy, and that the point of no
+    return is 18:00 on the first business day, after which issues are fixed forward in BIBS. Please confirm who decides
+    a rollback.
+  background: Handbook 'Go / no-go', 'Rollback', Part D checkpoints GNG-1 to GNG-3 (DMQ32, PR-DM-16; Drop 0 decision DEC-13,
+    due M6).
+  proposal: As stated; the go / no-go board decides, chaired by the Program Manager.
+  impact: The runbook and the dress-rehearsal test of the rollback.
+  priority: Medium
+  owner: Program Manager, Business Project Services; go / no-go board
+  needed_by: 01-Oct-2027
+  status: Open
+  sources: Data Migration Handbook v2.0 'Go / no-go', 'Rollback', PR-DM-16; Drop 0 Closure Summary DEC-13
+- ref: DM-Q47
+  category: Decision
+  area: Run-off and decommissioning
+  need: 'BRID_MIG 12.1 asks for clear run-off and legacy decommissioning criteria. Please confirm the criteria and the owner
+    per legacy system: final extracts reconciled; for EBIX and ISYS the final true-up reconciled and the legacy GL locked;
+    archive loaded and reconciled; Legacy Inquiry verified by Audit / Compliance; no open item or claim needing the system
+    and the claims tail covered; access logs archived; retention covered; sign-off by the system owner, Compliance and Comptrollership.'
+  background: BRD Data Migration V0.03 p.13 (12.1, unchanged). Handbook 'Decommissioning', Part D 'Decommissioning checklists',
+    PR-DM-21 (DMQ27); run-off of about 12-15 months tracked monthly.
+  proposal: As stated; QPS decommissioned after the last QPS-issued policy has renewed or lapsed.
+  impact: Decommissioning checklists and the run-off tracking.
+  priority: Medium
+  owner: Program Manager, Business Project Services; BDOI IT; Head, Comptrollership
+  needed_by: 01-Oct-2027
+  status: Open
+  sources: BRD Data Migration V0.03 p.13 (12.1); Data Migration Handbook v2.0 'Decommissioning', PR-DM-21
+- ref: DM-Q48
+  category: Decision
+  area: Reconciliation tolerances and sign-off
+  need: 'Please confirm the reconciliation sign-off criteria: every object reconciled by record counts, amounts, hash totals,
+    field values and (for financial objects) the GL; the amount tolerance per currency is 0.00; a break is fixed by a rerun
+    or explained with a reason from the list and approved by the reconciliation approver; Comptrollership signs the reconciliation
+    of financial objects. V0.03 13.1 accepts ''no material variances'': please say whether any materiality threshold applies,
+    and to which objects.'
+  background: Partly new in BRD V0.03 p.14 (13.1 'no material variances'); BRID_MIG 1.2 (p.7) 'all data objects and items
+    are reconcilable from source to target'. Handbook 'Reconciliation and sign-off', Part C 'Reconciliation levels', 'Control
+    totals BDOI sends', PR-DM-28.
+  proposal: Tolerance 0.00 for every amount; no materiality threshold; break explanations approved by the reconciliation
+    approver; gate G5 per object.
+  impact: Gate G5 of every object and the go / no-go criteria on amounts and Migration Clearing.
+  priority: High
+  owner: Head, Comptrollership; data owners
+  needed_by: 30-Oct-2026
+  status: Open
+  sources: BRD Data Migration V0.03 p.7 (1.2), p.14 (13.1); Data Migration Handbook v2.0 Part C, PR-DM-28; Migration Workbook
+    v2.0 sheet Reconciliation sign-off
+- ref: DM-Q49
+  category: Confirmation
+  area: Business acceptance of migrated data
+  need: 'Please confirm the acceptance criteria of each object (gate G6): the data owner checks the sample listed on the
+    Reconciliation sign-off sheet on the BIBS screens; for financial objects and client identity fields no error is accepted;
+    for other fields an isolated cosmetic error is recorded with its fix, and two errors of the same kind double the sample
+    and must be fixed before sign-off.'
+  background: Handbook Part C 'Business verification on screen (gate G6)', 'Sample plan', 'Acceptance rule'; V0.03 1.3 asks
+    that approved migrated data is 'available, validated and accessible in the target system post-cutover'.
+  proposal: As stated.
+  impact: Gate G6 of every object and the go / no-go criterion 'Day-1 objects accepted'.
+  priority: Medium
+  owner: Data owners; Data Migration Lead (BDOI)
+  needed_by: 30-Oct-2026
+  status: Open
+  sources: BRD Data Migration V0.03 p.7-8 (1.3); Data Migration Handbook v2.0 Part C 'Sample plan', 'Acceptance rule'
+- ref: DM-Q50
+  category: Confirmation
+  area: Defect handling
+  need: 'Please confirm how migration issues are handled: severities Critical, High, Medium and Low as defined in the test
+    plan; daily triage; Critical issues resolved within 1 working day and High within 3; no open Critical issue before the
+    next trial migration; hypercare exit with no open Critical or High issue, 10 consecutive business days of clean daily
+    checks and the first month-end close without difference. Please name the BDOI person who logs and triages migration
+    issues with the iorta TechNXT Migration Lead.'
+  background: Test plan BRD-13 'Issue management'; Handbook 'Migration cycles' exit criteria, 'Hypercare' and Part D 'Exit
+    criteria'.
+  proposal: As stated; the BDOI Data Migration Lead triages with the iorta TechNXT Migration Lead.
+  impact: Exit criteria of each cycle and of hypercare.
+  priority: Medium
+  owner: Data Migration Lead (BDOI); Program Manager, Business Project Services
+  needed_by: 30-Oct-2026
+  status: Open
+  sources: Test Plan BRD-13 v2.0 'Issue management'; Data Migration Handbook v2.0 'Hypercare', Part D 'Exit criteria'
+- ref: DM-Q51
+  category: Confirmation
+  area: Load approach
+  need: Please confirm that every migrated record is created through the same BIBS functions as the screens, so every business
+    rule, audit entry and accounting entry applies, and that loads send no notification to clients or insurers and start
+    no onboarding workflow.
+  background: Handbook principle 5, 'How migrated records are marked' (no side effects), PR-DM-27.
+  proposal: As stated.
+  impact: Load design and the absence of client or insurer messages during trial migrations and cut-over.
+  priority: Low
+  owner: Program Manager, Business Project Services
+  needed_by: 16-Oct-2026
+  status: Open
+  sources: Data Migration Handbook v2.0 'Principles', 'How migrated records are marked', PR-DM-27

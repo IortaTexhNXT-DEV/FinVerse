@@ -310,7 +310,7 @@ def output_name(doc_type: str, brd: str, name: str, version: str, ext: str) -> s
 DROP_SETS: dict[str, dict[str, object]] = {
     "Drop 0": {
         "folder": "Drop-0_Closure",
-        "version": "2.0",
+        "version": "2.1",
         "files": {"01": ("Configuration_Inputs", "xlsx", "Configuration inputs workbook (Excel)"),
                   "02": ("Closure_Summary", "docx", "Closure summary (Word)")},
     },

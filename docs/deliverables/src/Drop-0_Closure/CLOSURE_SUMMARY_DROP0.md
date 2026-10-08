@@ -1,5 +1,5 @@
 ---
-# Source of "02 Drop 0 Closure Summary" (Word), Drop 0 closure set v2.0, for the BDOI steering committee.
+# Source of "02 Drop 0 Closure Summary" (Word), Drop 0 closure set v2.1, for the BDOI steering committee.
 # Build: python tools/deliverables/drop_closure.py (writes 01 the configuration inputs workbook and this document).
 # The tables are ```pack blocks rendered by tools/deliverables/drop_closure.py from drop0.yaml, the clarification
 # chapters of the three sign-off sets and the BRD-13 catalogue.
@@ -10,12 +10,18 @@ doc_code: ClosureSummary
 brd: Drop 0
 name: Drop 0 Closure Summary
 doc_id: BIBS-CS-DROP-0
-version: "2.0"
-date: 5 October 2026
+version: "2.1"
+date: 8 October 2026
 status: Issued for the BDOI steering committee
 header_title: Drop 0 Closure Summary
 h1_page_break: true
 control:
+  - version: "2.1"
+    date: 8 Oct 2026
+    author: iorta TechNXT Project Manager
+    reviewer: iorta TechNXT Business Analysis
+    approver: ""
+    change: "Aligned with the three Drop 0 sign-off sets v2.1 (BRD versions of 8 October 2026); the group and inter-company input removed (BIBS is specific to BDOI as an insurance broker); the master data and configuration upload templates v1.1 named as the way BDOI provides the inputs"
   - version: "2.0"
     date: 5 Oct 2026
     author: iorta TechNXT Project Manager
@@ -36,7 +42,7 @@ distribution:
 
 This summary asks the BDOI steering committee to close Drop 0 (Setup and Data Migration) and to open Drop 1. It brings together, in one place, what the three Drop 0 sign-off sets ask the business to confirm, the number of proposed rules and clarifications that are still open in each set, the decisions BDOI takes to close the drop, the configuration inputs BDOI provides before go-live and when, the entry and exit criteria, the risks and dependencies, and the change control that applies once the sets are signed.
 
-The companion workbook **01_BIBS_Drop-0_Configuration_Inputs_v2.0.xlsx** lists every configuration input with its BDOI owner, its due date relative to go-live and its one route into BIBS. Go-live is proposed for Monday 3 January 2028 (T), at the year-end boundary, subject to the confirmation of the year-end option by Comptrollership (decision DEC-01).
+The companion workbook **01_BIBS_Drop-0_Configuration_Inputs_v2.1.xlsx** lists every configuration input with its BDOI owner, its due date relative to go-live and its one route into BIBS. Go-live is proposed for Monday 3 January 2028 (T), at the year-end boundary, subject to the confirmation of the year-end option by Comptrollership (decision DEC-01).
 
 # Scope of Drop 0
 

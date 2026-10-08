@@ -20,6 +20,8 @@ sign-off per BRD"). Each document is kept once, in its latest version.
 |---|---|---|---|---|
 | BIBS BDOI FeatureList vs OOTB and Best Practice v1.0 | - | Feature_List | - | [`Feature_List/BIBS_BDOI_FeatureList_vs_OOTB_and_Best_Practice_v1.0.xlsx`](Feature_List/BIBS_BDOI_FeatureList_vs_OOTB_and_Best_Practice_v1.0.xlsx) |
 | Core Replacement | BRD-00 | FRS | 1.1 | [`FRS/BIBS_FRS_BRD-00_Core_Replacement_v1.1.docx`](FRS/BIBS_FRS_BRD-00_Core_Replacement_v1.1.docx) |
+| Master Data Upload Guide | BRD-00 | BDOI_Inputs | 1.1 | [`BDOI_Inputs/BIBS_Templates_BRD-00_Master_Data_Upload_Guide_v1.1.docx`](BDOI_Inputs/BIBS_Templates_BRD-00_Master_Data_Upload_Guide_v1.1.docx) |
+| Master Data and Configuration Upload Templates | BRD-00 | BDOI_Inputs | 1.1 | [`BDOI_Inputs/BIBS_Templates_BRD-00_Master_Data_and_Configuration_Upload_Templates_v1.1.xlsx`](BDOI_Inputs/BIBS_Templates_BRD-00_Master_Data_and_Configuration_Upload_Templates_v1.1.xlsx) |
 | Change Management and Training Framework | BRD-00 | Adoption | 1.0 | [`Adoption/BIBS_Adoption_BRD-00_Change_Management_and_Training_Framework_v1.0.docx`](Adoption/BIBS_Adoption_BRD-00_Change_Management_and_Training_Framework_v1.0.docx) |
 | Knowledge Transfer Plan | BRD-00 | Adoption | 1.0 | [`Adoption/BIBS_Adoption_BRD-00_Knowledge_Transfer_Plan_v1.0.docx`](Adoption/BIBS_Adoption_BRD-00_Knowledge_Transfer_Plan_v1.0.docx) |
 | QRG Account Officer | BRD-00 | Adoption | 1.0 | [`Adoption/BIBS_Adoption_BRD-00_QRG_Account_Officer_v1.0.docx`](Adoption/BIBS_Adoption_BRD-00_QRG_Account_Officer_v1.0.docx) |
@@ -63,6 +65,7 @@ sign-off per BRD"). Each document is kept once, in its latest version.
 | Hypercare Warranty and Sign-off Plan | BRD-00 | Go_Live | 1.0 | [`Go_Live/BIBS_Hypercare_BRD-00_Hypercare_Warranty_and_Sign-off_Plan_v1.0.docx`](Go_Live/BIBS_Hypercare_BRD-00_Hypercare_Warranty_and_Sign-off_Plan_v1.0.docx) |
 | BIBS IER Application Architecture | BRD-00 | IER diagram (PNG) | - | [`Alignment/IER/BIBS_IER_Application_Architecture.png`](Alignment/IER/BIBS_IER_Application_Architecture.png) |
 | BIBS IER Infrastructure Deployment | BRD-00 | IER diagram (PNG) | - | [`Alignment/IER/BIBS_IER_Infrastructure_Deployment.png`](Alignment/IER/BIBS_IER_Infrastructure_Deployment.png) |
+| BDOI Requirements and Inputs by BRD | BRD-00 | BDOI_Inputs | 1.1 | [`BDOI_Inputs/BIBS_Inputs_BRD-00_BDOI_Requirements_and_Inputs_by_BRD_v1.1.xlsx`](BDOI_Inputs/BIBS_Inputs_BRD-00_BDOI_Requirements_and_Inputs_by_BRD_v1.1.xlsx) |
 | Non Functional Requirements Register | BRD-00 | Requirements | 1.0 | [`Requirements/BIBS_NFR_BRD-00_Non_Functional_Requirements_Register_v1.0.xlsx`](Requirements/BIBS_NFR_BRD-00_Non_Functional_Requirements_Register_v1.0.xlsx) |
 | Non Functional Requirements | BRD-00 | Requirements | 1.0 | [`Requirements/BIBS_NFR_BRD-00_Non_Functional_Requirements_v1.0.docx`](Requirements/BIBS_NFR_BRD-00_Non_Functional_Requirements_v1.0.docx) |
 | Runbook and Observability | BRD-00 | Operations | 1.0 | [`Operations/BIBS_Operations_BRD-00_Runbook_and_Observability_v1.0.docx`](Operations/BIBS_Operations_BRD-00_Runbook_and_Observability_v1.0.docx) |

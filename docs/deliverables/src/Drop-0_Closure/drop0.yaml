@@ -23,8 +23,8 @@
 meta:
   title: Drop 0 Configuration Inputs
   doc_type: Configuration inputs workbook
-  version: "2.0"
-  date: 5 October 2026
+  version: "2.1"
+  date: 8 October 2026
   go_live: 2028-01-03
   go_live_text: "Go-live is proposed for Monday 3 January 2028 (T), at the year-end boundary (option A of the Data Migration set, for Comptrollership to confirm)."
   statuses: [Not started, In progress, Ready for review, Confirmed, Not applicable]
@@ -264,9 +264,6 @@ items:
   - {id: CFG-010, area: Organisation, module: ORG, name: Currencies and exchange rates, due: D5, route: screen, screen: /setup/currencies,
      provides: "The currencies in use and the source and owner of the daily BOOK rate; the legacy currency codes are mapped by code map CURRENCY",
      tables: [cur_exchange_rate]}
-  - {id: CFG-011, area: Organisation, module: ORG, name: "Group, subsidiaries and inter-company relationships", due: D5, route: screen, screen: /planning/intercompany,
-     provides: "Whether BIBS consolidates other BDO entities, and the inter-company relationships and their accounts; blank when BDOI keeps one company",
-     tables: [con_group, con_group_member, ic_relationship]}
 
   # ---------------------------------------------------------------- Chart of accounts and accounting
   - {id: CFG-020, area: Chart of accounts and accounting, module: ORG, name: Chart of accounts, due: D2, route: template, template: D0-06, screen: /gl/accounts/upload,
@@ -476,7 +473,8 @@ items:
 # Master tables that the SIT seed data fills but that are records, not configuration (not claimed by an item).
 records_not_configuration:
   - [acc_account, acc_account_pn, acc_account_policy, acc_risk_item, acc_risk_item_detail]   # accounts and risks (New Business records)
-  - [acct_seed_gl, bkg_seed_account, bkg_seed_gl, mig_seed_gl, ops_seed_gl, sbm_seed_rule, seed_client]  # SIT data helpers
+  - [acct_seed_gl, bkg_seed_account, bkg_seed_account_hold, bkg_seed_gl, mig_seed_gl, ops_seed_gl, sbm_seed_rule, seed_client, seed_wording]  # SIT data helpers
+  - [con_group, con_group_member, ic_relationship]   # group and inter-company tables of the removed insurer-company suite (dropped by V2501)
   - [bkg_queue, crm_client, crm_client_instruction, crm_client_note_history, crm_client_tag, crm_kyc_document]
   - [csf_activity, csf_contact_change, csf_contact_change_field, csf_sync_outbox, csf_verification, csf_verification_check, csh_pickup_request]
   - [doc_attachment, doc_attachment_content, eb_activity_log, eb_cycle, eb_feedback, eb_programme, eb_programme_contact, eb_programme_line, eb_renewal_advice, eb_tracked_item]

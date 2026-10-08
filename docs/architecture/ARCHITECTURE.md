@@ -52,16 +52,35 @@ no cycles. Cross-module call-backs use ports (interfaces owned by the caller).
 
 BIBS runs on Amazon EKS in ap-southeast-1 with managed AWS services; the application stays one modular monolith
 ([`ARCHITECTURE_OPTION_DECISION.md`](ARCHITECTURE_OPTION_DECISION.md): BIBS modular monolith with the IER enterprise
-elements, awaiting BDOI confirmation, IQ25 / DCR-222).
+elements, confirmed by BDOI on 26-Sep-2026).
 
 | Layer | Component |
 |---|---|
-| Edge | Route 53, AWS WAF, Application Load Balancer (or Apigee X if BDO mandates it) in front of the ingress |
+| Edge | Route 53, AWS WAF, internal Application Load Balancer driven through the Kubernetes Gateway API (AWS Load Balancer Controller; Envoy Gateway as the per-environment alternative), Apigee X for the system APIs |
 | Workloads | `bibs-frontend` (nginx, React SPA) and one backend image (Spring Boot, Java 21) run as `bibs-web`, `bibs-jobs` and `bibs-integration` by runtime role, with HPA, PodDisruptionBudgets and NetworkPolicies (`deploy/k8s`, Kustomize base and overlays; `docs/operations/DEPLOYMENT.md`) |
-| Data | Amazon RDS PostgreSQL 16 Multi-AZ (one database, one transaction per business record), ElastiCache Redis 7 (cluster mode disabled), Amazon MSK (Kafka 3.6, 9 `bibs.*` topics with transactional outbox) |
+| Data | Amazon RDS PostgreSQL 16 Multi-AZ (one database, one transaction per business record), ElastiCache for Valkey 8 (cluster mode disabled), Amazon MSK (Kafka 3.9 KRaft, 9 `bibs.*` topics with transactional outbox) |
 | Files | Amazon S3 for every document and attachment (four buckets per environment, SSE-KMS with BDOI keys, Object Lock governance mode, GuardDuty malware scan); PostgreSQL keeps the metadata ([`DOCUMENT_STORAGE_DECISION.md`](DOCUMENT_STORAGE_DECISION.md)) |
 | Identity | EIAM (Microsoft Entra ID, OpenID Connect) for sign-in; UIDM-ISC (IGA) for provisioning (USER_ACCESS_DESIGN section 10.1) |
 | Environments | DEV, SIT, UAT, Pre-Prod, PROD, DR (warm standby in the DR region, RDS cross-region replica, S3 replication); RPO 15 minutes, RTO 4 hours |
+
+### Component baseline (client decision, 08-Oct-2026)
+
+| Component | Version baseline | Licence | Function |
+|---|---|---|---|
+| PostgreSQL | 16.x | PostgreSQL Licence | Relational data store |
+| Valkey | 8.x | BSD-3-Clause | Cache, job locks, token deny-list, counters |
+| Apache Kafka | 3.9 (KRaft) | Apache 2.0 | Event streaming, transactional outbox |
+| OpenJDK (Eclipse Temurin) | 21 LTS | GPLv2 with Classpath Exception | Application runtime |
+| Spring Boot | 3.5.x | Apache 2.0 | Application framework |
+| React | 19.x | MIT | Web user interface |
+| Node.js | 22 LTS | MIT | Build of the web user interface (not a production runtime) |
+| nginx (unprivileged image) | 1.30 | BSD-2-Clause | Serves the web user interface, proxies the API |
+| Kubernetes (managed) | Provider-supported version | Apache 2.0 | Container orchestration |
+| Gateway API controller | Conformant v1 implementation | Apache 2.0 | Ingress and traffic routing |
+
+Valkey replaces Redis (no longer under the BSD licence from 7.4 on) with the same client and protocol; the edge uses
+the Kubernetes Gateway API (ingress-nginx was retired by the Kubernetes project in March 2026). Support horizon and
+the annual review of the baseline: [`DEPLOYMENT.md`](../operations/DEPLOYMENT.md) section 7.
 
 The IER-aligned diagrams for BDOI IT are `docs/deliverables/out/Programme/Alignment/IER/BIBS_IER_Application_Architecture.png`
 and `BIBS_IER_Infrastructure_Deployment.png` (sources `docs/deliverables/src/alignment/figures/`); the comparison with

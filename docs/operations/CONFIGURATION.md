@@ -102,8 +102,8 @@ are for local development only.
 | `BROKERVERSE_PASSWORD_RESET_URL` | yes (every environment but local, not localhost) | on a developer's machine the first allowed origin + `/reset-password` | Address of the web page opened by the "Forgot password?" e-mail link (UAM-NFR-37; the link carries a single-use token valid 30 minutes), e.g. `https://bibs.example.com/reset-password`. Property `brokerverse.security.password-reset-url` (the relaxed name `BROKERVERSE_SECURITY_PASSWORD_RESET_URL` works too). |
 | `BROKERVERSE_JOB_EVENT_OUTBOX_RELAY_CRON` | no | `0 * * * * *` | Spring cron (UTC) of `EVENT_OUTBOX_RELAY` (platform, every minute): sends the integration events the after-commit relay left in `evt_outbox` (broker down, instance stopped) and the retries that are due; with Kafka disabled marks leftovers `LOCAL`. Property `brokerverse.jobs.event-outbox-relay-cron`. |
 | `BROKERVERSE_JOB_EVENT_HOUSEKEEPING_CRON` | no | `0 50 0 * * *` | Spring cron (UTC) of `EVENT_HOUSEKEEPING` (platform, daily): deletes delivered outbox rows older than `BROKERVERSE_KAFKA_OUTBOX_RETENTION`, archived events and resolved dead letters older than `BROKERVERSE_KAFKA_ARCHIVE_RETENTION`. Property `brokerverse.jobs.event-housekeeping-cron`. |
-| `BROKERVERSE_JOB_SHARED_STATE_CLEANUP_CRON` | no | `0 40 0 * * *` | Spring cron (UTC) of `SHARED_STATE_CLEANUP` (platform, daily): deletes expired rows of `sec_revoked_token` and `sys_shared_counter` (database fallback of Redis). Property `brokerverse.jobs.shared-state-cleanup-cron`. |
-| `BROKERVERSE_JOB_LOCK_LEASE` | no | `PT2M` | Lease of the Redis job lock, renewed every third of it while the job runs; an instance that dies frees the lock after at most one lease. Property `brokerverse.jobs.lock-lease`. |
+| `BROKERVERSE_JOB_SHARED_STATE_CLEANUP_CRON` | no | `0 40 0 * * *` | Spring cron (UTC) of `SHARED_STATE_CLEANUP` (platform, daily): deletes expired rows of `sec_revoked_token` and `sys_shared_counter` (database fallback of Valkey). Property `brokerverse.jobs.shared-state-cleanup-cron`. |
+| `BROKERVERSE_JOB_LOCK_LEASE` | no | `PT2M` | Lease of the Valkey job lock, renewed every third of it while the job runs; an instance that dies frees the lock after at most one lease. Property `brokerverse.jobs.lock-lease`. |
 | `BROKERVERSE_MAIL_ENABLED` | no | `false` | `true` delivers e-mails through the SMTP server below; `false` records them in the outbox as *simulated* (seed, test, UAT without mail). Addresses ending in `.invalid` are always rejected by the simulated transport. |
 | `BROKERVERSE_MAIL_DISPATCH_ON_COMMIT` | no | `true` | Deliver right after the business transaction commits; `false` leaves delivery to the `MAIL_DISPATCH` job only. |
 | `MAIL_HOST` / `MAIL_PORT` | when mail enabled | `localhost` (none with `prod`) / `587` | SMTP server. |
@@ -145,9 +145,18 @@ folder is connected (DMQ24) they are staged in the console (`POST /api/v1/migrat
 permission `MIG_INTAKE`) under the short-lived record class `MIGRATION_EXTRACT`, and the archive keeps its own copy as
 an attachment `LEGACY_DOCUMENT`.
 
-## Redis 7 and Apache Kafka (platform cache and events)
+## Valkey 8 and Apache Kafka (platform cache and events)
 
 Design, topic catalogue and runbook: [`PLATFORM_CACHE_AND_EVENTS.md`](../architecture/PLATFORM_CACHE_AND_EVENTS.md).
+Valkey 8 (BSD-3-Clause, Linux Foundation; on AWS Amazon ElastiCache for Valkey) replaces Redis, whose releases from 7.4 on are no
+longer under the BSD licence. Valkey speaks the same protocol, so the client (Spring Data Redis with Lettuce) and
+the Spring keys `spring.data.redis.*` and `brokerverse.redis.*` stay. The variables are named `BROKERVERSE_VALKEY_*`;
+the former names are still read when the new one is not set, so an existing deployment keeps working:
+`BROKERVERSE_REDIS_ENABLED`, `BROKERVERSE_REDIS_HOST`, `BROKERVERSE_REDIS_PORT`, `BROKERVERSE_REDIS_USERNAME`,
+`BROKERVERSE_REDIS_PASSWORD`, `BROKERVERSE_REDIS_TLS`, `BROKERVERSE_REDIS_DATABASE`, `BROKERVERSE_REDIS_TIMEOUT`,
+`BROKERVERSE_REDIS_CONNECT_TIMEOUT`, `BROKERVERSE_REDIS_KEY_PREFIX` (same meaning as the `BROKERVERSE_VALKEY_*`
+variable of the same suffix). The start-up safeguards name the new variables.
+Versions and licences of the platform components: [`DEPLOYMENT.md`](DEPLOYMENT.md) section 7 (component baseline).
 Both default to **on** in `application.yml` and are **off** in the `test` profile. With either off the
 application starts and behaves correctly on its fallbacks (in-memory cache, PostgreSQL advisory locks
 and tables of V28, events recorded `LOCAL`, e-mail sent after commit). Every instance of one
@@ -155,14 +164,14 @@ environment must use the same settings.
 
 | Variable | Required in prod | Default | Purpose |
 |---|---|---|---|
-| `BROKERVERSE_REDIS_ENABLED` | yes (`true`) | `true` | `brokerverse.redis.enabled`. `true`: Redis holds the reference-data cache, the job locks, the token denylist and the shared counters; `false`: in-memory cache (per instance, bounded by the time to live), PostgreSQL advisory job locks, tables `sec_revoked_token` / `sys_shared_counter`. Also switches the Redis health check (`management.health.redis.enabled`). |
-| `BROKERVERSE_REDIS_HOST` / `BROKERVERSE_REDIS_PORT` | when enabled | `localhost` / `6379` | `spring.data.redis.host` / `port`. On AWS: the ElastiCache (Redis 7) primary endpoint. |
-| `BROKERVERSE_REDIS_USERNAME` | no | – | `spring.data.redis.username` (ElastiCache RBAC user; blank = default user). |
-| `BROKERVERSE_REDIS_PASSWORD` | when the server requires it; always in production with Redis enabled | – | `spring.data.redis.password` (ElastiCache AUTH token or RBAC password). **Secret**: from the vault. |
-| `BROKERVERSE_REDIS_TLS` | yes (`true`) | `true`; `false` in the `dev`, `test` and `seed` profiles | `spring.data.redis.ssl.enabled`: `true` with ElastiCache in-transit encryption. |
-| `BROKERVERSE_REDIS_DATABASE` | no | `0` | `spring.data.redis.database`. |
-| `BROKERVERSE_REDIS_TIMEOUT` / `BROKERVERSE_REDIS_CONNECT_TIMEOUT` | no | `2s` / `5s` | Command and connect time-outs. |
-| `BROKERVERSE_REDIS_KEY_PREFIX` | no | `bv:` | `brokerverse.redis.key-prefix`: prefix of every key (`bv:cache:…`, `bv:joblock:…`, `bv:session:revoked:…`, `bv:counter:…`); use one per environment when environments share a Redis. |
+| `BROKERVERSE_VALKEY_ENABLED` | yes (`true`) | `true` | `brokerverse.redis.enabled`. `true`: Valkey holds the reference-data cache, the job locks, the token denylist and the shared counters; `false`: in-memory cache (per instance, bounded by the time to live), PostgreSQL advisory job locks, tables `sec_revoked_token` / `sys_shared_counter`. Also switches the Valkey health check (`management.health.redis.enabled`). |
+| `BROKERVERSE_VALKEY_HOST` / `BROKERVERSE_VALKEY_PORT` | when enabled | `localhost` / `6379` | `spring.data.redis.host` / `port`. On AWS: the primary endpoint of the ElastiCache for Valkey 8 cache. |
+| `BROKERVERSE_VALKEY_USERNAME` | no | – | `spring.data.redis.username` (ElastiCache RBAC user; blank = default user). |
+| `BROKERVERSE_VALKEY_PASSWORD` | when the server requires it; always in production with Valkey enabled | – | `spring.data.redis.password` (ElastiCache AUTH token or RBAC password). **Secret**: from the vault. |
+| `BROKERVERSE_VALKEY_TLS` | yes (`true`) | `true`; `false` in the `dev`, `test` and `seed` profiles | `spring.data.redis.ssl.enabled`: `true` with ElastiCache in-transit encryption. |
+| `BROKERVERSE_VALKEY_DATABASE` | no | `0` | `spring.data.redis.database`. |
+| `BROKERVERSE_VALKEY_TIMEOUT` / `BROKERVERSE_VALKEY_CONNECT_TIMEOUT` | no | `2s` / `5s` | Command and connect time-outs. |
+| `BROKERVERSE_VALKEY_KEY_PREFIX` | no | `bv:` | `brokerverse.redis.key-prefix`: prefix of every key (`bv:cache:…`, `bv:joblock:…`, `bv:session:revoked:…`, `bv:counter:…`); use one per environment when environments share a Valkey. |
 | `BROKERVERSE_CACHE_TTL_LOV` | no | `PT1H` | `brokerverse.cache.ttl.lov-values`: time to live of the list-of-values cache. |
 | `BROKERVERSE_CACHE_TTL_PARAMETERS` | no | `PT15M` | `brokerverse.cache.ttl.system-parameters`. |
 | `BROKERVERSE_CACHE_TTL_ROLE_PERMISSIONS` | no | `PT15M` | `brokerverse.cache.ttl.security-role-permissions`. |
@@ -170,13 +179,13 @@ environment must use the same settings.
 | `BROKERVERSE_CACHE_TTL_CATALOG` | no | `PT1H` | `brokerverse.cache.ttl.catalog-product-versions`. |
 | `BROKERVERSE_CACHE_TTL_ORGANIZATION` | no | `PT1H` | `brokerverse.cache.ttl.organization-units`. |
 | `BROKERVERSE_CACHE_MAX_SIZE` | no | `10000` | `brokerverse.cache.maximum-size`: entries per cache of the in-memory fallback. |
-| `BROKERVERSE_LOGIN_RATE_LIMIT` | no | `20` | `brokerverse.security.login-protection.max-attempts-per-window`: login requests accepted per client address and window, counted across all instances; above it `POST /auth/login` answers HTTP 429 (`LOGIN_RATE_LIMITED`). Behind the ingress set `SERVER_FORWARD_HEADERS_STRATEGY=native` (or `framework`) so the address is the caller's. |
+| `BROKERVERSE_LOGIN_RATE_LIMIT` | no | `20` | `brokerverse.security.login-protection.max-attempts-per-window`: login requests accepted per client address and window, counted across all instances; above it `POST /auth/login` answers HTTP 429 (`LOGIN_RATE_LIMITED`). Behind the gateway set `SERVER_FORWARD_HEADERS_STRATEGY=native` (or `framework`) so the address is the caller's. |
 | `BROKERVERSE_LOGIN_RATE_WINDOW` | no | `PT1M` | `brokerverse.security.login-protection.rate-limit-window`. The limit covers every anonymous sign-in step: password, second-factor code and enrolment, completion of a single sign-on. |
 | `BROKERVERSE_RESET_RATE_LIMIT` | no | `10` | `brokerverse.security.login-protection.reset-max-per-address`: "Forgot password?" requests (request, check and confirm of a link) accepted per client address and reset window (HTTP 429 `RESET_RATE_LIMITED` above). |
 | `BROKERVERSE_RESET_LINKS_PER_USER` | no | `3` | `brokerverse.security.login-protection.reset-max-per-user`: reset links e-mailed for one user per reset window; further requests get the same answer and no e-mail. |
 | `BROKERVERSE_RESET_RATE_WINDOW` | no | `PT15M` | `brokerverse.security.login-protection.reset-window`. |
 | `BROKERVERSE_LOGIN_FAILURE_WINDOW` | no | `P1D` | `brokerverse.security.login-protection.failed-attempt-window`: life of the shared failed-login counter of a user. The lockout itself still follows `LOGIN_MAX_FAILED_ATTEMPTS`; `sec_user.failed_attempts` stays the record. |
-| `BROKERVERSE_ATTACHMENT_MAX_SIZE` | no | `10MB` | `brokerverse.attachments.max-size`: largest file accepted as an attachment of a record (a Spring data size such as `10MB`); keep it at or below the multipart and ingress body limits. |
+| `BROKERVERSE_ATTACHMENT_MAX_SIZE` | no | `10MB` | `brokerverse.attachments.max-size`: largest file accepted as an attachment of a record (a Spring data size such as `10MB`); keep it at or below the multipart limit (the gateway sets no body limit; the WAF size rule allows 26 MB on uploads). |
 | `BROKERVERSE_KAFKA_ENABLED` | yes (`true`) | `true` | `brokerverse.kafka.enabled`. `true`: the outbox is relayed to Kafka and the consumers run (archive, e-mail dispatch, dead-letter recorder); `false`: events are recorded as delivered in-process (`LOCAL`) and e-mails are sent after commit and by `MAIL_DISPATCH`. |
 | `BROKERVERSE_KAFKA_BOOTSTRAP_SERVERS` | when enabled | `localhost:9092` | `spring.kafka.bootstrap-servers`. On AWS: the Amazon MSK bootstrap brokers (SASL/SCRAM port 9096 or TLS port 9094). |
 | `BROKERVERSE_KAFKA_SECURITY_PROTOCOL` | yes (`SASL_SSL`) | `SASL_SSL`; `PLAINTEXT` in the `dev`, `test` and `seed` profiles | `spring.kafka.properties.security.protocol`: `SASL_SSL` on MSK with SASL/SCRAM (production refuses anything else). |
@@ -228,7 +237,7 @@ Manual runs from *Administration › Scheduled Jobs* execute on the instance tha
 pod); the job lock still keeps one run at a time.
 
 **Encryption in transit.** The defaults of `application.yml` are TLS for every connection; the `dev`, `test` and
-`seed` profiles switch PostgreSQL, Redis and Kafka to plaintext unless the variables below ask otherwise, so a
+`seed` profiles switch PostgreSQL, Valkey and Kafka to plaintext unless the variables below ask otherwise, so a
 seed stack on AWS (UAT) sets them explicitly (the Kubernetes base configuration does).
 
 | Variable | Required in prod | Default | Purpose |
@@ -240,7 +249,7 @@ seed stack on AWS (UAT) sets them explicitly (the Kubernetes base configuration 
 | `BROKERVERSE_DB_SSL_MODE` | yes (`verify-full`) | `verify-full`; `prefer` in the `dev`, `test` and `seed` profiles | PostgreSQL driver `sslmode` (`spring.datasource.hikari.data-source-properties.sslmode`). Amazon RDS with `rds.force_ssl=1`. |
 | `BROKERVERSE_DB_SSL_ROOT_CERT` | with `verify-*` | `/etc/bibs/rds-ca/global-bundle.pem` | PostgreSQL driver `sslrootcert`: the RDS CA bundle (`global-bundle.pem`, mounted from the ConfigMap `rds-ca-bundle`). |
 
-`BROKERVERSE_REDIS_TLS` and `BROKERVERSE_KAFKA_SECURITY_PROTOCOL` are in the Redis and Kafka table above. SMTP uses
+`BROKERVERSE_VALKEY_TLS` and `BROKERVERSE_KAFKA_SECURITY_PROTOCOL` are in the Valkey and Kafka table above. SMTP uses
 STARTTLS (`MAIL_SMTP_STARTTLS`, default `true`).
 
 **API gateway tokens of `/integration/**`** (`IntegrationSecurityConfig`, a security chain separate from the user
@@ -321,13 +330,13 @@ integration checks as well. BIBS refuses to start, and lists every problem in on
   `BROKERVERSE_DB_USER` (the application must connect as the least-privilege runtime login, not as the schema owner;
   not checked when the migrations are switched off with `SPRING_FLYWAY_ENABLED=false`);
 - (every environment but local) `BROKERVERSE_JWT_SECRET` is missing, shorter than 32 characters or a development
-  value; the database, SMTP, Redis and Kafka credentials below are missing;
+  value; the database, SMTP, Valkey and Kafka credentials below are missing;
 - mail delivery is on (`BROKERVERSE_MAIL_ENABLED=true`) and `MAIL_HOST`, or with SMTP authentication
   `MAIL_USERNAME` / `MAIL_PASSWORD`, is missing;
-- Redis is on (`BROKERVERSE_REDIS_ENABLED`, default `true`) and `BROKERVERSE_REDIS_PASSWORD` is missing;
+- Valkey is on (`BROKERVERSE_VALKEY_ENABLED`, default `true`) and `BROKERVERSE_VALKEY_PASSWORD` is missing;
 - Kafka is on (`BROKERVERSE_KAFKA_ENABLED`, default `true`) and `BROKERVERSE_KAFKA_SASL_JAAS_CONFIG` is missing;
 - a connection could run in plaintext: PostgreSQL `sslmode` (URL or `BROKERVERSE_DB_SSL_MODE`) other than
-  `verify-full` / `verify-ca`, Redis on without TLS (`BROKERVERSE_REDIS_TLS`), Kafka on with a protocol other than
+  `verify-full` / `verify-ca`, Valkey on without TLS (`BROKERVERSE_VALKEY_TLS`), Kafka on with a protocol other than
   `SASL_SSL`, or the HTTP listener without TLS (`BROKERVERSE_SERVER_SSL_ENABLED`, and then
   `BROKERVERSE_SERVER_SSL_CERTIFICATE` / `_PRIVATE_KEY` missing);
 - the instance serves `/integration/**` (runtime role `integration` or `all`) and `BROKERVERSE_INTEGRATION_JWK_SET_URI`,
@@ -358,7 +367,7 @@ links. All properties are under `brokerverse.storage.*`.
 | `BROKERVERSE_STORAGE_LOCAL_ROOT` | no | `<tmp>/brokerverse-files` | `brokerverse.storage.local.root`: folder of the local store. |
 | `BROKERVERSE_STORAGE_LOCAL_LINK_SECRET` | no | random per start | `brokerverse.storage.local.link-secret`: key that signs the links of the local store. Set it when several instances share one local folder. |
 | `BROKERVERSE_STORAGE_LOCAL_SCAN_STATUS` | no | `NO_THREATS_FOUND` | `brokerverse.storage.local.scan-status`: scan result the local store gives every object (it marks files clean). |
-| `BROKERVERSE_STORAGE_MAX_UPLOAD_SIZE` | no | `25MB` | `brokerverse.storage.max-upload-size`: largest file accepted through the application. Larger bulk files go by presigned PUT (up to 5 GB). `BROKERVERSE_UPLOAD_MAX_FILE_SIZE` / `BROKERVERSE_UPLOAD_MAX_REQUEST_SIZE` (`spring.servlet.multipart.*`, now `25MB` / `26MB`) and the ingress body limit must allow it. |
+| `BROKERVERSE_STORAGE_MAX_UPLOAD_SIZE` | no | `25MB` | `brokerverse.storage.max-upload-size`: largest file accepted through the application. Larger bulk files go by presigned PUT (up to 5 GB). `BROKERVERSE_UPLOAD_MAX_FILE_SIZE` / `BROKERVERSE_UPLOAD_MAX_REQUEST_SIZE` (`spring.servlet.multipart.*`, now `25MB` / `26MB`) and the WAF size rule of the upload paths must allow it (the gateway itself sets no body limit). |
 | `BROKERVERSE_STORAGE_LINK_TTL` | no | `PT5M` | `brokerverse.storage.link-ttl`: fallback for the business parameter `FILE_LINK_TTL_SECONDS` (seeded 300, range 30-3600, *Administration › Parameters*), which sets the validity of presigned links. |
 | `BROKERVERSE_STORAGE_ORPHAN_AGE` | no | `PT24H` | `brokerverse.storage.orphan-age`: objects without a metadata row older than this are deleted by `FILE_ORPHAN_RECONCILIATION`. Announced uploads not confirmed within it are closed. |
 | `BROKERVERSE_STORAGE_DELETED_GRACE` | no | `P30D` | `brokerverse.storage.deleted-grace`: time between the soft delete of a file and the removal of its object by `FILE_RETENTION`. |

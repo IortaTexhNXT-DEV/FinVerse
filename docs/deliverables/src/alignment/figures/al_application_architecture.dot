@@ -31,8 +31,8 @@ digraph al_application_architecture {
   subgraph cluster_data {
     label=<<b>Managed data services</b>>; fontsize=12; fontcolor="@HEADER_BLUE"; style="rounded,dashed"; color="@HEADER_BLUE"; margin=10;
     rds [label=<<b>Amazon RDS PostgreSQL 16</b><br/><font point-size="9">one database, versioned schema;<br/>record, journal, ledger and<br/>sub-ledger in one transaction</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS", width=2.3];
-    redis [label=<<b>ElastiCache Redis 7</b><br/><font point-size="9">reference-data cache, job lock,<br/>token denylist, counters</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS", width=2.1];
-    msk [label=<<b>Amazon MSK (Kafka 3.6+)</b><br/><font point-size="9">9 topics, outbox relay,<br/>dead-letter topics</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS", width=2.1];
+    redis [label=<<b>ElastiCache for Valkey 8</b><br/><font point-size="9">reference-data cache, job lock,<br/>token denylist, counters</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS", width=2.1];
+    msk [label=<<b>Amazon MSK (Kafka 3.9)</b><br/><font point-size="9">9 topics, outbox relay,<br/>dead-letter topics</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS", width=2.1];
     s3 [label=<<b>Amazon S3</b><br/><font point-size="9">documents, reports, extracts,<br/>uploads; SSE-KMS (answer A4)</font>>, fillcolor="@AMBER_BG", width=2.1];
   }
 

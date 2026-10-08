@@ -10,7 +10,7 @@ encryption proposals are in section 5 (IER question IQ25, register DCR-222 / DCR
 | Shape | About ten microservices (policy admin, claims, billing and collections, distribution, portal, API gateway, IAM, integration, document, batch and notification) across three tenants | One modular monolith (Spring Boot 3.5, Java 21) with about 40 business modules, plus one React front end |
 | Data | Aurora and MongoDB, one database per service, "no cross-database transactions" | One PostgreSQL 16 database. A business record, its journal, ledger and sub-ledger rows commit in **one transaction** |
 | Messaging | EventBridge plus MSK, about 80 topics, schema registry | MSK Kafka for outbound integration events (9 topics, transactional outbox); in-process events between modules |
-| Edge and mesh | CloudFront, WAF, Apigee X, Istio with mTLS and OPA per pod | Ingress to nginx and the backend; JWT issued by BIBS |
+| Edge and mesh | CloudFront, WAF, Apigee X, Istio with mTLS and OPA per pod | Kubernetes Gateway API routes to nginx and the backend; JWT issued by BIBS |
 | Tenancy | Multi-tenant (broker, EB insurer portal, RI network) | Single tenant (BDOI) with multi-company support |
 
 ## 2. Recommendation: the BIBS architecture, with three enterprise elements taken from the IER
@@ -35,11 +35,11 @@ encryption proposals are in section 5 (IER question IQ25, register DCR-222 / DCR
   integration adapters. That step is cheap because the boundaries already exist.
 
 **Taken from the IER, because they are enterprise standards and do not change the application design:**
-1. **Edge security:** Route 53, AWS WAF and the Application Load Balancer in front of the ingress, or Apigee X if BDO
+1. **Edge security:** Route 53, AWS WAF and the Application Load Balancer as the Kubernetes gateway, or Apigee X if BDO
    mandates it for APIs exposed to other BDO systems. BIBS does not need Istio or OPA: authorisation is done in the
    application per permission, and TLS runs from the load balancer into the cluster (in-cluster mTLS only if BDO
    security requires it).
-2. **Managed AWS services:** EKS, RDS PostgreSQL 16 Multi-AZ, ElastiCache Redis 7, MSK Kafka, S3 with KMS
+2. **Managed AWS services:** EKS, RDS PostgreSQL 16 Multi-AZ, ElastiCache for Valkey 8, MSK Kafka, S3 with KMS
    (`DOCUMENT_STORAGE_DECISION.md`), CloudWatch or the BDO monitoring standard.
 3. **Workload separation on Kubernetes** (best practice for a modular monolith). The same image runs as three
    deployments, each scaled on its own:
@@ -47,7 +47,7 @@ encryption proposals are in section 5 (IER question IQ25, register DCR-222 / DCR
 | Deployment | Role | Scaling |
 |---|---|---|
 | `bibs-web` | Screens and APIs for users | Horizontal pod autoscaler on CPU and requests; at least 2 replicas across availability zones |
-| `bibs-jobs` | Scheduled and batch jobs: month-end, remittance extraction, renewal extraction, migration loads, report generation | 1-2 replicas; the Redis job lock already ensures a job runs once; heavy windows scaled on schedule |
+| `bibs-jobs` | Scheduled and batch jobs: month-end, remittance extraction, renewal extraction, migration loads, report generation | 1-2 replicas; the Valkey job lock already ensures a job runs once; heavy windows scaled on schedule |
 | `bibs-integration` | Kafka outbox relay and consumers, inbound bank and insurer files, ECM archiving | 1-2 replicas |
 | `bibs-frontend` | nginx serving the React build | 2 replicas |
 
@@ -94,7 +94,7 @@ TLS, lock down pod-to-pod traffic with network policies, and use no service mesh
 |---|---|
 | ALB → pods | HTTPS to the pods (target-group protocol HTTPS); certificates from cert-manager with a private CA (ACM Private CA), rotated automatically. The backend serves TLS (`server.ssl`), nginx serves TLS |
 | Backend → RDS PostgreSQL | TLS required: RDS parameter `rds.force_ssl=1`; JDBC `sslmode=verify-full` with the RDS CA bundle |
-| Backend → ElastiCache Redis | In-transit encryption on, Redis AUTH or RBAC user (`BROKERVERSE_REDIS_TLS=true`, already supported) |
+| Backend → ElastiCache for Valkey | In-transit encryption on, Valkey AUTH or RBAC user (`BROKERVERSE_VALKEY_TLS=true`, already supported) |
 | Backend → MSK Kafka | TLS with SASL/SCRAM or IAM authentication (`BROKERVERSE_KAFKA_SECURITY_PROTOCOL=SASL_SSL`, already supported); plaintext listeners disabled on the cluster |
 | Backend → S3, KMS, other AWS APIs | TLS through VPC endpoints; bucket policies deny non-TLS requests |
 | Backend → BDO systems | Through Apigee over TLS (5.1); SMTP to CCM with STARTTLS (already configured) |
@@ -112,7 +112,7 @@ Istio ambient mode) can be added at the platform layer without any change to BIB
 |---|---|
 | Workload role switch `brokerverse.runtime.role` (web / jobs / integration / all) controlling scheduling and Kafka consumers | `config/**`, jobs and Kafka consumer configuration |
 | Backend HTTPS (`server.ssl` from a mounted certificate), nginx TLS listener | `application.yml`, `deploy/nginx` |
-| Database TLS in the documented JDBC URL; Redis and Kafka TLS on by default outside `dev` / `test` | `application.yml`, CONFIGURATION.md |
+| Database TLS in the documented JDBC URL; Valkey and Kafka TLS on by default outside `dev` / `test` | `application.yml`, CONFIGURATION.md |
 | Apigee token validation for `/integration/*` (issuer, audience, scopes) as a separate security chain | `security/**` |
 | Kubernetes manifests / Helm values: four deployments, HPA, PodDisruptionBudgets, NetworkPolicies (deny by default), IRSA service accounts, ALB ingress annotations (internal, HTTPS backend, WAF ACL) | `deploy/k8s/**` |
 | Documentation: technical and deployment architecture (deliverable 12), BOM (deliverable 4), IER restatement | docs |
@@ -137,7 +137,15 @@ These are implemented in build step INF0 (5.3). Only the connectivity details (i
 |---|---|
 | Workload role switch | `brokerverse.runtime.role` (`BROKERVERSE_RUNTIME_ROLE`) = `web`, `jobs`, `integration`, `all` (default, for local, test and seed stacks). Package `common.runtime`: `RuntimeRole`, `Workload`, `@ConditionalOnWorkload`. Scheduling is enabled only for roles with scheduled work (`config.SchedulingConfiguration` replaces the global `@EnableScheduling` of `ApplicationConfig`); `JobScheduler` registers a `ManagedJob` only when the role runs its `workload()` (`BATCH` by default; `INTEGRATION` for `EVENT_OUTBOX_RELAY`, `SCR_WATCHLIST_INGEST`, `QUOTATION_REQUEST_INTAKE`). The Kafka consumers are `@ConditionalOnWorkload(INTEGRATION)`; the after-commit outbox drain runs only there. `config.RuntimeRoleRequestFilter` limits HTTP: `web` everything but `/integration/**`, `jobs` the actuator only, `integration` `/integration/**` and the actuator. Tests: `RuntimeRoleContextTest`, `RuntimeRoleRequestFilterTest`, `OutboxRelayRoleTest` |
 | Backend HTTPS, nginx TLS | `server.ssl` with the PEM bundle `server` from the mounted cert-manager secret (`BROKERVERSE_SERVER_SSL_*`), TLS 1.3 / 1.2, reloaded on rotation; off in dev and test (`ServerTlsTest`). nginx TLS listener on 8443 in `deploy/nginx/default.conf.template`, mounted over the frontend image's template in Kubernetes (the image and docker compose are unchanged) |
-| Database, Redis, Kafka TLS | Defaults outside the `dev`, `test`, `seed` profiles: PostgreSQL `sslmode=verify-full` with the RDS CA bundle (`BROKERVERSE_DB_SSL_MODE`, `BROKERVERSE_DB_SSL_ROOT_CERT`), Redis TLS on, Kafka `SASL_SSL`. `ProductionSafeguards` refuses a production start with a plaintext database, Redis or Kafka connection or an HTTP listener without TLS |
+| Database, Valkey, Kafka TLS | Defaults outside the `dev`, `test`, `seed` profiles: PostgreSQL `sslmode=verify-full` with the RDS CA bundle (`BROKERVERSE_DB_SSL_MODE`, `BROKERVERSE_DB_SSL_ROOT_CERT`), Valkey TLS on, Kafka `SASL_SSL`. `ProductionSafeguards` refuses a production start with a plaintext database, Valkey or Kafka connection or an HTTP listener without TLS |
 | Apigee token validation | `config.IntegrationSecurityConfig`: a separate, stateless security chain for `/integration/**` validating Apigee-issued OAuth 2.0 JWTs against the configured key set (issuer, audience, validity, asymmetric algorithms only) and the scopes of a per-API rule (`brokerverse.integration.security.apis.*`); paths without a rule are refused. User tokens are refused there and Apigee tokens on the user APIs. Connectivity check `GET /integration/v1/ping`. Test: `IntegrationApiSecurityIT` (locally generated key set) |
-| Kubernetes | `deploy/k8s` Kustomize base with overlays `uat` and `prod`: the four deployments from one backend image, HPA for `bibs-web` and `bibs-frontend`, PodDisruptionBudgets, NetworkPolicies denying by default with the flows of 5.2, IRSA service accounts, internal ALB ingresses (HTTPS backends, WAF ACL, `/integration/*` to `bibs-integration`), probes, resources, zone spread, cert-manager certificates from an AWS Private CA issuer. Replaces `deploy/k8s/brokerverse.yaml`. Deployment guide: `docs/operations/DEPLOYMENT.md` |
+| Kubernetes | `deploy/k8s` Kustomize base with overlays `uat` and `prod`: the four deployments from one backend image, HPA for `bibs-web` and `bibs-frontend`, PodDisruptionBudgets, NetworkPolicies denying by default with the flows of 5.2, IRSA service accounts, Gateway API edge (Gateway and HTTPRoutes; internal ALB through the AWS Load Balancer Controller with HTTPS target groups, WAF ACL, `/integration` to `bibs-integration`; since 08-Oct-2026, section 5.6), probes, resources, zone spread, cert-manager certificates from an AWS Private CA issuer. Replaces `deploy/k8s/brokerverse.yaml`. Deployment guide: `docs/operations/DEPLOYMENT.md` |
 | Documents | CONFIGURATION.md (runtime role, HTTPS, TLS and Apigee keys), DEPLOYMENT.md, RUNBOOK.md, DEVELOPER_GUIDE.md section 10.11. Deliverables 12 and 4 and the IER restatement follow in the deliverables work |
+
+### 5.6 Platform baseline update (client decision, 08-Oct-2026)
+
+| Item | Change |
+|---|---|
+| Cache and shared state | **Valkey 8** (BSD-3-Clause, Linux Foundation) replaces Redis, whose releases from 7.4 on are no longer under the BSD licence. Same protocol: the client (Spring Data Redis, Lettuce) and the fallbacks are unchanged; on AWS Amazon ElastiCache for Valkey; variables `BROKERVERSE_VALKEY_*` (former `BROKERVERSE_REDIS_*` still read) |
+| Edge | **Kubernetes Gateway API** replaces the Ingress resources (the Kubernetes project retired ingress-nginx in March 2026): Gateway `bibs` with an HTTPS listener, HTTPRoutes `bibs-users` and `bibs-integration` with the same host and paths. The controller is chosen per environment: AWS Load Balancer Controller (default, internal ALB with AWS WAF, as in 5.1) or Envoy Gateway (`deploy/k8s/components/gateway-*`) |
+| Component baseline | PostgreSQL 16, Valkey 8, Apache Kafka 3.9 (KRaft), OpenJDK 21 LTS (Eclipse Temurin), Spring Boot 3.5, React, Node.js 22 LTS (build only), nginx 1.30, managed Kubernetes, a conformant Gateway API controller; licences, support horizon and the annual review in [`DEPLOYMENT.md`](../operations/DEPLOYMENT.md) section 7 |

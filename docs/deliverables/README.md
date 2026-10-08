@@ -94,7 +94,7 @@ so each document can be regenerated after every build.
 2. Discrepancy register (item 2) resolved with BDOI; answers flow back into the FRS and the designs.
 3. Build aligned to the approved FRS, plus the screen and field alignment pass (items 17, 18 and 34), then FRS v1.1 with annotated screenshots.
 4. Test cases derived from the approved FRS (item 3), traced in the RTM (item 21), then SIT results (item 8) and persona end-to-end tests (items 12 and 13).
-5. NFR evidence (item 37), architecture conformance to the client BOM (item 4, including Redis and Kafka), and the code-quality report (item 27).
+5. NFR evidence (item 37), architecture conformance to the client BOM (item 4, including Valkey and Kafka), and the code-quality report (item 27).
 6. UAT per department with sign-off (item 30). Production readiness means the runbook, observability, alerts and error catalogue are in place (items 24, 35 and 38).
 
 ## Release and sign-off per BRD
@@ -260,7 +260,7 @@ Its summary is the UAT readiness statement per module and for the platform.
 
 **10. Resilience and operations:**
 - backup and restore test, and the disaster recovery switch-over (hosting appendix);
-- Redis and Kafka outages handled without losing a transaction;
+- Valkey and Kafka outages handled without losing a transaction;
 - monitoring and alerts (item 38), and the runbook (item 24).
 
 **11. Also in scope** (added to the client's list):

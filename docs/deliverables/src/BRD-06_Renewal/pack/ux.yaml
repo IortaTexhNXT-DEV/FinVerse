@@ -24,7 +24,7 @@ personas:
   LAMD: {who: "A LAMD officer of the bank who uploads the monthly paid-off and past-due loan reports"}
   BUSINESS_ADMIN: {who: "The business administrator (MBS) who keeps the Renewal set-up, the lists of values and the letter templates"}
   SYSADMIN: {who: "The system administrator of BIBS (BDOI IT operations), who keeps the roles and their functions"}
-  AUDITOR: {who: "An internal or external auditor with read access to Renewal and its reports"}
+  AUDITOR: {who: "An internal or external auditor with read access to Renewal and its reports", does: "Reads the renewals, their history and the renewal reports; no action changes a renewal"}
 
 # The UX state of an image when its name does not say it.
 classify:

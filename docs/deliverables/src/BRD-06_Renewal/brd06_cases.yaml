@@ -2938,7 +2938,7 @@ frs:
         type: Report-output
         persona: MKT_TL
         screen: REPORTS
-        brd: [restating BRD 1.010.6, 1.010.7]
+        brd: [restating BRD 1.010.6, 1.010.7, 1.010.7.1]
         title: Extract the details for sending
         steps:
           - As rn.mkttl1 click Extract Details on RA Generated.

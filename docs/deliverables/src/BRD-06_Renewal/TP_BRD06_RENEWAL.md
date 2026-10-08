@@ -74,7 +74,7 @@ In scope are all 58 FRs of FRS BRD-6 v2.0 and every BRD ID they trace to, the BR
 - Renewal Home, the status report with its 34 counters, listings with attention flags (no automatic escalation) and the operational reports (FR-RN-100 to 103);
 - lists of values, templates, rules and parameters (FR-RN-110 to 112).
 
-The main BRD repeats most capabilities once per persona. The FRS traces its 1,032 line IDs in ranges (for example "1.009.2.1-40"); section 7.3 shows how every range is covered. The roles-and-access sheet checks each Renewal action against the roles that may and may not perform it (FRS section 3.3).
+The main BRD repeats most capabilities once per persona. The FRS traces its 1,033 line IDs in ranges (for example "1.009.2.1-40"); section 7.3 shows how every range is covered. The roles-and-access sheet checks each Renewal action against the roles that may and may not perform it (FRS section 3.3).
 
 ## Out of scope
 
@@ -223,7 +223,7 @@ Every FR has at least one positive and one negative case, and every BRD ID of th
 
 The FRs trace 299 BRD references: the 40 BRRN IDs of the addenda, the persona line IDs and line-ID ranges of the main BRD as the FRS writes them (a range such as "1.009.2.1-40" stands for every line ID in it), and the cross-BRD references of FR-RN-090. The Coverage sheet of the workbook lists each of them with its positive and negative cases; every one has at least one case.
 
-FRS section 11.2 maps each of the 1,032 line IDs of the main BRD to an FR, of which nine are out of scope. The table below groups them by BRD function and gives the number of cases of the FRs that meet them. Every in-scope line ID belongs to a reference that has at least one case; the report criteria (1.009.2.1-40 and its copies), the status columns (1.009.3.1.1-40), the 34 summary counters (1.009.3.2.1-34), the 28 insurer extract columns (3.009.1.4.1-28) and the ten non-renewal reasons (2.004.4.1-10) are each checked item by item in one case.
+FRS section 11.2 maps each of the 1,033 line IDs of the main BRD to an FR, of which nine are out of scope. The table below groups them by BRD function and gives the number of cases of the FRs that meet them. Every in-scope line ID belongs to a reference that has at least one case; the report criteria (1.009.2.1-40 and its copies), the status columns (1.009.3.1.1-40), the 34 summary counters (1.009.3.2.1-34), the 28 insurer extract columns (3.009.1.4.1-28) and the ten non-renewal reasons (2.004.4.1-10) are each checked item by item in one case.
 
 <!-- table: widths=6.6,1.8,1.4,4.2,1.6 caption="Main BRD line IDs by function (FRS section 11.2)" size=7.5 -->
 | BRD function | Line IDs | Out of scope | FRs (FR-RN-) | Cases |

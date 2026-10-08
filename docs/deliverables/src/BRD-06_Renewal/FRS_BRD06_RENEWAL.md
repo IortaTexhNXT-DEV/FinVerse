@@ -124,7 +124,7 @@ LAMD: Bank loan unit that supplies the paid-off and RMU loan reports (the BRD do
 LOV: List of values maintained by the Business Administrator
 NAL: No Advice Letter, for expiring policies that need neither an RA nor an NFR (BRRN.001)
 NB path: A renewal with financial or structural changes processed as a New Business quotation or PRF (BRRN.033)
-Effective expiry date: The expiry date used for NRNS and the closing letters: the end of a confirmed hold cover, otherwise the policy expiry date (Walkthrough addendum R37-HC-01 to 04)
+Effective expiry date: The expiry date used for NRNS and the closing letters, that is the end of a confirmed hold cover, otherwise the policy expiry date (Walkthrough addendum R37-HC-01 to 04)
 HC: Hold cover, the insurer's temporary extension of cover while the renewal completes (BRRN.042)
 NFR: Not for Renewal Letter; the Walkthrough addendum writes NRL (Non-Renewal Letter) for the letter sent by the Marketing AO when no RA exists
 TSI: Total sum insured of the policy; above the threshold (PHP 250M) a renewal goes to TSU or proposal handling
@@ -759,7 +759,7 @@ screens: Record page (Checks & Bucket tab); Renewal Reports (RNW-SANITATION)
 description:
   - After extraction, after every upload and on every relevant event, BIBS runs the checks of section 5.3 on the candidate - reference match, PN present, risk code renewable, risk code defined, insurer renewable list, TSI threshold, LAMD status, claims, pending endorsement, outstanding premium, financial impact, insurer response match, mandatory fields, product renewable, insurer usable, duplicate candidate and KYC due. Eligibility no longer depends on manual pre-cleaning of the list.
   - Each check writes a result PASS, WARN, FAIL, INFO or NOT_APPLICABLE with its detail. The Checks & Bucket tab shows the latest results, and the RNW-SANITATION report lists them for any range.
-  - The sanitation criteria of the Walkthrough addendum (SC-01 to SC-13, p.20-21) are the defaults of the check settings: missing key fields make an exception record (MANDATORY_FIELDS, REFERENCE_MATCH); a risk code that is not renewable, such as Bonds or CAR, is excluded (RISK_CODE_RENEWABLE); a risk code not defined in the criteria goes to manual review (RISK_CODE_DEFINED, Review); a risk not on the insurer's renewable list stops the continuation (INSURER_RENEWABLE_LIST, Review); a total sum insured above PHP 250M goes to TSU or proposal handling (TSI_THRESHOLD, Review, with the decision matrix proposing For Proposal). The criteria are configurable, changed only by the authorised group with an effective date, applied at policy level, and a change never affects a candidate already initiated.
+  - "The sanitation criteria of the Walkthrough addendum (SC-01 to SC-13, p.20-21) are the defaults of the check settings: missing key fields make an exception record (MANDATORY_FIELDS, REFERENCE_MATCH); a risk code that is not renewable, such as Bonds or CAR, is excluded (RISK_CODE_RENEWABLE); a risk code not defined in the criteria goes to manual review (RISK_CODE_DEFINED, Review); a risk not on the insurer's renewable list stops the continuation (INSURER_RENEWABLE_LIST, Review); a total sum insured above PHP 250M goes to TSU or proposal handling (TSI_THRESHOLD, Review, with the decision matrix proposing For Proposal). The criteria are configurable, changed only by the authorised group with an effective date, applied at policy level, and a change never affects a candidate already initiated."
 preconditions:
   - "A candidate exists."
 main_flow:
@@ -768,7 +768,7 @@ main_flow:
   - BIBS recomputes the bucket (FR-RN-022).
 alternate_flows:
   - Claims cannot be read for the candidate (a migrated policy without a BIBS account, or the Claims module not reachable). The claims check reports Not applicable or INFO and does not block (decision D4); how claims of migrated policies are found is listed for confirmation (CLR-RN-28).
-  - An existing claims record requires manual evaluation (Walkthrough addendum R23-05, R28-05): open claims fail the check with severity Review, so the candidate is never disposed automatically.
+  - "An existing claims record requires manual evaluation (Walkthrough addendum R23-05, R28-05): open claims fail the check with severity Review, so the candidate is never disposed automatically."
 rules:
   - [R1, "Checks and their default severities are those of section 5.3, set from the sanitation criteria of the Walkthrough addendum (RQ01 answered in part).", Configurable, Check settings (Renewal Setup)]
   - [R4, "TSI threshold PHP 250,000,000.00; above it the candidate is Review and the matrix proposes For Proposal to TSU (SC-12, SC-13, R23-02, R24-02).", Configurable, Check setting TSI_THRESHOLD (parameter amount)]
@@ -1661,7 +1661,7 @@ main_flow:
   - BIBS validates the rows and shows valid and invalid counts.
   - The user confirms; BIBS updates the valid rows (disposition source UPLOAD) and pushes them to FOR_PROCESSING.
 alternate_flows:
-  - Rows with errors. They are listed with the reason, can be downloaded, and do not update any account (partial commit).
+  - Rows with errors. They are listed with the reason, can be downloaded, and do not update any account; the valid rows are applied.
   - Several files. Each file is its own upload job with its own result.
 rules:
   - [R1, "The renewal reference is the key of every row (BRRN.022).", Fixed, "-"]
@@ -2001,7 +2001,7 @@ acceptance:
 id: FR-RN-081
 title: Send Renewal Advices in batch, encrypted and password-protected
 brd:
-  - BRRN.010 (p.53-54), restating BRD 1.010.6, 1.010.7, 2.009.6, 2.009.7, 2.009.7.1, 3.011.6, 3.011.7, 3.011.7.1, 4.09.6, 4.09.7 (p.103-104, 133-134, 173-174, 204-205)
+  - BRRN.010 (p.53-54), restating BRD 1.010.6, 1.010.7, 1.010.7.1, 2.009.6, 2.009.7, 2.009.7.1, 3.011.6, 3.011.7, 3.011.7.1, 4.09.6, 4.09.7 (p.103-104, 133-134, 173-174, 204-205)
 actor: Marketing TL / AO; Processing TL / Officer (RNW_RA_SEND)
 priority: Must have
 screens: Letters (tab RA Generated; Send in Batch, Extract Details)
@@ -2038,13 +2038,13 @@ id: FR-RN-082
 title: Generate and send the closing letters (NAL and NRL)
 brd:
   - BRRN.001 (p.48; updated p.15-16)
-  - BRRN.037 (p.39; p.12, 24-26), rules R37-HC-07 to R37-HC-12
+  - BRRN.037 (p.39; p.12, 24-26; rules R37-HC-07 to 12)
 actor: Operations / Processing user (NAL); Marketing AO (NRL / NFR); System (eligibility)
 priority: Must have
 screens: Letters (NAL / NFR tab, with the period, segment, unit head and status filters)
 description:
   - The Letters screen lists the accounts eligible for each letter on its criteria - Renewal Advice (FR-RN-080), No Advice Letter (NAL) and Non-Renewal Letter (NRL, the Not for Renewal Letter of FR-RN-024) - with the filters period, market segment and unit head (updated BRRN.001). The user selects one or several accounts and generates and sends the letters from the approved templates; BIBS stores them, updates the account status (NAL Sent or NRL Sent), confirms the result and notifies the user of letters that could not be produced or sent.
-  - An account that reaches its effective expiry date without renewal (FR-RN-083) is routed by the letter it needs. When a Renewal Advice was sent, the account goes to Operations for the NAL (R37-HC-07); when no RA exists, it goes to the Marketing AO for the NRL (R37-HC-08). The two letters are mutually exclusive: an account that qualifies for one can never receive the other (R37-HC-09, 10).
+  - "An account that reaches its effective expiry date without renewal (FR-RN-083) is routed by the letter it needs. When a Renewal Advice was sent, the account goes to Operations for the NAL (R37-HC-07); when no RA exists, it goes to the Marketing AO for the NRL (R37-HC-08). The two letters are mutually exclusive: an account that qualifies for one can never receive the other (R37-HC-09, 10)."
   - "Note: the earlier BRRN.001 described the NAL for accounts that need neither an RA nor an NFR; the Walkthrough addendum sends the NAL when an RA exists. The NAL and NRL definitions are listed for confirmation (CLR-RN-32)."
 preconditions:
   - The accounts are eligible for the letter; the user holds the letter permission of his unit.
@@ -2081,7 +2081,7 @@ priority: Must have
 screens: Letters (NRNS tab); Expiry List (NRNS chip)
 description:
   - BIBS classifies as NRNS (No Renew / No Submit) the accounts that are not yet submitted at the checkpoint (no disposition, or For Renewal without RA acceptance). At the checkpoint (90 days before expiry by default) the daily job generates a reminder letter; policies already submitted or in progress are excluded.
-  - The NRNS tag and the closing letters use the **effective expiry date**: the end date of a confirmed hold cover (FR-RN-086), otherwise the policy expiry date (R37-HC-01 to 04). Before that date no account is tagged NRNS and no closing letter is sent (R37-HC-05). An account that reaches it without renewal becomes an unrenewed NRNS candidate (R37-HC-06); after the waiting period it is tagged NRNS and routed to its closing letter, NAL or NRL (FR-RN-082), for the AO's follow-up and final disposition (Annex BRRN.037, p.24-25).
+  - "The NRNS tag and the closing letters use the **effective expiry date**: the end date of a confirmed hold cover (FR-RN-086), otherwise the policy expiry date (R37-HC-01 to 04). Before that date no account is tagged NRNS and no closing letter is sent (R37-HC-05). An account that reaches it without renewal becomes an unrenewed NRNS candidate (R37-HC-06); after the waiting period it is tagged NRNS and routed to its closing letter, NAL or NRL (FR-RN-082), for the AO's follow-up and final disposition (Annex BRRN.037, p.24-25)."
   - At the non-acceptance point (the effective expiry date by default) BIBS sends the non-acceptance letter, closes the candidate as EXPIRED_UNRENEWED and notifies the owners. CBG and non-CBG accounts may follow different waiting periods (to confirm, CLR-RN-33).
 preconditions:
   - "None."
@@ -2113,13 +2113,13 @@ title: Record client acceptance and proceed to placement and booking
 brd:
   - BRRN.040 (p.40-41)
   - BRRN.038 AC3 (p.40)
-  - BRRN.035 (p.37-38; p.9-11, 23-24), client confirmation and manual placement and booking
+  - BRRN.035 (p.37-38; p.9-11, 23-24; client confirmation, manual placement and booking)
 actor: Marketing AO (confirmation, RNW_ACCEPT); Processing (placement); booking user (BRD-1); System
 priority: Must have
 screens: Record page (Record Acceptance); bulk upload RNW_ACCEPTANCE
 description:
   - The user records the client's acceptance of the RA with its method - e-mail (attachment RA_ACCEPTANCE), signed RA (attachment SIGNED_RA) or payment (the payment gate's evidence) - and the evidence. BIBS marks the renewal Accepted.
-  - When there is no unresolved exception and the payment rules are satisfied, BIBS moves the renewal account through the account workflow without resubmission (system fast track) to placement and booking. The client's confirmation is recorded through Marketing (the AO), and placement, booking and the completion of the renewal stay under manual control: the Processing user places the account and the booking user books it, without re-keying (Walkthrough addendum p.4, p.9-11). The booked invoice carries business type RENEWAL and the candidate closes RENEWED. Standard placement, booking and issuance SLAs apply.
+  - "When there is no unresolved exception and the payment rules are satisfied, BIBS moves the renewal account through the account workflow without resubmission (system fast track) to placement and booking. The client's confirmation is recorded through Marketing (the AO), and placement, booking and the completion of the renewal stay under manual control: the Processing user places the account and the booking user books it, without re-keying (Walkthrough addendum p.4, p.9-11). The booked invoice carries business type RENEWAL and the candidate closes RENEWED. Standard placement, booking and issuance SLAs apply."
   - "Note: the Workshop addendum moved an accepted renewal to placement and booking automatically (BRRN.040). The Walkthrough addendum keeps the automated progression up to the confirmation and leaves placement and booking to the user; automatic placement is therefore off by default for renewals, and the point is listed for confirmation (CLR-RN-34)."
 preconditions:
   - The candidate is RA_SENT; the user has RNW_ACCEPT.
@@ -2390,8 +2390,8 @@ priority: Must have
 screens: Renewal Reports (RNW-LISTING); Renewal Home (At risk tile)
 description:
   - Users generate one centralised renewal listing, filtered by unit and segment (for example UH, IBG, Leasing), by expiry window (current month, prior month, future or chosen months) and by status (Renewed, Unrenewed, Expired). The listing is live, viewed on screen and extracted, with the ageing to expiry, and the user acts on the listed accounts from it (open, assign, disposition).
-  - The listing shows the accounts that require attention, each with the rule that flagged it: ageing (not progressing within the escalation days before expiry), overdue (past the expected processing time), high risk, and the portfolio priority of IBG and Leasing (Annex BRRN.036, p.24).
-  - Escalation is supported by visibility only: the AO escalates outside the system, and BIBS never escalates an account by itself (Walkthrough addendum p.11-12). The at-risk tile of Renewal Home counts the flagged accounts.
+  - "The listing shows the accounts that require attention, each with the rule that flagged it: ageing (not progressing within the escalation days before expiry), overdue (past the expected processing time), high risk, and the portfolio priority of IBG and Leasing (Annex BRRN.036, p.24)."
+  - "Escalation is supported by visibility only: the AO escalates outside the system, and BIBS never escalates an account by itself (Walkthrough addendum p.11-12). The at-risk tile of Renewal Home counts the flagged accounts."
 preconditions:
   - The user has RNW_REPORT_VIEW.
 main_flow:
@@ -2963,7 +2963,7 @@ The items below are changed in BIBS without a release. Changes are audited.
 
 # Traceability
 
-Every BRD-6 requirement ID is met by at least one FR or is out of scope by the BRD itself. Section 11.1 traces the 42 BRRN IDs of the addenda; section 11.2 traces every one of the 1,032 line IDs of the main BRD with its page; section 11.3 lists the nine out-of-scope IDs.
+Every BRD-6 requirement ID is met by at least one FR or is out of scope by the BRD itself. Section 11.1 traces the 42 BRRN IDs of the addenda; section 11.2 traces every one of the 1,033 line IDs of the main BRD with its page; section 11.3 lists the nine out-of-scope IDs.
 
 <!-- table: widths=2.4,10,4.2 caption="Traceability summary" -->
 | Source | IDs | Traced to |
@@ -2972,9 +2972,11 @@ Every BRD-6 requirement ID is met by at least one FR or is out of scope by the B
 | Walkthrough addendum BRRN.041-042, restated BRRN.001, 020, 023, 024, 028-030, 033-037 | 2 new, 13 restated | Section 11.1 |
 | Walkthrough addendum BRRN.041-042, restated BRRN.001, 020, 023, 024, 028-030, 033-037 | 2 new, 13 restated | Section 11.1 |
 | Walkthrough addendum BRRN.041-042, restated BRRN.001, 020, 023, 024, 028-030, 033-037 | 2 new, 13 restated | Section 11.1 |
+| Walkthrough addendum BRRN.041-042, restated BRRN.001, 020, 023, 024, 028-030, 033-037 | 2 new, 13 restated | Section 11.1 |
+| Walkthrough addendum BRRN.041-042, restated BRRN.001, 020, 023, 024, 028-030, 033-037 | 2 new, 13 restated | Section 11.1 |
 | Workshop addendum BRRN.020-040 | 21 | Section 11.1 |
 | Addendum 1 BRRN.001-019 | 19 (with the main-BRD IDs they restate) | Section 11.1 |
-| Main BRD 1.001-6.002 | 1,032 line IDs, of which 9 out of scope | Section 11.2 |
+| Main BRD 1.001-6.002 | 1,033 line IDs, of which 9 out of scope | Section 11.2 |
 | Usage requirements (NFR) p.212-214 | 10 topics | Section 8 |
 
 ## BRRN requirements
@@ -3057,7 +3059,7 @@ The table lists every line ID of the main BRD in page order, grouped by BRD func
 | 1.009 Generate report | 1.009.1, 1.009.1.1, 1.009.1.2, 1.009.2, 1.009.2.1, 1.009.2.2, 1.009.2.3, 1.009.2.4, 1.009.2.5, 1.009.2.6, 1.009.2.7, 1.009.2.8, 1.009.2.9, 1.009.2.10, 1.009.2.11, 1.009.2.12, 1.009.2.13, 1.009.2.14, 1.009.2.15, 1.009.2.16, 1.009.2.17, 1.009.2.18, 1.009.2.19, 1.009.2.20, 1.009.2.21, 1.009.2.22, 1.009.2.23, 1.009.2.24, 1.009.2.25, 1.009.2.26, 1.009.2.27, 1.009.2.28, 1.009.2.29, 1.009.2.30, 1.009.2.31, 1.009.2.32, 1.009.2.33, 1.009.2.34, 1.009.2.35, 1.009.2.36, 1.009.2.37, 1.009.2.38, 1.009.2.39, 1.009.2.40, 1.009.3, 1.009.3.1, 1.009.3.1.1, 1.009.3.1.2, 1.009.3.1.3, 1.009.3.1.4, 1.009.3.1.5, 1.009.3.1.6, 1.009.3.1.7, 1.009.3.1.8, 1.009.3.1.9, 1.009.3.1.10, 1.009.3.1.11, 1.009.3.1.12, 1.009.3.1.13, 1.009.3.1.14, 1.009.3.1.15, 1.009.3.1.16, 1.009.3.1.17, 1.009.3.1.18, 1.009.3.1.19, 1.009.3.1.20, 1.009.3.1.21, 1.009.3.1.22, 1.009.3.1.23, 1.009.3.1.24, 1.009.3.1.25, 1.009.3.1.26, 1.009.3.1.27, 1.009.3.1.28, 1.009.3.1.29, 1.009.3.1.30, 1.009.3.1.31, 1.009.3.1.32, 1.009.3.1.33, 1.009.3.1.34, 1.009.3.1.35, 1.009.3.1.36, 1.009.3.1.37, 1.009.3.2, 1.009.3.2.1, 1.009.3.2.2, 1.009.3.2.3, 1.009.3.2.4, 1.009.3.2.5, 1.009.3.2.6, 1.009.3.2.7, 1.009.3.2.8, 1.009.3.2.9, 1.009.3.2.10, 1.009.3.2.11, 1.009.3.2.12, 1.009.3.2.13, 1.009.3.2.14, 1.009.3.2.15, 1.009.3.2.16, 1.009.3.2.17, 1.009.3.2.18, 1.009.3.2.19, 1.009.3.2.20, 1.009.3.2.21, 1.009.3.2.22, 1.009.3.2.23, 1.009.3.2.24, 1.009.3.2.25, 1.009.3.2.26, 1.009.3.2.27, 1.009.3.2.28, 1.009.3.2.29, 1.009.3.2.30, 1.009.3.2.31, 1.009.3.2.32, 1.009.3.2.33, 1.009.3.2.34, 1.009.4, 1.009.4.1, 1.009.4.2, 1.009.5, 1.009.5.1, 1.009.5.2, 1.009.6 | p.84-101 | FR-RN-101 | TC-RN-101.1, 101.2, 101.3, 101.4, 101.5 (8 cases) |
 |  | 1.009.7 | p.101 | FR-RN-100 | TC-RN-100.1, 100.2, 100.3 (4 cases) |
 | 1.010 Generate Renewal Advice | 1.010.1, 1.010.2, 1.010.2.1, 1.010.2.2, 1.010.3, 1.010.3.1, 1.010.3.2, 1.010.3.3, 1.010.4, 1.010.4.1, 1.010.4.2, 1.010.5, 1.010.5.1, 1.010.5.2 | p.102-103 | FR-RN-080 | TC-RN-080.1, 080.2, 080.3, 080.4, 080.5 (12 cases) |
-|  | 1.010.6, 1.010.7 | p.103 | FR-RN-081 | TC-RN-081.1, 081.2, 081.3, 081.4 (8 cases) |
+|  | 1.010.6, 1.010.7, 1.010.7.1 | p.103-104 | FR-RN-081 | TC-RN-081.1, 081.2, 081.3, 081.4 (8 cases) |
 | 1.011 Override accounts | 1.011.1, 1.011.1.1, 1.011.1.2, 1.011.1.3 | p.104 | FR-RN-051 | TC-RN-051.1, 051.2, 051.3, 051.4, 051.5 (8 cases) |
 | 2.001 Log in | 2.001.1, 2.001.1.1, 2.001.1.2, 2.001.1.3 | p.104-105 | FR-RN-001 | TC-RN-001.1, 001.2, 001.3, 001.4, 001.5, 001.6 (13 cases) |
 | 2.002 Open in several tabs | 2.002.1 | p.105 | FR-RN-001 | TC-RN-001.1, 001.2, 001.3, 001.4, 001.5, 001.6 (13 cases) |
@@ -3565,31 +3567,31 @@ One row per step of the five walkthroughs of chapter 14: the frame, the persona,
 <!-- table: widths=1.5,2.6,3.4,5.6,5.2,1.6,1.8,1.5 caption="Storyboard index of the walkthroughs" size=7.5 -->
 | Frame | Persona | Screen | Action | What the user sees / outcome | Figure | FR | UX slide |
 |---|---|---|---|---|---|---|---|
-| WT-A.1 | Marketing Team Leader | SCR-RN-02 Expiry List | Opens the Expiry List, tab Unassigned Disposition, ticks the renewal of Pacific Harbor Logistics Inc. and clicks Assign Disposition: Arnel Account Officer, then Assign and Push | Message: 1 assigned; the renewal leaves the tab. Assigned | - | FR-RN-030 | - |
-| WT-A.2 | Marketing Account Officer (Account Broker) | SCR-RN-06 My Dispositions | Opens My Dispositions | The renewal assigned to him with its expiry, the Review classification and the flags Outstanding and Claims. For disposition | - | FR-RN-040 | - |
-| WT-A.3 | Marketing Account Officer (Account Broker) | SCR-RN-04 Renewal: Checks, Account History and Computations | Opens the renewal, tab Account History, and clicks View Account History | The payments of the expiring invoice and the open claim; the viewing is recorded. History viewed | - | FR-RN-042 | - |
-| WT-A.4 | Marketing Account Officer (Account Broker) | SCR-RN-07 Set Disposition, Add Remark and Re-open | Clicks Set Disposition: For Renewal with the remarks of the client's call, then Save | Message: Saved; the disposition For Renewal on the renewal. Dispositioned | - | FR-RN-043 | - |
-| WT-A.5 | Marketing Account Officer (Account Broker) | SCR-RN-07 Set Disposition, Add Remark and Re-open | Clicks Push | Message: Pushed to the Team Leader; the status Review in Progress. Pushed | - | FR-RN-043 | - |
-| WT-A.6 | Marketing Team Leader | SCR-RN-08 TL Review | Opens TL Review, tab For Review, ticks the renewal and clicks Post, then confirms | The outcome: 1 refused, the renewal cannot be posted while the claims, endorsement and outstanding premium checks fail. Refused | - | FR-RN-050 | - |
-| WT-A.7 | Marketing Team Leader | SCR-RN-08 TL Review | Clicks Override: Outstanding balance, reason Approved by the Team Leader, with remarks (the open claim and the endorsement are overridden the same way) | Message: 1 overridden; the override kept in the History tab of the renewal. Overridden | - | FR-RN-051 | - |
-| WT-A.8 | Marketing Team Leader | SCR-RN-08 TL Review | Clicks Post again and confirms | Message: 1 posted; the renewal moves to Processing. Posted | - | FR-RN-050 | - |
-| WT-B.1 | Processing Team Leader | SCR-RN-10 Processing Worklist | Opens the Processing Worklist, tab For Processing, ticks the renewal and clicks Assign PO: Paolo Processor, then Assign | Message: 1 assigned; the renewal In Processing. In processing | - | FR-RN-061 | - |
-| WT-B.2 | Processing Officer (Broker) | SCR-RN-11 Insurer Batches | Opens Insurer Batches, clicks New Batch with Luzon Assurance Co. and the expiry date of the renewal, then Create Batch, and opens the batch | The batch Draft with the renewal and the columns of the insurer extract. Batch ready | - | FR-RN-070 | - |
-| WT-B.3 | Processing Officer (Broker) | SCR-RN-11 Insurer Batches | Clicks Send to Insurer and confirms | Message: Batch sent to the insurer; the batch Sent with its reply date. With the insurer | - | FR-RN-070 | - |
-| WT-B.4 | Processing Officer (Broker) | SCR-RN-12 Record Insurer Response | Opens the renewal and clicks Record Insurer Response: Renew as is with the insurer reference, then Record | Message: Saved; the renewal RA Ready. RA ready | - | FR-RN-071 | - |
-| WT-B.5 | Marketing Account Officer (Account Broker) | SCR-RN-13 Letters | Opens Letters, tab RA Ready, ticks the renewal, clicks Generate RA: First notice, then Generate | Message: 1 generated; the renewal in RA Generated, locked on the Marketing side. RA generated | - | FR-RN-080 | - |
-| WT-B.6 | Marketing Account Officer (Account Broker) | SCR-RN-13 Letters | Opens the tab RA Generated, ticks the renewal, clicks Send and confirms | Message: 1 sent; the Renewal Advice e-mailed protected to the client. RA sent | - | FR-RN-081 | - |
-| WT-C.1 | Contact Center | SCR-RN-15 Follow-ups | Opens Follow-ups, tab RA Sent | The renewal waiting for the client's reply. Awaiting response | - | FR-RN-085 | - |
-| WT-C.2 | Contact Center | SCR-RN-15 Follow-ups | Opens the renewal and clicks Add Follow-up: Call, Client will renew, the next action date and the remarks, then Save | Message: Saved; the follow-up on the Remarks & Follow-ups tab. Followed up | - | FR-RN-085 | - |
-| WT-C.3 | Marketing Account Officer (Account Broker) | SCR-RN-14 Record Acceptance | Opens the renewal and clicks Record Acceptance: Payment with the payment reference, then Record | Message: Saved; the renewal For Placement and Booking. Accepted | - | FR-RN-084 | - |
-| WT-C.4 | Marketing Account Officer (Account Broker) | SCR-RN-05 Renewal: Insurer, Letters, Documents, Remarks and History | Opens the tab Letters | The Renewal Advice in the e-mail queue to the client and the acceptance by payment. Kept | - | FR-RN-084 | - |
-| WT-D.1 | Marketing Account Officer (Account Broker) | SCR-RN-07 Set Disposition, Add Remark and Re-open | Opens the renewal, views its account history, clicks Set Disposition: Not for Renewal, reason Loan fully paid, with remarks, then Save | Message: Saved; the disposition Not for Renewal with its reason. Dispositioned | - | FR-RN-043 | - |
-| WT-D.2 | Marketing Team Leader | SCR-RN-08 TL Review | After the Account Officer's push, ticks the renewal on TL Review, clicks Post and confirms | Message: 1 posted; the renewal goes to the closing letters. Letter pending | - | FR-RN-050 | - |
-| WT-D.3 | Marketing Account Officer (Account Broker) | SCR-RN-13 Letters | Opens Letters, tab NAL / NFR, ticks the renewal, clicks Send Letters and confirms | Message: 1 sent; the renewal is closed. Closed | - | FR-RN-082 | - |
-| WT-D.4 | Marketing Account Officer (Account Broker) | SCR-RN-05 Renewal: Insurer, Letters, Documents, Remarks and History | Opens the renewal, tab Letters | The Not for Renewal Letter in the e-mail queue to the client. Letter kept | - | FR-RN-082 | - |
-| WT-E.1 | Marketing Team Leader | SCR-RN-09 Transfers | The Team Leader of Corporate Marketing Team 1 opens Transfers, tab Incoming, chooses Accept in the row action menu and confirms with remarks | Message: Transfer accepted; the renewal joins the Unassigned tab of the unit. Transferred | - | FR-RN-032 | - |
-| WT-E.2 | Marketing Account Officer (Account Broker) | SCR-RN-07 Set Disposition, Add Remark and Re-open | Aileen Account Officer gives a disposition on a renewal without opening its account history | Open the Account History before you give the disposition. Refused | - | FR-RN-042 | - |
-| WT-E.3 | Marketing Team Leader | SCR-RN-02 Expiry List | Marites Marketing Lead transfers a renewal of her unit to CBG Metro Team 1, her own unit | The receiving unit must be another unit. Refused | - | FR-RN-031 | - |
+| WT-A.1 | Marketing Team Leader | SCR-RN-02 Expiry List | Opens the Expiry List, tab Unassigned Disposition, ticks the renewal of Pacific Harbor Logistics Inc. and clicks Assign Disposition: Arnel Account Officer, then Assign and Push | Message: 1 assigned; the renewal leaves the tab. Assigned | 47 | FR-RN-030 | 78 |
+| WT-A.2 | Marketing Account Officer (Account Broker) | SCR-RN-06 My Dispositions | Opens My Dispositions | The renewal assigned to him with its expiry, the Review classification and the flags Outstanding and Claims. For disposition | 48 | FR-RN-040 | 79 |
+| WT-A.3 | Marketing Account Officer (Account Broker) | SCR-RN-04 Renewal: Checks, Account History and Computations | Opens the renewal, tab Account History, and clicks View Account History | The payments of the expiring invoice and the open claim; the viewing is recorded. History viewed | 49 | FR-RN-042 | 80 |
+| WT-A.4 | Marketing Account Officer (Account Broker) | SCR-RN-07 Set Disposition, Add Remark and Re-open | Clicks Set Disposition: For Renewal with the remarks of the client's call, then Save | Message: Saved; the disposition For Renewal on the renewal. Dispositioned | 50 | FR-RN-043 | 83 |
+| WT-A.5 | Marketing Account Officer (Account Broker) | SCR-RN-07 Set Disposition, Add Remark and Re-open | Clicks Push | Message: Pushed to the Team Leader; the status Review in Progress. Pushed | 51 | FR-RN-043 | 84 |
+| WT-A.6 | Marketing Team Leader | SCR-RN-08 TL Review | Opens TL Review, tab For Review, ticks the renewal and clicks Post, then confirms | The outcome: 1 refused, the renewal cannot be posted while the claims, endorsement and outstanding premium checks fail. Refused | 52 | FR-RN-050 | 85 |
+| WT-A.7 | Marketing Team Leader | SCR-RN-08 TL Review | Clicks Override: Outstanding balance, reason Approved by the Team Leader, with remarks (the open claim and the endorsement are overridden the same way) | Message: 1 overridden; the override kept in the History tab of the renewal. Overridden | 53 | FR-RN-051 | 86 |
+| WT-A.8 | Marketing Team Leader | SCR-RN-08 TL Review | Clicks Post again and confirms | Message: 1 posted; the renewal moves to Processing. Posted | 54 | FR-RN-050 | 87 |
+| WT-B.1 | Processing Team Leader | SCR-RN-10 Processing Worklist | Opens the Processing Worklist, tab For Processing, ticks the renewal and clicks Assign PO: Paolo Processor, then Assign | Message: 1 assigned; the renewal In Processing. In processing | 55 | FR-RN-061 | 90 |
+| WT-B.2 | Processing Officer (Broker) | SCR-RN-11 Insurer Batches | Opens Insurer Batches, clicks New Batch with Luzon Assurance Co. and the expiry date of the renewal, then Create Batch, and opens the batch | The batch Draft with the renewal and the columns of the insurer extract. Batch ready | 56 | FR-RN-070 | 91 |
+| WT-B.3 | Processing Officer (Broker) | SCR-RN-11 Insurer Batches | Clicks Send to Insurer and confirms | Message: Batch sent to the insurer; the batch Sent with its reply date. With the insurer | 57 | FR-RN-070 | 92 |
+| WT-B.4 | Processing Officer (Broker) | SCR-RN-12 Record Insurer Response | Opens the renewal and clicks Record Insurer Response: Renew as is with the insurer reference, then Record | Message: Saved; the renewal RA Ready. RA ready | 58 | FR-RN-071 | 93 |
+| WT-B.5 | Marketing Account Officer (Account Broker) | SCR-RN-13 Letters | Opens Letters, tab RA Ready, ticks the renewal, clicks Generate RA: First notice, then Generate | Message: 1 generated; the renewal in RA Generated, locked on the Marketing side. RA generated | 59 | FR-RN-080 | 94 |
+| WT-B.6 | Marketing Account Officer (Account Broker) | SCR-RN-13 Letters | Opens the tab RA Generated, ticks the renewal, clicks Send and confirms | Message: 1 sent; the Renewal Advice e-mailed protected to the client. RA sent | 60 | FR-RN-081 | 95 |
+| WT-C.1 | Contact Center | SCR-RN-15 Follow-ups | Opens Follow-ups, tab RA Sent | The renewal waiting for the client's reply. Awaiting response | 61 | FR-RN-085 | 98 |
+| WT-C.2 | Contact Center | SCR-RN-15 Follow-ups | Opens the renewal and clicks Add Follow-up: Call, Client will renew, the next action date and the remarks, then Save | Message: Saved; the follow-up on the Remarks & Follow-ups tab. Followed up | 62 | FR-RN-085 | 99 |
+| WT-C.3 | Marketing Account Officer (Account Broker) | SCR-RN-14 Record Acceptance | Opens the renewal and clicks Record Acceptance: Payment with the payment reference, then Record | Message: Saved; the renewal For Placement and Booking. Accepted | 63 | FR-RN-084 | 100 |
+| WT-C.4 | Marketing Account Officer (Account Broker) | SCR-RN-05 Renewal: Insurer, Letters, Documents, Remarks and History | Opens the tab Letters | The Renewal Advice in the e-mail queue to the client and the acceptance by payment. Kept | 64 | FR-RN-084 | 101 |
+| WT-D.1 | Marketing Account Officer (Account Broker) | SCR-RN-07 Set Disposition, Add Remark and Re-open | Opens the renewal, views its account history, clicks Set Disposition: Not for Renewal, reason Loan fully paid, with remarks, then Save | Message: Saved; the disposition Not for Renewal with its reason. Dispositioned | 65 | FR-RN-043 | 104 |
+| WT-D.2 | Marketing Team Leader | SCR-RN-08 TL Review | After the Account Officer's push, ticks the renewal on TL Review, clicks Post and confirms | Message: 1 posted; the renewal goes to the closing letters. Letter pending | 66 | FR-RN-050 | 105 |
+| WT-D.3 | Marketing Account Officer (Account Broker) | SCR-RN-13 Letters | Opens Letters, tab NAL / NFR, ticks the renewal, clicks Send Letters and confirms | Message: 1 sent; the renewal is closed. Closed | 67 | FR-RN-082 | 106 |
+| WT-D.4 | Marketing Account Officer (Account Broker) | SCR-RN-05 Renewal: Insurer, Letters, Documents, Remarks and History | Opens the renewal, tab Letters | The Not for Renewal Letter in the e-mail queue to the client. Letter kept | 68 | FR-RN-082 | 107 |
+| WT-E.1 | Marketing Team Leader | SCR-RN-09 Transfers | The Team Leader of Corporate Marketing Team 1 opens Transfers, tab Incoming, chooses Accept in the row action menu and confirms with remarks | Message: Transfer accepted; the renewal joins the Unassigned tab of the unit. Transferred | 69 | FR-RN-032 | 110 |
+| WT-E.2 | Marketing Account Officer (Account Broker) | SCR-RN-07 Set Disposition, Add Remark and Re-open | Aileen Account Officer gives a disposition on a renewal without opening its account history | Open the Account History before you give the disposition. Refused | 70 | FR-RN-042 | 111 |
+| WT-E.3 | Marketing Team Leader | SCR-RN-02 Expiry List | Marites Marketing Lead transfers a renewal of her unit to CBG Metro Team 1, her own unit | The receiving unit must be another unit. Refused | 71 | FR-RN-031 | 112 |
 
 <!-- portrait -->
 

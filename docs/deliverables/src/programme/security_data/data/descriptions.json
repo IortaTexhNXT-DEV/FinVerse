@@ -1,0 +1,2098 @@
+{
+ "acc_account": {
+  "doc": "An account: the risk record to be placed with an insurer, one per policy, identified by its Account Reference Number from quotation to invoice (BRNB.102). Its status mirrors the NB_ACCOUNT work case; lifecycle data is written by later modules through {@code AccountLifecycleService}.",
+  "package": "account"
+ },
+ "acc_account_legacy": {
+  "doc": "The legacy header of an account imported from a legacy system (object P01, BRD-13; table {@code acc_account_legacy}, V823): source system, legacy policy reference, policy and cover numbers, the legacy package kept as given until Renewal sanitation remaps it, the legacy status and the migration batch that loaded it.",
+  "package": "account"
+ },
+ "acc_cost_center_rule": {
+  "doc": "Standard rule for capturing the cost / responsibility centre (FRBS 3.1.1, DIS 3.30.0; AQ26): the accounting engine gives a journal line that needs a cost centre, and has none, the cost centre of the first active rule (lowest priority number) whose criteria all match. A blank criterion matches everything.",
+  "package": "accounting"
+ },
+ "acc_event_log": {
+  "doc": "Register of processed accounting events (event monitor and failed-event report).",
+  "package": "accounting"
+ },
+ "acc_event_type": {
+  "doc": "Accounting event master (e.g. POLICY_ISSUE, CLAIM_PAYMENT). Reference data seeded by migration; the event code is the natural key used by publishing modules and accounting rules.",
+  "package": "accounting"
+ },
+ "acc_period_close_schedule": {
+  "doc": "Scheduled month-end close of a period (FRBS 2.6.0 / Addendum 1): the GL Team Lead picks the date and time; the job {@code GL_PERIOD_CLOSE} runs the checklist then and closes the period, or records why it could not and raises {@code GL_CLOSE_FAILED}.",
+  "package": "closing"
+ },
+ "acc_period_module_lock": {
+  "doc": "Cut-off of one group of books in a period (FRBS 3.4.0): while locked, postings of the group's source modules into the period are refused, even though the period itself stays open for GL adjustments. The only group today is {@link #BROKING}.",
+  "package": "period"
+ },
+ "acc_risk_item": {
+  "doc": "One insured item of an account (BRNB.051): a vehicle, a location of risk with its items insured, an insured person or a generic risk, with its sum insured, rate and premium. Vehicle identifiers are stored normalised ({@link RiskIdentifiers}) for the duplicate fall-out.",
+  "package": "account"
+ },
+ "acc_rule": {
+  "doc": "Accounting rule: how an event type is journalised, optionally specialised by line of business and currency and valid for a date range.  * <p>Selection: among active rules of the company and event type whose conditions match the event, the most specific (most non-blank conditions) wins; ties are broken by the lowest priority value. Rules are changed under maker-checker control.",
+  "package": "accounting"
+ },
+ "acc_rule_line": {
+  "doc": "One debit or credit instruction of an accounting rule.  * <p>{@code accountCode} is either a GL account code or an account role placeholder starting with {@value #ROLE_PREFIX} (e.g. {@code @BANK}) resolved from the event at posting time. The line amount is the event's {@code amountComponent}; a negative amount posts to the opposite side.",
+  "package": "accounting"
+ },
+ "acsl_case": {
+  "doc": "An ACSL case (ACSL 2.5.0-2.6.2; ACCOUNTING_DISBURSEMENT_DESIGN 5.3): an account investigation, an account analysis request (the validation of a refund of a cancelled account asked by payrequest, MKT 1.11.0), an AR refund application or a sub-ledger payment reversal. It records the findings, the result given to the requester, the correction entry it raised and the reversal it requested from Cashiering. Its stage mirrors the ACSL_CASE work case.",
+  "package": "acsl"
+ },
+ "acsl_correction": {
+  "doc": "A correction entry (ACSL 2.7.0-2.15.0, 2.9.1; ACCOUNTING_DISBURSEMENT_DESIGN 5.3): assigned by the team leader, prepared, reviewed and approved, then posted as a system journal whose lines are the correction's. Posted journals are never changed: a wrong account is corrected by reversing the original line and re-posting it to the right account, linked to the invoice family.",
+  "package": "acsl"
+ },
+ "acsl_correction_line": {
+  "doc": "One line of a correction entry (ACSL 2.9.0-2.9.1): the account, side and amount with the party, invoice and component it corrects, and the original journal line it reverses when it does.",
+  "package": "acsl"
+ },
+ "acsl_glsl_control": {
+  "doc": "Which sub-ledger backs a control account in the GL-SL reconciliation (ACSL 2.13.2). Configuration by account code, because the real chart comes from BDOI (AQ01, OQ07): the Operations invoice ledger components for premium receivable, due to insurers or commission receivable, the open items of some document types, or the party postings of the account (the default).",
+  "package": "acsl"
+ },
+ "acsl_glsl_recon": {
+  "doc": "One control account in a GL-SL reconciliation (ACSL 2.13.2): the GL balance, the sub-ledger balance and the difference, all debit positive in base currency.",
+  "package": "acsl"
+ },
+ "acsl_glsl_run": {
+  "doc": "One GL-SL reconciliation of a company as of a date (ACSL 2.13.2), with its totals.",
+  "package": "acsl"
+ },
+ "acsl_recon_result": {
+  "doc": "The reconciliation of one SOA line (ACSL 2.13.1, 2.14.1; Appendix C \"SOA reconciliation\"): the bucket, the book figures of the matched invoice (premium, outstanding, for remittance, remitted with batch and date, 2307 with batch and date, cancellation reference, direct billed), the insurer's figures and the variances.",
+  "package": "acsl"
+ },
+ "acsl_recon_run": {
+  "doc": "One reconciliation of an insurer SOA against the books (ACSL 2.13.0-2.14.0), with the number of lines per bucket; the upload's latest run is its reconciliation report.",
+  "package": "acsl"
+ },
+ "acsl_soa_layout": {
+  "doc": "The layout of an insurer's statement of account (ACSL 2.4.0): the column header of each field in the insurer's file. The insurer formats are not known yet (AQ21), so the standard ACSL template ({@code *}) is used until an insurer layout is configured.",
+  "package": "acsl"
+ },
+ "acsl_soa_line": {
+  "doc": "One row of an insurer statement of account (ACSL 2.4.0): loaded with the insurer's invoice, policy, assured, dates, gross premium, balance and payments, or failed with the reason (the upload log).",
+  "package": "acsl"
+ },
+ "acsl_soa_upload": {
+  "doc": "An insurer statement of account uploaded for a covered period (ACSL 2.2.1, 2.4.0): the file and its checksum, the layout used, the rows read, loaded and failed (the upload log proving every row was loaded) and the latest reconciliation run.",
+  "package": "acsl"
+ },
+ "adj_min_balance_item": {
+  "doc": "One invoice balance written off or credited by the minimal balance file (ADJID.026): at most once per invoice.",
+  "package": "adjustment"
+ },
+ "adj_posting_batch": {
+  "doc": "A posting batch (validation batch {@code VB-<yyyy>}, ADJID.006/017): the requests posted together with the outcome of each; a request that fails stays for posting and does not stop the others.",
+  "package": "adjustment"
+ },
+ "adj_request": {
+  "doc": "An endorsement or cancellation request on a booked invoice (OPERATIONS_DESIGN 4.5; ADJID.001-025, MKTID.008): what is asked, the recompute per component and per insurer, the processing trail and what the posting produced. The stage mirrors the {@code OPS_ENDORSEMENT} work case.",
+  "package": "adjustment"
+ },
+ "alt_alert": {
+  "doc": "Raised exception (exception log entry): an occurrence of an {@link ExceptionCode} condition on a record. Only one live (open or acknowledged) alert exists per {@code dedupKey}.",
+  "package": "alert"
+ },
+ "alt_exception_code": {
+  "doc": "Exception Codes Master entry: an exception condition with its severity and the thresholds that trigger it. Codes are seeded by migrations (the rules are code); administrators tune severity, thresholds and activation.",
+  "package": "alert"
+ },
+ "att_document_access": {
+  "doc": "Access class row of a document type (BRID-025; cross-BRD work item P3, V1031): a permission that may list and download documents of the type. A type without rows is open to every holder of {@code ATTACHMENT_VIEW}, as before.",
+  "package": "attachment"
+ },
+ "audit_log": {
+  "doc": "Immutable audit trail record of a financial or non-financial action.  * <p>Captures originator, modifier and authorizer activity with timestamps, as required by the GL audit trail control. Rows are insert-only (no update/delete API exists).",
+  "package": "audit"
+ },
+ "bcl_attribute_change": {
+  "doc": "A proposed value of an attribute of a status or settlement type (BRCLM.010/014, FR-CM-040/043): it waits for another BCL_SETUP user to authorize it, then applies to {@code bcl_lov_attribute}. A null value removes the attribute (e.g. blank follow-up days = parameter). A newer proposal for the same value supersedes a pending one (deactivated).",
+  "package": "brokerclaims"
+ },
+ "bcl_claim": {
+  "doc": "A BDOI claim case file (BRCLM.001-043; CLAIMS_BROKING_DESIGN 5.1): one claim reference per loss incident whatever the number of locations and insurers (037 AC4, 043 AC3), numbered {@code BCL-<yyyy>-nnnnnn} (CLQ13). It holds the identity (company, number, handling branch and unit, handler, source) and three parts owned by the build waves: the {@link CoverSnapshot} and the {@link LossDetails} (CL1-A) and the {@link ClaimProgress} (CL1-B). A business method on the claim delegates to the part that owns the rule. Attachments, workflow cases and audit entries use the entity type {@link ClaimCodes#ENTITY_TYPE}, which is also the JPA entity name (JPQL {@code from BrokerClaim}), since the insurer-side {@code claims.domain.Claim} keeps the name {@code Claim}.",
+  "package": "brokerclaims"
+ },
+ "bcl_claim_event": {
+  "doc": "One change of a tracked field of a claim with its old and new value, reason, user and time (CLAIMS_BROKING_DESIGN 5.2; FR-CM-003: every version kept). Insert-only.",
+  "package": "brokerclaims"
+ },
+ "bcl_claim_location": {
+  "doc": "An insured location of the cover linked to a claim (BRCLM.037; CLAIMS_BROKING_DESIGN 5.2): the risk item of kind location with a snapshot of its address, city, province and normalised location key, and the damage at that location. A location is linked once per claim; the claim keeps one reference whatever the number of locations (037 AC4).",
+  "package": "brokerclaims"
+ },
+ "bcl_diary_entry": {
+  "doc": "A diary entry of a claim (BRCLM.022, NFR 15.08; FR-CM-052): a call, e-mail, meeting, note or follow-up with its date, optional due date and assignee, and the text; marked done when completed. Entries are never deleted: a wrong entry is marked done with a remark. Closed claims accept diary entries.",
+  "package": "brokerclaims"
+ },
+ "bcl_handler": {
+  "doc": "A claims handler of the register (BRCLM.012, NFR p.37; CLAIMS_BROKING_DESIGN 5.3): the unit of the user drives the status access matrix and the default assignment, the team is shown on the reports. Maintained by the Unit Head on Claims Setup.",
+  "package": "brokerclaims"
+ },
+ "bcl_insurer_claim": {
+  "doc": "One insurer's side of a claim incident (BRCLM.023/029/043; CLAIMS_BROKING_DESIGN 5.2): the insurer, its share, the insurer's own claim number and the date the loss was reported to it, the insurer reserve and settled amount as reported by the insurer (information only, BDOI posts no journal, Q44) and the adjuster the insurer appointed. A claim keeps one reference whatever the number of lines (043 AC3); a line may wait for its number.",
+  "package": "brokerclaims"
+ },
+ "bcl_insurer_update": {
+  "doc": "A communication received from an insurer about a claim (BRCLM.041; CLAIMS_BROKING_DESIGN 5.2): date, source ({@code BCL_UPDATE_SOURCE}), the insurer's reference, remarks and the attachments that carry the insurer's document, optionally tied to one insurer line. Insert-only: a wrong update is never edited; a correcting update refers to it (FR-CM-022).",
+  "package": "brokerclaims"
+ },
+ "bcl_location_ref": {
+  "doc": "The reference an insurer uses for an insured location of a cover (BRCLM.042; CLAIMS_BROKING_DESIGN 5.2), valid from a date. A new reference end-dates the open one the day before its own start, so the mapping history stays and is auditable; nothing is deleted (FR-CM-023 R1/R2).",
+  "package": "brokerclaims"
+ },
+ "bcl_lov_attribute": {
+  "doc": "An attribute of a Claims list value (BRCLM.010/014; CLAIMS_BROKING_DESIGN 5.3): the phase, waiting party, follow-up days and \"awaiting premium remittance\" flag of a claim status, and the outcome, closure and amount rules of a settlement type. The names are the {@code ATTR_*} constants of {@link ClaimCodes}; values are text ({@code true} / {@code false} for flags).  * <p>Seeded by V1020. Read by every wave; maintained on Claims Setup (wave CL1-B, which adds the maintenance methods).",
+  "package": "brokerclaims"
+ },
+ "bcl_reserve_change": {
+  "doc": "One amendment of an insurer reserve (BRCLM.023/024; CLAIMS_BROKING_DESIGN 5.2): previous and new amount, reason, user and time. Insert-only; the reserve is information only and produces no journal (FR-CM-032 R2).",
+  "package": "brokerclaims"
+ },
+ "bcl_status_access": {
+  "doc": "A row of the status access matrix (BRCLM.012/013; CLAIMS_BROKING_DESIGN 5.3): the status may be selected by a holder of the role in the unit ({@code null} = any unit). Maker-checker: a row is used only once another user authorized it; a row is deactivated, never deleted.",
+  "package": "brokerclaims"
+ },
+ "bcl_status_history": {
+  "doc": "One status change of a claim (BRCLM.011/027/028; CLAIMS_BROKING_DESIGN 5.2): from and to status and phase, user, time, remark and the days spent in the previous status, which the ageing per status report reads. Insert-only; a closure by settlement type and a reopen keep the status and change the phase.",
+  "package": "brokerclaims"
+ },
+ "bkg_auto_book_rule": {
+  "doc": "Auto-book rule (BRNB.076): an account of the product and market segment entering POLICY_ISSUED is queued for the next booking batch. A blank product or segment matches any.",
+  "package": "booking"
+ },
+ "bkg_batch_run": {
+  "doc": "One booking batch run (BRNB.036): who or what started it, the business date and the result of every account (partial success: each account is booked in its own transaction).",
+  "package": "booking"
+ },
+ "bkg_endorsement": {
+  "doc": "An endorsement or cancellation posted on a booked account (BRNB.076/081/094). A financial one references the invoice it produced; a non-financial one is recorded only.",
+  "package": "booking"
+ },
+ "bkg_incentive_rule": {
+  "doc": "Incentive eligibility rule (BRNB.107): a booking of the product, market segment and source channel dated within the period is flagged incentive eligible. Blank criteria match any. The qualification rules are parked (Q33): the table ships empty apart from a seed rule.",
+  "package": "booking"
+ },
+ "bkg_invoice": {
+  "doc": "A booked invoice (BRNB.027/061): the broker's billing of one transaction of an account - the original booking (one per policy year of a multi-year account, BRNB.112), a financial endorsement or a cancellation. It carries the premium by component, the commission with VAT and withholding tax, the insurer shares, the flags read by Operations and, once booked, its BIR-sequential number, journal batches and open items.",
+  "package": "booking"
+ },
+ "bkg_queue": {
+  "doc": "An account queued for the next booking batch (BRNB.036/076), with the optional booking date and cost center the user set before the batch runs.",
+  "package": "booking"
+ },
+ "bkg_service_invoice": {
+  "doc": "A service invoice or credit (BRNB.100/100b): BIR-sequential {@code SI-<branch>-<yyyy>} number, commission, VAT on commission and withholding tax lines, the PDF generated from the document template (stored as issued) and its e-mail dispatch.",
+  "package": "booking"
+ },
+ "bkg_si_type": {
+  "doc": "Service invoice type (BRNB.100): recipient, trigger (on booking, on endorsement, manual), owner (a team through a permission, or a user) notified of the dispatch, and the document template.",
+  "package": "booking"
+ },
+ "brs_match": {
+  "doc": "Reconciliation match: one or more ledger entries of a bank GL account agreed with one or more bank statement lines of the same (signed) total.",
+  "package": "receivables"
+ },
+ "brs_match_book": {
+  "doc": "Ledger entry reconciled by a {@link BankMatch}.",
+  "package": "receivables"
+ },
+ "brs_match_rule": {
+  "doc": "Auto-matching rule of a bank account (FRBS 3.3.2): {@link #CHECK_NO_AND_AMOUNT} matches a bank line and a book entry with the same cheque number and amount before the {@link #STANDARD} rules (amount within the date window, reference preference, deposit slips).",
+  "package": "receivables"
+ },
+ "brs_reconciliation": {
+  "doc": "Bank reconciliation of one GL bank account as of a statement date: the saved Bank Reconciliation Statement figures. It can be finalized only when the unexplained difference is zero.",
+  "package": "receivables"
+ },
+ "brs_statement": {
+  "doc": "Imported bank statement of one GL bank account.",
+  "package": "receivables"
+ },
+ "brs_statement_layout": {
+  "doc": "Column mapping of the spreadsheet statements (.xlsx / .ods) of one bank account (FRBS 3.3.1; AQ08): which column holds the date, description, reference (cheque number), debit and credit or one signed amount, and the running balance. Column names are matched case-insensitively.",
+  "package": "receivables"
+ },
+ "brs_statement_line": {
+  "doc": "One line of a bank statement. Debit = money leaving the account (cheque paid, charges), credit = money received (deposit, transfer in), from the bank's point of view.",
+  "package": "receivables"
+ },
+ "bud_budget": {
+  "doc": "Budget version of a company for one fiscal year (header of the budget grid).  * <p>Enforces the {@link BudgetStatus} lifecycle, including maker-checker segregation: the user who submitted a version can never approve it.",
+  "package": "budget"
+ },
+ "bud_budget_line": {
+  "doc": "Budget line: one GL account (optionally per cost centre) with twelve monthly amounts in natural sign (income and expense budgets are both positive).",
+  "package": "budget"
+ },
+ "bulk_job": {
+  "doc": "One uploaded file for a bulk handler, with its validation and commit counts.",
+  "package": "bulk"
+ },
+ "bulk_row": {
+  "doc": "One uploaded row as sanitised, with its outcome.",
+  "package": "bulk"
+ },
+ "cat_clause": {
+  "doc": "An entry of the clause library (PMADD02): a warranty, clause, exclusion or deductible wording, for one product line or every line, with its effective period. Insurer x coverage terms of a package version reference clauses by code. Maker-checker master data.",
+  "package": "catalog"
+ },
+ "cat_commission_rate": {
+  "doc": "Commission the insurer pays BDOI on a product (percent of net premium), effective dated. A row without product applies to every product of the insurer; a product row wins over it.",
+  "package": "catalog"
+ },
+ "cat_cover_type": {
+  "doc": "Type of cover within a product line (Annex II), e.g. Motor / Comprehensive.",
+  "package": "catalog"
+ },
+ "cat_coverage": {
+  "doc": "A coverage or peril of a product line, the lowest level of the product hierarchy (PMADD01: LOB &gt; Subline / Type &gt; Subtype &gt; Coverage / Peril). Package versions list the coverages they include and each insurer's terms per coverage (PMADD02). Maker-checker master data.",
+  "package": "catalog"
+ },
+ "cat_document_rule": {
+  "doc": "Mandatory document (DOCUMENT_TYPE list of values) of every product, a line or one product, checked when Marketing submits an account (BRNB.026/051, e.g. the IDF for motor).",
+  "package": "catalog"
+ },
+ "cat_field_rule": {
+  "doc": "One row of the minimum-field matrix (BRNB.002/003/093): a field of the account or of every risk item that is mandatory for every product, a product line or one product. A field key made of alternatives separated by {@code |} is satisfied by any one of them (plate number or conduction sticker). A product row overrides a line or global row with the same target and key.",
+  "package": "catalog"
+ },
+ "cat_incentive_criteria": {
+  "doc": "An incentive criterion on the maintained products matrix, for example \"CPC2\" (PMADD07/08; PRODUCT_MAINTENANCE_DESIGN section 4.3). Effective-dated and maker-checker: an ACTIVE row is never edited; a change end-dates it when its successor row is authorised, so history is kept.",
+  "package": "catalog"
+ },
+ "cat_insurer": {
+  "doc": "Panel insurer: the broking profile of a party of type INSURER (accreditation, placement channel and mailboxes, default credit days). Branches carry the LGT rate (Appendix A). Placement by e-mail only; SFTP and API channels are parked (Q06).",
+  "package": "catalog"
+ },
+ "cat_insurer_branch": {
+  "doc": "Branch of a panel insurer with its Local Government Tax rate (Appendix A: \"LGT value is dependent on the Insurer Branch\") and optional placement mailbox.",
+  "package": "catalog"
+ },
+ "cat_motor_limit": {
+  "doc": "Motor excess BI / PD limit and its premium (Appendix A: \"Excess BI / PD premium amounts per limit table\"), effective dated.",
+  "package": "catalog"
+ },
+ "cat_product": {
+  "doc": "A BDOI risk product (risk code, e.g. CAR00, MTR10, PAR01) with the attributes that drive the account workflow: package or not, fleet, segments, mortgage, direct payment, multi-year, Free First Year, payment gate, commission, minimum premium and TSU involvement (BRNB.001, Annex I, Appendix B).",
+  "package": "catalog"
+ },
+ "cat_product_line": {
+  "doc": "Product line of Annex II (Property, Motor, Engineering...). It declares the kind of risk items its accounts carry and the Appendix A formula used to rate them (BRNB.001/051).",
+  "package": "catalog"
+ },
+ "cat_product_version": {
+  "doc": "One version of a packaged product (BRPM.006/007/017, PMADD01/02/06; PRODUCT_MAINTENANCE_DESIGN sections 4.2 and 5.1): the rate scheme, package term, coverages, insurers and insurer x coverage terms, and the validation checkpoint. A package is never edited in place: commercial terms change only through a new DRAFT version, which is submitted, validated by someone other than its maker and released with an effective date, while the released version keeps selling.",
+  "package": "catalog"
+ },
+ "cat_rate": {
+  "doc": "A tax or rating factor of Appendix A (DST, premium tax, VAT, FST, VAT on commission, motor OD/Theft coverage factors) in percent, for every line or one product line, effective dated. A line row overrides the all-lines row.",
+  "package": "catalog"
+ },
+ "cat_rate_scheme_exception": {
+  "doc": "An approval to price one transaction on a non-current package version or on a rate other than the scheme rate (BRPM.007 \"a non-current rate triggers an approval workflow and is logged\"). Requested from the quotation (or account), authorised by a PRODUCT_AUTHORIZE holder other than the requester in My Approvals; its reference number is the {@code rateOverrideRef} of rating.",
+  "package": "catalog"
+ },
+ "cat_sales_officer": {
+  "doc": "An account officer (user) of a sales team (BRNB.075 production per user).",
+  "package": "catalog"
+ },
+ "cat_sales_unit": {
+  "doc": "Sales organisation unit (region, department or team) for production statistics (BRNB.075) with the default cost center of a team (BRNB.108, dimension COST_CENTER).",
+  "package": "catalog"
+ },
+ "cat_short_period_rate": {
+  "doc": "Short-period (short-term) table row (Appendix A): the percentage of the annual premium charged for a cover of a number of months, e.g. cancellation before expiry.",
+  "package": "catalog"
+ },
+ "cat_tsu_rule": {
+  "doc": "TSU routing rule (BRNB.098): an account needs TSU clearance when every criterion set on the rule holds (product class, line, fleet units, locations, total sum insured, endorsement type). Rules are evaluated by priority; the first match is reported.",
+  "package": "catalog"
+ },
+ "clm_claim": {
+  "doc": "An insurance claim at 100 % under an approved policy in force at the date of loss.  * <p>The claim holds the policy facts at registration ({@link ClaimPolicy}), the loss details ({@link LossDetails}), the involved parties and the running estimate / paid totals ({@link ClaimTotals}). Financial changes are made only through approved documents (reserve changes, settlements, recoveries) which call the {@code apply...} methods; status rules are enforced here.",
+  "package": "claims"
+ },
+ "clm_claim_party": {
+  "doc": "A business partner involved in a claim (claimant, third party, garage, surveyor, adjuster).",
+  "package": "claims"
+ },
+ "clm_lpo": {
+  "doc": "Local Purchase Order: authority given to a garage to repair a vehicle under a motor claim, own damage (OD) or third party (TP). Net = gross \u2212 discount. An LPO is a commitment, not an accounting entry: the garage is paid through a claim settlement.",
+  "package": "claims"
+ },
+ "clm_movement": {
+  "doc": "Immutable line of the claim movement ledger: an approved estimate change or an amount paid / recovered, typed with the Reports Book code, at 100 % and company share, with the base-currency equivalent at the rate of its date. Reports, the insurance kernel views and the listener notifications are all derived from these lines.",
+  "package": "claims"
+ },
+ "clm_recovery": {
+  "doc": "Salvage or subrogation money received into a bank account, at 100 %. On approval it consumes the recovery estimate and reduces claims expense by the company share.",
+  "package": "claims"
+ },
+ "clm_reserve_change": {
+  "doc": "Request to set a new estimate for one side and cost type of a claim (e.g. \"loss payment estimate becomes 250,000\"). The change against the estimate current at approval becomes a typed movement line: increases are type 1 / 2, decreases type 3 / 4 (Reports Book).  * <p>System-generated changes release the outstanding reserve when a claim is finally settled, closed, repudiated or withdrawn; they are approved as part of that decision.",
+  "package": "claims"
+ },
+ "clm_settlement": {
+  "doc": "Settlement of a claim to a payee (claimant, garage, surveyor), partial or final, at 100 %: net = assessed loss \u2212 deductible \u2212 excess. On approval the net consumes the outstanding reserve of its cost type, is posted (company share) and becomes a payable open item of the payee.",
+  "package": "claims"
+ },
+ "clx_application_request": {
+  "doc": "A request sent to Cashiering on a collector disposition (BRCLXN.030/032): apply the unapplied payment to an invoice, refund, reclass or transfer it, through the port {@code UnappliedDispositionRequests}. Its status follows Cashiering's answers ({@code UnappliedDispositionChanged}); the p.60 payment fields are kept as a snapshot for the daily \"For Application To Invoice\" file (BRCLXN.041/042), which records its run on the request.",
+  "package": "collections"
+ },
+ "clx_assignment": {
+  "doc": "One assignment of a collection item to a handler (BRCLXN.052): by rule, permanent, temporary with an end date, or the automatic return at the end of a temporary assignment. The history of an item's assignments stays visible on the account page.",
+  "package": "collections"
+ },
+ "clx_assignment_rule": {
+  "doc": "A default assignment rule (BRCLXN.052): the handler of the new items matching segment, sales unit, client, amount and aging criteria, tried in priority order by the daily refresh.",
+  "package": "collections"
+ },
+ "clx_billing_document": {
+  "doc": "The rendered PDF of a statement of account (BRCLXN.058), kept apart from the statement. The content is in the file store ({@code stored_file}, build step ST1); PDFs rendered before ST1 keep their bytes in {@code content} until {@code FILE_BYTEA_MIGRATION} copies them.",
+  "package": "collections"
+ },
+ "clx_billing_statement": {
+  "doc": "A statement of account (SOA) for one billing cycle of an installment plan (BRCLXN.058/060, CQ18): the client and account, the cycle's coverage period and due date, the installment of the cycle and any earlier one still unpaid, the totals, the document rendered from the template {@code CLX_SOA} and when it was sent. Billing is monitoring only: an SOA creates no receivable and no commission billing.",
+  "package": "collections"
+ },
+ "clx_billing_statement_line": {
+  "doc": "A line of a statement of account (BRCLXN.058/060): the installment of the cycle or an earlier one still unpaid, with the invoice, policy year, coverage period, amount, paid and balance.",
+  "package": "collections"
+ },
+ "clx_disposition": {
+  "doc": "A PR collector disposition of a collection item (BRCLXN.016-023): code of LOV {@code CLX_PR_DISPOSITION} with the category, tagging owner and Operations action of its attributes, remarks and the hand-off details (pick-up date and address, certificate number ...). Append-only: a new disposition supersedes the current one, which stays in the history.",
+  "package": "collections"
+ },
+ "clx_effort": {
+  "doc": "A collection effort on an item (p.43-46, p.59; BRCLXN.021): code of LOV {@code CLX_EFFORT_CODE}, when, channel, contact person and remarks. Efforts are a log: never changed or deleted.",
+  "package": "collections"
+ },
+ "clx_escalation": {
+  "doc": "An escalation of a collection account (BRCLXN.049/050): raised automatically by a rule or manually for one or several invoices of an account, routed to the team lead or the unit / section head, and worked in the workflow {@code CLX_ESCALATION}, whose stage it mirrors.",
+  "package": "collections"
+ },
+ "clx_escalation_item": {
+  "doc": "One invoice of an escalation with its outstanding and aging when escalated (BRCLXN.050 AC 1).",
+  "package": "collections"
+ },
+ "clx_escalation_rule": {
+  "doc": "An escalation rule (BRCLXN.049, CQ14): a basis and threshold, optional filters on the account (segment, sales unit, product line, outstanding range), the level that receives the escalation, its SLA and whether to notify. Maker-checker master data: a new or changed rule applies once another user authorized it (MASTER_AUTHORIZE).",
+  "package": "collections"
+ },
+ "clx_field_change": {
+  "doc": "One field change of a Collections record with its \"from\" and \"to\" values, user, time and source IP (BRCLXN.043, NFR audit logging); immutable. Bulk changes carry their bulk reference (BRCLXN.051).",
+  "package": "collections"
+ },
+ "clx_inbox": {
+  "doc": "An item Operations sent to Collections through an outbound {@code COLLECTION_*} feed (COLLECTIONS_DESIGN 2.2): a direct payment account returned by the insurer (CMRID.009) or a refund (BRCLXN.040), with the flow-in run it arrived in and what Collections did with it.",
+  "package": "collections"
+ },
+ "clx_installment": {
+  "doc": "One installment of a plan = one billing cycle (BRCLXN.053/058): its due date, the coverage period it bills, the amount and the payments allocated to it from the invoice ledger, oldest due first (BRCLXN.054). The status is derived from the due date and the allocation.",
+  "package": "collections"
+ },
+ "clx_installment_plan": {
+  "doc": "An installment plan of a collection account (BRCLXN.053/058, CQ15): the schedule of billing cycles of a multi-year account (one or more installments per policy-year invoice) or of one invoice, with the payments allocated to each installment. A plan is monitoring only: it never changes booking, the ledger or the GL (BRCLXN.060).",
+  "package": "collections"
+ },
+ "clx_item": {
+  "doc": "A collection item: one ledger invoice that has ever been listed in the worklist (COLLECTIONS_DESIGN 4.1; BRCLXN.001, 022). The ledger facts are refreshed by {@code CLX_DAILY_REFRESH} and the balance listener; the work pointers (handler, current disposition, category, owner, last effort, remarks) change with the collector's work; the flags (promise, escalation, installment) are set by the plans and escalation wave. Items are never deleted.",
+  "package": "collections"
+ },
+ "clx_legacy_state": {
+  "doc": "A row of the open collection follow-up carried from legacy for a legacy invoice (Data Migration object F03, the designed CLX_LEGACY_ITEMS): the latest disposition, a promise to pay, an installment of a plan or the collector assignment.",
+  "package": "collections"
+ },
+ "clx_lov_attribute": {
+  "doc": "An attribute of a Collections LOV value (table {@code clx_lov_attribute}, V1000; BRCLXN.016, 037, 047/048): {@code category}, {@code tagging_owner}, {@code ops_action}, {@code allowed_roles} of the PR collector dispositions and {@code requires_invoice}, {@code cashiering_action} of the unapplied-payment dispositions. {@code lov_value} has no attribute columns, so Collections keeps them by type, code and attribute.",
+  "package": "collections"
+ },
+ "clx_outbox": {
+  "doc": "An item Collections hands to Operations through an inbound {@code COLLECTION_*} feed (COLLECTIONS_DESIGN 2.2): a BIR 2307 tag for Cashiering, a direct payment account for Commission or a check pick-up request for Cashiering. The consumer pulls it with {@code CollectionFeed.pending} and acknowledges it once taken.",
+  "package": "collections"
+ },
+ "clx_promise": {
+  "doc": "A client's promise to pay an amount on a collection account (an invoice), or on one of its installments, by a date (BRCLXN.055, CQ16). The job {@code CLX_PROMISE_CHECK} compares it with the payments applied in the ledger and marks it kept, partially kept or broken; broken promises feed the escalation rules (BRCLXN.049).",
+  "package": "collections"
+ },
+ "clx_scheduled_file": {
+  "doc": "A Collections file published by a job or on request (BRCLXN.024-029, 045): the report, its period and scope (unit and branch of a weekly file), the archived report run holding the file and the time from which users may download it.",
+  "package": "collections"
+ },
+ "clx_unapplied_disposition": {
+  "doc": "A collector disposition of an unapplied payment (BRCLXN.031/033, 040): the value of LOV {@code CLX_UPP_DISPOSITION}, the target invoice when the value requires one (047/048), the amount and remarks, and the request sent to Cashiering when the value has a Cashiering action. Append-only: a later disposition of the same item is a new row, so the history is kept after the payment is applied or refunded.",
+  "package": "collections"
+ },
+ "cmr_billing": {
+  "doc": "A commission billing of direct payment accounts to one insurer (CMRID.009-012, workflow {@code OPS_DP_BILLING}): handler, totals, the billing file sent with password protection, the feedback due date in working days ({@code CMR_FEEDBACK_WORKING_DAYS}), the insurer's answer and the commission OR. The stage mirrors the work case.",
+  "package": "commission"
+ },
+ "cmr_certificate": {
+  "doc": "A BIR withholding tax certificate of an insurer tagged to the ORs issued for its commissions and submitted digitally to Comptrollership (CMRID.010/015, workflow {@code OPS_BIR_CERT}): form, number, period and tax withheld, the ORs it covers, the scans (attachments) and the decision (acknowledged, or rejected with a reason and resubmitted).",
+  "package": "commission"
+ },
+ "cmr_dp_item": {
+  "doc": "A direct payment account of a DP list (CMRID.001-013, MKTID.012): what the branch submitted, the commission receivable computed from the Operations ledger (commission, VAT, withholding tax, net, CMRID.007), the sanitation and rule results, the tag through billing, insurer feedback, collection with its OR, and the premium receivable reversal.",
+  "package": "commission"
+ },
+ "cmr_dp_list": {
+  "doc": "A direct payment list submitted by Head Office or a branch's Marketing Collection, or received from the Collection feed (CMRID.001): branch, submission date from the file name convention {@code <Branch>_DP_<yyyyMMdd>}, file checksum and the counts after consolidation.",
+  "package": "commission"
+ },
+ "cmr_dppr_batch": {
+  "doc": "A legacy direct payment PR reversal batch (DATA_MIGRATION_DESIGN 14.4 E; BRID 7.1): legacy invoices the client paid directly to the insurer, whose open premium receivable and due to insurer are reversed once the batch is approved; the maker never approves.",
+  "package": "commission"
+ },
+ "cmr_dppr_batch_line": {
+  "doc": "A legacy invoice of a direct payment PR reversal batch, posted in its own transaction.",
+  "package": "commission"
+ },
+ "cmr_incentive_run": {
+  "doc": "A computed incentive run of a scheme for a period (CMRID.003/005/006): eligible production, exclusions, the tier applied, the incentive, the pass-on to branches, and once posted the accrual (OPS_INCENTIVE_ACCRUE) and pass-on (OPS_INCENTIVE_PASS_ON) journals.",
+  "package": "commission"
+ },
+ "cmr_incentive_run_line": {
+  "doc": "One invoice of an incentive run (CMRID.003/005/006): its production, whether an exclusion rule removed it (negative amounts, erroneous bookings) and the incentive it earns.",
+  "package": "commission"
+ },
+ "cmr_incentive_scheme": {
+  "doc": "An incentive scheme (CMRID.003/005/006): No Touch and Top Up (production targets with rates and multipliers per period) and Motor Mania (fixed amount per policy by minimum basic premium, passed on to branches), with the production it covers (insurer, segments, product lines) and its tiers. The schemes are seeded without tiers; BDOI gives targets, rates and amounts (OQ39).",
+  "package": "commission"
+ },
+ "coa_account": {
+  "doc": "GL Head of Account (Main / Sub / Micro GL) in the multi-tier chart of accounts.  * <p>Holds every posting control defined by the GL maintenance programs: allowed currencies, allowed posting branches, role based access codes, freeze, closure, manual posting allowance, mandatory dimensions and sub-ledger control.",
+  "package": "coa"
+ },
+ "coa_category": {
+  "doc": "General Ledger Category Master: groups accounts by nature (e.g. Bank, Capital, Premium).",
+  "package": "coa"
+ },
+ "coa_numbering": {
+  "doc": "Numbering scheme of the children of a parent account (FRBS 2.3.2): a child's number is the parent code, an optional separator and the next sequence of a fixed width, e.g. parent {@code 1210}, separator {@code .}, width 2 gives {@code 1210.01}, {@code 1210.02}...",
+  "package": "coa"
+ },
+ "con_group": {
+  "doc": "Consolidation group: a parent company and its subsidiaries (with ownership), the consolidation (reporting) currency and the group accounts used by translation and elimination entries.  * <p>The group chart of accounts is the parent's chart: member balances are aggregated by account code, so members must use the same codes (standard chart).",
+  "package": "consolidation"
+ },
+ "con_group_member": {
+  "doc": "Subsidiary of a consolidation group with ownership and investment elimination settings.",
+  "package": "consolidation"
+ },
+ "con_run": {
+  "doc": "Consolidation run of a group as of a date: the consolidated ledger (translated member balances, CTA and elimination lines). Company ledgers are never modified.",
+  "package": "consolidation"
+ },
+ "con_run_line": {
+  "doc": "Line of the consolidated ledger of a run (translated balance, CTA or elimination).",
+  "package": "consolidation"
+ },
+ "crm_client": {
+  "doc": "A broking client. It starts as a <b>prospect</b> with a prospect code (minimum data, may be quoted) and becomes a <b>confirmed</b> client with a client code once onboarded; both codes are kept so history stays traceable (BRNB.090/101). Confirmation links the client to its sub-ledger party ({@code partyCode}) for premium receivables.",
+  "package": "crm"
+ },
+ "crm_client_instruction": {
+  "doc": "A special instruction on a client (BRNB.091): type, text and effectivity, shown as a banner on every screen of the client's quotations and accounts while in force.",
+  "package": "crm"
+ },
+ "crm_client_note_history": {
+  "doc": "Insert-only history of a client tag or instruction change: who, when, from and to (BRNB.091).",
+  "package": "crm"
+ },
+ "crm_client_payout_account": {
+  "doc": "CA / SA information of a client (MKT 2.25.0, Addendum 1): the BDO account a refund is credited to with its payee name, or the payee name of a check. Captured from an approved refund request and never overwritten: a changed account is a new row, an old one is deactivated (MKT 2.25.1).",
+  "package": "crm"
+ },
+ "crm_client_tag": {
+  "doc": "A controlled tag on a client (list of values CLIENT_TAG), e.g. VIP or DO_NOT_CALL (BRNB.091).",
+  "package": "crm"
+ },
+ "crm_kyc_document": {
+  "doc": "A KYC document of a client: an attachment of entity type {@code Client} with its document type (list of values DOCUMENT_TYPE), checked against the KYC checklist (BRNB.030/090).",
+  "package": "crm"
+ },
+ "csf_activity": {
+  "doc": "One action of an agent in the Customer Servicing Facility (FR-CSF-042): searches with their criteria, views, downloads, resends, uploads, verifications, contact changes and referrals. Append-only; the log cannot be switched off.",
+  "package": "csf"
+ },
+ "csf_contact_change": {
+  "doc": "A contact change made from the Customer Servicing Facility (FR-CSF-021, 022, 040): applied to the client master, refused (a field the contact centre cannot change) or referred to the fulfilment unit, with the verification of the caller, the reason, the field rows with the values before and after, and the legacy write-back state. Number {@code CSF-yyyy-nnnnnn}.",
+  "package": "csf"
+ },
+ "csf_sync_outbox": {
+  "doc": "One contact change to send to one legacy system (FR-CSF-022, CSQ01): the payload is kept with every row, so the outbox can be replayed once the interface is specified.",
+  "package": "csf"
+ },
+ "csf_verification": {
+  "doc": "Verification of a caller before a contact change (FR-CSF-020; e-mail topic 5): the checks asked, whether each answer matched, the result and how long a passed verification stays valid. Immutable once recorded.",
+  "package": "csf"
+ },
+ "csh_application": {
+  "doc": "Money of a receipt (or of an unapplied item) applied to one booked invoice, split by premium component in the hierarchy (CSHID.020/022). Posted as {@code OPS_PAYMENT_APPLY} with source reference {@code APP:<id>} and recorded on the invoice ledger; a reversal re-posts it negative.",
+  "package": "cashiering"
+ },
+ "csh_collector_request": {
+  "doc": "A collector's request to dispose of an unapplied item (BRCLXN.030-033), received through the Operations port {@code UnappliedDispositionRequests}: apply to an invoice, refund, reclass or transfer. It waits in the Cashiering queue until a cashier accepts it (a disposition of the workflow {@code OPS_DISPOSITION} is assigned from it) or rejects it; the executed disposition marks it applied.",
+  "package": "cashiering"
+ },
+ "csh_commission_line": {
+  "doc": "A commission payment detail uploaded from Collection (CSHID.007): staged until the official receipts are issued, one OR per insurer, payee, certificate and payment (OQ49).",
+  "package": "cashiering"
+ },
+ "csh_cwt_batch": {
+  "doc": "A validated batch of BIR 2307 certificates of one insurer (CSHID.027): its transaction report is posted and routed to Disbursement, which releases the certificates to the insurer (DBMID.001).",
+  "package": "cashiering"
+ },
+ "csh_cwt_tag": {
+  "doc": "A BIR 2307 reversal tagged by Marketing Collection with its {@code CWT-} reference (MKTID.013, CSHID.026): the 2% creditable withholding tax of an invoice settled in cash or by the client's certificate. Cashiering validates it against the CWT copy, posts the reclass and routes it to Disbursement (CSHID.027, DBMID.001). The stage mirrors the workflow {@code OPS_CWT_2307}.",
+  "package": "cashiering"
+ },
+ "csh_disposition": {
+  "doc": "A disposition assigned to an unapplied item (CSHID.024): apply to another invoice, DST application, refund, reclass, transfer to another marketing unit or others, with the target fields of its type, the four-eyes approval and the execution result.",
+  "package": "cashiering"
+ },
+ "csh_disposition_type_rule": {
+  "doc": "What a disposition type of LOV {@code DISPOSITION_TYPE} does and whether it needs the team leader's approval (CSHID.024, OQ15). Types added to the LOV need a rule row.",
+  "package": "cashiering"
+ },
+ "csh_legacy_batch": {
+  "doc": "A Cashiering batch of the legacy context (DATA_MIGRATION_DESIGN 14.4 D and F): the reclassification of old unapplied payments to other income, approved by the Cashiering team lead and then by top management, or the reversal of legacy PR 2307 balances against the insurer, approved by the team lead. Lines post once the last approval is given.",
+  "package": "cashiering"
+ },
+ "csh_legacy_batch_line": {
+  "doc": "A line of a Cashiering legacy batch: an unapplied item taken to income, or a legacy invoice whose PR 2307 is reversed against the insurer; posted in its own transaction.",
+  "package": "cashiering"
+ },
+ "csh_minimal_balance_rule": {
+  "doc": "The maintained minimal-balance table (CSHID.016, Cashiering summary 5.f, OQ11): the maximum amount per kind of balance, the exclusions of CSHID.016 and the action.",
+  "package": "cashiering"
+ },
+ "csh_payment": {
+  "doc": "A payment received through a channel (file row, over the counter, matured PDC, check pick-up), with the raw references it carried and the matching result (CSHID.008/020, BRQID.006).",
+  "package": "cashiering"
+ },
+ "csh_payment_file_layout": {
+  "doc": "The layout of a payment file handler's TXT files (CSHID.008): auto-detected, delimited with a separator, or fixed width with {@code Header:start:length} fields separated by {@code ;}. The bank layouts are parked (OQ03/OQ04); administrators set them here without a release.",
+  "package": "cashiering"
+ },
+ "csh_payment_reversal": {
+  "doc": "A sub-ledger payment reversal requested by another module (ACSL 2.6.0-2.6.1) through the port {@code PaymentReversalRequester}: a cashiering approver reverses the receipt's applications on the invoice (payment back to unapplied collections) or rejects the request.",
+  "package": "cashiering"
+ },
+ "csh_pdc_item": {
+  "doc": "A post-dated check in the warehouse (CSHID.008 item 4): stored with a traceable {@code PDCW-} number, it becomes a payment with an AR at maturity ({@code PDC_MATURITY} job) or is returned, replaced or pulled out before.",
+  "package": "cashiering"
+ },
+ "csh_pickup_request": {
+  "doc": "A check tagged \"for check pick-up\" by Collection (CSHID.009, OQ01/OQ13): queued by pick-up date; printing the ARs of the due requests allocates their AR numbers.",
+  "package": "cashiering"
+ },
+ "csh_prebooked": {
+  "doc": "A payment matched to an account that is not booked yet (CSHID.020, OQ12). The AR is issued and the money waits in unapplied collections; the booking of the account (ledger event) or the {@code PREBOOKED_REMATCH} job applies it and the item leaves the queue.",
+  "package": "cashiering"
+ },
+ "csh_print_batch": {
+  "doc": "A batch print of receipts (CSHID.019): the receipts printed or failed, and the merged PDF kept as the copy of the batch. Failed receipts can be retried.",
+  "package": "cashiering"
+ },
+ "csh_receipt": {
+  "doc": "An acknowledgement receipt (premium or non-premium payment, CSHID.001) or a Head Office official receipt (BDOI income, CSHID.002). One class holds both; the kind drives the series, the accounting event and the printed document (OPERATIONS_DESIGN principle 1).",
+  "package": "cashiering"
+ },
+ "csh_receipt_action": {
+  "doc": "A cancellation or reinstatement of a receipt (CSHID.001-005) with its own transaction number, reason and, for a reinstatement, the encoded fields of CSHID.005. It follows the workflow {@code OPS_RECEIPT_ACTION} (maker-checker assumed, OQ06); the stage is mirrored here.",
+  "package": "cashiering"
+ },
+ "csh_receipt_series": {
+  "doc": "A receipt number series of a branch (CSHID.006/015, OQ05): AR per branch, OR for Head Office only. Numbers are allocated sequentially under a row lock and a depleted series refuses allocation. Maker-checker: a series is used only once authorized.",
+  "package": "cashiering"
+ },
+ "csh_refund_validation": {
+  "doc": "A refund validation Cashiering answers (MKT 1.11.0): for the refund of a cancelled account, Cashiering confirms that the premium is back in the unapplied list with a new AR number, or rejects it. Opened through the port {@code RefundValidationSource} (validator CASHIERING).",
+  "package": "cashiering"
+ },
+ "csh_unapplied": {
+  "doc": "An unapplied payment or excess waiting for a disposition (CSHID.024/025). The money stays in unapplied collections (OPERATIONS_DESIGN section 5, row 5). The stage mirrors the workflow {@code OPS_DISPOSITION}, whose stage groups are the tabs Unapplied / Monitoring / For Approval / For Reversal.",
+  "package": "cashiering"
+ },
+ "cur_currency": {
+  "doc": "ISO 4217 currency master. The ISO code is the natural primary key.",
+  "package": "currency"
+ },
+ "cur_exchange_rate": {
+  "doc": "Exchange rate: base-currency units per one unit of {@code currencyCode}, effective from a date until superseded by a later rate of the same type.",
+  "package": "currency"
+ },
+ "dim_value": {
+  "doc": "A value of a financial dimension, e.g. cost centre \"FIN\" or business line \"MOTOR\".",
+  "package": "dimension"
+ },
+ "doc_attachment": {
+  "doc": "Metadata of a document attached to any record, identified by entity type and id (for example {@code JournalBatch} / {@code 42}). The file content is in the file store ({@code stored_file}, build step ST1); files attached before ST1 keep their bytes in {@link AttachmentContent} until {@code FILE_BYTEA_MIGRATION} copies them.",
+  "package": "attachment"
+ },
+ "doc_attachment_content": {
+  "doc": "File bytes of an {@link Attachment}, stored separately so listings never load them.",
+  "package": "attachment"
+ },
+ "doc_attachment_link": {
+  "doc": "Makes an uploaded file part of another record's documents without copying it (BRNB.026: link one file to several accounts). The file keeps its owner, checksum and audit trail. The link may carry the process it was made for (BRID-025).",
+  "package": "attachment"
+ },
+ "doc_rendition": {
+  "doc": "The content of a composed PDF, kept by the SHA-256 of the PDF so the same document can be downloaded as Word (client requirement 16). Never changed once recorded.",
+  "package": "docgen"
+ },
+ "doc_template": {
+  "doc": "One version of a document template. Versions are never changed: a new text is a new version effective from a date, and generated records store the version they used (BRNB.004).",
+  "package": "docgen"
+ },
+ "document_sequence": {
+  "doc": "Gapless counter per sequence key (e.g. \"JV-HO-2026\"). Updated under a row lock.",
+  "package": "common"
+ },
+ "dsb_eod_output": {
+  "doc": "A file produced by an end-of-day run (DIS 2.16.1-2.16.6, 3.28.2): the DCTF, the check print batch, the ATD / MC-DD / credit ticket / TT forms, the day's vouchers and the EOD reports.",
+  "package": "disbursement"
+ },
+ "dsb_eod_run": {
+  "doc": "An end-of-day run of a business date (DIS 2.16.0-2.16.6, 3.28.0-3.28.2, 2.7.12): the approved vouchers it froze and the counts of its outputs (checks, DCTF credits, forms, reports) and of the payment confirmations e-mailed afterwards.",
+  "package": "disbursement"
+ },
+ "dsb_funding_request": {
+  "doc": "Funding of the main BDOIR account through BDO Business Online Banking (DIS 2.17.0-2.17.4, AQ10): source and target bank accounts, amount, purpose, the BOB reference and the maker, verifier and two approvers of workflow {@code DISB_FUNDING}. Four eyes: the verifier is not the maker, the two approvers differ from each other, from the maker and from the verifier.",
+  "package": "disbursement"
+ },
+ "dsb_instrument": {
+  "doc": "The payment instrument of an approved voucher (DIS 2.7.0, 2.8.x, 3.26.x): check, authority to debit, credit to account, manager's check / demand draft, credit ticket, telegraphic transfer or online banking, with its number, status and the time of each step. Status changes follow {@link InstrumentLifecycle}; a status edit approved by the team leader (DIS 2.8.5) sets it directly.",
+  "package": "disbursement"
+ },
+ "dsb_instrument_event": {
+  "doc": "One status change of an instrument (DIS 2.8.0, 3.26.0): from and to status, what changed it (user, system, uploaded file, job), a note and the file reference; shown as the status timeline.",
+  "package": "disbursement"
+ },
+ "dsb_payee": {
+  "doc": "A Disbursement payee (DIS 2.2.0-2.2.8): the payment profile of a party code with its class (LOV {@code PAYEE_CLASS}), default and allowed modes of payment, disbursement types, currency, default cost centre (DIS 3.30.0) and bank accounts. Maintained under workflow {@code DISB_PAYEE}: a draft is authorised by a checker before it can be paid; deactivation and reactivation are authorised the same way. A payee that was never used may be deleted (DIS 2.2.4), otherwise it is deactivated. Taxes (TIN, ATC, VAT) come from the tax profile of the party.",
+  "package": "disbursement"
+ },
+ "dsb_payee_account": {
+  "doc": "A bank account of a payee (DIS 2.2.0, AQ11): bank, branch, account number (masked in lists without {@code DISB_PAYEE_VIEW_FULL}), account name, currency and the mode it serves (credit to account, telegraphic transfer, online banking).",
+  "package": "disbursement"
+ },
+ "dsb_payee_request": {
+  "doc": "A request to maintain a payee (DIS 2.2.1): from a Marketing refund request form (RRF, MKT 2.25.0), from a Disbursement user, or raised automatically when a payment request names a payee that is not in the master (DIS 3.25.2). It is closed when the payee is maintained.",
+  "package": "disbursement"
+ },
+ "dsb_request": {
+  "doc": "A payment request received by Disbursement (DIS 2.4.0-2.6.2, 3.25.0-3.25.2): from a module through the gateway (with the linked Operations request), from an upload row or encoded by a user. It carries the RFP number, disbursement type, payee, amount, purpose, root invoice and supporting documents; its payee is matched to the payee master and a voucher is built from it.",
+  "package": "disbursement"
+ },
+ "dsb_status_edit": {
+  "doc": "A request to correct the status tag of an instrument (DIS 2.8.5, AQ15), approved or rejected by the team leader under workflow {@code DISB_STATUS_EDIT}.",
+  "package": "disbursement"
+ },
+ "dsb_voucher": {
+  "doc": "A disbursement voucher (DV, DIS 2.7.0-2.7.12, 2.13-2.21): the payment of one request to one payee with its mode, paying bank account, gross / EWT / net, purpose, root invoice (DIS 3.27.2) and the editable proforma entry (DIS 2.7.6), moved through workflow {@code DISB_VOUCHER}. Only an unposted voucher can be changed (DIS 3.27.0 addendum); approval posts it, cancellation of an approved voucher reverses it.",
+  "package": "disbursement"
+ },
+ "dsb_voucher_line": {
+  "doc": "A line of the proforma entry of a voucher (DIS 2.7.6, 2.7.10, 3.30.0): side, account, sub-ledger party, cost centre, line of business, amount and the event component it comes from, with its origin (from the accounting rule, edited by the processor, or from the expense allocation). The approver sees which lines were edited.",
+  "package": "disbursement"
+ },
+ "dsb_voucher_tag": {
+  "doc": "A tag on a voucher (DIS 2.10.0-2.11.2): the official / acknowledgement receipt received from the payee (number, date, date received), or a creditable withholding tax certificate received from an insurer or released to a supplier (period covered, date received / released, amount, certificate reference).",
+  "package": "disbursement"
+ },
+ "eb_activity_log": {
+  "doc": "A received / released stamp of an activity of the TAT annex (BRID-022, 024; design 4.2): written by the EB services at each step, read by the {@code EB-TAT} report. The actor is a BIBS user or, for work the insurer or client does, the party recorded by the EB user.",
+  "package": "eb"
+ },
+ "eb_bor": {
+  "doc": "A version of the client's signed Broker on Record for a cycle (BRID-008; FR-EB-031): the file, the validator's checklist (signed by an authorised signatory, not blank, client name matches; e-signature verification is a parked seam, EBQ06), the validity dates and the decision. Versions are never changed after the decision; a rejected BOR is replaced by version n+1.",
+  "package": "eb"
+ },
+ "eb_client_confirmation": {
+  "doc": "The client's confirmation of the chosen proposals (BRID-017; FR-EB-046): channel (e-mail or signed document; no portal), date and the evidence, and per programme line the chosen proposal and insurer, later the account created at placement. A confirmation can be voided before the placement is triggered and recorded again.",
+  "package": "eb"
+ },
+ "eb_comment": {
+  "doc": "A comment on a comparative (FR-EB-043): an internal note or reply, or the client's comment received by e-mail and entered by the AO.",
+  "package": "eb"
+ },
+ "eb_comparative": {
+  "doc": "A comparative analysis of the validated proposals of a cycle (BRID-010, 011, 016; FR-EB-041 to 043), numbered {@code EBCA-<yyyy>-nnnnnn}: a snapshot of the rows (JSON) and, per benefit line, the lowest premium and the proposal the AO recommends. It is signed off by someone other than its maker, approved by Management when a threshold rule matches, then presented to the client. A rebuild supersedes the earlier version.",
+  "package": "eb"
+ },
+ "eb_comparative_signoff": {
+  "doc": "A sign-off or threshold decision on a comparative: signatory, role, decision and remarks.",
+  "package": "eb"
+ },
+ "eb_cycle": {
+  "doc": "One policy year of a programme (design 4.2, 7.1): numbered {@code EBC-<yyyy>-nnnnnn}, with its business type NEW_BUSINESS or RENEWAL (BRID-022.01; carried to the accounts created at placement, shared work item BT0), the stage mirrored from its {@code EB_CYCLE} work case, the outcome and the ARNs created for it. At most one open cycle per programme and policy year.",
+  "package": "eb"
+ },
+ "eb_document": {
+  "doc": "A document in the EB register (BRID-007, 008, 024, 025; design 4.2): the attachment with its document type, process tag and version on a programme and optionally a cycle, and where it came from. A new version supersedes the previous one; rows are never changed otherwise.",
+  "package": "eb"
+ },
+ "eb_feedback": {
+  "doc": "The client's feedback on a cycle (BRID-002, 003; FR-EB-023): channel, date received, the text and / or the files (stored as {@code EB_CLIENT_FEEDBACK} documents of the cycle). Never changed after it is recorded.",
+  "package": "eb"
+ },
+ "eb_franchise_request": {
+  "doc": "A franchise request to an insurer (BRID-026, 027, 029; FR-EB-032, 033), numbered {@code EBF-<yyyy>-nnnnnn}, with its {@code EB_FRANCHISE} work case whose stage it mirrors. Without the partner portal the AO records the insurer's decision with the insurer's reply as evidence; the client is then advised. Only an approved franchise lets the insurer receive the TOR.",
+  "package": "eb"
+ },
+ "eb_insurer_request": {
+  "doc": "A request for proposal sent to an insurer (BRID-009; FR-EB-035), numbered {@code EBR-<yyyy>-nnnnnn}: the TOR version, documents and due date, sent by e-mail. It is answered by the insurer's proposal, declined, or closed by the AO before the comparative.",
+  "package": "eb"
+ },
+ "eb_member": {
+  "doc": "A member of a roster version (FR-EB-054): employee number, name, birth date, gender, civil status, plan, dependants and effective dates. Minimal fields and no health data until the master list fields are confirmed (EBQ15).",
+  "package": "eb"
+ },
+ "eb_member_change": {
+  "doc": "A member change of a programme line (BRID-013, 025; FR-EB-055, 056), numbered {@code EBM-<yyyy>-nnnnnn}, with its {@code EB_MEMBER_CHANGE} work case whose stage it mirrors: lines adding, deleting or changing members, relayed to the insurer, billed (insurer billing or direct billing), validated by Processing (raising the endorsement request of a change with a premium effect) and closed, when its lines are applied to the roster.",
+  "package": "eb"
+ },
+ "eb_programme": {
+  "doc": "An Employee Benefits programme of a client (BRID-006, 022.01; design 4.2): the benefit lines (HMO, GLI, GPA) with the incumbent insurer and current policy, the team, the funding, the HR contacts and the account officer. Numbered {@code EBP-<yyyy>-nnnnnn}; one cycle per policy year ({@link EbCycle}). Created by wave E1-B; read by every EB wave.",
+  "package": "eb"
+ },
+ "eb_programme_contact": {
+  "doc": "A client contact of a programme (design 4.2): HR head, HR officer or finance, with the flags for the renewal advice and SOA e-mails (BRID-001, 021).",
+  "package": "eb"
+ },
+ "eb_programme_line": {
+  "doc": "A benefit line of a programme (design 4.2): benefit line (list EB_BENEFIT_LINE), product, the incumbent insurer, the current policy and ARN (the ARN a renewal renews, BT0 {@code renewal_of_ref}), the period and the headcount.",
+  "package": "eb"
+ },
+ "eb_proposal": {
+  "doc": "An insurer proposal on a cycle (BRID-005.02, 005.03, 010, 015; FR-EB-040, 045), numbered {@code EBPR-<yyyy>-nnnnnn}: the incumbent's indicative terms, a proposal answering a request, or a revised proposal answering a revision request. Without the portal the AO enters it with the insurer's document attached; only a VALIDATED proposal counts in the comparative. A new version of the same insurer supersedes the earlier one.",
+  "package": "eb"
+ },
+ "eb_proposal_factor": {
+  "doc": "A capability factor of a proposal (list EB_CAPABILITY_FACTOR): value and rating 1 to 5.",
+  "package": "eb"
+ },
+ "eb_proposal_item": {
+  "doc": "The answer of a proposal to a TOR item: what is offered and whether it deviates.",
+  "package": "eb"
+ },
+ "eb_proposal_line": {
+  "doc": "The premium of one plan of a benefit line in a proposal.",
+  "package": "eb"
+ },
+ "eb_renewal_advice": {
+  "doc": "The renewal advice of a renewal cycle (BRID-001, 002; design 4.2, 8.1): when and to whom it was sent, by the job {@code EB_RENEWAL_ADVICE} or the AO, the outbox message, the stored {@code RENEWAL_ADVICE} document, the reminders sent and the time the client's feedback stopped them. One per cycle.",
+  "package": "eb"
+ },
+ "eb_required_document": {
+  "doc": "A document required for a process (BRID-026; FR-EB-034): process type x benefit line (blank for every line) x document type, mandatory or optional. Maintained with maker-checker; checked before a franchise request, a submission and the placement trigger.",
+  "package": "eb"
+ },
+ "eb_revision_request": {
+  "doc": "The client's changes relayed to insurers (BRID-012, 015; FR-EB-044, 045): requested changes on TOR items or in free text, and the insurers asked to revise their proposals, each OPEN until its revised proposal is recorded. The request is ANSWERED when every target answered.",
+  "package": "eb"
+ },
+ "eb_roster_version": {
+  "doc": "A version of the member roster of a programme and policy year (BRID-013, 014; FR-EB-054), loaded from the master list through the bulk handler {@code EB_MASTERLIST} as STAGED; the AO reviews the differences with the accepted version and accepts it (the earlier accepted version is superseded and stays readable) or rejects it.",
+  "package": "eb"
+ },
+ "eb_soa": {
+  "doc": "An insurer statement of account of a programme (BRID-021; FR-EB-053), numbered {@code EBS-<yyyy>-nnnnnn}, with its {@code EB_SOA} work case whose stage it mirrors: the insurer's SOA number, period, amount, the stored file and its hash (duplicate check) and the booked invoices it bills. The payment status is read from the invoice ledger, never copied.",
+  "package": "eb"
+ },
+ "eb_submission": {
+  "doc": "Documents submitted to an insurer for a process (BRID-026; FR-EB-034): new-business or renewal placement, adjustment, endorsement, franchise or proposal, on a cycle or a member change, sent by protected e-mail after the required-document check.",
+  "package": "eb"
+ },
+ "eb_threshold_rule": {
+  "doc": "A value threshold above which a comparative needs Management approval (BRID-016; FR-EB-042): per benefit line or all lines, on the TSI or the annual premium of the recommended (or chosen) proposal, with the approver permission and level and the effective dates. Maintained with maker-checker; the values are BDOI's to give (EBQ11).",
+  "package": "eb"
+ },
+ "eb_tor": {
+  "doc": "A version of the Terms of Reference of a cycle (BRID-009; FR-EB-035): structured items per benefit line and plan, maintained while DRAFT and frozen when released. A change after release is a new version; the earlier one is superseded. The standard template per benefit line is an open question (EBQ08).",
+  "package": "eb"
+ },
+ "eb_tor_item": {
+  "doc": "An item of the Terms of Reference: benefit line, plan, description and requirement.",
+  "package": "eb"
+ },
+ "eb_tracked_item": {
+  "doc": "A deliverable BDOI waits for (BRID-030; FR-EB-057): the contract after placement, an HMO card, a card replacement or a billing, owed by the insurer, the client or BDOI, with its due date. The job {@code EB_ITEM_FOLLOWUP} sends the follow-ups of a pending item past due and escalates it after the last one; receiving, releasing or closing it stops them.",
+  "package": "eb"
+ },
+ "fa_asset": {
+  "doc": "Fixed asset register entry.  * <p>Registered by a maker ({@link AssetStatus#PENDING_CAPITALIZATION}), capitalized by a checker (posting the acquisition or, for assets taken over from a legacy register, the opening balance), then depreciated monthly until fully depreciated or disposed. Depreciation starts in the month of acquisition (full-month convention); a take-on asset continues from the month of its take-on date with the opening accumulated depreciation and months already charged.",
+  "package": "fixedasset"
+ },
+ "fa_category": {
+  "doc": "Fixed asset category: the GL accounts an asset posts to and its default depreciation policy (method, useful life, residual value %). Maintained under maker-checker control.",
+  "package": "fixedasset"
+ },
+ "fa_depreciation_line": {
+  "doc": "Depreciation charged to one asset in a run, with its position after the charge.",
+  "package": "fixedasset"
+ },
+ "fa_depreciation_run": {
+  "doc": "A posted monthly depreciation run. At most one per company and period (unique key), which makes the run idempotent: posting a period again returns the existing run.",
+  "package": "fixedasset"
+ },
+ "fa_movement": {
+  "doc": "An addition, disposal or inter-branch transfer of a fixed asset, with the values moved and the journal that accounted for it. Immutable history feeding the asset movement schedule.",
+  "package": "fixedasset"
+ },
+ "fin_schedule_def": {
+  "doc": "An account schedule of the BDOI report pack (FRBS 3.2.0, Appendix A II-IV; report list #9, #45, #46): which accounts, how the rows are grouped, which figures are shown, optional ageing, a comparative period and a commentary column. The engine ({@code finreport.service.ScheduleEngine}) turns a definition into the report {@code GL-SCHEDULE}, so a new schedule is configuration, not code (design section 10).",
+  "package": "finreport"
+ },
+ "fin_statement_comment": {
+  "doc": "Commentary on one row of a schedule for one month (Appendix A II-45 \"variance analysis with commentary\", III FS analysis): kept per company, schedule, period ({@code yyyy-MM}) and row key, printed in the schedule's commentary column.",
+  "package": "finreport"
+ },
+ "frbs_service_fee_item": {
+  "doc": "A fully paid invoice counted in a service-fee line (FRBS 2.10.0). An invoice is in one live run only; cancelling or recomputing the run frees it.",
+  "package": "frbs"
+ },
+ "frbs_service_fee_line": {
+  "doc": "A line of a service-fee run (FRBS 2.10.0-2.10.2): the fee of one service-fee segment, sales unit and currency, its accrual journal, its payout request to Disbursement and the RELEASED and LIQUIDATED tags with their dates and the unit's liquidation report.",
+  "package": "frbs"
+ },
+ "frbs_service_fee_recipient": {
+  "doc": "Who receives the service fee of a sales unit (FRBS 2.10.0; recipients to confirm, AQ20): the payee sent to Disbursement and the cost centre charged by the accrual (account 5614 requires one). A unit without a recipient is paid under its own code and charged to its own cost centre.",
+  "package": "frbs"
+ },
+ "frbs_service_fee_rule": {
+  "doc": "A service-fee rate (FRBS 2.10.0, Appendix A VI): the share of fully paid commission, net of the insurer's withholding tax, paid to the units and referrers of a service-fee segment (LOV {@code SERVICE_FEE_SEGMENT}) for the market segments it covers. The values are BDOI's to confirm (AQ20).",
+  "package": "frbs"
+ },
+ "frbs_service_fee_run": {
+  "doc": "A service-fee run (FRBS 2.10.0; design 5.4, 7.3): the service fee of the invoices fully paid in a period, one line per service-fee segment, unit and currency. Workflow {@code FRBS_SERVICE_FEE}: COMPUTED -&gt; FOR_APPROVAL -&gt; APPROVED (accrued and sent to Disbursement) -&gt; RELEASED -&gt; LIQUIDATED; cancelled before approval.",
+  "package": "frbs"
+ },
+ "fx_revaluation_line": {
+  "doc": "Revalued balance recorded in a revaluation run (FX Revaluation Register).",
+  "package": "closing"
+ },
+ "fx_revaluation_run": {
+  "doc": "FX revaluation run of a company for one accounting period (unique per period: a period is revalued once). Original transactions are never changed; the difference is posted in a separate REVALUATION journal, optionally reversed on the first day of the next period.",
+  "package": "closing"
+ },
+ "gl_ledger_entry": {
+  "doc": "Immutable posted GL transaction line \u2014 the book of record.  * <p>Written only by the posting engine. There are no setters and no update/delete paths; errors are corrected by reversal journals. Debit and credit are stored in separate columns (both in transaction and base currency) so aggregation is a simple SUM.",
+  "package": "ledger"
+ },
+ "ic_relationship": {
+  "doc": "Inter-company relationship of a company pair: the due-from (receivable) and due-to (payable) accounts each company uses for the other. Only active relationships may transact.",
+  "package": "consolidation"
+ },
+ "ic_transaction": {
+  "doc": "Inter-company transaction: one business event recorded by two mirror journals (one per company) sharing the same {@code icReference}, value date and amount.",
+  "package": "consolidation"
+ },
+ "inv_holding": {
+  "doc": "An investment holding (one purchase of one security or deposit).  * <p>Captured by a maker ({@link HoldingStatus#PENDING_APPROVAL}); a checker's approval posts the purchase (or, for a holding brought over from a previous system, the take-on opening balance). The holding then carries its amortized cost, accrued interest receivable and cumulative fair value adjustment, updated by the month-end runs, coupon receipts and fair value updates, until it matures or is sold.",
+  "package": "investment"
+ },
+ "inv_portfolio": {
+  "doc": "Investment portfolio: a PFRS 9 classification with the GL accounts its holdings post to (investment, accrued interest, interest income, realized gain / loss and, for fair valued portfolios, the fair value account - the equity reserve for FVOCI or a profit or loss account for FVPL). Maintained under maker-checker control.",
+  "package": "investment"
+ },
+ "inv_run": {
+  "doc": "A posted month-end accrual or amortization run; unique per company, type and period, so posting a period twice returns the existing run.",
+  "package": "investment"
+ },
+ "inv_transaction": {
+  "doc": "A posted event of a holding, with the holding's position after it. Feeds the interest accrual register and the realized gains report.",
+  "package": "investment"
+ },
+ "iss_document_trigger": {
+  "doc": "A document trigger rule (BRNB.105): uploading a document of a type starts a business action, e.g. an e-policy opens an extraction review task. The automatic booking that follows the policy issue belongs to the booking module, which listens for the POLICY_ISSUED stage.",
+  "package": "issuance"
+ },
+ "iss_epolicy": {
+  "doc": "An e-policy received from the insurer (BRNB.073), stored as an EPOLICY document of the account, with the data extracted from it (BRNB.104), the review that updates the policy number (BRNB.074) and its dispatch to the client (BRNB.077).",
+  "package": "issuance"
+ },
+ "iss_extraction_pattern": {
+  "doc": "A regular expression that reads one field of an insurer's e-policy text (BRNB.104); the first capture group is the value. A pattern without insurer is the default for every insurer.",
+  "package": "issuance"
+ },
+ "iss_insurance_advice": {
+  "doc": "An Insurance Advice IA-yyyy-nnnnnn (BRNB.070): the notice to the mortgagee bank that a mortgaged account is insured, generated from the INSURANCE_ADVICE template. Kept with its PDF for the register (BRNB.060) and sent password protected (BRNB.035).",
+  "package": "issuance"
+ },
+ "iss_upload_batch": {
+  "doc": "A bulk e-policy upload (BRNB.073): the files are held with the account proposed for each (ARN in the file name or in the document) until the user reviews the matches and confirms.",
+  "package": "issuance"
+ },
+ "iss_upload_item": {
+  "doc": "One file of a bulk e-policy upload with its proposed (or chosen) account and outcome.",
+  "package": "issuance"
+ },
+ "jnl_batch": {
+  "doc": "Journal batch (voucher): a balanced set of debit and credit lines posted as one unit.  * <p>Supports every batch shape (1Dr-1Cr, 1Dr-nCr, nDr-1Cr, nDr-nCr). The aggregate owns its lines and enforces the lifecycle in {@link JournalStatus}, including maker-checker segregation.",
+  "package": "journal"
+ },
+ "jnl_line": {
+  "doc": "One debit or credit line of a journal batch.  * <p>{@code amount} is in the line currency; {@code baseAmount} is the company base currency equivalent at {@code exchangeRate}. Amounts are always positive; {@code side} gives direction.",
+  "package": "journal"
+ },
+ "jnl_recurring_occurrence": {
+  "doc": "A generated occurrence of a recurring template. The unique (template, date) key makes generation idempotent: an occurrence is never generated twice, whoever runs it and however often.",
+  "package": "journal"
+ },
+ "jnl_recurring_template": {
+  "doc": "Recurring (standing) journal template, e.g. monthly rent or an accrual that is reversed at the start of the next period. Each occurrence generates a DRAFT journal (or submits it for approval when {@code autoSubmit} is set); generation is idempotent per occurrence date.",
+  "package": "journal"
+ },
+ "lov_type": {
+  "doc": "A list of values, e.g. {@code RETURN_REASON}. Types are seeded by the owning module.",
+  "package": "lov"
+ },
+ "lov_value": {
+  "doc": "One value of a list, valid from {@code effectiveFrom} to {@code effectiveTo} (inclusive, open ended when null). Values are never deleted: they are end-dated or deactivated (BRNB.083).",
+  "package": "lov"
+ },
+ "mig_access_log": {
+  "doc": "An access to the legacy archive (DATA_MIGRATION_DESIGN section 16; FR-DM-111): user, time, source address, action (search, view, download, export), criteria, record keys, result count and reason. Append-only: the database refuses updates and deletes.",
+  "package": "migration"
+ },
+ "mig_archive_record": {
+  "doc": "A legacy archive record (objects C04, P02, G02, H01, H02; DATA_MIGRATION_DESIGN section 16; FR-DM-110): the searchable keys of a closed legacy transaction or history record with its labelled legacy columns. Documents are attachments of type LEGACY_DOCUMENT linked to the record. Read-only for users; the access is logged.",
+  "package": "migration"
+ },
+ "mig_batch": {
+  "doc": "A migration batch (DATA_MIGRATION_DESIGN section 11; FR-DM-013 to 015): one object loaded from one checked extract of each of its layouts, validated with the approved code map versions it records, approved for load (gate G4) by a user other than the operator, loaded, reconciled and signed off, or rolled back. Counts: staged = valid + warning + invalid before the load, and loaded + skipped + rejected + excluded = staged after it.",
+  "package": "migration"
+ },
+ "mig_batch_log": {
+  "doc": "A step of the run log of a batch (DATA_MIGRATION_DESIGN section 11): plan, validation, matching, approval, load, reconciliation, sign-off, rollback and purge, with counts and time.",
+  "package": "migration"
+ },
+ "mig_client_match": {
+  "doc": "A matched pair of legacy clients (DATA_MIGRATION_DESIGN section 9; FR-DM-031): the two staged rows (or a staged row and a client already in BIBS), the score, the keys that matched, the decision (merged automatically, waiting for review, merged or kept separate by the Data Steward) and the values that lost to the survivor.",
+  "package": "migration"
+ },
+ "mig_code_map_entry": {
+  "doc": "An entry of a code map version: the legacy code of a source system and its action (MAP to a target code, DEFAULT, REJECT or CREATE). A PACKAGE entry may carry a qualifier (risk code, insurer or sum-insured band) when one legacy package splits into several BIBS packages.",
+  "package": "migration"
+ },
+ "mig_code_map_set": {
+  "doc": "A code map set (BRID 3.1; DATA_MIGRATION_DESIGN section 7): one per coded domain, for example {@code INSURER}, {@code PRODUCT}, {@code PACKAGE}, {@code LOV:MARKET_SEGMENT}, {@code GL_ACCOUNT} or {@code STATUS:UPP}, with its target domain, the kind of target the approval checks, a default target for DEFAULT entries, and the business owner and data steward.",
+  "package": "migration"
+ },
+ "mig_code_map_version": {
+  "doc": "A version of a code map set (gate G2; FR-DM-011): DRAFT while the Data Steward edits it, SUBMITTED to the business owner, APPROVED (one per set; the previous approved version becomes SUPERSEDED). The approver is never the submitter. A batch records the version it was validated with.",
+  "package": "migration"
+ },
+ "mig_cutover_plan": {
+  "doc": "A cutover plan (DATA_MIGRATION_DESIGN section 17.1; FR-DM-120): a mock, the dress rehearsal or the production cut-over, with its environment, go-live date, freeze window and status; its tasks and go / no-go criteria are separate records.",
+  "package": "migration"
+ },
+ "mig_cutover_task": {
+  "doc": "A task of a cutover plan: sequence, phase, task, owner role, the object it loads, dependencies, planned and actual times, status and evidence. The runbook is the export of the tasks.",
+  "package": "migration"
+ },
+ "mig_data_object": {
+  "doc": "A data object of the migration register (BRID 1.1a; FR-DM-001): source systems, target in BIBS, business owner and data steward, the four criteria of the BRD (Day-1 need, compliance need, read-only / archival option, data trust), the proposed and the decided class, dependencies and load order. An object is never deleted, only decided as EXCLUDED.",
+  "package": "migration"
+ },
+ "mig_decommission_item": {
+  "doc": "A criterion of a decommissioning checklist (DATA_MIGRATION_DESIGN section 17.6; FR-DM-123): per legacy system (milestone SYSTEM) or for the legacy context in BIBS (milestone CONTEXT), with its evidence, status and signature.",
+  "package": "migration"
+ },
+ "mig_extract": {
+  "doc": "A source extract (DATA_MIGRATION_DESIGN section 6; FR-DM-010): one file of one layout, source system and as-of date with its control file, the SHA-256, the declared and parsed counts, the control totals and the result of the intake checks. The files are in the file store (record class MIGRATION_EXTRACT); the counts, hashes and totals survive the purge as reconciliation evidence.",
+  "package": "migration"
+ },
+ "mig_gonogo_criterion": {
+  "doc": "A go / no-go criterion of a plan (DATA_MIGRATION_DESIGN section 17.5; FR-DM-121) with its threshold and its measured value: measured by BIBS for the reconciliation, sign-off and queue criteria, entered with a note for the manual ones (smoke test, snapshot, roster, signatures).",
+  "package": "migration"
+ },
+ "mig_gonogo_decision": {
+  "doc": "A go / no-go decision of a plan (gate G7) with the criteria met at the time.",
+  "package": "migration"
+ },
+ "mig_issue": {
+  "doc": "A data-quality issue of a staged row (DATA_MIGRATION_DESIGN section 8; FR-DM-013): the rule, its severity, the field and value and the message, and how the issue was resolved (fixed at source, mapped, waived by the data owner with a reason, or the row excluded with a manual-entry plan).",
+  "package": "migration"
+ },
+ "mig_key_xref": {
+  "doc": "The cross-reference of a loaded record from its legacy key (DATA_MIGRATION_DESIGN section 11): source system, object and legacy key to the BIBS entity, id and code, the batch that loaded it and the hash of the loaded row. It makes loads rerunnable (same key and hash: skipped) and lets users find a migrated record by its legacy key. A rolled-back entry keeps its row with the time.",
+  "package": "migration"
+ },
+ "mig_layout": {
+  "doc": "A version of an extract layout (DATA_MIGRATION_DESIGN section 5.1; FR-DM-010): the columns of one file of a data object, its key and the rule of the hash total of its control file. A file whose header does not match the FROZEN version in force is rejected. The layouts drive the data requirements workbook and the load templates exported from the console.",
+  "package": "migration"
+ },
+ "mig_layout_column": {
+  "doc": "A column of a layout version: name as in the header row, type, length, mandatory (Y, N or C for conditional), allowed values, the code map set of a coded column, format, example, BIBS target and the validation rule, as published in the data requirements workbook.",
+  "package": "migration"
+ },
+ "mig_masking_rule": {
+  "doc": "A masking rule (DATA_MIGRATION_DESIGN section 5.3): a column of a layout whose values are masked before staging when the environment is not production.",
+  "package": "migration"
+ },
+ "mig_object_decision": {
+  "doc": "A decision of the class of a data object (gate G1; FR-DM-002): submitted by the Data Migration Lead with the criteria and the rationale, approved or returned by the business owner of the object, never by the submitter. The history of decisions of an object is kept.",
+  "package": "migration"
+ },
+ "mig_package_map": {
+  "doc": "An entry of the package map of the legacy packages (object R06, table {@code mig_package_map}; DATA_MIGRATION_DESIGN section 15.2): a legacy package and version, optionally split by risk code, insurer or sum-insured band, mapped to a BIBS package version maintained by TSU or rejected. The entries are handed to the Renewal package map used at Renewal sanitation.",
+  "package": "migration"
+ },
+ "mig_ra_sent": {
+  "doc": "A renewal advice sent by hand before go-live (object P03; DATA_MIGRATION_DESIGN section 15.1; FR-DM-125): linked to the migrated header by the legacy policy reference, served to Renewal with the header in the go-live extraction so that the advice is not sent again.",
+  "package": "migration"
+ },
+ "mig_recon_line": {
+  "doc": "A line of a reconciliation run: level, measure and currency with the source (control file), staged and target values, the difference against the tolerance and the status. A BREAK needs an explanation with a reason, approved by a reconciliation approver other than the user who explained it.",
+  "package": "migration"
+ },
+ "mig_recon_run": {
+  "doc": "A reconciliation run of a batch or of a true-up (DATA_MIGRATION_DESIGN section 12; FR-DM-020): its lines per level (L1 count, L2 amount, L3 hash, L4 field, L5 GL; TU for the true-up checks) and its status: MATCHED, BREAKS while a break is open, EXPLAINED when every break has an approved explanation, SIGNED at gate G5.",
+  "package": "migration"
+ },
+ "mig_resubmission": {
+  "doc": "A resubmission of corrected rejected rows (workflow MIG_RESUBMISSION; DATA_MIGRATION_DESIGN section 15.1): the maker's corrected file of a batch, approved or returned by a checker who is never the maker; an approved resubmission is loaded as a RERUN batch of the parent.",
+  "package": "migration"
+ },
+ "mig_rule": {
+  "doc": "A data-quality rule of the catalogue (DATA_MIGRATION_DESIGN section 8; workbook rules DQ-001 to DQ-056): layouts it applies to, columns, kind, severity and the message shown on the issue. The Data Steward may switch a rule off or change its severity; the check itself is implemented by the rule engine under the rule code.",
+  "package": "migration"
+ },
+ "mig_runoff_cohort": {
+  "doc": "A run-off cohort of a monthly snapshot (DATA_MIGRATION_DESIGN section 15.2; FR-DM-122): the migrated headers in force at go-live expiring in a month, per source system, with how many were renewed in BIBS, not renewed, lapsed or are still open.",
+  "package": "migration"
+ },
+ "mig_signoff": {
+  "doc": "A sign-off of a gate (DATA_MIGRATION_DESIGN section 13; FR-DM-003): object, batch, gate, the role and user who signed, the decision, comment, time and optional evidence file. Sign-offs are never changed; a correction is a new sign-off.",
+  "package": "migration"
+ },
+ "mig_stage_row": {
+  "doc": "A staged row of an extract (DATA_MIGRATION_DESIGN section 6): the raw values as received (masked outside production), the values after the code maps, the SHA-256 of the raw values, the status and, once loaded, the target record. Rows are inserted in pages by the intake and purged with the retention of the batch.",
+  "package": "migration"
+ },
+ "mig_survivorship_rule": {
+  "doc": "A survivorship rule of client matching (DATA_MIGRATION_DESIGN section 9): for a field of the merged client, the first non-blank value by source priority, or the most recently updated value.",
+  "package": "migration"
+ },
+ "mig_tb_line": {
+  "doc": "A line of a legacy trial balance loaded by object G01 (DATA_MIGRATION_DESIGN 17.7): the provisional opening or a true-up version (TU1-TU3, FINAL), mapped to the BIBS account, kept for the movement and balance checks of the true-up reconciliation.",
+  "package": "migration"
+ },
+ "mig_trueup": {
+  "doc": "A FY2027 opening-balance true-up (object G03; DATA_MIGRATION_DESIGN section 17.7; FR-DM-023 and 024): prepared by the Comptrollership GL lead from a validated G03 batch and the legacy trial balance of the same true-up, approved by the Head of Comptrollership (never the preparer), posted as opening-balance adjustment journals and open-item adjustments, reconciled and signed. It keeps the evidence and is not purged with the staging data.",
+  "package": "migration"
+ },
+ "msg_notification": {
+  "doc": "An in-app notification for one user (header bell), e.g. \"Account returned by Processing\".",
+  "package": "messaging"
+ },
+ "msg_notification_event": {
+  "doc": "An event users can be notified about, with its default channels (RMTID.034). Seeded by the modules that raise it; users override the defaults with a {@link NotificationPreference}.",
+  "package": "messaging"
+ },
+ "msg_notification_preference": {
+  "doc": "A user's choice of channels for one notification event (RMTID.034).",
+  "package": "messaging"
+ },
+ "msg_outbound": {
+  "doc": "An e-mail in the outbox. The row is the send log: recipients, subject, body, attempts, outcome and time (BRNB.008). It is linked to the business record it concerns ({@code entityType}, {@code entityId}, {@code reference}) so every module can show what was sent for a record.",
+  "package": "messaging"
+ },
+ "msg_outbound_attachment": {
+  "doc": "A file attached to an outbound e-mail, stored as sent (protected when requested). The content is in the file store ({@code stored_file}, build step ST1); attachments queued before ST1 keep their bytes in {@code content} until {@code FILE_BYTEA_MIGRATION} copies them.",
+  "package": "messaging"
+ },
+ "nba_access_request": {
+  "doc": "A request to enrol, modify, deactivate or reactivate a user, or to create, change, deactivate or reactivate a group profile (BRNB.085; BRD 1.002-1.009, 3.002; PMADD05). It is saved as a draft, submitted to the approver(s) chosen by the requester, approved in order (with a second approval for risky changes, UAM-NFR-40), and then applied by the system, scheduled for its effective date or, for group profiles, implemented by the System Administrator (USER_ACCESS_DESIGN section 4.3). The change itself is applied by the service; this entity keeps the state machine.",
+  "package": "nbadmin"
+ },
+ "nba_access_request_approver": {
+  "doc": "One approver of an access request, in order (BRD 1.002.1.1.3 \"select approver\", BRD 3.002.x \"approver/s\"): user requests have one, group-profile requests one or more, each deciding in turn.",
+  "package": "nbadmin"
+ },
+ "nba_access_request_batch": {
+  "doc": "A bulk access request (BRD 1.009): one line request ({@link AccessRequest} with this batch) per row of the uploaded file. The batch is submitted and decided as a whole (UQ10); its status mirrors the statuses of its lines.",
+  "package": "nbadmin"
+ },
+ "nba_access_request_event": {
+  "doc": "One event in the history of an access request with its remarks (BRD 1.002.1.1.4-5 \"add / save remarks\", 1.006, 1.008, 2.002.7). Insert-only: a database trigger rejects update, delete and truncate (V1062).",
+  "package": "nbadmin"
+ },
+ "nba_retention_rule": {
+  "doc": "A data retention rule (BRNB.106, NFR retention): records of a type in one of the statuses become eligible once they have been inactive for {@code yearsOnline} years; they are then kept {@code yearsArchive} more years in the archive.",
+  "package": "nbadmin"
+ },
+ "nba_retention_run": {
+  "doc": "Result of one retention review of one rule: how many records were eligible (BRNB.106).",
+  "package": "nbadmin"
+ },
+ "nba_sod_rule": {
+  "doc": "A separation-of-duties rule: two group profiles that one user may not hold together (V1065). Created and deactivated under maker-checker: a new rule is Pending Authorization until another user authorises it; the deactivation of an active rule waits for the same authorisation.",
+  "package": "nbadmin"
+ },
+ "nbr_report_variant": {
+  "doc": "A saved report variant (BRNB.057): the parameters of a report saved by a user under a name, optionally shared with every user who may run the report. The ad-hoc report builder is parked (Q40).",
+  "package": "nbreport"
+ },
+ "nbr_sales_target": {
+  "doc": "Production target of a sales unit for a period, in PHP (BRNB.075): booked accounts, premium and commission. The hierarchy and target values are open with BDOI (Q41); the seed data seeds sample targets only.",
+  "package": "nbreport"
+ },
+ "npk_insurer_response": {
+  "doc": "The response of one insurer to the quotation slip of a PRF (BRNB.009): premium, rate, deductibles, conditions, validity, remarks and the response document; the recommended flag feeds the comparative table (BRNB.010). Every change raises the revision and is kept in {@link InsurerResponseHistory}.",
+  "package": "nonpackage"
+ },
+ "npk_insurer_response_history": {
+  "doc": "Insert-only snapshot of an insurer response after each change (BRNB.009 version history).",
+  "package": "nonpackage"
+ },
+ "npk_proposal": {
+  "doc": "A Proposal Request Form (BRNB.005/006): a non-package risk that TSU prices with the insurers. It carries its marketing reference (PRF number) and its Account Reference Number from creation (BRNB.102), the quotation slip, the chosen insurer and the proposal slip. The status mirrors the NB_PROPOSAL work case.",
+  "package": "nonpackage"
+ },
+ "ops_disbursement_request": {
+  "doc": "A payment request in the in-app Disbursement queue, the default {@code DisbursementGateway} until the Disbursement system and BRD are known (OQ02): remittances to insurers (RMTID.011), refunds (CSHID.024), BIR 2307 reports (DBMID.001) and incentive pass-on (CMRID.006). Status: SENT, ACKNOWLEDGED, DV_ASSIGNED, PAID, RETURNED or CANCELLED.  * <p>BRD-5 (DIS 3.25.0, 2.20.0, 3.27.2) extends the request with the RFP number, payee class, disbursement type, root invoice, supporting documents, accounting references to settle, the straight-to-approval routing and the DV / instrument statuses reported by Disbursement (V765).",
+  "package": "opsledger"
+ },
+ "ops_extract_file": {
+  "doc": "A file in the in-system extract repository, the default {@code FileDropPort} in place of the shared-drive folders (RMTID.001 one folder per remittance type, CMRID.001 DP lists; OQ17): kept with folder, name, checksum and the module that produced it. The content is in the file store ({@code stored_file}, build step ST1); files kept before ST1 have their bytes in {@code content} until {@code FILE_BYTEA_MIGRATION} copies them.",
+  "package": "opsledger"
+ },
+ "ops_flow_in_feed": {
+  "doc": "A data feed between BrokerVerse and another system (BRQID.004): partner, direction, transport, owner module, schedule and whether it is active. Seeded in V761; each Operations module owns its feeds.",
+  "package": "opsledger"
+ },
+ "ops_flow_in_record": {
+  "doc": "One record received through a feed, keyed by its idempotency key so it is processed once (BRQID.005 \"no duplicates\"), with the hash of its payload. A failed record may be sent again: the next attempt replaces its outcome.",
+  "package": "opsledger"
+ },
+ "ops_flow_in_run": {
+  "doc": "One run of a feed with its counts and outcome: the fetch log of BRQID.005 (timestamp, status, records read, accepted, duplicates and failures, error detail).",
+  "package": "opsledger"
+ },
+ "ops_handoff": {
+  "doc": "Work handed over through a port whose owning module is not active (the default adapters of {@code ReceiptIssuer} and {@code UnappliedSink}): an OR to issue or an unapplied item to set up by hand. Listed on the Interfaces screen until someone closes it; never a simulated result.",
+  "package": "opsledger"
+ },
+ "ops_invoice": {
+  "doc": "A booked invoice or endorsement invoice in the Operations ledger (OPERATIONS_DESIGN 4.1): header facts, insurer shares (ADJID.027), components with balances, payment and remittance status (RMTID.019/032), flags and the lock of the module working on it (RMTID.040).",
+  "package": "opsledger"
+ },
+ "ops_invoice_adjustment_total": {
+  "doc": "Cumulative adjustments of an original invoice against its original premium, DTIP and commission (ADJID.028 over-adjustment control): every endorsement or cancellation invoice booked against the original adds its amounts.",
+  "package": "opsledger"
+ },
+ "ops_invoice_component": {
+  "doc": "One component of an Operations invoice with its buckets and outstanding balance (CSHID.022, RMTID.038): {@code balance = booked + adjusted - applied + reversed - remitted - writtenOff}.",
+  "package": "opsledger"
+ },
+ "ops_invoice_movement": {
+  "doc": "One movement of one invoice component, immutable (RMTID.038 payment and remittance history, ADJID.024). Idempotent on source module, source reference, invoice, component and type.",
+  "package": "opsledger"
+ },
+ "ops_invoice_origin_snapshot": {
+  "doc": "The frozen original values of an open legacy invoice (DATA_MIGRATION_DESIGN 14.1, BRID 10.1): header amounts and, per component, the booked, adjusted, paid, remitted, written-off and open amounts at cut-over, written once by the legacy invoice intake and never updated. It is the \"original value\" of the legacy changes report and of the legacy block of the invoice 360.",
+  "package": "opsledger"
+ },
+ "ops_invoice_status_change": {
+  "doc": "One change of an invoice's statuses, flags or lock, with who, when and why (RMTID.032 hold and remittance status history, RMTID.040 lock log).",
+  "package": "opsledger"
+ },
+ "org_branch": {
+  "doc": "Branch / office / customer centre of a company (Office Master).",
+  "package": "organization"
+ },
+ "org_company": {
+  "doc": "Legal entity keeping its own books (base currency, fiscal calendar and posting windows).  * <p>{@code backValueDays}/{@code forwardValueDays} implement the company-level value-date window for journals (supplementary / back-dated transaction control).  * <p>The company also carries the client profile used by documents, screens and labels (short name, group name, logo reference, head-office code, default bank account code), so no client identity is written into the platform code.",
+  "package": "organization"
+ },
+ "org_employee": {
+  "doc": "Employee with the cost centre used for employee payments, cash advances and headcount reports (DIS 3.30.1 / 3.30.2). A separated employee is inactive and kept for history.",
+  "package": "organization"
+ },
+ "org_holiday": {
+  "doc": "Holiday calendar entry. A null {@code branchId} means a company-wide (global) holiday.",
+  "package": "organization"
+ },
+ "pay_bank_account": {
+  "doc": "Company bank account (house bank). Master data under maker-checker control, shared by payments, receipts, PDC registers and bank reconciliation.  * <p>Each bank account maps one-to-one to a postable GL account of a bank category (the {@code BANK} account role of receipt and payment events). The optional PDC clearing account is the liability credited when a post-dated cheque is issued on this account. Other modules read bank accounts through {@code payables.service.BankAccountQueryService}.  * <p>Disbursement (DIS 2.24.2) tags an account active or inactive with maker-checker: an inactive account is not {@link #isActive() active} and is refused for new payments.",
+  "package": "payables"
+ },
+ "pay_cheque_book": {
+  "doc": "Range of pre-printed cheque leaves of a bank account; hands out leaves in order.",
+  "package": "payables"
+ },
+ "pay_pdc_event": {
+  "doc": "Status history (confirmation audit trail) of a post-dated cheque issued. Insert only.",
+  "package": "payables"
+ },
+ "pay_pdc_issued": {
+  "doc": "Post-dated cheque issued (PDC register entry), created when a PDC payment voucher is approved.  * <p>Status flow: ISSUED \u2192 DUE (cheque date reached) \u2192 PRESENTED (confirmed; PDC liability cleared against the bank) \u2192 CLEARED (matched with the bank statement). An outstanding cheque can be CANCELLED (payment reversed) or REPLACED by a new cheque for the same payment. Dates of every transition are kept so the register can be reproduced as of any date.",
+  "package": "payables"
+ },
+ "pay_petty_cash_disbursement": {
+  "doc": "Petty cash disbursement voucher: an expense paid in cash from a fund. Approved vouchers are posted (Dr expense / Cr petty cash) and wait for reimbursement.",
+  "package": "payables"
+ },
+ "pay_petty_cash_fund": {
+  "doc": "Imprest petty cash fund (box) of a branch.  * <p>Imprest rule: the fund is established at its imprest amount; disbursements reduce the cash in the box and can never exceed it; reimbursements restore the cash but never above the imprest amount. Hence at all times {@code 0 <= cash balance <= imprest}, and cash + vouchers pending reimbursement = imprest.",
+  "package": "payables"
+ },
+ "pay_petty_cash_reimbursement": {
+  "doc": "Reimbursement (replenishment) claim of a petty cash fund: groups approved disbursement vouchers; once approved the bank refills the box by their total (Dr petty cash / Cr bank).",
+  "package": "payables"
+ },
+ "pay_supplier_invoice": {
+  "doc": "Supplier invoice (accounts payable document).  * <p>Lifecycle DRAFT \u2192 PENDING_APPROVAL \u2192 APPROVED, or CANCELLED before approval. On approval the service publishes the accounting events and records the CREDIT open item of the supplier; the invoice then becomes immutable.",
+  "package": "payables"
+ },
+ "pay_supplier_invoice_line": {
+  "doc": "Expense line of a supplier invoice with its computed input VAT and withholding tax.",
+  "package": "payables"
+ },
+ "pay_voucher": {
+  "doc": "Payment voucher: pays one or more open CREDIT items (payables) of one party by cheque, bank transfer or post-dated cheque.  * <p>Lifecycle DRAFT \u2192 PENDING_APPROVAL \u2192 APPROVED (posted) \u2192 VOIDED (reversal of an unpresented cheque or a cancelled PDC); CANCELLED before approval.",
+  "package": "payables"
+ },
+ "pay_voucher_allocation": {
+  "doc": "Payable open item settled by a payment voucher, with the amount paid against it.",
+  "package": "payables"
+ },
+ "per_fiscal_year": {
+  "doc": "Financial year of a company (fiscal or calendar, per company parameter).",
+  "package": "period"
+ },
+ "per_period": {
+  "doc": "Monthly accounting period with a controlled status lifecycle (see {@link PeriodStatus}).",
+  "package": "period"
+ },
+ "plc_billing_batch": {
+  "doc": "A CLPC billing batch (BRNB.067): the CBG Fire accounts awaiting payment billed on one file. The file is regenerated from the items on every download (.xlsx or .ods); the transport to CLPC is parked (Q28).",
+  "package": "placement"
+ },
+ "plc_billing_item": {
+  "doc": "One account on a CLPC billing batch (BRNB.067) with its payment outcome.",
+  "package": "placement"
+ },
+ "plc_hold_cover": {
+  "doc": "A hold cover requested from the insurer while the placement completes (BRNB.072) and its confirmation by the insurer with reference and date (BRNB.103). Expiry is monitored by the HOLD_COVER_EXPIRY job.",
+  "package": "placement"
+ },
+ "plc_insurer_return": {
+  "doc": "A placement returned by the insurer with its reason and remarks (BRNB.034/059), and how the return was resolved: resubmitted, returned to Marketing or cancelled (return queue).",
+  "package": "placement"
+ },
+ "plc_payment_evidence": {
+  "doc": "The evidence behind a payment gate decision (BRD 2.3.1, BRNB.067/068/114): a matched payment with its source and reference, or a client confirmation with the user and date (created by / at). Placement keeps only the evidence, never receipts or cash entries.",
+  "package": "placement"
+ },
+ "plc_payment_gate_rule": {
+  "doc": "One row of the payment gate rule table (BRD 2.3.1, BRNB.068): the rule for a market segment and product line; a blank segment or line matches any. The first active rule by priority applies.",
+  "package": "placement"
+ },
+ "plc_payment_report": {
+  "doc": "An uploaded payment report and its match (BRNB.067/068): a CLPC report matched by PN or loan application number against a billing batch, or a report of the other segments matched by ARN. Confirming it opens the payment gate of the matched, paid accounts.",
+  "package": "placement"
+ },
+ "plc_payment_report_line": {
+  "doc": "One line of a payment report with its match (matched, unpaid, unmatched or ambiguous).",
+  "package": "placement"
+ },
+ "plc_slip": {
+  "doc": "A placement slip PL-yyyy-nnnnnn for one insurer branch (BRNB.069), covering one or more accounts. A slip regenerated after an insurer return keeps its number with the next version; the previous version stays as SUPERSEDED. Sending records the placement of its accounts (BRNB.071).",
+  "package": "placement"
+ },
+ "plc_slip_file": {
+  "doc": "A rendered placement slip file (PDF or XLSX) with its checksum. The content is in the file store ({@code stored_file}, build step ST1); files rendered before ST1 keep their bytes in {@code content} until {@code FILE_BYTEA_MIGRATION} copies them.",
+  "package": "placement"
+ },
+ "pm_advisory": {
+  "doc": "A package advisory (BRPM.016): drafted automatically when a request's version is released or its package retired, edited by TSU, and sent to the recipient groups (list PKG_ADVISORY_GROUP) with the supporting documents. Sending is blocked while the required documents are missing.",
+  "package": "productmaint"
+ },
+ "pm_comparative_output": {
+  "doc": "A stored comparative output of a package request (BRPM.014, PMADD03): the audit MASTER compiled from a negotiation round (one current master per request; earlier masters are kept as superseded), or a CLIENT view derived from a master with selected fields and insurers. The compiled table is kept as JSON ({@code content}) so every file is rendered from the values the output was generated with; the PDF is attached to the request with its SHA-256.",
+  "package": "productmaint"
+ },
+ "pm_insurer_response": {
+  "doc": "The response of one insurer in one negotiation round (BRPM.013, PMADD04): the outcome (list PKG_RESPONSE_OUTCOME, including the exception states), rate, minimum premium, terms per coverage (JSON), conditions, validity and the response document. Every change raises the revision and is kept in {@link PackageResponseHistory}; the last quotation slip e-mail is kept for the resend.",
+  "package": "productmaint"
+ },
+ "pm_insurer_response_history": {
+  "doc": "Insert-only snapshot of a package insurer response after each change (PMADD04: every revision and outcome change is logged).",
+  "package": "productmaint"
+ },
+ "pm_negotiation_round": {
+  "doc": "One negotiation round of a package request (BRPM.010/012, PMADD04): its quotation slip (number, template version, notes, reply date), the insurers approached, the four-eyes approval and the send time. A round is locked at the ManCom sign-off (QS editable until then, BRPM.012).",
+  "package": "productmaint"
+ },
+ "pm_request": {
+  "doc": "A package request (BRPM.008-017; design section 4.4): the Package Request Form with its client or programme, line, cover type, target product, reason and requested terms; the approvals of Marketing, the TSU Team Lead and the TSU Head; the proposed terms after negotiation; and the catalog version the MBS set-up produced. The status mirrors the PM_PACKAGE_REQUEST work case. Terms are JSON ({@link PackageTerms}) written by the service's codec.",
+  "package": "productmaint"
+ },
+ "pm_signoff": {
+  "doc": "A ManCom decision on the requirements of a package request (BRPM.015, PQ07): signed off (the request goes to MBS) or returned to TSU; the signed sheet is an optional attachment.",
+  "package": "productmaint"
+ },
+ "prc_cycle": {
+  "doc": "A reconciliation cycle: one insurer and one production month (OPERATIONS_DESIGN 7, workflow {@code OPS_RECON}): register extracted, sent to the insurer, insurer feedback uploaded and reconciled, closed. The stage mirrors the work case; once closed, a new cycle can be opened for the same insurer and month.",
+  "package": "prodrecon"
+ },
+ "prc_extract": {
+  "doc": "A production register extract of a cycle (PRCID.001-008/011/020/034): booking period, trigger, file name (PRODRECON_FILE_PATTERN), repository file and checksum, number of lines, and when and to whom it was sent.",
+  "package": "prodrecon"
+ },
+ "prc_extract_line": {
+  "doc": "One booked invoice of a production register as it was sent (Annex IV #5 Production Register, PRCID.006/020): an immutable snapshot of the ledger invoice at extraction time.",
+  "package": "prodrecon"
+ },
+ "prc_item": {
+  "doc": "One reconciliation item of a cycle (PRCID.012-030/033): a booked invoice (BDOI side), an insurer production line (insurer side) or both once paired, with its status bucket, the fields that differ beyond the tolerance, the pre-booked account found for insurer production, and the feedback and disposition recorded by the reconciliation handler.",
+  "package": "prodrecon"
+ },
+ "prc_schedule": {
+  "doc": "Extraction schedule of an insurer's production register (PRCID.001): frequency, run day and the next run date (rolled to the next working day by the job). The frequency per insurer is parked with BDOI (OQ29); every schedule is maintained on the Schedules screen.",
+  "package": "prodrecon"
+ },
+ "prc_upload": {
+  "doc": "One attempt to upload an insurer production report (PRCID.009/010/031/032): file, checksum, attempt number per insurer and month, outcome with row counts and the flow-in run, including refused duplicates.",
+  "package": "prodrecon"
+ },
+ "prq_liquidation": {
+  "doc": "Liquidation of a disbursed cash advance (Appendix D Cash Advance Liquidation Form; in scope if confirmed, AQ18): fieldwork days with their expenses, the over / (short) against the cash advanced, and the journal of event {@code PRQ_CA_LIQUIDATION} once posted.",
+  "package": "payrequest"
+ },
+ "prq_liquidation_account": {
+  "doc": "The GL account Comptrollership assigns to an account role of the liquidation event {@code PRQ_CA_LIQUIDATION} (PER_DIEM, REPRESENTATION, TRANSPORT, LODGING, OTHER, CASH). Configuration, not code: the real accounts come with the BDOI chart (AQ02, OQ07).",
+  "package": "payrequest"
+ },
+ "prq_liquidation_line": {
+  "doc": "One fieldwork day of a Cash Advance Liquidation Form (Appendix D): date, particulars and the expenses per category.",
+  "package": "payrequest"
+ },
+ "prq_request": {
+  "doc": "A Marketing request for a payment or a check cancellation (MKT 1.2.0-2.26.0; ACCOUNTING_DISBURSEMENT_DESIGN 5.2): a Refund Request Form with its lines, a Request for Payment of an employee cash advance, or the cancellation of a disbursed check. Its stage mirrors the work case of the kind's workflow; approved requests are paid through the Operations {@code DisbursementGateway} and the Disbursement statuses are tracked on it.",
+  "package": "payrequest"
+ },
+ "prq_request_line": {
+  "doc": "One account of a Refund Request Form (Appendix D, MKT 1.10.0): AR number, client, assured, amount, reason, branch / unit, categories and account or check name. A live line blocks another refund of the same AR number (MKT 2.23.0); the line stops being live when its request is cancelled.",
+  "package": "payrequest"
+ },
+ "prq_validation": {
+  "doc": "A validation task of a refund of a cancelled policy (MKT 1.11.0, ACSL 2.5.5): ACSL checks the cancelled premium and the insurer's return, Cashiering confirms the reinstatement to the unapplied list with a new AR number. One task per validator and refund line and per round; the source reference {@code <request>#<round>:<line>} is the idempotency key of the port.",
+  "package": "payrequest"
+ },
+ "pty_party": {
+  "doc": "Business partner master: policyholders, intermediaries, reinsurers, coinsurers and suppliers.  * <p>The party {@code code} is the sub-ledger key carried on journal lines ({@code party_code}) and open items, so control account balances can be analysed by party.",
+  "package": "party"
+ },
+ "quo_quotation": {
+  "doc": "A package quotation (BRNB.043): one client (a prospect is allowed, BRNB.063), one product, its Account Reference Number from creation (BRNB.102) and numbered versions of its content (BRNB.020). The header carries the figures of the current version for lists and search; the status mirrors the NB_QUOTATION work case.",
+  "package": "quotation"
+ },
+ "quo_request": {
+  "doc": "A quotation request waiting to be quoted (BRNB.041, staging of BRNB.023): captured from an e-mail (attached as REQUEST_EMAIL), uploaded in bulk or delivered by a source system. It names an existing client or only the prospect's details.",
+  "package": "quotation"
+ },
+ "quo_version": {
+  "doc": "One version of a quotation's content (BRNB.020), stored as JSON. A version is frozen when the quotation is submitted and never changes afterwards; the next change opens a new version.",
+  "package": "quotation"
+ },
+ "rcv_deposit_slip": {
+  "doc": "Bank deposit (pay-in) slip grouping cash and cheque receipts taken to one bank account. The bank usually shows one credit per slip, which the reconciliation matches to the slip's receipts.",
+  "package": "receivables"
+ },
+ "rcv_pdc": {
+  "doc": "Post-dated cheque received (PDC register).  * <p>Accounting treatment: memorandum only while the cheque is held (ON_HAND / DUE); nothing is posted to the GL. When the cheque is banked it is converted into an official receipt (mode PDC) that is approved and accounted for like any other receipt; a bounce reverses that receipt.",
+  "package": "receivables"
+ },
+ "rcv_pdc_event": {
+  "doc": "Status change of a post-dated cheque (confirmation audit trail).",
+  "package": "receivables"
+ },
+ "rcv_receipt": {
+  "doc": "Official receipt (collection) of money from a policyholder, intermediary, reinsurer or other payer.  * <p>Maker-checker: a receipt is entered PENDING_APPROVAL and accounted for only when a different user approves it. The approved amount is split into an applied part (matched to the payer's debit notes) and an unapplied part kept on account.",
+  "package": "receivables"
+ },
+ "rcv_receipt_allocation": {
+  "doc": "Part of a receipt applied to one debit open item (debit note). The sub-ledger match is recorded when the receipt is approved (or when unapplied money is applied later).",
+  "package": "receivables"
+ },
+ "rem_batch": {
+  "doc": "A remittance batch {@code RMB-<insurer>-<yyyy>} of one insurer, remittance type and currency (RMTID.007/008): its lines, the totals of the lines not excluded (RMTID.002), the stage of the Process Remittance workflow (RMTID.009-011/019/036), the Disbursement request and DV number, the commission and incentive ORs (CSHID.007, RMTID.023) and the schedule sent to the insurer (MKTID.001).",
+  "package": "remittance"
+ },
+ "rem_batch_document": {
+  "doc": "A document stored on a batch at submission (RMTID.011): the remittance schedule (PDF and Excel) and the payment request, with the template version used (BRNB.004 convention). The content is in the file store ({@code stored_file}, build step ST1); documents stored before ST1 keep their bytes in {@code content} until {@code FILE_BYTEA_MIGRATION} copies them.",
+  "package": "remittance"
+ },
+ "rem_batch_line": {
+  "doc": "One invoice of a remittance batch (OPERATIONS_DESIGN 4.3): the invoice facts printed on the schedule, the read-only amounts (RMTID.002 addendum), the exclusion with its reason, user and restore (RMTID.002), the insurer OR and its comparison with the paid AR (RMTID.012/013/016).",
+  "package": "remittance"
+ },
+ "rem_deduction": {
+  "doc": "A remittance deduction {@code RDN-<yyyy>-n} (ACSL 2.9.2; ACCOUNTING_DISBURSEMENT_DESIGN 12.2): an amount the insurer confirmed in writing (for example an AR insurer's refund after a return premium) that BDOI deducts from its next remittance to that insurer. Prepared by ACSL, submitted with the insurer's confirmation, confirmed by another user (REMIT_DEDUCTION_CONFIRM), then consumed by the next approved batches of the insurer and currency, each time capped at what the batch pays (workflow {@code REM_DEDUCTION}).",
+  "package": "remittance"
+ },
+ "rem_deduction_application": {
+  "doc": "The part of a remittance deduction consumed by one send cycle of a batch (ACSL 2.9.2), with the journal of its {@code OPS_REMIT_DEDUCTION} posting; reversed when the batch's DV is cancelled (DIS 2.20.0).",
+  "package": "remittance"
+ },
+ "rem_eod_request": {
+  "doc": "An invoice looked up for remittance during the day and queued for the end-of-day extraction (RMTID.005): one request per invoice and day, so a search never triggers twice; the run records the tag it gave. The exact meaning of the BRD rule is parked (OQ18).",
+  "package": "remittance"
+ },
+ "rem_extraction_run": {
+  "doc": "One remittance extraction run (RMTID.001/003/004/005): trigger, scope (insurer, type or invoice), business date, counts per tag and the batches created. Every run is logged, also when it fails (REMIT_EXTRACTION_FAILED).",
+  "package": "remittance"
+ },
+ "rem_extraction_tag": {
+  "doc": "The extraction tag an invoice received (RMTID.003): EXTRACTED with its batch, UNEXTRACTED_DUE with the exclusion reasons (RMTID.014/017/020/022/031), UNEXTRACTED_NOT_DUE, or RETURNED when a user returned it from a batch (RMTID.029). The latest tag is the invoice's current tag.",
+  "package": "remittance"
+ },
+ "rem_hold_request": {
+  "doc": "A Marketing request to hold an invoice from remittance until a date {@code HLD-<yyyy>} (MKTID.003/005/007): reason (LOV {@code HOLD_REASON}), hold-until date and extensions, approval (MKTID.006), the processor it is assigned to (MKTID.004), release or expiry (MKTID.002, RMTID.021). While active, the invoice carries the {@code HOLD} flag and is not extracted (RMTID.020/031).",
+  "package": "remittance"
+ },
+ "rem_incentive_rule": {
+  "doc": "An early-remittance incentive rule (RMTID.023, PRCID.028): an insurer pays {@code rate} percent of the basic premium when BDOI remits within {@code windowDays} of the inception or booking date, optionally only for a product line and a segment. Rates are parked (OQ23); the table ships empty in production.",
+  "package": "remittance"
+ },
+ "rem_special_request": {
+  "doc": "A special remittance request {@code SPR-<yyyy>} (MKTID.009, RMTID.030): an invoice to remit outside the regular schedule for a condition (LOV {@code SPECIAL_REMIT_CONDITION}: claims, renewal, installment due, immediate OR). Validated, approved, then remitted through its own SPECIAL batch in Process Remittance; notified at every change (RMTID.033).",
+  "package": "remittance"
+ },
+ "report_batch": {
+  "doc": "Several reports run together with shared parameters and downloaded as one file (FRBS 2.4.5 / 2.4.7): a ZIP of the individual files, or one merged PDF. A failed report does not stop the batch; its item records the reason and the batch ends PARTIAL.",
+  "package": "report"
+ },
+ "report_batch_item": {
+  "doc": "One report of a {@link ReportBatch} with its outcome.",
+  "package": "report"
+ },
+ "report_run": {
+  "doc": "One archived run (on-screen view) or export of a report (CSHID.018: generated reports with name, date and creator, downloadable only by users allowed to export). The file of an export is in the file store ({@code stored_file}, build step ST1); files of runs before ST1 are kept apart in {@link ReportRunFile} until {@code FILE_BYTEA_MIGRATION} copies them.",
+  "package": "report"
+ },
+ "report_run_file": {
+  "doc": "The file of an archived report export (CSHID.018), kept apart from the run list.",
+  "package": "report"
+ },
+ "ri_cession": {
+  "doc": "Reinsurance allocation of one premium transaction (policy issue or endorsement): per insured risk, how the company's sum insured and net premium are split between retention, quota share, surplus and facultative, and each treaty participant's share. Exactly one cession exists per transaction (idempotency key: company, policy, endorsement number). Cessions are immutable once posted.",
+  "package": "reinsurance"
+ },
+ "ri_cession_line": {
+  "doc": "One share of one risk in a cession: the retention, a treaty participant's share, a facultative participant's share or the unplaced facultative requirement. Amounts in the policy currency, with the premium and commission also in the base currency (accounting and statements). Owned by {@link Cession}.",
+  "package": "reinsurance"
+ },
+ "ri_claim_movement": {
+  "doc": "A claim movement received from the claims module and the reinsurers' shares computed for it. One row per movement reference (idempotency key). The net retained amount is the company's share of a payment (positive) or recovery (negative) after proportional reinsurance, the base of the excess of loss recovery.",
+  "package": "reinsurance"
+ },
+ "ri_claim_share": {
+  "doc": "One reinsurer's share of a claim movement (base currency): of a reserve change (reinsurers' share of outstanding claims), of a payment (recovery due) or of a salvage recovery (negative). Owned by {@link RiClaimMovement}.",
+  "package": "reinsurance"
+ },
+ "ri_fac_placement": {
+  "doc": "Facultative placement of the part of a risk that exceeds the treaty capacity. Created PROVISIONAL by the allocation; the reinsurance officer records the participants and submits it; a checker approves it (PLACED: premium ceded to the participants); it is finally CLOSED. Endorsements ceded before placement increase the provisional requirement.",
+  "package": "reinsurance"
+ },
+ "ri_soa": {
+  "doc": "Quarterly statement of account of one treaty participant. Generated (and regenerated while pending) by a maker, approved by a checker (statement adjustments posted), then settled (balance paid or received and the reinsurer's open items matched).",
+  "package": "reinsurance"
+ },
+ "ri_treaty": {
+  "doc": "Reinsurance treaty of a company's programme for one line of business and underwriting year (maker-checker master data). Proportional treaties (quota share, surplus) share premium and losses in proportion to the sum insured ceded; excess of loss treaties recover losses above a priority per layer. Participants are the reinsurers and their shares.  * <p>Participants, layers and parties are small and always needed with the treaty, so they are loaded eagerly (one sub-select per collection for a list of treaties).",
+  "package": "reinsurance"
+ },
+ "rnw_acceptance": {
+  "doc": "The client's acceptance of a renewal (BRRN.040, BRRN.038 AC 3): method, evidence (attachment or the payment gate's reference), date, source and the acknowledgement of a financial impact.",
+  "package": "renewal"
+ },
+ "rnw_assignment": {
+  "doc": "An assignment of a renewal to a Marketing AO or a Processing Officer (BRD 1.005, 3.005): from, to, reason, user and time. The AO's list covers every renewal ever assigned to him (BRRN.011).",
+  "package": "renewal"
+ },
+ "rnw_bucket_history": {
+  "doc": "A change of bucket (BRRN.023 AC 6): from, to, rule set version and rule, check run, cause (rule or override), user (created by) and remarks.",
+  "package": "renewal"
+ },
+ "rnw_bucket_rule": {
+  "doc": "One rule of a {@link BucketRuleSet}: when a check (any check when blank) of a severity (any when blank) has the outcome FAIL or WARN, the candidate goes to the result bucket.",
+  "package": "renewal"
+ },
+ "rnw_bucket_rule_set": {
+  "doc": "A versioned bucket rule set (BRRN.023): rules by priority turn the check results into Clean, Review or Exception. A rule that maps a failed check to Clean cannot be saved (database check and this guard).",
+  "package": "renewal"
+ },
+ "rnw_candidate": {
+  "doc": "A renewal candidate (RENEWAL_DESIGN section 4.1): one expiring root invoice and policy year (BRRN.005), or one migrated or submitted policy, from extraction to closure. It carries the renewal reference (BRRN.022), a listing snapshot, the stage of its {@code RNW_CASE} work case, the bucket (BRRN.023), the current disposition, the assignment, the flag chips, and the links to the renewal account, the New Business path and the booked renewal invoice.",
+  "package": "renewal"
+ },
+ "rnw_candidate_endorsement": {
+  "doc": "An endorsement of the expiring invoice family linked to a renewal (BRRN.032 AC 3): the endorsement or request number, where it comes from (booking or Adjustment) and its status when it was linked.",
+  "package": "renewal"
+ },
+ "rnw_check_result": {
+  "doc": "The result of one check in a {@link CheckRun} (BRRN.020): outcome, severity from the check settings, the message shown on the Checks and Bucket tab and a detail for the report.",
+  "package": "renewal"
+ },
+ "rnw_check_run": {
+  "doc": "One run of the checks of a candidate (BRRN.020): what triggered it, when, and the bucket before and after with the rule-set version (BRRN.023). Its results are {@link CheckResult} rows.",
+  "package": "renewal"
+ },
+ "rnw_check_setting": {
+  "doc": "Setting of one renewal check (BRRN.020; RENEWAL_DESIGN section 4.2): active or not, the severity of a failure and optional parameters. Maintained with maker-checker; the authorized version stays in force until the change is authorized.",
+  "package": "renewal"
+ },
+ "rnw_decision_matrix": {
+  "doc": "A versioned decision matrix (BRRN.031/034): rules by priority propose a disposition and whether it is applied automatically. Every system decision stores the matrix version and the rule id.",
+  "package": "renewal"
+ },
+ "rnw_decision_rule": {
+  "doc": "One rule of a {@link DecisionMatrix} (BRRN.034): criteria (blank = any) and the proposed disposition with AUTO or MANUAL and a letter hint. The claims condition TOTAL_LOSS is kept but never matches until the Claims module defines a total-loss indicator (CLQ28).",
+  "package": "renewal"
+ },
+ "rnw_disposition": {
+  "doc": "A disposition row (BRD 2.004; RENEWAL_DESIGN section 4.3): append-only. A later disposition supersedes it; online, uploaded, matrix, insurer, LAMD and system dispositions write the same history with their source (BRRN.018, RQ14). A matrix decision stores the matrix version and the rule id (BRRN.034 AC 3).",
+  "package": "renewal"
+ },
+ "rnw_extraction_run": {
+  "doc": "One extraction of expiring policies (BRRN.030; RENEWAL_DESIGN section 4.1): the daily job, a range generated on demand, an upload of legacy policies or the go-live take-over, with its range and counts.",
+  "package": "renewal"
+ },
+ "rnw_followup": {
+  "doc": "A Contact Center follow-up of a renewal (BRRN.026): channel, outcome, remarks and the next action date.",
+  "package": "renewal"
+ },
+ "rnw_history_view": {
+  "doc": "A view of the account history of a renewal (BRRN.027 AC 4): who opened it (created by), when, and which sections; the disposition is refused until the user has viewed it.",
+  "package": "renewal"
+ },
+ "rnw_insurer_batch": {
+  "doc": "A batch of For Renewal accounts sent to one insurer (BRD 3.009, 4.007): the insurer, the expiry range, the extract file (attachment of type INSURER_RENEWAL_FILE), the protected e-mail and the reply date (alert RNW_INSURER_OVERDUE after it).",
+  "package": "renewal"
+ },
+ "rnw_insurer_batch_line": {
+  "doc": "An account of an {@link InsurerBatch} with the snapshot of the 28 columns sent (BRD 3.009.1.4), kept as JSON.",
+  "package": "renewal"
+ },
+ "rnw_insurer_response": {
+  "doc": "An insurer's response to a renewal (BRD 3.009.6; BRRN.035): append-only. The latest valid response drives the renewal; a mismatched row is kept but never progresses it; a late or conflicting response blocks straight-through progress.",
+  "package": "renewal"
+ },
+ "rnw_lamd_line": {
+  "doc": "A line of a {@link LamdReport} (BRRN.029): the PN, the loan status and date, the renewal it matched and the routing applied. Unmatched lines are kept, never dropped.",
+  "package": "renewal"
+ },
+ "rnw_lamd_report": {
+  "doc": "A LAMD report uploaded by the LAMD user (BRRN.029): paid-off or RMU loans of a month, with the upload job and the number of lines matched to renewals by PN.",
+  "package": "renewal"
+ },
+ "rnw_letter": {
+  "doc": "A renewal letter (RENEWAL_DESIGN section 4.5): Renewal Advice (first or second notice), No Advice Letter, Not for Renewal Letter, NRNS reminder or non-acceptance letter. It records the template code and version, the stored document (RENEWAL_ADVICE or RENEWAL_LETTER), the protected e-mail and its delivery status. A Renewal Advice sent by hand before go-live is recorded with source LEGACY_MANUAL and the tracker reference and date; it is never sent again.",
+  "package": "renewal"
+ },
+ "rnw_letter_batch": {
+  "doc": "A batch generation or sending of renewal letters (BRRN.010; job {@code RNW_LETTER_BATCH}): the selection, the counts and the messages of the failures.",
+  "package": "renewal"
+ },
+ "rnw_non_renewable_risk_code": {
+  "doc": "A risk code that is not renewable (BRRN.009): renewals on it are tagged Not for Renewal by the system and receive the Not for Renewal Letter. Maintained with maker-checker; never deleted, but end-dated.",
+  "package": "renewal"
+ },
+ "rnw_override": {
+  "doc": "A controlled override (BRD 1.011; BRRN.023/031/035): explicit, with a reason and mandatory remarks, logged with the user and time. An active check override lets the renewal be posted, get its Renewal Advice or be accepted although the check fails; it never makes the bucket Clean.",
+  "package": "renewal"
+ },
+ "rnw_package_choice": {
+  "doc": "The BIBS package version chosen for a migrated policy whose legacy package the map does not resolve (DMQ36; FR-RN-028): chosen with a reason by a member of the Renewal processing team (maker, created by) and approved or rejected by a second member.",
+  "package": "renewal"
+ },
+ "rnw_package_map": {
+  "doc": "An entry of the PACKAGE code map (DMQ36; DATA_MIGRATION_DESIGN section 15.2): a legacy package code and version, optionally narrowed by risk code, insurer or sum-insured band, maps to a BIBS package version, or is marked REJECT (no BIBS package). The migration loads the approved map (source MIGRATION); after go-live it is maintained here (source SETUP, or CHOICE when an approved choice of the processing team is added), with maker-checker.",
+  "package": "renewal"
+ },
+ "rnw_ra_sent_request": {
+  "doc": "The correction of a rejected row of the Renewal Advices already sent before go-live (DMQ38; FR-RN-016): prepared by a member of the Renewal processing team (maker, created by) and applied only after a second member approves it.",
+  "package": "renewal"
+ },
+ "rnw_remark": {
+  "doc": "A remark on a renewal (BRD 2.004.6-8): at most 200 characters, stamped with the user, time and stage; never edited.",
+  "package": "renewal"
+ },
+ "rnw_submitted_handoff": {
+  "doc": "The terms a submitted policy was handed to Renewal with (V1017; RENEWAL_DESIGN section 2.3): the RA template (generic or Free First Year), the insurer assigned by the insurer rules of Submitted Policies, the handler and Account Officer, the mailing address of printed letters and whether the renewal was started by hand (Renew with BDOI).",
+  "package": "renewal"
+ },
+ "rnw_transfer": {
+  "doc": "A transfer of a renewal to another Marketing unit (BRD 1.006, 1.007, 2.005): requested with remarks, accepted or declined with remarks by a Team Leader of the receiving unit, or cancelled by the sender. One open request per renewal.",
+  "package": "renewal"
+ },
+ "rnw_upload_scope": {
+  "doc": "The declared scope of a renewal upload (BRD 3.004.4): the expiry range and unit a dispositioned file covers and whether it is complete. Only a complete file tags the renewals of its scope that it does not list Not for Renewal (Non-renewable Accounts).",
+  "package": "renewal"
+ },
+ "rsv_parameter": {
+  "doc": "Reserve parameters of one line of business, effective from a date (maker-checker). A change of parameters is a new record with a later effective date, so the values used by past valuation runs stay traceable; a record can be edited only while it is pending authorization.",
+  "package": "reserves"
+ },
+ "rsv_run_line": {
+  "doc": "Closing balance of one reserve type for one reporting unit (branch, line of business, product, channel) of a valuation run, gross and reinsurers' share.",
+  "package": "reserves"
+ },
+ "rsv_takaful_line": {
+  "doc": "Takaful surplus of one policy stored with a valuation run (PGIBR074 posted view).",
+  "package": "reserves"
+ },
+ "rsv_takaful_setting": {
+  "doc": "Takaful surplus (Mudharabah) settings of one company (maker-checker). When enabled and authorized, valuation runs compute the surplus payable to participants of expiring takaful policies (PGIBR074).",
+  "package": "reserves"
+ },
+ "rsv_upr_detail": {
+  "doc": "Policy-level UPR stored with a valuation run (drill-down from the run summary): one row per premium transaction that is still unearned at the valuation date or was approved in its month.",
+  "package": "reserves"
+ },
+ "rsv_valuation_run": {
+  "doc": "Actuarial valuation of the technical reserves of one company at a month-end date.  * <p>Life cycle (maker-checker): {@code PREVIEW} (calculated, may be recalculated) \u2192 {@code PENDING_APPROVAL} (submitted by the preparer) \u2192 {@code APPROVED} (by a different user) \u2192 {@code POSTED} (movement journals booked). A checker can reject a submitted run back to preview. Any run can be cancelled; cancelling a posted run reverses its journals.",
+  "package": "reserves"
+ },
+ "sbm_approval_matrix": {
+  "doc": "A level of the IAAF or TSU (TOR) approval matrix (BRIDSP-07, 18): per document, segment and sum insured band, the permission or named approver of the level and the signatory title printed on the PDF. Maintained with maker and checker.",
+  "package": "submitted"
+ },
+ "sbm_extraction": {
+  "doc": "A document extraction (BRIDSP-02): the fields proposed from an uploaded policy document, for a new record or an existing one. Nothing reaches the masterlist before a user confirms; a rejected proposal keeps the document with the reason.",
+  "package": "submitted"
+ },
+ "sbm_handling_fee": {
+  "doc": "A handling fee billed on a CBG Motor submitted account (BRIDSP-31; design section 3.6): its PN (CLPC payments) or location reference (OTC payments), amount and billing date; TAGGED when a payment matched and the income request went to Cashiering, APPLIED when Cashiering recognised it with the official receipt.",
+  "package": "submitted"
+ },
+ "sbm_iaaf": {
+  "doc": "The Insurance Adequacy Assessment Form of a policy (BRIDSP-05-07): one per policy, generated once the last review is adequate, approved by the IAAF matrix and sent to the bank counterpart.",
+  "package": "submitted"
+ },
+ "sbm_iaaf_link": {
+  "doc": "A policy related to an IAAF (BRIDSP-05): previous term, same borrower or other.",
+  "package": "submitted"
+ },
+ "sbm_iaaf_review": {
+  "doc": "A policy review (BRIDSP-06): number, date, reviewer, adequacy, findings and remarks.",
+  "package": "submitted"
+ },
+ "sbm_insurer_rule": {
+  "doc": "An insurer assignment rule of the expiry scan (BRIDSP-23; SP SQ11): per segment, vehicle type or occupancy, the insurer to propose, highest priority first, optionally never the expiring insurer. Maintained with maker and checker.",
+  "package": "submitted"
+ },
+ "sbm_intake_run": {
+  "doc": "An intake run (BRIDSP-01): one source file loaded, with its file hash and the counts of the rows received, created, updated, duplicated and failed, and the processing run it started.",
+  "package": "submitted"
+ },
+ "sbm_lamd_loan": {
+  "doc": "A loan of a LAMD snapshot (BRIDSP-13): per PN the loan status, the amortised flag, the maturity date and the collateral numbers the matching step compares with the policy.",
+  "package": "submitted"
+ },
+ "sbm_letter": {
+  "doc": "A letter of this module (BRIDSP-22): a reminder, renewal notice or renewal proposal sent by e-mail, through the bank counterpart or printed in a batch for the mail house. The renewal letters of handed-over records are the Renewal module's.",
+  "package": "submitted"
+ },
+ "sbm_letter_rule": {
+  "doc": "A letter rule (BRIDSP-22; SP SQ09): the letter of a type sent to the records of a segment, bucket and status on the day that is the given number of days from their expiry (negative before), by a channel, from a template. Only letters that are not renewal letters. Maker and checker.",
+  "package": "submitted"
+ },
+ "sbm_limit_check": {
+  "doc": "One limit checked for a record in a run (BRIDSP-16): the limit, the value and the result.",
+  "package": "submitted"
+ },
+ "sbm_limit_rule": {
+  "doc": "An acceptance or coverage limit of an insurer (BRIDSP-16; design section 4.2), maintained with maker and checker until Product Maintenance takes the limits over (SP SQ08): the maximum sum insured, the maximum vehicle age and one other attribute limit, per insurer and segment.",
+  "package": "submitted"
+ },
+ "sbm_no_touch_batch": {
+  "doc": "A No Touch billing batch of one insurer and month (Report List #164; OQ39): exported with the premium and fee columns blank, returned by the insurer with the validated values, then billed with a service invoice.",
+  "package": "submitted"
+ },
+ "sbm_no_touch_line": {
+  "doc": "A policy of a No Touch billing batch with the values returned by the insurer (RL #164).",
+  "package": "submitted"
+ },
+ "sbm_policy": {
+  "doc": "",
+  "package": "submitted"
+ },
+ "sbm_policy_history": {
+  "doc": "One field change of a masterlist record with its source (BRIDSP-29). The user and time are the audit columns.",
+  "package": "submitted"
+ },
+ "sbm_print_batch": {
+  "doc": "A print batch for the mail house (BRIDSP-22; SP SQ09): the letters of one type and day merged into one PDF with a control list, kept in the file store until the mail house collects them.",
+  "package": "submitted"
+ },
+ "sbm_renewal": {
+  "doc": "The renewal hand-off of a masterlist record (BRIDSP-23, 25, 32; design section 4.4): pending until the Renewal module takes it, then the renewal reference, the insurer assigned, the renewal account and its hold cover as Submitted Policies follows them, the re-assignments and the outcome read from the Renewal module.",
+  "package": "submitted"
+ },
+ "sbm_rule": {
+  "doc": "A rule of a rule set (BRIDSP-08): priority, conditions, outcome, reason code and stop flag. The rules of a step are tried highest priority first; the first match with {@code stop} ends the step.",
+  "package": "submitted"
+ },
+ "sbm_rule_set": {
+  "doc": "A version of a rule set of one processing step, segment and business type (BRIDSP-08; design section 4.2): drafted and submitted by the maker, activated from its effective date by a checker who is not the maker, retired when a later version of the same code is activated.",
+  "package": "submitted"
+ },
+ "sbm_run": {
+  "doc": "A processing run (BRIDSP-09; design section 3.2): its trigger and scope and the counts of the records passed, bucketed, fallen out, overridden by a manual tag and above an insurer limit.",
+  "package": "submitted"
+ },
+ "sbm_run_result": {
+  "doc": "The result of one step of a run for one record (BRIDSP-08-10; design principle 3): outcome, bucket, reason code and the rule and rule-set version that produced it, so every result explains itself.",
+  "package": "submitted"
+ },
+ "sbm_signature": {
+  "doc": "The signature of an approval level of an IAAF or TOR (BRIDSP-07, 18).",
+  "package": "submitted"
+ },
+ "sbm_source": {
+  "doc": "An approved source of submitted policies (BRIDSP-01; FRS BRD-12 FR-SP-001): its segment and business type when fixed, the bulk handler that loads its files and, for manual entry, the mandatory fields.",
+  "package": "submitted"
+ },
+ "sbm_status_map": {
+  "doc": "Legacy status of the Excel masterlists mapped to a status and bucket (BRIDSP-33).",
+  "package": "submitted"
+ },
+ "sbm_tor": {
+  "doc": "Terms of Reference of an account above the insurer limits (BRIDSP-17-19): the breached limits and the proposed terms, approved by the TSU matrix and released when the Account Officer opens or downloads it.",
+  "package": "submitted"
+ },
+ "sbm_user_scope": {
+  "doc": "The data scope of a user (BRIDSP-28): the segments the user sees and, for account officers, only the records they handle or own.",
+  "package": "submitted"
+ },
+ "scr_approval_route": {
+  "doc": "A route of an APPROVAL_MATRIX version (SNSRP-103, 703). Rows are replaced as a whole while the version is a draft.",
+  "package": "screening"
+ },
+ "scr_assignment_rule": {
+  "doc": "A scenario of an ASSIGNMENT_MATRIX version (SNSRP-106). Rows are replaced as a whole while the version is a draft.",
+  "package": "screening"
+ },
+ "scr_case": {
+  "doc": "A screening case (SNSRP-303, 401-405, 501, 502, 701-706; design 4.4): the client, what opened it, its type and risk category, the active-policy flag, the marketing unit and unit head, the stage of workflow {@code SCR_CASE} (mirrored), the assignee, the disposition and recommendation, the SLA state of the current stage entry and the configuration versions in force when it was opened (FR-SS-034 R4). One open case per client and case type.",
+  "package": "screening"
+ },
+ "scr_case_answer": {
+  "doc": "The answer to one template field of a case review (SNSRP-501): text (text, long text, list and check box fields), number (number and amount), date or attachment.",
+  "package": "screening"
+ },
+ "scr_case_document": {
+  "doc": "The metadata of a document uploaded on a case (SNSRP-601; FR-SS-052): form type, document type, date received, source, the sequence among the case's documents of the type and the name of the BRD naming convention {@code <Form Type>_<Client Name>_<Date Received>_<Document Type>_<n>}. The file itself is an attachment of entity type {@code ScreeningCase}.",
+  "package": "screening"
+ },
+ "scr_case_event": {
+  "doc": "One entry of the insert-only case timeline (SNSRP-401, 404, 405, 701-704, 902, 903; design 4.4): the event, the round, the stages and values before and after, the reason, the remarks, the actor and the time. A database trigger refuses updates and deletes (FR-SS-091).",
+  "package": "screening"
+ },
+ "scr_case_review": {
+  "doc": "The review of a case on its template (SNSRP-501; FR-SS-050): the template version fixed when the review started (SNSRP-104 \"applies to new reviews only\") and its status. Answers are {@link CaseAnswer} rows.",
+  "package": "screening"
+ },
+ "scr_client_risk_profile": {
+  "doc": "One change of a client's risk profile made by screening (SNSRP-302, 304; FR-SS-033, 035): the category, the rating before and after, the tags added and ended, the source (RULE with the rule, the match and the run; MANUAL with the justification and the evidence) and the time. Insert-only history ({@code scr_client_risk_profile}); the client master itself is changed through {@code crm.service.ClientRiskService}.",
+  "package": "screening"
+ },
+ "scr_committee_vote": {
+  "doc": "An AML Committee member's decision on a case round (SNSRP-704; FR-SS-064): APPROVE_STR, NO_STR or COMMITTEE_RETURN with remarks. One vote per member and round; insert-only (a vote cannot be changed, FR-SS-064 R1).",
+  "package": "screening"
+ },
+ "scr_config_version": {
+  "doc": "One version of a screening configuration set (SNSRP-101-109; design 4.1). Maker-checker: a DRAFT is edited by the maker, submitted (PENDING), then approved (ACTIVE from its effective date) or rejected with a reason. An ACTIVE version is never edited; it becomes SUPERSEDED when a newer version of the same type and scope takes effect. The maker never decides (SNSRP-109).",
+  "package": "screening"
+ },
+ "scr_ingestion_error": {
+  "doc": "A list record that failed ingestion, with its line, raw record and reason (SNSRP-202). The digest job e-mails the records not yet digested and stamps them.",
+  "package": "screening"
+ },
+ "scr_ingestion_run": {
+  "doc": "The log of one ingestion of a list file (SNSRP-201): source, trigger, file, records received, added, updated, delisted, unchanged and failed, status and reason for failure. A run of a manual upload stages its changes for approval ({@link #isPendingApproval()}); a scheduled run of the official feed applies them at once.",
+  "package": "screening"
+ },
+ "scr_match": {
+  "doc": "A client matched against a watchlist entry version under a configuration version (SNSRP-301, FR-SS-031): score, algorithm, matched fields and status POTENTIAL, TRUE_MATCH or FALSE_POSITIVE. Unique per client, entry, entry version and configuration version, so a re-run records no second match (FR-SS-030 R1).",
+  "package": "screening"
+ },
+ "scr_match_rule": {
+  "doc": "A matching rule of a MATCH_CRITERIA version (SNSRP-101). Rows are replaced as a whole while the version is a draft.",
+  "package": "screening"
+ },
+ "scr_match_suppression": {
+  "doc": "A client cleared as a false positive for one watchlist entry version (SNSRP-304; FR-SS-035 R2; SQ12): the pair is not matched again until the entry changes (a new entry version).",
+  "package": "screening"
+ },
+ "scr_name_key": {
+  "doc": "A blocking key of a client or watchlist entry name (SNSRP-301; design 4.2 {@code scr_name_key}). Keys are replaced as a whole when the subject's names change; the engine scores only pairs that share a key.",
+  "package": "screening"
+ },
+ "scr_risk_category": {
+  "doc": "A risk-profile category of a RISK_RULES version (SNSRP-102). Rows are replaced as a whole while the version is a draft.",
+  "package": "screening"
+ },
+ "scr_risk_rule": {
+  "doc": "A tagging rule of a RISK_RULES version (SNSRP-102). Rows are replaced as a whole while the version is a draft.",
+  "package": "screening"
+ },
+ "scr_screening_run": {
+  "doc": "The log of one screening run (SNSRP-602 \"every activity is logged and traceable\"; FR-SS-030): trigger, scope, configuration versions, clients and entries screened, matches recorded, risk changes and cases opened, status, start and end time.",
+  "package": "screening"
+ },
+ "scr_sla_rule": {
+  "doc": "An SLA row of an SLA_MATRIX version (SNSRP-108). Rows are replaced as a whole while the version is a draft.",
+  "package": "screening"
+ },
+ "scr_str": {
+  "doc": "A suspicious transaction report of a screening case (SNSRP-705, 706; FR-SS-070 to 072): number, template version, the subject snapshot taken when it was prepared (later client changes do not alter it, FR-SS-070 R1), reason codes, status, the committee decision time, the extraction and the AMLC filing reference. Template field values are {@link StrField} rows, transactions {@link StrTransaction} rows.",
+  "package": "screening"
+ },
+ "scr_str_extraction": {
+  "doc": "An extraction of AML Committee-approved STRs in the AMLC layout (SNSRP-706; FR-SS-071): batch, period, layout version, count, file (name, SHA-256, report archive run), whether it is a re-extraction with its reason, user and time, and the STRs in the file.",
+  "package": "screening"
+ },
+ "scr_str_field": {
+  "doc": "The value of one STR template field (SNSRP-705; FR-SS-070): prefilled from the case and editable while the STR is a draft.",
+  "package": "screening"
+ },
+ "scr_str_layout": {
+  "doc": "The layout of an STR_LAYOUT version (SNSRP-105, 706). Rows are replaced as a whole while the version is a draft.",
+  "package": "screening"
+ },
+ "scr_str_layout_column": {
+  "doc": "A column of an STR layout (SNSRP-105, 706). Rows are replaced as a whole while the version is a draft.",
+  "package": "screening"
+ },
+ "scr_str_transaction": {
+  "doc": "A transaction reported on an STR (SNSRP-705; FR-SS-070): reference (account, invoice, receipt or policy), date, amount (greater than 0), currency, type and description; prefilled from the client's records and editable.",
+  "package": "screening"
+ },
+ "scr_template": {
+  "doc": "The template of a TEMPLATE version (SNSRP-104, 105). Rows are replaced as a whole while the version is a draft.",
+  "package": "screening"
+ },
+ "scr_template_field": {
+  "doc": "A field of a template (SNSRP-104, 501). Rows are replaced as a whole while the version is a draft.",
+  "package": "screening"
+ },
+ "scr_validation_rule": {
+  "doc": "A rule of a VALIDATION_RULES version (SNSRP-701, 802). Rows are replaced as a whole while the version is a draft.",
+  "package": "screening"
+ },
+ "scr_watchlist_alias": {
+  "doc": "An alias of a watchlist entry (AKA, FKA, spelling); replaced as a whole when a change applies.",
+  "package": "screening"
+ },
+ "scr_watchlist_change": {
+  "doc": "A change of a watchlist entry with its before and after values (SNSRP-203, 204). A manual or uploaded change waits in PENDING for a checker who is not its maker; a change of the scheduled official feed is recorded as APPROVED by the system. A decided change is read only (database trigger).",
+  "package": "screening"
+ },
+ "scr_watchlist_entry": {
+  "doc": "A sanctioned-name, PEP or internal watchlist entry (SNSRP-201, 203). It is identified by source and external reference, never deleted (delisting sets INACTIVE), and screened only while ACTIVE. {@link #getEntryVersion()} goes up with every applied change so that a false-positive suppression is lifted when the entry changes (SQ12).",
+  "package": "screening"
+ },
+ "scr_watchlist_source": {
+  "doc": "A watchlist source (SNSRP-201): the AML advisory, NLDS-PEP or the internal list. A FILE source receives its list as a file, uploaded on screen or staged for the scheduled run; a full-file source delists the entries missing from a new file. API transports are parked (SQ01).",
+  "package": "screening"
+ },
+ "sec_access_change_log": {
+  "doc": "One changed attribute of a user or role: from, to, the request that asked for it, who did it and who approved it (BRD 4.003.1, reports A-D; UAM-NFR-41). Insert-only: a database trigger rejects update, delete and truncate (V1061), as for the audit trail.",
+  "package": "security"
+ },
+ "sec_mfa_recovery_code": {
+  "doc": "A single-use recovery code of the second factor (V1181); only its SHA-256 is kept.",
+  "package": "security"
+ },
+ "sec_mfa_reset_request": {
+  "doc": "An administrator's request to reset a user's second factor (V1181): applied only when a holder of MFA_RESET_APPROVE other than the requester approves it (four eyes); the requester may withdraw it.",
+  "package": "security"
+ },
+ "sec_mfa_trusted_device": {
+  "doc": "A device remembered for the second factor until it expires (parameter {@code MFA_REMEMBER_DEVICE_DAYS}, off as delivered); only the SHA-256 of its token is kept.",
+  "package": "security"
+ },
+ "sec_password_history": {
+  "doc": "A previous password hash of a user, kept for the reuse rule (UAM-NFR-36, {@code PASSWORD_HISTORY_COUNT}).",
+  "package": "security"
+ },
+ "sec_password_reset_token": {
+  "doc": "A \"Forgot password?\" link (UAM-NFR-37; FR-UA-005 R3): single use and valid for a limited time. Only the SHA-256 of the token is kept, so the link cannot be rebuilt from the database.",
+  "package": "security"
+ },
+ "sec_role": {
+  "doc": "A named bundle of permissions assigned to users (e.g. ACCOUNTANT, AUTHORIZER); the BDOI \"user access group profile\". A deactivated role keeps its permissions and members but grants nothing until it is reactivated (BRD 3.002.3 / 3.002.4); its privilege level drives the second approval of risky changes (UAM-NFR-40).",
+  "package": "security"
+ },
+ "sec_sso_request": {
+  "doc": "A sign-in sent to the identity provider (V1182): the SHA-256 of its state, the PKCE verifier and nonce (OIDC) or the request ID (SAML). The answer of the provider is accepted once, within the validity.",
+  "package": "security"
+ },
+ "sec_sso_ticket": {
+  "doc": "The one-time ticket of a single sign-on (V1182): the web client redeems it for the session once the identity provider answered. Only its SHA-256 is kept.",
+  "package": "security"
+ },
+ "sec_user": {
+  "doc": "Application user.  * <p>Carries the security controls required by the GL: account lockout after repeated failed logins, a home branch, and an authorization limit capping the value of batches the user may authorize.  * <p>BRD-11 adds the directory identity (Windows ID), the business unit group and user level (BRD 1.002.1.1.1), the password dates and the forced change flag (UAM-NFR-36) and the last sign-out (UAM-NFR-35). Deactivated roles grant nothing (BRD 3.002.3).",
+  "package": "security"
+ },
+ "sec_user_data_scope": {
+  "doc": "One granted company (with all its branches, {@code branchId} null) or one granted branch of a user whose data scope is not \"all companies\" (V1240, docs/architecture/DATA_SCOPE_DESIGN.md). A scope change replaces the rows of the user.",
+  "package": "security"
+ },
+ "sec_user_mfa": {
+  "doc": "The authenticator app of a user (second factor, V1181): the TOTP secret encrypted at rest, PENDING until the first code confirms the enrolment, then ACTIVE. A user has at most one of each: a new enrolment stays PENDING beside the ACTIVE one until it is confirmed. The step of the last code accepted is kept so that no code is accepted twice.",
+  "package": "security"
+ },
+ "sec_user_session": {
+  "doc": "A sign-in session, keyed by the token id ({@code jti}) of its access token: issued, last seen, ended and why (UAM-NFR-35 logout logging; the \"online\" status, UQ13; a later single-session rule, UQ09).",
+  "package": "security"
+ },
+ "sl_item_match": {
+  "doc": "Settlement of a DEBIT open item by a CREDIT open item (knock-off / allocation).",
+  "package": "subledger"
+ },
+ "sl_open_item": {
+  "doc": "Open item of a party sub-ledger (receivables, payables, reinsurance and coinsurance balances).  * <p>Each business document that creates a party balance (debit note, supplier invoice, receipt, claim payable, reinsurance statement) records one open item alongside its GL posting. Matching DEBIT against CREDIT items gives statements of account, outstanding balances and ageing.",
+  "package": "subledger"
+ },
+ "sto_legal_hold_request": {
+  "doc": "A request to place or release the legal hold of a stored file (DOCUMENT_STORAGE_DECISION, decision 3): raised by a holder of {@code FILE_LEGAL_HOLD_REQUEST} with a reason, applied only when another user holding {@code FILE_LEGAL_HOLD_APPROVE} (the DOA roles) approves it.",
+  "package": "storage"
+ },
+ "sto_record_class": {
+  "doc": "A record class of stored files (DOCUMENT_STORAGE_DECISION, decisions 3 and 5): its bucket, its retention (the retention rules of {@link #getRetentionRecordType()}, else {@link #getRetentionPeriod()}), whether its files are under legal hold from the start and whether its final records are archived to ECM.",
+  "package": "storage"
+ },
+ "stored_file": {
+  "doc": "Metadata of a stored object (table {@code stored_file}, DOCUMENT_STORAGE_DECISION section 3): owner, type, name, size, SHA-256, bucket and key, retention, legal hold, malware scan state and ECM archive state. The bytes live in the object store only.",
+  "package": "storage"
+ },
+ "sys_job_run": {
+  "doc": "One execution of a background job (job monitor and batch processing history).",
+  "package": "system"
+ },
+ "sys_module_profile": {
+  "doc": "A named set of module switches (for example the profile of an insurance broker, which does not use the insurer suite). Applying a profile requests the changes of every module whose switch differs; each change takes effect on approval like a single switch.",
+  "package": "system"
+ },
+ "sys_parameter": {
+  "doc": "Editable business parameter (configuration repository). Parameters are seeded by migrations; administrators change values only, never keys or types.",
+  "package": "system"
+ },
+ "sys_product_module": {
+  "doc": "The switch of one {@link ProductModule} in this deployment. A change is requested by the system administrator with a reason and takes effect when another user approves it (maker-checker).",
+  "package": "system"
+ },
+ "tax_2307_batch": {
+  "doc": "A batch run that issued BIR Form 2307 certificates for one quarter.",
+  "package": "tax"
+ },
+ "tax_2307_certificate": {
+  "doc": "BIR Form 2307 \u2014 Certificate of Creditable Tax Withheld at Source, issued to one payee for one quarter. Payee and payor identities are copied when the certificate is issued, so a reprint shows the facts as certified even if the masters change later. An ISSUED certificate can be CANCELLED (e.g. after a correction) and the payee re-certified by a new batch.",
+  "package": "tax"
+ },
+ "tax_2307_line": {
+  "doc": "Part II line of BIR Form 2307: income by month of the quarter and tax withheld for one ATC.",
+  "package": "tax"
+ },
+ "tax_certificate_received": {
+  "doc": "A BIR 2307 certificate BDOI received from a withholding agent (DIS 2.11.0-2.11.2, OQ41, AQ16): the insurer's certificate of the tax it withheld on BDOI's commission and incentives. The one register behind Disbursement's CWT tagging, the Commission certificate submission (CMRID.015) and the SAWT. Recording it posts {@code TAX_CWT_CERT_RECEIVED}; a cancellation reverses it.",
+  "package": "tax"
+ },
+ "tax_code": {
+  "doc": "Tax code master (maker-checker): a tax with its rate in percent and the GL account the tax is booked to. Creditable withholding codes carry the BIR alphanumeric tax code (ATC), the payee class it applies to and the nature of income printed on BIR Form 2307 and the QAP.  * <p>The GL account is the reconciliation control of the worksheets: the posted movement of the account in a period is compared with the sub-ledger documents. Rates here drive the worksheets' rate checks only; the tax actually charged comes from the product (premiums) or the supplier (invoices).",
+  "package": "tax"
+ },
+ "tax_form": {
+  "doc": "A return in the tax filing calendar (maker-checker): authority, filing frequency, due-date rule, the worksheet that computes it and the GL accounts its remittance clears.  * <p>{@code trackFiling = false} marks reminder-only forms prepared outside BrokerVerse (e.g. 1601-C from payroll): they are listed on the calendar but raise no alerts and have no returns. The calendar starts at {@code effectiveFrom}, so go-live does not produce alerts for older periods.",
+  "package": "tax"
+ },
+ "tax_ic_line_item": {
+  "doc": "Mapping of one Insurance Commission schedule line to the ledger (maker-checker).  * <p>An account belongs to the line when its code lies in {@code [accountFrom, accountTo]} (text comparison, so ranges should use codes of equal length) or when its report group equals {@code reportGroup}. The line amount is the ledger net presented on the {@link NormalBalance} side; the schedule total adds each line multiplied by {@code signFactor} (+1 adds, \u22121 deducts, e.g. \"less reinsurance premiums ceded\"). For the RBC summary {@code rbcFactor} (percent) turns the line amount into a capital requirement.",
+  "package": "tax"
+ },
+ "tax_party_profile": {
+  "doc": "Tax profile of a business partner (maker-checker), kept beside the party master so the party module is not altered: BIR TIN and branch code, registered name (split into last, first and middle name for individuals, as the alphalists require), registered address, VAT treatment and the default ATC applied to income payments to the party.  * <p>Parties without a profile are reported with the TIN of the party master and their name; their withholding is shown under ATC \"UNMAPPED\" until a profile is authorized.",
+  "package": "tax"
+ },
+ "tax_remittance": {
+  "doc": "Payment of a filed return (one per return): what was paid, when, from which bank account, the bank / eFPS payment reference and the journal that cleared the tax payable. The remittance register (report TAX-REMIT) compares the payment date with the due date.",
+  "package": "tax"
+ },
+ "tax_return": {
+  "doc": "A tax return for one form and filing period.  * <p>Lifecycle: DRAFT (figures computed from the worksheet and refreshable) \u2192 FILED (figures frozen, filed by a user other than the preparer, with the eFPS / eBIRForms reference) \u2192 PAID (remittance posted). Only a DRAFT can be CANCELLED; at most one non-cancelled return exists per form and period (database index {@code tax_uq_return_period}).",
+  "package": "tax"
+ },
+ "tax_return_line": {
+  "doc": "One line of a return: a worksheet summary figure frozen when the return is filed.",
+  "package": "tax"
+ },
+ "uw_endorsement": {
+  "doc": "Change to an approved policy: additional or return premium, renewal, cancellation or a non-financial (NIL) amendment. Carries its own premium figures (the change, negative for returns), approval workflow and debit/credit note, and the underwriting year of the policy period it belongs to: a renewal the year its new period starts, any other endorsement the year of the period in force when it is made (the original issue's, or the latest renewal's).",
+  "package": "underwriting"
+ },
+ "uw_open_cover": {
+  "doc": "Marine open cover: a master contract under which the client declares shipments, each insured by a certificate (a {@link Policy} linked to the cover). Authorized under maker-checker control; certificates can be issued only under an authorized cover and within its limits.",
+  "package": "underwriting"
+ },
+ "uw_policy": {
+  "doc": "Insurance policy (or marine certificate under an open cover): header terms, insured risks and the premium of the original issue. Changes after approval are made by {@link Endorsement}s.  * <p>Lifecycle and maker-checker rules are held in {@link ApprovalWorkflow}; premium figures in {@link PremiumBreakdown}; accounting references in {@link PostingRefs}.",
+  "package": "underwriting"
+ },
+ "uw_policy_risk": {
+  "doc": "One insured risk (section) of a policy. Owned by {@link Policy}.",
+  "package": "underwriting"
+ },
+ "uw_product": {
+  "doc": "Insurance product (class of business) with its commission, earning basis and tax configuration. Maintained under maker-checker control: a product can be used only once authorized.",
+  "package": "underwriting"
+ },
+ "uw_quotation": {
+  "doc": "Quotation with negotiation iterations. Lifecycle: DRAFT \u2192 PENDING_APPROVAL \u2192 APPROVED (or REJECTED) \u2192 CONVERTED into a policy; open quotations EXPIRE after their validity. A new iteration re-opens the quotation as DRAFT.",
+  "package": "underwriting"
+ },
+ "uw_quotation_iteration": {
+  "doc": "One negotiation round of a quotation (immutable once created). Owned by {@link Quotation}.",
+  "package": "underwriting"
+ },
+ "wf_case": {
+  "doc": "The workflow position of one business record (quotation, proposal request, account...). The business record owns its data; the case owns where it stands, who works it and since when.",
+  "package": "workflow"
+ },
+ "wf_case_history": {
+  "doc": "One status change (insert only): from, to, action, reason, comment, who and when.",
+  "package": "workflow"
+ },
+ "wf_stage": {
+  "doc": "A stage of a workflow (seeded by migrations, read-only at run time).",
+  "package": "workflow"
+ },
+ "wf_transition": {
+  "doc": "An allowed move between two stages (seeded by migrations, read-only at run time).",
+  "package": "workflow"
+ },
+ "yec_year_end_close": {
+  "doc": "Record of a completed year-end close: closing journals, net result transferred to retained earnings and the fiscal year opened next.",
+  "package": "closing"
+ }
+}

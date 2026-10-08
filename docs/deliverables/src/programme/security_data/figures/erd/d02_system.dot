@@ -1,0 +1,10 @@
+digraph erd {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.3, ranksep=0.8, pad=0.2, bgcolor="white"];
+  node [shape=plain, fontname="Arial"];
+  edge [color="@CTA_BLUE", arrowsize=0.8, penwidth=1.2, dir=both];
+  "sys_module_profile" [label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="3" color="@BORDER"><tr><td bgcolor="@HEADER_BLUE" align="left" colspan="2"><font color="@WHITE" point-size="12"><b>SYS_MODULE_PROFILE</b></font></td></tr><tr><td align="left"><font point-size="10" color="@MUTED">PK</font></td><td align="left" port="id"><font point-size="11">ID</font></td></tr><tr><td colspan="2" align="left"><font point-size="10" color="@MUTED">+ 8 columns</font></td></tr></table>>];
+  "sys_module_profile_module" [label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="3" color="@BORDER"><tr><td bgcolor="@HEADER_BLUE" align="left" colspan="2"><font color="@WHITE" point-size="12"><b>SYS_MODULE_PROFILE_MODULE</b></font></td></tr><tr><td align="left"><font point-size="10" color="@MUTED">PK</font></td><td align="left" port="profile_id"><font point-size="11">PROFILE_ID</font></td></tr><tr><td align="left"><font point-size="10" color="@MUTED">PK</font></td><td align="left" port="module_code"><font point-size="11">MODULE_CODE</font></td></tr><tr><td colspan="2" align="left"><font point-size="10" color="@MUTED">+ 1 columns</font></td></tr></table>>];
+  "sys_product_module" [label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="3" color="@BORDER"><tr><td bgcolor="@HEADER_BLUE" align="left" colspan="2"><font color="@WHITE" point-size="12"><b>SYS_PRODUCT_MODULE</b></font></td></tr><tr><td align="left"><font point-size="10" color="@MUTED">PK</font></td><td align="left" port="id"><font point-size="11">ID</font></td></tr><tr><td colspan="2" align="left"><font point-size="10" color="@MUTED">+ 16 columns</font></td></tr></table>>];
+  "sys_module_profile_module":"module_code" -> "sys_product_module" [arrowtail=crow, arrowhead=teetee];
+  "sys_module_profile_module":"profile_id" -> "sys_module_profile" [arrowtail=crow, arrowhead=teetee];
+}

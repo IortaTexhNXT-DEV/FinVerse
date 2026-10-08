@@ -18,6 +18,7 @@ import { RateModal } from './RateModals';
 import type { RateTable } from './RateModals';
 import { RecordActions } from './RecordActions';
 import { LineLabel } from '@/components/broking/LovLabel';
+import { ConfigUploadButton } from '@/features/configpromo/ConfigUploadButton';
 
 const TABS: readonly { id: RateTable; label: string }[] = [
   { id: 'taxes', label: 'Taxes & factors' },
@@ -158,11 +159,14 @@ export default function RatesPage() {
         title="Rates & Taxes"
         description="Statutory charges and rating tables applied by the premium calculator."
         actions={
-          can('MASTER_MAINTAIN') && (
-            <Button variant="accent" icon={<Plus size={16} />} onClick={() => setAdding(true)}>
-              New Rate
-            </Button>
-          )
+          <>
+            <ConfigUploadButton types={['CFG_RATE_TABLE']} />
+            {can('MASTER_MAINTAIN') && (
+              <Button variant="accent" icon={<Plus size={16} />} onClick={() => setAdding(true)}>
+                New Rate
+              </Button>
+            )}
+          </>
         }
       />
       <Tabs tabs={TABS} active={tab} onChange={setTab} />

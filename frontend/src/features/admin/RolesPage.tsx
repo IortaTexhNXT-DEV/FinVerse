@@ -21,6 +21,7 @@ import { displayNameOf } from '@/api/users';
 import { Notice } from '@/components/ui/Notice';
 import { PermissionName } from '@/components/ui/PermissionName';
 import { permissionLabel, permissionLabels } from '@/utils/permissionLabel';
+import { ConfigUploadButton } from '@/features/configpromo/ConfigUploadButton';
 
 function roleHeader(r: Role): string {
   const level = r.privilegeLevel ? ` · ${humanize(r.privilegeLevel)}` : '';
@@ -175,6 +176,7 @@ export default function RolesPage() {
         section="Administration"
         title="Roles & Permissions"
         description="Group profiles and the permissions they grant."
+        actions={<ConfigUploadButton types={['CFG_ROLE_MATRIX']} />}
       />
       {direct && (
         <Notice tone="warning">

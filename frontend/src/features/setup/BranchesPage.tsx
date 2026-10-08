@@ -17,6 +17,7 @@ import { useWorkspace } from '@/context/workspaceContext';
 import { formatDate, today } from '@/utils/format';
 import { awaitsOtherChecker } from '@/utils/makerChecker';
 import { DateInput } from '@/components/ui/DateInput';
+import { ConfigUploadButton } from '@/features/configpromo/ConfigUploadButton';
 
 type BranchForm = Partial<Branch>;
 
@@ -66,17 +67,20 @@ export default function BranchesPage() {
         title="Branches"
         description="Branches, offices and customer centres."
         actions={
-          can('MASTER_MAINTAIN') && (
-            <Button
-              variant="accent"
-              icon={<Plus size={16} />}
-              onClick={() =>
-                setForm({ openingDate: today(), headOffice: false, forexAuthorized: false })
-              }
-            >
-              New Branch
-            </Button>
-          )
+          <>
+            <ConfigUploadButton types={['CFG_BRANCH']} />
+            {can('MASTER_MAINTAIN') && (
+              <Button
+                variant="accent"
+                icon={<Plus size={16} />}
+                onClick={() =>
+                  setForm({ openingDate: today(), headOffice: false, forexAuthorized: false })
+                }
+              >
+                New Branch
+              </Button>
+            )}
+          </>
         }
       />
       <ErrorAlert error={authorize.error} />

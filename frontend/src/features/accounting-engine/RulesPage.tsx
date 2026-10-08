@@ -16,6 +16,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { formatDate } from '@/utils/format';
 import { useAccountingLookups } from './useAccountingLookups';
 import { awaitsOtherChecker } from '@/utils/makerChecker';
+import { ConfigUploadButton } from '@/features/configpromo/ConfigUploadButton';
 
 function conditions(r: Rule): string {
   const parts = [r.businessLine ? `LoB ${r.businessLine}` : '', r.currency ?? ''];
@@ -58,15 +59,18 @@ export default function RulesPage() {
         title="Accounting Rules"
         description="Which GL accounts each business event posts to."
         actions={
-          can('ACCOUNTING_RULE_MANAGE') && (
-            <Button
-              variant="accent"
-              icon={<Plus size={16} />}
-              onClick={() => void navigate('/accounting/rules/new')}
-            >
-              New Rule
-            </Button>
-          )
+          <>
+            <ConfigUploadButton types={['CFG_ACCOUNTING_RULE']} />
+            {can('ACCOUNTING_RULE_MANAGE') && (
+              <Button
+                variant="accent"
+                icon={<Plus size={16} />}
+                onClick={() => void navigate('/accounting/rules/new')}
+              >
+                New Rule
+              </Button>
+            )}
+          </>
         }
       />
       <Card>

@@ -15,6 +15,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { useWorkspace } from '@/context/workspaceContext';
 import { formatDate } from '@/utils/format';
 import { DateInput } from '@/components/ui/DateInput';
+import { ConfigUploadButton } from '@/features/configpromo/ConfigUploadButton';
 
 const WEEKDAY = new Intl.DateTimeFormat('en-PH', { weekday: 'long', timeZone: 'UTC' });
 
@@ -59,6 +60,7 @@ export default function HolidaysPage() {
         description="Public and company holidays."
         actions={
           <>
+            <ConfigUploadButton types={['CFG_HOLIDAY']} />
             <label className="visually-hidden" htmlFor="holiday-year">
               Year
             </label>

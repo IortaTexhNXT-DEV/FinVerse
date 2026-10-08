@@ -18,6 +18,7 @@ import { formatRate, today } from '@/utils/format';
 import { AuthorizeButton, SelectField, TextField } from './MasterControls';
 import { TaxFormsPanel } from './TaxFormsPanel';
 import { awaitsOtherChecker } from '@/utils/makerChecker';
+import { ConfigUploadButton } from '@/features/configpromo/ConfigUploadButton';
 
 const TAX_TYPES: readonly TaxType[] = [
   'VAT_OUTPUT',
@@ -47,6 +48,7 @@ export default function TaxCodesPage() {
         section="Tax & Statutory"
         title="Tax Codes & Forms"
         description="VAT, premium taxes and withholding ATCs with rates and GL accounts."
+        actions={<ConfigUploadButton types={['CFG_TAX_CODE']} />}
       />
       <Tabs tabs={TABS} active={tab} onChange={setTab} />
       {tab === 'codes' ? <TaxCodesPanel /> : <TaxFormsPanel />}

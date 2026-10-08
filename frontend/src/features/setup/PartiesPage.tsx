@@ -19,6 +19,7 @@ import { emptyParty } from './partyForm';
 import type { PartyForm } from './partyForm';
 import { awaitsOtherChecker } from '@/utils/makerChecker';
 import { SETUP_PARTY_TYPES } from './partyTypes';
+import { ConfigUploadButton } from '@/features/configpromo/ConfigUploadButton';
 
 /**
  * Business partner master (policyholders, intermediaries, reinsurers, coinsurers, suppliers...):
@@ -55,15 +56,18 @@ export default function PartiesPage() {
         title="Business Partners"
         description="Policyholders, agents, brokers, reinsurers, coinsurers and suppliers used as sub-ledger parties."
         actions={
-          maintain && (
-            <Button
-              variant="accent"
-              icon={<Plus size={16} />}
-              onClick={() => setEditing(emptyParty(companyId, company?.baseCurrency))}
-            >
-              New Party
-            </Button>
-          )
+          <>
+            <ConfigUploadButton types={['CFG_BUSINESS_PARTNER']} />
+            {maintain && (
+              <Button
+                variant="accent"
+                icon={<Plus size={16} />}
+                onClick={() => setEditing(emptyParty(companyId, company?.baseCurrency))}
+              >
+                New Party
+              </Button>
+            )}
+          </>
         }
       />
       <Card>

@@ -18,6 +18,7 @@ import { frbsSetupApi } from './frbsSetupApi';
 import type { StatementLayout } from './frbsSetupApi';
 import { layoutProblems } from './setupForms';
 import { FileDropZone } from '@/components/ui/FileDropZone';
+import { ConfigUploadButton } from '@/features/configpromo/ConfigUploadButton';
 
 const NEW_LAYOUT: StatementLayout = {
   bankAccountCode: '',
@@ -83,6 +84,7 @@ export default function StatementLayoutsPage() {
         description="Map the columns of each bank's spreadsheet export."
         actions={
           <>
+            <ConfigUploadButton types={['CFG_STATEMENT_LAYOUT']} />
             <Button
               variant="secondary"
               icon={<FileUp size={16} />}

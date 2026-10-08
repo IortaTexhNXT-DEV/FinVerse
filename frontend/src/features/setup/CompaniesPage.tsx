@@ -16,6 +16,7 @@ import { useWorkspace } from '@/context/workspaceContext';
 import { awaitsOtherChecker } from '@/utils/makerChecker';
 import { ConfirmButton } from '@/components/ui/ConfirmButton';
 import { profileRequest } from './setupForms';
+import { ConfigUploadButton } from '@/features/configpromo/ConfigUploadButton';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -64,6 +65,7 @@ export default function CompaniesPage() {
         section="Setup"
         title="Companies"
         description="Each company keeps its own books. Select a company to maintain its client profile."
+        actions={<ConfigUploadButton types={['CFG_COMPANY']} />}
       />
       <ErrorAlert error={authorize.error} />
       <Card flush>

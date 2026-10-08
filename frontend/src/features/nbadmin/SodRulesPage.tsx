@@ -18,6 +18,7 @@ import { UserName } from '@/components/ui/UserName';
 import { formatDateTime } from '@/utils/format';
 import { EMPTY_SOD_RULE, pendingText, ruleErrors } from './sodRules';
 import { CellStack } from '@/components/ui/CellStack';
+import { ConfigUploadButton } from '@/features/configpromo/ConfigUploadButton';
 
 function NewRuleDialog({ onClose }: Readonly<{ onClose: () => void }>) {
   const toast = useToast();
@@ -208,11 +209,14 @@ export default function SodRulesPage() {
         title="Separation of Duties"
         description="Group profiles one user may not hold together. Requests and bulk lines that break an active rule are refused."
         actions={
-          maintain && (
-            <Button icon={<Plus size={16} />} onClick={() => setAdding(true)}>
-              New Rule
-            </Button>
-          )
+          <>
+            <ConfigUploadButton types={['CFG_SOD_RULE']} />
+            {maintain && (
+              <Button icon={<Plus size={16} />} onClick={() => setAdding(true)}>
+                New Rule
+              </Button>
+            )}
+          </>
         }
       />
       <ErrorAlert error={rules.error} />

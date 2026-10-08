@@ -12,8 +12,8 @@ meta:
   frs: HANDBOOK_BRD13_DATA_MIGRATION.md
   source_doc: Data Migration Handbook
   summary: TP_BRD13_DATA_MIGRATION.md
-  version: "2.0"
-  date: 5 October 2026
+  version: "2.1"
+  date: 8 October 2026
   signoff: pack/pack.yaml
   verify_messages: false
 
@@ -40,6 +40,13 @@ personas:
   GL_LEAD: {name: Comptrollership GL lead (true-up preparer), short: GL lead}
   RNW_MAKER: {name: Renewal processing team - maker, short: RNW maker}
   RNW_CHECKER: {name: Renewal processing team - checker, short: RNW checker}
+  SUPPORT: {name: Cashiering / Support Team user (DP PR reversal requester), short: Support}
+  COLLECTIONS: {name: Collections user (PR 2307 reversal requester), short: Collections}
+  COLLECTIONS_TL: {name: Collections team lead, short: Coll. TL}
+  REPORTING: {name: Reporting User, short: Reporting}
+  RNW_PROC: {name: Renewal Processor, short: RNW proc.}
+  CLAIMS: {name: Claims User, short: Claims}
+  PLACEMENT: {name: Placement User, short: Placement}
   SYSTEM: {name: BIBS (scheduled run or event)}
 
 screens:
@@ -81,6 +88,9 @@ screens:
   TRUEUPS: Data Migration > Opening-Balance Adjustments
   RESUB: Data Migration > Batches > (batch) Resubmissions tab
   DIRECT: Request outside the screens, signed in as the persona (test lead tool)
+  CLAIMREC: Claims > Claims work list > (claim) Claim record
+  ACCDOCS: Accounts > Account search > (account) Documents tab
+  RECEIPT: Cashiering > Receipts > (receipt) Acknowledgment receipt
 
 data:
   - id: TD-DM-01
@@ -123,6 +133,10 @@ data:
     name: Configuration for the tests
     content: "Settings as configured - the environment class Non-production, the staging retention days 5, the rows per load transaction 500, the partitions loaded in parallel 4, the amount tolerance 0.00, the error-rate limit of master data 0.5, the error-rate limit of financial objects 0, the automatic merge score 90, the review score 60, the archive export limit 1000, the unusual-export alert limit 5000, the opening value date 1 January 2028, the end of the go-live renewal window 31 May 2028, the urgent-renewal date 31 January 2028, the resubmission deadline T-1 12:00; legacy control accounts, Migration Clearing and the legacy accounting rules set up on the test chart."
     source: Configuration of the SIT environment (Handbook Part B, Configuration items); seed data
+  - id: TD-DM-12
+    name: Extracts of BRD V0.03 (proposed objects)
+    content: "F07 with 12 open claims (claim CLM-L-2027-0456 with reserve 150,000.00 and 50,000.00 paid, on policy C-2026-001200-01 expired on 30-Jun-2027; one claim on a policy without header); the e-policy index with 30 files for in-force migrated accounts (one file whose insurer policy number matches no account, one matching two accounts, one with a wrong checksum); a P01 renewal term C-2027-004700-02 starting 15-Dec-2027 booked in legacy."
+    source: Masked extracts prepared by the test lead with Claims and Placement
   - id: TD-DM-10
     name: New BIBS invoices and payments
     content: BIBS invoice BI-2028-000150 with 2,000.00 open; a Direct Credit payment file with one row carrying EBIX reference I00123457 and one row for a BIBS invoice; an approved client payout account.
@@ -174,6 +188,10 @@ scenarios:
     persona: DML
     title: Rollback and rerun. A loaded batch with a wrong code map is rolled back, the map is corrected and the batch is loaded again and reconciles; rejected rows are corrected and rerun.
     pre: Loads of SC-DM-02.
+  - id: SC-DM-13
+    persona: CLAIMS
+    title: Objects added by BRD V0.03 on BDOI confirmation. Open claims are carried forward and linked to their legacy policy headers, and e-policies are linked to the migrated accounts with the unmatched files flagged.
+    pre: BDOI has confirmed CLR-DM-08 and CLR-DM-09; extracts TD-DM-12.
   - id: SC-DM-12
     persona: GONOGO
     title: Cut-over rehearsal. The production cut-over plan is rehearsed with its checkpoints; a NO-GO restores the snapshot and reopens legacy, and the rehearsal is run again to GO.
@@ -531,6 +549,7 @@ frs:
       - A client created by a load is found in client search and has a cross-reference to its legacy key.
       - The batch page shows staged, loaded, skipped, rejected and excluded counts that add up.
       - An object loads only after the objects it depends on are accepted, and the approver of the load is not the operator.
+      - Every record created by a load carries the origin Migrated with its source system, legacy reference and batch, shown by the LEGACY badge and its tooltip.
     cases:
       - c: 1
         type: Positive
@@ -567,6 +586,13 @@ frs:
           - As migops approve the load of the batch migops will run.
         expected: Refused.
         msg: [A record cannot be authorized by the user who maintained it]
+      - c: 5
+        type: Positive
+        screen: CLIENTS
+        title: Migrated flag and legacy source on a loaded client
+        steps:
+          - After the C01 load, search a client loaded from QPS; hover the LEGACY badge.
+        expected: The client shows the LEGACY badge; the tooltip gives the source system QPS, the legacy client number and the batch; the Origin filter set to BIBS hides it.
 
   FR-DM-015:
     scenario: SC-DM-02
@@ -579,6 +605,7 @@ frs:
       - A rollback is refused when a payment was applied to a legacy invoice of the batch.
       - The approver of a rollback is not the requester.
       - After a rollback the batch is loaded again with a corrected code map version and reconciles like a first load.
+      - A rerun of rows selected among the rejected rows reprocesses only those rows; each shows whether it was migrated or failed again, a row that fails again keeps its error details, and the run log gives the counts reprocessed, migrated and failed with the times.
     cases:
       - c: 1
         type: Positive
@@ -619,6 +646,23 @@ frs:
           - As migsteward create a new version of the insurer code map with MAL mapped to INS-MAL; as migowner approve it.
           - Create a new batch of the same extract; validate, approve the load, load and reconcile.
         expected: The first batch is Rolled back; the new batch uses the new map version, loads every row and reconciles at L1-L4 with the control totals; the Code Map Versions report lists both versions and the batches that used them.
+      - c: 6
+        type: Positive
+        scenario: SC-DM-11
+        title: Rerun selected fall-out rows
+        pre: The C01 batch has 3 rejected rows; 2 are corrected at source and the third is not.
+        steps:
+          - On the Rows tab select the 3 rejected rows; click Rerun Rejects; approve and load the rerun batch.
+          - Open the run log of the rerun.
+        expected: The rerun reprocesses the 3 rows only - 2 show Migrated on rerun and 1 shows Failed again with its error details; the run log shows reprocessed 3, migrated 2, failed 1 with the start and end times.
+      - c: 6
+        type: Negative
+        scenario: SC-DM-11
+        title: Rerun after the object is accepted
+        pre: The R01 object is accepted (G6) in SIT.
+        steps:
+          - Open the accepted R01 batch and look for Rerun Rejects.
+        expected: Rerun Rejects is not offered; the remaining row is keyed from the manual-entry plan.
 
   FR-DM-020:
     scenario: SC-DM-03
@@ -669,6 +713,7 @@ frs:
       - The ACSL reconciliation of the legacy Premium Receivable account against the legacy invoices shows no difference.
       - An invoice missing from the load leaves a Migration Clearing difference with the sign of the trial balance (a credit of 4,200.00 for a paid, not remitted invoice with DTIP 5,000.00 and commission receivable 800.00), and the GL level cannot be signed.
       - A missing unpaid invoice whose net is zero shows as differences on the legacy control accounts in the report Migration Clearing and Legacy Control Accounts.
+      - The Premium Receivable, DTIP, Commission Receivable and unapplied-payment balances of the opening equal the legacy trial balance and the legacy sub-ledgers per branch and currency with a difference of 0.00.
     cases:
       - c: 1
         type: Positive
@@ -697,6 +742,13 @@ frs:
           - Load the F01 variant without I00300002 and the matching G01; run the report Migration Clearing and Legacy Control Accounts.
         expected: Migration Clearing is 0.00 for MKT01 PHP, but the per-account comparison shows Premium Receivable - Legacy 3,000.00 debit and DTIP - Legacy 3,000.00 credit higher in the trial balance than in the detail, and 480.00 on each commission account; the GL level cannot be signed.
         msg: ["{Premium Receivable - Legacy} differs from the opening detail by {3,000.00} in {MKT01} {PHP}"]
+      - c: 5
+        type: Report-output
+        screen: RECGL
+        title: Accounting data equal to legacy at the opening
+        steps:
+          - After the loads of F01, F02 and G01 for MKT01, run Migration Clearing and Legacy Control Accounts and the ACSL GL to Sub-ledger Reconciliation (legacy context).
+        expected: Each legacy control account equals the legacy trial balance line and the open-item detail per currency with a difference of 0.00; Migration Clearing is 0.00.
 
   FR-DM-022:
     scenario: SC-DM-09
@@ -1380,6 +1432,7 @@ frs:
       - An OTC payment of 6,000.00 on a legacy invoice with 6,000.00 open issues an AR, brings the balance to 0.00 and credits the PR legacy sub-ledger.
       - The receipt is listed in the Cash Receipts Book report for the day.
       - An unknown reference is refused.
+      - The AR shows the legacy invoice number the payment was applied to.
     cases:
       - c: 1
         type: Positive
@@ -1401,6 +1454,13 @@ frs:
           - Enter I88888888.
         expected: No invoice found.
         msg: ["No invoice matches {I88888888}"]
+      - c: 4
+        type: Report-output
+        screen: RECEIPT
+        title: Legacy invoice number on the AR
+        steps:
+          - After the OTC payment on I00123456, open and print the AR.
+        expected: The AR shows invoice I00123456 and the amount applied.
 
   FR-DM-061:
     scenario: SC-DM-05
@@ -1412,6 +1472,7 @@ frs:
       - A file with rows for legacy and new invoices posts each application to the right sub-ledger.
       - An invalid row is reported and does not stop the others.
       - Before the QPS pattern is configured, a row that quotes only a QPS invoice number stays unapplied, and a row that also quotes the ARN is applied to the QPS legacy invoice.
+      - The AR issued for an autopay row shows the legacy invoice number, and Invoice 360 of the invoice lists the AR.
     cases:
       - c: 1
         type: Upload-download
@@ -1439,10 +1500,18 @@ frs:
         steps:
           - Upload a bills payment file with one row quoting only the QPS invoice number and one row quoting the QPS invoice number and its ARN.
         expected: The first row stays unapplied (no match); the second is applied to the QPS legacy invoice through the ARN.
+      - c: 5
+        type: Report-output
+        screen: INV360
+        title: Autopay AR with the legacy invoice number
+        data: [TD-DM-10]
+        steps:
+          - Upload the Direct Credit file with the row for I00123457; open the AR of the row; open Invoice 360 of I00123457.
+        expected: The AR shows the legacy invoice number I00123457; Invoice 360 lists the AR under its receipts.
 
   FR-DM-070:
     scenario: SC-DM-06
-    persona: ACCT
+    persona: SUPPORT
     screen: DPPRREV
     data: [TD-DM-05]
     conditions:
@@ -1452,10 +1521,10 @@ frs:
     cases:
       - c: 1
         type: Workflow
-        persona: COMMREC_TL
+        persona: CASHIER_TL
         title: Approve and run a DP PR batch
         steps:
-          - As the accounting user upload 20 direct-payment legacy invoices; submit; as commrectl approve.
+          - As the Cashiering / Support Team user upload 20 direct-payment legacy invoices; submit; as the Cashiering team lead approve.
         expected: 20 lines posted; Dr DTIP - Legacy / Cr Premium Receivable - Legacy per line; run report with 20 posted.
       - c: 2
         type: Negative
@@ -1481,7 +1550,7 @@ frs:
 
   FR-DM-071:
     scenario: SC-DM-06
-    persona: ACCT
+    persona: COLLECTIONS
     screen: PR2307REV
     data: [TD-DM-05]
     conditions:
@@ -1490,10 +1559,10 @@ frs:
     cases:
       - c: 1
         type: Workflow
-        persona: CASHIER_TL
+        persona: COLLECTIONS_TL
         title: PR2307 batch
         steps:
-          - Create the batch from the PR 2307 for Reversal tags; submit; as cashiertl approve.
+          - As the Collections user create the batch from the PR 2307 for Reversal tags; submit; as the Collections team lead approve.
         expected: Each line's PR2307 legacy balance is 0.00; Dr DTIP - Legacy / Cr PR 2307 - Legacy.
       - c: 2
         type: Negative
@@ -1589,6 +1658,7 @@ frs:
       - A return premium of 1,000.00 on a legacy invoice with 1,000.00 open reduces the PR and DTIP legacy balances by 1,000.00.
       - After the endorsement the account premium is the net premium used by Renewal.
       - A decrease that takes the cumulative adjustments beyond the baseline of the original premium (taken from the frozen snapshot) is refused without a justification.
+      - A return premium on a legacy invoice paid in full and not remitted (zero premium receivable) creates an unapplied payment for the client and reduces DTIP legacy.
     cases:
       - c: 1
         type: Workflow
@@ -1611,6 +1681,14 @@ frs:
           - Raise a decrease larger than the original premium of the legacy invoice (23,050.00 in the snapshot of I00123456) without a justification; Submit.
         expected: Refused; with a justification the request is submitted and the Adjustment TL is alerted.
         msg: ["Cumulative adjustments of {amount} exceed the baseline of {100}% of the original premium {23,050.00}: review the previous adjustments and give the justification to proceed"]
+      - c: 4
+        type: Workflow
+        persona: ADJ_TL
+        title: Negative endorsement with zero premium receivable
+        pre: A legacy invoice paid in full in legacy and not remitted (zero premium receivable).
+        steps:
+          - Raise a return-premium request of 500.00 on the invoice; approve; post.
+        expected: The return invoice is booked in the legacy ledger context; an unapplied payment of 500.00 is created for the client; DTIP - Legacy falls by 500.00.
 
   FR-DM-092:
     scenario: SC-DM-06
@@ -1652,6 +1730,7 @@ frs:
       - After a positive endorsement of 2,000.00 on a legacy invoice with original premium 10,000.00, the report shows original 10,000.00, updated 12,000.00 and delta 2,000.00 with the endorsement number.
       - The report exports to Excel with the same rows.
       - A user without Recon process cannot run it.
+      - A Reporting User without the Production reconciliation permission runs and exports the report.
     cases:
       - c: 1
         type: Report-output
@@ -1673,6 +1752,58 @@ frs:
         steps:
           - As cashier open the report.
         expected: Not in the report list; the request is refused.
+      - c: 4
+        type: Report-output
+        persona: REPORTING
+        screen: REPORTS
+        title: Reporting User runs the legacy change report
+        steps:
+          - As a Reporting User run Changes to Legacy Invoices for January 2028; export to Excel.
+        expected: The report runs and exports with the same rows as for the Prod Recon Analyst.
+      - c: 4
+        type: Security-access
+        persona: CASHIER
+        screen: REPORTS
+        title: User without the report permission
+        steps:
+          - As a Cashiering user look for Changes to Legacy Invoices in the Report Centre.
+        expected: The report is not offered; a direct request is refused.
+
+  FR-DM-101:
+    scenario: SC-DM-06
+    persona: REPORTING
+    screen: REPORTS
+    data: [TD-DM-05, TD-DM-10]
+    conditions:
+      - The premium receivable ageing at go-live lists the legacy and the BIBS invoices together, and their total equals the open legacy invoices plus the open BIBS invoices.
+      - With the Origin filter on Migrated the report lists only the legacy invoices, each with the origin Migrated.
+      - The export to Excel has the same rows and the Origin column.
+      - A transaction-period report covers BIBS transactions from go-live only.
+    cases:
+      - c: 1
+        type: Report-output
+        title: Consolidated premium receivable ageing
+        steps:
+          - Run the premium receivable ageing as at the go-live date with the Origin filter on All origins.
+        expected: I00123456 (10,000.00, origin Migrated) and BI-2028-000150 (2,000.00, origin BIBS) are both listed; the total equals the open legacy invoices plus the open BIBS invoices.
+      - c: 2
+        type: Positive
+        title: Origin filter on Migrated
+        steps:
+          - Set the Origin filter to Migrated and run the report again.
+        expected: Only the legacy invoices are listed; BI-2028-000150 is not.
+      - c: 3
+        type: Upload-download
+        title: Export with the Origin column
+        steps:
+          - Export the consolidated report to Excel.
+        expected: The file has the same rows as the screen and an Origin column.
+      - c: 4
+        type: Negative
+        title: Period before go-live on a transaction report
+        steps:
+          - Run the Cash Receipts Book for December 2027.
+        expected: No receipt issued in legacy is listed; the report notes that periods before go-live are read in legacy or the archive.
 
   FR-DM-110:
     scenario: SC-DM-07
@@ -2069,6 +2200,115 @@ frs:
         expected: The row is Invalid.
         msg: ["Cover {C-2027-004600} was already renewed in legacy as {C-2027-004600-02}; remove the row"]
 
+  FR-DM-126:
+    scenario: SC-DM-08
+    persona: RNW_PROC
+    screen: RENEWAL
+    data: [TD-DM-04, TD-DM-12]
+    conditions:
+      - A legacy renewal whose new term starts before go-live is booked in legacy before the freeze and its new term is found in BIBS as a migrated account.
+      - At go-live an urgent January candidate shows the RA already sent, and the processor records its disposition in BIBS.
+      - The P03 batch log lists the loaded, rejected and resubmitted rows with times and messages, and the extraction check balances for each expiry month January-May 2028.
+      - No renewal stage is loaded from the legacy trackers.
+    cases:
+      - c: 1
+        type: Positive
+        screen: ACCOUNTS
+        title: Renewal completed in legacy migrates as a header
+        steps:
+          - Search the account C-2027-004700-02 (renewal term starting 15-Dec-2027, booked in legacy before the freeze).
+        expected: The account is found with the LEGACY badge and status Booked; the expiring term C-2027-004700-01 is not a renewal candidate.
+      - c: 2
+        type: Workflow
+        title: Continue a January renewal in BIBS
+        steps:
+          - Open the candidate of C-2027-004512-01; record the disposition For quotation.
+        expected: The candidate is urgent, shows the RA sent on 16-Nov-2027 by e-mail, and moves to the next stage with the disposition.
+      - c: 3
+        type: Report-output
+        persona: DML
+        screen: RECONC
+        title: Audit trail of the renewal transition
+        steps:
+          - Open the run log of the P03 batch and the go-live extraction check.
+        expected: The log lists the loaded, rejected and resubmitted rows with their times and messages; for each expiry month January-May 2028 headers = candidates + renewals booked in legacy.
+      - c: 4
+        type: Negative
+        persona: OPERATOR
+        screen: EXTRACTS
+        title: Tracker stages are not a load template
+        steps:
+          - Look for a layout of renewal stages among the load templates of Layouts and Rules.
+        expected: No such layout exists; only P03 (renewal advices already sent) is offered for the renewal transition.
+
+  FR-DM-130:
+    scenario: SC-DM-13
+    persona: CLAIMS
+    screen: CLAIMREC
+    data: [TD-DM-12]
+    conditions:
+      - An open claim with a reserve and payments in legacy is found by its legacy claim number, shows the origin Migrated, the reserve and the payment, and opens its legacy policy header.
+      - A claim whose policy has no header is rejected with its message.
+      - The claim reconciliation shows counts, reserves and paid amounts per currency with no difference.
+    cases:
+      - c: 1
+        type: Positive
+        title: Open claim carried with its legacy policy
+        steps:
+          - After the F07 load, search claim CLM-L-2027-0456 by its legacy number; open its policy.
+        expected: The claim shows the origin Migrated, reserve 150,000.00 and paid 50,000.00; the policy C-2026-001200-01 opens as a legacy header with the status Expired.
+      - c: 2
+        type: Negative
+        persona: OPERATOR
+        screen: BATCH
+        title: Claim without a policy header
+        steps:
+          - Validate the F07 batch.
+        expected: The claim whose policy has no header is Invalid.
+        msg: ["Policy {C-2026-009999-01} of claim {CLM-L-2027-0460} has no migrated header"]
+      - c: 3
+        type: Report-output
+        persona: RECON
+        screen: RECONC
+        title: Claims reconciliation
+        steps:
+          - Open the reconciliation of the F07 batch.
+        expected: Counts, reserves and paid amounts per currency equal the control file with a difference of 0.00.
+
+  FR-DM-131:
+    scenario: SC-DM-13
+    persona: PLACEMENT
+    screen: ACCDOCS
+    data: [TD-DM-12]
+    conditions:
+      - An e-policy whose insurer and insurer policy number match one migrated account is linked to it and can be viewed and downloaded from the account's documents.
+      - An e-policy that matches no account, or more than one, is not linked and appears on the exception report with its reason.
+      - The audit report lists every linked and failed file with the time and the reason.
+    cases:
+      - c: 1
+        type: Upload-download
+        title: Linked e-policy on the account
+        steps:
+          - After the e-policy load, open the migrated account of the first file of the index; open the Documents tab; download the e-policy.
+        expected: The e-policy is listed, opens and downloads; the download is logged.
+      - c: 2
+        type: Negative
+        persona: OPERATOR
+        screen: BATCH
+        title: Unmatched and ambiguous files
+        steps:
+          - Validate the e-policy index with the file that matches no account and the file that matches two accounts.
+        expected: Neither file is linked; both are on the exception report with their reasons.
+        msg: ["E-policy {EP-0029.pdf} matches no migrated account"]
+      - c: 3
+        type: Report-output
+        persona: OPERATOR
+        screen: REPORTS
+        title: Audit report of the linking
+        steps:
+          - Run the audit report of the e-policy batch.
+        expected: 27 files linked and 3 failed (no match, two matches, checksum) with times and reasons.
+
 access:
   - action: View the Migration Console
     screen: HOME
@@ -2139,8 +2379,8 @@ access:
   - action: Approve DP PR and PR2307 legacy reversal batches
     screen: APPROVALS
     permission: "Legacy reversal approve"
-    allow: [CASHIER_TL, COMMREC_TL]
-    deny: [CASHIER, ACCT]
+    allow: [CASHIER_TL, COLLECTIONS_TL]
+    deny: [SUPPORT, COLLECTIONS, ACCT]
     denied: Approve is not shown; the request is refused.
 
   - action: Prepare a FY2027 true-up

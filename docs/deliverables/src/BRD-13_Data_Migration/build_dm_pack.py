@@ -1,4 +1,4 @@
-"""BRD-13 Data Migration business sign-off set (release set v2.0, Drop 0): the migration catalogue, its checks, the
+"""BRD-13 Data Migration business sign-off set (release set v2.1, Drop 0): the migration catalogue, its checks, the
 tables of the Handbook and of the Start Here guide (```pack blocks) and the 03 Migration Workbook.
 
 Usage
@@ -795,7 +795,7 @@ def workbook_sheets(wb: Any, pack: Any, date_sheets: list[Any]) -> None:
         Column("brd", "BRD", 12, "BRD requirement"),
         Column("questions", "Open decisions", 14, "Decisions that affect the object"),
     ] + review(), rows, description="One row per legacy data object with the proposed decision and the four "
-                                    "criteria of the BRD (BRID 1.1a)"))
+                                    "criteria of the BRD (BRID_MIG 1.1)"))
 
     rows = [{"code": o["code"], "name": o["name"], "owner": o["owner"], "steward": o["steward"]}
             for o in cat.objects if o["decision"] != "EXCLUDED"]
@@ -892,7 +892,7 @@ def workbook_sheets(wb: Any, pack: Any, date_sheets: list[Any]) -> None:
         Column("owner", "Approves (G2)", 26, "Business owner who approves each version"),
         Column("steward", "Prepares", 24, "Data steward who prepares the entries"),
         Column("due", "First approved version due", 22, "Milestone"),
-    ] + review(), rows, description="Code map sets of the Migration Console (BRID 3.1): one per domain, versioned and "
+    ] + review(), rows, description="Code map sets of the Migration Console (BRID_MIG 3.1): one per domain, versioned and "
                                     "approved by the business owner"))
     wb.sheet("Code map template", [
         Column("set", "Code map", 20, "Code map set; the console exports one sheet per set, named after it"),
@@ -1006,7 +1006,7 @@ def workbook_sheets(wb: Any, pack: Any, date_sheets: list[Any]) -> None:
                                                                                                 "sign-off"),
         Column("signed", "Signed by and date", 20, "Signer"),
         Column("status", "Status", 11, "Status", values=["OPEN", "DONE", "N/A"], status=True),
-    ] + review(), rows, description="Checklist per legacy system and for the legacy context (BRID 12.1; DMQ27)"))
+    ] + review(), rows, description="Checklist per legacy system and for the legacy context (BRID_MIG 12.1; DMQ27)"))
 
     # Reconciliation sign-off per object
     rows = []

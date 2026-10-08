@@ -1,4 +1,4 @@
-// BRD-13 Data Migration Strategy: renewal-driven transition by expiry month (BRID 12.1; DMQ37 answered 26-Sep-2026).
+// BRD-13 Data Migration Strategy: renewal-driven transition by expiry month (BRID_MIG 12.1; DMQ37 answered 26-Sep-2026).
 // Go-live recommended Monday 3 January 2028; go-live extraction of the expiries to 31 May 2028.
 digraph dm_rmel {
   graph [rankdir=LR, fontname="Arial", nodesep=0.3, ranksep=0.3, bgcolor="white", pad=0.15];

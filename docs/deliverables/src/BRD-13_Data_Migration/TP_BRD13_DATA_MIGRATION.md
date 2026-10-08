@@ -8,8 +8,8 @@ doc_code: TestPlan
 brd: BRD-13
 name: Data Migration Summary
 doc_id: BIBS-TP-BRD-13
-version: "2.0"
-date: 5 October 2026
+version: "2.1"
+date: 8 October 2026
 status: Issued for BDOI business sign-off
 header_title: Test Plan BRD-13 Data Migration
 h1_page_break: false
@@ -26,6 +26,12 @@ control:
     reviewer: iorta TechNXT Project Manager
     approver: "Program Manager, Business Project Services (at sign-off)"
     change: "Files 04 and 05 of the BRD-13 business sign-off set: cases traced to the Data Migration Handbook and to the screens of the Migration Console (one screen case per screen, one message case per screen); scenarios SC-DM-10 trial migrations and dress rehearsal, SC-DM-11 rollback and rerun, SC-DM-12 cut-over rehearsal"
+  - version: "2.1"
+    date: 8 Oct 2026
+    author: iorta TechNXT test team
+    reviewer: iorta TechNXT Project Manager
+    approver: "Program Manager, Business Project Services (at sign-off)"
+    change: "Re-based on the Data Migration BRD V0.03: cases traced to BRID_MIG 1.1 to 14.2; new cases for FR-DM-101, 126, 130 and 131 and for the changes of FR-DM-014, 015, 021, 060, 061, 091 and 100; personas of the DP PR and PR 2307 reversals per V0.03; scenario SC-DM-13 for the objects added by V0.03 on BDOI confirmation"
 distribution:
   - {name: "Program Manager, Business Project Services", role: Approver, organisation: BDO Unibank ESG, purpose: Review and sign-off}
   - {name: "Head, Comptrollership; Product Owner FRBS / ACSL", role: Approver, organisation: BDOI, purpose: "Reconciliation, legacy sub-ledgers, reversals"}
@@ -41,13 +47,13 @@ distribution:
 
 This document summarises the test plan for BRD-13 Data Migration in BIBS. It tells the Data Migration Lead, the data owners and stewards, Comptrollership, Operations, Marketing, the Renewal processing team, Compliance and BDOI IT what will be tested, how, with which data and by whom, and when testing is complete. It is file 05 of the BRD-13 business sign-off set; the test conditions, scenarios and cases are in the test plan workbook, file 04.
 
-Every case traces to a functional requirement (FR) of the Data Migration Handbook v2.0 (Part B) and to the BRD requirement IDs (BRID 1.1a to 12.1) that the FR meets, and names the screen of the Migration Console where it runs.
+Every case traces to a functional requirement (FR) of the Data Migration Handbook v2.1 (Part B) and to the requirement IDs of the Data Migration BRD V0.03 (BRID_MIG 1.1 to 14.2; the second BRID_MIG 12.1 is read as 12.2) that the FR meets, and names the screen of the Migration Console where it runs.
 
 The expected results quote the message texts of the handbook, and the screen paths and button labels are those of its screen specifications. Each screen also has a screen case (the fields, actions and states of its specification) and a message case (the messages of the screen).
 
 ## Scope
 
-In scope are all 44 FRs of the Data Migration Handbook v2.0 and the 20 screens of Part B:
+In scope are all 48 FRs of the Data Migration Handbook v2.1 and the 20 screens of Part B:
 
 - governance: data object register, decisions and sign-off gates (FR-DM-001 to 003);
 - extract intake with control totals, code maps, unmapped codes, validation, load, rerun and rollback (FR-DM-010 to 015);
@@ -56,7 +62,9 @@ In scope are all 44 FRs of the Data Migration Handbook v2.0 and the 20 screens o
 - in-force policy headers (FR-DM-040, 041);
 - legacy invoices and UPP and their processing: automatch, dispositions, refund, reclassification to income, OTC and autopay, the DP PR Legacy Reversal and Legacy PR 2307 Reversal batches, remittance, endorsements, the Changes to Legacy Invoices report (FR-DM-050 to 100);
 - legacy archive inquiry and access log (FR-DM-110, 111);
-- cutover plan with the trial-migration load order, go / no-go, RMEL transition, decommissioning, the go-live renewal extraction of the January-May 2028 expiries and the renewal advices already sent, with their maker-checker review (FR-DM-120 to 125).
+- cutover plan with the trial-migration load order, go / no-go, RMEL transition, decommissioning, the go-live renewal extraction of the January-May 2028 expiries and the renewal advices already sent, with their maker-checker review (FR-DM-120 to 125), and the renewals in progress at the freeze as proposed (FR-DM-126);
+- migrated records in the reports (FR-DM-101);
+- the objects BRD V0.03 adds, tested when BDOI confirms them (scenario SC-DM-13): open claims carried with their legacy policy headers (FR-DM-130) and e-policies linked to the migrated accounts (FR-DM-131).
 
 The early renewal release of the concept paper of 6 September 2026 is superseded by the single January 2028 go-live (register DCR-240); no case tests a production use of BIBS before the cut-over. The cases apply BDOI's answers of 26 September 2026 to DMQ36-DMQ38 and the recommended year-end option A of DMQ39; if Comptrollership chooses another option, the cases of FR-DM-022 to 024 are rewritten.
 
@@ -72,7 +80,7 @@ The reconciliation of every object at L1 to L5, Migration Clearing and the openi
 
 ## Out of scope
 
-- Objects decided under DMQ30 (open claims, Employee Benefits programmes, submitted-policy masterlists, payees): they are tested in the plans of those modules when BDOI brings them into scope.
+- Objects decided under DMQ30 and the clarifications of BRD V0.03 (Employee Benefits programmes, submitted-policy masterlists, payees; CLR-DM-05, CLR-DM-06): they are tested in the plans of those modules when BDOI brings them into scope. Open claims and e-policies are tested by SC-DM-13 once BDOI confirms CLR-DM-08 and CLR-DM-09.
 - Performance at full volume (1,000,000 client rows, 500,000 open items): tested in the dress rehearsal and the performance plan (deliverable 28).
 - The secure file drop and the read-only legacy addresses (on hold until BDOI IT names them); the cases use the uploads of the Extracts screen.
 
@@ -81,10 +89,10 @@ The reconciliation of every object at L1 to L5, Migration Clearing and the openi
 <!-- table: widths=1.2,8.6,4.2 caption="Reference documents" -->
 | Ref. | Document | Version |
 |---|---|---|
-| R1 | Data Migration Handbook BRD-13 (file 02 of the set) | 2.0, 5 Oct 2026 |
-| R2 | BDOI Data Migration BRD | draft v0.01, 14-Apr-2026 |
-| R4 | Migration Workbook BRD-13 (file 03 of the set): load templates, code maps, validation rules, cut-over tasks | 2.0, 5 Oct 2026 |
-| R5 | Start Here guide and Guide deck BRD-13 (files 00 and 01 of the set) | 2.0, 5 Oct 2026 |
+| R1 | Data Migration Handbook BRD-13 (file 02 of the set) | 2.1, 8 Oct 2026 |
+| R2 | BDO Insure Core Modernization - Data Migration - Business Requirements Document (BRD) | V0.03, signed 15 to 19 May 2026 |
+| R4 | Migration Workbook BRD-13 (file 03 of the set): load templates, code maps, validation rules, cut-over tasks | 2.1, 8 Oct 2026 |
+| R5 | Start Here guide and Guide deck BRD-13 (files 00 and 01 of the set) | 2.1, 8 Oct 2026 |
 | R6 | BRD discrepancy and clarification register | 1.2 |
 
 # Test approach

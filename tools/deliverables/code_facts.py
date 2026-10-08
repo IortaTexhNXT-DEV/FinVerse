@@ -386,6 +386,7 @@ def role_grants(include_seed: bool = True) -> dict[str, set[str]]:
     roles: dict[str, set[str]] = {}
     unread: list[str] = []
     temp: dict[str, list[str]] = {}  # temporary permission lists of a migration (insert into tmp_x values ...)
+    temp_roles: dict[str, set[str]] = {}  # temporary role lists of a migration (create temporary table ... as select)
     for f in files:
         text = re.sub(r"--[^\n]*", "", f.read_text(encoding="utf-8"))
         # Function bodies ($$ ... $$, for example the immutability triggers) are
@@ -400,6 +401,20 @@ def role_grants(include_seed: bool = True) -> dict[str, set[str]]:
             tmp = re.match(r"insert into (tmp_\w+) \(permission\) values (.*)", s, re.I)
             if tmp:
                 temp[tmp.group(1).lower()] = _codes(tmp.group(2))
+                continue
+            # A temporary list of roles (create temporary table tmp_x ... as select ... from sec_role r where
+            # r.code in (...) [or r.code like '...']): the roles a later statement removes.
+            troles = re.match(r"create temporary table (tmp_\w+) .*?select r\.id, r\.code from sec_role r where (.*)",
+                              s, re.I)
+            if troles:
+                where = troles.group(2)
+                listed = re.search(r"r\.code in (\([^)]*\))", where, re.I)
+                chosen = set(_codes(listed.group(1))) if listed else set()
+                for like in re.findall(r"r\.code like '([^']*)'", where, re.I):
+                    # SQL LIKE: % any text, an escaped \_ a plain underscore.
+                    pattern = re.escape(like.replace("\\_", "_")).replace("%", ".*")
+                    chosen |= {r for r in roles if re.fullmatch(pattern, r)}
+                temp_roles[troles.group(1).lower()] = chosen
                 continue
             # Derived roles: insert into sec_role (code, ...) select '<PREFIX>' || r.code ... where r.code in (...)
             derived = re.match(r"insert into sec_role \(code[^)]*\) select '([A-Z0-9_]+)' \|\| r\.code .* where "
@@ -433,6 +448,17 @@ def role_grants(include_seed: bool = True) -> dict[str, set[str]]:
                     for r, p in re.findall(r"\('([A-Z][A-Z0-9_]*)',\s*'([A-Z][A-Z0-9_]*)'\)",
                                            pairs.group(1) if pairs else ""):
                         roles.setdefault(prefix + r, set()).add(p)
+                continue
+            # Grants removed by a temporary list: of permissions (from every role) or of roles (the roles go).
+            by_temp = re.match(r"delete from sec_role_permission where (permission|role_id) in "
+                               r"\(select (?:permission|id) from (tmp_\w+)\)", s, re.I)
+            if by_temp:
+                if by_temp.group(1).lower() == "permission":
+                    for ps in roles.values():
+                        ps.difference_update(temp.get(by_temp.group(2).lower(), []))
+                else:
+                    for r in temp_roles.get(by_temp.group(2).lower(), set()):
+                        roles.pop(r, None)
                 continue
             if low.startswith("delete from sec_role_permission"):
                 perms = _codes(re.search(r"permission\s*(?:=|in)\s*(\([^)]*\)|'[^']*')", s, re.I).group(1))

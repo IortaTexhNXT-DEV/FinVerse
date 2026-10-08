@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.renewal.check.service.BlockingChecks;
+import com.iortatechnxt.brokerverse.renewal.domain.CandidateExpiry;
 import com.iortatechnxt.brokerverse.renewal.domain.ClosedAs;
 import com.iortatechnxt.brokerverse.renewal.domain.LetterBatch;
 import com.iortatechnxt.brokerverse.renewal.domain.LetterBatchRepository;
@@ -19,6 +20,7 @@ import com.iortatechnxt.brokerverse.renewal.domain.RenewalLetterRepository;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalStage;
 import com.iortatechnxt.brokerverse.renewal.service.BatchOutcome;
 import com.iortatechnxt.brokerverse.renewal.service.RenewalBatch;
+import com.iortatechnxt.brokerverse.renewal.service.RenewalCodes;
 import com.iortatechnxt.brokerverse.renewal.service.RenewalFlow;
 import com.iortatechnxt.brokerverse.renewal.service.RenewalParameters;
 import com.iortatechnxt.brokerverse.renewal.service.RenewalRecords;
@@ -41,6 +43,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 public class LetterService {
+
+  private static final String RENEWAL = "Renewal ";
 
   private final RenewalRecords records;
   private final RenewalLetterRepository letters;
@@ -133,7 +137,7 @@ public class LetterService {
     if (late && !confirmLate) {
       throw new BusinessRuleException(
           "RNW_RA_LATE",
-          "Renewal "
+          RENEWAL
               + c.getRenewalRef()
               + " expires in "
               + days
@@ -159,7 +163,7 @@ public class LetterService {
                 () ->
                     new BusinessRuleException(
                         "RNW_RA_SECOND",
-                        "Renewal " + c.getRenewalRef() + " has no first notice sent"));
+                        RENEWAL + c.getRenewalRef() + " has no first notice sent"));
     long since = ChronoUnit.DAYS.between(BusinessClock.dateOf(firstSent), today);
     if (since < parameters.raSecondNoticeDays()) {
       throw new BusinessRuleException(
@@ -220,6 +224,7 @@ public class LetterService {
           RenewalCandidate c = records.get(companyId, ref);
           RenewalRecords.requireStage(c, RenewalStage.LETTER_PENDING);
           LetterType type = closingType(c);
+          requireNoOtherClosingLetter(c, type);
           RenewalLetter letter =
               pendingOptional(c, type)
                   .orElseGet(
@@ -233,6 +238,7 @@ public class LetterService {
           if (type == LetterType.NFR) {
             c.getFlags().setNfrSent(true);
           }
+          c.getExpiry().letterSent(type.name());
           flow.act(
               c,
               "send_letter",
@@ -241,6 +247,85 @@ public class LetterService {
           c.close(ClosedAs.NOT_RENEWED, null, clock.instant());
           return null;
         });
+  }
+
+  /**
+   * Generates and sends the closing letter of renewals that reached their effective expiry date
+   * unrenewed (Walkthrough addendum R37-HC-07 to 12; FR-RN-082): the No Advice Letter of the
+   * renewals routed to Operations (a Renewal Advice was sent), the Non-Renewal Letter (the Not for
+   * Renewal Letter) of those routed to the Marketing AO. A renewal never receives both.
+   *
+   * @param companyId company
+   * @param refs renewals
+   * @return sent and refused renewals
+   */
+  public BatchOutcome closingLettersAtExpiry(Long companyId, List<String> refs) {
+    return batch.runReporting(
+        refs,
+        ref -> {
+          RenewalCandidate c = records.get(companyId, ref);
+          LetterType type = closingTypeAtExpiry(c);
+          requireNoOtherClosingLetter(c, type);
+          RenewalLetter letter =
+              pendingOptional(c, type)
+                  .orElseGet(
+                      () ->
+                          writer.generate(
+                              c, new LetterBatch.Kind(type, null), LetterSource.USER, null, null));
+          Optional<String> refusal = writer.send(c, letter);
+          if (refusal.isEmpty()) {
+            closingSent(c, type);
+          }
+          return refusal.orElse(null);
+        });
+  }
+
+  /**
+   * The closing letter a renewal unrenewed at its effective expiry is routed to, for its sender.
+   */
+  private LetterType closingTypeAtExpiry(RenewalCandidate c) {
+    String route = c.getExpiry().getClosingRoute();
+    if (route == null) {
+      throw new BusinessRuleException(
+          "RNW_CLOSING_NOT_DUE", RENEWAL + c.getRenewalRef() + " is not due a closing letter");
+    }
+    LetterType type = CandidateExpiry.NAL.equals(route) ? LetterType.NAL : LetterType.NFR;
+    String permission = type == LetterType.NAL ? RenewalCodes.RA_SEND : RenewalCodes.DISPOSE;
+    if (!currentUser.hasAuthority(permission)) {
+      throw new BusinessRuleException(
+          "RNW_CLOSING_NOT_YOURS",
+          type == LetterType.NAL
+              ? "The No Advice Letter of " + c.getRenewalRef() + " is sent by Operations"
+              : "The Non-Renewal Letter of "
+                  + c.getRenewalRef()
+                  + " is sent by the Account Officer");
+    }
+    return type;
+  }
+
+  private static void closingSent(RenewalCandidate c, LetterType type) {
+    if (type == LetterType.NFR) {
+      c.getFlags().setNfrSent(true);
+    }
+    c.getExpiry().letterSent(type.name());
+  }
+
+  /**
+   * A No Advice Letter and a Non-Renewal (Not for Renewal) Letter exclude each other (R37-HC-09,
+   * 10).
+   */
+  private static void requireNoOtherClosingLetter(RenewalCandidate c, LetterType type) {
+    String sent = c.getExpiry().getClosingLetter();
+    if (sent != null) {
+      throw new BusinessRuleException(
+          "RNW_CLOSING_LETTER_SENT",
+          RENEWAL
+              + c.getRenewalRef()
+              + " already has a "
+              + LetterWriter.label(new LetterBatch.Kind(LetterType.valueOf(sent), null))
+              + " and cannot receive a "
+              + LetterWriter.label(new LetterBatch.Kind(type, null)));
+    }
   }
 
   /**
@@ -293,7 +378,7 @@ public class LetterService {
         .orElseThrow(
             () ->
                 new BusinessRuleException(
-                    "RNW_LETTER_NONE", "Renewal " + c.getRenewalRef() + " has no letter to send"));
+                    "RNW_LETTER_NONE", RENEWAL + c.getRenewalRef() + " has no letter to send"));
   }
 
   private Optional<RenewalLetter> pendingOptional(RenewalCandidate c, LetterType type) {

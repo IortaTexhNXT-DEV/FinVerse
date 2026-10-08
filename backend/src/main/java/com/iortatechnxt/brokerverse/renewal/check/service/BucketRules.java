@@ -41,10 +41,30 @@ public class BucketRules {
    * @return bucket with the rule set version and the rule that decided it
    */
   public Decision bucketOf(Long companyId, List<Finding> findings, LocalDate today) {
+    return bucketOf(companyId, findings, today, null);
+  }
+
+  /**
+   * The bucket of a set of findings for a renewal already initiated: the rule set version that
+   * classified it at initiation keeps applying, so that a new version applies only to the renewals
+   * not yet initiated (Annex BRRN.020; FR-RN-112 R3). Without a pinned version, or when that
+   * version no longer exists, the active rule set applies.
+   *
+   * @param companyId company
+   * @param findings findings of a check run
+   * @param today business date
+   * @param pinnedVersion rule set version of the renewal, null when not initiated
+   * @return bucket with the rule set version and the rule that decided it
+   */
+  public Decision bucketOf(
+      Long companyId, List<Finding> findings, LocalDate today, Integer pinnedVersion) {
     Optional<BucketRuleSet> active =
-        ruleSets.findByCompanyIdAndStatus(companyId, RuleSetStatus.ACTIVE).stream()
-            .filter(r -> !r.getEffectiveFrom().isAfter(today))
-            .findFirst();
+        pinned(companyId, pinnedVersion)
+            .or(
+                () ->
+                    ruleSets.findByCompanyIdAndStatus(companyId, RuleSetStatus.ACTIVE).stream()
+                        .filter(r -> !r.getEffectiveFrom().isAfter(today))
+                        .findFirst());
     Decision decision =
         new Decision(Bucket.CLEAN, active.map(r -> r.getVersionNo()).orElse(null), null);
     for (Finding f : findings) {
@@ -62,6 +82,19 @@ public class BucketRules {
       decision = new Decision(Bucket.REVIEW, decision.ruleSetVersion(), decision.ruleId());
     }
     return decision;
+  }
+
+  private Optional<BucketRuleSet> pinned(Long companyId, Integer version) {
+    if (version == null) {
+      return Optional.empty();
+    }
+    return ruleSets.findByCompanyIdOrderByVersionNoDesc(companyId).stream()
+        .filter(
+            r ->
+                version.equals(r.getVersionNo())
+                    && (r.getStatus() == RuleSetStatus.ACTIVE
+                        || r.getStatus() == RuleSetStatus.RETIRED))
+        .findFirst();
   }
 
   private static Decision byRules(BucketRuleSet set, Finding f) {

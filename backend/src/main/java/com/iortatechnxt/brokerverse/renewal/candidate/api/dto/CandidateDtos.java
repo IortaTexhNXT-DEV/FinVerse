@@ -260,6 +260,11 @@ public final class CandidateDtos {
    * @param stp straight-through
    * @param locked locked by the Renewal Advice
    * @param nfrSent NFR sent
+   * @param holdCoverUntil end of the confirmed hold cover (chip HC confirmed), null when none
+   * @param closingRoute closing letter due at the effective expiry (NAL or NRL), null when none
+   * @param closingLetter closing letter sent (NAL or NFR), null when none
+   * @param attention attention flag of the listing (Ageing, Overdue, High risk), null when none
+   * @param attentionRule rule that set the attention flag, null when none
    */
   public record FlagChips(
       boolean urgent,
@@ -273,7 +278,12 @@ public final class CandidateDtos {
       boolean nrns,
       boolean stp,
       boolean locked,
-      boolean nfrSent) {
+      boolean nfrSent,
+      LocalDate holdCoverUntil,
+      String closingRoute,
+      String closingLetter,
+      String attention,
+      String attentionRule) {
 
     static FlagChips of(RenewalCandidate c) {
       CandidateFlags f = c.getFlags();
@@ -289,7 +299,12 @@ public final class CandidateDtos {
           f.isNrns(),
           f.isStp(),
           c.getMarketingLockedAt() != null || c.getStage().isMarketingLocked(),
-          f.isNfrSent());
+          f.isNfrSent(),
+          c.getExpiry().getHoldCoverUntil(),
+          c.getExpiry().getClosingRoute(),
+          c.getExpiry().getClosingLetter(),
+          c.getAttention().getFlag() == null ? null : c.getAttention().getFlag().label(),
+          c.getAttention().getRule());
     }
   }
 }

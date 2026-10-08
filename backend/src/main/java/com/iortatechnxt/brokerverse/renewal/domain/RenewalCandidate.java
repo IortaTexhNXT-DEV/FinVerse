@@ -99,6 +99,10 @@ public class RenewalCandidate extends BaseEntity {
 
   @Embedded private final CandidateFlags flags = new CandidateFlags();
 
+  @Embedded private CandidateExpiry expiry = new CandidateExpiry();
+
+  @Embedded private CandidateAttention attention = new CandidateAttention();
+
   @Enumerated(EnumType.STRING)
   @Column(name = "ra_notice", nullable = false, length = 10)
   private RaNotice raNotice = RaNotice.NONE;
@@ -355,6 +359,7 @@ public class RenewalCandidate extends BaseEntity {
     this.closedAs = how;
     this.renewedInvoiceNo = invoiceNo;
     this.closedAt = at;
+    getAttention().set(null, null, null);
   }
 
   /** Re-opens a closed candidate (BRD 2.004.10). */
@@ -481,6 +486,39 @@ public class RenewalCandidate extends BaseEntity {
 
   public CandidateFlags getFlags() {
     return flags;
+  }
+
+  /**
+   * The hold cover and the closing letter (FR-RN-082, 083, 086).
+   *
+   * @return expiry facts, never null
+   */
+  public CandidateExpiry getExpiry() {
+    if (expiry == null) {
+      expiry = new CandidateExpiry();
+    }
+    return expiry;
+  }
+
+  /**
+   * The attention flag of the listing (FR-RN-102).
+   *
+   * @return attention, never null
+   */
+  public CandidateAttention getAttention() {
+    if (attention == null) {
+      attention = new CandidateAttention();
+    }
+    return attention;
+  }
+
+  /**
+   * The effective expiry date: the end of a confirmed hold cover, otherwise the policy expiry.
+   *
+   * @return date
+   */
+  public LocalDate effectiveExpiry() {
+    return getExpiry().effectiveExpiry(getExpiryDate());
   }
 
   public RaNotice getRaNotice() {

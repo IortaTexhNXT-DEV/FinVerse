@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.renewal.candidate.service.CandidateFilter.Co
 import com.iortatechnxt.brokerverse.renewal.candidate.service.CandidateFilter.Flags;
 import com.iortatechnxt.brokerverse.renewal.candidate.service.CandidateFilter.Tab;
 import com.iortatechnxt.brokerverse.renewal.domain.Bucket;
+import com.iortatechnxt.brokerverse.renewal.domain.CandidateExpiry;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalAssignment;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalCandidate;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalDisposition;
@@ -107,9 +108,10 @@ final class CandidateSpecifications {
       return cb.equal(root.get("disposition").get("code"), disposition);
     }
     RenewalStage stage = STAGE_TABS.get(tab);
-    if (stage != null) {
-      return cb.equal(root.get(STAGE), stage);
-    }
+    return stage == null ? otherTab(root, cb, tab) : cb.equal(root.get(STAGE), stage);
+  }
+
+  private static Predicate otherTab(Root<RenewalCandidate> root, CriteriaBuilder cb, Tab tab) {
     return switch (tab) {
       case EXCEPTIONS ->
           cb.and(
@@ -117,8 +119,19 @@ final class CandidateSpecifications {
       case RETURNED -> cb.isTrue(root.get(FLAGS).get("returned"));
       case NRNS -> cb.isTrue(root.get(FLAGS).get("nrns"));
       case CLOSED -> root.get(STAGE).in(CLOSED);
+      case ATTENTION -> cb.isNotNull(root.get("attention").get("flag"));
+      case NAL_DUE -> closingDue(root, cb, CandidateExpiry.NAL);
+      case NRL_DUE -> closingDue(root, cb, CandidateExpiry.NRL);
       default -> cb.conjunction();
     };
+  }
+
+  /** Renewals routed to a closing letter at their effective expiry that have none sent yet. */
+  private static Predicate closingDue(
+      Root<RenewalCandidate> root, CriteriaBuilder cb, String route) {
+    return cb.and(
+        cb.equal(root.get("expiry").get("closingRoute"), route),
+        cb.isNull(root.get("expiry").get("closingLetter")));
   }
 
   private static void range(

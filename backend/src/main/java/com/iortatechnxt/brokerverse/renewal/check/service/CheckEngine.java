@@ -125,7 +125,10 @@ public class CheckEngine {
       findings.add(new Finding(check.code(), v.outcome(), severity, v.message(), v.detail()));
     }
     BucketRules.Decision decision =
-        pinned(candidate, bucketRules.bucketOf(candidate.getCompanyId(), findings, today));
+        pinned(
+            candidate,
+            bucketRules.bucketOf(
+                candidate.getCompanyId(), findings, today, pinnedVersion(candidate)));
     Bucket before = candidate.getBucket();
     CheckRun run =
         runs.save(
@@ -158,6 +161,18 @@ public class CheckEngine {
     flags(candidate, evaluation, now);
     endPassedOverrides(candidate, evaluation);
     return evaluation;
+  }
+
+  /**
+   * The rule set version of a renewal evaluated since its initiation: a new version applies only to
+   * renewals not yet initiated (FR-RN-112 R3). The run at initiation takes the active version.
+   */
+  private static Integer pinnedVersion(RenewalCandidate c) {
+    boolean evaluatedSinceInitiation =
+        c.getInitiatedAt() != null
+            && c.getEvaluatedAt() != null
+            && c.getEvaluatedAt().isAfter(c.getInitiatedAt());
+    return evaluatedSinceInitiation ? c.getBucketRuleVersion() : null;
   }
 
   /** An active bucket override holds while the computed bucket is still the one it replaced. */

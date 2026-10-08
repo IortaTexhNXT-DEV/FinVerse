@@ -21,6 +21,9 @@ export type RenewalTab =
   | 'RA_GENERATED'
   | 'RA_SENT'
   | 'LETTER_PENDING'
+  | 'NAL_DUE'
+  | 'NRL_DUE'
+  | 'ATTENTION'
   | 'NRNS'
   | 'NB_PATH'
   | 'CLOSED';
@@ -119,6 +122,16 @@ export interface FlagChips {
   stp: boolean;
   locked: boolean;
   nfrSent: boolean;
+  /** End of the confirmed hold cover (the effective expiry date), null when none. */
+  holdCoverUntil?: string | null;
+  /** Closing letter due at the effective expiry: NAL (Operations) or NRL (Marketing AO). */
+  closingRoute?: 'NAL' | 'NRL' | null;
+  /** Closing letter sent: NAL or NFR (the Non-Renewal Letter). */
+  closingLetter?: 'NAL' | 'NFR' | null;
+  /** Attention flag of the listing (Ageing, Overdue, High risk), null when none. */
+  attention?: string | null;
+  /** Rule that set the attention flag. */
+  attentionRule?: string | null;
 }
 
 export interface CandidateRow {

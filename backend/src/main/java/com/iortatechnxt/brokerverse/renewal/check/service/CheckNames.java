@@ -21,7 +21,10 @@ public final class CheckNames {
           Map.entry("INSURER_USABLE", "Insurer usable"),
           Map.entry("DUPLICATE_CANDIDATE", "Duplicate renewal"),
           Map.entry("KYC_DUE", "KYC review due"),
-          Map.entry("PACKAGE_REMAP", "Package of a migrated policy"));
+          Map.entry("PACKAGE_REMAP", "Package of a migrated policy"),
+          Map.entry("TSI_THRESHOLD", "Total sum insured threshold"),
+          Map.entry("RISK_CODE_DEFINED", "Risk code defined"),
+          Map.entry("INSURER_RENEWABLE_LIST", "Insurer renewable list"));
 
   private CheckNames() {}
 

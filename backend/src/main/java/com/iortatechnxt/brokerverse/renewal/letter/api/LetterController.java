@@ -80,6 +80,19 @@ public class LetterController {
   }
 
   /**
+   * Generates and sends the closing letter of renewals unrenewed at their effective expiry: the No
+   * Advice Letter (Operations) or the Non-Renewal Letter (Marketing AO), never both.
+   *
+   * @param request selection
+   * @return outcome
+   */
+  @PostMapping("/letters/closing-at-expiry")
+  @PreAuthorize("hasAnyAuthority('RNW_RA_SEND', 'RNW_DISPOSE')")
+  public BatchOutcome closingAtExpiry(@Valid @RequestBody Selection request) {
+    return letters.closingLettersAtExpiry(request.companyId(), request.renewalRefs());
+  }
+
+  /**
    * The letters of a renewal.
    *
    * @param companyId company

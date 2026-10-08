@@ -283,7 +283,7 @@ describe('renewal values not given', () => {
     const r = row();
     const money = { ...r.money } as Partial<typeof r.money>;
     delete money.claimCount;
-    render(<>{premium?.render({ ...r, money: money as typeof r.money }, 0)}</>);
+    render(<>{premium?.render({ ...r, money: money as typeof r.money })}</>);
     expect(screen.queryByText(/undefined/)).toBeNull();
   });
 });

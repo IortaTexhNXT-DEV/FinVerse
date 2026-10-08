@@ -839,7 +839,14 @@
 }
 
 /* My Work: the description keeps one line at the column width (full text in the tooltip) */
-.queue-description {
+.table .queue-description {
   display: block;
-  max-width: 320px;
+  max-width: 200px;
+}
+
+/* Wide windows give the description more room */
+@media (min-width: 1680px) {
+  .table .queue-description {
+    max-width: 360px;
+  }
 }

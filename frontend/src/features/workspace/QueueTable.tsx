@@ -52,14 +52,14 @@ export function QueueTable(p: Readonly<QueueTableProps>) {
         {
           key: 'type',
           header: 'Type',
-          width: '128px',
+          width: '96px',
           truncate: true,
           render: (i) => workflowRecordType(i.workflowCode),
         },
         {
           key: 'title',
           header: 'Description / From',
-          width: '240px',
+          width: '200px',
           render: (i) => (
             <CellStack
               main={<TruncatedText text={splitTrailingAmount(i.title).text} />}
@@ -103,7 +103,7 @@ export function QueueTable(p: Readonly<QueueTableProps>) {
         {
           key: 'assignee',
           header: 'Assignee',
-          width: '150px',
+          width: '120px',
           truncate: true,
           render: (i) => <UserName login={i.assignee} empty="Unassigned" truncate />,
         },

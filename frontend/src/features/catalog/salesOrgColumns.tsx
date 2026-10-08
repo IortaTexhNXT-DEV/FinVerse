@@ -175,10 +175,6 @@ export function summaryText(counts: {
   teams: number;
   officers: number;
 }) {
-  return [
-    countOf(counts.regions, 'region'),
-    countOf(counts.departments, 'department'),
-    countOf(counts.teams, 'team'),
-    countOf(counts.officers, 'officer'),
-  ].join(' · ');
+  // A sentence, never a dot-separated run: "2 regions, 3 departments, 3 teams and 4 officers".
+  return `${countOf(counts.regions, 'region')}, ${countOf(counts.departments, 'department')}, ${countOf(counts.teams, 'team')} and ${countOf(counts.officers, 'officer')}`;
 }

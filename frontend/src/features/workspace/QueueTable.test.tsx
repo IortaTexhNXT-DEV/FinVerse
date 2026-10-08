@@ -197,7 +197,10 @@ describe('QueueTable', () => {
       expect(name).toHaveAttribute('title', 'Aileen Account Officer (ao)');
     }
     expect(names.some((n) => n.closest('td')?.classList.contains('col-truncate'))).toBe(true);
-    expect(screen.getByText('Bayside Builders Co.')).toHaveAttribute('title', 'Bayside Builders Co.');
+    expect(screen.getByText('Bayside Builders Co.')).toHaveAttribute(
+      'title',
+      'Bayside Builders Co.',
+    );
     setUserDirectory([]);
   });
 

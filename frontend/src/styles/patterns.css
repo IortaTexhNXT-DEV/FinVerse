@@ -1744,3 +1744,15 @@ a.card.kpi:focus-visible .kpi-label {
 .table td:has(> .cell-stack):not(.col-code, .num, .col-status, .col-date, .col-datetime) {
   min-width: 152px;
 }
+
+/* A card whose body is folded away (Queues by Stage) is its header alone, without an empty band. */
+.card-body:empty {
+  display: none;
+}
+
+/* Denser cell padding (10 px each side): a list of eight to ten columns fits a 1440 px window. */
+.table th,
+.table td {
+  padding-left: 10px;
+  padding-right: 10px;
+}

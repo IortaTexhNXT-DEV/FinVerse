@@ -331,3 +331,97 @@ screen_templates:
 
 # Notes on the gaps: datasets with a template whose rows the platform cannot take by file, keyed on the screen.
 gap_note: "No new upload is provided for these datasets. The BDOI owner fills in the template; the BIBS configuration team keys the rows on the screen named, a second user authorises each record (maker-checker), and the owner checks the result against the template before the dress rehearsal."
+
+# --------------------------------------------------------------------------------- workbook A: owner roles
+# One name per BDOI role (sheet Owners and the drop-down of the Owner column). Derived from the RACI matrix of the
+# programme (delivery_adoption/raci.yaml) and the personas and approval sheets of the FRS. [role, who, organisation,
+# what the role answers or provides]
+owner_roles:
+  - [Steering Committee, "Chaired by the Program Manager, Business Project Services; BIBS Product Owner and the heads of Operations, Comptrollership, Marketing, Compliance, BDOI IT and Information Security; go / no-go board", BDOI, "Drop closure, go / no-go and programme-level approvals"]
+  - [Program Manager, "Program Manager and BA Unit Head, Enterprise Services Group - Business Project Services", BDO Unibank ESG, "Plan, drops, traceability, BRD baselines and the data migration programme"]
+  - [BIBS Product Owner, "Owner of the BIBS scope; chairs the Change Control Board", BDOI, "Cross-BRD decisions, NFR targets, scope and phase 2"]
+  - [Business Analyst (BPS), "Business Project Services analysts, authors of the BRDs", BDO Unibank ESG, "BRD wording, numbering and traceability"]
+  - [Head of Marketing, "Heads of Retail and Corporate Marketing and the marketing unit heads", BDOI, "Sales organisation, account officers, marketing rules and approvals"]
+  - ["Product Owner, MBS", "Product Owner, Marketing Business System (MBS)", BDOI, "Product Maintenance, products, lists of values, document templates, user access ownership"]
+  - [TSU Head, "Head of the Technical Support Unit (TSU)", BDOI, "Packages, wordings, clauses, rates and the package map"]
+  - ["Product Owner, New Business", "Product Owner of New Business (Marketing and Processing)", BDOI, "Quotation, placement, issuance and booking"]
+  - ["Product Owner, Renewal", "Product Owner of Renewal (RMEL)", BDOI, "Renewal extraction, dispositions, letters and insurer responses"]
+  - ["Product Owner, Claims", "Product Owner of Claims and Risk Management", BDOI, "Claims handling"]
+  - ["Product Owner, Employee Benefits", "Product Owner of Employee Benefits", BDOI, "Employee Benefits programmes"]
+  - ["Product Owner, Customer Servicing", "Product Owner of the Customer Servicing Facility (Contact Center Management)", BDOI, "Customer servicing and case management"]
+  - ["Product Owner, Submitted Policies", "Product Owner of Submitted Policies (CBG and Non-CBG Marketing)", BDOI, "Submitted policies, masterlists and handling fees"]
+  - [Operations Head, "Head, Operations Services (financial transactions, cashiering, remittance, adjustments)", BDOI, "Operations rules, insurers, receipts and remittance"]
+  - [Collections Head, "VP and Head, BDOI Operations (Collections)", BDOI, "Collections rules, dispositions and escalations"]
+  - [Accounting Head / Controller, "Head, Comptrollership (FRBS, ACSL, Disbursement, Treasury and Tax)", BDOI, "Chart of accounts, accounting rules, tax, banks and the GL opening"]
+  - [Compliance Officer, "Chief Compliance Officer and the Compliance unit", BDOI, "Screening, KYC, watchlists and retention"]
+  - [Information Security Officer, "Head, BDOI Information Security", BDOI, "Security settings, role matrix, separation of duties"]
+  - [User Access Administrator, "Business Administration (User Access), the process owner of user access maintenance", BDOI, "Users, group profiles, approvers"]
+  - [BDOI IT, "BDOI Information Technology Group", BDOI, "Environments, extracts, interfaces and the Technical Specification"]
+  - [IT Infrastructure (BDO IT), "BDO Unibank IT: the EIAM, IGA, gateway and IT operations teams", BDO Unibank, "Directory sign-in, provisioning, gateway, infrastructure and DR"]
+  - [Data Migration Lead, "Data Migration Lead with the data owners and stewards", BDOI, "Migration objects, extracts, code maps and reconciliation"]
+  - [Human Resources, "BDOI Human Resources", BDOI, "Employees and holidays"]
+  - [Internal Audit, "BDOI Internal Audit", BDOI, "Audit trail and audit reports"]
+
+# Owner of each tab as a role of owner_roles.
+tab_owner_role:
+  BRD-00: BIBS Product Owner
+  BRD-01: "Product Owner, New Business"
+  BRD-02: Operations Head
+  BRD-03: "Product Owner, MBS"
+  BRD-04: Collections Head
+  BRD-05: Accounting Head / Controller
+  BRD-06: "Product Owner, Renewal"
+  BRD-07: "Product Owner, Claims"
+  BRD-08: "Product Owner, Employee Benefits"
+  BRD-09: "Product Owner, Customer Servicing"
+  BRD-10: Compliance Officer
+  BRD-11: "Product Owner, MBS"
+  BRD-12: "Product Owner, Submitted Policies"
+  BRD-13: Data Migration Lead
+  RI: BIBS Product Owner
+
+# Rules from an owner text of the sources to a role, applied to the first role named (up to ';' or ' with '),
+# in this order; 'TAB' means the owner of the tab.
+owner_rules:
+  - ['steering committee|go / no-go board', Steering Committee]
+  - ['program(me)? manager', Program Manager]
+  - ['BIBS product owner', BIBS Product Owner]
+  - ['data migration lead|migration lead|data owners?|data steward', Data Migration Lead]
+  - ['information security|security officer', Information Security Officer]
+  - ['\bBDO IT\b|EIAM team|IGA team|API team|\bITIO\b|IT operations|BDO Unibank IT|ITSD|cloud and digital', IT Infrastructure (BDO IT)]
+  - ['\bBDOI IT\b|information technology', BDOI IT]
+  - ['compliance|data protection', Compliance Officer]
+  - ['internal audit', Internal Audit]
+  - ['employee benefits', "Product Owner, Employee Benefits"]
+  - ['collection', Collections Head]
+  - ['\bTSU\b|technical support', TSU Head]
+  - ['user access|business administra|\bUAM\b|system administrator|access review', User Access Administrator]
+  - ['\bMBS\b|marketing business|product maintenance|incentive maintenance', "Product Owner, MBS"]
+  - ['submitted polic|\bCBG\b', "Product Owner, Submitted Policies"]
+  - ['claims', "Product Owner, Claims"]
+  - ['customer servic|contact cent|\bCSF\b|alternative distribution', "Product Owner, Customer Servicing"]
+  - ['renewal|\bRMEL\b', "Product Owner, Renewal"]
+  - ['new business|placement|booking|quotation|issuance', "Product Owner, New Business"]
+  - ['comptrollership|accounting|controller|\bFRBS\b|\bACSL\b|treasury|disbursement|\btax\b|finance\b', Accounting Head / Controller]
+  - ['human resources|\bHR\b', Human Resources]
+  - ['operations|remittance|cashiering|financial transactions|production reconciliation', Operations Head]
+  - ['marketing|sales|account officer|unit head', Head of Marketing]
+  - ['business analyst|business project services|\bBPS\b', Business Analyst (BPS)]
+  - ['product owner|business owner|owners? of the|key users|testers|configuration owners', TAB]
+
+# Rows of the tabs typed here (other than the reinsurance tab).
+extra_rows:
+  - ref: PM-CON-01
+    tab: BRD-03
+    type: Master data
+    need: "Insurers, insurer branches, commission rates and the package map: provide them in the Migration Console templates R04 (insurers), R04B (insurer branches), R07 (commission rates by insurer and product) and R06 (package code map) of the Master Data and Configuration Upload Templates workbook. These replace templates CI-05 and CI-07 of the BRD-03 configuration inputs (PM-05 and PM-07 of the Drop 0 workbook): the content is the same, in the column layout BIBS loads."
+    why: "BIBS loads the insurers, their branches, the commission rates and the package map through the Data Migration Console; one layout per dataset avoids preparing the same data twice."
+    proposal: "Operations (insurers, branches, commission rates) and TSU (package map, approved by MBS) fill in the four console templates; BDOI IT extracts the legacy rows in the same layouts."
+    source: "BRD-03 configuration input templates CI-05 and CI-07; Drop 0 configuration register CFG-095, CFG-100 and CFG-101; Migration Console layouts R04, R04B, R06 and R07"
+    owner: "Product Owner, MBS"
+    due: 2027-04-09
+    priority: High
+    status: Open
+    remarks: "Templates R04, R04B, R07 and R06 of the Master Data and Configuration Upload Templates workbook."
+
+# Type of each row after the row-by-row review (overrides the rules); filled from type_review.yaml.

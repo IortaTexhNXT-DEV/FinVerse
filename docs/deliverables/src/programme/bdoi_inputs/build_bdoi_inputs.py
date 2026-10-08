@@ -219,7 +219,7 @@ def business(text: Any) -> str:
     # (CODE) or (CODE, CODE) alone in brackets: dropped
     s = re.sub(r"\s*\((?:\s*(?:LOV |list |parameter |permission |role |status |event )?[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+"
                r"\s*[,;/]?)+\)", "", s)
-    s = CODE.sub(code_words, s)
+    s = CODE.sub(lambda m: m.group(0) if m.group(0).startswith("BRID_") else code_words(m), s)
     s = LOWER_CODE.sub(code_words, s)
     s = CAMEL.sub(lambda m: re.sub(r"(?<!^)(?=[A-Z])", " ", m.group(0)).lower(), s)
     s = wording(s)
@@ -655,18 +655,50 @@ def signoff_items() -> list[Item]:
 
 def ri_items() -> list[Item]:
     out = []
-    for r in cfg()["ri_rows"]:
-        out.append(Item(id=r["ref"], kind="ri", tab="RI", type=r["type"], need=r["need"], why=r["why"],
+    for r in cfg()["ri_rows"] + cfg().get("extra_rows", []):
+        out.append(Item(id=r["ref"], kind="ri", tab=r.get("tab", "RI"), type=r["type"], need=r["need"], why=r["why"],
                         proposal=r["proposal"], source=r["source"], owner=r["owner"], due=as_date(r["due"]),
                         priority=r["priority"], status=r["status"],
                         remarks=[r["remarks"]] if r.get("remarks") else []))
     return out
 
 
+# ============================================================================ owners
+
+
+def owner_roles() -> list[str]:
+    return [r[0] for r in cfg()["owner_roles"]]
+
+
+def owner_role(text: str, tab_key: str) -> str:
+    """The BDOI role of an owner text of the sources (first role named), one name per role."""
+    first = re.split(r";| with |/", clean(text), maxsplit=1)[0]
+    for pat, role in cfg()["owner_rules"]:
+        if re.search(pat, first, re.I):
+            return cfg()["tab_owner_role"][tab_key] if role == "TAB" else role
+    for pat, role in cfg()["owner_rules"]:
+        if role != "TAB" and re.search(pat, text, re.I):
+            return role
+    return cfg()["tab_owner_role"][tab_key]
+
+
 # ============================================================================ consolidation
 
 
+TYPE_REVIEW = HERE / "type_review.yaml"
+
+
+@lru_cache(maxsize=1)
+def type_review() -> dict[str, str]:
+    """Type of each row after the row-by-row review: {row ID: type}."""
+    if not TYPE_REVIEW.exists():
+        return {}
+    return {str(k): v for k, v in (yaml.safe_load(TYPE_REVIEW.read_text(encoding="utf-8")) or {}).items()}
+
+
 def classify(it: Item) -> str:
+    if it.id in type_review():
+        return type_review()[it.id]
     if it.type:
         return it.type
     ask = it.need.split(": ", 1)[1] if it.topic and ": " in it.need else it.need
@@ -811,6 +843,7 @@ def finish(rows: list[Item]) -> None:
                 if a not in seen:
                     seen.append(a)
             row.answer = "; ".join(seen)
+        row.owner = owner_role(row.owner, row.tab)
         prios = [row.priority] + [a.priority for a in row.attached if a.kind in ("dcr", "drop0", "decision")]
         row.priority = min((p for p in prios if p in PRIORITIES), key=PRIORITIES.index, default="Medium")
         also, seen_ids = [], {row.id}
@@ -895,15 +928,25 @@ def build_a() -> Path:
     types = cfg()["types"]
     cols = []
     for key, head, width, desc in A_COLUMNS:
-        values = {"type": types, "priority": PRIORITIES, "status": STATUSES}.get(key)
+        values = {"type": types, "priority": PRIORITIES, "status": STATUSES, "owner": owner_roles()}.get(key)
         cols.append(Column(key, head, width, desc, values=values, status=key == "status",
                            kind="date" if key == "due" else "text"))
+    owners_ws = wb.sheet("Owners", [
+        Column("role", "BDOI owner (role)", 30, "Role named in the Owner column of the BRD tabs"),
+        Column("who", "Who", 60, "Who holds the role"),
+        Column("org", "Organisation", 18, "Organisation"),
+        Column("answers", "Answers or provides", 50, "What the role answers or provides"),
+        Column("items", "Items", 8, "Rows of this workbook owned by the role", kind="number"),
+    ], [{"role": r, "who": w, "org": o, "answers": a,
+         "items": sum(1 for x in consolidated() if x.owner == r)} for r, w, o, a in cfg()["owner_roles"]],
+        description="The BDOI owner roles used in the Owner column (one name per role), from the programme RACI "
+                    "and the BRD approval sheets")
     sheets = []
     for t in tabs():
         rows = a_rows(t)
         ws = wb.sheet(t["sheet"], cols, rows, description=f"{t['brd'] if t['brd'] != 'RI' else 'Phase 2'} "
                                                           f"{t['name']}: what BDOI provides; owner "
-                                                          f"{t['owner']}")
+                                                          f"{cfg()['tab_owner_role'][t['brd']]}")
         rng = f"K5:K{5 + max(len(rows), 1) + 500}"
         ws.conditional_formatting.add(rng, CellIsRule(operator="equal", formula=['"Partly answered"'], stopIfTrue=True,
                                                       fill=PatternFill("solid", fgColor=brand.BG_BLUE,
@@ -921,7 +964,7 @@ def build_a() -> Path:
     del Alignment
     wb._build_cover()
     wb._build_readme()
-    order = [wb._cover, instructions, summary] + [s[1] for s in sheets] + [wb._readme, wb._lists]
+    order = [wb._cover, instructions, summary, owners_ws] + [s[1] for s in sheets] + [wb._readme, wb._lists]
     wb.wb._sheets = order
     wb.wb.active = 0
     props = wb.wb.properties
@@ -1056,7 +1099,8 @@ def _summary(ws, wb, sheets) -> None:
         row += 1
         q = f"'{sheet.title}'"
         last = 5 + max(len(rows), 1) + 500
-        vals: list[Any] = [t["brd"] if t["brd"] != "RI" else "Phase 2", t["name"], t["drop"], t["owner"],
+        vals: list[Any] = [t["brd"] if t["brd"] != "RI" else "Phase 2", t["name"], t["drop"],
+                           cfg()["tab_owner_role"][t["brd"]],
                            f"=COUNTA({q}!A5:A{last})"]
         vals += [f'=COUNTIF({q}!C5:C{last},"{x}")' for x in types]
         vals += [f'=COUNTIF({q}!K5:K{last},"{x}")' for x in STATUSES]
@@ -1081,7 +1125,7 @@ def _summary(ws, wb, sheets) -> None:
     ws.freeze_panes = ws.cell(row=first, column=2)
     # owners
     row += 2
-    _cell(ws, row, 1, "Items per BDOI owner (role), as issued (owners with five items or more)", 12, True, brand.HEADER_BLUE, wrap=False)
+    _cell(ws, row, 1, "Items per BDOI owner (role), as issued", 12, True, brand.HEADER_BLUE, wrap=False)
     row += 1
     for c, h in enumerate(["Owner (role)", None, None, None, "Items", "Open", "Partly answered", "Answered",
                            "First needed by", "BRDs"], start=1):
@@ -1092,11 +1136,7 @@ def _summary(ws, wb, sheets) -> None:
     for r in consolidated():
         by_owner[r.owner].append(r)
     ranked = sorted(by_owner.items(), key=lambda kv: (-len(kv[1]), kv[0]))
-    main_ = [kv for kv in ranked if len(kv[1]) >= 5]
-    rest = [i for kv in ranked if len(kv[1]) < 5 for i in kv[1]]
-    if rest:
-        main_.append((f"Other owners ({len(ranked) - len(main_)} roles with fewer than 5 items each)", rest))
-    for owner, items in main_:
+    for owner, items in ranked:
         row += 1
         st = Counter(i.status for i in items)
         brds = sorted({i.tab for i in items})
@@ -1842,6 +1882,8 @@ def check() -> list[str]:
             problems.append(f"workbook A: {r.id} without a Needed by date")
         if not r.need:
             problems.append(f"workbook A: {r.id} without what is needed")
+        if r.owner not in owner_roles():
+            problems.append(f"workbook A: {r.id} owner {r.owner} is not a role of the Owners sheet")
     book, templates, order = b_book()
     known = set(all_template_ids())
     for tid in known:

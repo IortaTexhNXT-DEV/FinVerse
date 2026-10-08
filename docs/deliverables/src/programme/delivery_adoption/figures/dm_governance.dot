@@ -1,0 +1,19 @@
+// Delivery Methodology: governance bodies and cadence.
+digraph dm_governance {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.3, ranksep=0.35, bgcolor="white", pad=0.1, newrank=true];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", fillcolor="@WHITE", fontname="Arial", fontsize=10.5,
+         fontcolor="@NEAR_BLACK", width=2.5, height=0.6, margin="0.08,0.04"];
+  edge  [color="@HEADER_BLUE", penwidth=1.1, arrowsize=0.7, dir=back];
+  sc  [label=<<b>Steering committee</b><br/>monthly and at each drop closure>, fillcolor="@BG_BLUE", width=4];
+  pm  [label=<<b>Programme meeting</b><br/>weekly>];
+  ccb [label=<<b>Change Control Board</b><br/>fortnightly>];
+  dab [label=<<b>Design authority</b><br/>fortnightly>];
+  wg1 [label=<Business working group<br/>per BRD; weekly in<br/>requirements and UAT>];
+  wg2 [label=<Data migration<br/>working group; weekly>];
+  wg3 [label=<Integration and<br/>security working group;<br/>fortnightly>];
+  wg4 [label=<Change and training<br/>working group; fortnightly<br/>from Apr 2027>];
+  team [label=<<b>Delivery team</b><br/>daily stand-up; iteration ceremonies>, width=4];
+  sc -> pm; sc -> ccb; sc -> dab;
+  pm -> wg1; pm -> wg2; dab -> wg3; pm -> wg4;
+  wg1 -> team; wg2 -> team; wg3 -> team; wg4 -> team;
+}

@@ -1,0 +1,17 @@
+// OCM and Training Framework: from impact to reinforcement.
+digraph ocm_framework {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.8, ranksep=0.25, bgcolor="white", pad=0.1, newrank=true];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", fillcolor="@WHITE", fontname="Arial", fontsize=12,
+         fontcolor="@NEAR_BLACK", width=4.2, height=0.7, margin="0.08,0.04"];
+  edge  [color="@HEADER_BLUE", penwidth=1.1, arrowsize=0.7];
+  a [label=<<b>1 Understand</b><br/>stakeholders, impact per persona,<br/>journey maps (Oct 2026 - Apr 2027)>];
+  b [label=<<b>2 Engage</b><br/>sponsors, change champions, key users,<br/>communication plan (from Oct 2026)>];
+  c [label=<<b>3 Prepare</b><br/>learning paths, material, usability tests,<br/>contextual help (Apr - Sep 2027)>];
+  d [label=<<b>4 Train</b><br/>key users, train-the-trainer, end users<br/>(Jul - Dec 2027)>];
+  e [label=<<b>5 Go live</b><br/>floor support, hypercare,<br/>adoption KPIs daily (Jan 2028)>];
+  f [label=<<b>6 Reinforce</b><br/>KPIs monthly, refresher sessions,<br/>retire trackers (Feb - Jun 2028)>, fillcolor="@BG_BLUE"];
+  { rank=same; a; d; } { rank=same; b; e; } { rank=same; c; f; }
+  a -> b -> c;
+  d -> e -> f;
+  c -> d [constraint=false, style=dashed];
+}

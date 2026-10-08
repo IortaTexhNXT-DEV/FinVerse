@@ -43,7 +43,7 @@ async function freshPage(ctx, user, password, clock = false) {
   await ctx.settle(page, 300);
   if (user) {
     await page.getByLabel('User ID').fill(user);
-    await page.getByLabel('Password').fill(password);
+    await page.getByLabel('Password', { exact: true }).fill(password);
     await page.getByRole('button', { name: /^(login|sign in)$/i }).click();
     await ctx.settle(page, 1200);
   }

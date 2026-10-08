@@ -162,7 +162,7 @@ async function signIn(browser, user) {
   await settle(page, 300);
   if (user) {
     await page.getByLabel('User ID').fill(user);
-    await page.getByLabel('Password').fill(PASSWORD);
+    await page.getByLabel('Password', { exact: true }).fill(PASSWORD);
     await page.getByRole('button', { name: /^(login|sign in)$/i }).click();
     await page.waitForURL((u) => !u.pathname.startsWith('/login'), { timeout: 30000 }).catch(() => {
       throw new Error(`sign-in of ${user} failed (check BROKERVERSE_ALLOWED_ORIGINS includes ${BASE})`);

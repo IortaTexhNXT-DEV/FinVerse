@@ -129,8 +129,9 @@ screens:
     rules:
       - "The advice is generated from the Insurance Advice template (FR-NB-103, FR-NB-104)."
       - "Documents that leave BIBS are password protected (FR-NB-013)."
+      - "An advice whose mortgagee is enrolled in the MIS set-up for automatic sending is sent when it is generated; the others wait here for manual sending, and a failed automatic sending is sent again from this screen (FR-NB-107, CLR-NB-48)."
     outcome: The mortgagee bank receives the Insurance Advice of each mortgaged account.
-    frs: [FR-NB-103, FR-NB-104]
+    frs: [FR-NB-103, FR-NB-104, FR-NB-107]
     tests: [IA]
 
   - id: SCR-NB-27

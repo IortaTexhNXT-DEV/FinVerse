@@ -33,8 +33,9 @@ screens:
       - "Send via Email (n) | QUOTE_MAINTAIN | At least one approved quotation selected | Opens the batch send dialog: the list of quotations and an optional password hint; Send n Quotation(s) sends one e-mail per client with the protected PDF and Excel of each quotation, and the password in a separate e-mail | Sent to client | E-mail to each client and the password e-mail"
       - "Open a row | Every user of the screen | Always | Opens the quotation record | - | -"
     rules:
-      - "Only approved quotations are sent; a quotation of a client without an e-mail address is refused with the list of problems (FR-NB-044)."
-      - "A batch send groups the quotations of the same client into one e-mail (FR-NB-044)."
+      - "Only approved quotations are sent. A batch is sent quotation by quotation: the quotations that pass are sent and the others (not approved, expired, without a recipient e-mail or without a supporting document the product requires) are listed with their reason; when none passes nothing is sent (FR-NB-044, BRNB.042 as restated on 13-May-2026, CLR-NB-47)."
+      - "A batch send groups the quotations of the same client into one e-mail, with the supporting documents ticked in the dialog; one action can address one or more recipients (FR-NB-044)."
+      - "Each quotation shows the delivery status of its last sending (FR-NB-044, FR-NB-013)."
     outcome: Marketing sees every quotation by stage and sends the approved ones in one step.
     frs: [FR-NB-010, FR-NB-042, FR-NB-044]
     tests: [QTS]
@@ -151,6 +152,8 @@ screens:
     rules:
       - "The maker and the submitter never approve their own quotation (FR-NB-043)."
       - "Documents that leave BIBS are password protected; the password follows in a separate e-mail (FR-NB-013, FR-NB-044)."
+      - "Supporting documents of the quotation or its client are sent with the quotation or on their own, and the quotation shows the delivery status of each sending (FR-NB-044)."
+      - "A quotation in For Review is read-only; an approved quotation changes only through a new version (FR-NB-042, CLR-NB-49). The approver approves or returns to the maker; a quotation that will not proceed is voided (FR-NB-043, CLR-NB-50)."
       - "Accounts are created only for a confirmed client and only for the accepted risk groups (FR-NB-045)."
       - "Void keeps the record with its reason; nothing is deleted (FR-NB-012)."
     outcome: The accepted quotation is converted into draft accounts under its ARN, ready for Marketing to complete and submit to Processing.

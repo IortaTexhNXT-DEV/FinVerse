@@ -1,4 +1,4 @@
-// BRD-1 New Business: process by actor (FRS section 2.2; BRNB.001 p.49, BRD p.134).
+// BRD-1 New Business: process by actor (FRS section 2.2; BRNB.001 p.59, BRD p.144).
 // Colour tokens (@HEADER_BLUE ...) are replaced by tools/deliverables before rendering.
 // Layout: rows of three steps; the fill colour of a step is its actor (legend at the bottom).
 digraph nb_process {

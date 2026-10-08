@@ -8,8 +8,8 @@ doc_code: TestPlan
 brd: BRD-11
 name: User Access Maintenance Summary
 doc_id: BIBS-TP-BRD-11
-version: "2.0"
-date: 27 September 2026
+version: "2.1"
+date: 8 October 2026
 status: Issued for BDOI business sign-off
 header_title: Test Plan BRD-11 User Access Maintenance
 h1_page_break: false
@@ -32,6 +32,12 @@ control:
     reviewer: iorta TechNXT Project Manager
     approver: BDOI business owner, Information Security and BDOI IT (sign-off)
     change: "Release set v2.0: expected results quote the messages and codes word for word, the test data are the seed data; cases re-traced to FRS v2.0 and its screen specifications (Screen ID on every case, Screens sheet); one screen case per screen and one message case per screen or dialog of the messages catalogue added. Issued 27-Sep-2026"
+  - version: "2.1"
+    date: 8 Oct 2026
+    author: iorta TechNXT QA
+    reviewer: iorta TechNXT Project Manager
+    approver: BDOI business owner, Information Security and BDOI IT (sign-off)
+    change: "Cases of FR-UA-003 rewritten for the single sign-on through EIAM (OpenID Connect or SAML 2.0) with the break-glass administrator; EIAM sign-out case added to FR-UA-004; traced to FRS v2.1"
 distribution:
   - {name: "Product Owner, Marketing Business System", role: Approver, organisation: BDOI, purpose: Review and sign-off}
   - {name: "Business Administrators (process owner)", role: Business tester, organisation: BDOI, purpose: "Requests, group-profile requests, reports"}
@@ -47,9 +53,9 @@ distribution:
 
 ## Purpose
 
-This document summarises the test plan for BRD-11 User Access Maintenance in BIBS (BDOI Broker System, on iNXT BrokerVerse). It tells the Business Administrators, the approvers and the system administrators what will be tested, how, with which data and by whom, and when testing is complete. The test conditions, scenarios and cases themselves are in the Excel workbook of the same version, `04_BIBS_TestPlan_BRD-11_User_Access_Maintenance_v2.0.xlsx`, which the testers use during execution.
+This document summarises the test plan for BRD-11 User Access Maintenance in BIBS (BDOI Broker System, on iNXT BrokerVerse). It tells the Business Administrators, the approvers and the system administrators what will be tested, how, with which data and by whom, and when testing is complete. The test conditions, scenarios and cases themselves are in the Excel workbook of the same version, `04_BIBS_TestPlan_BRD-11_User_Access_Maintenance_v2.1.xlsx`, which the testers use during execution.
 
-Every case traces to a functional requirement (FR) of FRS BRD-11 v2.0, to the BRD requirement IDs (the printed BRD numbers 1.001 to 4.003, and the non-functional rows UAM-NFR-nn) that the FR meets, and to the screen of the FRS screen specifications where the tester starts. In this plan:
+Every case traces to a functional requirement (FR) of FRS BRD-11 v2.1, to the BRD requirement IDs (the printed BRD numbers 1.001 to 4.003, and the non-functional rows UAM-NFR-nn) that the FR meets, and to the screen of the FRS screen specifications where the tester starts. In this plan:
 
 - expected results quote the messages and codes that BIBS shows, word for word;
 - the test data are the seed data of the SIT environment, and the screen paths are those of FRS chapter 12;
@@ -57,9 +63,9 @@ Every case traces to a functional requirement (FR) of FRS BRD-11 v2.0, to the BR
 
 ## Scope
 
-In scope are all 37 FRs of FRS BRD-11 v2.0 and the BRD IDs they trace to:
+In scope are all 40 FRs of FRS BRD-11 v2.1 and the BRD IDs they trace to:
 
-- sign-in with a persona profile, the inactivity warning and sign-out, directory sign-in with the Windows ID, log-out and the session log, the password policy (FR-UA-001 to 005);
+- sign-in with a persona profile, single sign-on with the BDO account through EIAM and the break-glass administrator, the inactivity warning and sign-out, log-out (with the EIAM sign-out, as proposed) and the session log, the password policy of local accounts (FR-UA-001 to 005);
 - user access requests: draft, edit, cancel and submit; enrol, modify, deactivate and reactivate; the chosen approver; correction, cancellation, tracking, bulk requests and effective dates (FR-UA-010 to 020);
 - review and approval: approve, reject, return, and the second approval of privileged and out-of-hours changes (FR-UA-030 to 034);
 - group-profile requests with ordered approvers and their implementation by the System Administrator (FR-UA-040 to 045);
@@ -72,7 +78,7 @@ The roles-and-access sheet checks each access-maintenance function against the r
 ## Out of scope
 
 - Access only from BDO-issued devices; it is enforced by the BDO network and device policy, not by BIBS.
-- The EUA protocol itself (UQ04). The directory cases run against a test directory once BDO supplies the interface.
+- The EIAM registration of each environment (UA-Q07). The single sign-on cases run against the test accounts of the EIAM test registration once BDOI IT provides them; the EUA sign-in is tested only if BDOI keeps it (CLR-UA-21).
 - An external access-control list and single session per device (UQ09, UQ14), which are on hold.
 - Temporary access with an end date, until BDOI answers UQ06.
 - Portal users of Employee Benefits (user type External); they belong to the BRD-8 Employee Benefits test plan.
@@ -83,9 +89,10 @@ The roles-and-access sheet checks each access-maintenance function against the r
 <!-- table: widths=1.2,8.6,4.2 caption="Reference documents" -->
 | Ref. | Document | Version |
 |---|---|---|
-| R1 | Functional Requirements Specification BRD-11 User Access Maintenance (`02_BIBS_FRS_BRD-11_User_Access_Maintenance_v2.0.docx`) | 2.0, 27 Sep 2026 |
+| R1 | Functional Requirements Specification BRD-11 User Access Maintenance (`02_BIBS_FRS_BRD-11_User_Access_Maintenance_v2.1.docx`) | 2.1, 8 Oct 2026 |
 | R2 | QPS User Access Maintenance Module BRD | v1, 15-Apr-2025; signed April-May 2025 |
-| R3 | Test plan workbook BRD-11 (`04_BIBS_TestPlan_BRD-11_User_Access_Maintenance_v2.0.xlsx`) | 2.0 |
+| R3 | Test plan workbook BRD-11 (`04_BIBS_TestPlan_BRD-11_User_Access_Maintenance_v2.1.xlsx`) | 2.1 |
+| R7 | Authentication and Identity Integration Requirements | v1.0, 03-Oct-2026 |
 | R5 | FRS BRD-3 Product Maintenance (role-permission change requests, PMADD05) | 2.0 |
 | R6 | BRD discrepancy and clarification register (`BIBS_Register_BRD-00_Discrepancies_and_Clarifications_v1.2.xlsx`) | 1.2 |
 
@@ -133,14 +140,14 @@ The workbook has a README sheet that explains every column. The sheets are Docum
 |---|---|
 | System test | BRD-11 is deployed on SIT with its roles, parameters, lists and jobs; the seed data is loaded; screen labels and messages have been compared with this plan and differences recorded; the test mailboxes receive mail. |
 | Persona end-to-end | All High-priority system test cases are run; no open Critical issue; the effective-date and password-expiry jobs run on SIT. |
-| UAT | FRS BRD-11 v2.0 is signed off or its open comments are agreed; the answers to UQ01, UQ02, UQ05 and UQ07 are applied as configuration; the system test exit criteria are met; the UAT environment holds masked user data (section 4.1); BDOI testers have user IDs with the roles of section 5 and attended the walkthrough of the User Access screens. |
+| UAT | FRS BRD-11 v2.1 is signed off or its open comments are agreed; the answers to UQ01, UQ02, UQ05 and UQ07 are applied as configuration; the system test exit criteria are met; the UAT environment holds masked user data (section 4.1); BDOI testers have user IDs with the roles of section 5 and attended the walkthrough of the User Access screens. |
 
 ## Exit criteria
 
 <!-- table: widths=2.4,11 caption="Exit criteria" -->
 | Level | Criteria |
 |---|---|
-| System test | 100 % of cases run (the directory sign-in cases may be Blocked until UQ04 is answered); 100 % of High-priority cases passed; no open Critical or High issue; open Medium and Low issues have an agreed fix date. |
+| System test | 100 % of cases run (the single sign-on cases may be Blocked until BDOI IT provides the EIAM test registration, UA-Q07); 100 % of High-priority cases passed; no open Critical or High issue; open Medium and Low issues have an agreed fix date. |
 | Persona end-to-end | All eight scenarios passed end to end with the expected notifications, e-mails and change-log rows. |
 | UAT | All scenarios and High-priority cases passed or accepted by the BDOI process owner; no open Critical or High issue; open issues listed with an agreed plan in the UAT sign-off; the sign-off of section 9 is signed. |
 
@@ -224,7 +231,7 @@ Every FR has at least one positive and one negative case, and every BRD ID is co
 
 ## Coverage by screen
 
-Every screen of the FRS v2.0 screen specifications has its screen case and the cases that start on it. A case is linked to the screen where the tester starts; the steps may go on to other screens.
+Every screen of the FRS v2.1 screen specifications has its screen case and the cases that start on it. A case is linked to the screen where the tester starts; the steps may go on to other screens.
 
 <!-- tp:screens -->
 
@@ -241,7 +248,7 @@ The table shows the functions checked per role. Each Y and N is one row of the R
 |---|---|---|
 | A screen, label or message changes after the sign-off | Medium | The signed rows are compared with the system before each release; a change is a change request and a new version of the set (FRS chapter 21) |
 | BDOI answers to open questions change expected results (UQ02 approver choice, UQ05 user ID format and lists, UQ07 privilege levels and working hours, UQ10 bulk rules, UQ16 profiles with members) | Medium | The values are parameters and lists; the affected cases name them and are re-run after the change without a change to the system |
-| The directory sign-in (EIAM on Entra ID) is not specified by BDOI IT (UQ04, IQ04) | Medium | Directory sign-in cases stay Blocked; LOCAL mode is tested now |
+| The EIAM test registration is late (UA-Q07, IQ04) | Medium | Single sign-on cases stay Blocked until it is available; LOCAL mode and the break-glass sign-in are tested now |
 | A test locks out the administrators of the environment | High | Keep a second administrator (admin2) outside the lock-out cases; the infrastructure administrator can unlock an account outside the screens |
 | Time-based cases (inactivity, session expiry, password age, effective dates, out-of-hours) need the clock to pass | Medium | The test lead shortens timers and moves dates in the test environment, as the preconditions describe |
 | Existing roles lose functions when the new permissions are introduced | High | FR-UA-050 cases check that ACCESS_REQUEST holders keep their request functions; the BRD-1 to BRD-5 access checks are re-run in the same cycle |

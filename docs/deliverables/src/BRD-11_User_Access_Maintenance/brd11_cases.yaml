@@ -1,8 +1,8 @@
 # Test plan BRD-11 User Access Maintenance - test data file.
 # Build: python docs/deliverables/src/testplans/build_test_plan.py docs/deliverables/src/BRD-11_User_Access_Maintenance/brd11_cases.yaml
 # Schema: see the header of build_test_plan.py. FR titles, BRD IDs and priorities come from the FRS.
-# Version 2.0 (business sign-off pack): the expected results quote the messages and codes of the screens, the
-# cases are traced to the screens of FRS v2.0, and the test data are the seed data.
+# Version 2.1 (business sign-off pack): the expected results quote the messages and codes of the screens, the
+# cases are traced to the screens of FRS v2.1, and the test data are the seed data.
 
 meta:
   brd: BRD-11
@@ -10,8 +10,8 @@ meta:
   code: UA
   frs: FRS_BRD11_USER_ACCESS_MAINTENANCE.md
   summary: TP_BRD11_USER_ACCESS_MAINTENANCE.md
-  version: "2.0"
-  date: 27 September 2026
+  version: "2.1"
+  date: 8 October 2026
   signoff: pack/pack.yaml
   verify_messages: true
 
@@ -77,9 +77,9 @@ data:
     content: "LOGIN_MAX_FAILED_ATTEMPTS 3; SESSION_IDLE_WARNING_MINUTES 15; SESSION_TIMEOUT_MINUTES 30; SESSION_EXPIRY_WARNING_MINUTES 30; AUTH_MODE LOCAL; USER_ID_PATTERN ^[a-zA-Z][0-9]{9}$; PASSWORD_HISTORY_COUNT 8; PASSWORD_MAX_AGE_DAYS 90; PASSWORD_MIN_AGE_DAYS 1; UAM_WORKING_HOURS 08:00-18:00 MON-FRI; UAM_ANY_APPROVER false; UAM_DIRECT_ROLE_EDIT false; UAM_ROLE_APPLY_ON_APPROVAL false; JOB_FAILURE_RECIPIENTS = test mailbox; jobs UAM_EFFECTIVE_CHANGES 00:05 and PASSWORD_EXPIRY_NOTICE 06:00."
     source: Configuration of the SIT environment (FRS section 9.1); recipients set by the test lead
   - id: TD-UA-07
-    name: Test directory
-    content: A test directory that answers for the Windows IDs of the test users, with one refusal message; available only when BDO supplies the EUA interface (UQ04).
-    source: Test directory prepared by the project team from the EUA specification (when BDO supplies it)
+    name: Test registration in EIAM
+    content: "The SIT registration of BIBS in EIAM (Microsoft Entra ID test tenant) with test accounts whose Windows IDs match requestor, badmin and a013000101; one test account that matches no BIBS user; the break-glass System Administrator admin with its second factor; AUTH_MODE OIDC on the test environment (SAML 2.0 if BDOI IT chooses it)."
+    source: Test registration and test accounts provided by BDOI IT (UA-Q07); sign-in settings of the SIT environment
   - id: TD-UA-08
     name: Test mailboxes
     content: E-mail addresses of the test users point to test mailboxes of the test lead.
@@ -88,7 +88,7 @@ data:
 scenarios:
   - id: SC-UA-01
     persona: UAM_REQUESTOR
-    title: Sign-in, session and password. Users log in with their profile, get the inactivity warning and sign-out, log out, and follow the password policy; directory sign-in when AUTH_MODE is DIRECTORY.
+    title: Sign-in, session and password. Users log in with their profile or with their BDO account through EIAM (single sign-on), get the inactivity warning and sign-out, log out, and follow the password policy of local accounts.
     pre: Users TD-UA-01; parameters TD-UA-06.
   - id: SC-UA-02
     persona: UAM_REQUESTOR
@@ -235,43 +235,45 @@ frs:
     screen: LOGIN
     data: [TD-UA-06, TD-UA-07]
     conditions:
-      - In DIRECTORY mode a user signs in with the Windows ID and the network password, and BIBS stores no password.
-      - A password refused by the directory shows the directory's message and counts towards the lock-out.
-      - A Windows ID not linked to a BIBS user is refused; an unreachable directory refuses the log-in with a service message.
-      - Roles and permissions stay in BIBS in both modes.
+      - In OIDC mode a user signs in with the BDO account at EIAM and BIBS opens the session with the user's BIBS roles; BIBS stores no password for the user.
+      - An identity that is not linked to an active BIBS user is refused with its message and the attempt is audited.
+      - In OIDC mode a break-glass System Administrator signs in with the local password and the second factor; another user cannot sign in with a local password.
+      - The menu after a single sign-on is that of the user's BIBS roles.
     cases:
       - c: 1
         type: Positive
-        title: Windows ID sign-in in DIRECTORY mode
-        pre: AUTH_MODE = DIRECTORY; the test directory of TD-UA-07 answers.
+        title: Single sign-on with the BDO account
+        pre: AUTH_MODE = OIDC on the test environment; the EIAM test registration of TD-UA-07.
         steps:
-          - Enter the Windows ID of requestor and the test directory password.
+          - Open BIBS and click Sign in with the BDO identity provider.
+          - Sign in at EIAM with the test account of requestor.
           - As the infrastructure administrator check the stored sign-in data of requestor.
-        expected: The home page opens with the Requestor menu; no password is kept for requestor.
+        expected: The home page opens with the Requestor menu; the audit shows the sign-in with the method OIDC; no password is kept for requestor.
       - c: 2
         type: Negative
-        title: Directory refuses the password
+        title: BDO account not linked to a BIBS user
         steps:
-          - Enter the Windows ID with a wrong password.
-        expected: The message returned by the directory is shown; the failed attempt is counted and the third one locks the account.
+          - Sign in at EIAM with the test account that matches no BIBS user.
+        expected: "BIBS refuses the sign-in and shows Message \"Your sign-in was accepted by your organisation, but it is not linked to an active user of this system. Contact your administrator.\" (SSO_NOT_LINKED); the attempt is audited."
       - c: 3
-        type: Negative
-        title: Windows ID without a BIBS user
+        type: Positive
+        persona: SYSADMIN
+        title: Break-glass administrator signs in locally
         steps:
-          - Enter a Windows ID that the test directory knows but no BIBS user carries.
-        expected: The log-in is refused.
-        msg: [Invalid user name or password]
+          - On the Login page sign in as admin with the local password and the second factor.
+        expected: The session opens; Information Security receives the alert of the break-glass sign-in.
       - c: 3
-        type: Negative
-        title: Directory not reachable
+        type: Security-access
+        title: Local password refused for a user of single sign-on
         steps:
-          - Stop the test directory; log in.
-        expected: The log-in is refused with a service message.
+          - On the Login page try to sign in as requestor with a password.
+        expected: The sign-in is refused; only Sign in with the BDO identity provider opens a session for requestor.
       - c: 4
         type: Positive
-        title: Roles come from BIBS in DIRECTORY mode
+        persona: BUSINESS_ADMIN
+        title: Roles come from BIBS after single sign-on
         steps:
-          - Sign in with the Windows ID of badmin.
+          - Sign in at EIAM with the test account of badmin.
         expected: The menu is that of the BIBS roles of badmin.
 
   FR-UA-004:
@@ -283,6 +285,7 @@ frs:
       - Log Out ends the session in BIBS and the log-out is recorded with user and time.
       - The Users screen shows a signed-in user as Online.
       - A request made with the sign-in of an ended session is refused.
+      - In single sign-on, after Log Out the user is at the EIAM sign-out page and opening BIBS again asks for the BDO sign-in (proposed, CLR-UA-23).
     cases:
       - c: 1
         type: Positive
@@ -308,6 +311,15 @@ frs:
         steps:
           - Keep the sign-in of requestor; log out; repeat an action of the old session outside the screens.
         expected: The request is refused.
+      - c: 4
+        type: Positive
+        data: [TD-UA-07]
+        title: Log Out also ends the EIAM session (proposed)
+        pre: AUTH_MODE = OIDC on the test environment; requestor signed in through EIAM.
+        steps:
+          - Click Log Out.
+          - Open BIBS again and click Sign in with the BDO identity provider.
+        expected: After Log Out the EIAM sign-out page is shown; the new sign-in asks for the BDO account and password again.
 
   FR-UA-005:
     scenario: SC-UA-01

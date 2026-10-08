@@ -1,4 +1,4 @@
-// BRD-11: interfaces of User Access Maintenance. FRS section 7. Dashed grey = parked seam.
+// BRD-11: interfaces of User Access Maintenance. FRS section 7. Dashed grey = on hold or proposed to be replaced.
 digraph ua_integration {
   graph [rankdir=TB, fontname="Arial", nodesep=0.25, ranksep=0.6, bgcolor="white", pad=0.15];
   node  [shape=box, style="rounded,filled", fillcolor="@WHITE", color="@HEADER_BLUE", penwidth=1.1,
@@ -6,7 +6,7 @@ digraph ua_integration {
   edge  [color="@MUTED", arrowsize=0.6, fontname="Arial", fontsize=9.5, fontcolor="@TEXT"];
 
   eua   [label="BDO EUA / AD / LDAP\n(Windows ID)", color="@MUTED", fontcolor="@MUTED", style="rounded,dashed"];
-  sso   [label="SSO identity provider\n(SAML / OIDC)", color="@MUTED", fontcolor="@MUTED", style="rounded,dashed"];
+  sso   [label="EIAM (Microsoft Entra ID)\nsingle sign-on: OpenID Connect\nor SAML 2.0"];
   acl   [label="External ACL", color="@MUTED", fontcolor="@MUTED", style="rounded,dashed"];
 
   subgraph cluster_uam {
@@ -22,8 +22,8 @@ digraph ua_integration {
   rep   [label="Reports (Control\n& Audit)"];
   bulk  [label="Bulk upload\n(template file)"];
 
-  eua -> sec [label="authenticate\n(on hold, UQ04)", style=dashed, color="@MUTED", fontcolor="@MUTED"];
-  sso -> sec [label="on hold", style=dashed, color="@MUTED", fontcolor="@MUTED"];
+  eua -> sec [label="replaced by EIAM\n(proposed, CLR-UA-21)", style=dashed, color="@MUTED", fontcolor="@MUTED"];
+  sso -> sec [label="sign-in\n(configuration)"];
   acl -> sec [label="on hold (UQ14)", style=dashed, color="@MUTED", fontcolor="@MUTED"];
   bulk -> req [label="1.009"];
   req -> sec [label="apply approved\nchanges"];

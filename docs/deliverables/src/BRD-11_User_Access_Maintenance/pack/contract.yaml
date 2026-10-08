@@ -69,8 +69,8 @@ contract:
   - id: IC-08
     party: EIAM (BDO Enterprise Identity Access Management on Microsoft Entra ID), owned by BDOI IT
     direction: In
-    what: The target sign-in of BDO users with OpenID Connect; BIBS keeps the roles, permissions, the inactivity sign-out and the session log
-    how: In this set BIBS signs users in locally (AUTH_MODE = LOCAL); the Entra ID sign-in is added when BDOI IT gives the tenant, the application registration, the claims and the session rules (IQ04). Until then, BIBS password, lock-out and expiry rules apply
+    what: The sign-in of BDO users through single sign-on (OpenID Connect, or SAML 2.0 as the fall-back); BIBS keeps the roles, permissions, the inactivity sign-out and the session log
+    how: Single sign-on is part of BIBS and is switched on by configuration (sign-in mode OIDC or SAML) once BDOI IT registers BIBS in EIAM for each environment (CLR-UA-01); until then SIT uses local sign-in, and the break-glass administrators keep it. Proposed rules for confirmation - the account is matched by the Windows ID or the user principal name (CLR-UA-22), Log Out also ends the EIAM session (CLR-UA-23). Details in the Authentication and Identity Integration Requirements v1.0 (03-Oct-2026)
     owner: BDOI IT
     screens: Login; My Profile
     frs: [FR-UA-003]

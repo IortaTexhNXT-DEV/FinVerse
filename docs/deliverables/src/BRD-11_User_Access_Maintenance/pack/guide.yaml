@@ -12,7 +12,7 @@ meta:
 documents:
   - {kind: StartHere, name: User Access Maintenance, ext: docx, what: "Start Here: the map of the pack, who reads what, the steps and the dates", readers: Everyone, when: "First, on issue"}
   - {kind: GuideDeck, name: User Access Maintenance, ext: pptx, what: "Sign-off Pack Guide: purpose, approach, the module at a glance, caveats, entry and exit criteria, change control", readers: "Business owner, Business Administration, Information Security, BDOI IT; presented at the kick-off", when: "Kick-off session"}
-  - {kind: FRS, name: User Access Maintenance, ext: docx, what: "Functional Requirements Specification v2.0: requirements, the menu of every persona, 18 screen specifications with screenshots, walkthroughs, messages, notifications, reports, the bulk upload, configuration inputs, cross-BRD contract", readers: "Business Administration for the requests and reports; Information Security for the role matrix and the separation of duties; BDOI IT for sign-in and identity integration", when: "During the review, with the SIT walkthroughs"}
+  - {kind: FRS, name: User Access Maintenance, ext: docx, what: "Functional Requirements Specification v2.1: requirements, the menu of every persona, 19 screen specifications with screenshots, walkthroughs, messages, notifications, reports, the bulk upload, configuration inputs, cross-BRD contract", readers: "Business Administration for the requests and reports; Information Security for the role matrix and the separation of duties; BDOI IT for sign-in and identity integration", when: "During the review, with the SIT walkthroughs"}
   - {kind: Signoff, name: User Access Maintenance, ext: xlsx, what: "Sign-off workbook: one row per screen, field, rule and message with the BU review columns; one menu sheet per persona; comments log, meeting minutes, version history, sign-off certificate", readers: "Every reviewer; the signatories sign it", when: "During the review and at sign-off"}
   - {kind: TestPlan, name: User Access Maintenance, ext: xlsx, what: "Test plan workbook: the test cases traced to the FRs and to the screens, including one screen case and one message case per screen and the access checks by persona", readers: "Business users who will run UAT; Information Security; BDOI IT", when: "After the screens; used again in SIT and UAT"}
   - {kind: TestPlan, name: User Access Maintenance Summary, ext: docx, what: "Test plan summary: scope, approach, coverage and the cases by area", readers: "Business owner, Information Security, BDOI IT", when: "Before sign-off"}
@@ -21,7 +21,7 @@ documents:
   - {kind: UXScreens, name: User Access Maintenance, ext: xlsx, what: "UX screen register: one row per screen image with the screen, personas, flow and step, state, FRS section and requirements, UXD status and comments, and the Changed in this issue flag", readers: "BDOI UX Design team", when: "Kept by the UX Design team; the changed rows are flagged at each issue"}
   - {kind: UXScreens, name: User Access Maintenance, ext: zip, what: "Image package: every screen image at twice the screen resolution (PNG), the component crops and the register as CSV", readers: "BDOI UX Design team", when: "Imported into the design tool at each issue"}
 
-# Reading order per role (FRS chapter numbers of v2.0).
+# Reading order per role (FRS chapter numbers of v2.1).
 reading:
   - role: Business owner (Product Owner, Marketing Business System)
     order: "00 Start Here; 01 Guide deck; FRS chapters 1-3 (context and personas), 14 (walkthroughs), 19 (configuration inputs), 21 (sign-off) and 22 (proposed rules for confirmation); workbook Sign-off certificate"
@@ -43,8 +43,8 @@ steps:
   - step: 1
     name: Pack issued
     who: "R: iorta TechNXT Project Manager; A: iorta TechNXT delivery lead; I: all reviewers"
-    inputs: "FRS v2.0, workbook, test plan, configuration input templates, guide and deck"
-    outputs: "Release set v2.0 in the BRD-11 folder of Drop 0; invitations to the sessions"
+    inputs: "FRS v2.1, workbook, test plan, configuration input templates, guide and deck"
+    outputs: "Release set v2.1 in the BRD-11 folder of Drop 0; invitations to the sessions"
     duration: "Day 0 (Mon 2-Nov-2026)"
   - step: 2
     name: Kick-off and screen walkthrough on SIT
@@ -65,15 +65,15 @@ steps:
     outputs: "One consolidated comments log, each item typed (clarification, correction, change request) and answered; Q&A minutes"
     duration: "3 working days, Q&A on Tue 24-Nov-2026"
   - step: 5
-    name: One revision cycle (v2.1)
+    name: One revision cycle (v2.2)
     who: "R: iorta TechNXT Business Analysis; A: iorta TechNXT delivery lead; C: reviewers who raised the items"
     inputs: "Agreed clarifications and corrections"
-    outputs: "Release set v2.1 with the changed rows marked; change requests raised for the rest"
-    duration: "v2.1 on Thu 26-Nov-2026; check by the reviewers until Fri 27-Nov-2026"
+    outputs: "Release set v2.2 with the changed rows marked; change requests raised for the rest"
+    duration: "v2.2 on Thu 26-Nov-2026; check by the reviewers until Fri 27-Nov-2026"
   - step: 6
     name: Sign-off meeting and signature
     who: "R: iorta TechNXT Project Manager; A: BDOI Product Owner; C: Business Administration, Information Security, BDOI IT"
-    inputs: "v2.1 (or v2.0 when no revision is needed); open items with their decision"
+    inputs: "v2.2 (or v2.1 when no revision is needed); open items with their decision"
     outputs: "Signed sign-off certificate; minutes; open items accepted as assumptions or change requests"
     duration: "Tue 1-Dec-2026"
   - step: 7
@@ -117,9 +117,9 @@ caveats:
     handling: "A new persona of an existing permission is a group-profile request under this signed set; a new permission or rule is a change request against the other BRD, and this set's menu pages are re-issued as a delta."
     example: "Claims adds a Claims Reports viewer: the profile is requested, approved and implemented; the menu sheet of the persona is added in the next version of the set."
   - topic: Identity integrations owned by BDOI IT
-    text: "Sign-in through EIAM on Microsoft Entra ID and provisioning from UIDM-ISC are named by BDOI for Drop 0; their specifications are open (IQ04, IQ05)."
-    handling: "In this set: local sign-in, and every change as a BIBS request. The integrations are change requests once BDOI IT gives the specifications; the screens of this set do not change."
-    example: "When Entra ID sign-in is enabled, the Login page redirects to BDO's sign-in; the BIBS password rules then apply only to the break-glass administrator."
+    text: "Sign-in through EIAM on Microsoft Entra ID and provisioning from UIDM-ISC are named by BDOI for Drop 0. Single sign-on with OpenID Connect and SAML 2.0 is part of BIBS; the UIDM-ISC option is open (IQ05). Details: Authentication and Identity Integration Requirements v1.0, 03-Oct-2026."
+    handling: "Single sign-on is switched on by configuration once BDOI IT registers BIBS in EIAM for each environment (not a change request); until then SIT uses local sign-in. The matching by Windows ID or UPN and the EIAM sign-out are proposed rules for confirmation (CLR-UA-22, CLR-UA-23). The UIDM-ISC option chosen by BDOI IT is a change request if it goes beyond aggregation; the screens of this set do not change."
+    example: "When single sign-on is switched on, the Login page shows Sign in with the BDO identity provider; the BIBS password rules then apply only to the break-glass administrators."
   - topic: Points for confirmation
     text: "A single session per device, an external access-control list and the dormancy values are listed for decision in FRS chapter 22."
     handling: "Each item is decided with the review; a decision that only sets a value is configuration, a new rule is a change request."

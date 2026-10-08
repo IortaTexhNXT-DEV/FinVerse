@@ -1,16 +1,16 @@
 ---
-# Source of "00 Start Here - Guide to the BRD-11 Sign-off Pack" (Word), release set v2.0 of BRD-11 User Access Maintenance.
+# Source of "00 Start Here - Guide to the BRD-11 Sign-off Pack" (Word), release set v2.1 of BRD-11 User Access Maintenance.
 # Build: python tools/deliverables/bdoi_docx.py docs/deliverables/src/BRD-11_User_Access_Maintenance/START_HERE_BRD11.md
 # The map, the reading order and the steps come from pack/guide.yaml (the same source as the guide deck).
 title: Start Here
-subtitle: Guide to the BRD-11 User Access Maintenance Sign-off Pack, release set v2.0
+subtitle: Guide to the BRD-11 User Access Maintenance Sign-off Pack, release set v2.1
 doc_type: Start Here Guide
 doc_code: StartHere
 brd: BRD-11
 name: User Access Maintenance
 doc_id: BIBS-SH-BRD-11
-version: "2.0"
-date: 27 September 2026
+version: "2.1"
+date: 8 October 2026
 status: Issued for BDOI business sign-off
 header_title: Start Here BRD-11 User Access Maintenance
 h1_page_break: false
@@ -21,11 +21,17 @@ control:
     reviewer: iorta TechNXT Business Analysis
     approver: ""
     change: First issue with the BRD-11 User Access Maintenance business sign-off pack
+  - version: "2.1"
+    date: 8 Oct 2026
+    author: iorta TechNXT Project Manager
+    reviewer: iorta TechNXT Business Analysis
+    approver: ""
+    change: "Re-based on the BRD of 15-Apr-2025 and the Drop 0 decisions; single sign-on through EIAM stated as part of BIBS; user-story view and storyboard index added to the FRS"
 distribution:
   - {name: "Product Owner, Marketing Business System", role: Approver, organisation: BDOI, purpose: Sign-off}
   - {name: "Business Administration (process owner of user access)", role: Business owner of the process, organisation: BDOI, purpose: Review and sign-off; configuration inputs}
   - {name: "BDOI Information Security", role: Signatory, organisation: BDOI, purpose: "Role matrix, menus by persona, separation of duties, password and session values"}
-  - {name: "BDOI IT", role: Signatory, organisation: BDOI, purpose: "Sign-in and identity integration assumptions (EIAM, UIDM-ISC); System Administrator functions"}
+  - {name: "BDOI IT", role: Signatory, organisation: BDOI, purpose: "Sign-in and identity integration (single sign-on through EIAM, UIDM-ISC); System Administrator functions"}
   - {name: "Unit heads of the other BRDs", role: Reviewers, organisation: BDOI, purpose: The menus of their personas}
   - {name: Business Project Services, role: BRD owner, organisation: BDO Unibank ESG, purpose: Traceability and sign-off coordination}
   - {name: Project team, role: Delivery, organisation: iorta TechNXT, purpose: "Sessions, answers, revisions, change requests"}

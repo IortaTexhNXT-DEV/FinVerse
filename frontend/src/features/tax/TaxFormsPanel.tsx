@@ -30,15 +30,7 @@ const FREQUENCIES: readonly FilingFrequency[] = [
   'MONTHLY_EXCEPT_QUARTER_END',
   'ANNUAL',
 ];
-const WORKSHEETS: readonly WorksheetKind[] = [
-  'VAT',
-  'EWT',
-  'DST',
-  'PREMIUM_TAX',
-  'LGT',
-  'FST',
-  'NONE',
-];
+const WORKSHEETS: readonly WorksheetKind[] = ['VAT', 'EWT', 'NONE'];
 
 type Form = Partial<TaxFormRequest> & { id?: number };
 

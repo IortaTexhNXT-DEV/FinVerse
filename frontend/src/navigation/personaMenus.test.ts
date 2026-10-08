@@ -104,15 +104,4 @@ describe('persona menus across suites', () => {
       expect(new Set(roles).size).toBe(roles.length);
     }
   });
-
-  it('keeps the insurer-side Claims module away from every listed role', () => {
-    const insurerClaims = MODULES.find((m) => m.id === 'claims');
-    expect(insurerClaims).toBeDefined();
-    const paths = new Set((insurerClaims?.screens ?? []).map((s) => s.path));
-    for (const suite of SUITES) {
-      for (const persona of Object.values(suite.roles)) {
-        expect(menuOf(persona.permissions).filter((s) => paths.has(s.path))).toEqual([]);
-      }
-    }
-  });
 });

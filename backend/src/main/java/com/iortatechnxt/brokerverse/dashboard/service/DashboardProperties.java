@@ -5,22 +5,18 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * Maps dashboard KPIs to the chart of accounts, so KPI definitions follow the client's chart
- * without code changes. Statement lines are {@code report_group} values; account prefixes select an
- * account and every account whose code starts with it.
+ * without code changes. Statement lines are {@code report_group} values.
  *
  * @param cashGroups statement lines counted as cash position
  * @param receivableGroups statement lines counted as insurance receivables
- * @param reserveGroups statement lines counted as technical reserves
  */
 @ConfigurationProperties(prefix = "brokerverse.dashboard")
-public record DashboardProperties(
-    List<String> cashGroups, List<String> receivableGroups, List<String> reserveGroups) {
+public record DashboardProperties(List<String> cashGroups, List<String> receivableGroups) {
 
   /** Canonical constructor applying defaults matching the standard insurance COA. */
   public DashboardProperties {
     cashGroups = orDefault(cashGroups, "Cash and Cash Equivalents");
     receivableGroups = orDefault(receivableGroups, "Insurance Receivables");
-    reserveGroups = orDefault(reserveGroups, "Insurance Contract Liabilities");
   }
 
   private static List<String> orDefault(List<String> configured, String fallback) {

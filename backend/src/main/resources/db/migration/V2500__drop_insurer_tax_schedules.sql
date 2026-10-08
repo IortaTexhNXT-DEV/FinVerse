@@ -2,8 +2,8 @@
 -- iNXT BrokerVerse - V2500 Insurer suite removal (range V2500-V2509): Tax & Statutory.
 -- BIBS is specific to BDOI as an insurance broker (client decision of 8 October 2026,
 -- docs/development/CODEBASE_RELEVANCE_AUDIT.md T1). The insurer parts of Tax & Statutory are removed:
---   * the Insurance Commission schedules of an insurer and their account mapping (tax_ic_line_item,
---     V700);
+--   * the Insurance Commission schedules of an insurer, their account mapping (tax_ic_line_item,
+--     V700) and the RBC hurdle parameter IC_RBC_HURDLE_PERCENT;
 --   * the premium levy worksheets (documentary stamp tax, premium tax, local government tax and fire
 --     service tax on the insurer's own policies): their tax forms and returns are deleted, with the
 --     lines and remittance records of those returns (posted remittance journals stay in the
@@ -15,6 +15,7 @@
 -- =====================================================================================
 
 drop table tax_ic_line_item;
+delete from sys_parameter where param_key = 'IC_RBC_HURDLE_PERCENT';
 
 create temporary table tmp_insurer_tax_return on commit drop as
 select r.id

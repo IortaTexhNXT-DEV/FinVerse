@@ -110,12 +110,8 @@ describe('tax display', () => {
   });
 
   it('links documents to their source screens', () => {
-    const doc = { sourceType: 'COMMISSION', sourceId: 42 } as TaxDocument;
-    expect(sourceLink(doc)).toBe('/underwriting/policies/42');
-    expect(sourceLink({ ...doc, sourceType: 'SUPPLIER_INVOICE' })).toBe(
-      '/payables/invoices?invoice=42',
-    );
-    expect(sourceLink({ ...doc, sourceType: 'ENDORSEMENT' })).toBe('/underwriting/policies/42');
+    const doc = { sourceType: 'SUPPLIER_INVOICE', sourceId: 42 } as TaxDocument;
+    expect(sourceLink(doc)).toBe('/payables/invoices?invoice=42');
   });
 
   it('summarises worksheets', () => {
@@ -125,7 +121,7 @@ describe('tax display', () => {
     expect(lineAmount(undefined, 'OUTPUT_VAT')).toBe(0);
     expect(worksheetKpis(vat).map((k) => k.value)).toEqual([1200, 200, 1000, 0]);
     expect(worksheetKpis(worksheet('EWT'))[3]).toEqual({ label: 'Tax still due', value: 1000 });
-    expect(worksheetKpis(worksheet('DST'))).toHaveLength(3);
+    expect(worksheetKpis(worksheet('NONE'))).toHaveLength(3);
     expect(unreconciled(vat)).toBe(60);
   });
 

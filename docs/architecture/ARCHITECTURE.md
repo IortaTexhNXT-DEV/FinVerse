@@ -15,8 +15,9 @@
 ## Backend modules
 
 This table lists the platform modules of the original finance suite. The BDOI broking modules (BRD-1 to BRD-13) are
-described in [`BROKING_ARCHITECTURE.md`](BROKING_ARCHITECTURE.md) and the design of each BRD. Modules marked
-*insurer-side* are not used by any BDOI process and are hidden from BDOI roles; see
+described in [`BROKING_ARCHITECTURE.md`](BROKING_ARCHITECTURE.md) and the design of each BRD. The insurer-company
+modules of the original suite (underwriting, insurer claims, reinsurance, actuarial reserves, consolidation and the
+insurer tax schedules) were removed because BIBS is specific to BDOI as an insurance broker; see
 [`CODEBASE_RELEVANCE_AUDIT.md`](../development/CODEBASE_RELEVANCE_AUDIT.md).
 
 | Module | Responsibility |
@@ -36,14 +37,10 @@ described in [`BROKING_ARCHITECTURE.md`](BROKING_ARCHITECTURE.md) and the design
 | `accounting` | Event-driven accounting engine: event catalogue, rules, simulator, event register |
 | `report` | Report framework, renderers (PDF/XLSX/CSV), GL & financial statement reports |
 | `dashboard` | Executive KPIs |
-| `underwriting` | *Insurer-side.* Products, quotations, policies, endorsements, open covers, UW reports |
-| `claims` | *Insurer-side* (BDOI claims are in `brokerclaims`). Claims, estimates, settlements, recoveries, LPOs, claims reports |
-| `reinsurance` | *Insurer-side* (the BDOI ReInsurance BRD is phase 2). Treaties, cessions, facultative, RI claims recoveries, statements of account |
-| `reserves` | *Insurer-side.* UPR, DAC, IBNR, OSLR and surplus processing |
 | `payables` | Bank accounts, supplier invoices, payment vouchers, PDC issued, petty cash |
 | `receivables` | Receipts, cheques & deposits, PDC received, bank reconciliation |
 | `finreport` | Finance / MIS report book |
-| `budget`, `consolidation`, `closing` | Budgets, inter-company & consolidation (*not used by BDOI*), FX revaluation, period close, year-end |
+| `budget`, `closing` | Budgets, FX revaluation, period close, year-end |
 
 Dependency direction is enforced by ArchUnit: operational modules → accounting → journal → ledger;
 no cycles. Cross-module call-backs use ports (interfaces owned by the caller).

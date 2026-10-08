@@ -136,15 +136,15 @@ tables of the migrated database.
   | Range | Owner |
   |---|---|
   | V1–V99 | platform (foundation, engine, party, sub-ledger); V28–V33 GL platform (BRD-5 A1-GL); V34 platform cache and events (job lock status `SKIPPED_LOCKED`, `sec_revoked_token`, `sys_shared_counter`, `evt_outbox`, `evt_archive`, `evt_dead_letter`) |
-  | V100–V199 | underwriting |
+  | V100–V199 | underwriting (insurer suite, removed: V100, V101 stay applied) |
   | V200–V299 | claims |
-  | V300–V399 | reinsurance |
-  | V400–V499 | period-end, actuarial reserves, FX revaluation, year-end |
+  | V300–V399 | reinsurance (insurer suite, removed: V300, V301 stay applied) |
+  | V400–V499 | period-end, FX revaluation, year-end (actuarial reserves removed: V420, V421 stay applied) |
   | V500–V549 | payables, petty cash, payments, PDC issued |
   | V550–V599 | receivables, collections, PDC received, bank reconciliation |
-  | V600–V649 | budgets, consolidation, inter-company |
+  | V600–V649 | budgets (consolidation and inter-company removed; V600 stays applied) |
   | V650–V699 | finance / MIS reports support objects |
-  | V700–V749 | tax & statutory reporting (BIR / LGU / BFP returns, 2307, IC schedules) |
+  | V700–V749 | tax & statutory reporting (BIR returns, 2307, BIR forms and books) |
   | V750–V759, V790–V799 | broking foundations (lov, workflow, bulk, messaging, docgen) and broking administration (V790 access requests and retention, V791 role-permission change requests) |
   | V755 | Product Maintenance (BRD-3) foundation: roles, grants, permission action classes (`sec_permission_action`), LOV types, workflow `PM_PACKAGE_REQUEST`, parameters |
   | V760–V789 | Operations (BRD-2): foundation, invoice ledger and platform extensions V760–V762, then cashiering, remittance, product reconciliation, adjustment and commission receivables in their own sub-ranges (adjustment V780–V784: V780 and V781 used, V781 links requests to their policy) |
@@ -158,15 +158,16 @@ tables of the migrated database.
   | V1190–V1199 | platform hardening: V1190 the least-privilege runtime role (row access only, default privileges for later tables; placeholder `runtime_role`), V1191 the UPDATE / DELETE / TRUNCATE guards of the insert-only tables (functions `platform_row_immutable()`, `platform_refuse_truncate()`) |
   | V1130–V1139 | User Access Maintenance extension (BRD-11), for changes that must run after migrations of later ranges: V1130 the User Access grants of `INFOSEC_OFFICER` (the role is created by V1101) |
   | V1150–V1159 | platform client neutrality (no client values in platform code): V1150 client profile on `org_company` (short name, group name, logo reference, head-office code, default bank account); V1151 claim status party `BROKER`; V1152 business rules as parameters (credit days, password notice days, rate exception validity, DP premium and EWT rate tolerances, open-cover transit days); V1153 platform codes for the broker itself (`VIA_BROKER`, `BROKER`, `BROKER_NOTICE`, `BROKER_ONLY`, `prc_item.broker_*`, `plc_billing_item.broker_location`). Seed counterpart V2010–V2019 in `db/seed` (V2010 client profile of the seed companies and their input VAT tax code) |
-  | V1160–V1169 | platform consistency (product module switches and permission grants): V1160 `sys_product_module`, `sys_module_profile`, the switch permissions and the insurance broker profile (the state V1064 set up); V1161 permission grants of the consistency review (MIG_RESUBMIT_APPROVE to the Data Owner). Its seed counterpart is V2020–V2029 in `db/seed` (V2020 keeps the insurer suite on in the SIT/UAT databases) |
+  | V1160–V1169 | platform consistency (product module switches and permission grants): V1160 `sys_product_module`, `sys_module_profile`, the switch permissions and the insurance broker profile (the state V1064 set up); V1161 permission grants of the consistency review (MIG_RESUBMIT_APPROVE to the Data Owner). Its seed counterpart is V2020–V2029 in `db/seed` (V2020 kept the insurer suite on in the SIT/UAT databases; the insurer modules and their switches were removed by V2502) |
   | V1180–V1189 | Platform authentication and session security: V1180 token model (refresh token of the session, `TOKEN_REUSED`, `ACCESS_TOKEN_MINUTES`, `METRICS_VIEW`, alert `SECURITY_STORE_UNAVAILABLE`), V1181 second factor (`sec_user_mfa`, recovery codes, remembered devices, four-eyes reset, `MFA_POLICY`, `MFA_RESET` / `MFA_RESET_APPROVE`), V1182 single sign-on (`sec_sso_request`, `sec_sso_ticket`, `AUTH_MODE` OIDC / SAML); V1183–V1188 free; V1189 in `db/seed` (the SIT/UAT seed turns `MFA_POLICY` off) |
   | V1240–V1249 | platform data scope (company and branch access per user, [`DATA_SCOPE_DESIGN.md`](../architecture/DATA_SCOPE_DESIGN.md)): V1240 `sec_user.all_companies` (default true: every existing and new user keeps all companies), `sec_user_data_scope`, access change activity `DATA_SCOPE_CHANGED`, `nba_access_request.data_scope`. Seed counterpart V2040–V2049 in `db/seed` (not used) |
   | V2001–V2009 | seed data corrections found by the business sign-off packs (`db/seed`, after V2000): V2001 BRD-1 and BRD-3 (package products active for testing, distinct seed clients, realistic addresses and location keys, the Unapplied Payment Handler's sign-in, placeholder texts, PAR08 version 2); V2002 BRD-3 (the seeded package release remark names the validator by display name) |
-  | V900–V999 | seed data (`db/seed`, loaded only with the `seed` profile) — same sub-ranges: underwriting V910s, claims V920s, reinsurance V930s, period-end V940s, payables V950s, receivables V955s, budget V960s, tax V975–V979, broking V980–V989, Operations V990–V995, Product Maintenance V996–V998 (V996 catalog versions, V997 package requests, V998 Product Maintenance users), Accounting / Disbursement V999 (reference data and users only; its storyline runs as Java seed runners) (full) |
+  | V2500–V2509 | insurer suite removal (client decision of 8 October 2026, [`CODEBASE_RELEVANCE_AUDIT.md`](CODEBASE_RELEVANCE_AUDIT.md)): V2500 Tax & Statutory (IC schedules of an insurer, premium levy forms and returns), V2501 the tables of underwriting, insurer claims, reinsurance, actuarial reserves, inter-company and consolidation, V2502 their event types, exception codes, parameters, job history, permissions, roles and module switches. The versions are above every seed script, so on a new database the seed scripts run while the insurer objects still exist. Seed counterpart V2510 in `db/seed` (removes the SIT/UAT users `uw`, `claims`, `reinsurer`) |
+  | V900–V999 | seed data (`db/seed`, loaded only with the `seed` profile) — same sub-ranges: underwriting V910s, claims V920s, reinsurance V930s (the insurer suite, removed by V2500–V2510), period-end V940s, payables V950s, receivables V955s, budget V960s, tax V975–V979, broking V980–V989, Operations V990–V995, Product Maintenance V996–V998 (V996 catalog versions, V997 package requests, V998 Product Maintenance users), Accounting / Disbursement V999 (reference data and users only; its storyline runs as Java seed runners) (full) |
   | V1900–V1999 | seed data of the V1000+ modules, 10 versions each in the same order: Collections V1900–V1909, Renewal V1910–V1919 (V1910 used), Claims V1920–V1929, Employee Benefits V1930–V1939 (V1930–V1933 used), Customer Servicing V1940–V1949 (V1940 used), Sanctions V1950–V1959, User Access V1960–V1969 (V1960–V1961 used), Submitted Policies V1970–V1979 (V1970 used; the seed records are loaded by `SubmittedSeedData`), Data Migration V1980–V1989, Core Replacement V1990–V1999 (runs after all V9xx seed, so it can build on the Operations and booking seed) |
 
   Because each module owns a range, a module can add a migration whose version is lower than one
-  another module has already applied (for example a new platform `V27` after underwriting's `V101`).
+  another module has already applied (for example a new platform `V27` after a module's `V101`).
   Flyway therefore runs with `spring.flyway.out-of-order: true`. Never renumber or edit an applied
   migration; add a new one in your range. Migrations of different modules must not depend on each
   other's order unless the lower-numbered one is certain to have been applied first.
@@ -197,15 +198,14 @@ tables of the migrated database.
 - Use a unique `sourceReference` per business transaction (e.g. `POLICY:123:ENDT:2`): the engine is
   idempotent on it.
 - Negative component amounts post to the opposite side (refunds, releases).
-- Sub-ledger party goes in `partyCode`; line of business in `businessLine` (mandatory for premium,
-  claims and reinsurance accounts in the standard chart).
+- Sub-ledger party goes in `partyCode`; line of business in `businessLine` (mandatory for the
+  accounts that require it in the chart of accounts).
 
 ## 6. Reports
 
 - One class per report implementing `ReportDefinition`, annotated `@Component`, in the owning
-  module's `report` sub-package (e.g. `underwriting.report.PremiumRegisterReport`).
-- Report codes: GI reports keep the codes of the Reports Book (e.g. `PGIBR015`); finance reports use
-  `FIN-…` codes from `docs/requirements/FINANCE_REPORTS_SPEC.md`; GL reports `GL-…`.
+  module's `report` sub-package (e.g. `tax.report.SawtReport`).
+- Report codes: finance reports use `FIN-…` codes from `docs/requirements/FINANCE_REPORTS_SPEC.md`; GL reports `GL-…`.
 - Declare parameters with `ParameterSpec` (dates default via `TODAY`, `MONTH_START`, `YEAR_START`, resolved on
   the Manila business day by `BusinessClock`, as in the browser; tests that compute "today" for a report use
   `BusinessClock.today(clock)`, never the UTC date).
@@ -276,8 +276,9 @@ tables of the migrated database.
 ## 8. Tests (definition of done)
 
 - Service logic: integration test annotated `@IntegrationTest` (embedded PostgreSQL, seed data) –
-  use `AsUser` to act as SIT/UAT users (`accountant`, `checker`, `fmanager`, `uw`, `claims`,
-  `reinsurer`, `auditor`).
+  use `AsUser` to act as SIT/UAT users (`accountant`, `checker`, `fmanager`, `auditor` and the BDOI
+  role users). `norole` (test data `src/test/resources/db/testdata`) holds no role, for the checks
+  that a missing permission is refused.
 - Every new read endpoint added to `ApiSmokeIT`.
 - Every report exercised in a test that runs it and exports PDF/XLSX/CSV.
 - Pure logic (calculations): plain JUnit tests.
@@ -315,17 +316,17 @@ Every document that waits for a checker must appear in the universal inbox. Impl
 
 ```java
 @Component
-public class PolicyApprovalSource implements PendingApprovalSource {
+public class InvoiceApprovalSource implements PendingApprovalSource {
   @Override
   public List<PendingApproval> pendingFor(ApprovalViewer viewer) {
-    if (!viewer.can("POLICY_AUTHORIZE")) {
+    if (!viewer.can("RECEIPT_PAYMENT_AUTHORIZE")) {
       return List.of();
     }
-    return policies.findPendingAuthorization().stream()
-        .filter(p -> viewer.mayApproveItemOf(p.getSubmittedBy())) // maker never sees own items
-        .map(p -> new PendingApproval("UNDERWRITING", "Policy", p.getPolicyNo(), p.getInsuredName(),
-            p.getGrossPremium(), p.getCurrency(), p.getSubmittedBy(), p.getSubmittedAt(),
-            p.getCompanyId(), "/underwriting/policies/" + p.getId()))
+    return invoices.findPendingApproval().stream()
+        .filter(i -> viewer.mayApproveItemOf(i.getSubmittedBy())) // maker never sees own items
+        .map(i -> new PendingApproval("PAYABLES", "Supplier invoice", i.getDocumentNo(),
+            i.getPartyName(), i.getPayable(), i.getCurrency(), i.getSubmittedBy(),
+            i.getSubmittedAt(), i.getCompanyId(), "/payables/invoices?invoice=" + i.getId()))
         .toList();
   }
 }
@@ -337,18 +338,14 @@ public class PolicyApprovalSource implements PendingApprovalSource {
 - Maker-checker master data (`AuthorizableEntity`) needs no custom query: use
   `approval.service.MasterRecordApprovals.pending(viewer, Entity.class, e -> new RecordFacts(...))`
   (see `organization.service.OrganizationApprovalSource`). Records a module authorizes under its own
-  permission pass a `Scope(module, permission)`, e.g. products under `POLICY_AUTHORIZE`
-  (`underwriting.service.UnderwritingApprovalSource`).
+  permission pass a `Scope(module, permission)` (`catalog.service.CatalogApprovalSource`).
 - Apply the same checks as the approval itself: the permission of the approve endpoint, every user
   the approval refuses (creator *and* submitter where both are checked), and the authorization limit
-  where the approval enforces one (`JournalApprovalSource`, `PayablesApprovalSource`,
-  `ClaimApprovalSource`, `UnderwritingApprovalSource`).
-- Sources today: GL journals, accounting rules, chart of accounts, parties, organization,
-  underwriting (policies, endorsements, quotations, products, open covers), payables (invoices,
-  vouchers, petty cash, bank accounts, funds), receivables (receipts), budget (submitted versions),
-  fixed assets (capitalization, categories), investments (holdings, portfolios), actuarial reserves
-  (valuation runs, reserve parameters). Consolidation runs have no maker-checker step, so they have
-  no source.
+  where the approval enforces one (`JournalApprovalSource`, `PayablesApprovalSource`).
+- Sources today: GL journals, accounting rules, chart of accounts, parties, organization, payables
+  (invoices, vouchers, petty cash, bank accounts, funds), receivables (receipts), budget (submitted
+  versions), fixed assets (capitalization, categories), investments (holdings, portfolios), tax
+  masters and the broking modules.
 - The `PENDING_APPROVAL_AGEING` check reads `ApprovalInboxService.pendingAll()` (the system view of
   every source) and raises one alert per item, de-duplicated on module, type and reference.
 - API: `GET /api/v1/approvals/inbox?companyId=`, `GET /api/v1/approvals/counts` (header badge).
@@ -388,7 +385,7 @@ environment variable and document it in `docs/operations/CONFIGURATION.md`. Jobs
 `RECURRING_JOURNALS`, `ALERT_DAILY_CHECKS`, `PDC_ISSUED_DUE`, `HOLD_COVER_EXPIRY`,
 `BOOKING_BATCH` (daily), `PAYMENT_CONFIRMATION_SWEEP` (hourly), `MAIL_DISPATCH` (every two minutes),
 `KYC_REVIEW_DUE`, `RETENTION_REVIEW` (monthly), the platform jobs `EVENT_OUTBOX_RELAY` (every minute),
-`EVENT_HOUSEKEEPING`, `SHARED_STATE_CLEANUP` (daily) and `QUOTATION_EXPIRY`, `RESERVE_VALUATION`, `RI_ALLOCATION` (insurer suite, off since V1064),
+`EVENT_HOUSEKEEPING`, `SHARED_STATE_CLEANUP` (daily),
 `QUOTATION_REQUEST_INTAKE`, `OPS_INVOICE_FEED_REPLAY` (manual unless scheduled), the document storage jobs
 `FILE_SCAN_RESULTS` (every 5 minutes), `FILE_ORPHAN_RECONCILIATION`, `FILE_RETENTION` (daily) and `FILE_ECM_ARCHIVE`
 (every 15 minutes; crons `brokerverse.storage.jobs.*`), and the one-off `FILE_BYTEA_MIGRATION` of build step ST1
@@ -459,7 +456,7 @@ never the reverse.
 ### 10.7 Help content
 
 Every screen has an entry in the in-app Help Center (summary, workflow, controls). A module keeps
-its section in `frontend/src/features/<module>/help.ts` (e.g. `UNDERWRITING_HELP`) and registers it
+its section in `frontend/src/features/<module>/help.ts` (e.g. `TAX_HELP`) and registers it
 in `HELP_SECTIONS` (`frontend/src/features/help/helpContent.ts`) in sidebar order. Every non-hidden
 screen route of a `features/*/module.ts` needs exactly one help entry with that `path`, and help
 links must point to menu screens; `helpContent.test.ts` fails the build otherwise. Add or update the
@@ -666,9 +663,9 @@ rules, reports, ports, seed data and open points. Update it together with the co
 | Broking (BDOI New Business) | [`docs/architecture/BROKING_ARCHITECTURE.md`](../architecture/BROKING_ARCHITECTURE.md) |
 
 The insurer-side modules of the original finance suite (`underwriting`, `claims`, `reinsurance`, `reserves`, the
-`insurance` kernel and `consolidation`) are not used by any BDOI process and stay hidden from BDOI roles. Their guides
-were removed; the inventory, the evidence and the recommended action per module are in
-[`CODEBASE_RELEVANCE_AUDIT.md`](CODEBASE_RELEVANCE_AUDIT.md), which also names the commit that still holds the old guides.
+`insurance` kernel, `consolidation` and the insurer tax schedules) were removed on the client's decision of
+8 October 2026 (BIBS is specific to BDOI as an insurance broker); their tables were dropped by V2500–V2502. The inventory,
+the evidence and the removal steps are in [`CODEBASE_RELEVANCE_AUDIT.md`](CODEBASE_RELEVANCE_AUDIT.md).
 
 Modules of later BRDs, **designed, not built** (the design is the guide until the module guide is written with the
 code; cross-BRD decisions and the build order are in
@@ -685,7 +682,7 @@ code; cross-BRD decisions and the build order are in
 | No new module (`dashboard`, `report`, `audit`, `catalog`, `opsledger`, `booking`) | BRD-00 Core Replacement (umbrella): role home, report layout and subscriptions, master data change log, MIS fields, insurer page, Invoice Master List, insurer invoice batch | V1090–V1096 (V1990–V1991) | [`CORE_REPLACEMENT_IMPACT.md`](../architecture/CORE_REPLACEMENT_IMPACT.md) |
 
 BRD-10 Sanction Screening (`screening`, V1050–V1055, seed V1950–V1952) and BRD-11 User Access Maintenance (no
-module of its own: it extends `security` and `nbadmin`, V1060–V1065 and V1130, seed V1960–V1962; V1064 and V1961 hide the insurer suite, see [`CODEBASE_RELEVANCE_AUDIT.md`](CODEBASE_RELEVANCE_AUDIT.md) R1) are built; their guides are in the
+module of its own: it extends `security` and `nbadmin`, V1060–V1065 and V1130, seed V1960–V1962; V1064 and V1961 hid the insurer suite until its removal, see [`CODEBASE_RELEVANCE_AUDIT.md`](CODEBASE_RELEVANCE_AUDIT.md) R1) are built; their guides are in the
 table above and their designs are [`SANCTION_SCREENING_DESIGN.md`](../architecture/SANCTION_SCREENING_DESIGN.md) and
 [`USER_ACCESS_DESIGN.md`](../architecture/USER_ACCESS_DESIGN.md). BRD-7 Claims Handling (`brokerclaims`, V1020–V1024,
 V1920–V1921; V1025 held for the legacy claims migration, CLQ14) is built (waves CL0, CL1-A, CL1-B and the integration

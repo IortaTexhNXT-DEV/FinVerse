@@ -20,12 +20,6 @@ const SERVER_MODULES = [
   'ASSETS_INVESTMENTS',
   'BUDGET',
   'TAX_STATUTORY',
-  'UNDERWRITING',
-  'INSURER_CLAIMS',
-  'REINSURANCE',
-  'ACTUARIAL_RESERVES',
-  'CONSOLIDATION',
-  'INSURER_TAX',
 ];
 
 const screens = MODULES.flatMap((m) => m.screens);
@@ -39,25 +33,25 @@ describe('product module switches in the menu', () => {
   });
 
   it('ties screens to their module by path, the longest prefix first', () => {
-    expect(productModuleOf('/claims')).toBe('INSURER_CLAIMS');
     expect(productModuleOf('/claims-handling/worklist')).toBe('CLAIMS_HANDLING');
+    expect(productModuleOf('/claims')).toBeUndefined();
     expect(productModuleOf('/tax/vat')).toBe('TAX_STATUTORY');
-    expect(productModuleOf('/tax/premium-tax')).toBe('INSURER_TAX');
-    expect(productModuleOf('/planning/consolidation')).toBe('CONSOLIDATION');
+    expect(productModuleOf('/planning/budgets/12')).toBe('BUDGET');
+    expect(productModuleOf('/planning/fx-revaluation')).toBeUndefined();
     expect(productModuleOf('/admin/users')).toBeUndefined();
   });
 
   it('shows no screen of a switched-off module and keeps the others', () => {
     const modules = {
-      switchedOff: ['RENEWAL', 'UNDERWRITING'],
-      inactivePermissions: ['POLICY_VIEW'],
+      switchedOff: ['RENEWAL', 'PAYABLES'],
+      inactivePermissions: ['RNW_VIEW'],
     };
     const can = (p: string) => mayUse(p, modules, () => true);
     const renewal = screens.filter((s) => s.path.startsWith('/renewal'));
     expect(renewal.length).toBeGreaterThan(0);
     renewal.forEach((s) => expect(mayOpen(s, can), s.path).toBe(false));
     screens
-      .filter((s) => s.path.startsWith('/underwriting'))
+      .filter((s) => s.path.startsWith('/payables'))
       .forEach((s) => expect(mayOpen(s, can), s.path).toBe(false));
     const collections = screens.find((s) => s.path === '/collections');
     expect(collections && mayOpen(collections, can)).toBe(true);
@@ -66,11 +60,11 @@ describe('product module switches in the menu', () => {
   });
 
   it('refuses the permissions of switched-off modules', () => {
-    const modules = { switchedOff: ['UNDERWRITING'], inactivePermissions: ['POLICY_VIEW'] };
-    expect(mayUse('POLICY_VIEW', modules, () => true)).toBe(false);
+    const modules = { switchedOff: ['RENEWAL'], inactivePermissions: ['RNW_VIEW'] };
+    expect(mayUse('RNW_VIEW', modules, () => true)).toBe(false);
     expect(mayUse('JOURNAL_VIEW', modules, () => true)).toBe(true);
     expect(mayUse('JOURNAL_VIEW', modules, () => false)).toBe(false);
-    expect(mayUse(`${MODULE_OFF}UNDERWRITING`, modules, () => false)).toBe(true);
-    expect(mayUse(`${MODULE_OFF}RENEWAL`, modules, () => true)).toBe(false);
+    expect(mayUse(`${MODULE_OFF}RENEWAL`, modules, () => false)).toBe(true);
+    expect(mayUse(`${MODULE_OFF}PAYABLES`, modules, () => true)).toBe(false);
   });
 });

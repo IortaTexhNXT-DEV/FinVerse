@@ -184,7 +184,12 @@ class TaxApiIT {
             "auditor",
             RETURNS,
             Json.of(
-                "companyId", fixtures.companyId(), "formCode", "2550Q", "periodStart", "2026-07-01"))
+                "companyId",
+                fixtures.companyId(),
+                "formCode",
+                "2550Q",
+                "periodStart",
+                "2026-07-01"))
         .andExpect(status().isForbidden());
   }
 }

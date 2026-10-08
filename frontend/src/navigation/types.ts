@@ -11,8 +11,7 @@ export interface ScreenDef {
   /** Other permissions that also open the screen (e.g. the checker of a maker screen). */
   alsoPermissions?: string[];
   /**
-   * Permissions the user must hold as well (all of them), e.g. INSURER_TAX_VIEW on the insurer tax
-   * worksheets, which no BDOI role holds.
+   * Permissions the user must hold as well (all of them).
    */
   requiresAll?: string[];
   /**

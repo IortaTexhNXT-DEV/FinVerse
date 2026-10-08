@@ -123,7 +123,7 @@ class InsurerSuiteRemovedIT {
     assertThat(
             count(
                 "select count(*) from sys_parameter where param_key in"
-                    + " ('RESERVES_AUTO_RUN_COMPANIES', 'OPEN_COVER_TRANSIT_DAYS')"))
+                    + " ('RESERVES_AUTO_RUN_COMPANIES', 'OPEN_COVER_TRANSIT_DAYS', 'IC_RBC_HURDLE_PERCENT')"))
         .isZero();
     assertThat(count("select count(*) from tax_form where worksheet not in ('VAT', 'EWT', 'NONE')"))
         .isZero();

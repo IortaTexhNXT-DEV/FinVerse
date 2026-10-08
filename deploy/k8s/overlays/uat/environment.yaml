@@ -11,8 +11,10 @@ data:
   awsRegion: "ap-southeast-1"
   albCertificateArn: "arn:aws:acm:ap-southeast-1:<AWS_ACCOUNT_ID>:certificate/<ALB_CERTIFICATE_ID>"
   wafAclArn: "arn:aws:wafv2:ap-southeast-1:<AWS_ACCOUNT_ID>:regional/webacl/<WAF_ACL_NAME>/<WAF_ACL_ID>"
-  # Client networks (Direct Connect / VPN, VDI) and the Apigee X private route, comma-separated.
-  inboundCidrs: "<BDO_CLIENT_CIDRS>,<APIGEE_ROUTE_CIDRS>"
+  # Gateway source ranges (one aggregate CIDR each): client networks (Direct Connect / VPN, VDI) and
+  # the Apigee X private route. albCertificateArn and wafAclArn apply to components/gateway-alb.
+  clientCidr: "<BDO_CLIENT_CIDR>"
+  apigeeCidr: "<APIGEE_ROUTE_CIDR>"
   webRoleArn: "arn:aws:iam::<AWS_ACCOUNT_ID>:role/bibs-uat-web"
   jobsRoleArn: "arn:aws:iam::<AWS_ACCOUNT_ID>:role/bibs-uat-jobs"
   integrationRoleArn: "arn:aws:iam::<AWS_ACCOUNT_ID>:role/bibs-uat-integration"

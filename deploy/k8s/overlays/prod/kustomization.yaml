@@ -5,6 +5,9 @@ resources:
   - ../../base
   - environment.yaml
 components:
+  # Gateway controller of this environment: gateway-alb (AWS Load Balancer Controller, internal ALB
+  # with AWS WAF) or gateway-envoy (Envoy Gateway). Listed before the environment component.
+  - ../../components/gateway-alb
   - ../../components/environment
 images:
   - name: bibs-backend
@@ -42,7 +45,7 @@ patches:
       - op: replace
         path: /spec/replicas
         value: 3
-  # Two jobs pods across zones; the Redis job lock keeps one run per schedule.
+  # Two jobs pods across zones; the Valkey job lock keeps one run per schedule.
   - target: { kind: Deployment, name: bibs-jobs }
     patch: |-
       - op: replace

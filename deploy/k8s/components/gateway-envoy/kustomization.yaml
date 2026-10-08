@@ -1,0 +1,67 @@
+# Gateway controller, alternative: Envoy Gateway (Apache 2.0, conformant Gateway API implementation),
+# for an environment that does not use the AWS Load Balancer Controller's Gateway support. Replaces
+# components/gateway-alb in the overlay's component list (one gateway component per overlay).
+#   GatewayClass bibs-envoy   controller gateway.envoyproxy.io/gatewayclass-controller, EnvoyProxy
+#                             bibs-envoy (Envoy service behind an internal NLB, source ranges)
+#   Gateway listener          TLS terminated with the secret bibs-edge-tls (certificate on the
+#                             client domain, from the client PKI; created before the first apply)
+#   BackendTLSPolicy (x3)     HTTPS to the pods, verified against the private CA (ConfigMap
+#                             bibs-private-ca, key ca.crt) and the service host name
+#   HTTPRoute timeouts        300 s per request (Envoy's own default is shorter)
+#   NetworkPolicy             Envoy pods (namespace envoy-gateway-system) -> pods on 8443
+# An NLB carries no AWS WAF web ACL: with this variant the WAF rules (managed rule groups, rate rule
+# on sign-in, Apigee-only /integration) must be provided in front of the gateway (DEPLOYMENT.md 3).
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+labels:
+  - pairs:
+      app.kubernetes.io/part-of: bibs
+    includeSelectors: false
+resources:
+  - gateway-class.yaml
+  - backend-tls.yaml
+patches:
+  - target: { kind: Gateway, name: bibs }
+    patch: |-
+      - op: replace
+        path: /spec/gatewayClassName
+        value: bibs-envoy
+      - op: add
+        path: /spec/listeners/0/tls
+        value:
+          mode: Terminate
+          certificateRefs:
+            - { kind: Secret, name: bibs-edge-tls }
+  - target: { kind: HTTPRoute, name: bibs-users }
+    patch: |-
+      - op: add
+        path: /spec/rules/0/timeouts
+        value: { request: 300s }
+      - op: add
+        path: /spec/rules/1/timeouts
+        value: { request: 300s }
+  - target: { kind: HTTPRoute, name: bibs-integration }
+    patch: |-
+      - op: add
+        path: /spec/rules/0/timeouts
+        value: { request: 300s }
+  - target: { kind: NetworkPolicy, name: allow-load-balancer }
+    patch: |-
+      - op: add
+        path: /spec/ingress/0/from/-
+        value:
+          namespaceSelector: { matchLabels: { kubernetes.io/metadata.name: envoy-gateway-system } }
+          podSelector: { matchLabels: { app.kubernetes.io/name: envoy } }
+replacements:
+  - source: { kind: ConfigMap, name: bibs-environment, fieldPath: data.clientCidr }
+    targets:
+      - select: { kind: EnvoyProxy, name: bibs-envoy }
+        fieldPaths:
+          - "spec.provider.kubernetes.envoyService.annotations.[service.beta.kubernetes.io/load-balancer-source-ranges]"
+        options: { delimiter: ",", index: 0 }
+  - source: { kind: ConfigMap, name: bibs-environment, fieldPath: data.apigeeCidr }
+    targets:
+      - select: { kind: EnvoyProxy, name: bibs-envoy }
+        fieldPaths:
+          - "spec.provider.kubernetes.envoyService.annotations.[service.beta.kubernetes.io/load-balancer-source-ranges]"
+        options: { delimiter: ",", index: 1 }

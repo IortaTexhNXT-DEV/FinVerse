@@ -1,28 +1,19 @@
 # Copies the per-environment values of the overlay's ConfigMap "bibs-environment" (environment.yaml,
-# annotated local-config, so it is never applied) into the base resources: host name, ALB
-# certificate, WAF web ACL, allowed source ranges, IRSA role ARNs, Private CA and the network ranges
-# of the NetworkPolicies. An overlay lists its environment.yaml under resources and this component
-# under components.
+# annotated local-config, so it is never applied) into the base resources: host name of the Gateway
+# listener and the HTTPRoutes, IRSA role ARNs, Private CA and the network ranges of the
+# NetworkPolicies. The values of the load balancer itself (certificate, WAF web ACL, source ranges)
+# are copied by the gateway component (components/gateway-alb or gateway-envoy). An overlay lists
+# its environment.yaml under resources and this component under components, after the gateway one.
 apiVersion: kustomize.config.k8s.io/v1alpha1
 kind: Component
 replacements:
-  # ---- Load balancer ----
+  # ---- Gateway host name ----
   - source: { kind: ConfigMap, name: bibs-environment, fieldPath: data.host }
     targets:
-      - select: { kind: Ingress }
-        fieldPaths: [spec.rules.0.host]
-  - source: { kind: ConfigMap, name: bibs-environment, fieldPath: data.albCertificateArn }
-    targets:
-      - select: { kind: Ingress }
-        fieldPaths: ["metadata.annotations.[alb.ingress.kubernetes.io/certificate-arn]"]
-  - source: { kind: ConfigMap, name: bibs-environment, fieldPath: data.wafAclArn }
-    targets:
-      - select: { kind: Ingress }
-        fieldPaths: ["metadata.annotations.[alb.ingress.kubernetes.io/wafv2-acl-arn]"]
-  - source: { kind: ConfigMap, name: bibs-environment, fieldPath: data.inboundCidrs }
-    targets:
-      - select: { kind: Ingress, name: bibs-users }
-        fieldPaths: ["metadata.annotations.[alb.ingress.kubernetes.io/inbound-cidrs]"]
+      - select: { kind: Gateway, name: bibs }
+        fieldPaths: [spec.listeners.0.hostname]
+      - select: { kind: HTTPRoute }
+        fieldPaths: [spec.hostnames.0]
   # ---- IRSA ----
   - source: { kind: ConfigMap, name: bibs-environment, fieldPath: data.webRoleArn }
     targets:

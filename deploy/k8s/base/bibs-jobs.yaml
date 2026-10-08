@@ -1,5 +1,5 @@
 # bibs-jobs: scheduled and batch jobs (month-end, remittance and renewal extraction, migration loads,
-# report generation). Runtime role "jobs": HTTP limited to the actuator (probes, metrics). The Redis
+# report generation). Runtime role "jobs": HTTP limited to the actuator (probes, metrics). The Valkey
 # job lock makes every job run once per schedule whatever the number of pods; heavy windows can be
 # scaled on schedule. Not behind the load balancer.
 apiVersion: apps/v1

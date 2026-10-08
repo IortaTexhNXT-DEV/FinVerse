@@ -36,12 +36,12 @@ data:
   # ---- PostgreSQL (Amazon RDS, rds.force_ssl=1): verify-full against the RDS CA bundle ----
   BROKERVERSE_DB_SSL_MODE: "verify-full"
   BROKERVERSE_DB_SSL_ROOT_CERT: "/etc/bibs/rds-ca/global-bundle.pem"
-  # ---- Redis 7 (ElastiCache, in-transit encryption); AUTH token in the secret ----
-  BROKERVERSE_REDIS_ENABLED: "true"
-  BROKERVERSE_REDIS_HOST: "<ELASTICACHE_PRIMARY_ENDPOINT>"
-  BROKERVERSE_REDIS_PORT: "6379"
-  BROKERVERSE_REDIS_TLS: "true"
-  BROKERVERSE_REDIS_KEY_PREFIX: "bv:"
+  # ---- Valkey 8 (Amazon ElastiCache for Valkey, in-transit encryption); AUTH token in the secret ----
+  BROKERVERSE_VALKEY_ENABLED: "true"
+  BROKERVERSE_VALKEY_HOST: "<ELASTICACHE_PRIMARY_ENDPOINT>"
+  BROKERVERSE_VALKEY_PORT: "6379"
+  BROKERVERSE_VALKEY_TLS: "true"
+  BROKERVERSE_VALKEY_KEY_PREFIX: "bv:"
   # ---- Kafka (Amazon MSK, SASL/SCRAM over TLS, port 9096); JAAS configuration in the secret ----
   BROKERVERSE_KAFKA_ENABLED: "true"
   BROKERVERSE_KAFKA_BOOTSTRAP_SERVERS: "<MSK_SASL_SCRAM_BOOTSTRAP_BROKERS>"

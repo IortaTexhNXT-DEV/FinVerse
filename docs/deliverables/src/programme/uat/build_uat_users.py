@@ -386,7 +386,7 @@ def brd_rows(m: Model, b: dict) -> list[dict[str, Any]]:
     for p in b["personas"]:
         if p.get("no_user"):
             rows.append({"persona": p["persona"], "profile": None, "code": None, "id": "None in UAT",
-                         "name": None, "place": None, "does": b["frs"].get(p["persona"], p.get("does")),
+                         "name": None, "place": None, "does": p.get("does") or b["frs"].get(p["persona"]),
                          "menu": None, "steps": ", ".join(r["step"] for r in b["script"]
                                                           if r["persona"] == p["persona"]) or None,
                          "scope": None, "password": None, "remarks": m.spec["no_user"][p["no_user"]]})

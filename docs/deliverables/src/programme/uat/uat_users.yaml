@@ -254,15 +254,18 @@ brds:
       - {persona: Authorizer of master data (escalation rules), role: AUTHORIZER, users: [checker],
          does: "Authorizes the escalation rules maintained in the Collections set-up (no Collections profile authorizes master data)"}
       - {persona: Unapplied Payment Handler, role: UNAPPLIED_HANDLER, users: [upphandler]}
-      - {persona: Operations Cashiering (Cashier), role: CASHIER, users: [cashier]}
+      - {persona: Operations Cashiering (Cashier), role: CASHIER, users: [cashier],
+         does: "Read access and exports; executes the application requests on its Incoming Requests screen"}
       - {persona: Operations Cashiering (Cashiering Team Leader / Head), role: CASHIER_TL, users: [cashtl],
          does: "Executes the application requests; as the proposed Operations billing user, generates and sends the statements of account"}
       - {persona: Marketing AO, role: MKT_AO, users: [ao]}
       - {persona: Marketing Team Lead, role: MKT_TL, users: [mkttl]}
       - {persona: Marketing Handler, role: MKT_HANDLER, users: [mkthandler]}
       - {persona: Processing Unit, role: PROCESSOR, users: [proc]}
-      - {persona: Commission Receivables Unit (handler), role: COMMREC_HANDLER, users: [commrec]}
-      - {persona: Commission Receivables Unit (team lead), role: COMMREC_TL, users: [commtl]}
+      - {persona: Commission Receivables Unit (handler), role: COMMREC_HANDLER, users: [commrec],
+         does: "Confirms the direct payment accounts fully paid to the insurer and bills the commission receivable in Commission Receivables (BRD-2); views the Collections accounts"}
+      - {persona: Commission Receivables Unit (team lead), role: COMMREC_TL, users: [commtl],
+         does: "As the handler, for the team; views the Collections accounts"}
       - {persona: Disbursement, role: DISBURSEMENT, users: [disb], does: "Read access, reports and exports"}
       - {persona: Comptrollership, role: COMPTROLLERSHIP, users: [comptrol], does: "Read access and reports"}
       - {persona: ACSL (processor), role: ACSL_PROCESSOR, users: [acsl], does: "Read access and reports"}
@@ -312,12 +315,12 @@ brds:
       - {persona: Accountant (bank reconciliation), role: ACCOUNTANT, users: [accountant],
          does: "Bank reconciliation and the accounting reports"}
       - {persona: Comptrollership administrator, role: FIN_ADMIN, users: [fmanager]}
-      - {persona: Comptrollership, role: COMPTROLLERSHIP, users: [comptrol]}
+      - {persona: Comptrollership, role: COMPTROLLERSHIP, users: [comptrol], does: "Read access to journals, reports and closing"}
       - {persona: Approver (administration), role: AUTHORIZER, users: [checker],
          does: "Approves, declines or returns the list-of-values and master-data requests of another user"}
       - {persona: Business Administrator, role: BUSINESS_ADMIN, users: [badmin]}
       - {persona: System Administrator, role: SYSADMIN, users: [admin]}
-      - {persona: Auditor, role: AUDITOR, users: [auditor]}
+      - {persona: Auditor, role: AUDITOR, users: [auditor], does: "Read access to journals, reports and closing"}
 
   - brd: BRD-06
     module: Renewal
@@ -374,8 +377,10 @@ brds:
       - {persona: Processing Supervisor, role: EB_PROC_SUPERVISOR, users: [ebprocsup]}
       - {persona: Collection (EB), role: EB_COLLECTION, users: [ebcoll]}
       - {persona: Business Administrator, role: BUSINESS_ADMIN, users: [badmin]}
-      - {persona: Insurer user (partner portal), no_user: portal}
-      - {persona: Client HR user (partner portal), no_user: portal}
+      - {persona: Insurer user (partner portal), no_user: portal,
+         does: "Answers requests, submits proposals, decides franchise, bills member changes, uploads policy forms and SOAs, for its own insurer only"}
+      - {persona: Client HR user (partner portal), no_user: portal,
+         does: "Views its programmes and roster, uploads master lists, utilization, member changes and feedback, comments on and confirms the comparative, for its own company only"}
     aliases:
       "Insurer user": "Insurer user (partner portal)"
       "Client HR user": "Client HR user (partner portal)"
@@ -512,14 +517,17 @@ brds:
          does: "Unapplied to Income and Legacy PR 2307 Reversal batches; payments and dispositions on legacy items"}
       - {persona: Cashiering team lead, role: CASHIER_TL, users: [cashtl],
          does: "Reviews and posts the Unapplied to Income and Legacy PR 2307 Reversal batches"}
-      - {persona: Top management (Finance Approver), role: TOP_MANAGEMENT_APPROVER, users: [topmgmt]}
+      - {persona: Top management (Finance Approver), role: TOP_MANAGEMENT_APPROVER, users: [topmgmt],
+         does: "Approves the Unapplied to Income batches after the Cashiering team lead"}
       - {persona: Commission user (DP PR Legacy Reversal), role: COMMREC_HANDLER, users: [commrec],
          does: "Prepares the DP PR Legacy Reversal batches"}
       - {persona: Commission team lead (DP PR Legacy Reversal), role: COMMREC_TL, users: [commtl],
          does: "Posts the DP PR Legacy Reversal batches"}
       - {persona: Collections user (Legacy PR 2307 Reversal), role: MKT_COLLECTION, users: [clxhandler],
+         does: "Legacy PR 2307 Reversal batches (BRD V0.03); finds the migrated items on the PR Worklist",
          remarks: "BRD V0.03 gives the Legacy PR 2307 Reversal to Collections; this set shows it with the Cashiering user and team lead (CLR-DM-16)"}
       - {persona: Collections team lead (Legacy PR 2307 Reversal), role: CLX_TL, users: [clxtl],
+         does: "Reviews and posts the Legacy PR 2307 Reversal batches (BRD V0.03)",
          remarks: "See CLR-DM-16"}
       - {persona: Accounting User (Comptrollership), role: ACCOUNTANT, users: [accountant]}
       - {persona: Marketing user, role: MKT_AO, users: [ao],

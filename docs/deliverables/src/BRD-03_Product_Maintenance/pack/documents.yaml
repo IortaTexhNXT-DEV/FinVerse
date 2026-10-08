@@ -54,7 +54,7 @@ documents:
     frs: [FR-PM-040]
   - id: DO-05
     name: ManCom sign-off record
-    template: (built-in layout, ManCom Sign-off)
+    template: (standard layout of the system, ManCom Sign-off)
     format: PDF, attached as ManCom sign-off when no signed sheet was uploaded
     produced: Automatically at Sign off and send to MBS
     protected: No (kept in BIBS)
@@ -65,7 +65,7 @@ documents:
     frs: [FR-PM-041]
   - id: DO-06
     name: Package advisory
-    template: PKG_ADVISORY (new, reactivated or updated package), PKG_RENEWAL_ADVISORY (renewed package); built-in text for a retirement
+    template: PKG_ADVISORY (new, reactivated or updated package), PKG_RENEWAL_ADVISORY (renewed package); standard text of the system for a retirement
     format: PDF, stored on the request as Package advisory and e-mailed when addresses are given
     produced: Advisories tab › Send Advisory
     protected: Yes when e-mailed (password in a separate e-mail)

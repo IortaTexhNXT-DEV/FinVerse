@@ -9,7 +9,7 @@ issue:
   version: "2.1"
   date: 8 October 2026
   changes:
-    - ref: CHG-DM-2.1-V003
+    - ref: CHG-DM-2.1-01
       what: >-
         Re-based on the Data Migration BRD V0.03: the DP PR Legacy Reversal is requested by a Cashiering or Support
         Team user and approved by the Cashiering team lead, the Legacy PR 2307 Reversal is requested by a Collections
@@ -43,7 +43,9 @@ personas:
   TOP_MANAGEMENT_APPROVER:
     who: "A member of top management named for the reclassification of unapplied payments to income"
     does: "Gives the second approval of an Unapplied to Income batch, or returns it with the reason"
-  COMMREC_HANDLER: {who: "A Commission officer of Operations"}
+  COMMREC_HANDLER:
+    who: "A Commission officer of Operations"
+    does: "Requests the DP PR Legacy Reversal batches in the screens of this set; BRD V0.03 gives them to a Cashiering or Support Team user (CLR-DM-16)"
   COMMREC_TL:
     who: "The team lead of Commission"
     does: "Approves or returns the DP PR Legacy Reversal batches of the Commission users"

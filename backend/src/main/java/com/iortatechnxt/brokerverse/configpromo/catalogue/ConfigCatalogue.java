@@ -54,6 +54,16 @@ public final class ConfigCatalogue {
     }
   }
 
+  /**
+   * Reads a catalogue in the format of {@value #RESOURCE}.
+   *
+   * @param in YAML
+   * @return catalogue
+   */
+  public static ConfigCatalogue read(InputStream in) {
+    return CatalogueYaml.read(in);
+  }
+
   private static Map<String, CatalogueDataset> index(
       List<CatalogueDataset> datasets, Function<CatalogueDataset, String> key, String what) {
     Map<String, CatalogueDataset> map = new LinkedHashMap<>();

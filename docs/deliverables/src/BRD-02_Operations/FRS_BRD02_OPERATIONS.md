@@ -1167,7 +1167,7 @@ acceptance:
 ```fr
 id: FR-OP-023
 title: Clear minimal balances when the payment is processed
-brd: [CSHID.016 (p.100-101; annex p.4, 6-7)]
+brd: [CSHID.016 (p.100-101; annex p.4 and 6-7)]
 actor: System; Cashiering TL (thresholds, safety-net run)
 priority: Must have
 screens: Receive Payment (preview); Receipt page (Applications, Journal); Cashiering Setup (Minimal Balance); Reports CSH-MINBAL-PREMIUM, CSH-MINBAL-EXCESS
@@ -1888,7 +1888,7 @@ acceptance:
 ```fr
 id: FR-OP-051
 title: Detect duplicate endorsement requests
-brd: [ADJID.023 (p.162; annex p.37-38, 40)]
+brd: [ADJID.023 (p.162; annex p.37-38 and 40)]
 actor: System; requester
 priority: Must have
 screens: New Request (duplicate warning)
@@ -2123,7 +2123,7 @@ acceptance:
 ```fr
 id: FR-OP-058
 title: Control over-adjustment and capture justifications
-brd: [ADJID.023 (p.162; annex p.37-38, 40), ADJID.028 (p.166)]
+brd: [ADJID.023 (p.162; annex p.37-38 and 40), ADJID.028 (p.166)]
 actor: System; requester
 priority: Must have
 screens: New Request (previous adjustments, justification); Invoice 360 (adjustment totals)
@@ -3921,235 +3921,244 @@ The items below are changed in BIBS without a release. Changes to parameters and
 
 # Traceability
 
-Every BRD-2 requirement ID (169) is met by at least one FR. The page is the page of the BRD-2 PDF ("add." = Addendum 1). The test cases are listed by test condition (TC-OP-nnn.n); the test plan workbook lists each case.
+Every requirement ID of the Operations BRD v1.01 and of the May 2026 annexes is listed with its page, the FRs that meet it, the screens and the test conditions of the test plan (TC-OP-nnn.n; the workbook lists each case). "p.n" is a page of BRD v1.01 in the file Operations_WS Addendum and "annex p.n" a page of the annexes. IDs moved by the annexes are listed under their old number with the new one; IDs removed from scope are listed with the FR withdrawn.
 
 ## General requirements (BRQID)
 
-<!-- table: widths=2.2,1.8,2.9,4.4,5.2 caption="Traceability: General requirements (BRQID)" size=7.5 -->
+<!-- table: widths=2.2,2.6,3.4,4.4,5.2 caption="Traceability: General requirements (BRQID)" size=7.5 -->
 | BRD ID | Page | FR | Screen | Test cases |
 |---|---|---|---|---|
-| BRQID.001 | p.16 | FR-OP-001 | Login | TC-OP-001.1, 001.2 (3 cases) |
-| BRQID.002 | p.16 | FR-OP-002 | Login | TC-OP-002.1, 002.2, 002.3 (3 cases) |
-| BRQID.003 | p.17 | FR-OP-003 | Operations Home, section workbenches | TC-OP-003.1, 003.2, 003.3 (3 cases) |
-| BRQID.004 | p.18 | FR-OP-130 | Interfaces | TC-OP-130.1, 130.2 (3 cases) |
-| BRQID.005 | p.18 | FR-OP-131 | Interfaces | TC-OP-131.1, 131.2 (3 cases) |
-| BRQID.006 | p.19-20 | FR-OP-008 | Bulk Uploads, Interfaces | TC-OP-008.1, 008.2, 008.3 (4 cases) |
+| BRQID.001 | p.79 | FR-OP-001 | - | TC-OP-001.1, 001.2 (3 cases) |
+| BRQID.002 | p.79 | FR-OP-002 | Operations Home | TC-OP-002.1, 002.2, 002.3 (3 cases) |
+| BRQID.003 | p.80 | FR-OP-003 | Operations Home, Cashiering Workbench, Remittance Workbench, Reconciliation Workbench and 1 more | TC-OP-003.1, 003.2, 003.3 (3 cases) |
+| BRQID.004 | p.81 | FR-OP-130 | Hand-offs and Extracts, Incoming Requests, Interfaces | TC-OP-130.1, 130.2 (3 cases) |
+| BRQID.005 | p.81 | FR-OP-131 | Interfaces | TC-OP-131.1, 131.2 (3 cases) |
+| BRQID.006 | p.82-83 | FR-OP-008 | Payment Uploads, Interfaces | TC-OP-008.1, 008.2, 008.3 (4 cases) |
+| BRQID.007 (new) | annex p.3 | FR-OP-004 | Invoice Search, Invoice 360, Interfaces, FFY Register | TC-OP-004.1, 004.2, 004.3, 004.4 (6 cases) |
 
 ## Cashiering (CSHID) and Disbursement (DBMID)
 
-<!-- table: widths=2.2,1.8,2.9,4.4,5.2 caption="Traceability: Cashiering (CSHID) and Disbursement (DBMID)" size=7.5 -->
+<!-- table: widths=2.2,2.6,3.4,4.4,5.2 caption="Traceability: Cashiering (CSHID) and Disbursement (DBMID)" size=7.5 -->
 | BRD ID | Page | FR | Screen | Test cases |
 |---|---|---|---|---|
-| CSHID.001 | p.23-24 | FR-OP-011, FR-OP-013, FR-OP-014 | Receive Payment, Receipt | TC-OP-011.1, 011.2, 011.3, 013.1, 013.2, 013.3, 014.1, 014.2, 014.3 (13 cases) |
-| CSHID.002 | p.24-25 | FR-OP-012, FR-OP-013 | Receipts | TC-OP-012.1, 012.2, 013.1, 013.2, 013.3 (7 cases) |
-| CSHID.003 | p.25-26 | FR-OP-013 | Receipt | TC-OP-013.1, 013.2, 013.3 (4 cases) |
-| CSHID.004 | p.26-27 | FR-OP-014 | Receipt | TC-OP-014.1, 014.2, 014.3 (4 cases) |
-| CSHID.005 | p.27-28 | FR-OP-014 | Receipt | TC-OP-014.1, 014.2, 014.3 (4 cases) |
-| CSHID.006 | p.28-29 | FR-OP-010 | Receipt Series | TC-OP-010.1, 010.2, 010.3 (5 cases) |
-| CSHID.007 | p.29 | FR-OP-021 | Commission ORs, Interfaces | TC-OP-021.1, 021.2 (4 cases) |
-| CSHID.008 | p.29-32 | FR-OP-015, FR-OP-016 | Payment Uploads, PDC Warehouse | TC-OP-015.1, 015.2, 015.3, 016.1, 016.2, 016.3 (8 cases) |
-| CSHID.009 | p.32-33 | FR-OP-017 | Check Pick-up | TC-OP-017.1, 017.2 (3 cases) |
-| CSHID.010 | p.33-34 | FR-OP-024 | Receipts | TC-OP-024.1, 024.2 (3 cases) |
-| CSHID.011 | p.34-35 | FR-OP-024 | Receipt (History) | TC-OP-024.1, 024.2 (3 cases) |
-| CSHID.012 | p.35 | FR-OP-013, FR-OP-027 | Receipt (Journal) | TC-OP-013.1, 013.2, 013.3, 027.1, 027.2 (7 cases) |
-| CSHID.013 | p.35-36 | FR-OP-014, FR-OP-027 | Receipt (Journal) | TC-OP-014.1, 014.2, 014.3, 027.1, 027.2 (7 cases) |
-| CSHID.014 | p.36 | FR-OP-027 | Receipt (Journal) | TC-OP-027.1, 027.2 (3 cases) |
-| CSHID.015 | p.37 | FR-OP-010 | Receipt Series | TC-OP-010.1, 010.2, 010.3 (5 cases) |
-| CSHID.016 | p.37-38 | FR-OP-023 | Cashiering Setup | TC-OP-023.1, 023.2 (3 cases) |
-| CSHID.017 | p.38 | FR-OP-009 | Report Centre (Report Centre) | TC-OP-009.1, 009.2 (2 cases) |
-| CSHID.018 | p.38 | FR-OP-009 | Report Centre (Report Centre) | TC-OP-009.1, 009.2 (2 cases) |
-| CSHID.019 | p.39-40 | FR-OP-025 | Batch Print | TC-OP-025.1, 025.2 (3 cases) |
-| CSHID.020 | p.40-41 | FR-OP-018, FR-OP-132 | Receive Payment, Pre-booked Payments | TC-OP-018.1, 018.2, 018.3, 132.1, 132.2 (7 cases) |
-| CSHID.021 | p.41 | FR-OP-020 | Receipts | TC-OP-020.1, 020.2 (2 cases) |
-| CSHID.022 | p.42 | FR-OP-019 | Receive Payment | TC-OP-019.1, 019.2 (3 cases) |
-| CSHID.023 | p.42,125-127 | FR-OP-028 | Report Centre (Report Centre) | TC-OP-028.1, 028.2 (3 cases) |
-| CSHID.024 | p.42-43 | FR-OP-022 | Unapplied Payments, Unapplied Payment | TC-OP-022.1, 022.2, 022.3 (6 cases) |
-| CSHID.025 | p.43-44 | FR-OP-022 | Unapplied Payments, Unapplied Payment | TC-OP-022.1, 022.2, 022.3 (6 cases) |
-| CSHID.026 | p.44 | FR-OP-026 | BIR 2307 | TC-OP-026.1, 026.2, 026.3 (4 cases) |
-| CSHID.027 | p.44-45 | FR-OP-026 | BIR 2307 | TC-OP-026.1, 026.2, 026.3 (4 cases) |
-| DBMID.001 | p.46 | FR-OP-120, FR-OP-121 | BIR 2307, Disbursement Queue | TC-OP-120.1, 120.2, 121.1, 121.2 (5 cases) |
+| CSHID.001 | p.86-87 | FR-OP-011, FR-OP-013, FR-OP-014 | Receive Payment, Receipt, Receipts | TC-OP-011.1, 011.2, 011.3, 013.1, 013.2, 013.3, 014.1, 014.2, 014.3 (13 cases) |
+| CSHID.002 | p.87-88 | FR-OP-012, FR-OP-013 | Receipts, Receipt | TC-OP-012.1, 012.2, 013.1, 013.2, 013.3 (7 cases) |
+| CSHID.003 | p.88-89 | FR-OP-013 | Receipts, Receipt | TC-OP-013.1, 013.2, 013.3 (4 cases) |
+| CSHID.004 | p.89-90 | FR-OP-014 | Receipts, Receipt | TC-OP-014.1, 014.2, 014.3 (4 cases) |
+| CSHID.005 | p.90-91 | FR-OP-014 | Receipts, Receipt | TC-OP-014.1, 014.2, 014.3 (4 cases) |
+| CSHID.006 | p.91-92 | FR-OP-010 | Receipt Series | TC-OP-010.1, 010.2, 010.3 (5 cases) |
+| CSHID.007 | p.92 | FR-OP-021 | Commission ORs | TC-OP-021.1, 021.2 (4 cases) |
+| CSHID.008 | p.92-95 | FR-OP-015, FR-OP-016 | Payment Uploads, Cashiering Setup, PDC Warehouse | TC-OP-015.1, 015.2, 015.3, 016.1, 016.2, 016.3 (8 cases) |
+| CSHID.009 (removed) | annex p.4-6 | FR-OP-017 removed from scope | - | - |
+| CSHID.010 | p.96-97 | FR-OP-024 | Receipts, Receipt | TC-OP-024.1, 024.2, 024.3 (5 cases) |
+| CSHID.011 | p.97-98 | FR-OP-024 | Receipts, Receipt | TC-OP-024.1, 024.2, 024.3 (5 cases) |
+| CSHID.012 | p.98 | FR-OP-013, FR-OP-027 | Receipts, Receipt | TC-OP-013.1, 013.2, 013.3, 027.1, 027.2 (7 cases) |
+| CSHID.013 | p.98-99 | FR-OP-014, FR-OP-027 | Receipts, Receipt | TC-OP-014.1, 014.2, 014.3, 027.1, 027.2 (7 cases) |
+| CSHID.014 | p.99 | FR-OP-027 | Receipt | TC-OP-027.1, 027.2 (3 cases) |
+| CSHID.015 | p.100 | FR-OP-010 | Receipt Series | TC-OP-010.1, 010.2, 010.3 (5 cases) |
+| CSHID.016 | p.100-101; annex p.4 and 6-7 | FR-OP-023 | Unapplied Payment, Cashiering Setup | TC-OP-023.1, 023.2, 023.3 (5 cases) |
+| CSHID.017 | p.101 | FR-OP-009 | Report Archive, Report Centre (Operations reports), Report | TC-OP-009.1, 009.2 (2 cases) |
+| CSHID.018 | p.101 | FR-OP-009 | Report Archive, Report Centre (Operations reports), Report | TC-OP-009.1, 009.2 (2 cases) |
+| CSHID.019 | p.102-103 | FR-OP-025 | Receipt, Batch Print | TC-OP-025.1, 025.2 (3 cases) |
+| CSHID.020 | p.103-104 | FR-OP-018, FR-OP-132 | Receive Payment, Pre-booked Payments | TC-OP-018.1, 018.2, 018.3, 132.1, 132.2 (7 cases) |
+| CSHID.021 | p.104 | FR-OP-020 | Receive Payment | TC-OP-020.1, 020.2 (2 cases) |
+| CSHID.022 | p.105 | FR-OP-019 | Receive Payment | TC-OP-019.1, 019.2 (3 cases) |
+| CSHID.023 | p.105; p.314-316 | FR-OP-028 | Report Centre (Operations reports) | TC-OP-028.1, 028.2 (3 cases) |
+| CSHID.024 | p.105-106 | FR-OP-022 | Unapplied Payments, Unapplied Payment, Incoming Requests | TC-OP-022.1, 022.2, 022.3 (6 cases) |
+| CSHID.025 | p.106-107 | FR-OP-022 | Unapplied Payments, Unapplied Payment, Incoming Requests | TC-OP-022.1, 022.2, 022.3 (6 cases) |
+| CSHID.026 (removed) | p.67-69, 186-188 (deleted) | FR-OP-026 removed from scope | - | - |
+| CSHID.027 (removed) | p.67-69, 186-188 (deleted) | FR-OP-026 removed from scope | - | - |
+| DBMID.001 | p.109 | FR-OP-120, FR-OP-121 | Unapplied Payment, Disbursement Queue, BIR 2307 | TC-OP-120.1, 120.2, 121.1, 121.2 (6 cases) |
 
 ## Remittance (RMTID)
 
-<!-- table: widths=2.2,1.8,2.9,4.4,5.2 caption="Traceability: Remittance (RMTID)" size=7.5 -->
+<!-- table: widths=2.2,2.6,3.4,4.4,5.2 caption="Traceability: Remittance (RMTID)" size=7.5 -->
 | BRD ID | Page | FR | Screen | Test cases |
 |---|---|---|---|---|
-| RMTID.001 | p.49 | FR-OP-030 | Extraction | TC-OP-030.1, 030.2, 030.3 (5 cases) |
-| RMTID.002 | p.50; add. p.4-5 | FR-OP-032 | Remittance Batch | TC-OP-032.1, 032.2, 032.3 (4 cases) |
-| RMTID.003 | p.50-51 | FR-OP-030 | Extraction | TC-OP-030.1, 030.2, 030.3 (5 cases) |
-| RMTID.004 | p.51-52 | FR-OP-030 | Extraction, DTIP Status | TC-OP-030.1, 030.2, 030.3 (5 cases) |
-| RMTID.005 | p.52 | FR-OP-030 | Extraction, DTIP Status | TC-OP-030.1, 030.2, 030.3 (5 cases) |
-| RMTID.006 | p.52 | FR-OP-031 | Remittance Batch | TC-OP-031.1, 031.2, 031.3 (5 cases) |
-| RMTID.007 | p.52-53 | FR-OP-030 | Extraction | TC-OP-030.1, 030.2, 030.3 (5 cases) |
-| RMTID.008 | p.53 | FR-OP-030 | Extraction | TC-OP-030.1, 030.2, 030.3 (5 cases) |
-| RMTID.009 | p.53-54 | FR-OP-033 | Remittance Batches, Remittance Batch | TC-OP-033.1, 033.2, 033.3 (4 cases) |
-| RMTID.010 | p.54 | FR-OP-033, FR-OP-035 | Remittance Batches, Remittance Batch | TC-OP-033.1, 033.2, 033.3, 035.1, 035.2, 035.3 (7 cases) |
-| RMTID.011 | p.54-55 | FR-OP-034 | Remittance Batch (Documents) | TC-OP-034.1, 034.2 (3 cases) |
-| RMTID.012 | p.55-56 | FR-OP-037 | Insurer OR Upload | TC-OP-037.1, 037.2 (4 cases) |
-| RMTID.013 | p.56 | FR-OP-037 | Insurer OR Upload | TC-OP-037.1, 037.2 (4 cases) |
-| RMTID.014 | p.56-57 | FR-OP-031 | Extraction | TC-OP-031.1, 031.2, 031.3 (5 cases) |
-| RMTID.015 | p.57 | FR-OP-031 | Extraction | TC-OP-031.1, 031.2, 031.3 (5 cases) |
-| RMTID.016 | p.57-58 | FR-OP-037 | Insurer OR Upload | TC-OP-037.1, 037.2 (4 cases) |
-| RMTID.017 | p.58-59 | FR-OP-031 | Extraction | TC-OP-031.1, 031.2, 031.3 (5 cases) |
-| RMTID.018 | p.59 | FR-OP-031 | Extraction | TC-OP-031.1, 031.2, 031.3 (5 cases) |
-| RMTID.019 | p.59-60 | FR-OP-033, FR-OP-035 | Remittance Batches, Remittance Batch | TC-OP-033.1, 033.2, 033.3, 035.1, 035.2, 035.3 (7 cases) |
-| RMTID.020 | p.60-61 | FR-OP-031 | Extraction, Remittance Holds | TC-OP-031.1, 031.2, 031.3 (5 cases) |
-| RMTID.021 | p.61 | FR-OP-111 | Remittance Holds, Remittance Hold | TC-OP-111.1, 111.2, 111.3, 111.4 (6 cases) |
-| RMTID.022 | p.61-62 | FR-OP-031 | Extraction | TC-OP-031.1, 031.2, 031.3 (5 cases) |
-| RMTID.023 | p.62 | FR-OP-038 | Incentive Rules | TC-OP-038.1, 038.2 (3 cases) |
-| RMTID.024 | p.62-63 | FR-OP-032 | DTIP Status, Remittance Batches | TC-OP-032.1, 032.2, 032.3 (4 cases) |
-| RMTID.025 | p.63 | FR-OP-039 | DTIP Status, Remittance Batches | TC-OP-039.1, 039.2 (3 cases) |
-| RMTID.026 | p.63 | FR-OP-005 | Invoice Search, Invoice 360 | TC-OP-005.1, 005.2, 005.3 (4 cases) |
-| RMTID.027 | p.64 | FR-OP-032 | DTIP Status, Remittance Batches | TC-OP-032.1, 032.2, 032.3 (4 cases) |
-| RMTID.028 | p.64 | FR-OP-031 | Remittance Batch | TC-OP-031.1, 031.2, 031.3 (5 cases) |
-| RMTID.029 | p.64-65 | FR-OP-033 | Remittance Batches, Remittance Batch | TC-OP-033.1, 033.2, 033.3 (4 cases) |
-| RMTID.030 | p.65 | FR-OP-040 | Special Remittance, Special Remittance Request | TC-OP-040.1, 040.2 (3 cases) |
-| RMTID.031 | p.65-66 | FR-OP-031 | Extraction, Remittance Holds | TC-OP-031.1, 031.2, 031.3 (5 cases) |
-| RMTID.032 | p.66 | FR-OP-005 | Invoice Search, Invoice 360 | TC-OP-005.1, 005.2, 005.3 (4 cases) |
-| RMTID.033 | p.66-67 | FR-OP-040 | Special Remittance, Special Remittance Request | TC-OP-040.1, 040.2 (3 cases) |
-| RMTID.034 | p.67 | FR-OP-036, FR-OP-120 | Remittance Batch, Disbursement Queue | TC-OP-036.1, 036.2, 120.1, 120.2 (6 cases) |
-| RMTID.035 | p.67 | FR-OP-031 | Extraction, Remittance Holds | TC-OP-031.1, 031.2, 031.3 (5 cases) |
-| RMTID.036 | p.67-68 | FR-OP-036 | Remittance Batch, Invoice 360 | TC-OP-036.1, 036.2 (3 cases) |
-| RMTID.037 | p.68 | FR-OP-097 | Estimated Items | TC-OP-097.1, 097.2 (3 cases) |
-| RMTID.038 | p.68-69 | FR-OP-004 | Invoice Search, Invoice 360 | TC-OP-004.1, 004.2, 004.3 (4 cases) |
-| RMTID.039 | p.69,127-129 | FR-OP-041 | Report Centre (Report Centre) | TC-OP-041.1, 041.2 (3 cases) |
-| RMTID.040 | p.69-70 | FR-OP-006 | Invoice 360 | TC-OP-006.1, 006.2, 006.3 (3 cases) |
+| RMTID.001 | p.112; annex p.12 | FR-OP-030 | Extraction, DTIP Status | TC-OP-030.1, 030.2, 030.3, 030.4 (6 cases) |
+| RMTID.002 | p.113 | FR-OP-032 | Remittance Batches, Remittance Batch | TC-OP-032.1, 032.2, 032.3, 032.4 (5 cases) |
+| RMTID.003 | p.113-114; annex p.13 | FR-OP-030 | Extraction, DTIP Status | TC-OP-030.1, 030.2, 030.3, 030.4 (6 cases) |
+| RMTID.004 | p.114-115; annex p.14 | FR-OP-030 | Extraction, DTIP Status | TC-OP-030.1, 030.2, 030.3, 030.4 (6 cases) |
+| RMTID.005 | p.115 | FR-OP-030 | Extraction, DTIP Status | TC-OP-030.1, 030.2, 030.3, 030.4 (6 cases) |
+| RMTID.006 | p.115 | FR-OP-031 | Extraction | TC-OP-031.1, 031.2, 031.3, 031.4 (7 cases) |
+| RMTID.007 | p.116-117 | FR-OP-030 | Extraction, DTIP Status | TC-OP-030.1, 030.2, 030.3, 030.4 (6 cases) |
+| RMTID.008 | p.116 | FR-OP-030 | Extraction, DTIP Status | TC-OP-030.1, 030.2, 030.3, 030.4 (6 cases) |
+| RMTID.009 | p.117-118 | FR-OP-033 | Remittance Batches, Remittance Batch | TC-OP-033.1, 033.2, 033.3 (4 cases) |
+| RMTID.010 | p.117 | FR-OP-033, FR-OP-035 | Remittance Batches, Remittance Batch, Remittance Deductions, Remittance Deduction | TC-OP-033.1, 033.2, 033.3, 035.1, 035.2, 035.3 (7 cases) |
+| RMTID.011 | p.118-119; annex p.14-15 | FR-OP-034 | Remittance Batch | TC-OP-034.1, 034.2, 034.3 (4 cases) |
+| RMTID.012 | p.118-119 | FR-OP-037 | Insurer OR Upload | TC-OP-037.1, 037.2 (4 cases) |
+| RMTID.013 | p.119 | FR-OP-037 | Insurer OR Upload | TC-OP-037.1, 037.2 (4 cases) |
+| RMTID.014 | p.119-120 | FR-OP-031 | Extraction | TC-OP-031.1, 031.2, 031.3, 031.4 (7 cases) |
+| RMTID.015 | p.120 | FR-OP-031 | Extraction | TC-OP-031.1, 031.2, 031.3, 031.4 (7 cases) |
+| RMTID.016 | p.120-121 | FR-OP-037 | Insurer OR Upload | TC-OP-037.1, 037.2 (4 cases) |
+| RMTID.017 | p.121-122 | FR-OP-031 | Extraction | TC-OP-031.1, 031.2, 031.3, 031.4 (7 cases) |
+| RMTID.018 | p.122 | FR-OP-031 | Extraction | TC-OP-031.1, 031.2, 031.3, 031.4 (7 cases) |
+| RMTID.019 | p.122-123 | FR-OP-033, FR-OP-035 | Remittance Batches, Remittance Batch, Remittance Deductions, Remittance Deduction | TC-OP-033.1, 033.2, 033.3, 035.1, 035.2, 035.3 (7 cases) |
+| RMTID.020 | p.123-124 | FR-OP-031 | Extraction | TC-OP-031.1, 031.2, 031.3, 031.4 (7 cases) |
+| RMTID.021 | p.124 | FR-OP-111 | Remittance Holds, Remittance Hold | TC-OP-111.1, 111.2, 111.3, 111.4 (6 cases) |
+| RMTID.022 | p.124-125 | FR-OP-031 | Extraction | TC-OP-031.1, 031.2, 031.3, 031.4 (7 cases) |
+| RMTID.023 | p.125 | FR-OP-038 | Extraction, Remittance Batch, Incentive Rules | TC-OP-038.1, 038.2 (3 cases) |
+| RMTID.024 | p.125-126; annex p.15 | FR-OP-032 | Remittance Batches, Remittance Batch | TC-OP-032.1, 032.2, 032.3, 032.4 (5 cases) |
+| RMTID.025 | p.126 | FR-OP-039 | DTIP Status | TC-OP-039.1, 039.2 (3 cases) |
+| RMTID.026 | p.126 | FR-OP-005 | Invoice Search, Invoice 360 | TC-OP-005.1, 005.2, 005.3 (4 cases) |
+| RMTID.027 | p.127 | FR-OP-032 | Remittance Batches, Remittance Batch | TC-OP-032.1, 032.2, 032.3, 032.4 (5 cases) |
+| RMTID.028 | p.127 | FR-OP-031 | Extraction | TC-OP-031.1, 031.2, 031.3, 031.4 (7 cases) |
+| RMTID.029 | p.127-128 | FR-OP-033 | Remittance Batches, Remittance Batch | TC-OP-033.1, 033.2, 033.3 (4 cases) |
+| RMTID.030 | p.128 | FR-OP-040 | Special Remittance, Special Remittance Request | TC-OP-040.1, 040.2 (3 cases) |
+| RMTID.031 | p.128-129 | FR-OP-031 | Extraction | TC-OP-031.1, 031.2, 031.3, 031.4 (7 cases) |
+| RMTID.032 | p.129 | FR-OP-005 | Invoice Search, Invoice 360 | TC-OP-005.1, 005.2, 005.3 (4 cases) |
+| RMTID.033 | p.129-130 | FR-OP-040 | Special Remittance, Special Remittance Request | TC-OP-040.1, 040.2 (3 cases) |
+| RMTID.034 | p.130 | FR-OP-036, FR-OP-120 | Notification Settings, Remittance Batches, Remittance Batch, Disbursement Queue and 1 more | TC-OP-036.1, 036.2, 120.1, 120.2 (6 cases) |
+| RMTID.035 | p.130 | FR-OP-031 | Extraction | TC-OP-031.1, 031.2, 031.3, 031.4 (7 cases) |
+| RMTID.036 | p.130-131 | FR-OP-036 | Notification Settings, Remittance Batches, Remittance Batch, Disbursement Queue | TC-OP-036.1, 036.2 (3 cases) |
+| RMTID.037 | p.131; annex p.16 | FR-OP-097 | Estimated Items | TC-OP-097.1, 097.2 (3 cases) |
+| RMTID.038 (moved) | p.131-132; annex p.3, 16 | Moved to BRQID.007: FR-OP-004 | - | - |
+| RMTID.039 | p.132; p.316-318 | FR-OP-041 | Report Centre (Operations reports) | TC-OP-041.1, 041.2 (3 cases) |
+| RMTID.040 | p.132-133 | FR-OP-006 | Invoice 360, Endorsement Request | TC-OP-006.1, 006.2, 006.3 (3 cases) |
+| RMTID.041 (new) | annex p.16-17 | FR-OP-038, FR-OP-078 | Extraction, Remittance Batch, Incentive Rules, Reconciliation Cycle | TC-OP-038.1, 038.2, 078.1, 078.2 (5 cases) |
 
 ## Marketing activities (MKTID)
 
-<!-- table: widths=2.2,1.8,2.9,4.4,5.2 caption="Traceability: Marketing activities (MKTID)" size=7.5 -->
+<!-- table: widths=2.2,2.6,3.4,4.4,5.2 caption="Traceability: Marketing activities (MKTID)" size=7.5 -->
 | BRD ID | Page | FR | Screen | Test cases |
 |---|---|---|---|---|
-| MKTID.001 | p.70-71 | FR-OP-110 | Remittance Batch | TC-OP-110.1, 110.2 (3 cases) |
-| MKTID.002 | p.71 | FR-OP-111 | Remittance Holds, Remittance Hold | TC-OP-111.1, 111.2, 111.3, 111.4 (6 cases) |
-| MKTID.003 | p.71-72 | FR-OP-111 | Remittance Holds, Remittance Hold | TC-OP-111.1, 111.2, 111.3, 111.4 (6 cases) |
-| MKTID.004 | p.72 | FR-OP-111 | Remittance Holds, Remittance Hold | TC-OP-111.1, 111.2, 111.3, 111.4 (6 cases) |
-| MKTID.005 | p.72-73 | FR-OP-111 | Remittance Holds, Remittance Hold | TC-OP-111.1, 111.2, 111.3, 111.4 (6 cases) |
-| MKTID.006 | p.73 | FR-OP-111 | Remittance Holds, Remittance Hold | TC-OP-111.1, 111.2, 111.3, 111.4 (6 cases) |
-| MKTID.007 | p.73-74 | FR-OP-111 | Remittance Holds, Remittance Hold | TC-OP-111.1, 111.2, 111.3, 111.4 (6 cases) |
-| MKTID.008 | p.114 | FR-OP-114 | Endorsement Request | TC-OP-114.1, 114.2 (2 cases) |
-| MKTID.009 | p.74 | FR-OP-112 | Special Remittance, Special Remittance Request | TC-OP-112.1, 112.2 (3 cases) |
-| MKTID.010 | p.74-75 | FR-OP-113 | BIR 2307 | TC-OP-113.1, 113.2 (3 cases) |
-| MKTID.011 | p.75 | FR-OP-004 | New Business account (direct payment tag), Invoice 360 | TC-OP-004.1, 004.2, 004.3 (4 cases) |
-| MKTID.012 | p.75-76 | FR-OP-094 | DP Accounts | TC-OP-094.1, 094.2 (4 cases) |
-| MKTID.013 | p.46 | FR-OP-113 | BIR 2307 | TC-OP-113.1, 113.2 (3 cases) |
+| MKTID.001 | p.133-134 | FR-OP-110 | Remittance Batch | TC-OP-110.1, 110.2 (3 cases) |
+| MKTID.002 | p.134 | FR-OP-111 | Remittance Holds, Remittance Hold | TC-OP-111.1, 111.2, 111.3, 111.4 (6 cases) |
+| MKTID.003 | p.134-135 | FR-OP-111 | Remittance Holds, Remittance Hold | TC-OP-111.1, 111.2, 111.3, 111.4 (6 cases) |
+| MKTID.004 | p.135 | FR-OP-111 | Remittance Holds, Remittance Hold | TC-OP-111.1, 111.2, 111.3, 111.4 (6 cases) |
+| MKTID.005 | p.135-136 | FR-OP-111 | Remittance Holds, Remittance Hold | TC-OP-111.1, 111.2, 111.3, 111.4 (6 cases) |
+| MKTID.006 | p.136 | FR-OP-111 | Remittance Holds, Remittance Hold | TC-OP-111.1, 111.2, 111.3, 111.4 (6 cases) |
+| MKTID.007 | p.136-137 | FR-OP-111 | Remittance Holds, Remittance Hold | TC-OP-111.1, 111.2, 111.3, 111.4 (6 cases) |
+| MKTID.008 | p.177 | FR-OP-114 | Endorsement Request | TC-OP-114.1, 114.2 (2 cases) |
+| MKTID.009 | p.137 | FR-OP-112 | Special Remittance, Special Remittance Request | TC-OP-112.1, 112.2 (3 cases) |
+| MKTID.010 | p.137-138; annex p.62-63 | FR-OP-113 | BIR 2307 | TC-OP-113.1, 113.2, 113.3, 113.4 (8 cases) |
+| MKTID.011 | p.138; annex p.63 | FR-OP-004 | Invoice Search, Invoice 360, Interfaces, FFY Register | TC-OP-004.1, 004.2, 004.3, 004.4 (6 cases) |
+| MKTID.012 | p.138-139; annex p.63-64 | FR-OP-094 | DP Accounts, DP Billing | TC-OP-094.1, 094.2 (4 cases) |
+| MKTID.013 | p.107-108 | FR-OP-113 | BIR 2307 | TC-OP-113.1, 113.2, 113.3, 113.4 (8 cases) |
+| MKTID.014 (new) | annex p.33 | FR-OP-050 | Adjustment Workbench, New Endorsement Request, Batch Request Upload | TC-OP-050.1, 050.2, 050.3, 050.4 (7 cases) |
+| MKTID.015 (new) | annex p.33-34 | FR-OP-050 | Adjustment Workbench, New Endorsement Request, Batch Request Upload | TC-OP-050.1, 050.2, 050.3, 050.4 (7 cases) |
+| MKTID.016 (new) | annex p.35 | FR-OP-053 | Endorsement Request | TC-OP-053.1, 053.2, 053.3, 053.4 (6 cases) |
+| MKTID.017 (new) | annex p.35-36 | FR-OP-053 | Endorsement Request | TC-OP-053.1, 053.2, 053.3, 053.4 (6 cases) |
+| MKTID.018 (new) | annex p.37 | FR-OP-060, FR-OP-114 | Endorsement Request | TC-OP-060.1, 060.2, 114.1, 114.2 (5 cases) |
+| MKTID.019 (new) | annex p.38 | FR-OP-052 | Endorsement Request | TC-OP-052.1, 052.2 (2 cases) |
 
 ## Production Reconciliation (PRCID)
 
-<!-- table: widths=2.2,1.8,2.9,4.4,5.2 caption="Traceability: Production Reconciliation (PRCID)" size=7.5 -->
+<!-- table: widths=2.2,2.6,3.4,4.4,5.2 caption="Traceability: Production Reconciliation (PRCID)" size=7.5 -->
 | BRD ID | Page | FR | Screen | Test cases |
 |---|---|---|---|---|
-| PRCID.001 | p.79 | FR-OP-070 | Extract Schedules | TC-OP-070.1, 070.2 (2 cases) |
-| PRCID.002 | p.79 | FR-OP-072 | Production Extracts | TC-OP-072.1, 072.2 (3 cases) |
-| PRCID.003 | p.79 | FR-OP-073 | Production Extracts | TC-OP-073.1, 073.2 (3 cases) |
-| PRCID.004 | p.79-80 | FR-OP-072 | Production Extracts | TC-OP-072.1, 072.2 (3 cases) |
-| PRCID.005 | p.80 | FR-OP-071 | Production Extracts | TC-OP-071.1, 071.2 (3 cases) |
-| PRCID.006 | p.80 | FR-OP-072 | Production Extracts | TC-OP-072.1, 072.2 (3 cases) |
-| PRCID.007 | p.80 | FR-OP-072 | Production Extracts | TC-OP-072.1, 072.2 (3 cases) |
-| PRCID.008 | p.81 | FR-OP-073 | Production Extracts | TC-OP-073.1, 073.2 (3 cases) |
-| PRCID.009 | p.81 | FR-OP-074 | Insurer Feedback | TC-OP-074.1, 074.2 (4 cases) |
-| PRCID.010 | p.81 | FR-OP-074 | Insurer Feedback | TC-OP-074.1, 074.2 (4 cases) |
-| PRCID.011 | p.81 | FR-OP-071 | Production Extracts | TC-OP-071.1, 071.2 (3 cases) |
-| PRCID.012 | p.82 | FR-OP-071 | Production Extracts | TC-OP-071.1, 071.2 (3 cases) |
-| PRCID.013 | p.82 | FR-OP-071 | Production Extracts | TC-OP-071.1, 071.2 (3 cases) |
-| PRCID.014 | p.82 | FR-OP-077 | Reconciliation Cycle | TC-OP-077.1, 077.2 (4 cases) |
-| PRCID.015 | p.82 | FR-OP-077 | Reconciliation Cycle | TC-OP-077.1, 077.2 (4 cases) |
-| PRCID.016 | p.82 | FR-OP-077 | Reconciliation Cycle | TC-OP-077.1, 077.2 (4 cases) |
-| PRCID.017 | p.82-83 | FR-OP-080 | Reconciliation Cycle | TC-OP-080.1, 080.2 (3 cases) |
-| PRCID.018 | p.83 | FR-OP-080 | Reconciliation Cycle | TC-OP-080.1, 080.2 (3 cases) |
-| PRCID.019 | p.83 | FR-OP-076 | Unbooked Accounts | TC-OP-076.1, 076.2 (3 cases) |
-| PRCID.020 | p.83 | FR-OP-071 | Production Extracts | TC-OP-071.1, 071.2 (3 cases) |
-| PRCID.021 | p.83 | FR-OP-077 | Reconciliation Cycle | TC-OP-077.1, 077.2 (4 cases) |
-| PRCID.022 | p.83-84 | FR-OP-074 | Insurer Feedback | TC-OP-074.1, 074.2 (4 cases) |
-| PRCID.023 | p.84 | FR-OP-076 | Unbooked Accounts | TC-OP-076.1, 076.2 (3 cases) |
-| PRCID.024 | p.84 | FR-OP-075 | Reconciliation Cycle | TC-OP-075.1, 075.2, 075.3 (3 cases) |
-| PRCID.025 | p.84 | FR-OP-075 | Reconciliation Cycle | TC-OP-075.1, 075.2, 075.3 (3 cases) |
-| PRCID.026 | p.84 | FR-OP-075 | Reconciliation Cycle | TC-OP-075.1, 075.2, 075.3 (3 cases) |
-| PRCID.027 | p.84-85 | FR-OP-075 | Reconciliation Cycle | TC-OP-075.1, 075.2, 075.3 (3 cases) |
-| PRCID.028 | p.85 | FR-OP-078 | Reconciliation Cycle (Early Incentive) | TC-OP-078.1, 078.2 (2 cases) |
-| PRCID.029 | p.85 | FR-OP-079 | Reconciliation Cycle (History) | TC-OP-079.1, 079.2 (2 cases) |
-| PRCID.030 | p.85 | FR-OP-075 | Reconciliation Cycle | TC-OP-075.1, 075.2, 075.3 (3 cases) |
-| PRCID.031 | p.85-86 | FR-OP-074 | Insurer Feedback | TC-OP-074.1, 074.2 (4 cases) |
-| PRCID.032 | p.86 | FR-OP-074 | Insurer Feedback | TC-OP-074.1, 074.2 (4 cases) |
-| PRCID.033 | p.86 | FR-OP-076 | Unbooked Accounts | TC-OP-076.1, 076.2 (3 cases) |
-| PRCID.034 | p.86 | FR-OP-071 | Production Extracts | TC-OP-071.1, 071.2 (3 cases) |
-| PRCID.035 | p.86 | FR-OP-080 | Report Centre (Report Centre) | TC-OP-080.1, 080.2 (3 cases) |
-| PRCID.036 | p.86-87 | FR-OP-080 | Report Centre (Report Centre) | TC-OP-080.1, 080.2 (3 cases) |
-| PRCID.037 | p.87 | FR-OP-080 | Report Centre (Report Centre) | TC-OP-080.1, 080.2 (3 cases) |
-| PRCID.038 | p.87 | FR-OP-080 | Reconciliation Cycle | TC-OP-080.1, 080.2 (3 cases) |
-| PRCID.039 | p.87 | FR-OP-080 | Reconciliation Cycle | TC-OP-080.1, 080.2 (3 cases) |
+| PRCID.001 | p.142 | FR-OP-070 | Extract Schedules | TC-OP-070.1, 070.2 (2 cases) |
+| PRCID.002 | p.142 | FR-OP-072 | Production Extracts | TC-OP-072.1, 072.2 (3 cases) |
+| PRCID.003 | p.142; annex p.22 | FR-OP-073 | Production Extracts | TC-OP-073.1, 073.2 (3 cases) |
+| PRCID.004 | p.142-143 | FR-OP-072 | Production Extracts | TC-OP-072.1, 072.2 (3 cases) |
+| PRCID.005 | p.143 | FR-OP-071 | Production Extracts | TC-OP-071.1, 071.2 (3 cases) |
+| PRCID.006 | p.143 | FR-OP-072 | Production Extracts | TC-OP-072.1, 072.2 (3 cases) |
+| PRCID.007 | p.143 | FR-OP-072 | Production Extracts | TC-OP-072.1, 072.2 (3 cases) |
+| PRCID.008 | p.144 | FR-OP-073 | Production Extracts | TC-OP-073.1, 073.2 (3 cases) |
+| PRCID.009 | p.144 | FR-OP-074 | Insurer Feedback | TC-OP-074.1, 074.2 (4 cases) |
+| PRCID.010 | p.144 | FR-OP-074 | Insurer Feedback | TC-OP-074.1, 074.2 (4 cases) |
+| PRCID.011 | p.144 | FR-OP-071 | Production Extracts | TC-OP-071.1, 071.2 (3 cases) |
+| PRCID.012 | p.145 | FR-OP-071 | Production Extracts | TC-OP-071.1, 071.2 (3 cases) |
+| PRCID.013 | p.145 | FR-OP-071 | Production Extracts | TC-OP-071.1, 071.2 (3 cases) |
+| PRCID.014 | p.145 | FR-OP-077 | Reconciliation Cycle | TC-OP-077.1, 077.2, 077.3 (5 cases) |
+| PRCID.015 | p.145; annex p.23 | FR-OP-077 | Reconciliation Cycle | TC-OP-077.1, 077.2, 077.3 (5 cases) |
+| PRCID.016 | p.145 | FR-OP-077 | Reconciliation Cycle | TC-OP-077.1, 077.2, 077.3 (5 cases) |
+| PRCID.017 | p.145-146 | FR-OP-080 | Report Centre (Operations reports) | TC-OP-080.1, 080.2 (3 cases) |
+| PRCID.018 | p.146 | FR-OP-080 | Report Centre (Operations reports) | TC-OP-080.1, 080.2 (3 cases) |
+| PRCID.019 | p.146 | FR-OP-076 | Unbooked Accounts | TC-OP-076.1, 076.2 (3 cases) |
+| PRCID.020 | p.146 | FR-OP-071 | Production Extracts | TC-OP-071.1, 071.2 (3 cases) |
+| PRCID.021 | p.146 | FR-OP-077 | Reconciliation Cycle | TC-OP-077.1, 077.2, 077.3 (5 cases) |
+| PRCID.022 | p.146-147; annex p.23-24 | FR-OP-074 | Insurer Feedback | TC-OP-074.1, 074.2 (4 cases) |
+| PRCID.023 | p.147 | FR-OP-076 | Unbooked Accounts | TC-OP-076.1, 076.2 (3 cases) |
+| PRCID.024 | p.147 | FR-OP-075 | Reconciliation Cycles, Reconciliation Cycle, Insurer Feedback | TC-OP-075.1, 075.2, 075.3 (4 cases) |
+| PRCID.025 | p.147 | FR-OP-075 | Reconciliation Cycles, Reconciliation Cycle, Insurer Feedback | TC-OP-075.1, 075.2, 075.3 (4 cases) |
+| PRCID.026 | p.147; annex p.24-25 | FR-OP-075 | Reconciliation Cycles, Reconciliation Cycle, Insurer Feedback | TC-OP-075.1, 075.2, 075.3 (4 cases) |
+| PRCID.027 | p.147-148 | FR-OP-075 | Reconciliation Cycles, Reconciliation Cycle, Insurer Feedback | TC-OP-075.1, 075.2, 075.3 (4 cases) |
+| PRCID.028 (moved) | p.148; annex p.25-26 | Moved to RMTID.041: FR-OP-038, FR-OP-078 | - | - |
+| PRCID.029 | p.148 | FR-OP-079 | Reconciliation Cycles, Reconciliation Cycle | TC-OP-079.1, 079.2 (2 cases) |
+| PRCID.030 | p.148 | FR-OP-075 | Reconciliation Cycles, Reconciliation Cycle, Insurer Feedback | TC-OP-075.1, 075.2, 075.3 (4 cases) |
+| PRCID.031 | p.148-149 | FR-OP-074 | Insurer Feedback | TC-OP-074.1, 074.2 (4 cases) |
+| PRCID.032 | p.149 | FR-OP-074 | Insurer Feedback | TC-OP-074.1, 074.2 (4 cases) |
+| PRCID.033 | p.149 | FR-OP-076 | Unbooked Accounts | TC-OP-076.1, 076.2 (3 cases) |
+| PRCID.034 | p.149 | FR-OP-071 | Production Extracts | TC-OP-071.1, 071.2 (3 cases) |
+| PRCID.035 | p.149 | FR-OP-080 | Report Centre (Operations reports) | TC-OP-080.1, 080.2 (3 cases) |
+| PRCID.036 | p.149-150 | FR-OP-080 | Report Centre (Operations reports) | TC-OP-080.1, 080.2 (3 cases) |
+| PRCID.037 | p.150 | FR-OP-080 | Report Centre (Operations reports) | TC-OP-080.1, 080.2 (3 cases) |
+| PRCID.038 | p.150 | FR-OP-080 | Report Centre (Operations reports) | TC-OP-080.1, 080.2 (3 cases) |
+| PRCID.039 | p.150 | FR-OP-080 | Report Centre (Operations reports) | TC-OP-080.1, 080.2 (3 cases) |
 
 ## Adjustment / Cancellation (ADJID)
 
-<!-- table: widths=2.2,1.8,2.9,4.4,5.2 caption="Traceability: Adjustment / Cancellation (ADJID)" size=7.5 -->
+<!-- table: widths=2.2,2.6,3.4,4.4,5.2 caption="Traceability: Adjustment / Cancellation (ADJID)" size=7.5 -->
 | BRD ID | Page | FR | Screen | Test cases |
 |---|---|---|---|---|
-| ADJID.001 | p.89 | FR-OP-050 | New Request, Adjustment Workbench | TC-OP-050.1, 050.2, 050.3, 050.4 (7 cases) |
-| ADJID.002 | p.89-90 | FR-OP-050 | New Request, Adjustment Workbench | TC-OP-050.1, 050.2, 050.3, 050.4 (7 cases) |
-| ADJID.003 | p.90 | FR-OP-050 | Endorsement Request | TC-OP-050.1, 050.2, 050.3, 050.4 (7 cases) |
-| ADJID.004 | p.90-91 | FR-OP-050 | New Request, Adjustment Workbench | TC-OP-050.1, 050.2, 050.3, 050.4 (7 cases) |
-| ADJID.005 | p.91-92 | FR-OP-053 | Endorsement Request, Posting Batches | TC-OP-053.1, 053.2, 053.3 (5 cases) |
-| ADJID.006 | p.92 | FR-OP-056 | Posting Batches, Batch Request Upload | TC-OP-056.1, 056.2 (3 cases) |
-| ADJID.007 | p.92 | FR-OP-053 | Endorsement Request, Posting Batches | TC-OP-053.1, 053.2, 053.3 (5 cases) |
-| ADJID.008 | p.92-93 | FR-OP-055 | New Request | TC-OP-055.1, 055.2 (3 cases) |
-| ADJID.009 | p.93-94 | FR-OP-057 | Endorsement Request | TC-OP-057.1, 057.2 (3 cases) |
-| ADJID.010 | p.94 | FR-OP-053 | Endorsement Request | TC-OP-053.1, 053.2, 053.3 (5 cases) |
-| ADJID.011 | p.94 | FR-OP-056 | Endorsement Request (Accounting) | TC-OP-056.1, 056.2 (3 cases) |
-| ADJID.012 | p.94-95 | FR-OP-057 | Endorsement Request | TC-OP-057.1, 057.2 (3 cases) |
-| ADJID.013 | p.95 | FR-OP-057 | Endorsement Request | TC-OP-057.1, 057.2 (3 cases) |
-| ADJID.014 | p.95-96; add. p.5 | FR-OP-054 | Endorsement Request (Recompute) | TC-OP-054.1, 054.2, 054.3 (4 cases) |
-| ADJID.015 | p.96 | FR-OP-060 | Endorsement Request | TC-OP-060.1, 060.2 (3 cases) |
-| ADJID.016 | p.96 | FR-OP-062 | Report Centre (Report Centre) | TC-OP-062.1, 062.2 (3 cases) |
-| ADJID.017 | p.97 | FR-OP-062 | Report Centre (Report Centre) | TC-OP-062.1, 062.2 (3 cases) |
-| ADJID.018 | p.97-98 | FR-OP-060 | Endorsement Request | TC-OP-060.1, 060.2 (3 cases) |
-| ADJID.019 | p.98 | FR-OP-062 | Report Centre (Report Centre) | TC-OP-062.1, 062.2 (3 cases) |
-| ADJID.020 | p.98 | FR-OP-050 | Adjustment Workbench, Invoice 360 | TC-OP-050.1, 050.2, 050.3, 050.4 (7 cases) |
-| ADJID.021 | p.98-99 | FR-OP-061 | Report Centre (Report Centre) | TC-OP-061.1, 061.2, 061.3 (5 cases) |
-| ADJID.022 | p.99 | FR-OP-061 | Endorsement Request (History, Policy Transactions) | TC-OP-061.1, 061.2, 061.3 (5 cases) |
-| ADJID.023 | p.99 | FR-OP-051 | New Request | TC-OP-051.1, 051.2 (2 cases) |
-| ADJID.024 | p.100 | FR-OP-005, FR-OP-061 | Adjustment Workbench, Invoice 360, Account | TC-OP-005.1, 005.2, 005.3, 061.1, 061.2, 061.3 (9 cases) |
-| ADJID.025 | p.100 | FR-OP-052 | Endorsement Request (Documents) | TC-OP-052.1, 052.2 (2 cases) |
-| ADJID.026 | p.101-102 | FR-OP-059 | Minimal Balance File | TC-OP-059.1, 059.2 (3 cases) |
-| ADJID.027 | p.102-103 | FR-OP-007 | Invoice 360, Endorsement Request (Recompute) | TC-OP-007.1, 007.2 (4 cases) |
-| ADJID.028 | p.103 | FR-OP-058 | New Request | TC-OP-058.1, 058.2 (3 cases) |
+| ADJID.001 | p.152 | FR-OP-050 | Adjustment Workbench, New Endorsement Request, Batch Request Upload | TC-OP-050.1, 050.2, 050.3, 050.4 (7 cases) |
+| ADJID.002 (moved) | p.152-153; annex p.33 | Moved to MKTID.014: FR-OP-050 | - | - |
+| ADJID.003 | p.153 | FR-OP-050 | Adjustment Workbench, New Endorsement Request, Batch Request Upload | TC-OP-050.1, 050.2, 050.3, 050.4 (7 cases) |
+| ADJID.004 (moved) | p.153-154; annex p.33-34 | Moved to MKTID.015: FR-OP-050 | - | - |
+| ADJID.005 | p.154-155; annex p.34-35 | FR-OP-053 | Endorsement Request | TC-OP-053.1, 053.2, 053.3, 053.4 (6 cases) |
+| ADJID.006 | p.155 | FR-OP-056 | Endorsement Request, Posting Batches, Batch Request Upload | TC-OP-056.1, 056.2 (3 cases) |
+| ADJID.007 (moved) | p.155; annex p.35 | Moved to MKTID.016: FR-OP-053 | - | - |
+| ADJID.008 | p.155-156 | FR-OP-055 | New Endorsement Request, Endorsement Request | TC-OP-055.1, 055.2 (3 cases) |
+| ADJID.009 | p.156-157 | FR-OP-057 | Endorsement Request | TC-OP-057.1, 057.2 (3 cases) |
+| ADJID.010 (moved) | p.157; annex p.35-36 | Moved to MKTID.017: FR-OP-053 | - | - |
+| ADJID.011 | p.157 | FR-OP-056 | Endorsement Request, Posting Batches, Batch Request Upload | TC-OP-056.1, 056.2 (3 cases) |
+| ADJID.012 | p.157-158 | FR-OP-057 | Endorsement Request | TC-OP-057.1, 057.2 (3 cases) |
+| ADJID.013 | p.158 | FR-OP-057 | Endorsement Request | TC-OP-057.1, 057.2 (3 cases) |
+| ADJID.014 | p.158-159; annex p.36-37 | FR-OP-054 | New Endorsement Request | TC-OP-054.1, 054.2, 054.3, 054.4 (5 cases) |
+| ADJID.015 (moved) | p.159; annex p.37 | Moved to MKTID.018: FR-OP-060, FR-OP-114 | - | - |
+| ADJID.016 | p.159 | FR-OP-062 | Report Centre (Operations reports) | TC-OP-062.1, 062.2 (3 cases) |
+| ADJID.017 | p.160 | FR-OP-062 | Report Centre (Operations reports) | TC-OP-062.1, 062.2 (3 cases) |
+| ADJID.018 | p.160-161 | FR-OP-060 | Endorsement Request | TC-OP-060.1, 060.2 (3 cases) |
+| ADJID.019 | p.161 | FR-OP-062 | Report Centre (Operations reports) | TC-OP-062.1, 062.2 (3 cases) |
+| ADJID.020 | p.161 | FR-OP-050 | Adjustment Workbench, New Endorsement Request, Batch Request Upload | TC-OP-050.1, 050.2, 050.3, 050.4 (7 cases) |
+| ADJID.021 | p.161-162; annex p.37 | FR-OP-061 | Invoice 360, Adjustment Workbench, Endorsement Request | TC-OP-061.1, 061.2, 061.3 (6 cases) |
+| ADJID.022 | p.162 | FR-OP-061 | Invoice 360, Adjustment Workbench, Endorsement Request | TC-OP-061.1, 061.2, 061.3 (6 cases) |
+| ADJID.023 | p.162; annex p.37-38 and 40 | FR-OP-051, FR-OP-058 | New Endorsement Request | TC-OP-051.1, 051.2, 058.1, 058.2, 058.3 (7 cases) |
+| ADJID.024 | p.163 | FR-OP-005, FR-OP-061 | Invoice Search, Invoice 360, Adjustment Workbench, Endorsement Request | TC-OP-005.1, 005.2, 005.3, 061.1, 061.2, 061.3 (10 cases) |
+| ADJID.025 (moved) | p.163; annex p.38 | Moved to MKTID.019: FR-OP-052 | - | - |
+| ADJID.026 | p.164-165 | FR-OP-059 | Minimal Balance File | TC-OP-059.1, 059.2 (3 cases) |
+| ADJID.027 | p.165-166 | FR-OP-007 | Invoice 360 | TC-OP-007.1, 007.2 (4 cases) |
+| ADJID.028 | p.166 | FR-OP-058 | New Endorsement Request | TC-OP-058.1, 058.2, 058.3 (5 cases) |
 
 ## Commission Receivables (CMRID)
 
-<!-- table: widths=2.2,1.8,2.9,4.4,5.2 caption="Traceability: Commission Receivables (CMRID)" size=7.5 -->
+<!-- table: widths=2.2,2.6,3.4,4.4,5.2 caption="Traceability: Commission Receivables (CMRID)" size=7.5 -->
 | BRD ID | Page | FR | Screen | Test cases |
 |---|---|---|---|---|
-| CMRID.001 | p.106 | FR-OP-090 | DP Lists | TC-OP-090.1, 090.2 (3 cases) |
-| CMRID.002 | p.106-107 | FR-OP-091 | DP Accounts | TC-OP-091.1, 091.2 (4 cases) |
-| CMRID.003 | p.107 | FR-OP-095 | Incentive Schemes, Incentive Runs | TC-OP-095.1, 095.2 (4 cases) |
-| CMRID.004 | p.108 | FR-OP-098 | Report Centre (Report Centre) | TC-OP-098.1, 098.2 (2 cases) |
-| CMRID.005 | p.108-109 | FR-OP-095 | Incentive Schemes, Incentive Runs | TC-OP-095.1, 095.2 (4 cases) |
-| CMRID.006 | p.109 | FR-OP-095 | Incentive Schemes, Incentive Runs | TC-OP-095.1, 095.2 (4 cases) |
-| CMRID.007 | p.109 | FR-OP-091 | DP Accounts | TC-OP-091.1, 091.2 (4 cases) |
-| CMRID.008 | p.109-110 | FR-OP-091, FR-OP-093 | DP Accounts | TC-OP-091.1, 091.2, 093.1, 093.2, 093.3 (8 cases) |
-| CMRID.009 | p.110-111 | FR-OP-092, FR-OP-093 | DP Billing, Insurer Responses | TC-OP-092.1, 092.2, 093.1, 093.2, 093.3 (7 cases) |
-| CMRID.010 | p.111 | FR-OP-094, FR-OP-096 | DP Billing | TC-OP-094.1, 094.2, 096.1, 096.2 (7 cases) |
-| CMRID.011 | p.111 | FR-OP-093 | DP Billings | TC-OP-093.1, 093.2, 093.3 (4 cases) |
-| CMRID.012 | p.111-112 | FR-OP-092 | DP Billing, Insurer Responses | TC-OP-092.1, 092.2 (3 cases) |
-| CMRID.013 | p.112 | FR-OP-091 | DP Accounts | TC-OP-091.1, 091.2 (4 cases) |
-| CMRID.014 | p.112-113 | FR-OP-097 | Estimated Items, Report Centre (Report Centre) | TC-OP-097.1, 097.2 (3 cases) |
-| CMRID.015 | p.113 | FR-OP-096 | BIR Certificates, BIR Certificate | TC-OP-096.1, 096.2 (3 cases) |
+| CMRID.001 | p.169; annex p.46 | FR-OP-090 | DP Lists | TC-OP-090.1, 090.2 (4 cases) |
+| CMRID.002 | p.169-170; annex p.46-48 | FR-OP-091 | DP Lists, DP Accounts | TC-OP-091.1, 091.2, 091.3 (5 cases) |
+| CMRID.003 | p.170; annex p.48-50 | FR-OP-091, FR-OP-095 | DP Lists, DP Accounts, Incentive Schemes, Incentive Runs | TC-OP-091.1, 091.2, 091.3, 095.1, 095.2, 095.3 (10 cases) |
+| CMRID.004 | p.171; annex p.50-51 | FR-OP-098 | Report Centre (Operations reports) | TC-OP-098.1, 098.2 (2 cases) |
+| CMRID.005 | p.171-172; annex p.52-53 | FR-OP-095 | Incentive Schemes, Incentive Runs | TC-OP-095.1, 095.2, 095.3 (5 cases) |
+| CMRID.006 | p.172; annex p.53-54 | FR-OP-095 | Incentive Schemes, Incentive Runs | TC-OP-095.1, 095.2, 095.3 (5 cases) |
+| CMRID.007 | p.172; annex p.54-55 | FR-OP-091, FR-OP-092 | DP Lists, DP Accounts, DP Billings, DP Billing | TC-OP-091.1, 091.2, 091.3, 092.1, 092.2, 092.3 (9 cases) |
+| CMRID.008 | p.172-173; annex p.55-57 | FR-OP-091, FR-OP-093 | DP Lists, DP Accounts, DP Billings, DP Billing and 1 more | TC-OP-091.1, 091.2, 091.3, 093.1, 093.2, 093.3 (9 cases) |
+| CMRID.009 | p.173-174; annex p.57-58 | FR-OP-092, FR-OP-093 | DP Accounts, DP Billings, DP Billing, Insurer Responses | TC-OP-092.1, 092.2, 092.3, 093.1, 093.2, 093.3 (8 cases) |
+| CMRID.010 | p.174; annex p.58 | FR-OP-094, FR-OP-096 | DP Accounts, DP Billing, BIR Certificates, BIR Certificate | TC-OP-094.1, 094.2, 096.1, 096.2 (7 cases) |
+| CMRID.011 | p.174; annex p.58-59 | FR-OP-099 | DP Billings, Report Centre (Operations reports) | TC-OP-099.1, 099.2 (3 cases) |
+| CMRID.012 | p.174-175; annex p.59 | FR-OP-092, FR-OP-093 | DP Accounts, DP Billings, DP Billing, Insurer Responses | TC-OP-092.1, 092.2, 092.3, 093.1, 093.2, 093.3 (8 cases) |
+| CMRID.013 | p.175; annex p.59-61 | FR-OP-091 | DP Lists, DP Accounts | TC-OP-091.1, 091.2, 091.3 (5 cases) |
+| CMRID.014 | p.175-176; annex p.61 | FR-OP-097 | Estimated Items | TC-OP-097.1, 097.2 (3 cases) |
+| CMRID.015 | p.176; annex p.61-62 | FR-OP-096 | BIR Certificates, BIR Certificate | TC-OP-096.1, 096.2 (3 cases) |
 
 ## Coverage summary
 
-<!-- table: widths=4,2,2 caption="BRD-2 requirement IDs covered" -->
-| Family | IDs | Covered |
-|---|---|---|
-| BRQID | 6 | 6 |
-| CSHID | 27 | 27 |
-| DBMID | 1 | 1 |
-| RMTID | 40 | 40 |
-| MKTID | 13 | 13 |
-| PRCID | 39 | 39 |
-| ADJID | 28 | 28 |
-| CMRID | 15 | 15 |
-| **Total** | **169** | **169** |
+<!-- table: widths=2.6,2.6,2.2,1.8,1.8,2.2,2.8 caption="BRD-2 requirement IDs covered (BRD v1.01 and the May 2026 annexes)" -->
+| Family | IDs listed | In scope | of which new | Moved | Removed | In scope, traced to FRs and test cases |
+|---|---|---|---|---|---|---|
+| BRQID | 7 | 7 | 1 | 0 | 0 | 7 |
+| CSHID | 27 | 24 | 0 | 0 | 3 | 24 |
+| DBMID | 1 | 1 | 0 | 0 | 0 | 1 |
+| RMTID | 41 | 40 | 1 | 1 | 0 | 40 |
+| MKTID | 19 | 19 | 6 | 0 | 0 | 19 |
+| PRCID | 39 | 38 | 0 | 1 | 0 | 38 |
+| ADJID | 28 | 22 | 0 | 6 | 0 | 22 |
+| CMRID | 15 | 15 | 0 | 0 | 0 | 15 |
+| **Total** | **177** | **166** | **8** | **8** | **3** | **166** |
 
-The non-functional requirements of the BRD (p.178-183) are traced in section 8.
+The non-functional requirements of the BRD (p.178-183) are traced in section 8; the audit trail standard set as a condition of the sign-off of BRD v1.01 (p.67, p.186) is traced to FR-OP-024 and CLR-OP-37.
+
 
 # Navigation
 
@@ -4466,6 +4475,290 @@ The table lists each point where the proposed screen or rule differs from the BR
 | CLR-OP-60 | DP account statuses (CMRID.008; FR-OP-091, 093) | Valid (eligible, not excluded, approved), Invalid (excluded or rejected) and Returned (sent back for correction or review), with a predefined reason before Invalid or Returned is final; the v2.0 tags map to them. | The annex replaces the tags DP for billing and DP for confirmation by Valid / Invalid / Returned (OQ40). | Confirm the statuses and give the feedback reasons. |
 | CLR-OP-61 | Ageing of commission receivables (CMRID.011; FR-OP-092, 093, 099) | Ageing per invoice from the billing date or the SOA date with buckets 0-30, 31-60, 61-90, 91-180 and over 180 days; the 10-working-day follow-up date is kept as a reminder that the handler can switch off. | The annex replaces the 10-working-day feedback timeline by ageing and rejects "timeline tracking instead of ageing logic"; CMRID.009 still asks for billing within the SLA (OQ43). | Confirm the buckets and the reference date, and whether the reminder stays. |
 | CLR-OP-62 | Fully paid status for billing (CMRID.013; FR-OP-091) | An account is eligible for billing when the payment status of the invoice ledger is Paid (fed by Cashiering and the Collections dispositions of BRD-4); the handler no longer confirms the payment and no manual override is offered. | The annex requires system-driven eligibility from the PR tagging upstream and no manual inference. | Confirm the payment status as the source, with the BRD-4 Collections owners. |
+
+# User-story view
+
+Each BRD requirement of the Operations BRD v1.01 and of the May 2026 annexes, restated as a user story: "As <persona>, I need <capability>, so that <business outcome>." The BRD writes its requirements in the form "As <Persona>, I must be able to ..."; the capability keeps the BRD's wording, tidied, and the persona is the FRS persona of chapter 3 who works with the function. The acceptance criteria are those of the FRs (FR-OP-nnn ACn, numbered as in chapter 4) and the test cases are the test conditions of the test plan. Moved and removed requirements are listed with their new number or their status.
+
+## General requirements (BRQID)
+
+<!-- table: widths=2.1,7.6,2.4,2.9,2.6 caption="User stories: General requirements (BRQID)" size=7.5 -->
+| BRD ID | User story | FR IDs | Acceptance criteria (FR AC numbers) | Test cases |
+|---|---|---|---|---|
+| BRQID.001 | As a Cashier, I need to access and log in to BIBS with my own credentials, so that only I can work with the Operations functions of my role. | FR-OP-001 | FR-OP-001 AC1-3 | TC-OP-001.1, 001.2 (3 cases) |
+| BRQID.002 | As the System Administrator, I need BIBS to restrict every Operations screen and action to authorised users, so that only authorised personnel can reach the Operations data. | FR-OP-002 | FR-OP-002 AC1-3 | TC-OP-002.1, 002.2, 002.3 (3 cases) |
+| BRQID.003 | As a Remittance Processor, I need to land on the Operations functions of my role after log-in and move between the sections I am allowed to use, so that I reach my work at once, with the functions, validations, reports and links of each section. | FR-OP-003 | FR-OP-003 AC1-3 | TC-OP-003.1, 003.2, 003.3 (3 cases) |
+| BRQID.004 | As the System Administrator, I need BIBS to integrate with the Collection, Accounting, Disbursement, Marketing and Claims systems and modules to fetch or flow in data, so that Operations works on complete data without re-keying it. | FR-OP-130 | FR-OP-130 AC1-2 | TC-OP-130.1, 130.2 (3 cases) |
+| BRQID.005 | As the System Administrator, I need BIBS to fetch the data that Operations needs from the other systems and modules, on schedule or in real time, so that the operational data are current when a team starts its work. | FR-OP-131 | FR-OP-131 AC1-2 | TC-OP-131.1, 131.2 (3 cases) |
+| BRQID.006 | As the System Administrator, I need batch jobs to continue past records in error and log every failed record with its reason, so that one bad record does not stop a whole run and the failures can be corrected. | FR-OP-008 | FR-OP-008 AC1-3 | TC-OP-008.1, 008.2, 008.3 (4 cases) |
+| BRQID.007 (new) | As a Remittance Processor, I need to view the payment history of each invoice, with the payment dates, the amounts applied and the AR numbers, so that every Operations team sees the same, traceable payment data at invoice level. | FR-OP-004 | FR-OP-004 AC1-5 | TC-OP-004.1, 004.2, 004.3, 004.4 (6 cases) |
+
+## Cashiering (CSHID) and Disbursement (DBMID)
+
+<!-- table: widths=2.1,7.6,2.4,2.9,2.6 caption="User stories: Cashiering (CSHID) and Disbursement (DBMID)" size=7.5 -->
+| BRD ID | User story | FR IDs | Acceptance criteria (FR AC numbers) | Test cases |
+|---|---|---|---|---|
+| CSHID.001 | As a Cashier, I need to create, cancel and reinstate Acknowledgement Receipts for premium and non-premium payments, so that every payment received is receipted, and corrected only through a controlled cancellation or reinstatement. | FR-OP-011, FR-OP-013, FR-OP-014 | FR-OP-011 AC1-3; FR-OP-013 AC1-3; FR-OP-014 AC1-3 | TC-OP-011.1, 011.2, 011.3, 013.1, 013.2, 013.3, 014.1, 014.2, 014.3 (13 cases) |
+| CSHID.002 | As a Cashier, I need to create, cancel and reinstate Official Receipts for BDOI income (service fees, profit share, commissions, incentives and others), so that BDOI's income is receipted with the right BIR receipt. | FR-OP-012, FR-OP-013 | FR-OP-012 AC1-2; FR-OP-013 AC1-3 | TC-OP-012.1, 012.2, 013.1, 013.2, 013.3 (7 cases) |
+| CSHID.003 | As a Cashier, I need to choose the reason for the cancellation of an AR or OR, so that every cancellation carries a reason that can be audited. | FR-OP-013 | FR-OP-013 AC1-3 | TC-OP-013.1, 013.2, 013.3 (4 cases) |
+| CSHID.004 | As a Cashier, I need to choose the reason for a reinstatement, so that every reinstatement carries a reason from the agreed list. | FR-OP-014 | FR-OP-014 AC1-3 | TC-OP-014.1, 014.2, 014.3 (4 cases) |
+| CSHID.005 | As a Cashier, I need to encode the information a reinstatement needs (for example the invoice number of a premium payment), so that the reinstated receipt is applied to the right invoice. | FR-OP-014 | FR-OP-014 AC1-3 | TC-OP-014.1, 014.2, 014.3 (4 cases) |
+| CSHID.006 | As the Cashiering TL / TH, I need BIBS to assign AR and OR numbers per transaction from the series of the branch, with ORs issued by Head Office only, so that receipt numbers are controlled, unique and compliant with BIR. | FR-OP-010 | FR-OP-010 AC1-4 | TC-OP-010.1, 010.2, 010.3 (5 cases) |
+| CSHID.007 | As a Cashier, I need to issue one OR per commission check or credited amount, or one OR for several payments of the same insurer or payee and certificate, so that commission payments are receipted as the insurers and BIR require. | FR-OP-021 | FR-OP-021 AC1-2 | TC-OP-021.1, 021.2 (4 cases) |
+| CSHID.008 | As a Cashier, I need to upload the Bills Payment, Trade, CLPC, matured PDC and Direct Credit files for batch processing, so that bank and channel payments are receipted and applied without keying each one. | FR-OP-015, FR-OP-016 | FR-OP-015 AC1-3; FR-OP-016 AC1-3 | TC-OP-015.1, 015.2, 015.3, 016.1, 016.2, 016.3 (8 cases) |
+| CSHID.009 | Removed from scope by the Cashiering annex (annex p.4-6). The former story was: as a Cashier, I need to accept checks tagged for pick-up from Collection. | - | - | - |
+| CSHID.010 | As a Cashier, I need to search receipts by AR, OR, client, invoice, payor, assured, amount, date, policy and insurer, so that I find any receipt quickly. | FR-OP-024 | FR-OP-024 AC1-3 | TC-OP-024.1, 024.2, 024.3 (5 cases) |
+| CSHID.011 | As an Auditor, I need BIBS to log every action on an AR with the AR number and the user name in the audit trail, so that every receipt action can be traced to the person who did it. | FR-OP-024 | FR-OP-024 AC1-3 | TC-OP-024.1, 024.2, 024.3 (5 cases) |
+| CSHID.012 | As a Cashier, I need BIBS to post the accounting entries of a posted cancellation, so that the books reflect the cancelled receipt at once. | FR-OP-013, FR-OP-027 | FR-OP-013 AC1-3; FR-OP-027 AC1-2 | TC-OP-013.1, 013.2, 013.3, 027.1, 027.2 (7 cases) |
+| CSHID.013 | As a Cashier, I need BIBS to post the accounting entries of a posted reinstatement, so that the books reflect the reinstated receipt at once. | FR-OP-014, FR-OP-027 | FR-OP-014 AC1-3; FR-OP-027 AC1-2 | TC-OP-014.1, 014.2, 014.3, 027.1, 027.2 (7 cases) |
+| CSHID.014 | As a Cashier, I need BIBS to post the accounting entries of every AR and OR, so that receipts and the general ledger always agree. | FR-OP-027 | FR-OP-027 AC1-2 | TC-OP-027.1, 027.2 (3 cases) |
+| CSHID.015 | As a Cashier, I need BIBS to check that the AR or OR series is not depleted before a transaction, so that no receipt is issued outside an authorised series. | FR-OP-010 | FR-OP-010 AC1-4 | TC-OP-010.1, 010.2, 010.3 (5 cases) |
+| CSHID.016 | As a Cashier, I need BIBS to clear minimal premium balances and minimal excess payments automatically when the payment is processed, within a configurable threshold and except for the 2% CWT, the DST charged or the entire premium, so that trivial residuals never reach the unapplied or disposition work and need no manual action. | FR-OP-023 | FR-OP-023 AC1-5 | TC-OP-023.1, 023.2, 023.3 (5 cases) |
+| CSHID.017 | As a Cashier, I need to generate, download or print the Cashiering reports I am authorised for, so that I can report on my work without asking IT. | FR-OP-009 | FR-OP-009 AC1-3 | TC-OP-009.1, 009.2 (2 cases) |
+| CSHID.018 | As a Cashier, I need to view the reports generated for my role, so that reports are shared only with the users who may see them. | FR-OP-009 | FR-OP-009 AC1-3 | TC-OP-009.1, 009.2 (2 cases) |
+| CSHID.019 | As a Cashier, I need to print ARs and ORs in batch, so that receipts of a day or a channel are printed in one run. | FR-OP-025 | FR-OP-025 AC1-2 | TC-OP-025.1, 025.2 (3 cases) |
+| CSHID.020 | As a Cashier, I need BIBS to match each payment at acceptance, except an issued PDC, and apply it to booked accounts or keep it as pre-booked or unapplied, so that money is applied as soon as it is received. | FR-OP-018, FR-OP-132 | FR-OP-018 AC1-4; FR-OP-132 AC1 | TC-OP-018.1, 018.2, 018.3, 132.1, 132.2 (7 cases) |
+| CSHID.021 | As a Cashier, I need to receive the non-premium payments of insurers as AR Insurance, apart from premium payments, so that insurer refunds and other payments are never mixed with client premium. | FR-OP-020 | FR-OP-020 AC1 | TC-OP-020.1, 020.2 (2 cases) |
+| CSHID.022 | As a Cashier, I need BIBS to apply payments in the defined hierarchy of premium components, so that every payment settles the components in the agreed order. | FR-OP-019 | FR-OP-019 AC1-2 | TC-OP-019.1, 019.2 (3 cases) |
+| CSHID.023 | As a Cashier, I need to generate the Cashiering reports listed in the annex, so that the team has the reports it uses today. | FR-OP-028 | FR-OP-028 AC1-2 | TC-OP-028.1, 028.2 (3 cases) |
+| CSHID.024 | As a Cashier, I need to view and manage the dispositions of unapplied payments, with approval and processing of each disposition type, so that unapplied money is applied, refunded, reclassed or transferred under control. | FR-OP-022 | FR-OP-022 AC1-4 | TC-OP-022.1, 022.2, 022.3 (6 cases) |
+| CSHID.025 | As a Cashier, I need to see unapplied payments in the Unapplied, Monitoring, For Approval and For Reversal tabs, so that I know at a glance what waits for a disposition, an approval or a reversal. | FR-OP-022 | FR-OP-022 AC1-4 | TC-OP-022.1, 022.2, 022.3 (6 cases) |
+| CSHID.026 | Deleted in BRD v1.01 (e-mail record p.67-69, p.186-188). The former story was: as a Cashier, I need to process the BIR 2307 data tagged by Marketing. | - | - | - |
+| CSHID.027 | Deleted in BRD v1.01 (e-mail record p.67-69, p.186-188). The former story was: as a Cashier, I need to reverse BIR 2307 transactions by reference number and route them to Disbursement. | - | - | - |
+| DBMID.001 | As Disbursement, I need to receive the BIR 2307 report with the certificates sorted per insurer and the supporting documents from Marketing Collection, and release them to the insurers, so that the certificates reach each insurer complete, without any posting by Disbursement. | FR-OP-120, FR-OP-121 | FR-OP-120 AC1-2; FR-OP-121 AC1-3 | TC-OP-120.1, 120.2, 121.1, 121.2 (6 cases) |
+
+## Remittance (RMTID)
+
+<!-- table: widths=2.1,7.6,2.4,2.9,2.6 caption="User stories: Remittance (RMTID)" size=7.5 -->
+| BRD ID | User story | FR IDs | Acceptance criteria (FR AC numbers) | Test cases |
+|---|---|---|---|---|
+| RMTID.001 | As a Remittance Processor, I need to extract per insurer and per remittance type (With Incentives, Normal - Dollar, Normal - Peso) only the eligible accounts, excluding those with a pending or unresolved financial endorsement, so that only premium that can be remitted is put in a batch. | FR-OP-030 | FR-OP-030 AC1-5 | TC-OP-030.1, 030.2, 030.3, 030.4 (6 cases) |
+| RMTID.002 | As a Remittance Processor, I need to open the extracted file online and exclude records, without changing any financial value, so that the batch is corrected by exclusion while the amounts stay as computed. | FR-OP-032 | FR-OP-032 AC1-5 | TC-OP-032.1, 032.2, 032.3, 032.4 (5 cases) |
+| RMTID.003 | As a Remittance Processor, I need BIBS to extract automatically on schedule, never reprocess an extracted invoice and include instalment invoices still in process, so that remittance runs without manual work and without double remittance. | FR-OP-030 | FR-OP-030 AC1-5 | TC-OP-030.1, 030.2, 030.3, 030.4 (6 cases) |
+| RMTID.004 | As a Remittance Processor, I need to extract one invoice of an insurer manually, with the account excluded from later runs and tagged as taken ad hoc, so that urgent remittances are made without risk of remitting twice. | FR-OP-030 | FR-OP-030 AC1-5 | TC-OP-030.1, 030.2, 030.3, 030.4 (6 cases) |
+| RMTID.005 | As a Remittance Processor, I need to search account and payment details per invoice or batch and have the searched invoice extracted at the end of the day, so that an invoice paid today can still be remitted today. | FR-OP-030 | FR-OP-030 AC1-5 | TC-OP-030.1, 030.2, 030.3, 030.4 (6 cases) |
+| RMTID.006 | As a Remittance Processor, I need BIBS to extract only from applied and posted payments, whatever the channel, so that only money really applied is remitted. | FR-OP-031 | FR-OP-031 AC1-5 | TC-OP-031.1, 031.2, 031.3, 031.4 (7 cases) |
+| RMTID.007 | As a Remittance Processor, I need the extract grouped by remittance type, processor, insurer and batch number, so that each processor works the batches of their insurers. | FR-OP-030 | FR-OP-030 AC1-5 | TC-OP-030.1, 030.2, 030.3, 030.4 (6 cases) |
+| RMTID.008 | As a Remittance Processor, I need BIBS to give each remittance extract a unique reference or batch number, so that every batch can be traced. | FR-OP-030 | FR-OP-030 AC1-5 | TC-OP-030.1, 030.2, 030.3, 030.4 (6 cases) |
+| RMTID.009 | As a Remittance Processor, I need extracted accounts transferred to Process Remittance with their status, so that I see where each account is in the remittance process. | FR-OP-033 | FR-OP-033 AC1-3 | TC-OP-033.1, 033.2, 033.3 (4 cases) |
+| RMTID.010 | As a Remittance Processor, I need to submit accounts for remittance processing and approval, so that a second person approves the remittance before it is paid. | FR-OP-033, FR-OP-035 | FR-OP-033 AC1-3; FR-OP-035 AC1-3 | TC-OP-033.1, 033.2, 033.3, 035.1, 035.2, 035.3 (7 cases) |
+| RMTID.011 | As a Remittance Processor, I need to save or export the remittance schedule before submission and print the schedule and payment request after it, so that I can check the schedule before I submit, and the insurer and Disbursement get the final documents. | FR-OP-034 | FR-OP-034 AC1-3 | TC-OP-034.1, 034.2, 034.3 (4 cases) |
+| RMTID.012 | As a Remittance Processor, I need to receive from the insurer the populated remittance schedule with the OR of each client, so that the insurer's official receipts are known for every remitted invoice. | FR-OP-037 | FR-OP-037 AC1-3 | TC-OP-037.1, 037.2 (4 cases) |
+| RMTID.013 | As a Remittance Processor, I need to upload the insurer's schedule and update the OR date and number of each client, so that the OR details are recorded without keying. | FR-OP-037 | FR-OP-037 AC1-3 | TC-OP-037.1, 037.2 (4 cases) |
+| RMTID.014 | As a Remittance Processor, I need BIBS to check that the paid AR is not more than the outstanding DTIP of the remittance, so that no more than the insurer's due is remitted. | FR-OP-031 | FR-OP-031 AC1-5 | TC-OP-031.1, 031.2, 031.3, 031.4 (7 cases) |
+| RMTID.015 | As a Remittance Processor, I need a list of the paid ARs higher than the DTIP balance, so that those accounts can be investigated. | FR-OP-031 | FR-OP-031 AC1-5 | TC-OP-031.1, 031.2, 031.3, 031.4 (7 cases) |
+| RMTID.016 | As a Remittance Processor, I need an exception report comparing the insurer's OR amounts with the paid premium, so that differences with the insurer are found and followed. | FR-OP-037 | FR-OP-037 AC1-3 | TC-OP-037.1, 037.2 (4 cases) |
+| RMTID.017 | As a Remittance Processor, I need BIBS to include checks only when they are at least 3 days old and cleared, so that uncleared checks are never remitted. | FR-OP-031 | FR-OP-031 AC1-5 | TC-OP-031.1, 031.2, 031.3, 031.4 (7 cases) |
+| RMTID.018 | As a Remittance Processor, I need BIBS to validate the holding period and the clearance of check payments, so that check payments are remitted only when safe. | FR-OP-031 | FR-OP-031 AC1-5 | TC-OP-031.1, 031.2, 031.3, 031.4 (7 cases) |
+| RMTID.019 | As a Remittance Processor, I need BIBS to validate the remittance status on submission, so that only accounts in a valid status are submitted. | FR-OP-033, FR-OP-035 | FR-OP-033 AC1-3; FR-OP-035 AC1-3 | TC-OP-033.1, 033.2, 033.3, 035.1, 035.2, 035.3 (7 cases) |
+| RMTID.020 | As a Remittance Processor, I need BIBS to exclude accounts on hold or with a pending negative adjustment request, so that money that may change is not remitted. | FR-OP-031 | FR-OP-031 AC1-5 | TC-OP-031.1, 031.2, 031.3, 031.4 (7 cases) |
+| RMTID.021 | As a Remittance Processor, I need an account processed in remittance once its holding dates have ended, so that held accounts are remitted as soon as the hold expires. | FR-OP-111 | FR-OP-111 AC1-4 | TC-OP-111.1, 111.2, 111.3, 111.4 (6 cases) |
+| RMTID.022 | As a Remittance Processor, I need BIBS to exclude written-off accounts, so that written-off balances are never remitted. | FR-OP-031 | FR-OP-031 AC1-5 | TC-OP-031.1, 031.2, 031.3, 031.4 (7 cases) |
+| RMTID.023 | As the Remittance TL / TH, I need the additional incentive for early remittance computed automatically, so that BDOI earns the incentive on every qualifying remittance. | FR-OP-038 | FR-OP-038 AC1-3 | TC-OP-038.1, 038.2 (3 cases) |
+| RMTID.024 | As a Remittance Processor, I need to view the extracted accounts with the details of the remittance schedule (policy, insurer, settlement number, remittance type, batch number), so that I check each account against the schedule the insurer will receive. | FR-OP-032 | FR-OP-032 AC1-5 | TC-OP-032.1, 032.2, 032.3, 032.4 (5 cases) |
+| RMTID.025 | As a Remittance Processor, I need to search accounts and payment details by invoice, batch, endorsement reference, policy, assured and other identifiers, so that I find any account in the remittance process. | FR-OP-039 | FR-OP-039 AC1-2 | TC-OP-039.1, 039.2 (3 cases) |
+| RMTID.026 | As a Remittance Processor, I need to view the details of an account or invoice, so that I have the full picture of the invoice before acting. | FR-OP-005 | FR-OP-005 AC1-3 | TC-OP-005.1, 005.2, 005.3 (4 cases) |
+| RMTID.027 | As a Remittance Processor, I need to view the accounts submitted from Process Remittance, so that I follow what was submitted. | FR-OP-032 | FR-OP-032 AC1-5 | TC-OP-032.1, 032.2, 032.3, 032.4 (5 cases) |
+| RMTID.028 | As a Remittance Processor, I need BIBS to check the payment status before extraction or processing, so that only posted and cleared payments are processed. | FR-OP-031 | FR-OP-031 AC1-5 | TC-OP-031.1, 031.2, 031.3, 031.4 (7 cases) |
+| RMTID.029 | As a Remittance Processor, I need to submit, hold and return invoices or batches, so that a batch can be stopped or sent back for correction. | FR-OP-033 | FR-OP-033 AC1-3 | TC-OP-033.1, 033.2, 033.3 (4 cases) |
+| RMTID.030 | As a Remittance Processor, I need to view the special remittance requests, so that requests from Marketing are processed in Remittance. | FR-OP-040 | FR-OP-040 AC1-2 | TC-OP-040.1, 040.2 (3 cases) |
+| RMTID.031 | As a Remittance Processor, I need BIBS to exclude accounts with an active hold during extraction, so that held accounts stay out of the batches. | FR-OP-031 | FR-OP-031 AC1-5 | TC-OP-031.1, 031.2, 031.3, 031.4 (7 cases) |
+| RMTID.032 | As a Remittance Processor, I need to track the hold status and the remittance status of each account, so that both statuses are visible in one place. | FR-OP-005 | FR-OP-005 AC1-3 | TC-OP-005.1, 005.2, 005.3 (4 cases) |
+| RMTID.033 | As a Remittance Processor, I need to be notified when the status of a special remittance changes, so that I act on returned, approved or held requests at once. | FR-OP-040 | FR-OP-040 AC1-2 | TC-OP-040.1, 040.2 (3 cases) |
+| RMTID.034 | As a Remittance Processor, I need to be notified of remittance and disbursement status changes, so that I follow each batch to payment without asking Disbursement. | FR-OP-036, FR-OP-120 | FR-OP-036 AC1-2; FR-OP-120 AC1-2 | TC-OP-036.1, 036.2, 120.1, 120.2 (6 cases) |
+| RMTID.035 | As a Remittance Processor, I need the Remittance Team notified of pending negative adjustments, so that a batch with a reduced invoice is corrected before it is paid. | FR-OP-031 | FR-OP-031 AC1-5 | TC-OP-031.1, 031.2, 031.3, 031.4 (7 cases) |
+| RMTID.036 | As a Remittance Processor, I need the remittance status tracked across every stage, so that each invoice can be followed from extraction to disbursement. | FR-OP-036 | FR-OP-036 AC1-2 | TC-OP-036.1, 036.2 (3 cases) |
+| RMTID.037 | As a Production Reconciliation Handler, I need estimated items tracked and flagged in the production reports, so that estimated production is never mistaken for final production. | FR-OP-097 | FR-OP-097 AC1-2 | TC-OP-097.1, 097.2 (3 cases) |
+| RMTID.038 | Moved to BRQID.007: see that row. | - | - | - |
+| RMTID.039 | As a Remittance Processor, I need to generate the Remittance reports listed in the annex, so that the team has the reports it uses today. | FR-OP-041 | FR-OP-041 AC1-2 | TC-OP-041.1, 041.2 (3 cases) |
+| RMTID.040 | As a Remittance Processor, I need BIBS to coordinate invoice adjustments, remittance exemptions and accounting entries in the right sequence, so that no two teams change the same invoice at the same time. | FR-OP-006 | FR-OP-006 AC1-3 | TC-OP-006.1, 006.2, 006.3 (3 cases) |
+| RMTID.041 (new) | As a Remittance Processor, I need BIBS to validate the eligibility of qualified CLG / CBG motor and fire accounts and compute the early remittance incentive as a separate calculation, so that the incentive is applied only when earned and never merged with the commission or remittance values. | FR-OP-038, FR-OP-078 | FR-OP-038 AC1-3; FR-OP-078 AC1-2 | TC-OP-038.1, 038.2, 078.1, 078.2 (5 cases) |
+
+## Marketing activities (MKTID)
+
+<!-- table: widths=2.1,7.6,2.4,2.9,2.6 caption="User stories: Marketing activities (MKTID)" size=7.5 -->
+| BRD ID | User story | FR IDs | Acceptance criteria (FR AC numbers) | Test cases |
+|---|---|---|---|---|
+| MKTID.001 | As Marketing Collection, I need to request that the remittance schedule be sent to the insurer, with the client details, so that the insurer receives the schedule it needs. | FR-OP-110 | FR-OP-110 AC1 | TC-OP-110.1, 110.2 (3 cases) |
+| MKTID.002 | As Marketing Collection, I need to remove the On Hold tag of an account so that it is included in the extraction, so that an account is remitted once the reason for the hold is gone. | FR-OP-111 | FR-OP-111 AC1-4 | TC-OP-111.1, 111.2, 111.3, 111.4 (6 cases) |
+| MKTID.003 | As Marketing Collection, I need to tag an account On Hold so that it is excluded from the extraction, so that premium is not remitted while an issue is open. | FR-OP-111 | FR-OP-111 AC1-4 | TC-OP-111.1, 111.2, 111.3, 111.4 (6 cases) |
+| MKTID.004 | As Marketing Collection, I need approved hold requests assigned to the remittance processors, so that every hold is followed by a named processor. | FR-OP-111 | FR-OP-111 AC1-4 | TC-OP-111.1, 111.2, 111.3, 111.4 (6 cases) |
+| MKTID.005 | As Marketing Collection, I need to create, cancel and extend hold requests, so that holds match the real situation of the account. | FR-OP-111 | FR-OP-111 AC1-4 | TC-OP-111.1, 111.2, 111.3, 111.4 (6 cases) |
+| MKTID.006 | As the Marketing TL / UH, I need to approve hold requests and their cancellations, so that no account is held without approval. | FR-OP-111 | FR-OP-111 AC1-4 | TC-OP-111.1, 111.2, 111.3, 111.4 (6 cases) |
+| MKTID.007 | As Marketing Collection, I need a unique reference number for every hold request, so that every hold can be traced. | FR-OP-111 | FR-OP-111 AC1-4 | TC-OP-111.1, 111.2, 111.3, 111.4 (6 cases) |
+| MKTID.008 | As Marketing Collection, I need to generate the endorsement slip of an external endorsement, so that the endorsement is documented for the insurer and the client. | FR-OP-114 | FR-OP-114 AC1 | TC-OP-114.1, 114.2 (2 cases) |
+| MKTID.009 | As Marketing Collection, I need to request a special remittance for accounts that meet specific conditions (claims, renewal, instalment due, immediate OR), so that urgent remittances are processed outside the schedule. | FR-OP-112 | FR-OP-112 AC1-2 | TC-OP-112.1, 112.2 (3 cases) |
+| MKTID.010 | As Marketing Collection, I need to tag and track BIR 2307 certificates, check whether the payment was already remitted and whether a commission receivable is outstanding, and log every action, so that the PR 2307 reversal is correct, and a remitted payment or an unpaid commission is handled, not missed. | FR-OP-113 | FR-OP-113 AC1-7 | TC-OP-113.1, 113.2, 113.3, 113.4 (8 cases) |
+| MKTID.011 | As Marketing Collection, I need to tag an account as direct payment during quotation and conversion to policy, so that the invoice and the payment modules treat it as direct payment. | FR-OP-004 | FR-OP-004 AC1-5 | TC-OP-004.1, 004.2, 004.3, 004.4 (6 cases) |
+| MKTID.012 | As Marketing Collection, I need the DP premium receivable reversed only after a valid DP tag and the collection of the commission, so that premium and commission reversals are correct without manual files. | FR-OP-094 | FR-OP-094 AC1-3 | TC-OP-094.1, 094.2 (4 cases) |
+| MKTID.013 | As Marketing Collection, I need to tag PR 2307 reversals, submit the certificates received from clients, have BIBS validate the amounts against the computed PR 2307 amount, the outstanding PR and the CRU, and post and route the BIR 2307 report to Disbursement, so that the PR is zeroed without over-reversal and every reversal is traceable to the invoice, AR / OR, certificate and CRU. | FR-OP-113 | FR-OP-113 AC1-7 | TC-OP-113.1, 113.2, 113.3, 113.4 (8 cases) |
+| MKTID.014 (new) | As Marketing Collection, I need to select the type of financial endorsement from the list, so that the request asks only for the inputs of that type. | FR-OP-050 | FR-OP-050 AC1-4 | TC-OP-050.1, 050.2, 050.3, 050.4 (7 cases) |
+| MKTID.015 (new) | As Marketing Collection, I need to select the type of non-financial endorsement from the list, so that descriptive and period changes are recorded without financial impact. | FR-OP-050 | FR-OP-050 AC1-4 | TC-OP-050.1, 050.2, 050.3, 050.4 (7 cases) |
+| MKTID.016 (new) | As Marketing Collection, I need to receive the requests returned by Operations with their reason, correct them and resubmit them, so that problem requests are fixed by their owner and never posted as they are. | FR-OP-053 | FR-OP-053 AC1-4 | TC-OP-053.1, 053.2, 053.3, 053.4 (6 cases) |
+| MKTID.017 (new) | As Marketing Collection, I need to request an extension of cover with additional premium, subject to approval, so that the additional premium is computed and approved before the endorsement is final. | FR-OP-053 | FR-OP-053 AC1-4 | TC-OP-053.1, 053.2, 053.3, 053.4 (6 cases) |
+| MKTID.018 (new) | As Marketing Collection, I need to generate the endorsement slip of an external endorsement, so that the endorsement is documented for the insurer and the client. | FR-OP-060, FR-OP-114 | FR-OP-060 AC1-2; FR-OP-114 AC1 | TC-OP-060.1, 060.2, 114.1, 114.2 (5 cases) |
+| MKTID.019 (new) | As Marketing Collection, I need to attach the supporting documents of an endorsement request, so that the request carries its evidence for validation. | FR-OP-052 | FR-OP-052 AC1 | TC-OP-052.1, 052.2 (2 cases) |
+
+## Production Reconciliation (PRCID)
+
+<!-- table: widths=2.1,7.6,2.4,2.9,2.6 caption="User stories: Production Reconciliation (PRCID)" size=7.5 -->
+| BRD ID | User story | FR IDs | Acceptance criteria (FR AC numbers) | Test cases |
+|---|---|---|---|---|
+| PRCID.001 | As a Production Reconciliation Handler, I need booked accounts extracted per insurer automatically on the defined frequency, on the next working day after a holiday, so that every insurer's register is ready without manual work. | FR-OP-070 | FR-OP-070 AC1 | TC-OP-070.1, 070.2 (2 cases) |
+| PRCID.002 | As a Production Reconciliation Handler, I need the extracted file locked except for the insurer's remarks column, so that the insurer can answer without changing BDOI's data. | FR-OP-072 | FR-OP-072 AC1-2 | TC-OP-072.1, 072.2 (3 cases) |
+| PRCID.003 | As a Production Reconciliation Handler, I need a cover letter generated for each extract, so that the insurer receives the register with a standard letter. | FR-OP-073 | FR-OP-073 AC1-2 | TC-OP-073.1, 073.2 (3 cases) |
+| PRCID.004 | As a Production Reconciliation Handler, I need a file name assigned to each extract by the standard naming convention, so that registers are filed and found consistently. | FR-OP-072 | FR-OP-072 AC1-2 | TC-OP-072.1, 072.2 (3 cases) |
+| PRCID.005 | As a Production Reconciliation Handler, I need to see the file location, date and time of each extract, so that I know which register was produced when. | FR-OP-071 | FR-OP-071 AC1-2 | TC-OP-071.1, 071.2 (3 cases) |
+| PRCID.006 | As a Production Reconciliation Handler, I need the file generated in the agreed format or template, so that the insurer can read it as agreed. | FR-OP-072 | FR-OP-072 AC1-2 | TC-OP-072.1, 072.2 (3 cases) |
+| PRCID.007 | As a Production Reconciliation Handler, I need to protect the generated file with a password, so that production data travel securely. | FR-OP-072 | FR-OP-072 AC1-2 | TC-OP-072.1, 072.2 (3 cases) |
+| PRCID.008 | As a Production Reconciliation Handler, I need to send the extract to the insurer with the sent time recorded, so that I can prove when the register was sent. | FR-OP-073 | FR-OP-073 AC1-2 | TC-OP-073.1, 073.2 (3 cases) |
+| PRCID.009 | As a Production Reconciliation Handler, I need to receive and upload the insurer's production report, so that the insurer's answer enters the reconciliation without re-keying. | FR-OP-074 | FR-OP-074 AC1-3 | TC-OP-074.1, 074.2 (4 cases) |
+| PRCID.010 | As a Production Reconciliation Handler, I need duplicate uploads blocked, so that the same answer is never reconciled twice. | FR-OP-074 | FR-OP-074 AC1-3 | TC-OP-074.1, 074.2 (4 cases) |
+| PRCID.011 | As a Production Reconciliation Handler, I need to extract the production register manually for a booking period, so that I can reconcile any period on request. | FR-OP-071 | FR-OP-071 AC1-2 | TC-OP-071.1, 071.2 (3 cases) |
+| PRCID.012 | As a Production Reconciliation Handler, I need to view the accounts of the extracted and the uploaded files, so that I see both sides of the reconciliation. | FR-OP-071 | FR-OP-071 AC1-2 | TC-OP-071.1, 071.2 (3 cases) |
+| PRCID.013 | As a Production Reconciliation Handler, I need to filter and display accounts by production month and insurer, so that I work one insurer and month at a time. | FR-OP-071 | FR-OP-071 AC1-2 | TC-OP-071.1, 071.2 (3 cases) |
+| PRCID.014 | As a Production Reconciliation Handler, I need to filter accounts by AO / AB, booked and pre-booked, so that I can follow up differences with the right account officer. | FR-OP-077 | FR-OP-077 AC1-3 | TC-OP-077.1, 077.2, 077.3 (5 cases) |
+| PRCID.015 | As a Production Reconciliation Handler, I need to record the company concerned and an instruction or notation on a production register record, without changing any policy, invoice or financial data, so that the follow-up of each difference is recorded on the right record. | FR-OP-077 | FR-OP-077 AC1-3 | TC-OP-077.1, 077.2, 077.3 (5 cases) |
+| PRCID.016 | As a Production Reconciliation Handler, I need to select the company concerned from the list, with Others, so that the follow-up names the right company. | FR-OP-077 | FR-OP-077 AC1-3 | TC-OP-077.1, 077.2, 077.3 (5 cases) |
+| PRCID.017 | As a Production Reconciliation Handler, I need to generate the production register with the insurer's feedback, so that the insurer's remarks are reported per account. | FR-OP-080 | FR-OP-080 AC1-2 | TC-OP-080.1, 080.2 (3 cases) |
+| PRCID.018 | As a Production Reconciliation Handler, I need to generate the production register with the insurer's and Marketing's feedback, so that both answers are reported together. | FR-OP-080 | FR-OP-080 AC1-2 | TC-OP-080.1, 080.2 (3 cases) |
+| PRCID.019 | As a Production Reconciliation Handler, I need a list of the unbooked accounts with their status, so that insurer production that BDOI did not book is followed to booking. | FR-OP-076 | FR-OP-076 AC1-2 | TC-OP-076.1, 076.2 (3 cases) |
+| PRCID.020 | As a Production Reconciliation Handler, I need to view the production register of manually extracted accounts, so that manual extracts are checked like scheduled ones. | FR-OP-071 | FR-OP-071 AC1-2 | TC-OP-071.1, 071.2 (3 cases) |
+| PRCID.021 | As a Production Reconciliation Handler, I need to filter by booking date, insurer, BDOI location, market segment and product type, so that I narrow the reconciliation to what I am working on. | FR-OP-077 | FR-OP-077 AC1-3 | TC-OP-077.1, 077.2, 077.3 (5 cases) |
+| PRCID.022 | As a Production Reconciliation Handler, I need to upload the insurer's matching results and have BIBS keep the technical match apart from the reconciliation outcome (Matched, Matched with Discrepancy, Unmatched), so that no record with a discrepancy is reported as matched and insurer-only records are recognised. | FR-OP-074 | FR-OP-074 AC1-3 | TC-OP-074.1, 074.2 (4 cases) |
+| PRCID.023 | As a Production Reconciliation Handler, I need accounts matched from booked to pre-booked by reference number, so that pre-booked production is matched when it is booked. | FR-OP-076 | FR-OP-076 AC1-2 | TC-OP-076.1, 076.2 (3 cases) |
+| PRCID.024 | As a Production Reconciliation Handler, I need pre-booked or unbooked accounts matched automatically on booking or upload, so that matches are made without waiting for me. | FR-OP-075 | FR-OP-075 AC1-4 | TC-OP-075.1, 075.2, 075.3 (4 cases) |
+| PRCID.025 | As a Production Reconciliation Handler, I need accounts of an uploaded file automatically matched by status at the set time, so that open items are matched again regularly. | FR-OP-075 | FR-OP-075 AC1-4 | TC-OP-075.1, 075.2, 075.3 (4 cases) |
+| PRCID.026 | As a Production Reconciliation Handler, I need accounts with a difference of 1.00 peso equivalent or less treated as matched, with foreign currency differences converted to pesos first, so that minor differences, including those from currency conversion, are handled consistently. | FR-OP-075 | FR-OP-075 AC1-4 | TC-OP-075.1, 075.2, 075.3 (4 cases) |
+| PRCID.027 | As a Production Reconciliation Handler, I need an account tagged matched once the policy number and the reference or invoice number agree, so that matching follows clear criteria. | FR-OP-075 | FR-OP-075 AC1-4 | TC-OP-075.1, 075.2, 075.3 (4 cases) |
+| PRCID.028 | Moved to RMTID.041: see that row. | - | - | - |
+| PRCID.029 | As a Production Reconciliation Handler, I need to view the history of an account and a cycle, so that every reconciliation step can be traced. | FR-OP-079 | FR-OP-079 AC1-2 | TC-OP-079.1, 079.2 (2 cases) |
+| PRCID.030 | As a Production Reconciliation Handler, I need to tag and track the status of each account (matched, matched with discrepancies, unmatched pre-booked, unmatched no booking), so that every account is followed to closure. | FR-OP-075 | FR-OP-075 AC1-4 | TC-OP-075.1, 075.2, 075.3 (4 cases) |
+| PRCID.031 | As a Production Reconciliation Handler, I need to monitor the status of each upload (successful or unsuccessful), so that failed uploads are retried. | FR-OP-074 | FR-OP-074 AC1-3 | TC-OP-074.1, 074.2 (4 cases) |
+| PRCID.032 | As a Production Reconciliation Handler, I need the number of upload attempts and their status recorded, so that upload problems with an insurer are visible. | FR-OP-074 | FR-OP-074 AC1-3 | TC-OP-074.1, 074.2 (4 cases) |
+| PRCID.033 | As a Production Reconciliation Handler, I need a repository of unmatched and duplicate accounts, so that problem accounts are kept in one place until solved. | FR-OP-076 | FR-OP-076 AC1-2 | TC-OP-076.1, 076.2 (3 cases) |
+| PRCID.034 | As a Production Reconciliation Handler, I need a report of the item count and extraction time of each extract, so that extractions can be checked for completeness. | FR-OP-071 | FR-OP-071 AC1-2 | TC-OP-071.1, 071.2 (3 cases) |
+| PRCID.035 | As a Production Reconciliation Handler, I need the Production Reconciliation Summary report, so that management sees the reconciliation position per insurer. | FR-OP-080 | FR-OP-080 AC1-2 | TC-OP-080.1, 080.2 (3 cases) |
+| PRCID.036 | As a Production Reconciliation Handler, I need the summary of unmatched accounts per location, so that locations follow up their own differences. | FR-OP-080 | FR-OP-080 AC1-2 | TC-OP-080.1, 080.2 (3 cases) |
+| PRCID.037 | As a Production Reconciliation Handler, I need the summary of unmatched accounts per Marketing AO / AB, so that account officers follow up their own differences. | FR-OP-080 | FR-OP-080 AC1-2 | TC-OP-080.1, 080.2 (3 cases) |
+| PRCID.038 | As a Production Reconciliation Handler, I need a report of the unmatched accounts with feedback and disposition, so that the follow-up of each difference is reported. | FR-OP-080 | FR-OP-080 AC1-2 | TC-OP-080.1, 080.2 (3 cases) |
+| PRCID.039 | As a Production Reconciliation Handler, I need the summary per disposition, so that the outcome of the reconciliation is reported by disposition. | FR-OP-080 | FR-OP-080 AC1-2 | TC-OP-080.1, 080.2 (3 cases) |
+
+## Adjustment / Cancellation (ADJID)
+
+<!-- table: widths=2.1,7.6,2.4,2.9,2.6 caption="User stories: Adjustment / Cancellation (ADJID)" size=7.5 -->
+| BRD ID | User story | FR IDs | Acceptance criteria (FR AC numbers) | Test cases |
+|---|---|---|---|---|
+| ADJID.001 | As an Adjustment Processor, I need to perform single or multiple financial, non-financial and internal endorsement transactions on booked accounts, so that every change to a booked account is processed in BIBS. | FR-OP-050 | FR-OP-050 AC1-4 | TC-OP-050.1, 050.2, 050.3, 050.4 (7 cases) |
+| ADJID.002 | Moved to MKTID.014: see that row. | - | - | - |
+| ADJID.003 | As an Adjustment Processor, I need to perform single or multiple non-financial endorsement transactions on booked accounts, so that descriptive changes are recorded and linked to the account. | FR-OP-050 | FR-OP-050 AC1-4 | TC-OP-050.1, 050.2, 050.3, 050.4 (7 cases) |
+| ADJID.004 | Moved to MKTID.015: see that row. | - | - | - |
+| ADJID.005 | As an Adjustment Processor, I need to return transactions that do not qualify before batch posting, with the reason, to Marketing for correction, so that only valid requests are posted and the history of each return is kept. | FR-OP-053 | FR-OP-053 AC1-4 | TC-OP-053.1, 053.2, 053.3, 053.4 (6 cases) |
+| ADJID.006 | As an Adjustment Processor, I need to post cancellations and adjustments in batches, so that many requests are posted in one action. | FR-OP-056 | FR-OP-056 AC1-2 | TC-OP-056.1, 056.2 (3 cases) |
+| ADJID.007 | Moved to MKTID.016: see that row. | - | - | - |
+| ADJID.008 | As an Adjustment Processor, I need BIBS to check an increase of TSI against the package limits and ask for the quotation, so that an increase beyond the package is priced before it is endorsed. | FR-OP-055 | FR-OP-055 AC1-2 | TC-OP-055.1, 055.2 (3 cases) |
+| ADJID.009 | As an Adjustment Processor, I need on a decrease of TSI, to apply the excess payment to another invoice or refund it, so that the client's money is never left unapplied after a decrease. | FR-OP-057 | FR-OP-057 AC1-2 | TC-OP-057.1, 057.2 (3 cases) |
+| ADJID.010 | Moved to MKTID.017: see that row. | - | - | - |
+| ADJID.011 | As an Adjustment Processor, I need BIBS to create the accounting entries of each financial endorsement type, so that the books follow every endorsement. | FR-OP-056 | FR-OP-056 AC1-2 | TC-OP-056.1, 056.2 (3 cases) |
+| ADJID.012 | As an Adjustment Processor, I need BIBS to set up the excess payment resulting from a cancellation or adjustment, so that the excess is ready for refund or re-application. | FR-OP-057 | FR-OP-057 AC1-2 | TC-OP-057.1, 057.2 (3 cases) |
+| ADJID.013 | As an Adjustment Processor, I need BIBS to reverse the payments applied to an account on the latest premium and route any excess for Marketing disposition, so that payments always match the premium in force. | FR-OP-057 | FR-OP-057 AC1-2 | TC-OP-057.1, 057.2 (3 cases) |
+| ADJID.014 | As an Adjustment Processor, I need BIBS to recompute premium, commission, refund premium and sum insured per insurer automatically on submission, from validated inputs, with a service invoice when income or commission changes, so that endorsements are computed correctly and consistently with the posting. | FR-OP-054 | FR-OP-054 AC1-5 | TC-OP-054.1, 054.2, 054.3, 054.4 (5 cases) |
+| ADJID.015 | Moved to MKTID.018: see that row. | - | - | - |
+| ADJID.016 | As an Adjustment Processor, I need the Adjustment and Daily Endorsement reports, so that daily activity is tracked. | FR-OP-062 | FR-OP-062 AC1-2 | TC-OP-062.1, 062.2 (3 cases) |
+| ADJID.017 | As an Adjustment Processor, I need a Validation List of the posted transactions with their GL entries and remarks, so that financial audits are supported. | FR-OP-062 | FR-OP-062 AC1-2 | TC-OP-062.1, 062.2 (3 cases) |
+| ADJID.018 | As an Adjustment Processor, I need to generate the validation slip of a validated request, so that the validation is documented. | FR-OP-060 | FR-OP-060 AC1-2 | TC-OP-060.1, 060.2 (3 cases) |
+| ADJID.019 | As an Adjustment Processor, I need the Adjustment report, so that adjustments are summarised for management. | FR-OP-062 | FR-OP-062 AC1-2 | TC-OP-062.1, 062.2 (3 cases) |
+| ADJID.020 | As an Adjustment Processor, I need endorsement transactions linked to the original account reference number, so that every endorsement can be traced to its account. | FR-OP-050 | FR-OP-050 AC1-4 | TC-OP-050.1, 050.2, 050.3, 050.4 (7 cases) |
+| ADJID.021 | As an Adjustment Processor, I need to view the ageing of transactions from the request date to the completion (posting) date, so that slow requests are followed up. | FR-OP-061 | FR-OP-061 AC1-6 | TC-OP-061.1, 061.2, 061.3 (6 cases) |
+| ADJID.022 | As an Adjustment Processor, I need to record and view the endorsement transactions of an account, so that the transaction history is always available. | FR-OP-061 | FR-OP-061 AC1-6 | TC-OP-061.1, 061.2, 061.3 (6 cases) |
+| ADJID.023 | As an Adjustment Processor, I need BIBS to detect duplicate requests by reference number, reason and type and to require a justification when an adjustment breaks the limits of the justification annex, so that no adjustment is processed twice or above the limits without an explanation. | FR-OP-051, FR-OP-058 | FR-OP-051 AC1; FR-OP-058 AC1-4 | TC-OP-051.1, 051.2, 058.1, 058.2, 058.3 (7 cases) |
+| ADJID.024 | As an Adjustment Processor, I need to search by Account Reference Number and pull up the policy, payment and remittance details, so that I see the whole account before processing a request. | FR-OP-005, FR-OP-061 | FR-OP-005 AC1-3; FR-OP-061 AC1-6 | TC-OP-005.1, 005.2, 005.3, 061.1, 061.2, 061.3 (10 cases) |
+| ADJID.025 | Moved to MKTID.019: see that row. | - | - | - |
+| ADJID.026 | As an Adjustment Processor, I need to process a file of accounts with minimal balances from 10.00 to 100.00, so that small balances are written off or credited in one run. | FR-OP-059 | FR-OP-059 AC1-2 | TC-OP-059.1, 059.2 (3 cases) |
+| ADJID.027 | As an Adjustment Processor, I need adjustment amounts allocated automatically by insurer share, so that co-insured accounts are adjusted per insurer correctly. | FR-OP-007 | FR-OP-007 AC1-2 | TC-OP-007.1, 007.2 (4 cases) |
+| ADJID.028 | As an Adjustment Processor, I need a baseline for allowable adjustments, tracking of cumulative adjustments and a prompt above the baseline or on a negative balance, so that over-adjustment is prevented. | FR-OP-058 | FR-OP-058 AC1-4 | TC-OP-058.1, 058.2, 058.3 (5 cases) |
+
+## Commission Receivables (CMRID)
+
+<!-- table: widths=2.1,7.6,2.4,2.9,2.6 caption="User stories: Commission Receivables (CMRID)" size=7.5 -->
+| BRD ID | User story | FR IDs | Acceptance criteria (FR AC numbers) | Test cases |
+|---|---|---|---|---|
+| CMRID.001 | As a Commission Handler / Processor, I need the DP entries of Head Office and the branches taken in from the DP tagging (the DP lists as fallback) and consolidated, so that billing starts from one complete list of direct payment accounts. | FR-OP-090 | FR-OP-090 AC1-3 | TC-OP-090.1, 090.2 (4 cases) |
+| CMRID.002 | As a Commission Handler / Processor, I need to view each DP entry read-only at invoice level with its production record, commission history, remittance status and commission status, so that I can check the entries without the system changing or reconciling them. | FR-OP-091 | FR-OP-091 AC1-4 | TC-OP-091.1, 091.2, 091.3 (5 cases) |
+| CMRID.003 | As a Commission Handler / Processor, I need entries excluded only by approved, configurable rules, kept visible with the rule, reason and time, so that billing, reports and incentives use only valid entries, without subjective exclusion. | FR-OP-091, FR-OP-095 | FR-OP-091 AC1-4; FR-OP-095 AC1-4 | TC-OP-091.1, 091.2, 091.3, 095.1, 095.2, 095.3 (10 cases) |
+| CMRID.004 | As a Commission Handler / Processor, I need commission receivable outputs that classify each entry as Direct Billed (Regular), Direct Billed (Priority) or Regular Commission, with the net commission after partial remittance and the remaining balance, so that billing and reporting use one consistent classification. | FR-OP-098 | FR-OP-098 AC1-3 | TC-OP-098.1, 098.2 (2 cases) |
+| CMRID.005 | As the Commission TL / TH, I need incentive eligibility and amounts computed per invoice from each insurer's SLA criteria, rates and multipliers, so that incentives follow the insurer agreements and never production targets. | FR-OP-095 | FR-OP-095 AC1-4 | TC-OP-095.1, 095.2, 095.3 (5 cases) |
+| CMRID.006 | As the Commission TL / TH, I need several incentive programmes defined by configurable parameters (product, period, branch, marketing unit, minimum premium), so that new programmes are set up without changing the system. | FR-OP-095 | FR-OP-095 AC1-4 | TC-OP-095.1, 095.2, 095.3 (5 cases) |
+| CMRID.007 | As a Commission Handler / Processor, I need commission receivables consolidated and computed automatically, with outputs for billing and the Statement of Account, so that billing needs no manual consolidation. | FR-OP-091, FR-OP-092 | FR-OP-091 AC1-4; FR-OP-092 AC1-3 | TC-OP-091.1, 091.2, 091.3, 092.1, 092.2, 092.3 (9 cases) |
+| CMRID.008 | As a Commission Handler / Processor, I need the status of each DP account updated from the validation and the insurer's answer (Valid, Invalid / Returned) with standard reasons and an audit trail, so that every account's position and history are clear. | FR-OP-091, FR-OP-093 | FR-OP-091 AC1-4; FR-OP-093 AC1-4 | TC-OP-091.1, 091.2, 091.3, 093.1, 093.2, 093.3 (9 cases) |
+| CMRID.009 | As a Commission Handler / Processor, I need validated accounts sorted by insurer and assigned to handlers for billing, with the insurer's approval or rejection recorded, so that each insurer is billed within the SLA and its answer is followed. | FR-OP-092, FR-OP-093 | FR-OP-092 AC1-3; FR-OP-093 AC1-4 | TC-OP-092.1, 092.2, 092.3, 093.1, 093.2, 093.3 (8 cases) |
+| CMRID.010 | As a Commission Handler / Processor, I need OR numbers and amounts, BIR certificates, withholding tax and insurer feedback tracked, so that the collection of each commission is fully documented. | FR-OP-094, FR-OP-096 | FR-OP-094 AC1-3; FR-OP-096 AC1-2 | TC-OP-094.1, 094.2, 096.1, 096.2 (7 cases) |
+| CMRID.011 | As a Commission Handler / Processor, I need commission receivables aged per invoice from the billing or Statement of Account date, so that aged receivables are prioritised for collection. | FR-OP-099 | FR-OP-099 AC1-3 | TC-OP-099.1, 099.2 (3 cases) |
+| CMRID.012 | As a Commission Handler / Processor, I need validation requests sent to insurers and their responses tracked automatically, so that no validation is missed or delayed. | FR-OP-092, FR-OP-093 | FR-OP-092 AC1-3; FR-OP-093 AC1-4 | TC-OP-092.1, 092.2, 092.3, 093.1, 093.2, 093.3 (8 cases) |
+| CMRID.013 | As a Commission Handler / Processor, I need only DP accounts confirmed fully paid by the upstream PR data allowed to proceed to billing, with the basis of each decision, so that BDOI never bills commission on unpaid accounts. | FR-OP-091 | FR-OP-091 AC1-4 | TC-OP-091.1, 091.2, 091.3 (5 cases) |
+| CMRID.014 | As a Commission Handler / Processor, I need production reports per branch and insurer with consolidated yearly data, so that production is analysed by branch and insurer. | FR-OP-097 | FR-OP-097 AC1-2 | TC-OP-097.1, 097.2 (3 cases) |
+| CMRID.015 | As a Commission Handler / Processor, I need to tag BIR withholding tax certificates to the ORs and submit them to Comptrollership for acknowledgement, so that certificates are tracked and acknowledged without paper transmittals. | FR-OP-096 | FR-OP-096 AC1-2 | TC-OP-096.1, 096.2 (3 cases) |
+
+
+# Storyboard index
+
+Each step of the four walkthroughs of chapter 14 is a frame of the storyboard: the persona, the screen, what the user does, what the user sees and the result, the screenshot of the step in chapter 14, the FRs it shows and the slide of the step in the 07 UX Screen Deck of this set. The walkthroughs run in this order on the SIT environment with seed data. The screens are those reviewed with v2.0; where version 2.1 changes a step (for example the direct payment billing of WT-C, FR-OP-091 to FR-OP-093), the FR column names the FR that states the change.
+
+## WT-A A booked invoice from the client's payment to the insurer's official receipt
+
+<!-- table: widths=1.4,2.4,2.8,3.6,3.8,1.6,2.4,1.2 caption="Storyboard of walkthrough WT-A" size=7 -->
+| Frame | Persona | Screen | Action | What the user sees / outcome | Screenshot | FR | UX deck slide |
+|---|---|---|---|---|---|---|---|
+| WT-A.1 | Processing (New Business, BRD-1) | SCR-NB-29 Book Account (New Business) | Opens the account from Ready to Book, checks the invoice and the journal preview and clicks Book Account | The Booked Invoice with its invoice number; the invoice is copied into the Operations ledger. Result: Booked | - | FR-OP-004 | - |
+| WT-A.2 | Cashier | SCR-OP-02 Invoice Search | Searches the ARN on Invoice Search | The new invoice with its gross premium, outstanding premium, Unpaid and With Outstanding Balance. Result: In the ledger | - | FR-OP-004, FR-OP-005 | - |
+| WT-A.3 | Cashier | SCR-OP-08 Receive Payment | Opens Receive Payment, enters the ARN, the payor, the amount paid and the payment date, and checks the preview | Application Preview: Booked, the invoice with each component and the amount applied to it, Excess to Unapplied 0.00. Result: Preview | - | FR-OP-011, FR-OP-018, FR-OP-019 | - |
+| WT-A.4 | Cashier | SCR-OP-10 Receipt | Clicks Issue AR and Apply | Message: <AR> issued and applied to 1 invoice(s); the receipt opens with its application by component. Result: AR issued and applied | - | FR-OP-011, FR-OP-019, FR-OP-027 | - |
+| WT-A.5 | Remittance Processor | SCR-OP-24 Extraction | Enters the invoice number on Extraction and clicks Run Extraction, then opens the run | The run tags the invoice Extracted with its paid AR and the batch number. Result: Extracted into a batch | - | FR-OP-030, FR-OP-031 | - |
+| WT-A.6 | Remittance Processor | SCR-OP-26 Remittance Batch | Opens the batch, checks the totals strip and the account, clicks Preview and Submit and submits the batch | The batch is For Approval; the history shows the submission. Result: For approval | - | FR-OP-032, FR-OP-033 | - |
+| WT-A.7 | Remittance TL / TH | SCR-OP-26 Remittance Batch | Opens the batch from For Approval and clicks Approve and Push | The batch is Approved - with Disbursement with its payment request and the commission OR. Result: Approved | - | FR-OP-035 | - |
+| WT-A.8 | Disbursement | SCR-OP-36 Disbursement Queue | Acknowledges the payment request and assigns the DV number | The request is on the DV Assigned tab with its DV number. Result: DV assigned | - | FR-OP-036, FR-OP-120 | - |
+| WT-A.9 | Remittance Processor | SCR-OP-27 Insurer OR Upload | Uploads the insurer's schedule with its OR number and opens the upload run | Records Read 1, OR Matches Paid PR 1; the account shows the insurer OR as Matched. Result: Insurer OR received | - | FR-OP-037 | - |
+| WT-A.10 | Remittance Processor | SCR-OP-03 Invoice 360 | Opens Invoice 360 of the invoice, Remittances tab | Paid and Fully Remitted; the remittance batch of the invoice. Result: Closed | - | FR-OP-005, FR-OP-036 | - |
+
+## WT-B Cancellation of a paid and remitted policy, from the request to the refund
+
+<!-- table: widths=1.4,2.4,2.8,3.6,3.8,1.6,2.4,1.2 caption="Storyboard of walkthrough WT-B" size=7 -->
+| Frame | Persona | Screen | Action | What the user sees / outcome | Screenshot | FR | UX deck slide |
+|---|---|---|---|---|---|---|---|
+| WT-B.1 | Marketing Collection | SCR-OP-38 New Endorsement Request | Opens New Request, searches the policy number and ticks the invoice | The booked invoice with its policy number, ARN, assured, insurer, payment and lock; the policy details of the invoice. Result: Policy chosen | - | FR-OP-050 | - |
+| WT-B.2 | Marketing Collection | SCR-OP-38 New Endorsement Request | Chooses Financial – Change of Cover, Flat Cancellation, the reason, the effective date and the description, and clicks Recompute | Recompute & Submit: the premium and commission change, before and after per component and per insurer. Result: Recomputed | - | FR-OP-050, FR-OP-054 | - |
+| WT-B.3 | Marketing Collection | SCR-OP-39 Endorsement Request | Clicks Submit for Validation | The request opens For Validation with the Policy No., ARN and Invoice chips; the invoice is locked by Adjustment. Result: For validation | - | FR-OP-050, FR-OP-006 | - |
+| WT-B.4 | Adjustment Processor | SCR-OP-39 Endorsement Request | Opens the request from the workbench and clicks Validate | The request is For Approval. Result: Validated | - | FR-OP-053 | - |
+| WT-B.5 | Adjustment TL | SCR-OP-39 Endorsement Request | Opens the request and clicks Approve | The request is For Posting. Result: Approved | - | FR-OP-053 | - |
+| WT-B.6 | Adjustment Processor | SCR-OP-40 Posting Batches | Ticks the request on Posting Batches and clicks Post Selected | The batch result: the request Posted. Result: Posted | - | FR-OP-056 | - |
+| WT-B.7 | Adjustment Processor | SCR-OP-39 Endorsement Request | Opens the Policy Transactions tab of the request and the journal of the last transaction | The original booking, the cancellation with its premium, taxes and commission change and gross premium 0.00 after it, the refund of the excess payment to the client, and the journal lines of the re-applied payment. Result: Policy history | - | FR-OP-057, FR-OP-061 | - |
+| WT-B.8 | Cashier | SCR-OP-12 Unapplied Payment | Opens the unapplied payment left by the re-application, assigns a refund to the client and submits it | The disposition is For Approval. Result: Refund for approval | - | FR-OP-022 | - |
+| WT-B.9 | Cashiering TL / TH | SCR-OP-12 Unapplied Payment | Opens the unapplied payment and clicks Approve | The disposition is Completed and the balance 0.00; the refund is sent to Disbursement. Result: Refund approved | - | FR-OP-022 | - |
+| WT-B.10 | Disbursement | SCR-OP-36 Disbursement Queue | Opens the Disbursement Queue | The refund request to the client in To Acknowledge. Result: Refund with Disbursement | - | FR-OP-120 | - |
+
+## WT-C Direct payment commission and the reconciliation of the insurer's production
+
+<!-- table: widths=1.4,2.4,2.8,3.6,3.8,1.6,2.4,1.2 caption="Storyboard of walkthrough WT-C" size=7 -->
+| Frame | Persona | Screen | Action | What the user sees / outcome | Screenshot | FR | UX deck slide |
+|---|---|---|---|---|---|---|---|
+| WT-C.1 | Commission Handler / Processor | SCR-OP-54 DP Billing | Opens the billing, clicks Record Answers, marks the account Approved and saves | The billing is Approved by Insurer - to Collect. Result: Insurer approved | - | FR-OP-093 | - |
+| WT-C.2 | Commission Handler / Processor | SCR-OP-54 DP Billing | Clicks Record Collection with the collection date and the bank account | The billing is Closed - PR Reversed with the commission OR. Result: Collected | - | FR-OP-094 | - |
+| WT-C.3 | Commission Handler / Processor | SCR-OP-03 Invoice 360 | Opens Invoice 360 of the direct payment invoice, Movements tab | The premium receivable reversal and the commission applied. Result: PR reversed | - | FR-OP-094, FR-OP-005 | - |
+| WT-C.4 | Production Reconciliation Handler | SCR-OP-45 Reconciliation Cycle | Opens the cycle, the With Discrepancy item, and records the company concerned, the disposition and the feedback | The item review with the BDOI and insurer values side by side and the gross premium difference. Result: Feedback recorded | - | FR-OP-077 | - |
+| WT-C.5 | Production Reconciliation Handler | SCR-OP-45 Reconciliation Cycle | Selects the insurer-only item and sets its disposition | The item Unmatched No Booking with its disposition. Result: Disposition set | - | FR-OP-077, FR-OP-076 | - |
+| WT-C.6 | Production Reconciliation Handler | SCR-OP-48 Unbooked Accounts | Opens Unbooked Accounts | The policy the insurer reported, not booked by BDOI, with its disposition. Result: Followed | - | FR-OP-076 | - |
+
+## WT-D Controls and the messages the user sees
+
+<!-- table: widths=1.4,2.4,2.8,3.6,3.8,1.6,2.4,1.2 caption="Storyboard of walkthrough WT-D" size=7 -->
+| Frame | Persona | Screen | Action | What the user sees / outcome | Screenshot | FR | UX deck slide |
+|---|---|---|---|---|---|---|---|
+| WT-D.1 | Marketing TL / UH | SCR-OP-29 Remittance Hold | Marketing Collection raises a hold on the invoice with its reason and hold-until date; the Marketing Team Leader opens it and clicks Approve hold | The hold is On Hold; the invoice is flagged On Hold and stays out of the extraction. Result: Hold approved | - | FR-OP-111 | - |
+| WT-D.2 | Marketing Collection | SCR-OP-38 New Endorsement Request | Searches on New Request the invoice that is in the remittance batch for approval | The invoice reads Locked by Remittance and cannot be selected; a request on it is refused with the message Invoice <invoice> is locked by Remittance. Result: Refused | - | FR-OP-006, FR-OP-050 | - |
+| WT-D.3 | Cashier | SCR-OP-10 Receipt | Opens a receipt, clicks Cancel Receipt, chooses the reason and submits the cancellation | The receipt shows the cancellation For Approval in its workflow header. Result: Cancellation requested | - | FR-OP-013 | - |
+| WT-D.4 | Cashiering TL / TH | SCR-OP-10 Receipt | Opens the receipt and clicks Approve and Post | The receipt is Cancelled; its unapplied balance is closed. Result: Cancelled | - | FR-OP-013 | - |
+| WT-D.5 | Remittance TL / TH | SCR-OP-26 Remittance Batch | Submits the batch in review for approval, then tries to approve it | Message: Batch <batch> must be approved by another user. Result: Refused | - | FR-OP-035 | - |
+
 
 # Appendix: Screen standards
 

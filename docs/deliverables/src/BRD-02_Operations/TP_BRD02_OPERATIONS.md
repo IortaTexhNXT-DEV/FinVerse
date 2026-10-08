@@ -2,14 +2,14 @@
 # Word summary of the BRD-2 Operations test plan. The tables marked <!-- tp:... --> are filled
 # from brd02_cases.yaml. Build: python docs/deliverables/src/testplans/build_test_plan.py brd02_cases.yaml
 title: Operations Test Plan
-subtitle: BRD-2 Operations (Cashiering, Remittance, Production Reconciliation, Adjustment / Cancellation, Commission Receivables) and Addendum 1 - test conditions, scenarios and cases
+subtitle: BRD-2 Operations v1.01 (Cashiering, Remittance, Production Reconciliation, Adjustment / Cancellation, Commission Receivables) and the May 2026 annexes - test conditions, scenarios and cases
 doc_type: Test Plan
 doc_code: TestPlan
 brd: BRD-02
 name: Operations Summary
 doc_id: BIBS-TP-BRD-02
-version: "2.0"
-date: 28 September 2026
+version: "2.1"
+date: 08 October 2026
 status: Issued for BDOI business sign-off
 header_title: Test Plan BRD-2 Operations
 h1_page_break: false
@@ -32,14 +32,20 @@ control:
     reviewer: iorta TechNXT Project Manager
     approver: BDOI business units (sign-off)
     change: "Release set v2.0: cases re-traced to FRS v2.0 and its screen specifications (Screen ID on every case, Screens sheet); one screen case per screen and one message case per screen or dialog of the messages catalogue added. Status as of 28-Sep-2026"
+  - version: "2.1"
+    date: 08 Oct 2026
+    author: iorta TechNXT QA
+    reviewer: iorta TechNXT Project Manager
+    approver: BDOI business units (sign-off)
+    change: "Re-based on FRS v2.1 (Operations BRD v1.01 and the May 2026 annexes): the cases of FR-OP-017 (check pick-up) and FR-OP-026 (Cashiering BIR 2307) retired with their FRs and the Check Pick-up screen case; cases rewritten for minimal balances at processing (FR-OP-023), the PR 2307 reversal of Marketing Collection (FR-OP-113, 121) and Commission Receivables (FR-OP-090 to 095); cases added for the payment history, audit trail, extraction source and pending endorsements, draft schedule, early incentive, return to Marketing, recompute inputs, justification limits, ageing, peso tolerance, annotations, classification and the new FR-OP-099 (ageing); new IDs BRQID.007, RMTID.041 and MKTID.014-019 traced"
 distribution:
   - {name: "Head, Operations Services", role: Approver, organisation: BDOI, purpose: Review and sign-off}
-  - {name: Cashiering, role: Business tester, organisation: BDOI, purpose: "Receipts, payment files, application, unapplied items, BIR 2307"}
+  - {name: Cashiering, role: Business tester, organisation: BDOI, purpose: "Receipts, payment files, application, unapplied items, minimal balances"}
   - {name: Remittance, role: Business tester, organisation: BDOI, purpose: "Extraction, batches, approval, insurer ORs, incentives"}
   - {name: Production Reconciliation, role: Business tester, organisation: BDOI, purpose: "Registers, insurer feedback, matching, closure"}
   - {name: Adjustment / Cancellation, role: Business tester, organisation: BDOI, purpose: "Endorsement requests, recompute, posting"}
   - {name: Commission Receivables, role: Business tester, organisation: BDOI, purpose: "Direct payment, incentives, BIR certificates"}
-  - {name: "Marketing, Comptrollership and Disbursement", role: Business tester, organisation: BDOI, purpose: "Holds, special remittances, 2307 tags, certificates, payment requests"}
+  - {name: "Marketing, Comptrollership and Disbursement", role: Business tester, organisation: BDOI, purpose: "Holds, special remittances, the PR 2307 reversal from tag to release, returned endorsement requests, certificates, payment requests"}
   - {name: Business Project Services, role: UAT coordinator, organisation: BDO Unibank ESG, purpose: UAT planning and traceability}
   - {name: Project team, role: Delivery, organisation: iorta TechNXT, purpose: "System test, issue resolution, UAT support"}
 ---
@@ -48,22 +54,22 @@ distribution:
 
 ## Purpose
 
-This document summarises the test plan for BRD-2 Operations in BIBS (BDOI Broker System, on iNXT BrokerVerse). It tells the BDOI Operations teams what will be tested, how, with which data and by whom, and when testing is complete. The test conditions, scenarios and cases are in the Excel workbook of the same version, `04_BIBS_TestPlan_BRD-02_Operations_v2.0.xlsx`, which the testers use during execution.
+This document summarises the test plan for BRD-2 Operations in BIBS (BDOI Broker System, on iNXT BrokerVerse). It tells the BDOI Operations teams what will be tested, how, with which data and by whom, and when testing is complete. The test conditions, scenarios and cases are in the Excel workbook of the same version, `04_BIBS_TestPlan_BRD-02_Operations_v2.1.xlsx`, which the testers use during execution.
 
-Every case traces to a functional requirement (FR) of FRS BRD-2 v2.0 and to the BRD requirement IDs (BRQID, CSHID, RMTID, ADJID, PRCID, CMRID, MKTID, DBMID) that the FR meets. The expected results quote the messages, with their codes, as BIBS shows them.
+Every case traces to a functional requirement (FR) of FRS BRD-2 v2.1 and to the BRD requirement IDs (BRQID, CSHID, RMTID, ADJID, PRCID, CMRID, MKTID, DBMID) that the FR meets. The expected results quote the messages, with their codes, as BIBS shows them.
 
 ## Scope
 
-In scope are all 83 FRs of FRS BRD-2 v2.0, grouped as in the FRS:
+In scope are all 82 FRs of FRS BRD-2 v2.1, grouped as in the FRS. FR-OP-017 (check pick-up, CSHID.009) and FR-OP-026 (Cashiering processing of BIR 2307, CSHID.026 and 027) are removed from scope by the new BRD version, and their test conditions TC-OP-017.1-017.2 and TC-OP-026.1-026.3 are retired; FR-OP-099 (ageing of commission receivables) is new:
 
 - access and invoice ledger: log-in, role-based access, the Operations home, the invoice ledger, Invoice 360, invoice locks, co-insurance shares, batch run reports and report access (FR-OP-001 to 009);
-- Cashiering: receipt series, ARs and ORs, cancellation and reinstatement, payment files, PDC warehouse, check pick-up, matching and application by component, pre-booked payments, AR Insurance, commission ORs, unapplied dispositions, minimal balances, search, batch printing, BIR 2307, accounting entries and reports (FR-OP-010 to 028);
-- Remittance: extraction, eligibility, batch review and exclusion (addendum), processing, schedule and payment request, approval, Disbursement tracking, insurer OR upload, early remittance incentive, search, special remittances and reports (FR-OP-030 to 041);
-- Adjustment / Cancellation: requests, duplicates, documents, validation and approval, recompute per insurer (addendum), TSI above the package limit, posting, excess and AR Insurer, over-adjustment, minimal balance file, slips, search and reports (FR-OP-050 to 062);
-- Production Reconciliation: schedules, manual extracts, register file, sending, feedback upload, matching within tolerance, unbooked production, feedback and pairing, early incentive validation, closure and reports (FR-OP-070 to 080);
-- Commission Receivables: DP lists, validation and tagging, billing, insurer answers and SLA, collection and PR reversal, incentives, BIR certificates, estimated items and reports (FR-OP-090 to 098);
-- Marketing collection items: schedule sending, holds, special remittance requests, 2307 tags and endorsement slips (FR-OP-110 to 114);
-- the Disbursement queue and 2307 release (FR-OP-120, 121) and the interfaces, flow-in feeds and New Business payment gate (FR-OP-130 to 132).
+- Cashiering: receipt series, ARs and ORs, cancellation and reinstatement, payment files, PDC warehouse, matching and application by component, pre-booked payments, AR Insurance, commission ORs, unapplied dispositions, minimal balances cleared at processing, search and the audit trail, batch printing, accounting entries and reports (FR-OP-010 to 028);
+- Remittance: extraction with its source and duplicate prevention, eligibility including pending financial endorsements, batch review and exclusion, processing, draft and issued schedule and payment request, approval, Disbursement tracking, insurer OR upload, early remittance incentive (RMTID.041), search, special remittances and reports (FR-OP-030 to 041);
+- Adjustment / Cancellation: requests, duplicates, documents, validation, approval and return to Marketing, recompute per insurer, TSI above the package limit, posting, excess and AR Insurer, justification and over-adjustment limits, minimal balance file, slips, search, ageing to the posting date and reports (FR-OP-050 to 062);
+- Production Reconciliation: schedules, manual extracts, register file, sending, feedback upload, matching within the peso-equivalent tolerance, unbooked production, annotations, feedback and pairing, the check of the early incentive applied by insurers, closure and reports (FR-OP-070 to 080);
+- Commission Receivables: DP entries from the tagging, read-only review, rule-based exclusion and eligibility from the fully paid status, billing and Statement of Account, insurer answers and account status, collection and PR reversal, SLA incentives, BIR certificates, estimated items, classification, reports and invoice-level ageing (FR-OP-090 to 099);
+- Marketing collection items: schedule sending, holds, special remittance requests, the PR 2307 reversal from tag to routing, and endorsement slips (FR-OP-110 to 114);
+- the Disbursement queue and the release of the 2307 certificates without posting (FR-OP-120, 121) and the interfaces, flow-in feeds and New Business payment gate (FR-OP-130 to 132).
 
 The roles-and-access sheet checks each Operations action against the roles that may and may not perform it (the grants of FRS section 3.3).
 
@@ -71,7 +77,7 @@ The roles-and-access sheet checks each Operations action against the roles that 
 
 - The Collection system, the Disbursement system and the GL mapping specification (OQ01, OQ02, OQ07). BRD-4 and BRD-5 test plans cover their replacements; this plan tests the hand-offs, extracts and the in-app Disbursement queue that stand in until then.
 - Electronic transfers (file transfer, system-to-system interfaces, shared drive folders) to insurers, BDO bank channels and the Marketing and Claims systems (OQ17, OQ22, OQ29). Files are uploaded by hand and sent by e-mail in this phase, and the cases test that route.
-- Payout of incentives to branches (CMRID.006, OQ39). The cases stop at the posted incentive and the Disbursement hand-off.
+- Payout of incentives to branches (CLR-OP-58, OQ39). The cases stop at the posted incentive.
 - Maintenance of products and incentive criteria (BRD-3), booking of new accounts (BRD-1) and renewal (BRD-6). This plan uses booked invoices as given.
 - Performance and volume testing (deliverable 28).
 
@@ -80,9 +86,9 @@ The roles-and-access sheet checks each Operations action against the roles that 
 <!-- table: widths=1.2,8.6,4.2 caption="Reference documents" -->
 | Ref. | Document | Version |
 |---|---|---|
-| R1 | Functional Requirements Specification BRD-2 Operations (`02_BIBS_FRS_BRD-02_Operations_v2.0.docx`) | 2.0, 28 Sep 2026 |
-| R2 | Operations BRD and Addendum 1 | BRD v1.0 Jul-2025; Addendum 1 18-Dec-2025 |
-| R3 | Test plan workbook BRD-2 (`04_BIBS_TestPlan_BRD-02_Operations_v2.0.xlsx`) | 2.0 |
+| R1 | Functional Requirements Specification BRD-2 Operations (`02_BIBS_FRS_BRD-02_Operations_v2.1.docx`) | 2.1, 08 Oct 2026 |
+| R2 | Operations BRD v1.01 and the Operations Central Addendum 1 annexes of May 2026 (file Operations_WS Addendum) | BRD v1.01 15-Apr-2026; annexes 8 to 21-May-2026 |
+| R3 | Test plan workbook BRD-2 (`04_BIBS_TestPlan_BRD-02_Operations_v2.1.xlsx`) | 2.1 |
 | R6 | Test plan BRD-1 New Business (booking, payment gate) | 1.0 |
 
 # Test approach
@@ -115,8 +121,8 @@ The roles-and-access sheet checks each Operations action against the roles that 
 | Workflow | A stage transition, approval, return or closure of a receipt, batch, request, cycle, billing or payment request |
 | Report-output | Reports, registers, schedules and exports; content checked against the screen |
 | Upload-download | Payment files, insurer files, DP lists, registers, slips and protected e-mails |
-| Screen | The screen matches its specification in FRS v2.0 chapter 13: fields, order, labels, mandatory markers, defaults, lists and buttons (TC-OP-SCR-nn, one per screen) |
-| Message | Every error, validation and warning message of one screen or dialog, word for word with its code (TC-OP-MSG-nn, from the messages catalogue of FRS v2.0 chapter 15) |
+| Screen | The screen matches its specification in FRS v2.1 chapter 13: fields, order, labels, mandatory markers, defaults, lists and buttons (TC-OP-SCR-nn, one per screen) |
+| Message | Every error, validation and warning message of one screen or dialog, word for word with its code (TC-OP-MSG-nn, from the messages catalogue of FRS v2.1 chapter 15) |
 
 ## Reading the workbook
 
@@ -131,7 +137,7 @@ The workbook has a README sheet that explains every column. The sheets are Docum
 |---|---|
 | System test | BIBS is deployed on SIT with the seed data; the test mailboxes of the four seed insurers and the Operations users receive mail; the seed accounting rules of the Operations events are active; this plan is reviewed by the iorta TechNXT project manager. |
 | Persona end-to-end | All High-priority system test cases are run; no open Critical issue; the e-mail relay and the scheduled jobs (remittance extraction, production register extraction, hold expiry, DP feedback follow-up, minimal balance sweep, flow-in feeds) run on SIT. |
-| UAT | FRS BRD-2 v2.0 is signed off or its open comments are agreed; the system test exit criteria are met; the UAT environment holds masked data (section 4.1); BDOI testers have user IDs with the roles of section 5; Comptrollership has confirmed the GL accounts of the Operations events for UAT (OQ07); receipt series match BDOI's BIR registration (OQ05). |
+| UAT | FRS BRD-2 v2.1 is signed off or its open comments are agreed; the system test exit criteria are met; the UAT environment holds masked data (section 4.1); BDOI testers have user IDs with the roles of section 5; Comptrollership has confirmed the GL accounts of the Operations events for UAT (OQ07); receipt series match BDOI's BIR registration (OQ05). |
 
 ## Exit criteria
 
@@ -221,7 +227,7 @@ Every FR has at least one positive and one negative case, and every BRD ID is co
 
 ## Coverage by screen
 
-Every screen of the FRS v2.0 screen specifications has its screen case and the cases that start on it. A case is linked to the screen where the tester starts; the steps may go on to other screens.
+Every screen of the FRS v2.1 screen specifications has its screen case and the cases that start on it. A case is linked to the screen where the tester starts; the steps may go on to other screens.
 
 <!-- tp:screens -->
 

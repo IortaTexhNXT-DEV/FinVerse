@@ -128,15 +128,15 @@ class TaxApiIT {
     api.doGet("auditor", RETURNS + "?companyId=" + c + "&year=2026&status=PAID")
         .andExpect(status().isOk());
 
-    JsonNode vat =
+    JsonNode ewt =
         api.read(
             api.doPost(
                 "accountant",
                 RETURNS,
-                Json.of("companyId", c, "formCode", "2550Q", "periodStart", "2026-10-01")));
+                Json.of("companyId", c, "formCode", "0619-E", "periodStart", "2026-11-01")));
     api.doPost(
             "accountant",
-            RETURNS + "/" + vat.get("id").asLong() + "/cancel",
+            RETURNS + "/" + ewt.get("id").asLong() + "/cancel",
             Json.of("reason", "Prepared by mistake"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.status").value("CANCELLED"));

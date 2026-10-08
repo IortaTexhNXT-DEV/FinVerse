@@ -8,8 +8,8 @@ doc_code: TestPlan
 brd: BRD-10
 name: Sanction Screening Summary
 doc_id: BIBS-TP-BRD-10
-version: "1.0"
-date: 25 September 2026
+version: "1.1"
+date: 08 October 2026
 status: Issued for BDOI review
 header_title: Test Plan BRD-10 Sanction Screening
 h1_page_break: false
@@ -26,6 +26,12 @@ control:
     reviewer: iorta TechNXT Project Manager
     approver: BDOI Product Owner (pending)
     change: First issue for BDOI review, with the Excel workbook of the same version
+  - version: "1.1"
+    date: 08 Oct 2026
+    author: iorta TechNXT QA
+    reviewer: iorta TechNXT Business Analysis
+    approver: BDOI Product Owner (pending)
+    change: "Re-based on FRS BRD-10 v1.1 (Sanction Screening and Risk Profiling BRD v04172026, unchanged; Report List of 13-May-2026): case for the Name Matching Fall-out report added."
 distribution:
   - {name: "Product Owner, Marketing Business System", role: Approver, organisation: BDOI, purpose: Review and sign-off}
   - {name: Chief Compliance Officer and Compliance unit, role: Business tester, organisation: BDOI, purpose: "Configuration, watchlist, compliance review, STR, reports"}
@@ -39,9 +45,9 @@ distribution:
 
 ## Purpose
 
-This document summarises the test plan for BRD-10 Sanction Screening and Risk Profiling in BIBS (BDOI Broker System, on iNXT BrokerVerse). It tells the Compliance unit and the other BDOI departments what will be tested, how, with which data and by whom, and when testing is complete. The test conditions, scenarios and cases themselves are in the Excel workbook of the same version, `BIBS_TestPlan_BRD-10_Sanction_Screening_v1.0.xlsx`, which the testers use during execution.
+This document summarises the test plan for BRD-10 Sanction Screening and Risk Profiling in BIBS (BDOI Broker System, on iNXT BrokerVerse). It tells the Compliance unit and the other BDOI departments what will be tested, how, with which data and by whom, and when testing is complete. The test conditions, scenarios and cases themselves are in the Excel workbook of the same version, `BIBS_TestPlan_BRD-10_Sanction_Screening_v1.1.xlsx`, which the testers use during execution.
 
-Every case traces to a functional requirement (FR) of FRS BRD-10 v1.0 and to the BRD requirement IDs (SNSRP-nnn, and the page references of the to-be process on p.6-8) that the FR meets.
+Every case traces to a functional requirement (FR) of FRS BRD-10 v1.1 and to the BRD requirement IDs (SNSRP-nnn, and the page references of the to-be process on p.6-8) that the FR meets.
 
 The cases are written from the FRS: the expected results quote the message texts of the FRS, and the screen paths and button labels are those of the FRS. They are checked against the screens before the system test starts.
 
@@ -49,7 +55,7 @@ All list entries and client names in the test data are invented. No real sanctio
 
 ## Scope
 
-In scope are all 44 FRs of FRS BRD-10 v1.0 and the BRD IDs they trace to:
+In scope are all 44 FRs of FRS BRD-10 v1.1 and the BRD IDs they trace to:
 
 - access, segregation of duties and the immutable audit log (FR-SS-001, 091, 092);
 - versioned configuration under maker-checker: matching criteria, risk categories and rules, approval, assignment and SLA matrices, review and STR templates, dispositions (FR-SS-010 to 019);
@@ -77,11 +83,11 @@ The roles-and-access sheet checks each screening action against the roles that m
 <!-- table: widths=1.2,8.6,4.2 caption="Reference documents" -->
 | Ref. | Document | Version |
 |---|---|---|
-| R1 | Functional Requirements Specification BRD-10 Sanction Screening (`BIBS_FRS_BRD-10_Sanction_Screening_v1.0.docx`) | 1.0, 25 Sep 2026 |
+| R1 | Functional Requirements Specification BRD-10 Sanction Screening (`BIBS_FRS_BRD-10_Sanction_Screening_v1.1.docx`) | 1.1, 08 Oct 2026 |
 | R2 | Sanction Screening and Risk Profiling BRD | Prepared 10-Apr-2026; approved 16 to 17-Apr-2026 |
-| R3 | Test plan workbook BRD-10 (`BIBS_TestPlan_BRD-10_Sanction_Screening_v1.0.xlsx`) | 1.0 |
-| R5 | FRS BRD-11 User Access Maintenance (roles, sign-in, session policy) | 1.0 |
-| R6 | BRD discrepancy and clarification register (`BIBS_Register_BRD-00_Discrepancies_and_Clarifications_v1.0.xlsx`) | 1.0 |
+| R3 | Test plan workbook BRD-10 (`BIBS_TestPlan_BRD-10_Sanction_Screening_v1.1.xlsx`) | 1.1 |
+| R5 | FRS BRD-11 User Access Maintenance (roles, sign-in, session policy) | Current version of the business sign-off pack |
+| R6 | BRD discrepancy and clarification register (`BIBS_Register_BRD-00_Discrepancies_and_Clarifications_v1.2.xlsx`) | 1.2 |
 
 # Test approach
 
@@ -127,7 +133,7 @@ The workbook has a README sheet that explains every column. The sheets are Docum
 |---|---|
 | System test | Sanction Screening is deployed on SIT with its roles, parameters, lists and jobs; the seed data (invented names only) is loaded; screen labels and messages have been compared with this plan and differences recorded; the test mailboxes receive mail. |
 | Persona end-to-end | All High-priority system test cases are run; no open Critical issue; five committee users exist; the SLA monitor and ingestion jobs run on SIT. |
-| UAT | FRS BRD-10 v1.0 is signed off or its open comments are agreed; Compliance has entered the configuration to be used in UAT (thresholds, risk categories, matrices, SLAs) through maker-checker; the system test exit criteria are met; the UAT environment holds masked client data and invented list entries (section 4.1); BDOI testers have user IDs with the roles of section 5 and attended the walkthrough. |
+| UAT | FRS BRD-10 v1.1 is signed off or its open comments are agreed; Compliance has entered the configuration to be used in UAT (thresholds, risk categories, matrices, SLAs) through maker-checker; the system test exit criteria are met; the UAT environment holds masked client data and invented list entries (section 4.1); BDOI testers have user IDs with the roles of section 5 and attended the walkthrough. |
 
 ## Exit criteria
 

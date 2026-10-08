@@ -1699,7 +1699,7 @@ rows:
 
 The CSF BRD and the Case Management Addendum write their requirements as user stories ("As a <Persona>, I must be able to <Requirement> so that ..."). This appendix restates each requirement of the file Customer Servicing Facility_Case Management (received on 08-Oct-2026) as one user story, with the FRs that meet it, their acceptance criteria and the test conditions of the test plan with their number of cases. The BRD wording is kept with tidied grammar; where the BRD names the persona "System", the story is written for the persona who needs the result. The personas are those of section 3.1. Acceptance criteria are numbered in the order of the FR (AC1 is the first criterion of the FR). The table has 35 rows: the 20 rows of the CSF BRD (BRCSF-001 to 011 with their process steps), the e-mail items CSF-EM07, CSF-EM09 and CSF-EM10, the eleven rows of the addendum (BRCSFCM.001 to 008 and 010 to 012) and its lists of values.
 
-<!-- table: widths=1.9,8.0,2.3,2.8,3.4 caption="User-story view: BRD requirement, user story, FRs, acceptance criteria and test cases" size=8 -->
+<!-- table: widths=2.4,7.5,2.3,2.8,3.4 caption="User-story view: BRD requirement, user story, FRs, acceptance criteria and test cases" size=8 -->
 | BRD ID | User story | FR IDs | Acceptance criteria | Test cases |
 |---|---|---|---|---|
 | BRCSF-001 | As the System Administrator, I need to restrict access to authorised users, so that only authorised personnel can use the Customer Servicing Facility. | FR-CSF-001, FR-CSF-002 | FR-CSF-001 AC1-3; FR-CSF-002 AC1-2 | TC-CSF-001.1 to 001.5, 002.1 to 002.3 (14 cases) |

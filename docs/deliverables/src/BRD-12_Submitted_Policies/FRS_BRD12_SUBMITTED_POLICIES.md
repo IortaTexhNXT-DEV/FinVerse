@@ -1844,7 +1844,7 @@ rows:
 
 The BRD writes each requirement as a user story ("As a <persona>, I want / I must ... so that ...") with Given / When / Then acceptance criteria. This appendix gives each requirement of the issue received on 08-Oct-2026 (BRIDSP-01 to 36) as one user story, with the FRs that meet it, their acceptance criteria and the test conditions of the test plan with their number of cases. The BRD wording is kept with tidied grammar; where the BRD names the persona "System", "User" or "Marketing User", the story names the persona of section 3.1 who acts or needs the result. Acceptance criteria are numbered in the order of the FR (AC1 is the first criterion of the FR). The table has 36 rows; BRIDSP-04 is met in Release 2.
 
-<!-- table: widths=1.9,8.0,2.3,2.8,3.4 caption="User-story view: BRD requirement, user story, FRs, acceptance criteria and test cases" size=8 -->
+<!-- table: widths=2.4,7.5,2.3,2.8,3.4 caption="User-story view: BRD requirement, user story, FRs, acceptance criteria and test cases" size=8 -->
 | BRD ID | User story | FR IDs | Acceptance criteria | Test cases |
 |---|---|---|---|---|
 | BRIDSP-01 (p.8) | As a Submitted Handler (CBG), I need to upload the submitted policies (Excel, CSV, ODS, PDF and the like) into BIBS, so that the uploaded data is accepted for further processing. | FR-SP-001 | FR-SP-001 AC1-4 | TC-SP-001.1 to 001.6 (8 cases) |

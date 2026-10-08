@@ -1,4 +1,4 @@
-// BRD-7 Claims: claim lifecycle by actor (FRS section 2.2; BRD p.24-27, BRCLM.001-043).
+// BRD-7 Claims: claim lifecycle by actor (FRS section 2.2; BRD p.26-29, BRCLM.001-043).
 // Colour tokens (@HEADER_BLUE ...) are replaced by tools/deliverables before rendering.
 // Layout: three rows of four steps; the fill colour of a step is its actor (legend at the bottom).
 digraph clm_process {
@@ -8,7 +8,7 @@ digraph clm_process {
   edge  [color="@HEADER_BLUE", arrowsize=0.7, penwidth=1.1, fontname="Arial", fontsize=9, fontcolor="@MUTED"];
 
   // Actors: client / Marketing = @BG_BLUE, Claims Officer = @WHITE, TL / TH = @AMBER_BG, system = @DIRTY_WHITE, report users = @SUCCESS_BG
-  s1  [label=<<b>1. Notice of loss</b><br/><font point-size="9">Client, AO or branch<br/>PLA / CRF (p.24-25)</font>>, fillcolor="@BG_BLUE"];
+  s1  [label=<<b>1. Notice of loss</b><br/><font point-size="9">Client, AO or branch<br/>PLA / CRF (p.26-27)</font>>, fillcolor="@BG_BLUE"];
   s2  [label=<<b>2. Record claim</b><br/><font point-size="9">Claims Officer; cover, version<br/>BRCLM.003, 004, 037</font>>, fillcolor="@WHITE"];
   s3  [label=<<b>3. Premium check</b><br/><font point-size="9">System; invoice ledger<br/>BRCLM.001</font>>, fillcolor="@DIRTY_WHITE"];
   s4  [label=<<b>4. Loss advice</b><br/><font point-size="9">Claims Officer to insurers<br/>BRCLM.041, 043</font>>, fillcolor="@WHITE"];

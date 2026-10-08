@@ -13,6 +13,7 @@ import { formatDateTime } from '@/utils/format';
 import { adjustmentApi } from './api';
 import type { WriteOff } from './api';
 import { displayNameOf } from '@/api/users';
+import { CellStack } from '@/components/ui/CellStack';
 
 const COLUMNS: Column<WriteOff>[] = [
   { key: 'file', header: 'File', render: (w) => w.fileRef },
@@ -46,7 +47,9 @@ const COLUMNS: Column<WriteOff>[] = [
   {
     key: 'at',
     header: 'Processed',
-    render: (w) => `${formatDateTime(w.createdAt)} · ${displayNameOf(w.createdBy)}`,
+    render: (w) => (
+      <CellStack main={formatDateTime(w.createdAt)} sub={displayNameOf(w.createdBy)} />
+    ),
   },
 ];
 

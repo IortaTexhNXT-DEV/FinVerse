@@ -246,6 +246,6 @@ describe('Renewal module', () => {
       await screen.findByText('Premium outstanding on the expiring invoice', { exact: false }),
     ).toBeInTheDocument();
     expect(await screen.findByRole('button', { name: 'Set Disposition' })).toBeInTheDocument();
-    expect(screen.getByText('Expiring account')).toBeInTheDocument();
+    expect(screen.getByText('Expiring Account')).toBeInTheDocument();
   });
 });

@@ -1,4 +1,5 @@
 import { AlarmClock } from 'lucide-react';
+import { titleCase } from '@/utils/format';
 
 /** A tile of a workbench: a count that opens its list. */
 export interface WorkTile {
@@ -23,7 +24,9 @@ export function WorkTiles({ tiles, label }: Readonly<{ tiles: WorkTile[]; label:
           aria-pressed={t.active === true}
           onClick={t.onClick}
         >
-          <span className="stage-tile-name">{t.label}</span>
+          <span className="stage-tile-name" title={titleCase(t.label)}>
+            {titleCase(t.label)}
+          </span>
           <span className="stage-tile-count">{t.value}</span>
           {t.alert === true && t.value > 0 && (
             <span className="stage-tile-meta">

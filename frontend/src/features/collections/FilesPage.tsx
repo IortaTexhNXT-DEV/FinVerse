@@ -24,6 +24,7 @@ import { displayNameOf } from '@/api/users';
 import { DateInput } from '@/components/ui/DateInput';
 import { PeriodCell } from '@/components/ui/PeriodCell';
 import { RowActionMenu } from '@/components/ui/RowActionMenu';
+import { CellStack } from '@/components/ui/CellStack';
 
 type FileTab = '' | 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'ON_REQUEST';
 
@@ -150,7 +151,9 @@ export default function FilesPage() {
     {
       key: 'c',
       header: 'Published',
-      render: (f) => `${formatDateTime(f.createdAt)} · ${displayNameOf(f.createdBy)}`,
+      render: (f) => (
+        <CellStack main={formatDateTime(f.createdAt)} sub={displayNameOf(f.createdBy)} />
+      ),
     },
     {
       key: 'a',

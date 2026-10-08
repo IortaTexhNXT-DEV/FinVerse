@@ -20,6 +20,7 @@ import { DateReasonModal } from './DateReasonModal';
 import { daysBetween } from './payablesMath';
 import { usePayablesLookups } from './usePayablesLookups';
 import { displayNameOf } from '@/api/users';
+import { CellStack } from '@/components/ui/CellStack';
 
 type View = 'OUTSTANDING' | 'SETTLED' | 'ALL';
 type Action = 'present' | 'clear' | 'cancel' | 'replace';
@@ -228,7 +229,9 @@ export default function PdcIssuedPage() {
             {
               key: 'u',
               header: 'By',
-              render: (e) => `${displayNameOf(e.createdBy)} · ${formatDateTime(e.createdAt)}`,
+              render: (e) => (
+                <CellStack main={displayNameOf(e.createdBy)} sub={formatDateTime(e.createdAt)} />
+              ),
             },
           ]}
         />

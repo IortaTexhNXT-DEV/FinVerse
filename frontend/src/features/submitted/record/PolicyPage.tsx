@@ -72,6 +72,17 @@ function TabBody({ tab, detail }: Readonly<{ tab: TabId; detail: PolicyDetail }>
   }
 }
 
+/**
+ * One filled primary action per area: the first business action is primary, the other routes are
+ * secondary; exclusion and closing are outlined red (destructive).
+ */
+function actionVariant(action: string, index: number): 'primary' | 'secondary' | 'danger' {
+  if (action === 'exclude' || action === 'close') {
+    return 'danger';
+  }
+  return index === 0 ? 'primary' : 'secondary';
+}
+
 function BusinessActions({
   detail,
   actions,
@@ -100,10 +111,11 @@ function BusinessActions({
   });
   return (
     <>
-      {actions.map((a) => (
+      {actions.map((a, i) => (
         <Button
           key={a.action}
-          variant={a.action === 'exclude' || a.action === 'close' ? 'secondary' : 'primary'}
+          variant={actionVariant(a.action, i)}
+          size="sm"
           onClick={() => setOpen(a)}
         >
           {a.label}

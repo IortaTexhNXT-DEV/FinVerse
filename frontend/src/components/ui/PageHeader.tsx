@@ -61,13 +61,12 @@ export function PageHeader({
   return (
     <div className="page-header">
       {backTo !== undefined && <BackLink to={backTo} />}
-      <div>
+      <div className="page-title">
         {section !== undefined && <div className="breadcrumb">{section}</div>}
         <h1>{title}</h1>
         {description !== undefined && <p title={description}>{description}</p>}
       </div>
-      <div className="spacer" />
-      {actions !== undefined && <div className="row">{actions}</div>}
+      {actions !== undefined && <div className="row page-actions">{actions}</div>}
     </div>
   );
 }

@@ -22,6 +22,7 @@ import { DialogFooter } from './VoucherDialogs';
 import './disbursement.css';
 import { displayNameOf } from '@/api/users';
 import { DateInput } from '@/components/ui/DateInput';
+import { CellStack } from '@/components/ui/CellStack';
 
 const COLUMNS: Column<EodRun>[] = [
   { key: 'no', header: 'Run', render: (r) => r.runNo },
@@ -34,7 +35,7 @@ const COLUMNS: Column<EodRun>[] = [
   {
     key: 'by',
     header: 'Run By',
-    render: (r) => `${displayNameOf(r.runBy)} · ${formatDateTime(r.runAt)}`,
+    render: (r) => <CellStack main={displayNameOf(r.runBy)} sub={formatDateTime(r.runAt)} />,
   },
   { key: 'status', header: 'Status', render: (r) => <StatusBadge status={r.status} /> },
 ];

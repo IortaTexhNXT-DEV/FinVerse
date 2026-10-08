@@ -16,6 +16,7 @@ const MINOR_WORDS = new Set([
   'the',
   'to',
   'via',
+  'vs',
   'with',
 ]);
 

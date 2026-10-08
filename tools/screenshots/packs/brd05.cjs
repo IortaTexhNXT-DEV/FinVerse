@@ -350,6 +350,9 @@ const after = {
 
 // ------------------------------------------------------------------ documents
 
+const SOA_COLUMNS = ['SOA Row', 'Invoice No.', 'Policy No.', 'Assured', 'Premium (Books)', 'Outstanding', 'Remitted', 'Direct Billed',
+  'Premium (SOA)', 'SOA Balance', 'Premium Variance', 'Outstanding Variance'];
+
 const documents = {
   'doc-dv': async (ctx, out) => {
     const id = ctx.one("select id from dsb_voucher where stage = 'APPROVED' and mode = 'CHECK' order by id limit 1");
@@ -371,7 +374,10 @@ const documents = {
     render(await ctx.api('accountant', 'GET', `/tax/2307/certificates/${id}/pdf`), 'pdf', out);
   },
   'doc-soa-report': async (ctx, out) => {
-    render(await ctx.api('acsl', 'GET', `/acsl/soa-uploads/${walkthrough.soaUpload(ctx)}/report`), 'xlsx', out);
+    // The reconciliation per invoice: the books against the insurer's statement (the remittance and 2307 columns are
+    // left out of the image so that it prints at a readable size; the workbook has all 17 columns).
+    render(await ctx.api('acsl', 'GET', `/acsl/soa-uploads/${walkthrough.soaUpload(ctx)}/report`), 'xlsx', out, 200,
+      SOA_COLUMNS);
   },
 };
 

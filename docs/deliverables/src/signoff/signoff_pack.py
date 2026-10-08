@@ -776,7 +776,9 @@ def r_documents(doc: Any, pack: Pack, **_: Any) -> None:
                        columns=1, label_width=3.2)
         doc.label("Fields and their source")
         doc.bullets(d["fields"], size=9)
-        doc.screenshot(pack.shot_file(d["shot"]), f"{d['id']} {d['name']}: first page as generated")
+        # An extract of a wide or long document says so in its caption (documents.yaml `shot_caption`).
+        doc.screenshot(pack.shot_file(d["shot"]),
+                       f"{d['id']} {d['name']}: {d.get('shot_caption') or 'first page as generated'}")
 
 
 def r_uploads(doc: Any, pack: Pack, **_: Any) -> None:

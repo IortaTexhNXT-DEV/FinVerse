@@ -225,13 +225,19 @@ async function exportReport(ctx, code, params, out) {
 
 const monthStart = () => `${today().slice(0, 8)}01`;
 
+/** The group profiles of user access maintenance shown in the extract of the User Access Matrix (DO-06). */
+const MATRIX_PROFILES = ['UAM_REQUESTOR', 'UAM_APPROVER', 'UAM_SECOND_APPROVER', 'INFOSEC_OFFICER', 'SYSADMIN', 'AUDITOR'];
+
 const documents = {
   'doc-user-access': (ctx, out) => exportReport(ctx, 'UAM-USER-ACCESS', { asOf: today(), status: 'ALL' }, out),
-  'doc-group-profile': (ctx, out) => exportReport(ctx, 'UAM-GROUP-PROFILE', { profile: 'UAM_APPROVER', active: 'ALL' }, out),
+  'doc-group-profile': (ctx, out) => exportReport(ctx, 'UAM-GROUP-PROFILE', { groupProfile: 'UAM_APPROVER', active: 'ALL' }, out),
   'doc-group-members': (ctx, out) => exportReport(ctx, 'UAM-GROUP-MEMBERS', { asOf: today(), groupProfile: 'MKT_AO' }, out),
   'doc-audit-log': (ctx, out) => exportReport(ctx, 'UAM-AUDIT-LOG', { from: monthStart(), to: today(), activity: 'ALL', includeSignIns: 'true' }, out),
   'doc-requests': (ctx, out) => exportReport(ctx, 'UAM-REQUESTS', { from: monthStart(), to: today(), status: 'ALL', type: 'ALL' }, out),
-  'doc-access-matrix': (ctx, out) => download(ctx, 'auditor', '/nbadmin/access-matrix/export', out, 'xlsx'),
+  // An extract of the matrix (it holds every permission against every group profile): the profiles of user access
+  // maintenance and the first permissions of the User Access area, under the header of the workbook.
+  'doc-access-matrix': (ctx, out) => download(ctx, 'auditor', '/nbadmin/access-matrix/export', out, 'xlsx',
+    ['Permission', 'Area', 'Action class', ...MATRIX_PROFILES], { rows: { column: 'Area', equals: 'USER_ACCESS', max: 14 } }),
 };
 
 // Shots kept as the whole window (the sign-in pages have no menu and are always whole; the home page shows the

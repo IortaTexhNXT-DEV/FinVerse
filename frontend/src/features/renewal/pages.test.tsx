@@ -215,7 +215,7 @@ describe('Renewal screens', () => {
     fireEvent.click(screen.getByRole('tab', { name: 'Checks' }));
     expect(await screen.findByText('Claims')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('tab', { name: 'Classification Rules' }));
-    expect(await screen.findByText('Rules of version 1')).toBeInTheDocument();
+    expect(await screen.findByText('Rules of Version 1')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'New Version' }));
     expect(screen.getByRole('button', { name: 'Save Draft' })).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Add Rule' }));
@@ -282,7 +282,7 @@ describe('Renewal screens', () => {
     const expectations: [string, string][] = [
       ['Checks', 'The checks have not run yet'],
       ['Account History', 'View Account History'],
-      ['Computations', 'Renewal (no renewal account yet)'],
+      ['Computations', 'Renewal (No Renewal Account Yet)'],
       ['Insurer', 'No response from the insurer'],
       ['Letters', 'No acceptance recorded'],
       ['Remarks & Follow-ups', 'No follow-ups'],

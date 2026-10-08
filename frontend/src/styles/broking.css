@@ -106,8 +106,10 @@
 /* The actions stay together on one row; the whole group moves below the meta row when narrow. */
 .workflow-actions {
   display: flex;
-  flex-wrap: nowrap;
-  flex: 0 0 auto;
+  flex-wrap: wrap;
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 100%;
   gap: var(--space-2);
   justify-content: flex-end;
   align-items: center;
@@ -314,17 +316,49 @@
   border-top-color: var(--color-danger);
 }
 
+.stage-groups {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* One line per workflow: its name, then its stage tiles */
+.stage-group {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: var(--space-4);
+  align-items: center;
+}
+
+.stage-group + .stage-group {
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--color-border);
+}
+
+.stage-group-name {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-heading);
+}
+
 .stage-tiles {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-  gap: var(--space-3);
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--space-2);
 }
 
 .stage-tile {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: var(--space-3);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'name count'
+    'meta count';
+  align-items: center;
+  column-gap: var(--space-2);
+  min-width: 0;
+  min-height: 56px;
+  padding: var(--space-2) var(--space-3);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-surface-alt);
@@ -341,21 +375,30 @@
 }
 
 .stage-tile-name {
+  grid-area: name;
   font-size: 13px;
   font-weight: 600;
   color: var(--color-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .stage-tile-count {
+  grid-area: count;
   font-family: var(--font-heading);
-  font-size: 26px;
+  font-size: 24px;
+  line-height: 30px;
   font-weight: 700;
   color: var(--brand-navy);
+  font-variant-numeric: tabular-nums;
 }
 
 .stage-tile-meta {
+  grid-area: meta;
   display: flex;
   gap: var(--space-2);
+  min-height: 16px;
   font-size: 12px;
   color: var(--color-text-muted);
 }
@@ -363,6 +406,13 @@
 .stage-tile-overdue {
   color: var(--color-danger);
   font-weight: 600;
+}
+
+@media (max-width: 900px) {
+  .stage-group {
+    grid-template-columns: 1fr;
+    gap: var(--space-2);
+  }
 }
 
 /* Action tiles (Bulk Processing, quick actions) */
@@ -786,4 +836,17 @@
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+/* My Work: the description keeps one line at the column width (full text in the tooltip) */
+.table .queue-description {
+  display: block;
+  max-width: 200px;
+}
+
+/* Wide windows give the description more room */
+@media (min-width: 1680px) {
+  .table .queue-description {
+    max-width: 360px;
+  }
 }

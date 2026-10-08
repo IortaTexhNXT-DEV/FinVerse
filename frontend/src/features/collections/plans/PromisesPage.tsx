@@ -18,7 +18,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate } from '@/utils/format';
+import { countOf, formatDate } from '@/utils/format';
 import type { ItemResult, PaymentPromise } from './api';
 import { plansApi } from './api';
 import type { PromiseTab } from './labels';
@@ -106,7 +106,7 @@ export default function PromisesPage() {
       setWithdrawing(false);
       selection.clear();
       await queryClient.invalidateQueries({ queryKey: ['collections', 'promises'] });
-      toast.success(`${n} promise(s) withdrawn`);
+      toast.success(`${countOf(n, 'promise')} withdrawn`);
     },
   });
   const list = rows.data?.content ?? [];

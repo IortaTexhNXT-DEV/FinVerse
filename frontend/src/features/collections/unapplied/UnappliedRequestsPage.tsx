@@ -18,6 +18,7 @@ import { unappliedApi } from './api';
 import type { RequestTab } from './labels';
 import { REQUEST_TABS, requestStatuses } from './labels';
 import { REQUEST_COLUMNS } from './columns';
+import { countOf } from '@/utils/format';
 
 /**
  * Requests to Cashiering (BRCLXN.030/032, 040): the status of every request sent on a collector
@@ -50,7 +51,7 @@ export default function UnappliedRequestsPage() {
     onSuccess: async (n) => {
       selection.clear();
       await queryClient.invalidateQueries({ queryKey: ['collections', 'unapplied'] });
-      toast.success(`${n} request(s) checked with Cashiering`);
+      toast.success(`${countOf(n, 'request')} checked with Cashiering`);
     },
   });
   const list = rows.data?.content ?? [];

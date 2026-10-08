@@ -11,6 +11,7 @@ import { collectionsApi } from './api';
 import { dispositionLabel } from './presentation';
 import { UserName } from '@/components/ui/UserName';
 import './collections.css';
+import { CellStack } from '@/components/ui/CellStack';
 
 /**
  * Client view (BRCLXN.003): every collection account of a client - open, completed, credit - with
@@ -63,7 +64,7 @@ export default function ClientViewPage() {
             {
               key: 'a',
               header: 'ARN / Policy',
-              render: (i) => [i.arn, i.policyNo].filter(Boolean).join(' · '),
+              render: (i) => <CellStack main={i.arn} sub={i.policyNo} />,
             },
             { key: 'b', header: 'Booked', render: (i) => formatDate(i.bookingDate) },
             { key: 'g', header: 'Aging', render: (i) => formatDays(i.agingDays) },

@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import { useInRouterContext, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
 import { FilterChips } from '@/components/ui/FilterChips';
+import type { ActiveFilter } from '@/components/ui/FilterChips';
 
 interface WorklistToolbarProps {
   /** Placeholder and accessible name of the search box (e.g. "Search Quotation No."). */
@@ -17,6 +18,8 @@ interface WorklistToolbarProps {
   extra?: ReactNode;
   /** Bulk actions on the right, enabled by the row selection. */
   children?: ReactNode;
+  /** Other active filters of the list, shown as removable chips after the search chip. */
+  chips?: readonly ActiveFilter[];
 }
 
 interface ToolbarViewProps extends WorklistToolbarProps {
@@ -35,6 +38,7 @@ function ToolbarView({
   filters,
   extra,
   children,
+  chips = [],
   urlSearch,
   onUrlSearch,
 }: Readonly<ToolbarViewProps>) {
@@ -91,8 +95,8 @@ function ToolbarView({
       {extra}
       {children !== undefined && <div className="worklist-actions">{children}</div>}
       <FilterChips
-        filters={
-          active === ''
+        filters={[
+          ...(active === ''
             ? []
             : [
                 {
@@ -103,8 +107,9 @@ function ToolbarView({
                     search('');
                   },
                 },
-              ]
-        }
+              ]),
+          ...chips,
+        ]}
       />
     </div>
   );

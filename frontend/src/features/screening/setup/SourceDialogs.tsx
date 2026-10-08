@@ -8,7 +8,7 @@ import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
-import { formatDateTime, humanize } from '@/utils/format';
+import { countOf, formatDateTime, humanize } from '@/utils/format';
 import { screeningSetupApi } from './api';
 import type { ListSource, RunDetail } from './api';
 import { FileDropZone } from '@/components/ui/FileDropZone';
@@ -235,7 +235,7 @@ export function RunDialog({ runId, onClose }: Readonly<{ runId: number; onClose:
     mutationFn: () => screeningSetupApi.approveRun(runId),
     onSuccess: async (r) => {
       await queryClient.invalidateQueries({ queryKey: ['screening-setup'] });
-      toast.success(`${r.approved} change(s) approved; the entries are active`);
+      toast.success(`${countOf(r.approved, 'change')} approved; the entries are active`);
     },
   });
   const d = detail.data;

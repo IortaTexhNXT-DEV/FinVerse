@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/Button';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
-import { today } from '@/utils/format';
+import { countOf, today } from '@/utils/format';
 import { collectionsApi } from './api';
 import type { DispositionInput, EffortInput, ReassignInput } from './api';
 import { cleanDetails, detailFields, dispositionErrors, handoffText } from './collectionsLogic';
@@ -297,7 +297,7 @@ export function ReassignDialog({
     >
       <div className="stack">
         <ErrorAlert error={error ?? handlers.error} />
-        <p className="clx-muted">{total} account(s) will move to the new handler.</p>
+        <p className="clx-muted">{countOf(total, 'account')} will move to the new handler.</p>
         <div className="form-grid">
           <Field label="New Handler" required error={errors.handler}>
             {(id) => (

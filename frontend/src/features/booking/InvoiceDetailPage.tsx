@@ -89,7 +89,7 @@ function Summary({ invoice: i }: Readonly<{ invoice: BookedInvoice }>) {
           <SummaryFact icon={UserRound} label="Client">
             {i.facts.clientName}
           </SummaryFact>
-          <SummaryFact icon={Building2} label="Insurer(s)">
+          <SummaryFact icon={Building2} label="Insurers">
             {i.shares.map((s, n) => (
               <span key={s.insurerCode}>
                 {n > 0 && ', '}

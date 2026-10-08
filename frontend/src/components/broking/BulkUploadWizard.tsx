@@ -16,6 +16,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { FileDropZone } from '@/components/ui/FileDropZone';
 import { Notice } from '@/components/ui/Notice';
+import { countOf } from '@/utils/format';
 
 interface BulkUploadWizardProps {
   handler: string;
@@ -79,7 +80,7 @@ export function BulkUploadWizard({
       setJob(j);
       setFilter(j.failedRows > 0 ? 'FAILED' : 'COMMITTED');
       await queryClient.invalidateQueries({ queryKey: ['bulk'] });
-      toast.success(`${j.committedRows} row(s) processed`);
+      toast.success(`${countOf(j.committedRows, 'row')} processed`);
       onCommitted?.(j);
     },
   });
@@ -276,7 +277,7 @@ function JobReview(p: Readonly<JobReviewProps>) {
                 disabled={job.validRows === 0}
                 onClick={p.onCommit}
               >
-                Process {job.validRows} Valid Row(s)
+                Process {countOf(job.validRows, 'Valid Row')}
               </Button>
               <Button
                 variant="secondary"

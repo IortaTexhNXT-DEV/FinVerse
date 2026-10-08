@@ -76,7 +76,7 @@ function facts(view: Invoice360): Fact[] {
     },
     {
       icon: Building2,
-      label: 'Insurer(s)',
+      label: 'Insurers',
       value: (
         <>
           {i.shares.map((s, n) => (

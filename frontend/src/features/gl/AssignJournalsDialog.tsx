@@ -6,6 +6,7 @@ import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { glPlatformApi } from './glPlatformApi';
 import { assigneeOptions } from './journalForm';
+import { countOf } from '@/utils/format';
 
 interface Props {
   open: boolean;
@@ -36,7 +37,7 @@ export function AssignJournalsDialog({
   });
   return (
     <Modal
-      title={`Assign ${count} journal(s)`}
+      title={`Assign ${countOf(count, 'journal')}`}
       open={open}
       onClose={onClose}
       footer={

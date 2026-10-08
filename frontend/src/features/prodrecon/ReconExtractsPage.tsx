@@ -15,7 +15,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { PageFooter } from '@/components/ui/Pager';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { today } from '@/utils/format';
+import { countOf, today } from '@/utils/format';
 import { SendExtractDialog } from './ExtractParts';
 import { extractColumns } from './extractColumns';
 import { prodreconApi } from './prodreconApi';
@@ -114,7 +114,7 @@ export default function ReconExtractsPage() {
   const create = useMutation({
     mutationFn: (v: { insurer: string; from: string; to: string }) =>
       prodreconApi.extract(companyId, v.insurer, v.from, v.to),
-    onSuccess: (e) => done(`${e.extractNo} extracted: ${String(e.rowCount)} account(s)`),
+    onSuccess: (e) => done(`${e.extractNo} extracted: ${countOf(e.rowCount, 'account')}`),
   });
   const send = useMutation({
     mutationFn: (v: { id: number; to: string[]; cc: string[] }) =>

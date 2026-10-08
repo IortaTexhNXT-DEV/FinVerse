@@ -40,9 +40,13 @@ describe('RowActions', () => {
     expect(screen.queryByRole('menu')).toBeNull();
   });
 
-  it('shows a dash when no action is open to the user', () => {
-    render(<RowActions record="X" actions={[{ label: 'A', onSelect: vi.fn(), hidden: true }]} />);
-    expect(screen.getByText('—')).toBeTruthy();
+  it('leaves the action cell empty when no action is open to the user', () => {
+    const { container } = render(
+      <RowActions record="X" actions={[{ label: 'A', onSelect: vi.fn(), hidden: true }]} />,
+    );
+    expect(container).toBeEmptyDOMElement();
+    expect(screen.queryByText('—')).toBeNull();
+    expect(screen.queryByRole('button')).toBeNull();
   });
 
   it('closes on Escape', () => {

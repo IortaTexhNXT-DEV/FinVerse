@@ -8,11 +8,13 @@ import {
   useSalesUnitNameOrNull,
 } from '@/components/broking/useLabels';
 import { DataTable } from '@/components/ui/DataTable';
+import { CellStack } from '@/components/ui/CellStack';
 import { DueDate } from '@/components/ui/DueDate';
 import { RowActions } from '@/components/ui/RowActions';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { ageText } from './age';
 import { UserName } from '@/components/ui/UserName';
+import { formatMoney, splitTrailingAmount } from '@/utils/wording';
 
 interface QueueTableProps {
   items: WorkItem[];
@@ -25,8 +27,10 @@ interface QueueTableProps {
 }
 
 /**
- * Work items with reference, record type, description, stage, origin, age, due time, assignee,
- * and Claim / Assign in the row action menu (screen standard: one menu button at the end of the
+ * Work items with reference, record type, description (the name, one line, with the unit it comes
+ * from under it) and its amount in a right-aligned column of its own ("PHP 2,500.00"), stage, due
+ * time with the time in stage under it, assignee, and
+ * Claim / Assign in the row action menu (screen standard: one menu button at the end of the
  * row). The record type has its own column, never a word beside the stage pill.
  */
 export function QueueTable(p: Readonly<QueueTableProps>) {
@@ -48,11 +52,37 @@ export function QueueTable(p: Readonly<QueueTableProps>) {
         {
           key: 'type',
           header: 'Type',
-          width: '160px',
+          width: '96px',
           truncate: true,
           render: (i) => workflowRecordType(i.workflowCode),
         },
-        { key: 'title', header: 'Description', render: (i) => i.title },
+        {
+          key: 'title',
+          header: 'Description / From',
+          width: '200px',
+          render: (i) => (
+            <CellStack
+              main={<TruncatedText text={splitTrailingAmount(i.title).text} />}
+              sub={
+                i.originatingUnit ? (
+                  <OriginUnit code={i.originatingUnit} />
+                ) : (
+                  <UserName login={i.createdBy} truncate />
+                )
+              }
+            />
+          ),
+        },
+        {
+          key: 'amount',
+          header: 'Amount',
+          kind: 'amount',
+          width: '136px',
+          render: (i) => {
+            const { currency, amount } = splitTrailingAmount(i.title);
+            return amount === undefined ? '' : formatMoney(currency, amount);
+          },
+        },
         {
           key: 'stage',
           header: 'Stage',
@@ -60,40 +90,26 @@ export function QueueTable(p: Readonly<QueueTableProps>) {
           render: (i) => <StatusBadge status={i.stageCode} workflow={i.workflowCode} />,
         },
         {
-          key: 'unit',
-          header: 'From',
-          width: '180px',
-          truncate: true,
-          render: (i) =>
-            i.originatingUnit ? (
-              <OriginUnit code={i.originatingUnit} />
-            ) : (
-              <UserName login={i.createdBy} truncate />
-            ),
-        },
-        {
-          key: 'age',
-          header: 'In Stage',
-          kind: 'amount',
-          width: '96px',
-          render: (i) => ageText(i.stageEnteredAt),
-        },
-        {
           key: 'due',
-          header: 'Due',
+          header: 'Due / In Stage',
           kind: 'datetime',
-          render: (i) => <DueDate at={i.dueAt} overdue={i.overdue} />,
+          render: (i) => (
+            <CellStack
+              main={<DueDate at={i.dueAt} overdue={i.overdue} />}
+              sub={<span className="num">{ageText(i.stageEnteredAt)} in stage</span>}
+            />
+          ),
         },
         {
           key: 'assignee',
           header: 'Assignee',
-          width: '180px',
+          width: '120px',
           truncate: true,
           render: (i) => <UserName login={i.assignee} empty="Unassigned" truncate />,
         },
         {
           key: 'actions',
-          header: '',
+          header: 'Actions',
           kind: 'actions',
           render: (i) => (
             <RowActions
@@ -139,6 +155,15 @@ function OriginUnit({ code }: Readonly<{ code: string }>) {
   return (
     <span className="truncate" title={name}>
       {name}
+    </span>
+  );
+}
+
+/** A text kept on one line, cut at the column width with the full text in the tooltip. */
+function TruncatedText({ text }: Readonly<{ text: string }>) {
+  return (
+    <span className="truncate queue-description" title={text}>
+      {text}
     </span>
   );
 }

@@ -14,7 +14,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
-import { formatDateTime, humanize } from '@/utils/format';
+import { countOf, formatDateTime, humanize } from '@/utils/format';
 import { CodeSelect, TextField } from './CashFields';
 import { cashieringApi } from './cashieringApi';
 import type { Layout, MinimalBalanceRule } from './cashieringApi';
@@ -205,7 +205,7 @@ function MinimalBalance() {
     mutationFn: cashieringApi.sweep,
     onSuccess: (s) =>
       toast.success(
-        `Sweep done: ${s.premium} premium balance(s) reversed, ${s.excess} excess moved to overages`,
+        `Sweep done: ${countOf(s.premium, 'premium balance')} reversed, ${s.excess} excess moved to overages`,
       ),
   });
   return (

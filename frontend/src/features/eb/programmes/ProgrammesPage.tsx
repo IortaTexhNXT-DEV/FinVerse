@@ -24,7 +24,7 @@ import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { UserName } from '@/components/ui/UserName';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate, humanize } from '@/utils/format';
+import { countOf, formatDate, humanize } from '@/utils/format';
 import { EB_SECTION } from '../EbPlaceholder';
 import { BenefitLines, EbLov } from '../common/EbLabels';
 import { EB_LOV, ebLabel } from '../common/ebCodes';
@@ -250,7 +250,7 @@ export default function ProgrammesPage() {
       {confirming && (
         <ConfirmDialog
           title="Send Renewal Advice"
-          record={`${String(selection.keys.length)} programme(s)`}
+          record={countOf(selection.keys.length, 'programme')}
           effect="The renewal advice is e-mailed, password-protected, to the HR contacts of each programme flagged for renewal, and its renewal cycle moves to Renewal Advice Sent."
           confirmLabel="Send RA"
           busy={send.isPending}

@@ -18,7 +18,7 @@ import { PageFooter } from '@/components/ui/Pager';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate, formatDateTime, humanize } from '@/utils/format';
+import { countOf, formatDate, formatDateTime, humanize } from '@/utils/format';
 import { DateInput } from '@/components/ui/DateInput';
 import { LovLabel } from '@/components/broking/LovLabel';
 import { groupLabel } from '@/context/clientNames';
@@ -166,7 +166,7 @@ export default function KycReviewsPage() {
       />
       <FilterBar filters={filters} onChange={setFilters} />
       <ErrorAlert error={due.error ?? download.error} />
-      <Card flush title={`${String(due.data?.totalElements ?? 0)} client(s) to review`}>
+      <Card flush title={`${countOf(due.data?.totalElements ?? 0, 'client')} to review`}>
         <DataTable<ClientListItem>
           loading={due.isLoading}
           rows={due.data?.content ?? []}

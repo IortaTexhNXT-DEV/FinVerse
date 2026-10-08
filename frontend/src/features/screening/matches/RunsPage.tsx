@@ -10,7 +10,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { PageFooter } from '@/components/ui/Pager';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDateTime, humanize } from '@/utils/format';
+import { countOf, formatDateTime, humanize } from '@/utils/format';
 import { screeningMatchesApi } from './api';
 import type { ScreeningMatch, ScreeningRun, ScreeningTrigger } from './api';
 import { TRIGGERS, matchedText, scoreText } from './matchLogic';
@@ -56,8 +56,10 @@ function RunDialog({ run, onClose }: Readonly<{ run: ScreeningRun; onClose: () =
           </dd>
           <dt>Counts</dt>
           <dd>
-            {run.clientsScreened} client(s), {run.entriesScreened} entr(ies), {run.matches} new
-            match(es), {run.riskChanges} risk change(s), {run.casesOpened} case(s)
+            {countOf(run.clientsScreened, 'client')},{' '}
+            {countOf(run.entriesScreened, 'entry', 'entries')},{' '}
+            {countOf(run.matches, 'new match', 'new matches')},{' '}
+            {countOf(run.riskChanges, 'risk change')}, {countOf(run.casesOpened, 'case')}
           </dd>
           <dt>Time</dt>
           <dd>

@@ -8,6 +8,7 @@ import type { CaseDialogProps } from './CaseDialogs';
 import { LovField, StepDialog, TextField } from './StepDialog';
 import { displayNameOf } from '@/api/users';
 import { UserName } from '@/components/ui/UserName';
+import { countOf } from '@/utils/format';
 
 const OTHERS = 'OTHERS';
 
@@ -160,9 +161,11 @@ export function BulkReassignDialog({
     onSuccess: (done) => {
       const failed = cases.length - done;
       if (failed > 0) {
-        toast.error(`${done} case(s) re-assigned; ${failed} refused (not eligible in their stage)`);
+        toast.error(
+          `${countOf(done, 'case')} re-assigned; ${failed} refused (not eligible in their stage)`,
+        );
       } else {
-        toast.success(`${done} case(s) re-assigned to ${displayNameOf(form.assignee)}`);
+        toast.success(`${countOf(done, 'case')} re-assigned to ${displayNameOf(form.assignee)}`);
       }
       onDone();
     },

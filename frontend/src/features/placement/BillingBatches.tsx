@@ -12,7 +12,7 @@ import { PageFooter } from '@/components/ui/Pager';
 import { RowActions } from '@/components/ui/RowActions';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
-import { formatAmount, formatDate } from '@/utils/format';
+import { countOf, formatAmount, formatDate } from '@/utils/format';
 import { batchActions } from './batchActions';
 
 interface BatchesProps {
@@ -52,7 +52,7 @@ export function BillingBatches({
     mutationFn: () => placementApi.createBatch(companyId, selection.keys),
     onSuccess: (batch) => {
       selection.clear();
-      toast.success(`${batch.batchNo} created with ${batch.itemCount} account(s)`);
+      toast.success(`${batch.batchNo} created with ${countOf(batch.itemCount, 'account')}`);
       onChanged();
     },
   });

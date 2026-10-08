@@ -94,7 +94,7 @@ describe('Sales organisation', () => {
     renderPage(['MASTER_MAINTAIN']);
     expect(await screen.findByText('NCR')).toBeInTheDocument();
     const grid = screen.getByRole('treegrid', { name: 'Sales organisation' });
-    expect(screen.getByText('2 regions · 2 departments · 2 teams · 1 officer')).toBeInTheDocument();
+    expect(screen.getByText('2 regions, 2 departments, 2 teams and 1 officer')).toBeInTheDocument();
     expect(within(grid).getByText('Inherited from CBG-VIS')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Expand All' }));
     expect(within(grid).getByText('Aileen Account Officer')).toBeInTheDocument();
@@ -118,7 +118,7 @@ describe('Sales organisation', () => {
     await user.click(screen.getByRole('button', { name: 'Search' }));
     expect(screen.getByText('Aileen Account Officer')).toBeInTheDocument();
     expect(screen.queryByText('VIS')).not.toBeInTheDocument();
-    expect(screen.getByText('1 region · 1 department · 1 team · 1 officer')).toBeInTheDocument();
+    expect(screen.getByText('1 region, 1 department, 1 team and 1 officer')).toBeInTheDocument();
   });
 
   it('refuses to deactivate a unit with active members and asks a reason otherwise', async () => {

@@ -6,9 +6,12 @@ import {
   funnelPath,
   funnelShare,
   groupName,
-  overdueHint,
+  monthStartOf,
+  overdueBreakdown,
+  overdueQualifier,
+  overdueQueuePath,
   requestPath,
-  requestsHint,
+  requestsBreakdown,
   total,
 } from './dashboardData';
 import { groupReports } from './reportGroups';
@@ -50,15 +53,41 @@ describe('NB dashboard data', () => {
     expect(barWidth(5, 0)).toBe(0);
   });
 
-  it('summarises overdue items and requests', () => {
-    expect(overdueHint([])).toBe('Every item is within its service level');
-    expect(overdueHint([count('W', 'NB_ACCOUNT', 3, 'Accounts')])).toBe('3 Accounts');
+  it('breaks the overdue items down by business name in the right number, each opening its queue', () => {
+    expect(overdueQualifier([])).toBe('Every item is within its service level');
+    expect(overdueBreakdown([])).toEqual([]);
+    const lines = overdueBreakdown([
+      count('BCL_CLAIM', 'BCL_CLAIM', 1, 'BCL_CLAIM'),
+      count('FRBS_SERVICE_FEE', 'FRBS_SERVICE_FEE', 1, 'FRBS_SERVICE_FEE'),
+      count('NB_ACCOUNT', 'NB_ACCOUNT', 31, 'Accounts'),
+      count('DISB_VOUCHER', 'DISB_VOUCHER', 4, 'DISB_VOUCHER'),
+      count('DISB_FUNDING', 'DISB_FUNDING', 1, 'DISB_FUNDING'),
+    ]);
+    expect(lines.map((l) => `${String(l.count)} ${l.label}`)).toEqual([
+      '1 Claim',
+      '1 Service fee run',
+      '31 Accounts',
+      '4 Disbursement vouchers',
+      '1 Account funding',
+    ]);
+    expect(lines.every((l) => !l.label.includes('_'))).toBe(true);
+    expect(lines[2]?.to).toBe('/my-work?workflow=NB_ACCOUNT&overdue=true');
+    expect(overdueQueuePath()).toBe('/my-work?overdue=true');
+    expect(overdueQualifier([count('W', 'NB_ACCOUNT', 3)])).toBe('Past their service level');
+  });
+
+  it('lists the quotations and proposal requests in progress as separate lines', () => {
     const d = {
       requests: [count('QUOTATION', 'DRAFT', 2), count('PROPOSAL', 'DRAFT', 1)],
     } as NbDashboard;
-    expect(requestsHint(d)).toBe('2 quotations · 1 PRFs in progress');
-    expect(groupName('REQUEST')).toBe('Request');
-    expect(groupName('QUOTATION')).toBe('Quotation');
+    expect(requestsBreakdown(d).map((l) => `${l.label}: ${String(l.count)}`)).toEqual([
+      'Quotations in progress: 2',
+      'Proposal request in progress: 1',
+    ]);
+    expect(groupName('REQUEST')).toBe('Quotation Requests');
+    expect(groupName('PROPOSAL')).toBe('Proposal Requests');
+    expect(groupName('QUOTATION')).toBe('Quotations');
+    expect(monthStartOf('2026-10-08')).toBe('01-Oct-2026');
   });
 });
 

@@ -18,7 +18,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate, formatDateTime, humanize, today } from '@/utils/format';
+import { countOf, formatDate, formatDateTime, humanize, today } from '@/utils/format';
 import { commissionApi } from './commissionApi';
 import type { DpList, Submission } from './commissionApi';
 import { FileDropZone } from '@/components/ui/FileDropZone';
@@ -167,7 +167,7 @@ export default function DpListsPage() {
       setUploading(false);
       await refresh();
       toast.success(
-        `${l.listNo}: ${String(l.validCount)} of ${String(l.itemCount)} account(s) valid`,
+        `${l.listNo}: ${String(l.validCount)} of ${countOf(l.itemCount, 'account')} valid`,
       );
     },
   });
@@ -175,7 +175,7 @@ export default function DpListsPage() {
     mutationFn: () => commissionApi.pull(companyId),
     onSuccess: async (taken) => {
       await refresh();
-      toast.success(`${String(taken.length)} list(s) taken from the collection feed`);
+      toast.success(`${countOf(taken.length, 'list')} taken from the collection feed`);
     },
   });
   const mayProcess = can('COMMREC_PROCESS');

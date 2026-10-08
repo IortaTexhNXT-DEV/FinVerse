@@ -15,7 +15,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId, useDefaultBranchId } from '@/context/workspaceContext';
-import { formatDateTime, humanize } from '@/utils/format';
+import { countOf, formatDateTime, humanize } from '@/utils/format';
 import { cashieringApi } from './cashieringApi';
 import type { CwtBatch, CwtTag } from './cashieringApi';
 import { CwtTagDialog } from './CwtTagDialog';
@@ -240,7 +240,7 @@ export default function Cwt2307Page() {
                 disabled={selection.keys.length === 0}
                 busy={act.isPending}
                 confirm={{
-                  title: `Validate and Post ${String(selection.keys.length)} Certificate(s)`,
+                  title: `Validate and Post ${countOf(selection.keys.length, 'Certificate')}`,
                   effect: 'The selected certificates are validated and the 2307 report is posted.',
                 }}
                 onConfirm={() =>

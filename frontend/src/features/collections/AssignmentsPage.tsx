@@ -11,7 +11,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatAmount } from '@/utils/format';
+import { countOf, formatAmount } from '@/utils/format';
 import { collectionsApi } from './api';
 import type { Criteria, ReassignInput, Rule, RuleInput } from './api';
 import { ReassignDialog } from './WorkDialogs';
@@ -202,7 +202,7 @@ function ReassignByCriteria({
       preview.reset();
       await queryClient.invalidateQueries({ queryKey: ['collections'] });
       const ref = r.bulkRef === undefined ? '' : ' (' + r.bulkRef + ')';
-      toast.success(`${r.moved} account(s) reassigned${ref}`);
+      toast.success(`${countOf(r.moved, 'account')} reassigned${ref}`);
     },
   });
   return (
@@ -232,7 +232,7 @@ function ReassignByCriteria({
         <CriteriaFields value={criteria} onChange={setCriteria} />
         {preview.data !== undefined && (
           <>
-            <p className="clx-muted">{preview.data.total} open account(s) match.</p>
+            <p className="clx-muted">{countOf(preview.data.total, 'open account')} match.</p>
             <DataTable
               caption="Accounts to reassign"
               columns={[
@@ -255,7 +255,7 @@ function ReassignByCriteria({
             />
             <div className="clx-form-actions">
               <Button disabled={preview.data.total === 0} onClick={() => setConfirming(true)}>
-                Reassign {preview.data.total} Account(s)
+                Reassign {countOf(preview.data.total, 'Account')}
               </Button>
             </div>
           </>

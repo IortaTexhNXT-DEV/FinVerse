@@ -15,7 +15,7 @@ import { PageFooter } from '@/components/ui/Pager';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId, useWorkspace } from '@/context/workspaceContext';
-import { formatDate } from '@/utils/format';
+import { countOf, formatDate } from '@/utils/format';
 import { AssignJournalsDialog } from './AssignJournalsDialog';
 import { ConfirmPostingDialog } from './ConfirmPostingDialog';
 import { JournalFiltersCard } from './JournalFiltersCard';
@@ -67,7 +67,9 @@ export default function JournalsPage() {
     mutationFn: () => glPlatformApi.bulkApprove(pending.map((j) => j.id)),
     onSuccess: async (result) => {
       setOutcomes(result.filter((o) => !o.posted));
-      await done(`${result.filter((o) => o.posted).length} of ${result.length} journal(s) posted`);
+      await done(
+        `${result.filter((o) => o.posted).length} of ${countOf(result.length, 'journal')} posted`,
+      );
     },
   });
   const assign = useMutation({
@@ -76,7 +78,7 @@ export default function JournalsPage() {
         selected.map((j) => j.id),
         assignee,
       ),
-    onSuccess: (result) => done(`${result.length} journal(s) assigned`),
+    onSuccess: (result) => done(`${countOf(result.length, 'journal')} assigned`),
   });
 
   return (

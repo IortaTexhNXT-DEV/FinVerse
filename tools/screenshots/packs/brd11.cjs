@@ -83,7 +83,12 @@ const fills = {
   forgot_user: [forgot, ['User ID', 'requestor']],
   enrol_user: [
     ['User ID', 'a013000197'], ['Full Name', 'Andrea Mercado'], ['E-mail', 'andrea.mercado@brokerverse-seed.ph'],
-    ['Windows ID', 'AMERCADO'], ['Home Branch', 'HO'], ['Marketing Account Officer', true],
+    ['Windows ID', 'AMERCADO'], ['Home Branch', 'HO'],
+    // The profile picker groups the profiles by business area, closed: the search opens the match, the
+    // ticked profile stays listed (its area open) once the search is cleared.
+    async (page) => page.getByPlaceholder('Search profile, area or what it does').fill('Marketing Account Officer'),
+    ['Marketing Account Officer', true],
+    async (page) => page.getByPlaceholder('Search profile, area or what it does').fill(''),
     ['Approver', 'Ulysses'], ['Remarks (Justification)', 'Joined Combank Marketing as account officer (seed data)'],
   ],
   enrol_invalid: [['User ID', 'ab']],

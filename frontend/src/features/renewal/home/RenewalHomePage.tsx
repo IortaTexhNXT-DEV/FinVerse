@@ -101,7 +101,7 @@ export default function RenewalHomePage() {
               },
               {
                 key: 'nrns',
-                label: 'NRNS',
+                label: 'No Response (NRNS)',
                 value: t.nrns,
                 onClick: () => void navigate('/renewal/letters?tab=NRNS'),
               },

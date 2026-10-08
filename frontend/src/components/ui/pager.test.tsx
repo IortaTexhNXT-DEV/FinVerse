@@ -7,6 +7,7 @@ describe('BDO pager', () => {
   it('describes the rows shown', () => {
     expect(showingText(0, 20, 57)).toBe('Showing 1 to 20 of 57 results');
     expect(showingText(2, 20, 57)).toBe('Showing 41 to 57 of 57 results');
+    expect(showingText(0, 20, 1)).toBe('Showing 1 to 1 of 1 result');
   });
 
   it('numbers every page up to seven and elides the others', () => {

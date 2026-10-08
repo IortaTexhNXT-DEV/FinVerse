@@ -30,6 +30,7 @@ import type { WorkbenchDialog } from './WorkbenchToolbar';
 import './booking.css';
 import { Notice } from '@/components/ui/Notice';
 import { Tag } from '@/components/ui/Tag';
+import { countOf } from '@/utils/format';
 
 const TILES: readonly { tab: WorkbenchTab; label: string; count: keyof WorkbenchCounts }[] = [
   { tab: 'READY', label: 'Ready to Book', count: 'readyToBook' },
@@ -95,7 +96,7 @@ function HandedBanner({
   return (
     <Notice
       tone="info"
-      title={`${String(arns.length)} account(s) sent from placement for booking`}
+      title={`${countOf(arns.length, 'account')} sent from placement for booking`}
       actions={
         <>
           {canProcess && (
@@ -140,7 +141,7 @@ function useHanded(companyId: number) {
       dismiss();
       await queryClient.invalidateQueries({ queryKey: ['booking'] });
       toast.success(
-        `${String(results.filter((r) => r.queued).length)} account(s) added to the batch`,
+        `${countOf(results.filter((r) => r.queued).length, 'account')} added to the batch`,
       );
     },
   });
@@ -169,7 +170,7 @@ function useWorkbenchActions(companyId: number, selectedRows: WorkbenchRow[], re
     enqueue: useMutation({
       mutationFn: () => bookingApi.enqueue(companyId, arns),
       onSuccess: (results) =>
-        done(`${String(results.filter((r) => r.queued).length)} account(s) added to the batch`),
+        done(`${countOf(results.filter((r) => r.queued).length, 'account')} added to the batch`),
     }),
     bookNow: useMutation({
       mutationFn: (date: string) => bookingApi.bookNow(companyId, arns, date),
@@ -186,7 +187,7 @@ function useWorkbenchActions(companyId: number, selectedRows: WorkbenchRow[], re
     }),
     cancel: useMutation({
       mutationFn: () => bookingApi.cancelBatch(companyId),
-      onSuccess: (r) => done(`Batch cancelled: ${String(r.removed)} account(s) removed`),
+      onSuccess: (r) => done(`Batch cancelled: ${countOf(r.removed, 'account')} removed`),
     }),
     edit: useMutation({
       mutationFn: (v: { id: number; date?: string; costCenter?: string }) =>
@@ -317,7 +318,7 @@ export default function BookingWorkbenchPage() {
         <BookingDateDialog
           title="Book Now"
           confirmLabel="Book Now"
-          intro={`Book ${String(count)} account(s) now. Each account is booked on its own: one failure does not stop the others.`}
+          intro={`Book ${countOf(count, 'account')} now. Each account is booked on its own: one failure does not stop the others.`}
           busy={actions.bookNow.isPending}
           error={actions.bookNow.error}
           onConfirm={(date) => actions.bookNow.mutate(date)}
@@ -328,7 +329,7 @@ export default function BookingWorkbenchPage() {
         <BookingDateDialog
           title="Confirm Batch"
           confirmLabel="Confirm Batch"
-          intro={`Book the ${String(count)} selected queued account(s). Accounts with their own booking date keep it.`}
+          intro={`Book the ${countOf(count, 'selected queued account')}. Accounts with their own booking date keep it.`}
           busy={actions.confirm.isPending}
           error={actions.confirm.error}
           onConfirm={(date) => actions.confirm.mutate(date)}

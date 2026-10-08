@@ -24,10 +24,10 @@ describe('Employee Benefits programme logic', () => {
 
   it('summarises Send RA', () => {
     expect(sendRaSummary([{ sent: true }, { sent: true }])).toBe(
-      'Renewal advice sent for 2 programme(s)',
+      'Renewal advice sent for 2 programmes',
     );
     expect(sendRaSummary([{ sent: true }, { sent: false }])).toBe(
-      'Renewal advice sent for 1 programme(s); 1 not sent',
+      'Renewal advice sent for 1 programme; 1 not sent',
     );
   });
 

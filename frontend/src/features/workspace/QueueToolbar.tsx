@@ -1,70 +1,53 @@
-import { Search } from 'lucide-react';
-import { useState } from 'react';
-import type { QueueFilters, QueueScope } from '@/api/workflow';
-import { Button } from '@/components/ui/Button';
+import type { QueueCount, QueueScope } from '@/api/workflow';
+import { WorklistToolbar } from '@/components/broking/WorklistToolbar';
+import { FilterToggle } from '@/components/ui/FilterToggle';
 import { Tabs } from '@/components/ui/Tabs';
-
-type Filters = Omit<QueueFilters, 'companyId'>;
+import { stageChips } from './queueParams';
+import type { QueueView } from './queueParams';
 
 const SCOPES: readonly { id: QueueScope; label: string }[] = [
-  { id: 'MINE', label: 'Assigned to me' },
-  { id: 'UNASSIGNED', label: 'Team queue' },
-  { id: 'ALL', label: 'All my queues' },
+  { id: 'MINE', label: 'Assigned to Me' },
+  { id: 'UNASSIGNED', label: 'Team Queue' },
+  { id: 'ALL', label: 'All My Queues' },
 ];
 
-/** Scope tabs, overdue toggle, stage filter reset and reference / name search. */
+/**
+ * The scope tabs of My Work on the card's tab line, then one toolbar row: the reference / name
+ * search with its button, the Overdue Only toggle and the active stage filter as a chip. Every
+ * control has the toolbar height and the row wraps as whole controls on narrow windows.
+ */
 export function QueueToolbar({
   filters,
+  stageCounts,
   onFilter,
-}: Readonly<{ filters: Filters; onFilter: (patch: Partial<Filters>) => void }>) {
-  const [text, setText] = useState(filters.text ?? '');
-  const stageFiltered = filters.workflow !== undefined || filters.stage !== undefined;
+  onSearch,
+}: Readonly<{
+  filters: QueueView;
+  stageCounts: readonly QueueCount[];
+  onFilter: (patch: Partial<QueueView>) => void;
+  onSearch: (text: string) => void;
+}>) {
   return (
-    <div className="row">
+    <>
       <Tabs
         tabs={SCOPES}
         active={filters.scope ?? 'ALL'}
         onChange={(scope) => onFilter({ scope })}
       />
-      <span className="spacer" />
-      <label className="checkbox">
-        <input
-          type="checkbox"
-          checked={filters.overdue ?? false}
-          onChange={(e) => onFilter({ overdue: e.target.checked })}
-        />{' '}
-        Overdue only
-      </label>
-      {stageFiltered && (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => onFilter({ workflow: undefined, stage: undefined })}
-        >
-          Clear Stage Filter
-        </Button>
-      )}
-      <form
-        className="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          onFilter({ text: text.trim() || undefined });
-        }}
-      >
-        <label className="visually-hidden" htmlFor="work-search">
-          Search reference or name
-        </label>
-        <input
-          id="work-search"
-          className="input"
-          placeholder="Reference or name…"
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-        />
-        <Button type="submit" variant="secondary" size="sm" icon={<Search size={14} />}>
-          Search
-        </Button>
-      </form>
-    </div>
+      <WorklistToolbar
+        placeholder="Search reference or name"
+        onSearch={onSearch}
+        extra={
+          <FilterToggle
+            label="Overdue Only"
+            checked={filters.overdue ?? false}
+            onChange={(overdue) => onFilter({ overdue })}
+          />
+        }
+        chips={stageChips(filters, stageCounts, () =>
+          onFilter({ workflow: undefined, stage: undefined }),
+        )}
+      />
+    </>
   );
 }

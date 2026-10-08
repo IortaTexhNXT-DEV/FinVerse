@@ -21,7 +21,7 @@ import { Modal } from '@/components/ui/Modal';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { UserName } from '@/components/ui/UserName';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate, formatDateTime } from '@/utils/format';
+import { countOf, formatDate, formatDateTime } from '@/utils/format';
 import { DialogFooter } from '../common/DialogFooter';
 import { EbLov } from '../common/EbLabels';
 import { EB_LOV } from '../common/ebCodes';
@@ -35,7 +35,7 @@ function RequestDialog({ cycleId, onClose }: Readonly<{ cycleId: number; onClose
   const [submitted, setSubmitted] = useState(false);
   const send = useEbMutation(
     (companyId, v: string[]) => ebMarketApi.requestFranchise(companyId, cycleId, v),
-    (r: Franchise[]) => `Franchise requested from ${String(r.length)} insurer(s)`,
+    (r: Franchise[]) => `Franchise requested from ${countOf(r.length, 'insurer')}`,
     onClose,
   );
   const save = () => {

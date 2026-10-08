@@ -91,7 +91,7 @@ function Feeds({ onDialog }: Readonly<{ onDialog: (d: Dialog) => void }>) {
     {
       key: 'partner',
       header: 'Partner',
-      render: (f) => `${humanize(f.partnerSystem)} · ${humanize(f.direction)}`,
+      render: (f) => <CellStack main={humanize(f.partnerSystem)} sub={humanize(f.direction)} />,
     },
     { key: 'transport', header: 'Transport', render: (f) => humanize(f.transport) },
     { key: 'owner', header: 'Owner', render: (f) => moduleLabel(f.ownerModule) },

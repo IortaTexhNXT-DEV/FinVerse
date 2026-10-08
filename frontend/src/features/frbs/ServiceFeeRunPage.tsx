@@ -20,7 +20,14 @@ import { RowActions } from '@/components/ui/RowActions';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
-import { formatAmount, formatDate, formatPeriod, formatRate, humanize } from '@/utils/format';
+import {
+  countOf,
+  formatAmount,
+  formatDate,
+  formatPeriod,
+  formatRate,
+  humanize,
+} from '@/utils/format';
 import { RUN_ENTITY, frbsApi } from './api';
 import type { ServiceFeeInvoice, ServiceFeeLine, ServiceFeeRun } from './api';
 import { LiquidateDialog, ReleaseDialog } from './LineDialogs';
@@ -227,7 +234,7 @@ function LinesCard({
         {totalsByCurrency(rows).map((t) => (
           <span key={t.currency}>
             {t.currency}: base <strong>{formatAmount(t.base)}</strong>, service fee{' '}
-            <strong>{formatAmount(t.fee)}</strong> on {t.count} invoice(s)
+            <strong>{formatAmount(t.fee)}</strong> on {countOf(t.count, 'invoice')}
           </span>
         ))}
       </div>

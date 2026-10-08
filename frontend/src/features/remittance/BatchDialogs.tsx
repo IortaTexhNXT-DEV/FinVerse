@@ -10,6 +10,7 @@ import type { Batch } from './api';
 import { TotalsStrip } from './RemittanceParts';
 import { parseEmails } from './remittanceLabels';
 import './remittance.css';
+import { countOf } from '@/utils/format';
 
 interface DialogProps {
   busy: boolean;
@@ -102,8 +103,9 @@ export function PreviewDialog({
         ) : (
           <>
             <p>
-              {p.lineCount} account(s) will be remitted; {p.excludedCount} excluded account(s) stay
-              out of the batch. Amounts cannot be changed.
+              {countOf(p.lineCount, 'account')} will be remitted;{' '}
+              {countOf(p.excludedCount, 'excluded account')} stay out of the batch. Amounts cannot
+              be changed.
             </p>
             <TotalsStrip totals={p.totals} currency={batch.summary.currency} />
             {p.problems.length > 0 && (
@@ -172,7 +174,7 @@ export function ExcludeDialog({
   const [missing, setMissing] = useState<string>();
   return (
     <Modal
-      title={`Exclude ${count} Account(s)`}
+      title={`Exclude ${countOf(count, 'Account')}`}
       open
       onClose={onClose}
       footer={

@@ -15,6 +15,7 @@ import { changedFieldText, changedValueText, dispositionLabel, handOffLabel } fr
 import type { ValueLookups } from './presentation';
 import { useLovLabel } from '@/components/broking/useLabels';
 import { useDisplayName } from '@/components/ui/useDisplayName';
+import { CellStack } from '@/components/ui/CellStack';
 
 /** Dispositions (append-only), efforts and hand-offs to Operations (BRCLXN.016-023). */
 export function DispositionsTab({ invoiceNo }: Readonly<{ invoiceNo: string }>) {
@@ -52,7 +53,9 @@ export function DispositionsTab({ invoiceNo }: Readonly<{ invoiceNo: string }>) 
             {
               key: 'b',
               header: 'Encoded By',
-              render: (d) => `${displayNameOf(d.createdBy)} · ${formatDateTime(d.createdAt)}`,
+              render: (d) => (
+                <CellStack main={displayNameOf(d.createdBy)} sub={formatDateTime(d.createdAt)} />
+              ),
             },
             {
               key: 's',
@@ -81,7 +84,7 @@ export function DispositionsTab({ invoiceNo }: Readonly<{ invoiceNo: string }>) 
             {
               key: 'p',
               header: 'Channel / Contact',
-              render: (e) => [e.channel, e.contactPerson].filter(Boolean).join(' · '),
+              render: (e) => <CellStack main={e.channel} sub={e.contactPerson} />,
             },
             { key: 'r', header: 'Remarks', render: (e) => e.remarks ?? '' },
             { key: 'b', header: 'Encoded By', render: (e) => <UserName login={e.createdBy} /> },

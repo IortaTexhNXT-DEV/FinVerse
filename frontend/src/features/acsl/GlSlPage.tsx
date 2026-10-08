@@ -12,7 +12,7 @@ import { Field } from '@/components/ui/Field';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate, formatDateTime, humanize } from '@/utils/format';
+import { countOf, formatDate, formatDateTime, humanize } from '@/utils/format';
 import { hasVariance } from './acsl';
 import { acslApi } from './api';
 import type { GlSlRow, GlSlRun } from './api';
@@ -101,7 +101,7 @@ export default function GlSlPage() {
     onSuccess: async (r) => {
       setPicked(r.id);
       await queryClient.invalidateQueries({ queryKey: ['acsl', 'glslRuns'] });
-      toast.success(`${String(r.differences)} difference(s) as of ${formatDate(r.asOf)}`);
+      toast.success(`${countOf(r.differences, 'difference')} as of ${formatDate(r.asOf)}`);
     },
   });
   const shown = runs.data?.find((r) => r.id === runId);

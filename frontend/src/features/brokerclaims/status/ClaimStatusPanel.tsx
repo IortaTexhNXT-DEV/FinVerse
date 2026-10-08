@@ -16,7 +16,7 @@ import { Field } from '@/components/ui/Field';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { useAuth } from '@/auth/authContext';
-import { formatAmount, formatDate } from '@/utils/format';
+import { countOf, formatAmount, formatDate } from '@/utils/format';
 import { claimStatusApi } from './api';
 import type { ClaimProgress } from './api';
 import { ACTION_PLAN_MAX, PHASE_LABELS, progressFlags, statusActions } from './statusLogic';
@@ -32,8 +32,12 @@ function settlementText(progress: ClaimProgress): string {
 function Facts({ progress }: Readonly<{ progress: ClaimProgress }>) {
   const facts = [
     { icon: Flag, label: 'Phase', value: PHASE_LABELS[progress.status.phase] },
-    { icon: Hourglass, label: 'Age this stage', value: `${progress.ages.thisStage} day(s)` },
-    { icon: Clock, label: 'Age overall', value: `${progress.ages.overall} day(s)` },
+    {
+      icon: Hourglass,
+      label: 'Age this stage',
+      value: countOf(progress.ages.thisStage, 'day'),
+    },
+    { icon: Clock, label: 'Age overall', value: countOf(progress.ages.overall, 'day') },
     {
       icon: CalendarClock,
       label: 'Next follow-up',

@@ -15,18 +15,22 @@ export interface EbHomeTile {
 const stage = (code: string) => `/eb/programmes?tab=IN_PROGRESS&stage=${code}`;
 
 export const EB_HOME_TILES: readonly EbHomeTile[] = [
-  { id: 'raDue', label: 'RA due', to: '/eb/programmes?tab=RENEWAL_DUE', alert: true },
-  { id: 'awaitingFeedback', label: 'Awaiting feedback', to: stage('RA_SENT') },
-  { id: 'franchisePending', label: 'Franchise pending', to: stage('FRANCHISE') },
-  { id: 'proposalsOutstanding', label: 'Proposals outstanding', to: stage('PROPOSALS') },
-  { id: 'comparativesToSignOff', label: 'Comparatives to sign off', to: stage('FOR_SIGNOFF') },
-  { id: 'thresholdApprovals', label: 'Threshold approvals', to: stage('THRESHOLD_APPROVAL') },
-  { id: 'withClient', label: 'With client', to: '/eb/programmes?tab=WITH_CLIENT' },
-  { id: 'memberChangesOpen', label: 'Member changes open', to: '/eb/member-changes' },
-  { id: 'soaToValidate', label: 'SOAs to validate', to: '/eb/soa?status=RECEIVED' },
+  { id: 'raDue', label: 'Renewal Advice Due', to: '/eb/programmes?tab=RENEWAL_DUE', alert: true },
+  { id: 'awaitingFeedback', label: 'Awaiting Feedback', to: stage('RA_SENT') },
+  { id: 'franchisePending', label: 'Franchise Pending', to: stage('FRANCHISE') },
+  { id: 'proposalsOutstanding', label: 'Proposals Outstanding', to: stage('PROPOSALS') },
+  { id: 'comparativesToSignOff', label: 'Comparatives to Sign Off', to: stage('FOR_SIGNOFF') },
+  { id: 'thresholdApprovals', label: 'Threshold Approvals', to: stage('THRESHOLD_APPROVAL') },
+  { id: 'withClient', label: 'With Client', to: '/eb/programmes?tab=WITH_CLIENT' },
+  { id: 'memberChangesOpen', label: 'Member Changes Open', to: '/eb/member-changes' },
+  {
+    id: 'soaToValidate',
+    label: 'Statements of Account to Validate',
+    to: '/eb/soa?status=RECEIVED',
+  },
   {
     id: 'pendingItemsOverdue',
-    label: 'Pending items overdue',
+    label: 'Pending Items Overdue',
     to: '/eb/pending-items?overdue=true',
     alert: true,
   },

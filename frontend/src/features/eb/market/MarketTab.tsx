@@ -15,7 +15,7 @@ import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { UserName } from '@/components/ui/UserName';
-import { formatDate, formatDateTime } from '@/utils/format';
+import { countOf, formatDate, formatDateTime } from '@/utils/format';
 import { DialogFooter } from '../common/DialogFooter';
 import { ActionButton } from '../common/ActionButton';
 import { InsurerChecks } from '../common/InsurerChecks';
@@ -30,7 +30,7 @@ function SendDialog({ cycleId, onClose }: Readonly<{ cycleId: number; onClose: (
   const [submitted, setSubmitted] = useState(false);
   const send = useEbMutation(
     (companyId, v: string[]) => ebMarketApi.sendRequests(companyId, cycleId, v),
-    (r: InsurerRequest[]) => `Request sent to ${String(r.length)} insurer(s)`,
+    (r: InsurerRequest[]) => `Request sent to ${countOf(r.length, 'insurer')}`,
     onClose,
   );
   const save = () => {

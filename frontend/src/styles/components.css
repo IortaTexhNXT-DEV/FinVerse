@@ -994,72 +994,242 @@
   border-bottom: 1px solid var(--color-surface);
 }
 
-/* ---------- Login (BDO Insure portal layout) ----------------------------------------------- */
-.login-page {
+/* ---------- Sign-in (BIBS enterprise layout) ------------------------------------------------ */
+.signin-page {
   min-height: 100%;
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  background: var(--color-surface);
+  grid-template-columns: minmax(380px, 36%) 1fr;
+  background: var(--color-bg);
 }
 
-.login-hero {
+.signin-brand {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--space-6);
+  padding: 56px 56px 40px;
   overflow: hidden;
-  background: var(--brand-blue-050);
+  color: #ffffff;
+  background:
+    radial-gradient(circle at 110% -10%, rgba(253, 185, 19, 0.18) 0, rgba(253, 185, 19, 0) 38%),
+    linear-gradient(160deg, var(--brand-navy) 0%, #003a7d 55%, #002a5c 100%);
 }
 
-.login-hero img {
+/* Fine diagonal lines: a quiet texture instead of a photo. */
+.signin-brand::before {
+  content: '';
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  background-image: repeating-linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.045) 0,
+    rgba(255, 255, 255, 0.045) 1px,
+    transparent 1px,
+    transparent 22px
+  );
+  pointer-events: none;
 }
 
-.login-panel {
+.signin-brand > * {
+  position: relative;
+}
+
+.signin-brand-body {
   display: grid;
-  place-items: center;
-  padding: var(--space-6);
+  gap: var(--space-3);
+  margin-top: 12vh;
+  max-width: 460px;
 }
 
-.login-card {
-  width: min(560px, 100%);
-  gap: var(--space-5);
+.signin-brand-product {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 56px;
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: 0.02em;
 }
 
-.login-logo {
+.signin-brand-name {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  opacity: 0.92;
+}
+
+.signin-brand-rule {
   display: block;
-  height: 56px;
+  width: 56px;
+  height: 4px;
+  margin: var(--space-2) 0;
+  border-radius: 2px;
+  background: var(--brand-gold);
+}
+
+.signin-brand-tagline {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.6;
+  opacity: 0.88;
+}
+
+.signin-brand-points {
+  display: grid;
+  gap: 10px;
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+}
+
+.signin-brand-points li {
+  position: relative;
+  padding-left: 22px;
+  opacity: 0.92;
+}
+
+.signin-brand-points li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.45em;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--brand-gold);
+}
+
+.signin-brand-company {
+  margin: 0;
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.signin-main {
+  display: grid;
+  grid-template-rows: auto 1fr auto auto;
+  justify-items: center;
+  padding: var(--space-5) var(--space-6);
+}
+
+.signin-topbar {
+  justify-self: end;
+  min-height: 28px;
+}
+
+.signin-env {
+  display: inline-block;
+  padding: 4px 12px;
+  border: 1px solid var(--brand-gold-600);
+  border-radius: 999px;
+  background: var(--brand-gold-050);
+  color: #6b4a00;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.signin-card {
+  align-self: center;
+  width: min(420px, 100%);
+  gap: var(--space-4);
+  padding: 40px 40px 32px;
+  border: 1px solid var(--color-border);
+  border-top: 4px solid var(--brand-navy);
+  border-radius: 8px;
+  background: var(--color-surface);
+  box-shadow: 0 12px 32px rgba(0, 42, 92, 0.1);
+}
+
+.signin-logo {
+  display: block;
+  height: 44px;
   width: auto;
-  margin: 0 auto;
 }
 
-.login-title {
-  font-size: 32px;
-  line-height: 40px;
-  text-align: center;
+.signin-title {
+  margin: 0;
+  font-size: 24px;
+  line-height: 32px;
+  color: var(--color-heading);
 }
 
-.login-subtitle {
-  margin: var(--space-1) 0 0;
-  text-align: center;
+.signin-subtitle {
+  margin: 2px 0 0;
   color: var(--color-text-muted);
-  font-size: 16px;
+  font-size: 14px;
 }
 
-.login-card .input {
-  height: 52px;
-  font-size: 16px;
+.signin-card .input {
+  height: 44px;
+  font-size: 15px;
 }
 
-.login-card .field label {
-  font-size: 16px;
-}
-
-.login-card .btn {
+.signin-card .btn {
   width: 100%;
-  height: 52px;
-  font-size: 18px;
+  height: 44px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.password-input {
+  position: relative;
+}
+
+.password-input .input {
+  padding-right: 64px;
+}
+
+.signin-card .password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  padding: 4px 8px;
+  border: 0;
+  background: none;
+  color: var(--color-info);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.signin-card .password-toggle:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: 4px;
+}
+
+.caps-lock {
+  margin: -8px 0 0;
+  color: #8a5a00;
+  font-size: 13px;
+}
+
+.signin-legal {
+  max-width: 520px;
+  margin: var(--space-5) 0 var(--space-3);
+  color: var(--color-text-muted);
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.signin-footer .powered-by img {
+  height: 22px;
+}
+
+.signin-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2) var(--space-5);
+  color: var(--color-text-muted);
+  font-size: 12px;
 }
 
 .powered-by {
@@ -1125,12 +1295,16 @@
     display: none;
   }
 
-  .login-page {
+  .signin-page {
     grid-template-columns: 1fr;
   }
 
-  .login-hero {
+  .signin-brand {
     display: none;
+  }
+
+  .signin-main {
+    padding: var(--space-4);
   }
 }
 

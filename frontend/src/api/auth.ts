@@ -13,6 +13,8 @@ export interface SignInOptions {
   /** The password form is the main sign-in (otherwise only for the break-glass administrators). */
   passwordSignIn: boolean;
   passwordReset: boolean;
+  /** Kind of environment (local, sit, uat, training, preprod, production). */
+  environment?: string;
 }
 
 /** A sign-in session of the session log (FR-UA-004). */

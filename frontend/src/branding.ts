@@ -15,5 +15,7 @@ export const BRAND = {
   vendor: 'iorta TechNXT',
   clientLogo: pack.clientLogo,
   vendorLogo,
-  loginPhoto: pack.loginPhoto,
+  legalName: pack.legalName,
+  signInTagline: pack.signInTagline,
+  signInHighlights: pack.signInHighlights,
 } as const;

@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.remittance.service;
 
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.opsledger.domain.DisbursementRequest;
 import com.iortatechnxt.brokerverse.opsledger.domain.LedgerComponent;
 import com.iortatechnxt.brokerverse.opsledger.domain.MovementType;
@@ -258,7 +259,7 @@ public class BatchPosting {
                       p[0],
                       p[1],
                       p[2],
-                      orType + " " + l.getInvoiceNo());
+                      DisplayFormat.label(orType) + " " + l.getInvoiceNo());
                 })
             .filter(l -> l.gross().signum() > 0)
             .toList();

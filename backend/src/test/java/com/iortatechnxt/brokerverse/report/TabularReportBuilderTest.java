@@ -116,4 +116,15 @@ class TabularReportBuilderTest {
         .extracting(r -> r.cells().get("status"), r -> r.cells().get("ref"))
         .containsExactlyInAnyOrder(tuple("Fully Remitted", "AB_1"), tuple("Open", "X"));
   }
+
+  @Test
+  void statusColumnsShowLabelsWithoutBeingNamed() {
+    var result =
+        TabularReportBuilder.of(params)
+            .columns(ReportColumn.text("remittance_status", "Remittance Status"))
+            .rows(List.of(Map.of("remittance_status", "WITH_OUTSTANDING_BALANCE")))
+            .build();
+    assertThat(result.rows().getFirst().cells().get("remittance_status"))
+        .isEqualTo("With Outstanding Balance");
+  }
 }

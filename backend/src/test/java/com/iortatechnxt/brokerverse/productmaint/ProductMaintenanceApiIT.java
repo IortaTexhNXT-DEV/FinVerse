@@ -77,7 +77,19 @@ class ProductMaintenanceApiIT {
     api.doGet("tsu", r + "/rounds/2/comparative")
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.rows[0].insurerCode").value("INS-MGIC"));
-    api.doGet("tsu", r + "/rounds/1/quotation-slip.pdf").andExpect(status().isOk());
+    byte[] slip =
+        api.doGet("tsu", r + "/rounds/1/quotation-slip.pdf")
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsByteArray();
+    // The reply-by date reads as dd-MMM-yyyy, as every other date of the document.
+    try (com.lowagie.text.pdf.PdfReader reader = new com.lowagie.text.pdf.PdfReader(slip)) {
+      String page = new com.lowagie.text.pdf.parser.PdfTextExtractor(reader).getTextFromPage(1);
+      assertThat(page.replace("\n", " "))
+          .containsPattern("on or before \\d{2}-[A-Z][a-z]{2}-\\d{4}")
+          .doesNotContainPattern("on or before \\d{4}-\\d{2}-\\d{2}");
+    }
     for (String path :
         List.of(
             "/responses/history", "/comparatives", "/requirements", "/advisories", "/form.pdf")) {

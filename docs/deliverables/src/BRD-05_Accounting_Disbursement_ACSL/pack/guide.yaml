@@ -5,14 +5,14 @@ meta:
   deck_title: Sign-off Pack Guide
   module: Accounting, Disbursement and ACSL
   owner: "Comptrollership (FRBS, Disbursement, ACSL), with Marketing for the refund and cash-advance requests"
-  issued: Fri 2-Oct-2026
+  issued: Thu 8-Oct-2026
   signoff_date: Wed 23-Dec-2026
 
 # The documents of the set in reading order. kind = doc type of the file name (brand.READING_ORDER).
 documents:
   - {kind: StartHere, name: Accounting Disbursement ACSL, ext: docx, what: "Start Here: the map of the pack, who reads what, who signs what, the steps and the dates", readers: Everyone, when: "First, on issue"}
   - {kind: GuideDeck, name: Accounting Disbursement ACSL, ext: pptx, what: "Sign-off Pack Guide: purpose, approach, the module at a glance, caveats and impacts on other modules, entry and exit criteria, change control", readers: "Head of Comptrollership, the product owners of FRBS, Disbursement, ACSL and Marketing; presented at the kick-off", when: "Kick-off session"}
-  - {kind: FRS, name: Accounting Disbursement ACSL, ext: docx, what: "Functional Requirements Specification v2.0: requirements of the two former volumes in one document, navigation, 51 screen specifications with screenshots, five walkthroughs, messages, notifications, documents, upload templates, cross-BRD contract", readers: "The GL team, Disbursement, ACSL and the Marketing requesters for their sections; Operations and BDOI IT for their chapters", when: "During the review, with the SIT walkthroughs"}
+  - {kind: FRS, name: Accounting Disbursement ACSL, ext: docx, what: "Functional Requirements Specification v2.1: requirements of the two former volumes in one document, re-based on the BRD with the minutes of 4-May-2026, with a user-story view and a storyboard index, navigation, 51 screen specifications with screenshots, five walkthroughs, messages, notifications, documents, upload templates, cross-BRD contract", readers: "The GL team, Disbursement, ACSL and the Marketing requesters for their sections; Operations and BDOI IT for their chapters", when: "During the review, with the SIT walkthroughs"}
   - {kind: Signoff, name: Accounting Disbursement ACSL, ext: xlsx, what: "Sign-off workbook: one row per screen, field, rule and message with the BU review columns; comments log, meeting minutes, version history, sign-off certificate", readers: "Every reviewer; the approvers sign it", when: "During the review and at sign-off"}
   - {kind: TestPlan, name: Accounting Disbursement ACSL, ext: xlsx, what: "Test plan workbook: the test cases of both former volumes traced to the FRs and to the screens, including one screen case and one message case per screen", readers: "Business users who will run UAT; BDOI IT", when: "After the screens; used again in SIT and UAT"}
   - {kind: TestPlan, name: Accounting Disbursement ACSL Summary, ext: docx, what: "Test plan summary: scope, approach, coverage and the cases by area", readers: "Product owners, BDOI IT", when: "Before sign-off"}
@@ -20,7 +20,7 @@ documents:
   - {kind: UXScreens, name: Accounting Disbursement ACSL, ext: xlsx, what: "UX screen register: one row per screen image with the screen, personas, walkthrough and step, state, FRS section and requirements, UXD status and comments, and the Changed in this issue flag", readers: "BDOI UX Design team", when: "Kept by the UX Design team; the changed rows are flagged at each issue"}
   - {kind: UXScreens, name: Accounting Disbursement ACSL, ext: zip, what: "Image package: every screen image at twice the screen resolution (PNG), the component crops and the register as CSV", readers: "BDOI UX Design team", when: "Imported into the design tool at each issue"}
 
-# Reading order per role (FRS chapter numbers of v2.0).
+# Reading order per role (FRS chapter numbers of v2.1).
 reading:
   - role: "Approvers (Head of Comptrollership; product owners of FRBS and ACSL, Disbursement, Comptrollership and Operations, Marketing)"
     order: "00 Start Here; 01 Guide deck; FRS chapters 1-3 (context and personas), 14 (walkthroughs), 20 (sign-off) and 21 (proposed rules for confirmation); workbook Sign-off certificate"
@@ -48,9 +48,9 @@ steps:
   - step: 1
     name: Pack issued
     who: "R: iorta TechNXT Project Manager; A: iorta TechNXT delivery lead; I: all reviewers"
-    inputs: "FRS v2.0, workbook, test plan, guide and deck"
-    outputs: "Release set v2.0 in the BRD-05 folder; invitations to the sessions"
-    duration: "Day 0 (Fri 2-Oct-2026); sessions scheduled after the BRD-4 Collections walkthroughs"
+    inputs: "FRS v2.1, workbook, test plan, guide and deck"
+    outputs: "Release set v2.1 in the BRD-05 folder; invitations to the sessions"
+    duration: "Day 0 (Thu 8-Oct-2026); sessions scheduled after the BRD-4 Collections walkthroughs"
   - step: 2
     name: Kick-off and screen walkthrough on SIT
     who: "R: iorta TechNXT Business Analysis; A: Head of Comptrollership; C: product owners of FRBS, ACSL, Disbursement and Marketing; I: Operations, BDOI IT"
@@ -70,15 +70,15 @@ steps:
     outputs: "One consolidated comments log, each item typed (clarification, correction, change request) and answered; Q&A minutes"
     duration: "2 working days, Q&A on Wed 16-Dec-2026"
   - step: 5
-    name: One revision cycle (v2.1)
+    name: One revision cycle (v2.2)
     who: "R: iorta TechNXT Business Analysis; A: iorta TechNXT delivery lead; C: reviewers who raised the items"
     inputs: "Agreed clarifications and corrections"
-    outputs: "Release set v2.1 with the changed rows marked; change requests raised for the rest"
-    duration: "2 working days, v2.1 on Fri 18-Dec-2026; check by the reviewers until Tue 22-Dec-2026"
+    outputs: "Release set v2.2 with the changed rows marked; change requests raised for the rest"
+    duration: "2 working days, v2.2 on Fri 18-Dec-2026; check by the reviewers until Tue 22-Dec-2026"
   - step: 6
     name: Sign-off meeting and signature
     who: "R: iorta TechNXT Project Manager; A: Head of Comptrollership; C: the product owners, BDOI IT, Business Project Services"
-    inputs: "v2.1 (or v2.0 when no revision is needed); open items with their decision"
+    inputs: "v2.2 (or v2.1 when no revision is needed); open items with their decision"
     outputs: "Signed sign-off certificate; minutes; open items accepted as assumptions or change requests"
     duration: "Wed 23-Dec-2026"
   - step: 7
@@ -150,7 +150,7 @@ entry:
   - "The BRD-2 Operations walkthroughs are held (the remittance batches, refunds and cashiering validations are the input of Disbursement and ACSL)."
 exit:
   - "Every row of the workbook reviewed by its unit (Accept, Change requested or Comment)."
-  - "Every comments log item closed: answered, corrected in v2.1, or raised as a change request."
+  - "Every comments log item closed: answered, corrected in v2.2, or raised as a change request."
   - "Open questions closed or accepted as assumptions."
   - "The sign-off certificate signed by every signatory of the Who signs what matrix: prepared, input, reviewed and approved as on the BRD-5 approval sheets; the Head of Comptrollership approves the whole set."
 done:

@@ -1,4 +1,4 @@
-# BRD-5 Accounting, Disbursement and ACSL – Business Sign-off Pack, release set v2.0 (Drop 1, Transactional).
+# BRD-5 Accounting, Disbursement and ACSL – Business Sign-off Pack, release set v2.1 (Drop 1, Transactional).
 # Built by docs/deliverables/src/signoff/signoff_pack.py (workbook, checks) and read by the FRS source through
 # ```pack blocks (tools/deliverables/bdoi_docx.py). Schema: docs/deliverables/src/signoff/README.md.
 meta:
@@ -6,9 +6,9 @@ meta:
   brd_label: BRD-5
   name: Accounting Disbursement ACSL
   code: AC
-  version: "2.0"
-  date: 2 October 2026
-  status_as_of: 02-Oct-2026
+  version: "2.1"
+  date: 8 October 2026
+  status_as_of: 08-Oct-2026
   release_set: BRD-05 Accounting, Disbursement and ACSL – Business Sign-off Pack
   frs: FRS_BRD05_ACCOUNTING.md
   test_plan: brd05_cases.yaml

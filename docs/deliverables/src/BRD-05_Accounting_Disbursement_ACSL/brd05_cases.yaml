@@ -1,4 +1,4 @@
-# Test plan BRD-5 Accounting, Disbursement and ACSL - test data file (release set v2.0).
+# Test plan BRD-5 Accounting, Disbursement and ACSL - test data file (release set v2.1).
 # Build: python docs/deliverables/src/testplans/build_test_plan.py docs/deliverables/src/BRD-05_Accounting_Disbursement_ACSL/brd05_cases.yaml
 # Schema: see the header of build_test_plan.py. FR titles, BRD IDs and priorities come from the FRS.
 # Messages and codes are the ones BIBS shows on the Accounting, Disbursement, Payment Requests, ACSL and
@@ -10,8 +10,8 @@ meta:
   code: AC
   frs: FRS_BRD05_ACCOUNTING.md
   summary: TP_BRD05_ACCOUNTING.md
-  version: "2.0"
-  date: 2 October 2026
+  version: "2.1"
+  date: 8 October 2026
   signoff: pack/pack.yaml
   verify_messages: true
 
@@ -174,7 +174,7 @@ data:
     source: SOA file prepared by the test lead; GL-SL controls as configured for the SIT environment; seed remittance deductions
   - id: TD-DPA-07
     name: Remittance and incentives
-    content: Remittance batches of the Operations seed; CPC2 incentive criterion (code CPC2, RATE basis) on packaged Motor lines; early-remittance incentive rules; EARLY_INCENTIVE_WTAX_RATE 2 %
+    content: Remittance batches of the Operations seed; CPC2 incentive criterion (code CPC2, RATE basis) on packaged Motor lines, whose booked invoices carry the CPC2 incentive tag; early-remittance incentive rules; EARLY_INCENTIVE_WTAX_RATE 2 %
     source: Seed data (remittance, package versions and incentive criteria)
   - id: TD-DPA-08
     name: Employee master and liquidation accounts
@@ -3467,7 +3467,7 @@ frs:
     conditions:
       - A qualifying line gets CPC2 at the rate of the criterion on the basic premium remitted, with VAT, deducted from the payable and shown apart from commission.
       - Approval posts OPS_REMIT_CPC2 per batch to CPC2 incentive income.
-      - A line without an active CPC2 criterion or below the minimum premium gets no CPC2.
+      - A line whose booked transaction has no CPC2 tag (no criterion matched at booking, below the minimum premium, or the tag removed by an endorsement) gets no CPC2.
     cases:
       - c: 1
         type: Positive
@@ -3489,6 +3489,13 @@ frs:
         steps:
           - Extract a batch with that line.
         expected: The line has no CPC2.
+      - c: 3
+        type: Negative
+        title: Endorsement removed the CPC2 tag
+        pre: A packaged Motor invoice booked with the CPC2 tag, then endorsed so that it no longer qualifies; the endorsement booking removed the tag.
+        steps:
+          - Extract a remittance batch with the endorsed invoice; open the batch, Settlement tab.
+        expected: The line has no CPC2 although the product still matches the CPC2 criteria; the batch payable is not reduced by CPC2.
 
   FR-DS-091:
     scenario: SC-DPA-06
@@ -3498,6 +3505,7 @@ frs:
     conditions:
       - Approving a batch with an early incentive issues one EARLY_INCENTIVE service invoice with 2 % withholding, linked to the batch.
       - A re-sent batch does not issue a second invoice; a manual issue of the type is refused.
+      - The service invoice has one line per qualified transaction of the batch, and its amount is the incentive of the batch with its taxes.
     cases:
       - c: 1
         type: Workflow
@@ -3519,6 +3527,14 @@ frs:
         steps:
           - Cancel the batch's DV and approve the batch again.
         expected: No second EARLY_INCENTIVE invoice is issued.
+      - c: 3
+        type: Report-output
+        screen: SINV
+        title: One line per qualified transaction
+        pre: A remittance batch with three transactions qualified for the early incentive.
+        steps:
+          - Approve the batch; open its service invoice from the Settlement tab.
+        expected: One EARLY_INCENTIVE service invoice with three lines, each naming its invoice, incentive, VAT and withholding; the invoice total is the incentive of the batch with VAT less withholding; the Settlement tab lists the three transactions with the service invoice number.
 
   FR-DS-092:
     scenario: SC-DPA-06
@@ -3527,6 +3543,7 @@ frs:
     conditions:
       - The CPC2 of each line (code, rate, amount, VAT) is shown on the batch and its payment request.
       - The CPC2 report lists the CPC2 lines of a period and its total agrees with the CPC2 income in the ledger.
+      - The report lists only the lines whose booked transaction carries the CPC2 tag.
     cases:
       - c: 1
         type: Positive
@@ -3549,6 +3566,12 @@ frs:
           - Run the CPC2 report with the period blank.
         expected: The report does not run.
         msg: ["Parameter <name> is required", MISSING_PARAMETER]
+      - c: 3
+        type: Negative
+        title: Untagged transaction not on the report
+        steps:
+          - Run the CPC2 report for the month of the batch with the endorsed invoice of FR-DS-090 (tag removed).
+        expected: The endorsed invoice is not listed; the report total still equals the CPC2 income posted.
 
   FR-DS-093:
     scenario: SC-DPA-06

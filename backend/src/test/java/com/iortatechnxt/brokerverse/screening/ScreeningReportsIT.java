@@ -38,7 +38,8 @@ class ScreeningReportsIT {
           "SCR-PEP-CLIENTS",
           "SCR-INGEST-ERRORS",
           "SCR-STR-REGISTER",
-          "SCR-AUDIT-LOG");
+          "SCR-AUDIT-LOG",
+          "SCR-NAME-MATCH-FALLOUT");
 
   @Autowired private ReportService reports;
   @Autowired private AsUser as;

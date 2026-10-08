@@ -120,9 +120,14 @@ class OpeningBalanceSeedDataIT {
       }
       assertThat(balance(BDO, monthEnd)).as("1111 at %s", monthEnd).isPositive();
       assertThat(balance(BPI, monthEnd)).as("1112 at %s", monthEnd).isPositive();
+      // Every branch that holds 1111 or 1112 is in credit: the four opening balances and the
+      // branches that received collections into them (e.g. a Davao cash receipt into 1112).
       assertThat(branchBalances(monthEnd))
           .as("branch balances of 1111 and 1112 at %s", monthEnd)
-          .hasSize(4)
+          .extracting(r -> r.get("account") + "/" + r.get("branch"))
+          .contains("1111/HO", "1111/CEB", "1111/DVO", "1112/HO");
+      assertThat(branchBalances(monthEnd))
+          .as("branch balances of 1111 and 1112 at %s", monthEnd)
           .allSatisfy(r -> assertThat((BigDecimal) r.get("balance")).isPositive());
     }
   }

@@ -53,7 +53,7 @@ source: pack/pack.yaml
 render: guide-reading
 ```
 
-SIT users of the seed data for the review: mkttl (Marketing Team Leader, CBG Team 1), ao (Marketing Account Officer, CBG Team 1), rnwtl (Renewal Team Leader, Corporate Team 1), ao2 (Marketing Account Officer, Corporate Team 1), proctl (Processing Team Leader), proc (Processing Officer), contactc (Contact Center), lamd (LAMD), badmin (Business Administrator), admin (System Administrator) and auditor. The passwords are sent separately to the named reviewers.
+SIT users of the seed data for the review: mkttl (Marketing Team Leader, CBG Metro Team 1), ao (Marketing Account Officer, CBG Metro Team 1), rnwtl (Renewal Team Leader, Corporate Marketing Team 1), ao2 (Marketing Account Officer, Corporate Marketing Team 1), proctl (Processing Team Leader), proc (Processing Officer), contactc (Contact Center), lamd (LAMD), badmin (Business Administrator), admin (System Administrator) and auditor. The passwords are sent separately to the named reviewers.
 
 # Steps up to closure
 

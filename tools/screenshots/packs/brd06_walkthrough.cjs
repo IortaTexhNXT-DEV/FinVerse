@@ -380,7 +380,7 @@ const steps = {
     await button(page, /^transfer$/i).click();
     await settle(page, 600);
     const d = dialogOf(page);
-    await fill(page, 'Receiving Unit', /CBG Team 1|T-CBG1/, d);
+    await fill(page, 'Receiving Unit', /CBG Metro Team 1|CBG Team 1|T-CBG1/, d);
     await d.getByLabel(/^Remarks/).fill('Client asked for its own unit');
     await d.getByRole('button', { name: /^submit and push$/i }).click();
     await settle(page, 1500);

@@ -1,19 +1,19 @@
 # End-to-end walkthroughs of BRD-6 Renewal, shown step by step with screenshots of the seed profile.
 # Each step: persona (role code), screen (SCR id), what the user does, what the user sees, the result, and the
 # screenshot taken after the step (captured live by tools/screenshots/capture_pack.cjs, which performs the steps).
-# The steps of the Corporate Team 1 are taken by its Team Leader (Rosario Renewal Team Lead) and its Account Officer
-# (Arnel Account Officer); those of CBG Team 1 by Marites Marketing Lead and Aileen Account Officer.
+# The steps of the Corporate Marketing Team 1 are taken by its Team Leader (Rosario Renewal Team Lead) and its Account Officer
+# (Arnel Account Officer); those of CBG Metro Team 1 by Marites Marketing Lead and Aileen Account Officer.
 walkthroughs:
   - id: WT-A
     title: An expiring account from the Expiry List to the Team Leader's post
     summary: >-
       The booked accounts expiring in the renewal horizon are extracted and initiated; the renewal of Pacific Harbor
-      Logistics Inc. waits in the Unassigned Disposition tab of Corporate Team 1, classified Review: its expiring
+      Logistics Inc. waits in the Unassigned Disposition tab of Corporate Marketing Team 1, classified Review: its expiring
       premium is outstanding, a claim is open and an endorsement is in progress. The Team Leader assigns it to the
       Account Officer, who reads the account history, gives the disposition For Renewal and pushes it. The Team
       Leader's post is refused while the blocking checks fail; she overrides them with a reason and posts the
       renewal to Processing.
-    data: "Seed data: renewal of account ARN-2026-940004 (Pacific Harbor Logistics Inc., Luzon Assurance Co.), Corporate Team 1"
+    data: "Seed data: renewal of account ARN-2026-940004 (Pacific Harbor Logistics Inc., Luzon Assurance Co.), Corporate Marketing Team 1"
     steps:
       - [MKT_TL, SCR-RN-02, "Opens the Expiry List, tab Unassigned Disposition, ticks the renewal of Pacific Harbor Logistics Inc. and clicks Assign Disposition: Arnel Account Officer, then Assign and Push", "Message: 1 assigned; the renewal leaves the tab", Assigned, wt-a-01]
       - [MKT_AO, SCR-RN-06, "Opens My Dispositions", "The renewal assigned to him with its expiry, the Review classification and the flags Outstanding and Claims", For disposition, wt-a-02]
@@ -66,7 +66,7 @@ walkthroughs:
       Aileen Account Officer learns that the client's loan is fully paid: she gives the disposition Not for Renewal
       with that reason and pushes it; the Team Leader posts it to the letter step and the Not for Renewal Letter is
       sent, which closes the renewal.
-    data: "Seed data: the renewal of the migrated motor policy QPS-FI-0100007 (Jose Miguel Reyes), CBG Team 1, assigned to Aileen Account Officer by the Team Leader"
+    data: "Seed data: the renewal of the migrated motor policy QPS-FI-0100007 (Jose Miguel Reyes), CBG Metro Team 1, assigned to Aileen Account Officer by the Team Leader"
     steps:
       - [MKT_AO, SCR-RN-07, "Opens the renewal, views its account history, clicks Set Disposition: Not for Renewal, reason Loan fully paid, with remarks, then Save", "Message: Saved; the disposition Not for Renewal with its reason", Dispositioned, wt-d-01]
       - [MKT_TL, SCR-RN-08, "After the Account Officer's push, ticks the renewal on TL Review, clicks Post and confirms", "Message: 1 posted; the renewal goes to the closing letters", Letter pending, wt-d-02]
@@ -78,11 +78,11 @@ walkthroughs:
   - id: WT-E
     title: A transfer to another unit, and the controls the user sees
     summary: >-
-      CBG Team 1 transferred the renewal of a corporate client to Corporate Team 1; its Team Leader accepts it. Then
+      CBG Metro Team 1 transferred the renewal of a corporate client to Corporate Marketing Team 1; its Team Leader accepts it. Then
       two controls of Renewal with the message the user sees: a disposition before the account history, and a
       transfer to the own unit.
-    data: "Seed data: the transfer request of the migrated policy EBIX-CG-0100005 (Luzon Agri-Industrial Corp.) to Corporate Team 1; the renewal of the migrated policy QPS-FI-0100002 (Jose Miguel Reyes) of CBG Team 1"
+    data: "Seed data: the transfer request of the migrated policy EBIX-CG-0100005 (Luzon Agri-Industrial Corp.) to Corporate Marketing Team 1; the renewal of the migrated policy QPS-FI-0100002 (Jose Miguel Reyes) of CBG Metro Team 1"
     steps:
-      - [MKT_TL, SCR-RN-09, "The Team Leader of Corporate Team 1 opens Transfers, tab Incoming, chooses Accept in the row action menu and confirms with remarks", "Message: Transfer accepted; the renewal joins the Unassigned tab of the unit", Transferred, wt-e-01]
+      - [MKT_TL, SCR-RN-09, "The Team Leader of Corporate Marketing Team 1 opens Transfers, tab Incoming, chooses Accept in the row action menu and confirms with remarks", "Message: Transfer accepted; the renewal joins the Unassigned tab of the unit", Transferred, wt-e-01]
       - [MKT_AO, SCR-RN-07, "Aileen Account Officer gives a disposition on a renewal without opening its account history", "Open the Account History before you give the disposition", Refused, wt-e-02]
-      - [MKT_TL, SCR-RN-02, "Marites Marketing Lead transfers a renewal of her unit to CBG Team 1, her own unit", "The receiving unit must be another unit", Refused, wt-e-03]
+      - [MKT_TL, SCR-RN-02, "Marites Marketing Lead transfers a renewal of her unit to CBG Metro Team 1, her own unit", "The receiving unit must be another unit", Refused, wt-e-03]

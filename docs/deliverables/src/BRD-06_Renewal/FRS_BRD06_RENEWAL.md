@@ -2971,6 +2971,7 @@ Every BRD-6 requirement ID is met by at least one FR or is out of scope by the B
 | Walkthrough addendum BRRN.041-042, restated BRRN.001, 020, 023, 024, 028-030, 033-037 | 2 new, 13 restated | Section 11.1 |
 | Walkthrough addendum BRRN.041-042, restated BRRN.001, 020, 023, 024, 028-030, 033-037 | 2 new, 13 restated | Section 11.1 |
 | Walkthrough addendum BRRN.041-042, restated BRRN.001, 020, 023, 024, 028-030, 033-037 | 2 new, 13 restated | Section 11.1 |
+| Walkthrough addendum BRRN.041-042, restated BRRN.001, 020, 023, 024, 028-030, 033-037 | 2 new, 13 restated | Section 11.1 |
 | Workshop addendum BRRN.020-040 | 21 | Section 11.1 |
 | Addendum 1 BRRN.001-019 | 19 (with the main-BRD IDs they restate) | Section 11.1 |
 | Main BRD 1.001-6.002 | 1,032 line IDs, of which 9 out of scope | Section 11.2 |
@@ -3586,9 +3587,9 @@ One row per step of the five walkthroughs of chapter 14: the frame, the persona,
 | WT-D.2 | Marketing Team Leader | SCR-RN-08 TL Review | After the Account Officer's push, ticks the renewal on TL Review, clicks Post and confirms | Message: 1 posted; the renewal goes to the closing letters. Letter pending | - | FR-RN-050 | - |
 | WT-D.3 | Marketing Account Officer (Account Broker) | SCR-RN-13 Letters | Opens Letters, tab NAL / NFR, ticks the renewal, clicks Send Letters and confirms | Message: 1 sent; the renewal is closed. Closed | - | FR-RN-082 | - |
 | WT-D.4 | Marketing Account Officer (Account Broker) | SCR-RN-05 Renewal: Insurer, Letters, Documents, Remarks and History | Opens the renewal, tab Letters | The Not for Renewal Letter in the e-mail queue to the client. Letter kept | - | FR-RN-082 | - |
-| WT-E.1 | Marketing Team Leader | SCR-RN-09 Transfers | The Team Leader of Corporate Team 1 opens Transfers, tab Incoming, chooses Accept in the row action menu and confirms with remarks | Message: Transfer accepted; the renewal joins the Unassigned tab of the unit. Transferred | - | FR-RN-032 | - |
+| WT-E.1 | Marketing Team Leader | SCR-RN-09 Transfers | The Team Leader of Corporate Marketing Team 1 opens Transfers, tab Incoming, chooses Accept in the row action menu and confirms with remarks | Message: Transfer accepted; the renewal joins the Unassigned tab of the unit. Transferred | - | FR-RN-032 | - |
 | WT-E.2 | Marketing Account Officer (Account Broker) | SCR-RN-07 Set Disposition, Add Remark and Re-open | Aileen Account Officer gives a disposition on a renewal without opening its account history | Open the Account History before you give the disposition. Refused | - | FR-RN-042 | - |
-| WT-E.3 | Marketing Team Leader | SCR-RN-02 Expiry List | Marites Marketing Lead transfers a renewal of her unit to CBG Team 1, her own unit | The receiving unit must be another unit. Refused | - | FR-RN-031 | - |
+| WT-E.3 | Marketing Team Leader | SCR-RN-02 Expiry List | Marites Marketing Lead transfers a renewal of her unit to CBG Metro Team 1, her own unit | The receiving unit must be another unit. Refused | - | FR-RN-031 | - |
 
 <!-- portrait -->
 

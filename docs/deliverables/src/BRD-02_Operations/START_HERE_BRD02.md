@@ -1,16 +1,16 @@
 ---
-# Source of "00 Start Here - Guide to the BRD-02 Sign-off Pack" (Word), release set v2.0 of BRD-2 Operations.
+# Source of "00 Start Here - Guide to the BRD-02 Sign-off Pack" (Word), release set v2.1 of BRD-2 Operations.
 # Build: python tools/deliverables/bdoi_docx.py docs/deliverables/src/BRD-02_Operations/START_HERE_BRD02.md
 # The map, the reading order and the steps come from pack/guide.yaml (the same source as the guide deck).
 title: Start Here
-subtitle: Guide to the BRD-02 Operations Sign-off Pack, release set v2.0
+subtitle: Guide to the BRD-02 Operations Sign-off Pack, release set v2.1
 doc_type: Start Here Guide
 doc_code: StartHere
 brd: BRD-02
 name: Operations
 doc_id: BIBS-SH-BRD-02
-version: "2.0"
-date: 28 September 2026
+version: "2.1"
+date: 08 October 2026
 status: Issued for BDOI business sign-off
 header_title: Start Here BRD-2 Operations
 h1_page_break: false
@@ -21,9 +21,17 @@ control:
     reviewer: iorta TechNXT Business Analysis
     approver: ""
     change: First issue with the BRD-2 Operations business sign-off pack (replaces the release note of the set)
+  - version: "2.1"
+    date: 08 Oct 2026
+    author: iorta TechNXT Project Manager
+    reviewer: iorta TechNXT Business Analysis
+    approver: ""
+    change: "Re-based on the Operations BRD v1.01 (15-Apr-2026) and the five Operations Central Addendum 1 annexes of May 2026; user-story view and storyboard index added to the FRS; every file of the set re-issued at v2.1"
 distribution:
   - {name: "Shellah Marie C. Miranda, AVP, Product Owner", role: Approver, organisation: BDOI, purpose: Sign-off}
   - {name: "Jose Melvin M. Jarin, Operations: Financial Transactions and Processing", role: Approver, organisation: BDOI, purpose: Review and sign-off for Operations}
+  - {name: "Pia Grace M. Pinili, Collections and Marketing Support", role: Approver, organisation: BDOI, purpose: Review and sign-off of the Marketing Collection items}
+  - {name: "Angel Lou R. Kabigting (Marketing Collections) and Rodrigo R. Dela Cruz (Comptrollership)", role: Reviewers, organisation: BDOI, purpose: Review of the Marketing Collection items and the accounting events}
   - {name: "Shirley Catapang and Perjelyn Joy Gutierrez, Operations: FT&P", role: Reviewers, organisation: BDOI, purpose: Review of the screens and rows of their teams}
   - {name: "Cashiering, Remittance, Adjustment, Production Reconciliation, Commission Receivables, Marketing Collection, Comptrollership and Disbursement", role: Reviewers, organisation: BDOI, purpose: Review of their screens and rows}
   - {name: Information Technology Group, role: Reviewer, organisation: BDOI, purpose: "Interfaces, jobs, access; the Technical Specification"}
@@ -34,6 +42,8 @@ distribution:
 # What this pack is for
 
 This pack shows the proposed BRD-2 Operations of BIBS, screen by screen, so that each Operations team can confirm what it will get and sign it off: the invoice ledger and Invoice 360, Cashiering, Remittance, Adjustment, Production Reconciliation and Commission Receivables, with the Disbursement queue, the interfaces and the Operations reports. Signing freezes the content, the screens and the navigation of Operations; a later change goes through the Change Management Register with its mandays. The screenshots use fictitious seed data only.
+
+**What is new in v2.1.** The set is re-based on the Operations BRD v1.01 of 15 April 2026 and on the five annexes signed in May 2026 (file Operations_WS Addendum). Check pick-up is removed from scope; the PR 2307 reversal is done by Marketing Collection and Disbursement only releases the certificates; minimal balances are cleared when the payment is processed; Remittance, Production Reconciliation and Adjustment take the clarifications of the annexes; Commission Receivables works from the system tagging with read-only review, rule-based exclusion, SLA incentives and invoice-level ageing. The screenshots are those of v2.0: where a screen changes, its specification says what changes and chapter 21 of the FRS lists what BDOI is asked to confirm (CLR-OP-36 to 62). The FRS now ends with a user-story view of every BRD requirement and a storyboard index of the walkthroughs.
 
 # The pack at a glance
 
@@ -76,7 +86,7 @@ render: guide-steps
 
 # Who signs what
 
-The set holds business content only: the screens and fields, the columns of the lists, reports and templates that the user sees or fills in, the validations, business rules, messages, notifications, documents, walkthroughs and reports. The business users sign that content. Technical content (the interfaces between systems, data storage, security set-up) is not part of the set: it is in the Technical Specification, a separate document reviewed by BDOI IT. The roles are those of the approval sheet of the Operations BRD: iorta TechNXT and the Business Analyst of Business Project Services prepare the set, Operations: Financial Transactions and Processing provides the input, BDOI IT reviews the interfaces, the user access and the Technical Specification, and the Program Manager of Business Project Services, Operations: Financial Transactions and Processing and the Product Owner approve it.
+The set holds business content only: the screens and fields, the columns of the lists, reports and templates that the user sees or fills in, the validations, business rules, messages, notifications, documents, walkthroughs and reports. The business users sign that content. Technical content (the interfaces between systems, data storage, security set-up) is not part of the set: it is in the Technical Specification, a separate document reviewed by BDOI IT. The roles are those of the approval sheet of the Operations BRD v1.01: iorta TechNXT and the Business Analyst of Business Project Services prepare the set, Operations: Financial Transactions and Processing provides the input, Marketing Collections and Comptrollership review the Marketing items and the accounting, BDOI IT reviews the interfaces, the user access and the Technical Specification, and the Program Manager of Business Project Services, Operations: Financial Transactions and Processing, Collections and Marketing Support and the Product Owner approve it.
 
 ```pack
 plugin: ../signoff/signoff_pack.py

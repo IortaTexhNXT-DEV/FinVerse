@@ -138,6 +138,7 @@ screens:
       - "Endorsement Slip / Validation Slip | Every user of the screen | Not internal / validated | Downloads the endorsement slip (numbered ES-yyyy-n once) or the validation slip | - | -"
     rules:
       - "A request is approved by someone who did not raise, submit or validate it (FR-OP-053)."
+      - "In v2.1 a returned request goes to the Marketing owner of the account, who corrects and resubmits it; the reason is mandatory and the page shows each return and resubmission (FR-OP-053, CLR-OP-52)."
       - "Posting books the endorsement or return invoice through New Business booking; a decrease or cancellation is counted once, on the original invoice (FR-OP-056)."
       - "After remittance, the remitted DTIP of a cancelled or reduced invoice is set up as AR Insurer per insurer share, and the pending negative adjustment stays for Remittance (FR-OP-057)."
       - "A paid invoice's payments are re-applied by Cashiering; the excess becomes an unapplied payment for refund (FR-OP-057)."

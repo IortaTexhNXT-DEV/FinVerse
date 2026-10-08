@@ -5,7 +5,8 @@
 sources:
   backend_packages: [opsledger, cashiering, remittance, adjustment, prodrecon, commission]
   exclude_classes: [LegacyBatch, LegacyBatchService, LegacyBatchPoster, LegacyInvoiceIntake, IncomeDispositions,
-                    DpprBatch, DpprBatchService, DpprBatchPoster, DpprOpenPremium, BookRates]
+                    DpprBatch, DpprBatchService, DpprBatchPoster, DpprOpenPremium, BookRates,
+                    PickupService, PickupRequest, PickupFlowInHandler]
   exclude_codes: [NOT_FOUND, MIG_UPP_NOT_MIGRATED, MIG_UPP_WORKED]
   exclude_texts: ["^<message>$", "^<errors>$"]
   bulk_handlers: [CwtTagHandler, PdcFileHandler, CommissionPaymentHandler, AdjustmentBatchHandler, MinimalBalanceFileHandler]
@@ -13,7 +14,7 @@ sources:
   frontend_dirs: [features/operations, features/remittance, features/adjustment, features/prodrecon,
                   features/cashiering/BatchPrintPage.tsx, features/cashiering/CashFields.tsx,
                   features/cashiering/CashieringHomePage.tsx, features/cashiering/CashieringRequestsPage.tsx,
-                  features/cashiering/CashieringSetupPage.tsx, features/cashiering/CheckPickupPage.tsx,
+                  features/cashiering/CashieringSetupPage.tsx,
                   features/cashiering/CommissionOrsPage.tsx, features/cashiering/Cwt2307Page.tsx,
                   features/cashiering/CwtTagDialog.tsx, features/cashiering/DispositionForm.tsx,
                   features/cashiering/IssueOrDialog.tsx, features/cashiering/PaymentPreviewPane.tsx,
@@ -53,7 +54,6 @@ places:
   - [ "^(PrebookedPage|PrebookedService)$", "Pre-booked Payments (SCR-OP-14)" ]
   - [ "^(PaymentUploadsPage|PaymentFileHandler|PaymentFileLayouts|PaymentFileLayout|CashieringSetupPage)$", "Payment Uploads and Cashiering Setup (SCR-OP-15, SCR-OP-22)" ]
   - [ "^(PdcWarehousePage|PdcDialogs|PdcItem|PdcWarehouseService)$", "PDC Warehouse (SCR-OP-16)" ]
-  - [ "^(CheckPickupPage|PickupService|PickupRequest|PickupFlowInHandler)$", "Check Pick-up (SCR-OP-17)" ]
   - [ "^(BatchPrintPage|BatchPrintService)$", "Batch Print (SCR-OP-18)" ]
   - [ "^(Cwt2307Page|CwtTagDialog|CwtTag|CwtService|CwtPostings)$", "BIR 2307 (SCR-OP-19)" ]
   - [ "^(CommissionOrsPage|CollectionFlowInFeeds)$", "Commission ORs (SCR-OP-20)" ]
@@ -113,7 +113,6 @@ fixes:
   PAYMENT_LAYOUT_FIELDS: Write each field as Header:start:length separated by semicolons.
   PDC_RELEASE_STATUS: Choose Returned, Replaced or Pulled out.
   PDC_NOT_WAREHOUSED: No action; the check has already left the warehouse.
-  PICKUP_NOT_QUEUED: No action; the pick-up has already been printed or cancelled.
   RECEIPT_ALREADY_CANCELLED: No action; the receipt is already cancelled.
   RECEIPT_NOT_CANCELLED: Cancel the receipt first; only a cancelled receipt is reinstated.
   REINSTATEMENT_AMOUNT: Enter an amount above zero and at most the receipt amount.
@@ -160,11 +159,6 @@ fixes:
   UNAPPLIED_WRONG_STAGE: No action; the item has already moved on.
   PDC_DUPLICATE: No action; the check is already in the warehouse.
   PDC_AMOUNT: Enter an amount above zero.
-  PICKUP_COMPANY_UNKNOWN: Correct the company of the pick-up record and import it again.
-  PICKUP_DUPLICATE: No action; the pick-up is already queued.
-  PICKUP_AMOUNT: Enter a check amount above zero.
-  PICKUP_NOTHING_DUE: Select pick-ups that are still For Pick-up.
-  PICKUP_RECORD_INVALID: Complete the pick-up record in Collections and import it again.
   PREBOOKED_NOT_OPEN: No action; the payment was already applied or released.
   RECEIPT_ACTION_NOT_FOR_APPROVAL: No action; the request is not waiting for approval.
   RECEIPT_ACTION_PENDING: Wait for the decision on the open request of the receipt.
@@ -269,7 +263,6 @@ fixes:
   COMPANY_REQUIRED: Choose the company in the header.
   RECON_SCHEDULE_INSURER: Enter the insurer of the schedule.
   "The reference belongs to a cancelled invoice: the payment goes to unapplied collections.": No action; the payment will be kept unapplied for a disposition.
-  "The pick-up is cancelled and the check stays with the client.": Confirm to cancel the pick-up, or close the dialog.
   "The selected certificates are validated and the 2307 report is posted.": Confirm to validate and post, or close the dialog.
   "The requested action is applied to the receipt.": Confirm to approve, or close the dialog.
   "The series becomes active for issuing receipts.": Confirm to authorise the series, or close the dialog.

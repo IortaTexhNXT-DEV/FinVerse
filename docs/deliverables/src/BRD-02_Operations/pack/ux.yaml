@@ -5,10 +5,18 @@
 # changes of the issue and the points for the UX Design team to confirm.
 
 issue:
-  version: "2.0"
-  date: 28 September 2026
-  # First issue of the UX screen documents of the set: every screen is new to the UX Design team.
-  changes: []
+  version: "2.1"
+  date: 08 October 2026
+  # Re-base of the set on the Operations BRD v1.01 and the May 2026 annexes. The images are those of v2.0; the
+  # changes below mark the screens whose rules, owner or flow change in v2.1 (FRS chapter 21, CLR-OP-36 to 62).
+  changes:
+    - {ref: "v2.1-01", what: "Check pick-up removed from scope (CSHID.009): the Check Pick-up screen is withdrawn and the Check Pick-ups Due tile of the Cashiering Workbench goes with it (FR-OP-017, CLR-OP-38)", screens: [SCR-OP-07]}
+    - {ref: "v2.1-02", what: "PR 2307 reversal owned by Marketing Collection: Receive, Validate and Post Report and Route to Disbursement move from the Cashier to Marketing Collection, Settle in Cash is withdrawn and Release to Insurer posts nothing (FR-OP-113, 121; CLR-OP-40, 41)", screens: [SCR-OP-19, SCR-OP-36]}
+    - {ref: "v2.1-03", what: "Minimal balances cleared when the payment is processed; the sweep becomes a safety net and minimal excess never reaches Unapplied Payments (FR-OP-023, CLR-OP-39)", screens: [SCR-OP-11, SCR-OP-22]}
+    - {ref: "v2.1-04", what: "Remittance: pending financial endorsements block the extraction, extraction source kept, draft schedule before submission (FR-OP-030 to 034, CLR-OP-44 to 46)", screens: [SCR-OP-24, SCR-OP-26]}
+    - {ref: "v2.1-05", what: "Early remittance incentive moved to Remittance (RMTID.041) and the peso-equivalent tolerance of the reconciliation (FR-OP-038, 075, 078; CLR-OP-47, 49)", screens: [SCR-OP-35, SCR-OP-45]}
+    - {ref: "v2.1-06", what: "Returned endorsement requests go to the Marketing owner of the account, with the return and resubmission history (FR-OP-053, CLR-OP-52)", screens: [SCR-OP-39]}
+    - {ref: "v2.1-07", what: "Commission Receivables: DP entries from the tagging, read-only review, rule-based exclusion, eligibility from the fully paid status, statuses Valid, Invalid and Returned, Statement of Account, SLA incentives and invoice-level ageing (FR-OP-090 to 099, CLR-OP-54 to 62)", screens: [SCR-OP-51, SCR-OP-52, SCR-OP-53, SCR-OP-54, SCR-OP-56, SCR-OP-57, SCR-OP-60]}
 
 # The personas whose landing page and full menu the deck shows (the Operations personas; Processing, whose sidebar
 # the set shows for the booking step of walkthrough A, belongs to the New Business set).
@@ -30,7 +38,7 @@ personas:
   ADJUSTMENT_TL: {who: "The team leader of Adjustment, who approves the endorsement requests"}
   COMMREC_HANDLER: {who: "A Commission Receivables handler who bills the direct payment commissions to the insurers"}
   COMMREC_TL: {who: "The team leader or head of Commission Receivables, who posts the incentive runs and keeps the schemes"}
-  MKT_COLLECTION: {who: "A Marketing Collection officer of the head office or of a branch who raises holds, special remittances, BIR 2307 tags and endorsement requests"}
+  MKT_COLLECTION: {who: "A Marketing Collection officer of the head office or of a branch who raises holds, special remittances and endorsement requests, and carries the PR 2307 reversal from the tag to the routing to Disbursement"}
   MKT_TL: {who: "A Marketing team leader or unit head, who approves the holds of the Marketing officers"}
   COMPTROLLERSHIP: {who: "A Comptrollership officer who acknowledges the BIR certificates and reads the journals and reports"}
   DISBURSEMENT: {who: "A Disbursement officer who works the payment requests of the queue until BRD-5 replaces it"}

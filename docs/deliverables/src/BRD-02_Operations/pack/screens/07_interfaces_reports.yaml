@@ -86,7 +86,7 @@ screens:
       - "The Operations reports are in the category Operations; viewing and exporting are separate permissions (FR-OP-009)."
       - "The layouts the BRD does not detail are proposed layouts for BDOI to confirm (FR-OP-028, FR-OP-041, FR-OP-062, FR-OP-080, FR-OP-098)."
     outcome: Every Operations report is found in one place.
-    frs: [FR-OP-009, FR-OP-028, FR-OP-041, FR-OP-062, FR-OP-080, FR-OP-098]
+    frs: [FR-OP-009, FR-OP-028, FR-OP-041, FR-OP-062, FR-OP-080, FR-OP-098, FR-OP-099]
     tests: [REPORTS]
 
   - id: SCR-OP-64

@@ -15,8 +15,8 @@ import java.util.zip.ZipOutputStream;
 
 /**
  * Writes and reads the zip form of a package: {@code manifest.json}, one {@code
- * datasets/<CODE>.json} per dataset and {@code signature.json}. Reading verifies the signature,
- * the checksum and row count of every data file, and refuses anything else in the archive.
+ * datasets/<CODE>.json} per dataset and {@code signature.json}. Reading verifies the signature, the
+ * checksum and row count of every data file, and refuses anything else in the archive.
  */
 public final class PackageCodec {
 
@@ -89,7 +89,8 @@ public final class PackageCodec {
   public static ConfigPackage read(byte[] content, PackageSigner signer, long maxBytes) {
     Map<String, byte[]> entries = unzip(content, maxBytes);
     byte[] manifestBytes = require(entries, MANIFEST);
-    PackageSignature signature = CanonicalJson.read(require(entries, SIGNATURE), PackageSignature.class);
+    PackageSignature signature =
+        CanonicalJson.read(require(entries, SIGNATURE), PackageSignature.class);
     if (!PackageSigner.ALGORITHM.equals(signature.algorithm())
         || !signer.verify(manifestBytes, signature.value())) {
       throw new PackageException(
@@ -123,7 +124,8 @@ public final class PackageCodec {
   private static byte[] require(Map<String, byte[]> entries, String name) {
     byte[] bytes = entries.get(name);
     if (bytes == null) {
-      throw new PackageException("The package has no " + name + "; it is not a configuration package");
+      throw new PackageException(
+          "The package has no " + name + "; it is not a configuration package");
     }
     return bytes;
   }

@@ -65,7 +65,8 @@ datasets:
       values: [MIG_ENVIRONMENT_CLASS, MAIL_FROM_ADDRESS, JOB_FAILURE_RECIPIENTS, SCR_INGEST_ALERT_RECIPIENTS,
                MIG_LEGACY_LINK_EBIX, MIG_LEGACY_LINK_QPS, AUTH_MODE, MFA_POLICY, MFA_ISSUER_NAME,
                CSF_LEGACY_SYNC_ENABLED, PRODRECON_FILE_PATTERN, REMIT_FILE_PATTERN,
-               CONFIG_PROMOTION_PRODUCTION_WINDOW, CONFIG_PROMOTION_NOTIFY, CONFIG_PROMOTION_MAX_PACKAGE_MB]
+               CONFIG_PROMOTION_PRODUCTION_WINDOW, CONFIG_PROMOTION_NOTIFY, CONFIG_PROMOTION_MAX_PACKAGE_MB,
+               CONFIG_PROMOTION_PIPELINE_APPLY]
   - {code: CUR_CURRENCY, name: Currencies, group: REFERENCE, module: currency, table: cur_currency, key: [code]}
   - {code: CUR_EXCHANGE_RATE, name: Exchange rates, group: REFERENCE, module: currency, table: cur_exchange_rate, key: [currency_code, rate_type, effective_date], optional: true}
   - code: SYS_PRODUCT_MODULE
@@ -399,4 +400,4 @@ excluded:
   PLANNING:
     [bud_budget, bud_budget_amount, bud_budget_line, nbr_sales_target]
   PROMOTION:
-    [cfp_package, cfp_import, cfp_baseline]
+    [cfp_package, cfp_import, cfp_import_dataset, cfp_baseline]

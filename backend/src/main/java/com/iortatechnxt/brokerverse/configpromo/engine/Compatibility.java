@@ -29,7 +29,10 @@ public record Compatibility(List<String> refusals, List<String> warnings) {
    * @return result
    */
   public static Compatibility check(
-      PackageManifest manifest, CatalogueModel target, String schemaVersion, String platformVersion) {
+      PackageManifest manifest,
+      CatalogueModel target,
+      String schemaVersion,
+      String platformVersion) {
     List<String> refusals = new ArrayList<>();
     List<String> warnings = new ArrayList<>();
     for (ManifestDataset d : manifest.datasets()) {

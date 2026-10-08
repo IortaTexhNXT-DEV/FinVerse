@@ -320,6 +320,12 @@ brokerverse:
     # when mail delivery is on.
     from-address: ${BROKERVERSE_MAIL_FROM:}
     dispatch-on-commit: ${BROKERVERSE_MAIL_DISPATCH_ON_COMMIT:true}
+  # ---- Configuration Promotion, docs/modules/CONFIG_PROMOTION.md ----
+  config-promotion:
+    # Key that signs and verifies the configuration packages (HMAC-SHA256, at least 32 characters),
+    # from the secrets store; every environment that exchanges packages holds the same key. Empty:
+    # packages can be neither exported nor imported.
+    signing-key: ${BROKERVERSE_CONFIG_PROMOTION_SIGNING_KEY:}
   # ---- Data Migration (BRD-13), docs/architecture/DATA_MIGRATION_DESIGN.md sections 5.3 and 20 ----
   migration:
     # Key of the keyed masking of personal data in non-production extracts (HMAC-SHA256), from the

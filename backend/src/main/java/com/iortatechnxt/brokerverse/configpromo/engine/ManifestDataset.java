@@ -10,8 +10,8 @@ package com.iortatechnxt.brokerverse.configpromo.engine;
  * @param rows number of rows
  * @param file path of the data file in the package
  * @param sha256 SHA-256 of the data file
- * @param contentSha256 SHA-256 of the compared values (environment columns left out), compared
- *     with the target after the import
+ * @param contentSha256 SHA-256 of the compared values (environment columns left out), compared with
+ *     the target after the import
  * @param fingerprint promoted columns and their types
  */
 public record ManifestDataset(

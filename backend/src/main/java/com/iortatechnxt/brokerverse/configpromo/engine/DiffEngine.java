@@ -43,7 +43,8 @@ public final class DiffEngine {
       }
       CanonicalRow existing = target.get(row.keyText());
       if (existing == null) {
-        added.add(new RowChange(ChangeType.ADDED, row.keyText(), row.key(), values, List.of(), null));
+        added.add(
+            new RowChange(ChangeType.ADDED, row.keyText(), row.key(), values, List.of(), null));
         continue;
       }
       List<FieldChange> fields = fields(m, existing, row);

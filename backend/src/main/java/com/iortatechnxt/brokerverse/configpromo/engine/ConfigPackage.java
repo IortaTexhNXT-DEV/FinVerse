@@ -12,7 +12,8 @@ import java.util.Map;
  * @param files data files by dataset code
  * @param keyId identifier of the signing key
  */
-public record ConfigPackage(PackageManifest manifest, Map<String, DatasetFile> files, String keyId) {
+public record ConfigPackage(
+    PackageManifest manifest, Map<String, DatasetFile> files, String keyId) {
 
   /** Unmodifiable copy keeping the manifest order. */
   public ConfigPackage {

@@ -13,7 +13,8 @@ import java.util.stream.Collectors;
  * @param columns columns by name, in database order
  * @param foreignKeys foreign keys
  */
-public record TableSchema(String name, Map<String, ColumnInfo> columns, List<ForeignKey> foreignKeys) {
+public record TableSchema(
+    String name, Map<String, ColumnInfo> columns, List<ForeignKey> foreignKeys) {
 
   /** Defensive copies keeping the column order. */
   public TableSchema {
@@ -53,8 +54,6 @@ public record TableSchema(String name, Map<String, ColumnInfo> columns, List<For
    * @return "name:type" entries joined by commas
    */
   public String fingerprint(List<String> names) {
-    return names.stream()
-        .map(n -> n + ":" + column(n).type())
-        .collect(Collectors.joining(","));
+    return names.stream().map(n -> n + ":" + column(n).type()).collect(Collectors.joining(","));
   }
 }

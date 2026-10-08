@@ -103,7 +103,9 @@ public final class DatasetModel {
       CatalogueDataset dataset, ConfigCatalogue catalogue, ForeignKey fk, Links links) {
     Optional<CatalogueDataset> target = catalogue.byTable(fk.table());
     if (target.isEmpty()) {
-      links.errors().add(
+      links
+          .errors()
+          .add(
               dataset.code()
                   + ": column "
                   + String.join(",", fk.columns())
@@ -113,7 +115,9 @@ public final class DatasetModel {
       return;
     }
     if (fk.byId()) {
-      links.refs().put(fk.columns().get(0), new Reference(fk.columns().get(0), target.get().code()));
+      links
+          .refs()
+          .put(fk.columns().get(0), new Reference(fk.columns().get(0), target.get().code()));
       addDependency(dataset, target.get().code(), fk.columns().get(0), links);
     } else if (target.get().code().equals(dataset.code())) {
       fk.columns().stream().filter(c -> !dataset.key().contains(c)).forEach(links.deferred()::add);

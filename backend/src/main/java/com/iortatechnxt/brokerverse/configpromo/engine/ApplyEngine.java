@@ -7,11 +7,11 @@ import java.util.Set;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
- * Applies the difference of a package to the target, in load order (a dataset after the datasets
- * it references), in the caller's transaction: updates, then inserts, then the references of a
- * dataset to its own rows, then the removal of items of replaced collections and the chosen
- * deactivations. References are remapped from the natural key in the package to the id of the
- * same row in the target.
+ * Applies the difference of a package to the target, in load order (a dataset after the datasets it
+ * references), in the caller's transaction: updates, then inserts, then the references of a dataset
+ * to its own rows, then the removal of items of replaced collections and the chosen deactivations.
+ * References are remapped from the natural key in the package to the id of the same row in the
+ * target.
  */
 public final class ApplyEngine {
 
@@ -37,7 +37,7 @@ public final class ApplyEngine {
     List<DatasetResult> results = new ArrayList<>();
     for (DatasetDiff diff : diffs) {
       DatasetModel m = model.model(diff.code());
-      RowWriter writer = new RowWriter(jdbc, reader, m, actors);
+      RowWriter writer = new RowWriter(jdbc, reader, model, m, actors);
       diff.changed().forEach(writer::update);
       diff.added().forEach(writer::insert);
       reader.forget(m.code());
@@ -47,7 +47,7 @@ public final class ApplyEngine {
       int removed = 0;
       if (m.dataset().collection()) {
         for (RowChange row : diff.onlyInTarget()) {
-          writer.delete(row, model);
+          writer.delete(row);
           removed++;
         }
       } else if (deactivate.contains(m.code())) {

@@ -490,7 +490,15 @@ public enum Permission {
   // Document upload from the Servicing View (BRCSF-007)
   CSF_DOCUMENT_UPLOAD,
   // Contact Changes and Agent Activity reports (BRCSF-011, usage requirements)
-  CSF_REPORT_VIEW;
+  CSF_REPORT_VIEW,
+
+  // Configuration Promotion (V1320, docs/modules/CONFIG_PROMOTION.md): export packages; prepare an
+  // import (upload, check, dry run, submit); approve and apply it (a second user, never the one who
+  // prepared it); mark baselines and read the drift.
+  CONFIG_EXPORT,
+  CONFIG_IMPORT_PREPARE,
+  CONFIG_IMPORT_APPROVE,
+  CONFIG_BASELINE_MANAGE;
 
   // The portal permissions of design 6.1 (PORTAL_USER_REQUEST, PORTAL_USER_APPROVE, PORTAL_ADMIN)
   // are parked with the partner portal (BDOI Drop 2 "Employee Benefits (No Portal Feature)"):

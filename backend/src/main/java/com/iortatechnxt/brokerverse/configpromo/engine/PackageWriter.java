@@ -50,9 +50,9 @@ public final class PackageWriter {
   public record Written(PackageManifest manifest, byte[] content) {}
 
   /**
-   * The datasets to export for a selection: the selected datasets and the collections of their
-   * rows (lines, grants), in load order. Collections are always exported with their parent, as an
-   * import replaces the collection of each parent it holds.
+   * The datasets to export for a selection: the selected datasets and the collections of their rows
+   * (lines, grants), in load order. Collections are always exported with their parent, as an import
+   * replaces the collection of each parent it holds.
    *
    * @param model catalogue model
    * @param selected selected dataset codes
@@ -85,7 +85,8 @@ public final class PackageWriter {
     List<ManifestDataset> entries = new ArrayList<>();
     for (String code : codes) {
       DatasetModel m = reader.model().model(code);
-      List<Map<String, Object>> rows = reader.rows(code).stream().map(CanonicalRow::values).toList();
+      List<Map<String, Object>> rows =
+          reader.rows(code).stream().map(CanonicalRow::values).toList();
       byte[] bytes = CanonicalJson.bytes(new DatasetFile(code, m.columns(), rows));
       String path = PackageCodec.fileOf(code);
       files.put(path, bytes);

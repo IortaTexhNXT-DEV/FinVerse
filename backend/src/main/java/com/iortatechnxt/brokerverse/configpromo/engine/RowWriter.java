@@ -11,8 +11,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  * Writes the rows of one dataset: inserts and updates with the references remapped to the ids of
- * the target, the audit columns of the import (maker = the user who prepared it, checker = the
- * user who approved it), deactivations and the removal of collection items.
+ * the target, the audit columns of the import (maker = the user who prepared it, checker = the user
+ * who approved it), deactivations and the removal of collection items.
  */
 final class RowWriter {
 
@@ -21,13 +21,16 @@ final class RowWriter {
   private static final String ACTIVE = "ACTIVE";
 
   private final JdbcTemplate jdbc;
-  private final DatasetReader reader;
+  private final IdResolver ids;
+  private final CatalogueModel model;
   private final DatasetModel m;
   private final ApplyActors actors;
 
-  RowWriter(JdbcTemplate jdbc, DatasetReader reader, DatasetModel m, ApplyActors actors) {
+  RowWriter(
+      JdbcTemplate jdbc, IdResolver ids, CatalogueModel model, DatasetModel m, ApplyActors actors) {
     this.jdbc = jdbc;
-    this.reader = reader;
+    this.ids = ids;
+    this.model = model;
     this.m = m;
     this.actors = actors;
   }
@@ -128,7 +131,7 @@ final class RowWriter {
   }
 
   private Long idOfKey(RowChange row) {
-    return m.hasId() ? reader.idOf(m.code(), row.key()).orElse(null) : null;
+    return m.hasId() ? ids.idOf(m.code(), row.key()).orElse(null) : null;
   }
 
   /** The value of a column of an item, with a reference remapped to the id in the target. */
@@ -138,8 +141,7 @@ final class RowWriter {
     if (ref == null || value == null) {
       return value;
     }
-    return reader
-        .idOf(ref.dataset(), value)
+    return ids.idOf(ref.dataset(), value)
         .map(String::valueOf)
         .orElseThrow(
             () ->
@@ -150,7 +152,7 @@ final class RowWriter {
                         + ": the referenced record "
                         + CanonicalJson.text(value)
                         + " of "
-                        + reader.model().model(ref.dataset()).dataset().name()
+                        + model.model(ref.dataset()).dataset().name()
                         + " exists neither in the package nor in this environment"));
   }
 
@@ -202,29 +204,28 @@ final class RowWriter {
    * Removes an item of a replaced collection, with the items of its own collections.
    *
    * @param row item only in the target
-   * @param model catalogue model
    */
-  void delete(RowChange row, CatalogueModel model) {
+  void delete(RowChange row) {
     if (row.targetId() != null) {
-      deleteChildren(model, m, row.targetId());
+      deleteChildren(m, row.targetId());
     }
     List<Object> params = new ArrayList<>();
     String where = where(row, params);
     execute(row, "delete from " + Sql.quote(m.table().name()) + where, params);
   }
 
-  private void deleteChildren(CatalogueModel model, DatasetModel parent, long parentId) {
+  private void deleteChildren(DatasetModel parent, long parentId) {
     for (String childCode : model.collectionsOf(parent.code())) {
       DatasetModel child = model.model(childCode);
       String table = Sql.quote(child.table().name());
       String parentColumn = Sql.quote(child.dataset().parent());
       if (child.hasId()) {
-        List<Long> ids =
+        List<Long> children =
             jdbc.queryForList(
                 "select \"id\" from " + table + " where " + parentColumn + " = ?",
                 Long.class,
                 parentId);
-        ids.forEach(id -> deleteChildren(model, child, id));
+        children.forEach(id -> deleteChildren(child, id));
       }
       jdbc.update("delete from " + table + " where " + parentColumn + " = ?", parentId);
     }

@@ -35,7 +35,8 @@ public final class Reconciler {
           packageRows.stream()
               .sorted(
                   (a, b) ->
-                      CanonicalRow.of(null, a, m).keyText()
+                      CanonicalRow.of(null, a, m)
+                          .keyText()
                           .compareTo(CanonicalRow.of(null, b, m).keyText()))
               .toList();
       lines.add(

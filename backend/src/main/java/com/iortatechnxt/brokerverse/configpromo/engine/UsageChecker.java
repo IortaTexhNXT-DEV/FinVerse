@@ -61,7 +61,10 @@ public final class UsageChecker {
       if (code != null && model.tables().containsKey(parts[0])) {
         Long n =
             jdbc.queryForObject(
-                "select count(*) from " + Sql.quote(parts[0]) + " where " + Sql.quote(parts[1])
+                "select count(*) from "
+                    + Sql.quote(parts[0])
+                    + " where "
+                    + Sql.quote(parts[1])
                     + " = ?",
                 Long.class,
                 code.toString());
@@ -87,7 +90,9 @@ public final class UsageChecker {
     }
     Long n =
         jdbc.queryForObject(
-            "select count(*) from " + Sql.quote(u.table()) + " where "
+            "select count(*) from "
+                + Sql.quote(u.table())
+                + " where "
                 + String.join(" and ", conditions),
             Long.class,
             params.toArray());

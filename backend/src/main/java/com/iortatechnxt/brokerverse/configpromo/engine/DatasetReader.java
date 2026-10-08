@@ -15,10 +15,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 /**
  * Reads datasets of one database in package form: references by id become the natural key of the
  * referenced row, environment rows are left out, rows come sorted by natural key. Keeps the keys of
- * the rows read, by id and by key text, for the references of other datasets; {@link #forget}
- * drops them after the rows of a dataset changed.
+ * the rows read, by id and by key text, for the references of other datasets; {@link #forget} drops
+ * them after the rows of a dataset changed.
  */
-public final class DatasetReader {
+public final class DatasetReader implements IdResolver {
 
   private final JdbcTemplate jdbc;
   private final CatalogueModel model;
@@ -58,16 +58,22 @@ public final class DatasetReader {
       select.add(0, "id");
     }
     String sql =
-        "select " + select.stream().map(Sql::quote).collect(Collectors.joining(", "))
-            + " from " + Sql.quote(m.table().name());
+        "select "
+            + select.stream().map(Sql::quote).collect(Collectors.joining(", "))
+            + " from "
+            + Sql.quote(m.table().name());
     List<CanonicalRow> rows = new ArrayList<>();
-    jdbc.query(sql, rs -> {
-      CanonicalRow row = row(rs, m);
-      if (m.dataset().environmentRows() == null
-          || !m.dataset().environmentRows().matches(row.get(m.dataset().environmentRows().column()))) {
-        rows.add(row);
-      }
-    });
+    jdbc.query(
+        sql,
+        rs -> {
+          CanonicalRow row = row(rs, m);
+          if (m.dataset().environmentRows() == null
+              || !m.dataset()
+                  .environmentRows()
+                  .matches(row.get(m.dataset().environmentRows().column()))) {
+            rows.add(row);
+          }
+        });
     rows.sort(Comparator.comparing(CanonicalRow::keyText));
     return rows;
   }
@@ -143,6 +149,7 @@ public final class DatasetReader {
    * @param key natural key (as exported)
    * @return id, empty when the database has no such row
    */
+  @Override
   public Optional<Long> idOf(String code, Object key) {
     Map<String, Long> ids =
         idsByKey.computeIfAbsent(
@@ -153,6 +160,19 @@ public final class DatasetReader {
               return byKey;
             });
     return Optional.ofNullable(ids.get(CanonicalJson.text(key)));
+  }
+
+  /**
+   * Number of rows of a dataset's table (environment rows included).
+   *
+   * @param code dataset code
+   * @return rows
+   */
+  public long count(String code) {
+    Long n =
+        jdbc.queryForObject(
+            "select count(*) from " + Sql.quote(model.model(code).table().name()), Long.class);
+    return n == null ? 0 : n;
   }
 
   /**

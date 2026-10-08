@@ -74,8 +74,7 @@ public final class CatalogueModel {
       }
     }
     if (sorted.size() < models.size()) {
-      List<String> cyclic =
-          models.keySet().stream().filter(c -> !sorted.contains(c)).toList();
+      List<String> cyclic = models.keySet().stream().filter(c -> !sorted.contains(c)).toList();
       problems.add("The datasets " + cyclic + " depend on each other in a cycle");
     }
     return List.copyOf(sorted);

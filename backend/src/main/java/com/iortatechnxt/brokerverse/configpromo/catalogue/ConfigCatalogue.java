@@ -44,8 +44,7 @@ public final class ConfigCatalogue {
    * @return catalogue
    */
   public static ConfigCatalogue load() {
-    try (InputStream in =
-        ConfigCatalogue.class.getClassLoader().getResourceAsStream(RESOURCE)) {
+    try (InputStream in = ConfigCatalogue.class.getClassLoader().getResourceAsStream(RESOURCE)) {
       if (in == null) {
         throw new IllegalStateException("The configuration catalogue " + RESOURCE + " is missing");
       }

@@ -12,8 +12,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  * The dry run of an import: the difference of every dataset of the package with the target, the
- * references that resolve neither in the package nor in the target, the items whose deactivation
- * is refused because records use them, and the users named by the package that the target lacks.
+ * references that resolve neither in the package nor in the target, the items whose deactivation is
+ * refused because records use them, and the users named by the package that the target lacks.
  */
 public final class ImportAnalyzer {
 
@@ -78,7 +78,8 @@ public final class ImportAnalyzer {
       DatasetModel m = model.model(code);
       Set<String> parents =
           m.dataset().collection()
-              ? packageKeys.getOrDefault(m.references().get(m.dataset().parent()).dataset(), Set.of())
+              ? packageKeys.getOrDefault(
+                  m.references().get(m.dataset().parent()).dataset(), Set.of())
               : Set.of();
       DatasetDiff diff = DiffEngine.diff(m, pkg.rows(code), reader.rows(code), full, parents);
       diffs.add(diff);
@@ -115,7 +116,11 @@ public final class ImportAnalyzer {
   }
 
   private void checkDeactivations(
-      DatasetModel m, DatasetDiff diff, boolean deactivate, List<Issue> blockers, List<Issue> warnings) {
+      DatasetModel m,
+      DatasetDiff diff,
+      boolean deactivate,
+      List<Issue> blockers,
+      List<Issue> warnings) {
     Optional<Deactivation> how = m.deactivation();
     if (deactivate && how.isEmpty() && !diff.onlyInTarget().isEmpty()) {
       warnings.add(
@@ -134,9 +139,7 @@ public final class ImportAnalyzer {
           .filter(r -> !how.get().isInactive(r.values().get(how.get().column())))
           .forEach(candidates::add);
     }
-    diff.changed().stream()
-        .filter(r -> becomesInactive(r, how.get()))
-        .forEach(candidates::add);
+    diff.changed().stream().filter(r -> becomesInactive(r, how.get())).forEach(candidates::add);
     for (RowChange row : candidates) {
       long uses = usage.count(m, withTargetValues(row));
       if (uses > 0) {
@@ -144,9 +147,7 @@ public final class ImportAnalyzer {
             new Issue(
                 m.code(),
                 row.keyText(),
-                "Is used by "
-                    + uses
-                    + " record(s) in this environment; it cannot be deactivated"));
+                "Is used by " + uses + " record(s) in this environment; it cannot be deactivated"));
       }
     }
   }
@@ -163,7 +164,8 @@ public final class ImportAnalyzer {
     }
     Map<String, Object> values = new HashMap<>(row.values());
     row.fields().forEach(f -> values.put(f.column(), f.from()));
-    return new RowChange(row.type(), row.keyText(), row.key(), values, row.fields(), row.targetId());
+    return new RowChange(
+        row.type(), row.keyText(), row.key(), values, row.fields(), row.targetId());
   }
 
   private void checkUsers(DatasetModel m, DatasetDiff diff, List<Issue> warnings) {

@@ -8,13 +8,14 @@ import java.util.Map;
  * A row in package form: the promoted columns with references replaced by the natural key of the
  * referenced row, its natural key and the canonical text of that key.
  *
- * @param id surrogate id in the database it was read from (null for package rows and tables
- *     without id)
+ * @param id surrogate id in the database it was read from (null for package rows and tables without
+ *     id)
  * @param values promoted columns
  * @param key natural key columns
  * @param keyText canonical JSON of the key, unique within the dataset
  */
-public record CanonicalRow(Long id, Map<String, Object> values, Map<String, Object> key, String keyText) {
+public record CanonicalRow(
+    Long id, Map<String, Object> values, Map<String, Object> key, String keyText) {
 
   /** Unmodifiable copies keeping the column order. */
   public CanonicalRow {

@@ -111,6 +111,16 @@
     <Class name="com.iortatechnxt.brokerverse.migration.mapping.service.TargetCodes"/>
     <Bug pattern="SQL_INJECTION_SPRING_JDBC"/>
   </Match>
+  <!--
+    SQL_INJECTION_SPRING_JDBC in the Configuration Promotion engine: the statements are built from
+    table and column names read from the database catalogue (information_schema) for the tables the
+    configuration catalogue lists; every name is checked against [a-z][a-z0-9_]* and quoted
+    (engine.Sql.quote), and every value is a bound parameter. No request value becomes SQL text.
+  -->
+  <Match>
+    <Package name="com.iortatechnxt.brokerverse.configpromo.engine"/>
+    <Bug pattern="SQL_INJECTION_SPRING_JDBC"/>
+  </Match>
   <!-- Generated/test code is not part of the production artefact. -->
   <Match>
     <Class name="~.*Test.*"/>

@@ -1,4 +1,4 @@
-// BRD-9 Customer Servicing Facility: servicing flow of a contact centre agent (FRS section 2.2; BRD p.5-12).
+// BRD-9 Customer Servicing Facility: servicing flow of a contact centre agent (FRS section 2.2; BRD p.22-29).
 // Top-down: sign-in, search, servicing view, then the four servicing actions side by side, then audit.
 digraph csf_process {
   graph [rankdir=TB, fontname="Arial", nodesep=0.35, ranksep=0.45, bgcolor="white", pad=0.15, newrank=true];

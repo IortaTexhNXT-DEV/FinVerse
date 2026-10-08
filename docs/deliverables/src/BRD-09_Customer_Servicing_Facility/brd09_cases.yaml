@@ -9,8 +9,8 @@ meta:
   code: CSF
   frs: FRS_BRD09_CUSTOMER_SERVICING_FACILITY.md
   summary: TP_BRD09_CUSTOMER_SERVICING_FACILITY.md
-  version: "1.0"
-  date: 25 September 2026
+  version: "1.1"
+  date: 08 October 2026
   verify_messages: false
 
 personas:
@@ -20,6 +20,7 @@ personas:
   SYSADMIN: {name: System Administrator, short: Sys Admin}
   MKT_AO: {name: Marketing AO without a CSF role, short: MKT AO}
   INFRA: {name: Infrastructure team (infrastructure administrator), short: Infra}
+  CSF_FULFILMENT: {name: Fulfilment Unit member, short: FU}
 
 screens:
   LOGIN: Login page
@@ -44,6 +45,13 @@ screens:
   MAIL: Test mailbox of the recipient
   RESTORE: Restore environment of the infrastructure team
   SYS: System function check outside the screens, signed in as the persona (test lead tool)
+  CASES: Customer Service Facility > Cases
+  LOGCASE: Customer Service Facility > Customer Search > Servicing View > Log Case dialog
+  CASE: Customer Service Facility > Cases > Case record
+  TEAMQ: Customer Service Facility > Cases > Team Queue
+  FUQ: Customer Service Facility > Cases > Fulfilment Unit Queue
+  DASH: Customer Service Facility > Case Dashboard
+  ROUTING: Customer Service Facility > Case Routing
 
 data:
   - id: TD-CSF-01
@@ -86,6 +94,22 @@ data:
     name: Test mailboxes
     content: Registered e-mail of each test client and the other address used by the supervisor point to test mailboxes of the test lead; no real client address.
     source: Test mail relay of SIT and UAT
+  - id: TD-CSF-11
+    name: Case lists and routing table
+    content: "The case lists of the addendum (3 channels, 7 case types with their turnaround times, 125 natures of transaction, 51 product types, 33 market segments, 53 fulfilment units), the proposed lists of priority, escalation, return and closure reasons, and routing rows - Request / Consumer 1 Motor / any nature to Consumer 1 Motor and Complaint / any segment to CBEST Retail; Complaint set for automatic escalation, Commendation not."
+    source: Loaded with the case lists at installation; the routing rows keyed by the test lead on Case Routing
+  - id: TD-CSF-12
+    name: Fulfilment unit users
+    content: fu1, member of Consumer 1 Motor; fu2, member of CLAIMS - Davao only; the escalation group of Consumer 1 Motor (sup1 and mgmt1); each with the role CSF_FULFILMENT or the CSF role of TD-CSF-01.
+    source: Created by the test lead through User Access requests on SIT
+  - id: TD-CSF-13
+    name: Cases in each status and SLA state
+    content: Cases of UAT CSF Client One in each status of FRS section 5.3; open Request, Problem, Complaint and Commendation cases created 2, 3 and 7 working days before the test date; one case Closed by Fulfillment Unit; one case Closed by CSR.
+    source: Logged by the test lead through the case screens on SIT; creation dates set in the test environment
+  - id: TD-CSF-14
+    name: Working-day calendar
+    content: BIBS holiday calendar of the test year with one holiday on a Wednesday of the test week.
+    source: Holiday calendar of SIT, maintained by the System Administrator
 
 scenarios:
   - id: SC-CSF-01
@@ -120,6 +144,22 @@ scenarios:
     persona: INFRA
     title: Backup and restore. The infrastructure team proves the 15-minute log archiving and a restore.
     pre: Restore environment available; log archiving configured.
+  - id: SC-CSF-09
+    persona: CSF_AGENT
+    title: Log and close cases. The agent logs a case from the Servicing View, resolves an inquiry on the call, adds notes and documents, and closes a case with a linked follow-up case.
+    pre: Client TD-CSF-02; case lists TD-CSF-11; fulfilment unit users TD-CSF-12.
+  - id: SC-CSF-10
+    persona: CSF_FULFILMENT
+    title: Fulfilment unit. The case is routed to the fulfilment unit, which resolves and closes it, returns it to the agent or asks for CSR action.
+    pre: Routing table TD-CSF-11; users TD-CSF-12; cases TD-CSF-13.
+  - id: SC-CSF-11
+    persona: CSF_SUPERVISOR
+    title: Supervision and SLA. The supervisor reassigns, escalates and recategorises cases; the SLA check flags and escalates cases approaching and past their due date.
+    pre: Cases TD-CSF-13; calendar TD-CSF-14.
+  - id: SC-CSF-12
+    persona: CSF_MANAGEMENT
+    title: Case reports and lists. Management follows the case dashboard and exports the case reports; the case lists and routing table are maintained.
+    pre: Scenarios SC-CSF-09 to SC-CSF-11 ran.
 
 frs:
   FR-CSF-001:
@@ -1212,6 +1252,577 @@ frs:
           - Make the archive storage unavailable on the test environment; wait for the next archive attempt.
         expected: The archive fails and the infrastructure team receives the alert; archiving resumes when the storage is back.
 
+  FR-CSF-050:
+    scenario: SC-CSF-09
+    persona: CSF_AGENT
+    screen: LOGCASE
+    data: [TD-CSF-02, TD-CSF-11, TD-CSF-12]
+    conditions:
+      - A case submitted with all mandatory fields gets a unique Case ID, is linked to the client and the account and shows in the queue of the fulfilment unit with the status Open - With Fulfillment Unit.
+      - A case with a blank mandatory field is refused and the missing fields are named.
+      - A second case for the same client, account and nature of transaction is refused while the first is open.
+      - The creation is recorded in the case history with the creator, date and time.
+      - The members of the fulfilment unit receive the notification with the Case ID and the policy number.
+      - A case resolved on the call is created with the status Closed by CSR and its resolution; a caller who is not a client is logged with name and contact.
+    cases:
+      - c: 1
+        type: Positive
+        title: Log a Request case for the CBG Motor account and submit it to the fulfilment unit
+        steps:
+          - Open the Servicing View of UAT CSF Client One; click Log Case.
+          - Select the CBG Motor account; channel Phone; case type Request; nature of transaction Resend insurance policy/COC; product type Motor Vehicle Insurance; keep the proposed market segment and fulfilment unit; priority Normal.
+          - Enter the subject and the description; click Submit to Fulfilment Unit.
+        expected: The confirmation shows the Case ID CASE-yyyy-nnnnnn and the due date 4 working days after today. The case is listed on the Cases tab of the client and in the Fulfilment Unit Queue of Consumer 1 Motor with the status Open - With Fulfillment Unit.
+      - c: 1
+        type: Workflow
+        title: Two cases get different Case IDs
+        steps:
+          - Log a second case for the non-CBG Property account with another nature of transaction.
+        expected: The second case gets the next Case ID; both cases are listed on the Cases tab of the client with their own account.
+      - c: 2
+        type: Negative
+        title: Case without nature of transaction and fulfilment unit
+        steps:
+          - Click Log Case; fill everything except the nature of transaction and the fulfilment unit; click Submit to Fulfilment Unit.
+        expected: No case is created; the dialog stays open with both fields marked.
+        msg: ["Complete the mandatory fields - Nature of transaction, Fulfilment unit"]
+      - c: 3
+        type: Negative
+        title: Second open case for the same transaction is refused
+        pre: The case of TC-CSF-050.1-01 is open.
+        steps:
+          - Log a case for the same client, the same CBG Motor account and the nature of transaction Resend insurance policy/COC.
+        expected: No case is created; BIBS names the open case and offers Open case, which opens it.
+        msg: ["Case <Case ID> is already open for this client, account and nature of transaction. Add a note to it instead"]
+      - c: 3
+        type: Boundary
+        title: Same nature of transaction after the first case is closed
+        pre: The case of TC-CSF-050.1-01 is closed.
+        steps:
+          - Log a case for the same client, account and nature of transaction.
+        expected: The case is created with a new Case ID; the duplicate check applies to open cases only.
+      - c: 4
+        type: Positive
+        screen: CASE
+        title: Creation in the case history
+        steps:
+          - Open the case of TC-CSF-050.1-01; open the History tab.
+        expected: The first row is Case created with agent1's name, the date and time and the values of every field.
+      - c: 5
+        type: Positive
+        persona: CSF_FULFILMENT
+        screen: NOTIF
+        title: Fulfilment unit notification
+        steps:
+          - Log in as fu1 (member of Consumer 1 Motor); open the bell and the test mailbox of fu1.
+        expected: The notice and the e-mail give the Case ID, the policy number, the case type, the nature of transaction and the due date; the account officer of the account received a copy.
+      - c: 6
+        type: Positive
+        title: Inquiry answered on the call is closed by the CSR
+        steps:
+          - Log an Inquiry case with the nature of transaction Breakdown of insurance premium; enter the resolution; click Resolve and Close.
+        expected: The case is created with the status Closed by CSR, the resolution and no notification to the fulfilment unit.
+      - c: 6
+        type: Negative
+        title: Resolve and Close without the resolution
+        steps:
+          - Log an Inquiry case; leave the resolution blank; click Resolve and Close.
+        expected: No case is created.
+        msg: [Enter the resolution given to the client]
+      - c: 6
+        type: Positive
+        screen: CASES
+        title: Case for a caller who is not a client
+        steps:
+          - Open Cases; click Log Case; tick Caller not a client; enter the caller name and mobile; case type Inquiry; nature of transaction Directory assistance; Resolve and Close with the resolution.
+        expected: The case is created without client and account, with the caller name and mobile, and the status Closed by CSR.
+
+  FR-CSF-051:
+    scenario: SC-CSF-09
+    persona: CSF_AGENT
+    screen: LOGCASE
+    data: [TD-CSF-11, TD-CSF-14]
+    conditions:
+      - The due date is the creation date plus the turnaround time of the case type in working days.
+      - Only a supervisor changes the category of a submitted case, with a reason.
+      - A new case type recomputes the due date from the creation time and records the old and new type.
+      - The list offers only the active case types, each with its turnaround time.
+    cases:
+      - c: 1
+        type: Positive
+        title: Due date of an Inquiry logged on a Monday
+        pre: The test date is a Monday with no holiday in the week (TD-CSF-14).
+        steps:
+          - Log an Inquiry case and submit it to the fulfilment unit.
+        expected: The due date is the Thursday of the same week (3 working days).
+      - c: 1
+        type: Boundary
+        title: Due date across a holiday
+        pre: A holiday of the BIBS calendar falls on the Wednesday (TD-CSF-14).
+        steps:
+          - Log an Inquiry case on the Monday.
+        expected: The due date is the Friday; the holiday is not counted.
+      - c: 2
+        type: Security-access
+        screen: CASE
+        title: The agent cannot change the category of a submitted case
+        steps:
+          - As agent1 open a submitted case; look for Change Category.
+          - Send a category change for the case signed in as agent1.
+        expected: Change Category is not offered; the request is refused.
+        msg: [You are not permitted to perform this action]
+      - c: 3
+        type: Workflow
+        persona: CSF_SUPERVISOR
+        screen: CASE
+        title: Supervisor changes an Inquiry to a Complaint
+        steps:
+          - As sup1 open the Inquiry case of TC-CSF-051.1-01; click Change Category; select Complaint; enter the reason; confirm.
+        expected: The due date becomes 6 working days after the creation date; the History tab shows the old and new case type, sup1 and the reason; the owner and the fulfilment unit are notified.
+      - c: 3
+        type: Negative
+        persona: CSF_SUPERVISOR
+        screen: CASE
+        title: Category change without reason
+        steps:
+          - Click Change Category; select Problem; leave the reason blank; confirm.
+        expected: The category does not change.
+        msg: [Enter the reason for changing the category]
+      - c: 4
+        type: Positive
+        title: Case type list with turnaround times
+        steps:
+          - Open the Case type list of the Log Case dialog.
+        expected: Inquiry 3, Request 4, Request (1-day) 1, Problem 6, Complaint 6, Follow-up 1 and Commendation 6 are offered, each with its turnaround time in working days.
+
+  FR-CSF-052:
+    scenario: SC-CSF-10
+    persona: CSF_FULFILMENT
+    screen: CASE
+    data: [TD-CSF-12, TD-CSF-13]
+    conditions:
+      - A case returned by the fulfilment unit shows Open - Returned to Agent in its header and in the agent's Returned to Me queue.
+      - A transition that section 5.3 does not allow is refused.
+      - Every status change is listed in the History tab with the time and the user.
+      - The Cases list shows the current status and the status group of every case.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Return moves the case to Open - Returned to Agent
+        steps:
+          - As fu1 open a case Open - With Fulfillment Unit; click Return to Agent; select Incomplete case details; confirm.
+          - Log in as agent1; open Cases > Returned to Me.
+        expected: The case header shows Open - Returned to Agent; the case is listed in agent1's Returned to Me queue with the reason.
+      - c: 2
+        type: Negative
+        persona: CSF_AGENT
+        title: No status action on a case Closed by CSR
+        steps:
+          - Open a case Closed by CSR; look for Return, Re-endorse or Close.
+          - Send a re-endorse request for the case signed in as agent1.
+        expected: No status action is offered; the request is refused and the status stays Closed by CSR.
+        msg: ["The case is Closed by CSR. This action is not allowed"]
+      - c: 3
+        type: Positive
+        persona: CSF_AGENT
+        title: Status history
+        steps:
+          - Open the History tab of the case of TC-CSF-052.1-01.
+        expected: The rows Open - With Fulfillment Unit and Open - Returned to Agent are listed with the date and time and the user of each change.
+      - c: 4
+        type: Positive
+        persona: CSF_SUPERVISOR
+        screen: CASES
+        title: Status and status group in the Cases list
+        steps:
+          - As sup1 open Cases > All Open, then Closed.
+        expected: Each row shows the status label and its group - Open / In Progress, Pending or Closed - as in FRS section 5.3.
+
+  FR-CSF-053:
+    scenario: SC-CSF-09
+    persona: CSF_AGENT
+    screen: CASE
+    data: [TD-CSF-12, TD-CSF-13]
+    conditions:
+      - Notes are listed in date order with their author, date and time.
+      - A saved note cannot be changed or deleted, and a blank note is refused.
+      - Only users with access to the case see its notes.
+    cases:
+      - c: 1
+        type: Positive
+        title: Notes by the agent and the fulfilment unit in date order
+        steps:
+          - As agent1 open an open case; Notes tab; Add Note; save.
+          - As fu1 add a second note to the same case.
+          - As agent1 reopen the Notes tab.
+        expected: Both notes are listed oldest first with the author's name, the date and the time; fu1's note notified agent1.
+      - c: 2
+        type: Negative
+        title: Saved notes cannot be edited or deleted; blank note refused
+        steps:
+          - Look for an edit or delete action on a saved note.
+          - Click Add Note and save without text.
+        expected: No edit or delete action exists; the blank note is not saved.
+        msg: [Enter the note]
+      - c: 3
+        type: Security-access
+        persona: CSF_FULFILMENT
+        screen: FUQ
+        title: A member of another fulfilment unit cannot see the case
+        steps:
+          - Log in as fu2 (member of CLAIMS - Davao only); search the Case ID of a Consumer 1 Motor case; open its address directly.
+        expected: The case is not listed; the direct address shows the no-access page and no note is shown.
+
+  FR-CSF-054:
+    scenario: SC-CSF-09
+    persona: CSF_AGENT
+    screen: CASE
+    data: [TD-CSF-07, TD-CSF-13]
+    conditions:
+      - A document uploaded to a case is listed on the case and on the Documents tab of the client with the Case ID.
+      - A file type that is not allowed is refused.
+      - Uploads and downloads of case documents appear in the case history.
+    cases:
+      - c: 1
+        type: Upload-download
+        title: Upload a PDF to a case
+        steps:
+          - Open an open case; Documents tab; Upload; document type Proof of payment; choose the PDF of TD-CSF-07; confirm.
+          - Open the Documents tab of the client's Servicing View.
+        expected: The PDF is listed on the case and on the client's Documents tab with the Case ID.
+      - c: 2
+        type: Negative
+        title: Executable file refused on a case
+        steps:
+          - Upload the .exe file of TD-CSF-07 to the case.
+        expected: Nothing is stored.
+        msg: [The file type is not allowed]
+      - c: 3
+        type: Upload-download
+        title: Upload and download in the case history
+        steps:
+          - Download the PDF of TC-CSF-054.1-01; open the History tab.
+        expected: The upload and the download are listed with the user, the document and the time.
+
+  FR-CSF-055:
+    scenario: SC-CSF-11
+    persona: CSF_SUPERVISOR
+    screen: CASE
+    data: [TD-CSF-13]
+    conditions:
+      - A reassignment shows in the History tab with the from and to owner, the user and the time.
+      - A priority change shows the old and new priority.
+      - No screen allows an audit record of a case to be changed or deleted.
+      - The Audit Trail report filtered on a Case ID lists every action of the case.
+    cases:
+      - c: 1
+        type: Positive
+        title: Reassignment in the case history
+        pre: TC-CSF-056.1-01 ran.
+        steps:
+          - Open the History tab of the reassigned case.
+        expected: The row shows Reassigned, from agent1 to agent2, sup1 and the date and time.
+      - c: 2
+        type: Positive
+        title: Priority change in the case history
+        steps:
+          - Change the priority of an open case from Normal to High; open the History tab.
+        expected: The row shows Priority changed, from Normal to High, sup1 and the date and time.
+      - c: 3
+        type: Negative
+        persona: SYSADMIN
+        screen: AUDIT
+        title: Case audit rows cannot be changed
+        steps:
+          - Open the History tab and the Audit Trail of the case; look for an edit or delete action.
+        expected: No edit or delete action exists on any audit row.
+      - c: 4
+        type: Report-output
+        persona: CSF_MANAGEMENT
+        screen: AUDIT
+        title: Audit Trail filtered on a Case ID
+        steps:
+          - Open Administration > Audit Trail; entity type Case; enter the Case ID; run; save as PDF.
+        expected: Creation, notes, documents, status changes, reassignment and priority change of the case are listed with their from and to values, user and time; the PDF holds the same rows.
+
+  FR-CSF-056:
+    scenario: SC-CSF-11
+    persona: CSF_SUPERVISOR
+    screen: TEAMQ
+    data: [TD-CSF-01, TD-CSF-13]
+    conditions:
+      - A reassigned case shows in the new owner's queue at once and leaves the old owner's queue.
+      - An escalation without a reason is refused.
+      - An escalated case shows the Escalated indicator with the reason in its header, its queue row and the dashboard.
+      - An agent does not see Reassign or Escalate.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Reassign a case from agent1 to agent2
+        steps:
+          - As sup1 select a case of agent1 in the Team Queue; Reassign; select agent2; enter the reason; confirm.
+          - Log in as agent2 and open My Cases; log in as agent1 and open My Cases.
+        expected: The case is in agent2's My Cases at once and no longer in agent1's; agent2 received the notification.
+      - c: 2
+        type: Negative
+        screen: CASE
+        title: Escalate without reason
+        steps:
+          - Open an open case; click Escalate; leave the reason blank; confirm.
+        expected: The case is not escalated.
+        msg: [Select the escalation reason]
+      - c: 3
+        type: Workflow
+        screen: CASE
+        title: Escalate with the reason Due for Resolution
+        steps:
+          - Click Escalate; select Due for Resolution; confirm.
+          - Open the Team Queue and the Case Dashboard.
+        expected: The case keeps its status and shows Escalated with the reason and date in the header, the queue row and the dashboard; the escalation group and the owner are notified.
+      - c: 4
+        type: Security-access
+        persona: CSF_AGENT
+        screen: CASE
+        title: The agent has no Reassign or Escalate
+        steps:
+          - As agent1 open an open case; send a reassignment request signed in as agent1.
+        expected: Reassign and Escalate are not offered; the request is refused.
+        msg: [You are not permitted to perform this action]
+
+  FR-CSF-057:
+    scenario: SC-CSF-11
+    persona: CSF_SUPERVISOR
+    screen: DASH
+    data: [TD-CSF-13, TD-CSF-14]
+    conditions:
+      - A case one working day before its due date shows Approaching breach and the four recipients are notified once.
+      - A case past its due date shows Breached on the case, the queue and the dashboard.
+      - A breached case of a type set for automatic escalation is escalated with the reason Past TAT.
+      - The age of a case is counted from its creation time.
+    cases:
+      - c: 1
+        type: Boundary
+        title: Approaching breach one working day before the due date
+        pre: A Request case created 3 working days ago (due tomorrow) and a Request case created 2 working days ago (TD-CSF-13).
+        steps:
+          - Run the SLA check (or wait 15 minutes); open both cases and the bells of agent1, sup1, fu1 and the escalation group.
+          - Run the SLA check a second time.
+        expected: The case due tomorrow shows Approaching breach and the four recipients have one notice each; the case due in 2 days stays Within TAT; the second check sends no further notice.
+      - c: 2
+        type: Positive
+        title: Breached case on the case, queue and dashboard
+        pre: A Problem case created 7 working days ago is open (TD-CSF-13).
+        steps:
+          - Run the SLA check; open the case, the Team Queue and the Case Dashboard.
+        expected: The case shows Breached in its header, its queue row and the breached count of the dashboard.
+      - c: 3
+        type: Workflow
+        title: Automatic escalation of a breached Complaint
+        pre: A Complaint case created 7 working days ago is open; Complaint is set for automatic escalation.
+        steps:
+          - Run the SLA check; open the case.
+        expected: The case shows Escalated with the reason Past TAT; the escalation group is notified; the History tab shows the automatic escalation.
+      - c: 3
+        type: Negative
+        neg: true
+        title: No automatic escalation for a type not set for it
+        pre: Commendation is not set for automatic escalation; a Commendation case created 7 working days ago is open.
+        steps:
+          - Run the SLA check; open the case.
+        expected: The case shows Breached but is not escalated.
+      - c: 4
+        type: Positive
+        persona: CSF_AGENT
+        screen: CASE
+        title: Age counted from creation
+        steps:
+          - Open a case created 2 working days ago that was returned to the agent yesterday.
+        expected: The age shows 2 working days, counted from the creation, not from the return.
+
+  FR-CSF-058:
+    scenario: SC-CSF-09
+    persona: CSF_AGENT
+    screen: CASE
+    data: [TD-CSF-13]
+    conditions:
+      - A closed case offers no edit, note, upload or status action.
+      - A follow-up case created from a closed case has a new Case ID, and both cases show the link and the reason.
+      - A case cannot be closed without the resolution and the closure reason.
+    cases:
+      - c: 1
+        type: Negative
+        neg: true
+        title: Closed case is read only
+        steps:
+          - Open a case Closed by Fulfillment Unit; look for Edit, Add Note, Upload, Return or Close.
+        expected: None of these actions is offered; only Create Follow-up Case is offered.
+      - c: 2
+        type: Workflow
+        title: Follow-up case linked to the closed case
+        steps:
+          - On the closed case click Create Follow-up Case; enter the reason Client to send the official receipt; confirm.
+          - Open the Linked Cases tab of both cases.
+        expected: A new case with its own Case ID and due date opens with the client, account and categories copied; both Linked Cases tabs show the original (closed) case, the new (active) case and the reason.
+      - c: 3
+        type: Negative
+        title: Close without resolution
+        steps:
+          - Open a case Open - Returned to Agent; click Close; leave the resolution blank; select the closure reason; confirm.
+        expected: The case stays open.
+        msg: [Enter the resolution given to the client]
+      - c: 3
+        type: Positive
+        title: Close with resolution and reason
+        steps:
+          - Click Close; enter the resolution; select Information provided; confirm.
+        expected: The case shows Closed by CSR with the resolution and reason and becomes read only.
+
+  FR-CSF-059:
+    scenario: SC-CSF-12
+    persona: CSF_MANAGEMENT
+    screen: DASH
+    data: [TD-CSF-13]
+    conditions:
+      - The dashboard and the Case Summary report for the same month and filters show the same figures.
+      - The Case Register exports to Excel, CSV and PDF with the same rows.
+      - An agent has no Case Dashboard and cannot run the case reports.
+      - The dashboard filters by date, case type, priority and status.
+    cases:
+      - c: 1
+        type: Report-output
+        title: Dashboard and Case Summary agree
+        steps:
+          - Open the Case Dashboard for this month; note the case volume, average ageing, SLA compliance rate and breached count.
+          - Run CSF-CASE-SUMMARY for this month with the same filters.
+        expected: The report shows the same case volume, average ageing, SLA compliance rate and breached versus non-breached counts as the dashboard.
+      - c: 1
+        type: Negative
+        screen: REPORTS
+        title: Case report with the end date before the start date
+        steps:
+          - Run CSF-CASES with start 30 of this month and end 1 of this month.
+        expected: The report does not run.
+        msg: [The end date must be on or after the start date]
+      - c: 2
+        type: Report-output
+        screen: REPORTS
+        title: Case Register in Excel, CSV and PDF
+        steps:
+          - Run CSF-CASES for this month; export to Excel, CSV and PDF.
+        expected: One row per case with the columns of FRS section 6.1; the three files hold the same rows as the screen; dates are dd-MMM-yyyy.
+      - c: 3
+        type: Security-access
+        persona: CSF_AGENT
+        title: The agent has no case dashboard or case reports
+        steps:
+          - As agent1 open the menu; open the Case Dashboard address directly; run CSF-CASES signed in as agent1.
+        expected: The Case Dashboard is not in the menu; the address shows the no-access page; the report run is refused.
+        msg: [You are not permitted to perform this action]
+      - c: 4
+        type: Positive
+        title: Dashboard filters
+        steps:
+          - Filter the dashboard on case type Complaint, priority High and status Open - Returned to Agent, then on last month.
+        expected: Every figure and the case list behind it change to the filtered cases.
+
+  FR-CSF-060:
+    scenario: SC-CSF-10
+    persona: CSF_FULFILMENT
+    screen: FUQ
+    data: [TD-CSF-11, TD-CSF-12, TD-CSF-13]
+    conditions:
+      - A case is proposed to the fulfilment unit of the routing table and shows in that unit's queue.
+      - A member of the fulfilment unit resolves and closes the case; the agent is notified.
+      - A returned case shows Open - Returned to Agent in the agent's queue with the reason; a request for CSR action shows Open - CSR Action Required with the instruction.
+      - A member of another fulfilment unit cannot see or act on the case.
+    cases:
+      - c: 1
+        type: Positive
+        persona: CSF_AGENT
+        screen: LOGCASE
+        title: Fulfilment unit proposed from the routing table
+        steps:
+          - Log a Request case for the Consumer 1 Motor account of UAT CSF Client One with the nature of transaction Delivery of Policy/COC.
+        expected: The fulfilment unit Consumer 1 Motor is proposed from the routing row of TD-CSF-11; after submission the case is in the Fulfilment Unit Queue of Consumer 1 Motor.
+      - c: 2
+        type: Workflow
+        title: Fulfilment unit resolves and closes the case
+        steps:
+          - As fu1 open the case from the Fulfilment Unit Queue; enter the resolution; click Resolve and Close.
+        expected: The case shows Closed by Fulfillment Unit with the resolution; agent1 receives the notice.
+      - c: 2
+        type: Negative
+        title: Resolve without resolution
+        steps:
+          - Click Resolve and Close with the resolution blank.
+        expected: The case stays Open - With Fulfillment Unit.
+        msg: [Enter the resolution given to the client]
+      - c: 3
+        type: Workflow
+        title: Request CSR action and close by the agent
+        steps:
+          - As fu1 open an open case; click Request CSR Action; enter the instruction Call the client to confirm the delivery address; confirm.
+          - As agent1 open Cases > CSR Action Required; open the case; add a note; click Close with the resolution.
+        expected: The case is listed in agent1's CSR Action Required queue with the instruction; after the agent's close it shows Closed by CSR.
+      - c: 3
+        type: Workflow
+        persona: CSF_AGENT
+        screen: CASE
+        title: Re-endorse a returned case
+        pre: The case of TC-CSF-052.1-01 is Open - Returned to Agent.
+        steps:
+          - Complete the missing details; click Re-endorse to Fulfilment Unit.
+        expected: The case is back in the Fulfilment Unit Queue with the status Open - With Fulfillment Unit.
+      - c: 4
+        type: Security-access
+        title: A member of another unit cannot act on the case
+        steps:
+          - Log in as fu2; send a Resolve and Close request for a Consumer 1 Motor case signed in as fu2.
+        expected: The case is not in fu2's queue; the request is refused.
+        msg: [You are not permitted to perform this action]
+
+  FR-CSF-061:
+    scenario: SC-CSF-12
+    persona: SYSADMIN
+    screen: LOV
+    data: [TD-CSF-11]
+    conditions:
+      - The Log Case dialog offers the values of the case lists of the addendum.
+      - A deactivated value is no longer offered and still shows on the cases that used it.
+      - A routing row proposes its fulfilment unit on the next case; a duplicate value or routing row is refused.
+    cases:
+      - c: 1
+        type: Positive
+        persona: CSF_AGENT
+        screen: LOGCASE
+        title: Case lists of the addendum
+        steps:
+          - Open the Log Case dialog; open each list and count the values.
+        expected: 3 channels, 7 case types, 125 natures of transaction, 51 product types, 33 market segments and 53 fulfilment units are offered, as in the addendum p.11-17.
+      - c: 2
+        type: Workflow
+        title: Deactivate a nature of transaction
+        steps:
+          - Open Broking Setup > Lists of Values > CSF_CASE_NATURE; deactivate Test transaction.
+          - As agent1 open the Log Case dialog; open a case that used Test transaction.
+        expected: Test transaction is not offered on the dialog; the case still shows it.
+      - c: 3
+        type: Positive
+        screen: ROUTING
+        title: New routing row proposes its fulfilment unit
+        steps:
+          - Open Customer Service Facility > Case Routing; add case type Complaint, market segment Leasing, any nature of transaction, fulfilment unit IDG/Leasing; save.
+          - As agent1 log a Complaint case for a client of the Leasing market segment.
+        expected: IDG/Leasing is proposed as the fulfilment unit.
+      - c: 3
+        type: Negative
+        screen: ROUTING
+        title: Duplicate routing row refused
+        steps:
+          - Add the routing row of TC-CSF-061.3-01 a second time.
+        expected: The row is not saved.
+        msg: ["A routing row already exists for this case type, market segment and nature of transaction"]
+
 access:
   - action: Open the Customer Search and the Servicing View
     screen: SEARCH
@@ -1269,3 +1880,33 @@ access:
     allow: [SYSADMIN]
     deny: [CSF_AGENT, CSF_SUPERVISOR, CSF_MANAGEMENT]
     denied: Administration > Users is not in the menu; the request is refused.
+  - action: Log a case, add notes and documents, close own cases
+    screen: LOGCASE
+    permission: CSF_CASE_CREATE
+    allow: [CSF_AGENT, CSF_SUPERVISOR]
+    deny: [CSF_MANAGEMENT, CSF_FULFILMENT]
+    denied: Log Case is not shown; a direct case creation request is refused.
+  - action: Reassign, escalate, change the category and close any case
+    screen: CASE
+    permission: CSF_CASE_SUPERVISE
+    allow: [CSF_SUPERVISOR]
+    deny: [CSF_AGENT, CSF_FULFILMENT]
+    denied: Reassign, Escalate and Change Category are not shown; a direct request is refused.
+  - action: Resolve, return or request CSR action on cases of the user's units
+    screen: FUQ
+    permission: CSF_CASE_FULFIL
+    allow: [CSF_FULFILMENT]
+    deny: [CSF_AGENT, CSF_MANAGEMENT]
+    denied: The Fulfilment Unit Queue is not in the menu; a direct request is refused.
+  - action: Open the case dashboard and run the case reports
+    screen: DASH
+    permission: CSF_CASE_REPORT
+    allow: [CSF_SUPERVISOR, CSF_MANAGEMENT]
+    deny: [CSF_AGENT, CSF_FULFILMENT]
+    denied: The Case Dashboard is not in the menu; a direct report run is refused.
+  - action: Maintain the case routing table
+    screen: ROUTING
+    permission: CSF_CASE_ROUTING
+    allow: [SYSADMIN]
+    deny: [CSF_AGENT, CSF_SUPERVISOR, CSF_MANAGEMENT]
+    denied: Case Routing is not in the menu; a direct change is refused.

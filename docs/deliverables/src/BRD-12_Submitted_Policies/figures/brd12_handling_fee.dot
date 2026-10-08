@@ -1,4 +1,4 @@
-// BRD-12: handling-fee tagging (FRS section 5.5; BRIDSP-31).
+// BRD-12: handling-fee tagging (FRS section 5.5; BRIDSP-34).
 digraph sp_fee {
   graph [rankdir=TB, fontname="Arial", nodesep=0.45, ranksep=0.4, bgcolor="white", pad=0.15];
   node  [shape=box, style="rounded,filled", fillcolor="@WHITE", color="@HEADER_BLUE", penwidth=1.1,

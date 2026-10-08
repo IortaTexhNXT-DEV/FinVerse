@@ -1,4 +1,4 @@
-// BRD-12: processing run steps (FRS section 5.2; BRIDSP-08-16).
+// BRD-12: processing run steps (FRS section 5.2; BRIDSP-10 to 17, 20).
 digraph sp_run {
   graph [rankdir=TB, fontname="Arial", nodesep=0.4, ranksep=0.4, bgcolor="white", pad=0.15];
   node  [shape=box, style="rounded,filled", fillcolor="@WHITE", color="@HEADER_BLUE", penwidth=1.1,
@@ -7,13 +7,13 @@ digraph sp_run {
 
   trig  [label="Trigger: intake commit,\ndaily job, on demand", fillcolor="@DIRTY_WHITE"];
   san   [label="1. SANITATION\nnormalise; duplicates; completeness", fillcolor="@HEADER_BLUE", fontcolor="@WHITE"];
-  mat   [label="2. MATCHING\nPN vs LAMD; loan status", fillcolor="@HEADER_BLUE", fontcolor="@WHITE"];
+  mat   [label="2. MATCHING\nPN / application no. vs loan files\n(LAMD, LMS, LAD); loan status", fillcolor="@HEADER_BLUE", fontcolor="@WHITE"];
   cls   [label="3. CLASSIFICATION\nInforced / Submitted", fillcolor="@HEADER_BLUE", fontcolor="@WHITE"];
   dis   [label="4. DISPOSITION\nbucket, tag, RA template", fillcolor="@HEADER_BLUE", fontcolor="@WHITE"];
   lim   [label="5. LIMITS\ninsurer approval needed?", fillcolor="@HEADER_BLUE", fontcolor="@WHITE"];
   fall  [label="Fallout\n(reason code)", fillcolor="@DANGER_BG", color="@DANGER"];
   res   [label="Run result per policy and step\n(rule id, rule-set version)", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
-  tor   [label="TOR task\n(BRIDSP-17)", fillcolor="@AMBER_BG"];
+  tor   [label="TOR task\n(BRIDSP-21)", fillcolor="@AMBER_BG"];
 
   trig -> san -> mat -> cls -> dis -> lim -> res;
   san -> fall [style=dashed, label=" incomplete /\n no rule"];

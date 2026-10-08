@@ -1,4 +1,4 @@
-// BRD-12: workflow SBM_IAAF (FRS section 5.3; BRIDSP-05-07). Each approval moves the IAAF to the next level of the matrix.
+// BRD-12: workflow SBM_IAAF (FRS section 5.3; BRIDSP-07 to 09). Each approval moves the IAAF to the next level of the matrix.
 digraph sp_iaaf {
   graph [rankdir=TB, fontname="Arial", nodesep=0.8, ranksep=0.45, bgcolor="white", pad=0.1];
   node  [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@HEADER_BLUE", penwidth=1.1,

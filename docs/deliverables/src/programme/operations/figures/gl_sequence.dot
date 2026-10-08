@@ -1,0 +1,19 @@
+// Go-live sequence: from legacy freeze to production, with the gates of each step.
+digraph gl_sequence {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.3, ranksep=0.2, bgcolor="white", pad=0.15];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.2, fontname="Arial",
+         fontsize=11, fontcolor="@NEAR_BLACK", width=6.6, height=0.55, margin="0.12,0.04", fillcolor="@WHITE"];
+  edge  [color="@HEADER_BLUE", arrowsize=0.8, penwidth=1.2];
+  a [label=<<b>1 Legacy freeze</b> - T-3 22:00: EBIX, QPS, CMS business modules read-only; GL for FY2027 only<br/><font point-size="9">gate GNG-2 (T-5); freeze test</font>>, fillcolor="@DIRTY_WHITE"];
+  b [label=<<b>2 Extract</b> - BDOI IT final extracts with control files after the last EOD<br/><font point-size="9">every file received; SHA-256 recorded</font>>];
+  c [label=<<b>3 Validate</b> - intake checks, code maps, data-quality rules, client matching<br/><font point-size="9">gates G2 and G3</font>>];
+  d [label=<<b>4 Migrate</b> - approved batches loaded through the BIBS services, rollback point first<br/><font point-size="9">gate G4; snapshot at T-2 02:00</font>>];
+  e [label=<<b>5 Reconcile</b> - L1 counts, L2 amounts, L3 hash totals, L4 fields, L5 GL<br/><font point-size="9">gate G5; Migration Clearing 0.00</font>>];
+  f [label=<<b>6 Business validation</b> - data owners verify samples on screen; smoke test<br/><font point-size="9">gate G6</font>>, fillcolor="@BG_BLUE"];
+  g [label=<<b>7 Go / No-Go</b> - board decision T-1 18:00 on measured criteria<br/><font point-size="9">GNG-3 = G7</font>>, fillcolor="@AMBER_BG"];
+  h [label=<<b>8 Production</b> - T 08:00 open for business; point of no return T 18:00<br/><font point-size="9">hypercare to the first month-end close</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  rb [label=<<b>Rollback</b><br/><font point-size="9">restore snapshot; reopen legacy</font>>, fillcolor="@DANGER_BG", color="@DANGER", width=2.2];
+  a -> b -> c -> d -> e -> f -> g -> h;
+  g -> rb [label=<<font point-size="9"> NO-GO </font>>, style=dashed, color="@DANGER"];
+  {rank=same; g; rb}
+}

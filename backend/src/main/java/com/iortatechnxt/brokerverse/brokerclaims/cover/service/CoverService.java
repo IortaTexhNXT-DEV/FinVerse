@@ -187,17 +187,19 @@ public class CoverService {
   }
 
   /**
-   * Snapshot of a cover for a claim (BRCLM.003/007/009/016/039).
+   * Snapshot of a cover for a claim (BRCLM.003/007/009/016/039): the latest booked version of the
+   * policy year, every booked endorsement included, whatever the loss date (FR-CM-015; minutes of
+   * 27-Apr-2026, BR 39); an endorsement effective after the loss date is shown as such on the cover
+   * panel.
    *
    * @param account account
    * @param policyYear policy year
-   * @param lossDate loss date (cover version at that date)
    * @return snapshot
    */
-  public CoverSnapshot snapshot(Account account, int policyYear, LocalDate lossDate) {
+  public CoverSnapshot snapshot(Account account, int policyYear) {
     return CoverSnapshot.of(
         policy(account, policyYear),
-        version(account.getArn(), policyYear, lossDate),
+        version(account.getArn(), policyYear, null),
         sales(account, policyYear));
   }
 

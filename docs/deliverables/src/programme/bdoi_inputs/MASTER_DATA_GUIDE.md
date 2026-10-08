@@ -9,7 +9,7 @@ doc_code: Guide
 brd: BRD-00
 name: Master Data Upload Guide
 doc_id: BIBS-GUIDE-BRD-00-MD
-version: "1.0"
+version: "1.1"
 date: 8 October 2026
 status: Issued for BDOI review
 header_title: Master Data Upload Guide
@@ -21,6 +21,12 @@ control:
     reviewer: iorta TechNXT Business Analysis
     approver: ""
     change: First issue with the Master Data and Configuration Upload Templates workbook v1.0
+  - version: "1.1"
+    date: 8 Oct 2026
+    author: iorta TechNXT Project Manager
+    reviewer: iorta TechNXT Business Analysis
+    approver: ""
+    change: "Taxes and charges made complete: premium charges checklist (PM-04, LGT in R04B), BDOI's own taxes checklist (D0-10), party tax profiles (TX-01), tax forms (TX-02), currencies and exchange rates (MD-02, MD-03); coverage check; data BIBS does not hold listed as gaps with their questions; insurer-company items removed"
 distribution:
   - {name: "Program Manager, Business Project Services", role: Owner of the master data plan, organisation: BDO Unibank ESG, purpose: Review and approval}
   - {name: "BIBS Product Owner", role: Product owner, organisation: BDOI, purpose: Review}
@@ -35,9 +41,9 @@ distribution:
 
 # Purpose
 
-BIBS needs its master, reference and configuration data before it can be used: the company and its branches, the users and their group profiles, the chart of accounts and the accounting rules, the bank accounts, the products, packages and rates, the insurers and other business partners, the clients, the lists of values, the numbering, the documents, the notifications and the service levels. This guide explains how BDOI prepares that data with the workbook **BIBS_Templates_BRD-00_Master_Data_and_Configuration_Upload_Templates_v1.0.xlsx**, in which order it is loaded, how it is checked and who signs it off.
+BIBS needs its master, reference and configuration data before it can be used: the company and its branches, the users and their group profiles, the chart of accounts and the accounting rules, the bank accounts, the products, packages and rates, the insurers and other business partners, the clients, the lists of values, the numbering, the documents, the notifications and the service levels. This guide explains how BDOI prepares that data with the workbook **BIBS_Templates_BRD-00_Master_Data_and_Configuration_Upload_Templates_v1.1.xlsx**, in which order it is loaded, how it is checked and who signs it off.
 
-The workbook answers the question of the BDOI product owner of 8 October 2026 on the templates to upload the master data: every dataset the platform needs to work has a template sheet in the column layout that BIBS loads. The companion workbook **BIBS_Inputs_BRD-00_BDOI_Requirements_and_Inputs_by_BRD_v1.0.xlsx** lists, BRD by BRD, every decision, clarification and input the project needs from the business users; its rows of type Master data and Configuration value point to the templates of this workbook.
+The workbook answers the question of the BDOI product owner of 8 October 2026 on the templates to upload the master data: every dataset the platform needs to work has a template sheet in the column layout that BIBS loads. The companion workbook **BIBS_Inputs_BRD-00_BDOI_Requirements_and_Inputs_by_BRD_v1.1.xlsx** lists, BRD by BRD, every decision, clarification and input the project needs from the business users; its rows of type Master data and Configuration value point to the templates of this workbook.
 
 # What the workbook contains
 
@@ -50,7 +56,7 @@ render: groups
 
 Each template sheet is self-contained. Its header block gives the purpose, who provides the data, the due date, how it is loaded, the templates it depends on (with links) and the progress. Above each column a guide band gives the Mandatory flag, the Format, the Allowed values and What to enter; a mandatory column is marked * in the header row. One grey example row shows a filled-in record; it is overwritten or deleted.
 
-Seven review sheets list what the platform delivers and ask for the value BDOI wants: the lists of values, the system parameters, the SLA and turnaround parameters, the numbering prefixes, the notification events with their recipients, the document and letter templates, and the accounting events that need an accounting rule. The sheet **Configured on screens** lists the set-up that is decided in working sessions and entered directly on the screens (rules, matrices, schedules), and the sheet **Gaps** lists the datasets that have a template but no upload. The sheet **Reference lists** holds every list of allowed values used by the drop-downs, and **Questions and comments** is where BDOI raises a question on a template or a column.
+Seven review sheets list what the platform delivers and ask for the value BDOI wants: the lists of values, the system parameters, the SLA and turnaround parameters, the numbering prefixes, the notification events with their recipients, the document and letter templates, and the accounting events that need an accounting rule. The sheet **Configured on screens** lists the set-up that is decided in working sessions and entered directly on the screens (rules, matrices, schedules). The sheet **Gaps** lists the datasets that have a template but no upload, and the data BDOI may need that BIBS does not hold, each with its question in the requirements workbook. The sheet **Coverage check** shows, for each dataset the product owner asked about, where it is in the workbook or why BIBS does not hold it. The workbook holds no item of the insurer modules (underwriting, insurer claims, reinsurance, reserves, consolidation), which BDOI as a broker does not use. The sheet **Reference lists** holds every list of allowed values used by the drop-downs, and **Questions and comments** is where BDOI raises a question on a template or a column.
 
 # Who does what
 
@@ -72,6 +78,17 @@ Seven review sheets list what the platform delivers and ask for the value BDOI w
 6. For a large legacy dataset (clients, client contacts, opening trial balance), BDOI IT sends the extract file in the layout of the template instead of typing the rows; the template then serves as the agreed layout and a sample.
 7. Raise questions on the sheet **Questions and comments** with the template and the column; the project team answers there.
 8. When the template is complete, write the name of the confirming owner and the date in **Confirmed by** and **Date** on the sheet, set the status in the index to Confirmed and return the workbook to the project team by the due date.
+
+# Taxes and charges
+
+Two checklists make sure no tax or charge is missed. The template **PM-04 Rate tables** carries one row per premium charge billed to clients (documentary stamp tax, premium tax, VAT on premium, fire service tax, VAT on BDOI's commission and the motor factors); BDOI gives the rate per line and the dates, and adds a row where a line has another rate. The local government tax is the rate of each insurer branch in **R04B**. The sheet **PM-04 Charges checklist** states the rule BIBS applies to each charge, for BDOI to confirm.
+
+```pack
+plugin: build_bdoi_inputs.py
+render: charges
+```
+
+The template **D0-10 Tax codes** carries one row per kind of BDOI's own tax: output VAT on commission and service fees, zero-rated and exempt sales, input VAT, the withholding tax insurers and clients withhold on BDOI's income (2307 received) and the withholding taxes BDOI deducts from suppliers, one row per ATC. BDOI gives the codes, ATCs, rates and accounts as its tax adviser confirms them; the workbook proposes none. The sheet **D0-10 Tax checklist** says what BIBS does with each and what it does not hold (final taxes, government and top withholding agent flags, exemption certificates). The tax details of each party (TIN, branch code, payee class, VAT treatment, default ATC) are given in **TX-01 Party tax profiles**, and the returns BDOI files with their due dates in **TX-02 Tax forms**.
 
 # Load routes
 
@@ -119,11 +136,18 @@ From the freeze of the code maps and reference values (T-7, 27 December 2027) a 
 
 # Gaps and set-up on screens
 
-The following datasets have a template but no upload or Migration Console layout: BIBS takes their rows on the configuration screen only. No new upload is provided. The BDOI owner fills in the template; the BIBS configuration team keys the rows on the screen named, a second user authorises each record, and the owner checks the result against the template before the dress rehearsal.
+The following datasets have a template but no upload or Migration Console layout yet. Their route is: configuration screen – upload on the screen (being added; until then BDOI fills this template and it is loaded on the screen with maker-checker). The owner checks the result against the template before the dress rehearsal.
 
 ```pack
 plugin: build_bdoi_inputs.py
 render: gaps
+```
+
+BIBS does not hold the following data today; each is asked as a question in the BDOI Requirements and Inputs workbook, and BDOI decides whether it is needed.
+
+```pack
+plugin: build_bdoi_inputs.py
+render: data_gaps
 ```
 
 The rules, matrices, schedules and other set-up listed on the sheet **Configured on screens** are decided by BDOI in working sessions and entered directly on the screens named there; there is no template to fill in, and the decisions are recorded in BDOI comments on that sheet.

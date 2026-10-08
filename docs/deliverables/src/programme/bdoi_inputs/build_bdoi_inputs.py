@@ -69,7 +69,17 @@ def _module(path: Path, name: str):
 
 @lru_cache(maxsize=1)
 def cfg() -> dict[str, Any]:
-    return yaml.safe_load(SOURCE.read_text(encoding="utf-8"))
+    data = yaml.safe_load(SOURCE.read_text(encoding="utf-8"))
+    for key in ("screen_templates", "depends", "due"):
+        data[key].update(data.get(f"{key}_more") or {})
+    data["extra_rows"] = list(data.get("extra_rows") or []) + list(data.get("extra_rows_more") or [])
+    return data
+
+
+def excluded() -> dict[str, set[str]]:
+    """Insurer-company items left out (parameters, accounting events and categories, configuration items)."""
+    x = cfg().get("insurer_exclusions") or {}
+    return {k: set(v or []) for k, v in x.items()}
 
 
 def register_module():
@@ -556,6 +566,8 @@ def cfg_items() -> list[Item]:
     dc = drop_closure()
     out = []
     for it, r in zip(dc.data()["items"], dc.register_rows()):
+        if it["id"] in excluded().get("config_items", set()):
+            continue
         target = b_target_text(it)
         if it["id"] in DOCUMENT_ITEMS:
             typ = "Sample document or template"
@@ -1190,6 +1202,9 @@ REVIEW = {  # review sheets of the platform lists: key -> sheet name
     "LIST-EVENTS": "Accounting events",
 }
 SCREENS_SHEET = "Configured on screens"
+CHARGES_SHEET = "PM-04 Charges checklist"
+TAX_SHEET = "D0-10 Tax checklist"
+COVERAGE_SHEET = "Coverage check"
 GAPS_SHEET = "Gaps"
 SLA = re.compile(r"SLA|_TAT_|_TAT$|TURNAROUND|REPLY_DAYS|FOLLOW_?UP_DAYS|ESCALATION|AGEING|AGING|REMINDER|LEAD_DAYS|"
                  r"NOTICE_DAYS|PAST_DUE|STALLED|ALERT_DAYS|GRACE|COMPARATIVE|ADVICE_DAYS|VALIDITY_DAYS|EXPIRING_DAYS|"
@@ -1468,6 +1483,8 @@ def b_target_text(item: dict[str, Any]) -> str:
         if layouts:
             return f"Fill in the template{'s' if len(layouts) > 1 else ''} {', '.join(layouts)} of the {book} workbook."
         return f"Loaded by the data migration (object {obj}, Migration Workbook of BRD-13)."
+    if item["id"] in (cfg().get("covered_by") or {}):
+        return f"Fill in the templates {', '.join(cfg()['covered_by'][item['id']])} of the {book} workbook."
     if item["route"] == "screen":
         return (f"Configured on the screen {drop_closure().menu()[item['screen']]} (sheet {SCREENS_SHEET} of the "
                 f"{book} workbook).")
@@ -1488,9 +1505,21 @@ def b_book() -> tuple[Any, list[Any], list[Any]]:
     ci = dc.config_inputs()
     meta = cfg()["meta"]
     book = g.GuidedBook(meta["title_b"], meta["version"])
+    insurer_codes = {r["code"] for r in dc.accounting_event_rows() if insurer_event(r)}
     for code, x in ci.resolve_lists(dc.combined()).items():
-        book.add_list(code, x["name"], x["values"], x["note"], x["strict"])
+        values = [v for v in x["values"] if v[0] not in insurer_codes] if code == "ACCOUNTING_EVENT" else x["values"]
+        book.add_list(code, x["name"], values, x["note"], x["strict"])
     templates = b_templates(book)
+    by_id = {t.id: t for t in templates}
+    for tid, cols in (cfg().get("list_overrides") or {}).items():
+        for header, spec in cols.items():
+            code = re.sub(r"[^A-Z0-9]+", "_", f"{tid}_{header}".upper()).strip("_")
+            book.add_list(code, spec["name"], [tuple(v) for v in spec["values"]])
+            col = next(c for c in by_id[tid].columns if c.header == header)
+            col.check, col.allowed, col.allowed_link = f"list:{code}", "", ""
+    for tid, notes in (cfg().get("template_notes") or {}).items():
+        if tid in by_id:
+            by_id[tid].notes = list(by_id[tid].notes) + list(notes)
     for t in templates:
         for c in t.columns:
             if c.example == "{baseCurrency}":
@@ -1526,6 +1555,8 @@ def review_rows() -> dict[str, list[dict[str, Any]]]:
         lovs.append(r)
     params, sla, numbering = [], [], []
     for r in dc.parameter_rows():
+        if r["key"] in excluded().get("parameters", set()):
+            continue
         r = dict(r)
         r["route"] = ROUTE_SCREEN
         r["prepared"] = _prepared_b(r["template"])
@@ -1541,9 +1572,14 @@ def review_rows() -> dict[str, list[dict[str, Any]]]:
         r = dict(r)
         r["prepared"] = _prepared_b(tl["documents"].get(r["code"], "LIST-DOCUMENTS"))
         docs.append(r)
-    acc = [dict(r, prepared=_prepared_b("D0-08")) for r in dc.accounting_event_rows()]
+    acc = [dict(r, prepared=_prepared_b("D0-08")) for r in dc.accounting_event_rows() if not insurer_event(r)]
     return {"LIST-LOV": lovs, "LIST-PARAMETERS": params, "LIST-SLA": sla, "LIST-NUMBERING": numbering,
             "LIST-NOTIFICATIONS": events, "LIST-DOCUMENTS": docs, "LIST-EVENTS": acc}
+
+
+def insurer_event(r: dict[str, Any]) -> bool:
+    x = excluded()
+    return r["code"] in x.get("events", set()) or r["category"] in x.get("event_categories", set())
 
 
 def review_columns() -> dict[str, tuple[str, list[Any]]]:
@@ -1642,18 +1678,25 @@ def index_rows() -> list[dict[str, Any]]:
         brd = brd_of_template(t.id)
         rows.append({"Step": i, "ID": t.id, "Dataset": t.name, "Group": group_of(t.id), "BRD": brd,
                      "Drop": brand.drop_of(brd) if brd != "BRD-13" else "Drop 0",
-                     "Provided by": t.owner, "Load route": route_of(t.id), "Entered or loaded on": where_of(t.id, t),
+                     "Provided by": t.owner, "Load route": route_label(t.id), "Entered or loaded on": where_of(t.id, t),
                      "Loads after": ", ".join(t.depends) or "-", "Due": t.due,
                      "Rows entered": p.rows_formula(), "Mandatory cells missing": p.missing_formula(),
                      "Status": "Not started", "Open": (f"{t.id} →", p.sheet)})
     return rows
 
 
+def route_label(tid: str) -> str:
+    """Route text of the index: the configuration-screen route with its note."""
+    r = route_of(tid)
+    return cfg()["route_screen"] if r == ROUTE_SCREEN else r
+
+
 def screen_rows() -> list[dict[str, Any]]:
     dc = drop_closure()
     rows = []
     for it, r in zip(dc.data()["items"], dc.register_rows()):
-        if it["route"] != "screen":
+        if (it["route"] != "screen" or it["id"] in excluded().get("config_items", set())
+                or it["id"] in (cfg().get("covered_by") or {})):
             continue
         rows.append({"id": it["id"], "name": it["name"], "provides": r["provides"], "brd": module_tab(it["module"]),
                      "owner": r["owner"], "where": r["where"], "due": f"{r['due_date']} – {r['due']}",
@@ -1661,19 +1704,68 @@ def screen_rows() -> list[dict[str, Any]]:
     return rows
 
 
+GAP_TEMPLATE = "No upload route: keyed on the screen from the template"
+GAP_DATA = "Not held by BIBS: question to BDOI"
+
+
 def gap_rows() -> list[dict[str, Any]]:
     book, templates, order = b_book()
-    note = cfg()["gap_note"]
     rows = []
     for t in order:
         if route_of(t.id) != ROUTE_SCREEN:
             continue
         p = book.plans[t.id]
-        rows.append({"id": (t.id, f"{p.sheet}!A1"), "name": t.name, "brd": brd_of_template(t.id), "owner": t.owner,
-                     "where": where_of(t.id, t), "columns": len(t.columns),
-                     "mandatory": sum(1 for c in t.columns if c.mandatory.startswith("Y")), "due": t.due,
-                     "how": note})
+        rows.append({"kind": GAP_TEMPLATE, "id": (t.id, f"{p.sheet}!A1"), "name": t.name,
+                     "brd": brd_of_template(t.id), "owner": t.owner, "where": where_of(t.id, t),
+                     "columns": len(t.columns), "mandatory": sum(1 for c in t.columns if c.mandatory.startswith("Y")),
+                     "due": t.due, "how": cfg()["route_screen"]})
+    return rows + data_gap_rows()
+
+
+def data_gap_rows() -> list[dict[str, Any]]:
+    """Data BDOI may need that BIBS does not hold (no field or no master): asked in the requirements workbook."""
+    a = {r.id: r for r in consolidated()}
+    rows = []
+    seen = set()
+    items = ([(x[0], x[1], x[5]) for x in cfg()["charges_checklist"] if x[4] == "No"]
+             + [(x[0], x[1], x[5]) for x in cfg()["tax_checklist"] if x[4] == "No"]
+             + [(x[0], x[3], x[4]) for x in cfg()["coverage"] if x[2] in ("No", "Partly") and x[4]])
+    for name, why, ref in items:
+        if name in seen:
+            continue
+        seen.add(name)
+        q = a.get(ref)
+        rows.append({"kind": GAP_DATA, "id": ref or "-", "name": name, "brd": q.tab if q else "-",
+                     "owner": q.owner if q else "-", "where": "-", "columns": None, "mandatory": None,
+                     "due": fmt(q.due) if q else "-",
+                     "how": f"{why} Question {ref} of the BDOI Requirements and Inputs workbook." if ref else why})
     return rows
+
+
+def checklist_rows(key: str) -> list[dict[str, Any]]:
+    return [{"item": x[0], "rule": x[1], "where": x[2], "provides": x[3], "held": x[4], "question": x[5] or "-",
+             "status": "Not started"} for x in cfg()[key]]
+
+
+def coverage_rows() -> list[dict[str, Any]]:
+    return [{"item": x[0], "where": x[1], "held": x[2], "note": x[3] or "-", "question": x[4] or "-"}
+            for x in cfg()["coverage"]]
+
+
+def prefill(book: Any, t: Any) -> None:
+    """Writes the checklist rows of a template into its first input rows."""
+    from openpyxl.styles import Font  # noqa: PLC0415
+
+    rows = (cfg().get("prefill") or {}).get(t.id) or []
+    if not rows:
+        return
+    p = book.plans[t.id]
+    ws = book.wb[p.sheet[:31]]
+    for i, values in enumerate(rows, start=1):
+        for header, value in values.items():
+            cell = ws[f"{p.letters[header]}{p.example_row + i}"]
+            cell.value = value
+            cell.font = Font(name=brand.FONT, size=10, color=brand.TEXT)
 
 
 def build_b() -> Path:
@@ -1684,6 +1776,7 @@ def build_b() -> Path:
     book, templates, order = b_book()
     for i, t in enumerate(order, start=1):
         book.template_sheet(t, i, len(order))
+        prefill(book, t)
     rcols = review_columns()
     rrows = review_rows()
     for key, sheet in REVIEW.items():
@@ -1702,10 +1795,11 @@ def build_b() -> Path:
         Column("status", "Status", 14, "Status of the item", values=B_STATUSES),
         Column("comments", "BDOI comments", 36, "Decisions and values of the owner"),
     ], screen_rows(), B_STATUSES)
-    book.table_sheet(GAPS_SHEET, "Gaps: datasets without an upload route", "Datasets whose template rows the "
-                     "platform cannot take by file (no screen upload, no Migration Console layout): they are keyed "
-                     "on the screen from the filled-in template. No new upload is provided.", [
-        Column("id", "Template", 9, "Template of this workbook"),
+    book.table_sheet(GAPS_SHEET, "Gaps", "Datasets whose template rows the platform cannot take by file (keyed on "
+                     "the screen from the filled-in template), and data BDOI may need that BIBS does not hold (asked "
+                     "as a question in the BDOI Requirements and Inputs workbook)", [
+        Column("kind", "Kind of gap", 22, "No upload route, or not held by BIBS", values=[GAP_TEMPLATE, GAP_DATA]),
+        Column("id", "Template or question", 11, "Template of this workbook, or Ref of the question"),
         Column("name", "Dataset", 30, "Dataset"),
         Column("brd", "BRD", 9, "BRD"),
         Column("owner", "Provided by", 30, "Who fills in the template"),
@@ -1713,12 +1807,39 @@ def build_b() -> Path:
         Column("columns", "Columns", 8, "Columns of the template", kind="number"),
         Column("mandatory", "Mandatory", 9, "Mandatory columns", kind="number"),
         Column("due", "Due", 24, "Due date of the template"),
-        Column("how", "How the rows get into BIBS", 60, "Handling of the dataset"),
+        Column("how", "How the rows get into BIBS, or what is asked", 60, "Handling of the dataset"),
     ], gap_rows(), B_STATUSES)
+    chk_cols = lambda what: [  # noqa: E731
+        Column("item", what, 30, "Item"),
+        Column("rule", "What BIBS does", 60, "The rule of the platform"),
+        Column("where", "Where it is set up", 32, "Template, column or list"),
+        Column("provides", "What BDOI provides or confirms", 44, "Input asked from BDOI"),
+        Column("held", "Held by BIBS", 9, "Yes, or No (sheet Gaps)", values=["Yes", "No"]),
+        Column("question", "Question", 10, "Ref of the question in the BDOI Requirements and Inputs workbook"),
+        Column("confirm", "Rule confirmed", 14, "Agree, or Change (describe in BDOI comments)",
+               values=["Agree", "Change"]),
+        Column("comments", "BDOI comments", 36, "Decision, value or comment of the owner"),
+        Column("status", "Status", 14, "Status of the item", values=B_STATUSES),
+    ]
+    book.table_sheet(CHARGES_SHEET, "PM-04 Charges checklist: premium charges billed to clients", "One row per "
+                     "charge: how BIBS computes it, where its rate is given and what BDOI confirms (rates per line in "
+                     "PM-04, LGT per insurer branch in R04B)", chk_cols("Charge"), checklist_rows("charges_checklist"),
+                     B_STATUSES)
+    book.table_sheet(TAX_SHEET, "D0-10 Tax checklist: BDOI's own taxes", "One row per kind of tax: what BIBS does, "
+                     "where it is set up (D0-10 tax codes, TX-01 party tax profiles, TX-02 tax forms) and what BIBS "
+                     "does not hold", chk_cols("Tax"), checklist_rows("tax_checklist"), B_STATUSES)
+    book.table_sheet(COVERAGE_SHEET, "Coverage check", "The datasets the product owner asked about and where each "
+                     "is in this workbook, or why BIBS does not hold it", [
+        Column("item", "Dataset", 40, "Dataset asked about"),
+        Column("where", "Where it is in this workbook", 46, "Template, list or sheet"),
+        Column("held", "Held by BIBS", 10, "Yes, Partly or No", values=["Yes", "Partly", "No"]),
+        Column("note", "Note", 60, "What BIBS keeps and what it does not"),
+        Column("question", "Question", 10, "Ref of the question in the BDOI Requirements and Inputs workbook"),
+    ], coverage_rows(), B_STATUSES)
     book.questions_sheet(order)
     idx = index_rows()
     columns = [("Step", 6), ("ID", 8), ("Dataset", 28), ("Group", 18), ("BRD", 8), ("Drop", 8), ("Provided by", 26),
-               ("Load route", 13), ("Entered or loaded on", 28), ("Loads after", 13), ("Due", 20),
+               ("Load route", 30), ("Entered or loaded on", 28), ("Loads after", 13), ("Due", 20),
                ("Rows entered", 9), ("Mandatory cells missing", 10), ("Status", 14), ("Open", 9)]
     routes = Counter(r["Load route"] for r in idx)
     steps = [
@@ -1728,8 +1849,8 @@ def build_b() -> Path:
         f"Load route: {ROUTE_UPLOAD} ({routes[ROUTE_UPLOAD]} templates) - the filled-in sheet is uploaded on the named "
         f"screen, which checks every row; {ROUTE_MIGRATION} ({routes[ROUTE_MIGRATION]}) - the data is extracted from "
         f"the legacy systems by BDOI IT in this layout and loaded by the Data Migration Console; {ROUTE_SCREEN} "
-        f"({routes[ROUTE_SCREEN]}) - the rows are keyed on the named screen from the confirmed template (sheet "
-        f"{GAPS_SHEET}). Every record is authorised by a second user.",
+        f"({routes[ROUTE_SCREEN]}) - upload on the screen being added; until then BDOI fills the template and it is "
+        f"loaded on the screen with maker-checker (sheet {GAPS_SHEET}). Every record is authorised by a second user.",
         "On a template sheet, read the header block (purpose, who fills it in, how it is loaded, due, depends on) and "
         "the guide above each column (Mandatory, Format, Allowed values, What to enter; * marks a mandatory column). "
         "Overwrite or delete the grey example row and enter one row per record. Drop-downs offer the allowed values "
@@ -1769,8 +1890,11 @@ def build_b() -> Path:
         return book.small_table(ws, row, "Other sheets", ["Sheet", "What it holds"], [
             ((name, name), desc) for name, desc in
             [(REVIEW[k], rcols[k][0]) for k in REVIEW] +
-            [(SCREENS_SHEET, "Set-up decided in working sessions and entered on the screens (no template)"),
-             (GAPS_SHEET, "Datasets without an upload route: keyed on the screen from the template"),
+            [(CHARGES_SHEET, "Premium charges billed to clients: one row per charge with the rule BIBS applies"),
+             (TAX_SHEET, "BDOI's own taxes: one row per kind of tax, what BIBS does and what it does not hold"),
+             (SCREENS_SHEET, "Set-up decided in working sessions and entered on the screens (no template)"),
+             (GAPS_SHEET, "Datasets without an upload route, and data BIBS does not hold (questions)"),
+             (COVERAGE_SHEET, "The datasets asked about and where each is, or why BIBS does not hold it"),
              (g.LISTS, "Every list of allowed values of the drop-downs, with code and label"),
              (g.QUESTIONS, "Questions and comments per template and column, with the answer")]
         ], spans=[3, 10])
@@ -1780,8 +1904,15 @@ def build_b() -> Path:
                      identity, steps, "Index of the datasets in load order (dependencies first)", columns, idx,
                      statuses=B_STATUSES, after=more)
     book.lists_sheet()
-    sheets = ([g.START] + [book.plans[t.id].sheet for t in order] + list(REVIEW.values()) +
-              [SCREENS_SHEET, GAPS_SHEET, g.LISTS, g.QUESTIONS])
+    tpl_sheets = []
+    for t in order:
+        tpl_sheets.append(book.plans[t.id].sheet)
+        if t.id == "PM-04":
+            tpl_sheets.append(CHARGES_SHEET)
+        if t.id == "D0-10":
+            tpl_sheets.append(TAX_SHEET)
+    sheets = ([g.START] + tpl_sheets + list(REVIEW.values()) +
+              [SCREENS_SHEET, GAPS_SHEET, COVERAGE_SHEET, g.LISTS, g.QUESTIONS])
     path = brand.out_path("BRD-00", KIND, brand.output_name("Templates", "BRD-00", meta["title_b"], meta["version"],
                                                               "xlsx"))
     return book.save(path, sheets, {"title": meta["title_b"],
@@ -1811,9 +1942,8 @@ def render(doc: Any, render: str, **_: Any) -> None:  # noqa: A002 - block key
                                   "with its control file (row count and totals). The Data Migration Console checks "
                                   "the file, maps the legacy codes with the approved code maps and loads it in a "
                                   "batch that is reconciled and signed.", routes[ROUTE_MIGRATION]],
-                [ROUTE_SCREEN, "The owner fills in the template; the BIBS configuration team keys the rows on the "
-                               "named screen and a second user authorises each record. These datasets are listed on "
-                               "the sheet Gaps.", routes[ROUTE_SCREEN]]]
+                [ROUTE_SCREEN, cfg()["route_screen"] + ". These datasets are listed on the sheet Gaps.",
+                 routes[ROUTE_SCREEN]]]
         doc.table(["Route", "How the data gets into BIBS", "Templates"], rows, widths=[3.2, 12.2, 2.2],
                   caption="Load routes", size=8.5)
         return
@@ -1823,9 +1953,19 @@ def render(doc: Any, render: str, **_: Any) -> None:  # noqa: A002 - block key
                   caption="Load order of the datasets (dependencies first)", size=7.5, keep_rows=False)
         return
     if render == "gaps":
-        rows = [[r["id"][0], r["name"], r["where"]] for r in gap_rows()]
+        rows = [[r["id"][0], r["name"], r["where"]] for r in gap_rows() if r["kind"] == GAP_TEMPLATE]
         doc.table(["Template", "Dataset", "Keyed on"], rows, widths=[1.6, 7.0, 9.0],
                   caption="Datasets without an upload route", size=8, keep_rows=False)
+        return
+    if render == "data_gaps":
+        rows = [[r["id"], r["name"], r["how"]] for r in gap_rows() if r["kind"] == GAP_DATA]
+        doc.table(["Question", "Data", "What BIBS keeps and what is asked"], rows, widths=[1.6, 5.0, 11.0],
+                  caption="Data BIBS does not hold (questions to BDOI)", size=8, keep_rows=False)
+        return
+    if render == "charges":
+        rows = [[x[0], x[1], x[2]] for x in cfg()["charges_checklist"]]
+        doc.table(["Charge", "What BIBS does", "Where it is set up"], rows, widths=[3.6, 9.0, 5.0],
+                  caption="Premium charges billed to clients", size=8, keep_rows=False)
         return
     if render == "screens":
         rows = [[r["id"], r["name"], r["where"]] for r in screen_rows()]

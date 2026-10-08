@@ -2,15 +2,15 @@
 # Word summary of the BRD-6 Renewal test plan. The tables marked <!-- tp:... --> are filled
 # from brd06_cases.yaml. Build: python docs/deliverables/src/testplans/build_test_plan.py brd06_cases.yaml
 title: Renewal Test Plan
-subtitle: BRD-6 Renewal (RMEL Phase 2 Online Dispositioning, Addendum 1 and Workshop Addendum) - test conditions, scenarios and cases
+subtitle: BRD-6 Renewal (RMEL Phase 2 Online Dispositioning, Addendum 1, the Workshop and the Walkthrough Addenda) - test conditions, scenarios and cases
 doc_type: Test Plan
 doc_code: TestPlan
 brd: BRD-06
 name: Renewal Summary
 doc_id: BIBS-TP-BRD-06
-version: "1.1"
-date: 26 September 2026
-status: Issued for BDOI review
+version: "2.0"
+date: 8 October 2026
+status: Issued for BDOI business sign-off
 header_title: Test Plan BRD-6 Renewal
 h1_page_break: false
 control:
@@ -19,7 +19,7 @@ control:
     author: iorta TechNXT QA
     reviewer: iorta TechNXT Business Analysis
     approver: ""
-    change: Internal draft from FRS BRD-6 v1.1
+    change: Internal draft from FRS BRD-6 v2.0
   - version: "1.0"
     date: 25 Sep 2026
     author: iorta TechNXT QA
@@ -31,10 +31,16 @@ control:
     author: iorta TechNXT QA
     reviewer: iorta TechNXT Business Analysis
     approver: BDOI Product Owner (pending)
-    change: "FRS BRD-6 v1.1: cases for the go-live extraction and the RAs already sent (FR-RN-016) and the package remapping at sanitation (FR-RN-028); test data TD-RN-15, TD-RN-16"
+    change: "FRS BRD-6 v2.0: cases for the go-live extraction and the RAs already sent (FR-RN-016) and the package remapping at sanitation (FR-RN-028); test data TD-RN-15, TD-RN-16"
+  - version: "2.0"
+    date: 8 Oct 2026
+    author: iorta TechNXT QA
+    reviewer: iorta TechNXT Project Manager
+    approver: BDOI business units (sign-off)
+    change: "Business sign-off pack on the Renewal BRD of 8-Oct-2026 (Walkthrough addendum of May 2026): cases for the hold cover (FR-RN-086), the incentive eligibility (FR-RN-087), the TSI threshold and the undefined risk codes, the rule reference of a classification and the exception ageing, the NAL / NRL routing on the effective expiry date, the client confirmation with placement and booking by user action and the listing without automatic escalation; one screen case and one message case per screen of the FRS v2.0 screen specifications; screen paths under Client & Policy"
 distribution:
-  - {name: "Product Owner, Renewal", role: Approver, organisation: BDOI, purpose: Review and sign-off}
-  - {name: "Unit Head, Combank and Corbank", role: Approver, organisation: BDOI, purpose: Review and sign-off}
+  - {name: "Shellah Marie C. Miranda, AVP, Product Owner", role: Approver, organisation: BDOI, purpose: Review and sign-off}
+  - {name: "Mark Joseph C. Makalintal, SAVP, Unit Head - Combank and Corbank", role: Approver, organisation: BDOI, purpose: Review and sign-off}
   - {name: "Retail and Corporate Marketing (Team Leaders, AOs)", role: Business tester, organisation: BDOI, purpose: "Extraction, assignment, disposition, review, letters"}
   - {name: "Processing (Team Leaders, Processing Officers)", role: Business tester, organisation: BDOI, purpose: "Processing, insurer round-trip, RAs, acceptance"}
   - {name: Marketing Business Services and System Support (MBS), role: Business tester, organisation: BDOI, purpose: "Lists of values, templates, rules and parameters"}
@@ -47,13 +53,13 @@ distribution:
 
 ## Purpose
 
-This document summarises the test plan for BRD-6 Renewal in BIBS (BDOI Broker System, on iNXT BrokerVerse). It tells the BDOI departments what will be tested, how, with which data and by whom, and when testing is complete. The test conditions, scenarios and cases are in the Excel workbook of the same version, `BIBS_TestPlan_BRD-06_Renewal_v1.1.xlsx`, which the testers use during execution.
+This document summarises the test plan for BRD-6 Renewal in BIBS (BDOI Broker System, on iNXT BrokerVerse). It tells the BDOI departments what will be tested, how, with which data and by whom, and when testing is complete. The test conditions, scenarios and cases are in the Excel workbook of the same version, `04_BIBS_TestPlan_BRD-06_Renewal_v2.0.xlsx`, which the testers use during execution.
 
-Every case traces to a functional requirement (FR) of FRS BRD-6 v1.1 and to the BRD requirement IDs (BRRN.nnn and the persona line IDs 1.001 to 6.002) that the FR meets. The expected results quote the message texts of the FRS, and the screen paths are those of the FRS. Where a Renewal check reuses a message that the platform already shows (log-in, bulk upload, account completeness), the case quotes the text BIBS shows on that screen.
+Every case traces to a functional requirement (FR) of FRS BRD-6 v2.0 and to the BRD requirement IDs (BRRN.nnn and the persona line IDs 1.001 to 6.002) that the FR meets. The expected results quote the message texts of the FRS, and the screen paths are those of the FRS. Where a Renewal check reuses a message that the platform already shows (log-in, bulk upload, account completeness), the case quotes the text BIBS shows on that screen.
 
 ## Scope
 
-In scope are all 56 FRs of FRS BRD-6 v1.1 and every BRD ID they trace to:
+In scope are all 58 FRs of FRS BRD-6 v2.0 and every BRD ID they trace to, the BRRN.041 and BRRN.042 of the Walkthrough addendum included:
 
 - log-in, sessions, tabs, roles, data scope, profiles and the audit trail (FR-RN-001 to 004);
 - extraction at the lead days and for any range, filters, the scrollable list, export, print and initiation (FR-RN-010 to 015);
@@ -63,9 +69,9 @@ In scope are all 56 FRs of FRS BRD-6 v1.1 and every BRD ID they trace to:
 - TL review, return, post and the controlled overrides (FR-RN-050, 051);
 - dispositioned-file upload, assignment to Processing Officers, the renewal account, computations and returns (FR-RN-060 to 065);
 - the extract per insurer and the insurer responses (FR-RN-070, 071);
-- Renewal Advices, NAL, NFR, NRNS reminders, non-acceptance letters, acceptance to booking and Contact Center follow-ups (FR-RN-080 to 085);
+- Renewal Advices, NAL and NRL on the effective expiry date, NFR, NRNS reminders, non-acceptance letters, acceptance with placement and booking by user action, Contact Center follow-ups, the hold cover and the incentive eligibility (FR-RN-080 to 087);
 - the Submitted Policies hand-off (FR-RN-090);
-- Renewal Home, the status report with its 34 counters, listings with escalation and the operational reports (FR-RN-100 to 103);
+- Renewal Home, the status report with its 34 counters, listings with attention flags (no automatic escalation) and the operational reports (FR-RN-100 to 103);
 - lists of values, templates, rules and parameters (FR-RN-110 to 112).
 
 The main BRD repeats most capabilities once per persona. The FRS traces its 1,032 line IDs in ranges (for example "1.009.2.1-40"); section 7.3 shows how every range is covered. The roles-and-access sheet checks each Renewal action against the roles that may and may not perform it (FRS section 3.3).
@@ -83,9 +89,9 @@ The main BRD repeats most capabilities once per persona. The FRS traces its 1,03
 <!-- table: widths=1.2,8.6,4.2 caption="Reference documents" -->
 | Ref. | Document | Version |
 |---|---|---|
-| R1 | Functional Requirements Specification BRD-6 Renewal (`BIBS_FRS_BRD-06_Renewal_v1.1.docx`) | 1.1, 26 Sep 2026 |
+| R1 | Functional Requirements Specification BRD-6 Renewal (`02_BIBS_FRS_BRD-06_Renewal_v2.0.docx`) | 2.0, 8 Oct 2026 |
 | R2 | Renewal BRD pack: Workshop addendum, Addendum 1 and RMEL Phase 2 BRD | BRD v1.0 9-May-2025; addenda 18-Nov-2025 and 8-Apr-2026 |
-| R3 | Test plan workbook BRD-6 (`BIBS_TestPlan_BRD-06_Renewal_v1.1.xlsx`) | 1.1 |
+| R3 | Test plan workbook BRD-6 (`04_BIBS_TestPlan_BRD-06_Renewal_v2.0.xlsx`) | 2.0 |
 | R6 | BRD discrepancy and clarification register (`BIBS_Register_BRD-00_Discrepancies_and_Clarifications_v1.2.xlsx`) | 1.2 |
 
 # Test approach
@@ -133,7 +139,7 @@ The workbook has a README sheet that explains every column. The sheets are Docum
 |---|---|
 | System test | The Renewal module is deployed on SIT with its jobs (RNW_EXTRACTION, RNW_REEVALUATE, RNW_NRNS_LETTERS, RNW_EXPIRY_SWEEP); the business type RENEWAL (BT0) is available on the account; the data sets of section 4.2 are loaded; the test mailboxes of clients and insurers receive mail. |
 | Persona end-to-end | All High-priority system test cases are run; no open Critical issue; notifications and the e-mail relay work on SIT; the Submitted Policies hand-off (BRD-12) is deployed for SC-RN-10. |
-| UAT | FRS BRD-6 v1.1 is signed off or its open comments are agreed; the open questions that change expected results (RQ01, RQ08, RQ10, RQ15, RQ24) are answered or their test values agreed; the system test exit criteria are met; the UAT environment holds masked data; BDOI testers have user IDs with the roles of section 5. |
+| UAT | FRS BRD-6 v2.0 is signed off or its open comments are agreed; the open questions that change expected results (RQ01, RQ08, RQ10, RQ15, RQ24) are answered or their test values agreed; the system test exit criteria are met; the UAT environment holds masked data; BDOI testers have user IDs with the roles of section 5. |
 
 ## Exit criteria
 
@@ -274,6 +280,12 @@ FRS section 11.2 maps each of the 1,032 line IDs of the main BRD to an FR, of wh
 ## Scenarios
 
 <!-- tp:scenarios -->
+
+## Coverage by screen
+
+Every screen of the FRS v2.0 screen specifications has its screen case and the cases that start on it. A case is linked to the screen where the tester starts; the steps may go on to other screens.
+
+<!-- tp:screens -->
 
 ## Roles and access
 

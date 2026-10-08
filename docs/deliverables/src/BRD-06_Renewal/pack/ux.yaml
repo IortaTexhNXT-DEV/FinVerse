@@ -94,5 +94,40 @@ states:
 
 # Points for the UX Design team to confirm with BDOI.
 confirm:
-  clarifications: []
-  findings: []
+  clarifications: [CLR-RN-17, CLR-RN-18, CLR-RN-19, CLR-RN-20, CLR-RN-21, CLR-RN-22, CLR-RN-23, CLR-RN-24, CLR-RN-25, CLR-RN-26]
+  findings:
+    - screens: [SCR-RN-02, SCR-RN-06, SCR-RN-08, SCR-RN-10, SCR-RN-13, SCR-RN-15]
+      observation: >-
+        The renewal lists hold many facts per row: related values share a column, one under the other (Risk /
+        Insurance Company, Unit / Officer, Status / Classification, Gross Premium / Outstanding), so that every column
+        is in view at 1440 pixels. The users who may not see amounts (Contact Center, LAMD) have no amount column.
+      proposal: Confirm the stacked columns, or choose the columns to keep in view and move the others to the record.
+    - screens: [SCR-RN-03]
+      observation: >-
+        The record page shows a step bar of 14 stages; the detours (Transfer Pending, the New Business path, Letter
+        Pending) show apart from the main stages, and the labels of long stages wrap on two or three lines.
+      proposal: Confirm the step bar, or shorten the stage labels shown on it.
+    - screens: [SCR-RN-03, SCR-RN-04]
+      observation: >-
+        The record has nine tabs (Details, Checks, Account History, Computations, Insurer, Letters, Documents, Remarks
+        & Follow-ups, History) that wrap on two lines at 1440 pixels.
+      proposal: Group the tabs (for example Insurer and Letters under Insurer & Letters), or confirm the two lines.
+    - screens: [SCR-RN-11]
+      observation: >-
+        The insurer batch shows the 28 columns of the insurer extract in a table that scrolls sideways (CLR-RN-25).
+      proposal: Confirm the sideways scroll, or name the columns to keep on screen.
+    - screens: [SCR-RN-17, SCR-RN-19]
+      observation: >-
+        The new non-renewable risk code and the package map take the risk code, the line of business and the legacy
+        package as typed codes (CLR-RN-21).
+      proposal: Offer the risk codes, lines and packages as drop-downs by name.
+    - screens: [SCR-RN-01]
+      observation: >-
+        The Marketing and Processing users land on the New Business dashboard, the Contact Center and LAMD users on My
+        Approvals; Renewal Home is one click away (CLR-RN-26).
+      proposal: Land each Renewal persona on Renewal Home.
+    - screens: [SCR-RN-14, SCR-RN-13]
+      observation: >-
+        A letter just sent shows Queued until the e-mail relay confirms it; the Letters tab then shows Sent with the
+        time.
+      proposal: Confirm the Queued status, or show Sending with the time of the request.

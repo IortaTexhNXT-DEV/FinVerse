@@ -53,7 +53,7 @@ public class MasterRecordApprovals {
 
   /**
    * Pending records of one entity type as inbox items, for records that a business module
-   * authorizes under its own permission (e.g. products under {@code POLICY_AUTHORIZE}).
+   * authorizes under its own permission (e.g. catalogue records under their own permission).
    *
    * @param viewer viewer
    * @param scope module code shown in the inbox and permission needed to authorize the records
@@ -113,7 +113,7 @@ public class MasterRecordApprovals {
   /**
    * Who authorizes a kind of master record.
    *
-   * @param module module code shown in the inbox, e.g. "UNDERWRITING"
+   * @param module module code shown in the inbox, e.g. "TAX"
    * @param permission permission the controller requires to authorize the record
    */
   public record Scope(String module, String permission) {}

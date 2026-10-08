@@ -327,15 +327,8 @@ brokerverse:
     # Spring cron (sec min hour day month weekday), UTC; "-" disables the schedule.
     recurring-journals-cron: ${BROKERVERSE_JOB_RECURRING_CRON:0 0 1 * * *}
     alert-checks-cron: ${BROKERVERSE_JOB_ALERTS_CRON:0 30 1 * * *}
-    # Monthly reserve valuation (previous month); disabled by default.
-    reserve-valuation-cron: ${BROKERVERSE_JOB_RESERVE_VALUATION_CRON:-}
-    # Batch RI allocation run (cedes approved transactions of the year to date not yet ceded); off by default.
-    ri-allocation-cron: ${BROKERVERSE_JOB_RI_ALLOCATION_CRON:-}
     # Post-dated cheques issued whose cheque date is reached become DUE (status only).
     pdc-issued-due-cron: ${BROKERVERSE_JOB_PDC_ISSUED_DUE_CRON:0 15 0 * * *}
-    # Insurer underwriting quotations (draft, pending, approved) past their validity become EXPIRED;
-    # insurer suite, not used by BIBS: disabled by default (V1064, CODEBASE_RELEVANCE_AUDIT.md A1).
-    quotation-expiry-cron: ${BROKERVERSE_JOB_QUOTATION_EXPIRY_CRON:-}
     # Outbox relay: delivers queued e-mails and retries failed attempts.
     mail-dispatch-cron: ${BROKERVERSE_JOB_MAIL_DISPATCH_CRON:0 */2 * * * *}
     # ---- Platform: job lock, integration events, shared state (PLATFORM_CACHE_AND_EVENTS.md) ----

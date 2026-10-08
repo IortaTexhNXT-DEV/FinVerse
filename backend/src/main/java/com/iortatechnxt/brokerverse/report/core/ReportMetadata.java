@@ -15,7 +15,7 @@ import java.util.List;
  * Runs and exports of an {@link #archived} report are kept in the report archive ({@code
  * report_run}), exports with their file.
  *
- * @param code report code (e.g. "GL-TB", "PGIBR015")
+ * @param code report code (e.g. "GL-TB", "TAX-SLS")
  * @param title title
  * @param category menu group
  * @param description one line purpose

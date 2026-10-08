@@ -8,12 +8,6 @@ import com.iortatechnxt.brokerverse.payables.service.SupplierInvoiceService;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.TestData;
 import com.iortatechnxt.brokerverse.tax.seed.TaxSeedMasters;
-import com.iortatechnxt.brokerverse.underwriting.UwFixtures;
-import com.iortatechnxt.brokerverse.underwriting.api.dto.PolicyRequest;
-import com.iortatechnxt.brokerverse.underwriting.domain.BusinessType;
-import com.iortatechnxt.brokerverse.underwriting.domain.Policy;
-import com.iortatechnxt.brokerverse.underwriting.domain.Product;
-import com.iortatechnxt.brokerverse.underwriting.domain.SourceType;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -22,15 +16,13 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 /**
- * Builds tax scenarios in the seed company FVI through the owning modules' services: a fire policy
- * through a broker (VAT, DST, LGT, FST and commission withholding) and a VAT-registered supplier
- * invoice with 2 % EWT.
+ * Builds tax scenarios in the seed company FVI through the owning modules' services: a
+ * VAT-registered supplier invoice with 2 % EWT.
  */
 @Component
 public class TaxFixtures {
 
   private final TaxSeedMasters masters;
-  private final UwFixtures uw;
   private final SupplierInvoiceService invoices;
   private final AsUser as;
   private final TestData data;
@@ -38,13 +30,11 @@ public class TaxFixtures {
 
   TaxFixtures(
       TaxSeedMasters masters,
-      UwFixtures uw,
       SupplierInvoiceService invoices,
       AsUser as,
       TestData data,
       JdbcTemplate jdbc) {
     this.masters = masters;
-    this.uw = uw;
     this.invoices = invoices;
     this.as = as;
     this.data = data;
@@ -58,33 +48,6 @@ public class TaxFixtures {
   /** Ensures the tax masters of FVI (idempotent). */
   public void masters() {
     masters.ensure(companyId());
-  }
-
-  /** Fire policy through broker B-0001, issued and approved on a date. */
-  public Policy firePolicy(LocalDate date, String premium) {
-    Product fire = uw.product("FIRE", false);
-    PolicyRequest request =
-        new PolicyRequest(
-            companyId(),
-            uw.branchId(),
-            fire.getId(),
-            "C-000201",
-            "Luzon Steel Manufacturing Corp.",
-            SourceType.BROKER,
-            "B-0001",
-            date,
-            date,
-            date.plusYears(1).minusDays(1),
-            "PHP",
-            BusinessType.DIRECT,
-            new BigDecimal("100"),
-            null,
-            false,
-            BigDecimal.ZERO,
-            BigDecimal.ZERO,
-            null,
-            List.of(uw.risk("20000000", premium, "NCR-TAX")));
-    return uw.issue(request, date);
   }
 
   /** Approved VAT-registered invoice of S-0002 (2 % EWT) booked to IT expenses. */

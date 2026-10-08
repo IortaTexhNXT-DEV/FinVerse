@@ -149,7 +149,6 @@ final class PermissionConsistencyTest {
     Set<String> granted = grantedByMigrations();
     Set<String> ungranted = new TreeSet<>(checked);
     ungranted.removeAll(granted);
-    ungranted.removeIf(p -> Permission.valueOf(p).isInsurerOnly());
     ungranted.removeAll(UNASSIGNED_BY_DESIGN.keySet());
     assertThat(ungranted).as("permissions checked on the server but granted to no role").isEmpty();
   }

@@ -1,18 +1,9 @@
 package com.iortatechnxt.brokerverse.security.domain;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-
 /**
  * Fine grained permissions checked with {@code @PreAuthorize("hasAuthority('...')")}.
  *
  * <p>Roles are bundles of permissions maintained in the database (see {@link Role}).
- *
- * <p>The permissions of the insurer suite ({@link #isInsurerOnly()}: underwriting, insurer claims,
- * reinsurance, actuarial reserves, consolidation and the insurer tax schedules) are not part of
- * BIBS: V1064 withdraws them from every role, and the User Access screens neither list nor accept
- * them ({@link #offered()}). See docs/development/CODEBASE_RELEVANCE_AUDIT.md (R1).
  */
 public enum Permission {
   // Administration
@@ -40,16 +31,7 @@ public enum Permission {
   YEAR_END_CLOSE,
   PERIOD_END_RUN,
 
-  // Insurance operations (sub-ledgers). POLICY_*, CLAIM_* and REINSURANCE_* belong to the insurer
-  // suite (insurer only, V1064).
-  POLICY_VIEW,
-  POLICY_MAINTAIN,
-  POLICY_AUTHORIZE,
-  CLAIM_VIEW,
-  CLAIM_MAINTAIN,
-  CLAIM_AUTHORIZE,
-  REINSURANCE_VIEW,
-  REINSURANCE_MAINTAIN,
+  // Receipts and payments (sub-ledgers)
   RECEIPT_PAYMENT_MAINTAIN,
   RECEIPT_PAYMENT_AUTHORIZE,
 
@@ -59,7 +41,6 @@ public enum Permission {
   // Finance functions
   RECONCILIATION_MANAGE,
   BUDGET_MANAGE,
-  CONSOLIDATION_RUN,
 
   // Reporting
   REPORT_VIEW,
@@ -82,24 +63,10 @@ public enum Permission {
   ASSET_MANAGE,
   INVESTMENT_MANAGE,
 
-  // Actuarial reserves (insurer only, V1064): prepare and submit valuation runs and maintain the
-  // reserve parameters (V421); view the reserve screens and reports; approve, post and cancel
-  // valuation runs and authorize the reserve parameters.
-  RESERVE_PREPARE,
-  RESERVE_VIEW,
-  RESERVE_APPROVE,
-
-  // Reinsurance checker: treaties, facultative placements and statements of account. See V300.
-  REINSURANCE_AUTHORIZE,
-
-  // Tax & statutory reporting: view worksheets, returns, certificates and IC schedules; maintain
-  // tax masters and prepare, file and pay returns (masters are authorized with MASTER_AUTHORIZE).
-  // See V701.
+  // Tax & statutory reporting: view worksheets, returns and certificates; maintain tax masters and
+  // prepare, file and pay returns (masters are authorized with MASTER_AUTHORIZE). See V701.
   TAX_VIEW,
   TAX_MANAGE,
-  // Insurer tax schedules (insurer only, V1064): premium tax / LGT / FST and documentary stamp tax
-  // on policies, and the Insurance Commission schedules of an insurer. Needed with TAX_VIEW.
-  INSURER_TAX_VIEW,
 
   // Broking (BDOI New Business). See docs/architecture/BROKING_ARCHITECTURE.md section 3.7 and
   // V750.
@@ -336,7 +303,7 @@ public enum Permission {
   METRICS_VIEW,
 
   // Claims Handling (BDOI BRD-7, broking claims). See docs/architecture/CLAIMS_BROKING_DESIGN.md
-  // section 7.1 and V1020. The insurer-side CLAIM_* permissions above stay hidden from BDOI roles.
+  // section 7.1 and V1020.
   // Claims home, worklist and claim record (read); Cover Lookup (BRCLM.002/003)
   BCL_VIEW,
   BCL_COVER_VIEW,
@@ -530,51 +497,4 @@ public enum Permission {
   // adding
   // PORTAL_USER_APPROVE switches the approver of EXTERNAL access requests (AccessApprovers), so it
   // comes with the portal wave.
-
-  private static final Set<Permission> INSURER_ONLY =
-      Set.of(
-          POLICY_VIEW,
-          POLICY_MAINTAIN,
-          POLICY_AUTHORIZE,
-          CLAIM_VIEW,
-          CLAIM_MAINTAIN,
-          CLAIM_AUTHORIZE,
-          REINSURANCE_VIEW,
-          REINSURANCE_MAINTAIN,
-          REINSURANCE_AUTHORIZE,
-          RESERVE_PREPARE,
-          RESERVE_VIEW,
-          RESERVE_APPROVE,
-          CONSOLIDATION_RUN,
-          INSURER_TAX_VIEW);
-
-  /**
-   * Whether the permission belongs to the insurer suite, which BIBS does not use. No BDOI role
-   * holds it (V1064) and the User Access screens do not offer it.
-   *
-   * @return true for an insurer-only permission
-   */
-  public boolean isInsurerOnly() {
-    return INSURER_ONLY.contains(this);
-  }
-
-  /**
-   * The permission catalogue of the User Access screens: every permission except the insurer-only
-   * ones, in declaration order.
-   *
-   * @return offered permissions
-   */
-  public static List<Permission> offered() {
-    return Arrays.stream(values()).filter(p -> !p.isInsurerOnly()).toList();
-  }
-
-  /**
-   * Whether a permission code may be listed or requested on the User Access screens.
-   *
-   * @param code permission code
-   * @return false for the code of an insurer-only permission
-   */
-  public static boolean isOffered(String code) {
-    return INSURER_ONLY.stream().noneMatch(p -> p.name().equals(code));
-  }
 }

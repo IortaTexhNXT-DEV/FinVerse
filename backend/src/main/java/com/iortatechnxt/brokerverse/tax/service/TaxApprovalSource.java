@@ -5,7 +5,6 @@ import com.iortatechnxt.brokerverse.approval.service.MasterRecordApprovals;
 import com.iortatechnxt.brokerverse.approval.service.MasterRecordApprovals.RecordFacts;
 import com.iortatechnxt.brokerverse.approval.service.PendingApproval;
 import com.iortatechnxt.brokerverse.approval.service.PendingApprovalSource;
-import com.iortatechnxt.brokerverse.tax.domain.IcLineItem;
 import com.iortatechnxt.brokerverse.tax.domain.PartyTaxProfile;
 import com.iortatechnxt.brokerverse.tax.domain.TaxCode;
 import com.iortatechnxt.brokerverse.tax.domain.TaxForm;
@@ -14,8 +13,8 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 /**
- * Approval inbox source: tax codes, tax forms, party tax profiles and IC schedule mappings pending
- * authorization (checker permission MASTER_AUTHORIZE; makers never see their own changes).
+ * Approval inbox source: tax codes, tax forms and party tax profiles pending authorization (checker
+ * permission MASTER_AUTHORIZE; makers never see their own changes).
  */
 @Component
 public class TaxApprovalSource implements PendingApprovalSource {
@@ -61,17 +60,6 @@ public class TaxApprovalSource implements PendingApprovalSource {
                     p.getRegisteredName(),
                     p.getCompanyId(),
                     "/tax/profiles")));
-    out.addAll(
-        records.pending(
-            viewer,
-            IcLineItem.class,
-            i ->
-                new RecordFacts(
-                    "IC schedule line",
-                    i.getSchedule() + "/" + i.getLineCode(),
-                    i.getDescription(),
-                    i.getCompanyId(),
-                    "/tax/ic-mapping")));
     return out;
   }
 }

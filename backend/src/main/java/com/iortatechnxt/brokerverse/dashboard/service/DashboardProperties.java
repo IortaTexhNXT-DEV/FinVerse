@@ -11,27 +11,16 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @param cashGroups statement lines counted as cash position
  * @param receivableGroups statement lines counted as insurance receivables
  * @param reserveGroups statement lines counted as technical reserves
- * @param premiumGroups statement lines of gross written premium (income, credit natural)
- * @param claimsPaidAccounts account prefixes of gross claims paid (expense, debit natural)
- * @param outstandingClaimsAccounts account prefixes of the outstanding claims reserve (liability)
  */
 @ConfigurationProperties(prefix = "brokerverse.dashboard")
 public record DashboardProperties(
-    List<String> cashGroups,
-    List<String> receivableGroups,
-    List<String> reserveGroups,
-    List<String> premiumGroups,
-    List<String> claimsPaidAccounts,
-    List<String> outstandingClaimsAccounts) {
+    List<String> cashGroups, List<String> receivableGroups, List<String> reserveGroups) {
 
   /** Canonical constructor applying defaults matching the standard insurance COA. */
   public DashboardProperties {
     cashGroups = orDefault(cashGroups, "Cash and Cash Equivalents");
     receivableGroups = orDefault(receivableGroups, "Insurance Receivables");
     reserveGroups = orDefault(reserveGroups, "Insurance Contract Liabilities");
-    premiumGroups = orDefault(premiumGroups, "Gross Premiums Written");
-    claimsPaidAccounts = orDefault(claimsPaidAccounts, "5100");
-    outstandingClaimsAccounts = orDefault(outstandingClaimsAccounts, "2102");
   }
 
   private static List<String> orDefault(List<String> configured, String fallback) {

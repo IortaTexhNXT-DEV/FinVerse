@@ -105,11 +105,11 @@ class TaxApiIT {
             api.doPost(
                     "accountant",
                     RETURNS,
-                    Json.of("companyId", c, "formCode", "2551Q", "periodStart", "2026-10-01"))
+                    Json.of("companyId", c, "formCode", "1601-EQ", "periodStart", "2026-10-01"))
                 .andExpect(status().isCreated()));
     long id = draft.get("id").asLong();
     assertThat(draft.get("status").asText()).isEqualTo("DRAFT");
-    assertThat(draft.get("dueDate").asText()).isEqualTo("2027-01-25");
+    assertThat(draft.get("dueDate").asText()).isEqualTo("2027-01-31");
     api.doPost("accountant", RETURNS + "/" + id + "/refresh", null).andExpect(status().isOk());
     api.doPost(
             "checker",
@@ -128,15 +128,15 @@ class TaxApiIT {
     api.doGet("auditor", RETURNS + "?companyId=" + c + "&year=2026&status=PAID")
         .andExpect(status().isOk());
 
-    JsonNode lbt =
+    JsonNode vat =
         api.read(
             api.doPost(
                 "accountant",
                 RETURNS,
-                Json.of("companyId", c, "formCode", "LBT", "periodStart", "2026-10-01")));
+                Json.of("companyId", c, "formCode", "2550Q", "periodStart", "2026-10-01")));
     api.doPost(
             "accountant",
-            RETURNS + "/" + lbt.get("id").asLong() + "/cancel",
+            RETURNS + "/" + vat.get("id").asLong() + "/cancel",
             Json.of("reason", "Prepared by mistake"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.status").value("CANCELLED"));
@@ -152,9 +152,8 @@ class TaxApiIT {
     api.doGet("accountant", "/api/v1/tax/exports/QAP?" + c + "&year=2026&quarter=3")
         .andExpect(status().isOk())
         .andExpect(content().contentType("text/csv"));
-    api.doGet("accountant", "/api/v1/tax/ic/schedules/RBC?" + c + "&from=2026-01-01&to=2026-09-30")
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.rbc.hurdle").value(100));
+    api.doGet("accountant", "/api/v1/tax/worksheets/DST?" + c + "&from=2026-09-01&to=2026-09-30")
+        .andExpect(status().isBadRequest());
 
     fixtures.supplierInvoice(LocalDate.of(2026, 7, 7), "3000");
     JsonNode batch =
@@ -180,12 +179,12 @@ class TaxApiIT {
   @Test
   void usersWithoutTaxPermissionsAreRefused() throws Exception {
     String c = "companyId=" + fixtures.companyId();
-    api.doGet("uw", "/api/v1/tax/codes?" + c).andExpect(status().isForbidden());
+    api.doGet("norole", "/api/v1/tax/codes?" + c).andExpect(status().isForbidden());
     api.doPost(
             "auditor",
             RETURNS,
             Json.of(
-                "companyId", fixtures.companyId(), "formCode", "LBT", "periodStart", "2026-07-01"))
+                "companyId", fixtures.companyId(), "formCode", "2550Q", "periodStart", "2026-07-01"))
         .andExpect(status().isForbidden());
   }
 }

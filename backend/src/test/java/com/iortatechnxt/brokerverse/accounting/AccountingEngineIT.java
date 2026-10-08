@@ -35,74 +35,74 @@ class AccountingEngineIT {
   @Autowired private AsUser as;
   @Autowired private TestData data;
 
-  private BusinessEvent policyIssue(String key) {
+  private BusinessEvent supplierInvoice(String key) {
     return new BusinessEvent(
-        "POLICY_ISSUE",
+        "SUPPLIER_INVOICE",
         data.company().getId(),
         data.branch("HO").getId(),
         BusinessClock.today(Clock.systemUTC()),
         "PHP",
-        "UNDERWRITING",
+        "PAYABLES",
         key,
-        "POL-" + key,
-        "C-000201",
-        "FIRE",
+        "INV-" + key,
+        "S-0002",
         null,
-        "Fire policy issued",
+        "IT",
+        "Cloud services invoice",
         Map.of(
-            "GROSS_PREMIUM", new BigDecimal("100000.00"),
-            "DST", new BigDecimal("12500.00"),
-            "VAT", new BigDecimal("12000.00"),
-            "LGT", new BigDecimal("500.00"),
-            "FST", new BigDecimal("2000.00"),
-            "TOTAL_DUE", new BigDecimal("127000.00")),
-        Map.of());
+            "NET_AMOUNT", new BigDecimal("10000.00"),
+            "INPUT_VAT", new BigDecimal("1200.00"),
+            "WITHHOLDING_TAX", new BigDecimal("200.00"),
+            "PAYABLE", new BigDecimal("11000.00")),
+        Map.of("EXPENSE", "5610"));
   }
 
   @Test
-  void policyIssuePostsBalancedPremiumJournalAndIsIdempotent() {
+  void supplierInvoicePostsBalancedJournalAndIsIdempotent() {
     Long company = data.company().getId();
-    Long receivable = accounts.getByCode(company, "1201").getId();
+    Long payable = accounts.getByCode(company, "2501").getId();
     BigDecimal before =
-        ledger.netBalance(company, receivable, null, BusinessClock.today(Clock.systemUTC()));
+        ledger.netBalance(company, payable, null, BusinessClock.today(Clock.systemUTC()));
     String key = UUID.randomUUID().toString();
 
-    JournalBatch batch = as.run("uw", () -> publisher.publish(policyIssue(key)));
+    JournalBatch batch = as.run("accountant", () -> publisher.publish(supplierInvoice(key)));
 
     assertThat(batch.getStatus()).isEqualTo(JournalStatus.POSTED);
-    assertThat(batch.getJournalType()).isEqualTo(JournalType.PREMIUM);
-    assertThat(batch.getTotalDebit()).isEqualByComparingTo("127000.00");
-    assertThat(batch.getLines()).anyMatch(l -> "C-000201".equals(l.getPartyCode()));
-    assertThat(ledger.netBalance(company, receivable, null, BusinessClock.today(Clock.systemUTC())))
-        .isEqualByComparingTo(before.add(new BigDecimal("127000.00")));
+    assertThat(batch.getJournalType()).isEqualTo(JournalType.PAYMENT);
+    assertThat(batch.getTotalDebit()).isEqualByComparingTo("11200.00");
+    assertThat(batch.getLines()).anyMatch(l -> "S-0002".equals(l.getPartyCode()));
+    assertThat(ledger.netBalance(company, payable, null, BusinessClock.today(Clock.systemUTC())))
+        .isEqualByComparingTo(before.subtract(new BigDecimal("11000.00")));
 
-    JournalBatch again = as.run("uw", () -> publisher.publish(policyIssue(key)));
+    JournalBatch again = as.run("accountant", () -> publisher.publish(supplierInvoice(key)));
     assertThat(again.getId()).isEqualTo(batch.getId());
   }
 
   @Test
   void negativeAmountsReverseSides() {
     String key = UUID.randomUUID().toString();
-    BusinessEvent release =
+    BusinessEvent refund =
         new BusinessEvent(
-            "CLAIM_RESERVE",
+            "MISC_PAYMENT",
             data.company().getId(),
             data.branch("HO").getId(),
             BusinessClock.today(Clock.systemUTC()),
             "PHP",
-            "CLAIMS",
+            "PAYABLES",
             key,
-            "CLM-" + key,
+            "PV-" + key,
             null,
-            "MOTOR",
             null,
-            "Reserve reduced",
-            Map.of("RESERVE_CHANGE", new BigDecimal("-5000.00")),
-            Map.of());
-    JournalBatch batch = as.run("claims", () -> publisher.publish(release));
+            "IT",
+            "Payment reversed",
+            Map.of("AMOUNT", new BigDecimal("-5000.00")),
+            Map.of("EXPENSE", "5610", "BANK", "1111"));
+    JournalBatch batch = as.run("accountant", () -> publisher.publish(refund));
     assertThat(batch.getLines())
         .anyMatch(
-            l -> "2102".equals(l.getAccount().getCode()) && l.getSide().name().equals("DEBIT"));
+            l -> "5610".equals(l.getAccount().getCode()) && l.getSide().name().equals("CREDIT"))
+        .anyMatch(
+            l -> "1111".equals(l.getAccount().getCode()) && l.getSide().name().equals("DEBIT"));
   }
 
   @Test

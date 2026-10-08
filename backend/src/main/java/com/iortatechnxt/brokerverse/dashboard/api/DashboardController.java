@@ -2,14 +2,12 @@ package com.iortatechnxt.brokerverse.dashboard.api;
 
 import com.iortatechnxt.brokerverse.dashboard.service.BudgetWidget;
 import com.iortatechnxt.brokerverse.dashboard.service.CashWidget;
-import com.iortatechnxt.brokerverse.dashboard.service.ClaimsWidget;
 import com.iortatechnxt.brokerverse.dashboard.service.CollectionsWidget;
 import com.iortatechnxt.brokerverse.dashboard.service.DashboardService;
 import com.iortatechnxt.brokerverse.dashboard.service.DashboardSummary;
 import com.iortatechnxt.brokerverse.dashboard.service.LedgerDashboardService;
 import com.iortatechnxt.brokerverse.dashboard.service.OperationsDashboardService;
 import com.iortatechnxt.brokerverse.dashboard.service.PayablesWidget;
-import com.iortatechnxt.brokerverse.dashboard.service.PremiumWidget;
 import com.iortatechnxt.brokerverse.dashboard.service.WorkloadWidget;
 import java.time.LocalDate;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -62,42 +60,6 @@ public class DashboardController {
   public DashboardSummary summary(
       @RequestParam Long companyId, @RequestParam(required = false) Long branchId) {
     return service.summary(companyId, branchId);
-  }
-
-  /**
-   * Gross written premium month and year to date against the prior year.
-   *
-   * @param companyId company
-   * @param branchId optional branch
-   * @param asOf optional reference date
-   * @return premium widget
-   */
-  @GetMapping("/premium")
-  @PreAuthorize(VIEW)
-  public PremiumWidget premium(
-      @RequestParam Long companyId,
-      @RequestParam(required = false) Long branchId,
-      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-          LocalDate asOf) {
-    return ledger.premium(companyId, branchId, asOf);
-  }
-
-  /**
-   * Claims paid and outstanding.
-   *
-   * @param companyId company
-   * @param branchId optional branch
-   * @param asOf optional reference date
-   * @return claims widget
-   */
-  @GetMapping("/claims")
-  @PreAuthorize(VIEW)
-  public ClaimsWidget claims(
-      @RequestParam Long companyId,
-      @RequestParam(required = false) Long branchId,
-      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-          LocalDate asOf) {
-    return ledger.claims(companyId, branchId, asOf);
   }
 
   /**

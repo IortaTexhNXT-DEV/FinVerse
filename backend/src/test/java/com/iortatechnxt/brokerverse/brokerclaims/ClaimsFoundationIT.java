@@ -95,7 +95,7 @@ class ClaimsFoundationIT {
     assertThat(authorities("ao")).contains("BCL_REPORT_VIEW").doesNotContain("BCL_VIEW");
     assertThat(authorities("mkttl")).contains("BCL_REPORT_EXPORT").doesNotContain("BCL_VIEW");
     assertThat(authorities("auditor")).contains("BCL_VIEW").doesNotContain("BCL_RECORD");
-    assertThat(authorities("claims")).doesNotContain("BCL_VIEW");
+    assertThat(authorities("norole")).doesNotContain("BCL_VIEW");
     assertThat(query("select username from bcl_handler where unit_code = 'MOTOR_HO'"))
         .contains("clmofficer", "clmtl");
   }

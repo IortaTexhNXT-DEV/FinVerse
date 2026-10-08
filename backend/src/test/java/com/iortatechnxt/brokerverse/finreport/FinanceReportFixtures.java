@@ -117,8 +117,22 @@ class FinanceReportFixtures {
                         line("5605", BalanceSide.DEBIT, "2500.00", "FIN"),
                         line("2502", BalanceSide.CREDIT, "2500.00", null))));
     as.run("accountant", () -> journals.submit(pending.getId()));
-    policy("C-000201", "127000.00");
-    policy("C-000203", "56000.00");
+    posted(
+        JournalType.MANUAL,
+        "Fire commission income",
+        line("1111", BalanceSide.DEBIT, "127000.00", null),
+        new JournalLineRequest(
+            "4700",
+            BalanceSide.CREDIT,
+            new BigDecimal("127000.00"),
+            null,
+            null,
+            null,
+            null,
+            "FIRE",
+            null,
+            null,
+            null));
     as.run(
         "accountant",
         () ->
@@ -139,30 +153,6 @@ class FinanceReportFixtures {
                     Map.of("AMOUNT", new BigDecimal("27000.00")),
                     Map.of("BANK", "1111"))));
     gapSeries(draft);
-  }
-
-  private void policy(String party, String total) {
-    BigDecimal due = new BigDecimal(total);
-    BigDecimal gross = due.multiply(new BigDecimal("0.8"));
-    as.run(
-        "uw",
-        () ->
-            publisher.publish(
-                new BusinessEvent(
-                    "POLICY_ISSUE",
-                    data.company().getId(),
-                    data.branch("HO").getId(),
-                    BusinessClock.today(Clock.systemUTC()),
-                    "PHP",
-                    "UNDERWRITING",
-                    "FINREP-POL-" + party,
-                    "POL-" + party,
-                    party,
-                    "FIRE",
-                    null,
-                    "Fire policy issued",
-                    Map.of("GROSS_PREMIUM", gross, "DST", due.subtract(gross), "TOTAL_DUE", due),
-                    Map.of())));
   }
 
   private void gapSeries(JournalBatch template) {

@@ -79,8 +79,8 @@ class ApprovalInboxIT {
 
     assertThat(references(as.run("accountant", () -> inbox.inbox(null))))
         .doesNotContain(batch.getBatchNo());
-    // The underwriter authorizes underwriting documents only: no journals.
-    assertThat(as.run("uw", () -> inbox.inbox(null))).noneMatch(i -> "GL".equals(i.module()));
+    // A user without a checker role sees no journals.
+    assertThat(as.run("norole", () -> inbox.inbox(null))).noneMatch(i -> "GL".equals(i.module()));
     assertThat(references(inbox.pendingAll())).contains(batch.getBatchNo());
     Long otherCompany = data.company().getId() + 1000;
     assertThat(references(as.run("checker", () -> inbox.inbox(otherCompany))))

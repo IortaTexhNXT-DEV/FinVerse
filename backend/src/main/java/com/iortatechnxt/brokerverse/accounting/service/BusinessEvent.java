@@ -12,19 +12,19 @@ import java.util.stream.Collectors;
  * <p>The engine turns it into a balanced journal using the configured accounting rule. The module
  * never chooses GL accounts itself; it only states what happened and the amounts involved.
  *
- * @param eventType event type code, e.g. POLICY_ISSUE (see acc_event_type)
+ * @param eventType event type code, e.g. SUPPLIER_INVOICE (see acc_event_type)
  * @param companyId company
  * @param branchId branch that owns the transaction
  * @param valueDate accounting date
  * @param currency transaction currency
- * @param sourceModule publishing module, e.g. UNDERWRITING
+ * @param sourceModule publishing module, e.g. PAYABLES
  * @param sourceReference unique key of the business transaction (idempotency)
  * @param reference business reference shown on the ledger (policy, claim, receipt no.)
  * @param partyCode sub-ledger party (client, intermediary, reinsurer, supplier)
  * @param businessLine line of business dimension
  * @param costCenter cost centre dimension
  * @param narration narration
- * @param amounts amount components by name (e.g. GROSS_PREMIUM, DST, TOTAL_DUE)
+ * @param amounts amount components by name (e.g. NET_AMOUNT, INPUT_VAT, PAYABLE)
  * @param accounts account role overrides for {@code @ROLE} rule lines (e.g. BANK -> 1111)
  * @param componentParties sub-ledger party per amount component, for events whose party lines
  *     concern more than one party (e.g. a broker booking: premium receivable from the client and

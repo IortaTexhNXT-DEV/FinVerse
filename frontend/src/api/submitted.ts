@@ -4,6 +4,7 @@ import type {
   ExtractionView,
   HistoryRow,
   LimitCheckView,
+  LoanMatchView,
   MasterlistFilters,
   MasterlistTab,
   PolicyData,
@@ -102,6 +103,10 @@ export const submittedApi = {
   results: (runId: number, outcome?: string) =>
     api.get<PageResponse<ResultView>>(
       `${B}/runs/${String(runId)}/results${toQuery({ outcome, size: 200 })}`,
+    ),
+  loanMatches: (runId: number, outcome?: 'MATCHED' | 'UNMATCHED') =>
+    api.get<PageResponse<LoanMatchView>>(
+      `${B}/runs/${String(runId)}/loan-matches${toQuery({ outcome, size: 200 })}`,
     ),
   resultsOf: (policyId: number) =>
     api.get<{ results: ResultView[]; limitChecks: LimitCheckView[] }>(

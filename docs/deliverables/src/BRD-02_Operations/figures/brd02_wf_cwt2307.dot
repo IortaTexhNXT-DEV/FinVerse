@@ -1,25 +1,25 @@
-// BRD-2: workflow OPS_CWT_2307 (V764; CSHID.026/027, MKTID.010/013, DBMID.001). FRS section 5. Stage owner in the second line.
-// Solid = main path, dashed = return or optional path, dotted = closes the case.
+// BRD-2: workflow OPS_CWT_2307 as proposed for FRS v2.1 (MKTID.010/013, DBMID.001 of BRD v1.01; CSHID.026/027 deleted).
+// FRS section 5. Stage owner in the second line. Solid = main path, dashed = return or optional path, dotted = closes the case.
 digraph wf_cwt2307 {
   graph [rankdir=TB, fontname="Arial", nodesep=0.35, ranksep=0.3, bgcolor="white", pad=0.1];
   node  [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@HEADER_BLUE", penwidth=1.1,
          fontname="Arial", fontsize=12, fontcolor="@NEAR_BLACK", width=2.4, height=0.45, margin="0.08,0.02"];
   edge  [color="@MUTED", arrowsize=0.6, fontname="Arial", fontsize=10.5, fontcolor="@TEXT"];
 
-  TAGGED [label="TAGGED\nMarketing Collection (CWT_TAG)"];
-  VALIDATING [label="VALIDATING\nCashier (CWT_PROCESS)"];
-  REPORT_POSTED [label="REPORT_POSTED\nCashier (CWT_PROCESS)"];
-  WITH_DISBURSEMENT [label="WITH_DISBURSEMENT\nDisbursement (DISB_PROCESS)"];
-  RELEASED [label="RELEASED", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
-  SETTLED_CASH [label="SETTLED_CASH", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  TAGGED [label="TAGGED\nMarketing Collection\n(PR 2307, PR balance and CRU checked)"];
+  VALIDATING [label="VALIDATING\nMarketing Collection\n(batch against the certificates)"];
+  REPORT_POSTED [label="REPORT_POSTED\nMarketing Collection\n(report posted, PR zeroed)"];
+  WITH_DISBURSEMENT [label="WITH_DISBURSEMENT\nDisbursement"];
+  RELEASED [label="RELEASED\n(certificates with the insurer)", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  CRU [label="For Commission Receivable\n(flag, CRU outstanding)", fillcolor="@DIRTY_WHITE", color="@MUTED"];
   CANCELLED [label="CANCELLED", fillcolor="@DIRTY_WHITE", color="@MUTED"];
 
-  TAGGED -> VALIDATING [label=" Receive for Validation"];
+  TAGGED -> VALIDATING [label=" Validate"];
   VALIDATING -> REPORT_POSTED [label=" Validate and Post"];
   REPORT_POSTED -> WITH_DISBURSEMENT [label=" Route to Disbursement"];
   WITH_DISBURSEMENT -> RELEASED [label=" Release to Insurer"];
-  VALIDATING -> SETTLED_CASH [label=" Settle in Cash", style=dashed];
-  VALIDATING -> TAGGED [label=" Return to Marketing", style=dashed, constraint=false];
+  WITH_DISBURSEMENT -> VALIDATING [label=" Return to Marketing", style=dashed, constraint=false];
+  REPORT_POSTED -> CRU [label=" CRU outstanding", style=dashed];
   TAGGED -> CANCELLED [label=" Cancel Tag", style=dotted];
   { rank=same; VALIDATING; CANCELLED; }
 }

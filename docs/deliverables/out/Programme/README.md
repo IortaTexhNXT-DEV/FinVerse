@@ -18,6 +18,7 @@ sign-off per BRD"). Each document is kept once, in its latest version.
 
 | Document | BRD | Kind | Version | File |
 |---|---|---|---|---|
+| BIBS BDOI FeatureList vs OOTB and Best Practice v1.0 | - | Feature_List | - | [`Feature_List/BIBS_BDOI_FeatureList_vs_OOTB_and_Best_Practice_v1.0.xlsx`](Feature_List/BIBS_BDOI_FeatureList_vs_OOTB_and_Best_Practice_v1.0.xlsx) |
 | Core Replacement | BRD-00 | FRS | 1.0 | [`FRS/BIBS_FRS_BRD-00_Core_Replacement_v1.0.docx`](FRS/BIBS_FRS_BRD-00_Core_Replacement_v1.0.docx) |
 | Drops Integrations Infrastructure | BRD-00 | Alignment pack | 1.0 | [`Alignment/BIBS_Alignment_BRD-00_Drops_Integrations_Infrastructure_v1.0.docx`](Alignment/BIBS_Alignment_BRD-00_Drops_Integrations_Infrastructure_v1.0.docx) |
 | Integration Inventory | BRD-00 | Alignment pack | 1.0 | [`Alignment/BIBS_Alignment_BRD-00_Integration_Inventory_v1.0.xlsx`](Alignment/BIBS_Alignment_BRD-00_Integration_Inventory_v1.0.xlsx) |

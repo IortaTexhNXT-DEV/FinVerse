@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 /**
@@ -26,6 +27,10 @@ final class UploadCells {
           .appendPattern("d-MMM-uuuu")
           .toFormatter(Locale.ENGLISH);
   private static final String DASH = "-";
+  private static final java.util.Set<String> YES = java.util.Set.of("Y", "YES");
+  private static final java.util.Set<String> NO = java.util.Set.of("N", "NO");
+  private static final Pattern ISO_DAY = Pattern.compile("\\d{4}-\\d{2}-\\d{2}");
+  private static final int ISO_LENGTH = 10;
 
   private UploadCells() {}
 
@@ -58,26 +63,40 @@ final class UploadCells {
   }
 
   /**
+   * A period of validity.
+   *
+   * @param from first day
+   * @param to last day, null for an open period
+   */
+  record Period(LocalDate from, LocalDate to) {}
+
+  /**
    * A date range "from; to" (or "from / to"), to blank for an open range.
    *
    * @param cell cell
-   * @return from and to (to may be null), null when the cell is not a date range
+   * @return the period, empty when the cell is not a date range
    */
-  static LocalDate[] dates(String cell) {
-    if (cell == null) {
-      return null;
-    }
-    String[] parts = RANGE_SEPARATOR.split(cell.trim(), -1);
-    if (parts.length > 2) {
-      return null;
+  static Optional<Period> period(String cell) {
+    String[] parts = cell == null ? new String[0] : RANGE_SEPARATOR.split(cell.trim(), -1);
+    if (parts.length == 0 || parts.length > 2) {
+      return Optional.empty();
     }
     LocalDate from = date(parts[0]);
-    LocalDate to = parts.length == 2 ? date(parts[1]) : null;
-    boolean toGiven = parts.length == 2 && clean(parts[1]) != null;
-    if (from == null || toGiven && to == null || to != null && to.isBefore(from)) {
-      return null;
-    }
-    return new LocalDate[] {from, to};
+    String toText = parts.length == 2 ? clean(parts[1]) : null;
+    LocalDate to = date(toText);
+    return from != null && (toText == null || to != null && !to.isBefore(from))
+        ? Optional.of(new Period(from, to))
+        : Optional.empty();
+  }
+
+  /**
+   * The period of a validated row.
+   *
+   * @param cell cell checked with {@link #period(String)}
+   * @return the period
+   */
+  static Period periodOf(String cell) {
+    return period(cell).orElseThrow();
   }
 
   /**
@@ -91,10 +110,10 @@ final class UploadCells {
     if (t == null) {
       return null;
     }
-    String day = t.length() > 10 && t.charAt(4) == '-' ? t.substring(0, 10) : t;
+    boolean iso = ISO_DAY.matcher(t).lookingAt();
     try {
-      return day.charAt(4) == '-' ? LocalDate.parse(day) : LocalDate.parse(day, SHOWN);
-    } catch (DateTimeParseException | StringIndexOutOfBoundsException e) {
+      return iso ? LocalDate.parse(t.substring(0, ISO_LENGTH)) : LocalDate.parse(t, SHOWN);
+    } catch (DateTimeParseException e) {
       return null;
     }
   }
@@ -121,18 +140,15 @@ final class UploadCells {
    * Y or N.
    *
    * @param text text
-   * @return true, false, or null when neither
+   * @return true or false, empty when neither
    */
-  static Boolean yes(String text) {
+  static Optional<Boolean> yes(String text) {
     String t = clean(text);
-    if (t == null) {
-      return null;
+    String upper = t == null ? "" : t.toUpperCase(Locale.ROOT);
+    if (YES.contains(upper)) {
+      return Optional.of(Boolean.TRUE);
     }
-    return switch (t.toUpperCase(Locale.ROOT)) {
-      case "Y", "YES" -> Boolean.TRUE;
-      case "N", "NO" -> Boolean.FALSE;
-      default -> null;
-    };
+    return NO.contains(upper) ? Optional.of(Boolean.FALSE) : Optional.empty();
   }
 
   /**
@@ -161,19 +177,14 @@ final class UploadCells {
   }
 
   private static String text(Object v) {
-    if (v instanceof BigDecimal n) {
-      return n.stripTrailingZeros().toPlainString();
-    }
-    if (v instanceof Boolean b) {
-      return b ? "Y" : "N";
-    }
-    if (v instanceof java.sql.Date d) {
-      return d.toLocalDate().format(SHOWN);
-    }
-    if (v instanceof LocalDate d) {
-      return d.format(SHOWN);
-    }
-    return String.valueOf(v);
+    Object value = v instanceof java.sql.Date d ? d.toLocalDate() : v;
+    return switch (value) {
+      case BigDecimal n -> n.stripTrailingZeros().toPlainString();
+      case Boolean b -> Boolean.TRUE.equals(b) ? "Y" : "N";
+      case LocalDate d -> d.format(SHOWN);
+      case null -> "null";
+      default -> String.valueOf(value);
+    };
   }
 
   private static String clean(String part) {

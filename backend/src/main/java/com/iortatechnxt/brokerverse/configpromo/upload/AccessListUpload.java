@@ -25,6 +25,9 @@ public class AccessListUpload extends ConfigUploadHandler {
   static final List<String> LISTS =
       List.of("UAM_BUSINESS_UNIT", "UAM_USER_LEVEL", "UAM_DEACTIVATION_REASON");
 
+  private static final int MAX_CODE = 30;
+  private static final int MAX_LABEL = 120;
+
   private final ListParameterRows lists;
 
   /**
@@ -98,10 +101,12 @@ public class AccessListUpload extends ConfigUploadHandler {
     if (errors.isEmpty() && !lists.isList(row.text(LIST))) {
       errors.add(error(LIST, row.text(LIST) + " is not a list of this environment"));
     }
-    lists.checkCode(row.text(CODE), 30).ifPresent(e -> errors.add(error(CODE, e)));
-    if (row.text(LABEL).length() > 120) {
-      errors.add(error(LABEL, "use up to 120 characters"));
-    }
+    lists.checkCode(row.text(CODE), MAX_CODE).ifPresent(e -> errors.add(error(CODE, e)));
+    check(
+        errors,
+        row.text(LABEL).length() > MAX_LABEL,
+        LABEL,
+        "use up to " + MAX_LABEL + " characters");
     BigDecimal order = row.number(ORDER);
     if (order != null && order.stripTrailingZeros().scale() > 0) {
       errors.add(error(ORDER, "enter a whole number"));

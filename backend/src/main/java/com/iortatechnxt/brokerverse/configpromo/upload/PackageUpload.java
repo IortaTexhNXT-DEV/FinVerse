@@ -26,6 +26,8 @@ import org.springframework.stereotype.Component;
  * the cell, the values of an entry separated by semicolons.
  */
 @Component
+// The package tab holds a whole product version in one row.
+@SuppressWarnings({"PMD.GodClass", "PMD.CyclomaticComplexity"})
 public class PackageUpload extends ConfigUploadHandler {
 
   static final String RISK = "Risk code";
@@ -43,6 +45,12 @@ public class PackageUpload extends ConfigUploadHandler {
       List.of("GENERIC", "CLIENT-SPECIFIC", "CLIENT_SPECIFIC");
   private static final String ENTRY_SEPARATOR = "\\r?\\n|\\|";
   private static final BigDecimal HUNDRED = BigDecimal.valueOf(100);
+  private static final int THREE_PARTS = 3;
+  private static final int FOUR_PARTS = 4;
+  private static final int FIVE_PARTS = 5;
+  private static final int FOURTH = 3;
+  private static final int FIFTH = 4;
+  private static final int MAX_SUMMARY = 300;
 
   private final PackageSetupService packages;
 
@@ -157,13 +165,13 @@ public class PackageUpload extends ConfigUploadHandler {
       errors.add(error(RISK, row.text(RISK) + " is not a packaged product"));
       return errors;
     }
-    List<String> name = UploadCells.parts(row.text(NAME), 3);
+    List<String> name = UploadCells.parts(row.text(NAME), THREE_PARTS);
     if (name.get(1) != null && !SCOPES.contains(name.get(1).toUpperCase(Locale.ROOT))) {
       errors.add(error(NAME, "the scope is Generic or Client-specific"));
     }
-    List<String> dates = UploadCells.parts(row.text(DATES), 4);
-    for (int i = 0; i < 4; i++) {
-      if ((i < 3 || dates.get(i) != null) && UploadCells.date(dates.get(i)) == null) {
+    List<String> dates = UploadCells.parts(row.text(DATES), FOUR_PARTS);
+    for (int i = 0; i < FOUR_PARTS; i++) {
+      if ((i < FOURTH || dates.get(i) != null) && UploadCells.date(dates.get(i)) == null) {
         errors.add(
             error(
                 DATES,
@@ -171,7 +179,7 @@ public class PackageUpload extends ConfigUploadHandler {
         break;
       }
     }
-    List<String> terms = UploadCells.parts(row.text(TERMS), 4);
+    List<String> terms = UploadCells.parts(row.text(TERMS), FOUR_PARTS);
     if (UploadCells.number(terms.get(1)) == null || UploadCells.number(terms.get(2)) == null) {
       errors.add(error(TERMS, "give the minimum premium and the commission %"));
     }
@@ -190,10 +198,10 @@ public class PackageUpload extends ConfigUploadHandler {
 
   private void validateCoverages(BulkRow row, String line, List<String> errors) {
     for (String entry : entries(row.text(COVERAGES))) {
-      List<String> p = UploadCells.parts(entry, 5);
+      List<String> p = UploadCells.parts(entry, FIVE_PARTS);
       if (p.get(0) == null || !coverage(line, p.get(0))) {
         errors.add(error(COVERAGES, p.get(0) + " is not a coverage of line " + line));
-      } else if (UploadCells.yes(p.get(1)) == null || UploadCells.yes(p.get(2)) == null) {
+      } else if (UploadCells.yes(p.get(1)).isEmpty() || UploadCells.yes(p.get(2)).isEmpty()) {
         errors.add(error(COVERAGES, p.get(0) + ": give included and optional as Y or N"));
       }
     }
@@ -203,7 +211,7 @@ public class PackageUpload extends ConfigUploadHandler {
     BigDecimal shares = BigDecimal.ZERO;
     boolean coInsured = false;
     for (String entry : entries(row.text(INSURERS))) {
-      List<String> p = UploadCells.parts(entry, 5);
+      List<String> p = UploadCells.parts(entry, FIVE_PARTS);
       if (!db.exists(
           "select 1 from cat_insurer where company_id = ? and party_code = ?",
           context.companyId(),
@@ -231,7 +239,7 @@ public class PackageUpload extends ConfigUploadHandler {
     List<String> insurers =
         entries(row.text(INSURERS)).stream().map(e -> UploadCells.parts(e, 1).get(0)).toList();
     for (String entry : entries(row.text(INSURER_TERMS))) {
-      List<String> p = UploadCells.parts(entry, 5);
+      List<String> p = UploadCells.parts(entry, FIVE_PARTS);
       if (!insurers.contains(p.get(0))) {
         errors.add(
             error(INSURER_TERMS, p.get(0) + " has terms but is not an insurer of the package"));
@@ -239,7 +247,7 @@ public class PackageUpload extends ConfigUploadHandler {
       if (p.get(1) == null || !coverage(line, p.get(1))) {
         errors.add(error(INSURER_TERMS, p.get(1) + " is not a coverage of line " + line));
       }
-      for (String clause : clauses(p.get(4))) {
+      for (String clause : clauses(p.get(FIFTH))) {
         if (!db.exists("select 1 from cat_clause where code = ?", clause)) {
           errors.add(error(INSURER_TERMS, clause + " is not a clause of the clause library"));
         }
@@ -316,50 +324,12 @@ public class PackageUpload extends ConfigUploadHandler {
   }
 
   private static PackageSpec spec(BulkRow row, BulkContext context) {
-    List<String> name = UploadCells.parts(row.text(NAME), 3);
-    List<String> d = UploadCells.parts(row.text(DATES), 4);
-    List<String> t = UploadCells.parts(row.text(TERMS), 4);
-    List<PackageSpec.Coverage> coverages = new ArrayList<>();
-    int order = 0;
-    for (String entry : entries(row.text(COVERAGES))) {
-      List<String> p = UploadCells.parts(entry, 5);
-      order += 10;
-      coverages.add(
-          new PackageSpec.Coverage(
-              p.get(0),
-              Boolean.TRUE.equals(UploadCells.yes(p.get(1))),
-              Boolean.TRUE.equals(UploadCells.yes(p.get(2))),
-              UploadCells.number(p.get(3)),
-              null,
-              deductible(p.get(4)),
-              order));
-    }
-    List<PackageSpec.Insurer> insurers = new ArrayList<>();
-    for (String entry : entries(row.text(INSURERS))) {
-      List<String> p = UploadCells.parts(entry, 5);
-      insurers.add(
-          new PackageSpec.Insurer(
-              p.get(0),
-              role(p.get(1)),
-              UploadCells.number(p.get(2)),
-              UploadCells.number(p.get(3)),
-              UploadCells.number(p.get(4)),
-              null));
-    }
-    List<PackageSpec.InsurerTerm> terms = new ArrayList<>();
-    for (String entry : entries(row.text(INSURER_TERMS))) {
-      List<String> p = UploadCells.parts(entry, 5);
-      terms.add(
-          new PackageSpec.InsurerTerm(
-              p.get(0),
-              p.get(1),
-              true,
-              UploadCells.number(p.get(2)),
-              null,
-              deductible(p.get(3)),
-              clauses(p.get(4)),
-              null));
-    }
+    List<String> name = UploadCells.parts(row.text(NAME), THREE_PARTS);
+    List<String> d = UploadCells.parts(row.text(DATES), FOUR_PARTS);
+    List<String> t = UploadCells.parts(row.text(TERMS), FOUR_PARTS);
+    List<PackageSpec.Coverage> coverages = coverages(row);
+    List<PackageSpec.Insurer> insurers = insurers(row);
+    List<PackageSpec.InsurerTerm> terms = insurerTerms(row);
     String summary =
         "Package "
             + (name.get(0) == null ? "" : name.get(0))
@@ -377,18 +347,73 @@ public class PackageUpload extends ConfigUploadHandler {
             UploadCells.number(t.get(0)),
             UploadCells.number(t.get(1)),
             UploadCells.number(t.get(2)),
-            UploadCells.number(t.get(3)),
+            UploadCells.number(t.get(FOURTH)),
             row.text(BASIS)),
         new PackageSpec.PackageDates(
             UploadCells.date(d.get(0)),
             UploadCells.date(d.get(1)),
             UploadCells.date(d.get(2)),
-            UploadCells.date(d.get(3))),
+            UploadCells.date(d.get(FOURTH))),
         coverages,
         insurers,
         terms,
         new PackageSpec.Origin(
-            null, signoff(row), summary.length() > 300 ? summary.substring(0, 300) : summary));
+            null,
+            signoff(row),
+            summary.length() > MAX_SUMMARY ? summary.substring(0, MAX_SUMMARY) : summary));
+  }
+
+  private static List<PackageSpec.Coverage> coverages(BulkRow row) {
+    List<PackageSpec.Coverage> coverages = new ArrayList<>();
+    int order = 0;
+    for (String entry : entries(row.text(COVERAGES))) {
+      List<String> p = UploadCells.parts(entry, FIVE_PARTS);
+      order += 10;
+      coverages.add(
+          new PackageSpec.Coverage(
+              p.get(0),
+              UploadCells.yes(p.get(1)).orElse(Boolean.FALSE),
+              UploadCells.yes(p.get(2)).orElse(Boolean.FALSE),
+              UploadCells.number(p.get(FOURTH)),
+              null,
+              deductible(p.get(FIFTH)),
+              order));
+    }
+    return coverages;
+  }
+
+  private static List<PackageSpec.Insurer> insurers(BulkRow row) {
+    List<PackageSpec.Insurer> insurers = new ArrayList<>();
+    for (String entry : entries(row.text(INSURERS))) {
+      List<String> p = UploadCells.parts(entry, FIVE_PARTS);
+      insurers.add(
+          new PackageSpec.Insurer(
+              p.get(0),
+              role(p.get(1)),
+              UploadCells.number(p.get(2)),
+              UploadCells.number(p.get(FOURTH)),
+              UploadCells.number(p.get(FIFTH)),
+              null));
+    }
+    return insurers;
+  }
+
+  private static List<PackageSpec.InsurerTerm> insurerTerms(BulkRow row) {
+    List<PackageSpec.InsurerTerm> terms = new ArrayList<>();
+    for (String entry : entries(row.text(INSURER_TERMS))) {
+      List<String> p = UploadCells.parts(entry, FIVE_PARTS);
+      terms.add(
+          new PackageSpec.InsurerTerm(
+              p.get(0),
+              p.get(1),
+              true,
+              UploadCells.number(p.get(2)),
+              null,
+              deductible(p.get(FOURTH)),
+              clauses(p.get(FIFTH)),
+              null));
+    }
+    return terms;
   }
 
   /** A deductible: an amount, a percentage ("10%") or a wording. */
@@ -436,45 +461,58 @@ public class PackageUpload extends ConfigUploadHandler {
                       v.get("default_commission_rate"),
                       v.get("max_sum_insured")),
               BASIS, v.get("rating_basis_note"),
-              COVERAGES,
-                  lines(
-                      db.rows(
-                          "select coverage_code, included, optional, limit_amount,"
-                              + " coalesce(cast(deductible_amount as varchar), deductible_percent || '%', deductible_text) as deductible"
-                              + " from cat_package_coverage where version_id = ? order by sort_order, coverage_code",
-                          id),
-                      "coverage_code",
-                      "included",
-                      "optional",
-                      "limit_amount",
-                      "deductible"),
-              INSURERS,
-                  lines(
-                      db.rows(
-                          "select insurer_code, initcap(role) as role, share_percent, rate, minimum_premium"
-                              + " from cat_package_insurer where version_id = ? order by insurer_code",
-                          id),
-                      "insurer_code",
-                      "role",
-                      "share_percent",
-                      "rate",
-                      "minimum_premium"),
-              INSURER_TERMS,
-                  lines(
-                      db.rows(
-                          "select insurer_code, coverage_code, limit_amount,"
-                              + " coalesce(cast(deductible_amount as varchar), deductible_percent || '%', deductible_text) as deductible,"
-                              + " replace(clause_codes, ' ', '') as clauses"
-                              + " from cat_package_insurer_term where version_id = ? order by insurer_code, coverage_code",
-                          id),
-                      "insurer_code",
-                      "coverage_code",
-                      "limit_amount",
-                      "deductible",
-                      "clauses"),
+              COVERAGES, coverageLines(id),
+              INSURERS, insurerLines(id),
+              INSURER_TERMS, termLines(id),
               SIGNOFF, v.get("mancom_signoff_ref")));
     }
     return rows;
+  }
+
+  private static final String DEDUCTIBLE =
+      "coalesce(cast(deductible_amount as varchar), deductible_percent || '%', deductible_text)";
+
+  private String coverageLines(Long id) {
+    return lines(
+        db.rows(
+            "select coverage_code, included, optional, limit_amount, "
+                + DEDUCTIBLE
+                + " as deductible from cat_package_coverage where version_id = ?"
+                + " order by sort_order, coverage_code",
+            id),
+        "coverage_code",
+        "included",
+        "optional",
+        "limit_amount",
+        "deductible");
+  }
+
+  private String insurerLines(Long id) {
+    return lines(
+        db.rows(
+            "select insurer_code, initcap(role) as role, share_percent, rate, minimum_premium"
+                + " from cat_package_insurer where version_id = ? order by insurer_code",
+            id),
+        "insurer_code",
+        "role",
+        "share_percent",
+        "rate",
+        "minimum_premium");
+  }
+
+  private String termLines(Long id) {
+    return lines(
+        db.rows(
+            "select insurer_code, coverage_code, limit_amount, "
+                + DEDUCTIBLE
+                + " as deductible, replace(clause_codes, ' ', '') as clauses"
+                + " from cat_package_insurer_term where version_id = ? order by insurer_code, coverage_code",
+            id),
+        "insurer_code",
+        "coverage_code",
+        "limit_amount",
+        "deductible",
+        "clauses");
   }
 
   private static String lines(List<Map<String, Object>> rows, String... columns) {

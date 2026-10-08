@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 /** D0-14 Bank statement layouts, on Bank Statement Layouts (Setup & Administration). */
 @Component
 public class StatementLayoutUpload extends ConfigUploadHandler {
+  private static final String COLUMN_FORMAT = "Column header or number";
 
   static final String BANK_ACCOUNT = "Bank account code";
   static final String NAME = "Layout name";
@@ -76,19 +77,16 @@ public class StatementLayoutUpload extends ConfigUploadHandler {
             .master("bank account"),
         BulkColumn.required(NAME, "Name of the layout", "BDO CSV statement"),
         BulkColumn.required(DATE, "Column of the posting date", "Posting Date")
-            .format("Column header or number"),
+            .format(COLUMN_FORMAT),
         BulkColumn.required(DESCRIPTION, "Column of the description", "Description")
-            .format("Column header or number"),
+            .format(COLUMN_FORMAT),
         BulkColumn.optional(REFERENCE, "Column of the reference", "Reference No.")
-            .format("Column header or number"),
-        BulkColumn.optional(DEBIT, "Column of the debits", "Debit")
-            .format("Column header or number"),
-        BulkColumn.optional(CREDIT, "Column of the credits", "Credit")
-            .format("Column header or number"),
+            .format(COLUMN_FORMAT),
+        BulkColumn.optional(DEBIT, "Column of the debits", "Debit").format(COLUMN_FORMAT),
+        BulkColumn.optional(CREDIT, "Column of the credits", "Credit").format(COLUMN_FORMAT),
         BulkColumn.optional(AMOUNT, "Column of a signed amount, instead of debit and credit", "")
-            .format("Column header or number"),
-        BulkColumn.optional(BALANCE, "Column of the balance", "Balance")
-            .format("Column header or number"),
+            .format(COLUMN_FORMAT),
+        BulkColumn.optional(BALANCE, "Column of the balance", "Balance").format(COLUMN_FORMAT),
         BulkColumn.required(PATTERN, "How the bank writes dates", "MM/dd/yyyy")
             .format("For example dd/MM/yyyy"));
   }

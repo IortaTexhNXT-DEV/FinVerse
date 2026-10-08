@@ -104,7 +104,7 @@ public class ListParameterRows {
     boolean added = UploadSupport.ADD.equals(valueAction(type, code));
     Map<String, Object> values = ConfigUploadHandler.columns("label", label);
     if (order != null || added) {
-      values.put("sort_order", order == null ? 0 : order);
+      values.put("sort_order", order == null ? Integer.valueOf(0) : order);
     }
     if (from != null || added) {
       values.put("effective_from", from == null ? context.businessDate() : from);

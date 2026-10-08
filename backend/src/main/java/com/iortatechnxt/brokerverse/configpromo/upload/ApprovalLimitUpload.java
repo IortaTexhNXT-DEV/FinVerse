@@ -23,6 +23,9 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class ApprovalLimitUpload extends ConfigUploadHandler {
+  private static final String TSI = "TSI";
+  private static final String TOR = "TOR";
+  private static final String IAAF = "IAAF";
 
   static final String MODULE = "Module";
   static final String DOCUMENT = "Document or transaction";
@@ -40,21 +43,23 @@ public class ApprovalLimitUpload extends ConfigUploadHandler {
   static final String DISBURSEMENT = "Disbursement";
 
   private static final String SBM_TABLE = "sbm_approval_matrix";
+  private static final int MAX_LEVEL = 9;
   private static final String EB_TABLE = "eb_threshold_rule";
   private static final List<String> MODULES = List.of(SUBMITTED, BENEFITS, SCREENING, DISBURSEMENT);
   private static final Map<String, String> SBM_DOCUMENTS =
-      Map.of(
-          "IAAF", "IAAF",
-          "INSURER APPROVAL", "IAAF",
-          "TOR", "TOR",
-          "TERMS OF REFERENCE", "TOR");
+      Map.of(IAAF, IAAF, "INSURER APPROVAL", IAAF, TOR, TOR, "TERMS OF REFERENCE", TOR);
   private static final Map<String, String> EB_MEASURES =
       Map.of(
-          "TSI", "TSI",
-          "SUM INSURED", "TSI",
-          "TOTAL SUM INSURED", "TSI",
-          "ANNUAL_PREMIUM", "ANNUAL_PREMIUM",
-          "ANNUAL PREMIUM", "ANNUAL_PREMIUM");
+          TSI,
+          TSI,
+          "SUM INSURED",
+          TSI,
+          "TOTAL SUM INSURED",
+          TSI,
+          "ANNUAL_PREMIUM",
+          "ANNUAL_PREMIUM",
+          "ANNUAL PREMIUM",
+          "ANNUAL_PREMIUM");
 
   /**
    * Creates the handler.
@@ -136,32 +141,31 @@ public class ApprovalLimitUpload extends ConfigUploadHandler {
     List<String> errors = errors();
     String module = row.text(MODULE);
     oneOf(errors, MODULE, module, MODULES);
-    if (SCREENING.equals(module)) {
-      errors.add(
-          error(
-              MODULE,
-              "the approval routes of Sanction Screening are set in a draft configuration"
-                  + " version on Compliance Setup"));
-    } else if (DISBURSEMENT.equals(module)) {
-      errors.add(error(MODULE, "disbursements follow the authorisation limit of the user (UA-03)"));
-    }
+    check(
+        errors,
+        SCREENING.equals(module),
+        MODULE,
+        "the approval routes of Sanction Screening are set in a draft configuration version on Compliance Setup");
+    check(
+        errors,
+        DISBURSEMENT.equals(module),
+        MODULE,
+        "disbursements follow the authorisation limit of the user (UA-03)");
     if (!errors.isEmpty()) {
       return errors;
     }
-    BigDecimal level = row.number(LEVEL);
-    if (level.stripTrailingZeros().scale() > 0 || level.intValue() < 1 || level.intValue() > 9) {
-      errors.add(error(LEVEL, "enter a whole number from 1 to 9"));
-    }
-    if (Arrays.stream(Permission.values()).noneMatch(p -> p.name().equals(row.text(ROLE)))) {
-      errors.add(
-          error(
-              ROLE,
-              row.text(ROLE) + " is not a permission; give the permission the approvers hold"));
-    }
-    if (row.text(APPROVER) != null
-        && !db.exists("select 1 from sec_user where username = ?", row.text(APPROVER))) {
-      errors.add(error(APPROVER, row.text(APPROVER) + " is not a user"));
-    }
+    whole(errors, LEVEL, row.number(LEVEL), 1, MAX_LEVEL);
+    check(
+        errors,
+        Arrays.stream(Permission.values()).noneMatch(p -> p.name().equals(row.text(ROLE))),
+        ROLE,
+        row.text(ROLE) + " is not a permission; give the permission the approvers hold");
+    String approver = row.text(APPROVER);
+    check(
+        errors,
+        approver != null && !db.exists("select 1 from sec_user where username = ?", approver),
+        APPROVER,
+        approver + " is not a user");
     if (SUBMITTED.equals(module)) {
       validateSubmitted(row, errors);
     } else {
@@ -279,7 +283,7 @@ public class ApprovalLimitUpload extends ConfigUploadHandler {
       rows.add(
           exportRow(
               MODULE, SUBMITTED,
-              DOCUMENT, "TOR".equals(r.get("document")) ? "Terms of reference" : "IAAF",
+              DOCUMENT, TOR.equals(r.get("document")) ? "Terms of reference" : IAAF,
               SEGMENT, r.get("segment"),
               FROM, r.get("tsi_from"),
               TO, r.get("tsi_to"),
@@ -297,7 +301,7 @@ public class ApprovalLimitUpload extends ConfigUploadHandler {
       rows.add(
           exportRow(
               MODULE, BENEFITS,
-              DOCUMENT, "TSI".equals(r.get("measure")) ? "Sum insured" : "Annual premium",
+              DOCUMENT, TSI.equals(r.get("measure")) ? "Sum insured" : "Annual premium",
               SEGMENT, r.get("benefit_line"),
               FROM, r.get("amount"),
               LEVEL, r.get("approval_level"),

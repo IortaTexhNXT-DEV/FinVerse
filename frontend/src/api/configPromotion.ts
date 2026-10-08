@@ -4,7 +4,8 @@ import type { PageResponse } from './types';
 /** Configuration Promotion: catalogue, exports, imports, baselines and drift, overrides. */
 
 export type PackageKind = 'EXPORT' | 'UPLOAD' | 'SNAPSHOT';
-export type ImportStatus = 'CHECKED' | 'SUBMITTED' | 'APPLIED' | 'REJECTED' | 'FAILED' | 'CANCELLED';
+export type ImportStatus =
+  'CHECKED' | 'SUBMITTED' | 'APPLIED' | 'REJECTED' | 'FAILED' | 'CANCELLED';
 export type ChangeType = 'ADDED' | 'CHANGED' | 'UNCHANGED' | 'ONLY_IN_TARGET';
 
 export interface CatalogueGroup {

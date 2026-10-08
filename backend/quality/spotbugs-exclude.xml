@@ -130,6 +130,21 @@
     <Class name="com.iortatechnxt.brokerverse.configpromo.upload.UploadSupport"/>
     <Bug pattern="SQL_INJECTION_SPRING_JDBC"/>
   </Match>
+  <!--
+    Configuration Promotion and the uploads compare codes, user names and environment names written in
+    ASCII (case-insensitive comparison of identifiers, not of user text). The SHA-256 checksums of a
+    package are public integrity values compared with the manifest and the target; the secret
+    signature is compared in constant time (PackageSigner.verify).
+  -->
+  <Match>
+    <Package name="~com\.iortatechnxt\.brokerverse\.configpromo(\..*)?"/>
+    <Bug pattern="IMPROPER_UNICODE,UNSAFE_HASH_EQUALS"/>
+  </Match>
+  <!-- The approval of an upload compares user names (ASCII identifiers). -->
+  <Match>
+    <Class name="com.iortatechnxt.brokerverse.bulk.domain.BulkJob"/>
+    <Bug pattern="IMPROPER_UNICODE"/>
+  </Match>
   <!-- Generated/test code is not part of the production artefact. -->
   <Match>
     <Class name="~.*Test.*"/>

@@ -34,17 +34,8 @@ public final class CanonicalValues {
         boolean v = rs.getBoolean(column);
         return rs.wasNull() ? null : v;
       }
-      case "date" -> {
-        Date d = rs.getDate(column);
-        return d == null ? null : d.toLocalDate().toString();
-      }
-      case "timestamptz" -> {
-        Timestamp t = rs.getTimestamp(column);
-        return t == null ? null : t.toInstant().toString();
-      }
-      case "timestamp" -> {
-        Timestamp t = rs.getTimestamp(column);
-        return t == null ? null : t.toLocalDateTime().toString();
+      case "date", "timestamptz", "timestamp" -> {
+        return time(rs, column, type);
       }
       case "numeric" -> {
         BigDecimal n = rs.getBigDecimal(column);
@@ -54,6 +45,18 @@ public final class CanonicalValues {
         return integerOrText(rs, column, type);
       }
     }
+  }
+
+  private static String time(ResultSet rs, String column, String type) throws SQLException {
+    if ("date".equals(type)) {
+      Date d = rs.getDate(column);
+      return d == null ? null : d.toLocalDate().toString();
+    }
+    Timestamp t = rs.getTimestamp(column);
+    if (t == null) {
+      return null;
+    }
+    return "timestamptz".equals(type) ? t.toInstant().toString() : t.toLocalDateTime().toString();
   }
 
   private static Object integerOrText(ResultSet rs, String column, String type)

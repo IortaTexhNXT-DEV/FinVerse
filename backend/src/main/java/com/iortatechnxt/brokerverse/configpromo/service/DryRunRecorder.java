@@ -58,15 +58,18 @@ public class DryRunRecorder {
             outcome.compatibility().warnings(),
             blockers,
             warnings);
-    int[] totals = new int[4];
+    int added = 0;
+    int changed = 0;
+    int unchanged = 0;
+    int onlyHere = 0;
     if (analysis != null) {
       int seq = 0;
       for (DatasetDiff diff : analysis.diffs()) {
         seq++;
-        totals[0] += diff.added().size();
-        totals[1] += diff.changed().size();
-        totals[2] += diff.unchanged();
-        totals[3] += diff.onlyInTarget().size();
+        added += diff.added().size();
+        changed += diff.changed().size();
+        unchanged += diff.unchanged();
+        onlyHere += diff.onlyInTarget().size();
         long datasetBlockers =
             blockers.stream().filter(b -> diff.code().equals(b.dataset())).count();
         lines.save(
@@ -90,7 +93,7 @@ public class DryRunRecorder {
             CanonicalJson.text(messages),
             messages.refusals().size() + blockers.size(),
             messages.notes().size() + warnings.size(),
-            new Counts(totals[0], totals[1], totals[2], totals[3])));
+            new Counts(added, changed, unchanged, onlyHere)));
     return imp;
   }
 

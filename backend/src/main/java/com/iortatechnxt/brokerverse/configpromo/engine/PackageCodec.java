@@ -91,34 +91,42 @@ public final class PackageCodec {
     byte[] manifestBytes = require(entries, MANIFEST);
     PackageSignature signature =
         CanonicalJson.read(require(entries, SIGNATURE), PackageSignature.class);
-    if (!PackageSigner.ALGORITHM.equals(signature.algorithm())
-        || !signer.verify(manifestBytes, signature.value())) {
-      throw new PackageException(
-          "The package is not signed with the signing key of this platform or was changed after"
-              + " its export; it is refused");
-    }
+    check(
+        PackageSigner.ALGORITHM.equals(signature.algorithm())
+            && signer.verify(manifestBytes, signature.value()),
+        "The package is not signed with the signing key of this platform or was changed after"
+            + " its export; it is refused");
     PackageManifest manifest = CanonicalJson.read(manifestBytes, PackageManifest.class);
-    if (!PackageManifest.FORMAT.equals(manifest.format())
-        || manifest.formatVersion() > PackageManifest.FORMAT_VERSION) {
-      throw new PackageException(
-          "The package format " + manifest.formatVersion() + " is not supported by this platform");
-    }
+    check(
+        PackageManifest.FORMAT.equals(manifest.format())
+            && manifest.formatVersion() <= PackageManifest.FORMAT_VERSION,
+        "The package format " + manifest.formatVersion() + " is not supported by this platform");
     Map<String, DatasetFile> files = new LinkedHashMap<>();
     for (ManifestDataset d : manifest.datasets()) {
-      byte[] bytes = require(entries, d.file());
-      if (!Sha256.hex(bytes).equals(d.sha256())) {
-        throw new PackageException("The data of " + d.name() + " does not match its checksum");
-      }
-      DatasetFile file = CanonicalJson.read(bytes, DatasetFile.class);
-      if (!d.code().equals(file.dataset()) || file.rows().size() != d.rows()) {
-        throw new PackageException("The data of " + d.name() + " does not match the manifest");
-      }
-      files.put(d.code(), file);
+      files.put(d.code(), dataset(entries, d));
     }
-    if (entries.size() != manifest.datasets().size() + 2) {
-      throw new PackageException("The package holds files that its manifest does not list");
-    }
+    check(
+        entries.size() == manifest.datasets().size() + 2,
+        "The package holds files that its manifest does not list");
     return new ConfigPackage(manifest, files, signature.keyId());
+  }
+
+  private static DatasetFile dataset(Map<String, byte[]> entries, ManifestDataset d) {
+    byte[] bytes = require(entries, d.file());
+    check(
+        Sha256.hex(bytes).equals(d.sha256()),
+        "The data of " + d.name() + " does not match its checksum");
+    DatasetFile file = CanonicalJson.read(bytes, DatasetFile.class);
+    check(
+        d.code().equals(file.dataset()) && file.rows().size() == d.rows(),
+        "The data of " + d.name() + " does not match the manifest");
+    return file;
+  }
+
+  private static void check(boolean valid, String problem) {
+    if (!valid) {
+      throw new PackageException(problem);
+    }
   }
 
   private static byte[] require(Map<String, byte[]> entries, String name) {
@@ -134,17 +142,15 @@ public final class PackageCodec {
     Map<String, byte[]> entries = new HashMap<>();
     long total = 0;
     try (ZipInputStream zip = new ZipInputStream(new ByteArrayInputStream(content))) {
-      ZipEntry e;
-      while ((e = zip.getNextEntry()) != null) {
-        if (e.isDirectory()) {
-          continue;
+      for (ZipEntry e = zip.getNextEntry(); e != null; e = zip.getNextEntry()) {
+        if (!e.isDirectory()) {
+          check(
+              entries.size() < MAX_ENTRIES && !entries.containsKey(e.getName()),
+              "The package has too many or repeated files");
+          byte[] bytes = readLimited(zip, maxBytes - total);
+          total += bytes.length;
+          entries.put(e.getName(), bytes);
         }
-        if (entries.size() >= MAX_ENTRIES || entries.containsKey(e.getName())) {
-          throw new PackageException("The package has too many or repeated files");
-        }
-        byte[] bytes = readLimited(zip, maxBytes - total);
-        total += bytes.length;
-        entries.put(e.getName(), bytes);
       }
     } catch (IOException ex) {
       throw new PackageException("The file is not a readable configuration package", ex);
@@ -159,12 +165,9 @@ public final class PackageCodec {
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     byte[] buffer = new byte[BUFFER];
     long read = 0;
-    int n;
-    while ((n = in.read(buffer)) > 0) {
+    for (int n = in.read(buffer); n > 0; n = in.read(buffer)) {
       read += n;
-      if (read > remaining) {
-        throw new PackageException("The package is larger than the allowed size");
-      }
+      check(read <= remaining, "The package is larger than the allowed size");
       out.write(buffer, 0, n);
     }
     return out.toByteArray();

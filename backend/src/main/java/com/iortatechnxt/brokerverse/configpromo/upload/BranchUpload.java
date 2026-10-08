@@ -36,6 +36,7 @@ public class BranchUpload extends ConfigUploadHandler {
   static final String REST_DAYS = "Weekly rest days";
   static final String LEGACY = "Legacy branch codes";
 
+  private static final int DAY_ABBREVIATION = 3;
   private static final Pattern CODE_FORMAT = Pattern.compile("[A-Z0-9]{1,10}");
   private static final String TABLE = "org_branch";
   private static final String CODE_MAP = "BRANCH";
@@ -143,7 +144,9 @@ public class BranchUpload extends ConfigUploadHandler {
   static Optional<String> restDays(String text) {
     List<Integer> days = new ArrayList<>();
     for (String part : text.toUpperCase(Locale.ROOT).split("[,;\\s]+")) {
-      int index = DAYS.indexOf(part.length() > 3 ? part.substring(0, 3) : part);
+      int index =
+          DAYS.indexOf(
+              part.length() > DAY_ABBREVIATION ? part.substring(0, DAY_ABBREVIATION) : part);
       if (index < 0) {
         return Optional.empty();
       }
@@ -158,7 +161,7 @@ public class BranchUpload extends ConfigUploadHandler {
       return null;
     }
     return Arrays.stream(stored.toString().split(","))
-        .map(d -> DayOfWeek.of(Integer.parseInt(d.strip())).name().substring(0, 3))
+        .map(d -> DayOfWeek.of(Integer.parseInt(d.strip())).name().substring(0, DAY_ABBREVIATION))
         .collect(Collectors.joining(","));
   }
 

@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class AccessRoleUpload extends ConfigUploadHandler {
+  private static final String APPROVER_ROLE = "Approver";
 
   static final String ROLE = "Role in user access";
   static final String USER = "User ID";
@@ -28,14 +29,21 @@ public class AccessRoleUpload extends ConfigUploadHandler {
 
   private static final Map<String, String> PROFILES =
       Map.of(
-          "Requestor", "UAM_REQUESTOR",
-          "Approver", "UAM_APPROVER",
-          "Second Approver", "UAM_SECOND_APPROVER",
-          "Group-profile requester", "BUSINESS_ADMIN",
-          "Implementer", "SYSADMIN");
+          "Requestor",
+          "UAM_REQUESTOR",
+          APPROVER_ROLE,
+          "UAM_APPROVER",
+          "Second Approver",
+          "UAM_SECOND_APPROVER",
+          "Group-profile requester",
+          "BUSINESS_ADMIN",
+          "Implementer",
+          "SYSADMIN");
   private static final List<String> ROLES =
-      List.of("Requestor", "Approver", "Second Approver", "Group-profile requester", "Implementer");
+      List.of(
+          "Requestor", APPROVER_ROLE, "Second Approver", "Group-profile requester", "Implementer");
   private static final String ANY_APPROVER = "UAM_ANY_APPROVER";
+  private static final int MAX_ORDER = 9;
 
   private final ListParameterRows lists;
 
@@ -88,7 +96,7 @@ public class AccessRoleUpload extends ConfigUploadHandler {
   @Override
   public List<BulkColumn> columns() {
     return List.of(
-        BulkColumn.required(ROLE, "The user access role of the user", "Approver")
+        BulkColumn.required(ROLE, "The user access role of the user", APPROVER_ROLE)
             .values(ROLES.toArray(String[]::new)),
         BulkColumn.required(USER, "The user who holds the role", "a013000205").master("user"),
         BulkColumn.required(UNIT, "Unit the user requests or approves for", "Combank Marketing")
@@ -99,7 +107,7 @@ public class AccessRoleUpload extends ConfigUploadHandler {
                 false,
                 Type.NUMBER,
                 "1")
-            .when("Approver"),
+            .when(APPROVER_ROLE),
         new BulkColumn(
             ANY, "Must match UAM_ANY_APPROVER (changed with UA-05)", false, Type.YES_NO, "N"),
         new BulkColumn(
@@ -120,37 +128,18 @@ public class AccessRoleUpload extends ConfigUploadHandler {
     List<String> errors = errors();
     oneOf(errors, ROLE, row.text(ROLE), ROLES);
     Optional<Long> user = user(row);
-    if (user.isEmpty()) {
-      errors.add(error(USER, row.text(USER) + " is not a user"));
-    }
-    if (unit(row).isEmpty()) {
-      errors.add(error(UNIT, row.text(UNIT) + " is not a value of the list Business unit group"));
-    }
-    BigDecimal order = row.number(ORDER);
-    if (order != null
-        && (order.stripTrailingZeros().scale() > 0
-            || order.intValue() < 1
-            || order.intValue() > 9)) {
-      errors.add(error(ORDER, "enter a whole number from 1 to 9"));
-    }
-    if (row.number(LIMIT) != null && row.number(LIMIT).signum() < 0) {
-      errors.add(error(LIMIT, "cannot be negative"));
-    }
-    if (row.text(ANY) != null) {
-      String wanted = row.yes(ANY) ? "true" : "false";
-      String current = lists.parameterValue(ANY_APPROVER).orElse("false");
-      if (!wanted.equalsIgnoreCase(current)) {
-        errors.add(
-            error(
-                ANY,
-                ANY_APPROVER
-                    + " is "
-                    + current
-                    + "; change it with the parameters upload (UA-05)"));
-      }
-    }
+    check(errors, user.isEmpty(), USER, row.text(USER) + " is not a user");
+    check(
+        errors,
+        unit(row).isEmpty(),
+        UNIT,
+        row.text(UNIT) + " is not a value of the list Business unit group");
+    whole(errors, ORDER, row.number(ORDER), 1, MAX_ORDER);
+    BigDecimal limit = row.number(LIMIT);
+    check(errors, limit != null && limit.signum() < 0, LIMIT, "cannot be negative");
+    checkAnyApprover(row, errors);
     if (errors.isEmpty()) {
-      conflict(user.get(), PROFILES.get(row.text(ROLE)))
+      conflict(user.orElseThrow(), PROFILES.get(row.text(ROLE)))
           .ifPresent(
               c ->
                   errors.add(
@@ -161,6 +150,19 @@ public class AccessRoleUpload extends ConfigUploadHandler {
                               + ", which the separation of duties forbids with it")));
     }
     return errors;
+  }
+
+  private void checkAnyApprover(BulkRow row, List<String> errors) {
+    if (row.text(ANY) == null) {
+      return;
+    }
+    String wanted = row.yes(ANY) ? "true" : "false";
+    String current = lists.parameterValue(ANY_APPROVER).orElse("false");
+    check(
+        errors,
+        !wanted.equalsIgnoreCase(current),
+        ANY,
+        ANY_APPROVER + " is " + current + "; change it with the parameters upload (UA-05)");
   }
 
   private Optional<Long> user(BulkRow row) {
@@ -230,7 +232,8 @@ public class AccessRoleUpload extends ConfigUploadHandler {
             "select r.code, u.username, coalesce(v.label, u.business_unit_code) as unit, u.authorization_limit"
                 + " from sec_user u join sec_user_role ur on ur.user_id = u.id join sec_role r on r.id = ur.role_id"
                 + " left join lov_value v on v.type_code = 'UAM_BUSINESS_UNIT' and v.code = u.business_unit_code"
-                + " where r.code in ('UAM_REQUESTOR', 'UAM_APPROVER', 'UAM_SECOND_APPROVER', 'BUSINESS_ADMIN', 'SYSADMIN')"
+                + " where r.code in ('UAM_REQUESTOR', 'UAM_APPROVER', 'UAM_SECOND_APPROVER',"
+                + " 'BUSINESS_ADMIN', 'SYSADMIN')"
                 + " and u.enabled and u.business_unit_code is not null order by r.code, u.username")
         .stream()
         .map(

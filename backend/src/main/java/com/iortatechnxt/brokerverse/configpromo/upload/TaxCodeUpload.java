@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 /** D0-10 Tax codes: the tax codes with their ATC, rate and GL account, on Tax Codes & Forms. */
 @Component
 public class TaxCodeUpload extends ConfigUploadHandler {
+  private static final String EWT = "EWT";
 
   static final String CODE = "Tax code";
   static final String NAME = "Name";
@@ -36,7 +37,7 @@ public class TaxCodeUpload extends ConfigUploadHandler {
           "DST",
           "LGT",
           "FST",
-          "EWT");
+          EWT);
   private static final List<String> PAYEE_CLASSES = List.of("INDIVIDUAL", "CORPORATE");
   private static final Pattern CODE_FORMAT = Pattern.compile("[A-Z0-9_-]{1,20}");
   private static final BigDecimal HUNDRED = BigDecimal.valueOf(100);
@@ -90,8 +91,8 @@ public class TaxCodeUpload extends ConfigUploadHandler {
     return List.of(
         BulkColumn.required(CODE, "Code of the tax", "EWT_WC158").format("Up to 20 capitals"),
         BulkColumn.required(NAME, "Name of the tax", "EWT 1% - goods"),
-        BulkColumn.required(TYPE, "Kind of tax", "EWT").codes(TYPES.toArray(String[]::new)),
-        BulkColumn.optional(ATC, "Alphanumeric tax code of the BIR", "WC158").when("EWT"),
+        BulkColumn.required(TYPE, "Kind of tax", EWT).codes(TYPES.toArray(String[]::new)),
+        BulkColumn.optional(ATC, "Alphanumeric tax code of the BIR", "WC158").when(EWT),
         BulkColumn.optional(PAYEE, "Payee class of the withholding", "CORPORATE")
             .codes(PAYEE_CLASSES.toArray(String[]::new)),
         new BulkColumn(RATE, "Rate in percent", true, Type.NUMBER, "1")
@@ -116,7 +117,7 @@ public class TaxCodeUpload extends ConfigUploadHandler {
     }
     oneOf(errors, TYPE, row.text(TYPE), TYPES);
     oneOf(errors, PAYEE, row.text(PAYEE), PAYEE_CLASSES);
-    if ("EWT".equals(row.text(TYPE)) && row.text(ATC) == null) {
+    if (EWT.equals(row.text(TYPE)) && row.text(ATC) == null) {
       errors.add(error(ATC, "mandatory for a withholding tax"));
     }
     BigDecimal rate = row.number(RATE);

@@ -4,7 +4,6 @@ import com.iortatechnxt.brokerverse.bulk.service.BulkColumn;
 import com.iortatechnxt.brokerverse.bulk.service.BulkColumn.Type;
 import com.iortatechnxt.brokerverse.bulk.service.BulkContext;
 import com.iortatechnxt.brokerverse.bulk.service.BulkRow;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -47,7 +46,7 @@ public class BusinessPartnerUpload extends ConfigUploadHandler {
   private static final List<String> INTERMEDIARIES = List.of("AGENT", "BROKER", "RI_BROKER");
   private static final Pattern CODE_FORMAT = Pattern.compile("[A-Z0-9.-]{1,30}");
   private static final Pattern MAIL = Pattern.compile("[^@\\s]+@[^@\\s]+\\.[^@\\s]+");
-  private static final BigDecimal HUNDRED = BigDecimal.valueOf(100);
+  private static final int MAX_CREDIT_DAYS = 365;
 
   /**
    * Creates the handler.
@@ -126,32 +125,31 @@ public class BusinessPartnerUpload extends ConfigUploadHandler {
   @Override
   public List<String> validate(BulkRow row, BulkContext context) {
     List<String> errors = errors();
-    if (!CODE_FORMAT.matcher(row.text(CODE)).matches()) {
-      errors.add(error(CODE, "use up to 30 capital letters, digits, - or ."));
-    }
+    check(
+        errors,
+        !CODE_FORMAT.matcher(row.text(CODE)).matches(),
+        CODE,
+        "use up to 30 capital letters, digits, - or .");
     oneOf(errors, TYPE, row.text(TYPE), TYPES);
-    if (INTERMEDIARIES.contains(row.text(TYPE)) && row.text(LICENCE) == null) {
-      errors.add(error(LICENCE, "mandatory for an agent, a broker or a reinsurance broker"));
-    }
-    if (row.text(EMAIL) != null && !MAIL.matcher(row.text(EMAIL)).matches()) {
-      errors.add(error(EMAIL, row.text(EMAIL) + " is not an e-mail address"));
-    }
-    if (!db.currency(row.text(CURRENCY))) {
-      errors.add(error(CURRENCY, row.text(CURRENCY) + " is not an active currency"));
-    }
-    BigDecimal days = row.number(CREDIT_DAYS);
-    if (days != null
-        && (days.stripTrailingZeros().scale() > 0
-            || days.intValue() < 0
-            || days.intValue() > 365)) {
-      errors.add(error(CREDIT_DAYS, "enter a whole number from 0 to 365"));
-    }
-    for (String h : List.of(COMMISSION, WITHHOLDING)) {
-      BigDecimal rate = row.number(h);
-      if (rate != null && (rate.signum() < 0 || rate.compareTo(HUNDRED) > 0)) {
-        errors.add(error(h, "enter a rate from 0 to 100"));
-      }
-    }
+    check(
+        errors,
+        INTERMEDIARIES.contains(row.text(TYPE)) && row.text(LICENCE) == null,
+        LICENCE,
+        "mandatory for an agent, a broker or a reinsurance broker");
+    String mail = row.text(EMAIL);
+    check(
+        errors,
+        mail != null && !MAIL.matcher(mail).matches(),
+        EMAIL,
+        mail + " is not an e-mail address");
+    check(
+        errors,
+        !db.currency(row.text(CURRENCY)),
+        CURRENCY,
+        row.text(CURRENCY) + " is not an active currency");
+    whole(errors, CREDIT_DAYS, row.number(CREDIT_DAYS), 0, MAX_CREDIT_DAYS);
+    percent(errors, COMMISSION, row.number(COMMISSION));
+    percent(errors, WITHHOLDING, row.number(WITHHOLDING));
     if (db.exists(
         "select 1 from pty_party where company_id = ? and code = ? and party_type <> ?",
         context.companyId(),

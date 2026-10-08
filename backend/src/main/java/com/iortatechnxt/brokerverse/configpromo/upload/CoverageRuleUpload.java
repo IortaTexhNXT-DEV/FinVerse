@@ -21,7 +21,15 @@ import org.springframework.stereotype.Component;
  * field key starting with "item." is a rule on the insured items, any other a rule on the account.
  */
 @Component
+// Coverages, field rules and document rules of one tab, each with its scope and checks.
+@SuppressWarnings("PMD.GodClass")
 public class CoverageRuleUpload extends ConfigUploadHandler {
+  private static final String REQUIRED_COLUMN = "required";
+  private static final String SCOPE_CODE = "scope_code";
+  private static final String PATTERN = "PATTERN";
+  private static final String RANGE = "RANGE";
+  private static final String LOV = "LOV";
+  private static final String REQUIRED = "REQUIRED";
 
   static final String RECORD = "Record";
   static final String SCOPE = "Line code / Risk code";
@@ -40,24 +48,24 @@ public class CoverageRuleUpload extends ConfigUploadHandler {
   private static final List<String> RECORDS = List.of(COVERAGE, FIELD_RULE, DOCUMENT_RULE);
   private static final Map<String, String> CHECKS =
       Map.of(
-          "PRESENCE", "REQUIRED",
-          "REQUIRED", "REQUIRED",
-          "LIST OF VALUES", "LOV",
-          "LOV", "LOV",
-          "NUMBER RANGE", "RANGE",
-          "RANGE", "RANGE",
-          "FORMAT", "PATTERN",
-          "PATTERN", "PATTERN");
+          "PRESENCE",
+          REQUIRED,
+          REQUIRED,
+          REQUIRED,
+          "LIST OF VALUES",
+          LOV,
+          LOV,
+          LOV,
+          "NUMBER RANGE",
+          RANGE,
+          RANGE,
+          RANGE,
+          "FORMAT",
+          PATTERN,
+          PATTERN,
+          PATTERN);
   private static final Map<String, String> CHECK_LABELS =
-      Map.of(
-          "REQUIRED",
-          "Presence",
-          "LOV",
-          "List of values",
-          "RANGE",
-          "Number range",
-          "PATTERN",
-          "Format");
+      Map.of(REQUIRED, "Presence", LOV, "List of values", RANGE, "Number range", PATTERN, "Format");
   private static final Pattern COVERAGE_CODE = Pattern.compile("[A-Z0-9_]{1,30}");
   private static final String ITEM_PREFIX = "item.";
   private static final String ALL = "*";
@@ -184,36 +192,40 @@ public class CoverageRuleUpload extends ConfigUploadHandler {
   }
 
   private void validateFieldRule(BulkRow row, List<String> errors) {
-    String check = check(row);
-    if (check == null) {
-      errors.add(error(KIND, "use Presence, List of values, Number range or Format"));
-      return;
-    }
+    String type = ruleType(row);
     String parameters = row.text(PARAMETERS);
-    switch (check) {
-      case "LOV" -> {
-        if (parameters == null || !db.exists("select 1 from lov_type where code = ?", parameters)) {
-          errors.add(error(PARAMETERS, "give the code of an existing list"));
-        }
-      }
-      case "RANGE" -> {
-        if (range(parameters) == null) {
-          errors.add(error(PARAMETERS, "give the minimum and the maximum separated by ;"));
-        }
-      }
-      case "PATTERN" -> {
-        try {
-          Pattern.compile(parameters == null ? "" : parameters);
-        } catch (PatternSyntaxException e) {
-          errors.add(error(PARAMETERS, "is not a valid format"));
-        }
-        if (parameters == null) {
-          errors.add(error(PARAMETERS, "give the format of the field"));
-        }
-      }
-      default -> {
-        // presence needs no parameters
-      }
+    if (type == null) {
+      errors.add(error(KIND, "use Presence, List of values, Number range or Format"));
+    } else if (LOV.equals(type)) {
+      check(
+          errors,
+          parameters == null || !db.exists("select 1 from lov_type where code = ?", parameters),
+          PARAMETERS,
+          "give the code of an existing list");
+    } else if (RANGE.equals(type)) {
+      check(
+          errors,
+          range(parameters).isEmpty(),
+          PARAMETERS,
+          "give the minimum and the maximum separated by ;");
+    } else if (PATTERN.equals(type)) {
+      check(
+          errors,
+          !isPattern(parameters),
+          PARAMETERS,
+          "give the format of the field as a valid pattern");
+    }
+  }
+
+  private static boolean isPattern(String text) {
+    if (text == null) {
+      return false;
+    }
+    try {
+      Pattern.compile(text);
+      return true;
+    } catch (PatternSyntaxException e) {
+      return false;
     }
   }
 
@@ -244,28 +256,37 @@ public class CoverageRuleUpload extends ConfigUploadHandler {
         row.text(KIND));
   }
 
-  private static String check(BulkRow row) {
+  private static String ruleType(BulkRow row) {
     return CHECKS.get(row.text(KIND).toUpperCase(Locale.ROOT));
   }
 
-  private static BigDecimal[] range(String parameters) {
-    if (parameters == null) {
-      return null;
+  /** The bounds of a number range rule; either may be open. */
+  private record Bounds(BigDecimal min, BigDecimal max) {}
+
+  private static final Bounds NO_BOUNDS = new Bounds(null, null);
+
+  private static Optional<Bounds> range(String parameters) {
+    List<String> parts = parameters == null ? List.of() : List.of(parameters.split(";", -1));
+    if (parts.size() != 2) {
+      return Optional.empty();
     }
-    String[] parts = parameters.split(";", -1);
-    if (parts.length != 2) {
-      return null;
+    BigDecimal min = UploadCells.number(parts.get(0));
+    BigDecimal max = UploadCells.number(parts.get(1));
+    boolean read = readable(parts.get(0), min) && readable(parts.get(1), max);
+    return read && ordered(min, max) ? Optional.of(new Bounds(min, max)) : Optional.empty();
+  }
+
+  /** A bound is blank or a number. */
+  private static boolean readable(String text, BigDecimal value) {
+    return value != null || text.isBlank();
+  }
+
+  /** At least one bound, and the minimum not above the maximum. */
+  private static boolean ordered(BigDecimal min, BigDecimal max) {
+    if (min == null || max == null) {
+      return min != null || max != null;
     }
-    try {
-      BigDecimal min = parts[0].isBlank() ? null : new BigDecimal(parts[0].trim());
-      BigDecimal max = parts[1].isBlank() ? null : new BigDecimal(parts[1].trim());
-      if (min == null && max == null || min != null && max != null && min.compareTo(max) > 0) {
-        return null;
-      }
-      return new BigDecimal[] {min, max};
-    } catch (NumberFormatException e) {
-      return null;
-    }
+    return min.compareTo(max) <= 0;
   }
 
   private static String target(BulkRow row) {
@@ -290,14 +311,14 @@ public class CoverageRuleUpload extends ConfigUploadHandler {
               ? columns(
                   "scope",
                   s.scope(),
-                  "scope_code",
+                  SCOPE_CODE,
                   s.code(),
                   "target",
                   target(row),
                   "field_key",
                   fieldKey(row))
               : columns(
-                  "scope", s.scope(), "scope_code", s.code(), "document_type", row.text(DOCUMENT)));
+                  "scope", s.scope(), SCOPE_CODE, s.code(), "document_type", row.text(DOCUMENT)));
     }
     return keys;
   }
@@ -337,26 +358,26 @@ public class CoverageRuleUpload extends ConfigUploadHandler {
               "basic",
               row.yes(BASIC));
       case FIELD_RULE -> {
-        String check = check(row);
-        BigDecimal[] range =
-            "RANGE".equals(check) ? range(row.text(PARAMETERS)) : new BigDecimal[2];
+        String check = ruleType(row);
+        Bounds range =
+            RANGE.equals(check) ? range(row.text(PARAMETERS)).orElse(NO_BOUNDS) : NO_BOUNDS;
         yield columns(
             "label",
             row.text(NAME),
-            "required",
+            REQUIRED_COLUMN,
             mandatory,
             "rule_type",
             check,
             "lov_type",
-            "LOV".equals(check) ? row.text(PARAMETERS) : null,
+            LOV.equals(check) ? row.text(PARAMETERS) : null,
             "min_value",
-            range[0],
+            range.min(),
             "max_value",
-            range[1],
+            range.max(),
             "pattern",
-            "PATTERN".equals(check) ? row.text(PARAMETERS) : null);
+            PATTERN.equals(check) ? row.text(PARAMETERS) : null);
       }
-      default -> columns("required", mandatory);
+      default -> columns(REQUIRED_COLUMN, mandatory);
     };
   }
 
@@ -387,12 +408,12 @@ public class CoverageRuleUpload extends ConfigUploadHandler {
       rows.add(
           exportRow(
               RECORD, FIELD_RULE,
-              SCOPE, r.get("scope_code"),
+              SCOPE, r.get(SCOPE_CODE),
               CODE, ("ITEM".equals(r.get("target")) ? ITEM_PREFIX : "") + r.get("field_key"),
               NAME, r.get("label"),
               KIND, CHECK_LABELS.getOrDefault(type, type),
               PARAMETERS, parameters(type, r),
-              MANDATORY, r.get("required")));
+              MANDATORY, r.get(REQUIRED_COLUMN)));
     }
     for (Map<String, Object> r :
         db.rows(
@@ -403,21 +424,21 @@ public class CoverageRuleUpload extends ConfigUploadHandler {
       rows.add(
           exportRow(
               RECORD, DOCUMENT_RULE,
-              SCOPE, r.get("scope_code"),
+              SCOPE, r.get(SCOPE_CODE),
               CODE, r.get("document_type"),
               NAME, r.get("label"),
               KIND, "Presence",
               DOCUMENT, r.get("document_type"),
-              MANDATORY, r.get("required")));
+              MANDATORY, r.get(REQUIRED_COLUMN)));
     }
     return rows;
   }
 
   private static String parameters(String type, Map<String, Object> r) {
     return switch (type) {
-      case "LOV" -> (String) r.get("lov_type");
-      case "PATTERN" -> (String) r.get("pattern");
-      case "RANGE" -> plain(r.get("min_value")) + ";" + plain(r.get("max_value"));
+      case LOV -> (String) r.get("lov_type");
+      case PATTERN -> (String) r.get("pattern");
+      case RANGE -> plain(r.get("min_value")) + ";" + plain(r.get("max_value"));
       default -> null;
     };
   }

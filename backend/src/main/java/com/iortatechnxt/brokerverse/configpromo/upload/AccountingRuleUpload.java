@@ -29,6 +29,8 @@ public class AccountingRuleUpload extends ConfigUploadHandler {
   static final String NARRATION = "Narration";
 
   private static final int MAX_LINE = 999;
+  private static final java.util.regex.Pattern ACCOUNT_ROLE =
+      java.util.regex.Pattern.compile("@[A-Z0-9_]+");
 
   /**
    * Creates the handler.
@@ -120,16 +122,11 @@ public class AccountingRuleUpload extends ConfigUploadHandler {
     }
     oneOf(errors, SIDE, row.text(SIDE), List.of("DEBIT", "CREDIT"));
     String account = row.text(ACCOUNT);
-    boolean role =
-        account.startsWith("@")
-            && account.length() > 1
-            && account.substring(1).matches("[A-Z0-9_]+");
-    if (!role && !db.account(context.companyId(), account)) {
-      errors.add(
-          error(
-              ACCOUNT,
-              account + " is not an account of the company nor an account role such as @BANK"));
-    }
+    check(
+        errors,
+        !ACCOUNT_ROLE.matcher(account).matches() && !db.account(context.companyId(), account),
+        ACCOUNT,
+        account + " is not an account of the company nor an account role such as @BANK");
     if (row.text(LINE_OF_BUSINESS) != null
         && !db.exists(
             "select 1 from dim_value where company_id = ? and dimension_type = 'BUSINESS_LINE' and code = ?",

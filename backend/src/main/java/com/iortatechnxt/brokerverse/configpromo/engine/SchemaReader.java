@@ -53,25 +53,25 @@ public final class SchemaReader {
         COLUMNS,
         rs -> {
           columns
-              .computeIfAbsent(rs.getString(1), t -> new LinkedHashMap<>())
+              .computeIfAbsent(rs.getString("table_name"), t -> new LinkedHashMap<>())
               .put(
-                  rs.getString(2),
+                  rs.getString("column_name"),
                   new ColumnInfo(
-                      rs.getString(2),
-                      rs.getString(3),
-                      "YES".equals(rs.getString(4)),
-                      rs.getBoolean(5)));
+                      rs.getString("column_name"),
+                      rs.getString("udt_name"),
+                      "YES".equals(rs.getString("is_nullable")),
+                      rs.getBoolean("has_default")));
         });
     Map<String, List<ForeignKey>> keys = new HashMap<>();
     jdbc.query(
         FOREIGN_KEYS,
         rs -> {
-          keys.computeIfAbsent(rs.getString(1), t -> new ArrayList<>())
+          keys.computeIfAbsent(rs.getString("table_name"), t -> new ArrayList<>())
               .add(
                   new ForeignKey(
-                      Arrays.asList(rs.getString(3).split(",")),
-                      rs.getString(2),
-                      Arrays.asList(rs.getString(4).split(","))));
+                      Arrays.asList(rs.getString("cols").split(",")),
+                      rs.getString("target_table"),
+                      Arrays.asList(rs.getString("target_cols").split(","))));
         });
     Map<String, TableSchema> tables = new LinkedHashMap<>();
     columns.forEach(

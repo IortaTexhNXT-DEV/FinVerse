@@ -51,6 +51,8 @@ public class ListParameterUpload extends ConfigUploadHandler {
           "PACKAGE_EXPIRY_REMINDER_DAYS",
           "PKG_ADVISORY_GROUPS");
 
+  private static final int MAX_CODE = 40;
+
   private final ListParameterRows lists;
 
   /**
@@ -134,19 +136,29 @@ public class ListParameterUpload extends ConfigUploadHandler {
       errors.add(error(LIST, list + " is not a list or parameter of Product Maintenance"));
       return errors;
     }
-    lists.checkCode(row.text(CODE), 40).ifPresent(e -> errors.add(error(CODE, e)));
+    lists.checkCode(row.text(CODE), MAX_CODE).ifPresent(e -> errors.add(error(CODE, e)));
+    checkOrder(row, errors);
+    check(
+        errors,
+        row.text(FROM) != null && UploadCells.date(row.text(FROM)) == null,
+        FROM,
+        "give the date as dd-MMM-yyyy");
+    return errors;
+  }
+
+  private static void checkOrder(BulkRow row, List<String> errors) {
     List<String> order = UploadCells.parts(row.text(ORDER), 2);
     BigDecimal sort = UploadCells.number(order.get(0));
-    if (order.get(0) != null && (sort == null || sort.stripTrailingZeros().scale() > 0)) {
-      errors.add(error(ORDER, "the order is a whole number"));
-    }
-    if (order.get(1) != null && UploadCells.yes(order.get(1)) == null) {
-      errors.add(error(ORDER, "active is Y or N"));
-    }
-    if (row.text(FROM) != null && UploadCells.date(row.text(FROM)) == null) {
-      errors.add(error(FROM, "give the date as dd-MMM-yyyy"));
-    }
-    return errors;
+    check(
+        errors,
+        order.get(0) != null && (sort == null || sort.stripTrailingZeros().scale() > 0),
+        ORDER,
+        "the order is a whole number");
+    check(
+        errors,
+        order.get(1) != null && UploadCells.yes(order.get(1)).isEmpty(),
+        ORDER,
+        "active is Y or N");
   }
 
   @Override
@@ -170,7 +182,7 @@ public class ListParameterUpload extends ConfigUploadHandler {
         row.text(CODE),
         row.text(LABEL),
         sort == null ? null : sort.intValue(),
-        !Boolean.FALSE.equals(UploadCells.yes(order.get(1))),
+        UploadCells.yes(order.get(1)).orElse(Boolean.TRUE),
         from,
         context);
     return row.text(LIST) + " " + row.text(CODE);

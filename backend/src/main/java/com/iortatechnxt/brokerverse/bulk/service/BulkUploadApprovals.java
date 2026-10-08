@@ -98,15 +98,16 @@ public class BulkUploadApprovals {
    */
   public BulkJob approve(Long jobId, String note) {
     BulkJob approved =
-        tx.execute(
-            s -> {
-              BulkJob job = bulk.job(jobId);
-              BulkImportHandler handler = registry.get(job.getHandlerCode());
-              requireApprover(handler);
-              job.approve(currentUser.username(), clock.instant(), note);
-              audit.record(ENTITY, job.getJobNo(), AuditAction.AUTHORIZE, "Approved for apply");
-              return jobs.save(job);
-            });
+        required(
+            tx.execute(
+                s -> {
+                  BulkJob job = bulk.job(jobId);
+                  BulkImportHandler handler = registry.get(job.getHandlerCode());
+                  requireApprover(handler);
+                  job.approve(currentUser.username(), clock.instant(), note);
+                  audit.record(ENTITY, job.getJobNo(), AuditAction.AUTHORIZE, "Approved for apply");
+                  return jobs.save(job);
+                }));
     return bulk.applyValidRows(approved, registry.get(approved.getHandlerCode()));
   }
 
@@ -149,5 +150,13 @@ public class BulkUploadApprovals {
       throw new BusinessRuleException(
           "BULK_APPROVAL_NOT_ALLOWED", "You may not approve uploads of " + handler.title());
     }
+  }
+
+  /** The result of a transaction callback that always returns one. */
+  private static <T> T required(T result) {
+    if (result == null) {
+      throw new IllegalStateException("The transaction returned no result");
+    }
+    return result;
   }
 }

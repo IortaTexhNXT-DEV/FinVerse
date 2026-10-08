@@ -10,7 +10,6 @@ import com.iortatechnxt.brokerverse.bulk.service.BulkRow;
 import com.iortatechnxt.brokerverse.catalog.service.IncentiveRuleParameters;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -28,7 +27,12 @@ import org.springframework.stereotype.Component;
  * later effective date adds the successor and ends the criterion in force the day before.
  */
 @Component
+// Criteria, value, rule parameters, products and successors of one tab.
+@SuppressWarnings("PMD.GodClass")
 public class IncentiveCriteriaUpload extends ConfigUploadHandler {
+  private static final String RULE = "RULE";
+  private static final String FIXED_AMOUNT = "FIXED_AMOUNT";
+  private static final String RATE = "RATE";
 
   static final String CODE = "Code / Name";
   static final String TYPE = "Incentive type";
@@ -40,13 +44,10 @@ public class IncentiveCriteriaUpload extends ConfigUploadHandler {
   private static final String TABLE = "cat_incentive_criteria";
   private static final Map<String, String> BASES =
       Map.of(
-          "RATE (%)", "RATE",
-          "RATE", "RATE",
-          "FIXED AMOUNT", "FIXED_AMOUNT",
-          "FIXED_AMOUNT", "FIXED_AMOUNT",
-          "RULE", "RULE");
+          "RATE (%)",
+          RATE, RATE, RATE, "FIXED AMOUNT", FIXED_AMOUNT, FIXED_AMOUNT, FIXED_AMOUNT, RULE, RULE);
   private static final Map<String, String> BASIS_LABELS =
-      Map.of("RATE", "Rate (%)", "FIXED_AMOUNT", "Fixed amount", "RULE", "Rule");
+      Map.of(RATE, "Rate (%)", FIXED_AMOUNT, "Fixed amount", RULE, "Rule");
   private static final Pattern CODE_FORMAT = Pattern.compile("[A-Z0-9_-]{1,30}");
   private static final Pattern PAIR =
       Pattern.compile("\\s*(.+?)\\s*(?:=|:|\\s)\\s*([^\\s=:]+)\\s*");
@@ -129,66 +130,87 @@ public class IncentiveCriteriaUpload extends ConfigUploadHandler {
 
   @Override
   public String duplicateKey(BulkRow row) {
-    LocalDate[] dates = UploadCells.dates(row.text(EFFECTIVE));
-    return UploadCells.parts(row.text(CODE), 2).get(0) + "|" + (dates == null ? "" : dates[0]);
+    return UploadCells.parts(row.text(CODE), 2).get(0)
+        + "|"
+        + UploadCells.period(row.text(EFFECTIVE)).map(d -> d.from().toString()).orElse("");
   }
 
   @Override
   public List<String> validate(BulkRow row, BulkContext context) {
     List<String> errors = errors();
     List<String> code = UploadCells.parts(row.text(CODE), 2);
-    if (code.get(0) == null || !CODE_FORMAT.matcher(code.get(0)).matches() || code.get(1) == null) {
-      errors.add(error(CODE, "give the code (A-Z, 0-9, _ and -) and, after a semicolon, the name"));
-    }
-    if (!db.listValue("INCENTIVE_TYPE", row.text(TYPE))) {
-      errors.add(error(TYPE, row.text(TYPE) + " is not an incentive type"));
-    }
-    List<String> value = UploadCells.parts(row.text(VALUE), 2);
-    String basis = basis(row);
-    if (basis == null) {
-      errors.add(error(VALUE, "the value basis is Rate (%), Fixed amount or Rule"));
-    } else if (!"RULE".equals(basis)) {
-      BigDecimal v = UploadCells.number(value.get(1));
-      if (v == null
-          || v.signum() < 0
-          || "RATE".equals(basis) && v.compareTo(BigDecimal.valueOf(100)) > 0) {
-        errors.add(
-            error(VALUE, "give the value after a semicolon (a rate from 0 to 100, or an amount)"));
-      }
-    }
+    check(
+        errors,
+        code.get(0) == null || !CODE_FORMAT.matcher(code.get(0)).matches() || code.get(1) == null,
+        CODE,
+        "give the code (A-Z, 0-9, _ and -) and, after a semicolon, the name");
+    check(
+        errors,
+        !db.listValue("INCENTIVE_TYPE", row.text(TYPE)),
+        TYPE,
+        row.text(TYPE) + " is not an incentive type");
+    validateValue(row, errors);
     try {
       ruleParameters.check(row.text(TYPE), params(row));
     } catch (BusinessRuleException e) {
       errors.add(error(PARAMETERS, e.getMessage()));
     }
-    for (String line : products(row)) {
-      String product = UploadCells.parts(line, 2).get(0);
-      if (!db.exists(
-          "select 1 from cat_product where code = ? and record_status = 'ACTIVE' and lifecycle_status = 'ACTIVE'",
-          product)) {
-        errors.add(error(PRODUCTS, product + " is not an active product"));
-      }
-    }
-    if (products(row).isEmpty()) {
-      errors.add(error(PRODUCTS, "give at least one product"));
-    }
-    LocalDate[] dates = UploadCells.dates(row.text(EFFECTIVE));
-    if (dates == null) {
-      errors.add(
-          error(
-              EFFECTIVE, "give the first day as dd-MMM-yyyy and, after a semicolon, the last day"));
-    } else if (errors.isEmpty() && overlaps(context, code.get(0), dates)) {
-      errors.add(
-          error(EFFECTIVE, "criterion " + code.get(0) + " already covers part of this period"));
-    }
+    validateProducts(row, errors);
+    Optional<UploadCells.Period> dates = UploadCells.period(row.text(EFFECTIVE));
+    check(
+        errors,
+        dates.isEmpty(),
+        EFFECTIVE,
+        "give the first day as dd-MMM-yyyy and, after a semicolon, the last day");
+    check(
+        errors,
+        errors.isEmpty() && overlaps(context, code.get(0), dates.orElseThrow()),
+        EFFECTIVE,
+        "criterion " + code.get(0) + " already covers part of this period");
     return errors;
+  }
+
+  private static void validateValue(BulkRow row, List<String> errors) {
+    String basis = basis(row);
+    check(errors, basis == null, VALUE, "the value basis is Rate (%), Fixed amount or Rule");
+    if (basis != null && !RULE.equals(basis)) {
+      checkAmount(row, basis, errors);
+    }
+  }
+
+  private static void checkAmount(BulkRow row, String basis, List<String> errors) {
+    BigDecimal v = UploadCells.number(UploadCells.parts(row.text(VALUE), 2).get(1));
+    boolean valid =
+        v != null
+            && v.signum() >= 0
+            && !(RATE.equals(basis) && v.compareTo(BigDecimal.valueOf(100)) > 0);
+    check(
+        errors,
+        !valid,
+        VALUE,
+        "give the value after a semicolon (a rate from 0 to 100, or an amount)");
+  }
+
+  private void validateProducts(BulkRow row, List<String> errors) {
+    List<String> lines = products(row);
+    check(errors, lines.isEmpty(), PRODUCTS, "give at least one product");
+    for (String line : lines) {
+      String product = UploadCells.parts(line, 2).get(0);
+      check(
+          errors,
+          !db.exists(
+              "select 1 from cat_product where code = ? and record_status = 'ACTIVE' and lifecycle_status = 'ACTIVE'",
+              product),
+          PRODUCTS,
+          product + " is not an active product");
+    }
   }
 
   /**
    * Another criterion with the code over the period, other than the one in force that a later row
    * succeeds.
    */
-  private boolean overlaps(BulkContext context, String code, LocalDate[] dates) {
+  private boolean overlaps(BulkContext context, String code, UploadCells.Period dates) {
     return db.exists(
         "select 1 from cat_incentive_criteria where company_id = ? and code = ? and record_status <> 'INACTIVE'"
             + " and effective_from <> ? and not (effective_to is null and effective_from < ?)"
@@ -196,11 +218,11 @@ public class IncentiveCriteriaUpload extends ConfigUploadHandler {
             + " and (effective_to is null or effective_to >= ?)",
         context.companyId(),
         code,
-        dates[0],
-        dates[0],
-        dates[1],
-        dates[1],
-        dates[0]);
+        dates.from(),
+        dates.from(),
+        dates.to(),
+        dates.to(),
+        dates.from());
   }
 
   private static String basis(BulkRow row) {
@@ -252,7 +274,7 @@ public class IncentiveCriteriaUpload extends ConfigUploadHandler {
     return columns(
         "company_id", context.companyId(),
         "code", UploadCells.parts(row.text(CODE), 2).get(0),
-        "effective_from", UploadCells.dates(row.text(EFFECTIVE))[0]);
+        "effective_from", UploadCells.periodOf(row.text(EFFECTIVE)).from());
   }
 
   @Override
@@ -263,7 +285,7 @@ public class IncentiveCriteriaUpload extends ConfigUploadHandler {
   @Override
   protected String apply(BulkRow row, BulkContext context) {
     String code = UploadCells.parts(row.text(CODE), 2).get(0);
-    LocalDate[] dates = UploadCells.dates(row.text(EFFECTIVE));
+    UploadCells.Period dates = UploadCells.periodOf(row.text(EFFECTIVE));
     String basis = basis(row);
     Map<String, Object> values =
         columns(
@@ -274,13 +296,13 @@ public class IncentiveCriteriaUpload extends ConfigUploadHandler {
             "value_basis",
             basis,
             "value",
-            "RULE".equals(basis)
+            RULE.equals(basis)
                 ? null
                 : UploadCells.number(UploadCells.parts(row.text(VALUE), 2).get(1)),
             "rule_params",
             params(row),
             "effective_to",
-            dates[1]);
+            dates.to());
     if (UploadSupport.ADD.equals(previewAction(row, context))) {
       Optional<Long> predecessor =
           db.id(
@@ -288,19 +310,19 @@ public class IncentiveCriteriaUpload extends ConfigUploadHandler {
                   + " and effective_to is null and effective_from < ?",
               context.companyId(),
               code,
-              dates[0]);
+              dates.from());
       predecessor.ifPresent(
           id -> {
             db.execute(
                 "update cat_incentive_criteria set effective_to = ?, version = version + 1 where id = ?",
-                dates[0].minusDays(1),
+                dates.from().minusDays(1),
                 id);
             values.put("successor_of", id);
           });
     }
     long id = db.upsert(TABLE, key(row, context), values, context, "Incentive criteria");
     replaceProducts(id, row);
-    return code + " from " + dates[0];
+    return code + " from " + dates.from();
   }
 
   private void replaceProducts(long id, BulkRow row) {
@@ -345,7 +367,8 @@ public class IncentiveCriteriaUpload extends ConfigUploadHandler {
       List<String> products = new ArrayList<>();
       for (Map<String, Object> p :
           db.rows(
-              "select product_code, market_segment from cat_incentive_criteria_product where criteria_id = ? order by id",
+              "select product_code, market_segment from cat_incentive_criteria_product"
+                  + " where criteria_id = ? order by id",
               r.get("id"))) {
         products.add(
             p.get("market_segment") == null

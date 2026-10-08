@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.configpromo.engine.CatalogueModel;
 import com.iortatechnxt.brokerverse.configpromo.engine.DatasetReader;
 import com.iortatechnxt.brokerverse.configpromo.engine.SchemaReader;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +20,7 @@ public class CatalogueService {
 
   private final JdbcTemplate jdbc;
   private final ConfigCatalogue catalogue = ConfigCatalogue.load();
-  private volatile CatalogueModel model;
+  private final AtomicReference<CatalogueModel> model = new AtomicReference<>();
 
   /**
    * Creates the service.
@@ -45,17 +46,12 @@ public class CatalogueService {
    * @return model
    */
   public CatalogueModel model() {
-    CatalogueModel current = model;
-    if (current == null) {
-      synchronized (this) {
-        current = model;
-        if (current == null) {
-          current = new CatalogueModel(catalogue, SchemaReader.read(jdbc));
-          model = current;
-        }
-      }
+    CatalogueModel current = model.get();
+    if (current != null) {
+      return current;
     }
-    return current;
+    CatalogueModel read = new CatalogueModel(catalogue, SchemaReader.read(jdbc));
+    return model.compareAndSet(null, read) ? read : model.get();
   }
 
   /**

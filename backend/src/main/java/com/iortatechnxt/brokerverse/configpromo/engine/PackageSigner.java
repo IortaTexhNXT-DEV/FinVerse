@@ -70,11 +70,9 @@ public final class PackageSigner {
    * @return true when valid
    */
   public boolean verify(byte[] content, String signature) {
-    if (signature == null) {
-      return false;
-    }
-    return MessageDigest.isEqual(
-        sign(content).getBytes(StandardCharsets.US_ASCII),
-        signature.getBytes(StandardCharsets.US_ASCII));
+    return signature != null
+        && MessageDigest.isEqual(
+            sign(content).getBytes(StandardCharsets.US_ASCII),
+            signature.getBytes(StandardCharsets.US_ASCII));
   }
 }

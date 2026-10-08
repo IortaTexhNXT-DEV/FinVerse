@@ -28,7 +28,10 @@ import org.springframework.stereotype.Component;
  * audit entry per record and the clearing of the reference-data caches after an upload.
  */
 @Component
+// One helper of the 27 uploads: lookups, preview and upsert.
+@SuppressWarnings("PMD.GodClass")
 public class UploadSupport {
+  private static final String VERSION = "version";
 
   /** Preview: a new record. */
   public static final String ADD = "ADD";
@@ -213,25 +216,17 @@ public class UploadSupport {
       String entity) {
     TableSchema schema = schema(table);
     Optional<Long> existing = find(table, key);
-    Map<String, Object> all = new LinkedHashMap<>(values);
+    Map<String, Object> all = withApproval(schema, values);
     String maker = context.maker() == null ? currentUser.username() : context.maker();
-    if (schema.has(RECORD_STATUS) && !all.containsKey(RECORD_STATUS)) {
-      all.put(RECORD_STATUS, ACTIVE);
-    }
-    if (schema.has("authorized_by") && ACTIVE.equals(all.get(RECORD_STATUS))) {
-      all.put("authorized_by", currentUser.username());
-      all.put("authorized_at", clock.instant());
-    }
     String keyText = key.values().stream().map(String::valueOf).collect(Collectors.joining(" / "));
     try {
-      if (existing.isPresent() && same(schema, key, all)) {
-        return existing.get();
-      }
       if (existing.isPresent()) {
-        putIfPresent(schema, all, "updated_at", clock.instant());
-        putIfPresent(schema, all, "updated_by", maker);
-        update(schema, key, all);
-        audit.record(entity, keyText, AuditAction.UPDATE, "Updated by upload " + context.jobNo());
+        if (!same(schema, key, all)) {
+          putIfPresent(schema, all, "updated_at", clock.instant());
+          putIfPresent(schema, all, "updated_by", maker);
+          update(schema, key, all);
+          audit.record(entity, keyText, AuditAction.UPDATE, "Updated by upload " + context.jobNo());
+        }
         return existing.get();
       }
       Map<String, Object> insert = new LinkedHashMap<>(key);
@@ -249,6 +244,21 @@ public class UploadSupport {
               + NestedExceptionUtils.getMostSpecificCause(e).getMessage(),
           e);
     }
+  }
+
+  /**
+   * The values with the record status and, for an active record, its authorisation by the approver.
+   */
+  private Map<String, Object> withApproval(TableSchema schema, Map<String, Object> values) {
+    Map<String, Object> all = new LinkedHashMap<>(values);
+    if (schema.has(RECORD_STATUS)) {
+      all.putIfAbsent(RECORD_STATUS, ACTIVE);
+    }
+    if (schema.has("authorized_by") && ACTIVE.equals(all.get(RECORD_STATUS))) {
+      all.put("authorized_by", currentUser.username());
+      all.put("authorized_at", clock.instant());
+    }
+    return all;
   }
 
   /**
@@ -305,9 +315,9 @@ public class UploadSupport {
 
   private void insert(TableSchema schema, Map<String, Object> values) {
     List<String> columns = new ArrayList<>(values.keySet());
-    if (schema.has("version") && !values.containsKey("version")) {
-      columns.add("version");
-      values.put("version", 0L);
+    if (schema.has(VERSION) && !values.containsKey(VERSION)) {
+      columns.add(VERSION);
+      values.put(VERSION, 0L);
     }
     String sql =
         "insert into "
@@ -326,7 +336,7 @@ public class UploadSupport {
         columns.stream()
             .map(c -> c + " = " + placeholder(schema, c))
             .collect(Collectors.joining(", "));
-    if (schema.has("version")) {
+    if (schema.has(VERSION)) {
       set += ", version = version + 1";
     }
     List<Object> params = params(schema, columns, values);

@@ -23,6 +23,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class DocumentTemplateUpload extends ConfigUploadHandler {
+  private static final String TITLE_FIELD = "title";
+  private static final String REFERENCE = "reference";
 
   static final String TEMPLATE = "Template";
   static final String TITLE = "Title";
@@ -51,11 +53,11 @@ public class DocumentTemplateUpload extends ConfigUploadHandler {
   private static Map<String, Set<String>> mergeFields() {
     Map<String, Set<String>> m = new LinkedHashMap<>();
     Set<String> advisory =
-        Set.of("productCode", "productName", "versionNo", "effectiveFrom", "reference");
-    m.put("PKG_REQUEST_FORM", Set.of("reference", "requestType", "title"));
-    m.put("PKG_QUOTATION_SLIP", Set.of("reference", "roundNo", "replyBy"));
-    m.put("PKG_COMPARATIVE", Set.of("reference", "roundNo", "variant"));
-    m.put("PKG_SLIP", Set.of("reference", "title"));
+        Set.of("productCode", "productName", "versionNo", "effectiveFrom", REFERENCE);
+    m.put("PKG_REQUEST_FORM", Set.of(REFERENCE, "requestType", TITLE_FIELD));
+    m.put("PKG_QUOTATION_SLIP", Set.of(REFERENCE, "roundNo", "replyBy"));
+    m.put("PKG_COMPARATIVE", Set.of(REFERENCE, "roundNo", "variant"));
+    m.put("PKG_SLIP", Set.of(REFERENCE, TITLE_FIELD));
     m.put("PKG_ADVISORY", advisory);
     m.put("PKG_RENEWAL_ADVISORY", advisory);
     return m;
@@ -155,7 +157,7 @@ public class DocumentTemplateUpload extends ConfigUploadHandler {
     return db.rows(LATEST, row.text(TEMPLATE)).stream()
         .anyMatch(
             r ->
-                Objects.equals(r.get("title"), row.text(TITLE))
+                Objects.equals(r.get(TITLE_FIELD), row.text(TITLE))
                     && Objects.equals(r.get("body"), row.text(TEXT))
                     && Objects.equals(
                         String.valueOf(r.get("effective_from")), String.valueOf(row.date(FROM))));
@@ -191,7 +193,7 @@ public class DocumentTemplateUpload extends ConfigUploadHandler {
         rows.add(
             exportRow(
                 TEMPLATE, code,
-                TITLE, r.get("title"),
+                TITLE, r.get(TITLE_FIELD),
                 TEXT, r.get("body"),
                 FIELDS, used.isEmpty() ? null : String.join(", ", used),
                 FROM, r.get("effective_from")));

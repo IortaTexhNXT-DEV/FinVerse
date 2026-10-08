@@ -18,6 +18,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class RateTableUpload extends ConfigUploadHandler {
+  private static final String EFFECTIVE_TO = "effective_to";
+  private static final String EFFECTIVE_FROM = "effective_from";
 
   static final String TABLE_COLUMN = "Table";
   static final String RATE = "Rate";
@@ -42,6 +44,9 @@ public class RateTableUpload extends ConfigUploadHandler {
           "MOTOR_OD_ANNUAL",
           "MOTOR_OD_MULTI_YEAR");
   private static final BigDecimal HUNDRED = BigDecimal.valueOf(100);
+  private static final int LIMIT_PARTS = 3;
+  private static final int MAX_DECIMALS = 4;
+  private static final int MAX_MONTHS = 12;
 
   /**
    * Creates the handler.
@@ -109,15 +114,15 @@ public class RateTableUpload extends ConfigUploadHandler {
 
   @Override
   public String duplicateKey(BulkRow row) {
-    LocalDate[] dates = UploadCells.dates(row.text(EFFECTIVE));
+    String from = UploadCells.period(row.text(EFFECTIVE)).map(d -> d.from().toString()).orElse("");
     return String.join(
         "|",
         String.valueOf(row.text(TABLE_COLUMN)),
         String.valueOf(rateCode(row)),
         String.valueOf(row.text(LINE)),
         String.valueOf(row.text(MONTHS)),
-        String.valueOf(UploadCells.parts(row.text(LIMIT), 3).subList(0, 2)),
-        dates == null ? "" : dates[0].toString());
+        String.valueOf(UploadCells.parts(row.text(LIMIT), LIMIT_PARTS).subList(0, 2)),
+        from);
   }
 
   @Override
@@ -125,50 +130,68 @@ public class RateTableUpload extends ConfigUploadHandler {
     List<String> errors = errors();
     String table = row.text(TABLE_COLUMN);
     oneOf(errors, TABLE_COLUMN, table, TABLES);
-    if (UploadCells.dates(row.text(EFFECTIVE)) == null) {
-      errors.add(
-          error(
-              EFFECTIVE, "give the first day as dd-MMM-yyyy and, after a semicolon, the last day"));
-    }
-    if (row.text(LINE) != null
-        && !db.exists("select 1 from cat_product_line where code = ?", row.text(LINE))) {
-      errors.add(error(LINE, row.text(LINE) + " is not a line"));
-    }
+    check(
+        errors,
+        UploadCells.period(row.text(EFFECTIVE)).isEmpty(),
+        EFFECTIVE,
+        "give the first day as dd-MMM-yyyy and, after a semicolon, the last day");
+    String line = row.text(LINE);
+    check(
+        errors,
+        line != null && !db.exists("select 1 from cat_product_line where code = ?", line),
+        LINE,
+        line + " is not a line");
     if (TAX.equals(table)) {
-      if (!RATE_CODES.contains(rateCode(row))) {
-        errors.add(error(RATE, "use one of " + String.join(", ", RATE_CODES)));
-      }
+      check(
+          errors,
+          !RATE_CODES.contains(rateCode(row)),
+          RATE,
+          "use one of " + String.join(", ", RATE_CODES));
       percent(row, errors);
     } else if (SHORT_PERIOD.equals(table)) {
       percent(row, errors);
       BigDecimal months = UploadCells.number(row.text(MONTHS));
-      if (months == null
-          || months.stripTrailingZeros().scale() > 0
-          || months.intValue() < 1
-          || months.intValue() > 12) {
-        errors.add(error(MONTHS, "enter a whole number from 1 to 12"));
-      }
+      check(errors, months == null, MONTHS, "enter the months covered");
+      whole(errors, MONTHS, months, 1, MAX_MONTHS);
     } else if (MOTOR_LIMIT.equals(table)) {
-      List<String> parts = UploadCells.parts(row.text(LIMIT), 3);
-      BigDecimal limit = UploadCells.number(parts.get(1));
-      BigDecimal premium = UploadCells.number(parts.get(2));
-      if (!List.of("BI", "PD").contains(String.valueOf(parts.get(0)).toUpperCase(Locale.ROOT))
-          || limit == null
-          || limit.signum() <= 0
-          || premium == null
-          || premium.signum() < 0) {
-        errors.add(
-            error(LIMIT, "give BI or PD, the limit and the premium separated by semicolons"));
-      }
+      check(
+          errors,
+          motor(row).isEmpty(),
+          LIMIT,
+          "give BI or PD, the limit and the premium separated by semicolons");
     }
     return errors;
   }
 
+  /** A compulsory motor limit: coverage, limit and premium. */
+  private record MotorLimit(String coverage, BigDecimal limit, BigDecimal premium) {}
+
+  private static java.util.Optional<MotorLimit> motor(BulkRow row) {
+    List<String> parts = UploadCells.parts(row.text(LIMIT), LIMIT_PARTS);
+    String coverage = parts.get(0) == null ? "" : parts.get(0).toUpperCase(Locale.ROOT);
+    BigDecimal limit = UploadCells.number(parts.get(1));
+    BigDecimal premium = UploadCells.number(parts.get(2));
+    boolean valid =
+        List.of("BI", "PD").contains(coverage)
+            && limit != null
+            && limit.signum() > 0
+            && premium != null
+            && premium.signum() >= 0;
+    return valid
+        ? java.util.Optional.of(new MotorLimit(coverage, limit, premium))
+        : java.util.Optional.empty();
+  }
+
   private static void percent(BulkRow row, List<String> errors) {
     BigDecimal rate = UploadCells.number(row.text(PERCENT));
-    if (rate == null || rate.signum() < 0 || rate.compareTo(HUNDRED) > 0 || rate.scale() > 4) {
-      errors.add(error(PERCENT, "enter a rate from 0 to 100 with up to four decimals"));
-    }
+    check(
+        errors,
+        rate == null
+            || rate.signum() < 0
+            || rate.compareTo(HUNDRED) > 0
+            || rate.scale() > MAX_DECIMALS,
+        PERCENT,
+        "enter a rate from 0 to 100 with up to four decimals");
   }
 
   private static String rateCode(BulkRow row) {
@@ -185,22 +208,19 @@ public class RateTableUpload extends ConfigUploadHandler {
   }
 
   private static Map<String, Object> key(BulkRow row) {
-    LocalDate from = UploadCells.dates(row.text(EFFECTIVE))[0];
+    LocalDate from = UploadCells.periodOf(row.text(EFFECTIVE)).from();
     return switch (row.text(TABLE_COLUMN)) {
       case TAX ->
-          columns("rate_code", rateCode(row), "line_code", row.text(LINE), "effective_from", from);
+          columns("rate_code", rateCode(row), "line_code", row.text(LINE), EFFECTIVE_FROM, from);
       case SHORT_PERIOD ->
           columns(
               "months_covered",
               UploadCells.number(row.text(MONTHS)).intValue(),
-              "effective_from",
+              EFFECTIVE_FROM,
               from);
       default -> {
-        List<String> parts = UploadCells.parts(row.text(LIMIT), 3);
-        yield columns(
-            "coverage", parts.get(0).toUpperCase(Locale.ROOT),
-            "limit_amount", UploadCells.number(parts.get(1)),
-            "effective_from", from);
+        MotorLimit m = motor(row).orElseThrow();
+        yield columns("coverage", m.coverage(), "limit_amount", m.limit(), EFFECTIVE_FROM, from);
       }
     };
   }
@@ -212,19 +232,13 @@ public class RateTableUpload extends ConfigUploadHandler {
 
   @Override
   protected String apply(BulkRow row, BulkContext context) {
-    LocalDate to = UploadCells.dates(row.text(EFFECTIVE))[1];
+    LocalDate to = UploadCells.periodOf(row.text(EFFECTIVE)).to();
     Map<String, Object> values =
         switch (row.text(TABLE_COLUMN)) {
-          case TAX -> columns("rate", UploadCells.number(row.text(PERCENT)), "effective_to", to);
+          case TAX -> columns("rate", UploadCells.number(row.text(PERCENT)), EFFECTIVE_TO, to);
           case SHORT_PERIOD ->
-              columns(
-                  "percent_of_annual", UploadCells.number(row.text(PERCENT)), "effective_to", to);
-          default ->
-              columns(
-                  "premium",
-                  UploadCells.number(UploadCells.parts(row.text(LIMIT), 3).get(2)),
-                  "effective_to",
-                  to);
+              columns("percent_of_annual", UploadCells.number(row.text(PERCENT)), EFFECTIVE_TO, to);
+          default -> columns("premium", motor(row).orElseThrow().premium(), EFFECTIVE_TO, to);
         };
     db.upsert(table(row), key(row), values, context, "Rate table " + label(row.text(TABLE_COLUMN)));
     return row.text(TABLE_COLUMN) + " " + key(row).values();
@@ -243,7 +257,7 @@ public class RateTableUpload extends ConfigUploadHandler {
               RATE, r.get("rate_code"),
               LINE, r.get("line_code"),
               PERCENT, r.get("rate"),
-              EFFECTIVE, UploadCells.range(r.get("effective_from"), r.get("effective_to"))));
+              EFFECTIVE, UploadCells.range(r.get(EFFECTIVE_FROM), r.get(EFFECTIVE_TO))));
     }
     for (Map<String, Object> r :
         db.rows(
@@ -254,7 +268,7 @@ public class RateTableUpload extends ConfigUploadHandler {
               TABLE_COLUMN, SHORT_PERIOD,
               PERCENT, r.get("percent_of_annual"),
               MONTHS, r.get("months_covered"),
-              EFFECTIVE, UploadCells.range(r.get("effective_from"), r.get("effective_to"))));
+              EFFECTIVE, UploadCells.range(r.get(EFFECTIVE_FROM), r.get(EFFECTIVE_TO))));
     }
     for (Map<String, Object> r :
         db.rows(
@@ -264,7 +278,7 @@ public class RateTableUpload extends ConfigUploadHandler {
           exportRow(
               TABLE_COLUMN, MOTOR_LIMIT,
               LIMIT, UploadCells.join(r.get("coverage"), r.get("limit_amount"), r.get("premium")),
-              EFFECTIVE, UploadCells.range(r.get("effective_from"), r.get("effective_to"))));
+              EFFECTIVE, UploadCells.range(r.get(EFFECTIVE_FROM), r.get(EFFECTIVE_TO))));
     }
     return rows;
   }

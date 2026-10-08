@@ -228,6 +228,51 @@ public abstract class ConfigUploadHandler implements BulkImportHandler {
   }
 
   /**
+   * Adds a message when a check fails.
+   *
+   * @param errors errors
+   * @param failed whether the check failed
+   * @param header column
+   * @param message message
+   */
+  protected static void check(List<String> errors, boolean failed, String header, String message) {
+    if (failed) {
+      errors.add(error(header, message));
+    }
+  }
+
+  /**
+   * Checks an optional whole number against its range.
+   *
+   * @param errors errors
+   * @param header column
+   * @param n value, may be null
+   * @param min lowest value
+   * @param max highest value
+   */
+  protected static void whole(List<String> errors, String header, BigDecimal n, int min, int max) {
+    if (n != null
+        && (n.stripTrailingZeros().scale() > 0
+            || n.compareTo(BigDecimal.valueOf(min)) < 0
+            || n.compareTo(BigDecimal.valueOf(max)) > 0)) {
+      errors.add(error(header, "enter a whole number from " + min + " to " + max));
+    }
+  }
+
+  /**
+   * Checks an optional rate in percent (0 to 100).
+   *
+   * @param errors errors
+   * @param header column
+   * @param rate value, may be null
+   */
+  protected static void percent(List<String> errors, String header, BigDecimal rate) {
+    if (rate != null && (rate.signum() < 0 || rate.compareTo(BigDecimal.valueOf(100)) > 0)) {
+      errors.add(error(header, "enter a rate from 0 to 100"));
+    }
+  }
+
+  /**
    * A new list of errors.
    *
    * @return list

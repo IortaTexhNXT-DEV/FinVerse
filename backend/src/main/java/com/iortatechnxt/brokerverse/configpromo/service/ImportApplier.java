@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -42,6 +44,8 @@ import org.springframework.transaction.support.TransactionTemplate;
  */
 @Service
 public class ImportApplier {
+
+  private static final Logger LOG = LoggerFactory.getLogger(ImportApplier.class);
 
   private static final String ENTITY = "ConfigImport";
 
@@ -129,8 +133,8 @@ public class ImportApplier {
     PromotionImport imp = imports.get(importId);
     requireWindow(imp);
     String approver = currentUser.username();
-    JobLock.Lease lease = guard.acquire();
-    try {
+    try (JobLock.Lease held = guard.acquire()) {
+      LOG.info("Import {} applied under fencing token {}", importId, held.fencingToken());
       tx.executeWithoutResult(
           s -> {
             PromotionImport current = imports.get(importId);
@@ -139,8 +143,6 @@ public class ImportApplier {
             audit.record(ENTITY, current.getImportNo(), AuditAction.AUTHORIZE, "Approved");
           });
       return apply(importId, imp.getPreparedBy(), approver);
-    } finally {
-      lease.close();
     }
   }
 
@@ -157,8 +159,11 @@ public class ImportApplier {
           "The pipeline may only prepare and submit the import here; a second user approves it");
     }
     String user = currentUser.username();
-    JobLock.Lease lease = guard.acquire();
-    try {
+    try (JobLock.Lease held = guard.acquire()) {
+      LOG.info(
+          "Import {} applied by the pipeline under fencing token {}",
+          importId,
+          held.fencingToken());
       tx.executeWithoutResult(
           s -> {
             PromotionImport current = imports.get(importId);
@@ -173,8 +178,6 @@ public class ImportApplier {
                 ENTITY, current.getImportNo(), AuditAction.AUTHORIZE, "Applied by the pipeline");
           });
       return apply(importId, user, user);
-    } finally {
-      lease.close();
     }
   }
 
@@ -200,12 +203,13 @@ public class ImportApplier {
     try {
       List<String> codes = codes(pkg, options);
       PromotionPackage snapshot =
-          tx.execute(
-              s ->
-                  exports.snapshot(
-                      codes,
-                      options.includeUsers(),
-                      "Configuration before import " + imp.getImportNo()));
+          required(
+              tx.execute(
+                  s ->
+                      exports.snapshot(
+                          codes,
+                          options.includeUsers(),
+                          "Configuration before import " + imp.getImportNo())));
       tx.executeWithoutResult(
           s -> applyInTransaction(importId, pkg, options, snapshot, maker, checker));
       caches.clearAll();
@@ -298,20 +302,32 @@ public class ImportApplier {
 
   private PromotionImport failed(Long importId, String message) {
     PromotionImport imp =
-        tx.execute(
-            s -> {
-              PromotionImport current = imports.get(importId);
-              current.failed(message);
-              repository.save(current);
-              audit.record(
-                  ENTITY, current.getImportNo(), AuditAction.REJECT, "Apply failed: " + message);
-              return current;
-            });
+        required(
+            tx.execute(
+                s -> {
+                  PromotionImport current = imports.get(importId);
+                  current.failed(message);
+                  repository.save(current);
+                  audit.record(
+                      ENTITY,
+                      current.getImportNo(),
+                      AuditAction.REJECT,
+                      "Apply failed: " + message);
+                  return current;
+                }));
     notifier.decided(
         imp,
         "CONFIG_IMPORT_FAILED",
         "Configuration import " + imp.getImportNo() + " failed",
         message);
     return imp;
+  }
+
+  /** The result of a transaction callback that always returns one. */
+  private static <T> T required(T result) {
+    if (result == null) {
+      throw new IllegalStateException("The transaction returned no result");
+    }
+    return result;
   }
 }

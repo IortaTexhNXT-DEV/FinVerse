@@ -49,7 +49,7 @@ public record ChangeWindow(Set<DayOfWeek> days, LocalTime from, LocalTime to) {
       return new ChangeWindow(
           days(parts[0], text), LocalTime.parse(hours[0]), LocalTime.parse(hours[1]));
     } catch (DateTimeParseException e) {
-      throw invalid(text);
+      throw invalid(text, e);
     }
   }
 
@@ -73,12 +73,17 @@ public record ChangeWindow(Set<DayOfWeek> days, LocalTime from, LocalTime to) {
   }
 
   private static BusinessRuleException invalid(String text) {
+    return invalid(text, null);
+  }
+
+  private static BusinessRuleException invalid(String text, Throwable cause) {
     return new BusinessRuleException(
         "CONFIG_WINDOW_INVALID",
         "The change window \""
             + text
             + "\" is not valid; write the days and the hours, for example"
-            + " SAT-SUN 20:00-06:00");
+            + " SAT-SUN 20:00-06:00",
+        cause);
   }
 
   /**

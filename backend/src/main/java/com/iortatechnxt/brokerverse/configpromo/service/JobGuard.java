@@ -50,23 +50,23 @@ public class JobGuard {
           "CONFIG_IMPORT_RUNNING",
           "Another configuration import is being applied; try again later");
     }
-    try {
-      for (String job : guardedJobs()) {
-        Optional<JobLock.Lease> probe = locks.tryAcquire(job);
-        if (probe.isEmpty()) {
-          throw new BusinessRuleException(
-              "CONFIG_IMPORT_JOB_RUNNING",
-              "The job "
-                  + job
-                  + " is running and reads the configuration; apply the import after it ends");
-        }
-        probe.get().close();
-      }
-    } catch (RuntimeException e) {
+    Optional<String> busy = guardedJobs().stream().filter(this::running).findFirst();
+    if (busy.isPresent()) {
       lease.get().close();
-      throw e;
+      throw new BusinessRuleException(
+          "CONFIG_IMPORT_JOB_RUNNING",
+          "The job "
+              + busy.get()
+              + " is running and reads the configuration; apply the import after it ends");
     }
     return lease.get();
+  }
+
+  /** Whether a job holds its lock now (probed by taking and releasing it). */
+  private boolean running(String job) {
+    Optional<JobLock.Lease> probe = locks.tryAcquire(job);
+    probe.ifPresent(JobLock.Lease::close);
+    return probe.isEmpty();
   }
 
   private Set<String> guardedJobs() {

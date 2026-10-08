@@ -3,7 +3,6 @@ package com.iortatechnxt.brokerverse.configpromo.upload;
 import com.iortatechnxt.brokerverse.bulk.service.BulkColumn;
 import com.iortatechnxt.brokerverse.bulk.service.BulkContext;
 import com.iortatechnxt.brokerverse.bulk.service.BulkRow;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -105,7 +104,7 @@ public class ClauseUpload extends ConfigUploadHandler {
         && !db.exists("select 1 from cat_product_line where code = ?", row.text(LINE))) {
       errors.add(error(LINE, row.text(LINE) + " is not a line"));
     }
-    if (UploadCells.dates(row.text(EFFECTIVE)) == null) {
+    if (UploadCells.period(row.text(EFFECTIVE)).isEmpty()) {
       errors.add(
           error(
               EFFECTIVE, "give the first day as dd-MMM-yyyy and, after a semicolon, the last day"));
@@ -124,7 +123,7 @@ public class ClauseUpload extends ConfigUploadHandler {
 
   @Override
   protected String apply(BulkRow row, BulkContext context) {
-    LocalDate[] dates = UploadCells.dates(row.text(EFFECTIVE));
+    UploadCells.Period dates = UploadCells.periodOf(row.text(EFFECTIVE));
     db.upsert(
         TABLE,
         key(row),
@@ -133,8 +132,8 @@ public class ClauseUpload extends ConfigUploadHandler {
             "line_code", row.text(LINE),
             "title", row.text(TITLE),
             "wording", row.text(WORDING),
-            "effective_from", dates[0],
-            "effective_to", dates[1]),
+            "effective_from", dates.from(),
+            "effective_to", dates.to()),
         context,
         "Clause");
     return row.text(CODE);

@@ -97,32 +97,33 @@ public class PettyCashFundUpload extends ConfigUploadHandler {
   public List<String> validate(BulkRow row, BulkContext context) {
     List<String> errors = errors();
     Long company = context.companyId();
-    if (db.branchId(company, row.text(BRANCH)).isEmpty()) {
-      errors.add(error(BRANCH, row.text(BRANCH) + " is not a branch of the company"));
-    }
-    boolean sameCustodian =
-        db.exists(
-            "select 1 from pay_petty_cash_fund where company_id = ? and code = ? and custodian = ?",
-            company,
-            row.text(CODE),
-            row.text(CUSTODIAN));
-    if (custodian(row, context).isEmpty() && !sameCustodian) {
-      errors.add(
-          error(CUSTODIAN, row.text(CUSTODIAN) + " is not an active employee of the company"));
-    }
-    if (!db.account(company, row.text(ACCOUNT))) {
-      errors.add(error(ACCOUNT, row.text(ACCOUNT) + " is not an account of the company"));
-    }
-    if (bank(row, context).isEmpty()) {
-      errors.add(error(BANK, row.text(BANK) + " is not a bank account of the company"));
-    }
-    if (!db.currency(row.text(CURRENCY))) {
-      errors.add(error(CURRENCY, row.text(CURRENCY) + " is not an active currency"));
-    }
+    check(
+        errors,
+        db.branchId(company, row.text(BRANCH)).isEmpty(),
+        BRANCH,
+        row.text(BRANCH) + " is not a branch of the company");
+    check(
+        errors,
+        custodian(row, context).isEmpty() && !sameCustodian(row, context),
+        CUSTODIAN,
+        row.text(CUSTODIAN) + " is not an active employee of the company");
+    check(
+        errors,
+        !db.account(company, row.text(ACCOUNT)),
+        ACCOUNT,
+        row.text(ACCOUNT) + " is not an account of the company");
+    check(
+        errors,
+        bank(row, context).isEmpty(),
+        BANK,
+        row.text(BANK) + " is not a bank account of the company");
+    check(
+        errors,
+        !db.currency(row.text(CURRENCY)),
+        CURRENCY,
+        row.text(CURRENCY) + " is not an active currency");
     BigDecimal imprest = row.number(IMPREST);
-    if (imprest.signum() <= 0) {
-      errors.add(error(IMPREST, "must be above zero"));
-    }
+    check(errors, imprest.signum() <= 0, IMPREST, "must be above zero");
     Optional<String> balance =
         db.text(
             "select cast(cash_balance as varchar) from pay_petty_cash_fund where company_id = ? and code = ?",
@@ -132,6 +133,14 @@ public class PettyCashFundUpload extends ConfigUploadHandler {
       errors.add(error(IMPREST, "is below the cash on hand of the fund (" + balance.get() + ")"));
     }
     return errors;
+  }
+
+  private boolean sameCustodian(BulkRow row, BulkContext context) {
+    return db.exists(
+        "select 1 from pay_petty_cash_fund where company_id = ? and code = ? and custodian = ?",
+        context.companyId(),
+        row.text(CODE),
+        row.text(CUSTODIAN));
   }
 
   private Optional<String> custodian(BulkRow row, BulkContext context) {

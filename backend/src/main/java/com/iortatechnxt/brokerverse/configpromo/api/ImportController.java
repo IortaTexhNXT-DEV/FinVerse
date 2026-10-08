@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.common.api.ReasonRequest;
 import com.iortatechnxt.brokerverse.configpromo.api.dto.DecisionRequest;
 import com.iortatechnxt.brokerverse.configpromo.api.dto.ImportDatasetResponse;
 import com.iortatechnxt.brokerverse.configpromo.api.dto.ImportResponse;
+import com.iortatechnxt.brokerverse.configpromo.api.dto.ImportUploadForm;
 import com.iortatechnxt.brokerverse.configpromo.api.dto.OptionsRequest;
 import com.iortatechnxt.brokerverse.configpromo.domain.ImportDataset;
 import com.iortatechnxt.brokerverse.configpromo.domain.PromotionImport;
@@ -29,6 +30,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -87,40 +89,25 @@ public class ImportController {
    * the environment allows the pipeline apply.
    *
    * @param file package (zip)
-   * @param datasets datasets to import; empty = all
-   * @param deactivate datasets whose items only here are deactivated
-   * @param includeUsers whether users are imported
-   * @param changeReference change request number (mandatory in production)
-   * @param reason reason (mandatory in production)
-   * @param pipeline whether a deployment pipeline sends the package
-   * @param apply pipeline only: apply the import when its dry run is clean and allowed here
+   * @param form choices, change request, reason and pipeline flags
    * @return the import
    * @throws IOException when the upload cannot be read
    */
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   @PreAuthorize(PREPARE)
   @ResponseStatus(HttpStatus.CREATED)
-  @SuppressWarnings("java:S107") // request parameters of the form
   public ImportResponse upload(
-      @RequestParam MultipartFile file,
-      @RequestParam(required = false) List<String> datasets,
-      @RequestParam(required = false) List<String> deactivate,
-      @RequestParam(defaultValue = "false") boolean includeUsers,
-      @RequestParam(required = false) String changeReference,
-      @RequestParam(required = false) String reason,
-      @RequestParam(defaultValue = "false") boolean pipeline,
-      @RequestParam(defaultValue = "false") boolean apply)
-      throws IOException {
+      @RequestParam MultipartFile file, @ModelAttribute ImportUploadForm form) throws IOException {
     PromotionImport imp =
         imports.upload(
             new UploadCommand(
                 file.getOriginalFilename(),
                 file.getBytes(),
-                new OptionsRequest(datasets, deactivate, includeUsers).options(),
-                changeReference,
-                reason,
-                pipeline));
-    if (pipeline && apply) {
+                form.options().options(),
+                form.changeReference(),
+                form.reason(),
+                form.fromPipeline()));
+    if (form.applyNow()) {
       imp = applier.pipelineApply(imp.getId());
     }
     return response(imp);

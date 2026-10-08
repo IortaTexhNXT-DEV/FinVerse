@@ -124,21 +124,21 @@ public class SodRuleUpload extends ConfigUploadHandler {
       errors.add(error(PROFILE_B, "a Prevent rule names the two group profiles"));
       return errors;
     }
+    checkProfiles(row, errors);
+    return errors;
+  }
+
+  private void checkProfiles(BulkRow row, List<String> errors) {
     for (String header : List.of(PROFILE_A, PROFILE_B)) {
       for (String p : names(row.text(header))) {
-        if (profile(p).isEmpty()) {
-          errors.add(error(header, p + " is not a group profile"));
-        }
+        check(errors, profile(p).isEmpty(), header, p + " is not a group profile");
       }
     }
     if (errors.isEmpty()) {
       for (Pair pair : pairs(row)) {
-        if (pair.a().equals(pair.b())) {
-          errors.add(error(PROFILE_B, pair.a() + " is also profile A"));
-        }
+        check(errors, pair.a().equals(pair.b()), PROFILE_B, pair.a() + " is also profile A");
       }
     }
-    return errors;
   }
 
   private static List<String> names(String cell) {
@@ -186,13 +186,8 @@ public class SodRuleUpload extends ConfigUploadHandler {
     List<String> codes = new ArrayList<>();
     for (int i = 0; i < pairs.size(); i++) {
       Pair pair = pairs.get(i);
-      String code =
-          existing(pair)
-              .orElse(pairs.size() == 1 ? row.text(RULE_ID) : row.text(RULE_ID) + "-" + (i + 1));
-      if (existing(pair).isEmpty()
-          && db.exists("select 1 from nba_sod_rule where rule_code = ?", code)) {
-        code = code + "-" + context.jobNo();
-      }
+      String wanted = pairs.size() == 1 ? row.text(RULE_ID) : row.text(RULE_ID) + "-" + (i + 1);
+      String code = existing(pair).orElseGet(() -> freeCode(wanted, context));
       db.upsert(
           "nba_sod_rule",
           columns("rule_code", code),
@@ -207,6 +202,13 @@ public class SodRuleUpload extends ConfigUploadHandler {
       codes.add(code);
     }
     return String.join(", ", codes);
+  }
+
+  /** The rule ID of the workbook, or with the upload number when another rule holds it. */
+  private String freeCode(String wanted, BulkContext context) {
+    return db.exists("select 1 from nba_sod_rule where rule_code = ?", wanted)
+        ? wanted + "-" + context.jobNo()
+        : wanted;
   }
 
   @Override

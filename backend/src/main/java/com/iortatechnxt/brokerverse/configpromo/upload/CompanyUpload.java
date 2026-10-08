@@ -4,7 +4,6 @@ import com.iortatechnxt.brokerverse.bulk.service.BulkColumn;
 import com.iortatechnxt.brokerverse.bulk.service.BulkColumn.Type;
 import com.iortatechnxt.brokerverse.bulk.service.BulkContext;
 import com.iortatechnxt.brokerverse.bulk.service.BulkRow;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -131,13 +130,7 @@ public class CompanyUpload extends ConfigUploadHandler {
   }
 
   static void whole(List<String> errors, BulkRow row, String header, int min, int max) {
-    BigDecimal n = row.number(header);
-    if (n != null
-        && (n.stripTrailingZeros().scale() > 0
-            || n.compareTo(BigDecimal.valueOf(min)) < 0
-            || n.compareTo(BigDecimal.valueOf(max)) > 0)) {
-      errors.add(error(header, "enter a whole number from " + min + " to " + max));
-    }
+    whole(errors, header, row.number(header), min, max);
   }
 
   private Optional<Long> companyId(String code) {

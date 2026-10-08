@@ -123,35 +123,37 @@ public class ImportService {
   public PromotionImport upload(UploadCommand command) {
     ConfigPackage pkg = store.verify(command.content());
     PromotionImport imp =
-        tx.execute(
-            s -> {
-              PromotionPackage kept =
-                  store.keep(PackageKind.UPLOAD, pkg.manifest(), command.content(), pkg.keyId());
-              PromotionImport created =
-                  imports.save(
-                      new PromotionImport(
-                          numbers.next("CFI-" + BusinessClock.today(clock).getYear()),
-                          kept.getId(),
-                          new ImportRequestFacts(
-                              settings.production(),
-                              command.pipeline(),
-                              blankToNull(command.changeReference()),
-                              blankToNull(command.reason()),
-                              currentUser.username(),
-                              clock.instant(),
-                              null)));
-              audit.record(
-                  ENTITY,
-                  created.getImportNo(),
-                  AuditAction.CREATE,
-                  "Uploaded package "
-                      + kept.getPackageNo()
-                      + " from "
-                      + pkg.manifest().sourceEnvironment()
-                      + ", SHA-256 "
-                      + kept.getSha256());
-              return created;
-            });
+        required(
+            tx.execute(
+                s -> {
+                  PromotionPackage kept =
+                      store.keep(
+                          PackageKind.UPLOAD, pkg.manifest(), command.content(), pkg.keyId());
+                  PromotionImport created =
+                      imports.save(
+                          new PromotionImport(
+                              numbers.next("CFI-" + BusinessClock.today(clock).getYear()),
+                              kept.getId(),
+                              new ImportRequestFacts(
+                                  settings.production(),
+                                  command.pipeline(),
+                                  blankToNull(command.changeReference()),
+                                  blankToNull(command.reason()),
+                                  currentUser.username(),
+                                  clock.instant(),
+                                  null)));
+                  audit.record(
+                      ENTITY,
+                      created.getImportNo(),
+                      AuditAction.CREATE,
+                      "Uploaded package "
+                          + kept.getPackageNo()
+                          + " from "
+                          + pkg.manifest().sourceEnvironment()
+                          + ", SHA-256 "
+                          + kept.getSha256());
+                  return created;
+                }));
     return check(imp.getId(), pkg, command.options());
   }
 
@@ -258,31 +260,32 @@ public class ImportService {
     PromotionPackage snapshot = store.get(original.getSnapshotPackageId());
     ConfigPackage pkg = store.open(snapshot);
     PromotionImport imp =
-        tx.execute(
-            s -> {
-              PromotionImport created =
-                  imports.save(
-                      new PromotionImport(
-                          numbers.next("CFI-" + BusinessClock.today(clock).getYear()),
-                          snapshot.getId(),
-                          new ImportRequestFacts(
-                              settings.production(),
-                              false,
-                              original.getChangeReference(),
-                              "Rollback of import " + original.getImportNo(),
-                              currentUser.username(),
-                              clock.instant(),
-                              original.getId())));
-              audit.record(
-                  ENTITY,
-                  created.getImportNo(),
-                  AuditAction.CREATE,
-                  "Rollback of "
-                      + original.getImportNo()
-                      + " from snapshot "
-                      + snapshot.getPackageNo());
-              return created;
-            });
+        required(
+            tx.execute(
+                s -> {
+                  PromotionImport created =
+                      imports.save(
+                          new PromotionImport(
+                              numbers.next("CFI-" + BusinessClock.today(clock).getYear()),
+                              snapshot.getId(),
+                              new ImportRequestFacts(
+                                  settings.production(),
+                                  false,
+                                  original.getChangeReference(),
+                                  "Rollback of import " + original.getImportNo(),
+                                  currentUser.username(),
+                                  clock.instant(),
+                                  original.getId())));
+                  audit.record(
+                      ENTITY,
+                      created.getImportNo(),
+                      AuditAction.CREATE,
+                      "Rollback of "
+                          + original.getImportNo()
+                          + " from snapshot "
+                          + snapshot.getPackageNo());
+                  return created;
+                }));
     return check(imp.getId(), pkg, options);
   }
 
@@ -354,5 +357,13 @@ public class ImportService {
    */
   public ImportOptions options(PromotionImport imp) {
     return recorder.options(imp);
+  }
+
+  /** The result of a transaction callback that always returns one. */
+  private static <T> T required(T result) {
+    if (result == null) {
+      throw new IllegalStateException("The transaction returned no result");
+    }
+    return result;
   }
 }

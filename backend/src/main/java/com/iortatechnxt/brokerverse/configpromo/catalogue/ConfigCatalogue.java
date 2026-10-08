@@ -44,7 +44,7 @@ public final class ConfigCatalogue {
    * @return catalogue
    */
   public static ConfigCatalogue load() {
-    try (InputStream in = ConfigCatalogue.class.getClassLoader().getResourceAsStream(RESOURCE)) {
+    try (InputStream in = ConfigCatalogue.class.getResourceAsStream("/" + RESOURCE)) {
       if (in == null) {
         throw new IllegalStateException("The configuration catalogue " + RESOURCE + " is missing");
       }
@@ -79,25 +79,29 @@ public final class ConfigCatalogue {
     Map<String, CatalogueGroup> groupCodes =
         groups.stream().collect(Collectors.toMap(CatalogueGroup::code, g -> g));
     for (CatalogueDataset d : byCode.values()) {
-      if (!groupCodes.containsKey(d.group())) {
-        throw new IllegalStateException(d.code() + " has the unknown group " + d.group());
-      }
-      if (d.key().isEmpty()) {
-        throw new IllegalStateException(d.code() + " has no natural key");
-      }
-      if (excluded.containsKey(d.table())) {
-        throw new IllegalStateException(d.table() + " is both a dataset and excluded");
-      }
-      for (String target : d.refs().values()) {
-        if (!byCode.containsKey(target)) {
-          throw new IllegalStateException(d.code() + " refers to the unknown dataset " + target);
-        }
-      }
+      require(groupCodes.containsKey(d.group()), d.code() + " has the unknown group " + d.group());
+      require(!d.key().isEmpty(), d.code() + " has no natural key");
+      require(!excluded.containsKey(d.table()), d.table() + " is both a dataset and excluded");
+      d.refs()
+          .values()
+          .forEach(
+              target ->
+                  require(
+                      byCode.containsKey(target),
+                      d.code() + " refers to the unknown dataset " + target));
     }
-    for (String reason : excluded.values()) {
-      if (!reasons.containsKey(reason)) {
-        throw new IllegalStateException("Unknown reason " + reason + " of an excluded table");
-      }
+    excluded
+        .values()
+        .forEach(
+            reason ->
+                require(
+                    reasons.containsKey(reason),
+                    "Unknown reason " + reason + " of an excluded table"));
+  }
+
+  private static void require(boolean valid, String problem) {
+    if (!valid) {
+      throw new IllegalStateException(problem);
     }
   }
 

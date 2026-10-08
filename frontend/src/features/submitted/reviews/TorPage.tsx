@@ -76,6 +76,7 @@ export default function TorPage() {
             {
               key: 'ao',
               header: 'Account Officer',
+              defaultHidden: true,
               render: (t) => <UserName login={t.aoUsername} />,
             },
             {

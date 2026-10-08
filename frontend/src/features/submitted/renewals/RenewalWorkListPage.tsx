@@ -133,12 +133,14 @@ export default function RenewalWorkListPage() {
             {
               key: 'hold',
               header: 'Hold Cover',
+              defaultHidden: true,
               kind: 'date',
               render: (r) => formatDate(r.holdCoverOn),
             },
             {
               key: 'accepted',
               header: 'Accepted',
+              defaultHidden: true,
               kind: 'date',
               render: (r) => formatDate(r.insurerAcceptedOn),
             },

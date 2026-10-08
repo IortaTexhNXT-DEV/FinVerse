@@ -1,13 +1,6 @@
-import { Link } from 'react-router-dom';
 import { dashboardApi } from '@/api/dashboard';
-import { Kpi } from '@/components/ui/Kpi';
-import { humanize } from '@/utils/format';
-import { useWidget } from './widgetSupport';
-
-function moduleSummary(byModule: Record<string, number>): string {
-  const parts = Object.entries(byModule).map(([m, n]) => `${String(n)} ${humanize(m)}`);
-  return parts.length === 0 ? 'Nothing waiting for you' : parts.join(' · ');
-}
+import { KpiTile } from '@/components/ui/KpiTile';
+import { approvalLines, useWidget } from './widgetSupport';
 
 /** Open alerts of the company and the signed-in user's approval inbox, as KPI tiles. */
 export function WorkloadWidget({ enabled }: Readonly<{ enabled: boolean }>) {
@@ -18,25 +11,26 @@ export function WorkloadWidget({ enabled }: Readonly<{ enabled: boolean }>) {
   }
   return (
     <>
-      <Kpi
-        label="Pending approvals"
-        value={
-          <Link className="kpi-link" to="/approvals" aria-label="Open my approvals">
-            {d.pendingApprovals}
-          </Link>
+      <KpiTile
+        label="Pending Approvals"
+        value={d.pendingApprovals}
+        to="/approvals"
+        qualifier={
+          d.pendingApprovals === 0 ? 'Nothing waiting for you' : 'Waiting for your decision'
         }
-        hint={moduleSummary(d.approvalsByModule)}
-        accent={d.pendingApprovals > 0}
+        alert={d.pendingApprovals > 0}
+        breakdown={{
+          label: 'Pending approvals by area',
+          items: approvalLines(d.approvalsByModule),
+          allTo: '/approvals',
+        }}
       />
-      <Kpi
-        label="Open alerts"
-        value={
-          <Link className="kpi-link" to="/alerts" aria-label="Open the alerts">
-            {d.openAlerts}
-          </Link>
-        }
-        hint="Open or acknowledged exceptions"
-        accent={d.openAlerts > 0}
+      <KpiTile
+        label="Open Alerts"
+        value={d.openAlerts}
+        to="/alerts"
+        qualifier="Open or acknowledged exceptions"
+        alert={d.openAlerts > 0}
       />
     </>
   );

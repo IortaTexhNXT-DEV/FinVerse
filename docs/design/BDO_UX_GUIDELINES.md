@@ -57,7 +57,7 @@ This page is binding for every BrokerVerse screen. Components read the design to
   - Dashboard and My Work (always open);
   - **Client & Policy**: Client Management, Sanction Screening, Quotation / Proposal, Accounts, Non-Package Management, Employee Benefits, Placement & Booking, Renewal, Submitted Policies, Product Reconciliation, Adjustment, Customer Service Facility, Product Maintenance, Bulk Processing;
   - **Finance**: Collections, the operations cash modules (cashiering, remittance, commission), Disbursement, Refund & Cash Advance Requests, ACSL and Accounting Reports, then the general ledger, receivables, payables, assets, planning, tax and accounting engine;
-  - **Claims & Insurance**: Claims Handling (broking claims, listed first), then the insurer-side modules;
+  - **Claims**: Claims Handling (the broking claims; the insurer-side modules are removed);
   - **Reports**;
   - **Setup & Administration**: includes Compliance Setup (Sanction Screening configuration and watchlist), User Access (access requests, including portal users, and the User Access Matrix, before Administration) and Portal Users (Employee Benefits portal).
 

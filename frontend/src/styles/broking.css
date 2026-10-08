@@ -838,15 +838,15 @@
   list-style: none;
 }
 
-/* My Work: the description keeps one line at the column width (full text in the tooltip) */
-.table .queue-description {
+/* My Work: names and descriptions wrap in their column, never cut (the full text in the tooltip) */
+[data-callout='work-queue'] .queue-description {
   display: block;
-  max-width: 200px;
+  min-width: 220px;
+  white-space: normal;
 }
 
-/* Wide windows give the description more room */
-@media (min-width: 1680px) {
-  .table .queue-description {
-    max-width: 360px;
-  }
+[data-callout='work-queue'] td .user-name,
+[data-callout='work-queue'] td .truncate {
+  white-space: normal;
+  overflow: visible;
 }

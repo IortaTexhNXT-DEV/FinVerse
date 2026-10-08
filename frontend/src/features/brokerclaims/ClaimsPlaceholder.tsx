@@ -3,8 +3,8 @@ import { Card } from '@/components/ui/Card';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { PageHeader } from '@/components/ui/PageHeader';
 
-/** Breadcrumb of every Claims Handling screen (group Claims & Insurance). */
-export const CLAIMS_SECTION = 'Claims & Insurance · Claims Handling';
+/** Breadcrumb of every Claims Handling screen (group Claims). */
+export const CLAIMS_SECTION = 'Claims · Claims Handling';
 
 interface ClaimsPlaceholderProps {
   title: string;

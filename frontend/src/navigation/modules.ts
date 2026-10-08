@@ -120,7 +120,7 @@ export const NAV_GROUPS: NavGroup[] = withProductModules([
   },
   {
     id: 'insurance',
-    title: 'Claims & Insurance',
+    title: 'Claims',
     modules: [
       // Claims Handling (BRD-7) first, CLAIMS_BROKING_DESIGN section 11.
       brokerClaimsModule,

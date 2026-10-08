@@ -8,6 +8,7 @@ import {
   useSalesUnitNameOrNull,
 } from '@/components/broking/useLabels';
 import { DataTable } from '@/components/ui/DataTable';
+import type { Column } from '@/components/ui/DataTable';
 import { CellStack } from '@/components/ui/CellStack';
 import { DueDate } from '@/components/ui/DueDate';
 import { RowActions } from '@/components/ui/RowActions';
@@ -52,37 +53,27 @@ export function QueueTable(p: Readonly<QueueTableProps>) {
         {
           key: 'type',
           header: 'Type',
-          width: '96px',
-          truncate: true,
+          width: '112px',
           render: (i) => workflowRecordType(i.workflowCode),
         },
         {
           key: 'title',
           header: 'Description / From',
-          width: '200px',
+          width: '260px',
           render: (i) => (
             <CellStack
-              main={<TruncatedText text={splitTrailingAmount(i.title).text} />}
+              main={<Description text={splitTrailingAmount(i.title).text} />}
               sub={
                 i.originatingUnit ? (
                   <OriginUnit code={i.originatingUnit} />
                 ) : (
-                  <UserName login={i.createdBy} truncate />
+                  <UserName login={i.createdBy} />
                 )
               }
             />
           ),
         },
-        {
-          key: 'amount',
-          header: 'Amount',
-          kind: 'amount',
-          width: '136px',
-          render: (i) => {
-            const { currency, amount } = splitTrailingAmount(i.title);
-            return amount === undefined ? '' : formatMoney(currency, amount);
-          },
-        },
+        ...amountColumn(p.items),
         {
           key: 'stage',
           header: 'Stage',
@@ -103,9 +94,8 @@ export function QueueTable(p: Readonly<QueueTableProps>) {
         {
           key: 'assignee',
           header: 'Assignee',
-          width: '120px',
-          truncate: true,
-          render: (i) => <UserName login={i.assignee} empty="Unassigned" truncate />,
+          width: '128px',
+          render: (i) => <UserName login={i.assignee} empty="Unassigned" />,
         },
         {
           key: 'actions',
@@ -159,11 +149,34 @@ function OriginUnit({ code }: Readonly<{ code: string }>) {
   );
 }
 
-/** A text kept on one line, cut at the column width with the full text in the tooltip. */
-function TruncatedText({ text }: Readonly<{ text: string }>) {
+/** The description of a work item, wrapped in its column (never cut), the full text in the tooltip. */
+function Description({ text }: Readonly<{ text: string }>) {
   return (
-    <span className="truncate queue-description" title={text}>
+    <span className="queue-description" title={text}>
       {text}
     </span>
   );
+}
+
+/**
+ * The Amount column, only when a work item of the list has an amount in its description (a
+ * payment, a voucher); a list without amounts has no column of dashes.
+ */
+function amountColumn(items: readonly WorkItem[]): Column<WorkItem>[] {
+  const amountOf = (i: WorkItem) => splitTrailingAmount(i.title);
+  if (!items.some((i) => amountOf(i).amount !== undefined)) {
+    return [];
+  }
+  return [
+    {
+      key: 'amount',
+      header: 'Amount',
+      kind: 'amount',
+      width: '136px',
+      render: (i) => {
+        const { currency, amount } = amountOf(i);
+        return amount === undefined ? '' : formatMoney(currency, amount);
+      },
+    },
+  ];
 }

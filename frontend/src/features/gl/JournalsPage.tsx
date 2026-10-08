@@ -161,11 +161,13 @@ export default function JournalsPage() {
             {
               key: 'to',
               header: 'Assigned To',
+              defaultHidden: true,
               render: (j) => <UserName login={j.assignedTo} />,
             },
             {
               key: 'auth',
               header: 'Authorizer',
+              defaultHidden: true,
               render: (j) => <UserName login={j.authorizedBy} />,
             },
             {

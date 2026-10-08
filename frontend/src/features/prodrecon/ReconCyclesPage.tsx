@@ -47,7 +47,7 @@ const COLUMNS: Column<ReconCycle>[] = [
     render: (c) => `${String(matchedPercent(c.counts))}%`,
   },
   { key: 'sent', header: 'Sent', render: (c) => formatDateTime(c.sentAt) },
-  { key: 'upload', header: 'Last Feedback', render: (c) => formatDateTime(c.lastUploadAt) },
+  { key: 'upload', header: 'Last Feedback', defaultHidden: true, render: (c) => formatDateTime(c.lastUploadAt) },
   { key: 'stage', header: 'Stage', render: (c) => <StatusBadge status={c.stage} /> },
 ];
 

@@ -77,6 +77,7 @@ function useColumns(compact: boolean): Column<AccountLine>[] {
       {
         key: 'pn',
         header: 'PN / Application No.',
+        defaultHidden: true,
         render: (a) => <CellStack main={a.pnNumbers.join(', ')} sub={a.loanApplicationNo} />,
       },
       {

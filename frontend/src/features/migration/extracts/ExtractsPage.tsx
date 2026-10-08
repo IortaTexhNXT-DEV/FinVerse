@@ -206,12 +206,14 @@ export default function ExtractsPage() {
             {
               key: 'staged-rows',
               header: 'Rows Staged',
+              defaultHidden: true,
               numeric: true,
               render: (e) => e.stagedRows,
             },
             {
               key: 'masked',
               header: 'Masked',
+              defaultHidden: true,
               kind: 'center',
               render: (e) => (e.masked ? 'Yes' : 'No'),
             },

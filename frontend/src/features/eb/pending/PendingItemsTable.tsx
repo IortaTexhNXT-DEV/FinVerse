@@ -54,6 +54,7 @@ function columns(showProgramme: boolean): Column<ItemRow>[] {
     {
       key: 'followUps',
       header: 'Follow-ups',
+      defaultHidden: true,
       kind: 'center',
       render: (i) =>
         i.escalatedAt ? (

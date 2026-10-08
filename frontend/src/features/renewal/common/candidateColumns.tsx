@@ -47,6 +47,7 @@ export function candidateColumns(showMoney: boolean): Column<CandidateRow>[] {
     {
       key: 'policy',
       header: 'Expiring Policy / Invoice',
+      defaultHidden: true,
       render: (r) => (
         <CellStack
           main={r.policy.policyNo ?? r.policy.sourceRef ?? ''}
@@ -64,6 +65,7 @@ export function candidateColumns(showMoney: boolean): Column<CandidateRow>[] {
     {
       key: 'officer',
       header: 'Unit / Officer',
+      defaultHidden: true,
       render: (r) => (
         <CellStack
           main={<RenewalUnit row={r} />}

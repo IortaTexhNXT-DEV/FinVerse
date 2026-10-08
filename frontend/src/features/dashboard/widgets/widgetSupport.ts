@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
+import type { KpiBreakdownItem } from '@/components/ui/kpiBreakdown';
 import { useCompanyId, useWorkspace } from '@/context/workspaceContext';
-import { formatAmount } from '@/utils/format';
+import { formatAmount, humanize } from '@/utils/format';
 import { monthLabel } from '../dashboardMath';
 
 /** Chart colours: the brand tokens of styles/tokens.css (no ad-hoc colours). */
@@ -41,4 +42,14 @@ export function tooltipAmount(value: unknown): string {
 /** Chart tooltip label formatter for `yyyy-MM` categories. */
 export function tooltipMonth(label: unknown): string {
   return typeof label === 'string' ? monthLabel(label) : '';
+}
+
+/** The approvals waiting per module, as ranked breakdown lines of the tile (never a dotted line). */
+export function approvalLines(byModule: Record<string, number>): KpiBreakdownItem[] {
+  return Object.entries(byModule).map(([module, count]) => ({
+    key: module,
+    label: humanize(module),
+    count,
+    to: '/approvals',
+  }));
 }

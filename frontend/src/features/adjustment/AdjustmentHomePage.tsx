@@ -39,6 +39,7 @@ const COLUMNS: Column<RequestSummary>[] = [
   {
     key: 'invoice',
     header: 'Invoice / Placement Slip',
+    defaultHidden: true,
     kind: 'code',
     render: (r) => <CellStack main={r.invoiceNo} sub={r.policy?.slipNo} />,
   },

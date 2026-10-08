@@ -37,6 +37,7 @@ export function useChangeColumns(withClient: boolean): Column<ContactChange>[] {
     {
       key: 'verification',
       header: 'Verification',
+      defaultHidden: true,
       render: (c) =>
         c.verificationResult ? (
           <CellStack
@@ -58,6 +59,7 @@ export function useChangeColumns(withClient: boolean): Column<ContactChange>[] {
     {
       key: 'sync',
       header: 'Legacy Sync',
+      defaultHidden: true,
       kind: 'status',
       render: (c) =>
         c.handoffStatus ? (

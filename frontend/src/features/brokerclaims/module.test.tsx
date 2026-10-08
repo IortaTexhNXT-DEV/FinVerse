@@ -39,7 +39,7 @@ describe('Claims Handling module', () => {
     brokerClaimsModule.screens.forEach((s) => expect(s.permission).toMatch(/^BCL_/));
   });
 
-  it('comes first in the Claims & Insurance group', () => {
+  it('comes first in the Claims group', () => {
     const group = NAV_GROUPS.find((g) => g.id === 'insurance');
     expect(group?.modules[0]?.id).toBe('brokerclaims');
     expect(MODULES.filter((m) => m.id === 'brokerclaims')).toHaveLength(1);
@@ -71,7 +71,7 @@ describe('Claims Handling module', () => {
       </MemoryRouter>,
     );
     expect(screen.getByRole('heading', { level: 1, name: 'Claims Worklist' })).toBeInTheDocument();
-    expect(screen.getByText('Claims & Insurance · Claims Handling')).toBeInTheDocument();
+    expect(screen.getByText('Claims · Claims Handling')).toBeInTheDocument();
     expect(screen.getByText('No claims to display')).toBeInTheDocument();
   });
 });

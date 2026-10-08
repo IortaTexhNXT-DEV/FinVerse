@@ -85,6 +85,7 @@ const COLUMNS: Column<CollectionItem>[] = [
   {
     key: 'segment',
     header: 'Segment / Unit',
+    defaultHidden: true,
     render: (i) => (
       <CellStack
         main={i.segment ? <LovLabel type="MARKET_SEGMENT" code={i.segment} /> : ''}

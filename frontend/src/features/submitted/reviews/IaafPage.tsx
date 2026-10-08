@@ -71,6 +71,7 @@ export default function IaafPage() {
             {
               key: 'segment',
               header: 'Segment',
+              defaultHidden: true,
               render: (i) => <LovLabel type={SBM_LOV.segment} code={i.segment} />,
             },
             {
@@ -88,6 +89,7 @@ export default function IaafPage() {
             {
               key: 'level',
               header: 'Level',
+              defaultHidden: true,
               render: (i) =>
                 i.approval.totalLevels === 0
                   ? '—'

@@ -156,7 +156,7 @@ export default function MigrationHomePage() {
             columns={[
               { key: 'plan', header: 'Plan', kind: 'code', render: (t) => t.planNo },
               { key: 'task', header: 'Task', render: (t) => t.task },
-              { key: 'owner', header: 'Owner', render: (t) => migLabel(t.ownerRole) },
+              { key: 'owner', header: 'Owner', defaultHidden: true, render: (t) => migLabel(t.ownerRole) },
               {
                 key: 'start',
                 header: 'Planned start',

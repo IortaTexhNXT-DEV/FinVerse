@@ -91,7 +91,7 @@ export function RefundLinesEditor({ lines, errors, onChange }: Readonly<RefundLi
               <th>Reason</th>
               <th>Branch / Unit</th>
               <th>Category A / B</th>
-              <th aria-label="Actions" />
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>

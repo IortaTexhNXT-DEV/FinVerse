@@ -20,14 +20,16 @@ export const policyColumns: Column<PolicyRow>[] = [
   {
     key: 'segment',
     header: 'Segment',
+    defaultHidden: true,
     render: (p) => <LovLabel type={SBM_LOV.segment} code={p.segment} />,
   },
   {
     key: 'bt',
     header: 'Business Type',
+    defaultHidden: true,
     render: (p) => <BusinessTypeName code={p.businessType} />,
   },
-  { key: 'pn', header: 'PN No.', kind: 'code', render: (p) => p.pnNo ?? '—' },
+  { key: 'pn', header: 'PN No.', defaultHidden: true, kind: 'code', render: (p) => p.pnNo ?? '—' },
   { key: 'insurer', header: 'Insurer', render: (p) => <InsurerName code={p.insurerCode} /> },
   { key: 'expiry', header: 'Expiry', kind: 'date', render: (p) => formatDate(p.expiryDate) },
   {
@@ -39,6 +41,7 @@ export const policyColumns: Column<PolicyRow>[] = [
   {
     key: 'bucket',
     header: 'Bucket',
+    defaultHidden: true,
     render: (p) => <LovLabel type={SBM_LOV.bucket} code={p.bucket} />,
   },
   { key: 'flags', header: 'Flags', render: (p) => <FlagChips flags={p.flags} /> },
@@ -51,6 +54,7 @@ export const policyColumns: Column<PolicyRow>[] = [
   {
     key: 'handler',
     header: 'Handler',
+    defaultHidden: true,
     render: (p) => (p.handlerUsername ? <UserName login={p.handlerUsername} /> : '—'),
   },
 ];

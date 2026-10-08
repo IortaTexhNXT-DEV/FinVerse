@@ -142,7 +142,7 @@ describe('QueueTable', () => {
       item({ id: 3, reference: 'X-1', workflowCode: 'SOMETHING_NEW', stageCode: 'DRAFT' }),
     ]);
     expect(screen.getByRole('columnheader', { name: 'Type' })).toBeTruthy();
-    expect(screen.getByText('Account')).toHaveAttribute('title', 'Account');
+    expect(screen.getByText('Account').closest('td')).not.toHaveClass('col-truncate');
     expect(screen.getByText('EB Cycle')).toBeTruthy();
     expect(screen.queryByText('Accounts')).toBeNull();
     const pill = screen.getByText('RA Sent');
@@ -185,7 +185,7 @@ describe('QueueTable', () => {
     expect(screen.getByText('PRF-2026-900005').closest('tr')?.textContent).toContain('—');
   });
 
-  it('keeps names on one line, cut at the column width with the full name in the tooltip', () => {
+  it('shows names whole (wrapped in their column, never cut), the login in the tooltip', () => {
     vi.spyOn(lovApi, 'options').mockResolvedValue([]);
     setUserDirectory([{ username: 'ao', displayName: 'Aileen Account Officer' }]);
     show([item({ id: 1, assignee: 'ao' })]);
@@ -193,14 +193,17 @@ describe('QueueTable', () => {
     // The assignee column and the "from" line under the description.
     expect(names).toHaveLength(2);
     for (const name of names) {
-      expect(name).toHaveClass('truncate');
-      expect(name).toHaveAttribute('title', 'Aileen Account Officer (ao)');
+      expect(name).not.toHaveClass('truncate');
+      // The whole name shows; the login id is in the tooltip.
+      expect(name).toHaveAttribute('title', 'ao');
+      expect(name.closest('td')).not.toHaveClass('col-truncate');
     }
-    expect(names.some((n) => n.closest('td')?.classList.contains('col-truncate'))).toBe(true);
     expect(screen.getByText('Bayside Builders Co.')).toHaveAttribute(
       'title',
       'Bayside Builders Co.',
     );
+    // No item of the list has an amount: no column of dashes.
+    expect(screen.queryByRole('columnheader', { name: 'Amount' })).toBeNull();
     setUserDirectory([]);
   });
 

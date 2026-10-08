@@ -202,7 +202,7 @@ export default function HandlingFeesPage() {
                 kind: 'status',
                 render: (f) => <StatusBadge status={f.status} />,
               },
-              { key: 'channel', header: 'Channel', render: (f) => channelLabel(f.channel) },
+              { key: 'channel', header: 'Channel', defaultHidden: true, render: (f) => channelLabel(f.channel) },
               {
                 key: 'payment',
                 header: 'Payment',
@@ -213,11 +213,13 @@ export default function HandlingFeesPage() {
               {
                 key: 'by',
                 header: 'Tagged By',
+                defaultHidden: true,
                 render: (f) => (f.taggedBy ? <UserName login={f.taggedBy} /> : '—'),
               },
               {
                 key: 'at',
                 header: 'Tagged',
+                defaultHidden: true,
                 kind: 'datetime',
                 render: (f) => formatDateTime(f.taggedAt),
               },

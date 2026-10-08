@@ -14,7 +14,7 @@ import type { FeatureModule } from '@/navigation/types';
 
 /**
  * Claims Handling (BRD-7, BRCLM.001-043; docs/architecture/CLAIMS_BROKING_DESIGN.md section 11):
- * the broker's claim case files. Registered by the foundation (CL0) first in the Claims & Insurance
+ * the broker's claim case files. Registered by the foundation (CL0) first in the Claims
  * group with every route of the design; each route points at the page of the wave that builds it
  * (CL1-A: record, cover, location; CL1-B: home, worklist, diary, setup, reports). A wave replaces
  * its page files and keeps the routes. The insurer-side Claims module (`features/claims`) is

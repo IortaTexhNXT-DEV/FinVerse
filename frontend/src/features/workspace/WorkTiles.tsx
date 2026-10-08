@@ -50,7 +50,7 @@ export function WorkSummary({ counts }: Readonly<{ counts: QueueCount[] }>) {
         alert={totals.overdue > 0}
       />
       <KpiTile
-        label="Queues I Work"
+        label="My Queues"
         value={counts.length}
         qualifier={`${nounFor(counts.length, 'Stage')} across ${countOf(workflows, 'workflow')}`}
       />

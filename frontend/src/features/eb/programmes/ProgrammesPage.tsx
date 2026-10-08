@@ -42,8 +42,8 @@ const COLUMNS: Column<ProgrammeRow>[] = [
     header: 'Client',
     render: (p) => <CellStack main={p.clientName} sub={p.clientCode} />,
   },
-  { key: 'lines', header: 'Lines', render: (p) => <BenefitLines codes={p.lines} /> },
-  { key: 'team', header: 'Team', render: (p) => <EbLov type={EB_LOV.team} code={p.teamCode} /> },
+  { key: 'lines', header: 'Lines', defaultHidden: true, render: (p) => <BenefitLines codes={p.lines} /> },
+  { key: 'team', header: 'Team', defaultHidden: true, render: (p) => <EbLov type={EB_LOV.team} code={p.teamCode} /> },
   { key: 'ao', header: 'Account Officer', render: (p) => <UserName login={p.accountOfficer} /> },
   { key: 'expiry', header: 'Next Expiry', kind: 'date', render: (p) => formatDate(p.nextExpiry) },
   {

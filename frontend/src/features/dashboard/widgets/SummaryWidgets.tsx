@@ -11,8 +11,9 @@ import {
 } from 'recharts';
 import type { CompositionItem, DashboardSummary } from '@/api/dashboard';
 import { Card } from '@/components/ui/Card';
-import { Kpi } from '@/components/ui/Kpi';
+import { KpiTile } from '@/components/ui/KpiTile';
 import { formatAmount, formatCompact } from '@/utils/format';
+import { nounFor } from '@/utils/wording';
 import { monthLabel, sharePct } from '../dashboardMath';
 import { CHART, tooltipAmount, tooltipMonth } from './widgetSupport';
 
@@ -39,38 +40,62 @@ function CompositionList({ items }: Readonly<{ items: CompositionItem[] }>) {
   );
 }
 
-/** Headline KPI tiles of the general ledger summary. */
+/** Headline KPI tiles of the general ledger summary: one tile anatomy, no dot-separated lines. */
 export function SummaryKpis({ summary: d }: Readonly<{ summary: DashboardSummary }>) {
   return (
     <>
-      <Kpi
+      <KpiTile
         label="Income (YTD)"
         value={formatCompact(d.totalIncomeYtd)}
-        hint={formatAmount(d.totalIncomeYtd)}
+        qualifier={formatAmount(d.totalIncomeYtd)}
       />
-      <Kpi
+      <KpiTile
         label="Expenses (YTD)"
         value={formatCompact(d.totalExpenseYtd)}
-        hint={formatAmount(d.totalExpenseYtd)}
+        qualifier={formatAmount(d.totalExpenseYtd)}
       />
-      <Kpi
-        label="Net result (YTD)"
+      <KpiTile
+        label="Net Result (YTD)"
         value={formatCompact(d.netResultYtd)}
-        hint={formatAmount(d.netResultYtd)}
-        accent
+        qualifier={formatAmount(d.netResultYtd)}
       />
-      <Kpi
-        label="Cash position"
+      <KpiTile
+        label="Cash Position"
         value={formatCompact(d.cashPosition)}
-        hint="Cash and bank balances"
+        qualifier="Cash and bank balances"
       />
-      <Kpi label="Insurance receivables" value={formatCompact(d.receivables)} />
-      <Kpi label="Total assets" value={formatCompact(d.totalAssets)} />
-      <Kpi
-        label="Journals in progress"
+      <KpiTile
+        label="Insurance Receivables"
+        value={formatCompact(d.receivables)}
+        qualifier={formatAmount(d.receivables)}
+      />
+      <KpiTile
+        label="Total Assets"
+        value={formatCompact(d.totalAssets)}
+        qualifier={formatAmount(d.totalAssets)}
+      />
+      <KpiTile
+        label="Journals in Progress"
         value={d.pendingJournals + d.draftJournals}
-        hint={`${String(d.pendingJournals)} pending · ${String(d.draftJournals)} draft`}
-        accent
+        to="/gl/journals"
+        qualifier="Waiting for approval or still in draft"
+        breakdown={{
+          label: 'Journals in progress by status',
+          items: [
+            {
+              key: 'pending',
+              label: 'Waiting for approval',
+              count: d.pendingJournals,
+              to: '/gl/journals',
+            },
+            {
+              key: 'draft',
+              label: nounFor(d.draftJournals, 'Draft'),
+              count: d.draftJournals,
+              to: '/gl/journals',
+            },
+          ],
+        }}
       />
     </>
   );

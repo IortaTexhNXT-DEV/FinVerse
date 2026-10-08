@@ -37,10 +37,11 @@ export const BATCH_COLUMNS: Column<BatchSummary>[] = [
     numeric: true,
     render: (b) => <Amount value={b.totals.payable} />,
   },
-  { key: 'cur', header: 'Currency', render: (b) => b.currency },
+  { key: 'cur', header: 'Currency', defaultHidden: true, render: (b) => b.currency },
   {
     key: 'proc',
     header: 'Processor',
+    defaultHidden: true,
     width: '180px',
     truncate: true,
     render: (b) => <UserName login={b.processor} empty="Unassigned" truncate />,

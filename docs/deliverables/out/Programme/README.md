@@ -84,6 +84,7 @@ sign-off per BRD"). Each document is kept once, in its latest version.
 | Support Model and Support Guide | BRD-00 | Operations | 1.0 | [`Operations/BIBS_Support_BRD-00_Support_Model_and_Support_Guide_v1.0.docx`](Operations/BIBS_Support_BRD-00_Support_Model_and_Support_Guide_v1.0.docx) |
 | Test Strategy | BRD-00 | Quality | 1.0 | [`Quality/BIBS_TestStrategy_BRD-00_Test_Strategy_v1.0.docx`](Quality/BIBS_TestStrategy_BRD-00_Test_Strategy_v1.0.docx) |
 | Walkthrough Users and Sign-in | BRD-00 | UAT | 1.0 | [`UAT/BIBS_UAT_BRD-00_Walkthrough_Users_and_Sign-in_v1.0.xlsx`](UAT/BIBS_UAT_BRD-00_Walkthrough_Users_and_Sign-in_v1.0.xlsx) |
+| BDOI FRS vs BIBS FRS Operations Cashiering | BRD-02 | Comparisons | 1.0 | [`Comparisons/BIBS_Comparison_BRD-02_BDOI_FRS_vs_BIBS_FRS_Operations_Cashiering_v1.0.xlsx`](Comparisons/BIBS_Comparison_BRD-02_BDOI_FRS_vs_BIBS_FRS_Operations_Cashiering_v1.0.xlsx) |
 | BDOI FRS vs BIBS FRS Product Maintenance | BRD-03 | Comparisons | 1.0 | [`Comparisons/BIBS_Comparison_BRD-03_BDOI_FRS_vs_BIBS_FRS_Product_Maintenance_v1.0.xlsx`](Comparisons/BIBS_Comparison_BRD-03_BDOI_FRS_vs_BIBS_FRS_Product_Maintenance_v1.0.xlsx) |
 
 ## Still to write

@@ -354,7 +354,7 @@ insert into seed_dsb values
 ('000907', 'S-0002', 'OTHER', 'CHECK', 56000.00, 1120.00, 'Annual licence of the document scanning software',
  'APPROVED', 'POSTED', null, 15, 'RELEASED', '100013', 14, 'DISBURSEMENT', 'SEED-RPT:DSR-2026-000907', 'RELEASED'),
 ('000908', 'G-0002', 'OTHER', 'CHECK', 12500.00, 250.00, 'Repair of the Cebu branch service vehicle', 'APPROVED',
- 'FAILED', 'The expense account 6105 is closed for posting in the period', 6, null, null, null, 'DISBURSEMENT',
+ 'FAILED', 'The expense account 6105 is closed for posting in the period', 6, 'PENDING', null, null, 'DISBURSEMENT',
  'SEED-RPT:DSR-2026-000908', 'IN_VOUCHER');
 
 insert into dsb_request (company_id, request_no, source, source_module, source_ref, disbursement_type, payee_class,
@@ -405,6 +405,26 @@ from seed_dsb d
 join dsb_voucher v on v.dv_no = 'DV-2026-' || d.seq
 where d.inst_status is not null
   and not exists (select 1 from dsb_instrument x where x.voucher_id = v.id);
+
+-- The end-of-day runs of the business dates on which the vouchers were approved.
+insert into dsb_eod_run (company_id, run_no, business_date, status, vouchers, checks, credits, forms, reports, emails,
+    message, created_at, created_by)
+select v.company_id, 'EOD-2026-' || lpad((900 + row_number() over (order by d.business_date))::text, 6, '0'),
+       d.business_date, 'CONFIRMED', d.vouchers, d.checks, d.vouchers - d.checks, d.vouchers, 6, d.vouchers,
+       d.vouchers || ' vouchers released', d.business_date + time '19:00' at time zone 'Asia/Manila', 'disbtl'
+from (select (approved_at at time zone 'Asia/Manila')::date as business_date, count(*) as vouchers,
+             count(*) filter (where mode = 'CHECK') as checks
+      from dsb_voucher where dv_no like 'DV-2026-0009%' and eod_run_id is null group by 1) d
+cross join lateral (select company_id from dsb_voucher where dv_no like 'DV-2026-0009%' limit 1) v
+where not exists (select 1 from dsb_eod_run x where x.company_id = v.company_id and x.business_date = d.business_date);
+
+update dsb_voucher v set eod_run_id = r.id
+from dsb_eod_run r
+where v.dv_no like 'DV-2026-0009%' and v.eod_run_id is null and r.company_id = v.company_id
+  and r.business_date = (v.approved_at at time zone 'Asia/Manila')::date;
+
+update dsb_instrument i set eod_run_id = v.eod_run_id
+from dsb_voucher v where v.id = i.voucher_id and v.dv_no like 'DV-2026-0009%' and i.eod_run_id is null;
 
 -- Certificates 2307 of the commission: received from the insurers on the remittance vouchers.
 insert into dsb_voucher_tag (voucher_id, kind, direction, doc_no, doc_date, received_on, period_from, period_to,
@@ -528,3 +548,136 @@ select c.id, 'BI-HO-2026-000003', 'INS-MGIC', 'NORMAL_PHP', 'UNEXTRACTED_DUE', '
 from org_company c
 where c.code = 'FVI'
   and not exists (select 1 from rem_extraction_tag x where x.invoice_no = 'BI-HO-2026-000003' and x.tag = 'UNEXTRACTED_DUE');
+
+-- =====================================================================================================
+-- 4. Commission: certificates 2307 of the commission submitted to Comptrollership and the Motor Mania
+--    incentive of the last quarter.
+-- =====================================================================================================
+insert into cmr_certificate (company_id, submission_no, insurer_code, certificate_form, certificate_no, period_from,
+    period_to, tax_withheld, stage, reject_reason, submitted_count, decided_at, decided_by, created_at, created_by)
+select c.id, s.submission_no, s.insurer, '2307', s.certificate_no, date_trunc('quarter', current_date - 92)::date,
+       (date_trunc('quarter', current_date) - interval '1 day')::date, s.tax, s.stage, s.reject_reason, s.submitted,
+       case when s.stage <> 'SUBMITTED' then (current_date - s.decided_ago) + time '14:00' at time zone 'Asia/Manila' end,
+       case when s.stage <> 'SUBMITTED' then 'comptrol' end,
+       (current_date - s.days_ago) + time '10:30' at time zone 'Asia/Manila', 'commrec'
+from (values
+    ('BCS-2026-000901', 'INS-MGIC', '2307-MGIC-2026-0731', 237.91, 'ACKNOWLEDGED', null, 1, 6, 5),
+    ('BCS-2026-000902', 'INS-LAC', '2307-LAC-2026-0418', 965.43, 'REJECTED',
+     'The certificate shows the TIN of the head office; the insurer to issue it to the branch TIN', 1, 4, 3),
+    ('BCS-2026-000903', 'INS-VMI', '2307-VMI-2026-0112', 1406.25, 'SUBMITTED', null, 1, 2, null)
+) as s(submission_no, insurer, certificate_no, tax, stage, reject_reason, submitted, days_ago, decided_ago)
+join org_company c on c.code = 'FVI'
+where not exists (select 1 from cmr_certificate x where x.submission_no = s.submission_no);
+
+insert into cmr_certificate_or (certificate_id, or_index, or_no, amount)
+select c.id, 1, o.or_no, o.amount
+from (values
+    ('BCS-2026-000901', 'OR-HO-100002', 2426.72),
+    ('BCS-2026-000902', 'OR-CEB-200002', 9847.43)
+) as o(submission_no, or_no, amount)
+join cmr_certificate c on c.submission_no = o.submission_no
+where not exists (select 1 from cmr_certificate_or x where x.certificate_id = c.id);
+
+insert into cmr_incentive_run (company_id, run_no, scheme_id, period_from, period_to, status, eligible_count,
+    eligible_production, excluded_count, excluded_amount, tier_applied, incentive_amount, pass_on_amount, posted_at,
+    posted_by, journal_refs, created_at, created_by)
+select c.id, 'INR-2026-000901', s.id, date_trunc('quarter', current_date - 92)::date,
+       (date_trunc('quarter', current_date) - interval '1 day')::date, 'POSTED', 2, 45534.49, 1, 22268.75,
+       'Fixed per policy', 1000.00, 1000.00, now() - interval '5 days', 'commtl', 'INC-HO-2026-000901',
+       now() - interval '6 days', 'commrec'
+from org_company c join cmr_incentive_scheme s on s.company_id = c.id and s.code = 'MOTOR_MANIA'
+where c.code = 'FVI' and not exists (select 1 from cmr_incentive_run x where x.run_no = 'INR-2026-000901');
+
+insert into cmr_incentive_run_line (run_id, invoice_no, insurer_code, sales_unit, segment, product_line,
+    basic_premium, gross_premium, excluded, exclusion_reason, incentive)
+select r.id, l.invoice_no, 'INS-MGIC', 'T-CBG1', 'CBG', l.line, l.basic, l.gross, l.excluded, l.reason, l.incentive
+from (values
+    ('BI-HO-2026-000001', 'MOTOR', 13595.00, 17027.86, false, null, 500.00),
+    ('BI-HO-2026-000003', 'MOTOR', 22805.00, 28506.63, false, null, 500.00),
+    ('BI-HO-2026-000002', 'FIRE', 17815.00, 22268.75, true, 'Not a motor policy; cancelled flat', 0.00)
+) as l(invoice_no, line, basic, gross, excluded, reason, incentive)
+join cmr_incentive_run r on r.run_no = 'INR-2026-000901'
+where not exists (select 1 from cmr_incentive_run_line x where x.run_id = r.id and x.invoice_no = l.invoice_no);
+
+-- =====================================================================================================
+-- 5. Employee Benefits: two new programme lines placed and booked this year (Group Personal Accident
+--    of Luzon Agri-Industrial with Mindanao Pacific, Group Life of Pacific Harbor with Luzon Assurance)
+--    and the franchise requests of the renewals sent to the incumbent insurers.
+-- =====================================================================================================
+create temporary table seed_eb_account (
+    arn varchar(30), programme_no varchar(30), line_no integer, benefit_line varchar(20), product varchar(20),
+    client_code varchar(30), insurer varchar(30), policy_no varchar(60), members integer, created_ago integer,
+    inception_ago integer, booked_ago integer, basic numeric(19, 2), dst numeric(19, 2), ptx numeric(19, 2),
+    lgt numeric(19, 2), comm_rate numeric(19, 8), officer varchar(50), team varchar(40), invoice_no varchar(40)
+) on commit drop;
+
+insert into seed_eb_account values
+('ARN-2026-950001', 'EBP-2026-000002', 2, 'GPA', 'EBGPA01', 'CL-2026-000004', 'INS-MPI', 'MPI-GPA-2026-07731', 410,
+ 48, 32, 25, 246000.00, 30750.00, 4920.00, 1230.00, 25, 'ebao', 'SM', 'BI-HO-2026-000901'),
+('ARN-2026-950002', 'EBP-2026-000005', 2, 'GLI', 'EBGLI01', 'CL-2026-000003', 'INS-LAC', 'LAC-GLI-2026-04418', 120,
+ 30, 16, 12, 180000.00, 0.00, 3600.00, 0.00, 15, 'ebao', 'VOLUNTARY', 'BI-HO-2026-000902');
+
+insert into acc_account (company_id, arn, client_id, client_code, client_name, product_code, line_code, cover_type_code,
+    market_segment, source_channel, insurer_code, period_from, period_to, multi_year, term_years, currency,
+    total_sum_insured, rating_basis, net_premium, dst, premium_tax, vat, fst, lgt, total_charges, gross_premium,
+    commission_rate, commission, vat_on_commission, minimum_applied, payment_arrangement, contact_name,
+    contact_email, contact_mobile, account_officer, status, payment_status, payment_source, payment_confirmed_at,
+    placement_slip_ref, placed_at, insurer_ref, policy_issue_date, epolicy_received, business_type, origin,
+    created_at, created_by)
+select c.id, e.arn, cl.id, cl.client_code, cl.display_name, e.product, e.benefit_line, e.benefit_line, 'CORPORATE',
+       'EMAIL', e.insurer, current_date - e.inception_ago, current_date - e.inception_ago + 365, false, 1, 'PHP',
+       e.members * 500000.00, 'ANNUAL', e.basic, e.dst, e.ptx, 0, 0, e.lgt, e.dst + e.ptx + e.lgt,
+       e.basic + e.dst + e.ptx + e.lgt, e.comm_rate, round(e.basic * e.comm_rate / 100, 2),
+       round(e.basic * e.comm_rate / 100 * 0.12, 2), false, 'VIA_BROKER', cl.display_name, cl.email, cl.mobile,
+       e.officer, 'BOOKED', 'PAID', 'Payment report', (current_date - e.booked_ago) + time '10:00' at time zone 'Asia/Manila',
+       'PL-2026-' || right(e.arn, 6), (current_date - e.inception_ago - 5) + time '15:00' at time zone 'Asia/Manila',
+       e.policy_no, current_date - e.inception_ago, true, 'NEW_BUSINESS', 'EMPLOYEE_BENEFITS',
+       (current_date - e.created_ago) + time '09:00' at time zone 'Asia/Manila', e.officer
+from seed_eb_account e
+join org_company c on c.code = 'FVI'
+join crm_client cl on cl.client_code = e.client_code
+where not exists (select 1 from acc_account x where x.arn = e.arn);
+
+insert into eb_programme_line (programme_id, line_no, benefit_line, product_code, incumbent_insurer, current_policy_no,
+    current_arn, period_from, period_to, headcount, active, created_at, created_by)
+select p.id, e.line_no, e.benefit_line, e.product, e.insurer, e.policy_no, e.arn, current_date - e.inception_ago,
+       current_date - e.inception_ago + 365, e.members, true,
+       (current_date - e.created_ago) + time '09:00' at time zone 'Asia/Manila', e.officer
+from seed_eb_account e
+join eb_programme p on p.programme_no = e.programme_no
+where not exists (select 1 from eb_programme_line x where x.programme_id = p.id and x.line_no = e.line_no);
+
+insert into bkg_invoice (company_id, branch_id, invoice_no, arn, account_id, transaction_no, kind, status, policy_year,
+    policy_no, client_id, client_code, client_name, insurer_code, risk_code, line_code, market_segment, source_channel,
+    account_officer, sales_unit, department, cost_center, currency, booking_date, inception_date, expiry_date,
+    basic_premium, dst, premium_tax_vat, lgt, fst, other_charges, commission_rate, commission, vat_on_commission,
+    wtax_rate, wtax_amount, direct_payment, cwt2_percent, incentive_eligible, business_type, booking_source,
+    booked_by, booked_at, created_at, created_by, root_invoice_no, ledger_context, incentive_status)
+select a.company_id, b.id, e.invoice_no, a.arn, a.id, 'NB', 'BOOKING', 'BOOKED', 1, e.policy_no, a.client_id,
+       a.client_code, a.client_name, a.insurer_code, a.product_code, a.line_code, 'CORPORATE', 'EMAIL', e.officer,
+       e.team, 'EB', 'EB-CORP', 'PHP', current_date - e.booked_ago, a.period_from, a.period_to, e.basic, e.dst, e.ptx,
+       e.lgt, 0, 0, e.comm_rate, a.commission, a.vat_on_commission, 10, round(a.commission * 0.10, 2), false, false,
+       false, 'NEW_BUSINESS', 'INDIVIDUAL', 'ebproc', (current_date - e.booked_ago) + time '14:00' at time zone 'Asia/Manila',
+       (current_date - e.booked_ago) + time '14:00' at time zone 'Asia/Manila', 'ebproc', e.invoice_no, 'NEW',
+       'NOT_ELIGIBLE'
+from seed_eb_account e
+join acc_account a on a.arn = e.arn
+join org_branch b on b.company_id = a.company_id and b.code = 'HO'
+where not exists (select 1 from bkg_invoice x where x.invoice_no = e.invoice_no);
+
+-- Franchise requests of the renewals: one waiting for the insurer, one approved by the insurer
+-- without evidence yet (advised to the client).
+insert into eb_franchise_request (company_id, franchise_no, programme_id, cycle_id, insurer_code, status,
+    submitted_at, due_date, advice_due_date, remarks, created_at, created_by)
+select cy.company_id, f.franchise_no, cy.programme_id, cy.id, f.insurer, 'SUBMITTED',
+       (current_date - f.sent_ago) + time '10:00' at time zone 'Asia/Manila', current_date - f.sent_ago + 10,
+       current_date - f.sent_ago + 15, f.remarks, (current_date - f.sent_ago) + time '09:30' at time zone 'Asia/Manila',
+       'ebao'
+from (values
+    ('EBF-2026-000901', 'EBC-2026-000004', 'INS-MPI', 6,
+     'Renewal of the Group Personal Accident of 120 members on the expiring terms'),
+    ('EBF-2026-000902', 'EBC-2026-000001', 'INS-MGIC', 3,
+     'Renewal of the Group HMO of 240 members; the client asks to keep the dental rider')
+) as f(franchise_no, cycle_no, insurer, sent_ago, remarks)
+join eb_cycle cy on cy.cycle_no = f.cycle_no
+where not exists (select 1 from eb_franchise_request x where x.franchise_no = f.franchise_no);

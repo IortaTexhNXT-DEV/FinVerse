@@ -1,0 +1,1399 @@
+# Additions of version 1.1 to BDOI's Renewal FRS (BDO ITG, PRJ0012475, v1.0 of 11-Jun-2026), in BDOI's style:
+# "The system shall ..." statements and numbered acceptance criteria. Read by build_brd06_bdoi_frs.py.
+#
+#   items         elaboration under each of BDOI's 143 items (key = BDOI's item number as printed; a repeated number is
+#                 keyed "<number> (2nd)"); the statements continue BDOI's numbered list of the item
+#   new_subitems  new sub-items of BDOI's entries, numbered after BDOI's last sub-item of the entry
+#   new_items     new entries FRRN.045 onwards (capabilities BDOI's FRS does not have)
+# refs: the BIBS reference requirements (FR-RN-nnn of the BIBS FRS BRD-06 v2.0) each item incorporates; they drive
+# Annex AL (traceability) and the FRRN items of the BRD lines in the Business Requirements Mapping.
+# Wording: business words only. "Annex AN" is the observations annex where a point is open for BDOI's decision; where
+# BDOI's text and the BIBS reference FRS differ, BDOI's text is kept and nothing added here contradicts it.
+
+items:
+  # ---------------------------------------------------------------------------------------------- FRRN.001 Login
+  FRRN.001.01:
+    refs: [FR-RN-001]
+    shall:
+      - The system shall keep one session for all the browser tabs of a user; each tab works on its own record, and activity in any tab keeps every tab signed in.
+    ac:
+      - A user works on the RMEL in one tab and on a renewal account in a second tab without losing the work of either tab.
+      - A user signed in on two tabs is still signed in on the second tab after working only in the first tab for 20 minutes.
+
+  FRRN.001.02:
+    refs: [FR-RN-001, FR-RN-002]
+    shall:
+      - The system shall show in the menu only the Renewal screens that the user's profiles allow, and hide the buttons of the actions the user may not perform.
+      - "The system shall refuse a direct link to a screen the user may not open with the message \"You do not have access to this screen. Contact your administrator if you need it.\", and an action without the function with the message \"You are not permitted to perform this action\"; each refusal is recorded with the user and the time."
+      - The system shall apply the user's data scope to every list, record, dashboard, report and export, not only to the screen.
+      - The system shall limit the LAMD profile to the LAMD uploads and the validation results; it shall never hold a booking, placement, issuance, letter or client-communication function (BRRN.024).
+      - The system shall show the renewal lists to the LAMD and Contact Center users without the premium and commission columns.
+      - "The system shall lock an account after three (3) consecutive failed sign-in attempts and give one message for a wrong password, a locked and a deactivated account: \"Invalid user name or password\"."
+    ac:
+      - A Marketing Account Officer sees My Dispositions and the renewal accounts assigned to him, and does not see the Processing Worklist or Renewal Setup.
+      - A Marketing Team Lead does not see the renewal accounts of another Marketing Unit, in the lists, the dashboard or an export.
+      - A Unit Head sees the renewal accounts of the users of his reporting hierarchy and can open them.
+      - A LAMD user can upload a LAMD report and view the matching results, and cannot generate or send a Renewal Advice.
+
+  FRRN.001.03:
+    refs: [FR-RN-001]
+    shall:
+      - The system shall count the inactivity across all the tabs of the user.
+      - The inactivity time (15 minutes as delivered) shall be a parameter maintained by the System Administrator.
+    ac:
+      - After 15 minutes without activity the warning appears with the message of this item and the buttons "Stay Logged In" and "Log Out".
+      - Stay Logged In closes the warning and restarts the inactivity timer; Log Out ends the session and opens the Login page.
+
+  FRRN.001.04:
+    refs: [FR-RN-001]
+    shall:
+      - The system shall record the end of each session with the reason (inactivity or log-out).
+      - The system shall also warn the user 30 minutes before the system-triggered end of a session, so that the work can be saved (BRD 1.001.3.1, 2.001.1.3, 3.001.1.3, 4.001.1.3, 5.001.1.3; Annex AN).
+    ac:
+      - After 30 minutes without activity the session ends and the message "Your session timed out. Please log in again to continue" is shown with the button Log In, which opens the Login page.
+      - 30 minutes before the system-triggered end of the session the user sees the session-end warning.
+      - The session log shows the end of the session with the reason inactivity.
+
+  # ---------------------------------------------------------------------------------------------- FRRN.002 Landing page
+  FRRN.002.01:
+    refs: [FR-RN-100, FR-RN-013]
+    shall:
+      - "The Renewal Module shall hold, by persona, the screens Renewal Home, RMEL (Expiry List), My Dispositions, TL Review, Transfers, Processing Worklist, Insurer Batches, Letters, Follow-ups, LAMD Reports, Renewal Reports and Renewal Setup; each screen is shown only to the profiles that hold its function (Annex AA, menu by persona)."
+      - Each upload of the module shall offer the download of its template, a check of every row with its message, and the processing of the valid rows; a file that was already uploaded shall be refused.
+      - Each upload shall be recorded with the file, the user, the time and the counts of rows read, applied and refused.
+    ac:
+      - A Processing Team Lead sees the Processing Worklist, the Insurer Batches and the uploads of Processing; a Marketing Account Officer does not see Renewal Setup.
+      - A file uploaded a second time is refused and nothing is updated.
+      - The upload result lists every refused row with its message and can be downloaded.
+
+  FRRN.002.02:
+    refs: [FR-RN-100]
+    shall:
+      - The dashboard shall count only the renewal accounts of the user's data scope.
+      - "The dashboard shall show the renewal accounts expiring within 30, 60, 90 and 140 days, the work that needs attention (at risk, urgent, returned, NRNS, insurer reply overdue, letters not delivered), the renewal accounts by status and by classification, and the workload per officer: per Account Officer for the Marketing Team Lead and per Processing Officer for the Processing Team Lead, with the ageing to expiry (BRD 1.009.7, 3.010.7)."
+      - Every figure of the dashboard shall open the list of the renewal accounts it counts, and that list can be exported.
+    ac:
+      - A Marketing Team Lead sees, for each Account Officer of his unit, the number of open renewal accounts assigned to him.
+      - Clicking "Expiring within 30 days" opens the list of exactly the renewal accounts counted.
+      - Changing the Market Segment filter changes every figure and the drill-down lists accordingly.
+
+  FRRN.002.02.01:
+    refs: []
+    shall:
+      - The actual figures shall be the basic premium and gross commission of the booked renewal accounts of the period; the budget figures shall be those of the Annual Renewal Budget of FRRN.042 for the same period, segment and hierarchy.
+    ac:
+      - With a budget of PHP 10,000,000.00 and an actual of PHP 8,500,000.00 for the period, the dashboard shows % vs Budget 85.00 and a variance of PHP -1,500,000.00.
+      - Show Details lists the transactions whose total equals the actual shown.
+
+  FRRN.002.02.02:
+    refs: []
+    shall:
+      - The system shall count each renewal account in one pipeline stage at a time, from its current status (the stage-to-status mapping is in Annex AC; Annex AN).
+    ac:
+      - The total of the Pipeline Summary equals the sum of its stages for count, premium and commission.
+      - Clicking a count lists exactly the renewal accounts counted.
+
+  FRRN.002.02.03:
+    refs: [FR-RN-100]
+    ac:
+      - A renewal account expiring next month and not yet booked is counted under +1 Month; once booked it is no longer counted.
+      - The Total column equals the sum of the ageing buckets for count, premium and commission.
+
+  FRRN.002.02.04:
+    refs: []
+    ac:
+      - With 40 booked renewal accounts out of 50 renewal accounts of the period, the closing ratio of Renewal shows 80.00%.
+      - The accounts contributing to each ratio can be listed from the figure.
+
+  FRRN.002.02.05:
+    refs: []
+    ac:
+      - The Top 50 view lists the 50 open renewal accounts with the highest premium, highest first, with the columns of this item.
+      - Selecting a row opens the renewal account.
+
+  FRRN.002.02.06:
+    refs: []
+    ac:
+      - With 90 renewed out of 100 renewable accounts in the current month, the count persistency of the current month shows 90.00%.
+      - The YTD figure covers the renewable accounts from January of the year to the selected month.
+
+  FRRN.002.02.07:
+    refs: []
+    ac:
+      - The product mix lists each product line with the count, premium and commission of the period, and the totals equal the dashboard totals.
+
+  FRRN.002.02.08:
+    refs: [FR-RN-071, FR-RN-103]
+    ac:
+      - A renewal account For Renewal with the insurer disposition Approved is counted under Insurer Approved; one without insurer disposition is counted under Pending for Insurer Approval and in the row of its insurer in the table of pending accounts.
+      - "% of Approval equals Insurer Approved divided by Total Renew As Is, times 100."
+
+  FRRN.002.02.09:
+    refs: [FR-RN-100, FR-RN-086]
+    shall:
+      - The card Expiring Hold Cover shall count the confirmed hold covers whose end date falls within the next 7 days (FRRN.036, FRRN.037).
+      - The cards that come from Cashiering (Bounced Check, Unapplied Payment, Refund) shall count the transactions of the renewal accounts of the user's scope (Operations Cashiering FRS).
+    ac:
+      - Clicking the For Disposition card lists every renewal account of the user's scope without a disposition.
+      - A renewal account with a confirmed hold cover ending in 5 days is counted in Expiring Hold Cover; one ending in 10 days is not.
+
+  FRRN.002.05:
+    refs: [FR-RN-013, FR-RN-022, FR-RN-045]
+    shall:
+      - The system shall show the records of each panel in one scrollable view without pages, with the number of rows (BRRN.004).
+      - The system shall show next to the renewal reference of each record its classification and the flags Returned, Transferred, Endorsed, Claims, Outstanding, KYC due, NRNS and Hold Cover confirmed; a padlock shall mark the locked accounts (BRD 2.006).
+      - "Besides the columns above, the system shall offer the columns of the BRD (BRD 1.003.4.1.1, 3.003.4.1): Cover No., Version No., Invoicing Branch, Department Code, Department Name, Unit Head, Business Origin, Account Officer, Expiring Policy No., Insurance Company, Risk Code, Risk Name, Risk Description, Disposition Remarks and, for Marketing, Number of Claims, Status of Each Claim and Amount of Outstanding Premium."
+      - The expiring EBIX invoice number and the BDOIsys reference number are out of scope (BRD Addendum 1, p.60); the expiring invoice number of the system and the renewal reference take their place.
+    ac:
+      - A panel of 20,000 records scrolls from the first to the last record without a pager, and the number of rows shows 20,000.
+      - A record with an open claim shows the Claims flag and never appears in the Clean panel.
+      - A record locked after posting and placement shows the padlock.
+
+  FRRN.002.06:
+    refs: [FR-RN-013, FR-RN-040]
+    shall:
+      - The global search shall filter the list and highlight the matching text in each row, like Ctrl+F (BRRN.016).
+      - "The system shall find an account by name or by reference: renewal reference, account reference number (ARN), expiring invoice number, expiring policy number, PN and client code (BRRN.017)."
+      - Each column shall be filtered by its type (text, list, date or amount); columns can be resized and moved, and the layout is kept for the user.
+    ac:
+      - Typing a client's name in the search box lists only that client's renewal accounts and highlights the name.
+      - A search by PN finds the renewal account of the loan.
+      - A column moved to the first position stays first after the user logs out and in.
+
+  FRRN.002.07:
+    refs: [FR-RN-014]
+    shall:
+      - Each export shall be recorded with the user, the filters and the time.
+    ac:
+      - The Excel file of a filtered drill-down list holds exactly the rows and columns shown on the screen.
+      - The print preview shows the same rows as the printed pages.
+
+  # ---------------------------------------------------------------------------------------------- FRRN.003 Processing dashboard
+  FRRN.003.01:
+    refs: [FR-RN-100, FR-RN-062]
+    shall:
+      - In the Renewal view the system shall show, per Processing Officer, the renewal accounts open, overdue against their expiry date and returned, with the ageing to expiry (BRD 3.010.7).
+    ac:
+      - The Combined View count equals the New Business View count plus the Renewal View count.
+      - A Processing Team Lead sees, for each Processing Officer, the number of open renewal accounts assigned to him.
+
+  FRRN.003.02:
+    refs: []
+    ac:
+      - A renewal account with status "Submitted for Placement" is counted in For Placement; once the placement is sent to the insurer and until it is booked, it is counted in For Booking.
+      - Clicking a card lists exactly the accounts counted, and the list can be searched, filtered, sorted and exported.
+
+  FRRN.003.02.01:
+    refs: []
+    shall:
+      - Ageing in business days shall exclude Saturdays, Sundays and the holidays of the BDOI holiday calendar.
+    ac:
+      - An account submitted for placement on a Friday shows an ageing of 1 on the following Monday.
+      - The Unassigned tab lists the accounts without a Placement Processor; assigning one moves the account to the Assigned tab with the Processor's name.
+
+  FRRN.003.02.02:
+    refs: []
+    ac:
+      - The ageing counts the business days from the date the placement was sent to the insurer.
+
+  FRRN.003.02.03:
+    refs: []
+    ac:
+      - An account whose policy number is recorded is listed under With Policy; one without is listed under Without Policy.
+      - TAT Status shows Beyond TAT when the placement ageing exceeds the turnaround time of FRRN.29.05.
+
+  FRRN.003.02.04:
+    refs: []
+    ac:
+      - A policy sent successfully is listed under Released; one that could not be sent is listed under Unreleased with the reason for reject.
+
+  FRRN.003.02.05:
+    refs: []
+    ac:
+      - An account tagged For Booking Only (direct booking) is counted under Directly Booked and listed with its booking details.
+
+  FRRN.003.02.06:
+    refs: [FR-RN-065]
+    ac:
+      - An account returned to Marketing is counted under Returned Accounts and listed with the return date and the return reason.
+
+  FRRN.003.03:
+    refs: [FR-RN-062, FR-RN-013]
+    ac:
+      - A partial value typed in a column filter lists every account whose value contains it.
+      - Sorting works on every column.
+
+  FRRN.003.04:
+    refs: [FR-RN-014]
+    ac:
+      - The exported file of a drill-down list matches the list shown, with its filters.
+
+  # ---------------------------------------------------------------------------------------------- FRRN.004 RMEL
+  FRRN.004.01:
+    refs: [FR-RN-011]
+    shall:
+      - The system shall record each generation of the RMEL as an extraction run with the user, the date range, the filters and the counts of accounts read, new, already listed and skipped.
+    ac:
+      - A Marketing Team Lead generates the RMEL for 01-Mar-2027 to 31-Mar-2027 and sees every account of his units expiring in March 2027, and only those.
+      - The run is listed with the user, the range and its counts.
+
+  FRRN.004.02:
+    refs: [FR-RN-011]
+    shall:
+      - "The system shall refuse a missing or invalid date with the message \"Enter a valid start and end date\", and an end date before the start date with the message \"The end date must be on or after the start date\"."
+    ac:
+      - An end date before the start date cannot be submitted, and the message is shown.
+      - Changing the range after generation refreshes the list at once.
+
+  FRRN.004.03:
+    refs: [FR-RN-012]
+    shall:
+      - "The system shall offer at least the filters of the BRD: Unit Head, Business Origin, Account Type, Region, Area, Invoicing Branch, Risk Code, Market Segment, Department Name and Account Officer (BRD 1.003.3.1, 3.003.3.1), and the classification, the disposition and the status; each with a search in the drop-down."
+      - "The system shall refuse an \"only\" and an \"all except\" selection on the same filter with the message \"Choose either 'only' or 'all except' for <filter>\"."
+      - The applied filters shall stay visible above the list.
+    ac:
+      - Risk Code "All Except" MC01 lists every expiring account except those with risk code MC01.
+      - Two Unit Heads selected together list the accounts of both.
+      - Clear returns the full list.
+
+  FRRN.004.04:
+    refs: [FR-RN-010, FR-RN-021, FR-RN-015]
+    shall:
+      - Besides the generation by the user, the system shall extract every day the accounts whose policy expiry date is the business date plus the lead days (140 days as delivered; a value per market segment may replace it), so that no expiring account is missed (BRRN.030; Annex AN).
+      - The lead days shall be parameters; a change applies from the next run.
+      - The unique identifier of a renewal account shall be its renewal reference; it shall be the matching key of every upload of Renewal (BRRN.022).
+      - The system shall keep one open renewal account per expiring policy; a second generation or run over the same dates shall not create a second one.
+      - For a multi-year policy, only the last policy year of the term shall produce a renewal account.
+      - Employee Benefits lines (HMO, group life and group personal accident) shall not be listed; they are renewed in the Employee Benefits module (cross-BRD decision D3).
+      - When the daily run fails, the system shall alert the administrators and the next run shall take the missed dates.
+    ac:
+      - A booked account expiring 140 days after the business date is listed that day with a renewal reference, and is not listed twice after a second run.
+      - A change of the lead days from 140 to 150 applies from the next run without a release.
+      - An HMO account is not listed.
+      - A date range without expiring account shows "No records found."; a successful generation shows "Generation of RMEL successful!".
+
+  FRRN.004.06:
+    refs: [FR-RN-027]
+    shall:
+      - The renewal account shall be built from the expiring (mother) policy as of its last posted endorsement.
+      - "While an endorsement request on the expiring policy is neither posted nor cancelled, the system shall refuse the posting, the Renewal Advice and the client acceptance of the renewal account with the message \"Renewal <reference> has an endorsement in progress (<endorsement no.>)\" (BRRN.032)."
+      - The system shall record on the renewal account the endorsements linked to it and show the Endorsed flag.
+    ac:
+      - A renewal account cannot be posted while an endorsement request on its expiring policy is open, and the message names the endorsement.
+      - After the endorsement is posted, the renewal account shows the endorsed sum insured, and the endorsement number is listed on it.
+
+  FRRN.004.06 (2nd):
+    refs: [FR-RN-014]
+    shall:
+      - The export shall hold the same rows and columns as the list displayed; nothing is truncated (BRRN.007).
+    ac:
+      - The RMEL of March 2027 extracted on 10-Oct-2026 downloads as RMEL_MAR_2027_10102026.xlsx with exactly the rows and columns of the screen.
+      - The print preview has the page size and orientation chosen by the user.
+
+  # ---------------------------------------------------------------------------------------------- FRRN.005-009
+  FRRN.005.01:
+    refs: [FR-RN-063]
+    shall:
+      - The duplicate checking of FRRN.006 shall run before the renewal account is saved.
+      - "The system shall list every missing mandatory field of the product with the message \"Complete the mandatory fields of <product>: <fields>\", and refuse a product that is not sellable with the message \"Product <code> is <status> and cannot be sold\"."
+      - The renewal account shall carry the business type Renewal and the link to the account reference number (ARN) of the expiring account (cross-BRD decision D1).
+      - The creation shall be recorded in the audit log with the user and the time.
+    ac:
+      - A renewal account created from an expiring Motor account carries the same client, vehicle, insurer and PN, the business type Renewal and the link to the expiring ARN.
+      - A save with a mandatory field missing names every missing field.
+      - The new renewal account appears in the renewal list and goes through sanitation, assignment and classification.
+
+  FRRN.006.01:
+    refs: [FR-RN-020]
+    shall:
+      - Whatever the configured criteria, the system shall never keep two open renewal accounts for the same expiring policy (BRRN.005).
+      - The result of the duplicate check shall be shown on the sanitation results of the renewal account.
+      - The duplicate criteria per line of insurance shall be maintained by the Business Administrator with an effective date (Annex B).
+    ac:
+      - A manual creation with the same plate, serial and motor numbers and an overlapping policy period as an existing Motor account shows the potential-duplicate warning with the link to that account.
+      - A match with a cancelled account shows the cancelled-match warning and the account can be saved.
+      - A generated renewal account with a potential duplicate is classified For Review with the reason "Potential Duplicate Account" and the link.
+
+  FRRN.007.01:
+    refs: [FR-RN-020, FR-RN-112]
+    shall:
+      - The system shall also run the sanitation after every upload (LAMD, insurer disposition, renewal update), on the booking, endorsement and payment of the expiring account, and every night.
+      - "Each sanitation rule shall record its result (passed, warning, failed, for information or not applicable) with its detail; the results are shown on the renewal account and in the Sanitation report for any date range."
+      - A change of the sanitation rules shall apply to the renewal accounts not yet in process; accounts in process keep their results until their next event (BRRN.020).
+      - The sanitation rules shall be changed only by the authorised users, with an effective date (FRRN.040).
+    ac:
+      - A renewal account with an open endorsement request shows the endorsement rule as failed in its sanitation results.
+      - When the endorsement is posted, the rule shows passed at the next event without a user action.
+      - The Sanitation report lists the failed rules of a date range with the renewal account and the detail.
+
+  FRRN.007.02:
+    refs: [FR-RN-020, FR-RN-022, FR-RN-024, FR-RN-026]
+    shall:
+      - For CBG Motor and CBG Home (mortgaged accounts) the system shall check that the PN is present; a renewal account without PN shall not proceed without review (BRRN.039).
+      - The system shall check that the risk is in the renewable list given by the insurer, where the insurer gives one (Walkthrough addendum SC-10).
+      - The system shall check that the insurer is active and usable, and that the renewal premium has no financial impact beyond the tolerance (FRRN.009, BRRN.038).
+      - When the claims of an account cannot be read (a migrated policy whose claims are not in the system), the claims rule shall show not applicable and shall not block the renewal.
+      - The KYC due rule shall be for information only and shall never block the renewal (BRRN.028; FRRN.039).
+      - The TSI threshold (PHP 250,000,000.00 as delivered) shall be a parameter.
+    ac:
+      - A renewal account with a TSI of PHP 300,000,000.00 is classified and dispositioned as Annex C states for its market segment; one with PHP 200,000,000.00 passes the TSI rule.
+      - A renewal account whose risk code is not maintained is flagged Review with the reason "Risk Code is not maintained as Renewable/Not Renewable".
+      - A renewal account on a non-renewable risk code is tagged Not for Renewal and is not in the assignment list.
+      - A CBG Motor renewal account without PN does not move on as Clean.
+
+  FRRN.008.01:
+    refs: [FR-RN-022, FR-RN-023, FR-RN-051]
+    shall:
+      - The system shall record with each classification the version of the rules and the rule that set it, and keep the history of the classifications of the renewal account (from, to, rule, cause, user and remarks).
+      - "A renewal account with a failed sanitation rule shall never be classified Clean, by rule or by a manual reclassification; the attempt is refused with the message \"Renewal <reference> has failed checks and cannot be Clean\" (BRRN.023)."
+      - "A manual reclassification shall need a justification of up to 200 characters (\"Enter the remarks of the override\") and shall be recorded with the user and the time."
+      - A renewal account that stays in exception beyond the ageing days (5 working days as delivered) shall raise one alert to the owner of its stage; the account is not moved by the alert (Walkthrough addendum R29-05).
+      - The users shall filter and export the renewal accounts by classification.
+    ac:
+      - A renewal account with an open claim is classified Review, never Clean.
+      - When the claim is closed, the renewal account becomes Clean at the next re-evaluation and the history shows both classifications.
+      - A manual reclassification to Clean of a renewal account with a failed rule is refused with the message.
+      - The renewal account shows, for each classification, the version of the rules and the rule that set it.
+
+  FRRN.009.01:
+    refs: [FR-RN-063, FR-RN-064]
+    shall:
+      - The system shall show on a Computations tab every calculated field of the renewal account (premium by component, taxes, commission and total) next to the expiring account, with the difference.
+      - The system shall compare the renewal premium, sum insured, rate, commission and charges with the expiring account; a difference beyond the tolerance (0.00 as delivered, a parameter) shall flag a financial impact, route the renewal account to Review and propose the New Business path (FRRN.018.02, BRRN.038).
+      - "The documentary stamp tax shall be rounded up to the next PHP 0.50 (Annex D)."
+    ac:
+      - The Computations tab shows the same premium components as the renewal account, with the expiring values and the differences.
+      - For a CBG Motor Regular renewal, the own damage and theft sum insured is depreciated by 10% and the other fields are updated as Annex D states.
+      - A renewal premium different from the expiring premium flags the financial impact and shows the difference.
+
+  # ---------------------------------------------------------------------------------------------- FRRN.010-011
+  FRRN.010.01:
+    refs: [FR-RN-030, FR-RN-061]
+    shall:
+      - The system shall also allow the Marketing Team Lead to assign accounts of his unit to an Account Officer of the unit, and the Processing Team Lead to assign accounts to a Processing Officer or to himself, by single, multiple, all and all-except selection (BRD 1.005, 3.005; Annex AN).
+      - "The list of officers offered shall be limited to the active officers of the user's unit; an officer of another unit is refused with the message \"<officer> is not an officer of your unit\", and an empty selection with \"Select at least one account\"."
+      - The assigned officer shall receive a notice in the system for each account assigned to him (Annex AE).
+      - Each assignment shall be recorded with the previous and new officer, the user and the time.
+    ac:
+      - Accounts assigned to an Account Officer appear in his My Dispositions and leave the unassigned list.
+      - A Team Lead cannot assign an account to an officer of another unit.
+      - The assigned officer receives the notice "<renewal reference> assigned to you".
+
+  FRRN.010.02:
+    refs: [FR-RN-030]
+    shall:
+      - "Re-assignment shall be refused once the account is locked (FRRN.014.02), with the message \"Renewal <reference> is locked since the Renewal Advice was generated\" for an account locked by its Renewal Advice (Annex AN)."
+      - The user may give a reason for the re-assignment from a list maintained by the Business Administrator.
+    ac:
+      - A Team Lead re-assigns three accounts to another officer of his unit; the accounts move to that officer's list and the history shows both officers.
+      - A locked account cannot be re-assigned.
+
+  FRRN.011:
+    refs: [FR-RN-031, FR-RN-032]
+    shall:
+      - The transfer of the renewal account itself to another Marketing Unit (BRD 1.006, 1.007, 2.005) is specified in FRRN.011.06; whether the referral of this entry, the transfer or both are used is a decision of BDOI (Annex AN).
+    ac:
+      - A transfer request never changes the owner of the original renewal account (referral of this entry).
+
+  FRRN.011.01:
+    refs: [FR-RN-031]
+    shall:
+      - "The system shall refuse a request without target unit (\"Select the receiving unit\"), without justification (\"Enter the remarks\"), to the same unit (\"The receiving unit must be another unit\") or for an account with an open request (\"Renewal <reference> already has a transfer request\")."
+    ac:
+      - A submitted request gets a Transfer Request Number and the status Pending Acceptance, and the Team Leads of the receiving unit are notified.
+      - A request to the originating unit is refused with the message.
+
+  FRRN.011.02:
+    refs: [FR-RN-032]
+    shall:
+      - Only a Team Lead of the receiving unit shall decide the request; remarks are mandatory to reject or return it ("Enter the remarks of the decline").
+      - "A request already decided shall not be decided again (\"The transfer of <reference> is already decided\")."
+    ac:
+      - The receiving Team Lead accepts the request; the acceptance date and time are recorded and the status becomes Accepted.
+      - A rejection without remarks is refused.
+
+  FRRN.011.03:
+    refs: []
+    ac:
+      - On acceptance, a New Business account is created with the data copied from the renewal account, linked to the Transfer Request Number; the receiving user can change the copied data before saving.
+
+  FRRN.011.04:
+    refs: [FR-RN-031, FR-RN-032]
+    ac:
+      - The Transfer Request Monitoring screen lists every request with its number, units, status and the New Business account number once created.
+      - Each request, decision and New Business account creation is in the audit log with the user and the time.
+
+  FRRN.011.05:
+    refs: [FR-RN-031, FR-RN-032]
+    shall:
+      - The notifications shall use the texts of Annex AE.
+    ac:
+      - The requesting user is notified when the request is rejected or returned for clarification, with the remarks.
+
+  # ---------------------------------------------------------------------------------------------- FRRN.012 LAMD
+  FRRN.012.01:
+    refs: [FR-RN-025]
+    shall:
+      - Only the users of the LAMD profile (and the users BDOI names) shall upload LAMD reports.
+      - The user shall give the period (month) of the report; each upload is recorded with the report type, the period, the file, the user and the time.
+    ac:
+      - A LAMD user uploads the List of Paid Off Accounts of September 2026 and sees "LAMD report is successfully processed. Records have been matched and updated accordingly."
+      - A file in another format is refused with "Upload failed. Invalid file format. Please upload a supported file type (.xlsx or .csv)."
+      - A file without the PN column is refused with the missing-required-data message.
+
+  FRRN.012.02:
+    refs: [FR-RN-025]
+    shall:
+      - The PN shall be the primary matching key (BRRN.029).
+      - "A PN that matches several renewal accounts shall not update any of them and shall be listed with the message \"Row <n>: PN <pn> matches several renewals\"; an unmatched PN shall be kept as unmatched."
+      - Each match and its effect on the renewal account shall be recorded with the time and the data source (BRRN.029).
+    ac:
+      - A paid-off PN matching an expiring CBG Motor account updates that renewal account as the sanitation rules of Annex C state.
+      - A PN found on two renewal accounts updates neither and is listed with the message.
+
+  FRRN.012.03:
+    refs: [FR-RN-025]
+    ac:
+      - Each upload is one row of the summary, latest first, with its status and counts; the processing result downloads as "LAMD Processing Result_ MMDDYYYY.xlsx" with the upload date.
+
+  FRRN.012.04:
+    refs: [FR-RN-025]
+    ac:
+      - Opening an upload lists every record with its matching and processing status and the reason of a failure, and the list can be filtered by Matched and Unmatched.
+
+  FRRN.012.05:
+    refs: [FR-RN-025]
+    ac:
+      - A paid-off account uploaded twice in two months is kept once in the list of paid-off accounts, unchanged by the second upload.
+
+  FRRN.012.06:
+    refs: []
+    ac:
+      - A BDOFC report with the PN, the assured's name and the remarks is processed and the success message of this item is shown.
+      - A file without the PN or the remarks is refused with the missing-required-data message.
+
+  FRRN.012.07:
+    refs: []
+    ac:
+      - A BDOFC or SOLD line whose PN matches a renewal account is linked to it and the account is re-evaluated by the sanitation rules (the effect of a match is to be confirmed by BDOI, Annex AM).
+
+  FRRN.012.08:
+    refs: []
+    ac:
+      - Each BDOFC or SOLD upload is one row of the summary with its status; the processing result downloads as "BDOFC/SOLD Processing Result_ MMDDYYYY.xlsx".
+
+  FRRN.012.09:
+    refs: []
+    ac:
+      - Opening a BDOFC or SOLD upload lists every record with its matching and processing status.
+
+  # ---------------------------------------------------------------------------------------------- FRRN.013 Insurer disposition
+  FRRN.013.01:
+    refs: [FR-RN-071]
+    shall:
+      - Each upload shall be recorded with the file, the insurer, the user, the time and the counts of records matched, applied and refused.
+      - The insurer's response shall be captured once and be the single source of the progress of the renewal account (BRRN.035).
+    ac:
+      - A CBG insurer disposition file in the layout of Annex H is processed and the success messages of this item are shown.
+      - A file without a required field is refused with the missing-required-data message, and nothing is updated.
+
+  FRRN.013.02:
+    refs: [FR-RN-071]
+    shall:
+      - "Each insurer disposition value shall also count as one of the three outcomes of the BRD (BRRN.035): Renew As Is / Approved as Approve; Renew with surcharge, Renew under another package and Apply minimum premium as Revise; Rejected, Total Loss and the three non-renewal values as Reject (Annex AN)."
+      - The responses shall only be added, never changed; the latest valid response drives the renewal account.
+      - A response that does not match (reference, policy number or several rows for one account), arrives after the reply date or conflicts with another response in the same file shall not move the renewal account; it is flagged for review, and only a manual update with remarks moves it.
+      - A Renew As Is that matches shall move the renewal account on without re-keying and without changing the terms, the price or the structure (BRRN.035).
+    ac:
+      - An insurer disposition Renew As Is that matches sets the bucket Clean and the renewal disposition For Renewal, with the premium and terms unchanged.
+      - A row whose expiring policy number differs from the renewal account's is not applied and the account is flagged for review.
+      - "An insurer disposition Renew with surcharge sets the bucket Review and the renewal disposition For Disposition, and the financial impact is flagged."
+
+  FRRN.012.03 (2nd):
+    refs: [FR-RN-071]
+    ac:
+      - Each insurer disposition upload is one row of the summary with its status and counts, latest first.
+
+  FRRN.012.04 (2nd):
+    refs: [FR-RN-071]
+    ac:
+      - A record whose reference is not found is listed with "Record not found" and updates nothing.
+
+  # ---------------------------------------------------------------------------------------------- FRRN.014 account details
+  FRRN.014.01:
+    refs: [FR-RN-041, FR-RN-042]
+    shall:
+      - The account details shall be read from the expiring account and the renewal account at the time of viewing, so that every update and endorsement shows at once (BRRN.011, BRRN.013).
+      - The system shall show on an Account History tab, read only, the previous policies and renewals of the account, its endorsements, its payment history and its claims, sourced from the mother policy (BRRN.027).
+      - "The system shall refuse the disposition until the user has opened the Account History, with the message \"Open the Account History before you give the disposition\"; the viewing is recorded with the user and the time (BRRN.027)."
+    ac:
+      - The account details show every renewal field of the account as listed in the RMEL.
+      - The Account History of a renewed account lists the previous year's ARN, its endorsements, payments and claims.
+      - A disposition given without opening the Account History is refused with the message; once opened, it is accepted.
+
+  FRRN.014.02:
+    refs: [FR-RN-043, FR-RN-044, FR-RN-080]
+    shall:
+      - "The system shall refuse a Not for Renewal without reason (\"Select the reason for Not for Renewal\"); the reason Booked to New Invoice shall require the new invoice number (\"Enter the new invoice number\"), which must exist; the reason Transfer to Another Marketing Unit shall open the transfer of FRRN.011.06."
+      - "The system shall keep every disposition as a new entry with its source (user, rule, upload, insurer, LAMD or sanitation), reason, remarks, user and time; the earlier entries stay visible."
+      - "The user may add remarks of up to 200 characters (\"Remarks may have at most 200 characters\"); each remark is stamped with the user ID, the date, the time and the stage, and saved remarks are not edited (BRD 2.004.6-8)."
+      - The account shall also be locked on the Marketing side once its Renewal Advice is generated (BRD 2.004.9; Annex AN); an authorised user unlocks it only by cancelling the Renewal Advice through a controlled override (FRRN.020.03).
+    ac:
+      - An Account Officer gives the disposition For Renewal, saves and submits the account; it appears in the Team Lead's review list.
+      - A Not for Renewal without reason cannot be saved; Booked to New Invoice without an existing invoice number is refused.
+      - A saved remark shows the user ID, the date and the time; a remark of 201 characters cannot be saved.
+      - After the Renewal Advice is generated, the disposition of the account cannot be changed.
+
+  FRRN.014.03:
+    refs: []
+    ac:
+      - Two insurers at 60% and 40% are saved; 60% and 30% are refused because the total is not 100%.
+      - With coverage amounts of PHP 6,000,000.00 and 4,000,000.00 on a TSI of PHP 10,000,000.00 the allocation is saved, and the premium per insurer is computed from the allocation.
+
+  FRRN.014.04:
+    refs: [FR-RN-051]
+    ac:
+      - "An account tagged For Booking Only without full payment cannot be submitted for placement and shows \"The account is not fully paid. Override approval is required before you can proceed.\""
+      - After the override approval with a justification, the account can be submitted; the approval and the justification are in the audit log.
+
+  FRRN.014.05:
+    refs: []
+    ac:
+      - An account tagged Direct-to-Insurer Payment with "Route for UH Approval" goes to the Unit Head of the assigned user and proceeds only after the Unit Head approves it.
+      - A rejection without reason is refused; after a rejection the account proceeds only once the tag is removed.
+
+  FRRN.014.06:
+    refs: [FR-RN-041]
+    shall:
+      - Each download shall be recorded with the user and the time.
+    ac:
+      - The downloaded file "Renewal Account Details.xlsx" holds the same values as the account details on the screen.
+
+  # ---------------------------------------------------------------------------------------------- FRRN.015-016
+  FRRN.015.03:
+    refs: [FR-RN-060]
+    shall:
+      - "The renewal reference shall be mandatory on every row; a row without a valid reference is refused with the message \"Row <n> has no valid renewal reference\" (BRRN.022)."
+      - "A row with a disposition that is not in the list (\"Row <n>: disposition <value> is not valid\") or for an account that cannot be changed in its status (\"Row <n>: renewal <reference> cannot be updated in stage <status>\") shall be refused; the valid rows are applied."
+      - The user may upload several files at once; each file is processed and reported on its own.
+      - The dispositions given by upload and online shall be kept in the same history with their source (BRRN.018).
+    ac:
+      - A file of 500 rows with 3 unknown references updates 497 renewal accounts and lists the 3 refused rows with their message.
+      - Two files uploaded together give two results.
+
+  FRRN.015.04:
+    refs: [FR-RN-060, FR-RN-021]
+    ac:
+      - A row matched on its renewal reference updates only the fields given in the file; a row whose reference is unknown updates nothing.
+
+  FRRN.015.05:
+    refs: [FR-RN-060]
+    ac:
+      - Each renewal update upload is one row of the summary with its status and counts, latest first.
+
+  FRRN.015.06:
+    refs: [FR-RN-060]
+    ac:
+      - The record-level view lists each row of the file with its processing status and message, and can be filtered, sorted and searched.
+
+  FRRN.016.01:
+    refs: [FR-RN-043, FR-RN-050]
+    shall:
+      - "The completeness check shall name every missing required field in the message (\"Complete the mandatory fields: <fields>\")."
+      - The account shall not be submitted while a blocking sanitation rule fails (endorsement in progress, outstanding premium, financial impact), unless an authorised user has overridden it (FRRN.020.03).
+      - The selected approver, or the Team Leads of the unit, shall receive a notice of the submitted account.
+    ac:
+      - An account submitted for posting has the status "Submitted for Posting" and is listed for the approver chosen.
+      - A submission with a required field missing names every missing field and the status is unchanged.
+
+  # ---------------------------------------------------------------------------------------------- FRRN.017-021
+  FRRN.017.01:
+    refs: [FR-RN-048]
+    shall:
+      - A proposal generated from a renewal account shall carry its renewal reference, and the accounts booked from it shall carry the business type Renewal and the link to the expiring ARN (cross-BRD decision D1).
+      - Each generation shall be recorded with the proposal type, the signatories, the user and the time.
+    ac:
+      - "Generate Proposal Slip is disabled for a renewal account whose disposition is not For Proposal."
+      - "A Full Proposal of a non-package account with a TSI above PHP 500,000,000.00 cannot be generated until three signatories are selected; the message \"Required signatories must be selected before the Full Quote can be generated.\" is shown."
+      - The Quick Proposal of reference 1234567890 generated on 30-Jun-2026 is named Renewal_QuickProposal_1234567890_06302026.pdf and is attached to the renewal account.
+
+  FRRN.017.02:
+    refs: []
+    ac:
+      - "A proposal sent successfully shows \"Proposal has been successfully submitted to CCM for delivery to the client.\", and the CCM transaction reference number and the delivery status are kept on the renewal account."
+      - An invalid recipient address is refused with the invalid-address message, and nothing is sent.
+
+  FRRN.018.01:
+    refs: [FR-RN-048]
+    shall:
+      - The TSU request shall carry the renewal reference and the expiring account's data (Annex K), and the accounts booked from it shall carry the business type Renewal.
+    ac:
+      - A TSU request submitted for approval has the status Pending Team Lead Approval and the Team Lead is notified; after approval and the choice of the TSU Officer it has the status For TSU Processing and the officer is notified.
+      - A second TSU request for the same renewal account is refused.
+
+  FRRN.019.01:
+    refs: [FR-RN-048, FR-RN-084]
+    shall:
+      - Remarks shall be mandatory for the statuses Rejected and Request for Revision; the client's response document is attached to the renewal account.
+    ac:
+      - A proposal Rejected by the client sets the disposition Not for Renewal with the reason Lost Business.
+      - After a revised proposal is sent, the client acceptance status returns to Pending Client Response.
+
+  FRRN.020.01:
+    refs: [FR-RN-050]
+    shall:
+      - "The system shall refuse to post an account while a blocking sanitation rule fails, with the message \"Renewal <reference> cannot be posted: <rule> failed\", unless an authorised user has overridden it with remarks (FRRN.020.03; BRD 1.008, 1.011)."
+      - A posted account with the disposition Lost Business shall be closed.
+      - The Processing Team Leads shall receive a notice of each account posted For Renewal (Annex AE).
+      - The approver shall be able to approve several accounts at once (single, multiple, all, all except); each account is checked and posted on its own (BRD 1.008.3).
+    ac:
+      - A posted For Renewal account appears in the Processing Worklist with the status Posted.
+      - An account with an outstanding premium cannot be posted until the Team Lead overrides the flag.
+      - Approving ten accounts at once posts the valid ones and lists each refused account with its reason.
+
+  FRRN.020.02:
+    refs: [FR-RN-050, FR-RN-065]
+    shall:
+      - "The reason of the return shall be chosen from the list of return reasons (\"Select a reason for 'Return'\") and the remarks are mandatory; the reason Disapproved counts in the summary of the Renewal Status Report (BRD 1.009.3.2)."
+      - A returned account shall carry the red Returned flag until it is submitted again, and the assigned officer shall be notified with the reason and the remarks (Annex AE).
+    ac:
+      - A returned account is back in the officer's list with the Returned flag and the approver's remarks.
+      - A return without a reason is refused.
+
+  FRRN.021:
+    refs: [FR-RN-070]
+    shall:
+      - "By default the export shall hold the 28 fields of BRD 3.009.1.4 (Annex AF), one file per insurer and expiry range; a renewal account is in one open insurer request at a time."
+      - The file shall leave the system password protected, and the password shall be sent in a separate e-mail (FRRN.024).
+      - The system shall set a reply date (send date plus the reply days of the insurer) and raise an alert when the insurer has not answered by that date (Annex AE).
+      - The renewal accounts of a sent request shall show that they wait for the insurer's disposition.
+    ac:
+      - A request for insurer X and March 2027 holds every For Renewal account of insurer X expiring in March 2027 with the 28 fields.
+      - The insurer receives a password-protected Excel file and, in a separate e-mail, its password.
+      - An insurer that has not answered by the reply date raises the overdue alert.
+
+  # ---------------------------------------------------------------------------------------------- FRRN.022-025
+  FRRN.022.01:
+    refs: [FR-RN-080]
+    shall:
+      - "The system shall refuse the Renewal Advice of an account with a blocking sanitation rule, with the message \"Renewal <reference> cannot get a Renewal Advice: <rule> failed\", and of an account that already has one for the same notice."
+      - The system shall warn when the Renewal Advice is generated less than 30 days (a parameter) before the expiry date; the user confirms to continue and the confirmation is recorded.
+      - The system shall number each Renewal Advice and store it with the renewal account, the client and the template version used.
+      - The generation shall lock the account on the Marketing side (BRD 2.004.9; FRRN.014.02).
+      - Only the profiles that hold the Renewal Advice function shall generate it; a generation of a large selection runs in the background and shows its progress.
+    ac:
+      - "A Renewal Advice generated for reference 1234567890 on 30-Jun-2026 for a Motor account is named MTR_RA_First Notice_1234567890_06302026.pdf and attached to the renewal account."
+      - A Renewal Advice generated 20 days before expiry needs the user's confirmation.
+      - After generation, the disposition of the account cannot be changed.
+      - A user without the Renewal Advice function cannot generate it.
+
+  FRRN.022.02:
+    refs: [FR-RN-081]
+    shall:
+      - The Renewal Advice shall always leave the system encrypted and password protected; the protection cannot be switched off (BRRN.010).
+      - The password shall be sent to the client in a separate e-mail (Annex AE).
+      - A Renewal Advice that could not be delivered shall raise an alert to the administrators and can be resent.
+      - Every sending, including a failure, shall be recorded with the user, the time, the recipient and the status.
+    ac:
+      - Sending 50 Renewal Advices produces 50 protected e-mails and 50 password e-mails, and the 50 accounts show the Renewal Advice as sent.
+      - A failed sending is listed with its error and can be resent.
+
+  FRRN.023.01:
+    refs: [FR-RN-082, FR-RN-083]
+    shall:
+      - "The letters shall be determined on the effective expiry date: the end of a confirmed hold cover (FRRN.037), otherwise the policy expiry date (Walkthrough addendum R37-HC-01 to 04)."
+      - No closing letter shall be sent before the effective expiry date (R37-HC-05).
+      - "An account shall never receive both a No Advice Letter and a Non-Renewal Letter (R37-HC-09, 10; Annex AN)."
+    ac:
+      - An account with a confirmed 30-day hold cover gets no closing letter until the hold cover ends.
+      - An account that has received a No Advice Letter cannot receive a Non-Renewal Letter, and the reverse.
+
+  FRRN.023.02:
+    refs: [FR-RN-082, FR-RN-111]
+    shall:
+      - Each letter shall record the template and its version; a letter generated after a new template version is activated uses that version.
+      - A letter that could not be generated or sent shall stay listed with the failure, and the user shall be notified.
+    ac:
+      - The Non-Renewal letter of reference 1234567890 for a Motor account generated on 30-Jun-2026 is named MTR_NRL_1234567890_06302026.pdf and attached to the renewal account.
+      - A resend keeps the original attached letter and records the resend in the audit log.
+
+  FRRN.024.01:
+    refs: [FR-RN-081]
+    shall:
+      - The password shall never be written in the e-mail that carries the file, in the system screens or in the audit log.
+      - The same rule shall apply to every file the Renewal Module sends (Renewal Advice, letters, insurer requests, placement files, Insurance Advice, e-policies).
+    ac:
+      - For the individual client Juan Dela Cruz the password is JUADEL; for the individual client Li Ong it is LIONG.
+      - For a corporate client the password has eight characters - one lower-case letter, one upper-case letter, one special character and five digits - and differs from one sending to the next.
+      - The PDF cannot be opened without the password.
+
+  FRRN.025.01:
+    refs: [FR-RN-084]
+    shall:
+      - "The user shall record the method of the client's acceptance (e-mail, signed Renewal Advice or payment) and attach the evidence; the date of acceptance cannot be in the future (\"Select the acceptance method\", \"Attach the acceptance evidence\")."
+      - The evidence shall be mandatory when the renewal has a financial impact (FRRN.009.01, BRRN.038).
+      - The acceptance shall be refused while a blocking sanitation rule fails ("Renewal <reference> cannot be accepted: <rule> failed").
+    ac:
+      - An acceptance by e-mail with the client's e-mail attached sets the status Accepted and the account moves on as this item states.
+      - An acceptance of a renewal with a financial impact cannot be saved without evidence.
+
+  FRRN.26.01:
+    refs: [FR-RN-084]
+    shall:
+      - The approval shall not create a second proposal or a new renewal account; the renewal account is the one already processed (BRRN.040).
+    ac:
+      - "An approved Non-CBG account without the payment confirmation status shows \"Please select the client's payment confirmation status.\"; with it, the status becomes Submitted for Placement."
+      - A rejected account has the status "Returned Account" and is back in the queue of its officer; its resubmission is recorded with the date and time.
+
+  FRRN.27.01:
+    refs: []
+    ac:
+      - On a day the CBG Home job runs, every CBG Home account with the status For Billing Generation expiring 10 calendar days later is in the billing file of its type; the file is named, for example, HOME_CLPC Billing Built in_10152026.csv.
+      - The generated file is attached to each account it holds.
+
+  FRRN.27.02:
+    refs: []
+    ac:
+      - A From Date more than 31 calendar days before the To Date is refused; a From Date after the To Date is refused.
+
+  FRRN.27.03:
+    refs: []
+    ac:
+      - After sending, the delivery status of the billing file is shown on the billing record (e-mail of Annex S).
+
+  # ---------------------------------------------------------------------------------------------- FRRN.028-033
+  FRRN.028.01:
+    refs: [FR-RN-084, FR-RN-087]
+    ac:
+      - A payment applied in Cashiering that leaves an outstanding balance of zero sets the payment status Paid; one that leaves a balance below the total premium sets Partially Paid.
+
+  FRRN.028.02:
+    refs: [FR-RN-084]
+    shall:
+      - The placement itself shall remain a user action (Walkthrough addendum p.4; FRRN.029).
+    ac:
+      - A CBG renewal account whose payment status becomes Paid has the status Submitted for Placement without a user action.
+
+  FRRN.029.01:
+    refs: []
+    ac:
+      - The Submitted for Placement list shows only the accounts of the user's profile and hierarchy, and can be searched, filtered, sorted and exported.
+
+  FRRN.029.02:
+    refs: []
+    ac:
+      - A renewal account with two co-insurers produces two placement slips; an account tagged For Booking Only produces none.
+      - Packaged accounts of the same insurer are combined in one placement file per insurer showing each co-insurer's share.
+
+  FRRN.029.02.01:
+    refs: []
+    ac:
+      - After generation the placement slip is attached to the renewal account and the account shows Is Generated Placement Yes, the generation date and the user.
+
+  FRRN.029.02.02:
+    refs: []
+    ac:
+      - For 150 renewal accounts of insurer ABC, 150 placement slips and one placement file are generated.
+
+  FRRN.29.03:
+    refs: []
+    ac:
+      - For an insurer not tagged MFT Enrolled, no file is uploaded to MFT and the file waits for sending by e-mail; a failed upload shows Upload Failed.
+
+  FRRN.29.04:
+    refs: []
+    ac:
+      - The recipients are taken from Insurer Maintenance and can be changed before sending; an invalid address is refused before sending.
+      - After a successful sending the renewal account has the status For Booking.
+
+  FRRN.29.05:
+    refs: [FR-RN-070]
+    ac:
+      - A packaged placement sent at 4:00 PM on a Monday counts from Tuesday and is Beyond TAT from the fourth business day.
+      - A placement tagged With Issue with a resolution date measures the TAT up to the resolution date; a resolution date before the placement submission date is refused.
+
+  FRRN.030.01:
+    refs: []
+    ac:
+      - An uploaded response file is matched on the renewal reference; a response without a matching reference is listed as unmatched and updates nothing.
+
+  FRRN.030.01.01:
+    refs: []
+    ac:
+      - An Approved response records the response date and the insurer's remarks and sets the status as this item states.
+
+  FRRN.030.01.02:
+    refs: []
+    ac:
+      - A Rejected response records the reason, sets the status Rejected Placement, and the user can return the account to Marketing or cancel the placement.
+
+  FRRN.030.03:
+    refs: []
+    ac:
+      - Each placement response file is one row of the summary with its status, latest first.
+
+  FRRN.030.04:
+    refs: []
+    ac:
+      - The record-level view can be filtered by Matched and Unmatched and by Approved and Rejected.
+
+  FRRN.031.01:
+    refs: [FR-RN-065]
+    shall:
+      - The return shall be possible for one or several accounts at once (single, multiple, all, all except), to the assigned Account Officer or to the Marketing Team Lead (BRD 3.008.2, 4.006.2).
+      - "A return without reason is refused (\"Select a reason for 'Return to Marketing'\") and without remarks (\"Enter the remarks\")."
+      - The receiving user shall be notified with the reason and the remarks (Annex AE).
+    ac:
+      - An account returned to the Account Officer appears in his list with the Returned flag and the reason.
+      - A return without reason is refused.
+
+  FRRN.032.01:
+    refs: []
+    ac:
+      - The Insurance Advice of a mortgaged renewal account is generated when the placement slip is sent, named IA_<reference>_MMDDYYYY.pdf and attached; a change of the placement creates a new version and the previous one stays available.
+      - No Insurance Advice is generated for a renewal account without mortgage.
+
+  FRRN.032.02:
+    refs: []
+    ac:
+      - Send Insurance Advice is disabled when one of the selected accounts has no generated Insurance Advice.
+
+  FRRN.033:
+    refs: []
+    ac:
+      - The policy number from the insurer's e-policy file updates the renewal account it matches.
+
+  FRRN.033.01:
+    refs: []
+    ac:
+      - A ZIP file with a document that is not in the summary file is refused for that document; a matched document is attached to its renewal account and the policy number is updated.
+
+  FRRN.033.02:
+    refs: []
+    ac:
+      - Each received e-policy file is one row of the summary with its receipt type and status.
+
+  FRRN.033.03:
+    refs: []
+    ac:
+      - The record-level view lists each document with its matching status.
+
+  FRRN.033.04:
+    refs: []
+    ac:
+      - An account without a valid client e-mail address or not in the status For E-Policy Sending is excluded from the sending, and the summary shows it.
+
+  FRRN.033.05:
+    refs: []
+    ac:
+      - An e-policy number already held by another active account is excluded and listed in the exception report.
+
+  # ---------------------------------------------------------------------------------------------- FRRN.034-044
+  FRRN.034.01:
+    refs: [FR-RN-087]
+    shall:
+      - The eligibility shall also be evaluated when the payment becomes Fully Paid and the client's acceptance is confirmed (BRRN.041; Annex AN), with the matched criteria and the time recorded.
+      - The incentive code shall never be set or changed by hand; an endorsement of the term re-evaluates it and a cancellation after booking invalidates it.
+    ac:
+      - A renewal account that matches the configured incentive criteria shows the incentive code on the booking screen.
+      - No user can set the incentive code by hand.
+      - A renewal cancelled after booking shows the incentive invalidated, with the reason in the history.
+
+  FRRN.035.01:
+    refs: [FR-RN-084]
+    ac:
+      - The booked renewal account has a unique invoice number, the business type Renewal, the accounting entries of the booking date and the service invoice attached.
+
+  FRRN.036.01:
+    refs: [FR-RN-086]
+    shall:
+      - The default durations shall be parameters maintained by the Business Administrator.
+    ac:
+      - A hold cover of a Non-CBG account defaults to 30 days and one of a CBG account to 90 days.
+      - A hold cover of a CBG Motor account whose first insurer rejected the request defaults to 60 days.
+
+  FRRN.036.02:
+    refs: [FR-RN-086]
+    shall:
+      - "A second hold cover request for the same renewal account shall be refused while one is requested or confirmed (\"Account <ARN> already has a hold cover requested or confirmed\"); it is allowed once the previous one has expired or was cancelled."
+      - A requested or confirmed hold cover can be cancelled with a reason.
+      - Each request, confirmation, rejection and cancellation shall be recorded with the user, the time, the dates and the insurer's reference.
+    ac:
+      - After a Non-CBG client confirms the renewal, a hold cover request is generated from the approved template, one per co-insurer.
+      - A second request while the first is confirmed is refused; after the first is cancelled a new request is accepted.
+
+  FRRN.036.03:
+    refs: []
+    ac:
+      - An extension of 15 or 30 days can be generated from 7 calendar days before the hold cover ends, and not earlier.
+
+  FRRN.036.04:
+    refs: []
+    ac:
+      - 75 days before expiry, the eligible Clean CBG accounts produce one Excel file per insurer, with a separate file for the accounts with co-insurers.
+
+  FRRN.036.05:
+    refs: []
+    ac:
+      - On the 15th of the month every eligible CBG Home account receives a 30-day hold cover extension.
+
+  FRRN.036.06:
+    refs: [FR-RN-086]
+    ac:
+      - The request of an MFT-enrolled insurer is uploaded to its MFT location; that of another insurer is sent by e-mail with the hold cover document attached.
+
+  FRRN.037.01:
+    refs: [FR-RN-086]
+    ac:
+      - An uploaded hold cover response is matched to its renewal account and request by the reference number.
+
+  FRRN.037.02:
+    refs: [FR-RN-086]
+    shall:
+      - The end date of an approved hold cover shall become the effective expiry date of the renewal account for the reminders and the closing letters (FRRN.023.01; Walkthrough addendum R37-HC-01 to 04).
+      - The renewal lists and the account shall show the flag Hold Cover confirmed.
+    ac:
+      - After an approved response, the renewal account shows Hold Cover confirmed and its effective expiry date is the end of the hold cover.
+      - A rejected response returns the account to the responsible user with the insurer's remarks.
+
+  FRRN.037.03:
+    refs: []
+    ac:
+      - Each hold cover response file is one row of the summary with its status and counts, latest first.
+
+  FRRN.037.04:
+    refs: []
+    ac:
+      - The record-level view can be filtered by Matched and Unmatched and by Approved and Rejected.
+
+  FRRN.037.05:
+    refs: [FR-RN-086]
+    shall:
+      - "The user shall enter the insurer's reference and the validity period of an approved hold cover (\"Enter the insurer reference and the validity period\")."
+    ac:
+      - A manual update to Rejected without remarks is refused.
+
+  FRRN.038.01:
+    refs: [FR-RN-024, FR-RN-112]
+    shall:
+      - A risk code shall never be deleted; it is deactivated or its indicator changed with an effective date, so that the accounts that used it stay readable.
+      - A change of a risk code shall take effect only after another authorised user approves it (Annex AN).
+    ac:
+      - A user without the maintenance function sees the risk codes read only.
+      - A change takes effect only after a second authorised user approves it.
+
+  FRRN.038.02:
+    refs: [FR-RN-024]
+    ac:
+      - The list shows each risk code with its description, line, Renewable or Non-Renewable indicator, status and the created and updated by and on.
+
+  FRRN.038.03:
+    refs: [FR-RN-024]
+    shall:
+      - A renewal account on a risk code tagged Non-Renewable shall be excluded from the assignment list and the Non-Renewal Letter shall be prepared for it (BRRN.009; FRRN.023).
+    ac:
+      - "A risk code already in the list is refused with \"Duplicate entry detected. The risk code already exists in the list.\""
+      - A retroactive effective date is refused.
+      - An expiring account on a risk code tagged Non-Renewable is classified Not for Renewal at the next generation, with the reason recorded.
+
+  FRRN.038.03 (2nd):
+    refs: [FR-RN-024, FR-RN-112]
+    ac:
+      - "An update saved shows \"Record successfully updated.\" and the log shows the old and new values, the user and the time."
+      - A change of the indicator to Non-Renewable applies to the accounts generated after its effective date.
+
+  FRRN.039.01:
+    refs: [FR-RN-026]
+    shall:
+      - The KYC tag shall be shown as a flag in the renewal lists and as a column in the reports, with the date it was first identified, and shall never block, stop or reroute the renewal (BRRN.028; Annex AN).
+    ac:
+      - A renewal account whose client is due for KYC review in 20 days shows the KYC due flag, and its classification is unchanged.
+
+  FRRN.039.02:
+    refs: [FR-RN-026]
+    ac:
+      - Recording a completed KYC review sets the status Completed and the history keeps the earlier statuses with the user and the time.
+
+  FRRN.039.03:
+    refs: [FR-RN-026]
+    ac:
+      - Clicking Total Accounts Due for KYC Review lists those accounts.
+
+  FRRN.040.01:
+    refs: [FR-RN-112, FR-RN-022, FR-RN-023]
+    shall:
+      - A rule set shall become active only after another authorised user approves it (maker-checker); the active version and the earlier versions stay visible with their makers, checkers and dates (Annex AN).
+      - A rule that would make a renewal account with a failed rule Clean shall not be saved ("A failed check cannot give the Clean bucket").
+      - The lead days, the thresholds and the notice days shall be maintained in the same menu with their effective dates (FRRN.040.03).
+    ac:
+      - A cloned rule has the status Draft and does not apply until it is approved and its effective date is reached.
+      - A rule that maps a failed rule to Clean cannot be saved.
+      - A rule approved by its own maker is refused.
+
+  FRRN.041.01:
+    refs: [FR-RN-025]
+    ac:
+      - A second active record with the same Account Officer code is refused.
+      - A loan of the LAMD report whose Account Officer code is in the RMU list is identified as RMU.
+
+  FRRN.042.01:
+    refs: []
+    ac:
+      - A user without the budget function does not see the Renewal Annual Budget Maintenance menu.
+
+  FRRN.042.02:
+    refs: []
+    ac:
+      - The annual total of a budget record equals the sum of its twelve monthly amounts.
+
+  FRRN.042.03:
+    refs: []
+    ac:
+      - An uploaded budget in the template creates or updates the records of the file.
+
+  FRRN.042.04:
+    refs: []
+    ac:
+      - A negative amount is refused; a Corporate budget without team and sub-team is refused.
+
+  FRRN.042.05:
+    refs: []
+    ac:
+      - The Budget Inquiry screen lists the budgets of the fiscal year chosen, by segment and hierarchy.
+
+  FRRN.042.06:
+    refs: []
+    ac:
+      - A change of a monthly amount keeps the previous and the new value with the user and the time.
+
+  FRRN.043.01:
+    refs: [FR-RN-004]
+    shall:
+      - The audit log shall only be added to; no user can change or delete an entry (BRRN.021 to BRRN.040).
+      - The actions of the system (generation, sanitation, classification, rule-based disposition, uploads, letters) shall be logged with the rule or the run that made them; extraction and initiation are separate entries.
+    ac:
+      - For a renewed account, the log lists the extraction, the sanitation, the classification, the disposition, the posting, the insurer's disposition, the Renewal Advice, the acceptance and the booking with the user or the source and the time.
+      - No screen allows an audit entry to be changed or deleted.
+
+  FRRN.043.02:
+    refs: [FR-RN-004]
+    ac:
+      - The audit section of a renewal account lists its actions with the old and new values, and can be exported.
+
+  FRRN.044.01:
+    refs: [FR-RN-101, FR-RN-102, FR-RN-103]
+    shall:
+      - The reports shall also include the Renewal Status Report (FRRN.044.02), the renewal listing with attention flags (FRRN.044.03) and the operational reports of FRRN.044.04; the columns, filters and schedules of every report are in Annex AG.
+      - Every report shall apply the user's data scope and be produced within 20 seconds for up to 30,000 rows (BRD, usage requirements).
+    ac:
+      - Each report of this item can be previewed, downloaded as Excel and PDF, and printed with print preview.
+      - A user sees in a report only the accounts of his data scope.
+
+new_subitems:
+  - id: FRRN.001.05
+    row: FRRN.001
+    title: Profiles and Renewal Functions
+    refs: [FR-RN-003]
+    shall:
+      - Each of the 25 Renewal functions of the BRD (BRD 6.002.2.1 to 6.002.2.25) shall be a function that can be granted to any profile; the profiles of Renewal are Marketing Team Lead, Marketing Account Officer / Admin, Processing Team Lead, Processing Officer, Business Administrator, System Administrator, LAMD user and Contact Center user.
+      - The System Administrator shall assign functions to a profile, and the Business Administrator profiles to a user (BRD 5.004.1, 6.002), through a request approved by another user, as the User Access Maintenance FRS states.
+      - A user may hold several profiles; the menu and the functions are those of all his profiles.
+    ac:
+      - The function "Extract accounts for renewal per insurer" is granted to the Processing Officer profile only after another user approves the request.
+      - A user given the Marketing Account Officer profile sees the Renewal screens of that profile at his next sign-in.
+
+  - id: FRRN.002.08
+    row: FRRN.002
+    title: My Dispositions (Account Officer List)
+    refs: [FR-RN-040, FR-RN-045, FR-RN-046]
+    shall:
+      - The system shall list for the Account Officer, in one scrollable view, every renewal account ever assigned to him, whatever its status and year (active, expiring, expired, previous years); the filters are optional and the default is all statuses and years (BRRN.011, BRD 2.003).
+      - The policy fields shall be read from the current account, so that endorsements and updates of the mother policy show at once.
+      - The list shall offer the quick filters Returned to me, Due in 30 days and NRNS, and a dispositioned view with the status, the flags Endorsed and Claims with the effective date of the latest endorsement, and a padlock on closed or locked accounts (BRD 2.006).
+      - The Account Officer shall be notified when an account is returned to him; a returned account carries a red Returned flag and shows the reason and the remarks of the return until it is submitted again (BRD 2.007).
+    ac:
+      - An Account Officer sees his renewal accounts of the current and previous years without choosing a filter, and sorts them by expiry date both ways.
+      - An endorsement posted on the mother policy shows in the list without a new generation, with the Endorsed flag and its effective date.
+      - A returned account shows the red Returned flag and the Team Lead's remarks; once submitted again it leaves the Returned to me filter.
+
+  - id: FRRN.003.05
+    row: FRRN.003
+    title: Processing Worklist
+    refs: [FR-RN-062, FR-RN-061]
+    shall:
+      - The system shall show the renewal accounts of Processing in one scrollable view with the tabs For Processing, In Processing, With Insurer, Insurer Responded and Returned, with the filter, sort and search of FRRN.003.03 (BRD 3.006, 4.003).
+      - A Processing Officer shall see the accounts assigned to him; the Processing Team Lead sees those of his unit.
+    ac:
+      - A Processing Officer sees in In Processing only the accounts assigned to him.
+      - Sorting and the column filters work on every column of every tab.
+
+  - id: FRRN.004.07
+    row: FRRN.004
+    title: Initiation of Renewal Processing
+    refs: [FR-RN-015]
+    shall:
+      - The system shall start the renewal processing of a listed account (classification, rule-based disposition, assignment, letters) only when an authorised user initiates it; the generation alone never starts it (BRRN.021; Annex AN).
+      - The market segments initiated in bulk (CLG as delivered) shall be a parameter; the other segments (for example Non-Mortgage) are initiated one account at a time.
+      - "The system shall refuse a second initiation (\"Renewal <reference> is already initiated\") and the bulk initiation of a segment initiated one by one (\"Segment <segment> is initiated one account at a time\")."
+      - The initiation shall be recorded with the user and the time, as an entry separate from the generation.
+    ac:
+      - A generated account stays unassigned and in no work list until it is initiated.
+      - Bulk initiation of 200 CLG accounts records the user and the time on each.
+      - A Non-Mortgage account in a bulk initiation is refused with the segment message while the others are initiated.
+
+  - id: FRRN.011.06
+    row: FRRN.011
+    title: Transfer of the Account to Another Marketing Unit
+    refs: [FR-RN-031, FR-RN-032]
+    shall:
+      - The Marketing Team Lead or the Account Officer shall be able to transfer an unlocked renewal account to another active Marketing Unit with the remarks; the account leaves the sender's list and waits for the decision of the receiving unit (BRD 1.006, 2.005).
+      - A Team Lead of the receiving unit shall accept the account, which joins his unit's unassigned list with the Transferred flag, or decline it with remarks, which returns it to the sending unit at its previous status (BRD 1.007).
+      - The sender may cancel an open transfer before it is decided; the account returns to its status.
+      - The non-renewal reason Transfer to Another Marketing Unit shall open this transfer (BRD 2.004.4.8).
+    ac:
+      - A submitted transfer removes the account from the sender's list and shows it in the receiving Team Lead's Transfers inbox.
+      - An accepted account appears in the receiving unit's unassigned list with the Transferred flag.
+      - A declined account returns to the sender with the decline remarks.
+
+  - id: FRRN.013.05
+    row: FRRN.013
+    title: Insurer Disposition Recorded on the Account
+    refs: [FR-RN-071]
+    shall:
+      - "For a single account, the authorised user shall record the insurer's disposition on the renewal account: the disposition, the insurer's reference, the received date (not in the future), the remarks and, for a revision, the revised premium, sum insured, rate or terms (\"Row <n>: enter the revised premium, sum insured or rate\" in an upload)."
+      - The recorded disposition shall drive the renewal account as an uploaded one (FRRN.013.02), and the assigned Processing Officer shall be notified (Annex AE).
+    ac:
+      - A disposition Renew As Is recorded by hand moves the renewal account as the same disposition uploaded would.
+      - A revision without revised values is refused.
+
+  - id: FRRN.014.07
+    row: FRRN.014
+    title: Re-open an Account Tagged Not for Renewal
+    refs: [FR-RN-047]
+    shall:
+      - When the client decides to renew after the account was tagged Not for Renewal (by the user, by the sanitation or by an upload), the Account Officer or the Processing Team Lead shall re-open it with a reason and give a new disposition (BRD 2.004.10, 3.004.5).
+      - "Re-opening shall be allowed until the expiry date plus 30 days (a parameter); later it is refused (\"Renewal <reference> can no longer be re-opened (expired on <date>)\")."
+      - The earlier disposition and a letter already sent stay in the history; the account shows the flag Non-Renewal Letter sent.
+    ac:
+      - A Not for Renewal account re-opened ten days before expiry returns to For Disposition, and the assigned Account Officer and Team Lead are notified.
+      - A re-open after the limit is refused.
+
+  - id: FRRN.015.07
+    row: FRRN.015
+    title: Complete Dispositioned File
+    refs: [FR-RN-060]
+    shall:
+      - When the user declares a file complete for an expiry range and a unit, the system shall tag Not for Renewal, with the reason Non-renewable Accounts, the accounts of that range and unit that are not in the file, and keep them out of the processing list (BRD 3.004.4).
+      - Without that declaration no account shall be tagged; a tagged account can be re-opened (FRRN.014.07).
+    ac:
+      - With "Complete file for March 2027, unit X" ticked, a March account of unit X absent from the file is tagged Not for Renewal with the reason Non-renewable Accounts.
+      - Without the tick, no account is tagged.
+
+  - id: FRRN.018.02
+    row: FRRN.018
+    title: Renewals with Financial or Structural Changes
+    refs: [FR-RN-048, FR-RN-064]
+    shall:
+      - A renewal shall take the New Business path when its disposition is For Quotation or For Proposal, or when the financial impact of FRRN.009.01 is flagged; the account is tagged "For Proposal / New Business Path" and the reason is recorded (BRRN.033, BRRN.038).
+      - The quotation or proposal request started from the renewal shall be pre-filled from the expiring account, carry the renewal reference, and its booked accounts carry the business type Renewal; one New Business path is allowed per renewal ("Renewal <reference> already has quotation <no.>").
+      - "When the financial impact is flagged, the client's acceptance shall be recorded with its method (e-mail, signed Renewal Advice or payment), whichever path the renewal takes (BRRN.038)."
+      - What makes a structural change, and whether the routing is automatic, is to be confirmed by BDOI (Annex AM).
+    ac:
+      - A renewal with a 10% premium increase from the insurer is tagged For Proposal / New Business Path with the reason.
+      - The quotation created from the renewal carries the renewal reference, and its booked invoice has the business type Renewal.
+      - The renewal is closed as renewed when the quotation's account is booked, or as lost when the quotation is declined.
+
+  - id: FRRN.020.03
+    row: FRRN.020
+    title: Controlled Overrides
+    refs: [FR-RN-051]
+    shall:
+      - The system shall flag the accounts whose expiring policy has an outstanding premium above the threshold (0.00 as delivered) and route them to Review (BRD 1.011).
+      - "The Marketing Team Lead shall override, for one or several selected accounts, the outstanding-balance flag, a classification, a rule-based disposition or an insurer-response mismatch, and cancel a Renewal Advice to unlock an account; each override needs a reason from a list and remarks (\"Select the reason of the override\", \"Enter the remarks of the override\")."
+      - An override shall never make a renewal account with a failed rule Clean (FRRN.008.01).
+      - Every override shall be recorded with its kind, the previous and new value, the reason, the remarks, the user and the time, and listed in the decision log report.
+    ac:
+      - An account with an unpaid premium shows the Outstanding flag; after the Team Lead's override it can be posted.
+      - An override without remarks is refused.
+      - The decision log report lists the override with the Team Lead and the remarks.
+
+  - id: FRRN.023.03
+    row: FRRN.023
+    title: NRNS Classification, Reminders and Non-acceptance
+    refs: [FR-RN-083]
+    shall:
+      - The system shall tag NRNS (no renew, no submit) the renewal accounts not yet submitted at the checkpoint, and send each one reminder letter at that checkpoint; accounts already submitted or in process are excluded (BRRN.025).
+      - "The NRNS tag and the closing letters shall use the effective expiry date (FRRN.023.01); an account that reaches it without renewal becomes an unrenewed NRNS account and, after the waiting days of its segment (0 as delivered), is routed to its closing letter for the Account Officer's follow-up and final disposition (BRRN.037)."
+      - At the non-acceptance point (the effective expiry date as delivered) the system shall send the non-acceptance letter, close the renewal account as expired without renewal and notify the assigned users (Annex AE).
+      - The checkpoint, the waiting days and the non-acceptance days shall be parameters (Annex AC).
+    ac:
+      - An account without disposition at the checkpoint gets one reminder letter and the NRNS flag; an account already accepted gets none.
+      - At the effective expiry date without acceptance, the account is closed as expired without renewal with a non-acceptance letter, and its officers are notified.
+      - An account with a confirmed hold cover is not tagged NRNS until the hold cover ends.
+
+  - id: FRRN.025.02
+    row: FRRN.025
+    title: Acceptance Upload
+    refs: [FR-RN-084]
+    shall:
+      - The authorised user shall upload a list of client acceptances (renewal reference, method, date and the evidence reference) to record several acceptances at once; each row is checked as an acceptance recorded on the account.
+      - A payment received before the confirmation shall be shown to the Account Officer as evidence, who records the acceptance with the method Payment.
+    ac:
+      - An acceptance list of 20 rows with one unknown reference records 19 acceptances and lists the refused row.
+
+  - id: FRRN.040.02
+    row: FRRN.040
+    title: Decision Matrix for the Rule-based Disposition
+    refs: [FR-RN-023]
+    shall:
+      - The system shall hold a versioned decision matrix; each rule has a priority and conditions on market segment, line, product, mortgaged, classification, claims, endorsements, payment status and days to expiry, and gives a disposition and the automation Automatic or Manual (BRRN.031, BRRN.034).
+      - The first rule by priority shall propose the disposition of a renewal account after its initiation; for a Clean account whose rule is Automatic the disposition is given by the system and the account moves on without a user action; otherwise the proposal is the default the Account Officer sees.
+      - Renewal accounts with claims, endorsements, a missing or invalid PN or an unresolved payment shall always be handled by a user (BRRN.031).
+      - Each version shall be activated by an authorised user other than its maker; each disposition given by the system records the version and the rule (Annex AN).
+      - The first content of the matrix shall be BDOI's rules of FRRN.008 and Annex C (Clean accounts For Renewal).
+    ac:
+      - A Clean CBG Motor account matching an Automatic rule receives the disposition For Renewal from the system and moves on without a user action.
+      - An account with an open claim is not disposed by the system; the Account Officer sees the proposal.
+      - The decision log report shows, for each disposition given by the system, the matrix version and the rule.
+
+  - id: FRRN.040.03
+    row: FRRN.040
+    title: Renewal Parameters
+    refs: [FR-RN-112]
+    shall:
+      - The Business Administrator shall maintain, without a change to the system, the parameters of Annex AC (lead days, TSI threshold, outstanding and financial-impact tolerances, Renewal Advice notice and second-notice days, NRNS checkpoint and waiting days, re-open days, ageing days, hold cover durations, segments initiated in bulk); every change is recorded with the old and new value, the user and the time.
+      - The lead days shall never be fixed in the system (BRRN.030).
+      - A user without the maintenance function shall see the parameters read only (Walkthrough addendum SC-07).
+    ac:
+      - Changing the lead days from 140 to 120 applies from the next daily run.
+      - A user without the maintenance function cannot change a parameter.
+
+  - id: FRRN.044.02
+    row: FRRN.044
+    title: Renewal Status Report
+    refs: [FR-RN-101]
+    shall:
+      - "The user shall select and change the expiry date range and the criteria of the BRD (Unit Head, Risk Code, Insurance Company, Insurance Group, Business Origin, Market Category, BDO Branch, BDO Area, Region, Bank Officer, Bank Unit, Product Code, Account Type, BDOI Branch, Location, Account Broker, Business Type, Customer Segment, Specific Client, Renewal Status), each with single, multiple, all-except and all selection and a search in the drop-down (BRD 1.009.2, 2.008.2, 3.010.2, 4.008.2)."
+      - The report shall show the status of every renewal per invoice in one scrollable view with the 37 columns of the BRD for Marketing and 40 for Processing, and the summary of 34 counters (BRD 1.009.3; Annex AG).
+      - The report shall export to Excel and PDF, be saved, printed with preview and print settings, and saved as a variant of the user (BRRN.019).
+    ac:
+      - The Renewal Status Report of March 2027 with Risk Code "All Except" MC01 lists the March invoices except MC01 and shows the 34 counters.
+      - The Excel and PDF files have the same rows as the screen.
+      - The Processing variant shows the renewal processor, the assigned Account Officer and the sum insured per cover.
+
+  - id: FRRN.044.03
+    row: FRRN.044
+    title: Renewal Listing with Attention Flags
+    refs: [FR-RN-102]
+    shall:
+      - The user shall generate one renewal listing filtered by unit and segment (for example UH, IBG, Leasing), by expiry window (current, prior, future or chosen months) and by status (Renewed, Unrenewed, Expired), with the ageing to expiry, and act on the listed accounts from it (BRRN.036).
+      - "The listing shall flag the accounts that need attention, each with the rule that flagged it: ageing (not progressing within the escalation days before expiry: 60 for IBG and Leasing, 30 for the others as delivered), overdue and high risk."
+      - The system shall never escalate an account by itself; no alert goes to the Unit Head without a user action (BRRN.036).
+    ac:
+      - A listing of IBG for the next month shows each account with its status and days to expiry.
+      - An IBG account not disposed 59 days before expiry shows the ageing flag with its rule, and no alert is sent to the Unit Head.
+
+  - id: FRRN.044.04
+    row: FRRN.044
+    title: Operational Renewal Reports
+    refs: [FR-RN-103]
+    shall:
+      - "The Renewal reports shall also hold the sanitation results and classification changes, the decision log (dispositions with the matrix rule and version, overrides with their reasons), the LAMD matching, the request per insurer (28 fields), the letter log with the delivery status, the workload per officer by status, the go-live take-over and the package choices of migrated policies (Annex AG)."
+      - Every report shall export to PDF, Excel, ODS and CSV, offer saved variants and apply the user's data scope.
+    ac:
+      - The decision log lists each disposition given by the system with the matrix version and the rule, and each override with the user and the remarks.
+      - The letter log lists every Renewal Advice of a date range with its recipient and delivery status.
+
+new_items:
+  - id: FRRN.045
+    component: Renewal Setup
+    capability: Go-live Take-over of Expiring Renewals
+    subitems:
+      - id: FRRN.045.01
+        title: Go-live Extraction
+        refs: [FR-RN-016]
+        shall:
+          - Once, after the sign-off of the migration load, the system shall create a renewal account for every migrated policy in force that expires from the go-live date to 31-May-2028, with the legacy policy reference, and run the sanitation on it (BRRN.005; BDOI decision of 26-Sep-2026).
+          - The renewal accounts expiring up to 31-Jan-2028 shall carry the flag Urgent and come first in every list; both dates are parameters.
+          - A policy already renewed in the legacy system shall be skipped; a second run shall create nothing new and is recorded with zero new accounts; the daily run (FRRN.004.04) shall not list a policy already taken over.
+          - The Processing Team Lead and the Marketing Team Leads shall be notified of the counts per expiry month and the number of urgent accounts (Annex AE).
+        ac:
+          - After the go-live run every migrated policy expiring from go-live to 31-May-2028 is listed exactly once, and the January 2028 expiries show Urgent and come first.
+          - The first daily run after go-live creates no second renewal account for a policy expiring on 31-May-2028.
+      - id: FRRN.045.02
+        title: Renewal Advices Already Sent before Go-live
+        refs: [FR-RN-016]
+        shall:
+          - The Renewal processing team shall upload the Renewal Advices sent by hand before go-live (legacy policy reference, date, reference and recipient) from the trackers of the business units; each matched row is recorded as a Renewal Advice sent with its date, and the account is not offered for a Renewal Advice again.
+          - "A row without a matching renewal account (\"Row <n>: no renewal candidate for legacy policy <reference>\"), a second row for the same policy or a date missing or after go-live is refused; the corrected row is applied only after a second member of the team approves it (maker-checker)."
+          - The second notice and the NRNS checkpoint shall count from the legacy date of the Renewal Advice.
+        ac:
+          - An account whose Renewal Advice is recorded from a tracker shows it as sent with the legacy date and cannot be sent again.
+          - A refused tracker row is applied only after a second team member approves the correction.
+
+  - id: FRRN.046
+    component: Renewal Account Screen
+    capability: Package of a Migrated Policy
+    subitems:
+      - id: FRRN.046.01
+        title: Package Remapping at Sanitation
+        refs: [FR-RN-028]
+        shall:
+          - For a migrated policy, the sanitation shall look its legacy package up in the package code map; when the map gives one active package version for renewal, the renewal account takes it; otherwise the account is set apart as an exception (BRRN.020; BDOI decision of 26-Sep-2026).
+          - A member of the Renewal processing team shall choose the package version with a reason, and a second member shall approve the choice (maker-checker); the choice is logged and listed so that the map can be completed.
+          - Only active package versions sellable for renewal can be chosen.
+        ac:
+          - A migrated policy whose legacy package maps to one package version passes the rule and shows that version.
+          - A migrated policy with an unmapped package stays an exception until a choice is approved by a second team member; the same user cannot choose and approve.
+
+  - id: FRRN.047
+    component: Follow-ups
+    capability: Contact Center Follow-up
+    subitems:
+      - id: FRRN.047.01
+        title: Follow-up of the Client by the Contact Center
+        refs: [FR-RN-085]
+        shall:
+          - The Contact Center users shall view the renewal lists without the premium and commission columns and record follow-ups on an account - channel (call, e-mail, SMS), outcome, remarks and next action date - and upload the documents received from the client (BRRN.026).
+          - The Contact Center users shall not give a disposition or send letters; every follow-up and upload is recorded with the user and the time.
+          - "The system shall refuse a follow-up without outcome (\"Select the outcome\") and a next action date in the past."
+        ac:
+          - A Contact Center user records a call outcome and uploads a signed Renewal Advice; the Account Officer sees both on the account.
+          - A Contact Center user does not see the premium columns.
+
+  - id: FRRN.048
+    component: Renewal List
+    capability: Renewal of Submitted Policies
+    subitems:
+      - id: FRRN.048.01
+        title: Renewal of Submitted Policies Handed over by Submitted Policies
+        refs: [FR-RN-090]
+        shall:
+          - When the Submitted Policies module hands over an expiring submitted policy, the Renewal Module shall create one renewal account per SBM number, initiate it, run the sanitation and the decision matrix, request the hold cover and prepare the letters of submitted policies (FFY Renewal Advice, reminder, SFU letter for mortgaged accounts, NRNS and No Advice Letter) (cross-BRD decision D2).
+          - The Renewal Module shall answer the status queries of Submitted Policies (open, renewed, not renewed, lost or expired without renewal, with the reason).
+          - A Non-CBG Retail hand-off shall start unassigned for a disposition by the user; a second hand-off of the same SBM number creates nothing new.
+        ac:
+          - A submitted CBG Motor policy handed over creates one renewal account, one hold cover request and one Renewal Advice.
+          - When the renewal account is booked, the masterlist record of Submitted Policies shows it as booked.
+
+  - id: FRRN.049
+    component: Maintenance
+    capability: Lists of Values and Letter Templates
+    subitems:
+      - id: FRRN.049.01
+        title: Lists of Values of Renewal
+        refs: [FR-RN-110]
+        shall:
+          - The Business Administrator shall view, add, edit and end the values of the Renewal lists (dispositions labels, non-renewal reasons, return reasons, transfer reasons, follow-up outcomes, override reasons, insurer dispositions) with an effective date; a change takes effect on its date and is approved by a second user (BRD 5.003).
+          - "A value is never deleted; it is ended so that the records that used it stay readable. An end date before the start date is refused (\"The effective-to date is before the effective-from date\")."
+        ac:
+          - A new non-renewal reason effective next month can be chosen from that date only.
+          - An ended reason stays visible on the accounts that used it.
+      - id: FRRN.049.02
+        title: Renewal Advice and Letter Templates
+        refs: [FR-RN-111]
+        shall:
+          - The Business Administrator shall update the Renewal Advice template and the other Renewal letter templates; a new version applies to every document generated after its activation, and documents already generated keep their version (BRD 5.005).
+          - A template that uses an unknown field shall not be saved ("The template uses an unknown field <name>").
+        ac:
+          - A Renewal Advice generated after a new version is activated shows the new layout and its version.

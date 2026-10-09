@@ -53,7 +53,9 @@ public class PackageQueryService {
           + " where r.company_id = :company group by r.status";
 
   private static final String CASES =
-      "select c.entity_id, c.stage_entered_at, c.due_at, c.assignee from wf_case c"
+      "select c.entity_id, c.stage_entered_at, c.due_at, c.assignee, h.action as last_action"
+          + " from wf_case c left join lateral (select x.action from wf_case_history x"
+          + " where x.case_id = c.id order by x.id desc limit 1) h on true"
           + " where c.entity_type = 'PackageRequest' and c.entity_id in (:ids)";
 
   private final PackageRequestRepository requests;
@@ -119,7 +121,8 @@ public class PackageQueryService {
               new CaseFacts(
                   instant(rs.getTimestamp("stage_entered_at")),
                   instant(rs.getTimestamp("due_at")),
-                  rs.getString("assignee")));
+                  rs.getString("assignee"),
+                  rs.getString("last_action")));
         });
     return facts;
   }
@@ -233,8 +236,10 @@ public class PackageQueryService {
    * @param stageEnteredAt when the current stage started
    * @param dueAt SLA due time, null when none
    * @param assignee assignee, null when unassigned
+   * @param lastAction last workflow action (a return shows "Returned for Revision"), may be null
    */
-  public record CaseFacts(Instant stageEnteredAt, Instant dueAt, String assignee) {}
+  public record CaseFacts(
+      Instant stageEnteredAt, Instant dueAt, String assignee, String lastAction) {}
 
   /**
    * Requests in one stage.

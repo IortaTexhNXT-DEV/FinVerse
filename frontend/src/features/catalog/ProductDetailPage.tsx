@@ -27,6 +27,8 @@ import { RuleEditorModal } from './RuleEditorModal';
 import type { RuleKind } from './RuleEditorModal';
 import { CoverTypeLabel, LovLabel, LovLabels } from '@/components/broking/LovLabel';
 import { LoadingPanel } from '@/components/ui/LoadingPanel';
+import { DeactivatePackageButton } from '@/features/productmaint/workspace/DeactivatePackageButton';
+import { RecordAuditLog } from '@/features/productmaint/workspace/RecordAuditLog';
 
 const yes = (flag: boolean) => (flag ? 'Yes' : 'No');
 
@@ -34,6 +36,7 @@ const TABS = [
   { id: 'versions', label: 'Versions' },
   { id: 'features', label: 'Features' },
   { id: 'rules', label: 'Field Rules & Documents' },
+  { id: 'audit', label: 'Audit Logs' },
 ] as const;
 
 type TabId = (typeof TABS)[number]['id'];
@@ -240,6 +243,7 @@ export default function ProductDetailPage() {
                 Edit
               </Button>
             )}
+            <DeactivatePackageButton product={d.product} />
           </>
         }
       />
@@ -252,6 +256,7 @@ export default function ProductDetailPage() {
         </Card>
       )}
       {tab === 'rules' && <Rules detail={d} maintain={maintain} />}
+      {tab === 'audit' && <RecordAuditLog reference={d.product.code} />}
       {editing && (
         <ProductEditorModal initial={productFormOf(d.product)} onClose={() => setEditing(false)} />
       )}

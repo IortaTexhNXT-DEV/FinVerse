@@ -44,6 +44,10 @@ export interface AuditEntry {
   newValue?: string;
   /** Source (IP) address of the action. */
   ipAddress?: string;
+  /** Client or assured's name of the record (Product Maintenance). */
+  subject?: string;
+  /** Remarks of the action (approval, return or rejection comment). */
+  remarks?: string;
 }
 
 /** Filters, sort and page of the Audit Trail. */

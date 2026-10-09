@@ -43,6 +43,24 @@ public class RiskProduct extends AuthorizableEntity implements CatalogRecord {
   @Column(nullable = false)
   private boolean packaged;
 
+  @Column(length = 500)
+  private String description;
+
+  @Column(name = "incentive_eligible", nullable = false)
+  private boolean incentiveEligible;
+
+  @Column(name = "incentive_amount", precision = 19, scale = 2)
+  private BigDecimal incentiveAmount;
+
+  @Column(name = "incentive_rate", precision = 9, scale = 4)
+  private BigDecimal incentiveRate;
+
+  @Column(name = "policy_type", length = 30)
+  private String policyType;
+
+  @Column(name = "insured_name", length = 250)
+  private String insuredName;
+
   @Column(name = "fleet_capable", nullable = false)
   private boolean fleetCapable;
 
@@ -223,6 +241,73 @@ public class RiskProduct extends AuthorizableEntity implements CatalogRecord {
   public boolean isSellable() {
     return isActive() && lifecycleStatus == ProductLifecycle.ACTIVE;
   }
+
+  /**
+   * Sets the package description shown on the Product Matrix (BDOI FRS FRPM.003.01).
+   *
+   * @param text description, blank to clear
+   */
+  public void describe(String text) {
+    this.description = text == null || text.isBlank() ? null : text.strip();
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  /**
+   * Sets the Annex A attributes of the Product Matrix record (BDOI FRS FRPM.003.02): Incentive
+   * Eligible with the incentive amount or commission rate, Policy Type and Insured's Name.
+   *
+   * @param m the attributes (already checked)
+   */
+  public void matrixAttributes(MatrixAttributes m) {
+    this.incentiveEligible = m.incentiveEligible();
+    this.incentiveAmount = m.incentiveEligible() ? m.incentiveAmount() : null;
+    this.incentiveRate = m.incentiveEligible() ? m.incentiveRate() : null;
+    this.policyType = blank(m.policyType());
+    this.insuredName = blank(m.insuredName());
+  }
+
+  private static String blank(String text) {
+    return text == null || text.isBlank() ? null : text.strip();
+  }
+
+  public boolean isIncentiveEligible() {
+    return incentiveEligible;
+  }
+
+  public BigDecimal getIncentiveAmount() {
+    return incentiveAmount;
+  }
+
+  public BigDecimal getIncentiveRate() {
+    return incentiveRate;
+  }
+
+  public String getPolicyType() {
+    return policyType;
+  }
+
+  public String getInsuredName() {
+    return insuredName;
+  }
+
+  /**
+   * The Annex A attributes of a Product Matrix record.
+   *
+   * @param incentiveEligible Incentive Eligible (default No)
+   * @param incentiveAmount incentive amount
+   * @param incentiveRate incentive commission rate
+   * @param policyType policy type (list PKG_POLICY_TYPE)
+   * @param insuredName Insured's Name of a client-specific package
+   */
+  public record MatrixAttributes(
+      boolean incentiveEligible,
+      BigDecimal incentiveAmount,
+      BigDecimal incentiveRate,
+      String policyType,
+      String insuredName) {}
 
   public ProductLifecycle getLifecycleStatus() {
     return lifecycleStatus;

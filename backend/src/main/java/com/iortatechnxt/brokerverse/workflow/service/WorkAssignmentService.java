@@ -5,6 +5,7 @@ import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.security.UserDisplayNames;
 import com.iortatechnxt.brokerverse.messaging.domain.Notice;
 import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
 import com.iortatechnxt.brokerverse.workflow.domain.StageChange;
@@ -36,6 +37,7 @@ public class WorkAssignmentService {
   private final AuditTrailService audit;
   private final CurrentUser currentUser;
   private final Clock clock;
+  private final UserDisplayNames names;
 
   /**
    * Creates the service.
@@ -47,6 +49,7 @@ public class WorkAssignmentService {
    * @param audit audit trail
    * @param currentUser current user
    * @param clock clock
+   * @param names user names (notices)
    */
   public WorkAssignmentService(
       WorkCaseRepository cases,
@@ -55,7 +58,8 @@ public class WorkAssignmentService {
       NotificationService notifications,
       AuditTrailService audit,
       CurrentUser currentUser,
-      Clock clock) {
+      Clock clock,
+      UserDisplayNames names) {
     this.cases = cases;
     this.history = history;
     this.definitions = definitions;
@@ -63,6 +67,7 @@ public class WorkAssignmentService {
     this.audit = audit;
     this.currentUser = currentUser;
     this.clock = clock;
+    this.names = names;
   }
 
   /**
@@ -161,7 +166,28 @@ public class WorkAssignmentService {
               workCase.getEntityType(),
               workCase.getEntityId()));
     }
+    tellOriginal(workCase, previous, assignee);
     return workCase;
+  }
+
+  /** The original assignee learns that the item was reassigned (BDOI FRS FRPM.017.01). */
+  private void tellOriginal(WorkCase workCase, String previous, String assignee) {
+    if (previous == null
+        || CurrentUser.sameUser(previous, assignee)
+        || CurrentUser.sameUser(previous, currentUser.username())) {
+      return;
+    }
+    notifications.notifyUser(
+        previous,
+        new Notice(
+            workCase.getReference() + " reassigned",
+            workCase.getTitle()
+                + " was reassigned to "
+                + (assignee == null ? "the team queue" : names.displayName(assignee))
+                + ".",
+            workCase.getLink(),
+            workCase.getEntityType(),
+            workCase.getEntityId()));
   }
 
   private WorkCase get(Long caseId) {

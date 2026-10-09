@@ -15,6 +15,8 @@ import com.iortatechnxt.brokerverse.messaging.domain.OutboundMessage.RecordLink;
 import com.iortatechnxt.brokerverse.messaging.service.MessageService;
 import com.iortatechnxt.brokerverse.messaging.service.OutboundEmail;
 import com.iortatechnxt.brokerverse.messaging.service.OutboundEmail.Protection;
+import com.iortatechnxt.brokerverse.nonpackage.service.ProposalDocuments;
+import com.iortatechnxt.brokerverse.nonpackage.service.ProposalDocuments.InsurerFileName;
 import com.iortatechnxt.brokerverse.productmaint.domain.NegotiationRound;
 import com.iortatechnxt.brokerverse.productmaint.domain.NegotiationRoundRepository;
 import com.iortatechnxt.brokerverse.productmaint.domain.PackageInsurerResponse;
@@ -22,6 +24,7 @@ import com.iortatechnxt.brokerverse.productmaint.domain.PackageRequest;
 import com.iortatechnxt.brokerverse.productmaint.domain.PackageResponseRepository;
 import com.iortatechnxt.brokerverse.productmaint.domain.RequestStage;
 import com.iortatechnxt.brokerverse.productmaint.domain.RoundStatus;
+import com.iortatechnxt.brokerverse.report.core.ExportFileNames;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import com.iortatechnxt.brokerverse.workflow.service.TransitionNote;
 import com.iortatechnxt.brokerverse.workflow.service.WorkflowService;
@@ -389,7 +392,12 @@ public class NegotiationService {
                     + r.getReplyDue()
                     + ". The document is password protected; the password follows separately."
                     + "\n\nBDO Insurance and Reinsurance Brokers, Inc.",
-                List.of(f),
+                List.of(
+                    ProposalDocuments.forInsurer(
+                        f,
+                        new InsurerFileName("QS", p.getRequestNo(), insurer.getName()),
+                        BusinessClock.today(clock),
+                        ExportFileNames.bdoi(parameters))),
                 new Protection(null, true, null),
                 new RecordLink(PackageRequests.ENTITY, String.valueOf(p.getId()), r.getQsNo())))
         .messageId();

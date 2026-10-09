@@ -61,4 +61,16 @@ public interface ProductVersionQueryService {
    * @return expiring versions
    */
   List<ProductVersionView> packagesExpiring(Long companyId, int withinDays);
+
+  /**
+   * Current RELEASED versions whose anniversary date falls between today and today plus {@code
+   * withinDays} (inclusive), soonest first (anniversary notice, BDOI FRS FRPM.004.01).
+   *
+   * @param companyId company
+   * @param withinDays look-ahead in days
+   * @return versions reaching their anniversary
+   */
+  default List<ProductVersionView> packagesAtAnniversary(Long companyId, int withinDays) {
+    return List.of();
+  }
 }

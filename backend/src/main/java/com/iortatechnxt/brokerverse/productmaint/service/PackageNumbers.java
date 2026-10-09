@@ -50,6 +50,15 @@ public class PackageNumbers {
     return series("PKG_QS_PREFIX", "PQS-");
   }
 
+  /**
+   * Next package deactivation request number (BDOI FRS FRPM.003.04).
+   *
+   * @return e.g. PKD-2026-000001
+   */
+  public String deactivation() {
+    return series("PKG_DEACTIVATION_PREFIX", "PKD-");
+  }
+
   private String series(String parameter, String fallback) {
     return numbers.next(
         parameters.text(parameter, fallback) + BusinessClock.today(clock).getYear());

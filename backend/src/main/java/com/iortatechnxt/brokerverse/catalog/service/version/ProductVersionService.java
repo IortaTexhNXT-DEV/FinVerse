@@ -223,6 +223,28 @@ public class ProductVersionService {
   }
 
   /**
+   * Sets the package expiry date of a version on an approved deactivation request (BDOI FRS
+   * FRPM.003.07: the later of the deactivation effective date and the approval date).
+   *
+   * @param productCode package
+   * @param versionNo version in force
+   * @param expiry new package expiry date
+   * @param requestNo deactivation request number (audit)
+   */
+  public void deactivateOn(String productCode, int versionNo, LocalDate expiry, String requestNo) {
+    ProductVersion version = queries.require(productCode, versionNo);
+    LocalDate before = version.getPackageEndDate();
+    version.endPackageOn(expiry);
+    audit.recordChange(
+        ProductVersionQueries.ENTITY,
+        version.reference(),
+        AuditAction.UPDATE,
+        "Package expiry date set by deactivation request " + requestNo,
+        before == null ? null : before.toString(),
+        expiry.toString());
+  }
+
+  /**
    * The daily lifecycle step (BRPM.006/017; run by the PACKAGE_EXPIRY_MONITOR job of {@code
    * productmaint}): versions whose selling period ended become SUPERSEDED, a version that took
    * effect is projected on its product, and a current version whose package end date passed becomes

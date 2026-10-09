@@ -55,6 +55,12 @@ export function productFormOf(product: Product): ProductForm {
     minimumPremium: product.minimumPremium,
     maxSumInsured: product.maxSumInsured ?? undefined,
     tsuInvolvement: product.tsuInvolvement ?? 'BY_RULES',
+    description: product.description ?? undefined,
+    incentiveEligible: product.incentiveEligible ?? false,
+    incentiveAmount: product.incentiveAmount ?? undefined,
+    incentiveRate: product.incentiveRate ?? undefined,
+    policyType: product.policyType ?? undefined,
+    insuredName: product.insuredName ?? undefined,
     existing: true,
   };
 }
@@ -74,8 +80,25 @@ export function productProblems(form: ProductForm): string[] {
   if (form.defaultCommissionRate === undefined) {
     problems.push('Default commission rate is required.');
   }
+  problems.push(...incentiveProblems(form));
   if (form.multiYearAllowed && (form.maxTermYears ?? 1) < 2) {
     problems.push('A multi-year product needs a maximum term of at least 2 years.');
+  }
+  return problems;
+}
+
+/** The Incentive Eligible rules of BDOI's FRS FRPM.003.02. */
+export function incentiveProblems(form: ProductForm): string[] {
+  const problems: string[] = [];
+  const { incentiveAmount: amount, incentiveRate: rate } = form;
+  if (amount !== undefined && amount <= 0) {
+    problems.push('The incentive amount must be greater than zero.');
+  }
+  if (rate !== undefined && (rate <= 0 || rate > 100)) {
+    problems.push('The incentive commission rate must be above 0% and at most 100%.');
+  }
+  if (form.incentiveEligible === true && amount === undefined && rate === undefined) {
+    problems.push('Enter the incentive amount or the incentive commission rate.');
   }
   return problems;
 }

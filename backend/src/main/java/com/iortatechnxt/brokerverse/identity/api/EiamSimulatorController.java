@@ -141,7 +141,7 @@ public class EiamSimulatorController {
     EiamSimulator.AuthorizationRequest request = request(params);
     try {
       DirectoryAccount account =
-          simulator.signIn(params.get("windowsId"), "BDO".equals(params.get("device")));
+          simulator.signIn(params.get("windowsId"), "BANK".equals(params.get("device")));
       response.addHeader(
           HttpHeaders.SET_COOKIE,
           sessionCookie(simulator.openSession(account.windowsId()), SESSION_LIFE, http).toString());
@@ -256,7 +256,7 @@ public class EiamSimulatorController {
             + "<label>Account <select name=\"windowsId\">"
             + options
             + "</select></label><fieldset><legend>Device</legend><label><input type=\"radio\""
-            + " name=\"device\" value=\"BDO\" checked> BDO-issued device</label><label><input"
+            + " name=\"device\" value=\"BANK\" checked> Bank-issued device</label><label><input"
             + " type=\"radio\" name=\"device\" value=\"PERSONAL\"> Personal device</label>"
             + "</fieldset><button type=\"submit\">Sign in</button></form>");
   }

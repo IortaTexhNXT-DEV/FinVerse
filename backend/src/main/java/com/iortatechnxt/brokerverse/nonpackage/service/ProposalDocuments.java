@@ -20,9 +20,11 @@ import com.iortatechnxt.brokerverse.nonpackage.domain.ProposalRequest;
 import com.iortatechnxt.brokerverse.nonpackage.domain.RiskDetails;
 import com.iortatechnxt.brokerverse.nonpackage.service.ComparativeTable.Row;
 import com.iortatechnxt.brokerverse.organization.service.OrganizationService;
+import com.iortatechnxt.brokerverse.report.core.ExportFileNames;
 import com.iortatechnxt.brokerverse.security.service.UserDirectory;
 import java.math.BigDecimal;
 import java.time.Clock;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -222,6 +224,45 @@ public class ProposalDocuments {
                 signatures(p.getPsSubmittedBy(), p.getPsApprovedBy()),
                 text.versionLabel() + " | Proposal slip version " + p.getPsVersion()));
     return new MessageFile(p.getPsNo() + "_v" + p.getPsVersion() + ".pdf", PDF, pdf);
+  }
+
+  /**
+   * The copy of a slip for one insurer, named {@code <prefix>_<reference>_<insurer>_MMDDYYYY.pdf}
+   * as BDOI's FRS asks (quotation slips per insurer) when BDOI's file names apply.
+   *
+   * @param slip the slip
+   * @param naming prefix, reference number and insurer name
+   * @param date date of the file
+   * @param bdoi whether BDOI's file names apply
+   * @return the slip with the insurer's file name
+   */
+  public static MessageFile forInsurer(
+      MessageFile slip, InsurerFileName naming, LocalDate date, boolean bdoi) {
+    if (!bdoi) {
+      return slip;
+    }
+    return new MessageFile(
+        ExportFileNames.dated(naming.stem(), date, "pdf"), slip.mimeType(), slip.content());
+  }
+
+  /**
+   * The parts of a file name of one insurer.
+   *
+   * @param prefix prefix (QS, ProposalSlip)
+   * @param reference reference number
+   * @param insurerName insurer name
+   */
+  public record InsurerFileName(String prefix, String reference, String insurerName) {
+
+    /**
+     * The name without the date: the insurer name keeps its letters and digits only.
+     *
+     * @return stem
+     */
+    public String stem() {
+      String insurer = insurerName == null ? "" : insurerName.replaceAll("[^A-Za-z0-9]+", "");
+      return prefix + "_" + reference + "_" + insurer;
+    }
   }
 
   /**

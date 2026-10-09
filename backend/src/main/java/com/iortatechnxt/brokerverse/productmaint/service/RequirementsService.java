@@ -20,6 +20,7 @@ import com.iortatechnxt.brokerverse.productmaint.domain.RequestType;
 import com.iortatechnxt.brokerverse.productmaint.domain.Signoff;
 import com.iortatechnxt.brokerverse.productmaint.domain.SignoffRepository;
 import com.iortatechnxt.brokerverse.security.service.UserDirectory;
+import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import com.iortatechnxt.brokerverse.workflow.service.TransitionNote;
 import com.iortatechnxt.brokerverse.workflow.service.WorkflowService;
 import java.time.Clock;
@@ -47,6 +48,9 @@ public class RequirementsService {
   /** Document type of the ManCom sign-off. */
   public static final String MANCOM_SIGNOFF = "MANCOM_SIGNOFF";
 
+  /** Setting: AUTO or MANUAL deployment request. */
+  public static final String DEPLOYMENT_SETTING = "PM_DEPLOYMENT_REQUEST";
+
   private final PackageRequests requests;
   private final NegotiationService negotiation;
   private final SignoffRepository signoffs;
@@ -58,6 +62,7 @@ public class RequirementsService {
   private final CurrentUser currentUser;
   private final Clock clock;
   private final UserDirectory directory;
+  private final SystemParameterService parameters;
 
   /**
    * Creates the service.
@@ -73,6 +78,7 @@ public class RequirementsService {
    * @param currentUser current user
    * @param clock clock
    * @param directory user directory (display names in texts)
+   * @param parameters business parameters (deployment request)
    */
   public RequirementsService(
       PackageRequests requests,
@@ -85,7 +91,8 @@ public class RequirementsService {
       AuditTrailService audit,
       CurrentUser currentUser,
       Clock clock,
-      UserDirectory directory) {
+      UserDirectory directory,
+      SystemParameterService parameters) {
     this.requests = requests;
     this.negotiation = negotiation;
     this.signoffs = signoffs;
@@ -97,6 +104,7 @@ public class RequirementsService {
     this.currentUser = currentUser;
     this.clock = clock;
     this.directory = directory;
+    this.parameters = parameters;
   }
 
   /**
@@ -198,8 +206,14 @@ public class RequirementsService {
       throw new BusinessRuleException(
           "PKG_FOUR_EYES", "ManCom signs off requirements submitted by someone else");
     }
+    // BDOI FRS FRPM.015.01: with PM_DEPLOYMENT_REQUEST MANUAL the deployment is requested by a
+    // button; AUTO forwards the package to MBS at once (BRPM.015).
+    String action =
+        "MANUAL".equals(parameters.text(DEPLOYMENT_SETTING, "AUTO").strip())
+            ? "signoff_hold"
+            : "signoff";
     workflow.transition(
-        PackageRequests.ENTITY, String.valueOf(id), "signoff", TransitionNote.comment(comment));
+        PackageRequests.ENTITY, String.valueOf(id), action, TransitionNote.comment(comment));
     negotiation.lockAll(id);
     Signoff s =
         signoffs.save(

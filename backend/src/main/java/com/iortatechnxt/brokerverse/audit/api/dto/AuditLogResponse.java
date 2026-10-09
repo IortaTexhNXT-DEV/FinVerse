@@ -23,6 +23,8 @@ import java.time.Instant;
  * @param oldValue value before the change, null when not recorded
  * @param newValue value after the change, null when not recorded
  * @param ipAddress source (IP) address
+ * @param subject client or assured's name of the record, null when none
+ * @param remarks remarks of the action (approval, return or rejection comment), null when none
  */
 public record AuditLogResponse(
     Long id,
@@ -38,7 +40,9 @@ public record AuditLogResponse(
     String roleNames,
     String oldValue,
     String newValue,
-    String ipAddress) {
+    String ipAddress,
+    String subject,
+    String remarks) {
 
   /**
    * Maps an entry.
@@ -62,6 +66,8 @@ public record AuditLogResponse(
         a.getRoleNames(),
         a.getOldValue(),
         a.getNewValue(),
-        a.getIpAddress());
+        a.getIpAddress(),
+        e.subject(),
+        a.getRemarks());
   }
 }

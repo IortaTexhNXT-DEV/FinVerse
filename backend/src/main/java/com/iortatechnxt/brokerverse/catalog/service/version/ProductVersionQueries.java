@@ -103,6 +103,21 @@ public class ProductVersionQueries implements ProductVersionQueryService {
         .toList();
   }
 
+  @Override
+  public List<ProductVersionView> packagesAtAnniversary(Long companyId, int withinDays) {
+    LocalDate today = BusinessClock.today(clock);
+    LocalDate until = today.plusDays(Math.max(0, withinDays));
+    return versions
+        .findByStatusInOrderBySubmittedAtAscIdAsc(List.of(ProductVersionStatus.RELEASED))
+        .stream()
+        .filter(v -> v.getEffectiveTo() == null && v.getAnniversaryDate() != null)
+        .filter(
+            v -> !v.getAnniversaryDate().isBefore(today) && !v.getAnniversaryDate().isAfter(until))
+        .sorted(Comparator.comparing(ProductVersion::getAnniversaryDate))
+        .map(this::view)
+        .toList();
+  }
+
   /**
    * The version entity in force on a date.
    *

@@ -1,6 +1,7 @@
 import { api, toQuery } from './client';
 import type { ProductLifecycle, VersionStatus } from './productCatalog';
 import type { RecordStatus, RecordOriginFields } from './types';
+import type { ProductMatrixInput } from './pmWorkspace';
 import type {
   SalesAssignment,
   SalesOfficer,
@@ -96,7 +97,7 @@ export interface CoverType extends Authorizable {
   sortOrder: number;
 }
 
-export interface ProductInput {
+export interface ProductInput extends ProductMatrixInput {
   code: string;
   name: string;
   lineCode: string;

@@ -85,7 +85,25 @@ public class AuditTrailService {
       String summary,
       String before,
       String after) {
-    entry(currentUser.username(), entityType, entityId, action, summary).values(before, after);
+    repository.save(
+        build(currentUser.username(), entityType, entityId, action, summary).values(before, after));
+  }
+
+  /**
+   * Records an action by the current user with its remarks (the comment of an approval, a return or
+   * a rejection), shown in the Remarks column of the audit logs (BDOI FRS FRPM.021).
+   *
+   * @param entityType entity type
+   * @param entityId entity id or business key
+   * @param action action
+   * @param summary description
+   * @param remarks remarks, may be null
+   */
+  @Transactional(propagation = Propagation.REQUIRED)
+  public void recordWithRemarks(
+      String entityType, Object entityId, AuditAction action, String summary, String remarks) {
+    repository.save(
+        build(currentUser.username(), entityType, entityId, action, summary).remarks(remarks));
   }
 
   /**
@@ -124,12 +142,16 @@ public class AuditTrailService {
 
   private AuditLog entry(
       String username, String entityType, Object entityId, AuditAction action, String summary) {
+    return repository.save(build(username, entityType, entityId, action, summary));
+  }
+
+  /** An entry not yet saved: the values and remarks are set before the insert-only save. */
+  private AuditLog build(
+      String username, String entityType, Object entityId, AuditAction action, String summary) {
     String text = summary.length() > MAX_SUMMARY ? summary.substring(0, MAX_SUMMARY) : summary;
     String id = entityId == null ? null : String.valueOf(entityId);
-    AuditLog log =
-        new AuditLog(clock.instant(), username, entityType, id, action, text)
-            .from(ActorContext.address(), rolesOf(username));
-    return repository.save(log);
+    return new AuditLog(clock.instant(), username, entityType, id, action, text)
+        .from(ActorContext.address(), rolesOf(username));
   }
 
   private String rolesOf(String username) {

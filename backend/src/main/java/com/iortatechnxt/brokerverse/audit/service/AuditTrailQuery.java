@@ -10,10 +10,12 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -64,18 +66,26 @@ public class AuditTrailQuery {
     ACTION_LABELS.put(AuditAction.EXPORT, "Export");
   }
 
+  private static final String KEY = "|";
+
   private final AuditLogRepository repository;
   private final ObjectProvider<ActorRoles> directory;
+  private final ObjectProvider<AuditSubjects> subjects;
 
   /**
    * Creates the query.
    *
    * @param repository audit trail
    * @param directory Windows IDs of the users
+   * @param subjects client or assured's names of the audited records
    */
-  public AuditTrailQuery(AuditLogRepository repository, ObjectProvider<ActorRoles> directory) {
+  public AuditTrailQuery(
+      AuditLogRepository repository,
+      ObjectProvider<ActorRoles> directory,
+      ObjectProvider<AuditSubjects> subjects) {
     this.repository = repository;
     this.directory = directory;
+    this.subjects = subjects;
   }
 
   /**
@@ -122,13 +132,33 @@ public class AuditTrailQuery {
             specification(filter), PageRequest.of(page, size, sort.and(Sort.by("id"))));
     Map<String, String> windowsIds =
         windowsIds(logs.getContent().stream().map(AuditLog::getUsername).toList());
+    Map<String, String> names = subjects(logs.getContent());
     return logs.map(
         a ->
             new AuditEntry(
                 a,
                 AuditModules.of(a.getEntityType()),
                 windowsIds.get(a.getUsername().toLowerCase(Locale.ROOT)),
-                label(a.getAction())));
+                label(a.getAction()),
+                names.get(a.getEntityType() + KEY + a.getEntityId())));
+  }
+
+  private Map<String, String> subjects(List<AuditLog> logs) {
+    Map<String, String> found = new HashMap<>();
+    logs.stream()
+        .collect(
+            Collectors.groupingBy(
+                AuditLog::getEntityType,
+                Collectors.mapping(AuditLog::getEntityId, Collectors.toSet())))
+        .forEach(
+            (type, ids) ->
+                subjects
+                    .orderedStream()
+                    .forEach(
+                        s ->
+                            s.subjects(type, ids)
+                                .forEach((id, name) -> found.putIfAbsent(type + KEY + id, name))));
+    return found;
   }
 
   private static Specification<AuditLog> specification(Filter filter) {
@@ -198,6 +228,8 @@ public class AuditTrailQuery {
    * @param module module
    * @param windowsId Windows ID of the user, null when none
    * @param actionLabel action in BDOI's words
+   * @param subject client or assured's name of the record, null when none
    */
-  public record AuditEntry(AuditLog log, String module, String windowsId, String actionLabel) {}
+  public record AuditEntry(
+      AuditLog log, String module, String windowsId, String actionLabel, String subject) {}
 }

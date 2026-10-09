@@ -104,6 +104,8 @@ public class PackageRequest extends BaseEntity {
   @Column(name = "released_at")
   private Instant releasedAt;
 
+  @Embedded private RequestRouting routing = new RequestRouting();
+
   protected PackageRequest() {}
 
   /**
@@ -374,4 +376,22 @@ public class PackageRequest extends BaseEntity {
    * @param name display name
    */
   public record ClientRef(Long id, String code, String name) {}
+
+  /** A request on an insurer's offer needs no quotation slip (BDOI FRS FRPM.011.02). */
+  public void withoutNegotiation() {
+    this.negotiationRequired = false;
+  }
+
+  /**
+   * Source, Annex E details, Marketing approvals and the deployment request (BDOI FRS FRPM.011.02
+   * and FRPM.015.01).
+   *
+   * @return routing facts
+   */
+  public RequestRouting getRouting() {
+    if (routing == null) {
+      routing = new RequestRouting();
+    }
+    return routing;
+  }
 }

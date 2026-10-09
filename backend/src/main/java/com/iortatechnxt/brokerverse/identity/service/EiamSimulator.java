@@ -109,7 +109,7 @@ public class EiamSimulator {
     if (!bdoDevice) {
       throw new IdentityRefused(
           "DEVICE_NOT_ALLOWED",
-          "Access blocked: your organisation's policy allows sign-in only from BDO-issued devices");
+          "Access blocked: your organisation's policy allows sign-in only from bank-issued devices");
     }
     DirectoryAccount account =
         directory

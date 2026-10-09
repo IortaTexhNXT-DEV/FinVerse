@@ -198,11 +198,12 @@ public class WorkflowService {
             currentUser.username(),
             automatic,
             clock.instant()));
-    audit.record(
+    audit.recordWithRemarks(
         ENTITY,
         workCase.getReference(),
         AuditAction.UPDATE,
-        t.getLabel() + ": " + from + " -> " + target.getStageCode() + reasonText(given));
+        t.getLabel() + ": " + from + " -> " + target.getStageCode() + reasonText(given),
+        given.comment());
     notifyChange(workCase, target, given);
     events.publishEvent(
         new WorkCaseTransitioned(

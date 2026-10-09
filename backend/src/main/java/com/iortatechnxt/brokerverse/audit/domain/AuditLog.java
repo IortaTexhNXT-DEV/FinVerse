@@ -23,6 +23,8 @@ public class AuditLog {
   /** Longest old or new value kept on an entry. */
   public static final int MAX_VALUE = 500;
 
+  private static final int MAX_REMARKS = 1000;
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
@@ -57,6 +59,9 @@ public class AuditLog {
 
   @Column(name = "new_value", updatable = false, length = MAX_VALUE)
   private String newValue;
+
+  @Column(updatable = false, length = MAX_REMARKS)
+  private String remarks;
 
   protected AuditLog() {}
 
@@ -109,6 +114,22 @@ public class AuditLog {
     this.oldValue = ActorContext.clip(before, MAX_VALUE);
     this.newValue = ActorContext.clip(after, MAX_VALUE);
     return this;
+  }
+
+  /**
+   * Adds the remarks of the action (the comment of an approval, a return or a rejection).
+   *
+   * @param text remarks, may be null
+   * @return this entry
+   */
+  public AuditLog remarks(String text) {
+    this.remarks =
+        text == null || text.isBlank() ? null : ActorContext.clip(text.strip(), MAX_REMARKS);
+    return this;
+  }
+
+  public String getRemarks() {
+    return remarks;
   }
 
   public Long getId() {

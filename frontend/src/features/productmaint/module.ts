@@ -1,12 +1,22 @@
-import { FilePlus2, FileStack, Hourglass, LayoutDashboard, Workflow } from 'lucide-react';
+import {
+  BarChart3,
+  FilePlus2,
+  FileStack,
+  Hourglass,
+  LayoutDashboard,
+  PackageX,
+  RefreshCcwDot,
+  ScrollText,
+  Workflow,
+} from 'lucide-react';
 import { lazy } from 'react';
 import type { FeatureModule, ScreenDef } from '@/navigation/types';
 
 /**
  * Package request screens of Product Maintenance (BRD-3, `productmaint`; BRPM.008-019,
- * PMADD03/04; PRODUCT_MAINTENANCE_DESIGN section 11). The menu screens are Home, Package
- * Requests, TSU Workbench and Package Expiry (help entries in `PACKAGE_REQUEST_HELP_SCREENS`, same
- * order); the form and the record page open from the list.
+ * PMADD03/04; PRODUCT_MAINTENANCE_DESIGN section 11). The menu screens are Home (landing page),
+ * Dashboard, Package Requests, TSU Workbench, Package Expiry, Deactivation Requests and Audit Logs
+ * (help entries in `PACKAGE_REQUEST_HELP_SCREENS`); the form and the record page open from the list.
  */
 export const PACKAGE_REQUEST_SCREENS: readonly ScreenDef[] = [
   {
@@ -16,6 +26,14 @@ export const PACKAGE_REQUEST_SCREENS: readonly ScreenDef[] = [
     permission: 'PRODUCT_VIEW',
     alsoPermissions: ['PKG_REPORT_VIEW'],
     component: lazy(() => import('./ProductMaintenanceHomePage')),
+  },
+  {
+    path: '/product-maintenance/dashboard',
+    label: 'Product Maintenance Dashboard',
+    icon: BarChart3,
+    permission: 'PRODUCT_VIEW',
+    alsoPermissions: ['PKG_REPORT_VIEW'],
+    component: lazy(() => import('./workspace/PmDashboardPage')),
   },
   {
     path: '/product-maintenance/requests',
@@ -66,6 +84,30 @@ export const PACKAGE_REQUEST_SCREENS: readonly ScreenDef[] = [
     permission: 'PKG_NEGOTIATE',
     alsoPermissions: ['PRODUCT_MAINTAIN', 'PKG_REPORT_VIEW'],
     component: lazy(() => import('./PackageExpiryPage')),
+  },
+  {
+    path: '/product-maintenance/deactivations',
+    label: 'Deactivation Requests',
+    icon: PackageX,
+    permission: 'PRODUCT_VIEW',
+    alsoPermissions: ['PKG_REPORT_VIEW'],
+    component: lazy(() => import('./workspace/DeactivationsPage')),
+  },
+  {
+    path: '/product-maintenance/master-changes',
+    label: 'Product Master Transfers',
+    icon: RefreshCcwDot,
+    permission: 'PRODUCT_MAINTAIN',
+    alsoPermissions: ['PKG_REPORT_VIEW'],
+    component: lazy(() => import('./workspace/MasterChangesPage')),
+  },
+  {
+    path: '/product-maintenance/audit-logs',
+    label: 'Audit Logs',
+    icon: ScrollText,
+    permission: 'PRODUCT_VIEW',
+    alsoPermissions: ['PKG_REPORT_VIEW', 'AUDIT_VIEW'],
+    component: lazy(() => import('./workspace/PmAuditLogsPage')),
   },
 ];
 

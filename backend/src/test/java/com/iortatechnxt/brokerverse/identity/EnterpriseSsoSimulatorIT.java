@@ -108,7 +108,7 @@ class EnterpriseSsoSimulatorIT {
   void aUserWhoseWindowsIdMatchesAnActiveUserSignsInAtEiamAndGetsTheSession() throws Exception {
     Map<String, String> request = start();
     assertThat(get(authorizeUrl(request)).body()).contains("Enterprise SSO simulator");
-    HttpResponse<String> signedIn = signIn(request, "BDO\\sit.auditor", "BDO");
+    HttpResponse<String> signedIn = signIn(request, "BDO\\sit.auditor", "BANK");
     assertThat(signedIn.statusCode()).isEqualTo(302);
     JsonNode session = complete(signedIn.headers().firstValue("Location").orElseThrow());
     assertThat(session.path("user").path("username").asText()).isEqualTo("auditor");
@@ -123,16 +123,16 @@ class EnterpriseSsoSimulatorIT {
     Map<String, String> request = start();
     HttpResponse<String> personal = signIn(request, "BDO\\sit.auditor", "PERSONAL");
     assertThat(personal.statusCode()).isEqualTo(403);
-    assertThat(personal.body()).contains("only from BDO-issued devices");
+    assertThat(personal.body()).contains("only from bank-issued devices");
     assertThat(personal.headers().firstValue("Location")).isEmpty();
-    HttpResponse<String> disabled = signIn(start(), "BDO\\dlim", "BDO");
+    HttpResponse<String> disabled = signIn(start(), "BDO\\dlim", "BANK");
     assertThat(disabled.statusCode()).isEqualTo(403);
     assertThat(disabled.body()).containsIgnoringCase("disabled");
   }
 
   @Test
   void anAccountThatMatchesNoActiveUserIsRefusedAsNotLinkedAndRecorded() throws Exception {
-    HttpResponse<String> signedIn = signIn(start(), "BDO\\creyes", "BDO");
+    HttpResponse<String> signedIn = signIn(start(), "BDO\\creyes", "BANK");
     HttpResponse<String> callback = get(signedIn.headers().firstValue("Location").orElseThrow());
     assertThat(callback.headers().firstValue("Location").orElseThrow())
         .endsWith("/sso/callback?error=SSO_NOT_LINKED");
@@ -147,7 +147,7 @@ class EnterpriseSsoSimulatorIT {
   @Test
   void afterLogOutOpeningTheSystemAgainAsksForTheEiamSignIn() throws Exception {
     complete(
-        signIn(start(), "BDO\\sit.auditor", "BDO").headers().firstValue("Location").orElseThrow());
+        signIn(start(), "BDO\\sit.auditor", "BANK").headers().firstValue("Location").orElseThrow());
     HttpResponse<String> again = get(authorizeUrl(start()));
     assertThat(again.statusCode()).isEqualTo(302);
     JsonNode signOut = json.readTree(get(BASE + "/api/v1/auth/sso/sign-out").body());

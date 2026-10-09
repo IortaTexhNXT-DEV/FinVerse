@@ -88,6 +88,8 @@ sign-off per BRD"). Each document is kept once, in its latest version.
 | BDOI FRS vs BIBS FRS Operations Cashiering | BRD-02 | Comparisons | 1.0 | [`Comparisons/BIBS_Comparison_BRD-02_BDOI_FRS_vs_BIBS_FRS_Operations_Cashiering_v1.0.xlsx`](Comparisons/BIBS_Comparison_BRD-02_BDOI_FRS_vs_BIBS_FRS_Operations_Cashiering_v1.0.xlsx) |
 | BDOI FRS vs BIBS FRS Product Maintenance | BRD-03 | Comparisons | 1.0 | [`Comparisons/BIBS_Comparison_BRD-03_BDOI_FRS_vs_BIBS_FRS_Product_Maintenance_v1.0.xlsx`](Comparisons/BIBS_Comparison_BRD-03_BDOI_FRS_vs_BIBS_FRS_Product_Maintenance_v1.0.xlsx) |
 | BDOI FRS vs BIBS FRS Renewal | BRD-06 | Comparisons | 1.0 | [`Comparisons/BIBS_Comparison_BRD-06_BDOI_FRS_vs_BIBS_FRS_Renewal_v1.0.xlsx`](Comparisons/BIBS_Comparison_BRD-06_BDOI_FRS_vs_BIBS_FRS_Renewal_v1.0.xlsx) |
+| FRS Product Maintenance in BDOI's template (clean) | BRD-03 | BDOI_Template_FRS | 1.1 | [`BDOI_Template_FRS/BIBS_FRS-BDOI_BRD-03_Product_Maintenance_v1.1.docx`](BDOI_Template_FRS/BIBS_FRS-BDOI_BRD-03_Product_Maintenance_v1.1.docx) |
+| FRS Product Maintenance in BDOI's template, changes highlighted | BRD-03 | BDOI_Template_FRS | 1.1 | [`BDOI_Template_FRS/BIBS_FRS-BDOI_BRD-03_Product_Maintenance_v1.1_Changes_Highlighted.docx`](BDOI_Template_FRS/BIBS_FRS-BDOI_BRD-03_Product_Maintenance_v1.1_Changes_Highlighted.docx) |
 
 ## Still to write
 

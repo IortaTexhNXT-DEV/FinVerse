@@ -1,0 +1,65 @@
+// Package set-up, validation and release (FRPM.014.01, 014.02, 015.01, 016.01, 016.02, 025.01; BRPM.015, 016; PMADD06).
+// Swimlanes in the style of BDOI's process flows: one column per actor, decisions as diamonds.
+digraph setup_release {
+  graph [rankdir=TB, newrank=true, fontname="Arial", nodesep=0.25, ranksep=0.32, bgcolor="white", pad=0.2, splines=ortho];
+  node  [shape=box, style="filled", fontname="Arial", fontsize=10, width=1.6, height=0.55, margin="0.08,0.04"];
+  edge  [arrowsize=0.6, penwidth=0.9, fontname="Arial", fontsize=9, color="#333333"];
+
+  subgraph cluster_tsu { label="TSU"; fontname="Arial Bold"; fontsize=11; style="rounded"; color="#6C8EBF";
+    node [fillcolor="#DAE8FC", color="#6C8EBF"];
+    h1 [label="", shape=plaintext, style="", width=0.1, height=0.1];
+    start [label="Start", shape=ellipse, fillcolor="#D5E8D4", color="#82B366", width=0.8, height=0.35];
+    t1 [label="Complete product\nrequirements; attach\nsigned package slip"];
+    t2 [label="Select ManCom\napprovers and submit"];
+    t3 [label="Request for\nDeployment"];
+    t4 [label="Check and send\nadvisory with supporting\ndocuments"];
+    end_ [label="End", shape=ellipse, fillcolor="#D5E8D4", color="#82B366", width=0.8, height=0.35];
+  }
+  subgraph cluster_mancom { label="ManCom"; fontname="Arial Bold"; fontsize=11; style="rounded"; color="#9673A6";
+    node [fillcolor="#E1D5E7", color="#9673A6"];
+    h2 [label="", shape=plaintext, style="", width=0.1, height=0.1];
+    m1 [label="Review product\nrequirements"];
+    m2 [label="Approve?", shape=diamond, width=1.0, height=0.7];
+    m3 [label="Return with\nremarks"];
+  }
+  subgraph cluster_mbs { label="MBS"; fontname="Arial Bold"; fontsize=11; style="rounded"; color="#D6B656";
+    node [fillcolor="#FFF2CC", color="#D6B656"];
+    h3 [label="", shape=plaintext, style="", width=0.1, height=0.1];
+    b1 [label="Review deployment\nrequest"];
+    b2 [label="Complete?", shape=diamond, width=1.0, height=0.7];
+    b3 [label="Return to TSU\nwith reason"];
+    b4 [label="Set up package\nconfiguration (draft\nversion)"];
+    b5 [label="Submit for\nvalidation"];
+  }
+  subgraph cluster_val { label="TSU Head / Business Administrator"; fontname="Arial Bold"; fontsize=11; style="rounded"; color="#B85450";
+    node [fillcolor="#F8CECC", color="#B85450"];
+    h4 [label="", shape=plaintext, style="", width=0.1, height=0.1];
+    v1 [label="Confirm checklist;\nreview test premium"];
+    v2 [label="Passed?", shape=diamond, width=1.0, height=0.7];
+    v3 [label="Return to MBS\nwith reason"];
+  }
+  subgraph cluster_sys { label="System"; fontname="Arial Bold"; fontsize=11; style="rounded"; color="#666666";
+    node [fillcolor="#F5F5F5", color="#666666"];
+    h5 [label="", shape=plaintext, style="", width=0.1, height=0.1];
+    s1 [label="Lock Quotation Slips;\nrecord sign-off\nreference"];
+    s2 [label="Release version; end\nprevious version"];
+    s3 [label="Notify Marketing;\ndraft advisory"];
+  }
+  { rank=same; h1; h2; h3; h4; h5; }
+  h1 -> h2 -> h3 -> h4 -> h5 [style=invis];
+  h1 -> start [style=invis];
+
+  start -> t1 -> t2 -> m1 -> m2;
+  m2 -> m3 [xlabel="No"];
+  m3 -> t1;
+  m2 -> s1 [xlabel="Yes"];
+  s1 -> t3 -> b1 -> b2;
+  b2 -> b3 [xlabel="No"];
+  b3 -> t1;
+  b2 -> b4 [xlabel="Yes"];
+  b4 -> b5 -> v1 -> v2;
+  v2 -> v3 [xlabel="No"];
+  v3 -> b4;
+  v2 -> s2 [xlabel="Yes"];
+  s2 -> s3 -> t4 -> end_;
+}

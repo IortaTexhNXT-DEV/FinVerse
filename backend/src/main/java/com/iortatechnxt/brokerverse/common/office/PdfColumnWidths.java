@@ -22,6 +22,10 @@ public final class PdfColumnWidths {
   /** Room left beside a word that just fits (borders and rounding of the line layout). */
   private static final float SLACK = 3f;
 
+  /** A date as printed, with an optional trailing punctuation mark. */
+  private static final java.util.regex.Pattern DATE =
+      java.util.regex.Pattern.compile("\\d{2}-[A-Za-z]{3}-\\d{4}\\p{Punct}?");
+
   /** Guards the division when every column is fixed at its minimum. */
   private static final float MIN_WEIGHT = 1e-6f;
 
@@ -86,6 +90,21 @@ public final class PdfColumnWidths {
       }
     }
     return this;
+  }
+
+  /**
+   * Whether every heading word and every unbreakable value part fits a table of this width.
+   *
+   * @param total table width in points
+   * @return true when no word has to be cut
+   */
+  public boolean fits(float total) {
+    float cap = total * LONGEST_VALUE_SHARE;
+    float sum = 0;
+    for (int i = 0; i < weights.length; i++) {
+      sum += Math.max(room(headMinimum[i], cap), room(partMinimum[i], cap));
+    }
+    return sum <= total;
   }
 
   /**
@@ -192,7 +211,20 @@ public final class PdfColumnWidths {
    * @return width in points, 0 for an empty text
    */
   public static float longestPart(String text, Font font) {
-    return longest(text, font, "\\s+|(?<=-)");
+    if (text == null || text.isBlank()) {
+      return 0;
+    }
+    float longest = 0;
+    for (String word : text.strip().split("\\s+")) {
+      // A date (09-Oct-2026) is never broken at its hyphens (PdfWordBreaks).
+      longest =
+          Math.max(
+              longest,
+              DATE.matcher(word).matches()
+                  ? longestWord(word, font)
+                  : longest(word, font, "(?<=-)"));
+    }
+    return longest;
   }
 
   private static float longest(String text, Font font, String separators) {

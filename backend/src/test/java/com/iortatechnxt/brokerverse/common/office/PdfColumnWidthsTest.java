@@ -34,4 +34,12 @@ class PdfColumnWidthsTest {
         new PdfColumnWidths(new float[] {1, 9}, 4f).value(0, "A".repeat(200), FONT).fit(300);
     assertThat(widths[0]).isCloseTo(300 * 0.3f + 4f + 3f, within(0.01f));
   }
+
+  @Test
+  void aDateIsOnePartAReferenceBreaksAfterItsHyphens() {
+    assertThat(PdfColumnWidths.longestPart("02-Oct-2026", FONT))
+        .isEqualTo(PdfColumnWidths.longestWord("02-Oct-2026", FONT));
+    assertThat(PdfColumnWidths.longestPart("BI-HO-2026-000001", FONT))
+        .isEqualTo(PdfColumnWidths.longestWord("000001", FONT));
+  }
 }

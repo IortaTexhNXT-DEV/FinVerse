@@ -15,8 +15,9 @@ import org.junit.jupiter.api.Test;
 /** Table headings and dates of generated documents break only between words. */
 class DocumentTableWidthsTest {
 
-  private static final Font HEAD = new Font(Font.HELVETICA, 8.5f, Font.BOLD, Color.WHITE);
-  private static final Font BODY = new Font(Font.HELVETICA, 9, Font.NORMAL, Color.BLACK);
+  // A table of 15 columns is printed in the small table size.
+  private static final Font HEAD = new Font(Font.HELVETICA, 7.5f, Font.BOLD, Color.WHITE);
+  private static final Font BODY = new Font(Font.HELVETICA, 7.5f, Font.NORMAL, Color.BLACK);
 
   @Test
   void headingWordsAmountsAndCodesFitTheirColumns() {
@@ -84,7 +85,8 @@ class DocumentTableWidthsTest {
                     null));
     try (com.lowagie.text.pdf.PdfReader reader = new com.lowagie.text.pdf.PdfReader(pdf)) {
       String page = new com.lowagie.text.pdf.parser.PdfTextExtractor(reader).getTextFromPage(1);
-      assertThat(page).contains("Realized", "Commission", "Endorsement", "14,601.14", "MTR10");
+      assertThat(page)
+          .contains("Realized", "Commission", "Endorsement", "14,601.14", "MTR10", "25-Sep-2026");
     } catch (java.io.IOException e) {
       throw new AssertionError(e);
     }

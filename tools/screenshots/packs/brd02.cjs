@@ -249,13 +249,15 @@ const after = {
 const receiptOf = (ctx, no) => ctx.one(`select id from csh_receipt where receipt_no = '${no}'`);
 const batchOr = (ctx) => ctx.one("select id from rem_batch where stage = 'OR_RECEIVED' order by id limit 1");
 const posted = (ctx) => ctx.one("select id from adj_request where stage = 'POSTED' order by id desc limit 1");
+// An internal adjustment has no endorsement slip: the latest posted adjustment that has one.
+const postedWithSlip = (ctx) => ctx.one("select id from adj_request where stage = 'POSTED' and request_class <> 'INTERNAL' order by id desc limit 1");
 
 const documents = {
   'doc-ar': (ctx, out) => download(ctx, 'cashier', `/cashiering/receipts/${receiptOf(ctx, 'AR-HO-000001')}/pdf`, out),
   'doc-or': (ctx, out) => download(ctx, 'cashier', `/cashiering/receipts/${receiptOf(ctx, 'OR-HO-100002')}/pdf`, out),
   'doc-remittance-schedule': (ctx, out) => download(ctx, 'remittl', `/remittance/batches/${batchOr(ctx)}/documents/SCHEDULE_PDF`, out),
   'doc-payment-request': (ctx, out) => download(ctx, 'remittl', `/remittance/batches/${batchOr(ctx)}/documents/PAYMENT_REQUEST_PDF`, out),
-  'doc-endorsement-slip': (ctx, out) => download(ctx, 'adjust', `/adjustment/requests/${posted(ctx)}/endorsement-slip`, out),
+  'doc-endorsement-slip': (ctx, out) => download(ctx, 'adjust', `/adjustment/requests/${postedWithSlip(ctx)}/endorsement-slip`, out),
   'doc-validation-slip': (ctx, out) => download(ctx, 'adjust', `/adjustment/requests/${posted(ctx)}/validation-slip`, out),
   'doc-production-register': async (ctx, out) => render(await ctx.api('recon', 'GET', `/prodrecon/extracts/${ctx.one('select id from prc_extract order by id limit 1')}/file`),
     'xlsx', out, 200, ['Invoice Number', 'Policy No.', 'Gross Premium', 'Amount Paid', 'Remittance Status', 'Assured Name']),

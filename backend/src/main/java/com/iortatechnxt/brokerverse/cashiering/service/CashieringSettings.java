@@ -9,6 +9,7 @@ import com.iortatechnxt.brokerverse.organization.domain.BranchRepository;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -93,6 +94,16 @@ public class CashieringSettings {
           "BRANCH_OF_OTHER_COMPANY", "Branch " + branch.getCode() + " is not of this company");
     }
     return branch;
+  }
+
+  /**
+   * The branches of a company by code.
+   *
+   * @param companyId company
+   * @return branches
+   */
+  public List<Branch> branches(Long companyId) {
+    return branches.findByCompanyIdOrderByCode(companyId);
   }
 
   /**

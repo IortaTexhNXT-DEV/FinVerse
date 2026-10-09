@@ -133,6 +133,9 @@ public class Receipt extends BaseEntity {
   @Column(length = 250)
   private String remarks;
 
+  @Column(name = "bank_account", length = 40)
+  private String bankAccount;
+
   @ElementCollection
   @CollectionTable(name = "csh_receipt_line", joinColumns = @JoinColumn(name = "receipt_id"))
   @OrderColumn(name = "line_no")
@@ -261,6 +264,19 @@ public class Receipt extends BaseEntity {
   public void printed(Instant at) {
     printedCount++;
     lastPrintedAt = at;
+  }
+
+  /**
+   * Records the bank account the receipt is posted to (FRS.CSH.02.01.02), before its posting.
+   *
+   * @param code code of the Post to Bank Account list, may be null
+   */
+  public void postTo(String code) {
+    this.bankAccount = code;
+  }
+
+  public String getBankAccount() {
+    return bankAccount;
   }
 
   public Long getCompanyId() {

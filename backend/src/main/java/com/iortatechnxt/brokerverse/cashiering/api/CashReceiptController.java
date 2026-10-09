@@ -20,6 +20,7 @@ import com.iortatechnxt.brokerverse.cashiering.service.BatchPrintService;
 import com.iortatechnxt.brokerverse.cashiering.service.CashReceiptService;
 import com.iortatechnxt.brokerverse.cashiering.service.CashReceiptService.ArIssue;
 import com.iortatechnxt.brokerverse.cashiering.service.CashReceiptService.OrIssue;
+import com.iortatechnxt.brokerverse.cashiering.service.CashieringDecisions;
 import com.iortatechnxt.brokerverse.cashiering.service.ReceiptActionService;
 import com.iortatechnxt.brokerverse.cashiering.service.ReceiptDocument;
 import com.iortatechnxt.brokerverse.cashiering.service.ReceiptSearchService;
@@ -54,6 +55,7 @@ public class CashReceiptController {
   private final ReceiptActionService actions;
   private final ReceiptDocument documents;
   private final BatchPrintService printing;
+  private final CashieringDecisions decisions;
 
   /**
    * Creates the controller.
@@ -63,18 +65,21 @@ public class CashReceiptController {
    * @param actions cancellations and reinstatements
    * @param documents printed receipts
    * @param printing batch printing and certificates
+   * @param decisions settings of BDOI's decisions (posting step)
    */
   public CashReceiptController(
       CashReceiptService receipts,
       ReceiptSearchService search,
       ReceiptActionService actions,
       ReceiptDocument documents,
-      BatchPrintService printing) {
+      BatchPrintService printing,
+      CashieringDecisions decisions) {
     this.receipts = receipts;
     this.search = search;
     this.actions = actions;
     this.documents = documents;
     this.printing = printing;
+    this.decisions = decisions;
   }
 
   /**
@@ -118,6 +123,7 @@ public class CashReceiptController {
   @PostMapping("/receipts/ar")
   @PreAuthorize(CashAccess.RECEIPT)
   public ReceiptResponse issueAr(@Valid @RequestBody ArRequest request) {
+    decisions.requireDirectIssue(ReceiptKind.AR);
     Receipt r =
         receipts.issueAr(
             new ArIssue(
@@ -153,6 +159,7 @@ public class CashReceiptController {
   @PostMapping("/receipts/or")
   @PreAuthorize(CashAccess.RECEIPT)
   public ReceiptResponse issueOr(@Valid @RequestBody OrRequest request) {
+    decisions.requireDirectIssue(ReceiptKind.OR);
     Receipt r =
         receipts.issueOr(
             new OrIssue(

@@ -153,7 +153,15 @@ public final class CashCodes {
     /** Other. */
     OTHER,
     /** Unapplied payment carried from legacy at cut-over (Data Migration, F02). */
-    MIGRATED
+    MIGRATED,
+    /** Reversed payment of a remitted AR: refund receivable from the insurer (FRS.CSH.03.01.08). */
+    AR_INSURER_REFUND,
+    /** Reversed payment of a reinstated OR (FRS.CSH.04.01.09). */
+    AP_UNAPPLIED_COMMISSION,
+    /** Payment of a cancelled OR kept for Commission Receivable (FRS.CSH.03.01.08). */
+    COMMISSION_RECEIVABLE,
+    /** Reversed payment of a reinstated AR not yet remitted (FRS.CSH.04.01.09). */
+    REINSTATEMENT
   }
 
   /** What a disposition type does (CSHID.024). */

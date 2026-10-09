@@ -18,6 +18,31 @@ export const CASHIERING_HELP: HelpSection = {
       ],
     },
     {
+      name: 'Create AR/OR',
+      path: '/cashiering/records/new',
+      summary:
+        'Creation record of an acknowledgement receipt (premium or non-premium payment) or of a Head Office official receipt: receipt type, entry type with the client or insurer, payor, payment type, currency, Post to Bank Account, paid amount, check details, receipt issuance date, receipting branch, remarks and the accounts paid with the amount of each.',
+      workflow: [
+        'Save checks the required fields, the currency booked on each account and the holding period of a check, then gives the record its number (CR-AR-… or CR-OR-…) with the status Created.',
+        'A record in status Created or Returned can be edited; a record in status Created can be cancelled and keeps its number.',
+        'Submit for Posting sends the record to the Approver/Poster; the AR or OR number is issued only when the record is posted.',
+      ],
+      controls: [
+        'Whether ARs and ORs wait for the posting step is a setting of the System Administrator.',
+      ],
+    },
+    {
+      name: 'Posting',
+      path: '/cashiering/posting',
+      summary:
+        'The creation, cancellation and reinstatement records of ARs and ORs For Posting or Returned, filtered by status, receipt type, dates, record number and name, with the export to Excel.',
+      workflow: [
+        'Select one or several records and post them: each is posted on its own, so a record in a depleted series stays For Posting with its reason while the others are posted.',
+        'Return sends a record back to its creator with a reason; the creator is notified.',
+      ],
+      controls: ['The creator of a record can neither post nor return it.'],
+    },
+    {
       name: 'Receive Payment',
       path: '/cashiering/receive',
       summary:

@@ -32,7 +32,7 @@ public final class ConfigCatalogue {
       Map<String, String> reasons) {
     this.groups = List.copyOf(groups);
     this.byCode = index(datasets, CatalogueDataset::code, "dataset code");
-    this.byTable = index(datasets, CatalogueDataset::table, "table");
+    this.byTable = tables(datasets);
     this.excluded = Collections.unmodifiableMap(new LinkedHashMap<>(excluded));
     this.reasons = Collections.unmodifiableMap(new LinkedHashMap<>(reasons));
     validate();
@@ -70,6 +70,22 @@ public final class ConfigCatalogue {
     for (CatalogueDataset d : datasets) {
       if (map.put(key.apply(d), d) != null) {
         throw new IllegalStateException("Duplicate " + what + " in the catalogue: " + key.apply(d));
+      }
+    }
+    return Collections.unmodifiableMap(map);
+  }
+
+  /**
+   * The first dataset of every table. A table may hold several datasets only when each of them
+   * names its rows; references by id to such a table resolve through the first one.
+   */
+  private static Map<String, CatalogueDataset> tables(List<CatalogueDataset> datasets) {
+    Map<String, CatalogueDataset> map = new LinkedHashMap<>();
+    for (CatalogueDataset d : datasets) {
+      CatalogueDataset first = map.putIfAbsent(d.table(), d);
+      if (first != null && (first.rows() == null || d.rows() == null)) {
+        throw new IllegalStateException(
+            "Duplicate table in the catalogue without the rows of each dataset: " + d.table());
       }
     }
     return Collections.unmodifiableMap(map);
@@ -148,7 +164,7 @@ public final class ConfigCatalogue {
   }
 
   /**
-   * The dataset of a table.
+   * The dataset of a table (the first one when several datasets share the table).
    *
    * @param table table
    * @return dataset, empty when the table is not configuration

@@ -13,11 +13,14 @@ approval screen Configuration Uploads (opened from My Approvals). API: `/api/v1/
 ## 1. Purpose
 
 - The configuration of an environment is described by a **configuration catalogue**
-  (`backend/src/main/resources/configpromo/catalogue.yml`): 152 datasets in 16 groups, each with its table, its
+  (`backend/src/main/resources/configpromo/catalogue.yml`): 153 datasets in 16 groups, each with its table, its
   natural key, the datasets it refers to and what each environment keeps for itself. Every other table of the schema
   is classified as never promoted, with its reason (421 tables: transactions, client data, logs, secrets, running
   numbers, files, environment state, planning figures, watchlist contents and the module's own records). A build test
   (`ConfigCatalogueSchemaIT`) fails when a table is neither a dataset nor classified, so a new table is always placed.
+- One table may hold two datasets when each names its rows (`rows`): the **standard report variants** of the Report
+  Centre (V2610, and the shared Claims variants marked standard by V2620) are configuration in the Reports group and
+  are promoted by default; the variants the users saved for themselves stay user records, promoted only with users.
 - An **export** writes the datasets into a signed, versioned **package**. An **import** verifies the package, checks
   it against the target environment, compares it in a **dry run**, waits for the **approval of a second user** and
   applies it in one database transaction, after keeping a **snapshot** of the configuration it changes.

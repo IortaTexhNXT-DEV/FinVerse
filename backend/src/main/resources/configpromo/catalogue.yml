@@ -15,6 +15,8 @@
 #   environment  columns the target environment keeps on an existing row (schedules, recipients,
 #              running numbers and balances); a new row takes the value of the package
 #   environmentRows  rows that belong to the environment and are never promoted (column and values)
+#   rows       rows of the table that make up the dataset (column and values), when one table holds
+#              several datasets (standard report variants and the variants the users saved)
 #   insertDefaults  value of a column on a new row: "=column" copies another column of the row
 #   userColumns  columns naming a user; the dry run warns when the user does not exist in the target
 #   optional   true = not selected by default (market data)
@@ -260,7 +262,21 @@ datasets:
   - {code: FIN_STATEMENT_FORMAT, name: Financial statement formats, group: REPORTS, module: finreport, table: fin_statement_format, key: [company_id, code]}
   - {code: FIN_STATEMENT_FORMAT_LINE, name: Lines of the statement formats, group: REPORTS, module: finreport, table: fin_statement_format_line, key: [format_id, line_no], parent: format_id}
   - {code: FRBS_REPORT_PACK_ENTRY, name: Report pack, group: REPORTS, module: frbs, table: frbs_report_pack_entry, key: [group_code, seq]}
-  - {code: NBR_REPORT_VARIANT, name: Saved report variants, group: USERS, module: nbreport, table: nbr_report_variant, key: [owner, report_code, name], users: true}
+  - code: NBR_REPORT_STANDARD_VARIANT
+    name: Standard report variants
+    group: REPORTS
+    module: nbreport
+    table: nbr_report_variant
+    key: [owner, report_code, name]
+    rows: {column: standard, values: [true]}
+  - code: NBR_REPORT_VARIANT
+    name: Report variants saved by the users
+    group: USERS
+    module: nbreport
+    table: nbr_report_variant
+    key: [owner, report_code, name]
+    rows: {column: standard, values: [false]}
+    users: true
 
   # ---------- Group profiles, permissions and separation of duties ---------------------------------
   - {code: SEC_ROLE, name: Group profiles, group: SECURITY, module: security, table: sec_role, key: [code], exclude: [deactivated_at, deactivated_by]}

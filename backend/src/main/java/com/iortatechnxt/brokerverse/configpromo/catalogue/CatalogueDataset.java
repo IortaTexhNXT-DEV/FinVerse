@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.configpromo.catalogue;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * One configuration dataset of the catalogue (see {@code configpromo/catalogue.yml} for the meaning
@@ -18,6 +19,7 @@ import java.util.Map;
  * @param exclude columns never promoted besides the audit columns
  * @param environment columns kept by the target on an existing row
  * @param environmentRows rows that belong to the environment, null when none
+ * @param rows rows of the table that make up the dataset, null when the dataset is the whole table
  * @param insertDefaults value of a column on a new row ("=column" copies another column)
  * @param userColumns columns naming a user
  * @param optional not selected by default
@@ -36,6 +38,7 @@ public record CatalogueDataset(
     List<String> exclude,
     List<String> environment,
     EnvironmentRows environmentRows,
+    DatasetRows rows,
     Map<String, String> insertDefaults,
     List<String> userColumns,
     boolean optional,
@@ -51,6 +54,19 @@ public record CatalogueDataset(
     insertDefaults = insertDefaults == null ? Map.of() : Map.copyOf(insertDefaults);
     userColumns = userColumns == null ? List.of() : List.copyOf(userColumns);
     usedBy = usedBy == null ? List.of() : List.copyOf(usedBy);
+  }
+
+  /**
+   * Whether a row of the table is left out of the dataset: it belongs to the environment or to
+   * another dataset of the same table.
+   *
+   * @param value value of a column of the row
+   * @return true when the row is not promoted with this dataset
+   */
+  public boolean leavesOut(Function<String, Object> value) {
+    boolean environment =
+        environmentRows != null && environmentRows.matches(value.apply(environmentRows.column()));
+    return environment || rows != null && !rows.matches(value.apply(rows.column()));
   }
 
   /**

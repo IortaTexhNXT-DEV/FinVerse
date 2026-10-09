@@ -222,7 +222,7 @@ def summary_rows(src: dict, mapping: list[dict], coverage: list[dict], only_ours
     brrn = [c for c in coverage if c["id"].startswith("BRRN")]
     lines = [c for c in coverage if not c["id"].startswith("BRRN")]
     bcov = Counter(c["bdoi_cov"] for c in lines)
-    ours_bracket = sum(1 for c in conflicts if c["matches"].startswith("Ours"))
+    ours_bracket = sum(1 for c in conflicts if c["matches"].startswith("Ours ("))
     items = sum(len(f["items"]) for f in BDOI["frrn"])
     empty = sum(1 for v in BDOI["annex_forms"].values() if v == "Heading only")
     rows = [
@@ -418,7 +418,7 @@ def build(src: dict) -> Path:
         Column("matches", "Matches the BRD / platform", 22, "Which side matches the BRD and the platform"),
         Column("decision", "BDOI to", 10, "Confirm the BRD rule or decide", values=DECISION, status=True),
         Column("recommendation", "Our recommendation", 44, "The project team's recommendation"),
-    ], [{"no": i, **c, "decision": "Confirm" if c["matches"].startswith("Ours") else "Decide"}
+    ], [{"no": i, **c, "decision": "Confirm" if c["matches"].startswith("Ours (") else "Decide"}
         for i, c in enumerate(CMP["conflicts"], start=1)],
         description="Where the two documents say different things, which side matches the BRD and the platform, "
                     "and the decision needed from BDOI")

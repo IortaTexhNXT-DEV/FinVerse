@@ -46,7 +46,7 @@ public class PaymentChannelSimulator {
   private static final DateTimeFormatter COMPACT =
       DateTimeFormatter.ofPattern("yyyyMMdd", Locale.ROOT);
   private static final String BOOKED =
-      "select i.invoice_no, coalesce(i.assured_name, 'Seed Payor') as name, i.insurer_code, sum(c.balance) as due"
+      "select i.invoice_no, coalesce(i.assured_name, 'Walk-in Payor') as name, i.insurer_code, sum(c.balance) as due"
           + " from ops_invoice i join ops_invoice_component c on c.invoice_id = i.id"
           + " where i.company_id = ? and i.payment_status in ('UNPAID', 'PARTIALLY_PAID')"
           + " and c.component in ('BASIC', 'DST', 'PREMIUM_TAX_VAT', 'LGT', 'FST', 'OTHER')"
@@ -144,14 +144,13 @@ public class PaymentChannelSimulator {
         PREBOOKED,
         rs -> {
           payees.add(
-              new Payee(
-                  rs.getString("arn"), "Seed Pre-booked Payor", null, new BigDecimal("1500.00")));
+              new Payee(rs.getString("arn"), "Pre-booked Payor", null, new BigDecimal("1500.00")));
         },
         companyId);
     payees.add(
         new Payee(
             "UNKNOWN-" + BusinessClock.today(clock).format(COMPACT),
-            "Seed Unknown Payor",
+            "Unidentified Payor",
             null,
             new BigDecimal("750.25")));
     return payees;

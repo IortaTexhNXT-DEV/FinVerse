@@ -113,8 +113,13 @@ public class CashieringDashboardService {
    * @return groups with their items
    */
   public List<Group> dashboard(Long companyId) {
+    String base =
+        jdbc.queryForObject(
+            "select base_currency from org_company where id = ?", String.class, companyId);
     List<Tally> tallies =
-        records.tally(companyId, EnumSet.of(RecordStage.FOR_POSTING, RecordStage.RETURNED));
+        records.tally(companyId, EnumSet.of(RecordStage.FOR_POSTING, RecordStage.RETURNED)).stream()
+            .map(t -> t.currency() == null ? inBase(t, base) : t)
+            .toList();
     List<Group> groups = new ArrayList<>();
     groups.add(forPosting("ISSUANCE", "AR/OR for Posting", RecordKind.CREATION, tallies));
     groups.add(
@@ -130,6 +135,12 @@ public class CashieringDashboardService {
     groups.add(unapplied(companyId));
     groups.add(files(companyId));
     return groups;
+  }
+
+  /** A record without a currency yet is counted in the base currency of the company. */
+  private static Tally inBase(Tally t, String base) {
+    return new Tally(
+        t.kind(), t.receiptKind(), t.receiptType(), t.stage(), base, t.count(), t.amount());
   }
 
   private Group forPosting(String code, String label, RecordKind kind, List<Tally> tallies) {

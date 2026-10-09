@@ -11,6 +11,7 @@ import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.messaging.domain.Notice;
 import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
+import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
@@ -34,12 +35,14 @@ public class ReceiptFormService {
   public static final String APPROVER = "MASTER_AUTHORIZE";
 
   private static final Set<String> KINDS = Set.of("AR", "OR");
+  private static final String WORD_UNITS = "CASH_AMOUNT_WORDS_UNITS";
 
   private final ReceiptFormRepository forms;
   private final NotificationService notifications;
   private final AuditTrailService audit;
   private final CurrentUser currentUser;
   private final Clock clock;
+  private final SystemParameterService parameters;
 
   /**
    * Creates the service.
@@ -49,18 +52,21 @@ public class ReceiptFormService {
    * @param audit audit trail
    * @param currentUser maker and checker
    * @param clock clock
+   * @param parameters unit names of the amount in words
    */
   public ReceiptFormService(
       ReceiptFormRepository forms,
       NotificationService notifications,
       AuditTrailService audit,
       CurrentUser currentUser,
-      Clock clock) {
+      Clock clock,
+      SystemParameterService parameters) {
     this.forms = forms;
     this.notifications = notifications;
     this.audit = audit;
     this.currentUser = currentUser;
     this.clock = clock;
+    this.parameters = parameters;
   }
 
   /**
@@ -89,6 +95,28 @@ public class ReceiptFormService {
             companyId, kind, ReceiptForm.APPROVED, date)
         .map(ReceiptForm::getText)
         .orElse(FormText.EMPTY);
+  }
+
+  /**
+   * The unit names of a currency in words (setting {@code CASH_AMOUNT_WORDS_UNITS}, entries {@code
+   * <currency>=<major>/<minor>} separated by semicolons); the currency code and "Cents" when the
+   * currency is not listed.
+   *
+   * @param currency currency code
+   * @return major and minor unit names
+   */
+  @Transactional(readOnly = true)
+  public String[] wordUnits(String currency) {
+    for (String entry : parameters.text(WORD_UNITS, "").split(";")) {
+      int eq = entry.indexOf('=');
+      int slash = entry.indexOf('/');
+      if (eq > 0 && slash > eq && entry.substring(0, eq).strip().equals(currency)) {
+        return new String[] {
+          entry.substring(eq + 1, slash).strip(), entry.substring(slash + 1).strip()
+        };
+      }
+    }
+    return new String[] {currency, "Cents"};
   }
 
   /**

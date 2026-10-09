@@ -110,8 +110,27 @@ public class RecordFormService {
             .toList(),
         branches(records.receiptingBranches(companyId, ReceiptKind.AR)),
         branches(records.receiptingBranches(companyId, ReceiptKind.OR)),
-        settings.bookRate(companyId, "USD", today),
+        foreignRate(companyId, today),
         today);
+  }
+
+  /**
+   * The rate of the day of the foreign currency of the bank accounts (the first account whose
+   * currency is not the base currency of the company).
+   *
+   * @param companyId company
+   * @param today business day
+   * @return rate, null without a foreign currency account
+   */
+  private BigDecimal foreignRate(Long companyId, LocalDate today) {
+    String base = settings.headOffice(companyId).getCompany().getBaseCurrency();
+    return bankAccounts.findByCompanyIdOrderByCurrencyAscNameAsc(companyId).stream()
+        .filter(CashBankAccount::isActive)
+        .map(CashBankAccount::getCurrency)
+        .filter(c -> !c.equals(base))
+        .findFirst()
+        .map(c -> settings.bookRate(companyId, c, today))
+        .orElse(null);
   }
 
   private static List<BranchOption> branches(List<Branch> list) {
@@ -189,7 +208,7 @@ public class RecordFormService {
    * @param bankAccounts the list Post to Bank Account
    * @param arBranches receipting branches of ARs
    * @param orBranches receipting branches of ORs (Head Office)
-   * @param usdRate rate of the day of USD
+   * @param foreignRate rate of the day of the foreign currency of the bank accounts
    * @param today business day
    */
   public record FormSettings(
@@ -202,7 +221,7 @@ public class RecordFormService {
       List<BankOption> bankAccounts,
       List<BranchOption> arBranches,
       List<BranchOption> orBranches,
-      BigDecimal usdRate,
+      BigDecimal foreignRate,
       LocalDate today) {
 
     /** Defensive copies. */

@@ -8,8 +8,8 @@ import java.util.List;
 /**
  * An amount in English words with the pesos and the centavos, as on the sample AR of BDOI
  * (FRS.CSH.02.06.02): 5,541,001.26 is "Five Million Five Hundred Forty One Thousand One Pesos and
- * Twenty Six Centavos". Another currency is written with its own unit names. The tens are written
- * without a hyphen, as on the client's form (the voucher words of the platform hyphenate them).
+ * Twenty Six Centavos". The unit names of each currency are a setting. The tens are written without
+ * a hyphen, as on the client's form (the voucher words of the platform hyphenate them).
  */
 public final class ReceiptAmountWords {
 
@@ -49,30 +49,20 @@ public final class ReceiptAmountWords {
   /**
    * An amount in words.
    *
-   * @param amount amount, rounded to the centavo
-   * @param currency currency code (PHP is written in pesos and centavos)
+   * @param amount amount, rounded to the minor unit
+   * @param major name of the major unit in words, e.g. "Pesos"
+   * @param minor name of the minor unit in words, e.g. "Centavos"
    * @return words
    */
-  public static String of(BigDecimal amount, String currency) {
+  public static String of(BigDecimal amount, String major, String minor) {
     BigDecimal value = amount.abs().setScale(2, RoundingMode.HALF_UP);
     long whole = value.longValue();
     int cents = value.remainder(BigDecimal.ONE).movePointRight(2).intValue();
-    String[] units = units(currency);
-    StringBuilder text = new StringBuilder(whole(whole)).append(' ').append(units[0]);
+    StringBuilder text = new StringBuilder(whole(whole)).append(' ').append(major);
     if (cents > 0) {
-      text.append(" and ").append(below(cents)).append(' ').append(units[1]);
+      text.append(" and ").append(below(cents)).append(' ').append(minor);
     }
     return amount.signum() < 0 ? "Minus " + text : text.toString();
-  }
-
-  private static String[] units(String currency) {
-    if (currency == null || "PHP".equals(currency)) {
-      return new String[] {"Pesos", "Centavos"};
-    }
-    if ("USD".equals(currency)) {
-      return new String[] {"US Dollars", "Cents"};
-    }
-    return new String[] {currency, "Cents"};
   }
 
   /**

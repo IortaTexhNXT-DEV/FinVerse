@@ -60,7 +60,7 @@ public interface ReceiptRecordRepository extends JpaRepository<ReceiptRecord, Lo
    */
   @Query(
       "select new com.iortatechnxt.brokerverse.cashiering.domain.ReceiptRecordRepository$Tally("
-          + "r.recordKind, r.receiptKind, r.receiptType, r.stage, coalesce(r.tender.currency, 'PHP'),"
+          + "r.recordKind, r.receiptKind, r.receiptType, r.stage, r.tender.currency,"
           + " count(r), coalesce(sum(r.tender.amount), 0))"
           + " from ReceiptRecord r where r.companyId = :companyId and r.stage in :stages"
           + " group by r.recordKind, r.receiptKind, r.receiptType, r.stage, r.tender.currency")

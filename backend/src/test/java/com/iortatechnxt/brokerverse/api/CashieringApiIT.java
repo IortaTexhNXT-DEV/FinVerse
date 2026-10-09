@@ -6,10 +6,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.iortatechnxt.brokerverse.cashiering.CashFixtures;
+import com.iortatechnxt.brokerverse.cashiering.service.CashieringDecisions;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.support.Api;
+import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
+import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.time.Clock;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.web.servlet.ResultActions;
 
 /**
  * Cashiering endpoints through HTTP (CSHID.001-027): read endpoints, permissions and main flows.
@@ -28,6 +32,8 @@ class CashieringApiIT {
 
   @Autowired private Api api;
   @Autowired private CashFixtures fx;
+  @Autowired private SystemParameterService parameters;
+  @Autowired private AsUser as;
 
   private String c() {
     return fx.company().toString();
@@ -93,9 +99,7 @@ class CashieringApiIT {
 
     JsonNode intake =
         api.read(
-            api.doPost(
-                    "cashier",
-                    BASE + "/payments",
+            receiveAtTheCounter(
                     Map.of(
                         "companyId",
                         fx.company(),
@@ -156,9 +160,7 @@ class CashieringApiIT {
   void anUnappliedItemIsDispositionedAndSeriesAreMaintainedThroughTheApi() throws Exception {
     JsonNode intake =
         api.read(
-            api.doPost(
-                    "cashier",
-                    BASE + "/payments",
+            receiveAtTheCounter(
                     Map.of(
                         "companyId",
                         fx.company(),
@@ -232,5 +234,24 @@ class CashieringApiIT {
         .andExpect(status().isForbidden());
     api.doPost("cashtl", BASE + "/matching/run", null).andExpect(status().isOk());
     api.doPost("cashtl", BASE + "/minimal-balance/sweep", null).andExpect(status().isOk());
+  }
+
+  /**
+   * Receives a payment at the counter. With the posting step of the AR (CASH_POSTING_STEP_RECEIPTS)
+   * the counter refuses to issue the AR at save; in the configuration without it the AR is issued
+   * at save, which is the flow these tests follow.
+   */
+  private ResultActions receiveAtTheCounter(Map<String, Object> body) throws Exception {
+    String posting = parameters.text(CashieringDecisions.POSTING_STEP, "");
+    try {
+      as.run("admin", () -> parameters.update(CashieringDecisions.POSTING_STEP, "AR,OR"));
+      api.doPost("cashier", BASE + "/payments", body)
+          .andExpect(status().isUnprocessableEntity())
+          .andExpect(jsonPath("$.code").value("RECEIPT_POSTING_STEP"));
+      as.run("admin", () -> parameters.update(CashieringDecisions.POSTING_STEP, "OR"));
+      return api.doPost("cashier", BASE + "/payments", body);
+    } finally {
+      as.run("admin", () -> parameters.update(CashieringDecisions.POSTING_STEP, posting));
+    }
   }
 }

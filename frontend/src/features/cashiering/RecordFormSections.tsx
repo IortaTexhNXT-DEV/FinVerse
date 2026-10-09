@@ -221,7 +221,7 @@ export function PaymentSection({ form, settings, set, update, error }: Readonly<
         />
         {form.currency !== base && (
           <Field label="Rate of the Day">
-            {() => <span className="num">{formatAmount(settings.usdRate)}</span>}
+            {() => <span className="num">{formatAmount(settings.foreignRate)}</span>}
           </Field>
         )}
         <CodeSelect

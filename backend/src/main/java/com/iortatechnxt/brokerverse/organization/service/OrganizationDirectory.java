@@ -50,6 +50,15 @@ public class OrganizationDirectory {
   }
 
   /**
+   * Every company of the installation.
+   *
+   * @return companies by id
+   */
+  public List<CompanyRef> companies() {
+    return companies.findAll().stream().map(CompanyRef::of).toList();
+  }
+
+  /**
    * A company by code.
    *
    * @param code company code

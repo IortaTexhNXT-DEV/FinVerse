@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.configpromo.engine;
 
+import com.iortatechnxt.brokerverse.configpromo.catalogue.DatasetRows;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -46,7 +47,8 @@ public final class DatasetReader implements IdResolver {
   }
 
   /**
-   * The rows of a dataset, sorted by natural key, without the environment rows.
+   * The rows of a dataset, sorted by natural key, without the environment rows and the rows of
+   * other datasets of the same table.
    *
    * @param code dataset code
    * @return rows
@@ -67,10 +69,7 @@ public final class DatasetReader implements IdResolver {
         sql,
         rs -> {
           CanonicalRow row = row(rs, m);
-          if (m.dataset().environmentRows() == null
-              || !m.dataset()
-                  .environmentRows()
-                  .matches(row.get(m.dataset().environmentRows().column()))) {
+          if (!m.dataset().leavesOut(row::get)) {
             rows.add(row);
           }
         });
@@ -163,15 +162,23 @@ public final class DatasetReader implements IdResolver {
   }
 
   /**
-   * Number of rows of a dataset's table (environment rows included).
+   * Number of rows of a dataset (environment rows included; for a dataset that names its rows, only
+   * those rows).
    *
    * @param code dataset code
    * @return rows
    */
   public long count(String code) {
+    DatasetModel m = model.model(code);
+    String sql = "select count(*) from " + Sql.quote(m.table().name());
+    DatasetRows scope = m.dataset().rows();
     Long n =
-        jdbc.queryForObject(
-            "select count(*) from " + Sql.quote(model.model(code).table().name()), Long.class);
+        scope == null
+            ? jdbc.queryForObject(sql, Long.class)
+            : jdbc.queryForObject(
+                sql + " where cast(" + Sql.quote(scope.column()) + " as text) = any(?)",
+                Long.class,
+                (Object) scope.values().toArray(String[]::new));
     return n == null ? 0 : n;
   }
 

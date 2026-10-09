@@ -1,0 +1,1467 @@
+{
+ "ACSL-BOOKED-FIN-DETAILS": {
+  "status": 200,
+  "data": 11,
+  "variant": "Year to Date"
+ },
+ "ACSL-GL-SL-RECON": {
+  "status": 200,
+  "data": 34,
+  "variant": "As of Today"
+ },
+ "ACSL-SOA-RECON": {
+  "status": 422,
+  "data": 0,
+  "variant": "All Records"
+ },
+ "ACSL-SOA-UPLOAD-LOG": {
+  "status": 422,
+  "data": 0,
+  "variant": "All Records"
+ },
+ "ADJ-AGING": {
+  "status": 200,
+  "data": 6,
+  "variant": "Year to Date"
+ },
+ "ADJ-DAILY": {
+  "status": 200,
+  "data": 6,
+  "variant": "Year to Date"
+ },
+ "ADJ-MINBAL-FILE": {
+  "status": 200,
+  "data": 0,
+  "variant": "Year to Date"
+ },
+ "ADJ-REGISTER": {
+  "status": 200,
+  "data": 6,
+  "variant": "Year to Date"
+ },
+ "ADJ-VALIDATION-LIST": {
+  "status": 200,
+  "data": 0,
+  "variant": "Year to Date"
+ },
+ "BCL-ACTIVITY-LOG": {
+  "status": 200,
+  "data": 39,
+  "variant": "Year to Date"
+ },
+ "BCL-AGEING": {
+  "status": 200,
+  "data": 6,
+  "variant": "As of Today"
+ },
+ "BCL-AGEING-STATUS": {
+  "status": 200,
+  "data": 6,
+  "variant": "As of Today"
+ },
+ "BCL-INSURER-CLAIMS": {
+  "status": 200,
+  "data": 7,
+  "variant": "Year to Date"
+ },
+ "BCL-LOSS-EXPERIENCE": {
+  "status": 200,
+  "data": 7,
+  "variant": "Year to Date"
+ },
+ "BCL-LOSS-RATIO": {
+  "status": 200,
+  "data": 7,
+  "variant": "By Product Line"
+ },
+ "BCL-OUTSTANDING": {
+  "status": 200,
+  "data": 6,
+  "variant": "As of Today"
+ },
+ "BCL-OUTSTANDING-PAST-DUE": {
+  "status": 200,
+  "data": 0,
+  "variant": "As of Today"
+ },
+ "BCL-PENDING-ACTIONS": {
+  "status": 200,
+  "data": 1,
+  "variant": "As of Today"
+ },
+ "BCL-PRONE-LOCATIONS": {
+  "status": 200,
+  "data": 1,
+  "variant": "Year to Date"
+ },
+ "BCL-SETTLED": {
+  "status": 200,
+  "data": 1,
+  "variant": "Year to Date"
+ },
+ "CLX-APPLICATION-TO-INVOICE": {
+  "status": 200,
+  "data": 2,
+  "variant": "Year to Date"
+ },
+ "CLX-AUDIT-LOG": {
+  "status": 200,
+  "data": 27,
+  "variant": "Year to Date"
+ },
+ "CLX-BROKEN-PROMISES": {
+  "status": 200,
+  "data": 1,
+  "variant": "Year to Date"
+ },
+ "CLX-COMPLETED-COLLECTIONS": {
+  "status": 200,
+  "data": 2,
+  "variant": "Year to Date"
+ },
+ "CLX-DP-FOR-REVERSAL": {
+  "status": 200,
+  "data": 1,
+  "variant": "Year to Date"
+ },
+ "CLX-ESCALATIONS": {
+  "status": 200,
+  "data": 5,
+  "variant": "Year to Date"
+ },
+ "CLX-FULL-PRODUCTION": {
+  "status": 200,
+  "data": 9,
+  "variant": "Year to Date"
+ },
+ "CLX-INSTALLMENTS-DUE": {
+  "status": 200,
+  "data": 8,
+  "variant": "Next 12 Months"
+ },
+ "CLX-INVOICES-WITH-DISPOSITION": {
+  "status": 200,
+  "data": 4,
+  "variant": "All Records"
+ },
+ "CLX-OUTSTANDING-PR": {
+  "status": 200,
+  "data": 8,
+  "variant": "All Records"
+ },
+ "CLX-PR2307-FOR-REVERSAL": {
+  "status": 200,
+  "data": 1,
+  "variant": "Year to Date"
+ },
+ "CLX-REASSIGNMENTS": {
+  "status": 200,
+  "data": 9,
+  "variant": "Year to Date"
+ },
+ "CLX-UNAPPLIED-DISPOSITIONS": {
+  "status": 200,
+  "data": 4,
+  "variant": "Year to Date"
+ },
+ "CMR-BIR-CERT": {
+  "status": 200,
+  "data": 3,
+  "variant": "Year to Date"
+ },
+ "CMR-COMMISSION-RECEIVABLE": {
+  "status": 200,
+  "data": 4,
+  "variant": "Year to Date"
+ },
+ "CMR-DP-STATUS": {
+  "status": 200,
+  "data": 1,
+  "variant": "Year to Date"
+ },
+ "CMR-FEEDBACK-SLA": {
+  "status": 200,
+  "data": 1,
+  "variant": "Year to Date"
+ },
+ "CMR-INCENTIVE": {
+  "status": 200,
+  "data": 3,
+  "variant": "Year to Date"
+ },
+ "CMR-PRODUCTION-YEARLY": {
+  "status": 200,
+  "data": 3,
+  "variant": "Year to Date"
+ },
+ "CSF-ACTIVITY": {
+  "status": 200,
+  "data": 2,
+  "variant": "Year to Date"
+ },
+ "CSF-CONTACT-CHANGES": {
+  "status": 200,
+  "data": 2,
+  "variant": "Year to Date"
+ },
+ "CSH-2307-TXN": {
+  "status": 200,
+  "data": 4,
+  "variant": "Year to Date"
+ },
+ "CSH-ADVANCE-PAYMENT": {
+  "status": 200,
+  "data": 1,
+  "variant": "Year to Date"
+ },
+ "CSH-APPLIED-COMM": {
+  "status": 200,
+  "data": 1,
+  "variant": "Year to Date"
+ },
+ "CSH-APPLIED-PREM": {
+  "status": 200,
+  "data": 7,
+  "variant": "Year to Date"
+ },
+ "CSH-AR-OUTSTANDING": {
+  "status": 200,
+  "data": 8,
+  "variant": "Year to Date"
+ },
+ "CSH-BATCH-RUN": {
+  "status": 200,
+  "data": 2,
+  "variant": "Year to Date"
+ },
+ "CSH-CANCELLED-AR": {
+  "status": 200,
+  "data": 4,
+  "variant": "Year to Date"
+ },
+ "CSH-CANCELLED-OR": {
+  "status": 200,
+  "data": 2,
+  "variant": "Year to Date"
+ },
+ "CSH-CERT-OF-PAYMENT": {
+  "status": 200,
+  "data": 3,
+  "variant": "Year to Date"
+ },
+ "CSH-CHECK-PICKUP": {
+  "status": 200,
+  "data": 2,
+  "variant": "Year to Date"
+ },
+ "CSH-CWT": {
+  "status": 200,
+  "data": 5,
+  "variant": "Year to Date"
+ },
+ "CSH-DAILY-CASH-REC": {
+  "status": 200,
+  "data": 12,
+  "variant": "Year to Date"
+ },
+ "CSH-DIRECT-PAYMENT": {
+  "status": 200,
+  "data": 1,
+  "variant": "Year to Date"
+ },
+ "CSH-MINBAL-COMMISSION": {
+  "status": 200,
+  "data": 2,
+  "variant": "Year to Date"
+ },
+ "CSH-MINBAL-EXCESS": {
+  "status": 200,
+  "data": 2,
+  "variant": "Year to Date"
+ },
+ "CSH-MINBAL-PREMIUM": {
+  "status": 200,
+  "data": 3,
+  "variant": "Year to Date"
+ },
+ "CSH-PAYMENT-REVERSAL": {
+  "status": 200,
+  "data": 2,
+  "variant": "Year to Date"
+ },
+ "CSH-PDC-WAREHOUSE": {
+  "status": 200,
+  "data": 1,
+  "variant": "Next 12 Months"
+ },
+ "CSH-PRIORITY-POSTED": {
+  "status": 200,
+  "data": 9,
+  "variant": "Year to Date"
+ },
+ "CSH-REAPPLICATION": {
+  "status": 200,
+  "data": 3,
+  "variant": "Year to Date"
+ },
+ "CSH-REINSTATEMENT": {
+  "status": 200,
+  "data": 1,
+  "variant": "Year to Date"
+ },
+ "CSH-REINSTATEMENT-MON": {
+  "status": 200,
+  "data": 2,
+  "variant": "Year to Date"
+ },
+ "CSH-UNAPPLIED-COMM-MANCOM": {
+  "status": 200,
+  "data": 9,
+  "variant": "Year to Date"
+ },
+ "CSH-UNAPPLIED-COMM-YTD": {
+  "status": 200,
+  "data": 5,
+  "variant": "Year to Date"
+ },
+ "CSH-UPP-INCOME-RECLASS": {
+  "status": 200,
+  "data": 3,
+  "variant": "Year to Date"
+ },
+ "CSH-UPP-LEGACY": {
+  "status": 200,
+  "data": 4,
+  "variant": "Year to Date"
+ },
+ "CTL-AUDIT": {
+  "status": 200,
+  "data": 3064,
+  "variant": "Year to Date"
+ },
+ "CTL-EXCEPTIONS": {
+  "status": 200,
+  "data": 32,
+  "variant": "Year to Date"
+ },
+ "DSB-ATD": {
+  "status": 200,
+  "data": 2,
+  "variant": "Year to Date"
+ },
+ "DSB-CASH-FLOW": {
+  "status": 200,
+  "data": 7,
+  "variant": "Year to Date"
+ },
+ "DSB-CWT-COMMISSION": {
+  "status": 200,
+  "data": 2,
+  "variant": "Year to Date"
+ },
+ "DSB-EOD-EMPLOYEE": {
+  "status": 200,
+  "data": 2,
+  "variant": "Year to Date"
+ },
+ "DSB-EOD-OTHER": {
+  "status": 200,
+  "data": 1,
+  "variant": "Year to Date"
+ },
+ "DSB-EOD-REFUND": {
+  "status": 200,
+  "data": 1,
+  "variant": "Year to Date"
+ },
+ "DSB-EOD-REMIT": {
+  "status": 200,
+  "data": 4,
+  "variant": "Year to Date"
+ },
+ "DSB-EOD-SUMMARY": {
+  "status": 200,
+  "data": 7,
+  "variant": "Year to Date"
+ },
+ "DSB-EOD-SUPPLIER": {
+  "status": 200,
+  "data": 1,
+  "variant": "Year to Date"
+ },
+ "DSB-MASTERLIST": {
+  "status": 200,
+  "data": 12,
+  "variant": "Year to Date"
+ },
+ "DSB-ML-STALE": {
+  "status": 200,
+  "data": 6,
+  "variant": "Year to Date"
+ },
+ "DSB-PAYEE": {
+  "status": 200,
+  "data": 9,
+  "variant": "All Records"
+ },
+ "DSB-PAYEE-NOMATCH": {
+  "status": 200,
+  "data": 1,
+  "variant": "Year to Date"
+ },
+ "DSB-UNREGULARIZED": {
+  "status": 200,
+  "data": 1,
+  "variant": "Year to Date"
+ },
+ "DSB-UNRELEASED-CHECKS": {
+  "status": 200,
+  "data": 2,
+  "variant": "Year to Date"
+ },
+ "DSB-UPLOAD-FALLOUT": {
+  "status": 200,
+  "data": 2,
+  "variant": "Year to Date"
+ },
+ "EB-FRANCHISE": {
+  "status": 200,
+  "data": 2,
+  "variant": "Year to Date"
+ },
+ "EB-NEW-BUSINESS": {
+  "status": 200,
+  "data": 2,
+  "variant": "Year to Date"
+ },
+ "EB-PENDING-ITEMS": {
+  "status": 200,
+  "data": 1,
+  "variant": "Year to Date"
+ },
+ "EB-PLACEMENT": {
+  "status": 200,
+  "data": 0,
+  "variant": "Year to Date"
+ },
+ "EB-PRODUCTION": {
+  "status": 200,
+  "data": 2,
+  "variant": "Year to Date"
+ },
+ "EB-RENEWAL": {
+  "status": 200,
+  "data": 7,
+  "variant": "Next 12 Months"
+ },
+ "EB-TAT": {
+  "status": 200,
+  "data": 2,
+  "variant": "Year to Date"
+ },
+ "FIN-ACT-DET": {
+  "status": 200,
+  "data": 1909,
+  "variant": "Year to Date"
+ },
+ "FIN-ACT-SUM2": {
+  "status": 200,
+  "data": 169,
+  "variant": "Year to Date"
+ },
+ "FIN-AP-AGE-DET": {
+  "status": 200,
+  "data": 21,
+  "variant": "As of Today"
+ },
+ "FIN-AP-AGE-SUM": {
+  "status": 200,
+  "data": 3,
+  "variant": "As of Today"
+ },
+ "FIN-AP-SOP": {
+  "status": 200,
+  "data": 25,
+  "variant": "As of Today"
+ },
+ "FIN-AP-SUPOS": {
+  "status": 200,
+  "data": 3,
+  "variant": "As of Today"
+ },
+ "FIN-AP-VOUCHER": {
+  "status": 200,
+  "data": 48,
+  "variant": "Year to Date"
+ },
+ "FIN-AR-AGE-DET": {
+  "status": 200,
+  "data": 80,
+  "variant": "As of Today"
+ },
+ "FIN-AR-AGE-DIV": {
+  "status": 200,
+  "data": 26,
+  "variant": "As of Today"
+ },
+ "FIN-AR-AGE-SUM": {
+  "status": 200,
+  "data": 17,
+  "variant": "As of Today"
+ },
+ "FIN-AR-CHQ-RCPT": {
+  "status": 200,
+  "data": 41,
+  "variant": "Year to Date"
+ },
+ "FIN-AR-CHQ-UNDEP": {
+  "status": 200,
+  "data": 1,
+  "variant": "As of Today"
+ },
+ "FIN-AR-SOO": {
+  "status": 200,
+  "data": 216,
+  "variant": "As of Today"
+ },
+ "FIN-AR-SOO-FC": {
+  "status": 200,
+  "data": 0,
+  "variant": "US Dollar - As of Today"
+ },
+ "FIN-ARAP-SOA-MATCH": {
+  "status": 200,
+  "data": 260,
+  "variant": "Year to Date"
+ },
+ "FIN-BRS-PAYNOTIFY": {
+  "status": 200,
+  "data": 0,
+  "variant": "This Month"
+ },
+ "FIN-BRS-STMT": {
+  "status": 422,
+  "data": 0,
+  "variant": "As of Today"
+ },
+ "FIN-BRS-UNREC-BANK": {
+  "status": 200,
+  "data": 2,
+  "variant": "As of Today"
+ },
+ "FIN-BRS-UNREC-BOOK": {
+  "status": 200,
+  "data": 183,
+  "variant": "As of Today"
+ },
+ "FIN-CB-POSITION": {
+  "status": 200,
+  "data": 6,
+  "variant": "Year to Date"
+ },
+ "FIN-FA-DEPR": {
+  "status": 200,
+  "data": 187,
+  "variant": "Year to Date"
+ },
+ "FIN-FA-MOVE": {
+  "status": 200,
+  "data": 11,
+  "variant": "Year to Date"
+ },
+ "FIN-FA-NBV": {
+  "status": 200,
+  "data": 12,
+  "variant": "As of Today"
+ },
+ "FIN-FA-REG": {
+  "status": 200,
+  "data": 24,
+  "variant": "As of Today"
+ },
+ "FIN-GL-ALLOCJV": {
+  "status": 200,
+  "data": 0,
+  "variant": "Year to Date"
+ },
+ "FIN-GL-CONSSUM": {
+  "status": 200,
+  "data": 72,
+  "variant": "Year to Date"
+ },
+ "FIN-GL-DAYBOOK": {
+  "status": 200,
+  "data": 1909,
+  "variant": "Year to Date"
+ },
+ "FIN-GL-LEDGER-FC": {
+  "status": 200,
+  "data": 1629,
+  "variant": "Year to Date"
+ },
+ "FIN-GL-LEDGER-LC": {
+  "status": 200,
+  "data": 1624,
+  "variant": "Year to Date"
+ },
+ "FIN-GL-MISSVCH": {
+  "status": 200,
+  "data": 6,
+  "variant": "Year to Date"
+ },
+ "FIN-GL-PROCLIST": {
+  "status": 200,
+  "data": 1909,
+  "variant": "Year to Date"
+ },
+ "FIN-GL-SUBLEDGER-FC": {
+  "status": 200,
+  "data": 373,
+  "variant": "Year to Date"
+ },
+ "FIN-GL-SUBLEDGER-LC": {
+  "status": 200,
+  "data": 373,
+  "variant": "Year to Date"
+ },
+ "FIN-GL-TXNLIST": {
+  "status": 200,
+  "data": 1909,
+  "variant": "Year to Date"
+ },
+ "FIN-GL-VOUCHER": {
+  "status": 200,
+  "data": 1909,
+  "variant": "Year to Date"
+ },
+ "FIN-INV-ACCR": {
+  "status": 200,
+  "data": 118,
+  "variant": "Year to Date"
+ },
+ "FIN-INV-MAT": {
+  "status": 200,
+  "data": 9,
+  "variant": "As of Today"
+ },
+ "FIN-INV-PORT": {
+  "status": 200,
+  "data": 9,
+  "variant": "As of Today"
+ },
+ "FIN-INV-RGL": {
+  "status": 200,
+  "data": 3,
+  "variant": "Year to Date"
+ },
+ "FIN-INV-SECDEP": {
+  "status": 200,
+  "data": 1,
+  "variant": "As of Today"
+ },
+ "FIN-MIS-BS": {
+  "status": 200,
+  "data": 24,
+  "variant": "As of Today"
+ },
+ "FIN-MIS-BS-SCH": {
+  "status": 200,
+  "data": 54,
+  "variant": "As of Today"
+ },
+ "FIN-MIS-IE": {
+  "status": 200,
+  "data": 14,
+  "variant": "Year to Date"
+ },
+ "FIN-MIS-IE-SCH": {
+  "status": 200,
+  "data": 19,
+  "variant": "Year to Date"
+ },
+ "FIN-PC-PENDING": {
+  "status": 200,
+  "data": 9,
+  "variant": "As of Today"
+ },
+ "FIN-PC-REIMB": {
+  "status": 200,
+  "data": 72,
+  "variant": "Year to Date"
+ },
+ "FIN-PDC-CONF-AUDIT-DDB": {
+  "status": 200,
+  "data": 10,
+  "variant": "Year to Date"
+ },
+ "FIN-PDC-ISS-DUEPAY": {
+  "status": 200,
+  "data": 2,
+  "variant": "As of Today"
+ },
+ "FIN-PDC-ISS-DUEPAY-DDB": {
+  "status": 200,
+  "data": 2,
+  "variant": "As of Today"
+ },
+ "FIN-PDC-ISS-PERIOD": {
+  "status": 200,
+  "data": 9,
+  "variant": "Year to Date"
+ },
+ "FIN-PDC-ISS-PERIOD-DDB": {
+  "status": 200,
+  "data": 9,
+  "variant": "Year to Date"
+ },
+ "FIN-PDC-RCV-DUEBANK": {
+  "status": 200,
+  "data": 2,
+  "variant": "As of Today"
+ },
+ "FIN-PDC-RCV-DUEBANK-DDB": {
+  "status": 200,
+  "data": 2,
+  "variant": "As of Today"
+ },
+ "FIN-PDC-RCV-ONHAND": {
+  "status": 200,
+  "data": 3,
+  "variant": "As of Today"
+ },
+ "FIN-PDC-RCV-ONHAND-DDB": {
+  "status": 200,
+  "data": 3,
+  "variant": "As of Today"
+ },
+ "FIN-PDC-RCV-PERIOD": {
+  "status": 200,
+  "data": 11,
+  "variant": "Year to Date"
+ },
+ "FIN-PDC-RCV-PERIOD-DDB": {
+  "status": 200,
+  "data": 11,
+  "variant": "Year to Date"
+ },
+ "FIN-TB-DIVDEPT": {
+  "status": 200,
+  "data": 105,
+  "variant": "This Year"
+ },
+ "FIN-TB-MAIN": {
+  "status": 200,
+  "data": 23,
+  "variant": "This Year"
+ },
+ "FIN-TB-POSTUNP": {
+  "status": 200,
+  "data": 23,
+  "variant": "This Year"
+ },
+ "FIN-TB-SUB": {
+  "status": 200,
+  "data": 56,
+  "variant": "This Year"
+ },
+ "FIN-TB-YTD": {
+  "status": 200,
+  "data": 24,
+  "variant": "This Year"
+ },
+ "FRBS-BRANCH-PRODUCTION": {
+  "status": 200,
+  "data": 11,
+  "variant": "Year to Date"
+ },
+ "FRBS-BRANCH-PRODUCTION-SUM": {
+  "status": 200,
+  "data": 4,
+  "variant": "Year to Date"
+ },
+ "FRBS-CASH-FLOW": {
+  "status": 200,
+  "data": 7,
+  "variant": "Year to Date"
+ },
+ "FRBS-EXPENSE-GROUPING": {
+  "status": 200,
+  "data": 26,
+  "variant": "Year to Date"
+ },
+ "FRBS-GAP": {
+  "status": 200,
+  "data": 3,
+  "variant": "As of Today"
+ },
+ "FRBS-MANCOM-MARKET": {
+  "status": 200,
+  "data": 4,
+  "variant": "As of Today"
+ },
+ "FRBS-SERVICE-FEE": {
+  "status": 200,
+  "data": 1,
+  "variant": "Year to Date"
+ },
+ "FRBS-SERVICE-FEE-DETAIL": {
+  "status": 200,
+  "data": 2,
+  "variant": "Year to Date"
+ },
+ "FRBS-SUSTAINABILITY-PROD": {
+  "status": 200,
+  "data": 5,
+  "variant": "This Year"
+ },
+ "GL-BS": {
+  "status": 200,
+  "data": 11,
+  "variant": "As of Today"
+ },
+ "GL-BUTIL": {
+  "status": 200,
+  "data": 24,
+  "variant": "As of Today"
+ },
+ "GL-BVA": {
+  "status": 200,
+  "data": 24,
+  "variant": "As of Today"
+ },
+ "GL-CCY": {
+  "status": 200,
+  "data": 74,
+  "variant": "As of Today"
+ },
+ "GL-COA": {
+  "status": 200,
+  "data": 172,
+  "variant": "All Records"
+ },
+ "GL-DETAIL": {
+  "status": 200,
+  "data": 1981,
+  "variant": "Year to Date"
+ },
+ "GL-FXREV": {
+  "status": 200,
+  "data": 1,
+  "variant": "As of Today"
+ },
+ "GL-JRNL": {
+  "status": 200,
+  "data": 744,
+  "variant": "Year to Date"
+ },
+ "GL-PL": {
+  "status": 200,
+  "data": 7,
+  "variant": "Year to Date"
+ },
+ "GL-SCHEDULE": {
+  "status": 200,
+  "data": 7,
+  "variant": "Expenses per Cost Centre - This Month"
+ },
+ "GL-TB": {
+  "status": 200,
+  "data": 70,
+  "variant": "As of Today"
+ },
+ "IC-BROKER-ASBO": {
+  "status": 200,
+  "data": 5,
+  "variant": "This Year"
+ },
+ "MIG-BATCH-LOG": {
+  "status": 200,
+  "data": 14,
+  "variant": "All Records"
+ },
+ "MIG-CLIENT-MATCH": {
+  "status": 200,
+  "data": 3,
+  "variant": "All Records"
+ },
+ "MIG-CUTOVER-STATUS": {
+  "status": 200,
+  "data": 42,
+  "variant": "All Records"
+ },
+ "MIG-DECISIONS": {
+  "status": 200,
+  "data": 21,
+  "variant": "All Records"
+ },
+ "MIG-DQ-ISSUES": {
+  "status": 200,
+  "data": 4,
+  "variant": "All Records"
+ },
+ "MIG-GL-CLEARING": {
+  "status": 200,
+  "data": 5,
+  "variant": "All Records"
+ },
+ "MIG-GONOGO": {
+  "status": 200,
+  "data": 24,
+  "variant": "All Records"
+ },
+ "MIG-LEGACY-POSITIONS": {
+  "status": 200,
+  "data": 3,
+  "variant": "All Records"
+ },
+ "MIG-MAP-VERSIONS": {
+  "status": 200,
+  "data": 29,
+  "variant": "All Records"
+ },
+ "MIG-OBJECT-REGISTER": {
+  "status": 200,
+  "data": 32,
+  "variant": "All Records"
+ },
+ "MIG-RECON-DETAIL": {
+  "status": 200,
+  "data": 126,
+  "variant": "All Records"
+ },
+ "MIG-RECON-SUMMARY": {
+  "status": 200,
+  "data": 35,
+  "variant": "All Records"
+ },
+ "MIG-REJECTS": {
+  "status": 200,
+  "data": 3,
+  "variant": "All Records"
+ },
+ "MIG-RENEWAL-GOLIVE": {
+  "status": 200,
+  "data": 3,
+  "variant": "All Records"
+ },
+ "MIG-RUNOFF": {
+  "status": 200,
+  "data": 4,
+  "variant": "Year to Date"
+ },
+ "MIG-SIGNOFF-STATUS": {
+  "status": 200,
+  "data": 86,
+  "variant": "All Records"
+ },
+ "MIG-TRUEUP-RECON": {
+  "status": 200,
+  "data": 0,
+  "variant": "All Records"
+ },
+ "MIG-TRUEUP-REGISTER": {
+  "status": 200,
+  "data": 0,
+  "variant": "All Records"
+ },
+ "MIG-UNMAPPED-CODES": {
+  "status": 200,
+  "data": 2,
+  "variant": "All Records"
+ },
+ "NB-ACC-STATUS": {
+  "status": 200,
+  "data": 37,
+  "variant": "All Records"
+ },
+ "NB-BOOKED-REG": {
+  "status": 200,
+  "data": 11,
+  "variant": "Year to Date"
+ },
+ "NB-DISPATCH": {
+  "status": 200,
+  "data": 1,
+  "variant": "Year to Date"
+ },
+ "NB-KYC-DUE": {
+  "status": 200,
+  "data": 1,
+  "variant": "As of Today"
+ },
+ "NB-PLC-UPDATE": {
+  "status": 200,
+  "data": 19,
+  "variant": "Year to Date"
+ },
+ "NB-PRODUCTION": {
+  "status": 200,
+  "data": 3,
+  "variant": "Year to Date"
+ },
+ "NB-STAGE-OUTCOME": {
+  "status": 200,
+  "data": 14,
+  "variant": "Year to Date"
+ },
+ "ORG-HEADCOUNT-CC": {
+  "status": 200,
+  "data": 16,
+  "variant": "All Records"
+ },
+ "PM-PKG-EXPIRY": {
+  "status": 200,
+  "data": 1,
+  "variant": "All Records"
+ },
+ "PM-PKG-STATUS": {
+  "status": 200,
+  "data": 6,
+  "variant": "All Records"
+ },
+ "PM-VERSION-HISTORY": {
+  "status": 200,
+  "data": 62,
+  "variant": "All Records"
+ },
+ "PRC-DISPOSITION": {
+  "status": 200,
+  "data": 2,
+  "variant": "Year to Date"
+ },
+ "PRC-EARLY-INCENTIVE": {
+  "status": 200,
+  "data": 5,
+  "variant": "Year to Date"
+ },
+ "PRC-EXTRACT-LOG": {
+  "status": 200,
+  "data": 1,
+  "variant": "Year to Date"
+ },
+ "PRC-LEGACY-CHANGES": {
+  "status": 200,
+  "data": 0,
+  "variant": "Year to Date"
+ },
+ "PRC-REGISTER": {
+  "status": 200,
+  "data": 5,
+  "variant": "Year to Date"
+ },
+ "PRC-SUMMARY": {
+  "status": 200,
+  "data": 1,
+  "variant": "Year to Date"
+ },
+ "PRC-UNBOOKED": {
+  "status": 200,
+  "data": 1,
+  "variant": "Year to Date"
+ },
+ "PRC-UNMATCHED-AO": {
+  "status": 200,
+  "data": 1,
+  "variant": "Year to Date"
+ },
+ "PRC-UNMATCHED-FEEDBACK": {
+  "status": 200,
+  "data": 5,
+  "variant": "Year to Date"
+ },
+ "PRC-UNMATCHED-LOC": {
+  "status": 200,
+  "data": 2,
+  "variant": "Year to Date"
+ },
+ "PRQ-REGISTER": {
+  "status": 200,
+  "data": 2,
+  "variant": "Year to Date"
+ },
+ "PRQ-STATUS": {
+  "status": 200,
+  "data": 2,
+  "variant": "Year to Date"
+ },
+ "REM-DTIP-DETAIL": {
+  "status": 200,
+  "data": 10,
+  "variant": "All Records"
+ },
+ "REM-DTIP-SUMMARY": {
+  "status": 200,
+  "data": 7,
+  "variant": "All Records"
+ },
+ "REM-EXCLUDED": {
+  "status": 200,
+  "data": 2,
+  "variant": "Year to Date"
+ },
+ "REM-HOLD": {
+  "status": 200,
+  "data": 1,
+  "variant": "Year to Date"
+ },
+ "REM-OR-EXCEPTION": {
+  "status": 200,
+  "data": 2,
+  "variant": "Year to Date"
+ },
+ "REM-PAIDAR-OVER-DTIP": {
+  "status": 200,
+  "data": 1,
+  "variant": "Year to Date"
+ },
+ "REM-REMITTED-BATCH": {
+  "status": 200,
+  "data": 3,
+  "variant": "Year to Date"
+ },
+ "REM-SCHEDULE-INCENTIVE": {
+  "status": 200,
+  "data": 1,
+  "variant": "Year to Date"
+ },
+ "REM-SCHEDULE-NORMAL": {
+  "status": 200,
+  "data": 2,
+  "variant": "Year to Date"
+ },
+ "REM-SCHEDULE-SPECIAL": {
+  "status": 200,
+  "data": 1,
+  "variant": "Year to Date"
+ },
+ "REM-SPECIAL-REGISTER": {
+  "status": 200,
+  "data": 2,
+  "variant": "Year to Date"
+ },
+ "REM-TRACKER": {
+  "status": 200,
+  "data": 4,
+  "variant": "Year to Date"
+ },
+ "RNW-DECISIONS": {
+  "status": 200,
+  "data": 7,
+  "variant": "All Expiries"
+ },
+ "RNW-EXPIRY-LIST": {
+  "status": 200,
+  "data": 12,
+  "variant": "All Expiries"
+ },
+ "RNW-GOLIVE": {
+  "status": 200,
+  "data": 3,
+  "variant": "All Expiries"
+ },
+ "RNW-INSURER-EXTRACT": {
+  "status": 200,
+  "data": 2,
+  "variant": "All Expiries"
+ },
+ "RNW-LAMD-MATCH": {
+  "status": 200,
+  "data": 3,
+  "variant": "All Expiries"
+ },
+ "RNW-LISTING": {
+  "status": 200,
+  "data": 12,
+  "variant": "All Expiries"
+ },
+ "RNW-PACKAGE-REMAP": {
+  "status": 200,
+  "data": 1,
+  "variant": "All Expiries"
+ },
+ "RNW-RA-DISPATCH": {
+  "status": 200,
+  "data": 0,
+  "variant": "All Expiries"
+ },
+ "RNW-SANITATION": {
+  "status": 200,
+  "data": 23,
+  "variant": "All Expiries"
+ },
+ "RNW-STATUS": {
+  "status": 200,
+  "data": 12,
+  "variant": "All Expiries"
+ },
+ "RNW-WORKLOAD": {
+  "status": 200,
+  "data": 7,
+  "variant": "All Expiries"
+ },
+ "SBM-CLASSIFICATION": {
+  "status": 200,
+  "data": 8,
+  "variant": "Year to Date"
+ },
+ "SBM-CONVERSION": {
+  "status": 200,
+  "data": 1,
+  "variant": "Next 12 Months"
+ },
+ "SBM-DISPOSITION": {
+  "status": 200,
+  "data": 5,
+  "variant": "Year to Date"
+ },
+ "SBM-DOC-FALLOUT": {
+  "status": 200,
+  "data": 1,
+  "variant": "Year to Date"
+ },
+ "SBM-HANDLING-FEE": {
+  "status": 200,
+  "data": 3,
+  "variant": "Year to Date"
+ },
+ "SBM-HOLD-COVER-GAP": {
+  "status": 200,
+  "data": 1,
+  "variant": "Year to Date"
+ },
+ "SBM-IAAF": {
+  "status": 200,
+  "data": 4,
+  "variant": "Year to Date"
+ },
+ "SBM-LETTERS": {
+  "status": 200,
+  "data": 3,
+  "variant": "Year to Date"
+ },
+ "SBM-MASTERLIST": {
+  "status": 200,
+  "data": 24,
+  "variant": "Year to Date"
+ },
+ "SBM-MIGRATION-ERRORS": {
+  "status": 200,
+  "data": 2,
+  "variant": "Year to Date"
+ },
+ "SBM-NO-TOUCH": {
+  "status": 200,
+  "data": 2,
+  "variant": "Year to Date"
+ },
+ "SBM-NON-RENEWAL": {
+  "status": 200,
+  "data": 5,
+  "variant": "Next 12 Months"
+ },
+ "SBM-PENETRATION": {
+  "status": 200,
+  "data": 4,
+  "variant": "Year to Date"
+ },
+ "SBM-PERSISTENCY": {
+  "status": 200,
+  "data": 9,
+  "variant": "Next 12 Months"
+ },
+ "SBM-PR-CONVERSION": {
+  "status": 200,
+  "data": 2,
+  "variant": "Year to Date"
+ },
+ "SBM-PR-MONITORING": {
+  "status": 200,
+  "data": 2,
+  "variant": "Year to Date"
+ },
+ "SBM-PROCESS-FALLOUT": {
+  "status": 200,
+  "data": 1,
+  "variant": "Year to Date"
+ },
+ "SBM-RENEWABLE": {
+  "status": 200,
+  "data": 5,
+  "variant": "Next 12 Months"
+ },
+ "SBM-SANITATION": {
+  "status": 200,
+  "data": 1,
+  "variant": "Year to Date"
+ },
+ "SBM-TOR": {
+  "status": 200,
+  "data": 1,
+  "variant": "Year to Date"
+ },
+ "SCR-AUDIT-LOG": {
+  "status": 200,
+  "data": 33,
+  "variant": "Year to Date"
+ },
+ "SCR-CASE-STATUS": {
+  "status": 200,
+  "data": 10,
+  "variant": "Year to Date"
+ },
+ "SCR-HIGH-RISK-CLIENTS": {
+  "status": 200,
+  "data": 2,
+  "variant": "As of Today"
+ },
+ "SCR-INGEST-ERRORS": {
+  "status": 200,
+  "data": 3,
+  "variant": "Year to Date"
+ },
+ "SCR-PEP-CLIENTS": {
+  "status": 200,
+  "data": 1,
+  "variant": "As of Today"
+ },
+ "SCR-SANCTIONED-NAMES": {
+  "status": 200,
+  "data": 25,
+  "variant": "All Listed Names"
+ },
+ "SCR-SLA-BREACHES": {
+  "status": 200,
+  "data": 4,
+  "variant": "Year to Date"
+ },
+ "SCR-STR-REGISTER": {
+  "status": 200,
+  "data": 2,
+  "variant": "Year to Date"
+ },
+ "TAX-0619F": {
+  "status": 200,
+  "data": 3,
+  "variant": "This Year"
+ },
+ "TAX-1603": {
+  "status": 200,
+  "data": 3,
+  "variant": "This Year"
+ },
+ "TAX-1604E": {
+  "status": 200,
+  "data": 3,
+  "variant": "This Year"
+ },
+ "TAX-1702": {
+  "status": 200,
+  "data": 8,
+  "variant": "This Year"
+ },
+ "TAX-1702Q": {
+  "status": 200,
+  "data": 8,
+  "variant": "This Year"
+ },
+ "TAX-2307-REG": {
+  "status": 200,
+  "data": 6,
+  "variant": "This Year"
+ },
+ "TAX-BOOK-CDB": {
+  "status": 200,
+  "data": 340,
+  "variant": "Year to Date"
+ },
+ "TAX-BOOK-CRB": {
+  "status": 200,
+  "data": 249,
+  "variant": "Year to Date"
+ },
+ "TAX-BOOK-GJ": {
+  "status": 200,
+  "data": 395,
+  "variant": "Year to Date"
+ },
+ "TAX-BOOK-PJ": {
+  "status": 200,
+  "data": 300,
+  "variant": "Year to Date"
+ },
+ "TAX-BOOK-SJ": {
+  "status": 200,
+  "data": 337,
+  "variant": "Year to Date"
+ },
+ "TAX-BOOK-SL": {
+  "status": 200,
+  "data": 930,
+  "variant": "Year to Date"
+ },
+ "TAX-EWT-1601EQ": {
+  "status": 200,
+  "data": 3,
+  "variant": "Year to Date"
+ },
+ "TAX-MAP": {
+  "status": 200,
+  "data": 0,
+  "variant": "This Year"
+ },
+ "TAX-QAP": {
+  "status": 200,
+  "data": 0,
+  "variant": "This Year"
+ },
+ "TAX-REMIT": {
+  "status": 200,
+  "data": 8,
+  "variant": "Year to Date"
+ },
+ "TAX-SAWT": {
+  "status": 200,
+  "data": 1,
+  "variant": "This Year"
+ },
+ "TAX-SLP": {
+  "status": 200,
+  "data": 3,
+  "variant": "Year to Date"
+ },
+ "TAX-SLS": {
+  "status": 200,
+  "data": 0,
+  "variant": "Year to Date"
+ },
+ "TAX-VAT-2550Q": {
+  "status": 200,
+  "data": 13,
+  "variant": "Year to Date"
+ },
+ "UAM-AUDIT-LOG": {
+  "status": 200,
+  "data": 58,
+  "variant": "Year to Date"
+ },
+ "UAM-GROUP-MEMBERS": {
+  "status": 200,
+  "data": 122,
+  "variant": "As of Today"
+ },
+ "UAM-GROUP-PROFILE": {
+  "status": 200,
+  "data": 3767,
+  "variant": "Active Profiles - All Modules"
+ },
+ "UAM-REQUESTS": {
+  "status": 200,
+  "data": 11,
+  "variant": "Year to Date"
+ },
+ "UAM-USER-ACCESS": {
+  "status": 200,
+  "data": 118,
+  "variant": "As of Today"
+ }
+}

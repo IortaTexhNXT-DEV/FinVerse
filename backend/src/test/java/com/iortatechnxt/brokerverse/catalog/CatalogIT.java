@@ -41,6 +41,8 @@ import com.iortatechnxt.brokerverse.catalog.service.SalesOrganisationExport;
 import com.iortatechnxt.brokerverse.catalog.service.SalesOrganisationService;
 import com.iortatechnxt.brokerverse.catalog.service.TsuRoutingService;
 import com.iortatechnxt.brokerverse.common.domain.RecordStatus;
+import com.iortatechnxt.brokerverse.dimension.domain.DimensionType;
+import com.iortatechnxt.brokerverse.dimension.service.DimensionService;
 import com.iortatechnxt.brokerverse.party.service.PartyService;
 import com.iortatechnxt.brokerverse.security.service.UserDirectory;
 import com.iortatechnxt.brokerverse.support.AsUser;
@@ -71,6 +73,7 @@ class CatalogIT {
   @Autowired private UserDirectory directory;
   @Autowired private AsUser as;
   @Autowired private TestData data;
+  @Autowired private DimensionService dimensions;
 
   private static String unique(String prefix) {
     return prefix + Long.toString(System.nanoTime() % 1_000_000_000L, 36).toUpperCase();
@@ -236,6 +239,23 @@ class CatalogIT {
                 line,
                 new LineDetails("Test line 2", RiskItemKind.PERSON, RatingMethod.GENERIC, 500)));
     assertThat(catalog.requireLine(line).getRiskItemKind()).isEqualTo(RiskItemKind.PERSON);
+  }
+
+  @Test
+  void aNewProductLineHasItsBusinessLineForTheAccountingEntries() {
+    String line = unique("BL");
+    as.run(
+        "badmin",
+        () ->
+            catalog.createLine(
+                line,
+                new LineDetails("Group Dental", RiskItemKind.GENERIC, RatingMethod.GENERIC, 510)));
+    Long company = data.company().getId();
+    assertThat(dimensions.list(company, DimensionType.BUSINESS_LINE))
+        .filteredOn(v -> v.getCode().equals(line))
+        .singleElement()
+        .satisfies(v -> assertThat(v.getName()).isEqualTo("Group Dental"));
+    dimensions.validateOptional(company, DimensionType.BUSINESS_LINE, line);
   }
 
   @Test

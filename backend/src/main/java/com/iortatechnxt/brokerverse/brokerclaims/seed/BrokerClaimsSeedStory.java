@@ -254,17 +254,25 @@ public class BrokerClaimsSeedStory {
 
   /**
    * Property claim whose premium is paid but not yet remitted: "With BDOI - For Premium
-   * Remittance", the claims special remittance can be requested from the claim.
+   * Remittance", the claims special remittance can be requested from the claim; the proof of
+   * remittance is due to the insurer today (a pending action of the handler).
    *
    * @param companyId company
    * @param claimId claim
    */
   public void awaitingRemittance(Long companyId, Long claimId) {
+    LocalDate today = today();
     status(
         TH,
         companyId,
         claimId,
         "BDOI_PREMIUM_REMITTANCE",
         "Insurer asks for proof of premium remittance before evaluation");
+    diary(
+        NON_MOTOR,
+        companyId,
+        claimId,
+        new DiaryInput(
+            "FOLLOW_UP", today, today, null, "Send the insurer the proof of premium remittance"));
   }
 }

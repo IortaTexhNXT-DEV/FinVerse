@@ -52,6 +52,7 @@ final class CatalogueYaml {
   private static CatalogueDataset dataset(Map<String, Object> m) {
     Map<String, Object> rows =
         m.containsKey("environmentRows") ? map(m.get("environmentRows")) : null;
+    Map<String, Object> scope = m.containsKey("rows") ? map(m.get("rows")) : null;
     return new CatalogueDataset(
         text(m, CODE),
         text(m, NAME),
@@ -66,6 +67,7 @@ final class CatalogueYaml {
         rows == null
             ? null
             : new EnvironmentRows(text(rows, "column"), strings(rows.get("values"))),
+        scope == null ? null : new DatasetRows(text(scope, "column"), strings(scope.get("values"))),
         stringMap(m.get("insertDefaults")),
         strings(m.get("userColumns")),
         Boolean.TRUE.equals(m.get("optional")),

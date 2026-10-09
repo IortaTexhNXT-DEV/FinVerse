@@ -7,6 +7,7 @@ import com.iortatechnxt.brokerverse.configpromo.catalogue.CatalogueDataset;
 import com.iortatechnxt.brokerverse.configpromo.catalogue.ConfigCatalogue;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
@@ -126,6 +127,48 @@ class ConfigCatalogueTest {
 
     assertThatThrownBy(() -> read(unknownGroup)).hasMessageContaining("unknown group");
     assertThatThrownBy(() -> read(twice)).hasMessageContaining("both a dataset and excluded");
+  }
+
+  @Test
+  void aTableHoldsSeveralDatasetsOnlyWhenEachNamesItsRows() {
+    String named =
+        """
+        groups: [{code: G, name: Group}]
+        datasets:
+          - {code: A, name: A, group: G, module: m, table: a, key: [code], rows: {column: kind, values: [S]}}
+          - {code: B, name: B, group: G, module: m, table: a, key: [code], rows: {column: kind, values: [U]}}
+        reasons: {}
+        excluded: {}
+        """;
+    String unnamed =
+        """
+        groups: [{code: G, name: Group}]
+        datasets:
+          - {code: A, name: A, group: G, module: m, table: a, key: [code], rows: {column: kind, values: [S]}}
+          - {code: B, name: B, group: G, module: m, table: a, key: [code]}
+        reasons: {}
+        excluded: {}
+        """;
+
+    ConfigCatalogue shared = read(named);
+    assertThat(shared.byTable("a").orElseThrow().code()).isEqualTo("A");
+    assertThat(shared.dataset("A").leavesOut(Map.of("kind", "S")::get)).isFalse();
+    assertThat(shared.dataset("A").leavesOut(Map.of("kind", "U")::get)).isTrue();
+    assertThat(shared.dataset("B").leavesOut(Map.of("kind", "U")::get)).isFalse();
+    assertThatThrownBy(() -> read(unnamed)).hasMessageContaining("Duplicate table");
+  }
+
+  @Test
+  void theStandardReportVariantsAreAConfigurationDataset() {
+    CatalogueDataset standard = catalogue.dataset("NBR_REPORT_STANDARD_VARIANT");
+
+    assertThat(standard.group()).isEqualTo("REPORTS");
+    assertThat(standard.selectedByDefault(false)).isTrue();
+    assertThat(standard.leavesOut(Map.of("standard", true)::get)).isFalse();
+    assertThat(standard.leavesOut(Map.of("standard", false)::get)).isTrue();
+    assertThat(catalogue.dataset("NBR_REPORT_VARIANT").leavesOut(Map.of("standard", false)::get))
+        .isFalse();
+    assertThat(catalogue.dataset("NBR_REPORT_VARIANT").users()).isTrue();
   }
 
   private static ConfigCatalogue read(String yaml) {

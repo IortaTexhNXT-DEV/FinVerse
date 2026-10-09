@@ -1,0 +1,363 @@
+# Review of the end-to-end conformance run (read by build_conformance.py): the decisions on requirements that the
+# evidence alone cannot give, notes on walkthrough steps checked by hand, the cycle steps of each requirement, the
+# fixes made during the run, the open gaps with their proposals and the corrections of the FRS texts.
+version: "1.0"
+date: 09 October 2026
+scope: >-
+  Run on a fresh SIT/UAT environment (seed data of the release) on 09-Oct-2026: the 367 steps of the UAT walkthrough
+  script, the walkthroughs of the sign-off packs performed live by their personas, one client taken through the whole
+  broking cycle, the sidebar of every persona of the FRS persona tables, and the automated checks of the release
+  mapped to the 744 requirements and 1,772 acceptance criteria of the FRSs.
+
+# Further automated checks of a requirement that do not name it in their description (cross-BRD requirements).
+extra_checks:
+  FR-CR-001: [PersonaMenusIT, PermissionConsistencyTest, navigation/personaMenus.test.ts]
+  FR-CR-010: [ExecutiveDashboardIT, CollectionsHomeIT]
+  FR-CR-020: [NotificationEventWordingIT, MessagingIT]
+  FR-CR-030: [AuditTrailImmutabilityIT, SessionLogIT]
+  FR-CR-040: [ReportRenderingIT, ReportArchiveIT, ExportOptionsTest]
+  FR-CR-041: [NbReportApiIT, ConfigCatalogueSchemaIT]
+  FR-CR-050: [DocTemplateServiceIT, DocumentWordIT]
+  FR-CR-060: [LovServiceIT]
+  FR-CR-061: [CatalogIT]
+  FR-CR-070: [UserAdminApiIT, LoginProtectionTest, SignInTokensIT]
+  FR-CR-071: [DocumentProtectorTest]
+  FR-CR-080: [WorkflowServiceIT]
+  FR-CR-081: [ServiceInvoiceIT]
+  FR-CR-083: [BulkServiceIT, BulkExtensionsIT, AdvisoryJobLockIT]
+  FR-CR-090: [InvoiceLedgerIT]
+  FR-CR-091: [CurrencyAndDimensionApiIT]
+  FR-CR-093: [ServiceInvoiceIT, BookingServiceIT]
+
+# Requirements shown by the persona access check (every persona signs in and sees the menu of the FRS; a screen
+# outside it opened by its address is refused).
+persona_frs: [FR-CR-001, FR-CR-070, FR-NB-130, FR-OP-001, FR-OP-002, FR-PM-001, FR-AC-001, FR-DS-001, FR-CM-001,
+  FR-CM-002, FR-EB-001, FR-SS-001, FR-UA-001, FR-RN-001]
+
+# The requirements each step of the broking cycle shows.
+cycle_frs:
+  C01: [FR-NB-034]
+  C02: [FR-NB-041, FR-NB-043, FR-NB-044, FR-NB-047]
+  C03: [FR-NB-080, FR-NB-081, FR-NB-092, FR-NB-110]
+  C04: [FR-NB-110]
+  C05: [FR-CL-017]
+  C06: [FR-OP-019]
+  C07: [FR-CL-017]
+  C08: [FR-OP-030, FR-OP-031, FR-OP-034, FR-OP-035, FR-OP-021]
+  C09: [FR-OP-021]
+  C11: [FR-CM-011, FR-CM-016]
+  C12: [FR-CSF-010]
+  C13: [FR-OP-050, FR-OP-057]
+  C14: [FR-NB-122, FR-OP-041]
+
+# Steps of the broking cycle not run on the account of the scenario, with how they are covered.
+cycle_notes:
+  - step: C15
+    area: Renewal
+    action: Renewal of the policy of the scenario
+    observed: >-
+      Not run on the account of the scenario: its policy expires in one year and enters the expiry list 120 days
+      before. Renewal is shown on the expiring accounts of the SIT/UAT data by the BRD-6 walkthroughs (see
+      Walkthrough results, BRD-06).
+    result: Blocked
+  - step: C16
+    area: Employee Benefits
+    action: Employee benefits programme of a corporate client
+    observed: >-
+      Employee Benefits runs on its own programmes, not on a retail policy; it is shown on the programmes of the
+      SIT/UAT data by the BRD-8 steps of the walkthrough script (see Walkthrough results, BRD-08).
+    result: Blocked
+
+# Requirements whose result is decided by the review (result and reason).
+requirements:
+  FR-CM-002:
+    result: Partly conformant
+    reason: The automated check of the claims worklist passes on the tabs, search, follow-ups and diary, but not on
+      the in-app notice to the new handler after a reassignment (gap G13).
+  FR-CM-050:
+    result: Partly conformant
+    reason: The automated check of the claims worklist passes on the tabs, search, follow-ups and diary, but not on
+      the in-app notice to the new handler after a reassignment (gap G13).
+  FR-CM-052:
+    result: Partly conformant
+    reason: The automated check of the claims worklist passes on the tabs, search, follow-ups and diary, but not on
+      the in-app notice to the new handler after a reassignment (gap G13).
+  FR-CM-054:
+    result: Partly conformant
+    reason: The automated check of the claims worklist passes on the tabs, search, follow-ups and diary, but not on
+      the in-app notice to the new handler after a reassignment (gap G13).
+  FR-CL-091:
+    result: Not testable yet
+    reason: Draft requirement waiting for BDOI's confirmation (CQ01); separate incentive receivables follow it.
+  FR-CL-093:
+    result: Not testable yet
+    reason: Draft requirement waiting for BDOI's confirmation (CQ01) and the archiving criteria (CQ26).
+  FR-CL-094:
+    result: Not testable yet
+    reason: Draft requirement waiting for BDOI's confirmation (CQ01) and how a partial direct payment is evidenced (CQ19).
+  FR-DM-126:
+    result: Not testable yet
+    reason: Proposed position, waiting for BDOI's decision on the renewals in progress at the freeze.
+  FR-DM-130:
+    result: Not testable yet
+    reason: Carried out only on BDOI's confirmation that open legacy claims are migrated.
+  FR-DM-131:
+    result: Not testable yet
+    reason: Carried out only on BDOI's confirmation that the e-policies are linked to the migrated accounts.
+  FR-CR-082:
+    result: Not testable yet
+    reason: The coexistence feed of legacy client batches waits for BDOI's decision on coexistence (CRQ19); migrated
+      clients load through the bulk client upload with the duplicate check.
+
+# What the platform lacks for the steps of an open gap (step_checks.yaml, gap).
+step_gaps:
+  CSF-CASES: Case management of the Customer Service Facility is not on the platform yet (open gap G01)
+  SBM-MANUAL: A policy cannot yet be created or edited by hand on the screens (open gap G11)
+  SBM-RECIPIENTS: The recipients of the notices cannot yet be set on Submitted Policies Setup (open gap G12)
+
+# Walkthrough steps checked by hand after the run: "BRD step" -> result, observed, evidence.
+step_notes: {}
+
+fixes:
+  - id: F01
+    brd: BRD-00
+    area: Configuration promotion
+    found: >-
+      The standard report variants (the saved report settings offered to every user) did not move with the
+      configuration from one environment to the next; only users' own variants should stay behind.
+    fix: >-
+      The standard variants are now part of the configuration promoted from SIT to UAT and production, with the
+      same comparison and approval as the other configuration; users' own variants stay in their environment.
+    check: Automated check that the standard variants move with the configuration and the users' variants stay behind
+  - id: F02
+    brd: BRD-05
+    area: Tax set-up
+    found: Party tax profiles (TX-01) and tax forms (TX-02) could only be entered one by one on their screens.
+    fix: >-
+      Upload of both from the screen: template with the layout of the BDOI input tabs, preview with the rules of the
+      screen, approval by a second user, and export of the current values.
+    check: Automated checks of the uploads of the configuration screens
+  - id: F03
+    brd: BRD-05
+    area: Currencies and exchange rates
+    found: Currencies (MD-02) and exchange rates (MD-03) could only be entered one by one.
+    fix: >-
+      Upload of both from the Currency Rates screen with the same template, preview, approval and export; the base
+      currency and a currency of an active bank account cannot be deactivated; the export of rates covers the last
+      90 days.
+    check: Automated checks of the uploads of the configuration screens
+  - id: F04
+    brd: BRD-00
+    area: SIT/UAT data
+    found: 64 standard reports returned no row on a fresh SIT/UAT environment, so UAT could not check them.
+    fix: >-
+      SIT/UAT data added in line with the seed story (Cebu branch receipts, cancellations, minimal balances,
+      disbursements and end-of-day runs, remittance batches, commission certificates, employee benefits invoices,
+      submitted policies, screening cases, LAMD results, migration batches, headcount, payment requests, PDCs,
+      completed collections, a claims follow-up due today, the GL to sub-ledger reconciliation of the day): 50 of
+      the 64 reports now return rows; the other 14 are listed as gap G03.
+    check: Each of the 64 reports run on a fresh SIT/UAT environment
+
+  - id: F05
+    brd: BRD-03
+    area: Product lines and accounting
+    found: >-
+      A product line added in the catalog had no business line for the accounting entries, so a payment applied
+      to an account of the line was refused (seen on the Employee Benefits lines HMO, GLI and GPA).
+    fix: >-
+      A new product line gets its business line in every company when it is created; the business lines of the
+      Employee Benefits lines are added to the SIT/UAT data.
+    check: Automated check that a new product line has its business line for the accounting entries
+  - id: F06
+    brd: BRD-00
+    area: SIT/UAT data
+    found: >-
+      Records added to the SIT/UAT data for the reports took numbers that the platform would also issue later
+      (for example DV-2026-000901), the Employee Benefits accounts had no sales unit and an opening-balance
+      adjustment of FY2027 was recorded before the cut-off.
+    fix: >-
+      The records are numbered in the block kept for the SIT/UAT data of each series (900901 and up), the
+      Employee Benefits accounts belong to their corporate sales unit, and the adjustment is removed (the
+      reconciliation of the trial load stays).
+    check: The automated checks of the SIT/UAT data and of the numbering of booked invoices
+
+gaps:
+  - id: G01
+    brd: BRD-09
+    frs: [FR-CSF-050, FR-CSF-051, FR-CSF-052, FR-CSF-053, FR-CSF-054, FR-CSF-055, FR-CSF-056, FR-CSF-057, FR-CSF-058,
+          FR-CSF-059, FR-CSF-060, FR-CSF-061]
+    gap: Case management of the Customer Service Facility is not on the platform yet (logging, categories and turnaround, statuses,
+      notes, documents, routing to the fulfilment units, ageing and SLA, follow-up cases, dashboard).
+    impact: Storyboard P2 of BRD-9 (12 steps of the walkthrough script) cannot be run; customer requests are tracked
+      outside BIBS.
+    proposal: >-
+      Add the case module on the existing workflow, documents and notification services: case types with their
+      turnaround times and routing table (lists of values), the case record with notes, documents and history, the
+      team and fulfilment unit queues with reassign, escalate, resolve and return, SLA ageing with reminders, linked
+      follow-up cases, the case dashboard and the case reports; log a case from the Servicing View.
+    size: Large
+  - id: G02
+    brd: BRD-08
+    frs: [FR-EB-010, FR-EB-011, FR-EB-012, FR-EB-013, FR-EB-014, FR-EB-015, FR-EB-045, FR-EB-056]
+    result: Not testable yet
+    gap: The insurer and client HR portal is outside Drop 2 (Employee Benefits without the portal feature).
+    impact: Insurers and client HR send proposals, confirmations, member changes and billing by e-mail; the EB officer
+      records them in BIBS. Steps P1.2 to P1.4, P3.1 and P3.3 of the walkthrough script are blocked.
+    proposal: >-
+      Deliver the portal in the drop agreed with BDOI: external users provisioned through User Access requests,
+      the task inbox and structured proposal form for insurers, the client HR pages, and the staging and review of
+      portal uploads; until then the officer keys in what is received by e-mail.
+    size: Large
+  - id: G03
+    brd: BRD-00
+    frs_text: "Reports BCL-OUTSTANDING-PAST-DUE, EB-PLACEMENT, RNW-RA-DISPATCH, ADJ-VALIDATION-LIST, ADJ-MINBAL-FILE,
+      FIN-AR-SOO-FC, FIN-BRS-PAYNOTIFY, FIN-GL-ALLOCJV, PRC-LEGACY-CHANGES, TAX-MAP, TAX-QAP, TAX-SLS,
+      MIG-TRUEUP-REGISTER, MIG-TRUEUP-RECON"
+    gap: 14 standard reports still return no row on a fresh SIT/UAT environment until the walkthroughs have created
+      their records.
+    impact: UAT checks these reports after the walkthrough steps that create their records (or on a later day for the
+      past-due claims), not on day one.
+    proposal: >-
+      Add the records through the business services of the SIT/UAT data loader (posted adjustments with an
+      accounting entry, a minimal-balance invoice between PHP 10 and 100, foreign-currency receivables, bank
+      payment notifications, allocation journals, legacy invoice changes, withholding and VAT postings for the
+      tax returns, renewal advices dispatched, an EB placement with its confirmation, and a claim reported 90 days
+      before the seed date); the two reports of the opening-balance adjustments fill after the FY2027 cut-off.
+    size: Medium
+  - id: G04
+    brd: BRD-00
+    frs: [FR-CR-043]
+    gap: Reports cannot be scheduled or subscribed to; they are run on demand and saved in the report archive.
+    impact: Recurring reports (daily, weekly, month-end) are run by hand by their users.
+    proposal: >-
+      Add Schedule on the report runner for a saved variant (daily, weekly on chosen days, monthly on a chosen day or
+      the last working day, time in Philippine time, formats, BIBS users and allowed e-mail recipients) and My
+      Subscriptions under Reports; a scheduled job runs the variant with the owner's access, stores the file in the
+      report archive and e-mails it, password protected when the report is confidential.
+    size: Medium
+  - id: G05
+    brd: BRD-00
+    frs: [FR-CR-031]
+    gap: There is no master data change log with the old and new value of each changed field; the audit trail
+      records the action and the access change log covers users and roles only.
+    impact: A reviewer cannot see field by field what changed on a product, insurer, commission rate, list of values,
+      account of the chart, payee or parameter.
+    proposal: >-
+      Record each approved change of the registered master data field by field (old value, new value, maker,
+      approver, time, approval reference) through the common maker-checker of the set-up screens, and add the
+      Master Data Change Log screen under Setup & Administration with filters by data, record, user and date and an
+      export.
+    size: Medium
+  - id: G06
+    brd: BRD-00
+    frs: [FR-CR-042, FR-CR-062]
+    gap: The report runner offers the choice and order of columns and the filters, but no grouping, subtotals or
+      chart, and there is no catalogue of MIS fields.
+    impact: Users regroup and chart report exports in Excel.
+    proposal: >-
+      Add the MIS Fields set-up screen (business label, data type, list of values per core entity, delivered with
+      the fields of BR-173 and the MIS columns of the Report List) and a Layout panel on the report runner (one or two
+      grouping fields, subtotals and counts, one bar or line chart) saved with the variant and applied to the screen,
+      Excel and PDF.
+    size: Large
+  - id: G07
+    brd: BRD-00
+    frs: [FR-CR-010]
+    result: Partly conformant
+    gap: The role home pages and their widgets are in place, but the System Administrator cannot maintain the widgets
+      of a role (Role Home Set-up).
+    impact: A change of the widgets of a role needs a release.
+    proposal: Add Role Home Set-up under Setup & Administration to choose and order the widgets of each role, with
+      approval.
+    size: Small
+  - id: G08
+    brd: BRD-00
+    frs: [FR-CR-061]
+    result: Partly conformant
+    gap: The insurer page shows the profile, the branches with their LGT rates and the commission rates; the
+      contacts, the payment terms and remittance schedule per remittance type, the risk participation (CRQ08) and the
+      read-only views of the products and packages and of the GL and sub-ledger accounts are not on it.
+    impact: The insurer's contacts and payment terms are kept outside BIBS.
+    proposal: Add the Contacts, Payment Terms and Remittance, Products and Packages and Accounts sections to the
+      insurer page with the catalog maker-checker; add Risk Participation when BDOI confirms CRQ08.
+    size: Medium
+  - id: G09
+    brd: BRD-00
+    frs: [FR-CR-081]
+    gap: Service invoices are e-mailed to the insurer one by one; there is no daily batch per insurer with its
+      delivery report.
+    impact: Insurers receive many e-mails a day instead of one batch.
+    proposal: >-
+      Add the daily job (after booking closes, 20:00 by default) that makes one batch of the day's service invoices
+      per insurer (merged PDF or ZIP with a manifest), stores it, sends it through the insurer's channel (e-mail;
+      file transfer when BDOI supplies the addresses, CRQ18) and lists each batch in a delivery report.
+    size: Medium
+  - id: G10
+    brd: BRD-00
+    frs: [FR-CR-090]
+    result: Partly conformant
+    gap: The invoice ledger of Operations does not yet show the cover number, version number, Marketing and Processing
+      assignees, placement status, approval dates and cancellation status of the Invoice Master List.
+    impact: Users open the account to see these values.
+    proposal: Add the columns to the invoice ledger (hidden by default, chosen with Columns) and a link to the audit
+      trail of the invoice.
+    size: Small
+  - id: G11
+    brd: BRD-12
+    frs: [FR-SP-003]
+    result: Partly conformant
+    gap: A policy cannot be created or edited by hand on the screens; the Masterlist has no New Policy and the policy
+      record no Edit, although the platform accepts and checks such records. The renewal tag can be set by hand.
+    impact: Step P1.2 of the walkthrough script cannot be done; a Non-CBG Corporate policy outside the bank files is
+      kept outside BIBS until it is loaded by upload.
+    proposal: Add New Policy on the Masterlist and Edit on the policy record (segment, business type, loan, assured,
+      terms, risk, marks and tracking), with the validations of the upload and the history of the changed fields.
+    size: Medium
+  - id: G12
+    brd: BRD-12
+    frs: [FR-SP-082]
+    result: Partly conformant
+    gap: Submitted Policies Setup has no Notification Recipients; the events notify the assigned handler only.
+    impact: Step P4.4 of the walkthrough script cannot be done; the bank counterpart and named users are informed
+      by e-mail outside BIBS.
+    proposal: Add the Notification Recipients tab (per event type and segment - roles, named users, the assigned
+      handler or AO, outside e-mail addresses of the bank counterpart) with approval, read by the notification of each
+      lifecycle event.
+    size: Small
+  - id: G13
+    brd: BRD-07
+    frs_text: FR-CM-055 (claims worklist, reassignment)
+    gap: When a Team Lead reassigns claims, the handler who receives them gets no notice in the bell in the
+      automated check of the claims worklist.
+    impact: A handler may not notice claims reassigned to him until he opens his worklist, which lists them.
+    proposal: Confirm the in-app notice of the event Claim assigned for the new handler (the default setting of
+      the event and the handler's notification preferences) and correct it if it is not sent.
+    size: Small
+frs_corrections:
+  - id: C01
+    brd: BRD-07
+    where: Storyboard step P2.2 (process walkthrough)
+    current: "Claim record (Update Status)"
+    proposed: "Claim record (Change Status)"
+    reason: The action on the claim record is Change Status, as FR-CM-041 and FR-CM-042 of the same FRS already name it.
+  - id: C02
+    brd: BRD-12
+    where: Storyboard step P1.4; FR-SP-035 (screens)
+    current: "Upload & Intake (Loan Files)"
+    proposed: "Upload & Intake (Upload Loan File, for the LAMD, LMS or LAD report)"
+    reason: The action on Upload & Intake is Upload Loan File, with the loan report chosen in it.
+  - id: C03
+    brd: BRD-12
+    where: Storyboard step P3.5; FR-SP-063 (screens)
+    current: "Renewal Work List (Insurer Not Accepted; Re-assign Insurer)"
+    proposed: "Renewal Work List (Pending tab); policy record, Renewal tab (Re-assign Insurer while the hold cover is not accepted)"
+    reason: The Renewal Work List has the tabs All, With Renewal, Pending and Refused; Re-assign Insurer is on the
+      Renewal tab of the policy record while the insurer has not accepted the hold cover.
+  - id: C04
+    brd: BRD-11
+    where: Menu by persona (sign-off workbook and FRS), personas Processing (Employee Benefits) and its supervisor
+    current: Only the Employee Benefits screens and the shared screens are listed.
+    proposed: Also list the Processing screens these personas see (accounts, placement, e-policy, booking, billing and
+      the collection work screens), as the persona table of FRS BRD-8 states.
+    reason: The EB processing roles hold the Processing permissions to book EB accounts; the sidebar shown at sign-in
+      has these screens.

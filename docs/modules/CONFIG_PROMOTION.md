@@ -13,11 +13,14 @@ approval screen Configuration Uploads (opened from My Approvals). API: `/api/v1/
 ## 1. Purpose
 
 - The configuration of an environment is described by a **configuration catalogue**
-  (`backend/src/main/resources/configpromo/catalogue.yml`): 152 datasets in 16 groups, each with its table, its
+  (`backend/src/main/resources/configpromo/catalogue.yml`): 153 datasets in 16 groups, each with its table, its
   natural key, the datasets it refers to and what each environment keeps for itself. Every other table of the schema
   is classified as never promoted, with its reason (421 tables: transactions, client data, logs, secrets, running
   numbers, files, environment state, planning figures, watchlist contents and the module's own records). A build test
   (`ConfigCatalogueSchemaIT`) fails when a table is neither a dataset nor classified, so a new table is always placed.
+- One table may hold two datasets when each names its rows (`rows`): the **standard report variants** of the Report
+  Centre (V2610, and the shared Claims variants marked standard by V2620) are configuration in the Reports group and
+  are promoted by default; the variants the users saved for themselves stay user records, promoted only with users.
 - An **export** writes the datasets into a signed, versioned **package**. An **import** verifies the package, checks
   it against the target environment, compares it in a **dry run**, waits for the **approval of a second user** and
   applies it in one database transaction, after keeping a **snapshot** of the configuration it changes.
@@ -177,6 +180,10 @@ or rejects it.
 | UA-05 Parameters | Administration > System Parameters | `SYSTEM_PARAMETER_MANAGE` | `SECURITY_PARAMETER_APPROVE` |
 | UA-06 Lists of values | Broking Setup > Lists of Values | `LOV_MANAGE` | `MASTER_AUTHORIZE` |
 | MD-01 Business partners | Setup > Business Partners | `MASTER_MAINTAIN` | `MASTER_AUTHORIZE` |
+| MD-02 Currencies | Setup > Currencies & Exchange Rates | `MASTER_MAINTAIN` | `MASTER_AUTHORIZE` |
+| MD-03 Exchange rates | Setup > Currencies & Exchange Rates | `MASTER_MAINTAIN` | `MASTER_AUTHORIZE` |
+| TX-01 Party tax profiles | Tax & Statutory > Party Tax Profiles | `TAX_MANAGE` | `MASTER_AUTHORIZE` |
+| TX-02 Tax forms | Tax & Statutory > Tax Codes & Forms | `TAX_MANAGE` | `MASTER_AUTHORIZE` |
 
 Rules of particular tabs:
 
@@ -185,6 +192,13 @@ Rules of particular tabs:
   a file filled on the workbook; the download of the current data holds them. D0-10 takes the final tax types (FWT,
   FINAL_VAT, PERCENTAGE_TAX); FWT needs its ATC like EWT.
 
+- MD-02 keeps the base currency of a company and the currency of an active bank account active. MD-03 takes the
+  SPOT, CLOSING, AVERAGE and BUDGET rates of a foreign currency (the book rates come from the closing rates on the
+  screen); its download of the current data holds the rates of the last 90 days and the rates dated later.
+- TX-01 follows the rules of Party Tax Profiles: last and first name for an individual, the default ATC a withholding
+  code of the payee class, a top withholding agent or government payor always a withholding agent, the certificate
+  validity when a certificate number is given. TX-02 tracks a form until its payment clears the tax payable when it
+  has a worksheet and a tax payable account; any other form is a reminder on the tax calendar.
 - Cells holding several values use semicolons (`50; Y`, `01-Jan-2028; 31-Dec-2028`); the cells of PM-06 and PM-10
   that hold several entries (coverages, insurers, insurer terms, products) take one entry per line of the cell.
 - D0-09 adds the legacy accounts to the draft of the code map `GL_ACCOUNT` of the Migration Console, approved there.

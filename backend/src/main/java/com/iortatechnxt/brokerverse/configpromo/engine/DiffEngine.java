@@ -68,8 +68,7 @@ public final class DiffEngine {
   }
 
   private static boolean isEnvironmentRow(DatasetModel m, CanonicalRow row) {
-    return m.dataset().environmentRows() != null
-        && m.dataset().environmentRows().matches(row.get(m.dataset().environmentRows().column()));
+    return m.dataset().leavesOut(row::get);
   }
 
   private static boolean listed(

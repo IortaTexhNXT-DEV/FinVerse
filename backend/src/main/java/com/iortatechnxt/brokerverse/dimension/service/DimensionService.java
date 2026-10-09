@@ -62,6 +62,21 @@ public class DimensionService {
   }
 
   /**
+   * Makes sure a value exists: creates it when the company has no value of the type with the code
+   * (an existing value is kept as it is, active or not).
+   *
+   * @param companyId company
+   * @param type type
+   * @param code code
+   * @param name name of a new value
+   */
+  public void ensure(Long companyId, DimensionType type, String code, String name) {
+    if (repository.findByCompanyIdAndTypeAndCode(companyId, type, code).isEmpty()) {
+      create(companyId, type, code, name);
+    }
+  }
+
+  /**
    * Activates or deactivates a value.
    *
    * @param id id

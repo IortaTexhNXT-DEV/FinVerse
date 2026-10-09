@@ -1,0 +1,5780 @@
+[
+ {
+  "brd": "BRD-00",
+  "walkthrough": "J1 Access and set-up",
+  "step": "J1.1",
+  "persona": "UAM requestor, approver, implementer",
+  "user": "requestor",
+  "users": "requestor, uamapprover, admin",
+  "action": "Enrol a new user and give the persona its menus (FRS BRD-11 walkthrough WT-A (A.1-A.8))",
+  "expected": "The user signs in and sees only the menus of the persona",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-00",
+  "walkthrough": "J1 Access and set-up",
+  "step": "J1.2",
+  "persona": "TSU Officer",
+  "user": "tsu",
+  "users": "tsu",
+  "action": "Capability 20 Product Maintenance: a new package from request to first quotation (FRS BRD-3 walkthrough WT-A)",
+  "expected": "Package released and used by New Business",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-00",
+  "walkthrough": "J1 Access and set-up",
+  "step": "J1.3",
+  "persona": "Business Administrator",
+  "user": "badmin",
+  "users": "badmin",
+  "action": "Capability 17 Data Management: lists of values, insurer record, MIS fields, change log (Lists of Values; insurer page (FR-CR-031, 060 to 062))",
+  "expected": "Master data maintained with approval and a change log",
+  "checks": [
+   {
+    "name": "Lists of Values",
+    "path": "/broking-setup/lists",
+    "list": null,
+    "items": []
+   },
+   {
+    "name": "insurer page",
+    "path": "/catalog/insurers/:id",
+    "list": "/catalog/insurers",
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-00",
+  "walkthrough": "J2 New business",
+  "step": "J2.1",
+  "persona": "Marketing AO",
+  "user": "ao",
+  "users": "ao",
+  "action": "Capability 1 Client Onboarding: prospect, KYC, verified client; sanction screening (FRS BRD-1 walkthrough WT-A (A.1-A.4); FRS BRD-10 storyboard P2)",
+  "expected": "Client confirmed and screened",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-00",
+  "walkthrough": "J2 New business",
+  "step": "J2.2",
+  "persona": "Marketing AO",
+  "user": "ao",
+  "users": "ao",
+  "action": "Capability 2 Quotation or Proposal: quotation approved and sent (FRS BRD-1 walkthrough WT-A (A.5-A.8))",
+  "expected": "Quotation accepted; accounts created",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-00",
+  "walkthrough": "J2 New business",
+  "step": "J2.3",
+  "persona": "TSU Officer",
+  "user": "tsu",
+  "users": "tsu",
+  "action": "Capability 4 Non-Package Management: PRF, quotation slip, insurer terms, proposal slip (FRS BRD-1 walkthrough WT-B (B.1-B.9))",
+  "expected": "Proposal accepted; account created with the chosen insurer",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-00",
+  "walkthrough": "J2 New business",
+  "step": "J2.4",
+  "persona": "Marketing AO",
+  "user": "ao",
+  "users": "ao",
+  "action": "Capability 3 Account Creation and Maintenance; submitted policies of the bank (FRS BRD-1 walkthrough WT-A (A.9-A.10); FRS BRD-12 storyboard P1)",
+  "expected": "Account validated for placement; submitted policies in the masterlist",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-00",
+  "walkthrough": "J2 New business",
+  "step": "J2.5",
+  "persona": "Processing Officer",
+  "user": "proc",
+  "users": "proc",
+  "action": "Capability 5 Placement and Booking: CLPC billing, placement, e-policy, booking (FRS BRD-1 walkthrough WT-A (A.11-A.17))",
+  "expected": "Account booked; invoice and GL entries created",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-00",
+  "walkthrough": "J2 New business",
+  "step": "J2.6",
+  "persona": "Processing Officer",
+  "user": "proc",
+  "users": "proc",
+  "action": "Returns and corrections across New Business (FRS BRD-1 walkthrough WT-C)",
+  "expected": "Returned records corrected and resubmitted",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-00",
+  "walkthrough": "J3 Money and accounting",
+  "step": "J3.1",
+  "persona": "Collection user and TL",
+  "user": "clxhandler",
+  "users": "clxhandler, clxtl",
+  "action": "Capability 7 Marketing Collection: worklist, promise to pay, unapplied payment, installment SOA (FRS BRD-4 walkthroughs WT-A to WT-E)",
+  "expected": "Receivables followed and collected",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-00",
+  "walkthrough": "J3 Money and accounting",
+  "step": "J3.2",
+  "persona": "Cashiering, Remittance, Prod Recon, Adjustment, Commission users",
+  "user": "cashier",
+  "users": "cashier, remit, recon, adjust, commrec",
+  "action": "Capabilities 9 and 10 Cashiering and Remittance: payment to the insurer's official receipt (FRS BRD-2 walkthrough WT-A)",
+  "expected": "Payment applied, receipted and remitted",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-00",
+  "walkthrough": "J3 Money and accounting",
+  "step": "J3.3",
+  "persona": "Cashiering, Remittance, Prod Recon, Adjustment, Commission users",
+  "user": "cashier",
+  "users": "cashier, remit, recon, adjust, commrec",
+  "action": "Capability 12 Adjustment / Cancellation: cancellation of a paid and remitted policy to the refund (FRS BRD-2 walkthrough WT-B)",
+  "expected": "Cancellation posted; refund paid",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-00",
+  "walkthrough": "J3 Money and accounting",
+  "step": "J3.4",
+  "persona": "Cashiering, Remittance, Prod Recon, Adjustment, Commission users",
+  "user": "cashier",
+  "users": "cashier, remit, recon, adjust, commrec",
+  "action": "Capabilities 11 and 13 Production Reconciliation and Commission Receivables (direct payment) (FRS BRD-2 walkthrough WT-C)",
+  "expected": "Production reconciled; DP commission collected",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-00",
+  "walkthrough": "J3 Money and accounting",
+  "step": "J3.5",
+  "persona": "FRBS, Disbursement, ACSL users",
+  "user": "glofficer",
+  "users": "glofficer, disb, acsl",
+  "action": "Capability 8 Accounting, GL, Disbursement and ACSL: accrual, refund, insurer SOA, month end (FRS BRD-5 walkthroughs WT-A to WT-E)",
+  "expected": "Books closed with reconciled subsidiary ledgers",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-00",
+  "walkthrough": "J4 Lifecycle services",
+  "step": "J4.1",
+  "persona": "Marketing AO",
+  "user": "ao",
+  "users": "ao",
+  "action": "Capability 6 Renewal (FRS BRD-6 storyboard (process flow))",
+  "expected": "Expiring policies renewed or closed with their letters",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-00",
+  "walkthrough": "J4 Lifecycle services",
+  "step": "J4.2",
+  "persona": "Claims Officer, Assistant, Unit Head",
+  "user": "clmofficer",
+  "users": "clmofficer, clmuh",
+  "action": "Capability 14 Claims: recording to settlement and closure (FRS BRD-7 storyboard P1 to P4)",
+  "expected": "Claim followed to settlement; insurer numbers and updates recorded",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-00",
+  "walkthrough": "J4 Lifecycle services",
+  "step": "J4.3",
+  "persona": "CSF Agent, Supervisor",
+  "user": "csfagent",
+  "users": "csfagent, csfsup",
+  "action": "Capability 16 Customer Service Facility: servicing contact and case management (FRS BRD-9 storyboard P1 and P2)",
+  "expected": "Caller served; inquiry logged as a case and closed",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-00",
+  "walkthrough": "J4 Lifecycle services",
+  "step": "J4.4",
+  "persona": "EB AO, Processing, Collection",
+  "user": "ebao",
+  "users": "ebao, ebproc, ebcoll",
+  "action": "Capability 19 Employee Benefits: programme to booking, billing and member changes (FRS BRD-8 storyboard P1 to P5)",
+  "expected": "Programme placed, booked and serviced",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-00",
+  "walkthrough": "J4 Lifecycle services",
+  "step": "J4.5",
+  "persona": "Compliance officer, investigator",
+  "user": "compoff",
+  "users": "compoff, investigator",
+  "action": "Sanction screening of clients (capability 1) (FRS BRD-10 storyboard P2 to P4)",
+  "expected": "Matches investigated and decided; STR filed where needed",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-00",
+  "walkthrough": "J5 Platform services",
+  "step": "J5.1",
+  "persona": "Marketing AO",
+  "user": "ao",
+  "users": "ao",
+  "action": "Role dashboards, notifications and audit (Home page of each persona (FR-CR-010); notifications (FR-CR-020))",
+  "expected": "Each role sees its work; approvals notified; every change logged",
+  "checks": [
+   {
+    "name": "Report FR-CR-010",
+    "path": "/reports/FR-CR-010",
+    "items": []
+   },
+   {
+    "name": "notifications",
+    "path": "/notifications",
+    "list": null,
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-00",
+  "walkthrough": "J5 Platform services",
+  "step": "J5.2",
+  "persona": "Business Administrator, System Administrator",
+  "user": "badmin",
+  "users": "badmin, admin",
+  "action": "Capability 21 Report Generation: standard, customised and scheduled reports (Report Centre (FR-CR-040 to 043))",
+  "expected": "Reports in Excel, PDF and Word, saved as variants and scheduled",
+  "checks": [
+   {
+    "name": "Report FR-CR-040",
+    "path": "/reports/FR-CR-040",
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-01",
+  "walkthrough": "WT-A Retail package policy from a new client to booking",
+  "step": "WT-A.1",
+  "persona": "Marketing AO",
+  "user": "ao",
+  "users": "ao",
+  "action": "Opens Clients \u203a New Client, enters the individual's identity, contact, address and segment, and clicks Save as prospect",
+  "expected": "The Prospect saved panel with the prospect code PR-yyyy-nnnnnn",
+  "checks": [],
+  "buttons": [
+   "Save"
+  ]
+ },
+ {
+  "brd": "BRD-01",
+  "walkthrough": "WT-A Retail package policy from a new client to booking",
+  "step": "WT-A.2",
+  "persona": "Marketing AO",
+  "user": "ao",
+  "users": "ao",
+  "action": "Opens the client, uploads the KYC form and a valid ID on the KYC & Documents tab and clicks Submit KYC",
+  "expected": "The checklist shows every document Uploaded; the workflow panel moves to KYC for verification",
+  "checks": [],
+  "buttons": [
+   "Submit KYC"
+  ]
+ },
+ {
+  "brd": "BRD-01",
+  "walkthrough": "WT-A Retail package policy from a new client to booking",
+  "step": "WT-A.3",
+  "persona": "Marketing TL / TH / UH",
+  "user": "mkttl",
+  "users": "mkttl",
+  "action": "Opens the client from My Work and clicks Verify KYC",
+  "expected": "Toast: <code>: KYC verified, next review <date>",
+  "checks": [],
+  "buttons": [
+   "Verify KYC"
+  ]
+ },
+ {
+  "brd": "BRD-01",
+  "walkthrough": "WT-A Retail package policy from a new client to booking",
+  "step": "WT-A.4",
+  "persona": "Marketing AO",
+  "user": "ao",
+  "users": "ao",
+  "action": "Clicks Confirm client",
+  "expected": "Toast: Client confirmed as CL-yyyy-nnnnnn; the client code appears in the header",
+  "checks": [],
+  "buttons": [
+   "Confirm"
+  ]
+ },
+ {
+  "brd": "BRD-01",
+  "walkthrough": "WT-A Retail package policy from a new client to booking",
+  "step": "WT-A.5",
+  "persona": "Marketing AO",
+  "user": "ao",
+  "users": "ao",
+  "action": "Clicks Generate Quotation, checks the market segment taken from the client, chooses PAR01, the insurer and its branch, adds the location with its sum insured, reviews the live premium and clicks Submit for Review",
+  "expected": "Toast: QT-yyyy-nnnnnn submitted for review; the quotation shows For review",
+  "checks": [],
+  "buttons": [
+   "Generate Quotation",
+   "Submit"
+  ]
+ },
+ {
+  "brd": "BRD-01",
+  "walkthrough": "WT-A Retail package policy from a new client to booking",
+  "step": "WT-A.6",
+  "persona": "Marketing TL / TH / UH",
+  "user": "mkttl",
+  "users": "mkttl",
+  "action": "Opens the quotation from the For Review tab and clicks Approve",
+  "expected": "Toast: Approve: QT-yyyy-nnnnnn is now approved",
+  "checks": [],
+  "buttons": [
+   "Approve"
+  ]
+ },
+ {
+  "brd": "BRD-01",
+  "walkthrough": "WT-A Retail package policy from a new client to booking",
+  "step": "WT-A.7",
+  "persona": "Marketing AO",
+  "user": "ao",
+  "users": "ao",
+  "action": "Clicks Send via Email, keeps the proposed e-mail and clicks Send",
+  "expected": "The quotation is Sent to client; the E-mails tab lists the quotation e-mail and the password e-mail",
+  "checks": [],
+  "buttons": [
+   "Send",
+   "Send"
+  ]
+ },
+ {
+  "brd": "BRD-01",
+  "walkthrough": "WT-A Retail package policy from a new client to booking",
+  "step": "WT-A.8",
+  "persona": "Marketing AO",
+  "user": "ao",
+  "users": "ao",
+  "action": "Clicks Record acceptance, uploads the client's reply and clicks Record Acceptance, then Create accounts",
+  "expected": "The quotation is Converted; the Control card lists the account ARN",
+  "checks": [],
+  "buttons": [
+   "Record",
+   "Record Acceptance"
+  ]
+ },
+ {
+  "brd": "BRD-01",
+  "walkthrough": "WT-A Retail package policy from a new client to booking",
+  "step": "WT-A.9",
+  "persona": "Marketing AO",
+  "user": "ao",
+  "users": "ao",
+  "action": "Opens the draft account, completes the mortgagee bank and PN number, reviews the completeness check and clicks Submit to Processing",
+  "expected": "Complete: the account can be submitted; toast ARN-yyyy-nnnnnn submitted to Processing",
+  "checks": [],
+  "buttons": [
+   "Submit"
+  ]
+ },
+ {
+  "brd": "BRD-01",
+  "walkthrough": "WT-A Retail package policy from a new client to booking",
+  "step": "WT-A.10",
+  "persona": "Processing",
+  "user": "proc",
+  "users": "proc",
+  "action": "Opens the account from My Work and clicks Validate",
+  "expected": "The account moves to Awaiting payment (CBG Fire) or Ready for placement (after the gate)",
+  "checks": [],
+  "buttons": [
+   "Validate"
+  ]
+ },
+ {
+  "brd": "BRD-01",
+  "walkthrough": "WT-A Retail package policy from a new client to booking",
+  "step": "WT-A.11",
+  "persona": "Processing",
+  "user": "proc",
+  "users": "proc",
+  "action": "Bills the account on CLPC Billing, downloads the file, uploads CLPC's payment report and confirms the matches",
+  "expected": "Payment Report: the line is Matched; Confirm Matches opens the payment gate",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-01",
+  "walkthrough": "WT-A Retail package policy from a new client to booking",
+  "step": "WT-A.12",
+  "persona": "Processing",
+  "user": "proc",
+  "users": "proc",
+  "action": "Selects the account on the Placement Workbench, clicks For Placement, then Generate Slips, then Send Slips",
+  "expected": "Generate Placement Slips shows every prerequisite valid; the result list shows the slip sent",
+  "checks": [],
+  "buttons": [
+   "For Placement"
+  ]
+ },
+ {
+  "brd": "BRD-01",
+  "walkthrough": "WT-A Retail package policy from a new client to booking",
+  "step": "WT-A.13",
+  "persona": "Processing",
+  "user": "proc",
+  "users": "proc",
+  "action": "Uploads the insurer's e-policy PDF with the ARN",
+  "expected": "Toast: <file> stored on ARN-yyyy-nnnnnn; the Extraction Review opens",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-01",
+  "walkthrough": "WT-A Retail package policy from a new client to booking",
+  "step": "WT-A.14",
+  "persona": "Processing",
+  "user": "proc",
+  "users": "proc",
+  "action": "Checks the extracted policy number against the account and clicks Confirm Policy",
+  "expected": "Policy <no> confirmed; the account is policy issued; the Insurance Advice is generated",
+  "checks": [],
+  "buttons": [
+   "Confirm Policy"
+  ]
+ },
+ {
+  "brd": "BRD-01",
+  "walkthrough": "WT-A Retail package policy from a new client to booking",
+  "step": "WT-A.15",
+  "persona": "E-policy Sender",
+  "user": "epol",
+  "users": "epol",
+  "action": "Sends the e-policy to the client from Ready to Dispatch",
+  "expected": "Toast: E-policy of ARN-yyyy-nnnnnn sent; the Dispatch Report shows it Queued, then Sent when the mail server has delivered it",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-01",
+  "walkthrough": "WT-A Retail package policy from a new client to booking",
+  "step": "WT-A.16",
+  "persona": "Processing",
+  "user": "proc",
+  "users": "proc",
+  "action": "Opens the account from Ready to Book, checks the invoice and the journal preview, and clicks Book Account",
+  "expected": "Toast: ARN-yyyy-nnnnnn booked as <invoice>; the Booked Invoice opens",
+  "checks": [],
+  "buttons": [
+   "Book Account"
+  ]
+ },
+ {
+  "brd": "BRD-01",
+  "walkthrough": "WT-A Retail package policy from a new client to booking",
+  "step": "WT-A.17",
+  "persona": "Processing",
+  "user": "proc",
+  "users": "proc",
+  "action": "Reviews the Journal and Open Items tabs of the booked invoice",
+  "expected": "The GL entry and the receivable from the client, the payable to the insurer and the commission",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-01",
+  "walkthrough": "WT-B Non-package commercial risk through a PRF with insurer quotations",
+  "step": "WT-B.1",
+  "persona": "Marketing AO",
+  "user": "ao",
+  "users": "ao",
+  "action": "Opens New Proposal Request, chooses the client and CAR00, describes the risk, adds the item, ticks three insurers, attaches the mandatory documents and clicks Submit for Approval",
+  "expected": "Toast: PRF-yyyy-nnnnnn submitted for Marketing approval",
+  "checks": [],
+  "buttons": [
+   "Submit"
+  ]
+ },
+ {
+  "brd": "BRD-01",
+  "walkthrough": "WT-B Non-package commercial risk through a PRF with insurer quotations",
+  "step": "WT-B.2",
+  "persona": "Marketing TL / TH / UH",
+  "user": "mkttl",
+  "users": "mkttl",
+  "action": "Opens the PRF and clicks Approve and send to TSU",
+  "expected": "The PRF is Received by TSU",
+  "checks": [],
+  "buttons": [
+   "Approve"
+  ]
+ },
+ {
+  "brd": "BRD-01",
+  "walkthrough": "WT-B Non-package commercial risk through a PRF with insurer quotations",
+  "step": "WT-B.3",
+  "persona": "TSU",
+  "user": "tsu",
+  "users": "tsu",
+  "action": "Claims the PRF on the TSU Workbench and opens it",
+  "expected": "Toast: PRF-yyyy-nnnnnn is now yours",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-01",
+  "walkthrough": "WT-B Non-package commercial risk through a PRF with insurer quotations",
+  "step": "WT-B.4",
+  "persona": "TSU",
+  "user": "tsu",
+  "users": "tsu",
+  "action": "Clicks Accept and Prepare Quotation Slip, confirms the insurers on the Quotation Slip tab and clicks Submit quotation slip with the reply date",
+  "expected": "The PRF is Quotation slip for approval with its QS number",
+  "checks": [],
+  "buttons": [
+   "Accept",
+   "Submit"
+  ]
+ },
+ {
+  "brd": "BRD-01",
+  "walkthrough": "WT-B Non-package commercial risk through a PRF with insurer quotations",
+  "step": "WT-B.5",
+  "persona": "TSU",
+  "user": "tsulead",
+  "users": "tsulead",
+  "action": "A second TSU officer clicks Approve and send to insurers",
+  "expected": "The PRF is Awaiting insurer terms; the E-mails tab lists one e-mail per insurer",
+  "checks": [],
+  "buttons": [
+   "Approve"
+  ]
+ },
+ {
+  "brd": "BRD-01",
+  "walkthrough": "WT-B Non-package commercial risk through a PRF with insurer quotations",
+  "step": "WT-B.6",
+  "persona": "TSU",
+  "user": "tsu",
+  "users": "tsu",
+  "action": "Keys in the terms of each insurer on the Insurer Responses tab (one declines), recommends the lowest premium and clicks Insurer terms complete",
+  "expected": "The responses and the Comparative Table with the lowest premium marked",
+  "checks": [],
+  "buttons": [
+   "Insurer"
+  ]
+ },
+ {
+  "brd": "BRD-01",
+  "walkthrough": "WT-B Non-package commercial risk through a PRF with insurer quotations",
+  "step": "WT-B.7",
+  "persona": "TSU",
+  "user": "tsu",
+  "users": "tsu, tsulead",
+  "action": "Clicks Submit proposal slip for the recommended insurer; a second TSU officer approves and releases it",
+  "expected": "The PRF is Proposal slip released to Marketing with its PS number",
+  "checks": [],
+  "buttons": [
+   "Submit"
+  ]
+ },
+ {
+  "brd": "BRD-01",
+  "walkthrough": "WT-B Non-package commercial risk through a PRF with insurer quotations",
+  "step": "WT-B.8",
+  "persona": "Marketing AO",
+  "user": "ao",
+  "users": "ao",
+  "action": "Clicks Send via Email to send the proposal slip and the comparative table to the client",
+  "expected": "The PRF is Sent to client",
+  "checks": [],
+  "buttons": [
+   "Send"
+  ]
+ },
+ {
+  "brd": "BRD-01",
+  "walkthrough": "WT-B Non-package commercial risk through a PRF with insurer quotations",
+  "step": "WT-B.9",
+  "persona": "Marketing AO",
+  "user": "ao",
+  "users": "ao",
+  "action": "Records the client's acceptance and clicks Create accounts",
+  "expected": "The PRF is Converted; the account is created in draft under the PRF's ARN with the chosen insurer's rate",
+  "checks": [],
+  "buttons": [
+   "Create"
+  ]
+ },
+ {
+  "brd": "BRD-01",
+  "walkthrough": "WT-C Returns for correction and the messages the user sees",
+  "step": "WT-C.1",
+  "persona": "Marketing AO",
+  "user": "ao",
+  "users": "ao",
+  "action": "Clicks Submit KYC on a prospect without the mandatory documents",
+  "expected": "Message: Upload the mandatory KYC documents before you submit the KYC: <documents>",
+  "checks": [],
+  "buttons": [
+   "Submit KYC"
+  ]
+ },
+ {
+  "brd": "BRD-01",
+  "walkthrough": "WT-C Returns for correction and the messages the user sees",
+  "step": "WT-C.2",
+  "persona": "Marketing TL / TH / UH",
+  "user": "mkttl",
+  "users": "mkttl",
+  "action": "Opens a client in KYC review and clicks Return To Account Officer, selects the reason and writes the comment",
+  "expected": "The client is back to Prospect; the Account Officer's bell shows the notice with the comment",
+  "checks": [],
+  "buttons": [
+   "Return To Account Officer"
+  ]
+ },
+ {
+  "brd": "BRD-01",
+  "walkthrough": "WT-C Returns for correction and the messages the user sees",
+  "step": "WT-C.3",
+  "persona": "Marketing TL / TH / UH",
+  "user": "mkttl",
+  "users": "mkttl",
+  "action": "Makes a quotation, submits it for review and then tries to approve it himself",
+  "expected": "Message: A quotation is approved by someone other than its maker",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-01",
+  "walkthrough": "WT-C Returns for correction and the messages the user sees",
+  "step": "WT-C.4",
+  "persona": "Marketing TL / TH / UH",
+  "user": "mkttl",
+  "users": "mkttl",
+  "action": "Clicks Return To Maker on the quotation with the reason Rate or terms to be reviewed",
+  "expected": "The quotation is a Draft again; the History tab shows the reason and comment",
+  "checks": [],
+  "buttons": [
+   "Return To Maker"
+  ]
+ },
+ {
+  "brd": "BRD-01",
+  "walkthrough": "WT-C Returns for correction and the messages the user sees",
+  "step": "WT-C.5",
+  "persona": "Processing",
+  "user": "proc",
+  "users": "proc",
+  "action": "Clicks Validate on an account whose client is not confirmed (the Account Officer submitted it with the valid ID attached)",
+  "expected": "Message: Client <code> is not yet confirmed (onboarding and KYC incomplete)",
+  "checks": [],
+  "buttons": [
+   "Validate"
+  ]
+ },
+ {
+  "brd": "BRD-01",
+  "walkthrough": "WT-C Returns for correction and the messages the user sees",
+  "step": "WT-C.6",
+  "persona": "Processing",
+  "user": "proc",
+  "users": "proc",
+  "action": "Clicks Return To Marketing with the reason Missing supporting documents",
+  "expected": "The account is Returned to Marketing",
+  "checks": [],
+  "buttons": [
+   "Return To Marketing"
+  ]
+ },
+ {
+  "brd": "BRD-01",
+  "walkthrough": "WT-C Returns for correction and the messages the user sees",
+  "step": "WT-C.7",
+  "persona": "Marketing AO",
+  "user": "ao",
+  "users": "ao",
+  "action": "Opens the Returned to Me tab, opens the account, attaches the document and clicks Resubmit to Processing",
+  "expected": "Toast: ARN-yyyy-nnnnnn submitted to Processing",
+  "checks": [],
+  "buttons": [
+   "Resubmit"
+  ]
+ },
+ {
+  "brd": "BRD-01",
+  "walkthrough": "WT-C Returns for correction and the messages the user sees",
+  "step": "WT-C.8",
+  "persona": "Processing",
+  "user": "proc",
+  "users": "proc",
+  "action": "Records an insurer return on a placed account with the reason Additional insurer requirements",
+  "expected": "The account is Returned by insurer; the Insurer Returns tab lists the return",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-01",
+  "walkthrough": "WT-C Returns for correction and the messages the user sees",
+  "step": "WT-C.9",
+  "persona": "Processing",
+  "user": "proc",
+  "users": "proc",
+  "action": "Clicks Resubmit for Placement, then Generate Placement Slip, and sends the new slip from the Placement Slips tab",
+  "expected": "The account is back For placement; the slip is generated again as its next version (PL-yyyy-nnnnnn v2) and sent; the earlier version shows Superseded",
+  "checks": [],
+  "buttons": [
+   "Resubmit"
+  ]
+ },
+ {
+  "brd": "BRD-02",
+  "walkthrough": "WT-A A booked invoice from the client's payment to the insurer's official receipt",
+  "step": "WT-A.1",
+  "persona": "Processing (books the account",
+  "user": "proc",
+  "users": "proc",
+  "action": "Opens the account from Ready to Book, checks the invoice and the journal preview and clicks Book Account",
+  "expected": "The Booked Invoice with its invoice number; the invoice is copied into the Operations ledger",
+  "checks": [],
+  "buttons": [
+   "Book Account"
+  ]
+ },
+ {
+  "brd": "BRD-02",
+  "walkthrough": "WT-A A booked invoice from the client's payment to the insurer's official receipt",
+  "step": "WT-A.2",
+  "persona": "Cashier, HO (11) and branches (5)",
+  "user": "cashier",
+  "users": "cashier",
+  "action": "Searches the ARN on Invoice Search",
+  "expected": "The new invoice with its gross premium, outstanding premium, Unpaid and With Outstanding Balance",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-02",
+  "walkthrough": "WT-A A booked invoice from the client's payment to the insurer's official receipt",
+  "step": "WT-A.3",
+  "persona": "Cashier, HO (11) and branches (5)",
+  "user": "cashier",
+  "users": "cashier",
+  "action": "Opens Receive Payment, enters the ARN, the payor, the amount paid and the payment date, and checks the preview",
+  "expected": "Application Preview: Booked, the invoice with each component and the amount applied to it, Excess to Unapplied 0.00",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-02",
+  "walkthrough": "WT-A A booked invoice from the client's payment to the insurer's official receipt",
+  "step": "WT-A.4",
+  "persona": "Cashier, HO (11) and branches (5)",
+  "user": "cashier",
+  "users": "cashier",
+  "action": "Clicks Issue AR and Apply",
+  "expected": "Message: <AR> issued and applied to 1 invoice(s); the receipt opens with its application by component",
+  "checks": [],
+  "buttons": [
+   "Issue AR"
+  ]
+ },
+ {
+  "brd": "BRD-02",
+  "walkthrough": "WT-A A booked invoice from the client's payment to the insurer's official receipt",
+  "step": "WT-A.5",
+  "persona": "Remittance Processor (4)",
+  "user": "remit",
+  "users": "remit",
+  "action": "Enters the invoice number on Extraction and clicks Run Extraction, then opens the run",
+  "expected": "The run tags the invoice Extracted with its paid AR and the batch number",
+  "checks": [],
+  "buttons": [
+   "Run Extraction"
+  ]
+ },
+ {
+  "brd": "BRD-02",
+  "walkthrough": "WT-A A booked invoice from the client's payment to the insurer's official receipt",
+  "step": "WT-A.6",
+  "persona": "Remittance Processor (4)",
+  "user": "remit",
+  "users": "remit",
+  "action": "Opens the batch, checks the totals strip and the account, clicks Preview and Submit and submits the batch",
+  "expected": "The batch is For Approval; the history shows the submission",
+  "checks": [],
+  "buttons": [
+   "Preview"
+  ]
+ },
+ {
+  "brd": "BRD-02",
+  "walkthrough": "WT-A A booked invoice from the client's payment to the insurer's official receipt",
+  "step": "WT-A.7",
+  "persona": "Remittance TL / TH",
+  "user": "remittl",
+  "users": "remittl",
+  "action": "Opens the batch from For Approval and clicks Approve and Push",
+  "expected": "The batch is Approved - with Disbursement with its payment request and the commission OR",
+  "checks": [],
+  "buttons": [
+   "Approve"
+  ]
+ },
+ {
+  "brd": "BRD-02",
+  "walkthrough": "WT-A A booked invoice from the client's payment to the insurer's official receipt",
+  "step": "WT-A.8",
+  "persona": "Disbursement",
+  "user": "disb",
+  "users": "disb",
+  "action": "Acknowledges the payment request and assigns the DV number",
+  "expected": "The request is on the DV Assigned tab with its DV number",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-02",
+  "walkthrough": "WT-A A booked invoice from the client's payment to the insurer's official receipt",
+  "step": "WT-A.9",
+  "persona": "Remittance Processor (4)",
+  "user": "remit",
+  "users": "remit",
+  "action": "Uploads the insurer's schedule with its OR number and opens the upload run",
+  "expected": "Records Read 1, OR Matches Paid PR 1; the account shows the insurer OR as Matched",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-02",
+  "walkthrough": "WT-A A booked invoice from the client's payment to the insurer's official receipt",
+  "step": "WT-A.10",
+  "persona": "Remittance Processor (4)",
+  "user": "remit",
+  "users": "remit",
+  "action": "Opens Invoice 360 of the invoice, Remittances tab",
+  "expected": "Paid and Fully Remitted; the remittance batch of the invoice",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-02",
+  "walkthrough": "WT-B Cancellation of a paid and remitted policy, from the request to the refund",
+  "step": "WT-B.1",
+  "persona": "Marketing Collection (HO / branches)",
+  "user": "mktcoll",
+  "users": "mktcoll",
+  "action": "Opens New Request, searches the policy number and ticks the invoice",
+  "expected": "The booked invoice with its policy number, ARN, assured, insurer, payment and lock; the policy details of the invoice",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-02",
+  "walkthrough": "WT-B Cancellation of a paid and remitted policy, from the request to the refund",
+  "step": "WT-B.2",
+  "persona": "Marketing Collection (HO / branches)",
+  "user": "mktcoll",
+  "users": "mktcoll",
+  "action": "Chooses Financial \u2013 Change of Cover, Flat Cancellation, the reason, the effective date and the description, and clicks Recompute",
+  "expected": "Recompute & Submit: the premium and commission change, before and after per component and per insurer",
+  "checks": [],
+  "buttons": [
+   "Recompute"
+  ]
+ },
+ {
+  "brd": "BRD-02",
+  "walkthrough": "WT-B Cancellation of a paid and remitted policy, from the request to the refund",
+  "step": "WT-B.3",
+  "persona": "Marketing Collection (HO / branches)",
+  "user": "mktcoll",
+  "users": "mktcoll",
+  "action": "Clicks Submit for Validation",
+  "expected": "The request opens For Validation with the Policy No., ARN and Invoice chips; the invoice is locked by Adjustment",
+  "checks": [],
+  "buttons": [
+   "Submit"
+  ]
+ },
+ {
+  "brd": "BRD-02",
+  "walkthrough": "WT-B Cancellation of a paid and remitted policy, from the request to the refund",
+  "step": "WT-B.4",
+  "persona": "Adjustment Processor (6)",
+  "user": "adjust",
+  "users": "adjust",
+  "action": "Opens the request from the workbench and clicks Validate",
+  "expected": "The request is For Approval",
+  "checks": [],
+  "buttons": [
+   "Validate"
+  ]
+ },
+ {
+  "brd": "BRD-02",
+  "walkthrough": "WT-B Cancellation of a paid and remitted policy, from the request to the refund",
+  "step": "WT-B.5",
+  "persona": "Adjustment TL",
+  "user": "adjtl",
+  "users": "adjtl",
+  "action": "Opens the request and clicks Approve",
+  "expected": "The request is For Posting",
+  "checks": [],
+  "buttons": [
+   "Approve"
+  ]
+ },
+ {
+  "brd": "BRD-02",
+  "walkthrough": "WT-B Cancellation of a paid and remitted policy, from the request to the refund",
+  "step": "WT-B.6",
+  "persona": "Adjustment Processor (6)",
+  "user": "adjust",
+  "users": "adjust",
+  "action": "Ticks the request on Posting Batches and clicks Post Selected",
+  "expected": "The batch result: the request Posted",
+  "checks": [],
+  "buttons": [
+   "Post Selected"
+  ]
+ },
+ {
+  "brd": "BRD-02",
+  "walkthrough": "WT-B Cancellation of a paid and remitted policy, from the request to the refund",
+  "step": "WT-B.7",
+  "persona": "Adjustment Processor (6)",
+  "user": "adjust",
+  "users": "adjust",
+  "action": "Opens the Policy Transactions tab of the request and the journal of the last transaction",
+  "expected": "The original booking, the cancellation with its premium, taxes and commission change and gross premium 0.00 after it, the refund of the excess payment to the client, and the journal lines of the re-applied payment",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-02",
+  "walkthrough": "WT-B Cancellation of a paid and remitted policy, from the request to the refund",
+  "step": "WT-B.8",
+  "persona": "Cashier, HO (11) and branches (5)",
+  "user": "cashier",
+  "users": "cashier",
+  "action": "Opens the unapplied payment left by the re-application, assigns a refund to the client and submits it",
+  "expected": "The disposition is For Approval",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-02",
+  "walkthrough": "WT-B Cancellation of a paid and remitted policy, from the request to the refund",
+  "step": "WT-B.9",
+  "persona": "Cashiering TL / TH",
+  "user": "cashtl",
+  "users": "cashtl",
+  "action": "Opens the unapplied payment and clicks Approve",
+  "expected": "The disposition is Completed and the balance 0.00; the refund is sent to Disbursement",
+  "checks": [],
+  "buttons": [
+   "Approve"
+  ]
+ },
+ {
+  "brd": "BRD-02",
+  "walkthrough": "WT-B Cancellation of a paid and remitted policy, from the request to the refund",
+  "step": "WT-B.10",
+  "persona": "Disbursement",
+  "user": "disb",
+  "users": "disb",
+  "action": "Opens the Disbursement Queue",
+  "expected": "The refund request to the client in To Acknowledge",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-02",
+  "walkthrough": "WT-C Direct payment commission and the reconciliation of the insurer's production",
+  "step": "WT-C.1",
+  "persona": "Commission Handler / Processor",
+  "user": "commrec",
+  "users": "commrec",
+  "action": "Opens the billing, clicks Record Answers, marks the account Approved and saves",
+  "expected": "The billing is Approved by Insurer - to Collect",
+  "checks": [],
+  "buttons": [
+   "Record Answers"
+  ]
+ },
+ {
+  "brd": "BRD-02",
+  "walkthrough": "WT-C Direct payment commission and the reconciliation of the insurer's production",
+  "step": "WT-C.2",
+  "persona": "Commission Handler / Processor",
+  "user": "commrec",
+  "users": "commrec",
+  "action": "Clicks Record Collection with the collection date and the bank account",
+  "expected": "The billing is Closed - PR Reversed with the commission OR",
+  "checks": [],
+  "buttons": [
+   "Record Collection"
+  ]
+ },
+ {
+  "brd": "BRD-02",
+  "walkthrough": "WT-C Direct payment commission and the reconciliation of the insurer's production",
+  "step": "WT-C.3",
+  "persona": "Commission Handler / Processor",
+  "user": "commrec",
+  "users": "commrec",
+  "action": "Opens Invoice 360 of the direct payment invoice, Movements tab",
+  "expected": "The premium receivable reversal and the commission applied",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-02",
+  "walkthrough": "WT-C Direct payment commission and the reconciliation of the insurer's production",
+  "step": "WT-C.4",
+  "persona": "Production Reconciliation Handler (4)",
+  "user": "recon",
+  "users": "recon",
+  "action": "Opens the cycle, the With Discrepancy item, and records the company concerned, the disposition and the feedback",
+  "expected": "The item review with the BDOI and insurer values side by side and the gross premium difference",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-02",
+  "walkthrough": "WT-C Direct payment commission and the reconciliation of the insurer's production",
+  "step": "WT-C.5",
+  "persona": "Production Reconciliation Handler (4)",
+  "user": "recon",
+  "users": "recon",
+  "action": "Selects the insurer-only item and sets its disposition",
+  "expected": "The item Unmatched No Booking with its disposition",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-02",
+  "walkthrough": "WT-C Direct payment commission and the reconciliation of the insurer's production",
+  "step": "WT-C.6",
+  "persona": "Production Reconciliation Handler (4)",
+  "user": "recon",
+  "users": "recon",
+  "action": "Opens Unbooked Accounts",
+  "expected": "The policy the insurer reported, not booked by BDOI, with its disposition",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-02",
+  "walkthrough": "WT-D Controls and the messages the user sees",
+  "step": "WT-D.1",
+  "persona": "Marketing TL / UH",
+  "user": "mkttl",
+  "users": "mkttl",
+  "action": "Marketing Collection raises a hold on the invoice with its reason and hold-until date; the Marketing Team Leader opens it and clicks Approve hold",
+  "expected": "The hold is On Hold; the invoice is flagged On Hold and stays out of the extraction",
+  "checks": [],
+  "buttons": [
+   "Approve"
+  ]
+ },
+ {
+  "brd": "BRD-02",
+  "walkthrough": "WT-D Controls and the messages the user sees",
+  "step": "WT-D.2",
+  "persona": "Marketing Collection (HO / branches)",
+  "user": "mktcoll",
+  "users": "mktcoll",
+  "action": "Searches on New Request the invoice that is in the remittance batch for approval",
+  "expected": "The invoice reads Locked by Remittance and cannot be selected; a request on it is refused with the message Invoice <invoice> is locked by Remittance",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-02",
+  "walkthrough": "WT-D Controls and the messages the user sees",
+  "step": "WT-D.3",
+  "persona": "Cashier, HO (11) and branches (5)",
+  "user": "cashier",
+  "users": "cashier",
+  "action": "Opens a receipt, clicks Cancel Receipt, chooses the reason and submits the cancellation",
+  "expected": "The receipt shows the cancellation For Approval in its workflow header",
+  "checks": [],
+  "buttons": [
+   "Cancel Receipt"
+  ]
+ },
+ {
+  "brd": "BRD-02",
+  "walkthrough": "WT-D Controls and the messages the user sees",
+  "step": "WT-D.4",
+  "persona": "Cashiering TL / TH",
+  "user": "cashtl",
+  "users": "cashtl",
+  "action": "Opens the receipt and clicks Approve and Post",
+  "expected": "The receipt is Cancelled; its unapplied balance is closed",
+  "checks": [],
+  "buttons": [
+   "Approve"
+  ]
+ },
+ {
+  "brd": "BRD-02",
+  "walkthrough": "WT-D Controls and the messages the user sees",
+  "step": "WT-D.5",
+  "persona": "Remittance TL / TH",
+  "user": "remittl",
+  "users": "remittl",
+  "action": "Submits the batch in review for approval, then tries to approve it",
+  "expected": "Message: Batch <batch> must be approved by another user",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-03",
+  "walkthrough": "WT-A A new package from the request to its first New Business quotation",
+  "step": "WT-A.1",
+  "persona": "MBS",
+  "user": "mbs",
+  "users": "mbs",
+  "action": "Opens Coverages & Clauses \u203a Clause Library, clicks New Clause, enters the code FLEET_REPAIR, kind, line Motor, title, effective date and wording, and clicks Save for Authorization",
+  "expected": "Toast: Clause FLEET_REPAIR saved \u2013 pending authorization; the row shows Pending Authorization",
+  "checks": [],
+  "buttons": [
+   "New Clause",
+   "Save"
+  ]
+ },
+ {
+  "brd": "BRD-03",
+  "walkthrough": "WT-A A new package from the request to its first New Business quotation",
+  "step": "WT-A.2",
+  "persona": "Business Administrator",
+  "user": "badmin",
+  "users": "badmin",
+  "action": "Opens the Clause Library and clicks Authorize on FLEET_REPAIR",
+  "expected": "Toast: FLEET_REPAIR authorized; the status is Active",
+  "checks": [],
+  "buttons": [
+   "Authorize"
+  ]
+ },
+ {
+  "brd": "BRD-03",
+  "walkthrough": "WT-A A new package from the request to its first New Business quotation",
+  "step": "WT-A.3",
+  "persona": "Marketing AO",
+  "user": "ao",
+  "users": "ao",
+  "action": "Opens Package Requests \u203a New Package Request, chooses New package and Generic programme, enters Motor Fleet Plus, line Motor, cover type Comprehensive, reason New programme for a market segment, the segments, the requested coverages, rate 1.20%, minimum premium and package dates, ticks Mabuhay General Insurance Corp. and Luzon Assurance Co., and clicks Submit for Approval",
+  "expected": "Toast: PKR-yyyy-nnnnnn submitted for Marketing approval; the request opens in For Marketing approval",
+  "checks": [],
+  "buttons": [
+   "Submit"
+  ]
+ },
+ {
+  "brd": "BRD-03",
+  "walkthrough": "WT-A A new package from the request to its first New Business quotation",
+  "step": "WT-A.4",
+  "persona": "Marketing TL / TH / UH",
+  "user": "mkttl",
+  "users": "mkttl",
+  "action": "Opens the request from the For Approval tab and clicks Approve and send to TSU",
+  "expected": "The stage becomes For TSU review; the history lists the approval",
+  "checks": [],
+  "buttons": [
+   "Approve"
+  ]
+ },
+ {
+  "brd": "BRD-03",
+  "walkthrough": "WT-A A new package from the request to its first New Business quotation",
+  "step": "WT-A.5",
+  "persona": "TSU Team Lead",
+  "user": "tsulead",
+  "users": "tsulead",
+  "action": "Clicks Recommend for approval, writes the recommendation and clicks Recommend",
+  "expected": "The TSU recommendation shows on the Details tab; the stage becomes For TSU Head approval",
+  "checks": [],
+  "buttons": [
+   "Recommend",
+   "Recommend"
+  ]
+ },
+ {
+  "brd": "BRD-03",
+  "walkthrough": "WT-A A new package from the request to its first New Business quotation",
+  "step": "WT-A.6",
+  "persona": "TSU Team Head / Head",
+  "user": "tsuhead",
+  "users": "tsuhead",
+  "action": "Reads the recommendation and clicks Approve for negotiation",
+  "expected": "The stage becomes Insurer negotiation; round 1 is opened with the two target insurers",
+  "checks": [],
+  "buttons": [
+   "Approve"
+  ]
+ },
+ {
+  "brd": "BRD-03",
+  "walkthrough": "WT-A A new package from the request to its first New Business quotation",
+  "step": "WT-A.7",
+  "persona": "TSU Officer",
+  "user": "tsu",
+  "users": "tsu",
+  "action": "Opens the Negotiation tab, adds a note to the insurers and clicks Submit for Approval",
+  "expected": "Toast: PQS-yyyy-nnnnnn submitted for approval; round 1 shows For approval",
+  "checks": [],
+  "buttons": [
+   "Submit"
+  ]
+ },
+ {
+  "brd": "BRD-03",
+  "walkthrough": "WT-A A new package from the request to its first New Business quotation",
+  "step": "WT-A.8",
+  "persona": "TSU Team Lead",
+  "user": "tsulead",
+  "users": "tsulead",
+  "action": "Clicks Approve and Send on round 1",
+  "expected": "Toast: PQS-yyyy-nnnnnn sent to 2 insurer(s); both responses show Pending; the E-mails tab lists the slip and password e-mails",
+  "checks": [],
+  "buttons": [
+   "Approve"
+  ]
+ },
+ {
+  "brd": "BRD-03",
+  "walkthrough": "WT-A A new package from the request to its first New Business quotation",
+  "step": "WT-A.9",
+  "persona": "TSU Officer",
+  "user": "tsu",
+  "users": "tsu",
+  "action": "Clicks Key In for each insurer, enters the outcome, rate, minimum premium and deductibles, attaches the insurer's reply and clicks Save Terms",
+  "expected": "Toast: Terms of <insurer> saved; the responses show Approved with changes and Counter-proposal with their rates",
+  "checks": [],
+  "buttons": [
+   "Key In",
+   "Save Terms"
+  ]
+ },
+ {
+  "brd": "BRD-03",
+  "walkthrough": "WT-A A new package from the request to its first New Business quotation",
+  "step": "WT-A.10",
+  "persona": "TSU Officer",
+  "user": "tsu",
+  "users": "tsu",
+  "action": "Clicks Terms final, ticks the offer of Mabuhay General Insurance Corp. and clicks Make Terms Final",
+  "expected": "The stage becomes Negotiated terms review; the chosen insurer shows in the header",
+  "checks": [],
+  "buttons": [
+   "Terms",
+   "Make Terms Final"
+  ]
+ },
+ {
+  "brd": "BRD-03",
+  "walkthrough": "WT-A A new package from the request to its first New Business quotation",
+  "step": "WT-A.11",
+  "persona": "TSU Officer",
+  "user": "tsu",
+  "users": "tsu",
+  "action": "Opens the Comparative tab",
+  "expected": "The round 1 comparison with the Lowest rate tag and the current audit master in Stored outputs",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-03",
+  "walkthrough": "WT-A A new package from the request to its first New Business quotation",
+  "step": "WT-A.12",
+  "persona": "TSU Team Head / Head",
+  "user": "tsuhead",
+  "users": "tsuhead",
+  "action": "Clicks Proceed to requirements (generic package)",
+  "expected": "The stage becomes Requirements preparation",
+  "checks": [],
+  "buttons": [
+   "Proceed"
+  ]
+ },
+ {
+  "brd": "BRD-03",
+  "walkthrough": "WT-A A new package from the request to its first New Business quotation",
+  "step": "WT-A.13",
+  "persona": "TSU Officer",
+  "user": "tsu",
+  "users": "tsu",
+  "action": "Enters the computation basis, clicks Save Requirements, downloads the Package Slip, uploads the signed slip on the Documents tab as Package slip (signed), and clicks Submit requirements for ManCom sign-off",
+  "expected": "The checklist reads The requirements pack is complete.; the stage becomes For ManCom sign-off",
+  "checks": [],
+  "buttons": [
+   "Save Requirements",
+   "Submit"
+  ]
+ },
+ {
+  "brd": "BRD-03",
+  "walkthrough": "WT-A A new package from the request to its first New Business quotation",
+  "step": "WT-A.14",
+  "persona": "ManCom",
+  "user": "mancom",
+  "users": "mancom",
+  "action": "Reviews the proposed terms and clicks Sign off and send to MBS",
+  "expected": "ManCom decisions lists MC-PKR-yyyy-nnnnnn Signed; the slips show Locked; the stage becomes With MBS for set-up",
+  "checks": [],
+  "buttons": [
+   "Sign"
+  ]
+ },
+ {
+  "brd": "BRD-03",
+  "walkthrough": "WT-A A new package from the request to its first New Business quotation",
+  "step": "WT-A.15",
+  "persona": "MBS",
+  "user": "mbs",
+  "users": "mbs",
+  "action": "Clicks Set up package version, enters the risk code MTR30 and the product name, and clicks Set Up Version",
+  "expected": "Toast: Version 1 set up; the Set-up tab shows MTR30 version 1; the stage becomes Package version for validation",
+  "checks": [],
+  "buttons": [
+   "Set",
+   "Set Up Version"
+  ]
+ },
+ {
+  "brd": "BRD-03",
+  "walkthrough": "WT-A A new package from the request to its first New Business quotation",
+  "step": "WT-A.16",
+  "persona": "MBS",
+  "user": "mbs",
+  "users": "mbs",
+  "action": "Clicks Open Version Editor, adds the clause FLEET_REPAIR on the insurer terms, saves and clicks Submit for Validation",
+  "expected": "Toast: Version 1 submitted for validation; the version shows For validation",
+  "checks": [],
+  "buttons": [
+   "Open Version Editor",
+   "Submit"
+  ]
+ },
+ {
+  "brd": "BRD-03",
+  "walkthrough": "WT-A A new package from the request to its first New Business quotation",
+  "step": "WT-A.17",
+  "persona": "TSU Team Head / Head",
+  "user": "tsuhead",
+  "users": "tsuhead",
+  "action": "Opens the version from the Validation Queue, ticks the five checklist items and clicks Validate and Release",
+  "expected": "Toast: Version 1 released; the Validation card shows the result Passed, the validator, the date, the test premium and the checks with their figures",
+  "checks": [],
+  "buttons": [
+   "Validate"
+  ]
+ },
+ {
+  "brd": "BRD-03",
+  "walkthrough": "WT-A A new package from the request to its first New Business quotation",
+  "step": "WT-A.18",
+  "persona": "Business Administrator",
+  "user": "badmin",
+  "users": "badmin",
+  "action": "Opens Insurers \u203a Mabuhay General Insurance Corp., clicks Add rate, chooses MTR30, 15% from today and clicks Save for Authorization",
+  "expected": "Toast: Commission rate saved \u2013 pending authorization",
+  "checks": [],
+  "buttons": [
+   "Add",
+   "Save"
+  ]
+ },
+ {
+  "brd": "BRD-03",
+  "walkthrough": "WT-A A new package from the request to its first New Business quotation",
+  "step": "WT-A.19",
+  "persona": "New Business Approver",
+  "user": "approver",
+  "users": "approver",
+  "action": "Opens the insurer and clicks Authorize on the new commission rate",
+  "expected": "The rate for MTR30 shows Active",
+  "checks": [],
+  "buttons": [
+   "Authorize"
+  ]
+ },
+ {
+  "brd": "BRD-03",
+  "walkthrough": "WT-A A new package from the request to its first New Business quotation",
+  "step": "WT-A.20",
+  "persona": "TSU Officer",
+  "user": "tsu",
+  "users": "tsu",
+  "action": "Opens the Advisories tab of the released request, checks that both supporting documents are Attached and clicks Send Advisory",
+  "expected": "Toast: Advisory sent; the advisory shows Sent with the date; Marketing users receive the notice",
+  "checks": [],
+  "buttons": [
+   "Send Advisory"
+  ]
+ },
+ {
+  "brd": "BRD-03",
+  "walkthrough": "WT-A A new package from the request to its first New Business quotation",
+  "step": "WT-A.21",
+  "persona": "Marketing AO",
+  "user": "ao",
+  "users": "ao",
+  "action": "Opens Premium Calculator, chooses MTR30 and Mabuhay General Insurance Corp., enters a vehicle value and clicks Calculate",
+  "expected": "Priced on package version 1 (effective <date>, scheme rate 1.2%) with every charge and the commission",
+  "checks": [],
+  "buttons": [
+   "Calculate"
+  ]
+ },
+ {
+  "brd": "BRD-03",
+  "walkthrough": "WT-A A new package from the request to its first New Business quotation",
+  "step": "WT-A.22",
+  "persona": "Marketing AO",
+  "user": "ao",
+  "users": "ao",
+  "action": "Creates a New Business quotation of MTR30 for the seed client with an item rate of 1.10%, opens it and clicks Request Rate Exception with the reason",
+  "expected": "The rate scheme panel shows the exception pending approval",
+  "checks": [],
+  "buttons": [
+   "Request Rate Exception"
+  ]
+ },
+ {
+  "brd": "BRD-03",
+  "walkthrough": "WT-A A new package from the request to its first New Business quotation",
+  "step": "WT-A.23",
+  "persona": "New Business Approver",
+  "user": "approver",
+  "users": "approver",
+  "action": "Opens My Approvals, clicks the rate exception of the quotation, compares the requested rate with the scheme in force on the exception record, clicks Approve, writes the comment and confirms",
+  "expected": "Toast: Rate exception RSE-yyyy-nnnnnn approved; the record shows Approved with the approver, the date and the comment; the Account Officer receives the notice",
+  "checks": [],
+  "buttons": [
+   "Approve"
+  ]
+ },
+ {
+  "brd": "BRD-03",
+  "walkthrough": "WT-A A new package from the request to its first New Business quotation",
+  "step": "WT-A.24",
+  "persona": "Marketing AO",
+  "user": "ao",
+  "users": "ao",
+  "action": "Opens the quotation again after the approval",
+  "expected": "The Rate Exceptions table lists the exception Approved; the quotation can be submitted for review",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-03",
+  "walkthrough": "WT-B Returns and refusals, and the messages the user sees",
+  "step": "WT-B.1",
+  "persona": "Marketing AO",
+  "user": "ao",
+  "users": "ao",
+  "action": "Opens New Package Request and clicks Save Draft without the name, line and reason",
+  "expected": "Under the fields: Enter the package or programme name; Select the product line; Select the reason. Nothing is saved",
+  "checks": [],
+  "buttons": [
+   "Save Draft"
+  ]
+ },
+ {
+  "brd": "BRD-03",
+  "walkthrough": "WT-B Returns and refusals, and the messages the user sees",
+  "step": "WT-B.2",
+  "persona": "Marketing AO",
+  "user": "ao",
+  "users": "ao",
+  "action": "Completes the header only and clicks Submit for Approval",
+  "expected": "The hint Before submitting, complete the requested terms (coverages or sections); at least one target insurer; the package end date, and the refusal Complete the request: ... with its reference",
+  "checks": [],
+  "buttons": [
+   "Submit"
+  ]
+ },
+ {
+  "brd": "BRD-03",
+  "walkthrough": "WT-B Returns and refusals, and the messages the user sees",
+  "step": "WT-B.3",
+  "persona": "Marketing TL / TH / UH",
+  "user": "mkttl",
+  "users": "mkttl",
+  "action": "Creates and submits a request himself, then clicks Approve and send to TSU on it",
+  "expected": "A package request is approved by someone other than its maker",
+  "checks": [],
+  "buttons": [
+   "Approve"
+  ]
+ },
+ {
+  "brd": "BRD-03",
+  "walkthrough": "WT-B Returns and refusals, and the messages the user sees",
+  "step": "WT-B.4",
+  "persona": "TSU Team Lead",
+  "user": "tsulead",
+  "users": "tsulead",
+  "action": "Opens PKR-2026-900002 and clicks Return to requester, chooses the reason and writes what is missing",
+  "expected": "The stage becomes Draft request; the requester receives the workflow notice with the comment",
+  "checks": [],
+  "buttons": [
+   "Return"
+  ]
+ },
+ {
+  "brd": "BRD-03",
+  "walkthrough": "WT-B Returns and refusals, and the messages the user sees",
+  "step": "WT-B.5",
+  "persona": "TSU Team Lead",
+  "user": "tsulead",
+  "users": "tsulead",
+  "action": "Prepares and submits a slip himself, then clicks Approve and Send on it",
+  "expected": "The quotation slip is approved by a TL or a co-officer",
+  "checks": [],
+  "buttons": [
+   "Approve"
+  ]
+ },
+ {
+  "brd": "BRD-03",
+  "walkthrough": "WT-B Returns and refusals, and the messages the user sees",
+  "step": "WT-B.6",
+  "persona": "TSU Officer",
+  "user": "tsu",
+  "users": "tsu",
+  "action": "Opens PKR-2026-900003 and clicks Terms final while Luzon Assurance is still pending in round 2",
+  "expected": "Every insurer of round 2 needs an outcome before the terms are final (1 pending)",
+  "checks": [],
+  "buttons": [
+   "Terms"
+  ]
+ },
+ {
+  "brd": "BRD-03",
+  "walkthrough": "WT-B Returns and refusals, and the messages the user sees",
+  "step": "WT-B.7",
+  "persona": "ManCom",
+  "user": "mancom",
+  "users": "mancom",
+  "action": "Opens PKR-2026-900004 and clicks Return to TSU with the reason",
+  "expected": "The stage becomes Requirements preparation; ManCom decisions lists the return",
+  "checks": [],
+  "buttons": [
+   "Return"
+  ]
+ },
+ {
+  "brd": "BRD-03",
+  "walkthrough": "WT-B Returns and refusals, and the messages the user sees",
+  "step": "WT-B.8",
+  "persona": "TSU Officer",
+  "user": "tsu",
+  "users": "tsu",
+  "action": "Clicks Submit requirements for ManCom sign-off before uploading the signed package slip",
+  "expected": "The checklist lists the missing signed package slip; the refusal Complete the requirements: ...",
+  "checks": [],
+  "buttons": [
+   "Submit"
+  ]
+ },
+ {
+  "brd": "BRD-03",
+  "walkthrough": "WT-B Returns and refusals, and the messages the user sees",
+  "step": "WT-B.9",
+  "persona": "MBS",
+  "user": "mbs",
+  "users": "mbs",
+  "action": "Opens PKR-2026-900005 and clicks Return incomplete requirements to TSU with the reason",
+  "expected": "The stage becomes Requirements preparation",
+  "checks": [],
+  "buttons": [
+   "Return"
+  ]
+ },
+ {
+  "brd": "BRD-03",
+  "walkthrough": "WT-B Returns and refusals, and the messages the user sees",
+  "step": "WT-B.10",
+  "persona": "MBS",
+  "user": "mbs",
+  "users": "mbs",
+  "action": "Opens MTR12 version 2, clears the minimum premium and sets an effective date before today, then clicks Submit for Validation",
+  "expected": "Toast Correct the highlighted fields; under the fields Enter the minimum premium and The effective date cannot be before today",
+  "checks": [],
+  "buttons": [
+   "Submit"
+  ]
+ },
+ {
+  "brd": "BRD-03",
+  "walkthrough": "WT-B Returns and refusals, and the messages the user sees",
+  "step": "WT-B.11",
+  "persona": "TSU Team Head / Head",
+  "user": "tsuhead",
+  "users": "tsuhead",
+  "action": "Opens the submitted MTR12 version 2 and clicks Return to MBS with the reason",
+  "expected": "Toast: Version 2 returned to MBS",
+  "checks": [],
+  "buttons": [
+   "Return"
+  ]
+ },
+ {
+  "brd": "BRD-03",
+  "walkthrough": "WT-B Returns and refusals, and the messages the user sees",
+  "step": "WT-B.12",
+  "persona": "MBS",
+  "user": "mbs",
+  "users": "mbs",
+  "action": "Opens MTR12 version 2",
+  "expected": "The banner Returned by the validator: <reason> above the tabs; the draft can be corrected and submitted again",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-04",
+  "walkthrough": "WT-A A new outstanding account from the refresh of the worklist to the first collection effort",
+  "step": "WT-A.1",
+  "persona": "Section Head (Corporate / Retail)",
+  "user": "clxuh",
+  "users": "clxuh",
+  "action": "Clicks Refresh Worklist Now on Collections Setup",
+  "expected": "Message with the outcome of the refresh: the accounts listed and updated",
+  "checks": [],
+  "buttons": [
+   "Refresh Worklist Now"
+  ]
+ },
+ {
+  "brd": "BRD-04",
+  "walkthrough": "WT-A A new outstanding account from the refresh of the worklist to the first collection effort",
+  "step": "WT-A.2",
+  "persona": "Collection Handler",
+  "user": "clxhandler",
+  "users": "clxhandler",
+  "action": "Opens Collections Home",
+  "expected": "My Open Accounts counts the new account assigned to her by the rule; the open amounts by aging bracket",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-04",
+  "walkthrough": "WT-A A new outstanding account from the refresh of the worklist to the first collection effort",
+  "step": "WT-A.3",
+  "persona": "Collection Handler",
+  "user": "clxhandler",
+  "users": "clxhandler",
+  "action": "Opens the PR Worklist with Only mine ticked",
+  "expected": "The new invoice with the client, segment, booking date and aging, outstanding premium, her name as handler and no disposition yet",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-04",
+  "walkthrough": "WT-A A new outstanding account from the refresh of the worklist to the first collection effort",
+  "step": "WT-A.4",
+  "persona": "Collection Handler",
+  "user": "clxhandler",
+  "users": "clxhandler",
+  "action": "Opens the account and clicks Log Effort: Phone call to the client's finance officer",
+  "expected": "Message: Effort logged; the Summary tab shows the last effort",
+  "checks": [],
+  "buttons": [
+   "Log Effort"
+  ]
+ },
+ {
+  "brd": "BRD-04",
+  "walkthrough": "WT-B A promise to pay, the escalation of the account and its resolution",
+  "step": "WT-B.1",
+  "persona": "Collection Handler",
+  "user": "clxhandler",
+  "users": "clxhandler",
+  "action": "Clicks Record Promise and enters the invoice, the promised payment date in ten days and half of the outstanding",
+  "expected": "Promises Recorded: the promise of the invoice recorded; it is on Open Promises",
+  "checks": [],
+  "buttons": [
+   "Record Promise"
+  ]
+ },
+ {
+  "brd": "BRD-04",
+  "walkthrough": "WT-B A promise to pay, the escalation of the account and its resolution",
+  "step": "WT-B.2",
+  "persona": "Collection Handler",
+  "user": "clxhandler",
+  "users": "clxhandler",
+  "action": "Clicks Escalate Accounts and enters the invoice, Team Lead and the reason Credit term extension refused by the insurer",
+  "expected": "Escalation Results: one escalation raised for the account",
+  "checks": [],
+  "buttons": [
+   "Escalate Accounts"
+  ]
+ },
+ {
+  "brd": "BRD-04",
+  "walkthrough": "WT-B A promise to pay, the escalation of the account and its resolution",
+  "step": "WT-B.3",
+  "persona": "Collection Team Lead",
+  "user": "clxtl",
+  "users": "clxtl",
+  "action": "Opens the escalation from With Team Lead and clicks Acknowledge",
+  "expected": "The escalation is In action with the step in its history",
+  "checks": [],
+  "buttons": [
+   "Acknowledge"
+  ]
+ },
+ {
+  "brd": "BRD-04",
+  "walkthrough": "WT-B A promise to pay, the escalation of the account and its resolution",
+  "step": "WT-B.4",
+  "persona": "Collection Team Lead",
+  "user": "clxtl",
+  "users": "clxtl",
+  "action": "Clicks Resolve and gives the resolution",
+  "expected": "The escalation is Resolved with the resolution",
+  "checks": [],
+  "buttons": [
+   "Resolve"
+  ]
+ },
+ {
+  "brd": "BRD-04",
+  "walkthrough": "WT-B A promise to pay, the escalation of the account and its resolution",
+  "step": "WT-B.5",
+  "persona": "Authorizer of master data (escalation rules)",
+  "user": "checker",
+  "users": "checker",
+  "action": "Opens Escalation Rules and, from the row menu of CLX-AMOUNT-1M, authorizes the rule made by the Business Administrator",
+  "expected": "The rule is Active",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-04",
+  "walkthrough": "WT-C An unapplied payment applied to an invoice at the collector's request",
+  "step": "WT-C.1",
+  "persona": "Unapplied Payment Handler",
+  "user": "upphandler",
+  "users": "upphandler",
+  "action": "Selects the payment, clicks Request Application and enters the invoice number",
+  "expected": "Message: Disposition recorded; request sent to Cashiering",
+  "checks": [],
+  "buttons": [
+   "Request Application"
+  ]
+ },
+ {
+  "brd": "BRD-04",
+  "walkthrough": "WT-C An unapplied payment applied to an invoice at the collector's request",
+  "step": "WT-C.2",
+  "persona": "Unapplied Payment Handler",
+  "user": "upphandler",
+  "users": "upphandler",
+  "action": "Opens Requests to Cashiering",
+  "expected": "The request Sent with the Cashiering reference of the request",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-04",
+  "walkthrough": "WT-C An unapplied payment applied to an invoice at the collector's request",
+  "step": "WT-C.3",
+  "persona": "Operations Cashiering (Cashier)",
+  "user": "cashier",
+  "users": "cashier",
+  "action": "Opens Incoming Requests, selects the collector request and clicks Accept Request with Submit the disposition now",
+  "expected": "The request accepted; the application of the payment is processed at once",
+  "checks": [],
+  "buttons": [
+   "Accept Request"
+  ]
+ },
+ {
+  "brd": "BRD-04",
+  "walkthrough": "WT-C An unapplied payment applied to an invoice at the collector's request",
+  "step": "WT-C.4",
+  "persona": "Unapplied Payment Handler",
+  "user": "upphandler",
+  "users": "upphandler",
+  "action": "Opens the Executed tab of Requests to Cashiering",
+  "expected": "The request Applied with the Cashiering reference",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-04",
+  "walkthrough": "WT-C An unapplied payment applied to an invoice at the collector's request",
+  "step": "WT-C.5",
+  "persona": "Unapplied Payment Handler",
+  "user": "upphandler",
+  "users": "upphandler",
+  "action": "Opens the unapplied payment, History tab",
+  "expected": "The payment, the collector disposition, the request and its application, kept after the payment is applied",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-04",
+  "walkthrough": "WT-D An installment plan and the statement of account of its first cycle",
+  "step": "WT-D.1",
+  "persona": "Collection Handler",
+  "user": "clxhandler",
+  "users": "clxhandler",
+  "action": "Clicks New Installment Plan: installments of one invoice, the invoice, the first due date, 4 installments, Quarterly",
+  "expected": "Message: <plan> created with 4 installments; the plan opens with its installments",
+  "checks": [],
+  "buttons": [
+   "New Installment Plan"
+  ]
+ },
+ {
+  "brd": "BRD-04",
+  "walkthrough": "WT-D An installment plan and the statement of account of its first cycle",
+  "step": "WT-D.2",
+  "persona": "Operations Cashiering (Cashiering Team Leader / Head)",
+  "user": "cashtl",
+  "users": "cashtl",
+  "action": "Opens the plan, the row menu of cycle 1 and clicks Generate SOA, then the Statements of Account tab",
+  "expected": "Message: <SOA> generated; the statement of cycle 1 To Send",
+  "checks": [],
+  "buttons": [
+   "Generate SOA"
+  ]
+ },
+ {
+  "brd": "BRD-04",
+  "walkthrough": "WT-D An installment plan and the statement of account of its first cycle",
+  "step": "WT-D.3",
+  "persona": "Operations Cashiering (Cashiering Team Leader / Head)",
+  "user": "cashtl",
+  "users": "cashtl",
+  "action": "Opens the statement and clicks Send via Email",
+  "expected": "The e-mail with the client's address, the proposed subject and message and the protected attachment",
+  "checks": [],
+  "buttons": [
+   "Send"
+  ]
+ },
+ {
+  "brd": "BRD-04",
+  "walkthrough": "WT-D An installment plan and the statement of account of its first cycle",
+  "step": "WT-D.4",
+  "persona": "Operations Cashiering (Cashiering Team Leader / Head)",
+  "user": "cashtl",
+  "users": "cashtl",
+  "action": "Clicks Send",
+  "expected": "Message: <SOA> sent to <address>; the statement is Sent and E-mails Sent lists the e-mail; the Collection Handler sees it Sent on the plan",
+  "checks": [],
+  "buttons": [
+   "Send"
+  ]
+ },
+ {
+  "brd": "BRD-04",
+  "walkthrough": "WT-E Controls and the messages the user sees",
+  "step": "WT-E.1",
+  "persona": "Marketing AO",
+  "user": "ao",
+  "users": "ao",
+  "action": "The account officer records the disposition No / missing policy number on an account",
+  "expected": "The refusal: the disposition is reserved to other roles",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-04",
+  "walkthrough": "WT-E Controls and the messages the user sees",
+  "step": "WT-E.2",
+  "persona": "Collection Team Lead",
+  "user": "clxtl",
+  "users": "clxtl",
+  "action": "Opens the account the Collection Handler is working on",
+  "expected": "<name> is editing since <time>; Update Remarks, Log Effort and Record Disposition are not offered",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-04",
+  "walkthrough": "WT-E Controls and the messages the user sees",
+  "step": "WT-E.3",
+  "persona": "Collection Handler",
+  "user": "clxhandler",
+  "users": "clxhandler",
+  "action": "Records a promise of an amount above the outstanding of the account",
+  "expected": "Promises Recorded with the outcome of the invoice: the promised amount is above the outstanding",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-04",
+  "walkthrough": "WT-E Controls and the messages the user sees",
+  "step": "WT-E.4",
+  "persona": "Unapplied Payment Handler",
+  "user": "upphandler",
+  "users": "upphandler",
+  "action": "Requests the application of a payment to an invoice number in the wrong format",
+  "expected": "Under the field: The invoice number does not have the expected format",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-05",
+  "walkthrough": "WT-A A manual accrual from the voucher to its posting and automatic reversal",
+  "step": "WT-A.1",
+  "persona": "GL Officer (FRBS Processor)",
+  "user": "glofficer",
+  "users": "glofficer",
+  "action": "Enters an accrual on New Journal (value date today, Reverse on the first day of next month, a debit to the expense with its cost centre and a credit to accrued expenses), clicks Save & Submit and confirms",
+  "expected": "The journal with its batch number, Pending Approval, the lines and the automatic reversal date",
+  "checks": [],
+  "buttons": [
+   "Save"
+  ]
+ },
+ {
+  "brd": "BRD-05",
+  "walkthrough": "WT-A A manual accrual from the voucher to its posting and automatic reversal",
+  "step": "WT-A.2",
+  "persona": "GL Team Lead",
+  "user": "gltl",
+  "users": "gltl",
+  "action": "Selects the voucher on Journals, clicks Assign and chooses the GL Section Head",
+  "expected": "Message: 1 journal(s) assigned; Assigned To shows her name",
+  "checks": [],
+  "buttons": [
+   "Assign"
+  ]
+ },
+ {
+  "brd": "BRD-05",
+  "walkthrough": "WT-A A manual accrual from the voucher to its posting and automatic reversal",
+  "step": "WT-A.3",
+  "persona": "GL Team Head / Section Head",
+  "user": "glhead",
+  "users": "glhead",
+  "action": "Chooses Assigned to me, selects the voucher, clicks Post Selected and confirms",
+  "expected": "Message: 1 of 1 journal(s) posted; the voucher is Posted",
+  "checks": [],
+  "buttons": [
+   "Post Selected"
+  ]
+ },
+ {
+  "brd": "BRD-05",
+  "walkthrough": "WT-A A manual accrual from the voucher to its posting and automatic reversal",
+  "step": "WT-A.4",
+  "persona": "GL Team Head / Section Head",
+  "user": "glhead",
+  "users": "glhead",
+  "action": "Opens the journal",
+  "expected": "The posted voucher with Input by, Submitted by and Authorized by, and Automatic reversal on the first day of next month",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-05",
+  "walkthrough": "WT-A A manual accrual from the voucher to its posting and automatic reversal",
+  "step": "WT-A.5",
+  "persona": "GL Officer (FRBS Processor)",
+  "user": "glofficer",
+  "users": "glofficer",
+  "action": "Opens Account Inquiry for the expense account of the month",
+  "expected": "The accrual among the posted lines, with the running balance",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-05",
+  "walkthrough": "WT-B A client refund from the Refund Request Form to the payment",
+  "step": "WT-B.1",
+  "persona": "Marketing Processor (AO)",
+  "user": "mktao",
+  "users": "mktao",
+  "action": "Fills in New Refund Request (segment, reference, purpose, credit to the client's account) with one account to refund (AR number, client, assured, amount, reason Overpayment) and clicks Save Request",
+  "expected": "Message: <request> saved; the request opens in Draft with its account to refund",
+  "checks": [],
+  "buttons": [
+   "Save Request"
+  ]
+ },
+ {
+  "brd": "BRD-05",
+  "walkthrough": "WT-B A client refund from the Refund Request Form to the payment",
+  "step": "WT-B.2",
+  "persona": "Marketing Processor (AO)",
+  "user": "mktao",
+  "users": "mktao",
+  "action": "Clicks Submit for Review and confirms",
+  "expected": "The request For Review in the workflow header",
+  "checks": [],
+  "buttons": [
+   "Submit"
+  ]
+ },
+ {
+  "brd": "BRD-05",
+  "walkthrough": "WT-B A client refund from the Refund Request Form to the payment",
+  "step": "WT-B.3",
+  "persona": "Marketing Reviewer",
+  "user": "mktrev",
+  "users": "mktrev",
+  "action": "Opens the request and clicks Endorse for Approval",
+  "expected": "The request For Approval with the step in its history",
+  "checks": [],
+  "buttons": [
+   "Endorse"
+  ]
+ },
+ {
+  "brd": "BRD-05",
+  "walkthrough": "WT-B A client refund from the Refund Request Form to the payment",
+  "step": "WT-B.4",
+  "persona": "Marketing Approver",
+  "user": "mktappr",
+  "users": "mktappr",
+  "action": "Clicks Approve and Send",
+  "expected": "The request With Disbursement",
+  "checks": [],
+  "buttons": [
+   "Approve"
+  ]
+ },
+ {
+  "brd": "BRD-05",
+  "walkthrough": "WT-B A client refund from the Refund Request Form to the payment",
+  "step": "WT-B.5",
+  "persona": "Disbursement Processor",
+  "user": "disb",
+  "users": "disb",
+  "action": "Opens For Approval on the Disbursement Workbench",
+  "expected": "The voucher of the refund, created automatically from the request with the client as payee and routed straight to the approver",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-05",
+  "walkthrough": "WT-B A client refund from the Refund Request Form to the payment",
+  "step": "WT-B.6",
+  "persona": "Disbursement Processor",
+  "user": "disb",
+  "users": "disb",
+  "action": "Opens the voucher",
+  "expected": "The voucher For Approval: the client as payee, credit to account, the paying account, the net amount and the history that shows the automatic routing",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-05",
+  "walkthrough": "WT-B A client refund from the Refund Request Form to the payment",
+  "step": "WT-B.7",
+  "persona": "Disbursement Approver",
+  "user": "disbappr",
+  "users": "disbappr",
+  "action": "Clicks Approve and Post and confirms",
+  "expected": "The voucher Approved; the journal posted and the credit to account issued",
+  "checks": [],
+  "buttons": [
+   "Approve"
+  ]
+ },
+ {
+  "brd": "BRD-05",
+  "walkthrough": "WT-B A client refund from the Refund Request Form to the payment",
+  "step": "WT-B.8",
+  "persona": "Marketing Processor (AO)",
+  "user": "mktao",
+  "users": "mktao",
+  "action": "Opens the Disbursement tab of the request",
+  "expected": "The voucher number and its status in Disbursement",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-05",
+  "walkthrough": "WT-C An insurer's statement of account reconciled and a wrong posting corrected",
+  "step": "WT-C.1",
+  "persona": "ACSL Processor",
+  "user": "acsl",
+  "users": "acsl",
+  "action": "Clicks Upload SOA, chooses the insurer, the period and the statement file, and clicks Upload and Reconcile",
+  "expected": "Message: <upload>: n of n rows loaded; the upload is listed with its results",
+  "checks": [],
+  "buttons": [
+   "Upload SOA",
+   "Upload"
+  ]
+ },
+ {
+  "brd": "BRD-05",
+  "walkthrough": "WT-C An insurer's statement of account reconciled and a wrong posting corrected",
+  "step": "WT-C.2",
+  "persona": "ACSL Processor",
+  "user": "acsl",
+  "users": "acsl",
+  "action": "Opens the upload",
+  "expected": "The counts per result and the lines with their premium and balance variances",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-05",
+  "walkthrough": "WT-C An insurer's statement of account reconciled and a wrong posting corrected",
+  "step": "WT-C.3",
+  "persona": "ACSL Team Leader",
+  "user": "acsltl",
+  "users": "acsltl",
+  "action": "Clicks Open a Case: investigation of the invoice with a variance",
+  "expected": "Message: <case> opened; the case is Received",
+  "checks": [],
+  "buttons": [
+   "Open"
+  ]
+ },
+ {
+  "brd": "BRD-05",
+  "walkthrough": "WT-C An insurer's statement of account reconciled and a wrong posting corrected",
+  "step": "WT-C.4",
+  "persona": "ACSL Team Leader",
+  "user": "acsltl",
+  "users": "acsltl",
+  "action": "Opens the case and assigns it to the ACSL Processor",
+  "expected": "The case Assigned with the step in its history",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-05",
+  "walkthrough": "WT-C An insurer's statement of account reconciled and a wrong posting corrected",
+  "step": "WT-C.5",
+  "persona": "ACSL Processor",
+  "user": "acsl",
+  "users": "acsl",
+  "action": "Clicks Start Investigation, records the findings and clicks Raise Correction (posting to a wrong GL account)",
+  "expected": "The correction entry opens, raised from the case",
+  "checks": [],
+  "buttons": [
+   "Start Investigation",
+   "Raise Correction"
+  ]
+ },
+ {
+  "brd": "BRD-05",
+  "walkthrough": "WT-C An insurer's statement of account reconciled and a wrong posting corrected",
+  "step": "WT-C.6",
+  "persona": "ACSL Team Leader",
+  "user": "acsltl",
+  "users": "acsltl",
+  "action": "Assigns the correction to the ACSL Processor as its preparer",
+  "expected": "The correction in Draft",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-05",
+  "walkthrough": "WT-C An insurer's statement of account reconciled and a wrong posting corrected",
+  "step": "WT-C.7",
+  "persona": "ACSL Processor",
+  "user": "acsl",
+  "users": "acsl",
+  "action": "Picks the wrong line among the posted lines of the invoice family, clicks Correct with the right account, saves the lines and clicks Submit for Review",
+  "expected": "The correction For Review with its reversal and re-post lines",
+  "checks": [],
+  "buttons": [
+   "Correct",
+   "Submit"
+  ]
+ },
+ {
+  "brd": "BRD-05",
+  "walkthrough": "WT-C An insurer's statement of account reconciled and a wrong posting corrected",
+  "step": "WT-C.8",
+  "persona": "ACSL Team Leader",
+  "user": "acsltl",
+  "users": "acsltl",
+  "action": "Clicks Endorse for Approval",
+  "expected": "The correction For Approval",
+  "checks": [],
+  "buttons": [
+   "Endorse"
+  ]
+ },
+ {
+  "brd": "BRD-05",
+  "walkthrough": "WT-C An insurer's statement of account reconciled and a wrong posting corrected",
+  "step": "WT-C.9",
+  "persona": "ACSL Head (Approver)",
+  "user": "acslhead",
+  "users": "acslhead",
+  "action": "Clicks Approve and Post and confirms",
+  "expected": "The correction Posted with its journal",
+  "checks": [],
+  "buttons": [
+   "Approve"
+  ]
+ },
+ {
+  "brd": "BRD-05",
+  "walkthrough": "WT-D Month end: the revaluation rate, the revaluation, the GL close and the service fee",
+  "step": "WT-D.1",
+  "persona": "GL Team Head / Section Head",
+  "user": "glhead",
+  "users": "glhead",
+  "action": "Enters the month-end rate of USD for the previous month on Monthly revaluation rates and clicks Save Rate",
+  "expected": "The rate listed with the month end and her name",
+  "checks": [],
+  "buttons": [
+   "Save Rate"
+  ]
+ },
+ {
+  "brd": "BRD-05",
+  "walkthrough": "WT-D Month end: the revaluation rate, the revaluation, the GL close and the service fee",
+  "step": "WT-D.2",
+  "persona": "GL Team Lead",
+  "user": "gltl",
+  "users": "gltl",
+  "action": "Chooses the previous month, checks the preview and clicks Post revaluation",
+  "expected": "The revaluation run of the month with its journal and its reversal",
+  "checks": [],
+  "buttons": [
+   "Post"
+  ]
+ },
+ {
+  "brd": "BRD-05",
+  "walkthrough": "WT-D Month end: the revaluation rate, the revaluation, the GL close and the service fee",
+  "step": "WT-D.3",
+  "persona": "GL Team Lead",
+  "user": "gltl",
+  "users": "gltl",
+  "action": "Clicks Schedule Close for the previous month at the proposed date and time",
+  "expected": "Message: the close of the month scheduled; listed as Scheduled",
+  "checks": [],
+  "buttons": [
+   "Schedule Close"
+  ]
+ },
+ {
+  "brd": "BRD-05",
+  "walkthrough": "WT-D Month end: the revaluation rate, the revaluation, the GL close and the service fee",
+  "step": "WT-D.4",
+  "persona": "GL Team Lead",
+  "user": "gltl",
+  "users": "gltl",
+  "action": "Opens Broking Books Cut-Off",
+  "expected": "The broking books of each period with who closed them and when",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-05",
+  "walkthrough": "WT-D Month end: the revaluation rate, the revaluation, the GL close and the service fee",
+  "step": "WT-D.5",
+  "persona": "GL Officer (FRBS Processor)",
+  "user": "glofficer",
+  "users": "glofficer",
+  "action": "Opens the service-fee run of the month and tags a line Released with the date the recipient was credited",
+  "expected": "The line Released with its date",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-05",
+  "walkthrough": "WT-E Controls and the messages the user sees",
+  "step": "WT-E.1",
+  "persona": "GL Officer (FRBS Processor)",
+  "user": "glofficer",
+  "users": "glofficer",
+  "action": "Enters a voucher whose debit and credit differ",
+  "expected": "Under the lines: Difference with the amount; Save & Submit is not offered",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-05",
+  "walkthrough": "WT-E Controls and the messages the user sees",
+  "step": "WT-E.2",
+  "persona": "Marketing Processor (AO)",
+  "user": "mktao",
+  "users": "mktao",
+  "action": "Raises a refund with the AR of the refund of walkthrough B",
+  "expected": "The refusal: the AR is already refunded by the request named",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-05",
+  "walkthrough": "WT-E Controls and the messages the user sees",
+  "step": "WT-E.3",
+  "persona": "ACSL Processor",
+  "user": "acsl",
+  "users": "acsl",
+  "action": "Uploads the statement of walkthrough C again",
+  "expected": "The refusal: the file was already uploaded for the insurer as the upload named",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-05",
+  "walkthrough": "WT-E Controls and the messages the user sees",
+  "step": "WT-E.4",
+  "persona": "Disbursement Processor",
+  "user": "disb",
+  "users": "disb",
+  "action": "Encodes a payment request for a payee code that is not maintained",
+  "expected": "The request on the No Payee tab, waiting for its payee; a payee request is raised",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-06",
+  "walkthrough": "WT-A An expiring account from the Expiry List to the Team Leader's post",
+  "step": "WT-A.1",
+  "persona": "Marketing Team Leader",
+  "user": "mkttl",
+  "users": "mkttl",
+  "action": "Opens the Expiry List, tab Unassigned Disposition, ticks the renewal of Pacific Harbor Logistics Inc. and clicks Assign Disposition: Arnel Account Officer, then Assign and Push",
+  "expected": "Message: 1 assigned; the renewal leaves the tab",
+  "checks": [],
+  "buttons": [
+   "Assign Disposition"
+  ]
+ },
+ {
+  "brd": "BRD-06",
+  "walkthrough": "WT-A An expiring account from the Expiry List to the Team Leader's post",
+  "step": "WT-A.2",
+  "persona": "Marketing AO / Admin, Account Broker",
+  "user": "ao",
+  "users": "ao",
+  "action": "Opens My Dispositions",
+  "expected": "The renewal assigned to him with its expiry, the Review classification and the flags Outstanding and Claims",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-06",
+  "walkthrough": "WT-A An expiring account from the Expiry List to the Team Leader's post",
+  "step": "WT-A.3",
+  "persona": "Marketing AO / Admin, Account Broker",
+  "user": "ao",
+  "users": "ao",
+  "action": "Opens the renewal, tab Account History, and clicks View Account History",
+  "expected": "The payments of the expiring invoice and the open claim; the viewing is recorded",
+  "checks": [],
+  "buttons": [
+   "View Account History"
+  ]
+ },
+ {
+  "brd": "BRD-06",
+  "walkthrough": "WT-A An expiring account from the Expiry List to the Team Leader's post",
+  "step": "WT-A.4",
+  "persona": "Marketing AO / Admin, Account Broker",
+  "user": "ao",
+  "users": "ao",
+  "action": "Clicks Set Disposition: For Renewal with the remarks of the client's call, then Save",
+  "expected": "Message: Saved; the disposition For Renewal on the renewal",
+  "checks": [],
+  "buttons": [
+   "Set Disposition"
+  ]
+ },
+ {
+  "brd": "BRD-06",
+  "walkthrough": "WT-A An expiring account from the Expiry List to the Team Leader's post",
+  "step": "WT-A.5",
+  "persona": "Marketing AO / Admin, Account Broker",
+  "user": "ao",
+  "users": "ao",
+  "action": "Clicks Push",
+  "expected": "Message: Pushed to the Team Leader; the status Review in Progress",
+  "checks": [],
+  "buttons": [
+   "Push"
+  ]
+ },
+ {
+  "brd": "BRD-06",
+  "walkthrough": "WT-A An expiring account from the Expiry List to the Team Leader's post",
+  "step": "WT-A.6",
+  "persona": "Marketing Team Leader",
+  "user": "mkttl",
+  "users": "mkttl",
+  "action": "Opens TL Review, tab For Review, ticks the renewal and clicks Post, then confirms",
+  "expected": "The outcome: 1 refused, the renewal cannot be posted while the claims, endorsement and outstanding premium checks fail",
+  "checks": [],
+  "buttons": [
+   "Post"
+  ]
+ },
+ {
+  "brd": "BRD-06",
+  "walkthrough": "WT-A An expiring account from the Expiry List to the Team Leader's post",
+  "step": "WT-A.7",
+  "persona": "Marketing Team Leader",
+  "user": "mkttl",
+  "users": "mkttl",
+  "action": "Clicks Override: Outstanding balance, reason Approved by the Team Leader, with remarks (the open claim and the endorsement are overridden the same way)",
+  "expected": "Message: 1 overridden; the override kept in the History tab of the renewal",
+  "checks": [],
+  "buttons": [
+   "Override"
+  ]
+ },
+ {
+  "brd": "BRD-06",
+  "walkthrough": "WT-A An expiring account from the Expiry List to the Team Leader's post",
+  "step": "WT-A.8",
+  "persona": "Marketing Team Leader",
+  "user": "mkttl",
+  "users": "mkttl",
+  "action": "Clicks Post again and confirms",
+  "expected": "Message: 1 posted; the renewal moves to Processing",
+  "checks": [],
+  "buttons": [
+   "Post"
+  ]
+ },
+ {
+  "brd": "BRD-06",
+  "walkthrough": "WT-B Processing, the insurer's answer and the Renewal Advice",
+  "step": "WT-B.1",
+  "persona": "Processing Team Leader",
+  "user": "proctl",
+  "users": "proctl",
+  "action": "Opens the Processing Worklist, tab For Processing, ticks the renewal and clicks Assign PO: Paolo Processor, then Assign",
+  "expected": "Message: 1 assigned; the renewal In Processing",
+  "checks": [],
+  "buttons": [
+   "Assign PO"
+  ]
+ },
+ {
+  "brd": "BRD-06",
+  "walkthrough": "WT-B Processing, the insurer's answer and the Renewal Advice",
+  "step": "WT-B.2",
+  "persona": "Processing Officer / Broker",
+  "user": "proc",
+  "users": "proc",
+  "action": "Opens Insurer Batches, clicks New Batch with Luzon Assurance Co. and the expiry date of the renewal, then Create Batch, and opens the batch",
+  "expected": "The batch Draft with the renewal and the columns of the insurer extract",
+  "checks": [],
+  "buttons": [
+   "New Batch"
+  ]
+ },
+ {
+  "brd": "BRD-06",
+  "walkthrough": "WT-B Processing, the insurer's answer and the Renewal Advice",
+  "step": "WT-B.3",
+  "persona": "Processing Officer / Broker",
+  "user": "proc",
+  "users": "proc",
+  "action": "Clicks Send to Insurer and confirms",
+  "expected": "Message: Batch sent to the insurer; the batch Sent with its reply date",
+  "checks": [],
+  "buttons": [
+   "Send"
+  ]
+ },
+ {
+  "brd": "BRD-06",
+  "walkthrough": "WT-B Processing, the insurer's answer and the Renewal Advice",
+  "step": "WT-B.4",
+  "persona": "Processing Officer / Broker",
+  "user": "proc",
+  "users": "proc",
+  "action": "Opens the renewal and clicks Record Insurer Response: Renew as is with the insurer reference, then Record",
+  "expected": "Message: Saved; the renewal RA Ready",
+  "checks": [],
+  "buttons": [
+   "Record Insurer Response"
+  ]
+ },
+ {
+  "brd": "BRD-06",
+  "walkthrough": "WT-B Processing, the insurer's answer and the Renewal Advice",
+  "step": "WT-B.5",
+  "persona": "Marketing AO / Admin, Account Broker",
+  "user": "ao",
+  "users": "ao",
+  "action": "Opens Letters, tab RA Ready, ticks the renewal, clicks Generate RA: First notice, then Generate",
+  "expected": "Message: 1 generated; the renewal in RA Generated, locked on the Marketing side",
+  "checks": [],
+  "buttons": [
+   "Generate RA"
+  ]
+ },
+ {
+  "brd": "BRD-06",
+  "walkthrough": "WT-B Processing, the insurer's answer and the Renewal Advice",
+  "step": "WT-B.6",
+  "persona": "Marketing AO / Admin, Account Broker",
+  "user": "ao",
+  "users": "ao",
+  "action": "Opens the tab RA Generated, ticks the renewal, clicks Send and confirms",
+  "expected": "Message: 1 sent; the Renewal Advice e-mailed protected to the client",
+  "checks": [],
+  "buttons": [
+   "Send"
+  ]
+ },
+ {
+  "brd": "BRD-06",
+  "walkthrough": "WT-C The Contact Center follow-up and the client's acceptance",
+  "step": "WT-C.1",
+  "persona": "Contact Center user",
+  "user": "contactc",
+  "users": "contactc",
+  "action": "Opens Follow-ups, tab RA Sent",
+  "expected": "The renewal waiting for the client's reply",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-06",
+  "walkthrough": "WT-C The Contact Center follow-up and the client's acceptance",
+  "step": "WT-C.2",
+  "persona": "Contact Center user",
+  "user": "contactc",
+  "users": "contactc",
+  "action": "Opens the renewal and clicks Add Follow-up: Call, Client will renew, the next action date and the remarks, then Save",
+  "expected": "Message: Saved; the follow-up on the Remarks & Follow-ups tab",
+  "checks": [],
+  "buttons": [
+   "Add Follow-up"
+  ]
+ },
+ {
+  "brd": "BRD-06",
+  "walkthrough": "WT-C The Contact Center follow-up and the client's acceptance",
+  "step": "WT-C.3",
+  "persona": "Marketing AO / Admin, Account Broker",
+  "user": "ao",
+  "users": "ao",
+  "action": "Opens the renewal and clicks Record Acceptance: Payment with the payment reference, then Record",
+  "expected": "Message: Saved; the renewal For Placement and Booking",
+  "checks": [],
+  "buttons": [
+   "Record Acceptance"
+  ]
+ },
+ {
+  "brd": "BRD-06",
+  "walkthrough": "WT-C The Contact Center follow-up and the client's acceptance",
+  "step": "WT-C.4",
+  "persona": "Marketing AO / Admin, Account Broker",
+  "user": "ao",
+  "users": "ao",
+  "action": "Opens the tab Letters",
+  "expected": "The Renewal Advice in the e-mail queue to the client and the acceptance by payment",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-06",
+  "walkthrough": "WT-D Not for Renewal and the closing letter",
+  "step": "WT-D.1",
+  "persona": "Marketing AO / Admin, Account Broker",
+  "user": "ao",
+  "users": "ao",
+  "action": "Opens the renewal, views its account history, clicks Set Disposition: Not for Renewal, reason Loan fully paid, with remarks, then Save",
+  "expected": "Message: Saved; the disposition Not for Renewal with its reason",
+  "checks": [],
+  "buttons": [
+   "Set Disposition"
+  ]
+ },
+ {
+  "brd": "BRD-06",
+  "walkthrough": "WT-D Not for Renewal and the closing letter",
+  "step": "WT-D.2",
+  "persona": "Marketing Team Leader",
+  "user": "mkttl",
+  "users": "mkttl",
+  "action": "After the Account Officer's push, ticks the renewal on TL Review, clicks Post and confirms",
+  "expected": "Message: 1 posted; the renewal goes to the closing letters",
+  "checks": [],
+  "buttons": [
+   "Post"
+  ]
+ },
+ {
+  "brd": "BRD-06",
+  "walkthrough": "WT-D Not for Renewal and the closing letter",
+  "step": "WT-D.3",
+  "persona": "Marketing AO / Admin, Account Broker",
+  "user": "ao",
+  "users": "ao",
+  "action": "Opens Letters, tab NAL / NFR, ticks the renewal, clicks Send Letters and confirms",
+  "expected": "Message: 1 sent; the renewal is closed",
+  "checks": [],
+  "buttons": [
+   "Send Letters"
+  ]
+ },
+ {
+  "brd": "BRD-06",
+  "walkthrough": "WT-D Not for Renewal and the closing letter",
+  "step": "WT-D.4",
+  "persona": "Marketing AO / Admin, Account Broker",
+  "user": "ao",
+  "users": "ao",
+  "action": "Opens the renewal, tab Letters",
+  "expected": "The Not for Renewal Letter in the e-mail queue to the client",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-06",
+  "walkthrough": "WT-E A transfer to another unit, and the controls the user sees",
+  "step": "WT-E.1",
+  "persona": "Marketing Team Leader",
+  "user": "mkttl",
+  "users": "mkttl",
+  "action": "The Team Leader of Corporate Marketing Team 1 opens Transfers, tab Incoming, chooses Accept in the row action menu and confirms with remarks",
+  "expected": "Message: Transfer accepted; the renewal joins the Unassigned tab of the unit",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-06",
+  "walkthrough": "WT-E A transfer to another unit, and the controls the user sees",
+  "step": "WT-E.2",
+  "persona": "Marketing AO / Admin, Account Broker",
+  "user": "ao",
+  "users": "ao",
+  "action": "Aileen Account Officer gives a disposition on a renewal without opening its account history",
+  "expected": "Open the Account History before you give the disposition",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-06",
+  "walkthrough": "WT-E A transfer to another unit, and the controls the user sees",
+  "step": "WT-E.3",
+  "persona": "Marketing Team Leader",
+  "user": "mkttl",
+  "users": "mkttl",
+  "action": "Marites Marketing Lead transfers a renewal of her unit to CBG Metro Team 1, her own unit",
+  "expected": "The receiving unit must be another unit",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-07",
+  "walkthrough": "P1 Recording and notice of loss",
+  "step": "P1.1",
+  "persona": "Claims Officer / Claims Assistant",
+  "user": "clmofficer",
+  "users": "clmofficer",
+  "action": "Receives the notice of loss and looks up the cover (Cover Lookup)",
+  "expected": "Cover number, latest version, policy number, Marketing unit and branch shown read-only",
+  "checks": [
+   {
+    "name": "Cover Lookup",
+    "path": "/claims-handling/covers",
+    "list": null,
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-07",
+  "walkthrough": "P1 Recording and notice of loss",
+  "step": "P1.2",
+  "persona": "Claims Officer / Claims Assistant",
+  "user": "clmofficer",
+  "users": "clmofficer",
+  "action": "Records the claim with reported date, loss date, nature, locations and insurers (Record Claim)",
+  "expected": "Claim number; locations of the cover only; Multi-location and Multi-insurer flags",
+  "checks": [
+   {
+    "name": "Record Claim",
+    "path": "/claims-handling/new",
+    "list": null,
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-07",
+  "walkthrough": "P1 Recording and notice of loss",
+  "step": "P1.3",
+  "persona": "Claims Officer / Claims Assistant",
+  "user": "clmofficer",
+  "users": "clmofficer",
+  "action": "Checks the premium of the cover (Claim record (cover card))",
+  "expected": "PAID enables the authorization code; unpaid premium disables it",
+  "checks": [
+   {
+    "name": "Claim record",
+    "path": "/claims-handling/:id",
+    "list": "/claims-handling/worklist",
+    "items": [
+     "cover card"
+    ]
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-07",
+  "walkthrough": "P1 Recording and notice of loss",
+  "step": "P1.4",
+  "persona": "Claims Officer / Claims Assistant",
+  "user": "clmofficer",
+  "users": "clmofficer",
+  "action": "Sends the loss advice to the insurers (Claim record (Send Loss Advice); loss advice document)",
+  "expected": "One e-mail per insurer; the advice stored as claims report",
+  "checks": [
+   {
+    "name": "Claim record",
+    "path": "/claims-handling/:id",
+    "list": "/claims-handling/worklist",
+    "items": [
+     "Send Loss Advice"
+    ]
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-07",
+  "walkthrough": "P1 Recording and notice of loss",
+  "step": "P1.5",
+  "persona": "Claims Officer / Claims Assistant",
+  "user": "clmofficer",
+  "users": "clmofficer",
+  "action": "Records the insurer claim numbers and updates (Claim record (Insurers & Updates))",
+  "expected": "One number per insurer, no duplicate for the same insurer; updates in the timeline",
+  "checks": [
+   {
+    "name": "Claim record",
+    "path": "/claims-handling/:id",
+    "list": "/claims-handling/worklist",
+    "items": [
+     "Insurers & Updates"
+    ]
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-07",
+  "walkthrough": "P2 Handling and follow-up",
+  "step": "P2.1",
+  "persona": "Team Lead",
+  "user": "clmtl",
+  "users": "clmtl",
+  "action": "Assigns the adjuster and amends the insurer reserve (Claim record (Details, Reserve & Settlement))",
+  "expected": "Adjuster and reserve recorded with history",
+  "checks": [
+   {
+    "name": "Claim record",
+    "path": "/claims-handling/:id",
+    "list": "/claims-handling/worklist",
+    "items": [
+     "Details",
+     "Reserve & Settlement"
+    ]
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-07",
+  "walkthrough": "P2 Handling and follow-up",
+  "step": "P2.2",
+  "persona": "Claims Officer / Claims Assistant",
+  "user": "clmofficer",
+  "users": "clmofficer",
+  "action": "Updates the status within the role and unit matrix (Claim record (Update Status))",
+  "expected": "New status with age per status; not-allowed statuses are not offered",
+  "checks": [
+   {
+    "name": "Claim record",
+    "path": "/claims-handling/:id",
+    "list": "/claims-handling/worklist",
+    "items": [
+     "Update Status"
+    ]
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-07",
+  "walkthrough": "P2 Handling and follow-up",
+  "step": "P2.3",
+  "persona": "Claims Officer / Claims Assistant",
+  "user": "clmofficer",
+  "users": "clmofficer",
+  "action": "Sets the next follow-up date and action plan and writes diary entries (Claim record (Details, Diary); Follow-ups Due)",
+  "expected": "Follow-ups due listed; supervisors see overdue ones",
+  "checks": [
+   {
+    "name": "Claim record",
+    "path": "/claims-handling/:id",
+    "list": "/claims-handling/worklist",
+    "items": [
+     "Details",
+     "Diary"
+    ]
+   },
+   {
+    "name": "Follow-ups Due",
+    "path": "/renewal/followups",
+    "list": null,
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-07",
+  "walkthrough": "P2 Handling and follow-up",
+  "step": "P2.4",
+  "persona": "Team Lead",
+  "user": "clmtl",
+  "users": "clmtl",
+  "action": "Requests the premium remittance and confirms the special remittance (Claim record; Operations remittance)",
+  "expected": "Status With BDOI - For Premium Remittance; remittance confirmed",
+  "checks": [
+   {
+    "name": "Claim record",
+    "path": "/claims-handling/:id",
+    "list": "/claims-handling/worklist",
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-07",
+  "walkthrough": "P3 Settlement and closure",
+  "step": "P3.1",
+  "persona": "Team Lead",
+  "user": "clmtl",
+  "users": "clmtl",
+  "action": "Sets the requested type of settlement with amount, date and payment method (Claim record (Set Settlement))",
+  "expected": "Settled claim in the Settled Claims report",
+  "checks": [
+   {
+    "name": "Claim record",
+    "path": "/claims-handling/:id",
+    "list": "/claims-handling/worklist",
+    "items": [
+     "Set Settlement"
+    ]
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-07",
+  "walkthrough": "P3 Settlement and closure",
+  "step": "P3.2",
+  "persona": "Claims Officer / Claims Assistant",
+  "user": "clmofficer",
+  "users": "clmofficer",
+  "action": "Closes a claim temporarily for missing documents (Claim record)",
+  "expected": "Claim stays outstanding and can resume",
+  "checks": [
+   {
+    "name": "Claim record",
+    "path": "/claims-handling/:id",
+    "list": "/claims-handling/worklist",
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-07",
+  "walkthrough": "P3 Settlement and closure",
+  "step": "P3.3",
+  "persona": "Team Head",
+  "user": "clmth",
+  "users": "clmth",
+  "action": "Closes a claim permanently and reopens one with a reason (Claim record)",
+  "expected": "Closed claim read-only; reopen recorded",
+  "checks": [
+   {
+    "name": "Claim record",
+    "path": "/claims-handling/:id",
+    "list": "/claims-handling/worklist",
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-07",
+  "walkthrough": "P4 Monitoring and analytics",
+  "step": "P4.1",
+  "persona": "Claims Officer / Claims Assistant",
+  "user": "clmofficer",
+  "users": "clmofficer",
+  "action": "Opens the Claims home and the pending actions (Claims Home; Pending Actions)",
+  "expected": "Claims by age and status; pending actions per handler",
+  "checks": [
+   {
+    "name": "Claims Home",
+    "path": "/claims-handling",
+    "list": null,
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-07",
+  "walkthrough": "P4 Monitoring and analytics",
+  "step": "P4.2",
+  "persona": "Unit Head",
+  "user": "clmuh",
+  "users": "clmuh",
+  "action": "Runs the ageing, outstanding, settled, loss experience and loss ratio reports (Reports (Claims Handling))",
+  "expected": "Reports in Excel and PDF from the same data",
+  "checks": [
+   {
+    "name": "Reports",
+    "path": "/reports",
+    "list": null,
+    "items": [
+     "Claims Handling"
+    ]
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-07",
+  "walkthrough": "P4 Monitoring and analytics",
+  "step": "P4.3",
+  "persona": "Claims / Risk user",
+  "user": "clmrisk",
+  "users": "clmrisk",
+  "action": "Runs the claims-prone locations report and the data extract (Reports (BCL-PRONE-LOCATIONS, BCL-DATA-EXTRACT))",
+  "expected": "Locations flagged claims-prone; extract for analysis",
+  "checks": [
+   {
+    "name": "Report BCL-PRONE-LOCATIONS",
+    "path": "/reports/BCL-PRONE-LOCATIONS",
+    "items": []
+   },
+   {
+    "name": "Report BCL-DATA-EXTRACT",
+    "path": "/reports/BCL-DATA-EXTRACT",
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-07",
+  "walkthrough": "P4 Monitoring and analytics",
+  "step": "P4.4",
+  "persona": "Marketing user",
+  "user": "ao",
+  "users": "ao",
+  "action": "Views the loss experience and the claims ageing of a client (Reports; account page)",
+  "expected": "Read-only loss information; export only where the role allows",
+  "checks": [
+   {
+    "name": "Reports",
+    "path": "/reports",
+    "list": null,
+    "items": []
+   },
+   {
+    "name": "account page",
+    "path": "/accounts/:id",
+    "list": "/accounts",
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-07",
+  "walkthrough": "P4 Monitoring and analytics",
+  "step": "P4.5",
+  "persona": "Unit Head",
+  "user": "clmuh",
+  "users": "clmuh",
+  "action": "Reviews the insurer claim numbers and the activity log (Reports (BCL-INSURER-CLAIMS, BCL-ACTIVITY-LOG))",
+  "expected": "Every insurer number with its claim; every change with user and time",
+  "checks": [
+   {
+    "name": "Report BCL-INSURER-CLAIMS",
+    "path": "/reports/BCL-INSURER-CLAIMS",
+    "items": []
+   },
+   {
+    "name": "Report BCL-ACTIVITY-LOG",
+    "path": "/reports/BCL-ACTIVITY-LOG",
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-08",
+  "walkthrough": "P1 Programme start and portal access",
+  "step": "P1.1",
+  "persona": "Marketing AO (EB)",
+  "user": "ebao",
+  "users": "ebao",
+  "action": "Creates the client and the programme (new business) or receives the renewal due list (Clients; New Programme; Programmes (Renewal Due))",
+  "expected": "Programme with business type; renewal advice sent at the lead time",
+  "checks": [
+   {
+    "name": "Clients",
+    "path": "/crm/clients",
+    "list": null,
+    "items": []
+   },
+   {
+    "name": "New Programme",
+    "path": "/eb/programmes/new",
+    "list": null,
+    "items": []
+   },
+   {
+    "name": "Programmes",
+    "path": "/eb/programmes",
+    "list": null,
+    "items": [
+     "Renewal Due"
+    ]
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-08",
+  "walkthrough": "P1 Programme start and portal access",
+  "step": "P1.2",
+  "persona": "Business Administrator",
+  "user": "badmin",
+  "users": "badmin",
+  "action": "Approves the portal users of the insurer and the client (Portal user requests)",
+  "expected": "Insurer and client HR users can sign in to the portal",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-08",
+  "walkthrough": "P1 Programme start and portal access",
+  "step": "P1.3",
+  "persona": "Client HR user (partner portal)",
+  "user": "No",
+  "users": "No UAT sign-in",
+  "action": "Uploads the master list and utilization report and gives feedback (Portal - client HR)",
+  "expected": "Uploads waiting for review",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-08",
+  "walkthrough": "P1 Programme start and portal access",
+  "step": "P1.4",
+  "persona": "Marketing AO (EB)",
+  "user": "ebao",
+  "users": "ebao",
+  "action": "Reviews and approves the portal uploads (Portal Uploads queue)",
+  "expected": "Valid documents attached to the programme",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-08",
+  "walkthrough": "P2 Documents, BOR, franchise and TOR",
+  "step": "P2.1",
+  "persona": "Marketing AO (EB)",
+  "user": "ebao",
+  "users": "ebao",
+  "action": "Uploads the TOR, master list, utilization report and the signed BOR (Documents tab; BOR tab)",
+  "expected": "BOR attested; documents complete",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-08",
+  "walkthrough": "P2 Documents, BOR, franchise and TOR",
+  "step": "P2.2",
+  "persona": "Marketing AO (EB)",
+  "user": "ebao",
+  "users": "ebao",
+  "action": "Submits the franchise request; the insurer decides (Franchise tab; Portal - Franchise Requests)",
+  "expected": "Franchise approved or rejected; the client is advised",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-08",
+  "walkthrough": "P2 Documents, BOR, franchise and TOR",
+  "step": "P2.3",
+  "persona": "Marketing AO (EB)",
+  "user": "ebao",
+  "users": "ebao",
+  "action": "Distributes the TOR and requests proposals from the insurers (TOR and Insurer Requests tabs)",
+  "expected": "Requests sent to the incumbent and, when remarketing, other insurers",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-08",
+  "walkthrough": "P3 Proposals, comparative and client decision",
+  "step": "P3.1",
+  "persona": "Insurer user (partner portal)",
+  "user": "No",
+  "users": "No UAT sign-in",
+  "action": "Submits the proposal and updates it for client changes (Portal - Requests for Proposal)",
+  "expected": "Proposal versions received",
+  "checks": [
+   {
+    "name": "Portal - Requests for Proposal",
+    "path": "/proposals",
+    "list": null,
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-08",
+  "walkthrough": "P3 Proposals, comparative and client decision",
+  "step": "P3.2",
+  "persona": "Marketing TL / UH (EB)",
+  "user": "ebtl",
+  "users": "ebtl",
+  "action": "Signs the comparative of the validated proposals (Comparative page)",
+  "expected": "Comparative ready; approval above the threshold by BDOI Management",
+  "checks": [
+   {
+    "name": "Comparative page",
+    "path": "/eb/comparatives/:id",
+    "list": "/eb/comparatives",
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-08",
+  "walkthrough": "P3 Proposals, comparative and client decision",
+  "step": "P3.3",
+  "persona": "Client HR user (partner portal)",
+  "user": "No",
+  "users": "No UAT sign-in",
+  "action": "Comments on and confirms the comparative (Portal - comparative)",
+  "expected": "Client decision recorded; revisions if requested",
+  "checks": [
+   {
+    "name": "Portal - comparative",
+    "path": "/eb/comparatives/:id",
+    "list": "/eb/comparatives",
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-08",
+  "walkthrough": "P3 Proposals, comparative and client decision",
+  "step": "P3.4",
+  "persona": "Marketing AO (EB)",
+  "user": "ebao",
+  "users": "ebao",
+  "action": "Triggers the placement (Programme page (Trigger Placement))",
+  "expected": "Placement work created for Processing",
+  "checks": [
+   {
+    "name": "Programme page",
+    "path": "/eb/programmes/:id",
+    "list": "/eb/programmes",
+    "items": [
+     "Trigger Placement"
+    ]
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-08",
+  "walkthrough": "P4 Processing, booking, billing and members",
+  "step": "P4.1",
+  "persona": "Processing Supervisor",
+  "user": "ebprocsup",
+  "users": "ebprocsup",
+  "action": "Assigns the placement work (My Work)",
+  "expected": "Work assigned with remarks",
+  "checks": [
+   {
+    "name": "My Work",
+    "path": "/my-work",
+    "list": null,
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-08",
+  "walkthrough": "P4 Processing, booking, billing and members",
+  "step": "P4.2",
+  "persona": "Processing (EB)",
+  "user": "ebproc",
+  "users": "ebproc",
+  "action": "Completes issuance and books the accounts (Account page (BRD-1); Book Account)",
+  "expected": "Accounts booked by line",
+  "checks": [
+   {
+    "name": "Account page",
+    "path": "/accounts/:id",
+    "list": "/accounts",
+    "items": []
+   },
+   {
+    "name": "Book Account",
+    "path": "/accounts/:id",
+    "list": "/accounts",
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-08",
+  "walkthrough": "P4 Processing, booking, billing and members",
+  "step": "P4.3",
+  "persona": "Collection (EB)",
+  "user": "ebcoll",
+  "users": "ebcoll",
+  "action": "Records the SOA and tracks payment (SOA Register)",
+  "expected": "SOA validated; payments tracked",
+  "checks": [
+   {
+    "name": "SOA Register",
+    "path": "/eb/soa",
+    "list": null,
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-08",
+  "walkthrough": "P4 Processing, booking, billing and members",
+  "step": "P4.4",
+  "persona": "Marketing AO (EB)",
+  "user": "ebao",
+  "users": "ebao",
+  "action": "Records member changes and uploads the insurer's billing documents (Members; Member Changes)",
+  "expected": "Roster updated; billing linked to the change",
+  "checks": [
+   {
+    "name": "Member Changes",
+    "path": "/eb/member-changes",
+    "list": null,
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-08",
+  "walkthrough": "P5 Monitoring",
+  "step": "P5.1",
+  "persona": "BDOI Management",
+  "user": "ebmgmt",
+  "users": "ebmgmt",
+  "action": "Receives the weekly Renewal and New Business reports and the monthly Placement report (Reports (Employee Benefits); EB Home)",
+  "expected": "Reports on schedule with the Report List fields",
+  "checks": [
+   {
+    "name": "Reports",
+    "path": "/reports",
+    "list": null,
+    "items": [
+     "Employee Benefits"
+    ]
+   },
+   {
+    "name": "EB Home",
+    "path": "/eb",
+    "list": null,
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-08",
+  "walkthrough": "P5 Monitoring",
+  "step": "P5.2",
+  "persona": "Processing (EB)",
+  "user": "ebproc",
+  "users": "ebproc",
+  "action": "Follows the pending items (Pending Items)",
+  "expected": "Contracts, cards and billing pending with age and follow-ups",
+  "checks": [
+   {
+    "name": "Pending Items",
+    "path": "/eb/pending-items",
+    "list": null,
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-09",
+  "walkthrough": "P1 Servicing contact: from the call to the audit report",
+  "step": "P1.1",
+  "persona": "BDO Insure Contact Center Agent",
+  "user": "csfagent",
+  "users": "csfagent",
+  "action": "Signs in with user ID and password (Login)",
+  "expected": "The Customer Search opens as the landing page; a wrong password is refused",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-09",
+  "walkthrough": "P1 Servicing contact: from the call to the audit report",
+  "step": "P1.2",
+  "persona": "BDO Insure Contact Center Agent",
+  "user": "csfagent",
+  "users": "csfagent",
+  "action": "Searches the caller by name, client ID, account, PN or application number (Customer Search)",
+  "expected": "Results grouped by client with the matching accounts; one match opens directly",
+  "checks": [
+   {
+    "name": "Customer Search",
+    "path": "/csf",
+    "list": null,
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-09",
+  "walkthrough": "P1 Servicing contact: from the call to the audit report",
+  "step": "P1.3",
+  "persona": "BDO Insure Contact Center Agent",
+  "user": "csfagent",
+  "users": "csfagent",
+  "action": "Opens the client and reads the client information and accounts (Servicing View (summary card, Accounts tab))",
+  "expected": "Every account, CBG and non-CBG, with its CSF status and BIBS stage",
+  "checks": [
+   {
+    "name": "Servicing View",
+    "path": "/csf/clients/:clientId",
+    "list": "/csf/clients",
+    "items": [
+     "summary card",
+     "Accounts tab"
+    ]
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-09",
+  "walkthrough": "P1 Servicing contact: from the call to the audit report",
+  "step": "P1.4",
+  "persona": "BDO Insure Contact Center Agent",
+  "user": "csfagent",
+  "users": "csfagent",
+  "action": "Opens the payment history (Servicing View (Payments tab))",
+  "expected": "Payments of the last 12 months with the invoices and balances",
+  "checks": [
+   {
+    "name": "Servicing View",
+    "path": "/csf/clients/:clientId",
+    "list": "/csf/clients",
+    "items": [
+     "Payments tab"
+    ]
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-09",
+  "walkthrough": "P1 Servicing contact: from the call to the audit report",
+  "step": "P1.5",
+  "persona": "BDO Insure Contact Center Agent",
+  "user": "csfagent",
+  "users": "csfagent",
+  "action": "Verifies the caller with the checklist (Update Contact dialog (step 1))",
+  "expected": "Verification Passed (valid 30 minutes) or Failed",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-09",
+  "walkthrough": "P1 Servicing contact: from the call to the audit report",
+  "step": "P1.6",
+  "persona": "BDO Insure Contact Center Agent",
+  "user": "csfagent",
+  "users": "csfagent",
+  "action": "Changes the mobile number with a reason (Update Contact dialog (step 2))",
+  "expected": "Contact saved in the client master; shown on the Contact History tab; queued for QPS and EBIX while they coexist",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-09",
+  "walkthrough": "P1 Servicing contact: from the call to the audit report",
+  "step": "P1.7",
+  "persona": "BDO Insure Contact Center Agent",
+  "user": "csfagent",
+  "users": "csfagent",
+  "action": "Resends the renewal advice to the registered e-mail (Renewal Advice tab; Resend dialog)",
+  "expected": "RA sent password protected; the password follows in a separate e-mail",
+  "checks": [
+   {
+    "name": "Renewal Advice tab",
+    "path": "/renewal/candidates/:ref",
+    "list": "/renewal/candidates",
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-09",
+  "walkthrough": "P1 Servicing contact: from the call to the audit report",
+  "step": "P1.8",
+  "persona": "Contact Center Supervisor, BDO Contact Center personnel",
+  "user": "csfsup",
+  "users": "csfsup",
+  "action": "Resends the RA to another address with a reason (Resend dialog)",
+  "expected": "RA sent to the other address; the reason is logged",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-09",
+  "walkthrough": "P1 Servicing contact: from the call to the audit report",
+  "step": "P1.9",
+  "persona": "BDO Insure Contact Center Agent",
+  "user": "csfagent",
+  "users": "csfagent",
+  "action": "Resends the confirmed e-policy (E-policies tab; Resend dialog)",
+  "expected": "E-policy dispatched; listed in the e-policy dispatch report",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-09",
+  "walkthrough": "P1 Servicing contact: from the call to the audit report",
+  "step": "P1.10",
+  "persona": "BDO Insure Contact Center Agent",
+  "user": "csfagent",
+  "users": "csfagent",
+  "action": "Uploads the client's document and retrieves a claims report (Documents tab; Upload dialog)",
+  "expected": "Document stored on the account; claims report previewed and downloaded",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-09",
+  "walkthrough": "P1 Servicing contact: from the call to the audit report",
+  "step": "P1.11",
+  "persona": "Contact Center Management, Leads / Heads",
+  "user": "csfmgmt",
+  "users": "csfmgmt",
+  "action": "Prints and saves the audit trail and the Contact Changes and Agent Activity reports (Audit Trail; Reports (Customer Service))",
+  "expected": "PDF and Excel files with the same rows as the screen",
+  "checks": [
+   {
+    "name": "Audit Trail",
+    "path": "/admin/audit",
+    "list": null,
+    "items": []
+   },
+   {
+    "name": "Reports",
+    "path": "/reports",
+    "list": null,
+    "items": [
+     "Customer Service"
+    ]
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-09",
+  "walkthrough": "P2 Case management: from logging to closure and reporting",
+  "step": "P2.1",
+  "persona": "BDO Insure Contact Center Agent",
+  "user": "csfagent",
+  "users": "csfagent",
+  "action": "Clicks Log Case on the Servicing View and enters the channel, case type, nature of transaction, product type, market segment and fulfilment unit (Log Case dialog)",
+  "expected": "Case ID CASE-yyyy-nnnnnn and the due date from the turnaround time; a duplicate open case is refused",
+  "checks": [],
+  "buttons": [
+   "Log Case"
+  ]
+ },
+ {
+  "brd": "BRD-09",
+  "walkthrough": "P2 Case management: from logging to closure and reporting",
+  "step": "P2.2",
+  "persona": "BDO Insure Contact Center Agent",
+  "user": "csfagent",
+  "users": "csfagent",
+  "action": "Answers an inquiry on the call and clicks Resolve and Close (Log Case dialog)",
+  "expected": "Case created as Closed by CSR with the resolution",
+  "checks": [],
+  "buttons": [
+   "Resolve"
+  ]
+ },
+ {
+  "brd": "BRD-09",
+  "walkthrough": "P2 Case management: from logging to closure and reporting",
+  "step": "P2.3",
+  "persona": "Fulfilment Unit",
+  "user": "No",
+  "users": "No UAT sign-in",
+  "action": "Receives the routed case in the Fulfilment Unit Queue (Cases (Fulfilment Unit Queue); notification)",
+  "expected": "Case Open - With Fulfillment Unit; the account officer has a copy",
+  "checks": [
+   {
+    "name": "Cases",
+    "path": "/screening/cases",
+    "list": null,
+    "items": [
+     "Fulfilment Unit Queue"
+    ]
+   },
+   {
+    "name": "notification",
+    "path": "/operations/notifications",
+    "list": null,
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-09",
+  "walkthrough": "P2 Case management: from logging to closure and reporting",
+  "step": "P2.4",
+  "persona": "Fulfilment Unit",
+  "user": "No",
+  "users": "No UAT sign-in",
+  "action": "Records the resolution and clicks Resolve and Close (Case record)",
+  "expected": "Case Closed by Fulfillment Unit; the agent is notified",
+  "checks": [
+   {
+    "name": "Case record",
+    "path": "/screening/cases/:id",
+    "list": "/screening/cases",
+    "items": []
+   }
+  ],
+  "buttons": [
+   "Resolve"
+  ]
+ },
+ {
+  "brd": "BRD-09",
+  "walkthrough": "P2 Case management: from logging to closure and reporting",
+  "step": "P2.5",
+  "persona": "Fulfilment Unit",
+  "user": "No",
+  "users": "No UAT sign-in",
+  "action": "Returns a case with an error, or asks the agent to act with the client (Case record (Return to Agent, Request CSR Action))",
+  "expected": "Case Open - Returned to Agent or Open - CSR Action Required in the agent's queue",
+  "checks": [
+   {
+    "name": "Case record",
+    "path": "/screening/cases/:id",
+    "list": "/screening/cases",
+    "items": [
+     "Return to Agent",
+     "Request CSR Action"
+    ]
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-09",
+  "walkthrough": "P2 Case management: from logging to closure and reporting",
+  "step": "P2.6",
+  "persona": "BDO Insure Contact Center Agent",
+  "user": "csfagent",
+  "users": "csfagent",
+  "action": "Adds a note and a document, then re-endorses or closes the case (Case record (Notes, Documents))",
+  "expected": "Note and document listed with author and time; case back with the unit or Closed by CSR",
+  "checks": [
+   {
+    "name": "Case record",
+    "path": "/screening/cases/:id",
+    "list": "/screening/cases",
+    "items": [
+     "Notes",
+     "Documents"
+    ]
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-09",
+  "walkthrough": "P2 Case management: from logging to closure and reporting",
+  "step": "P2.7",
+  "persona": "Contact Center Supervisor, BDO Contact Center personnel",
+  "user": "csfsup",
+  "users": "csfsup",
+  "action": "Reassigns a case and escalates another with a reason (Cases (Team Queue); Case record)",
+  "expected": "New owner sees the case at once; Escalated indicator with the reason",
+  "checks": [
+   {
+    "name": "Cases",
+    "path": "/screening/cases",
+    "list": null,
+    "items": [
+     "Team Queue"
+    ]
+   },
+   {
+    "name": "Case record",
+    "path": "/screening/cases/:id",
+    "list": "/screening/cases",
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-09",
+  "walkthrough": "P2 Case management: from logging to closure and reporting",
+  "step": "P2.8",
+  "persona": "Contact Center Supervisor, BDO Contact Center personnel",
+  "user": "csfsup",
+  "users": "csfsup",
+  "action": "Follows the cases approaching or past their due date (Case Dashboard; notifications)",
+  "expected": "Approaching breach and Breached indicators; breach notices; automatic escalation",
+  "checks": [
+   {
+    "name": "Case Dashboard",
+    "path": "/",
+    "list": null,
+    "items": []
+   },
+   {
+    "name": "notifications",
+    "path": "/notifications",
+    "list": null,
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-09",
+  "walkthrough": "P2 Case management: from logging to closure and reporting",
+  "step": "P2.9",
+  "persona": "BDO Insure Contact Center Agent",
+  "user": "csfagent",
+  "users": "csfagent",
+  "action": "Creates a follow-up case from a closed case while a client item is pending (Case record (Create Follow-up Case, Linked Cases))",
+  "expected": "New linked case; the closed case stays read only",
+  "checks": [
+   {
+    "name": "Case record",
+    "path": "/screening/cases/:id",
+    "list": "/screening/cases",
+    "items": [
+     "Create Follow-up Case",
+     "Linked Cases"
+    ]
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-09",
+  "walkthrough": "P2 Case management: from logging to closure and reporting",
+  "step": "P2.10",
+  "persona": "Contact Center Management, Leads / Heads",
+  "user": "csfmgmt",
+  "users": "csfmgmt",
+  "action": "Reviews the case history and the audit trail of a case (Case record (History); Audit Trail)",
+  "expected": "Every action with from and to values, user and time",
+  "checks": [
+   {
+    "name": "Case record",
+    "path": "/screening/cases/:id",
+    "list": "/screening/cases",
+    "items": [
+     "History"
+    ]
+   },
+   {
+    "name": "Audit Trail",
+    "path": "/admin/audit",
+    "list": null,
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-09",
+  "walkthrough": "P2 Case management: from logging to closure and reporting",
+  "step": "P2.11",
+  "persona": "Contact Center Management, Leads / Heads",
+  "user": "csfmgmt",
+  "users": "csfmgmt",
+  "action": "Opens the case dashboard and exports the case reports (Case Dashboard; Reports (Case Register, Case Ageing and SLA, Case Summary))",
+  "expected": "Same figures on the dashboard and in the Excel, CSV and PDF reports",
+  "checks": [
+   {
+    "name": "Case Dashboard",
+    "path": "/",
+    "list": null,
+    "items": []
+   },
+   {
+    "name": "Reports",
+    "path": "/reports",
+    "list": null,
+    "items": [
+     "Case Register",
+     "Case Ageing and SLA",
+     "Case Summary"
+    ]
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-09",
+  "walkthrough": "P2 Case management: from logging to closure and reporting",
+  "step": "P2.12",
+  "persona": "System Administrator",
+  "user": "admin",
+  "users": "admin",
+  "action": "Maintains the case lists and the routing table at the request of Contact Center Management (Lists of Values; Case Routing)",
+  "expected": "New values offered on the next case; deactivated values kept on old cases",
+  "checks": [
+   {
+    "name": "Lists of Values",
+    "path": "/broking-setup/lists",
+    "list": null,
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-10",
+  "walkthrough": "P1 Configuration and lists",
+  "step": "P1.1",
+  "persona": "Compliance Officer",
+  "user": "compoff",
+  "users": "compoff",
+  "action": "Drafts the matching criteria, risk rules, matrices, SLAs, templates and dispositions (Configuration Versions; Templates)",
+  "expected": "Draft version with before and after values",
+  "checks": [
+   {
+    "name": "Configuration Versions",
+    "path": "/screening-setup/config",
+    "list": null,
+    "items": []
+   },
+   {
+    "name": "Templates",
+    "path": "/screening-setup/templates",
+    "list": null,
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-10",
+  "walkthrough": "P1 Configuration and lists",
+  "step": "P1.2",
+  "persona": "Compliance Officer (Checker)",
+  "user": "compchk",
+  "users": "compchk",
+  "action": "Approves the configuration version with an effective date (My Approvals)",
+  "expected": "Version active from its effective date",
+  "checks": [
+   {
+    "name": "My Approvals",
+    "path": "/approvals",
+    "list": null,
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-10",
+  "walkthrough": "P1 Configuration and lists",
+  "step": "P1.3",
+  "persona": "Compliance Officer",
+  "user": "compoff",
+  "users": "compoff",
+  "action": "Uploads the sanctions and PEP list files and reviews the failed records (List Sources and Runs; Unsuccessful Ingestion Records)",
+  "expected": "Lists current; failed records reported to the recipients",
+  "checks": [
+   {
+    "name": "List Sources and Runs",
+    "path": "/screening-setup/sources",
+    "list": null,
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-10",
+  "walkthrough": "P1 Configuration and lists",
+  "step": "P1.4",
+  "persona": "Compliance Officer",
+  "user": "compoff",
+  "users": "compoff",
+  "action": "Adds a sanctioned name by hand; the checker approves it (Watchlist; My Approvals)",
+  "expected": "Entry active and screened; Compliance notified of the new name",
+  "checks": [
+   {
+    "name": "Watchlist",
+    "path": "/screening-setup/watchlist",
+    "list": null,
+    "items": []
+   },
+   {
+    "name": "My Approvals",
+    "path": "/approvals",
+    "list": null,
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-10",
+  "walkthrough": "P2 Screening and case creation",
+  "step": "P2.1",
+  "persona": "Compliance Officer",
+  "user": "compoff",
+  "users": "compoff",
+  "action": "Sets the batch window; the window or a new client triggers the matching (Screening Home (runs))",
+  "expected": "All eligible clients screened with the active rules",
+  "checks": [
+   {
+    "name": "Screening Home",
+    "path": "/screening",
+    "list": null,
+    "items": [
+     "runs"
+    ]
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-10",
+  "walkthrough": "P2 Screening and case creation",
+  "step": "P2.2",
+  "persona": "Investigator",
+  "user": "investigator",
+  "users": "investigator",
+  "action": "Reviews the potential matches below the case threshold (Matches; Name Matching Fall-out report)",
+  "expected": "Matches confirmed or dismissed with a reason",
+  "checks": [
+   {
+    "name": "Matches",
+    "path": "/screening/matches",
+    "list": null,
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-10",
+  "walkthrough": "P2 Screening and case creation",
+  "step": "P2.3",
+  "persona": "Unit Compliance (User) Coordinator",
+  "user": "ucc",
+  "users": "ucc",
+  "action": "Receives the case created for a high-risk or PEP client (Cases; notifications)",
+  "expected": "Case assigned by the assignment matrix; client risk-tagged; notice for a client without an active policy",
+  "checks": [
+   {
+    "name": "Cases",
+    "path": "/screening/cases",
+    "list": null,
+    "items": []
+   },
+   {
+    "name": "notifications",
+    "path": "/notifications",
+    "list": null,
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-10",
+  "walkthrough": "P3 Investigation, approval and escalation",
+  "step": "P3.1",
+  "persona": "Investigator",
+  "user": "investigator",
+  "users": "investigator",
+  "action": "Completes the guided review, uploads the KYC documents and updates the risk tag with evidence (Case (Review, Documents))",
+  "expected": "Mandatory fields complete; documents named by the convention",
+  "checks": [
+   {
+    "name": "Case",
+    "path": "/screening/cases/:id",
+    "list": "/screening/cases",
+    "items": [
+     "Review",
+     "Documents"
+    ]
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-10",
+  "walkthrough": "P3 Investigation, approval and escalation",
+  "step": "P3.2",
+  "persona": "Investigator",
+  "user": "investigator",
+  "users": "investigator",
+  "action": "Selects the disposition and submits (Case (workflow panel))",
+  "expected": "Case validated and routed by the approval matrix; read only to the investigator",
+  "checks": [
+   {
+    "name": "Case",
+    "path": "/screening/cases/:id",
+    "list": "/screening/cases",
+    "items": [
+     "workflow panel"
+    ]
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-10",
+  "walkthrough": "P3 Investigation, approval and escalation",
+  "step": "P3.3",
+  "persona": "Approver (Unit Head)",
+  "user": "scrapprover",
+  "users": "scrapprover",
+  "action": "Approves or disapproves the recommendation with comments (Cases (For Approval); Case)",
+  "expected": "Case advances, or returns to the investigator, who corrects and resubmits",
+  "checks": [
+   {
+    "name": "Cases",
+    "path": "/screening/cases",
+    "list": null,
+    "items": [
+     "For Approval"
+    ]
+   },
+   {
+    "name": "Case",
+    "path": "/screening/cases/:id",
+    "list": "/screening/cases",
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-10",
+  "walkthrough": "P3 Investigation, approval and escalation",
+  "step": "P3.4",
+  "persona": "Compliance Officer",
+  "user": "compoff",
+  "users": "compoff",
+  "action": "Reviews the BU escalation and routes it to the AML Committee (Cases (Compliance Review))",
+  "expected": "Case with the committee, or returned with reasons",
+  "checks": [
+   {
+    "name": "Cases",
+    "path": "/screening/cases",
+    "list": null,
+    "items": [
+     "Compliance Review"
+    ]
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-10",
+  "walkthrough": "P3 Investigation, approval and escalation",
+  "step": "P3.5",
+  "persona": "AML Committee Member",
+  "user": "amlcom1",
+  "users": "amlcom1",
+  "action": "Records the committee decision (Cases (Committee); Case (Decisions))",
+  "expected": "Decision recorded; case routed by the governance workflow",
+  "checks": [
+   {
+    "name": "Cases",
+    "path": "/screening/cases",
+    "list": null,
+    "items": [
+     "Committee"
+    ]
+   },
+   {
+    "name": "Case",
+    "path": "/screening/cases/:id",
+    "list": "/screening/cases",
+    "items": [
+     "Decisions"
+    ]
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-10",
+  "walkthrough": "P3 Investigation, approval and escalation",
+  "step": "P3.6",
+  "persona": "Unit Compliance (User) Coordinator",
+  "user": "ucc",
+  "users": "ucc",
+  "action": "Follows the SLA reminders and re-assigns a case (Screening Home; Case (Re-assign))",
+  "expected": "Overdue cases escalated; new assignee notified",
+  "checks": [
+   {
+    "name": "Screening Home",
+    "path": "/screening",
+    "list": null,
+    "items": []
+   },
+   {
+    "name": "Case",
+    "path": "/screening/cases/:id",
+    "list": "/screening/cases",
+    "items": [
+     "Re-assign"
+    ]
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-10",
+  "walkthrough": "P4 Suspicious Transaction Report",
+  "step": "P4.1",
+  "persona": "Compliance Officer",
+  "user": "compoff",
+  "users": "compoff",
+  "action": "Prepares the STR from the case data (Case (STR))",
+  "expected": "STR prefilled; completeness checks highlight gaps",
+  "checks": [
+   {
+    "name": "Case",
+    "path": "/screening/cases/:id",
+    "list": "/screening/cases",
+    "items": [
+     "STR"
+    ]
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-10",
+  "walkthrough": "P4 Suspicious Transaction Report",
+  "step": "P4.2",
+  "persona": "Compliance Officer",
+  "user": "compoff",
+  "users": "compoff",
+  "action": "Extracts the committee-approved STRs and records the AMLC reference (STR)",
+  "expected": "File in the AMLC format saved to the folder; filing reference recorded",
+  "checks": [
+   {
+    "name": "STR",
+    "path": "/screening/str",
+    "list": null,
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-10",
+  "walkthrough": "P5 Monitoring and audit",
+  "step": "P5.1",
+  "persona": "Compliance Officer",
+  "user": "compoff",
+  "users": "compoff",
+  "action": "Runs the case status, high-risk clients and SLA reports (Reports (Compliance))",
+  "expected": "Reports with the AO and Marketing Business Unit, in CSV, XLSX and PDF",
+  "checks": [
+   {
+    "name": "Reports",
+    "path": "/reports",
+    "list": null,
+    "items": [
+     "Compliance"
+    ]
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-10",
+  "walkthrough": "P5 Monitoring and audit",
+  "step": "P5.2",
+  "persona": "Auditor",
+  "user": "auditor",
+  "users": "auditor",
+  "action": "Reads a case history and the audit log report (Case (Timeline); Reports (SCR-AUDIT-LOG))",
+  "expected": "Every action with before and after values, user and time",
+  "checks": [
+   {
+    "name": "Case",
+    "path": "/screening/cases/:id",
+    "list": "/screening/cases",
+    "items": [
+     "Timeline"
+    ]
+   },
+   {
+    "name": "Report SCR-AUDIT-LOG",
+    "path": "/reports/SCR-AUDIT-LOG",
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-11",
+  "walkthrough": "WT-A A new user from the enrolment request to the first sign-in with the menus of the persona",
+  "step": "WT-A.1",
+  "persona": "Requestor",
+  "user": "requestor",
+  "users": "requestor",
+  "action": "Opens User Access \u203a Access Requests \u203a New Request, keeps Enrol new user, enters the user ID a013000196, the full name, e-mail, Windows ID and home branch, ticks Marketing Account Officer, chooses the approver Ulysses Access Approver, writes the justification and clicks Save Draft",
+  "expected": "Toast: AR-yyyy-nnnnnn saved as a draft; the request opens as Draft with Approver Chosen on submission",
+  "checks": [],
+  "buttons": [
+   "Save Draft"
+  ]
+ },
+ {
+  "brd": "BRD-11",
+  "walkthrough": "WT-A A new user from the enrolment request to the first sign-in with the menus of the persona",
+  "step": "WT-A.2",
+  "persona": "Requestor",
+  "user": "requestor",
+  "users": "requestor",
+  "action": "Clicks Edit Request, checks the data and clicks Submit",
+  "expected": "Toast: AR-yyyy-nnnnnn submitted; the status is Pending Approval and the History tab lists Saved and Submitted",
+  "checks": [],
+  "buttons": [
+   "Edit Request",
+   "Submit"
+  ]
+ },
+ {
+  "brd": "BRD-11",
+  "walkthrough": "WT-A A new user from the enrolment request to the first sign-in with the menus of the persona",
+  "step": "WT-A.3",
+  "persona": "Approver",
+  "user": "uamapprover",
+  "users": "uamapprover",
+  "action": "Opens the notice Access request AR-yyyy-nnnnnn to approve, or User Access \u203a Access Requests",
+  "expected": "The request is on the Assigned to Me tab with its change: Create user a013000196 with group profiles Marketing Account Officer",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-11",
+  "walkthrough": "WT-A A new user from the enrolment request to the first sign-in with the menus of the persona",
+  "step": "WT-A.4",
+  "persona": "Approver",
+  "user": "uamapprover",
+  "users": "uamapprover",
+  "action": "Opens the request, reads the Details tab (current and requested values), clicks Approve and Apply, adds a comment and confirms",
+  "expected": "User a013000196 was created, with the temporary password shown once to be given through a secure channel; the status is Approved",
+  "checks": [],
+  "buttons": [
+   "Approve"
+  ]
+ },
+ {
+  "brd": "BRD-11",
+  "walkthrough": "WT-A A new user from the enrolment request to the first sign-in with the menus of the persona",
+  "step": "WT-A.5",
+  "persona": "Subject users of the requests (Marketing AO)",
+  "user": "a013000196",
+  "users": "a013000196",
+  "action": "The new user opens BIBS and signs in with a013000196 and the temporary password",
+  "expected": "Change Your Password: Your password was set by an administrator. Choose your own password to continue.",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-11",
+  "walkthrough": "WT-A A new user from the enrolment request to the first sign-in with the menus of the persona",
+  "step": "WT-A.6",
+  "persona": "Subject users of the requests (Marketing AO)",
+  "user": "a013000196",
+  "users": "a013000196",
+  "action": "Enters the temporary password as the current password and a personal password twice, and clicks Change Password",
+  "expected": "Toast: Password changed; the home page opens",
+  "checks": [],
+  "buttons": [
+   "Change Password"
+  ]
+ },
+ {
+  "brd": "BRD-11",
+  "walkthrough": "WT-A A new user from the enrolment request to the first sign-in with the menus of the persona",
+  "step": "WT-A.7",
+  "persona": "Subject users of the requests (Marketing AO)",
+  "user": "a013000196",
+  "users": "a013000196",
+  "action": "Opens the sidebar and My Profile",
+  "expected": "The sidebar holds exactly the entries of the Marketing Account Officer (chapter 12); My Profile lists the group profile Marketing Account Officer and its permissions, and the first session",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-11",
+  "walkthrough": "WT-A A new user from the enrolment request to the first sign-in with the menus of the persona",
+  "step": "WT-A.8",
+  "persona": "Auditor",
+  "user": "auditor",
+  "users": "auditor",
+  "action": "Opens User Access Reports \u203a User Access Audit Log for today, ticks Include Log-ins and Log-outs and clicks Run Report",
+  "expected": "Enroll New User a013000196 with the from and to values of the full name, e-mail and profiles, Done By and Approved By the Approver, the request number, and the Log-in of the new user",
+  "checks": [],
+  "buttons": [
+   "Run Report"
+  ]
+ },
+ {
+  "brd": "BRD-11",
+  "walkthrough": "WT-B A change and a revocation under four eyes, and a group-profile change approved in order and implemented",
+  "step": "WT-B.1",
+  "persona": "Requestor",
+  "user": "requestor",
+  "users": "requestor",
+  "action": "Opens a New Request of type Modify user for a013000196, ticks Marketing Team Leader / Head (approver) besides the current profile, chooses the approver, writes the justification and clicks Submit",
+  "expected": "The Group Profiles show (current) after Marketing Account Officer; toast AR-yyyy-nnnnnn submitted",
+  "checks": [],
+  "buttons": [
+   "Submit"
+  ]
+ },
+ {
+  "brd": "BRD-11",
+  "walkthrough": "WT-B A change and a revocation under four eyes, and a group-profile change approved in order and implemented",
+  "step": "WT-B.2",
+  "persona": "Approver",
+  "user": "uamapprover",
+  "users": "uamapprover",
+  "action": "Opens the request: the Details tab shows the group profiles added; clicks Approve and Apply",
+  "expected": "The status is Approved; the user receives Your access changed in the app and by e-mail",
+  "checks": [],
+  "buttons": [
+   "Approve"
+  ]
+ },
+ {
+  "brd": "BRD-11",
+  "walkthrough": "WT-B A change and a revocation under four eyes, and a group-profile change approved in order and implemented",
+  "step": "WT-B.3",
+  "persona": "Second approver",
+  "user": "secapprover",
+  "users": "secapprover",
+  "action": "Opens AR-2026-900008 from the Second Approval tab: the tag Privilege increase, first approved by the Approver; clicks Second Approval and confirms",
+  "expected": "The status is Approved; the alert Privileged access change stays in the Alert inbox as evidence",
+  "checks": [],
+  "buttons": [
+   "Second Approval"
+  ]
+ },
+ {
+  "brd": "BRD-11",
+  "walkthrough": "WT-B A change and a revocation under four eyes, and a group-profile change approved in order and implemented",
+  "step": "WT-B.4",
+  "persona": "Business Administrator",
+  "user": "badmin",
+  "users": "badmin",
+  "action": "Opens Group Profile Requests \u203a New Group Profile Request, enters the code RENEWAL_ENQUIRY, the name and description, keeps the level Standard, ticks two permissions, adds the approvers Ulysses Access Approver then the New Business Approver, writes the justification and clicks Submit",
+  "expected": "Toast: AR-yyyy-nnnnnn submitted; the Approvers tab lists the two approvers in order",
+  "checks": [],
+  "buttons": [
+   "Submit"
+  ]
+ },
+ {
+  "brd": "BRD-11",
+  "walkthrough": "WT-B A change and a revocation under four eyes, and a group-profile change approved in order and implemented",
+  "step": "WT-B.5",
+  "persona": "Approver",
+  "user": "uamapprover",
+  "users": "uamapprover",
+  "action": "Approves the group-profile request",
+  "expected": "The status stays Pending Approval; the request moves to the New Business Approver, who receives the notice",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-11",
+  "walkthrough": "WT-B A change and a revocation under four eyes, and a group-profile change approved in order and implemented",
+  "step": "WT-B.6",
+  "persona": "Approver (New Business Approver",
+  "user": "approver",
+  "users": "approver",
+  "action": "Opens the request from My Approvals and approves it",
+  "expected": "The status is For Implementation; the System Administrators receive Access request AR-yyyy-nnnnnn to implement",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-11",
+  "walkthrough": "WT-B A change and a revocation under four eyes, and a group-profile change approved in order and implemented",
+  "step": "WT-B.7",
+  "persona": "System Administrator",
+  "user": "admin",
+  "users": "admin",
+  "action": "Opens Roles & Permissions, finds the request under Approved Requests to Implement, clicks Implement Request and confirms",
+  "expected": "Toast: AR-yyyy-nnnnnn implemented; the profile appears in the matrix with its two permissions",
+  "checks": [],
+  "buttons": [
+   "Implement Request"
+  ]
+ },
+ {
+  "brd": "BRD-11",
+  "walkthrough": "WT-B A change and a revocation under four eyes, and a group-profile change approved in order and implemented",
+  "step": "WT-B.8",
+  "persona": "Requestor",
+  "user": "requestor",
+  "users": "requestor",
+  "action": "Opens a New Request of type Deactivate user for a013000196, chooses the reason Resigned, leaves the effective date blank, chooses the approver and clicks Submit",
+  "expected": "Toast: AR-yyyy-nnnnnn submitted",
+  "checks": [],
+  "buttons": [
+   "Submit"
+  ]
+ },
+ {
+  "brd": "BRD-11",
+  "walkthrough": "WT-B A change and a revocation under four eyes, and a group-profile change approved in order and implemented",
+  "step": "WT-B.9",
+  "persona": "Approver",
+  "user": "uamapprover",
+  "users": "uamapprover",
+  "action": "Approves the deactivation",
+  "expected": "The status is Approved; the user is Disabled and every open session of the user has ended",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-11",
+  "walkthrough": "WT-B A change and a revocation under four eyes, and a group-profile change approved in order and implemented",
+  "step": "WT-B.10",
+  "persona": "System Administrator",
+  "user": "admin",
+  "users": "admin",
+  "action": "Opens Administration \u203a Users with the status Disabled",
+  "expected": "a013000196 is listed Disabled with the profiles it held; Sessions shows the last session ended by the administrator",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-11",
+  "walkthrough": "WT-C Refused cases and the messages the user sees",
+  "step": "WT-C.1",
+  "persona": "Requestor",
+  "user": "requestor",
+  "users": "requestor",
+  "action": "Opens New Request, enters the user ID ab and clicks Submit without a full name, profile, approver or justification",
+  "expected": "Under the fields: Use 3 to 50 letters, digits, dots, dashes or underscores; Enter the full name of the new user; Select at least one role; Select the approver; Enter the justification. Nothing is saved",
+  "checks": [],
+  "buttons": [
+   "Submit"
+  ]
+ },
+ {
+  "brd": "BRD-11",
+  "walkthrough": "WT-C Refused cases and the messages the user sees",
+  "step": "WT-C.2",
+  "persona": "Requestor",
+  "user": "requestor",
+  "users": "requestor",
+  "action": "Enters the user ID a01300019X with the other fields complete and clicks Submit",
+  "expected": "Under the user ID: The user ID must be a letter followed by nine digits, for example a013000196",
+  "checks": [],
+  "buttons": [
+   "Submit"
+  ]
+ },
+ {
+  "brd": "BRD-11",
+  "walkthrough": "WT-C Refused cases and the messages the user sees",
+  "step": "WT-C.3",
+  "persona": "Requestor",
+  "user": "requestor",
+  "users": "requestor",
+  "action": "Raises a Modify user request for a013000101, which already has a pending request, and clicks Submit",
+  "expected": "A request for user a013000101 is already waiting for approval, with its reference",
+  "checks": [],
+  "buttons": [
+   "Submit"
+  ]
+ },
+ {
+  "brd": "BRD-11",
+  "walkthrough": "WT-C Refused cases and the messages the user sees",
+  "step": "WT-C.4",
+  "persona": "Requestor",
+  "user": "requestor",
+  "users": "requestor",
+  "action": "Raises a Modify user request for himself (requestor), ticks an additional profile and clicks Submit",
+  "expected": "You cannot change your own roles",
+  "checks": [],
+  "buttons": [
+   "Submit"
+  ]
+ },
+ {
+  "brd": "BRD-11",
+  "walkthrough": "WT-C Refused cases and the messages the user sees",
+  "step": "WT-C.5",
+  "persona": "Requestor",
+  "user": "requestor",
+  "users": "requestor",
+  "action": "Enrols a new user with both the User Access Requestor and the User Access Approver profiles and clicks Submit",
+  "expected": "One user may not hold both User Access Requestor and User Access Approver (separation-of-duties rule SOD-900001): the rule authorised by Information Security",
+  "checks": [],
+  "buttons": [
+   "Submit"
+  ]
+ },
+ {
+  "brd": "BRD-11",
+  "walkthrough": "WT-C Refused cases and the messages the user sees",
+  "step": "WT-C.6",
+  "persona": "Approver (New Business Approver",
+  "user": "approver",
+  "users": "approver",
+  "action": "Opens AR-2026-900002, assigned to Ulysses Access Approver",
+  "expected": "The request shows no decision button for this approver; a decision would be refused: Request AR-2026-900002 is assigned to uamapprover for approval",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-11",
+  "walkthrough": "WT-C Refused cases and the messages the user sees",
+  "step": "WT-C.7",
+  "persona": "System Administrator",
+  "user": "admin",
+  "users": "admin",
+  "action": "Clicks Implement Request on a group-profile request he raised himself",
+  "expected": "A request is implemented by someone other than its requester",
+  "checks": [],
+  "buttons": [
+   "Implement Request"
+  ]
+ },
+ {
+  "brd": "BRD-11",
+  "walkthrough": "WT-C Refused cases and the messages the user sees",
+  "step": "WT-C.8",
+  "persona": "Subject users of the requests (Marketing AO)",
+  "user": "a013000101",
+  "users": "a013000101",
+  "action": "User a013000101 enters a wrong password three times, then the right one",
+  "expected": "Invalid user name or password each time, also for the right password: a locked account is refused with the same message as a wrong password; Users shows the lock to the System Administrator",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-11",
+  "walkthrough": "WT-C Refused cases and the messages the user sees",
+  "step": "WT-C.9",
+  "persona": "System Administrator",
+  "user": "admin",
+  "users": "admin",
+  "action": "Opens Users with the status Locked and clicks Unlock on a013000101",
+  "expected": "The user is Active again; the unlock is in the access change log",
+  "checks": [],
+  "buttons": [
+   "Unlock"
+  ]
+ },
+ {
+  "brd": "BRD-11",
+  "walkthrough": "WT-C Refused cases and the messages the user sees",
+  "step": "WT-C.10",
+  "persona": "Subject users of the requests (Marketing AO)",
+  "user": "a013000196",
+  "users": "a013000196",
+  "action": "The deactivated user a013000196 tries to sign in",
+  "expected": "Invalid user name or password, the same message as a wrong password; the attempt does not count towards the lock-out",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-11",
+  "walkthrough": "WT-C Refused cases and the messages the user sees",
+  "step": "WT-C.11",
+  "persona": "Requestor",
+  "user": "requestor",
+  "users": "requestor",
+  "action": "On My Profile, types a new password that is too short and has no symbol",
+  "expected": "Still needed: At least 10 characters; A symbol; Change Password stays disabled",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-11",
+  "walkthrough": "WT-C Refused cases and the messages the user sees",
+  "step": "WT-C.12",
+  "persona": "Requestor",
+  "user": "requestor",
+  "users": "requestor",
+  "action": "Enters the current password as the new password and clicks Change Password",
+  "expected": "You used this password recently. Choose another one",
+  "checks": [],
+  "buttons": [
+   "Change Password"
+  ]
+ },
+ {
+  "brd": "BRD-11",
+  "walkthrough": "WT-D The evidence of access",
+  "step": "WT-D.1",
+  "persona": "Auditor",
+  "user": "auditor",
+  "users": "auditor",
+  "action": "Opens User Access \u203a User Access Matrix, By Action, and searches USER ACCESS",
+  "expected": "The User Access area by action class, with the permissions each profile holds: the Requestor creates and amends, the Approver approves, the Second Approver gives the second approval",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-11",
+  "walkthrough": "WT-D The evidence of access",
+  "step": "WT-D.2",
+  "persona": "Auditor",
+  "user": "auditor",
+  "users": "auditor",
+  "action": "Runs the User Group Profile Report for the profile UAM_APPROVER",
+  "expected": "The modules and tasks of the Approver with With Access, and the dates and actors of its creation and last change",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-11",
+  "walkthrough": "WT-D The evidence of access",
+  "step": "WT-D.3",
+  "persona": "Auditor",
+  "user": "auditor",
+  "users": "auditor",
+  "action": "Runs Group Profile Membership for MKT_AO as of today",
+  "expected": "The members of the Marketing Account Officer profile with who added each and when",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-12",
+  "walkthrough": "P1 Intake, loan files and classification",
+  "step": "P1.1",
+  "persona": "Submitted Handler (CBG)",
+  "user": "sbmhandler",
+  "users": "sbmhandler",
+  "action": "Uploads the LFS insurance report and a PDF policy document (Upload & Intake)",
+  "expected": "Records RECEIVED with SBM numbers; the PDF attached for manual entry",
+  "checks": [
+   {
+    "name": "Upload & Intake",
+    "path": "/submitted/intake",
+    "list": null,
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-12",
+  "walkthrough": "P1 Intake, loan files and classification",
+  "step": "P1.2",
+  "persona": "Policy Review Officer (Non-CBG Corporate)",
+  "user": "polreview",
+  "users": "polreview",
+  "action": "Creates a Non-CBG Corporate policy by hand and tags it Renewable (Masterlist (New Policy); Policy record)",
+  "expected": "Record VALIDATED with the Renewable chip",
+  "checks": [
+   {
+    "name": "Masterlist",
+    "path": "/submitted/masterlist",
+    "list": null,
+    "items": [
+     "New Policy"
+    ]
+   },
+   {
+    "name": "Policy record",
+    "path": "/submitted/policies/:id",
+    "list": "/submitted/masterlist",
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-12",
+  "walkthrough": "P1 Intake, loan files and classification",
+  "step": "P1.3",
+  "persona": "Team Lead",
+  "user": "sbmtl",
+  "users": "sbmtl",
+  "action": "Migrates a legacy Excel masterlist (Upload & Intake (Migration); Migration Error Log)",
+  "expected": "Records flagged Migrated; failed rows in the error log",
+  "checks": [
+   {
+    "name": "Upload & Intake",
+    "path": "/submitted/intake",
+    "list": null,
+    "items": [
+     "Migration"
+    ]
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-12",
+  "walkthrough": "P1 Intake, loan files and classification",
+  "step": "P1.4",
+  "persona": "Sanitation Handler",
+  "user": "sanitation",
+  "users": "sanitation",
+  "action": "Uploads the LAMD and LMS loan files (Upload & Intake (Loan Files))",
+  "expected": "Loans matched by PN or application number; unmatched loans listed",
+  "checks": [
+   {
+    "name": "Upload & Intake",
+    "path": "/submitted/intake",
+    "list": null,
+    "items": [
+     "Loan Files"
+    ]
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-12",
+  "walkthrough": "P1 Intake, loan files and classification",
+  "step": "P1.5",
+  "persona": "Sanitation Handler",
+  "user": "sanitation",
+  "users": "sanitation",
+  "action": "Follows the processing run (Processing Runs)",
+  "expected": "Records sanitised, classified Inforced or Submitted and bucketed; fallout with reasons",
+  "checks": [
+   {
+    "name": "Processing Runs",
+    "path": "/submitted/runs",
+    "list": null,
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-12",
+  "walkthrough": "P1 Intake, loan files and classification",
+  "step": "P1.6",
+  "persona": "Sanitation Handler",
+  "user": "sanitation",
+  "users": "sanitation",
+  "action": "Resolves the fallout and the unmatched records (Masterlist (Fallout, Unmatched); Fallout report)",
+  "expected": "Corrected records re-run; manual dispositions with reasons",
+  "checks": [
+   {
+    "name": "Masterlist",
+    "path": "/submitted/masterlist",
+    "list": null,
+    "items": [
+     "Fallout",
+     "Unmatched"
+    ]
+   },
+   {
+    "name": "Fallout report",
+    "path": "/reports/:code",
+    "list": "/reports",
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-12",
+  "walkthrough": "P1 Intake, loan files and classification",
+  "step": "P1.7",
+  "persona": "Rule administrator",
+  "user": "sbmrules",
+  "users": "sbmrules",
+  "action": "Changes a disposition rule; the NB Team Lead approves it (Submitted Policies Setup; My Approvals)",
+  "expected": "New rule version applies from the next run",
+  "checks": [
+   {
+    "name": "Submitted Policies Setup",
+    "path": "/submitted/setup",
+    "list": null,
+    "items": []
+   },
+   {
+    "name": "My Approvals",
+    "path": "/approvals",
+    "list": null,
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-12",
+  "walkthrough": "P2 Policy review, IAAF, limits and TOR",
+  "step": "P2.1",
+  "persona": "Policy Review Officer (Non-CBG Corporate)",
+  "user": "polreview",
+  "users": "polreview",
+  "action": "Records two reviews and generates the IAAF (Policy Reviews / IAAF)",
+  "expected": "IAAF Region Code-Year-Counter with the review history",
+  "checks": [
+   {
+    "name": "Policy Reviews / IAAF",
+    "path": "/submitted/reviews",
+    "list": null,
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-12",
+  "walkthrough": "P2 Policy review, IAAF, limits and TOR",
+  "step": "P2.2",
+  "persona": "Submitted Checker",
+  "user": "sbmchecker",
+  "users": "sbmchecker",
+  "action": "Approves the IAAF at level 1; the NB Team Lead at level 2 (My Approvals; IAAF page)",
+  "expected": "IAAF approved, stamped and e-mailed to the bank counterpart",
+  "checks": [
+   {
+    "name": "My Approvals",
+    "path": "/approvals",
+    "list": null,
+    "items": []
+   },
+   {
+    "name": "IAAF page",
+    "path": "/submitted/reviews",
+    "list": null,
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-12",
+  "walkthrough": "P2 Policy review, IAAF, limits and TOR",
+  "step": "P2.3",
+  "persona": "Marketing AO / MAO",
+  "user": "ao",
+  "users": "ao",
+  "action": "Prepares the TOR of an account flagged for a limit breach (Policy record; TOR)",
+  "expected": "TOR generated and submitted",
+  "checks": [
+   {
+    "name": "Policy record",
+    "path": "/submitted/policies/:id",
+    "list": "/submitted/masterlist",
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-12",
+  "walkthrough": "P2 Policy review, IAAF, limits and TOR",
+  "step": "P2.4",
+  "persona": "TSU",
+  "user": "tsu",
+  "users": "tsu",
+  "action": "Approves the TOR by the TSU matrix (My Approvals; TOR page)",
+  "expected": "TOR approved and handed over; the AO is notified and downloads it",
+  "checks": [
+   {
+    "name": "My Approvals",
+    "path": "/approvals",
+    "list": null,
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-12",
+  "walkthrough": "P3 Proposals, renewal hand-off, placement and booking",
+  "step": "P3.1",
+  "persona": "Sanitation Handler",
+  "user": "sanitation",
+  "users": "sanitation",
+  "action": "Creates a batch of proposals with nominated rates and edits the rate of a vehicle classification (Renewal Work List (Create Proposals))",
+  "expected": "One proposal per record with the applied rates; batch For Review",
+  "checks": [
+   {
+    "name": "Renewal Work List",
+    "path": "/submitted/renewals",
+    "list": null,
+    "items": [
+     "Create Proposals"
+    ]
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-12",
+  "walkthrough": "P3 Proposals, renewal hand-off, placement and booking",
+  "step": "P3.2",
+  "persona": "Sanitation Handler",
+  "user": "sanitation",
+  "users": "sanitation",
+  "action": "Assigns part of the batch to a preferred accredited insurer (Proposal Batch page (Assign Insurer))",
+  "expected": "Insurer and rates updated on the selected proposals",
+  "checks": [
+   {
+    "name": "Proposal Batch page",
+    "path": "/migration/batches/:batchNo",
+    "list": "/migration/batches",
+    "items": [
+     "Assign Insurer"
+    ]
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-12",
+  "walkthrough": "P3 Proposals, renewal hand-off, placement and booking",
+  "step": "P3.3",
+  "persona": "Team Lead",
+  "user": "sbmtl",
+  "users": "sbmtl",
+  "action": "Releases the proposals (Proposal Batch page)",
+  "expected": "Proposals Released for the hand-off",
+  "checks": [
+   {
+    "name": "Proposal Batch page",
+    "path": "/migration/batches/:batchNo",
+    "list": "/migration/batches",
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-12",
+  "walkthrough": "P3 Proposals, renewal hand-off, placement and booking",
+  "step": "P3.4",
+  "persona": "Sanitation Handler",
+  "user": "sanitation",
+  "users": "sanitation",
+  "action": "Lets the expiry scan hand the records over and reviews the work list (Renewal Work List)",
+  "expected": "Records RENEWAL_IN_PROGRESS with the insurer and proposal; letters sent by the rules",
+  "checks": [
+   {
+    "name": "Renewal Work List",
+    "path": "/submitted/renewals",
+    "list": null,
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-12",
+  "walkthrough": "P3 Proposals, renewal hand-off, placement and booking",
+  "step": "P3.5",
+  "persona": "Sanitation Handler",
+  "user": "sanitation",
+  "users": "sanitation",
+  "action": "Re-assigns the insurer of a hold cover not accepted in time (Renewal Work List (Insurer Not Accepted))",
+  "expected": "New hold cover request to the new insurer",
+  "checks": [
+   {
+    "name": "Renewal Work List",
+    "path": "/submitted/renewals",
+    "list": null,
+    "items": [
+     "Insurer Not Accepted"
+    ]
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-12",
+  "walkthrough": "P3 Proposals, renewal hand-off, placement and booking",
+  "step": "P3.6",
+  "persona": "Placement and Booking users",
+  "user": "proc",
+  "users": "proc",
+  "action": "Places and books the renewal account (Placement and Booking Workbench (BRD-1))",
+  "expected": "Masterlist shows PLACED, then BOOKED with the invoice",
+  "checks": [
+   {
+    "name": "Placement and Booking Workbench",
+    "path": "/booking",
+    "list": null,
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-12",
+  "walkthrough": "P4 Handling fee and monitoring",
+  "step": "P4.1",
+  "persona": "Admin Team UPP handler",
+  "user": "sbmfee",
+  "users": "sbmfee",
+  "action": "Reviews the payments tagged as handling fees (Handling Fees; Unapplied Payments)",
+  "expected": "CLPC and OTC payments tagged and applied with an OR",
+  "checks": [
+   {
+    "name": "Handling Fees",
+    "path": "/submitted/fees",
+    "list": null,
+    "items": []
+   },
+   {
+    "name": "Unapplied Payments",
+    "path": "/cashiering/unapplied",
+    "list": null,
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-12",
+  "walkthrough": "P4 Handling fee and monitoring",
+  "step": "P4.2",
+  "persona": "Team Lead",
+  "user": "sbmtl",
+  "users": "sbmtl",
+  "action": "Runs the Sanitation, Disposition and Conversion reports and exports them (Reports (Submitted Policies))",
+  "expected": "Report columns of the Report List in Excel and PDF",
+  "checks": [
+   {
+    "name": "Reports",
+    "path": "/reports",
+    "list": null,
+    "items": [
+     "Submitted Policies"
+    ]
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-12",
+  "walkthrough": "P4 Handling fee and monitoring",
+  "step": "P4.3",
+  "persona": "Sanitation Handler",
+  "user": "sanitation",
+  "users": "sanitation",
+  "action": "Runs the monthly expiring and uninsured-loan report (Reports (SBM-EXPIRING-UNINSURED))",
+  "expected": "Expiring accounts and active loans without an active policy",
+  "checks": [
+   {
+    "name": "Report SBM-EXPIRING-UNINSURED",
+    "path": "/reports/SBM-EXPIRING-UNINSURED",
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-12",
+  "walkthrough": "P4 Handling fee and monitoring",
+  "step": "P4.4",
+  "persona": "Rule administrator",
+  "user": "sbmrules",
+  "users": "sbmrules",
+  "action": "Defines the recipients of the TOR hand-over notice (Submitted Policies Setup (Notification Recipients); notifications)",
+  "expected": "The named users receive the notices of the event",
+  "checks": [
+   {
+    "name": "Submitted Policies Setup",
+    "path": "/submitted/setup",
+    "list": null,
+    "items": [
+     "Notification Recipients"
+    ]
+   },
+   {
+    "name": "notifications",
+    "path": "/notifications",
+    "list": null,
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-12",
+  "walkthrough": "P4 Handling fee and monitoring",
+  "step": "P4.5",
+  "persona": "Submitted Handler (CBG)",
+  "user": "sbmhandler",
+  "users": "sbmhandler",
+  "action": "Updates the handler and conversion status and extracts the masterlist of the segment (Masterlist; Policy record (History))",
+  "expected": "Latest values and history; extract within the user's scope",
+  "checks": [
+   {
+    "name": "Masterlist",
+    "path": "/submitted/masterlist",
+    "list": null,
+    "items": []
+   },
+   {
+    "name": "Policy record",
+    "path": "/submitted/policies/:id",
+    "list": "/submitted/masterlist",
+    "items": [
+     "History"
+    ]
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-13",
+  "walkthrough": "UF-A A data object from its decision to its acceptance",
+  "step": "UF-A.1",
+  "persona": "Data Migration Lead",
+  "user": "miglead",
+  "users": "miglead",
+  "action": "Opens Data Objects, finds the object and submits the proposed class for decision (SCR-DM-02 Data Objects and the decision of an object)",
+  "expected": "The object in the register with its class and status. Shows the decision as For decision and notifies the business owner",
+  "checks": [
+   {
+    "name": "Report SCR-DM-02",
+    "path": "/reports/SCR-DM-02",
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-13",
+  "walkthrough": "UF-A A data object from its decision to its acceptance",
+  "step": "UF-A.2",
+  "persona": "Data owner (business owner of an object)",
+  "user": "migowner",
+  "users": "migowner",
+  "action": "Opens the object, reads the four criteria and the rationale and clicks Approve (SCR-DM-02 Data Objects and the decision of an object)",
+  "expected": "Toast: the decision is approved; the history lists the decision with the name of the owner. Decides the class (gate G1) and keeps the decision in the history",
+  "checks": [
+   {
+    "name": "Report SCR-DM-02",
+    "path": "/reports/SCR-DM-02",
+    "items": []
+   }
+  ],
+  "buttons": [
+   "Approve"
+  ]
+ },
+ {
+  "brd": "BRD-13",
+  "walkthrough": "UF-A A data object from its decision to its acceptance",
+  "step": "UF-A.3",
+  "persona": "Data Steward",
+  "user": "migsteward",
+  "users": "migsteward",
+  "action": "Opens the code map, creates a draft version and adds the legacy codes with their BIBS values (SCR-DM-03 Code Maps and the versions of a code map)",
+  "expected": "The Add Entry dialog with the legacy code, the action and the BIBS value. Keeps the draft; Submit sends it to the owner after a confirmation",
+  "checks": [
+   {
+    "name": "Report SCR-DM-03",
+    "path": "/reports/SCR-DM-03",
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-13",
+  "walkthrough": "UF-A A data object from its decision to its acceptance",
+  "step": "UF-A.4",
+  "persona": "Data Steward",
+  "user": "migsteward",
+  "users": "migsteward",
+  "action": "Opens Unmapped Codes to see the legacy codes of the extracts that have no entry yet (SCR-DM-03 Code Maps and the versions of a code map)",
+  "expected": "The unmapped codes to add before the validation. Lists each unmapped code with the extract and the count of rows",
+  "checks": [
+   {
+    "name": "Report SCR-DM-03",
+    "path": "/reports/SCR-DM-03",
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-13",
+  "walkthrough": "UF-A A data object from its decision to its acceptance",
+  "step": "UF-A.5",
+  "persona": "Data owner (business owner of an object)",
+  "user": "migowner",
+  "users": "migowner",
+  "action": "Approves the code map version and signs the mapping of the object (SCR-DM-10 Sign-off)",
+  "expected": "The gate matrix with the signer and date of G1 and G2. Signs gate G2: the layouts are frozen and every code map is approved",
+  "checks": [
+   {
+    "name": "Report SCR-DM-10",
+    "path": "/reports/SCR-DM-10",
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-13",
+  "walkthrough": "UF-A A data object from its decision to its acceptance",
+  "step": "UF-A.6",
+  "persona": "Migration Operator",
+  "user": "migops",
+  "users": "migops",
+  "action": "Uploads the extract with its control file and clicks Upload and Check (SCR-DM-05 Extracts)",
+  "expected": "The extract listed as Staged with its rows and the masking applied. Runs the intake checks (name, checksum, header, row count, totals) and stages the file",
+  "checks": [
+   {
+    "name": "Report SCR-DM-05",
+    "path": "/reports/SCR-DM-05",
+    "items": []
+   }
+  ],
+  "buttons": [
+   "Upload"
+  ]
+ },
+ {
+  "brd": "BRD-13",
+  "walkthrough": "UF-A A data object from its decision to its acceptance",
+  "step": "UF-A.7",
+  "persona": "Migration Operator",
+  "user": "migops",
+  "users": "migops",
+  "action": "Uploads a file whose control file announces more rows than the file holds (SCR-DM-05 Extracts)",
+  "expected": "The error notice with the reason of the rejection; the extract listed as Rejected. Rejects the file as a whole with the reason",
+  "checks": [
+   {
+    "name": "Report SCR-DM-05",
+    "path": "/reports/SCR-DM-05",
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-13",
+  "walkthrough": "UF-A A data object from its decision to its acceptance",
+  "step": "UF-A.8",
+  "persona": "Migration Operator",
+  "user": "migops",
+  "users": "migops",
+  "action": "Clicks Plan Batch, chooses the object and the staged extracts (SCR-DM-06 Batches and resubmissions)",
+  "expected": "The Plan Batch dialog with the staged extracts of the object. Plans the batch and opens it",
+  "checks": [
+   {
+    "name": "Report SCR-DM-06",
+    "path": "/reports/SCR-DM-06",
+    "items": []
+   }
+  ],
+  "buttons": [
+   "Plan Batch"
+  ]
+ },
+ {
+  "brd": "BRD-13",
+  "walkthrough": "UF-A A data object from its decision to its acceptance",
+  "step": "UF-A.9",
+  "persona": "Migration Operator",
+  "user": "migops",
+  "users": "migops",
+  "action": "Clicks Validate on the planned batch (SCR-DM-07 Batch)",
+  "expected": "The batch Validated with its counts, error rate and the Issues tab. Maps the rows with the approved code maps and checks them against the data-quality rules",
+  "checks": [
+   {
+    "name": "Report SCR-DM-07",
+    "path": "/reports/SCR-DM-07",
+    "items": []
+   }
+  ],
+  "buttons": [
+   "Validate"
+  ]
+ },
+ {
+  "brd": "BRD-13",
+  "walkthrough": "UF-A A data object from its decision to its acceptance",
+  "step": "UF-A.10",
+  "persona": "Data Steward",
+  "user": "migsteward",
+  "users": "migsteward",
+  "action": "Opens the doubtful client pair and merges it or keeps the clients separate (SCR-DM-08 Client Matching)",
+  "expected": "The two records side by side with the matched keys marked. Records the decision; the load waits until the queue is empty",
+  "checks": [
+   {
+    "name": "Report SCR-DM-08",
+    "path": "/reports/SCR-DM-08",
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-13",
+  "walkthrough": "UF-A A data object from its decision to its acceptance",
+  "step": "UF-A.11",
+  "persona": "Data owner (business owner of an object)",
+  "user": "migowner",
+  "users": "migowner",
+  "action": "Selects failing rows on the Rows tab and clicks Waive Rows with the reason (SCR-DM-07 Batch)",
+  "expected": "The Waive Rows dialog with the count of rows and the mandatory reason. Loads the rows despite their errors, with the waiver kept on the batch",
+  "checks": [
+   {
+    "name": "Report SCR-DM-07",
+    "path": "/reports/SCR-DM-07",
+    "items": []
+   }
+  ],
+  "buttons": [
+   "Waive Rows"
+  ]
+ },
+ {
+  "brd": "BRD-13",
+  "walkthrough": "UF-A A data object from its decision to its acceptance",
+  "step": "UF-A.12",
+  "persona": "Reconciliation approver (Head of Comptrollership for financial objects)",
+  "user": "migrecon",
+  "users": "migrecon",
+  "action": "After the load, opens the reconciliation of the batch by level (SCR-DM-09 Reconciliation)",
+  "expected": "The lines by level with the breaks to explain. Compares counts, amounts, hash totals, fields and the general ledger between the source and BIBS",
+  "checks": [
+   {
+    "name": "Report SCR-DM-09",
+    "path": "/reports/SCR-DM-09",
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-13",
+  "walkthrough": "UF-A A data object from its decision to its acceptance",
+  "step": "UF-A.13",
+  "persona": "Data Steward",
+  "user": "migsteward",
+  "users": "migsteward",
+  "action": "Explains a break with its reason (SCR-DM-09 Reconciliation)",
+  "expected": "The Explain Break dialog with the reason and the explanation. Marks the line Explained for the approver",
+  "checks": [
+   {
+    "name": "Report SCR-DM-09",
+    "path": "/reports/SCR-DM-09",
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-13",
+  "walkthrough": "UF-A A data object from its decision to its acceptance",
+  "step": "UF-A.14",
+  "persona": "Data Migration Lead",
+  "user": "miglead",
+  "users": "miglead",
+  "action": "After the reconciliation is signed, accepts the object as Migration Lead, after the owner (SCR-DM-07 Batch)",
+  "expected": "The Sign-offs tab with every gate, its signer and date. Signs gate G6; with both acceptances the object is accepted",
+  "checks": [
+   {
+    "name": "Report SCR-DM-07",
+    "path": "/reports/SCR-DM-07",
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-13",
+  "walkthrough": "UF-B The cut-over from the mock run to the go / no-go decision and the run-off",
+  "step": "UF-B.1",
+  "persona": "Data Migration Lead",
+  "user": "miglead",
+  "users": "miglead",
+  "action": "Clicks New Plan, chooses the kind of run and the go-live date (SCR-DM-12 Cutover)",
+  "expected": "The New Cutover Plan dialog. Creates the plan with its runbook tasks and the twelve criteria planned from the go-live date",
+  "checks": [
+   {
+    "name": "Report SCR-DM-12",
+    "path": "/reports/SCR-DM-12",
+    "items": []
+   }
+  ],
+  "buttons": [
+   "New Plan"
+  ]
+ },
+ {
+  "brd": "BRD-13",
+  "walkthrough": "UF-B The cut-over from the mock run to the go / no-go decision and the run-off",
+  "step": "UF-B.2",
+  "persona": "Data Migration Lead",
+  "user": "miglead",
+  "users": "miglead",
+  "action": "Records the start and end of each runbook task, or blocks a task with its reason (SCR-DM-12 Cutover)",
+  "expected": "The plans and the runbook of the mock run. Keeps the actual times and the owner of each task",
+  "checks": [
+   {
+    "name": "Report SCR-DM-12",
+    "path": "/reports/SCR-DM-12",
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-13",
+  "walkthrough": "UF-B The cut-over from the mock run to the go / no-go decision and the run-off",
+  "step": "UF-B.3",
+  "persona": "Go / no-go board",
+  "user": "migpm",
+  "users": "migpm, miggonogo",
+  "action": "Clicks Measure Criteria, reads the criteria and records GO or NO-GO (SCR-DM-12 Cutover)",
+  "expected": "The Go / No-Go Criteria and the Decisions of the plan. Measures the criteria that BIBS measures; a GO with a criterion not met needs its justification",
+  "checks": [
+   {
+    "name": "Report SCR-DM-12",
+    "path": "/reports/SCR-DM-12",
+    "items": []
+   }
+  ],
+  "buttons": [
+   "Measure Criteria"
+  ]
+ },
+ {
+  "brd": "BRD-13",
+  "walkthrough": "UF-B The cut-over from the mock run to the go / no-go decision and the run-off",
+  "step": "UF-B.4",
+  "persona": "Comptrollership GL lead",
+  "user": "comptrol",
+  "users": "comptrol",
+  "action": "After go-live, prepares an opening-balance adjustment on the validated adjustment batch (SCR-DM-11 Opening-Balance Adjustments)",
+  "expected": "The Prepare Adjustment dialog with the batches of the same version. Prepares the adjustment and sends it to the Head of Comptrollership on Submit",
+  "checks": [
+   {
+    "name": "Report SCR-DM-11",
+    "path": "/reports/SCR-DM-11",
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-13",
+  "walkthrough": "UF-B The cut-over from the mock run to the go / no-go decision and the run-off",
+  "step": "UF-B.5",
+  "persona": "Reconciliation approver (Head of Comptrollership for financial objects)",
+  "user": "migrecon",
+  "users": "migrecon",
+  "action": "Approves the adjustment prepared by the GL lead, then signs it once reconciled (SCR-DM-11 Opening-Balance Adjustments)",
+  "expected": "The adjustments with their batches and status. Allows the load of the adjustment journals into the opening balances",
+  "checks": [
+   {
+    "name": "Report SCR-DM-11",
+    "path": "/reports/SCR-DM-11",
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-13",
+  "walkthrough": "UF-B The cut-over from the mock run to the go / no-go decision and the run-off",
+  "step": "UF-B.6",
+  "persona": "Data Migration Lead",
+  "user": "miglead",
+  "users": "miglead",
+  "action": "Opens Run-off and Decommissioning each month and records the checklist of a legacy system (SCR-DM-13 Run-off and Decommissioning)",
+  "expected": "The run-off and the decommissioning checklists. Shows the run-off by expiry month and source system and keeps the signed criteria",
+  "checks": [
+   {
+    "name": "SCR-DM-13 Run-off and Decommissioning",
+    "path": "/migration/runoff",
+    "list": null,
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-13",
+  "walkthrough": "UF-C Migrated records on the business screens and the legacy batches",
+  "step": "UF-C.1",
+  "persona": "Marketing user",
+  "user": "ao",
+  "users": "ao",
+  "action": "Searches the clients list for a migrated client (SCR-DM-16 LEGACY badge and Origin filter on the lists)",
+  "expected": "The Clients list with the LEGACY badge. Lists the client with the LEGACY badge and the legacy reference in its tooltip",
+  "checks": [
+   {
+    "name": "Report SCR-DM-16",
+    "path": "/reports/SCR-DM-16",
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-13",
+  "walkthrough": "UF-C Migrated records on the business screens and the legacy batches",
+  "step": "UF-C.2",
+  "persona": "Cashiering user",
+  "user": "cashier",
+  "users": "cashier",
+  "action": "Sets the Origin filter of Unapplied Payments to Migrated (SCR-DM-16 LEGACY badge and Origin filter on the lists)",
+  "expected": "The Origin filter set to Migrated. Lists only the migrated unapplied payments",
+  "checks": [
+   {
+    "name": "Report SCR-DM-16",
+    "path": "/reports/SCR-DM-16",
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-13",
+  "walkthrough": "UF-C Migrated records on the business screens and the legacy batches",
+  "step": "UF-C.3",
+  "persona": "Cashiering user",
+  "user": "cashier",
+  "users": "cashier",
+  "action": "Opens a legacy invoice from Invoice Search (SCR-DM-17 Legacy invoice on Invoice 360)",
+  "expected": "The Legacy Invoice card. Shows Invoice 360 with the LEGACY badge and the Legacy Invoice card with the values at cut-over",
+  "checks": [
+   {
+    "name": "Report SCR-DM-17",
+    "path": "/reports/SCR-DM-17",
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-13",
+  "walkthrough": "UF-C Migrated records on the business screens and the legacy batches",
+  "step": "UF-C.4",
+  "persona": "Cashiering user",
+  "user": "cashier",
+  "users": "cashier",
+  "action": "Opens a draft Unapplied to Income batch, adds old unapplied payments and clicks Submit (SCR-DM-18 Unapplied to Income)",
+  "expected": "The draft batch with its lines and the payments that may be added. Sends the batch to the Cashiering team lead",
+  "checks": [
+   {
+    "name": "Report SCR-DM-18",
+    "path": "/reports/SCR-DM-18",
+    "items": []
+   }
+  ],
+  "buttons": [
+   "Submit"
+  ]
+ },
+ {
+  "brd": "BRD-13",
+  "walkthrough": "UF-C Migrated records on the business screens and the legacy batches",
+  "step": "UF-C.5",
+  "persona": "Top management (Finance Approver)",
+  "user": "topmgmt",
+  "users": "topmgmt",
+  "action": "After the team lead, approves the batch (SCR-DM-18 Unapplied to Income)",
+  "expected": "The batch waiting for top management with Approve and Return. Posts each line on its own and closes the payments",
+  "checks": [
+   {
+    "name": "Report SCR-DM-18",
+    "path": "/reports/SCR-DM-18",
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-13",
+  "walkthrough": "UF-C Migrated records on the business screens and the legacy batches",
+  "step": "UF-C.6",
+  "persona": "Cashiering user",
+  "user": "cashier",
+  "users": "cashier",
+  "action": "Adds a legacy invoice with the PR 2307 amount to reverse and submits the batch (SCR-DM-19 Legacy PR 2307 Reversal)",
+  "expected": "The draft PR 2307 reversal batch. Sends the batch to the team lead, who posts each line",
+  "checks": [
+   {
+    "name": "SCR-DM-19 Legacy PR 2307 Reversal",
+    "path": "/cashiering/legacy-pr2307",
+    "list": null,
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-13",
+  "walkthrough": "UF-C Migrated records on the business screens and the legacy batches",
+  "step": "UF-C.7",
+  "persona": "Commission user (DP PR Legacy Reversal)",
+  "user": "commrec",
+  "users": "commrec",
+  "action": "Adds the legacy invoices tagged DP PR for reversal and submits the batch (SCR-DM-20 DP PR Legacy Reversal)",
+  "expected": "The draft DP PR reversal batch. Sends the batch to the Commission team lead, who posts each invoice",
+  "checks": [
+   {
+    "name": "SCR-DM-20 DP PR Legacy Reversal",
+    "path": "/commission/dppr-batches",
+    "list": null,
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-13",
+  "walkthrough": "UF-D A legacy archive inquiry and its review",
+  "step": "UF-D.1",
+  "persona": "Audit / Compliance user",
+  "user": "legacyaudit",
+  "users": "legacyaudit",
+  "action": "Opens Legacy Inquiry and gives the reason of the inquiry (SCR-DM-14 Legacy Inquiry)",
+  "expected": "The Reason of the Inquiry card. Keeps the reason for the session",
+  "checks": [
+   {
+    "name": "Report SCR-DM-14",
+    "path": "/reports/SCR-DM-14",
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-13",
+  "walkthrough": "UF-D A legacy archive inquiry and its review",
+  "step": "UF-D.2",
+  "persona": "Audit / Compliance user",
+  "user": "legacyaudit",
+  "users": "legacyaudit",
+  "action": "Searches the closed invoices (SCR-DM-14 Legacy Inquiry)",
+  "expected": "The search criteria and the records found. Lists the matching records and logs the search",
+  "checks": [
+   {
+    "name": "Report SCR-DM-14",
+    "path": "/reports/SCR-DM-14",
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-13",
+  "walkthrough": "UF-D A legacy archive inquiry and its review",
+  "step": "UF-D.3",
+  "persona": "Audit / Compliance user",
+  "user": "legacyaudit",
+  "users": "legacyaudit",
+  "action": "Opens a record and downloads a document (SCR-DM-14 Legacy Inquiry)",
+  "expected": "The legacy record with its legacy details and documents. Shows the record read-only and logs the view and the download",
+  "checks": [
+   {
+    "name": "Report SCR-DM-14",
+    "path": "/reports/SCR-DM-14",
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-13",
+  "walkthrough": "UF-D A legacy archive inquiry and its review",
+  "step": "UF-D.4",
+  "persona": "Compliance reviewer",
+  "user": "legacyrev",
+  "users": "legacyrev",
+  "action": "Opens the Access Log and filters it by user and date (SCR-DM-15 Access Log)",
+  "expected": "The access log, which cannot be changed. Shows every access with the user, time, action, criteria and reason",
+  "checks": [
+   {
+    "name": "Report SCR-DM-15",
+    "path": "/reports/SCR-DM-15",
+    "items": []
+   }
+  ],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-13",
+  "walkthrough": "FR-DM-125 Renewal advices already sent before go-live",
+  "step": "FR-DM-125.1",
+  "persona": "Renewal processing team (maker)",
+  "user": "rnwmaker",
+  "users": "rnwmaker",
+  "action": "Compiles the renewal advices already sent from the Excel trackers in the template of layout P03, one row per expiring term",
+  "expected": "The file is ready for the checker",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-13",
+  "walkthrough": "FR-DM-125 Renewal advices already sent before go-live",
+  "step": "FR-DM-125.2",
+  "persona": "Renewal processing team (checker)",
+  "user": "rnwchecker",
+  "users": "rnwchecker",
+  "action": "Compares the file with the trackers (row counts per tracker and 10 sample rows) and releases it",
+  "expected": "The file goes to the Migration Operator",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-13",
+  "walkthrough": "FR-DM-125 Renewal advices already sent before go-live",
+  "step": "FR-DM-125.3",
+  "persona": "Migration Operator",
+  "user": "migops",
+  "users": "migops",
+  "action": "Uploads the file with its control file on Extracts, plans the batch and validates it",
+  "expected": "The batch is validated; the rejected rows are on the batch with an Excel rejection report and correction columns",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-13",
+  "walkthrough": "FR-DM-125 Renewal advices already sent before go-live",
+  "step": "FR-DM-125.4",
+  "persona": "Renewal processing team (maker)",
+  "user": "rnwmaker",
+  "users": "rnwmaker",
+  "action": "Corrects each rejected row in the correction columns and prepares the resubmission with the corrected rows only (Resubmit Corrected Rows)",
+  "expected": "The resubmission waits for the checker on the Resubmissions tab of Batches",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-13",
+  "walkthrough": "FR-DM-125 Renewal advices already sent before go-live",
+  "step": "FR-DM-125.5",
+  "persona": "Renewal processing team (checker)",
+  "user": "rnwchecker",
+  "users": "rnwchecker",
+  "action": "Reviews each correction against the tracker and approves the resubmission, or returns it with a reason",
+  "expected": "Approved, or Returned to the maker; the maker of a resubmission cannot approve it: A record cannot be authorized by the user who maintained it",
+  "checks": [],
+  "buttons": []
+ },
+ {
+  "brd": "BRD-13",
+  "walkthrough": "FR-DM-125 Renewal advices already sent before go-live",
+  "step": "FR-DM-125.6",
+  "persona": "Migration Operator",
+  "user": "migops",
+  "users": "migops",
+  "action": "Loads the approved resubmission as a rerun batch after the load approval (G4)",
+  "expected": "The valid rows are loaded; the go-live renewal extraction records the advices already sent, so that no advice is sent twice",
+  "checks": [],
+  "buttons": []
+ }
+]

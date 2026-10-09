@@ -36,7 +36,7 @@ insert into seed_csh_receipt values
  'T-CBG1', 48250.00, 0, 0, 0, 'CHECK', '0118823', 'Metrobank', 'REINSTATED', 48250.00,
  'Reinstated in full after the check cleared on re-deposit'),
 ('AR-CEB-000004', 'AR', 'OTC', 12, 'CL-2026-000002', 'Reyes, Jose Miguel Lopez', 'Reyes, Jose Miguel Lopez',
- 'T-CBG1', 19351.13, 0, 0, 0, 'CASH', null, null, 'ISSUED', null, null),
+ 'T-CBG1', 19351.53, 0, 0, 0, 'CASH', null, null, 'ISSUED', null, null),
 ('AR-CEB-000005', 'AR', 'OTC', 9, 'CL-2026-000005', 'Garcia, Antonio Luis Dizon', 'Garcia, Antonio Luis Dizon',
  'T-CBG1', 19087.50, 0, 0, 0, 'CHECK', '0220145', 'BPI', 'ISSUED', null, null),
 ('AR-CEB-000006', 'AR', 'OTC', 6, 'CL-2026-000001', 'Santos, Maria Clara Reyes', 'Santos, Maria Clara Reyes',
@@ -160,7 +160,7 @@ select r.company_id, a.invoice_no, a.arn, r.payor_code, r.id, 'PAYMENT', a.sourc
 from (values
     ('AR-CEB-000003', 'BI-HO-2026-000004', 'ARN-2026-940004', 'PAY-2026-000911', 28281.25, 4064.45, 487.73,
      21, 'REVERSED', 20, 'Check returned for insufficient funds', '-000911'),
-    ('AR-CEB-000004', 'BI-HO-2026-000008', 'ARN-2026-940008', 'PAY-2026-000912', 19350.73, 2703.69, 324.44,
+    ('AR-CEB-000004', 'BI-HO-2026-000008', 'ARN-2026-940008', 'PAY-2026-000912', 19351.13, 2703.75, 324.45,
      12, 'ACTIVE', null, null, '-000912'),
     ('AR-CEB-000005', 'BI-HO-2026-000003', 'ARN-2026-940003', 'PAY-2026-000913', 19087.50, 2668.45, 320.21,
      9, 'REVERSED', 7, 'Applied to the wrong invoice; re-applied to the client''s fire policy', '-000913'),
@@ -254,8 +254,8 @@ from (values
      30000.00, 'BILLS_PAYMENT', 'EXCESS', 'BI-HO-2026-000003', 28506.63, 'Paid more than the balance', 11),
     ('PAY-2026-000904', 'BILLS_PAYMENT', 'BLK-2026-000901', 4, 'REF 55120', 'R. Santos', 2500.00,
      'BILLS_PAYMENT', 'UNAPPLIED_NO_MATCH', null, 0, 'No account or invoice matches the reference', 11),
-    ('PAY-2026-000905', 'DIRECT_CREDIT', 'BLK-2026-000902', 1, 'ARN-2026-940004', 'Pacific Harbor Logistics Inc.',
-     28281.25, 'DIRECT_CREDIT', 'APPLIED', 'BI-HO-2026-000004', 28281.25, 'Applied to the invoice', 4),
+    ('PAY-2026-000905', 'DIRECT_CREDIT', 'BLK-2026-000902', 1, 'ARN-2026-950011', 'Pacific Harbor Logistics Inc.',
+     379080.00, 'DIRECT_CREDIT', 'PREBOOKED', 'ARN-2026-950011', 0, 'Held for the renewal not yet booked', 4),
     ('PAY-2026-000906', 'DIRECT_CREDIT', 'BLK-2026-000902', 2, 'ARN-2026-940002', 'Garcia, Antonio Luis Dizon',
      5000.00, 'DIRECT_CREDIT', 'CANCELLED_REFERENCE', 'ARN-2026-940002', 0,
      'The account of the reference is cancelled', 4)
@@ -505,7 +505,7 @@ insert into seed_rem_batch values
  'MGIC-OR-2026-900911', 'DV-2026-000903'),
 ('RMB-INS-MGIC-2026-000903', 'SPECIAL', 'APPROVED', 'SPR-2026-000901', 9, 'BI-HO-2026-000008', 'ARN-2026-940008',
  'MGIC-MC-2026-98808', 'CL-2026-000002', 'Reyes, Jose Miguel Lopez', 'MTR10', 'MOTOR', date '2026-09-12',
- date '2027-09-12', date '2026-10-09', 12, 15450.00, 19350.73, 2703.69, 324.44, 270.37, 19351.13, 0, 0, null, null);
+ date '2027-09-12', date '2026-10-09', 12, 15450.00, 19351.13, 2703.75, 324.45, 270.38, 19351.13, 0, 0, null, null);
 
 insert into rem_batch (company_id, batch_no, insurer_code, remittance_type, currency, special_request_no, processor,
     stage, line_count, paid_ar, commission, commission_vat, wtax, dtip, incentive, incentive_vat, net_due,

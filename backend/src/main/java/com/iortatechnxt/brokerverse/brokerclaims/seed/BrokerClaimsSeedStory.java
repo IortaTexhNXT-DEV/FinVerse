@@ -273,10 +273,6 @@ public class BrokerClaimsSeedStory {
         companyId,
         claimId,
         new DiaryInput(
-            "FOLLOW_UP",
-            today,
-            today,
-            null,
-            "Send the insurer the proof of premium remittance"));
+            "FOLLOW_UP", today, today, null, "Send the insurer the proof of premium remittance"));
   }
 }

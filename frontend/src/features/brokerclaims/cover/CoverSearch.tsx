@@ -5,7 +5,6 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
-import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { StatusBadge } from '@/components/ui/StatusBadge';
@@ -96,12 +95,11 @@ export function CoverSearch({
           </Button>
         </div>
         <ErrorAlert error={results.error} />
-        {query !== undefined && !results.isFetching && hits.length === 0 && !results.error && (
-          <EmptyState message={`No cover found for ${query.q}`} />
-        )}
-        {hits.length > 0 && (
+        {query !== undefined && (
           <DataTable<CoverHit>
             caption="Covers"
+            loading={results.isFetching}
+            emptyMessage={`No cover found for ${query.q}`}
             rows={hits}
             rowKey={(c) => c.arn}
             onRowClick={onSelect}

@@ -54,6 +54,10 @@ export interface ReportVariant {
   name: string;
   owner: string;
   shared: boolean;
+  /** A standard variant of the report (configuration): shared with everyone, never deleted. */
+  standard: boolean;
+  /** The user's default variant of the report, applied when the report opens. */
+  defaultVariant: boolean;
   mine: boolean;
   parameters: Record<string, string>;
 }
@@ -85,6 +89,7 @@ export const nbReportsApi = {
     name: string;
     parameters: Record<string, string>;
     shared: boolean;
+    defaultVariant: boolean;
   }) => api.post<ReportVariant>('/nb/report-variants', body),
   deleteVariant: (id: number) => api.delete(`/nb/report-variants/${id}`),
   targets: (companyId: number, from: string, to: string) =>

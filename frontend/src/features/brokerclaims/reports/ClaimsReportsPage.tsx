@@ -8,6 +8,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { FORMAT_LABELS, menuFormats } from '@/features/reports/exportFormats';
 import { CLAIMS_SECTION } from '../ClaimsPlaceholder';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 /** Report category of the Claims Handling reports (ReportCategory.CLAIMS_HANDLING). */
 export const CLAIMS_CATEGORY = 'CLAIMS_HANDLING';
@@ -28,7 +29,7 @@ export default function ClaimsReportsPage() {
         description="Outstanding and past due claims, settled claims, ageing overall and per status."
       />
       <ErrorAlert error={catalogue.error} />
-      {catalogue.isLoading && <span className="spinner" aria-label="Loading" />}
+      {catalogue.isLoading && <LoadingPanel />}
       <Card title="Claims Handling">
         {reports.length === 0 && !catalogue.isLoading ? (
           <EmptyState message="No Claims Handling reports available to you" />

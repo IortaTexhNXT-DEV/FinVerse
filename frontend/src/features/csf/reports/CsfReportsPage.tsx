@@ -8,6 +8,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { FORMAT_LABELS, menuFormats } from '@/features/reports/exportFormats';
 import { CSF_SECTION } from '../csfCodes';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 /** Report category of the CSF reports (ReportCategory.CUSTOMER_SERVICE). */
 export const CSF_CATEGORY = 'CUSTOMER_SERVICE';
@@ -28,7 +29,7 @@ export default function CsfReportsPage() {
         description="Contact changes and agent activity for the leads and heads."
       />
       <ErrorAlert error={catalogue.error} />
-      {catalogue.isLoading && <span className="spinner" aria-label="Loading" />}
+      {catalogue.isLoading && <LoadingPanel />}
       <Card title="Customer Service">
         {reports.length === 0 && !catalogue.isLoading ? (
           <EmptyState message="No Customer Service reports available to you" />

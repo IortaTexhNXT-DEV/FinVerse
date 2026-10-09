@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Navigate, useParams } from 'react-router-dom';
 import { accountsApi } from '@/api/accounts';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 /** Opens an account from its ARN (links in duplicate findings, e-mails and other modules). */
 export default function AccountByArnPage() {
@@ -13,9 +14,5 @@ export default function AccountByArnPage() {
   if (account.data) {
     return <Navigate to={`/accounts/${account.data.id}`} replace />;
   }
-  return account.error ? (
-    <ErrorAlert error={account.error} />
-  ) : (
-    <span className="spinner" aria-label="Loading" />
-  );
+  return account.error ? <ErrorAlert error={account.error} /> : <LoadingPanel />;
 }

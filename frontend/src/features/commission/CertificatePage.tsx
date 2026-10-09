@@ -27,6 +27,7 @@ import { CERTIFICATE_ENTITY, commissionApi } from './commissionApi';
 import type { Certificate, OrLink } from './commissionApi';
 import { receiptsTotal } from './commissionLogic';
 import { ReasonDialog } from './DpItemDialogs';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 const TABS = [
   { id: 'receipts', label: 'Official Receipts' },
@@ -121,11 +122,7 @@ export default function CertificatePage() {
     },
   });
   if (cert.data === undefined) {
-    return cert.error ? (
-      <ErrorAlert error={cert.error} />
-    ) : (
-      <span className="spinner" aria-label="Loading" />
-    );
+    return cert.error ? <ErrorAlert error={cert.error} /> : <LoadingPanel />;
   }
   const c = cert.data;
   const decide = can('BIR_CERT_ACK') && c.stage === 'SUBMITTED';

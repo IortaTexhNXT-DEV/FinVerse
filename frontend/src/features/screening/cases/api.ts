@@ -155,6 +155,7 @@ export interface HighRiskClient {
   clientName: string;
   clientType: string;
   riskCategory?: string | null;
+  riskCategoryName?: string | null;
   riskRating?: string | null;
   tags?: string | null;
   taggedOn?: string | null;
@@ -162,6 +163,23 @@ export interface HighRiskClient {
   openCase: string;
   activePolicy: string;
   unit?: string | null;
+  openCaseNo?: string | null;
+  openCaseStage?: string | null;
+  marketingUnit?: string | null;
+  marketingUnitName?: string | null;
+  unitHead?: string | null;
+}
+
+/** One value of a High-risk Clients filter. */
+export interface FilterOption {
+  code: string;
+  label: string;
+}
+
+/** The values of the High-risk Clients filters. */
+export interface HighRiskFilters {
+  riskCategories: FilterOption[];
+  marketingUnits: FilterOption[];
 }
 
 export interface CaseSearchParams {
@@ -264,4 +282,6 @@ export const casesApi = {
     marketingUnit?: string;
     clientType?: string;
   }) => api.get<HighRiskClient[]>(`${BASE}/high-risk-clients${toQuery({ ...params })}`),
+  highRiskFilters: (companyId: number) =>
+    api.get<HighRiskFilters>(`${BASE}/high-risk-clients/filters${toQuery({ companyId })}`),
 };

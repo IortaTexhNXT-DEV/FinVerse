@@ -69,8 +69,45 @@ public class HighRiskController {
         .toList();
   }
 
+  /**
+   * The values of the screen's filters: the risk categories and marketing units, by name.
+   *
+   * @param companyId company
+   * @return filter values
+   */
+  @GetMapping("/filters")
+  @PreAuthorize(CaseController.HAS_VIEW)
+  public HighRiskFilters filters(@RequestParam Long companyId) {
+    return new HighRiskFilters(
+        report.riskCategories(companyId).stream().map(FilterOption::from).toList(),
+        report.marketingUnits(companyId).stream().map(FilterOption::from).toList());
+  }
+
   private static String blankToNull(String value) {
     return value == null || value.isBlank() ? null : value.strip();
+  }
+
+  /**
+   * The values of the High-risk Clients filters.
+   *
+   * @param riskCategories risk categories given to clients
+   * @param marketingUnits marketing units of the screening cases
+   */
+  public record HighRiskFilters(
+      List<FilterOption> riskCategories, List<FilterOption> marketingUnits) {}
+
+  /**
+   * One value of a filter.
+   *
+   * @param code stored code
+   * @param label name shown
+   */
+  public record FilterOption(String code, String label) {
+
+    static FilterOption from(Map<String, Object> row) {
+      return new FilterOption(
+          Objects.toString(row.get("code"), ""), Objects.toString(row.get("label"), ""));
+    }
   }
 
   /**
@@ -80,6 +117,7 @@ public class HighRiskController {
    * @param clientName client name
    * @param clientType client type
    * @param riskCategory risk category of the last tagging
+   * @param riskCategoryName name of the risk category
    * @param riskRating risk rating
    * @param tags PEP / WATCHLIST_REVIEW
    * @param taggedOn date of the last change
@@ -87,19 +125,30 @@ public class HighRiskController {
    * @param openCase open case number and stage, or None
    * @param activePolicy Yes or No
    * @param unit marketing unit / unit head
+   * @param openCaseNo number of the open case
+   * @param openCaseStage stage of the open case
+   * @param marketingUnit marketing unit code
+   * @param marketingUnitName marketing unit name
+   * @param unitHead unit head (user name)
    */
   public record HighRiskRow(
       String clientCode,
       String clientName,
       String clientType,
       String riskCategory,
+      String riskCategoryName,
       String riskRating,
       String tags,
       String taggedOn,
       String source,
       String openCase,
       String activePolicy,
-      String unit) {
+      String unit,
+      String openCaseNo,
+      String openCaseStage,
+      String marketingUnit,
+      String marketingUnitName,
+      String unitHead) {
 
     static HighRiskRow from(Map<String, Object> row) {
       return new HighRiskRow(
@@ -107,13 +156,19 @@ public class HighRiskController {
           text(row, "display_name"),
           text(row, "client_type"),
           text(row, "risk_category"),
+          text(row, "risk_category_name"),
           text(row, "risk_rating"),
           text(row, "tags"),
           text(row, "tagged_on"),
           text(row, "source"),
           text(row, "open_case"),
           text(row, "active_policy"),
-          text(row, "unit"));
+          text(row, "unit"),
+          text(row, "open_case_no"),
+          text(row, "open_case_stage"),
+          text(row, "marketing_unit"),
+          text(row, "marketing_unit_name"),
+          text(row, "unit_head"));
     }
 
     private static String text(Map<String, Object> row, String key) {

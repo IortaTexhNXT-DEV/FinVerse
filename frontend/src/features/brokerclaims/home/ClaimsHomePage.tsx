@@ -19,6 +19,7 @@ import type { BucketCount, StatusCount } from './api';
 import { bucketShares } from './homeLogic';
 import './home.css';
 import { countOf } from '@/utils/format';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 /** Outstanding claims per ageing bucket (BRCLM.025/026; BCL_AGEING_BUCKETS). */
 function AgeingChart({ buckets }: Readonly<{ buckets: BucketCount[] }>) {
@@ -95,7 +96,7 @@ export default function ClaimsHomePage() {
         }
       />
       <ErrorAlert error={home.error} />
-      {home.isLoading && <span className="spinner" aria-label="Loading" />}
+      {home.isLoading && <LoadingPanel />}
       {home.data !== undefined && (
         <>
           <WorkTiles

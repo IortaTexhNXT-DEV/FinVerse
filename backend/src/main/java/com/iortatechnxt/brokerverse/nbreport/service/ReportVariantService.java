@@ -76,10 +76,15 @@ public class ReportVariantService {
    * @param name name
    * @param parameters parameter values
    * @param shared whether other users see it
+   * @param defaultVariant whether it is the user's default variant of the report
    * @return variant
    */
   public ReportVariant save(
-      String reportCode, String name, Map<String, String> parameters, boolean shared) {
+      String reportCode,
+      String name,
+      Map<String, String> parameters,
+      boolean shared,
+      boolean defaultVariant) {
     ReportMetadata report = runnable(reportCode);
     String owner = currentUser.username();
     ReportVariant variant =
@@ -88,6 +93,12 @@ public class ReportVariantService {
             .orElseGet(() -> new ReportVariant(owner, reportCode, name));
     boolean created = variant.getId() == null;
     variant.save(write(known(report, parameters)), shared);
+    if (defaultVariant) {
+      variants
+          .findByOwnerIgnoreCaseAndReportCode(owner, reportCode)
+          .forEach(v -> v.markDefault(false));
+    }
+    variant.markDefault(defaultVariant);
     ReportVariant saved = variants.save(variant);
     audit.record(
         ENTITY,
@@ -109,6 +120,10 @@ public class ReportVariantService {
   public void delete(Long id) {
     ReportVariant variant =
         variants.findById(id).orElseThrow(() -> new ResourceNotFoundException(ENTITY, id));
+    if (variant.isStandard()) {
+      throw new BusinessRuleException(
+          "VARIANT_STANDARD", "A standard variant of the report cannot be deleted");
+    }
     if (!CurrentUser.sameUser(variant.getOwner(), currentUser.username())) {
       throw new BusinessRuleException(
           "VARIANT_NOT_OWNER", "Only the user who saved a report variant may delete it");

@@ -8,6 +8,7 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.common.util.Money;
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.PayeeRequestSource;
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.RequestSource;
@@ -246,7 +247,7 @@ public class RequestIntakeService {
             null,
             DisbursementSettings.REQUEST,
             r.getRequestNo(),
-            reason + " (" + r.getSourceModule() + " " + r.getSourceRef() + ")",
+            reason + " (" + DisplayFormat.label(r.getSourceModule()) + " " + r.getSourceRef() + ")",
             r.getAmount(),
             NO_MATCH_ALERT + ":" + r.getRequestNo()));
     payeeService.request(

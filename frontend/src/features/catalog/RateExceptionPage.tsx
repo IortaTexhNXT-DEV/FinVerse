@@ -35,6 +35,7 @@ import {
   requestedValue,
   schemeInForce,
 } from './rateException';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 /** The quotation (or account) the exception is for, opened from the record when it is found. */
 function Transaction({ reference }: Readonly<{ reference: string }>) {
@@ -151,11 +152,7 @@ export default function RateExceptionPage() {
     },
   });
   if (detail.data === undefined) {
-    return detail.error ? (
-      <ErrorAlert error={detail.error} />
-    ) : (
-      <span className="spinner" aria-label="Loading" />
-    );
+    return detail.error ? <ErrorAlert error={detail.error} /> : <LoadingPanel />;
   }
   const d = detail.data;
   const e = d.exception;

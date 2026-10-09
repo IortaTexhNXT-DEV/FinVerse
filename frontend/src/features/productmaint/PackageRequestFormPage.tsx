@@ -23,6 +23,7 @@ import { RequestHeaderCard } from './RequestHeaderCard';
 import { TermsEditor } from './TermsEditor';
 import '@/styles/quotation.css';
 import { refreshRecord } from '@/components/broking/recordRefresh';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 function useRequestSaver(setForm: (u: (f: RequestForm) => RequestForm) => void) {
   const companyId = useCompanyId();
@@ -163,11 +164,7 @@ export default function PackageRequestFormPage() {
     return <Form initial={newRequestForm()} />;
   }
   if (existing.data === undefined) {
-    return existing.error ? (
-      <ErrorAlert error={existing.error} />
-    ) : (
-      <span className="spinner" aria-label="Loading" />
-    );
+    return existing.error ? <ErrorAlert error={existing.error} /> : <LoadingPanel />;
   }
   return <Form key={existing.data.id} initial={formOfRequest(existing.data)} />;
 }

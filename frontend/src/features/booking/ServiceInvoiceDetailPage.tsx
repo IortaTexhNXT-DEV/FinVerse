@@ -31,6 +31,7 @@ import { UserName } from '@/components/ui/UserName';
 import { permissionLabel } from '@/utils/permissionLabel';
 import { useServiceInvoiceTypeName } from './serviceInvoiceLabels';
 import { Notice } from '@/components/ui/Notice';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 function CreditDialog({ si, onClose }: Readonly<{ si: ServiceInvoice; onClose: () => void }>) {
   const toast = useToast();
@@ -208,11 +209,7 @@ export default function ServiceInvoiceDetailPage() {
     onSuccess: (file) => saveFile(file.blob, file.fileName),
   });
   if (si.data === undefined) {
-    return si.error ? (
-      <ErrorAlert error={si.error} />
-    ) : (
-      <span className="spinner" aria-label="Loading" />
-    );
+    return si.error ? <ErrorAlert error={si.error} /> : <LoadingPanel />;
   }
   const s = si.data;
   return (

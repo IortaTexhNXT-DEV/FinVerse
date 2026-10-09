@@ -11,6 +11,8 @@ import java.util.Map;
  * @param name name
  * @param owner user who saved it
  * @param shared whether other users see it
+ * @param standard standard variant of the report (configuration, not deletable)
+ * @param defaultVariant the owner's default variant of the report
  * @param mine whether the current user saved it (may delete it)
  * @param parameters saved parameter values
  */
@@ -20,6 +22,8 @@ public record ReportVariantDto(
     String name,
     String owner,
     boolean shared,
+    boolean standard,
+    boolean defaultVariant,
     boolean mine,
     Map<String, String> parameters) {
 
@@ -34,6 +38,14 @@ public record ReportVariantDto(
   public static ReportVariantDto from(
       ReportVariant v, boolean mine, Map<String, String> parameters) {
     return new ReportVariantDto(
-        v.getId(), v.getReportCode(), v.getName(), v.getOwner(), v.isShared(), mine, parameters);
+        v.getId(),
+        v.getReportCode(),
+        v.getName(),
+        v.getOwner(),
+        v.isShared(),
+        v.isStandard(),
+        v.isDefaultVariant(),
+        mine,
+        parameters);
   }
 }

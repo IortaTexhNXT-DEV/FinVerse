@@ -205,7 +205,7 @@ export function ItemDialog({
   return (
     <Modal
       open
-      title={isNew ? 'Add Pending Item' : 'Edit Pending Item'}
+      title={item === undefined ? 'Add Pending Item' : `Edit Pending Item – ${item.subject}`}
       onClose={onClose}
       footer={
         <DialogFooter busy={save.isPending} label="Save Item" onClose={onClose} onSave={submit} />

@@ -35,6 +35,7 @@ import { displayNameOf } from '@/api/users';
 import { ConfirmButton } from '@/components/ui/ConfirmButton';
 import { RowActions } from '@/components/ui/RowActions';
 import { payeeAccountActions } from './rowActions';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 const ENTITY = 'DisbursementPayee';
 const ACTIONS: Record<string, string> = {
@@ -234,11 +235,7 @@ function ExistingPayee({ id }: Readonly<{ id: number }>) {
     },
   });
   if (payee.data === undefined) {
-    return payee.error ? (
-      <ErrorAlert error={payee.error} />
-    ) : (
-      <span className="spinner" aria-label="Loading" />
-    );
+    return payee.error ? <ErrorAlert error={payee.error} /> : <LoadingPanel />;
   }
   const p = payee.data;
   const current = form ?? payeeFormOf(p);

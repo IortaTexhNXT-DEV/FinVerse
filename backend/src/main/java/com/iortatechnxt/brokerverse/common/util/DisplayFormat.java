@@ -116,6 +116,36 @@ public final class DisplayFormat {
   }
 
   /**
+   * A count with its noun in singular or plural: "1 invoice", "3 invoices", "2 policies".
+   *
+   * @param count count
+   * @param noun noun in singular
+   * @return count and noun
+   */
+  public static String countOf(long count, String noun) {
+    return countOf(count, noun, pluralOf(noun));
+  }
+
+  /**
+   * A count with its noun in singular or plural, the plural given.
+   *
+   * @param count count
+   * @param singular noun in singular
+   * @param plural noun in plural
+   * @return count and noun
+   */
+  public static String countOf(long count, String singular, String plural) {
+    return count + " " + (count == 1 ? singular : plural);
+  }
+
+  private static String pluralOf(String noun) {
+    if (noun.matches(".*[^aeiou]y")) {
+      return noun.substring(0, noun.length() - 1) + "ies";
+    }
+    return noun.matches(".*(s|x|ch|sh)") ? noun + "es" : noun + "s";
+  }
+
+  /**
    * An amount with thousands separators and two decimals, e.g. 80,000,000.00.
    *
    * @param amount amount, may be null

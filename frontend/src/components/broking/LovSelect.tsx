@@ -1,5 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { lovApi } from '@/api/lov';
+import { Combobox } from '@/components/ui/Combobox';
+import { SEARCH_FROM } from '@/components/ui/comboOptions';
 
 interface LovSelectProps {
   id: string;
@@ -17,7 +19,7 @@ interface LovSelectProps {
 
 /**
  * Select bound to a list of values (BRNB.083): shows the values usable today, in their
- * maintained order. Use it for every coded business field.
+ * maintained order; a long list is searchable. Use it for every coded business field.
  */
 export function LovSelect({
   id,
@@ -37,6 +39,19 @@ export function LovSelect({
   const visible = (options.data ?? []).filter(
     (o) => parentCode === undefined || o.parentCode === parentCode,
   );
+  if (visible.length >= SEARCH_FROM) {
+    return (
+      <Combobox
+        id={id}
+        value={value}
+        onChange={onChange}
+        options={visible.map((o) => ({ value: o.code, label: o.label }))}
+        placeholder={placeholder}
+        disabled={disabled}
+        required={required}
+      />
+    );
+  }
   return (
     <select
       id={id}

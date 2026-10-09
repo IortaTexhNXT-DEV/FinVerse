@@ -29,6 +29,7 @@ import { CYCLE_ENTITY, prodreconApi } from './prodreconApi';
 import type { EarlyIncentiveLine, ReconCycle, ReconExtract } from './prodreconApi';
 import { matchedPercent, monthLabel } from './prodreconLogic';
 import { clientShortName } from '@/context/clientNames';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 const TABS = [
   { id: 'items', label: 'Items' },
@@ -223,11 +224,7 @@ export default function ReconCyclePage() {
     },
   });
   if (cycle.data === undefined) {
-    return cycle.error ? (
-      <ErrorAlert error={cycle.error} />
-    ) : (
-      <span className="spinner" aria-label="Loading" />
-    );
+    return cycle.error ? <ErrorAlert error={cycle.error} /> : <LoadingPanel />;
   }
   const c = cycle.data;
   const editable = can('RECON_PROCESS') && !c.closed;

@@ -9,13 +9,17 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
+import { Combobox } from '@/components/ui/Combobox';
 import { Field } from '@/components/ui/Field';
 import { Kpi } from '@/components/ui/Kpi';
-import { Modal } from '@/components/ui/Modal';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { RowActions } from '@/components/ui/RowActions';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { formatDateTime, humanize } from '@/utils/format';
+import { AlertActionDialog } from './AlertActionDialog';
+import type { AlertActionKind } from './AlertActionDialog';
+import { alertRef, recordKind, ruleName, ruleNames } from './alertWording';
 import { SeverityBadge } from './SeverityBadge';
 import { UserName } from '@/components/ui/UserName';
 
@@ -24,7 +28,7 @@ const STATUSES: AlertStatus[] = ['OPEN', 'ACKNOWLEDGED', 'RESOLVED'];
 
 interface Action {
   alert: AlertItem;
-  kind: 'acknowledge' | 'resolve';
+  kind: AlertActionKind;
 }
 
 /**
@@ -37,8 +41,9 @@ export default function AlertsPage() {
   const queryClient = useQueryClient();
   const [filters, setFilters] = useState<AlertFilters>({ status: 'OPEN' });
   const [action, setAction] = useState<Action | null>(null);
-  const [comment, setComment] = useState('');
   const canManage = can('ALERT_MANAGE');
+  const codes = useQuery({ queryKey: ['exception-codes'], queryFn: alertsApi.codes });
+  const names = ruleNames(codes.data);
 
   const alerts = useQuery({
     queryKey: ['alerts', filters],
@@ -48,15 +53,16 @@ export default function AlertsPage() {
   const refresh = () => queryClient.invalidateQueries({ queryKey: ['alerts'] });
 
   const act = useMutation({
-    mutationFn: (a: Action) =>
+    mutationFn: ({ a, comment }: { a: Action; comment: string }) =>
       a.kind === 'acknowledge'
         ? alertsApi.acknowledge(a.alert.id, comment || undefined)
         : alertsApi.resolve(a.alert.id, comment),
     onSuccess: async (a) => {
       setAction(null);
-      setComment('');
       await refresh();
-      toast.success(`${a.exceptionCode} ${humanize(a.status).toLowerCase()}`);
+      toast.success(
+        `Alert ${alertRef(a.id)} (${ruleName(names, a.exceptionCode)}) ${humanize(a.status).toLowerCase()}`,
+      );
     },
   });
   const runChecks = useMutation({
@@ -140,15 +146,19 @@ export default function AlertsPage() {
               </select>
             )}
           </Field>
-          <Field label="Exception code">
+          <Field label="Rule">
             {(id) => (
-              <input
+              <Combobox
                 id={id}
-                className="input"
                 value={filters.code ?? ''}
-                onChange={(e) =>
-                  setFilters({ ...filters, code: e.target.value.toUpperCase() || undefined })
-                }
+                emptyLabel="All"
+                loading={codes.isLoading}
+                options={(codes.data ?? []).map((c) => ({
+                  value: c.code,
+                  label: c.name,
+                  hint: humanize(c.module),
+                }))}
+                onChange={(code) => setFilters({ ...filters, code: code || undefined })}
               />
             )}
           </Field>
@@ -161,14 +171,36 @@ export default function AlertsPage() {
           rowKey={(a) => a.id}
           emptyMessage="No alerts match the filters."
           columns={[
-            { key: 't', header: 'Raised', render: (a) => formatDateTime(a.raisedAt) },
+            {
+              key: 'n',
+              header: 'Alert No. / Raised',
+              kind: 'code',
+              render: (a) => (
+                <>
+                  <strong>{alertRef(a.id)}</strong>
+                  <span className="cell-sub">{formatDateTime(a.raisedAt)}</span>
+                </>
+              ),
+            },
             {
               key: 'v',
               header: 'Severity',
               render: (a) => <SeverityBadge severity={a.severity} />,
             },
-            { key: 'c', header: 'Code', render: (a) => <strong>{a.exceptionCode}</strong> },
-            { key: 'e', header: 'Record', render: (a) => a.entityId ?? '' },
+            { key: 'c', header: 'Rule', render: (a) => ruleName(names, a.exceptionCode) },
+            {
+              key: 'e',
+              header: 'Record',
+              render: (a) =>
+                a.entityId === undefined || /^\d+$/.test(a.entityId) ? (
+                  recordKind(a.entityType)
+                ) : (
+                  <>
+                    <span className="mono">{a.entityId}</span>
+                    <span className="cell-sub">{recordKind(a.entityType)}</span>
+                  </>
+                ),
+            },
             { key: 'm', header: 'Message', render: (a) => a.message },
             {
               key: 'a',
@@ -179,71 +211,48 @@ export default function AlertsPage() {
             { key: 's', header: 'Status', render: (a) => <StatusBadge status={a.status} /> },
             {
               key: 'h',
-              header: 'Handled by',
+              header: 'Handled By',
               render: (a) => <UserName login={a.resolvedBy ?? a.acknowledgedBy} />,
             },
             {
               key: 'x',
               header: 'Actions',
-              render: (a) =>
-                canManage &&
-                a.status !== 'RESOLVED' && (
-                  <div className="row">
-                    {a.status === 'OPEN' && (
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        onClick={() => setAction({ alert: a, kind: 'acknowledge' })}
-                      >
-                        Acknowledge
-                      </Button>
-                    )}
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      onClick={() => setAction({ alert: a, kind: 'resolve' })}
-                    >
-                      Resolve
-                    </Button>
-                  </div>
-                ),
+              kind: 'actions',
+              render: (a) => (
+                <RowActions
+                  record={alertRef(a.id)}
+                  actions={[
+                    {
+                      label: 'Acknowledge',
+                      hidden: !canManage || a.status !== 'OPEN',
+                      onSelect: () => setAction({ alert: a, kind: 'acknowledge' }),
+                    },
+                    {
+                      label: 'Resolve',
+                      hidden: !canManage || a.status === 'RESOLVED',
+                      onSelect: () => setAction({ alert: a, kind: 'resolve' }),
+                    },
+                  ]}
+                />
+              ),
             },
           ]}
         />
       </Card>
-      <Modal
-        title={action?.kind === 'resolve' ? 'Resolve alert' : 'Acknowledge alert'}
-        open={action !== null}
-        onClose={() => setAction(null)}
-        footer={
-          <Button
-            variant="accent"
-            busy={act.isPending}
-            disabled={action?.kind === 'resolve' && comment.trim() === ''}
-            onClick={() => action && act.mutate(action)}
-          >
-            {action?.kind === 'resolve' ? 'Resolve' : 'Acknowledge'}
-          </Button>
-        }
-      >
-        <ErrorAlert error={act.error} />
-        {action !== null && (
-          <div className="stack">
-            <p>{action.alert.message}</p>
-            <Field label="Comment" required={action.kind === 'resolve'}>
-              {(id) => (
-                <textarea
-                  id={id}
-                  className="textarea"
-                  maxLength={200}
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
-                />
-              )}
-            </Field>
-          </div>
-        )}
-      </Modal>
+      {action !== null && (
+        <AlertActionDialog
+          alert={action.alert}
+          kind={action.kind}
+          rule={ruleName(names, action.alert.exceptionCode)}
+          busy={act.isPending}
+          error={act.error}
+          onConfirm={(comment) => act.mutate({ a: action, comment })}
+          onClose={() => {
+            setAction(null);
+            act.reset();
+          }}
+        />
+      )}
     </div>
   );
 }

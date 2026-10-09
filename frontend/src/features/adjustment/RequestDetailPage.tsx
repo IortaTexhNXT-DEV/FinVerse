@@ -38,6 +38,7 @@ import { AccountingTab, DetailsTab, HistoryTab, PolicyTab, RecomputeTab } from '
 import { useRequestLabels } from './useRequestLabels';
 import { UserName } from '@/components/ui/UserName';
 import { Notice } from '@/components/ui/Notice';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 const TABS = [
   { id: 'details', label: 'Details' },
@@ -207,11 +208,7 @@ export default function RequestDetailPage() {
     queryFn: () => adjustmentApi.get(id),
   });
   if (request.data === undefined) {
-    return request.error ? (
-      <ErrorAlert error={request.error} />
-    ) : (
-      <span className="spinner" aria-label="Loading" />
-    );
+    return request.error ? <ErrorAlert error={request.error} /> : <LoadingPanel />;
   }
   const r = request.data;
   const editable =

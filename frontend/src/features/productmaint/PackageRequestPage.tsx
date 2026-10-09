@@ -38,6 +38,7 @@ import { DetailsTab, HistoryTab, SetupTab } from './RequestTabs';
 import { TermsView } from './TermsView';
 import '@/styles/quotation.css';
 import { InsurerNames, LineLabel } from '@/components/broking/LovLabel';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 const TABS = [
   { id: 'details', label: 'Details' },
@@ -164,11 +165,7 @@ export default function PackageRequestPage() {
     queryFn: () => productMaintApi.get(id),
   });
   if (request.data === undefined) {
-    return request.error ? (
-      <ErrorAlert error={request.error} />
-    ) : (
-      <span className="spinner" aria-label="Loading" />
-    );
+    return request.error ? <ErrorAlert error={request.error} /> : <LoadingPanel />;
   }
   const p = request.data;
   return (

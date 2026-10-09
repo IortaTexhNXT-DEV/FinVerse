@@ -18,6 +18,7 @@ import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.lov.domain.LovValue;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import com.iortatechnxt.brokerverse.opsledger.domain.LedgerComponent;
@@ -148,8 +149,8 @@ public class IncentiveRunService {
               null,
               ENTITY,
               run.getRunNo(),
-              result.excludedCount()
-                  + " invoice(s) excluded from "
+              DisplayFormat.countOf(result.excludedCount(), "invoice")
+                  + " excluded from "
                   + scheme.getName()
                   + " run "
                   + run.getRunNo(),

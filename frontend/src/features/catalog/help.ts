@@ -65,7 +65,7 @@ export const CATALOG_HELP: HelpSection = {
       summary:
         'Incentive criteria such as CPC2 on the maintained products matrix: type, value or rule, products (with an optional segment) and effective dates (PMADD07/08).',
       workflow: [
-        'New Criterion: only active products of the matrix can be selected; the value is a rate, an amount or a rule with parameters.',
+        'Add Incentive Criterion: only active products of the matrix can be selected; the value is a rate, an amount or a rule with parameters.',
         'Open an active criterion to amend it: the amendment starts later and ends the current row the day before once authorized.',
         'Deactivate a criterion to stop it; it stays in the History tab.',
       ],

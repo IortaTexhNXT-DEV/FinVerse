@@ -40,6 +40,7 @@ import { TotalsStrip, TypeChip } from './RemittanceParts';
 import { batchLine, joinParts } from './remittanceLabels';
 import './remittance.css';
 import { UserName } from '@/components/ui/UserName';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 const ENTITY = 'RemittanceBatch';
 const TABS = [
@@ -263,11 +264,7 @@ export default function BatchDetailPage() {
   });
   const actions = useBatchActions(id, () => setDialog(undefined));
   if (batch.data === undefined) {
-    return batch.error ? (
-      <ErrorAlert error={batch.error} />
-    ) : (
-      <span className="spinner" aria-label="Loading" />
-    );
+    return batch.error ? <ErrorAlert error={batch.error} /> : <LoadingPanel />;
   }
   const b = batch.data;
   const s = b.summary;

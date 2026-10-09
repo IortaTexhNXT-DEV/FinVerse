@@ -7,6 +7,7 @@ import type {
 } from '@/api/ebMarket';
 import { ebServiceApi } from '@/api/ebService';
 import { LovSelect } from '@/components/broking/LovSelect';
+import { useLovLabel } from '@/components/broking/useLabels';
 import { DateInput } from '@/components/ui/DateInput';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
@@ -18,6 +19,13 @@ import { useEbMutation } from '../common/useEbMutation';
 import { docInput, ruleErrors, ruleInput } from './setupLogic';
 import { Notice } from '@/components/ui/Notice';
 import { useBaseCurrency } from '@/context/workspaceContext';
+import { CurrencySelect } from '@/components/broking/Lookups';
+
+/** A threshold rule as users name it: "Sum Insured Level 2". */
+function thresholdName(rule: ThresholdRule): string {
+  const measure = rule.measure === 'TSI' ? 'Sum Insured' : 'Annual Premium';
+  return `${measure} Level ${String(rule.approvalLevel)}`;
+}
 
 /**
  * Add or edit a value threshold rule: above the amount of total sum insured or annual premium, a
@@ -51,7 +59,7 @@ export function ThresholdRuleDialog({
   return (
     <Modal
       open
-      title={rule ? 'Edit Threshold Rule' : 'Add Threshold Rule'}
+      title={rule ? `Edit Threshold Rule – ${thresholdName(rule)}` : 'Add Threshold Rule'}
       onClose={onClose}
       footer={<DialogFooter busy={save.isPending} label="Save" onClose={onClose} onSave={submit} />}
     >
@@ -98,11 +106,10 @@ export function ThresholdRuleDialog({
           </Field>
           <Field label="Currency">
             {(id) => (
-              <input
+              <CurrencySelect
                 id={id}
-                className="input"
                 value={input.currency ?? ''}
-                onChange={(e) => set({ currency: e.target.value })}
+                onChange={(code) => set({ currency: code })}
               />
             )}
           </Field>
@@ -150,6 +157,7 @@ export function RequiredDocumentDialog({
 }: Readonly<{ doc?: RequiredDocument; onClose: () => void }>) {
   const [input, setInput] = useState<RequiredDocumentInput>(() => docInput(doc));
   const [submitted, setSubmitted] = useState(false);
+  const documentName = useLovLabel(EB_LOV.documentType);
   const save = useEbMutation(
     (c, v: RequiredDocumentInput) => ebServiceApi.saveRequiredDocument(c, v, doc?.id),
     'Required document saved; it waits for authorization',
@@ -166,7 +174,9 @@ export function RequiredDocumentDialog({
   return (
     <Modal
       open
-      title={doc ? 'Edit Required Document' : 'Add Required Document'}
+      title={
+        doc ? `Edit Required Document – ${documentName(doc.documentType)}` : 'Add Required Document'
+      }
       onClose={onClose}
       footer={<DialogFooter busy={save.isPending} label="Save" onClose={onClose} onSave={submit} />}
     >

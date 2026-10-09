@@ -6,6 +6,7 @@ import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { today } from '@/utils/format';
 import { DateInput } from '@/components/ui/DateInput';
+import { CostCentreSelect } from '@/components/broking/Lookups';
 
 interface DateDialogProps {
   title: string;
@@ -119,13 +120,7 @@ export function QueueEditDialog({ row, busy, error, onSave, onClose }: Readonly<
         </Field>
         <Field label="Cost center" hint="Leave blank for the account's cost center.">
           {(id) => (
-            <input
-              id={id}
-              className="input"
-              value={costCenter}
-              maxLength={20}
-              onChange={(e) => setCostCenter(e.target.value.toUpperCase())}
-            />
+            <CostCentreSelect id={id} value={costCenter} onChange={(code) => setCostCenter(code)} />
           )}
         </Field>
       </div>

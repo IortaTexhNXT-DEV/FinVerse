@@ -12,9 +12,11 @@ import java.util.Map;
  * @param name name of the variant
  * @param parameters parameter values to save
  * @param shared whether other users who may run the report see it
+ * @param defaultVariant make it the user's default variant of the report
  */
 public record SaveVariantRequest(
     @NotBlank @Size(max = 40) String reportCode,
     @NotBlank @Size(max = 80) String name,
     @NotNull Map<String, String> parameters,
-    boolean shared) {}
+    boolean shared,
+    boolean defaultVariant) {}

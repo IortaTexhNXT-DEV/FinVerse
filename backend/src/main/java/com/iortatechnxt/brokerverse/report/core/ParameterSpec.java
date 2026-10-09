@@ -78,6 +78,19 @@ public record ParameterSpec(
   }
 
   /**
+   * A choice of one value from a list by name; the value is the code.
+   *
+   * @param name parameter name
+   * @param label business label
+   * @param source key of the {@link CodeSetSource} offering the values
+   * @param required whether a value must be chosen
+   * @return spec
+   */
+  public static ParameterSpec lookup(String name, String label, String source, boolean required) {
+    return new ParameterSpec(name, label, ParameterType.LOOKUP, required, List.of(source), null);
+  }
+
+  /**
    * Returns a copy with a default value.
    *
    * @param value default

@@ -32,6 +32,7 @@ import { UserName } from '@/components/ui/UserName';
 import { Notice } from '@/components/ui/Notice';
 import { FormErrorSummary } from '@/components/ui/FormErrorSummary';
 import { BRAND } from '@/branding';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 type Mode = 'draft' | 'submit';
 
@@ -334,7 +335,7 @@ export default function AccessRequestFormPage() {
     users.data !== undefined &&
     (id === undefined || request.data !== undefined);
   if (!ready) {
-    return error ? <ErrorAlert error={error} /> : <span className="spinner" aria-label="Loading" />;
+    return error ? <ErrorAlert error={error} /> : <LoadingPanel />;
   }
   const initial =
     request.data === undefined

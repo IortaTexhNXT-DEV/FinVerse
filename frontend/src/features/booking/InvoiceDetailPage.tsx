@@ -36,6 +36,7 @@ import {
 } from './InvoiceTabs';
 import { UserName } from '@/components/ui/UserName';
 import { InsurerName } from '@/components/broking/LovLabel';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 const TABS = [
   { id: 'premium', label: 'Premium & Commission' },
@@ -166,11 +167,7 @@ export default function InvoiceDetailPage() {
     queryFn: () => bookingApi.invoice(id),
   });
   if (invoice.data === undefined) {
-    return invoice.error ? (
-      <ErrorAlert error={invoice.error} />
-    ) : (
-      <span className="spinner" aria-label="Loading" />
-    );
+    return invoice.error ? <ErrorAlert error={invoice.error} /> : <LoadingPanel />;
   }
   const i = invoice.data;
   return (

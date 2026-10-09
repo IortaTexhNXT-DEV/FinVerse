@@ -12,6 +12,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { useCompanyId } from '@/context/workspaceContext';
 import { WorkCountTiles } from './OpsParts';
 import { SECTION_LABELS, SECTION_ROUTES, safeUrl } from './opsLabels';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 function InvoiceFinder() {
   const navigate = useNavigate();
@@ -99,7 +100,7 @@ export default function OperationsHomePage() {
       />
       <ErrorAlert error={home.error} />
       <InvoiceFinder />
-      {home.isLoading && <span className="spinner" aria-label="Loading" />}
+      {home.isLoading && <LoadingPanel />}
       {!home.isLoading && sections.length === 0 && (
         <Card>
           <EmptyState message="No Operations section is assigned to your role" />

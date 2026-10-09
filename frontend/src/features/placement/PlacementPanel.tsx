@@ -8,6 +8,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatDateTime, formatPeriod, humanize } from '@/utils/format';
 import { placementLink } from './placementLogic';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 function returnText(r: InsurerReturn): string {
   const resolved = r.resolution === undefined ? 'open' : humanize(r.resolution);
@@ -24,11 +25,7 @@ export function PlacementPanel({ arn }: Readonly<{ arn: string }>) {
     queryFn: () => placementApi.account(arn),
   });
   if (view.data === undefined) {
-    return view.error ? (
-      <ErrorAlert error={view.error} />
-    ) : (
-      <span className="spinner" aria-label="Loading" />
-    );
+    return view.error ? <ErrorAlert error={view.error} /> : <LoadingPanel />;
   }
   const { gate, slips, holdCovers, returns } = view.data;
   const slip = slips.find((s) => s.status !== 'SUPERSEDED');

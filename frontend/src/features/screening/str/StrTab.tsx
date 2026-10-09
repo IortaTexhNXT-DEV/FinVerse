@@ -16,6 +16,7 @@ import { FilingDialog } from './StrDialogs';
 import { ReasonCodes, TemplateFields, Transactions } from './StrEditor';
 import { keyed, plain, transactionsError } from './strLogic';
 import type { EditLine } from './strLogic';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 function StrForm({ detail, str }: Readonly<{ detail: CaseDetail; str: StrDetail }>) {
   const toast = useToast();
@@ -151,7 +152,7 @@ export function StrTab({ detail }: Readonly<{ detail: CaseDetail }>) {
       queryClient.invalidateQueries({ queryKey: ['screening', 'case', detail.row.id] }),
   });
   if (str.isLoading) {
-    return <span className="spinner" aria-label="Loading" />;
+    return <LoadingPanel />;
   }
   if (str.data === undefined) {
     const canPrepare = detail.actions.includes('STR_EDIT');

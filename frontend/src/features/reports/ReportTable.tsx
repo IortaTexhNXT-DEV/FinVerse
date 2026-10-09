@@ -1,4 +1,5 @@
 import type { ReportResult, ReportRow } from '@/api/reports';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { formatAmount, formatDate } from '@/utils/format';
 import { filterRows } from './reportOptions';
 import type { ColumnFilters } from './reportOptions';
@@ -143,6 +144,13 @@ export function ReportTable({ result, filters = {}, onFilterChange }: Readonly<R
           )}
         </thead>
         <tbody>
+          {!rows.some((r) => r.kind === 'DETAIL') && (
+            <tr>
+              <td colSpan={span}>
+                <EmptyState message="No rows for these parameters. Change the period or the filters and run the report again." />
+              </td>
+            </tr>
+          )}
           {rows.map((row, i) => {
             const label = row.label ? `${'  '.repeat(row.level)}${row.label}` : '';
             if (row.kind === 'GROUP_HEADER' || row.kind === 'SECTION') {

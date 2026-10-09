@@ -29,6 +29,7 @@ import { BILLING_ENTITY, commissionApi } from './commissionApi';
 import type { DpBilling, DpItem } from './commissionApi';
 import { ReasonDialog } from './DpItemDialogs';
 import { UserName } from '@/components/ui/UserName';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 const TABS = [
   { id: 'accounts', label: 'Accounts' },
@@ -191,11 +192,7 @@ export default function DpBillingPage() {
     },
   });
   if (billing.data === undefined) {
-    return billing.error ? (
-      <ErrorAlert error={billing.error} />
-    ) : (
-      <span className="spinner" aria-label="Loading" />
-    );
+    return billing.error ? <ErrorAlert error={billing.error} /> : <LoadingPanel />;
   }
   const b = billing.data;
   const close = () => setDialog(undefined);

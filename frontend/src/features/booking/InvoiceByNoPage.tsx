@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Navigate, useParams } from 'react-router-dom';
 import { bookingApi } from '@/api/booking';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 /** Opens a booked invoice by its number (links from batch results and other modules). */
 export default function InvoiceByNoPage() {
@@ -13,9 +14,5 @@ export default function InvoiceByNoPage() {
   if (invoice.data !== undefined) {
     return <Navigate to={`/booking/invoices/${String(invoice.data.id)}`} replace />;
   }
-  return invoice.error ? (
-    <ErrorAlert error={invoice.error} />
-  ) : (
-    <span className="spinner" aria-label="Loading" />
-  );
+  return invoice.error ? <ErrorAlert error={invoice.error} /> : <LoadingPanel />;
 }

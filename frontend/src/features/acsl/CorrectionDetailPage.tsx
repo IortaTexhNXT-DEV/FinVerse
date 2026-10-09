@@ -32,6 +32,7 @@ import type { DialogField } from './FormDialog';
 import { OriginalLinesCard } from './OriginalLinesCard';
 import { UserName } from '@/components/ui/UserName';
 import { Notice } from '@/components/ui/Notice';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 function fieldsOf(action: CorrectionAction, users: readonly string[]): DialogField[] {
   return action === 'assign'
@@ -126,11 +127,7 @@ export default function CorrectionDetailPage() {
     queryFn: () => acslApi.getCorrection(id),
   });
   if (found.data === undefined) {
-    return found.error ? (
-      <ErrorAlert error={found.error} />
-    ) : (
-      <span className="spinner" aria-label="Loading" />
-    );
+    return found.error ? <ErrorAlert error={found.error} /> : <LoadingPanel />;
   }
   const c = found.data;
   const editable = c.stage === 'DRAFT' && can('ACSL_PROCESS');

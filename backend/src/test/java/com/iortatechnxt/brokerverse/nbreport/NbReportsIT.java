@@ -36,6 +36,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 /** New Business reports, dashboard, production targets and report variants (W4). */
 @IntegrationTest
@@ -62,6 +63,7 @@ class NbReportsIT {
   @Autowired private TestData data;
   @Autowired private AsUser as;
   @Autowired private UserDirectory users;
+  @Autowired private JdbcTemplate jdbc;
 
   private Map<String, String> params(String... pairs) {
     Map<String, String> m = new HashMap<>();
@@ -246,11 +248,14 @@ class NbReportsIT {
                     "NB-ACC-STATUS",
                     name,
                     Map.of("exceptions", "STALLED", "companyId", "1", "unknown", "x"),
-                    false));
+                    false,
+                    true));
+    assertThat(saved.isDefaultVariant()).isTrue();
     assertThat(variants.parameters(saved)).containsOnly(Map.entry("exceptions", "STALLED"));
     assertThat(as.run("ao2", () -> variants.visible("NB-ACC-STATUS")))
         .noneMatch(v -> v.getId().equals(saved.getId()));
-    as.run("ao", () -> variants.save("NB-ACC-STATUS", name, Map.of("status", "PLACED"), true));
+    as.run(
+        "ao", () -> variants.save("NB-ACC-STATUS", name, Map.of("status", "PLACED"), true, false));
     assertThat(as.run("ao2", () -> variants.visible("NB-ACC-STATUS")))
         .anyMatch(v -> v.getId().equals(saved.getId()));
     assertThatThrownBy(() -> as.run("ao2", () -> runDelete(saved.getId())))
@@ -259,9 +264,26 @@ class NbReportsIT {
     assertThat(as.run("ao", () -> variants.visible("NB-ACC-STATUS")))
         .noneMatch(v -> v.getId().equals(saved.getId()));
     assertThatThrownBy(
-            () -> as.run("ao", () -> variants.save("NB-PRODUCTION", "x", Map.of(), false)))
+            () -> as.run("ao", () -> variants.save("NB-PRODUCTION", "x", Map.of(), false, false)))
         .isInstanceOf(BusinessRuleException.class)
         .hasMessageContaining("not available");
+  }
+
+  @Test
+  void everyReportOffersStandardVariantsThatNoUserDeletes() {
+    var visible = as.run("ao", () -> variants.visible("NB-ACC-STATUS"));
+    var standard = visible.stream().filter(v -> v.isStandard()).toList();
+    assertThat(standard).isNotEmpty().allMatch(v -> v.isShared());
+    // Standard variants come first, then the user's own and shared ones.
+    assertThat(visible.get(0).isStandard()).isTrue();
+    assertThatThrownBy(() -> as.run("ao", () -> runDelete(standard.get(0).getId())))
+        .isInstanceOf(BusinessRuleException.class)
+        .hasMessageContaining("standard variant");
+    Integer reports =
+        jdbc.queryForObject(
+            "select count(distinct report_code) from nbr_report_variant where standard",
+            Integer.class);
+    assertThat(reports).isGreaterThan(250);
   }
 
   private Void runDelete(Long id) {

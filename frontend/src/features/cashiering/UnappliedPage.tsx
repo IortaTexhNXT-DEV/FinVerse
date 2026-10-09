@@ -10,7 +10,6 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import type { Column } from '@/components/ui/DataTable';
 import { DataTable } from '@/components/ui/DataTable';
-import { EmptyState } from '@/components/ui/EmptyState';
 import { OriginBadge } from '@/components/ui/OriginBadge';
 import { OriginFilter } from '@/components/ui/OriginFilter';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
@@ -205,18 +204,15 @@ export default function UnappliedPage() {
           />
         </WorklistToolbar>
         <ErrorAlert error={list.error ?? bulk.error} />
-        {!list.isLoading && rows.length === 0 ? (
-          <EmptyState />
-        ) : (
-          <DataTable
-            caption="Unapplied payments"
-            columns={columns}
-            rows={rows}
-            rowKey={(u) => u.id}
-            loading={list.isLoading}
-            onRowClick={(u) => void navigate(`/cashiering/unapplied/${u.id}`)}
-          />
-        )}
+        <DataTable
+          caption="Unapplied payments"
+          emptyMessage="No unapplied payment matches the filters."
+          columns={columns}
+          rows={rows}
+          rowKey={(u) => u.id}
+          loading={list.isLoading}
+          onRowClick={(u) => void navigate(`/cashiering/unapplied/${u.id}`)}
+        />
         <PageFooter data={list.data} noun="items" onPage={setPage} />
       </Card>
       {results && (

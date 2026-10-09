@@ -21,6 +21,7 @@ import { isBlankLine, lineProblems, totals } from './journalMath';
 import { useJournalSave } from './useJournalSave';
 import type { SaveMode } from './useJournalSave';
 import { Notice } from '@/components/ui/Notice';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 function SubmitConfirmation({
   open,
@@ -179,18 +180,14 @@ export default function JournalEntryPage() {
 
   if (editingId !== undefined) {
     if (existing.data === undefined) {
-      return existing.error ? (
-        <ErrorAlert error={existing.error} />
-      ) : (
-        <span className="spinner" aria-label="Loading" />
-      );
+      return existing.error ? <ErrorAlert error={existing.error} /> : <LoadingPanel />;
     }
     return (
       <JournalForm key={editingId} initial={journalValues(existing.data)} editingId={editingId} />
     );
   }
   if (branches.length === 0) {
-    return <span className="spinner" aria-label="Loading" />;
+    return <LoadingPanel />;
   }
   return (
     <JournalForm key="new" initial={newJournalValues(defaultBranch, company?.baseCurrency ?? '')} />

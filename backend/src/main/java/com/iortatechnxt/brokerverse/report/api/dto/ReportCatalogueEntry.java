@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.report.api.dto;
 
+import com.iortatechnxt.brokerverse.report.core.ParameterLookups;
 import com.iortatechnxt.brokerverse.report.core.ParameterSpec;
 import com.iortatechnxt.brokerverse.report.core.ReportMetadata;
 import com.iortatechnxt.brokerverse.report.render.ExportFormat;
@@ -44,8 +45,8 @@ public record ReportCatalogueEntry(
         m.title(),
         m.category().name(),
         m.category().label(),
-        m.description(),
-        m.parameters(),
+        ParameterLookups.businessDescription(m.description()),
+        m.parameters().stream().map(ParameterLookups::refine).toList(),
         exportable,
         m.archived(),
         m.documentStyle(),

@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.alert.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.BaseEntity;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.util.ReadableText;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -90,7 +91,7 @@ public class Alert extends BaseEntity {
     this.branchId = facts.branchId();
     this.entityType = facts.entityType();
     this.entityId = facts.entityId();
-    this.message = truncate(facts.message());
+    this.message = truncate(ReadableText.of(facts.message()));
     this.amount = facts.amount();
     this.dedupKey = facts.dedupKey();
     this.raisedAt = raisedAt;

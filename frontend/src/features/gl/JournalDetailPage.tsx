@@ -17,6 +17,7 @@ import { journalSource } from './journalSource';
 import { UserName } from '@/components/ui/UserName';
 import { displayNameOf } from '@/api/users';
 import { LineLabel } from '@/components/broking/LovLabel';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 function Summary({ journal: j }: Readonly<{ journal: Journal }>) {
   const source = journalSource(j);
@@ -113,11 +114,7 @@ export default function JournalDetailPage() {
   const journal = useQuery({ queryKey: ['journal', id], queryFn: () => glApi.journal(id) });
 
   if (journal.data === undefined) {
-    return journal.error ? (
-      <ErrorAlert error={journal.error} />
-    ) : (
-      <span className="spinner" aria-label="Loading" />
-    );
+    return journal.error ? <ErrorAlert error={journal.error} /> : <LoadingPanel />;
   }
   const j = journal.data;
   return (

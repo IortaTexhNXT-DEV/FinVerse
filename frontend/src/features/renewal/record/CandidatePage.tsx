@@ -33,6 +33,7 @@ import { AccountHistoryTab, HistoryTab, NotesTab } from './HistoryTabs';
 import { ChecksTab, ComputationsTab, InsurerTab, LettersTab } from './RecordTabs';
 import '../renewal.css';
 import { Notice } from '@/components/ui/Notice';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 const TABS = [
   { id: 'details', label: 'Details' },
@@ -124,11 +125,7 @@ export default function CandidatePage() {
     enabled: companyId > 0 && ref !== '',
   });
   if (detail.data === undefined) {
-    return detail.error ? (
-      <ErrorAlert error={detail.error} />
-    ) : (
-      <span className="spinner" aria-label="Loading" />
-    );
+    return detail.error ? <ErrorAlert error={detail.error} /> : <LoadingPanel />;
   }
   const d = detail.data;
   const refresh = () => void queryClient.invalidateQueries({ queryKey: ['renewal'] });

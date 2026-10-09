@@ -21,6 +21,8 @@ import { formatAmount, formatDate, today } from '@/utils/format';
 import { JournalLines, PremiumTables, SummaryFact } from './BookingParts';
 import { DateInput } from '@/components/ui/DateInput';
 import { ProductLineLabel, InsurerWithBranch } from '@/components/broking/LovLabel';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
+import { CostCentreSelect } from '@/components/broking/Lookups';
 
 interface Options {
   bookingDate: string;
@@ -62,12 +64,10 @@ function OptionsForm({
       </Field>
       <Field label="Cost center" hint="Blank: the account's cost center (sales organisation).">
         {(id) => (
-          <input
+          <CostCentreSelect
             id={id}
-            className="input"
-            maxLength={20}
             value={value.costCenter}
-            onChange={(e) => onChange({ ...value, costCenter: e.target.value.toUpperCase() })}
+            onChange={(code) => onChange({ ...value, costCenter: code })}
           />
         )}
       </Field>
@@ -268,7 +268,7 @@ export default function BookingConfirmPage() {
         <OptionsForm value={options} onChange={setOptions} />
       </Card>
       <ErrorAlert error={preview.error} />
-      {preview.isLoading && <span className="spinner" aria-label="Loading" />}
+      {preview.isLoading && <LoadingPanel />}
       {preview.data && <InvoicePreview preview={preview.data} />}
     </div>
   );

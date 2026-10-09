@@ -74,14 +74,16 @@ public final class ClientReports {
 
     private static final String SQL =
         "select * from (select coalesce(c.client_code, c.prospect_code) as client_code,"
-            + " c.display_name, c.client_type, lp.category_code as risk_category, rc.tier,"
+            + " c.display_name, c.client_type, lp.category_code as risk_category,"
+            + " rc.name as risk_category_name, rc.tier,"
             + " c.risk_rating, tg.tags, cast(lp.effective_at at time zone '"
             + BusinessClock.zoneId()
             + "' as date)"
             + " as tagged_on, lp.source, coalesce(oc.open_case, 'None') as open_case,"
             + " case when exists (select 1 from acc_account a where a.client_id = c.id"
             + " and a.status in ('POLICY_ISSUED', 'BOOKED')) then 'Yes' else 'No' end as active_policy,"
-            + " lc.marketing_unit, lc.unit_head,"
+            + " oc.case_no as open_case_no, oc.stage as open_case_stage,"
+            + " lc.marketing_unit, su.name as marketing_unit_name, lc.unit_head,"
             + " coalesce(lc.marketing_unit, '') || coalesce(' / ' || lc.unit_head, '') as unit"
             + " from crm_client c"
             + LAST_PROFILE
@@ -90,10 +92,13 @@ public final class ClientReports {
             + " left join lateral (select string_agg(t.tag_code, ', ' order by t.tag_code) as tags"
             + " from crm_client_tag t where t.client_id = c.id and t.active"
             + " and t.tag_code in ('PEP', 'WATCHLIST_REVIEW')) tg on true"
-            + " left join lateral (select k.case_no || ' (' || k.stage || ')' as open_case"
+            + " left join lateral (select k.case_no || ' (' || k.stage || ')' as open_case,"
+            + " k.case_no, k.stage"
             + " from scr_case k where k.client_id = c.id and k.status = 'OPEN'"
             + " order by k.id desc limit 1) oc on true"
             + LAST_CASE
+            + " left join cat_sales_unit su on su.company_id = c.company_id"
+            + " and su.code = lc.marketing_unit"
             + " where c.company_id = :companyId and c.status <> 'INACTIVE'"
             + " and (c.risk_rating = 'HIGH' or tg.tags is not null)) r"
             + " where (cast(:riskCategory as varchar) is null or r.risk_category = :riskCategory)"
@@ -101,6 +106,21 @@ public final class ClientReports {
             + " and (cast(:unitHead as varchar) is null or lower(r.unit_head) = lower(:unitHead))"
             + " and (cast(:clientType as varchar) is null or r.client_type = :clientType)"
             + " order by r.tier nulls last, r.display_name";
+
+    /** The risk categories given to the company's clients, by name. */
+    private static final String CATEGORIES =
+        "select distinct rc.code, rc.name as label from scr_client_risk_profile p"
+            + " join crm_client c on c.id = p.client_id"
+            + " join scr_risk_category rc on rc.version_id = p.risk_version_id"
+            + " and rc.code = p.category_code"
+            + " where c.company_id = :companyId order by label";
+
+    /** The marketing units of the company's screening cases, by name. */
+    private static final String UNITS =
+        "select distinct k.marketing_unit as code, coalesce(su.name, k.marketing_unit) as label"
+            + " from scr_case k left join cat_sales_unit su on su.company_id = k.company_id"
+            + " and su.code = k.marketing_unit"
+            + " where k.company_id = :companyId and k.marketing_unit is not null order by label";
 
     private final ScrReportSql sql;
 
@@ -148,6 +168,26 @@ public final class ClientReports {
       args.put(RISK_CATEGORY, filter.riskCategory());
       args.put(CLIENT_TYPE, filter.clientType());
       return sql.rows(SQL, args);
+    }
+
+    /**
+     * The values of the screen's Risk Category filter (code and name).
+     *
+     * @param companyId company
+     * @return rows with code and label
+     */
+    public List<Map<String, Object>> riskCategories(Long companyId) {
+      return sql.rows(CATEGORIES, Map.of(ScrReportSql.COMPANY, companyId));
+    }
+
+    /**
+     * The values of the screen's Marketing Unit filter (code and name).
+     *
+     * @param companyId company
+     * @return rows with code and label
+     */
+    public List<Map<String, Object>> marketingUnits(Long companyId) {
+      return sql.rows(UNITS, Map.of(ScrReportSql.COMPANY, companyId));
     }
 
     @Override

@@ -10,6 +10,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatDate, formatDateTime, humanize } from '@/utils/format';
 import { displayNameOf } from '@/api/users';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 /** One booking batch run (BRNB.036): the outcome of every account, with the failure reasons. */
 export default function BatchRunDetailPage() {
@@ -19,11 +20,7 @@ export default function BatchRunDetailPage() {
     queryFn: () => bookingApi.run(runNo),
   });
   if (run.data === undefined) {
-    return run.error ? (
-      <ErrorAlert error={run.error} />
-    ) : (
-      <span className="spinner" aria-label="Loading" />
-    );
+    return run.error ? <ErrorAlert error={run.error} /> : <LoadingPanel />;
   }
   const r = run.data;
   return (

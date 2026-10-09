@@ -11,6 +11,7 @@ import { EMPTY_ACCOUNT, accountErrors } from './payeeForm';
 import type { PayeeForm } from './payeeForm';
 import { DialogFooter } from './VoucherDialogs';
 import './disbursement.css';
+import { CurrencySelect } from '@/components/broking/Lookups';
 
 /** The payee fields (DIS 2.2.2): class, name, contact, TIN, modes, currency and types. */
 export function PayeeFields({
@@ -101,13 +102,11 @@ export function PayeeFields({
       </Field>
       <Field label="Currency" required error={errors.currency}>
         {(id) => (
-          <input
+          <CurrencySelect
             id={id}
-            className="input"
-            maxLength={3}
             disabled={disabled}
             value={form.currency}
-            onChange={(e) => onChange({ currency: e.target.value.toUpperCase() })}
+            onChange={(code) => onChange({ currency: code })}
           />
         )}
       </Field>
@@ -178,12 +177,10 @@ export function AccountFields({
       {text('accountName', 'Account Name', true)}
       <Field label="Currency" required>
         {(id) => (
-          <input
+          <CurrencySelect
             id={id}
-            className="input"
-            maxLength={3}
             value={value.currency}
-            onChange={(e) => onChange({ ...value, currency: e.target.value.toUpperCase() })}
+            onChange={(code) => onChange({ ...value, currency: code })}
           />
         )}
       </Field>

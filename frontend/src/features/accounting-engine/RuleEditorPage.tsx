@@ -17,6 +17,7 @@ import { RuleLinesEditor } from './RuleLinesEditor';
 import { components, newRule, roles, toRuleInput, validateRule } from './ruleModel';
 import { useAccountingLookups } from './useAccountingLookups';
 import { Notice } from '@/components/ui/Notice';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 interface EditorProps {
   existing: Rule | undefined;
@@ -117,7 +118,7 @@ export default function RuleEditorPage() {
   const { id } = useParams();
   const { rules, eventTypes, companyId, loading, error } = useAccountingLookups();
   if (loading || companyId === 0) {
-    return <span className="spinner" aria-label="Loading" />;
+    return <LoadingPanel />;
   }
   const existing =
     id === undefined || id === 'new' ? undefined : rules.find((r) => r.id === Number(id));

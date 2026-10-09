@@ -27,6 +27,7 @@ import { LegacyInvoiceBlock } from './LegacyInvoiceBlock';
 import { RELATED_TABS, flagChips, invoiceTabs } from './opsLabels';
 import type { Invoice360TabId } from './opsLabels';
 import { displayNameOf } from '@/api/users';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 function TabBody({ tab, view }: Readonly<{ tab: Invoice360TabId; view: Invoice360 }>) {
   const module = RELATED_TABS.find((t) => t.id === tab);
@@ -175,11 +176,7 @@ export default function Invoice360Page() {
     queryFn: () => opsApi.invoice(invoiceNo),
   });
   if (view.data === undefined) {
-    return view.error ? (
-      <ErrorAlert error={view.error} />
-    ) : (
-      <span className="spinner" aria-label="Loading" />
-    );
+    return view.error ? <ErrorAlert error={view.error} /> : <LoadingPanel />;
   }
   const v = view.data;
   const bookedId = v.booking.bookedInvoiceId;

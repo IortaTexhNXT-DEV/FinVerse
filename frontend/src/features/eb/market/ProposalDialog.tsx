@@ -1,4 +1,5 @@
 import { Plus, Trash2 } from 'lucide-react';
+import { EmptyRow } from '@/components/ui/EmptyRow';
 import { useState } from 'react';
 import { ebMarketApi } from '@/api/ebMarket';
 import type { Proposal, TorItem } from '@/api/ebMarket';
@@ -24,6 +25,7 @@ import {
 import type { AnswerRow, FactorRow, PlanRow, ProposalForm } from './proposalForm';
 import { Notice } from '@/components/ui/Notice';
 import { useBaseCurrency } from '@/context/workspaceContext';
+import { CurrencySelect } from '@/components/broking/Lookups';
 
 type Setter = (patch: Partial<ProposalForm>) => void;
 
@@ -110,9 +112,6 @@ function AnswersTable({
   items,
   set,
 }: Readonly<{ form: ProposalForm; items: TorItem[]; set: Setter }>) {
-  if (items.length === 0) {
-    return <p className="muted">No released terms of reference to answer</p>;
-  }
   const update = (index: number, patch: Partial<AnswerRow>) =>
     set({ answers: form.answers.map((a, i) => (i === index ? { ...a, ...patch } : a)) });
   return (
@@ -127,6 +126,9 @@ function AnswersTable({
         </tr>
       </thead>
       <tbody>
+        {items.length === 0 && (
+          <EmptyRow columns={5} message="No released terms of reference to answer" />
+        )}
         {form.answers.map((a, i) => {
           const item = items.find((t) => t.id === a.torItemId);
           return (
@@ -290,11 +292,10 @@ export function ProposalDialog({
           </Field>
           <Field label="Currency">
             {(id) => (
-              <input
+              <CurrencySelect
                 id={id}
-                className="input"
                 value={form.currency}
-                onChange={(e) => set({ currency: e.target.value })}
+                onChange={(code) => set({ currency: code })}
               />
             )}
           </Field>

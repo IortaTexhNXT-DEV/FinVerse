@@ -22,6 +22,7 @@ import { acslApi } from './api';
 import type { LogRow, ReconBucket, ReconRow, RunView, SoaUpload } from './api';
 import './acsl.css';
 import { displayNameOf } from '@/api/users';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 function Variance({ value }: Readonly<{ value?: number }>) {
   if (value === undefined) {
@@ -223,11 +224,7 @@ export default function SoaUploadDetailPage() {
     },
   });
   if (upload.data === undefined) {
-    return upload.error ? (
-      <ErrorAlert error={upload.error} />
-    ) : (
-      <span className="spinner" aria-label="Loading" />
-    );
+    return upload.error ? <ErrorAlert error={upload.error} /> : <LoadingPanel />;
   }
   const u = upload.data;
   return (

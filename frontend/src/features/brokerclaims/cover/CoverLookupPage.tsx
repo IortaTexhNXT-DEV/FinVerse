@@ -16,6 +16,7 @@ import { coverApi } from './api';
 import { CoverSearch } from './CoverSearch';
 import { CoverTabs } from './CoverTabs';
 import { displayNameOf } from '@/api/users';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 function CoverSummary({ cover }: Readonly<{ cover: CoverDetail }>) {
   const h = cover.header;
@@ -102,7 +103,7 @@ export default function CoverLookupPage() {
       ) : (
         <>
           <ErrorAlert error={cover.error} />
-          {cover.isLoading && <span className="spinner" aria-label="Loading" />}
+          {cover.isLoading && <LoadingPanel />}
           {cover.data && <CoverSummary cover={cover.data} />}
           {cover.data && <CoverTabs cover={cover.data} />}
         </>

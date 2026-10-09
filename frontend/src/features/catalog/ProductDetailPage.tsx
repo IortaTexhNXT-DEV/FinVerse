@@ -26,6 +26,7 @@ import { RecordActions } from './RecordActions';
 import { RuleEditorModal } from './RuleEditorModal';
 import type { RuleKind } from './RuleEditorModal';
 import { CoverTypeLabel, LovLabel, LovLabels } from '@/components/broking/LovLabel';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 const yes = (flag: boolean) => (flag ? 'Yes' : 'No');
 
@@ -205,11 +206,7 @@ export default function ProductDetailPage() {
     queryFn: () => catalogApi.product(code),
   });
   if (detail.data === undefined) {
-    return detail.error ? (
-      <ErrorAlert error={detail.error} />
-    ) : (
-      <span className="spinner" aria-label="Loading" />
-    );
+    return detail.error ? <ErrorAlert error={detail.error} /> : <LoadingPanel />;
   }
   const d = detail.data;
   const maintain = PRODUCT_MAINTAINERS.some((p) => can(p));

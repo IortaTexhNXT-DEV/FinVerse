@@ -35,6 +35,7 @@ import { lineMenu, payoutNote, tagProgress, totalsByCurrency } from './serviceFe
 import './frbs.css';
 import { UserName } from '@/components/ui/UserName';
 import { InsurerName, LovLabel } from '@/components/broking/LovLabel';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 type TabId = 'lines' | 'invoices';
 type Pending = { kind: 'release' | 'liquidate'; line: ServiceFeeLine } | undefined;
@@ -300,11 +301,7 @@ export default function ServiceFeeRunPage() {
     onSuccess: (l) => refresh(`Line ${String(l.lineNo)} sent to Disbursement again`),
   });
   if (run.data === undefined) {
-    return run.error ? (
-      <ErrorAlert error={run.error} />
-    ) : (
-      <span className="spinner" aria-label="Loading" />
-    );
+    return run.error ? <ErrorAlert error={run.error} /> : <LoadingPanel />;
   }
   const r = run.data;
   const rows = lines.data ?? [];

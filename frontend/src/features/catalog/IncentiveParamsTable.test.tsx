@@ -41,7 +41,10 @@ describe('Incentive rule parameters table', () => {
     await user.selectOptions(screen.getByLabelText('Parameter 1'), '');
     expect(screen.getByLabelText('Value of parameter 1')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Remove parameter' }));
-    expect(screen.queryByRole('table')).not.toBeInTheDocument();
+    // The grid keeps its headers and says that it has no parameter.
+    expect(screen.queryByLabelText('Parameter 1')).not.toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: 'Parameter' })).toBeInTheDocument();
+    expect(screen.getByText(/No parameter yet/)).toBeInTheDocument();
   });
 
   it('asks for the incentive type first', () => {

@@ -1,6 +1,6 @@
 import type { ParameterSpec } from '@/api/reports';
 import { dateRangeError } from '@/utils/dateRange';
-import { initialValue, parameterErrors, rangePartner } from './reportParams';
+import { initialValue, parameterErrors, rangePartner, resolveValue } from './reportParams';
 
 function spec(
   name: string,
@@ -74,5 +74,23 @@ describe('report parameter form', () => {
     expect(initialValue(spec('d', 'D', 'DATE', true, 'YEAR_START'))).toMatch(/^\d{4}-01-01$/);
     expect(initialValue(spec('s', 'S', 'SELECT', true, 'SUMMARY'))).toBe('SUMMARY');
     expect(initialValue(spec('t', 'T', 'TEXT'))).toBe('');
+  });
+});
+
+describe('variant keywords', () => {
+  it('resolves the period, year and branch keywords of a variant', () => {
+    const now = '2026-01-15';
+    expect(resolveValue('MONTH_START', undefined, now)).toBe('2026-01-01');
+    expect(resolveValue('MONTH_END', undefined, now)).toBe('2026-01-31');
+    expect(resolveValue('PREV_MONTH_START', undefined, now)).toBe('2025-12-01');
+    expect(resolveValue('PREV_MONTH_END', undefined, now)).toBe('2025-12-31');
+    expect(resolveValue('NEXT_MONTH_END', undefined, now)).toBe('2026-02-28');
+    expect(resolveValue('IN_THREE_MONTHS', undefined, now)).toBe('2026-04-15');
+    expect(resolveValue('PREV_YEAR', undefined, now)).toBe('2025');
+    expect(resolveValue('TWELVE_MONTHS_AGO', undefined, now)).toBe('2025-01-15');
+    expect(resolveValue('PREV_YEAR_END', undefined, now)).toBe('2025-12-31');
+    expect(resolveValue('MY_BRANCH', 7, now)).toBe('7');
+    expect(resolveValue('MY_BRANCH', undefined, now)).toBe('');
+    expect(resolveValue('OPEN', undefined, now)).toBe('OPEN');
   });
 });

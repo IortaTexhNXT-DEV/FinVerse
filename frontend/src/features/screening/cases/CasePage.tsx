@@ -43,6 +43,7 @@ import { DocumentsTab } from './DocumentsTab';
 import { ReviewTab } from './ReviewTab';
 import { UserName } from '@/components/ui/UserName';
 import { Notice } from '@/components/ui/Notice';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 type TabId = 'matches' | 'review' | 'documents' | 'decisions' | 'str' | 'timeline';
 
@@ -158,11 +159,7 @@ export default function CasePage() {
   const refresh = () => queryClient.invalidateQueries({ queryKey: ['screening'] });
 
   if (detail.data === undefined) {
-    return detail.error ? (
-      <ErrorAlert error={detail.error} />
-    ) : (
-      <span className="spinner" aria-label="Loading" />
-    );
+    return detail.error ? <ErrorAlert error={detail.error} /> : <LoadingPanel />;
   }
   const d = detail.data;
   const onDone = (outcome?: CaseOutcome) => {

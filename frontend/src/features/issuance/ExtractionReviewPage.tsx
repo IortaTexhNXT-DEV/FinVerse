@@ -18,6 +18,7 @@ import { UserName } from '@/components/ui/UserName';
 import { displayNameOf } from '@/api/users';
 import { matchText, extractionNotes } from './issuanceLogic';
 import { Notice } from '@/components/ui/Notice';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 interface Row {
   field: string;
@@ -101,11 +102,7 @@ export default function ExtractionReviewPage() {
     queryFn: () => issuanceApi.review(id),
   });
   if (review.data === undefined) {
-    return review.error ? (
-      <ErrorAlert error={review.error} />
-    ) : (
-      <span className="spinner" aria-label="Loading" />
-    );
+    return review.error ? <ErrorAlert error={review.error} /> : <LoadingPanel />;
   }
   const r = review.data;
   const open = r.epolicy.status === 'REVIEW' || r.epolicy.status === 'RECEIVED';

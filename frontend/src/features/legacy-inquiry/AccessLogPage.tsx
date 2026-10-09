@@ -16,6 +16,7 @@ import { useCompanyId } from '@/context/workspaceContext';
 import { formatDateTime } from '@/utils/format';
 import { reasonLabel } from './reason';
 import { UserName } from '@/components/ui/UserName';
+import { UserLookup } from '@/components/broking/Lookups';
 
 const ACTIONS = ['SEARCH', 'VIEW', 'DOWNLOAD', 'EXPORT'];
 
@@ -79,11 +80,11 @@ export default function AccessLogPage() {
         <div className="worklist-filters form-grid">
           <Field label="User">
             {(id) => (
-              <input
+              <UserLookup
+                emptyLabel="All"
                 id={id}
-                className="input"
                 value={filter.username ?? ''}
-                onChange={(e) => set('username', e.target.value)}
+                onChange={(code) => set('username', code)}
               />
             )}
           </Field>

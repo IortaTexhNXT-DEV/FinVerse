@@ -20,6 +20,7 @@ import { RecordActions } from './RecordActions';
 import { UserName } from '@/components/ui/UserName';
 import { placementChannelLabel } from './insurerForm';
 import { ProductName } from '@/components/broking/LovLabel';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 type Dialog = 'edit' | 'branch' | 'commission' | null;
 
@@ -113,11 +114,7 @@ export default function InsurerDetailPage() {
     queryFn: () => catalogApi.insurer(id),
   });
   if (detail.data === undefined) {
-    return detail.error ? (
-      <ErrorAlert error={detail.error} />
-    ) : (
-      <span className="spinner" aria-label="Loading" />
-    );
+    return detail.error ? <ErrorAlert error={detail.error} /> : <LoadingPanel />;
   }
   const d = detail.data;
   const maintain = can('MASTER_MAINTAIN');

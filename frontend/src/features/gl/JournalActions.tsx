@@ -160,7 +160,11 @@ export function JournalActions({ journal }: Readonly<{ journal: Journal }>) {
         onClose={() => setDialog(null)}
       />
       <Modal
-        title={dialog === 'reject' ? 'Return journal to its maker' : 'Reverse journal'}
+        title={
+          dialog === 'reject'
+            ? `Return Journal ${journal.batchNo} to Its Maker`
+            : `Reverse Journal ${journal.batchNo}`
+        }
         open={dialog === 'reject' || dialog === 'reverse'}
         onClose={() => setDialog(null)}
         footer={

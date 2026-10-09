@@ -22,6 +22,8 @@ import { TextDialog } from './VoucherDialogs';
 import './disbursement.css';
 import { displayNameOf } from '@/api/users';
 import { DateInput } from '@/components/ui/DateInput';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
+import { CurrencySelect } from '@/components/broking/Lookups';
 
 const ENTITY = 'DisbursementFunding';
 
@@ -77,13 +79,11 @@ function FundingFields({
       </Field>
       <Field label="Currency" required>
         {(id) => (
-          <input
+          <CurrencySelect
             id={id}
-            className="input"
-            maxLength={3}
             disabled={disabled}
             value={form.currency}
-            onChange={(e) => onChange({ currency: e.target.value.toUpperCase() })}
+            onChange={(code) => onChange({ currency: code })}
           />
         )}
       </Field>
@@ -215,11 +215,7 @@ function ExistingFunding({ id }: Readonly<{ id: number }>) {
   });
   const f = funding.data;
   if (f === undefined) {
-    return funding.error ? (
-      <ErrorAlert error={funding.error} />
-    ) : (
-      <span className="spinner" aria-label="Loading" />
-    );
+    return funding.error ? <ErrorAlert error={funding.error} /> : <LoadingPanel />;
   }
   const businessActions = (available: WorkAction[]) =>
     available

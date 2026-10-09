@@ -1771,7 +1771,7 @@ a.card.kpi:focus-visible .kpi-label {
   right: var(--space-4);
   z-index: 30;
   width: 320px;
-  max-height: 420px;
+  max-height: min(420px, 55vh);
   overflow: auto;
   padding: var(--space-3);
   border: 1px solid var(--color-border);
@@ -1856,4 +1856,291 @@ a.card.kpi:focus-visible .kpi-label {
 
 .table-compact .cell-stack > .muted {
   font-size: 12px;
+}
+
+/* ---------- Dialog standard (Modal, ConfirmDialog, ActionDialog) ------------------------- */
+/* Sizes: sm 480 px (confirmations), md 640 px (a few fields), lg 920 px (forms and tables). A
+   dialog without a size takes md, or lg when it holds a table, a form grid, tabs or wide blocks. */
+.modal.modal-sm {
+  width: min(480px, 94vw);
+}
+
+.modal.modal-md,
+.modal.modal-auto {
+  width: min(640px, 94vw);
+}
+
+.modal.modal-lg,
+.modal.modal-auto:has(table, .form-grid, .tabs, .def-grid.cols-2, iframe, .grid-2, .grid-4) {
+  width: min(920px, 94vw);
+}
+
+.modal:focus {
+  outline: none;
+}
+
+/* Cancel (secondary) to the left of the primary action, whatever order the footer is written in. */
+.modal-footer {
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.modal-footer:not(:has(.spacer)) > .btn-secondary,
+.modal-footer:not(:has(.spacer)) > .btn-ghost {
+  order: -1;
+}
+
+/* The key facts of the record the dialog acts on. */
+.dialog-context {
+  margin-bottom: var(--space-4);
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+}
+
+.dialog-context .def-row:last-child {
+  border-bottom: 0;
+}
+
+.dialog-helper {
+  margin: 0 0 var(--space-3);
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+.confirm-effect.danger {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-left: 3px solid var(--color-danger);
+  background: var(--color-danger-bg);
+  color: var(--color-heading);
+}
+
+/* Comment with its counter. */
+.comment-foot {
+  display: flex;
+  gap: var(--space-3);
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 12px;
+}
+
+.comment-count {
+  margin-left: auto;
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.comment-count.near {
+  color: var(--color-warning);
+}
+
+/* ---------- Searchable select (Combobox) ------------------------------------------------- */
+.combobox {
+  position: relative;
+  min-width: 0;
+}
+
+.combobox-input.input {
+  padding-right: 32px;
+  text-overflow: ellipsis;
+}
+
+.combobox-caret,
+.combobox-clear {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  color: var(--color-text-muted);
+}
+
+.combobox-caret {
+  pointer-events: none;
+}
+
+.combobox-clear {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  cursor: pointer;
+}
+
+.combobox-clear:hover,
+.combobox-clear:focus-visible {
+  background: var(--color-bg);
+  color: var(--color-heading);
+}
+
+.combobox-list {
+  position: absolute;
+  z-index: 70;
+  top: calc(100% + 2px);
+  left: 0;
+  min-width: 100%;
+  max-width: min(420px, 90vw);
+  max-height: 280px;
+  margin: 0;
+  padding: var(--space-1) 0;
+  overflow: auto;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-md);
+}
+
+.combobox-option,
+.combobox-none {
+  display: flex;
+  flex-direction: column;
+  padding: 6px var(--space-3);
+  cursor: pointer;
+}
+
+.combobox-option.active,
+.combobox-option:hover {
+  background: var(--color-bg);
+}
+
+.combobox-option[aria-selected='true'] {
+  font-weight: 600;
+}
+
+.combobox-hint {
+  color: var(--color-text-muted);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.combobox-none {
+  color: var(--color-text-muted);
+  cursor: default;
+}
+
+/* ---------- Loading panel (a record, tab or panel while it loads) ------------------------- */
+.loading-panel {
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md, var(--radius-sm));
+  background: var(--color-surface);
+}
+
+.loading-panel .loading-title {
+  width: 35%;
+  height: 18px;
+  margin-bottom: var(--space-3);
+}
+
+/* A toast closes by itself (sooner for a confirmation than for an error) or with its button. */
+.toast-close {
+  display: grid;
+  place-items: center;
+  margin-left: auto;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.toast-close:hover,
+.toast-close:focus-visible {
+  background: var(--color-bg);
+  color: var(--color-heading);
+}
+
+.confirm-consequence {
+  margin-top: var(--space-1);
+  font-weight: 600;
+}
+
+/* ---------- Report Centre: variants, list parameters and actions ------------------------- */
+.report-variant-actions {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-end;
+}
+
+.report-variant-hint {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: 13px;
+}
+
+.variant-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-5);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.variant-options legend {
+  margin-bottom: var(--space-1);
+  font-weight: 600;
+  color: var(--color-heading);
+}
+
+.code-set {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.code-set-row {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr);
+  gap: var(--space-2);
+}
+
+.report-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+}
+
+.report-download {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.report-download .select {
+  width: 120px;
+}
+
+.report-download-label {
+  color: var(--color-text-muted);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.report-print-options summary {
+  cursor: pointer;
+  color: var(--brand-blue);
+  font-weight: 600;
+}
+
+.report-print-options[open] summary {
+  margin-bottom: var(--space-3);
+}
+
+.report-filter-note {
+  margin: 0;
+  font-size: 13px;
 }

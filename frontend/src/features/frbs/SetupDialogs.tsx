@@ -10,6 +10,8 @@ import { frbsApi } from './api';
 import type { RecipientBody, RuleBody, ServiceFeeRecipient, ServiceFeeRule } from './api';
 import { ruleErrors } from './serviceFee';
 import { DateInput } from '@/components/ui/DateInput';
+import { CostCentreSelect } from '@/components/broking/Lookups';
+import { SalesUnitSelect } from '@/components/broking/Lookups';
 
 /** Adds or changes a service-fee rate (FRBS 2.10.0; values AQ20). */
 export function RuleDialog({
@@ -194,13 +196,11 @@ export function RecipientDialog({
         <div className="frbs-form">
           <Field label="Sales Unit" required error={missing(body.salesUnit)}>
             {(id) => (
-              <input
+              <SalesUnitSelect
                 id={id}
-                className="input"
                 disabled={recipient !== undefined}
-                maxLength={20}
                 value={body.salesUnit}
-                onChange={(e) => setBody({ ...body, salesUnit: e.target.value })}
+                onChange={(code) => setBody({ ...body, salesUnit: code })}
               />
             )}
           </Field>
@@ -233,12 +233,10 @@ export function RecipientDialog({
           </Field>
           <Field label="Cost Centre" hint="Blank: the unit's cost centre or the cost-centre rules">
             {(id) => (
-              <input
+              <CostCentreSelect
                 id={id}
-                className="input"
-                maxLength={20}
                 value={body.costCenter ?? ''}
-                onChange={(e) => setBody({ ...body, costCenter: e.target.value || undefined })}
+                onChange={(code) => setBody({ ...body, costCenter: code || undefined })}
               />
             )}
           </Field>

@@ -1,5 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { catalogApi } from '@/api/catalog';
+import { Combobox } from '@/components/ui/Combobox';
+import { SEARCH_FROM } from '@/components/ui/comboOptions';
 import { useCompanyId } from '@/context/workspaceContext';
 
 /**
@@ -27,6 +29,19 @@ export function InsurerSelect({
     queryFn: () => catalogApi.insurers(companyId),
     enabled: companyId > 0,
   });
+  const shown = (insurers.data ?? []).filter((i) => i.partyCode !== exclude);
+  if (shown.length >= SEARCH_FROM) {
+    return (
+      <Combobox
+        id={id}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        options={shown.map((i) => ({ value: i.partyCode, label: i.name }))}
+        {...rest}
+      />
+    );
+  }
   return (
     <select
       id={id}
@@ -36,13 +51,11 @@ export function InsurerSelect({
       {...rest}
     >
       <option value="">{placeholder}</option>
-      {(insurers.data ?? [])
-        .filter((i) => i.partyCode !== exclude)
-        .map((i) => (
-          <option key={i.partyCode} value={i.partyCode}>
-            {i.name}
-          </option>
-        ))}
+      {shown.map((i) => (
+        <option key={i.partyCode} value={i.partyCode}>
+          {i.name}
+        </option>
+      ))}
     </select>
   );
 }

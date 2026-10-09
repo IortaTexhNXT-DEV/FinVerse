@@ -104,16 +104,18 @@ export function TableTools(props: Readonly<TableToolsProps>) {
         setOpen(false);
       }
     };
+    // Escape closes the chooser only (not a dialog around the list).
     const escape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
+        e.preventDefault();
         setOpen(false);
       }
     };
     document.addEventListener('mousedown', close);
-    document.addEventListener('keydown', escape);
+    document.addEventListener('keydown', escape, true);
     return () => {
       document.removeEventListener('mousedown', close);
-      document.removeEventListener('keydown', escape);
+      document.removeEventListener('keydown', escape, true);
     };
   }, [open]);
   const hidden = columns.filter((c) => !locked.has(c.key) && choice.hidden.includes(c.key)).length;

@@ -34,6 +34,7 @@ import type { QuotationStepProps } from './QuotationSteps';
 import '@/styles/quotation.css';
 import { useUnsavedChangesGuard } from '@/components/ui/useUnsavedChangesGuard';
 import { refreshRecord } from '@/components/broking/recordRefresh';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 function numberParam(value: string | null): number | undefined {
   return value === null || value === '' ? undefined : Number(value);
@@ -296,11 +297,7 @@ export default function QuotationWizardPage() {
     return <Wizard initial={newQuotationForm(today(), preselection(search))} />;
   }
   if (existing.data === undefined) {
-    return existing.error ? (
-      <ErrorAlert error={existing.error} />
-    ) : (
-      <span className="spinner" aria-label="Loading" />
-    );
+    return existing.error ? <ErrorAlert error={existing.error} /> : <LoadingPanel />;
   }
   return <Wizard key={existing.data.id} initial={formOfQuotation(existing.data)} />;
 }

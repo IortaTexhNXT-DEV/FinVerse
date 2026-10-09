@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.messaging.domain;
 
+import com.iortatechnxt.brokerverse.common.util.ReadableText;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -52,8 +53,8 @@ public class Notification {
    */
   public Notification(String recipient, Notice notice, Instant createdAt) {
     this.recipient = recipient;
-    this.title = notice.title();
-    this.body = notice.body();
+    this.title = ReadableText.of(notice.title());
+    this.body = ReadableText.of(notice.body());
     this.link = notice.link();
     this.entityType = notice.entityType();
     this.entityId = notice.entityId();

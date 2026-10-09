@@ -15,6 +15,7 @@ import type { AllocationRow, Line, Side, Voucher } from './api';
 import { entryOrigin, entryTotals } from './labels';
 import { DialogFooter } from './VoucherDialogs';
 import './disbursement.css';
+import { CostCentreSelect } from '@/components/broking/Lookups';
 
 const READ_COLUMNS: Column<Line>[] = [
   { key: 'side', header: 'Side', render: (l) => (l.side === 'DEBIT' ? 'Debit' : 'Credit') },
@@ -187,11 +188,10 @@ function AllocationDialog({
             </Field>
             <Field label="Cost Centre">
               {(id) => (
-                <input
+                <CostCentreSelect
                   id={id}
-                  className="input"
                   value={r.costCenter ?? ''}
-                  onChange={(e) => set(i, { costCenter: e.target.value || undefined })}
+                  onChange={(code) => set(i, { costCenter: code || undefined })}
                 />
               )}
             </Field>

@@ -31,6 +31,7 @@ import { useAccountRefresh } from './useAccountRefresh';
 import { UserName } from '@/components/ui/UserName';
 import { InsurerName, ProductLineLabel } from '@/components/broking/LovLabel';
 import { PolicyTransactions } from '@/components/broking/PolicyTransactions';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 const TABS = [
   { id: 'details', label: 'Details' },
@@ -199,11 +200,7 @@ export default function AccountDetailPage() {
   const productName = useProductName();
   const account = useQuery({ queryKey: ['account', id], queryFn: () => accountsApi.get(id) });
   if (account.data === undefined) {
-    return account.error ? (
-      <ErrorAlert error={account.error} />
-    ) : (
-      <span className="spinner" aria-label="Loading" />
-    );
+    return account.error ? <ErrorAlert error={account.error} /> : <LoadingPanel />;
   }
   const a = account.data;
   const editable = EDITABLE.has(a.status) && can('ACCOUNT_MAINTAIN');

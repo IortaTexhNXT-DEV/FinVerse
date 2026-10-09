@@ -29,6 +29,14 @@ public class ReportVariant extends BaseEntity {
   @Column(nullable = false)
   private boolean shared;
 
+  /** A standard variant of the report: configuration, shared with every user, never deleted. */
+  @Column(nullable = false, updatable = false)
+  private boolean standard;
+
+  /** The owner's default variant of the report, applied when the report opens. */
+  @Column(name = "default_variant", nullable = false)
+  private boolean defaultVariant;
+
   protected ReportVariant() {}
 
   /**
@@ -73,5 +81,22 @@ public class ReportVariant extends BaseEntity {
 
   public boolean isShared() {
     return shared;
+  }
+
+  public boolean isStandard() {
+    return standard;
+  }
+
+  public boolean isDefaultVariant() {
+    return defaultVariant;
+  }
+
+  /**
+   * Makes the variant the owner's default of the report, or not.
+   *
+   * @param value whether it is the default
+   */
+  public void markDefault(boolean value) {
+    this.defaultVariant = value;
   }
 }

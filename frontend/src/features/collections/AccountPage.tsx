@@ -28,6 +28,7 @@ import { DetailsDialog, DispositionDialog, EffortDialog } from './WorkDialogs';
 import { LockBanner } from './WorkInputs';
 import './collections.css';
 import { displayNameOf } from '@/api/users';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 function flags(a: Account): string[] {
   const out: string[] = [];
@@ -252,11 +253,7 @@ export default function AccountPage() {
     onSuccess: () => done('Account refreshed from the ledger'),
   });
   if (account.data === undefined) {
-    return account.error ? (
-      <ErrorAlert error={account.error} />
-    ) : (
-      <span className="spinner" aria-label="Loading" />
-    );
+    return account.error ? <ErrorAlert error={account.error} /> : <LoadingPanel />;
   }
   const a = account.data;
   const lockedByOther = a.lock.editingBy !== undefined && !a.lock.mine;

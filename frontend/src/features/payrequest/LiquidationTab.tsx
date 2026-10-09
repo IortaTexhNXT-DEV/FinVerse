@@ -16,6 +16,7 @@ import type { LiquidationView, PayRequest } from './api';
 import { dayTotal, daysErrors, expenseInputs } from './requestForm';
 import type { DayDraft, FieldErrors } from './requestForm';
 import { DateInput } from '@/components/ui/DateInput';
+import { CostCentreSelect } from '@/components/broking/Lookups';
 
 const EXPENSES = [
   ['perDiem', 'Per Diem'],
@@ -282,12 +283,11 @@ export function LiquidationTab({ request }: Readonly<{ request: PayRequest }>) {
           </Field>
           <Field label="Cost Centre" hint="Cost centre charged with the expenses">
             {(id) => (
-              <input
+              <CostCentreSelect
                 id={id}
-                className="input"
                 disabled={!editable}
                 value={costCenter}
-                onChange={(e) => setCostCenter(e.target.value)}
+                onChange={(code) => setCostCenter(code)}
               />
             )}
           </Field>

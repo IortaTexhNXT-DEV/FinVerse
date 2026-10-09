@@ -1,4 +1,5 @@
 import { api, toQuery } from './client';
+import type { PageResponse } from './types';
 
 export type ParameterType =
   | 'DATE'
@@ -11,7 +12,11 @@ export type ParameterType =
   | 'ACCOUNT'
   | 'CURRENCY'
   | 'BUSINESS_LINE'
-  | 'INSURER';
+  | 'INSURER'
+  /** Several codes of a list ("only" or "all except"); options[0] names the list. */
+  | 'CODE_SET'
+  /** One value of a platform list chosen by name; options[0] names the list. */
+  | 'LOOKUP';
 
 export interface ParameterSpec {
   name: string;
@@ -65,7 +70,31 @@ export interface ReportResult {
 
 export type ExportFormat = 'PDF' | 'XLSX' | 'CSV' | 'ODS' | 'XML' | 'DOCX';
 
+/** One archived run or export of a report. */
+export interface ReportRunEntry {
+  id: number;
+  reportCode: string;
+  title: string;
+  parameters: string;
+  action: string;
+  format?: string;
+  rowCount: number;
+  fileName?: string;
+  createdBy: string;
+  createdAt: string;
+}
+
+/** One value of a report parameter list. */
+export interface CodeOption {
+  code: string;
+  label: string;
+}
+
 export const reportApi = {
+  runs: (code: string, page = 0, size = 5) =>
+    api.get<PageResponse<ReportRunEntry>>(`/reports/runs${toQuery({ code, page, size })}`),
+  codeSet: (source: string, companyId: number) =>
+    api.get<CodeOption[]>(`/reports/code-sets/${source}${toQuery({ companyId })}`),
   catalogue: () => api.get<CatalogueEntry[]>('/reports'),
   run: (code: string, params: Record<string, string>) =>
     api.post<ReportResult>(`/reports/${code}/run`, params),

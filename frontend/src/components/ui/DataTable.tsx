@@ -1,7 +1,8 @@
 import { ChevronDown, ChevronUp, ChevronsUpDown } from 'lucide-react';
-import { Fragment, useRef } from 'react';
+import { Fragment, isValidElement, useRef } from 'react';
 import type { KeyboardEvent, ReactNode } from 'react';
 import { EmptyState } from './EmptyState';
+import { PageFooter, Pager } from './Pager';
 import { PeriodCell } from './PeriodCell';
 import { stickyCount, useStickyOffsets, withSticky } from './stickyColumns';
 import { TableTools } from './TableTools';
@@ -175,9 +176,24 @@ function HeaderCell<T>({
   );
 }
 
-/** Whether the totals footer shows: a loaded list with rows. */
-function showFooter(footer: ReactNode, loading: boolean, rows: number): boolean {
-  return footer !== undefined && !loading && rows > 0;
+/**
+ * Whether the footer is a pager (shown under the table) rather than totals rows (the table's
+ * tfoot): a pager inside the tfoot would sit in the first column and widen it.
+ */
+function isPagerFooter(footer: ReactNode): boolean {
+  return isValidElement(footer) && (footer.type === PageFooter || footer.type === Pager);
+}
+
+/** Where the footer shows: totals in the tfoot, a pager under the table; none while loading or empty. */
+function footerPlace(
+  footer: ReactNode,
+  loading: boolean,
+  rows: number,
+): 'none' | 'table' | 'below' {
+  if (footer === undefined || loading || rows === 0) {
+    return 'none';
+  }
+  return isPagerFooter(footer) ? 'below' : 'table';
 }
 
 /** The class of the table: sticky first column and compact rows for a list with the chooser. */
@@ -391,6 +407,7 @@ export function DataTable<T>({
   const sticky = choice.on ? stickyCount(shown) : 0;
   useStickyOffsets(ref, sticky);
   const tableClass = tableClassOf(choice.on, choice.choice.density);
+  const place = footerPlace(footer, loading, rows.length);
   return (
     <>
       {choice.on && (
@@ -432,9 +449,10 @@ export function DataTable<T>({
             renderExpanded={renderExpanded}
             expanded={expanded}
           />
-          {showFooter(footer, loading, rows.length) && <tfoot>{footer}</tfoot>}
+          {place === 'table' && <tfoot>{footer}</tfoot>}
         </table>
       </div>
+      {place === 'below' && footer}
     </>
   );
 }

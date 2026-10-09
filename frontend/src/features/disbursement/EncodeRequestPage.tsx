@@ -13,6 +13,7 @@ import { useCompanyId, useBaseCurrency } from '@/context/workspaceContext';
 import { disbursementApi } from './api';
 import { encodeErrors } from './labels';
 import './disbursement.css';
+import { CurrencySelect } from '@/components/broking/Lookups';
 
 interface Form {
   disbursementType: string;
@@ -129,12 +130,10 @@ export default function EncodeRequestPage() {
           {text('payeeName', 'Payee Name')}
           <Field label="Currency" required error={err('currency')}>
             {(id) => (
-              <input
+              <CurrencySelect
                 id={id}
-                className="input"
-                maxLength={3}
                 value={form.currency}
-                onChange={(e) => set({ currency: e.target.value.toUpperCase() })}
+                onChange={(code) => set({ currency: code })}
               />
             )}
           </Field>

@@ -17,6 +17,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { countOf, formatAmount, formatDate } from '@/utils/format';
 import { lineActions } from './batchActions';
 import { candidatesOf, linesOf, placementLink, REPORT_TABS } from './placementLogic';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 function MatchDialog({
   report,
@@ -136,11 +137,7 @@ export default function PaymentReportPage() {
     queryFn: () => placementApi.report(id),
   });
   if (report.data === undefined) {
-    return report.error ? (
-      <ErrorAlert error={report.error} />
-    ) : (
-      <span className="spinner" aria-label="Loading" />
-    );
+    return report.error ? <ErrorAlert error={report.error} /> : <LoadingPanel />;
   }
   const r = report.data;
   const counts: Record<MatchStatus, number> = {

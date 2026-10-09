@@ -12,6 +12,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatAmount, formatDate, formatDateTime, humanize } from '@/utils/format';
 import { ReceiptActions } from './ReceiptActions';
 import { displayNameOf } from '@/api/users';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 type Allocation = Receipt['allocations'][number];
 
@@ -110,7 +111,7 @@ export default function ReceiptDetailPage() {
     return (
       <div className="stack">
         <ErrorAlert error={query.error} />
-        {query.isLoading && <span className="spinner" aria-label="Loading" />}
+        {query.isLoading && <LoadingPanel />}
       </div>
     );
   }

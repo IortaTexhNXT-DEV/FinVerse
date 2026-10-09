@@ -14,6 +14,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { formatDateTime } from '@/utils/format';
 import { FileDropZone } from '@/components/ui/FileDropZone';
 import { displayNameOf } from '@/api/users';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 function ChecklistItems({ checklist }: Readonly<{ checklist: KycChecklist }>) {
   if (checklist.items.length === 0) {
@@ -136,11 +137,7 @@ export function KycTab({ client }: Readonly<{ client: ClientDetail }>) {
         }
       >
         <ErrorAlert error={checklist.error} />
-        {data ? (
-          <ChecklistItems checklist={data} />
-        ) : (
-          <span className="spinner" aria-label="Loading" />
-        )}
+        {data ? <ChecklistItems checklist={data} /> : <LoadingPanel />}
       </Card>
       {can('CLIENT_MAINTAIN') && client.status !== 'INACTIVE' && (
         <Card title="Upload a KYC document">

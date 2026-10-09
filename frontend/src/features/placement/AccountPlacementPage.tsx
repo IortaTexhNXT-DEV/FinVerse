@@ -24,6 +24,7 @@ import { PlacementActions } from './PlacementActions';
 import { SlipActions } from './SlipActions';
 import { displayNameOf } from '@/api/users';
 import { ProductLineLabel, InsurerWithBranch } from '@/components/broking/LovLabel';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 const TABS = [
   { id: 'gate', label: 'Payment Gate' },
@@ -165,7 +166,7 @@ export default function AccountPlacementPage() {
   };
   if (account.data === undefined || view.data === undefined) {
     const error = account.error ?? view.error;
-    return error ? <ErrorAlert error={error} /> : <span className="spinner" aria-label="Loading" />;
+    return error ? <ErrorAlert error={error} /> : <LoadingPanel />;
   }
   const a = account.data;
   const v = view.data;

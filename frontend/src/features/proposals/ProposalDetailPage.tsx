@@ -40,6 +40,7 @@ import '@/styles/quotation.css';
 import { ProductLineLabel, InsurerNames } from '@/components/broking/LovLabel';
 import { recordDescription } from '@/components/broking/recordDescription';
 import { useProductName } from '@/components/broking/useLabels';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 const TABS = [
   { id: 'details', label: 'Details' },
@@ -141,11 +142,7 @@ export default function ProposalDetailPage() {
   const [tab, setTab] = useState<TabId>('details');
   const proposal = useQuery({ queryKey: ['proposal', id], queryFn: () => proposalsApi.get(id) });
   if (proposal.data === undefined) {
-    return proposal.error ? (
-      <ErrorAlert error={proposal.error} />
-    ) : (
-      <span className="spinner" aria-label="Loading" />
-    );
+    return proposal.error ? <ErrorAlert error={proposal.error} /> : <LoadingPanel />;
   }
   const p = proposal.data;
   return (

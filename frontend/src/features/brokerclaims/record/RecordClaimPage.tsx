@@ -19,6 +19,7 @@ import { LossFields } from './LossFields';
 import { policyYearLabel, SOURCE_LABELS } from './recordLogic';
 import type { RecordState } from './useRecordClaim';
 import { useRecordClaim } from './useRecordClaim';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 function ClaimSetup({
   draft,
@@ -164,7 +165,7 @@ export default function RecordClaimPage() {
       />
       {arn === '' && <CoverSearch onSelect={(c) => setParams({ arn: c.arn })} />}
       <ErrorAlert error={draft.error ?? saveError} />
-      {draft.isLoading && <span className="spinner" aria-label="Loading" />}
+      {draft.isLoading && <LoadingPanel />}
       {d && <ClaimEditor draft={d} state={state} />}
       {question !== undefined && (
         <ConfirmModal

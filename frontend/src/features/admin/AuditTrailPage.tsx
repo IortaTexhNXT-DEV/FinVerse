@@ -13,6 +13,7 @@ import { AuditExportButtons } from './AuditExportButtons';
 import { DateInput } from '@/components/ui/DateInput';
 import { UserName } from '@/components/ui/UserName';
 import { StatusBadge } from '@/components/ui/StatusBadge';
+import { UserLookup } from '@/components/broking/Lookups';
 
 /** Audit trail inquiry: originator, modifier and authorizer activity with timestamps. */
 export default function AuditTrailPage() {
@@ -53,11 +54,11 @@ export default function AuditTrailPage() {
           </Field>
           <Field label="User">
             {(id) => (
-              <input
+              <UserLookup
+                emptyLabel="All"
                 id={id}
-                className="input"
                 value={filters.username}
-                onChange={(e) => set({ username: e.target.value })}
+                onChange={(code) => set({ username: code })}
               />
             )}
           </Field>

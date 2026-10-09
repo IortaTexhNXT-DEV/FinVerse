@@ -1,4 +1,5 @@
 import { dashboardApi } from '@/api/dashboard';
+import { countOf } from '@/utils/format';
 import { sharePct } from '../dashboardMath';
 import { WidgetCard } from './WidgetCard';
 import { useWidget } from './widgetSupport';
@@ -36,7 +37,11 @@ export function PayablesWidget({ enabled }: Readonly<{ enabled: boolean }>) {
             <Figure label="Overdue" value={d.overdue} danger={d.overdue > 0} />
             <Figure label="Due in 7 days" value={d.dueIn7Days} />
             <Figure label="Due in 30 days" value={d.dueIn30Days} />
-            <Figure label="Total payables" value={d.total} hint={`${d.openItems} open item(s)`} />
+            <Figure
+              label="Total payables"
+              value={d.total}
+              hint={countOf(d.openItems, 'open item')}
+            />
           </div>
           <div className="stack" style={{ gap: 10 }}>
             <DueBar label="Overdue share" part={d.overdue} whole={d.total} />

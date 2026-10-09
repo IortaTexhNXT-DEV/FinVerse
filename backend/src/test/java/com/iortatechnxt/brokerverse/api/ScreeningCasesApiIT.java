@@ -80,6 +80,10 @@ class ScreeningCasesApiIT {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$[0].caseNo").value("SCR-2026-000002"));
     api.doGet(UCC, BASE + "/high-risk-clients?companyId=" + company).andExpect(status().isOk());
+    api.doGet(UCC, BASE + "/high-risk-clients/filters?companyId=" + company)
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.riskCategories").isArray())
+        .andExpect(jsonPath("$.marketingUnits[0].label").isNotEmpty());
     api.doGet(UCC, BASE + "/cases/" + investigation + "/eligible-assignees")
         .andExpect(status().isOk());
     api.doPost(OUTSIDER, BASE + "/cases/" + investigation + "/reassign", Map.of())

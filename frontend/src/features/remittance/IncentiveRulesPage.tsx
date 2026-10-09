@@ -126,6 +126,7 @@ function RuleDialog({
   onClose: () => void;
   onSave: (form: Form) => void;
 }>) {
+  const insurerName = useInsurerName();
   const [form, setForm] = useState<Form>(() => formOf(rule));
   const [errors, setErrors] = useState<Partial<Record<keyof Form, string>>>({});
   const lines = useQuery({ queryKey: ['catalog', 'lines'], queryFn: catalogApi.lines });
@@ -139,7 +140,11 @@ function RuleDialog({
   };
   return (
     <Modal
-      title={rule === undefined ? 'New Incentive Rule' : 'Edit Incentive Rule'}
+      title={
+        rule === undefined
+          ? 'New Incentive Rule'
+          : `Edit Incentive Rule – ${insurerName(rule.insurerCode)}`
+      }
       open
       onClose={onClose}
       footer={

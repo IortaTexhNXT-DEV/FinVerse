@@ -22,6 +22,7 @@ import type { AcslCase } from './api';
 import { CaseActions } from './CaseActions';
 import { UserName } from '@/components/ui/UserName';
 import { displayNameOf } from '@/api/users';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 type TabId = 'details' | 'family' | 'documents';
 
@@ -159,11 +160,7 @@ export default function CaseDetailPage() {
   const [tab, setTab] = useState<TabId>('details');
   const found = useQuery({ queryKey: ['acsl', 'case', id], queryFn: () => acslApi.getCase(id) });
   if (found.data === undefined) {
-    return found.error ? (
-      <ErrorAlert error={found.error} />
-    ) : (
-      <span className="spinner" aria-label="Loading" />
-    );
+    return found.error ? <ErrorAlert error={found.error} /> : <LoadingPanel />;
   }
   const c = found.data;
   return (

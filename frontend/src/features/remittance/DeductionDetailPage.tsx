@@ -33,6 +33,7 @@ import { deductionsApi } from './deductionsApi';
 import type { Deduction, DeductionApplication } from './deductionsApi';
 import './remittance.css';
 import { deductionLine } from './remittanceLabels';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 const ENTITY = 'RemittanceDeduction';
 const TABS = [
@@ -153,11 +154,7 @@ export default function DeductionDetailPage() {
     setAsking(undefined);
   });
   if (deduction.data === undefined) {
-    return deduction.error ? (
-      <ErrorAlert error={deduction.error} />
-    ) : (
-      <span className="spinner" aria-label="Loading" />
-    );
+    return deduction.error ? <ErrorAlert error={deduction.error} /> : <LoadingPanel />;
   }
   const d = deduction.data;
   return (

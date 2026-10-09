@@ -21,6 +21,7 @@ import { frbsApi } from './api';
 import type { PackEntry } from './api';
 import { entryLink, groupPack, packFormats, quickParams } from './schedules';
 import './frbs.css';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 function PackExportButtons({
   entry,
@@ -135,7 +136,7 @@ export default function FrbsHomePage() {
           hint="Board schedules exported to Word as well as Excel and PDF"
         />
       </div>
-      {pack.isLoading && <span className="spinner" aria-label="Loading" />}
+      {pack.isLoading && <LoadingPanel />}
       {groups.map((g) => (
         <Card key={g.code} title={g.name} flush>
           <DataTable

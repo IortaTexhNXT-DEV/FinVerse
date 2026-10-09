@@ -16,6 +16,7 @@ import { formatLabel } from './exportFormats';
 import { ReportBatchDialog } from './ReportBatchDialog';
 import { downloadBatch, reportOptionsApi } from './reportOptions';
 import type { ReportBatch } from './reportOptions';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 function groupByCategory(entries: CatalogueEntry[]): [string, CatalogueEntry[]][] {
   const groups = new Map<string, CatalogueEntry[]>();
@@ -113,7 +114,7 @@ export default function ReportsPage() {
       />
       <RecentBatches />
       <ErrorAlert error={catalogue.error} />
-      {catalogue.isLoading && <span className="spinner" aria-label="Loading" />}
+      {catalogue.isLoading && <LoadingPanel />}
       {groups.map(([category, entries]) => (
         <Card key={category} title={category}>
           <div className="report-grid">

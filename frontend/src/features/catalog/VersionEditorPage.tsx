@@ -31,6 +31,7 @@ import { VersionTermsSection } from './VersionTermsSection';
 import { formOf, toInput, validateVersionForm } from './versionForm';
 import type { VersionForm } from './versionForm';
 import { UserName } from '@/components/ui/UserName';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 const TABS = [
   { id: 'scheme', label: 'Rate Scheme & Dates' },
@@ -160,11 +161,7 @@ export default function VersionEditorPage() {
     queryFn: () => productCatalogApi.version(code, versionNo),
   });
   if (version.data === undefined) {
-    return version.error ? (
-      <ErrorAlert error={version.error} />
-    ) : (
-      <span className="spinner" aria-label="Loading" />
-    );
+    return version.error ? <ErrorAlert error={version.error} /> : <LoadingPanel />;
   }
   const d = version.data;
   return (

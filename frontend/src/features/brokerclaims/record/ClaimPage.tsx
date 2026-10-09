@@ -24,6 +24,7 @@ import { ClaimActions } from './ClaimActions';
 import { ClaimSummary } from './ClaimSummary';
 import { DetailsTab } from './DetailsTab';
 import { Notice } from '@/components/ui/Notice';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 type TabId = 'details' | 'locations' | 'insurers' | 'reserve' | 'diary' | 'documents' | 'history';
 
@@ -119,7 +120,7 @@ export default function ClaimPage() {
         actions={c ? <ClaimActions claim={c} companyId={companyId} /> : undefined}
       />
       <ErrorAlert error={claim.error} />
-      {claim.isLoading && <span className="spinner" aria-label="Loading" />}
+      {claim.isLoading && <LoadingPanel />}
       {c && (
         <>
           <ClaimSummary claim={c} />

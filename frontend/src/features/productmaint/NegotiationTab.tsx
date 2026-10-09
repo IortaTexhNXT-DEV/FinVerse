@@ -19,6 +19,7 @@ import { ResponseDialog } from './ResponseDialog';
 import { responseColumns } from './responseColumns';
 import { displayNameOf } from '@/api/users';
 import { ConfirmButton } from '@/components/ui/ConfirmButton';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 interface RoundProps {
   request: PackageRequest;
@@ -209,7 +210,7 @@ export function NegotiationTab({ request }: Readonly<{ request: PackageRequest }
     await queryClient.invalidateQueries({ queryKey: ['package-request-tab', request.id] });
   };
   if (rounds.isLoading) {
-    return <span className="spinner" aria-label="Loading" />;
+    return <LoadingPanel />;
   }
   const list = [...(rounds.data ?? [])].reverse();
   return (

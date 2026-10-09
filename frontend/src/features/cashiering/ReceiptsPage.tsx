@@ -9,7 +9,6 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import type { Column } from '@/components/ui/DataTable';
 import { DataTable } from '@/components/ui/DataTable';
-import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PageFooter } from '@/components/ui/Pager';
@@ -147,18 +146,15 @@ function ReceiptList({ companyId }: Readonly<{ companyId: number }>) {
       />
       {open && <FilterPanel value={filters} onChange={setFilters} />}
       <ErrorAlert error={list.error} />
-      {!list.isLoading && rows.length === 0 ? (
-        <EmptyState message="No receipts match the search" />
-      ) : (
-        <DataTable
-          caption="Receipts"
-          columns={COLUMNS}
-          rows={rows}
-          rowKey={(r) => r.id}
-          loading={list.isLoading}
-          onRowClick={(r) => void navigate(`/cashiering/receipts/${r.id}`)}
-        />
-      )}
+      <DataTable
+        emptyMessage="No receipts match the search"
+        caption="Receipts"
+        columns={COLUMNS}
+        rows={rows}
+        rowKey={(r) => r.id}
+        loading={list.isLoading}
+        onRowClick={(r) => void navigate(`/cashiering/receipts/${r.id}`)}
+      />
       <PageFooter data={list.data} noun="receipts" onPage={setPage} />
     </>
   );

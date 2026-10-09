@@ -6,7 +6,7 @@ import { nbadminApi } from '@/api/nbadmin';
 import type { AccessActionMatrix, AccessMatrix, MatrixRole } from '@/api/nbadmin';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import { EmptyState } from '@/components/ui/EmptyState';
+import { EmptyRow } from '@/components/ui/EmptyRow';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { PageHeader } from '@/components/ui/PageHeader';
@@ -16,6 +16,7 @@ import { useFitHeight } from '@/components/ui/useFitHeight';
 import { PermissionName } from '@/components/ui/PermissionName';
 import { permissionLabel, permissionLabels } from '@/utils/permissionLabel';
 import { ACTION_LABELS, actionText, areaLabel } from './accessMatrix';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 type View = 'permission' | 'action';
 
@@ -51,9 +52,6 @@ function PermissionTable({ matrix, needle }: Readonly<{ matrix: AccessMatrix; ne
       (p.area ?? '').includes(needle) ||
       matchesName(permissionLabel(p.permission), needle),
   );
-  if (rows.length === 0) {
-    return <EmptyState message="No permission matches the search." />;
-  }
   return (
     <table className="matrix">
       <caption className="visually-hidden">Roles against permissions</caption>
@@ -66,6 +64,9 @@ function PermissionTable({ matrix, needle }: Readonly<{ matrix: AccessMatrix; ne
         </tr>
       </thead>
       <tbody>
+        {rows.length === 0 && (
+          <EmptyRow columns={3 + matrix.roles.length} message="No permission matches the search." />
+        )}
         {rows.map((p) => (
           <tr key={p.permission}>
             <th scope="row">
@@ -93,9 +94,6 @@ function ActionTable({ matrix, needle }: Readonly<{ matrix: AccessActionMatrix; 
       r.area.includes(needle) ||
       r.permissions.some((p) => p.includes(needle) || matchesName(permissionLabel(p), needle)),
   );
-  if (rows.length === 0) {
-    return <EmptyState message="No area or permission matches the search." />;
-  }
   return (
     <table className="matrix">
       <caption className="visually-hidden">Roles against areas and action classes</caption>
@@ -107,6 +105,12 @@ function ActionTable({ matrix, needle }: Readonly<{ matrix: AccessActionMatrix; 
         </tr>
       </thead>
       <tbody>
+        {rows.length === 0 && (
+          <EmptyRow
+            columns={2 + matrix.roles.length}
+            message="No area or permission matches the search."
+          />
+        )}
         {rows.map((row) => (
           <tr key={`${row.area}-${row.action}`}>
             <th scope="row" className="matrix-area" title={permissionLabels(row.permissions)}>
@@ -188,7 +192,7 @@ export default function AccessMatrixPage() {
       </Card>
       <Card flush>
         <Tabs tabs={VIEWS} active={view} onChange={setView} />
-        {current.isLoading && <span className="spinner" aria-label="Loading" />}
+        {current.isLoading && <LoadingPanel />}
         <div className="matrix-wrap" ref={wrap} data-fit="">
           {view === 'permission' && matrix.data && (
             <PermissionTable matrix={matrix.data} needle={needle} />

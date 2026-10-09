@@ -9,6 +9,7 @@ import { Field } from '@/components/ui/Field';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { countOf } from '@/utils/format';
+import { UnitSelect } from './ActionDialogs';
 
 /**
  * Declares a committed disposition file complete for an expiry range and unit (BRD 3.004.4): the
@@ -46,14 +47,7 @@ export function CompleteFileForm({ job }: Readonly<{ job: BulkJob }>) {
           {(id) => <DateInput id={id} value={to} onChange={(e) => setTo(e.target.value)} />}
         </Field>
         <Field label="Unit" required>
-          {(id) => (
-            <input
-              id={id}
-              className="input"
-              value={unit}
-              onChange={(e) => setUnit(e.target.value)}
-            />
-          )}
+          {(id) => <UnitSelect id={id} value={unit} onChange={(code) => setUnit(code)} />}
         </Field>
       </div>
       <div>

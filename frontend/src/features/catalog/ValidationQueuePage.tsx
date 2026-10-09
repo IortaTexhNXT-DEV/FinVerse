@@ -6,7 +6,6 @@ import type { VersionSummary } from '@/api/productCatalog';
 import { WorklistToolbar } from '@/components/broking/WorklistToolbar';
 import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
-import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
@@ -43,41 +42,38 @@ export default function ValidationQueuePage() {
       <Card flush>
         <WorklistToolbar onSearch={setText} placeholder="Search Product" />
         <ErrorAlert error={queue.error} />
-        {!queue.isLoading && rows.length === 0 ? (
-          <EmptyState message="No package version waits for validation." />
-        ) : (
-          <DataTable<VersionSummary>
-            loading={queue.isLoading}
-            rows={rows}
-            rowKey={(v) => `${v.productCode}-${v.versionNo}`}
-            onRowClick={(v) =>
-              void navigate(`/catalog/products/${v.productCode}/versions/${v.versionNo}`)
-            }
-            columns={[
-              {
-                key: 'p',
-                header: 'Product',
-                render: (v) => <CellStack main={v.productName} sub={v.productCode} />,
-              },
-              { key: 'v', header: 'Version', render: (v) => `v${v.versionNo}` },
-              { key: 's', header: 'Status', render: (v) => <StatusBadge status={v.status} /> },
-              { key: 'e', header: 'Effective From', render: (v) => formatDate(v.effectiveFrom) },
-              { key: 'q', header: 'Request', render: (v) => v.sourceRequestNo ?? '' },
-              {
-                key: 'b',
-                header: 'Submitted By',
-                render: (v) => <UserName login={v.submittedBy} />,
-              },
-              { key: 'a', header: 'Submitted', render: (v) => formatDateTime(v.submittedAt) },
-              {
-                key: 'g',
-                header: 'Age (days)',
-                numeric: true,
-                render: (v) => ageInDays(v.submittedAt),
-              },
-            ]}
-          />
-        )}
+        <DataTable<VersionSummary>
+          emptyMessage="No package version waits for validation."
+          loading={queue.isLoading}
+          rows={rows}
+          rowKey={(v) => `${v.productCode}-${v.versionNo}`}
+          onRowClick={(v) =>
+            void navigate(`/catalog/products/${v.productCode}/versions/${v.versionNo}`)
+          }
+          columns={[
+            {
+              key: 'p',
+              header: 'Product',
+              render: (v) => <CellStack main={v.productName} sub={v.productCode} />,
+            },
+            { key: 'v', header: 'Version', render: (v) => `v${v.versionNo}` },
+            { key: 's', header: 'Status', render: (v) => <StatusBadge status={v.status} /> },
+            { key: 'e', header: 'Effective From', render: (v) => formatDate(v.effectiveFrom) },
+            { key: 'q', header: 'Request', render: (v) => v.sourceRequestNo ?? '' },
+            {
+              key: 'b',
+              header: 'Submitted By',
+              render: (v) => <UserName login={v.submittedBy} />,
+            },
+            { key: 'a', header: 'Submitted', render: (v) => formatDateTime(v.submittedAt) },
+            {
+              key: 'g',
+              header: 'Age (days)',
+              numeric: true,
+              render: (v) => ageInDays(v.submittedAt),
+            },
+          ]}
+        />
       </Card>
     </div>
   );

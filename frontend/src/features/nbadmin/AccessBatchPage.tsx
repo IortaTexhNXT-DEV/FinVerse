@@ -29,6 +29,7 @@ import { UserName } from '@/components/ui/UserName';
 import { ApproverPicker } from './ApproverPicker';
 import { ReasonDialog } from './ReasonDialog';
 import { Notice } from '@/components/ui/Notice';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 type BatchAction = 'submit' | 'approve' | 'return' | 'reject' | 'cancel';
 
@@ -146,11 +147,7 @@ export default function AccessBatchPage() {
     },
   });
   if (batch.data === undefined) {
-    return batch.error ? (
-      <ErrorAlert error={batch.error} />
-    ) : (
-      <span className="spinner" aria-label="Loading" />
-    );
+    return batch.error ? <ErrorAlert error={batch.error} /> : <LoadingPanel />;
   }
   const b = batch.data;
   const actions = actionsOf(b, user?.username ?? '', can);

@@ -4,6 +4,7 @@ import { StatusPage } from '@/components/ui/StatusPage';
 import { mayOpen } from '@/navigation/access';
 import { useAuth } from './authContext';
 import { ForcedPasswordChange } from './ForcedPasswordChange';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 /**
  * Redirects anonymous users to the login page, remembering the page so the user returns to it
@@ -14,7 +15,7 @@ export function RequireAuth({ children }: Readonly<{ children: ReactNode }>) {
   const { user, loading, passwordChange } = useAuth();
   const location = useLocation();
   if (loading) {
-    return <span className="spinner" aria-label="Loading" />;
+    return <LoadingPanel />;
   }
   if (user === null) {
     return (

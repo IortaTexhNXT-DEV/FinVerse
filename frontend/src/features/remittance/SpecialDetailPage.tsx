@@ -22,6 +22,7 @@ import type { Special } from './api';
 import './remittance.css';
 import { Notice } from '@/components/ui/Notice';
 import { specialLine } from './remittanceLabels';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 const ENTITY = 'SpecialRemittance';
 
@@ -100,11 +101,7 @@ export default function SpecialDetailPage() {
     },
   });
   if (special.data === undefined) {
-    return special.error ? (
-      <ErrorAlert error={special.error} />
-    ) : (
-      <span className="spinner" aria-label="Loading" />
-    );
+    return special.error ? <ErrorAlert error={special.error} /> : <LoadingPanel />;
   }
   const s = special.data;
   return (

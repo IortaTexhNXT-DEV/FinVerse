@@ -8,6 +8,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { groupReports } from './reportGroups';
 import './nbreports.css';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 /**
  * New Business reports (BRNB.011/057/075/078): the NB reports of the Report Centre the user may
@@ -30,7 +31,7 @@ export default function NbReportsPage() {
         }
       />
       <ErrorAlert error={catalogue.error} />
-      {catalogue.isLoading && <span className="spinner" aria-label="Loading" />}
+      {catalogue.isLoading && <LoadingPanel />}
       {catalogue.data !== undefined && groups.length === 0 && (
         <Card>
           <EmptyState message="No New Business report is available to your role" />

@@ -36,7 +36,7 @@ export function EntryDialog({
   });
   return (
     <Modal
-      title={entryId === undefined ? 'Add Entry' : 'Edit Entry'}
+      title={entryId === undefined ? 'Add Entry' : `Edit Entry ${initial.legacyCode}`}
       open
       onClose={onClose}
       footer={

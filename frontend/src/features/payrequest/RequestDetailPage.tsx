@@ -23,6 +23,7 @@ import { RequestActions } from './RequestActions';
 import { KIND_LABELS } from './requestForm';
 import { DetailsTab, DisbursementTab, ValidationTab } from './RequestTabs';
 import { Notice } from '@/components/ui/Notice';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 type TabId = 'details' | 'validation' | 'disbursement' | 'liquidation' | 'documents';
 
@@ -146,11 +147,7 @@ export default function RequestDetailPage() {
     onSuccess: (f) => saveFile(f.blob, f.fileName),
   });
   if (request.data === undefined) {
-    return request.error ? (
-      <ErrorAlert error={request.error} />
-    ) : (
-      <span className="spinner" aria-label="Loading" />
-    );
+    return request.error ? <ErrorAlert error={request.error} /> : <LoadingPanel />;
   }
   const r = request.data;
   const editable = r.stage === 'DRAFT' || r.stage === 'PREPARING';

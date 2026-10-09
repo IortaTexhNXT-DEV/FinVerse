@@ -8,6 +8,7 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.lov.domain.LovValue;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import com.iortatechnxt.brokerverse.messaging.domain.Notice;
@@ -186,7 +187,9 @@ public class SbmProcessingService {
               null,
               RUN_ENTITY,
               run.getRunNo(),
-              run.getFallout() + " submitted policies in fallout after run " + run.getRunNo(),
+              DisplayFormat.countOf(run.getFallout(), "submitted policy", "submitted policies")
+                  + " in fallout after run "
+                  + run.getRunNo(),
               BigDecimal.valueOf(run.getFallout()),
               "SBM_FALLOUT:" + run.getRunNo()));
     }

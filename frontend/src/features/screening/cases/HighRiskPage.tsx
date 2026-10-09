@@ -5,15 +5,38 @@ import type { ExportFormat } from '@/api/reports';
 import { useAuth } from '@/auth/authContext';
 import { useFileDownload } from '@/components/broking/useFileDownload';
 import { Card } from '@/components/ui/Card';
+import { Combobox } from '@/components/ui/Combobox';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { UserName } from '@/components/ui/UserName';
 import { useCompanyId } from '@/context/workspaceContext';
 import { ExportButtons } from '@/features/reports/ExportButtons';
 import { formatDate, humanize, today } from '@/utils/format';
 import { casesApi } from './api';
-import type { HighRiskClient } from './api';
+import type { FilterOption, HighRiskClient } from './api';
+
+/** Client types of the filter. */
+const CLIENT_TYPES = [
+  { value: 'INDIVIDUAL', label: 'Individual' },
+  { value: 'CORPORATE', label: 'Corporate' },
+];
+
+/** Filter values as choices: the name shown, the code stored. */
+function choices(options: readonly FilterOption[] | undefined) {
+  return (options ?? []).map((o) => ({ value: o.code, label: o.label || o.code }));
+}
+
+/** Tags in words: "PEP, WATCHLIST_REVIEW" becomes "PEP, Watchlist Review". */
+function tagWords(tags: string | null | undefined): string {
+  return tags
+    ? tags
+        .split(',')
+        .map((t) => humanize(t.trim()))
+        .join(', ')
+    : '';
+}
 
 /** The report behind the list (export, SNSRP-901). */
 const REPORT = 'SCR-HIGH-RISK-CLIENTS';
@@ -39,6 +62,11 @@ export default function HighRiskPage() {
     clientType: '',
   });
   const [pending, setPending] = useState<ExportFormat>();
+  const values = useQuery({
+    queryKey: ['screening', 'high-risk', 'filters', companyId],
+    queryFn: () => casesApi.highRiskFilters(companyId),
+    enabled: companyId > 0,
+  });
   const list = useQuery({
     queryKey: ['screening', 'high-risk', companyId, filters],
     queryFn: () => casesApi.highRisk({ companyId, ...filters }),
@@ -78,36 +106,37 @@ export default function HighRiskPage() {
         <div className="worklist-filters form-grid">
           <Field label="Risk Category">
             {(id) => (
-              <input
+              <Combobox
                 id={id}
-                className="input"
                 value={filters.riskCategory}
-                onChange={(e) => setFilters({ ...filters, riskCategory: e.target.value })}
+                emptyLabel="All"
+                loading={values.isLoading}
+                options={choices(values.data?.riskCategories)}
+                onChange={(riskCategory) => setFilters({ ...filters, riskCategory })}
               />
             )}
           </Field>
           <Field label="Marketing Unit">
             {(id) => (
-              <input
+              <Combobox
                 id={id}
-                className="input"
                 value={filters.marketingUnit}
-                onChange={(e) => setFilters({ ...filters, marketingUnit: e.target.value })}
+                emptyLabel="All"
+                loading={values.isLoading}
+                options={choices(values.data?.marketingUnits)}
+                onChange={(marketingUnit) => setFilters({ ...filters, marketingUnit })}
               />
             )}
           </Field>
           <Field label="Client Type">
             {(id) => (
-              <select
+              <Combobox
                 id={id}
-                className="select"
                 value={filters.clientType}
-                onChange={(e) => setFilters({ ...filters, clientType: e.target.value })}
-              >
-                <option value="">All</option>
-                <option value="INDIVIDUAL">Individual</option>
-                <option value="CORPORATE">Corporate</option>
-              </select>
+                emptyLabel="All"
+                options={CLIENT_TYPES}
+                onChange={(clientType) => setFilters({ ...filters, clientType })}
+              />
             )}
           </Field>
         </div>
@@ -130,9 +159,18 @@ export default function HighRiskPage() {
               ),
             },
             { key: 'type', header: 'Client Type', render: (r) => humanize(r.clientType) },
-            { key: 'category', header: 'Risk Category', render: (r) => r.riskCategory ?? '—' },
-            { key: 'rating', header: 'Risk Rating', render: (r) => r.riskRating ?? '—' },
-            { key: 'tags', header: 'Tags', render: (r) => r.tags ?? '—' },
+            {
+              key: 'category',
+              header: 'Risk Category',
+              render: (r) =>
+                r.riskCategoryName ?? (r.riskCategory ? humanize(r.riskCategory) : '—'),
+            },
+            {
+              key: 'rating',
+              header: 'Risk Rating',
+              render: (r) => (r.riskRating ? humanize(r.riskRating) : '—'),
+            },
+            { key: 'tags', header: 'Tags', render: (r) => tagWords(r.tags) || '—' },
             {
               key: 'tagged',
               header: 'Tagged On / Source',
@@ -143,9 +181,34 @@ export default function HighRiskPage() {
                 </>
               ),
             },
-            { key: 'case', header: 'Open Case', render: (r) => r.openCase },
+            {
+              key: 'case',
+              header: 'Open Case',
+              render: (r) =>
+                r.openCaseNo ? (
+                  <>
+                    <span className="mono">{r.openCaseNo}</span>
+                    <span className="cell-sub">{humanize(r.openCaseStage ?? '')}</span>
+                  </>
+                ) : (
+                  'None'
+                ),
+            },
             { key: 'policy', header: 'Active Policy', render: (r) => r.activePolicy },
-            { key: 'unit', header: 'Marketing Unit / Unit Head', render: (r) => r.unit ?? '—' },
+            {
+              key: 'unit',
+              header: 'Marketing Unit / Unit Head',
+              render: (r) => (
+                <>
+                  {r.marketingUnitName ?? r.marketingUnit ?? '—'}
+                  {r.unitHead && (
+                    <span className="cell-sub">
+                      <UserName login={r.unitHead} />
+                    </span>
+                  )}
+                </>
+              ),
+            },
           ]}
         />
       </Card>

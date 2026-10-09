@@ -19,5 +19,11 @@ public enum ParameterType {
    * separated list, prefixed with {@code !} for "all except"; the options come from the {@link
    * CodeSetSource} named in {@link ParameterSpec#options()}.
    */
-  CODE_SET
+  CODE_SET,
+  /**
+   * One value chosen from a list by name (a user, a group profile, a sales unit...): the value is
+   * the code; the options come from the {@link CodeSetSource} named in {@link
+   * ParameterSpec#options()}.
+   */
+  LOOKUP
 }

@@ -8,6 +8,7 @@ import { humanize } from '@/utils/format';
 import { FREQUENCIES } from './recurringModel';
 import type { TemplateForm } from './recurringModel';
 import { DateInput } from '@/components/ui/DateInput';
+import { CurrencySelect } from '@/components/broking/Lookups';
 
 interface Props {
   value: TemplateForm;
@@ -63,12 +64,10 @@ function HeaderFields({ value, onChange }: Readonly<Props>) {
       </Field>
       <Field label="Currency" required>
         {(id) => (
-          <input
+          <CurrencySelect
             id={id}
-            className="input"
-            maxLength={3}
             value={value.currency}
-            onChange={(e) => set('currency', e.target.value.toUpperCase())}
+            onChange={(code) => set('currency', code)}
           />
         )}
       </Field>

@@ -1,16 +1,13 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { Play, Printer } from 'lucide-react';
-import { useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useCallback, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { saveFile } from '@/api/client';
 import { reportApi } from '@/api/reports';
-import type { CatalogueEntry, ExportFormat } from '@/api/reports';
-import { Button } from '@/components/ui/Button';
+import type { ExportFormat, ReportResult } from '@/api/reports';
 import { Card } from '@/components/ui/Card';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { useWorkspace } from '@/context/workspaceContext';
-import { ExportButtons } from './ExportButtons';
 import { menuFormats } from './exportFormats';
 import { ParameterInput } from './ParameterInput';
 import { PrintOptionsFields } from './PrintOptionsFields';
@@ -18,33 +15,28 @@ import { ReportVariants } from './ReportVariants';
 import { ReportTable } from './ReportTable';
 import { DEFAULT_PRINT, filterPairs, reportOptionsApi } from './reportOptions';
 import type { ColumnFilters, PrintOptions } from './reportOptions';
-import { initialValue, parameterErrors } from './reportParams';
+import { initialValue, parameterErrors, resolveValue, runParameters } from './reportParams';
+import { RecentRuns, ReportActions } from './ReportRunnerParts';
 import { Notice } from '@/components/ui/Notice';
 
-/** The download buttons: Excel and PDF, Word for documents and schedules (client requirement 16). */
-function ReportDownloads({
-  entry,
-  filtered,
-  busy,
-  format,
-  onExport,
+/** The result of a run: the parameters used, the table with its column filters and the notes. */
+function ResultCard({
+  result,
+  filters,
+  onFilterChange,
 }: Readonly<{
-  entry: CatalogueEntry;
-  filtered: boolean;
-  busy: boolean;
-  format?: ExportFormat;
-  onExport: (format: ExportFormat) => void;
+  result: ReportResult;
+  filters: ColumnFilters;
+  onFilterChange: (column: string, text: string) => void;
 }>) {
   return (
-    <div className="report-downloads">
-      <span className="muted">{filtered ? 'Download filtered rows' : 'Download'}</span>
-      <ExportButtons
-        formats={menuFormats(entry)}
-        variant="ghost"
-        pending={busy ? format : undefined}
-        onExport={onExport}
-      />
-    </div>
+    <Card title={result.title} flush>
+      <div className="report-echo muted">{result.parameterEcho.join(' · ')}</div>
+      <ReportTable result={result} filters={filters} onFilterChange={onFilterChange} />
+      {result.notes.length > 0 && (
+        <Notice tone="info" className="report-note" items={result.notes} />
+      )}
+    </Card>
   );
 }
 
@@ -70,28 +62,35 @@ export default function ReportRunnerPage() {
   const [filters, setFilters] = useState<ColumnFilters>({});
   const [print, setPrint] = useState<PrintOptions>(DEFAULT_PRINT);
 
-  const params = (): Record<string, string> => {
-    const out: Record<string, string> = {};
-    entry?.parameters.forEach((p) => {
-      out[p.name] = values[p.name] ?? initialValue(p);
-    });
-    if (company !== undefined) {
-      out.companyId = String(company.id);
-    }
-    if (branchId !== undefined && out.branchId === '') {
-      out.branchId = String(branchId);
-    }
-    return out;
-  };
+  const params = () => runParameters(entry?.parameters ?? [], values, company?.id, branchId);
 
+  const queryClient = useQueryClient();
+  const refreshRuns = () => queryClient.invalidateQueries({ queryKey: ['report-runs', code] });
   const run = useMutation({
     mutationFn: () => reportApi.run(code, params()),
-    onSuccess: () => setFilters({}),
+    onSuccess: async () => {
+      setFilters({});
+      await refreshRuns();
+    },
   });
+  const applyVariant = useCallback(
+    (saved: Record<string, string>) => {
+      const resolved: Record<string, string> = {};
+      Object.entries(saved).forEach(([k, v]) => {
+        resolved[k] = resolveValue(v, branchId);
+      });
+      setValues(resolved);
+      setChecked(false);
+    },
+    [branchId],
+  );
   const exporter = useMutation({
     mutationFn: (format: ExportFormat) =>
       reportOptionsApi.export(code, params(), format, print, filters),
-    onSuccess: ({ blob, fileName }) => saveFile(blob, fileName),
+    onSuccess: async ({ blob, fileName }) => {
+      saveFile(blob, fileName);
+      await refreshRuns();
+    },
   });
   const printer = useMutation({
     mutationFn: () => reportOptionsApi.export(code, params(), 'PDF', print, filters),
@@ -125,38 +124,9 @@ export default function ReportRunnerPage() {
         title={entry.title}
         description={entry.description}
       />
-      <Card
-        title="Parameters"
-        actions={
-          <div className="row">
-            <Button
-              variant="accent"
-              icon={<Play size={16} />}
-              busy={run.isPending}
-              onClick={guarded(() => run.mutate())}
-            >
-              Run Report
-            </Button>
-            <Button
-              variant="secondary"
-              icon={<Printer size={16} />}
-              busy={printer.isPending}
-              onClick={guarded(() => printer.mutate())}
-            >
-              Print
-            </Button>
-          </div>
-        }
-      >
+      <Card title="Parameters">
         <div className="stack">
-          <ReportVariants
-            code={code}
-            values={params}
-            onApply={(saved) => {
-              setValues(saved);
-              setChecked(false);
-            }}
-          />
+          <ReportVariants code={code} title={entry.title} values={params} onApply={applyVariant} />
           <div className="form-grid">
             {visible.map((p) => (
               <ParameterInput
@@ -168,32 +138,39 @@ export default function ReportRunnerPage() {
               />
             ))}
           </div>
-          <div className="form-grid">
-            <PrintOptionsFields value={print} onChange={setPrint} />
-          </div>
-          <ReportDownloads
-            entry={entry}
-            filtered={filtered}
-            busy={exporter.isPending}
-            format={exporter.variables}
+          <details className="report-print-options">
+            <summary>Page Setup for PDF and Print</summary>
+            <div className="form-grid">
+              <PrintOptionsFields value={print} onChange={setPrint} />
+            </div>
+          </details>
+          <ReportActions
+            formats={menuFormats(entry)}
+            valid={valid}
+            ran={run.data !== undefined}
+            running={run.isPending}
+            exporting={exporter.isPending}
+            printing={printer.isPending}
+            onRun={guarded(() => run.mutate())}
             onExport={(format) => guarded(() => exporter.mutate(format))()}
+            onPrint={guarded(() => printer.mutate())}
           />
+          {filtered && (
+            <p className="muted report-filter-note">
+              The download holds the rows that match the column filters of the result.
+            </p>
+          )}
         </div>
       </Card>
       <ErrorAlert error={run.error ?? exporter.error ?? printer.error} />
       {run.data !== undefined && (
-        <Card title={run.data.title} flush>
-          <div className="report-echo muted">{run.data.parameterEcho.join(' · ')}</div>
-          <ReportTable
-            result={run.data}
-            filters={filters}
-            onFilterChange={(column, text) => setFilters((f) => ({ ...f, [column]: text }))}
-          />
-          {run.data.notes.length > 0 && (
-            <Notice tone="info" className="report-note" items={run.data.notes} />
-          )}
-        </Card>
+        <ResultCard
+          result={run.data}
+          filters={filters}
+          onFilterChange={(column, text) => setFilters((f) => ({ ...f, [column]: text }))}
+        />
       )}
+      <RecentRuns code={code} />
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { ProfileInput, ProgrammeView } from '@/api/eb';
 import { LovSelect } from '@/components/broking/LovSelect';
+import { useLovLabel } from '@/components/broking/useLabels';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
@@ -122,6 +123,7 @@ export function LineDialog({
 }: Readonly<DialogProps<LineForm> & { initial: LineForm }>) {
   const [line, setLine] = useState(initial);
   const [submitted, setSubmitted] = useState(false);
+  const lineName = useLovLabel(EB_LOV.benefitLine);
   const errors = submitted ? validateLine(line) : {};
   const save = () => {
     setSubmitted(true);
@@ -132,7 +134,11 @@ export function LineDialog({
   return (
     <Modal
       open
-      title={initial.benefitLine === '' ? 'Add Benefit Line' : 'Edit Benefit Line'}
+      title={
+        initial.benefitLine === ''
+          ? 'Add Benefit Line'
+          : `Edit Benefit Line – ${lineName(initial.benefitLine)}`
+      }
       onClose={onClose}
       footer={<DialogFooter busy={busy} label="Save Line" onClose={onClose} onSave={save} />}
     >
@@ -164,7 +170,7 @@ export function ContactDialog({
   return (
     <Modal
       open
-      title={initial.name === '' ? 'Add HR Contact' : 'Edit HR Contact'}
+      title={initial.name === '' ? 'Add HR Contact' : `Edit HR Contact – ${initial.name}`}
       onClose={onClose}
       footer={<DialogFooter busy={busy} label="Save Contact" onClose={onClose} onSave={save} />}
     >

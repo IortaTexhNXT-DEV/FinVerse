@@ -17,6 +17,7 @@ import './disbursement.css';
 import { UserName } from '@/components/ui/UserName';
 import { DateInput } from '@/components/ui/DateInput';
 import { displayNameOf } from '@/api/users';
+import { CostCentreSelect } from '@/components/broking/Lookups';
 
 function termsOf(v: Voucher): TermsInput {
   return {
@@ -228,11 +229,10 @@ export function VoucherDetailsTab({
           </Field>
           <Field label="Cost Centre">
             {(id) => (
-              <input
+              <CostCentreSelect
                 id={id}
-                className="input"
                 value={terms.costCenter ?? ''}
-                onChange={(e) => set({ costCenter: e.target.value || undefined })}
+                onChange={(code) => set({ costCenter: code || undefined })}
               />
             )}
           </Field>

@@ -8,7 +8,6 @@ import { RowActions } from '@/components/ui/RowActions';
 import { Card } from '@/components/ui/Card';
 import type { Column } from '@/components/ui/DataTable';
 import { DataTable } from '@/components/ui/DataTable';
-import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
@@ -123,7 +122,16 @@ export default function PdcWarehousePage() {
       <ErrorAlert error={list.error ?? act.error} />
       <Card flush>
         <Tabs tabs={TABS} active={status} onChange={setStatus} />
-        {!list.isLoading && months.length === 0 && <EmptyState message="No post-dated checks" />}
+        {months.length === 0 && (
+          <DataTable
+            caption="Post-dated checks"
+            columns={columns}
+            rows={[]}
+            loading={list.isLoading}
+            rowKey={(p) => p.id}
+            emptyMessage="No post-dated checks"
+          />
+        )}
         {months.map((m) => (
           <div key={m.month} className="stack">
             <div className="csh-month">

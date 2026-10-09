@@ -5,6 +5,7 @@ import { productCatalogApi } from '@/api/productCatalog';
 import type { Coverage } from '@/api/productCatalog';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import { EmptyRow } from '@/components/ui/EmptyRow';
 import { Field } from '@/components/ui/Field';
 import { NumberInput, TextInput } from '@/features/assets/FormControls';
 import { InsurerChoices } from '@/features/proposals/ProposalFormParts';
@@ -214,39 +215,39 @@ function CoveragesCard({ terms, onChange, errors, lineCode }: Readonly<TermsEdit
           {errors.coverages}
         </p>
       )}
-      {coverages.length === 0 ? (
-        <p className="muted">
-          No coverage yet. Add the coverages, limits and deductibles asked for.
-        </p>
-      ) : (
-        <div className="table-wrap">
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Coverage</th>
-                <th>Included</th>
-                <th className="num">Limit</th>
-                <th>Deductible</th>
-                <th aria-label="Actions" />
-              </tr>
-            </thead>
-            <tbody>
-              {coverages.map((c, index) => (
-                <CoverageRow
-                  key={`coverage-${index + 1}`}
-                  c={c}
-                  index={index}
-                  options={line === '' ? undefined : (options.data ?? [])}
-                  onChange={(patch) => set(index, patch)}
-                  onRemove={() =>
-                    onChange({ ...terms, coverages: coverages.filter((_, i) => i !== index) })
-                  }
-                />
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <div className="table-wrap">
+        <table className="table">
+          <thead>
+            <tr>
+              <th>Coverage</th>
+              <th>Included</th>
+              <th className="num">Limit</th>
+              <th>Deductible</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {coverages.length === 0 && (
+              <EmptyRow
+                columns={5}
+                message="No coverage yet. Add the coverages, limits and deductibles asked for."
+              />
+            )}
+            {coverages.map((c, index) => (
+              <CoverageRow
+                key={`coverage-${index + 1}`}
+                c={c}
+                index={index}
+                options={line === '' ? undefined : (options.data ?? [])}
+                onChange={(patch) => set(index, patch)}
+                onRemove={() =>
+                  onChange({ ...terms, coverages: coverages.filter((_, i) => i !== index) })
+                }
+              />
+            ))}
+          </tbody>
+        </table>
+      </div>
     </Card>
   );
 }

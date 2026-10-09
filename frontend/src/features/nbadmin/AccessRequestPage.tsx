@@ -36,6 +36,7 @@ import { ReasonDialog } from './ReasonDialog';
 import { UserName } from '@/components/ui/UserName';
 import { displayNameOf } from '@/api/users';
 import { Notice } from '@/components/ui/Notice';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 const TABS = [
   { id: 'details', label: 'Details' },
@@ -378,11 +379,7 @@ export default function AccessRequestPage() {
     queryFn: () => nbadminApi.request(id),
   });
   if (request.data === undefined) {
-    return request.error ? (
-      <ErrorAlert error={request.error} />
-    ) : (
-      <span className="spinner" aria-label="Loading" />
-    );
+    return request.error ? <ErrorAlert error={request.error} /> : <LoadingPanel />;
   }
   return <RequestView request={request.data} />;
 }

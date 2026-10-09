@@ -106,7 +106,11 @@ public class NbReportController {
   public ReportVariantDto saveVariant(@Valid @RequestBody SaveVariantRequest request) {
     return dto(
         variants.save(
-            request.reportCode(), request.name(), request.parameters(), request.shared()));
+            request.reportCode(),
+            request.name(),
+            request.parameters(),
+            request.shared(),
+            request.defaultVariant()));
   }
 
   /**

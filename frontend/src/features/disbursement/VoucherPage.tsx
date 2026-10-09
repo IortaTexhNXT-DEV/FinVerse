@@ -29,6 +29,7 @@ import { TagsTab } from './TagsTab';
 import { VoucherDetailsTab } from './VoucherDetailsTab';
 import { CommentDialog } from './VoucherDialogs';
 import './disbursement.css';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 const ENTITY = 'DisbursementVoucher';
 const TABS = [
@@ -233,11 +234,7 @@ export default function VoucherPage() {
   };
   const v = voucher.data;
   if (v === undefined) {
-    return voucher.error ? (
-      <ErrorAlert error={voucher.error} />
-    ) : (
-      <span className="spinner" aria-label="Loading" />
-    );
+    return voucher.error ? <ErrorAlert error={voucher.error} /> : <LoadingPanel />;
   }
   const s = v.summary;
   const businessActions = (available: WorkAction[]) =>

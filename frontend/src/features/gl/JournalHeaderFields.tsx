@@ -3,6 +3,7 @@ import { Field } from '@/components/ui/Field';
 import { useWorkspace } from '@/context/workspaceContext';
 import type { JournalHeaderValues } from './journalForm';
 import { DateInput } from '@/components/ui/DateInput';
+import { CurrencySelect } from '@/components/broking/Lookups';
 
 interface Props {
   value: JournalHeaderValues;
@@ -62,12 +63,10 @@ export function JournalHeaderFields({ value, onChange }: Readonly<Props>) {
         </Field>
         <Field label="Currency" required>
           {(id) => (
-            <input
+            <CurrencySelect
               id={id}
-              className="input"
-              maxLength={3}
               value={value.currency}
-              onChange={(e) => set('currency', e.target.value.toUpperCase())}
+              onChange={(code) => set('currency', code)}
             />
           )}
         </Field>

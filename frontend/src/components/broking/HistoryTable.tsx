@@ -1,7 +1,7 @@
 import { ArrowDown, ArrowUp } from 'lucide-react';
 import { useState } from 'react';
 import type { HistoryEntry } from '@/api/workflow';
-import { EmptyState } from '@/components/ui/EmptyState';
+import { EmptyRow } from '@/components/ui/EmptyRow';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useDisplayName, useRoleName } from '@/components/ui/useDisplayName';
 import { formatDateTime, humanize, titleCase } from '@/utils/format';
@@ -44,9 +44,6 @@ export function HistoryTable({
   const [newestFirst, setNewestFirst] = useState(true);
   const name = useDisplayName();
   const role = useRoleName();
-  if (history.length === 0) {
-    return <EmptyState message="No history recorded" />;
-  }
   const rows = historyRows(history, terminal);
   if (newestFirst) {
     rows.reverse();
@@ -78,6 +75,7 @@ export function HistoryTable({
           </tr>
         </thead>
         <tbody>
+          {rows.length === 0 && <EmptyRow columns={7} message="No history recorded" />}
           {rows.map(({ entry, duration, order }) => {
             const actorRole = entry.automatic ? 'Automatic step' : role(entry.actor);
             return (

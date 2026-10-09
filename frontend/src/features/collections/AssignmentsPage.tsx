@@ -119,7 +119,7 @@ function RuleDialog({
   };
   return (
     <Modal
-      title={rule === undefined ? 'New Assignment Rule' : 'Change Assignment Rule'}
+      title={rule === undefined ? 'New Assignment Rule' : `Change Assignment Rule – ${rule.name}`}
       open
       onClose={onClose}
       footer={

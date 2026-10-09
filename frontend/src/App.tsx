@@ -12,6 +12,7 @@ import { landingPath } from '@/navigation/access';
 import { MODULES } from '@/navigation/modules';
 import type { ScreenDef } from '@/navigation/types';
 import { createQueryClient } from '@/queryClient';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 const LoginPage = lazy(() => import('@/auth/LoginPage'));
 const ResetPasswordPage = lazy(() => import('@/auth/ResetPasswordPage'));
@@ -46,7 +47,7 @@ export function App() {
       <ToastProvider>
         <AuthProvider>
           <BrowserRouter>
-            <Suspense fallback={<span className="spinner" aria-label="Loading" />}>
+            <Suspense fallback={<LoadingPanel />}>
               <Routes>
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/reset-password" element={<ResetPasswordPage />} />

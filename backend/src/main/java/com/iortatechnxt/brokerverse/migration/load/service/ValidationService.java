@@ -274,7 +274,10 @@ public class ValidationService {
               null,
               MigrationCodes.ENTITY_BATCH,
               batch.getBatchNo(),
-              "Batch " + batch.getBatchNo() + " has " + unmapped + " unmapped legacy codes",
+              "Batch "
+                  + batch.getBatchNo()
+                  + " has "
+                  + DisplayFormat.countOf(unmapped, "unmapped legacy code"),
               null,
               MigrationCodes.ALERT_UNMAPPED + ":" + batch.getBatchNo()));
     }

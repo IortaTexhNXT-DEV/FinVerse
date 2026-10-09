@@ -23,6 +23,7 @@ import { formOfProposal, newProposalForm, proposalErrors, toProposalInput } from
 import type { ProposalForm } from './proposalForm';
 import '@/styles/quotation.css';
 import { refreshRecord } from '@/components/broking/recordRefresh';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 function HeaderCard({
   form,
@@ -239,11 +240,7 @@ export default function ProposalFormPage() {
     return <Form initial={newProposalForm(client === null ? undefined : Number(client))} />;
   }
   if (existing.data === undefined) {
-    return existing.error ? (
-      <ErrorAlert error={existing.error} />
-    ) : (
-      <span className="spinner" aria-label="Loading" />
-    );
+    return existing.error ? <ErrorAlert error={existing.error} /> : <LoadingPanel />;
   }
   return <Form key={existing.data.id} initial={formOfProposal(existing.data)} />;
 }

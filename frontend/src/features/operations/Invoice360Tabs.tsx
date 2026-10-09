@@ -12,7 +12,6 @@ import { Amount } from '@/components/ui/Amount';
 import { Card } from '@/components/ui/Card';
 import type { Column } from '@/components/ui/DataTable';
 import { DataTable } from '@/components/ui/DataTable';
-import { EmptyState } from '@/components/ui/EmptyState';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { CellStack } from '@/components/ui/CellStack';
 import { DefinitionGrid } from '@/components/ui/DefinitionGrid';
@@ -210,19 +209,13 @@ export function RelatedSectionTab({
   items,
 }: Readonly<{ section: RelatedSection; items: RelatedItem[] | undefined }>) {
   const title = RELATED_LABELS[section];
-  if (items === undefined || items.length === 0) {
-    return (
-      <Card title={title}>
-        <EmptyState message={`No ${title.toLowerCase()} for this invoice yet`} />
-      </Card>
-    );
-  }
   return (
     <Card title={title} flush>
       <DataTable
         caption={title}
         columns={RELATED_COLUMNS}
-        rows={items}
+        emptyMessage={`No ${title.toLowerCase()} for this invoice yet`}
+        rows={items ?? []}
         rowKey={(i) => `${i.type}-${i.reference}`}
       />
     </Card>

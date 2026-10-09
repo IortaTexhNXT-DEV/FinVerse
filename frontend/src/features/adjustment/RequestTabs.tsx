@@ -24,6 +24,7 @@ import { adjustmentApi, REQUEST_ENTITY } from './api';
 import type { EndorsementRequest, GlLine } from './api';
 import { RecomputePreview } from './RecomputePreview';
 import { displayNameOf } from '@/api/users';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 type Row = [string, string | undefined];
 
@@ -157,11 +158,7 @@ export function RecomputeTab({ request }: Readonly<{ request: EndorsementRequest
     retry: false,
   });
   if (recompute.data === undefined) {
-    return recompute.error ? (
-      <ErrorAlert error={recompute.error} />
-    ) : (
-      <span className="spinner" aria-label="Loading" />
-    );
+    return recompute.error ? <ErrorAlert error={recompute.error} /> : <LoadingPanel />;
   }
   return <RecomputePreview recompute={recompute.data} />;
 }

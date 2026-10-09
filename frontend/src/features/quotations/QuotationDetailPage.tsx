@@ -39,6 +39,7 @@ import { ProductLineLabel, InsurerName } from '@/components/broking/LovLabel';
 import { recordDescription } from '@/components/broking/recordDescription';
 import { useProductName } from '@/components/broking/useLabels';
 import { coverPeriod } from './coverPeriod';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 const TABS = [
   { id: 'details', label: 'Details' },
@@ -112,11 +113,7 @@ function ItemsOfVersion({
   const current = version === quotation.currentVersion;
   const content = current ? quotation.content : past.data?.content;
   if (content === undefined) {
-    return past.error ? (
-      <ErrorAlert error={past.error} />
-    ) : (
-      <span className="spinner" aria-label="Loading" />
-    );
+    return past.error ? <ErrorAlert error={past.error} /> : <LoadingPanel />;
   }
   return (
     <ItemsTab
@@ -209,11 +206,7 @@ export default function QuotationDetailPage() {
   const [version, setVersion] = useState<number>();
   const quotation = useQuery({ queryKey: ['quotation', id], queryFn: () => quotationsApi.get(id) });
   if (quotation.data === undefined) {
-    return quotation.error ? (
-      <ErrorAlert error={quotation.error} />
-    ) : (
-      <span className="spinner" aria-label="Loading" />
-    );
+    return quotation.error ? <ErrorAlert error={quotation.error} /> : <LoadingPanel />;
   }
   const q = quotation.data;
   const shown = version ?? q.currentVersion;

@@ -24,6 +24,7 @@ import {
 import type { ClientForm } from './clientForm';
 import { useUnsavedChangesGuard } from '@/components/ui/useUnsavedChangesGuard';
 import { FormErrorSummary } from '@/components/ui/FormErrorSummary';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 function Saved({ client, onAnother }: Readonly<{ client: ClientDetail; onAnother: () => void }>) {
   const navigate = useNavigate();
@@ -178,11 +179,7 @@ export default function ClientFormPage() {
     return <ClientEditor />;
   }
   if (existing.data === undefined) {
-    return existing.error ? (
-      <ErrorAlert error={existing.error} />
-    ) : (
-      <span className="spinner" aria-label="Loading" />
-    );
+    return existing.error ? <ErrorAlert error={existing.error} /> : <LoadingPanel />;
   }
   return <ClientEditor key={existing.data.id} existing={existing.data} />;
 }

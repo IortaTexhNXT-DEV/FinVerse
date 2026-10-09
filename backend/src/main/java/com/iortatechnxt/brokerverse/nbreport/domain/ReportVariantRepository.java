@@ -17,7 +17,9 @@ public interface ReportVariantRepository extends JpaRepository<ReportVariant, Lo
    */
   @Query(
       "select v from ReportVariant v where v.reportCode = :reportCode"
-          + " and (lower(v.owner) = lower(:owner) or v.shared = true) order by lower(v.name)")
+          + " and (lower(v.owner) = lower(:owner) or v.shared = true)"
+          + " order by v.standard desc, case when v.standard = true then v.id else 0 end,"
+          + " lower(v.name)")
   List<ReportVariant> visibleTo(String reportCode, String owner);
 
   /**
@@ -30,4 +32,13 @@ public interface ReportVariantRepository extends JpaRepository<ReportVariant, Lo
    */
   Optional<ReportVariant> findByOwnerIgnoreCaseAndReportCodeAndNameIgnoreCase(
       String owner, String reportCode, String name);
+
+  /**
+   * A user's variants of a report.
+   *
+   * @param owner owner
+   * @param reportCode report
+   * @return variants
+   */
+  List<ReportVariant> findByOwnerIgnoreCaseAndReportCode(String owner, String reportCode);
 }

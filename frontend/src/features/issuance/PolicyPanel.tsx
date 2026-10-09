@@ -7,6 +7,7 @@ import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatDate, formatDateTime } from '@/utils/format';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 /**
  * Policy tab of the account detail page: policy numbers and issue date, the e-policies received
@@ -18,11 +19,7 @@ export function PolicyPanel({ arn }: Readonly<{ arn: string }>) {
     queryFn: () => issuanceApi.policy(arn),
   });
   if (policy.data === undefined) {
-    return policy.error ? (
-      <ErrorAlert error={policy.error} />
-    ) : (
-      <span className="spinner" aria-label="Loading" />
-    );
+    return policy.error ? <ErrorAlert error={policy.error} /> : <LoadingPanel />;
   }
   const p = policy.data;
   return (

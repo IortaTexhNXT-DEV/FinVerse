@@ -2,7 +2,6 @@ import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
-import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatAmount, formatDate, formatDateTime, formatPeriod, humanize } from '@/utils/format';
@@ -14,6 +13,7 @@ import { CellStack, EmptyCell } from '@/components/ui/CellStack';
 import { Tag } from '@/components/ui/Tag';
 import { UserName } from '@/components/ui/UserName';
 import { InsurerName, LovLabel } from '@/components/broking/LovLabel';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 function Total({
   label,
@@ -121,11 +121,7 @@ export function PaymentsTab({ invoiceNo }: Readonly<{ invoiceNo: string }>) {
     queryFn: () => collectionsApi.payments(invoiceNo),
   });
   if (q.data === undefined) {
-    return q.error ? (
-      <ErrorAlert error={q.error} />
-    ) : (
-      <span className="spinner" aria-label="Loading" />
-    );
+    return q.error ? <ErrorAlert error={q.error} /> : <LoadingPanel />;
   }
   return (
     <div className="stack">
@@ -172,20 +168,14 @@ export function TimelineTab({ invoiceNo }: Readonly<{ invoiceNo: string }>) {
     queryFn: () => collectionsApi.timeline(invoiceNo),
   });
   if (q.data === undefined) {
-    return q.error ? (
-      <ErrorAlert error={q.error} />
-    ) : (
-      <span className="spinner" aria-label="Loading" />
-    );
-  }
-  if (q.data.length === 0) {
-    return <EmptyState message="No history yet" />;
+    return q.error ? <ErrorAlert error={q.error} /> : <LoadingPanel />;
   }
   const rows = q.data.map((e, index) => ({ ...e, index }));
   return (
     <Card flush>
       <DataTable
         caption="Account history"
+        emptyMessage="No history yet"
         rows={rows}
         rowKey={(e) => `${e.at}-${String(e.index)}`}
         columns={[
@@ -226,11 +216,7 @@ export function PolicyTab({ invoiceNo }: Readonly<{ invoiceNo: string }>) {
     queryFn: () => collectionsApi.policy(invoiceNo),
   });
   if (q.data === undefined) {
-    return q.error ? (
-      <ErrorAlert error={q.error} />
-    ) : (
-      <span className="spinner" aria-label="Loading" />
-    );
+    return q.error ? <ErrorAlert error={q.error} /> : <LoadingPanel />;
   }
   const p = q.data;
   return (

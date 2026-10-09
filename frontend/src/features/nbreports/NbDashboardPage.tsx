@@ -34,6 +34,7 @@ import {
 import './nbreports.css';
 import { DateInput } from '@/components/ui/DateInput';
 import { InBaseCurrency } from '@/components/ui/InBaseCurrency';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 function Tiles({ d }: Readonly<{ d: NbDashboard }>) {
   const baseCurrency = useBaseCurrency();
@@ -254,7 +255,7 @@ export default function NbDashboardPage() {
         }
       />
       <ErrorAlert error={query.error} />
-      {query.isLoading && <span className="spinner" aria-label="Loading" />}
+      {query.isLoading && <LoadingPanel />}
       {d !== undefined && (
         <>
           <Tiles d={d} />

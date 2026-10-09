@@ -10,6 +10,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { useCompanyId } from '@/context/workspaceContext';
 import { WorkCountTiles } from './OpsParts';
 import { SECTION_LABELS } from './opsLabels';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 interface SectionHomeProps {
   section: OpsSection;
@@ -44,7 +45,7 @@ export function OperationsSectionHome({ section, description }: Readonly<Section
       />
       <ErrorAlert error={home.error} />
       <Card title="Work Queues">
-        {home.isLoading && <span className="spinner" aria-label="Loading" />}
+        {home.isLoading && <LoadingPanel />}
         {!home.isLoading && counts.length === 0 && <EmptyState message="No queues to show yet" />}
         {counts.length > 0 && <WorkCountTiles counts={counts} label={`${title} work queues`} />}
       </Card>

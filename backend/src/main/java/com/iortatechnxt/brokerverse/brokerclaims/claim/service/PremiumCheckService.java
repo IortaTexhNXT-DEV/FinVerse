@@ -16,6 +16,7 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.messaging.domain.Notice;
 import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
@@ -117,7 +118,13 @@ public class PremiumCheckService {
               claim.getBranchId(),
               ClaimCodes.ENTITY_TYPE,
               String.valueOf(claim.getId()),
-              "Claim " + claim.getClaimNo() + " on " + cover.getArn() + " with " + result.status(),
+              "Claim "
+                  + claim.getClaimNo()
+                  + " on "
+                  + cover.getArn()
+                  + " with "
+                  + DisplayFormat.words(result.status())
+                  + " premium",
               null,
               UNPAID_ALERT + ":" + claim.getId()));
     } else if (becamePaid(before, result.status())) {

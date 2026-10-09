@@ -2,11 +2,14 @@ package com.iortatechnxt.brokerverse.alert.report;
 
 import com.iortatechnxt.brokerverse.alert.domain.Alert;
 import com.iortatechnxt.brokerverse.alert.domain.AlertStatus;
+import com.iortatechnxt.brokerverse.alert.domain.ExceptionCode;
 import com.iortatechnxt.brokerverse.alert.service.AlertService;
 import com.iortatechnxt.brokerverse.alert.service.AlertService.AlertSearch;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.report.core.ParameterSpec;
 import com.iortatechnxt.brokerverse.report.core.ParameterType;
+import com.iortatechnxt.brokerverse.report.core.PlatformCodeSets;
 import com.iortatechnxt.brokerverse.report.core.ReportCategory;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
 import com.iortatechnxt.brokerverse.report.core.ReportDefinition;
@@ -18,6 +21,7 @@ import com.iortatechnxt.brokerverse.security.domain.Permission;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
@@ -59,7 +63,7 @@ public class ExceptionReport implements ReportDefinition {
             ParameterSpec.required(TO, "To Date", ParameterType.DATE).withDefault("TODAY"),
             ParameterSpec.select(
                 STATUS, "Status", List.of(ALL, "OPEN", "ACKNOWLEDGED", "RESOLVED"), ALL),
-            ParameterSpec.optional(CODE, "Exception Code", ParameterType.TEXT)),
+            ParameterSpec.lookup(CODE, "Alert Rule", PlatformCodeSets.ALERT_RULE, false)),
         Permission.ALERT_VIEW);
   }
 
@@ -74,13 +78,16 @@ public class ExceptionReport implements ReportDefinition {
             p.optionalLong("companyId").orElse(null),
             BusinessClock.startOf(p.date(FROM)),
             BusinessClock.startOf(p.date(TO).plusDays(1)));
+    Map<String, String> names =
+        alerts.codes().stream()
+            .collect(Collectors.toMap(ExceptionCode::getCode, ExceptionCode::getName, (a, b) -> a));
     List<Map<String, Object>> rows =
         alerts.search(criteria, PageRequest.of(0, MAX_ROWS)).getContent().stream()
-            .map(ExceptionReport::row)
+            .map(a -> row(a, names))
             .toList();
     return TabularReportBuilder.of(p)
         .columns(
-            ReportColumn.text("raised", "Raised (UTC)"),
+            ReportColumn.text("raised", "Raised On"),
             ReportColumn.text("severity", "Severity"),
             ReportColumn.text("entity", "Record"),
             ReportColumn.text("message", "Exception"),
@@ -88,21 +95,22 @@ public class ExceptionReport implements ReportDefinition {
             ReportColumn.text("status", "Status"),
             ReportColumn.text("handledBy", "Handled By"),
             ReportColumn.text("comment", "Comment"))
-        .groupBy(CODE, "Exception Code")
+        .groupBy(CODE, "Alert Rule")
         .rows(rows)
         .withoutGrandTotal()
         .build();
   }
 
-  private static Map<String, Object> row(Alert a) {
+  private static Map<String, Object> row(Alert a, Map<String, String> names) {
     Map<String, Object> m = new LinkedHashMap<>();
-    m.put(CODE, a.getExceptionCode());
-    m.put("raised", a.getRaisedAt().toString());
-    m.put("severity", a.getSeverity().name());
-    m.put("entity", a.getEntityType() == null ? "" : a.getEntityType() + " " + a.getEntityId());
+    m.put(
+        CODE, names.getOrDefault(a.getExceptionCode(), DisplayFormat.label(a.getExceptionCode())));
+    m.put("raised", DisplayFormat.dateTime(a.getRaisedAt()));
+    m.put("severity", DisplayFormat.label(a.getSeverity()));
+    m.put("entity", a.getEntityId() == null ? "" : a.getEntityId());
     m.put("message", a.getMessage());
     m.put("amount", a.getAmount());
-    m.put(STATUS, a.getStatus().name());
+    m.put(STATUS, DisplayFormat.label(a.getStatus()));
     m.put("handledBy", a.getResolvedBy() != null ? a.getResolvedBy() : a.getAcknowledgedBy());
     m.put("comment", a.getStatusComment());
     return m;

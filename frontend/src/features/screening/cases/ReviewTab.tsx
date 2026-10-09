@@ -16,6 +16,7 @@ import { casesApi } from './api';
 import type { CaseDetail, CaseDocument, TemplateField } from './api';
 import { fieldError, missingFields, sections } from './caseLogic';
 import { UserName } from '@/components/ui/UserName';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 interface InputProps {
   field: TemplateField;
@@ -123,7 +124,7 @@ export function ReviewTab({ detail }: Readonly<{ detail: CaseDetail }>) {
     },
   });
   if (review.isLoading) {
-    return <span className="spinner" aria-label="Loading" />;
+    return <LoadingPanel />;
   }
   const form = review.data;
   if (form === undefined) {

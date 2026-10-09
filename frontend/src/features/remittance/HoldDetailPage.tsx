@@ -25,6 +25,7 @@ import { AssignDialog, ExtendDialog } from './HoldDialogs';
 import { holdLine, holdStatus } from './remittanceLabels';
 import { CellStack } from '@/components/ui/CellStack';
 import './remittance.css';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 const ENTITY = 'RemittanceHold';
 
@@ -149,11 +150,7 @@ export default function HoldDetailPage() {
     setDialog(undefined);
   });
   if (hold.data === undefined) {
-    return hold.error ? (
-      <ErrorAlert error={hold.error} />
-    ) : (
-      <span className="spinner" aria-label="Loading" />
-    );
+    return hold.error ? <ErrorAlert error={hold.error} /> : <LoadingPanel />;
   }
   const h = hold.data;
   const run = (a: WorkAction) => {

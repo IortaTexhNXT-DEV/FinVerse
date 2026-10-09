@@ -9,7 +9,6 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { DataTable } from '@/components/ui/DataTable';
-import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
@@ -94,7 +93,7 @@ export default function IncentivesPage() {
         actions={
           maintain && (
             <Button variant="accent" icon={<Plus size={16} />} onClick={() => setEditing('new')}>
-              New Criterion
+              Add Incentive Criterion
             </Button>
           )
         }
@@ -103,68 +102,72 @@ export default function IncentivesPage() {
         <Tabs tabs={TABS} active={tab} onChange={setTab} />
         <WorklistToolbar onSearch={setText} placeholder="Search Criterion or Product" />
         <ErrorAlert error={criteria.error} />
-        {!criteria.isLoading && rows.length === 0 ? (
-          <EmptyState message="No incentive criterion in this list." />
-        ) : (
-          <DataTable<IncentiveCriteria>
-            loading={criteria.isLoading}
-            rows={rows}
-            rowKey={(c) => c.id}
-            onRowClick={(c) => {
-              if (maintain && c.recordStatus !== 'INACTIVE') {
-                setEditing(c);
-              }
-            }}
-            columns={[
-              { key: 'c', header: 'Code', render: (c) => <strong>{c.code}</strong> },
-              { key: 'n', header: 'Name', render: (c) => c.name },
-              {
-                key: 't',
-                header: 'Type',
-                render: (c) => <LovLabel type="INCENTIVE_TYPE" code={c.incentiveType} />,
-              },
-              { key: 'v', header: 'Value', render: valueOf },
-              {
-                key: 'p',
-                header: 'Products',
-                render: (c) => c.products.map((p) => p.productCode).join(', '),
-              },
-              { key: 'f', header: 'From', render: (c) => formatDate(c.effectiveFrom) },
-              { key: 'u', header: 'Until', render: (c) => formatDate(c.effectiveTo) },
-              {
-                key: 's',
-                header: 'Status',
-                render: (c) => <StatusBadge status={c.recordStatus} />,
-              },
-              {
-                key: 'a',
-                header: <span className="visually-hidden">Actions</span>,
-                width: '64px',
-                render: (c) => (
-                  <RecordActions
-                    kind="INCENTIVE_CRITERIA"
-                    record={c}
-                    label={`${c.code} ${c.name}`}
-                    refresh={[['catalog', 'incentives']]}
-                    authorizers={AUTHORIZERS}
-                    maintainers={NO_MAINTAINERS}
-                    extra={
-                      maintain && c.recordStatus === 'ACTIVE'
-                        ? [
-                            {
-                              label: 'Deactivate',
-                              danger: true,
-                              onSelect: () => setDeactivating(c),
-                            },
-                          ]
-                        : []
-                    }
-                  />
-                ),
-              },
-            ]}
-          />
-        )}
+        <DataTable<IncentiveCriteria>
+          emptyMessage="No incentive criterion in this list."
+          emptyAction={
+            maintain && (
+              <Button variant="accent" icon={<Plus size={16} />} onClick={() => setEditing('new')}>
+                Add Incentive Criterion
+              </Button>
+            )
+          }
+          loading={criteria.isLoading}
+          rows={rows}
+          rowKey={(c) => c.id}
+          onRowClick={(c) => {
+            if (maintain && c.recordStatus !== 'INACTIVE') {
+              setEditing(c);
+            }
+          }}
+          columns={[
+            { key: 'c', header: 'Code', render: (c) => <strong>{c.code}</strong> },
+            { key: 'n', header: 'Name', render: (c) => c.name },
+            {
+              key: 't',
+              header: 'Type',
+              render: (c) => <LovLabel type="INCENTIVE_TYPE" code={c.incentiveType} />,
+            },
+            { key: 'v', header: 'Value', render: valueOf },
+            {
+              key: 'p',
+              header: 'Products',
+              render: (c) => c.products.map((p) => p.productCode).join(', '),
+            },
+            { key: 'f', header: 'From', render: (c) => formatDate(c.effectiveFrom) },
+            { key: 'u', header: 'Until', render: (c) => formatDate(c.effectiveTo) },
+            {
+              key: 's',
+              header: 'Status',
+              render: (c) => <StatusBadge status={c.recordStatus} />,
+            },
+            {
+              key: 'a',
+              header: <span className="visually-hidden">Actions</span>,
+              width: '64px',
+              render: (c) => (
+                <RecordActions
+                  kind="INCENTIVE_CRITERIA"
+                  record={c}
+                  label={`${c.code} ${c.name}`}
+                  refresh={[['catalog', 'incentives']]}
+                  authorizers={AUTHORIZERS}
+                  maintainers={NO_MAINTAINERS}
+                  extra={
+                    maintain && c.recordStatus === 'ACTIVE'
+                      ? [
+                          {
+                            label: 'Deactivate',
+                            danger: true,
+                            onSelect: () => setDeactivating(c),
+                          },
+                        ]
+                      : []
+                  }
+                />
+              ),
+            },
+          ]}
+        />
       </Card>
       {deactivating !== null && (
         <ConfirmDialog

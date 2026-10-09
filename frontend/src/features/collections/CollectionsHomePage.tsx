@@ -15,6 +15,7 @@ import { collectionsApi } from './api';
 import type { AgingCell } from './api';
 import { agingBars, agingSegments } from './collectionsLogic';
 import './collections.css';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 /** Open amounts per aging bracket, for all segments or one (BRCLXN.001-012, OQ43). */
 function AgingChart({ cells }: Readonly<{ cells: AgingCell[] }>) {
@@ -101,7 +102,7 @@ export default function CollectionsHomePage() {
         }
       />
       <ErrorAlert error={home.error} />
-      {home.isLoading && <span className="spinner" aria-label="Loading" />}
+      {home.isLoading && <LoadingPanel />}
       {home.data !== undefined && (
         <>
           <WorkTiles

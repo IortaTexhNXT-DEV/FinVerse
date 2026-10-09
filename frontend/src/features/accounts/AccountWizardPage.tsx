@@ -34,6 +34,7 @@ import { useAutosave } from './useAutosave';
 import { ClientStep, ContactStep, PeriodStep, ProductStep } from './WizardSteps';
 import type { StepProps } from './WizardSteps';
 import { Notice } from '@/components/ui/Notice';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 function DuplicateFallout({ arns }: Readonly<{ arns: string[] }>) {
   return (
@@ -330,11 +331,7 @@ export default function AccountWizardPage() {
     return <Wizard initial={newDraft(today(), baseCurrency)} resubmission={false} />;
   }
   if (existing.data === undefined) {
-    return existing.error ? (
-      <ErrorAlert error={existing.error} />
-    ) : (
-      <span className="spinner" aria-label="Loading" />
-    );
+    return existing.error ? <ErrorAlert error={existing.error} /> : <LoadingPanel />;
   }
   return (
     <Wizard

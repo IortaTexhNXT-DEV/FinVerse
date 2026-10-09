@@ -512,7 +512,7 @@ def split_subject(ac: str) -> tuple[str, str, bool] | None:
     return None
 
 
-def given_when_then(fr: Fr, n: int, ac: str) -> str:
+def given_when_then(fr: Fr, n: int, ac: str, with_fr: bool = False) -> str:
     """One numbered acceptance criterion of the FR as Given / When / Then. The AC number is kept in brackets."""
     pre = [clean(p) for p in as_list(fr.data.get("preconditions"))]
     pre = [no_stop(p) for p in pre if p and not p.lower().startswith(("none", "as fr", "as for fr"))]
@@ -539,7 +539,8 @@ def given_when_then(fr: Fr, n: int, ac: str) -> str:
         subject, predicate, plural = s
         given = f"{given} and {lower_first(subject)}"
         then = f"{'they' if plural else 'it'} {predicate}"
-    return f"(AC{n}) Given {given}, when {when}, then {lower_first(then)}."
+    label = f"{fr.id} AC{n}" if with_fr else f"AC{n}"
+    return f"({label}) Given {given}, when {when}, then {lower_first(then)}."
 
 
 def wiki(text: str) -> str:
@@ -622,7 +623,7 @@ def complete_story(model: Backlog, s: Story) -> None:
                  + "; ".join(via[:6])) if via else "No test plan of its own (umbrella FRS)"
     s.frs_ref = f"{doc.label} ({doc.docname}), section {fr0.number} {fr0.section}, " + ", ".join(
         f"{fr.id} {fr.title}" for fr in frs)
-    s.gwt = [given_when_then(doc.frs[fid], n, text) for fid, n, text in s.acs]
+    s.gwt = [given_when_then(doc.frs[fid], n, text, len(s.frs) > 1) for fid, n, text in s.acs]
     # business rules and checks of the FR
     rules: list[str] = []
     for fr in frs:
@@ -691,7 +692,7 @@ def story_description(s: Story) -> str:
 
 def epic_description(model: Backlog, e: Epic) -> str:
     doc = model.docs[e.brd]
-    frs = [f for s in e.stories for f in s.frs]
+    frs = list(dict.fromkeys(f for s in e.stories for f in s.frs))
     lines = [wiki(f"Capability {e.capability} of {brand.BRD_NAMES.get(e.brd, 'Core Replacement')} ({e.brd}): "
                   f"section {e.number} of the {doc.label} ({doc.docname})."), "",
              wiki(f"Stories: {len(e.stories)}, story points (first estimate): {e.points}. FRs: {range_text(frs)}."),
@@ -815,7 +816,7 @@ def issue_rows(model: Backlog, brd: str, drop: str) -> list[dict[str, Any]]:
 
 
 def epic_row(e: Epic) -> dict[str, Any]:
-    frs = [f for s in e.stories for f in s.frs]
+    frs = list(dict.fromkeys(f for s in e.stories for f in s.frs))
     ids = list(dict.fromkeys(i for s in e.stories for i in s.brd_ids))
     return {"type": "Epic", "id": e.issue_id, "parent": None, "epic": e.name, "summary": e.name, "story": "",
             "priority": max((s.priority for s in e.stories), key=["Low", "Medium", "High", "Highest"].index),

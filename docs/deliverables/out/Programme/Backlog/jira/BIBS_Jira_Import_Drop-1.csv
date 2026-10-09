@@ -41,9 +41,9 @@ Stories: 9, story points (first estimate): 22. FRs: FR-NB-030, FR-NB-031, FR-NB-
 Fix version: Drop 1.",High,BRD-01,Drop-1,,,,New Business,Drop 1,,"BR-012, BRNB.044, BRNB.046, BR-005, BR-009, BR-010, BR-011, BR-013, BRNB.029, BRNB.030, BRNB.048, BR-006, BRNB.049, BRNB.032, BR-007, BRNB.090, BRNB.101, BRNB.047, BRNB.065, BRNB.091, BR-030, BRNB.099, BRNB.110","FR-NB-030, FR-NB-031, FR-NB-032, FR-NB-033, FR-NB-034, FR-NB-035, FR-NB-036, FR-NB-037, FR-NB-038",,Section 4.3 Client onboarding and KYC,
 Epic,20009,,New Business - Quotation,New Business - Quotation,"Capability Quotation of New Business (BRD-01): section 4.4 of the FRS BRD-01 New Business v2.1 (02_BIBS_FRS_BRD-01_New_Business_v2.1.docx).
 
-Stories: 9, story points (first estimate): 29. FRs: FR-NB-040, FR-NB-041, FR-NB-042, FR-NB-043, FR-NB-044, FR-NB-044, FR-NB-045, FR-NB-046, FR-NB-047.
+Stories: 9, story points (first estimate): 29. FRs: FR-NB-040, FR-NB-041, FR-NB-042, FR-NB-043, FR-NB-044, FR-NB-045, FR-NB-046, FR-NB-047.
 
-Fix version: Drop 1.",High,BRD-01,Drop-1,,,,New Business,Drop 1,,"BR-014, BRNB.023, BRNB.041, BR-015, BR-016, BR-020, BR-022, BRNB.004, BRNB.029, BRNB.043, BRNB.102, BR-018, BRNB.020, BR-019, BRNB.014, BRNB.021, BRNB.013, BRNB.042, BR-038, BRNB.024, BRNB.044, BRNB.045, BRNB.028, BRNB.063, BRNB.006","FR-NB-040, FR-NB-041, FR-NB-042, FR-NB-043, FR-NB-044, FR-NB-044, FR-NB-045, FR-NB-046, FR-NB-047",,Section 4.4 Quotation,
+Fix version: Drop 1.",High,BRD-01,Drop-1,,,,New Business,Drop 1,,"BR-014, BRNB.023, BRNB.041, BR-015, BR-016, BR-020, BR-022, BRNB.004, BRNB.029, BRNB.043, BRNB.102, BR-018, BRNB.020, BR-019, BRNB.014, BRNB.021, BRNB.013, BRNB.042, BR-038, BRNB.024, BRNB.044, BRNB.045, BRNB.028, BRNB.063, BRNB.006","FR-NB-040, FR-NB-041, FR-NB-042, FR-NB-043, FR-NB-044, FR-NB-045, FR-NB-046, FR-NB-047",,Section 4.4 Quotation,
 Epic,20010,,New Business - Non-package placement (PRF),New Business - Non-package placement (PRF),"Capability Non-package placement (PRF) of New Business (BRD-01): section 4.5 of the FRS BRD-01 New Business v2.1 (02_BIBS_FRS_BRD-01_New_Business_v2.1.docx).
 
 Stories: 8, story points (first estimate): 22. FRs: FR-NB-050, FR-NB-051, FR-NB-052, FR-NB-053, FR-NB-054, FR-NB-055, FR-NB-056, FR-NB-057.
@@ -96,14 +96,14 @@ Stories: 17, story points (first estimate): 61. FRs: FR-OP-010, FR-OP-011, FR-OP
 Fix version: Drop 1.",High,BRD-02,Drop-1,,,,Operations,Drop 1,,"BR-094, BR-095, BR-096, CSHID.006, CSHID.015, BR-086, CSHID.001, CSHID.002, BR-087, CSHID.003, CSHID.012, CSHID.004, CSHID.005, CSHID.013, BR-089, BR-100, CSHID.008, BR-091, BR-092, CSHID.020, CSHID.022, CSHID.021, BR-098, BR-099, CSHID.007, BR-090, BR-093, CSHID.024, CSHID.025, CSHID.016, CSHID.010, CSHID.011, CSHID.019, CSHID.014, BR-097, CSHID.023","FR-OP-010, FR-OP-011, FR-OP-012, FR-OP-013, FR-OP-014, FR-OP-015, FR-OP-016, FR-OP-018, FR-OP-019, FR-OP-020, FR-OP-021, FR-OP-022, FR-OP-023, FR-OP-024, FR-OP-025, FR-OP-027, FR-OP-028",,Section 4.2 Cashiering,
 Epic,20020,,Operations - Remittance,Operations - Remittance,"Capability Remittance of Operations (BRD-02): section 4.3 of the FRS BRD-02 Operations v2.1 (02_BIBS_FRS_BRD-02_Operations_v2.1.docx).
 
-Stories: 13, story points (first estimate): 45. FRs: FR-OP-030, FR-OP-030, FR-OP-031, FR-OP-032, FR-OP-033, FR-OP-034, FR-OP-035, FR-OP-036, FR-OP-037, FR-OP-038, FR-OP-039, FR-OP-040, FR-OP-041.
+Stories: 13, story points (first estimate): 45. FRs: FR-OP-030, FR-OP-031, FR-OP-032, FR-OP-033, FR-OP-034, FR-OP-035, FR-OP-036, FR-OP-037, FR-OP-038, FR-OP-039, FR-OP-040, FR-OP-041.
 
-Fix version: Drop 1.",High,BRD-02,Drop-1,,,,Operations,Drop 1,,"BR-102, BR-103, RMTID.001, RMTID.003, RMTID.004, RMTID.005, RMTID.007, RMTID.008, BR-106, BR-107, BR-108, BR-110, BR-111, BR-112, BR-113, BR-114, BR-115, BR-116, RMTID.006, RMTID.014, RMTID.015, RMTID.017, RMTID.018, RMTID.020, RMTID.022, RMTID.028, RMTID.031, RMTID.035, RMTID.002, RMTID.024, RMTID.027, RMTID.009, RMTID.010, RMTID.019, RMTID.029, BR-104, BR-105, RMTID.011, RMTID.034, RMTID.036, RMTID.012, RMTID.013, RMTID.016, RMTID.023, RMTID.041 (new), BR-109, RMTID.025, BR-083, BR-117, BR-206, RMTID.030, RMTID.033, RMTID.039","FR-OP-030, FR-OP-030, FR-OP-031, FR-OP-032, FR-OP-033, FR-OP-034, FR-OP-035, FR-OP-036, FR-OP-037, FR-OP-038, FR-OP-039, FR-OP-040, FR-OP-041",,Section 4.3 Remittance,
+Fix version: Drop 1.",High,BRD-02,Drop-1,,,,Operations,Drop 1,,"BR-102, BR-103, RMTID.001, RMTID.003, RMTID.004, RMTID.005, RMTID.007, RMTID.008, BR-106, BR-107, BR-108, BR-110, BR-111, BR-112, BR-113, BR-114, BR-115, BR-116, RMTID.006, RMTID.014, RMTID.015, RMTID.017, RMTID.018, RMTID.020, RMTID.022, RMTID.028, RMTID.031, RMTID.035, RMTID.002, RMTID.024, RMTID.027, RMTID.009, RMTID.010, RMTID.019, RMTID.029, BR-104, BR-105, RMTID.011, RMTID.034, RMTID.036, RMTID.012, RMTID.013, RMTID.016, RMTID.023, RMTID.041 (new), BR-109, RMTID.025, BR-083, BR-117, BR-206, RMTID.030, RMTID.033, RMTID.039","FR-OP-030, FR-OP-031, FR-OP-032, FR-OP-033, FR-OP-034, FR-OP-035, FR-OP-036, FR-OP-037, FR-OP-038, FR-OP-039, FR-OP-040, FR-OP-041",,Section 4.3 Remittance,
 Epic,20021,,Operations - Adjustment / Cancellation,Operations - Adjustment / Cancellation,"Capability Adjustment / Cancellation of Operations (BRD-02): section 4.4 of the FRS BRD-02 Operations v2.1 (02_BIBS_FRS_BRD-02_Operations_v2.1.docx).
 
-Stories: 14, story points (first estimate): 52. FRs: FR-OP-050, FR-OP-051, FR-OP-052, FR-OP-053, FR-OP-054, FR-OP-055, FR-OP-056, FR-OP-057, FR-OP-058, FR-OP-059, FR-OP-060, FR-OP-061, FR-OP-061, FR-OP-062.
+Stories: 14, story points (first estimate): 52. FRs: FR-OP-050, FR-OP-051, FR-OP-052, FR-OP-053, FR-OP-054, FR-OP-055, FR-OP-056, FR-OP-057, FR-OP-058, FR-OP-059, FR-OP-060, FR-OP-061, FR-OP-062.
 
-Fix version: Drop 1.",High,BRD-02,Drop-1,,,,Operations,Drop 1,,"BR-126, BR-128, BR-129, MKTID.014 (new), MKTID.015 (new), ADJID.001, ADJID.003, ADJID.020, ADJID.023, BR-130, BR-131, MKTID.019 (new), MKTID.016 (new), MKTID.017 (new), ADJID.005, ADJID.014, ADJID.008, BR-127, BR-132, ADJID.006, ADJID.011, ADJID.009, ADJID.012, ADJID.013, ADJID.028, ADJID.026, MKTID.018 (new), ADJID.018, ADJID.021, ADJID.022, ADJID.024, ADJID.016, ADJID.017, ADJID.019","FR-OP-050, FR-OP-051, FR-OP-052, FR-OP-053, FR-OP-054, FR-OP-055, FR-OP-056, FR-OP-057, FR-OP-058, FR-OP-059, FR-OP-060, FR-OP-061, FR-OP-061, FR-OP-062",,Section 4.4 Adjustment / Cancellation,
+Fix version: Drop 1.",High,BRD-02,Drop-1,,,,Operations,Drop 1,,"BR-126, BR-128, BR-129, MKTID.014 (new), MKTID.015 (new), ADJID.001, ADJID.003, ADJID.020, ADJID.023, BR-130, BR-131, MKTID.019 (new), MKTID.016 (new), MKTID.017 (new), ADJID.005, ADJID.014, ADJID.008, BR-127, BR-132, ADJID.006, ADJID.011, ADJID.009, ADJID.012, ADJID.013, ADJID.028, ADJID.026, MKTID.018 (new), ADJID.018, ADJID.021, ADJID.022, ADJID.024, ADJID.016, ADJID.017, ADJID.019","FR-OP-050, FR-OP-051, FR-OP-052, FR-OP-053, FR-OP-054, FR-OP-055, FR-OP-056, FR-OP-057, FR-OP-058, FR-OP-059, FR-OP-060, FR-OP-061, FR-OP-062",,Section 4.4 Adjustment / Cancellation,
 Epic,20022,,Operations - Commission Receivables / Direct Payment,Operations - Commission Receivables / Direct Payment,"Capability Commission Receivables / Direct Payment of Operations (BRD-02): section 4.6 of the FRS BRD-02 Operations v2.1 (02_BIBS_FRS_BRD-02_Operations_v2.1.docx).
 
 Stories: 10, story points (first estimate): 39. FRs: FR-OP-090, FR-OP-091, FR-OP-092, FR-OP-093, FR-OP-094, FR-OP-095, FR-OP-096, FR-OP-097, FR-OP-098, FR-OP-099.
@@ -111,9 +111,9 @@ Stories: 10, story points (first estimate): 39. FRs: FR-OP-090, FR-OP-091, FR-OP
 Fix version: Drop 1.",High,BRD-02,Drop-1,,,,Operations,Drop 1,,"CMRID.001, BR-052, BR-098, BR-099, BR-133, BR-135, BR-136, BR-137, BR-138, BR-139, BR-140, CMRID.002, CMRID.003, CMRID.007, CMRID.008, CMRID.013, CMRID.009, CMRID.012, MKTID.012, CMRID.010, BR-166, BR-167, BR-168, BR-169, CMRID.005, CMRID.006, CMRID.015, BR-134, RMTID.037, CMRID.014, CMRID.004, CMRID.011","FR-OP-090, FR-OP-091, FR-OP-092, FR-OP-093, FR-OP-094, FR-OP-095, FR-OP-096, FR-OP-097, FR-OP-098, FR-OP-099",,Section 4.6 Commission Receivables / Direct Payment,
 Epic,20023,,Operations - Marketing Collection items,Operations - Marketing Collection items,"Capability Marketing Collection items of Operations (BRD-02): section 4.7 of the FRS BRD-02 Operations v2.1 (02_BIBS_FRS_BRD-02_Operations_v2.1.docx).
 
-Stories: 6, story points (first estimate): 22. FRs: FR-OP-110, FR-OP-111, FR-OP-112, FR-OP-113, FR-OP-113, FR-OP-114.
+Stories: 6, story points (first estimate): 22. FRs: FR-OP-110, FR-OP-111, FR-OP-112, FR-OP-113, FR-OP-114.
 
-Fix version: Drop 1.",High,BRD-02,Drop-1,,,,Operations,Drop 1,,"MKTID.001, RMTID.021, MKTID.002, MKTID.003, MKTID.004, MKTID.005, MKTID.006, MKTID.007, MKTID.009, BR-078, BR-118, BR-138, BR-139, MKTID.010, MKTID.013, MKTID.008, MKTID.018 (new)","FR-OP-110, FR-OP-111, FR-OP-112, FR-OP-113, FR-OP-113, FR-OP-114",,Section 4.7 Marketing Collection items,
+Fix version: Drop 1.",High,BRD-02,Drop-1,,,,Operations,Drop 1,,"MKTID.001, RMTID.021, MKTID.002, MKTID.003, MKTID.004, MKTID.005, MKTID.006, MKTID.007, MKTID.009, BR-078, BR-118, BR-138, BR-139, MKTID.010, MKTID.013, MKTID.008, MKTID.018 (new)","FR-OP-110, FR-OP-111, FR-OP-112, FR-OP-113, FR-OP-114",,Section 4.7 Marketing Collection items,
 Epic,20024,,Operations - Disbursement queue,Operations - Disbursement queue,"Capability Disbursement queue of Operations (BRD-02): section 4.8 of the FRS BRD-02 Operations v2.1 (02_BIBS_FRS_BRD-02_Operations_v2.1.docx).
 
 Stories: 2, story points (first estimate): 5. FRs: FR-OP-120, FR-OP-121.
@@ -126,9 +126,9 @@ Stories: 3, story points (first estimate): 5. FRs: FR-OP-130, FR-OP-131, FR-OP-1
 Fix version: Drop 1.",High,BRD-02,Drop-1,,,,Operations,Drop 1,,"BRQID.004, BRQID.005, BR-091, BR-092, CSHID.020","FR-OP-130, FR-OP-131, FR-OP-132",,Section 4.9 Interfaces and flow-in,
 Epic,20026,,"Collections - Access, audit and record lock","Collections - Access, audit and record lock","Capability Access, audit and record lock of Collections (BRD-04): section 4.1 of the FRS BRD-04 Collections v2.1 (02_BIBS_FRS_BRD-04_Collections_v2.1.docx).
 
-Stories: 6, story points (first estimate): 16. FRs: FR-CL-001, FR-CL-001, FR-CL-002, FR-CL-003, FR-CL-004, FR-CL-005.
+Stories: 6, story points (first estimate): 16. FRs: FR-CL-001, FR-CL-002, FR-CL-003, FR-CL-004, FR-CL-005.
 
-Fix version: Drop 1.",High,BRD-04,Drop-1,,,,Collections,Drop 1,,"Stakeholder functions (p.45-48), NFR 3.01-3.05 (p.54), Minutes of 27-Apr-2026 on user access (p.1), BRCLXN.019, BRCLXN.020, BR-053, BR-054, BR-170, BRCLXN.043, BRCLXN.044, NFR 9.03 (p.55)","FR-CL-001, FR-CL-001, FR-CL-002, FR-CL-003, FR-CL-004, FR-CL-005",,"Section 4.1 Access, audit and record lock",
+Fix version: Drop 1.",High,BRD-04,Drop-1,,,,Collections,Drop 1,,"Stakeholder functions (p.45-48), NFR 3.01-3.05 (p.54), Minutes of 27-Apr-2026 on user access (p.1), BRCLXN.019, BRCLXN.020, BR-053, BR-054, BR-170, BRCLXN.043, BRCLXN.044, NFR 9.03 (p.55)","FR-CL-001, FR-CL-002, FR-CL-003, FR-CL-004, FR-CL-005",,"Section 4.1 Access, audit and record lock",
 Epic,20027,,Collections - Commission receivable and incentives,Collections - Commission receivable and incentives,"Capability Commission receivable and incentives of Collections (BRD-04): section 4.10 of the FRS BRD-04 Collections v2.1 (02_BIBS_FRS_BRD-04_Collections_v2.1.docx).
 
 Stories: 4, story points (first estimate): 7. FRs: FR-CL-090, FR-CL-091, FR-CL-092, FR-CL-093, FR-CL-094.
@@ -5976,8 +5976,8 @@ Story,20273,20027,Handle commission refunds from negative adjustments apart; bil
 * (R1) Collectible CR = commission x confirmed direct portion / gross premium. (Configurable)
 
 *Acceptance criteria*
-* (AC1) Given BDOI confirms the draft row (CQ01) and a negative endorsement on a collected commission, when Adjustment posts the commission delta (BRD-2), then it creates a refund, not a negative CR line.
-* (AC1) Given BDOI confirms the draft row (CQ01) and how a partial direct payment is evidenced (CQ19), when the partial direct payment is confirmed, then for a premium of 100,000.00 with 40,000.00 paid directly and confirmed, the collectible commission is 40% of the commission.
+* (FR-CL-093 AC1) Given BDOI confirms the draft row (CQ01) and a negative endorsement on a collected commission, when Adjustment posts the commission delta (BRD-2), then it creates a refund, not a negative CR line.
+* (FR-CL-094 AC1) Given BDOI confirms the draft row (CQ01) and how a partial direct payment is evidenced (CQ19), when the partial direct payment is confirmed, then for a premium of 100,000.00 with 40,000.00 paid directly and confirmed, the collectible commission is 40% of the commission.
 
 *Out of scope / notes*
 * CLR-CL-17 - open, for BDOI confirmation: Draft commission and incentive rows (BRCLXN.061-064; FR-CL-091 to 094). Proposed: The four draft rows are proposed as described in section 4.10; their validations and messages are confirmed with the draft. Decision requested: Confirm in writing that BRCLXN.061-064 are approved scope, as the minutes describe them, or withdraw them (CQ01).
@@ -5986,8 +5986,8 @@ Story,20273,20027,Handle commission refunds from negative adjustments apart; bil
 *Links*
 * FRS section 4.10 Commission receivable and incentives (02_BIBS_FRS_BRD-04_Collections_v2.1.docx)
 * Screens: Commission (to be extended)
-* Test cases: TC-CL-093.1, TC-CL-094.1 (2 conditions, 4 cases)",High,BRD-04,Drop-1,System,Commission_Receivables_Unit,,Collections,Drop 1,2,"BRCLXN.063, BRCLXN.064",FR-CL-093 AC1; FR-CL-094 AC1,"TC-CL-093.1, TC-CL-094.1 (2 conditions, 4 cases)","FRS BRD-04 Collections v2.1 (02_BIBS_FRS_BRD-04_Collections_v2.1.docx), section 4.10 Commission receivable and incentives, FR-CL-093 Handle commission refunds from negative adjustments apart, FR-CL-094 Bill only the collectible commission on mixed payments","(AC1) Given BDOI confirms the draft row (CQ01) and a negative endorsement on a collected commission, when Adjustment posts the commission delta (BRD-2), then it creates a refund, not a negative CR line.
-(AC1) Given BDOI confirms the draft row (CQ01) and how a partial direct payment is evidenced (CQ19), when the partial direct payment is confirmed, then for a premium of 100,000.00 with 40,000.00 paid directly and confirmed, the collectible commission is 40% of the commission."
+* Test cases: TC-CL-093.1, TC-CL-094.1 (2 conditions, 4 cases)",High,BRD-04,Drop-1,System,Commission_Receivables_Unit,,Collections,Drop 1,2,"BRCLXN.063, BRCLXN.064",FR-CL-093 AC1; FR-CL-094 AC1,"TC-CL-093.1, TC-CL-094.1 (2 conditions, 4 cases)","FRS BRD-04 Collections v2.1 (02_BIBS_FRS_BRD-04_Collections_v2.1.docx), section 4.10 Commission receivable and incentives, FR-CL-093 Handle commission refunds from negative adjustments apart, FR-CL-094 Bill only the collectible commission on mixed payments","(FR-CL-093 AC1) Given BDOI confirms the draft row (CQ01) and a negative endorsement on a collected commission, when Adjustment posts the commission delta (BRD-2), then it creates a refund, not a negative CR line.
+(FR-CL-094 AC1) Given BDOI confirms the draft row (CQ01) and how a partial direct payment is evidenced (CQ19), when the partial direct payment is confirmed, then for a premium of 100,000.00 with 40,000.00 paid directly and confirmed, the collectible commission is 40% of the commission."
 Story,20274,20028,Access Accounting and administration with a user profile,,"As a GL Officer (FRBS Processor), I need to access the module/application using any BDO issued device, so that only authorised users reach Accounting from BDO devices.
 
 *Background*
@@ -7888,8 +7888,8 @@ Story,20349,20037,Run the real-time Disbursement reports; report payees and uplo
 * (R1) Account numbers are masked without DISB_PAYEE_VIEW_FULL. (Fixed)
 
 *Acceptance criteria*
-* (AC1) Given the user has DISB_REPORT_VIEW, when the user runs the report for the range, then the unreleased-checks report puts a check printed 45 days ago in 31-60.
-* (AC1) Given the user has DISB_REPORT_VIEW, when the user runs the report for the period, then the fall-out report of September lists the 3 refused rows of an upload with their reasons.
+* (FR-DS-082 AC1) Given the user has DISB_REPORT_VIEW, when the user runs the report for the range, then the unreleased-checks report puts a check printed 45 days ago in 31-60.
+* (FR-DS-083 AC1) Given the user has DISB_REPORT_VIEW, when the user runs the report for the period, then the fall-out report of September lists the 3 refused rows of an upload with their reasons.
 
 *Out of scope / notes*
 * FR-DS-082 and FR-DS-083 are one story: each has one acceptance criterion on the same screen.
@@ -7897,8 +7897,8 @@ Story,20349,20037,Run the real-time Disbursement reports; report payees and uplo
 *Links*
 * FRS section 4.11 Disbursement (02_BIBS_FRS_BRD-05_Accounting_Disbursement_ACSL_v2.1.docx)
 * Screens: Disbursement Reports
-* Test cases: TC-DS-082.1, TC-DS-082.2, TC-DS-083.1 (3 conditions, 6 cases)",High,BRD-05,Drop-1,Disbursement_User,,,Accounting Disbursement ACSL,Drop 1,2,"DIS 3.28.3, DIS 3.28.1, DIS 3.28.4",FR-DS-082 AC1; FR-DS-083 AC1,"TC-DS-082.1, TC-DS-082.2, TC-DS-083.1 (3 conditions, 6 cases)","FRS BRD-05 Accounting Disbursement ACSL v2.1 (02_BIBS_FRS_BRD-05_Accounting_Disbursement_ACSL_v2.1.docx), section 4.11 Disbursement, FR-DS-082 Run the real-time Disbursement reports, FR-DS-083 Report payees and upload fall-outs","(AC1) Given the user has DISB_REPORT_VIEW, when the user runs the report for the range, then the unreleased-checks report puts a check printed 45 days ago in 31-60.
-(AC1) Given the user has DISB_REPORT_VIEW, when the user runs the report for the period, then the fall-out report of September lists the 3 refused rows of an upload with their reasons."
+* Test cases: TC-DS-082.1, TC-DS-082.2, TC-DS-083.1 (3 conditions, 6 cases)",High,BRD-05,Drop-1,Disbursement_User,,,Accounting Disbursement ACSL,Drop 1,2,"DIS 3.28.3, DIS 3.28.1, DIS 3.28.4",FR-DS-082 AC1; FR-DS-083 AC1,"TC-DS-082.1, TC-DS-082.2, TC-DS-083.1 (3 conditions, 6 cases)","FRS BRD-05 Accounting Disbursement ACSL v2.1 (02_BIBS_FRS_BRD-05_Accounting_Disbursement_ACSL_v2.1.docx), section 4.11 Disbursement, FR-DS-082 Run the real-time Disbursement reports, FR-DS-083 Report payees and upload fall-outs","(FR-DS-082 AC1) Given the user has DISB_REPORT_VIEW, when the user runs the report for the range, then the unreleased-checks report puts a check printed 45 days ago in 31-60.
+(FR-DS-083 AC1) Given the user has DISB_REPORT_VIEW, when the user runs the report for the period, then the fall-out report of September lists the 3 refused rows of an upload with their reasons."
 Story,20350,20037,Compute CPC2 incentives per remittance,,"As a Disbursement Processor, I need the system to account for the CPC2 incentive separately from the basic commission, so that the CPC2 incentive of each remittance is accounted for apart from commission.
 
 *Background*

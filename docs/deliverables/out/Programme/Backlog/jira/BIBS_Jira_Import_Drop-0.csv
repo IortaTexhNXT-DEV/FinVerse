@@ -126,9 +126,9 @@ Stories: 5, story points (first estimate): 29. FRs: FR-DM-020, FR-DM-021, FR-DM-
 Fix version: Drop 0.",High,BRD-13,Drop-0,,,,Data Migration,Drop 0,,"BRID_MIG 1.2 (p.7), BRID_MIG 5.1 (p.9), BRID_MIG 13.1 (p.14), BRID_MIG 12.1 (p.13)","FR-DM-020, FR-DM-021, FR-DM-022, FR-DM-023, FR-DM-024",,Section 20.3 Reconciliation,
 Epic,10026,,Data Migration - Client master and reference data,Data Migration - Client master and reference data,"Capability Client master and reference data of Data Migration (BRD-13): section 20.4 of the Data Migration Handbook BRD-13 Data Migration v2.1 (02_BIBS_Handbook_BRD-13_Data_Migration_v2.1.docx).
 
-Stories: 6, story points (first estimate): 20. FRs: FR-DM-030, FR-DM-031, FR-DM-032, FR-DM-033, FR-DM-034, FR-DM-034.
+Stories: 6, story points (first estimate): 20. FRs: FR-DM-030, FR-DM-031, FR-DM-032, FR-DM-033, FR-DM-034.
 
-Fix version: Drop 0.",High,BRD-13,Drop-0,,,,Data Migration,Drop 0,,"BRID_MIG 3.1 (p.9), BRID_MIG 2.1 (p.8-9), BRID_MIG 1.3 (p.7-8), BRID_MIG 4.1 (p.9), BRID_MIG 12.1 (p.13)","FR-DM-030, FR-DM-031, FR-DM-032, FR-DM-033, FR-DM-034, FR-DM-034",,Section 20.4 Client master and reference data,
+Fix version: Drop 0.",High,BRD-13,Drop-0,,,,Data Migration,Drop 0,,"BRID_MIG 3.1 (p.9), BRID_MIG 2.1 (p.8-9), BRID_MIG 1.3 (p.7-8), BRID_MIG 4.1 (p.9), BRID_MIG 12.1 (p.13)","FR-DM-030, FR-DM-031, FR-DM-032, FR-DM-033, FR-DM-034",,Section 20.4 Client master and reference data,
 Epic,10027,,Data Migration - In-force policy headers,Data Migration - In-force policy headers,"Capability In-force policy headers of Data Migration (BRD-13): section 20.5 of the Data Migration Handbook BRD-13 Data Migration v2.1 (02_BIBS_Handbook_BRD-13_Data_Migration_v2.1.docx).
 
 Stories: 2, story points (first estimate): 8. FRs: FR-DM-040, FR-DM-041.
@@ -2933,8 +2933,8 @@ Story,10125,10021,User Group Profile Report; group Profile Membership list,,"As 
 * (R1) Module and task come from the permission areas and action classes; the BRD sample's QPS task names are UQ11. (Fixed)
 
 *Acceptance criteria*
-* (AC1) Given the user has UAM_REPORT_VIEW and the Marketing Account Officer profile, when the user selects the report, the profile(s), area and active flag, then the report lists Client Management tasks with ""With Access"" or ""No Access"".
-* (AC1) Given the user has UAM_REPORT_VIEW, when the user selects the report, the profile(s) and the as-of date, then the list shows every member of Marketing Team Lead with the user who added each member and the date.
+* (FR-UA-061 AC1) Given the user has UAM_REPORT_VIEW and the Marketing Account Officer profile, when the user selects the report, the profile(s), area and active flag, then the report lists Client Management tasks with ""With Access"" or ""No Access"".
+* (FR-UA-062 AC1) Given the user has UAM_REPORT_VIEW, when the user selects the report, the profile(s) and the as-of date, then the list shows every member of Marketing Team Lead with the user who added each member and the date.
 
 *Out of scope / notes*
 * CLR-UA-10 - open, for BDOI confirmation: Module and task names in the reports (3.003; FR-UA-060, 061). Proposed: The User Group Profile Report shows the module as the permission area and the task as the permission name. The report parameters Group Profile and Module are offered as lists. Decision requested: Confirm the module and task names (UQ11, UA-Q50).
@@ -2948,8 +2948,8 @@ Story,10125,10021,User Group Profile Report; group Profile Membership list,,"As 
 * Walkthrough step WT-D.2 (Auditor): SCR-UA-17 User access report (report runner), figure Figure 78, UX deck slide 115
 * Walkthrough step WT-D.3 (Auditor): SCR-UA-17 User access report (report runner), figure Figure 79, UX deck slide 116
 * Walkthrough step WT-D.4 (Auditor): SCR-UA-17 User access report (report runner), figure Figure 80, UX deck slide 117
-* Test cases: TC-UA-061.1, TC-UA-061.2, TC-UA-062.1, TC-UA-062.2 (4 conditions, 4 cases)",High,BRD-11,Drop-0,Business_Administrator,System_Administrator,Auditor,User Access Maintenance,Drop 0,2,"BRD 3.003.2 (p.9), BRD 3.003.2.1 (p.9), BRD 3.003.2.2 (p.9), BRD 3.003.2.3 (p.9), BRD 3.003.2.4 (p.9), BRD 3.003.2.5 (p.9), BRD 3.003.2.6 (p.9), UAM-NFR-41 (p.18), BRD 3.003.3 (p.9), BRD 3.003.3.1 (p.9), BRD 3.003.3.1.1 (p.9), BRD 3.003.3.1.2 (p.9), UAM-NFR-10 (p.13)",FR-UA-061 AC1; FR-UA-062 AC1,"TC-UA-061.1, TC-UA-061.2, TC-UA-062.1, TC-UA-062.2 (4 conditions, 4 cases)","FRS BRD-11 User Access Maintenance v2.1 (02_BIBS_FRS_BRD-11_User_Access_Maintenance_v2.1.docx), section 4.6 Reports and logs, FR-UA-061 User Group Profile Report, FR-UA-062 Group Profile Membership list","(AC1) Given the user has UAM_REPORT_VIEW and the Marketing Account Officer profile, when the user selects the report, the profile(s), area and active flag, then the report lists Client Management tasks with ""With Access"" or ""No Access"".
-(AC1) Given the user has UAM_REPORT_VIEW, when the user selects the report, the profile(s) and the as-of date, then the list shows every member of Marketing Team Lead with the user who added each member and the date."
+* Test cases: TC-UA-061.1, TC-UA-061.2, TC-UA-062.1, TC-UA-062.2 (4 conditions, 4 cases)",High,BRD-11,Drop-0,Business_Administrator,System_Administrator,Auditor,User Access Maintenance,Drop 0,2,"BRD 3.003.2 (p.9), BRD 3.003.2.1 (p.9), BRD 3.003.2.2 (p.9), BRD 3.003.2.3 (p.9), BRD 3.003.2.4 (p.9), BRD 3.003.2.5 (p.9), BRD 3.003.2.6 (p.9), UAM-NFR-41 (p.18), BRD 3.003.3 (p.9), BRD 3.003.3.1 (p.9), BRD 3.003.3.1.1 (p.9), BRD 3.003.3.1.2 (p.9), UAM-NFR-10 (p.13)",FR-UA-061 AC1; FR-UA-062 AC1,"TC-UA-061.1, TC-UA-061.2, TC-UA-062.1, TC-UA-062.2 (4 conditions, 4 cases)","FRS BRD-11 User Access Maintenance v2.1 (02_BIBS_FRS_BRD-11_User_Access_Maintenance_v2.1.docx), section 4.6 Reports and logs, FR-UA-061 User Group Profile Report, FR-UA-062 Group Profile Membership list","(FR-UA-061 AC1) Given the user has UAM_REPORT_VIEW and the Marketing Account Officer profile, when the user selects the report, the profile(s), area and active flag, then the report lists Client Management tasks with ""With Access"" or ""No Access"".
+(FR-UA-062 AC1) Given the user has UAM_REPORT_VIEW, when the user selects the report, the profile(s) and the as-of date, then the list shows every member of Marketing Team Lead with the user who added each member and the date."
 Story,10126,10021,User Access Audit Log,,"As the System Administrator, I need to generate audit logs for compliance and audit purposes as needed (Generate Logs), so that compliance and audit reviews have the evidence of every access change.
 
 *Background*

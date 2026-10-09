@@ -17,6 +17,7 @@ import { AuthorizeButton, CheckField, SelectField, TextField } from './MasterCon
 import { exemptionLabel, withholdingLabel } from './taxDisplay';
 import { formatDate } from '@/utils/format';
 import { awaitsOtherChecker } from '@/utils/makerChecker';
+import { ConfigUploadButton } from '@/features/configpromo/ConfigUploadButton';
 
 const PAYEE_CLASSES: readonly PayeeClass[] = ['CORPORATE', 'INDIVIDUAL'];
 const VAT_TREATMENTS: readonly VatTreatment[] = ['REGULAR', 'ZERO_RATED', 'EXEMPT'];
@@ -73,15 +74,18 @@ export default function PartyProfilesPage() {
         title="Party Tax Profiles"
         description="TIN, registered name, VAT treatment, default ATC, withholding status and tax exemption certificate of suppliers, agents, brokers and customers."
         actions={
-          can('TAX_MANAGE') && (
-            <Button
-              variant="accent"
-              icon={<Plus size={16} />}
-              onClick={() => setForm({ payeeClass: 'CORPORATE', vatTreatment: 'REGULAR' })}
-            >
-              New Profile
-            </Button>
-          )
+          <>
+            <ConfigUploadButton types={['CFG_PARTY_TAX_PROFILE']} />
+            {can('TAX_MANAGE') && (
+              <Button
+                variant="accent"
+                icon={<Plus size={16} />}
+                onClick={() => setForm({ payeeClass: 'CORPORATE', vatTreatment: 'REGULAR' })}
+              >
+                New Profile
+              </Button>
+            )}
+          </>
         }
       />
       <ErrorAlert error={profiles.error ?? authorize.error} />

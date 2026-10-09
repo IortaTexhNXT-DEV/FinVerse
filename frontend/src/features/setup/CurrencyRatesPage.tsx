@@ -16,6 +16,7 @@ import { RevaluationRatesCard } from './RevaluationRatesCard';
 import { DateInput } from '@/components/ui/DateInput';
 import { UserName } from '@/components/ui/UserName';
 import { useCurrencyCodes } from '@/context/currencies';
+import { ConfigUploadButton } from '@/features/configpromo/ConfigUploadButton';
 
 const RATE_TYPES: RateType[] = ['SPOT', 'CLOSING', 'AVERAGE', 'BUDGET', 'BOOK'];
 
@@ -57,6 +58,7 @@ export default function CurrencyRatesPage() {
         section="Setup"
         title="Currencies & Exchange Rates"
         description="Rates are base-currency units per one unit of foreign currency."
+        actions={<ConfigUploadButton types={['CFG_CURRENCY', 'CFG_EXCHANGE_RATE']} />}
       />
       <RevaluationRatesCard currencies={(currencies.data ?? []).filter((c) => c.active)} />
       {can('MASTER_MAINTAIN') && (

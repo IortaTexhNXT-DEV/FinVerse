@@ -52,7 +52,7 @@ export default function TaxCodesPage() {
         section="Tax & Statutory"
         title="Tax Codes & Forms"
         description="VAT, premium taxes and withholding ATCs with rates and GL accounts."
-        actions={<ConfigUploadButton types={['CFG_TAX_CODE']} />}
+        actions={<ConfigUploadButton types={['CFG_TAX_CODE', 'CFG_TAX_FORM']} />}
       />
       <Tabs tabs={TABS} active={tab} onChange={setTab} />
       {tab === 'codes' ? <TaxCodesPanel /> : <TaxFormsPanel />}

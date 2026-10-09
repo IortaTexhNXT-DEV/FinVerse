@@ -19,6 +19,9 @@ import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.storage.api.FileDownloads;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
@@ -263,14 +266,64 @@ public class CheckController {
    */
   @PostMapping("/print-batches")
   @PreAuthorize(CashAccess.PRINT)
-  public PrintBatchResponse print(@Valid @RequestBody Selection selection) {
+  public PrintBatchResponse print(@Valid @RequestBody PrintRequest selection) {
     return PrintBatchResponse.from(
         printing.print(
             selection.companyId(),
             selection.ids(),
-            selection.criteria() == null ? "Selection" : selection.criteria()),
+            selection.criteria() == null ? "Selection" : selection.criteria(),
+            selection.copy() == null ? "CLIENT" : selection.copy()),
         true);
   }
+
+  /**
+   * Skips failed receipts of a batch (FRS.CSH.02.04.15).
+   *
+   * @param id batch
+   * @param body receipts to skip, all failed ones when none
+   * @return the batch
+   */
+  @PostMapping("/print-batches/{id}/skip")
+  @PreAuthorize(CashAccess.PRINT)
+  public PrintBatchResponse skip(
+      @PathVariable Long id, @RequestBody(required = false) SkipBody body) {
+    return PrintBatchResponse.from(
+        printing.skip(id, body == null || body.ids() == null ? List.of() : body.ids()), true);
+  }
+
+  /**
+   * The ZIP of the receipts of a batch, one PDF per receipt (FRS.CSH.02.04.09.02).
+   *
+   * @param id batch
+   * @param request HTTP request (client address of the link audit)
+   * @return redirect or ZIP
+   */
+  @GetMapping("/print-batches/{id}/zip")
+  @PreAuthorize(CashAccess.PRINT)
+  public ResponseEntity<byte[]> zip(@PathVariable Long id, HttpServletRequest request) {
+    return downloads.respond(printing.zipFile(id), request);
+  }
+
+  /**
+   * Receipts to print.
+   *
+   * @param companyId company
+   * @param ids receipts, 1 to 500
+   * @param criteria how they were selected
+   * @param copy CLIENT (Client's Copy), COMPANY (the company's copy) or BOTH
+   */
+  public record PrintRequest(
+      @NotNull Long companyId,
+      @NotEmpty List<Long> ids,
+      String criteria,
+      @Pattern(regexp = "CLIENT|COMPANY|BOTH") String copy) {}
+
+  /**
+   * Receipts to skip.
+   *
+   * @param ids receipts
+   */
+  public record SkipBody(List<Long> ids) {}
 
   /**
    * One batch with its receipts.

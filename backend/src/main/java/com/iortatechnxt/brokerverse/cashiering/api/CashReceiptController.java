@@ -20,13 +20,18 @@ import com.iortatechnxt.brokerverse.cashiering.service.BatchPrintService;
 import com.iortatechnxt.brokerverse.cashiering.service.CashReceiptService;
 import com.iortatechnxt.brokerverse.cashiering.service.CashReceiptService.ArIssue;
 import com.iortatechnxt.brokerverse.cashiering.service.CashReceiptService.OrIssue;
+import com.iortatechnxt.brokerverse.cashiering.service.CashieringDecisions;
 import com.iortatechnxt.brokerverse.cashiering.service.ReceiptActionService;
-import com.iortatechnxt.brokerverse.cashiering.service.ReceiptDocument;
+import com.iortatechnxt.brokerverse.cashiering.service.ReceiptForms;
+import com.iortatechnxt.brokerverse.cashiering.service.ReceiptForms.PrintMark;
 import com.iortatechnxt.brokerverse.cashiering.service.ReceiptSearchService;
+import com.iortatechnxt.brokerverse.cashiering.service.ReceiptSearchService.PrintFilter;
 import com.iortatechnxt.brokerverse.cashiering.service.ReceiptSearchService.ReceiptCriteria;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import jakarta.validation.Valid;
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -52,8 +57,10 @@ public class CashReceiptController {
   private final CashReceiptService receipts;
   private final ReceiptSearchService search;
   private final ReceiptActionService actions;
-  private final ReceiptDocument documents;
+  private final ReceiptForms forms;
+  private final Clock clock;
   private final BatchPrintService printing;
+  private final CashieringDecisions decisions;
 
   /**
    * Creates the controller.
@@ -61,20 +68,26 @@ public class CashReceiptController {
    * @param receipts receipts
    * @param search receipt search
    * @param actions cancellations and reinstatements
-   * @param documents printed receipts
+   * @param forms receipts in their form
    * @param printing batch printing and certificates
+   * @param decisions settings of BDOI's decisions (posting step)
+   * @param clock print date of a receipt not printed yet
    */
   public CashReceiptController(
       CashReceiptService receipts,
       ReceiptSearchService search,
       ReceiptActionService actions,
-      ReceiptDocument documents,
-      BatchPrintService printing) {
+      ReceiptForms forms,
+      BatchPrintService printing,
+      CashieringDecisions decisions,
+      Clock clock) {
     this.receipts = receipts;
     this.search = search;
     this.actions = actions;
-    this.documents = documents;
+    this.forms = forms;
     this.printing = printing;
+    this.decisions = decisions;
+    this.clock = clock;
   }
 
   /**
@@ -93,7 +106,7 @@ public class CashReceiptController {
       @RequestParam(defaultValue = "20") int size) {
     return PageResponse.of(
         search.search(criteria.toCriteria(), CashAccess.newest(page, size)),
-        ReceiptSummaryResponse::from);
+        r -> ReceiptSummaryResponse.from(r, search.insurerOf(r)));
   }
 
   /**
@@ -118,6 +131,7 @@ public class CashReceiptController {
   @PostMapping("/receipts/ar")
   @PreAuthorize(CashAccess.RECEIPT)
   public ReceiptResponse issueAr(@Valid @RequestBody ArRequest request) {
+    decisions.requireDirectIssue(ReceiptKind.AR);
     Receipt r =
         receipts.issueAr(
             new ArIssue(
@@ -153,6 +167,7 @@ public class CashReceiptController {
   @PostMapping("/receipts/or")
   @PreAuthorize(CashAccess.RECEIPT)
   public ReceiptResponse issueOr(@Valid @RequestBody OrRequest request) {
+    decisions.requireDirectIssue(ReceiptKind.OR);
     Receipt r =
         receipts.issueOr(
             new OrIssue(
@@ -283,7 +298,17 @@ public class CashReceiptController {
   @PreAuthorize(CashAccess.VIEW)
   public ResponseEntity<byte[]> pdf(@PathVariable Long id) {
     Receipt r = receipts.get(id);
-    return CashAccess.pdf(r.getReceiptNo() + ".pdf", documents.pdf(r));
+    return CashAccess.pdf(
+        r.getKind().name() + "_" + r.getReceiptNo() + ".pdf",
+        forms.pdf(
+            r,
+            new PrintMark(
+                ReceiptForms.CLIENT_COPY,
+                r.getPrintedCount() > 0,
+                r.getCertificateNo(),
+                r.getCertificateDate() == null
+                    ? BusinessClock.today(clock)
+                    : r.getCertificateDate())));
   }
 
   /**
@@ -319,6 +344,10 @@ public class CashReceiptController {
    * @param insurer insurer
    * @param kind AR or OR
    * @param status status
+   * @param branchId receipting branch
+   * @param printed true for printed receipts, false for the print queue
+   * @param systemOnly only the receipts the system generated
+   * @param numberPart full or partial AR or OR number
    */
   public record SearchParams(
       Long companyId,
@@ -333,7 +362,11 @@ public class CashReceiptController {
       String policyNo,
       String insurer,
       ReceiptKind kind,
-      ReceiptStatus status) {
+      ReceiptStatus status,
+      Long branchId,
+      Boolean printed,
+      Boolean systemOnly,
+      String numberPart) {
 
     ReceiptCriteria toCriteria() {
       return new ReceiptCriteria(
@@ -349,7 +382,8 @@ public class CashReceiptController {
           policyNo,
           insurer,
           kind,
-          status);
+          status,
+          new PrintFilter(branchId, printed, Boolean.TRUE.equals(systemOnly), numberPart));
     }
   }
 }

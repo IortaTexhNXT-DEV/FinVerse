@@ -22,6 +22,9 @@ import build_brd11_bdoi_frs as u11
 REPO = m.REPO
 OPS = m.OPS
 DOC, REV, ADD, FLOWS = m.DOC, m.REV, m.ADD, m.FLOWS
+CONFIGURABLE = yaml.safe_load((Path(__file__).resolve().parent / "brd02_workbooks.yaml").read_text(
+    encoding="utf-8")).get("configurable", {})
+CONFIGURABLE_STATUS = "Configurable – BDOI to confirm the setting"
 JAVA = REPO / "backend" / "src" / "main" / "java" / "com" / "iortatechnxt" / "brokerverse"
 PORTRAIT_W = 7.4
 LANDSCAPE_W = 9.9
@@ -35,6 +38,8 @@ NOTICE_SOURCES = ["cashiering/service/ReceiptActionService.java", "cashiering/se
                   "cashiering/service/CashieringDispositionRequests.java",
                   "cashiering/service/CashieringRefundValidationSource.java",
                   "cashiering/service/ReceiptSeriesService.java", "cashiering/service/PrebookedService.java",
+                  "cashiering/service/ReceiptRecordService.java", "cashiering/service/ReceiptRecordPoster.java",
+                  "cashiering/service/ChannelFileService.java", "cashiering/service/ReceiptFormService.java",
                   "workflow/service/WorkflowService.java", "workflow/service/WorkAssignmentService.java",
                   "opsledger/service/HandoffService.java", "opsledger/service/DisbursementQueueService.java",
                   "opsledger/service/FlowInService.java", "messaging/service/JobFailureMailer.java"]
@@ -570,7 +575,8 @@ class Appendices:
         self.p("Every point where BDOI's FRS and the BIBS reference FRS differ, the slips noticed in BDOI's text, the "
                "changes made to the Business Requirements Mapping and the other observations of this version. BDOI's "
                "text is kept in the body of the document; this appendix gives both readings, the BRD text, what "
-               "version 3.2 proposes, the impact and who decides. Every point starts as Open.")
+               "version 3.2 proposes, the impact and who decides. Every point starts as Open; a point available as a "
+               "setting of the system is marked Configurable – BDOI to confirm the setting.")
         header = ["No.", "Topic", "BDOI FRS text", "BRD text", "Proposed in v3.2", "Impact", "Decision by", "Status"]
         widths = [0.75, 1.0, 1.9, 1.5, 2.2, 0.95, 1.0, 0.6]
         no = 0
@@ -580,7 +586,10 @@ class Appendices:
         def row(ref, topic, bdoi, brd, prop, impact, who):
             nonlocal no
             no += 1
-            out = [f"R-{no:02d}" + (f" ({ref})" if ref else ""), topic, bdoi, brd, prop, impact, who, "Open"]
+            status = "Open"
+            if ref in CONFIGURABLE:
+                prop, status = f"{prop} Available as a setting: {CONFIGURABLE[ref]}", CONFIGURABLE_STATUS
+            out = [f"R-{no:02d}" + (f" ({ref})" if ref else ""), topic, bdoi, brd, prop, impact, who, status]
             q_rows.append(dict(zip(["no", "topic", "bdoi", "brd", "proposal", "impact", "decide_by", "status"], out),
                                section=section))
             return out

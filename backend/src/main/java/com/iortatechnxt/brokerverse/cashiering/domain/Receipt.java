@@ -127,11 +127,20 @@ public class Receipt extends BaseEntity {
   @Column(name = "last_printed_at")
   private Instant lastPrintedAt;
 
+  @Column(name = "certificate_no", length = 40)
+  private String certificateNo;
+
+  @Column(name = "certificate_date")
+  private LocalDate certificateDate;
+
   @Column(name = "journal_batch_no", length = 40)
   private String journalBatchNo;
 
   @Column(length = 250)
   private String remarks;
+
+  @Column(name = "bank_account", length = 40)
+  private String bankAccount;
 
   @ElementCollection
   @CollectionTable(name = "csh_receipt_line", joinColumns = @JoinColumn(name = "receipt_id"))
@@ -261,6 +270,41 @@ public class Receipt extends BaseEntity {
   public void printed(Instant at) {
     printedCount++;
     lastPrintedAt = at;
+  }
+
+  /**
+   * Gives the receipt its certificate number at its first print (FRS.CSH.02.04.07); kept for the
+   * reprints.
+   *
+   * @param number certificate number
+   * @param date print date
+   */
+  public void certified(String number, LocalDate date) {
+    if (certificateNo == null) {
+      this.certificateNo = number;
+      this.certificateDate = date;
+    }
+  }
+
+  public String getCertificateNo() {
+    return certificateNo;
+  }
+
+  public LocalDate getCertificateDate() {
+    return certificateDate;
+  }
+
+  /**
+   * Records the bank account the receipt is posted to (FRS.CSH.02.01.02), before its posting.
+   *
+   * @param code code of the Post to Bank Account list, may be null
+   */
+  public void postTo(String code) {
+    this.bankAccount = code;
+  }
+
+  public String getBankAccount() {
+    return bankAccount;
   }
 
   public Long getCompanyId() {

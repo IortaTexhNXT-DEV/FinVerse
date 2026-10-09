@@ -9,6 +9,7 @@ import com.iortatechnxt.brokerverse.organization.domain.BranchRepository;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,6 +56,16 @@ public class CashieringSettings {
   }
 
   /**
+   * The base of the PR 2307 of a 2% CWT account (FRS.CSH.02.05.13; Appendix R, C26): the premium
+   * amount (every premium receivable component, as delivered) or the basic premium only.
+   *
+   * @return true when the base is the basic premium ({@code CASH_PR2307_BASE = BASIC})
+   */
+  public boolean pr2307OnBasicPremium() {
+    return "BASIC".equals(parameters.text("CASH_PR2307_BASE", "PREMIUM").strip());
+  }
+
+  /**
    * Whether commission is realized when premium is applied.
    *
    * @return true for ON_COLLECTION (the default)
@@ -93,6 +104,16 @@ public class CashieringSettings {
           "BRANCH_OF_OTHER_COMPANY", "Branch " + branch.getCode() + " is not of this company");
     }
     return branch;
+  }
+
+  /**
+   * The branches of a company by code.
+   *
+   * @param companyId company
+   * @return branches
+   */
+  public List<Branch> branches(Long companyId) {
+    return branches.findByCompanyIdOrderByCode(companyId);
   }
 
   /**

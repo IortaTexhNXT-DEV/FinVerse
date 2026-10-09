@@ -44,6 +44,8 @@ public final class ReceiptDtos {
    * @param source source
    * @param status status
    * @param printedCount prints
+   * @param insurerCode insurer the payment was received for (AR) or the OR was issued to
+   * @param certificateNo certificate number given at the first print
    */
   public record ReceiptSummaryResponse(
       Long id,
@@ -62,7 +64,9 @@ public final class ReceiptDtos {
       String mode,
       String source,
       String status,
-      int printedCount) {
+      int printedCount,
+      String insurerCode,
+      String certificateNo) {
 
     /**
      * Maps a receipt.
@@ -71,6 +75,17 @@ public final class ReceiptDtos {
      * @return response
      */
     public static ReceiptSummaryResponse from(Receipt r) {
+      return from(r, null);
+    }
+
+    /**
+     * Maps a receipt with its insurer.
+     *
+     * @param r receipt
+     * @param insurerCode insurer, may be null
+     * @return response
+     */
+    public static ReceiptSummaryResponse from(Receipt r, String insurerCode) {
       return new ReceiptSummaryResponse(
           r.getId(),
           r.getReceiptNo(),
@@ -88,7 +103,9 @@ public final class ReceiptDtos {
           r.getMode().name(),
           r.getSource().name(),
           r.getStatus().name(),
-          r.getPrintedCount());
+          r.getPrintedCount(),
+          insurerCode,
+          r.getCertificateNo());
     }
   }
 

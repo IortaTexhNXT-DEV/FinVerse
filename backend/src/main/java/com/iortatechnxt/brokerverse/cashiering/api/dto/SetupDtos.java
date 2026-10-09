@@ -8,6 +8,7 @@ import com.iortatechnxt.brokerverse.cashiering.domain.PaymentFileLayout;
 import com.iortatechnxt.brokerverse.cashiering.domain.PrintBatch;
 import com.iortatechnxt.brokerverse.cashiering.domain.ReceiptSeries;
 import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -43,6 +44,10 @@ public final class SetupDtos {
    * @param recordStatus maker-checker status
    * @param maker maker
    * @param authorizedBy checker
+   * @param seriesYear year the series serves, null for every year
+   * @param numberFormat number format (prefix, year and branch indicator resolved), null for prefix
+   *     and sequence
+   * @param nextNumber the number the series gives next, null when depleted
    * @param origin BIBS or the legacy origin (source system, legacy reference, batch)
    */
   public record SeriesResponse(
@@ -60,6 +65,9 @@ public final class SetupDtos {
       String recordStatus,
       String maker,
       String authorizedBy,
+      Integer seriesYear,
+      String numberFormat,
+      String nextNumber,
       @JsonUnwrapped RecordOrigin origin) {
 
     /**
@@ -84,6 +92,9 @@ public final class SetupDtos {
           s.getRecordStatus().name(),
           s.getMaker(),
           s.getAuthorizedBy(),
+          s.getSeriesYear(),
+          s.getNumberFormat(),
+          s.preview(),
           s.getRecordOrigin());
     }
   }
@@ -99,6 +110,9 @@ public final class SetupDtos {
    * @param toNo last number
    * @param atpNo BIR ATP
    * @param warnAt warning threshold
+   * @param seriesYear year the series serves, null for every year
+   * @param numberFormat number format, null for the format of the setting, blank for prefix and
+   *     sequence
    */
   public record SeriesRequest(
       @NotNull Long companyId,
@@ -108,7 +122,9 @@ public final class SetupDtos {
       @Min(1) long fromNo,
       @Min(1) long toNo,
       @Size(max = 40) String atpNo,
-      @Min(0) int warnAt) {}
+      @Min(0) int warnAt,
+      @Min(2000) @Max(2999) Integer seriesYear,
+      @Size(max = 60) String numberFormat) {}
 
   /**
    * A series change.
@@ -221,6 +237,9 @@ public final class SetupDtos {
    * @param fileName file
    * @param createdBy printed by
    * @param createdAt printed at
+   * @param skippedCount failures skipped
+   * @param copyLabel copy printed (CLIENT, COMPANY or BOTH)
+   * @param zipped whether the ZIP of the receipts is kept
    * @param lines receipts
    */
   public record PrintBatchResponse(
@@ -234,6 +253,9 @@ public final class SetupDtos {
       String fileName,
       String createdBy,
       Instant createdAt,
+      int skippedCount,
+      String copyLabel,
+      boolean zipped,
       List<PrintLineResponse> lines) {
 
     /**
@@ -255,6 +277,9 @@ public final class SetupDtos {
           b.getFileName(),
           b.getCreatedBy(),
           b.getCreatedAt(),
+          b.getSkippedCount(),
+          b.getCopyLabel(),
+          b.getZipFileId() != null,
           withLines ? b.getLines().stream().map(PrintLineResponse::from).toList() : List.of());
     }
   }
@@ -264,10 +289,18 @@ public final class SetupDtos {
    *
    * @param receiptId receipt
    * @param receiptNo number
-   * @param status PRINTED or FAILED
+   * @param status PRINTED, FAILED or SKIPPED
    * @param message message
+   * @param reprint whether the receipt was printed before (REPRINT mark)
+   * @param certificateNo certificate number of the receipt
    */
-  public record PrintLineResponse(Long receiptId, String receiptNo, String status, String message) {
+  public record PrintLineResponse(
+      Long receiptId,
+      String receiptNo,
+      String status,
+      String message,
+      boolean reprint,
+      String certificateNo) {
 
     /**
      * Maps a line.
@@ -277,7 +310,12 @@ public final class SetupDtos {
      */
     public static PrintLineResponse from(PrintBatch.Line l) {
       return new PrintLineResponse(
-          l.getReceiptId(), l.getReceiptNo(), l.getStatus(), l.getMessage());
+          l.getReceiptId(),
+          l.getReceiptNo(),
+          l.getStatus(),
+          l.getMessage(),
+          l.isReprint(),
+          l.getCertificateNo());
     }
   }
 

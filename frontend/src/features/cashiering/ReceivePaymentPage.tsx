@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { modeLabel } from './cashieringLabels';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { LovSelect } from '@/components/broking/LovSelect';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -17,6 +17,7 @@ import type { IntakeResult, PaymentMode } from './cashieringApi';
 import { parseReferences, receiveErrors } from './cashieringLogic';
 import { PaymentPreviewPane } from './PaymentPreviewPane';
 import { useDebounced } from './useDebounced';
+import { recordsApi } from './recordsApi';
 import './cashiering.css';
 
 const OTC_MODES: readonly PaymentMode[] = [
@@ -72,6 +73,20 @@ function resultMessage(r: IntakeResult): string {
  * excess in unapplied collections.
  */
 export default function ReceivePaymentPage() {
+  const companyId = useCompanyId();
+  const settings = useQuery({
+    queryKey: ['cashiering', 'record-settings', companyId],
+    queryFn: () => recordsApi.settings(companyId),
+    enabled: companyId > 0,
+  });
+  if (settings.data?.arPostingStep) {
+    return <Navigate to="/cashiering/records/new?kind=AR" replace />;
+  }
+  return <ReceivePaymentForm />;
+}
+
+/** The over-the-counter payment issued at save (posting step off for ARs, Appendix R, C1). */
+function ReceivePaymentForm() {
   const companyId = useCompanyId();
   const branchId = useDefaultBranchId();
   const toast = useToast();

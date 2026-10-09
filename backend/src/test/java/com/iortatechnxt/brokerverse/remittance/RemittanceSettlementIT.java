@@ -136,7 +136,8 @@ class RemittanceSettlementIT {
       assertThat(si.getWtaxAmount())
           .isEqualByComparingTo(Money.round(incentive.multiply(new BigDecimal("0.02"))))
           .isEqualByComparingTo(batch.getSettlement().getEarlySiWtax());
-      assertThat(batch.getIncentiveOrStatus()).isEqualTo("ISSUED");
+      assertThat(batch.getIncentiveOrStatus()).isEqualTo("DEFERRED");
+      assertThat(fx.disbursementApproved(batch).getIncentiveOrStatus()).isEqualTo("ISSUED");
 
       assertThatThrownBy(
               () ->

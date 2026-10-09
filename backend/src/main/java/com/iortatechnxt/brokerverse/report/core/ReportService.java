@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.office.BrandAssets;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.organization.domain.BranchRepository;
 import com.iortatechnxt.brokerverse.organization.domain.Company;
 import com.iortatechnxt.brokerverse.organization.domain.CompanyRepository;
@@ -152,7 +153,7 @@ public class ReportService {
     }
     audit.record(
         "Report", code, AuditAction.EXPORT, "Exported " + format + " " + String.join(", ", echo));
-    String fileName = code + "." + format.extension();
+    String fileName = fileName(def, code, format);
     archive.exported(
         def.metadata(),
         echo,
@@ -242,10 +243,16 @@ public class ReportService {
         result.rows().size(),
         new RunFile(
             format.name(),
-            code + "." + format.extension(),
+            fileName(def, code, format),
             format.contentType(),
             renderers.get(format).render(result, ctx)),
         availableFrom);
+  }
+
+  /** The file name of an export: the naming convention of the report, else its code. */
+  private String fileName(ReportDefinition def, String code, ExportFormat format) {
+    String name = def.exportName(BusinessClock.today(clock));
+    return (name == null || name.isBlank() ? code : name) + "." + format.extension();
   }
 
   /**

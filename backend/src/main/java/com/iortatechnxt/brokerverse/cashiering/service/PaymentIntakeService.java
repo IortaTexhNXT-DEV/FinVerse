@@ -108,6 +108,63 @@ public class PaymentIntakeService {
     return settle(payment, ar, match);
   }
 
+  /**
+   * Receives a payment split by the cashier over several accounts (FRS.CSH.02.01.04): one AR for
+   * the whole paid amount, posted to the bank account chosen, and one payment per account matched
+   * and applied on its own; what an account cannot take is its excess, an account not booked yet
+   * waits as a pre-booked payment and an unknown reference is unbooked / unmatched.
+   *
+   * @param target company, receipting branch, AR class and receipt source
+   * @param received the whole payment; its source key identifies the record
+   * @param split accounts with their paid amounts, empty for an unmatched payment
+   * @param bankAccount code of the Post to Bank Account list
+   * @return the AR and one outcome per account
+   */
+  public List<IntakeResult> receiveAllocated(
+      IntakeTarget target, PaymentIntake received, List<Allocation> split, String bankAccount) {
+    PaymentIntake whole =
+        received.orInCurrency(organization.company(target.companyId()).baseCurrency());
+    List<Allocation> parts =
+        split.isEmpty() ? List.of(new Allocation(null, whole.amount())) : List.copyOf(split);
+    Match first = matcher.match(target.companyId(), refs(parts.get(0).reference()));
+    Payment head = newPayment(target, part(whole, parts.get(0), 1));
+    Receipt ar = receipts.issueAr(arOf(target, whole, head, first), bankAccount);
+    List<IntakeResult> results = new ArrayList<>();
+    for (int i = 0; i < parts.size(); i++) {
+      Payment payment = i == 0 ? head : newPayment(target, part(whole, parts.get(i), i + 1));
+      payment.receipted(ar.getId());
+      Match match =
+          i == 0 ? first : matcher.match(target.companyId(), refs(parts.get(i).reference()));
+      results.add(settle(payment, ar, match));
+    }
+    return results;
+  }
+
+  private Payment newPayment(IntakeTarget target, PaymentIntake intake) {
+    return payments.save(
+        new Payment(
+            target.companyId(),
+            target.branchId(),
+            numbers.next("PAY-" + intake.valueDate().getYear()),
+            intake));
+  }
+
+  private static PaymentIntake part(PaymentIntake whole, Allocation part, int no) {
+    return whole.part(part.reference(), part.amount(), no);
+  }
+
+  private static List<String> refs(String reference) {
+    return reference == null || reference.isBlank() ? List.of() : List.of(reference.strip());
+  }
+
+  /**
+   * The part of a payment for one account.
+   *
+   * @param reference account number, invoice, ARN, policy or PN number; null for none
+   * @param amount paid amount for the account
+   */
+  public record Allocation(String reference, BigDecimal amount) {}
+
   private IntakeResult settle(Payment payment, Receipt ar, Match match) {
     return switch (match.kind()) {
       case BOOKED -> applyBooked(payment, ar, match);
@@ -123,7 +180,9 @@ public class PaymentIntakeService {
         yield new IntakeResult(payment, ar, List.of(), null, item);
       }
       case CANCELLED -> {
-        Unapplied item = toUnapplied(payment, ar, UnappliedOrigin.CANCELLED_REFERENCE, match);
+        Unapplied item =
+            toUnapplied(
+                payment, ar, UnappliedOrigin.CANCELLED_REFERENCE, match, payment.getAmount());
         payment.matched(
             MatchCategory.CANCELLED_REFERENCE,
             match.invoices().get(0).getInvoiceNo(),
@@ -132,7 +191,8 @@ public class PaymentIntakeService {
         yield new IntakeResult(payment, ar, List.of(), item, null);
       }
       case NONE -> {
-        Unapplied item = toUnapplied(payment, ar, UnappliedOrigin.NO_MATCH, match);
+        Unapplied item =
+            toUnapplied(payment, ar, UnappliedOrigin.NO_MATCH, match, payment.getAmount());
         payment.matched(
             MatchCategory.UNAPPLIED_NO_MATCH,
             null,
@@ -156,7 +216,9 @@ public class PaymentIntakeService {
     BigDecimal excess = payment.getAmount().subtract(applied);
     String invoiceNo = match.invoices().get(0).getInvoiceNo();
     Unapplied item =
-        excess.signum() > 0 ? toUnapplied(payment, ar, UnappliedOrigin.EXCESS, match) : null;
+        excess.signum() > 0
+            ? toUnapplied(payment, ar, UnappliedOrigin.EXCESS, match, excess)
+            : null;
     if (applied.signum() > 0 && excess.signum() == 0) {
       payment.matched(MatchCategory.APPLIED, invoiceNo, applied, "Applied to " + invoices(made));
     } else {
@@ -200,8 +262,8 @@ public class PaymentIntakeService {
     return made;
   }
 
-  private Unapplied toUnapplied(Payment payment, Receipt ar, UnappliedOrigin origin, Match match) {
-    BigDecimal balance = payment.getAmount().subtract(ar.getAppliedAmount());
+  private Unapplied toUnapplied(
+      Payment payment, Receipt ar, UnappliedOrigin origin, Match match, BigDecimal balance) {
     return unappliedItems.create(
         payment.getCompanyId(),
         payment.getBranchId(),

@@ -97,7 +97,23 @@ public class AutomatchService {
   }
 
   private boolean rematch(Unapplied item, LocalDate date) {
-    List<String> refs = referencesOf(item);
+    return applyItem(item, referencesOf(item), date);
+  }
+
+  /**
+   * Applies an unapplied payment to the booked account of references given (Direct Credit file,
+   * FRS.CSH.05.01.09 priority 2).
+   *
+   * @param item unapplied payment of the payment identified
+   * @param refs references of the Direct Credit row
+   * @param date value date of the application
+   * @return true when money was applied
+   */
+  public boolean identify(Unapplied item, List<String> refs, LocalDate date) {
+    return applyItem(item, refs, date);
+  }
+
+  private boolean applyItem(Unapplied item, List<String> refs, LocalDate date) {
     if (refs.isEmpty() || item.getBalance().signum() <= 0) {
       return false;
     }
@@ -151,6 +167,9 @@ public class AutomatchService {
     }
     if (payment.getOtherRefs() != null) {
       refs.addAll(Arrays.asList(payment.getOtherRefs().split(",")));
+    }
+    if (payment.getMatchedRef() != null && !refs.contains(payment.getMatchedRef())) {
+      refs.add(payment.getMatchedRef());
     }
     return refs;
   }

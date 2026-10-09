@@ -4,6 +4,8 @@ import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.cashiering.domain.Application;
 import com.iortatechnxt.brokerverse.cashiering.domain.ApplicationRepository;
+import com.iortatechnxt.brokerverse.cashiering.domain.CashBankAccount;
+import com.iortatechnxt.brokerverse.cashiering.domain.CashBankAccountRepository;
 import com.iortatechnxt.brokerverse.cashiering.domain.CashCodes.ReceiptKind;
 import com.iortatechnxt.brokerverse.cashiering.domain.CashReceiptRepository;
 import com.iortatechnxt.brokerverse.cashiering.domain.OrAmounts;
@@ -71,6 +73,7 @@ public class CashReceiptService {
   private final CashieringPosting posting;
   private final LovService lovs;
   private final AuditTrailService audit;
+  private final CashBankAccountRepository bankAccounts;
 
   /**
    * Creates the service.
@@ -83,6 +86,7 @@ public class CashReceiptService {
    * @param posting accounting events
    * @param lovs lists of values
    * @param audit audit trail
+   * @param bankAccounts the list Post to Bank Account (GL account of the receipt)
    */
   public CashReceiptService(
       CashReceiptRepository receipts,
@@ -92,7 +96,9 @@ public class CashReceiptService {
       CashieringSettings settings,
       CashieringPosting posting,
       LovService lovs,
-      AuditTrailService audit) {
+      AuditTrailService audit,
+      CashBankAccountRepository bankAccounts) {
+    this.bankAccounts = bankAccounts;
     this.receipts = receipts;
     this.applications = applications;
     this.actions = actions;
@@ -169,6 +175,18 @@ public class CashReceiptService {
    * @return the AR
    */
   public Receipt issueAr(ArIssue issue) {
+    return issueAr(issue, null);
+  }
+
+  /**
+   * Issues an acknowledgement receipt posted to a bank account of the list Post to Bank Account
+   * (FRS.CSH.02.01.02) and posts it.
+   *
+   * @param issue branch, class, payor, amount and tender
+   * @param bankAccount code of the bank account, null for the collection account of the mode
+   * @return the AR
+   */
+  public Receipt issueAr(ArIssue issue, String bankAccount) {
     Optional<Receipt> earlier = earlier(issue.companyId(), issue.tender());
     if (earlier.isPresent()) {
       return earlier.get();
@@ -204,6 +222,7 @@ public class CashReceiptService {
                     Money.convert(issue.amount(), rate),
                     zeroTaxes()),
                 issue.tender()));
+    receipt.postTo(bankAccount);
     receipt.posted(
         posting.publish(
             context(receipt, issue.tender(), "AR " + receipt.getReceiptNo()),
@@ -230,6 +249,18 @@ public class CashReceiptService {
    * @return the OR
    */
   public Receipt issueOr(OrIssue issue) {
+    return issueOr(issue, null);
+  }
+
+  /**
+   * Issues a Head Office official receipt posted to a bank account of the list Post to Bank Account
+   * (FRS.CSH.02.02.02) and posts it.
+   *
+   * @param issue OR type, payee, lines and tender
+   * @param bankAccount code of the bank account, null for the collection account of the mode
+   * @return the OR
+   */
+  public Receipt issueOr(OrIssue issue, String bankAccount) {
     Optional<Receipt> earlier = earlier(issue.companyId(), issue.tender());
     if (earlier.isPresent()) {
       return earlier.get();
@@ -273,6 +304,7 @@ public class CashReceiptService {
                     totals),
                 issue.tender()));
     issue.lines().forEach(receipt::addLine);
+    receipt.postTo(bankAccount);
     receipt.posted(
         posting.publish(
             context(receipt, issue.tender(), "OR " + receipt.getReceiptNo()),
@@ -362,7 +394,29 @@ public class CashReceiptService {
         null,
         null,
         narration + " " + receipt.getPayorName(),
-        settings.collectionAccount(tender.mode()));
+        bankAccountOf(receipt, tender));
+  }
+
+  /**
+   * The tender of an issued receipt, for the postings that follow it (cancellation, reinstatement).
+   *
+   * @param receipt receipt
+   * @return mode and source of the receipt
+   */
+  static ReceiptTender tenderOf(Receipt receipt) {
+    return new ReceiptTender(
+        receipt.getMode(), null, null, null, null, receipt.getSource(), null, null, null);
+  }
+
+  private String bankAccountOf(Receipt receipt, ReceiptTender tender) {
+    if (receipt.getBankAccount() == null) {
+      return settings.collectionAccount(tender.mode());
+    }
+    return bankAccounts
+        .findByCompanyIdAndCode(receipt.getCompanyId(), receipt.getBankAccount())
+        .map(CashBankAccount::getGlAccountCode)
+        .filter(code -> !code.isBlank())
+        .orElseGet(() -> settings.collectionAccount(tender.mode()));
   }
 
   private Optional<Receipt> earlier(Long companyId, ReceiptTender tender) {

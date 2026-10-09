@@ -10,6 +10,7 @@ import com.iortatechnxt.brokerverse.account.domain.PaymentArrangement;
 import com.iortatechnxt.brokerverse.booking.BookingFixtures;
 import com.iortatechnxt.brokerverse.brokerclaims.ClaimsFixtures;
 import com.iortatechnxt.brokerverse.cashiering.CashFixtures;
+import com.iortatechnxt.brokerverse.cashiering.service.CashieringDecisions;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.domain.PaymentStatus;
@@ -18,7 +19,9 @@ import com.iortatechnxt.brokerverse.opsledger.service.DisbursementQueueService;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
 import com.iortatechnxt.brokerverse.remittance.RemittanceFixtures;
 import com.iortatechnxt.brokerverse.support.Api;
+import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
+import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -58,6 +61,8 @@ class ClaimsEndToEndApiIT {
   @Autowired private InvoiceLedgerQueryService ledger;
   @Autowired private DisbursementQueueService queue;
   @Autowired private JdbcTemplate jdbc;
+  @Autowired private SystemParameterService parameters;
+  @Autowired private AsUser as;
 
   private String company;
 
@@ -173,6 +178,17 @@ class ClaimsEndToEndApiIT {
    * past the check holding period of the remittance (RMTID.017).
    */
   private void payThroughCashiering(OpsInvoice invoice) throws Exception {
+    // The counter issues the AR at save in this configuration (setting of Appendix R, C1).
+    String posting = parameters.text(CashieringDecisions.POSTING_STEP, "");
+    as.run("admin", () -> parameters.update(CashieringDecisions.POSTING_STEP, "OR"));
+    try {
+      payAtTheCounter(invoice);
+    } finally {
+      as.run("admin", () -> parameters.update(CashieringDecisions.POSTING_STEP, posting));
+    }
+  }
+
+  private void payAtTheCounter(OpsInvoice invoice) throws Exception {
     api.doPost(
             "cashier",
             "/api/v1/cashiering/payments",

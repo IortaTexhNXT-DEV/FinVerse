@@ -18,11 +18,12 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
-import { formatDate, formatDateTime } from '@/utils/format';
+import { formatDate } from '@/utils/format';
 import { remittanceApi } from './api';
 import type { Hold } from './api';
 import { AssignDialog, ExtendDialog } from './HoldDialogs';
-import { holdStatus, joinParts } from './remittanceLabels';
+import { holdLine, holdStatus } from './remittanceLabels';
+import { CellStack } from '@/components/ui/CellStack';
 import './remittance.css';
 
 const ENTITY = 'RemittanceHold';
@@ -85,11 +86,18 @@ function Summary({ hold }: Readonly<{ hold: Hold }>) {
         {
           icon: CalendarClock,
           label: 'Hold Until',
-          value: joinParts([
-            formatDate(hold.holdUntil),
-            hold.requestedUntil && `extension to ${formatDate(hold.requestedUntil)} requested`,
-          ]),
+          value: (
+            <CellStack
+              main={formatDate(hold.holdUntil)}
+              sub={
+                hold.requestedUntil
+                  ? `Extension to ${formatDate(hold.requestedUntil)} requested`
+                  : undefined
+              }
+            />
+          ),
         },
+        { icon: CalendarClock, label: 'Remarks', value: hold.remarks ?? '—' },
         {
           icon: UserRound,
           label: 'Requested / Approved By',
@@ -169,7 +177,7 @@ export default function HoldDetailPage() {
         section="Remittance · Holds"
         backTo="/remittance/holds"
         title={h.requestNo}
-        description={joinParts([h.invoiceNo, `created ${formatDateTime(h.createdAt)}`, h.remarks])}
+        description={holdLine(h.invoiceNo, h.createdAt)}
         actions={
           h.stage === 'ACTIVE' && can('HOLD_APPROVE') ? (
             <Button variant="secondary" onClick={() => setDialog('assign')}>

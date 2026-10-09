@@ -13,6 +13,7 @@ import {
   Wallet,
 } from 'lucide-react';
 import { useState } from 'react';
+import type { ReactNode } from 'react';
 import { useParams } from 'react-router-dom';
 import type { WorkAction } from '@/api/workflow';
 import { useAuth } from '@/auth/authContext';
@@ -29,14 +30,14 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
-import { countOf, formatAmount, formatDateTime } from '@/utils/format';
+import { formatAmount, formatDateTime } from '@/utils/format';
 import { remittanceApi } from './api';
 import type { Batch, DocumentKind } from './api';
 import { ApproveDialog, PreviewDialog, SendScheduleDialog } from './BatchDialogs';
 import { BatchLinesTab } from './BatchLinesTab';
 import { BatchSettlementTab } from './BatchSettlementTab';
 import { TotalsStrip, TypeChip } from './RemittanceParts';
-import { joinParts } from './remittanceLabels';
+import { batchLine, joinParts } from './remittanceLabels';
 import './remittance.css';
 import { UserName } from '@/components/ui/UserName';
 
@@ -50,13 +51,19 @@ type TabId = (typeof TABS)[number]['id'];
 type Dialog = 'submit' | 'approve' | 'return' | 'send';
 const SENDABLE = ['APPROVED', 'PARTIALLY_REMITTED', 'FULLY_REMITTED', 'OR_RECEIVED'];
 
-function disbursementText(batch: Batch): string {
+/** The disbursement of a batch: the request number with its status and voucher under it. */
+function disbursementText(batch: Batch): ReactNode {
   const d = batch.disbursement;
   if (d.requestNo === undefined) {
-    return d.status === 'NOT_REQUIRED' ? 'Settled by deductions' : 'Not sent';
+    return <>{d.status === 'NOT_REQUIRED' ? 'Settled by deductions' : 'Not sent'}</>;
   }
-  const dv = batch.summary.dvNo === undefined ? undefined : `DV ${batch.summary.dvNo}`;
-  return joinParts([d.requestNo, d.status ? `Disbursement ${statusLabel(d.status)}` : '', dv]);
+  const dv = batch.summary.dvNo === undefined ? undefined : `voucher ${batch.summary.dvNo}`;
+  return (
+    <CellStack
+      main={d.requestNo}
+      sub={joinParts([d.status ? `Disbursement ${statusLabel(d.status)}` : '', dv], ', ')}
+    />
+  );
 }
 
 /** Which batch actions the user may take now. */
@@ -271,7 +278,7 @@ export default function BatchDetailPage() {
         section="Remittance · Batches"
         backTo="/remittance/batches"
         title={s.batchNo}
-        description={`${b.insurerName} · ${countOf(s.lineCount, 'account')} · extracted ${formatDateTime(s.createdAt)}`}
+        description={batchLine(b.insurerName, s.lineCount, s.createdAt)}
         actions={
           canSend ? (
             <Button variant="secondary" icon={<Mail size={16} />} onClick={() => setDialog('send')}>

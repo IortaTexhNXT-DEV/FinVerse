@@ -126,7 +126,7 @@ export function ReportTable({ result, filters = {}, onFilterChange }: Readonly<R
         <caption className="visually-hidden">{result.title}</caption>
         <thead>
           <tr>
-            {labels && <th aria-label="Row label" className="report-label" />}
+            {labels && <th className="report-label">Group</th>}
             {columns.map((c) => (
               <th key={c.key} className={cellClass(c.type)}>
                 {c.label}

@@ -14,7 +14,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { PageFooter } from '@/components/ui/Pager';
 import { Tabs } from '@/components/ui/Tabs';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate, formatDays } from '@/utils/format';
+import { formatDate, formatAging } from '@/utils/format';
 import { adjustmentApi } from './api';
 import type { RequestSummary, StageCounts } from './api';
 import { RequestFlags, RequestStatus, RequestTypeCell } from './RequestParts';
@@ -69,7 +69,7 @@ const COLUMNS: Column<RequestSummary>[] = [
     key: 'effective',
     header: 'Effective / Aging',
     kind: 'date',
-    render: (r) => <CellStack main={formatDate(r.effectiveDate)} sub={formatDays(r.agingDays)} />,
+    render: (r) => <CellStack main={formatDate(r.effectiveDate)} sub={formatAging(r.agingDays)} />,
   },
   {
     key: 'status',

@@ -21,7 +21,7 @@ import { Tag } from '@/components/ui/Tag';
 import { UserName } from '@/components/ui/UserName';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { countOf, formatAmount, formatDate, formatDays, humanize } from '@/utils/format';
+import { countOf, formatAging, formatAmount, formatDate, humanize } from '@/utils/format';
 import { collectionsApi } from './api';
 import type { CollectionItem, DispositionInput, EffortInput, ReassignInput } from './api';
 import { WORKLIST_TABS, filtersFromSearch, tabFromSearch, worklistQuery } from './collectionsLogic';
@@ -50,10 +50,10 @@ function DispositionCell({ code, category }: Readonly<{ code?: string; category?
   );
 }
 
-/** Aging of an account with its bracket: "16 days (0-30)". */
+/** Aging of an account with its bracket: "16 days (0-30)"; a future date is "Not yet due". */
 function agingText(i: CollectionItem): string {
-  const days = formatDays(i.agingDays);
-  return i.agingBracket === undefined ? days : `${days} (${i.agingBracket})`;
+  const days = formatAging(i.agingDays);
+  return i.agingBracket === undefined || i.agingDays < 0 ? days : `${days} (${i.agingBracket})`;
 }
 
 const COLUMNS: Column<CollectionItem>[] = [

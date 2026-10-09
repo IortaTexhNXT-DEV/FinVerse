@@ -31,8 +31,8 @@ import { appliedPercent, formOf, inputOf, isConfirmedByInsurer } from './deducti
 import type { DeductionForm } from './deductionForm';
 import { deductionsApi } from './deductionsApi';
 import type { Deduction, DeductionApplication } from './deductionsApi';
-import { joinParts } from './remittanceLabels';
 import './remittance.css';
+import { deductionLine } from './remittanceLabels';
 
 const ENTITY = 'RemittanceDeduction';
 const TABS = [
@@ -166,11 +166,7 @@ export default function DeductionDetailPage() {
         section="Remittance · Deductions"
         backTo="/remittance/deductions"
         title={d.deductionNo}
-        description={joinParts([
-          d.sourceRef,
-          d.invoiceNo,
-          `created ${formatDateTime(d.createdAt)}`,
-        ])}
+        description={deductionLine(d.sourceRef, d.invoiceNo, d.createdAt)}
         actions={
           d.stage === 'DRAFT' && can('ACSL_PROCESS') ? (
             <Button

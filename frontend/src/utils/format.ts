@@ -152,6 +152,17 @@ export function formatDays(days: number | null | undefined): string {
   return `${String(days)} ${Math.abs(days) === 1 ? 'day' : 'days'}`;
 }
 
+/**
+ * The age of an item in days, never negative: an item dated in the future is "Not yet due (in 389
+ * days)" instead of "-389 days".
+ */
+export function formatAging(days: number | null | undefined): string {
+  if (days === null || days === undefined || !Number.isFinite(days)) {
+    return '';
+  }
+  return days < 0 ? `Not yet due (in ${formatDays(-days)})` : formatDays(days);
+}
+
 /** A timestamp as dd-MMM-yyyy HH:mm in Philippine time: 25-Sep-2026 19:32. */
 export function formatDateTime(iso: string | null | undefined): string {
   if (!iso) {

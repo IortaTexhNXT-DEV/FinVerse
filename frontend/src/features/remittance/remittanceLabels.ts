@@ -1,3 +1,4 @@
+import { countOf, formatDateTime } from '@/utils/format';
 import { moduleLabel } from '@/utils/businessLabels';
 import type {
   Amounts,
@@ -234,4 +235,33 @@ export function triggerLabel(trigger: string): string {
  */
 export function holdStatus(stage: string): string {
   return stage === 'ACTIVE' ? 'ON_HOLD' : stage;
+}
+
+/**
+ * The one sentence under the title of a remittance record (never a dot-separated run):
+ * "Remittance to Mabuhay General Insurance Corp.: 1 account extracted on 09-Oct-2026 04:40."
+ */
+export function batchLine(insurer: string, accounts: number, at: string): string {
+  return `Remittance to ${insurer}: ${countOf(accounts, 'account')} extracted on ${formatDateTime(at)}.`;
+}
+
+/** "Hold on invoice BI-HO-2026-000008, requested on 09-Oct-2026 04:41." */
+export function holdLine(invoice: string, at: string): string {
+  return `Hold on invoice ${invoice}, requested on ${formatDateTime(at)}.`;
+}
+
+/** "Deduction ACSL-1 on invoice BI-…, created on …." */
+export function deductionLine(
+  source: string | undefined,
+  invoice: string | undefined,
+  at: string,
+): string {
+  const on = invoice ? ['on invoice', invoice] : [];
+  return `${['Deduction', source, ...on].filter(Boolean).join(' ')}, created on ${formatDateTime(at)}.`;
+}
+
+/** "Special remittance of invoice …, requested on …." and the remarks after it. */
+export function specialLine(invoice: string, at: string, remarks: string | undefined): string {
+  const first = `Special remittance of invoice ${invoice}, requested on ${formatDateTime(at)}.`;
+  return remarks ? `${first} ${remarks}` : first;
 }

@@ -333,7 +333,7 @@ export default function ServiceFeeRunPage() {
           {
             icon: CalendarDays,
             label: 'Released / Liquidated',
-            value: `${String(progress.released)} / ${String(progress.liquidated)} of ${String(progress.paid)} lines`,
+            value: `${String(progress.released)} released, ${String(progress.liquidated)} liquidated of ${countOf(progress.paid, 'line')}`,
           },
         ]}
       />

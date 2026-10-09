@@ -17,12 +17,11 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
-import { formatDateTime } from '@/utils/format';
 import { remittanceApi } from './api';
 import type { Special } from './api';
-import { joinParts } from './remittanceLabels';
 import './remittance.css';
 import { Notice } from '@/components/ui/Notice';
+import { specialLine } from './remittanceLabels';
 
 const ENTITY = 'SpecialRemittance';
 
@@ -114,11 +113,7 @@ export default function SpecialDetailPage() {
         section="Remittance · Special Remittance"
         backTo="/remittance/special"
         title={s.requestNo}
-        description={joinParts([
-          s.invoiceNo,
-          `requested ${formatDateTime(s.createdAt)}`,
-          s.remarks,
-        ])}
+        description={specialLine(s.invoiceNo, s.createdAt, s.remarks)}
       />
       <Summary special={s} />
       {s.rejectedReason !== undefined && (

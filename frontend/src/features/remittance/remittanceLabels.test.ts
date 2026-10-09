@@ -3,13 +3,17 @@ import type { BatchLine, DtipRow } from './api';
 import { toQuery } from './api';
 import {
   BATCH_TABS,
-  batchTabOf,
-  dtipFlags,
   HOLD_TABS,
+  batchLine,
+  batchTabOf,
+  deductionLine,
+  dtipFlags,
   holdFormErrors,
+  holdLine,
   isExcluded,
   parseEmails,
   reasonsText,
+  specialLine,
   stagesOf,
   totalsOf,
 } from './remittanceLabels';
@@ -119,5 +123,26 @@ describe('remittance labels', () => {
       'Pending negative adjustment, Locked by another team',
     );
     expect(reasonsText(undefined)).toBe('');
+  });
+});
+
+describe('one sentence under the title of a remittance record', () => {
+  it('reads as a sentence, never a dot-separated run of values', () => {
+    const at = '2026-10-09T04:40:00+08:00';
+    expect(batchLine('Mabuhay General Insurance Corp.', 1, at)).toBe(
+      'Remittance to Mabuhay General Insurance Corp.: 1 account extracted on 09-Oct-2026 04:40.',
+    );
+    expect(holdLine('BI-HO-2026-000008', at)).toBe(
+      'Hold on invoice BI-HO-2026-000008, requested on 09-Oct-2026 04:40.',
+    );
+    expect(deductionLine('ACSL-2026-000001', 'BI-HO-2026-000002', at)).toBe(
+      'Deduction ACSL-2026-000001 on invoice BI-HO-2026-000002, created on 09-Oct-2026 04:40.',
+    );
+    expect(specialLine('BI-HO-2026-000003', at, 'Client paid the insurer directly')).toBe(
+      'Special remittance of invoice BI-HO-2026-000003, requested on 09-Oct-2026 04:40. Client paid the insurer directly',
+    );
+    for (const line of [batchLine('X', 2, at), holdLine('Y', at)]) {
+      expect(line).not.toContain('·');
+    }
   });
 });

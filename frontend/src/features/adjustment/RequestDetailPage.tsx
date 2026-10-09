@@ -29,7 +29,7 @@ import { Card } from '@/components/ui/Card';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Tabs } from '@/components/ui/Tabs';
-import { formatDate, formatDays, formatPeriod } from '@/utils/format';
+import { formatDate, formatAging, formatPeriod } from '@/utils/format';
 import { adjustmentApi, REQUEST_ENTITY } from './api';
 import type { EndorsementRequest } from './api';
 import { RequestActions } from './RequestActions';
@@ -75,7 +75,7 @@ function facts(r: EndorsementRequest, typeLabel: string): Fact[] {
     },
     { icon: Layers, label: 'Type', value: typeLabel },
     { icon: User, label: 'Requested By', value: <UserName login={r.createdBy} /> },
-    { icon: Hourglass, label: 'Aging', value: formatDays(r.agingDays) },
+    { icon: Hourglass, label: 'Aging', value: formatAging(r.agingDays) },
     {
       icon: CalendarClock,
       label: 'Placement Slip / Batch',

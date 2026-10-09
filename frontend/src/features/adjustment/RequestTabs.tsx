@@ -10,7 +10,13 @@ import { Card } from '@/components/ui/Card';
 import type { Column } from '@/components/ui/DataTable';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
-import { formatAmount, formatDate, formatDateTime, formatDays, formatPeriod } from '@/utils/format';
+import {
+  formatAmount,
+  formatDate,
+  formatDateTime,
+  formatAging,
+  formatPeriod,
+} from '@/utils/format';
 import { InsurerName, ProductName } from '@/components/broking/LovLabel';
 import { ReferenceChip } from '@/components/broking/ReferenceChip';
 import { useRequestLabels } from './useRequestLabels';
@@ -93,7 +99,7 @@ function processingRows(r: EndorsementRequest): Row[] {
     ['Approved', done(t.approvedBy, t.approvedAt)],
     ['Posted', done(t.postedBy, t.postedAt)],
     ['Completed', t.completedAt === undefined ? undefined : formatDateTime(t.completedAt)],
-    ['Aging', formatDays(r.agingDays)],
+    ['Aging', formatAging(r.agingDays)],
     ['Endorsement Slip', r.control.slipNo],
   ];
 }

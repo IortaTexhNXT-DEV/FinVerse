@@ -13,7 +13,8 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatAmount, formatDate, formatDateTime } from '@/utils/format';
+import { formatAging, formatAmount, formatDate, formatDateTime } from '@/utils/format';
+import { CellStack } from '@/components/ui/CellStack';
 import { DispositionsTab, HistoryTab } from './AccountHistoryTabs';
 import { PaymentsTab, PolicyTab, SummaryTab, TimelineTab } from './AccountTabs';
 import { collectionsApi } from './api';
@@ -91,7 +92,16 @@ function Summary({ account }: Readonly<{ account: Account }>) {
         {
           icon: CalendarRange,
           label: 'Aging',
-          value: `${i.agingDays} days (${i.agingBracket ?? '—'}) · booked ${formatDate(i.bookingDate)}`,
+          value: (
+            <CellStack
+              main={
+                i.agingDays < 0 || !i.agingBracket
+                  ? formatAging(i.agingDays)
+                  : `${formatAging(i.agingDays)} (${i.agingBracket})`
+              }
+              sub={`Booked ${formatDate(i.bookingDate)}`}
+            />
+          ),
         },
         { icon: Building2, label: 'Insurer', value: <InsurerName code={i.insurerCode} /> },
         {

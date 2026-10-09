@@ -1,5 +1,6 @@
 import {
   countOf,
+  formatAging,
   formatAmount,
   formatCompact,
   formatDate,
@@ -119,5 +120,14 @@ describe('status phrases and template versions in messages', () => {
     expect(versionLabel('QUOTATION_INTAKE v12')).toBe('Version 12');
     expect(versionLabel('Manual')).toBe('Manual');
     expect(versionLabel(undefined)).toBe('');
+  });
+});
+
+describe('formatAging', () => {
+  it('never shows a negative age: a future date is not yet due', () => {
+    expect(formatAging(16)).toBe('16 days');
+    expect(formatAging(1)).toBe('1 day');
+    expect(formatAging(-389)).toBe('Not yet due (in 389 days)');
+    expect(formatAging(null)).toBe('');
   });
 });

@@ -158,7 +158,8 @@ export function ReportBatchDialog({ open, entries, onClose }: Readonly<Props>) {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <div className="stack" style={{ maxHeight: 280, overflowY: 'auto' }}>
+        {/* The report list is part of the dialog's one scroll area (no list scrolling inside it). */}
+        <div className="stack report-batch-list">
           {shown.map((e) => (
             <label key={e.code} className="checkbox">
               <input

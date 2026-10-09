@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { Check, FileDown } from 'lucide-react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { saveFile } from '@/api/client';
 import { nbadminApi } from '@/api/nbadmin';
 import type { AccessActionMatrix, AccessMatrix, MatrixRole } from '@/api/nbadmin';
@@ -12,6 +12,7 @@ import { Field } from '@/components/ui/Field';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
+import { useFitHeight } from '@/components/ui/useFitHeight';
 import { PermissionName } from '@/components/ui/PermissionName';
 import { permissionLabel, permissionLabels } from '@/utils/permissionLabel';
 import { ACTION_LABELS, actionText, areaLabel } from './accessMatrix';
@@ -132,6 +133,9 @@ function ActionTable({ matrix, needle }: Readonly<{ matrix: AccessActionMatrix; 
  */
 export default function AccessMatrixPage() {
   const toast = useToast();
+  // The matrix scrolls inside its card, capped to the room left in the window: one scroll bar.
+  const wrap = useRef<HTMLDivElement>(null);
+  useFitHeight(wrap);
   const [view, setView] = useState<View>('permission');
   const [filter, setFilter] = useState('');
   const matrix = useQuery({ queryKey: ['nbadmin', 'matrix'], queryFn: nbadminApi.matrix });
@@ -185,7 +189,7 @@ export default function AccessMatrixPage() {
       <Card flush>
         <Tabs tabs={VIEWS} active={view} onChange={setView} />
         {current.isLoading && <span className="spinner" aria-label="Loading" />}
-        <div className="matrix-wrap">
+        <div className="matrix-wrap" ref={wrap} data-fit="">
           {view === 'permission' && matrix.data && (
             <PermissionTable matrix={matrix.data} needle={needle} />
           )}

@@ -57,6 +57,14 @@ class ReportParametersTest {
   }
 
   @Test
+  void theChoicesPrintedOnAReportAreWords() {
+    ReportMetadata report =
+        metadata(ParameterSpec.select("active", "Active", List.of("ACTIVE", "ALL"), "ACTIVE"));
+    assertThat(ReportParameters.validate(report, Map.of(), CLOCK).echo())
+        .containsExactly("Active : Active");
+  }
+
+  @Test
   void requiredParameterSentBlankIsRejectedInsteadOfDefaulted() {
     Map<String, String> raw = new HashMap<>();
     raw.put("toDate", " ");

@@ -204,6 +204,9 @@ public final class ReportParameters {
         return value;
       }
     }
+    if (spec.type() == ParameterType.SELECT) {
+      return DisplayFormat.label(value); // the choice in words: "Active", "Due Date"
+    }
     return display.display(spec, value);
   }
 

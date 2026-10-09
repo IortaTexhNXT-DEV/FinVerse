@@ -36,8 +36,9 @@ public final class DisplayFormat {
   /** Codes kept in capitals when a status is written as words (DV_ASSIGNED is "DV assigned"). */
   private static final Set<String> ACRONYMS =
       Set.of(
-          "AP", "AR", "ARN", "BIR", "CBG", "CPC2", "CWT", "DST", "DTIP", "DV", "EOD", "FFY", "IA",
-          "KYC", "OR", "OTC", "PDC", "PN", "PRF", "PS", "QS", "SI", "TSU", "VAT");
+          "ACSL", "AP", "AR", "ARN", "BIR", "CBG", "CPC2", "CWT", "DST", "DTIP", "DV", "EB", "EOD",
+          "FFY", "FRBS", "GL", "IA", "KYC", "OR", "OTC", "PDC", "PEP", "PN", "PRF", "PS", "QS",
+          "SI", "SLA", "SOA", "TSU", "VAT");
 
   private DisplayFormat() {}
 

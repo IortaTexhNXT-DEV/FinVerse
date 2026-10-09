@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.security.domain;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -82,4 +83,15 @@ public interface AppUserRepository extends JpaRepository<AppUser, Long> {
    */
   List<AppUser> findByEnabledTrueAndPasswordChangedAtGreaterThanEqualAndPasswordChangedAtLessThan(
       Instant from, Instant to);
+
+  /**
+   * User name and Windows ID of users (Audit Trail).
+   *
+   * @param lowerNames user names in lower case
+   * @return pairs of user name and Windows ID, for users with a Windows ID
+   */
+  @Query(
+      "select u.username, u.windowsId from AppUser u"
+          + " where lower(u.username) in :names and u.windowsId is not null")
+  List<Object[]> windowsIdsOf(@Param("names") Collection<String> lowerNames);
 }

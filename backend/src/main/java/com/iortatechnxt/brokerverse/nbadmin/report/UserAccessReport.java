@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.nbadmin.report.UserAccessHistory.Change;
 import com.iortatechnxt.brokerverse.nbadmin.report.UserAccessHistory.Snapshot;
 import com.iortatechnxt.brokerverse.nbadmin.report.UserAccessHistory.UserRow;
+import com.iortatechnxt.brokerverse.report.core.NamedExport;
 import com.iortatechnxt.brokerverse.report.core.ParameterSpec;
 import com.iortatechnxt.brokerverse.report.core.ParameterType;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
@@ -31,7 +32,7 @@ import org.springframework.stereotype.Component;
  * change log) and the last action. Sorted by user ID.
  */
 @Component
-public class UserAccessReport implements ReportDefinition {
+public class UserAccessReport implements ReportDefinition, NamedExport {
 
   /** Report code. */
   public static final String CODE = "UAM-USER-ACCESS";
@@ -54,6 +55,11 @@ public class UserAccessReport implements ReportDefinition {
   public UserAccessReport(UserAccessHistory history, Clock clock) {
     this.history = history;
     this.clock = clock;
+  }
+
+  @Override
+  public String exportName() {
+    return "User Access Report";
   }
 
   @Override

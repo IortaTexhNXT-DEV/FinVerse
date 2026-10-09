@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.nbadmin.report;
 
+import com.iortatechnxt.brokerverse.report.core.NamedExport;
 import com.iortatechnxt.brokerverse.report.core.ParameterSpec;
 import com.iortatechnxt.brokerverse.report.core.ParameterType;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
@@ -16,6 +17,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -29,7 +31,7 @@ import org.springframework.stereotype.Component;
  * failed log-ins and log-outs of the audit trail. Sorted by date and time.
  */
 @Component
-public class AccessAuditLogReport implements ReportDefinition {
+public class AccessAuditLogReport implements ReportDefinition, NamedExport {
 
   /** Report code. */
   public static final String CODE = "UAM-AUDIT-LOG";
@@ -53,6 +55,14 @@ public class AccessAuditLogReport implements ReportDefinition {
   private static final String APPROVED_BY = "approvedBy";
   private static final String REQUEST_NO = "requestNo";
   private static final String SUBJECT = "subject";
+  private static final String MODULE = "module";
+  private static final String USER_ID = "userId";
+  private static final String ROLE = "role";
+  private static final String ACTION = "action";
+  private static final String UPDATE = "Update";
+  private static final String IP = "ipAddress";
+  private static final String ROLE_NAMES = "role_names";
+  private static final String IP_ADDRESS = "ip_address";
   private static final String OCCURRED = "occurred_at";
   private static final String START = "start";
   private static final String END = "end";
@@ -91,7 +101,47 @@ public class AccessAuditLogReport implements ReportDefinition {
           Map.entry("REACTIVATE_ROLE", "Reactivate Group Profile"));
 
   private static final Map<String, String> SIGN_IN_ACTIONS =
-      Map.of("LOGIN", "Log-in", "LOGIN_FAILED", "Failed Log-in", "LOGOUT", "Log-out");
+      Map.of(
+          "LOGIN", "Log-in",
+          "LOGIN_FAILED", "Failed Log-in",
+          "LOGOUT", "Log-out",
+          "INACTIVITY", "Inactivity of",
+          "TIMEOUT", "Time-out of");
+
+  /** BDOI's action words (FRUM.008.01) of the access changes, request events and sign-ins. */
+  private static final Map<String, String> ACTION_WORDS =
+      Map.ofEntries(
+          Map.entry("CREATE_USER", "Create"),
+          Map.entry("MODIFY_USER", UPDATE),
+          Map.entry("ROLES_CHANGED", UPDATE),
+          Map.entry("DISABLE_USER", "Deactivate"),
+          Map.entry("ENABLE_USER", "Reactivate"),
+          Map.entry("UNLOCK", "Unlock"),
+          Map.entry("PASSWORD_RESET", "Reset Password"),
+          Map.entry("CREATE_ROLE", "Create"),
+          Map.entry("ROLE_PERMISSIONS", UPDATE),
+          Map.entry("DEACTIVATE_ROLE", "Deactivate"),
+          Map.entry("REACTIVATE_ROLE", "Reactivate"),
+          Map.entry("DATA_SCOPE_CHANGED", UPDATE),
+          Map.entry("SAVE", "Create"),
+          Map.entry("EDIT", UPDATE),
+          Map.entry("SUBMIT", "Submit"),
+          Map.entry("RESUBMIT", "Submit"),
+          Map.entry("RETURN", "Return"),
+          Map.entry("CANCEL", "Cancel"),
+          Map.entry("APPROVE", "Approve"),
+          Map.entry("SECOND_APPROVE", "Approve"),
+          Map.entry("REJECT", "Reject"),
+          Map.entry("SCHEDULE", "Schedule"),
+          Map.entry("APPLY", "Apply"),
+          Map.entry("APPLY_FAILED", "Apply"),
+          Map.entry("FOR_IMPLEMENTATION", "Submit"),
+          Map.entry("IMPLEMENT", "Implement"),
+          Map.entry("LOGIN", "Login"),
+          Map.entry("LOGIN_FAILED", "Failed Login"),
+          Map.entry("LOGOUT", "Logout"),
+          Map.entry("INACTIVITY", "Inactivity"),
+          Map.entry("TIMEOUT", "Timeout"));
 
   private final NamedParameterJdbcTemplate jdbc;
 
@@ -102,6 +152,11 @@ public class AccessAuditLogReport implements ReportDefinition {
    */
   public AccessAuditLogReport(NamedParameterJdbcTemplate jdbc) {
     this.jdbc = jdbc;
+  }
+
+  @Override
+  public String exportName() {
+    return "Audit Logs";
   }
 
   @Override
@@ -143,19 +198,25 @@ public class AccessAuditLogReport implements ReportDefinition {
     if (p.flag(SIGN_INS)) {
       rows.addAll(signIns(args));
     }
+    Map<String, String> windowsIds = windowsIds();
     List<Map<String, Object>> shown =
         rows.stream()
             .filter(r -> user == null || involves(r, user))
             .sorted(Comparator.comparing(r -> (Instant) r.get(OCCURRED)))
-            .map(AccessAuditLogReport::display)
+            .map(r -> display(r, windowsIds))
             .toList();
     return TabularReportBuilder.of(p)
         .columns(
-            ReportColumn.text(TIME, "Date"),
+            ReportColumn.text(TIME, "Timestamp"),
+            ReportColumn.text(MODULE, "Module"),
+            ReportColumn.text(USER_ID, "User Id"),
+            ReportColumn.text(DONE_BY, "Performed By"),
+            ReportColumn.text(ROLE, "User Group Profile"),
+            ReportColumn.text(ACTION, "Action"),
+            ReportColumn.text(FROM_COL, "Old Value"),
+            ReportColumn.text(TO_COL, "New Value"),
             ReportColumn.text(ACTIVITY, "Activity"),
-            ReportColumn.text(FROM_COL, "From"),
-            ReportColumn.text(TO_COL, "To"),
-            ReportColumn.text(DONE_BY, "Done By"),
+            ReportColumn.text(IP, "IP Address"),
             ReportColumn.text(APPROVED_BY, "Approved By"),
             ReportColumn.text(REQUEST_NO, "Request No."))
         .rows(shown)
@@ -171,7 +232,8 @@ public class AccessAuditLogReport implements ReportDefinition {
     for (Map<String, Object> c :
         jdbc.queryForList(
             "select occurred_at, subject_type, subject, activity, attribute, from_value, to_value,"
-                + " request_no, done_by, approved_by from sec_access_change_log"
+                + " request_no, done_by, approved_by, role_names, ip_address"
+                + " from sec_access_change_log"
                 + " where occurred_at >= :start and occurred_at < :end",
             args)) {
       String code = UamReportSupport.text(c, ACTIVITY);
@@ -194,7 +256,11 @@ public class AccessAuditLogReport implements ReportDefinition {
                   UamReportSupport.text(c, "done_by"),
                   UamReportSupport.text(c, "approved_by"),
                   UamReportSupport.text(c, "request_no"),
-                  UamReportSupport.text(c, SUBJECT))));
+                  UamReportSupport.text(c, SUBJECT)),
+              new Origin(
+                  ACTION_WORDS.get(code),
+                  UamReportSupport.text(c, ROLE_NAMES),
+                  UamReportSupport.text(c, IP_ADDRESS))));
     }
     return rows;
   }
@@ -203,7 +269,8 @@ public class AccessAuditLogReport implements ReportDefinition {
     return jdbc
         .queryForList(
             "select e.occurred_at, e.action, e.from_status, e.to_status, e.actor, r.request_no,"
-                + " r.request_type, coalesce(r.role_code, r.username) as subject"
+                + " r.request_type, coalesce(r.role_code, r.username) as subject,"
+                + " e.role_names, e.ip_address"
                 + " from nba_access_request_event e join nba_access_request r"
                 + " on r.id = e.request_id where e.occurred_at >= :start and e.occurred_at < :end",
             args)
@@ -213,8 +280,8 @@ public class AccessAuditLogReport implements ReportDefinition {
                 entry(
                     e.get(OCCURRED),
                     ACTIONS.getOrDefault(
-                            UamReportSupport.text(e, "action"),
-                            UamReportSupport.words(UamReportSupport.text(e, "action")))
+                            UamReportSupport.text(e, ACTION),
+                            UamReportSupport.words(UamReportSupport.text(e, ACTION)))
                         + " Request to "
                         + TYPES.getOrDefault(
                             UamReportSupport.text(e, "request_type"),
@@ -227,15 +294,20 @@ public class AccessAuditLogReport implements ReportDefinition {
                         UamReportSupport.text(e, "actor"),
                         null,
                         UamReportSupport.text(e, "request_no"),
-                        UamReportSupport.text(e, SUBJECT))))
+                        UamReportSupport.text(e, SUBJECT)),
+                    new Origin(
+                        ACTION_WORDS.get(UamReportSupport.text(e, ACTION)),
+                        UamReportSupport.text(e, ROLE_NAMES),
+                        UamReportSupport.text(e, IP_ADDRESS))))
         .toList();
   }
 
   private List<Map<String, Object>> signIns(Map<String, Object> args) {
     return jdbc
         .queryForList(
-            "select occurred_at, username, entity_id, action, summary from audit_log"
-                + " where action in ('LOGIN', 'LOGIN_FAILED', 'LOGOUT')"
+            "select occurred_at, username, entity_id, action, summary, role_names, ip_address"
+                + " from audit_log"
+                + " where action in ('LOGIN', 'LOGIN_FAILED', 'LOGOUT', 'INACTIVITY', 'TIMEOUT')"
                 + " and occurred_at >= :start and occurred_at < :end",
             args)
         .stream()
@@ -252,7 +324,11 @@ public class AccessAuditLogReport implements ReportDefinition {
                         UamReportSupport.text(a, "username"),
                         null,
                         null,
-                        UamReportSupport.text(a, "entity_id"))))
+                        UamReportSupport.text(a, "entity_id")),
+                    new Origin(
+                        ACTION_WORDS.get(UamReportSupport.text(a, ACTION)),
+                        UamReportSupport.text(a, ROLE_NAMES),
+                        UamReportSupport.text(a, IP_ADDRESS))))
         .toList();
   }
 
@@ -261,8 +337,11 @@ public class AccessAuditLogReport implements ReportDefinition {
   }
 
   private static Map<String, Object> entry(
-      Object occurred, String activity, String from, String to, Source source) {
+      Object occurred, String activity, String from, String to, Source source, Origin origin) {
     Map<String, Object> m = new HashMap<>();
+    m.put(ACTION, origin.action());
+    m.put(ROLE, origin.roles());
+    m.put(IP, origin.address());
     m.put(OCCURRED, UamReportSupport.instant(occurred));
     m.put(ACTIVITY, activity);
     m.put(FROM_COL, from);
@@ -280,16 +359,33 @@ public class AccessAuditLogReport implements ReportDefinition {
         || UamReportSupport.same(user, (String) row.get(APPROVED_BY));
   }
 
-  private static Map<String, Object> display(Map<String, Object> row) {
+  private static Map<String, Object> display(
+      Map<String, Object> row, Map<String, String> windowsIds) {
     Map<String, Object> m = new LinkedHashMap<>();
+    String doneBy = (String) row.get(DONE_BY);
     m.put(TIME, UamReportSupport.dateTime((Instant) row.get(OCCURRED)));
-    m.put(ACTIVITY, row.get(ACTIVITY));
+    m.put(MODULE, "User Access Maintenance");
+    m.put(USER_ID, doneBy == null ? null : windowsIds.get(doneBy.toLowerCase(Locale.ROOT)));
+    m.put(DONE_BY, doneBy);
+    m.put(ROLE, row.get(ROLE));
+    m.put(ACTION, row.get(ACTION));
     m.put(FROM_COL, UamReportSupport.orNull((String) row.get(FROM_COL)));
     m.put(TO_COL, UamReportSupport.orNull((String) row.get(TO_COL)));
-    m.put(DONE_BY, row.get(DONE_BY));
+    m.put(ACTIVITY, row.get(ACTIVITY));
+    m.put(IP, row.get(IP));
     m.put(APPROVED_BY, row.get(APPROVED_BY));
     m.put(REQUEST_NO, row.get(REQUEST_NO));
     return m;
+  }
+
+  private Map<String, String> windowsIds() {
+    Map<String, String> ids = new HashMap<>();
+    jdbc.query(
+        "select lower(username), windows_id from sec_user where windows_id is not null",
+        rs -> {
+          ids.put(rs.getString(1), rs.getString(2));
+        });
+    return ids;
   }
 
   private Map<String, String> roleNames() {
@@ -311,4 +407,13 @@ public class AccessAuditLogReport implements ReportDefinition {
    * @param subject user or group profile concerned
    */
   private record Source(String doneBy, String approvedBy, String requestNo, String subject) {}
+
+  /**
+   * BDOI's action word of an activity, and the roles and source address of its actor.
+   *
+   * @param action action word
+   * @param roles group profiles of the actor at the time, may be null
+   * @param address source (IP) address, may be null
+   */
+  private record Origin(String action, String roles, String address) {}
 }

@@ -152,7 +152,7 @@ public class ReportService {
     }
     audit.record(
         "Report", code, AuditAction.EXPORT, "Exported " + format + " " + String.join(", ", echo));
-    String fileName = code + "." + format.extension();
+    String fileName = ExportFileNames.of(def, code, format.extension(), parameters, clock);
     archive.exported(
         def.metadata(),
         echo,

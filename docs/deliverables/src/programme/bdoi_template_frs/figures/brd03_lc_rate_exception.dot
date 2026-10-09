@@ -1,0 +1,15 @@
+// Life-cycle of a rate exception on a new-business quotation priced on a package (FRPM.024.02; BRPM.007).
+digraph lc_rate_exception {
+  graph [rankdir=LR, fontname="Arial", nodesep=0.35, ranksep=0.45, bgcolor="white", pad=0.15];
+  node  [shape=box, style="rounded,filled", fillcolor="#E1D5E7", color="#9673A6", fontname="Arial", fontsize=10, width=1.3, height=0.55];
+  edge  [arrowsize=0.55, penwidth=0.8, color="#333333", fontname="Arial", fontsize=8.5];
+  rq [label="Requested\n(pending approval)"];
+  ap [label="Approved\n(valid 30 days)", fillcolor="#D5E8D4", color="#82B366"];
+  rj [label="Rejected\n(reason shown)", fillcolor="#F8CECC", color="#B85450"];
+  us [label="Used on the\nquotation, account\nand invoice"];
+  lp [label="Lapsed\n(not used in time)", fillcolor="#EEEEEE", color="#888888"];
+  rq -> ap [label="approver\n(not the requester)"];
+  rq -> rj [label="approver,\nwith reason"];
+  ap -> us [label="quotation\nsubmitted"];
+  ap -> lp [label="validity\npassed"];
+}

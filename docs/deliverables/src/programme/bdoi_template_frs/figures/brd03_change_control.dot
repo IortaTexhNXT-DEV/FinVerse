@@ -1,0 +1,17 @@
+// Change control after sign-off (Annex W): raise, assess, approve, schedule, test, close.
+digraph change_control {
+  graph [rankdir=LR, fontname="Arial", nodesep=0.25, ranksep=0.35, bgcolor="white", pad=0.15];
+  node  [shape=box, style="rounded,filled", fillcolor="#DAE8FC", color="#6C8EBF", fontname="Arial", fontsize=10, width=1.15, height=0.75];
+  edge  [arrowsize=0.55, penwidth=0.8, color="#333333", fontname="Arial", fontsize=8.5];
+  r [label="1 Raise\n(business owner;\nCR register)"];
+  a [label="2 Assess\n(project team:\nimpact, mandays)"];
+  d [label="Approve?", shape=diamond, width=1.0, height=0.7, fillcolor="#FFF2CC", color="#D6B656"];
+  s [label="4 Schedule\n(target drop)"];
+  t [label="5 Test\n(cases updated;\nBU retest)"];
+  c [label="6 Close\n(FRS re-issued;\ndelta signed)", fillcolor="#D5E8D4", color="#82B366"];
+  x [label="Rejected or\ndeferred\n(reason logged)", fillcolor="#EEEEEE", color="#888888"];
+  r -> a -> d;
+  d -> s [label="3 Yes: owners\nof every BRD\ntouched"];
+  d -> x [label="No"];
+  s -> t -> c;
+}

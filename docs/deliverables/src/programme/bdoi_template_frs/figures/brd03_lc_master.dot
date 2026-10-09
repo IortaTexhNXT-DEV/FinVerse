@@ -1,0 +1,18 @@
+// Life-cycle of a product master record or incentive rule under maker-checker (FRPM.003.02, 003.08, 018.01,
+// 022.01-02, 023.01).
+digraph lc_master {
+  graph [rankdir=LR, fontname="Arial", nodesep=0.35, ranksep=0.45, bgcolor="white", pad=0.15];
+  node  [shape=box, style="rounded,filled", fillcolor="#B1DDF0", color="#10739E", fontname="Arial", fontsize=10, width=1.3, height=0.55];
+  edge  [arrowsize=0.55, penwidth=0.8, color="#333333", fontname="Arial", fontsize=8.5];
+  dr [label="Draft\n(maker)"];
+  pa [label="Pending\nauthorization"];
+  ac [label="Active\n(from the\neffective date)", fillcolor="#D5E8D4", color="#82B366"];
+  rj [label="Rejected\n(back to maker)", fillcolor="#F8CECC", color="#B85450"];
+  in [label="Inactive /\nend-dated\n(kept, read only)", fillcolor="#EEEEEE", color="#888888"];
+  dr -> pa [label="save for\nauthorization"];
+  pa -> ac [label="authorized by\nanother user"];
+  pa -> rj [label="rejected\nwith reason"];
+  rj -> pa [label="corrected", style=dashed];
+  ac -> pa [label="change\n(successor)", style=dashed];
+  ac -> in [label="deactivated or\nend date passed"];
+}

@@ -1,0 +1,218 @@
+# Product Maintenance FRS in BDOI's template, version 1.2: the open items checked against BDOI's FRS, and the data of
+# the workbooks of the Business Unit review pack. Read by brd03_v12.py (Annex V of the FRS) and by
+# build_brd03_workbooks.py.
+#
+#   our_items        the assumptions (A-PM), dependencies (D-PM), open questions (PQ) and proposed rules (CLR-PM) of
+#                    the BIBS FRS BRD-3, each checked against BDOI's FRS: Answered (dropped from the FRS; listed in
+#                    the traceability workbook, sheet 'Answered in the BDOI FRS', with BDOI's clause), Partly (only
+#                    the remaining part stays open), Open (not answered), Answered earlier (closed in our sources).
+#   inputs_bdoi      the items of the programme inputs workbook v1.2 (sheet BRD-03) that BDOI's FRS answers in full
+#                    or in part; every other item stays as it is.
+#   fitgap           per BRD ID: what BIBS offers for BDOI, the fit, the recommendation and the impact (the OOTB and
+#                    best-practice columns come from the programme Feature List workbook).
+#   frpm_tests       per FRPM sub-item: the persona and screen of its acceptance test cases.
+#   coverage         acceptance criteria whose availability differs from the conformance of their reference FR.
+
+our_items:
+  # --- assumptions
+  - {id: A-PM-01, kind: Assumption, text: "The final main BRD and the addendum are the baseline; the earlier version is used only to trace changes.", status: Open, format: "Confirmation (yes / no)", owner: "Product Owner", needed: 30-Nov-2026, rc: PM-Q01}
+  - {id: A-PM-02, kind: Assumption, text: "A package is a catalogue product flagged as packaged, generic for a segment or client-specific; each package has its own risk code.", status: Answered, clause: "FRPM.003.02", answer: "A Product Matrix record has the Product type Package or Non-Package; Annex A holds the Insured's Name for client-specific packages."}
+  - {id: A-PM-03, kind: Assumption, text: "Any one of Marketing TL, TH or UH approves a request.", status: Answered, clause: "FRPM.011.02", answer: "The request passes the Marketing approval hierarchy until the Unit Head; each approver approves or rejects independently (TL, TH, then UH). The difference with the earlier BIBS proposal is point C05 of Annex M."}
+  - {id: A-PM-04, kind: Assumption, text: "One ManCom member's sign-off completes the ManCom step.", status: Answered, clause: "FRPM.014.01", answer: "All selected non-President approvers approve in parallel, then the President. The difference is point C17 of Annex M."}
+  - {id: A-PM-05, kind: Assumption, text: "'Deletion' in BRPM.011 means retirement; records are never deleted.", status: Answered, clause: "FRPM.003.04 to FRPM.003.07", answer: "A package is deactivated through an approved deactivation request or on its expiry date; existing transactions stay accessible."}
+  - {id: A-PM-06, kind: Assumption, text: "Maintenance of non-package products is out of scope in this phase.", status: Answered, clause: "FRPM.002.01, FRPM.003.02, FRPM.005 to FRPM.010", answer: "BDOI's FRS keeps non-package records and quotation requests in the Product Maintenance module (scope point C01 of Annex M)."}
+  - {id: A-PM-07, kind: Assumption, text: "BRPM.023 does not exist in either BRD version; no requirement is missing.", status: Answered, clause: "Business Requirements Mapping", answer: "BDOI's mapping lists BRPM.022 followed by BRPM.024."}
+  - {id: A-PM-08, kind: Assumption, text: "Package request volume is low (tens a month).", status: Open, format: "Number of package requests a month and yearly growth", owner: "Head, TSU", needed: 30-Nov-2026, rc: PM-Q48}
+  # --- dependencies
+  - {id: D-PM-01, kind: Dependency, text: "BDOI provides the product matrix content: subtypes, coverages per line, naming convention.", status: Partly, clause: "Annex A (Sub-Line dropdown values)", answer: "The sub-line values of each line are given in Annex A.", remaining: "BDOI provides the coverages and perils per line and the naming convention of the risk codes.", format: "Filled templates PM-01 and PM-02; naming rule per line", owner: "Head, MBS", needed: 09-Apr-2027, rc: CFG-091}
+  - {id: D-PM-02, kind: Dependency, text: "BDOI provides the document layouts and the password convention.", status: Partly, clause: "Annex D, Annex F", answer: "The Quotation Slip templates of each line (non-package and package) are given.", remaining: "BDOI provides the layouts of the package request form, the Comparative Table client output, the package slip, the advisory and the ManCom record, and the password convention.", format: "Word or PDF layouts with wording and logo placement; password rule", owner: "Head, TSU; Head, MBS", needed: 16-Jul-2027, rc: DOC-07}
+  - {id: D-PM-03, kind: Dependency, text: "BDOI defines CPC2 and the other incentive criteria.", status: Partly, clause: "FRPM.003.02, FRPM.018.01", answer: "The rule fields (code, description, effective and expiry dates, status, criteria) and the incentive amount or commission rate on the product are given.", remaining: "BDOI defines CPC2 and the other incentive types.", format: "Filled template PM-10 with the definition of each type", owner: "Head, MBS", needed: 16-Jul-2027, rc: PM-Q42}
+  - {id: D-PM-04, kind: Dependency, text: "BDOI names the systems that receive product master changes.", status: Open, format: "System name, data, format, timing and BDOI IT contact", owner: "Product Owner; BDO ITG", needed: 30-Nov-2026, rc: CLR-PM-10}
+  - {id: D-PM-05, kind: Dependency, text: "Renewal (BRD-06) passes the expiring account's version on Renew As Is.", status: Open, format: "Confirmation in the Renewal FRS", owner: "Head, Renewal", needed: 30-Nov-2026, rc: PM-Q41}
+  - {id: D-PM-06, kind: Dependency, text: "The e-mail relay of the BIBS environment is available for insurer e-mails.", status: Partly, clause: "FRPM.014.01", answer: "ManCom e-mails are sent through Microsoft 365.", remaining: "BDOI confirms the e-mail channel and sender mailbox for the insurer e-mails (Quotation Slips, advisories).", format: "Channel (Microsoft 365 or CCM), sender mailbox, contact", owner: "BDO ITG", needed: 04-Jan-2027, rc: PM-Q46}
+  # --- open questions of the BIBS FRS
+  - {id: PQ02, kind: Open question, text: "Subline / type / subtype values and coverage / peril list per line; naming convention for product codes.", status: Partly, clause: "Annex A (Sub-Line dropdown values)", answer: "Sub-line values per line are given.", remaining: "Coverage and peril list per line; naming convention of the risk codes.", format: "Filled template PM-02; naming rule per line with an example", owner: "Head, MBS", needed: 09-Apr-2027, rc: CLR-PM-01}
+  - {id: PQ03, kind: Open question, text: "Which attributes vary by insurer in a package; co-insurance shares.", status: Partly, clause: "FRPM.006.02, FRPM.012.02", answer: "An insurer may offer several combinations of coverage, premium, commission, deductibles, terms and conditions, warranties, clauses and extensions.", remaining: "Can a package have several panel insurers or co-insurance with shares, and with which roles.", format: "Yes / no per case, with the roles (lead, participant, panel)", owner: "Head, TSU", needed: 30-Nov-2026, rc: PM-Q22}
+  - {id: PQ04, kind: Open question, text: "Definition of CPC2 and other criteria; required attributes; who is the Incentive Maintenance user.", status: Partly, clause: "FRPM.003.02, FRPM.018.01", answer: "Rule fields and the incentive amount or commission rate are given.", remaining: "Definition of CPC2 and the other incentive types; the maintainer and the approver of the rules.", format: "Definition per type (basis, value, products); roles", owner: "Head, MBS; Product Owner", needed: 16-Jul-2027, rc: PM-Q42}
+  - {id: PQ05, kind: Open question, text: "Full list of negotiation outcomes; maximum rounds; apply PMADD03/04 to non-package requests.", status: Partly, clause: "FRPM.006.02, FRPM.012.02", answer: "Responses Approved, Not Covered and Others, the same for package and non-package requests.", remaining: "Maximum number of negotiation rounds, if any.", format: "Number or 'no limit'", owner: "Head, TSU", needed: 16-Jul-2027, rc: PM-Q21}
+  - {id: PQ06, kind: Open question, text: "Fields of client views; client layout; who generates client outputs.", status: Partly, clause: "FRPM.006.02, FRPM.012.02", answer: "The user chooses which details of the Comparative Table are displayed and sent to the client.", remaining: "The layout of the client output.", format: "Layout (Word, PDF or Excel sample)", owner: "Head, TSU", needed: 16-Jul-2027, rc: RC-DOC-02}
+  - {id: PQ07, kind: Open question, text: "ManCom membership, quorum, in-system versus signed sheet, service level.", status: Partly, clause: "FRPM.014.01", answer: "Selected approvers from the ManCom approver list approve in the system in parallel, then the President.", remaining: "The ManCom approver list and the service level of the ManCom step.", format: "List of names and roles; hours", owner: "ManCom; Product Owner", needed: 30-Nov-2026, rc: RC-APR-02}
+  - {id: PQ08, kind: Open question, text: "Approval chain by segment or amount; QS co-officer; service level of each stage.", status: Partly, clause: "FRPM.011.02", answer: "Every Marketing request passes TL, TH and UH.", remaining: "Who the QS co-officer is; the service level of each stage.", format: "Name or role of the co-officer; hours per stage (Annex O)", owner: "Head, TSU; Head, Retail Marketing", needed: 16-Jul-2027, rc: PM-Q17}
+  - {id: PQ09, kind: Open question, text: "Validator role (TSU Head, Business Administrator or either); checklist content.", status: Partly, clause: "FRPM.003.03; New Request Process Flow (review of the package configuration by TSU)", answer: "TSU reviews and approves the package configuration set up by MBS.", remaining: "Whether the Business Administrator may also validate; the checklist items.", format: "Role(s); checklist items", owner: "Head, TSU; Head, MBS", needed: 30-Nov-2026, rc: PM-Q28}
+  - {id: PQ10, kind: Open question, text: "Scope of a rate scheme (statutory rates?); approver of non-current rates; manual item rates on packages.", status: Open, format: "Decision per point", owner: "Head, MBS; Head, Retail Marketing", needed: 30-Nov-2026, rc: PM-Q31}
+  - {id: PQ11, kind: Open question, text: "Meaning of package expiry / anniversary; notice period; automatic renewal drafts.", status: Partly, clause: "FRPM.004.01", answer: "Alerts begin 90 calendar days before the expiry and the anniversary dates.", remaining: "Meaning of the expiry and anniversary dates; reminder days; automatic drafting of renewal requests.", format: "Definition; days; yes / no", owner: "Head, TSU", needed: 16-Jul-2027, rc: PM-Q38}
+  - {id: PQ12, kind: Open question, text: "Content of the requirements pack; formulas beyond the three rating methods; advisory recipients and channel.", status: Open, format: "List of contents; formulas; recipient units", owner: "Head, TSU", needed: 30-Nov-2026, rc: PM-Q27}
+  - {id: PQ14, kind: Open question, text: "Mandatory fields of the Package Request Form; client for generic programmes.", status: Partly, clause: "Annex E", answer: "The fields of the Package Request Form per line.", remaining: "Which fields are mandatory; whether a generic programme needs a client.", format: "Mandatory Y / N per field of Annex E", owner: "Head, Retail Marketing; Head, TSU", needed: 30-Nov-2026, rc: PM-Q15}
+  - {id: PQ15, kind: Open question, text: "Name and columns of the BRPM.018 report.", status: Answered, clause: "FRPM.007.01", answer: "Consolidated Placement Update Report, every Thursday 08:00, with its twelve columns and the Placement Update Status rules."}
+  - {id: PQ16, kind: Open question, text: "Systems that receive product master changes; format and timing.", status: Open, format: "System name, data, format, timing, contact", owner: "Product Owner; BDO ITG", needed: 30-Nov-2026, rc: CLR-PM-10}
+  - {id: PQ17, kind: Open question, text: "Final role-to-action matrix; approval of role changes.", status: Answered earlier, clause: "Business Requirements Mapping (PMADD05: Refer to User Access Maintenance FRS)", answer: "Answered (status ANSWERED in the BIBS FRS); roles and their changes follow the User Access Maintenance FRS."}
+  - {id: PQ18, kind: Open question, text: "Volumes, growth, availability window and retention.", status: Open, format: "Numbers and periods (Annex T)", owner: "Product Owner; BDO ITG", needed: 30-Nov-2026, rc: PM-Q48}
+  - {id: PQ21, kind: Open question, text: "Which documents leave BDOI and the password convention.", status: Open, format: "List of documents; password rule", owner: "Product Owner", needed: 30-Nov-2026, rc: CLR-PM-09}
+  # --- proposed rules of the BIBS FRS
+  - {id: CLR-PM-01, kind: Proposed rule, text: "Risk-code naming per line.", status: Open, format: "Naming rule per line with an example", owner: "Head, MBS", needed: 09-Apr-2027, rc: CLR-PM-01}
+  - {id: CLR-PM-02, kind: Proposed rule, text: "Package documents: layouts; one quotation slip per round per insurer; no brochure.", status: Partly, clause: "FRPM.006.01, FRPM.012.01, Annex D, Annex F", answer: "Quotation Slip per insurer with BDOI's templates and file naming.", remaining: "Layouts of the other package documents; confirm that no brochure is generated.", format: "Layouts; yes / no", owner: "Head, TSU", needed: 30-Nov-2026, rc: CLR-PM-02}
+  - {id: CLR-PM-03, kind: Proposed rule, text: "Marketing approval by any one of TL, TH or UH.", status: Answered, clause: "FRPM.011.02", answer: "TL, TH and UH approve in turn until the Unit Head (point C05 of Annex M)."}
+  - {id: CLR-PM-04, kind: Proposed rule, text: "Retirement in place of deletion.", status: Answered, clause: "FRPM.003.04 to FRPM.003.07", answer: "Deactivation request with effective date and approver; automatic deactivation at expiry."}
+  - {id: CLR-PM-05, kind: Proposed rule, text: "One ManCom member's sign-off completes the step.", status: Answered, clause: "FRPM.014.01", answer: "All selected approvers in parallel, then the President (point C17 of Annex M)."}
+  - {id: CLR-PM-06, kind: Proposed rule, text: "Advisory recipients and channel.", status: Open, format: "Recipient units; channel", owner: "Head, TSU", needed: 16-Jul-2027, rc: CLR-PM-06}
+  - {id: CLR-PM-07, kind: Proposed rule, text: "Expiry and incentive alerts as in-system notices to TSU and MBS.", status: Partly, clause: "FRPM.004.01", answer: "Recipients of the expiry alerts: TSU Officer and TSU Team Lead.", remaining: "Channel of the alerts; whether MBS also receives them; recipients of the incentive review notice.", format: "Channel; recipients", owner: "Head, TSU; Head, MBS", needed: 30-Nov-2026, rc: CLR-PM-07}
+  - {id: CLR-PM-08, kind: Proposed rule, text: "Name and columns of the Package Status Update Report.", status: Answered, clause: "FRPM.007.01", answer: "Consolidated Placement Update Report with its columns and Thursday 08:00 schedule (point C03 of Annex M for the package creation status)."}
+  - {id: CLR-PM-09, kind: Proposed rule, text: "Generated password of protected documents, or BDOI's convention.", status: Open, format: "Password rule", owner: "Product Owner", needed: 30-Nov-2026, rc: CLR-PM-09}
+  - {id: CLR-PM-10, kind: Proposed rule, text: "Systems, format and timing of the product master changes.", status: Open, format: "System, format, timing", owner: "Product Owner; BDO ITG", needed: 30-Nov-2026, rc: CLR-PM-10}
+  - {id: CLR-PM-11, kind: Proposed rule, text: "Fixed catalogue of eight fields for client views.", status: Answered, clause: "FRPM.006.02, FRPM.012.02", answer: "The user configures which details of the Comparative Table are displayed and sent to the client."}
+  - {id: CLR-PM-12, kind: Proposed rule, text: "Client view without a field selected.", status: Open, format: "Yes / no", owner: "Head, TSU", needed: 30-Nov-2026, rc: CLR-PM-12}
+  - {id: CLR-PM-13, kind: Proposed rule, text: "Master Comparative Table with Pending rows before responses.", status: Open, format: "Yes / no", owner: "Head, TSU", needed: 30-Nov-2026, rc: CLR-PM-13}
+  - {id: CLR-PM-14, kind: Proposed rule, text: "Package remapping at migration.", status: Answered earlier, clause: "BDOI answers DMQ36 to DMQ38 of 26-Sep-2026", answer: "Legacy packages are mapped to BIBS package versions in the package map of the data migration."}
+  - {id: CLR-PM-15, kind: Proposed rule, text: "No bulk upload of product masters after go-live.", status: Open, format: "Yes / no", owner: "Head, MBS", needed: 30-Nov-2026, rc: CLR-PM-15}
+  - {id: CLR-PM-16, kind: Proposed rule, text: "No escalation beyond the stage owners.", status: Open, format: "Yes / no; escalation level and hours if yes", owner: "Head, TSU; Head, Retail Marketing", needed: 30-Nov-2026, rc: CLR-PM-16}
+  - {id: CLR-PM-17, kind: Proposed rule, text: "Stage list of the package request stepper.", status: Answered, clause: "FRPM.011.01", answer: "BDOI's list of package request statuses (alignment of names is point C16 of Annex M)."}
+  - {id: CLR-PM-18, kind: Proposed rule, text: "Scheme rate compared in a rate exception.", status: Open, format: "Rate compared with", owner: "Head, MBS", needed: 30-Nov-2026, rc: CLR-PM-18}
+  - {id: CLR-PM-19, kind: Proposed rule, text: "Difference column in percentage points with the sign.", status: Open, format: "Yes / no", owner: "Head, MBS", needed: 30-Nov-2026, rc: CLR-PM-19}
+  - {id: CLR-PM-20, kind: Proposed rule, text: "Full status labels and their short forms.", status: Answered, clause: "FRPM.011.01", answer: "BDOI's full status names."}
+  - {id: CLR-PM-21, kind: Proposed rule, text: "Packages in force at go-live set up through package requests.", status: Open, format: "Yes / no; number of packages", owner: "Head, TSU; Head, MBS", needed: 30-Nov-2026, rc: CLR-PM-21}
+  - {id: CLR-PM-22, kind: Proposed rule, text: "Automatic drafting of package renewal requests at the first expiry alert.", status: Partly, clause: "FRPM.004.01", answer: "First alert 90 days before the expiry and anniversary dates.", remaining: "Whether renewal requests are drafted automatically at the first alert.", format: "Yes / no", owner: "Head, TSU", needed: 30-Nov-2026, rc: CLR-PM-22}
+  - {id: CLR-PM-23, kind: Proposed rule, text: "Product Maintenance follows BRD-11 for sign-in and role changes.", status: Answered, clause: "Business Requirements Mapping (BRPM.001, BRPM.002, PMADD05)", answer: "Refer to User Access Maintenance FRS."}
+  - {id: CLR-PM-24, kind: Proposed rule, text: "No endorsement attribute on the incentive criteria.", status: Open, format: "Yes / no", owner: "Head, MBS", needed: 30-Nov-2026, rc: CLR-PM-24}
+
+inputs_bdoi:
+  # items of the programme inputs workbook v1.2 answered in BDOI's FRS (status, clause, answer, remaining)
+  CLR-PM-03: [Answered, "FRPM.011.02", "TL, TH and UH approve in turn until the Unit Head.", ""]
+  CLR-PM-05: [Answered, "FRPM.014.01", "All selected approvers in parallel, then the President.", ""]
+  CLR-PM-08: [Answered, "FRPM.007.01", "Consolidated Placement Update Report: name, columns, Thursday 08:00 schedule.", ""]
+  CLR-PM-11: [Answered, "FRPM.006.02, FRPM.012.02", "The user chooses the details displayed and sent to the client.", ""]
+  CLR-PM-17: [Answered, "FRPM.011.01", "BDOI's status list of the package request.", ""]
+  CLR-PM-20: [Answered, "FRPM.011.01", "BDOI's full status names.", ""]
+  CLR-PM-23: [Answered, "Business Requirements Mapping", "Refer to User Access Maintenance FRS.", ""]
+  CLR-PM-04: [Answered, "FRPM.003.04 to FRPM.003.07", "Deactivation in place of deletion.", ""]
+  PM-Q04: [Answered, "Business Requirements Mapping", "No BRPM.023 in BDOI's mapping.", ""]
+  PM-Q06: [Answered, "FRPM.002.01, FRPM.005 to FRPM.010", "Non-package records and quotation requests are in the Product Maintenance module.", ""]
+  PM-Q07: [Answered, "FRPM.003.02", "A package is a Product Matrix record of the type Package.", ""]
+  PM-Q10: [Answered, "Business Requirements Mapping (PMADD05)", "Refer to User Access Maintenance FRS.", ""]
+  PM-Q11: [Answered, "Business Requirements Mapping (BRPM.001)", "Refer to User Access Maintenance FRS.", ""]
+  PM-Q12: [Answered, "Business Requirements Mapping (PMADD05)", "Refer to User Access Maintenance FRS.", ""]
+  PM-Q14: [Answered, "FRPM.011.02", "A request from TSU or an insurer goes through the TSU approval hierarchy, not Marketing.", ""]
+  CLR-PM-02: [Partly, "FRPM.006.01, FRPM.012.01, Annex D, Annex F", "Quotation Slip per insurer with BDOI's templates.", "Layouts of the other package documents; no brochure."]
+  CLR-PM-07: [Partly, "FRPM.004.01", "Expiry alerts to the TSU Officer and TSU Team Lead.", "Channel; MBS as recipient; incentive review recipients."]
+  CLR-PM-22: [Partly, "FRPM.004.01", "First alert 90 days before expiry and anniversary.", "Automatic drafting of renewal requests."]
+  PM-Q15: [Partly, "Annex E", "Fields of the Package Request Form.", "Mandatory fields; client of a generic programme."]
+  PM-Q21: [Partly, "FRPM.006.02, FRPM.012.02", "Responses Approved, Not Covered, Others; same for non-package.", "Maximum number of rounds."]
+  PM-Q22: [Partly, "FRPM.006.02, FRPM.012.02", "Options per insurer: coverage, premium, commission, deductibles, terms, warranties, clauses, extensions.", "Panel insurers and co-insurance shares."]
+  PM-Q28: [Partly, "FRPM.003.03; New Request Process Flow", "TSU reviews and approves the package configuration.", "Business Administrator as validator; checklist."]
+  PM-Q33: [Partly, "FRPM.002.02, FRPM.003.05", "Expired packages are kept in the Expired Products tab; transactions stay accessible.", "Who may see expired packages."]
+  PM-Q38: [Partly, "FRPM.004.01", "First alert 90 days before the expiry and anniversary dates.", "Meaning of the dates; reminder days."]
+  PM-Q42: [Partly, "FRPM.003.02, FRPM.018.01", "Rule fields; incentive amount or commission rate.", "Definition of CPC2 and the other types; maintainer and approver."]
+  PM-Q46: [Partly, "FRPM.014.01", "ManCom e-mails through Microsoft 365.", "Channel and sender mailbox for insurer e-mails."]
+  PM-Q50: [Partly, "Annex A, Annex B, Annex C", "Fields per line of insurance.", "Validation rules per field; documents per product."]
+  PM-Q08: [Partly, "FRPM.002.01", "The module covers product set-up, risk codes and field management.", "Owners of the master screens (insurers, rates and taxes, sales organisation)."]
+
+# Fit-gap per BRD ID. fit: Fit | Configure | Extend | Recommend change.
+fitgap:
+  PMADD01: {bibs: "One product hierarchy: line, cover type / sub-line, subtype, product (risk code), coverages and perils per line, under maker-checker.", fit: Configure, rec: "Load BDOI's sub-lines (Annex A) and the coverages per line; state the risk-code naming convention.", impact: "Product data consistent across New Business, Renewal and reports."}
+  PMADD02: {bibs: "Clause library; insurer-specific coverages, deductibles, warranties and clauses on each package version; co-insurance roles and shares.", fit: Configure, rec: "Load the clause library and the insurer terms of the packages in force (templates PM-03, PM-06).", impact: "Insurer variability kept as data, without IT."}
+  PMADD03: {bibs: "Master Comparative Table per round with superseded masters kept; client views with chosen insurers and fields; PDF and Excel.", fit: Fit, rec: "Adopt; BDOI to give the client layout.", impact: "Auditable record of what the client saw."}
+  PMADD04: {bibs: "Negotiation rounds with revised slips; response outcomes including declines and counter-proposals; not proceeded with reason.", fit: Configure, rec: "Confirm the response list (BDOI: Approved, Not Covered, Others) and the maximum rounds.", impact: "Negotiation outcomes reported consistently."}
+  PMADD05: {bibs: "Role-based access with permissions per action; four-eyes rules; role changes through the User Access Maintenance process.", fit: Fit, rec: "Follow the User Access Maintenance FRS; confirm the role-to-action matrix of Annex J.5.", impact: "Access controlled; audit risk reduced."}
+  PMADD06: {bibs: "Post-setup validation of each package version by a user other than the maker, with checklist and test premium.", fit: Fit, rec: "Name the validator role and the checklist items.", impact: "No unvalidated package reaches sales."}
+  PMADD07: {bibs: "Incentive rules on maintained products, under maker-checker; applied at booking; review notice when a product ends.", fit: Configure, rec: "Define the incentive types and load the rules (template PM-10).", impact: "Incentives applied only to eligible products."}
+  PMADD08: {bibs: "Maintenance screen of incentive rules with history and successors.", fit: Configure, rec: "Define CPC2 and the other types.", impact: "CPC2 cannot be set up until defined."}
+  BRPM.001: {bibs: "Sign-in through BDO sign-in (Entra ID) once switched on; lock-out and sign-out per the User Access Maintenance FRS.", fit: Fit, rec: "Follow the User Access Maintenance FRS.", impact: "-"}
+  BRPM.002: {bibs: "Menus, screens and actions by role; direct requests without the right are refused and logged.", fit: Fit, rec: "Follow the User Access Maintenance FRS.", impact: "-"}
+  BRPM.003: {bibs: "Mandatory and product-specific fields per line; field rules (presence, list, range, pattern).", fit: Configure, rec: "Give the mandatory fields and rules per line (Annex A to C, template PM-02).", impact: "Complete risk data for insurers."}
+  BRPM.004: {bibs: "Validation rules by product, maintained by MBS under maker-checker.", fit: Configure, rec: "Give the rules per product type.", impact: "Fewer returned requests."}
+  BRPM.005: {bibs: "Shared document templates with product-specific sections; versioned; layouts replaced without a release.", fit: Configure, rec: "Provide the layouts of the package documents (Annex Q); load Annex D and F as the slip templates.", impact: "Documents in BDOI's layouts."}
+  BRPM.006: {bibs: "Expired and deactivated packages archived with their versions and documents; visible to authorized users; return to sale through a new request.", fit: Fit, rec: "Confirm reactivation through a package request (C11).", impact: "History kept for servicing and audit."}
+  BRPM.007: {bibs: "New business priced on the version in force; other rates only with an approved rate exception; version kept on quotation, account and invoice.", fit: Fit, rec: "Confirm the approver and validity of rate exceptions.", impact: "Outdated rates cannot be used."}
+  BRPM.008: {bibs: "Package Request Form with numbering, documents, Marketing approval and routing by source.", fit: Extend, rec: "Adopt BDOI's TL, TH, UH sequence and the Annex E fields (platform change).", impact: "Requests reach TSU complete and approved."}
+  BRPM.009: {bibs: "TSU Team Lead recommendation and TSU Head approval, never by the recommender.", fit: Fit, rec: "Keep the two TSU steps of BRPM.009 (C06).", impact: "Accountable TSU review."}
+  BRPM.010: {bibs: "Negotiation by TSU with insurers in rounds; terms final; review of negotiated terms.", fit: Fit, rec: "Adopt.", impact: "-"}
+  BRPM.011: {bibs: "Requests to create, amend, update, renew, reactivate or deactivate a package, visible in the request list.", fit: Recommend change, rec: "Deactivation in place of deletion (records kept).", impact: "No loss of history."}
+  BRPM.012: {bibs: "Quotation Slip approved and sent from the system to each insurer as a protected document; send log and resend.", fit: Fit, rec: "Adopt sending from the system; keep BDOI's file naming (C12, C23).", impact: "Evidence of transmission."}
+  BRPM.013: {bibs: "Key-in of insurer terms with history; Marketing review of client-specific terms.", fit: Fit, rec: "Adopt.", impact: "-"}
+  BRPM.014: {bibs: "Comparative Table compiled from the responses, one master per request.", fit: Fit, rec: "Adopt; QS value column (BDOI) as a platform change.", impact: "No manual spreadsheets."}
+  BRPM.015: {bibs: "Requirements with signed package slip; ManCom approval in the system; forwarded to MBS; set-up and validation.", fit: Extend, rec: "Adopt BDOI's parallel approvers then President routing (platform change).", impact: "ManCom evidence in the system."}
+  BRPM.016: {bibs: "Advisories drafted on release with the supporting documents; sent to groups and by protected e-mail.", fit: Fit, rec: "Name the recipient units.", impact: "Units informed formally."}
+  BRPM.017: {bibs: "Daily expiry check with alerts; Package Expiry list; renewal requests generated from the version in force.", fit: Extend, rec: "Set 90 days; add the anniversary alert (platform change); decide automatic drafting.", impact: "Renewals started in time."}
+  BRPM.018: {bibs: "Package Status Update Report and Placement Update Report on request, PDF and Excel.", fit: Extend, rec: "Add the weekly Thursday 08:00 run with repository (platform change).", impact: "Weekly report without manual run."}
+  BRPM.019: {bibs: "Dashboard tiles by stage with overdue marking, expiring packages, validation queue.", fit: Extend, rec: "Add BDOI's KPIs, filters and PDF and CSV export (platform change).", impact: "Management visibility as BDOI specified."}
+  BRPM.020: {bibs: "Every document e-mailed outside BDOI is password protected; password in a separate e-mail.", fit: Recommend change, rec: "Do not waive BRPM.020; give the password convention.", impact: "Data privacy of client and insurer documents."}
+  BRPM.021: {bibs: "Workflow enforcement; maker-checker; service levels with overdue alerts; reassignment.", fit: Fit, rec: "Confirm the service levels.", impact: "-"}
+  BRPM.022: {bibs: "Notifications at each step; product master changes recorded for other BDOI systems.", fit: Extend, rec: "Name the receiving systems, format and timing.", impact: "Data flow to BDOI systems."}
+  BRPM.024: {bibs: "Audit trail of every action that no user can change; per-record history; export.", fit: Extend, rec: "Add old and new values of master changes and the export file name (platform change).", impact: "Complete audit for reviewers."}
+
+# OOTB and best-practice text for the BRD IDs the Feature List does not cite.
+fitgap_extra:
+  PMADD05: {ootb: "Role-based security with roles and permissions per function.", best: "Access by role with segregation of duties; reviewed periodically."}
+  BRPM.001: {ootb: "Sign-in with user name and password; single sign-on available.", best: "Single sign-on with the bank's directory and a second factor for privileged users."}
+  BRPM.002: {ootb: "Roles and permissions per menu and function.", best: "Least privilege; access requests approved and logged."}
+  BRPM.024: {ootb: "Audit history of changes per record.", best: "Complete, unchangeable audit trail with old and new values, exportable for auditors."}
+
+# Persona and screen of the acceptance test cases of each FRPM sub-item (persona codes of brd03_cases.yaml; screen
+# keys of brd03_cases.yaml or a menu path).
+frpm_tests:
+  FRPM.001.01: [TSU_HEAD, HOME]
+  FRPM.002.01: [MKT_AO, HOME]
+  FRPM.002.02: [TSU, REQS]
+  FRPM.003.01: [MBS, PRODUCTS]
+  FRPM.003.02: [MBS, PRODUCT]
+  FRPM.003.03: [TSU_HEAD, PRODUCT]
+  FRPM.003.04: [MBS, REQ]
+  FRPM.003.05: [SYSTEM, EXPIRY]
+  FRPM.003.06: [TSU_HEAD, REQS]
+  FRPM.003.07: [TSU_HEAD, REQ]
+  FRPM.004.01: [SYSTEM, EXPIRY]
+  FRPM.005.01: [MKT_AO, "New Business > Proposal Requests"]
+  FRPM.005.02: [TSU_TL, "New Business > Proposal Requests > TSU Workbench"]
+  FRPM.006.01: [TSU, "New Business > Proposal Requests > Quotation Slips"]
+  FRPM.006.02: [TSU, "New Business > Proposal Requests > Comparative Table"]
+  FRPM.007.01: [TSU_HEAD, "Reports > Placement Update Report"]
+  FRPM.007.02: [TSU_HEAD, "Reports > Package Status Update Report"]
+  FRPM.008.01: [MKT_AO, "New Business > Proposal Requests > Comparative Table"]
+  FRPM.009.01: [TSU, "New Business > Proposal Requests > Proposal"]
+  FRPM.009.02: [TSU, "New Business > Proposal Requests > Proposal"]
+  FRPM.010.01: [MKT_AO, "New Business > Proposal Requests > Client response"]
+  FRPM.011.01: [TSU_TL, REQS]
+  FRPM.011.02: [MKT_AO, NEWREQ]
+  FRPM.011.03: [TSU_TL, REQ]
+  FRPM.012.01: [TSU, NEG]
+  FRPM.012.02: [TSU, NEG]
+  FRPM.012.03: [TSU, NEG]
+  FRPM.012.04: [TSU, COMP]
+  FRPM.013.01: [TSU, NEG]
+  FRPM.013.02: [TSU_HEAD, REQ]
+  FRPM.014.01: [MANCOM, REQM]
+  FRPM.014.02: [TSU, REQM]
+  FRPM.015.01: [MANCOM, REQM]
+  FRPM.016.01: [MBS, SETUP]
+  FRPM.016.02: [TSU_HEAD, "Product Maintenance > Validation Queue"]
+  FRPM.017.01: [TSU_TL, TSUWB]
+  FRPM.018.01: [MBS, "Product Maintenance > Incentive Criteria"]
+  FRPM.018.02: [SYSTEM, "Product Maintenance > Incentive Criteria"]
+  FRPM.019.01: [TSU, "Reports > Renewal Request Report"]
+  FRPM.019.02: [TSU, "Reports > Package Expiry Report"]
+  FRPM.019.03: [MBS, "Reports > Package Version History"]
+  FRPM.020.01: [TSU_HEAD, "Reports"]
+  FRPM.021.01: [AUDITOR, "Audit > Audit Logs"]
+  FRPM.021.02: [AUDITOR, HIST]
+  FRPM.003.08: [MBS, "Product Maintenance > Coverages & Clauses > Field Rules"]
+  FRPM.022.01: [MBS, "Product Maintenance > Coverages & Clauses"]
+  FRPM.022.02: [MBS, "Product Maintenance > Coverages & Clauses > Clause Library"]
+  FRPM.023.01: [MBS, "Product Maintenance > Products > Package Version"]
+  FRPM.024.01: [MBS, "Product Maintenance > Products > Package Version"]
+  FRPM.024.02: [MKT_AO, "New Business > Quotations > Rate scheme panel"]
+  FRPM.025.01: [TSU, ADV]
+  FRPM.026.01: [TSU, EXPIRY]
+  FRPM.027.01: [TSU, EMAILS]
+  FRPM.028.01: [SYSTEM, HOME]
+  FRPM.029.01: [TSU_TL, REQ]
+  FRPM.030.01: [SYSADMIN, "Setup & Administration > Document Templates"]
+
+# Acceptance criteria whose availability in the BIBS environment differs from the conformance of their reference FR
+# (item: {criterion number: [Yes|Partly|No, reason]}). Item-level availability of BDOI's own sub-items comes from the
+# platform status of the comparison workbook (brd03_frs_comparison.yaml, mapping).
+coverage:
+  FRPM.003.07: {2: [Partly, "A deactivation (retirement) request can be returned or voided with its reason; an explicit Reject outcome is point C04."]}
+  FRPM.004.01: {1: [Partly, "The Expiring tab lists packages within the notice days; the delivered notice is 60 days and is set to 90 at go-live (M.5)."]}
+  FRPM.007.01: {1: [No, "Reports cannot be scheduled yet; the weekly run is planned (programme gap G04)."], 3: [Partly, "Report runs are kept in the report archive; the weekly repository comes with the scheduled run."]}
+  FRPM.009.01: {1: [No, "The Final Terms for Proposal column is not available (comparison: platform status No)."]}
+  FRPM.020.01: {1: [Partly, "Saved report variants are available; sharing a saved definition between users is to be confirmed in UAT."]}
+  FRPM.029.01: {1: [Partly, "Stage notices go to the creator and the assignee; a notice to every TSU Team Lead is not sent."], 2: [Partly, "The change is recorded; its transfer waits for BDOI to name the systems (PQ16)."]}

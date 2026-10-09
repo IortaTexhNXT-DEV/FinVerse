@@ -50,7 +50,8 @@ class CashieringReportsIT {
           "CSH-CWT",
           "CSH-AR-OUTSTANDING",
           "CSH-BATCH-RUN",
-          "CSH-2307-TXN");
+          "CSH-2307-TXN",
+          "CSH-DISPOSITION-SUMMARY");
 
   @Autowired private ReportService reports;
   @Autowired private CashFixtures fx;
@@ -82,6 +83,49 @@ class CashieringReportsIT {
             }
           }
           assertThat(reports.run("CSH-APPLIED-PREM", params()).rows()).isNotEmpty();
+          return null;
+        });
+  }
+
+  @Test
+  void theReportFilesFollowTheNamingConventionAndTheAgeingBrackets() {
+    fx.pay(fx.motorInvoice().getInvoiceNo(), new BigDecimal("100.00"));
+    String date =
+        BusinessClock.today(Clock.systemUTC())
+            .format(java.time.format.DateTimeFormatter.ofPattern("MMddyyyy"));
+    as.run(
+        "cashtl",
+        () -> {
+          assertThat(reports.export("CSH-APPLIED-PREM", params(), ExportFormat.XLSX).fileName())
+              .isEqualTo("Manually Applied Payments_" + date + ".xlsx");
+          assertThat(reports.export("CSH-PAYMENT-REVERSAL", params(), ExportFormat.PDF).fileName())
+              .isEqualTo("Payment Reversals_" + date + ".pdf");
+          assertThat(reports.run("CSH-APPLIED-PREM", params()).columns())
+              .extracting(c -> c.label())
+              .containsSubsequence(
+                  "Acknowledgement Receipt No.",
+                  "Date Paid",
+                  "Amount Paid",
+                  "Invoice No.",
+                  "Payor / Client Name",
+                  "Bank",
+                  "Branch",
+                  "Check No.",
+                  "Risk Code");
+          assertThat(reports.run("CSH-AR-OUTSTANDING", params()).rows())
+              .filteredOn(r -> r.kind() == com.iortatechnxt.brokerverse.report.core.RowKind.DETAIL)
+              .isNotEmpty()
+              .allSatisfy(
+                  r ->
+                      assertThat(r.cells().get("bucket"))
+                          .isIn(
+                              "0-30",
+                              "31-60",
+                              "61-90",
+                              "91-120",
+                              "121-180",
+                              "181-365",
+                              "above 365"));
           return null;
         });
   }

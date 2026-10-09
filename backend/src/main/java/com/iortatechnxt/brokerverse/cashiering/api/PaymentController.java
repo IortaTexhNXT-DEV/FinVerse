@@ -8,11 +8,13 @@ import com.iortatechnxt.brokerverse.cashiering.api.dto.PaymentDtos.ReasonBody;
 import com.iortatechnxt.brokerverse.cashiering.api.dto.PaymentDtos.ReceivePaymentRequest;
 import com.iortatechnxt.brokerverse.cashiering.domain.CashCodes.MatchCategory;
 import com.iortatechnxt.brokerverse.cashiering.domain.CashCodes.PaymentChannel;
+import com.iortatechnxt.brokerverse.cashiering.domain.CashCodes.ReceiptKind;
 import com.iortatechnxt.brokerverse.cashiering.domain.CashCodes.ReceiptSource;
 import com.iortatechnxt.brokerverse.cashiering.domain.PaymentIntake;
 import com.iortatechnxt.brokerverse.cashiering.domain.PaymentRepository;
 import com.iortatechnxt.brokerverse.cashiering.domain.Prebooked;
 import com.iortatechnxt.brokerverse.cashiering.service.AutomatchService;
+import com.iortatechnxt.brokerverse.cashiering.service.CashieringDecisions;
 import com.iortatechnxt.brokerverse.cashiering.service.PaymentIntakeService;
 import com.iortatechnxt.brokerverse.cashiering.service.PaymentIntakeService.IntakeTarget;
 import com.iortatechnxt.brokerverse.cashiering.service.PaymentPreviewService;
@@ -49,6 +51,7 @@ public class PaymentController {
   private final PrebookedService prebooked;
   private final AutomatchService automatch;
   private final Clock clock;
+  private final CashieringDecisions decisions;
 
   /**
    * Creates the controller.
@@ -59,6 +62,7 @@ public class PaymentController {
    * @param prebooked pre-booked queue
    * @param automatch automatch
    * @param clock clock
+   * @param decisions settings of BDOI's decisions (posting step)
    */
   public PaymentController(
       PaymentIntakeService intake,
@@ -66,13 +70,15 @@ public class PaymentController {
       PaymentRepository payments,
       PrebookedService prebooked,
       AutomatchService automatch,
-      Clock clock) {
+      Clock clock,
+      CashieringDecisions decisions) {
     this.intake = intake;
     this.preview = preview;
     this.payments = payments;
     this.prebooked = prebooked;
     this.automatch = automatch;
     this.clock = clock;
+    this.decisions = decisions;
   }
 
   /**
@@ -101,6 +107,7 @@ public class PaymentController {
   @PostMapping("/payments")
   @PreAuthorize(CashAccess.RECEIPT)
   public IntakeResponse receive(@Valid @RequestBody ReceivePaymentRequest request) {
+    decisions.requireDirectIssue(ReceiptKind.AR);
     return IntakeResponse.from(
         intake.receive(
             new IntakeTarget(

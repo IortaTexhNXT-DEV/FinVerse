@@ -49,6 +49,15 @@
     <Bug pattern="SERVLET_HEADER"/>
   </Match>
   <!--
+    SERVLET_HEADER in DeviceAccessFilter: the device header is the one the device-management gateway
+    in front of the application sets for a company-issued device and removes from client requests;
+    it only lets the request reach sign-in, which still authenticates the user.
+  -->
+  <Match>
+    <Class name="com.iortatechnxt.brokerverse.system.service.DeviceAccessFilter"/>
+    <Bug pattern="SERVLET_HEADER"/>
+  </Match>
+  <!--
     SERVLET_HEADER in SecurityConfig: the presence of an Authorization header only exempts the
     request from CSRF tokens. Browsers cannot add that header to a cross-site request without a
     CORS preflight that the origin allow-list rejects, and a forged token fails authentication.

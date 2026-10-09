@@ -138,8 +138,10 @@ export interface Pickup {
 export interface PrintLine {
   receiptId: number;
   receiptNo: string;
-  status: string;
+  status: 'PRINTED' | 'FAILED' | 'SKIPPED';
   message?: string;
+  reprint: boolean;
+  certificateNo?: string;
 }
 
 export interface PrintBatch {
@@ -153,8 +155,14 @@ export interface PrintBatch {
   fileName?: string;
   createdBy: string;
   createdAt: string;
+  skippedCount: number;
+  copyLabel: PrintCopy;
+  zipped: boolean;
   lines: PrintLine[];
 }
+
+/** The copy printed: the Client's Copy, the company's copy or both (FRS.CSH.02.04.17). */
+export type PrintCopy = 'CLIENT' | 'COMPANY' | 'BOTH';
 
 export interface CwtTag {
   id: number;
@@ -232,6 +240,9 @@ export interface Series extends RecordOriginFields {
   recordStatus: string;
   maker?: string;
   authorizedBy?: string;
+  seriesYear?: number;
+  numberFormat?: string;
+  nextNumber?: string;
 }
 
 export interface SeriesBody {
@@ -243,6 +254,8 @@ export interface SeriesBody {
   toNo: number;
   atpNo?: string;
   warnAt: number;
+  seriesYear?: number;
+  numberFormat?: string;
 }
 
 export interface Layout {

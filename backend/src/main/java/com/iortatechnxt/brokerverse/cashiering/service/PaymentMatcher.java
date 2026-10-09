@@ -2,6 +2,8 @@ package com.iortatechnxt.brokerverse.cashiering.service;
 
 import com.iortatechnxt.brokerverse.account.domain.Account;
 import com.iortatechnxt.brokerverse.account.service.AccountQueryService;
+import com.iortatechnxt.brokerverse.cashiering.domain.LegacyReference;
+import com.iortatechnxt.brokerverse.cashiering.domain.LegacyReferenceRepository;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
 import java.util.ArrayList;
@@ -29,6 +31,7 @@ public class PaymentMatcher {
   private final InvoiceLedgerQueryService ledger;
   private final AccountQueryService accounts;
   private final JdbcTemplate jdbc;
+  private final LegacyReferenceRepository legacy;
 
   /**
    * Creates the matcher.
@@ -36,9 +39,14 @@ public class PaymentMatcher {
    * @param ledger invoice ledger
    * @param accounts accounts (pre-booked look-up)
    * @param jdbc JDBC
+   * @param legacy legacy numbers of the migrated accounts
    */
   public PaymentMatcher(
-      InvoiceLedgerQueryService ledger, AccountQueryService accounts, JdbcTemplate jdbc) {
+      InvoiceLedgerQueryService ledger,
+      AccountQueryService accounts,
+      JdbcTemplate jdbc,
+      LegacyReferenceRepository legacy) {
+    this.legacy = legacy;
     this.ledger = ledger;
     this.accounts = accounts;
     this.jdbc = jdbc;
@@ -52,7 +60,8 @@ public class PaymentMatcher {
    * @return the match
    */
   public Match match(Long companyId, List<String> references) {
-    for (String ref : references) {
+    List<String> keys = withLegacyNumbers(companyId, references);
+    for (String ref : keys) {
       List<OpsInvoice> invoices = invoices(companyId, ref);
       if (!invoices.isEmpty()) {
         List<OpsInvoice> live = invoices.stream().filter(i -> !i.isCancelled()).toList();
@@ -60,12 +69,35 @@ public class PaymentMatcher {
             ? new Match(Kind.CANCELLED, ref, invoices, null)
             : new Match(Kind.BOOKED, ref, live, null);
       }
+    }
+    for (String ref : keys) {
       Optional<Account> preBooked = accounts.preBooked(companyId, ref).stream().findFirst();
       if (preBooked.isPresent()) {
         return new Match(Kind.PREBOOKED, ref, List.of(), preBooked.get());
       }
     }
     return new Match(Kind.NONE, null, List.of(), null);
+  }
+
+  /**
+   * The references of a payment followed, for each, by the accounts its legacy number stands for
+   * (QPS, ISYS, Ebix, PN or Loan Application Number of an account migrated at go-live;
+   * FRS.CSH.05.01.08). Booked accounts are tried on every key before pre-booked ones.
+   *
+   * @param companyId company
+   * @param references references of the payment
+   * @return keys to try, in order
+   */
+  List<String> withLegacyNumbers(Long companyId, List<String> references) {
+    List<String> keys = new ArrayList<>();
+    for (String ref : references) {
+      keys.add(ref);
+      legacy.findByCompanyIdAndRefNoIgnoreCaseOrderByIdAsc(companyId, ref).stream()
+          .map(LegacyReference::getAccountRef)
+          .filter(a -> !keys.contains(a))
+          .forEach(keys::add);
+    }
+    return keys;
   }
 
   /**

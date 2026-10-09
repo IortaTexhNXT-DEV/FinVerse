@@ -87,6 +87,11 @@ public class SqlReport implements ReportDefinition {
     return builder.rows(rows).presorted().build();
   }
 
+  @Override
+  public String exportName(LocalDate extractionDate) {
+    return CashieringReportNames.fileName(spec.code(), extractionDate);
+  }
+
   private static Map<String, Object> normalise(Map<String, Object> row) {
     Map<String, Object> out = new LinkedHashMap<>();
     row.forEach(

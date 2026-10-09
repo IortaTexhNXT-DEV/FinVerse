@@ -98,7 +98,7 @@ public class ApplicationService {
     if (invoice.isCwtFlag()) {
       withheld =
           ApplicationPlanner.withheld(
-              premiumDue(invoice),
+              settings.pr2307OnBasicPremium() ? basicDue(invoice) : premiumDue(invoice),
               invoice.component(LedgerComponent.PR2307).getAdjusted().max(BigDecimal.ZERO),
               settings.cwtApplicationPercent());
     }
@@ -323,6 +323,20 @@ public class ApplicationService {
   static BigDecimal premiumDue(OpsInvoice invoice) {
     return invoice.getComponents().stream()
         .filter(c -> c.getComponent().isPremiumReceivable())
+        .map(OpsInvoiceComponent::due)
+        .reduce(BigDecimal.ZERO, BigDecimal::add);
+  }
+
+  /**
+   * The basic premium due of an invoice (base of the PR 2307 with {@code CASH_PR2307_BASE =
+   * BASIC}).
+   *
+   * @param invoice invoice
+   * @return basic premium due
+   */
+  static BigDecimal basicDue(OpsInvoice invoice) {
+    return invoice.getComponents().stream()
+        .filter(c -> c.getComponent() == LedgerComponent.BASIC)
         .map(OpsInvoiceComponent::due)
         .reduce(BigDecimal.ZERO, BigDecimal::add);
   }

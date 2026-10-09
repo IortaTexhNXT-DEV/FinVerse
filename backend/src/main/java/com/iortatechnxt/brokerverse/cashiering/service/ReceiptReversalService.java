@@ -24,6 +24,7 @@ import java.time.Clock;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -118,10 +119,23 @@ public class ReceiptReversalService {
    * @return journal of the receipt reversal, may be null
    */
   public String cancel(Receipt receipt, ReceiptAction action) {
+    return cancel(receipt, action, app -> false);
+  }
+
+  /**
+   * Posts a cancellation that keeps some applications (FRS.CSH.03.01.08: the payment of an account
+   * already remitted is not reversed but becomes an AR Insurer Refund).
+   *
+   * @param receipt receipt
+   * @param action approved cancellation
+   * @param keep applications not to reverse
+   * @return journal of the receipt reversal, may be null
+   */
+  public String cancel(Receipt receipt, ReceiptAction action, Predicate<Application> keep) {
     requireCancellable(receipt);
     String suffix = ":" + action.getTransactionNo();
     for (Application app : applications.findByReceiptIdOrderByIdAsc(receipt.getId())) {
-      if (app.isActive()) {
+      if (app.isActive() && !keep.test(app)) {
         OpsInvoice invoice = ledger.require(app.getInvoiceNo());
         applier.reverse(app, invoice, app.reference() + suffix, "Receipt cancelled");
       }

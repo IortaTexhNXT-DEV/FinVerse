@@ -32,6 +32,28 @@ public class PrintBatchFileStorage {
   }
 
   /**
+   * Who may open the documents of a receipt (the company's copy printed, FRS.CSH.02.04.17): the
+   * holders of the cashiering screens.
+   *
+   * @param currentUser current user
+   * @return resolver
+   */
+  @Bean
+  FileOwnerAccess receiptFileAccess(CurrentUser currentUser) {
+    return new PermissionFileAccess(
+        Set.of(BatchPrintService.RECEIPT_OWNER),
+        List.of(
+            "CASH_RECEIPT",
+            "CASH_APPROVE",
+            "CASH_APPLY",
+            "CASH_DISPOSITION",
+            "CASH_PRINT",
+            "CASH_UPLOAD",
+            "CWT_PROCESS"),
+        currentUser);
+  }
+
+  /**
    * Merged PDFs of print batches kept in the database before ST1.
    *
    * @return table

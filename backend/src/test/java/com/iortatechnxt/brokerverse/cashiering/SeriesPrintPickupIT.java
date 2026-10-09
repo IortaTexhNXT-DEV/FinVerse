@@ -24,6 +24,7 @@ import com.iortatechnxt.brokerverse.cashiering.service.ReceiptActionService;
 import com.iortatechnxt.brokerverse.cashiering.service.ReceiptSearchService;
 import com.iortatechnxt.brokerverse.cashiering.service.ReceiptSearchService.ReceiptCriteria;
 import com.iortatechnxt.brokerverse.cashiering.service.ReceiptSeriesService;
+import com.iortatechnxt.brokerverse.cashiering.service.ReceiptSeriesService.Numbering;
 import com.iortatechnxt.brokerverse.cashiering.service.ReceiptSeriesService.SeriesRequest;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
@@ -99,7 +100,15 @@ class SeriesPrintPickupIT {
             () ->
                 series.create(
                     new SeriesRequest(
-                        fx.company(), dvo, ReceiptKind.AR, prefix, 1, 2, "ATP-T", 1)));
+                        fx.company(),
+                        dvo,
+                        ReceiptKind.AR,
+                        prefix,
+                        1,
+                        2,
+                        "ATP-T",
+                        1,
+                        Numbering.PLAIN)));
     assertThat(created.getRecordStatus().name()).isEqualTo("PENDING_AUTHORIZATION");
     assertThat(as.run("approver", () -> inbox.inbox(fx.company())))
         .anyMatch(p -> p.reference().startsWith(prefix));
@@ -131,7 +140,15 @@ class SeriesPrintPickupIT {
                     () ->
                         series.create(
                             new SeriesRequest(
-                                fx.company(), dvo, ReceiptKind.OR, prefix + "O", 1, 9, null, 1))))
+                                fx.company(),
+                                dvo,
+                                ReceiptKind.OR,
+                                prefix + "O",
+                                1,
+                                9,
+                                null,
+                                1,
+                                Numbering.PLAIN))))
         .extracting("code")
         .isEqualTo("OR_HEAD_OFFICE_ONLY");
   }
@@ -193,7 +210,9 @@ class SeriesPrintPickupIT {
                             null,
                             null,
                             invoice.getInvoiceNo(),
-                            null,
+                            // the payor of the AR names the invoice: a payment pre-booked on the
+                            // new account's reference may be applied to the invoice as well
+                            invoice.getInvoiceNo(),
                             null,
                             null,
                             null,
@@ -201,6 +220,7 @@ class SeriesPrintPickupIT {
                             invoice.getPolicyNo(),
                             null,
                             ReceiptKind.AR,
+                            null,
                             null),
                         Pageable.ofSize(10))))
         .extracting(Receipt::getId)
@@ -220,6 +240,7 @@ class SeriesPrintPickupIT {
                             new BigDecimal("1100.00"),
                             BusinessClock.today(Clock.systemUTC()).minusDays(1),
                             BusinessClock.today(Clock.systemUTC()),
+                            null,
                             null,
                             null,
                             null,

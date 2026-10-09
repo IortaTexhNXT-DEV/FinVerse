@@ -72,7 +72,8 @@ public class ReceiptSeriesLoader implements MigrationLoader {
                 number(v, "from_no"),
                 number(v, "to_no"),
                 Values.text(v.get("atp_no")),
-                0));
+                0,
+                ReceiptSeriesService.Numbering.PLAIN));
     created.continueFrom(number(v, NEXT));
     created.markMigrated(
         RecordOrigin.migrated(unit.sourceSystem(), unit.legacyKey(), ctx.batchNo()));

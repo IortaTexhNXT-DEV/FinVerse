@@ -53,4 +53,12 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
       @Param("category") MatchCategory category,
       @Param("batchRef") String batchRef,
       Pageable pageable);
+
+  /**
+   * A payment by its number.
+   *
+   * @param paymentNo PAY- number
+   * @return payment
+   */
+  Optional<Payment> findByPaymentNo(String paymentNo);
 }

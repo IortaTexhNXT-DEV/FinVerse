@@ -22,6 +22,7 @@ import { cashieringApi } from './cashieringApi';
 import type { ReceiptCriteria, ReceiptSummary } from './cashieringApi';
 import { IssueOrDialog } from './IssueOrDialog';
 import { ReceiptActionsTab } from './ReceiptActionsTab';
+import { recordsApi } from './recordsApi';
 import './cashiering.css';
 
 const TABS = [
@@ -30,7 +31,7 @@ const TABS = [
 ] as const;
 type TabId = (typeof TABS)[number]['id'];
 
-type Filters = Omit<ReceiptCriteria, 'companyId'>;
+type Filters = Omit<ReceiptCriteria, 'companyId' | 'branchId' | 'printed' | 'systemOnly'>;
 
 const FILTER_FIELDS: readonly [keyof Filters, string, 'text' | 'number' | 'date'][] = [
   ['clientCode', 'Client Code', 'text'],
@@ -170,6 +171,16 @@ export default function ReceiptsPage() {
   const { can } = useAuth();
   const [tab, setTab] = useState<TabId>('receipts');
   const [issuing, setIssuing] = useState(false);
+  const navigate = useNavigate();
+  const settings = useQuery({
+    queryKey: ['cashiering', 'record-settings', companyId],
+    queryFn: () => recordsApi.settings(companyId),
+    enabled: companyId > 0,
+  });
+  const issueOr = () =>
+    settings.data?.orPostingStep
+      ? void navigate('/cashiering/records/new?kind=OR')
+      : setIssuing(true);
   return (
     <div className="stack">
       <PageHeader
@@ -178,12 +189,8 @@ export default function ReceiptsPage() {
         description="Acknowledgement receipts (AR) and Head Office official receipts (OR)."
         actions={
           can('CASH_RECEIPT') && (
-            <Button
-              variant="accent"
-              icon={<FilePlus2 size={16} />}
-              onClick={() => setIssuing(true)}
-            >
-              Issue Official Receipt
+            <Button variant="accent" icon={<FilePlus2 size={16} />} onClick={issueOr}>
+              {settings.data?.orPostingStep ? 'Create OR' : 'Issue Official Receipt'}
             </Button>
           )
         }

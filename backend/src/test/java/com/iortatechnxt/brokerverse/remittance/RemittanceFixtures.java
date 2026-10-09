@@ -12,6 +12,7 @@ import com.iortatechnxt.brokerverse.opsledger.domain.LedgerComponent;
 import com.iortatechnxt.brokerverse.opsledger.domain.MovementType;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoiceComponent;
+import com.iortatechnxt.brokerverse.opsledger.service.DisbursementQueueService;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerService;
 import com.iortatechnxt.brokerverse.opsledger.service.MovementRequest;
@@ -52,6 +53,7 @@ public class RemittanceFixtures {
   private final ExtractionService extraction;
   private final BatchService batches;
   private final BatchLineRepository lines;
+  private final DisbursementQueueService queue;
   private final TransactionTemplate tx;
   private final AsUser as;
 
@@ -64,6 +66,7 @@ public class RemittanceFixtures {
       ExtractionService extraction,
       BatchService batches,
       BatchLineRepository lines,
+      DisbursementQueueService queue,
       TransactionTemplate tx,
       AsUser as) {
     this.ledgerFixtures = ledgerFixtures;
@@ -74,6 +77,7 @@ public class RemittanceFixtures {
     this.extraction = extraction;
     this.batches = batches;
     this.lines = lines;
+    this.queue = queue;
     this.tx = tx;
     this.as = as;
   }
@@ -174,6 +178,16 @@ public class RemittanceFixtures {
     as.run("remit", () -> batches.submit(id, "Checked"));
     as.run("remittl", () -> batches.approve(id, "Approved"));
     return as.run("remit", () -> batches.get(id));
+  }
+
+  /**
+   * Disbursement approves the voucher of the batch's payment request: the ORs of the batch kept
+   * until then are issued (FRS.CSH.07.01.01).
+   */
+  public RemittanceBatch disbursementApproved(RemittanceBatch batch) {
+    Long requestId = queue.find("REMITTANCE", batch.cycleReference()).orElseThrow().getId();
+    as.run("disb", () -> queue.track(requestId, "APPROVED", null));
+    return as.run("remit", () -> batches.get(batch.getId()));
   }
 
   /** The ledger invoice now. */

@@ -22,6 +22,7 @@ import { FileDropZone } from '@/components/ui/FileDropZone';
 import { displayNameOf } from '@/api/users';
 import { DateInput } from '@/components/ui/DateInput';
 import { Notice } from '@/components/ui/Notice';
+import { ConfigUploadButton } from '@/features/configpromo/ConfigUploadButton';
 
 /**
  * Document templates (BRNB.004): the texts merged into quotations, slips, insurance advice and
@@ -52,16 +53,18 @@ export default function DocumentTemplatesPage() {
         title="Document Templates"
         description="Texts of generated documents with {{placeholders}} filled from the record."
         actions={
-          canEdit &&
-          latest && (
-            <Button
-              variant="accent"
-              icon={<FilePlus2 size={16} />}
-              onClick={() => setEditing(latest)}
-            >
-              New Version
-            </Button>
-          )
+          <>
+            <ConfigUploadButton types={['CFG_DOCUMENT_TEMPLATE']} />
+            {canEdit && latest && (
+              <Button
+                variant="accent"
+                icon={<FilePlus2 size={16} />}
+                onClick={() => setEditing(latest)}
+              >
+                New Version
+              </Button>
+            )}
+          </>
         }
       />
       <ErrorAlert error={templates.error ?? download.error} />

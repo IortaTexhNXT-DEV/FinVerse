@@ -19,6 +19,7 @@ import './disbursement.css';
 import { displayNameOf } from '@/api/users';
 import { RowActions } from '@/components/ui/RowActions';
 import { bankActions, seriesActions } from './rowActions';
+import { ConfigUploadButton } from '@/features/configpromo/ConfigUploadButton';
 
 interface BookTarget {
   bank: Bank;
@@ -216,6 +217,7 @@ export default function BanksPage() {
         section="Finance · Disbursement"
         title="Bank Accounts and Checks"
         description="Paying bank accounts, their status and check series."
+        actions={<ConfigUploadButton types={['CFG_BANK_ACCOUNT', 'CFG_CHECK_BOOK']} />}
       />
       <ErrorAlert error={banks.error ?? status.error ?? authorize.error} />
       <Card flush>

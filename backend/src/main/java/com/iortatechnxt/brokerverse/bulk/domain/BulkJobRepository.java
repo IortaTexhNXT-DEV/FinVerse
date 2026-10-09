@@ -48,4 +48,12 @@ public interface BulkJobRepository extends JpaRepository<BulkJob, Long> {
    * @return upload
    */
   Optional<BulkJob> findByJobNo(String jobNo);
+
+  /**
+   * Jobs in a status, oldest first (uploads waiting for approval).
+   *
+   * @param status status
+   * @return jobs
+   */
+  java.util.List<BulkJob> findByStatusOrderByIdAsc(BulkJobStatus status);
 }

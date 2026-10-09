@@ -16,6 +16,7 @@ import { assetsModule } from '@/features/assets/module';
 import { collectionsModule } from '@/features/collections/module';
 import { commissionModule } from '@/features/commission/module';
 import { crmModule } from '@/features/crm/module';
+import { configPromotionModule } from '@/features/configpromo/module';
 import { csfModule } from '@/features/csf/module';
 import { proposalsModule } from '@/features/proposals/module';
 import { quotationsModule } from '@/features/quotations/module';
@@ -144,6 +145,8 @@ export const NAV_GROUPS: NavGroup[] = withProductModules([
       // User Access (BRD-11) before Administration, USER_ACCESS_DESIGN 11.2.
       userAccessModule,
       adminModule,
+      // Configuration Promotion between environments, docs/modules/CONFIG_PROMOTION.md.
+      configPromotionModule,
       helpModule,
     ],
   },

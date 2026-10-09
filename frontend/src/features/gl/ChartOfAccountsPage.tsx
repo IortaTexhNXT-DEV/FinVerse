@@ -20,6 +20,7 @@ import { useGlLookups } from './useLookups';
 import { awaitsOtherChecker } from '@/utils/makerChecker';
 import { RowActions } from '@/components/ui/RowActions';
 import { accountRowActions, accountWord } from './rowActions';
+import { ConfigUploadButton } from '@/features/configpromo/ConfigUploadButton';
 
 const INDENT: Record<string, number> = { GROUP: 0, MAIN: 1, SUB: 2, MICRO: 3 };
 
@@ -74,6 +75,7 @@ export default function ChartOfAccountsPage() {
         description="Main, Sub and Micro GL heads."
         actions={
           <>
+            <ConfigUploadButton types={['CFG_LEGACY_ACCOUNT']} />
             {can('COA_UPLOAD') && (
               <Button
                 variant="secondary"

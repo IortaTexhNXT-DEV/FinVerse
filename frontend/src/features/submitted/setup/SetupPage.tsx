@@ -14,6 +14,7 @@ import { SBM_LOV, SOURCE_LABELS, SUBMITTED_SECTION } from '../common/submittedCo
 import { ControlledTable } from './ControlledTable';
 import { RuleSets } from './RuleSets';
 import { Scopes } from './Scopes';
+import { ConfigUploadButton } from '@/features/configpromo/ConfigUploadButton';
 
 const TABS = [
   { id: 'rules', label: 'Rule Sets' },
@@ -232,6 +233,7 @@ export default function SetupPage() {
         section={SUBMITTED_SECTION}
         title="Submitted Policies Setup"
         description="Rules, limits, insurer assignment, letters, approval matrix, sources and scopes."
+        actions={<ConfigUploadButton types={['CFG_APPROVAL_LIMIT']} />}
       />
       <Tabs tabs={TABS} active={tab} onChange={setTab} />
       <Body tab={tab} />

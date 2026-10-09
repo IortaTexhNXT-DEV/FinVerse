@@ -413,7 +413,7 @@ class StoredFileIT {
   void recordClassesAreParameterisedAndMappedToTheRetentionRules() throws Exception {
     api.doGet("holdofficer", "/api/v1/files/record-classes")
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.length()").value(11))
+        .andExpect(jsonPath("$.length()").value(12))
         .andExpect(jsonPath("$[?(@.code == 'STR')].legalHold").value(true))
         .andExpect(jsonPath("$[?(@.code == 'STR')].archiveToEcm").value(true));
     api.doGet("accountant", "/api/v1/files/record-classes").andExpect(status().isForbidden());

@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
@@ -57,6 +58,16 @@ public class BulkHandlerRegistry {
           "BULK_NOT_PERMITTED", "You are not allowed to use '" + handler.title() + "'");
     }
     return handler;
+  }
+
+  /**
+   * A handler by code without permission check (approval of an upload by a checker).
+   *
+   * @param code handler code
+   * @return handler, empty when unknown
+   */
+  public Optional<BulkImportHandler> find(String code) {
+    return Optional.ofNullable(handlers.get(code));
   }
 
   /**

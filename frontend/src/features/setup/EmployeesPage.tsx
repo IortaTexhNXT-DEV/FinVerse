@@ -22,6 +22,7 @@ import type { Employee, EmployeeInput } from './frbsSetupApi';
 import { employeeInput, employeeProblems, newEmployee } from './setupForms';
 import type { FieldErrors } from './setupForms';
 import { DateInput } from '@/components/ui/DateInput';
+import { ConfigUploadButton } from '@/features/configpromo/ConfigUploadButton';
 
 /**
  * Employee master with cost centres (DIS 3.30.1): used for employee payments and cash advances
@@ -85,11 +86,14 @@ export default function EmployeesPage() {
         title="Employees"
         description="Employees with their branch and cost centre, used by Disbursement."
         actions={
-          can('EMPLOYEE_MAINTAIN') && (
-            <Button variant="accent" icon={<Plus size={16} />} onClick={() => open(null)}>
-              Add Employee
-            </Button>
-          )
+          <>
+            <ConfigUploadButton types={['CFG_EMPLOYEE']} />
+            {can('EMPLOYEE_MAINTAIN') && (
+              <Button variant="accent" icon={<Plus size={16} />} onClick={() => open(null)}>
+                Add Employee
+              </Button>
+            )}
+          </>
         }
       />
       <ErrorAlert error={query.error} />

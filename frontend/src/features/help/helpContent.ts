@@ -5,6 +5,7 @@ import { ADJUSTMENT_HELP } from '@/features/adjustment/help';
 import { ADMIN_HELP } from '@/features/admin/help';
 import { ASSETS_HELP } from '@/features/assets/help';
 import { BOOKING_HELP } from '@/features/booking/help';
+import { CONFIG_PROMOTION_HELP } from '@/features/configpromo/help';
 import { CSF_HELP } from '@/features/csf/help';
 import { RENEWAL_HELP } from '@/features/renewal/help';
 import { SUBMITTED_HELP } from '@/features/submitted/help';
@@ -179,6 +180,7 @@ export const HELP_SECTIONS: HelpSection[] = [
   SETUP_HELP,
   USER_ACCESS_HELP,
   ADMIN_HELP,
+  CONFIG_PROMOTION_HELP,
   {
     id: 'account',
     module: 'Help and your account',

@@ -20,6 +20,7 @@ import { fundLevel } from './payablesMath';
 import { PettyCashFundPanel } from './PettyCashFundPanel';
 import { usePayablesLookups } from './usePayablesLookups';
 import { awaitsOtherChecker } from '@/utils/makerChecker';
+import { ConfigUploadButton } from '@/features/configpromo/ConfigUploadButton';
 
 type FundForm = Partial<FundRequest>;
 
@@ -86,21 +87,24 @@ export default function PettyCashPage() {
         title="Petty Cash"
         description="Imprest funds: cash in the box plus vouchers pending reimbursement always equals the imprest."
         actions={
-          can('MASTER_MAINTAIN') && (
-            <Button
-              variant="accent"
-              icon={<Plus size={16} />}
-              onClick={() =>
-                setForm({
-                  glAccountCode: '1102',
-                  branchId: defaultBranch || undefined,
-                  replenishBankAccountId: activeBanks[0]?.id,
-                })
-              }
-            >
-              New Fund
-            </Button>
-          )
+          <>
+            <ConfigUploadButton types={['CFG_PETTY_CASH_FUND']} />
+            {can('MASTER_MAINTAIN') && (
+              <Button
+                variant="accent"
+                icon={<Plus size={16} />}
+                onClick={() =>
+                  setForm({
+                    glAccountCode: '1102',
+                    branchId: defaultBranch || undefined,
+                    replenishBankAccountId: activeBanks[0]?.id,
+                  })
+                }
+              >
+                New Fund
+              </Button>
+            )}
+          </>
         }
       />
       <ErrorAlert error={funds.error ?? authorize.error ?? establish.error} />

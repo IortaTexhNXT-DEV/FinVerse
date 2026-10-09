@@ -361,3 +361,22 @@ adrs:
       - '+ Real-time ledger that agrees with the sub-ledgers; rule simulator before a change.'
       - '- A missing or unauthorized rule stops the business transaction with NO_ACCOUNTING_RULE until the rule is maintained.'
     sources: Solution architecture (platform modules); developer guide core flow; runbook business error codes
+  - id: ADR-21
+    title: Configuration promoted between environments as signed packages applied by the platform
+    status: Proposed
+    date: 08-Oct-2026
+    decided_by: Project (platform principle; BDOI IT to confirm the custody of the signing key)
+    area: Data
+    context:
+      - Development, SIT, UAT and production must run the same set-up (masters, configuration, rules and validations) without copying transactions or client data, and every production change must be traceable to a change request and approved by a second person.
+      - The configuration is spread over about 150 tables with references by database identifiers, which differ between environments.
+    decision:
+      - A configuration catalogue lists every configuration dataset with its natural key and references, and classifies every other table as never promoted (a build test fails on an unclassified table). Configuration moves as a versioned package of canonical JSON with a SHA-256 per file and an HMAC signature, exported by the platform in the source and imported by the platform in the target.
+      - An import is verified and compared in a dry run, approved by a second user, and applied in one transaction in dependency order with the identifiers remapped by natural key, after a snapshot that a rollback import restores. Items are deactivated, never deleted, and never when transactions use them. Production applies only in the change window with a change request number, never during a period close or a batch run.
+    alternatives:
+      - [Database dumps or SQL scripts per environment, 'Copies transactions and identifiers; no dry run, no approval, no field-level difference']
+      - [Manual re-entry on the screens of each environment, 'Slow and error-prone; environments drift apart']
+    consequences:
+      - '+ Same set-up in every environment, with a dry run, a field-level difference, maker-checker, audit, reconciliation and rollback; baselines show drift.'
+      - '- Every new table is placed in the catalogue with its change; the environments of one path share the signing key.'
+    sources: Configuration Promotion module guide; runbook "Promote configuration between environments"

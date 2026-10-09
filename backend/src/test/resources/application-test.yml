@@ -17,6 +17,9 @@ brokerverse:
       reset-max-per-address: 100000
   migration:
     masking-key: test-masking-key-for-automated-tests-0123456789
+  # Test key of the configuration packages; never used elsewhere.
+  config-promotion:
+    signing-key: test-config-promotion-signing-key-0123456789abcdef
   # No Valkey or Kafka in the test profile: in-memory cache, database fallbacks, events LOCAL.
   redis:
     enabled: false

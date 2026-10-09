@@ -13,6 +13,8 @@ import java.util.List;
  * @param instructions extra instructions
  * @param outcomeCategories outcome categories of committed rows (BRQID.006)
  * @param blocksDuplicateFiles whether an identical earlier file is refused
+ * @param requiresApproval whether a second user approves the upload before its rows apply
+ * @param exportable whether the current data can be downloaded in the template layout
  * @param textFile whether the file is a text file (.txt) in a layout of its own (bank and channel
  *     payment files, CSHID.008), rather than a sheet with the template headers
  */
@@ -23,7 +25,9 @@ public record BulkHandlerResponse(
     String instructions,
     List<String> outcomeCategories,
     boolean blocksDuplicateFiles,
-    boolean textFile) {
+    boolean textFile,
+    boolean requiresApproval,
+    boolean exportable) {
 
   /**
    * Maps a handler.
@@ -39,6 +43,8 @@ public record BulkHandlerResponse(
         h.instructions(),
         h.outcomeCategories(),
         h.blocksDuplicateFiles(),
-        h.textFile());
+        h.textFile(),
+        h.approvePermission() != null,
+        h.exportable());
   }
 }

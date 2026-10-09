@@ -19,6 +19,9 @@ sign-off per BRD"). Each document is kept once, in its latest version.
 | Document | BRD | Kind | Version | File |
 |---|---|---|---|---|
 | BIBS BDOI FeatureList vs OOTB and Best Practice v1.0 | - | Feature_List | - | [`Feature_List/BIBS_BDOI_FeatureList_vs_OOTB_and_Best_Practice_v1.0.xlsx`](Feature_List/BIBS_BDOI_FeatureList_vs_OOTB_and_Best_Practice_v1.0.xlsx) |
+| BIBS Jira Import Drop-0 | - | Backlog | - | [`Backlog/jira/BIBS_Jira_Import_Drop-0.csv`](Backlog/jira/BIBS_Jira_Import_Drop-0.csv) |
+| BIBS Jira Import Drop-1 | - | Backlog | - | [`Backlog/jira/BIBS_Jira_Import_Drop-1.csv`](Backlog/jira/BIBS_Jira_Import_Drop-1.csv) |
+| BIBS Jira Import Drop-2 | - | Backlog | - | [`Backlog/jira/BIBS_Jira_Import_Drop-2.csv`](Backlog/jira/BIBS_Jira_Import_Drop-2.csv) |
 | Core Replacement | BRD-00 | FRS | 1.1 | [`FRS/BIBS_FRS_BRD-00_Core_Replacement_v1.1.docx`](FRS/BIBS_FRS_BRD-00_Core_Replacement_v1.1.docx) |
 | Master Data Upload Guide | BRD-00 | BDOI_Inputs | 1.1 | [`BDOI_Inputs/BIBS_Templates_BRD-00_Master_Data_Upload_Guide_v1.1.docx`](BDOI_Inputs/BIBS_Templates_BRD-00_Master_Data_Upload_Guide_v1.1.docx) |
 | Master Data and Configuration Upload Templates | BRD-00 | BDOI_Inputs | 1.1 | [`BDOI_Inputs/BIBS_Templates_BRD-00_Master_Data_and_Configuration_Upload_Templates_v1.1.xlsx`](BDOI_Inputs/BIBS_Templates_BRD-00_Master_Data_and_Configuration_Upload_Templates_v1.1.xlsx) |
@@ -50,6 +53,10 @@ sign-off per BRD"). Each document is kept once, in its latest version.
 | Integration Architecture | BRD-00 | Architecture | 1.0 | [`Architecture/BIBS_Architecture_BRD-00_Integration_Architecture_v1.0.docx`](Architecture/BIBS_Architecture_BRD-00_Integration_Architecture_v1.0.docx) |
 | Security Architecture | BRD-00 | Security | 1.0 | [`Security/BIBS_Architecture_BRD-00_Security_Architecture_v1.0.docx`](Security/BIBS_Architecture_BRD-00_Security_Architecture_v1.0.docx) |
 | Solution Architecture | BRD-00 | Architecture | 1.0 | [`Architecture/BIBS_Architecture_BRD-00_Solution_Architecture_v1.0.docx`](Architecture/BIBS_Architecture_BRD-00_Solution_Architecture_v1.0.docx) |
+| Jira Import Guide | BRD-00 | Backlog | 1.0 | [`Backlog/BIBS_Backlog_BRD-00_Jira_Import_Guide_v1.0.docx`](Backlog/BIBS_Backlog_BRD-00_Jira_Import_Guide_v1.0.docx) |
+| User Story Backlog Drop-0 | BRD-00 | Backlog | 1.0 | [`Backlog/BIBS_Backlog_BRD-00_User_Story_Backlog_Drop-0_v1.0.xlsx`](Backlog/BIBS_Backlog_BRD-00_User_Story_Backlog_Drop-0_v1.0.xlsx) |
+| User Story Backlog Drop-1 | BRD-00 | Backlog | 1.0 | [`Backlog/BIBS_Backlog_BRD-00_User_Story_Backlog_Drop-1_v1.0.xlsx`](Backlog/BIBS_Backlog_BRD-00_User_Story_Backlog_Drop-1_v1.0.xlsx) |
+| User Story Backlog Drop-2 | BRD-00 | Backlog | 1.0 | [`Backlog/BIBS_Backlog_BRD-00_User_Story_Backlog_Drop-2_v1.0.xlsx`](Backlog/BIBS_Backlog_BRD-00_User_Story_Backlog_Drop-2_v1.0.xlsx) |
 | Change Management | BRD-00 | Change register summary (Word) | 1.0 | [`Change_Management/BIBS_Change_Register_BRD-00_Change_Management_Summary_v1.0.docx`](Change_Management/BIBS_Change_Register_BRD-00_Change_Management_Summary_v1.0.docx) |
 | Change Management | BRD-00 | Change register workbook (Excel) | 1.0 | [`Change_Management/BIBS_Change_Register_BRD-00_Change_Management_v1.0.xlsx`](Change_Management/BIBS_Change_Register_BRD-00_Change_Management_v1.0.xlsx) |
 | Disaster Recovery and Business Continuity Plan | BRD-00 | Operations | 1.0 | [`Operations/BIBS_Continuity_BRD-00_Disaster_Recovery_and_Business_Continuity_Plan_v1.0.docx`](Operations/BIBS_Continuity_BRD-00_Disaster_Recovery_and_Business_Continuity_Plan_v1.0.docx) |

@@ -18,7 +18,9 @@ Errors:
   * development-status wording or an internal engineering reference in the text of a client document in out/ (Word
     body, tables, headers and footers; Excel cells, sheet names, headers and footers; PowerPoint slides, tables and
     notes): built / as built / not built, designed, build waves and steps, work in progress, defects and known issues,
-    automated tests and test class names, code, file and API paths, Flyway versions and internal engineering codes.
+    automated tests and test class names, code, file and API paths, Flyway versions and internal engineering codes;
+    a word is accepted in one folder only when it is on BUILD_STATUS_ALLOWED with its reason (the name of the backlog
+    tool in the user story backlog of out/Programme/Backlog).
     Until BDOI's business users sign off each FRS, a client document presents the proposed system only (client
     instruction of 27-Sep-2026). Matching is whole-word and case-insensitive; business words such as "building",
     "built-in" or the design of a product do not match;
@@ -91,6 +93,12 @@ BUILD_STATUS: list[tuple[str, re.Pattern]] = [(label, re.compile(pat, re.I)) for
                            r"\bsprints?\b|\bjira\b|\bbacklog item\b|"
                            r"\bgap(?:s)? to (?:build|close)\b"),
 ]]
+# Words of BUILD_STATUS a folder of out/ may contain, each with its reason: (folder, label, pattern of the word).
+BUILD_STATUS_ALLOWED: list[tuple[Path, str, re.Pattern, str]] = [
+    (brand.OUT_DIR / brand.DROPS["Programme"]["folder"] / "Backlog", "development status", re.compile(r"^jira$", re.I),
+     "The user story backlog and its import guide name the tool BDOI chose for the working backlog (decision of the "
+     "BIBS Product Owner of 9-Oct-2026); the other development-status words, sprint among them, stay refused there"),
+]
 # Technical terms that a business sign-off set does not contain (client decision of 28-Sep-2026). (label, pattern);
 # whole-word and case-insensitive.
 TECHNICAL: list[tuple[str, re.Pattern]] = [(label, re.compile(pat, re.I)) for label, pat in [
@@ -293,6 +301,9 @@ def build_status() -> list[str]:
             for label, pattern in BUILD_STATUS:
                 for m in pattern.finditer(line):
                     if label == "internal code" and m.group(0) in allowed:
+                        continue
+                    if any(label == lab and folder in p.parents and word.match(m.group(0).strip())
+                           for folder, lab, word, _ in BUILD_STATUS_ALLOWED):
                         continue
                     hits[label].add(m.group(0).strip())
         if hits:

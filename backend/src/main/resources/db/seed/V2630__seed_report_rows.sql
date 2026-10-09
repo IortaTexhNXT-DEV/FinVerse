@@ -877,3 +877,183 @@ from (values
 ) as l(row_no, pn_no, borrower, days_ago)
 join rnw_lamd_report r on r.report_no = 'LMD-2026-000901'
 where not exists (select 1 from rnw_lamd_line x where x.report_id = r.id and x.row_no = l.row_no);
+
+-- =====================================================================================================
+-- 9. Data Migration: the trial run of a delta client extract with refused rows and its client matching,
+--    a delta policy load whose policies expire in the go-live renewal window, and the FY2027 true-up
+--    of the legacy invoices with its reconciliation.
+-- =====================================================================================================
+insert into mig_batch (company_id, batch_no, object_code, environment_class, mode, status, staged_count, valid_count,
+    warning_count, invalid_count, loaded_count, skipped_count, rejected_count, excluded_count, waived_count,
+    error_rate, unmapped_count, review_count, validated_by, validated_at, load_approved_by, load_approved_at,
+    loaded_by, started_at, ended_at, signed_off_at, created_at, created_by)
+select c.id, b.batch_no, b.object_code, 'NON_PRODUCTION', 'DELTA', b.status, b.staged, b.valid, 0, b.invalid,
+       b.loaded, 0, b.rejected, 0, 0, b.error_rate, 0, b.review, 'migops', now() - b.ago - interval '2 hours',
+       'miglead', now() - b.ago - interval '1 hour', 'migops', now() - b.ago, now() - b.ago + interval '4 minutes',
+       case when b.status = 'SIGNED_OFF' then now() - b.ago + interval '1 day' end, now() - b.ago - interval '3 hours',
+       'migops'
+from (values
+    ('MGB-2026-000901', 'C01', 'LOADED_WITH_REJECTS', 5, 2, 2, 2, 1, 40.00, 1, interval '6 days'),
+    ('MGB-2026-000902', 'P01', 'SIGNED_OFF', 3, 3, 0, 3, 0, 0.00, 0, interval '5 days'),
+    ('MGB-2026-000903', 'F01', 'RECONCILED', 2, 2, 0, 2, 0, 0.00, 0, interval '3 days')
+) as b(batch_no, object_code, status, staged, valid, invalid, loaded, rejected, error_rate, review, ago)
+join org_company c on c.code = 'FVI'
+where not exists (select 1 from mig_batch x where x.batch_no = b.batch_no);
+
+insert into mig_extract (company_id, extract_no, object_code, layout_code, layout_version, source_system, as_of,
+    sequence_no, mode, file_name, sha256, extracted_at, extracted_by, declared_rows, parsed_rows, staged_rows, masked,
+    status, received_by, received_at, checked_at, created_at, created_by)
+select c.id, e.extract_no, e.object_code, e.object_code, 1, 'EBIX', timestamp '2027-12-31 18:00:00', 2, 'DELTA',
+       e.object_code || '_EBIX_20271231_02.csv', md5(e.extract_no) || md5(e.object_code || e.extract_no),
+       now() - e.ago - interval '5 hours', 'ebix.extract', e.rows, e.rows, e.rows, true, 'STAGED', 'migops',
+       now() - e.ago - interval '4 hours', now() - e.ago - interval '4 hours', now() - e.ago - interval '4 hours',
+       'migops'
+from (values
+    ('MGX-2026-000901', 'C01', 5, interval '6 days'),
+    ('MGX-2026-000902', 'P01', 3, interval '5 days'),
+    ('MGX-2026-000903', 'F01', 2, interval '3 days')
+) as e(extract_no, object_code, rows, ago)
+join org_company c on c.code = 'FVI'
+where not exists (select 1 from mig_extract x where x.extract_no = e.extract_no);
+
+insert into mig_stage_row (extract_id, object_code, layout_code, row_no, legacy_key, raw_payload, row_hash, status,
+    batch_id, target_entity, target_code, message, loaded_at)
+select x.id, x.object_code, x.layout_code, r.row_no, r.legacy_key, r.payload::jsonb, md5(x.extract_no || r.legacy_key),
+       r.status, b.id, case when r.status = 'LOADED' then r.entity end, case when r.status = 'LOADED' then r.target end,
+       r.message, case when r.status = 'LOADED' then b.ended_at end
+from (values
+    ('MGX-2026-000901', 'MGB-2026-000901', 1, 'E970211', '{"client_type": "C", "name": "Pacific Harbour Logistics Inc", "tin": "008-421-337-000"}',
+     'LOADED', 'Client', 'CL-2026-000003', null),
+    ('MGX-2026-000901', 'MGB-2026-000901', 2, 'E970212', '{"client_type": "I", "last_name": "Villanueva", "first_name": "Carmela", "birth_date": "1984-02-11"}',
+     'LOADED', 'Client', 'CL-2026-000006', null),
+    ('MGX-2026-000901', 'MGB-2026-000901', 3, 'E970213', '{"client_type": "C", "name": "Sierra Agro Holdings", "tin": ""}',
+     'INVALID', null, null, null),
+    ('MGX-2026-000901', 'MGB-2026-000901', 4, 'E970214', '{"client_type": "X", "name": "Dela Rosa Trading"}',
+     'INVALID', null, null, null),
+    ('MGX-2026-000901', 'MGB-2026-000901', 5, 'E970215', '{"client_type": "I", "last_name": "Reyes", "first_name": "Jose Miguel"}',
+     'REJECTED', null, null, 'Duplicate of client E970045 already loaded; kept apart for the data owner'),
+    ('MGX-2026-000902', 'MGB-2026-000902', 1, 'EP970311', '{"policy_no": "FI-970311", "expiry": "2028-01-20"}',
+     'LOADED', 'Account', 'ARN-2026-950021', null),
+    ('MGX-2026-000902', 'MGB-2026-000902', 2, 'EP970312', '{"policy_no": "FI-970312", "expiry": "2028-02-15"}',
+     'LOADED', 'Account', 'ARN-2026-950022', null),
+    ('MGX-2026-000902', 'MGB-2026-000902', 3, 'EP970313', '{"policy_no": "MC-970313", "expiry": "2028-04-10"}',
+     'LOADED', 'Account', 'ARN-2026-950023', null),
+    ('MGX-2026-000903', 'MGB-2026-000903', 1, 'I97000311', '{"invoice_no": "I97000311", "true_up": "FY2027"}',
+     'LOADED', 'Invoice', 'I97000311', null),
+    ('MGX-2026-000903', 'MGB-2026-000903', 2, 'I97000312', '{"invoice_no": "I97000312", "true_up": "FY2027"}',
+     'LOADED', 'Invoice', 'I97000312', null)
+) as r(extract_no, batch_no, row_no, legacy_key, payload, status, entity, target, message)
+join mig_extract x on x.extract_no = r.extract_no
+join mig_batch b on b.batch_no = r.batch_no
+where not exists (select 1 from mig_stage_row s where s.extract_id = x.id and s.row_no = r.row_no);
+
+insert into mig_issue (stage_row_id, batch_id, rule_code, severity, field, value, message, resolution, created_at,
+    created_by)
+select s.id, s.batch_id, i.rule_code, i.severity, i.field, i.value, i.message, 'OPEN', now() - interval '6 days',
+       'migops'
+from (values
+    ('E970213', 'DQ-001', 'ERROR', 'tin', '', 'TIN is mandatory for a corporate client'),
+    ('E970214', 'DQ-003', 'ERROR', 'client_type', 'X', 'Code X of LOV:CLIENT_TYPE is not mapped'),
+    ('E970211', 'DQ-010', 'WARNING', 'name', 'Pacific Harbour Logistics Inc',
+     'Name differs from the matched BIBS client Pacific Harbor Logistics Inc.')
+) as i(legacy_key, rule_code, severity, field, value, message)
+join mig_stage_row s on s.legacy_key = i.legacy_key and s.layout_code = 'C01'
+join mig_batch b on b.id = s.batch_id and b.batch_no = 'MGB-2026-000901'
+where not exists (select 1 from mig_issue x where x.stage_row_id = s.id and x.rule_code = i.rule_code);
+
+insert into mig_client_match (batch_id, cluster_no, left_row_id, left_key, right_row_id, right_key, right_client_code,
+    score, matched_keys, decision, survivor_key, decided_by, decided_at, created_at, created_by)
+select b.id, m.cluster_no, s.id, s.legacy_key, null, null, m.client_code, m.score, m.keys, m.decision, m.survivor,
+       m.decided_by, case when m.decided_by is not null then now() - interval '5 days' end, now() - interval '6 days',
+       'migops'
+from (values
+    (1, 'E970211', 'CL-2026-000003', 94, 'TIN, name (similar), address', 'AUTO_MERGE', 'CL-2026-000003', null),
+    (2, 'E970212', 'CL-2026-000006', 78, 'Name, birth date', 'MERGE', 'CL-2026-000006', 'migsteward'),
+    (3, 'E970215', 'CL-2026-000002', 66, 'Name', 'KEEP_SEPARATE', null, 'migsteward')
+) as m(cluster_no, legacy_key, client_code, score, keys, decision, survivor, decided_by)
+join mig_batch b on b.batch_no = 'MGB-2026-000901'
+join mig_stage_row s on s.batch_id = b.id and s.legacy_key = m.legacy_key
+where not exists (select 1 from mig_client_match x where x.batch_id = b.id and x.cluster_no = m.cluster_no);
+
+-- Policies loaded by the delta: in force at go-live and expiring in the go-live renewal window.
+create temporary table seed_mig_policy (
+    arn varchar(30), legacy_ref varchar(30), policy_no varchar(60), cover_no varchar(30), client_code varchar(30),
+    product varchar(20), line varchar(30), insurer varchar(30), expiry date, net numeric(19, 2), gross numeric(19, 2),
+    legacy_client varchar(30)
+) on commit drop;
+
+insert into seed_mig_policy values
+('ARN-2026-950021', 'EP970311', 'FI-970311', 'EC970311', 'CL-2026-000004', 'PAR01', 'PROPERTY', 'INS-LAC',
+ date '2028-01-20', 96000.00, 120960.00, 'E970044'),
+('ARN-2026-950022', 'EP970312', 'FI-970312', 'EC970312', 'CL-2026-000006', 'PAR08', 'PROPERTY', 'INS-MGIC',
+ date '2028-02-15', 10600.00, 13361.25, 'E970212'),
+('ARN-2026-950023', 'EP970313', 'MC-970313', 'EC970313', 'CL-2026-000005', 'MTR10', 'MOTOR', 'INS-MGIC',
+ date '2028-04-10', 15450.00, 19351.13, 'E970061');
+
+insert into acc_account (company_id, arn, client_id, client_code, client_name, product_code, line_code, market_segment,
+    source_channel, insurer_code, period_from, period_to, multi_year, term_years, currency, rating_basis, net_premium,
+    gross_premium, minimum_applied, payment_arrangement, account_officer, status, payment_status, insurer_ref,
+    business_type, origin, created_at, created_by)
+select c.id, p.arn, cl.id, cl.client_code, cl.display_name, p.product, p.line, 'CBG', 'MIGRATION', p.insurer,
+       (p.expiry - interval '1 year')::date, p.expiry, false, 1, 'PHP', 'ANNUAL', p.net, p.gross, false, 'VIA_BROKER',
+       'ao', 'BOOKED', 'PAID', p.policy_no, 'RENEWAL', 'MIGRATED', now() - interval '5 days', 'mig-loader'
+from seed_mig_policy p
+join org_company c on c.code = 'FVI'
+join crm_client cl on cl.client_code = p.client_code
+where not exists (select 1 from acc_account x where x.arn = p.arn);
+
+insert into acc_account_legacy (account_id, company_id, source_system, legacy_ref, policy_no, cover_no, cover_version,
+    legacy_client_no, legacy_package_code, legacy_package_version, legacy_status, assured_name, migration_batch,
+    created_at, created_by)
+select a.id, a.company_id, 'EBIX', p.legacy_ref, p.policy_no, p.cover_no, 1, p.legacy_client, null, null, 'IN_FORCE',
+       a.client_name, 'MGB-2026-000902', now() - interval '5 days', 'mig-loader'
+from seed_mig_policy p
+join acc_account a on a.arn = p.arn
+where not exists (select 1 from acc_account_legacy x where x.account_id = a.id);
+
+insert into mig_ra_sent (company_id, legacy_policy_ref, account_arn, cover_no, expiry_date, ra_sent_date, ra_ref,
+    ra_channel, sent_to, proposed_insurer, currency, proposed_premium, sent_by, tracker_name, remarks, batch_id,
+    rolled_back, created_at, created_by)
+select b.company_id, 'EP970311', 'ARN-2026-950021', 'EC970311', date '2028-01-20', date '2027-11-05', 'RA-EBIX-2027-11873',
+       'EMAIL', 'finance@luzonagri.ph', 'INS-LAC', 'PHP', 121500.00, 'ao', 'RA tracker - corporate November 2027',
+       'Renewal advice sent from the legacy system before the freeze', b.id, false, now() - interval '5 days', 'migops'
+from mig_batch b
+where b.batch_no = 'MGB-2026-000902'
+  and not exists (select 1 from mig_ra_sent x where x.legacy_policy_ref = 'EP970311');
+
+-- FY2027 true-up of the legacy invoices: prepared, approved, posted and reconciled.
+insert into mig_recon_run (company_id, run_no, batch_id, object_code, as_of, status, break_count, run_by, run_at,
+    created_at, created_by)
+select b.company_id, 'MGR-2026-000901', b.id, 'F01', date '2027-12-31', 'EXPLAINED', 1, 'migrecon',
+       now() - interval '2 days', now() - interval '2 days', 'migrecon'
+from mig_batch b
+where b.batch_no = 'MGB-2026-000903' and not exists (select 1 from mig_recon_run x where x.run_no = 'MGR-2026-000901');
+
+insert into mig_trueup (company_id, trueup_no, reference, as_of, status, batch_id, journals_posted, items_adjusted,
+    prepared_by, prepared_at, approved_by, approved_at, posted_at, recon_run_id, remarks, created_at, created_by)
+select b.company_id, '1', 'TU1-FY2027', date '2027-12-31', 'RECONCILED', b.id, 2, 2, 'migops',
+       now() - interval '4 days', 'miglead', now() - interval '3 days', now() - interval '3 days', r.id,
+       'Premium changes booked in the legacy system after the opening extract', now() - interval '4 days', 'migops'
+from mig_batch b join mig_recon_run r on r.run_no = 'MGR-2026-000901'
+where b.batch_no = 'MGB-2026-000903' and not exists (select 1 from mig_trueup x where x.reference = 'TU1-FY2027');
+
+update mig_recon_run r set trueup_id = t.id
+from mig_trueup t where t.recon_run_id = r.id and r.run_no = 'MGR-2026-000901' and r.trueup_id is null;
+
+insert into mig_recon_line (run_id, level, measure, currency, source_value, staged_value, target_value, difference,
+    tolerance, status, break_reason, explanation, explained_by, explained_at, approved_by, approved_at, created_at,
+    created_by)
+select r.id, l.level, l.measure, l.currency, l.source, l.staged, l.target, l.target - l.source, 0, l.status, l.reason,
+       l.explanation, case when l.status = 'EXPLAINED' then 'migrecon' end,
+       case when l.status = 'EXPLAINED' then now() - interval '2 days' end,
+       case when l.status = 'EXPLAINED' then 'miglead' end,
+       case when l.status = 'EXPLAINED' then now() - interval '1 day' end, now() - interval '2 days', 'migrecon'
+from (values
+    ('L1', 'Rows received F01_EBIX_20271231_02.csv', null, 2.00, 2.00, 2.00, 'MATCHED', null, null),
+    ('TU', 'True-up of the basic premium of legacy invoices', 'PHP', 4250.00, 4250.00, 4250.00, 'MATCHED', null, null),
+    ('TU', 'True-up of the commission of legacy invoices', 'PHP', 595.00, 595.00, 595.00, 'MATCHED', null, null),
+    ('TU', 'Legacy control account LGC-DTIP after the true-up', 'PHP', 15450.00, 15450.00, 15449.40, 'EXPLAINED',
+     'Rounding', 'Rounding of the documentary stamp tax on two endorsements')
+) as l(level, measure, currency, source, staged, target, status, reason, explanation)
+join mig_recon_run r on r.run_no = 'MGR-2026-000901'
+where not exists (select 1 from mig_recon_line x where x.run_id = r.id);

@@ -681,3 +681,199 @@ from (values
 ) as f(franchise_no, cycle_no, insurer, sent_ago, remarks)
 join eb_cycle cy on cy.cycle_no = f.cycle_no
 where not exists (select 1 from eb_franchise_request x where x.franchise_no = f.franchise_no);
+
+-- =====================================================================================================
+-- 6. Submitted Policies: corporate policies in review with their IAAF, the renewal proposal letters to
+--    the bank counterpart, an expired policy whose renewal waits on a hold cover that starts after the
+--    expiry, an intake file with refused rows and a migration upload with refused rows.
+-- =====================================================================================================
+insert into sbm_intake_run (company_id, run_no, source_code, bulk_job_no, file_name, file_sha256, received, created,
+    updated, duplicate, failed, status, started_at, finished_at, created_at, created_by)
+select c.id, 'SIR-2026-000901', 'IBG_LEASING_DOC', 'BLK-2026-000913', 'ibg-leasing-policies.xlsx',
+       md5('ibg-leasing-policies-901') || md5('ibg-leasing-policies-901'), 14, 12, 0, 0, 2, 'COMPLETED',
+       (current_date - 36) + time '08:10' at time zone 'Asia/Manila',
+       (current_date - 36) + time '08:12' at time zone 'Asia/Manila',
+       (current_date - 36) + time '08:10' at time zone 'Asia/Manila', 'sbmtl'
+from org_company c
+where c.code = 'FVI' and not exists (select 1 from sbm_intake_run x where x.run_no = 'SIR-2026-000901');
+
+create temporary table seed_sbm (
+    sbm_no varchar(30), natural_key varchar(80), assured varchar(250), status varchar(30), received_ago integer,
+    inception date, expiry date, insurer varchar(30), policy_no varchar(60), sum_insured numeric(19, 2),
+    premium numeric(19, 2), location varchar(250), adequacy varchar(30), email varchar(120)
+) on commit drop;
+
+insert into seed_sbm values
+('SBM-2026-000901', 'POL:POL-C60114', 'Luzon Agri-Industrial Corp.', 'IN_REVIEW', 35, date '2026-01-15',
+ date '2027-01-15', 'INS-LAC', 'POL-C60114', 32000000.00, 480000.00, 'Warehouse 3, Calamba Premiere Park, Laguna',
+ null, 'rm.ibgleasing@bdo.com.ph'),
+('SBM-2026-000902', 'POL:POL-C60231', 'Mindanao Agri Ventures Inc.', 'IN_REVIEW', 12, date '2026-02-01',
+ date '2027-02-01', 'INS-MPI', 'POL-C60231', 21500000.00, 322500.00, 'Packing plant, Tagum City, Davao del Norte',
+ 'WITH_FINDINGS', 'rm.ibgleasing@bdo.com.ph'),
+('SBM-2026-000903', 'POL:POL-C57702', 'Pacific Harbor Logistics Inc.', 'RENEWAL_IN_PROGRESS', 60, null,
+ null, 'INS-MPI', 'POL-C57702', 27000000.00, 405000.00, 'Container yard, Port Area, Manila', 'ADEQUATE',
+ 'rm.ibgleasing@bdo.com.ph');
+
+insert into sbm_policy (company_id, sbm_no, segment, business_type, natural_key, source_code, intake_run_id,
+    date_received, assured_name, email, bank_counterpart_email, insurer_code, policy_no, inception_date, expiry_date,
+    sum_insured, total_premium, currency, property_location, occupancy, mortgagee, ffy, employee_account, no_touch,
+    migrated, has_documents, classification, bucket, insurer_approval_required, fallout, handler_username,
+    ao_username, adequacy_status, status, renewal_ref, renewal_arn, remarks, created_at, created_by)
+select c.id, s.sbm_no, 'NONCBG_CORPORATE', 'NB', s.natural_key, 'IBG_LEASING_DOC', r.id, current_date - s.received_ago,
+       s.assured, null, s.email, s.insurer, s.policy_no,
+       coalesce(s.inception, current_date - 385), coalesce(s.expiry, current_date - 20), s.sum_insured, s.premium,
+       'PHP', s.location, 'Industrial', 'BDO Leasing and Finance, Inc.', false, false, false, false, true,
+       'SUBMITTED', case when s.status = 'IN_REVIEW' then 'FOR_REVIEW' else 'FOR_RENEWAL' end, false, false, 'sbmtl',
+       'ao2', s.adequacy, s.status,
+       case when s.status = 'RENEWAL_IN_PROGRESS' then 'RNW-SBM-2026-000903' end,
+       case when s.status = 'RENEWAL_IN_PROGRESS' then 'ARN-2026-950011' end,
+       case when s.adequacy = 'WITH_FINDINGS' then 'Sum insured below the appraised value of the plant' end,
+       (current_date - s.received_ago) + time '08:11' at time zone 'Asia/Manila', 'sbmtl'
+from seed_sbm s
+join org_company c on c.code = 'FVI'
+join sbm_intake_run r on r.run_no = 'SIR-2026-000901'
+where not exists (select 1 from sbm_policy x where x.sbm_no = s.sbm_no);
+
+insert into sbm_iaaf (company_id, iaaf_no, policy_id, status, current_level, total_levels, submitted_at,
+    template_version, created_at, created_by)
+select p.company_id, i.iaaf_no, p.id, i.status, i.level, 2,
+       case when i.status = 'FOR_APPROVAL' then (current_date - 20) + time '15:00' at time zone 'Asia/Manila' end,
+       1, (current_date - i.created_ago) + time '10:00' at time zone 'Asia/Manila', 'sbmtl'
+from (values
+    ('IAAF-2026-000901', 'SBM-2026-000901', 'FOR_APPROVAL', 1, 22),
+    ('IAAF-2026-000902', 'SBM-2026-000902', 'DRAFT', 0, 9)
+) as i(iaaf_no, sbm_no, status, level, created_ago)
+join sbm_policy p on p.sbm_no = i.sbm_no
+where not exists (select 1 from sbm_iaaf x where x.iaaf_no = i.iaaf_no);
+
+insert into sbm_letter (company_id, letter_no, policy_id, rule_id, letter_type, channel, status, recipient,
+    template_code, template_version, error, sent_at, created_at, created_by)
+select p.company_id, l.letter_no, p.id, r.id, 'RENEWAL_PROPOSAL', 'BANK_COUNTERPART', l.status,
+       'rm.ibgleasing@bdo.com.ph', 'SBM_RENEWAL_PROPOSAL', 1, l.error,
+       case when l.status = 'SENT' then (current_date - l.days_ago) + time '07:05' at time zone 'Asia/Manila' end,
+       (current_date - l.days_ago) + time '07:00' at time zone 'Asia/Manila', 'sbmtl'
+from (values
+    ('SBL-2026-000901', 'SBM-2026-000901', 'SENT', null, 30),
+    ('SBL-2026-000902', 'SBM-2026-000903', 'SENT', null, 50),
+    ('SBL-2026-000903', 'SBM-2026-000902', 'FAILED', 'The mail server refused the recipient address', 8)
+) as l(letter_no, sbm_no, status, error, days_ago)
+join sbm_policy p on p.sbm_no = l.sbm_no
+join sbm_letter_rule r on r.company_id = p.company_id and r.letter_type = 'RENEWAL_PROPOSAL'
+                      and r.segment = 'NONCBG_CORPORATE'
+where not exists (select 1 from sbm_letter x where x.letter_no = l.letter_no);
+
+-- The renewal of the expired policy: account placed with the insurer, hold cover requested from the
+-- day the insurer accepted, four days after the expiry.
+insert into acc_account (company_id, arn, client_id, client_code, client_name, product_code, line_code, cover_type_code,
+    market_segment, source_channel, insurer_code, period_from, period_to, multi_year, term_years, currency,
+    total_sum_insured, rating_basis, net_premium, dst, premium_tax, vat, fst, lgt, total_charges, gross_premium,
+    commission_rate, commission, vat_on_commission, minimum_applied, payment_arrangement, contact_name, contact_email,
+    account_officer, status, payment_status, placement_slip_ref, placed_at, business_type, origin, renewal_of_ref,
+    created_at, created_by)
+select c.id, 'ARN-2026-950011', cl.id, cl.client_code, cl.display_name, 'PAR01', 'PROPERTY', 'FIRE', 'CORPORATE',
+       'EMAIL', 'INS-MPI', current_date - 20, current_date + 345, false, 1, 'PHP', 27000000.00, 'ANNUAL', 324000.00,
+       40500.00, 6480.00, 0, 6480.00, 1620.00, 55080.00, 379080.00, 20, 64800.00, 7776.00, false, 'VIA_BROKER',
+       cl.display_name, cl.email, 'ao2', 'PLACED', 'UNPAID', 'PL-2026-950011',
+       (current_date - 17) + time '16:00' at time zone 'Asia/Manila', 'RENEWAL', 'SUBMITTED_POLICY', 'POL-C57702',
+       (current_date - 28) + time '09:00' at time zone 'Asia/Manila', 'sbmtl'
+from org_company c join crm_client cl on cl.client_code = 'CL-2026-000003'
+where c.code = 'FVI' and not exists (select 1 from acc_account x where x.arn = 'ARN-2026-950011');
+
+insert into sbm_renewal (company_id, policy_id, handoff_status, manual, renewal_ref, insurer_assigned, ra_template,
+    arn, hold_cover_on, outcome, handed_off_at, message, created_at, created_by)
+select p.company_id, p.id, 'HANDED_OFF', false, 'RNW-SBM-2026-000903', 'INS-MPI', 'GENERIC', 'ARN-2026-950011',
+       current_date - 16, 'IN_PROGRESS', (current_date - 30) + time '08:00' at time zone 'Asia/Manila',
+       'Handed off to the renewal of the corporate team', (current_date - 30) + time '08:00' at time zone 'Asia/Manila',
+       'sbmtl'
+from sbm_policy p
+where p.sbm_no = 'SBM-2026-000903' and not exists (select 1 from sbm_renewal x where x.policy_id = p.id);
+
+insert into plc_hold_cover (company_id, account_id, arn, insurer_code, status, start_date, expiry_date, created_at,
+    created_by, duration_days, expiring_policy_no, remarks, requested_by)
+select a.company_id, a.id, a.arn, 'INS-MPI', 'REQUESTED', current_date - 16, current_date + 14,
+       (current_date - 16) + time '11:00' at time zone 'Asia/Manila', 'sbmtl', 30, 'POL-C57702',
+       'The insurer accepted the renewal four days after the expiry; cover from acceptance', 'sbmtl'
+from acc_account a
+where a.arn = 'ARN-2026-950011' and not exists (select 1 from plc_hold_cover x where x.arn = a.arn);
+
+-- Migration upload of submitted policies with rows refused.
+insert into bulk_job (company_id, job_no, handler_code, file_name, status, total_rows, valid_rows, invalid_rows,
+    committed_rows, failed_rows, completed_at, created_at, created_by)
+select c.id, 'BLK-2026-000914', 'SBM_MIGRATION', 'legacy-submitted-policies-batch2.xlsx', 'COMPLETED', 5, 3, 2, 3, 0,
+       now() - interval '15 days', now() - interval '15 days', 'sbmtl'
+from org_company c
+where c.code = 'FVI' and not exists (select 1 from bulk_job x where x.job_no = 'BLK-2026-000914');
+
+insert into bulk_row (job_id, row_no, data, status, messages, result_ref)
+select j.id, r.row_no, r.data, r.status, r.messages, r.result_ref
+from (values
+    (1, '{"Policy no":"POL-C51120","Assured":"Visayas Shipping Lines Inc.","Expiry date":"2027-03-14"}',
+     'COMMITTED', null, 'POL:POL-C51120'),
+    (2, '{"Policy no":"POL-C51188","Assured":"Metro Retail Holdings Corp.","Expiry date":"2027-13-01"}',
+     'INVALID', 'Expiry date: 2027-13-01 is not a date', null),
+    (3, '{"Policy no":"","Assured":"Cebu Motor Works","Expiry date":"2027-02-20"}',
+     'INVALID', 'Policy no is mandatory', null),
+    (4, '{"Policy no":"POL-C51207","Assured":"Luzon Steel Manufacturing Corp.","Expiry date":"2027-04-02"}',
+     'COMMITTED', null, 'POL:POL-C51207'),
+    (5, '{"Policy no":"POL-C51233","Assured":"Mindanao Agri Ventures Inc.","Expiry date":"2027-05-11"}',
+     'COMMITTED', null, 'POL:POL-C51233')
+) as r(row_no, data, status, messages, result_ref)
+join bulk_job j on j.job_no = 'BLK-2026-000914'
+where not exists (select 1 from bulk_row x where x.job_id = j.id);
+
+-- =====================================================================================================
+-- 7. Sanction Screening: the client of the PEP case is tagged PEP; the SLA monitor reminded the
+--    assignees and recorded the breach of the high-risk case waiting for Compliance review.
+-- =====================================================================================================
+insert into crm_client_tag (client_id, tag_code, active, created_at, created_by)
+select c.id, 'PEP', true, k.created_at + interval '2 hours', 'compoff'
+from crm_client c
+join scr_case k on k.client_id = c.id and k.case_type = 'PEP'
+where c.client_code = 'CL-2026-000006'
+  and not exists (select 1 from crm_client_tag t where t.client_id = c.id and t.tag_code = 'PEP');
+
+insert into scr_case_event (case_id, event, from_stage, to_value, remarks, actor, occurred_at, created_at, created_by)
+select k.id, e.event, k.stage, e.notified, e.remarks, 'system', now() - e.ago, now() - e.ago, 'system'
+from (values
+    ('SCR-2026-000005', 'REMINDER', 'compoff', 'Compliance review due within a day', interval '30 hours'),
+    ('SCR-2026-000005', 'BREACH', 'compoff, compchk', 'Compliance review past its due time', interval '3 hours'),
+    ('SCR-2026-000002', 'REMINDER', 'investigator', 'Investigation due within two days', interval '5 hours'),
+    ('SCR-2026-000003', 'DOCUMENT_REMINDER', 'investigator, ao',
+     'Proof of the source of funds still missing after the return', interval '20 hours')
+) as e(case_no, event, notified, remarks, ago)
+join scr_case k on k.case_no = e.case_no
+where not exists (select 1 from scr_case_event x where x.case_id = k.id and x.event = e.event);
+
+update scr_case set breached = true
+where case_no = 'SCR-2026-000005' and not breached
+  and exists (select 1 from scr_case_event e where e.case_id = scr_case.id and e.event = 'BREACH');
+
+-- =====================================================================================================
+-- 8. Renewal: the paid-off loans report of Loan Monitoring of last month; none of its PNs belongs to an
+--    open renewal of the seed (their policies were not mortgage-tagged renewals).
+-- =====================================================================================================
+insert into bulk_job (company_id, job_no, handler_code, file_name, status, total_rows, valid_rows, invalid_rows,
+    committed_rows, failed_rows, completed_at, created_at, created_by)
+select c.id, 'BLK-2026-000915', 'RNW_LAMD_REPORT', 'lamd-paid-off-loans.xlsx', 'COMPLETED', 3, 3, 0, 3, 0,
+       now() - interval '7 days', now() - interval '7 days', 'lamd'
+from org_company c
+where c.code = 'FVI' and not exists (select 1 from bulk_job x where x.job_no = 'BLK-2026-000915');
+
+insert into rnw_lamd_report (company_id, report_no, report_type, period, job_no, line_count, matched_count,
+    created_at, created_by)
+select c.id, 'LMD-2026-000901', 'PAID_OFF', to_char(date_trunc('month', current_date) - interval '1 month', 'YYYY-MM'),
+       'BLK-2026-000915', 3, 0, now() - interval '7 days', 'lamd'
+from org_company c
+where c.code = 'FVI' and not exists (select 1 from rnw_lamd_report x where x.job_no = 'BLK-2026-000915');
+
+insert into rnw_lamd_line (report_id, row_no, pn_no, loan_status, status_date, borrower, match_outcome, message,
+    created_at, created_by)
+select r.id, l.row_no, l.pn_no, 'PAID_OFF', current_date - l.days_ago, l.borrower, 'UNMATCHED',
+       'No open renewal has PN ' || l.pn_no, r.created_at, 'lamd'
+from (values
+    (1, 'PN-0144-2023-118820', 'Salazar, Quintin Ramos', 38),
+    (2, 'PN-0151-2022-097431', 'Tan, Rowena Uy', 33),
+    (3, 'PN-0102-2024-003915', 'Mendoza Agri Trading', 31)
+) as l(row_no, pn_no, borrower, days_ago)
+join rnw_lamd_report r on r.report_no = 'LMD-2026-000901'
+where not exists (select 1 from rnw_lamd_line x where x.report_id = r.id and x.row_no = l.row_no);

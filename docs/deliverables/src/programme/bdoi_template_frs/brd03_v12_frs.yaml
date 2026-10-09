@@ -1,0 +1,763 @@
+# Product Maintenance FRS in BDOI's template, version 1.2 (Business Unit review edition): the content added in this
+# round. Read by brd03_v12.py (called from build_bdoi_frs_pm.py). Every passage traces to a BRD ID of the Product
+# Maintenance BRD of 8-Oct-2026; anything beyond the BRD is a proposal logged in Annex M (section M.5).
+#
+#   revision        the row of the Document Revision Log
+#   summary         Introduction > Summary for the Business Unit Review (scope, key numbers, decisions, how to review)
+#   flows           the figures added to the Process Flow section (Graphviz sources in figures/)
+#   workflow        Annex O  Workflow and Approvals
+#   notifications   Annex P  E-mail and Notification Texts (BIBS texts quoted; proposed texts marked as proposed)
+#   documents       Annex Q  Document Prints and Output Formats
+#   reports         Annex R  Reports and Schedules
+#   integrations    Annex S  Integrations
+#   nfr             Annex T  Non-functional Requirements
+#   data_setup      Annex U  Data Set-up and Migration at Go-live
+#   change_control  Annex W  Change Control after Sign-off
+#   checklist       Annex X  Business Unit Review Checklist
+#   observations    Annex M, section M.5 (new observations of this round)
+# Annex V (assumptions, dependencies and open questions) comes from brd03_v12_items.yaml (open_items), which also
+# feeds the workbooks.
+
+revision:
+  date: 09 Oct 2026
+  version: "1.2"
+  description: "Business Unit review edition: summary for the Business Unit, end-to-end flows, workflow and approvals, e-mail texts, document formats, reports and schedules, integrations, non-functional requirements, open questions not answered in the BDOI FRS, change control, review checklist"
+  by: "iorta TechNXT Project Team (drafting)"
+
+intro_note: "Version 1.2 adds, for the review of the Business Unit, a summary of the module in pictures and tables (section 1.4), the end-to-end process flows and status life-cycles of every process of the BRD, and Annexes O to X: workflow and approvals, e-mail and notification texts, document prints, reports and schedules, integrations, non-functional requirements, data set-up at go-live, the open questions that BDOI's FRS does not answer, change control after sign-off and the review checklist. BDOI's text and the content of version 1.1 are unchanged."
+
+summary:
+  title: Summary for the Business Unit Review
+  purpose: "This section gives the Business Unit the whole module on a few pages: what is in scope, how the process runs end to end, the key numbers of this FRS, the decisions the Business Unit must take before signing, and which annexes each reviewer reads. The details are in the functional requirements (section 3), the process flows (section 4) and the annexes."
+  scope:
+    in:
+      - ["Product hierarchy, product matrix and clause library (packaged and non-packaged products)", "PMADD01, PMADD02, BRPM.003, BRPM.004"]
+      - ["Insurer-specific coverages, deductibles, warranties and clauses", "PMADD02"]
+      - ["Package requests: creation, update, deactivation and renewal, with Marketing and TSU approvals", "BRPM.008, BRPM.009, BRPM.011, BRPM.021"]
+      - ["Quotation Slips, negotiation rounds, insurer responses and Comparative Tables (master and client views)", "PMADD03, PMADD04, BRPM.010, BRPM.012, BRPM.013, BRPM.014"]
+      - ["Review of negotiated terms, product requirements and ManCom approval", "BRPM.013, BRPM.015"]
+      - ["MBS set-up, post-setup validation and release of package versions", "PMADD06, BRPM.015"]
+      - ["Latest approved rate scheme for new business and rate exceptions", "BRPM.007"]
+      - ["Advisories with supporting documents", "BRPM.016"]
+      - ["Expiry and anniversary alerts, renewal requests, deactivation and archive", "BRPM.006, BRPM.017"]
+      - ["Incentive eligibility rules (for example CPC2) on maintained products", "PMADD07, PMADD08"]
+      - ["Dashboard, Placement Update and package reports, reports builder", "BRPM.018, BRPM.019"]
+      - ["Document protection, workflow enforcement, notifications, audit trail", "BRPM.020, BRPM.021, BRPM.022, BRPM.024"]
+      - ["Non-package quotation requests, as kept in BDOI's FRS (FRPM.005 to FRPM.010)", "BRPM.010 to BRPM.014 (see C01)"]
+    out:
+      - "Computation and payout of incentives (the module keeps the rules and the indicator; PM-Q43)"
+      - "Renewal of client policies sold on a package (Renewal BRD-06)"
+      - "Transfer of product master changes to other BDOI systems until BDOI names them (BRPM.022, PQ16)"
+      - "Insurer portals: insurers are reached by e-mail (BRPM.012)"
+    other:
+      - ["Sign-in, access, roles and the role-to-action matrix", "User Access Maintenance FRS (BRPM.001, BRPM.002, PMADD05)"]
+      - ["Quotations, accounts and booking that use the packages", "New Business FRS (BRD-01)"]
+      - ["Endorsement re-rating and commission on package accounts", "Operations FRS (BRD-02)"]
+      - ["Go-live load of products, insurers and the package map", "Data Migration (BRD-13)"]
+  decisions:
+    # top 10 decisions; where = annex row
+    - ["Who validates a package configuration after set-up (TSU Head, Business Administrator or either) and the checklist", "No package reaches sales without an accountable check (PMADD06)", "Annex V (PQ09); Annex M (C06)", "Head, TSU; Head, MBS"]
+    - ["ManCom approval: approver list, the President's step and the service level", "ManCom approval time and evidence (BRPM.015)", "Annex M (C17); Annex V (PQ07)", "ManCom; Product Owner"]
+    - ["BRPM.020 document protection: confirm it is not waived and give the password convention", "Insurer and client documents leave BDOI by e-mail", "Annex M (M.2); Annex V (PQ21)", "Product Owner; BPS"]
+    - ["Service level of each workflow stage and who is alerted when it passes", "Overdue marking, alerts and reports (BRPM.021)", "Annex O; Annex V (PQ08, CLR-PM-16)", "Head, TSU; Head, Retail Marketing"]
+    - ["Expiry and anniversary dates of a package, alert days and automatic drafting of renewal requests", "Renewal of packages on time (BRPM.017)", "Annex V (PQ11, CLR-PM-22)", "Head, TSU"]
+    - ["Definition of CPC2 and the other incentive types", "Incentive rules cannot be set up without it (PMADD08)", "Annex V (PQ04)", "Head, MBS; Product Owner"]
+    - ["The other BDOI systems that receive product master changes, the format and the timing", "BRPM.022 integration", "Annex S; Annex V (PQ16)", "Product Owner; BDO ITG"]
+    - ["Layouts of the package documents not yet given (request form, Comparative Table, package slip, advisory, ManCom record)", "Documents printed and e-mailed by the module (BRPM.005, BRPM.016)", "Annex Q; Annex V (D-PM-02)", "Head, TSU; Head, MBS"]
+    - ["Packages in force at go-live: set up through package requests, and how many", "Effort of TSU and MBS before go-live (BRPM.007)", "Annex U; Annex V (CLR-PM-21)", "Head, TSU; Head, MBS"]
+    - ["Non-package quotation requests: stay in this FRS as BDOI wrote them, or in the New Business FRS", "Scope of this sign-off and the menu (C01)", "Annex M (C01)", "Product Owner; BPS"]
+  review:
+    # role, what to read, about how long
+    - ["Head, Technical Support Unit (and TSU Team Leads)", "Section 1.4; process flows; FRPM.004 to FRPM.016, FRPM.024 to FRPM.026; Annexes O, P, Q, V, X", "3 hours"]
+    - ["Head, Marketing Business Services and System Support (MBS)", "Section 1.4; FRPM.002, FRPM.003, FRPM.016, FRPM.018, FRPM.022 to FRPM.024, FRPM.030; Annexes A, J, O, U, V", "3 hours"]
+    - ["Head, Retail Marketing (and Marketing approvers)", "Section 1.4; package request flow; FRPM.011, FRPM.013.02, FRPM.024.02; Annexes E, K, P", "1.5 hours"]
+    - ["ManCom representative", "Section 1.4; FRPM.014; Annex O (ManCom stage); Annex P (ManCom e-mails)", "30 minutes"]
+    - ["Product Owner, Marketing Business System", "Section 1.4; Annexes M, V, W, X; the decisions above", "2 hours"]
+    - ["BDO ITG System Analyst and Tech Lead", "Whole document; Annexes L, R, S, T, W", "4 hours"]
+    - ["Program Manager, Business Project Services", "Section 1.4; Annexes M, V, W, X", "1 hour"]
+
+# Figures added to the Process Flow section in this round, after the figures of version 1.1.
+flows:
+  - {title: "Package Request and Approval Process Flow (Marketing and TSU)", dot: figures/brd03_request_approval.dot, caption: "Package request and approval, with the default service levels"}
+  - {title: "Negotiation, Comparative Table and Terms Review Process Flow", dot: figures/brd03_negotiation.dot, caption: "Negotiation with insurers, Comparative Table and review of the negotiated terms"}
+  - {title: "Product Master Maintenance Process Flow (Maker-Checker)", dot: figures/brd03_master_maintenance.dot, caption: "Maintenance of the product hierarchy, clauses, field rules and incentive rules"}
+lifecycles:
+  title: Status Life-cycles
+  intro: "The statuses each record passes through. Solid arrows are the main path; dashed arrows are returns; dotted arrows close the record."
+  items:
+    - {dot: figures/brd03_lc_request.dot, caption: "Life-cycle of a package request (BDOI's status names in brackets)"}
+    - {dot: figures/brd03_lc_version.dot, caption: "Life-cycle of a package version"}
+    - {dot: figures/brd03_lc_master.dot, caption: "Life-cycle of a product master record or incentive rule"}
+    - {dot: figures/brd03_lc_rate_exception.dot, caption: "Life-cycle of a rate exception"}
+    - {dot: figures/brd03_lc_quotation_request.dot, caption: "Life-cycle of a non-package quotation request (BDOI's statuses)"}
+integration_figure: {title: Integration Context Diagram, dot: figures/brd03_integration_context.dot, caption: "Integration context of Product Maintenance (business level; dashed = waits for a BDOI input)"}
+e2e_figure: {dot: figures/brd03_e2e_summary.dot, caption: "Product Maintenance end to end, by persona (numbers give the order of the steps)"}
+
+# ------------------------------------------------------------------------------------------------ Annex O
+workflow:
+  intro: "Who makes, checks and approves at each stage of every Product Maintenance process, the service level of each stage, the reminders and the return, reject and void paths. A user never approves or validates what he or she made or submitted (four eyes, FRPM.028.01). Service levels are the defaults proposed in FRPM.028.01 and are configurable values for BDOI to confirm (Annex V, PQ08)."
+  sla_rules:
+    - "The service level of a stage starts when the request enters the stage and stops when it leaves it (aging, FRPM.001.01)."
+    - "A request is marked amber from 80% of the stage service level and red once it has passed; the daily check at 09:30 raises the alert 'Work item overdue' (Annex P) and the dashboard counts the overdue requests."
+    - "Escalation beyond the owners of the stage is not in the BRD; it is an open question (Annex V, CLR-PM-16). An absent approver is replaced through reassignment (FRPM.017.01)."
+    - "Reminders of package expiry follow FRPM.004.01: from 90 days before the expiry and anniversary dates, then at the configured reminder days."
+  columns: ["Stage", "Makes / performs", "Checks / approves", "Four-eyes rule and limit", "Service level and reminder", "Return, reject or void", "FRPM"]
+  processes:
+    - name: "O.2.1 Package request and approval"
+      brd: "BRPM.008, BRPM.009, BRPM.011, BRPM.021"
+      rows:
+        - ["Create and submit", "Marketing AO or TSU Officer (source Marketing, TSU or Insurer)", "-", "Mandatory fields and documents checked on submission", "-", "Requester may void a draft", "FRPM.011.02"]
+        - ["Marketing approval (source Marketing)", "-", "Marketing TL, then TH, then UH; each approves independently", "Requester is never offered as approver; minimums of 20 policies and PHP 5,000,000.00 basic premium (Annex E)", "24 hours per level", "Return with remarks (Returned for Revision) or reject with remarks", "FRPM.011.02, FRPM.011.03"]
+        - ["TSU review and recommendation", "-", "TSU Team Lead (assigns the TSU Officer)", "Not the requester", "24 hours", "Return with remarks", "FRPM.011.03"]
+        - ["TSU Head approval", "-", "TSU Head", "Not the recommender (proposed, C06)", "24 hours", "Return or reject with remarks; approve without negotiation", "FRPM.011.03"]
+    - name: "O.2.2 Quotation Slip and negotiation"
+      brd: "BRPM.010, BRPM.012, BRPM.013, BRPM.014, PMADD03, PMADD04"
+      rows:
+        - ["Prepare Quotation Slip (each round)", "TSU Officer", "-", "-", "Within the negotiation stage, 120 hours", "-", "FRPM.012.01"]
+        - ["Approve Quotation Slip", "-", "TSU Team Lead (or the co-officer, PM-Q19)", "The preparer cannot approve", "Within the negotiation stage", "Return or reject with remarks", "FRPM.012.01"]
+        - ["Send to insurers", "System, from the approved slip", "-", "Protected document; password in a separate e-mail", "Insurer reply days: 5 (configurable)", "Resend to one insurer", "FRPM.012.01, FRPM.027.01"]
+        - ["Key in insurer terms; Comparative Table; further rounds", "TSU Officer", "-", "Every earlier value kept in the history", "-", "Not proceeded with reason (TSU Officer or TSU Head)", "FRPM.012.02 to FRPM.012.04"]
+        - ["Select insurers; terms final", "TSU Officer", "-", "Only insurers with terms can be selected; shares total 100%", "-", "-", "FRPM.013.01"]
+    - name: "O.2.3 Terms review, requirements and ManCom approval"
+      brd: "BRPM.013, BRPM.015, BRPM.016"
+      rows:
+        - ["Review of negotiated terms", "-", "TSU Head", "-", "24 hours", "Back to negotiation", "FRPM.013.02"]
+        - ["Marketing review (client-specific package)", "-", "Marketing requester", "-", "48 hours", "Changes requested (back to negotiation) or not proceeded", "FRPM.013.02"]
+        - ["Product requirements and signed package slip", "TSU Officer or TSU Team Lead", "-", "Signed package slip required", "48 hours", "-", "FRPM.014.02"]
+        - ["ManCom approval", "-", "Selected ManCom approvers in parallel, then the President", "The submitter cannot approve; Quotation Slips lock on approval", "72 hours", "Return for revision or reject with remarks", "FRPM.014.01"]
+    - name: "O.2.4 Deployment, set-up and post-setup validation"
+      brd: "BRPM.015, PMADD06, BRPM.007"
+      rows:
+        - ["Request for deployment", "TSU (BDOI's FRPM.015.01); automatic on ManCom approval proposed (C20)", "-", "Only after every required approval", "-", "-", "FRPM.015.01"]
+        - ["Set up package version (draft)", "MBS", "-", "Terms equal the ManCom-approved terms", "48 hours", "Return incomplete requirements to TSU with reason", "FRPM.016.01, FRPM.016.02"]
+        - ["Post-setup validation", "-", "TSU Head or Business Administrator (PQ09)", "The MBS user who set up cannot validate; checklist and test premium", "24 hours", "Return to MBS with reason", "FRPM.003.03, FRPM.016.02"]
+        - ["Release", "System on validation", "-", "Previous version ends the day before the new one takes effect", "-", "-", "FRPM.024.01"]
+    - name: "O.2.5 Advisories"
+      brd: "BRPM.016"
+      rows:
+        - ["Draft advisory", "System on release, renewal or deactivation", "-", "-", "-", "-", "FRPM.025.01"]
+        - ["Check and send advisory", "TSU Officer or TSU Team Lead", "-", "Signed package slip and ManCom sign-off attached", "-", "-", "FRPM.025.01"]
+    - name: "O.2.6 Deactivation and expiry"
+      brd: "BRPM.006, BRPM.011, BRPM.017"
+      rows:
+        - ["Deactivation request", "Authorized users (TSU, MBS)", "Selected approver", "The requester cannot approve", "-", "Reject with remarks", "FRPM.003.04, FRPM.003.07"]
+        - ["Automatic expiry", "System (daily check)", "-", "-", "Alerts from 90 days before expiry", "-", "FRPM.003.05, FRPM.004.01"]
+    - name: "O.2.7 Renewal of a package"
+      brd: "BRPM.017"
+      rows:
+        - ["Expiry and anniversary alerts", "System (daily check)", "-", "Once per alert day", "From 90 days; reminders at the configured days", "-", "FRPM.004.01"]
+        - ["Renewal request", "TSU Officer (generated from the expiry list, or drafted automatically if switched on)", "As O.2.1 to O.2.4", "One open renewal request per package", "As O.2.1 to O.2.4", "As O.2.1 to O.2.4", "FRPM.026.01"]
+    - name: "O.2.8 Product masters and clause library"
+      brd: "PMADD01, PMADD02, BRPM.003, BRPM.004, BRPM.005"
+      rows:
+        - ["Add or change a line, cover type, coverage, clause, field rule or template", "MBS (templates: System Administrator)", "Business Administrator", "The maker cannot authorize", "-", "Reject with reason", "FRPM.003.08, FRPM.022.01, FRPM.022.02, FRPM.030.01"]
+        - ["Product Matrix record (BDOI's FRPM.003.02)", "Authorized users", "Selected approver", "The maker cannot approve", "-", "Return or reject with remarks", "FRPM.003.02, FRPM.003.03"]
+        - ["Insurer commission rate for a new product", "Business Administrator", "New Business Approver", "The maker cannot authorize", "-", "Reject with reason", "FRPM.023.01"]
+    - name: "O.2.9 Incentive rules"
+      brd: "PMADD07, PMADD08"
+      rows:
+        - ["Add, change, activate or deactivate a rule", "MBS (incentive maintainer)", "Business Administrator", "Only on active products; no overlap in time for the same code", "-", "Reject with reason", "FRPM.018.01"]
+        - ["Review when a product ends", "System raises the notice; MBS reviews", "-", "-", "-", "-", "FRPM.018.02"]
+    - name: "O.2.10 Rate exception on new business"
+      brd: "BRPM.007"
+      rows:
+        - ["Request a rate exception", "Marketing AO", "-", "Reason required", "-", "-", "FRPM.024.02"]
+        - ["Decide the rate exception", "-", "New Business approver or Business Administrator", "The requester cannot decide; a rejection needs its reason", "Validity 30 days", "Reject with reason", "FRPM.024.02"]
+    - name: "O.2.11 Non-package quotation request (BDOI's FRPM.005 to FRPM.010)"
+      brd: "BRPM.010 to BRPM.014"
+      rows:
+        - ["Create and submit request", "Marketing AO", "Marketing approvers", "The submitter cannot approve", "As O.2.1", "Return with remarks", "FRPM.005.01, FRPM.005.02"]
+        - ["TSU review", "-", "TSU approver", "-", "24 hours", "Return or reject with remarks", "FRPM.005.02"]
+        - ["Quotation Slip per insurer", "TSU Officer", "TSU approver", "The preparer cannot approve", "-", "Return or reject with remarks", "FRPM.006.01"]
+        - ["Insurer responses, Comparative Table, insurer selection", "TSU Officer; requester selects insurers", "-", "Only insurers with responses", "-", "-", "FRPM.006.02, FRPM.008.01"]
+        - ["Proposal Slips and approval", "TSU Officer", "A second TSU officer", "The preparer cannot approve", "-", "Return or reject with remarks", "FRPM.009.01, FRPM.009.02"]
+        - ["Client response", "Marketing AO", "-", "Client acceptance e-mail attached", "-", "Rejected or returned for revision", "FRPM.010.01"]
+    - name: "O.2.12 Reassignment"
+      brd: "BRPM.021"
+      rows:
+        - ["Reassign a reviewer or approver", "Team leaders and authorized users", "-", "-", "-", "-", "FRPM.017.01"]
+  matrix_intro: "Role-to-stage matrix: M = makes or performs, A = approves, checks or validates, R = reviews or recommends, N = is notified, V = views. The role-to-action matrix of the access rights is in Annex J.5 and the User Access Maintenance FRS (PMADD05)."
+  matrix_roles: ["Mkt AO", "Mkt TL/TH/UH", "TSU Officer", "TSU TL", "TSU Head", "ManCom", "MBS", "Bus. Admin", "NB Appr.", "System"]
+  matrix:
+    - ["Package request", "M", "A", "M", "R", "A", "", "", "", "", "N"]
+    - ["Quotation Slip", "", "", "M", "A", "", "", "", "", "", "N"]
+    - ["Insurer terms and Comparative Table", "V", "V", "M", "M", "V", "", "", "", "", ""]
+    - ["Review of negotiated terms", "A", "", "", "", "A", "", "", "", "", "N"]
+    - ["Product requirements", "", "", "M", "M", "", "", "", "", "", ""]
+    - ["ManCom approval", "", "", "", "", "", "A", "", "", "", "N"]
+    - ["Set-up of the package version", "", "", "", "", "", "", "M", "", "", "N"]
+    - ["Post-setup validation", "", "", "", "", "A", "", "", "A", "", "N"]
+    - ["Advisory", "N", "N", "M", "M", "", "", "N", "", "", "M"]
+    - ["Deactivation request", "", "", "M", "", "A", "", "M", "", "", "N"]
+    - ["Expiry alerts and renewal request", "", "", "M", "N", "", "", "N", "", "", "M"]
+    - ["Product masters and clauses", "", "", "", "", "", "", "M", "A", "", ""]
+    - ["Incentive rules", "", "", "", "", "", "", "M", "A", "", "N"]
+    - ["Rate exception", "M", "", "", "", "", "", "", "A", "A", "N"]
+  status_map_intro: "BDOI's status names (FRPM.011.01, FRPM.016.01) and the stages of the package request shown on the screens, side by side. One list of names is to be agreed (Annex M, C16); the names are configurable labels."
+  status_map:
+    - ["Draft; Returned for Revision", "Draft", "FRPM.011.02"]
+    - ["Pending Marketing TL / TH / UH Approval", "For Marketing approval", "FRPM.011.02"]
+    - ["For TSU Review", "For TSU review; For TSU Head approval", "FRPM.011.03"]
+    - ["For Quotation Slip Creation; QS for Approval; QS Returned; QS Rejected; Under Negotiation", "Insurer negotiation", "FRPM.012.01, FRPM.012.02"]
+    - ["Terms Agreed", "Negotiated terms review; Marketing review", "FRPM.013.02"]
+    - ["Proposal Ready; Proposal Rejected", "Requirements preparation", "FRPM.013.01, FRPM.014.02"]
+    - ["Awaiting ManCom Approval", "For ManCom sign-off", "FRPM.014.01"]
+    - ["For Deployment; Draft Setup; Package Deployment Returned", "With MBS for set-up", "FRPM.015.01, FRPM.016.01"]
+    - ["Pending Approval; Package Deployment for Review", "Package version for validation", "FRPM.016.01, FRPM.016.02"]
+    - ["Approved; Deployed", "Released", "FRPM.016.01"]
+    - ["Rejected", "Voided; Not proceeded", "FRPM.011.03"]
+
+# ------------------------------------------------------------------------------------------------ Annex P
+notifications:
+  intro: "Every e-mail and in-system notice of Product Maintenance: what triggers it, who receives it, the channel, the subject and the full text with the parts the system fills in shown in angle brackets, the attachments, the protection and how often it is sent. 'Sent by BIBS' texts are quoted word for word from the BIBS environment; 'Proposed' texts are the wording proposed by the iorta TechNXT Project Team where BDOI's FRS asks for a notice and has not given its text, for BDOI to approve (Annex X). Documents e-mailed outside the system are password protected and the password follows in a separate e-mail (FRPM.027.01)."
+  items:
+    - id: NT-01
+      name: Package request moved to another stage
+      trigger: "Any workflow action on a package request: submit, approve, recommend, return, reject or void, terms final, ManCom approval, set-up, the release or return of its version"
+      recipients: "The creator of the request and its current assignee (not the user who made the move)"
+      channel: In-system notice
+      subject: "<request no.>: <new stage name>"
+      body: "<request description> - <comment typed with the action>"
+      attachments: "None; the notice opens the request"
+      protection: "-"
+      frequency: "Once per workflow action"
+      source: Sent by BIBS
+      frpm: "FRPM.003.03, FRPM.011.02, FRPM.011.03, FRPM.012.01, FRPM.014.01, FRPM.029.01"
+      platform: "workflow stage change"
+    - id: NT-02
+      name: Package available
+      trigger: "A package version set up from a request is validated and released"
+      recipients: "Marketing users who create quotations"
+      channel: In-system notice
+      subject: "Package available: <risk code>"
+      body: "<package name> (version <n>) sells from <effective date dd-MMM-yyyy>."
+      attachments: "None; the notice opens the package request"
+      protection: "-"
+      frequency: "Once per release"
+      source: Sent by BIBS
+      frpm: "FRPM.003.03, FRPM.016.02, FRPM.029.01"
+      platform: "Package available: "
+    - id: NT-03
+      name: Package advisory (in-system)
+      trigger: "TSU sends an advisory (Send Advisory)"
+      recipients: "The users of each recipient group chosen: Marketing, Technical Support Unit, Marketing Business Services, Processing, Operations"
+      channel: In-system notice
+      subject: "<advisory subject>"
+      body: "<advisory text as edited by TSU>"
+      attachments: "The advisory PDF and the supporting documents are listed on the request"
+      protection: "-"
+      frequency: "Once per advisory sent"
+      source: Sent by BIBS
+      frpm: "FRPM.025.01"
+      platform: "advisory notice"
+    - id: NT-04
+      name: Package expired
+      trigger: "The daily check finds a package whose expiry date has passed without a released renewal; the package becomes Inactive"
+      recipients: "TSU users and MBS users"
+      channel: In-system notice
+      subject: "Package expired: <risk code>"
+      body: "Version <n> ended on <expiry date dd-MMM-yyyy> without a renewal; the package is no longer sold for new business."
+      attachments: "None; the notice opens Package Expiry"
+      protection: "-"
+      frequency: "Once per package"
+      source: Sent by BIBS
+      frpm: "FRPM.003.05, FRPM.029.01"
+      platform: "Package expired: "
+    - id: NT-05
+      name: Package Quotation Slip to insurers
+      trigger: "A Quotation Slip is approved and sent (Approve and Send), or resent to one insurer (Resend)"
+      recipients: "The placement e-mail addresses of each insurer of the round"
+      channel: E-mail
+      subject: "Package quotation slip <PQS no.> - <package name>"
+      body: "Dear <insurer>,\n\nPlease find attached our package quotation slip <PQS no.> (round <n>) for <package name>. Kindly send your best terms on or before <reply date>. The document is password protected; the password follows separately.\n\nBDO Insurance and Reinsurance Brokers, Inc."
+      attachments: "The Quotation Slip (PDF)"
+      protection: "Password protected; password in NT-07"
+      frequency: "Once per insurer per send or resend; each send logged on the E-mails tab"
+      source: Sent by BIBS
+      frpm: "FRPM.012.01, FRPM.027.01"
+      platform: "Package quotation slip "
+    - id: NT-06
+      name: Package advisory (e-mail)
+      trigger: "An advisory is sent with e-mail addresses entered in E-mail to"
+      recipients: "The addresses entered on the advisory"
+      channel: E-mail
+      subject: "<advisory subject>"
+      body: "<advisory text>\n\nThe advisory is attached (password protected; the password follows separately).\n\nBDO Insurance and Reinsurance Brokers, Inc."
+      attachments: "The advisory (PDF) with the list of supporting documents kept in the system"
+      protection: "Password protected; password in NT-07"
+      frequency: "Once per advisory"
+      source: Sent by BIBS
+      frpm: "FRPM.025.01, FRPM.027.01"
+      platform: "The advisory is attached (password protected"
+    - id: NT-07
+      name: Password of protected documents
+      trigger: "Every e-mail sent with a password-protected attachment (NT-05, NT-06, NT-18, NT-19)"
+      recipients: "The same recipients as the document e-mail"
+      channel: E-mail (separate)
+      subject: "Password for: <subject of the document e-mail>"
+      body: "The documents sent to you in the e-mail \"<subject>\" are password protected.\n\nPassword: <password>\n\nThis e-mail was sent separately for your security. Please do not forward it."
+      attachments: "None"
+      protection: "Sent separately from the documents"
+      frequency: "One per document e-mail"
+      source: Sent by BIBS
+      frpm: "FRPM.027.01"
+      platform: "Password for: "
+    - id: NT-08
+      name: Package ending (expiry alert)
+      trigger: "The daily check (01:00) finds an active package at the expiry alert days before its expiry date (90 days, FRPM.004.01) and at each reminder day"
+      recipients: "TSU users and MBS users (in-system); the Alerts screen (System Administrator, Auditor)"
+      channel: In-system notice and alert
+      subject: "Package ending: <risk code>"
+      body: "Package <risk code> version <n> ends on <expiry date dd-MMM-yyyy> (<n> days); no renewal request yet (or: ; renewal <request no.>)"
+      attachments: "None; the notice opens Package Expiry"
+      protection: "-"
+      frequency: "Once per package per alert day; never twice for the same day"
+      source: Sent by BIBS
+      frpm: "FRPM.004.01"
+      platform: "Package ending: "
+    - id: NT-09
+      name: Incentive rule to review
+      trigger: "A package or product named by an active incentive rule expires or is deactivated"
+      recipients: "TSU users and MBS users (in-system); the Alerts screen"
+      channel: In-system notice and alert
+      subject: "Incentive criterion to review: <code>"
+      body: "Incentive criterion <code> applies to package <risk code>, which <expired or retired>: review or deactivate it"
+      attachments: "None; the notice opens Incentive Criteria"
+      protection: "-"
+      frequency: "Once per rule and product"
+      source: Sent by BIBS
+      frpm: "FRPM.018.02"
+      platform: "Incentive criterion to review: "
+    - id: NT-10
+      name: Request assigned
+      trigger: "A team leader assigns or reassigns package requests"
+      recipients: "The new assignee (not the team leader assigning to himself or herself)"
+      channel: In-system notice
+      subject: "<request no.> assigned to you"
+      body: "<request description>"
+      attachments: "None; the notice opens the request"
+      protection: "-"
+      frequency: "Once per assignment"
+      source: Sent by BIBS
+      frpm: "FRPM.017.01"
+      platform: "assigned to you"
+    - id: NT-11
+      name: Work item overdue
+      trigger: "The daily check (09:30) finds package requests past the service level of their stage"
+      recipients: "The Alerts screen (System Administrator, Auditor); the requests show as overdue on the dashboard and lists of the Product Maintenance roles"
+      channel: Alert
+      subject: "Work item overdue"
+      body: "A broking work item (quotation, proposal request or account) has stayed in its stage beyond the stage SLA"
+      attachments: "None"
+      protection: "-"
+      frequency: "Daily while overdue"
+      source: Sent by BIBS
+      frpm: "FRPM.028.01"
+      platform: "Work item overdue"
+    - id: NT-12
+      name: Rate exception decided
+      trigger: "The approver approves or rejects a rate exception requested on a new-business quotation"
+      recipients: "The Marketing AO who requested the exception"
+      channel: In-system notice
+      subject: "Rate exception <RSE no.> approved (or: rejected)"
+      body: "<quotation no.>: <requested rate and validity> approved (or: rejected) by <approver name> – <comment>."
+      attachments: "None; the notice opens the rate exception"
+      protection: "-"
+      frequency: "Once per decision"
+      source: Sent by BIBS
+      frpm: "FRPM.024.02"
+      platform: "Rate exception "
+    - id: NT-13
+      name: ManCom approval request
+      trigger: "TSU submits the product requirements to the selected ManCom approvers (Select ManCom Approvers)"
+      recipients: "Each selected ManCom approver (not the President at this step)"
+      channel: "E-mail through Microsoft 365, and in-system notice"
+      subject: "For ManCom approval: <request no.> - <package name>"
+      body: "Dear <approver>,\n\nThe product requirements of <package name> (<request no.>, <line of insurance>) are ready for your approval. Please open the request in BIBS, My Approvals, to approve, reject or return it for revision by <due date>.\n\nTechnical Support Unit, BDO Insurance and Reinsurance Brokers, Inc."
+      attachments: "None; the requirements and the signed package slip are on the request"
+      protection: "No document attached"
+      frequency: "Once per approver"
+      source: "Proposed (BDOI's FRPM.014.01 asks for the e-mail; BIBS sends the in-system notice NT-01)"
+      frpm: "FRPM.014.01"
+    - id: NT-14
+      name: ManCom approval request to the President
+      trigger: "All selected ManCom approvers have approved"
+      recipients: "The President"
+      channel: "E-mail through Microsoft 365, and in-system notice"
+      subject: "For your approval: <request no.> - <package name>"
+      body: "Dear <President>,\n\nThe ManCom approvers <names> have approved the product requirements of <package name> (<request no.>). Please open the request in BIBS, My Approvals, to approve, reject or return it for revision.\n\nTechnical Support Unit, BDO Insurance and Reinsurance Brokers, Inc."
+      attachments: "None"
+      protection: "No document attached"
+      frequency: "Once per request"
+      source: "Proposed (BDOI's FRPM.014.01)"
+      frpm: "FRPM.014.01"
+    - id: NT-15
+      name: Assignment moved to another user
+      trigger: "A reviewer or approver is replaced (FRPM.017.01)"
+      recipients: "The original reviewer or approver"
+      channel: In-system notice
+      subject: "<request no.> reassigned"
+      body: "<request no.> (<request description>) has been reassigned from you to <new assignee> by <user>."
+      attachments: "None"
+      protection: "-"
+      frequency: "Once per reassignment"
+      source: "Proposed (BDOI's FRPM.017.01; BIBS notifies the new assignee, NT-10)"
+      frpm: "FRPM.017.01"
+    - id: NT-16
+      name: Quotation Slip decision to the preparer
+      trigger: "The approver approves, returns or rejects a Quotation Slip"
+      recipients: "The TSU Officer who prepared the slip"
+      channel: In-system notice
+      subject: "<PQS no.> <approved, returned or rejected>"
+      body: "Quotation Slip <PQS no.> of <request no.> was <approved, returned or rejected> by <approver> - <remarks>."
+      attachments: "None"
+      protection: "-"
+      frequency: "Once per decision"
+      source: "Proposed (BDOI's FRPM.006.01 and FRPM.012.01)"
+      frpm: "FRPM.006.01, FRPM.012.01"
+    - id: NT-17
+      name: Weekly Placement Update Report available
+      trigger: "The scheduled run of the Consolidated Placement Update Report (Thursday 08:00)"
+      recipients: "TSU Head, TSU Team Leads and Marketing unit heads (to be confirmed, Annex V)"
+      channel: In-system notice
+      subject: "Placement Update Report of <dd-MMM-yyyy>"
+      body: "The Consolidated Placement Update Report of <dd-MMM-yyyy> (<n> requests) is available in the report repository."
+      attachments: "None; the notice opens the report repository"
+      protection: "-"
+      frequency: "Weekly"
+      source: "Proposed (BDOI's FRPM.007.01)"
+      frpm: "FRPM.007.01"
+    - id: NT-18
+      name: Non-package Quotation Slip to insurers
+      trigger: "A non-package Quotation Slip is approved and sent to the insurers approached"
+      recipients: "The placement e-mail address of each insurer approached"
+      channel: E-mail
+      subject: "Quotation slip <QS No.> - <client>"
+      body: "Dear <insurer>,\n\nPlease find attached our quotation slip <QS No.> for <product>. Kindly send your best terms on or before <reply date>. The document is password protected; the password follows separately.\n\nBDO Insurance and Reinsurance Brokers, Inc."
+      attachments: "The Quotation Slip (PDF), one per insurer"
+      protection: "Password protected; password in NT-07"
+      frequency: "Once per insurer per send"
+      source: "Sent by BIBS (New Business FRS, NT-11)"
+      frpm: "FRPM.006.01"
+    - id: NT-19
+      name: Proposal to the client (non-package)
+      trigger: "Send via Email on a released Proposal Slip"
+      recipients: "The client and any Cc"
+      channel: E-mail
+      subject: "Insurance proposal <PS No.> – <product>"
+      body: "Dear <client>,\n\nPlease find attached our proposal slip <PS No.> and the comparative table of the terms received from the insurers approached (ARN <ARN>). The documents are password protected; the password follows in a separate e-mail. To proceed, reply to this e-mail confirming your acceptance.\n\nBDO Insurance and Reinsurance Brokers, Inc."
+      attachments: "Proposal Slip (PDF); Comparative Table (PDF)"
+      protection: "Password protected; password in NT-07"
+      frequency: "Once per send"
+      source: "Sent by BIBS (New Business FRS, NT-12)"
+      frpm: "FRPM.009.02, FRPM.010.01"
+
+# ------------------------------------------------------------------------------------------------ Annex Q
+documents:
+  intro: "Every document Product Maintenance prints, e-mails or exports: purpose, recipients, format, protection, the fields in order, and the current layout in the BIBS environment where one exists. Where BDOI has not given its layout, the layout is to be provided by the Business Unit; the item number of the Business Unit requirements-collection workbook (BIBS_Inputs_BRD-03) is given. BDOI's own templates (Annex D and Annex F) are loaded as the Quotation Slip layouts."
+  items:
+    - id: DO-01
+      name: Package Request Form
+      purpose: "Record of a package request with its requested terms and approvals"
+      recipients: "Internal: Marketing, TSU, MBS (kept in the system)"
+      format: "PDF"
+      protection: "Not e-mailed; kept in the system"
+      fields: "Request number, type, scope, date, requester; client or programme; line, cover type, product; reason; requested terms by section; coverages (included, limit, deductible); rate scheme and package dates; target insurers; approvals with names and dates; signature lines Prepared by and Approved by"
+      image: "BRD-03:doc-request-form"
+      layout: "Draft layout in BIBS; BDOI layout to be provided (RC-DOC-01)"
+      frpm: "FRPM.011.02, FRPM.030.01"
+    - id: DO-02
+      name: Package Quotation Slip
+      purpose: "Request for terms sent to each insurer of a negotiation round"
+      recipients: "Insurers (placement e-mail)"
+      format: "PDF, one per insurer per round; file name QS_<Reference Number>_<Insurer>_MMDDYYYY.pdf (BDOI's convention)"
+      protection: "Password protected when e-mailed (NT-05, NT-07)"
+      fields: "As BDOI's Annex F template of the line; slip number PQS-yyyy-nnnnnn, round, reply date; requested cover by section; coverages; rate and minimum premium; period; contact"
+      image: "BRD-03:doc-quotation-slip"
+      layout: "BDOI's Annex F templates (given)"
+      frpm: "FRPM.012.01, FRPM.027.01"
+    - id: DO-03
+      name: Comparative Table (master and client view)
+      purpose: "Side-by-side comparison of the insurer responses; the master is kept for audit, client views are derived from it"
+      recipients: "Internal (master); client (client view, through Marketing)"
+      format: "PDF and Excel (.xlsx)"
+      protection: "Password protected when e-mailed"
+      fields: "Title (Audit master or client view title), request, round; one column per insurer (and the QS value column); rows per selected field: outcome, rate, minimum premium, coverages, deductibles, conditions and warranties, valid until, remarks; lowest rate marked"
+      image: "BRD-03:doc-comparative"
+      layout: "Draft layout in BIBS; client layout to be provided (RC-DOC-02)"
+      frpm: "FRPM.006.02, FRPM.012.02, FRPM.012.04"
+    - id: DO-04
+      name: Package slip
+      purpose: "Agreed package terms, printed, signed and uploaded before the ManCom approval"
+      recipients: "Internal: TSU, ManCom, MBS"
+      format: "PDF"
+      protection: "Not e-mailed; kept in the system"
+      fields: "Package name and code; insurers with role and share; rate scheme; coverages and insurer terms; clauses; package dates; signature blocks"
+      image: "BRD-03:doc-package-slip"
+      layout: "Draft layout in BIBS; BDOI layout to be provided (RC-DOC-03)"
+      frpm: "FRPM.014.02"
+    - id: DO-05
+      name: ManCom approval record
+      purpose: "Evidence of the ManCom approval when no signed sheet is uploaded"
+      recipients: "Internal (kept on the request)"
+      format: "PDF"
+      protection: "Not e-mailed"
+      fields: "Request, package, line, client or programme; reference MC-<request no.>; decision; approved by; date and time; comment"
+      image: "BRD-03:doc-mancom-signoff"
+      layout: "Standard layout of the system; BDOI to confirm (RC-DOC-04)"
+      frpm: "FRPM.014.01"
+    - id: DO-06
+      name: Package advisory (new, updated, renewed, deactivated)
+      purpose: "Notice to the business units that a package is ready, renewed, updated or deactivated"
+      recipients: "Recipient groups chosen by TSU; e-mail addresses entered"
+      format: "PDF, stored on the request and e-mailed when addresses are given"
+      protection: "Password protected when e-mailed (NT-06, NT-07)"
+      fields: "Subject; advisory type; package and version; effective date; what changed; supporting documents (signed package slip, ManCom approval) with file names; instructions to units"
+      image: "BRD-03:doc-advisory"
+      layout: "Draft layout in BIBS; BDOI layout and wording to be provided (RC-DOC-05)"
+      frpm: "FRPM.025.01"
+    - id: DO-07
+      name: Non-package Quotation Slip
+      purpose: "Request for terms sent to each insurer approached for a non-package risk"
+      recipients: "Insurers"
+      format: "PDF, one per insurer; file name QS_<Reference Number>_<Insurer>_MMDDYYYY.pdf"
+      protection: "Password protected (NT-18, NT-07)"
+      fields: "As BDOI's Annex D template of the line"
+      image: "BRD-01:doc-quotation-slip"
+      layout: "BDOI's Annex D templates (given)"
+      frpm: "FRPM.006.01"
+    - id: DO-08
+      name: Proposal Slip (non-package)
+      purpose: "Proposal to the client with the final terms of one selected insurer"
+      recipients: "Client (through Marketing)"
+      format: "PDF, versioned; file name ProposalSlip_<Reference Number>_<Insurer Name>_<Version Number>_MMDDYYYY.pdf"
+      protection: "Password protected when e-mailed (NT-19, NT-07)"
+      fields: "Client, product and risk; selected insurer; Final Terms for Proposal; validity; signature"
+      image: "BRD-01:doc-proposal-slip"
+      layout: "Layout of the New Business FRS; BDOI to confirm (RC-DOC-06)"
+      frpm: "FRPM.009.02, FRPM.013.01"
+    - id: DO-09
+      name: Consolidated Placement Update Report
+      purpose: "Weekly status of the quotation requests active or processed in the period"
+      recipients: "TSU and Marketing (repository)"
+      format: "Excel (.xlsx); file name PlacementUpdate_MMDDYYYY.xlsx"
+      protection: "Internal"
+      fields: "Item No.; Insured's Name; Marketing Segment; Team; Account Officer; TSU Handler; Line of Insurance; Sub-Line; PRF Received Date; PRF Received Time; Aging; Status (Placement Update Status)"
+      image: ""
+      layout: "BDOI's FRPM.007.01 (given)"
+      frpm: "FRPM.007.01"
+    - id: DO-10
+      name: Package reports (status, expiry, version history)
+      purpose: "Monitoring of package requests and packages (Annex R)"
+      recipients: "Authorized users"
+      format: "PDF, Excel, CSV"
+      protection: "Internal"
+      fields: "Columns as in Annex R"
+      image: ""
+      layout: "Draft columns in BIBS; BDOI to confirm (RC-RPT-01)"
+      frpm: "FRPM.007.02, FRPM.019.01 to FRPM.019.03"
+    - id: DO-11
+      name: Dashboard and list exports
+      purpose: "Export of the dashboard drill-down and of the Product Matrix and request lists"
+      recipients: "The user who exports"
+      format: "Excel (.xlsx), PDF, CSV (BDOI's FRPM.001.01)"
+      protection: "Internal; the export holds only the rows the user may see"
+      fields: "The columns shown on the screen, in the same order"
+      image: ""
+      layout: "As the screen"
+      frpm: "FRPM.001.01, FRPM.003.01"
+    - id: DO-12
+      name: Audit log export
+      purpose: "Extract of the audit logs for review"
+      recipients: "Auditor, authorized users"
+      format: "CSV or Excel; file name Audit Logs_MMDDYYYY"
+      protection: "Internal"
+      fields: "Timestamp; Module; Reference Number; Client / Assured's Name; Action Type; Description; Old Value; New Value; Performed By; Remarks"
+      image: ""
+      layout: "BDOI's FRPM.021.01 (given)"
+      frpm: "FRPM.021.01, FRPM.021.02"
+
+# ------------------------------------------------------------------------------------------------ Annex R
+reports:
+  intro: "Every report of Product Maintenance and every scheduled run (alerts, jobs, weekly reports), with frequency and time, recipients, filters, columns, sort and output format. Times are Philippine time."
+  items:
+    - ["Dashboard (KPIs and drill-down)", "On screen, refreshed with the filters", "Product Maintenance users, by role", "Period From and To, TSU Officer, Product Line, Package Type", "Request Number; Request Type; Product Line; Requested By; Assigned TSU Officer; Current Status; Submission Date; Aging", "Aging, oldest first", "Screen; Excel, PDF, CSV", "FRPM.001.01"]
+    - ["Consolidated Placement Update Report", "Weekly, Thursday 08:00 (configurable); also on request for one or all requests", "TSU, Marketing (repository)", "Reporting period", "Item No.; Insured's Name; Marketing Segment; Team; Account Officer; TSU Handler; Line of Insurance; Sub-Line; PRF Received Date; PRF Received Time; Aging; Status", "Item No.", "Excel; PlacementUpdate_MMDDYYYY.xlsx", "FRPM.007.01"]
+    - ["Package Status Update Report", "On request (one request or all)", "TSU, Marketing approvers, MBS, Auditor", "Request No.; Status; Request Type; Line; Insurer; Package Ends Within (days)", "Request No.; Type; Client / Programme; Package; Product; Version; Stage; Days in Stage; Package End; Rate %; Insurers; Last Action; On / By", "Request number", "PDF, Excel, CSV", "FRPM.007.02"]
+    - ["Renewal Request Report", "On request", "TSU", "Reporting period", "Package; Version; Expiry Date; Days Left; Renewal Request; Renewal Stage", "Expiry date", "Preview; Excel, PDF", "FRPM.019.01"]
+    - ["Package Expiry Report", "On request", "TSU, MBS", "Ending Within (days), default 90", "Product; Package; Version; Package End; Days Left; Anniversary; Renewal Request; Renewal Stage", "Package end date", "PDF, Excel, CSV", "FRPM.019.02"]
+    - ["Package Version History", "On request", "MBS, TSU Head, Auditor", "Product Code (optional)", "Product; Version; Status; Effective From / To; Package End; Submitted By; Validated By; Validated On; Validation Result; Source Request; Change Summary", "Product, then version", "PDF, Excel, CSV", "FRPM.019.03"]
+    - ["Reports Builder (custom reports)", "On request; saved definitions", "Authorized users", "Fields of the chosen data source; date range", "As chosen", "As chosen", "Excel, PDF, CSV", "FRPM.020.01"]
+    - ["Audit logs", "On request", "Auditor, authorized users", "Date range; Action Type; Reference Number; User", "As in Annex Q, DO-12", "Timestamp, newest first", "CSV, Excel", "FRPM.021.01, FRPM.021.02"]
+  schedules_intro: "Scheduled runs of Product Maintenance."
+  schedules:
+    - ["Daily package check", "Daily 01:00", "Expiry and anniversary alerts from 90 days (NT-08); expiry of packages past their expiry date (NT-04); automatic drafting of renewal requests when switched on; review notice of incentive rules (NT-09)", "TSU, MBS, Alerts screen", "FRPM.003.05, FRPM.004.01, FRPM.018.02, FRPM.026.01"]
+    - ["Daily version check", "Daily 01:00", "A released version takes effect on its effective date; the previous version is superseded", "-", "FRPM.024.01"]
+    - ["Daily service-level check", "Daily 09:30", "Requests past the service level of their stage are marked red and raise 'Work item overdue' (NT-11)", "Alerts screen; dashboards", "FRPM.028.01"]
+    - ["Weekly Placement Update Report", "Thursday 08:00 (configurable)", "Generates and stores the Consolidated Placement Update Report; notice NT-17 (proposed)", "TSU, Marketing", "FRPM.007.01"]
+    - ["E-mail sending", "Every 2 minutes", "Sends the queued e-mails (Quotation Slips, advisories, passwords) and records their status", "-", "FRPM.012.01, FRPM.027.01"]
+
+# ------------------------------------------------------------------------------------------------ Annex S
+integrations:
+  intro: "The interfaces of Product Maintenance with the other BDOI systems and with the other BIBS modules, in business terms. The technical detail is in the Technical Specification reviewed by BDO ITG. Status of the BDOI input: Given (in the BRD or BDOI's FRS), To be provided (an item of the requirements-collection workbook), Not needed."
+  columns: ["No.", "Interface (party)", "Direction", "What is exchanged", "Trigger and frequency", "Volume", "Owner of the data", "What BDOI IT provides", "BDOI input", "FRPM / BRD"]
+  items:
+    - ["IN-01", "New Business (BRD-01)", "To New Business", "Products and their flags, the latest approved rate scheme of each package, rate exceptions, incentive indicators", "When a quotation, account or proposal request is created or saved", "Per quotation", "MBS", "-", "Given", "FRPM.003.03, FRPM.024.02; BRPM.007, PMADD07"]
+    - ["IN-02", "New Business (BRD-01): client master", "From New Business", "Client look-up on client-specific package requests", "When a request is created", "Per request", "Marketing", "-", "Given", "FRPM.011.02; BRPM.008"]
+    - ["IN-03", "New Business (BRD-01): non-package requests", "Both", "Quotation requests, Quotation Slips, proposals and client responses (BDOI's FRPM.005 to FRPM.010)", "Per request", "Per request", "Marketing, TSU", "-", "Decision C01", "FRPM.005.01 to FRPM.010.01"]
+    - ["IN-04", "Operations (BRD-02)", "To Operations", "Package version for endorsement re-rating; incentive codes for commission", "On each endorsement", "Per endorsement", "MBS", "-", "Given", "FRPM.024.02; PMADD07"]
+    - ["IN-05", "Renewal (BRD-06)", "To Renewal", "Package version of the expiring account", "On each renewal", "Per renewal", "MBS", "-", "Given", "FRPM.024.02; BRPM.007"]
+    - ["IN-06", "User Access Maintenance (BRD-11)", "To Product Maintenance", "Users, roles, sign-in through BDO sign-in (Entra ID)", "On sign-in and role change", "-", "BDO ITG, System Administrator", "Directory sign-in set-up", "Given (UAM FRS)", "BRPM.001, BRPM.002, PMADD05"]
+    - ["IN-07", "Data Migration (BRD-13)", "To Product Maintenance", "Go-live product masters, insurers, commission rates; package map of legacy packages", "Once at go-live (trial loads before)", "See Annex U", "MBS, TSU", "Legacy extracts", "To be provided (Annex U)", "BRPM.007; Annex U"]
+    - ["IN-08", "E-mail channel of BDOI (Microsoft 365 or CCM)", "From Product Maintenance", "Quotation Slips, advisories, ManCom notices, password e-mails", "On each send", "Tens a month", "TSU", "E-mail channel and sender address", "To be provided (PM-Q46)", "FRPM.012.01, FRPM.014.01, FRPM.027.01; BRPM.012, BRPM.020"]
+    - ["IN-09", "Insurers", "To insurers (by e-mail)", "Protected Quotation Slips; replies received by e-mail and keyed in", "Per round", "Per round", "TSU", "-", "Insurer placement e-mails (PM-Q52)", "FRPM.012.01; BRPM.012, BRPM.013"]
+    - ["IN-10", "Document store (ECM)", "From Product Maintenance", "Package documents and attachments", "On upload or generation", "Per document", "TSU, MBS", "Document store access", "Given (programme)", "BRPM.016, BRPM.024"]
+    - ["IN-11", "Other BDOI systems (to be named)", "From Product Maintenance", "Product master changes: product, version, effective date, status", "On each release and expiry", "Low", "MBS", "Receiving systems, format, timing", "To be provided (PQ16)", "FRPM.029.01; BRPM.022"]
+
+# ------------------------------------------------------------------------------------------------ Annex T
+nfr:
+  intro: "The non-functional requirements that apply to Product Maintenance, from the BRD (non-functional table of the Product Maintenance BRD) and the programme register of non-functional requirements (NFR IDs). Status: Agreed (programme decision), Proposed (for BDOI to confirm, Annex V)."
+  columns: ["No.", "Topic", "Requirement for Product Maintenance", "Target", "BRD trace", "Programme NFR", "Status"]
+  items:
+    - ["T-01", "Users", "Marketing up to 485 users (145 concurrent), MBS 5 (5), TSU 13 (13)", "Within the programme sizing of 150 concurrent users, growing 20% a year", "BRD non-functional table", "NFR-CAP-01", "Agreed"]
+    - ["T-02", "Volumes", "Package requests and packages", "Tens of package requests a month (assumption A-PM-08); BDOI to give the volumes", "BRD non-functional table", "NFR-CAP-02", "Proposed"]
+    - ["T-03", "Response time", "Every screen of the module", "Under 5 seconds for every role (BRD); 95% of screens within 2 seconds", "BRD non-functional table; BRPM.019", "NFR-PRF-01", "Agreed"]
+    - ["T-04", "Reports", "Dashboard, Placement Update and package reports", "Interactive reports within 20 seconds; scheduled reports ready at their time", "BRPM.018, BRPM.019", "NFR-PRF-03, NFR-PRF-04", "Agreed"]
+    - ["T-05", "Documents and e-mails", "Quotation Slips, advisories and their e-mails", "One document within 5 seconds; notices within 1 minute of the event", "BRPM.012, BRPM.016, BRPM.022", "NFR-PRF-06, NFR-PRF-08", "Proposed"]
+    - ["T-06", "Peak", "15th and 30th of the month, 08:00 to 17:30", "1.5 times the average daily volume", "BRD non-functional table", "NFR-CAP-05", "Agreed"]
+    - ["T-07", "Availability", "Service window of the users", "99.9% of the service window; use from 07:00 to 18:30 (BRD) within the programme window", "BRD non-functional table", "NFR-AVL-01, NFR-AVL-02", "Agreed"]
+    - ["T-08", "Recovery", "Loss of service", "Recovery within 4 hours; data loss of at most 15 minutes (BRD allows 24 hours)", "BRD non-functional table", "NFR-REC-01, NFR-REC-02", "Agreed"]
+    - ["T-09", "Devices", "Mobile and desktop", "Same functions and performance on BDO-issued mobile devices and desktops", "BRD non-functional table", "NFR-RSP-01, NFR-RSP-02", "Agreed"]
+    - ["T-10", "Access", "Only authorized users; actions by role; four eyes", "No unauthorized access in the security tests", "BRPM.002, BRPM.021, PMADD05", "NFR-SEC-04", "Agreed"]
+    - ["T-11", "Document security", "Documents that leave BDOI", "Every document e-mailed outside BDOI is password protected; password sent separately", "BRPM.020", "NFR-SEC-10", "Agreed"]
+    - ["T-12", "Uploads", "Supporting documents and insurer replies", "Every file checked for malware before use; size limit 10 MB a file", "BRPM.016", "NFR-SEC-11, NFR-CAP-04", "Agreed"]
+    - ["T-13", "Audit", "Every action and change", "Complete audit trail that no user can change; exportable", "BRPM.024", "NFR-AUD-01 to NFR-AUD-04", "Agreed"]
+    - ["T-14", "Retention", "Packages, versions, requests, documents", "5 years online and 15 years archive; package versions never deleted", "BRPM.006", "NFR-RET-01", "Proposed"]
+    - ["T-15", "Accessibility", "Every screen", "WCAG 2.2 level AA; keyboard use", "BRD (all users)", "NFR-ACC-01, NFR-ACC-02", "Proposed"]
+    - ["T-16", "Configurability", "Service levels, alert days, lists, templates", "Changed by authorized users without a release, with approval and effective date", "BRPM.005, BRPM.021, PMADD02", "NFR-CFG-01 to NFR-CFG-04", "Agreed"]
+    - ["T-17", "Dates and amounts", "Every screen, document and report", "Dates dd-MMM-yyyy, Philippine time; amounts with thousands separators", "BRPM.003", "NFR-LOC-02, NFR-LOC-03", "Agreed"]
+
+# ------------------------------------------------------------------------------------------------ Annex U
+data_setup:
+  intro: "What Product Maintenance needs loaded or set up before go-live, from which source, with which template, who provides it and who checks it. The templates are the tabs of the programme workbook 'Master Data and Configuration Upload Templates' v1.2 (BIBS_Templates_BRD-00); the item numbers are those of the requirements-collection workbook of this FRS."
+  columns: ["No.", "What is loaded or set up", "Source", "Template (tab)", "Provided by", "Checked by", "Needed by", "Item"]
+  items:
+    - ["U-01", "Lists of values and parameters of Product Maintenance (request reasons, response outcomes, alert days, service levels, numbering prefixes)", "BDOI decisions (Annex V)", "PM-09 Lists and parameters", "Head, MBS", "Head, TSU", "16-Jul-2027", "CFG-097"]
+    - ["U-02", "Product lines, cover types / sub-lines and products (risk codes)", "Legacy product matrix; BDOI's Annex A sub-line values", "PM-01 Product catalogue; R05 Product lines", "Head, MBS", "Head, TSU", "09-Apr-2027", "CFG-090"]
+    - ["U-03", "Coverages, perils and field rules per line", "Insurer wordings; BDOI's Annex A to C", "PM-02 Coverages and rules", "Head, MBS", "Head, TSU", "16-Jul-2027", "CFG-091"]
+    - ["U-04", "Clause library (warranties, clauses, exclusions, deductible wordings)", "Insurer wordings", "PM-03 Clause library", "Head, TSU", "Head, MBS", "16-Jul-2027", "CFG-092"]
+    - ["U-05", "Rate tables and statutory charges", "Legacy rate tables; tax rules", "PM-04 Rate tables; PM-04C Other charges", "Head, MBS", "Head, Comptrollership", "16-Jul-2027", "CFG-093"]
+    - ["U-06", "Insurers, insurer branches and placement e-mails", "Legacy insurer master", "R04 Insurers; R04B Insurer branches", "Head, TSU", "Head, MBS", "09-Apr-2027", "PM-Q52"]
+    - ["U-07", "Commission rates by insurer and product", "Legacy commission tables", "R07 Commission rates by insurer", "Head, MBS", "Head, Comptrollership", "09-Apr-2027", "PM-CON-01"]
+    - ["U-08", "Packages in force at go-live (set up through package requests, not loaded)", "Signed package slips and ManCom approvals", "PM-06 Packages", "Head, TSU", "Head, MBS (set-up); TSU Head (validation)", "01-Nov-2027", "CFG-094, PM-Q56"]
+    - ["U-09", "Package map (legacy package to BIBS package version)", "Legacy package list", "R06 Package code map", "Head, MBS", "Head, TSU", "18-Jun-2027", "CFG-095"]
+    - ["U-10", "Document templates of the package documents", "BDOI layouts (Annex Q)", "PM-08 Document templates", "Head, TSU", "Head, MBS", "16-Jul-2027", "CFG-098, DOC-07"]
+    - ["U-11", "Incentive rules (CPC2 and others)", "BDOI incentive definitions", "PM-10 Incentive criteria", "Head, MBS", "Product Owner", "16-Jul-2027", "CFG-096, PM-Q42"]
+    - ["U-12", "Users and roles of the module; ManCom approver list", "BDOI organisation", "UA-01 Users and roles; UA-02 Role matrix (User Access Maintenance); ManCom list: RC-APR-02", "Product Owner", "BDO ITG", "30-Nov-2026", "PM-Q10, RC-APR-02"]
+
+# ------------------------------------------------------------------------------------------------ Annex W
+change_control:
+  intro: "How the content of this FRS is controlled once it is signed (BDOI's 'Document Preparation, Review and Approval': changes are governed by the project's change management process)."
+  freezes:
+    - "The functional requirements FRPM.001 to FRPM.030 with their acceptance criteria, and the Business Requirements Mapping."
+    - "The process flows, the workflow and approvals (Annex O), the screens (Annex G), the messages (Annex H), the e-mail and notification texts (Annex P), the documents (Annex Q), the reports and schedules (Annex R) and the integrations (Annex S)."
+    - "Not frozen: the content of the configuration (products, versions, rates, clauses, lists, parameters such as service levels and alert days, templates), which authorized users maintain under maker-checker without a change request."
+  steps:
+    - ["1 Raise", "The business owner raises the change in the change request register with the BRD ID, the FRPM item, the reason and the priority.", "Business owner (Head of the unit)", "Same day"]
+    - ["2 Assess", "The iorta TechNXT Project Team assesses the impact on scope, schedule, cost (mandays), the other BRDs (through the integrations of Annex S) and the tests.", "iorta TechNXT Project Team; BDO ITG System Analyst", "5 working days"]
+    - ["3 Approve", "The owners of every BRD the change touches, the Product Owner and the Program Manager (BPS) approve or reject it.", "Product Owner; Program Manager BPS; owners of the BRDs touched", "At the weekly change board"]
+    - ["4 Schedule", "An approved change is assigned to a drop and to a version of this FRS.", "Program Manager BPS; iorta TechNXT Project Manager", "At approval"]
+    - ["5 Test", "The test cases of the traceability workbook are updated and run; the Business Unit retests the changed rows.", "iorta TechNXT test lead; Business Unit testers", "Within the drop"]
+    - ["6 Close", "This FRS is re-issued (1.3, 1.4 ...) with the changed passages marked, and the delta is signed.", "System Analyst; signatories of this FRS", "End of the drop"]
+  register: "BIBS_CR_BRD-03_Change_Request_Register_v1.0.xlsx (sheet Register; the candidate changes already known are listed with the status 'Candidate - for decision')"
+
+# ------------------------------------------------------------------------------------------------ Annex X
+checklist:
+  intro: "The points the Business Unit confirms before signing this FRS. Each reviewer ticks the box of each point of his or her role and records any comment in the change request register or the requirements-collection workbook."
+  items:
+    - ["Scope: in scope, out of scope and handled in another FRS", "Section 1.4", "The list is complete and correct", "Product Owner"]
+    - ["Business Requirements Mapping: every BRD ID is mapped", "Section 2", "Each BRD ID maps to the right FRPM items", "Product Owner; System Analyst"]
+    - ["Package request: fields, approvals and minimums", "FRPM.011; Annex E; Annex O.2.1", "Fields, approval levels, 20 policies and PHP 5,000,000.00 minimums", "Head, Retail Marketing"]
+    - ["TSU review and approval steps", "FRPM.011.03; Annex O.2.1; Annex M (C06)", "One or two TSU steps; who recommends, who approves", "Head, TSU"]
+    - ["Quotation Slip: one per insurer, approval and sending from the system", "FRPM.012.01; Annex Q (DO-02); Annex P (NT-05)", "Approver, layout (Annex F) and e-mail text", "Head, TSU"]
+    - ["Insurer responses, rounds and Comparative Table", "FRPM.012.02 to FRPM.012.04; Annex M (C14, C15)", "Response values; master and client views", "Head, TSU"]
+    - ["Review of negotiated terms and Marketing review", "FRPM.013.02; Annex O.2.3", "Steps and service levels", "Head, TSU; Head, Retail Marketing"]
+    - ["ManCom approval", "FRPM.014; Annex O.2.3; Annex P (NT-13, NT-14)", "Approver list, President's step, e-mail texts", "ManCom; Product Owner"]
+    - ["MBS set-up and post-setup validation", "FRPM.016; Annex O.2.4", "Validator and checklist", "Head, MBS; Head, TSU"]
+    - ["Latest approved rate scheme and rate exceptions", "FRPM.024; Annex O.2.10", "Approver and validity of exceptions", "Head, Retail Marketing; Head, MBS"]
+    - ["Advisories", "FRPM.025; Annex P (NT-03, NT-06); Annex Q (DO-06)", "Recipient groups, wording and supporting documents", "Head, TSU"]
+    - ["Expiry, anniversary, renewal and deactivation", "FRPM.003.04 to FRPM.004.01, FRPM.026; Annex O.2.6, O.2.7", "Alert days, recipients, automatic drafting", "Head, TSU"]
+    - ["Incentive rules (CPC2)", "FRPM.018; Annex O.2.9", "Rule content and definition of CPC2", "Head, MBS; Product Owner"]
+    - ["Product hierarchy, clause library and field rules", "FRPM.003.08, FRPM.022, FRPM.023; Annex A", "Levels, coverages, clause kinds, field rules per line", "Head, MBS"]
+    - ["Non-package quotation requests", "FRPM.005 to FRPM.010; Annex M (C01)", "Where the non-package process is specified", "Product Owner; BPS"]
+    - ["Workflow, approvals and service levels", "Annex O", "Makers, checkers, service levels, reassignment", "Head, TSU; Head, Retail Marketing; Head, MBS"]
+    - ["E-mail and notification texts", "Annex P", "Each text, recipient and channel; proposed texts approved", "Head, TSU; Head, MBS"]
+    - ["Document prints and formats", "Annex Q", "Layouts given or to be provided; protection", "Head, TSU; Head, MBS"]
+    - ["Reports and schedules", "Annex R", "Columns, filters, Thursday 08:00 run and recipients", "Head, TSU; Head, Retail Marketing"]
+    - ["Integrations", "Annex S", "Interfaces and the BDOI inputs to provide", "Product Owner; BDO ITG Tech Lead"]
+    - ["Non-functional requirements", "Annex T", "Targets and proposed values", "Product Owner; BDO ITG Tech Lead"]
+    - ["Data set-up at go-live", "Annex U", "Owners and dates of each load", "Head, MBS; Head, TSU"]
+    - ["Open questions answered or assigned", "Annex V", "Each open question has an owner and a date", "Product Owner"]
+    - ["Observations and points for decision", "Annex M", "Decision recorded on each point", "Product Owner; System Analyst"]
+    - ["Screens and messages", "Annex G; Annex H", "Screens, fields and messages as expected", "Heads of TSU, MBS and Retail Marketing"]
+    - ["Change control after sign-off", "Annex W", "Process and approvers", "Product Owner; Program Manager BPS"]
+    - ["Walkthrough users and sign-in", "Walkthrough users workbook (BIBS_UAT_BRD-03)", "Each reviewer has a sign-in ID for the walkthrough", "Product Owner"]
+
+# ------------------------------------------------------------------------------------------------ Annex M, M.5
+observations:
+  - ref: "FRPM.004.01"
+    topic: "Expiry alert days: 90 days in BDOI's FRS"
+    bdoi: "FRPM.004.01: alerts beginning 90 calendar days before the package expiry date and the anniversary date."
+    brd: "BRPM.017: TSU monitors the expiry or anniversary date of each package."
+    proposes: "The alert days are a configurable value; the go-live value is set to BDOI's 90 days (the BIBS delivered value is 60 with reminders at 30 and 7 days). The anniversary alert is added to the daily check."
+    impact: "Configuration value at go-live; anniversary alert to be made available."
+    role: [TSU]
+  - ref: "FRPM.014.01"
+    topic: "ManCom e-mail through Microsoft 365"
+    bdoi: "FRPM.014.01: e-mail notifications to all selected approvers via Microsoft 365; the President after the other approvers."
+    brd: "BRPM.015: ManCom review and in-system sign-off."
+    proposes: "Annex P gives the proposed texts NT-13 and NT-14 for BDOI's approval; the e-mail channel of BDOI is an integration input (Annex S, IN-08)."
+    impact: "Wording and channel of the ManCom e-mails."
+    role: [MANCOM, ITG]
+  - ref: "FRPM.007.01"
+    topic: "Weekly run of the Consolidated Placement Update Report"
+    bdoi: "FRPM.007.01: generated automatically every Thursday at 8am; stored in a repository."
+    brd: "BRPM.018: Placement Update Reports for individual accounts and collectively."
+    proposes: "The report runs on request and its runs are kept; the scheduled weekly run with its repository and notice (NT-17, proposed) is planned with the report scheduling of the platform."
+    impact: "Until the scheduled run is available, TSU runs the report on Thursday morning."
+    role: [TSU, ITG]
+  - ref: "FRPM.017.01"
+    topic: "Notice to the original assignee on reassignment"
+    bdoi: "FRPM.017.01: the system notifies the replacement and the original reviewer or approver."
+    brd: "BRPM.021: workflow enforcement."
+    proposes: "The notice to the new assignee is sent (NT-10); the notice to the original assignee is proposed (NT-15)."
+    impact: "One more notice."
+    role: [SA]
+  - ref: "FRPM.021.01"
+    topic: "Old and new values of changed master records in the audit logs"
+    bdoi: "FRPM.021.01: audit logs with Old Value and New Value."
+    brd: "BRPM.024: audit trail for all actions and changes."
+    proposes: "The audit trail records every action with the user and time; the field-by-field old and new values of changed product masters are planned with the programme master data change log."
+    impact: "Reviewers of master changes see old and new values."
+    role: [SA, ITG]
+  - ref: "Open questions"
+    topic: "Open questions answered by BDOI's FRS"
+    bdoi: "BDOI's FRS states the Marketing approval chain (TL, TH, UH), the ManCom routing, the Placement Update Report columns, the client-view fields, the status names, the sign-in reference and the non-package scope."
+    brd: "-"
+    proposes: "The open questions of the BIBS FRS that BDOI's FRS answers are no longer asked (Annex V); they are listed with BDOI's clause in the traceability workbook (sheet 'Answered in the BDOI FRS'). Where BDOI's answer differs from the earlier BIBS proposal, the point is in M.1 (C05, C17, C03, C16)."
+    impact: "Fewer open questions for the Business Unit."
+    role: [PO, SA]
+  - ref: "Annex P"
+    topic: "Rate exception notice added to the notifications"
+    bdoi: "Not stated."
+    brd: "BRPM.007: outdated rates cannot be selected for new business."
+    proposes: "The notice sent by BIBS when a rate exception is approved or rejected (NT-12) is added to Annex P."
+    impact: "Completeness of the notification texts."
+    role: [MKT]
+  - ref: "Annex T"
+    topic: "Non-functional values to confirm"
+    bdoi: "Not stated in BDOI's FRS."
+    brd: "BRD non-functional table: users, response time under 5 seconds, availability 99.9%, recovery 4 hours."
+    proposes: "Annex T aligns the BRD values with the programme register; volumes, retention and accessibility are proposed values for BDOI to confirm (PQ18)."
+    impact: "Sizing and tests of the module."
+    role: [PO, ITG]

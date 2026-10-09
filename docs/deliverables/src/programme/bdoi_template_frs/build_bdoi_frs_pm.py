@@ -1,4 +1,4 @@
-"""Product Maintenance FRS in BDOI's template, version 1.1.
+"""Product Maintenance FRS in BDOI's template, version 1.2 (Business Unit review edition).
 
     python docs/deliverables/src/programme/bdoi_template_frs/build_bdoi_frs_pm.py [--no-pdf]
 
@@ -10,26 +10,31 @@ update when the document is opened). BDOI's text is kept word for word; the addi
   pm_document.yaml        cover, revision log, introduction, mapping, process flows, sign-off, annex rows, Annex J, N
   pm_observations.yaml    Annex M: what v1.1 proposes for each conflict and slip, and the other observations
   figures/*.dot           the process flows added after BDOI's two figures
+  brd03_v12.py            version 1.2: summary for the Business Unit, flows and life-cycles, Annexes O to X, M.5
+  brd03_v12_frs.yaml      the content of version 1.2; brd03_v12_items.yaml the open items checked against BDOI's FRS
 
 and from the BIBS release set BRD-3 (screens, notifications, walkthroughs, test cases, FRS) and the comparison data of
 docs/deliverables/src/programme/comparisons (conflicts and slips).
 
-Outputs in docs/deliverables/out/Programme/BDOI_Template_FRS/:
-  BIBS_FRS-BDOI_BRD-03_Product_Maintenance_v1.1.docx                         clean copy
-  BIBS_FRS-BDOI_BRD-03_Product_Maintenance_v1.1.pdf                          the clean copy as PDF (contents updated)
-  BIBS_FRS-BDOI_BRD-03_Product_Maintenance_v1.1_Changes_Highlighted.docx     every addition shaded light yellow, with a
-                                                                             one-page change summary at the front
+Outputs in docs/deliverables/out/Programme/BDOI_Template_FRS/BRD-03_Product_Maintenance/:
+  BIBS_FRS-BDOI_BRD-03_Product_Maintenance_v1.2.docx                         clean copy
+  BIBS_FRS-BDOI_BRD-03_Product_Maintenance_v1.2.pdf                          the clean copy as PDF (not committed)
+  BIBS_FRS-BDOI_BRD-03_Product_Maintenance_v1.2_Changes_Highlighted.docx     the additions of version 1.2 shaded light
+                                                                             yellow, with a change summary at the front
 
 Self-checks (the build fails when one does not hold): every BRD ID of the Product Maintenance BRD is in the mapping and
 maps to at least one FRPM item (or keeps BDOI's reference to the User Access Maintenance FRS); every FR-PM of the BIBS
 FRS appears in Annex L; every conflict and slip of the comparison appears in Annex M; BDOI's original FRPM IDs and
-texts are all still present; no internal code or restricted word in the added text.
+texts are all still present; no internal code or restricted word in the added text; every notice, e-mail and
+report of the platform for Product Maintenance is in Annex P and Annex R; no open question in Annex V that BDOI's FRS
+answers; no password value.
 """
 
 from __future__ import annotations
 
 import argparse
 import codecs
+import contextlib
 import copy
 import re
 import shutil
@@ -49,6 +54,10 @@ from docx.shared import Inches
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[4]
+sys.path.insert(0, str(HERE))
+import brd03_v12 as v12  # noqa: E402
+
+v12.bind(sys.modules[__name__])
 SRC = REPO / "docs" / "deliverables" / "src"
 PM = SRC / "BRD-03_Product_Maintenance"
 NB = SRC / "BRD-01_New_Business"
@@ -88,7 +97,8 @@ CODES = {
     "MKT_AO": "Marketing AO", "MKT_TL": "Marketing TL", "TSU_TL": "TSU Team Lead", "TSU_HEAD": "TSU Head",
     "NB_APPROVER": "New Business approver", "BUSINESS_ADMIN": "Business Administrator",
 }
-CODE_OK = {"FLEET_REPAIR"}   # a clause code of the walkthrough data, shown on the screens as such
+CODE_OK = {"FLEET_REPAIR",    # a clause code of the walkthrough data, shown on the screens as such
+           "BIBS_CR_BRD", "BIBS_RTM_BRD", "BIBS_UAT_BRD"}  # the names of the workbooks of the review pack
 CODE_RE = re.compile(r"\b[A-Z][A-Z0-9]*_[A-Z0-9][A-Z0-9_]*\b")
 PHRASES = [
     # alert days of the BIBS release set, read with the 90 days of BDOI's FRPM.004.01 kept in this FRS
@@ -171,7 +181,8 @@ def strip_ids(el):
 
 class Builder:
     def __init__(self, highlight: bool):
-        self.hl = highlight
+        self.highlight = highlight   # the review copy: the additions of version 1.2 are shaded
+        self.hl = False              # shading of what is written now (v12.this_round switches it on)
         self.doc = docx.Document(str(REPO / DOC["meta"]["source"]))
         self.body = self.doc.element.body
         self.numbering = self.doc.part.numbering_part.element
@@ -387,6 +398,7 @@ class Builder:
         j = OxmlElement("w:jc")
         j.set(qn("w:val"), "center")
         ppr_insert(el.get_or_add_pPr(), j)
+        ppr_insert(el.get_or_add_pPr(), OxmlElement("w:keepNext"))  # the caption stays with its figure
         return el
 
 
@@ -446,7 +458,7 @@ def edit_cover(b: Builder):
     for t in cell.iter(qn("w:t")):
         if t.text.strip() == DOC["meta"]["version_old"]:
             t.text = DOC["meta"]["version_new"]
-            if b.hl:
+            if b.highlight:
                 rpr_shade(t.getparent().find(qn("w:rPr")))
             break
     else:
@@ -461,11 +473,12 @@ def edit_cover(b: Builder):
 
 def edit_revision_log(b: Builder):
     t = b.doc.tables[1]
-    row = t.rows[2]
-    vals = [DOC["revision_log"][k] for k in ("date", "version", "description", "by")]
-    for cell, v in zip(row.cells, vals):
-        p = cell.paragraphs[0]._p
-        p.append(b.run(v, size=9))
+    for i, log in ((2, DOC["revision_log"]), (3, v12.V12["revision"])):
+        with (v12.this_round(b) if i == 3 else contextlib.nullcontext()):
+            vals = [log[k] for k in ("date", "version", "description", "by")]
+            for cell, v in zip(t.rows[i].cells, vals):
+                p = cell.paragraphs[0]._p
+                p.append(b.run(v, size=9))
 
 
 def clone_par(b: Builder, p_el, text):
@@ -660,7 +673,7 @@ def edit_process_flows(b: Builder):
     work = Path(tempfile.mkdtemp(prefix="pmflows_"))
     for flow in DOC["process_flows"]:
         png = work / (Path(flow["dot"]).stem + ".png")
-        subprocess.run(["dot", "-Tpng", "-Gdpi=170", str(HERE / flow["dot"]), "-o", str(png)], check=True)
+        subprocess.run(["dot", "-Tpng", "-Gdpi=200", str(HERE / flow["dot"]), "-o", str(png)], check=True)
         head = strip_ids(copy.deepcopy(el))
         for r in head.findall(qn("w:r")):
             head.remove(r)
@@ -968,6 +981,7 @@ class Annexes:
 
     # Annex M – observations
     def observations(self):
+        self.b.obs_rows = []
         cmp_data = yaml.safe_load(CMP.read_text(encoding="utf-8"))
         roles = OBS["roles"]
         self.h1("Annex M – Observations and Points for BDOI Decision")
@@ -980,11 +994,14 @@ class Annexes:
         widths = [0.45, 0.5, 0.95, 1.75, 1.45, 2.15, 1.05, 1.0, 0.5]
         no = 0
 
-        def row(ref, topic, bdoi, brd, prop, impact, role_keys):
+        def row(ref, topic, bdoi, brd, prop, impact, role_keys, section=None):
             nonlocal no
             no += 1
             who = "; ".join(roles[r] for r in role_keys)
-            return [f"M-{no:02d}", ref, topic, bdoi, brd, prop, impact, who, "Open"]
+            out = [f"M-{no:02d}", ref, topic, bdoi, brd, prop, impact, who, "Open"]
+            self.b.obs_rows.append(out + [section or current[0]])
+            return out
+        current = ["M.1"]
 
         groups = [("M.1 Conflicts between BDOI's FRS and the BIBS reference FRS", "C"),
                   ("M.3 Slips noticed in BDOI's FRS (proposed corrections; the text is not changed)", "D")]
@@ -1002,6 +1019,7 @@ class Annexes:
                 self.listed_conflicts.add(cid)
             self.table(header, rows, widths, size=7)
         self.h2("M.2 BDOI's open item and changes to the Business Requirements Mapping")
+        current[0] = "M.2"
         rows = []
         for o in OBS["others"][:1]:
             rows.append(row(o["ref"], o["topic"], o["bdoi"], o["brd"], o["proposes"], o["impact"], o["role"]))
@@ -1014,6 +1032,7 @@ class Annexes:
         self.table(header, rows, widths, size=7)
         title, kind = groups[1]
         self.h2(title)
+        current[0] = "M.3"
         rows = []
         for cid, c in conf.items():
             if cid.startswith(kind):
@@ -1023,9 +1042,11 @@ class Annexes:
                 self.listed_conflicts.add(cid)
         self.table(header, rows, widths, size=7)
         self.h2("M.4 Scope, added requirements and added annex rows")
+        current[0] = "M.4"
         rows = [row(o["ref"], o["topic"], o["bdoi"], o["brd"], o["proposes"], o["impact"], o["role"])
                 for o in OBS["others"][1:]]
         self.table(header, rows, widths, size=7)
+        v12.observations_m5(self, row, header, widths)
         self.b.stats["observations"] = no
         self.b.stats["conflicts"] = len([c for c in self.listed_conflicts if c.startswith("C")])
         self.b.stats["slips"] = len([c for c in self.listed_conflicts if c.startswith("D")])
@@ -1059,6 +1080,7 @@ def section_break(b: Builder, landscape: bool):
 def add_annexes(b: Builder, mapping, ids, our, nb):
     a = Annexes(b, mapping, ids)
     titles = a.screens()
+    v12.menu_page(a)
     a.messages(our, nb, titles)
     a.notifications()
     a.rules()
@@ -1068,6 +1090,8 @@ def add_annexes(b: Builder, mapping, ids, our, nb):
     a.observations()
     a.els.append(section_break(b, landscape=True))
     a.glossary()
+    v12.glossary_add(a)
+    v12.annexes(a)
     body_sect = b.body.find(qn("w:sectPr"))
     for el in a.els:
         body_sect.addprevious(el)
@@ -1075,21 +1099,45 @@ def add_annexes(b: Builder, mapping, ids, our, nb):
 
 
 def change_summary(b: Builder):
-    cs = DOC["change_summary"]
-    s = b.stats
-    values = dict(brd_ids=s["brd_ids"], mapping_changes=s["mapping_changes"], bdoi_items=s["bdoi_items"],
-                  bdoi_subitems=s["bdoi_subitems"], elaborated=s["elaborated"], new_subitems=s["new_subitems"],
-                  new_items=s["new_items"], ac_total=s["ac"], flows=s["flows"], annex_rows=s["annex_rows"],
-                  screens=s["screens"], messages=s["messages"], notifications=s["notifications"],
-                  walk_steps=s["walk_steps"], observations=s["observations"], glossary=s["glossary"])
-    els = [b.para(cs["title"], bold=True, size=14, color="014EA9", hl=False, space_after=120),
-           b.para(cs["intro"], size=9.5, hl=False)]
+    """The change summary page at the front of the review copy: the changes of version 1.2 (this round)."""
+    s, oi = b.stats, v12.open_items()
+    points = [
+        "Cover and Document Revision Log: version 1.2, Business Unit review edition; BDOI's details, signatories and "
+        "the entries of versions 1.0 and 1.1 unchanged.",
+        f"Introduction: new section 1.4 'Summary for the Business Unit Review' (scope on a page, the process end to "
+        f"end, key numbers, the ten decisions for the Business Unit, how to review, the {s['checklist']} points of "
+        "the review checklist); a note on what version 1.2 adds.",
+        f"Process Flow: a caption under every figure; {s['flows_v12']} process flows, {s['lifecycles']} status "
+        "life-cycles and the integration context diagram added (Graphviz, by persona, with service levels).",
+        f"Annex G: section G.23 'Navigation: menu by persona' ({s['menu_personas']} personas, {s['menu_entries']} "
+        f"menu entries). Annex M: section M.5 with {s['observations_v12']} observations of version 1.2. Annex N: "
+        f"{s['glossary_v12']} terms added.",
+        f"New annexes: O Workflow and Approvals ({s['workflow_processes']} processes, {s['workflow_rows']} stages, "
+        f"role-to-stage matrix, status names); P E-mail and Notification Texts ({s['notices']}: "
+        f"{s['notices_bibs']} as sent by BIBS, {s['notices_proposed']} proposed for approval); Q Document Prints and "
+        f"Output Formats ({s['documents']} documents, {s['doc_images']} current layouts); R Reports and Schedules "
+        f"({s['reports']} reports, {s['schedules']} scheduled runs); S Integrations ({s['integrations']}); "
+        f"T Non-functional Requirements ({s['nfr']}); U Data Set-up and Migration at Go-live ({s['data_setup']}); "
+        f"V Assumptions, Dependencies and Open Questions ({s['open_kept']} items); W Change Control after "
+        f"Sign-off; X Business Unit Review Checklist ({s['checklist']} points).",
+        f"Open items: {len(oi['answered'])} assumptions, open questions and proposed rules of the BIBS reference FRS "
+        f"are answered by BDOI's FRS (or were closed earlier) and are no longer asked; {len(oi['partly'])} are "
+        "answered in part and only the remaining part is asked (Annex V).",
+    ]
+    els = [b.para("Version 1.2 – summary of changes for the Business Unit and BDO ITG review", bold=True, size=14,
+                  color="014EA9", hl=False, space_after=120),
+           b.para("This review copy is BDOI's Functional Requirements Specifications for Product Maintenance with the "
+                  "changes of version 1.2 (Business Unit review edition). The passages added in version 1.2 are "
+                  "shaded light yellow; BDOI's text and the content of version 1.1 are not shaded and are "
+                  "unchanged. The clean copy has the same content without shading and without this page.",
+                  size=9.5, hl=False)]
     n = b.new_num()
-    for pt in cs["points"]:
-        els.append(b.para(pt.format(**values), style="ListParagraph", num=(n, 0), size=9.5, hl=False))
-    els.append(b.para(cs["legend"], size=9.5, hl=False))
+    for pt in points:
+        els.append(b.para(pt, style="ListParagraph", num=(n, 0), size=9.5, hl=False))
+    els.append(b.para("Where BDOI's FRS and the BIBS reference FRS differ, BDOI's text is kept and the point is listed "
+                      "in Annex M with both readings and a recommendation.", size=9.5, hl=False))
     els.append(b.para("Shading used in this copy: ", size=9.5, hl=False))
-    els[-1].append(b.run("text added or extended in version 1.1", size=9.5, hl=True))
+    els[-1].append(b.run("text added in version 1.2", size=9.5, hl=True))
     # the summary is a section of its own, with the page set-up of the cover, so the cover keeps its first page
     brk = OxmlElement("w:p")
     ppr = OxmlElement("w:pPr")
@@ -1137,7 +1185,22 @@ def check_bdoi_text(new_doc):
     ids_new = set(re.findall(r"FRPM\.\d{3}(?:\.\d{2})?", "\n".join(texts_of(new_doc.element.body))))
     missing_ids = ids_src - ids_new
     problems = [f"FRPM ID missing: {sorted(missing_ids)}"] if missing_ids else []
-    for ti, (ts, tn) in enumerate(zip(src.tables, new_doc.tables)):
+    # BDOI's tables in the new document, in order: tables added in between (summary, annexes) are skipped
+    new_tables, k = [], 0
+    for ts in src.tables:
+        head = [texts_of(c._tc) for c in ts.rows[0].cells]
+        while k < len(new_doc.tables):
+            tn = new_doc.tables[k]
+            k += 1
+            cand = [texts_of(c._tc) for c in tn.rows[0].cells] if len(tn.rows) >= len(ts.rows) else None
+            if cand is not None and len(cand) == len(head) and all(
+                    all(any(o.replace(DOC["meta"]["version_old"], DOC["meta"]["version_new"]) == n for n in c)
+                        for o in h) for h, c in zip(head, cand)):
+                new_tables.append(tn)
+                break
+        else:
+            raise SystemExit("BDOI text check failed: a table of BDOI's FRS is missing")
+    for ti, (ts, tn) in enumerate(zip(src.tables, new_tables)):
         for ri, row in enumerate(ts.rows):
             for ci, cell in enumerate(row.cells):
                 old = texts_of(cell._tc)
@@ -1222,17 +1285,53 @@ def to_pdf(src: Path, dest: Path, timeout=600):
 
 
 # ----------------------------------------------------------------------------------------------------------- main
+def key_numbers(b: Builder, ids) -> list[list[str]]:
+    s, oi = b.stats, v12.open_items()
+    items = v12.frpm_items()
+    n_items = len({i["item"] for i in items})
+    n_bdoi = sum(1 for i in items if i["origin"].startswith("BDOI"))
+    return [
+        ["BRD requirement IDs (PMADD01 to PMADD08, BRPM.001 to BRPM.024)", str(len(ids)), "Section 2"],
+        ["Functional requirement items and sub-items", f"{n_items} items; {len(items)} sub-items ({n_bdoi} of BDOI, "
+         f"{len(items) - n_bdoi} added)", "Section 3"],
+        ["Acceptance criteria", str(s["ac"]), "Section 3"],
+        ["Process flows, life-cycles and other figures", f"{s['figures_total']} figures", "Section 1.4, section 4"],
+        ["Screens", f"{s['screens']} (menu of {s['menu_personas']} personas)", "Annex G"],
+        ["Messages and validations", str(s["messages"]), "Annex H"],
+        ["E-mails and notices", f"{s['notices']} ({s['notices_bibs']} as sent by BIBS, {s['notices_proposed']} "
+         "proposed)", "Annex P"],
+        ["Documents printed, e-mailed or exported", str(s["documents"]), "Annex Q"],
+        ["Reports and scheduled runs", f"{s['reports']} reports; {s['schedules']} runs (weekly Thursday 08:00)",
+         "Annex R"],
+        ["Integrations", str(s["integrations"]), "Annex S, Figure " + str(b.integration_fig)],
+        ["Non-functional requirements", str(s["nfr"]), "Annex T"],
+        ["Data set-up items at go-live", str(s["data_setup"]), "Annex U"],
+        ["Open items for BDOI (not answered in BDOI's FRS)", f"{s['open_kept']} (another {len(oi['answered'])} "
+         "answered by BDOI's FRS)", "Annex V"],
+        ["Observations and points for decision", str(s["observations"]), "Annex M"],
+        ["Test cases (traceability workbook)", str(len(v12.test_cases())), "BIBS_RTM_BRD-03 workbook"],
+        ["Review checklist points", str(s["checklist"]), "Annex X"],
+    ]
+
+
 def build(highlight: bool, our, nb, ids) -> Builder:
     b = Builder(highlight)
+    b.fig_no = 1  # Figure 1 is the end-to-end picture of the summary in the Introduction
     edit_cover(b)
     edit_revision_log(b)
     edit_introduction(b)
+    with v12.this_round(b):
+        v12.introduction(b)
     mapping = edit_mapping(b, ids)
     edit_functional_requirements(b)
     edit_process_flows(b)
+    with v12.this_round(b):
+        v12.process_flows(b)
     edit_signoff(b)
     edit_annex_rows(b)
     a = add_annexes(b, mapping, ids, our, nb)
+    with v12.this_round(b):
+        v12.summary(b, key_numbers(b, ids), b.stats["checklist"])
     missing_fr = [f for f in our if f not in a.listed_refs]
     if missing_fr:
         raise SystemExit(f"Annex L lacks {missing_fr}")
@@ -1242,10 +1341,15 @@ def build(highlight: bool, our, nb, ids) -> Builder:
     unknown = [r for r in b.fr_to_frpm if r.startswith("FR-PM") and r not in our]
     if unknown:
         raise SystemExit(f"unknown BIBS references: {unknown}")
+    if b.fr_to_frpm != v12.fr_to_frpm():
+        raise SystemExit("the FRPM references of the document and of the shared data differ")
     if highlight:
         change_summary(b)
     set_update_fields(b)
     check_words(b)
+    problems = v12.self_checks(b, " ".join(b.added_text))
+    if problems:
+        raise SystemExit("version 1.2 checks failed:\n  " + "\n  ".join(problems))
     return b
 
 
@@ -1261,6 +1365,7 @@ def main(argv=None) -> int:
         b = build(highlight, our, nb, ids)
         path = OUT / name
         b.doc.save(str(path))
+        v12.cleanup(b)
         n_ids = check_bdoi_text(docx.Document(str(path)))
         results[name] = (b, n_ids)
         print(f"wrote {path.relative_to(REPO)} ({path.stat().st_size // 1024} KB)")
@@ -1280,6 +1385,13 @@ def main(argv=None) -> int:
           f"H {s['messages']} messages; I {s['notifications']} notifications; K {s['walk_steps']} steps; "
           f"M {s['observations']} observations ({s['conflicts']} conflicts, {s['slips']} slips); N {s['glossary']} "
           f"terms; process flows added {s['flows']}")
+    print(f"v1.2: figures {s['figures_total']} ({s['flows_v12']} flows, {s['lifecycles']} life-cycles added); G.23 "
+          f"menu {s['menu_personas']} personas; M.5 {s['observations_v12']}; O {s['workflow_processes']} processes "
+          f"{s['workflow_rows']} stages; P {s['notices']} ({s['notices_bibs']} BIBS, {s['notices_proposed']} "
+          f"proposed); Q {s['documents']} ({s['doc_images']} images); R {s['reports']} reports, {s['schedules']} "
+          f"runs; S {s['integrations']}; T {s['nfr']}; U {s['data_setup']}; V {s['open_kept']} kept, "
+          f"{s['open_answered']} answered, {s['open_partly']} partly; X {s['checklist']}; "
+          f"test cases {len(v12.test_cases())}")
     return 0
 
 

@@ -1,0 +1,31 @@
+// Integration context of Product Maintenance, business level (FRPM.014.01, 024.02, 027.01, 029.01; BRPM.007, 012,
+// 015, 016, 020, 022). Dashed = waits for a BDOI input (Annex S, Annex V).
+digraph integration_context {
+  graph [rankdir=LR, fontname="Arial", nodesep=0.22, ranksep=0.9, bgcolor="white", pad=0.15];
+  node  [shape=box, style="rounded,filled", fillcolor="#FFFFFF", color="#014EA9", penwidth=1.1, fontname="Arial", fontsize=10, width=1.9, height=0.55];
+  edge  [color="#555555", arrowsize=0.6, fontname="Arial", fontsize=8.5];
+  pm [label="Product Maintenance\n(BIBS)\npackages, product\nmatrix, versions,\nincentive rules", fillcolor="#014EA9", fontcolor="#FFFFFF", width=2.0, height=1.3];
+  subgraph cluster_in { label="Other BIBS modules (other BRDs)"; fontname="Arial Bold"; fontsize=10; style="rounded"; color="#9DB7DE";
+    nb  [label="New Business (BRD-01):\nquotations, accounts,\nnon-package requests"];
+    ops [label="Operations (BRD-02):\nendorsements,\ncommission"];
+    rnw [label="Renewal (BRD-06)"];
+    uam [label="User Access\nMaintenance (BRD-11)"];
+    dm  [label="Data Migration\n(BRD-13)"];
+  }
+  subgraph cluster_ext { label="BDOI and external systems"; fontname="Arial Bold"; fontsize=10; style="rounded"; color="#BBBBBB";
+    mail [label="E-mail channel of BDOI\n(Microsoft 365 / CCM)"];
+    ins  [label="Insurers\n(by e-mail)"];
+    ecm  [label="Document store\n(ECM)"];
+    oth  [label="Other BDOI systems\n(to be named)", style="rounded,dashed", color="#888888", fontcolor="#555555"];
+  }
+  pm -> nb  [label="products, latest approved\nrate scheme, rate exceptions,\nincentive indicators"];
+  nb -> pm  [label="client look-up;\nnon-package requests", style=dashed];
+  pm -> ops [label="version for re-rating;\nincentive codes"];
+  pm -> rnw [label="version of the\nexpiring account"];
+  uam -> pm [label="users, roles, sign-in\n(BDO sign-in, Entra ID)"];
+  dm -> pm  [label="go-live masters;\npackage map"];
+  pm -> mail [label="Quotation Slips, advisories,\nManCom notices; passwords\nin a separate e-mail"];
+  mail -> ins [label="protected\ndocuments"];
+  pm -> ecm [label="package\ndocuments"];
+  pm -> oth [label="product master\nchanges", style=dashed, color="#888888"];
+}

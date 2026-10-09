@@ -1186,9 +1186,11 @@ def _summary(ws, wb, sheets) -> None:
 # ============================================================================ workbook B: the templates
 
 ROUTE_UPLOAD = "Screen upload"
+ROUTE_CONFIG = "Configuration screen upload"
 ROUTE_MIGRATION = "Migration Console"
 ROUTE_SCREEN = "Configuration screen"
-ROUTES = [ROUTE_UPLOAD, ROUTE_MIGRATION, ROUTE_SCREEN]
+ROUTES = [ROUTE_UPLOAD, ROUTE_CONFIG, ROUTE_MIGRATION, ROUTE_SCREEN]
+UPLOAD_FOLDER = ("configpromo", "upload")  # the uploads of the configuration screens (one per template)
 # Templates of the Drop 0, BRD-03 and BRD-11 sources whose rows the platform takes by file.
 UPLOAD_TEMPLATES = {"D0-06", "UA-01"}
 MIGRATION_TEMPLATES = {"PM-01"}  # delivered in the layout of R05; the set-up values on Products
@@ -1331,6 +1333,193 @@ def _upload_template(tid: str, spec: dict[str, Any], book) -> Any:
                       depends=list(cfg()["depends"].get(tid, [])), capacity=300)
 
 
+def config_uploads() -> dict[str, dict[str, Any]]:
+    """Templates uploaded on their configuration screen: ID -> handler (upload of the platform), screen (menu path)."""
+    return cfg().get("config_uploads") or {}
+
+
+def config_route_text(tid: str) -> str:
+    return f"Upload on the configuration screen {config_uploads()[tid]['screen']}, approved by a second user"
+
+
+def _platform_label(code: str) -> str:
+    """The label the platform gives a code of a drop-down (BulkColumn.codes): words, acronyms kept, first capital."""
+    import code_facts as cf  # noqa: PLC0415
+
+    path = next(cf.JAVA_ROOT.rglob("DisplayFormat.java"))
+    m = re.search(r"ACRONYMS\s*=\s*Set\.of\((.*?)\);", path.read_text(encoding="utf-8"), re.S)
+    acronyms = set(re.findall(r'"([^"]+)"', m.group(1))) if m else set()
+    words = " ".join(w if w in acronyms else w.lower() for w in code.split("_"))
+    return words[:1].upper() + words[1:] if words else code
+
+
+def _java_list(name: str, text: str, consts: dict[str, str]) -> list[str]:
+    """The strings of a list, set or map-key constant of a class: NAME = List.of(...), Set.of(...), a map filled by
+    put("KEY", ...) in the method that builds it, or a local list built with new ArrayList<>(A) and addAll(B)."""
+    import code_facts as cf  # noqa: PLC0415
+
+    def items(expr: str) -> list[str]:
+        out = []
+        for part in cf.split_top(expr):
+            part = part.strip()
+            if part.startswith('"'):
+                out.append(part[1:-1])
+            elif part in consts:
+                out.append(consts[part])
+            elif part:
+                out.extend(_java_list(part, text, consts))
+        return out
+
+    if name.endswith(".keySet()"):
+        base = name[:-len(".keySet()")]
+        m = re.search(rf"\b{base}\s*=\s*(\w+)\(\)\s*;", text)
+        body = cf._method_body(text, m.group(1)) if m else ""
+        keys = re.findall(r'\.put\(\s*("[^"]+"|\w+)\s*,', body or "")
+        return [k.strip('"') if k.startswith('"') else consts.get(k, k) for k in keys]
+    m = re.search(rf"\b{name}\s*=\s*(?:List|Set)\.of\(", text)
+    if m:
+        start = m.end() - 1
+        return items(text[start + 1:cf.matching(text, start)])
+    m = re.search(rf"\b{name}\s*=\s*new ArrayList<>\((\w+)\)\s*;", text)
+    if m:
+        out = _java_list(m.group(1), text, consts)
+        for add in re.findall(rf"\b{name}\.addAll\((\w+)\)", text):
+            out += _java_list(add, text, consts)
+        return out
+    return []
+
+
+@lru_cache(maxsize=None)
+def handler_columns(cls: str) -> tuple[dict[str, Any], ...]:
+    """The columns of an upload of a configuration screen as its template shows them: header, description, required,
+    type, example, condition, choices [(code, label)], list of values, allowed text and format."""
+    import code_facts as cf  # noqa: PLC0415
+
+    path = next(p for p in cf.JAVA_ROOT.joinpath(*UPLOAD_FOLDER).glob(f"{cls}.java"))
+    text = cf._strip_comments(path.read_text(encoding="utf-8"))
+    consts = {**cf._global_constants_simple(), **cf._package_constants(path.parent), **cf._java_constants(text)}
+    body = cf._method_body(text, "columns") or ""
+    m = re.search(r"return\s+List\.of\(", body)
+    inner = body[m.end():cf.matching(body, m.end() - 1)]
+    out = []
+    for arg in cf.split_top(inner):
+        base = cf._columns_of(arg, consts, path.parent)
+        if not base:
+            continue
+        col = {**base[0], "when": "", "choices": [], "lov": "", "allowed": "", "format": ""}
+        for mm in re.finditer(r"\.(when|lov|codes|values|allowed|master|example|format)\(", arg):
+            start = mm.end() - 1
+            if arg[:mm.start()].count("(") - arg[:mm.start()].count(")") != 0:
+                continue  # inside the constructor, not a modifier of the column
+            val = arg[start + 1:cf.matching(arg, start)].strip()
+            key = mm.group(1)
+            if key in ("codes", "values"):
+                lit = val.split(".toArray(")[0] if ".toArray(" in val else val
+                codes = (_java_list(lit, text, consts) if ".toArray(" in val
+                         else [x for x in (consts.get(v.strip(), v.strip().strip('"')) for v in cf.split_top(lit)) if x])
+                col["choices"] = [(c, _platform_label(c) if key == "codes" else c) for c in codes]
+            elif key == "master":
+                col["allowed"] = f"Code of an existing {cf.java_text(val, consts, cls)}"
+            else:
+                col[key] = cf.java_text(val, consts, cls)
+        if col["required"]:
+            col["when"] = ""
+        out.append(col)
+    return tuple(out)
+
+
+def handler_template_ids() -> dict[str, str]:
+    """Template ID of every upload of the configuration screens: handler class -> ID."""
+    import code_facts as cf  # noqa: PLC0415
+
+    out = {}
+    for path in sorted(cf.JAVA_ROOT.joinpath(*UPLOAD_FOLDER).glob("*.java")):
+        text = cf._strip_comments(path.read_text(encoding="utf-8"))
+        if "extends ConfigUploadHandler" not in text:
+            continue
+        m = re.search(r'templateId\(\)\s*\{\s*return\s+"([^"]+)"', text)
+        if m:
+            out[path.stem] = m.group(1)
+    return out
+
+
+# The template whose codes a column of a new template takes, by the master the upload names (.master(...)).
+MASTER_CODES = {"account of the chart of accounts": "code:D0-06/Account Code", "branch": "code:D0-02/Branch code",
+                "line": "code:PM-01/Line code", "product": "code:PM-01/Risk code"}
+KIND_FORMAT = {"TEXT": "Text", "NUMBER": "Number without thousands separators, e.g. 1500000.50",
+               "DATE": "Date dd-MMM-yyyy, e.g. 15-Jan-2026", "YES_NO": "Y or N"}
+
+
+def _config_template(tid: str, base: Any, book) -> Any:
+    """A template in the layout of the upload of its configuration screen: the columns, headers, mandatory flags,
+    formats and allowed values of the platform's upload template; the title block of the template it replaces (or of
+    config_uploads for a new one). A column the platform names without a list keeps the drop-down of the codes of the
+    template filled in before (code of D0-06, of D0-02 ...)."""
+    import copy  # noqa: PLC0415
+
+    import guided_xlsx as g  # noqa: PLC0415
+    import sql_facts  # noqa: PLC0415
+
+    spec = config_uploads()[tid]
+    old = {c.header: c for c in (base.columns if base else [])}
+    overrides = (cfg().get("list_overrides") or {}).get(tid) or {}
+    lov_values = sql_facts.rows("lov_value", ("type_code", "code"))
+    lov_types = {r["code"]: r["name"] for r in sql_facts.rows("lov_type")}
+    cols = []
+    for c in handler_columns(spec["handler"]):
+        header, kind = c["header"], c["type"]
+        need = "Y" if c["required"] else (f"Cond.: {c['when']}" if c["when"] else "N")
+        fmt_ = c["format"] or ("Code from the drop-down" if kind == "TEXT" and c["choices"] else KIND_FORMAT[kind])
+        allowed, check = c["allowed"], ""
+        if c["choices"]:
+            ov = overrides.get(header) or {}
+            labels = {v[0]: v[1] for v in ov.get("values") or []}
+            code = re.sub(r"[^A-Z0-9]+", "_", f"{tid}_{header}".upper()).strip("_")
+            book.add_list(code, ov.get("name") or f"{header} ({tid})",
+                          [(x, labels.get(x, lbl)) for x, lbl in c["choices"]])
+            check = f"list:{code}"
+        elif c["lov"]:
+            values = [(v["code"], v["label"]) for v in lov_values if v["type_code"] == c["lov"]]
+            name = lov_types.get(c["lov"], _platform_label(c["lov"]))
+            if values:
+                book.add_list(f"LOV_{c['lov']}", name, values, "The values of the list as delivered with BIBS; a new "
+                              "value is added on Lists of Values first.", strict=False)
+                check = f"list:LOV_{c['lov']}"
+                if kind == "TEXT" and not c["format"]:
+                    fmt_ = "Code from the drop-down"
+            elif not allowed:
+                allowed = f"Code of the list {name} (Lists of Values)"
+        elif kind == "YES_NO":
+            check = "yn"
+        elif kind == "DATE":
+            check = "date"
+        elif kind == "NUMBER":
+            r = re.fullmatch(r"A (whole )?number from (\d+) to (\d+)", allowed)
+            check = (f"{'whole' if r.group(1) else 'number'}:{r.group(2)}-{r.group(3)}" if r else "number")
+        if not check and header in old and old[header].check.startswith(("code:", "ref:")) and (
+                not allowed or allowed.startswith("Code of an existing")):
+            check = old[header].check  # drop-down or link of the codes of the template filled in before
+        elif not check and allowed.startswith("Code of an existing ") and base is None:
+            check = MASTER_CODES.get(allowed[len("Code of an existing "):], "")
+        example = str(c.get("example") or "")
+        if example == "{baseCurrency}":
+            example = "PHP"
+        if check == "date" and re.fullmatch(r"\d{4}-\d{2}-\d{2}", example):
+            example = dt.date.fromisoformat(example).strftime("%d-%b-%Y")
+        cols.append(g.GuideColumn(header, need, fmt_, business(c["description"]) or header, example or "-", check,
+                                  allowed=allowed))
+    source = "Upload template of the configuration screen (the same columns, headers, mandatory flags and allowed " \
+             "values)"
+    if base is not None:
+        t = copy.deepcopy(base)
+        t.columns, t.load, t.source = cols, config_route_text(tid), source
+        t.extra_rows, t.input_rows, t.extra_lists = [], [], {}
+        return t
+    return g.Template(tid, spec["name"], f"{tid} {spec['sheet']}"[:31], spec["purpose"], spec["owner"],
+                      due_text(tid), config_route_text(tid), cols, source=source,
+                      depends=list(cfg()["depends"].get(tid, [])), capacity=300)
+
+
 def _screen_template(tid: str, spec: dict[str, Any], book) -> Any:
     import guided_xlsx as g  # noqa: PLC0415
 
@@ -1412,6 +1601,8 @@ def due_of(text: str) -> dt.date | None:
 def route_of(tid: str) -> str:
     if tid in UPLOAD_TEMPLATES or tid.startswith("UP-"):
         return ROUTE_UPLOAD
+    if tid in config_uploads():
+        return ROUTE_CONFIG
     if tid in dm_catalogue().layouts or tid in MIGRATION_TEMPLATES:
         return ROUTE_MIGRATION
     return ROUTE_SCREEN
@@ -1435,6 +1626,8 @@ def brd_of_template(tid: str) -> str:
 
 def where_of(tid: str, t: Any) -> str:
     """The screen or console where the rows are entered or loaded."""
+    if tid in config_uploads():
+        return config_uploads()[tid]["screen"]
     dc = drop_closure()
     for it in dc.data()["items"]:
         if it.get("template") == tid and it.get("screen"):
@@ -1451,19 +1644,29 @@ def b_templates(book) -> list[Any]:
     out = []
     drops = drop_templates_b()
     for tid in all_template_ids():
+        t = None
         if tid in drops:
-            out.append(drops[tid])
+            t = drops[tid]
         elif tid in c["uploads"]:
-            out.append(_upload_template(tid, c["uploads"][tid], book))
+            t = _upload_template(tid, c["uploads"][tid], book)
         elif tid in c["screen_templates"]:
-            out.append(_screen_template(tid, c["screen_templates"][tid], book))
+            t = _screen_template(tid, c["screen_templates"][tid], book)
         elif tid in dm_catalogue().layouts:
-            out.append(_layout_template(tid, book))
-        else:
+            t = _layout_template(tid, book)
+        elif tid not in config_uploads():
             raise SystemExit(f"workbook B: unknown template {tid}")
+        if tid in config_uploads():
+            t = _config_template(tid, t, book)
+        out.append(t)
     ids = {t.id for t in out}
+    columns = {t.id: {c.header for c in t.columns} for t in out}
     for t in out:
         t.depends = [d for d in t.depends if d in ids and d != t.id]
+        for col in t.columns:  # a code check naming a column the template no longer has is dropped
+            kind, _, arg = col.check.partition(":")
+            ref, _, name = arg.partition("/")
+            if kind in ("code", "ref") and (ref not in columns or name not in columns[ref]):
+                col.check = ""
     return out
 
 
@@ -1516,6 +1719,8 @@ def b_book() -> tuple[Any, list[Any], list[Any]]:
     templates = b_templates(book)
     by_id = {t.id: t for t in templates}
     for tid, cols in (cfg().get("list_overrides") or {}).items():
+        if tid in config_uploads():
+            continue  # the labels are given to the list of the upload (_config_template)
         for header, spec in cols.items():
             code = re.sub(r"[^A-Z0-9]+", "_", f"{tid}_{header}".upper()).strip("_")
             book.add_list(code, spec["name"], [tuple(v) for v in spec["values"]])
@@ -1829,11 +2034,11 @@ def build_b() -> Path:
     ]
     book.table_sheet(CHARGES_SHEET, "PM-04 Charges checklist: premium charges billed to clients", "One row per "
                      "charge: how BIBS computes it, where its rate is given and what BDOI confirms (rates per line in "
-                     "PM-04, LGT per insurer branch in R04B)", chk_cols("Charge"), checklist_rows("charges_checklist"),
+                     "PM-04, other charges in PM-04C, LGT per insurer branch in R04B)", chk_cols("Charge"), checklist_rows("charges_checklist"),
                      B_STATUSES)
     book.table_sheet(TAX_SHEET, "D0-10 Tax checklist: BDOI's own taxes", "One row per kind of tax: what BIBS does, "
-                     "where it is set up (D0-10 tax codes, TX-01 party tax profiles, TX-02 tax forms) and what BIBS "
-                     "does not hold", chk_cols("Tax"), checklist_rows("tax_checklist"), B_STATUSES)
+                     "where it is set up (D0-10 tax codes, TX-01 party tax profiles, TX-02 tax forms, D0-01 and D0-02 "
+                     "tax registration) and what BDOI provides", chk_cols("Tax"), checklist_rows("tax_checklist"), B_STATUSES)
     book.table_sheet(COVERAGE_SHEET, "Coverage check", "The datasets the product owner asked about and where each "
                      "is in this workbook, or why BIBS does not hold it", [
         Column("item", "Dataset", 40, "Dataset asked about"),
@@ -1852,11 +2057,14 @@ def build_b() -> Path:
         "The index below lists every master, reference and configuration dataset BIBS needs before go-live, one "
         "template sheet each, in the order the data is loaded: a dataset whose codes others use comes first (Loads "
         "after names the templates it depends on). Each template has the column layout BIBS loads.",
-        f"Load route: {ROUTE_UPLOAD} ({routes[ROUTE_UPLOAD]} templates) - the filled-in sheet is uploaded on the named "
-        f"screen, which checks every row; {ROUTE_MIGRATION} ({routes[ROUTE_MIGRATION]}) - the data is extracted from "
-        f"the legacy systems by BDOI IT in this layout and loaded by the Data Migration Console; {ROUTE_SCREEN} "
-        f"({routes[ROUTE_SCREEN]}) - upload on the screen being added; until then BDOI fills the template and it is "
-        f"loaded on the screen with maker-checker (sheet {GAPS_SHEET}). Every record is authorised by a second user.",
+        f"Load route: {ROUTE_CONFIG} ({routes[ROUTE_CONFIG]} templates) - the filled-in sheet is uploaded with Upload "
+        f"on the named configuration screen, in exactly this layout; every row is checked first and the rows are "
+        f"applied when a second user approves the upload; {ROUTE_UPLOAD} ({routes[ROUTE_UPLOAD]}) - the filled-in "
+        f"sheet is uploaded on the named screen, which checks every row; {ROUTE_MIGRATION} "
+        f"({routes[ROUTE_MIGRATION]}) - the data is extracted from the legacy systems by BDOI IT in this layout and "
+        f"loaded by the Data Migration Console; {ROUTE_SCREEN} ({routes[ROUTE_SCREEN]}) - no upload: the rows are "
+        f"keyed on the screen from the filled-in template (sheet {GAPS_SHEET}). Every record is authorised by a "
+        f"second user.",
         "On a template sheet, read the header block (purpose, who fills it in, how it is loaded, due, depends on) and "
         "the guide above each column (Mandatory, Format, Allowed values, What to enter; * marks a mandatory column). "
         "Overwrite or delete the grey example row and enter one row per record. Drop-downs offer the allowed values "
@@ -1882,13 +2090,15 @@ def build_b() -> Path:
     dc = drop_closure()
 
     def more(ws, row):
-        row = book.small_table(ws, row, "Groups of datasets", ["Group", "Templates", "Upload", "Migration Console",
-                                                               "Configuration screen"],
+        row = book.small_table(ws, row, "Groups of datasets", ["Group", "Templates", "Configuration screen upload",
+                                                               "Screen upload", "Migration Console",
+                                                               "Keyed on screen"],
                                [[gr["name"], ", ".join(gr["templates"]),
+                                 sum(1 for t in gr["templates"] if route_of(t) == ROUTE_CONFIG),
                                  sum(1 for t in gr["templates"] if route_of(t) == ROUTE_UPLOAD),
                                  sum(1 for t in gr["templates"] if route_of(t) == ROUTE_MIGRATION),
                                  sum(1 for t in gr["templates"] if route_of(t) == ROUTE_SCREEN)]
-                                for gr in cfg()["groups"]], spans=[3, 6, 2, 2, 2])
+                                for gr in cfg()["groups"]], spans=[3, 6, 2, 2, 1, 1])
         row = book.small_table(ws, row, "Due milestones", ["Due", "Milestone", "Due date", "Before go-live",
                                                             "Why this date"],
                                [[c, x["label"], dc.fmt(x["date"]), f"T-{x['weeks']} weeks", x["note"]]
@@ -1897,7 +2107,7 @@ def build_b() -> Path:
             ((name, name), desc) for name, desc in
             [(REVIEW[k], rcols[k][0]) for k in REVIEW] +
             [(CHARGES_SHEET, "Premium charges billed to clients: one row per charge with the rule BIBS applies"),
-             (TAX_SHEET, "BDOI's own taxes: one row per kind of tax, what BIBS does and what it does not hold"),
+             (TAX_SHEET, "BDOI's own taxes: one row per kind of tax, what BIBS does and what BDOI provides"),
              (SCREENS_SHEET, "Set-up decided in working sessions and entered on the screens (no template)"),
              (GAPS_SHEET, "Datasets without an upload route, and data BIBS does not hold (questions)"),
              (COVERAGE_SHEET, "The datasets asked about and where each is, or why BIBS does not hold it"),
@@ -1940,7 +2150,14 @@ def render(doc: Any, render: str, **_: Any) -> None:  # noqa: A002 - block key
         return
     if render == "routes":
         routes = Counter(route_of(t.id) for t in templates)
-        rows = [[ROUTE_UPLOAD, "The filled-in sheet (or a CSV or TXT file with the same header row) is uploaded on "
+        rows = [[ROUTE_CONFIG, "Upload on the configuration screen named, approved by a second user. The screen's "
+                               "Upload offers the template in exactly the layout of this sheet (and the current data "
+                               "in the same layout); the filled-in sheet, or a CSV or TXT file with the same header "
+                               "row, is uploaded there. Every row is checked first, with the reason of each error and "
+                               "an error file to correct; the preview shows which rows add and which update a record; "
+                               "nothing changes until a second user approves the upload. Uploading the same file "
+                               "again changes nothing.", routes[ROUTE_CONFIG]],
+                [ROUTE_UPLOAD, "The filled-in sheet (or a CSV or TXT file with the same header row) is uploaded on "
                                "the named screen. Every row is checked; the screen lists the rows refused with the "
                                "reason, and the accepted rows wait for a second user to authorise them.",
                  routes[ROUTE_UPLOAD]],
@@ -2035,12 +2252,57 @@ def check() -> list[str]:
     for tid in known:
         if tid not in book.plans:
             problems.append(f"workbook B: template {tid} not written")
+    problems += check_config_uploads(templates)
     dc = drop_closure()
     for it in dc.data()["items"]:
         if it["route"] == "template" and it.get("template", "").startswith(("D0-", "PM-", "UA-")):
             if it["template"] not in known and it["template"] not in cfg()["replaced"]:
                 problems.append(f"workbook B: configuration item {it['id']} names template {it['template']}, "
                                 "not in the workbook")
+    return problems
+
+
+def check_config_uploads(templates: list[Any]) -> list[str]:
+    """Every upload of a configuration screen has its tab, and each tab has exactly the columns, headers, order,
+    mandatory flags and allowed codes of the upload's template; the screens are menu paths of BIBS."""
+    problems = []
+    by_id = {t.id: t for t in templates}
+    handlers = handler_template_ids()
+    mapped = {spec["handler"]: tid for tid, spec in config_uploads().items()}
+    for cls, tid in handlers.items():
+        if mapped.get(cls) != tid:
+            problems.append(f"workbook B: upload {cls} (template {tid}) is not the upload of tab {tid}")
+    menus = set(drop_closure().menu().values())
+    for tid, spec in config_uploads().items():
+        if spec["handler"] not in handlers:
+            problems.append(f"workbook B: {tid} names {spec['handler']}, not an upload of a configuration screen")
+            continue
+        for screen in spec["screen"].split(" or "):
+            if screen not in menus:
+                problems.append(f"workbook B: {tid} screen {screen} is not a menu path of BIBS")
+        t = by_id.get(tid)
+        if t is None:
+            problems.append(f"workbook B: no tab for the upload {tid}")
+            continue
+        want = handler_columns(spec["handler"])
+        if [c.header for c in t.columns] != [c["header"] for c in want]:
+            problems.append(f"workbook B: {tid} headers differ from the upload: "
+                            f"{[c.header for c in t.columns]} != {[c['header'] for c in want]}")
+            continue
+        for c, w in zip(t.columns, want):
+            need = "Y" if w["required"] else (f"Cond.: {w['when']}" if w["when"] else "N")
+            if c.mandatory != need:
+                problems.append(f"workbook B: {tid} {c.header}: mandatory {c.mandatory}, the upload {need}")
+            if w["choices"]:
+                codes = [v for v, _ in b_book()[0].lists[c.check[5:]].values] if c.check.startswith("list:") else []
+                if codes != [x for x, _ in w["choices"]]:
+                    problems.append(f"workbook B: {tid} {c.header}: values {codes}, the upload "
+                                    f"{[x for x, _ in w['choices']]}")
+        for header in (cfg().get("list_overrides") or {}).get(tid) or {}:
+            ov = {v[0] for v in cfg()["list_overrides"][tid][header]["values"]}
+            up = {x for c in want if c["header"] == header for x, _ in c["choices"]}
+            if ov != up:
+                problems.append(f"workbook B: {tid} {header}: labels given for {sorted(ov ^ up)} not in the upload")
     return problems
 
 

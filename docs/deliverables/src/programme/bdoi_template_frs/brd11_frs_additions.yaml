@@ -1,0 +1,608 @@
+# Additions of version 1.2 to BDOI's User Access Maintenance FRS (BDO ITG template D051, PRJ0012475), in BDOI's
+# style: "The system shall ..." statements and numbered acceptance criteria. Read by build_brd11_bdoi_frs.py.
+#
+#   items         elaboration under each of BDOI's items (key = BDOI's item number; the second FRUM.008.01 is keyed
+#                 "FRUM.008.01 (2nd)"); the statements continue BDOI's numbered list of the item
+#   new_subitems  new sub-items of BDOI's entries, numbered after BDOI's last sub-item of the entry
+#   new_items     new entries FRUM.009 onwards (capabilities BDOI's FRS does not have)
+# refs: the BIBS reference requirements (FR-UA-nnn of the BIBS FRS BRD-11) each item incorporates; they drive
+# Annex P (traceability) and the FRUM items of the BRD lines in the Business Requirements Mapping.
+# Wording: business words only; "Annex Q" is the observations annex where a point is open for BDOI's decision.
+
+items:
+  FRUM.001.01:
+    refs: [FR-UA-001, FR-UA-002]
+    shall:
+      - The system shall keep one session for all the browser tabs of a user; activity in any tab keeps every tab signed in.
+      - The system shall rely on the BDO network and device policy, applied by EIAM at sign-in, to restrict access to BDO-issued devices (Annex N).
+    ac:
+      - A user signed in on two tabs keeps working in the second tab after working only in the first for 20 minutes.
+      - A sign-in from a device that the BDO device policy does not allow is refused by EIAM before the system opens a session.
+
+  FRUM.001.02:
+    refs: [FR-UA-001, FR-UA-003, FR-UA-051]
+    shall:
+      - The system shall offer "Sign in with" the BDO identity provider (EIAM) on the Login page when single sign-on is switched on for the environment (Annex N).
+      - The system shall link the identity returned by EIAM to an existing and active user by the Windows ID, or by the user principal name where the Windows ID is not released; it shall never create a user from a sign-in.
+      - "The system shall refuse an identity that is not linked to an active user with the message \"Your sign-in was accepted by your organisation, but it is not linked to an active user of this system. Contact your administrator.\" and record the attempt in the audit trail."
+      - The system shall take the roles and permissions of the user only from the user's group profiles held in the system, whatever groups the identity provider holds.
+      - The system shall show in the menu only the screens of the user's active group profiles; a user with several group profiles sees the screens of all of them.
+      - "The system shall refuse an action for which the user holds no permission with the message \"You are not permitted to perform this action\"."
+      - "The system shall allow local sign-in only to the named break-glass System Administrators (FRUM.001.06); it shall lock a local account after three (3) consecutive failed attempts and give one message for a wrong password, a locked and a deactivated account: \"Invalid user name or password\"."
+      - The system shall record each sign-in with its method (single sign-on or local) and each failed attempt in the audit trail.
+    ac:
+      - A user whose Windows ID matches an active user signs in at EIAM and sees only the screens of his or her group profiles; no password of the user is held in the system.
+      - An EIAM account that matches no active user is refused with the not-linked message, and the attempt is in the audit trail.
+      - A user without the permission of an action does not see its button, and the action is refused with "You are not permitted to perform this action".
+      - The third wrong password of a break-glass account locks it; the next attempt with the right password is refused with "Invalid user name or password", and the Users screen shows the account as locked.
+
+  FRUM.001.03:
+    refs: [FR-UA-002]
+    shall:
+      - The system shall count the inactivity across all the tabs of the user and show the warning after the inactivity time set by the System Administrator (15 minutes as delivered).
+      - A change of the inactivity time shall apply only after the approval of Information Security (FRUM.012.02).
+    ac:
+      - After 15 minutes without activity the warning appears with the buttons "Stay Logged In" and "Log Out".
+      - Stay Logged In closes the warning and restarts the timer; Log Out ends the session and opens the Login page.
+
+  FRUM.001.04:
+    refs: [FR-UA-002, FR-UA-004]
+    shall:
+      - The system shall sign the user out after the session timeout without activity (30 minutes as delivered) and record the end of the session with the reason inactivity.
+      - The system shall also warn the user before the fixed end of a session, the configured number of minutes before it (30 minutes as delivered), so that the user can save the work (BRD x.001.1.3; Annex Q).
+      - After a sign-out of a single sign-on session, the next sign-in shall go through EIAM again.
+    ac:
+      - After 30 minutes without activity the user is signed out, and the session log shows the reason inactivity.
+      - Opening a page of the ended session leads to the Login page and a new sign-in.
+      - 30 minutes before the fixed end of the session the user sees the session-end warning.
+
+  FRUM.002.01:
+    refs: [FR-UA-011, FR-UA-031, FR-UA-052]
+    shall:
+      - Where the user is enrolled through a request in the system (FRUM.009.02), the system shall create the user only when the request is approved by another user, with the data and group profiles of the request.
+      - Where UIDM-ISC provisions the user account (Annex N), the system shall create the user from the provisioning event with the UIDM request number; the group profiles are assigned through a request (Annex Q).
+      - The system shall hold for each user the user ID (a letter followed by nine digits, for example a013000196), Windows ID, full name, e-mail, home branch, business unit group, user level, group profiles, authorisation limit and status.
+      - "The system shall refuse a user ID that already exists (\"User <user> already exists\") or that does not follow the format (\"The user ID must be a letter followed by nine digits, for example a013000196\"), and a Windows ID held by another user (\"Windows ID <windows id> belongs to another user\")."
+      - The system shall offer only active group profiles and refuse two group profiles that a separation-of-duties rule forbids one user to hold (FRUM.012.01).
+      - The system shall record every attribute of the new user, with the request number and the approver, in the access-change log (FRUM.008.01).
+    ac:
+      - An enrolment of user a013000196 with the profile Marketing Account Officer, approved by another user, creates the user, who can then sign in.
+      - An enrolment with an existing user ID is refused with "User a013000196 already exists".
+      - An enrolment with a Windows ID held by another user is refused.
+      - An inactive group profile is not offered.
+
+  FRUM.002.02:
+    refs: []
+    shall:
+      - Where UIDM-ISC provisioning is used (Annex N), the system shall receive the joiner, mover and leaver events of UIDM-ISC through the standard user-provisioning interface and apply them with the UIDM request number as reference.
+      - The system shall record each provisioning event, applied or refused, in the access-change log with the source UIDM-ISC, and alert the System Administrators of each refused event.
+      - The system shall show on the user the last provisioning event, with its date and time, source and UIDM request number (Annex Q).
+      - The system shall offer UIDM-ISC an extract of the accounts, group profiles and permissions for access certification.
+    ac:
+      - A joiner event of UIDM-ISC creates the user, and the user shows the UIDM request number and the time of the event.
+      - A provisioning event for a Windows ID held by another user is refused, logged and alerted to the System Administrators.
+
+  FRUM.003.01:
+    refs: [FR-UA-012]
+    shall:
+      - Where the change is requested in the system (FRUM.009.03), the system shall apply the changed data and group profiles of an approved Modify user request and record each changed attribute with its from and to values and the request number.
+      - Where UIDM-ISC provisioning is used, the system shall apply the mover events of UIDM-ISC to the user details and keep the group profiles unchanged.
+    ac:
+      - An approved request moving a user from Marketing Team Lead to Processing Team Lead is applied, and the User Access Audit Log shows "Marketing Team Lead" to "Processing Team Lead".
+      - A change of the e-mail only leaves the group profiles unchanged.
+
+  FRUM.003.02.01:
+    refs: [FR-UA-013, FR-UA-006]
+    shall:
+      - Where the deactivation is requested in the system (FRUM.009.04), the system shall deactivate the user when the request is approved, or on its effective date, with its reason (Resigned, Transferred to another unit, Long leave, Security, Others).
+      - The system shall keep the group profiles of a deactivated user so that a reactivation restores them.
+      - The system shall refuse the sign-in of a deactivated user with the same message as a wrong password.
+      - The system shall end the open sessions of the user when a deactivation is applied, from a request, from UIDM-ISC or from the dormant-user run (Annex Q).
+    ac:
+      - After the approved deactivation the user cannot sign in, and the User Access Report shows the deactivation with the approver.
+      - A deactivation with the effective date 30th is applied on the 30th.
+      - The open session of a deactivated user ends at the user's next action.
+
+  FRUM.003.02.02:
+    refs: [FR-UA-014]
+    shall:
+      - Where the reactivation is requested in the system (FRUM.009.05), the system shall reactivate the user when the request is approved, with the group profiles held before, and unlock the account when the request asks for it.
+      - "The system shall refuse the reactivation of an active user (\"User <user> is already active\")."
+    ac:
+      - After the approved reactivation the user signs in with the group profiles held before the deactivation.
+      - A locked user reactivated with "Also unlock the account" can sign in again.
+
+  FRUM.003.03:
+    refs: []
+    shall:
+      - Where UIDM-ISC provisioning is used, the system shall apply its leaver and rehire events as the deactivation and the reactivation of the user (FRUM.003.02).
+      - A user whose EIAM account is disabled or locked shall not reach the system, because EIAM does not complete the sign-in.
+      - The system shall notify the System Administrators of every refused provisioning event (Annex L).
+    ac:
+      - A leaver event of UIDM-ISC deactivates the user, and the user's next action is refused.
+      - A disabled EIAM account cannot sign in to the system.
+
+  FRUM-004.01:
+    refs: [FR-UA-005, FR-UA-003]
+    shall:
+      - For the break-glass accounts (local password, FRUM.001.06), the system shall require a new password after 90 days, refuse a second change within 1 day, and ask for the new password at sign-in when the password has expired.
+      - The system shall notify the holder of a local account 7 days before the password expires.
+    ac:
+      - A break-glass administrator whose password is 91 days old must set a new one before the home page opens.
+      - A single sign-on user is never asked for a password by the system.
+
+  FRUM-004.02:
+    refs: [FR-UA-005]
+    shall:
+      - For the break-glass accounts only, a System Administrator other than the holder shall reset the password; the system shall show the temporary password once and require a change at the next sign-in (Annex Q).
+      - "The system shall refuse the reuse of the last ten (10) passwords of a local account (\"You used this password recently. Choose another one\")."
+      - A new local password shall have at least 10 characters with upper- and lower-case letters, a digit and a symbol; the screen shows what is still needed as the user types.
+    ac:
+      - A reset password must be changed at the next sign-in.
+      - A new password equal to one of the last ten is refused.
+      - A password without a symbol is refused, and the screen lists "A symbol" as still needed.
+
+  FRUM-004.03:
+    refs: [FR-UA-005]
+    shall:
+      - The system shall offer no forgotten-password function to single sign-on users; for the break-glass accounts the self-service reset link (single use, valid 30 minutes) shall be switched off in production (Annex Q).
+    ac:
+      - The Login page shows no forgotten-password function when single sign-on is switched on.
+
+  FRUM.005.01:
+    refs: [FR-UA-040, FR-UA-044, FR-UA-045, FR-UA-050, FR-UA-051]
+    shall:
+      - The system shall create and change roles (group profiles) through approved group-profile requests (FRUM.005.02 to FRUM.005.04); the authorised user who configures the role in the system is the System Administrator who implements the approved request.
+      - The system shall hold for each role a code (capital letters, digits and underscore, up to 40 characters, unique), a name (up to 120 characters), a description (up to 500 characters), a privilege level (Low, Standard, High or Admin), a status and the permissions.
+      - The system shall give every function and action its own permission, with its module and action class (View, Create, Amend, Approve), so that each function can be granted to any role.
+      - "The system shall refuse a direct change of a role outside an approved request (\"Roles are changed through an approved group-profile request; implement the request instead\") unless the emergency role edit is switched on with the approval of Information Security; each emergency change is recorded and alerted."
+    ac:
+      - An approved request for a new role Processing Team Lead creates the role only when the System Administrator implements it.
+      - A role code that already exists is refused.
+      - A direct change of a role is refused while the emergency role edit is off.
+
+  FRUM.006.01:
+    refs: [FR-UA-041, FR-UA-045]
+    shall:
+      - The system shall apply role updates through a change request naming the role, the permissions to add and to remove, any change of the name, description and privilege level, the approvers and the justification (FRUM.006.04).
+      - The change applied shall be the difference between the role at implementation and the request, so that a change implemented in between is not lost.
+      - "The system shall refuse a request for a role that has another request waiting for approval (\"A request for role <code> is already waiting for approval\")."
+    ac:
+      - A request that adds one permission and removes another is implemented with exactly that difference.
+      - A second request for a role with a pending request is refused.
+
+  FRUM.006.02.01:
+    refs: [FR-UA-042]
+    shall:
+      - The system shall deactivate a role through an approved and implemented deactivation request that lists the members; the members lose its screens at their next action and are each notified in the system and by e-mail.
+      - The System Administrator profile shall never be deactivated.
+      - An inactive role shall keep its permissions for a reactivation.
+    ac:
+      - After the implementation the members of the deactivated role lose its screens at their next action.
+      - The deactivated role is not offered on new requests.
+
+  FRUM.006.02.02:
+    refs: [FR-UA-043]
+    shall:
+      - The system shall reactivate a role through an approved and implemented reactivation request, chosen from the list of inactive roles; the role is restored with its last permissions and its members regain them.
+    ac:
+      - A reactivated role grants its permissions again to its members.
+
+  FRUM.006.03:
+    refs: [FR-UA-041, FR-UA-053]
+    shall:
+      - "The system shall refuse a permission both added and removed in one request (\"Permission(s) both added and removed: <permissions>\") and a request that changes nothing."
+      - The system shall check every user request and bulk line against the separation-of-duties rules between roles (FRUM.012.01); a user may not hold both roles of an active rule.
+      - "The system shall refuse a request listing too many permission changes at once (\"Split the change into several requests\")."
+    ac:
+      - A request that adds and removes the same permission is refused.
+      - A request giving one user both roles of an active separation-of-duties rule is refused with the names of the two roles.
+
+  FRUM.007.01:
+    refs: [FR-UA-060, FR-UA-061, FR-UA-062]
+    shall:
+      - The system shall offer the User Access Report by as-of date (the access held at the end of that date), business unit group, status and group profile; the User Group Profile Report by group profile, module and active flag; and the Group Profile Membership List by group profile and as-of date.
+      - The User Access Report shall show for each user the user ID, Windows ID, group profiles, business unit group, user level, status, created by and date, modified by and date, and the last action (added, modified, deactivated, reactivated) with who did it (Annex E).
+      - The User Group Profile Report shall show the module, task and access of each role, and the role's dates created and modified with who created and changed it (Annex F).
+      - Created by and Modified by shall show the approver of the request that made the change, with the request number.
+      - "The system shall refuse an as-of date in the future (\"The as-of date cannot be in the future\")."
+    ac:
+      - The User Access Report shows user a024000000 with the profile Processing Officer, created by the approver of its enrolment and modified by the approver of the later change.
+      - For the Marketing Account Officer profile the User Group Profile Report lists the Client Management tasks with With Access or No Access.
+      - The membership list shows every member of Marketing Team Lead with who added the member and when.
+
+  FRUM.007.02:
+    refs: [FR-UA-060, FR-UA-061, FR-UA-062]
+    shall:
+      - Every report shall print in its header the report name, the user who generated it, the date coverage and the date and time generated (BRD section 7).
+    ac:
+      - The User Access Report exports to PDF, XLSX and CSV with the header of the report and only the filtered rows.
+
+  FRUM.008.01:
+    refs: [FR-UA-064, FR-UA-063, FR-UA-004]
+    shall:
+      - Each applied access change shall also write one line per changed attribute in the access-change log (time, user or role, activity, attribute, from value, to value, request number, done by, approved by), together with the change, so that no change is applied without its log lines.
+      - No user, the System Administrator included, shall change or delete an audit or access-change log entry; the entries are kept at least as long as the audit trail.
+      - The system shall record in each audit entry the role of the user at the time of the action and the source (IP) address of the session (Annex Q).
+    ac:
+      - Each attribute of a modified user has one log line with its from and to values and the request number.
+      - An attempt to change or delete a log entry is refused.
+
+  FRUM.008.02:
+    refs: [FR-UA-063]
+    shall:
+      - The User Access Audit Log shall list, for a date range, a user and an activity, each access activity with its date, activity, from, to, done by, approved by and request number; log-ins, failed log-ins and log-outs are included on request.
+      - "The system shall refuse an end date before the start date (\"The end date must be on or after the start date\")."
+    ac:
+      - A change of the group profile of a user appears as "Modify User Group Profile" from "Marketing Team Lead" to "Processing Team Lead" with the user who did it.
+      - Log-outs appear when the option is selected.
+
+  FRUM.008.01 (2nd):
+    refs: [FR-UA-063]
+    shall:
+      - The export shall carry the header of the report (name, generated by, date coverage, date and time generated).
+    ac:
+      - An export of the audit log for a date range holds only the records of that range and is itself recorded in the audit trail.
+
+new_subitems:
+  - row: FRUM.001
+    id: FRUM.001.05
+    title: Log Out and Session Log
+    refs: [FR-UA-004]
+    shall:
+      - The system shall provide Log Out in the user menu; it shall end the session, record the log-out in the audit trail and show the Login page.
+      - With single sign-on, the system shall also send the user to the EIAM sign-out page so that the BDO session ends too (Annex Q).
+      - The system shall keep a session log of every session - user, sign-in method, second factor, start, last activity, end and end reason (log-out, inactivity, session expiry, ended by an administrator, account locked).
+      - The system shall show a user as Online on the Users screen while a session is open, and allow the System Administrator to end a session.
+    ac:
+      - After Log Out the User Access Audit Log shows the log-out with the user and the time.
+      - The Users screen shows a signed-in user as Online.
+      - With single sign-on, after Log Out opening the system again asks for the BDO sign-in.
+
+  - row: FRUM.001
+    id: FRUM.001.06
+    title: Break-glass Administrators
+    refs: [FR-UA-003]
+    shall:
+      - The system shall keep local sign-in, with a password and a second factor (code of an authenticator application) always asked, for two named System Administrator accounts, so that the system can be administered when EIAM is not available (Annex N).
+      - The system shall alert Information Security of every sign-in of a break-glass account and record it in the audit trail.
+      - The system shall refuse local sign-in to every other user while single sign-on is switched on.
+      - The password rules of the break-glass accounts are those of FRUM-004 and Annex M.
+    ac:
+      - With single sign-on switched on, a break-glass System Administrator signs in with the password and the second factor, and Information Security receives the alert.
+      - Another user cannot sign in with a local password.
+      - A wrong second-factor code is refused and counts as a failed attempt.
+
+  - row: FRUM.002
+    id: FRUM.002.03
+    title: User Data and User ID Format
+    refs: [FR-UA-052]
+    shall:
+      - The system shall list the users with user ID, Windows ID, full name, business unit group, user level, group profiles, authorisation limit, last sign-in and status (Active, Disabled, Locked, Online), with filters by status, business unit group and group profile.
+      - The system shall check new user IDs against the user ID format set by the System Administrator (a letter followed by nine digits as delivered) and show the format in words to the requester.
+      - The system shall take the business unit groups and the user levels from lists maintained by the Business Administrator.
+      - The system shall let one user hold several group profiles and one group profile be held by many users.
+      - The system shall change user data and group profiles only through approved requests; the System Administrator unlocks an account and resets the password of a local account directly, each recorded in the access-change log.
+      - "The system shall refuse a change of one's own group profiles (\"You cannot change your own roles\")."
+    ac:
+      - The Users screen shows the Windows ID, business unit group, user level and status of each user.
+      - An unlock is listed in the User Access Audit Log with the System Administrator who did it.
+      - A System Administrator cannot change his or her own group profiles.
+
+  - row: FRUM.003
+    id: FRUM.003.04
+    title: Dormant Users
+    refs: [FR-UA-006]
+    shall:
+      - Every night the system shall deactivate the users who have not signed in for the dormancy period (90 days as delivered), counted from the last sign-in, or from the creation or the last reactivation when later.
+      - The system shall tell the user, in the system and by e-mail, the notice period before the deactivation (7 days as delivered).
+      - "Each deactivation shall be a Deactivate user request with the reason \"No sign-in for the dormancy period\", approved and applied by the system, with its history and notices."
+      - The holders of the System Administrator profile shall never be deactivated this way.
+      - A dormancy period of 0 switches the deactivation off; a change of the values applies after the approval of Information Security (FRUM.012.02).
+    ac:
+      - A user without a sign-in for 91 days is deactivated with the reason "No sign-in for the dormancy period".
+      - A user whose deactivation is 7 days away receives the notice and stays active.
+      - A System Administrator without a sign-in for 91 days stays active.
+
+  - row: FRUM.005
+    id: FRUM.005.02
+    title: Group-Profile Request
+    refs: [FR-UA-040]
+    shall:
+      - The system shall let the Business Administrator request a new group profile with its code, name, description, privilege level, the permissions picked by module and action, the approvers and the remarks.
+      - The request shall follow the request steps of FRUM.009.01 - draft, edit, cancel, submit - and keep every remark in its history.
+      - "The system shall refuse a request without a permission (\"Select at least one permission\") or with a code that already exists."
+    ac:
+      - A request for a new profile with its permissions reaches For Implementation after its approvers approve.
+      - A request without a permission cannot be submitted.
+
+  - row: FRUM.005
+    id: FRUM.005.03
+    title: Approvers in Order
+    refs: [FR-UA-044]
+    shall:
+      - The system shall hold one or more approvers in order on a group-profile request; each approver decides in turn, the request moves to the next approver on approval, and all must approve.
+      - Any approver may reject or return the request; after a return and re-submission it starts again with the first approver.
+      - The system shall refuse an approver listed twice and the requester as an approver.
+    ac:
+      - With two approvers, the second is notified only after the first approves.
+      - A rejection by the first approver ends the request; the second approver is not asked.
+
+  - row: FRUM.005
+    id: FRUM.005.04
+    title: Implementation by the System Administrator
+    refs: [FR-UA-045]
+    shall:
+      - The system shall list the approved group-profile requests under For Implementation; Implement Request opens the role with the approved change, and saving it applies the change and sets the request to Implemented.
+      - "The implementer shall not be the requester (\"A request is implemented by someone other than its requester\")."
+      - The system shall notify the System Administrators of each request to implement and the requester when it is implemented.
+    ac:
+      - An approved new profile exists only after the System Administrator implements it.
+      - The requester of a group-profile request cannot implement it.
+
+  - row: FRUM.005
+    id: FRUM.005.05
+    title: Group Profiles of the Access Personas (BRD 4.002.1)
+    refs: [FR-UA-050]
+    shall:
+      - The system shall provide the group profiles Requestor, Approver, Second Approver, Business Administrator, System Administrator, Auditor and Information Security Officer with the access permissions of Annex M; later changes to them are group-profile requests.
+    ac:
+      - The Requestor, Approver and Business Administrator profiles exist with the permissions of Annex M.
+
+  - row: FRUM.005
+    id: FRUM.005.06
+    title: Functions Assigned to Group Profiles (BRD 4.002.2)
+    refs: [FR-UA-051]
+    shall:
+      - Each access function of BRD 4.002.2 shall have its own permission - enrol, modify, deactivate and reactivate a user, apply correction, cancel a request, view requests, review and approve, submit group-profile requests, generate reports (Annex M); granting a permission to a role grants the function to all its members.
+      - The User Access Matrix shall show the roles by permission and by module and action class, with an Excel export.
+    ac:
+      - A role without the cancel permission does not show Cancel Request.
+      - The User Access Matrix shows the enrol permission under the module User Access, action Create.
+
+  - row: FRUM.006
+    id: FRUM.006.04
+    title: Group-Profile Change, Deactivation and Reactivation Requests
+    refs: [FR-UA-041, FR-UA-042, FR-UA-043]
+    shall:
+      - The Business Administrator shall choose the role from the drop-down of active roles (change, deactivation) or of inactive roles (reactivation), enter the change, choose the approvers in order and write the remarks, and save a draft, edit it, cancel it or submit it as in FRUM.009.01.
+      - The system shall show the current members of the role on the request.
+      - The system shall refuse the deactivation of an inactive role and the reactivation of an active role.
+    ac:
+      - A draft change request is seen and edited only by its creator and is submitted later with the same number.
+      - A deactivation request shows the members of the role.
+
+  - row: FRUM.007
+    id: FRUM.007.03
+    title: Access Requests Report and User Access Matrix Export
+    refs: [FR-UA-018, FR-UA-051]
+    shall:
+      - The system shall offer the Access Requests report by date range, status, type, requester and approver, with the age of each request.
+      - The system shall export the User Access Matrix (every role against every permission) to Excel.
+    ac:
+      - The Access Requests report lists the requests of a date range with their status and approver.
+      - The User Access Matrix export lists every role against every permission.
+
+  - row: FRUM-008
+    id: FRUM.008.04
+    title: Activities Recorded for User Access
+    refs: [FR-UA-063, FR-UA-064]
+    shall:
+      - "The system shall record the activities: request created, submitted, approved, second-approved, rejected, returned, re-submitted, cancelled, scheduled, applied and implemented; user created, modified, deactivated, reactivated and unlocked; password reset; group profile created, changed, deactivated and reactivated; separation-of-duties rule created, authorised and deactivated; security setting change requested, approved and rejected; log-in, failed log-in, log-out, inactivity sign-out and session expiry."
+    ac:
+      - Each activity of the walkthroughs of Annex O appears in the User Access Audit Log with its actor and time.
+
+new_items:
+  - id: FRUM.009
+    component: User Access Requests
+    capability: Access Request Lifecycle (Requestor)
+    scope:
+      - "In-Scope: access requests raised and decided in BDOI-BROKERSYS for the changes that are not requested in UIDM - the assignment and change of group profiles, and the enrolment, modification, deactivation and reactivation of users where BDOI decides so (Annex Q)."
+      - "Out-of-Scope: the requests that BDOI keeps in UIDM, which reach the system through the provisioning of FRUM.002.02."
+    subitems:
+      - id: FRUM.009.01
+        title: Draft, Edit, Cancel and Submit a Request
+        refs: [FR-UA-010]
+        shall:
+          - The system shall let a holder of the request permission create a request of type Enrol new user, Modify user, Deactivate user or Reactivate user from Access Requests, New Request, and save it as a draft.
+          - The system shall number each request AR-yyyy-nnnnnn; the type and the user of a saved request cannot change.
+          - Only the creator shall see and edit a draft; the creator cancels a draft with a reason (status Cancelled, kept and never deleted) or submits it.
+          - On Save Draft the system shall check the formats only; on Submit it shall run every check (the user exists or not, active group profiles, user ID format, eligible approver, one open request per user) and set the status Pending Approval.
+          - The remarks (justification, reason for the deactivation or the reactivation) shall be mandatory on submission, up to 1,000 characters, and every remark shall be kept in the history of the request.
+          - "The system shall refuse a second open request for the same user (\"A request for user <user> is already waiting for approval\")."
+        ac:
+          - A draft enrolment saved today, edited the next day and submitted becomes Pending Approval with the same number.
+          - A cancelled draft stays in My Requests as Cancelled with its reason.
+          - Another Requestor cannot open the draft.
+          - A submission without justification is refused with "Enter the justification".
+      - id: FRUM.009.02
+        title: Enrol a New User
+        refs: [FR-UA-011]
+        shall:
+          - The request shall carry the user ID, Windows ID, full name, e-mail, home branch, business unit group, user level, authorisation limit, group profiles (at least one), effective date, approver and justification (Annex J).
+          - The group profiles shall be chosen in the profile picker - profiles grouped by business area, searchable by name, area or what the profile does, each with a short description and its details; the chosen profiles listed apart; high-privilege profiles marked Privileged; and a warning when two chosen profiles may not be held together (FRUM.012.01).
+          - On approval the system shall create the user and, for a local account, show the temporary password once to the approver (FRUM.010.02).
+        ac:
+          - A request for a013000196 with the profile Marketing Account Officer, once approved, creates the user.
+          - Choosing two profiles of an active separation-of-duties rule shows the warning in the picker, and Submit is refused with "One user may not hold both <profile> and <profile>".
+      - id: FRUM.009.03
+        title: Modify an Existing User
+        refs: [FR-UA-012]
+        shall:
+          - The Requestor shall search the user by user ID, Windows ID or name; the form shows the current values next to the new ones, and the picker marks the group profiles held as Current, those added as Added and those removed as Removed.
+          - The request shall change the user data, the group profiles or both; only the changed attributes are applied.
+          - "The system shall refuse a request that changes nothing (\"The request does not change the user\") and a request about the requester's own group profiles."
+        ac:
+          - The form shows the group profiles the user holds marked Current.
+          - A request that changes nothing is refused.
+      - id: FRUM.009.04
+        title: Deactivate a User
+        refs: [FR-UA-013]
+        shall:
+          - The system shall offer only active users; the request carries a reason from the list (Resigned, Transferred to another unit, Long leave, Security, Others), the remarks and an optional effective date.
+        ac:
+          - The deactivation of a user already deactivated is refused with "User <user> is already deactivated".
+      - id: FRUM.009.05
+        title: Reactivate a User
+        refs: [FR-UA-014]
+        shall:
+          - The system shall offer only deactivated or locked users; for a locked user the request may also unlock the account.
+        ac:
+          - A reactivation request lists only deactivated or locked users.
+      - id: FRUM.009.06
+        title: Choose the Approver
+        refs: [FR-UA-015]
+        shall:
+          - The Requestor shall select the approver from a drop-down of the active holders of the approval permission, less the requester and the user concerned; only the chosen approver is notified and sees the request under Assigned to Me, unless BDOI decides that any approver may decide (Annex M).
+        ac:
+          - The drop-down lists neither the requester nor the user the request is about.
+          - Only the chosen approver receives the notice.
+      - id: FRUM.009.07
+        title: Apply Correction on a Returned Request
+        refs: [FR-UA-016]
+        shall:
+          - The creator of a returned request shall receive a notice with the return remarks, edit the data, add the correction remarks (mandatory) and re-submit it to the same or another approver; the history keeps every round.
+        ac:
+          - A returned request shows the approver's remarks; after correction and re-submission it is Pending Approval again.
+          - The history lists both rounds with their remarks.
+      - id: FRUM.009.08
+        title: Cancel a Submitted Request
+        refs: [FR-UA-017]
+        shall:
+          - The Requestor shall search a request by status, type, text (user, group profile or request number), requester, approver and date range, and cancel a Pending, Returned or Scheduled request with a mandatory reason; the request leaves the approver's list and the approver is notified.
+          - "A decided request shall not be cancelled (\"Request <request no> is already <status>\")."
+        ac:
+          - A pending request cancelled by its creator disappears from the approver's list and shows Cancelled with the reason.
+          - An approved and applied request cannot be cancelled.
+      - id: FRUM.009.09
+        title: View Submitted Requests
+        refs: [FR-UA-018]
+        shall:
+          - Access Requests shall list the requests with number, type, change, requested by, requested on, approver, status and decided by, with filters; a Requestor sees his or her own requests on My Requests, and the holders of the approval, user management or audit permission see all.
+          - A request shall open on its detail with the tabs Details (current and requested values), Approvers and History (every event with its remarks).
+          - The requester shall be notified of each decision (FRUM.013.01).
+        ac:
+          - A Requestor sees only his or her requests, with the current status.
+          - The History tab lists the submission, return, re-submission and approval with their remarks.
+      - id: FRUM.009.10
+        title: Effective Date
+        refs: [FR-UA-020]
+        shall:
+          - A request may carry an effective date of today or later; approved before that date, it shall wait as Scheduled and be applied by the daily run on the date after a new check; a blank date applies the change on approval.
+          - If the new check fails, the request shall stay Scheduled and the System Administrators shall be alerted.
+        ac:
+          - A deactivation approved on the 10th with the effective date 15th is applied on the 15th.
+          - An effective date in the past is refused with "The effective date cannot be before today".
+
+  - id: FRUM.010
+    component: User Access Requests
+    capability: Review and Approval (Approver)
+    scope: []
+    subitems:
+      - id: FRUM.010.01
+        title: Receive, List and Open Requests for Approval
+        refs: [FR-UA-030]
+        shall:
+          - The chosen approver shall receive a notice for each request assigned to him or her and find it in My Approvals and on Access Requests under Assigned to Me; the detail shows the current values next to the requested ones, the risk flags and the history.
+        ac:
+          - The chosen approver receives a notice and finds the request under Assigned to Me.
+          - The detail of a role change shows Marketing Team Lead as current and Processing Team Lead as requested.
+      - id: FRUM.010.02
+        title: Approve a Request
+        refs: [FR-UA-031]
+        shall:
+          - Approve and Apply shall record the decision and apply the change, or set the request to Scheduled (effective date), Pending Second Approval (risk flag) or For Implementation (group profile); the change is checked again at approval.
+          - "Neither the requester nor the user concerned shall decide (\"A request cannot be decided by the user who submitted it\"; \"You cannot decide a request about your own access\")."
+          - An enrolment shall be approved on its own page so that the temporary password of a local account is shown once to the approver; other requests may be approved several at a time.
+        ac:
+          - An approved enrolment creates the user and shows the temporary password once.
+          - The requester cannot approve his or her own request.
+      - id: FRUM.010.03
+        title: Reject a Request
+        refs: [FR-UA-032]
+        shall:
+          - "Reject shall need a reason (\"Enter the reason of the rejection\"), set the request to Rejected, change nothing and notify the requester; a rejected request is final."
+        ac:
+          - A rejection without a reason is refused.
+          - The requester sees the reason on the rejected request.
+      - id: FRUM.010.04
+        title: Return a Request to the Requestor
+        refs: [FR-UA-033]
+        shall:
+          - Return shall need remarks, set the request to Returned and notify the requester to correct it (FRUM.009.07).
+        ac:
+          - A returned request appears in the requester's list for correction with the approver's remarks.
+      - id: FRUM.010.05
+        title: Second Approval of Privileged and Out-of-Hours Changes
+        refs: [FR-UA-034]
+        shall:
+          - The system shall flag a request that gives a user a High or Admin group profile, or that is submitted or approved outside working hours (08:00 to 18:00, Monday to Friday, as delivered); after the first approval a flagged request shall wait as Pending Second Approval for a holder of the second-approval permission other than the first approver, and raise an alert.
+          - The second approver approves, rejects or returns the request as in FRUM.010.02 to FRUM.010.04.
+        ac:
+          - A request that adds the System Administrator profile to a user needs a second approval.
+          - A request submitted at 21:00 on a weekday is flagged out of hours.
+          - The first approver cannot give the second approval.
+
+  - id: FRUM.011
+    component: User Access Requests
+    capability: Bulk Request
+    scope: []
+    subitems:
+      - id: FRUM.011.01
+        title: Submit a Bulk Request
+        refs: [FR-UA-019]
+        shall:
+          - The Requestor shall download the template, fill in one row per user (action enrol, modify, deactivate or reactivate; user ID, Windows ID, name, e-mail, branch, business unit group, user level, group profiles, effective date, remarks) and upload it as Excel, CSV or TXT.
+          - The system shall check every row as a single request and show a validation report with the rows in error and their messages, which can be downloaded as an error file; the valid rows become the lines of a draft batch.
+          - The Requestor shall add the batch remarks, edit the draft (replace the file or remove lines), cancel it or submit it to the chosen approver.
+          - On approval each line shall be applied on its own; a failed line is marked with its reason and the other lines stand.
+          - The maximum number of rows and line-by-line decisions are set by BDOI (Annex Q).
+        ac:
+          - A file of three enrolments creates a draft batch of three lines; after approval the three users exist.
+          - A row with an existing user ID is reported before the batch is created.
+          - A file that is not Excel, CSV or TXT is refused.
+
+  - id: FRUM.012
+    component: Security Administration
+    capability: Separation of Duties and Security Settings
+    scope: []
+    subitems:
+      - id: FRUM.012.01
+        title: Separation-of-Duties Rules
+        refs: [FR-UA-053]
+        shall:
+          - The Business Administrator shall record the pairs of group profiles that one user may not hold together, with the reason; each new rule and each deactivation shall wait for the authorisation of Information Security, and the maker never authorises.
+          - Every user request and every bulk line that would give a user both profiles of an active rule shall be refused, on submission and again at approval; users who already hold both are found with the User Access Report.
+        ac:
+          - A rule on the Requestor and Approver profiles, once authorised, refuses a request that gives one user both.
+          - The Business Administrator who created a rule cannot authorise it.
+      - id: FRUM.012.02
+        title: Second Approval of Security Settings
+        refs: [FR-UA-054]
+        shall:
+          - A change of a security setting (sign-in, lock-out, password, session, dormancy, working hours, approver rules, emergency role edit) shall wait as pending and apply only when an Information Security Officer other than the requester approves it; one change per setting may be pending.
+        ac:
+          - A change of the lock-out attempts by the System Administrator applies only after the Information Security Officer approves it.
+          - Switching on the emergency role edit needs the same approval.
+
+  - id: FRUM.013
+    component: Notifications
+    capability: Notifications and E-mails
+    scope: []
+    subitems:
+      - id: FRUM.013.01
+        title: Request and Access-Change Notices
+        refs: [FR-UA-070]
+        shall:
+          - "The system shall notify, in the system and by e-mail as each user prefers: the chosen approver of a submitted or re-submitted request; the requester of each decision, return and scheduled application; the approver of a cancellation; the second approvers and the System Administrators of the requests waiting for them; the affected user, always also by e-mail, when his or her access changes, and each member of a deactivated or reactivated role; the authorisers of separation-of-duties rules and the approvers of security settings (Annex L)."
+          - The temporary password of a new user shall never be sent by e-mail.
+        ac:
+          - A returned request notifies the requester with the remarks.
+          - An applied deactivation notifies the affected user by e-mail.
+      - id: FRUM.013.02
+        title: Failed Batch Runs
+        refs: [FR-UA-071]
+        shall:
+          - The system shall record each run of the daily runs (effective changes, dormant users, password expiry notice) with its success or failure, allow a run on demand and a re-run from the screen, and e-mail each failed run with the run, time and error to the recipients set by the System Administrator.
+        ac:
+          - A failed run of the effective changes sends an e-mail to the recipients with the error.

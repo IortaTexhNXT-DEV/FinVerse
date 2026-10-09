@@ -88,6 +88,8 @@ sign-off per BRD"). Each document is kept once, in its latest version.
 | BDOI FRS vs BIBS FRS Product Maintenance | BRD-03 | Comparisons | 1.0 | [`Comparisons/BIBS_Comparison_BRD-03_BDOI_FRS_vs_BIBS_FRS_Product_Maintenance_v1.0.xlsx`](Comparisons/BIBS_Comparison_BRD-03_BDOI_FRS_vs_BIBS_FRS_Product_Maintenance_v1.0.xlsx) |
 | BDOI FRS vs BIBS FRS Renewal | BRD-06 | Comparisons | 1.0 | [`Comparisons/BIBS_Comparison_BRD-06_BDOI_FRS_vs_BIBS_FRS_Renewal_v1.0.xlsx`](Comparisons/BIBS_Comparison_BRD-06_BDOI_FRS_vs_BIBS_FRS_Renewal_v1.0.xlsx) |
 | BDOI FRS vs BIBS FRS User Access Maintenance | BRD-11 | Comparisons | 1.0 | [`Comparisons/BIBS_Comparison_BRD-11_BDOI_FRS_vs_BIBS_FRS_User_Access_Maintenance_v1.0.xlsx`](Comparisons/BIBS_Comparison_BRD-11_BDOI_FRS_vs_BIBS_FRS_User_Access_Maintenance_v1.0.xlsx) |
+| FRS User Access Maintenance in BDOI's template (clean) | BRD-11 | BDOI_Template_FRS | 1.2 | [`BDOI_Template_FRS/BIBS_FRS-BDOI_BRD-11_User_Access_Maintenance_v1.2.docx`](BDOI_Template_FRS/BIBS_FRS-BDOI_BRD-11_User_Access_Maintenance_v1.2.docx) |
+| FRS User Access Maintenance in BDOI's template, changes highlighted | BRD-11 | BDOI_Template_FRS | 1.2 | [`BDOI_Template_FRS/BIBS_FRS-BDOI_BRD-11_User_Access_Maintenance_v1.2_Changes_Highlighted.docx`](BDOI_Template_FRS/BIBS_FRS-BDOI_BRD-11_User_Access_Maintenance_v1.2_Changes_Highlighted.docx) |
 
 ## Still to write
 

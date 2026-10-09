@@ -218,7 +218,7 @@ only_ours:
   - [FR, "FR-UA-006 Daily deactivation of dormant users (90 days, notice 7 days before; System Administrators exempt)", "New FRUM.003.04", Include]
   - [FR, "FR-UA-004 Log out with a session log (start, last activity, end and end reason; status Online)", "New FRUM.001.05", Include]
   - [FR, "FR-UA-003 Break-glass administrators: named local accounts with password and second factor, alerted to Information Security", "New FRUM.001.06", Include]
-  - [FR, "FR-UA-040 to FR-UA-045 Group-profile requests (create, modify, deactivate, reactivate), approvers in order, implementation by the System Administrator", "New FRUM.005.02 to .04 and FRUM.006.04 to .06", Include]
+  - [FR, "FR-UA-040 to FR-UA-045 Group-profile requests (create, modify, deactivate, reactivate), approvers in order, implementation by the System Administrator", "New FRUM.005.02 to .04 and FRUM.006.04", Include]
   - [FR, "FR-UA-050 and FR-UA-051 Delivered profiles of the access personas and one permission per access function (BRD 4.002)", "New FRUM.005.05 and .06", Include]
   - [FR, "FR-UA-052 User data maintenance: user ID format, Windows ID, business unit group, user level, status Active, Disabled, Locked, Online; unlock", "New FRUM.002.03", Include]
   - [FR, "FR-UA-064 Access-change log with one line per attribute (from, to, request number, done by, approved by)", "New FRUM.008.04", Include]
@@ -277,7 +277,7 @@ conflicts:
     brd: "BRD 3.002 and the process diagram of p.6: the Business Administrator submits the request, the approver approves, declines or returns it, the System Administrator creates or modifies the group profile."
     platform: Group Profile Requests with approvers in order and the implementation step.
     matches: Ours (BRD and platform)
-    recommendation: Keep BDOI's capabilities as the System Administrator's implementation of an approved group-profile request (FRUM.005.02 to .04, FRUM.006.04 to .06).
+    recommendation: Keep BDOI's capabilities as the System Administrator's implementation of an approved group-profile request (FRUM.005.02 to .04, FRUM.006.04).
     impact: FRUM.005, FRUM.006.
     decide_by: Process Owner (Business Administration); Information Security
   - id: C04
@@ -734,7 +734,7 @@ plan:
   - [1, "Front matter", "Revision 1.2 on the cover; Drafting support line; Document Revision Log with rows 1.1 and 1.2", "BDOI's cover box and a revision log table in BDOI's table style", "0.5", "iorta TechNXT; BDO ITG review"]
   - [2, "Introduction", "One sentence on the drafting support under Document Preparation; the references used", "BDOI's Body Text paragraphs", "0.5", "iorta TechNXT"]
   - [3, "Business Requirements Mapping", "Keep the 23 rows; add the 160 BRD lines under their rows with the FRUM items; add FRUM items to the \"c/o UIDM\" and FRID rows", "Rows in BDOI's mapping table", "1", "iorta TechNXT; BDOI SA review"]
-  - [4, "Functional Requirements FRUM.001-008", "Under each item: our rules, validations, fields, statuses, approvals and messages as \"The system shall ...\" statements, then numbered acceptance criteria; new sub-items (FRUM.001.05, .06; FRUM.002.03; FRUM.003.04; FRUM.005.02-.06; FRUM.006.04-.06; FRUM.007.03; FRUM.008.04)", "Bullets in BDOI's list style under the existing numbers", "3", "iorta TechNXT; BDOI SA review"]
+  - [4, "Functional Requirements FRUM.001-008", "Under each item: our rules, validations, fields, statuses, approvals and messages as \"The system shall ...\" statements, then numbered acceptance criteria; new sub-items (FRUM.001.05, .06; FRUM.002.03; FRUM.003.04; FRUM.005.02-.06; FRUM.006.04; FRUM.007.03; FRUM.008.04)", "Bullets in BDOI's list style under the existing numbers", "3", "iorta TechNXT; BDOI SA review"]
   - [5, "Functional Requirements (new entries)", "FRUM.009 access requests, FRUM.010 review and approval, FRUM.011 bulk requests, FRUM.012 separation of duties and security settings, FRUM.013 notifications", "New rows of the same table", "2", "iorta TechNXT"]
   - [6, "Annexes A-I", "Keep BDOI's annexes; add the fields the BRD and our reports require to E to H", "Rows in BDOI's field tables", "0.5", "iorta TechNXT"]
   - [7, "Annex J Screen specifications", "19 screens with one screenshot each, fields, actions and rules; note on the profile picker", "Annex after I", "2", "iorta TechNXT"]

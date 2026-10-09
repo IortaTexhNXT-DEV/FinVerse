@@ -4,7 +4,7 @@
 
 meta:
   source: "docs/source-documents/FRS - BDOI BROKERSYS Product Maintenance v1.0 (BDOI, 19-Aug-2026).docx"
-  out_folder: "Programme/BDOI_Template_FRS"
+  out_folder: "Programme/BDOI_Template_FRS/BRD-03_Product_Maintenance"
   clean: BIBS_FRS-BDOI_BRD-03_Product_Maintenance_v1.1.docx
   highlighted: BIBS_FRS-BDOI_BRD-03_Product_Maintenance_v1.1_Changes_Highlighted.docx
   version_old: v1.0

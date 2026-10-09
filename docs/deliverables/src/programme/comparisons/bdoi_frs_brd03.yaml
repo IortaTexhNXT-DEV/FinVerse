@@ -1,0 +1,1841 @@
+# BDOI's Functional Requirements Specifications for Product Maintenance (BDO ITG, v1.0 of 19-Aug-2026), extracted
+# word for word from docs/source-documents (business requirements mapping, functional requirement items, annex field
+# tables and the labels of the quotation slip templates embedded as Annex D and F). Data for the comparison workbook.
+meta:
+  title: Functional Requirements Specifications - BDO Insurance Brokering System - Product Maintenance
+  project: PRJ0012475
+  version: '1.0'
+  date: 19-Aug-2026
+  prepared_by: Angela V. Ramirez, BDO ITG
+  file: FRS - BDOI BROKERSYS Product Maintenance v1.0 (BDOI, 19-Aug-2026).docx
+  approx_words: 8872
+  process_flows:
+  - Non-Package Request Process Flow (swimlanes Marketing, TSU, Insurer, MBS)
+  - New Request Process Flow (package; swimlanes Marketing, TSU, Insurer, MBS)
+brm:
+- id: PMADD01
+  requirement: I want a standard reusable product structure hierarchy so that product data is consistent and scalable across
+    packaged and non-packaged products.
+  bdoi_frs: FRPM.003
+- id: PMADD02
+  requirement: I want insurer-specific coverage, deductibles, and warranty mappings maintained without IT intervention so
+    that insurer variability is supported in a controlled manner.
+  bdoi_frs: FRPM.003
+- id: PMADD03
+  requirement: I want configurable comparative tables so that client-specific outputs can be generated without manual Excel
+    rework while retaining an auditable master version.
+  bdoi_frs: FRPM.006
+- id: PMADD04
+  requirement: I want to have explicit exception states and iterative negotiation loop support so that non-linear insurer
+    negotiations, revisions, and declines are handled as formal workflow outcomes rather than informal handling.
+  bdoi_frs: FRPM.006
+- id: PMADD05
+  requirement: I want a role-to-action access matrix so that access is controlled appropriately and audit risk is reduced.
+  bdoi_frs: Refer to User Access Maintenance FRS
+- id: PMADD06
+  requirement: I want an explicit post-setup validation checkpoint (e.g., by TSU Head / Business Administrator role) so
+    that incorrect package/product configurations do not propagate downstream without accountability.
+  bdoi_frs: FRPM.003.03
+- id: PMADD07
+  requirement: I want to define and maintain Incentive criteria based on the Maintained Products Matrix, so that incentives
+    are accurately configured and applied only to eligible product combinations.
+  bdoi_frs: FRPM.018 / FRPM.003.02
+- id: PMADD08
+  requirement: I must have a maintenance facility to define and update Incentives (i.e. CPC2) criteria based on the maintained
+    products.
+  bdoi_frs: FRPM.018 / FRPM.003.02
+- id: BRPM.001
+  requirement: Access and log-in to the system.
+  bdoi_frs: Refer to User Access Maintenance FRS
+- id: BRPM.002
+  requirement: Restrict access to authorized users.
+  bdoi_frs: Refer to User Access Maintenance FRS
+- id: BRPM.003
+  requirement: There must be a capability to capture, store, and validate all mandatory, critical and product-specific fields.
+  bdoi_frs: FRPM.002 / FRPM.003
+- id: BRPM.004
+  requirement: There must be a capability to apply validation rules based on product type.
+  bdoi_frs: FRPM.003
+- id: BRPM.005
+  requirement: There must be a capability to use shared templates with dynamic fields for product-specific data.
+  bdoi_frs: FRPM.020
+- id: BRPM.006
+  requirement: There must be a capability to store and archive details of expired insurance products (policies/packages)
+    for future reference or potential reactivation.
+  bdoi_frs: FRPM.002.02
+- id: BRPM.007
+  requirement: The system ensures that all new business (new insurance placements) must automatically use the latest approved
+    rate scheme. Outdated rates cannot be selected for new business.
+  bdoi_frs: FRPM.003.03
+- id: BRPM.008
+  requirement: Submit approved Package Request Form.
+  bdoi_frs: FRPM.011
+- id: BRPM.009
+  requirement: Review package requests and recommends for approval.
+  bdoi_frs: FRPM.011.03
+- id: BRPM.010
+  requirement: The system must support the process where the Technical Support Unit (TSU) or authorized users negotiate
+    terms, rates, and conditions with insurers for insurance packages.
+  bdoi_frs: FRPM.006.02 / FRPM.008 / FRPM.009 / FRPM.010 / FRPM.013
+- id: BRPM.011
+  requirement: Facility to allow User to receive and view requests for product creation, amend, updating, or deletion based
+    on client or business needs.
+  bdoi_frs: FRPM.005 / FRPM.017
+- id: BRPM.012
+  requirement: Prepare and send quotation slip to Insurers indicating applicable terms and conditions.
+  bdoi_frs: FRPM.006 / FRPM.012 / FRPM.013
+- id: BRPM.013
+  requirement: Facility to allow user to key-in the terms and conditions / feedback from the Insurers, which may be edited
+    by TSU later on.
+  bdoi_frs: FRPM.006.02 / FRPM.008 / FRPM.009
+- id: BRPM.014
+  requirement: The system must automatically compile all insurers’ feedback and responses into a single, consolidated comparative
+    table for each package.
+  bdoi_frs: FRPM.006.02 / FRPM.008 / FRPM.009
+- id: BRPM.015
+  requirement: Received product requirements from TSU. (i.e. computation and details that Marketing needed for their transactions).
+    / Product requirements and details from TSU are submitted via the system, triggering a ManCom review and signoff workflow.
+    Only after ManCom’s in-system approval are requirements automatically forwarded to MBS for processing. MBS receives
+    only validated, signed-off requirements and returns incomplete submissions. Marketing is notified by the system when
+    the package is ready. While some manual steps (like physical signatures) may still occur, most information should flow
+    through the system.
+  bdoi_frs: FRPM.014 / FRPM.015 / FRPM.016
+- id: BRPM.016
+  requirement: 'The system must allow Users to access supporting documents necessary for creating advisories. This means
+    users should be able to retrieve, view, and utilize all relevant documentation directly within the system when preparing
+    advisory communications (e.g., notifications, emails, or reports about product/package status). / Documents could be
+    but not limited to the following: Advisory / email broadcast that Package is ready. / Package slip (signed) ManCom signed
+    off'
+  bdoi_frs: FRPM.011
+- id: BRPM.017
+  requirement: The system must enable the TSU Officer to monitor the expiry or anniversary date of each insurance package
+  bdoi_frs: FRPM.004 / FRPM.019
+- id: BRPM.018
+  requirement: 'Facility to allow User to generate Placement Update Reports (both for individual accounts and collectively
+    for all accounts). / This is to track and report the status of package creation, including key details such as but not
+    limited to the following: account information, package status, expiry dates, terms, rates, and recent actions. Reports
+    should support business monitoring, audit, and operational needs.'
+  bdoi_frs: FRPM.007
+- id: BRPM.019
+  requirement: Dashboard for real-time tracking and reporting
+  bdoi_frs: FRPM.001
+- id: BRPM.020
+  requirement: Capability to check for document security (password protection/ encryption).
+  bdoi_frs: Under negotiation if can be waived
+- id: BRPM.021
+  requirement: Validation and approval workflow enforcement.
+  bdoi_frs: FRPM.003.03 / FRPM.003.07 / FRPM.005.02 / FRPM.011.03 / FRPM.012.01 / FRPM.014
+- id: BRPM.022
+  requirement: Notification and integration for seamless data flow.
+  bdoi_frs: FRPM.003 / FRPM.004 / FRPM.005 / FRPM.006 / FRPM.008 / FRPM.009 / FRPM.010 / FRPM.011 / FRPM.012 / FRPM.013
+    / FRPM.014 / FRPM.015 / FRPM.017
+- id: BRPM.024
+  requirement: Ensure audit trail for all actions and changes.
+  bdoi_frs: FRPM.021
+frpm:
+- id: FRPM.001
+  component: Dashboard
+  capability: Dashboard
+  items:
+  - id: FRPM.001.01
+    title: Dashboard Visibility
+- id: FRPM.002
+  component: Product Maintenance Module
+  capability: Product Maintenance Module
+  items:
+  - id: FRPM.002.01
+    title: Product Maintenance Module
+  - id: FRPM.002.02
+    title: Product Maintenance Landing Page
+- id: FRPM.003
+  component: Product Matrix
+  capability: Product Matrix Maintenance
+  items:
+  - id: FRPM.003.01
+    title: View Product Matrix
+  - id: FRPM.003.02
+    title: Create/Update a Package/Non-Package Record
+  - id: FRPM.003.03
+    title: Review Product Matrix Creation/ Update Request
+  - id: FRPM.003.04
+    title: Deactivation Request for a Package/Non-Package Record
+  - id: FRPM.003.05
+    title: Automatic Package Deactivation
+  - id: FRPM.003.06
+    title: View Deactivation Requests
+  - id: FRPM.003.07
+    title: Approve or Reject Deactivation Request
+- id: FRPM.004
+  component: '-'
+  capability: Package Expiry Notification
+  items:
+  - id: FRPM.004.01
+    title: Package Expiry Notification
+- id: FRPM.005
+  component: Quotation Request
+  capability: Quotation Request / Management
+  items:
+  - id: FRPM.005.01
+    title: Quotation Request List
+  - id: FRPM.005.02
+    title: Review Quotation Request Details
+- id: FRPM.006
+  component: Quotation Slip
+  capability: Quotation Slip (QS) Management
+  items:
+  - id: FRPM.006.01
+    title: Generate Quotation Slip
+  - id: FRPM.006.02
+    title: Insurer Feedback and Terms Capture
+- id: FRPM.007
+  component: Placement Update
+  capability: Placement Update Report Generation
+  items:
+  - id: FRPM.007.01
+    title: Consolidated Placement Update Report
+- id: FRPM.008
+  component: '-'
+  capability: Insurer Selection for Proposal Creation
+  items:
+  - id: FRPM.008.01
+    title: Insurer Selection for Proposal Creation
+- id: FRPM.009
+  component: '-'
+  capability: Proposal Creation
+  items:
+  - id: FRPM.009.01
+    title: Comparative Table with Final Terms Column
+  - id: FRPM.009.02
+    title: Generate Proposal
+- id: FRPM.010
+  component: '-'
+  capability: Client Response Capture
+  items:
+  - id: FRPM.010.01
+    title: Client Response Capture
+- id: FRPM.011
+  component: Package Request
+  capability: Package Request / Management
+  items:
+  - id: FRPM.011.01
+    title: Package Request List
+  - id: FRPM.011.02
+    title: Create/Edit Package Request Details
+  - id: FRPM.011.03
+    title: 'Review Package Request Details (Source: Marketing)'
+- id: FRPM.012
+  component: Package Request
+  capability: Quotation Slip (QS) Management
+  items:
+  - id: FRPM.012.01
+    title: 'Generate Quotation Slip for Package Request (skip if Source: Insurer)'
+  - id: FRPM.012.02
+    title: 'Insurer Feedback and Terms Capture (skip if Source: Insurer)'
+- id: FRPM.013
+  component: Package Request
+  capability: Insurer Selection for Proposal Creation
+  items:
+  - id: FRPM.013.01
+    title: Generate Proposal
+- id: FRPM.014
+  component: Package Request
+  capability: ManCom Approval
+  items:
+  - id: FRPM.014.01
+    title: ManCom Approver Selection and Approval Routing
+- id: FRPM.015
+  component: '-'
+  capability: Request Package Deployment
+  items:
+  - id: FRPM.015.01
+    title: Request Package Deployment
+- id: FRPM.016
+  component: '-'
+  capability: MBS Work Queue
+  items:
+  - id: FRPM.016.01
+    title: MBS Work Queue
+- id: FRPM.017
+  component: '-'
+  capability: Update Reviewer / Approver Assignment
+  items:
+  - id: FRPM.017.01
+    title: Update Reviewer / Approver Assignment
+- id: FRPM.018
+  component: '-'
+  capability: Incentive Eligibility Configuration Maintenance
+  items:
+  - id: FRPM.018.01
+    title: Maintain Incentive Eligibility Rules
+- id: FRPM.019
+  component: Reports
+  capability: Generate Renewal Request Report
+  items:
+  - id: FRPM.019.01
+    title: Generate Renewal Request Report
+- id: FRPM.020
+  component: Reports
+  capability: Reports Generation
+  items:
+  - id: FRPM.020.01
+    title: Report Generation
+- id: FRPM.021
+  component: Audit Trail
+  capability: Audit Trail / Generation
+  items:
+  - id: FRPM.021.01
+    title: Audit Logs Module and List View
+  - id: FRPM.021.02
+    title: Audit Logs per record display
+annex_a:
+- field: Policy Type
+  type: Dropdown
+  lines: Motor, Property, EEI, Floater, Marine Cargo, Marine Hull, Aviation, Stock Throughput, Personal Accident, Miscellaneous
+  remarks: 'Values: Individual, Fleet, Group, Single Location, Various Locations'
+- field: Sub-Line
+  type: Dropdown
+  lines: Engineering, Liability, Crime, Bonds, Personal Accident, Miscellaneous
+  remarks: ''
+- field: Package Name
+  type: Text
+  lines: All
+  remarks: ''
+- field: Package Description
+  type: Text
+  lines: All
+  remarks: ''
+- field: Insurer
+  type: Dropdown
+  lines: All
+  remarks: ''
+- field: Business Origin
+  type: Dropdown
+  lines: All
+  remarks: ''
+- field: Account Officer
+  type: Dropdown
+  lines: All
+  remarks: ''
+- field: Unit Head
+  type: Dropdown
+  lines: All
+  remarks: ''
+- field: Insured's Name
+  type: Text
+  lines: All
+  remarks: ''
+- field: Mailing Address
+  type: Text
+  lines: All
+  remarks: ''
+- field: Perils/Coverages
+  type: Text
+  lines: Motor, Engineering, EEI, Floater, Marine Cargo, Marine Hull, Aviation
+  remarks: ''
+- field: Benefits/Coverages
+  type: Text
+  lines: Personal Accident
+  remarks: ''
+- field: Type of Cover
+  type: Dropdown
+  lines: Property
+  remarks: 'Values: All-Risk, F/L Only, Named Perils'
+- field: Description of Cover
+  type: Text
+  lines: All
+  remarks: ''
+- field: Extensions of Cover
+  type: Text
+  lines: Property, Engineering, EEI, Floater, Marine Cargo, Marine Hull, Aviation, Stock Throughput, Liability, Crime, Personal
+    Accident, Miscellaneous
+  remarks: ''
+- field: Warranties, Clauses
+  type: Dropdown
+  lines: All
+  remarks: ''
+- field: Other Conditions, Subjectivities, Exclusions
+  type: Text
+  lines: All
+  remarks: ''
+- field: Deductibles
+  type: Text
+  lines: All
+  remarks: ''
+- field: Maximum Limit/s
+  type: Text
+  lines: All
+  remarks: ''
+- field: Premium
+  type: Currency
+  lines: All
+  remarks: ''
+- field: Premium Rates
+  type: Percentage
+  lines: All
+  remarks: ''
+- field: Commission Rates
+  type: Percentage
+  lines: All
+  remarks: ''
+- field: Effectivity Date
+  type: Date
+  lines: All
+  remarks: ''
+- field: Expiry Date
+  type: Date
+  lines: All
+  remarks: ''
+- field: Incentive Eligible
+  type: Boolean
+  lines: All
+  remarks: ''
+- field: Incentive Amount
+  type: Float
+  lines: All
+  remarks: ''
+- field: Incentive Commission Rate
+  type: Percentage
+  lines: All
+  remarks: ''
+sub_line_values:
+- line: Engineering
+  values: CARI, EAR
+- line: Liability
+  values: Comprehensive General Liability, Employers Liability, Directors and Officers Liability, Pollution Liability, Cyber
+    Liability, Professional Liability, Medical Malpractice, Products Liability, Errors and Omissions, Marine Liability,
+    Excess Auto Liability
+- line: Crime
+  values: Fidelity Guarantee, Money/Securities & Payroll, Kidnap and Ransom, Bankers Blanket Bond, Combined FG and MSP,
+    Dishonesty/Disappearance/Destruction
+- line: Bonds
+  values: Heirs Bond, Performance Bond, Surety Bond, Bidder's Bond, Judicial Bond, Warranty Bond
+- line: Personal Accident
+  values: Personal Accident, Travel
+- line: Miscellaneous
+  values: Golfer's Insurance/Hole-In-One, Sabotage and Terrorism, Political Violence, Trade Credit, Parametric, Fine Arts
+annex_b:
+- field: Policy Type
+  type: Dropdown
+  lines: Motor, Property, EEI, Floater, Marine Cargo, Marine Hull, Aviation, Stock Throughput, Personal Accident, Miscellaneous
+  remarks: 'Values: Individual, Fleet, Group, Single Location, Various Locations)'
+- field: Sub-Line
+  type: Dropdown
+  lines: Engineering, Liability, Crime, Bonds, Personal Accident, Miscellaneous
+  remarks: ''
+- field: Business Origin
+  type: Dropdown
+  lines: All Product Lines
+  remarks: ''
+- field: Account Officer
+  type: Dropdown
+  lines: All Product Lines
+  remarks: ''
+- field: Unit Head
+  type: Dropdown
+  lines: All Product Lines
+  remarks: ''
+- field: Insured's Name
+  type: Text
+  lines: All Product Lines
+  remarks: ''
+- field: Mailing Address
+  type: Text
+  lines: All Product Lines
+  remarks: ''
+- field: Effectivity Date
+  type: Date
+  lines: All Product Lines
+  remarks: ''
+- field: Expiry Date
+  type: Date
+  lines: All Product Lines
+  remarks: ''
+- field: Premium
+  type: Currency
+  lines: All Product Lines
+  remarks: ''
+- field: Premium Rates
+  type: Percentage
+  lines: All Product Lines
+  remarks: ''
+- field: Commission Rates
+  type: Percentage
+  lines: All Product Lines
+  remarks: ''
+- field: Warranties, Clauses
+  type: Text
+  lines: All Product Lines
+  remarks: ''
+- field: Other Conditions, Subjectivities, Exclusions
+  type: '-'
+  lines: All Product Lines
+  remarks: ''
+- field: Deductibles
+  type: Text
+  lines: All Product Lines
+  remarks: ''
+- field: Extensions of Cover
+  type: Text
+  lines: Property, Engineering, EEI, Floater, Marine Cargo, Marine Hull, Aviation, Stock Throughput, Liability, Crime, Personal
+    Accident, Miscellaneous
+  remarks: ''
+- field: Maximum Limit/s
+  type: '-'
+  lines: Property
+  remarks: ''
+- field: Type of Cover
+  type: Dropdown
+  lines: Property
+  remarks: 'Values: All-Risk, F/L Only, Named Perils'
+- field: Description of Cover
+  type: Text
+  lines: Property, Personal Accident
+  remarks: ''
+- field: Cover/ Undertaking
+  type: '-'
+  lines: Engineering, EEI, Floater, Stock Throughput, Liability, Crime, Miscellaneous, Bonds
+  remarks: ''
+- field: Perils/Coverages
+  type: Text
+  lines: Motor, Marine Cargo, Marine Hull, Aviation
+  remarks: ''
+- field: Benefits/Coverages
+  type: Dropdown
+  lines: Personal Accident
+  remarks: ''
+- field: Vehicle Type
+  type: Dropdown
+  lines: Motor
+  remarks: 'Values: / 1. PC Sedan / 2. PC SUV/AUV / 2. CV / 3. Motorcycle / 4. LTO / 5. Various'
+- field: Engine Type
+  type: Dropdown
+  lines: Motor
+  remarks: 'Values: / 1. Gas / 2. Diesel / 3. Hybrid / 4. Fully-Electric / 5. Various'
+- field: Year Model
+  type: Text/Number
+  lines: Motor
+  remarks: ''
+- field: Manufacturer
+  type: Dropdown
+  lines: Motor
+  remarks: ''
+- field: Model / Variant
+  type: Dropdown
+  lines: Motor
+  remarks: ''
+- field: Sum Insured per Peril
+  type: Currency
+  lines: Motor
+  remarks: ''
+- field: Currency
+  type: '-'
+  lines: Motor, Property, Engineering, EEI, Floater, Miscellaneous, Marine Cargo, Stock Throughput, Liability, Crime, Bonds
+  remarks: ''
+- field: Location/s of Risk
+  type: Text
+  lines: Property, EEI, Floater, Stock Throughput, Crime, Miscellaneous
+  remarks: ''
+- field: Location/s of Risk City
+  type: '-'
+  lines: Property, EEI, Floater, Stock Throughput, Crime, Miscellaneous
+  remarks: ''
+- field: 'Location/s of Risk: Province'
+  type: '-'
+  lines: Property, EEI, Floater, Stock Throughput, Crime, Miscellaneous
+  remarks: ''
+- field: Properties Insured
+  type: Dropdown
+  lines: Property, Miscellaneous
+  remarks: 'Dropdown for Property: / 1. Building / Building Improvements or / Leasehold Improvements / Land / Improvements
+    / 2. Contents / 3. Machinery / Equipment / 4. Stocks / Drop-Down (for Sabotage and Terrorism, Political Violence and
+    Parametric only) : / 1. Building / Building Improvements or / Leasehold Improvements / Land / Improvements / 2. Contents
+    / 3. Machinery / Equipment / 4. Stocks / Free text for Golfer’s Insurance, Fine Arts'
+- field: Description of Properties Insured
+  type: Text
+  lines: Property, EEI, Floater, Miscellaneous
+  remarks: ''
+- field: Sum Insured per Property Insured
+  type: Currency
+  lines: Property, EEI, Floater, Miscellaneous
+  remarks: ''
+- field: Basis of Valuation
+  type: '-'
+  lines: Property, EEI, Floater, Stock Throughput, Miscellaneous
+  remarks: 'Drop-Down : / 1. Sound Value / Actual Cash / Value / 2. Replacement Value / 3. Cost Price / 4. Selling Price
+    / Note: Under Miscellaneous: for Sabotage and Terrorism, Political Violence and Parametric only'
+- field: Total Sum Insured
+  type: Currency (Computed)
+  lines: Property, EEI, Floater, Stock Throughput
+  remarks: Must automatically be computed by the system based on the Sum Insured per Property Insured specified
+- field: Building Description
+  type: Dropdown
+  lines: Property, Stock Throughput
+  remarks: 'Values: / 1. Class A / 2. Class B / 3. Light Material'
+- field: Building Occupancy
+  type: Dropdown
+  lines: Property
+  remarks: 'Values: / 1. Residential / 2. General / 3. Warehouse / 4. Industrial'
+- field: Contractor's Name
+  type: Text
+  lines: Engineering
+  remarks: ''
+- field: Project Description / Scope of Work
+  type: Text
+  lines: Engineering
+  remarks: ''
+- field: Project Location
+  type: Text
+  lines: Engineering
+  remarks: ''
+- field: Total Contract Value
+  type: Currency
+  lines: Engineering
+  remarks: ''
+- field: Sum Insured per Cover
+  type: Currency
+  lines: Engineering
+  remarks: ''
+- field: Nature of Business
+  type: Text
+  lines: Marine Cargo, Marine Hull, Liability, Crime, Bonds, Miscellaneous
+  remarks: ''
+- field: Details of Cargo
+  type: Text
+  lines: Marine Cargo
+  remarks: ''
+- field: Details of Packaging
+  type: Text
+  lines: Marine Cargo, Stock Throughput
+  remarks: ''
+- field: Type of Conveyance
+  type: Dropdown
+  lines: Marine Cargo
+  remarks: ''
+- field: Limit per Conveyance/Shipment
+  type: Currency
+  lines: Marine Cargo
+  remarks: ''
+- field: Frequency of Delivery
+  type: Text
+  lines: Marine Cargo
+  remarks: ''
+- field: Actual Turn-Over for the Past 12 Months
+  type: Currency
+  lines: Marine Cargo
+  remarks: ''
+- field: Estimated Turn-Over for the Next 12 Months
+  type: Currency
+  lines: Marine Cargo
+  remarks: ''
+- field: Sum Insured
+  type: Currency
+  lines: Marine Cargo, Stock Throughput
+  remarks: ''
+- field: Vessel Name
+  type: Text
+  lines: Marine Hull
+  remarks: ''
+- field: Vessel Operator and Manager
+  type: Text
+  lines: Marine Hull
+  remarks: ''
+- field: Type of Vessel
+  type: Dropdown
+  lines: Marine Hull
+  remarks: ''
+- field: Aircraft Usage
+  type: '-'
+  lines: Marine Hull
+  remarks: ''
+- field: Year Built
+  type: Number
+  lines: Marine Hull, Aviation
+  remarks: ''
+- field: Gross Tonnage
+  type: Number
+  lines: Marine Hull
+  remarks: ''
+- field: Net Tonnage
+  type: Number
+  lines: Marine Hull
+  remarks: ''
+- field: Cargoes Carried
+  type: Text
+  lines: Marine Hull
+  remarks: ''
+- field: No. of Passenger and Crew Seats
+  type: Number
+  lines: Marine Hull
+  remarks: ''
+- field: Construction Material
+  type: Dropdown
+  lines: Marine Hull
+  remarks: ''
+- field: Agreed Value
+  type: Currency
+  lines: Marine Hull, Aviation
+  remarks: ''
+- field: Type of Aircraft
+  type: Dropdown
+  lines: Aviation
+  remarks: ''
+- field: Pilot Details
+  type: Text
+  lines: Aviation
+  remarks: ''
+- field: Aircraft Operator
+  type: Text
+  lines: Aviation
+  remarks: ''
+- field: Make/Model
+  type: Text
+  lines: Aviation
+  remarks: ''
+- field: Registration Mark No.
+  type: Text
+  lines: Aviation
+  remarks: ''
+- field: Serial No.
+  type: Text
+  lines: Aviation
+  remarks: ''
+- field: Hangar Location
+  type: Text
+  lines: Aviation
+  remarks: ''
+- field: Geographical Limits
+  type: Text
+  lines: Aviation
+  remarks: ''
+- field: Origin of Goods
+  type: Text
+  lines: Stock Throughput
+  remarks: ''
+- field: Destination of Goods
+  type: Text
+  lines: Stock Throughput
+  remarks: ''
+- field: Average and Maximum Monthly Inventory
+  type: Currency
+  lines: Stock Throughput
+  remarks: ''
+- field: Annual Sales Turn-Over
+  type: Currency
+  lines: Stock Throughput
+  remarks: ''
+- field: Description of Stocks
+  type: Text
+  lines: Stock Throughput
+  remarks: ''
+- field: Location of Premises
+  type: Text
+  lines: Liability
+  remarks: ''
+- field: Limit of Liability
+  type: Currency
+  lines: Liability, Crime
+  remarks: ''
+- field: Bond Amount
+  type: Currency
+  lines: Bonds
+  remarks: ''
+- field: Occupation / Nature of Business
+  type: Text
+  lines: Personal Accident
+  remarks: ''
+- field: No. of Persons to be Covered
+  type: Number
+  lines: Personal Accident
+  remarks: ''
+- field: Incentive Eligible
+  type: Boolean
+  lines: All Product Lines
+  remarks: ''
+- field: Incentive Amount
+  type: Currency
+  lines: All Product Lines
+  remarks: ''
+- field: Incentive Commission Rate
+  type: Percentage
+  lines: All Product Lines
+  remarks: ''
+annex_c:
+- field: Line of Insurance
+  type: Dropdown
+  lines: All
+  remarks: ''
+- field: Transaction Type
+  type: Dropdown
+  lines: All
+  remarks: 'Values: New Business, Renewal, Endorsement / Engineering & Bonds: New Business, Endorsement only'
+- field: Expiring / Existing Policy No.
+  type: Text
+  lines: All
+  remarks: Applicable for Renewal/Endorsement transactions only
+- field: Preferred / Expiring / Existing Insurer/s
+  type: Dropdown
+  lines: All
+  remarks: Insurer selection
+- field: Expiring / Existing Share per Insurer
+  type: Percentage
+  lines: All
+  remarks: Applicable for Renewal/Endorsement only; should be in %
+- field: Expiring / Existing Premium Rate per Insurer
+  type: Percentage
+  lines: All
+  remarks: Applicable for Renewal/Endorsement only; should be in %
+- field: Expiring / Existing Commission Rate per Insurer
+  type: Percentage
+  lines: All
+  remarks: Applicable for Renewal/Endorsement only; should be in %
+- field: Policy Type
+  type: Dropdown
+  lines: Motor, Property, EEI, Floater, Marine Cargo, Marine Hull, Aviation, Stock Throughput, Personal Accident, Miscellaneous
+  remarks: Product line-specific dropdown values
+- field: Sub-Line
+  type: Dropdown
+  lines: Engineering, Liability, Crime, Bonds, Personal Accident, Miscellaneous
+  remarks: Product line-specific dropdown values
+- field: Business Origin
+  type: Dropdown
+  lines: All
+  remarks: Business source/origin
+- field: Account Officer
+  type: Dropdown
+  lines: All
+  remarks: Account Officer selection
+- field: Unit Head
+  type: Dropdown
+  lines: All
+  remarks: Unit Head selection
+- field: Insured's Name
+  type: Text
+  lines: All
+  remarks: Free text
+- field: Mailing Address
+  type: Text
+  lines: All
+  remarks: Free text
+- field: Effectivity Date
+  type: Date
+  lines: All
+  remarks: Policy start date
+- field: Expiry Date
+  type: Date
+  lines: All
+  remarks: Policy expiry date
+- field: Mortgagee
+  type: Text
+  lines: All
+  remarks: Optional field
+- field: Loss Information
+  type: Text
+  lines: All
+  remarks: Free text, optional
+- field: Premium
+  type: Currency
+  lines: Engineering, Marine Cargo, Marine Hull, Aviation, Stock Throughput, Liability, Crime, Bonds, Personal Accident,
+    Miscellaneous
+  remarks: Currency must be captured separately
+- field: Premium Rates
+  type: Percentage
+  lines: All
+  remarks: Premium rate (%)
+- field: Commission Rates
+  type: Percentage
+  lines: All
+  remarks: Commission rate (%)
+- field: Warranties, Clauses
+  type: Text
+  lines: All
+  remarks: Free text
+- field: Other Instructions
+  type: Text
+  lines: All
+  remarks: Free text
+- field: Deductibles
+  type: Text
+  lines: All
+  remarks: Free text
+- field: Extensions of Cover
+  type: Text
+  lines: Property, Engineering, EEI, Floater, Marine Cargo, Marine Hull, Aviation, Stock Throughput, Liability, Crime, Personal
+    Accident, Miscellaneous
+  remarks: Free text
+- field: Vehicle Type
+  type: Dropdown
+  lines: Motor
+  remarks: 'Values: PC Sedan, PC SUV/AUV, CV, Motorcycle, LTO, Various'
+- field: Engine Type
+  type: Dropdown
+  lines: Motor
+  remarks: 'Values: Gas, Diesel, Hybrid, Fully-Electric, Various'
+- field: Year Model
+  type: Text/Number
+  lines: Motor
+  remarks: Vehicle year model
+- field: Manufacturer
+  type: Dropdown
+  lines: Motor
+  remarks: Manufacturer list
+- field: Model / Variant
+  type: Dropdown
+  lines: Motor
+  remarks: Vehicle model/variant
+- field: Perils/Coverages
+  type: Text
+  lines: Motor, Marine Cargo, Marine Hull, Aviation
+  remarks: Coverage details
+- field: Sum Insured per Peril
+  type: Currency
+  lines: Motor
+  remarks: Currency should be separate field
+- field: Location/s of Risk
+  type: Text
+  lines: Property, EEI, Floater, Stock Throughput, Crime
+  remarks: City and Province should be maintained separately as dropdowns
+- field: Properties Insured
+  type: Dropdown
+  lines: Property, Miscellaneous
+  remarks: Product-specific property types
+- field: Description of Properties Insured
+  type: Text
+  lines: Property, EEI, Floater, Miscellaneous
+  remarks: Free text per property insured
+- field: Sum Insured per Property Insured
+  type: Currency
+  lines: Property, EEI, Floater, Miscellaneous
+  remarks: Currency should be maintained separately
+- field: Basis of Valuation per Property Insured
+  type: Dropdown
+  lines: Property, EEI, Floater, Miscellaneous, Stock Throughput
+  remarks: 'Values: Sound Value/Actual Cash Value, Replacement Value, Cost Price, Selling Price'
+- field: Total Sum Insured
+  type: Currency (Computed)
+  lines: Property, EEI, Floater, Stock Throughput
+  remarks: System-computed based on insured values entered
+- field: Building Description
+  type: Dropdown
+  lines: Property, Stock Throughput
+  remarks: 'Values: Class A, Class B, Light Material'
+- field: Building Occupancy
+  type: Dropdown
+  lines: Property
+  remarks: 'Values: Residential, General, Warehouse, Industrial'
+- field: Type of Cover
+  type: Dropdown
+  lines: Property
+  remarks: 'Values: All-Risk, F/L Only, Named Perils'
+- field: Description of Cover
+  type: Text
+  lines: Property, Personal Accident
+  remarks: Free text
+- field: Contractor's Name
+  type: Text
+  lines: Engineering
+  remarks: Free text
+- field: Project Description / Scope of Work
+  type: Text
+  lines: Engineering
+  remarks: Free text
+- field: Project Location
+  type: Text
+  lines: Engineering
+  remarks: Free text
+- field: Total Contract Value
+  type: Currency
+  lines: Engineering
+  remarks: Currency should be maintained separately
+- field: Cover / Undertaking
+  type: Text
+  lines: Engineering, EEI, Floater, Stock Throughput, Liability, Crime, Miscellaneous, Bonds
+  remarks: Free text/dropdown depending on product line
+- field: Sum Insured per Cover
+  type: Currency
+  lines: Engineering
+  remarks: Currency should be maintained separately
+- field: Nature of Business
+  type: Text
+  lines: Marine Cargo, Marine Hull, Liability, Crime, Bonds, Miscellaneous, Personal Accident
+  remarks: Free text
+- field: Details of Cargo
+  type: Text
+  lines: Marine Cargo
+  remarks: Free text
+- field: Details of Packaging
+  type: Text
+  lines: Marine Cargo, Stock Throughput
+  remarks: Free text
+- field: Type of Conveyance
+  type: Dropdown
+  lines: Marine Cargo
+  remarks: Conveyance types maintained by system
+- field: Limit per Conveyance/Shipment
+  type: Currency
+  lines: Marine Cargo
+  remarks: Currency maintained separately
+- field: Frequency of Delivery
+  type: Text
+  lines: Marine Cargo
+  remarks: Free text
+- field: Actual Turn-Over for Past 12 Months
+  type: Currency
+  lines: Marine Cargo
+  remarks: Currency maintained separately
+- field: Estimated Turn-Over for Next 12 Months
+  type: Currency
+  lines: Marine Cargo
+  remarks: Currency maintained separately
+- field: Sum Insured
+  type: Currency
+  lines: Marine Cargo, Stock Throughput
+  remarks: Currency maintained separately
+- field: Vessel Name
+  type: Text
+  lines: Marine Hull
+  remarks: Free text
+- field: Vessel Operator and Manager
+  type: Text
+  lines: Marine Hull
+  remarks: Free text
+- field: Type of Vessel
+  type: Dropdown
+  lines: Marine Hull
+  remarks: Vessel type list
+- field: Vessel Usage
+  type: Dropdown
+  lines: Marine Hull
+  remarks: Usage classification
+- field: Year Built
+  type: Number
+  lines: Marine Hull, Aviation
+  remarks: Year value
+- field: Gross Tonnage
+  type: Number
+  lines: Marine Hull
+  remarks: Numeric value
+- field: Net Tonnage
+  type: Number
+  lines: Marine Hull
+  remarks: Numeric value
+- field: Cargoes Carried
+  type: Text
+  lines: Marine Hull
+  remarks: Free text
+- field: No. of Passenger and Crew Seats
+  type: Number
+  lines: Marine Hull
+  remarks: Numeric value
+- field: Construction Material
+  type: Dropdown
+  lines: Marine Hull
+  remarks: Material classification
+- field: Agreed Value
+  type: Currency
+  lines: Marine Hull, Aviation
+  remarks: Currency maintained separately
+- field: Type of Aircraft
+  type: Dropdown
+  lines: Aviation
+  remarks: Aircraft type selection
+- field: Pilot Details
+  type: Text
+  lines: Aviation
+  remarks: Free text
+- field: Aircraft Operator
+  type: Text
+  lines: Aviation
+  remarks: Free text
+- field: Make/Model
+  type: Text
+  lines: Aviation
+  remarks: Aircraft make/model
+- field: Registration Mark No.
+  type: Text
+  lines: Aviation
+  remarks: Registration number
+- field: Serial No.
+  type: Text
+  lines: Aviation
+  remarks: Serial number
+- field: Hangar Location
+  type: Text
+  lines: Aviation
+  remarks: Free text
+- field: Geographical Limits
+  type: Text
+  lines: Aviation, Crime
+  remarks: Geographic coverage limits
+- field: Origin of Goods
+  type: Text
+  lines: Stock Throughput
+  remarks: Free text
+- field: Destination of Goods
+  type: Text
+  lines: Stock Throughput
+  remarks: Free text
+- field: Average and Maximum Monthly Inventory
+  type: Currency
+  lines: Stock Throughput
+  remarks: Currency maintained separately
+- field: Annual Sales Turn-Over
+  type: Currency
+  lines: Stock Throughput
+  remarks: Currency maintained separately
+- field: Description of Stocks
+  type: Text
+  lines: Stock Throughput
+  remarks: Free text
+- field: Location of Premises
+  type: Text
+  lines: Liability
+  remarks: Free text
+- field: Limit of Liability
+  type: Currency
+  lines: Liability, Crime
+  remarks: Currency maintained separately
+- field: Bond Amount
+  type: Currency
+  lines: Bonds
+  remarks: Currency maintained separately
+- field: Occupation / Nature of Business
+  type: Text
+  lines: Personal Accident
+  remarks: Free text
+- field: No. of Persons to be Covered
+  type: Number
+  lines: Personal Accident
+  remarks: Whole number only
+- field: Benefits/Coverages
+  type: Dropdown
+  lines: Personal Accident
+  remarks: Coverage benefits
+- field: Location of Risk
+  type: Text
+  lines: Miscellaneous
+  remarks: Free text
+- field: Incentive Eligible
+  type: Boolean
+  lines: All Product Lines
+  remarks: ''
+- field: Incentive Amount
+  type: Currency
+  lines: All Product Lines
+  remarks: ''
+- field: Incentive Commission Rate
+  type: Percentage
+  lines: All Product Lines
+  remarks: ''
+annex_e:
+- field: Line of Insurance
+  type: Dropdown
+  lines: All
+  remarks: ''
+- field: Sub-Line
+  type: Dropdown
+  lines: Engineering, Liability, Crime, Bonds, Personal Accident, Miscellaneous
+  remarks: ''
+- field: Insurer/s
+  type: Dropdown
+  lines: All
+  remarks: ''
+- field: Business Origin
+  type: Dropdown
+  lines: All
+  remarks: ''
+- field: Account Officer
+  type: Dropdown
+  lines: All
+  remarks: ''
+- field: Unit Head
+  type: Dropdown
+  lines: All
+  remarks: ''
+- field: Estimated No. of Policies to be Issued
+  type: Numeric
+  lines: All
+  remarks: Estimated number of policies; must be at least 20
+- field: Estimated Total Basic Premium to be Issued
+  type: Float
+  lines: All
+  remarks: Estimated premium; must be at least PHP 5M
+- field: Insured's Name
+  type: Text
+  lines: All
+  remarks: ''
+- field: Perils/Coverages
+  type: Dropdown
+  lines: Motor, Engineering, EEI, Floater, Marine Cargo, Marine Hull, Aviation
+  remarks: ''
+- field: Type of Cover
+  type: Dropdown
+  lines: Property
+  remarks: 'Values: / 1. All-Risk / 2. F/L only / 3. Named Perils'
+- field: Description of Cover
+  type: Text
+  lines: Property, Personal Accident
+  remarks: ''
+- field: Benefits/Coverages
+  type: Text
+  lines: Personal Accident
+  remarks: ''
+- field: Cover
+  type: Text
+  lines: Motor, Engineering, EEI, Floater, Marine Cargo, Marine Hull, Aviation, Stock Throughput, Liability, Crime, Miscellaneous
+  remarks: ''
+- field: Cover / Undertaking
+  type: Text
+  lines: Bonds
+  remarks: ''
+- field: Extensions of Cover
+  type: Text
+  lines: Property, Engineering, EEI, Floater, Marine Cargo, Marine Hull, Aviation, Stock Throughput, Liability, Crime, Personal
+    Accident, Miscellaneous
+  remarks: ''
+- field: Warranties, Clauses
+  type: Dropdown
+  lines: All
+  remarks: ''
+- field: Other Instructions
+  type: Text
+  lines: All
+  remarks: ''
+- field: Deductibles
+  type: Text
+  lines: Motor, Property, Engineering, EEI, Floater, Marine Cargo, Marine Hull, Aviation, Stock Throughput, Liability, Crime,
+    Bonds, Miscellaneous
+  remarks: ''
+- field: Maximum Limit/s
+  type: Text
+  lines: All
+  remarks: ''
+- field: Premium
+  type: Currency
+  lines: Liability, Crime, Personal Accident, Miscellaneous
+  remarks: ''
+- field: Premium Rates
+  type: Percentage
+  lines: All
+  remarks: ''
+- field: Commission Rates
+  type: Percentage
+  lines: All
+  remarks: ''
+- field: Incentive Eligible
+  type: Boolean
+  lines: All
+  remarks: ''
+- field: Incentive Amount
+  type: Float
+  lines: All
+  remarks: ''
+- field: Incentive Commission Rate
+  type: Percentage
+  lines: All
+  remarks: ''
+qs_templates:
+  non_package:
+  - template: Aviation
+    line_text: Aviation Insurance
+    labels:
+    - Date
+    - Reference No
+    - Business Origin
+    - Account Officer
+    - Unit Head
+    - Line of Insurance
+    - Policy Type
+    - Period of Insurance
+    - Insured’s Name
+    - Mailing Address
+    - Mortgagee
+    - Type of Aircraft
+    - Pilot Details
+    - Aircraft Operator
+    - Make / Model
+    - Year Built
+    - Registration Mark No
+    - Serial No.
+    - Hangar Location
+    - Geographical Limits
+    - Perils / Coverages
+    - Agreed Value
+    - Extensions of Cover
+    - Warranties / Clauses
+    - Deductibles
+    - Premium Rates/ Commission Rates
+    - Loss Information
+    - Law and Jurisdiction
+  - template: Bonds
+    line_text: (SUB-LINE)
+    labels:
+    - Date
+    - Reference No
+    - Business Origin
+    - Account Officer
+    - Unit Head
+    - Line of Insurance
+    - Period of Insurance
+    - Insured’s Name
+    - Mailing Address
+    - Nature of Business
+    - Cover / Undertaking
+    - Bond Amount
+    - Warranties / Clauses
+    - Premium Rates/ Commission Rates
+    - Loss Information
+    - Law and Jurisdiction
+  - template: Crime
+    line_text: (SUB-LINE)
+    labels:
+    - Date
+    - Reference No
+    - Business Origin
+    - Account Officer
+    - Unit Head
+    - Line of Insurance
+    - Period of Insurance
+    - Insured’s Name
+    - Mailing Address
+    - Nature of Business
+    - Location of Risk / Geographical Limits
+    - Limit of Liability
+    - Cover
+    - Extensions of Cover
+    - Warranties / Clauses
+    - Deductibles
+    - Premium Rates/ Commission Rates
+    - Loss Information
+    - Law and Jurisdiction
+  - template: EEI
+    line_text: Electronic Equipment Insurance
+    labels:
+    - Date
+    - Reference No
+    - Business Origin
+    - Account Officer
+    - Unit Head
+    - Line of Insurance
+    - Policy Type
+    - Period of Insurance
+    - Insured’s Name
+    - Mailing Address
+    - Mortgagee
+    - Perils / Coverages
+    - Location/s of Risk
+    - Properties Insured
+    - Total Sum Insured
+    - Cover
+    - Extensions of Cover
+    - Warranties / Clauses
+    - Deductibles
+    - Premium Rates/ Commission Rates
+    - Loss Information
+    - Law and Jurisdiction
+  - template: Engineering
+    line_text: (SUB-LINE)
+    labels:
+    - Date
+    - Reference No
+    - Business Origin
+    - Account Officer
+    - Unit Head
+    - Line of Insurance
+    - Period of Insurance
+    - Insured’s Name
+    - Mailing Address
+    - Mortgagee
+    - Contractor’s Name
+    - Project Description/ Scope of Work
+    - Project Location
+    - Total Contract Value
+    - Cover
+    - Extensions of Cover
+    - Warranties / Clauses
+    - Deductibles
+    - Premium Rates/ Commission Rates
+    - Loss Information
+    - Law and Jurisdiction
+  - template: Floater
+    line_text: Property Floater
+    labels:
+    - Date
+    - Reference No
+    - Business Origin
+    - Account Officer
+    - Unit Head
+    - Line of Insurance
+    - Policy Type
+    - Period of Insurance
+    - Insured’s Name
+    - Mailing Address
+    - Mortgagee
+    - Location/s of Risk
+    - Properties Insured
+    - Total Sum Insured
+    - Cover
+    - Extensions of Cover
+    - Warranties / Clauses
+    - Deductibles
+    - Premium Rates/ Commission Rates
+    - Loss Information
+    - Law and Jurisdiction
+  - template: Liability
+    line_text: (SUB-LINE)
+    labels:
+    - Date
+    - Reference No
+    - Business Origin
+    - Account Officer
+    - Unit Head
+    - Line of Insurance
+    - Period of Insurance
+    - Insured’s Name
+    - Mailing Address
+    - Nature of Business
+    - Location of Premises
+    - Limit of Liability
+    - Cover
+    - Extensions of Cover
+    - Warranties / Clauses
+    - Deductibles
+    - Premium Rates/ Commission Rates
+    - Loss Information
+    - Law and Jurisdiction
+  - template: Marine Cargo
+    line_text: Marine Cargo Insurance
+    labels:
+    - Date
+    - Reference No
+    - Business Origin
+    - Account Officer
+    - Unit Head
+    - Line of Insurance
+    - Policy Type
+    - Period of Insurance
+    - Insured’s Name
+    - Mailing Address
+    - Nature of Business
+    - Mortgagee
+    - Nature of Business
+    - Details of Cargo
+    - Details of Packaging
+    - Type of Conveyance
+    - Frequency of Delivery
+    - Turn-Over
+    - Estimated for the Next 12 Mos
+    - Perils / Coverages
+    - Total Sum Insured
+    - Extensions of Cover
+    - Warranties / Clauses
+    - Deductibles
+    - Premium Rates/ Commission Rates
+    - Loss Information
+    - Law and Jurisdiction
+  - template: Marine Hull
+    line_text: Marine Hull Insurance
+    labels:
+    - Date
+    - Reference No
+    - Business Origin
+    - Account Officer
+    - Unit Head
+    - Line of Insurance
+    - Policy Type
+    - Period of Insurance
+    - Insured’s Name
+    - Mailing Address
+    - Nature of Business
+    - Mortgagee
+    - Vessel Name
+    - Vessel Operator/ Manager
+    - Type of Vessel
+    - Vessel Usage
+    - Year Built
+    - Tonnage
+    - Cargoes Carried
+    - No. of Passengers/ Crew Seats
+    - Construction
+    - Perils / Coverages
+    - Agreed Value
+    - Extensions of Cover
+    - Warranties / Clauses
+    - Deductibles
+    - Premium Rates/ Commission Rates
+    - Loss Information
+    - Law and Jurisdiction
+  - template: Miscellaneous
+    line_text: (SUB-LINE)
+    labels:
+    - Date
+    - Reference No
+    - Business Origin
+    - Account Officer
+    - Unit Head
+    - Line of Insurance
+    - Policy Type
+    - Period of Insurance
+    - Insured’s Name
+    - Mailing Address
+    - Nature of Business
+    - Location/s of Risk
+    - Properties Insured/ Description
+    - Sum Insured / Basis of Valuation
+    - Total Sum Insured
+    - Cover
+    - Extensions of Cover
+    - Warranties / Clauses
+    - Deductibles
+    - Premium Rates/ Commission Rates
+    - Loss Information
+    - Law and Jurisdiction
+  - template: Motor
+    line_text: Motor Insurance
+    labels:
+    - Date
+    - Reference No
+    - Business Origin
+    - Account Officer
+    - Unit Head
+    - Line of Insurance
+    - Policy Type
+    - Period of Insurance
+    - Insured’s Name
+    - Mailing Address
+    - Mortgagee
+    - Vehicle Type
+    - Engine Type
+    - Year Model
+    - Manufacturer
+    - Model / Variant
+    - Cover
+    - Warranties/Clauses
+    - Deductibles
+    - Premium Rates / Commission Rates
+    - Loss Information
+    - Law and Jurisdiction
+  - template: Personal Accident
+    line_text: (SUB-LINE)
+    labels:
+    - Date
+    - Reference No
+    - Business Origin
+    - Account Officer
+    - Unit Head
+    - Line of Insurance
+    - Policy Type
+    - Period of Insurance
+    - Insured’s Name
+    - Mailing Address
+    - Occupation/ Nature of Business
+    - No of Persons Covered
+    - Benefits / Coverages
+    - Description of Cover
+    - Extensions of Cover
+    - Warranties / Clauses
+    - Premium Rates/ Commission Rates
+    - Loss Information
+    - Law and Jurisdiction
+  - template: Property
+    line_text: Property Insurance
+    labels:
+    - Date
+    - Reference No
+    - Business Origin
+    - Account Officer
+    - Unit Head
+    - Line of Insurance
+    - Policy Type
+    - Period of Insurance
+    - Insured’s Name
+    - Mailing Address
+    - Mortgagee
+    - Location/s of Risk
+    - Properties Insured/ Description
+    - Sum Insured / Basis of Valuation
+    - Total Sum Insured
+    - Building Description
+    - Building Occupancy
+    - Type of Cover
+    - Description of Cover
+    - Extensions of Cover
+    - Warranties / Clauses
+    - Deductibles
+    - Premium Rates/ Commission Rates
+    - Loss Information
+    - Law and Jurisdiction
+  - template: Stockthroughput
+    line_text: Stockthroughput Insurance
+    labels:
+    - Date
+    - Reference No
+    - Business Origin
+    - Account Officer
+    - Unit Head
+    - Line of Insurance
+    - Policy Type
+    - Period of Insurance
+    - Insured’s Name
+    - Mailing Address
+    - Mortgagee
+    - Location/s of Risk
+    - Origin of Goods
+    - Destination of Goods
+    - Details of Packaging
+    - Monthly Inventory
+    - Annual Turn-Over
+    - Description of Stocks
+    - Total Sum Insured
+    - Building Description
+    - Cover
+    - Extensions of Cover
+    - Warranties / Clauses
+    - Deductibles
+    - Premium Rates/ Commission Rates
+    - Loss Information
+    - Law and Jurisdiction
+  package:
+  - template: Aviation
+    line_text: Aviation Insurance
+    labels:
+    - Date
+    - Reference No
+    - Business Origin
+    - Account Officer
+    - Unit Head
+    - Line of Insurance
+    - Insured’s Name
+    - Perils / Coverages
+    - Cover
+    - Extensions of Cover
+    - Warranties / Clauses
+    - Deductibles
+    - Maximum Limit/S
+    - Premium Rates/ Commission Rates
+    - Law and Jurisdiction
+  - template: Bonds
+    line_text: (SUB-LINE)
+    labels:
+    - Date
+    - Reference No
+    - Business Origin
+    - Account Officer
+    - Unit Head
+    - Line of Insurance
+    - Insured’s Name
+    - Cover / Undertaking
+    - Warranties / Clauses
+    - Deductibles
+    - Maximum Limit/S
+    - Premium Rates/ Commission Rates
+    - Law and Jurisdiction
+  - template: Crime
+    line_text: (SUB-LINE)
+    labels:
+    - Date
+    - Reference No
+    - Business Origin
+    - Account Officer
+    - Unit Head
+    - Line of Insurance
+    - Insured’s Name
+    - Cover
+    - Extensions of Cover
+    - Warranties / Clauses
+    - Deductibles
+    - Maximum Limit/S
+    - Premium Rates/ Commission Rates
+    - Law and Jurisdiction
+  - template: EEI
+    line_text: Electronic Equipment Insurance
+    labels:
+    - Date
+    - Reference No
+    - Business Origin
+    - Account Officer
+    - Unit Head
+    - Line of Insurance
+    - Insured’s Name
+    - Perils / Coverages
+    - Cover
+    - Extensions of Cover
+    - Warranties / Clauses
+    - Deductibles
+    - Maximum Limit/S
+    - Premium Rates/ Commission Rates
+    - Law and Jurisdiction
+  - template: Engineering
+    line_text: (SUB-LINE)
+    labels:
+    - Date
+    - Reference No
+    - Business Origin
+    - Account Officer
+    - Unit Head
+    - Line of Insurance
+    - Insured’s Name
+    - Perils / Coverages
+    - Cover
+    - Extensions of Cover
+    - Warranties / Clauses
+    - Deductibles
+    - Maximum Limit/S
+    - Premium Rates/ Commission Rates
+    - Law and Jurisdiction
+  - template: Floater
+    line_text: Property Floater
+    labels:
+    - Date
+    - Reference No
+    - Business Origin
+    - Account Officer
+    - Unit Head
+    - Line of Insurance
+    - Insured’s Name
+    - Perils / Coverages
+    - Cover
+    - Extensions of Cover
+    - Warranties / Clauses
+    - Deductibles
+    - Maximum Limit/S
+    - Premium Rates/ Commission Rates
+    - Law and Jurisdiction
+  - template: Liability
+    line_text: (SUB-LINE)
+    labels:
+    - Date
+    - Reference No
+    - Business Origin
+    - Account Officer
+    - Unit Head
+    - Line of Insurance
+    - Insured’s Name
+    - Cover
+    - Extensions of Cover
+    - Warranties / Clauses
+    - Deductibles
+    - Maximum Limit/S
+    - Premium Rates/ Commission Rates
+    - Law and Jurisdiction
+  - template: Marine Cargo
+    line_text: Marine Cargo Insurance
+    labels:
+    - Date
+    - Reference No
+    - Business Origin
+    - Account Officer
+    - Unit Head
+    - Line of Insurance
+    - Insured’s Name
+    - Perils / Coverages
+    - Cover
+    - Extensions of Cover
+    - Warranties / Clauses
+    - Deductibles
+    - Maximum Limit/S
+    - Premium Rates/ Commission Rates
+    - Law and Jurisdiction
+  - template: Marine Hull
+    line_text: Marine Hull Insurance
+    labels:
+    - Date
+    - Reference No
+    - Business Origin
+    - Account Officer
+    - Unit Head
+    - Line of Insurance
+    - Insured’s Name
+    - Perils / Coverages
+    - Cover
+    - Extensions of Cover
+    - Warranties / Clauses
+    - Deductibles
+    - Maximum Limit/S
+    - Premium Rates/ Commission Rates
+    - Law and Jurisdiction
+  - template: Miscellaneous
+    line_text: (SUB-LINE)
+    labels:
+    - Date
+    - Reference No
+    - Business Origin
+    - Account Officer
+    - Unit Head
+    - Line of Insurance
+    - Insured’s Name
+    - Cover
+    - Extensions of Cover
+    - Warranties / Clauses
+    - Deductibles
+    - Maximum Limit/S
+    - Premium Rates/ Commission Rates
+    - Law and Jurisdiction
+  - template: Motor
+    line_text: Motor Insurance
+    labels:
+    - Date
+    - Reference No
+    - Business Origin
+    - Account Officer
+    - Unit Head
+    - Line of Insurance
+    - Insured’s Name
+    - Perils/Coverages
+    - Cover
+    - Warranties/Clauses
+    - Deductibles
+    - Maximum Limit/S
+    - Premium Rates / Commission Rates
+    - Law and Jurisdiction
+  - template: Personal Accident
+    line_text: (SUB-LINE)
+    labels:
+    - Date
+    - Reference No
+    - Business Origin
+    - Account Officer
+    - Unit Head
+    - Line of Insurance
+    - Insured’s Name
+    - Benefits / Coverages
+    - Description of Cover
+    - Extensions of Cover
+    - Warranties / Clauses
+    - Maximum Limit/S
+    - Premium Rates/ Commission Rates
+    - Law and Jurisdiction
+  - template: Property
+    line_text: Property Insurance
+    labels:
+    - Date
+    - Reference No
+    - Business Origin
+    - Account Officer
+    - Unit Head
+    - Line of Insurance
+    - Type of Cover
+    - Insured’s Name
+    - Description of Cover
+    - Extensions of Cover
+    - Warranties / Clauses
+    - Deductibles
+    - Maximum Limit/S
+    - Premium Rates/ Commission Rates
+    - Law and Jurisdiction
+  - template: Stockthroughput
+    line_text: Stockthroughput Insurance
+    labels:
+    - Date
+    - Reference No
+    - Business Origin
+    - Account Officer
+    - Unit Head
+    - Line of Insurance
+    - Insured’s Name
+    - Cover
+    - Extensions of Cover
+    - Warranties / Clauses
+    - Deductibles
+    - Maximum Limit/S
+    - Premium Rates/ Commission Rates
+    - Law and Jurisdiction

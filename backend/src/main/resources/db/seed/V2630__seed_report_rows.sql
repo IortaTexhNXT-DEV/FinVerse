@@ -1145,3 +1145,47 @@ select q.id, 1, 'AR-CEB-000006', 'CL-2026-000001', 'Santos, Maria Clara Reyes', 
        'BI-HO-2026-000003', 16506.63, 'DOUBLE_PAYMENT', 'Cebu Branch', false, true
 from prq_request q
 where q.request_no = 'RRF-2026-000901' and not exists (select 1 from prq_request_line x where x.request_id = q.id);
+
+-- =====================================================================================================
+-- 12. Receivables: post-dated cheques of corporate customers received at Cebu and due for deposit.
+-- =====================================================================================================
+insert into rcv_pdc (company_id, branch_id, pdc_no, received_date, party_id, party_code, payer_name, department,
+    cheque_no, cheque_date, drawee_bank, currency, exchange_rate, amount, base_amount, bank_account_code, narration,
+    status, status_date, created_at, created_by)
+select c.id, b.id, d.pdc_no, current_date - d.received_ago, p.id, p.code, p.name, 'FND', d.cheque_no,
+       current_date - d.due_ago, d.bank, 'PHP', 1, d.amount, d.amount, '1111', d.narration, 'ON_HAND',
+       current_date - d.received_ago, (current_date - d.received_ago) + time '15:00' at time zone 'Asia/Manila',
+       'accountant'
+from (values
+    ('PDC-CEB-2026-000901', 'C-000202', '220417', 'Metrobank', 41850.00, 31, 1,
+     'Post-dated cheque for the premium of the hull renewal'),
+    ('PDC-CEB-2026-000902', 'C-000203', '508812', 'Land Bank', 18225.00, 29, 0,
+     'Post-dated cheque, second instalment of the crop insurance premium')
+) as d(pdc_no, party_code, cheque_no, bank, amount, received_ago, due_ago, narration)
+join org_company c on c.code = 'FVI'
+join org_branch b on b.company_id = c.id and b.code = 'CEB'
+join pty_party p on p.company_id = c.id and p.code = d.party_code
+where not exists (select 1 from rcv_pdc x where x.company_id = c.id and x.pdc_no = d.pdc_no);
+
+-- =====================================================================================================
+-- 13. Collections: the motor policy of Maria Clara Santos and its endorsement were on the worklist until
+--     the client paid at the head office cashier.
+-- =====================================================================================================
+insert into clx_item (company_id, invoice_no, arn, root_invoice_no, invoice_kind, policy_no, policy_year, client_code,
+    assured_name, insurer_code, branch_id, segment, sales_unit, unit_head_username, ao_username, product_line,
+    currency, booking_date, inception_date, expiry_date, dp_flag, cwt_flag, invoice_category, gross_premium,
+    net_outstanding, outstanding_pr2307, aging_days, aging_bracket, payment_status, status, listed_on, completed_on,
+    last_refreshed_at, current_handler, last_effort_at, last_effort_code, remarks, created_at, created_by, origin)
+select c.id, i.invoice_no, 'ARN-2026-940001', 'BI-HO-2026-000001', i.kind, 'MGIC-MC-2026-98801', 1, 'CL-2026-000001',
+       'Santos, Maria Clara Reyes', 'INS-MGIC', b.id, 'CBG', 'T-CBG1', 'mkttl', 'ao', 'MOTOR', 'PHP', i.booked,
+       date '2026-09-01', date '2027-09-01', false, false, 'REGULAR', i.gross, 0, 0, current_date - 7 - i.booked,
+       '0-30', 'PAID', 'COMPLETED', current_date - 14, current_date - 7, now() - interval '7 days', 'clxhandler',
+       now() - interval '9 days', 'CALL', 'Client promised to pay at the head office cashier',
+       now() - interval '14 days', 'system', 'BIBS'
+from (values
+    ('BI-HO-2026-000001', 'BOOKING', date '2026-09-15', 17027.86),
+    ('BI-HO-2026-000005', 'ENDORSEMENT_PLUS', date '2026-09-20', 2690.00)
+) as i(invoice_no, kind, booked, gross)
+join org_company c on c.code = 'FVI'
+join org_branch b on b.company_id = c.id and b.code = 'HO'
+where not exists (select 1 from clx_item x where x.company_id = c.id and x.invoice_no = i.invoice_no);

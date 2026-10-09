@@ -655,7 +655,7 @@ insert into bkg_invoice (company_id, branch_id, invoice_no, arn, account_id, tra
     booked_by, booked_at, created_at, created_by, root_invoice_no, ledger_context, incentive_status)
 select a.company_id, b.id, e.invoice_no, a.arn, a.id, 'NB', 'BOOKING', 'BOOKED', 1, e.policy_no, a.client_id,
        a.client_code, a.client_name, a.insurer_code, a.product_code, a.line_code, 'CORPORATE', 'EMAIL', e.officer,
-       e.team, 'EB', 'EB-CORP', 'PHP', current_date - e.booked_ago, a.period_from, a.period_to, e.basic, e.dst, e.ptx,
+       e.team, 'EB', 'NB-CORP', 'PHP', current_date - e.booked_ago, a.period_from, a.period_to, e.basic, e.dst, e.ptx,
        e.lgt, 0, 0, e.comm_rate, a.commission, a.vat_on_commission, 10, round(a.commission * 0.10, 2), false, false,
        false, 'NEW_BUSINESS', 'INDIVIDUAL', 'ebproc', (current_date - e.booked_ago) + time '14:00' at time zone 'Asia/Manila',
        (current_date - e.booked_ago) + time '14:00' at time zone 'Asia/Manila', 'ebproc', e.invoice_no, 'NEW',

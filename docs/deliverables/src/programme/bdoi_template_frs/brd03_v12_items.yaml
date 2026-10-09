@@ -91,19 +91,19 @@ inputs_bdoi:
   PM-Q11: [Answered, "Business Requirements Mapping (BRPM.001)", "Refer to User Access Maintenance FRS.", ""]
   PM-Q12: [Answered, "Business Requirements Mapping (PMADD05)", "Refer to User Access Maintenance FRS.", ""]
   PM-Q14: [Answered, "FRPM.011.02", "A request from TSU or an insurer goes through the TSU approval hierarchy, not Marketing.", ""]
-  CLR-PM-02: [Partly, "FRPM.006.01, FRPM.012.01, Annex D, Annex F", "Quotation Slip per insurer with BDOI's templates.", "Layouts of the other package documents; no brochure."]
-  CLR-PM-07: [Partly, "FRPM.004.01", "Expiry alerts to the TSU Officer and TSU Team Lead.", "Channel; MBS as recipient; incentive review recipients."]
-  CLR-PM-22: [Partly, "FRPM.004.01", "First alert 90 days before expiry and anniversary.", "Automatic drafting of renewal requests."]
-  PM-Q15: [Partly, "Annex E", "Fields of the Package Request Form.", "Mandatory fields; client of a generic programme."]
-  PM-Q21: [Partly, "FRPM.006.02, FRPM.012.02", "Responses Approved, Not Covered, Others; same for non-package.", "Maximum number of rounds."]
-  PM-Q22: [Partly, "FRPM.006.02, FRPM.012.02", "Options per insurer: coverage, premium, commission, deductibles, terms, warranties, clauses, extensions.", "Panel insurers and co-insurance shares."]
-  PM-Q28: [Partly, "FRPM.003.03; New Request Process Flow", "TSU reviews and approves the package configuration.", "Business Administrator as validator; checklist."]
-  PM-Q33: [Partly, "FRPM.002.02, FRPM.003.05", "Expired packages are kept in the Expired Products tab; transactions stay accessible.", "Who may see expired packages."]
-  PM-Q38: [Partly, "FRPM.004.01", "First alert 90 days before the expiry and anniversary dates.", "Meaning of the dates; reminder days."]
-  PM-Q42: [Partly, "FRPM.003.02, FRPM.018.01", "Rule fields; incentive amount or commission rate.", "Definition of CPC2 and the other types; maintainer and approver."]
-  PM-Q46: [Partly, "FRPM.014.01", "ManCom e-mails through Microsoft 365.", "Channel and sender mailbox for insurer e-mails."]
-  PM-Q50: [Partly, "Annex A, Annex B, Annex C", "Fields per line of insurance.", "Validation rules per field; documents per product."]
-  PM-Q08: [Partly, "FRPM.002.01", "The module covers product set-up, risk codes and field management.", "Owners of the master screens (insurers, rates and taxes, sales organisation)."]
+  CLR-PM-02: ["Partly", "FRPM.006.01, FRPM.012.01, Annex D, Annex F", "Quotation Slip per insurer with BDOI's templates.", "Layouts of the other package documents; no brochure."]
+  CLR-PM-07: ["Partly", "FRPM.004.01", "Expiry alerts to the TSU Officer and TSU Team Lead.", "Channel; MBS as recipient; incentive review recipients."]
+  CLR-PM-22: ["Partly", "FRPM.004.01", "First alert 90 days before expiry and anniversary.", "Automatic drafting of renewal requests."]
+  PM-Q15: ["Partly", "Annex E", "Fields of the Package Request Form.", "Mandatory fields; client of a generic programme."]
+  PM-Q21: ["Partly", "FRPM.006.02, FRPM.012.02", "Responses Approved, Not Covered, Others; same for non-package.", "Maximum number of rounds."]
+  PM-Q22: ["Partly", "FRPM.006.02, FRPM.012.02", "Options per insurer: coverage, premium, commission, deductibles, terms, warranties, clauses, extensions.", "Panel insurers and co-insurance shares."]
+  PM-Q28: ["Partly", "FRPM.003.03; New Request Process Flow", "TSU reviews and approves the package configuration.", "Business Administrator as validator; checklist."]
+  PM-Q33: ["Partly", "FRPM.002.02, FRPM.003.05", "Expired packages are kept in the Expired Products tab; transactions stay accessible.", "Who may see expired packages."]
+  PM-Q38: ["Partly", "FRPM.004.01", "First alert 90 days before the expiry and anniversary dates.", "Meaning of the dates; reminder days."]
+  PM-Q42: ["Partly", "FRPM.003.02, FRPM.018.01", "Rule fields; incentive amount or commission rate.", "Definition of CPC2 and the other types; maintainer and approver."]
+  PM-Q46: ["Partly", "FRPM.014.01", "ManCom e-mails through Microsoft 365.", "Channel and sender mailbox for insurer e-mails."]
+  PM-Q50: ["Partly", "Annex A, Annex B, Annex C", "Fields per line of insurance.", "Validation rules per field; documents per product."]
+  PM-Q08: ["Partly", "FRPM.002.01", "The module covers product set-up, risk codes and field management.", "Owners of the master screens (insurers, rates and taxes, sales organisation)."]
 
 # Fit-gap per BRD ID. fit: Fit | Configure | Extend | Recommend change.
 fitgap:
@@ -210,9 +210,9 @@ frpm_tests:
 # (item: {criterion number: [Yes|Partly|No, reason]}). Item-level availability of BDOI's own sub-items comes from the
 # platform status of the comparison workbook (brd03_frs_comparison.yaml, mapping).
 coverage:
-  FRPM.003.07: {2: [Partly, "A deactivation (retirement) request can be returned or voided with its reason; an explicit Reject outcome is point C04."]}
-  FRPM.004.01: {1: [Partly, "The Expiring tab lists packages within the notice days; the delivered notice is 60 days and is set to 90 at go-live (M.5)."]}
-  FRPM.007.01: {1: [No, "Reports cannot be scheduled yet; the weekly run is planned (programme gap G04)."], 3: [Partly, "Report runs are kept in the report archive; the weekly repository comes with the scheduled run."]}
-  FRPM.009.01: {1: [No, "The Final Terms for Proposal column is not available (comparison: platform status No)."]}
-  FRPM.020.01: {1: [Partly, "Saved report variants are available; sharing a saved definition between users is to be confirmed in UAT."]}
-  FRPM.029.01: {1: [Partly, "Stage notices go to the creator and the assignee; a notice to every TSU Team Lead is not sent."], 2: [Partly, "The change is recorded; its transfer waits for BDOI to name the systems (PQ16)."]}
+  FRPM.003.07: {2: ["Partly", "A deactivation (retirement) request can be returned or voided with its reason; an explicit Reject outcome is point C04."]}
+  FRPM.004.01: {1: ["Partly", "The Expiring tab lists packages within the notice days; the delivered notice is 60 days and is set to 90 at go-live (M.5)."]}
+  FRPM.007.01: {1: ["No", "Reports cannot be scheduled yet; the weekly run is planned (programme gap G04)."], 3: ["Partly", "Report runs are kept in the report archive; the weekly repository comes with the scheduled run."]}
+  FRPM.009.01: {1: ["No", "The Final Terms for Proposal column is not available (comparison: platform status No)."]}
+  FRPM.020.01: {1: ["Partly", "Saved report variants are available; sharing a saved definition between users is to be confirmed in UAT."]}
+  FRPM.029.01: {1: ["Partly", "Stage notices go to the creator and the assignee; a notice to every TSU Team Lead is not sent."], 2: ["Partly", "The change is recorded; its transfer waits for BDOI to name the systems (PQ16)."]}

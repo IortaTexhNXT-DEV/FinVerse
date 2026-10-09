@@ -152,6 +152,9 @@ describe('names in the renewal lists', () => {
     ] as unknown as Awaited<ReturnType<typeof catalogApi.insurers>>);
     render(renewalWrapper(new Set(['RNW_VIEW']))(<CandidateList />));
     expect(await screen.findByText('Luzon Assurance Co.')).toBeInTheDocument();
+    // The unit column is left out of the default view; the column chooser shows it.
+    fireEvent.click(screen.getByRole('button', { name: /^Columns/ }));
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Unit / Officer' }));
     expect(screen.getByText('Corporate Marketing Team 1')).toBeInTheDocument();
     expect(await screen.findByText('Mabuhay General Insurance Corp.')).toBeInTheDocument();
     expect(screen.getAllByText('Motor')).toHaveLength(2);

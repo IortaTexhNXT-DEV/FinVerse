@@ -206,7 +206,6 @@ export default function ExtractsPage() {
             {
               key: 'staged-rows',
               header: 'Rows Staged',
-              defaultHidden: true,
               numeric: true,
               render: (e) => e.stagedRows,
             },
@@ -220,6 +219,7 @@ export default function ExtractsPage() {
             {
               key: 'received',
               header: 'Received On',
+              defaultHidden: true,
               render: (e) => (
                 <CellStack
                   main={formatDateTime(e.receivedAt)}

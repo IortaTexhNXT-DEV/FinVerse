@@ -66,7 +66,10 @@ describe('account page Claims tab', () => {
     );
     expect(screen.getByText('With Insurer - For Issuance of LOA')).toBeInTheDocument();
     expect(screen.getByText(/2 claims, 1 open/)).toBeInTheDocument();
-    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    // Read-only: no action button (only the list's own column and density tools).
+    expect(
+      screen.queryAllByRole('button').filter((b) => b.closest('.table-tools') === null),
+    ).toHaveLength(0);
     expect(spy).toHaveBeenCalledWith('ARN-2026-940001');
   });
 

@@ -55,11 +55,15 @@ export function useChangeColumns(withClient: boolean): Column<ContactChange>[] {
         <CellStack main={c.reasonCode ? reason(c.reasonCode) : ''} sub={channel(c.channel)} />
       ),
     },
-    { key: 'agent', header: 'Agent', render: (c) => <UserName login={c.agent} /> },
+    {
+      key: 'agent',
+      header: 'Agent',
+      defaultHidden: true,
+      render: (c) => <UserName login={c.agent} />,
+    },
     {
       key: 'sync',
       header: 'Legacy Sync',
-      defaultHidden: true,
       kind: 'status',
       render: (c) =>
         c.handoffStatus ? (

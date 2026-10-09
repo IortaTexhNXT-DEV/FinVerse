@@ -18,6 +18,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class NoticeDelivery {
 
+  /** Longest reference of an e-mail (the title of the notice). */
+  private static final int MAX_REFERENCE = 60;
+
   private final NotificationService notifications;
   private final NotificationPreferenceService preferences;
   private final MessageService messages;
@@ -112,7 +115,13 @@ public class NoticeDelivery {
             notice.body(),
             List.of(),
             null,
-            new RecordLink(notice.entityType(), notice.entityId(), notice.title())));
+            new RecordLink(notice.entityType(), notice.entityId(), reference(notice.title()))));
+  }
+
+  private static String reference(String title) {
+    return title == null || title.length() <= MAX_REFERENCE
+        ? title
+        : title.substring(0, MAX_REFERENCE);
   }
 
   private void email(String username, Notice notice, String purpose) {

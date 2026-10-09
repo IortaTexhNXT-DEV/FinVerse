@@ -137,12 +137,12 @@ insert into csh_unapplied (company_id, branch_id, reference, origin, receipt_id,
     sales_unit, currency, amount, balance, stage, disposition_hint, source_module, source_ref, remarks, created_at,
     created_by, ledger_context)
 select r.company_id, r.branch_id, u.reference, 'EXCESS', r.id, u.invoice_no, r.payor_code, r.payor_name, 'T-CBG1',
-       'PHP', u.amount, 0, 'COMPLETED', 'Minimal balance', 'CASHIERING', 'SEED-RPT:' || u.reference,
+       'PHP', u.amount, 0, 'COMPLETED', 'Minimal balance', 'CASHIERING', 'PAY:' || u.payment_no,
        'Swept to miscellaneous income by the minimal balance sweep', r.created_at, 'cashbr', 'NEW'
 from (values
-    ('UNP-2026-000901', 'AR-CEB-000002', null, 0.75),
-    ('UNP-2026-000902', 'AR-CEB-000004', 'BI-HO-2026-000008', 0.40)
-) as u(reference, receipt_no, invoice_no, amount)
+    ('UNP-2026-000901', 'AR-CEB-000002', null, 0.75, 'PAY-2026-000921'),
+    ('UNP-2026-000902', 'AR-CEB-000004', 'BI-HO-2026-000008', 0.40, 'PAY-2026-000922')
+) as u(reference, receipt_no, invoice_no, amount, payment_no)
 join csh_receipt r on r.receipt_no = u.receipt_no
 where not exists (select 1 from csh_unapplied x where x.reference = u.reference);
 
@@ -158,13 +158,13 @@ select r.company_id, a.invoice_no, a.arn, r.payor_code, r.id, 'PAYMENT', a.sourc
        case when a.status = 'REVERSED' then 'REV-CEB-' || to_char(current_date, 'YYYY') || a.seq end,
        (current_date - a.days_ago) + time '10:00' at time zone 'Asia/Manila', 'cashbr'
 from (values
-    ('AR-CEB-000003', 'BI-HO-2026-000004', 'ARN-2026-940004', 'SEED-RPT:APP-1', 28281.25, 4064.45, 487.73,
+    ('AR-CEB-000003', 'BI-HO-2026-000004', 'ARN-2026-940004', 'PAY-2026-000911', 28281.25, 4064.45, 487.73,
      21, 'REVERSED', 20, 'Check returned for insufficient funds', '-000911'),
-    ('AR-CEB-000004', 'BI-HO-2026-000008', 'ARN-2026-940008', 'SEED-RPT:APP-2', 19350.73, 2703.69, 324.44,
+    ('AR-CEB-000004', 'BI-HO-2026-000008', 'ARN-2026-940008', 'PAY-2026-000912', 19350.73, 2703.69, 324.44,
      12, 'ACTIVE', null, null, '-000912'),
-    ('AR-CEB-000005', 'BI-HO-2026-000003', 'ARN-2026-940003', 'SEED-RPT:APP-3', 19087.50, 2668.45, 320.21,
+    ('AR-CEB-000005', 'BI-HO-2026-000003', 'ARN-2026-940003', 'PAY-2026-000913', 19087.50, 2668.45, 320.21,
      9, 'REVERSED', 7, 'Applied to the wrong invoice; re-applied to the client''s fire policy', '-000913'),
-    ('AR-CEB-000005', 'BI-HO-2026-000007', 'ARN-2026-000002', 'SEED-RPT:APP-4', 19087.50, 2668.45, 320.21,
+    ('AR-CEB-000005', 'BI-HO-2026-000007', 'ARN-2026-000002', 'RAP-2026-000914', 19087.50, 2668.45, 320.21,
      7, 'ACTIVE', null, null, '-000914')
 ) as a(receipt_no, invoice_no, arn, source_ref, amount, commission, vat, days_ago, status, reversed_ago, reason, seq)
 join csh_receipt r on r.receipt_no = a.receipt_no
@@ -176,12 +176,12 @@ insert into csh_reapplication (company_id, invoice_no, source_module, source_ref
 select c.id, ra.invoice_no, ra.module, ra.source_ref, ra.reason, ra.unapplied, ra.excess, ra.receipts, ra.unapplied_ref,
        (current_date - ra.days_ago) + time '14:15' at time zone 'Asia/Manila', 'cashbr'
 from (values
-    ('BI-HO-2026-000007', 'ADJUSTMENT', 'SEED-RPT:ADJ-2026-000901',
+    ('BI-HO-2026-000007', 'ADJUSTMENT', 'ADJ-2026-000901',
      'Refund of the cancelled fire policy re-applied to the new fire policy of the client', 10095.49, 0.00, null,
      'UNP-2026-000903', 8),
-    ('BI-HO-2026-000007', 'CASHIERING', 'SEED-RPT:REV-2026-000913', 'Payment reversed from the wrong invoice and re-applied',
+    ('BI-HO-2026-000007', 'CASHIERING', 'REV-2026-000913', 'Payment reversed from the wrong invoice and re-applied',
      19087.50, 0.00, 'AR-CEB-000005', null, 7),
-    ('BI-HO-2026-000004', 'CASHIERING', 'SEED-RPT:RIN-2026-000901', 'Reinstated receipt re-applied to the invoice',
+    ('BI-HO-2026-000004', 'CASHIERING', 'RIN-2026-000901', 'Reinstated receipt re-applied to the invoice',
      28281.25, 0.00, 'AR-CEB-000003', null, 13)
 ) as ra(invoice_no, module, source_ref, reason, unapplied, excess, receipts, unapplied_ref, days_ago)
 join org_company c on c.code = 'FVI'
@@ -241,7 +241,7 @@ where not exists (select 1 from csh_cwt_tag x where x.reference = t.reference);
 insert into csh_payment (company_id, branch_id, payment_no, channel, batch_ref, source_key, row_no, reference,
     payor_name, assured_name, amount, currency, value_date, paid_time, late_deposit, payment_mode, match_category,
     matched_ref, receipt_id, applied_amount, unapplied_amount, message, created_at, created_by)
-select c.id, b.id, p.payment_no, p.channel, p.batch_ref, 'SEED-RPT:' || p.payment_no, p.row_no, p.reference,
+select c.id, b.id, p.payment_no, p.channel, p.batch_ref, 'UPL:' || p.batch_ref || ':' || p.row_no, p.row_no, p.reference,
        p.payor, p.payor, p.amount, 'PHP', current_date - p.days_ago, '10:15', false, p.mode, p.category, p.matched,
        null, p.applied, p.amount - p.applied, p.message,
        (current_date - p.days_ago) + time '17:30' at time zone 'Asia/Manila', 'cashbr'
@@ -338,24 +338,24 @@ create temporary table seed_dsb (
 
 insert into seed_dsb values
 ('000901', 'INS-LAC', 'REMITTANCE', 'CHECK', 64215.80, 0, 'Net premium remittance batch RMB-INS-LAC-2026-000901',
- 'APPROVED', 'POSTED', null, 196, 'STALE', '100003', 195, 'REMITTANCE', 'SEED-RPT:RMB-INS-LAC-2026-000901', 'RELEASED'),
+ 'APPROVED', 'POSTED', null, 196, 'STALE', '100003', 195, 'REMITTANCE', 'RMB-INS-LAC-2026-000901', 'RELEASED'),
 ('000902', 'INS-LAC', 'REMITTANCE', 'CHECK', 48250.00, 0, 'Net premium remittance batch RMB-INS-LAC-2026-000902',
- 'APPROVED', 'POSTED', null, 62, 'RELEASED', '100011', 61, 'REMITTANCE', 'SEED-RPT:RMB-INS-LAC-2026-000902', 'RELEASED'),
+ 'APPROVED', 'POSTED', null, 62, 'RELEASED', '100011', 61, 'REMITTANCE', 'RMB-INS-LAC-2026-000902', 'RELEASED'),
 ('000903', 'INS-VMI', 'REMITTANCE', 'ATD', 132600.00, 0, 'Net premium remittance batch RMB-INS-VMI-2026-000901',
- 'APPROVED', 'POSTED', null, 18, 'DEBITED', 'ATD-2026-000901', null, 'REMITTANCE', 'SEED-RPT:RMB-INS-VMI-2026-000901',
+ 'APPROVED', 'POSTED', null, 18, 'DEBITED', 'ATD-2026-000901', null, 'REMITTANCE', 'RMB-INS-VMI-2026-000901',
  'RELEASED'),
 ('000904', 'INS-VMI', 'REMITTANCE', 'ATD', 28125.00, 0, 'Net premium remittance batch RMB-INS-VMI-2026-000902',
- 'APPROVED', 'POSTED', null, 3, 'EMAILED', 'ATD-2026-000902', null, 'REMITTANCE', 'SEED-RPT:RMB-INS-VMI-2026-000902',
+ 'APPROVED', 'POSTED', null, 3, 'EMAILED', 'ATD-2026-000902', null, 'REMITTANCE', 'RMB-INS-VMI-2026-000902',
  'RELEASED'),
 ('000905', 'EMP-0412', 'CASH_ADVANCE', 'CHECK', 15000.00, 0, 'Cash advance for the Cebu client service visits',
- 'APPROVED', 'POSTED', null, 25, 'PRINTED', '100014', 24, 'PAYREQUEST', 'SEED-RPT:PRQ-2026-000901', 'RELEASED'),
+ 'APPROVED', 'POSTED', null, 25, 'PRINTED', '100014', 24, 'PAYREQUEST', 'RFP-2026-000901', 'RELEASED'),
 ('000906', 'EMP-0388', 'EMPLOYEE', 'CHECK', 8640.00, 0, 'Reimbursement of transportation and meals, client visits',
- 'APPROVED', 'POSTED', null, 11, 'PRINTED', '100015', 10, 'DISBURSEMENT', 'SEED-RPT:DSR-2026-000906', 'RELEASED'),
+ 'APPROVED', 'POSTED', null, 11, 'PRINTED', '100015', 10, 'DISBURSEMENT', 'DSR-2026-000906', 'RELEASED'),
 ('000907', 'S-0002', 'OTHER', 'CHECK', 56000.00, 1120.00, 'Annual licence of the document scanning software',
- 'APPROVED', 'POSTED', null, 15, 'RELEASED', '100013', 14, 'DISBURSEMENT', 'SEED-RPT:DSR-2026-000907', 'RELEASED'),
+ 'APPROVED', 'POSTED', null, 15, 'RELEASED', '100013', 14, 'DISBURSEMENT', 'DSR-2026-000907', 'RELEASED'),
 ('000908', 'G-0002', 'OTHER', 'CHECK', 12500.00, 250.00, 'Repair of the Cebu branch service vehicle', 'APPROVED',
  'FAILED', 'The expense account 6105 is closed for posting in the period', 6, 'PENDING', null, null, 'DISBURSEMENT',
- 'SEED-RPT:DSR-2026-000908', 'IN_VOUCHER');
+ 'DSR-2026-000908', 'IN_VOUCHER');
 
 insert into dsb_request (company_id, request_no, source, source_module, source_ref, disbursement_type, payee_class,
     payee_code, payee_name, payee_id, currency, amount, purpose, received_at, status, created_at, created_by)
@@ -1057,3 +1057,91 @@ from (values
 ) as l(level, measure, currency, source, staged, target, status, reason, explanation)
 join mig_recon_run r on r.run_no = 'MGR-2026-000901'
 where not exists (select 1 from mig_recon_line x where x.run_id = r.id);
+
+-- =====================================================================================================
+-- 10. Organisation: the employees of the cost centres (head office and branches), one separated.
+-- =====================================================================================================
+insert into org_employee (company_id, employee_no, full_name, branch_id, cost_center, position, email, party_code,
+    hired_on, separated_on, active, created_at, created_by)
+select c.id, e.no, e.name, b.id, e.cc, e.position, e.email, e.party, e.hired, e.separated, e.separated is null,
+       now() - interval '30 days', 'hrappr'
+from (values
+    ('EMP-0101', 'Concepcion, Teresa Marie', 'HO', 'EXEC', 'President and Chief Executive Officer',
+     'tconcepcion@bdoi.com.ph', null, date '2015-03-02', null::date),
+    ('EMP-0214', 'Navarro, Antonio Jose', 'HO', 'FIN', 'Comptroller', 'anavarro@bdoi.com.ph', null,
+     date '2016-07-18', null),
+    ('EMP-0233', 'Lim, Grace Anne', 'HO', 'FIN', 'General Ledger Officer', 'glim@bdoi.com.ph', null,
+     date '2019-01-07', null),
+    ('EMP-0245', 'Mercado, Paolo Luis', 'HO', 'FIN', 'Cashier', 'pmercado@bdoi.com.ph', null, date '2020-06-15', null),
+    ('EMP-0301', 'Fernandez, Clarissa Joy', 'HO', 'CLM', 'Claims Officer', 'cfernandez@bdoi.com.ph', null,
+     date '2018-09-03', null),
+    ('EMP-0302', 'Ocampo, Cedric James', 'HO', 'CLM', 'Claims Officer', 'cocampo@bdoi.com.ph', null,
+     date '2021-02-01', null),
+    ('EMP-0388', 'Bautista, Ramon Luis', 'HO', 'MKT', 'Account Officer', 'rbautista@bdoi.com.ph', 'EMP-0388',
+     date '2017-11-13', null),
+    ('EMP-0390', 'Aquino, Aileen Grace', 'HO', 'NB-CBG-M', 'Account Officer', 'aaquino@bdoi.com.ph', null,
+     date '2019-04-22', null),
+    ('EMP-0392', 'Robles, Marites Ann', 'HO', 'NB-CBG-M', 'Marketing Team Leader', 'mrobles@bdoi.com.ph', null,
+     date '2014-08-11', null),
+    ('EMP-0395', 'Castro, Arnel Vincent', 'HO', 'NB-CORP', 'Account Officer', 'acastro@bdoi.com.ph', null,
+     date '2020-10-05', null),
+    ('EMP-0412', 'Dela Paz, Kristine Mae', 'CEB', 'NB-CBG-V', 'Account Officer', 'kdelapaz@bdoi.com.ph', 'EMP-0412',
+     date '2022-03-14', null),
+    ('EMP-0415', 'Sison, Benjamin Rey', 'CEB', 'NB-CBG-V', 'Branch Cashier', 'bsison@bdoi.com.ph', null,
+     date '2021-07-01', null),
+    ('EMP-0421', 'Torres, Consuelo Faith', 'CEB', 'CLM', 'Claims Officer', 'ctorres@bdoi.com.ph', null,
+     date '2023-01-16', null),
+    ('EMP-0502', 'Villaroman, Dennis Paul', 'DVO', 'NB-CBG-V', 'Account Officer', 'dvillaroman@bdoi.com.ph', null,
+     date '2022-09-05', null),
+    ('EMP-0610', 'Ilagan, Ingrid Sol', 'HO', 'IT', 'Information Security Officer', 'iilagan@bdoi.com.ph', null,
+     date '2018-05-21', null),
+    ('EMP-0702', 'Domingo, Helena Rose', 'HO', 'HR', 'Human Resources Officer', 'hdomingo@bdoi.com.ph', null,
+     date '2016-02-08', null),
+    ('EMP-0398', 'Pascual, Rodel Ian', 'HO', 'NB-CBG-M', 'Account Officer', 'rpascual@bdoi.com.ph', null,
+     date '2019-08-19', date '2026-06-30')
+) as e(no, name, branch, cc, position, email, party, hired, separated)
+join org_company c on c.code = 'FVI'
+join org_branch b on b.company_id = c.id and b.code = e.branch
+where not exists (select 1 from org_employee x where x.company_id = c.id and x.employee_no = e.no);
+
+-- =====================================================================================================
+-- 11. Payment requests: the cash advance of the Cebu account officer (disbursed, check printed) and the
+--     refund of the part of a cancelled receipt that was not reinstated (waiting for approval).
+-- =====================================================================================================
+insert into prq_request (company_id, branch_id, request_no, kind, stage, segment, reference_text, request_date,
+    requesting_unit, payee_type, payee_code, payee_name, payment_mode, rfp_type, purpose, currency, amount,
+    validation_required, validation_round, submitted_by, submitted_at, reviewed_by, reviewed_at, approved_by,
+    approved_at, hr_approved_by, hr_approved_at, send_count, disbursement_request_no, disbursement_status, dv_no,
+    dv_status, instrument_status, disbursed_at, created_at, created_by)
+select c.id, b.id, r.request_no, r.kind, r.stage, 'CBG', r.reference, current_date - r.days_ago, r.unit, r.payee_type,
+       r.payee_code, r.payee_name, 'CHECK', r.rfp_type, r.purpose, 'PHP', r.amount, r.kind = 'REFUND',
+       case when r.kind = 'REFUND' then 1 else 0 end, r.maker,
+       (current_date - r.days_ago) + time '10:00' at time zone 'Asia/Manila', r.reviewer,
+       case when r.reviewer is not null then (current_date - r.days_ago) + time '14:00' at time zone 'Asia/Manila' end,
+       r.approver,
+       case when r.approver is not null then (current_date - r.days_ago + 1) + time '09:30' at time zone 'Asia/Manila' end,
+       r.hr, case when r.hr is not null then (current_date - r.days_ago + 1) + time '11:00' at time zone 'Asia/Manila' end,
+       case when r.dsr is not null then 1 else 0 end, r.dsr, case when r.dsr is not null then 'RELEASED' end, r.dv,
+       case when r.dv is not null then 'APPROVED' end, case when r.dv is not null then 'PRINTED' end,
+       case when r.dv is not null then (current_date - r.days_ago + 2) + time '16:00' at time zone 'Asia/Manila' end,
+       (current_date - r.days_ago) + time '09:00' at time zone 'Asia/Manila', r.maker
+from (values
+    ('RFP-2026-000901', 'CASH_ADVANCE', 'DISBURSED', 'Client service visits, Cebu and Bohol', 'Marketing - Cebu',
+     'EMPLOYEE', 'EMP-0412', 'Dela Paz, Kristine Mae', 'CASH_ADVANCE',
+     'Cash advance for the client service visits of the quarter', 15000.00, 27, 'mktao', 'mkttl', 'mktappr',
+     'hrappr', 'DSR-2026-000905', 'DV-2026-000905'),
+    ('RRF-2026-000901', 'REFUND', 'FOR_APPROVAL', 'AR-CEB-000006', 'Cashiering - Cebu', 'CLIENT', 'CL-2026-000001',
+     'Santos, Maria Clara Reyes', null, 'Refund of the part of the cancelled receipt not reinstated', 16506.63, 2,
+     'cashbr', 'cashtl', null, null, null, null)
+) as r(request_no, kind, stage, reference, unit, payee_type, payee_code, payee_name, rfp_type, purpose, amount,
+       days_ago, maker, reviewer, approver, hr, dsr, dv)
+join org_company c on c.code = 'FVI'
+join org_branch b on b.company_id = c.id and b.code = 'CEB'
+where not exists (select 1 from prq_request x where x.request_no = r.request_no);
+
+insert into prq_request_line (request_id, line_no, ar_no, client_code, assured_name, invoice_no, root_invoice_no,
+    amount, reason_code, branch_unit, cancelled_policy, live)
+select q.id, 1, 'AR-CEB-000006', 'CL-2026-000001', 'Santos, Maria Clara Reyes', 'BI-HO-2026-000003',
+       'BI-HO-2026-000003', 16506.63, 'DOUBLE_PAYMENT', 'Cebu Branch', false, true
+from prq_request q
+where q.request_no = 'RRF-2026-000901' and not exists (select 1 from prq_request_line x where x.request_id = q.id);

@@ -121,8 +121,8 @@ public class CoverController {
   }
 
   /**
-   * The cover card of Record Claim: snapshot facts, version at the loss date, premium check,
-   * locations and proposed insurers.
+   * The cover card of Record Claim: snapshot facts, latest booked version, premium check, locations
+   * and proposed insurers.
    *
    * @param arn cover
    * @param companyId company
@@ -139,7 +139,7 @@ public class CoverController {
       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
           LocalDate lossDate) {
     Account a = covers.account(companyId, arn);
-    CoverSnapshot snapshot = covers.snapshot(a, policyYear, lossDate);
+    CoverSnapshot snapshot = covers.snapshot(a, policyYear);
     return new ClaimDraft(
         CoverHit.from(a),
         CoverService.policyYears(a).stream().map(PolicyYearDto::from).toList(),

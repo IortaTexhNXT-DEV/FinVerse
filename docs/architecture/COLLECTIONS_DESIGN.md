@@ -208,7 +208,8 @@ Sub-ledger: incentive receivables are open items of the insurer party (type INCE
 | `CLX_ESCALATION_HANDLE` | Act on escalations (TL / UH / Section Head) |
 | `CLX_ASSIGN` | Reassignment and assignment rules (052) |
 | `CLX_UNAPPLIED_WORK` | Collector disposition and application request on unapplied payments (030-033) |
-| `CLX_BILLING` | Installment plans and SOA generation (053/058) |
+| `CLX_BILLING` | Installment plans of the collectors (053) |
+| `CLX_SOA_ISSUE` | Billing run, generation, sending and cancellation of the statements of account, by Operations (058; FR-CL-060, 061; V1009) |
 | `CLX_SETUP` | Threshold, escalation rules, billing frequencies, invoice pattern, Collections LOVs (007, 017, 037, 049) |
 | `CLX_EXPORT` | Export of lists and download of files (caveat p.93) |
 | `CLX_REPORT_VIEW` | Scheduled files and Collections reports (view) |
@@ -226,7 +227,7 @@ Sub-ledger: incentive receivables are open items of the insurer party (type INCE
 | `MKT_SECTION_HEAD` (new) | Section Head Corporate / Retail | + CLX_SETUP (Corporate per p.44; Retail without setup), CLX_AUDIT_VIEW | `clxuh` |
 | `UNAPPLIED_HANDLER` (new, CQ10) | Unapplied Payment Handler | CLX_VIEW, CLX_UNAPPLIED_WORK, CLX_REPORT_VIEW | - |
 | `PROCESSOR` (exists) | Processing Unit | CLX_VIEW, CLX_WORK (limited to the disposition "no / missing policy number" by LOV attribute `allowed_roles`) | existing |
-| `CASHIER`, `CASHIER_TL` (exist) | Operations Cashiering | CLX_VIEW, CLX_REPORT_VIEW, CLX_EXPORT | existing |
+| `CASHIER`, `CASHIER_TL` (exist) | Operations Cashiering | CLX_VIEW, CLX_REPORT_VIEW, CLX_EXPORT; `CASHIER_TL` also CLX_SOA_ISSUE (the Operations billing user, proposed; CLR-CL-32) | existing (`cashtl`) |
 | `DISBURSEMENT`, `COMPTROLLERSHIP` (exist), `ACSL` (new, view) | BDO Insure viewers | CLX_VIEW, CLX_REPORT_VIEW (+ CLX_EXPORT for Disbursement) | existing |
 | `APP_SUPPORT` (new) / `BUSINESS_ADMIN` (exists) / `DCO` (new) | Application support, Admin, DCO | CLX_SETUP, CLX_AUDIT_VIEW, `FLOWIN_MANAGE` (sync view), job run view | - |
 

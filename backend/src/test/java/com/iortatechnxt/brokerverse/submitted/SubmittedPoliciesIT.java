@@ -304,6 +304,7 @@ class SubmittedPoliciesIT {
             "SBM-PERSISTENCY",
             "SBM-PENETRATION",
             "SBM-HOLD-COVER-GAP",
+            "SBM-EXPIRING-UNINSURED",
             "SBM-LETTERS")) {
       ReportResult result = as.run(TL, () -> reports.run(code, params));
       assertThat(result.code()).isEqualTo(code);

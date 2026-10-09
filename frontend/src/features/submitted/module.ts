@@ -86,6 +86,13 @@ export const submittedModule: FeatureModule = {
       component: lazy(() => import('./renewals/RenewalWorkListPage')),
     },
     {
+      path: '/submitted/proposals',
+      label: 'Renewal Proposals',
+      icon: FileSignature,
+      permission: 'SBM_PROPOSAL',
+      component: lazy(() => import('./proposals/ProposalsPage')),
+    },
+    {
       path: '/submitted/letters',
       label: 'Letters & Print Batches',
       icon: Mails,

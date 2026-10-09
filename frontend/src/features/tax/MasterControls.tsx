@@ -78,6 +78,24 @@ export function SelectField<T extends string>({
   );
 }
 
+/** Labelled check box of the tax master forms. */
+export function CheckField({
+  label,
+  checked,
+  onChange,
+}: Readonly<{ label: string; checked: boolean | undefined; onChange: (v: boolean) => void }>) {
+  return (
+    <label className="checkbox" style={{ alignSelf: 'end' }}>
+      <input
+        type="checkbox"
+        checked={checked ?? false}
+        onChange={(e) => onChange(e.target.checked)}
+      />{' '}
+      {label}
+    </label>
+  );
+}
+
 /** "Authorize" button of a pending master record (checker). */
 export function AuthorizeButton({
   onClick,

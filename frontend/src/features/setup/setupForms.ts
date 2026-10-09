@@ -1,4 +1,4 @@
-import type { ClientProfile, Company } from '@/api/types';
+import type { ClientProfile, Company, TaxRegistration } from '@/api/types';
 import type { CostCenterRuleInput, Employee, EmployeeInput, StatementLayout } from './frbsSetupApi';
 
 /** Errors by field name. */
@@ -153,6 +153,7 @@ export function ruleCriteria(r: Omit<CostCenterRuleInput, 'companyId'>): string 
 export function profileRequest(
   c: Company,
   profile: ClientProfile,
+  taxRegistration?: TaxRegistration,
 ): Partial<Company> & { profile: ClientProfile } {
   const trimmed: ClientProfile = {};
   for (const [key, value] of Object.entries(profile) as [keyof ClientProfile, string?][]) {
@@ -169,5 +170,28 @@ export function profileRequest(
     forwardValueDays: c.forwardValueDays,
     retainedEarningsAccount: c.retainedEarningsAccount,
     profile: trimmed,
+    taxRegistration: taxRegistration ?? c.taxRegistration,
   };
+}
+
+const RDO = /^\d{3}[A-Z]?$/;
+
+/**
+ * The problem of a tax registration, if any: the RDO code is three digits with an optional
+ * letter, and a permit date needs its permit number.
+ *
+ * @param t tax registration
+ * @returns message, or null when valid
+ */
+export function taxRegistrationProblem(t: TaxRegistration): string | null {
+  if (t.rdoCode && !RDO.test(t.rdoCode.trim())) {
+    return 'The RDO code is three digits, optionally followed by a letter (e.g. 050 or 047A)';
+  }
+  if (t.casPermitDate && !t.casPermitNo?.trim()) {
+    return 'Enter the number of the CAS permit';
+  }
+  if (t.einvoicingPermitDate && !t.einvoicingPermitNo?.trim()) {
+    return 'Enter the number of the e-invoicing permit';
+  }
+  return null;
 }

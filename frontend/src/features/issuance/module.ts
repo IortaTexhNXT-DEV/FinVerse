@@ -1,4 +1,4 @@
-import { FileBadge, FileSearch, FileUp, LayoutList, Send } from 'lucide-react';
+import { FileBadge, FileSearch, FileUp, LayoutList, MailCheck, Send } from 'lucide-react';
 import { lazy } from 'react';
 import type { FeatureModule } from '@/navigation/types';
 
@@ -41,6 +41,14 @@ export const issuanceModule: FeatureModule = {
       permission: 'ACCOUNT_VIEW',
       alsoPermissions: ['EPOLICY_MANAGE', 'EPOLICY_SEND'],
       component: lazy(() => import('./InsuranceAdvicePage')),
+    },
+    {
+      path: '/issuance/advice-recipients',
+      label: 'Insurance Advice Recipients',
+      icon: MailCheck,
+      permission: 'MASTER_VIEW',
+      alsoPermissions: ['LOV_MANAGE', 'MASTER_AUTHORIZE', 'EPOLICY_MANAGE', 'EPOLICY_SEND'],
+      component: lazy(() => import('./AdviceRecipientsPage')),
     },
     {
       path: '/issuance/dispatch',

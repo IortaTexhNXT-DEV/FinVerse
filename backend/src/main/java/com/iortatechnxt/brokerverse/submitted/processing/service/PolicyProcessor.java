@@ -3,7 +3,6 @@ package com.iortatechnxt.brokerverse.submitted.processing.service;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmClassification;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmHistorySource;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmLamdLoan;
-import com.iortatechnxt.brokerverse.submitted.domain.SbmLamdLoanRepository;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmLimitCheck;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmPolicy;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmPolicyRepository;
@@ -29,11 +28,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Runs the steps of a processing run for one record (BRIDSP-08-16; design section 3.2): SANITATION,
- * MATCHING (the latest LAMD snapshot row of the PN), CLASSIFICATION, DISPOSITION and LIMITS. Each
- * step writes one result row with the rule and rule-set version; a fallout ends the run of the
- * record. The final bucket moves the record: RENEW to For Renewal, MANUAL to For Manual
- * Disposition, EXCLUDE to Excluded, a REVIEW flag to In Review, no bucket to Classified. A manual
- * renewal tag overrides the rule's (outcome OVERRIDDEN).
+ * MATCHING (the newest loan file row of the PN number, else of the loan application number,
+ * FR-SP-035), CLASSIFICATION, DISPOSITION and LIMITS. Each step writes one result row with the rule
+ * and rule-set version; a fallout ends the run of the record. The final bucket moves the record:
+ * RENEW to For Renewal, MANUAL to For Manual Disposition, EXCLUDE to Excluded, a REVIEW flag to In
+ * Review, no bucket to Classified. A manual renewal tag overrides the rule's (outcome OVERRIDDEN).
  */
 @Component
 @Transactional(propagation = Propagation.MANDATORY)
@@ -44,7 +43,7 @@ public class PolicyProcessor {
           EnumSet.of(SbmPolicyStatus.CLOSED, SbmPolicyStatus.BOOKED, SbmPolicyStatus.NOT_RENEWED));
 
   private final SbmPolicyRepository policies;
-  private final SbmLamdLoanRepository lamd;
+  private final LoanMatcher loans;
   private final SbmRunResultRepository results;
   private final LimitsStep limits;
   private final SbmHistoryService history;
@@ -54,7 +53,7 @@ public class PolicyProcessor {
    * Creates the processor.
    *
    * @param policies masterlist
-   * @param lamd LAMD loans
+   * @param loans matching with the loan files
    * @param results run results
    * @param limits limits step
    * @param history field history
@@ -62,13 +61,13 @@ public class PolicyProcessor {
    */
   public PolicyProcessor(
       SbmPolicyRepository policies,
-      SbmLamdLoanRepository lamd,
+      LoanMatcher loans,
       SbmRunResultRepository results,
       LimitsStep limits,
       SbmHistoryService history,
       SbmPolicyFlow flow) {
     this.policies = policies;
-    this.lamd = lamd;
+    this.loans = loans;
     this.results = results;
     this.limits = limits;
     this.history = history;
@@ -89,7 +88,7 @@ public class PolicyProcessor {
     Carry carry = new Carry();
     for (SbmStep step : List.of(SbmStep.SANITATION, SbmStep.MATCHING, SbmStep.CLASSIFICATION)) {
       if (step == SbmStep.MATCHING) {
-        match(p, facts);
+        match(ctx, p, facts);
       }
       StepDecision d = StepDecision.evaluate(ctx.rules().of(step, p), facts);
       if (d.fallout()) {
@@ -136,13 +135,8 @@ public class PolicyProcessor {
     return new Duplicates(samePn, sameUnit);
   }
 
-  private void match(SbmPolicy p, Map<String, Object> facts) {
-    String pn = p.getLoan().pnNo();
-    SbmLamdLoan loan =
-        pn == null
-            ? null
-            : lamd.findFirstByCompanyIdAndPnNoOrderBySnapshotDateDescIdDesc(p.getCompanyId(), pn)
-                .orElse(null);
+  private void match(RunContext ctx, SbmPolicy p, Map<String, Object> facts) {
+    SbmLamdLoan loan = loans.match(ctx.run().getId(), p);
     p.matched(loan == null ? null : loan.getLoanStatus(), loan != null && loan.isAmortised());
     SbmFacts.matched(facts, p, loan);
   }

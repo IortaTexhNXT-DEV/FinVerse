@@ -22,6 +22,7 @@ import com.iortatechnxt.brokerverse.messaging.service.OutboundEmail;
 import com.iortatechnxt.brokerverse.placement.domain.HoldCover;
 import com.iortatechnxt.brokerverse.placement.domain.HoldCover.CoverPeriod;
 import com.iortatechnxt.brokerverse.placement.domain.HoldCoverRepository;
+import com.iortatechnxt.brokerverse.placement.domain.HoldCoverRequestDetails;
 import com.iortatechnxt.brokerverse.placement.service.InsurerDirectory.PlacementAddress;
 import com.iortatechnxt.brokerverse.placement.service.SlipDocuments.SlipHeader;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
@@ -54,6 +55,7 @@ public class HoldCoverService {
   /** Parameter: alert lead time in days. */
   public static final String ALERT_DAYS = "HOLD_COVER_ALERT_DAYS";
 
+  private static final String ACCOUNT = "Account ";
   private static final int DEFAULT_DAYS = 30;
   private static final int DEFAULT_ALERT_DAYS = 5;
   private static final String TEMPLATE = "HOLD_COVER_REQUEST";
@@ -138,7 +140,7 @@ public class HoldCoverService {
     }
     if (current(arn).filter(HoldCover::isOpen).isPresent()) {
       throw new BusinessRuleException(
-          "HOLD_COVER_OPEN", "Account " + arn + " already has a hold cover requested or confirmed");
+          "HOLD_COVER_OPEN", ACCOUNT + arn + " already has a hold cover requested or confirmed");
     }
     PlacementAddress address =
         insurers.address(
@@ -186,6 +188,118 @@ public class HoldCoverService {
         AuditAction.CREATE,
         "Hold cover requested " + DisplayFormat.period(start, expiry));
     return saved;
+  }
+
+  /**
+   * Sends a hold cover request for a renewal account (Renewal BRD BRRN.042; FR-RN-086): from the
+   * coverage start (the expiry of the expiring policy) for the chosen duration, with the expiring
+   * policy number and remarks. The account need not be in placement yet. A second request is
+   * refused while one is requested or confirmed.
+   *
+   * @param arn renewal account
+   * @param request start, duration, expiring policy, remarks and optional recipients
+   * @return the hold cover
+   */
+  public HoldCover requestForRenewal(String arn, RenewalHoldCoverRequest request) {
+    Account account = accounts.require(arn);
+    String insurer = requireInsurer(account);
+    if (current(arn).filter(HoldCover::isOpen).isPresent()) {
+      throw new BusinessRuleException(
+          "HOLD_COVER_OPEN", ACCOUNT + arn + " already has a hold cover requested or confirmed");
+    }
+    if (request.durationDays() <= 0) {
+      throw new BusinessRuleException(
+          "HOLD_COVER_DURATION", "Select the duration of the hold cover");
+    }
+    LocalDate start =
+        request.startDate() == null ? BusinessClock.today(clock) : request.startDate();
+    LocalDate expiry = start.plusDays(request.durationDays());
+    sendRenewalRequest(account, insurer, start, expiry, request);
+    HoldCover saved =
+        holdCovers.save(
+            new HoldCover(
+                account.getCompanyId(),
+                account.getId(),
+                arn,
+                insurer,
+                new CoverPeriod(start, expiry)));
+    saved.describe(
+        new HoldCoverRequestDetails(
+            request.durationDays(),
+            request.expiringPolicyNo(),
+            request.remarks(),
+            currentUser.username()));
+    lifecycle.recordHoldCover(arn, HoldCoverStatus.REQUESTED, null, start);
+    audit.record(
+        ENTITY,
+        arn,
+        AuditAction.CREATE,
+        "Hold cover of "
+            + request.durationDays()
+            + " days requested "
+            + DisplayFormat.period(start, expiry));
+    return saved;
+  }
+
+  private void sendRenewalRequest(
+      Account account,
+      String insurer,
+      LocalDate start,
+      LocalDate expiry,
+      RenewalHoldCoverRequest request) {
+    String arn = account.getArn();
+    PlacementAddress address =
+        insurers.address(account.getCompanyId(), insurer, account.getInsurerBranch());
+    MergedText text =
+        templates.merge(
+            TEMPLATE, BusinessClock.today(clock), Map.of("startDate", start, "reference", arn));
+    String body =
+        text.text()
+            + (request.expiringPolicyNo() == null
+                ? ""
+                : "\nExpiring policy: " + request.expiringPolicyNo())
+            + (request.remarks() == null ? "" : "\nRemarks: " + request.remarks());
+    byte[] pdf =
+        documents.holdCoverPdf(
+            new SlipHeader(
+                account.getCompanyId(), arn, insurer, address, text, currentUser.username()),
+            account,
+            start,
+            expiry);
+    messages.queueEmail(
+        new OutboundEmail(
+            account.getCompanyId(),
+            "HOLD_COVER",
+            request.to().isEmpty() ? address.recipients() : request.to(),
+            List.of(),
+            "Hold cover request - " + arn + " - " + account.getClientName(),
+            body,
+            List.of(new MessageFile("HOLD_COVER_" + arn + ".pdf", "application/pdf", pdf)),
+            null,
+            new RecordLink(AccountService.ENTITY, String.valueOf(account.getId()), arn)));
+  }
+
+  /**
+   * Cancels the requested or confirmed hold cover of an account with a reason (BRRN.042); a new
+   * request is then allowed.
+   *
+   * @param arn account
+   * @param reason reason
+   * @return the hold cover
+   */
+  public HoldCover cancel(String arn, String reason) {
+    HoldCover cover =
+        current(arn)
+            .filter(HoldCover::isOpen)
+            .orElseThrow(
+                () ->
+                    new BusinessRuleException(
+                        "HOLD_COVER_NONE", ACCOUNT + arn + " has no open hold cover"));
+    cover.cancel(reason);
+    lifecycle.recordHoldCover(
+        arn, HoldCoverStatus.CANCELLED, cover.getInsurerRef(), BusinessClock.today(clock));
+    audit.record(ENTITY, arn, AuditAction.UPDATE, "Hold cover cancelled: " + reason.strip());
+    return cover;
   }
 
   /**
@@ -258,7 +372,7 @@ public class HoldCoverService {
             .orElseThrow(
                 () ->
                     new BusinessRuleException(
-                        "HOLD_COVER_NONE", "Account " + arn + " has no open hold cover"));
+                        "HOLD_COVER_NONE", ACCOUNT + arn + " has no open hold cover"));
     cover.decline(reference);
     lifecycle.recordHoldCover(arn, HoldCoverStatus.DECLINED, reference, BusinessClock.today(clock));
     audit.record(ENTITY, arn, AuditAction.UPDATE, "Hold cover declined by the insurer");
@@ -283,7 +397,7 @@ public class HoldCoverService {
             .orElseThrow(
                 () ->
                     new BusinessRuleException(
-                        "HOLD_COVER_NONE", "Account " + arn + " has no open hold cover request"));
+                        "HOLD_COVER_NONE", ACCOUNT + arn + " has no open hold cover request"));
     if (reasonCode == null || reasonCode.isBlank()) {
       throw new BusinessRuleException("REASSIGN_REASON_REQUIRED", "Select the reason");
     }
@@ -367,6 +481,28 @@ public class HoldCoverService {
 
     /** Defensive copy. */
     public HoldCoverRequest {
+      to = to == null ? List.of() : List.copyOf(to);
+    }
+  }
+
+  /**
+   * A hold cover request of a renewal account (BRRN.042).
+   *
+   * @param startDate coverage start; today when null
+   * @param durationDays duration in days (30 or 60)
+   * @param expiringPolicyNo expiring policy number, may be null
+   * @param remarks remarks, may be null
+   * @param to recipients; the insurer branch mailbox when empty
+   */
+  public record RenewalHoldCoverRequest(
+      LocalDate startDate,
+      int durationDays,
+      String expiringPolicyNo,
+      String remarks,
+      List<String> to) {
+
+    /** Defensive copy. */
+    public RenewalHoldCoverRequest {
       to = to == null ? List.of() : List.copyOf(to);
     }
   }

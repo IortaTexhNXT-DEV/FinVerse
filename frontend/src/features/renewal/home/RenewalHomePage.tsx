@@ -80,10 +80,10 @@ export default function RenewalHomePage() {
             tiles={[
               {
                 key: 'risk',
-                label: 'At risk',
+                label: 'Need attention',
                 value: t.atRisk,
                 alert: true,
-                onClick: () => void navigate('/renewal/expiry?tab=UNASSIGNED'),
+                onClick: () => void navigate('/renewal/expiry?tab=ATTENTION'),
               },
               {
                 key: 'urgent',

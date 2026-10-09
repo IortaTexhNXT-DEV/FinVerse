@@ -23,8 +23,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Rates a product for accounts, quotations and the premium calculator screen: resolves the rates in
- * force (taxes per line, LGT of the insurer branch, commission of the insurer or the product
- * default, motor limits, short-period table) and runs the Appendix A {@link PremiumCalculator}.
+ * force (taxes per line, VAT or premium tax by the tax status of the insurer, LGT of the insurer
+ * branch, commission of the insurer or the product default, motor limits, short-period table, the
+ * other charges of the product while they are billed) and runs the Appendix A {@link
+ * PremiumCalculator}.
  *
  * <p>Package products are priced on the rate scheme of the package version that the purpose selects
  * ({@link SchemeResolver}, BRPM.007): for new business always the current released version,
@@ -41,6 +43,7 @@ public class RatingService {
   private final InsurerService insurers;
   private final RateResolver resolver;
   private final SchemeResolver schemes;
+  private final PremiumLevies levies;
   private final Clock clock;
   private final PremiumCalculator calculator = new PremiumCalculator();
 
@@ -51,6 +54,7 @@ public class RatingService {
    * @param insurers insurers and branches
    * @param resolver rate lookups
    * @param schemes package rate schemes
+   * @param levies VAT or premium tax by insurer and the other charges billed with the premium
    * @param clock clock
    */
   public RatingService(
@@ -58,11 +62,13 @@ public class RatingService {
       InsurerService insurers,
       RateResolver resolver,
       SchemeResolver schemes,
+      PremiumLevies levies,
       Clock clock) {
     this.catalog = catalog;
     this.insurers = insurers;
     this.resolver = resolver;
     this.schemes = schemes;
+    this.levies = levies;
     this.clock = clock;
   }
 
@@ -113,7 +119,8 @@ public class RatingService {
                 query.multiYear(),
                 period,
                 scheme.minimumPremium(),
-                query.endorsement()));
+                query.endorsement(),
+                levies.otherCharges(product, date)));
     return new Rating(
         breakdown,
         rates,
@@ -193,10 +200,12 @@ public class RatingService {
       lgt =
           insurers.requireUsableBranch(q.companyId(), q.insurerCode(), q.branchCode()).getLgtRate();
     }
+    PremiumLevies.TaxOnPremium tax =
+        levies.taxOnPremium(q.companyId(), q.insurerCode(), line, date);
     return new RatingRates(
         rate(RateCode.DST, line, date),
-        rate(RateCode.PREMIUM_TAX, line, date),
-        rate(RateCode.VAT_PREMIUM, line, date),
+        tax.premiumTax(),
+        tax.vat(),
         rate(RateCode.FIRE_SERVICE_TAX, line, date),
         lgt,
         commission(q, product, scheme, date),

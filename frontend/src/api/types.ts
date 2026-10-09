@@ -80,11 +80,23 @@ export interface Company {
   headOfficeCode?: string;
   /** Client profile: bank account code proposed by default. */
   defaultBankCode?: string;
+  /** RDO, VAT registration, CAS and e-invoicing permits of the company. */
+  taxRegistration?: TaxRegistration;
   recordStatus: RecordStatus;
   createdBy: string;
   /** Creator or last maintainer; unchanged by authorization. */
   maker?: string;
   authorizedBy?: string;
+}
+
+/** Tax registration of a company (RDO, VAT, CAS and e-invoicing permits). */
+export interface TaxRegistration {
+  rdoCode?: string;
+  vatRegistered: boolean;
+  casPermitNo?: string;
+  casPermitDate?: string;
+  einvoicingPermitNo?: string;
+  einvoicingPermitDate?: string;
 }
 
 /** The client profile part of a company update. */
@@ -110,6 +122,10 @@ export interface Branch {
   contactEmail?: string;
   managerName?: string;
   weeklyHolidays?: string;
+  /** BIR branch code of the registered branch (3 to 5 digits). */
+  birBranchCode?: string;
+  /** Revenue District Office of the branch. */
+  rdoCode?: string;
   recordStatus: RecordStatus;
   createdBy: string;
   /** Creator or last maintainer; unchanged by authorization. */

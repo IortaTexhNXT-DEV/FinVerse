@@ -55,6 +55,10 @@ public class InsurerProfile extends AuthorizableEntity implements CatalogRecord 
   @Column(name = "default_credit_days", nullable = false)
   private int defaultCreditDays;
 
+  @Enumerated(EnumType.STRING)
+  @Column(name = "tax_status", length = 15)
+  private InsurerTaxStatus taxStatus;
+
   protected InsurerProfile() {}
 
   /**
@@ -100,6 +104,7 @@ public class InsurerProfile extends AuthorizableEntity implements CatalogRecord 
             ? null
             : String.join(SEPARATOR, d.placementEmails());
     this.defaultCreditDays = d.defaultCreditDays();
+    this.taxStatus = d.taxStatus();
   }
 
   /**
@@ -169,6 +174,15 @@ public class InsurerProfile extends AuthorizableEntity implements CatalogRecord 
   }
 
   /**
+   * VAT registration of the insurer; null follows the taxes of the product line.
+   *
+   * @return tax status, may be null
+   */
+  public InsurerTaxStatus getTaxStatus() {
+    return taxStatus;
+  }
+
+  /**
    * Maintainable attributes of an insurer profile.
    *
    * @param name insurer name
@@ -178,6 +192,7 @@ public class InsurerProfile extends AuthorizableEntity implements CatalogRecord 
    * @param placementChannel channel (EMAIL; others parked)
    * @param placementEmails placement mailboxes
    * @param defaultCreditDays default credit days
+   * @param taxStatus VAT registration of the insurer, null to follow the product line
    */
   public record InsurerDetails(
       String name,
@@ -186,7 +201,39 @@ public class InsurerProfile extends AuthorizableEntity implements CatalogRecord 
       LocalDate accreditedUntil,
       PlacementChannel placementChannel,
       List<String> placementEmails,
-      int defaultCreditDays) {}
+      int defaultCreditDays,
+      InsurerTaxStatus taxStatus) {
+
+    /**
+     * Details without a tax status (the taxes of the product line apply).
+     *
+     * @param name name
+     * @param shortName short name
+     * @param accreditationNo accreditation number
+     * @param accreditedUntil accreditation end
+     * @param placementChannel placement channel
+     * @param placementEmails placement e-mails
+     * @param defaultCreditDays default credit days
+     */
+    public InsurerDetails(
+        String name,
+        String shortName,
+        String accreditationNo,
+        LocalDate accreditedUntil,
+        PlacementChannel placementChannel,
+        List<String> placementEmails,
+        int defaultCreditDays) {
+      this(
+          name,
+          shortName,
+          accreditationNo,
+          accreditedUntil,
+          placementChannel,
+          placementEmails,
+          defaultCreditDays,
+          null);
+    }
+  }
 
   /**
    * Marks a record loaded from a legacy system (DATA_MIGRATION_DESIGN section 10).

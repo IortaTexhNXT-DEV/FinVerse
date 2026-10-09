@@ -2,7 +2,7 @@ package com.iortatechnxt.brokerverse.renewal.report;
 
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.nbreport.service.NbReportJdbc;
-import com.iortatechnxt.brokerverse.renewal.service.RenewalParameters;
+import com.iortatechnxt.brokerverse.renewal.domain.AttentionFlag;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
 import com.iortatechnxt.brokerverse.report.core.ReportDefinition;
 import com.iortatechnxt.brokerverse.report.core.ReportMetadata;
@@ -17,7 +17,8 @@ import org.springframework.stereotype.Component;
 
 /**
  * Renewal listing (RNW-LISTING; FR-RN-102, BRRN.036): the open renewals by unit, with the days to
- * expiry, the ageing window and the escalation flag of {@code RNW_ESCALATION_DAYS}.
+ * expiry, the ageing window and the attention flag (ageing, overdue, high risk) with the rule that
+ * set it. Escalation is by visibility only: the listing raises no alert.
  */
 @Component
 public class RenewalListingReport implements ReportDefinition {
@@ -30,14 +31,13 @@ public class RenewalListingReport implements ReportDefinition {
 
   private static final String SQL =
       "select c.owner_unit, c.renewal_ref, c.client_name, c.segment, c.product_code, c.stage,"
-          + " c.assigned_ao, c.assigned_po, c.expiry_date"
+          + " c.assigned_ao, c.assigned_po, c.expiry_date, c.attention_flag, c.attention_rule"
           + " from rnw_candidate c where c.stage not in ('RENEWED', 'CLOSED')"
           + RenewalReportSupport.FILTERS
           + " order by c.owner_unit, c.expiry_date, c.renewal_ref";
 
   private final NbReportJdbc jdbc;
   private final RenewalReportSupport support;
-  private final RenewalParameters parameters;
   private final Clock clock;
 
   /**
@@ -45,21 +45,20 @@ public class RenewalListingReport implements ReportDefinition {
    *
    * @param jdbc report SQL
    * @param support filters and scope
-   * @param parameters escalation days
    * @param clock clock
    */
-  public RenewalListingReport(
-      NbReportJdbc jdbc, RenewalReportSupport support, RenewalParameters parameters, Clock clock) {
+  public RenewalListingReport(NbReportJdbc jdbc, RenewalReportSupport support, Clock clock) {
     this.jdbc = jdbc;
     this.support = support;
-    this.parameters = parameters;
     this.clock = clock;
   }
 
   @Override
   public ReportMetadata metadata() {
     return RenewalReportSupport.metadata(
-        CODE, "Renewal Listing", "Open renewals by unit with the ageing to expiry and escalation");
+        CODE,
+        "Renewal Listing",
+        "Open renewals by unit with the ageing to expiry and the accounts that need attention");
   }
 
   @Override
@@ -82,7 +81,8 @@ public class RenewalListingReport implements ReportDefinition {
             ReportColumn.date("expiry_date", "Expiry Date"),
             ReportColumn.count("days", "Days to Expiry"),
             ReportColumn.text("window", "Window"),
-            ReportColumn.text("escalated", "Escalated"))
+            ReportColumn.text("attention", "Attention"),
+            ReportColumn.text("attention_rule", "Rule"))
         .groupBy("owner_unit", "Unit")
         .rows(rows)
         .presorted()
@@ -94,8 +94,8 @@ public class RenewalListingReport implements ReportDefinition {
     long days = ChronoUnit.DAYS.between(today, expiry);
     r.put("days", days);
     r.put("window", window(days));
-    int limit = parameters.escalationDays((String) r.get("segment"));
-    r.put("escalated", days <= limit ? "Yes" : "No");
+    Object flag = r.get("attention_flag");
+    r.put("attention", flag == null ? "" : AttentionFlag.valueOf(flag.toString()).label());
     return r;
   }
 

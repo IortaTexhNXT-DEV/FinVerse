@@ -90,11 +90,37 @@ The client record shows a **Renewal** tab with the client's renewals. The report
    to RA Ready; a decline goes back to Processing or to the NAL letter.
 6. **Renewal Advice** generated (RA Generated) and sent (Awaiting Response). A late RA needs the user's confirmation;
    the second notice is offered by the NRNS job.
-7. **Acceptance** (Accepted): the renewal account is fast-tracked, the placement slips are generated and the Processing
-   Officer is notified (For Placement and Booking). The issued policy is queued for booking; the booked invoice closes
-   the renewal as **Renewed**.
+7. **Acceptance** (Accepted): the Account Officer records the client's confirmation; the renewal account is
+   fast-tracked and the Processing Officer is notified (For Placement and Booking). Placement and booking stay user
+   actions (Walkthrough addendum p.4): the placement slips are generated automatically only when `RNW_AUTO_PLACEMENT`
+   is switched on (off since V1332). The issued policy is queued for booking; the booked invoice closes the renewal
+   as **Renewed**. Its incentive indicator is evaluated once it is booked, fully paid and its acceptance recorded
+   (FR-RN-087, the same evaluation as New Business, `booking.service.IncentiveEvaluationService`).
 8. **Closing letters**: Send Letters sends the NAL or NFR and closes the renewal (Closed). A renewal closed as not renewed
-   can be re-opened until its expiry plus `RNW_REOPEN_DAYS`.
+   can be re-opened until its expiry plus `RNW_REOPEN_DAYS`. A renewal that reaches its **effective expiry date**
+   unrenewed (the end of a confirmed hold cover, otherwise the policy expiry, plus `RNW_NON_ACCEPTANCE_DAYS` and the
+   `RNW_NRNS_WAITING_DAYS` of its segment) is closed Expired Unrenewed, tagged NRNS and routed to its closing letter:
+   the No Advice Letter of Operations when a Renewal Advice was sent (tab Unrenewed – NAL), otherwise the Non-Renewal
+   Letter of the Account Officer (tab Unrenewed – NRL). The two letters exclude each other (FR-RN-082, 083).
+
+**Hold cover of a renewal** (FR-RN-086, tab Hold Cover of the record): once the renewal account exists, the Account
+Officer or Processing requests the hold cover from the insurer (duration from `RNW_HOLD_COVER_DAYS`, start the policy
+expiry by default, expiring policy and remarks; the hold cover of the account, `placement.service.HoldCoverService`),
+Processing records the confirmation (reference, validity, conditions) or the decline, and an open hold cover can be
+cancelled with a reason. The confirmed end is the effective expiry date; the lists show the chip HC confirmed.
+
+**Sanitation criteria** (Walkthrough addendum SC-01 to SC-13): besides the checks of R1-A, `TSI_THRESHOLD` (Review
+above the amount of its setting, default 250,000,000.00; the decision proposal is then For Proposal, manual),
+`RISK_CODE_DEFINED` (Review when the risk code is not a product of the catalogue) and `INSURER_RENEWABLE_LIST` (Review
+when the risk is not on the renewable list of the insurer, kept on Renewal Setup, Insurer Renewable Lists; an insurer
+without a list is not checked). A renewal keeps the Classification rule version that classified it at initiation; a new
+version applies to the renewals not yet initiated.
+
+**Attention flags** (FR-RN-102): the nightly re-evaluation sets the flag Ageing (not accepted within
+`RNW_ESCALATION_DAYS` of the segment before the effective expiry), Overdue (past it) or High risk (Exception bucket or
+claims) with its rule and the priority portfolio of `RNW_PRIORITY_SEGMENTS`. The flags show in the lists (tab Need
+Attention), on Renewal Home and in `RNW-LISTING`; no alert is sent to the unit head (`RNW_RENEWAL_AT_RISK` is switched
+off).
 
 ## 5. Jobs
 
@@ -128,7 +154,8 @@ Parameters (System Parameters, category Renewal): `RNW_EXTRACTION_LEAD_DAYS` (14
 `RNW_OUTSTANDING_THRESHOLD`, `RNW_FIN_IMPACT_TOLERANCE`, `RNW_RA_MIN_NOTICE_DAYS` (30), `RNW_RA_SECOND_NOTICE_DAYS` (15),
 `RNW_NRNS_REMINDER_DAYS`, `RNW_NON_ACCEPTANCE_DAYS`, `RNW_REOPEN_DAYS`, `RNW_ESCALATION_DAYS`, `RNW_KYC_SEGMENTS`,
 `RNW_RMU_UNIT`, `RNW_AUTO_PLACEMENT`, `RNW_REFERENCE_PREFIX`, `RNW_EXCLUDED_LINES`, `RNW_NAL_REASONS`,
-`RNW_INVOICE_NO_REASONS`, `RNW_INSURER_REPLY_DAYS`, `RNW_EXCEPTION_AGEING_DAYS`, `MIG_GOLIVE_RENEWAL_TO` (2028-05-31),
+`RNW_INVOICE_NO_REASONS`, `RNW_INSURER_REPLY_DAYS`, `RNW_EXCEPTION_AGEING_DAYS` (5 working days), `RNW_HOLD_COVER_DAYS`
+(30, 60), `RNW_NRNS_WAITING_DAYS` (per segment), `RNW_PRIORITY_SEGMENTS` (IBG, Leasing), `MIG_GOLIVE_RENEWAL_TO` (2028-05-31),
 `MIG_RENEWAL_URGENT_TO` (2028-01-31).
 
 Lists of values: `RNW_DISPOSITION`, `RNW_NONRENEWAL_REASON`, `RNW_RETURN_REASON`, `RNW_TRANSFER_REASON`,
@@ -139,13 +166,13 @@ Letter templates (document templates, maintained by `RNW_TEMPLATE_MAINTAIN`): `R
 
 ## 8. Alerts and notifications
 
-Alerts: `RNW_RENEWAL_AT_RISK`, `RNW_EXTRACTION_FAILED`, `RNW_INSURER_OVERDUE`, `RNW_LETTER_FAILED`,
+Alerts: `RNW_RENEWAL_AT_RISK` (switched off: attention flags instead), `RNW_EXTRACTION_FAILED`, `RNW_INSURER_OVERDUE`, `RNW_LETTER_FAILED`,
 `RNW_EXCEPTION_AGEING`. Notifications: renewal assigned, transfer requested and decided, returned, posted, insurer
 response, accepted, renewed, go-live extraction completed, package choice decided.
 
 ## 9. Reports
 
-`RNW-EXPIRY-LIST`, `RNW-STATUS` (Marketing or Processing, detail or summary), `RNW-LISTING` (with escalation),
+`RNW-EXPIRY-LIST`, `RNW-STATUS` (Marketing or Processing, detail or summary), `RNW-LISTING` (with the attention flags and their rules),
 `RNW-INSURER-EXTRACT`, `RNW-RA-DISPATCH`, `RNW-SANITATION`, `RNW-DECISIONS`, `RNW-LAMD-MATCH`, `RNW-WORKLOAD`,
 `RNW-GOLIVE`, `RNW-PACKAGE-REMAP`. Each multi-select criterion accepts several values or "all except"; each report is
 limited to the user's scope.

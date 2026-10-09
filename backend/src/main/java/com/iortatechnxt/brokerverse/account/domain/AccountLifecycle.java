@@ -103,6 +103,16 @@ public class AccountLifecycle {
     this.incentiveFlag = incentive;
   }
 
+  /**
+   * The incentive indicator decided when the booked invoice is fully paid, or changed by an
+   * endorsement or a cancellation (FR-NB-118).
+   *
+   * @param eligible indicator Eligible
+   */
+  public void incentiveDecided(boolean eligible) {
+    this.incentiveFlag = eligible;
+  }
+
   void cancelled(LocalDate date, String reason) {
     this.cancelledAt = date;
     this.cancellationReason = reason;

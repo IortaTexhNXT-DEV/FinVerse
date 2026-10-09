@@ -15,6 +15,7 @@ import java.util.List;
  * @param period period basis and dates
  * @param minimumPremium minimum premium of the product (zero for none)
  * @param endorsement endorsement transaction (minimum premium never applies)
+ * @param otherCharges other charges billed with the premium (none on an endorsement)
  */
 public record PremiumRequest(
     RatingMethod method,
@@ -23,12 +24,48 @@ public record PremiumRequest(
     boolean multiYear,
     Period period,
     BigDecimal minimumPremium,
-    boolean endorsement) {
+    boolean endorsement,
+    List<ChargeRate> otherCharges) {
 
   /** Defensive copy. */
   public PremiumRequest {
     items = items == null ? List.of() : List.copyOf(items);
+    otherCharges = otherCharges == null ? List.of() : List.copyOf(otherCharges);
   }
+
+  /**
+   * A request without other charges.
+   *
+   * @param method formula
+   * @param items rated items
+   * @param rates resolved rates
+   * @param multiYear multi-year motor cover
+   * @param period period basis and dates
+   * @param minimumPremium minimum premium, null for none
+   * @param endorsement rating of an endorsement
+   */
+  public PremiumRequest(
+      RatingMethod method,
+      List<RatedItem> items,
+      RatingRates rates,
+      boolean multiYear,
+      Period period,
+      BigDecimal minimumPremium,
+      boolean endorsement) {
+    this(method, items, rates, multiYear, period, minimumPremium, endorsement, List.of());
+  }
+
+  /**
+   * An other charge billed with the premium (template PM-04 Charges).
+   *
+   * @param code charge code
+   * @param name name on the breakdown
+   * @param rate true for a rate of the net premium, false for a fixed amount per policy
+   * @param value rate in percent, or amount
+   * @param vatable VAT is added to the charge
+   */
+  public record ChargeRate(
+      String code, String name, boolean rate, BigDecimal value, boolean vatable) {}
 
   /**
    * One rated item: a vehicle, a location (sum of its items insured) or any other risk.

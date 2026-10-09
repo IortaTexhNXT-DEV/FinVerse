@@ -11,5 +11,7 @@ public enum HoldCoverStatus {
   /** Lapsed without a policy. */
   EXPIRED,
   /** Closed because the insurer was re-assigned while the request was open (BRIDSP-32). */
-  REASSIGNED
+  REASSIGNED,
+  /** Cancelled with a reason while requested or confirmed (BRRN.042). */
+  CANCELLED
 }

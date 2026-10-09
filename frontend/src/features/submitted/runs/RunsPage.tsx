@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { submittedApi } from '@/api/submitted';
-import type { ResultView, RunView } from '@/api/submitted';
+import type { LoanMatchView, ResultView, RunView } from '@/api/submitted';
 import { LovLabel } from '@/components/broking/LovLabel';
 import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
@@ -12,14 +12,75 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { UserName } from '@/components/ui/UserName';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDateTime, humanize } from '@/utils/format';
+import { formatDate, formatDateTime, humanize } from '@/utils/format';
 import { SBM_LOV, STEP_LABELS, SUBMITTED_SECTION, policyLink } from '../common/submittedCodes';
 
+type ResultTab = 'ALL' | 'FALLOUT' | 'LOANS' | 'UNMATCHED';
+
+const MATCH_KEYS: Record<string, string> = {
+  PN: 'PN number',
+  LOAN_APPLICATION: 'Loan application number',
+};
+
+/** Loan file results of a run: the loan file and key of each record, or why it is unmatched. */
+function LoanMatches({ run, unmatched }: Readonly<{ run: RunView; unmatched: boolean }>) {
+  const matches = useQuery({
+    queryKey: ['submitted', 'loan-matches', run.id, unmatched],
+    queryFn: () => submittedApi.loanMatches(run.id, unmatched ? 'UNMATCHED' : undefined),
+  });
+  return (
+    <>
+      <ErrorAlert error={matches.error} />
+      <DataTable<LoanMatchView>
+        loading={matches.isLoading}
+        rows={matches.data?.content ?? []}
+        rowKey={(m) => m.id}
+        emptyMessage={unmatched ? 'Every record matched a loan file' : 'No loan file results'}
+        columns={[
+          {
+            key: 'sbm',
+            header: 'Masterlist No.',
+            kind: 'code',
+            render: (m) => <Link to={policyLink(m.policyId)}>{m.sbmNo ?? m.policyId}</Link>,
+          },
+          { key: 'assured', header: 'Assured', render: (m) => m.assuredName ?? '' },
+          {
+            key: 'outcome',
+            header: 'Result',
+            kind: 'status',
+            render: (m) => <StatusBadge status={m.outcome} />,
+          },
+          {
+            key: 'key',
+            header: 'Matched On',
+            render: (m) => (m.keyUsed ? MATCH_KEYS[m.keyUsed] : '—'),
+          },
+          {
+            key: 'file',
+            header: 'Loan File',
+            render: (m) =>
+              m.loanReport ? `${m.loanReport} of ${formatDate(m.fileDate)}` : (m.reason ?? '—'),
+          },
+          { key: 'upload', header: 'Upload', kind: 'code', render: (m) => m.uploadNo ?? '' },
+          {
+            key: 'at',
+            header: 'Time',
+            kind: 'datetime',
+            render: (m) => formatDateTime(m.matchedAt),
+          },
+        ]}
+      />
+    </>
+  );
+}
+
 function Results({ run }: Readonly<{ run: RunView }>) {
-  const [outcome, setOutcome] = useState<'ALL' | 'FALLOUT'>('FALLOUT');
+  const [outcome, setOutcome] = useState<ResultTab>('FALLOUT');
+  const loans = outcome === 'LOANS' || outcome === 'UNMATCHED';
   const results = useQuery({
     queryKey: ['submitted', 'results', run.id, outcome],
     queryFn: () => submittedApi.results(run.id, outcome === 'ALL' ? undefined : outcome),
+    enabled: !loans,
   });
   return (
     <Card title={`Results of ${run.runNo}`} flush>
@@ -27,16 +88,40 @@ function Results({ run }: Readonly<{ run: RunView }>) {
         tabs={[
           { id: 'FALLOUT', label: 'Fallout', count: run.fallout },
           { id: 'ALL', label: 'All Steps' },
+          { id: 'LOANS', label: 'Loan File Results' },
+          { id: 'UNMATCHED', label: 'Unmatched Loans' },
         ]}
         active={outcome}
         onChange={setOutcome}
       />
-      <ErrorAlert error={results.error} />
+      {loans ? (
+        <LoanMatches run={run} unmatched={outcome === 'UNMATCHED'} />
+      ) : (
+        <StepResults
+          results={results.data?.content ?? []}
+          loading={results.isLoading}
+          error={results.error}
+          fallout={outcome === 'FALLOUT'}
+        />
+      )}
+    </Card>
+  );
+}
+
+function StepResults({
+  results,
+  loading,
+  error,
+  fallout,
+}: Readonly<{ results: ResultView[]; loading: boolean; error: unknown; fallout: boolean }>) {
+  return (
+    <>
+      <ErrorAlert error={error} />
       <DataTable<ResultView>
-        loading={results.isLoading}
-        rows={results.data?.content ?? []}
+        loading={loading}
+        rows={results}
         rowKey={(r) => r.id}
-        emptyMessage={outcome === 'FALLOUT' ? 'No fallout in this run' : 'No results'}
+        emptyMessage={fallout ? 'No fallout in this run' : 'No results'}
         columns={[
           {
             key: 'sbm',
@@ -65,7 +150,7 @@ function Results({ run }: Readonly<{ run: RunView }>) {
           { key: 'rule', header: 'Rule', render: (r) => r.ruleName ?? '—' },
         ]}
       />
-    </Card>
+    </>
   );
 }
 
@@ -88,7 +173,7 @@ export default function RunsPage() {
       <PageHeader
         section={SUBMITTED_SECTION}
         title="Processing Runs"
-        description="Sanitation, matching, classification, disposition and limits of each run."
+        description="Sanitation, matching with the loan files, classification, disposition and limits of each run."
       />
       <ErrorAlert error={runs.error} onRetry={() => void runs.refetch()} />
       <Card flush>

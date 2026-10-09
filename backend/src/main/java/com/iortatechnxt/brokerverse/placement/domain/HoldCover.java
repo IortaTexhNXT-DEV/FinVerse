@@ -5,6 +5,7 @@ import com.iortatechnxt.brokerverse.common.domain.BaseEntity;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -50,6 +51,14 @@ public class HoldCover extends BaseEntity {
 
   @Column(name = "alerted_on")
   private LocalDate alertedOn;
+
+  @Embedded private HoldCoverRequestDetails details = HoldCoverRequestDetails.NONE;
+
+  @Column(length = 500)
+  private String conditions;
+
+  @Column(name = "cancel_reason", length = 200)
+  private String cancelReason;
 
   protected HoldCover() {}
 
@@ -111,7 +120,41 @@ public class HoldCover extends BaseEntity {
     this.insurerRef = reference;
   }
 
-  /** Marks the hold cover as lapsed without a policy. */
+  /**
+   * Records the details of a request made from a renewal (BRRN.042): duration, expiring policy,
+   * remarks and requester.
+   *
+   * @param requestDetails details of the request
+   */
+  public void describe(HoldCoverRequestDetails requestDetails) {
+    this.details = requestDetails == null ? HoldCoverRequestDetails.NONE : requestDetails;
+  }
+
+  /**
+   * Records the conditions the insurer attached to its confirmation.
+   *
+   * @param insurerConditions conditions, may be null
+   */
+  public void conditions(String insurerConditions) {
+    this.conditions =
+        insurerConditions == null || insurerConditions.isBlank() ? null : insurerConditions.strip();
+  }
+
+  /**
+   * Cancels a requested or confirmed hold cover (BRRN.042): a new request is then allowed.
+   *
+   * @param reason reason of the cancellation
+   */
+  public void cancel(String reason) {
+    requireOpen();
+    if (reason == null || reason.isBlank()) {
+      throw new BusinessRuleException(
+          "HOLD_COVER_CANCEL_REASON", "Enter the reason for cancelling the hold cover");
+    }
+    this.status = HoldCoverStatus.CANCELLED;
+    this.cancelReason = reason.strip();
+  }
+
   /**
    * Closes an open request because the insurer was re-assigned (BRIDSP-32).
    *
@@ -123,6 +166,7 @@ public class HoldCover extends BaseEntity {
     this.insurerRef = reason;
   }
 
+  /** Marks the hold cover as lapsed without a policy. */
   public void expire() {
     this.status = HoldCoverStatus.EXPIRED;
   }
@@ -190,6 +234,18 @@ public class HoldCover extends BaseEntity {
 
   public LocalDate getAlertedOn() {
     return alertedOn;
+  }
+
+  public HoldCoverRequestDetails getDetails() {
+    return details == null ? HoldCoverRequestDetails.NONE : details;
+  }
+
+  public String getConditions() {
+    return conditions;
+  }
+
+  public String getCancelReason() {
+    return cancelReason;
   }
 
   /**

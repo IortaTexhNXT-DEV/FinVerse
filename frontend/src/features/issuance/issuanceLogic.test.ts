@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import type { Review } from '@/api/issuance';
 import {
+  adviceSending,
   addresses,
+  recipientProblem,
   issuanceTiles,
   matchText,
   numbersError,
@@ -79,5 +81,29 @@ describe('extractionNotes', () => {
       'Premium not found.',
       'Period end not found.',
     ]);
+  });
+});
+
+describe('Insurance Advice sending', () => {
+  it('shows automatic, manual, waiting or the reason of a failed automatic sending', () => {
+    expect(adviceSending({ status: 'SENT', sendMode: 'AUTOMATIC' })).toBe('Automatic');
+    expect(adviceSending({ status: 'SENT', sendMode: 'MANUAL' })).toBe('Manual');
+    expect(adviceSending({ status: 'GENERATED' })).toBe('Waiting');
+    expect(adviceSending({ status: 'GENERATED', autoSendFailure: 'no recipient is set up' })).toBe(
+      'Not sent automatically: no recipient is set up',
+    );
+  });
+
+  it('needs the bank, the start date and a recipient for automatic sending', () => {
+    const base = {
+      mortgageeBank: 'BANK',
+      to: ['a@b.ph'],
+      autoSend: true,
+      effectiveFrom: '2026-01-01',
+    };
+    expect(recipientProblem(base)).toBeUndefined();
+    expect(recipientProblem({ ...base, mortgageeBank: '' })).toMatch(/mortgagee bank/);
+    expect(recipientProblem({ ...base, to: [] })).toMatch(/recipient/);
+    expect(recipientProblem({ ...base, to: [], autoSend: false })).toBeUndefined();
   });
 });

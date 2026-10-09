@@ -63,7 +63,8 @@ export function GenerateSlipsDialog({
         <ErrorAlert error={readiness.error ?? generate.error} />
         <p className="muted">
           One slip is generated per insurer branch, as PDF and Excel, from the placement slip
-          template.
+          template. The taxpayer name, TIN and registered address of each insured are printed on the
+          slip; a slip is generated again before sending when these details change.
         </p>
         <DataTable<Readiness>
           caption="Placement prerequisites"
@@ -86,6 +87,19 @@ export function GenerateSlipsDialog({
               key: 'insurer',
               header: 'Insurer',
               render: (r) => <InsurerWithBranch insurer={r.insurerCode} branch={r.insurerBranch} />,
+            },
+            {
+              key: 'tax',
+              header: 'Taxpayer Details',
+              render: (r) =>
+                r.taxDetails ? (
+                  <span>
+                    {r.taxDetails.taxpayerName} · TIN {r.taxDetails.tin}
+                    <span className="cell-sub">{r.taxDetails.registeredAddress}</span>
+                  </span>
+                ) : (
+                  '—'
+                ),
             },
             {
               key: 'ready',

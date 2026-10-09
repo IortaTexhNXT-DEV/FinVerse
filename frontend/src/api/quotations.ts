@@ -195,6 +195,15 @@ export interface BatchSendResult {
   quotations: number;
   clients: number;
   references: string[];
+  /** Quotations not sent, with the reason. */
+  notSent?: { reference: string; reason: string }[];
+}
+
+/** Further recipients of a batch send, besides each client's e-mail. */
+export interface BatchRecipients {
+  passwordHint?: string;
+  to?: string[];
+  cc?: string[];
 }
 
 export interface QuotationRequest {
@@ -261,8 +270,8 @@ export const quotationsApi = {
   createAccounts: (id: number, text?: string) =>
     api.post<Quotation>(`${base}/${id}/create-accounts`, comment(text)),
   send: (id: number, email: EmailInput) => api.post<Quotation>(`${base}/${id}/send`, email),
-  batchSend: (ids: number[], passwordHint?: string) =>
-    api.post<BatchSendResult>(`${base}/batch-send`, { ids, passwordHint }),
+  batchSend: (ids: number[], recipients: BatchRecipients = {}) =>
+    api.post<BatchSendResult>(`${base}/batch-send`, { ids, ...recipients }),
   accept: (id: number, groups: number[], text?: string) =>
     api.post<Quotation>(`${base}/${id}/accept`, { groups, comment: text }),
 };

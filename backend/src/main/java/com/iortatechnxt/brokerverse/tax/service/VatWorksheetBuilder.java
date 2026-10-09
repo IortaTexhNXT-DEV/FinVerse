@@ -1,7 +1,10 @@
 package com.iortatechnxt.brokerverse.tax.service;
 
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.common.util.Money;
 import com.iortatechnxt.brokerverse.tax.domain.NormalBalance;
+import com.iortatechnxt.brokerverse.tax.domain.PartyTaxProfile;
+import com.iortatechnxt.brokerverse.tax.domain.PartyTaxStatus;
 import com.iortatechnxt.brokerverse.tax.domain.ReturnFigures;
 import com.iortatechnxt.brokerverse.tax.domain.ReturnLineValues;
 import com.iortatechnxt.brokerverse.tax.domain.ReturnStatus;
@@ -32,7 +35,9 @@ import org.springframework.stereotype.Component;
  *   <li>Purchases: approved supplier invoices by invoice date. With VAT the net is a purchase of
  *       capital goods when a line is booked to an asset account, else a purchase of services;
  *       without VAT it is zero-rated when the supplier's profile says so, otherwise exempt. All
- *       input VAT is treated as creditable (no apportionment to exempt sales — assumption).
+ *       input VAT is treated as creditable (no apportionment to exempt sales — assumption). A
+ *       zero-rated or exempt purchase from a supplier whose tax exemption certificate does not
+ *       cover the invoice date is listed in the notes.
  *   <li>Credits = input VAT + excess input VAT carried over from the previous quarter's FILED or
  *       PAID 2550Q. VAT payable = output VAT − credits; a negative result is carried over.
  * </ul>
@@ -91,6 +96,7 @@ public class VatWorksheetBuilder {
     BigDecimal outputVat = Money.zero();
     BigDecimal inputVat = WorksheetSupport.sum(buyLines, TaxDocumentLine::taxAmount);
     List<String> notes = new ArrayList<>();
+    invoices.forEach(i -> exemptionNote(i, lookup).ifPresent(notes::add));
     BigDecimal carryOver = carryOver(companyId, period, notes);
     ReturnFigures figures = ReturnFigures.of(taxable, outputVat, inputVat.add(carryOver));
 
@@ -176,6 +182,35 @@ public class VatWorksheetBuilder {
         ZERO_RATED.equals(vatClass) ? net : Money.zero(),
         vat,
         ReturnFigures.effectiveRate(net, vat));
+  }
+
+  /**
+   * A supplier invoice without VAT, classified zero-rated or exempt by the supplier's VAT
+   * treatment, whose tax exemption certificate does not cover the invoice date: the classification
+   * is to be checked before the return is filed (TX-Q09).
+   */
+  static Optional<String> exemptionNote(InvoiceTaxRow i, Lookup lookup) {
+    if (i.vat().signum() != 0 || lookup.vatTreatment(i.partyCode()) == VatTreatment.REGULAR) {
+      return Optional.empty();
+    }
+    return lookup
+        .profile(i.partyCode())
+        .map(PartyTaxProfile::getTaxStatus)
+        .filter(PartyTaxStatus::hasExemptionCertificate)
+        .filter(t -> !t.exemptionValidOn(i.invoiceDate()))
+        .map(
+            t ->
+                "Invoice "
+                    + i.documentNo()
+                    + " of "
+                    + i.partyName()
+                    + " is classified without VAT, but tax exemption certificate "
+                    + t.exemptionCertificateNo()
+                    + " is valid only from "
+                    + DisplayFormat.date(t.exemptionValidFrom())
+                    + " to "
+                    + DisplayFormat.date(t.exemptionValidTo())
+                    + ": check the classification before filing.");
   }
 
   private static String classify(BigDecimal vat, VatTreatment treatment, String taxableClass) {

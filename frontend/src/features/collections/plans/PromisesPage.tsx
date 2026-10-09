@@ -67,6 +67,11 @@ const COLUMNS: Column<PaymentPromise>[] = [
   { key: 'status', header: 'Status', render: (p) => <StatusBadge status={p.status} /> },
 ];
 
+/** The tab asked for in the address (a home tile), Open Promises by default. */
+function promiseTabOf(value: string | null): PromiseTab {
+  return PROMISE_TABS.find((t) => t.id === value)?.id ?? 'OPEN';
+}
+
 /**
  * Promises to pay (BRCLXN.055): open promises by promised date, broken, kept and withdrawn ones;
  * record a promise on one invoice, or the same promise on several (bulk update), and withdraw
@@ -79,7 +84,7 @@ export default function PromisesPage() {
   const toast = useToast();
   const queryClient = useQueryClient();
   const [params] = useSearchParams();
-  const [tab, setTab] = useState<PromiseTab>('OPEN');
+  const [tab, setTab] = useState<PromiseTab>(() => promiseTabOf(params.get('tab')));
   const [query, setQuery] = useState(params.get('q') ?? '');
   const [page, setPage] = useState(0);
   const [recording, setRecording] = useState(false);

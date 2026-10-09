@@ -73,7 +73,7 @@ class CollectionsAccountingFoundationIT {
             "REVALUATION_RATE",
             "REMIT_DEDUCTION",
             "EMPLOYEE_MAINTAIN");
-    assertThat(collections).hasSize(12);
+    assertThat(collections).hasSize(13);
     assertThat(accounting).hasSize(42);
     assertThat(granted).containsAll(collections).containsAll(accounting);
     assertThat(classified)

@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.catalog.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.iortatechnxt.brokerverse.catalog.domain.InsurerProfile;
+import com.iortatechnxt.brokerverse.catalog.domain.InsurerTaxStatus;
 import com.iortatechnxt.brokerverse.catalog.domain.PlacementChannel;
 import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
 import com.iortatechnxt.brokerverse.common.domain.RecordStatus;
@@ -21,6 +22,7 @@ import java.util.List;
  * @param placementChannel placement channel
  * @param placementEmails placement mailboxes
  * @param defaultCreditDays default credit days
+ * @param taxStatus VAT registration, null when the product line decides
  * @param recordStatus maker-checker status
  * @param maker last maintainer
  * @param authorizedBy checker
@@ -37,6 +39,7 @@ public record InsurerResponse(
     PlacementChannel placementChannel,
     List<String> placementEmails,
     int defaultCreditDays,
+    InsurerTaxStatus taxStatus,
     RecordStatus recordStatus,
     String maker,
     String authorizedBy,
@@ -60,6 +63,7 @@ public record InsurerResponse(
         e.getPlacementChannel(),
         e.getPlacementEmailList(),
         e.getDefaultCreditDays(),
+        e.getTaxStatus(),
         e.getRecordStatus(),
         e.getMaker(),
         e.getAuthorizedBy(),

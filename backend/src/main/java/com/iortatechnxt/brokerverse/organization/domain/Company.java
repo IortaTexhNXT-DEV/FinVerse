@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.organization.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.AuthorizableEntity;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
@@ -60,6 +61,8 @@ public class Company extends AuthorizableEntity {
 
   @Column(name = "default_bank_code", length = 30)
   private String defaultBankCode;
+
+  @Embedded private TaxRegistration taxRegistration = TaxRegistration.NONE;
 
   protected Company() {}
 
@@ -184,6 +187,14 @@ public class Company extends AuthorizableEntity {
 
   public void setDefaultBankCode(String defaultBankCode) {
     this.defaultBankCode = blankToNull(defaultBankCode);
+  }
+
+  public TaxRegistration getTaxRegistration() {
+    return taxRegistration == null ? TaxRegistration.NONE : taxRegistration;
+  }
+
+  public void setTaxRegistration(TaxRegistration taxRegistration) {
+    this.taxRegistration = taxRegistration == null ? TaxRegistration.NONE : taxRegistration;
   }
 
   private static String blankToNull(String value) {

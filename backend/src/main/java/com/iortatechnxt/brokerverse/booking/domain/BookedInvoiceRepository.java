@@ -27,6 +27,14 @@ public interface BookedInvoiceRepository
   List<BookedInvoice> findByArnOrderByPolicyYearAscIdAsc(String arn);
 
   /**
+   * The invoices of an invoice family (the root, its endorsements and cancellation).
+   *
+   * @param rootInvoiceNo root invoice
+   * @return invoices, oldest first
+   */
+  List<BookedInvoice> findByRootInvoiceNoOrderByIdAsc(String rootInvoiceNo);
+
+  /**
    * Whether a transaction of an account is already invoiced (booking key, BRNB.076).
    *
    * @param arn Account Reference Number

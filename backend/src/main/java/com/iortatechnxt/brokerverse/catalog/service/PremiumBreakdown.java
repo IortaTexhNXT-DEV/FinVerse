@@ -24,11 +24,13 @@ import java.util.List;
  * @param vat VAT on premium
  * @param fst fire service tax
  * @param lgt local government tax
- * @param totalCharges sum of the taxes
+ * @param totalCharges sum of the taxes and of the other charges with their VAT
  * @param grossPremium net premium plus charges (motor total premium)
  * @param commission broker commission on the net premium
  * @param vatOnCommission VAT on the commission
  * @param items annual premium per item
+ * @param otherCharges other charges billed with the premium, with their VAT (empty when the billing
+ *     of other charges is off)
  */
 public record PremiumBreakdown(
     RatingMethod method,
@@ -50,12 +52,35 @@ public record PremiumBreakdown(
     BigDecimal grossPremium,
     BigDecimal commission,
     BigDecimal vatOnCommission,
-    List<ItemPremium> items) {
+    List<ItemPremium> items,
+    List<ChargeAmount> otherCharges) {
 
   /** Defensive copy. */
   public PremiumBreakdown {
     items = items == null ? List.of() : List.copyOf(items);
+    otherCharges = otherCharges == null ? List.of() : List.copyOf(otherCharges);
   }
+
+  /**
+   * Total of the other charges with their VAT.
+   *
+   * @return amount, zero when none
+   */
+  public BigDecimal otherChargesTotal() {
+    return otherCharges.stream()
+        .map(c -> c.amount().add(c.vat()))
+        .reduce(BigDecimal.ZERO.setScale(2), BigDecimal::add);
+  }
+
+  /**
+   * An other charge of the breakdown.
+   *
+   * @param code charge code
+   * @param name name
+   * @param amount charge
+   * @param vat VAT on the charge
+   */
+  public record ChargeAmount(String code, String name, BigDecimal amount, BigDecimal vat) {}
 
   /**
    * Premium of one item.

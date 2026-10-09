@@ -349,6 +349,9 @@ class ApiSmokeIT {
     "badmin, /api/v1/renewal/setup/bucket-rules?companyId={c}",
     "badmin, /api/v1/renewal/setup/matrix?companyId={c}",
     "proc, /api/v1/renewal/setup/package-map?companyId={c}",
+    "badmin, /api/v1/renewal/setup/insurer-renewable?companyId={c}",
+    "badmin, /api/v1/issuance/advice-recipients?companyId={c}",
+    "badmin, /api/v1/catalog/rates/other-charges",
     "mkttl, /api/v1/reports/code-sets/renewal.riskCode?companyId={c}",
     "mkttl, /api/v1/reports/code-sets/renewal.stage?companyId={c}",
   })

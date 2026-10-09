@@ -1,7 +1,5 @@
 package com.iortatechnxt.brokerverse.brokerclaims.insurer.service;
 
-import com.iortatechnxt.brokerverse.alert.domain.AlertFacts;
-import com.iortatechnxt.brokerverse.alert.service.AlertService;
 import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.brokerclaims.domain.BrokerClaimRepository;
@@ -29,9 +27,8 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * The insurers of a claim incident (BRCLM.018/023/024/043; FR-CM-021/031/032): one line per insurer
  * and insurer claim number under one claim reference, the insurer's share, the number and date
- * reported to the insurer (no duplicate for the same insurer and claim, AC6; a warning and the
- * alert {@code BCL_INSURER_CLAIM_NO_REUSED} when another claim carries it), the insurer reserve
- * with its amendment history (information only, no journal) and the adjuster per line.
+ * reported to the insurer (unique per insurer across all claims, AC6; FR-CM-021), the insurer
+ * reserve with its amendment history (information only, no journal) and the adjuster per line.
  */
 @Service
 @Transactional
@@ -49,7 +46,6 @@ public class InsurerClaimService {
   private final BrokerClaimRepository claims;
   private final InsurerService insurers;
   private final LovService lovs;
-  private final AlertService alerts;
   private final AuditTrailService audit;
   private final CurrentUser currentUser;
   private final Clock clock;
@@ -62,7 +58,6 @@ public class InsurerClaimService {
    * @param claims claims (numbers of other claims)
    * @param insurers insurer master
    * @param lovs adjusters
-   * @param alerts reused number alert
    * @param audit audit trail
    * @param currentUser current user
    * @param clock clock
@@ -74,7 +69,6 @@ public class InsurerClaimService {
       BrokerClaimRepository claims,
       InsurerService insurers,
       LovService lovs,
-      AlertService alerts,
       AuditTrailService audit,
       CurrentUser currentUser,
       Clock clock) {
@@ -83,7 +77,6 @@ public class InsurerClaimService {
     this.claims = claims;
     this.insurers = insurers;
     this.lovs = lovs;
-    this.alerts = alerts;
     this.audit = audit;
     this.currentUser = currentUser;
     this.clock = clock;
@@ -104,7 +97,7 @@ public class InsurerClaimService {
     String insurer =
         insurers.requireInsurer(claim.getCompanyId(), line.insurerCode().strip()).getPartyCode();
     String number = blankToNull(line.insurerClaimNo());
-    checkNumber(claim, insurer, number, null, confirmReuse);
+    checkNumber(claim, insurer, number, null);
     InsurerClaim created =
         new InsurerClaim(
             claim.getCompanyId(), claim.getId(), insurer, line.sharePct(), line.reserve());
@@ -141,7 +134,7 @@ public class InsurerClaimService {
       return add(
           claim, new NewLine(line.getInsurerCode(), null, value, reportedOn, null), confirmReuse);
     }
-    checkNumber(claim, line.getInsurerCode(), value, line.getId(), confirmReuse);
+    checkNumber(claim, line.getInsurerCode(), value, line.getId());
     line.number(value, reportedOn, BusinessClock.today(clock));
     audit.record(
         ClaimCodes.ENTITY_TYPE,
@@ -270,8 +263,7 @@ public class InsurerClaimService {
         .orElseThrow(() -> new ResourceNotFoundException(LINE, lineId));
   }
 
-  private void checkNumber(
-      Claim claim, String insurer, String number, Long lineId, boolean confirmReuse) {
+  private void checkNumber(Claim claim, String insurer, String number, Long lineId) {
     List<InsurerClaim> same =
         number == null
             ? lines.findByClaimIdOrderByIdAsc(claim.getId()).stream()
@@ -297,37 +289,16 @@ public class InsurerClaimService {
             .map(l -> claims.findById(l.getClaimId()).map(Claim::getClaimNo).orElse("?"))
             .distinct()
             .toList();
-    if (number == null || others.isEmpty()) {
-      return;
-    }
-    if (!confirmReuse) {
+    if (number != null && !others.isEmpty()) {
       throw new BusinessRuleException(
-          REUSED,
+          "BCL_INSURER_CLAIM_NO_DUPLICATE",
           "Insurer claim number "
               + number
               + " of "
               + insurer
-              + " is already on claim "
-              + String.join(", ", others)
-              + ". Confirm to continue");
+              + " is already recorded on claim "
+              + String.join(", ", others));
     }
-    alerts.raise(
-        REUSED,
-        new AlertFacts(
-            claim.getCompanyId(),
-            claim.getBranchId(),
-            ClaimCodes.ENTITY_TYPE,
-            String.valueOf(claim.getId()),
-            "Insurer claim number "
-                + number
-                + " of "
-                + insurer
-                + " on "
-                + claim.getClaimNo()
-                + " is also on "
-                + String.join(", ", others),
-            null,
-            REUSED + ":" + insurer + ":" + number));
   }
 
   private static String blankToNull(String value) {

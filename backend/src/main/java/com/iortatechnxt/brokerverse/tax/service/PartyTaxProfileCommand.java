@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.tax.service;
 
+import com.iortatechnxt.brokerverse.tax.domain.PartyTaxStatus;
 import com.iortatechnxt.brokerverse.tax.domain.PayeeClass;
 import com.iortatechnxt.brokerverse.tax.domain.VatTreatment;
 
@@ -19,6 +20,7 @@ import com.iortatechnxt.brokerverse.tax.domain.VatTreatment;
  * @param zipCode ZIP code
  * @param vatTreatment VAT treatment
  * @param defaultAtcCode default withholding tax code, null when none
+ * @param taxStatus withholding status and exemption certificate, null for none
  */
 public record PartyTaxProfileCommand(
     Long companyId,
@@ -33,4 +35,5 @@ public record PartyTaxProfileCommand(
     String registeredAddress,
     String zipCode,
     VatTreatment vatTreatment,
-    String defaultAtcCode) {}
+    String defaultAtcCode,
+    PartyTaxStatus taxStatus) {}

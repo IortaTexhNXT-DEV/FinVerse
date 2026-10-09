@@ -143,8 +143,14 @@ public record CandidateFilter(
     RA_SENT,
     /** Letters: letter pending (NAL, NFR). */
     LETTER_PENDING,
+    /** Letters: unrenewed at the effective expiry, No Advice Letter due (Operations). */
+    NAL_DUE,
+    /** Letters: unrenewed at the effective expiry, Non-Renewal Letter due (Marketing AO). */
+    NRL_DUE,
     /** Letters: NRNS. */
     NRNS,
+    /** Renewals with an attention flag (ageing, overdue, high risk; FR-RN-102). */
+    ATTENTION,
     /** New Business path. */
     NB_PATH,
     /** Closed and renewed. */

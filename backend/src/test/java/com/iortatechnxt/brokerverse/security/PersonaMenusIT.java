@@ -105,6 +105,7 @@ class PersonaMenusIT {
               "/submitted/reviews", "/api/v1/submitted/iaaf?companyId={c}&status=FOR_APPROVAL"),
           Map.entry("/submitted/tors", "/api/v1/submitted/tors?companyId={c}&status=FOR_APPROVAL"),
           Map.entry("/submitted/renewals", "/api/v1/submitted/renewals?companyId={c}"),
+          Map.entry("/submitted/proposals", "/api/v1/submitted/proposals/batches?companyId={c}"),
           Map.entry("/submitted/letters", "/api/v1/submitted/letters?companyId={c}&status=FAILED"),
           Map.entry(
               "/submitted/fees", "/api/v1/submitted/handling-fees?companyId={c}&status=BILLED"),

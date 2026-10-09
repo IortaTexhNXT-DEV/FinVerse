@@ -66,6 +66,9 @@ public final class SubmittedCodes {
   /** LOV of the loan statuses. */
   public static final String LOV_LOAN_STATUS = "SBM_LOAN_STATUS";
 
+  /** List of the loan reports loaded as loan files, in their order of precedence. */
+  public static final String LOV_LOAN_REPORT = "SBM_LOAN_REPORT";
+
   /** LOV of the re-assignment reasons. */
   public static final String LOV_DECLINE = "SBM_DECLINE_REASON";
 

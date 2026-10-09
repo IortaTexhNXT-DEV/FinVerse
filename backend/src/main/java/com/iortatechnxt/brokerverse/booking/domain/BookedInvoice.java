@@ -96,6 +96,8 @@ public class BookedInvoice extends BaseEntity {
 
   @Embedded private InvoiceFlags flags;
 
+  @Embedded private InvoiceIncentive incentive = InvoiceIncentive.PENDING;
+
   @Enumerated(EnumType.STRING)
   @Column(name = "booking_source", nullable = false, length = 20)
   private BookingSource source = BookingSource.INDIVIDUAL;
@@ -358,6 +360,28 @@ public class BookedInvoice extends BaseEntity {
 
   public InvoiceFlags getFlags() {
     return flags;
+  }
+
+  public InvoiceIncentive getIncentive() {
+    return incentive == null ? InvoiceIncentive.PENDING : incentive;
+  }
+
+  /**
+   * Records the incentive indicator decided by the rules (FR-NB-118): the flags carry the indicator
+   * and the criteria matched. It is never set by hand.
+   *
+   * @param decided indicator, time and reason
+   * @param criteria criteria codes matched, empty when none
+   */
+  public void incentiveDecided(InvoiceIncentive decided, java.util.List<String> criteria) {
+    this.incentive = decided;
+    this.flags =
+        new InvoiceFlags(
+            flags.directPayment(),
+            flags.cwt2Percent(),
+            decided.status() == IncentiveStatus.ELIGIBLE,
+            flags.businessType(),
+            criteria.isEmpty() ? flags.incentiveCriteria() : String.join(",", criteria));
   }
 
   public BookingSource getSource() {

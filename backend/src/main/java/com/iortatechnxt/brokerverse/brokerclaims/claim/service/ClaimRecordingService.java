@@ -133,7 +133,7 @@ public class ClaimRecordingService {
     LocalDate today = BusinessClock.today(clock);
     validate(request, today);
     Account account = covers.account(companyId, request.arn());
-    CoverSnapshot cover = covers.snapshot(account, request.policyYear(), request.loss().lossDate());
+    CoverSnapshot cover = covers.snapshot(account, request.policyYear());
     LossDetails loss =
         LossDetails.of(request.loss(), request.amounts(), account.getClientName(), today);
     if (!cover.covers(loss.getLossDate()) && !request.confirmOutsidePeriod()) {

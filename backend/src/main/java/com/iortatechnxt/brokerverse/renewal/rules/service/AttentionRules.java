@@ -9,7 +9,6 @@ import com.iortatechnxt.brokerverse.renewal.service.RenewalParameters;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.EnumSet;
-import java.util.Locale;
 import java.util.Set;
 import org.springframework.stereotype.Component;
 
@@ -104,9 +103,9 @@ public class AttentionRules {
     if (segment == null) {
       return "";
     }
-    boolean listed =
-        parameters.prioritySegments().stream().anyMatch(s -> s.equalsIgnoreCase(segment.strip()));
-    return listed ? "; priority portfolio " + segment.strip().toUpperCase(Locale.ROOT) : "";
+    String code = segment.strip();
+    boolean listed = parameters.prioritySegments().stream().anyMatch(s -> s.strip().equals(code));
+    return listed ? "; priority portfolio " + code : "";
   }
 
   /**

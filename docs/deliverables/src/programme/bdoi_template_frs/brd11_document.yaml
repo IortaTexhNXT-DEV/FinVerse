@@ -3,7 +3,7 @@
 meta:
   source: docs/source-documents/FRS - BDOI BROKERSYS User Access Maintenance v1.1 (BDOI).docx
   brd_pdf: docs/source-documents/User Access Maintenance.pdf
-  out_folder: Programme/BDOI_Template_FRS
+  out_folder: Programme/BDOI_Template_FRS/BRD-11_User_Access_Maintenance
   clean: BIBS_FRS-BDOI_BRD-11_User_Access_Maintenance_v1.2.docx
   highlighted: BIBS_FRS-BDOI_BRD-11_User_Access_Maintenance_v1.2_Changes_Highlighted.docx
   version_old: "1.1"

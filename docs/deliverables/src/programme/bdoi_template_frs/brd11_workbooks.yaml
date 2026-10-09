@@ -1,0 +1,224 @@
+# Data of the five review workbooks of BRD-11 User Access Maintenance and of the internal coverage workbook, read by
+# build_brd11_workbooks.py together with the FRS v1.3 (built in memory, so that every number agrees with it),
+# brd11_review.yaml, the BIBS FRS BRD-11, its test plan and the programme workbooks. Business wording only.
+
+meta:
+  version: "1.0"
+  date: 9 October 2026
+  folder: Programme/BDOI_Template_FRS/BRD-11_User_Access_Maintenance
+  quality: Programme/Quality
+  frs: "FRS User Access Maintenance in BDOI's template v1.3"
+  environment: "BIBS UAT environment (address issued with the passwords)"
+  password_text: "Issued separately by the iorta TechNXT Project Team"
+  dates:
+    decision: 2026-12-01      # sign-off of the BRD-11 FRS (drop plan)
+    sit: 2027-04-09           # master data for trial migration 1 and the SIT reviewers
+    uat: 2027-07-16           # values for UAT
+    prod: 2027-11-01          # production values before the dress rehearsal
+
+# Persona of each FR entry for the acceptance test cases: role code of the test plan, screen
+entry_persona:
+  FRUM.001: [UAM_REQUESTOR, "Login page; any screen"]
+  FRUM.002: [SYSADMIN, "Administration › Users"]
+  FRUM.003: [SYSADMIN, "Administration › Users; Access Requests"]
+  FRUM-004: [SYSADMIN, "Login page; My Profile"]
+  FRUM.005: [BUSINESS_ADMIN, "User Access › Group Profile Requests; Roles & Permissions"]
+  FRUM.006: [BUSINESS_ADMIN, "User Access › Group Profile Requests"]
+  FRUM.007: [AUDITOR, "User Access › User Access Reports"]
+  FRUM-008: [AUDITOR, "User Access Reports › User Access Audit Log; Audit Trail"]
+  FRUM.008: [AUDITOR, "User Access Reports › User Access Audit Log; Audit Trail"]
+  FRUM.009: [UAM_REQUESTOR, "User Access › Access Requests › New Request"]
+  FRUM.010: [UAM_APPROVER, "User Access › Access Requests (Assigned to Me)"]
+  FRUM.011: [UAM_REQUESTOR, "User Access › Bulk Request"]
+  FRUM.012: [INFOSEC_OFFICER, "User Access › Separation of Duties; System Parameters"]
+  FRUM.013: [UAM_REQUESTOR, "Notifications (bell); test mailbox"]
+
+# ------------------------------------------------------------------------------------------------ fit-gap
+fit_values: [Fit, Configure, Extend, Recommend change]
+fitgap_groups:
+  # key: the BRD function (first IDs of the BRD line); features: rows of the BIBS Feature List vs OOTB workbook
+  - keys: ["1.001", "2.001", "3.001", "4.001"]
+    name: Log in, inactivity warning and session end
+    features: [UAM-001, UAM-003, UAM-006, UAM-007, UAM-033]
+    fit: Configure
+    ootb: "Sign-in with named users, lock-out, idle sign-out and several tabs in one session are standard; single sign-on (OpenID Connect or SAML 2.0) is switched on by configuration for EIAM; the inactivity and session-end times are settings."
+    best: "Corporate users sign in once through the enterprise identity provider with a second factor and device rules; idle sessions are warned and closed; only named break-glass accounts keep a local password (ISO 27001 access control; BSP Circular 808 cited by the BRD)."
+    rec: "Register BIBS in EIAM per environment and keep two named break-glass accounts (Annex Z)."
+    impact: "BDOI IT registration; no change to the screens."
+  - keys: ["1.002", "1.003", "1.004", "1.005"]
+    name: User access requests (enrol, modify, deactivate, reactivate)
+    features: [UAM-019, UAM-020, UAM-012]
+    fit: Extend
+    ootb: "The base product creates and changes users directly by an administrator; the request with a chosen approver, draft, edit, cancel and submit is an extension of BIBS, available in the BIBS environment."
+    best: "Every access change requested with a justification and decided by another person (four eyes); least privilege; joiners, movers and leavers driven from the identity governance tool where the bank has one."
+    rec: "Decide C01: accounts from UIDM-ISC and role changes as requests in the system (option a) keeps four eyes on every role change."
+    impact: "Scope of FRUM.009; UIDM-ISC interface (Annex N)."
+  - keys: ["1.006", "1.007", "1.008"]
+    name: Correction, cancellation and view of requests; notices
+    features: [UAM-019, UAM-027]
+    fit: Extend
+    ootb: "Extension of BIBS: returned requests corrected and re-submitted, cancellation with a reason, own requests with status and history, notices in the system."
+    best: "The requester sees the status and the decision of each request; every return and cancellation is reasoned and kept."
+    rec: "Confirm whether the notices are also e-mailed (Annex Z)."
+    impact: "Annex T."
+  - keys: ["1.009"]
+    name: Bulk request
+    features: [UAM-023]
+    fit: Extend
+    ootb: "Extension of BIBS: upload of a template file checked row by row, draft batch decided by an approver as a whole."
+    best: "Bulk loads for mass joiners or reorganisations, with the same controls as single requests and a report of the rows refused."
+    rec: "BDOI's mapping reads \"c/o UIDM\" (Annex Q, C24); keep the bulk request for the go-live load of users (Annex Y)."
+    impact: "FRUM.011; go-live load."
+  - keys: ["2.002"]
+    name: Review and approve requests
+    features: [UAM-021, UAM-025]
+    fit: Extend
+    ootb: "Extension of BIBS: requests assigned to the approver, approve, reject or return with remarks, automatic application on approval, second approval of privileged or out-of-hours changes."
+    best: "The approver sees current and requested access side by side; privileged changes get a second approval; decisions within an agreed time with reminders."
+    rec: "Agree the approval times and the escalation (Annex S, proposal)."
+    impact: "FRUM.010; Annex S."
+  - keys: ["3.002"]
+    name: Group-profile requests
+    features: [UAM-022, UAM-015]
+    fit: Extend
+    ootb: "Extension of BIBS: group-profile requests approved by approvers in order and implemented by the System Administrator, with the privilege level of the profile."
+    best: "Role engineering owned by the business, approved by the role owner and Information Security, and applied by a different person than the requester."
+    rec: "Decide C03 (requests and implementation, or direct change by authorised users as in BDOI's FRS)."
+    impact: "FRUM.005, FRUM.006."
+  - keys: ["3.003"]
+    name: Reports
+    features: [UAM-029, UAM-030]
+    fit: Configure
+    ootb: "Report runner with the header of the BRD (report name, generated by, coverage, time generated) and export to PDF, Excel and CSV; the four reports of the BRD samples are set up as report definitions."
+    best: "Periodic access review: the users and their profiles certified by the unit heads every quarter; the audit log reviewed by Information Security."
+    rec: "Confirm the layouts against Annexes B, E to G (requirements collection workbook) and consider the monthly access review report (Annex Q.5)."
+    impact: "FRUM.007; Annex V."
+  - keys: ["4.002.1"]
+    name: Define user profiles (roles)
+    features: [UAM-014, UAM-016]
+    fit: Configure
+    ootb: "Roles with several roles per user and menus by persona are standard; the profiles of the access personas are set up as configuration."
+    best: "A role catalogue per job function, approved by the business and Information Security, with privileged roles marked."
+    rec: "Complete BDOI's User Access Matrix (Annex C) into the role-to-permission template UA-02."
+    impact: "Annex C; Annex Y."
+  - keys: ["4.002.2"]
+    name: Assign functions to profiles
+    features: [UAM-015]
+    fit: Configure
+    ootb: "Every access function has its own permission; permissions are given to profiles by configuration (group-profile requests)."
+    best: "Fine-grained permissions per function and action (view, create, amend, approve)."
+    rec: "Confirm the matrix of Annex M.3 with the final User Access Matrix."
+    impact: "FRUM.005.06."
+  - keys: ["4.003"]
+    name: Audit logs
+    features: [UAM-031, UAM-002]
+    fit: Fit
+    ootb: "Audit trail and access-change log that no user can change, with from and to values, done by, approved by and the request number; sign-in log."
+    best: "Every access event logged with actor, time, source and outcome, kept for the retention period and reviewed."
+    rec: "BDOI's FRS adds the IP address and the role at the time of the action (Annex Q, C19)."
+    impact: "FRUM.008."
+fitgap_nfr:
+  # UAM-NFR number: [fit, features, recommendation]
+  1: [Fit, [], "Within the BIBS sizing; measured in the performance test."]
+  2: [Fit, [], "No specific sizing needed."]
+  3: [Configure, [UAM-031], "Retention periods to give (UA-Q53)."]
+  4: [Fit, [], "BIBS standards for all BRDs (UA-Q57)."]
+  5: [Fit, [], "Contrast and colour rules; responsive screens."]
+  6: [Fit, [UAM-018, UAM-028, UAM-031], "Four eyes, separation of duties, dormant users, audit trail."]
+  7: [Fit, [], "Service accounts named by the BDO convention."]
+  8: [Fit, [], "Encrypted connections; no change to the BDO network."]
+  9: [Fit, [UAM-014, UAM-028], "Several roles per user; disable and re-enable; audited."]
+  10: [Fit, [UAM-029], "User Access Report and Group Profile Membership."]
+  11: [Configure, [UAM-011], "Enterprise SSO (EIAM) replaces LDAP / Active Directory (BDOI FRUM.001.02)."]
+  12: [Recommend change, [UAM-013], "Authorisation stays in the system (BDOI FRUM.001.02)."]
+  13: [Recommend change, [UAM-012], "BDOI's FRS uses the Windows ID as user ID (Annex Q, C06)."]
+  14: [Extend, [UAM-024], "Effective dates on requests; daily run."]
+  15: [Extend, [UAM-012, UAM-004], "Windows ID, business unit group, user level and status on the user."]
+  16: [Fit, [UAM-026], "Security settings change under the approval of Information Security."]
+  17: [Recommend change, [UAM-011], "EUA replaced by the Enterprise SSO (BDOI FRUM.001.02)."]
+  18: [Fit, [UAM-002], "Every valid and invalid sign-in recorded."]
+  19: [Configure, [UAM-001], "EIAM lock-out for SSO users; 3 attempts for local accounts."]
+  20: [Fit, [], "Lists of values under maker-checker."]
+  21: [Fit, [], "Error log as specified in the Technical Specification."]
+  22: [Fit, [UAM-031], "Audit trail no user can change; meaning of 'automatic save option' open (UA-Q54)."]
+  23: [Configure, [], "Retention values to give (UA-Q53)."]
+  24: [Fit, [], "Job scheduler with history, re-run and failure alert."]
+  25: [Fit, [], "Failed runs e-mailed to the named recipients (UA-Q52)."]
+  26: [Fit, [], "Monitoring without a command line."]
+  27: [Configure, [], "Retention review monthly; archive and purge per the retention decision."]
+  28: [Fit, [], "Browser only on the workstations."]
+  29: [Fit, [], "User-administration guide in the Help Center."]
+  30: [Fit, [], "Engagement terms."]
+  31: [Configure, [UAM-008, UAM-009], "Enterprise SSO for SSO users (BDOI FRUM-004); break-glass reset by an administrator."]
+  32: [Fit, [UAM-014, UAM-015], "Roles, permissions, user-role mapping and the User Access Matrix."]
+  33: [Configure, [UAM-011, UAM-007], "Single sign-on with EIAM switched on by configuration."]
+  34: [Extend, [UAM-003], "Warning at 15 minutes and sign-out at 30 minutes."]
+  35: [Extend, [UAM-004, UAM-031], "Log-out and session log; role and permission changes logged."]
+  36: [Configure, [UAM-008], "Password policy of the Enterprise SSO; local values for break-glass."]
+  37: [Configure, [UAM-009, UAM-010], "Recovery through the Enterprise SSO (BDOI FRUM-004.03)."]
+  38: [Extend, [UAM-023], "Bulk request (BDOI: c/o UIDM)."]
+  39: [Extend, [UAM-027], "Access-change notice in the system and by e-mail."]
+  40: [Extend, [UAM-025, UAM-018, UAM-026], "Second approval of privileged or out-of-hours changes; separation-of-duties rules."]
+  41: [Configure, [UAM-029], "Four reports with the header of the BRD."]
+
+# --------------------------------------------------------------------------------------- change requests
+cr_types: [Beyond the BRD, Added by BDOI's FRS, Proposal for best practice, Correction]
+cr_status: [Candidate - for decision, Raised, Assessed, Approved, Rejected, Scheduled, In test, Closed]
+cr_candidates:
+  - [FRUM.012.01, "BRD NFR p.17 (11)", "Separation-of-duties rules", "Pairs of group profiles one user may not hold, kept by the Business Administrator and authorised by Information Security; checked on every request.", "The BRD asks to monitor and escalate privilege changes; the rules are a means proposed by the project.", Beyond the BRD, "None (available)", "None", "None", "All modules (roles)", "FRUM.012.01 cases", High]
+  - [FRUM.003.04, "BRD NFR p.13 (1.e)", "Dormant-user deactivation", "Users without a sign-in for 90 days deactivated by a daily run, with a notice 7 days before.", "Information Security practice; not in the BRD text.", Beyond the BRD, "None (available)", "None", "None", "All users", "FRUM.003.04 cases", Medium]
+  - [FRUM.001.06, "BRD 4.001.1", "Break-glass administrators", "Two named System Administrator accounts with a local password and second factor when the sign-in is through EIAM; each sign-in alerted to Information Security.", "BDOI's FRS requires the Enterprise SSO for every sign-in; the system must stay manageable when EIAM is down.", Beyond the BRD, "Alert to Information Security to add", "Small", "Low", "-", "FRUM.001.06 cases", High]
+  - [FRUM.001.04, "BRD x.001.1.3", "Warning before the fixed end of a session", "Warning 30 minutes before the fixed end of a session, besides the inactivity time-out.", "BRD reads 'warning prior to system triggered log out'; BDOI's FRS gives a time-out message instead (Annex Q, C07).", Correction, "None (available)", "None", "None", "-", "FRUM.001.04 cases", Medium]
+  - [FRUM.002.02, "BRD p.5-6", "Synchronisation of user details and status from the Enterprise SSO / UIDM-ISC", "User details and status received from UIDM-ISC with the UIDM request number, synchronisation status and on-demand synchronisation per user.", "Added by BDOI's FRS (FRUM.002.02, FRUM.003.03); not available in the system today.", Added by BDOI's FRS, "Provisioning interface and user screens", "Medium", "Medium", "All modules (users)", "FRUM.002.02, FRUM.003.03 cases", High]
+  - [FRUM.003.02.01, "BRD 1.004", "Revocation on an SSO status change", "Access revoked and open sessions ended as soon as the SSO status is inactive, locked or disabled.", "Added by BDOI's FRS (Annex Q, C13).", Added by BDOI's FRS, "Status events from UIDM-ISC / EIAM", "Small", "Low", "-", "FRUM.003.02.01 cases", High]
+  - [FRUM.005.01, "BRD 4.002", "Record-ownership and supervisory access rules", "Users with supervisory roles see the records of their assigned personnel.", "Added by BDOI's FRS (Annex Q, C15); data scope by unit exists.", Added by BDOI's FRS, "Rules per role", "Medium", "Medium", "All modules (data scope)", "FRUM.005.01 cases", Medium]
+  - [FRUM.006.03, "BRD 4.002.2", "Conflicting permission combinations inside a role", "A role cannot hold two permissions that conflict.", "Added by BDOI's FRS (Annex Q, C16); the system checks pairs of profiles today.", Added by BDOI's FRS, "Rule on permission pairs", "Small", "Low", "-", "FRUM.006.03 cases", Medium]
+  - [FRUM.007.02, "BRD p.18", "Export file names", "Exports named <Report_Name>_MMDDYYYY and Audit Logs_MMDDYYYY.", "Added by BDOI's FRS (Annex Q, C18).", Added by BDOI's FRS, "File name of the downloads", "Small", "Low", "All reports (common)", "FRUM.007.02 cases", Low]
+  - [FRUM.008.01, "BRD 4.003.1", "IP address and role in the audit log", "Each audit record shows the source IP address and the role of the user at the time.", "Added by BDOI's FRS (Annex Q, C19).", Added by BDOI's FRS, "Audit record and report", "Small", "Low", "All modules (audit)", "FRUM.008 cases", Medium]
+  - [FRUM.010, "BRD 2.002", "Approval times, reminders and escalation", "2 working days per approval stage, reminder on the next day, escalation to the Business Administrator after 5 working days.", "No service level in the BRD; proposal (Annex Q.5).", Proposal for best practice, "Reminder and escalation run", "Small", "Low", "-", "FRUM.010 cases", Medium]
+  - [FRUM.007, "BRD NFR p.11", "Monthly access review report", "User Access Report and audit log of the month sent to Information Security on the first working day.", "Best practice; UA-Q51 (Annex Q.5).", Proposal for best practice, "Scheduled report", "Small", "Low", "-", "FRUM.007 cases", Low]
+  - [FRUM.013.01, "BRD 1.006.1.1, 1.008.1.4, 2.002.1", "E-mail copy of the request notices", "The notices to approve, returned and decided also sent by e-mail by the user's preference.", "The BRD asks for a notification (met in the system); Annex Z.", Proposal for best practice, "E-mail of the notices", "Small", "Low", "-", "FRUM.013.01 cases", Low]
+  - [FRUM.009.10, "BRD NFR p.13 (1.k)", "Temporary access with an end date", "Access given until an end date, removed by the daily run.", "Open question CLR-UA-13 (Annex Z).", Beyond the BRD, "End date on requests", "Small", "Low", "-", "FRUM.009.10 cases", Low]
+  - [FRUM.001.01, "BRD NFR p.14", "One session per user or device", "A new sign-in ends the earlier session of the same user (or device).", "Open question CLR-UA-09 (Annex Z).", Beyond the BRD, "Session rule", "Small", "Low", "All users", "FRUM.001 cases", Low]
+
+# --------------------------------------------------------------------------------------- coverage (internal)
+# Item-level status of BDOI's items comes from the comparison workbook (platform column) and the conformance
+# register; overrides here: item -> [status, note]; acceptance criteria: "item#n" -> [status, note]
+coverage_items:
+  FRUM.002.02: ["No", "Synchronisation from the Enterprise SSO / UIDM-ISC is planned after decision C01; users are created through approved requests today."]
+  FRUM.003.03: ["No", "Synchronisation of user status from the Enterprise SSO is planned after decision C01; EIAM refuses a disabled BDO account at sign-in once single sign-on is switched on."]
+  FRUM.001.06: ["Partly", "Break-glass sign-in with password and second factor available; the alert to Information Security at each break-glass sign-in is planned."]
+  FRUM.013.01: ["Partly", "Notices in the system and the access-change e-mail available; the e-mail copy of the request notices is a point for decision."]
+  FRUM.007.02: ["Partly", "Exports to PDF, Excel and CSV available; BDOI's file name format differs (C18)."]
+  FRUM.008.01: ["Partly", "Audit trail and access-change log available; the IP address and the role at the time of the action are not shown (C19)."]
+  FRUM.008.02: ["Partly", "Audit Trail page available; no IP address or role column (C19)."]
+  FRUM.008.01 (2nd): ["Partly", "Export available; BDOI's file name and the template of Annex D differ (C18)."]
+coverage_acs:
+  "FRUM.001.01#2": ["Partly", "Enforced by the EIAM device policy once BIBS is registered in EIAM (CLR-UA-17)."]
+  "FRUM.001.02#1": ["Partly", "Single sign-on available in the system; switched on in the environment once BDOI IT registers BIBS in EIAM; local sign-in in SIT and UAT until then."]
+  "FRUM.001.02#2": ["Partly", "As above: the not-linked refusal shows once single sign-on is switched on."]
+  "FRUM.001.05#3": ["Partly", "Single sign-out depends on the EIAM registration and decision CLR-UA-23."]
+  "FRUM.001.06#1": ["Partly", "Sign-in with password and second factor available; the alert to Information Security is planned."]
+  "FRUM.002.02#1": ["No", "Provisioning from UIDM-ISC planned after decision C01."]
+  "FRUM.002.02#2": ["No", "Provisioning from UIDM-ISC planned after decision C01."]
+  "FRUM.003.03#1": ["No", "Leaver events from UIDM-ISC planned after decision C01."]
+  "FRUM.003.03#2": ["Partly", "Refused by EIAM once single sign-on is switched on in the environment."]
+  "FRUM-004.01#2": ["Partly", "Depends on single sign-on being switched on in the environment."]
+  "FRUM-004.02#2": ["Partly", "The password history is a setting delivered at 8; it is set to 10 with the approval of Information Security."]
+  "FRUM-004.03#1": ["Partly", "Depends on single sign-on being switched on in the environment."]
+  "FRUM.013.01#1": ["Yes", "Notice in the system with the remarks (NT-05)."]
+
+# ------------------------------------------------------------------------------------ requirements collection
+uat_criteria:
+  entry:
+    - "The FRS v1.3 is signed, or the open decisions of Annex Q that affect the cases are recorded."
+    - "The UAT environment is ready with the users of the walkthrough users workbook and the SIT/UAT data."
+    - "The SIT exit report shows no open severity 1 or 2 finding on User Access Maintenance."
+    - "The testers are named (TD-11) and have their sign-in IDs; the passwords are issued separately by the iorta TechNXT Project Team."
+    - "The test cases of this workbook are approved by the Process Owner (SO-11-2)."
+  exit:
+    - "Every test case of priority High is run and passed, or its observation is accepted by the Process Owner."
+    - "Every BRD ID has at least one passed test case (sheet Traceability)."
+    - "No open severity 1 or 2 observation; severity 3 observations have an agreed date."
+    - "The walkthrough of the Business Unit is completed and recorded (walkthrough users workbook)."
+    - "The UAT sign-off certificate is signed (SO-11-3)."

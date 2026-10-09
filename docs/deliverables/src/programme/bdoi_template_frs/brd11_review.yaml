@@ -1,0 +1,754 @@
+# Additions of version 1.3 (Business Unit review edition) to the User Access Maintenance FRS in BDOI's template.
+# Read by build_brd11_bdoi_frs.py (the FRS) and build_brd11_workbooks.py (the workbooks of the review pack).
+# Business wording only. Every passage traces to a BRD ID of the BRD of 8-Oct-2026; anything beyond the BRD is a
+# proposal and is listed in Annex Q.5. "C01" etc. are the conflicts of Annex Q (written Q-nn (Cnn) in the document).
+
+meta:
+  version: "1.3"
+  date: 09 Oct 2026
+  clean: BIBS_FRS-BDOI_BRD-11_User_Access_Maintenance_v1.3.docx
+  highlighted: BIBS_FRS-BDOI_BRD-11_User_Access_Maintenance_v1.3_Changes_Highlighted.docx
+  revision_row: ["09 Oct 2026", "1.3", "Business Unit review edition: summary for the Business Unit, end-to-end flows, workflow and approvals, e-mail texts, document formats, reports and schedules, integrations, non-functional requirements, open questions not answered in the BDOI FRS, change control, review checklist", "iorta TechNXT Project Team (drafting)"]
+  references: >-
+    References added in version 1.3: the review workbooks of BRD-11 issued with this edition (Business Unit
+    Requirements Collection, BRD vs Out-of-the-Box vs Best Practice, Change Request Register, Test Cases and
+    Traceability, Business Unit Walkthrough Users, all v1.0 of 9-Oct-2026); BIBS Non-Functional Requirements Register
+    v1.0; BIBS Master Data and Configuration Upload Templates v1.2; BDOI Requirements and Inputs by BRD v1.2.
+
+# ------------------------------------------------------------------------- 1.8 Summary for the Business Unit Review
+summary:
+  intro: >-
+    This section is the short way into the document for the Business Unit. It shows on a few pages what User Access
+    Maintenance covers, how the work flows from one persona to the next, the numbers behind the document, the
+    decisions the Business Unit must take before signing, and which part each reviewer reads. The detail is in
+    sections 2 and 3 and in the annexes; every statement traces to a BRD ID of the User Access Maintenance BRD of
+    8-Oct-2026.
+  scope_header: ["In scope of this FRS", "Out of scope", "Handled in another FRS or document"]
+  scope:
+    - ["Sign-in through the BDO single sign-on (EIAM), inactivity warning, session end, log-out (FRUM.001)", "Creation of EIAM accounts, their passwords, lock-out and second factor (BDO Enterprise SSO platform; FRUM.002, FRUM-004)", "Permissions of each business module (the FRS of each BRD; the matrix of Annex C)"]
+    - ["Users: creation, update, deactivation, reactivation, dormant users (FRUM.002, FRUM.003)", "AD group creation and its request (FRUM.005, as BDOI states)", "Loading the users at go-live: Data Set-up (Annex Y) with BRD-13 Data Migration"]
+    - ["Passwords of the break-glass accounts only (FRUM-004, FRUM.001.06)", "Authorisation through an external access-control list (BRD NFR 1.i, on hold)", "Technical settings of single sign-on and provisioning: Technical Specification reviewed by BDOI IT"]
+    - ["Roles (group profiles) and their permissions (FRUM.005, FRUM.006)", "Portal (external) users: no portal in the BDOI drop plan", "Screen standards: programme level (BIBS screen standards)"]
+    - ["Access requests, approvals, bulk requests (FRUM.009 to FRUM.011), within the decision on C01", "Infrastructure set-up answered 'Follow existing QPS set up' (Annex X)", "Hosting, back-up, disaster recovery: programme NFR register"]
+    - ["Reports and audit logs (FRUM.007, FRUM.008); separation of duties and security settings (FRUM.012); notices and e-mails (FRUM.013)", "The device policy itself (BDO network and EIAM conditional access)", "Access certification campaigns in UIDM-ISC (BDOI IT)"]
+  numbers_intro: "The key numbers of this document (counted by the builder of the document; the workbooks give the same numbers):"
+  decisions_intro: >-
+    The ten decisions below shape the rest of the document. Each points to the row of Annex Q (observations and
+    points for decision) or Annex Z (open questions) where both readings, the BRD text and the proposal are given.
+  decisions:
+    - [1, "Where access requests are raised and approved: in UIDM-ISC (BDOI's FRS, \"c/o UIDM\") or in the system (BRD sections A and B)", "C01", "BDOI IT; Process Owner (Business Administration); Information Security"]
+    - [2, "Roles assigned and changed only through approved requests and implemented by the System Administrator, or directly by authorised users", "C02, C03, C22", "Process Owner (Business Administration); Information Security"]
+    - [3, "User ID and Windows ID, duplicate check and the user fields synchronised from the SSO platform", "C04, C05, C06, C28", "Process Owner (Business Administration); BDOI IT"]
+    - [4, "Message at session time-out and the warning before the fixed end of a session", "C07, C08", "Process Owner (Business Administration)"]
+    - [5, "Lock-out, password history of 10 and the reset of the break-glass accounts; number and holders of break-glass accounts", "C09, C10, C11; Z: CLR-UA-24", "Information Security; BDOI IT"]
+    - [6, "Revocation on an SSO status change, synchronisation status and on-demand synchronisation", "C13, C14", "BDOI IT"]
+    - [7, "Which profiles are high privilege, the working hours and who gives the second approval", "C17; Z: UQ07", "Information Security"]
+    - [8, "Conflicting permissions inside a role and the separation-of-duties pairs of profiles", "C16", "Information Security"]
+    - [9, "Dormant accounts: period and notice", "C26; Z: CLR-UA-08", "Information Security"]
+    - [10, "Export file names and the role and IP address in the audit log", "C18, C19", "Process Owner (Business Administration); Information Security"]
+  review_intro: "How to review: each reviewer reads the parts of his or her role; the times are a guide for a first reading."
+  review_header: ["Reviewer (role)", "Read first", "Then", "About"]
+  review:
+    - ["Product Owner, Marketing Business System", "1.8 Summary; Annex A figures; Annex AB checklist", "Annex Q decisions; Annex Z open questions", "2 hours"]
+    - ["Process Owner, User Access Maintenance (Business Administration)", "Sections 2 and 3; Annex A; Annex S workflow", "Annexes J, K, O (screens, messages, walkthroughs); T e-mails; U documents; V reports", "4 hours"]
+    - ["BDOI Information Security", "FRUM.001, FRUM-004, FRUM.008, FRUM.012; Annex M rules", "Annex N sign-in; Annex X non-functional requirements; Annex Q decisions 5 to 9", "3 hours"]
+    - ["BDOI IT", "Annex N sign-in and identity; Annex W integrations", "Annex Y data set-up; Annex Z integration questions", "2 hours"]
+    - ["Internal Audit and Compliance", "FRUM.007, FRUM.008; Annex V reports", "Annex U document formats; Annex X retention and audit", "1.5 hours"]
+    - ["System Analyst (BDO ITG)", "Section 2 mapping; Annex P traceability; Annex Q", "Annex AA change control; the review workbooks", "4 hours"]
+  workbooks_intro: "The review workbooks issued with this edition (same numbers as this document):"
+  workbooks:
+    - ["Business Unit Requirements Collection", "What the Business Unit provides: document layouts, e-mail wordings, schedules, parameters, lists, master data, approvers, integration inputs, open decisions"]
+    - ["BRD vs Out-of-the-Box vs Best Practice", "For every BRD requirement: what the system offers as standard, broking best practice, fit and recommendation"]
+    - ["Change Request Register", "How a change after sign-off is raised and decided; candidate changes; the decision log of every Annex Q observation"]
+    - ["Test Cases and Traceability", "BRD ID to FR item, test cases, screens and walkthrough steps; the questions answered in BDOI's FRS; UAT entry and exit criteria"]
+    - ["Business Unit Walkthrough Users", "The sign-in ID of every persona for the walkthrough in the BIBS UAT environment and the walkthrough script"]
+
+# ------------------------------------------------------------------------------------- Annex A additions (figures)
+annex_a:
+  intro: >-
+    Added in version 1.3: one figure for every process of the BRD, drawn from end to end with one column per persona
+    and one for the system, then the status life-cycle of each record and the integration context. BDOI's four
+    process flows above are kept as issued; where the figures below follow the BRD and BDOI's FRS reads differently,
+    the point is in Annex Q.
+
+# ------------------------------------------------------------------------------------- Annex S workflow and approvals
+workflow:
+  intro: >-
+    How each change of access is made, checked and approved: the stages, who acts at each stage, the limits and
+    controls, the time rules, escalation and the paths to return or void a request. The figure gives the routes at a
+    glance; the table gives the detail. The BRD sets no service level for approvals; the times marked "proposed" are
+    a proposal of iorta TechNXT for the Business Unit to confirm (Annex Q.5 and the requirements collection
+    workbook, sheet Schedules and timings).
+  header: ["Process", "Stage", "Who acts (maker / checker / approver)", "Limits and controls", "Time rule, reminder, escalation", "Return or void"]
+  rows:
+    - ["User access request (BRD 1.002 to 1.008, 2.002)", "1 Draft", "Requestor (maker)", "Seen and edited by its creator only; justification mandatory; one open request per user", "No time limit; draft kept until submitted or cancelled", "Cancel with a reason (BRD 1.002.1.3)"]
+    - ["", "2 Pending Approval", "Approver chosen on the request (checker)", "Four eyes: not the requester, not the user concerned; checks repeated at approval", "Proposed: decision within 2 working days; reminder on day 3; age shown in the Access Requests report", "Return with remarks (BRD 2.002.7); reject with a reason (BRD 2.002.6); requester may cancel (BRD 1.007)"]
+    - ["", "3 Pending Second Approval", "Second Approver (Information Security)", "Only for a privileged profile (High, Admin) or an out-of-hours change; not the first approver", "Proposed: within 1 working day; alert Privileged access change to System Administrators and Auditors", "Return or reject as stage 2"]
+    - ["", "4 Scheduled / Approved", "System", "Applied at once, or on the effective date by the daily run at 00:05", "Failed application alerted (high) to System Administrators and Auditors", "Creator or approver may cancel a Scheduled request"]
+    - ["Bulk request (BRD 1.009)", "1 Upload and draft batch", "Requestor (maker)", "Every row checked before the batch is created; rows in error listed for correction", "-", "Cancel the draft batch"]
+    - ["", "2 Decision on the batch", "Approver chosen on the batch", "Decided as a whole (CLR-UA-16 answered by BDOI's mapping \"c/o UIDM\"; Annex Q, C24)", "As stage 2 above", "Return or reject the whole batch"]
+    - ["Group-profile request (BRD 3.002)", "1 Draft", "Business Administrator (maker)", "Unique profile name; no permission both added and removed; privilege level given", "-", "Cancel"]
+    - ["", "2 Approvals in order", "Approvers chosen on the request, in order; all must approve", "The next approver is asked only after the previous one approves", "Proposed: 2 working days per approver", "Return or reject ends the round"]
+    - ["", "3 For Implementation", "System Administrator (implementer)", "Not the requester of the request (four eyes)", "Proposed: implemented within 1 working day of the last approval", "-"]
+    - ["Separation-of-duties rule (BRD NFR 11)", "Create or deactivate; authorise", "Business Administrator (maker); Information Security Officer (checker)", "The maker cannot authorise; rule applies to every later request and bulk line", "Proposed: 2 working days", "Reject: rule not created / deactivation refused"]
+    - ["Security setting (BRD NFR 11; p.14)", "Change; approve", "System Administrator (maker); Information Security Officer (approver)", "Old value stays in force until approved; change audited", "Proposed: 2 working days", "Reject: setting unchanged"]
+    - ["Second-factor reset (break-glass)", "Request; approve", "System Administrator; another holder of the reset approval right", "The requester cannot approve", "Same working day", "Reject"]
+    - ["Dormant users (Information Security practice; CLR-UA-08)", "Notice; deactivation", "System (daily run 00:15)", "Notice 7 days before; deactivation after 90 days without sign-in; System Administrator profile exempt", "Business and System Administrators receive the list", "Reactivation request"]
+  matrix_intro: "Role-to-stage matrix: M = makes, C = checks or approves, 2 = second approval, I = implements, V = views."
+  matrix_header: ["Stage", "Requestor", "Approver", "Second Approver", "Business Admin.", "System Admin.", "Information Security", "Auditor"]
+  matrix:
+    - ["User access request: raise, correct, cancel", M, "", "", M, "", "", V]
+    - ["User access request: approve, reject, return", "", C, "", "", "", "", V]
+    - ["Privileged or out-of-hours change", "", C, "2", "", "", "", V]
+    - ["Bulk request", M, C, "2", M, M, "", V]
+    - ["Group-profile request", "", C, "", M, I, V, V]
+    - ["Separation-of-duties rule", "", "", "", M, "", C, V]
+    - ["Security setting", "", "", "", "", M, C, V]
+    - ["Second-factor reset", "", "", "", "", M, C, ""]
+    - ["Reports and audit log", "", V, "", V, V, V, V]
+  escalation: >-
+    Escalation today: the request ages on the Access Requests list and report (Age in days); the Business
+    Administrator may cancel it and raise it again to another approver, or the setting "Any approver may decide"
+    lets every holder of the approval right decide it. An automatic reminder and escalation after a number of
+    working days is a proposal (Annex Q.5) for the Business Unit to decide.
+
+# ------------------------------------------------------------------------------- Annex T e-mail and notification texts
+emails:
+  intro: >-
+    Every notice and e-mail of User Access Maintenance, word for word as the system sends it today. The parts in
+    angle brackets are filled in by the system. BDOI has not given wordings for these messages: the texts below are
+    proposed by iorta TechNXT for BDOI's approval (requirements collection workbook, sheet E-mail wordings). The
+    e-mails are plain text, sent from the system address of the environment, with no attachment; no password is
+    ever sent by e-mail (the temporary password of a new user is shown once to the approver on the screen). A
+    notice "in the system" appears under the bell in the page header and opens the record.
+  common:
+    attachments: None
+    protection: "No attachment and no password in the message; the link opens the record only for a signed-in user who holds the right."
+  items:
+    - id: NT-01
+      name: Request to approve
+      trigger: "A user access request is submitted or re-submitted; a group-profile request approved by one approver waits for the next approver in order."
+      recipients: "The approver chosen on the request (group profiles: the next approver in order); for a request raised without a chosen approver, every holder of the approval right."
+      channel: Notice in the system
+      subject: "Access request <request no> to approve"
+      body: "<description of the change>, for example: Create user a013000196 with group profiles Marketing Account Officer"
+      frequency: "Once per submission or re-submission; once per approver in order."
+      brd: "BRD 2.002.1 (a); BRD 3.002.1.2"
+      frum: "FRUM.010.01, FRUM.005.03, FRUM.013.01"
+      code: ['notice(r, "to approve"']
+    - id: NT-02
+      name: Request for second approval
+      trigger: "The first approval of a request with a risk flag (privilege increase, outside working hours)."
+      recipients: "Every holder of the second-approval right (Second Approver), except the first approver."
+      channel: Notice in the system
+      subject: "Access request <request no> for second approval"
+      body: "<description of the change> (<risk flags: privilege increase, outside working hours>)"
+      frequency: Once per request.
+      brd: "BRD NFR p.17 (11)"
+      frum: "FRUM.010.05"
+      code: ['"for second approval"', 'riskLabels(r) + ")"']
+    - id: NT-03
+      name: Request to implement
+      trigger: "The last approval of a group-profile request (the request waits for implementation)."
+      recipients: "Every holder of the role management right (System Administrators)."
+      channel: Notice in the system
+      subject: "Access request <request no> to implement"
+      body: "<description of the change>"
+      frequency: Once per request.
+      brd: "BRD 3.002; p.6"
+      frum: "FRUM.005.04"
+      code: ['"to implement"']
+    - id: NT-04
+      name: Decision on the request
+      trigger: "A request is approved and applied, approved with a later effective date, approved for implementation, rejected, implemented, or applied on its effective date by the daily run."
+      recipients: "The requester (the user who submitted the request)."
+      channel: Notice in the system
+      subject: "Access request <request no> approved | approved, applies on <dd-MMM-yyyy> | approved, for implementation | rejected | implemented | applied on its effective date"
+      body: "<description of the change> (<comment of the decider>)"
+      frequency: Once per decision.
+      brd: "BRD 1.008.1.4"
+      frum: "FRUM.009.09, FRUM.013.01"
+      code: ['"approved, applies on "', '"approved, for implementation"', '"rejected"', '"implemented"', '"applied on its effective date"']
+    - id: NT-05
+      name: Request returned
+      trigger: "The approver returns a request for correction."
+      recipients: "The requester."
+      channel: Notice in the system
+      subject: "Access request <request no> returned"
+      body: "<description of the change> - <remarks of the approver>"
+      frequency: Once per return.
+      brd: "BRD 1.006.1.1; 2.002.7"
+      frum: "FRUM.009.07, FRUM.010.04"
+      code: ['"returned"']
+    - id: NT-06
+      name: Request cancelled
+      trigger: "The creator cancels a request that was assigned to an approver."
+      recipients: "The approver the request was assigned to."
+      channel: Notice in the system
+      subject: "Access request <request no> cancelled"
+      body: "<description of the change> - <reason for the cancellation>"
+      frequency: Once per cancellation.
+      brd: "BRD 1.007.1"
+      frum: "FRUM.009.08"
+      code: ['"cancelled"']
+    - id: NT-07
+      name: Your access changed
+      trigger: "An approved change to a user is applied (at approval, or on the effective date)."
+      recipients: "The user whose access changed (e-mail to the user's registered address)."
+      channel: "Notice in the system and e-mail"
+      subject: "BIBS: your access changed (e-mail); Your access changed (notice)"
+      body: "Your access changed: <description of the change> (request <request no>)."
+      frequency: "Once per applied change."
+      brd: "BRD NFR p.17 (10)"
+      frum: "FRUM.013.01"
+      code: ['"Your access changed: "', '": your access changed"']
+    - id: NT-14
+      name: Your access changed (group profile deactivated or reactivated)
+      trigger: "A request that deactivates or reactivates a group profile is implemented."
+      recipients: "Each active member of the group profile (e-mail to the member's registered address)."
+      channel: "Notice in the system and e-mail"
+      subject: "BIBS: your access changed (e-mail); Your access changed (notice)"
+      body: "Your access changed: <description of the change>, a group profile you hold (request <request no>)."
+      frequency: "Once per member and request."
+      brd: "BRD 3.002.3, 3.002.4; NFR p.17 (10)"
+      frum: "FRUM.006.04, FRUM.013.01"
+      code: ['", a group profile you hold (request "']
+    - id: NT-15
+      name: Your account will be deactivated
+      trigger: "The daily run of dormant users (00:15) finds a user whose deactivation is 7 days away."
+      recipients: "The dormant user."
+      channel: "Notice in the system and e-mail"
+      subject: "BIBS: sign in to keep your account (e-mail); Your account will be deactivated (notice)"
+      body: "You have not signed in to BIBS for a long time. Sign in before <dd-MMM-yyyy>, or your account is deactivated and a new access request is needed."
+      frequency: "Once, 7 days before the deactivation."
+      brd: "BRD NFR p.13 (1.e)"
+      frum: "FRUM.003.04"
+      code: ['" for a long time. Sign in before "', '": sign in to keep your account"']
+    - id: NT-16
+      name: Dormant users deactivated
+      trigger: "The daily run of dormant users deactivates one or more users (each user also receives NT-07)."
+      recipients: "Every holder of the request right (Business Administrators, System Administrators)."
+      channel: Notice in the system
+      subject: "Dormant users deactivated"
+      body: "<count> user(s) without a sign-in for <days> days were deactivated: <user IDs>"
+      frequency: "Once per run that deactivates users."
+      brd: "BRD NFR p.13 (1.e)"
+      frum: "FRUM.003.04"
+      code: ['" user(s) without a sign-in for "']
+    - id: NT-08
+      name: Reset your password (break-glass accounts only)
+      trigger: "A local account asks for a reset link (Forgot password?). Not offered to single sign-on users (BDOI's FRUM-004.03)."
+      recipients: "The registered e-mail address of the user, when the account is active and has one."
+      channel: E-mail
+      subject: "BIBS: reset your password"
+      body: "Dear <full name>, A new BIBS password was requested for user <user ID>. Open this link to set it: <link>. The link works once and expires at <date and time> (Philippine time). If you did not ask for it, ignore this e-mail; your password stays as it is."
+      frequency: "Once per request; the link works once and for 30 minutes."
+      brd: "BRD NFR p.17 (1, 8)"
+      frum: "FRUM-004.03, FRUM.001.06"
+      code: ['" password was requested for user "', '": reset your password"']
+    - id: NT-09
+      name: Your password expires soon (break-glass accounts)
+      trigger: "The daily run (06:00) finds a local password that expires within 7 days."
+      recipients: "The holder of the local account."
+      channel: "Notice in the system; e-mail when the user's preference asks for it"
+      subject: "BIBS: your password expires soon (e-mail); Your password expires soon (notice)"
+      body: "Your BIBS password expires on <date and time> (Philippine time). Change it on My Profile before then."
+      frequency: "Daily while the password expires within 7 days."
+      brd: "BRD NFR p.17 (7)"
+      frum: "FRUM-004.01"
+      code: ['" password expires on "', '": your password expires soon"']
+    - id: NT-10
+      name: Batch job failed
+      trigger: "A scheduled run fails (for example the daily application of dated access changes)."
+      recipients: "The addresses of the setting \"failed-run recipients\" (to be named by BDOI, UA-Q52)."
+      channel: E-mail
+      subject: "BIBS: batch job <job> failed"
+      body: "The batch job <job> failed. Run: <run>. Started: <date and time> (Philippine time). Trigger: <trigger>. Error: <message>. Open Administration > Scheduled Jobs to see the run history and run the job again."
+      frequency: "Once per failed run."
+      brd: "BRD NFR p.15 (batch failure e-mail)"
+      frum: "FRUM.013.02"
+      code: ['"The batch job "', '"\nError: "']
+    - id: NT-11
+      name: "Alert: privileged access change"
+      trigger: "A request with a risk flag passes its first approval."
+      recipients: "Holders of the alert right (System Administrators, Auditors)."
+      channel: "Alerts inbox in the system (medium)"
+      subject: "Privileged access change"
+      body: "Access request <request no> (<risk flags>): <description of the change>"
+      frequency: Once per request.
+      brd: "BRD NFR p.17 (11)"
+      frum: "FRUM.010.05"
+      code: ['PRIVILEGED_CHANGE,', '+ AccessRequestNotifier.riskLabels(r)']
+    - id: NT-12
+      name: "Alert: scheduled access change failed"
+      trigger: "A scheduled request cannot be applied on its effective date."
+      recipients: "Holders of the alert right (System Administrators, Auditors)."
+      channel: "Alerts inbox in the system (high)"
+      subject: "Scheduled access change failed"
+      body: "Access request <request no> could not be applied on <dd-MMM-yyyy>: <reason>"
+      frequency: "Once per request and date."
+      brd: "BRD NFR p.13 (1.k)"
+      frum: "FRUM.009.10"
+      code: ['" could not be applied on "']
+    - id: NT-13
+      name: "Alert: role edited outside a request"
+      trigger: "A group profile is created or changed directly while the emergency role edit is switched on."
+      recipients: "Holders of the alert right (System Administrators, Auditors)."
+      channel: "Alerts inbox in the system (medium)"
+      subject: "Role edited outside a request"
+      body: "Role <profile code> <change> directly by <user> (emergency path <setting code>)"
+      frequency: "Once per direct change."
+      brd: "BRD NFR p.17 (11)"
+      frum: "FRUM.005.01, FRUM.012.02"
+      code: ['" directly by "']
+    - id: NT-17
+      name: Separation-of-duties rule to authorise
+      trigger: "A separation-of-duties rule is created, or its deactivation is asked."
+      recipients: "Every holder of the rule authorisation right (Information Security Officers), except the maker."
+      channel: Notice in the system
+      subject: "Separation-of-duties rule <rule> to authorise"
+      body: "The new rule of rule <rule>: <reason> | The deactivation of rule <rule>: <reason>"
+      frequency: "Once per rule change."
+      brd: "BRD NFR p.17 (11)"
+      frum: "FRUM.012.01"
+      code: ['"Separation-of-duties rule "', '" to authorise"']
+    - id: NT-18
+      name: Security setting to approve
+      trigger: "The System Administrator changes a security setting on System Parameters."
+      recipients: "Every holder of the security setting approval right (Information Security Officers)."
+      channel: Notice in the system
+      subject: "Security setting to approve: <description of the setting>"
+      body: "<user name> requests a change from '<current value>' to '<new value>'"
+      frequency: "Once per change."
+      brd: "BRD NFR p.17 (11); p.14"
+      frum: "FRUM.012.02"
+      code: ['"Security setting to approve: "', '" requests a change from ''']
+    - id: NT-19
+      name: Second-factor reset to approve
+      trigger: "A System Administrator asks for the reset of the authenticator app of a break-glass account."
+      recipients: "Every holder of the reset approval right, except the requester."
+      channel: Notice in the system
+      subject: "Second factor reset to approve: <user name>"
+      body: "<user name of the requester> asks for the reset. Reason: <reason>"
+      frequency: "Once per reset request."
+      brd: "BRD NFR p.17 (1)"
+      frum: "FRUM.001.06"
+      code: ['"Second factor reset to approve: "', '" asks for the reset. Reason: "']
+    - id: NT-20
+      name: Authenticator app reset
+      trigger: "The reset of the authenticator app is approved and applied."
+      recipients: "The holder of the break-glass account."
+      channel: Notice in the system
+      subject: "Your authenticator app was reset"
+      body: "Enrol your authenticator app again at your next sign-in."
+      frequency: "Once per reset."
+      brd: "BRD NFR p.17 (1)"
+      frum: "FRUM.001.06"
+      code: ['"Your authenticator app was reset"']
+
+# ----------------------------------------------------------------------- Annex U document prints and output formats
+documents:
+  intro: >-
+    Every document User Access Maintenance prints, e-mails or exports: purpose, recipients, format, protection, the
+    fields in order and an image of the current layout in the system. BDOI's samples in Annexes B and D remain the
+    reference; where the layout must still be given or confirmed by the Business Unit, the item of the requirements
+    collection workbook is named. User Access Maintenance prints no letter, slip or certificate.
+  file_name_rule: >-
+    File names: BDOI's FRUM.007.02 and FRUM.008 (export) set <Report_Name>_MMDDYYYY and Audit Logs_MMDDYYYY; the
+    system names the download after the report and the date in another order today (Annex Q, C18).
+  items:
+    DO-01: {purpose: "Users with their group profiles and who created and changed them (BRD 3.003.1; sample A; Annex E)", recipients: "Business Administrator, System Administrator, Approver, Information Security, Auditor", rc: RC-DOC-01, bdoi: "Annex B (User Access Report) and Annex E"}
+    DO-02: {purpose: "Modules and tasks each group profile can access (BRD 3.003.2; sample B; Annex F)", recipients: "As DO-01", rc: RC-DOC-02, bdoi: "Annex B (User Group Profile Report) and Annex F"}
+    DO-03: {purpose: "Members of each group profile (BRD 3.003.3; sample C; Annex G)", recipients: "As DO-01", rc: RC-DOC-03, bdoi: "Annex B (Group Profile Membership List) and Annex G"}
+    DO-04: {purpose: "Access activities with from and to values (BRD 4.003.1; sample D; Annex H)", recipients: "System Administrator, Information Security, Auditor", rc: RC-DOC-04, bdoi: "Annex D (Audit Log Export) and Annex H"}
+    DO-05: {purpose: "Requests by status, type, requester, approver and age (BRD 1.008; 2.002.2)", recipients: "Business Administrator, System Administrator, Approver, Auditor", rc: RC-DOC-05, bdoi: "Not in BDOI's annexes (layout to be confirmed)"}
+    DO-06: {purpose: "Which group profiles hold which permissions (BRD 4.002.2; Annex C)", recipients: "Business Administrator, System Administrator, Approver, Information Security, Auditor", rc: RC-DOC-06, bdoi: "Annex C (User Access Matrix workbook of BDOI)"}
+  extra:
+    - id: DO-07
+      name: Bulk request template and error file
+      purpose: "The file a Requestor fills in for a bulk request, and the file of the rows in error returned by the check (BRD 1.009)"
+      recipients: Requestor
+      format: "Excel template (also accepted as CSV or TXT); error file in Excel"
+      produced: "User Access › Bulk Request › Download template / Download errors"
+      protected: "No"
+      fields: ["One row per user: action (enrol, modify, deactivate, reactivate), user ID, full name, e-mail, Windows ID, home branch, business unit group, user level, group profiles, effective date, remarks", "Error file: the rows in error with the message of each"]
+      rc: RC-DOC-07
+      bdoi: "Not in BDOI's FRS (bulk is \"c/o UIDM\" in the mapping, Annex Q C24)"
+    - id: DO-08
+      name: Temporary password of a new break-glass user (screen only)
+      purpose: "The password set by the system for a new local account (break-glass), shown once to the approver"
+      recipients: "The approver of the enrolment, who gives it through a secure channel"
+      format: "Shown once on the screen; never printed or e-mailed"
+      produced: "Access Request record › Approve and Apply"
+      protected: "Shown once; changed at the first sign-in"
+      fields: ["User ID, temporary password, the rule to change it at the first sign-in"]
+      rc: RC-DOC-08
+      bdoi: "BDOI's FRUM-004 (no password function for SSO users)"
+
+# ----------------------------------------------------------------------------------- Annex V reports and schedules
+reports:
+  intro: >-
+    Every report of User Access Maintenance and every run the system starts by itself. The reports run on demand
+    from User Access › User Access Reports for the holders of the report right and export to PDF, Excel and CSV
+    with the header of the BRD (report name, generated by, date coverage, date and time generated; BRD p.18). No
+    report is sent by e-mail on a schedule today; a monthly access review report to Information Security is a
+    proposal (Annex Q.5, UA-Q51).
+  header: ["Report", "Frequency", "Who runs it", "Filters", "Columns (in order)", "Sort", "Output", "BRD / FR"]
+  rows:
+    - ["User Access Report", "On demand", "Business Administrator, System Administrator, Approver, Information Security, Auditor", "As-of date; business unit group; status; group profile", "User Name; User ID / Windows ID; User Group Profile; Business Unit / User Level; Status; Created by / Date Created; Modified by / Date Modified; Last Action / by", "User name", "PDF (landscape), Excel, CSV", "BRD 3.003.1; FRUM.007; Annex E"]
+    - ["User Group Profile Report", "On demand", "As above", "Group profile; module; active", "Group Profile; Module Name; Task Name; Access (With Access / No Access); Date Created / Created by; Date Modified / Modified by", "Profile, then module", "PDF (portrait), Excel, CSV", "BRD 3.003.2; FRUM.007; Annex F"]
+    - ["Group Profile Membership", "On demand", "As above", "Group profile; as-of date", "Group Profile; Member Username; Member User ID; Created by / Date Created; Modified by / Date Modified", "Profile, then member", "PDF (portrait), Excel, CSV", "BRD 3.003.3; FRUM.007; Annex G"]
+    - ["User Access Audit Log", "On demand", "System Administrator, Information Security, Auditor", "Date from / to; user; activity; include log-ins and log-outs", "Date; Activity; From; To; Done By; Approved By / Request No.", "Date and time", "PDF (landscape), Excel, CSV", "BRD 4.003.1; FRUM.008; Annex H"]
+    - ["Access Requests", "On demand", "Business Administrator, System Administrator, Approver, Auditor", "Period; status; request type", "Request No.; Request Type; User / Group Profile; Requester; Approver; Date Created; Date Decided; Effective Date; Age (days)", "Date created", "PDF, Excel, CSV", "BRD 1.008; FRUM.007.03"]
+    - ["Audit Trail (screen)", "On demand", "Information Security, Auditor, System Administrator", "Period; user; module; action", "Timestamp; Module; User; Action; Record; Summary", "Newest first", "Screen; export CSV, PDF, Excel", "BRD 4.003.1; FRUM.008.02"]
+    - ["User Access Matrix", "On demand", "Business Administrator, System Administrator, Approver, Information Security, Auditor", "Area; action class", "Permission; Area; Action class; one column per group profile", "Area, permission", "Excel (two sheets)", "BRD 4.002.2; FRUM.007.03; Annex C"]
+  schedules_intro: "Runs the system starts by itself (Philippine time; each run is listed with its history on Administration › Scheduled Jobs and can be run again there):"
+  schedules_header: ["Run", "When", "What it does", "Who is told", "Setting and owner", "BRD / FR"]
+  schedules:
+    - ["Effective-dated access changes", "Daily 00:05", "Applies the approved requests whose effective date is today", "The requester (NT-04), the user (NT-07); a failure: alert NT-12 and e-mail NT-10", "Time: System Administrator", "BRD NFR p.13 (1.k); FRUM.009.10"]
+    - ["Dormant users", "Daily 00:15", "Tells users 7 days before the deactivation; deactivates users without a sign-in for 90 days (System Administrator profile exempt)", "The user (NT-15, NT-07); Business and System Administrators (NT-16)", "Dormancy period and notice days: Information Security (CLR-UA-08)", "BRD NFR p.13 (1.e); FRUM.003.04"]
+    - ["Password expiry notice", "Daily 06:00", "Tells the holders of local (break-glass) accounts whose password expires within 7 days", "The holder (NT-09)", "Information Security", "BRD NFR p.17 (7); FRUM-004.01"]
+    - ["Retention review", "Monthly, 2nd day 11:00", "Counts the records that have reached their retention period under each rule; archives or deletes nothing", "System Administrator (run history)", "Retention periods: Compliance (UA-Q53)", "BRD NFR p.11, p.14 (retention); Annex X"]
+    - ["E-mail dispatch", "Every 2 minutes", "Sends the queued e-mails of the notices above", "-", "System Administrator; relay by BDOI IT (UA-Q56)", "BRD NFR p.17 (10)"]
+    - ["Failed-run notice", "On every failed run", "E-mails the failed run with its error", "Failed-run recipients (to be named, UA-Q52)", "System Administrator", "BRD NFR p.15; FRUM.013.02"]
+
+# ---------------------------------------------------------------------------------------- Annex W integrations
+integrations:
+  intro: >-
+    The interfaces of User Access Maintenance with BDOI's other systems and with the other BIBS modules, at
+    business level. The technical detail (protocols, addresses, credentials) is in the Technical Specification
+    reviewed by BDOI IT. The integration context is drawn in Annex A.
+  header: ["Interface", "Direction", "What is exchanged", "Trigger and frequency", "Volumes", "Owner", "What BDOI IT provides", "BDOI input"]
+  rows:
+    - ["EIAM (BDO Enterprise SSO, Microsoft Entra ID)", "In", "The sign-in of every BDO user and the identity that links the account to the user (Windows ID)", "Each sign-in; sign-out", "All users of BIBS (sizing 145 concurrent); BRD p.11: 14 requestors, 8 approvers, 4 business and 1 system administrator", "BDOI IT", "Registration of BIBS per environment, sign-in and sign-out addresses, the identifier returned, test accounts for SIT and UAT", "Given: SSO is the sign-in (FRUM.001.02). To be provided: protocol and registration (CLR-UA-01)"]
+    - ["UIDM-ISC (identity governance)", "In and out", "Joiner, mover and leaver changes of user accounts with the UIDM request number; accounts and group profiles for certification", "Each approved UIDM request; certification extract daily (proposed)", "About 10 changes a month (BRD p.11)", "BDOI IT; Information Security", "The option of Annex N (a, b or c), the connection of UIDM-ISC, the aggregation frequency", "Given: requests in UIDM, details synchronised (FRUM.002, FRUM.003). To be decided: C01. To be provided: UA-Q19, UA-Q21"]
+    - ["BDO e-mail relay", "Out", "The e-mails of Annex T", "Each notice; dispatch every 2 minutes", "Tens a month", "BDOI IT", "Relay and sender address per environment", "To be provided (UA-Q56)"]
+    - ["All BIBS modules (BRD-1 to BRD-13)", "Out", "The signed-in user, the active group profiles and the permissions: menus, buttons and actions", "Every screen and action", "All users", "Business Administration (profile content)", "-", "Given: Annex C matrix (preliminary); final matrix to be provided (UA-Q29, UA-Q30)"]
+    - ["BRD-1 New Business", "Out and in", "The approval right of access requests held by New Business approvers; the lists used on the request (branches)", "Each request", "-", "Business Administration", "-", "Given"]
+    - ["BRD-3 Product Maintenance", "Out", "Changes of Product Maintenance roles as group-profile requests", "Each change", "-", "Business Administration; System Administrator", "-", "Given (Annex Q, C03)"]
+    - ["BRD-13 Data Migration", "In", "The users and their group profiles at go-live (users are not migrated; they are loaded by bulk request)", "Once before go-live, then dress rehearsal", "All users", "Business Administration; migration working group", "-", "To be provided (template UA-01)"]
+    - ["Audit trail and reports", "Out", "Sign-ins, failed sign-ins, sign-outs, parameter changes and every access change", "Continuous", "-", "System Administrator; Auditor", "-", "Given"]
+    - ["BDO log server", "Out", "Application and error logs", "Continuous", "-", "BDOI IT", "Address and format", "On hold (BRD NFR p.14)"]
+    - ["External access-control list", "In", "Authorisation from an external list", "-", "-", "BDOI IT", "-", "Answered by BDOI's FRS: authorisation stays in the system (FRUM.001.02)"]
+    - ["BDO EUA / LDAP (Active Directory)", "In", "User ID and password check", "-", "-", "BDOI IT", "-", "Answered by BDOI's FRS: replaced by the Enterprise SSO (FRUM.001.02)"]
+
+# --------------------------------------------------------------------------------- Annex X non-functional requirements
+nfr:
+  intro: >-
+    Every non-functional row of the BRD (section 6, pages 11 to 18). The BRD gives these rows no IDs; they carry the
+    IDs UAM-NFR-01 to UAM-NFR-41 of the BIBS FRS. For each: the BRD requirement, how the system meets it, the FR item
+    of this FRS or where it is specified, and the row of the BIBS Non-Functional Requirements Register. Rows answered
+    "Follow existing QPS set up" in the BRD follow the BIBS standards agreed for all BRDs (Annex Z, UA-Q57).
+  header: ["ID", "Topic", "BRD requirement (page)", "How the system meets it", "Specified in", "NFR register"]
+  # UAM-NFR number -> rows of the BIBS Non-Functional Requirements Register v1.0
+  register:
+    1: [NFR-PRF-01, NFR-PRF-03, NFR-CAP-01]
+    2: [NFR-CAP-02, NFR-PRF-03]
+    3: [NFR-RET-01, NFR-RET-03]
+    4: [NFR-AVL-01, NFR-REC-01, NFR-REC-02, NFR-SCL-01, NFR-OBS-01, NFR-SUP-01]
+    5: [NFR-ACC-01, NFR-ACC-03, NFR-RSP-01]
+    6: [NFR-SEC-04, NFR-AUD-02, NFR-PRV-03]
+    7: [NFR-MNT-04]
+    8: [NFR-SEC-06, NFR-SEC-09]
+    9: [NFR-SEC-03, NFR-SEC-04]
+    10: [NFR-AUD-03]
+    11: [NFR-SEC-01, NFR-INT-03]
+    12: [NFR-SEC-04]
+    13: [NFR-CFG-01]
+    14: [NFR-CFG-02]
+    15: [NFR-SEC-04]
+    16: [NFR-CFG-03, NFR-SUP-05]
+    17: [NFR-SEC-01]
+    18: [NFR-AUD-01]
+    19: [NFR-SEC-05]
+    20: [NFR-AUD-04, NFR-CFG-02]
+    21: [NFR-OBS-02, NFR-SUP-03]
+    22: [NFR-AUD-01, NFR-AUD-02]
+    23: [NFR-RET-02, NFR-RET-03]
+    24: [NFR-OBS-05, NFR-SUP-05, NFR-PRF-07]
+    25: [NFR-OBS-03, NFR-OBS-05]
+    26: [NFR-OBS-01, NFR-SUP-05, NFR-REC-03]
+    27: [NFR-RET-02]
+    28: [NFR-RSP-03, NFR-MNT-05]
+    29: [NFR-MNT-06]
+    30: [NFR-SUP-01, NFR-PRV-02]
+    31: [NFR-SEC-01]
+    32: [NFR-SEC-04]
+    33: [NFR-SEC-01, NFR-INT-03]
+    34: [NFR-SEC-05]
+    35: [NFR-AUD-01]
+    36: [NFR-SEC-01, NFR-SEC-05]
+    37: [NFR-SEC-01]
+    38: [NFR-PRF-05]
+    39: [NFR-PRF-08]
+    40: [NFR-CFG-03, NFR-PRV-06]
+    41: [NFR-AUD-03, NFR-PRF-03]
+  # where a row without an FR item is specified
+  specified_default:
+    1: "Annex X; Technical Specification (BDOI IT)"
+    2: "Annex X; Technical Specification (BDOI IT)"
+    3: "Annex V (retention review); Annex Z (UA-Q53)"
+    5: "Annex J (screens); programme screen standards"
+    20: "Lists of values (Annex M.8)"
+    23: "Annex V (retention review); Annex Z (UA-Q53)"
+    27: "Annex V (retention review); Annex Z (UA-Q53)"
+    29: "User-administration guide of the Help Center"
+    30: "Engagement terms"
+  # how the row is met, where BDOI's FRS answered it after the BIBS FRS was written
+  approach:
+    11: "Directory sign-in through the Enterprise SSO platform (EIAM on Microsoft Entra ID), which holds the BDO directory accounts (BDOI FRUM.001.02); single sign-on with OpenID Connect or SAML 2.0, switched on by configuration."
+    17: "Replaced by the sign-in through the Enterprise SSO platform (BDOI FRUM.001.02); the Windows ID identifies the user (Annex E)."
+    19: "For single sign-on users the lock-out of the Enterprise SSO platform applies (BDOI FRUM.001.02, three invalid tries); local break-glass accounts lock after 3 failed attempts."
+    31: "Password reset and change through the Enterprise SSO platform (BDOI FRUM-004.02); for the break-glass accounts, reset by a System Administrator with change at the next sign-in."
+    33: "Single sign-on through the Enterprise SSO platform (BDOI FRUM.001.02), OpenID Connect or SAML 2.0, switched on by configuration once BIBS is registered (Annex Z)."
+    36: "Password policy of the Enterprise SSO platform: expiry at least every 90 days, last 10 passwords refused (BDOI FRUM-004); the break-glass accounts follow the same values in the system."
+    37: "Password recovery through the Enterprise SSO platform (BDOI FRUM-004.03); users manage access through the screens of Annex J; user details come from the Enterprise SSO platform (BDOI FRUM.002.02)."
+
+# ----------------------------------------------------------------------------------- Annex Y data set-up at go-live
+data_setup:
+  intro: >-
+    What User Access Maintenance needs loaded before go-live (and before each test cycle), where it comes from, the
+    template, who provides it and who checks it. Users are not migrated from the legacy systems (data migration
+    decision DMQ30): they are loaded with the bulk request and approved like single requests. The templates are the
+    tabs UA-01 to UA-06 of the BIBS Master Data and Configuration Upload Templates v1.2.
+  header: ["What is loaded", "Source", "Template", "Provided by", "Checked by", "How it is loaded", "Needed by"]
+  rows:
+    - ["Lists of values: business unit group, user level, deactivation reasons", "BDOI Business Administration", "UA-06 Lists of values (CI-06)", "Business Administration", "Process Owner", "Lists of Values under maker-checker", "1-Nov-2027 (before the users)"]
+    - ["Group profiles and their permissions (role-to-permission matrix)", "BDOI's User Access Matrix (Annex C), completed", "UA-02 Role matrix (CI-02)", "Business Administration with the unit heads", "Information Security (signs)", "Group-profile requests, approved and implemented; checked with the User Group Profile Report", "9-Apr-2027 (trial migration 1)"]
+    - ["Users with their group profiles", "BDOI HR and unit heads; for SSO users the EIAM accounts", "UA-01 Users and roles (CI-01)", "Business Administration with the unit heads", "Approver of the bulk request", "Bulk request, checked row by row and approved", "SIT/UAT reviewers 9-Apr-2027; production 1-Nov-2027"]
+    - ["Approvers, approval rules and authorisation limits", "BDOI Business Administration; Comptrollership for amounts", "UA-03 Approval rules (CI-03)", "Business Administration; Comptrollership", "Information Security", "Requests (users' profiles and limits); settings", "16-Jul-2027"]
+    - ["Separation-of-duties rules", "BDOI Information Security", "UA-04 SoD rules (CI-04)", "Information Security", "Information Security (authoriser)", "Separation of Duties screen, authorised", "16-Jul-2027"]
+    - ["Password, session and sign-in settings", "BDOI Information Security; BDOI IT for the sign-in mode", "UA-05 Parameters (CI-05)", "Information Security; BDOI IT", "Information Security (approver)", "System Parameters, approved", "16-Jul-2027"]
+    - ["Break-glass administrators and their second factor", "BDOI IT and Information Security", "-", "BDOI IT", "Information Security", "Enrolment of two named local accounts", "Before single sign-on is switched on"]
+  not_loaded: "Not loaded: the access requests, access history and audit logs of the legacy systems stay in the legacy systems for their retention period (retention values, UA-Q53)."
+
+# ------------------------------------------------------------- Annex Z assumptions, dependencies and open questions
+# Every item of our sources is classified once: open (Annex Z.3), input (a value or data the Business Unit provides:
+# requirements collection workbook and Annex Y), assumption / dependency (Z.1, Z.2), or answered by BDOI's FRS (dropped
+# from the document, listed in the RTM workbook sheet "Answered in the BDOI FRS" with the BDOI clause).
+open_items:
+  intro: >-
+    Only the points that BDOI's FRS does not answer. Each of our earlier references (CLR-UA, UQ, IQ, UA-Q, A-UA,
+    D-UA) is kept in a column so that the link to earlier decisions is not lost. The points that BDOI's FRS answers
+    were checked one by one and are listed, with the clause of BDOI's FRS that answers them, in the Test Cases and
+    Traceability workbook (sheet "Answered in the BDOI FRS"). The values and data the Business Unit provides are in
+    the requirements collection workbook.
+  assumptions:
+    - [A-UA-02, "Group profiles are the roles of the system; a user may hold several (BRD NFR 1.c-d).", "FRUM.001.02, FRUM.005"]
+    - [A-UA-03, "BDOI's User Access Matrix (Annex C, preliminary) is completed and approved by the Business Unit before UAT.", "Annex C; UA-Q29"]
+    - [A-UA-05, "The approvers of a group-profile request decide in the order chosen and all must approve.", "FRUM.005.03"]
+    - [A-UA-06, "Single sign-on through EIAM is switched on by configuration once BDOI IT registers BIBS for each environment; SIT uses local sign-in until then; the break-glass administrators keep local sign-in.", "Annex N"]
+    - [A-UA-07, "The infrastructure rows answered \"Follow existing QPS set up\" are met by the BIBS standards agreed for all BRDs.", "Annex X; UA-Q57"]
+    - [A-UA-08, "The duplicate BRD IDs 2.002.7.1 and 3.003.1.1 are kept as printed and marked \"(2nd)\".", "Section 2; Annex P"]
+  dependencies:
+    - [D-UA-01, "BDOI IT registers BIBS in EIAM for each environment, with test accounts for SIT and UAT.", "FRUM.001.02 (CLR-UA-01)"]
+    - [D-UA-02, "BDOI supplies the business unit groups and user levels.", "FRUM.002.03 (CLR-UA-05)"]
+    - [D-UA-03, "BDOI names the Requestors, Approvers, Second Approvers and the high-privilege profiles.", "Section 3; FRUM.010.05 (UQ01, UQ07)"]
+    - [D-UA-05, "The e-mail relay of each BIBS environment is available.", "FRUM.013 (UA-Q56)"]
+    - [D-UA-07, "The decision on C01 (where requests are raised) is taken before the provisioning from UIDM-ISC is set up.", "FRUM.002, FRUM.003, FRUM.009 to FRUM.011"]
+  open_header: ["No.", "Our references", "Question", "Why it matters", "Format of the answer needed", "Owner", "Needed by"]
+  open:
+    - {refs: "CLR-UA-01; UA-Q06; IQ04", q: "Which single sign-on standard does EIAM use for BIBS (OpenID Connect proposed, SAML 2.0 fall-back), and when is BIBS registered for each environment?", why: "BDOI's FRS onboards BIBS in the Enterprise SSO (FRUM.001.02) but does not name the standard or the registration.", fmt: "Choice: OpenID Connect or SAML 2.0; per environment: registration date, sign-in and sign-out addresses, identifier returned, two test accounts", owner: BDOI IT, by: 2026-12-01}
+    - {refs: "CLR-UA-23; UA-Q12", q: "Should Log Out also end the user's EIAM session (single sign-out)?", why: "Ending the EIAM session also signs the user out of the other BDO applications.", fmt: "Yes / No", owner: BDOI IT, by: 2026-12-01}
+    - {refs: "UA-Q11", q: "What is the longest a session may last before the system asks to sign in again (the fixed end before which the session-end warning appears)?", why: "BRD x.001.1.3 asks for a warning before the system-triggered log-out; BDOI's FRUM.001.04 gives the 30-minute inactivity time-out only.", fmt: "Number of hours (proposed: 10)", owner: Information Security, by: 2026-12-01}
+    - {refs: "CLR-UA-24; UA-Q13", q: "Are local break-glass System Administrator accounts allowed when EIAM is the sign-in? If yes: how many, who holds them, where the credentials are kept and how each use is reviewed.", why: "BDOI's FRS requires the Enterprise SSO for every sign-in; the system must stay manageable when EIAM is not available.", fmt: "Yes / No; number; names of the holders; vault; review period", owner: Information Security, by: 2026-12-01}
+    - {refs: "CLR-UA-17; UA-Q10", q: "Which BDO network and device policy enforces access from BDO-issued devices only?", why: "BRD 1.001.1 a; the system cannot see the device a browser runs on.", fmt: "Name of the policy and confirmation that it applies to BIBS", owner: BDOI IT, by: 2026-12-01}
+    - {refs: "CLR-UA-09; UQ09; UA-Q44", q: "Must one session per user or per device be enforced?", why: "BDOI's FRUM.001.01 allows several tabs; one session per device is not stated.", fmt: "Yes (per user / per device) / No", owner: Information Security, by: 2026-12-01}
+    - {refs: "UQ13", q: "Must the user list show who is online in real time, and must an administrator be able to end a user's session?", why: "BRD NFR p.14 lists the status Online.", fmt: "Yes / No for each", owner: Business Administration, by: 2026-12-01}
+    - {refs: "UQ07", q: "Which group profiles are high privilege, what are the working hours, and who gives the additional review of privileged or out-of-hours changes?", why: "BRD NFR 11 asks for the escalation of such changes; Annex Q, C17.", fmt: "List of profiles with level High or Admin; hours (e.g. 08:00-18:00 Mon-Fri); role of the second approver", owner: Information Security, by: 2027-07-16}
+    - {refs: "CLR-UA-14; UA-Q37", q: "Do public holidays count as out of hours for the second approval?", why: "The working hours have no holiday calendar.", fmt: "Yes / No", owner: Information Security, by: 2027-07-16}
+    - {refs: "CLR-UA-08; UA-Q42", q: "Dormant accounts: after how many days without a sign-in is a user deactivated, and how many days before is the user told?", why: "Information Security practice; BRD NFR 1.e allows accounts to be disabled.", fmt: "Number of days (proposed 90) and notice days (proposed 7); 0 switches it off", owner: Information Security, by: 2027-07-16}
+    - {refs: "CLR-UA-15; UA-Q31", q: "When a new separation-of-duties rule is made, does Information Security review the users who already hold both profiles and raise the requests?", why: "Existing access changes only through requests.", fmt: "Yes / No and who raises the requests", owner: Information Security, by: 2027-07-16}
+    - {refs: "CLR-UA-04; UA-Q24", q: "Do external (portal) users stay switched off?", why: "The BDOI drop plan has no portal.", fmt: "Yes / No", owner: BDOI IT, by: 2026-12-01}
+    - {refs: "CLR-UA-06; UQ06; UA-Q39", q: "Effective dates: may a user access change start on a later date, and may access be given until an end date (temporary access)?", why: "BRD NFR 1.k asks for an effective date; an end date is not stated. Applies to the changes raised in the system (decision C01).", fmt: "Start date: Yes / No; End date: Yes / No", owner: Business Administration, by: 2026-12-01}
+    - {refs: "CLR-UA-13", q: "If temporary access is needed: who is told before the end date and how many days before?", why: "Follows the answer above.", fmt: "Role and number of days", owner: Business Administration, by: 2026-12-01}
+    - {refs: "CLR-UA-11; UA-Q32", q: "Should the Requestor read the User Access Matrix?", why: "BRD 4.002.2.7 (view function) does not name the matrix.", fmt: "Yes / No", owner: Business Administration, by: 2026-12-01}
+    - {refs: "CLR-UA-18; CLR-UA-19; CLR-UA-20; UA-Q36", q: "Confirm the stages and labels shown on a request (Draft, Pending Approval, Second approval, Approved / For implementation, Implemented, Scheduled, Returned, Rejected, Cancelled) and the full status labels.", why: "The screens show these stages (Annex J).", fmt: "Confirm / give the labels", owner: Business Administration, by: 2026-12-01}
+    - {refs: "CLR-UA-27; UA-Q04", q: "Accept the numbered acceptance criteria of section 3 and the IDs UAM-NFR-01 to 41 as the acceptance basis; BRD rows without a Mandatory flag treated as Must have.", why: "The BRD has no acceptance criteria and no NFR IDs; they are the basis of the test cases.", fmt: "Accept / amend per item", owner: "Business Administration; Information Security", by: 2026-12-01}
+    - {refs: "UQ15; UQ18; UA-Q54", q: "What do the BRD lines \"allow automatic save option\" (audit trail, p.14) and the cut-off documentation line (p.17) mean?", why: "Two BRD lines are incomplete.", fmt: "Text of the complete requirement", owner: "ES-BPDS (BRD owner)", by: 2026-12-01}
+    - {refs: "UA-Q21", q: "How will access certification work: frequency, who certifies, the content of the extract and how revocations come back?", why: "Joiner, mover and leaver changes come from UIDM-ISC (BDOI's FRS); certification closes the loop.", fmt: "Frequency; certifier role; extract fields; return path", owner: Information Security, by: 2027-07-16}
+    - {refs: "UA-Q45; UA-Q46; UA-Q47; UA-Q48", q: "Data access by company and branch: who may narrow a user's data access, must branch-limited users see only their branches in reports, must the home branch be included, and is widening flagged for second approval?", why: "BDOI's FRUM.001.02 and FRUM.005.01 give supervisory and record-ownership access; the branch rules are not stated.", fmt: "Yes / No and role for each of the four points", owner: Information Security, by: 2027-07-16}
+    - {refs: "UA-Q51", q: "Are the event / incident, device status and historical events reports of the BRD volume table (p.11) required, and must any report be produced on a schedule for named recipients?", why: "They are not among the report samples (p.18).", fmt: "List of reports with frequency and recipients, or None", owner: Business Administration, by: 2026-12-01}
+    - {refs: "UA-Q55", q: "Masking of user data: may the user-access screens and reports show the Windows ID, e-mail and mobile number in full to their authorised viewers?", why: "Data Privacy Act 2012 (BRD NFR p.12).", fmt: "Field by field: Show / Mask, per role", owner: Information Security, by: 2027-07-16}
+    - {refs: "UA-Q57", q: "Confirm that the infrastructure rows answered \"Follow existing QPS set up\" are replaced by the BIBS standards agreed for all BRDs.", why: "Annex X; the QPS set-up does not apply to the new platform.", fmt: "Confirm / list the exceptions", owner: BDOI IT, by: 2026-12-01}
+    - {refs: "Q.5 (approval times)", q: "Approval times: how many working days may each approval stage take, when is a reminder sent and to whom is an overdue request escalated?", why: "The BRD sets no service level; Annex S proposes 2 working days.", fmt: "Days per stage; reminder day; escalation role", owner: Business Administration, by: 2026-12-01}
+    - {refs: "Q.5 (e-mail copy of notices)", q: "Should the notices of requests (to approve, returned, decided) also be e-mailed?", why: "BRD 1.006.1.1, 1.008.1.4 and 2.002.1 ask for a notification; the system gives it in the system.", fmt: "Yes / No per notice of Annex T", owner: Business Administration, by: 2026-12-01}
+  # Inputs (values and data, requirements collection workbook) and answered items. answered: ID -> [BDOI clause, answer]
+  inputs: [CLR-UA-05, UQ01, UQ05, UQ12, UA-Q27, UA-Q29, UA-Q30, UA-Q33, UA-Q35, UA-Q49, UA-Q52, UA-Q53, UA-Q56, UA-Q19, UA-Q22, CFG-071, CFG-110, CFG-111, CFG-112, CFG-113, DEP-16, TD-11, SO-11-1, SO-11-2, SO-11-3, D-UA-04]
+  answered:
+    UA-Q01: ["1.1 Document Purpose; FRUM.001.02", "The FRS covers BDO Insure Brokering System (BIBS) - User Access Maintenance: one set of users, roles and permissions for the whole application (\"User shall only access ... modules based on the permission on the access matrix\")."]
+    UQ19: ["1.1 Document Purpose; FRUM.001.02", "As UA-Q01: the requirements apply to BIBS as a whole."]
+    A-UA-01: ["1.1 Document Purpose", "As UA-Q01."]
+    UA-Q02: ["Cover: \"Release 1 / Drop 0\"", "User Access Maintenance is accepted as Drop 0 of Release 1."]
+    UA-Q03: ["Signoff Sheet", "Signatories: System Analyst / Business System Analyst (prepared), BU Project Owner, Delivery Manager, BU Product Owner Supervisor / Project Sponsor, Application Owner, Platform Owner."]
+    CLR-UA-21: ["FRUM.001.02", "\"The system shall require users to sign in using their authorized Enterprise SSO account\"; \"shall integrate with Enterprise SSO platform for user authentication\": EIAM replaces the EUA and LDAP sign-in."]
+    UQ04: ["FRUM.001.02", "As CLR-UA-21: no EUA interface."]
+    UA-Q05: ["FRUM.001.02", "As CLR-UA-21."]
+    CLR-UA-26: ["FRUM.002.02; FRUM.005 (In-Scope)", "\"The system shall preserve application-specific roles and permissions maintained within BDOI-BROKERSYS application\": roles stay in the system, not taken from EIAM groups."]
+    UA-Q09: ["FRUM.002.02; FRUM.005", "As CLR-UA-26."]
+    CLR-UA-25: ["FRUM.001.02; FRUM-004.01", "\"Access to the application disables after three (3) invalid password tries\"; the system \"shall rely on the Enterprise SSO platform for password expiry validation\": lock-out and password rules are those of the Enterprise SSO."]
+    UA-Q15: ["FRUM.001.02; FRUM-004", "As CLR-UA-25."]
+    UQ08: ["FRUM-004.01 to FRUM-004.03", "Password expiry at least every 90 days, reuse of the last 10 passwords prevented, no reset or forgot-password function in the application (Enterprise SSO)."]
+    UA-Q16: ["FRUM-004.01 to FRUM-004.03", "As UQ08; the values of the break-glass accounts follow from CLR-UA-24 (open)."]
+    CLR-UA-02: ["FRUM.001.02", "\"Grant access based on the user's assigned roles and permissions\" on the access matrix of Annex C: authorisation stays in the system; no external access-control list."]
+    UQ14: ["FRUM.001.02", "As CLR-UA-02."]
+    UA-Q23: ["FRUM.001.02", "As CLR-UA-02."]
+    CLR-UA-03: ["FRUM.002 and FRUM.003 (Out-of-Scope); mapping rows BRD 1.006 to 1.009, 2.002 \"c/o UIDM\"", "User requests are raised outside the application (UIDM) and user details are synchronised. The difference with the BRD remains decision C01 of Annex Q."]
+    IQ05: ["FRUM.002, FRUM.003; mapping \"c/o UIDM\"", "As CLR-UA-03."]
+    UA-Q18: ["FRUM.002, FRUM.003", "As CLR-UA-03."]
+    UA-Q20: ["FRUM.002.02, FRUM.003.03", "Changes approved in UIDM are synchronised to the application; roles stay in the application. Decision C01 of Annex Q."]
+    CLR-UA-16: ["Mapping row BRD 1.009.1 \"c/o UIDM\"", "Bulk requests are handled in UIDM; the bulk settings apply only if decision C01 keeps requests in the system (Annex Q, C24)."]
+    UQ10: ["Mapping row BRD 1.009.1", "As CLR-UA-16."]
+    UA-Q41: ["Mapping row BRD 1.009.1", "As CLR-UA-16."]
+    UQ02: ["Mapping row BRD 2.002.1 \"c/o UIDM\"; FRUM.006", "Approval of user requests is done in UIDM; for group profiles see decision C22 of Annex Q."]
+    UA-Q34: ["Mapping row BRD 2.002.1", "As UQ02."]
+    CLR-UA-07: ["FRUM.006.02.01", "A role with members can be deactivated: the members are displayed before, the role is no longer assignable, assignments are kept for history and access is restricted."]
+    UQ16: ["FRUM.006.02.01", "As CLR-UA-07."]
+    UA-Q40: ["FRUM.006.02.01", "As CLR-UA-07."]
+    CLR-UA-12: ["FRUM.006.01, FRUM.006.03", "\"Apply approved role updates to all users assigned to the role\"; \"automatically enforce updated permissions after successful save\". The difference with the implementation step of BRD p.6 remains decision C03 of Annex Q."]
+    UQ03: ["FRUM.006.01, FRUM.006.03", "As CLR-UA-12."]
+    A-UA-04: ["FRUM.006.03", "As CLR-UA-12."]
+    UA-Q38: ["FRUM.005.01, FRUM.006.01", "Authorised users create and change roles directly in the application (the request is made outside); decision C03 of Annex Q."]
+    UQ17: ["FRUM.002.02, FRUM.003.01", "User details are maintained in the Enterprise SSO platform and synchronised; users do not update them in the application."]
+    UA-Q17: ["FRUM.002.02, FRUM.003.01", "As UQ17."]
+    UA-Q25: ["Annexes E, G and H (\"User ID: User's Windows ID\")", "The user ID is the Windows ID; difference with the a999999999 format of BRD NFR 1.j is decision C06 of Annex Q."]
+    CLR-UA-22: ["FRUM.002.01", "The user is linked to the Enterprise SSO account; duplicates are an existing AD e-mail and Windows ID combination."]
+    UA-Q08: ["FRUM.002.01; Annex E", "As CLR-UA-22."]
+    UA-Q43: ["FRUM.001.03, FRUM.001.04", "Inactivity warning at 15 minutes and time-out at 30 minutes for the application."]
+    CLR-UA-10: ["Annex F (Module Name, Task Name)", "Module Name: the system module or functional area of the permission; Task Name: the action or function within the module."]
+    UQ11: ["Annex F; Annex E (Date Coverage: As of Date)", "As CLR-UA-10; \"as of\" is the date coverage of the report."]
+    UA-Q50: ["Annex F", "As CLR-UA-10."]
+    UA-Q07: ["FRUM.001.02", "BIBS is onboarded as an authorised application in the Enterprise SSO; the registration details remain an integration input (Annex Z, CLR-UA-01)."]
+    UA-Q14: ["FRUM.001.02", "The system denies users whose Enterprise SSO accounts are inactive, locked, disabled or unauthorised."]
+  # references of our sources that exist only as parts of the open items above (kept for the completeness check)
+  covered_by_open: [D-UA-06, UA-Q10, UA-Q24, UA-Q31, UA-Q32, UA-Q37, UA-Q39, UA-Q42, UA-Q44]
+
+# ---------------------------------------------------------------------------------- Annex AA change control
+change_control:
+  intro: >-
+    Once this FRS is signed it is the baseline of User Access Maintenance (section 1.6). This annex says what the
+    signature freezes, how a change is raised and decided, and where it is recorded: the Change Request Register
+    workbook of BRD-11.
+  freezes:
+    - "The functional requirements of section 3 with their acceptance criteria, and the Business Requirements Mapping of section 2."
+    - "The screens, fields, actions, messages and walkthroughs (Annexes J, K and O), the e-mail texts (Annex T), the document formats (Annex U), the reports and schedules (Annex V)."
+    - "The workflow and approvals (Annex S), the business rules (Annex M) and the integrations at business level (Annexes N and W)."
+  not_frozen: >-
+    Not frozen: the content of the configuration - users, group profiles and their permissions, approvers, list
+    values and the settings of Annex M (password, session, working hours, dormancy). They change in the system
+    through approved requests and audited changes, without a change request.
+  steps_header: ["Step", "What happens", "Who", "Record"]
+  steps:
+    - ["1 Raise", "The change is written with the BRD ID, the FR item or annex concerned, the reason and the business priority", "Any signatory or the Process Owner", "Register: new row, status Raised"]
+    - ["2 Assess", "Impact on scope, schedule, cost (mandays), the other BRDs (interface lines of Annex W), the test cases and the training", "iorta TechNXT Project Team with the System Analyst (BDO ITG)", "Impact assessment form; status Assessed"]
+    - ["3 Approve", "Decision by the owners of every BRD touched; a change to a separation-of-duties rule, the sign-in or a security setting also by Information Security; a change to an integration also by BDOI IT", "Business owner; Process Owner; Information Security; BDOI IT", "Decision, approved by, date; status Approved or Rejected"]
+    - ["4 Schedule", "The change is given a drop and a version of this FRS (1.4, 1.5 and so on)", "Project managers", "Target drop; status Scheduled"]
+    - ["5 Test", "The test cases linked to the change are updated and run", "Test lead; Business Unit testers", "Linked test cases; result"]
+    - ["6 Close", "The new version of the FRS and of the workbooks is issued with the change marked", "System Analyst (BDO ITG)", "Status Closed"]
+  candidates: >-
+    The Change Request Register is seeded with the candidate changes already known - the points where this FRS or
+    BDOI's FRS goes beyond the BRD text - with the status "Candidate - for decision", and with one decision row per
+    observation of Annex Q so that the Business Unit records its decision on each.
+
+# ---------------------------------------------------------------------------------- Annex AB review checklist
+checklist:
+  intro: >-
+    The points the Business Unit confirms before signing. Tick each point when it is confirmed; a point that cannot
+    be confirmed is recorded as a comment in the requirements collection workbook (sheet Questions and comments) or,
+    when it changes the document, in the Change Request Register.
+  header: ["No.", "Point", "Where", "What to confirm", "Role", "Done"]
+  rows:
+    - ["Scope", "1.8, section 2", "In scope, out of scope and handled elsewhere are as the Business Unit expects", "Product Owner"]
+    - ["Every BRD ID mapped", "Section 2; Annex P", "Each of the BRD IDs is mapped to at least one FR item", "System Analyst (BDO ITG)"]
+    - ["Where requests are raised", "Annex Q, C01", "The choice between UIDM-ISC and the system for user access requests", "Process Owner; BDOI IT; Information Security"]
+    - ["Roles and group profiles", "FRUM.005, FRUM.006; Annex Q C02, C03, C22", "How roles are created, changed and implemented", "Process Owner; Information Security"]
+    - ["Process flows", "Annex A", "Each flow matches the way the Business Unit works", "Process Owner"]
+    - ["Status life-cycles", "Annex A", "The statuses and who moves a record from one to the next", "Process Owner"]
+    - ["Workflow and approvals", "Annex S", "Maker, checker and approver of each change; the approval times", "Process Owner; Information Security"]
+    - ["Second approval", "FRUM.010.05; Annex Z (UQ07)", "The high-privilege profiles and the working hours", "Information Security"]
+    - ["Separation of duties", "FRUM.012; Annex M.6", "The pairs of profiles one user may not hold", "Information Security"]
+    - ["Sign-in and sessions", "FRUM.001; Annex N", "Single sign-on, inactivity warning, time-out, session end, log-out", "Information Security; BDOI IT"]
+    - ["Passwords and break-glass", "FRUM-004, FRUM.001.06; Annex M.4", "Password rules of the break-glass accounts and who holds them", "Information Security"]
+    - ["User data", "FRUM.002; Annexes E and J", "User ID, Windows ID and the user fields", "Process Owner; BDOI IT"]
+    - ["Screens", "Annex J", "Fields, labels, mandatory rules and actions of each screen", "Process Owner"]
+    - ["Menu by persona", "Annex J (figure)", "What each persona sees in the menu", "Process Owner; Information Security"]
+    - ["Messages", "Annex K", "The wording of the messages", "Process Owner"]
+    - ["E-mail and notice texts", "Annex T", "Trigger, recipients and wording of each notice and e-mail", "Process Owner"]
+    - ["Document formats", "Annexes B, D and U", "The layout of each report and export, the file names", "Process Owner; Auditor"]
+    - ["Reports and schedules", "Annex V", "Report filters and columns; the times of the daily runs", "Process Owner; Information Security"]
+    - ["Audit log", "FRUM.008; Annex H", "The activities recorded and the fields shown", "Information Security; Auditor"]
+    - ["Integrations", "Annexes N and W", "Each interface, its owner and what BDOI IT provides", "BDOI IT"]
+    - ["Non-functional requirements", "Annex X", "How each BRD non-functional row is met", "BDOI IT; Information Security"]
+    - ["Data set-up", "Annex Y", "What is loaded, from which template, by whom and when", "Process Owner"]
+    - ["Open questions", "Annex Z", "An owner and a date for each open question", "Product Owner"]
+    - ["Observations and decisions", "Annex Q", "A decision recorded on each observation (Change Request Register, Decisions log)", "Product Owner; Process Owner"]
+    - ["Acceptance criteria", "Section 3", "The acceptance criteria are the basis of UAT", "Process Owner; Information Security"]
+    - ["Test cases and walkthrough users", "Review workbooks", "The test cases and the sign-in IDs for the walkthrough", "Process Owner"]
+    - ["Change control", "Annex AA", "What signing freezes and how a change is raised", "Product Owner"]
+
+# ---------------------------------------------------------------------------------- Annex Q.5 observations of v1.3
+observations:
+  - topic: E-mail copy of the request notices
+    bdoi: "-"
+    brd: "BRD 1.006.1.1, 1.008.1.4 and 2.002.1 a: receive notification on the returned, decided and to-approve request."
+    proposal: "The notices of requests (NT-01 to NT-06) are given in the system (bell); Annex L of version 1.2 said they were also e-mailed by preference, which the system does not do today. Annex L is corrected and the e-mail copy is a point for decision (Annex Z)."
+    impact: "Annexes L and T; FRUM.013.01."
+    decide_by: Process Owner (Business Administration)
+  - topic: Notices not listed in version 1.2
+    bdoi: "-"
+    brd: "BRD NFR p.17 (1, 11)."
+    proposal: "The two notices of the reset of a break-glass authenticator app (NT-19, NT-20) are added to Annex T."
+    impact: "Annex T."
+    decide_by: Information Security - for information
+  - topic: Wording of three system texts
+    bdoi: "-"
+    brd: "-"
+    proposal: "Proposed wording for BDOI's approval: NT-17 \"New rule <rule>: <reason>\" instead of \"The new rule of rule <rule>\"; NT-13 \"(emergency role edit)\" instead of the setting code shown today; NT-18: the system says \"<user> requests a change from ... to ...\" while Annex L of version 1.2 showed \"asks to change it from\"; Annex L now quotes the system and BDOI chooses the wording."
+    impact: "Annexes L and T."
+    decide_by: Process Owner (Business Administration)
+  - topic: Approval times, reminders and escalation
+    bdoi: "-"
+    brd: "No service level in the BRD."
+    proposal: "Proposed: 2 working days per approval stage, 1 for the second approval and the implementation; a reminder on the next working day and escalation to the Business Administrator after 5 working days. Not available in the system today: the age of each request is shown on the Access Requests list and report."
+    impact: "Annex S; Change Request Register (candidate)."
+    decide_by: Process Owner (Business Administration)
+  - topic: Scheduled access review report
+    bdoi: "-"
+    brd: "BRD NFR p.11 (audit log report weekly, monthly, yearly) - UA-Q51."
+    proposal: "Proposed as best practice: the User Access Report and the User Access Audit Log of the month sent to Information Security on the first working day of each month. Not available today (reports run on demand)."
+    impact: "Annex V; Change Request Register (candidate)."
+    decide_by: Information Security
+  - topic: Alert of a break-glass sign-in
+    bdoi: "FRUM.001.02: SSO for every user."
+    brd: "BRD NFR p.17 (11): changes systematically monitored."
+    proposal: "FRUM.001.06 asks that Information Security is alerted at every break-glass sign-in. The system records the sign-in with its method in the audit trail today; the alert is planned for the release that switches single sign-on on."
+    impact: "FRUM.001.06; Annex N."
+    decide_by: Information Security
+  - topic: Non-functional rows without an FR item
+    bdoi: "-"
+    brd: "BRD section 6 (41 rows, no IDs)."
+    proposal: "Annex X lists all 41 rows with how each is met; version 1.2 traced only the 25 rows that carry a function (Annex P)."
+    impact: "Annex X."
+    decide_by: BDOI IT - for information
+  - topic: Open questions answered in BDOI's FRS
+    bdoi: "Sections 1 to 3 and Annexes E to I."
+    brd: "-"
+    proposal: "Our earlier questions that BDOI's FRS answers are no longer asked; each is listed with the BDOI clause that answers it in the Test Cases and Traceability workbook (sheet Answered in the BDOI FRS). Where BDOI's answer differs from the BRD, the decision stays in Annex Q."
+    impact: "Annex Z."
+    decide_by: System Analyst (BDO ITG) - for information
+  - topic: E-mail sender and footer
+    bdoi: "-"
+    brd: "BRD NFR p.17 (10)."
+    proposal: "The e-mails are plain text without a footer; BDOI gives the sender address of each environment and, if required, its standard footer or disclaimer (requirements collection workbook)."
+    impact: "Annex T."
+    decide_by: BDOI IT; Process Owner (Business Administration)
+
+glossary_add:
+  - [Break-glass account, "See Break-glass administrator"]
+  - [Change request, "A request to change something frozen by the signature of this FRS (Annex AA)"]
+  - [Checker, "The user who checks and approves the work of the maker (four eyes)"]
+  - [Maker, "The user who prepares a request or record for another user to check"]
+  - [OOTB, "Out of the box: what the system offers as standard or by configuration"]
+  - [SLA, "Service level: the time within which a stage must be completed"]
+  - [Swim lane, "A column of a process figure holding the steps of one persona"]
+  - [UAT, "User acceptance testing by the Business Unit"]

@@ -1,5 +1,5 @@
 # Business Unit review edition of BDOI's Renewal FRS (version 1.1): the summary for the Business Unit (Introduction),
-# Annexes AD to AJ, AM, AO and AP, and the observations of Annex AN.5. Read by build_brd06_bdoi_frs.py and by
+# Annexes AD to AK, AN, AP and AQ, and the observations of Annex AP.5. Read by build_brd06_bdoi_frs.py and by
 # build_brd06_workbooks.py. Business words only; the e-mail texts are those of the system (checked at every build
 # against the platform: the fragments under "code" must be found word for word).
 
@@ -19,8 +19,8 @@ summary:
     - ["Dashboards, reports, audit, maintenance; go-live take-over (FRRN.002.02, 042-049)", "-", "Migrated policies and their packages: Data Migration FRS"]
   numbers_intro: "The key numbers of this version, by where they are in the document:"
   decisions_intro: >-
-    The ten decisions with the widest effect, of the points listed in Annex AN (conflicts between BDOI's FRS and the
-    BRD or the system) and Annex AM (open questions not answered in BDOI's FRS). Each must be decided before the
+    The ten decisions with the widest effect, of the points listed in Annex AO (conflicts between BDOI's FRS and the
+    BRD or the system) and Annex AN (open questions not answered in BDOI's FRS). Each must be decided before the
     sign-off, or signed as proposed in this version.
   decisions:
     - [1, "Third classification: Non-Renewable (BDOI) or Exception (BRD BRRN.023); missing data Review or Exception", "C01", "Product Owner, Renewal"]
@@ -32,21 +32,21 @@ summary:
     - [7, "Second approval after the client's acceptance and the automatic Submitted for Placement", "C23, C28", "Product Owner, Renewal; Processing"]
     - [8, "Delivery through CCM and MFT at go-live, with e-mail as the fall-back", "C17", "BDO ITG"]
     - [9, "Letters: lock at the Renewal Advice (BRD 2.004.9) or after posting and placement; NAL and NRL rules", "C11, C15", "Product Owner, Renewal"]
-    - [10, "KYC blocking or visibility only; the incentive criteria", "AM.3", "Compliance; Product Owner, Renewal"]
+    - [10, "KYC blocking or visibility only; the incentive criteria", "AN.3", "Compliance; Product Owner, Renewal"]
   review_intro: "Which part each role reads, in this order:"
   review_header: ["Role", "Read first", "Then", "About"]
   review:
-    - ["Product Owner, Renewal", "This summary; Annex AN; Annex AM", "Annex AD; Annex AP", "2 hours"]
-    - ["Marketing Team Leads and Account Officers", "Process Flow; FRRN.002-020", "Annexes AA, AE, AK", "3 hours"]
-    - ["Processing Team Leads and Officers", "Process Flow; FRRN.003, 013, 015, 021-037", "Annexes AA, AF, AK", "3 hours"]
+    - ["Product Owner, Renewal", "This summary; Annex AO; Annex AN", "Annex AD; Annex AQ", "2 hours"]
+    - ["Marketing Team Leads and Account Officers", "Process Flow; FRRN.002-020", "Annexes AA, AE, AL", "3 hours"]
+    - ["Processing Team Leads and Officers", "Process Flow; FRRN.003, 013, 015, 021-037", "Annexes AA, AF, AL", "3 hours"]
     - ["LAMD, Contact Center", "FRRN.012, FRRN.047", "Annex AA (their screens)", "1 hour"]
-    - ["Business Administrator (MBS)", "Annex AC; FRRN.038-042, 049", "Annexes AE, AF, AJ", "2 hours"]
-    - ["BDO ITG (System Analyst, Tech Lead)", "Business Requirements Mapping; Annex AN", "Annexes AH, AI, AL, AO", "4 hours"]
+    - ["Business Administrator (MBS)", "Annex AC; FRRN.038-042, 049", "Annexes AE, AF, AK", "2 hours"]
+    - ["BDO ITG (System Analyst, Tech Lead)", "Business Requirements Mapping; Annex AO", "Annexes AH, AJ, AM, AP", "4 hours"]
   workbooks_intro: "The workbooks issued with this edition:"
   workbooks:
     - ["Business Unit Requirements Collection", "What the Business Unit provides: templates and print formats, e-mail wordings to confirm, schedules, parameters, lists, master data, approvers and users, inputs of BDOI IT, open decisions"]
     - ["BRD vs Out-of-the-Box vs Best Practice", "Every BRD requirement against what the system offers and insurance-broking practice, with the fit"]
-    - ["Change Request Register", "How a change is raised after sign-off, the candidate changes and the decision log of Annex AN"]
+    - ["Change Request Register", "How a change is raised after sign-off, the candidate changes and the decision log of Annex AO"]
     - ["Test Cases and Traceability", "BRD ID to FR item to test cases, screens and walkthrough steps; the test cases; the questions answered in BDOI's FRS"]
     - ["Business Unit Walkthrough Users", "The users of the walkthrough with their sign-in IDs, menus and the walkthrough script"]
 
@@ -65,11 +65,11 @@ workflow:
     - ["Transfer", "Request and decision", "Team Lead or Account Officer", "Team Lead of the receiving unit", "-", "Decline with remarks; cancel by the sender"]
     - ["Disposition", "Disposition and submission for posting", "Account Officer", "Marketing Team Lead (approver chosen, FRRN.016.01)", "Ageing flag 30 days before expiry (IBG, Leasing 60); no automatic escalation", "Return with reason and remarks"]
     - ["Posting", "Review and post", "Marketing Team Lead", "-", "-", "Return to the Account Officer"]
-    - ["Overrides", "Outstanding balance, classification, disposition, insurer mismatch, RA cancellation", "Marketing Team Lead", "Remarks recorded (no second approver in the BRD; Annex AN)", "-", "-"]
+    - ["Overrides", "Outstanding balance, classification, disposition, insurer mismatch, RA cancellation", "Marketing Team Lead", "Remarks recorded (no second approver in the BRD; Annex AO)", "-", "-"]
     - ["Processing", "Update, computations, request to the insurer", "Processing Officer", "Processing Team Lead (assignment)", "Insurer reply 10 days; overdue alert", "Return to Marketing"]
     - ["Insurer", "Insurer disposition", "Insurer (file) or Processing", "-", "Late answer blocks straight-through progress", "Revise or Reject reroutes"]
     - ["Renewal Advice", "Generate and send", "Authorised Marketing or Processing user", "-", "First notice 75 days, last notice 45 days before expiry; warning below 30 days", "RA cancellation by override"]
-    - ["Acceptance", "Client acceptance", "Account Officer", "Approver of FRRN.26.01 (BDOI); none in the BRD (Annex AN)", "NRNS reminder 75 days before expiry; non-acceptance at the effective expiry date", "Request for Revision returns to the revision"]
+    - ["Acceptance", "Client acceptance", "Account Officer", "Approver of FRRN.26.01 (BDOI); none in the BRD (Annex AO)", "NRNS reminder 75 days before expiry; non-acceptance at the effective expiry date", "Request for Revision returns to the revision"]
     - ["Placement and booking", "Placement, booking", "Processing; booking user", "Override approval for For Booking Only; Unit Head for Direct-to-Insurer Payment", "Placement TAT 3 / 10 business days, cut-off 3 PM", "Rejected Placement returns to Marketing"]
     - ["Hold cover", "Request, extension, confirmation", "System or user", "Insurer", "CBG 75 days before expiry; extension from 7 days before the end", "Rejected returns to the user"]
     - ["Letters", "NRNS, No Advice, Non-Renewal, non-acceptance", "System; Operations; Account Officer", "-", "On the effective expiry date (+1 / +3 days, Annex M)", "Re-open until expiry plus 30 days"]
@@ -103,7 +103,7 @@ emails:
     full text, attachments, protection and frequency. The texts are the wording of the system today (quoted word for
     word; <name> parts are filled in by the system), proposed by iorta TechNXT for BDOI's approval where BDOI has not
     given its own. Where BDOI's FRS gives the wording (Annexes L, S, W, X), BDOI's wording prevails and the difference
-    is listed in Annex AN.5; the Business Unit approves each text in the requirements collection workbook (sheet
+    is listed in Annex AP.5; the Business Unit approves each text in the requirements collection workbook (sheet
     E-mail wordings).
   common:
     notice: "A notice appears under the bell in the page header and opens the renewal account; the user chooses on Notification Settings whether the events of Renewal also come by e-mail."
@@ -373,7 +373,8 @@ emails:
       brd: BRRN.010; BRD 1.010.7
       frrn: FRRN.022.01, FRRN.022.02
       code: ["Renewal Advice - {{assuredName}} - policy {{policyNo}}", "We are pleased to offer its renewal for the period"]
-      bdoi: "BDOI's approved Renewal Advice templates BDOI-005 to BDOI-008 (one per line) and e-mails BDOI-009 to BDOI-011 (Annex L) prevail; the system's text is replaced by them (Annex AN.5)."
+      source: [renewal/letter/service/LetterWriter.java]
+      bdoi: "BDOI's approved Renewal Advice templates BDOI-005 to BDOI-008 (one per line) and e-mails BDOI-009 to BDOI-011 (Annex L) prevail; the system's text is replaced by them (Annex AP.5)."
     - id: AE.23
       name: Renewal Advice e-mail (second / last notice)
       trigger: Send of a second notice on the Letters screen (FRRN.022.01).
@@ -386,7 +387,7 @@ emails:
       brd: BRRN.010
       frrn: FRRN.022.01
       code: ["Second notice: Renewal Advice - {{assuredName}}", "This is our second notice on the renewal of your policy"]
-      bdoi: "BDOI's templates mark the last notice FINAL NOTICE (Annex L); BDOI's wording prevails (Annex AN.5)."
+      bdoi: "BDOI's templates mark the last notice FINAL NOTICE (Annex L); BDOI's wording prevails (Annex AP.5)."
     - id: AE.24
       name: Password e-mail
       trigger: Follows every protected e-mail of Renewal (Renewal Advice, letters, request to the insurer).
@@ -399,7 +400,7 @@ emails:
       brd: BRRN.010; BRD 1.010.7.1
       frrn: FRRN.024.01, FRRN.022.02
       code: ['"Password for: "', '" are password protected.', '"\n\nThis e-mail was sent separately for your security. Please do not forward it."']
-      bdoi: "BDOI's convention (FRRN.024.01) lets the client derive the password, which BDOI's e-mails BDOI-009 to BDOI-011 explain; whether the separate password e-mail is still sent is a decision (Annex AN.5)."
+      bdoi: "BDOI's convention (FRRN.024.01) lets the client derive the password, which BDOI's e-mails BDOI-009 to BDOI-011 explain; whether the separate password e-mail is still sent is a decision (Annex AP.5)."
     - id: AE.25
       name: No Advice Letter e-mail
       trigger: Send Letters on the No Advice tab (FRRN.023.02).
@@ -451,7 +452,7 @@ emails:
       brd: BRRN.025, 037
       frrn: FRRN.023.03
       code: ["Your policy {{policyNo}} has expired", "as we did not receive your acceptance of the Renewal Advice"]
-      bdoi: "Not in BDOI's matrix; added as a row of Annex M (Annex AN.4)."
+      bdoi: "Not in BDOI's matrix; added as a row of Annex M (Annex AP.4)."
     - id: AE.29
       name: Renewal Advice of a free-first-year account (FFY)
       trigger: The Renewal Advice of a submitted FFY policy (FRRN.048.01).
@@ -490,6 +491,7 @@ emails:
       brd: BRD 3.009.5; 4.007.5
       frrn: FRRN.021
       code: ["Renewals for your decision - batch {{batchNo}}", "Please return the file with your decision on each account"]
+      source: [renewal/insurer/service/InsurerBatchService.java]
       bdoi: "BDOI's FRS gives the success message of FRRN.021 but no e-mail text: the Business Unit confirms this text."
     - id: AE.32
       name: Hold cover request e-mail
@@ -503,7 +505,24 @@ emails:
       brd: BRRN.042
       frrn: FRRN.036.02, FRRN.036.06
       code: ['"Hold cover request - "', "Please hold cover the risk below for thirty (30) days from {{startDate}}"]
-      bdoi: "Annex Z (Hold Cover Template) is a heading only. The text names thirty days whatever the duration (30, 60 or 90 days, FRRN.036.01): Annex AN.5."
+      bdoi: "Annex Z (Hold Cover Template) is a heading only. The text names thirty days whatever the duration (30, 60 or 90 days, FRRN.036.01): Annex AP.5."
+    - id: AE.33
+      name: Step of the progression not completed
+      trigger: A step after the acceptance (completion of the renewal account, placement) cannot be completed (FRRN.028.02).
+      recipients: The Processing Officer of the account
+      channel: Notice in the system
+      subject: "<renewal reference>"
+      body: "<what could not be completed, as recorded in the remarks of the account>"
+      attachments: None
+      frequency: Once per step not completed
+      brd: BRRN.040
+      frrn: FRRN.028.02
+      code: ["public void failed(Long candidateId, String text)"]
+  # the notifications catalogue of the BIBS FRS (NT-nn) and the texts of this annex that quote them
+  catalogue: {NT-01: [AE.01, AE.02, AE.03, AE.04], NT-02: [AE.05], NT-03: [AE.06], NT-04: [AE.07, AE.08, AE.09],
+              NT-05: [AE.10], NT-06: [AE.11], NT-07: [AE.12, AE.13, AE.33], NT-08: [AE.14, AE.15], NT-09: [AE.16],
+              NT-10: [AE.17], NT-11: [], NT-12: [AE.18], NT-13: [AE.19], NT-14: [AE.20], NT-15: [AE.21],
+              NT-16: [AE.22, AE.23, AE.29, AE.30], NT-17: [AE.24], NT-18: [AE.31], NT-19: [AE.25, AE.26, AE.27, AE.28]}
   not_sent:
     - ["Renewal at risk", "The accounts not disposed or not accepted within the escalation days show the ageing flag in the renewal listing and the At risk figure of the dashboard; no message is sent to anyone (BRRN.036)."]
     - ["Proposal, Insurance Advice, e-policy, billing and placement e-mails", "Sent with the wording of BDOI's Annexes S, W and X and of the New Business FRS (FRRN.017.02, 027, 029.04, 032.02, 033.04); the e-mail texts of New Business are in the New Business FRS."]
@@ -537,7 +556,7 @@ documents:
     - {id: DO-12, name: "Insurance Advice", purpose: "Advice to the mortgagee bank (FRRN.032)", recipients: "Client and the BDO unit of the mortgage", format: "PDF", produced: "On sending of the placement", protected: "Yes when e-mailed", fields: ["As templates IA-001 to IA-004 (Annex W)"], bdoi: "Annex W: given", rc: RC-DOC-12}
     - {id: DO-13, name: "E-policy e-mail", purpose: "Sending of the e-policy to the client (FRRN.033.04)", recipients: "Client", format: "E-mail with the e-policy PDF", produced: "E-policy sending", protected: "Yes (FRRN.024.01)", fields: ["As templates BDOI-012 to BDOI-014 (Annex X)"], bdoi: "Annex X: given", rc: RC-DOC-13}
     - {id: DO-14, name: "Service invoice", purpose: "Invoice of the brokerage service on booking (FRRN.035)", recipients: "Insurer", format: "PDF", produced: "Booking", protected: "No", fields: ["As the image of Annex Y"], bdoi: "Annex Y: given (image)", rc: RC-DOC-14}
-    - {id: DO-15, name: "Hold cover request", purpose: "Request of a hold cover or extension (FRRN.036)", recipients: "Insurer", format: "PDF with e-mail, or Excel batch per insurer (CBG)", produced: "Hold cover request; scheduled CBG requests", protected: "No as delivered (Annex AN.5)", fields: ["Insurer and ARN", "Client and risk", "Start date and duration", "Reference"], bdoi: "Annex Z: heading only", rc: RC-DOC-15}
+    - {id: DO-15, name: "Hold cover request", purpose: "Request of a hold cover or extension (FRRN.036)", recipients: "Insurer", format: "PDF with e-mail, or Excel batch per insurer (CBG)", produced: "Hold cover request; scheduled CBG requests", protected: "No as delivered (Annex AP.5)", fields: ["Insurer and ARN", "Client and risk", "Start date and duration", "Reference"], bdoi: "Annex Z: heading only", rc: RC-DOC-15}
     - {id: DO-16, name: "Upload results and exports of lists", purpose: "Processing results of the LAMD, BDOFC/SOLD, insurer disposition, renewal update, hold cover and e-policy uploads; audit log export", recipients: "The user (download)", format: "Excel or CSV", produced: "Each upload summary; Audit Logs", protected: "No", fields: ["The columns of the record-level views (FRRN.012.04, 015.06, 030.04, 033.03, 037.04)"], bdoi: "File names given (FRRN.012.03, 012.08, 043.01)", rc: RC-DOC-16}
 
 # Annex AG - Reports and Schedules
@@ -592,10 +611,10 @@ integrations:
     - ["Booked accounts and the operations ledger (New Business, Operations)", "In", "Expiring accounts, balances, booking and endorsement events", "Daily run; on each event", "About 25,800 renewals a month (BRD)", "New Business / Operations", "-", "Given (BRD)"]
     - ["New Business: quotation, proposal, TSU, placement, issuance, booking", "Out / in", "Renewal account (business type Renewal), quotation or proposal request, placement slip, booking", "On posting, acceptance, placement", "As renewals", "New Business", "-", "Given (New Business FRS)"]
     - ["Cashiering", "In", "Payment applications, bounced checks, unapplied payments, refunds", "On each payment", "As payments", "Operations Cashiering", "-", "Given (Cashiering FRS)"]
-    - ["Claims", "In", "Claims of the expiring term; total-loss settlement tag", "On sanitation", "-", "Claims", "-", "To be provided: total-loss indicator (Annex AM)"]
+    - ["Claims", "In", "Claims of the expiring term; total-loss settlement tag", "On sanitation", "-", "Claims", "-", "To be provided: total-loss indicator (Annex AN)"]
     - ["LAMD (BDO loans)", "In", "CBG loans excluding personal; paid-off accounts; RMU Account Officer codes", "Upload, frequency to be confirmed", "To be confirmed", "LAMD", "Report extraction from the loan systems", "Layout given (Annex G); frequency to be provided"]
-    - ["BDOFC and BDOSOLD reports", "In", "PN, assured, remarks", "Upload", "To be confirmed", "BDOI", "-", "To be provided: effect of a match (Annex AM)"]
-    - ["Insurers", "Out / in", "Request for renewal disposition (28 fields); disposition file; placement files and responses; hold cover requests and responses; e-policies", "E-mail and upload; MFT where enrolled", "Per insurer and month", "Processing", "MFT set-up and directories per insurer (if in scope)", "To be provided: MFT scope (Annex AN C17)"]
+    - ["BDOFC and BDOSOLD reports", "In", "PN, assured, remarks", "Upload", "To be confirmed", "BDOI", "-", "To be provided: effect of a match (Annex AN)"]
+    - ["Insurers", "Out / in", "Request for renewal disposition (28 fields); disposition file; placement files and responses; hold cover requests and responses; e-policies", "E-mail and upload; MFT where enrolled", "Per insurer and month", "Processing", "MFT set-up and directories per insurer (if in scope)", "To be provided: MFT scope (Annex AO C17)"]
     - ["CCM (client communications)", "Out", "Proposals, Renewal Advices, letters, Insurance Advices, e-policies", "On sending", "About 25,800 RAs a month", "BDO ITG", "CCM interface and delivery statuses (if in scope)", "To be provided: CCM scope for go-live"]
     - ["E-mail of the system", "Out", "Protected e-mails and the password e-mails (fall-back of CCM)", "On sending", "As letters", "iorta TechNXT / BDO ITG", "Sender address and relay per environment", "To be provided"]
     - ["CLPC / LMS", "Out", "CLPC billing files", "Scheduled (FRRN.027)", "Daily and twice a month", "BDO CBG Loan Services", "LMS shared directory (if available)", "To be provided"]
@@ -604,7 +623,7 @@ integrations:
     - ["Sign-in (EIAM)", "In", "Single sign-on and user identity", "On sign-in", "Renewal users", "BDO ITG", "As the User Access Maintenance FRS", "Given (User Access Maintenance FRS)"]
     - ["Product Maintenance", "In", "Risk codes, packages, rates, incentive criteria", "On rating and evaluation", "-", "MBS", "-", "Given (Product Maintenance FRS)"]
 
-# Annex AI - Non-functional requirements of Renewal
+# Annex AJ - Non-functional requirements of Renewal
 nfr:
   intro: >-
     The non-functional requirements of Renewal: the usage requirements of the BRD (pages 212-214), BDOI's own rules
@@ -618,9 +637,9 @@ nfr:
     - ["RN-NFR-04", "Peak", "Month-end; 08:00-10:00 and 15:00-17:00 daily (BRD p.213)", "Extraction, re-evaluation and letter runs at night", "FRRN.004.04", "NFR-CAP-05, NFR-PRF-07"]
     - ["RN-NFR-05", "One view without pages", "\"The system shall not use pagination\" (FRRN.004.04); one scrollable view (BRRN.004)", "Lists of up to 30,000 rows in one scrollable view with the row count", "FRRN.002.05", "NFR-USE-02"]
     - ["RN-NFR-06", "Devices", "Same performance on mobile and desktop; any BDO-issued device (BRD p.213; FRRN.001.01)", "Responsive screens", "FRRN.001.01", "NFR-RSP-01, NFR-RSP-02"]
-    - ["RN-NFR-07", "Availability", "Use 07:00-22:00 Monday to Saturday; availability, downtime and maintenance \"follow existing QPS set up\" (BRD p.213)", "Service window of the programme; BDOI gives the values (Annex AM)", "-", "NFR-AVL-01, NFR-AVL-02, NFR-AVL-03"]
+    - ["RN-NFR-07", "Availability", "Use 07:00-22:00 Monday to Saturday; availability, downtime and maintenance \"follow existing QPS set up\" (BRD p.213)", "Service window of the programme; BDOI gives the values (Annex AN)", "-", "NFR-AVL-01, NFR-AVL-02, NFR-AVL-03"]
     - ["RN-NFR-08", "Recovery", "\"Follow existing QPS set up\" (BRD p.214)", "Recovery point and time of the programme register", "-", "NFR-REC-01, NFR-REC-02"]
-    - ["RN-NFR-09", "Retention", "\"Follow existing QPS set up\" (BRD p.214)", "Retention per record type of the programme; renewal records and letters kept as policy records (values Annex AM)", "FRRN.043", "NFR-RET-01, NFR-RET-03"]
+    - ["RN-NFR-09", "Retention", "\"Follow existing QPS set up\" (BRD p.214)", "Retention per record type of the programme; renewal records and letters kept as policy records (values Annex AN)", "FRRN.043", "NFR-RET-01, NFR-RET-03"]
     - ["RN-NFR-10", "Security of files sent", "Encrypted, password-protected Renewal Advice and insurer files; approved domains (BRD 1.010.7.1; FRRN.024.01)", "Every file that leaves BDOI is protected; BDOI's password convention", "FRRN.022.02, 024.01", "NFR-SEC-10"]
     - ["RN-NFR-11", "Access", "Role-based access and data scope (FRRN.001.02)", "Each function and record checked against the user's profiles and scope", "FRRN.001.02, 001.05", "NFR-SEC-04"]
     - ["RN-NFR-12", "Session", "Inactivity warning 15 minutes; session end 30 minutes (FRRN.001.03-04)", "Parameters of the programme", "FRRN.001.03, 001.04", "NFR-SEC-05"]
@@ -629,7 +648,7 @@ nfr:
     - ["RN-NFR-15", "E-mail channel", "Proposals, Renewal Advices, letters through CCM (BDOI FRS)", "Through CCM when in scope; e-mail of the system as the fall-back", "FRRN.022.02, 023.02", "NFR-INT-05"]
     - ["RN-NFR-16", "Accessibility", "-", "Screens meet WCAG 2.2 level AA", "-", "NFR-ACC-01"]
 
-# Annex AJ - Data set-up and migration at go-live
+# Annex AK - Data set-up and migration at go-live
 data_setup:
   intro: >-
     What is loaded for Renewal before go-live, from which source and template, who provides it and who checks it.
@@ -656,20 +675,20 @@ data_setup:
     Not loaded: renewals in progress in the legacy systems (none is carried over, BDOI decision of 26-Sep-2026), and
     the history of renewals before the system (the Account History shows the history from the system on).
 
-# Annex AM - Assumptions, dependencies and open questions; classification of every earlier question
+# Annex AN - Assumptions, dependencies and open questions; classification of every earlier question
 open_items:
   intro: >-
     Only the points that BDOI's FRS does not answer. Every open question, assumption and clarification of the BIBS
     FRS of Renewal (references RQ, CLR-RN, A-RN, D-RN, DMQ) and every Renewal row of the BDOI Requirements and Inputs
     by BRD v1.2 was checked against BDOI's FRS: a point BDOI's FRS answers is not repeated here and is listed, with
     BDOI's clause, in the sheet "Answered in the BDOI FRS" of the Test Cases and Traceability workbook; where BDOI's
-    answer differs from the BRD, the decision is in Annex AN. Values and data the Business Unit provides are in the
+    answer differs from the BRD, the decision is in Annex AO. Values and data the Business Unit provides are in the
     requirements collection workbook. The reference numbers keep the link to the earlier decisions.
   assumptions:
     - ["A-RN-01", "The Walkthrough addendum is the latest layer and governs the BRRN it restates; the Workshop addendum governs the other BRRN.020-040; a BRRN of Addendum 1 governs the main-BRD IDs it restates; the main BRD governs the rest.", "BRD of 8-Oct-2026"]
     - ["A-RN-08", "The renewal is a new account of business type Renewal; the expiring account is never endorsed to renew it.", "Decision D1; FRRN.005.01"]
     - ["A-RN-09", "The payment rules of BRRN.040 and BRRN.041 are those of the payment gate of New Business and Cashiering.", "FRRN.028; FRRN.034"]
-    - ["A-RN-11", "Renewal volume is 25,800 transactions a month per process, growing 20% a year.", "BRD p.212; Annex AI"]
+    - ["A-RN-11", "Renewal volume is 25,800 transactions a month per process, growing 20% a year.", "BRD p.212; Annex AJ"]
     - ["A-RN-13", "The hold cover of a renewal uses the hold cover request and confirmation of New Business on the renewal account.", "BRRN.042; FRRN.036"]
   dependencies:
     - ["D-RN-01", "The business type Renewal of the account is shared with the New Business booking.", "FRRN.005.01, 018.02, 035.01"]
@@ -679,7 +698,7 @@ open_items:
     - ["D-RN-08", "The incentive criteria of Product Maintenance are given.", "FRRN.034.01"]
   open_header: ["No.", "Our reference", "Question", "Why (BDOI's FRS)", "Format of the answer", "Owner", "Needed by"]
   open:
-    - {refs: "RQ04", q: "Lead days of the daily extraction per segment or line (140 proposed), in addition to the generation by date range of FRRN.004.", why: "BDOI's FRS has the generation by date range only; BRRN.030 asks for configurable lead days (Annex AN C08).", fmt: "Days per market segment (Non-CBG, CBG Motor, CBG Home)", owner: "Product Owner, Renewal", by: 2026-11-30}
+    - {refs: "RQ04", q: "Lead days of the daily extraction per segment or line (140 proposed), in addition to the generation by date range of FRRN.004.", why: "BDOI's FRS has the generation by date range only; BRRN.030 asks for configurable lead days (Annex AO C08).", fmt: "Days per market segment (Non-CBG, CBG Motor, CBG Home)", owner: "Product Owner, Renewal", by: 2026-11-30}
     - {refs: "RQ09", q: "Outstanding balance: which balances count (the expiring invoice only, the client, all years), the threshold, and who may override.", why: "Annex C routes an outstanding balance to Review without threshold or override (BRD 1.011).", fmt: "Scope; amount; role", owner: "Product Owner, Renewal", by: 2026-11-30}
     - {refs: "RQ10", q: "Definition of the 34 summary counters of the Renewal Status Report, including For ARF, Renew to TSU, Disapproved and to Other Bank.", why: "BDOI's FRS does not specify the Renewal Status Report.", fmt: "Rule per counter (status, disposition, reason)", owner: "Product Owner, Renewal", by: 2026-11-30}
     - {refs: "RQ11; CLR-RN-35", q: "Ageing, overdue and high-risk criteria of the renewal listing, and whether the Account Officer may be notified.", why: "BDOI's FRS has no listing with attention flags (BRRN.036).", fmt: "Days per segment; criteria; Yes / No", owner: "Product Owner, Renewal", by: 2026-11-30}
@@ -687,7 +706,7 @@ open_items:
     - {refs: "RQ21", q: "Contact Center follow-up outcomes and the lists the Contact Center sees.", why: "BDOI's FRS refers to the User Access Matrix only (BRRN.026).", fmt: "List of outcomes; lists", owner: "Contact Center Head", by: 2026-11-30}
     - {refs: "RQ22", q: "Source of the KYC data of bank clients and the KYC review dates.", why: "FRRN.039.01 makes the criteria configurable without naming the source.", fmt: "Source system; field", owner: "Compliance", by: 2027-01-31}
     - {refs: "RQ25", q: "Financial-impact tolerance (any change, or an amount or %) for the routing to the New Business path.", why: "BDOI's FRS has no financial-impact rule (BRRN.038).", fmt: "Amount or %", owner: "Product Owner, Renewal", by: 2026-11-30}
-    - {refs: "RQ28", q: "Availability, maintenance window, recovery and retention values (the BRD says \"follow existing QPS set up\").", why: "BDOI's FRS has no non-functional section.", fmt: "Values per item of Annex AI", owner: "BDOI IT", by: 2027-01-31}
+    - {refs: "RQ28", q: "Availability, maintenance window, recovery and retention values (the BRD says \"follow existing QPS set up\").", why: "BDOI's FRS has no non-functional section.", fmt: "Values per item of Annex AJ", owner: "BDOI IT", by: 2027-01-31}
     - {refs: "RQ29", q: "Late Renewal Requests Report: needed as a variant of the renewal listing?", why: "Not among the reports of FRRN.044.01.", fmt: "Yes / No; columns", owner: "Product Owner, Renewal", by: 2026-11-30}
     - {refs: "RQ30", q: "Renewal of an account whose package version has expired with no current version.", why: "BDOI's FRS does not treat it.", fmt: "Rule", owner: "MBS", by: 2026-11-30}
     - {refs: "RQ33; CLR-RN-37", q: "The incentive criteria and whether the evaluation is shared with New Business.", why: "FRRN.034.01 refers to configured rules without giving them.", fmt: "Criteria (line, product, segment, conditions)", owner: "Product Owner, Renewal; MBS", by: 2026-11-30}
@@ -705,23 +724,23 @@ open_items:
     - {refs: "CBG-HOME", q: "The sanitation rules of CBG Home (Annex C) and the fields updated automatically for CBG Home and Non-CBG (FRRN.009.01).", why: "Both are empty in BDOI's FRS.", fmt: "Rules as Annex C; field list", owner: "Product Owner, Renewal; CBG", by: 2026-11-30}
     - {refs: "DCR-065; DCR-076; DCR-077", q: "Slips of the BRD text: labels of 1.003.4.1.1.21-24 all read 1.21; RA IDs 4.09.x; the workshop table titled for New Business; the source IDs of BRRN.020-040.", why: "Corrections of the BRD, not of the FRS.", fmt: "Corrected BRD pages or confirmation", owner: "BRD owner (ESG - Business Project Services)", by: 2026-11-30}
     - {refs: "DCR-061; DCR-066; DCR-068; DCR-069", q: "Confirm the signed BRD text is final; the Processing Officer profile (BRD 4.001.1.1 reads Operations Team Leader); the recipient of an account returned by Processing (3.008.2.5); the approval e-mail of the addenda.", why: "Points on the BRD document.", fmt: "Confirmation", owner: "Product Owner, Renewal", by: 2026-11-30}
-  inputs: [CFG-124, DOC-08, TD-06, SO-06-1, SO-06-2, SO-06-3, CLR-RN-27, CLR-RN-33, CLR-RN-40, RQ20, CLR-RN-25]
+  inputs: [CFG-124, DOC-08, TD-06, SO-06-1, SO-06-2, SO-06-3, CLR-RN-27, CLR-RN-33, CLR-RN-40, CLR-RN-25]
   answered:
     RQ01: ["Annex C; FRRN.007.02; FRRN.008.01", "BDOI gives the sanitation rules per market segment and the classification rules."]
-    RQ02: ["FRRN.004.04", "BDOI creates the renewal accounts at generation; the initiation of BRRN.021 is a decision (Annex AN C09)."]
+    RQ02: ["FRRN.004.04", "BDOI creates the renewal accounts at generation; the initiation of BRRN.021 is a decision (Annex AO C09)."]
     RQ03: ["FRRN.004.04; FRRN.015.04", "The renewal account has a sequential unique identifier, the Reference Number, used to match the uploads."]
     RQ05: ["FRRN.004.04", "\"The system shall not use pagination.\""]
     RQ06: ["FRRN.004.04", "Expired accounts with no linked new renewal account, booked accounts expiring in the range and FFY accounts In Process are included."]
     RQ07: ["FRRN.020.01; FRRN.007.02; Annex M", "The Non-Renewal Letter is generated after posting Not for Renewal and by the letter matrix; the non-renewable risk code tags Not for Renewal."]
     RQ08: ["Annexes C, D, F; FRRN.010.01", "CBG and Non-CBG are market segments (CBG Motor, CBG Home; Retail, Corporate) with their own rules and assignment."]
-    RQ12: ["FRRN.014.02; FRRN.022.01", "The account locks when posted and placed; the RA is disabled for locked accounts (the lock of BRD 2.004.9 is Annex AN C11)."]
+    RQ12: ["FRRN.014.02; FRRN.022.01", "The account locks when posted and placed; the RA is disabled for locked accounts (the lock of BRD 2.004.9 is Annex AO C11)."]
     RQ14: ["FRRN.014.02; FRRN.015", "Both: the update of one account online and the bulk upload of dispositioned files."]
-    RQ15: ["Annex H; FRRN.013.02", "The CBG layout of the insurer disposition file and nine disposition values with their effect (the three outcomes of the BRD: Annex AN C10)."]
+    RQ15: ["Annex H; FRRN.013.02", "The CBG layout of the insurer disposition file and nine disposition values with their effect (the three outcomes of the BRD: Annex AO C10)."]
     RQ17: ["Annex M", "No Advice Letter 1 day after expiry when an RA was issued and not answered."]
     RQ18: ["Annex M; FRRN.023.01", "NRNS reminder 75 days before expiry for CBG Motor accounts with an active loan and no policy in BDOI."]
     RQ19: ["FRRN.025.01; FRRN.26.01; FRRN.028", "The client acceptance statuses, the payment confirmation for Non-CBG and the automatic progression of paid CBG accounts."]
     RQ20: ["Annex G", "The LAMD layouts (CBG loans excluding personal; paid-off accounts); the frequency is an input."]
-    RQ23: ["Annex C (CBG Motor)", "A fully paid loan renewed as is is Clean / For Renewal and becomes CLG Auto Open Market; the process flow differs (Annex AN C04)."]
+    RQ23: ["Annex C (CBG Motor)", "A fully paid loan renewed as is is Clean / For Renewal and becomes CLG Auto Open Market; the process flow differs (Annex AO C04)."]
     RQ24: ["Annex C; FRRN.008.01", "The rules of Annex C are the first content of the decision matrix; Clean accounts get For Renewal."]
     RQ26: ["Annexes L, W, X, S", "BDOI gives the approved Renewal Advice, Insurance Advice, e-policy and billing templates; the templates of Annexes I, J, N-R, T, Z are inputs (DOC-08)."]
     RQ27: ["FRRN.045 (decision of 26-Sep-2026)", "Renewals expiring up to 31-May-2028 are processed in the system after go-live; none is carried from legacy."]
@@ -741,25 +760,25 @@ open_items:
     CLR-RN-06: ["FRRN.045", "Decision of 26-Sep-2026."]
     CLR-RN-07: ["FRRN.046", "Decision of 26-Sep-2026."]
     CLR-RN-08: ["FRRN.004.06", "Endorsements are synchronised before booking; the block of an open endorsement is FRRN.004.06 of this version."]
-    CLR-RN-09: ["Annexes C, F", "CBG is a market segment; CBG accounts are assigned by Annex F (Annex AN C06)."]
+    CLR-RN-09: ["Annexes C, F", "CBG is a market segment; CBG accounts are assigned by Annex F (Annex AO C06)."]
     CLR-RN-10: ["Annex C; FRRN.008.01", "BDOI gives the rules."]
     CLR-RN-11: ["FRRN.007.02", "Active or unresolved claims go to Review; Total Loss claims are Not for Renewal."]
     CLR-RN-13: ["Annex M", "No Advice Letter eligibility."]
     CLR-RN-14: ["Annex M", "NRNS reminder eligibility and schedule."]
-    CLR-RN-15: ["FRRN.014.02", "Lock when posted and placed (Annex AN C11)."]
+    CLR-RN-15: ["FRRN.014.02", "Lock when posted and placed (Annex AO C11)."]
     CLR-RN-16: ["FRRN.048 (decision D2)", "Submitted policies are renewed by Renewal."]
     CLR-RN-18: ["FRRN.045.02", "The Renewal processing team loads and approves the go-live data (decision of 26-Sep-2026)."]
     CLR-RN-20: ["Annexes M to R", "BDOI names the letters Renewal Advice, No Advice Letter, Non-Renewal Letter, NRNS Reminder, SFU and FFY Reminder."]
-    CLR-RN-29: ["FRRN.007.02; Annex C", "TSI above PHP 250M: Clean with For Quotation, routed to the TSU queue (Annex AN C02)."]
+    CLR-RN-29: ["FRRN.007.02; Annex C", "TSI above PHP 250M: Clean with For Quotation, routed to the TSU queue (Annex AO C02)."]
     CLR-RN-30: ["FRRN.039", "KYC monitoring only."]
-    CLR-RN-32: ["Annex M", "NAL 1 day after expiry when an RA was issued; NRL 1 or 3 days after expiry (Annex AN C15)."]
-    CLR-RN-34: ["FRRN.028.02; FRRN.029", "Paid CBG accounts are Submitted for Placement automatically; placement by the user (Annex AN C28)."]
-    CLR-RN-36: ["FRRN.036", "Hold cover requests generated by the system; durations by segment (Annex AN C12)."]
+    CLR-RN-32: ["Annex M", "NAL 1 day after expiry when an RA was issued; NRL 1 or 3 days after expiry (Annex AO C15)."]
+    CLR-RN-34: ["FRRN.028.02; FRRN.029", "Paid CBG accounts are Submitted for Placement automatically; placement by the user (Annex AO C28)."]
+    CLR-RN-36: ["FRRN.036", "Hold cover requests generated by the system; durations by segment (Annex AO C12)."]
     A-RN-02: ["FRRN.004.04", "Expiring accounts are the booked accounts; one renewal account per expiring account."]
     A-RN-03: ["FRRN.004.04", "Sequential unique identifier."]
     A-RN-04: ["FRRN.014.02; FRRN.015", "Online and bulk."]
-    A-RN-05: ["FRRN.008.01", "Clean accounts For Renewal (Annex AN C24)."]
-    A-RN-06: ["FRRN.008.01; Annex F", "CBG Clean accounts go to RA generation; assignment by Annex F (Annex AN C06)."]
+    A-RN-05: ["FRRN.008.01", "Clean accounts For Renewal (Annex AO C24)."]
+    A-RN-06: ["FRRN.008.01; Annex F", "CBG Clean accounts go to RA generation; assignment by Annex F (Annex AO C06)."]
     A-RN-07: ["Annex M", "NRNS reminder 75 days before expiry."]
     A-RN-10: ["FRRN.024.01", "Protection by BDOI's password convention."]
     A-RN-12: ["FRRN.039", "KYC monitoring only."]
@@ -768,7 +787,7 @@ open_items:
     D-RN-07: ["FRRN.035.01", "Booking generates the invoice, accounting entries and service invoice."]
     D-RN-09: ["FRRN.036", "BDOI's hold cover processing."]
 
-# Annex AO - Change control after sign-off
+# Annex AP - Change control after sign-off
 change_control:
   intro: >-
     Once BDOI signs this FRS, it is the baseline of the Renewal Module. A change is raised, assessed, approved,
@@ -781,7 +800,7 @@ change_control:
   not_frozen: >-
     Not frozen: the values the Business Administrator maintains in the system (parameters, lists of values, rules
     and the decision matrix, risk codes, templates) - they are changed in the system with four eyes, without a change
-    request - and the answers to the open questions of Annex AM, which are applied as configuration or, where they
+    request - and the answers to the open questions of Annex AN, which are applied as configuration or, where they
     change a frozen item, through a change request.
   steps_header: ["Step", "What happens", "Who", "Record"]
   steps:
@@ -795,7 +814,7 @@ change_control:
     The candidate changes known at this version - the points where this FRS proposes more than the BRD text or where
     BDOI's FRS goes beyond the BRD - are seeded in the register with the status "Candidate - for decision".
 
-# Annex AP - Business Unit review checklist
+# Annex AQ - Business Unit review checklist
 checklist:
   intro: >-
     The points the Business Unit confirms before signing this FRS. Each points to the part of the document to read
@@ -803,9 +822,9 @@ checklist:
   header: ["No.", "Point", "Where", "What to confirm", "Role", "Done"]
   rows:
     - ["Scope", "Summary for the Business Unit Review", "In scope, out of scope and the other FRS", "Product Owner, Renewal"]
-    - ["BRD coverage", "Business Requirements Mapping; Annex AL", "Every BRD ID maps to an FR item", "System Analyst (BDO ITG)"]
-    - ["Decisions", "Annex AN", "A decision on each conflict, or sign as proposed", "Product Owner, Renewal"]
-    - ["Open questions", "Annex AM", "An answer or an owner and date for each", "Product Owner, Renewal"]
+    - ["BRD coverage", "Business Requirements Mapping; Annex AM", "Every BRD ID maps to an FR item", "System Analyst (BDO ITG)"]
+    - ["Decisions", "Annex AO", "A decision on each conflict, or sign as proposed", "Product Owner, Renewal"]
+    - ["Open questions", "Annex AN", "An answer or an owner and date for each", "Product Owner, Renewal"]
     - ["RMEL and extraction", "FRRN.004; FRRN.045", "Generation, lead days, go-live take-over", "Marketing and Processing Heads"]
     - ["Sanitation and classification", "FRRN.006-009; Annex C; Annex AC", "Rules per segment, classification, decision matrix", "Product Owner, Renewal; CBG"]
     - ["Assignment and transfer", "FRRN.010-011", "Automatic or manual assignment; referral or transfer", "Marketing Heads"]
@@ -824,21 +843,21 @@ checklist:
     - ["Documents and formats", "Annex AF", "Layouts and file names; templates still to give", "Product Owner, Renewal"]
     - ["Reports and schedules", "Annex AG", "Columns, filters, run times; layouts of BDOI's reports", "Marketing and Processing Heads"]
     - ["Integrations", "Annex AH", "CCM, MFT, LAMD, LMS inputs of BDOI IT", "BDO ITG"]
-    - ["Non-functional", "Annex AI", "Volumes, times, availability values", "BDO ITG"]
-    - ["Data set-up", "Annex AJ", "Who provides each data set and when", "Product Owner, Renewal"]
-    - ["Walkthrough", "Annex AK; Walkthrough Users workbook", "The walkthrough was run with the named users", "Business Unit testers"]
-    - ["Change control", "Annex AO", "What signing freezes", "Project Owner"]
-    - ["Signatories", "Signoff Sheet; Annex AN.4", "The Business Unit signatories to add", "Project Owner; PMO"]
+    - ["Non-functional", "Annex AJ", "Volumes, times, availability values", "BDO ITG"]
+    - ["Data set-up", "Annex AK", "Who provides each data set and when", "Product Owner, Renewal"]
+    - ["Walkthrough", "Annex AL; Walkthrough Users workbook", "The walkthrough was run with the named users", "Business Unit testers"]
+    - ["Change control", "Annex AP", "What signing freezes", "Project Owner"]
+    - ["Signatories", "Signoff Sheet; Annex AP.4", "The Business Unit signatories to add", "Project Owner; PMO"]
 
-# Annex AN.5 - observations of the Business Unit review edition
+# Annex AP.5 - observations of the Business Unit review edition
 observations:
-  - {topic: "Renewal Advice wording", bdoi: "Annex L: approved templates BDOI-005 to BDOI-008 per line, with the bills payment slip, the FINAL NOTICE marker, the conforme and the data privacy consent; e-mails BDOI-009 to BDOI-011.", brd: "BRRN.010: \"using the latest BDOI-approved RA template\"", proposal: "The system's two draft templates (first and second notice, Annex AE.22-23) are replaced by BDOI's four templates and three e-mails; the notice is First or Final as BDOI writes.", impact: "Template set-up before UAT (Annex AJ).", by: "Product Owner, Renewal; Compliance"}
+  - {topic: "Renewal Advice wording", bdoi: "Annex L: approved templates BDOI-005 to BDOI-008 per line, with the bills payment slip, the FINAL NOTICE marker, the conforme and the data privacy consent; e-mails BDOI-009 to BDOI-011.", brd: "BRRN.010: \"using the latest BDOI-approved RA template\"", proposal: "The system's two draft templates (first and second notice, Annex AE.22-23) are replaced by BDOI's four templates and three e-mails; the notice is First or Final as BDOI writes.", impact: "Template set-up before UAT (Annex AK).", by: "Product Owner, Renewal; Compliance"}
   - {topic: "Separate password e-mail", bdoi: "FRRN.024.01 derives the password of individuals from their names and BDOI's e-mails explain it to the client.", brd: "BRD 1.010.7.1: \"Encrypt and add password prior to sending\"", proposal: "Keep BDOI's convention; the separate password e-mail (Annex AE.24) is sent only for corporate clients, whose password is random, unless BDOI decides otherwise.", impact: "One e-mail less per individual client.", by: "Product Owner, Renewal; Information Security"}
   - {topic: "Hold cover request text", bdoi: "FRRN.036.01: durations of 30, 60 and 90 days; Annex Z: heading only.", brd: "BRRN.042", proposal: "The request text of the system names thirty days whatever the duration (Annex AE.32); the text takes the duration of the request, and BDOI gives its template.", impact: "Wording of a document sent to insurers.", by: "Processing Head"}
   - {topic: "Insurance Advice and e-policy wording", bdoi: "Annexes W and X: approved templates IA-001 to IA-004 and BDOI-012 to BDOI-014.", brd: "-", proposal: "The system's Insurance Advice and e-policy texts of New Business are replaced by BDOI's templates for renewals.", impact: "Template set-up.", by: "Product Owner, Renewal"}
   - {topic: "Renewal at risk", bdoi: "-", brd: "BRRN.036: no automatic escalation", proposal: "The at-risk accounts are shown by the ageing flag and the dashboard; no message is sent (Annex AE).", impact: "None; to be confirmed with RQ11.", by: "Product Owner, Renewal"}
   - {topic: "E-mail channel in the programme", bdoi: "CCM for every client communication.", brd: "-", proposal: "The programme register of non-functional requirements also sends all outbound e-mail through CCM (NFR-INT-05); BDO ITG confirms the go-live date of CCM for Renewal, and the system's e-mail stays the fall-back.", impact: "Integration plan.", by: "BDO ITG"}
-  - {topic: "Reports without layout", bdoi: "FRRN.044.01 names 13 reports without columns.", brd: "BRRN.019", proposal: "The layouts are requested in the requirements collection workbook (RC-RPT-01 to 06); until given they are built as listings with the columns of the Renewal Status Report.", impact: "Report build and test.", by: "Marketing and Processing Heads"}
+  - {topic: "Reports without layout", bdoi: "FRRN.044.01 names 13 reports without columns.", brd: "BRRN.019", proposal: "The layouts are requested in the requirements collection workbook (RC-RPT-01 to 06); until given they are produced as listings with the columns of the Renewal Status Report.", impact: "Report set-up and test.", by: "Marketing and Processing Heads"}
   - {topic: "Sender and footer of e-mails", bdoi: "-", brd: "-", proposal: "BDO ITG gives the sender address per environment and the standard footer or disclaimer of BDOI's e-mails.", impact: "Every e-mail of Annex AE.", by: "BDO ITG"}
 
 glossary_add:

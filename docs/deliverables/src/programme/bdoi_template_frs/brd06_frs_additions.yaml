@@ -6,8 +6,8 @@
 #   new_subitems  new sub-items of BDOI's entries, numbered after BDOI's last sub-item of the entry
 #   new_items     new entries FRRN.045 onwards (capabilities BDOI's FRS does not have)
 # refs: the BIBS reference requirements (FR-RN-nnn of the BIBS FRS BRD-06 v2.0) each item incorporates; they drive
-# Annex AL (traceability) and the FRRN items of the BRD lines in the Business Requirements Mapping.
-# Wording: business words only. "Annex AN" is the observations annex where a point is open for BDOI's decision; where
+# Annex AM (traceability) and the FRRN items of the BRD lines in the Business Requirements Mapping.
+# Wording: business words only. "Annex AO" is the observations annex where a point is open for BDOI's decision; where
 # BDOI's text and the BIBS reference FRS differ, BDOI's text is kept and nothing added here contradicts it.
 
 items:
@@ -48,7 +48,7 @@ items:
     refs: [FR-RN-001]
     shall:
       - The system shall record the end of each session with the reason (inactivity or log-out).
-      - The system shall also warn the user 30 minutes before the system-triggered end of a session, so that the work can be saved (BRD 1.001.3.1, 2.001.1.3, 3.001.1.3, 4.001.1.3, 5.001.1.3; Annex AN).
+      - The system shall also warn the user 30 minutes before the system-triggered end of a session, so that the work can be saved (BRD 1.001.3.1, 2.001.1.3, 3.001.1.3, 4.001.1.3, 5.001.1.3; Annex AO).
     ac:
       - After 30 minutes without activity the session ends and the message "Your session timed out. Please log in again to continue" is shown with the button Log In, which opens the Login page.
       - 30 minutes before the system-triggered end of the session the user sees the session-end warning.
@@ -88,7 +88,7 @@ items:
   FRRN.002.02.02:
     refs: []
     shall:
-      - The system shall count each renewal account in one pipeline stage at a time, from its current status (the stage-to-status mapping is in Annex AC; Annex AN).
+      - The system shall count each renewal account in one pipeline stage at a time, from its current status (the stage-to-status mapping is in Annex AC; Annex AO).
     ac:
       - The total of the Pipeline Summary equals the sum of its stages for count, premium and commission.
       - Clicking a count lists exactly the renewal accounts counted.
@@ -259,7 +259,7 @@ items:
   FRRN.004.04:
     refs: [FR-RN-010, FR-RN-021, FR-RN-015]
     shall:
-      - Besides the generation by the user, the system shall extract every day the accounts whose policy expiry date is the business date plus the lead days (140 days as delivered; a value per market segment may replace it), so that no expiring account is missed (BRRN.030; Annex AN).
+      - Besides the generation by the user, the system shall extract every day the accounts whose policy expiry date is the business date plus the lead days (140 days as delivered; a value per market segment may replace it), so that no expiring account is missed (BRRN.030; Annex AO).
       - The lead days shall be parameters; a change applies from the next run.
       - The unique identifier of a renewal account shall be its renewal reference; it shall be the matching key of every upload of Renewal (BRRN.022).
       - The system shall keep one open renewal account per expiring policy; a second generation or run over the same dates shall not create a second one.
@@ -275,7 +275,7 @@ items:
   FRRN.004.06:
     refs: [FR-RN-027]
     shall:
-      - The renewal account shall be built from the expiring (mother) policy as of its last posted endorsement.
+      - The renewal account shall be created from the expiring (mother) policy as of its last posted endorsement.
       - "While an endorsement request on the expiring policy is neither posted nor cancelled, the system shall refuse the posting, the Renewal Advice and the client acceptance of the renewal account with the message \"Renewal <reference> has an endorsement in progress (<endorsement no.>)\" (BRRN.032)."
       - The system shall record on the renewal account the endorsements linked to it and show the Endorsed flag.
     ac:
@@ -370,7 +370,7 @@ items:
   FRRN.010.01:
     refs: [FR-RN-030, FR-RN-061]
     shall:
-      - The system shall also allow the Marketing Team Lead to assign accounts of his unit to an Account Officer of the unit, and the Processing Team Lead to assign accounts to a Processing Officer or to himself, by single, multiple, all and all-except selection (BRD 1.005, 3.005; Annex AN).
+      - The system shall also allow the Marketing Team Lead to assign accounts of his unit to an Account Officer of the unit, and the Processing Team Lead to assign accounts to a Processing Officer or to himself, by single, multiple, all and all-except selection (BRD 1.005, 3.005; Annex AO).
       - "The list of officers offered shall be limited to the active officers of the user's unit; an officer of another unit is refused with the message \"<officer> is not an officer of your unit\", and an empty selection with \"Select at least one account\"."
       - The assigned officer shall receive a notice in the system for each account assigned to him (Annex AE).
       - Each assignment shall be recorded with the previous and new officer, the user and the time.
@@ -382,7 +382,7 @@ items:
   FRRN.010.02:
     refs: [FR-RN-030]
     shall:
-      - "Re-assignment shall be refused once the account is locked (FRRN.014.02), with the message \"Renewal <reference> is locked since the Renewal Advice was generated\" for an account locked by its Renewal Advice (Annex AN)."
+      - "Re-assignment shall be refused once the account is locked (FRRN.014.02), with the message \"Renewal <reference> is locked since the Renewal Advice was generated\" for an account locked by its Renewal Advice (Annex AO)."
       - The user may give a reason for the re-assignment from a list maintained by the Business Administrator.
     ac:
       - A Team Lead re-assigns three accounts to another officer of his unit; the accounts move to that officer's list and the history shows both officers.
@@ -391,7 +391,7 @@ items:
   FRRN.011:
     refs: [FR-RN-031, FR-RN-032]
     shall:
-      - The transfer of the renewal account itself to another Marketing Unit (BRD 1.006, 1.007, 2.005) is specified in FRRN.011.06; whether the referral of this entry, the transfer or both are used is a decision of BDOI (Annex AN).
+      - The transfer of the renewal account itself to another Marketing Unit (BRD 1.006, 1.007, 2.005) is specified in FRRN.011.06; whether the referral of this entry, the transfer or both are used is a decision of BDOI (Annex AO).
     ac:
       - A transfer request never changes the owner of the original renewal account (referral of this entry).
 
@@ -475,7 +475,7 @@ items:
   FRRN.012.07:
     refs: []
     ac:
-      - A BDOFC or SOLD line whose PN matches a renewal account is linked to it and the account is re-evaluated by the sanitation rules (the effect of a match is to be confirmed by BDOI, Annex AM).
+      - A BDOFC or SOLD line whose PN matches a renewal account is linked to it and the account is re-evaluated by the sanitation rules (the effect of a match is to be confirmed by BDOI, Annex AN).
 
   FRRN.012.08:
     refs: []
@@ -500,7 +500,7 @@ items:
   FRRN.013.02:
     refs: [FR-RN-071]
     shall:
-      - "Each insurer disposition value shall also count as one of the three outcomes of the BRD (BRRN.035): Renew As Is / Approved as Approve; Renew with surcharge, Renew under another package and Apply minimum premium as Revise; Rejected, Total Loss and the three non-renewal values as Reject (Annex AN)."
+      - "Each insurer disposition value shall also count as one of the three outcomes of the BRD (BRRN.035): Renew As Is / Approved as Approve; Renew with surcharge, Renew under another package and Apply minimum premium as Revise; Rejected, Total Loss and the three non-renewal values as Reject (Annex AO)."
       - The responses shall only be added, never changed; the latest valid response drives the renewal account.
       - A response that does not match (reference, policy number or several rows for one account), arrives after the reply date or conflicts with another response in the same file shall not move the renewal account; it is flagged for review, and only a manual update with remarks moves it.
       - A Renew As Is that matches shall move the renewal account on without re-keying and without changing the terms, the price or the structure (BRRN.035).
@@ -537,7 +537,7 @@ items:
       - "The system shall refuse a Not for Renewal without reason (\"Select the reason for Not for Renewal\"); the reason Booked to New Invoice shall require the new invoice number (\"Enter the new invoice number\"), which must exist; the reason Transfer to Another Marketing Unit shall open the transfer of FRRN.011.06."
       - "The system shall keep every disposition as a new entry with its source (user, rule, upload, insurer, LAMD or sanitation), reason, remarks, user and time; the earlier entries stay visible."
       - "The user may add remarks of up to 200 characters (\"Remarks may have at most 200 characters\"); each remark is stamped with the user ID, the date, the time and the stage, and saved remarks are not edited (BRD 2.004.6-8)."
-      - The account shall also be locked on the Marketing side once its Renewal Advice is generated (BRD 2.004.9; Annex AN); an authorised user unlocks it only by cancelling the Renewal Advice through a controlled override (FRRN.020.03).
+      - The account shall also be locked on the Marketing side once its Renewal Advice is generated (BRD 2.004.9; Annex AO); an authorised user unlocks it only by cancelling the Renewal Advice through a controlled override (FRRN.020.03).
     ac:
       - An Account Officer gives the disposition For Renewal, saves and submits the account; it appears in the Team Lead's review list.
       - A Not for Renewal without reason cannot be saved; Booked to New Invoice without an existing invoice number is refused.
@@ -703,7 +703,7 @@ items:
     shall:
       - "The letters shall be determined on the effective expiry date: the end of a confirmed hold cover (FRRN.037), otherwise the policy expiry date (Walkthrough addendum R37-HC-01 to 04)."
       - No closing letter shall be sent before the effective expiry date (R37-HC-05).
-      - "An account shall never receive both a No Advice Letter and a Non-Renewal Letter (R37-HC-09, 10; Annex AN)."
+      - "An account shall never receive both a No Advice Letter and a Non-Renewal Letter (R37-HC-09, 10; Annex AO)."
     ac:
       - An account with a confirmed 30-day hold cover gets no closing letter until the hold cover ends.
       - An account that has received a No Advice Letter cannot receive a Non-Renewal Letter, and the reverse.
@@ -892,7 +892,7 @@ items:
   FRRN.034.01:
     refs: [FR-RN-087]
     shall:
-      - The eligibility shall also be evaluated when the payment becomes Fully Paid and the client's acceptance is confirmed (BRRN.041; Annex AN), with the matched criteria and the time recorded.
+      - The eligibility shall also be evaluated when the payment becomes Fully Paid and the client's acceptance is confirmed (BRRN.041; Annex AO), with the matched criteria and the time recorded.
       - The incentive code shall never be set or changed by hand; an endorsement of the term re-evaluates it and a cancellation after booking invalidates it.
     ac:
       - A renewal account that matches the configured incentive criteria shows the incentive code on the booking screen.
@@ -977,7 +977,7 @@ items:
     refs: [FR-RN-024, FR-RN-112]
     shall:
       - A risk code shall never be deleted; it is deactivated or its indicator changed with an effective date, so that the accounts that used it stay readable.
-      - A change of a risk code shall take effect only after another authorised user approves it (Annex AN).
+      - A change of a risk code shall take effect only after another authorised user approves it (Annex AO).
     ac:
       - A user without the maintenance function sees the risk codes read only.
       - A change takes effect only after a second authorised user approves it.
@@ -1005,7 +1005,7 @@ items:
   FRRN.039.01:
     refs: [FR-RN-026]
     shall:
-      - The KYC tag shall be shown as a flag in the renewal lists and as a column in the reports, with the date it was first identified, and shall never block, stop or reroute the renewal (BRRN.028; Annex AN).
+      - The KYC tag shall be shown as a flag in the renewal lists and as a column in the reports, with the date it was first identified, and shall never block, stop or reroute the renewal (BRRN.028; Annex AO).
     ac:
       - A renewal account whose client is due for KYC review in 20 days shows the KYC due flag, and its classification is unchanged.
 
@@ -1022,7 +1022,7 @@ items:
   FRRN.040.01:
     refs: [FR-RN-112, FR-RN-022, FR-RN-023]
     shall:
-      - A rule set shall become active only after another authorised user approves it (maker-checker); the active version and the earlier versions stay visible with their makers, checkers and dates (Annex AN).
+      - A rule set shall become active only after another authorised user approves it (maker-checker); the active version and the earlier versions stay visible with their makers, checkers and dates (Annex AO).
       - A rule that would make a renewal account with a failed rule Clean shall not be saved ("A failed check cannot give the Clean bucket").
       - The lead days, the thresholds and the notice days shall be maintained in the same menu with their effective dates (FRRN.040.03).
     ac:
@@ -1132,7 +1132,7 @@ new_subitems:
     title: Initiation of Renewal Processing
     refs: [FR-RN-015]
     shall:
-      - The system shall start the renewal processing of a listed account (classification, rule-based disposition, assignment, letters) only when an authorised user initiates it; the generation alone never starts it (BRRN.021; Annex AN).
+      - The system shall start the renewal processing of a listed account (classification, rule-based disposition, assignment, letters) only when an authorised user initiates it; the generation alone never starts it (BRRN.021; Annex AO).
       - The market segments initiated in bulk (CLG as delivered) shall be a parameter; the other segments (for example Non-Mortgage) are initiated one account at a time.
       - "The system shall refuse a second initiation (\"Renewal <reference> is already initiated\") and the bulk initiation of a segment initiated one by one (\"Segment <segment> is initiated one account at a time\")."
       - The initiation shall be recorded with the user and the time, as an entry separate from the generation.
@@ -1197,7 +1197,7 @@ new_subitems:
       - A renewal shall take the New Business path when its disposition is For Quotation or For Proposal, or when the financial impact of FRRN.009.01 is flagged; the account is tagged "For Proposal / New Business Path" and the reason is recorded (BRRN.033, BRRN.038).
       - The quotation or proposal request started from the renewal shall be pre-filled from the expiring account, carry the renewal reference, and its booked accounts carry the business type Renewal; one New Business path is allowed per renewal ("Renewal <reference> already has quotation <no.>").
       - "When the financial impact is flagged, the client's acceptance shall be recorded with its method (e-mail, signed Renewal Advice or payment), whichever path the renewal takes (BRRN.038)."
-      - What makes a structural change, and whether the routing is automatic, is to be confirmed by BDOI (Annex AM).
+      - What makes a structural change, and whether the routing is automatic, is to be confirmed by BDOI (Annex AN).
     ac:
       - A renewal with a 10% premium increase from the insurer is tagged For Proposal / New Business Path with the reason.
       - The quotation created from the renewal carries the renewal reference, and its booked invoice has the business type Renewal.
@@ -1249,7 +1249,7 @@ new_subitems:
       - The system shall hold a versioned decision matrix; each rule has a priority and conditions on market segment, line, product, mortgaged, classification, claims, endorsements, payment status and days to expiry, and gives a disposition and the automation Automatic or Manual (BRRN.031, BRRN.034).
       - The first rule by priority shall propose the disposition of a renewal account after its initiation; for a Clean account whose rule is Automatic the disposition is given by the system and the account moves on without a user action; otherwise the proposal is the default the Account Officer sees.
       - Renewal accounts with claims, endorsements, a missing or invalid PN or an unresolved payment shall always be handled by a user (BRRN.031).
-      - Each version shall be activated by an authorised user other than its maker; each disposition given by the system records the version and the rule (Annex AN).
+      - Each version shall be activated by an authorised user other than its maker; each disposition given by the system records the version and the rule (Annex AO).
       - The first content of the matrix shall be BDOI's rules of FRRN.008 and Annex C (Clean accounts For Renewal).
     ac:
       - A Clean CBG Motor account matching an Automatic rule receives the disposition For Renewal from the system and moves on without a user action.

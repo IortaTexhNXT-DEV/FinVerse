@@ -93,7 +93,7 @@ create table rnw_rmu_officer (
     updated_at        timestamptz,
     updated_by        varchar(50)
 );
-create unique index uq_rnw_rmu_officer_active on rnw_rmu_officer (company_id, ao_code) where active;
+create unique index uq_rnw_rmu_officer on rnw_rmu_officer (company_id, ao_code);
 
 insert into sys_parameter (param_key, param_value, value_type, category, description, min_value,
     max_value, created_at, created_by) values

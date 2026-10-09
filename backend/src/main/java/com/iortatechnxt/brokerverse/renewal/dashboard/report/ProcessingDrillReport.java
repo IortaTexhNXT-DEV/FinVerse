@@ -108,7 +108,7 @@ public class ProcessingDrillReport implements ReportDefinition {
         .columns(
             ReportColumn.text("arn", "Account Reference Number"),
             ReportColumn.text(BUSINESS_TYPE, "Business Type"),
-            ReportColumn.text("branch", "BDOI Branch"),
+            ReportColumn.text("branch", "Branch"),
             ReportColumn.text("department", "Department"),
             ReportColumn.text("unitHead", "Unit Head"),
             ReportColumn.text("accountOfficer", "Account Officer"),

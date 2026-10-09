@@ -9,12 +9,12 @@ import org.springframework.stereotype.Component;
  * The renewal status as users read it on the dashboards and lists: BDOI's status names (In Process
  * Renewal, Submitted for Posting, Posted, For RA Generation, Submitted for Placement, For Booking,
  * Booked, Returned - Renewal ...) or the names of the workflow stages, chosen by the parameter
- * {@value #PARAMETER} (BDOI by default).
+ * {@value #PARAMETER} (CLIENT, by default, for these names).
  */
 @Component
 public class RenewalStatusNames {
 
-  /** Parameter: BDOI or SYSTEM. */
+  /** Parameter: CLIENT or SYSTEM. */
   public static final String PARAMETER = "RNW_STATUS_NAMES";
 
   /** Value of the parameter for the workflow stage names. */
@@ -66,7 +66,7 @@ public class RenewalStatusNames {
    */
   public String of(String stage, boolean returned, String accountStatus) {
     RenewalStage s = RenewalStage.valueOf(stage);
-    if (SYSTEM.equals(parameters.text(PARAMETER, "BDOI").strip())) {
+    if (SYSTEM.equals(parameters.text(PARAMETER, "CLIENT").strip())) {
       return s.label();
     }
     return bdoi(s, returned, accountStatus);

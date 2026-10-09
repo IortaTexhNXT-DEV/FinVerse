@@ -454,6 +454,10 @@ public enum Permission {
   RNW_AUDIT_VIEW,
   // CLPC billing files of renewal accounts (FRRN.027)
   RNW_BILLING,
+  // CCM and MFT messages of Renewal: view and resend (Channel Monitor)
+  RNW_CHANNEL_MONITOR,
+  // Connection settings of CCM and MFT
+  RNW_CHANNEL_SETUP,
 
   // Submitted Policies (BDOI BRD-12). See docs/architecture/SUBMITTED_POLICIES_DESIGN.md section
   // 6.1 and V1070. The data scope (segments, own records of an AO) is applied by SbmScopeService

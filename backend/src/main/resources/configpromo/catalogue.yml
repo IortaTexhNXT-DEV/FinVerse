@@ -214,6 +214,8 @@ datasets:
   - {code: RNW_NON_RENEWABLE_RISK_CODE, name: Non-renewable risk codes, group: RENEWAL_SUBMITTED, module: renewal, table: rnw_non_renewable_risk_code, key: [company_id, risk_code, effective_from]}
   - {code: RNW_PACKAGE_MAP, name: Renewal package map, group: RENEWAL_SUBMITTED, module: renewal, table: rnw_package_map, key: [company_id, legacy_package_code, legacy_package_version, risk_code, insurer_code, si_from, map_version]}
   - {code: RNW_INSURER_RENEWABLE_RISK, name: Risks each insurer renews, group: RENEWAL_SUBMITTED, module: renewal, table: rnw_insurer_renewable_risk, key: [company_id, insurer_code, risk_code, effective_from]}
+  - {code: RNW_RMU_OFFICER, name: RMU Account Officers, group: RENEWAL_SUBMITTED, module: renewal, table: rnw_rmu_officer, key: [company_id, ao_code]}
+  - {code: RNW_INSURER_DISPOSITION_MAP, name: Insurer dispositions of renewal, group: RENEWAL_SUBMITTED, module: renewal, table: rnw_insurer_disposition_map, key: [code]}
   - {code: SBM_SOURCE, name: Submitted policy sources, group: RENEWAL_SUBMITTED, module: submitted, table: sbm_source, key: [code]}
   - {code: SBM_STATUS_MAP, name: Submitted policy status map, group: RENEWAL_SUBMITTED, module: submitted, table: sbm_status_map, key: [legacy_status]}
   - {code: SBM_RULE_SET, name: Submitted policy rule sets, group: RENEWAL_SUBMITTED, module: submitted, table: sbm_rule_set, key: [company_id, code, version_no]}
@@ -388,7 +390,8 @@ excluded:
      scr_ingestion_run, scr_match, scr_match_suppression, scr_screening_run, scr_str,
      scr_str_extraction, scr_str_extraction_item, scr_str_field, scr_str_transaction, sl_item_match,
      sl_open_item, tax_2307_batch, tax_2307_certificate, tax_2307_line, tax_certificate_received,
-     tax_certificate_received_line, tax_remittance, tax_return, tax_return_line, wf_case]
+     tax_certificate_received_line, tax_remittance, tax_return, tax_return_line, wf_case,
+     rnw_bdofc_line, rnw_channel_message, rnw_insurer_disposition_line, rnw_lamd_loan, rnw_paid_off_account, rnw_placement_tracking, rnw_processing_assignment, rnw_referral]
   CLIENT_DATA:
     [crm_client, crm_client_instruction, crm_client_payout_account, crm_client_tag, crm_kyc_document,
      csf_contact_change, csf_contact_change_field, csf_sync_outbox, csf_verification,
@@ -404,7 +407,8 @@ excluded:
      npk_insurer_response_history, ops_invoice_status_change, pay_pdc_event,
      pm_insurer_response_history, rcv_pdc_event, rnw_bucket_history, rnw_history_view,
      sbm_policy_history, scr_case_event, scr_ingestion_error, sec_access_change_log, sys_job_run,
-     wf_case_history]
+     wf_case_history,
+     rnw_budget_history, rnw_channel_event]
   SECRET:
     [sec_mfa_recovery_code, sec_mfa_reset_request, sec_mfa_trusted_device, sec_password_history,
      sec_password_reset_token, sec_revoked_token, sec_sso_request, sec_sso_ticket, sec_user_mfa,
@@ -419,6 +423,7 @@ excluded:
      per_period, report_batch, report_batch_item, report_run, report_run_file, scr_name_key,
      sto_legal_hold_request, yec_year_end_close]
   PLANNING:
-    [bud_budget, bud_budget_amount, bud_budget_line, nbr_sales_target]
+    [bud_budget, bud_budget_amount, bud_budget_line, nbr_sales_target,
+     rnw_budget, rnw_budget_month]
   PROMOTION:
     [cfp_package, cfp_import, cfp_import_dataset, cfp_baseline]

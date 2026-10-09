@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * RMU Account Maintenance (FRRN.041.01): the Account Officer codes of the Remedial Management Unit.
  * A loan of the CBG loans list whose Account Officer is in the list has the loan status RMU and
- * routes its renewal account to RMU. An active code is listed once.
+ * routes its renewal account to RMU. A code is listed once; it is deactivated, never deleted.
  */
 @Service
 @Transactional
@@ -132,9 +132,6 @@ public class RmuOfficerService {
             .orElseThrow(() -> new ResourceNotFoundException("RMU Account Officer", id));
     String name = require(input.aoName(), "Enter the Account Officer name");
     boolean active = input.active() == null || input.active();
-    if (active && !old.active()) {
-      requireUnique(companyId, old.aoCode(), id);
-    }
     Map<String, Object> a = new HashMap<>();
     a.put("id", id);
     a.put("name", name);
@@ -159,7 +156,7 @@ public class RmuOfficerService {
   private void requireUnique(Long companyId, String code, Long except) {
     Long count =
         jdbc.queryForObject(
-            "select count(*) from rnw_rmu_officer where company_id = :companyId and active"
+            "select count(*) from rnw_rmu_officer where company_id = :companyId"
                 + " and ao_code = :code and id <> :except",
             Map.of(
                 "companyId",

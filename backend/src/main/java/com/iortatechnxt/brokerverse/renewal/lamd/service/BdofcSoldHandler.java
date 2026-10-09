@@ -24,7 +24,7 @@ public class BdofcSoldHandler implements BulkImportHandler {
   /** Parameter: BDOFC or BDOSOLD. */
   public static final String PARAM_TYPE = "reportType";
 
-  private static final String LOCATION = "BDOI Location";
+  private static final String LOCATION = "Location";
   private static final String PN = "PN";
   private static final String ASSURED = "Assured's Name";
   private static final String INCEPTION = "Inception Date";
@@ -56,6 +56,11 @@ public class BdofcSoldHandler implements BulkImportHandler {
   @Override
   public String permission() {
     return Permission.RNW_LAMD_UPLOAD.name();
+  }
+
+  @Override
+  public String filledBy() {
+    return "The renewal team, from the BDOFC or BDOSOLD report of the bank";
   }
 
   @Override

@@ -748,7 +748,7 @@ items:
   FRRN.27.01:
     refs: []
     ac:
-      - On a day the CBG Home job runs, every CBG Home account with the status For Billing Generation expiring 10 calendar days later is in the billing file of its type; the file is named, for example, HOME_CLPC Billing Built in_10152026.csv.
+      - On a day the CBG Home job runs, every CBG Home account with the status For Billing Generation expiring 10 calendar days later is in the billing file of its type (built-in or non-built-in), named as this item states with the date of the run.
       - The generated file is attached to each account it holds.
 
   FRRN.27.02:

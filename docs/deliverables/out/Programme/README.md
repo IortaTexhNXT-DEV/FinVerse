@@ -82,6 +82,7 @@ sign-off per BRD"). Each document is kept once, in its latest version.
 | System Requirements Specification | BRD-00 | Requirements | 1.0 | [`Requirements/BIBS_SRS_BRD-00_System_Requirements_Specification_v1.0.docx`](Requirements/BIBS_SRS_BRD-00_System_Requirements_Specification_v1.0.docx) |
 | ASVS L2 Control Mapping | BRD-00 | Security | 1.0 | [`Security/BIBS_Security_BRD-00_ASVS_L2_Control_Mapping_v1.0.xlsx`](Security/BIBS_Security_BRD-00_ASVS_L2_Control_Mapping_v1.0.xlsx) |
 | Support Model and Support Guide | BRD-00 | Operations | 1.0 | [`Operations/BIBS_Support_BRD-00_Support_Model_and_Support_Guide_v1.0.docx`](Operations/BIBS_Support_BRD-00_Support_Model_and_Support_Guide_v1.0.docx) |
+| End-to-End Conformance Register | BRD-00 | Quality | 1.0 | [`Quality/BIBS_Conformance_BRD-00_End-to-End_Conformance_Register_v1.0.xlsx`](Quality/BIBS_Conformance_BRD-00_End-to-End_Conformance_Register_v1.0.xlsx) |
 | Test Strategy | BRD-00 | Quality | 1.0 | [`Quality/BIBS_TestStrategy_BRD-00_Test_Strategy_v1.0.docx`](Quality/BIBS_TestStrategy_BRD-00_Test_Strategy_v1.0.docx) |
 | Walkthrough Users and Sign-in | BRD-00 | UAT | 1.0 | [`UAT/BIBS_UAT_BRD-00_Walkthrough_Users_and_Sign-in_v1.0.xlsx`](UAT/BIBS_UAT_BRD-00_Walkthrough_Users_and_Sign-in_v1.0.xlsx) |
 

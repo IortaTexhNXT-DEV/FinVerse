@@ -14,7 +14,9 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import sys
+import tempfile
 from pathlib import Path
 
 import yaml
@@ -29,9 +31,35 @@ SUITES = ROOT / "frontend/src/navigation/personaMenus.json"
 SEED_USERS = ROOT / "docs/deliverables/src/programme/uat/seed_users.yaml"
 
 
+def grants_before(migration: Path) -> dict[str, set[str]]:
+    """The grants of every role once the migrations up to this one have run (a copy of grants takes the grants of
+    that moment)."""
+    with tempfile.TemporaryDirectory() as tmp:
+        (Path(tmp) / "migration").mkdir()
+        (Path(tmp) / "seed").mkdir()
+        for f in (ROOT / "backend/src/main/resources/db/migration").glob("V*.sql"):
+            if code_facts._version(f) <= code_facts._version(migration):
+                (Path(tmp) / "migration" / f.name).symlink_to(f)
+        saved = code_facts.DB_ROOT
+        code_facts.DB_ROOT = Path(tmp)
+        try:
+            return code_facts.role_grants(include_seed=False)
+        finally:
+            code_facts.DB_ROOT = saved
+
+
 def main() -> None:
     groups = code_facts.frontend_menu()
     grants = code_facts.role_grants()
+    # Roles that receive the grants of another role by a migration (for example the EB processing roles, which hold
+    # the Processing permissions to book EB accounts: FRS BRD-8, persona table).
+    for f in sorted((ROOT / "backend/src/main/resources/db/migration").glob("V*.sql")):
+        text = f.read_text(encoding="utf-8")
+        for m in re.finditer(r"join sec_role_permission \w+ on \w+\.role_id = \(select id from sec_role where code = "
+                             r"'(\w+)'\)\s*where r\.code in \(([^)]*)\)", text, re.I):
+            source = grants_before(f).get(m.group(1), set())
+            for target in re.findall(r"'(\w+)'", m.group(2)):
+                grants.setdefault(target, set()).update(source)
     roles_of = {u["id"]: u.get("roles") or [] for u in yaml.safe_load(SEED_USERS.read_text(encoding="utf-8"))["users"]}
 
     def menu(roles: list[str]) -> list[str]:

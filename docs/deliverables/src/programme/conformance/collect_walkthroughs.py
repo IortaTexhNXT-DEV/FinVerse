@@ -50,6 +50,12 @@ def best_line(text: str, expected: str) -> tuple[str, float]:
 
 def main(run: Path) -> None:
     results = []
+    users_of = {}
+    for b_ in yaml.safe_load((SRC / "programme/uat/uat_users.yaml").read_text(encoding="utf-8"))["brds"]:
+        for p in b_.get("personas") or []:
+            if p.get("role") and p.get("users"):
+                u = p["users"][0]
+                users_of.setdefault(p["role"], u if isinstance(u, str) else u["id"])
     shots = HERE / "shots"
     shots.mkdir(exist_ok=True)
     for pack in sorted(SRC.glob("BRD-*/pack/walkthroughs.yaml")):
@@ -59,10 +65,12 @@ def main(run: Path) -> None:
         if not log.exists():
             continue
         outcome: dict[str, str | None] = {}
-        for line in log.read_text(encoding="utf-8", errors="replace").splitlines():
-            m = re.match(r"(captured|FAILED) (wt-[a-z]-\d+) ?(.*)", line)
-            if m:
-                outcome[m.group(2)] = None if m.group(1) == "captured" else m.group(3)
+        # The run of the BRD, then the reruns of some of its steps (<brd><suffix>.log): a later result counts.
+        for f in [log] + sorted(p for p in run.glob(f"{b}?*.log")):
+            for line in f.read_text(encoding="utf-8", errors="replace").splitlines():
+                m = re.match(r"(captured|FAILED) (wt-[a-z]-\d+) ?(.*)", line)
+                if m:
+                    outcome[m.group(2)] = None if m.group(1) == "captured" else m.group(3)
         for wt in yaml.safe_load(pack.read_text(encoding="utf-8"))["walkthroughs"]:
             for n, step in enumerate(wt["steps"], start=1):
                 persona, screen_id, does, sees, result, slug = (step + [None] * 6)[:6]
@@ -85,7 +93,10 @@ def main(run: Path) -> None:
                 status = "fail" if error or ERROR.search(text) else "pass"
                 shot = None
                 if status == "fail":
-                    for f in sorted((run / "fail" / b).glob(f"capture-pack-failed-{slug}-*.png")):
+                    files = sorted((run / "fail" / b).glob(f"capture-pack-failed-{slug}-*.png"))
+                    # The page of the persona of the step, when the run kept one per signed-in user.
+                    mine = [f for f in files if f.stem.endswith("-" + users_of.get(str(persona), "?"))]
+                    for f in mine + files:
                         shot = f"{brd}_{wt['id']}_{n}.png"
                         shutil.copyfile(f, shots / shot)
                         break

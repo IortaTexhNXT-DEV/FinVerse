@@ -19,61 +19,68 @@ const PROBES = ['/admin/users', '/gl/journals', '/cashiering/receive', '/screeni
 const DENIED = /You do not have access|not permitted|no access/i;
 
 async function sidebar(page) {
-  const nav = page.locator('nav.app-sidebar');
-  for (let i = 0; i < 40; i += 1) {
-    const closed = nav.locator('button[aria-expanded="false"]');
-    if ((await closed.count()) === 0) break;
-    await closed.first().click();
-    await page.waitForTimeout(120);
+  await page.locator('nav.app-sidebar').waitFor({ timeout: 15000 });
+  // Opens every closed group of the sidebar (a group renders its screens only when open).
+  for (let i = 0; i < 5; i += 1) {
+    const opened = await page.locator('nav.app-sidebar button[aria-expanded="false"]').evaluateAll((bs) => {
+      bs.forEach((b) => b.click());
+      return bs.length;
+    });
+    if (opened === 0) break;
+    await page.waitForTimeout(250);
   }
-  const hrefs = await page.locator('nav.app-sidebar a[href]').evaluateAll((as) => as.map((a) => a.getAttribute('href')));
+  const hrefs = await page.locator('nav.app-sidebar a.nav-link[href]').evaluateAll((as) => as.map((a) => a.getAttribute('href')));
   return [...new Set(hrefs.filter((h) => h && h.startsWith('/')))].sort();
 }
 
 (async () => {
   if (!PASSWORD) throw new Error('Set SEED_PASSWORD');
   const browser = await chromium.launch({ executablePath: process.env.CHROMIUM || undefined });
-  const seen = {};
+  const seen = {}; // per sign-in: the sidebar, the screen probed by its address and the sign-in error
   const results = [];
   for (const p of personas) {
-    let shown = seen[p.user];
-    let denial = null;
     let error = null;
-    const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
-    const page = await context.newPage();
-    page.setDefaultTimeout(20000);
-    try {
-      await page.goto(`${BASE}/login`);
-      await page.getByLabel('User ID').fill(p.user);
-      await page.getByLabel('Password', { exact: true }).fill(PASSWORD);
-      await page.getByRole('button', { name: /^(login|sign in)$/i }).click();
-      await page.waitForURL((u) => !u.pathname.startsWith('/login'), { timeout: 30000 });
-      await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {});
-      if (!shown) {
-        shown = await sidebar(page);
-        seen[p.user] = shown;
-      }
-      const probe = PROBES.find((x) => !p.expected.includes(x));
-      if (probe) {
-        await page.goto(`${BASE}${probe}`);
+    let page = null;
+    let context = null;
+    if (!seen[p.user]) {
+      context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+      page = await context.newPage();
+      page.setDefaultTimeout(20000);
+      const entry = { shown: [], denial: null, error: null };
+      try {
+        await page.goto(`${BASE}/login`);
+        await page.getByLabel('User ID').fill(p.user);
+        await page.getByLabel('Password', { exact: true }).fill(PASSWORD);
+        await page.getByRole('button', { name: /^(login|sign in)$/i }).click();
+        await page.waitForURL((u) => !u.pathname.startsWith('/login'), { timeout: 30000 });
         await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {});
-        await page.waitForTimeout(600);
-        const text = await page.locator('body').innerText();
-        denial = { screen: probe, denied: DENIED.test(text) };
+        entry.shown = await sidebar(page);
+        const probe = PROBES.find((x) => !p.expected.includes(x));
+        if (probe) {
+          await page.goto(`${BASE}${probe}`);
+          await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {});
+          await page.waitForTimeout(500);
+          entry.denial = { screen: probe, denied: DENIED.test(await page.locator('body').innerText()) };
+        }
+      } catch (e) {
+        entry.error = e.message.split('\n')[0];
       }
-    } catch (e) {
-      error = e.message.split('\n')[0];
+      seen[p.user] = entry;
     }
+    const { shown, denial } = seen[p.user];
+    error = seen[p.user].error;
     const observed = shown || [];
     const missing = p.expected.filter((x) => !observed.includes(x));
     const extra = observed.filter((x) => !p.expected.includes(x));
     const frsMissing = p.frs_menu.filter((x) => !observed.includes(x));
     const ok = !error && missing.length === 0 && extra.length === 0 && (!denial || denial.denied);
-    if (!ok) {
+    if (!ok && page) {
       fs.mkdirSync(SHOTS, { recursive: true });
       await page.screenshot({ path: path.join(SHOTS, `persona_${p.brd}_${p.user}.png`) }).catch(() => {});
     }
-    await context.close();
+    if (context) {
+      await context.close();
+    }
     results.push({ ...p, observed, missing, extra, frs_missing: frsMissing, denial, error, ok });
     console.log(p.brd, p.user, p.role, ok ? 'ok' : 'MISMATCH', error || '', missing.join(' '), extra.length ? `extra ${extra.join(' ')}` : '',
       denial && !denial.denied ? `opens ${denial.screen}` : '');

@@ -6,9 +6,9 @@
 # Read by run_steps.cjs and build_conformance.py.
 
 BRD-00:
-  J1.1: {refs: [BRD-11/WT-A], checks: [[/admin/users, null, [New User]]]}
+  J1.1: {refs: [BRD-11/WT-A], checks: [[/user-access/requests, null, [New Request]]]}
   J1.2: {refs: [BRD-03/WT-A], checks: [[/product-maintenance/tsu, null, []]]}
-  J1.3: {checks: [[/broking-setup/lists, null, []], [/catalog/insurers/:id, /catalog/insurers, [History]]]}
+  J1.3: {checks: [[/broking-setup/lists, null, []], [/catalog/insurers/:id, /catalog/insurers, [Profile, Branches, Commission rates]]]}
   J2.1: {refs: [BRD-01/WT-A.1-4], checks: [[/crm/clients/new, null, [Save as Prospect]], [/screening, null, []]]}
   J2.2: {refs: [BRD-01/WT-A.5-8], checks: [[/quotations, null, []]]}
   J2.3: {refs: [BRD-01/WT-B], checks: [[/proposals/tsu, null, []]]}
@@ -26,7 +26,7 @@ BRD-00:
   J4.4: {refs: [BRD-08/P1, BRD-08/P2, BRD-08/P3, BRD-08/P4, BRD-08/P5], checks: [[/eb, null, []]]}
   J4.5: {refs: [BRD-10/P2, BRD-10/P3, BRD-10/P4], checks: [[/screening/cases, null, []]]}
   J5.1: {checks: [[/, null, []], [/notifications, null, []], [/admin/audit, null, []]], user: admin}
-  J5.2: {checks: [[/reports, null, []], [/reports/NB-PRODUCTION, null, [Run Report]]]}
+  J5.2: {checks: [[/reports, null, []], [/reports/:code, /reports, [Run Report]]]}
 
 BRD-07:
   P1.1: {checks: [[/claims-handling/covers, null, []]]}
@@ -35,7 +35,7 @@ BRD-07:
   P1.4: {checks: [[/claims-handling/:id, /claims-handling/worklist, [Send Loss Advice]]]}
   P1.5: {checks: [[/claims-handling/:id, /claims-handling/worklist, [Insurers]]]}
   P2.1: {checks: [[/claims-handling/:id, /claims-handling/worklist, [Details, Reserve]]]}
-  P2.2: {checks: [[/claims-handling/:id, /claims-handling/worklist, [Update Status]]]}
+  P2.2: {checks: [[/claims-handling/:id, /claims-handling/worklist, [Change Status]]]}
   P2.3: {checks: [[/claims-handling/:id, /claims-handling/worklist, [Diary]], [/claims-handling/diary, null, []]]}
   P2.4: {checks: [[/claims-handling/:id, /claims-handling/worklist, []], [/remittance, null, []]], user: clmtl}
   P3.1: {checks: [[/claims-handling/:id, /claims-handling/worklist, [Settlement]]]}
@@ -69,17 +69,17 @@ BRD-08:
 BRD-09:
   P1.1: {checks: [[/, null, []]]}
   P1.2: {checks: [[/csf, null, []]]}
-  P1.3: {checks: [[/csf/clients/:clientId, /csf, [Accounts]]]}
-  P1.4: {checks: [[/csf/clients/:clientId, /csf, [Payments]]]}
-  P1.5: {checks: [[/csf/clients/:clientId, /csf, [Update Contact]]]}
-  P1.6: {checks: [[/csf/clients/:clientId, /csf, [Update Contact]]]}
-  P1.7: {checks: [[/csf/clients/:clientId, /csf, [Renewal Advice]]]}
-  P1.8: {checks: [[/csf/clients/:clientId, /csf, [Renewal Advice]]]}
-  P1.9: {checks: [[/csf/clients/:clientId, /csf, [E-policies]]]}
-  P1.10: {checks: [[/csf/clients/:clientId, /csf, [Documents]]]}
+  P1.3: {checks: [[/csf/clients/:clientId, "/csf?q=Santos", [Accounts]]]}
+  P1.4: {checks: [[/csf/clients/:clientId, "/csf?q=Santos", [Payments]]]}
+  P1.5: {checks: [[/csf/clients/:clientId, "/csf?q=Santos", [Update Contact]]]}
+  P1.6: {checks: [[/csf/clients/:clientId, "/csf?q=Santos", [Update Contact]]]}
+  P1.7: {checks: [[/csf/clients/:clientId, "/csf?q=Santos", [Renewal Advice]]]}
+  P1.8: {checks: [[/csf/clients/:clientId, "/csf?q=Santos", [Renewal Advice]]]}
+  P1.9: {checks: [[/csf/clients/:clientId, "/csf?q=Santos", [E-policies]]]}
+  P1.10: {checks: [[/csf/clients/:clientId, "/csf?q=Santos", [Documents]]]}
   P1.11: {checks: [[/csf/changes, null, []], [/csf/reports, null, []], [/admin/audit, null, []]]}
-  P2.1: {checks: [[/csf/clients/:clientId, /csf, [Log Case]]], gap: CSF-CASES}
-  P2.2: {checks: [[/csf/clients/:clientId, /csf, [Log Case]]], gap: CSF-CASES}
+  P2.1: {checks: [[/csf/clients/:clientId, "/csf?q=Santos", [Log Case]]], gap: CSF-CASES}
+  P2.2: {checks: [[/csf/clients/:clientId, "/csf?q=Santos", [Log Case]]], gap: CSF-CASES}
   P2.3: {gap: CSF-CASES}
   P2.4: {gap: CSF-CASES}
   P2.5: {gap: CSF-CASES}
@@ -112,9 +112,9 @@ BRD-10:
 
 BRD-12:
   P1.1: {checks: [[/submitted/intake, null, []]]}
-  P1.2: {checks: [[/submitted/masterlist, null, [New Policy]], [/submitted/policies/:id, /submitted/masterlist, []]]}
+  P1.2: {checks: [[/submitted/masterlist, null, [New Policy]], [/submitted/policies/:id, /submitted/masterlist, []]], gap: SBM-MANUAL}
   P1.3: {checks: [[/submitted/intake, null, [Migration]], [/reports/SBM-MIGRATION-ERRORS, null, [Run Report]]]}
-  P1.4: {checks: [[/submitted/intake, null, [Loan Files]]]}
+  P1.4: {checks: [[/submitted/intake, null, [Upload Loan File]]]}
   P1.5: {checks: [[/submitted/runs, null, []]]}
   P1.6: {checks: [[/submitted/masterlist, null, [Fallout]], [/reports/SBM-PROCESS-FALLOUT, null, [Run Report]]]}
   P1.7: {checks: [[/submitted/setup, null, []], [/approvals, null, []]]}
@@ -126,12 +126,12 @@ BRD-12:
   P3.2: {checks: [[/submitted/proposals, null, []]]}
   P3.3: {checks: [[/submitted/proposals, null, []]]}
   P3.4: {checks: [[/submitted/renewals, null, []]]}
-  P3.5: {checks: [[/submitted/renewals, null, [Insurer Not Accepted]]]}
+  P3.5: {checks: [[/submitted/renewals, null, []]]}
   P3.6: {checks: [[/placement, null, []], [/booking, null, []]]}
   P4.1: {checks: [[/submitted/fees, null, []], [/cashiering/unapplied, null, []]]}
   P4.2: {checks: [[/reports/SBM-SANITATION, null, [Run Report]], [/reports/SBM-DISPOSITION, null, [Run Report]], [/reports/SBM-CONVERSION, null, [Run Report]]]}
   P4.3: {checks: [[/reports/SBM-EXPIRING-UNINSURED, null, [Run Report]]]}
-  P4.4: {checks: [[/submitted/setup, null, [Notification Recipients]]]}
+  P4.4: {checks: [[/submitted/setup, null, [Notification Recipients]]], gap: SBM-RECIPIENTS}
   P4.5: {checks: [[/submitted/masterlist, null, []], [/submitted/policies/:id, /submitted/masterlist, [History]]]}
 
 BRD-13:

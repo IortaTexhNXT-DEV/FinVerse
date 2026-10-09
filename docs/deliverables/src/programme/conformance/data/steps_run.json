@@ -1,0 +1,2558 @@
+[
+ {
+  "brd": "BRD-00",
+  "step": "J1.1",
+  "user": "requestor",
+  "checks": [
+   {
+    "screen": "/user-access/requests",
+    "url": "/user-access/requests",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-00",
+  "step": "J1.2",
+  "user": "tsu",
+  "checks": [
+   {
+    "screen": "/product-maintenance/tsu",
+    "url": "/product-maintenance/tsu",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-00",
+  "step": "J1.3",
+  "user": "badmin",
+  "checks": [
+   {
+    "screen": "/broking-setup/lists",
+    "url": "/broking-setup/lists",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/catalog/insurers/:id",
+    "url": "/catalog/insurers/6",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-00",
+  "step": "J2.1",
+  "user": "ao",
+  "checks": [
+   {
+    "screen": "/crm/clients/new",
+    "url": "/crm/clients/new",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/screening",
+    "url": "/screening",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-00",
+  "step": "J2.2",
+  "user": "ao",
+  "checks": [
+   {
+    "screen": "/quotations",
+    "url": "/quotations",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-00",
+  "step": "J2.3",
+  "user": "tsu",
+  "checks": [
+   {
+    "screen": "/proposals/tsu",
+    "url": "/proposals/tsu",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-00",
+  "step": "J2.4",
+  "user": "ao",
+  "checks": [
+   {
+    "screen": "/accounts",
+    "url": "/accounts",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/submitted/masterlist",
+    "url": "/submitted/masterlist",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-00",
+  "step": "J2.5",
+  "user": "proc",
+  "checks": [
+   {
+    "screen": "/placement",
+    "url": "/placement",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/booking",
+    "url": "/booking",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-00",
+  "step": "J2.6",
+  "user": "proc",
+  "checks": [
+   {
+    "screen": "/accounts",
+    "url": "/accounts",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-00",
+  "step": "J3.1",
+  "user": "clxhandler",
+  "checks": [
+   {
+    "screen": "/collections",
+    "url": "/collections",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-00",
+  "step": "J3.2",
+  "user": "cashier",
+  "checks": [
+   {
+    "screen": "/cashiering",
+    "url": "/cashiering",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/remittance",
+    "url": "/remittance",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-00",
+  "step": "J3.3",
+  "user": "cashier",
+  "checks": [
+   {
+    "screen": "/adjustment",
+    "url": "/adjustment",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-00",
+  "step": "J3.4",
+  "user": "cashier",
+  "checks": [
+   {
+    "screen": "/prodrecon",
+    "url": "/prodrecon",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/commission",
+    "url": "/commission",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-00",
+  "step": "J3.5",
+  "user": "glofficer",
+  "checks": [
+   {
+    "screen": "/gl/inquiry",
+    "url": "/gl/inquiry",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/acsl",
+    "url": "/acsl",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-00",
+  "step": "J4.1",
+  "user": "ao",
+  "checks": [
+   {
+    "screen": "/renewal/processing",
+    "url": "/renewal/processing",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-00",
+  "step": "J4.2",
+  "user": "clmofficer",
+  "checks": [
+   {
+    "screen": "/claims-handling",
+    "url": "/claims-handling",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-00",
+  "step": "J4.3",
+  "user": "csfagent",
+  "checks": [
+   {
+    "screen": "/csf",
+    "url": "/csf",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-00",
+  "step": "J4.4",
+  "user": "ebao",
+  "checks": [
+   {
+    "screen": "/eb",
+    "url": "/eb",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-00",
+  "step": "J4.5",
+  "user": "compoff",
+  "checks": [
+   {
+    "screen": "/screening/cases",
+    "url": "/screening/cases",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-00",
+  "step": "J5.1",
+  "user": "admin",
+  "checks": [
+   {
+    "screen": "/",
+    "url": "/",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/notifications",
+    "url": "/notifications",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/admin/audit",
+    "url": "/admin/audit",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-00",
+  "step": "J5.2",
+  "user": "badmin",
+  "checks": [
+   {
+    "screen": "/reports",
+    "url": "/reports",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/reports/:code",
+    "url": "/reports/CLX-AUDIT-LOG",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-07",
+  "step": "P1.1",
+  "user": "clmofficer",
+  "checks": [
+   {
+    "screen": "/claims-handling/covers",
+    "url": "/claims-handling/covers",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-07",
+  "step": "P1.2",
+  "user": "clmofficer",
+  "checks": [
+   {
+    "screen": "/claims-handling/new",
+    "url": "/claims-handling/new",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-07",
+  "step": "P1.3",
+  "user": "clmofficer",
+  "checks": [
+   {
+    "screen": "/claims-handling/:id",
+    "url": "/claims-handling/3",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-07",
+  "step": "P1.4",
+  "user": "clmofficer",
+  "checks": [
+   {
+    "screen": "/claims-handling/:id",
+    "url": "/claims-handling/3",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-07",
+  "step": "P1.5",
+  "user": "clmofficer",
+  "checks": [
+   {
+    "screen": "/claims-handling/:id",
+    "url": "/claims-handling/3",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-07",
+  "step": "P2.1",
+  "user": "clmtl",
+  "checks": [
+   {
+    "screen": "/claims-handling/:id",
+    "url": "/claims-handling/8",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-07",
+  "step": "P2.2",
+  "user": "clmofficer",
+  "checks": [
+   {
+    "screen": "/claims-handling/:id",
+    "url": "/claims-handling/3",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-07",
+  "step": "P2.3",
+  "user": "clmofficer",
+  "checks": [
+   {
+    "screen": "/claims-handling/:id",
+    "url": "/claims-handling/3",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/claims-handling/diary",
+    "url": "/claims-handling/diary",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-07",
+  "step": "P2.4",
+  "user": "clmtl",
+  "checks": [
+   {
+    "screen": "/claims-handling/:id",
+    "url": "/claims-handling/8",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/remittance",
+    "url": "/remittance",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-07",
+  "step": "P3.1",
+  "user": "clmtl",
+  "checks": [
+   {
+    "screen": "/claims-handling/:id",
+    "url": "/claims-handling/8",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-07",
+  "step": "P3.2",
+  "user": "clmofficer",
+  "checks": [
+   {
+    "screen": "/claims-handling/:id",
+    "url": "/claims-handling/3",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-07",
+  "step": "P3.3",
+  "user": "clmth",
+  "checks": [
+   {
+    "screen": "/claims-handling/:id",
+    "url": "/claims-handling/8",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-07",
+  "step": "P4.1",
+  "user": "clmofficer",
+  "checks": [
+   {
+    "screen": "/claims-handling",
+    "url": "/claims-handling",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/reports/BCL-PENDING-ACTIONS",
+    "url": "/reports/BCL-PENDING-ACTIONS",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-07",
+  "step": "P4.2",
+  "user": "clmuh",
+  "checks": [
+   {
+    "screen": "/reports/BCL-AGEING",
+    "url": "/reports/BCL-AGEING",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/reports/BCL-OUTSTANDING",
+    "url": "/reports/BCL-OUTSTANDING",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/reports/BCL-SETTLED",
+    "url": "/reports/BCL-SETTLED",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/reports/BCL-LOSS-EXPERIENCE",
+    "url": "/reports/BCL-LOSS-EXPERIENCE",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/reports/BCL-LOSS-RATIO",
+    "url": "/reports/BCL-LOSS-RATIO",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-07",
+  "step": "P4.3",
+  "user": "clmrisk",
+  "checks": [
+   {
+    "screen": "/reports/BCL-PRONE-LOCATIONS",
+    "url": "/reports/BCL-PRONE-LOCATIONS",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/reports/BCL-DATA-EXTRACT",
+    "url": "/reports/BCL-DATA-EXTRACT",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-07",
+  "step": "P4.4",
+  "user": "ao",
+  "checks": [
+   {
+    "screen": "/reports/BCL-LOSS-EXPERIENCE",
+    "url": "/reports/BCL-LOSS-EXPERIENCE",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/accounts/:id",
+    "url": "/accounts/49",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-07",
+  "step": "P4.5",
+  "user": "clmuh",
+  "checks": [
+   {
+    "screen": "/reports/BCL-INSURER-CLAIMS",
+    "url": "/reports/BCL-INSURER-CLAIMS",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/reports/BCL-ACTIVITY-LOG",
+    "url": "/reports/BCL-ACTIVITY-LOG",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-08",
+  "step": "P1.1",
+  "user": "ebao",
+  "checks": [
+   {
+    "screen": "/crm/clients",
+    "url": "/crm/clients",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/eb/programmes/new",
+    "url": "/eb/programmes/new",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/eb/programmes",
+    "url": "/eb/programmes",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-08",
+  "step": "P1.2",
+  "user": "badmin",
+  "checks": [],
+  "status": "blocked",
+  "note": "The insurer and client portal is outside Drop 2 (Employee Benefits without the portal feature)"
+ },
+ {
+  "brd": "BRD-08",
+  "step": "P1.3",
+  "user": "No",
+  "checks": [],
+  "status": "blocked",
+  "note": "The insurer and client portal is outside Drop 2 (Employee Benefits without the portal feature)"
+ },
+ {
+  "brd": "BRD-08",
+  "step": "P1.4",
+  "user": "ebao",
+  "checks": [],
+  "status": "blocked",
+  "note": "The insurer and client portal is outside Drop 2 (Employee Benefits without the portal feature)"
+ },
+ {
+  "brd": "BRD-08",
+  "step": "P2.1",
+  "user": "ebao",
+  "checks": [
+   {
+    "screen": "/eb/programmes/:id",
+    "url": "/eb/programmes/4",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-08",
+  "step": "P2.2",
+  "user": "ebao",
+  "checks": [
+   {
+    "screen": "/eb/programmes/:id",
+    "url": "/eb/programmes/4",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-08",
+  "step": "P2.3",
+  "user": "ebao",
+  "checks": [
+   {
+    "screen": "/eb/programmes/:id",
+    "url": "/eb/programmes/4",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-08",
+  "step": "P3.1",
+  "user": "No",
+  "checks": [],
+  "status": "blocked",
+  "note": "The insurer submits its proposal through the portal, outside Drop 2; the officer keys the proposal in BIBS instead"
+ },
+ {
+  "brd": "BRD-08",
+  "step": "P3.2",
+  "user": "ebtl",
+  "checks": [
+   {
+    "screen": "/eb/programmes/:id",
+    "url": "/eb/programmes/4",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-08",
+  "step": "P3.3",
+  "user": "No",
+  "checks": [],
+  "status": "blocked",
+  "note": "The client confirms the comparative through the portal, outside Drop 2; the confirmation is recorded by the officer"
+ },
+ {
+  "brd": "BRD-08",
+  "step": "P3.4",
+  "user": "ebao",
+  "checks": [
+   {
+    "screen": "/eb/programmes/:id",
+    "url": "/eb/programmes/4",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-08",
+  "step": "P4.1",
+  "user": "ebprocsup",
+  "checks": [
+   {
+    "screen": "/my-work",
+    "url": "/my-work",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-08",
+  "step": "P4.2",
+  "user": "ebproc",
+  "checks": [
+   {
+    "screen": "/accounts/:id",
+    "url": "/accounts/49",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/booking",
+    "url": "/booking",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-08",
+  "step": "P4.3",
+  "user": "ebcoll",
+  "checks": [
+   {
+    "screen": "/eb/soa",
+    "url": "/eb/soa",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-08",
+  "step": "P4.4",
+  "user": "ebao",
+  "checks": [
+   {
+    "screen": "/eb/member-changes",
+    "url": "/eb/member-changes",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-08",
+  "step": "P5.1",
+  "user": "ebmgmt",
+  "checks": [
+   {
+    "screen": "/reports/EB-NEW-BUSINESS",
+    "url": "/reports/EB-NEW-BUSINESS",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/reports/EB-PLACEMENT",
+    "url": "/reports/EB-PLACEMENT",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/eb",
+    "url": "/eb",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-08",
+  "step": "P5.2",
+  "user": "ebproc",
+  "checks": [
+   {
+    "screen": "/eb/pending-items",
+    "url": "/eb/pending-items",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-09",
+  "step": "P1.1",
+  "user": "csfagent",
+  "checks": [
+   {
+    "screen": "/",
+    "url": "/csf",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-09",
+  "step": "P1.2",
+  "user": "csfagent",
+  "checks": [
+   {
+    "screen": "/csf",
+    "url": "/csf",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-09",
+  "step": "P1.3",
+  "user": "csfagent",
+  "checks": [
+   {
+    "screen": "/csf/clients/:clientId",
+    "url": "/csf/clients/1",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-09",
+  "step": "P1.4",
+  "user": "csfagent",
+  "checks": [
+   {
+    "screen": "/csf/clients/:clientId",
+    "url": "/csf/clients/1",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-09",
+  "step": "P1.5",
+  "user": "csfagent",
+  "checks": [
+   {
+    "screen": "/csf/clients/:clientId",
+    "url": "/csf/clients/1",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-09",
+  "step": "P1.6",
+  "user": "csfagent",
+  "checks": [
+   {
+    "screen": "/csf/clients/:clientId",
+    "url": "/csf/clients/1",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-09",
+  "step": "P1.7",
+  "user": "csfagent",
+  "checks": [
+   {
+    "screen": "/csf/clients/:clientId",
+    "url": "/csf/clients/1",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-09",
+  "step": "P1.8",
+  "user": "csfsup",
+  "checks": [
+   {
+    "screen": "/csf/clients/:clientId",
+    "url": "/csf/clients/1",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-09",
+  "step": "P1.9",
+  "user": "csfagent",
+  "checks": [
+   {
+    "screen": "/csf/clients/:clientId",
+    "url": "/csf/clients/1",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-09",
+  "step": "P1.10",
+  "user": "csfagent",
+  "checks": [
+   {
+    "screen": "/csf/clients/:clientId",
+    "url": "/csf/clients/1",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-09",
+  "step": "P1.11",
+  "user": "csfmgmt",
+  "checks": [
+   {
+    "screen": "/csf/changes",
+    "url": "/csf/changes",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/csf/reports",
+    "url": "/csf/reports",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/admin/audit",
+    "url": "/admin/audit",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-09",
+  "step": "P2.1",
+  "user": "csfagent",
+  "checks": [
+   {
+    "screen": "/csf/clients/:clientId",
+    "url": "/csf/clients/1",
+    "ok": false,
+    "problem": null,
+    "missing": [
+     "Log Case"
+    ]
+   }
+  ],
+  "status": "fail"
+ },
+ {
+  "brd": "BRD-09",
+  "step": "P2.2",
+  "user": "csfagent",
+  "checks": [
+   {
+    "screen": "/csf/clients/:clientId",
+    "url": "/csf/clients/1",
+    "ok": false,
+    "problem": null,
+    "missing": [
+     "Log Case"
+    ]
+   }
+  ],
+  "status": "fail"
+ },
+ {
+  "brd": "BRD-09",
+  "step": "P2.3",
+  "user": "No",
+  "checks": [],
+  "status": "fail",
+  "note": "gap CSF-CASES"
+ },
+ {
+  "brd": "BRD-09",
+  "step": "P2.4",
+  "user": "No",
+  "checks": [],
+  "status": "fail",
+  "note": "gap CSF-CASES"
+ },
+ {
+  "brd": "BRD-09",
+  "step": "P2.5",
+  "user": "No",
+  "checks": [],
+  "status": "fail",
+  "note": "gap CSF-CASES"
+ },
+ {
+  "brd": "BRD-09",
+  "step": "P2.6",
+  "user": "csfagent",
+  "checks": [],
+  "status": "fail",
+  "note": "gap CSF-CASES"
+ },
+ {
+  "brd": "BRD-09",
+  "step": "P2.7",
+  "user": "csfsup",
+  "checks": [],
+  "status": "fail",
+  "note": "gap CSF-CASES"
+ },
+ {
+  "brd": "BRD-09",
+  "step": "P2.8",
+  "user": "csfsup",
+  "checks": [],
+  "status": "fail",
+  "note": "gap CSF-CASES"
+ },
+ {
+  "brd": "BRD-09",
+  "step": "P2.9",
+  "user": "csfagent",
+  "checks": [],
+  "status": "fail",
+  "note": "gap CSF-CASES"
+ },
+ {
+  "brd": "BRD-09",
+  "step": "P2.10",
+  "user": "csfmgmt",
+  "checks": [],
+  "status": "fail",
+  "note": "gap CSF-CASES"
+ },
+ {
+  "brd": "BRD-09",
+  "step": "P2.11",
+  "user": "csfmgmt",
+  "checks": [],
+  "status": "fail",
+  "note": "gap CSF-CASES"
+ },
+ {
+  "brd": "BRD-09",
+  "step": "P2.12",
+  "user": "admin",
+  "checks": [],
+  "status": "fail",
+  "note": "gap CSF-CASES"
+ },
+ {
+  "brd": "BRD-10",
+  "step": "P1.1",
+  "user": "compoff",
+  "checks": [
+   {
+    "screen": "/screening-setup/config",
+    "url": "/screening-setup/config",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/screening-setup/templates",
+    "url": "/screening-setup/templates",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-10",
+  "step": "P1.2",
+  "user": "compchk",
+  "checks": [
+   {
+    "screen": "/approvals",
+    "url": "/approvals",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-10",
+  "step": "P1.3",
+  "user": "compoff",
+  "checks": [
+   {
+    "screen": "/screening-setup/sources",
+    "url": "/screening-setup/sources",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-10",
+  "step": "P1.4",
+  "user": "compoff",
+  "checks": [
+   {
+    "screen": "/screening-setup/watchlist",
+    "url": "/screening-setup/watchlist",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/approvals",
+    "url": "/approvals",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-10",
+  "step": "P2.1",
+  "user": "compoff",
+  "checks": [
+   {
+    "screen": "/screening",
+    "url": "/screening",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/screening/runs",
+    "url": "/screening/runs",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-10",
+  "step": "P2.2",
+  "user": "investigator",
+  "checks": [
+   {
+    "screen": "/screening/matches",
+    "url": "/screening/matches",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-10",
+  "step": "P2.3",
+  "user": "ucc",
+  "checks": [
+   {
+    "screen": "/screening/cases",
+    "url": "/screening/cases",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/notifications",
+    "url": "/notifications",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-10",
+  "step": "P3.1",
+  "user": "investigator",
+  "checks": [
+   {
+    "screen": "/screening/cases/:id",
+    "url": "/screening/cases/10",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-10",
+  "step": "P3.2",
+  "user": "investigator",
+  "checks": [
+   {
+    "screen": "/screening/cases/:id",
+    "url": "/screening/cases/10",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-10",
+  "step": "P3.3",
+  "user": "scrapprover",
+  "checks": [
+   {
+    "screen": "/screening/cases",
+    "url": "/screening/cases",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/screening/cases/:id",
+    "url": "/screening/cases/10",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-10",
+  "step": "P3.4",
+  "user": "compoff",
+  "checks": [
+   {
+    "screen": "/screening/cases",
+    "url": "/screening/cases",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-10",
+  "step": "P3.5",
+  "user": "amlcom1",
+  "checks": [
+   {
+    "screen": "/screening/cases",
+    "url": "/screening/cases",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/screening/cases/:id",
+    "url": "/screening/cases/10",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-10",
+  "step": "P3.6",
+  "user": "ucc",
+  "checks": [
+   {
+    "screen": "/screening",
+    "url": "/screening",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/screening/cases/:id",
+    "url": "/screening/cases/10",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-10",
+  "step": "P4.1",
+  "user": "compoff",
+  "checks": [
+   {
+    "screen": "/screening/cases/:id",
+    "url": "/screening/cases/10",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-10",
+  "step": "P4.2",
+  "user": "compoff",
+  "checks": [
+   {
+    "screen": "/screening/str",
+    "url": "/screening/str",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-10",
+  "step": "P5.1",
+  "user": "compoff",
+  "checks": [
+   {
+    "screen": "/reports/SCR-CASE-STATUS",
+    "url": "/reports/SCR-CASE-STATUS",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/reports/SCR-HIGH-RISK-CLIENTS",
+    "url": "/reports/SCR-HIGH-RISK-CLIENTS",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/reports/SCR-SLA-BREACHES",
+    "url": "/reports/SCR-SLA-BREACHES",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-10",
+  "step": "P5.2",
+  "user": "auditor",
+  "checks": [
+   {
+    "screen": "/screening/cases/:id",
+    "url": "/screening/cases/10",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/reports/SCR-AUDIT-LOG",
+    "url": "/reports/SCR-AUDIT-LOG",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-12",
+  "step": "P1.1",
+  "user": "sbmhandler",
+  "checks": [
+   {
+    "screen": "/submitted/intake",
+    "url": "/submitted/intake",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-12",
+  "step": "P1.2",
+  "user": "polreview",
+  "checks": [
+   {
+    "screen": "/submitted/masterlist",
+    "url": "/submitted/masterlist",
+    "ok": false,
+    "problem": null,
+    "missing": [
+     "New Policy"
+    ]
+   },
+   {
+    "screen": "/submitted/policies/:id",
+    "url": "/submitted/policies/3",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "fail"
+ },
+ {
+  "brd": "BRD-12",
+  "step": "P1.3",
+  "user": "sbmtl",
+  "checks": [
+   {
+    "screen": "/submitted/intake",
+    "url": "/submitted/intake",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/reports/SBM-MIGRATION-ERRORS",
+    "url": "/reports/SBM-MIGRATION-ERRORS",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-12",
+  "step": "P1.4",
+  "user": "sanitation",
+  "checks": [
+   {
+    "screen": "/submitted/intake",
+    "url": "/submitted/intake",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-12",
+  "step": "P1.5",
+  "user": "sanitation",
+  "checks": [
+   {
+    "screen": "/submitted/runs",
+    "url": "/submitted/runs",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-12",
+  "step": "P1.6",
+  "user": "sanitation",
+  "checks": [
+   {
+    "screen": "/submitted/masterlist",
+    "url": "/submitted/masterlist",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/reports/SBM-PROCESS-FALLOUT",
+    "url": "/reports/SBM-PROCESS-FALLOUT",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-12",
+  "step": "P1.7",
+  "user": "sbmrules",
+  "checks": [
+   {
+    "screen": "/submitted/setup",
+    "url": "/submitted/setup",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/approvals",
+    "url": "/approvals",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-12",
+  "step": "P2.1",
+  "user": "polreview",
+  "checks": [
+   {
+    "screen": "/submitted/reviews",
+    "url": "/submitted/reviews",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-12",
+  "step": "P2.2",
+  "user": "sbmchecker",
+  "checks": [
+   {
+    "screen": "/approvals",
+    "url": "/approvals",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/submitted/reviews",
+    "url": "/submitted/reviews",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-12",
+  "step": "P2.3",
+  "user": "ao",
+  "checks": [
+   {
+    "screen": "/submitted/policies/:id",
+    "url": "/submitted/policies/10",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/submitted/tors",
+    "url": "/submitted/tors",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-12",
+  "step": "P2.4",
+  "user": "tsu",
+  "checks": [
+   {
+    "screen": "/approvals",
+    "url": "/approvals",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/submitted/tors",
+    "url": "/submitted/tors",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-12",
+  "step": "P3.1",
+  "user": "sanitation",
+  "checks": [
+   {
+    "screen": "/submitted/renewals",
+    "url": "/submitted/renewals",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-12",
+  "step": "P3.2",
+  "user": "sanitation",
+  "checks": [
+   {
+    "screen": "/submitted/proposals",
+    "url": "/submitted/proposals",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-12",
+  "step": "P3.3",
+  "user": "sbmtl",
+  "checks": [
+   {
+    "screen": "/submitted/proposals",
+    "url": "/submitted/proposals",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-12",
+  "step": "P3.4",
+  "user": "sanitation",
+  "checks": [
+   {
+    "screen": "/submitted/renewals",
+    "url": "/submitted/renewals",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-12",
+  "step": "P3.5",
+  "user": "sanitation",
+  "checks": [
+   {
+    "screen": "/submitted/renewals",
+    "url": "/submitted/renewals",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-12",
+  "step": "P3.6",
+  "user": "proc",
+  "checks": [
+   {
+    "screen": "/placement",
+    "url": "/placement",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/booking",
+    "url": "/booking",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-12",
+  "step": "P4.1",
+  "user": "sbmfee",
+  "checks": [
+   {
+    "screen": "/submitted/fees",
+    "url": "/submitted/fees",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/cashiering/unapplied",
+    "url": "/cashiering/unapplied",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-12",
+  "step": "P4.2",
+  "user": "sbmtl",
+  "checks": [
+   {
+    "screen": "/reports/SBM-SANITATION",
+    "url": "/reports/SBM-SANITATION",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/reports/SBM-DISPOSITION",
+    "url": "/reports/SBM-DISPOSITION",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/reports/SBM-CONVERSION",
+    "url": "/reports/SBM-CONVERSION",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-12",
+  "step": "P4.3",
+  "user": "sanitation",
+  "checks": [
+   {
+    "screen": "/reports/SBM-EXPIRING-UNINSURED",
+    "url": "/reports/SBM-EXPIRING-UNINSURED",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-12",
+  "step": "P4.4",
+  "user": "sbmrules",
+  "checks": [
+   {
+    "screen": "/submitted/setup",
+    "url": "/submitted/setup",
+    "ok": false,
+    "problem": null,
+    "missing": [
+     "Notification Recipients"
+    ]
+   }
+  ],
+  "status": "fail"
+ },
+ {
+  "brd": "BRD-12",
+  "step": "P4.5",
+  "user": "sbmhandler",
+  "checks": [
+   {
+    "screen": "/submitted/masterlist",
+    "url": "/submitted/masterlist",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/submitted/policies/:id",
+    "url": "/submitted/policies/10",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-13",
+  "step": "UF-A.1",
+  "user": "miglead",
+  "checks": [
+   {
+    "screen": "/migration/objects",
+    "url": "/migration/objects",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-13",
+  "step": "UF-A.2",
+  "user": "migowner",
+  "checks": [
+   {
+    "screen": "/migration/objects",
+    "url": "/migration/objects",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-13",
+  "step": "UF-A.3",
+  "user": "migsteward",
+  "checks": [
+   {
+    "screen": "/migration/maps",
+    "url": "/migration/maps",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-13",
+  "step": "UF-A.4",
+  "user": "migsteward",
+  "checks": [
+   {
+    "screen": "/migration/maps",
+    "url": "/migration/maps",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-13",
+  "step": "UF-A.5",
+  "user": "migowner",
+  "checks": [
+   {
+    "screen": "/migration/signoff",
+    "url": "/migration/signoff",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-13",
+  "step": "UF-A.6",
+  "user": "migops",
+  "checks": [
+   {
+    "screen": "/migration/extracts",
+    "url": "/migration/extracts",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-13",
+  "step": "UF-A.7",
+  "user": "migops",
+  "checks": [
+   {
+    "screen": "/migration/extracts",
+    "url": "/migration/extracts",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-13",
+  "step": "UF-A.8",
+  "user": "migops",
+  "checks": [
+   {
+    "screen": "/migration/batches",
+    "url": "/migration/batches",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-13",
+  "step": "UF-A.9",
+  "user": "migops",
+  "checks": [
+   {
+    "screen": "/migration/batches/:batchNo",
+    "url": "/migration/batches/MGB-2026-000011",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-13",
+  "step": "UF-A.10",
+  "user": "migsteward",
+  "checks": [
+   {
+    "screen": "/migration/matching",
+    "url": "/migration/matching",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-13",
+  "step": "UF-A.11",
+  "user": "migowner",
+  "checks": [
+   {
+    "screen": "/migration/batches/:batchNo",
+    "url": "/migration/batches/MGB-2026-000011",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-13",
+  "step": "UF-A.12",
+  "user": "migrecon",
+  "checks": [
+   {
+    "screen": "/migration/reconciliation",
+    "url": "/migration/reconciliation",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-13",
+  "step": "UF-A.13",
+  "user": "migsteward",
+  "checks": [
+   {
+    "screen": "/migration/reconciliation",
+    "url": "/migration/reconciliation",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-13",
+  "step": "UF-A.14",
+  "user": "miglead",
+  "checks": [
+   {
+    "screen": "/migration/batches/:batchNo",
+    "url": "/migration/batches/MGB-2026-000011",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-13",
+  "step": "UF-B.1",
+  "user": "miglead",
+  "checks": [
+   {
+    "screen": "/migration/cutover",
+    "url": "/migration/cutover",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-13",
+  "step": "UF-B.2",
+  "user": "miglead",
+  "checks": [
+   {
+    "screen": "/migration/cutover",
+    "url": "/migration/cutover",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-13",
+  "step": "UF-B.3",
+  "user": "migpm",
+  "checks": [
+   {
+    "screen": "/migration/cutover",
+    "url": "/migration/cutover",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-13",
+  "step": "UF-B.4",
+  "user": "comptrol",
+  "checks": [
+   {
+    "screen": "/migration/trueups",
+    "url": "/migration/trueups",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-13",
+  "step": "UF-B.5",
+  "user": "migrecon",
+  "checks": [
+   {
+    "screen": "/migration/trueups",
+    "url": "/migration/trueups",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-13",
+  "step": "UF-B.6",
+  "user": "miglead",
+  "checks": [
+   {
+    "screen": "/migration/runoff",
+    "url": "/migration/runoff",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-13",
+  "step": "UF-C.1",
+  "user": "ao",
+  "checks": [
+   {
+    "screen": "/crm/clients",
+    "url": "/crm/clients",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-13",
+  "step": "UF-C.2",
+  "user": "cashier",
+  "checks": [
+   {
+    "screen": "/cashiering/unapplied",
+    "url": "/cashiering/unapplied",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-13",
+  "step": "UF-C.3",
+  "user": "cashier",
+  "checks": [
+   {
+    "screen": "/operations/invoices/:no",
+    "url": "/operations/invoices/I97000011",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-13",
+  "step": "UF-C.4",
+  "user": "cashier",
+  "checks": [
+   {
+    "screen": "/cashiering/unapplied-income",
+    "url": "/cashiering/unapplied-income",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-13",
+  "step": "UF-C.5",
+  "user": "topmgmt",
+  "checks": [
+   {
+    "screen": "/cashiering/unapplied-income",
+    "url": "/cashiering/unapplied-income",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/approvals",
+    "url": "/approvals",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-13",
+  "step": "UF-C.6",
+  "user": "cashier",
+  "checks": [
+   {
+    "screen": "/cashiering/legacy-pr2307",
+    "url": "/cashiering/legacy-pr2307",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-13",
+  "step": "UF-C.7",
+  "user": "commrec",
+  "checks": [
+   {
+    "screen": "/commission/dppr-batches",
+    "url": "/commission/dppr-batches",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-13",
+  "step": "UF-D.1",
+  "user": "legacyaudit",
+  "checks": [
+   {
+    "screen": "/legacy-inquiry",
+    "url": "/legacy-inquiry",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-13",
+  "step": "UF-D.2",
+  "user": "legacyaudit",
+  "checks": [
+   {
+    "screen": "/legacy-inquiry",
+    "url": "/legacy-inquiry",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-13",
+  "step": "UF-D.3",
+  "user": "legacyaudit",
+  "checks": [
+   {
+    "screen": "/legacy-inquiry",
+    "url": "/legacy-inquiry",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-13",
+  "step": "UF-D.4",
+  "user": "legacyrev",
+  "checks": [
+   {
+    "screen": "/legacy-inquiry/access-log",
+    "url": "/legacy-inquiry/access-log",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-13",
+  "step": "FR-DM-125.1",
+  "user": "rnwmaker",
+  "checks": [],
+  "status": "blocked",
+  "note": "Compiled outside BIBS from the Excel trackers of the legacy renewal advices"
+ },
+ {
+  "brd": "BRD-13",
+  "step": "FR-DM-125.2",
+  "user": "rnwchecker",
+  "checks": [],
+  "status": "blocked",
+  "note": "Checked outside BIBS against the Excel trackers before the file goes to the Migration Operator"
+ },
+ {
+  "brd": "BRD-13",
+  "step": "FR-DM-125.3",
+  "user": "migops",
+  "checks": [
+   {
+    "screen": "/migration/extracts",
+    "url": "/migration/extracts",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/migration/batches",
+    "url": "/migration/batches",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-13",
+  "step": "FR-DM-125.4",
+  "user": "rnwmaker",
+  "checks": [
+   {
+    "screen": "/migration/batches",
+    "url": "/migration/batches",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-13",
+  "step": "FR-DM-125.5",
+  "user": "rnwchecker",
+  "checks": [
+   {
+    "screen": "/migration/batches",
+    "url": "/migration/batches",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ },
+ {
+  "brd": "BRD-13",
+  "step": "FR-DM-125.6",
+  "user": "migops",
+  "checks": [
+   {
+    "screen": "/migration/batches",
+    "url": "/migration/batches",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
+ }
+]

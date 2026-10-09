@@ -19,6 +19,7 @@ Usage: python3 build_conformance.py
 
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 import sys
@@ -98,7 +99,7 @@ AREAS = {
     "workflow": "Workflow", "workspace": "My Work", "utils": "Common screen elements",
 }
 TECHNICAL = re.compile(r"\b(?:HTTP|API|api|JSON|SQL|database|PostgreSQL|Redis|server|endpoint|DTO|JDBC|JWT|Kafka|"
-                       r"controller|service|repository|class|DOCX|XLSX|CSV|token|cache|V\d{2,4}|wave|W\d|IT)\b")
+                       r"controller|service|repository|class|DOCX|XLSX|CSV|token|cache|adapters?|ports?|V\d{2,4}|wave|W\d|IT)\b")
 
 
 def business_name(check: dict) -> str:
@@ -106,9 +107,25 @@ def business_name(check: dict) -> str:
     or the business area it checks."""
     name = re.sub(r"\s*\([^)]*\)", "", str(check.get("name") or "")).strip(" .")
     area = AREAS.get(check.get("module") or "", "Platform")
-    if not check.get("named") or not name or TECHNICAL.search(name) or len(name) < 12:
+    flagged = any(p.search(name) for _, p in check_pack.BUILD_STATUS + check_pack.TECHNICAL)
+    if not check.get("named") or not name or flagged or TECHNICAL.search(name) or len(name) < 12:
         return f"automated check of {area}"
     return f"{name} ({area})"
+
+
+def dedupe_shots() -> dict[str, str]:
+    """Keeps one file of identical screenshots (the first by name): name of each screenshot -> file kept."""
+    kept: dict[str, str] = {}
+    out: dict[str, str] = {}
+    for f in sorted((HERE / "shots").glob("*.png")):
+        digest = hashlib.md5(f.read_bytes()).hexdigest()  # noqa: S324 - content identity, not security
+        if digest in kept:
+            out[f.name] = kept[digest]
+            f.unlink()
+        else:
+            kept[digest] = f.name
+            out[f.name] = f.name
+    return out
 
 
 # ------------------------------------------------------------------ walkthrough results
@@ -120,6 +137,8 @@ def walkthrough_rows(assess: dict, labels: dict[str, str]) -> tuple[list[dict], 
     runs = {(r["brd"], r["step"]): r for r in load("steps_run.json", [])}
     curated = yaml.safe_load((HERE / "step_checks.yaml").read_text(encoding="utf-8"))
     notes = assess.get("step_notes") or {}
+    shots = dedupe_shots()
+    gap_notes = assess.get("step_gaps") or {}
     rows = []
     status_of: dict[str, str] = {}
 
@@ -156,9 +175,12 @@ def walkthrough_rows(assess: dict, labels: dict[str, str]) -> tuple[list[dict], 
                     parts.append(f"{name} opens")
                 else:
                     miss = ", ".join(c.get("missing") or [])
-                    parts.append(f"{name}: {clean(c.get('problem')) or ''}{' missing ' + miss if miss else ''}".strip())
-            observed = "; ".join(parts) or clean(run.get("note"))
-            if run["status"] == "fail" and not parts:
+                    said = [clean(c.get("problem")), f"does not show {miss}" if miss else ""]
+                    parts.append(f"{name}: " + "; ".join(x for x in said if x))
+            observed = "; ".join(parts)
+            if spec.get("gap"):
+                observed = "; ".join(x for x in (observed, gap_notes.get(spec["gap"], "")) if x)
+            if not observed:
                 observed = clean(run.get("note"))
             shot = ", ".join(f"{brd}_{step}_{i}.png".replace(" ", "_")
                              for i, c in enumerate(run.get("checks") or [], start=1) if not c["ok"])
@@ -172,6 +194,7 @@ def walkthrough_rows(assess: dict, labels: dict[str, str]) -> tuple[list[dict], 
             observed = n.get("observed", observed)
             if n.get("evidence"):
                 evidence = n["evidence"]
+        shot = ", ".join(dict.fromkeys(shots.get(x.strip(), x.strip()) for x in shot.split(",") if x.strip()))
         status_of[key] = result
         rows.append({"brd": brd, "walkthrough": p["walkthrough"], "step": step, "persona": p["persona"],
                      "user": p["user"], "action": p["action"], "expected": p["expected"], "result": result,
@@ -231,6 +254,16 @@ def requirement_rows(assess: dict, wt_rows: list[dict], labels: dict[str, str]) 
     for p in persona:
         shown |= set(p.get("observed") or [])
     by_label = {v.split(" > ", 1)[-1].lower(): k for k, v in labels.items()}
+    reports = load("report_runs.json", {})
+    # Screens opened by the personas in the screen checks of the walkthrough script, with the steps.
+    step_screens = defaultdict(set)
+    for run in load("steps_run.json", []):
+        for c in run.get("checks") or []:
+            if c["ok"]:
+                step_screens[re.sub(r"/:[^/]+$", "", c["screen"]) if ":" in c["screen"] else c["screen"]].add(
+                    f"{run['brd']} {run['step']}")
+    persona_ok = bool(persona) and all(p["ok"] for p in persona)
+    persona_frs = set(assess.get("persona_frs") or [])
 
     def fr_paths(screens: str) -> set[str]:
         out = set()
@@ -254,6 +287,12 @@ def requirement_rows(assess: dict, wt_rows: list[dict], labels: dict[str, str]) 
         cyc = cycle_frs.get(fid, [])
         cyc_ok = [s for s in cyc if s["status"] == "pass"]
         screens_on = fr_paths(fr["screens"]) & shown
+        script_steps = sorted({st for p in fr_paths(fr["screens"]) for st in step_screens.get(p, set())})
+        text = " ".join([fr["title"], fr["screens"], *fr["acceptance"]])
+        runs = sorted({c for c in re.findall(r"\b[A-Z]{2,4}(?:-[A-Z0-9]+)+\b", text)
+                       if c in reports and reports[c].get("status") == 200})
+        if fid in persona_frs and persona_ok:
+            cyc_ok = cyc_ok + [{"no": "persona access"}]
         evidence = []
         if passed:
             evidence.append("Automated checks: " + "; ".join(sorted({business_name(c) for c in passed})[:4]))
@@ -261,8 +300,17 @@ def requirement_rows(assess: dict, wt_rows: list[dict], labels: dict[str, str]) 
             evidence.append("Automated checks of the function behind it: " + "; ".join(sorted({business_name(c) for c in via_passed})[:3]))
         if steps_ok:
             evidence.append("Walkthrough steps passed: " + ", ".join(sorted({f"{s['brd']} {s['walkthrough']}.{s['step']}" for s in steps_ok})[:6]))
-        if cyc_ok:
-            evidence.append("Broking cycle steps passed: " + ", ".join(s["no"] for s in cyc_ok))
+        if script_steps and not steps_ok:
+            evidence.append("Walkthrough script steps passed on its screens: " + ", ".join(script_steps[:6]))
+            steps_ok = [{"brd": x} for x in script_steps]
+        if any(s["no"] != "persona access" for s in cyc_ok):
+            evidence.append("Broking cycle steps passed: " + ", ".join(s["no"] for s in cyc_ok if s["no"] != "persona access"))
+        if fid in persona_frs and persona_ok:
+            evidence.append("Persona access: every persona signs in to the menu of its FRS; a screen outside it is refused")
+        if runs:
+            evidence.append("Reports run on the SIT/UAT data: " + ", ".join(
+                f"{c} ({reports[c].get('data', 0)} rows)" for c in runs[:4]))
+            cyc_ok = cyc_ok + [{"no": c} for c in runs]
         if screens_on and not (passed or steps_ok):
             evidence.append("Screen shown to its personas: " + ", ".join(sorted(labels.get(p, p) for p in screens_on)[:3]))
         reason = ""
@@ -299,6 +347,17 @@ def requirement_rows(assess: dict, wt_rows: list[dict], labels: dict[str, str]) 
 # ------------------------------------------------------------------ workbook
 
 
+def short_reason(reason: str) -> str:
+    """The reason of a requirement not testable yet, in a few words for the summary."""
+    if reason.startswith("No automated check"):
+        return "not reached by this run, tested in UAT"
+    if reason.startswith("Open gap"):
+        return reason.split(":")[0].replace("Open gap", "outside the release, gap")
+    if "BDOI" in reason:
+        return "waits for a BDOI decision"
+    return reason.split(";")[0][:60]
+
+
 def main() -> None:
     assess = yaml.safe_load((HERE / "assessment.yaml").read_text(encoding="utf-8"))
     version = str(assess.get("version", "1.0"))
@@ -322,7 +381,7 @@ def main() -> None:
         by_brd[s["brd"]][s["result"]] += 1
         acs[s["brd"]] += s["acs"]
         if s["result"] == "Not testable yet":
-            reasons[s["brd"]][s["reason"].split(":")[0]] += 1
+            reasons[s["brd"]][short_reason(s["reason"])] += 1
     wt_by_brd = defaultdict(Counter)
     for r in wt_rows:
         wt_by_brd[r["brd"]][r["result"]] += 1

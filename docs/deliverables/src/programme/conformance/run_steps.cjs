@@ -43,8 +43,25 @@ async function settle(page) {
 async function openFirst(page, list) {
   await page.goto(`${BASE}${list}`);
   await settle(page);
-  const row = page.locator('main table tbody tr').first();
-  if ((await row.count()) === 0) {
+  const card = page.locator('main a.report-card').first();
+  if ((await card.count()) > 0) {
+    const before = page.url();
+    await card.click();
+    await page.waitForURL((u) => u.toString() !== before, { timeout: 10000 }).catch(() => {});
+    await settle(page);
+    return null;
+  }
+  let row = page.locator('main table tbody tr').filter({ hasNotText: /^\s*No .* (match|to display|recorded|found)/i }).first();
+  if ((await row.count()) === 0 || /^\s*No \w/.test(await row.innerText().catch(() => ''))) {
+    // A work list opens on the user's own tab: look in the tab of all records.
+    const all = page.getByRole('tab', { name: /^All$/ }).or(page.getByRole('button', { name: /^All$/ })).first();
+    if ((await all.count()) > 0) {
+      await all.click();
+      await settle(page);
+      row = page.locator('main table tbody tr').first();
+    }
+  }
+  if ((await row.count()) === 0 || /^\s*No \w/.test(await row.innerText().catch(() => ''))) {
     return 'the list has no record';
   }
   const link = row.locator('a').first();

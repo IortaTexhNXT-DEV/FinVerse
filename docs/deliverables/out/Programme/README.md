@@ -19,6 +19,10 @@ sign-off per BRD"). Each document is kept once, in its latest version.
 | Document | BRD | Kind | Version | File |
 |---|---|---|---|---|
 | BIBS BDOI FeatureList vs OOTB and Best Practice v1.0 | - | Feature_List | - | [`Feature_List/BIBS_BDOI_FeatureList_vs_OOTB_and_Best_Practice_v1.0.xlsx`](Feature_List/BIBS_BDOI_FeatureList_vs_OOTB_and_Best_Practice_v1.0.xlsx) |
+| BIBS FRS-BDOI BRD-03 Product Maintenance v1.1 | - | BDOI_Template_FRS | - | [`BDOI_Template_FRS/BIBS_FRS-BDOI_BRD-03_Product_Maintenance_v1.1.docx`](BDOI_Template_FRS/BIBS_FRS-BDOI_BRD-03_Product_Maintenance_v1.1.docx) |
+| BIBS FRS-BDOI BRD-03 Product Maintenance v1.1 Changes Highlighted | - | BDOI_Template_FRS | - | [`BDOI_Template_FRS/BIBS_FRS-BDOI_BRD-03_Product_Maintenance_v1.1_Changes_Highlighted.docx`](BDOI_Template_FRS/BIBS_FRS-BDOI_BRD-03_Product_Maintenance_v1.1_Changes_Highlighted.docx) |
+| BIBS FRS-BDOI BRD-11 User Access Maintenance v1.2 | - | BDOI_Template_FRS | - | [`BDOI_Template_FRS/BIBS_FRS-BDOI_BRD-11_User_Access_Maintenance_v1.2.docx`](BDOI_Template_FRS/BIBS_FRS-BDOI_BRD-11_User_Access_Maintenance_v1.2.docx) |
+| BIBS FRS-BDOI BRD-11 User Access Maintenance v1.2 Changes Highlighted | - | BDOI_Template_FRS | - | [`BDOI_Template_FRS/BIBS_FRS-BDOI_BRD-11_User_Access_Maintenance_v1.2_Changes_Highlighted.docx`](BDOI_Template_FRS/BIBS_FRS-BDOI_BRD-11_User_Access_Maintenance_v1.2_Changes_Highlighted.docx) |
 | BIBS Jira Import Drop-0 | - | Backlog | - | [`Backlog/jira/BIBS_Jira_Import_Drop-0.csv`](Backlog/jira/BIBS_Jira_Import_Drop-0.csv) |
 | BIBS Jira Import Drop-1 | - | Backlog | - | [`Backlog/jira/BIBS_Jira_Import_Drop-1.csv`](Backlog/jira/BIBS_Jira_Import_Drop-1.csv) |
 | BIBS Jira Import Drop-2 | - | Backlog | - | [`Backlog/jira/BIBS_Jira_Import_Drop-2.csv`](Backlog/jira/BIBS_Jira_Import_Drop-2.csv) |
@@ -59,6 +63,7 @@ sign-off per BRD"). Each document is kept once, in its latest version.
 | User Story Backlog Drop-2 | BRD-00 | Backlog | 1.0 | [`Backlog/BIBS_Backlog_BRD-00_User_Story_Backlog_Drop-2_v1.0.xlsx`](Backlog/BIBS_Backlog_BRD-00_User_Story_Backlog_Drop-2_v1.0.xlsx) |
 | Change Management | BRD-00 | Change register summary (Word) | 1.0 | [`Change_Management/BIBS_Change_Register_BRD-00_Change_Management_Summary_v1.0.docx`](Change_Management/BIBS_Change_Register_BRD-00_Change_Management_Summary_v1.0.docx) |
 | Change Management | BRD-00 | Change register workbook (Excel) | 1.0 | [`Change_Management/BIBS_Change_Register_BRD-00_Change_Management_v1.0.xlsx`](Change_Management/BIBS_Change_Register_BRD-00_Change_Management_v1.0.xlsx) |
+| End-to-End Conformance Register | BRD-00 | Quality | 1.0 | [`Quality/BIBS_Conformance_BRD-00_End-to-End_Conformance_Register_v1.0.xlsx`](Quality/BIBS_Conformance_BRD-00_End-to-End_Conformance_Register_v1.0.xlsx) |
 | Disaster Recovery and Business Continuity Plan | BRD-00 | Operations | 1.0 | [`Operations/BIBS_Continuity_BRD-00_Disaster_Recovery_and_Business_Continuity_Plan_v1.0.docx`](Operations/BIBS_Continuity_BRD-00_Disaster_Recovery_and_Business_Continuity_Plan_v1.0.docx) |
 | Data Dictionary | BRD-00 | Data | 1.0 | [`Data/BIBS_Data_BRD-00_Data_Dictionary_v1.0.xlsx`](Data/BIBS_Data_BRD-00_Data_Dictionary_v1.0.xlsx) |
 | Entity Relationship Diagrams | BRD-00 | Data | 1.0 | [`Data/BIBS_Data_BRD-00_Entity_Relationship_Diagrams_v1.0.docx`](Data/BIBS_Data_BRD-00_Entity_Relationship_Diagrams_v1.0.docx) |
@@ -82,14 +87,12 @@ sign-off per BRD"). Each document is kept once, in its latest version.
 | System Requirements Specification | BRD-00 | Requirements | 1.0 | [`Requirements/BIBS_SRS_BRD-00_System_Requirements_Specification_v1.0.docx`](Requirements/BIBS_SRS_BRD-00_System_Requirements_Specification_v1.0.docx) |
 | ASVS L2 Control Mapping | BRD-00 | Security | 1.0 | [`Security/BIBS_Security_BRD-00_ASVS_L2_Control_Mapping_v1.0.xlsx`](Security/BIBS_Security_BRD-00_ASVS_L2_Control_Mapping_v1.0.xlsx) |
 | Support Model and Support Guide | BRD-00 | Operations | 1.0 | [`Operations/BIBS_Support_BRD-00_Support_Model_and_Support_Guide_v1.0.docx`](Operations/BIBS_Support_BRD-00_Support_Model_and_Support_Guide_v1.0.docx) |
-| End-to-End Conformance Register | BRD-00 | Quality | 1.0 | [`Quality/BIBS_Conformance_BRD-00_End-to-End_Conformance_Register_v1.0.xlsx`](Quality/BIBS_Conformance_BRD-00_End-to-End_Conformance_Register_v1.0.xlsx) |
 | Test Strategy | BRD-00 | Quality | 1.0 | [`Quality/BIBS_TestStrategy_BRD-00_Test_Strategy_v1.0.docx`](Quality/BIBS_TestStrategy_BRD-00_Test_Strategy_v1.0.docx) |
 | Walkthrough Users and Sign-in | BRD-00 | UAT | 1.0 | [`UAT/BIBS_UAT_BRD-00_Walkthrough_Users_and_Sign-in_v1.0.xlsx`](UAT/BIBS_UAT_BRD-00_Walkthrough_Users_and_Sign-in_v1.0.xlsx) |
 | BDOI FRS vs BIBS FRS Operations Cashiering | BRD-02 | Comparisons | 1.0 | [`Comparisons/BIBS_Comparison_BRD-02_BDOI_FRS_vs_BIBS_FRS_Operations_Cashiering_v1.0.xlsx`](Comparisons/BIBS_Comparison_BRD-02_BDOI_FRS_vs_BIBS_FRS_Operations_Cashiering_v1.0.xlsx) |
 | BDOI FRS vs BIBS FRS Product Maintenance | BRD-03 | Comparisons | 1.0 | [`Comparisons/BIBS_Comparison_BRD-03_BDOI_FRS_vs_BIBS_FRS_Product_Maintenance_v1.0.xlsx`](Comparisons/BIBS_Comparison_BRD-03_BDOI_FRS_vs_BIBS_FRS_Product_Maintenance_v1.0.xlsx) |
 | BDOI FRS vs BIBS FRS Renewal | BRD-06 | Comparisons | 1.0 | [`Comparisons/BIBS_Comparison_BRD-06_BDOI_FRS_vs_BIBS_FRS_Renewal_v1.0.xlsx`](Comparisons/BIBS_Comparison_BRD-06_BDOI_FRS_vs_BIBS_FRS_Renewal_v1.0.xlsx) |
-| FRS Product Maintenance in BDOI's template (clean) | BRD-03 | BDOI_Template_FRS | 1.1 | [`BDOI_Template_FRS/BIBS_FRS-BDOI_BRD-03_Product_Maintenance_v1.1.docx`](BDOI_Template_FRS/BIBS_FRS-BDOI_BRD-03_Product_Maintenance_v1.1.docx) |
-| FRS Product Maintenance in BDOI's template, changes highlighted | BRD-03 | BDOI_Template_FRS | 1.1 | [`BDOI_Template_FRS/BIBS_FRS-BDOI_BRD-03_Product_Maintenance_v1.1_Changes_Highlighted.docx`](BDOI_Template_FRS/BIBS_FRS-BDOI_BRD-03_Product_Maintenance_v1.1_Changes_Highlighted.docx) |
+| BDOI FRS vs BIBS FRS User Access Maintenance | BRD-11 | Comparisons | 1.0 | [`Comparisons/BIBS_Comparison_BRD-11_BDOI_FRS_vs_BIBS_FRS_User_Access_Maintenance_v1.0.xlsx`](Comparisons/BIBS_Comparison_BRD-11_BDOI_FRS_vs_BIBS_FRS_User_Access_Maintenance_v1.0.xlsx) |
 
 ## Still to write
 

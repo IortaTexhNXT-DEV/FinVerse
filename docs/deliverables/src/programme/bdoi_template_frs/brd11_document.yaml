@@ -1,0 +1,368 @@
+# Front matter, mapping changes, annex rows and the content of Annexes M, N and R of the User Access Maintenance
+# FRS in BDOI's template, version 1.2. Read by build_brd11_bdoi_frs.py. Business wording only.
+meta:
+  source: docs/source-documents/FRS - BDOI BROKERSYS User Access Maintenance v1.1 (BDOI).docx
+  brd_pdf: docs/source-documents/User Access Maintenance.pdf
+  out_folder: Programme/BDOI_Template_FRS
+  clean: BIBS_FRS-BDOI_BRD-11_User_Access_Maintenance_v1.2.docx
+  highlighted: BIBS_FRS-BDOI_BRD-11_User_Access_Maintenance_v1.2_Changes_Highlighted.docx
+  version_old: "1.1"
+  version_new: "1.2"
+
+cover:
+  drafting_label: "Drafting support:"
+  drafting_value: iorta TechNXT Project Team
+
+revision_log:
+  title: Document Revision Log
+  header: [Date, Revision, Description, Updated by]
+  rows:
+    - ["21 Sep 2026 - 09 Oct 2026", "1.1", "As issued by BDO ITG (created 09/21/2026, last updated 10/09/2026)", John Barbachano]
+    - ["09 Oct 2026", "1.2", "Draft for BDOI review: full coverage of the User Access Maintenance BRD (version of 8-Oct-2026); functional requirements elaborated with business rules, validations, fields, statuses, approvals, messages and numbered acceptance criteria; new sub-items and new items FRUM.009 to FRUM.013; Business Requirements Mapping extended to every BRD line; rows added to Annexes E, F and H; Annexes J to R added; observations and points for BDOI decision listed in Annex Q", "iorta TechNXT Project Team (drafting support); for review by John Barbachano"]
+
+introduction:
+  preparation: >-
+    This version 1.2 was drafted with the iorta TechNXT Project Team, from the inputs of the business unit and BDO
+    ITG, for review by the System Analyst. BDOI's text of version 1.1 is kept as issued; the additions elaborate it,
+    and every point where the additions differ from it, or where BDOI's text needs a correction, is listed for BDOI's
+    decision in Annex Q.
+  references: >-
+    References used for version 1.2: Business Requirements Document - QPS User Access Maintenance Module (version of
+    8-Oct-2026; v1 of 15-Apr-2025); BIBS Functional Requirements Specification BRD-11 User Access Maintenance v2.1
+    (8-Oct-2026) and its test plan v2.1; Authentication and Identity Integration Requirements v1.0 (03-Oct-2026);
+    Drop 0 decisions of 26-Sep-2026 (EIAM single sign-on, UIDM-ISC provisioning).
+
+# Additions to BDOI's Business Requirements Mapping rows (kept as they are; the FR IDs below are added on a new line
+# of the third column). why: the reason recorded in Annex Q.
+mapping:
+  BRD 1.002.1:
+    add: [FRUM.009.01, FRUM.009.02, FRUM.009.06]
+    why: The enrolment request, its draft and the chosen approver of BRD 1.002 are specified in the system as FRUM.009 (conflict C01).
+  BRD 1.003.1.1:
+    add: [FRUM.003.01, FRUM.009.03]
+    why: FRUM-004 (password maintenance) does not cover a modification request (slip S05); the modification is FRUM.003.01 and the request FRUM.009.03.
+  BRD 1.004.1:
+    add: [FRUM.003.02.01, FRUM.009.04]
+    why: The deactivation request of BRD 1.004 is specified as FRUM.009.04 (conflict C01).
+  BRD 1.005:
+    add: [FRUM.003.02.02, FRUM.009.05]
+    why: The reactivation request of BRD 1.005 is specified as FRUM.009.05 (conflict C01).
+  BRD 1.006.1:
+    add: [FRUM.009.07, FRUM.013.01]
+    why: "BDOI maps the row \"c/o UIDM\"; the correction of a returned request is specified in the system as FRUM.009.07, applicable if the request is raised in BDOI-BROKERSYS (conflict C01)."
+  BRD 1.007.1:
+    add: [FRUM.009.08]
+    why: "BDOI maps the row \"c/o UIDM\"; the cancellation is specified as FRUM.009.08 (conflict C01)."
+  BRD 1.008.1:
+    add: [FRUM.009.09, FRUM.013.01]
+    why: "BDOI maps the row \"c/o UIDM\"; the view of requests and the decision notice are specified as FRUM.009.09 and FRUM.013.01 (conflict C01)."
+  BRD 1.009.1:
+    add: [FRUM.011.01]
+    why: "BDOI maps the row \"c/o UIDM\"; the bulk request is specified as FRUM.011.01 (conflicts C01, C24)."
+  BRD 2.002.1:
+    add: [FRUM.010.01, FRUM.010.02, FRUM.010.03, FRUM.010.04, FRUM.010.05]
+    why: "BDOI maps the row \"c/o UIDM\"; review, approval, rejection, return and second approval are specified as FRUM.010 (conflicts C01, C17)."
+  BRD 3.002.1:
+    add: [FRUM.005.02, FRUM.005.03, FRUM.005.04]
+    why: The group-profile request, its approvers in order and the implementation of p.6 are specified as FRUM.005.02 to FRUM.005.04 (conflicts C03, C22).
+  BRD 3.002.2:
+    add: [FRUM.006.04, FRUM.005.03, FRUM.005.04]
+    why: The change request of a group profile is specified as FRUM.006.04 (conflict C03).
+  BRD 3.002.3:
+    add: [FRUM.006.04, FRUM.005.03, FRUM.005.04]
+    why: The deactivation request of a group profile is specified as FRUM.006.04 (conflict C03).
+  BRD 3.002.4:
+    add: [FRUM.006.04, FRUM.005.03, FRUM.005.04]
+    why: The reactivation request of a group profile is specified as FRUM.006.04 (conflict C03).
+  BRD 4.001.1:
+    add: [FRUM.001]
+    why: FRID.001 is not an item of this FRS (slip S01); the log-in of the System Administrator is FRUM.001.
+  BRD 4.002.1:
+    add: [FRUM.005.05]
+    why: FRID.005 is not an item of this FRS (slip S02); the profiles of the access personas are FRUM.005.05.
+  BRD 4.002.2:
+    add: [FRUM.005.06]
+    why: FRID.006 is not an item of this FRS (slip S02); the functions assigned to profiles are FRUM.005.06.
+  BRD 4.003.1:
+    add: [FRUM.008.04]
+    why: The activities recorded for user access are listed in FRUM.008.04.
+
+# Rows added to BDOI's annex field tables (No, Field, Data Type, Description), each recorded in Annex Q.
+annex_rows:
+  E:
+    - ["11", Windows ID, Text, "The user's Windows ID, held apart from the user ID (conflict C06)."]
+    - ["12", Business Unit Group, Text, The business unit group of the user (BRD NFR p.14).]
+    - ["13", User Level, Text, The user level of the user (BRD NFR p.14).]
+    - ["14", Status, Text, "Active, Disabled or Locked on the as-of date."]
+    - ["15", Last Action, Text, "Added, modified, deactivated or reactivated (BRD 3.003.1.6)."]
+    - ["16", Last Action by, Text, "The user who approved the last action, with the request number (BRD 3.003.1.6)."]
+  F:
+    - ["8", Date Created, Date, The date the group profile was created (BRD 3.003.2.3).]
+    - ["9", Created by, Text, The user who created the group profile (BRD 3.003.2.5).]
+    - ["10", Date Modified, Date, The date the group profile was last changed (BRD 3.003.2.4).]
+    - ["11", "Added / Modified / Deactivated / Reactivated by", Text, The user who made the last change to the group profile (BRD 3.003.2.6).]
+  H:
+    - ["12", Activity, Text, Short description of the action (FRUM.008.01).]
+    - ["13", IP Address, Text, The source address of the session (FRUM.008.01; conflict C19).]
+    - ["14", Approved By, Text, The approver of the request from which the activity came.]
+    - ["15", Request No., Text, The number of the access request (AR-yyyy-nnnnnn).]
+annex_why:
+  E: The BRD asks for the actor of each action (3.003.1.6) and the user fields of NFR p.14; the BIBS User Access Report shows them.
+  F: BRD 3.003.2.3 to 3.003.2.6 ask for the dates and actors of each group profile; Annex F does not list them.
+  H: FRUM.008.01 lists Activity and IP Address, which Annex H omits (slip S10); approved by and the request number come from sample D of the BRD and the BIBS audit log.
+
+# Annex M - business rules and parameters
+annex_m:
+  personas:
+    - [Requestor, "Raises user access requests: enrol, modify, deactivate, reactivate, bulk; corrects and cancels them; views own requests", "BRD section A"]
+    - [Approver, "Reviews and approves, rejects or returns the requests assigned to him or her", "BRD section B"]
+    - [Second Approver, Reviews privileged or out-of-hours changes after the first approval, "BRD NFR 11"]
+    - [Business Administrator, "Raises group-profile requests; generates the reports; maintains the separation-of-duties rules; uploads bulk requests; supports users", "BRD section C"]
+    - [System Administrator, "Implements approved group-profile requests; unlocks users; resets the passwords of local accounts; audit logs", "BRD section D"]
+    - [Auditor, Views the requests and runs the reports and the audit log, "BRD NFR 6"]
+    - [Information Security Officer, "Authorises the separation-of-duties rules and the changes of security settings; views requests, matrix and audit trail", "BRD NFR 11"]
+  permissions:
+    - [Enrol a new user, Create, "4.002.2.1"]
+    - [Modify an existing user, Amend, "4.002.2.2"]
+    - [Deactivate a user, Amend, "4.002.2.3"]
+    - [Reactivate a user, Amend, "4.002.2.4"]
+    - [Apply correction to a returned request, Amend, "4.002.2.5"]
+    - [Cancel a request, Amend, "4.002.2.6"]
+    - [View requests, View, "4.002.2.7"]
+    - [Review and approve requests, Approve, "4.002.2.8"]
+    - [Submit group-profile requests, Create, "4.002.2.9"]
+    - [Generate the user access reports, View, "4.002.2.10"]
+    - [Second approval of privileged or out-of-hours changes, Approve, "NFR 11"]
+    - [Maintain separation-of-duties rules, Amend, "NFR 11"]
+    - [Authorise separation-of-duties rules, Approve, "NFR 11"]
+    - [Approve a change of a security setting, Approve, "NFR 11"]
+    - [Manage users and roles (implementation of group-profile requests), Amend, "4.002.1"]
+    - [Bulk upload, Create, "1.009"]
+  matrix_roles: [Requestor, Approver, Second Approver, Business Admin, System Admin, NB Approver, Auditor, InfoSec Officer]
+  matrix:
+    - [Enrol a new user, Y, "", "", "", "", "", "", ""]
+    - [Modify an existing user, Y, "", "", "", "", "", "", ""]
+    - [Deactivate a user, Y, "", "", "", "", "", "", ""]
+    - [Reactivate a user, Y, "", "", "", "", "", "", ""]
+    - [Apply correction, Y, "", "", Y, "", "", "", ""]
+    - [Cancel a request, Y, "", "", Y, "", "", "", ""]
+    - [View requests, Y, Y, Y, Y, Y, "", Y, ""]
+    - [Review and approve requests, "", Y, "", "", "", Y, "", ""]
+    - [Second approval, "", "", Y, "", "", "", "", ""]
+    - [Submit group-profile requests, "", "", "", Y, "", "", "", ""]
+    - [Generate the user access reports, "", Y, "", Y, Y, "", Y, Y]
+    - [Manage users and roles, "", "", "", "", Y, "", "", ""]
+    - [Bulk upload, Y, "", "", Y, Y, "", "", ""]
+    - [Maintain separation-of-duties rules, "", "", "", Y, "", "", "", ""]
+    - [Authorise separation-of-duties rules, "", "", "", "", "", "", "", Y]
+    - [Approve a change of a security setting, "", "", "", "", "", "", "", Y]
+  passwords:
+    - [Sign-in of BDO users, "Single sign-on through EIAM; the password, its expiry and history, the lock-out and the second factor are EIAM's policies", All users except the break-glass accounts]
+    - [Password length and composition, "At least 10 characters with upper- and lower-case letters, a digit and a symbol", Break-glass accounts]
+    - [Password history, "Last 10 passwords refused (BDOI's FRUM-004; delivered value 8, to be set to 10)", Break-glass accounts]
+    - [Password expiry, 90 days; a notice 7 days before, Break-glass accounts]
+    - [Minimum password age, 1 day, Break-glass accounts]
+    - [Lock-out, "3 consecutive failed attempts; unlocked by a System Administrator or a reactivation request", Break-glass accounts (EIAM's lock-out for the others)]
+    - [Password reset, "By a second System Administrator; temporary password shown once; change at the next sign-in; the self-service link switched off in production", Break-glass accounts]
+    - [Second factor, "Code of an authenticator application at every sign-in; ten single-use recovery codes; a lost authenticator is reset by a System Administrator and approved by another", Break-glass accounts (EIAM's second factor for the others)]
+  sessions:
+    - [Inactivity warning, 15 minutes without activity, Stay Logged In / Log Out]
+    - [Inactivity sign-out, 30 minutes without activity, The session ends with the reason inactivity]
+    - [Session-end warning, 30 minutes before the fixed end of a session, BRD x.001.1.3]
+    - [Several tabs, One session for all the tabs of a user, Activity in any tab counts]
+    - [One session per device, Not enforced; every session is in the session log, Open point UQ09 of the BIBS FRS]
+  controls:
+    - "Four eyes: the requester and the user a request is about never decide it."
+    - "The second approver differs from the first approver, the requester and the user concerned."
+    - "The implementer of a group-profile request is not its requester."
+    - "Separation-of-duties rules: pairs of group profiles one user may not hold together, kept by the Business Administrator and authorised by Information Security; checked on every request and bulk line, at submission and at approval."
+    - "A user never changes his or her own group profiles."
+    - "Privilege level of each group profile (Low, Standard, High, Admin): a request that gives a High or Admin profile, or that is submitted or approved outside working hours, needs a second approval and raises an alert."
+    - "Security settings change only with the approval of Information Security."
+    - "Group profiles change only through approved and implemented requests; the emergency role edit is off by default, needs the approval of Information Security and is alerted."
+    - "Every change is recorded with its from and to values in a log that no user can change."
+  parameters:
+    - [Sign-in mode, Single sign-on through EIAM (OpenID Connect or SAML 2.0) in production; local sign-in in SIT until BIBS is registered in EIAM, Sign-in of the environment, BDOI IT]
+    - [Lock-out attempts, "3", Failed attempts before a local account locks, Information Security]
+    - [Inactivity warning, 15 minutes, Inactivity time before the warning, Information Security]
+    - [Session timeout, 30 minutes, Inactivity time before the sign-out, Information Security]
+    - [Session-end warning, 30 minutes, Warning before the fixed end of a session, Information Security]
+    - [User ID format, A letter followed by nine digits (a999999999), Format of new user IDs, shown in words to the requester, Business Administration]
+    - [Password history, "8 (to be set to 10)", Previous passwords refused (local accounts), Information Security]
+    - [Password expiry, 90 days, Password expiry (local accounts), Information Security]
+    - [Minimum password age, 1 day, Minimum days between changes (local accounts), Information Security]
+    - [Working hours, "08:00 to 18:00, Monday to Friday", Hours outside which a change needs a second approval, Information Security]
+    - [Any approver may decide, "No", "Yes lets every approver decide every pending request, not only the chosen one", Business Administration]
+    - [Emergency role edit, "Off", Direct change of roles in an emergency (audited and alerted), Information Security]
+    - [Apply group profiles on approval, "No", "Yes applies an approved group-profile request without the implementation step", Business Administration]
+    - [Failed-run recipients, (set by BDOI), E-mail addresses of the failed-run notice, System Administrator]
+    - [Dormancy period, 90 days, Days without a sign-in after which a user is deactivated; 0 switches it off, Information Security]
+    - [Dormancy notice, 7 days, Days before the deactivation on which the user is told, Information Security]
+    - [External (portal) users, "Off", Requests for portal users; off while no portal is installed, Business Administration]
+    - [Daily run of effective changes, 00:05 daily, Applies the scheduled requests, System Administrator]
+    - [Daily run of dormant users, 00:15 daily, Deactivates the dormant users and sends the notices, System Administrator]
+    - [Password expiry notice, 06:00 daily, Notifies local-account users whose password expires within 7 days, System Administrator]
+  lists:
+    - [Business unit group, Empty until BDOI supplies the values]
+    - [User level, Empty until BDOI supplies the values]
+    - [Deactivation reason, "Resigned; Transferred to another unit; Long leave; Security; Others; No sign-in for the dormancy period (dormant-user run)"]
+    - [Privilege level, Low; Standard; High; Admin]
+  statuses:
+    - [Draft, "Saved, not submitted; seen by its creator only", "Creator (edit, submit, cancel)"]
+    - [Pending Approval, "Submitted; waiting for the chosen approver (group profiles: the current approver in order)", Approver; creator may cancel]
+    - [Pending Second Approval, Approved once; waiting for a second approval because of a risk flag, Second Approver]
+    - [Returned, Returned with remarks for correction, "Creator (correct and re-submit, or cancel)"]
+    - [Scheduled, Approved; applied by the daily run on the effective date, System; creator or approver may cancel]
+    - [Approved, Approved and applied, "-"]
+    - [Rejected, Rejected with a reason, "-"]
+    - [Cancelled, Cancelled by the creator with a reason, "-"]
+    - [For Implementation, "Group profile: approved; waiting for the System Administrator", System Administrator]
+    - [Implemented, "Group profile: implemented", "-"]
+  transitions:
+    - [(new), Save, Draft, Requestor (request permission), Optional]
+    - [Draft, Submit, Pending Approval, Creator, Mandatory]
+    - [Draft, Cancel, Cancelled, Creator, Mandatory]
+    - [Pending Approval, Approve, "Approved, Scheduled, Pending Second Approval, For Implementation or the next approver", Chosen approver, Optional]
+    - [Pending Second Approval, Second approval, "Approved, Scheduled or For Implementation", "Second Approver, not the first approver", Optional]
+    - ["Pending Approval, Pending Second Approval", Return, Returned, Approver, Mandatory]
+    - ["Pending Approval, Pending Second Approval", Reject, Rejected, Approver, Mandatory]
+    - [Returned, Re-submit, Pending Approval, Creator (correction permission), Mandatory]
+    - ["Pending Approval, Returned, Scheduled", Cancel, Cancelled, "Creator (cancel permission); approver for Scheduled", Mandatory]
+    - [Scheduled, Apply (daily run), Approved, System, "-"]
+    - [For Implementation, Implement, Implemented, "System Administrator, not the requester", Optional]
+
+# Annex N - sign-in and identity integration (business level)
+annex_n:
+  modes:
+    - [Single sign-on (production), "The user signs in once with the BDO account at EIAM (BDO Enterprise Identity Access Management on Microsoft Entra ID), with EIAM's password, second factor and device rules; the system opens a session with the user's group profiles. OpenID Connect is proposed, SAML 2.0 is the fall-back if BDOI IT prefers it.", "BDO users"]
+    - [Local sign-in (break-glass), "User ID, password and second factor held in the system", "Two named System Administrators of BDOI IT"]
+    - [Local sign-in (SIT only), User ID and password held in the system, "SIT and UAT users until BIBS is registered in EIAM for the environment"]
+  steps:
+    - The user opens the system and clicks Sign in with the BDO identity provider on the Login page.
+    - EIAM signs the user in with the BDO account and its second factor, applying the BDO device and access policies, and returns the user to the system.
+    - The system checks EIAM's answer, finds the active user that matches the returned Windows ID (or user principal name) and opens the session with the user's group profiles; the sign-in is recorded with its method.
+    - An identity that matches no active user is refused with the not-linked message; EIAM unavailable shows "Your organisation's sign-in service could not complete the sign-in. Try again in a moment."
+    - Log Out ends the session in the system and at EIAM; an inactivity sign-out asks for the EIAM sign-in again at the next access.
+  rules:
+    - "The system never creates a user from a sign-in; users exist through an approved enrolment or the UIDM-ISC provisioning."
+    - "Roles and permissions stay in the system and change only through requests; no EIAM group is mapped to a role. EIAM may restrict who reaches the system through a 'BIBS users' group kept by BDOI IT."
+    - "The Windows ID held on each user identifies the EIAM account; the user ID keeps the BDOI format a999999999."
+    - "Switching to single sign-on is a setting of the environment once BDOI IT has registered the system in EIAM, not a change request."
+  provisioning:
+    - ["(a) UIDM-ISC provisions the user accounts; role changes stay requests in the system (proposed)", "Joiners, movers and leavers come from UIDM-ISC: create, change, deactivate and reactivate users, each with its UIDM request number. The assignment and change of group profiles and the group-profile requests stay requests in the system under four eyes (FRUM.009 to FRUM.011 for them).", "Standard user-provisioning interface (SCIM 2.0) from UIDM-ISC; extract of accounts, group profiles and permissions for certification"]
+    - ["(b) UIDM-ISC provisions users and roles", "Every access change is requested and approved in UIDM-ISC and applied by the system; requests in the system only for the break-glass path.", "The same interface with the group profiles as entitlements"]
+    - ["(c) No provisioning from UIDM-ISC", "Every access change is a request in the system, as the BRD reads; UIDM-ISC only reads the accounts for certification.", "Extract only"]
+  provisioning_rules:
+    - Every change applied from UIDM-ISC is recorded in the access-change log with the source UIDM-ISC and the UIDM request number, so the reports of FRUM.007 and FRUM.008 stay complete.
+    - A refused provisioning event is answered to UIDM-ISC and alerted to the System Administrators; it is re-sent from UIDM-ISC once corrected.
+    - A leaver deactivates the user and ends the user's open sessions.
+  break_glass:
+    - [Who, "Two named System Administrators of BDOI IT, listed in the configuration of the environment; no shared account"]
+    - [When, "EIAM, or the network path to it, is not available, or the single sign-on settings must be repaired"]
+    - [How, "Local password (Annex M) and the second factor, always"]
+    - [Control, "Every sign-in recorded and alerted to Information Security; credentials kept in the BDOI privileged access vault; each use reviewed within one working day; password changed after each use"]
+  bdoi_it:
+    - "Registration of BIBS in EIAM for each environment: sign-in and sign-out addresses, the identifier of the user returned (Windows ID or user principal name) and test accounts for SIT and UAT."
+    - "The choice of the UIDM-ISC option (a, b or c) and, for (a) or (b), the connection of UIDM-ISC to the system."
+    - "Confirmation that EIAM's policies meet the BRD rules: lock-out after 3 invalid attempts, password expiry, second factor and BDO-issued devices."
+    - "The holders of the break-glass accounts and the privileged access vault."
+
+glossary:
+  - [Access request, "A request to create, change, deactivate or reactivate a user, or to change a group profile, decided under four eyes; numbered AR-yyyy-nnnnnn"]
+  - [Access-change log, "The log of every applied access change, one line per attribute with from and to values, request number, done by and approved by; no user can change it"]
+  - [AD, Active Directory]
+  - [Approver, "The user who reviews and approves, rejects or returns access requests (BRD section B)"]
+  - [BDOI-BROKERSYS, "BDO Insure Brokering System (BIBS), the system specified in this document"]
+  - [Break-glass administrator, "A named System Administrator account that keeps a local password and the second factor, so that the system can be administered when EIAM is not available"]
+  - [BRD, Business Requirements Document]
+  - [Business Administrator, "The BDOI user who defines and manages group profiles and raises group-profile requests (BRD section C)"]
+  - [Dormant user, A user who has not signed in for the dormancy period]
+  - [Effective date, The date on which an approved access change applies]
+  - [EIAM, "BDO Enterprise Identity Access Management on Microsoft Entra ID, the Enterprise SSO platform of BDO users"]
+  - [Enterprise SSO, "The BDO single sign-on platform (EIAM)"]
+  - [Four eyes, The rule that an access change is decided by a user other than the one who requested it]
+  - [FR, Functional requirement]
+  - [FRUM, Functional requirement of User Access Maintenance in this document]
+  - [FR-UA, Functional requirement of the BIBS FRS BRD-11 User Access Maintenance (reference of Annex P)]
+  - [Group profile, A set of permissions assigned to a group of users (BRD 1.3); a role]
+  - [Information Security Officer, "The BDOI Information Security user who authorises separation-of-duties rules and changes of security settings"]
+  - [OpenID Connect, A single sign-on standard; the proposed way for the system to sign users in through EIAM]
+  - [Permission, "One function or action of the system, with its module and action class (View, Create, Amend, Approve)"]
+  - [Privilege level, "Low, Standard, High or Admin; given to each group profile; High and Admin changes need a second approval"]
+  - [Provisioning, The creation and change of user accounts in the system from the identity governance tool]
+  - [Requestor, The user who submits user access requests (BRD section A)]
+  - [SAML 2.0, The other single sign-on standard the system supports]
+  - [Second factor, A code of an authenticator application asked in addition to the password]
+  - [Separation of duties, Pairs of group profiles one user may not hold together]
+  - [Session log, "The record of every session: user, sign-in method, start, last activity, end and end reason"]
+  - [SIT / UAT, System integration testing / user acceptance testing]
+  - [SSO, Single sign-on]
+  - [System Administrator, "The IT user who implements group profiles and maintains users and roles (BRD section D)"]
+  - [UIDM / UIDM-ISC, "BDO's identity governance tool for joiner, mover and leaver requests and access certification"]
+  - [UPN, "User principal name, the sign-in name of a BDO account (for example name@bdo.com.ph)"]
+  - [User Access Matrix, The screen and export that show which roles hold which permissions]
+  - [User ID, "The identifier of a user in the system, in the BDOI format a999999999"]
+  - [Windows ID, "The user's BDO network log-on name, held on every user and used to match the EIAM account"]
+
+# Observations of Annex Q.4 (besides the conflicts, slips, mapping changes and annex rows)
+observations:
+  - topic: Screenshots of New Request
+    bdoi: "-"
+    brd: "BRD 1.002.1.1.2 and 1.003.1.1.3: Select User Access Group profile."
+    proposal: "The screenshot of New Request in Annex J (J.7) was taken on 29-Sep-2026 and still shows the earlier check-box list of group profiles. The screen now offers the profile picker described in FRUM.009.02 and J.7 (profiles by business area, search, details, chosen profiles listed apart, Privileged marker, separation-of-duties warning). The screenshot is replaced at the next issue."
+    impact: Annex J only; no change to the requirements.
+    decide_by: Process Owner (Business Administration) - for information
+  - topic: Scope of FRUM.009 to FRUM.013
+    bdoi: "Requests, approvals and bulk \"c/o UIDM\"; no notification, separation-of-duties or security-setting item."
+    brd: "Sections A and B; NFR 9, 10 and 11."
+    proposal: New entries FRUM.009 to FRUM.013 specify what the BRD asks; their scope follows the decision on conflict C01 (requests in UIDM or in the system).
+    impact: FRUM.009 to FRUM.013; Business Requirements Mapping.
+    decide_by: BDOI IT; Process Owner (Business Administration)
+  - topic: Duplicate BRD IDs
+    bdoi: "-"
+    brd: "The BRD prints BRD 2.002.7.1 and BRD 3.003.1.1 twice; BRD 1.005 is numbered one level up."
+    proposal: "The second occurrence is shown as \"(2nd)\" in the mapping and in Annex P; the printed IDs are kept."
+    impact: Mapping and Annex P.
+    decide_by: ES-BPDS (BRD owner)
+  - topic: Non-functional rows of the BRD
+    bdoi: "-"
+    brd: "Section 6 has no IDs; most rows read \"Follow existing QPS set up\"."
+    proposal: "Annex P lists the rows that carry a function with the analyst's IDs UAM-NFR-nn of the BIBS FRS; the infrastructure rows are answered in the Technical Specification reviewed by BDOI IT."
+    impact: Annex P.
+    decide_by: BDOI IT
+  - topic: User Access Matrix (Annex C)
+    bdoi: "Annex C: \"Disclaimer: This document contains preliminary and partially completed set of capabilities, roles and permissions ...\""
+    brd: "2.2: the assumption is there is a defined User Access Matrix in place."
+    proposal: BDOI issues the final matrix; the system holds it as group profiles created through group-profile requests (FRUM.005), and the configuration template of the matrix is provided with the BIBS sign-off set.
+    impact: Annex C; FRUM.005.
+    decide_by: Process Owner (Business Administration); Information Security
+  - topic: Password guidelines (Annex I)
+    bdoi: "Annex I refers to the Application Security Requirement workbook and the Password Protection Guidelines v2 of 10-Sep-2026."
+    brd: "Other BU NFR 7: enforce strong password policies."
+    proposal: The values of Annex M for the break-glass accounts are reconciled with the guidelines once BDOI shares them; single sign-on users follow EIAM.
+    impact: Annex M; FRUM-004.
+    decide_by: Information Security
+  - topic: Acceptance criteria of version 1.2
+    bdoi: No acceptance criteria.
+    brd: "Usage instruction 4: all requirements testable."
+    proposal: The numbered acceptance criteria added under each item are the basis of the BIBS test plan BRD-11 (Annex P); BDOI accepts or amends them with the review.
+    impact: All FRUM items.
+    decide_by: Process Owner (Business Administration); Information Security
+
+change_summary:
+  title: Summary of changes in version 1.2
+  intro: >-
+    This review copy shows in light yellow every passage added or extended in version 1.2. BDOI's text of version 1.1
+    is unchanged; where the additions differ from it or a correction is proposed, the point is in Annex Q for BDOI's
+    decision.
+  points:
+    - "Cover and front matter: revision 1.2, \"Drafting support: iorta TechNXT Project Team\", Document Revision Log."
+    - "Business Requirements Mapping: BDOI's {bdoi_rows} rows kept; {leaf_rows} BRD lines added under them so that all {brd_ids} BRD IDs are mapped; {mapping_changes} rows given the FRUM items that cover them."
+    - "Functional Requirements: BDOI's {bdoi_entries} entries and {bdoi_items} items kept word for word; {elaborated} items elaborated; {new_subitems} new sub-items; {new_items} new entries FRUM.009 to FRUM.013 with {new_item_subitems} sub-items; {requirements_added} requirements and {ac_total} acceptance criteria added."
+    - "Annexes A to I kept; {annex_rows} rows added to Annexes E, F and H."
+    - "New annexes: J Screen specifications ({screens} screens, {screenshots} screenshots), K Messages and validations ({messages}), L Notifications and e-mails ({notifications}), M Business rules and parameters, N Sign-in and identity integration, O Process walkthroughs ({walk_steps} steps), P Traceability ({trace_rows} rows), Q Observations and points for BDOI decision ({observations}), R Glossary ({glossary} terms)."
+    - "Signoff Sheet: signatories unchanged; \"iorta TechNXT Project Team (drafting support)\" added under Prepared by."
+  legend: The first decision BDOI must take is where access requests are raised and approved (Annex Q, conflict C01).
+
+signoff:
+  drafting: iorta TechNXT Project Team (drafting support)

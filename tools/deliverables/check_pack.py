@@ -105,6 +105,10 @@ BUILD_STATUS_ALLOWED: list[tuple[Path, str, re.Pattern, str]] = [
     (brand.OUT_DIR / brand.DROPS["Programme"]["folder"] / "BDOI_Template_FRS", "built", re.compile(r"\bYear Built$"),
      "BDOI's Product Maintenance FRS v1.1 keeps BDOI's own Annex B and C, whose vessel and aircraft field is 'Year "
      "Built'; every other form of the word stays refused there"),
+    (brand.OUT_DIR / brand.DROPS["Programme"]["folder"] / "BDOI_Template_FRS", "build",
+     re.compile(r"subject to further design, build$"),
+     "BDOI's Signoff Sheet (template D051) is kept word for word: the Application Owner confirms the requirements "
+     "'subject to further design, build and test activities'; every other use of the word stays refused there"),
 ]
 # Technical terms that a business sign-off set does not contain (client decision of 28-Sep-2026). (label, pattern);
 # whole-word and case-insensitive.

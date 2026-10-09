@@ -87,22 +87,22 @@ select r.company_id, r.id, a.tx || to_char(current_date, 'YYYY') || a.seq, a.act
        case when a.stage = 'POSTED' then 'RCT-CEB-' || to_char(current_date, 'YYYY') || a.seq end,
        (current_date - a.requested_ago) + time '11:20' at time zone 'Asia/Manila', 'cashbr'
 from (values
-    ('AR-CEB-000001', 'CAN-', '-000901', 'CANCEL', 'PRM_INCORRECT_CHECK', 'Check drawn on the wrong account',
+    ('AR-CEB-000001', 'CAN-', '-900901', 'CANCEL', 'PRM_INCORRECT_CHECK', 'Check drawn on the wrong account',
      35840.00, null, null, 'POSTED', 33, 33),
-    ('AR-CEB-000002', 'CAN-', '-000902', 'CANCEL', 'PRM_INCORRECT_PAYEE', 'Wrong payor name on the receipt',
+    ('AR-CEB-000002', 'CAN-', '-900902', 'CANCEL', 'PRM_INCORRECT_PAYEE', 'Wrong payor name on the receipt',
      13361.25, null, null, 'POSTED', 26, 26),
-    ('AR-CEB-000003', 'CAN-', '-000903', 'CANCEL', 'GEN_BOUNCED_CHECK', 'Check returned for insufficient funds',
+    ('AR-CEB-000003', 'CAN-', '-900903', 'CANCEL', 'GEN_BOUNCED_CHECK', 'Check returned for insufficient funds',
      48250.00, null, null, 'POSTED', 20, 20),
-    ('AR-CEB-000003', 'RIN-', '-000901', 'REINSTATE_FULL', 'PRM_OTHERS', 'Check cleared on re-deposit',
+    ('AR-CEB-000003', 'RIN-', '-900901', 'REINSTATE_FULL', 'PRM_OTHERS', 'Check cleared on re-deposit',
      48250.00, 'BI-HO-2026-000004', 'DEP-CEB-0412', 'POSTED', 14, 13),
-    ('AR-CEB-000006', 'CAN-', '-000904', 'CANCEL', 'GEN_ISSUANCE_ERROR', 'Amount keyed twice',
+    ('AR-CEB-000006', 'CAN-', '-900904', 'CANCEL', 'GEN_ISSUANCE_ERROR', 'Amount keyed twice',
      28506.63, null, null, 'POSTED', 5, 5),
-    ('AR-CEB-000006', 'RIN-', '-000902', 'REINSTATE_PARTIAL', 'PRM_MISAPPLICATION',
+    ('AR-CEB-000006', 'RIN-', '-900902', 'REINSTATE_PARTIAL', 'PRM_MISAPPLICATION',
      'Part of the amount applies to the renewal premium', 12000.00,
      'BI-HO-2026-000003', null, 'FOR_APPROVAL', 3, null),
-    ('OR-CEB-200001', 'CAN-', '-000905', 'CANCEL', 'GEN_DOUBLE_ISSUANCE', 'Service fee billed twice',
+    ('OR-CEB-200001', 'CAN-', '-900905', 'CANCEL', 'GEN_DOUBLE_ISSUANCE', 'Service fee billed twice',
      16800.00, null, null, 'POSTED', 29, 28),
-    ('OR-CEB-200002', 'CAN-', '-000906', 'CANCEL', 'COM_INCORRECT_DETAILS', 'Issued before the insurer confirmed',
+    ('OR-CEB-200002', 'CAN-', '-900906', 'CANCEL', 'COM_INCORRECT_DETAILS', 'Issued before the insurer confirmed',
      9847.43, null, null, 'POSTED', 15, 15)
 ) as a(receipt_no, tx, seq, action, reason, reason_text, amount, invoice_no, document_no, stage, requested_ago,
        posted_ago)
@@ -117,17 +117,17 @@ select c.id, m.kind, m.subject_ref, m.invoice_no, m.client_code, m.sales_unit, m
        (current_date - m.days_ago) + time '18:05' at time zone 'Asia/Manila', 'cashtl'
 from (values
     ('PREMIUM', 'BI-HO-2026-000001:BASIC', 'BI-HO-2026-000001', 'CL-2026-000001', 'T-CBG1', 0.86,
-     'Basic premium 0.86', '-000901', 8),
+     'Basic premium 0.86', '-900901', 8),
     ('PREMIUM', 'BI-HO-2026-000003:BASIC', 'BI-HO-2026-000003', 'CL-2026-000001', 'T-CBG1', 0.63,
-     'Basic premium 0.50; documentary stamp tax 0.13', '-000901', 8),
+     'Basic premium 0.50; documentary stamp tax 0.13', '-900901', 8),
     ('PREMIUM', 'BI-HO-2026-000004:BASIC', 'BI-HO-2026-000004', 'CL-2026-000003', 'T-CBG2', 0.25,
-     'Basic premium 0.25', '-000902', 2),
+     'Basic premium 0.25', '-900902', 2),
     ('COMMISSION', 'BI-HO-2026-000002:COMMISSION', 'BI-HO-2026-000002', 'CL-2026-000005', 'T-CBG1', 0.42,
-     'Commission 0.38; VAT on commission 0.04', '-000901', 8),
+     'Commission 0.38; VAT on commission 0.04', '-900901', 8),
     ('COMMISSION', 'BI-HO-2026-000004:COMMISSION', 'BI-HO-2026-000004', 'CL-2026-000003', 'T-CBG2', 0.17,
-     'Commission 0.17', '-000902', 2),
-    ('EXCESS', 'UNP-2026-000901', null, 'CL-2026-000006', 'T-CBG1', 0.75, 'Excess payment 0.75', '-000901', 8),
-    ('EXCESS', 'UNP-2026-000902', null, 'CL-2026-000002', 'T-CBG1', 0.40, 'Excess payment 0.40', '-000902', 2)
+     'Commission 0.17', '-900902', 2),
+    ('EXCESS', 'UNP-2026-900901', null, 'CL-2026-000006', 'T-CBG1', 0.75, 'Excess payment 0.75', '-900901', 8),
+    ('EXCESS', 'UNP-2026-900902', null, 'CL-2026-000002', 'T-CBG1', 0.40, 'Excess payment 0.40', '-900902', 2)
 ) as m(kind, subject_ref, invoice_no, client_code, sales_unit, amount, components, seq, days_ago)
 join org_company c on c.code = 'FVI'
 where not exists (select 1 from csh_minimal_balance x where x.kind = m.kind and x.subject_ref = m.subject_ref);
@@ -140,8 +140,8 @@ select r.company_id, r.branch_id, u.reference, 'EXCESS', r.id, u.invoice_no, r.p
        'PHP', u.amount, 0, 'COMPLETED', 'Minimal balance', 'CASHIERING', 'PAY:' || u.payment_no,
        'Swept to miscellaneous income by the minimal balance sweep', r.created_at, 'cashbr', 'NEW'
 from (values
-    ('UNP-2026-000901', 'AR-CEB-000002', null, 0.75, 'PAY-2026-000921'),
-    ('UNP-2026-000902', 'AR-CEB-000004', 'BI-HO-2026-000008', 0.40, 'PAY-2026-000922')
+    ('UNP-2026-900901', 'AR-CEB-000002', null, 0.75, 'PAY-2026-900921'),
+    ('UNP-2026-900902', 'AR-CEB-000004', 'BI-HO-2026-000008', 0.40, 'PAY-2026-900922')
 ) as u(reference, receipt_no, invoice_no, amount, payment_no)
 join csh_receipt r on r.receipt_no = u.receipt_no
 where not exists (select 1 from csh_unapplied x where x.reference = u.reference);
@@ -158,14 +158,14 @@ select r.company_id, a.invoice_no, a.arn, r.payor_code, r.id, 'PAYMENT', a.sourc
        case when a.status = 'REVERSED' then 'REV-CEB-' || to_char(current_date, 'YYYY') || a.seq end,
        (current_date - a.days_ago) + time '10:00' at time zone 'Asia/Manila', 'cashbr'
 from (values
-    ('AR-CEB-000003', 'BI-HO-2026-000004', 'ARN-2026-940004', 'PAY-2026-000911', 28281.25, 4064.45, 487.73,
-     21, 'REVERSED', 20, 'Check returned for insufficient funds', '-000911'),
-    ('AR-CEB-000004', 'BI-HO-2026-000008', 'ARN-2026-940008', 'PAY-2026-000912', 19351.13, 2703.75, 324.45,
-     12, 'ACTIVE', null, null, '-000912'),
-    ('AR-CEB-000005', 'BI-HO-2026-000003', 'ARN-2026-940003', 'PAY-2026-000913', 19087.50, 2668.45, 320.21,
-     9, 'REVERSED', 7, 'Applied to the wrong invoice; re-applied to the client''s fire policy', '-000913'),
-    ('AR-CEB-000005', 'BI-HO-2026-000007', 'ARN-2026-000002', 'RAP-2026-000914', 19087.50, 2668.45, 320.21,
-     7, 'ACTIVE', null, null, '-000914')
+    ('AR-CEB-000003', 'BI-HO-2026-000004', 'ARN-2026-940004', 'PAY-2026-900911', 28281.25, 4064.45, 487.73,
+     21, 'REVERSED', 20, 'Check returned for insufficient funds', '-900911'),
+    ('AR-CEB-000004', 'BI-HO-2026-000008', 'ARN-2026-940008', 'PAY-2026-900912', 19351.13, 2703.75, 324.45,
+     12, 'ACTIVE', null, null, '-900912'),
+    ('AR-CEB-000005', 'BI-HO-2026-000003', 'ARN-2026-940003', 'PAY-2026-900913', 19087.50, 2668.45, 320.21,
+     9, 'REVERSED', 7, 'Applied to the wrong invoice; re-applied to the client''s fire policy', '-900913'),
+    ('AR-CEB-000005', 'BI-HO-2026-000007', 'ARN-2026-000002', 'RAP-2026-900914', 19087.50, 2668.45, 320.21,
+     7, 'ACTIVE', null, null, '-900914')
 ) as a(receipt_no, invoice_no, arn, source_ref, amount, commission, vat, days_ago, status, reversed_ago, reason, seq)
 join csh_receipt r on r.receipt_no = a.receipt_no
 where not exists (select 1 from csh_application x where x.source_ref = a.source_ref);
@@ -176,12 +176,12 @@ insert into csh_reapplication (company_id, invoice_no, source_module, source_ref
 select c.id, ra.invoice_no, ra.module, ra.source_ref, ra.reason, ra.unapplied, ra.excess, ra.receipts, ra.unapplied_ref,
        (current_date - ra.days_ago) + time '14:15' at time zone 'Asia/Manila', 'cashbr'
 from (values
-    ('BI-HO-2026-000007', 'ADJUSTMENT', 'ADJ-2026-000901',
+    ('BI-HO-2026-000007', 'ADJUSTMENT', 'ADJ-2026-900901',
      'Refund of the cancelled fire policy re-applied to the new fire policy of the client', 10095.49, 0.00, null,
-     'UNP-2026-000903', 8),
-    ('BI-HO-2026-000007', 'CASHIERING', 'REV-2026-000913', 'Payment reversed from the wrong invoice and re-applied',
+     'UNP-2026-900903', 8),
+    ('BI-HO-2026-000007', 'CASHIERING', 'REV-2026-900913', 'Payment reversed from the wrong invoice and re-applied',
      19087.50, 0.00, 'AR-CEB-000005', null, 7),
-    ('BI-HO-2026-000004', 'CASHIERING', 'RIN-2026-000901', 'Reinstated receipt re-applied to the invoice',
+    ('BI-HO-2026-000004', 'CASHIERING', 'RIN-2026-900901', 'Reinstated receipt re-applied to the invoice',
      28281.25, 0.00, 'AR-CEB-000003', null, 13)
 ) as ra(invoice_no, module, source_ref, reason, unapplied, excess, receipts, unapplied_ref, days_ago)
 join org_company c on c.code = 'FVI'
@@ -209,8 +209,8 @@ select c.id, b.batch_no, b.insurer, b.tags, b.total, b.status,
        case when b.status = 'RELEASED' then (current_date - b.routed_ago + 3) + time '10:00' at time zone 'Asia/Manila' end,
        (current_date - b.days_ago) + time '09:00' at time zone 'Asia/Manila', 'cashtl'
 from (values
-    ('CWB-2026-000901', 'INS-LAC', 2, 2465.63, 'WITH_DISBURSEMENT', 'DRQ-2026-000901', 18, 19),
-    ('CWB-2026-000902', 'INS-MGIC', 2, 618.79, 'REPORT_POSTED', null, 4, 4)
+    ('CWB-2026-900901', 'INS-LAC', 2, 2465.63, 'WITH_DISBURSEMENT', 'DRQ-2026-900901', 18, 19),
+    ('CWB-2026-900902', 'INS-MGIC', 2, 618.79, 'REPORT_POSTED', null, 4, 4)
 ) as b(batch_no, insurer, tags, total, status, request_no, routed_ago, days_ago)
 join org_company c on c.code = 'FVI'
 where not exists (select 1 from csh_cwt_batch x where x.batch_no = b.batch_no);
@@ -224,14 +224,14 @@ select b.company_id, t.reference, t.invoice_no, t.arn, t.client_code, b.insurer_
        'CWR-' || to_char(current_date, 'YYYY') || t.seq, t.offset_journal,
        'Client certificate 2307 received', b.created_at, 'mktcoll'
 from (values
-    ('CWB-2026-000901', 'CWT-2026-000901', 'BI-HO-2026-000004', 'ARN-2026-940004', 'CL-2026-000003', 1565.63,
-     '2307-2026-900011', 'BATCHED', 'AR-CEB-000003', '-000901', null),
-    ('CWB-2026-000901', 'CWT-2026-000902', 'BI-HO-2026-000004', 'ARN-2026-940004', 'CL-2026-000003', 900.00,
-     '2307-2026-900012', 'BATCHED', 'AR-CEB-000003', '-000902', null),
-    ('CWB-2026-000902', 'CWT-2026-000903', 'BI-HO-2026-000008', 'ARN-2026-940008', 'CL-2026-000002', 309.40,
-     '2307-2026-900013', 'BATCHED', 'AR-CEB-000004', '-000903', null),
-    ('CWB-2026-000902', 'CWT-2026-000904', 'BI-HO-2026-000007', 'ARN-2026-000002', 'CL-2026-000005', 309.39,
-     '2307-2026-900014', 'BATCHED', 'AR-CEB-000005', '-000904', null)
+    ('CWB-2026-900901', 'CWT-2026-900901', 'BI-HO-2026-000004', 'ARN-2026-940004', 'CL-2026-000003', 1565.63,
+     '2307-2026-900011', 'BATCHED', 'AR-CEB-000003', '-900901', null),
+    ('CWB-2026-900901', 'CWT-2026-900902', 'BI-HO-2026-000004', 'ARN-2026-940004', 'CL-2026-000003', 900.00,
+     '2307-2026-900012', 'BATCHED', 'AR-CEB-000003', '-900902', null),
+    ('CWB-2026-900902', 'CWT-2026-900903', 'BI-HO-2026-000008', 'ARN-2026-940008', 'CL-2026-000002', 309.40,
+     '2307-2026-900013', 'BATCHED', 'AR-CEB-000004', '-900903', null),
+    ('CWB-2026-900902', 'CWT-2026-900904', 'BI-HO-2026-000007', 'ARN-2026-000002', 'CL-2026-000005', 309.39,
+     '2307-2026-900014', 'BATCHED', 'AR-CEB-000005', '-900904', null)
 ) as t(batch_no, reference, invoice_no, arn, client_code, amount, certificate_no, stage, receipt_no, seq,
        offset_journal)
 join csh_cwt_batch b on b.batch_no = t.batch_no
@@ -244,19 +244,19 @@ insert into csh_payment (company_id, branch_id, payment_no, channel, batch_ref, 
 select c.id, b.id, p.payment_no, p.channel, p.batch_ref, 'UPL:' || p.batch_ref || ':' || p.row_no, p.row_no, p.reference,
        p.payor, p.payor, p.amount, 'PHP', current_date - p.days_ago, '10:15', false, p.mode, p.category, p.matched,
        null, p.applied, p.amount - p.applied, p.message,
-       (current_date - p.days_ago) + time '17:30' at time zone 'Asia/Manila', 'cashbr'
+       (current_date - p.days_ago) + time '17:30' at time zone 'Asia/Manila', 'cashier'
 from (values
-    ('PAY-2026-000901', 'BILLS_PAYMENT', 'BLK-2026-000901', 1, 'ARN-2026-940005', 'Reyes, Jose Miguel Lopez',
+    ('PAY-2026-900901', 'BILLS_PAYMENT', 'BLK-2026-900901', 1, 'ARN-2026-940005', 'Reyes, Jose Miguel Lopez',
      17027.86, 'BILLS_PAYMENT', 'APPLIED', 'BI-HO-2026-000008', 17027.86, 'Applied to the invoice', 11),
-    ('PAY-2026-000902', 'BILLS_PAYMENT', 'BLK-2026-000901', 2, 'ARN-2026-940006', 'Villanueva, Carmela Isabel Santos',
+    ('PAY-2026-900902', 'BILLS_PAYMENT', 'BLK-2026-900901', 2, 'ARN-2026-940006', 'Villanueva, Carmela Isabel Santos',
      13361.25, 'BILLS_PAYMENT', 'PREBOOKED', 'ARN-2026-940006', 0, 'Held for the account not yet booked', 11),
-    ('PAY-2026-000903', 'BILLS_PAYMENT', 'BLK-2026-000901', 3, 'ARN-2026-940003', 'Santos, Maria Clara Reyes',
+    ('PAY-2026-900903', 'BILLS_PAYMENT', 'BLK-2026-900901', 3, 'ARN-2026-940003', 'Santos, Maria Clara Reyes',
      30000.00, 'BILLS_PAYMENT', 'EXCESS', 'BI-HO-2026-000003', 28506.63, 'Paid more than the balance', 11),
-    ('PAY-2026-000904', 'BILLS_PAYMENT', 'BLK-2026-000901', 4, 'REF 55120', 'R. Santos', 2500.00,
+    ('PAY-2026-900904', 'BILLS_PAYMENT', 'BLK-2026-900901', 4, 'REF 55120', 'R. Santos', 2500.00,
      'BILLS_PAYMENT', 'UNAPPLIED_NO_MATCH', null, 0, 'No account or invoice matches the reference', 11),
-    ('PAY-2026-000905', 'DIRECT_CREDIT', 'BLK-2026-000902', 1, 'ARN-2026-950011', 'Pacific Harbor Logistics Inc.',
+    ('PAY-2026-900905', 'DIRECT_CREDIT', 'BLK-2026-900902', 1, 'ARN-2026-950011', 'Pacific Harbor Logistics Inc.',
      379080.00, 'DIRECT_CREDIT', 'PREBOOKED', 'ARN-2026-950011', 0, 'Held for the renewal not yet booked', 4),
-    ('PAY-2026-000906', 'DIRECT_CREDIT', 'BLK-2026-000902', 2, 'ARN-2026-940002', 'Garcia, Antonio Luis Dizon',
+    ('PAY-2026-900906', 'DIRECT_CREDIT', 'BLK-2026-900902', 2, 'ARN-2026-940002', 'Garcia, Antonio Luis Dizon',
      5000.00, 'DIRECT_CREDIT', 'CANCELLED_REFERENCE', 'ARN-2026-940002', 0,
      'The account of the reference is cancelled', 4)
 ) as p(payment_no, channel, batch_ref, row_no, reference, payor, amount, mode, category, matched, applied, message,
@@ -274,10 +274,10 @@ select c.id, b.id, u.reference, 'MIGRATED', null, u.client_code, u.payor, 'T-CBG
        'Unapplied for more than the holding period; reclassified to income', now() - interval '20 days', 'mig-loader',
        'EBIX', u.legacy_ref, 'MIG-2026-UPP-01', 'LEGACY', u.legacy_ar, u.legacy_date
 from (values
-    ('UNP-2026-000911', 'CL-2026-000101', 'Abad, Adrian', 850.00, 'UPP970911', 'AR-0098812', date '2024-03-14'),
-    ('UNP-2026-000912', 'CL-2026-000004', 'Luzon Agri-Industrial Corp.', 3120.50, 'UPP970912', 'AR-0101457',
+    ('UNP-2026-900911', 'CL-2026-000101', 'Abad, Adrian', 850.00, 'UPP970911', 'AR-0098812', date '2024-03-14'),
+    ('UNP-2026-900912', 'CL-2026-000004', 'Luzon Agri-Industrial Corp.', 3120.50, 'UPP970912', 'AR-0101457',
      date '2024-06-02'),
-    ('UNP-2026-000913', null, 'Walk-in payor (no reference)', 600.00, 'UPP970913', 'AR-0104420', date '2024-08-19')
+    ('UNP-2026-900913', null, 'Walk-in payor (no reference)', 600.00, 'UPP970913', 'AR-0104420', date '2024-08-19')
 ) as u(reference, client_code, payor, amount, legacy_ref, legacy_ar, legacy_date)
 join org_company c on c.code = 'FVI'
 join org_branch b on b.company_id = c.id and b.code = 'HO'
@@ -286,21 +286,21 @@ where not exists (select 1 from csh_unapplied x where x.reference = u.reference)
 insert into csh_legacy_batch (company_id, batch_no, kind, status, reason, currency, total, line_count, submitted_by,
     submitted_at, first_approved_by, first_approved_at, final_approved_by, final_approved_at, executed_at,
     posted_count, failed_count, created_at, created_by)
-select c.id, 'LUB-2026-000901', 'INCOME_RECLASS', 'EXECUTED',
+select c.id, 'LUB-2026-900901', 'INCOME_RECLASS', 'EXECUTED',
        'Legacy unapplied payments held beyond the holding period without a claimant', 'PHP', 4570.50, 3,
        'upphandler', now() - interval '12 days', 'cashtl', now() - interval '11 days', 'topmgmt',
        now() - interval '10 days', now() - interval '10 days', 3, 0, now() - interval '13 days', 'upphandler'
 from org_company c
-where c.code = 'FVI' and not exists (select 1 from csh_legacy_batch x where x.batch_no = 'LUB-2026-000901');
+where c.code = 'FVI' and not exists (select 1 from csh_legacy_batch x where x.batch_no = 'LUB-2026-900901');
 
 insert into csh_legacy_batch_line (batch_id, line_no, unapplied_id, reference, ledger_context, amount, age_days, reason,
     status, journal_batch_no)
 select lb.id, row_number() over (order by u.reference), u.id, u.reference, 'LEGACY', u.amount,
        current_date - u.legacy_ar_date, 'Unclaimed beyond the holding period', 'POSTED',
-       'LUI-' || to_char(current_date, 'YYYY') || '-00090' || row_number() over (order by u.reference)
+       'LUI-' || to_char(current_date, 'YYYY') || '-90090' || row_number() over (order by u.reference)
 from csh_legacy_batch lb
-join csh_unapplied u on u.reference in ('UNP-2026-000911', 'UNP-2026-000912', 'UNP-2026-000913')
-where lb.batch_no = 'LUB-2026-000901'
+join csh_unapplied u on u.reference in ('UNP-2026-900911', 'UNP-2026-900912', 'UNP-2026-900913')
+where lb.batch_no = 'LUB-2026-900901'
   and not exists (select 1 from csh_legacy_batch_line x where x.batch_id = lb.id);
 
 -- =====================================================================================================
@@ -311,7 +311,7 @@ where lb.batch_no = 'LUB-2026-000901'
 insert into dsb_payee (company_id, payee_code, payee_class, name, address, email, tin, default_mode, allowed_modes,
     disbursement_types, currency, source, stage, used, created_at, created_by, origin)
 select c.id, p.code, p.klass, p.name, p.address, p.email, p.tin, p.mode, p.modes, p.types, 'PHP', 'MANUAL', 'ACTIVE',
-       true, now() - interval '200 days', 'disb', 'BIBS'
+       true, now() - interval '200 days', 'disbtl', 'BIBS'
 from (values
     ('INS-LAC', 'INSURER', 'Luzon Assurance Co.', '6788 Ayala Avenue, Makati City', 'treasury@luzonassurance.ph',
      '000-123-456-000', 'CHECK', 'CHECK,ATD', 'REMITTANCE,REFUND'),
@@ -319,9 +319,9 @@ from (values
      '000-234-567-000', 'ATD', 'ATD,CHECK', 'REMITTANCE'),
     ('S-0002', 'SUPPLIER', 'Cloud Systems Philippines Inc.', 'BGC, Taguig City', 'billing@cloudsystems.ph',
      '009-876-543-000', 'CHECK', 'CHECK', 'SUPPLIER'),
-    ('EMP-0412', 'EMPLOYEE', 'Dela Paz, Kristine Mae', 'Cebu Branch', 'kdelapaz@bdoi.com.ph', null, 'CHECK',
+    ('EMP-0412', 'EMPLOYEE', 'Dela Paz, Kristine Mae', 'Cebu Branch', 'kdelapaz@brokerverse-seed.ph', null, 'CHECK',
      'CHECK', 'EMPLOYEE,CASH_ADVANCE'),
-    ('EMP-0388', 'EMPLOYEE', 'Bautista, Ramon Luis', 'Head Office - Makati', 'rbautista@bdoi.com.ph', null, 'CHECK',
+    ('EMP-0388', 'EMPLOYEE', 'Bautista, Ramon Luis', 'Head Office - Makati', 'rbautista@brokerverse-seed.ph', null, 'CHECK',
      'CHECK', 'EMPLOYEE,CASH_ADVANCE'),
     ('G-0002', 'SUPPLIER', 'Cebu Motor Works', 'Mandaue City, Cebu', 'accounts@cebumotorworks.ph',
      '004-555-121-000', 'CHECK', 'CHECK', 'SUPPLIER,OTHER')
@@ -337,25 +337,25 @@ create temporary table seed_dsb (
 ) on commit drop;
 
 insert into seed_dsb values
-('000901', 'INS-LAC', 'REMITTANCE', 'CHECK', 64215.80, 0, 'Net premium remittance batch RMB-INS-LAC-2026-000901',
- 'APPROVED', 'POSTED', null, 196, 'STALE', '100003', 195, 'REMITTANCE', 'RMB-INS-LAC-2026-000901', 'RELEASED'),
-('000902', 'INS-LAC', 'REMITTANCE', 'CHECK', 48250.00, 0, 'Net premium remittance batch RMB-INS-LAC-2026-000902',
- 'APPROVED', 'POSTED', null, 62, 'RELEASED', '100011', 61, 'REMITTANCE', 'RMB-INS-LAC-2026-000902', 'RELEASED'),
-('000903', 'INS-VMI', 'REMITTANCE', 'ATD', 132600.00, 0, 'Net premium remittance batch RMB-INS-VMI-2026-000901',
- 'APPROVED', 'POSTED', null, 18, 'DEBITED', 'ATD-2026-000901', null, 'REMITTANCE', 'RMB-INS-VMI-2026-000901',
+('900901', 'INS-LAC', 'REMITTANCE', 'CHECK', 64215.80, 0, 'Net premium remittance batch RMB-INS-LAC-2026-900901',
+ 'APPROVED', 'POSTED', null, 196, 'STALE', '100003', 195, 'REMITTANCE', 'RMB-INS-LAC-2026-900901', 'RELEASED'),
+('900902', 'INS-LAC', 'REMITTANCE', 'CHECK', 48250.00, 0, 'Net premium remittance batch RMB-INS-LAC-2026-900902',
+ 'APPROVED', 'POSTED', null, 62, 'RELEASED', '100011', 61, 'REMITTANCE', 'RMB-INS-LAC-2026-900902', 'RELEASED'),
+('900903', 'INS-VMI', 'REMITTANCE', 'ATD', 132600.00, 0, 'Net premium remittance batch RMB-INS-VMI-2026-900901',
+ 'APPROVED', 'POSTED', null, 18, 'DEBITED', 'ATD-2026-900901', null, 'REMITTANCE', 'RMB-INS-VMI-2026-900901',
  'RELEASED'),
-('000904', 'INS-VMI', 'REMITTANCE', 'ATD', 28125.00, 0, 'Net premium remittance batch RMB-INS-VMI-2026-000902',
- 'APPROVED', 'POSTED', null, 3, 'EMAILED', 'ATD-2026-000902', null, 'REMITTANCE', 'RMB-INS-VMI-2026-000902',
+('900904', 'INS-VMI', 'REMITTANCE', 'ATD', 28125.00, 0, 'Net premium remittance batch RMB-INS-VMI-2026-900902',
+ 'APPROVED', 'POSTED', null, 3, 'EMAILED', 'ATD-2026-900902', null, 'REMITTANCE', 'RMB-INS-VMI-2026-900902',
  'RELEASED'),
-('000905', 'EMP-0412', 'CASH_ADVANCE', 'CHECK', 15000.00, 0, 'Cash advance for the Cebu client service visits',
- 'APPROVED', 'POSTED', null, 25, 'PRINTED', '100014', 24, 'PAYREQUEST', 'RFP-2026-000901', 'RELEASED'),
-('000906', 'EMP-0388', 'EMPLOYEE', 'CHECK', 8640.00, 0, 'Reimbursement of transportation and meals, client visits',
- 'APPROVED', 'POSTED', null, 11, 'PRINTED', '100015', 10, 'DISBURSEMENT', 'DSR-2026-000906', 'RELEASED'),
-('000907', 'S-0002', 'OTHER', 'CHECK', 56000.00, 1120.00, 'Annual licence of the document scanning software',
- 'APPROVED', 'POSTED', null, 15, 'RELEASED', '100013', 14, 'DISBURSEMENT', 'DSR-2026-000907', 'RELEASED'),
-('000908', 'G-0002', 'OTHER', 'CHECK', 12500.00, 250.00, 'Repair of the Cebu branch service vehicle', 'APPROVED',
+('900905', 'EMP-0412', 'CASH_ADVANCE', 'CHECK', 15000.00, 0, 'Cash advance for the Cebu client service visits',
+ 'APPROVED', 'POSTED', null, 25, 'PRINTED', '100014', 24, 'PAYREQUEST', 'RFP-2026-900901', 'RELEASED'),
+('900906', 'EMP-0388', 'EMPLOYEE', 'CHECK', 8640.00, 0, 'Reimbursement of transportation and meals, client visits',
+ 'APPROVED', 'POSTED', null, 11, 'PRINTED', '100015', 10, 'DISBURSEMENT', 'DSR-2026-900906', 'RELEASED'),
+('900907', 'S-0002', 'OTHER', 'CHECK', 56000.00, 1120.00, 'Annual licence of the document scanning software',
+ 'APPROVED', 'POSTED', null, 15, 'RELEASED', '100013', 14, 'DISBURSEMENT', 'DSR-2026-900907', 'RELEASED'),
+('900908', 'G-0002', 'OTHER', 'CHECK', 12500.00, 250.00, 'Repair of the Cebu branch service vehicle', 'APPROVED',
  'FAILED', 'The expense account 6105 is closed for posting in the period', 6, 'PENDING', null, null, 'DISBURSEMENT',
- 'DSR-2026-000908', 'IN_VOUCHER');
+ 'DSR-2026-900908', 'IN_VOUCHER');
 
 insert into dsb_request (company_id, request_no, source, source_module, source_ref, disbursement_type, payee_class,
     payee_code, payee_name, payee_id, currency, amount, purpose, received_at, status, created_at, created_by)
@@ -409,7 +409,7 @@ where d.inst_status is not null
 -- The end-of-day runs of the business dates on which the vouchers were approved.
 insert into dsb_eod_run (company_id, run_no, business_date, status, vouchers, checks, credits, forms, reports, emails,
     message, created_at, created_by)
-select v.company_id, 'EOD-2026-' || lpad((900 + row_number() over (order by d.business_date))::text, 6, '0'),
+select v.company_id, 'EOD-2026-' || lpad((900900 + row_number() over (order by d.business_date))::text, 6, '0'),
        d.business_date, 'CONFIRMED', d.vouchers, d.checks, d.vouchers - d.checks, d.vouchers, 6, d.vouchers,
        d.vouchers || ' vouchers released', d.business_date + time '19:00' at time zone 'Asia/Manila', 'disbtl'
 from (select (approved_at at time zone 'Asia/Manila')::date as business_date, count(*) as vouchers,
@@ -434,8 +434,8 @@ select v.id, 'CWT', 'RECEIVED', t.doc_no, current_date - t.days_ago, current_dat
        t.amount, t.doc_no, 'Withholding on the commission of the quarter',
        (current_date - t.days_ago) + time '15:00' at time zone 'Asia/Manila', 'disb'
 from (values
-    ('DV-2026-000902', '2307-LAC-2026-0418', 965.43, 40),
-    ('DV-2026-000903', '2307-VMI-2026-0112', 1406.25, 12)
+    ('DV-2026-900902', '2307-LAC-2026-0418', 965.43, 40),
+    ('DV-2026-900903', '2307-VMI-2026-0112', 1406.25, 12)
 ) as t(dv_no, doc_no, amount, days_ago)
 join dsb_voucher v on v.dv_no = t.dv_no
 where not exists (select 1 from dsb_voucher_tag x where x.voucher_id = v.id and x.kind = 'CWT');
@@ -443,24 +443,24 @@ where not exists (select 1 from dsb_voucher_tag x where x.voucher_id = v.id and 
 -- Upload of payment requests with two rows refused.
 insert into bulk_job (company_id, job_no, handler_code, file_name, status, total_rows, valid_rows, invalid_rows,
     committed_rows, failed_rows, completed_at, created_at, created_by)
-select c.id, 'BLK-2026-000911', 'DISB_REQUESTS', 'payment-requests-cebu.xlsx', 'COMPLETED', 4, 2, 2, 2, 0,
+select c.id, 'BLK-2026-900911', 'DISB_REQUESTS', 'payment-requests-cebu.xlsx', 'COMPLETED', 4, 2, 2, 2, 0,
        now() - interval '9 days', now() - interval '9 days', 'disb'
 from org_company c
-where c.code = 'FVI' and not exists (select 1 from bulk_job x where x.job_no = 'BLK-2026-000911');
+where c.code = 'FVI' and not exists (select 1 from bulk_job x where x.job_no = 'BLK-2026-900911');
 
 insert into bulk_row (job_id, row_no, data, status, messages, result_ref)
 select j.id, r.row_no, r.data, r.status, r.messages, r.result_ref
 from (values
     (1, '{"Type":"SUPPLIER","Payee code":"S-0001","Currency":"PHP","Amount":"4560.00","Purpose":"Office supplies"}',
-     'COMMITTED', null, 'DSR-2026-000921'),
+     'COMMITTED', null, 'DSR-2026-900921'),
     (2, '{"Type":"SUPPLIER","Payee code":"S-0099","Currency":"PHP","Amount":"12000.00","Purpose":"Printer toner"}',
      'INVALID', 'Payee code: S-0099 is not a payee of the company', null),
     (3, '{"Type":"EMPLOYEE","Payee code":"EMP-0412","Currency":"PHP","Amount":"","Purpose":"Meal allowance"}',
      'INVALID', 'Amount is mandatory', null),
     (4, '{"Type":"SUPPLIER","Payee code":"S-0002","Currency":"PHP","Amount":"3360.00","Purpose":"Cloud storage"}',
-     'COMMITTED', null, 'DSR-2026-000922')
+     'COMMITTED', null, 'DSR-2026-900922')
 ) as r(row_no, data, status, messages, result_ref)
-join bulk_job j on j.job_no = 'BLK-2026-000911'
+join bulk_job j on j.job_no = 'BLK-2026-900911'
 where not exists (select 1 from bulk_row x where x.job_id = j.id);
 
 -- =====================================================================================================
@@ -478,10 +478,10 @@ select c.id, s.request_no, s.invoice_no, s.arn, 'INS-MGIC', s.client_code, s.ass
        case when s.pushed_ago is not null then (current_date - s.pushed_ago) + time '17:00' at time zone 'Asia/Manila' end,
        (current_date - s.days_ago) + time '09:40' at time zone 'Asia/Manila', 'mktcoll'
 from (values
-    ('SPR-2026-000901', 'BI-HO-2026-000008', 'ARN-2026-940008', 'CL-2026-000002', 'Reyes, Jose Miguel Lopez',
+    ('SPR-2026-900901', 'BI-HO-2026-000008', 'ARN-2026-940008', 'CL-2026-000002', 'Reyes, Jose Miguel Lopez',
      'MGIC-MC-2026-98808', 'IMMEDIATE_OR', 'Client needs the insurer''s OR for the car loan release',
-     'PUSHED_TO_DISBURSEMENT', 11, 10, 9, 'RMB-INS-MGIC-2026-000903'),
-    ('SPR-2026-000902', 'BI-HO-2026-000003', 'ARN-2026-940003', 'CL-2026-000001', 'Santos, Maria Clara Reyes',
+     'PUSHED_TO_DISBURSEMENT', 11, 10, 9, 'RMB-INS-MGIC-2026-900903'),
+    ('SPR-2026-900902', 'BI-HO-2026-000003', 'ARN-2026-940003', 'CL-2026-000001', 'Santos, Maria Clara Reyes',
      'MGIC-MC-2026-98803', 'CLAIMS', 'Claim settlement waits for the premium remittance',
      'FOR_APPROVAL', 2, null, null, null)
 ) as s(request_no, invoice_no, arn, client_code, assured, policy_no, condition, remarks, stage, days_ago,
@@ -499,11 +499,11 @@ create temporary table seed_rem_batch (
 ) on commit drop;
 
 insert into seed_rem_batch values
-('RMB-INS-MGIC-2026-000902', 'WITH_INCENTIVES', 'FULLY_REMITTED', null, 6, 'BI-HO-2026-000007', 'ARN-2026-000002',
+('RMB-INS-MGIC-2026-900902', 'WITH_INCENTIVES', 'FULLY_REMITTED', null, 6, 'BI-HO-2026-000007', 'ARN-2026-000002',
  'MGIC-FI-2026-91901', 'CL-2026-000005', 'Garcia, Antonio Luis Dizon', 'PAR01', 'FIRE', date '2026-09-01',
  date '2029-09-01', date '2026-10-09', 7, 15270.00, 19087.50, 2668.45, 320.21, 266.85, 19087.50, 381.75, 45.81,
- 'MGIC-OR-2026-900911', 'DV-2026-000903'),
-('RMB-INS-MGIC-2026-000903', 'SPECIAL', 'APPROVED', 'SPR-2026-000901', 9, 'BI-HO-2026-000008', 'ARN-2026-940008',
+ 'MGIC-OR-2026-900911', 'DV-2026-900903'),
+('RMB-INS-MGIC-2026-900903', 'SPECIAL', 'APPROVED', 'SPR-2026-900901', 9, 'BI-HO-2026-000008', 'ARN-2026-940008',
  'MGIC-MC-2026-98808', 'CL-2026-000002', 'Reyes, Jose Miguel Lopez', 'MTR10', 'MOTOR', date '2026-09-12',
  date '2027-09-12', date '2026-10-09', 12, 15450.00, 19351.13, 2703.75, 324.45, 270.38, 19351.13, 0, 0, null, null);
 
@@ -561,10 +561,10 @@ select c.id, s.submission_no, s.insurer, '2307', s.certificate_no, date_trunc('q
        case when s.stage <> 'SUBMITTED' then 'comptrol' end,
        (current_date - s.days_ago) + time '10:30' at time zone 'Asia/Manila', 'commrec'
 from (values
-    ('BCS-2026-000901', 'INS-MGIC', '2307-MGIC-2026-0731', 237.91, 'ACKNOWLEDGED', null, 1, 6, 5),
-    ('BCS-2026-000902', 'INS-LAC', '2307-LAC-2026-0418', 965.43, 'REJECTED',
+    ('BCS-2026-900901', 'INS-MGIC', '2307-MGIC-2026-0731', 237.91, 'ACKNOWLEDGED', null, 1, 6, 5),
+    ('BCS-2026-900902', 'INS-LAC', '2307-LAC-2026-0418', 965.43, 'REJECTED',
      'The certificate shows the TIN of the head office; the insurer to issue it to the branch TIN', 1, 4, 3),
-    ('BCS-2026-000903', 'INS-VMI', '2307-VMI-2026-0112', 1406.25, 'SUBMITTED', null, 1, 2, null)
+    ('BCS-2026-900903', 'INS-VMI', '2307-VMI-2026-0112', 1406.25, 'SUBMITTED', null, 1, 2, null)
 ) as s(submission_no, insurer, certificate_no, tax, stage, reject_reason, submitted, days_ago, decided_ago)
 join org_company c on c.code = 'FVI'
 where not exists (select 1 from cmr_certificate x where x.submission_no = s.submission_no);
@@ -572,8 +572,8 @@ where not exists (select 1 from cmr_certificate x where x.submission_no = s.subm
 insert into cmr_certificate_or (certificate_id, or_index, or_no, amount)
 select c.id, 1, o.or_no, o.amount
 from (values
-    ('BCS-2026-000901', 'OR-HO-100002', 2426.72),
-    ('BCS-2026-000902', 'OR-CEB-200002', 9847.43)
+    ('BCS-2026-900901', 'OR-HO-100002', 2426.72),
+    ('BCS-2026-900902', 'OR-CEB-200002', 9847.43)
 ) as o(submission_no, or_no, amount)
 join cmr_certificate c on c.submission_no = o.submission_no
 where not exists (select 1 from cmr_certificate_or x where x.certificate_id = c.id);
@@ -581,12 +581,12 @@ where not exists (select 1 from cmr_certificate_or x where x.certificate_id = c.
 insert into cmr_incentive_run (company_id, run_no, scheme_id, period_from, period_to, status, eligible_count,
     eligible_production, excluded_count, excluded_amount, tier_applied, incentive_amount, pass_on_amount, posted_at,
     posted_by, journal_refs, created_at, created_by)
-select c.id, 'INR-2026-000901', s.id, date_trunc('quarter', current_date - 92)::date,
+select c.id, 'INR-2026-900901', s.id, date_trunc('quarter', current_date - 92)::date,
        (date_trunc('quarter', current_date) - interval '1 day')::date, 'POSTED', 2, 45534.49, 1, 22268.75,
-       'Fixed per policy', 1000.00, 1000.00, now() - interval '5 days', 'commtl', 'INC-HO-2026-000901',
+       'Fixed per policy', 1000.00, 1000.00, now() - interval '5 days', 'commtl', 'INC-HO-2026-900901',
        now() - interval '6 days', 'commrec'
 from org_company c join cmr_incentive_scheme s on s.company_id = c.id and s.code = 'MOTOR_MANIA'
-where c.code = 'FVI' and not exists (select 1 from cmr_incentive_run x where x.run_no = 'INR-2026-000901');
+where c.code = 'FVI' and not exists (select 1 from cmr_incentive_run x where x.run_no = 'INR-2026-900901');
 
 insert into cmr_incentive_run_line (run_id, invoice_no, insurer_code, sales_unit, segment, product_line,
     basic_premium, gross_premium, excluded, exclusion_reason, incentive)
@@ -596,7 +596,7 @@ from (values
     ('BI-HO-2026-000003', 'MOTOR', 22805.00, 28506.63, false, null, 500.00),
     ('BI-HO-2026-000002', 'FIRE', 17815.00, 22268.75, true, 'Not a motor policy; cancelled flat', 0.00)
 ) as l(invoice_no, line, basic, gross, excluded, reason, incentive)
-join cmr_incentive_run r on r.run_no = 'INR-2026-000901'
+join cmr_incentive_run r on r.run_no = 'INR-2026-900901'
 where not exists (select 1 from cmr_incentive_run_line x where x.run_id = r.id and x.invoice_no = l.invoice_no);
 
 -- =====================================================================================================
@@ -604,6 +604,16 @@ where not exists (select 1 from cmr_incentive_run_line x where x.run_id = r.id a
 --    of Luzon Agri-Industrial with Mindanao Pacific, Group Life of Pacific Harbor with Luzon Assurance)
 --    and the franchise requests of the renewals sent to the incumbent insurers.
 -- =====================================================================================================
+-- The business line of the Employee Benefits product lines (HMO, GLI, GPA), added to the catalog after the
+-- business lines of the other product lines: the accounting entries of an EB account carry its product line as
+-- the line of business, as for any account (a new product line gets its business line when it is created).
+insert into dim_value (company_id, dimension_type, code, name, created_at, created_by)
+select c.id, 'BUSINESS_LINE', l.code, l.name, now(), 'SYSTEM'
+from org_company c
+cross join cat_product_line l
+where not exists (select 1 from dim_value d where d.company_id = c.id
+                  and d.dimension_type = 'BUSINESS_LINE' and d.code = l.code);
+
 create temporary table seed_eb_account (
     arn varchar(30), programme_no varchar(30), line_no integer, benefit_line varchar(20), product varchar(20),
     client_code varchar(30), insurer varchar(30), policy_no varchar(60), members integer, created_ago integer,
@@ -613,9 +623,9 @@ create temporary table seed_eb_account (
 
 insert into seed_eb_account values
 ('ARN-2026-950001', 'EBP-2026-000002', 2, 'GPA', 'EBGPA01', 'CL-2026-000004', 'INS-MPI', 'MPI-GPA-2026-07731', 410,
- 48, 32, 25, 246000.00, 30750.00, 4920.00, 1230.00, 25, 'ebao', 'SM', 'BI-HO-2026-000901'),
+ 48, 32, 25, 246000.00, 30750.00, 4920.00, 1230.00, 25, 'ebao', 'SM', 'BI-HO-2026-900901'),
 ('ARN-2026-950002', 'EBP-2026-000005', 2, 'GLI', 'EBGLI01', 'CL-2026-000003', 'INS-LAC', 'LAC-GLI-2026-04418', 120,
- 30, 16, 12, 180000.00, 0.00, 3600.00, 0.00, 15, 'ebao', 'VOLUNTARY', 'BI-HO-2026-000902');
+ 30, 16, 12, 180000.00, 0.00, 3600.00, 0.00, 15, 'ebao', 'VOLUNTARY', 'BI-HO-2026-900902');
 
 insert into acc_account (company_id, arn, client_id, client_code, client_name, product_code, line_code, cover_type_code,
     market_segment, source_channel, insurer_code, period_from, period_to, multi_year, term_years, currency,
@@ -623,7 +633,7 @@ insert into acc_account (company_id, arn, client_id, client_code, client_name, p
     commission_rate, commission, vat_on_commission, minimum_applied, payment_arrangement, contact_name,
     contact_email, contact_mobile, account_officer, status, payment_status, payment_source, payment_confirmed_at,
     placement_slip_ref, placed_at, insurer_ref, policy_issue_date, epolicy_received, business_type, origin,
-    created_at, created_by)
+    sales_region, sales_department, sales_team, created_at, created_by)
 select c.id, e.arn, cl.id, cl.client_code, cl.display_name, e.product, e.benefit_line, e.benefit_line, 'CORPORATE',
        'EMAIL', e.insurer, current_date - e.inception_ago, current_date - e.inception_ago + 365, false, 1, 'PHP',
        e.members * 500000.00, 'ANNUAL', e.basic, e.dst, e.ptx, 0, 0, e.lgt, e.dst + e.ptx + e.lgt,
@@ -632,7 +642,7 @@ select c.id, e.arn, cl.id, cl.client_code, cl.display_name, e.product, e.benefit
        e.officer, 'BOOKED', 'PAID', 'Payment report', (current_date - e.booked_ago) + time '10:00' at time zone 'Asia/Manila',
        'PL-2026-' || right(e.arn, 6), (current_date - e.inception_ago - 5) + time '15:00' at time zone 'Asia/Manila',
        e.policy_no, current_date - e.inception_ago, true, 'NEW_BUSINESS', 'EMPLOYEE_BENEFITS',
-       (current_date - e.created_ago) + time '09:00' at time zone 'Asia/Manila', e.officer
+       'NCR', 'CORP-NCR', 'T-CORP1', (current_date - e.created_ago) + time '09:00' at time zone 'Asia/Manila', e.officer
 from seed_eb_account e
 join org_company c on c.code = 'FVI'
 join crm_client cl on cl.client_code = e.client_code
@@ -674,9 +684,9 @@ select cy.company_id, f.franchise_no, cy.programme_id, cy.id, f.insurer, 'SUBMIT
        current_date - f.sent_ago + 15, f.remarks, (current_date - f.sent_ago) + time '09:30' at time zone 'Asia/Manila',
        'ebao'
 from (values
-    ('EBF-2026-000901', 'EBC-2026-000004', 'INS-MPI', 6,
+    ('EBF-2026-900901', 'EBC-2026-000004', 'INS-MPI', 6,
      'Renewal of the Group Personal Accident of 120 members on the expiring terms'),
-    ('EBF-2026-000902', 'EBC-2026-000001', 'INS-MGIC', 3,
+    ('EBF-2026-900902', 'EBC-2026-000001', 'INS-MGIC', 3,
      'Renewal of the Group HMO of 240 members; the client asks to keep the dental rider')
 ) as f(franchise_no, cycle_no, insurer, sent_ago, remarks)
 join eb_cycle cy on cy.cycle_no = f.cycle_no
@@ -689,13 +699,13 @@ where not exists (select 1 from eb_franchise_request x where x.franchise_no = f.
 -- =====================================================================================================
 insert into sbm_intake_run (company_id, run_no, source_code, bulk_job_no, file_name, file_sha256, received, created,
     updated, duplicate, failed, status, started_at, finished_at, created_at, created_by)
-select c.id, 'SIR-2026-000901', 'IBG_LEASING_DOC', 'BLK-2026-000913', 'ibg-leasing-policies.xlsx',
+select c.id, 'SIR-2026-900901', 'IBG_LEASING_DOC', 'BLK-2026-900913', 'ibg-leasing-policies.xlsx',
        md5('ibg-leasing-policies-901') || md5('ibg-leasing-policies-901'), 14, 12, 0, 0, 2, 'COMPLETED',
        (current_date - 36) + time '08:10' at time zone 'Asia/Manila',
        (current_date - 36) + time '08:12' at time zone 'Asia/Manila',
        (current_date - 36) + time '08:10' at time zone 'Asia/Manila', 'sbmtl'
 from org_company c
-where c.code = 'FVI' and not exists (select 1 from sbm_intake_run x where x.run_no = 'SIR-2026-000901');
+where c.code = 'FVI' and not exists (select 1 from sbm_intake_run x where x.run_no = 'SIR-2026-900901');
 
 create temporary table seed_sbm (
     sbm_no varchar(30), natural_key varchar(80), assured varchar(250), status varchar(30), received_ago integer,
@@ -704,13 +714,13 @@ create temporary table seed_sbm (
 ) on commit drop;
 
 insert into seed_sbm values
-('SBM-2026-000901', 'POL:POL-C60114', 'Luzon Agri-Industrial Corp.', 'IN_REVIEW', 35, date '2026-01-15',
+('SBM-2026-900901', 'POL:POL-C60114', 'Luzon Agri-Industrial Corp.', 'IN_REVIEW', 35, date '2026-01-15',
  date '2027-01-15', 'INS-LAC', 'POL-C60114', 32000000.00, 480000.00, 'Warehouse 3, Calamba Premiere Park, Laguna',
  null, 'rm.ibgleasing@bdo.com.ph'),
-('SBM-2026-000902', 'POL:POL-C60231', 'Mindanao Agri Ventures Inc.', 'IN_REVIEW', 12, date '2026-02-01',
+('SBM-2026-900902', 'POL:POL-C60231', 'Mindanao Agri Ventures Inc.', 'IN_REVIEW', 12, date '2026-02-01',
  date '2027-02-01', 'INS-MPI', 'POL-C60231', 21500000.00, 322500.00, 'Packing plant, Tagum City, Davao del Norte',
  'WITH_FINDINGS', 'rm.ibgleasing@bdo.com.ph'),
-('SBM-2026-000903', 'POL:POL-C57702', 'Pacific Harbor Logistics Inc.', 'RENEWAL_IN_PROGRESS', 60, null,
+('SBM-2026-900903', 'POL:POL-C57702', 'Pacific Harbor Logistics Inc.', 'RENEWAL_IN_PROGRESS', 60, null,
  null, 'INS-MPI', 'POL-C57702', 27000000.00, 405000.00, 'Container yard, Port Area, Manila', 'ADEQUATE',
  'rm.ibgleasing@bdo.com.ph');
 
@@ -725,13 +735,13 @@ select c.id, s.sbm_no, 'NONCBG_CORPORATE', 'NB', s.natural_key, 'IBG_LEASING_DOC
        'PHP', s.location, 'Industrial', 'BDO Leasing and Finance, Inc.', false, false, false, false, true,
        'SUBMITTED', case when s.status = 'IN_REVIEW' then 'FOR_REVIEW' else 'FOR_RENEWAL' end, false, false, 'sbmtl',
        'ao2', s.adequacy, s.status,
-       case when s.status = 'RENEWAL_IN_PROGRESS' then 'RNW-SBM-2026-000903' end,
+       case when s.status = 'RENEWAL_IN_PROGRESS' then 'RNW-SBM-2026-900903' end,
        case when s.status = 'RENEWAL_IN_PROGRESS' then 'ARN-2026-950011' end,
        case when s.adequacy = 'WITH_FINDINGS' then 'Sum insured below the appraised value of the plant' end,
        (current_date - s.received_ago) + time '08:11' at time zone 'Asia/Manila', 'sbmtl'
 from seed_sbm s
 join org_company c on c.code = 'FVI'
-join sbm_intake_run r on r.run_no = 'SIR-2026-000901'
+join sbm_intake_run r on r.run_no = 'SIR-2026-900901'
 where not exists (select 1 from sbm_policy x where x.sbm_no = s.sbm_no);
 
 insert into sbm_iaaf (company_id, iaaf_no, policy_id, status, current_level, total_levels, submitted_at,
@@ -740,8 +750,8 @@ select p.company_id, i.iaaf_no, p.id, i.status, i.level, 2,
        case when i.status = 'FOR_APPROVAL' then (current_date - 20) + time '15:00' at time zone 'Asia/Manila' end,
        1, (current_date - i.created_ago) + time '10:00' at time zone 'Asia/Manila', 'sbmtl'
 from (values
-    ('IAAF-2026-000901', 'SBM-2026-000901', 'FOR_APPROVAL', 1, 22),
-    ('IAAF-2026-000902', 'SBM-2026-000902', 'DRAFT', 0, 9)
+    ('IAAF-2026-900901', 'SBM-2026-900901', 'FOR_APPROVAL', 1, 22),
+    ('IAAF-2026-900902', 'SBM-2026-900902', 'DRAFT', 0, 9)
 ) as i(iaaf_no, sbm_no, status, level, created_ago)
 join sbm_policy p on p.sbm_no = i.sbm_no
 where not exists (select 1 from sbm_iaaf x where x.iaaf_no = i.iaaf_no);
@@ -753,9 +763,9 @@ select p.company_id, l.letter_no, p.id, r.id, 'RENEWAL_PROPOSAL', 'BANK_COUNTERP
        case when l.status = 'SENT' then (current_date - l.days_ago) + time '07:05' at time zone 'Asia/Manila' end,
        (current_date - l.days_ago) + time '07:00' at time zone 'Asia/Manila', 'sbmtl'
 from (values
-    ('SBL-2026-000901', 'SBM-2026-000901', 'SENT', null, 30),
-    ('SBL-2026-000902', 'SBM-2026-000903', 'SENT', null, 50),
-    ('SBL-2026-000903', 'SBM-2026-000902', 'FAILED', 'The mail server refused the recipient address', 8)
+    ('SBL-2026-900901', 'SBM-2026-900901', 'SENT', null, 30),
+    ('SBL-2026-900902', 'SBM-2026-900903', 'SENT', null, 50),
+    ('SBL-2026-900903', 'SBM-2026-900902', 'FAILED', 'The mail server refused the recipient address', 8)
 ) as l(letter_no, sbm_no, status, error, days_ago)
 join sbm_policy p on p.sbm_no = l.sbm_no
 join sbm_letter_rule r on r.company_id = p.company_id and r.letter_type = 'RENEWAL_PROPOSAL'
@@ -769,24 +779,24 @@ insert into acc_account (company_id, arn, client_id, client_code, client_name, p
     total_sum_insured, rating_basis, net_premium, dst, premium_tax, vat, fst, lgt, total_charges, gross_premium,
     commission_rate, commission, vat_on_commission, minimum_applied, payment_arrangement, contact_name, contact_email,
     account_officer, status, payment_status, placement_slip_ref, placed_at, business_type, origin, renewal_of_ref,
-    created_at, created_by)
+    sales_region, sales_department, sales_team, created_at, created_by)
 select c.id, 'ARN-2026-950011', cl.id, cl.client_code, cl.display_name, 'PAR01', 'PROPERTY', 'FIRE', 'CORPORATE',
        'EMAIL', 'INS-MPI', current_date - 20, current_date + 345, false, 1, 'PHP', 27000000.00, 'ANNUAL', 324000.00,
        40500.00, 6480.00, 0, 6480.00, 1620.00, 55080.00, 379080.00, 20, 64800.00, 7776.00, false, 'VIA_BROKER',
        cl.display_name, cl.email, 'ao2', 'PLACED', 'UNPAID', 'PL-2026-950011',
        (current_date - 17) + time '16:00' at time zone 'Asia/Manila', 'RENEWAL', 'SUBMITTED_POLICY', 'POL-C57702',
-       (current_date - 28) + time '09:00' at time zone 'Asia/Manila', 'sbmtl'
+       'NCR', 'CORP-NCR', 'T-CORP1', (current_date - 28) + time '09:00' at time zone 'Asia/Manila', 'sbmtl'
 from org_company c join crm_client cl on cl.client_code = 'CL-2026-000003'
 where c.code = 'FVI' and not exists (select 1 from acc_account x where x.arn = 'ARN-2026-950011');
 
 insert into sbm_renewal (company_id, policy_id, handoff_status, manual, renewal_ref, insurer_assigned, ra_template,
     arn, hold_cover_on, outcome, handed_off_at, message, created_at, created_by)
-select p.company_id, p.id, 'HANDED_OFF', false, 'RNW-SBM-2026-000903', 'INS-MPI', 'GENERIC', 'ARN-2026-950011',
+select p.company_id, p.id, 'HANDED_OFF', false, 'RNW-SBM-2026-900903', 'INS-MPI', 'GENERIC', 'ARN-2026-950011',
        current_date - 16, 'IN_PROGRESS', (current_date - 30) + time '08:00' at time zone 'Asia/Manila',
        'Handed off to the renewal of the corporate team', (current_date - 30) + time '08:00' at time zone 'Asia/Manila',
        'sbmtl'
 from sbm_policy p
-where p.sbm_no = 'SBM-2026-000903' and not exists (select 1 from sbm_renewal x where x.policy_id = p.id);
+where p.sbm_no = 'SBM-2026-900903' and not exists (select 1 from sbm_renewal x where x.policy_id = p.id);
 
 insert into plc_hold_cover (company_id, account_id, arn, insurer_code, status, start_date, expiry_date, created_at,
     created_by, duration_days, expiring_policy_no, remarks, requested_by)
@@ -799,10 +809,10 @@ where a.arn = 'ARN-2026-950011' and not exists (select 1 from plc_hold_cover x w
 -- Migration upload of submitted policies with rows refused.
 insert into bulk_job (company_id, job_no, handler_code, file_name, status, total_rows, valid_rows, invalid_rows,
     committed_rows, failed_rows, completed_at, created_at, created_by)
-select c.id, 'BLK-2026-000914', 'SBM_MIGRATION', 'legacy-submitted-policies-batch2.xlsx', 'COMPLETED', 5, 3, 2, 3, 0,
+select c.id, 'BLK-2026-900914', 'SBM_MIGRATION', 'legacy-submitted-policies-batch2.xlsx', 'COMPLETED', 5, 3, 2, 3, 0,
        now() - interval '15 days', now() - interval '15 days', 'sbmtl'
 from org_company c
-where c.code = 'FVI' and not exists (select 1 from bulk_job x where x.job_no = 'BLK-2026-000914');
+where c.code = 'FVI' and not exists (select 1 from bulk_job x where x.job_no = 'BLK-2026-900914');
 
 insert into bulk_row (job_id, row_no, data, status, messages, result_ref)
 select j.id, r.row_no, r.data, r.status, r.messages, r.result_ref
@@ -818,7 +828,7 @@ from (values
     (5, '{"Policy no":"POL-C51233","Assured":"Mindanao Agri Ventures Inc.","Expiry date":"2027-05-11"}',
      'COMMITTED', null, 'POL:POL-C51233')
 ) as r(row_no, data, status, messages, result_ref)
-join bulk_job j on j.job_no = 'BLK-2026-000914'
+join bulk_job j on j.job_no = 'BLK-2026-900914'
 where not exists (select 1 from bulk_row x where x.job_id = j.id);
 
 -- =====================================================================================================
@@ -854,17 +864,17 @@ where case_no = 'SCR-2026-000005' and not breached
 -- =====================================================================================================
 insert into bulk_job (company_id, job_no, handler_code, file_name, status, total_rows, valid_rows, invalid_rows,
     committed_rows, failed_rows, completed_at, created_at, created_by)
-select c.id, 'BLK-2026-000915', 'RNW_LAMD_REPORT', 'lamd-paid-off-loans.xlsx', 'COMPLETED', 3, 3, 0, 3, 0,
+select c.id, 'BLK-2026-900915', 'RNW_LAMD_REPORT', 'lamd-paid-off-loans.xlsx', 'COMPLETED', 3, 3, 0, 3, 0,
        now() - interval '7 days', now() - interval '7 days', 'lamd'
 from org_company c
-where c.code = 'FVI' and not exists (select 1 from bulk_job x where x.job_no = 'BLK-2026-000915');
+where c.code = 'FVI' and not exists (select 1 from bulk_job x where x.job_no = 'BLK-2026-900915');
 
 insert into rnw_lamd_report (company_id, report_no, report_type, period, job_no, line_count, matched_count,
     created_at, created_by)
-select c.id, 'LMD-2026-000901', 'PAID_OFF', to_char(date_trunc('month', current_date) - interval '1 month', 'YYYY-MM'),
-       'BLK-2026-000915', 3, 0, now() - interval '7 days', 'lamd'
+select c.id, 'LMD-2026-900901', 'PAID_OFF', to_char(date_trunc('month', current_date) - interval '1 month', 'YYYY-MM'),
+       'BLK-2026-900915', 3, 0, now() - interval '7 days', 'lamd'
 from org_company c
-where c.code = 'FVI' and not exists (select 1 from rnw_lamd_report x where x.job_no = 'BLK-2026-000915');
+where c.code = 'FVI' and not exists (select 1 from rnw_lamd_report x where x.job_no = 'BLK-2026-900915');
 
 insert into rnw_lamd_line (report_id, row_no, pn_no, loan_status, status_date, borrower, match_outcome, message,
     created_at, created_by)
@@ -875,13 +885,14 @@ from (values
     (2, 'PN-0151-2022-097431', 'Tan, Rowena Uy', 33),
     (3, 'PN-0102-2024-003915', 'Mendoza Agri Trading', 31)
 ) as l(row_no, pn_no, borrower, days_ago)
-join rnw_lamd_report r on r.report_no = 'LMD-2026-000901'
+join rnw_lamd_report r on r.report_no = 'LMD-2026-900901'
 where not exists (select 1 from rnw_lamd_line x where x.report_id = r.id and x.row_no = l.row_no);
 
 -- =====================================================================================================
 -- 9. Data Migration: the trial run of a delta client extract with refused rows and its client matching,
---    a delta policy load whose policies expire in the go-live renewal window, and the FY2027 true-up
---    of the legacy invoices with its reconciliation.
+--    a delta policy load whose policies expire in the go-live renewal window, and the reconciliation of
+--    the trial load of legacy invoices (the opening-balance adjustments themselves follow the FY2027
+--    cut-off, after go-live).
 -- =====================================================================================================
 insert into mig_batch (company_id, batch_no, object_code, environment_class, mode, status, staged_count, valid_count,
     warning_count, invalid_count, loaded_count, skipped_count, rejected_count, excluded_count, waived_count,
@@ -893,9 +904,9 @@ select c.id, b.batch_no, b.object_code, 'NON_PRODUCTION', 'DELTA', b.status, b.s
        case when b.status = 'SIGNED_OFF' then now() - b.ago + interval '1 day' end, now() - b.ago - interval '3 hours',
        'migops'
 from (values
-    ('MGB-2026-000901', 'C01', 'LOADED_WITH_REJECTS', 5, 2, 2, 2, 1, 40.00, 1, interval '6 days'),
-    ('MGB-2026-000902', 'P01', 'SIGNED_OFF', 3, 3, 0, 3, 0, 0.00, 0, interval '5 days'),
-    ('MGB-2026-000903', 'F01', 'RECONCILED', 2, 2, 0, 2, 0, 0.00, 0, interval '3 days')
+    ('MGB-2026-900901', 'C01', 'LOADED_WITH_REJECTS', 5, 2, 2, 2, 1, 40.00, 1, interval '6 days'),
+    ('MGB-2026-900902', 'P01', 'SIGNED_OFF', 3, 3, 0, 3, 0, 0.00, 0, interval '5 days'),
+    ('MGB-2026-900903', 'F01', 'RECONCILED', 2, 2, 0, 2, 0, 0.00, 0, interval '3 days')
 ) as b(batch_no, object_code, status, staged, valid, invalid, loaded, rejected, error_rate, review, ago)
 join org_company c on c.code = 'FVI'
 where not exists (select 1 from mig_batch x where x.batch_no = b.batch_no);
@@ -909,9 +920,9 @@ select c.id, e.extract_no, e.object_code, e.object_code, 1, 'EBIX', timestamp '2
        now() - e.ago - interval '4 hours', now() - e.ago - interval '4 hours', now() - e.ago - interval '4 hours',
        'migops'
 from (values
-    ('MGX-2026-000901', 'C01', 5, interval '6 days'),
-    ('MGX-2026-000902', 'P01', 3, interval '5 days'),
-    ('MGX-2026-000903', 'F01', 2, interval '3 days')
+    ('MGX-2026-900901', 'C01', 5, interval '6 days'),
+    ('MGX-2026-900902', 'P01', 3, interval '5 days'),
+    ('MGX-2026-900903', 'F01', 2, interval '3 days')
 ) as e(extract_no, object_code, rows, ago)
 join org_company c on c.code = 'FVI'
 where not exists (select 1 from mig_extract x where x.extract_no = e.extract_no);
@@ -922,25 +933,25 @@ select x.id, x.object_code, x.layout_code, r.row_no, r.legacy_key, r.payload::js
        r.status, b.id, case when r.status = 'LOADED' then r.entity end, case when r.status = 'LOADED' then r.target end,
        r.message, case when r.status = 'LOADED' then b.ended_at end
 from (values
-    ('MGX-2026-000901', 'MGB-2026-000901', 1, 'E970211', '{"client_type": "C", "name": "Pacific Harbour Logistics Inc", "tin": "008-421-337-000"}',
+    ('MGX-2026-900901', 'MGB-2026-900901', 1, 'E970211', '{"client_type": "C", "name": "Pacific Harbour Logistics Inc", "tin": "008-421-337-000"}',
      'LOADED', 'Client', 'CL-2026-000003', null),
-    ('MGX-2026-000901', 'MGB-2026-000901', 2, 'E970212', '{"client_type": "I", "last_name": "Villanueva", "first_name": "Carmela", "birth_date": "1984-02-11"}',
+    ('MGX-2026-900901', 'MGB-2026-900901', 2, 'E970212', '{"client_type": "I", "last_name": "Villanueva", "first_name": "Carmela", "birth_date": "1984-02-11"}',
      'LOADED', 'Client', 'CL-2026-000006', null),
-    ('MGX-2026-000901', 'MGB-2026-000901', 3, 'E970213', '{"client_type": "C", "name": "Sierra Agro Holdings", "tin": ""}',
+    ('MGX-2026-900901', 'MGB-2026-900901', 3, 'E970213', '{"client_type": "C", "name": "Sierra Agro Holdings", "tin": ""}',
      'INVALID', null, null, null),
-    ('MGX-2026-000901', 'MGB-2026-000901', 4, 'E970214', '{"client_type": "X", "name": "Dela Rosa Trading"}',
+    ('MGX-2026-900901', 'MGB-2026-900901', 4, 'E970214', '{"client_type": "X", "name": "Dela Rosa Trading"}',
      'INVALID', null, null, null),
-    ('MGX-2026-000901', 'MGB-2026-000901', 5, 'E970215', '{"client_type": "I", "last_name": "Reyes", "first_name": "Jose Miguel"}',
+    ('MGX-2026-900901', 'MGB-2026-900901', 5, 'E970215', '{"client_type": "I", "last_name": "Reyes", "first_name": "Jose Miguel"}',
      'REJECTED', null, null, 'Duplicate of client E970045 already loaded; kept apart for the data owner'),
-    ('MGX-2026-000902', 'MGB-2026-000902', 1, 'EP970311', '{"policy_no": "FI-970311", "expiry": "2028-01-20"}',
+    ('MGX-2026-900902', 'MGB-2026-900902', 1, 'EP970311', '{"policy_no": "FI-970311", "expiry": "2028-01-20"}',
      'LOADED', 'Account', 'ARN-2026-950021', null),
-    ('MGX-2026-000902', 'MGB-2026-000902', 2, 'EP970312', '{"policy_no": "FI-970312", "expiry": "2028-02-15"}',
+    ('MGX-2026-900902', 'MGB-2026-900902', 2, 'EP970312', '{"policy_no": "FI-970312", "expiry": "2028-02-15"}',
      'LOADED', 'Account', 'ARN-2026-950022', null),
-    ('MGX-2026-000902', 'MGB-2026-000902', 3, 'EP970313', '{"policy_no": "MC-970313", "expiry": "2028-04-10"}',
+    ('MGX-2026-900902', 'MGB-2026-900902', 3, 'EP970313', '{"policy_no": "MC-970313", "expiry": "2028-04-10"}',
      'LOADED', 'Account', 'ARN-2026-950023', null),
-    ('MGX-2026-000903', 'MGB-2026-000903', 1, 'I97000311', '{"invoice_no": "I97000311", "true_up": "FY2027"}',
+    ('MGX-2026-900903', 'MGB-2026-900903', 1, 'I97000311', '{"invoice_no": "I97000311", "true_up": "FY2027"}',
      'LOADED', 'Invoice', 'I97000311', null),
-    ('MGX-2026-000903', 'MGB-2026-000903', 2, 'I97000312', '{"invoice_no": "I97000312", "true_up": "FY2027"}',
+    ('MGX-2026-900903', 'MGB-2026-900903', 2, 'I97000312', '{"invoice_no": "I97000312", "true_up": "FY2027"}',
      'LOADED', 'Invoice', 'I97000312', null)
 ) as r(extract_no, batch_no, row_no, legacy_key, payload, status, entity, target, message)
 join mig_extract x on x.extract_no = r.extract_no
@@ -958,7 +969,7 @@ from (values
      'Name differs from the matched BIBS client Pacific Harbor Logistics Inc.')
 ) as i(legacy_key, rule_code, severity, field, value, message)
 join mig_stage_row s on s.legacy_key = i.legacy_key and s.layout_code = 'C01'
-join mig_batch b on b.id = s.batch_id and b.batch_no = 'MGB-2026-000901'
+join mig_batch b on b.id = s.batch_id and b.batch_no = 'MGB-2026-900901'
 where not exists (select 1 from mig_issue x where x.stage_row_id = s.id and x.rule_code = i.rule_code);
 
 insert into mig_client_match (batch_id, cluster_no, left_row_id, left_key, right_row_id, right_key, right_client_code,
@@ -971,7 +982,7 @@ from (values
     (2, 'E970212', 'CL-2026-000006', 78, 'Name, birth date', 'MERGE', 'CL-2026-000006', 'migsteward'),
     (3, 'E970215', 'CL-2026-000002', 66, 'Name', 'KEEP_SEPARATE', null, 'migsteward')
 ) as m(cluster_no, legacy_key, client_code, score, keys, decision, survivor, decided_by)
-join mig_batch b on b.batch_no = 'MGB-2026-000901'
+join mig_batch b on b.batch_no = 'MGB-2026-900901'
 join mig_stage_row s on s.batch_id = b.id and s.legacy_key = m.legacy_key
 where not exists (select 1 from mig_client_match x where x.batch_id = b.id and x.cluster_no = m.cluster_no);
 
@@ -993,10 +1004,11 @@ insert into seed_mig_policy values
 insert into acc_account (company_id, arn, client_id, client_code, client_name, product_code, line_code, market_segment,
     source_channel, insurer_code, period_from, period_to, multi_year, term_years, currency, rating_basis, net_premium,
     gross_premium, minimum_applied, payment_arrangement, account_officer, status, payment_status, insurer_ref,
-    business_type, origin, created_at, created_by)
+    business_type, origin, sales_region, sales_department, sales_team, created_at, created_by)
 select c.id, p.arn, cl.id, cl.client_code, cl.display_name, p.product, p.line, 'CBG', 'MIGRATION', p.insurer,
        (p.expiry - interval '1 year')::date, p.expiry, false, 1, 'PHP', 'ANNUAL', p.net, p.gross, false, 'VIA_BROKER',
-       'ao', 'BOOKED', 'PAID', p.policy_no, 'RENEWAL', 'MIGRATED', now() - interval '5 days', 'mig-loader'
+       'ao', 'BOOKED', 'PAID', p.policy_no, 'RENEWAL', 'MIGRATED', 'NCR', 'CBG-NCR', 'T-CBG1',
+       now() - interval '5 days', 'mig-loader'
 from seed_mig_policy p
 join org_company c on c.code = 'FVI'
 join crm_client cl on cl.client_code = p.client_code
@@ -1006,7 +1018,7 @@ insert into acc_account_legacy (account_id, company_id, source_system, legacy_re
     legacy_client_no, legacy_package_code, legacy_package_version, legacy_status, assured_name, migration_batch,
     created_at, created_by)
 select a.id, a.company_id, 'EBIX', p.legacy_ref, p.policy_no, p.cover_no, 1, p.legacy_client, null, null, 'IN_FORCE',
-       a.client_name, 'MGB-2026-000902', now() - interval '5 days', 'mig-loader'
+       a.client_name, 'MGB-2026-900902', now() - interval '5 days', 'mig-loader'
 from seed_mig_policy p
 join acc_account a on a.arn = p.arn
 where not exists (select 1 from acc_account_legacy x where x.account_id = a.id);
@@ -1018,27 +1030,16 @@ select b.company_id, 'EP970311', 'ARN-2026-950021', 'EC970311', date '2028-01-20
        'EMAIL', 'finance@luzonagri.ph', 'INS-LAC', 'PHP', 121500.00, 'ao', 'RA tracker - corporate November 2027',
        'Renewal advice sent from the legacy system before the freeze', b.id, false, now() - interval '5 days', 'migops'
 from mig_batch b
-where b.batch_no = 'MGB-2026-000902'
+where b.batch_no = 'MGB-2026-900902'
   and not exists (select 1 from mig_ra_sent x where x.legacy_policy_ref = 'EP970311');
 
--- FY2027 true-up of the legacy invoices: prepared, approved, posted and reconciled.
+-- Reconciliation of the trial load of legacy invoices, with one difference explained.
 insert into mig_recon_run (company_id, run_no, batch_id, object_code, as_of, status, break_count, run_by, run_at,
     created_at, created_by)
-select b.company_id, 'MGR-2026-000901', b.id, 'F01', date '2027-12-31', 'EXPLAINED', 1, 'migrecon',
+select b.company_id, 'MGR-2026-900901', b.id, 'F01', current_date - 3, 'EXPLAINED', 1, 'migrecon',
        now() - interval '2 days', now() - interval '2 days', 'migrecon'
 from mig_batch b
-where b.batch_no = 'MGB-2026-000903' and not exists (select 1 from mig_recon_run x where x.run_no = 'MGR-2026-000901');
-
-insert into mig_trueup (company_id, trueup_no, reference, as_of, status, batch_id, journals_posted, items_adjusted,
-    prepared_by, prepared_at, approved_by, approved_at, posted_at, recon_run_id, remarks, created_at, created_by)
-select b.company_id, '1', 'TU1-FY2027', date '2027-12-31', 'RECONCILED', b.id, 2, 2, 'migops',
-       now() - interval '4 days', 'miglead', now() - interval '3 days', now() - interval '3 days', r.id,
-       'Premium changes booked in the legacy system after the opening extract', now() - interval '4 days', 'migops'
-from mig_batch b join mig_recon_run r on r.run_no = 'MGR-2026-000901'
-where b.batch_no = 'MGB-2026-000903' and not exists (select 1 from mig_trueup x where x.reference = 'TU1-FY2027');
-
-update mig_recon_run r set trueup_id = t.id
-from mig_trueup t where t.recon_run_id = r.id and r.run_no = 'MGR-2026-000901' and r.trueup_id is null;
+where b.batch_no = 'MGB-2026-900903' and not exists (select 1 from mig_recon_run x where x.run_no = 'MGR-2026-900901');
 
 insert into mig_recon_line (run_id, level, measure, currency, source_value, staged_value, target_value, difference,
     tolerance, status, break_reason, explanation, explained_by, explained_at, approved_by, approved_at, created_at,
@@ -1049,13 +1050,14 @@ select r.id, l.level, l.measure, l.currency, l.source, l.staged, l.target, l.tar
        case when l.status = 'EXPLAINED' then 'miglead' end,
        case when l.status = 'EXPLAINED' then now() - interval '1 day' end, now() - interval '2 days', 'migrecon'
 from (values
-    ('L1', 'Rows received F01_EBIX_20271231_02.csv', null, 2.00, 2.00, 2.00, 'MATCHED', null, null),
-    ('TU', 'True-up of the basic premium of legacy invoices', 'PHP', 4250.00, 4250.00, 4250.00, 'MATCHED', null, null),
-    ('TU', 'True-up of the commission of legacy invoices', 'PHP', 595.00, 595.00, 595.00, 'MATCHED', null, null),
-    ('TU', 'Legacy control account LGC-DTIP after the true-up', 'PHP', 15450.00, 15450.00, 15449.40, 'EXPLAINED',
+    ('L1', 'Rows received ' || 'F01_EBIX_' || to_char(current_date - 3, 'YYYYMMDD') || '_02.csv', null, 2.00, 2.00,
+     2.00, 'MATCHED', null, null),
+    ('L2', 'Basic premium of the legacy invoices', 'PHP', 4250.00, 4250.00, 4250.00, 'MATCHED', null, null),
+    ('L2', 'Commission of the legacy invoices', 'PHP', 595.00, 595.00, 595.00, 'MATCHED', null, null),
+    ('L3', 'Legacy control account LGC-DTIP after the load', 'PHP', 15450.00, 15450.00, 15449.40, 'EXPLAINED',
      'Rounding', 'Rounding of the documentary stamp tax on two endorsements')
 ) as l(level, measure, currency, source, staged, target, status, reason, explanation)
-join mig_recon_run r on r.run_no = 'MGR-2026-000901'
+join mig_recon_run r on r.run_no = 'MGR-2026-900901'
 where not exists (select 1 from mig_recon_line x where x.run_id = r.id);
 
 -- =====================================================================================================
@@ -1067,37 +1069,37 @@ select c.id, e.no, e.name, b.id, e.cc, e.position, e.email, e.party, e.hired, e.
        now() - interval '30 days', 'hrappr'
 from (values
     ('EMP-0101', 'Concepcion, Teresa Marie', 'HO', 'EXEC', 'President and Chief Executive Officer',
-     'tconcepcion@bdoi.com.ph', null, date '2015-03-02', null::date),
-    ('EMP-0214', 'Navarro, Antonio Jose', 'HO', 'FIN', 'Comptroller', 'anavarro@bdoi.com.ph', null,
+     'tconcepcion@brokerverse-seed.ph', null, date '2015-03-02', null::date),
+    ('EMP-0214', 'Navarro, Antonio Jose', 'HO', 'FIN', 'Comptroller', 'anavarro@brokerverse-seed.ph', null,
      date '2016-07-18', null),
-    ('EMP-0233', 'Lim, Grace Anne', 'HO', 'FIN', 'General Ledger Officer', 'glim@bdoi.com.ph', null,
+    ('EMP-0233', 'Lim, Grace Anne', 'HO', 'FIN', 'General Ledger Officer', 'glim@brokerverse-seed.ph', null,
      date '2019-01-07', null),
-    ('EMP-0245', 'Mercado, Paolo Luis', 'HO', 'FIN', 'Cashier', 'pmercado@bdoi.com.ph', null, date '2020-06-15', null),
-    ('EMP-0301', 'Fernandez, Clarissa Joy', 'HO', 'CLM', 'Claims Officer', 'cfernandez@bdoi.com.ph', null,
+    ('EMP-0245', 'Mercado, Paolo Luis', 'HO', 'FIN', 'Cashier', 'pmercado@brokerverse-seed.ph', null, date '2020-06-15', null),
+    ('EMP-0301', 'Fernandez, Clarissa Joy', 'HO', 'CLM', 'Claims Officer', 'cfernandez@brokerverse-seed.ph', null,
      date '2018-09-03', null),
-    ('EMP-0302', 'Ocampo, Cedric James', 'HO', 'CLM', 'Claims Officer', 'cocampo@bdoi.com.ph', null,
+    ('EMP-0302', 'Ocampo, Cedric James', 'HO', 'CLM', 'Claims Officer', 'cocampo@brokerverse-seed.ph', null,
      date '2021-02-01', null),
-    ('EMP-0388', 'Bautista, Ramon Luis', 'HO', 'MKT', 'Account Officer', 'rbautista@bdoi.com.ph', 'EMP-0388',
+    ('EMP-0388', 'Bautista, Ramon Luis', 'HO', 'MKT', 'Account Officer', 'rbautista@brokerverse-seed.ph', 'EMP-0388',
      date '2017-11-13', null),
-    ('EMP-0390', 'Aquino, Aileen Grace', 'HO', 'NB-CBG-M', 'Account Officer', 'aaquino@bdoi.com.ph', null,
+    ('EMP-0390', 'Aquino, Aileen Grace', 'HO', 'NB-CBG-M', 'Account Officer', 'aaquino@brokerverse-seed.ph', null,
      date '2019-04-22', null),
-    ('EMP-0392', 'Robles, Marites Ann', 'HO', 'NB-CBG-M', 'Marketing Team Leader', 'mrobles@bdoi.com.ph', null,
+    ('EMP-0392', 'Robles, Marites Ann', 'HO', 'NB-CBG-M', 'Marketing Team Leader', 'mrobles@brokerverse-seed.ph', null,
      date '2014-08-11', null),
-    ('EMP-0395', 'Castro, Arnel Vincent', 'HO', 'NB-CORP', 'Account Officer', 'acastro@bdoi.com.ph', null,
+    ('EMP-0395', 'Castro, Arnel Vincent', 'HO', 'NB-CORP', 'Account Officer', 'acastro@brokerverse-seed.ph', null,
      date '2020-10-05', null),
-    ('EMP-0412', 'Dela Paz, Kristine Mae', 'CEB', 'NB-CBG-V', 'Account Officer', 'kdelapaz@bdoi.com.ph', 'EMP-0412',
+    ('EMP-0412', 'Dela Paz, Kristine Mae', 'CEB', 'NB-CBG-V', 'Account Officer', 'kdelapaz@brokerverse-seed.ph', 'EMP-0412',
      date '2022-03-14', null),
-    ('EMP-0415', 'Sison, Benjamin Rey', 'CEB', 'NB-CBG-V', 'Branch Cashier', 'bsison@bdoi.com.ph', null,
+    ('EMP-0415', 'Sison, Benjamin Rey', 'CEB', 'NB-CBG-V', 'Branch Cashier', 'bsison@brokerverse-seed.ph', null,
      date '2021-07-01', null),
-    ('EMP-0421', 'Torres, Consuelo Faith', 'CEB', 'CLM', 'Claims Officer', 'ctorres@bdoi.com.ph', null,
+    ('EMP-0421', 'Torres, Consuelo Faith', 'CEB', 'CLM', 'Claims Officer', 'ctorres@brokerverse-seed.ph', null,
      date '2023-01-16', null),
-    ('EMP-0502', 'Villaroman, Dennis Paul', 'DVO', 'NB-CBG-V', 'Account Officer', 'dvillaroman@bdoi.com.ph', null,
+    ('EMP-0502', 'Villaroman, Dennis Paul', 'DVO', 'NB-CBG-V', 'Account Officer', 'dvillaroman@brokerverse-seed.ph', null,
      date '2022-09-05', null),
-    ('EMP-0610', 'Ilagan, Ingrid Sol', 'HO', 'IT', 'Information Security Officer', 'iilagan@bdoi.com.ph', null,
+    ('EMP-0610', 'Ilagan, Ingrid Sol', 'HO', 'IT', 'Information Security Officer', 'iilagan@brokerverse-seed.ph', null,
      date '2018-05-21', null),
-    ('EMP-0702', 'Domingo, Helena Rose', 'HO', 'HR', 'Human Resources Officer', 'hdomingo@bdoi.com.ph', null,
+    ('EMP-0702', 'Domingo, Helena Rose', 'HO', 'HR', 'Human Resources Officer', 'hdomingo@brokerverse-seed.ph', null,
      date '2016-02-08', null),
-    ('EMP-0398', 'Pascual, Rodel Ian', 'HO', 'NB-CBG-M', 'Account Officer', 'rpascual@bdoi.com.ph', null,
+    ('EMP-0398', 'Pascual, Rodel Ian', 'HO', 'NB-CBG-M', 'Account Officer', 'rpascual@brokerverse-seed.ph', null,
      date '2019-08-19', date '2026-06-30')
 ) as e(no, name, branch, cc, position, email, party, hired, separated)
 join org_company c on c.code = 'FVI'
@@ -1126,11 +1128,11 @@ select c.id, b.id, r.request_no, r.kind, r.stage, 'CBG', r.reference, current_da
        case when r.dv is not null then (current_date - r.days_ago + 2) + time '16:00' at time zone 'Asia/Manila' end,
        (current_date - r.days_ago) + time '09:00' at time zone 'Asia/Manila', r.maker
 from (values
-    ('RFP-2026-000901', 'CASH_ADVANCE', 'DISBURSED', 'Client service visits, Cebu and Bohol', 'Marketing - Cebu',
+    ('RFP-2026-900901', 'CASH_ADVANCE', 'DISBURSED', 'Client service visits, Cebu and Bohol', 'Marketing - Cebu',
      'EMPLOYEE', 'EMP-0412', 'Dela Paz, Kristine Mae', 'CASH_ADVANCE',
      'Cash advance for the client service visits of the quarter', 15000.00, 27, 'mktao', 'mkttl', 'mktappr',
-     'hrappr', 'DSR-2026-000905', 'DV-2026-000905'),
-    ('RRF-2026-000901', 'REFUND', 'FOR_APPROVAL', 'AR-CEB-000006', 'Cashiering - Cebu', 'CLIENT', 'CL-2026-000001',
+     'hrappr', 'DSR-2026-900905', 'DV-2026-900905'),
+    ('RRF-2026-900901', 'REFUND', 'FOR_APPROVAL', 'AR-CEB-000006', 'Cashiering - Cebu', 'CLIENT', 'CL-2026-000001',
      'Santos, Maria Clara Reyes', null, 'Refund of the part of the cancelled receipt not reinstated', 16506.63, 2,
      'cashbr', 'cashtl', null, null, null, null)
 ) as r(request_no, kind, stage, reference, unit, payee_type, payee_code, payee_name, rfp_type, purpose, amount,
@@ -1144,7 +1146,7 @@ insert into prq_request_line (request_id, line_no, ar_no, client_code, assured_n
 select q.id, 1, 'AR-CEB-000006', 'CL-2026-000001', 'Santos, Maria Clara Reyes', 'BI-HO-2026-000003',
        'BI-HO-2026-000003', 16506.63, 'DOUBLE_PAYMENT', 'Cebu Branch', false, true
 from prq_request q
-where q.request_no = 'RRF-2026-000901' and not exists (select 1 from prq_request_line x where x.request_id = q.id);
+where q.request_no = 'RRF-2026-900901' and not exists (select 1 from prq_request_line x where x.request_id = q.id);
 
 -- =====================================================================================================
 -- 12. Receivables: post-dated cheques of corporate customers received at Cebu and due for deposit.
@@ -1157,9 +1159,9 @@ select c.id, b.id, d.pdc_no, current_date - d.received_ago, p.id, p.code, p.name
        current_date - d.received_ago, (current_date - d.received_ago) + time '15:00' at time zone 'Asia/Manila',
        'accountant'
 from (values
-    ('PDC-CEB-2026-000901', 'C-000202', '220417', 'Metrobank', 41850.00, 31, 1,
+    ('PDC-CEB-2026-900901', 'C-000202', '220417', 'Metrobank', 41850.00, 31, 1,
      'Post-dated cheque for the premium of the hull renewal'),
-    ('PDC-CEB-2026-000902', 'C-000203', '508812', 'Land Bank', 18225.00, 29, 0,
+    ('PDC-CEB-2026-900902', 'C-000203', '508812', 'Land Bank', 18225.00, 29, 0,
      'Post-dated cheque, second instalment of the crop insurance premium')
 ) as d(pdc_no, party_code, cheque_no, bank, amount, received_ago, due_ago, narration)
 join org_company c on c.code = 'FVI'

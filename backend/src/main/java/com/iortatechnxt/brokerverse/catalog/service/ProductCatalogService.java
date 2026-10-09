@@ -17,7 +17,10 @@ import com.iortatechnxt.brokerverse.common.exception.DuplicateResourceException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
+import com.iortatechnxt.brokerverse.dimension.domain.DimensionType;
+import com.iortatechnxt.brokerverse.dimension.service.DimensionService;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
+import com.iortatechnxt.brokerverse.organization.service.OrganizationDirectory;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
@@ -47,6 +50,8 @@ public class ProductCatalogService {
   private final ProductVersionRepository versions;
   private final LovService lovs;
   private final AuditTrailService audit;
+  private final DimensionService dimensions;
+  private final OrganizationDirectory organization;
   private final Clock clock;
 
   /**
@@ -58,6 +63,8 @@ public class ProductCatalogService {
    * @param versions package versions
    * @param lovs lists of values (market segments)
    * @param audit audit trail
+   * @param dimensions dimensions (the business line of a product line)
+   * @param organization companies
    * @param clock clock
    */
   public ProductCatalogService(
@@ -67,6 +74,8 @@ public class ProductCatalogService {
       ProductVersionRepository versions,
       LovService lovs,
       AuditTrailService audit,
+      DimensionService dimensions,
+      OrganizationDirectory organization,
       Clock clock) {
     this.lines = lines;
     this.coverTypes = coverTypes;
@@ -74,6 +83,8 @@ public class ProductCatalogService {
     this.versions = versions;
     this.lovs = lovs;
     this.audit = audit;
+    this.dimensions = dimensions;
+    this.organization = organization;
     this.clock = clock;
   }
 
@@ -101,7 +112,9 @@ public class ProductCatalogService {
   }
 
   /**
-   * Adds a product line, pending authorization.
+   * Adds a product line, pending authorization, with its business line in every company: the
+   * accounting entries of the accounts of the line carry the product line as their line of
+   * business, and a journal refuses a business line that is not a value of the dimension.
    *
    * @param code code
    * @param details attributes
@@ -112,6 +125,9 @@ public class ProductCatalogService {
       throw new DuplicateResourceException(CatalogKind.PRODUCT_LINE.label(), code);
     }
     ProductLine saved = lines.save(new ProductLine(code, details));
+    for (OrganizationDirectory.CompanyRef company : organization.companies()) {
+      dimensions.ensure(company.id(), DimensionType.BUSINESS_LINE, code, details.name());
+    }
     record(CatalogKind.PRODUCT_LINE, code, AuditAction.CREATE, "Added " + details.name());
     return saved;
   }

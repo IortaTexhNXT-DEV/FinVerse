@@ -4,7 +4,9 @@ import com.iortatechnxt.brokerverse.bulk.service.BulkColumn;
 import com.iortatechnxt.brokerverse.bulk.service.BulkColumn.Type;
 import com.iortatechnxt.brokerverse.bulk.service.BulkContext;
 import com.iortatechnxt.brokerverse.bulk.service.BulkRow;
+import java.util.Currency;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
 import org.springframework.stereotype.Component;
@@ -18,6 +20,12 @@ public class CurrencyUpload extends ConfigUploadHandler {
   static final String SYMBOL = "Symbol";
   static final String DECIMALS = "Decimal places";
   static final String ACTIVE = "Active";
+
+  /**
+   * Currency of the example row of the templates (the currency of the United States, read from the
+   * platform's currency list: no currency code is written in platform code).
+   */
+  static final String EXAMPLE_CODE = Currency.getInstance(Locale.US).getCurrencyCode();
 
   private static final String TABLE = "cur_currency";
   private static final Pattern CODE_FORMAT = Pattern.compile("[A-Z]{3}");
@@ -72,7 +80,8 @@ public class CurrencyUpload extends ConfigUploadHandler {
   @Override
   public List<BulkColumn> columns() {
     return List.of(
-        BulkColumn.required(CODE, "Code of the currency", "USD").format("ISO 4217, 3 capitals"),
+        BulkColumn.required(CODE, "Code of the currency", EXAMPLE_CODE)
+            .format("ISO 4217, 3 capitals"),
         BulkColumn.required(NAME, "Name of the currency", "US dollar").format("Text, up to 60"),
         BulkColumn.optional(SYMBOL, "Symbol printed on documents", "$")
             .format("Up to 5 characters"),

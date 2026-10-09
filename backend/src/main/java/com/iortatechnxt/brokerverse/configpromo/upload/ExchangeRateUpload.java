@@ -77,7 +77,10 @@ public class ExchangeRateUpload extends ConfigUploadHandler {
   @Override
   public List<BulkColumn> columns() {
     return List.of(
-        BulkColumn.required(CURRENCY, "Currency of the rate (not the base currency)", "USD")
+        BulkColumn.required(
+                CURRENCY,
+                "Currency of the rate (not the base currency)",
+                CurrencyUpload.EXAMPLE_CODE)
             .master("currency of MD-02 Currencies"),
         BulkColumn.required(TYPE, "Kind of rate", "SPOT").codes(TYPES.toArray(String[]::new)),
         new BulkColumn(DATE, "Date from which the rate applies", true, Type.DATE, "2028-01-03"),

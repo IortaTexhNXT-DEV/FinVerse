@@ -225,10 +225,12 @@ class BookingServiceIT {
   @Test
   void aFailedPostingRollsTheWholeBookingBack() {
     Account account = fx.motor();
-    String before =
+    // The next number of the series (the seed data numbers its invoices in a block of its own,
+    // above the series).
+    Long next =
         jdbc.queryForObject(
-            "select coalesce(max(invoice_no), '') from bkg_invoice where invoice_no like 'BI-HO-2026-%'",
-            String.class);
+            "select coalesce(max(next_value), 1) from document_sequence where sequence_key = 'BI-HO-2026'",
+            Long.class);
     assertThatThrownBy(
             () -> book(account.getArn(), BookingOptions.of(LocalDate.of(2025, 12, 15), null)))
         .isInstanceOf(RuntimeException.class);
@@ -239,9 +241,7 @@ class BookingServiceIT {
 
     BookedInvoice invoice =
         book(account.getArn(), BookingOptions.of(BookingFixtures.BOOKED_ON, null));
-    long previous =
-        before.isEmpty() ? 0 : Long.parseLong(before.substring(before.lastIndexOf('-') + 1));
-    assertThat(invoice.getInvoiceNo()).isEqualTo(String.format("BI-HO-2026-%06d", previous + 1));
+    assertThat(invoice.getInvoiceNo()).isEqualTo(String.format("BI-HO-2026-%06d", next));
   }
 
   @Test

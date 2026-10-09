@@ -40,8 +40,12 @@ class DisbursementSeedIT {
         .contains("APPROVED");
     assertThat(values("select stage from dsb_voucher where disbursement_type = 'SUPPLIER'"))
         .contains("APPROVED", "IN_PROCESS");
+    // Approved vouchers are posted, but for the one whose posting failed (the expense account was
+    // closed): it is
+    // the unregularised voucher of the control reports.
     assertThat(values("select posting_status from dsb_voucher where stage = 'APPROVED'"))
-        .containsOnly("POSTED");
+        .containsOnly("POSTED", "FAILED")
+        .containsOnlyOnce("FAILED");
     assertThat(values("select status from dsb_instrument")).contains("NEGOTIATED");
     assertThat(values("select status from dsb_eod_run")).isNotEmpty();
     assertThat(values("select stage from dsb_funding_request")).contains("APPROVED");

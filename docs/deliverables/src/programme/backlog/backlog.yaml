@@ -1,0 +1,169 @@
+# User story backlog of BIBS for the BDOI Jira project (BRD-00, programme level).
+# Read by build_backlog.py, which takes everything else from the FRS sources (```fr blocks, the appendices
+# "User-story view" and "Storyboard index", the clarification tables) and from the test case files of each BRD.
+# Decision of the BIBS Product Owner of 9 October 2026: the FRS keeps the user-story view and the storyboard index as
+# signed appendices; the working backlog lives in Jira and is generated from the same sources so that they cannot drift.
+# This file holds only the planning choices that the sources do not state: the drop of each epic, the splits and
+# merges of FRs into stories, the derived user stories of the FRs that no BRD row names, the estimation rule and the
+# Definition of Ready / Done.
+
+version: "1.0"
+date: 9 October 2026
+
+# Short name of each BRD in the epic names ("<BRD short name> - <capability>") and the component (module) of its issues.
+brds:
+  BRD-00: {short: Core Replacement, component: Core Replacement}
+  BRD-01: {short: New Business, component: New Business}
+  BRD-02: {short: Operations, component: Operations}
+  BRD-03: {short: Product Maintenance, component: Product Maintenance}
+  BRD-04: {short: Collections, component: Collections}
+  BRD-05: {short: Accounting, component: Accounting Disbursement ACSL}
+  BRD-06: {short: Renewal, component: Renewal}
+  BRD-07: {short: Claims, component: Claims}
+  BRD-08: {short: Employee Benefits, component: Employee Benefits}
+  BRD-09: {short: Customer Servicing, component: Customer Servicing Facility}
+  BRD-10: {short: Sanction Screening, component: Sanction Screening}
+  BRD-11: {short: User Access, component: User Access Maintenance}
+  BRD-12: {short: Submitted Policies, component: Submitted Policies}
+  BRD-13: {short: Data Migration, component: Data Migration}
+
+# Drop of the epics. An epic is one section of the chapter "Functional requirements" of the FRS (the capability) and
+# takes the primary drop of its BRD (drop map of the deliverables: Drop 0 BRD-03, 11, 13; Drop 1 BRD-01, 02, 04, 05,
+# 06, 09, 10, 12; Drop 2 BRD-07, 08), except the sections below, which the BDOI drop plan of 26-Sep-2026 places in
+# another drop. All stories of an epic share its drop, so that each import file holds its epics and their stories.
+drops:
+  BRD-00:
+    default: Drop 1
+    reason: "The umbrella BRD has no drop of its own; the setup items of the drop plan (access and log-in, authorisation, user maintenance, data management, workflow) are Drop 0 and the other cross-cutting functions go with the first transactional drop"
+    sections:
+      Navigation and persona menus: Drop 0
+      Notifications and workflow communication: Drop 0
+      Audit: Drop 0
+      Data management: Drop 0
+      Security and access: Drop 0
+  BRD-02:
+    sections:
+      Production Reconciliation: Drop 2
+    reason: "Drop plan item 2.3: Production Reconciliation is in Drop 2"
+  BRD-04:
+    sections:
+      Outstanding PR worklist: Drop 2
+      Assignment: Drop 2
+      Collector dispositions and efforts: Drop 2
+      Installments, promises and account views: Drop 2
+      Escalation: Drop 2
+      Billing statements: Drop 2
+      Unapplied payments: Drop 2
+      Scheduled files, reports and home: Drop 2
+    reason: "Drop plan item 2.1 (Marketing Collection) is in Drop 2; item 1.D7 (collection of commission receivables, direct payment) and the access of the module stay in Drop 1"
+  BRD-05:
+    sections:
+      Chart of accounts and revaluation rate: Drop 0
+    reason: "Drop plan item 0.4: GL accounts and reference tables are set up in Drop 0"
+  BRD-08:
+    sections:
+      Placement, issuance and booking: Drop 1
+      Reports and monitoring: Drop 1
+      Partner portal: Phase 2
+    reason: "Drop plan items 1.U6 and 1.U9 (EB placement and e-policy, EB upstream reports) are in Drop 1; item 2.4 is Employee Benefits without the portal feature, so the portal stories are held for phase 2 (IQ22, CR-0147)"
+  BRD-09:
+    sections:
+      Case management: Drop 2
+    reason: "Case Management (CSF addendum) is proposed for Drop 2 in the project plan (P-05) until BDOI and the Change Control Board decide its drop (CLR-CSF-07, DEP-03)"
+
+# Sections that are cut in two epics because their stories fall in two drops (by FR).
+epic_cuts:
+  BRD-08:
+    Processing, booking, billing and member servicing:
+      - {name: "Placement, issuance and booking", frs: [FR-EB-050, FR-EB-051, FR-EB-052]}
+      - {name: "Billing and member servicing", frs: [FR-EB-053, FR-EB-054, FR-EB-055, FR-EB-056, FR-EB-057]}
+
+# Stories with a fix version other than the drop of their epic.
+story_versions:
+  FR-SP-002: {version: Phase 2, reason: "The BRD issue of 8-Oct-2026 marks BRIDSP-04 Must Have (Release 2); FR-SP-002 is delivered after the first release (CLR-SP-03)"}
+
+# FRs split into stories: each part takes the acceptance criteria listed (AC numbers of the FR).
+splits:
+  FR-NB-044:
+    - {acs: [1, 2], summary: "Send approved quotations to clients by e-mail, singly or in a batch"}
+    - {acs: [3, 4, 5], summary: "Send supporting documents with a quotation and show its delivery status"}
+  FR-OP-030:
+    - {acs: [1, 2, 4], summary: "Extract remittances in the scheduled run"}
+    - {acs: [3, 5], summary: "Extract remittances manually for an insurer or an invoice"}
+  FR-OP-061:
+    - {acs: [1, 2, 3], summary: "Show the ageing and the change history of adjustment requests"}
+    - {acs: [4, 5, 6], summary: "Search requests by ARN or policy and view the policy transaction history"}
+  FR-OP-113:
+    - {acs: [1, 2, 7], summary: "Tag PR 2307 reversals and check them against the computed amount"}
+    - {acs: [3, 4, 5, 6], summary: "Validate and post PR 2307 reversals and route the certificates to Disbursement"}
+  FR-CL-001:
+    - {acs: [1, 2, 3, 4], summary: "Restrict each Collections action to authorised roles"}
+    - {acs: [5], summary: "Open Remittance and the Production Register read only from Collections",
+       story: "As a Collection Handler, I need to search and open remittances and filter the Production Register read only, so that I see what was remitted and produced for the accounts I collect."}
+  FR-DM-034:
+    - {acs: [1, 4], summary: "Load and approve the package code map"}
+    - {acs: [2, 3, 5], summary: "Remap legacy packages at Renewal sanitation through the package code map"}
+
+# User stories derived from the FR where no row of the user-story view names the FR (the FR meets a requirement
+# through another FR's row, or an NFR, or the minutes of a walkthrough).
+derived_stories:
+  FR-CR-050: "As a business user, I need business documents generated from maintained templates, so that every quotation, slip, advice, invoice, receipt, letter and statement carries the approved layout."
+  FR-CR-063: "As an MBS, TSU or Marketing user, I need products and packages maintained through Product Maintenance, so that every module uses one product catalogue."
+  FR-CR-071: "As a client or insurer receiving a document from BDOI, I need it protected with a password sent separately, so that documents that leave BDOI stay confidential."
+  FR-CR-081: "As an insurer, I need the day's service invoices of BDOI in one batch through my configured channel, so that I receive them together after booking closes."
+  FR-CR-082: "As the Data Migration Lead, I need migrated clients and legacy client batches loaded with the duplicate check, so that every client stays unique during coexistence."
+  FR-CL-001: "As the System Administrator, I need every Collections screen and action restricted to authorised roles, so that only authorised users view and work the collection accounts."
+  FR-CL-005: "As a Collection user, I need an account locked while another user edits it, so that two users do not change the same account at once."
+  FR-CL-033: "As a Collection Handler, I need to log each collection effort with its remarks and tagging category, so that the latest effort shows on the worklist and in the reversal reports."
+  FR-CL-084: "As a Collection user, I need to export the worklist and the Collections reports on request without slowing the system, so that I can share and keep them."
+  FR-CL-085: "As a Collections user, I need a home page with the tiles of my work, so that I see my open accounts, promises, installments and escalations at once."
+  FR-RN-044: "As a Marketing AO, Marketing TL or Processing user, I need to add remarks to an account, so that each remark is stamped and shown on the account and in the listing."
+  FR-RN-047: "As a Marketing AO or Processing TL, I need to re-open an account tagged Not for Renewal, so that a client who decides to renew gets a new disposition."
+  FR-RN-065: "As a Processing TL or Processing Officer, I need to return accounts to Marketing with a reason, so that Marketing completes the disposition or the review."
+  FR-RN-100: "As a Marketing TL or Processing TL, I need the Renewal Home with tiles and officer dashboards, so that I see the renewals by stage, expiry and officer."
+  FR-CM-001: "As a Claims or Marketing user, I need to log in with the lock-out and session rules, so that only authorised users reach Claims."
+
+# Priority: from the MoSCoW priority of the FR (or the level the BRD states).
+priority:
+  - [Must have, High]
+  - [High, High]
+  - [Should have, Medium]
+  - [Medium, Medium]
+  - [Could have, Low]
+  - [Nice to have, Low]
+  - [Low, Low]
+  - [Not stated, Medium]
+priority_note: "Highest is not set by the import; the BIBS Product Owner sets it on a story that blocks a test window or the go-live. A Won't have FR is not imported. An FR whose BRD gives no priority imports as Medium."
+
+# Story points, first estimate: the number of acceptance criteria gives the base on the scale 1, 2, 3, 5, 8, 13; one
+# step is added when the story names three screens or more, and one when it exchanges data with a BDO or external
+# system named below. The team re-estimates at the refinement of the iteration.
+points:
+  scale: [1, 2, 3, 5, 8, 13]
+  base: {1: 0, 2: 1, 3: 2, 4: 3, 5: 3, 6: 4}     # AC count -> step of the scale (6 or more -> 8 points)
+  screens_step: 3
+  systems: [EIAM, Entra ID, UIDM-ISC, CCM, M365, LMS, HL-LOAS, LOAS, LFS, PMS, CMS / New BOB, New BOB, Old BOB, OBPCS,
+            AFTS, TFS, EDP, EGL, Enterprise General Ledger, CARMS, Bridger, NLDS, ECM, LAMD report, insurer extract,
+            insurer file, bank file]
+
+# Definition of Ready and Definition of Done (consistent with the Test Strategy v1.0: traceability, test plans per
+# BRD, severity levels, SIT and UAT exit criteria).
+ready:
+  - [Traced, "The story names its BRD IDs, FR IDs and FRS reference; the FRS is issued for BDOI review or signed."]
+  - [Story and acceptance, "The user story and the numbered acceptance criteria (ACn) are written as Given / When / Then and agreed with the BDOI owner of the BRD."]
+  - [Clarifications, "Every clarification (CLR) named in the notes is decided, or the BIBS Product Owner accepts the proposed rule as the working assumption for the iteration."]
+  - [Screens, "The screens of the story are specified in the FRS (screen specification and fields) and listed in the UX screen register of the set."]
+  - [Test cases, "The test conditions and cases named in the Test Cases field are in the approved test plan of the BRD."]
+  - [Access, "The persona, the role and the permission of each action are in the permissions matrix of the FRS."]
+  - [Data and set-up, "The reference data, parameters and configuration values the story needs are listed in the configuration inputs of the drop, with the SIT values or seed values."]
+  - [Dependencies, "Stories of other BRDs and BDO system specifications the story depends on are linked; an interface story has the specification of BDOI IT."]
+  - [Size, "The first estimate is reviewed by the team; a story above 13 points is split before it enters an iteration."]
+done:
+  - [Acceptance criteria, "Every acceptance criterion (ACn) of the story passes in SIT with the test cases of its Test Cases field; the evidence is kept in the test management tool."]
+  - [Incidents, "No open Severity 1 or Severity 2 test incident on the story; a Severity 3 incident has an agreed workaround (Test Strategy, severity levels)."]
+  - [Regression, "The positive main flow of a Must-have story is in the regression set of the drop and passes on the last release candidate."]
+  - [Access and audit, "The Security-access cases pass: allowed roles act, other roles are refused; the audit trail records what the FR states."]
+  - [Screens and messages, "The screens follow the screen standards of the FRS (names not logins, labels not codes, dd-MMM-yyyy dates, formatted amounts, row action menus) and show the FRS messages."]
+  - [Documents, "The quick-reference guide or user manual topic of the screen is updated; the release note of the release candidate names the story."]
+  - [Traceability, "The FRS, the test plan and the backlog still agree: a change of an acceptance criterion went through a change request and the regenerated files."]
+  - [Acceptance, "In UAT, the BDOI owner of the BRD accepts the story through the UAT scenario that covers it; the UAT sign-off certificate of the BRD lists it."]

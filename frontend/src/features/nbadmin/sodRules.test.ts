@@ -1,6 +1,7 @@
+import { describe, expect, it } from 'vitest';
 import type { SodRule } from '@/api/nbadmin';
 import { riskFlagLabel } from './riskFlags';
-import { EMPTY_SOD_RULE, pendingText, ruleErrors } from './sodRules';
+import { EMPTY_SOD_RULE, pendingText, RULE_KINDS, ruleErrors } from './sodRules';
 
 const RULE: SodRule = {
   id: 1,
@@ -43,5 +44,22 @@ describe('risk flags', () => {
     expect(riskFlagLabel('OUTSIDE_HOURS')).toBe('Outside working hours');
     expect(riskFlagLabel('PRIVILEGE_INCREASE')).toBe('Privilege increase');
     expect(riskFlagLabel('NEW_FLAG')).toBe('new flag');
+  });
+});
+
+describe('permission combination rules', () => {
+  it('names the permissions in the checks of a rule of two permissions', () => {
+    expect(
+      ruleErrors({
+        kind: 'PERMISSIONS',
+        profileA: 'ACCESS_REQUEST',
+        profileB: 'ACCESS_REQUEST',
+        description: 'Requester and approver',
+      }),
+    ).toEqual({ profileB: 'Choose two different permissions' });
+    expect(ruleErrors({ ...EMPTY_SOD_RULE, kind: 'PERMISSIONS' }).profileA).toBe(
+      'Select the first permission',
+    );
+    expect(RULE_KINDS.map((k) => k.value)).toEqual(['PROFILES', 'PERMISSIONS']);
   });
 });

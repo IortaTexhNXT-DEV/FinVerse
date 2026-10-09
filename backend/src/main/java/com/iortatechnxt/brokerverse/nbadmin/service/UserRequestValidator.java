@@ -7,6 +7,7 @@ import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestContent;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestType;
 import com.iortatechnxt.brokerverse.nbadmin.domain.RequestedUserData;
 import com.iortatechnxt.brokerverse.nbadmin.domain.SodRule;
+import com.iortatechnxt.brokerverse.nbadmin.domain.SodRuleKind;
 import com.iortatechnxt.brokerverse.nbadmin.domain.SodRuleRepository;
 import com.iortatechnxt.brokerverse.security.domain.AppUser;
 import com.iortatechnxt.brokerverse.security.domain.AppUserRepository;
@@ -47,6 +48,7 @@ public class UserRequestValidator {
   private final CurrentUser currentUser;
   private final SodRuleRepository sodRules;
   private final DataScopeService dataScopes;
+  private final PermissionConflicts conflicts;
 
   /**
    * Creates the validator.
@@ -57,6 +59,7 @@ public class UserRequestValidator {
    * @param currentUser current user (the requester)
    * @param sodRules separation-of-duties rules
    * @param dataScopes data scope administration
+   * @param conflicts conflicting permission combinations across the user's group profiles
    */
   public UserRequestValidator(
       AppUserRepository users,
@@ -64,7 +67,9 @@ public class UserRequestValidator {
       AccessSettings settings,
       CurrentUser currentUser,
       SodRuleRepository sodRules,
-      DataScopeService dataScopes) {
+      DataScopeService dataScopes,
+      PermissionConflicts conflicts) {
+    this.conflicts = conflicts;
     this.sodRules = sodRules;
     this.dataScopes = dataScopes;
     this.users = users;
@@ -177,6 +182,7 @@ public class UserRequestValidator {
             });
     Set<String> codes = new TreeSet<>(c.roleCodes());
     requireNoSodConflict(codes, found);
+    conflicts.checkUser(found);
     return codes;
   }
 
@@ -195,7 +201,7 @@ public class UserRequestValidator {
         found.stream().collect(Collectors.toMap(Role::getCode, Role::getName, (a, b) -> a));
     Function<String, String> name = code -> names.getOrDefault(code, code);
     for (SodRule rule : sodRules.findByRecordStatus(RecordStatus.ACTIVE)) {
-      if (rule.forbids(codes)) {
+      if (rule.getKind() == SodRuleKind.PROFILES && rule.forbids(codes)) {
         String profile = name.apply(rule.getProfileA());
         String otherProfile = name.apply(rule.getProfileB());
         String ruleCode = rule.getRuleCode();

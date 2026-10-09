@@ -31,14 +31,28 @@ public class RolePermissionChangeValidator {
       Arrays.stream(Permission.values()).map(Enum::name).collect(Collectors.toUnmodifiableSet());
 
   private final RoleRepository roles;
+  private final PermissionConflicts conflicts;
 
   /**
    * Creates the validator.
    *
    * @param roles roles
+   * @param conflicts conflicting permission combinations
    */
-  public RolePermissionChangeValidator(RoleRepository roles) {
+  public RolePermissionChangeValidator(RoleRepository roles, PermissionConflicts conflicts) {
     this.roles = roles;
+    this.conflicts = conflicts;
+  }
+
+  /**
+   * Refuses a conflicting permission combination in a group profile (BDOI FRS FRUM.006.03).
+   *
+   * @param profile name of the group profile
+   * @param resulting permissions after the change
+   * @param added permissions the change adds
+   */
+  public void checkCombination(String profile, Set<String> resulting, Set<String> added) {
+    conflicts.checkProfile(profile, resulting, added);
   }
 
   /**
@@ -65,6 +79,10 @@ public class RolePermissionChangeValidator {
     Set<String> removed = new TreeSet<>(change.removed());
     removed.retainAll(current);
     RolePermissionChange effective = new RolePermissionChange(role.getCode(), added, removed);
+    Set<String> resulting = new TreeSet<>(current);
+    resulting.removeAll(removed);
+    resulting.addAll(added);
+    conflicts.checkProfile(role.getName(), resulting, added);
     RequestedRole data = roleDataChange(role, c.role());
     if (effective.isEmpty() && data == null) {
       throw new BusinessRuleException(

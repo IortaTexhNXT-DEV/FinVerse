@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Ban, Check, Plus, X } from 'lucide-react';
 import { useState } from 'react';
 import { nbadminApi } from '@/api/nbadmin';
-import type { SodRule, SodRuleInput } from '@/api/nbadmin';
+import type { SodRule, SodRuleInput, SodRuleKind } from '@/api/nbadmin';
 import { useAuth } from '@/auth/authContext';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -16,7 +16,8 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { UserName } from '@/components/ui/UserName';
 import { formatDateTime } from '@/utils/format';
-import { EMPTY_SOD_RULE, pendingText, ruleErrors } from './sodRules';
+import { EMPTY_SOD_RULE, pendingText, RULE_KINDS, ruleErrors } from './sodRules';
+import { permissionLabel } from '@/utils/permissionLabel';
 import { CellStack } from '@/components/ui/CellStack';
 import { ConfigUploadButton } from '@/features/configpromo/ConfigUploadButton';
 
@@ -36,7 +37,19 @@ function NewRuleDialog({ onClose }: Readonly<{ onClose: () => void }>) {
       onClose();
     },
   });
-  const profile = (key: 'profileA' | 'profileB', label: string) => (
+  const matrix = useQuery({
+    queryKey: ['nbadmin', 'access-matrix'],
+    queryFn: nbadminApi.matrix,
+    enabled: input.kind === 'PERMISSIONS',
+  });
+  const choices =
+    input.kind === 'PERMISSIONS'
+      ? (matrix.data?.permissions ?? []).map((p) => ({
+          value: p.permission,
+          label: permissionLabel(p.permission),
+        }))
+      : active.map((r) => ({ value: r.code, label: r.name }));
+  const pick = (key: 'profileA' | 'profileB', label: string) => (
     <Field label={label} required error={errors[key]}>
       {(id) => (
         <select
@@ -45,10 +58,10 @@ function NewRuleDialog({ onClose }: Readonly<{ onClose: () => void }>) {
           value={input[key]}
           onChange={(e) => setInput({ ...input, [key]: e.target.value })}
         >
-          <option value="">Select a group profile…</option>
-          {active.map((r) => (
-            <option key={r.code} value={r.code}>
-              {r.name}
+          <option value="">Select…</option>
+          {choices.map((c) => (
+            <option key={c.value} value={c.value}>
+              {c.label}
             </option>
           ))}
         </select>
@@ -85,9 +98,31 @@ function NewRuleDialog({ onClose }: Readonly<{ onClose: () => void }>) {
           error={create.error ?? roles.error}
           title="Cannot send the rule for authorisation"
         />
+        <Field label="Rule Type" required>
+          {(id) => (
+            <select
+              id={id}
+              className="select"
+              value={input.kind}
+              onChange={(e) =>
+                setInput({
+                  ...EMPTY_SOD_RULE,
+                  description: input.description,
+                  kind: e.target.value as SodRuleKind,
+                })
+              }
+            >
+              {RULE_KINDS.map((k) => (
+                <option key={k.value} value={k.value}>
+                  {k.label}
+                </option>
+              ))}
+            </select>
+          )}
+        </Field>
         <div className="form-grid">
-          {profile('profileA', 'Group Profile')}
-          {profile('profileB', 'May Not Be Held With')}
+          {pick('profileA', input.kind === 'PERMISSIONS' ? 'Permission' : 'Group Profile')}
+          {pick('profileB', 'May Not Be Held With')}
         </div>
         <Field label="Reason" required error={errors.description}>
           {(id) => (
@@ -230,7 +265,12 @@ export default function SodRulesPage() {
           emptyMessage="No separation-of-duties rule yet."
           columns={[
             { key: 'c', header: 'Rule', kind: 'code', render: (r) => r.ruleCode },
-            { key: 'a', header: 'Group Profile', render: (r) => r.profileAName },
+            {
+              key: 't',
+              header: 'Type',
+              render: (r) => (r.kind === 'PERMISSIONS' ? 'Permissions' : 'Group profiles'),
+            },
+            { key: 'a', header: 'Group Profile / Permission', render: (r) => r.profileAName },
             { key: 'b', header: 'May Not Be Held With', render: (r) => r.profileBName },
             { key: 'd', header: 'Reason', render: (r) => r.description },
             {

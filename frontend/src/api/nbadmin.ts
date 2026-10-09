@@ -310,12 +310,18 @@ export interface SodRule {
   authorizedBy?: string;
   authorizedAt?: string;
   createdAt: string;
+  /** Two group profiles one user may not hold, or two permissions not held together. */
+  kind?: SodRuleKind;
 }
+
+/** What a separation-of-duties rule pairs. */
+export type SodRuleKind = 'PROFILES' | 'PERMISSIONS';
 
 export interface SodRuleInput {
   profileA: string;
   profileB: string;
   description: string;
+  kind?: SodRuleKind;
 }
 
 const SOD = '/nbadmin/sod-rules';

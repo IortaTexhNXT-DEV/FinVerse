@@ -10,10 +10,12 @@ import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
 import com.iortatechnxt.brokerverse.messaging.domain.Notice;
 import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
 import com.iortatechnxt.brokerverse.nbadmin.domain.SodRule;
+import com.iortatechnxt.brokerverse.nbadmin.domain.SodRuleKind;
 import com.iortatechnxt.brokerverse.nbadmin.domain.SodRuleRepository;
 import com.iortatechnxt.brokerverse.security.domain.RoleRepository;
 import java.time.Clock;
 import java.util.List;
+import java.util.Set;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -100,23 +102,30 @@ public class SodRuleService {
    * @return the rule
    */
   public SodRule create(String profileA, String profileB, String description) {
-    String a = requireProfile(profileA);
-    String b = requireProfile(profileB);
+    return create(SodRuleKind.PROFILES, profileA, profileB, description);
+  }
+
+  /**
+   * Creates a rule of a kind, pending authorisation: two group profiles one user may not hold, or
+   * two permissions that may not be held together (BDOI FRS FRUM.006.03).
+   *
+   * @param kind PROFILES or PERMISSIONS
+   * @param first first group profile or permission
+   * @param second second group profile or permission
+   * @param description why they may not be held together
+   * @return the rule
+   */
+  public SodRule create(SodRuleKind kind, String first, String second, String description) {
+    boolean permissions = kind == SodRuleKind.PERMISSIONS;
+    String a = permissions ? requirePermission(first) : requireProfile(first);
+    String b = permissions ? requirePermission(second) : requireProfile(second);
     if (a.equals(b)) {
-      throw new BusinessRuleException("SOD_SAME_PROFILE", "Choose two different group profiles");
-    }
-    if (description == null || description.isBlank()) {
       throw new BusinessRuleException(
-          "SOD_DESCRIPTION", "Enter why the two profiles are not held together");
+          "SOD_SAME_PROFILE",
+          permissions ? "Choose two different permissions" : "Choose two different group profiles");
     }
-    boolean exists =
-        rules.findAll().stream()
-            .anyMatch(r -> r.getRecordStatus() != RecordStatus.INACTIVE && r.samePair(a, b));
-    if (exists) {
-      throw new BusinessRuleException(
-          "SOD_RULE_EXISTS", "A rule for these two group profiles already exists");
-    }
-    SodRule rule = rules.save(new SodRule(numbers.next("SOD"), a, b, description.trim()));
+    requireNewPair(kind, a, b, description);
+    SodRule rule = rules.save(new SodRule(kind, numbers.next("SOD"), a, b, description.trim()));
     audit.record(ENTITY, rule.getRuleCode(), AuditAction.CREATE, text("Created", rule));
     tellAuthorisers(rule, "new rule");
     return rule;
@@ -176,6 +185,30 @@ public class SodRuleService {
     return rules.findById(id).orElseThrow(() -> new ResourceNotFoundException(ENTITY, id));
   }
 
+  private void requireNewPair(SodRuleKind kind, String a, String b, String description) {
+    if (description == null || description.isBlank()) {
+      throw new BusinessRuleException(
+          "SOD_DESCRIPTION", "Enter why the two profiles are not held together");
+    }
+    boolean exists =
+        rules.findAll().stream()
+            .anyMatch(
+                r ->
+                    r.getRecordStatus() != RecordStatus.INACTIVE
+                        && r.getKind() == kind
+                        && r.samePair(a, b));
+    if (exists) {
+      throw new BusinessRuleException(
+          "SOD_RULE_EXISTS", "A rule for these two group profiles already exists");
+    }
+  }
+
+  private static String requirePermission(String code) {
+    String permission = code == null ? "" : code.trim();
+    RolePermissionChangeValidator.requireKnown(Set.of(permission));
+    return permission;
+  }
+
   private String requireProfile(String code) {
     String clean = code == null ? "" : code.trim();
     if (roles.findByCode(clean).isEmpty()) {
@@ -202,6 +235,7 @@ public class SodRuleService {
         + " rule "
         + rule.getRuleCode()
         + ": "
+        + (rule.getKind() == SodRuleKind.PERMISSIONS ? "permissions " : "")
         + rule.getProfileA()
         + " and "
         + rule.getProfileB()

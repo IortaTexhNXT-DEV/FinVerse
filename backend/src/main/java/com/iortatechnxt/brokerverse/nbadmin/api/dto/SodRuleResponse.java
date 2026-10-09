@@ -3,7 +3,9 @@ package com.iortatechnxt.brokerverse.nbadmin.api.dto;
 import com.iortatechnxt.brokerverse.common.domain.RecordStatus;
 import com.iortatechnxt.brokerverse.nbadmin.domain.SodRule;
 import com.iortatechnxt.brokerverse.nbadmin.domain.SodRule.PendingAction;
+import com.iortatechnxt.brokerverse.nbadmin.domain.SodRuleKind;
 import com.iortatechnxt.brokerverse.nbadmin.service.AccessRequestDescriber;
+import com.iortatechnxt.brokerverse.nbadmin.service.PermissionNames;
 import java.time.Instant;
 
 /**
@@ -22,6 +24,7 @@ import java.time.Instant;
  * @param authorizedBy authorising user
  * @param authorizedAt authorisation time
  * @param createdAt creation time
+ * @param kind PROFILES or PERMISSIONS
  */
 public record SodRuleResponse(
     Long id,
@@ -36,7 +39,8 @@ public record SodRuleResponse(
     String maker,
     String authorizedBy,
     Instant authorizedAt,
-    Instant createdAt) {
+    Instant createdAt,
+    SodRuleKind kind) {
 
   /**
    * Maps a rule.
@@ -50,15 +54,22 @@ public record SodRuleResponse(
         r.getId(),
         r.getRuleCode(),
         r.getProfileA(),
-        describer.profileName(r.getProfileA()),
+        name(r, r.getProfileA(), describer),
         r.getProfileB(),
-        describer.profileName(r.getProfileB()),
+        name(r, r.getProfileB(), describer),
         r.getDescription(),
         r.getRecordStatus(),
         r.getPendingAction(),
         r.getMaker(),
         r.getAuthorizedBy(),
         r.getAuthorizedAt(),
-        r.getCreatedAt());
+        r.getCreatedAt(),
+        r.getKind());
+  }
+
+  private static String name(SodRule r, String code, AccessRequestDescriber describer) {
+    return r.getKind() == SodRuleKind.PERMISSIONS
+        ? PermissionNames.name(code)
+        : describer.profileName(code);
   }
 }

@@ -614,6 +614,7 @@ def build(highlight: bool, ids, figs) -> Builder:
     a = annexes.Appendices(b, figs, where)
     a.write_all()
     a.place(last_ref)
+    b.annex = a
     missing_fr = [f for f in SCOPE_FRS if f not in a.listed_refs]
     if missing_fr:
         raise SystemExit(f"Appendix Q lacks {missing_fr}")

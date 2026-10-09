@@ -36,6 +36,8 @@ import brand  # noqa: E402
 from bdoi_xlsx import BdoiWorkbook, Column  # noqa: E402
 
 TITLE = "End-to-End Conformance Register"
+# Screens every persona opens (they say nothing about a requirement on their own).
+GENERIC_SCREENS = {"/", "/approvals", "/my-work", "/notifications", "/reports", "/alerts"}
 RESULTS = ["Conformant", "Partly conformant", "Not conformant", "Not testable yet"]
 STEP_RESULTS = ["Pass", "Fail", "Blocked", "Not run"]
 MODULES = {
@@ -105,7 +107,9 @@ TECHNICAL = re.compile(r"\b(?:HTTP|API|api|JSON|SQL|database|PostgreSQL|Redis|se
 def business_name(check: dict) -> str:
     """The name of an automated check in business words: its description without references and technical terms,
     or the business area it checks."""
-    name = re.sub(r"\s*\([^)]*\)", "", str(check.get("name") or "")).strip(" .")
+    name = re.sub(r"\s*\([^()]*\)", "", str(check.get("name") or ""))
+    name = re.sub(r"\s*\([^()]*\)", "", name)
+    name = re.sub(r"\s*\([^)]*$", "", name).strip(" .,;")
     area = AREAS.get(check.get("module") or "", "Platform")
     flagged = any(p.search(name) for _, p in check_pack.BUILD_STATUS + check_pack.TECHNICAL)
     if not check.get("named") or not name or flagged or TECHNICAL.search(name) or len(name) < 12:
@@ -287,7 +291,7 @@ def requirement_rows(assess: dict, wt_rows: list[dict], labels: dict[str, str]) 
         cyc = cycle_frs.get(fid, [])
         cyc_ok = [s for s in cyc if s["status"] == "pass"]
         screens_on = fr_paths(fr["screens"]) & shown
-        script_steps = sorted({st for p in fr_paths(fr["screens"]) for st in step_screens.get(p, set())})
+        script_steps = sorted({st for p in fr_paths(fr["screens"]) - GENERIC_SCREENS for st in step_screens.get(p, set())})
         text = " ".join([fr["title"], fr["screens"], *fr["acceptance"]])
         runs = sorted({c for c in re.findall(r"\b[A-Z]{2,4}(?:-[A-Z0-9]+)+\b", text)
                        if c in reports and reports[c].get("status") == 200})

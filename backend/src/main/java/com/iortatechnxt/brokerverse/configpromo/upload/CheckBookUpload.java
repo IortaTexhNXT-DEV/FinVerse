@@ -70,7 +70,7 @@ public class CheckBookUpload extends ConfigUploadHandler {
   @Override
   public List<BulkColumn> columns() {
     return List.of(
-        BulkColumn.required(BANK_ACCOUNT, "Bank account of the book", "BDO-CA-001")
+        BulkColumn.required(BANK_ACCOUNT, "Bank account of the book", "BNK-CA-001")
             .master("bank account"),
         BulkColumn.required(FIRST, "First check number of the book", "0001001").format("Digits"),
         BulkColumn.required(LAST, "Last check number of the book", "0001100").format("Digits"),

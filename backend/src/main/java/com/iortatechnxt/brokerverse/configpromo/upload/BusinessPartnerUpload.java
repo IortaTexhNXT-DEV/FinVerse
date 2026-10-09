@@ -107,7 +107,7 @@ public class BusinessPartnerUpload extends ConfigUploadHandler {
         BulkColumn.optional(PHONE, "Phone number", "+63 2 8888 0000"),
         BulkColumn.required(
             CURRENCY, "Currency of the partner's transactions", BulkColumn.BASE_CURRENCY_EXAMPLE),
-        BulkColumn.optional(BANK, "Bank of the partner's account", "BDO Unibank"),
+        BulkColumn.optional(BANK, "Bank of the partner's account", "Metropolitan Commercial Bank"),
         BulkColumn.optional(ACCOUNT, "Account number for payments", "001234567890"),
         BulkColumn.optional(LICENCE, "Insurance Commission licence number", "IC-RB-2026-015")
             .when("agent, broker, reinsurance broker"),

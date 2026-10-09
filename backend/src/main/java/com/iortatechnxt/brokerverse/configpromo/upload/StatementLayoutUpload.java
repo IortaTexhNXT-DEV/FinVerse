@@ -73,9 +73,9 @@ public class StatementLayoutUpload extends ConfigUploadHandler {
   @Override
   public List<BulkColumn> columns() {
     return List.of(
-        BulkColumn.required(BANK_ACCOUNT, "Bank account of the statements", "BDO-CA-001")
+        BulkColumn.required(BANK_ACCOUNT, "Bank account of the statements", "BNK-CA-001")
             .master("bank account"),
-        BulkColumn.required(NAME, "Name of the layout", "BDO CSV statement"),
+        BulkColumn.required(NAME, "Name of the layout", "Bank CSV statement"),
         BulkColumn.required(DATE, "Column of the posting date", "Posting Date")
             .format(COLUMN_FORMAT),
         BulkColumn.required(DESCRIPTION, "Column of the description", "Description")

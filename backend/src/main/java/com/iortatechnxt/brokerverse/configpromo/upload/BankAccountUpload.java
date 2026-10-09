@@ -74,10 +74,10 @@ public class BankAccountUpload extends ConfigUploadHandler {
   @Override
   public List<BulkColumn> columns() {
     return List.of(
-        BulkColumn.required(CODE, "Code of the bank account", "BDO-CA-001")
+        BulkColumn.required(CODE, "Code of the bank account", "BNK-CA-001")
             .format("Up to 20 capitals"),
         BulkColumn.required(NAME, "Name of the account", "Makati current account"),
-        BulkColumn.required(BANK, "Bank name", "BDO Unibank, Inc."),
+        BulkColumn.required(BANK, "Bank name", "Metropolitan Commercial Bank"),
         BulkColumn.required(NUMBER, "As printed by the bank", "000123456789"),
         BulkColumn.required(CURRENCY, "Currency of the account", BulkColumn.BASE_CURRENCY_EXAMPLE),
         BulkColumn.required(ACCOUNT, "Account of the chart with a bank category", "1110.01")

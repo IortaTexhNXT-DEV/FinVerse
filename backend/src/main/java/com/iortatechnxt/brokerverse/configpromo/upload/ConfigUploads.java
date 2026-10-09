@@ -16,14 +16,14 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 /**
  * The uploads of the configuration screens, on top of the bulk upload framework: each upload type
  * is open to the holders of its maintenance permission (template, export, upload, submit) and of
  * its approval permission (approve or reject); nothing else of the framework is reachable here.
  */
-@Service
+@Component
 public class ConfigUploads {
 
   private final List<ConfigUploadHandler> handlers;

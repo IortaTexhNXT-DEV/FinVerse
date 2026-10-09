@@ -82,7 +82,7 @@ public class PettyCashFundUpload extends ConfigUploadHandler {
             .master("employee"),
         BulkColumn.required(ACCOUNT, "Account of the fund", "1101.01")
             .master("account of the chart of accounts"),
-        BulkColumn.required(BANK, "Bank account that replenishes the fund", "BDO-CA-001")
+        BulkColumn.required(BANK, "Bank account that replenishes the fund", "BNK-CA-001")
             .master("bank account"),
         BulkColumn.required(CURRENCY, "Currency of the fund", BulkColumn.BASE_CURRENCY_EXAMPLE),
         new BulkColumn(IMPREST, "Amount of the fund", true, Type.NUMBER, "20000"));

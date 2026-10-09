@@ -89,7 +89,7 @@ public class SecurityParameterUpload extends ConfigUploadHandler {
 
   @Override
   public String filledBy() {
-    return "Information Security; BDOI IT";
+    return "Information Security; IT";
   }
 
   @Override
@@ -99,11 +99,11 @@ public class SecurityParameterUpload extends ConfigUploadHandler {
             .codes(PARAMETERS.toArray(String[]::new)),
         BulkColumn.optional(
             DELIVERED, "The value proposed with the system; blank = no value", "90"),
-        BulkColumn.optional(WANTED, "The value BDOI wants; blank = no value", "90")
+        BulkColumn.optional(WANTED, "The value wanted; blank = no value", "90")
             .format("Same type and range"),
-        BulkColumn.optional(REASON, "Policy reference or reason", "BDO password policy"),
+        BulkColumn.optional(REASON, "Policy reference or reason", "Password policy"),
         BulkColumn.required(
-            APPROVED_BY, "Information Security or BDOI IT approver of the value", "Ramon Dizon"));
+            APPROVED_BY, "Information Security or IT approver of the value", "Ramon Dizon"));
   }
 
   @Override

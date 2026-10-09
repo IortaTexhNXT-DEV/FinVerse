@@ -76,13 +76,14 @@ public class CompanyUpload extends ConfigUploadHandler {
   @Override
   public List<BulkColumn> columns() {
     return List.of(
-        BulkColumn.required(CODE, "Code of the company on every record", "BDOI")
+        BulkColumn.required(CODE, "Code of the company on every record", "IBRK")
             .format("Up to 10 capitals"),
-        BulkColumn.required(NAME, "Name as registered with the SEC", "BDO Insurance Brokers, Inc."),
+        BulkColumn.required(NAME, "Name as registered with the SEC", "Insurance Brokers, Inc."),
         BulkColumn.required(TIN, "Tax identification number with branch code", "000-000-000-00000")
             .format("000-000-000-00000"),
         BulkColumn.required(ADDRESS, "Address printed on receipts and BIR forms", "Makati City"),
-        BulkColumn.required(CURRENCY, "Currency of the books", "PHP").format("ISO 4217"),
+        BulkColumn.required(CURRENCY, "Currency of the books", BulkColumn.BASE_CURRENCY_EXAMPLE)
+            .format("ISO 4217"),
         new BulkColumn(MONTH, "First month of the financial year", true, Type.NUMBER, "1")
             .allowed("A whole number from 1 to 12"),
         new BulkColumn(

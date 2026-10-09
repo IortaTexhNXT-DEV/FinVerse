@@ -20,9 +20,10 @@ import { EXPIRY_TABS, RENEWAL_SECTION, tabOf } from '../common/renewalCodes';
 import { useBatchAction } from '../common/useBatchAction';
 import { useListDialogs } from '../common/useListDialogs';
 import { ManualCreationDialog } from '../updates/ManualCreationDialog';
+import { SubmitPostingDialog } from '../referrals/SubmitPostingDialog';
 import '../renewal.css';
 
-type Open = 'assign' | 'transfer' | 'extract' | 'manual';
+type Open = 'assign' | 'transfer' | 'extract' | 'manual' | 'push';
 
 function RunsCard() {
   const companyId = useCompanyId();
@@ -94,10 +95,10 @@ export default function ExpiryListPage() {
     ({ ao, reason }) => renewalApi.assign(companyId, refs, ao, reason || undefined),
     done,
   );
-  const push = useBatchAction<string[]>(
-    'Push',
-    'pushed',
-    (r) => renewalApi.push(companyId, r),
+  const push = useBatchAction<{ refs: string[]; approver?: string }>(
+    'Submit for Posting',
+    'submitted for posting',
+    (a) => renewalApi.push(companyId, a.refs, a.approver),
     done,
   );
   const transfer = useMutation({
@@ -184,7 +185,7 @@ export default function ExpiryListPage() {
                 icon={<Send size={16} />}
                 disabled={selected.length === 0}
                 busy={push.mutation.isPending}
-                onClick={() => push.mutation.mutate(selected, { onSuccess: selection.clear })}
+                onClick={() => show('push', selected, selection.clear)}
               >
                 Push
               </Button>
@@ -233,6 +234,15 @@ export default function ExpiryListPage() {
       )}
       {initiate.dialog}
       {assign.dialog}
+      {open === 'push' && (
+        <SubmitPostingDialog
+          refs={refs}
+          busy={push.mutation.isPending}
+          error={push.mutation.error}
+          onClose={close}
+          onConfirm={(approver) => push.mutation.mutate({ refs, approver })}
+        />
+      )}
       {push.dialog}
     </div>
   );

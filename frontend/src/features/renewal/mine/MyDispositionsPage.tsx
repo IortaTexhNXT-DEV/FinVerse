@@ -12,6 +12,7 @@ import type { QuickFilter } from '../common/CandidateList';
 import { EXPIRY_TABS, RENEWAL_SECTION } from '../common/renewalCodes';
 import { useBatchAction } from '../common/useBatchAction';
 import { useListDialogs } from '../common/useListDialogs';
+import { SubmitPostingDialog } from '../referrals/SubmitPostingDialog';
 import '../renewal.css';
 
 const TABS = [
@@ -39,8 +40,13 @@ export default function MyDispositionsPage() {
   const { can } = useAuth();
   const toast = useToast();
   const queryClient = useQueryClient();
-  const { open, refs, close, done, show } = useListDialogs<'transfer'>();
-  const push = useBatchAction<string[]>('Push', 'pushed', (r) => renewalApi.push(companyId, r));
+  const { open, refs, close, done, show } = useListDialogs<'transfer' | 'push'>();
+  const push = useBatchAction<{ refs: string[]; approver?: string }>(
+    'Submit for Posting',
+    'submitted for posting',
+    (a) => renewalApi.push(companyId, a.refs, a.approver),
+    done,
+  );
   const transfer = useMutation({
     mutationFn: (input: { toUnit: string; reasonCode: string; remarks: string }) =>
       renewalApi.requestTransfer(companyId, {
@@ -74,7 +80,7 @@ export default function MyDispositionsPage() {
               icon={<Send size={16} />}
               disabled={selected.length === 0}
               busy={push.mutation.isPending}
-              onClick={() => push.mutation.mutate(selected, { onSuccess: selection.clear })}
+              onClick={() => show('push', selected, selection.clear)}
             >
               Push
             </Button>
@@ -99,6 +105,15 @@ export default function MyDispositionsPage() {
           onConfirm={(toUnit, reasonCode, remarks) =>
             transfer.mutate({ toUnit, reasonCode, remarks })
           }
+        />
+      )}
+      {open === 'push' && (
+        <SubmitPostingDialog
+          refs={refs}
+          busy={push.mutation.isPending}
+          error={push.mutation.error}
+          onClose={close}
+          onConfirm={(approver) => push.mutation.mutate({ refs, approver })}
         />
       )}
       {push.dialog}

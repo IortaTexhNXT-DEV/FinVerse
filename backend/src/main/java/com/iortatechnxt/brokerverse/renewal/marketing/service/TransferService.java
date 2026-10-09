@@ -49,6 +49,7 @@ public class TransferService {
   private final LovService lovs;
   private final AuditTrailService audit;
   private final CurrentUser currentUser;
+  private final TransferModes modes;
   private final Clock clock;
 
   /**
@@ -64,6 +65,7 @@ public class TransferService {
    * @param lovs lists of values
    * @param audit audit trail
    * @param currentUser current user
+   * @param modes transfer in use
    * @param clock clock
    */
   @SuppressWarnings("java:S107") // constructor injection
@@ -78,6 +80,7 @@ public class TransferService {
       LovService lovs,
       AuditTrailService audit,
       CurrentUser currentUser,
+      TransferModes modes,
       Clock clock) {
     this.records = records;
     this.transfers = transfers;
@@ -89,6 +92,7 @@ public class TransferService {
     this.lovs = lovs;
     this.audit = audit;
     this.currentUser = currentUser;
+    this.modes = modes;
     this.clock = clock;
   }
 
@@ -114,6 +118,11 @@ public class TransferService {
    * @return the request
    */
   public RenewalTransfer request(RenewalCandidate c, Request request) {
+    if (!modes.transfer()) {
+      throw new BusinessRuleException(
+          "RNW_TRANSFER_OFF",
+          "Use Transfer to Other Unit: the receiving unit opens a New Business account");
+    }
     String toUnit = requireTransferable(c, request.toUnit());
     String text = RemarkService.requireText(request.remarks(), "Enter the remarks");
     if (request.reasonCode() != null && !request.reasonCode().isBlank()) {

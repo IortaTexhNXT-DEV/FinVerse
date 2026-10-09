@@ -37,8 +37,8 @@ import org.springframework.transaction.support.TransactionTemplate;
 /**
  * BDOI's sanitation rules, duplicate checking and automatic updates against the real database
  * (FRRN.004.04, FRRN.004.06, FRRN.005, FRRN.007, FRRN.008.01, FRRN.009.01): the total sum insured
- * above the threshold For Quotation, the total loss claim, the renewal account created by hand
- * with the duplicate warning, the refresh of the endorsements and the CBG Motor automatic values.
+ * above the threshold For Quotation, the total loss claim, the renewal account created by hand with
+ * the duplicate warning, the refresh of the endorsements and the CBG Motor automatic values.
  */
 @IntegrationTest
 class RenewalSanitationRulesIT {
@@ -124,8 +124,7 @@ class RenewalSanitationRulesIT {
       var warning = as.run(TL, () -> manual.create(fx.company(), second.getInvoiceNo(), false));
       assertThat(warning.renewalRef()).isNull();
       assertThat(warning.message()).isEqualTo(ManualCreationService.POTENTIAL);
-      assertThat(warning.duplicates())
-          .anyMatch(m -> existing.getRenewalRef().equals(m.ref()));
+      assertThat(warning.duplicates()).anyMatch(m -> existing.getRenewalRef().equals(m.ref()));
 
       var created = as.run(TL, () -> manual.create(fx.company(), second.getInvoiceNo(), true));
       assertThat(created.renewalRef()).isNotNull();
@@ -144,8 +143,7 @@ class RenewalSanitationRulesIT {
       assertThat(again.renewalRef()).isNull();
       assertThat(again.duplicates()).allMatch(RenewalDuplicates.Match::exact);
     } finally {
-      as.run(
-          ADMIN, () -> parameters.update(RenewalDuplicates.CRITERIA, RenewalDuplicates.DEFAULT));
+      as.run(ADMIN, () -> parameters.update(RenewalDuplicates.CRITERIA, RenewalDuplicates.DEFAULT));
       as.run(ADMIN, () -> parameters.update(RenewalDuplicates.MIN_MATCH, "1"));
     }
   }
@@ -165,7 +163,10 @@ class RenewalSanitationRulesIT {
     List<ValueRow> rows = as.run(TL, () -> updates.autoUpdate(fx.company(), c.getRenewalRef()));
     assertThat(rows).extracting(ValueRow::field).contains("OD / Theft Coverage", "Total Premium");
     ValueRow od =
-        rows.stream().filter(r -> r.field().equals("OD / Theft Coverage")).findFirst().orElseThrow();
+        rows.stream()
+            .filter(r -> r.field().equals("OD / Theft Coverage"))
+            .findFirst()
+            .orElseThrow();
     assertThat(new BigDecimal(od.renewal()))
         .isEqualByComparingTo(new BigDecimal(od.expiring()).multiply(new BigDecimal("0.90")));
     assertThat(od.difference()).isNegative();

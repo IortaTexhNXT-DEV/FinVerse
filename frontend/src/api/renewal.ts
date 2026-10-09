@@ -86,8 +86,8 @@ export const renewalApi = {
       remarks?: string;
     },
   ) => api.post<{ stage: string }>(`${ref(renewalRef)}/disposition${co(companyId)}`, input),
-  push: (companyId: number, renewalRefs: string[]) =>
-    api.post<BatchOutcome>(`${C}/push`, { companyId, renewalRefs }),
+  push: (companyId: number, renewalRefs: string[], approver?: string) =>
+    api.post<BatchOutcome>(`${C}/push${toQuery({ approver })}`, { companyId, renewalRefs }),
   remarks: (companyId: number, renewalRef: string) =>
     api.get<RemarkView[]>(`${ref(renewalRef)}/remarks${co(companyId)}`),
   addRemark: (companyId: number, renewalRef: string, text: string) =>

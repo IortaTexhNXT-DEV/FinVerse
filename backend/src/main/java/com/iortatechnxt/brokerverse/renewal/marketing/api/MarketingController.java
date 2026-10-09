@@ -110,12 +110,14 @@ public class MarketingController {
    * Pushes dispositioned renewals to the Team Leader.
    *
    * @param request selection
+   * @param approver Team Leader chosen to approve the posting, may be null
    * @return outcome
    */
   @PostMapping("/candidates/push")
   @PreAuthorize("hasAnyAuthority('RNW_DISPOSE','RNW_REVIEW')")
-  public BatchOutcome push(@Valid @RequestBody Selection request) {
-    return dispositions.push(request.companyId(), request.renewalRefs());
+  public BatchOutcome push(
+      @Valid @RequestBody Selection request, @RequestParam(required = false) String approver) {
+    return dispositions.push(request.companyId(), request.renewalRefs(), approver);
   }
 
   /**

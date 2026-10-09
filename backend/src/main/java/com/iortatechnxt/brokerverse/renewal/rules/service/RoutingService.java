@@ -12,6 +12,7 @@ import com.iortatechnxt.brokerverse.renewal.domain.RenewalCandidate;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalDisposition;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalPath;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalStage;
+import com.iortatechnxt.brokerverse.renewal.marketing.service.RenewalAutoAssignment;
 import com.iortatechnxt.brokerverse.renewal.service.RenewalDispositions;
 import com.iortatechnxt.brokerverse.renewal.service.RenewalFlow;
 import com.iortatechnxt.brokerverse.renewal.service.RenewalParameters;
@@ -53,6 +54,7 @@ public class RoutingService {
 
   private final DecisionMatrixEvaluator matrix;
   private final BdoiSanitation sanitation;
+  private final RenewalAutoAssignment autoAssignment;
   private final RenewalDispositions dispositions;
   private final RenewalFlow flow;
   private final RenewalParameters parameters;
@@ -63,6 +65,7 @@ public class RoutingService {
    *
    * @param matrix decision matrix
    * @param sanitation BDOI's sanitation rules of Clean renewals
+   * @param autoAssignment automatic assignment after the routing
    * @param dispositions disposition writer
    * @param flow workflow
    * @param parameters renewal parameters
@@ -71,12 +74,14 @@ public class RoutingService {
   public RoutingService(
       DecisionMatrixEvaluator matrix,
       BdoiSanitation sanitation,
+      RenewalAutoAssignment autoAssignment,
       RenewalDispositions dispositions,
       RenewalFlow flow,
       RenewalParameters parameters,
       Clock clock) {
     this.matrix = matrix;
     this.sanitation = sanitation;
+    this.autoAssignment = autoAssignment;
     this.dispositions = dispositions;
     this.flow = flow;
     this.parameters = parameters;
@@ -108,6 +113,7 @@ public class RoutingService {
         flow.system(candidate, ROUTE_UNASSIGNED, "For disposition by Marketing");
       }
     }
+    autoAssignment.afterRouting(candidate);
   }
 
   private boolean loanDriven(RenewalCandidate candidate) {

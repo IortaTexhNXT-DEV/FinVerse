@@ -2,16 +2,28 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { renewalApi } from '@/api/renewal';
+import { renewalReferralsApi } from '@/api/renewalReferrals';
 import type { CandidateDetail } from '@/api/renewal';
 import { useAuth } from '@/auth/authContext';
 import { Button } from '@/components/ui/Button';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { TextDialog } from '../common/ActionDialogs';
+import { ReferralRequestDialog } from '../referrals/ReferralDialogs';
+import { SubmitPostingDialog } from '../referrals/SubmitPostingDialog';
 import { DispositionDialog, ResponseDialog } from './RecordDialogs';
 import { AcceptanceDialog, FollowupDialog, PackageDialog } from './ClientDialogs';
 
-type DialogKind = 'dispose' | 'response' | 'accept' | 'followup' | 'package' | 'remark' | 'reopen';
+type DialogKind =
+  | 'dispose'
+  | 'push'
+  | 'referral'
+  | 'response'
+  | 'accept'
+  | 'followup'
+  | 'package'
+  | 'remark'
+  | 'reopen';
 
 type Can = (permission: string) => boolean;
 
@@ -78,7 +90,15 @@ const ACTIONS: (ActionDef & { when: (d: CandidateDetail, can: Can) => boolean })
     key: 'push',
     label: 'Push',
     variant: 'secondary',
+    dialog: 'push',
     when: (d, can) => isDisposing(d, can) && d.row.disposition !== null,
+  },
+  {
+    key: 'referral',
+    label: 'Transfer to Other Unit',
+    variant: 'ghost',
+    dialog: 'referral',
+    when: (d, can) => !FINISHED.has(d.row.stage) && (can('RNW_DISPOSE') || can('RNW_ASSIGN')),
   },
   { key: 'nb', label: 'Start Quotation / Proposal', variant: 'primary', when: isNbStart },
   { key: 'account', label: 'Create Renewal Account', variant: 'primary', when: isAccountDue },
@@ -123,10 +143,6 @@ const ACTIONS: (ActionDef & { when: (d: CandidateDetail, can: Can) => boolean })
 /** The direct calls of the record actions, with their confirmation text. */
 function directCalls(companyId: number, ref: string): Record<string, () => Promise<string>> {
   return {
-    push: async () => {
-      await renewalApi.push(companyId, [ref]);
-      return 'Pushed to the Team Leader';
-    },
     nb: async () => (await renewalApi.startNbPath(companyId, ref)).reference + ' started',
     account: async () =>
       `Renewal account ${(await renewalApi.createAccount(companyId, ref)).arn} created`,
@@ -158,6 +174,37 @@ function RecordDialog({
           {...common}
           initial={detail.row.disposition}
           onConfirm={(input) => onRun(() => renewalApi.dispose(companyId, ref, input))}
+        />
+      );
+    case 'push':
+      return (
+        <SubmitPostingDialog
+          {...common}
+          refs={[ref]}
+          onConfirm={(approver) =>
+            onRun(async () => {
+              await renewalApi.push(companyId, [ref], approver);
+              return 'Submitted for posting';
+            })
+          }
+        />
+      );
+    case 'referral':
+      return (
+        <ReferralRequestDialog
+          {...common}
+          renewalRef={ref}
+          onConfirm={(toUnit, justification, submit) =>
+            onRun(async () => {
+              const r = await renewalReferralsApi.request(companyId, {
+                renewalRef: ref,
+                toUnit,
+                justification,
+                submit,
+              });
+              return `Transfer request ${r.referralNo}: ${r.statusLabel}`;
+            })
+          }
         />
       );
     case 'response':

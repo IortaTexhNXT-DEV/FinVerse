@@ -88,6 +88,12 @@ final class CandidateSpecifications {
       codes(root, cb, f.codes() == null ? Codes.NONE : f.codes(), p);
       Flags flags = f.flags() == null ? Flags.NONE : f.flags();
       flags(root, cb, flags, today, p);
+      if (f.tab() == Tab.REVIEW && user != null) {
+        p.add(
+            cb.or(
+                cb.isNull(root.get("postingApprover")),
+                cb.equal(root.get("postingApprover"), user)));
+      }
       if (flags.assignedToMe()) {
         Subquery<Long> assigned = query.subquery(Long.class);
         var a = assigned.from(RenewalAssignment.class);

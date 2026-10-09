@@ -91,6 +91,9 @@ public class RenewalCandidate extends BaseEntity {
   @Column(name = "owner_unit", length = 20)
   private String ownerUnit;
 
+  @Column(name = "posting_approver", length = 50)
+  private String postingApprover;
+
   @Column(name = "marketing_locked_at")
   private Instant marketingLockedAt;
 
@@ -263,6 +266,19 @@ public class RenewalCandidate extends BaseEntity {
    */
   public void assignAo(String ao) {
     this.assignedAo = ao;
+  }
+
+  /**
+   * The approver chosen at the submission for posting (FRRN.016.01), null for every Team Leader.
+   *
+   * @param approver approver or null
+   */
+  public void postingApprover(String approver) {
+    this.postingApprover = approver;
+  }
+
+  public String getPostingApprover() {
+    return postingApprover;
   }
 
   /**

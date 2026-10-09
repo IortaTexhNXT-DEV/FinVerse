@@ -29,8 +29,8 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * The sanitation criteria of the Walkthrough addendum (Annex BRRN.020; FR-RN-020, 022, 023): the
- * TSI threshold with the proposal for TSU or proposal handling (the Review setting of the TSI rule),
- * and the insurer renewable list.
+ * TSI threshold with the proposal for TSU or proposal handling (the Review setting of the TSI
+ * rule), and the insurer renewable list.
  */
 @IntegrationTest
 class RenewalSanitationIT {

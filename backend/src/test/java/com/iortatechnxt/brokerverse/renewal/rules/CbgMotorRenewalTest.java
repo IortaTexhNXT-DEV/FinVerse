@@ -73,8 +73,10 @@ class CbgMotorRenewalTest {
     assertThat(r.biPremium()).isEqualByComparingTo("650.00");
     BigDecimal basic = bd("21384.00").add(bd("650.00")).add(bd("560.00")).add(bd("250.00"));
     assertThat(r.basic()).isEqualByComparingTo(basic);
-    assertThat(r.vat()).isEqualByComparingTo(basic.multiply(bd("0.12")).setScale(2, RoundingMode.HALF_UP));
-    assertThat(r.lgt()).isEqualByComparingTo(basic.multiply(bd("0.002")).setScale(2, RoundingMode.HALF_UP));
+    assertThat(r.vat())
+        .isEqualByComparingTo(basic.multiply(bd("0.12")).setScale(2, RoundingMode.HALF_UP));
+    assertThat(r.lgt())
+        .isEqualByComparingTo(basic.multiply(bd("0.002")).setScale(2, RoundingMode.HALF_UP));
     assertThat(r.total()).isEqualByComparingTo(r.basic().add(r.dst()).add(r.vat()).add(r.lgt()));
   }
 

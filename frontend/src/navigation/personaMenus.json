@@ -496,6 +496,7 @@
             "/renewal/mine",
             "/renewal/review",
             "/renewal/transfers",
+            "/renewal/referrals",
             "/renewal/letters",
             "/renewal/audit-logs"
           ]
@@ -522,6 +523,7 @@
             "/renewal/expiry",
             "/renewal/mine",
             "/renewal/transfers",
+            "/renewal/referrals",
             "/renewal/letters"
           ]
         },

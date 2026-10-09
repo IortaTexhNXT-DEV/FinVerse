@@ -54,8 +54,8 @@ public class BdoiSanitation {
   }
 
   /**
-   * The disposition of a Clean renewal by BDOI's rules, with its reason. A migrated policy (no
-   * BIBS account, so no claims, endorsement or premium checks) is not disposed For Renewal
+   * The disposition of a Clean renewal by BDOI's rules, with its reason. A migrated policy (no BIBS
+   * account, so no claims, endorsement or premium checks) is not disposed For Renewal
    * automatically: Marketing confirms it.
    *
    * @param c renewal (classified)

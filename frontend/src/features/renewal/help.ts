@@ -143,6 +143,21 @@ export const RENEWAL_HELP: HelpSection = {
       controls: ['A renewal has one open transfer request at a time.'],
     },
     {
+      name: 'Transfer Requests',
+      path: '/renewal/referrals',
+      summary:
+        'Transfer Request Monitoring: requests to another Marketing unit for a New Business opportunity, with their status and the New Business account.',
+      workflow: [
+        'Transfer to Other Unit on a renewal account sends the request with its justification (Pending Acceptance) or saves it as a Draft.',
+        'The receiving unit accepts, rejects with remarks or returns the request for clarification; the requester clarifies and submits it again.',
+        'Once accepted, Create New Business Account copies the data of the renewal account for the receiving unit to review and save.',
+      ],
+      controls: [
+        'The renewal account keeps its unit and Account Officer.',
+        'The receiving unit must be another unit; every request, decision and New Business account is in the audit log.',
+      ],
+    },
+    {
       name: 'Processing Worklist',
       path: '/renewal/processing',
       summary:

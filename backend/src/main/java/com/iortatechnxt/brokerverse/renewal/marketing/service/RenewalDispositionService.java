@@ -56,6 +56,7 @@ public class RenewalDispositionService {
   private final LovService lovs;
   private final AuditTrailService audit;
   private final CurrentUser currentUser;
+  private final PostingApprovers approvers;
   private final Clock clock;
 
   /**
@@ -74,6 +75,7 @@ public class RenewalDispositionService {
    * @param lovs lists of values
    * @param audit audit trail
    * @param currentUser current user
+   * @param approvers approver of a submission for posting
    * @param clock clock
    */
   @SuppressWarnings("java:S107") // constructor injection
@@ -91,6 +93,7 @@ public class RenewalDispositionService {
       LovService lovs,
       AuditTrailService audit,
       CurrentUser currentUser,
+      PostingApprovers approvers,
       Clock clock) {
     this.records = records;
     this.dispositions = dispositions;
@@ -105,6 +108,7 @@ public class RenewalDispositionService {
     this.lovs = lovs;
     this.audit = audit;
     this.currentUser = currentUser;
+    this.approvers = approvers;
     this.clock = clock;
   }
 
@@ -156,10 +160,24 @@ public class RenewalDispositionService {
    */
   @Transactional(propagation = Propagation.NOT_SUPPORTED)
   public BatchOutcome push(Long companyId, List<String> refs) {
-    return batch.run(refs, ref -> pushOne(records.get(companyId, ref)));
+    return push(companyId, refs, null);
   }
 
-  private void pushOne(RenewalCandidate c) {
+  /**
+   * Submits dispositioned renewals for posting to the approver chosen (FRRN.016.01), or to every
+   * Team Leader of the unit without one.
+   *
+   * @param companyId company
+   * @param refs renewals
+   * @param approver Team Leader chosen, may be null
+   * @return submitted and refused renewals
+   */
+  @Transactional(propagation = Propagation.NOT_SUPPORTED)
+  public BatchOutcome push(Long companyId, List<String> refs, String approver) {
+    return batch.run(refs, ref -> pushOne(records.get(companyId, ref), approver));
+  }
+
+  private void pushOne(RenewalCandidate c, String approver) {
     RenewalRecords.requireStage(c, RenewalStage.FOR_DISPOSITION);
     RenewalRecords.requireUnlocked(c);
     requireDisposer(c);
@@ -169,9 +187,12 @@ public class RenewalDispositionService {
           "RNW_DISPOSITION_INCOMPLETE",
           "Complete the mandatory fields: " + String.join(", ", missing));
     }
+    String chosen = approvers.require(c, approver);
     c.getFlags().setReturned(false);
+    c.postingApprover(chosen);
     flow.act(c, "push", TransitionNote.comment("Disposition " + c.getDisposition().code().label()));
-    flow.assign(c, null);
+    flow.assign(c, chosen);
+    approvers.notify(c, chosen);
     audit.record(
         RenewalCodes.ENTITY,
         c.getRenewalRef(),

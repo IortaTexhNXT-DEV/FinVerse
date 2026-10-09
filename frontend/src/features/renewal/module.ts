@@ -90,6 +90,14 @@ export const renewalModule: FeatureModule = {
       component: lazy(() => import('./transfers/TransfersPage')),
     },
     {
+      path: '/renewal/referrals',
+      label: 'Transfer Requests',
+      icon: ArrowLeftRight,
+      permission: 'RNW_ASSIGN',
+      alsoPermissions: ['RNW_DISPOSE'],
+      component: lazy(() => import('./referrals/ReferralsPage')),
+    },
+    {
       path: '/renewal/processing',
       label: 'Processing Worklist',
       icon: Workflow,

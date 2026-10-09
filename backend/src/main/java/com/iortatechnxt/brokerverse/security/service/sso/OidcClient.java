@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -250,15 +251,27 @@ public class OidcClient {
     String authorization = oidc.authorizationUri();
     String token = oidc.tokenUri();
     String jwks = oidc.jwkSetUri();
+    String endSession = null;
     if (blank(authorization) || blank(token) || blank(jwks)) {
-      JsonNode discovery = discover(oidc.issuer());
-      authorization =
-          blank(authorization) ? text(discovery, "authorization_endpoint") : authorization;
-      token = blank(token) ? text(discovery, "token_endpoint") : token;
-      jwks = blank(jwks) ? text(discovery, "jwks_uri") : jwks;
+      Endpoints found = discovered(oidc, authorization, token, jwks);
+      authorization = found.authorization();
+      token = found.token();
+      jwks = found.jwkSet();
+      endSession = found.endSession();
     }
-    endpoints.compareAndSet(null, new Endpoints(authorization, token, jwks));
+    endpoints.compareAndSet(null, new Endpoints(authorization, token, jwks, endSession));
     return endpoints.get();
+  }
+
+  private Endpoints discovered(
+      SsoProperties.Oidc oidc, String authorization, String token, String jwks) {
+    JsonNode discovery = discover(oidc.issuer());
+    JsonNode logout = discovery.get("end_session_endpoint");
+    return new Endpoints(
+        blank(authorization) ? text(discovery, "authorization_endpoint") : authorization,
+        blank(token) ? text(discovery, "token_endpoint") : token,
+        blank(jwks) ? text(discovery, "jwks_uri") : jwks,
+        logout == null || logout.asText().isBlank() ? null : logout.asText());
   }
 
   private JsonNode discover(String issuer) {
@@ -321,5 +334,33 @@ public class OidcClient {
     return URLEncoder.encode(value == null ? "" : value, StandardCharsets.UTF_8);
   }
 
-  private record Endpoints(String authorization, String token, String jwkSet) {}
+  /**
+   * The provider's sign-out page that returns to an address of the system (BDOI FRS FRUM.001.05:
+   * with single sign-on, Log Out also ends the session at EIAM).
+   *
+   * @param returnTo address of the system to return to
+   * @return the address, empty when the provider has no sign-out page or cannot be reached
+   */
+  public Optional<String> signOutUrl(String returnTo) {
+    if (!configured()) {
+      return Optional.empty();
+    }
+    try {
+      String endSession = endpoints().endSession();
+      if (endSession == null) {
+        return Optional.empty();
+      }
+      return Optional.of(
+          endSession
+              + (endSession.contains("?") ? "&" : "?")
+              + "client_id="
+              + encode(properties.oidc().clientId())
+              + "&post_logout_redirect_uri="
+              + encode(returnTo));
+    } catch (SsoException ex) {
+      return Optional.empty();
+    }
+  }
+
+  private record Endpoints(String authorization, String token, String jwkSet, String endSession) {}
 }

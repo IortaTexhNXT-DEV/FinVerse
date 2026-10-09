@@ -6,6 +6,9 @@ management:
     redis:
       enabled: false
 brokerverse:
+  # The flows of the Enterprise SSO platform run against its simulator in the tests.
+  identity:
+    simulator: true
   security:
     jwt-secret: test-secret-for-automated-tests-0123456789abcdef
     mfa:

@@ -74,6 +74,24 @@ public class SsoController {
   }
 
   /**
+   * The identity provider's sign-out page, opened after Log Out so that the BDO session ends too.
+   *
+   * @return the address, or none
+   */
+  @GetMapping("/sign-out")
+  @PreAuthorize(ANYONE)
+  public SignOut signOut() {
+    return new SignOut(sso.signOutUrl().orElse(null));
+  }
+
+  /**
+   * The address of the identity provider's sign-out page.
+   *
+   * @param redirectUrl address, null when there is none
+   */
+  public record SignOut(String redirectUrl) {}
+
+  /**
    * The OpenID Connect redirect of the provider.
    *
    * @param code authorisation code

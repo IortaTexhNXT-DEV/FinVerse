@@ -164,6 +164,18 @@ brokerverse:
         ping:
           path: /integration/v1/ping
           scopes: ${BROKERVERSE_INTEGRATION_PING_SCOPES:}
+        # User provisioning of UIDM-ISC (SCIM 2.0): joiners, movers, leavers, status, extract.
+        identity-provisioning:
+          path: /integration/v1/scim/v2/**
+          scopes: ${BROKERVERSE_INTEGRATION_IDENTITY_SCOPES:identity.provision}
+  # ---- Enterprise SSO platform / UIDM-ISC user directory (IdentityProperties) ----
+  identity:
+    # true: the Enterprise SSO simulator replaces the platform (SIT and UAT; refused in production).
+    simulator: ${BROKERVERSE_IDENTITY_SIMULATOR:false}
+    # SCIM 2.0 directory of the platform, given by BDOI IT at SIT; blank until connected.
+    directory-url: ${BROKERVERSE_IDENTITY_DIRECTORY_URL:}
+    directory-token: ${BROKERVERSE_IDENTITY_DIRECTORY_TOKEN:}
+    timeout: ${BROKERVERSE_IDENTITY_TIMEOUT:PT10S}
   security:
     # Supplied via BROKERVERSE_JWT_SECRET (>= 32 random bytes); only the seed and test profiles carry
     # a local value. Production refuses to start without it (ProductionSafeguards).
@@ -553,6 +565,9 @@ spring:
   datasource:
     password: ${BROKERVERSE_DB_PASSWORD:brokerverse}
 brokerverse:
+  identity:
+    # SIT and UAT run the flows of the Enterprise SSO platform against its simulator.
+    simulator: ${BROKERVERSE_IDENTITY_SIMULATOR:true}
   seed:
     # Password of the SIT/UAT users of this environment (SeedPasswords), set at deploy from the secret
     # store and never written into a file. Blank: the users keep the hash of the seed scripts.

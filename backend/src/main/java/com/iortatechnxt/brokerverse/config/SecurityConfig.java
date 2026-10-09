@@ -68,6 +68,14 @@ public class SecurityConfig {
       "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline';"
           + " frame-ancestors 'none'; base-uri 'self'; form-action 'self'";
 
+  /**
+   * The Enterprise SSO simulator of SIT and UAT (sign-in page, token and key set of the simulated
+   * identity provider): anonymous like the provider it stands for; registered only when the
+   * simulator is on, and refused in production.
+   */
+  private static final RequestMatcher EIAM_SIMULATOR =
+      PathPatternRequestMatcher.withDefaults().matcher("/eiam-simulator/**");
+
   /** Login is exempt from CSRF: it carries credentials in the body and establishes no session. */
   private static final RequestMatcher LOGIN =
       PathPatternRequestMatcher.withDefaults()
@@ -158,7 +166,11 @@ public class SecurityConfig {
     http.csrf(
             c ->
                 c.ignoringRequestMatchers(
-                    SecurityConfig::carriesBearerToken, LOGIN, PASSWORD_RESET, SIGN_IN))
+                    SecurityConfig::carriesBearerToken,
+                    LOGIN,
+                    PASSWORD_RESET,
+                    SIGN_IN,
+                    EIAM_SIMULATOR))
         .cors(c -> c.configurationSource(corsSource(properties.allowedOrigins())))
         .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .exceptionHandling(
@@ -169,16 +181,18 @@ public class SecurityConfig {
                         hsts -> hsts.includeSubDomains(true).maxAgeInSeconds(HSTS_SECONDS))
                     .addHeaderWriter(
                         new DelegatingRequestMatcherHeaderWriter(
-                            API_DOCS, new StaticHeadersWriter(CSP, DOCS_CSP)))
+                            new OrRequestMatcher(API_DOCS, EIAM_SIMULATOR),
+                            new StaticHeadersWriter(CSP, DOCS_CSP)))
                     .addHeaderWriter(
                         new DelegatingRequestMatcherHeaderWriter(
-                            new NegatedRequestMatcher(API_DOCS),
+                            new NegatedRequestMatcher(
+                                new OrRequestMatcher(API_DOCS, EIAM_SIMULATOR)),
                             new StaticHeadersWriter(CSP, API_CSP)))
                     .referrerPolicy(
                         r -> r.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.NO_REFERRER)))
         .authorizeHttpRequests(
             a ->
-                a.requestMatchers(LOGIN, PASSWORD_RESET, SIGN_IN)
+                a.requestMatchers(LOGIN, PASSWORD_RESET, SIGN_IN, EIAM_SIMULATOR)
                     .permitAll()
                     .requestMatchers(OPEN_ACTUATOR)
                     .permitAll()

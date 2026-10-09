@@ -1,0 +1,155 @@
+# Review of the end-to-end conformance run (read by build_conformance.py): the decisions on requirements that the
+# evidence alone cannot give, notes on walkthrough steps checked by hand, the cycle steps of each requirement, the
+# fixes made during the run, the open gaps with their proposals and the corrections of the FRS texts.
+version: "1.0"
+date: 09 October 2026
+scope: >-
+  Run on a fresh SIT/UAT environment (seed data of the release) on 09-Oct-2026: the 367 steps of the UAT walkthrough
+  script, the walkthroughs of the sign-off packs performed live by their personas, one client taken through the whole
+  broking cycle, the sidebar of every persona of the FRS persona tables, and the automated checks of the release
+  mapped to the 744 requirements and 1,772 acceptance criteria of the FRSs.
+
+# Further automated checks of a requirement that do not name it in their description (cross-BRD requirements).
+extra_checks:
+  FR-CR-001: [PersonaMenusIT, PermissionConsistencyTest, navigation/personaMenus.test.ts]
+  FR-CR-010: [ExecutiveDashboardIT, CollectionsHomeIT]
+  FR-CR-020: [NotificationEventWordingIT, MessagingIT]
+  FR-CR-030: [AuditTrailImmutabilityIT, SessionLogIT]
+  FR-CR-040: [ReportRenderingIT, ReportArchiveIT, ExportOptionsTest]
+  FR-CR-041: [NbReportApiIT, ConfigCatalogueSchemaIT]
+  FR-CR-050: [DocTemplateServiceIT, DocumentWordIT]
+  FR-CR-060: [LovServiceIT]
+  FR-CR-061: [CatalogIT]
+  FR-CR-070: [UserAdminApiIT, LoginProtectionTest, SignInTokensIT]
+  FR-CR-071: [DocumentProtectorTest]
+  FR-CR-080: [WorkflowServiceIT]
+  FR-CR-081: [ServiceInvoiceIT]
+  FR-CR-083: [BulkServiceIT, BulkExtensionsIT, AdvisoryJobLockIT]
+  FR-CR-090: [InvoiceLedgerIT]
+  FR-CR-091: [CurrencyAndDimensionApiIT]
+  FR-CR-093: [ServiceInvoiceIT, BookingServiceIT]
+
+# The requirements each step of the broking cycle shows.
+cycle_frs:
+  C01: [FR-NB-034]
+  C02: [FR-NB-041, FR-NB-043, FR-NB-044, FR-NB-047]
+  C03: [FR-NB-080, FR-NB-081, FR-NB-092, FR-NB-110]
+  C04: [FR-NB-110]
+  C05: [FR-CL-017]
+  C06: [FR-OP-019]
+  C07: [FR-CL-017]
+  C08: [FR-OP-030, FR-OP-031, FR-OP-034, FR-OP-035, FR-OP-021]
+  C09: [FR-OP-021]
+  C11: [FR-CM-011, FR-CM-016]
+  C12: [FR-CSF-010]
+  C13: [FR-OP-050, FR-OP-057]
+  C14: [FR-NB-122, FR-OP-041]
+
+# Steps of the broking cycle not run on the account of the scenario, with how they are covered.
+cycle_notes:
+  - step: C15
+    area: Renewal
+    action: Renewal of the policy of the scenario
+    observed: >-
+      Not run on the account of the scenario: its policy expires in one year and enters the expiry list 120 days
+      before. Renewal is shown on the expiring accounts of the SIT/UAT data by the BRD-6 walkthroughs (see
+      Walkthrough results, BRD-06).
+    result: Blocked
+  - step: C16
+    area: Employee Benefits
+    action: Employee benefits programme of a corporate client
+    observed: >-
+      Employee Benefits runs on its own programmes, not on a retail policy; it is shown on the programmes of the
+      SIT/UAT data by the BRD-8 steps of the walkthrough script (see Walkthrough results, BRD-08).
+    result: Blocked
+
+# Requirements whose result is decided by the review (result and reason).
+requirements: {}
+
+# Walkthrough steps checked by hand after the run: "BRD step" -> result, observed, evidence.
+step_notes: {}
+
+fixes:
+  - id: F01
+    brd: BRD-00
+    area: Configuration promotion
+    found: >-
+      The standard report variants (the saved report settings offered to every user) did not move with the
+      configuration from one environment to the next; only users' own variants should stay behind.
+    fix: >-
+      The standard variants are now part of the configuration promoted from SIT to UAT and production, with the
+      same comparison and approval as the other configuration; users' own variants stay in their environment.
+    check: Automated check that the standard variants move with the configuration and the users' variants stay behind
+  - id: F02
+    brd: BRD-05
+    area: Tax set-up
+    found: Party tax profiles (TX-01) and tax forms (TX-02) could only be entered one by one on their screens.
+    fix: >-
+      Upload of both from the screen: template with the layout of the BDOI input tabs, preview with the rules of the
+      screen, approval by a second user, and export of the current values.
+    check: Automated checks of the uploads of the configuration screens
+  - id: F03
+    brd: BRD-05
+    area: Currencies and exchange rates
+    found: Currencies (MD-02) and exchange rates (MD-03) could only be entered one by one.
+    fix: >-
+      Upload of both from the Currency Rates screen with the same template, preview, approval and export; the base
+      currency and a currency of an active bank account cannot be deactivated; the export of rates covers the last
+      90 days.
+    check: Automated checks of the uploads of the configuration screens
+  - id: F04
+    brd: BRD-00
+    area: SIT/UAT data
+    found: 64 standard reports returned no row on a fresh SIT/UAT environment, so UAT could not check them.
+    fix: >-
+      SIT/UAT data added in line with the seed story (Cebu branch receipts, cancellations, minimal balances,
+      disbursements and end-of-day runs, remittance batches, commission certificates, employee benefits invoices,
+      submitted policies, screening cases, LAMD results, migration batches, headcount, payment requests, PDCs,
+      completed collections, a claims follow-up due today, the GL to sub-ledger reconciliation of the day): 52 of
+      the 64 reports now return rows; the other 12 are listed as gap G03.
+    check: Each of the 64 reports run on a fresh SIT/UAT environment
+
+gaps:
+  - id: G01
+    brd: BRD-09
+    frs: [FR-CSF-050, FR-CSF-051, FR-CSF-052, FR-CSF-053, FR-CSF-054, FR-CSF-055, FR-CSF-056, FR-CSF-057, FR-CSF-058,
+          FR-CSF-059, FR-CSF-060, FR-CSF-061]
+    gap: Case management of the Customer Service Facility is not on the platform yet (logging, categories and turnaround, statuses,
+      notes, documents, routing to the fulfilment units, ageing and SLA, follow-up cases, dashboard).
+    impact: Storyboard P2 of BRD-9 (12 steps of the walkthrough script) cannot be run; customer requests are tracked
+      outside BIBS.
+    proposal: >-
+      Add the case module on the existing workflow, documents and notification services: case types with their
+      turnaround times and routing table (lists of values), the case record with notes, documents and history, the
+      team and fulfilment unit queues with reassign, escalate, resolve and return, SLA ageing with reminders, linked
+      follow-up cases, the case dashboard and the case reports; log a case from the Servicing View.
+    size: Large
+  - id: G02
+    brd: BRD-08
+    frs: [FR-EB-010, FR-EB-011, FR-EB-012, FR-EB-013, FR-EB-014, FR-EB-015, FR-EB-045, FR-EB-056]
+    result: Not testable yet
+    gap: The insurer and client HR portal is outside Drop 2 (Employee Benefits without the portal feature).
+    impact: Insurers and client HR send proposals, confirmations, member changes and billing by e-mail; the EB officer
+      records them in BIBS. Steps P1.2 to P1.4, P3.1 and P3.3 of the walkthrough script are blocked.
+    proposal: >-
+      Deliver the portal in the drop agreed with BDOI: external users provisioned through User Access requests,
+      the task inbox and structured proposal form for insurers, the client HR pages, and the staging and review of
+      portal uploads; until then the officer keys in what is received by e-mail.
+    size: Large
+  - id: G03
+    brd: BRD-00
+    frs_text: "Reports BCL-OUTSTANDING-PAST-DUE, EB-PLACEMENT, RNW-RA-DISPATCH, ADJ-VALIDATION-LIST, ADJ-MINBAL-FILE,
+      FIN-AR-SOO-FC, FIN-BRS-PAYNOTIFY, FIN-GL-ALLOCJV, PRC-LEGACY-CHANGES, TAX-MAP, TAX-QAP, TAX-SLS"
+    gap: 12 standard reports still return no row on a fresh SIT/UAT environment until the walkthroughs have created
+      their records.
+    impact: UAT checks these reports after the walkthrough steps that create their records (or on a later day for the
+      past-due claims), not on day one.
+    proposal: >-
+      Add the records through the business services of the SIT/UAT data loader (posted adjustments with an
+      accounting entry, a minimal-balance invoice between PHP 10 and 100, foreign-currency receivables, bank
+      payment notifications, allocation journals, legacy invoice changes, withholding and VAT postings for the
+      tax returns, renewal advices dispatched, an EB placement with its confirmation, and a claim reported 90 days
+      before the seed date).
+    size: Medium
+
+frs_corrections: []

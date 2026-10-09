@@ -1,0 +1,536 @@
+# Version 3.2 of BDOI's Operations Cashiering FRS (BDO ITG template, PRJ0012475): the edits of BDOI's sections, the
+# Business Requirements Mapping, Appendices D, H and I, the observations that are not in the comparison workbook and
+# the glossary. Read by build_brd02_bdoi_frs.py. Business wording only.
+
+meta:
+  source: "docs/source-documents/FRS - BDOI Core Replacement Operations Cashiering v3.1 (BDOI).docx"
+  out_folder: Programme/BDOI_Template_FRS/BRD-02_Operations_Cashiering
+  clean: BIBS_FRS-BDOI_BRD-02_Operations_Cashiering_v3.2.docx
+  highlighted: BIBS_FRS-BDOI_BRD-02_Operations_Cashiering_v3.2_Changes_Highlighted.docx
+  version_old: "3.1"
+  version_new: "3.2"
+  date: 09 Oct 2026
+  brd_pdf: "docs/source-documents/Operations_WS Addendum.pdf"
+
+cover:
+  drafting: "Drafting support: iorta TechNXT Project Team"
+
+revision_row: ["09 Oct 2026", "3.2", "Draft for BDOI review: full coverage of the Cashiering scope of the Operations BRD (v1.01 with the Cashiering annex of May 2026; version of 8-Oct-2026), functional requirements elaborated with numbered acceptance criteria, new items FRS.CSH.05.02 to FRS.CSH.10.04, Appendices C to V added, observations and points for decision in Appendix R; Business Unit review edition: summary for the Business Unit, end-to-end flows, workflow and approvals, e-mail texts, document prints and formats, reports and schedules, integrations, non-functional requirements, data set-up, open questions not answered in the BDOI FRS, change control, review checklist", "iorta TechNXT Project Team (drafting); for review by Abegail Panghulan"]
+
+signoff:
+  drafting: "iorta TechNXT Project Team (drafting support)"
+
+introduction:
+  preparation: >-
+    Version 3.2 of this document was drafted with the iorta TechNXT Project Team, from the inputs of the business unit
+    and BDO ITG, for review by the System Analyst. BDOI's text of version 3.1 is kept as issued; the additions are
+    written in the same style and listed in the change summary of the review copy; the points where a decision is
+    needed are in Appendix R.
+  overview: >-
+    The Operations BRD of 8-Oct-2026 (BRD v1.01 of 15-Apr-2026 with the Cashiering annex of May 2026) removes check
+    pick-up from Collection (CSHID.009) and the Cashiering processing and reversal of BIR 2307 (CSHID.026, CSHID.027),
+    and clears minimal balances when the payment is processed (CSHID.016). This FRS covers the Cashiering
+    requirements (BRQID.001 to BRQID.007, CSHID.001 to CSHID.025) and states where MKTID.013 and DBMID.001 are
+    specified; the rest of Operations (Remittance, Adjustment / Cancellation, Production Reconciliation, Commission
+    Receivables and the Marketing activities) stays in the BIBS FRS BRD-2 Operations v2.1.
+  references_title: "References added in version 3.2:"
+  references:
+    - "- Operations BRD v1.01 (15-Apr-2026, signed 23 to 28-Apr-2026): pages 71-185 of the file Operations_WS Addendum; the Cashiering annex of May 2026 (Operations Central - Addendum 1, pages 1-8); the e-mail record of the BIR 2307 changes (pages 67-70 and 186-189)."
+    - "- BIBS FRS BRD-2 Operations v2.1 (8-Oct-2026) and its test plan: the reference requirements FR-OP-nnn and the test conditions TC-OP-nnn.n quoted in Appendix Q."
+    - "- Comparison of BDOI's Operations Cashiering FRS with the BIBS FRS BRD-2 Operations, v1.0 (9-Oct-2026): the conflicts and slips of Appendix R."
+    - "- Review workbooks of BRD-02 Operations Cashiering, v1.0 (9-Oct-2026): Business Unit Requirements Collection; BRD vs Out-of-the-Box vs Best Practice; Change Request Register; Test Cases and Traceability; Business Unit Walkthrough Users."
+    - "- BIBS Non-Functional Requirements Register v1.0; BIBS Master Data and Configuration Upload Templates v1.2; BDOI Requirements and Inputs by BRD v1.2."
+
+# ------------------------------------------------------------------------------------- Business Requirements Mapping
+mapping:
+  BRQID.001: {add: [FRS.CSH.01.01, FRS.CSH.01.02], why: "BDOI's row was blank; the log-in is specified in FRS.CSH.01.01 and FRS.CSH.01.02 (FRS.OPS.001, FRS.OPS.002)."}
+  BRQID.002: {add: [FRS.CSH.01.02, FRS.OPS.002.04, FRS.OPS.002.05], why: "BDOI's row was blank; access by profile is in FRS.CSH.01.02; permissions per action and segregation of duties added."}
+  BRQID.003: {add: [FRS.CSH.01.03, FRS.CSH.01.03.05, FRS.CSH.10.01.02], why: "BDOI's row was blank; the dashboard and the main navigation are in FRS.CSH.01.03; the links to the applications it integrates with added."}
+  BRQID.004: {add: [FRS.CSH.10.01, FRS.CSH.06.03], why: "BDOI's row was blank; the List of Integrations names two interfaces; FRS.CSH.10.01 and Appendix N give every interface of Cashiering."}
+  BRQID.005: {add: [FRS.CSH.05.01, FRS.CSH.10.02], why: "BDOI's row was blank; the files received via MFT are in FRS.CSH.05.01.04; the flow-in runs added in FRS.CSH.10.02."}
+  BRQID.006: {add: [FRS.CSH.05.01, FRS.CSH.05.01.13, FRS.CSH.10.03, FRS.CSH.09.02.23], why: "BDOI's row was blank; partial failures and the run report are in FRS.CSH.05.01.06 and .12; batch runs added in FRS.CSH.10.03."}
+  BRQID.007: {add: [FRS.CSH.08.01, FRS.CSH.08.02, FRS.CSH.02.05.10], why: "BDOI's row was blank; remittance and payment details are in the Account Record Inquiry (FRS.CSH.08.01); the payment history of each account added in FRS.CSH.08.02."}
+  CSHID.001: {add: [FRS.CSH.02.01.15, FRS.CSH.02.01.16, FRS.CSH.03.01.11, FRS.CSH.04.01.12], why: "AR Insurance, the cashier's day-end list and the notices of the cancellation and reinstatement records added."}
+  CSHID.002: {add: [FRS.CSH.02.02.10, FRS.CSH.02.06], why: "Taxes on ORs and the OR template added to the mapping."}
+  CSHID.003: {add: [FRS.CSH.03.01.06], why: "The validation of the reason (FRS.CSH.03.01.06) named."}
+  CSHID.005: {add: [FRS.CSH.04.01.06], why: "The information of CSHID.005 is captured in FRS.CSH.04.01.06."}
+  CSHID.006: {add: [FRS.CSH.02.03.06, FRS.CSH.02.05.08], why: "The AR / OR number assignment (FRS.CSH.02.05.08) and the series in use at go-live added."}
+  CSHID.007: {add: [FRS.CSH.02.05.14, FRS.CSH.07.01.05], why: "The application of the OR payment and the list of commission ORs added."}
+  CSHID.008: {add: [FRS.CSH.05.02, FRS.CSH.05.01.13], why: "The post-dated check warehouse of CSHID.008 (system number, repository, list) added as FRS.CSH.05.02."}
+  CSHID.010: {add: [FRS.CSH.08.01.04], why: "The search log of CSHID.010 added."}
+  CSHID.011: {add: [FRS.CSH.08.03, FRS.CSH.02.01.14], why: "BDOI's row was blank; the audit trail is stated in each FR item; FRS.CSH.08.03 added for the AR and OR audit trail."}
+  CSHID.012: {add: [FRS.CSH.03.01.09], why: "GL posting of the cancellation (FRS.CSH.03.01.09) named; entries in Appendix I."}
+  CSHID.013: {add: [FRS.CSH.04.01.10], why: "GL posting of the reinstatement (FRS.CSH.04.01.10) named; entries in Appendix I."}
+  CSHID.014: {add: [FRS.CSH.02.05.15], why: "GL posting (FRS.CSH.02.05.15) named; entries in Appendix I."}
+  CSHID.015: {add: [FRS.CSH.02.05.09], why: "The depleted-series check (FRS.CSH.02.05.09) named."}
+  CSHID.016: {add: [FRS.CSH.02.05.12, FRS.CSH.06.01.08], why: "The minimal balance item (FRS.CSH.02.05.12) named; minimal balances kept out of the Unapplied list."}
+  CSHID.017: {add: [FRS.CSH.09.01.05], why: "Reports on a schedule added."}
+  CSHID.019: {add: [FRS.CSH.02.04.17], why: "Copy label added."}
+  CSHID.020: {add: [FRS.CSH.05.03, FRS.CSH.05.04, FRS.CSH.02.01.02], why: "Pre-booked payments and the payment confirmation to New Business added; matching at the counter in FRS.CSH.02.01.02."}
+  CSHID.021: {add: [FRS.CSH.02.01.15], why: "The non-premium payments of insurers (AR Insurance) are received in FRS.CSH.02.01; FRS.CSH.02.01.15 added."}
+  CSHID.022: {add: [FRS.CSH.02.05.11], why: "The hierarchy (FRS.CSH.02.05.11) named."}
+  CSHID.023: {add: [FRS.CSH.09.02, FRS.CSH.02.06.04], why: "The report requirements (FRS.CSH.09.02) and the Certification of Payment added."}
+  CSHID.024: {add: [FRS.CSH.06.02, FRS.CSH.06.03], why: "The disposition types (FRS.CSH.06.02) and the requests of other modules (FRS.CSH.06.03) added."}
+  MKTID.013: {add: [FRS.CSH.02.05.13], why: "BDOI maps the row to the Commission Receivable FRS (\"Com rec\"); the PR 2307 kept outstanding at payment is in FRS.CSH.02.05.13; the reversal itself is outside this FRS (Appendix R)."}
+  DBMID.001: {add: [FRS.CSH.10.01], why: "BDOI maps the row to the Commission Receivable FRS (\"Com rec\"); the hand-over to Disbursement is an interface of FRS.CSH.10.01; the receipt and release of the certificates is outside this FRS (Appendix R)."}
+
+# BRD IDs of the cashiering scope that BDOI's mapping does not list (removed from the BRD): added as rows, after the row
+# named in "after", with the BRD text and the reason
+removed:
+  - id: CSHID.009
+    after: CSHID.008
+    text: "Facility to accept check with “for check pick up” from Collection."
+    fr: "Removed from the BRD by the Cashiering annex of May 2026 (annex p.4-6): check pick-up is no longer part of BDOI's target process; no FR item."
+  - id: CSHID.026
+    after: CSHID.025
+    text: "Facility to receive tagged BIR 2307 data from Marketing Collection, process payments (cash or certificate), and remit accordingly. Issue ARs, reverse premiums, and forward transactions to Disbursement."
+    fr: "Deleted in BRD v1.01 (e-mail record p.67-69, p.186-188): the BIR 2307 processing is done by Marketing Collection (MKTID.013); no FR item."
+  - id: CSHID.027
+    after: CSHID.026
+    text: "Facility to provide capability to Operations to process BIR 2307 reversals using reference numbers generated by Marketing. This is to validate the data, generate the transaction report, and route it directly to Disbursement without going through the Remittance function."
+    fr: "Deleted in BRD v1.01 (e-mail record p.67-69, p.186-188); no FR item."
+
+# "Com rec" rows of BDOI's mapping: kept; specified in another FRS
+by_reference: [MKTID.013, DBMID.001]
+
+integrations_title: "Added in version 3.2 (Appendix N gives each interface with its direction, trigger, owner and what BDOI IT provides):"
+integrations:
+  - "Trade (TFS) and Direct Credit files to BIBS by upload; CLPC file by upload"
+  - "BIBS Collections module to Cashiering: disposition requests on unapplied payments, commission payment details"
+  - "Cashiering to BIBS Disbursement module: refund requests; Disbursement to Cashiering: payment request status and the approved insurer settlements that trigger the automatic OR"
+  - "BIBS New Business to Cashiering: booked accounts; Cashiering to New Business: payment confirmation of each account"
+  - "Cashiering to BIBS Remittance: paid and applied premium of each account; Remittance to Cashiering: remittance status"
+  - "Cashiering to the BIBS accounting engine: the journal of every posting (Appendix I)"
+
+# Column "Application Feature Model" of each FR entry: the feature group and feature of BIBS (the BIBS reference FRs
+# of the entry are added by the builder)
+feature:
+  FRS.CSH.01.01: "Platform › Sign-in (User Access Maintenance FRS)"
+  FRS.CSH.01.02: "Platform › Roles, permissions and segregation of duties"
+  FRS.CSH.01.03: "Finance › Cashiering › Cashiering Workbench ({SCR-OP-07})"
+  FRS.CSH.02.01: "Finance › Cashiering › Receive Payment; Receipts ({SCR-OP-08}, {SCR-OP-10})"
+  FRS.CSH.02.02: "Finance › Cashiering › Receipts › Issue Official Receipt; Commission ORs ({SCR-OP-09}, {SCR-OP-20})"
+  FRS.CSH.02.03: "Finance › Cashiering › Receipt Series ({SCR-OP-21})"
+  FRS.CSH.02.04: "Finance › Cashiering › Batch Print; Document templates ({SCR-OP-18}; Appendix L)"
+  FRS.CSH.02.05: "Finance › Cashiering › Receipts (posting, application, journal) ({SCR-OP-10})"
+  FRS.CSH.02.06: "Setup › Document Templates (AR and OR forms, Appendix L)"
+  FRS.CSH.03.01: "Finance › Cashiering › Receipt › Cancel ({SCR-OP-10})"
+  FRS.CSH.04.01: "Finance › Cashiering › Receipt › Reinstate ({SCR-OP-10})"
+  FRS.CSH.05.01: "Finance › Cashiering › Payment Uploads; Cashiering Setup ({SCR-OP-15}, {SCR-OP-22})"
+  FRS.CSH.06.01: "Finance › Cashiering › Unapplied Payments ({SCR-OP-11}, {SCR-OP-12})"
+  FRS.CSH.06.02: "Finance › Cashiering › Unapplied Payments (tabs) ({SCR-OP-11}, {SCR-OP-12})"
+  FRS.CSH.07.01: "Finance › Cashiering › Commission ORs; Disbursement ({SCR-OP-20})"
+  FRS.CSH.08.01: "Finance › Cashiering › Receipts (search); Operations › Invoice Search, Invoice 360 ({SCR-OP-09}, {SCR-OP-02}, {SCR-OP-03})"
+  FRS.CSH.09.01: "Reports › Report Centre; Operations › Report Archive ({SCR-OP-05}, {SCR-OP-63}, {SCR-OP-64})"
+  FRS.CSH.09.02: "Reports › Report Centre (Cashiering reports, Appendix M)"
+  FRS.CSH.05.02: "Finance › Cashiering › PDC Warehouse ({SCR-OP-16})"
+  FRS.CSH.05.03: "Finance › Cashiering › Pre-booked Payments ({SCR-OP-14})"
+  FRS.CSH.05.04: "New Business › Placement payment gate"
+  FRS.CSH.06.03: "Finance › Cashiering › Incoming Requests ({SCR-OP-13})"
+  FRS.CSH.08.02: "Operations › Invoice Search, Invoice 360 ({SCR-OP-02}, {SCR-OP-03})"
+  FRS.CSH.08.03: "Finance › Cashiering › Receipt › History ({SCR-OP-10})"
+  FRS.CSH.10.01: "Operations › Hand-offs and Extracts; Disbursement Queue (Appendix N)"
+  FRS.CSH.10.02: "Operations › Interfaces ({SCR-OP-61})"
+  FRS.CSH.10.03: "Operations › Interfaces; Administration › Scheduled Jobs"
+  FRS.CSH.10.04: "Notifications (bell), Alerts, Notification Settings (Appendix G)"
+
+# ------------------------------------------------------------------------------------- Appendix D: file layouts
+annex_d:
+  intro: >-
+    The layouts of the payment files of FRS.CSH.05.01 and of the Commission Schedule of FRS.CSH.02.02, field by field,
+    with BDOI's samples of Appendix A where BDOI gave them. Each layout is kept in Cashiering Setup and can be changed
+    without a change to the system (FRS.CSH.05.01.06). "To be confirmed" marks a point BDOI confirms with the channel
+    owner (requirements collection workbook, sheet Integration inputs).
+  files:
+    - id: D.1
+      name: Bills Payment file (OBPCS, via MFT)
+      convention: "BDOIYYYYMMDD.txt (example BDOI201506181.TXT); text file, values separated by a pipe (|); a header record (type 1) then detail records (type 2), without a line of column names (sample of Appendix A)."
+      header: ["Pos.", "Field", "Format (sample)", "Mandatory", "Use in the system"]
+      rows:
+        - ["H1", "Record type", "1", "Yes", "Identifies the header record"]
+        - ["H2", "Record count", "5 digits, zero-filled (00048)", "Yes", "Checked against the number of detail records (FRS.CSH.05.01.06)"]
+        - ["H3", "Total amount", "12 characters, 2 decimals (000623704.80)", "Yes", "Checked against the total of the detail records"]
+        - ["H4", "File date", "MM/DD/YYYY (04/03/2025)", "Yes", "Shown on the run"]
+        - ["1", "Record type", "2", "Yes", "Identifies a detail record"]
+        - ["2", "Incremental #", "5 digits (00001)", "Yes", "Row number in the run report"]
+        - ["3", "Reference (invoice #)", "10 digits (0250193490)", "Yes", "Match key: account number or a legacy number (QPS, ISYS, Ebix, PN, Loan Application Number), FRS.CSH.05.01.08"]
+        - ["4", "Assured / payor name", "Text", "Yes", "Payor of the AR"]
+        - ["5", "Amount", "12 characters, 2 decimals (000015159.21)", "Yes", "Paid amount"]
+        - ["6", "Late deposit", "Y / N", "No", "Kept with the payment"]
+        - ["7", "(not named)", "2 on every row", "To be confirmed", "To be confirmed by BDOI"]
+        - ["8", "Paying bank", "BDO, PNB, BNK0131", "To be confirmed", "Bank of the payment (to be confirmed)"]
+        - ["9", "(not named)", "8 digits (00411335)", "To be confirmed", "Phone number, check or account number (to be confirmed)"]
+        - ["10-11", "(empty)", "-", "-", "Not read"]
+        - ["12", "Reference (repeated)", "Same value as position 3", "To be confirmed", "Second reference (to be confirmed)"]
+        - ["13", "(empty)", "-", "-", "Not read"]
+        - ["14", "Branch code", "5 digits (00300)", "No", "Paying branch"]
+        - ["15", "Date of payment", "MM/DD/YYYY (04/03/2025)", "Yes", "Payment date of the AR"]
+        - ["16", "Time of payment", "HH:MM:SS (00:00:00)", "No", "Kept with the payment"]
+    - id: D.2
+      name: Post-dated checks file (PMS, via MFT; or Excel upload)
+      convention: "BDOIYYYYMMDDPMS.txt (example BDOI201506181PMS.TXT), values separated by a pipe (|); header and details of BDOI's FRS to be given (FRS.CSH.05.01.06). The BRD names an Excel file; the Excel template of the system is used until BDOI gives the PMS layout."
+      header: ["No.", "Field", "Format (example)", "Mandatory", "Use in the system"]
+      rows:
+        - ["1", "Client code", "Text (CL-2026-000001)", "No", "Client of the check"]
+        - ["2", "Payor", "Text", "Yes", "Payor of the AR"]
+        - ["3", "Reference", "Account, invoice, ARN, policy or PN number", "Yes", "Match key at maturity"]
+        - ["4", "Check number", "Text (0012345)", "Yes", "With the bank, unique in the warehouse"]
+        - ["5", "Bank code", "Text (PNB)", "Yes", "Drawee bank"]
+        - ["6", "Check branch", "Text (Makati)", "No", "Branch of the drawee bank"]
+        - ["7", "Maturity date", "Date", "Yes", "Date of the daily maturity run"]
+        - ["8", "Amount", "Number, 2 decimals", "Yes", "Check amount"]
+        - ["9", "Market segment", "Text (CBG)", "No", "Segment for the reports"]
+    - id: D.3
+      name: CLPC file
+      convention: "CLPC-MonDDYYYY.xlsx (example CLPC-Jun032025.xlsx); Excel sheet with a line of column names and a TOTAL row at the end (sample of Appendix A)."
+      header: ["Col.", "Field", "Format (sample)", "Mandatory", "Use in the system"]
+      rows:
+        - ["1", "COUNT", "1 to n", "Yes", "Row number"]
+        - ["2", "DATE CREDIT", "MM/DD/YYYY (04/04/2025)", "Yes", "Payment date"]
+        - ["3", "AMOUNT", "Number without thousands separator (28695.75)", "Yes", "Paid amount"]
+        - ["4", "AR NUMBER", "Empty on upload", "No", "Filled by the system"]
+        - ["5", "INVOICE", "Text", "No", "Match key (account or invoice)"]
+        - ["6", "ASSURED", "Text", "Yes", "Payor of the AR"]
+        - ["7", "PN NUMBER", "Text", "No", "Match key when the invoice is blank"]
+        - ["8", "CORP.DEPT", "Text (SMALLBUSINESSLOAN)", "No", "Kept with the payment"]
+        - ["9", "RISK CODE", "Text (FIP)", "No", "Kept with the payment"]
+        - ["10", "REMARKS", "Text", "No", "Kept with the payment"]
+        - ["-", "TOTAL row", "Label TOTAL with the total amount", "Yes", "Control total, not a payment (FRS.CSH.05.01.06)"]
+    - id: D.4
+      name: Trade file (TFS, from CIB)
+      convention: "UploadTrade_MM.DD.YYYY.txt (example UploadTrade_01.01.2025.TXT); text file with a line of column names; the sample of Appendix A is aligned with spaces or tabs although the FRS says pipe (|): separator to be confirmed."
+      header: ["Col.", "Field", "Format (sample)", "Mandatory", "Use in the system"]
+      rows:
+        - ["1", "Transaction Date", "MM/DD/YYYY (04/03/2025)", "Yes", "Payment date"]
+        - ["2", "Branch Name", "Text (RECON)", "No", "Kept with the payment"]
+        - ["3", "Transaction Description", "Risk code / 10-digit reference / code (FIP/0250088368/FSA7041259859IVF)", "Yes", "Each part is tried as a match key"]
+        - ["4", "Debit", "Number (0)", "No", "Kept with the payment"]
+        - ["5", "Credit", "Number (31080.04)", "Yes", "Paid amount; a row without credit is failed"]
+        - ["6", "Running Balance", "Number", "No", "Kept with the payment"]
+        - ["7", "Check No.", "Text (0)", "No", "Kept with the payment"]
+    - id: D.5
+      name: Direct Credit file
+      convention: "OTCYYYYMMDD-<branch>.txt (example OTC202506101- AUTOCREDIT.TXT); text (pipe) or Excel. BDOI's FRS uses the file to identify payments already received (FRS.CSH.05.01.09): the columns below are those of the BRD."
+      header: ["Col.", "Field", "Format", "Mandatory", "Use in the system"]
+      rows:
+        - ["1", "Transaction date", "Date", "Yes", "Payment date"]
+        - ["2", "BP filename", "Text", "Yes", "Priority 1 match with the payment record (FRS.CSH.05.01.09)"]
+        - ["3", "Transaction no", "Text", "Yes", "Priority 1 match with the payment record"]
+        - ["4", "Paid amount", "Number, 2 decimals", "Yes", "Must equal the amount of the payment record"]
+        - ["5", "Payment type", "Text", "No", "Kept with the payment"]
+        - ["6", "Payor", "Text", "Yes", "Payor"]
+        - ["7", "Account ref no", "Text", "No", "Priority 2 and 3 match keys"]
+        - ["8", "Assured", "Text", "No", "Kept with the payment"]
+        - ["9", "Ebix reference no.", "Text", "No", "Match key"]
+        - ["10", "Logged by", "Text", "No", "Kept with the payment"]
+        - ["11", "Requestor", "Text", "No", "Kept with the payment"]
+    - id: D.6
+      name: Commission Schedule (FRS.CSH.02.02.03)
+      convention: "Pipe-delimited .csv (FRS.CSH.02.02.04); BDOI's list of fields is blank (FRS.CSH.02.02.07): the fields below are proposed (the Commission Payment Details template of the system)."
+      header: ["Col.", "Field", "Format (example)", "Mandatory", "Use in the system"]
+      rows:
+        - ["1", "Insurer code", "Text (INS-MGIC)", "Yes", "Insurer paying the commission"]
+        - ["2", "Payee name", "Text", "Yes", "Received From of the OR"]
+        - ["3", "Certificate ref", "Text (2307-0001)", "No", "BIR 2307 certificate of the insurer"]
+        - ["4", "Payment ref", "Text (check or credit reference)", "Yes", "Check number or credit reference"]
+        - ["5", "Invoice no", "Text", "No", "Match key (reference number)"]
+        - ["6", "Basic commission", "Number, 2 decimals", "Yes", "Commission paid"]
+        - ["7", "VAT", "Number, 2 decimals", "Yes", "VAT on the commission"]
+        - ["8", "Withholding tax", "Number, 2 decimals", "Yes", "Tax withheld by the insurer"]
+        - ["9", "Payment date", "Date", "Yes", "Date of the payment"]
+
+# ------------------------------------------------------------------------------------- Appendix H: rules and roles
+annex_h:
+  intro: >-
+    The roles of Cashiering, the permissions of each action, the configurable parameters and lists, the scheduled runs
+    and the statuses of the records. The roles and permissions are proposed until BDOI confirms the access matrix in
+    the User Access Maintenance FRS ("Based on UAM"); the values are changed in the system by the owner named, with
+    an audit record, without a change to the system.
+  personas:
+    - ["Cashier, Head Office (11 users in the BRD)", "Creates ARs and ORs, uploads payment files, keeps the post-dated check warehouse, creates cancellation and reinstatement records, assigns dispositions, prints", "CSHID.001-008, 010-025"]
+    - ["Cashier, branches (5 users)", "Creates ARs of the branch, prints, creates cancellation and reinstatement records", "CSHID.001, 006, 019"]
+    - ["Cashiering Team Leader / Team Head (5 + 5 users)", "Approver/Poster of AR and OR creation, cancellation and reinstatement records; approves dispositions; maintains the receipt series and the minimal balance threshold; receives the alerts", "CSHID.001-006, 015, 016, 024, 025"]
+    - ["Marketing (Marketing Support, Account Officers, Unit Heads)", "Sees and works the Unapplied payment records of its unit; transfers to Cashiering when the unit is unknown (BDOI FRS.CSH.06.02.01)", "CSHID.024, 025"]
+    - ["Commission Receivable", "Works the AP Unapplied Commission records; Commission Schedule (with Cashiering)", "CSHID.007, 024"]
+    - ["MBS", "Maintains the AR and OR templates (BDOI FRS.CSH.02.06)", "CSHID.019"]
+    - ["Comptrollership", "Maintains the accounts of the entries and the exchange rates; views the journals and reports", "CSHID.012-014"]
+    - ["Disbursement", "Pays the refunds; approves the insurer settlements that trigger the automatic OR", "CSHID.024; FRS.CSH.07.01"]
+    - ["System Administrator", "Maintains the lists, the parameters and the interfaces", "BRQID.004, 005"]
+    - ["Auditor", "Views the receipts, their history, the search log and the reports", "CSHID.010, 011, 018"]
+  matrix_roles: ["Cashier HO", "Cashier branch", "Cashiering TL / TH", "Marketing", "Comm. Receivable", "Comptroller-ship", "Auditor"]
+  matrix:
+    - ["Create AR; print", "Y", "Y", "Y", "", "", "", ""]
+    - ["Create OR", "Y", "", "Y", "", "", "", ""]
+    - ["Post or return AR / OR creation records", "", "", "Y", "", "", "", ""]
+    - ["Create cancellation and reinstatement records", "Y", "Y", "Y", "", "", "", ""]
+    - ["Post or return cancellation and reinstatement records", "", "", "Y", "", "", "", ""]
+    - ["Upload payment files; post-dated check warehouse", "Y", "", "Y", "", "", "", ""]
+    - ["Assign and submit dispositions", "Y", "", "Y", "Y (own unit)", "Y (AP Unapplied Commission)", "", ""]
+    - ["Approve dispositions and payment reversals", "", "", "Y", "", "", "", ""]
+    - ["Maintain receipt series", "", "", "Y (maker)", "", "", "", ""]
+    - ["Authorise receipt series", "", "", "Y (checker)", "", "", "", ""]
+    - ["View receipts, accounts and history", "Y", "Y", "Y", "Y (own unit)", "Y", "Y", "Y"]
+    - ["View reports", "Y", "Y", "Y", "", "Y", "Y", "Y"]
+    - ["Download and print reports", "Y", "Y", "Y", "", "", "Y", ""]
+  controls:
+    - "The user who creates a record never posts, approves or authorises it (FRS.OPS.002.05); this cannot be switched off."
+    - "OR series and ORs belong to Head Office only (CSHID.006)."
+    - "A receipt has at most one cancellation or reinstatement record waiting at a time."
+    - "Audit records cannot be changed or deleted by any user (FRS.CSH.02.01.14)."
+  parameters:
+    - ["Minimal balance threshold – premium receivable", "BDOI FRS: -1.00 to 1.00; BRD: 10.00 (Appendix R, C5)", "Outstanding premium receivable cleared when the payment is processed", "Cashiering Team Leader (Comptrollership confirms)"]
+    - ["Minimal balance threshold – excess payment", "As above", "Excess cleared instead of an Excess payment record", "Cashiering Team Leader"]
+    - ["Share of premium applied for a BIR 2307 account", "98%", "The 2% waits for the BIR 2307 certificate (FRS.CSH.02.05.13)", "Comptrollership"]
+    - ["Check holding period", "4 working days (BDOI FRS.CSH.02.01.08)", "Check date validation (Appendix R, C7)", "Cashiering Team Leader"]
+    - ["Maximum paid amount per receipt", "1,000,000,000.00", "Paid Amount validation", "Cashiering Team Leader"]
+    - ["Maximum file size", "50 MB", "Upload validation", "System Administrator"]
+    - ["Pre-booked ageing alert", "5 days", "Alert to the Cashiering Team Leader", "Cashiering Team Leader"]
+    - ["Re-matching frequency", "Every hour", "Unbooked/Unmatched and Pre-booked payment records matched again", "System Administrator"]
+    - ["Maximum receipts per print batch", "500", "Batch printing", "System Administrator"]
+    - ["Failed-run recipients", "(addresses to give)", "E-mail of a failed batch run", "System Administrator"]
+    - ["Exchange rate", "Comptrollership table, 2 decimals", "Conversion of USD receipts (FRS.CSH.02.05.15.01)", "Comptrollership"]
+  lists:
+    - ["Receipt Type", "Acknowledgement Receipt; Official Receipt"]
+    - ["Acknowledgement Receipt Type", "Premium Payment; Non-Premium Payment (Refund from Insurer, Other Expenses, AR Insurance)"]
+    - ["Official Receipt Type", "Fee Invoice (list of service fees); Contingent Profit Commission (CPC); Commissions (Commission Income – Direct Payment); Incentives (list of incentives); Others"]
+    - ["Entry Type", "Client; Insurer; Other"]
+    - ["Payment Type", "Cash; Check; Direct Credit (OR)"]
+    - ["Currency", "PHP; USD"]
+    - ["Post to Bank Account", "DFLB - Current (BDO Ortigas) (OR); DFLB Savings (BDO Ortigas); DFLB Savings Mall (Peso); DFLB savings Trade (Peso); DFLB Savings FX (BDO Ortigas)"]
+    - ["Receipting Branch", "Head office; Cebu; Angeles; Davao; General Santos; CDO"]
+    - ["Reason for Cancellation", "Error in Issuance Details; Double issuance; Others; Discrepancy in check amount; No signature; Incorrect payee; Incorrect check details provided by the client or Insurer; Incorrect payment details (BRD list: Appendix R, C21)"]
+    - ["Reason for Reinstatement (AR)", "Mis-application of payment; Withholding Tax Adjustment; Others (BRD list: Appendix R, C2)"]
+    - ["Reason for Reinstatement (OR)", "Withholding Tax Adjustment; Others"]
+    - ["Type of Reinstatement", "Partial Reinstatement (AR only); Full Reinstatement"]
+    - ["Payment file type", "Bills Payment; CLPC; Trade; Direct Credit; PDC; Commission Schedule"]
+    - ["Unapplied Payment Type", "Excess payments; Unapplied payment; AR Insurer Refund; Unbooked/Unmatched payment; Pre-booked payment; AP Unapplied Commission"]
+    - ["Disposition type", "Apply to Other Invoice; DST payment application; Refund; Reclass; Transfer to other marketing unit; Others (customizable)"]
+    - ["Links to applications", "Name and address of each application the dashboard links to"]
+  jobs:
+    - ["Re-matching of unapplied payments", "Every hour", "Unbooked/Unmatched and Pre-booked payment records matched again (FRS.CSH.05.01.08)"]
+    - ["Pre-booked re-matching", "Every 2 hours", "Pre-booked payments of accounts now booked applied (FRS.CSH.05.03)"]
+    - ["Post-dated check maturity", "08:30 daily", "Matured checks turned into payments with their AR (FRS.CSH.05.02.02)"]
+    - ["Minimal balance run", "04:00 daily", "Balances left within the threshold by a later event cleared (FRS.CSH.02.05.12)"]
+    - ["Files received via MFT", "At the times agreed with BDOI IT", "OBPCS and PMS files checked and processed (FRS.CSH.05.01.04)"]
+  statuses:
+    - ["AR / OR creation record", "Created; For Posting; Returned; Record Cancelled; AR/OR Issued", "BDOI FRS.CSH.02.01, 02.05"]
+    - ["AR / OR number", "For Printing (system-generated); Issued; Cancelled", "BDOI FRS.CSH.02.05, 03.01, 05.01.10"]
+    - ["Cancellation record", "Created; For Posting; Returned; Record Cancelled; AR/OR Cancelled", "BDOI FRS.CSH.03.01"]
+    - ["Reinstatement record", "Created; For Posting; Returned; Record Cancelled; AR/OR Reinstated", "BDOI FRS.CSH.04.01"]
+    - ["Payment record of a file", "Applied Payment; Excess Payment; Matched on Pre-booked (Pre-booked Payment); Unbooked/Unmatched; Invalid BP filename; Invalid Transaction Number; Duplicate; Failed", "BDOI FRS.CSH.05.01"]
+    - ["Unapplied payment record", "Unapplied; Monitoring; For Approval; For Reversal; Done", "BDOI FRS.CSH.06.02.02; Done added"]
+    - ["Post-dated check", "Warehoused; Applied; Returned; Replaced; Pulled Out", "FRS.CSH.05.02"]
+    - ["Account (payment status)", "Unpaid; Partially Paid; Paid", "FRS.CSH.02.05.10"]
+
+# ------------------------------------------------------------------------------------- Appendix I: accounting entries
+annex_i:
+  intro: >-
+    The default entry of each event of Cashiering, filling the "Debit: Credit:" lines of BDOI's FRS.CSH.02.05.15,
+    FRS.CSH.03.01.09 and FRS.CSH.04.01.10. The accounts are named by their purpose; Comptrollership gives the account
+    of each line in the accounting rules of the system (maker-checker), and no account is fixed in the system (open
+    question S.3, OQ07). Amounts in USD are converted to pesos at the rate of BDOI's FRS with two decimals.
+  header: ["Event (BDOI's line)", "GL Reference / Description", "Debit", "Credit", "BDOI FR item"]
+  rows:
+    - ["AR issued (premium payment received)", "AR Number / AR; Account Numbers <xxx>", "Cash in bank (the Post to Bank Account of the receipt)", "Unapplied collections – client", "FRS.CSH.02.05.15"]
+    - ["Applied to invoice AR (payments)", "AR Number / AR; Account Numbers <xxx>", "Unapplied collections – client", "Premium receivable by component (DST, Premium Tax (VAT), LGT, Other Charges, Basic Premium); with the commission realised on collection: Commission income and Output VAT against Unrealised commission and Deferred output VAT", "FRS.CSH.02.05.15"]
+    - ["Excess AR", "AR Number / AR; Account Numbers <xxx>", "-", "The excess stays in Unapplied collections – client as an Excess payment record (no further entry)", "FRS.CSH.02.05.15"]
+    - ["Minimal Balance (Outstanding PR)", "AR Number / Minimal balance reversal", "Minimal balance write-off", "Premium receivable of the component", "FRS.CSH.02.05.15"]
+    - ["Minimal Balance (Excess)", "AR Number / Minimal balance reversal", "Unapplied collections – client", "Overages (minimal excess)", "FRS.CSH.02.05.15"]
+    - ["OR Issuance", "OR Number / OR; Account Numbers <xxx>", "Cash in bank; Creditable withholding tax receivable (tax withheld by the payor)", "Income of the Official Receipt Type (service fee, profit share, commission, incentive, others); Output VAT. Commission ORs: Commission receivable; Deferred output VAT to Output VAT", "FRS.CSH.02.05.15"]
+    - ["AR Insurance (non-premium payment of an insurer)", "AR Number / AR Insurance", "Cash in bank", "AR Insurer – insurer", "FRS.CSH.02.01.15"]
+    - ["Cancellation of Applied to invoice AR (not yet remitted)", "<Cancellation Record Number> / Cancellation of AR due to <reason> <AR Number>", "Premium receivable by component (application reversed); Unapplied collections – client", "Unapplied collections – client; Cash in bank (receipt reversed)", "FRS.CSH.03.01.09"]
+    - ["Cancellation of Applied to invoice AR (remitted)", "<Cancellation Record Number> / Cancellation of AR due to <reason> <AR Number>", "AR Insurer Refund – insurer", "Cash in bank (receipt reversed)", "FRS.CSH.03.01.09"]
+    - ["Cancellation of OR Issuance", "<Cancellation Record Number> / Cancellation of OR due to <reason> <OR Number>", "Income of the Official Receipt Type; Output VAT (commission ORs: Commission receivable restored)", "Cash in bank; Creditable withholding tax receivable", "FRS.CSH.03.01.09"]
+    - ["Cancellation of Minimal Balance", "<Cancellation Record Number>", "Premium receivable of the component (or Overages)", "Minimal balance write-off (or Unapplied collections)", "FRS.CSH.03.01.09"]
+    - ["Reinstatement AR (not yet remitted)", "<Reinstatement Record Number> / Reinstatement of AR due to <reason> <AR Number>", "Premium receivable by component", "Unapplied collections – client (Unapplied payment record)", "FRS.CSH.04.01.10"]
+    - ["Reinstatement AR (remitted)", "<Reinstatement Record Number> / Reinstatement of AR due to <reason> <AR Number>", "Premium receivable by component; AR Insurer Refund – insurer", "Unapplied collections – client; Due to insurer (remittance reversed, with the commission receivable and the withholding tax of the remittance)", "FRS.CSH.04.01.10"]
+    - ["Reinstatement OR", "<Reinstatement Record Number> / Reinstatement of OR due to <reason> <OR Number>", "Commission receivable (application reversed)", "AP Unapplied Commission – insurer", "FRS.CSH.04.01.10"]
+    - ["Reinstatement of Minimal Balance (compound entry)", "<Reinstatement Record Number>", "Premium receivable of the component", "Minimal balance write-off", "FRS.CSH.04.01.10"]
+    - ["Refund of an Unapplied payment record", "Unapplied Payment No.", "Unapplied collections – client", "Refund payable – client (paid by Disbursement)", "FRS.CSH.06.02.01"]
+    - ["Reclass / transfer of an Unapplied payment record", "Unapplied Payment No.", "Unapplied collections – old client or unit", "Unapplied collections – new client or unit", "FRS.CSH.06.02.01"]
+
+# ------------------------------------------------------------------------------------- Appendix R: observations
+# Observations that are not conflicts of the comparison workbook. section R.2: slips of BDOI's text (proposed
+# corrections, BDOI's text not changed); R.4: other observations and proposals of this version.
+slips:
+  - topic: Excess amount formula
+    bdoi: "FRS.CSH.02.01.03, FRS.CSH.02.05.13 and FRS.CSH.05.01.11: \"Excess Amount = Paid Amount – Outstanding Balance – PR 2307\" under the condition \"Paid Amount > (Outstanding Balance – PR 2307)\"."
+    brd: "CSHID.020: for accounts with 2% CWT only 98% is applied."
+    proposal: "The excess is Paid Amount – (Outstanding Balance – PR 2307), that is Paid Amount – Outstanding Balance + PR 2307. Example: outstanding 10,200.00, PR 2307 200.00, paid 10,100.00: applied 10,000.00, excess 100.00 (the formula as written gives -300.00)."
+    impact: "Amount of every Excess payment record of a BIR 2307 account."
+    decide_by: "System Analyst (BDO ITG); Comptrollership"
+  - topic: Duplicate and missing item numbers
+    bdoi: "FRS.CSH.03.01.05 and FRS.CSH.04.01.03 are each used twice; FRS.CSH.02.02.05 and FRS.CSH.02.02.09.06 to .09 are not used; FRS.CSH.04.01.04.01 follows FRS.CSH.04.01.03; numbers with a space (\"FRS.CSH.01.03 .01\", \"FRS.CSH.02.05.08 .01\")."
+    brd: "-"
+    proposal: "Renumber in the next BDOI revision; this version refers to the second FRS.CSH.03.01.05 as \"FRS.CSH.03.01.05 (Reason for Cancellation)\" and keeps BDOI's numbers otherwise."
+    impact: "References from the test cases and the traceability."
+    decide_by: "System Analyst (BDO ITG)"
+  - topic: Tabs quoted in the mapping
+    bdoi: "Mapping row CSHID.025 quotes three tabs (Unapplied, Monitoring, For Approval); FRS.CSH.06.02.02 has four (For Reversal)."
+    brd: "CSHID.025: Unapplied, Monitoring, For Approval, For Reversal."
+    proposal: "Read the mapping row with the four tabs of FRS.CSH.06.02.02."
+    impact: "None on the system."
+    decide_by: "System Analyst (BDO ITG)"
+  - topic: Rule of the Cancelled Acknowledgement Receipts report
+    bdoi: "FRS.CSH.09.02.05: \"Rules: Extract all cancelled OR within the covered period\"."
+    brd: "Annex II #6 Cancelled Acknowledgment Receipts."
+    proposal: "Extract all cancelled AR within the covered period (AR status = Cancelled, as the next line says)."
+    impact: "Content of the report."
+    decide_by: "System Analyst (BDO ITG)"
+  - topic: Cross-reference to batch printing
+    bdoi: "FRS.CSH.05.01.10: \"Allow the user to print the AR (see FRS.CSH.02.03)\"."
+    brd: "-"
+    proposal: "The reference is FRS.CSH.02.04 (Batch Printing); FRS.CSH.02.03 is the number series."
+    impact: "None on the system."
+    decide_by: "System Analyst (BDO ITG)"
+  - topic: Status of the record in a depleted series
+    bdoi: "FRS.CSH.02.05.09.02: \"Status will remain unchanged (AR/OR Creation Record = Created)\", while the records posted are For Posting."
+    brd: "CSHID.015."
+    proposal: "The record keeps its status For Posting and the poster sees the message; read \"Created\" as \"unchanged\"."
+    impact: "Status after a failed posting."
+    decide_by: "System Analyst (BDO ITG)"
+  - topic: Status shown in the reinstatement posting list
+    bdoi: "FRS.CSH.04.01.09.05: \"AR/OR Status (should be For Posting)\"."
+    brd: "-"
+    proposal: "The AR / OR number status stays Issued; the Reinstatement Record Status is For Posting."
+    impact: "Column of the list."
+    decide_by: "System Analyst (BDO ITG)"
+  - topic: Record number of the returned reinstatement list
+    bdoi: "FRS.CSH.01.03.04 Returned - Reinstatement: \"Cancellation Record Number\"."
+    brd: "-"
+    proposal: "Reinstatement Record Number."
+    impact: "Column of the list."
+    decide_by: "System Analyst (BDO ITG)"
+  - topic: Drafting notes left in the text
+    bdoi: "FRS.CSH.03.01.08.08: \"Copy from reinstatement\", \"no UPP\"; FRS.CSH.01.03.02: \"Refund to Client (?)\", \"Refund to Insurer (?)\"; FRS.CSH.02.06.01: \"AR Template set up ... the following fields:\" with no list (the list is in FRS.CSH.02.06.03); FRS.CSH.02.04.12 \"See template:\" and FRS.CSH.02.04.07 \"Convention:\" blank."
+    brd: "-"
+    proposal: "Remove the notes and question marks in the next BDOI revision; the certificate convention is proposed in FRS.CSH.02.04.07 and the template is Appendix A."
+    impact: "Clarity of the signed baseline."
+    decide_by: "System Analyst (BDO ITG)"
+  - topic: Typing errors
+    bdoi: "\"Unpplied Premium Minimal Balance\" (FRS.CSH.09.02.08, FRS.CSH.09.01.02); \"You you wish to continue\" (FRS.CSH.02.05.06, 03.01.08.06, 04.01.09.06); \"Aging (Per Date Booked)\\\"S\" (FRS.CSH.09.02.11)."
+    brd: "-"
+    proposal: "Unapplied Premium Minimal Balance; \"Do you wish to continue\"; Aging (Per Date Booked)."
+    impact: "Report name and confirmation messages."
+    decide_by: "System Analyst (BDO ITG)"
+  - topic: Version of record
+    bdoi: "Document Revision Log: 1.0 of Aug 26, 2026 and 1.1 of October 9, 2026; the file is named v3.1."
+    brd: "-"
+    proposal: "This version is numbered 3.2 after the file name; BDO ITG confirms the numbering of record."
+    impact: "Revision log."
+    decide_by: "System Analyst (BDO ITG)"
+
+observations:
+  - topic: Official receipts and the Ease of Paying Taxes Act
+    bdoi: "ORs for service fee, profit share, commissions, incentives and others (FRS.CSH.02.02, FRS.CSH.02.06.02)."
+    brd: "CSHID.002, CSHID.006."
+    proposal: "Under the Ease of Paying Taxes Act (Republic Act 11976) and its revenue regulations, the invoice is the primary document for the sale of services and the official receipt a supplementary document. Comptrollership (Tax) confirms whether BDOI's income receipts are issued as invoices and the wording of the OR form and footer; the series and forms follow the BIR registration of BDOI."
+    impact: "Form, name and series of the OR (FRS.CSH.02.06.02); BIR registration."
+    decide_by: "Comptrollership (Tax)"
+  - topic: Value added tax and withholding tax printed on the OR
+    bdoi: "OR body: Received From, Address, TIN, Form of Payment, Paid Amount, In payment of, Bank/Branch, Check No, Check Date, AC No, Date Issued (FRS.CSH.02.06.02)."
+    brd: "CSHID.002: \"Commissions (e.g. VAT or W/Tax)\"."
+    proposal: "Print the gross amount, the VAT and the withholding tax of each OR line (FRS.CSH.02.02.10), as the BIR invoicing rules require for a VAT-registered seller."
+    impact: "OR template."
+    decide_by: "Comptrollership (Tax); MBS"
+  - topic: Insurance Profit Share and Contingent Profit Commission
+    bdoi: "Official Receipt Type \"Contingent Profit Commission (CPC)\" (FRS.CSH.02.02.02)."
+    brd: "CSHID.002: \"Insurance Profit Share\"."
+    proposal: "Keep CPC as the value of the list and add \"Insurance Profit Share\" if it is a different income; the list is maintained (Appendix H)."
+    impact: "List of OR types."
+    decide_by: "Cashiering Process Owner; Comptrollership"
+  - topic: Owner of MKTID.013 and DBMID.001
+    bdoi: "Mapping rows MKTID.013 and DBMID.001: \"Com rec\" (the Commission Receivable FRS)."
+    brd: "MKTID.013 (Marketing Collection tags and validates the BIR 2307 reversals); DBMID.001 (Disbursement receives the certificates)."
+    proposal: "Specify them in the FRS of Commission Receivables as BDOI maps them, or in the Marketing Collection and Disbursement FRS (BIBS FRS BRD-2 v2.1 FR-OP-113, FR-OP-121); Cashiering keeps the PR 2307 outstanding at payment (FRS.CSH.02.05.13)."
+    impact: "Owner of two BRD IDs."
+    decide_by: "Product Owner; BDO ITG"
+  - topic: Notices by e-mail
+    bdoi: "\"Record will be assigned to Approver/Poster\" (FRS.CSH.02.01.10 and the other submissions); no notice named."
+    brd: "BRD silent."
+    proposal: "The notices of Appendix G are given in the system (bell); the system sends no e-mail of Cashiering today except the failed batch run. An e-mail copy of the approval notices is a point for decision (Appendix S)."
+    impact: "Appendix G; FRS.CSH.10.04."
+    decide_by: "Cashiering Process Owner"
+  - topic: Messages of the system that carry a BRD reference
+    bdoi: "-"
+    brd: "-"
+    proposal: "Some messages of the system end with the BRD ID (for example \"Official receipts are issued by Head Office only (CSHID.006)\", Appendix F); the texts of this FRS are without it. The wording of every message is confirmed through the requirements collection workbook (sheet Messages to confirm) and the system texts aligned."
+    impact: "Appendix F."
+    decide_by: "Cashiering Process Owner"
+  - topic: Bank deposit of the day's collections
+    bdoi: "Daily Cash Reconciliation Reports with Deposit In Bank (FRS.CSH.09.02.10)."
+    brd: "CSHID.023 (report list); no deposit requirement."
+    proposal: "The deposit slip of the day's cash and checks is kept in the Accounting (Receivables) module of BIBS; the Daily Cash Reconciliation report gives the receipts per bank account. Whether the cashier prepares the deposit slip in Cashiering is a point for decision (Appendix S)."
+    impact: "FRS.CSH.02.01.16; FRS.CSH.09.02.10."
+    decide_by: "Cashiering Process Owner; Comptrollership"
+  - topic: Legacy numbers of the migrated accounts
+    bdoi: "Match keys QPS, ISYS, Ebix, PN and Loan Application Number (FRS.CSH.05.01.08)."
+    brd: "CSHID.020."
+    proposal: "The legacy numbers are loaded with the migrated accounts (Appendix P, BRD-13 Data Migration), so that the payments quoting them are matched (FRS.CSH.05.01.08)."
+    impact: "Data migration templates."
+    decide_by: "Data Migration lead; Cashiering Process Owner"
+  - topic: Control totals of the Bills Payment file
+    bdoi: "Sample Billspayment file (Appendix A): header record with record count and total amount."
+    brd: "CSHID.008."
+    proposal: "Check the detail records against the header count and total and refuse a file that differs (FRS.CSH.05.01.06)."
+    impact: "Validation of the file."
+    decide_by: "Cashiering Process Owner; BDOI IT (OBPCS)"
+  - topic: Address and VAT TIN of the forms
+    bdoi: "\"Company Address:\" and \"Company VAT:\" blank (FRS.CSH.02.06.02, 02.06.03); the sample AR gives them."
+    brd: "-"
+    proposal: "Taken from the company record, as on the sample AR (FRS.CSH.02.06.02)."
+    impact: "AR and OR templates."
+    decide_by: "MBS"
+  - topic: Approval and posting times
+    bdoi: "No time given for posting, cancellation, reinstatement or disposition approval."
+    brd: "BRD silent; peak days 15th and 30th."
+    proposal: "Proposed: AR / OR creation records posted the same business day; cancellation and reinstatement records within 1 working day; dispositions within 2 working days; overdue records shown on the dashboard (Appendix J)."
+    impact: "Appendix J; dashboard."
+    decide_by: "Cashiering Process Owner"
+  - topic: Proposals beyond the BRD text
+    bdoi: "-"
+    brd: "-"
+    proposal: "Items added in this version that go beyond the BRD text and are proposals for decision: certificate number convention (FRS.CSH.02.04.07), day-end list (FRS.CSH.02.01.16), copy label kept (FRS.CSH.02.04.17), Done tab (FRS.CSH.06.02.02), five added reports (FRS.CSH.09.02.19 to .23); each is a candidate change in the Change Request Register."
+    impact: "Scope."
+    decide_by: "Product Owner"
+
+# ------------------------------------------------------------------------------------- Appendix V: glossary
+glossary:
+  - ["AC No.", "Acknowledgement certificate number printed on an AR or OR"]
+  - ["Approver/Poster", "The user who posts or returns a creation, cancellation or reinstatement record (Cashiering Team Leader or Team Head, proposed)"]
+  - ["AR", "Acknowledgement Receipt, issued by Cashiering for premium collected on behalf of an insurer and for non-premium payments"]
+  - ["AR Insurance", "Non-premium payment of an insurer received by Cashiering (CSHID.021)"]
+  - ["AR Insurer Refund", "Receivable from an insurer for premium already remitted and later reversed"]
+  - ["AP Unapplied Commission", "Commission payment reversed by the reinstatement of an OR, kept for Commission Receivable"]
+  - ["ARN", "Account Reference Number of a New Business account"]
+  - ["ATP", "BIR Authority to Print of a receipt series"]
+  - ["BIR", "Bureau of Internal Revenue"]
+  - ["BIR 2307", "Certificate of Creditable Tax Withheld at Source given by a client who withholds 2% on the premium"]
+  - ["CLPC", "Consumer Lending Processing Center"]
+  - ["CPC", "Contingent Profit Commission"]
+  - ["CRU", "Commission receivable of BDOI still unpaid on an account"]
+  - ["CWT", "Creditable withholding tax"]
+  - ["Disposition", "The decision on an Unapplied payment record (apply, refund, reclass, transfer, others)"]
+  - ["DST", "Documentary Stamp Tax"]
+  - ["DTIP", "Due To Insurer Provider: premium payable to the insurer"]
+  - ["EOPT", "Ease of Paying Taxes Act (Republic Act 11976)"]
+  - ["EWT", "Expanded withholding tax"]
+  - ["Excess payment", "Payment above the outstanding balance of the account, kept as an Unapplied payment record"]
+  - ["FST", "Fire Service Tax"]
+  - ["HO", "Head Office"]
+  - ["LGT", "Local Government Tax"]
+  - ["MBS", "Marketing Business System team"]
+  - ["MFT", "Managed File Transfer, BDO's file transport"]
+  - ["Minimal balance", "Outstanding balance or excess within the configured threshold, cleared when the payment is processed"]
+  - ["OBPCS", "Online Bills Payment Consolidation System"]
+  - ["OR", "Official Receipt, issued by Head Office for BDOI income"]
+  - ["PDC", "Post-dated check"]
+  - ["PMS", "PDC Management System"]
+  - ["PN", "Promissory Note"]
+  - ["PR", "Premium receivable from the client, held by component"]
+  - ["PR 2307", "The 2% CWT portion of the premium receivable waiting for the client's BIR 2307 certificate"]
+  - ["Pre-booked payment", "A payment matched to an account that is not booked yet"]
+  - ["SOA", "Statement of Account"]
+  - ["TFS", "Trade Finance System"]
+  - ["Unbooked/Unmatched", "A payment that matches no account"]
+  - ["VAT", "Value Added Tax"]

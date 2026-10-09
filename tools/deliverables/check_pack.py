@@ -113,6 +113,9 @@ BUILD_STATUS_ALLOWED: list[tuple[Path, str, re.Pattern, str]] = [
      re.compile(r"subject to further design, build$"),
      "BDOI's Signoff Sheet (template D051) is kept word for word: the Application Owner confirms the requirements "
      "'subject to further design, build and test activities'; every other use of the word stays refused there"),
+    (brand.OUT_DIR / brand.DROPS["Programme"]["folder"] / "BDOI_Template_FRS", "API path", re.compile(r"^/LIM/FIRE$"),
+     "BDOI's Operations Cashiering FRS v3.1 keeps BDOI's Trade payment file sample word for word, whose Remarks read "
+     "'(part of 900,000 /LIM/FIRE)'; every other path stays refused there"),
 ]
 # Technical terms that a business sign-off set does not contain (client decision of 28-Sep-2026). (label, pattern);
 # whole-word and case-insensitive.

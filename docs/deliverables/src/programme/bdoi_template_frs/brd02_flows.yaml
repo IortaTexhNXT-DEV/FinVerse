@@ -1,0 +1,599 @@
+# Figures of the Operations Cashiering FRS in BDOI's template, version 3.2, drawn by brd11_figures.render (Graphviz, PNG
+# at 200 dpi) and placed by build_brd02_bdoi_frs.py.
+# swimlane: lanes (one per persona, system lanes marked system: true) and steps placed in rows (row 0 at the top);
+#   kind task (default), decision, start, end, note, system; edges [from, to, label, style, port].
+# states / context / table: Graphviz dot source; a table takes @HEADER@ and @ROWS@ from header and rows.
+# where: summary (section 1.4), C (Appendix C), E (Appendix E), J (Appendix J), N (Appendix N).
+figures:
+  # ------------------------------------------------------------------------------------------ 1.4 Summary
+  - id: brd02_fig_e2e
+    kind: swimlane
+    where: summary
+    caption: "Operations Cashiering from end to end: from the payment received to the receipt, the application, the unapplied payments and the reports"
+    read: "Read from top to bottom. Each column is a persona; the green column is what the system does by itself. The numbers in brackets are the FR items of section 3."
+    brd: "BRQID.001 to BRQID.007; CSHID.001 to CSHID.025"
+    lanes:
+      - {id: pay, label: Client / payor / bank channel}
+      - {id: cas, label: Cashier}
+      - {id: tl, label: "Approver / Poster"}
+      - {id: sys, label: System, system: true}
+      - {id: mkt, label: Marketing / Comm. Receivable}
+      - {id: oth, label: Disbursement / Remittance}
+    steps:
+      - {id: s0, lane: pay, row: 0, kind: start, text: Payment}
+      - {id: p1, lane: pay, row: 1, text: "Files via MFT or for upload (05.01)"}
+      - {id: y0, lane: sys, row: 1, kind: system, text: "Validate, match, AR for printing (05.01)"}
+      - {id: c1, lane: cas, row: 2, text: "Create AR / OR record, submit for posting (02.01, 02.02)"}
+      - {id: t1, lane: tl, row: 3, text: "Post or return (02.05)"}
+      - {id: y1, lane: sys, row: 4, kind: system, text: "AR / OR number; apply by hierarchy; minimal balance; GL (02.05)"}
+      - {id: y2, lane: sys, row: 5, kind: decision, text: "Fully applied?"}
+      - {id: c2, lane: cas, row: 5, text: "Batch print AR / OR (02.04)"}
+      - {id: m1, lane: mkt, row: 6, text: "Excess, pre-booked, unmatched: disposition (06.01, 06.02)"}
+      - {id: t2, lane: tl, row: 7, text: "Approve disposition"}
+      - {id: o1, lane: oth, row: 7, text: "Refund paid; remittance; automatic OR (07.01)"}
+      - {id: c3, lane: cas, row: 8, text: "Cancellation or reinstatement record (03.01, 04.01)"}
+      - {id: t3, lane: tl, row: 9, text: "Post or return"}
+      - {id: y3, lane: sys, row: 10, kind: system, text: "Inquiry, reports, audit trail (08, 09)"}
+      - {id: e1, lane: sys, row: 11, kind: end, text: Closed}
+    edges:
+      - [s0, p1]
+      - [s0, c1]
+      - [p1, y0, "", "", right]
+      - [c1, t1]
+      - [t1, y1]
+      - [y0, y1]
+      - [y1, y2]
+      - [y2, c2, "Yes", "", left]
+      - [y2, m1, "No", "", right]
+      - [m1, t2, "", "", left]
+      - [t2, o1, "Refund", "", right]
+      - [c2, c3, "", "dashed"]
+      - [c3, t3]
+      - [t3, y3]
+      - [y3, e1]
+
+  # ------------------------------------------------------------------------------------------ Appendix C
+  - id: brd02_fig_ar
+    kind: swimlane
+    where: C
+    caption: "Creation and posting of an Acknowledgement Receipt (premium and non-premium payments)"
+    read: "Read from top to bottom. The AR number is generated only when the Approver/Poster posts the record (BDOI FRS.CSH.02.05.08); the creator never posts his or her own record."
+    brd: "CSHID.001, 006, 014, 015, 016, 020, 021, 022; FRS.CSH.02.01, FRS.CSH.02.05"
+    lanes:
+      - {id: cas, label: Cashier}
+      - {id: sys, label: System, system: true}
+      - {id: tl, label: "Approver / Poster"}
+    steps:
+      - {id: s0, lane: cas, row: 0, kind: start, text: Payment}
+      - {id: c1, lane: cas, row: 1, text: "Create AR: type, entry type, accounts, payment, bank account"}
+      - {id: y1, lane: sys, row: 1, kind: system, text: "Account table: outstanding, PR 2307, excess preview"}
+      - {id: y2, lane: sys, row: 2, kind: decision, text: "Validations pass?"}
+      - {id: y3, lane: sys, row: 3, kind: system, text: "Status Created; record no. CR-AR-n"}
+      - {id: c3, lane: cas, row: 4, text: "Submit for Posting"}
+      - {id: y4, lane: sys, row: 5, kind: system, text: "For Posting; notice to the Approver / Poster"}
+      - {id: t1, lane: tl, row: 6, kind: decision, text: "Post?"}
+      - {id: c4, lane: cas, row: 7, text: "Returned: edit and re-submit"}
+      - {id: y5, lane: sys, row: 7, kind: decision, text: "Series depleted?"}
+      - {id: n1, lane: tl, row: 8, kind: note, text: "Message; status unchanged"}
+      - {id: y6, lane: sys, row: 9, kind: system, text: "AR number of the branch; Issued; apply by hierarchy; minimal balance; excess; GL"}
+      - {id: c5, lane: cas, row: 10, text: "Print the AR (Batch Print)"}
+      - {id: e1, lane: cas, row: 11, kind: end, text: AR issued}
+    edges:
+      - [s0, c1]
+      - [c1, y1, "", "", right]
+      - [y1, y2]
+      - [y2, c1, "No: correct", "dashed", left]
+      - [y2, y3, "Yes"]
+      - [y3, c3, "", "", left]
+      - [c3, y4, "", "", right]
+      - [y4, t1, "", "", right]
+      - [t1, c4, "Return", "", left]
+      - [t1, y5, "Post"]
+      - [y5, n1, "Yes", "", right]
+      - [y5, y6, "No"]
+      - [y6, c5, "", "", left]
+      - [c5, e1]
+
+  - id: brd02_fig_or
+    kind: swimlane
+    where: C
+    caption: "Creation and posting of an Official Receipt, with the Commission Schedule upload and other income"
+    read: "Read from top to bottom. ORs are issued by Head Office only. A Commission Schedule with a failed or unmatched line is not processed (BDOI FRS.CSH.02.02.06, 02.02.09.01; Appendix R, C10)."
+    brd: "CSHID.002, 006, 007, 014; FRS.CSH.02.02, FRS.CSH.02.05.14"
+    lanes:
+      - {id: cas, label: Head Office Cashier}
+      - {id: sys, label: System, system: true}
+      - {id: tl, label: "Approver / Poster"}
+    steps:
+      - {id: s0, lane: cas, row: 0, kind: start, text: Income}
+      - {id: c1, lane: cas, row: 1, kind: decision, text: "Commission Schedule?"}
+      - {id: c2, lane: cas, row: 2, text: "Upload the Commission Schedule files"}
+      - {id: y1, lane: sys, row: 2, kind: system, text: "File checks: .csv pipe, 50 MB, fields, duplicate"}
+      - {id: y2, lane: sys, row: 3, kind: decision, text: "All lines valid and matched?"}
+      - {id: c3, lane: cas, row: 4, text: "Validation report, unmatched list: correct the file"}
+      - {id: c4, lane: cas, row: 5, text: "Create OR: type, insurer, payment, bank account; SOA or fee invoice"}
+      - {id: y3, lane: sys, row: 5, kind: system, text: "Created; Submit for Posting"}
+      - {id: t1, lane: tl, row: 6, kind: decision, text: "Post?"}
+      - {id: y4, lane: sys, row: 7, kind: system, text: "OR number of Head Office; apply; GL; print queue"}
+      - {id: e1, lane: sys, row: 8, kind: end, text: OR issued}
+    edges:
+      - [s0, c1]
+      - [c1, c2, "Yes"]
+      - [c1, c4, "No", "", left]
+      - [c2, y1, "", "", right]
+      - [y1, y2]
+      - [y2, c3, "No", "", left]
+      - [y2, y4, "Yes", "", right]
+      - [c4, y3, "", "", right]
+      - [y3, t1, "", "", right]
+      - [t1, y4, "Post"]
+      - [y4, e1]
+
+  - id: brd02_fig_auto
+    kind: swimlane
+    where: C
+    caption: "Automatic payment processing of the Bills Payment, CLPC, Trade, Direct Credit and post-dated check files"
+    read: "Read from top to bottom. Every row is processed on its own; a failed row never stops the others (BRQID.006). The right-hand column is the Unapplied list."
+    brd: "BRQID.005, 006; CSHID.008, 020, 022; FRS.CSH.05.01"
+    lanes:
+      - {id: src, label: "OBPCS, PMS, bank channels"}
+      - {id: cas, label: Cashier}
+      - {id: sys, label: System (matching and application), system: true}
+      - {id: unp, label: Unapplied list, system: true}
+    steps:
+      - {id: s0, lane: src, row: 0, kind: start, text: Files}
+      - {id: a1, lane: src, row: 1, text: "Bills Payment and PDC files via MFT"}
+      - {id: c1, lane: cas, row: 2, text: "Upload: several files per type"}
+      - {id: y1, lane: sys, row: 2, kind: system, text: "File checks: name, format, size, template, totals, duplicate"}
+      - {id: y2, lane: sys, row: 3, kind: decision, text: "File valid?"}
+      - {id: c2, lane: cas, row: 3, text: "Refused: validation report; alert"}
+      - {id: y3, lane: sys, row: 4, kind: decision, text: "Priority 1: booked account?"}
+      - {id: y4, lane: sys, row: 5, kind: system, text: "Apply by hierarchy; BIR 2307; minimal balance; excess to the Unapplied list"}
+      - {id: u1, lane: unp, row: 5, kind: decision, text: "Priority 2: pre-booked?"}
+      - {id: u3, lane: unp, row: 6, text: "Pre-booked payment: applied when booked"}
+      - {id: u4, lane: unp, row: 7, text: "Unbooked / Unmatched record"}
+      - {id: y5, lane: sys, row: 9, kind: system, text: "AR for printing; run report"}
+      - {id: c3, lane: cas, row: 10, text: "Review the run report; correct and reprocess failed rows"}
+      - {id: e1, lane: cas, row: 11, kind: end, text: Closed}
+    edges:
+      - [s0, a1]
+      - [s0, c1, "", "", right]
+      - [a1, y1, "", "", right]
+      - [c1, y1, "", "", right]
+      - [y1, y2]
+      - [y2, c2, "No", "", left]
+      - [y2, y3, "Yes"]
+      - [y3, y4, "Yes"]
+      - [y3, u1, "No", "", right]
+      - [u1, u3, "Yes", "", left]
+      - [u1, u4, "No", "", right]
+      - [y4, y5]
+      - [y5, c3, "", "", left]
+      - [c3, e1]
+
+  - id: brd02_fig_cancel
+    kind: swimlane
+    where: C
+    caption: "Cancellation of an AR or OR: record, posting and reversal"
+    read: "Read from top to bottom. The right-hand column shows what the posting creates in each case (remitted AR, AR not remitted, OR); the GL reversal entries are in Appendix I."
+    brd: "CSHID.001, 002, 003, 012; FRS.CSH.03.01"
+    lanes:
+      - {id: cas, label: Cashier}
+      - {id: tl, label: "Approver / Poster"}
+      - {id: sys, label: System, system: true}
+      - {id: rec, label: Records created, system: true}
+    steps:
+      - {id: s0, lane: cas, row: 0, kind: start, text: Start}
+      - {id: c1, lane: cas, row: 1, text: "Search issued AR or OR; select; reason"}
+      - {id: y1, lane: sys, row: 2, kind: decision, text: "Validations pass?"}
+      - {id: y2, lane: sys, row: 3, kind: system, text: "Created: CN-AR / CN-OR record"}
+      - {id: c3, lane: cas, row: 4, text: "Submit for Posting"}
+      - {id: t1, lane: tl, row: 5, kind: decision, text: "Post?"}
+      - {id: c4, lane: cas, row: 6, text: "Returned: edit and re-submit"}
+      - {id: y3, lane: sys, row: 6, kind: decision, text: "AR or OR? AR remitted?"}
+      - {id: r1, lane: rec, row: 7, text: "AR remitted: AR Insurer Refund per account and insurer"}
+      - {id: r2, lane: rec, row: 8, text: "AR not remitted: PR and DTIP reversed; account outstanding"}
+      - {id: r3, lane: rec, row: 9, text: "OR: re-class to Commission Receivable; CRU reversed"}
+      - {id: y4, lane: sys, row: 10, kind: system, text: "AR / OR number Cancelled; GL reversal"}
+      - {id: e1, lane: sys, row: 11, kind: end, text: Cancelled}
+    edges:
+      - [s0, c1]
+      - [c1, y1, "", "", right]
+      - [y1, c1, "No", "dashed", left]
+      - [y1, y2, "Yes"]
+      - [y2, c3, "", "", left]
+      - [c3, t1, "", "", right]
+      - [t1, c4, "Return", "", left]
+      - [t1, y3, "Post", "", right]
+      - [y3, r1, "", "", right]
+      - [r1, r2, "or", "dashed"]
+      - [r2, r3, "or", "dashed"]
+      - [y3, y4]
+      - [y4, e1]
+
+  - id: brd02_fig_reinstate
+    kind: swimlane
+    where: C
+    caption: "Reinstatement of an AR or OR: partial or full, remitted or not remitted"
+    read: "Read from top to bottom. The receipt stays Issued; the reversed payment becomes an Unapplied, AR Insurer Refund or AP Unapplied Commission record (BDOI FRS.CSH.04.01.09)."
+    brd: "CSHID.001, 002, 004, 005, 013; FRS.CSH.04.01"
+    lanes:
+      - {id: cas, label: Cashier}
+      - {id: tl, label: "Approver / Poster"}
+      - {id: sys, label: System, system: true}
+      - {id: rec, label: Records created, system: true}
+    steps:
+      - {id: s0, lane: cas, row: 0, kind: start, text: Start}
+      - {id: c1, lane: cas, row: 1, text: "Search issued AR or OR; Partial (AR) or Full; accounts; reason; CSHID.005 information"}
+      - {id: y1, lane: sys, row: 2, kind: decision, text: "Validations pass?"}
+      - {id: y2, lane: sys, row: 3, kind: system, text: "Created: RE-AR / RE-OR record"}
+      - {id: c3, lane: cas, row: 4, text: "Submit for Posting"}
+      - {id: t1, lane: tl, row: 5, kind: decision, text: "Post?"}
+      - {id: c4, lane: cas, row: 6, text: "Returned: edit and re-submit"}
+      - {id: y3, lane: sys, row: 6, kind: decision, text: "AR or OR? AR remitted?"}
+      - {id: r1, lane: rec, row: 7, text: "AR remitted: AR Insurer Refund; remittance status reversed"}
+      - {id: r2, lane: rec, row: 8, text: "AR not remitted: Unapplied payment per account"}
+      - {id: r3, lane: rec, row: 9, text: "OR: AP Unapplied Commission per account and insurer"}
+      - {id: y4, lane: sys, row: 10, kind: system, text: "AR / OR stays Issued; GL; record AR/OR Reinstated"}
+      - {id: e1, lane: sys, row: 11, kind: end, text: Reinstated}
+    edges:
+      - [s0, c1]
+      - [c1, y1, "", "", right]
+      - [y1, c1, "No", "dashed", left]
+      - [y1, y2, "Yes"]
+      - [y2, c3, "", "", left]
+      - [c3, t1, "", "", right]
+      - [t1, c4, "Return", "", left]
+      - [t1, y3, "Post", "", right]
+      - [y3, r1, "", "", right]
+      - [r1, r2, "or", "dashed"]
+      - [r2, r3, "or", "dashed"]
+      - [y3, y4]
+      - [y4, e1]
+
+  - id: brd02_fig_unapplied
+    kind: swimlane
+    where: C
+    caption: "Unapplied payments: disposition, approval, refund and reversal"
+    read: "Read from top to bottom. The tabs of the Unapplied list follow the record: Unapplied, Monitoring, For Approval, For Reversal and Done."
+    brd: "CSHID.016, 024, 025; FRS.CSH.06.01, FRS.CSH.06.02"
+    lanes:
+      - {id: src, label: "Sources: excess, unmatched, reversals"}
+      - {id: cas, label: "Cashier / Marketing"}
+      - {id: tl, label: "Cashiering TL (Team approval)"}
+      - {id: sys, label: System, system: true}
+      - {id: dsb, label: Disbursement}
+    steps:
+      - {id: s0, lane: src, row: 0, kind: start, text: Start}
+      - {id: y1, lane: sys, row: 1, kind: system, text: "Unapplied payment record (tab Unapplied)"}
+      - {id: c1, lane: cas, row: 2, text: "Assign disposition: type, amount, target (tab Monitoring)"}
+      - {id: c2, lane: cas, row: 3, kind: decision, text: "Needs approval?"}
+      - {id: c3, lane: cas, row: 4, text: "Submit (tab For Approval)"}
+      - {id: t1, lane: tl, row: 5, kind: decision, text: "Approve?"}
+      - {id: t2, lane: tl, row: 6, text: "Return to Monitoring with reason"}
+      - {id: y2, lane: sys, row: 7, kind: system, text: "Apply, DST, reclass, transfer, others; Done"}
+      - {id: d1, lane: dsb, row: 8, text: "Refund request paid"}
+      - {id: c4, lane: cas, row: 9, text: "Mark for reversal with reason (tab For Reversal)"}
+      - {id: t3, lane: tl, row: 10, text: "Approve or reject the reversal"}
+      - {id: e1, lane: sys, row: 11, kind: end, text: Done}
+    edges:
+      - [s0, y1, "", "", right]
+      - [y1, c1, "", "", left]
+      - [c1, c2]
+      - [c2, y2, "No: execute at once", "", right]
+      - [c2, c3, "Yes"]
+      - [c3, t1, "", "", right]
+      - [t1, t2, "No"]
+      - [t1, y2, "Yes", "", right]
+      - [y2, d1, "Refund", "", right]
+      - [y2, c4, "", "dashed", left]
+      - [c4, t3, "", "", right]
+      - [t3, e1, "", "", right]
+
+  - id: brd02_fig_pdc
+    kind: swimlane
+    where: C
+    caption: "Post-dated checks: warehouse, release before maturity and maturity"
+    read: "Read from top to bottom. A post-dated check is not matched before its maturity (CSHID.020)."
+    brd: "CSHID.008, 020; FRS.CSH.05.01.04, FRS.CSH.05.02"
+    lanes:
+      - {id: src, label: "Client / PMS"}
+      - {id: cas, label: Cashier}
+      - {id: sys, label: System, system: true}
+    steps:
+      - {id: s0, lane: src, row: 0, kind: start, text: Checks}
+      - {id: a1, lane: src, row: 1, text: "Matured checks of PMS via MFT: processed as payments (05.01)"}
+      - {id: c1, lane: cas, row: 2, text: "Add a check or upload the PDC list"}
+      - {id: y1, lane: sys, row: 3, kind: decision, text: "Already in the warehouse?"}
+      - {id: c2, lane: cas, row: 4, text: "Refused: check already in the warehouse"}
+      - {id: y2, lane: sys, row: 5, kind: system, text: "Warehoused with its PDC warehouse number"}
+      - {id: c3, lane: cas, row: 6, kind: decision, text: "Released before maturity?"}
+      - {id: c4, lane: cas, row: 7, text: "Returned, Replaced or Pulled Out with reason"}
+      - {id: y3, lane: sys, row: 8, kind: system, text: "Maturity run 08:30: payment, AR, matching and application"}
+      - {id: e1, lane: sys, row: 9, kind: end, text: Applied}
+    edges:
+      - [s0, a1]
+      - [s0, c1, "", "", right]
+      - [c1, y1, "", "", right]
+      - [y1, c2, "Yes", "", left]
+      - [y1, y2, "No"]
+      - [y2, c3, "", "", left]
+      - [c3, c4, "Yes"]
+      - [c3, y3, "No", "", right]
+      - [y3, e1]
+
+  - id: brd02_fig_print
+    kind: swimlane
+    where: C
+    caption: "Batch printing and re-printing of ARs and ORs"
+    read: "Read from top to bottom. The certificate number is assigned per printed receipt; every print after the first carries REPRINT."
+    brd: "CSHID.019; FRS.CSH.02.04"
+    lanes:
+      - {id: cas, label: Cashier}
+      - {id: sys, label: System, system: true}
+    steps:
+      - {id: s0, lane: cas, row: 0, kind: start, text: Start}
+      - {id: c1, lane: cas, row: 1, text: "Filter: branch and dates (AR); insurer and dates (OR); number (re-print)"}
+      - {id: y1, lane: sys, row: 2, kind: system, text: "List with print queue of system ARs and ORs; select up to 500"}
+      - {id: c2, lane: cas, row: 3, kind: decision, text: "Download or print?"}
+      - {id: y2, lane: sys, row: 4, kind: system, text: "ZIP of PDFs <Receipt Type>_<Receipt Number>.pdf"}
+      - {id: c3, lane: cas, row: 5, text: "Print preview of each document"}
+      - {id: y3, lane: sys, row: 6, kind: system, text: "Print queue; certificate number; REPRINT after the first print"}
+      - {id: c4, lane: cas, row: 7, kind: decision, text: "Printer error?"}
+      - {id: c5, lane: cas, row: 8, text: "Retry or Skip"}
+      - {id: y4, lane: sys, row: 9, kind: system, text: "Print log: user, time, count, re-print count"}
+      - {id: e1, lane: sys, row: 10, kind: end, text: Printed}
+    edges:
+      - [s0, c1]
+      - [c1, y1, "", "", right]
+      - [y1, c2, "", "", left]
+      - [c2, y2, "Download", "", right]
+      - [c2, c3, "Print"]
+      - [c3, y3, "", "", right]
+      - [y3, c4, "", "", left]
+      - [c4, c5, "Yes"]
+      - [c4, y4, "No", "", right]
+      - [c5, y4, "", "", right]
+      - [y4, e1]
+
+  - id: brd02_fig_autoor
+    kind: swimlane
+    where: C
+    caption: "Automatic generation of the OR of an insurer settlement"
+    read: "Read from top to bottom. The OR is generated once Disbursement approves the settlement (BDOI FRS.CSH.07.01.01; Appendix R, C12)."
+    brd: "CSHID.007; FRS.CSH.07.01"
+    lanes:
+      - {id: dsb, label: Disbursement}
+      - {id: sys, label: System, system: true}
+      - {id: cas, label: Head Office Cashier}
+    steps:
+      - {id: s0, lane: dsb, row: 0, kind: start, text: Settlement}
+      - {id: d1, lane: dsb, row: 1, text: "Approve the settlement"}
+      - {id: y1, lane: sys, row: 2, kind: system, text: "One OR per insurer or payee per batch, Head Office series"}
+      - {id: y2, lane: sys, row: 3, kind: system, text: "Lines per account: commission, VAT, withholding tax"}
+      - {id: y3, lane: sys, row: 4, kind: system, text: "GL; OR in the print queue (For Printing)"}
+      - {id: c1, lane: cas, row: 5, text: "Print the OR (Batch Print)"}
+      - {id: e1, lane: cas, row: 6, kind: end, text: OR issued}
+    edges:
+      - [s0, d1]
+      - [d1, y1, "", "", right]
+      - [y1, y2]
+      - [y2, y3]
+      - [y3, c1, "", "", right]
+      - [c1, e1]
+
+  - id: brd02_fig_series
+    kind: swimlane
+    where: C
+    caption: "AR and OR number series: maintenance, authorisation, numbering and depletion"
+    read: "Read from top to bottom. A series is usable only when another authorised user authorises it."
+    brd: "CSHID.006, 015; FRS.CSH.02.03, FRS.CSH.02.05.08, FRS.CSH.02.05.09"
+    lanes:
+      - {id: m, label: "Cashiering TL (maker)"}
+      - {id: k, label: "Cashiering TL (checker)"}
+      - {id: sys, label: System, system: true}
+    steps:
+      - {id: s0, lane: m, row: 0, kind: start, text: Start}
+      - {id: m1, lane: m, row: 1, text: "Maintain series: branch, kind, prefix, start, end, year, ATP, warning level"}
+      - {id: k1, lane: k, row: 2, kind: decision, text: "Authorise?"}
+      - {id: m2, lane: m, row: 3, text: "Correct the series"}
+      - {id: y1, lane: sys, row: 3, kind: system, text: "Series usable"}
+      - {id: y2, lane: sys, row: 4, kind: system, text: "Each posting takes the next number"}
+      - {id: y3, lane: sys, row: 5, kind: decision, text: "At warning level?"}
+      - {id: k2, lane: k, row: 6, text: "Alert: numbers left"}
+      - {id: y4, lane: sys, row: 7, kind: decision, text: "Depleted?"}
+      - {id: n1, lane: k, row: 8, kind: note, text: "Message: series depleted. Contact your Administrator."}
+      - {id: e1, lane: sys, row: 9, kind: end, text: Issued}
+    edges:
+      - [s0, m1]
+      - [m1, k1, "", "", right]
+      - [k1, m2, "No", "", left]
+      - [k1, y1, "Yes", "", right]
+      - [y1, y2]
+      - [y2, y3]
+      - [y3, k2, "Yes", "", left]
+      - [y3, y4, "No"]
+      - [y4, n1, "Yes", "", left]
+      - [y4, e1, "No"]
+
+  - id: brd02_fig_states_records
+    kind: states
+    where: C
+    caption: "Status life-cycle of the AR / OR creation, cancellation and reinstatement records"
+    read: "Each box is a status of BDOI's FRS; each arrow is an action with the persona who takes it. Grey boxes are final. The cancellation and reinstatement records follow the same statuses and end in AR/OR Cancelled or AR/OR Reinstated."
+    brd: "CSHID.001 to CSHID.005; FRS.CSH.02.01, 02.05, 03.01, 04.01"
+    dot: |
+      digraph R {
+        graph [rankdir=LR, nodesep=0.3, ranksep=0.45, fontname="Arial", pad=0.15, size="9.4,6"];
+        node [fontname="Arial", fontsize=10, shape=box, style="rounded,filled", fillcolor="#EAF1FB", color="#1F3864", margin="0.12,0.06"];
+        edge [fontname="Arial", fontsize=8.5, color="#404040", arrowsize=0.7];
+        new [label="(new)", shape=circle, fillcolor="#C6E0B4", width=0.5, fixedsize=true];
+        cre [label="Created"]; fp [label="For Posting"]; ret [label="Returned"];
+        iss [label="AR/OR Issued\n(cancellation: AR/OR Cancelled;\nreinstatement: AR/OR Reinstated)", fillcolor="#D9D9D9"];
+        can [label="Record Cancelled", fillcolor="#D9D9D9"];
+        new -> cre [label="Save\n(Cashier)"];
+        cre -> cre [label="Edit"];
+        cre -> fp [label="Submit for\nPosting"];
+        cre -> can [label="Cancel\n(creator)"];
+        fp -> iss [label="Post\n(Approver / Poster,\nnot the creator)"];
+        fp -> ret [label="Return\n(reason)"];
+        ret -> fp [label="Edit and\nre-submit"];
+        fp -> fp [label="Series depleted:\nunchanged"];
+      }
+
+  - id: brd02_fig_states_receipts
+    kind: states
+    where: C
+    caption: "Status life-cycle of the AR / OR number and of a payment record of a file"
+    read: "Top: the status of an AR or OR number. Bottom: the record status of a payment of a file after matching (BDOI FRS.CSH.05.01.08 to .10)."
+    brd: "CSHID.006, 008, 019, 020; FRS.CSH.02.05, 03.01, 05.01"
+    dot: |
+      digraph N {
+        graph [rankdir=LR, nodesep=0.3, ranksep=0.5, fontname="Arial", pad=0.15];
+        node [fontname="Arial", fontsize=10, shape=box, style="rounded,filled", fillcolor="#EAF1FB", color="#1F3864", margin="0.12,0.06"];
+        edge [fontname="Arial", fontsize=8.5, color="#404040", arrowsize=0.7];
+        subgraph cluster_n { label="AR / OR number"; fontname="Arial"; fontsize=10; color="#8EA9DB";
+          n0 [label="(posted)", shape=circle, fillcolor="#C6E0B4", width=0.6, fixedsize=true];
+          fpr [label="For Printing\n(system-generated)"]; iss [label="Issued"]; canc [label="Cancelled", fillcolor="#D9D9D9"];
+          n0 -> iss [label="Manual AR / OR\nposted"]; n0 -> fpr [label="Upload, PDC,\nautomatic OR"];
+          fpr -> iss [label="Printed"]; iss -> iss [label="Re-print;\nreinstatement"];
+          iss -> canc [label="Cancellation\nposted"];
+        }
+        subgraph cluster_p { label="Payment record of a file"; fontname="Arial"; fontsize=10; color="#8EA9DB";
+          p0 [label="(row read)", shape=circle, fillcolor="#C6E0B4", width=0.6, fixedsize=true];
+          app [label="Applied Payment", fillcolor="#D9D9D9"]; exc [label="Excess Payment"]; pre [label="Matched on\nPre-booked"];
+          unb [label="Unbooked /\nUnmatched"]; fail [label="Failed / Invalid /\nDuplicate", fillcolor="#D9D9D9"];
+          p0 -> app [label="Priority 1"]; p0 -> exc [label="paid above\noutstanding"]; p0 -> pre [label="Priority 2"];
+          p0 -> unb [label="no match"]; p0 -> fail [label="row check\nfailed"];
+          pre -> app [label="account booked\n(no new AR)"]; unb -> app [label="re-matched or\nDirect Credit"];
+        }
+      }
+
+  - id: brd02_fig_states_unapplied
+    kind: states
+    where: C
+    caption: "Status life-cycle of an Unapplied payment record and of a post-dated check"
+    read: "Top: the tabs of the Unapplied list (BDOI FRS.CSH.06.02.02, with Done added). Bottom: the statuses of a check in the warehouse."
+    brd: "CSHID.008, 024, 025; FRS.CSH.05.02, FRS.CSH.06.02"
+    dot: |
+      digraph U {
+        graph [rankdir=LR, nodesep=0.3, ranksep=0.5, fontname="Arial", pad=0.15];
+        node [fontname="Arial", fontsize=10, shape=box, style="rounded,filled", fillcolor="#EAF1FB", color="#1F3864", margin="0.12,0.06"];
+        edge [fontname="Arial", fontsize=8.5, color="#404040", arrowsize=0.7];
+        subgraph cluster_u { label="Unapplied payment record"; fontname="Arial"; fontsize=10; color="#8EA9DB";
+          u0 [label="(created)", shape=circle, fillcolor="#C6E0B4", width=0.6, fixedsize=true];
+          un [label="Unapplied"]; mo [label="Monitoring"]; fa [label="For Approval"]; done [label="Done", fillcolor="#D9D9D9"]; fr [label="For Reversal"];
+          u0 -> un; un -> mo [label="Assign\ndisposition"]; mo -> un [label="Withdraw"];
+          mo -> fa [label="Submit"]; mo -> done [label="Process\n(no approval)"];
+          fa -> done [label="Approve\n(Team)"]; fa -> mo [label="Return"];
+          done -> fr [label="Mark for\nreversal"]; fr -> un [label="Reversal\napproved"]; fr -> done [label="Rejected"];
+          done -> un [label="Partial: balance\nleft"];
+        }
+        subgraph cluster_c { label="Post-dated check"; fontname="Arial"; fontsize=10; color="#8EA9DB";
+          c0 [label="(received)", shape=circle, fillcolor="#C6E0B4", width=0.6, fixedsize=true];
+          wh [label="Warehoused"]; ap [label="Applied", fillcolor="#D9D9D9"]; rl [label="Returned / Replaced /\nPulled Out", fillcolor="#D9D9D9"];
+          c0 -> wh [label="Add or upload"]; wh -> ap [label="Maturity run"]; wh -> rl [label="Release\n(reason)"];
+        }
+      }
+
+  # ------------------------------------------------------------------------------------------ Appendix E
+  - id: brd02_fig_menus
+    kind: table
+    where: E
+    caption: "Menu by persona: the Cashiering screens each persona sees"
+    read: "A tick means the screen is in the persona's menu; a screen without a tick is neither shown nor opened by its address. The full menus of every persona are in the BIBS sign-off workbook of BRD-02."
+    brd: "BRQID.002, BRQID.003; FRS.CSH.01.02, FRS.CSH.01.03"
+    header: ["Menu entry", "Cashier", "Cashiering|TL / TH", "Marketing|Collection", "Commission|Receivable", "Comptroller-|ship", "Disburse-|ment", "System|Admin.", "Auditor"]
+    tick: true
+    dot: |
+      digraph M {
+        graph [pad=0.1];
+        node [shape=plaintext, fontname="Arial", fontsize=9];
+        m [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4" COLOR="#8EA9DB">
+          @HEADER@
+          @ROWS@
+        </TABLE>>];
+      }
+    # the rows are read from the sign-off workbook of BRD-02 (sheet Menu by persona) for these screens and personas
+    menu_screens: ["Operations › Operations › Operations Home", "Operations › Operations › Invoice Search",
+                   "Finance › Cashiering › Cashiering Workbench", "Finance › Cashiering › Receive Payment",
+                   "Finance › Cashiering › Receipts", "Finance › Cashiering › Unapplied Payments",
+                   "Finance › Cashiering › Incoming Requests", "Finance › Cashiering › Pre-booked Payments",
+                   "Finance › Cashiering › Payment Uploads", "Finance › Cashiering › PDC Warehouse",
+                   "Finance › Cashiering › Batch Print", "Finance › Cashiering › Commission ORs",
+                   "Finance › Cashiering › Receipt Series", "Finance › Cashiering › Cashiering Setup",
+                   "Operations › Operations › Disbursement Queue", "Operations › Operations › Interfaces",
+                   "Operations › Operations › Report Archive", "Reports › Reports › Report Centre",
+                   "Operations › Operations › Notification Settings"]
+    menu_personas: ["Cashier", "Cashiering Team Leader / Head", "Marketing Collection",
+                    "Commission Receivables Handler", "Comptrollership", "Disbursement", "System Administrator",
+                    "Auditor"]
+    rows: []
+
+  # ------------------------------------------------------------------------------------------ Appendix J
+  - id: brd02_fig_approvals
+    kind: table
+    where: J
+    caption: "Who makes, who checks and who approves each Cashiering record"
+    read: "Each row is a kind of record, read from left to right: the maker, the checker or approver and what the system then does. No one posts or approves his or her own record."
+    brd: "CSHID.001 to 006, 015, 024, 025; FRS.OPS.002.05"
+    header: ["Record", "Maker", "Checker / approver", "Then the system"]
+    tick: false
+    dot: |
+      digraph T {
+        graph [pad=0.1];
+        node [shape=plaintext, fontname="Arial", fontsize=9];
+        m [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="5" COLOR="#8EA9DB">
+          @HEADER@
+          @ROWS@
+        </TABLE>>];
+      }
+    rows:
+      - ["AR creation record", "Cashier (HO or branch)", "Approver / Poster (Cashiering TL / TH)", "AR number, application, GL"]
+      - ["OR creation record", "Head Office Cashier", "Approver / Poster of Head Office", "OR number, application, GL"]
+      - ["Commission Schedule", "Head Office Cashier (upload)", "Approver / Poster (OR posting)", "One OR per insurer / payee"]
+      - ["Cancellation record", "Cashier", "Approver / Poster", "AR / OR Cancelled; reversal; GL"]
+      - ["Reinstatement record", "Cashier", "Approver / Poster", "Unapplied or refund record; GL"]
+      - ["Disposition needing approval", "Cashier or Marketing", "Cashiering TL (Team approval)", "Disposition executed; refund to Disbursement"]
+      - ["Reversal of a disposition", "Cashier", "Cashiering TL", "Disposition reversed"]
+      - ["Payment reversal request", "Accounting Controls", "Cashiering TL", "Payment reversed"]
+      - ["Receipt series", "Cashiering TL (maker)", "Another Cashiering TL (checker)", "Series usable"]
+      - ["AR / OR template", "MBS (maker)", "Another authorised MBS user", "Template in effect"]
+      - ["Automatic OR", "Disbursement (settlement approval)", "-", "OR generated, print queue"]
+
+  # ------------------------------------------------------------------------------------------ Appendix N
+  - id: brd02_fig_context
+    kind: context
+    where: N
+    caption: "Integration context of Operations Cashiering"
+    read: "Solid lines are in scope; dashed lines are by upload until a transfer is agreed; the detail of each interface is in the table below."
+    brd: "BRQID.004, BRQID.005; FRS.CSH.10.01, FRS.CSH.10.02"
+    dot: |
+      digraph C {
+        graph [layout=dot, rankdir=LR, nodesep=0.3, ranksep=0.8, fontname="Arial", pad=0.15];
+        node [fontname="Arial", fontsize=10, shape=box, style="rounded,filled", fillcolor="#FFFFFF", color="#1F3864", margin="0.14,0.07"];
+        edge [fontname="Arial", fontsize=8.5, color="#404040", arrowsize=0.7];
+        csh [label="BIBS\nOperations Cashiering\n(AR, OR, application,\nunapplied, reports)", fillcolor="#1F3864", fontcolor="white", fontsize=11];
+        obp [label="OBPCS\n(bills payment)", fillcolor="#EAF1FB"];
+        pms [label="PMS\n(post-dated checks)", fillcolor="#EAF1FB"];
+        chn [label="TFS (Trade), Direct Credit,\nCLPC files", fillcolor="#F2F2F2"];
+        nb [label="BIBS New Business\n(booked accounts,\npayment gate)", fillcolor="#E2EFDA"];
+        col [label="BIBS Collections\n(requests, commission\npayment details)", fillcolor="#E2EFDA"];
+        dsb [label="BIBS Disbursement\n(refunds, settlements)", fillcolor="#E2EFDA"];
+        rem [label="BIBS Remittance", fillcolor="#E2EFDA"];
+        acc [label="BIBS Accounting\n(journals, exchange rates)", fillcolor="#E2EFDA"];
+        mkt [label="Marketing Collection /\nCommission Receivable\n(PR 2307, AP Unapplied\nCommission)", fillcolor="#E2EFDA"];
+        dm [label="BRD-13 Data Migration\n(open accounts, legacy\nnumbers, unapplied)", fillcolor="#E2EFDA"];
+        obp -> csh [label="MFT"];
+        pms -> csh [label="MFT"];
+        chn -> csh [label="upload", style=dashed];
+        nb -> csh [label="booked accounts"]; csh -> nb [label="payment confirmation"];
+        col -> csh [label="requests"];
+        csh -> dsb [label="refund requests"]; dsb -> csh [label="status; settlement\napproved: automatic OR"];
+        csh -> rem [label="paid premium"]; rem -> csh [label="remittance status"];
+        csh -> acc [label="journals"]; acc -> csh [label="rates"];
+        csh -> mkt [label="unapplied records"];
+        dm -> csh [label="go-live load"];
+      }

@@ -13,7 +13,9 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { AuthorizeButton, SelectField, TextField } from './MasterControls';
+import { AuthorizeButton, CheckField, SelectField, TextField } from './MasterControls';
+import { exemptionLabel, withholdingLabel } from './taxDisplay';
+import { formatDate } from '@/utils/format';
 import { awaitsOtherChecker } from '@/utils/makerChecker';
 
 const PAYEE_CLASSES: readonly PayeeClass[] = ['CORPORATE', 'INDIVIDUAL'];
@@ -23,7 +25,8 @@ type Form = Partial<PartyTaxProfileRequest> & { id?: number };
 
 /**
  * Tax profiles of business partners: TIN and branch code, registered name (name parts for
- * individuals), VAT treatment and the default ATC of their income payments.
+ * individuals), VAT treatment, the default ATC of their income payments, the withholding status
+ * (withholding agent, top withholding agent, government payor) and the tax exemption certificate.
  */
 export default function PartyProfilesPage() {
   const companyId = useCompanyId();
@@ -68,7 +71,7 @@ export default function PartyProfilesPage() {
       <PageHeader
         section="Tax & Statutory"
         title="Party Tax Profiles"
-        description="TIN, registered name, VAT treatment and default ATC of suppliers, agents, brokers and customers."
+        description="TIN, registered name, VAT treatment, default ATC, withholding status and tax exemption certificate of suppliers, agents, brokers and customers."
         actions={
           can('TAX_MANAGE') && (
             <Button
@@ -96,6 +99,12 @@ export default function PartyProfilesPage() {
             { key: 'p', header: 'Payee', render: (p) => p.payeeClass },
             { key: 'v', header: 'VAT', render: (p) => p.vatTreatment },
             { key: 'a', header: 'Default ATC', render: (p) => p.defaultAtcCode ?? '' },
+            { key: 'w', header: 'Withholding', render: (p) => withholdingLabel(p) },
+            {
+              key: 'e',
+              header: 'Exemption Certificate',
+              render: (p) => exemptionLabel(p, formatDate),
+            },
             { key: 's', header: 'Status', render: (p) => <StatusBadge status={p.recordStatus} /> },
             {
               key: 'x',
@@ -199,6 +208,38 @@ export default function PartyProfilesPage() {
               options={atcs}
               allowEmpty
               onChange={(v) => set({ defaultAtcCode: v })}
+            />
+            <CheckField
+              label="Withholding agent"
+              checked={form.withholdingAgent}
+              onChange={(v) => set({ withholdingAgent: v })}
+            />
+            <CheckField
+              label="Top withholding agent"
+              checked={form.topWithholdingAgent}
+              onChange={(v) => set({ topWithholdingAgent: v })}
+            />
+            <CheckField
+              label="Government payor (final VAT and final tax withheld)"
+              checked={form.governmentPayor}
+              onChange={(v) => set({ governmentPayor: v })}
+            />
+            <TextField
+              label="Tax exemption certificate no."
+              value={form.exemptionCertificateNo}
+              onChange={(v) => set({ exemptionCertificateNo: v })}
+            />
+            <TextField
+              label="Certificate valid from"
+              type="date"
+              value={form.exemptionValidFrom}
+              onChange={(v) => set({ exemptionValidFrom: v })}
+            />
+            <TextField
+              label="Certificate valid to"
+              type="date"
+              value={form.exemptionValidTo}
+              onChange={(v) => set({ exemptionValidTo: v })}
             />
           </div>
         )}

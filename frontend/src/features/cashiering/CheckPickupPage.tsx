@@ -16,7 +16,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate, formatDateTime } from '@/utils/format';
+import { countOf, formatDate, formatDateTime } from '@/utils/format';
 import { TextField } from './CashFields';
 import { cashieringApi } from './cashieringApi';
 import type { Pickup, PickupStatus, PrintBatch } from './cashieringApi';
@@ -64,7 +64,7 @@ export default function CheckPickupPage() {
     mutationFn: () => cashieringApi.printPickups(companyId, selection.keys.map(Number)),
     onSuccess: async (b) => {
       setBatch(b);
-      await done(`${b.batchNo}: ${b.printedCount} AR(s) printed, ${b.failedCount} failed`);
+      await done(`${b.batchNo}: ${countOf(b.printedCount, 'AR')} printed, ${b.failedCount} failed`);
     },
   });
   const act = useMutation({

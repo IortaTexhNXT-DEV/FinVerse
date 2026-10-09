@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { useToast } from '@/components/ui/toastContext';
-import { formatDate, formatDateTime, humanize } from '@/utils/format';
+import { countOf, formatDate, formatDateTime, humanize } from '@/utils/format';
 import type { Claim } from '../record/api';
 import type { InsurerLine, InsurerUpdate, NewInsurerLine, NewUpdate } from './api';
 import { insurerApi } from './api';
@@ -63,7 +63,7 @@ function UpdatesTable({ updates }: Readonly<{ updates: InsurerUpdate[] }>) {
               {u.remarks}
               {u.correctsUpdateId !== undefined && <span className="muted"> (correction)</span>}
               {u.attachmentIds.length > 0 && (
-                <span className="muted"> · {u.attachmentIds.length} document(s)</span>
+                <span className="muted"> · {countOf(u.attachmentIds.length, 'document')}</span>
               )}
             </span>
           ),

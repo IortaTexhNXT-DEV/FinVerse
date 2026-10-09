@@ -8,7 +8,6 @@ import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.tax.domain.TaxCode;
 import com.iortatechnxt.brokerverse.tax.domain.TaxCodeRepository;
-import com.iortatechnxt.brokerverse.tax.domain.TaxType;
 import java.time.Clock;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -120,7 +119,7 @@ public class TaxCodeService {
 
   private void apply(TaxCode code, TaxCodeCommand c) {
     String atc = TaxMasterSupport.blankToNull(c.atc());
-    if (c.taxType() == TaxType.EWT && atc == null) {
+    if (c.taxType() != null && c.taxType().needsAtc() && atc == null) {
       throw new BusinessRuleException(
           "ATC_REQUIRED", "A withholding tax code needs its alphanumeric tax code (ATC)");
     }

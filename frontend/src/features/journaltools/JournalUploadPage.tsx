@@ -20,6 +20,7 @@ import { checkUploadFile, invalidRows, previewCsv, summarize } from './uploadHel
 import type { CsvPreview } from './uploadHelpers';
 import { FileDropZone } from '@/components/ui/FileDropZone';
 import { Notice } from '@/components/ui/Notice';
+import { countOf } from '@/utils/format';
 
 type Mode = 'VALIDATE' | 'IMPORT';
 
@@ -28,7 +29,7 @@ function PreviewTable({ preview }: Readonly<{ preview: CsvPreview }>) {
     <Card title={`Preview – first ${preview.rows.length} of ${preview.totalRows} rows`} flush>
       {preview.missingColumns.length > 0 && (
         <Notice tone="warning" role="alert">
-          Missing required column(s): {preview.missingColumns.join(', ')}
+          Missing required columns: {preview.missingColumns.join(', ')}
         </Notice>
       )}
       <div className="table-wrap">
@@ -64,11 +65,12 @@ function ResultTables({ result }: Readonly<{ result: UploadResult }>) {
         tone={tone}
         title={
           result.committed
-            ? `${s.created} of ${s.vouchers} voucher(s) created as drafts (upload ${result.uploadReference ?? ''})`
-            : `${s.valid} of ${s.vouchers} voucher(s) are valid. Nothing has been created yet`
+            ? `${s.created} of ${countOf(s.vouchers, 'voucher')} created as drafts (upload ${result.uploadReference ?? ''})`
+            : `${s.valid} of ${countOf(s.vouchers, 'voucher')} are valid. Nothing has been created yet`
         }
       >
-        {s.rejected > 0 && `${s.rejected} voucher(s) rejected; ${s.rowErrors} row(s) with errors.`}
+        {s.rejected > 0 &&
+          `${countOf(s.rejected, 'voucher')} rejected; ${countOf(s.rowErrors, 'row')} with errors.`}
       </Notice>
       <Card title="Vouchers" flush>
         <DataTable<VoucherResult>
@@ -133,7 +135,7 @@ export default function JournalUploadPage() {
     onSuccess: async (result) => {
       if (result.committed) {
         await queryClient.invalidateQueries({ queryKey: ['journals'] });
-        toast.success(`${summarize(result).created} draft journal(s) created`);
+        toast.success(`${countOf(summarize(result).created, 'draft journal')} created`);
       }
     },
   });

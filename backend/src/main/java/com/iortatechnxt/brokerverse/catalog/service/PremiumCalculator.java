@@ -1,7 +1,9 @@
 package com.iortatechnxt.brokerverse.catalog.service;
 
 import com.iortatechnxt.brokerverse.catalog.domain.RatingMethod;
+import com.iortatechnxt.brokerverse.catalog.service.PremiumBreakdown.ChargeAmount;
 import com.iortatechnxt.brokerverse.catalog.service.PremiumBreakdown.ItemPremium;
+import com.iortatechnxt.brokerverse.catalog.service.PremiumRequest.ChargeRate;
 import com.iortatechnxt.brokerverse.catalog.service.PremiumRequest.Period;
 import com.iortatechnxt.brokerverse.catalog.service.PremiumRequest.RatedItem;
 import com.iortatechnxt.brokerverse.catalog.service.PremiumRequest.RatingRates;
@@ -30,7 +32,8 @@ import java.util.List;
  *       PremiumRequest.Period#remainingTerm}, pro-rata or short period); a reduction of the sum
  *       insured gives a negative (return) premium; no minimum premium.
  *   <li><b>Charges</b> on the net (basic) premium: DST with the Appendix A half-peso rounding,
- *       premium tax, VAT, FST and LGT at the insurer branch rate; gross = net + charges.
+ *       premium tax, VAT, FST and LGT at the insurer branch rate, and the other charges of the
+ *       product with their VAT when they are billed; gross = net + charges.
  *   <li><b>Commission</b> = rate x net premium; VAT on commission.
  * </ul>
  *
@@ -75,7 +78,14 @@ public final class PremiumCalculator {
     BigDecimal vat = money(percentOf(net, rates.vatPremium()));
     BigDecimal fst = money(percentOf(net, rates.fireServiceTax()));
     BigDecimal lgt = money(percentOf(net, rates.lgt()));
-    BigDecimal charges = dst.add(premiumTax).add(vat).add(fst).add(lgt);
+    List<ChargeAmount> others =
+        request.endorsement() ? List.of() : otherCharges(request.otherCharges(), net, rates);
+    BigDecimal charges =
+        dst.add(premiumTax)
+            .add(vat)
+            .add(fst)
+            .add(lgt)
+            .add(others.stream().map(c -> c.amount().add(c.vat())).reduce(ZERO, BigDecimal::add));
     BigDecimal commission = money(percentOf(net, rates.commission()));
     return new PremiumBreakdown(
         request.method(),
@@ -97,7 +107,28 @@ public final class PremiumCalculator {
         net.add(charges),
         commission,
         money(percentOf(commission, rates.vatCommission())),
-        base.items());
+        base.items(),
+        others);
+  }
+
+  /**
+   * Other charges (template PM-04 Charges): a fixed amount per policy or a rate of the net premium,
+   * with VAT on a VATable charge at the VAT rate of the premium, or at the VAT rate on commission
+   * when the premium carries no VAT. Not billed on endorsements.
+   */
+  private static List<ChargeAmount> otherCharges(
+      List<ChargeRate> charges, BigDecimal net, RatingRates rates) {
+    BigDecimal vatRate =
+        rates.vatPremium() != null && rates.vatPremium().signum() > 0
+            ? rates.vatPremium()
+            : rates.vatCommission();
+    List<ChargeAmount> out = new ArrayList<>();
+    for (ChargeRate c : charges) {
+      BigDecimal amount = money(c.rate() ? percentOf(net, c.value()) : c.value());
+      BigDecimal vat = c.vatable() ? money(percentOf(amount, vatRate)) : ZERO;
+      out.add(new ChargeAmount(c.code(), c.name(), amount, vat));
+    }
+    return out;
   }
 
   private static Base standardBase(List<RatedItem> items, boolean endorsement) {

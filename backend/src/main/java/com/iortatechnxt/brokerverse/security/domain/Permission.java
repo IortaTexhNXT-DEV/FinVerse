@@ -184,8 +184,10 @@ public enum Permission {
   CLX_ASSIGN,
   // Collector disposition and application request on unapplied payments (BRCLXN.030-033)
   CLX_UNAPPLIED_WORK,
-  // Installment plans and billing statements (BRCLXN.053/058)
+  // Installment plans of the collectors (BRCLXN.053)
   CLX_BILLING,
+  // Statements of account prepared by Operations: billing run, generate, send, cancel (BRCLXN.058)
+  CLX_SOA_ISSUE,
   // Threshold, escalation rules, billing frequencies, invoice pattern, Collections LOVs
   CLX_SETUP,
   // Export of lists and download of files (caveat p.93); scheduled files and reports; audit log
@@ -455,6 +457,8 @@ public enum Permission {
   SBM_INTAKE,
   // Processing runs, fallout, manual disposition, renewal hand-off, insurer re-assignment (09, 32)
   SBM_PROCESS,
+  // Renewal proposals with nominated rates and the preferred insurer (BRIDSP-18, 19)
+  SBM_PROPOSAL,
   // Rule sets, limit, insurer and letter rules, approval matrices: maker and checker (08)
   SBM_RULE_MAINTAIN,
   SBM_RULE_APPROVE,

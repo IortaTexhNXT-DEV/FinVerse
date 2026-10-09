@@ -805,6 +805,7 @@
             "SBM_LETTER_SEND",
             "SBM_MAINTAIN",
             "SBM_PROCESS",
+            "SBM_PROPOSAL",
             "SBM_REPORT_EXPORT",
             "SBM_REPORT_VIEW",
             "SBM_VIEW",
@@ -819,6 +820,7 @@
             "/submitted/reviews",
             "/submitted/tors",
             "/submitted/renewals",
+            "/submitted/proposals",
             "/submitted/letters"
           ]
         },
@@ -838,6 +840,7 @@
             "SBM_MAINTAIN",
             "SBM_MIGRATE",
             "SBM_PROCESS",
+            "SBM_PROPOSAL",
             "SBM_REPORT_EXPORT",
             "SBM_REPORT_VIEW",
             "SBM_RULE_MAINTAIN",
@@ -855,6 +858,7 @@
             "/submitted/reviews",
             "/submitted/tors",
             "/submitted/renewals",
+            "/submitted/proposals",
             "/submitted/letters",
             "/submitted/fees",
             "/submitted/no-touch",

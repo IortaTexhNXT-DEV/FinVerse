@@ -17,7 +17,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate, formatDays } from '@/utils/format';
+import { countOf, formatDate, formatDays } from '@/utils/format';
 import { CLAIMS_SECTION } from '../ClaimsPlaceholder';
 import { claimsHomeApi } from '../home/api';
 import type { WorklistQuery, WorklistRow, WorklistTab } from '../home/api';
@@ -109,7 +109,7 @@ export default function WorklistPage() {
       setReassigning(false);
       selection.clear();
       await queryClient.invalidateQueries({ queryKey: ['broker-claims'] });
-      toast.success(`${r.moved} claim(s) reassigned`);
+      toast.success(`${countOf(r.moved, 'claim')} reassigned`);
     },
   });
   const change = (next: WorklistQuery) => {

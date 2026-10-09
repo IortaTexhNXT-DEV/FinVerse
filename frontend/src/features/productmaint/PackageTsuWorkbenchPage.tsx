@@ -61,23 +61,21 @@ export default function PackageTsuWorkbenchPage() {
       />
       <ErrorAlert error={counts.error ?? queue.error ?? claim.error} />
       <StageTiles counts={stageCounts} filters={filters} onFilter={setFilter} />
-      <Card>
-        <div className="stack">
-          <QueueTable
-            items={queue.data?.content ?? []}
-            loading={queue.isLoading}
-            canAssign={can('WORK_ASSIGN')}
-            claiming={claim.isPending}
-            onOpen={(item) => item.link && void navigate(item.link)}
-            onClaim={(item) => claim.mutate(item.id)}
-            onAssign={setAssigning}
-          />
-          <PageFooter
-            data={queue.data}
-            noun="items"
-            onPage={(page) => setFilters({ ...filters, page })}
-          />
-        </div>
+      <Card flush>
+        <QueueTable
+          items={queue.data?.content ?? []}
+          loading={queue.isLoading}
+          canAssign={can('WORK_ASSIGN')}
+          claiming={claim.isPending}
+          onOpen={(item) => item.link && void navigate(item.link)}
+          onClaim={(item) => claim.mutate(item.id)}
+          onAssign={setAssigning}
+        />
+        <PageFooter
+          data={queue.data}
+          noun="items"
+          onPage={(page) => setFilters({ ...filters, page })}
+        />
       </Card>
       {assigning && (
         <AssignDialog item={assigning} onClose={() => setAssigning(null)} onDone={refresh} />

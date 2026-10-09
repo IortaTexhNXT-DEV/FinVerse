@@ -13,9 +13,9 @@ approval screen Configuration Uploads (opened from My Approvals). API: `/api/v1/
 ## 1. Purpose
 
 - The configuration of an environment is described by a **configuration catalogue**
-  (`backend/src/main/resources/configpromo/catalogue.yml`): 148 datasets in 16 groups, each with its table, its
+  (`backend/src/main/resources/configpromo/catalogue.yml`): 152 datasets in 16 groups, each with its table, its
   natural key, the datasets it refers to and what each environment keeps for itself. Every other table of the schema
-  is classified as never promoted, with its reason (417 tables: transactions, client data, logs, secrets, running
+  is classified as never promoted, with its reason (421 tables: transactions, client data, logs, secrets, running
   numbers, files, environment state, planning figures, watchlist contents and the module's own records). A build test
   (`ConfigCatalogueSchemaIT`) fails when a table is neither a dataset nor classified, so a new table is always placed.
 - An **export** writes the datasets into a signed, versioned **package**. An **import** verifies the package, checks
@@ -166,6 +166,7 @@ or rejects it.
 | PM-02 Coverages and rules | Product Maintenance > Coverages & Clauses; Products | `PRODUCT_MAINTAIN` | `PRODUCT_AUTHORIZE` |
 | PM-03 Clause library | Product Maintenance > Coverages & Clauses | `PRODUCT_MAINTAIN` | `PRODUCT_AUTHORIZE` |
 | PM-04 Rate tables | Product Maintenance > Rates & Taxes | `PRODUCT_MAINTAIN` | `PRODUCT_AUTHORIZE` |
+| PM-04C Other charges (platform layout; charges of the checklist PM-04) | Product Maintenance > Rates & Taxes > Other Charges | `MASTER_MAINTAIN` | `MASTER_AUTHORIZE` |
 | PM-06 Packages | Product Maintenance > Products | `PRODUCT_MAINTAIN` | `PRODUCT_MAINTAIN` (second package maintainer; the draft is then validated and released on Products) |
 | PM-08 Document templates | Broking Setup > Document Templates | `MASTER_MAINTAIN` | `MASTER_AUTHORIZE` |
 | PM-09 Lists and parameters | Broking Setup > Lists of Values; System Parameters | `LOV_MANAGE` | `MASTER_AUTHORIZE` |
@@ -178,6 +179,11 @@ or rejects it.
 | MD-01 Business partners | Setup > Business Partners | `MASTER_MAINTAIN` | `MASTER_AUTHORIZE` |
 
 Rules of particular tabs:
+
+- Columns the platform added after the workbook tab (the BIR registration of D0-01 and D0-02: RDO code, VAT
+  registration, CAS and e-invoicing permits, BIR branch code) are at the end of the template and may be missing from
+  a file filled on the workbook; the download of the current data holds them. D0-10 takes the final tax types (FWT,
+  FINAL_VAT, PERCENTAGE_TAX); FWT needs its ATC like EWT.
 
 - Cells holding several values use semicolons (`50; Y`, `01-Jan-2028; 31-Dec-2028`); the cells of PM-06 and PM-10
   that hold several entries (coverages, insurers, insurer terms, products) take one entry per line of the cell.

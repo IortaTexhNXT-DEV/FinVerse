@@ -1,13 +1,13 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { catalogApi } from '@/api/catalog';
-import type { Insurer, InsurerInput, PlacementChannel } from '@/api/catalog';
+import type { Insurer, InsurerInput, InsurerTaxStatus, PlacementChannel } from '@/api/catalog';
 import { Button } from '@/components/ui/Button';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Modal } from '@/components/ui/Modal';
 import { useToast } from '@/components/ui/toastContext';
 import { NumberInput, SelectInput, TextInput } from '@/features/assets/FormControls';
-import { PLACEMENT_CHANNELS as CHANNELS, splitEmails } from './insurerForm';
+import { PLACEMENT_CHANNELS as CHANNELS, INSURER_TAX_STATUSES, splitEmails } from './insurerForm';
 
 type InsurerForm = Omit<InsurerInput, 'defaultCreditDays' | 'placementEmails'> & {
   defaultCreditDays?: number;
@@ -34,6 +34,7 @@ function formOf(companyId: number, insurer?: Insurer): InsurerForm {
     accreditedUntil: insurer.accreditedUntil ?? undefined,
     placementChannel: insurer.placementChannel,
     defaultCreditDays: insurer.defaultCreditDays,
+    taxStatus: insurer.taxStatus ?? undefined,
     emails: insurer.placementEmails.join(', '),
   };
 }
@@ -127,6 +128,14 @@ export function InsurerEditorModal({ companyId, insurer, onClose }: Readonly<Pro
           step="1"
           value={form.defaultCreditDays}
           onChange={(defaultCreditDays) => set({ defaultCreditDays })}
+        />
+        <SelectInput
+          label="Tax status"
+          hint="Decides VAT or premium tax on the premium"
+          blank="As the product line"
+          value={form.taxStatus}
+          options={INSURER_TAX_STATUSES}
+          onChange={(v) => set({ taxStatus: (v || undefined) as InsurerTaxStatus | undefined })}
         />
         {insurer === undefined && (
           <>

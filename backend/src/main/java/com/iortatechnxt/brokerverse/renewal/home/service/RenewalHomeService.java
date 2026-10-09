@@ -40,9 +40,7 @@ public class RenewalHomeService {
           + " count(*) filter (where c.urgent) as urgent,"
           + " count(*) filter (where c.returned) as returned,"
           + " count(*) filter (where c.nrns) as nrns,"
-          + " count(*) filter (where c.stage in ('UNASSIGNED', 'FOR_DISPOSITION', 'FOR_TL_REVIEW',"
-          + " 'FOR_PROCESSING', 'IN_PROCESSING', 'WITH_INSURER', 'RA_READY', 'RA_GENERATED', 'RA_SENT')"
-          + " and c.expiry_date <= :d30) as at_risk"
+          + " count(*) filter (where c.attention_flag is not null) as at_risk"
           + " from rnw_candidate c where c.stage not in ('RENEWED', 'CLOSED')"
           + RenewalReportSupport.FILTERS;
 
@@ -165,7 +163,7 @@ public class RenewalHomeService {
    * @param due60 within 60 days
    * @param due90 within 90 days
    * @param due140 within 140 days
-   * @param atRisk open before acceptance and expiring within 30 days
+   * @param atRisk renewals with an attention flag (ageing, overdue, high risk; FR-RN-102)
    * @param urgent urgent (go-live window)
    * @param returned returned to Marketing
    * @param nrns NRNS

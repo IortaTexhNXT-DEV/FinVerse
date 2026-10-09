@@ -5,6 +5,7 @@ import com.iortatechnxt.brokerverse.account.domain.PaymentArrangement;
 import com.iortatechnxt.brokerverse.renewal.check.service.ClaimsCheck;
 import com.iortatechnxt.brokerverse.renewal.check.service.Evaluation;
 import com.iortatechnxt.brokerverse.renewal.check.service.Finding;
+import com.iortatechnxt.brokerverse.renewal.check.service.TsiThresholdCheck;
 import com.iortatechnxt.brokerverse.renewal.domain.Bucket;
 import com.iortatechnxt.brokerverse.renewal.domain.CandidateEndorsementRepository;
 import com.iortatechnxt.brokerverse.renewal.domain.CandidateSnapshot;
@@ -14,6 +15,7 @@ import com.iortatechnxt.brokerverse.renewal.domain.DecisionRule;
 import com.iortatechnxt.brokerverse.renewal.domain.DecisionRule.Criteria;
 import com.iortatechnxt.brokerverse.renewal.domain.DispositionProposal;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalCandidate;
+import com.iortatechnxt.brokerverse.renewal.domain.RenewalDisposition;
 import com.iortatechnxt.brokerverse.renewal.domain.RuleSetStatus;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -25,7 +27,9 @@ import org.springframework.transaction.annotation.Transactional;
  * Evaluates the active decision matrix on a Clean or Review renewal after initiation (BRRN.031,
  * 034; RENEWAL_DESIGN section 8.2): the first rule by priority whose criteria match gives the
  * proposed disposition and AUTO or MANUAL. Without an active matrix every renewal is manual (risk
- * 2). The condition TOTAL_LOSS never matches until Claims defines a total-loss indicator.
+ * 2). The condition TOTAL_LOSS never matches until Claims defines a total-loss indicator. A renewal
+ * above the total sum insured threshold is proposed For Proposal, manual (TSU or proposal handling,
+ * Annex BRRN.020 R23-02, R24-02).
  */
 @Component
 @Transactional(readOnly = true)
@@ -66,6 +70,19 @@ public class DecisionMatrixEvaluator {
     if (candidate.getBucket() == Bucket.EXCEPTION) {
       return DispositionProposal.NONE;
     }
+    return aboveTsiThreshold(evaluation)
+        ? new DispositionProposal(
+            RenewalDisposition.FOR_PROPOSAL, DispositionProposal.MANUAL, null, null)
+        : byMatrix(candidate, evaluation, today);
+  }
+
+  /** Above the TSI threshold the renewal goes to TSU or proposal handling (R23-02, R24-02). */
+  private static boolean aboveTsiThreshold(Evaluation evaluation) {
+    return evaluation.finding(TsiThresholdCheck.CODE).map(Finding::failed).orElse(false);
+  }
+
+  private DispositionProposal byMatrix(
+      RenewalCandidate candidate, Evaluation evaluation, LocalDate today) {
     Optional<DecisionMatrix> matrix =
         matrices.findByCompanyIdAndStatus(candidate.getCompanyId(), RuleSetStatus.ACTIVE).stream()
             .filter(m -> !m.getEffectiveFrom().isAfter(today))

@@ -265,7 +265,7 @@ public class BulkService {
     List<String> missing =
         handler.columns().stream()
             .map(BulkColumn::header)
-            .filter(h -> !file.headers().contains(h))
+            .filter(h -> !file.headers().contains(h) && !handler.optionalHeaders().contains(h))
             .toList();
     if (!missing.isEmpty()) {
       throw new BusinessRuleException(

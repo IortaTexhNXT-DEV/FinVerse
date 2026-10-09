@@ -103,7 +103,7 @@ public class BirExportService {
         amt(sum(rows, PartySummary::zeroRated)),
         amt(sum(rows, PartySummary::services)),
         amt(sum(rows, PartySummary::tax)),
-        rdo(),
+        rdo(companyId),
         PERIOD_END.format(period.to()),
         FISCAL_YEAR_END_MONTH);
     for (PartySummary r : rows) {
@@ -166,7 +166,7 @@ public class BirExportService {
         amt(input),
         amt(input),
         amt(BigDecimal.ZERO),
-        rdo(),
+        rdo(companyId),
         PERIOD_END.format(period.to()),
         FISCAL_YEAR_END_MONTH);
     for (PartySummary r : rows) {
@@ -219,7 +219,7 @@ public class BirExportService {
         owner.branchCode(),
         q(owner.name()),
         returnPeriod,
-        rdo());
+        rdo(companyId));
     int seq = 0;
     BigDecimal income = BigDecimal.ZERO;
     BigDecimal tax = BigDecimal.ZERO;
@@ -257,8 +257,10 @@ public class BirExportService {
     return Taxpayer.parse(c.getTaxId(), upper(c.getName()), upper(c.getAddress()), null);
   }
 
-  private String rdo() {
-    return parameters.text(RDO_PARAMETER, DEFAULT_RDO);
+  /** The RDO of the company (D0-01), else the parameter TAX_RDO_CODE. */
+  private String rdo(Long companyId) {
+    String registered = organization.getCompany(companyId).getTaxRegistration().rdoCode();
+    return registered != null ? registered : parameters.text(RDO_PARAMETER, DEFAULT_RDO);
   }
 
   /** Individuals are listed by name parts, others by registered name. */

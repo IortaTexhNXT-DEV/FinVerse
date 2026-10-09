@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
@@ -35,6 +36,13 @@ public class BranchUpload extends ConfigUploadHandler {
   static final String MANAGER = "Branch manager";
   static final String REST_DAYS = "Weekly rest days";
   static final String LEGACY = "Legacy branch codes";
+  static final String BIR_CODE = "BIR branch code";
+  static final String RDO = "RDO code";
+
+  /** The BIR registration columns added after the workbook tab. */
+  private static final Set<String> TAX_REGISTRATION = Set.of(BIR_CODE, RDO);
+
+  private static final Pattern BIR_CODE_FORMAT = Pattern.compile("\\d{3,5}");
 
   private static final int DAY_ABBREVIATION = 3;
   private static final Pattern CODE_FORMAT = Pattern.compile("[A-Z0-9]{1,10}");
@@ -106,7 +114,16 @@ public class BranchUpload extends ConfigUploadHandler {
         BulkColumn.optional(REST_DAYS, "Days the branch is closed each week", "SAT,SUN")
             .format("SAT, SUN"),
         BulkColumn.optional(LEGACY, "Legacy branch codes for the code map BRANCH", "001")
-            .format("Codes separated by commas"));
+            .format("Codes separated by commas"),
+        BulkColumn.optional(BIR_CODE, "Branch code of the BIR registration", "00000")
+            .format("3 to 5 digits"),
+        BulkColumn.optional(RDO, "Revenue District Office of the branch", "050")
+            .format("Three digits, optionally a letter"));
+  }
+
+  @Override
+  public Set<String> optionalHeaders() {
+    return TAX_REGISTRATION;
   }
 
   @Override
@@ -120,6 +137,18 @@ public class BranchUpload extends ConfigUploadHandler {
     if (!CODE_FORMAT.matcher(row.text(CODE)).matches()) {
       errors.add(error(CODE, "use up to 10 capital letters or digits"));
     }
+    String birCode = row.text(BIR_CODE);
+    check(
+        errors,
+        birCode != null && !BIR_CODE_FORMAT.matcher(birCode).matches(),
+        BIR_CODE,
+        "3 to 5 digits");
+    String rdo = row.text(RDO);
+    check(
+        errors,
+        rdo != null && !CompanyUpload.RDO_FORMAT.matcher(rdo).matches(),
+        RDO,
+        "three digits, optionally followed by a letter (e.g. 050 or 047A)");
     if (row.text(EMAIL) != null && !EmailAddresses.isValid(row.text(EMAIL))) {
       errors.add(error(EMAIL, row.text(EMAIL) + " is not an e-mail address"));
     }
@@ -199,7 +228,11 @@ public class BranchUpload extends ConfigUploadHandler {
             "manager_name",
             row.text(MANAGER),
             "weekly_holidays",
-            row.text(REST_DAYS) == null ? null : restDays(row.text(REST_DAYS)).orElse(null)),
+            row.text(REST_DAYS) == null ? null : restDays(row.text(REST_DAYS)).orElse(null),
+            "bir_branch_code",
+            row.text(BIR_CODE),
+            "rdo_code",
+            row.text(RDO)),
         context,
         "Branch");
     codeMaps.map(
@@ -217,7 +250,7 @@ public class BranchUpload extends ConfigUploadHandler {
     return db
         .rows(
             "select code, name, region, address, opening_date, head_office, forex_authorized,"
-                + " contact_phone, contact_email, manager_name, weekly_holidays"
+                + " contact_phone, contact_email, manager_name, weekly_holidays, bir_branch_code, rdo_code"
                 + " from org_branch where company_id = ? order by code",
             companyId)
         .stream()
@@ -234,7 +267,9 @@ public class BranchUpload extends ConfigUploadHandler {
                     PHONE, r.get("contact_phone"),
                     EMAIL, r.get("contact_email"),
                     MANAGER, r.get("manager_name"),
-                    REST_DAYS, dayNames(r.get("weekly_holidays"))))
+                    REST_DAYS, dayNames(r.get("weekly_holidays")),
+                    BIR_CODE, r.get("bir_branch_code"),
+                    RDO, r.get("rdo_code")))
         .toList();
   }
 }

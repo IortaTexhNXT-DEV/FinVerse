@@ -1,5 +1,7 @@
 import { api, toQuery } from './client';
 import type { PageResponse } from './types';
+import { humanize } from '@/utils/format';
+import { nounFor, pluralOf, sentenceCase } from '@/utils/wording';
 
 export type QueueScope = 'MINE' | 'UNASSIGNED' | 'ALL';
 
@@ -167,6 +169,18 @@ export const WORKFLOW_RECORD_TYPES: Record<string, string> = {
 /** The record type of a workflow by its name; an unknown workflow reads as the muted dash. */
 export function workflowRecordType(code: string | null | undefined): string {
   return code ? (WORKFLOW_RECORD_TYPES[code] ?? '') : '';
+}
+
+/**
+ * What a count of a workflow's items counts, in the right number and in sentence case: "1 Claim",
+ * "2 Claims", "1 Service fee run", "4 Disbursement vouchers", "1 Account funding". An unknown
+ * workflow reads by its words, never its code.
+ */
+export function workflowNoun(code: string, count: number): string {
+  const type = WORKFLOW_RECORD_TYPES[code];
+  const singular = sentenceCase(type ?? humanize(code));
+  const plural = WORKFLOW_NAMES[code] ?? pluralOf(singular);
+  return nounFor(count, singular, plural);
 }
 
 /** Workflow engine: My Work queues, record workflow panel, generic actions, assignment. */

@@ -212,10 +212,19 @@ public interface BulkImportHandler {
   }
 
   /**
-   * Whether the current data can be downloaded in the layout of the template (round trip of the
-   * configuration uploads).
+   * Columns added to the template after its layout was published: a file without them is still read
+   * (their cells are blank). Empty (the default): every column of the template is expected.
    *
-   * @return true when {@link #exportRows} is implemented
+   * @return headers that a file may lack
+   */
+  default java.util.Set<String> optionalHeaders() {
+    return java.util.Set.of();
+  }
+
+  /**
+   * Whether the current data downloads in the layout of the template (configuration uploads).
+   *
+   * @return true when {@link #exportRows(Long)} is implemented
    */
   default boolean exportable() {
     return false;

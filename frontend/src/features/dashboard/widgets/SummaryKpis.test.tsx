@@ -35,7 +35,7 @@ function show(permissions: string[]) {
 describe('general ledger KPI tiles', () => {
   it('shows the ledger tiles without an insurer technical reserves tile', () => {
     show(['GL_VIEW']);
-    expect(screen.getByText('Insurance receivables')).toBeInTheDocument();
-    expect(screen.queryByText('Technical reserves')).not.toBeInTheDocument();
+    expect(screen.getByText('Insurance Receivables')).toBeInTheDocument();
+    expect(screen.queryByText(/Technical reserves/i)).not.toBeInTheDocument();
   });
 });

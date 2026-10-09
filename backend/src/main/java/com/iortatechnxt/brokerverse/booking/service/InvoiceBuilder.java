@@ -123,7 +123,7 @@ public class InvoiceBuilder {
           year == years ? account.getPeriodTo() : account.getPeriodFrom().plusYears(year);
       LocalDate flagDate = year == 1 ? bookingDate : inception;
       InvoiceFlags flags =
-          InvoiceFlags.withCriteria(
+          InvoiceFlags.pendingIncentive(
               account.isDirectPayment(),
               cwt2,
               BusinessType.of(account.getBusinessType()),

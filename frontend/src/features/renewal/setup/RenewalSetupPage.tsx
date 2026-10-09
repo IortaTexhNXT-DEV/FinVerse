@@ -7,6 +7,7 @@ import { useTabParam } from '@/components/ui/useTabParam';
 import { RENEWAL_SECTION } from '../common/renewalCodes';
 import { ChecksTab } from './ChecksTab';
 import { GoLiveTab } from './GoLiveTab';
+import { InsurerListsTab } from './InsurerListsTab';
 import { PackageChoicesTab } from './PackageChoicesTab';
 import { PackageMapTab } from './PackageMapTab';
 import { RiskCodesTab } from './RiskCodesTab';
@@ -17,6 +18,7 @@ import '../renewal.css';
 const TABS = [
   { id: 'risk', label: 'Non-renewable Risk Codes', permissions: ['RNW_SETUP'] },
   { id: 'checks', label: 'Checks', permissions: ['RNW_SETUP'] },
+  { id: 'insurer-lists', label: 'Insurer Renewable Lists', permissions: ['RNW_SETUP'] },
   { id: 'buckets', label: 'Classification Rules', permissions: ['RNW_SETUP'] },
   { id: 'matrix', label: 'Decision Matrix', permissions: ['RNW_SETUP'] },
   { id: 'packages', label: 'Package Map', permissions: ['RNW_PACKAGE_REMAP'] },
@@ -52,6 +54,8 @@ function Body({ tab }: Readonly<{ tab: TabId }>) {
   switch (tab) {
     case 'checks':
       return <ChecksTab />;
+    case 'insurer-lists':
+      return <InsurerListsTab />;
     case 'buckets':
       return <BucketRules />;
     case 'matrix':
@@ -80,9 +84,10 @@ function Body({ tab }: Readonly<{ tab: TabId }>) {
 }
 
 /**
- * Renewal Setup (FR-RN-016, 024, 028, 112): non-renewable risk codes, the sanitation checks, the
- * classification rules and decision matrix versions (maker and checker), the package code map of
- * migrated policies with the package choices to approve, and the go-live take-over.
+ * Renewal Setup (FR-RN-016, 020, 024, 028, 112): non-renewable risk codes, the sanitation checks,
+ * the insurer renewable lists, the classification rules and decision matrix versions (maker and
+ * checker), the package code map of migrated policies with the package choices to approve, and the
+ * go-live take-over.
  */
 export default function RenewalSetupPage() {
   const { can } = useAuth();

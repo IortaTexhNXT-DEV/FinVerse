@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { titleCase } from '@/utils/format';
 import { calloutName } from './calloutName';
 
 interface CardProps {
@@ -14,7 +15,10 @@ interface CardProps {
   children: ReactNode;
 }
 
-/** Content container with optional header title and actions. */
+/**
+ * Content container with optional header title (in Title Case, acronyms kept) and actions. The
+ * callout name stays the title as written.
+ */
 export function Card({
   title,
   actions,
@@ -27,7 +31,7 @@ export function Card({
     <section className={`card ${className ?? ''}`} data-callout={callout ?? calloutName(title)}>
       {title !== undefined && (
         <header className="card-header">
-          <h2>{title}</h2>
+          <h2>{typeof title === 'string' ? titleCase(title) : title}</h2>
           <div className="spacer" />
           {actions}
         </header>

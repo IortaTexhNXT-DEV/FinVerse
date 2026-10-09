@@ -34,7 +34,9 @@ export function WorkCountTiles({
           to={c.link ?? '/operations'}
           className={`ops-tile ${tileTone(c.count, c.severity)}`}
         >
-          <span className="ops-tile-label">{c.label}</span>
+          <span className="ops-tile-label" title={c.label}>
+            {c.label}
+          </span>
           <span className="ops-tile-count">{c.count}</span>
           {c.severity !== 'INFO' && c.count > 0 && (
             <span className="ops-muted">

@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.tax.api.dto;
 
+import com.iortatechnxt.brokerverse.tax.domain.PartyTaxStatus;
 import com.iortatechnxt.brokerverse.tax.domain.PayeeClass;
 import com.iortatechnxt.brokerverse.tax.domain.VatTreatment;
 import com.iortatechnxt.brokerverse.tax.service.PartyTaxProfileCommand;
@@ -7,6 +8,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import java.time.LocalDate;
 
 /**
  * Create / update party tax profile request ({@code partyCode} is immutable after creation).
@@ -24,6 +26,13 @@ import jakarta.validation.constraints.Size;
  * @param zipCode ZIP code
  * @param vatTreatment VAT treatment
  * @param defaultAtcCode default withholding tax code
+ * @param withholdingAgent the party withholds tax on its payments to the company
+ * @param topWithholdingAgent top withholding agent (implies withholding agent)
+ * @param governmentPayor government payor withholding final VAT and final tax (implies withholding
+ *     agent)
+ * @param exemptionCertificateNo tax exemption certificate number, blank when none
+ * @param exemptionValidFrom first day of the certificate
+ * @param exemptionValidTo last day of the certificate
  */
 public record PartyTaxProfileRequest(
     @NotNull Long companyId,
@@ -38,7 +47,13 @@ public record PartyTaxProfileRequest(
     @Size(max = 300) String registeredAddress,
     @Size(max = 10) String zipCode,
     VatTreatment vatTreatment,
-    @Size(max = 20) String defaultAtcCode) {
+    @Size(max = 20) String defaultAtcCode,
+    Boolean withholdingAgent,
+    Boolean topWithholdingAgent,
+    Boolean governmentPayor,
+    @Size(max = 40) String exemptionCertificateNo,
+    LocalDate exemptionValidFrom,
+    LocalDate exemptionValidTo) {
 
   /**
    * Converts to the service command.
@@ -59,6 +74,13 @@ public record PartyTaxProfileRequest(
         registeredAddress,
         zipCode,
         vatTreatment,
-        defaultAtcCode);
+        defaultAtcCode,
+        new PartyTaxStatus(
+            Boolean.TRUE.equals(withholdingAgent),
+            Boolean.TRUE.equals(topWithholdingAgent),
+            Boolean.TRUE.equals(governmentPayor),
+            exemptionCertificateNo,
+            exemptionValidFrom,
+            exemptionValidTo));
   }
 }

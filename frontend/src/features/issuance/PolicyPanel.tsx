@@ -29,7 +29,7 @@ export function PolicyPanel({ arn }: Readonly<{ arn: string }>) {
     <Card title="Policy">
       <div className="stack">
         <dl className="detail-list">
-          <dt>Policy number(s)</dt>
+          <dt>Policy Numbers</dt>
           <dd>{p.policyNumbers.length > 0 ? p.policyNumbers.join(', ') : 'Not issued yet'}</dd>
           <dt>Issue date</dt>
           <dd>{formatDate(p.issueDate) || '—'}</dd>

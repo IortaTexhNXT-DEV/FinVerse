@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.common.domain.RecordStatus;
 import com.iortatechnxt.brokerverse.tax.domain.PartyTaxProfile;
 import com.iortatechnxt.brokerverse.tax.domain.PayeeClass;
 import com.iortatechnxt.brokerverse.tax.domain.VatTreatment;
+import java.time.LocalDate;
 
 /**
  * Party tax profile.
@@ -22,6 +23,12 @@ import com.iortatechnxt.brokerverse.tax.domain.VatTreatment;
  * @param zipCode ZIP code
  * @param vatTreatment VAT treatment
  * @param defaultAtcCode default withholding tax code
+ * @param withholdingAgent the party withholds tax on its payments to the company
+ * @param topWithholdingAgent top withholding agent
+ * @param governmentPayor government payor (final VAT and final tax withheld)
+ * @param exemptionCertificateNo tax exemption certificate number
+ * @param exemptionValidFrom first day of the certificate
+ * @param exemptionValidTo last day of the certificate
  * @param recordStatus maker-checker status
  * @param maker last maintainer
  */
@@ -40,6 +47,12 @@ public record PartyTaxProfileResponse(
     String zipCode,
     VatTreatment vatTreatment,
     String defaultAtcCode,
+    boolean withholdingAgent,
+    boolean topWithholdingAgent,
+    boolean governmentPayor,
+    String exemptionCertificateNo,
+    LocalDate exemptionValidFrom,
+    LocalDate exemptionValidTo,
     RecordStatus recordStatus,
     String maker) {
 
@@ -65,6 +78,12 @@ public record PartyTaxProfileResponse(
         p.getZipCode(),
         p.getVatTreatment(),
         p.getDefaultAtcCode(),
+        p.getTaxStatus().withholdingAgent(),
+        p.getTaxStatus().topWithholdingAgent(),
+        p.getTaxStatus().governmentPayor(),
+        p.getTaxStatus().exemptionCertificateNo(),
+        p.getTaxStatus().exemptionValidFrom(),
+        p.getTaxStatus().exemptionValidTo(),
         p.getRecordStatus(),
         p.getMaker());
   }

@@ -55,6 +55,9 @@ public class PlacementSlip extends BaseEntity {
   @Column(name = "send_count", nullable = false)
   private int sendCount;
 
+  @Column(name = "eopt_fingerprint", length = 64)
+  private String eoptFingerprint;
+
   @ElementCollection
   @CollectionTable(name = "plc_slip_account", joinColumns = @JoinColumn(name = "slip_id"))
   @OrderColumn(name = "line_index")
@@ -107,6 +110,15 @@ public class PlacementSlip extends BaseEntity {
     return first;
   }
 
+  /**
+   * Records the fingerprint of the clients' tax details printed on the slip.
+   *
+   * @param fingerprint fingerprint of the taxpayer names, TINs and registered addresses
+   */
+  public void printedTaxDetails(String fingerprint) {
+    this.eoptFingerprint = fingerprint;
+  }
+
   /** Marks the slip as replaced by a new version. */
   public void supersede() {
     this.status = SlipStatus.SUPERSEDED;
@@ -155,6 +167,10 @@ public class PlacementSlip extends BaseEntity {
 
   public Instant getSentAt() {
     return sentAt;
+  }
+
+  public String getEoptFingerprint() {
+    return eoptFingerprint;
   }
 
   public int getSendCount() {

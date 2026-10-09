@@ -22,6 +22,7 @@ import { Notice } from '@/components/ui/Notice';
 import { PermissionName } from '@/components/ui/PermissionName';
 import { permissionLabel, permissionLabels } from '@/utils/permissionLabel';
 import { ConfigUploadButton } from '@/features/configpromo/ConfigUploadButton';
+import { CellStack } from '@/components/ui/CellStack';
 
 function roleHeader(r: Role): string {
   const level = r.privilegeLevel ? ` · ${humanize(r.privilegeLevel)}` : '';
@@ -71,7 +72,9 @@ function ToImplement() {
           {
             key: 'd',
             header: 'Approved',
-            render: (r) => `${displayNameOf(r.decidedBy)} · ${formatDateTime(r.decidedAt)}`,
+            render: (r) => (
+              <CellStack main={displayNameOf(r.decidedBy)} sub={formatDateTime(r.decidedAt)} />
+            ),
           },
           {
             key: 'a',

@@ -30,6 +30,7 @@ class CollectionsPlansApiIT {
 
   private static final String HANDLER = "mktcoll";
   private static final String TEAM_LEAD = "mkttl";
+  private static final String OPERATIONS = "cashtl";
   private static final String PLANS = "/api/v1/collections/plans";
   private static final String STATEMENTS = "/api/v1/collections/billing/statements";
   private static final String ESCALATIONS = "/api/v1/collections/escalations";
@@ -74,15 +75,17 @@ class CollectionsPlansApiIT {
     api.doPost(HANDLER, PLANS + "/" + planId + "/refresh", null).andExpect(status().isOk());
     api.doGet("norole", PLANS + "?companyId=" + company).andExpect(status().isForbidden());
 
+    api.doPost(HANDLER, STATEMENTS, Map.of("planId", planId, "cycleSeq", 2))
+        .andExpect(status().isForbidden());
     JsonNode soa =
         api.read(
-            api.doPost(HANDLER, STATEMENTS, Map.of("planId", planId, "cycleSeq", 2))
+            api.doPost(OPERATIONS, STATEMENTS, Map.of("planId", planId, "cycleSeq", 2))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.lines.length()").value(2))
                 .andExpect(jsonPath("$.lines[0].kind").value("ARREARS"))
                 .andExpect(jsonPath("$.templateVersion").value("CLX_SOA v1")));
     long soaId = soa.get("id").asLong();
-    api.doPost(HANDLER, STATEMENTS, Map.of("planId", planId, "cycleSeq", 2))
+    api.doPost(OPERATIONS, STATEMENTS, Map.of("planId", planId, "cycleSeq", 2))
         .andExpect(status().isUnprocessableEntity())
         .andExpect(jsonPath("$.code").value("CLX_SOA_EXISTS"));
     api.doGet(TEAM_LEAD, STATEMENTS + "/" + soaId)
@@ -97,19 +100,21 @@ class CollectionsPlansApiIT {
     api.download(TEAM_LEAD, STATEMENTS + "/" + soaId + "/document")
         .andExpect(status().isOk())
         .andExpect(header().string("Content-Type", "application/pdf"));
-    api.doGet(HANDLER, STATEMENTS + "/" + soaId + "/recipient").andExpect(status().isOk());
+    api.doGet(OPERATIONS, STATEMENTS + "/" + soaId + "/recipient").andExpect(status().isOk());
+    api.doPost(HANDLER, STATEMENTS + "/" + soaId + "/cancel", Map.of("reason", "No"))
+        .andExpect(status().isForbidden());
     api.doPost(
-            HANDLER,
+            OPERATIONS,
             STATEMENTS + "/" + soaId + "/send",
             Map.of("to", List.of("client@example.com"), "subject", "SOA", "body", "Please pay"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.status").value("SENT"));
     api.doPost(
-            HANDLER,
+            OPERATIONS,
             STATEMENTS + "/generate-due",
             Map.of("companyId", company, "from", "2027-10-01", "to", "2027-10-01"))
         .andExpect(status().isOk());
-    api.doPost(HANDLER, STATEMENTS + "/" + soaId + "/cancel", Map.of("reason", "Resend"))
+    api.doPost(OPERATIONS, STATEMENTS + "/" + soaId + "/cancel", Map.of("reason", "Resend"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.status").value("CANCELLED"));
     api.doPost(HANDLER, PLANS + "/" + planId + "/cancel", Map.of("reason", "Replaced"))

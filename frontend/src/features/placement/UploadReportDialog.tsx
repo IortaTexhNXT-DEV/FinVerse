@@ -7,6 +7,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { FileDropZone } from '@/components/ui/FileDropZone';
+import { countOf } from '@/utils/format';
 
 /**
  * Uploads a payment report (BRNB.067/068): a CLPC report answering a billing batch (matched by PN
@@ -93,7 +94,7 @@ export function UploadReportDialog({
                 <option value="">Select…</option>
                 {open.map((b) => (
                   <option key={b.id} value={b.id}>
-                    {b.batchNo} · {b.itemCount} account(s)
+                    {b.batchNo} · {countOf(b.itemCount, 'account')}
                   </option>
                 ))}
               </select>

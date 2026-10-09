@@ -15,6 +15,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { formatAmount, formatDate, formatDateTime, humanize } from '@/utils/format';
 import { displayNameOf } from '@/api/users';
 import { LovLabel, LineLabel } from '@/components/broking/LovLabel';
+import { CellStack } from '@/components/ui/CellStack';
 
 function ClientConfirmationDialog({
   gate,
@@ -149,7 +150,7 @@ export function GatePanel({ gate, onChanged }: Readonly<{ gate: Gate; onChanged:
             {
               key: 'source',
               header: 'Source',
-              render: (e) => `${humanize(e.source)} · ${e.reference}`,
+              render: (e) => <CellStack main={humanize(e.source)} sub={e.reference} />,
             },
             {
               key: 'detail',

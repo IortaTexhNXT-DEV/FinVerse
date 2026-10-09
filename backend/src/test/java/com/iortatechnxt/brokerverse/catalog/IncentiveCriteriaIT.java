@@ -164,7 +164,9 @@ class IncentiveCriteriaIT {
                     account.getArn(),
                     BookingOptions.of(BookingFixtures.BOOKED_ON, null),
                     BookingSource.INDIVIDUAL));
-    assertThat(invoice.getFlags().incentiveEligible()).isTrue();
+    // FR-NB-118: the criteria matched at booking are the tag of the transaction (CPC2,
+    // FR-DS-090); the indicator itself waits for the full payment
+    assertThat(invoice.getFlags().incentiveEligible()).isFalse();
     assertThat(invoice.getFlags().incentiveCriteriaCodes()).contains("CPC2");
     assertThat(invoice.getFacts().productVersionNo()).isEqualTo(1);
     InvoiceBooked event = InvoiceBooked.of(invoice);

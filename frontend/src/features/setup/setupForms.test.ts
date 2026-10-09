@@ -5,6 +5,7 @@ import {
   layoutProblems,
   newEmployee,
   profileRequest,
+  taxRegistrationProblem,
   ruleCriteria,
   ruleProblems,
 } from './setupForms';
@@ -99,5 +100,17 @@ describe('client profile of a company', () => {
     });
     expect(request).toMatchObject({ code: 'CO1', name: 'Company One, Inc.', baseCurrency: 'PHP' });
     expect(request.profile).toEqual({ shortName: 'One', groupName: '', logoRef: '' });
+  });
+
+  it('checks the tax registration of the company', () => {
+    expect(taxRegistrationProblem({ vatRegistered: true, rdoCode: '050' })).toBeNull();
+    expect(taxRegistrationProblem({ vatRegistered: true, rdoCode: '047A' })).toBeNull();
+    expect(taxRegistrationProblem({ vatRegistered: true, rdoCode: '5O' })).toContain('RDO');
+    expect(taxRegistrationProblem({ vatRegistered: false, casPermitDate: '2027-01-15' })).toContain(
+      'CAS permit',
+    );
+    expect(
+      taxRegistrationProblem({ vatRegistered: false, einvoicingPermitDate: '2027-01-15' }),
+    ).toContain('e-invoicing');
   });
 });

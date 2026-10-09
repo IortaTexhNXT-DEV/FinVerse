@@ -14,7 +14,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { RowActions } from '@/components/ui/RowActions';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
-import { formatAmount, formatDate } from '@/utils/format';
+import { countOf, formatAmount, formatDate } from '@/utils/format';
 import { lineActions } from './batchActions';
 import { candidatesOf, linesOf, placementLink, REPORT_TABS } from './placementLogic';
 
@@ -99,7 +99,7 @@ function ReportActions({ report }: Readonly<{ report: PaymentReport }>) {
     onSuccess: (r) =>
       done(
         r,
-        `${r.reportNo} confirmed: ${r.lines.filter((l) => l.applied).length} payment gate(s) opened`,
+        `${r.reportNo} confirmed: ${countOf(r.lines.filter((l) => l.applied).length, 'payment gate')} opened`,
       ),
   });
   const discard = useMutation({

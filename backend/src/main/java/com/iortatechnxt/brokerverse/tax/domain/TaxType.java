@@ -15,6 +15,10 @@ package com.iortatechnxt.brokerverse.tax.domain;
  *   <li>{@link #FST}: fire service tax on fire premiums, remitted for the Bureau of Fire
  *       Protection.
  *   <li>{@link #EWT}: creditable expanded withholding tax, one code per ATC (0619-E / 1601-EQ).
+ *   <li>{@link #FWT}: final withholding tax, one code per ATC: tax withheld by government payors on
+ *       payments to the company, final tax on bank interest.
+ *   <li>{@link #FINAL_VAT}: final VAT withheld by government payors on the company's sales.
+ *   <li>{@link #PERCENTAGE_TAX}: percentage tax on the company's own receipts not subject to VAT.
  * </ul>
  */
 public enum TaxType {
@@ -26,7 +30,10 @@ public enum TaxType {
   DST,
   LGT,
   FST,
-  EWT;
+  EWT,
+  FWT,
+  FINAL_VAT,
+  PERCENTAGE_TAX;
 
   /**
    * Whether the tax is levied on premiums and computed by the underwriting premium breakdown.
@@ -35,5 +42,23 @@ public enum TaxType {
    */
   public boolean isPremiumLevy() {
     return this == PREMIUM_TAX || this == DST || this == LGT || this == FST;
+  }
+
+  /**
+   * Whether the tax is a withholding identified by its ATC (creditable or final).
+   *
+   * @return true for EWT and FWT
+   */
+  public boolean needsAtc() {
+    return this == EWT || this == FWT;
+  }
+
+  /**
+   * Whether the tax withheld is final, not creditable against the company's income tax or VAT.
+   *
+   * @return true for FWT and FINAL_VAT
+   */
+  public boolean isFinal() {
+    return this == FWT || this == FINAL_VAT;
   }
 }

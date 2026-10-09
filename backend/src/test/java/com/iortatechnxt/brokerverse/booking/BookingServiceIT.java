@@ -8,6 +8,7 @@ import com.iortatechnxt.brokerverse.account.domain.AccountStatus;
 import com.iortatechnxt.brokerverse.account.service.AccountQueryService;
 import com.iortatechnxt.brokerverse.booking.domain.BookedInvoice;
 import com.iortatechnxt.brokerverse.booking.domain.BookingSource;
+import com.iortatechnxt.brokerverse.booking.domain.IncentiveStatus;
 import com.iortatechnxt.brokerverse.booking.domain.InsurerShare;
 import com.iortatechnxt.brokerverse.booking.domain.InvoiceKind;
 import com.iortatechnxt.brokerverse.booking.domain.OpenItemRole;
@@ -97,7 +98,10 @@ class BookingServiceIT {
     assertThat(loaded.getPremium().total()).isEqualByComparingTo(gross);
     assertThat(loaded.getPremium().basic()).isEqualByComparingTo(account.getPremium().netPremium());
     assertThat(loaded.getFacts().costCenter()).isEqualTo("NB-CBG-M");
-    assertThat(loaded.getFlags().incentiveEligible()).isTrue();
+    // FR-NB-118: the indicator reads Pending until the booked invoice is fully paid
+    assertThat(loaded.getFlags().incentiveEligible()).isFalse();
+    assertThat(loaded.getIncentive().status()).isEqualTo(IncentiveStatus.PENDING);
+    assertThat(loaded.getFlags().incentiveCriteriaCodes()).isNotEmpty();
     assertThat(loaded.getCommission().wtaxRate()).isEqualByComparingTo("10");
 
     List<Map<String, Object>> journal = lines(loaded.getJournalBatches().get(0));
@@ -151,7 +155,7 @@ class BookingServiceIT {
     Account booked = accounts.requireByArn(account.getArn());
     assertThat(booked.getStatus()).isEqualTo(AccountStatus.BOOKED);
     assertThat(booked.getLifecycle().getBookingRef()).isEqualTo(loaded.getInvoiceNo());
-    assertThat(booked.getLifecycle().isIncentiveFlag()).isTrue();
+    assertThat(booked.getLifecycle().isIncentiveFlag()).isFalse();
 
     InvoiceBooked event = events.forInvoice(loaded.getInvoiceNo()).orElseThrow();
     assertThat(event.kind()).isEqualTo(InvoiceKind.BOOKING);
@@ -177,7 +181,7 @@ class BookingServiceIT {
     assertThat(event.wtaxRate()).isEqualByComparingTo("10");
     assertThat(event.directPayment()).isFalse();
     assertThat(event.cwt2Percent()).isFalse();
-    assertThat(event.incentiveEligible()).isTrue();
+    assertThat(event.incentiveEligible()).isFalse();
     assertThat(queries.invoice(loaded.getInvoiceNo())).isEqualTo(event);
     assertThat(queries.invoicesForArn(account.getArn())).containsExactly(event);
     assertThat(clientRecords.recordsOf(account.getClientId()))

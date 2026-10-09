@@ -1,5 +1,5 @@
 import type { LedgerComponent } from '@/api/operations';
-import { humanize } from '@/utils/format';
+import { countOf, humanize } from '@/utils/format';
 import type {
   Allocation,
   DispositionBody,
@@ -93,7 +93,7 @@ export function matchMessage(p: PaymentPreview | undefined): string {
     case undefined:
       return 'Enter an ARN, invoice, policy or PN number to preview the application.';
     case 'BOOKED':
-      return `Matched ${p.invoices.length} booked invoice(s) on ${p.reference ?? ''}.`;
+      return `Matched ${countOf(p.invoices.length, 'booked invoice')} on ${p.reference ?? ''}.`;
     case 'PREBOOKED':
       return `Account ${p.prebookedArn ?? ''} is not booked yet: the payment waits in the pre-booked queue.`;
     case 'CANCELLED':

@@ -20,6 +20,8 @@ import java.time.LocalDate;
  * @param contactEmail email
  * @param managerName manager
  * @param weeklyHolidays weekly holidays
+ * @param birBranchCode BIR branch code
+ * @param rdoCode Revenue District Office
  * @param recordStatus maker-checker status
  * @param createdBy creator
  * @param maker user who created or last maintained the record (unchanged by authorization)
@@ -39,6 +41,8 @@ public record BranchResponse(
     String contactEmail,
     String managerName,
     String weeklyHolidays,
+    String birBranchCode,
+    String rdoCode,
     RecordStatus recordStatus,
     String createdBy,
     String maker,
@@ -65,6 +69,8 @@ public record BranchResponse(
         b.getContactEmail(),
         b.getManagerName(),
         b.getWeeklyHolidays(),
+        b.getBirBranchCode(),
+        b.getRdoCode(),
         b.getRecordStatus(),
         b.getCreatedBy(),
         b.getMaker(),

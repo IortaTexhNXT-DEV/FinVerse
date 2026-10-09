@@ -1,6 +1,9 @@
 import type { NbDashboard, StatusCount } from '@/api/nbReports';
-import { WORKFLOW_NAMES } from '@/api/workflow';
-import { humanize } from '@/utils/format';
+import { WORKFLOW_NAMES, workflowNoun } from '@/api/workflow';
+import type { KpiBreakdownItem } from '@/components/ui/kpiBreakdown';
+import { formatDate, humanize } from '@/utils/format';
+import { queuePath } from '@/features/workspace/queueParams';
+import { nounFor } from '@/utils/wording';
 
 /** Drill-down route of an account stage: the Accounts list filtered on the status. */
 export function accountsPath(status: string): string {
@@ -68,7 +71,6 @@ export function barWidth(value: number, max: number): number {
   return Math.max(2, Math.round((value * 100) / max));
 }
 
-/** Short summary of the overdue items per workflow ("3 Accounts · 1 Quotations"). */
 /** A workflow or status label for business users: a code such as PM_PACKAGE_REQUEST becomes its name. */
 function readableLabel(label: string): string {
   if (!/^[A-Z0-9_]+$/.test(label)) {
@@ -77,22 +79,61 @@ function readableLabel(label: string): string {
   return WORKFLOW_NAMES[label] ?? humanize(label);
 }
 
-export function overdueHint(overdue: readonly StatusCount[]): string {
-  if (overdue.length === 0) {
-    return 'Every item is within its service level';
-  }
-  return overdue.map((o) => `${String(o.count)} ${readableLabel(o.label)}`).join(' · ');
+/** My Work filtered on the overdue items of a workflow, or of every workflow (all the user's queues). */
+export function overdueQueuePath(workflow?: string): string {
+  return queuePath({ scope: 'ALL', overdue: true, workflow });
 }
 
-/** Requests hint: quotations and PRFs in progress next to the new requests. */
-export function requestsHint(d: NbDashboard): string {
+/**
+ * The overdue items per workflow as tile breakdown lines: the business name in the right number
+ * ("1 Claim", "4 Disbursement vouchers"), never a code, each opening the overdue items of its
+ * queue.
+ */
+export function overdueBreakdown(overdue: readonly StatusCount[]): KpiBreakdownItem[] {
+  return overdue.map((o) => ({
+    key: o.code,
+    label: /^[A-Z0-9_]+$/.test(o.code) ? workflowNoun(o.code, o.count) : readableLabel(o.label),
+    count: o.count,
+    to: overdueQueuePath(o.code),
+  }));
+}
+
+/** The qualifier of the overdue tile. */
+export function overdueQualifier(overdue: readonly StatusCount[]): string {
+  const n = total(overdue);
+  return n === 0 ? 'Every item is within its service level' : 'Past their service level';
+}
+
+/** Quotations and proposal requests in progress, as breakdown lines of the New Requests tile. */
+export function requestsBreakdown(d: NbDashboard): KpiBreakdownItem[] {
   const quotations = total(d.requests.filter((r) => r.group === 'QUOTATION'));
   const proposals = total(d.requests.filter((r) => r.group === 'PROPOSAL'));
-  return `${String(quotations)} quotations · ${String(proposals)} PRFs in progress`;
+  return [
+    {
+      key: 'quotations',
+      label: nounFor(quotations, 'Quotation in progress', 'Quotations in progress'),
+      count: quotations,
+      to: '/quotations',
+    },
+    {
+      key: 'proposals',
+      label: nounFor(proposals, 'Proposal request in progress', 'Proposal requests in progress'),
+      count: proposals,
+      to: '/proposals',
+    },
+  ];
 }
 
-/** Name of what a request count counts. */
+/** First day of the month of a business date, as dd-MMM-yyyy ("Since 01-Oct-2026"). */
+export function monthStartOf(asOf: string): string {
+  return formatDate(`${asOf.slice(0, 7)}-01`);
+}
+
+/** Heading of a group of request counts (Requests by Status). */
 export function groupName(group: string): string {
-  const names: Record<string, string> = { REQUEST: 'Request', PROPOSAL: 'PRF' };
-  return names[group] ?? 'Quotation';
+  const names: Record<string, string> = {
+    REQUEST: 'Quotation Requests',
+    PROPOSAL: 'Proposal Requests',
+  };
+  return names[group] ?? 'Quotations';
 }

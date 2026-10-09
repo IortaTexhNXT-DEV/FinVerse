@@ -85,12 +85,12 @@ class ConfigUploadIT {
 
   @Test
   void everyScreenHasAnUploadWithItsWorkbookTab() {
-    assertThat(handlers).hasSize(27);
+    assertThat(handlers).hasSize(28);
     assertThat(handlers)
         .extracting(ConfigUploadHandler::templateId)
         .contains("D0-01", "D0-15", "PM-02", "PM-10", "UA-02", "UA-06", "MD-01")
         .doesNotHaveDuplicates();
-    assertThat(as.run(MAKER, () -> uploads.available())).hasSize(27);
+    assertThat(as.run(MAKER, () -> uploads.available())).hasSize(28);
     for (ConfigUploadHandler h : handlers) {
       byte[] template = as.run(MAKER, () -> uploads.template(h.code(), company()));
       assertThat(template).as(h.templateId()).isNotEmpty();

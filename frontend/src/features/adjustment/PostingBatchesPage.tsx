@@ -15,7 +15,7 @@ import { PageFooter } from '@/components/ui/Pager';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate, formatDateTime, humanize } from '@/utils/format';
+import { countOf, formatDate, formatDateTime, humanize } from '@/utils/format';
 import { adjustmentApi } from './api';
 import type { PostingBatch, RequestSummary } from './api';
 import { BatchResultDialog } from './BatchResultDialog';
@@ -94,7 +94,7 @@ function ReadyList({ onPosted }: Readonly<{ onPosted: (b: PostingBatch) => void 
       adjustmentApi.returnRequests(ids, reason, comment),
     onSuccess: async (result) => {
       await done();
-      toast.success(`${String(result.returned)} request(s) returned to the requester`);
+      toast.success(`${countOf(result.returned, 'request')} returned to the requester`);
     },
   });
   const rows = list.data?.content ?? [];
@@ -146,7 +146,7 @@ function ReadyList({ onPosted }: Readonly<{ onPosted: (b: PostingBatch) => void 
       <PageFooter data={list.data} noun="requests" onPage={setPage} />
       {dialog === 'post' && (
         <ActionDialog
-          title={`Post ${String(ids.length)} Request(s)`}
+          title={`Post ${countOf(ids.length, 'Request')}`}
           confirmLabel="Post Batch"
           busy={post.isPending}
           error={post.error}
@@ -156,7 +156,7 @@ function ReadyList({ onPosted }: Readonly<{ onPosted: (b: PostingBatch) => void 
       )}
       {dialog === 'return' && (
         <ActionDialog
-          title={`Return ${String(ids.length)} Request(s)`}
+          title={`Return ${countOf(ids.length, 'Request')}`}
           reasonLov="ADJ_RETURN_REASON"
           confirmLabel="Return"
           busy={giveBack.isPending}

@@ -11,7 +11,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { RowActions } from '@/components/ui/RowActions';
 import { useToast } from '@/components/ui/toastContext';
-import { formatDate, today } from '@/utils/format';
+import { countOf, formatDate, today } from '@/utils/format';
 import { frbsSetupApi } from './frbsSetupApi';
 import { monthText, revaluationRateActions } from './rateLabels';
 import { UserName } from '@/components/ui/UserName';
@@ -59,7 +59,7 @@ export function RevaluationRatesCard({ currencies }: Readonly<{ currencies: Curr
     mutationFn: (m: string) => frbsSetupApi.copyToBook(m),
     onSuccess: async (created) => {
       await queryClient.invalidateQueries({ queryKey: ['rates'] });
-      toast.success(`${created.length} Book rate(s) created for the next month`);
+      toast.success(`${countOf(created.length, 'book rate')} created for the next month`);
     },
   });
   const rateOk = Number(rate) > 0;

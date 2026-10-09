@@ -7,6 +7,7 @@ import { useCompanyId } from '@/context/workspaceContext';
 import { formatDate, humanize } from '@/utils/format';
 import { api } from '@/api/client';
 import type { CollectionItem } from './api';
+import { CellStack } from '@/components/ui/CellStack';
 
 /** A follow-up row carried from legacy (disposition, promise, installment or collector). */
 export interface LegacyFollowUp {
@@ -86,7 +87,7 @@ export function LegacyFollowUpCard({ item }: Readonly<{ item: CollectionItem }>)
           {
             key: 'source',
             header: 'Source',
-            render: (r) => `${r.sourceSystem} · ${r.legacyInvoiceNo}`,
+            render: (r) => <CellStack main={r.sourceSystem} sub={r.legacyInvoiceNo} />,
           },
         ]}
       />

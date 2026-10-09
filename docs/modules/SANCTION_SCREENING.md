@@ -205,6 +205,7 @@ company FVI has version 1 of each (V1950), with seed values only.
 | `SCR-INGEST-ERRORS` | Failed list records by run |
 | `SCR-STR-REGISTER` | STRs with status, extraction and AMLC reference (also Word) |
 | `SCR-AUDIT-LOG` | Screening audit log (SCR_AUDIT_VIEW) |
+| `SCR-NAME-MATCH-FALLOUT` | Name matching fall-out: potential matches of the runs of the period at or above the matching threshold but below the case threshold, with the account officer and the marketing business unit of the client |
 
 Each runs on screen and exports to PDF, Excel and CSV; every run is archived.
 

@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import java.time.LocalDate;
 
 /**
  * Create / update company request.
@@ -20,6 +21,7 @@ import jakarta.validation.constraints.Size;
  * @param forwardValueDays allowed forward-dated days for journals
  * @param retainedEarningsAccount account code receiving year-end profit/loss
  * @param profile client profile (short name, group, logo, head-office and bank codes), may be null
+ * @param taxRegistration RDO, VAT registration, CAS and e-invoicing permits, may be null
  */
 public record CompanyRequest(
     @NotBlank @Size(max = 10) @Pattern(regexp = "[A-Z0-9]+") String code,
@@ -31,7 +33,8 @@ public record CompanyRequest(
     @Min(0) @Max(366) int backValueDays,
     @Min(0) @Max(366) int forwardValueDays,
     @Size(max = 30) String retainedEarningsAccount,
-    @Valid ClientProfileRequest profile) {
+    @Valid ClientProfileRequest profile,
+    @Valid TaxRegistrationRequest taxRegistration) {
 
   /**
    * A request without the client profile (the short name is then the company code).
@@ -66,6 +69,7 @@ public record CompanyRequest(
         backValueDays,
         forwardValueDays,
         retainedEarningsAccount,
+        null,
         null);
   }
 
@@ -84,4 +88,22 @@ public record CompanyRequest(
       @Size(max = 300) String logoRef,
       @Size(max = 10) @Pattern(regexp = "[A-Z0-9]*") String headOfficeCode,
       @Size(max = 30) String defaultBankCode) {}
+
+  /**
+   * Tax registration of the company (BDOI inputs TX-Q08); null keeps the recorded registration.
+   *
+   * @param rdoCode Revenue District Office code (3 digits, optional letter)
+   * @param vatRegistered registered for VAT
+   * @param casPermitNo permit of the computerised accounting system
+   * @param casPermitDate date of the CAS permit
+   * @param einvoicingPermitNo e-invoicing permit or enrolment number
+   * @param einvoicingPermitDate date of the e-invoicing permit
+   */
+  public record TaxRegistrationRequest(
+      @Size(max = 5) @Pattern(regexp = "^$|^[0-9]{3}[A-Z]?$") String rdoCode,
+      boolean vatRegistered,
+      @Size(max = 40) String casPermitNo,
+      LocalDate casPermitDate,
+      @Size(max = 40) String einvoicingPermitNo,
+      LocalDate einvoicingPermitDate) {}
 }

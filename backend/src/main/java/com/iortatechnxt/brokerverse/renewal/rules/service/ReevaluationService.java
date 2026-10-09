@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.renewal.rules.service;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.renewal.check.service.CheckEngine;
 import com.iortatechnxt.brokerverse.renewal.check.service.Evaluation;
 import com.iortatechnxt.brokerverse.renewal.domain.Bucket;
@@ -8,6 +9,7 @@ import com.iortatechnxt.brokerverse.renewal.domain.RenewalCandidate;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalStage;
 import com.iortatechnxt.brokerverse.renewal.service.RenewalCodes;
 import com.iortatechnxt.brokerverse.renewal.service.RenewalNotices;
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -18,7 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
  * Re-evaluation of an open renewal (BRRN.023 AC 3; RENEWAL_DESIGN section 8.1): the checks run
  * again on ledger, account and booking events, on every upload and nightly; the bucket follows, a
  * system action (non-renewable risk code, LAMD) is applied to an initiated renewal, and the
- * assignees are told when it enters the Exception bucket.
+ * assignees are told when it enters the Exception bucket. The attention flag of the listing is set
+ * again (FR-RN-102).
  */
 @Service
 @Transactional
@@ -27,6 +30,8 @@ public class ReevaluationService {
   private final CheckEngine engine;
   private final RoutingService routing;
   private final RenewalNotices notices;
+  private final AttentionRules attention;
+  private final Clock clock;
 
   /**
    * Creates the service.
@@ -34,11 +39,20 @@ public class ReevaluationService {
    * @param engine check engine
    * @param routing routing (system actions)
    * @param notices notifications
+   * @param attention attention flags of the listing
+   * @param clock clock
    */
-  public ReevaluationService(CheckEngine engine, RoutingService routing, RenewalNotices notices) {
+  public ReevaluationService(
+      CheckEngine engine,
+      RoutingService routing,
+      RenewalNotices notices,
+      AttentionRules attention,
+      Clock clock) {
     this.engine = engine;
     this.routing = routing;
     this.notices = notices;
+    this.attention = attention;
+    this.clock = clock;
   }
 
   /**
@@ -55,6 +69,7 @@ public class ReevaluationService {
     Bucket before = candidate.getBucket();
     Evaluation evaluation = engine.run(candidate, trigger);
     evaluation.systemTag().ifPresent(tag -> routing.applyLater(candidate, tag));
+    attention.apply(candidate, BusinessClock.today(clock));
     if (evaluation.bucket() == Bucket.EXCEPTION && before != Bucket.EXCEPTION) {
       List<String> owners = new ArrayList<>();
       owners.add(candidate.getAssignedAo());

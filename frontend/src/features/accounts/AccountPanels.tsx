@@ -32,10 +32,9 @@ function detailRows(a: Account): DetailRow[] {
     ['Loan application', a.loanApplicationNo],
     ['PN numbers', a.pnNumbers.join(', ') || '—'],
     ['Quotation / proposal', [a.quotationRef, a.proposalRef].filter(Boolean).join(' / ') || '—'],
-    [
-      'Contact',
-      [a.contact.name, a.contact.email, a.contact.mobile].filter(Boolean).join(' · ') || '—',
-    ],
+    ['Contact', a.contact.name],
+    ['Contact e-mail', a.contact.email],
+    ['Contact mobile', a.contact.mobile],
     ['Account officer', displayNameOf(a.sales.accountOfficer)],
     [
       'Sales unit',

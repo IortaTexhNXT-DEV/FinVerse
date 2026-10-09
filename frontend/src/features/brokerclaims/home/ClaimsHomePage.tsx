@@ -18,6 +18,7 @@ import { claimsHomeApi } from './api';
 import type { BucketCount, StatusCount } from './api';
 import { bucketShares } from './homeLogic';
 import './home.css';
+import { countOf } from '@/utils/format';
 
 /** Outstanding claims per ageing bucket (BRCLM.025/026; BCL_AGEING_BUCKETS). */
 function AgeingChart({ buckets }: Readonly<{ buckets: BucketCount[] }>) {
@@ -33,7 +34,7 @@ function AgeingChart({ buckets }: Readonly<{ buckets: BucketCount[] }>) {
               key={b.bucket}
               className="bcl-ageing-row"
               role="row"
-              title={`${b.bucket} days: ${b.claims} claim(s)`}
+              title={`${b.bucket} days: ${countOf(b.claims, 'claim')}`}
             >
               <span className="bcl-ageing-label" role="rowheader">
                 {b.bucket}

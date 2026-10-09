@@ -8,10 +8,12 @@
 
 .ops-tiles {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: var(--space-3);
 }
 
+/* One anatomy per tile: a label of at most two lines in a fixed band, the count on one line under
+   it, the attention note last, so the counts of a row line up. */
 .ops-tile {
   display: flex;
   flex-direction: column;
@@ -44,12 +46,22 @@
 }
 
 .ops-tile-label {
-  font-size: 12px;
+  display: -webkit-box;
+  min-height: 36px;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 18px;
   color: var(--color-text-muted);
 }
 
 .ops-tile-count {
   font-size: 28px;
+  line-height: 34px;
+  font-variant-numeric: tabular-nums;
   font-weight: 800;
   color: var(--color-heading);
 }

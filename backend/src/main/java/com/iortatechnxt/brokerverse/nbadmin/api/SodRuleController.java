@@ -30,6 +30,13 @@ public class SodRuleController {
   private static final String MAINTAIN = "hasAuthority('UAM_SOD_MAINTAIN')";
   private static final String AUTHORIZE = "hasAuthority('UAM_SOD_AUTHORIZE')";
 
+  /**
+   * Who reads the rules: their maintainers, auditors and the user access requestors and approvers.
+   */
+  static final String LIST =
+      "hasAnyAuthority('UAM_SOD_MAINTAIN', 'UAM_SOD_AUTHORIZE', 'AUDIT_VIEW', 'UAM_VIEW',"
+          + " 'ACCESS_APPROVE', 'USER_MANAGE')";
+
   private final SodRuleService rules;
   private final AccessRequestDescriber describer;
 
@@ -45,12 +52,13 @@ public class SodRuleController {
   }
 
   /**
-   * Every rule.
+   * Every rule. The user access requestors and approvers read them too, so the profile picker of a
+   * request warns at once when two chosen profiles may not be held together.
    *
    * @return rules
    */
   @GetMapping
-  @PreAuthorize("hasAnyAuthority('UAM_SOD_MAINTAIN', 'UAM_SOD_AUTHORIZE', 'AUDIT_VIEW')")
+  @PreAuthorize(LIST)
   public List<SodRuleResponse> list() {
     return rules.list().stream().map(this::view).toList();
   }

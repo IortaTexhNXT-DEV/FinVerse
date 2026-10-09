@@ -16,6 +16,9 @@ export const COLLECTIONS_HELP: HelpSection = {
       path: '/collections',
       summary:
         'Your collection work as tiles - your open accounts, unassigned accounts, direct payments returned by insurers, credit balances, files ready and the tiles of the other Collections screens - and the open amounts per aging bracket, for all segments or one.',
+      workflow: [
+        'Collection Handlers see Broken Promises, Promises Due, Overdue Installments and Open Escalations of their own accounts; Team Leads see them for every account. Each tile opens its list.',
+      ],
       controls: [
         'An invoice enters the worklist when its net outstanding premium is above CLX_MIN_BALANCE_THRESHOLD.',
         'Aging counts from the booking or inception date in the brackets of CLX_AGING_BRACKETS.',

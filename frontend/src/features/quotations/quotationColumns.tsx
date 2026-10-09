@@ -3,7 +3,7 @@ import { ReferenceChip } from '@/components/broking/ReferenceChip';
 import { Amount } from '@/components/ui/Amount';
 import type { Column } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/StatusBadge';
-import { formatDate, today } from '@/utils/format';
+import { countOf, formatDate, today } from '@/utils/format';
 import { daysLeft } from './quotationList';
 import { InsurerName, ProductName } from '@/components/broking/LovLabel';
 
@@ -17,7 +17,7 @@ function validity(q: QuotationListItem) {
       {formatDate(q.validUntil)}
       {open && left <= EXPIRY_WARNING_DAYS && (
         <div className={left < 0 ? 'text-danger' : 'muted'}>
-          {left < 0 ? 'Expired' : `${left} day(s) left`}
+          {left < 0 ? 'Expired' : `${countOf(left, 'day')} left`}
         </div>
       )}
     </span>

@@ -29,6 +29,7 @@ export const EXPIRY_TABS: RenewalTabDef[] = [
   { id: 'NOT_FOR_RENEWAL', label: 'Not for Renewal' },
   { id: 'LOST_BUSINESS', label: 'Lost Business' },
   { id: 'EXCEPTIONS', label: 'Exceptions' },
+  { id: 'ATTENTION', label: 'Need Attention' },
   { id: 'TRANSFER_PENDING', label: 'Transfer Pending' },
   { id: 'ALL', label: 'All' },
 ];
@@ -48,6 +49,8 @@ export const LETTER_TABS: RenewalTabDef[] = [
   { id: 'RA_GENERATED', label: 'RA Generated' },
   { id: 'RA_SENT', label: 'RA Sent' },
   { id: 'LETTER_PENDING', label: 'NAL / NFR' },
+  { id: 'NAL_DUE', label: 'Unrenewed – NAL' },
+  { id: 'NRL_DUE', label: 'Unrenewed – NRL' },
   { id: 'NRNS', label: 'NRNS' },
 ];
 

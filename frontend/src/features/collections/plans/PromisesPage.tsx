@@ -18,7 +18,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate } from '@/utils/format';
+import { countOf, formatDate } from '@/utils/format';
 import type { ItemResult, PaymentPromise } from './api';
 import { plansApi } from './api';
 import type { PromiseTab } from './labels';
@@ -67,6 +67,11 @@ const COLUMNS: Column<PaymentPromise>[] = [
   { key: 'status', header: 'Status', render: (p) => <StatusBadge status={p.status} /> },
 ];
 
+/** The tab asked for in the address (a home tile), Open Promises by default. */
+function promiseTabOf(value: string | null): PromiseTab {
+  return PROMISE_TABS.find((t) => t.id === value)?.id ?? 'OPEN';
+}
+
 /**
  * Promises to pay (BRCLXN.055): open promises by promised date, broken, kept and withdrawn ones;
  * record a promise on one invoice, or the same promise on several (bulk update), and withdraw
@@ -79,7 +84,7 @@ export default function PromisesPage() {
   const toast = useToast();
   const queryClient = useQueryClient();
   const [params] = useSearchParams();
-  const [tab, setTab] = useState<PromiseTab>('OPEN');
+  const [tab, setTab] = useState<PromiseTab>(() => promiseTabOf(params.get('tab')));
   const [query, setQuery] = useState(params.get('q') ?? '');
   const [page, setPage] = useState(0);
   const [recording, setRecording] = useState(false);
@@ -106,7 +111,7 @@ export default function PromisesPage() {
       setWithdrawing(false);
       selection.clear();
       await queryClient.invalidateQueries({ queryKey: ['collections', 'promises'] });
-      toast.success(`${n} promise(s) withdrawn`);
+      toast.success(`${countOf(n, 'promise')} withdrawn`);
     },
   });
   const list = rows.data?.content ?? [];

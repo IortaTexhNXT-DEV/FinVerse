@@ -15,7 +15,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDateTime, today } from '@/utils/format';
+import { countOf, formatDateTime, today } from '@/utils/format';
 import { collectionsApi } from './api';
 import type { ScheduledFile } from './api';
 import { reportTitle } from './collectionsLogic';
@@ -24,6 +24,7 @@ import { displayNameOf } from '@/api/users';
 import { DateInput } from '@/components/ui/DateInput';
 import { PeriodCell } from '@/components/ui/PeriodCell';
 import { RowActionMenu } from '@/components/ui/RowActionMenu';
+import { CellStack } from '@/components/ui/CellStack';
 
 type FileTab = '' | 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'ON_REQUEST';
 
@@ -122,7 +123,9 @@ export default function FilesPage() {
       setGenerating(false);
       await queryClient.invalidateQueries({ queryKey: ['collections', 'files'] });
       toast.success(
-        out.length === 0 ? 'Nothing to publish for that date' : `${out.length} file(s) published`,
+        out.length === 0
+          ? 'Nothing to publish for that date'
+          : `${countOf(out.length, 'file')} published`,
       );
     },
   });
@@ -148,7 +151,9 @@ export default function FilesPage() {
     {
       key: 'c',
       header: 'Published',
-      render: (f) => `${formatDateTime(f.createdAt)} · ${displayNameOf(f.createdBy)}`,
+      render: (f) => (
+        <CellStack main={formatDateTime(f.createdAt)} sub={displayNameOf(f.createdBy)} />
+      ),
     },
     {
       key: 'a',

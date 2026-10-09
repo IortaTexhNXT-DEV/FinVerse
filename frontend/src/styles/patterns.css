@@ -1174,3 +1174,585 @@ dl.form-grid dd {
   font-size: 13px;
   margin-right: auto;
 }
+
+/* ---------- KPI tiles (dashboards): one anatomy and one height per row ------------------------ */
+/* Label, big figure, one short qualifier, then an optional structured part (ranked breakdown or
+   labelled figures) that starts at the same line in every tile of the row. */
+.kpi-tile {
+  display: flex;
+  flex-direction: column;
+  min-height: 112px;
+  padding: var(--space-4) var(--space-5);
+  border-top: 4px solid var(--brand-blue);
+}
+
+.kpi-tile:has(.kpi-tile-detail) {
+  min-height: 168px;
+}
+
+.kpi-tile-alert {
+  border-top-color: var(--color-danger);
+}
+
+.kpi-tile-label {
+  margin: 0;
+  font-size: 13px;
+  line-height: 20px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.kpi-tile-value {
+  font-family: var(--font-heading);
+  font-size: 28px;
+  line-height: 36px;
+  font-weight: 700;
+  color: var(--brand-navy);
+  font-variant-numeric: tabular-nums;
+}
+
+.kpi-tile-value a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.kpi-tile-value a:hover,
+.kpi-tile-value a:focus-visible {
+  text-decoration: underline;
+}
+
+.kpi-tile-qualifier {
+  min-height: 18px;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.kpi-tile-detail {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  margin-top: var(--space-3);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--color-border);
+}
+
+.kpi-list,
+.kpi-pairs {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.kpi-list-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  padding: 2px var(--space-1);
+  margin: 0 calc(-1 * var(--space-1));
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+a.kpi-list-row:hover,
+a.kpi-list-row:focus-visible {
+  background: var(--brand-blue-050);
+  color: var(--brand-blue);
+}
+
+.kpi-list-label {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.kpi-list-value {
+  margin: 0;
+  font-weight: 700;
+  color: var(--color-heading);
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.kpi-more {
+  margin-top: auto;
+  padding-top: var(--space-1);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--brand-blue);
+  text-decoration: none;
+}
+
+.kpi-more:hover,
+.kpi-more:focus-visible {
+  text-decoration: underline;
+}
+
+/* ---------- Work list toolbar: one row of controls of one height ------------------------------ */
+/* Search box, its button, filter toggles and actions share the compact toolbar height and wrap as
+   whole controls on narrow windows. */
+.worklist-toolbar {
+  --control-height: 40px;
+}
+
+.worklist-toolbar .btn {
+  white-space: nowrap;
+}
+
+.worklist-search {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.worklist-search .input {
+  min-width: 200px;
+}
+
+.filter-toggle,
+.worklist-toolbar label.checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--control-height);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--brand-field-blue);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-heading);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.filter-toggle input,
+.worklist-toolbar label.checkbox input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--brand-blue);
+}
+
+.filter-toggle.checked,
+.worklist-toolbar label.checkbox:has(input:checked) {
+  border-color: var(--brand-blue);
+  background: var(--brand-blue-050);
+  color: var(--brand-blue);
+}
+
+.filter-toggle:focus-within,
+.worklist-toolbar label.checkbox:focus-within {
+  box-shadow: var(--focus-ring);
+}
+
+/* ---------- Group profile picker (user access) ------------------------------------------------ */
+/* Left: profiles by business area in collapsible groups; right: the selection, separation-of-
+   duties warnings and the details of the profile in view. One column on narrow windows. */
+.profile-picker {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+  container-type: inline-size;
+}
+
+.profile-picker > legend {
+  margin-bottom: var(--space-2);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-heading);
+}
+
+.profile-picker-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 380px);
+  gap: var(--space-4);
+  align-items: start;
+}
+
+/* The picker stacks when its own width is narrow (a dialog, a narrow window). */
+@container (max-width: 760px) {
+  .profile-picker-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .profile-picker-side {
+    position: static;
+  }
+}
+
+.profile-picker-list {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  min-width: 0;
+}
+
+.profile-picker-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+  --control-height: 40px;
+}
+
+.profile-search {
+  position: relative;
+  display: flex;
+  flex: 1 1 260px;
+  align-items: center;
+}
+
+.profile-search svg {
+  position: absolute;
+  left: var(--space-3);
+  color: var(--color-placeholder);
+  pointer-events: none;
+}
+
+.profile-search .input {
+  width: 100%;
+  padding-left: 36px;
+}
+
+.profile-group + .profile-group {
+  border-top: 1px solid var(--color-border);
+}
+
+.profile-group-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  background: var(--color-surface-alt);
+  font: inherit;
+  font-weight: 700;
+  color: var(--color-heading);
+  text-align: left;
+  cursor: pointer;
+}
+
+.profile-group-head:hover,
+.profile-group-head:focus-visible {
+  background: var(--brand-blue-050);
+}
+
+.profile-group-head svg {
+  color: var(--brand-blue);
+  flex: none;
+}
+
+.profile-group-name {
+  flex: 1;
+}
+
+.profile-group-count {
+  min-width: 28px;
+  padding: 0 var(--space-2);
+  border-radius: 999px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.profile-options {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.profile-option {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3) var(--space-2) var(--space-6);
+  border-top: 1px solid var(--color-border);
+}
+
+.profile-option.selected {
+  background: var(--brand-blue-050);
+}
+
+.profile-option input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--brand-blue);
+}
+
+.profile-option-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.profile-option-name {
+  font-weight: 600;
+  color: var(--color-heading);
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.profile-option-desc {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.profile-option-tags {
+  display: flex;
+  gap: var(--space-1);
+}
+
+.profile-option-info[aria-pressed='true'] {
+  background: var(--brand-blue-050);
+  color: var(--brand-blue);
+}
+
+.profile-picker-side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  position: sticky;
+  top: var(--space-4);
+}
+
+.profile-picker-side-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font-size: 16px;
+}
+
+.profile-selected {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.profile-selected-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-areas:
+    'name tag action'
+    'area tag action';
+  align-items: center;
+  column-gap: var(--space-2);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.profile-selected-item > .link-button {
+  grid-area: name;
+  justify-self: start;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+  text-align: left;
+}
+
+.profile-selected-area {
+  grid-area: area;
+  font-size: 12px;
+}
+
+.profile-selected-item > .tag {
+  grid-area: tag;
+}
+
+.profile-selected-item > .btn {
+  grid-area: action;
+}
+
+.profile-selected-item.removed > .link-button {
+  text-decoration: line-through;
+  color: var(--color-text-muted);
+}
+
+.profile-selected-item.conflict {
+  box-shadow: inset 3px 0 0 var(--color-warning-accent);
+  padding-left: var(--space-2);
+}
+
+.profile-selected-empty,
+.profile-picker-note {
+  margin: 0;
+  font-size: 13px;
+}
+
+.profile-details {
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+}
+
+.profile-details-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.profile-details-head h3 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.profile-details > p {
+  margin: var(--space-1) 0 var(--space-2);
+  font-size: 13px;
+}
+
+.profile-details-facts {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr);
+  gap: var(--space-1) var(--space-2);
+  margin: 0 0 var(--space-2);
+  font-size: 13px;
+}
+
+.profile-details-facts dt {
+  color: var(--color-text-muted);
+}
+
+.profile-details-facts dd {
+  margin: 0;
+  color: var(--color-heading);
+}
+
+.profile-details-group h4 {
+  margin: var(--space-2) 0 var(--space-1);
+  font-size: 13px;
+}
+
+.profile-details-group ul {
+  margin: 0;
+  padding-left: var(--space-4);
+  font-size: 13px;
+}
+
+/* ---------- Page header: the title block takes the room left, the actions stay on the right --- */
+/* A long description wraps under the title instead of pushing the actions onto a line of their
+   own; the actions (fields and buttons) line up on their bottom edge. */
+.page-title {
+  flex: 1 1 360px;
+  min-width: 0;
+}
+
+.page-header > .page-actions {
+  flex: 0 1 auto;
+  justify-content: flex-end;
+  align-items: flex-end;
+  margin-left: auto;
+}
+
+/* ---------- KPI tiles that open their list (home pages) --------------------------------------- */
+/* The whole tile is the link: no underline, one tile height, the hover of a clickable card. */
+a.card.kpi {
+  display: flex;
+  flex-direction: column;
+  min-height: 112px;
+  color: inherit;
+  text-decoration: none;
+}
+
+a.card.kpi:hover,
+a.card.kpi:focus-visible {
+  box-shadow: var(--shadow-md);
+}
+
+a.card.kpi:hover .kpi-label,
+a.card.kpi:focus-visible .kpi-label {
+  color: var(--brand-blue);
+}
+
+.kpi .kpi-hint {
+  margin-top: var(--space-1);
+}
+
+/* ---------- Tab strips: one line ------------------------------------------------------------- */
+/* Tabs never wrap onto a second line (a wrapped strip reads as two rows of tabs): the labels stay
+   whole and a long strip scrolls sideways on a narrow window, with a thin scroll bar. */
+.tabs {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.tab {
+  flex: none;
+  white-space: nowrap;
+}
+
+.card-body.flush .tabs {
+  padding-top: var(--space-3);
+}
+
+.card-body.flush .tab {
+  padding: var(--space-2) var(--space-4);
+}
+
+/* ---------- Table header labels may wrap between words ------------------------------------- */
+/* A long column label ("Status / Classification", "Risk / Insurance Company") wraps onto a second
+   line instead of widening the table past its card; one word never breaks. */
+.table thead th {
+  white-space: normal;
+  overflow-wrap: normal;
+  text-wrap: balance;
+}
+
+/* ---------- Column widths: a code column keeps its width, a text column keeps readable lines --- */
+/* The second line of a code cell (the name under a programme or request number) wraps within the
+   code column instead of widening it; a two-line text cell (client, risk and insurer) is never
+   squeezed to one word per line. */
+.table td.col-code .cell-stack > :not(:first-child):not(.nowrap) {
+  white-space: normal;
+}
+
+.table td:has(> .cell-stack):not(.col-code, .num, .col-status, .col-date, .col-datetime) {
+  min-width: 152px;
+}
+
+/* A card whose body is folded away (Queues by Stage) is its header alone, without an empty band. */
+.card-body:empty {
+  display: none;
+}
+
+/* Denser cell padding (10 px each side): a list of eight to ten columns fits a 1440 px window. */
+.table th,
+.table td {
+  padding-left: 10px;
+  padding-right: 10px;
+}

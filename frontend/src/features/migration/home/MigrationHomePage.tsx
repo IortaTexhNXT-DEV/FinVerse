@@ -10,7 +10,7 @@ import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDateTime } from '@/utils/format';
+import { formatDateTime, titleCase } from '@/utils/format';
 import { MigStatus } from '../common/MigStatus';
 import { MIG_SECTION, migLabel } from '../common/migrationCodes';
 import '../migration.css';
@@ -137,7 +137,7 @@ export default function MigrationHomePage() {
           const value = data === undefined ? '–' : String(tile.value(data));
           return (
             <Link key={tile.id} to={tile.to} className="card kpi" aria-label={tile.label}>
-              <div className="kpi-label">{tile.label}</div>
+              <div className="kpi-label">{titleCase(tile.label)}</div>
               <div className="kpi-value">{value}</div>
               {tile.alert === true && value !== '0' && value !== '–' && (
                 <div className="kpi-hint">Needs attention</div>

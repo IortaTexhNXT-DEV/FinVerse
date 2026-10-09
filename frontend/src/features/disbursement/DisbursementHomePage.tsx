@@ -27,6 +27,7 @@ import { RequestDialog } from './WorkbenchParts';
 import './disbursement.css';
 import { DateInput } from '@/components/ui/DateInput';
 import { ConfirmButton } from '@/components/ui/ConfirmButton';
+import { countOf } from '@/utils/format';
 
 interface Filters {
   type: string;
@@ -36,7 +37,7 @@ interface Filters {
 
 const NO_FILTERS: Filters = { type: '', from: '', to: '' };
 
-function countOf(summary: Summary | undefined, tab: WorkbenchTab): number | undefined {
+function tabCount(summary: Summary | undefined, tab: WorkbenchTab): number | undefined {
   if (summary === undefined) {
     return undefined;
   }
@@ -53,7 +54,7 @@ function countOf(summary: Summary | undefined, tab: WorkbenchTab): number | unde
 }
 
 function tabLabel(summary: Summary | undefined, tab: WorkbenchTab, label: string): string {
-  const n = countOf(summary, tab);
+  const n = tabCount(summary, tab);
   return n === undefined ? label : `${label} (${n})`;
 }
 
@@ -113,7 +114,7 @@ function useBulkApprove(reset: () => void) {
       const ok = results.filter((r) => r.ok).length;
       const failed = results.filter((r) => !r.ok);
       if (failed.length === 0) {
-        toast.success(`${ok} voucher(s) approved and posted`);
+        toast.success(`${countOf(ok, 'voucher')} approved and posted`);
       } else {
         toast.error(`${ok} approved; ${failed.length} failed: ${failed[0]?.message ?? ''}`);
       }
@@ -224,7 +225,7 @@ function BulkApprove({ selection }: Readonly<{ selection: RowSelection }>) {
         disabled={ids.length === 0}
         busy={bulk.isPending}
         confirm={{
-          title: `Approve ${String(ids.length)} Item(s)`,
+          title: `Approve ${countOf(ids.length, 'Item')}`,
           effect:
             'Each selected item is approved on its own; an item that cannot be approved is reported and stays pending.',
         }}

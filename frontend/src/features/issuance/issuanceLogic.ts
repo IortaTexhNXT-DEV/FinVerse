@@ -1,4 +1,4 @@
-import type { IssuanceCounts, IssuanceRow, IssuanceTab, Review } from '@/api/issuance';
+import type { Advice, IssuanceCounts, IssuanceRow, IssuanceTab, Review } from '@/api/issuance';
 import { humanize } from '@/utils/format';
 
 /** Issuance Workbench tabs. */
@@ -90,4 +90,33 @@ export function extractionNotes(note: string): string[] {
     .map((n) => n.trim())
     .filter((n) => n !== '')
     .map((n) => `${n.charAt(0).toUpperCase()}${n.slice(1)}${n.endsWith('.') ? '' : '.'}`);
+}
+
+/** How an Insurance Advice was sent, for the register: automatic, manual, or why not. */
+export function adviceSending(
+  advice: Pick<Advice, 'sendMode' | 'autoSendFailure' | 'status'>,
+): string {
+  if (advice.autoSendFailure && advice.status === 'GENERATED') {
+    return `Not sent automatically: ${advice.autoSendFailure}`;
+  }
+  if (advice.sendMode === 'AUTOMATIC') {
+    return 'Automatic';
+  }
+  return advice.sendMode === 'MANUAL' ? 'Manual' : 'Waiting';
+}
+
+/** Why an Insurance Advice recipient set-up cannot be saved, or undefined when it can. */
+export function recipientProblem(r: {
+  mortgageeBank: string;
+  to: string[];
+  autoSend: boolean;
+  effectiveFrom: string;
+}): string | undefined {
+  if (r.mortgageeBank === '' || r.effectiveFrom === '') {
+    return 'Choose the mortgagee bank and the start date.';
+  }
+  if (r.autoSend && r.to.length === 0) {
+    return 'Enter at least one recipient for automatic sending.';
+  }
+  return undefined;
 }

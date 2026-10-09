@@ -6,7 +6,6 @@ import type { AccessRequest, RoleInfo, UserAccess } from '@/api/nbadmin';
 import { ebWrapper } from '@/features/eb/testWrapper';
 import AccessRequestPage from './AccessRequestPage';
 import { accessRequestStages, accessStatusLabel } from './accessStages';
-import { profileGroups } from './profileGroups';
 
 const role = (code: string, name: string, module?: string, active = true): RoleInfo => ({
   id: code.length,
@@ -54,7 +53,7 @@ const USER = {
   roleCodes: ['MKT_AO', 'SYSADMIN'],
 } as unknown as UserAccess;
 
-describe('access request labels and profile picker', () => {
+describe('access request labels', () => {
   it('names a request waiting for its approver Pending Approval everywhere', () => {
     expect(accessStatusLabel('PENDING')).toBe('Pending Approval');
     expect(accessStatusLabel('RETURNED')).toBe('Returned');
@@ -64,18 +63,6 @@ describe('access request labels and profile picker', () => {
       lifecycle: REQUEST.lifecycle,
     });
     expect(stages.find((s) => s.code === 'PENDING')?.name).toBe('Pending Approval');
-  });
-
-  it('groups the active group profiles by module and filters them by a search', () => {
-    const all = profileGroups(ROLES, '', []);
-    expect(all.map((g) => g.module)).toEqual([
-      'Data Migration',
-      'New Business',
-      'Platform and Administration',
-    ]);
-    expect(all.flatMap((g) => g.roles.map((r) => r.code))).not.toContain('OLD');
-    const found = profileGroups(ROLES, 'migration', ['MKT_AO']);
-    expect(found.flatMap((g) => g.roles.map((r) => r.code))).toEqual(['MIG_DO', 'MKT_AO']);
   });
 });
 

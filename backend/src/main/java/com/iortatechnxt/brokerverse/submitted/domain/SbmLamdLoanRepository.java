@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-/** LAMD loan snapshots. */
+/** Loan files of the bank (LAMD, LMS, LAD). */
 public interface SbmLamdLoanRepository extends JpaRepository<SbmLamdLoan, Long> {
 
   /**
@@ -32,6 +32,51 @@ public interface SbmLamdLoanRepository extends JpaRepository<SbmLamdLoan, Long> 
    */
   Optional<SbmLamdLoan> findFirstByCompanyIdAndPnNoOrderBySnapshotDateDescIdDesc(
       Long companyId, String pnNo);
+
+  /**
+   * The rows of a loan file for a PN number (the caller keeps the one with the same loan
+   * application number: loading the same loan again for the same report and date replaces it).
+   *
+   * @param companyId company
+   * @param loanReport loan report
+   * @param snapshotDate date of the file
+   * @param pnNo PN number
+   * @return rows
+   */
+  List<SbmLamdLoan> findByCompanyIdAndLoanReportAndSnapshotDateAndPnNo(
+      Long companyId, String loanReport, LocalDate snapshotDate, String pnNo);
+
+  /**
+   * The rows of a loan file for a loan application number.
+   *
+   * @param companyId company
+   * @param loanReport loan report
+   * @param snapshotDate date of the file
+   * @param loanApplicationNo loan application number
+   * @return rows
+   */
+  List<SbmLamdLoan> findByCompanyIdAndLoanReportAndSnapshotDateAndLoanApplicationNo(
+      Long companyId, String loanReport, LocalDate snapshotDate, String loanApplicationNo);
+
+  /**
+   * The rows of a PN number in every loan file, newest file first.
+   *
+   * @param companyId company
+   * @param pnNo PN number
+   * @return rows
+   */
+  List<SbmLamdLoan> findByCompanyIdAndPnNoOrderBySnapshotDateDescIdDesc(
+      Long companyId, String pnNo);
+
+  /**
+   * The rows of a loan application number in every loan file, newest file first.
+   *
+   * @param companyId company
+   * @param loanApplicationNo loan application number
+   * @return rows
+   */
+  List<SbmLamdLoan> findByCompanyIdAndLoanApplicationNoOrderBySnapshotDateDescIdDesc(
+      Long companyId, String loanApplicationNo);
 
   /**
    * Loans of a snapshot.

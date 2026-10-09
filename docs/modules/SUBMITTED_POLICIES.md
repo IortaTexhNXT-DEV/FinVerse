@@ -56,10 +56,11 @@ A user sees the records of the segments of their scope (Setup, User Scopes); the
 | Submitted policy | `/submitted/policies/:id` | `SBM_VIEW` |
 | Upload & Intake | `/submitted/intake` | `SBM_INTAKE` or `SBM_MIGRATE` |
 | Extraction Review | `/submitted/extractions` | `SBM_MAINTAIN` |
-| Processing Runs | `/submitted/runs` | `SBM_VIEW` |
+| Processing Runs | `/submitted/runs` | `SBM_VIEW` (tabs Loan File Results and Unmatched Loans: the loan file and key of each record) |
 | Reviews & IAAF | `/submitted/reviews` | `SBM_VIEW` (`IAAF_PREPARE`, `IAAF_APPROVE` for the actions) |
 | Terms of Reference | `/submitted/tors` | `SBM_VIEW` or `TOR_APPROVE` |
 | Renewal Work List | `/submitted/renewals` | `SBM_VIEW` (Scan Now, Re-assign: `SBM_PROCESS`) |
+| Renewal Proposals | `/submitted/proposals` | `SBM_PROPOSAL` (Create Proposals, Proposal Batches with release and return by someone other than the maker, Assign Insurer, Nominated Rates with maker and checker) |
 | Letters & Print Batches | `/submitted/letters` | `SBM_LETTER_SEND` |
 | Handling Fees | `/submitted/fees` | `SBM_HANDLING_FEE` |
 | No Touch Billing | `/submitted/no-touch` | `SBM_HANDLING_FEE` |
@@ -67,7 +68,8 @@ A user sees the records of the segments of their scope (Setup, User Scopes); the
 
 ## 4. Life of a record
 
-`RECEIVED` (intake) → `VALIDATED` (entered by hand or confirmed) → processing: `CLASSIFIED`, `IN_REVIEW`, `FOR_RENEWAL`,
+`RECEIVED` (intake) → `VALIDATED` (entered by hand or confirmed) → processing (the matching step looks the record up in
+the newest loan file on its PN number, then on its loan application number, and logs the result): `CLASSIFIED`, `IN_REVIEW`, `FOR_RENEWAL`,
 `FOR_MANUAL_DISPOSITION` or `EXCLUDED` (a fallout stays where it is, flagged) → `RENEWAL_IN_PROGRESS` (handed to Renewal)
 → `PLACED` → `BOOKED`, or `NOT_RENEWED` / `CLOSED`. The handler disposes a record for renewal, excludes it with a
 non-renewal reason, reinstates it or closes it; every change of a field is in the History tab.
@@ -86,7 +88,7 @@ non-renewal reason, reinstates it or closes it; every change of a field is in th
 ## 6. Uploads
 
 `SBM_LFS_INSURANCE`, `SBM_HLS_INSURANCE`, `SBM_CIU`, `SBM_SPI`, `SBM_LOAN_BOOKING`, `SBM_IA_MASTERLIST` (sources),
-`SBM_LAMD` (loan snapshot), `SBM_MIGRATION` (Excel masterlists, legacy statuses through the status map),
+`SBM_LAMD` (loan file of the report chosen: LAMD, LMS or LAD; a loan has a PN number or a loan application number), `SBM_MIGRATION` (Excel masterlists, legacy statuses through the status map),
 `SBM_HANDLING_FEE_BILLING` (fees billed) and `SBM_NO_TOUCH_RETURN` (the insurer's return of a No Touch batch). Each has
 its template on the upload screen; a committed source upload starts a processing run of its records.
 
@@ -96,7 +98,7 @@ Parameters of category SUBMITTED: `SBM_RENEWAL_LEAD_DAYS` (per segment: CBG Fire
 `SBM_INSURER_ACCEPT_DAYS`, `SBM_HOLD_COVER_UNBOOKED_ALERT_DAYS`, `SBM_REVIEW_SLA_DAYS`, `SBM_MANUAL_RENEWAL_SEGMENTS`,
 `SBM_OWN_RECORDS_ROLES`, `SBM_NUMBER_PREFIX`. Lists: `SBM_SEGMENT`, `SBM_BUCKET` (the group of each bucket says whether it
 is renewed, disposed by hand or excluded), `SBM_REASON`, `SBM_NON_RENEWAL_REASON`, `SBM_CONVERSION_STATUS`,
-`SBM_LOAN_STATUS`, `SBM_LETTER_TYPE`, `SBM_DECLINE_REASON`, `SBM_IAAF_FINDING`, `SBM_RETURN_REASON`.
+`SBM_LOAN_STATUS`, `SBM_LOAN_REPORT` (LAMD, LMS, LAD in their order of precedence), `SBM_LETTER_TYPE`, `SBM_DECLINE_REASON`, `SBM_IAAF_FINDING`, `SBM_RETURN_REASON`.
 
 ## 8. Alerts and notifications
 
@@ -109,7 +111,9 @@ handler and the Account Officer are told when a renewal starts. IAAF and TOR wai
 Report Centre, category Submitted Policies: `SBM-MASTERLIST`, `SBM-DOC-FALLOUT`, `SBM-PROCESS-FALLOUT`,
 `SBM-NON-RENEWAL`, `SBM-MIGRATION-ERRORS`, `SBM-SANITATION`, `SBM-DISPOSITION`, `SBM-CLASSIFICATION`, `SBM-RENEWABLE`,
 `SBM-IAAF`, `SBM-TOR`, `SBM-HANDLING-FEE`, `SBM-CONVERSION`, `SBM-NO-TOUCH`, `SBM-PR-CONVERSION`, `SBM-PR-MONITORING`,
-`SBM-PERSISTENCY`, `SBM-PENETRATION`, `SBM-HOLD-COVER-GAP`, `SBM-LETTERS`. Each takes the company and a date range; the
+`SBM-PERSISTENCY`, `SBM-PENETRATION`, `SBM-HOLD-COVER-GAP`, `SBM-LETTERS`, `SBM-EXPIRING-UNINSURED` (part 1: the
+accounts expiring in the period; part 2: the active loans of the latest loan files without a policy in force at the end of
+the period). Each takes the company and a date range; the
 reports of the masterlist are limited to the user's scope. View: `SBM_REPORT_VIEW`; export: `SBM_REPORT_EXPORT`.
 
 ## 10. Accounting

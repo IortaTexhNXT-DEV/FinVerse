@@ -14,7 +14,7 @@ import { Field } from '@/components/ui/Field';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { InsurerChoices } from '@/features/proposals/ProposalFormParts';
-import { formatDate, formatDateTime } from '@/utils/format';
+import { countOf, formatDate, formatDateTime } from '@/utils/format';
 import { ResponseDialog } from './ResponseDialog';
 import { responseColumns } from './responseColumns';
 import { displayNameOf } from '@/api/users';
@@ -103,7 +103,7 @@ function RoundActions({ request, round, onChanged }: Readonly<RoundProps>) {
     mutationFn: () => productMaintApi.approveSlip(request.id, round.roundNo),
     onSuccess: async (r) => {
       await onChanged();
-      toast.success(`${r.qsNo ?? 'Slip'} sent to ${r.insurers.length} insurer(s)`);
+      toast.success(`${r.qsNo ?? 'Slip'} sent to ${countOf(r.insurers.length, 'insurer')}`);
     },
   });
   const approvable =

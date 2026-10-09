@@ -26,6 +26,12 @@ public class SbmReportSupport {
   /** Placeholder of the scope condition in a report SQL. */
   public static final String SCOPE = "{scope}";
 
+  /**
+   * Placeholder of the scope condition on the loan files {@code l} (FR-SP-083): the segments of the
+   * user's scope; a user who sees only own records sees no loan without a record.
+   */
+  public static final String LOAN_SCOPE = "{loanScope}";
+
   /** Filter of the date range on a column, with the {@code :from} and {@code :to} parameters. */
   public static final String RANGE =
       " and (cast(:from as date) is null or cast(%1$s as date) >= :from)"
@@ -88,7 +94,16 @@ public class SbmReportSupport {
             .with(TO, p.optionalDate(TO).orElse(null))
             .with("scopeSegments", scope.segments().isEmpty() ? List.of("") : scope.segments())
             .with("scopeUser", scope.username() == null ? "" : scope.username());
-    return jdbc.rows(sql.replace(SCOPE, scope.sql()), args.map()).stream()
+    String loanScope =
+        scope
+            .sql()
+            .replace("p.segment", "l.segment")
+            .replace(
+                "(p.handler_username = :scopeUser or p.ao_username = :scopeUser)",
+                "(1 = 0 and :scopeUser = '')");
+    return jdbc
+        .rows(sql.replace(SCOPE, scope.sql()).replace(LOAN_SCOPE, loanScope), args.map())
+        .stream()
         .map(this::labels)
         .toList();
   }

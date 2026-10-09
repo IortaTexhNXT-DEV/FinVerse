@@ -18,12 +18,12 @@ sign-off per BRD"). Each document is kept once, in its latest version.
 
 The sets of BRD-03, BRD-11, BRD-13 also carry the UX screen documents for the BDOI UX Design team: 07 the UX Screen Deck (every screen persona by persona and flow by flow, with all its states), 08 the UX screen register (one row per screen image with the FRS section, the UXD status and the change flag) and 09 the image package (every screen image at twice the screen resolution, with the register as CSV). A change of the FRS names the screens it affects, so the UX Design team revises only those screens.
 
-The drop-level set `Drop-0_Closure/` (v2.0) covers the whole drop: 01 Configuration inputs workbook (Excel); 02 Closure summary (Word). Its workbook lists every configuration input BDOI provides before go-live with its owner, due date and one route (screen, template or data migration object).
+The drop-level set `Drop-0_Closure/` (v2.1) covers the whole drop: 01 Configuration inputs workbook (Excel); 02 Closure summary (Word). Its workbook lists every configuration input BDOI provides before go-live with its owner, due date and one route (screen, template or data migration object).
 
 | Document | BRD | Kind | Version | File |
 |---|---|---|---|---|
-| Configuration Inputs | - | Configuration inputs workbook (Excel) | 2.0 | [`Drop-0_Closure/01_BIBS_Drop-0_Configuration_Inputs_v2.0.xlsx`](Drop-0_Closure/01_BIBS_Drop-0_Configuration_Inputs_v2.0.xlsx) |
-| Closure Summary | - | Closure summary (Word) | 2.0 | [`Drop-0_Closure/02_BIBS_Drop-0_Closure_Summary_v2.0.docx`](Drop-0_Closure/02_BIBS_Drop-0_Closure_Summary_v2.0.docx) |
+| Configuration Inputs | - | Configuration inputs workbook (Excel) | 2.1 | [`Drop-0_Closure/01_BIBS_Drop-0_Configuration_Inputs_v2.1.xlsx`](Drop-0_Closure/01_BIBS_Drop-0_Configuration_Inputs_v2.1.xlsx) |
+| Closure Summary | - | Closure summary (Word) | 2.1 | [`Drop-0_Closure/02_BIBS_Drop-0_Closure_Summary_v2.1.docx`](Drop-0_Closure/02_BIBS_Drop-0_Closure_Summary_v2.1.docx) |
 | Product Maintenance | BRD-03 | Start here guide | 2.1 | [`BRD-03_Product_Maintenance/00_BIBS_StartHere_BRD-03_Product_Maintenance_v2.1.docx`](BRD-03_Product_Maintenance/00_BIBS_StartHere_BRD-03_Product_Maintenance_v2.1.docx) |
 | Product Maintenance | BRD-03 | Sign-off pack guide deck | 2.1 | [`BRD-03_Product_Maintenance/01_BIBS_GuideDeck_BRD-03_Product_Maintenance_v2.1.pptx`](BRD-03_Product_Maintenance/01_BIBS_GuideDeck_BRD-03_Product_Maintenance_v2.1.pptx) |
 | Product Maintenance | BRD-03 | FRS | 2.1 | [`BRD-03_Product_Maintenance/02_BIBS_FRS_BRD-03_Product_Maintenance_v2.1.docx`](BRD-03_Product_Maintenance/02_BIBS_FRS_BRD-03_Product_Maintenance_v2.1.docx) |

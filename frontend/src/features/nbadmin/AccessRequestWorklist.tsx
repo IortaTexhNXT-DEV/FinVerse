@@ -24,7 +24,7 @@ import { PageFooter } from '@/components/ui/Pager';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
-import { formatDateTime } from '@/utils/format';
+import { countOf, formatDateTime } from '@/utils/format';
 import { GROUP_TYPES, REQUEST_TYPE_LABELS, USER_TYPES } from './accessRequest';
 import { accessStatusLabel } from './accessStages';
 import { UserName } from '@/components/ui/UserName';
@@ -214,7 +214,7 @@ export function AccessRequestWorklist({
     },
     onSuccess: async (count) => {
       selection.clear();
-      toast.success(`${String(count)} request(s) approved`);
+      toast.success(`${countOf(count, 'request')} approved`);
       await queryClient.invalidateQueries({ queryKey: ['nbadmin'] });
     },
   });
@@ -263,7 +263,7 @@ export function AccessRequestWorklist({
               disabled={selection.keys.length === 0}
               busy={approveSelected.isPending}
               confirm={{
-                title: `Approve ${String(selection.keys.length)} Request(s)`,
+                title: `Approve ${countOf(selection.keys.length, 'Request')}`,
                 effect:
                   'Each selected request is approved on its own; a request that breaks a rule is refused and stays pending.',
               }}

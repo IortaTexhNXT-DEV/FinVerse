@@ -11,6 +11,7 @@ import com.iortatechnxt.brokerverse.catalog.domain.IncentiveCriteria;
 import com.iortatechnxt.brokerverse.catalog.domain.InsurerBranch;
 import com.iortatechnxt.brokerverse.catalog.domain.InsurerProfile;
 import com.iortatechnxt.brokerverse.catalog.domain.MotorLimit;
+import com.iortatechnxt.brokerverse.catalog.domain.OtherCharge;
 import com.iortatechnxt.brokerverse.catalog.domain.ProductLine;
 import com.iortatechnxt.brokerverse.catalog.domain.RateOverride;
 import com.iortatechnxt.brokerverse.catalog.domain.RiskProduct;
@@ -63,6 +64,7 @@ public enum CatalogKind {
   SHORT_PERIOD_RATE(ShortPeriodRate.class, "Short-period rate", Screens.RATES, Area.MASTER),
   /** Motor BI / PD limit. */
   MOTOR_LIMIT(MotorLimit.class, "Motor limit", Screens.RATES, Area.MASTER),
+  OTHER_CHARGE(OtherCharge.class, "Other charge", Screens.RATES, Area.MASTER),
   /** Sales organisation unit. */
   SALES_UNIT(SalesUnit.class, "Sales unit", Screens.SALES, Area.MASTER),
   /** Account officer of a team. */

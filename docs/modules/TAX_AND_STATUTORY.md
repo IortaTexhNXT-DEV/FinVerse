@@ -139,9 +139,13 @@ and appear in the approval inbox.
 2. Configure the forms (due rules, payable / credit accounts, `effectiveFrom` = first period filed in
    BrokerVerse) and mark forms filed elsewhere as reminders.
 3. Create party tax profiles (TIN, registered name, individual name parts, VAT treatment, default
-   ATC) for every supplier, agent, broker and zero-rated / exempt customer; worksheets list payees
-   still `UNMAPPED`.
-4. Set `TAX_RDO_CODE` and the company TIN / registered address (company master).
+   ATC, withholding agent, top withholding agent, government payor, tax exemption certificate and
+   its validity) for every supplier, agent, broker, client and zero-rated / exempt customer;
+   worksheets list payees still `UNMAPPED`. Tax codes cover the final taxes `FWT` (one code per
+   ATC) and `FINAL_VAT`, and `PERCENTAGE_TAX`.
+4. Set the company tax registration (TIN, registered address, RDO, VAT registration, CAS and
+   e-invoicing permits) and the BIR branch code and RDO of each branch on the company master;
+   `TAX_RDO_CODE` is used when the company has no RDO.
 5. Configure and authorize the `TAX_REMITTANCE` accounting rule for the company.
 6. Tune thresholds of `TAX_RETURN_DUE` / `TAX_RETURN_OVERDUE` (Administration → Exception Codes).
 7. Reconcile the opening balances of the tax payable accounts (returns of periods before go-live are

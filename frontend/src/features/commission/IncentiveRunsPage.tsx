@@ -17,7 +17,7 @@ import { PageFooter } from '@/components/ui/Pager';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatAmount, humanize, today } from '@/utils/format';
+import { countOf, formatAmount, humanize, today } from '@/utils/format';
 import { commissionApi } from './commissionApi';
 import type { IncentiveRun, RunLine, Scheme } from './commissionApi';
 import { DateInput } from '@/components/ui/DateInput';
@@ -205,8 +205,9 @@ function RunDialog({
       <div className="stack">
         <ErrorAlert error={error ?? lines.error} />
         <p>
-          {t.eligibleCount} eligible invoice(s), production {formatAmount(t.eligibleProduction)};{' '}
-          {t.excludedCount} excluded ({formatAmount(t.excludedAmount)}). {t.tierApplied}. Incentive{' '}
+          {countOf(t.eligibleCount, 'eligible invoice')}, production{' '}
+          {formatAmount(t.eligibleProduction)}; {t.excludedCount} excluded (
+          {formatAmount(t.excludedAmount)}). {t.tierApplied}. Incentive{' '}
           <strong>{formatAmount(t.incentive)}</strong>
           {t.passOn > 0 && `, passed on to the branches ${formatAmount(t.passOn)}`}.
         </p>

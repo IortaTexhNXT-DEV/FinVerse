@@ -17,6 +17,7 @@ import { TextInput } from '@/features/assets/FormControls';
 import { formatAmount, formatDateTime, formatRate } from '@/utils/format';
 import { COMPARATIVE_FIELDS } from './packageRequest';
 import { displayNameOf } from '@/api/users';
+import { CellStack } from '@/components/ui/CellStack';
 
 function orDash(value: string | undefined): string {
   return value === undefined || value === '' ? '—' : value;
@@ -162,7 +163,9 @@ function OutputsCard({
     {
       key: 'by',
       header: 'Generated',
-      render: (o) => `${displayNameOf(o.generatedBy)} · ${formatDateTime(o.generatedAt)}`,
+      render: (o) => (
+        <CellStack main={displayNameOf(o.generatedBy)} sub={formatDateTime(o.generatedAt)} />
+      ),
     },
     {
       key: 'hash',

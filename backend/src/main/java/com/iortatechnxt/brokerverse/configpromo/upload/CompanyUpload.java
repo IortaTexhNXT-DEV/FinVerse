@@ -7,6 +7,7 @@ import com.iortatechnxt.brokerverse.bulk.service.BulkRow;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Pattern;
 import org.springframework.stereotype.Component;
 
@@ -23,6 +24,18 @@ public class CompanyUpload extends ConfigUploadHandler {
   static final String BACK = "Back-value days";
   static final String FORWARD = "Forward-value days";
   static final String RETAINED = "Retained earnings account";
+  static final String RDO = "RDO code";
+  static final String VAT_REGISTERED = "VAT registered";
+  static final String CAS_NO = "CAS permit no.";
+  static final String CAS_DATE = "CAS permit date";
+  static final String EINVOICING_NO = "E-invoicing permit no.";
+  static final String EINVOICING_DATE = "E-invoicing permit date";
+
+  /** The BIR registration columns added after the workbook tab (company tax registration). */
+  private static final Set<String> TAX_REGISTRATION =
+      Set.of(RDO, VAT_REGISTERED, CAS_NO, CAS_DATE, EINVOICING_NO, EINVOICING_DATE);
+
+  static final Pattern RDO_FORMAT = Pattern.compile("\\d{3}[A-Z]?");
 
   private static final Pattern CODE_FORMAT = Pattern.compile("[A-Z0-9]{1,10}");
   private static final Pattern TIN_FORMAT = Pattern.compile("\\d{3}-\\d{3}-\\d{3}-\\d{3,5}");
@@ -93,7 +106,20 @@ public class CompanyUpload extends ConfigUploadHandler {
                 FORWARD, "How many days after today a posting may be dated", true, Type.NUMBER, "0")
             .allowed("A whole number from 0 to 365"),
         BulkColumn.required(RETAINED, "Account that receives the year-end result", "3200")
-            .master("account of the chart of accounts"));
+            .master("account of the chart of accounts"),
+        BulkColumn.optional(RDO, "Revenue District Office of the registration", "050")
+            .format("Three digits, optionally a letter"),
+        new BulkColumn(
+            VAT_REGISTERED, "Y when the company is VAT-registered", false, Type.YES_NO, "Y"),
+        BulkColumn.optional(CAS_NO, "Permit of the computerised accounting system", ""),
+        new BulkColumn(CAS_DATE, "Date of the CAS permit", false, Type.DATE, ""),
+        BulkColumn.optional(EINVOICING_NO, "Permit of the electronic invoicing", ""),
+        new BulkColumn(EINVOICING_DATE, "Date of the e-invoicing permit", false, Type.DATE, ""));
+  }
+
+  @Override
+  public Set<String> optionalHeaders() {
+    return TAX_REGISTRATION;
   }
 
   @Override
@@ -118,6 +144,7 @@ public class CompanyUpload extends ConfigUploadHandler {
     if (!db.currency(row.text(CURRENCY))) {
       errors.add(error(CURRENCY, row.text(CURRENCY) + " is not an active currency"));
     }
+    checkTaxRegistration(row, errors);
     whole(errors, row, MONTH, 1, MONTHS);
     whole(errors, row, BACK, 0, MAX_DAYS);
     whole(errors, row, FORWARD, 0, MAX_DAYS);
@@ -128,6 +155,25 @@ public class CompanyUpload extends ConfigUploadHandler {
       errors.add(error(RETAINED, row.text(RETAINED) + " is not an account of " + code));
     }
     return errors;
+  }
+
+  private static void checkTaxRegistration(BulkRow row, List<String> errors) {
+    String rdo = row.text(RDO);
+    check(
+        errors,
+        rdo != null && !RDO_FORMAT.matcher(rdo).matches(),
+        RDO,
+        "three digits, optionally followed by a letter (e.g. 050 or 047A)");
+    check(
+        errors,
+        row.text(CAS_DATE) != null && row.text(CAS_NO) == null,
+        CAS_NO,
+        "give the number of the CAS permit");
+    check(
+        errors,
+        row.text(EINVOICING_DATE) != null && row.text(EINVOICING_NO) == null,
+        EINVOICING_NO,
+        "give the number of the e-invoicing permit");
   }
 
   static void whole(List<String> errors, BulkRow row, String header, int min, int max) {
@@ -156,7 +202,13 @@ public class CompanyUpload extends ConfigUploadHandler {
             "fiscal_year_start_month", row.number(MONTH),
             "back_value_days", row.number(BACK),
             "forward_value_days", row.number(FORWARD),
-            "retained_earnings_account", row.text(RETAINED)),
+            "retained_earnings_account", row.text(RETAINED),
+            "rdo_code", row.text(RDO),
+            "vat_registered", row.text(VAT_REGISTERED) == null || row.yes(VAT_REGISTERED),
+            "cas_permit_no", row.text(CAS_NO),
+            "cas_permit_date", row.date(CAS_DATE),
+            "einvoicing_permit_no", row.text(EINVOICING_NO),
+            "einvoicing_permit_date", row.date(EINVOICING_DATE)),
         context,
         "Company");
     return row.text(CODE);
@@ -167,8 +219,9 @@ public class CompanyUpload extends ConfigUploadHandler {
     return db
         .rows(
             "select code, name, tax_id, address, base_currency, fiscal_year_start_month,"
-                + " back_value_days, forward_value_days, retained_earnings_account"
-                + " from org_company order by code")
+                + " back_value_days, forward_value_days, retained_earnings_account, rdo_code,"
+                + " vat_registered, cas_permit_no, cas_permit_date, einvoicing_permit_no,"
+                + " einvoicing_permit_date from org_company order by code")
         .stream()
         .map(
             r ->
@@ -181,7 +234,13 @@ public class CompanyUpload extends ConfigUploadHandler {
                     MONTH, r.get("fiscal_year_start_month"),
                     BACK, r.get("back_value_days"),
                     FORWARD, r.get("forward_value_days"),
-                    RETAINED, r.get("retained_earnings_account")))
+                    RETAINED, r.get("retained_earnings_account"),
+                    RDO, r.get("rdo_code"),
+                    VAT_REGISTERED, r.get("vat_registered"),
+                    CAS_NO, r.get("cas_permit_no"),
+                    CAS_DATE, r.get("cas_permit_date"),
+                    EINVOICING_NO, r.get("einvoicing_permit_no"),
+                    EINVOICING_DATE, r.get("einvoicing_permit_date")))
         .toList();
   }
 }

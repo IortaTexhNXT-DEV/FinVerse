@@ -19,6 +19,7 @@ import type { StatementLayout } from './frbsSetupApi';
 import { layoutProblems } from './setupForms';
 import { FileDropZone } from '@/components/ui/FileDropZone';
 import { ConfigUploadButton } from '@/features/configpromo/ConfigUploadButton';
+import { countOf } from '@/utils/format';
 
 const NEW_LAYOUT: StatementLayout = {
   bankAccountCode: '',
@@ -187,7 +188,7 @@ function ImportStatementDialog({
         : frbsSetupApi.importStatement(companyId, account, file),
     onSuccess: (r) => {
       toast.success(
-        `Statement ${r.statement.statementRef}: ${r.statement.lineCount} line(s), ${r.matched} matched automatically`,
+        `Statement ${r.statement.statementRef}: ${countOf(r.statement.lineCount, 'line')}, ${r.matched} matched automatically`,
       );
       onClose();
     },

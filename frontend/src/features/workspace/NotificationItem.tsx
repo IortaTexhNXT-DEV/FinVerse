@@ -3,6 +3,7 @@ import type { AppNotification } from '@/api/messaging';
 import { formatDateTime } from '@/utils/format';
 import { kindOf, referenceOf, relativeTime } from './notificationLogic';
 import type { NotificationKind } from './notificationLogic';
+import { readableText } from '@/utils/wording';
 
 const ICONS: Record<NotificationKind, typeof Inbox> = {
   returned: Undo2,
@@ -34,10 +35,10 @@ export function NotificationItem({
       <button type="button" className="notification-item" onClick={() => onOpen(n)}>
         <Icon size={18} aria-hidden="true" className={`notification-icon ${kindOf(n)}`} />
         <span className="notification-text">
-          <span className="notification-title">{n.title}</span>
+          <span className="notification-title">{readableText(n.title)}</span>
           {n.body && (
-            <span className="notification-body" title={n.body}>
-              {n.body}
+            <span className="notification-body" title={readableText(n.body)}>
+              {readableText(n.body)}
             </span>
           )}
           <span className="notification-meta">

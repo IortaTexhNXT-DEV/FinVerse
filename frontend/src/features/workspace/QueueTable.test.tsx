@@ -115,6 +115,25 @@ describe('QueueTable', () => {
     expect(screen.getByText('X-UNKNOWN')).toHaveClass('muted');
   });
 
+  it('shows the name and the amount of a description in their own columns, formatted', () => {
+    vi.spyOn(lovApi, 'options').mockResolvedValue([]);
+    show([
+      item({ id: 1, title: 'Maria Clara Santos PHP 500.00' }),
+      item({ id: 2, reference: 'DV-2', title: 'Mega Traders Inc. PHP 2500.00' }),
+      item({ id: 3, reference: 'X-3', title: 'Bayside Builders Co.', assignee: 'tsu' }),
+    ]);
+    const headers = screen.getAllByRole('columnheader').map((h) => h.textContent);
+    expect(headers).toContain('Amount');
+    expect(headers.at(-1)).toBe('Actions');
+    expect(headers.every((h) => h !== '')).toBe(true);
+    expect(screen.getByText('Maria Clara Santos')).toBeTruthy();
+    expect(screen.getByText('PHP 2,500.00').closest('td')).toHaveClass('num');
+    expect(screen.queryByText(/2500\.00/)).toBeNull();
+    // A description without an amount: the amount cell is the muted dash.
+    const row = screen.getByText('X-3').closest('tr');
+    expect(within(row as HTMLElement).getAllByText('—').length).toBeGreaterThan(0);
+  });
+
   it('shows the record type in its own column and the stage pill alone', () => {
     vi.spyOn(lovApi, 'options').mockResolvedValue([]);
     show([
@@ -152,8 +171,9 @@ describe('QueueTable', () => {
       item({ id: 3, reference: 'PRF-2026-900005' }),
     ]);
     vi.useRealTimers();
-    const age = screen.getByText('22 days');
-    expect(age.closest('td')).toHaveClass('num');
+    // The time in stage is the second line of the due cell, in tabular figures.
+    const age = screen.getByText('22 days in stage');
+    expect(age).toHaveClass('num');
     const late = screen.getByText('10-Sep-2026 10:00').closest('.due-date');
     expect(late).toHaveClass('overdue');
     expect(late?.textContent).toContain('Overdue');
@@ -170,11 +190,17 @@ describe('QueueTable', () => {
     setUserDirectory([{ username: 'ao', displayName: 'Aileen Account Officer' }]);
     show([item({ id: 1, assignee: 'ao' })]);
     const names = screen.getAllByText('Aileen Account Officer');
+    // The assignee column and the "from" line under the description.
+    expect(names).toHaveLength(2);
     for (const name of names) {
       expect(name).toHaveClass('truncate');
       expect(name).toHaveAttribute('title', 'Aileen Account Officer (ao)');
-      expect(name.closest('td')).toHaveClass('col-truncate');
     }
+    expect(names.some((n) => n.closest('td')?.classList.contains('col-truncate'))).toBe(true);
+    expect(screen.getByText('Bayside Builders Co.')).toHaveAttribute(
+      'title',
+      'Bayside Builders Co.',
+    );
     setUserDirectory([]);
   });
 

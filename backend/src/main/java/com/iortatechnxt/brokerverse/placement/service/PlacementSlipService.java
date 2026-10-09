@@ -22,6 +22,7 @@ import com.iortatechnxt.brokerverse.placement.domain.SlipAccount;
 import com.iortatechnxt.brokerverse.placement.domain.SlipFile;
 import com.iortatechnxt.brokerverse.placement.domain.SlipFileRepository;
 import com.iortatechnxt.brokerverse.placement.domain.SlipStatus;
+import com.iortatechnxt.brokerverse.placement.service.ClientTaxDetails.TaxDetails;
 import com.iortatechnxt.brokerverse.placement.service.InsurerDirectory.PlacementAddress;
 import com.iortatechnxt.brokerverse.placement.service.SlipDocuments.SlipHeader;
 import com.iortatechnxt.brokerverse.placement.service.SlipPrerequisites.Unmet;
@@ -149,7 +150,7 @@ public class PlacementSlipService {
   public List<Readiness> readiness(Long companyId, List<String> arns) {
     return arns.stream()
         .map(arn -> accounts.require(companyId, arn))
-        .map(a -> new Readiness(a, prerequisites.check(a)))
+        .map(a -> new Readiness(a, prerequisites.check(a), documents.taxDetails(a)))
         .toList();
   }
 
@@ -287,14 +288,15 @@ public class PlacementSlipService {
             TEMPLATE,
             BusinessClock.today(clock),
             Map.of("reference", number.slipNo(), "insurerName", address.insurerName()));
-    PlacementSlip slip =
-        slips.save(
-            new PlacementSlip(
-                companyId,
-                number,
-                insurer,
-                text.versionTag(),
-                slipAccounts.stream().map(a -> new SlipAccount(a.getId(), a.getArn())).toList()));
+    PlacementSlip draft =
+        new PlacementSlip(
+            companyId,
+            number,
+            insurer,
+            text.versionTag(),
+            slipAccounts.stream().map(a -> new SlipAccount(a.getId(), a.getArn())).toList());
+    draft.printedTaxDetails(documents.taxFingerprint(slipAccounts));
+    PlacementSlip slip = slips.save(draft);
     String name = slip.displayNo().replace(' ', '_');
     SlipHeader header =
         new SlipHeader(
@@ -371,10 +373,10 @@ public class PlacementSlipService {
    * @return the slip
    */
   public PlacementSlip send(Long slipId, SlipEmail email) {
-    PlacementSlip slip = get(slipId);
+    PlacementSlip slip = withCurrentTaxDetails(get(slipId));
     insurers.address(slip.getCompanyId(), slip.getInsurerCode(), slip.getBranchCode());
     List<MessageFile> attachments =
-        files.findBySlipIdOrderByFormatAsc(slipId).stream()
+        files.findBySlipIdOrderByFormatAsc(slip.getId()).stream()
             .map(
                 f ->
                     new MessageFile(
@@ -406,6 +408,33 @@ public class PlacementSlipService {
         AuditAction.UPDATE,
         (first ? "Sent to " : "Resent to ") + String.join(", ", email.to()));
     return slip;
+  }
+
+  /**
+   * A slip not sent yet whose clients' taxpayer details changed after it was generated is generated
+   * again as its next version, so that the insurer receives the current details (FR-NB-087); the
+   * previous version is kept as superseded.
+   */
+  private PlacementSlip withCurrentTaxDetails(PlacementSlip slip) {
+    if (slip.getStatus() != SlipStatus.GENERATED || slip.getEoptFingerprint() == null) {
+      return slip;
+    }
+    List<Account> current =
+        slip.getAccounts().stream()
+            .map(a -> accounts.require(slip.getCompanyId(), a.arn()))
+            .toList();
+    if (slip.getEoptFingerprint().equals(documents.taxFingerprint(current))) {
+      return slip;
+    }
+    PlacementSlip created = regenerate(slip.getId());
+    audit.record(
+        ENTITY,
+        created.displayNo(),
+        AuditAction.UPDATE,
+        "The EOPT details of the insured changed after slip "
+            + slip.displayNo()
+            + " was generated; the slip is regenerated with the current details before sending");
+    return created;
   }
 
   /**
@@ -482,8 +511,9 @@ public class PlacementSlipService {
    *
    * @param account account
    * @param unmet unmet prerequisites; empty when ready
+   * @param taxDetails taxpayer details of the client sent with the placement, may be null
    */
-  public record Readiness(Account account, List<Unmet> unmet) {
+  public record Readiness(Account account, List<Unmet> unmet, TaxDetails taxDetails) {
 
     /** Defensive copy. */
     public Readiness {

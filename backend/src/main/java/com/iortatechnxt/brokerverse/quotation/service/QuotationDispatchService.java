@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.quotation.service;
 import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.messaging.domain.MessageFile;
 import com.iortatechnxt.brokerverse.messaging.domain.OutboundMessage.RecordLink;
@@ -14,6 +15,7 @@ import com.iortatechnxt.brokerverse.quotation.domain.QuotationStatus;
 import com.iortatechnxt.brokerverse.workflow.service.TransitionNote;
 import com.iortatechnxt.brokerverse.workflow.service.WorkflowService;
 import java.time.Clock;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -94,43 +96,60 @@ public class QuotationDispatchService {
 
   /**
    * Sends several approved quotations: one e-mail per client with all its quotations attached, the
-   * password in a separate e-mail (BRNB.042).
+   * password in a separate e-mail (BRNB.042). Each quotation is checked on its own (FR-NB-044):
+   * those approved, still valid and with a client e-mail are sent, the others are listed with their
+   * reason; when none passes nothing is sent.
    *
    * @param ids quotations
-   * @param message optional subject and message; defaults are used when blank
-   * @return what was sent
+   * @param message optional subject, message and further recipients; defaults are used when blank
+   * @return what was sent and what was not
    */
   public BatchResult sendBatch(List<Long> ids, EmailRequest message) {
     if (ids == null || ids.isEmpty()) {
       throw new BusinessRuleException("QUOTATION_BATCH_EMPTY", "Select the quotations to send");
     }
     List<Quotation> selected = ids.stream().distinct().map(service::get).toList();
-    requireSendable(selected);
+    LocalDate today = BusinessClock.today(clock);
+    List<NotSent> notSent = new ArrayList<>();
+    List<Quotation> sendable = new ArrayList<>();
+    for (Quotation q : selected) {
+      String problem = problem(q, today);
+      if (problem == null) {
+        sendable.add(q);
+      } else {
+        notSent.add(new NotSent(q.getQuotationNo(), problem));
+      }
+    }
+    if (sendable.isEmpty()) {
+      throw new BusinessRuleException(
+          "QUOTATION_BATCH_INVALID",
+          "Cannot send: "
+              + notSent.stream()
+                  .map(n -> n.reference() + ": " + n.reason())
+                  .collect(Collectors.joining("; ")));
+    }
     Map<Long, List<Quotation>> byClient =
-        selected.stream()
+        sendable.stream()
             .collect(
                 Collectors.groupingBy(
                     Quotation::getClientId, LinkedHashMap::new, Collectors.toList()));
     byClient.values().forEach(group -> sendGroup(group, message));
     return new BatchResult(
-        selected.size(),
+        sendable.size(),
         byClient.size(),
-        selected.stream().map(Quotation::getQuotationNo).toList());
+        sendable.stream().map(Quotation::getQuotationNo).toList(),
+        notSent);
   }
 
-  private static void requireSendable(List<Quotation> selected) {
-    List<String> problems = new ArrayList<>();
-    for (Quotation q : selected) {
-      if (q.getStatus() != QuotationStatus.APPROVED) {
-        problems.add(q.getQuotationNo() + " is " + DisplayFormat.words(q.getStatus()));
-      } else if (blank(q.getClientEmail())) {
-        problems.add(q.getQuotationNo() + ": client " + q.getClientCode() + " has no e-mail");
-      }
+  /** Why a quotation cannot be sent, null when it can. */
+  private static String problem(Quotation q, LocalDate today) {
+    if (q.getStatus() != QuotationStatus.APPROVED) {
+      return "it is " + DisplayFormat.words(q.getStatus());
     }
-    if (!problems.isEmpty()) {
-      throw new BusinessRuleException(
-          "QUOTATION_BATCH_INVALID", "Cannot send: " + String.join("; ", problems));
+    if (q.getValidUntil() != null && q.getValidUntil().isBefore(today)) {
+      return "it expired on " + DisplayFormat.date(q.getValidUntil());
     }
+    return blank(q.getClientEmail()) ? "client " + q.getClientCode() + " has no e-mail" : null;
   }
 
   private void sendGroup(List<Quotation> group, EmailRequest message) {
@@ -155,14 +174,22 @@ public class QuotationDispatchService {
         new OutboundEmail(
             first.getCompanyId(),
             PURPOSE,
-            List.of(first.getClientEmail()),
-            List.of(),
+            recipients(first, message),
+            message == null ? List.of() : message.cc(),
             subject,
             body,
             files,
             new Protection(null, true, message == null ? null : message.passwordHint()),
             link(first)));
     group.forEach(q -> markSent(q, "Sent in batch to " + q.getClientEmail() + " with " + refs));
+  }
+
+  private static List<String> recipients(Quotation first, EmailRequest message) {
+    List<String> to = new ArrayList<>(List.of(first.getClientEmail()));
+    if (message != null) {
+      message.to().stream().filter(a -> !to.contains(a)).forEach(to::add);
+    }
+    return to;
   }
 
   private void markSent(Quotation q, String comment) {
@@ -215,13 +242,24 @@ public class QuotationDispatchService {
    *
    * @param quotations quotations sent
    * @param emails e-mails queued (one per client, plus the password e-mails)
-   * @param references quotation numbers
+   * @param references quotation numbers sent
+   * @param notSent quotations not sent with their reason
    */
-  public record BatchResult(int quotations, int emails, List<String> references) {
+  public record BatchResult(
+      int quotations, int emails, List<String> references, List<NotSent> notSent) {
 
-    /** Defensive copy. */
+    /** Defensive copies. */
     public BatchResult {
       references = List.copyOf(references);
+      notSent = List.copyOf(notSent);
     }
   }
+
+  /**
+   * A quotation not sent.
+   *
+   * @param reference quotation number
+   * @param reason why
+   */
+  public record NotSent(String reference, String reason) {}
 }

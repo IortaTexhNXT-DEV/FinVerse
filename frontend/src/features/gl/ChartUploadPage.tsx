@@ -15,7 +15,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDateTime } from '@/utils/format';
+import { countOf, formatDateTime } from '@/utils/format';
 import { NumberingPanel } from './NumberingPanel';
 import { glPlatformApi } from './glPlatformApi';
 import { FileDropZone } from '@/components/ui/FileDropZone';
@@ -93,7 +93,7 @@ function UploadPanel() {
       setFilter(j.failedRows > 0 ? 'FAILED' : 'COMMITTED');
       await queryClient.invalidateQueries({ queryKey: ['accounts'] });
       await queryClient.invalidateQueries({ queryKey: ['coa-uploads'] });
-      toast.success(`${j.committedRows} account(s) created, pending authorization`);
+      toast.success(`${countOf(j.committedRows, 'account')} created, pending authorization`);
     },
   });
   const cancel = useMutation({
@@ -176,7 +176,7 @@ function UploadPanel() {
                     disabled={job.validRows === 0}
                     onClick={() => commit.mutate()}
                   >
-                    Create {job.validRows} Account(s)
+                    Create {countOf(job.validRows, 'Account')}
                   </Button>
                   <Button
                     variant="secondary"

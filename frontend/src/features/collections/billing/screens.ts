@@ -12,7 +12,7 @@ export const BILLING_SCREENS: ScreenDef[] = [
     label: 'Billing Statements',
     icon: ReceiptText,
     permission: 'CLX_VIEW',
-    alsoPermissions: ['CLX_BILLING'],
+    alsoPermissions: ['CLX_SOA_ISSUE'],
     component: lazy(() => import('./BillingStatementsPage')),
   },
   {

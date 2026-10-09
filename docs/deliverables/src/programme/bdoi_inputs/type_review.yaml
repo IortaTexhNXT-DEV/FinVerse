@@ -1,0 +1,913 @@
+# Type of every row of the BDOI Requirements and Inputs workbook after the row-by-row review of 8-Oct-2026
+# (build_bdoi_inputs.py reads it before the text rules). A row added later and not listed here is typed by the
+# rules of bdoi_inputs.yaml. 910 rows reviewed; 211 types changed from the rules.
+CLR-CR-01: Business rule confirmation
+CLR-CR-02: Clarification
+CLR-CR-03: Decision
+CLR-CR-04: Business rule confirmation
+CLR-CR-05: Business rule confirmation
+CLR-CR-06: Business rule confirmation
+CLR-CR-07: Report layout
+CLR-CR-08: Report layout
+CLR-CR-09: Clarification
+CLR-CR-10: Clarification
+CLR-CR-11: Report layout
+CLR-CR-12: Report layout
+CLR-CR-13: Clarification
+CLR-CR-14: Business rule confirmation
+CLR-CR-15: Clarification
+CLR-CR-16: Integration detail
+CLR-CR-17: Business rule confirmation
+CLR-NB-01: Configuration value
+CLR-NB-02: Integration detail
+CLR-NB-03: Report layout
+CLR-NB-04: Business rule confirmation
+CLR-NB-05: Configuration value
+CLR-NB-06: Integration detail
+CLR-NB-07: Business rule confirmation
+CLR-NB-08: Report layout
+CLR-NB-09: Business rule confirmation
+CLR-NB-10: Business rule confirmation
+CLR-NB-11: Integration detail
+CLR-NB-12: Business rule confirmation
+CLR-NB-13: Business rule confirmation
+CLR-NB-14: Report layout
+CLR-NB-15: Business rule confirmation
+CLR-NB-16: Integration detail
+CLR-NB-17: Integration detail
+CLR-NB-18: Clarification
+CLR-NB-19: Integration detail
+CLR-NB-20: Report layout
+CLR-NB-21: Business rule confirmation
+CLR-NB-22: Business rule confirmation
+CLR-NB-23: Configuration value
+CLR-NB-24: Clarification
+CLR-NB-25: Business rule confirmation
+CLR-NB-26: Decision
+CLR-NB-27: Decision
+CLR-NB-28: Configuration value
+CLR-NB-29: Business rule confirmation
+CLR-NB-30: Business rule confirmation
+CLR-NB-31: Clarification
+CLR-NB-32: Business rule confirmation
+CLR-NB-33: Business rule confirmation
+CLR-NB-34: Business rule confirmation
+CLR-NB-35: Configuration value
+CLR-NB-36: Business rule confirmation
+CLR-NB-37: Sample document or template
+CLR-NB-38: Business rule confirmation
+CLR-NB-39: Business rule confirmation
+CLR-NB-40: Business rule confirmation
+CLR-NB-41: Business rule confirmation
+CLR-NB-42: Business rule confirmation
+CLR-NB-43: Business rule confirmation
+CLR-NB-44: Business rule confirmation
+CLR-NB-45: Clarification
+CLR-NB-46: Business rule confirmation
+CLR-NB-47: Sample document or template
+CLR-NB-48: Business rule confirmation
+CLR-NB-49: Business rule confirmation
+CLR-NB-50: Business rule confirmation
+CLR-OP-01: Business rule confirmation
+CLR-OP-02: Clarification
+CLR-OP-03: Integration detail
+CLR-OP-04: Business rule confirmation
+CLR-OP-05: Business rule confirmation
+CLR-OP-06: Business rule confirmation
+CLR-OP-07: Business rule confirmation
+CLR-OP-08: Business rule confirmation
+CLR-OP-09: Business rule confirmation
+CLR-OP-10: Business rule confirmation
+CLR-OP-11: Decision
+CLR-OP-12: Configuration value
+CLR-OP-13: Business rule confirmation
+CLR-OP-14: Business rule confirmation
+CLR-OP-15: Integration detail
+CLR-OP-16: Report layout
+CLR-OP-17: Business rule confirmation
+CLR-OP-18: Business rule confirmation
+CLR-OP-19: Business rule confirmation
+CLR-OP-20: Business rule confirmation
+CLR-OP-21: Business rule confirmation
+CLR-OP-22: Business rule confirmation
+CLR-OP-23: Business rule confirmation
+CLR-OP-24: Clarification
+CLR-OP-25: Business rule confirmation
+CLR-OP-26: Configuration value
+CLR-OP-28: Business rule confirmation
+CLR-OP-32: Configuration value
+CLR-OP-33: Configuration value
+CLR-OP-34: Report layout
+CLR-OP-35: Business rule confirmation
+CLR-OP-36: Sign-off
+CLR-OP-37: Business rule confirmation
+CLR-OP-38: Business rule confirmation
+CLR-OP-39: Configuration value
+CLR-OP-40: Business rule confirmation
+CLR-OP-41: Business rule confirmation
+CLR-OP-42: Business rule confirmation
+CLR-OP-43: Business rule confirmation
+CLR-OP-44: Clarification
+CLR-OP-45: Business rule confirmation
+CLR-OP-46: Clarification
+CLR-OP-47: Business rule confirmation
+CLR-OP-48: Decision
+CLR-OP-49: Configuration value
+CLR-OP-50: Business rule confirmation
+CLR-OP-51: Business rule confirmation
+CLR-OP-52: Business rule confirmation
+CLR-OP-53: Configuration value
+CLR-OP-54: Business rule confirmation
+CLR-OP-55: Business rule confirmation
+CLR-OP-56: Configuration value
+CLR-OP-57: Business rule confirmation
+CLR-OP-58: Configuration value
+CLR-OP-59: Report layout
+CLR-OP-60: Configuration value
+CLR-OP-61: Configuration value
+CLR-OP-62: Business rule confirmation
+CLR-PM-01: Configuration value
+CLR-PM-02: Sample document or template
+CLR-PM-03: Business rule confirmation
+CLR-PM-04: Business rule confirmation
+CLR-PM-05: Business rule confirmation
+CLR-PM-06: Business rule confirmation
+CLR-PM-07: Business rule confirmation
+CLR-PM-08: Report layout
+CLR-PM-09: Business rule confirmation
+CLR-PM-10: Integration detail
+CLR-PM-11: Business rule confirmation
+CLR-PM-12: Business rule confirmation
+CLR-PM-13: Business rule confirmation
+CLR-PM-14: Business rule confirmation
+CLR-PM-15: Business rule confirmation
+CLR-PM-16: Business rule confirmation
+CLR-PM-17: Business rule confirmation
+CLR-PM-18: Business rule confirmation
+CLR-PM-19: Business rule confirmation
+CLR-PM-20: Business rule confirmation
+CLR-PM-21: Business rule confirmation
+CLR-PM-22: Configuration value
+CLR-PM-23: Business rule confirmation
+CLR-PM-24: Business rule confirmation
+CLR-CL-01: Business rule confirmation
+CLR-CL-02: Business rule confirmation
+CLR-CL-03: Business rule confirmation
+CLR-CL-04: Business rule confirmation
+CLR-CL-05: Business rule confirmation
+CLR-CL-06: Business rule confirmation
+CLR-CL-07: Business rule confirmation
+CLR-CL-08: Report layout
+CLR-CL-09: Integration detail
+CLR-CL-10: Business rule confirmation
+CLR-CL-11: Business rule confirmation
+CLR-CL-12: Business rule confirmation
+CLR-CL-13: Configuration value
+CLR-CL-14: Business rule confirmation
+CLR-CL-15: Business rule confirmation
+CLR-CL-16: Decision
+CLR-CL-17: Business rule confirmation
+CLR-CL-18: Business rule confirmation
+CLR-CL-19: Business rule confirmation
+CLR-CL-20: Business rule confirmation
+CLR-CL-21: Business rule confirmation
+CLR-CL-22: Business rule confirmation
+CLR-CL-23: Report layout
+CLR-CL-24: Business rule confirmation
+CLR-CL-25: Business rule confirmation
+CLR-CL-26: Business rule confirmation
+CLR-CL-27: Configuration value
+CLR-CL-28: Business rule confirmation
+CLR-CL-29: Business rule confirmation
+CLR-CL-30: Configuration value
+CLR-CL-31: Business rule confirmation
+CLR-CL-32: Business rule confirmation
+CLR-CL-33: Business rule confirmation
+CLR-CL-34: Configuration value
+CLR-CL-35: Business rule confirmation
+CLR-CL-36: Integration detail
+CLR-CL-37: Business rule confirmation
+CLR-CL-38: Configuration value
+CLR-CL-39: Business rule confirmation
+CLR-CL-40: Business rule confirmation
+CLR-CL-41: Clarification
+CLR-CL-42: Business rule confirmation
+CLR-AC-01: Configuration value
+CLR-AC-02: Configuration value
+CLR-AC-03: Configuration value
+CLR-AC-04: Business rule confirmation
+CLR-AC-05: Configuration value
+CLR-AC-06: Business rule confirmation
+CLR-AC-07: Business rule confirmation
+CLR-AC-08: Decision
+CLR-AC-09: Business rule confirmation
+CLR-AC-10: Report layout
+CLR-AC-11: Report layout
+CLR-AC-12: Report layout
+CLR-AC-13: Business rule confirmation
+CLR-AC-14: Business rule confirmation
+CLR-DS-01: Decision
+CLR-DS-02: Business rule confirmation
+CLR-DS-03: Business rule confirmation
+CLR-DS-04: Sample document or template
+CLR-DS-05: Integration detail
+CLR-DS-06: Integration detail
+CLR-DS-07: Business rule confirmation
+CLR-DS-08: Business rule confirmation
+CLR-DS-09: Configuration value
+CLR-DS-10: Business rule confirmation
+CLR-DS-11: Business rule confirmation
+CLR-DS-12: Business rule confirmation
+CLR-DS-13: Clarification
+CLR-DS-14: Report layout
+CLR-DS-16: Business rule confirmation
+CLR-DS-17: Business rule confirmation
+CLR-DS-18: Report layout
+CLR-DS-15: Sample document or template
+CLR-PQ-01: Report layout
+CLR-PQ-02: Business rule confirmation
+CLR-PQ-03: Sample document or template
+CLR-PQ-04: Business rule confirmation
+CLR-PQ-05: Configuration value
+CLR-PQ-06: Business rule confirmation
+CLR-AS-01: Report layout
+CLR-AS-02: Business rule confirmation
+CLR-AS-03: Report layout
+CLR-AS-04: Business rule confirmation
+CLR-AC-15: Business rule confirmation
+CLR-RN-01: Business rule confirmation
+CLR-RN-02: Integration detail
+CLR-RN-03: Business rule confirmation
+CLR-RN-04: Business rule confirmation
+CLR-RN-05: Business rule confirmation
+CLR-RN-06: Business rule confirmation
+CLR-RN-07: Business rule confirmation
+CLR-RN-08: Business rule confirmation
+CLR-RN-09: Clarification
+CLR-RN-10: Configuration value
+CLR-RN-11: Business rule confirmation
+CLR-RN-12: Configuration value
+CLR-RN-13: Business rule confirmation
+CLR-RN-14: Business rule confirmation
+CLR-RN-15: Business rule confirmation
+CLR-RN-16: Business rule confirmation
+CLR-RN-17: Business rule confirmation
+CLR-RN-18: Business rule confirmation
+CLR-RN-19: Business rule confirmation
+CLR-RN-20: Business rule confirmation
+CLR-RN-21: Business rule confirmation
+CLR-RN-22: Business rule confirmation
+CLR-RN-23: Business rule confirmation
+CLR-RN-24: Business rule confirmation
+CLR-RN-25: Report layout
+CLR-RN-26: Business rule confirmation
+CLR-RN-27: Configuration value
+CLR-RN-28: Business rule confirmation
+CLR-RN-29: Configuration value
+CLR-RN-30: Decision
+CLR-RN-31: Clarification
+CLR-RN-32: Sample document or template
+CLR-RN-33: Configuration value
+CLR-RN-34: Business rule confirmation
+CLR-RN-35: Configuration value
+CLR-RN-36: Business rule confirmation
+CLR-RN-37: Business rule confirmation
+CLR-RN-38: Integration detail
+CLR-RN-39: Business rule confirmation
+CLR-RN-40: Sign-off
+CLR-CM-01: Business rule confirmation
+CLR-CM-02: Business rule confirmation
+CLR-CM-03: Configuration value
+CLR-CM-04: Business rule confirmation
+CLR-CM-05: Configuration value
+CLR-CM-06: Business rule confirmation
+CLR-CM-07: Business rule confirmation
+CLR-CM-08: Business rule confirmation
+CLR-CM-09: Business rule confirmation
+CLR-CM-10: Business rule confirmation
+CLR-CM-11: Clarification
+CLR-CM-12: Business rule confirmation
+CLR-CM-13: Business rule confirmation
+CLR-CM-14: Business rule confirmation
+CLR-CM-15: Business rule confirmation
+CLR-EB-01: Business rule confirmation
+CLR-EB-02: Business rule confirmation
+CLR-EB-03: Configuration value
+CLR-EB-04: Integration detail
+CLR-EB-05: Business rule confirmation
+CLR-EB-06: Integration detail
+CLR-EB-07: Business rule confirmation
+CLR-EB-08: Business rule confirmation
+CLR-EB-09: Report layout
+CLR-CSF-01: Clarification
+CLR-CSF-02: Business rule confirmation
+CLR-CSF-03: Business rule confirmation
+CLR-CSF-04: Configuration value
+CLR-CSF-05: Business rule confirmation
+CLR-CSF-06: Clarification
+CLR-CSF-07: Decision
+CLR-CSF-08: Business rule confirmation
+CLR-CSF-09: Configuration value
+CLR-CSF-10: Configuration value
+CLR-CSF-11: Configuration value
+CLR-CSF-12: Clarification
+CLR-SS-01: Integration detail
+CLR-SS-02: Configuration value
+CLR-SS-03: Decision
+CLR-SS-04: Clarification
+CLR-SS-05: Business rule confirmation
+CLR-SS-06: Clarification
+CLR-SS-07: Integration detail
+CLR-SS-08: Sample document or template
+CLR-SS-09: Business rule confirmation
+CLR-SS-10: Business rule confirmation
+CLR-SS-11: Business rule confirmation
+CLR-UA-01: Integration detail
+CLR-UA-02: Business rule confirmation
+CLR-UA-03: Integration detail
+CLR-UA-04: Integration detail
+CLR-UA-05: Configuration value
+CLR-UA-06: Business rule confirmation
+CLR-UA-07: Decision
+CLR-UA-08: Configuration value
+CLR-UA-09: Decision
+CLR-UA-10: Report layout
+CLR-UA-11: Decision
+CLR-UA-12: Business rule confirmation
+CLR-UA-13: Decision
+CLR-UA-14: Decision
+CLR-UA-15: Business rule confirmation
+CLR-UA-16: Configuration value
+CLR-UA-17: Integration detail
+CLR-UA-18: Business rule confirmation
+CLR-UA-19: Business rule confirmation
+CLR-UA-20: Business rule confirmation
+CLR-UA-21: Integration detail
+CLR-UA-22: Integration detail
+CLR-UA-23: Integration detail
+CLR-UA-24: Business rule confirmation
+CLR-UA-25: Integration detail
+CLR-UA-26: Business rule confirmation
+CLR-UA-27: Business rule confirmation
+CLR-SP-01: Business rule confirmation
+CLR-SP-02: Integration detail
+CLR-SP-03: Business rule confirmation
+CLR-SP-04: Business rule confirmation
+CLR-SP-05: Configuration value
+CLR-SP-06: Configuration value
+CLR-SP-07: Integration detail
+CLR-SP-08: Report layout
+CLR-SP-09: Business rule confirmation
+CLR-SP-10: Business rule confirmation
+CLR-SP-11: Business rule confirmation
+CLR-SP-12: Integration detail
+CLR-SP-13: Report layout
+CLR-SP-14: Business rule confirmation
+CLR-SP-15: Configuration value
+CLR-SP-16: Business rule confirmation
+CLR-SP-17: Report layout
+CLR-SP-18: Configuration value
+PR-DM-01: Decision
+PR-DM-02: Business rule confirmation
+PR-DM-03: Integration detail
+PR-DM-04: Integration detail
+PR-DM-05: Decision
+PR-DM-06: Business rule confirmation
+PR-DM-07: Business rule confirmation
+PR-DM-08: Business rule confirmation
+PR-DM-09: Configuration value
+PR-DM-10: Configuration value
+PR-DM-11: Business rule confirmation
+PR-DM-12: Business rule confirmation
+PR-DM-13: Business rule confirmation
+PR-DM-14: Configuration value
+PR-DM-15: Business rule confirmation
+PR-DM-16: Business rule confirmation
+PR-DM-17: Business rule confirmation
+PR-DM-18: Business rule confirmation
+PR-DM-19: Business rule confirmation
+PR-DM-20: Business rule confirmation
+PR-DM-21: Business rule confirmation
+PR-DM-22: Business rule confirmation
+PR-DM-23: Business rule confirmation
+PR-DM-24: Business rule confirmation
+PR-DM-25: Business rule confirmation
+PR-DM-26: Decision
+PR-DM-27: Business rule confirmation
+PR-DM-28: Configuration value
+CLR-DM-01: Business rule confirmation
+CLR-DM-02: Clarification
+CLR-DM-03: Business rule confirmation
+CLR-DM-04: Configuration value
+CLR-DM-05: Business rule confirmation
+CLR-DM-06: Business rule confirmation
+CLR-DM-07: Business rule confirmation
+CLR-DM-08: Business rule confirmation
+CLR-DM-09: Clarification
+CLR-DM-10: Business rule confirmation
+CLR-DM-11: Business rule confirmation
+CLR-DM-12: Business rule confirmation
+CLR-DM-13: Business rule confirmation
+CLR-DM-14: Business rule confirmation
+CLR-DM-15: Business rule confirmation
+CLR-DM-16: Business rule confirmation
+CLR-DM-17: Business rule confirmation
+CLR-DM-18: Business rule confirmation
+CLR-DM-19: Business rule confirmation
+CLR-DM-20: Report layout
+DMQ08: Clarification
+PM-Q01: Clarification
+PM-Q02: Clarification
+PM-Q03: Clarification
+PM-Q04: Clarification
+PM-Q05: Business rule confirmation
+PM-Q06: Business rule confirmation
+PM-Q07: Business rule confirmation
+PM-Q08: Business rule confirmation
+PM-Q09: Sign-off
+PM-Q10: Master data
+PM-Q11: Business rule confirmation
+PM-Q12: Business rule confirmation
+PM-Q14: Decision
+PM-Q15: Configuration value
+PM-Q17: Configuration value
+PM-Q19: Clarification
+PM-Q21: Configuration value
+PM-Q22: Clarification
+PM-Q25: Business rule confirmation
+PM-Q27: Clarification
+PM-Q28: Decision
+PM-Q30: Clarification
+PM-Q31: Decision
+PM-Q33: Business rule confirmation
+PM-Q34: Decision
+PM-Q37: Decision
+PM-Q38: Configuration value
+PM-Q39: Business rule confirmation
+PM-Q40: Business rule confirmation
+PM-Q41: Decision
+PM-Q42: Configuration value
+PM-Q43: Business rule confirmation
+PM-Q46: Integration detail
+PM-Q48: Configuration value
+PM-Q50: Configuration value
+PM-Q51: Master data
+PM-Q52: Master data
+PM-Q53: Master data
+PM-Q54: Configuration value
+PM-Q56: Master data
+PM-Q57: Business rule confirmation
+UA-Q01: Business rule confirmation
+UA-Q02: Clarification
+UA-Q03: Sign-off
+UA-Q04: Business rule confirmation
+UA-Q06: Integration detail
+UA-Q08: Integration detail
+UA-Q09: Decision
+UA-Q11: Integration detail
+UA-Q12: Decision
+UA-Q13: Decision
+UA-Q15: Integration detail
+UA-Q16: Configuration value
+UA-Q17: Decision
+UA-Q19: Integration detail
+UA-Q20: Decision
+UA-Q21: Decision
+UA-Q22: Integration detail
+UA-Q25: Configuration value
+UA-Q27: Master data
+UA-Q29: Master data
+UA-Q30: Master data
+UA-Q33: Master data
+UA-Q34: Decision
+UA-Q35: Configuration value
+UA-Q38: Decision
+UA-Q43: Business rule confirmation
+UA-Q45: Decision
+UA-Q46: Decision
+UA-Q47: Decision
+UA-Q48: Decision
+UA-Q49: Master data
+UA-Q51: Report layout
+UA-Q52: Configuration value
+UA-Q53: Configuration value
+UA-Q54: Clarification
+UA-Q55: Business rule confirmation
+UA-Q56: Integration detail
+UA-Q57: Business rule confirmation
+DM-Q03: Clarification
+DM-Q04: Business rule confirmation
+DM-Q07: Clarification
+DM-Q18: Business rule confirmation
+DM-Q19: Business rule confirmation
+DM-Q22: Decision
+DM-Q37: Report layout
+DM-Q41: Integration detail
+DM-Q49: Business rule confirmation
+DM-Q50: Business rule confirmation
+NFR-PRF-01: Decision
+NFR-PRF-02: Configuration value
+NFR-PRF-03: Decision
+NFR-PRF-05: Configuration value
+NFR-PRF-07: Configuration value
+NFR-PRF-08: Configuration value
+NFR-PRF-09: Configuration value
+NFR-CAP-01: Decision
+NFR-CAP-03: Configuration value
+NFR-CAP-04: Configuration value
+NFR-CAP-05: Configuration value
+NFR-AVL-01: Decision
+NFR-AVL-02: Decision
+NFR-AVL-03: Decision
+NFR-REC-03: Decision
+NFR-REC-04: Configuration value
+NFR-REC-05: Decision
+NFR-SCL-04: Configuration value
+NFR-SEC-02: Configuration value
+NFR-SEC-03: Decision
+NFR-SEC-05: Decision
+NFR-SEC-06: Configuration value
+NFR-SEC-08: Configuration value
+NFR-SEC-12: Configuration value
+NFR-PRV-02: Decision
+NFR-PRV-04: Configuration value
+NFR-PRV-06: Configuration value
+NFR-ACC-01: Configuration value
+NFR-ACC-04: Configuration value
+NFR-USE-01: Configuration value
+NFR-USE-05: Configuration value
+NFR-RSP-03: Configuration value
+NFR-LOC-04: Configuration value
+NFR-MNT-02: Configuration value
+NFR-MNT-05: Configuration value
+NFR-MNT-06: Configuration value
+NFR-OBS-01: Decision
+NFR-OBS-02: Configuration value
+NFR-OBS-03: Configuration value
+NFR-SUP-02: Configuration value
+NFR-AUD-03: Configuration value
+NFR-RET-01: Decision
+NFR-RET-03: Decision
+NFR-INT-04: Configuration value
+NFR-INT-05: Decision
+NFR-INT-06: Configuration value
+CRQ01: Clarification
+CRQ05: Decision
+CRQ13: Report layout
+CRQ14: Decision
+CRQ15: Clarification
+CRQ16: Clarification
+CRQ17: Sample document or template
+CRQ23: Clarification
+CRQ25: Sign-off
+Q04: Configuration value
+Q13: Decision
+Q14: Configuration value
+Q16: Integration detail
+Q17: Configuration value
+Q20: Decision
+Q21: Configuration value
+Q22: Clarification
+Q23: Configuration value
+Q25: Decision
+Q26: Clarification
+Q32: Clarification
+Q34: Master data
+Q36: Clarification
+Q38: Sample document or template
+IQ09: Integration detail
+IQ10: Integration detail
+IQ14: Integration detail
+IQ20: Clarification
+OQ05: Configuration value
+OQ09: Clarification
+OQ10: Clarification
+OQ12: Configuration value
+OQ13: Clarification
+OQ14: Clarification
+OQ25: Configuration value
+OQ26: Clarification
+OQ31: Configuration value
+OQ34: Decision
+OQ35: Business rule confirmation
+OQ36: Decision
+OQ41: Clarification
+OQ42: Report layout
+OQ47: Clarification
+OQ50: Clarification
+CQ02: Business rule confirmation
+CQ09: Report layout
+CQ19: Clarification
+CQ20: Integration detail
+CQ22: Clarification
+AQ08: Integration detail
+AQ20: Clarification
+AQ26: Clarification
+AQ31: Integration detail
+AQ22: Decision
+RQ02: Decision
+RQ04: Configuration value
+RQ09: Configuration value
+RQ14: Clarification
+RQ15: Integration detail
+RQ23: Decision
+RQ25: Configuration value
+OOS-1: Clarification
+RQ31: Decision
+RQ32: Clarification
+RQ33: Configuration value
+CLQ01: Clarification
+CLQ03: Clarification
+CLQ07: Configuration value
+CLQ08: Clarification
+CLQ09: Clarification
+CLQ11: Master data
+CLQ12: Configuration value
+CLQ13: Configuration value
+CLQ15: Decision
+CLQ16: Configuration value
+CLQ18: Clarification
+CLQ19: Clarification
+CLQ20: Clarification
+CLQ22: Sample document or template
+CLQ23: Clarification
+CLQ25: Clarification
+EBQ03: Clarification
+EBQ04: Integration detail
+EBQ07: Clarification
+EBQ10: Configuration value
+EBQ11: Configuration value
+EBQ12: Decision
+EBQ13: Integration detail
+EBQ14: Clarification
+EBQ16: Clarification
+EBQ18: Decision
+EBQ19: Report layout
+EBQ20: Configuration value
+EBQ22: Decision
+EBQ23: Clarification
+EBQ24: Clarification
+EBQ27: Clarification
+EBQ28: Decision
+CSQ04: Clarification
+CSQ05: Clarification
+CSQ13: Clarification
+CSQ14: Clarification
+CSQ16: Clarification
+CSQ23: Clarification
+XQ02: Clarification
+XQ04: Configuration value
+XQ05: Clarification
+SANC-SQ08: Configuration value
+SANC-SQ11: Configuration value
+SANC-SQ12: Clarification
+SANC-SQ13: Clarification
+SANC-SQ14: Clarification
+UQ13: Decision
+SP-SQ04: Clarification
+SP-SQ05: Configuration value
+SP-SQ08: Sample document or template
+SP-SQ13: Clarification
+SP-SQ17: Clarification
+SP-SQ18: Integration detail
+SP-SQ19: Clarification
+SP-SQ23: Clarification
+SP-SQ24: Configuration value
+IQ01: Decision
+IQ02: Business rule confirmation
+IQ06: Integration detail
+IQ07: Integration detail
+IQ08: Integration detail
+IQ12: Integration detail
+IQ13: Integration detail
+IQ15: Integration detail
+IQ16: Integration detail
+IQ17: Integration detail
+IQ18: Integration detail
+IQ19: Integration detail
+IQ21: Clarification
+IQ23: Decision
+IQ28: Integration detail
+IQ29: Integration detail
+IQ31: Decision
+IQ32: Decision
+IQ33: Clarification
+IQ34: Integration detail
+DSQ01: Decision
+DSQ02: Integration detail
+DSQ03: Configuration value
+DSQ04: Integration detail
+XQ01: Integration detail
+XQ06: Report layout
+XQ07: Clarification
+XQ09: Report layout
+XQ10: Decision
+XQ11: Decision
+XQ13: Decision
+DCR-004: Report layout
+DCR-010: Business rule confirmation
+DCR-011: Business rule confirmation
+DCR-021: Clarification
+DCR-024: Clarification
+DCR-026: Clarification
+DCR-040: Clarification
+DCR-047: Report layout
+DCR-048: Sign-off
+DCR-049: Sign-off
+DCR-050: Clarification
+DCR-051: Clarification
+DCR-060: Clarification
+DCR-061: Clarification
+DCR-065: Clarification
+DCR-066: Business rule confirmation
+DCR-068: Business rule confirmation
+DCR-069: Sign-off
+DCR-076: Clarification
+DCR-077: Clarification
+DCR-091: Clarification
+DCR-095: Clarification
+DCR-098: Clarification
+DCR-099: Clarification
+DCR-105: Business rule confirmation
+DCR-113: Sign-off
+DCR-122: Clarification
+DCR-123: Clarification
+DCR-128: Sign-off
+DCR-130: Clarification
+DCR-132: Decision
+DCR-145: Clarification
+DCR-159: Business rule confirmation
+DCR-183: Business rule confirmation
+DCR-188: Clarification
+CFG-001: Master data
+CFG-002: Master data
+CFG-003: Master data
+CFG-004: Master data
+CFG-005: Master data
+CFG-006: Configuration value
+CFG-007: Master data
+CFG-008: Configuration value
+CFG-009: Configuration value
+CFG-010: Configuration value
+CFG-011: Configuration value
+CFG-020: Master data
+CFG-021: Master data
+CFG-022: Master data
+CFG-023: Master data
+CFG-024: Master data
+CFG-025: Master data
+CFG-026: Configuration value
+CFG-027: Configuration value
+CFG-028: Configuration value
+CFG-029: Configuration value
+CFG-030: Configuration value
+CFG-031: Configuration value
+CFG-040: Master data
+CFG-041: Master data
+CFG-042: Master data
+CFG-043: Master data
+CFG-044: Integration detail
+CFG-045: Master data
+CFG-050: Master data
+CFG-051: Configuration value
+CFG-052: Configuration value
+CFG-060: Configuration value
+CFG-061: Configuration value
+CFG-070: Configuration value
+CFG-071: Configuration value
+CFG-072: Configuration value
+CFG-073: Configuration value
+CFG-074: Configuration value
+CFG-075: Integration detail
+CFG-080: Configuration value
+CFG-081: Configuration value
+CFG-082: Sample document or template
+CFG-083: Sample document or template
+CFG-090: Master data
+CFG-091: Master data
+CFG-092: Master data
+CFG-093: Master data
+CFG-094: Master data
+CFG-095: Master data
+CFG-096: Master data
+CFG-097: Master data
+CFG-098: Sample document or template
+CFG-100: Master data
+CFG-101: Master data
+CFG-102: Master data
+CFG-103: Master data
+CFG-104: Master data
+CFG-110: Master data
+CFG-111: Master data
+CFG-112: Master data
+CFG-113: Master data
+CFG-114: Configuration value
+CFG-115: Configuration value
+CFG-120: Configuration value
+CFG-121: Configuration value
+CFG-122: Configuration value
+CFG-123: Configuration value
+CFG-124: Configuration value
+CFG-125: Configuration value
+CFG-126: Configuration value
+CFG-127: Master data
+CFG-128: Configuration value
+CFG-129: Master data
+CFG-130: Configuration value
+CFG-131: Configuration value
+CFG-140: Master data
+CFG-141: Master data
+DOC-01: Sample document or template
+DOC-02: Sample document or template
+DOC-03: Sample document or template
+DOC-04: Sample document or template
+DOC-05: Sample document or template
+DOC-06: Sample document or template
+DOC-07: Sample document or template
+DOC-08: Sample document or template
+DOC-09: Sample document or template
+DEP-01: Decision
+DEP-02: Decision
+DEP-03: Decision
+DEP-05: Master data
+DEP-06: Integration detail
+DEP-07: Integration detail
+DEP-08: Integration detail
+DEP-09: Master data
+DEP-10: Integration detail
+DEP-11: Integration detail
+DEP-12: Integration detail
+DEP-13: Integration detail
+DEP-15: Decision
+DEP-16: Master data
+DEP-17: Master data
+DEP-18: Decision
+DEP-19: Decision
+DEP-21: Integration detail
+DEP-22: Decision
+DEP-23: Integration detail
+DEP-24: Decision
+DEP-25: Integration detail
+DEP-26: Master data
+TD-01: Test data
+TD-02: Test data
+TD-03: Test data
+TD-04: Test data
+TD-05: Test data
+TD-06: Test data
+TD-07: Test data
+TD-08: Test data
+TD-09: Test data
+TD-10: Test data
+TD-11: Test data
+TD-12: Test data
+TD-13: Test data
+SO-00-1: Sign-off
+SO-00-2: Sign-off
+SO-00-3: Sign-off
+SO-00-4: Sign-off
+SO-01-1: Sign-off
+SO-01-2: Sign-off
+SO-01-3: Sign-off
+SO-02-1: Sign-off
+SO-02-2: Sign-off
+SO-02-3: Sign-off
+SO-03-1: Sign-off
+SO-03-2: Sign-off
+SO-03-3: Sign-off
+SO-04-1: Sign-off
+SO-04-2: Sign-off
+SO-04-3: Sign-off
+SO-05-1: Sign-off
+SO-05-2: Sign-off
+SO-05-3: Sign-off
+SO-06-1: Sign-off
+SO-06-2: Sign-off
+SO-06-3: Sign-off
+SO-07-1: Sign-off
+SO-07-2: Sign-off
+SO-07-3: Sign-off
+SO-08-1: Sign-off
+SO-08-2: Sign-off
+SO-08-3: Sign-off
+SO-09-1: Sign-off
+SO-09-2: Sign-off
+SO-09-3: Sign-off
+SO-10-1: Sign-off
+SO-10-2: Sign-off
+SO-10-3: Sign-off
+SO-11-1: Sign-off
+SO-11-2: Sign-off
+SO-11-3: Sign-off
+SO-12-1: Sign-off
+SO-12-2: Sign-off
+SO-12-3: Sign-off
+SO-13-1: Sign-off
+SO-13-2: Sign-off
+SO-13-3: Sign-off
+SO-13-4: Sign-off
+SO-13-5: Sign-off
+RI-01: Decision
+RI-02: Master data
+RI-03: Report layout
+PM-CON-01: Master data

@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { workflowApi } from '@/api/workflow';
 import type { QueueFilters, WorkItem } from '@/api/workflow';
 import { useAuth } from '@/auth/authContext';
@@ -11,16 +11,17 @@ import { PageFooter } from '@/components/ui/Pager';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { AssignDialog } from './AssignDialog';
+import { queueParamsOf, queueViewOf } from './queueParams';
+import type { QueueView } from './queueParams';
 import { QueueTable } from './QueueTable';
 import { QueueToolbar } from './QueueToolbar';
 import { StageTiles, WorkSummary } from './WorkTiles';
 
-type Filters = Omit<QueueFilters, 'companyId'>;
-
 /**
  * My Work (BRNB.096/115/080): the queues of the stages your team works, with open, overdue and
  * assigned-to-me counts. Claim items from the team queue, open them to act, and — as a team
- * leader — assign or re-assign them.
+ * leader — assign or re-assign them. The filters are kept in the page URL, so a dashboard figure
+ * opens the filtered queue and Back returns to it.
  */
 export default function MyWorkPage() {
   const companyId = useCompanyId();
@@ -28,9 +29,11 @@ export default function MyWorkPage() {
   const navigate = useNavigate();
   const toast = useToast();
   const queryClient = useQueryClient();
-  const [filters, setFilters] = useState<Filters>({ scope: 'ALL' });
+  const [params, setParams] = useSearchParams();
+  const [page, setPage] = useState(0);
   const [assigning, setAssigning] = useState<WorkItem | null>(null);
-  const query: QueueFilters = { ...filters, companyId };
+  const view = queueViewOf(params);
+  const query: QueueFilters = { ...view, page, companyId };
 
   const counts = useQuery({
     queryKey: ['workflow', 'counts', companyId],
@@ -50,7 +53,10 @@ export default function MyWorkPage() {
       toast.success(`${item.reference} is now yours`);
     },
   });
-  const setFilter = (patch: Partial<Filters>) => setFilters({ ...filters, page: 0, ...patch });
+  const setFilter = (patch: Partial<QueueView>) => {
+    setPage(0);
+    setParams((current) => queueParamsOf({ ...queueViewOf(current), ...patch }));
+  };
   const stageCounts = counts.data ?? [];
   const openItem = (item: WorkItem) => {
     if (item.link) {
@@ -66,26 +72,25 @@ export default function MyWorkPage() {
         description="Items waiting for your team, oldest due first."
       />
       <ErrorAlert error={counts.error ?? queue.error ?? claim.error} />
-      <WorkSummary counts={stageCounts} onFilter={setFilter} />
-      <StageTiles counts={stageCounts} filters={filters} onFilter={setFilter} />
-      <Card>
-        <div className="stack">
-          <QueueToolbar filters={filters} onFilter={setFilter} />
-          <QueueTable
-            items={queue.data?.content ?? []}
-            loading={queue.isLoading}
-            canAssign={can('WORK_ASSIGN')}
-            claiming={claim.isPending}
-            onOpen={openItem}
-            onClaim={(item) => claim.mutate(item.id)}
-            onAssign={setAssigning}
-          />
-          <PageFooter
-            data={queue.data}
-            noun="items"
-            onPage={(page) => setFilters({ ...filters, page })}
-          />
-        </div>
+      <WorkSummary counts={stageCounts} />
+      <StageTiles counts={stageCounts} filters={view} onFilter={setFilter} />
+      <Card flush callout="work-queue-card">
+        <QueueToolbar
+          filters={view}
+          stageCounts={stageCounts}
+          onFilter={setFilter}
+          onSearch={() => setPage(0)}
+        />
+        <QueueTable
+          items={queue.data?.content ?? []}
+          loading={queue.isLoading}
+          canAssign={can('WORK_ASSIGN')}
+          claiming={claim.isPending}
+          onOpen={openItem}
+          onClaim={(item) => claim.mutate(item.id)}
+          onAssign={setAssigning}
+        />
+        <PageFooter data={queue.data} noun="items" onPage={setPage} />
       </Card>
       {assigning && (
         <AssignDialog item={assigning} onClose={() => setAssigning(null)} onDone={refresh} />

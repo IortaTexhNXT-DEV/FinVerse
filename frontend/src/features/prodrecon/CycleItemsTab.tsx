@@ -20,6 +20,7 @@ import type { Bucket, ReconCycle, ReconFeedback, ReconItem } from './prodreconAp
 import { itemColumns } from './cycleItemColumns';
 import { bucketTabs, maySplit } from './prodreconLogic';
 import { clientShortName } from '@/context/clientNames';
+import { countOf } from '@/utils/format';
 
 function BulkDialog({
   count,
@@ -38,7 +39,7 @@ function BulkDialog({
   const [error, setError] = useState<string>();
   return (
     <Modal
-      title={`Set Disposition of ${String(count)} Item(s)`}
+      title={`Set Disposition of ${countOf(count, 'Item')}`}
       open
       onClose={onClose}
       footer={

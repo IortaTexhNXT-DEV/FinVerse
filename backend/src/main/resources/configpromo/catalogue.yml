@@ -111,6 +111,7 @@ datasets:
   - {code: PLC_PAYMENT_GATE_RULE, name: Payment gate rules, group: PRODUCTS, module: placement, table: plc_payment_gate_rule, key: [market_segment, line_code, priority]}
   - {code: ISS_DOCUMENT_TRIGGER, name: Document triggers of issuance, group: PRODUCTS, module: issuance, table: iss_document_trigger, key: [document_type, action]}
   - {code: ISS_EXTRACTION_PATTERN, name: Policy extraction patterns, group: PRODUCTS, module: issuance, table: iss_extraction_pattern, key: [insurer_code, kind, field, priority]}
+  - {code: CAT_OTHER_CHARGE, name: Other charges of the products, group: PRODUCTS, module: catalog, table: cat_other_charge, key: [charge_code, line_code, product_code, effective_from]}
 
   # ---------- Insurers and business partners -------------------------------------------------------
   - {code: CAT_INSURER, name: Insurers, group: PARTNERS, module: catalog, table: cat_insurer, key: [company_id, party_code], environment: [placement_emails]}
@@ -210,6 +211,7 @@ datasets:
   - {code: RNW_DECISION_RULE, name: Renewal decision rules, group: RENEWAL_SUBMITTED, module: renewal, table: rnw_decision_rule, key: [matrix_id, priority], parent: matrix_id}
   - {code: RNW_NON_RENEWABLE_RISK_CODE, name: Non-renewable risk codes, group: RENEWAL_SUBMITTED, module: renewal, table: rnw_non_renewable_risk_code, key: [company_id, risk_code, effective_from]}
   - {code: RNW_PACKAGE_MAP, name: Renewal package map, group: RENEWAL_SUBMITTED, module: renewal, table: rnw_package_map, key: [company_id, legacy_package_code, legacy_package_version, risk_code, insurer_code, si_from, map_version]}
+  - {code: RNW_INSURER_RENEWABLE_RISK, name: Risks each insurer renews, group: RENEWAL_SUBMITTED, module: renewal, table: rnw_insurer_renewable_risk, key: [company_id, insurer_code, risk_code, effective_from]}
   - {code: SBM_SOURCE, name: Submitted policy sources, group: RENEWAL_SUBMITTED, module: submitted, table: sbm_source, key: [code]}
   - {code: SBM_STATUS_MAP, name: Submitted policy status map, group: RENEWAL_SUBMITTED, module: submitted, table: sbm_status_map, key: [legacy_status]}
   - {code: SBM_RULE_SET, name: Submitted policy rule sets, group: RENEWAL_SUBMITTED, module: submitted, table: sbm_rule_set, key: [company_id, code, version_no]}
@@ -219,6 +221,7 @@ datasets:
   - {code: SBM_LETTER_RULE, name: Letter rules, group: RENEWAL_SUBMITTED, module: submitted, table: sbm_letter_rule, key: [company_id, letter_type, segment, bucket, status]}
   - {code: SBM_LIMIT_RULE, name: Insurer limit rules, group: RENEWAL_SUBMITTED, module: submitted, table: sbm_limit_rule, key: [company_id, insurer_code, segment, line, attribute]}
   - {code: SBM_APPROVAL_MATRIX, name: Approval matrix of submitted policies, group: RENEWAL_SUBMITTED, module: submitted, table: sbm_approval_matrix, key: [company_id, document, segment, tsi_from, level], userColumns: [approver_username]}
+  - {code: SBM_NOMINATED_RATE, name: Nominated rates of the insurers, group: RENEWAL_SUBMITTED, module: submitted, table: sbm_nominated_rate, key: [company_id, segment, vehicle_type, insurer_code, effective_from]}
   - {code: SBM_USER_SCOPE, name: Segments of the submitted policy users, group: USERS, module: submitted, table: sbm_user_scope, key: [company_id, username], users: true}
 
   # ---------- Claims and employee benefits rules ---------------------------------------------------
@@ -249,6 +252,7 @@ datasets:
   - {code: MSG_NOTIFICATION_EVENT, name: Notification events, group: WORKFLOW_DOCUMENTS, module: messaging, table: msg_notification_event, key: [code]}
   - {code: MSG_NOTIFICATION_PREFERENCE, name: Notification preferences of the users, group: USERS, module: messaging, table: msg_notification_preference, key: [username, event_code], users: true}
   - {code: DOC_TEMPLATE, name: Document and letter templates, group: WORKFLOW_DOCUMENTS, module: docgen, table: doc_template, key: [code, version_no]}
+  - {code: ISS_ADVICE_RECIPIENT, name: Recipients of the insurance advices, group: WORKFLOW_DOCUMENTS, module: issuance, table: iss_advice_recipient, key: [company_id, mortgagee_bank, market_segment, effective_from], environment: [to_addresses, cc_addresses]}
 
   # ---------- Report definitions and layouts -------------------------------------------------------
   - {code: FIN_SCHEDULE_DEF, name: Finance schedule definitions, group: REPORTS, module: finreport, table: fin_schedule_def, key: [code]}
@@ -305,7 +309,8 @@ reasons:
 # Tables never promoted, by reason.
 excluded:
   TRANSACTION:
-    [acc_account, acc_account_legacy, acc_account_pn, acc_account_policy, acc_risk_item,
+    [bkg_incentive_evaluation, sbm_loan_match, sbm_proposal, sbm_proposal_batch,
+     acc_account, acc_account_legacy, acc_account_pn, acc_account_policy, acc_risk_item,
      acc_risk_item_detail, acsl_case, acsl_correction, acsl_correction_line, acsl_glsl_recon,
      acsl_glsl_run, acsl_recon_result, acsl_recon_run, acsl_soa_line, acsl_soa_upload,
      adj_min_balance_item, adj_posting_batch, adj_posting_batch_line, adj_request,

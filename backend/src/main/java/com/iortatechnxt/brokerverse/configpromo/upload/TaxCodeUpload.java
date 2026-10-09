@@ -37,7 +37,14 @@ public class TaxCodeUpload extends ConfigUploadHandler {
           "DST",
           "LGT",
           "FST",
-          EWT);
+          EWT,
+          "FWT",
+          "FINAL_VAT",
+          "PERCENTAGE_TAX");
+
+  /** The withholding taxes, which need the ATC of the BIR. */
+  private static final List<String> WITHHOLDING = List.of(EWT, "FWT");
+
   private static final List<String> PAYEE_CLASSES = List.of("INDIVIDUAL", "CORPORATE");
   private static final Pattern CODE_FORMAT = Pattern.compile("[A-Z0-9_-]{1,20}");
   private static final BigDecimal HUNDRED = BigDecimal.valueOf(100);
@@ -92,7 +99,7 @@ public class TaxCodeUpload extends ConfigUploadHandler {
         BulkColumn.required(CODE, "Code of the tax", "EWT_WC158").format("Up to 20 capitals"),
         BulkColumn.required(NAME, "Name of the tax", "EWT 1% - goods"),
         BulkColumn.required(TYPE, "Kind of tax", EWT).codes(TYPES.toArray(String[]::new)),
-        BulkColumn.optional(ATC, "Alphanumeric tax code of the BIR", "WC158").when(EWT),
+        BulkColumn.optional(ATC, "Alphanumeric tax code of the BIR", "WC158").when("EWT, FWT"),
         BulkColumn.optional(PAYEE, "Payee class of the withholding", "CORPORATE")
             .codes(PAYEE_CLASSES.toArray(String[]::new)),
         new BulkColumn(RATE, "Rate in percent", true, Type.NUMBER, "1")
@@ -117,7 +124,7 @@ public class TaxCodeUpload extends ConfigUploadHandler {
     }
     oneOf(errors, TYPE, row.text(TYPE), TYPES);
     oneOf(errors, PAYEE, row.text(PAYEE), PAYEE_CLASSES);
-    if (EWT.equals(row.text(TYPE)) && row.text(ATC) == null) {
+    if (WITHHOLDING.contains(row.text(TYPE)) && row.text(ATC) == null) {
       errors.add(error(ATC, "mandatory for a withholding tax"));
     }
     BigDecimal rate = row.number(RATE);

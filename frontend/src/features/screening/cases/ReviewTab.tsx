@@ -11,7 +11,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
-import { formatDateTime } from '@/utils/format';
+import { countOf, formatDateTime } from '@/utils/format';
 import { casesApi } from './api';
 import type { CaseDetail, CaseDocument, TemplateField } from './api';
 import { fieldError, missingFields, sections } from './caseLogic';
@@ -160,7 +160,8 @@ export function ReviewTab({ detail }: Readonly<{ detail: CaseDetail }>) {
         )}
         {Object.keys(missing).length > 0 && (
           <p className="muted">
-            Complete the {Object.keys(missing).length} mandatory field(s) before submitting.
+            Complete the {countOf(Object.keys(missing).length, 'mandatory field')} before
+            submitting.
           </p>
         )}
         {sections(form.fields).map((group) => (

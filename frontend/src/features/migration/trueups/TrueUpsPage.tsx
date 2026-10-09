@@ -15,7 +15,7 @@ import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate, formatDateTime } from '@/utils/format';
+import { countOf, formatDate, formatDateTime } from '@/utils/format';
 import { ActionConfirm } from '../common/ActionConfirm';
 import type { MigAction } from '../common/ActionConfirm';
 import { MigStatus } from '../common/MigStatus';
@@ -94,7 +94,7 @@ export default function TrueUpsPage() {
                   ''
                 ) : (
                   <CellStack
-                    main={`${String(t.journalsPosted)} journal(s), ${String(t.itemsAdjusted)} item(s)`}
+                    main={`${countOf(t.journalsPosted, 'journal')}, ${countOf(t.itemsAdjusted, 'item')}`}
                     sub={formatDateTime(t.postedAt)}
                   />
                 ),

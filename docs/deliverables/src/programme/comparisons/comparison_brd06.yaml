@@ -287,7 +287,7 @@ mapping:
   - [FRRN.014.03, "-", Not in ours, Partly, Platform change, "Allocation of the renewal to several insurers by percentage (total 100%) or amount (total = TSI); BIBS takes the insurers and shares from the package."]
   - [FRRN.014.04, "-", Not in ours, Partly, Adopt BDOI wording, "For Booking Only tag with policy number, OR number, policy document and full payment checks and an override approval; BIBS books directly in New Business."]
   - [FRRN.014.05, "-", Not in ours, Partly, Platform change, "Direct-to-Insurer Payment tag with blanket approval or Unit Head approval; BIBS has the direct payment tag of New Business without the approval route. Ours has only the non-renewal reason Direct to Insurer."]
-  - [FRRN.014.06, FR-RN-041, Same, "Yes", Adopt BDOI wording, "Both download and print the details; BDOI fixes the file name Renewal Account Details.xlsx."]
+  - [FRRN.014.06, FR-RN-041, Partial, "Yes", Adopt BDOI wording, "Both download and print the details; BDOI fixes the file name Renewal Account Details.xlsx."]
   - [FRRN.015.03, FR-RN-060, Partial, Partly, Adopt BDOI wording, "Ours uploads dispositioned files on the Processing Worklist; BDOI has a general Renewal Update upload with a downloadable template on the landing page."]
   - [FRRN.015.04, "FR-RN-060, FR-RN-021", Same, "Yes", Keep ours, "Rows matched on the reference number (ours: the renewal reference, mandatory)."]
   - [FRRN.015.05, FR-RN-060, Partial, Partly, Adopt BDOI wording, "Upload summary columns and statuses."]

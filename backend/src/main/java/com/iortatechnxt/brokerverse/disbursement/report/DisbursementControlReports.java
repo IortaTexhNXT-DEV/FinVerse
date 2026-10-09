@@ -54,8 +54,8 @@ public class DisbursementControlReports {
                 ReportColumn.text("stage", "Status")),
             "payee_class",
             "Payee Class",
-            "Account numbers are masked; the full number is shown on the payee page to"
-                + " DISB_PAYEE_VIEW_FULL."),
+            "Account numbers are masked; the full number is shown on the payee page to the users"
+                + " allowed to see full account numbers."),
         jdbc);
   }
 

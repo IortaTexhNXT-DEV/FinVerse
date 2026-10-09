@@ -103,8 +103,18 @@ export default function LayoutsPage() {
                   ),
                 },
                 { key: 'object', header: 'Object', kind: 'code', render: (l) => l.objectCode },
-                { key: 'keys', header: 'Key columns', defaultHidden: true, render: (l) => l.keyColumns },
-                { key: 'hash', header: 'Hash total', defaultHidden: true, render: (l) => migLabel(l.hashRule) },
+                {
+                  key: 'keys',
+                  header: 'Key columns',
+                  defaultHidden: true,
+                  render: (l) => l.keyColumns,
+                },
+                {
+                  key: 'hash',
+                  header: 'Hash total',
+                  defaultHidden: true,
+                  render: (l) => migLabel(l.hashRule),
+                },
                 {
                   key: 'frozen',
                   header: 'Frozen',

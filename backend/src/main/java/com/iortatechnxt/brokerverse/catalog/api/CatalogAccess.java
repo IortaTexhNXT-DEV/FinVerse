@@ -8,12 +8,15 @@ final class CatalogAccess {
       "hasAnyAuthority('MASTER_VIEW', 'PRODUCT_VIEW', 'ACCOUNT_VIEW', 'QUOTE_VIEW', 'TSU_PROCESS')";
 
   /**
-   * The list of insurers: every catalog reader, and the ACSL and Remittance users who record and
-   * confirm the deductions an insurer confirmed (they choose the insurer and see it by name).
+   * The list of insurers: every catalog reader, the ACSL and Remittance users who record and
+   * confirm the deductions an insurer confirmed (they choose the insurer and see it by name), and
+   * the users of the screens that show an insurer by name (submitted policies, renewal, claims
+   * handling, collections, employee benefits and the contact centre).
    */
   static final String INSURER_LIST =
       "hasAnyAuthority('MASTER_VIEW', 'PRODUCT_VIEW', 'ACCOUNT_VIEW', 'QUOTE_VIEW', 'TSU_PROCESS',"
-          + " 'ACSL_PROCESS', 'ACSL_VIEW', 'REMIT_DEDUCTION_CONFIRM')";
+          + " 'ACSL_PROCESS', 'ACSL_VIEW', 'REMIT_DEDUCTION_CONFIRM', 'SBM_VIEW', 'RNW_VIEW',"
+          + " 'BCL_VIEW', 'CLX_VIEW', 'EB_VIEW', 'CSF_VIEW')";
 
   /** Maintaining catalog records (maker) outside the product areas. */
   static final String MAINTAIN = "hasAuthority('MASTER_MAINTAIN')";

@@ -51,7 +51,7 @@ public class AgeingAlertsJob implements ManagedJob {
 
   @Override
   public String description() {
-    return "Flags outstanding claims older than BCL_PAST_DUE_DAYS";
+    return "Flags outstanding claims older than the past-due days of the claims setup";
   }
 
   @Override

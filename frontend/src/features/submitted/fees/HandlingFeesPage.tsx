@@ -202,7 +202,12 @@ export default function HandlingFeesPage() {
                 kind: 'status',
                 render: (f) => <StatusBadge status={f.status} />,
               },
-              { key: 'channel', header: 'Channel', defaultHidden: true, render: (f) => channelLabel(f.channel) },
+              {
+                key: 'channel',
+                header: 'Channel',
+                defaultHidden: true,
+                render: (f) => channelLabel(f.channel),
+              },
               {
                 key: 'payment',
                 header: 'Payment',

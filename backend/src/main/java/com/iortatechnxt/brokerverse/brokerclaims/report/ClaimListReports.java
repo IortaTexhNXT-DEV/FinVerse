@@ -111,7 +111,8 @@ public final class ClaimListReports {
       return ReportMetadata.claimsHandling(
           PAST_DUE,
           "Outstanding Claims 90 Days Past Due",
-          "Outstanding claims older than BCL_PAST_DUE_DAYS from the reported date",
+          "Outstanding claims older than the past-due days of the claims setup (90 by default),"
+              + " counted from the reported date",
           params);
     }
 

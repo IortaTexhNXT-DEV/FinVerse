@@ -122,7 +122,9 @@ class NbReportsIT {
   void theAccountStatusReportFlagsSlaBreachesAndStalledAccounts() {
     ReportResult all = as.run("ao", () -> reports.run("NB-ACC-STATUS", params()));
     assertThat(details(all)).isNotEmpty();
-    assertThat(all.notes()).anyMatch(n -> n.contains("NB_STALLED_DAYS"));
+    assertThat(all.notes())
+        .anyMatch(n -> n.contains("days or more (New Business setting)"))
+        .noneMatch(n -> n.contains("NB_STALLED_DAYS"));
     ReportResult breaches =
         as.run("ao", () -> reports.run("NB-ACC-STATUS", params("exceptions", "SLA_BREACH")));
     assertThat(details(breaches))

@@ -78,7 +78,7 @@ public class CheckStaleJob implements ManagedJob {
 
   @Override
   public String description() {
-    return "Tags as stale the checks not negotiated DISB_STALE_DAYS after their print date";
+    return "Tags as stale the checks not negotiated within the stale-check days after their print date";
   }
 
   @Override

@@ -149,7 +149,8 @@ public class DisbursementReports {
             checkColumns(),
             "bucket",
             "Ageing",
-            "Aged at the To date; checks become stale after DISB_STALE_DAYS."),
+            "Aged at the To date; checks become stale after the stale-check days of the"
+                + " disbursement setup."),
         jdbc);
   }
 

@@ -138,7 +138,8 @@ public class AccountStatusReport implements ReportDefinition {
         .note(
             "Stalled: no stage movement for "
                 + stall.days()
-                + " days or more (parameter NB_STALLED_DAYS). SLA per stage from the workflow.")
+                + " days or more (New Business setting). The service level of each stage comes"
+                + " from its workflow.")
         .build();
   }
 }

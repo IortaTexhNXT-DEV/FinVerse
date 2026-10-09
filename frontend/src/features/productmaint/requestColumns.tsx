@@ -51,7 +51,12 @@ export const REQUEST_COLUMNS: Column<RequestListItem>[] = [
       </>
     ),
   },
-  { key: 'line', header: 'Line', defaultHidden: true, render: (r) => <LineLabel code={r.lineCode} /> },
+  {
+    key: 'line',
+    header: 'Line',
+    defaultHidden: true,
+    render: (r) => <LineLabel code={r.lineCode} />,
+  },
   {
     key: 'product',
     header: 'Product',

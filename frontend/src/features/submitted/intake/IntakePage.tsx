@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { submittedApi } from '@/api/submitted';
 import type { IntakeRunView } from '@/api/submitted';
 import { useAuth } from '@/auth/authContext';
+import { LovSelect } from '@/components/broking/LovSelect';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
@@ -39,6 +40,7 @@ export default function IntakePage() {
   const queryClient = useQueryClient();
   const [panel, setPanel] = useState<Panel>(null);
   const [source, setSource] = useState('LFS_INSURANCE');
+  const [loanReport, setLoanReport] = useState('LAMD');
   const [page, setPage] = useState(0);
   const runs = useQuery({
     queryKey: ['submitted', 'intake-runs', companyId, page],
@@ -60,7 +62,7 @@ export default function IntakePage() {
                   Upload Source File
                 </Button>
                 <Button variant="secondary" onClick={() => setPanel('lamd')}>
-                  Upload LAMD Snapshot
+                  Upload Loan File
                 </Button>
               </>
             )}
@@ -102,8 +104,25 @@ export default function IntakePage() {
       )}
       {panel === 'lamd' && (
         <UploadPanel
-          label="Upload LAMD Snapshot"
+          label={`Upload ${loanReport} Loan File`}
           handler="SBM_LAMD"
+          parameters={{ loanReport }}
+          parametersReady={loanReport !== ''}
+          parameterFields={
+            <div className="form-grid">
+              <Field label="Loan Report" required>
+                {(id) => (
+                  <LovSelect
+                    id={id}
+                    type="SBM_LOAN_REPORT"
+                    value={loanReport}
+                    onChange={setLoanReport}
+                    required
+                  />
+                )}
+              </Field>
+            </div>
+          }
           onCommitted={refresh}
           onClose={() => setPanel(null)}
         />

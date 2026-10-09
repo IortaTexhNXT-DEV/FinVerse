@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.tax.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.AuthorizableEntity;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -10,8 +11,9 @@ import jakarta.persistence.Table;
 /**
  * Tax profile of a business partner (maker-checker), kept beside the party master so the party
  * module is not altered: BIR TIN and branch code, registered name (split into last, first and
- * middle name for individuals, as the alphalists require), registered address, VAT treatment and
- * the default ATC applied to income payments to the party.
+ * middle name for individuals, as the alphalists require), registered address, VAT treatment, the
+ * default ATC applied to income payments to the party, and its withholding status and tax exemption
+ * certificate ({@link PartyTaxStatus}).
  *
  * <p>Parties without a profile are reported with the TIN of the party master and their name; their
  * withholding is shown under ATC "UNMAPPED" until a profile is authorized.
@@ -63,6 +65,8 @@ public class PartyTaxProfile extends AuthorizableEntity {
 
   @Column(name = "default_atc_code", length = 20)
   private String defaultAtcCode;
+
+  @Embedded private PartyTaxStatus taxStatus = PartyTaxStatus.NONE;
 
   protected PartyTaxProfile() {}
 
@@ -177,5 +181,13 @@ public class PartyTaxProfile extends AuthorizableEntity {
 
   public void setDefaultAtcCode(String defaultAtcCode) {
     this.defaultAtcCode = defaultAtcCode;
+  }
+
+  public PartyTaxStatus getTaxStatus() {
+    return taxStatus == null ? PartyTaxStatus.NONE : taxStatus;
+  }
+
+  public void setTaxStatus(PartyTaxStatus taxStatus) {
+    this.taxStatus = taxStatus == null ? PartyTaxStatus.NONE : taxStatus;
   }
 }

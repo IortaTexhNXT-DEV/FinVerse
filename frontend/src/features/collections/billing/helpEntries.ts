@@ -17,7 +17,7 @@ export const BILLING_HELP: HelpScreen[] = [
     controls: [
       'One live statement per plan and billing cycle; the PDF comes from the document template CLX_SOA and records the template version.',
       'Billing is monitoring only: a statement creates no receivable and no commission billing.',
-      'Generating, sending and cancelling need CLX_BILLING.',
+      'Operations prepares the statements: the billing run, generating, sending and cancelling are offered to the Operations billing user only. Collections users see the statements, their lines and the e-mails sent, read only.',
     ],
   },
 ];

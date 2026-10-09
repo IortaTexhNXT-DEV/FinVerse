@@ -11,12 +11,15 @@ export const RENEWAL_HELP: HelpSection = {
       name: 'Renewal Home',
       path: '/renewal',
       summary:
-        'Renewals due in 30, 60, 90 and 140 days, those at risk, urgent, returned, with no response, insurer replies overdue and failed letters; the renewals by status and Classification and the workload of the officers.',
+        'Renewals due in 30, 60, 90 and 140 days, those that need attention, urgent, returned, with no response, insurer replies overdue and failed letters; the renewals by status and Classification and the workload of the officers.',
       workflow: [
         'Select a tile or a status to open the list of those renewals.',
         'The counts cover the renewals of your scope: your unit, or all units for the Renewal team.',
       ],
-      controls: ['A renewal is at risk when it is close to expiry and has no disposition.'],
+      controls: [
+        'A renewal needs attention when it is not accepted within the escalation days before its expiry (ageing), past its effective expiry (overdue) or in the Exception bucket or with claims (high risk); the rule is shown with the flag.',
+        'No alert is sent to the unit head: the Account Officer escalates outside the system.',
+      ],
     },
     {
       name: 'Expiry List',
@@ -107,9 +110,12 @@ export const RENEWAL_HELP: HelpSection = {
       workflow: [
         'Generate RA for the renewals with their terms (first or second notice), then Send.',
         'Send Letters generates and sends the No Advice and Not for Renewal letters and closes the renewals.',
+        'Unrenewed – NAL and Unrenewed – NRL list the renewals that reached their effective expiry date without renewal: Operations sends the No Advice Letter where a Renewal Advice was sent, the Account Officer the Non-Renewal Letter otherwise.',
         'Upload Acceptances records client acceptances from a file.',
       ],
       controls: [
+        'The effective expiry date is the end of a confirmed hold cover, otherwise the policy expiry date; no closing letter is sent before it.',
+        'A renewal never receives both a No Advice Letter and a Non-Renewal Letter.',
         'An RA generated after the minimum notice before expiry needs your confirmation, which is recorded.',
         'Letters are generated from versioned templates and kept in the documents of the renewal.',
         'Renewal Advices sent by hand before go-live are never sent again.',
@@ -139,15 +145,17 @@ export const RENEWAL_HELP: HelpSection = {
       name: 'Renewal Setup',
       path: '/renewal/setup',
       summary:
-        'Non-renewable risk codes, the checks, the Classification rules, the decision matrix, the package map of migrated policies, package choices to approve and the go-live take-over.',
+        'Non-renewable risk codes, the checks, the insurer renewable lists, the Classification rules, the decision matrix, the package map of migrated policies, package choices to approve and the go-live take-over.',
       workflow: [
-        'Risk codes, checks and package mappings are saved for authorization by a second user.',
+        'Risk codes, checks, insurer renewable lists and package mappings are saved for authorization by a second user.',
+        'A renewal above the total sum insured threshold of the checks (250 million in the base currency by default) is held for review and proposed For Proposal; a risk code outside the catalogue or outside the renewable list of its insurer is held for review.',
         'Classification rules and the decision matrix are versioned: a new draft is submitted, then activated or rejected by a second user; activation retires the active version.',
         'Approve or reject the package proposed for a migrated policy.',
       ],
       controls: [
         'You cannot authorize your own change.',
         'Risk codes are end-dated, never deleted.',
+        'A new version of the classification rules applies to the renewals not yet initiated; renewals in progress keep the version that classified them.',
       ],
     },
   ],

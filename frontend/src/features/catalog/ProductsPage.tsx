@@ -26,6 +26,7 @@ import type { ProductForm } from './productForm';
 import { RecordActions } from './RecordActions';
 import { LineLabel, LovLabels } from '@/components/broking/LovLabel';
 import { formatRate } from '@/utils/format';
+import { ConfigUploadButton } from '@/features/configpromo/ConfigUploadButton';
 
 const TABS = [
   { id: 'products', label: 'Products' },
@@ -247,15 +248,18 @@ export default function ProductsPage() {
         title="Products"
         description="Products offered to clients, the data and documents each requires, and when TSU reviews an account."
         actions={
-          PRODUCT_MAINTAINERS.some((p) => can(p)) && (
-            <Button
-              variant="accent"
-              icon={<Plus size={16} />}
-              onClick={() => setEditing(newProductForm())}
-            >
-              New Product
-            </Button>
-          )
+          <>
+            <ConfigUploadButton types={['CFG_PACKAGE', 'CFG_COVERAGE_RULE']} />
+            {PRODUCT_MAINTAINERS.some((p) => can(p)) && (
+              <Button
+                variant="accent"
+                icon={<Plus size={16} />}
+                onClick={() => setEditing(newProductForm())}
+              >
+                New Product
+              </Button>
+            )}
+          </>
         }
       />
       <Tabs tabs={TABS} active={tab} onChange={setTab} />

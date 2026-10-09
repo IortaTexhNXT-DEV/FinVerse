@@ -14,6 +14,7 @@ import { awaitsOtherChecker } from '@/utils/makerChecker';
 import { LovValueDialog } from './LovValueDialog';
 import { nextSortOrder } from './lovForm';
 import { LovValuesTable } from './LovValuesTable';
+import { ConfigUploadButton } from '@/features/configpromo/ConfigUploadButton';
 
 type Editing = { value?: LovValue } | null;
 
@@ -135,6 +136,7 @@ export default function LovPage() {
         section="Broking Setup"
         title="Lists of Values"
         description="Coded values used on the broking screens."
+        actions={<ConfigUploadButton types={['CFG_PM_LIST_PARAMETER', 'CFG_ACCESS_LIST']} />}
       />
       <ErrorAlert error={types.error} />
       <div className="split">

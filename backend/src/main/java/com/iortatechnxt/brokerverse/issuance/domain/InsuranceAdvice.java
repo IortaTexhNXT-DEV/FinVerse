@@ -17,6 +17,8 @@ import java.time.Instant;
 @Table(name = "iss_insurance_advice")
 public class InsuranceAdvice extends BaseEntity {
 
+  private static final int FAILURE_LENGTH = 300;
+
   @Column(name = "company_id", nullable = false, updatable = false)
   private Long companyId;
 
@@ -76,6 +78,13 @@ public class InsuranceAdvice extends BaseEntity {
   @Column(name = "last_sent_to", length = 500)
   private String lastSentTo;
 
+  @Enumerated(EnumType.STRING)
+  @Column(name = "send_mode", length = 10)
+  private AdviceSendMode sendMode;
+
+  @Column(name = "auto_send_failure", length = 300)
+  private String autoSendFailure;
+
   protected InsuranceAdvice() {}
 
   /**
@@ -128,10 +137,42 @@ public class InsuranceAdvice extends BaseEntity {
    * @param when time
    */
   public void sent(String to, Instant when) {
+    sent(to, when, AdviceSendMode.MANUAL);
+  }
+
+  /**
+   * Records a sending.
+   *
+   * @param to recipients
+   * @param when time
+   * @param mode manual or automatic
+   */
+  public void sent(String to, Instant when, AdviceSendMode mode) {
+    this.sendMode = mode;
+    this.autoSendFailure = null;
     this.status = AdviceStatus.SENT;
     this.sendCount++;
     this.lastSentAt = when;
     this.lastSentTo = to;
+  }
+
+  /**
+   * Records why the automatic sending could not be made; the advice stays Generated for sending
+   * from the register.
+   *
+   * @param reason reason
+   */
+  public void autoSendFailed(String reason) {
+    this.autoSendFailure =
+        reason.length() > FAILURE_LENGTH ? reason.substring(0, FAILURE_LENGTH) : reason;
+  }
+
+  public AdviceSendMode getSendMode() {
+    return sendMode;
+  }
+
+  public String getAutoSendFailure() {
+    return autoSendFailure;
   }
 
   public Long getCompanyId() {

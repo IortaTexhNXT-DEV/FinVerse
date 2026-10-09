@@ -17,6 +17,7 @@ import com.iortatechnxt.brokerverse.organization.domain.Company;
 import com.iortatechnxt.brokerverse.organization.domain.CompanyRepository;
 import com.iortatechnxt.brokerverse.organization.domain.Holiday;
 import com.iortatechnxt.brokerverse.organization.domain.HolidayRepository;
+import com.iortatechnxt.brokerverse.organization.domain.TaxRegistration;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.Month;
@@ -377,6 +378,17 @@ public class OrganizationService {
       company.setHeadOfficeCode(profile.headOfficeCode());
       company.setDefaultBankCode(profile.defaultBankCode());
     }
+    CompanyRequest.TaxRegistrationRequest tax = request.taxRegistration();
+    if (tax != null) {
+      company.setTaxRegistration(
+          new TaxRegistration(
+              tax.rdoCode(),
+              tax.vatRegistered(),
+              tax.casPermitNo(),
+              tax.casPermitDate(),
+              tax.einvoicingPermitNo(),
+              tax.einvoicingPermitDate()));
+    }
   }
 
   private static void applyBranch(Branch branch, BranchRequest request) {
@@ -388,5 +400,7 @@ public class OrganizationService {
     branch.setContactEmail(request.contactEmail());
     branch.setManagerName(request.managerName());
     branch.setWeeklyHolidays(request.weeklyHolidays());
+    branch.setBirBranchCode(request.birBranchCode());
+    branch.setRdoCode(request.rdoCode());
   }
 }

@@ -19,6 +19,7 @@ import { DefinitionGrid } from '@/components/ui/DefinitionGrid';
 import { Notice } from '@/components/ui/Notice';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { UserName } from '@/components/ui/UserName';
+import { ConfigUploadButton } from '@/features/configpromo/ConfigUploadButton';
 
 type Tab = 'parameters' | 'configuration';
 
@@ -215,6 +216,7 @@ export default function SystemParametersPage() {
         section="Administration"
         title="System Parameters"
         description="Business parameters used across modules."
+        actions={<ConfigUploadButton types={['CFG_SECURITY_PARAMETER', 'CFG_PM_LIST_PARAMETER']} />}
       />
       <Tabs tabs={TABS} active={tab} onChange={setTab} />
       {tab === 'configuration' && <ConfigurationTable />}

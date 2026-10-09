@@ -29,6 +29,7 @@ import { RENEWAL_SECTION, dispositionLabel } from '../common/renewalCodes';
 import { WORKFLOW_VIEW } from '../common/presentation';
 import { RecordActions } from './RecordActions';
 import { DetailsTab } from './DetailsTab';
+import { HoldCoverTab } from './HoldCoverTab';
 import { AccountHistoryTab, HistoryTab, NotesTab } from './HistoryTabs';
 import { ChecksTab, ComputationsTab, InsurerTab, LettersTab } from './RecordTabs';
 import '../renewal.css';
@@ -42,6 +43,7 @@ const TABS = [
   { id: 'computations', label: 'Computations' },
   { id: 'insurer', label: 'Insurer' },
   { id: 'letters', label: 'Letters' },
+  { id: 'hold-cover', label: 'Hold Cover' },
   { id: 'documents', label: 'Documents' },
   { id: 'notes', label: 'Remarks & Follow-ups' },
   { id: 'history', label: 'History' },
@@ -86,6 +88,8 @@ function Body({ tab, detail }: Readonly<{ tab: TabId; detail: CandidateDetail }>
       return <InsurerTab detail={detail} />;
     case 'letters':
       return <LettersTab detail={detail} />;
+    case 'hold-cover':
+      return <HoldCoverTab detail={detail} />;
     case 'documents':
       return (
         <Attachments

@@ -20,6 +20,7 @@ import { NumberingPanel } from './NumberingPanel';
 import { glPlatformApi } from './glPlatformApi';
 import { FileDropZone } from '@/components/ui/FileDropZone';
 import { UserName } from '@/components/ui/UserName';
+import { ConfigUploadButton } from '@/features/configpromo/ConfigUploadButton';
 
 type Tab = 'upload' | 'numbering' | 'history';
 
@@ -56,6 +57,7 @@ export default function ChartUploadPage() {
         backTo="/gl/accounts"
         title="Chart Upload & Numbering"
         description="Load parent and child accounts from a file and set how child account numbers are generated."
+        actions={<ConfigUploadButton types={['CFG_COA_CATEGORY']} />}
       />
       <Tabs tabs={TABS} active={tab} onChange={setTab} />
       {tab === 'upload' && <UploadPanel />}

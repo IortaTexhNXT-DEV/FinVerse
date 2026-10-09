@@ -13,3 +13,14 @@ export const PLACEMENT_CHANNELS = [{ value: 'EMAIL', label: 'E-mail' }];
 export function placementChannelLabel(code: string | undefined): string {
   return PLACEMENT_CHANNELS.find((c) => c.value === code)?.label ?? code ?? '';
 }
+
+/** Tax statuses of an insurer with their labels (blank: the taxes of the product line). */
+export const INSURER_TAX_STATUSES = [
+  { value: 'VAT_REGISTERED', label: 'VAT-registered (VAT on premium)' },
+  { value: 'NON_VAT', label: 'Not VAT-registered (premium tax)' },
+];
+
+/** The label of an insurer's tax status. */
+export function insurerTaxStatusLabel(code: string | null | undefined): string {
+  return INSURER_TAX_STATUSES.find((s) => s.value === code)?.label ?? 'As the product line';
+}

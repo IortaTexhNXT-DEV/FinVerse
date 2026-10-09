@@ -45,7 +45,7 @@ export const BROKER_CLAIMS_HELP: HelpSection = {
       name: 'Record Claim',
       path: '/claims-handling/new',
       summary:
-        'Find the cover by ARN, policy number or assured; the cover card shows the policy number, cover version at the loss date, period, sum insured, Marketing team, AO and branch, and the premium check with any unpaid invoices. Then pick the locations, record the loss and confirm the insurers proposed from the invoice shares.',
+        'Find the cover by ARN, policy number or assured; the cover card shows the policy number, the latest booked cover version (every booked endorsement of the policy year), period, sum insured, Marketing team, AO and branch, and the premium check with any unpaid invoices. Then pick the locations, record the loss and confirm the insurers proposed from the invoice shares.',
       workflow: [
         'Save gives the claim its number BCL-<yyyy>-nnnnnn, phase New and the first status, and puts it in your queue. The account officer is told in the app.',
         'A loss date outside the policy year asks for confirmation; an insurer claim number already on another claim asks for confirmation and raises an alert.',

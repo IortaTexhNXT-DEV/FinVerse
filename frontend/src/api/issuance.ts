@@ -116,6 +116,8 @@ export interface Advice {
   lastSentTo?: string;
   createdAt: string;
   createdBy: string;
+  sendMode?: 'MANUAL' | 'AUTOMATIC' | null;
+  autoSendFailure?: string | null;
 }
 
 export interface PolicyRecord {

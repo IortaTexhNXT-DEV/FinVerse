@@ -23,6 +23,7 @@ import { EbLov } from '../common/EbLabels';
 import { EB_LOV, ebLabel } from '../common/ebCodes';
 import { useEbMutation } from '../common/useEbMutation';
 import { RequiredDocumentDialog, ThresholdRuleDialog } from './SetupDialogs';
+import { ConfigUploadButton } from '@/features/configpromo/ConfigUploadButton';
 
 type Action = 'authorize' | 'deactivate';
 
@@ -179,6 +180,7 @@ export default function EbSetupPage() {
         section={EB_SECTION}
         title="EB Setup"
         description="Value threshold rules and required documents; each change waits for another user's authorization."
+        actions={<ConfigUploadButton types={['CFG_APPROVAL_LIMIT']} />}
       />
       <Card title="Value Threshold Rules" actions={addButton('Add Rule', { kind: 'rule' })}>
         <ErrorAlert error={rules.error ?? ruleAct.error} onRetry={() => void rules.refetch()} />

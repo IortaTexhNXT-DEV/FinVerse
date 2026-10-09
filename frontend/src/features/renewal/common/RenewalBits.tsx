@@ -7,6 +7,7 @@ import { Modal } from '@/components/ui/Modal';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tag } from '@/components/ui/Tag';
 import { bucketTone } from './renewalCodes';
+import { expiryChips } from './expiryChips';
 
 const BUCKET_LABELS: Record<string, string> = {
   CLEAN: 'Clean',
@@ -57,8 +58,11 @@ export function BucketPill({ bucket }: Readonly<{ bucket?: string | null }>) {
 }
 
 type ChipTone = 'flag' | 'danger' | 'info' | 'neutral';
+type BooleanFlag = {
+  [K in keyof CandidateRow['flags']]-?: CandidateRow['flags'][K] extends boolean ? K : never;
+}[keyof CandidateRow['flags']];
 
-const CHIPS: { key: keyof CandidateRow['flags']; label: string; tone: ChipTone }[] = [
+const CHIPS: { key: BooleanFlag; label: string; tone: ChipTone }[] = [
   { key: 'urgent', label: 'Urgent', tone: 'danger' },
   { key: 'returned', label: 'Returned', tone: 'danger' },
   { key: 'transferred', label: 'Transferred', tone: 'info' },
@@ -74,7 +78,7 @@ const CHIPS: { key: keyof CandidateRow['flags']; label: string; tone: ChipTone }
 
 /** The flag chips of a renewal, next to its reference (never inside the pill). */
 export function FlagChips({ row }: Readonly<{ row: CandidateRow }>) {
-  const chips = CHIPS.filter((c) => row.flags[c.key] === true);
+  const chips = [...CHIPS.filter((c) => row.flags[c.key]), ...expiryChips(row.flags)];
   if (chips.length === 0) {
     return null;
   }

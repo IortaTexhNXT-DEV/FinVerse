@@ -13,6 +13,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useCompanyId } from '@/context/workspaceContext';
 import { ConfirmButton } from '@/components/ui/ConfirmButton';
+import { ConfigUploadButton } from '@/features/configpromo/ConfigUploadButton';
 
 const TABS = [
   { id: 'COST_CENTER', label: 'Cost centres' },
@@ -54,6 +55,7 @@ export default function DimensionsPage() {
         section="Setup"
         title="Financial Dimensions"
         description="Cost centres, lines of business, departments and profit centres."
+        actions={<ConfigUploadButton types={['CFG_DIMENSION']} />}
       />
       <Tabs tabs={TABS} active={type} onChange={setType} />
       {can('MASTER_MAINTAIN') && (

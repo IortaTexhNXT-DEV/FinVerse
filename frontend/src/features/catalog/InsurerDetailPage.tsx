@@ -18,7 +18,7 @@ import { InsurerEditorModal } from './InsurerEditorModal';
 import { BranchModal, CommissionModal } from './InsurerRatesModals';
 import { RecordActions } from './RecordActions';
 import { UserName } from '@/components/ui/UserName';
-import { placementChannelLabel } from './insurerForm';
+import { insurerTaxStatusLabel, placementChannelLabel } from './insurerForm';
 import { ProductName } from '@/components/broking/LovLabel';
 import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
@@ -38,6 +38,7 @@ function Profile({ detail }: Readonly<{ detail: InsurerDetail }>) {
         ['Placement channel', placementChannelLabel(i.placementChannel)],
         ['Placement e-mails', i.placementEmails.join(', ')],
         ['Credit days', i.defaultCreditDays],
+        ['Tax status', insurerTaxStatusLabel(i.taxStatus)],
         ['Maker', <UserName key="maker" login={i.maker} />],
         ['Authorized by', <UserName key="a" login={i.authorizedBy} />],
       ]}

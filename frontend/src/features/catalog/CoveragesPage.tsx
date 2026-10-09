@@ -17,6 +17,7 @@ import { formatDate } from '@/utils/format';
 import { ClauseEditorModal, CoverageEditorModal } from './CoverageModals';
 import { RecordActions } from './RecordActions';
 import { LineLabel, LovLabel } from '@/components/broking/LovLabel';
+import { ConfigUploadButton } from '@/features/configpromo/ConfigUploadButton';
 
 const TABS = [
   { id: 'coverages', label: 'Coverages & Perils' },
@@ -171,15 +172,18 @@ export default function CoveragesPage() {
         title="Coverages & Clauses"
         description="Coverages and perils per product line, and the clause library used in insurer terms."
         actions={
-          maintain && (
-            <Button
-              variant="accent"
-              icon={<Plus size={16} />}
-              onClick={() => (tab === 'coverages' ? setCoverage('new') : setClause('new'))}
-            >
-              {tab === 'coverages' ? 'New Coverage' : 'New Clause'}
-            </Button>
-          )
+          <>
+            <ConfigUploadButton types={['CFG_COVERAGE_RULE', 'CFG_CLAUSE']} />
+            {maintain && (
+              <Button
+                variant="accent"
+                icon={<Plus size={16} />}
+                onClick={() => (tab === 'coverages' ? setCoverage('new') : setClause('new'))}
+              >
+                {tab === 'coverages' ? 'New Coverage' : 'New Clause'}
+              </Button>
+            )}
+          </>
         }
       />
       <Tabs tabs={TABS} active={tab} onChange={setTab} />

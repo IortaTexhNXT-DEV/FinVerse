@@ -198,6 +198,21 @@ export interface RunView {
   breaches: number;
 }
 
+/** The matching of a record with the loan files in a processing run. */
+export interface LoanMatchView {
+  id: number;
+  policyId: number;
+  sbmNo: string | null;
+  assuredName: string | null;
+  outcome: 'MATCHED' | 'UNMATCHED';
+  keyUsed: 'PN' | 'LOAN_APPLICATION' | null;
+  loanReport: string | null;
+  fileDate: string | null;
+  uploadNo: string | null;
+  reason: string | null;
+  matchedAt: string;
+}
+
 export interface ResultView {
   id: number;
   runId: number;

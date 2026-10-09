@@ -13,6 +13,7 @@ import java.util.Map;
  * @param resultRef record created or updated
  * @param values values by column
  * @param outcome outcome category of a committed row (BRQID.006)
+ * @param action ADD or UPDATE: what applying the valid row does (preview), null when not told
  * @param attempts commit attempts
  */
 public record BulkRowResponse(
@@ -22,7 +23,8 @@ public record BulkRowResponse(
     String resultRef,
     Map<String, String> values,
     String outcome,
-    int attempts) {
+    int attempts,
+    String action) {
 
   /**
    * Maps a row.
@@ -39,6 +41,7 @@ public record BulkRowResponse(
         r.getResultRef(),
         values,
         r.getOutcome(),
-        r.getAttempts());
+        r.getAttempts(),
+        r.getAction());
   }
 }

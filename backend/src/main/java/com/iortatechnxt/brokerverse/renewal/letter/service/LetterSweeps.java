@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.messaging.domain.MessageStatus;
 import com.iortatechnxt.brokerverse.messaging.domain.OutboundMessage;
 import com.iortatechnxt.brokerverse.messaging.domain.OutboundMessageRepository;
+import com.iortatechnxt.brokerverse.renewal.domain.CandidateExpiry;
 import com.iortatechnxt.brokerverse.renewal.domain.ClosedAs;
 import com.iortatechnxt.brokerverse.renewal.domain.LetterBatch;
 import com.iortatechnxt.brokerverse.renewal.domain.LetterSource;
@@ -16,6 +17,7 @@ import com.iortatechnxt.brokerverse.renewal.domain.RenewalCandidateRepository;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalLetter;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalLetterRepository;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalStage;
+import com.iortatechnxt.brokerverse.renewal.holdcover.service.RenewalHoldCoverService;
 import com.iortatechnxt.brokerverse.renewal.service.RenewalCodes;
 import com.iortatechnxt.brokerverse.renewal.service.RenewalFlow;
 import com.iortatechnxt.brokerverse.renewal.service.RenewalNotices;
@@ -30,10 +32,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * The daily letter work of the renewal jobs, one renewal per transaction (FR-RN-083, 081): the NRNS
- * classification with one reminder letter per renewal at the checkpoint, the expiry sweep with the
- * non-acceptance letter and the closure EXPIRED_UNRENEWED, and the delivery status of the queued
- * letters (alert {@code RNW_LETTER_FAILED}).
+ * The daily letter work of the renewal jobs, one renewal per transaction (FR-RN-083, 081, 082): the
+ * NRNS classification with one reminder letter per renewal at the checkpoint (none while a
+ * confirmed hold cover extends the cover), the expiry sweep at the effective expiry date with the
+ * non-acceptance letter, the closure EXPIRED_UNRENEWED and the routing to the No Advice or
+ * Non-Renewal Letter, and the delivery status of the queued letters (alert {@code
+ * RNW_LETTER_FAILED}).
  */
 @Service
 @Transactional
@@ -70,6 +74,7 @@ public class LetterSweeps {
   private final RenewalNotices notices;
   private final OutboundMessageRepository messages;
   private final AlertService alerts;
+  private final RenewalHoldCoverService holdCovers;
   private final Clock clock;
 
   /**
@@ -83,6 +88,7 @@ public class LetterSweeps {
    * @param notices notifications
    * @param messages outbound messages
    * @param alerts alerts
+   * @param holdCovers hold covers of the renewals (effective expiry date)
    * @param clock clock
    */
   @SuppressWarnings("java:S107") // constructor injection
@@ -95,6 +101,7 @@ public class LetterSweeps {
       RenewalNotices notices,
       OutboundMessageRepository messages,
       AlertService alerts,
+      RenewalHoldCoverService holdCovers,
       Clock clock) {
     this.candidates = candidates;
     this.letters = letters;
@@ -104,6 +111,7 @@ public class LetterSweeps {
     this.notices = notices;
     this.messages = messages;
     this.alerts = alerts;
+    this.holdCovers = holdCovers;
     this.clock = clock;
   }
 
@@ -119,6 +127,7 @@ public class LetterSweeps {
     return candidates.findByStageIn(NOT_SUBMITTED).stream()
         .filter(c -> !c.getFlags().isNrns() || !reminded(c))
         .filter(c -> c.daysToExpiry(today) <= days && c.daysToExpiry(today) >= 0)
+        .filter(c -> !holdCovers.effectiveExpiry(c).isAfter(c.getExpiryDate()))
         .map(RenewalCandidate::getId)
         .toList();
   }
@@ -155,13 +164,28 @@ public class LetterSweeps {
   public List<Long> expired(LocalDate today) {
     int grace = parameters.nonAcceptanceDays();
     return candidates.findByStageIn(EXPIRABLE).stream()
-        .filter(c -> c.getExpiryDate().plusDays(grace).isBefore(today))
+        .filter(c -> closingPoint(c, grace).isBefore(today))
         .map(RenewalCandidate::getId)
         .toList();
   }
 
   /**
-   * Closes an expired renewal as EXPIRED_UNRENEWED with the non-acceptance letter.
+   * The day after which an unrenewed renewal closes (R37-HC-01 to 06): its effective expiry date
+   * (the end of a confirmed hold cover, otherwise the policy expiry) plus the non-acceptance days
+   * and the NRNS waiting days of its segment. Before it no NRNS tag and no closing letter.
+   */
+  private LocalDate closingPoint(RenewalCandidate c, int grace) {
+    String segment = c.getSnapshot().product() == null ? null : c.getSnapshot().product().segment();
+    return holdCovers
+        .effectiveExpiry(c)
+        .plusDays(grace)
+        .plusDays(parameters.nrnsWaitingDays(segment));
+  }
+
+  /**
+   * Closes an expired renewal as EXPIRED_UNRENEWED with the non-acceptance letter, tags it NRNS and
+   * routes it to its closing letter (R37-HC-06 to 10): the No Advice Letter of Operations when a
+   * Renewal Advice was sent, otherwise the Non-Renewal Letter of the Marketing AO.
    *
    * @param id renewal
    */
@@ -170,6 +194,10 @@ public class LetterSweeps {
     if (!EXPIRABLE.contains(c.getStage())) {
       return;
     }
+    holdCovers.refresh(c);
+    c.getFlags().setNrns(true);
+    String route = raSent(c) ? CandidateExpiry.NAL : CandidateExpiry.NRL;
+    c.getExpiry().route(route);
     RenewalLetter letter =
         writer.generate(
             c,
@@ -192,7 +220,19 @@ public class LetterSweeps {
             "The policy of "
                 + c.getSnapshot().clientName()
                 + " expired on "
-                + DisplayFormat.date(c.getExpiryDate())));
+                + DisplayFormat.date(c.effectiveExpiry())
+                + (CandidateExpiry.NAL.equals(route)
+                    ? "; Operations sends the No Advice Letter"
+                    : "; the Account Officer sends the Non-Renewal Letter")));
+  }
+
+  private boolean raSent(RenewalCandidate c) {
+    return letters.findByCandidateIdOrderByIdDesc(c.getId()).stream()
+        .anyMatch(
+            l ->
+                l.getType() == LetterType.RA
+                    && l.getSentAt() != null
+                    && l.getStatus() != LetterStatus.CANCELLED);
   }
 
   /**

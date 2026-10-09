@@ -55,7 +55,8 @@ export type CatalogKind =
   | 'COVERAGE'
   | 'CLAUSE'
   | 'INCENTIVE_CRITERIA'
-  | 'RATE_SCHEME_EXCEPTION';
+  | 'RATE_SCHEME_EXCEPTION'
+  | 'OTHER_CHARGE';
 
 export const RATE_CODES: RateCode[] = [
   'DST',
@@ -196,6 +197,8 @@ export interface InsurerInput {
   placementChannel: PlacementChannel;
   placementEmails: string[];
   defaultCreditDays: number;
+  /** VAT registration of the insurer; blank follows the taxes of the product line. */
+  taxStatus?: InsurerTaxStatus;
   taxId?: string;
   address?: string;
   email?: string;
@@ -212,7 +215,11 @@ export interface Insurer extends Authorizable, RecordOriginFields {
   placementChannel: PlacementChannel;
   placementEmails: string[];
   defaultCreditDays: number;
+  taxStatus?: InsurerTaxStatus;
 }
+
+/** VAT registration of an insurer: VAT on premium or premium tax. */
+export type InsurerTaxStatus = 'VAT_REGISTERED' | 'NON_VAT';
 
 export interface BranchInput {
   code: string;

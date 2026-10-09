@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.placement.api.dto;
 
+import com.iortatechnxt.brokerverse.placement.service.ClientTaxDetails.TaxDetails;
 import com.iortatechnxt.brokerverse.placement.service.PlacementSlipService.Readiness;
 import com.iortatechnxt.brokerverse.placement.service.SlipPrerequisites.Unmet;
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.List;
  * @param status account status
  * @param ready all prerequisites met
  * @param unmet unmet prerequisites
+ * @param taxDetails taxpayer name, TIN and registered address sent with the placement
  */
 public record ReadinessResponse(
     String arn,
@@ -22,7 +24,8 @@ public record ReadinessResponse(
     String insurerBranch,
     String status,
     boolean ready,
-    List<Unmet> unmet) {
+    List<Unmet> unmet,
+    TaxDetails taxDetails) {
 
   /**
    * Maps a readiness.
@@ -38,6 +41,7 @@ public record ReadinessResponse(
         r.account().getInsurerBranch(),
         r.account().getStatus().name(),
         r.unmet().isEmpty(),
-        r.unmet());
+        r.unmet(),
+        r.taxDetails());
   }
 }

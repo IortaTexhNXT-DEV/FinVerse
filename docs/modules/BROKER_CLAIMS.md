@@ -20,7 +20,8 @@ BDOI is a broker. The insurer decides and pays a claim; BDOI records it, coordin
 it up for the client. Before BrokerVerse this work was kept in spreadsheets and e-mail. The module:
 
 - finds the **cover** (account ARN and policy year) of a loss, read-only, with the policy number,
-  cover version at the loss date, Marketing team, AO, branch and the premium position of the year;
+  the latest booked cover version of the year (every booked endorsement), Marketing team, AO,
+  branch and the premium position of the year;
 - **records the claim** (`BCL-<yyyy>-nnnnnn`) with its loss, claimant, catastrophe tag, several
   insured locations and several insurers, each with its own claim number, reserve, settlement and
   adjuster;
@@ -137,8 +138,8 @@ reports are checked after each step.
   reference valid on the loss date (`bcl_location_ref`; a new reference end-dates the open one).
 - Each insurer line has its share, insurer claim number, date reported to the insurer, reserve
   (history in `bcl_reserve_change`, no journal), settled amount and adjuster. A number already on
-  the claim is refused. A number found on another claim of the same insurer needs confirmation and
-  raises `BCL_INSURER_CLAIM_NO_REUSED`.
+  the claim is refused, and so is a number of the same insurer already recorded on another claim
+  (unique per insurer across all claims).
 - Insurer updates are insert-only (date, source, reference, remarks, attachments). They are
   allowed on closed claims.
 - The loss advice is generated per insurer from template `BCL_LOSS_ADVICE` as a PDF on the company

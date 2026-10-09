@@ -102,6 +102,11 @@ describe('placement and issuance workbenches', () => {
         status: 'READY_FOR_PLACEMENT',
         ready: true,
         unmet: [],
+        taxDetails: {
+          taxpayerName: 'Client Corporation',
+          tin: '123-456-789-000',
+          registeredAddress: 'Makati City',
+        },
       },
     ]);
     const generate = vi.spyOn(placementApi, 'generateSlips').mockResolvedValue([]);
@@ -114,6 +119,7 @@ describe('placement and issuance workbenches', () => {
     await user.click(place);
     const confirm = await screen.findByRole('button', { name: /Generate Slips/ });
     await waitFor(() => expect(confirm).toBeEnabled());
+    expect(screen.getByText(/TIN 123-456-789-000/)).toBeInTheDocument();
     await user.click(confirm);
     await waitFor(() => expect(generate).toHaveBeenCalledWith(1, ['ARN-2026-000001']));
   }, 20_000);

@@ -1,4 +1,12 @@
-import type { DueState, TaxDocument, TaxForm, Worksheet, WorksheetKind } from '@/api/tax';
+import type {
+  DueState,
+  PartyTaxProfile,
+  TaxDocument,
+  TaxForm,
+  TaxType,
+  Worksheet,
+  WorksheetKind,
+} from '@/api/tax';
 import { BRAND } from '@/branding';
 
 /** Badge tone (CSS class of `.badge`) and text of a calendar due state. */
@@ -70,4 +78,51 @@ export function isQuarterly(form: TaxForm): boolean {
 /** Sum of the ledger reconciliation differences (0 when fully reconciled). */
 export function unreconciled(worksheet: Worksheet): number {
   return worksheet.controls.reduce((sum, c) => sum + Math.abs(c.difference), 0);
+}
+
+/** Names of the kinds of tax on the Tax Codes screen. */
+const TAX_TYPE_LABELS: Record<TaxType, string> = {
+  VAT_OUTPUT: 'Output VAT',
+  VAT_INPUT: 'Input VAT',
+  VAT_ZERO_RATED: 'Zero-rated',
+  VAT_EXEMPT: 'VAT-exempt',
+  PREMIUM_TAX: 'Premium tax',
+  DST: 'Documentary stamp tax',
+  LGT: 'Local government tax',
+  FST: 'Fire service tax',
+  EWT: 'Creditable withholding tax',
+  FWT: 'Final withholding tax',
+  FINAL_VAT: 'Final VAT withheld',
+  PERCENTAGE_TAX: 'Percentage tax',
+};
+
+/** Name of a kind of tax. */
+export function taxTypeLabel(type: TaxType): string {
+  return TAX_TYPE_LABELS[type];
+}
+
+/** Withholding status of a party as the profile list shows it. */
+export function withholdingLabel(
+  p: Pick<PartyTaxProfile, 'withholdingAgent' | 'topWithholdingAgent' | 'governmentPayor'>,
+): string {
+  if (p.governmentPayor) {
+    return 'Government payor';
+  }
+  if (p.topWithholdingAgent) {
+    return 'Top withholding agent';
+  }
+  return p.withholdingAgent ? 'Withholding agent' : '';
+}
+
+/** Exemption certificate of a party with its validity, or blank. */
+export function exemptionLabel(
+  p: Pick<PartyTaxProfile, 'exemptionCertificateNo' | 'exemptionValidFrom' | 'exemptionValidTo'>,
+  formatDate: (iso: string) => string,
+): string {
+  if (!p.exemptionCertificateNo) {
+    return '';
+  }
+  const from = p.exemptionValidFrom ? formatDate(p.exemptionValidFrom) : '';
+  const to = p.exemptionValidTo ? formatDate(p.exemptionValidTo) : '';
+  return `${p.exemptionCertificateNo} (${from} to ${to})`;
 }

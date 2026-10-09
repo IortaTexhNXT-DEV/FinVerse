@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.catalog.api.dto;
 
 import com.iortatechnxt.brokerverse.catalog.domain.InsurerProfile.InsurerDetails;
+import com.iortatechnxt.brokerverse.catalog.domain.InsurerTaxStatus;
 import com.iortatechnxt.brokerverse.catalog.domain.PlacementChannel;
 import com.iortatechnxt.brokerverse.catalog.service.InsurerService.PartyContact;
 import jakarta.validation.constraints.Email;
@@ -29,6 +30,7 @@ import java.util.List;
  * @param address address of the party
  * @param email general e-mail of the party
  * @param phone phone of the party
+ * @param taxStatus VAT registration of the insurer; blank follows the taxes of the product line
  */
 public record InsurerRequest(
     @NotNull Long companyId,
@@ -43,7 +45,8 @@ public record InsurerRequest(
     @Size(max = 30) String taxId,
     @Size(max = 300) String address,
     @Email @Size(max = 120) String email,
-    @Size(max = 40) String phone) {
+    @Size(max = 40) String phone,
+    InsurerTaxStatus taxStatus) {
 
   /**
    * Profile attributes.
@@ -58,7 +61,8 @@ public record InsurerRequest(
         accreditedUntil,
         placementChannel,
         placementEmails == null ? List.of() : List.copyOf(placementEmails),
-        defaultCreditDays);
+        defaultCreditDays,
+        taxStatus);
   }
 
   /**

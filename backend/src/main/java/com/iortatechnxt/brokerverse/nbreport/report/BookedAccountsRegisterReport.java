@@ -37,7 +37,9 @@ public class BookedAccountsRegisterReport implements ReportDefinition {
           + " as gross, i.commission, i.vat_on_commission as vat, i.cost_center,"
           + " "
           + NbReportSupport.userName("i.account_officer")
-          + " as officer, i.incentive_eligible as incentive,"
+          + " as officer, case i.incentive_status when 'ELIGIBLE' then 'Eligible'"
+          + " when 'NOT_ELIGIBLE' then 'Not eligible' else 'Pending (not fully paid)' end"
+          + " as incentive,"
           + " i.direct_payment as direct, i.business_type"
           + " from bkg_invoice i left join cat_insurer n on n.company_id = i.company_id"
           + " and n.party_code = i.insurer_code"
@@ -95,9 +97,7 @@ public class BookedAccountsRegisterReport implements ReportDefinition {
             .map(
                 r ->
                     NbReportSupport.relabel(
-                        NbReportSupport.relabel(
-                            NbReportSupport.flag(NbReportSupport.flag(r, "incentive"), "direct"),
-                            KIND),
+                        NbReportSupport.relabel(NbReportSupport.flag(r, "direct"), KIND),
                         "business_type"))
             .toList();
     return TabularReportBuilder.of(p)

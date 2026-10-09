@@ -12,7 +12,8 @@ import java.util.List;
  * @param directPayment premium paid directly to the insurer: no client receivable, only commission
  *     receivable (BRNB.114)
  * @param cwt2Percent the client withholds 2 % creditable tax on premium (CSHID.027)
- * @param incentiveEligible matched at least one incentive criterion (BRNB.107, PMADD07)
+ * @param incentiveEligible incentive indicator: booked, fully paid and matching at least one
+ *     incentive criterion (BRNB.107, PMADD07; FR-NB-118)
  * @param businessType New Business or Renewal (BRNB.097)
  * @param incentiveCriteria codes of the catalog incentive criteria matched, comma-separated, null
  *     when none (PMADD07)
@@ -65,6 +66,30 @@ public record InvoiceFlags(
         directPayment,
         cwt2Percent,
         !criteria.isEmpty(),
+        businessType,
+        criteria.isEmpty() ? null : String.join(",", criteria));
+  }
+
+  /**
+   * Flags of a new booking (FR-NB-118): the incentive criteria matched at booking are kept as the
+   * tag of the transaction (CPC2, FR-DS-090), and the indicator stays off until the transaction is
+   * booked and fully paid.
+   *
+   * @param directPayment direct payment
+   * @param cwt2Percent CWT 2 %
+   * @param businessType business type
+   * @param criteria criteria codes matched at booking
+   * @return flags
+   */
+  public static InvoiceFlags pendingIncentive(
+      boolean directPayment,
+      boolean cwt2Percent,
+      BusinessType businessType,
+      List<String> criteria) {
+    return new InvoiceFlags(
+        directPayment,
+        cwt2Percent,
+        false,
         businessType,
         criteria.isEmpty() ? null : String.join(",", criteria));
   }

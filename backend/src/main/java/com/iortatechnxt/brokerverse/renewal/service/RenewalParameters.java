@@ -99,6 +99,16 @@ public class RenewalParameters {
   /** Exception ageing days. */
   public static final String EXCEPTION_AGEING_DAYS = "RNW_EXCEPTION_AGEING_DAYS";
 
+  /** Parameter: priority portfolio segments of the attention flags (BRRN.036). */
+  public static final String PRIORITY_SEGMENTS = "RNW_PRIORITY_SEGMENTS";
+
+  /** Parameter: durations of a renewal hold cover (BRRN.042). */
+  public static final String HOLD_COVER_DAYS = "RNW_HOLD_COVER_DAYS";
+
+  /** Parameter: waiting days after the effective expiry before the NRNS tag (BRRN.037). */
+  public static final String NRNS_WAITING_DAYS = "RNW_NRNS_WAITING_DAYS";
+
+  private static final int DEFAULT_HOLD_COVER = 30;
   private static final int DEFAULT_LEAD = 140;
   private static final int DEFAULT_MIN_NOTICE = 30;
   private static final int DEFAULT_SECOND_NOTICE = 15;
@@ -304,12 +314,13 @@ public class RenewalParameters {
   }
 
   /**
-   * Whether accepted renewals are placed automatically.
+   * Whether accepted renewals are placed automatically; off by default, placement and booking stay
+   * user actions (Walkthrough addendum p.4; FR-RN-084 R2).
    *
    * @return switch
    */
   public boolean autoPlacement() {
-    return TRUE.equals(parameters.text(AUTO_PLACEMENT, TRUE));
+    return TRUE.equals(parameters.text(AUTO_PLACEMENT, "false"));
   }
 
   /**
@@ -367,6 +378,46 @@ public class RenewalParameters {
    */
   public int exceptionAgeingDays() {
     return parameters.intValue(EXCEPTION_AGEING_DAYS, DEFAULT_AGEING);
+  }
+
+  /**
+   * Segments of the priority portfolio named in the attention flags (Annex BRRN.036).
+   *
+   * @return segments
+   */
+  public List<String> prioritySegments() {
+    return parameters.items(PRIORITY_SEGMENTS);
+  }
+
+  /**
+   * Durations offered for the hold cover of a renewal (BRRN.042), the default first.
+   *
+   * @return days, at least one
+   */
+  public List<Integer> holdCoverDays() {
+    List<Integer> days =
+        parameters.items(HOLD_COVER_DAYS).stream()
+            .map(String::strip)
+            .filter(v -> v.matches("\\d{1,3}"))
+            .map(Integer::valueOf)
+            .toList();
+    return days.isEmpty() ? List.of(DEFAULT_HOLD_COVER) : days;
+  }
+
+  /**
+   * Days after the effective expiry date before an unrenewed renewal of a segment is tagged NRNS
+   * (Annex BRRN.037, CBG and non-CBG; CLR-RN-33).
+   *
+   * @param segment market segment
+   * @return days, 0 by default
+   */
+  public int nrnsWaitingDays(String segment) {
+    Map<String, Integer> values = pairs(NRNS_WAITING_DAYS);
+    Integer days = values.get(key(segment));
+    if (days == null) {
+      days = values.get(ANY_SEGMENT);
+    }
+    return days == null ? 0 : days;
   }
 
   private boolean listed(String key, String value) {

@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -26,6 +27,18 @@ public interface OpsInvoiceRepository
       type = EntityGraph.EntityGraphType.LOAD,
       attributePaths = {"components", "shares"})
   Optional<OpsInvoice> findByInvoiceNo(String invoiceNo);
+
+  /**
+   * Sets the incentive indicator decided by booking at full payment (FR-NB-118).
+   *
+   * @param invoiceNo invoice number
+   * @param eligible indicator Eligible
+   * @return rows changed
+   */
+  @Modifying(flushAutomatically = true)
+  @Query("update OpsInvoice i set i.incentiveEligible = :eligible where i.invoiceNo = :invoiceNo")
+  int setIncentiveEligible(
+      @Param("invoiceNo") String invoiceNo, @Param("eligible") boolean eligible);
 
   /**
    * Invoices by number (links of several records at once).

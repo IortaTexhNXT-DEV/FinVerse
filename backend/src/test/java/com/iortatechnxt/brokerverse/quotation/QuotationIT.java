@@ -261,14 +261,17 @@ class QuotationIT {
     Quotation a = approved(fx.create(client));
     Quotation b = approved(fx.create(client));
     Quotation draft = fx.create(client);
-    assertThatThrownBy(
-            () -> as.run("ao", () -> dispatch.sendBatch(List.of(a.getId(), draft.getId()), null)))
+    assertThatThrownBy(() -> as.run("ao", () -> dispatch.sendBatch(List.of(draft.getId()), null)))
         .extracting("code")
         .isEqualTo("QUOTATION_BATCH_INVALID");
+    // FR-NB-044: the quotations that pass are sent, the others are listed with their reason
     BatchResult result =
-        as.run("ao", () -> dispatch.sendBatch(List.of(a.getId(), b.getId()), null));
+        as.run("ao", () -> dispatch.sendBatch(List.of(a.getId(), b.getId(), draft.getId()), null));
     assertThat(result.quotations()).isEqualTo(2);
     assertThat(result.emails()).isEqualTo(1);
+    assertThat(result.notSent())
+        .singleElement()
+        .satisfies(n -> assertThat(n.reference()).isEqualTo(draft.getQuotationNo()));
     assertThat(queries.get(b.getId()).getStatus()).isEqualTo(QuotationStatus.SENT_TO_CLIENT);
     assertThat(messages.forRecord("Quotation", String.valueOf(a.getId())))
         .first()

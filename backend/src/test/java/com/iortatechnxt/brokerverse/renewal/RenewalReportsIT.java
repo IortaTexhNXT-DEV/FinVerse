@@ -5,9 +5,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.iortatechnxt.brokerverse.nbadmin.service.RetentionCriteria;
 import com.iortatechnxt.brokerverse.renewal.alert.RenewalAlertCheck;
+import com.iortatechnxt.brokerverse.renewal.domain.AttentionFlag;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalCandidate;
 import com.iortatechnxt.brokerverse.renewal.home.service.RenewalHomeService;
 import com.iortatechnxt.brokerverse.renewal.retention.RenewalRetentionProvider;
+import com.iortatechnxt.brokerverse.renewal.rules.service.AttentionRules;
 import com.iortatechnxt.brokerverse.report.core.ReportResult;
 import com.iortatechnxt.brokerverse.report.core.ReportRow;
 import com.iortatechnxt.brokerverse.report.core.ReportService;
@@ -48,6 +50,7 @@ class RenewalReportsIT {
   @Autowired private ReportService reports;
   @Autowired private RenewalHomeService home;
   @Autowired private RenewalAlertCheck alerts;
+  @Autowired private AttentionRules attentionRules;
   @Autowired private RenewalRetentionProvider retention;
   @Autowired private AsUser as;
 
@@ -103,8 +106,18 @@ class RenewalReportsIT {
     RenewalCandidate c = fx.unassignedRetail();
     RenewalHomeService.Home figures = as.run(TL, () -> home.home(fx.company()));
     assertThat(figures.stages()).isNotEmpty();
+    // FR-RN-102: an account at risk shows its attention flag and raises no alert to the unit head
     assertThat(alerts.evaluate(c.getExpiryDate().minusDays(10)))
-        .anyMatch(s -> s.facts().entityId().equals(c.getRenewalRef()));
+        .noneMatch(
+            s ->
+                s.facts().entityId().equals(c.getRenewalRef())
+                    && "RNW_RENEWAL_AT_RISK".equals(s.code()));
+    AttentionRules.Attention attention =
+        attentionRules.evaluate(c, c.getExpiryDate().minusDays(10));
+    assertThat(attention.flag()).isIn(AttentionFlag.AGEING, AttentionFlag.HIGH_RISK);
+    assertThat(attention.rule()).isNotBlank();
+    assertThat(attentionRules.evaluate(c, c.getExpiryDate().plusDays(1)).flag())
+        .isEqualTo(AttentionFlag.OVERDUE);
     assertThat(
             retention.countEligible(
                 new RetentionCriteria(Set.of("RENEWED", "CLOSED"), LocalDate.of(2099, 1, 1))))

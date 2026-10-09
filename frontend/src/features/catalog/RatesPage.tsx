@@ -17,12 +17,17 @@ import { formatDate, formatRate, humanize } from '@/utils/format';
 import { RateModal } from './RateModals';
 import type { RateTable } from './RateModals';
 import { RecordActions } from './RecordActions';
+import { OtherChargesTab } from './OtherChargesTab';
 import { LineLabel } from '@/components/broking/LovLabel';
+import { ConfigUploadButton } from '@/features/configpromo/ConfigUploadButton';
 
-const TABS: readonly { id: RateTable; label: string }[] = [
+type RatesTab = RateTable | 'other-charges';
+
+const TABS: readonly { id: RatesTab; label: string }[] = [
   { id: 'taxes', label: 'Taxes & factors' },
   { id: 'short-period', label: 'Short-period table' },
   { id: 'motor-limits', label: 'BI / PD limits' },
+  { id: 'other-charges', label: 'Other charges' },
 ];
 
 const REFRESH = [['catalog', 'rates']] as const;
@@ -145,11 +150,12 @@ function MotorLimits() {
 
 /**
  * Rates & taxes used by rating (BRNB.007-009): DST, premium tax, VAT, fire service tax, motor
- * own-damage factors, the short-period table and the BI / PD limit premiums, all effective-dated.
+ * own-damage factors, the short-period table, the BI / PD limit premiums and the other charges
+ * billed with the premium, all effective-dated.
  */
 export default function RatesPage() {
   const { can } = useAuth();
-  const [tab, setTab] = useState<RateTable>('taxes');
+  const [tab, setTab] = useState<RatesTab>('taxes');
   const [adding, setAdding] = useState(false);
   return (
     <div className="stack">
@@ -158,11 +164,14 @@ export default function RatesPage() {
         title="Rates & Taxes"
         description="Statutory charges and rating tables applied by the premium calculator."
         actions={
-          can('MASTER_MAINTAIN') && (
-            <Button variant="accent" icon={<Plus size={16} />} onClick={() => setAdding(true)}>
-              New Rate
-            </Button>
-          )
+          <>
+            <ConfigUploadButton types={['CFG_RATE_TABLE', 'CFG_OTHER_CHARGE']} />
+            {can('MASTER_MAINTAIN') && tab !== 'other-charges' && (
+              <Button variant="accent" icon={<Plus size={16} />} onClick={() => setAdding(true)}>
+                New Rate
+              </Button>
+            )}
+          </>
         }
       />
       <Tabs tabs={TABS} active={tab} onChange={setTab} />
@@ -170,8 +179,11 @@ export default function RatesPage() {
         {tab === 'taxes' && <Taxes />}
         {tab === 'short-period' && <ShortPeriod />}
         {tab === 'motor-limits' && <MotorLimits />}
+        {tab === 'other-charges' && <OtherChargesTab />}
       </Card>
-      {adding && <RateModal table={tab} onClose={() => setAdding(false)} />}
+      {adding && tab !== 'other-charges' && (
+        <RateModal table={tab} onClose={() => setAdding(false)} />
+      )}
     </div>
   );
 }

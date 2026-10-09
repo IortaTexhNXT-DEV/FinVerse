@@ -47,10 +47,27 @@ export const ISSUANCE_HELP: HelpSection = {
         'Advices are generated automatically on policy issue (parameter IA_TRIGGER: or on placement, or manual only).',
         'Generate an advice for mortgaged accounts by ARN when needed.',
         'Select advices and send them: the PDF is encrypted and the password is sent in a separate e-mail.',
+        'An advice of a mortgagee bank enrolled for automatic sending is sent when it is generated; the Sending column shows Automatic, Manual, or why it could not be sent automatically.',
       ],
       controls: [
         'Only accounts with a mortgagee bank get an Insurance Advice.',
         'Every generation, download and send is audited.',
+        'Processing is notified when an automatic sending cannot be made; the advice is then sent from the register.',
+      ],
+    },
+    {
+      name: 'Insurance Advice Recipients',
+      path: '/issuance/advice-recipients',
+      summary:
+        'Per mortgagee bank, and where needed per market segment, the recipients of the Insurance Advices and whether each new advice is sent to them automatically.',
+      workflow: [
+        'Add the recipient set-up of a bank, with the e-mail addresses and the automatic sending choice.',
+        'A second user authorizes the set-up; it applies from its effective date.',
+        'A set-up for a market segment takes precedence over the set-up of the bank as a whole.',
+      ],
+      controls: [
+        'Every change waits for a checker other than its maker.',
+        'A bank without an authorized set-up has its advices sent manually from the register.',
       ],
     },
     {

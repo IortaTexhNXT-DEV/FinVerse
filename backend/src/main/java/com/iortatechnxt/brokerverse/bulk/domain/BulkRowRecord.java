@@ -46,6 +46,9 @@ public class BulkRowRecord {
   @Column(nullable = false)
   private int attempts;
 
+  @Column(length = 10, updatable = false)
+  private String action;
+
   protected BulkRowRecord() {}
 
   /**
@@ -57,11 +60,25 @@ public class BulkRowRecord {
    * @param errors validation errors (empty = valid)
    */
   public BulkRowRecord(Long jobId, int rowNo, String data, List<String> errors) {
+    this(jobId, rowNo, data, errors, null);
+  }
+
+  /**
+   * Creates a validated row with what applying it would do (preview of a configuration upload).
+   *
+   * @param jobId job
+   * @param rowNo row number in the file (header = 1)
+   * @param data row values as JSON
+   * @param errors validation errors (empty = valid)
+   * @param action ADD or UPDATE for a valid row, null when the handler does not tell
+   */
+  public BulkRowRecord(Long jobId, int rowNo, String data, List<String> errors, String action) {
     this.jobId = jobId;
     this.rowNo = rowNo;
     this.data = data;
     this.status = errors.isEmpty() ? BulkRowStatus.VALID : BulkRowStatus.INVALID;
     this.messages = errors.isEmpty() ? null : join(errors);
+    this.action = errors.isEmpty() ? action : null;
   }
 
   /**
@@ -137,5 +154,9 @@ public class BulkRowRecord {
 
   public int getAttempts() {
     return attempts;
+  }
+
+  public String getAction() {
+    return action;
   }
 }

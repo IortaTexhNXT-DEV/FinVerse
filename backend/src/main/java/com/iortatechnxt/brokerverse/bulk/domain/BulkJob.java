@@ -57,6 +57,21 @@ public class BulkJob extends BaseEntity {
   @Column(name = "reprocess_count", nullable = false)
   private int reprocessCount;
 
+  @Column(name = "submitted_by", length = 50)
+  private String submittedBy;
+
+  @Column(name = "submitted_at")
+  private Instant submittedAt;
+
+  @Column(name = "decided_by", length = 50)
+  private String decidedBy;
+
+  @Column(name = "decided_at")
+  private Instant decidedAt;
+
+  @Column(name = "decision_note", length = 1000)
+  private String decisionNote;
+
   protected BulkJob() {}
 
   /**
@@ -118,7 +133,9 @@ public class BulkJob extends BaseEntity {
    * @param when completion time
    */
   public void completed(int committed, int failed, Instant when) {
-    requireValidated();
+    if (status != BulkJobStatus.SUBMITTED) {
+      requireValidated();
+    }
     this.committedRows = committed;
     this.failedRows = failed;
     this.status = BulkJobStatus.COMPLETED;
@@ -150,6 +167,59 @@ public class BulkJob extends BaseEntity {
     this.committedRows += recovered;
     this.failedRows = stillFailed;
     this.reprocessCount++;
+  }
+
+  /**
+   * Submits the validated upload for approval (handlers with an approval permission).
+   *
+   * @param user uploader
+   * @param when time
+   */
+  public void submit(String user, Instant when) {
+    requireValidated();
+    this.status = BulkJobStatus.SUBMITTED;
+    this.submittedBy = user;
+    this.submittedAt = when;
+  }
+
+  /**
+   * Records the approval of a second user before the valid rows are applied; the approver is never
+   * the uploader nor the submitter.
+   *
+   * @param approver approver
+   * @param when time
+   * @param note remarks
+   */
+  public void approve(String approver, Instant when, String note) {
+    requireSubmitted();
+    if (approver.equalsIgnoreCase(getCreatedBy()) || approver.equalsIgnoreCase(submittedBy)) {
+      throw new BusinessRuleException(
+          "MAKER_CHECKER_VIOLATION", "An upload cannot be approved by the user who uploaded it");
+    }
+    this.decidedBy = approver;
+    this.decidedAt = when;
+    this.decisionNote = note;
+  }
+
+  /**
+   * Rejects the submitted upload; nothing is applied.
+   *
+   * @param approver approver
+   * @param when time
+   * @param note reason
+   */
+  public void reject(String approver, Instant when, String note) {
+    approve(approver, when, note);
+    this.status = BulkJobStatus.REJECTED;
+    this.completedAt = when;
+  }
+
+  /** Ensures the job waits for approval. */
+  public void requireSubmitted() {
+    if (status != BulkJobStatus.SUBMITTED) {
+      throw new BusinessRuleException(
+          "BULK_JOB_NOT_SUBMITTED", "Upload " + jobNo + " is not waiting for approval");
+    }
   }
 
   /** Ensures the job still waits for a decision. */
@@ -214,5 +284,25 @@ public class BulkJob extends BaseEntity {
 
   public int getReprocessCount() {
     return reprocessCount;
+  }
+
+  public String getSubmittedBy() {
+    return submittedBy;
+  }
+
+  public Instant getSubmittedAt() {
+    return submittedAt;
+  }
+
+  public String getDecidedBy() {
+    return decidedBy;
+  }
+
+  public Instant getDecidedAt() {
+    return decidedAt;
+  }
+
+  public String getDecisionNote() {
+    return decisionNote;
   }
 }

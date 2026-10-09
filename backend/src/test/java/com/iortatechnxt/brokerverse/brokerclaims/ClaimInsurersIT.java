@@ -153,14 +153,14 @@ class ClaimInsurersIT {
                 as.run(
                     OFFICER, () -> insurers.number(other, otherLead.getId(), number, today, false)))
         .isInstanceOf(BusinessRuleException.class)
-        .hasMessageContaining("is already on claim " + claim.getClaimNo());
-    as.run(OFFICER, () -> insurers.number(other, otherLead.getId(), number, today, true));
-    assertThat(
-            jdbc.queryForObject(
-                "select count(*) from alt_alert where dedup_key = ?",
-                Long.class,
-                InsurerClaimService.REUSED + ":" + LEAD + ":" + number))
-        .isEqualTo(1L);
+        .hasMessageContaining("is already recorded on claim " + claim.getClaimNo());
+    // FR-CM-021: a number of the same insurer on another claim is refused, even when confirmed
+    assertThatThrownBy(
+            () ->
+                as.run(
+                    OFFICER, () -> insurers.number(other, otherLead.getId(), number, today, true)))
+        .extracting("code")
+        .isEqualTo("BCL_INSURER_CLAIM_NO_DUPLICATE");
 
     InsurerClaim amended =
         as.run(

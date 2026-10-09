@@ -20,6 +20,7 @@ import { IncentiveEditorModal } from './IncentiveEditorModal';
 import { isCurrent } from './incentiveForm';
 import { RecordActions } from './RecordActions';
 import { LovLabel } from '@/components/broking/LovLabel';
+import { ConfigUploadButton } from '@/features/configpromo/ConfigUploadButton';
 
 const TABS = [
   { id: 'current', label: 'Current' },
@@ -91,11 +92,14 @@ export default function IncentivesPage() {
         title="Incentive Criteria"
         description="Incentive criteria on the products matrix, with their value, products and effective dates."
         actions={
-          maintain && (
-            <Button variant="accent" icon={<Plus size={16} />} onClick={() => setEditing('new')}>
-              Add Incentive Criterion
-            </Button>
-          )
+          <>
+            <ConfigUploadButton types={['CFG_INCENTIVE_CRITERIA']} />
+            {maintain && (
+              <Button variant="accent" icon={<Plus size={16} />} onClick={() => setEditing('new')}>
+                Add Incentive Criterion
+              </Button>
+            )}
+          </>
         }
       />
       <Card flush>

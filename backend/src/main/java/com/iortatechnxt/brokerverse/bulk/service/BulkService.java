@@ -129,6 +129,26 @@ public class BulkService {
             companyId == null ? null : organization.company(companyId).baseCurrency()));
   }
 
+  /**
+   * The current data of a handler's screen in the layout of its template (configuration uploads):
+   * changed and uploaded again as it is.
+   *
+   * @param handlerCode handler
+   * @param companyId company
+   * @return xlsx bytes
+   */
+  @Transactional(readOnly = true)
+  public byte[] export(String handlerCode, Long companyId) {
+    BulkImportHandler handler = registry.require(handlerCode);
+    if (!handler.exportable()) {
+      throw new BusinessRuleException(
+          "BULK_EXPORT_NOT_AVAILABLE", handler.title() + " has no export of the current data");
+    }
+    String currency = companyId == null ? null : organization.company(companyId).baseCurrency();
+    return BulkExportFile.write(
+        BulkTemplates.of(handler, lists, maxRows(), currency), handler.exportRows(companyId));
+  }
+
   private GuidedTemplate guided(BulkImportHandler handler) {
     return BulkTemplates.of(handler, lists, maxRows());
   }
@@ -219,7 +239,9 @@ public class BulkService {
           errors.addAll(handler.validate(row, context));
         }
       }
-      rows.save(new BulkRowRecord(job.getId(), row.rowNo(), store.write(row.values()), errors));
+      String action = errors.isEmpty() ? handler.previewAction(row, context) : null;
+      rows.save(
+          new BulkRowRecord(job.getId(), row.rowNo(), store.write(row.values()), errors, action));
       if (errors.isEmpty()) {
         valid++;
       }
@@ -243,7 +265,7 @@ public class BulkService {
     List<String> missing =
         handler.columns().stream()
             .map(BulkColumn::header)
-            .filter(h -> !file.headers().contains(h))
+            .filter(h -> !file.headers().contains(h) && !handler.optionalHeaders().contains(h))
             .toList();
     if (!missing.isEmpty()) {
       throw new BusinessRuleException(
@@ -254,7 +276,8 @@ public class BulkService {
   }
 
   /**
-   * Commits the valid rows, one transaction per row.
+   * Commits the valid rows, one transaction per row. An upload whose handler names an approval
+   * permission is submitted instead and applied when a second user approves it.
    *
    * @param jobId job
    * @return the completed job
@@ -262,12 +285,25 @@ public class BulkService {
   public BulkJob commit(Long jobId) {
     BulkJob job = requireOpen(jobId);
     BulkImportHandler handler = registry.require(job.getHandlerCode());
-    BulkContext context =
-        new BulkContext(
-            job.getCompanyId(),
-            job.getJobNo(),
-            BusinessClock.today(clock),
-            store.read(job.getParameters()));
+    if (handler.approvePermission() != null) {
+      throw new BusinessRuleException(
+          "BULK_APPROVAL_REQUIRED",
+          "This upload is applied after the approval of a second user; submit it for approval");
+    }
+    return applyValidRows(job, handler);
+  }
+
+  /**
+   * Applies the valid rows of a validated or approved job, one transaction per row, and closes the
+   * job.
+   *
+   * @param job job
+   * @param handler its handler
+   * @return the completed job
+   */
+  BulkJob applyValidRows(BulkJob job, BulkImportHandler handler) {
+    Long jobId = job.getId();
+    BulkContext context = context(job);
     List<BulkRowRecord> valid = rows.findByJobIdAndStatusOrderByRowNo(jobId, BulkRowStatus.VALID);
     int committed = 0;
     int failed = 0;
@@ -283,7 +319,7 @@ public class BulkService {
     BulkJob done =
         tx.execute(
             s -> {
-              BulkJob j = requireOpen(jobId);
+              BulkJob j = job(jobId);
               j.completed(ok, ko, clock.instant());
               audit.record(
                   ENTITY,
@@ -294,6 +330,15 @@ public class BulkService {
             });
     tx.executeWithoutResult(s -> handler.afterCommit(context, ok, ko));
     return done;
+  }
+
+  private BulkContext context(BulkJob job) {
+    return new BulkContext(
+        job.getCompanyId(),
+        job.getJobNo(),
+        BusinessClock.today(clock),
+        store.read(job.getParameters()),
+        job.getCreatedBy());
   }
 
   /**
@@ -311,12 +356,7 @@ public class BulkService {
           "BULK_JOB_NOT_COMPLETED", "Upload " + job.getJobNo() + " has not been committed yet");
     }
     BulkImportHandler handler = registry.require(job.getHandlerCode());
-    BulkContext context =
-        new BulkContext(
-            job.getCompanyId(),
-            job.getJobNo(),
-            BusinessClock.today(clock),
-            store.read(job.getParameters()));
+    BulkContext context = context(job);
     int recovered = 0;
     int failed = 0;
     for (BulkRowRecord record :

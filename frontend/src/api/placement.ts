@@ -61,6 +61,14 @@ export interface Readiness {
   status: string;
   ready: boolean;
   unmet: Unmet[];
+  taxDetails?: TaxpayerDetails | null;
+}
+
+/** Taxpayer details of the insured sent to the insurer with the placement. */
+export interface TaxpayerDetails {
+  taxpayerName: string;
+  tin: string;
+  registeredAddress: string;
 }
 
 export interface SlipAccount {

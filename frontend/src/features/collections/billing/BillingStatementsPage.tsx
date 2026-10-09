@@ -138,7 +138,7 @@ export default function BillingStatementsPage() {
         title="Billing Statements"
         description="Statements of account per billing cycle of multi-year and installment accounts."
         actions={
-          can('CLX_BILLING') ? (
+          can('CLX_SOA_ISSUE') ? (
             <Button
               variant="accent"
               icon={<ReceiptText size={16} />}

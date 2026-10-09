@@ -25,6 +25,7 @@ import { formatAmount, formatDateTime } from '@/utils/format';
 import { DataAccessDialog } from './DataAccessDialog';
 import { UserSessionsDialog } from './UserSessionsDialog';
 import { useLovLabel } from '@/components/broking/useLabels';
+import { ConfigUploadButton } from '@/features/configpromo/ConfigUploadButton';
 
 interface Editing {
   id?: number;
@@ -173,6 +174,7 @@ export default function UsersPage() {
         description="Accounts lock after three failed sign-ins."
         actions={
           <>
+            <ConfigUploadButton types={['CFG_ACCESS_ROLE']} />
             <Button
               variant="secondary"
               icon={<UserCheck size={16} />}

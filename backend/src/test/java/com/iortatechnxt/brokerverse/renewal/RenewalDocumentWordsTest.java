@@ -195,7 +195,8 @@ class RenewalDocumentWordsTest {
                 mock(BucketHistoryRepository.class),
                 batches,
                 mock(RenewalParameters.class),
-                insurers)
+                insurers,
+                mock(OrganizationService.class))
             .evaluate(LocalDate.of(2027, 8, 20));
 
     assertThat(signals)

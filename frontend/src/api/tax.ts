@@ -12,7 +12,10 @@ export type TaxType =
   | 'DST'
   | 'LGT'
   | 'FST'
-  | 'EWT';
+  | 'EWT'
+  | 'FWT'
+  | 'FINAL_VAT'
+  | 'PERCENTAGE_TAX';
 export type PayeeClass = 'INDIVIDUAL' | 'CORPORATE';
 export type VatTreatment = 'REGULAR' | 'ZERO_RATED' | 'EXEMPT';
 export type WorksheetKind = 'VAT' | 'EWT' | 'NONE';
@@ -74,6 +77,14 @@ export interface PartyTaxProfile extends Maintained {
   zipCode?: string;
   vatTreatment: VatTreatment;
   defaultAtcCode?: string;
+  /** The party withholds tax on its payments to the company. */
+  withholdingAgent?: boolean;
+  topWithholdingAgent?: boolean;
+  /** Government office or corporation withholding final VAT and final tax. */
+  governmentPayor?: boolean;
+  exemptionCertificateNo?: string;
+  exemptionValidFrom?: string;
+  exemptionValidTo?: string;
 }
 
 export type PartyTaxProfileRequest = Omit<PartyTaxProfile, 'id' | 'recordStatus' | 'maker'>;

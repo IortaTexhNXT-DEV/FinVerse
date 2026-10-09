@@ -17,6 +17,7 @@ import { useWorkspace } from '@/context/workspaceContext';
 import { formatDate, today } from '@/utils/format';
 import { awaitsOtherChecker } from '@/utils/makerChecker';
 import { DateInput } from '@/components/ui/DateInput';
+import { ConfigUploadButton } from '@/features/configpromo/ConfigUploadButton';
 
 type BranchForm = Partial<Branch>;
 
@@ -29,6 +30,8 @@ const TEXT_FIELDS: { key: keyof Branch; label: string; required?: boolean }[] = 
   { key: 'contactPhone', label: 'Phone' },
   { key: 'contactEmail', label: 'Email' },
   { key: 'weeklyHolidays', label: 'Weekly holidays (ISO days, e.g. 6,7)' },
+  { key: 'birBranchCode', label: 'BIR branch code (e.g. 00001)' },
+  { key: 'rdoCode', label: 'RDO code (e.g. 050)' },
 ];
 
 /** Office Master maintenance: branches with maker-checker authorization. */
@@ -66,17 +69,20 @@ export default function BranchesPage() {
         title="Branches"
         description="Branches, offices and customer centres."
         actions={
-          can('MASTER_MAINTAIN') && (
-            <Button
-              variant="accent"
-              icon={<Plus size={16} />}
-              onClick={() =>
-                setForm({ openingDate: today(), headOffice: false, forexAuthorized: false })
-              }
-            >
-              New Branch
-            </Button>
-          )
+          <>
+            <ConfigUploadButton types={['CFG_BRANCH']} />
+            {can('MASTER_MAINTAIN') && (
+              <Button
+                variant="accent"
+                icon={<Plus size={16} />}
+                onClick={() =>
+                  setForm({ openingDate: today(), headOffice: false, forexAuthorized: false })
+                }
+              >
+                New Branch
+              </Button>
+            )}
+          </>
         }
       />
       <ErrorAlert error={authorize.error} />
@@ -89,6 +95,11 @@ export default function BranchesPage() {
             { key: 'c', header: 'Code', render: (b) => <strong>{b.code}</strong> },
             { key: 'n', header: 'Name', render: (b) => b.name },
             { key: 'r', header: 'Region', render: (b) => b.region ?? '' },
+            {
+              key: 'bir',
+              header: 'BIR Branch / RDO',
+              render: (b) => [b.birBranchCode, b.rdoCode].filter(Boolean).join(' / '),
+            },
             { key: 'o', header: 'Opened', render: (b) => formatDate(b.openingDate) },
             { key: 'h', header: 'Head Office', render: (b) => (b.headOffice ? 'Yes' : '') },
             { key: 'f', header: 'Forex', render: (b) => (b.forexAuthorized ? 'Authorized' : '') },

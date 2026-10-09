@@ -19,8 +19,8 @@ import org.springframework.stereotype.Component;
  * Bulk upload {@code BCL_INSURER_CLAIM_NO} of insurer claim numbers (BRCLM.043; design 9.5,
  * FR-CM-021): claim number, insurer, insurer claim number and the date reported to the insurer. The
  * number goes on the claim's line of that insurer still waiting for a number, else on a new line;
- * the duplicate rules of the screen apply, and a number already on another claim is accepted with
- * the alert {@code BCL_INSURER_CLAIM_NO_REUSED}.
+ * the duplicate rules of the screen apply: a number of the same insurer already on another claim is
+ * refused.
  */
 @Component
 public class InsurerClaimNoBulkHandler implements BulkImportHandler {

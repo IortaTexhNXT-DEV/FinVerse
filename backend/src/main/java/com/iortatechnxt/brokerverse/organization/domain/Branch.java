@@ -52,6 +52,12 @@ public class Branch extends AuthorizableEntity {
   @Column(name = "weekly_holidays", length = 20)
   private String weeklyHolidays;
 
+  @Column(name = "bir_branch_code", length = 5)
+  private String birBranchCode;
+
+  @Column(name = "rdo_code", length = 5)
+  private String rdoCode;
+
   protected Branch() {}
 
   /**
@@ -151,5 +157,21 @@ public class Branch extends AuthorizableEntity {
 
   public void setWeeklyHolidays(String weeklyHolidays) {
     this.weeklyHolidays = weeklyHolidays;
+  }
+
+  public String getBirBranchCode() {
+    return birBranchCode;
+  }
+
+  public void setBirBranchCode(String birBranchCode) {
+    this.birBranchCode = birBranchCode == null || birBranchCode.isBlank() ? null : birBranchCode;
+  }
+
+  public String getRdoCode() {
+    return rdoCode;
+  }
+
+  public void setRdoCode(String rdoCode) {
+    this.rdoCode = rdoCode == null || rdoCode.isBlank() ? null : rdoCode;
   }
 }

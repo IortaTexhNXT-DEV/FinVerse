@@ -93,11 +93,15 @@ BUILD_STATUS: list[tuple[str, re.Pattern]] = [(label, re.compile(pat, re.I)) for
                            r"\bsprints?\b|\bjira\b|\bbacklog item\b|"
                            r"\bgap(?:s)? to (?:build|close)\b"),
 ]]
-# Words of BUILD_STATUS a folder of out/ may contain, each with its reason: (folder, label, pattern of the word).
+# Words of BUILD_STATUS a folder of out/ may contain, each with its reason: (folder, label, pattern of the word,
+# or of the text up to and including the word when the pattern names its context).
 BUILD_STATUS_ALLOWED: list[tuple[Path, str, re.Pattern, str]] = [
     (brand.OUT_DIR / brand.DROPS["Programme"]["folder"] / "Backlog", "development status", re.compile(r"^jira$", re.I),
      "The user story backlog and its import guide name the tool BDOI chose for the working backlog (decision of the "
      "BIBS Product Owner of 9-Oct-2026); the other development-status words, sprint among them, stay refused there"),
+    (brand.OUT_DIR / brand.DROPS["Programme"]["folder"] / "Comparisons", "built", re.compile(r"\bYear Built$"),
+     "The comparison of BDOI's Product Maintenance FRS quotes BDOI's vessel and aircraft field 'Year Built' (Annex B, C "
+     "and the quotation slip templates) word for word; every other form of the word stays refused there"),
 ]
 # Technical terms that a business sign-off set does not contain (client decision of 28-Sep-2026). (label, pattern);
 # whole-word and case-insensitive.
@@ -302,7 +306,8 @@ def build_status() -> list[str]:
                 for m in pattern.finditer(line):
                     if label == "internal code" and m.group(0) in allowed:
                         continue
-                    if any(label == lab and folder in p.parents and word.match(m.group(0).strip())
+                    if any(label == lab and folder in p.parents
+                           and (word.match(m.group(0).strip()) or word.search(line[:m.end()]))
                            for folder, lab, word, _ in BUILD_STATUS_ALLOWED):
                         continue
                     hits[label].add(m.group(0).strip())

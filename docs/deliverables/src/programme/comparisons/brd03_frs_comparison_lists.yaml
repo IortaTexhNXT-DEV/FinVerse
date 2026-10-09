@@ -1,0 +1,604 @@
+# Lists of the comparison of BDOI's Product Maintenance FRS (v1.0, 19-Aug-2026) with the BIBS FRS BRD-3 v2.1:
+# what only ours has (sheet 6), what only BDOI's has (sheet 7) and the field mapping of BDOI's Annex A to F against our
+# screen specifications (sheet 9). Read by build_frs_comparison.py with brd03_frs_comparison.yaml.
+
+# ------------------------------------------------------------------ 6 Only in ours
+# recommendation: Include | Include as annex | Keep as supporting document
+only_ours:
+  - ref: FR-PM-004
+    kind: Functional requirement
+    content: "Protect documents that leave BIBS: password-protected PDF or Excel, password in a separate e-mail, access to package documents by permission."
+    brd: BRPM.020
+    where: "New FRPM.031 Document protection (unless BDOI waives BRPM.020, C13)"
+    recommendation: Include
+  - ref: FR-PM-005
+    kind: Functional requirement
+    content: "Audit entries can only be added, never changed or deleted; retention 5 years online, 15 years archive until BDOI states otherwise; the History tab shows workflow and audit rows."
+    brd: BRPM.024
+    where: "Sub-items of FRPM.021.01 and 021.02"
+    recommendation: Include
+  - ref: FR-PM-010
+    kind: Functional requirement
+    content: "Product hierarchy line > cover type > subtype (depth 2) > product (risk code), coverages and perils per line; risk-code naming pattern per line; maker-checker."
+    brd: PMADD01
+    where: "New FRPM.022 Product hierarchy and clause library"
+    recommendation: Include
+  - ref: FR-PM-011
+    kind: Functional requirement
+    content: "Clause library of warranties, clauses, exclusions and deductible wordings with effective dates; the source list of BDOI's 'Warranties, Clauses' drop-down (Annex A, E)."
+    brd: PMADD02
+    where: "New FRPM.022"
+    recommendation: Include
+  - ref: FR-PM-012
+    kind: Functional requirement
+    content: "Field rules per line or product: presence, list, range, pattern; most specific scope applies; unsafe patterns refused."
+    brd: "BRPM.003, BRPM.004"
+    where: "Sub-items of FRPM.003.02 ('configure rules per field')"
+    recommendation: Include
+  - ref: FR-PM-013
+    kind: Functional requirement
+    content: "Documents generated from versioned templates with line-specific sections; each document records its template version; a regenerated file shows the same content."
+    brd: BRPM.005
+    where: "New FRPM.034 Shared document templates (with Annex D and F as the layouts)"
+    recommendation: Include
+  - ref: FR-PM-014
+    kind: Functional requirement
+    content: "Insurers of a package version with role (Lead, Participant, Panel), share, rate and minimum premium; terms per insurer and coverage; shares total 100%; quotation with an insurer outside the panel refused."
+    brd: PMADD02
+    where: "New FRPM.023 Insurer-specific package terms"
+    recommendation: Include
+  - ref: FR-PM-020
+    kind: Functional requirement (part)
+    content: "Six request types (new, amend terms, update details, renew, reactivate, retire); scope generic programme or client-specific; reason list; terms pre-filled from the current version; the type cannot change after the first save."
+    brd: "BRPM.008, BRPM.011"
+    where: "Sub-items of FRPM.011.02"
+    recommendation: Include
+  - ref: FR-PM-022
+    kind: Functional requirement
+    content: "TSU TL review with a mandatory written recommendation shown to the TSU Head; the TSU Head approval is never given by the recommender."
+    brd: BRPM.009
+    where: "FRPM.011.03 split into two sub-items"
+    recommendation: Include
+  - ref: FR-PM-030
+    kind: Functional requirement (part)
+    content: "Slip number and reply due date (5 days by default); approval by someone other than the preparer; sending from BIBS with per-insurer send status, sent history and resend; slips lock at ManCom sign-off."
+    brd: BRPM.012
+    where: "Sub-items of FRPM.012.01"
+    recommendation: Include
+  - ref: FR-PM-031
+    kind: Functional requirement (part)
+    content: "Response outcomes with exception states; a rate is required for an offer; every change kept in the response history."
+    brd: "BRPM.013, PMADD04"
+    where: "Sub-items of FRPM.012.02"
+    recommendation: Include
+  - ref: FR-PM-032
+    kind: Functional requirement
+    content: "Further negotiation rounds: revise the slip, round n+1 proposes the insurers that did not decline; all rounds kept; not-proceeded closure with a reason."
+    brd: "PMADD04, BRPM.010"
+    where: "New FRPM.025 Negotiation rounds and terms final"
+    recommendation: Include
+  - ref: FR-PM-033
+    kind: Functional requirement
+    content: "Terms final: refused while any insurer of the latest round has no outcome; only insurers that offered terms can be chosen; roles and shares."
+    brd: BRPM.010
+    where: "New FRPM.025"
+    recommendation: Include
+  - ref: FR-PM-034
+    kind: Functional requirement (part)
+    content: "One current comparative master per request; superseded masters kept and downloadable; outputs stored as PDF and Excel with a fingerprint; Marketing view-only."
+    brd: "BRPM.014, PMADD03"
+    where: "Sub-items of FRPM.012.02"
+    recommendation: Include
+  - ref: FR-PM-035
+    kind: Functional requirement
+    content: "Client view generated from the current master with chosen fields and insurers and a title; never edits values; linked to its master."
+    brd: PMADD03
+    where: "Sub-item of FRPM.012.02 ('configure what details ... sent to the client')"
+    recommendation: Include
+  - ref: FR-PM-036
+    kind: Functional requirement
+    content: "TSU Head reviews proposed terms; client-specific packages go to Marketing review (accept terms, request changes, not proceeded); generic programmes go straight to requirements."
+    brd: "BRPM.013, BRPM.010"
+    where: "New FRPM.026 Review of negotiated terms"
+    recommendation: Include
+  - ref: FR-PM-040
+    kind: Functional requirement
+    content: "Requirements pack: scheme rate or rate per insurer, minimum premium, commission, package TSI limit, computation basis, dates, insurers and the signed package slip before ManCom."
+    brd: BRPM.015
+    where: "New FRPM.027 Requirements pack and package slip"
+    recommendation: Include
+  - ref: FR-PM-041
+    kind: Functional requirement (part)
+    content: "ManCom sign-off locks the slips, creates the sign-off reference, attaches a signed sheet or a generated sign-off record, and forwards to MBS automatically; the signer did not submit the pack."
+    brd: BRPM.015
+    where: "Sub-items of FRPM.014.01"
+    recommendation: Include
+  - ref: FR-PM-042
+    kind: Functional requirement
+    content: "MBS sets up a draft package version from the signed-off terms (risk code and name for a new package) or returns incomplete requirements to TSU; one version in set-up per product."
+    brd: BRPM.015
+    where: "New FRPM.028 Package set-up and validation checkpoint (with FRPM.016)"
+    recommendation: Include
+  - ref: FR-PM-043
+    kind: Functional requirement
+    content: "Validation checkpoint: checklist (hierarchy, insurer terms, shares, rates, dates, test premium), validator never the maker or submitter, release or return with reason, validation result kept."
+    brd: "PMADD06, BRPM.015"
+    where: "New FRPM.028"
+    recommendation: Include
+  - ref: FR-PM-044
+    kind: Functional requirement
+    content: "Advisory drafted on release (new, update, renewal, retirement); recipients by group; sending blocked until the signed package slip and ManCom sign-off are attached; protected PDF by e-mail."
+    brd: "BRPM.016, BRPM.017"
+    where: "New FRPM.029 Package advisories"
+    recommendation: Include
+  - ref: FR-PM-045
+    kind: Functional requirement
+    content: "Retirement through a Retire package request with ManCom sign-off; product and versions stay readable; incentive criteria on the product flagged for review."
+    brd: "BRPM.011, BRPM.006"
+    where: "Alternative text for FRPM.003.04 to 07 (C10)"
+    recommendation: Include
+  - ref: FR-PM-050
+    kind: Functional requirement
+    content: "Package terms held in numbered versions with an effective date; never edited in place; one released version in force; previous one ends the day before; packages in force at go-live set up by request."
+    brd: BRPM.007
+    where: "New FRPM.024 Package versions and rate schemes"
+    recommendation: Include
+  - ref: FR-PM-051
+    kind: Functional requirement
+    content: "New business priced on the version in force on the transaction date; version stored on quotation, account and invoice; deviating or non-current rate needs an approved rate exception (30 days)."
+    brd: BRPM.007
+    where: "New FRPM.024"
+    recommendation: Include
+  - ref: FR-PM-052
+    kind: Functional requirement (part)
+    content: "Expired and retired packages never deleted, tagged, visible only to users with the archive permission; reactivation only by request."
+    brd: BRPM.006
+    where: "Sub-items of FRPM.002.02 (Expired Products) and FRPM.003.05"
+    recommendation: Include
+  - ref: FR-PM-061
+    kind: Functional requirement
+    content: "Generate renewal requests for selected expiring packages, pre-filled from the current version with the next term's dates; one open renewal per package; optional automatic drafting at the first alert."
+    brd: BRPM.017
+    where: "New FRPM.030 Renewal requests"
+    recommendation: Include
+  - ref: FR-PM-072
+    kind: Functional requirement
+    content: "Notification preferences per event; product master changes recorded for the transfer to BDOI systems (on hold until BDOI names them)."
+    brd: BRPM.022
+    where: "New FRPM.033 Product master changes to BDOI systems"
+    recommendation: Include
+  - ref: FR-PM-073
+    kind: Functional requirement
+    content: "Each stage has an owner and a service level; only defined transitions possible; amber from 80% of the service level, red past it, alert to the stage owners."
+    brd: BRPM.021
+    where: "New FRPM.032 Workflow enforcement and service levels; FRPM.001 aging"
+    recommendation: Include
+  - ref: FR-PM-081
+    kind: Functional requirement (part)
+    content: "At booking the matched criteria are stored on the invoice; endorsements inherit them; criteria of an ended product flagged for review."
+    brd: "PMADD07, PMADD08"
+    where: "Sub-items of FRPM.018.01"
+    recommendation: Include
+  - ref: "Rules (115)"
+    kind: Business rules
+    content: "115 rules marked fixed or configurable with the place where the business maintains them."
+    brd: All
+    where: "Numbered '-R' sub-items under each FRPM item"
+    recommendation: Include
+  - ref: "Validations (92)"
+    kind: Validations and messages
+    content: "92 checks with the message the user sees."
+    brd: All
+    where: "Numbered '-V' sub-items; full list in Annex H"
+    recommendation: Include
+  - ref: "Acceptance criteria (104)"
+    kind: Acceptance criteria
+    content: "104 numbered acceptance criteria, the basis of the test plan."
+    brd: All
+    where: "Numbered '-AC' sub-items under each FRPM item"
+    recommendation: Include
+  - ref: "Segregation of duties"
+    kind: Business rules
+    content: "Maker never approves; the TSU Head approval never by the recommender; slip never approved by its preparer; ManCom never signs off what it submitted; a version never validated by its maker or submitter."
+    brd: "BRPM.021, PMADD06"
+    where: "Annex K and a sub-item of the new FRPM.032"
+    recommendation: Include
+  - ref: "Roles and permissions"
+    kind: Role-to-action matrix
+    content: "10 personas, 15 permissions with action class, the proposed role-to-action matrix."
+    brd: PMADD05
+    where: "Annex K (BDOI refers PMADD05 to the UAM FRS)"
+    recommendation: Include as annex
+  - ref: "SCR-PM-01 to SCR-PM-22"
+    kind: Screen specifications
+    content: "22 screens with purpose, access, navigation, 325 fields, 104 actions, 84 screen rules, outcome and screenshots; screen index, flow, menus by persona, common elements."
+    brd: All
+    where: "Annex G"
+    recommendation: Include as annex
+  - ref: "Messages catalogue"
+    kind: Messages
+    content: "276 messages by screen with type and the fix the user makes."
+    brd: All
+    where: "Annex H"
+    recommendation: Include as annex
+  - ref: "NT-01 to NT-11"
+    kind: Notifications
+    content: "11 notifications with channel, trigger, recipient, text and content."
+    brd: "BRPM.021, BRPM.022"
+    where: "Annex I"
+    recommendation: Include as annex
+  - ref: "WT-A, WT-B; storyboard"
+    kind: Walkthroughs
+    content: "Two end-to-end walkthroughs (24 and 12 steps) and the storyboard index of 36 frames with screenshots and UX deck slides."
+    brd: All
+    where: "Annex J"
+    recommendation: Include as annex
+  - ref: "Workflow and status model"
+    kind: Workflow
+    content: "15 stages with owner and service level, 23 transitions with reason lists, 5 package version states."
+    brd: "BRPM.021"
+    where: "Annex L; tables under the process flows"
+    recommendation: Include as annex
+  - ref: "Configuration items"
+    kind: Configuration
+    content: "14 parameters with defaults, 10 lists of values, 10 masters maintained by the business with their authoriser."
+    brd: All
+    where: "Annex L"
+    recommendation: Include as annex
+  - ref: "Package Status Update Report, Package Expiry Report, Package Version History"
+    kind: Report layouts
+    content: "Parameters, layout and columns of the three reports; export formats and saved variants."
+    brd: "BRPM.017, 018, 006, 007"
+    where: "Sub-items of FRPM.007.01 and 019.01"
+    recommendation: Include
+  - ref: "Document outputs DO-01 to DO-06"
+    kind: Documents
+    content: "Package Request Form, quotation slip, comparative table, package slip, ManCom sign-off record, advisory: format, protection and the source of each field."
+    brd: "BRPM.005, 012, 014, 015, 016"
+    where: "Note under Annex D and F; new FRPM.034"
+    recommendation: Include
+  - ref: "Interfaces; cross-BRD contract"
+    kind: Interfaces
+    content: "10 interfaces (client master, catalogue, e-mail, notifications, New Business, Operations, Renewal, other BDOI systems) and the contract with the other BRDs."
+    brd: "BRPM.022, BRPM.007"
+    where: "New FRPM.033; contract as supporting document"
+    recommendation: Keep as supporting document
+  - ref: "Non-functional requirements"
+    kind: NFR
+    content: "Users, volumes, response time, peaks, availability, recovery, devices, security, audit, retention with the proposed approach."
+    brd: "BRD p.33"
+    where: "No NFR section in BDOI's template; programme NFR catalogue"
+    recommendation: Keep as supporting document
+  - ref: "Configuration inputs CI-01 to CI-10"
+    kind: Configuration inputs
+    content: "Ten templates the business fills before go-live (catalogue, coverages and field rules, clauses, rates, insurers, packages in force, package map, document templates, lists, incentive criteria)."
+    brd: All
+    where: "Referenced from Annex L"
+    recommendation: Keep as supporting document
+  - ref: "Assumptions, dependencies, open questions, CLR-PM-01 to 24"
+    kind: Clarifications
+    content: "8 assumptions, 6 dependencies, 17 open questions and 24 proposed rules with the decision requested (Drop 0 questions PM-Q01 to PM-Q58)."
+    brd: All
+    where: "Settled in the decision session; open items stay in the clarification register"
+    recommendation: Keep as supporting document
+  - ref: "User-story view"
+    kind: User stories
+    content: "One user story per BRD ID with FRs, acceptance criteria and test cases."
+    brd: All
+    where: "Annex M with the traceability"
+    recommendation: Include as annex
+  - ref: "Test plan"
+    kind: Test cases
+    content: "138 test conditions, 270 test cases, 8 scenarios traced to FRs and screens."
+    brd: All
+    where: "Referenced; FRPM column added"
+    recommendation: Keep as supporting document
+  - ref: "Screen standards; sign-off and change control"
+    kind: Standards and governance
+    content: "15 screen standards; what is signed, how the review is recorded, what signing freezes, change after sign-off."
+    brd: "-"
+    where: "Note under BDOI's Signoff Sheet; screen standards stay supporting"
+    recommendation: Keep as supporting document
+  - ref: "Glossary, references, personas, scope"
+    kind: Introduction
+    content: "26 terms, references R1 to R10, personas, scope by area and BRD ID, out-of-scope list."
+    brd: "-"
+    where: "New sub-sections 1.4 to 1.6 and 1.2"
+    recommendation: Include
+
+# ------------------------------------------------------------------ 7 Only in BDOI's
+# action: Add to our FRS | Platform change needed | Ask BDOI
+only_bdoi:
+  - ref: "FRPM.002.01, 003.02; Annex B, C, D"
+    item: "Non-package products and quotation requests inside Product Maintenance"
+    impact: "Scope of the FRS and menu placement; BIBS supports the process under New Business."
+    action: Ask BDOI
+    detail: "C01."
+  - ref: "FRPM.005, 008, 009, 010"
+    item: "Non-package quotation request list and review, insurer selection by the requestor, proposal generation per insurer, client response (Accepted, Rejected, Return for Revision)"
+    impact: "Mostly supported in BIBS New Business (FR-NB-050 to 057); client return for revision and several insurers per proposal slip are not."
+    action: Ask BDOI
+    detail: "C01, C18; platform change for client return for revision."
+  - ref: "FRPM.002.02"
+    item: "Landing page with Product Matrix tabs Active, Expiring (within 90 days), Expired, and the two request lists"
+    impact: "Different navigation; same information spread over our screens."
+    action: Add to our FRS
+    detail: "Describe our screens under BDOI's tabs."
+  - ref: "FRPM.003.01"
+    item: "Product Matrix columns Insurer, Effective Date, Expiry Date, Last Updated By, Last Updated Date; export"
+    impact: "List columns and export missing on Products."
+    action: Platform change needed
+    detail: "Small change."
+  - ref: "FRPM.003.02; Annex A, B, C, E"
+    item: "Incentive Eligible indicator (default No) with Incentive Amount (greater than zero) or Incentive Commission Rate (above 0%, at most 100%) on the product and requests"
+    impact: "Two places for incentive eligibility if criteria also stay."
+    action: Ask BDOI
+    detail: "C19."
+  - ref: "FRPM.003.02"
+    item: "Supporting documents on the Product Matrix record"
+    impact: "Ours keeps documents on the package request, not on the product."
+    action: Ask BDOI
+    detail: "Confirm the request documents are enough."
+  - ref: "FRPM.003.02, 003.04, 014.01"
+    item: "Approver chosen by name by the requester"
+    impact: "Role queues in BIBS."
+    action: Ask BDOI
+    detail: "C08."
+  - ref: "FRPM.003.04 to 007"
+    item: "Deactivation request with effective date (today or later), reason, remarks, documents, one approver; list of deactivation requests; expiry date set to the later of effective and approval date"
+    impact: "BIBS retires through the full request route."
+    action: Ask BDOI
+    detail: "C10; platform change if adopted."
+  - ref: "FRPM.004.01"
+    item: "Alerts 90 days before expiry and 90 days before the anniversary; recipients TSU Officer and Team Lead; non-package products included"
+    impact: "Notice period is a parameter; anniversary alert not in BIBS."
+    action: Platform change needed
+    detail: "C02."
+  - ref: "FRPM.001.01"
+    item: "Dashboard KPIs Issued Proposals and Deactivation Requests; filters by period, TSU officer, product line, package type; drill-down columns; export to Excel, PDF and CSV"
+    impact: "BRPM.019 asks for filters; our home page has none."
+    action: Platform change needed
+    detail: "Add filters and export formats."
+  - ref: "FRPM.007.01"
+    item: "Consolidated Placement Update Report every Thursday at 8am, configurable schedule, 12 columns (Item No., Insured's Name, Marketing Segment, Team, Account Officer, TSU Handler, Line, Sub-Line, PRF Received Date and Time, Aging, Status), Excel, file name, repository with preview and download"
+    impact: "No scheduled run or repository for this report in BIBS."
+    action: Ask BDOI
+    detail: "C03; platform change for the schedule and repository."
+  - ref: "FRPM.006.01, 009.02, 007.01, 021.01"
+    item: "File naming conventions (QS_, ProposalSlip_, PlacementUpdate_, Audit Logs_ with MMDDYYYY)"
+    impact: "BIBS names files after the document number."
+    action: Platform change needed
+    detail: "C23."
+  - ref: "FRPM.006.01, 012.01"
+    item: "Quotation slip per insurer; QS-specific values edited before generation; version history on regeneration; manual e-mail of the downloaded slip"
+    impact: "Package slip is one per round in BIBS and sent by BIBS."
+    action: Ask BDOI
+    detail: "C12."
+  - ref: "FRPM.006.02, 012.02"
+    item: "Comparative table with QS value column, choice of fields before capture, responses captured in the table, several quotation options per insurer, responses Approved / Not Covered / Others"
+    impact: "Different capture model; several options per insurer not supported."
+    action: Ask BDOI
+    detail: "C14, C15."
+  - ref: "FRPM.009.01"
+    item: "Final Terms for Proposal column"
+    impact: "Not in BIBS."
+    action: Platform change needed
+    detail: "Only if the proposal step is kept (C18)."
+  - ref: "FRPM.011.02"
+    item: "Request Source Marketing / TSU / Insurer with routing; Insurer source skips the quotation slip"
+    impact: "BIBS routes every request through Marketing approval and TSU review."
+    action: Ask BDOI
+    detail: "C07."
+  - ref: "FRPM.011.02"
+    item: "Marketing approval hierarchy TL, TH, UH, each approving independently"
+    impact: "BIBS has one Marketing approval stage."
+    action: Ask BDOI
+    detail: "C05."
+  - ref: "FRPM.003.03, 005.02, 006.01, 011.03, 013.01, 014.01"
+    item: "Reject as an outcome distinct from Return"
+    impact: "BIBS uses Void or Not proceeded with a reason."
+    action: Ask BDOI
+    detail: "C04."
+  - ref: "Annex E"
+    item: "Business Origin, Account Officer, Unit Head, Estimated No. of Policies (at least 20), Estimated Total Basic Premium (at least PHP 5M), Other Instructions, Incentive fields on the package request"
+    impact: "Fields and two minimum rules missing on our request form."
+    action: Platform change needed
+    detail: "Sheet 9."
+  - ref: "Annex A; Sub Line Dropdown Values"
+    item: "Package product fields per line (Policy Type, Package Description, Business Origin, Account Officer, Unit Head, Insured's Name, Mailing Address, Type of Cover, Description of Cover, Other Conditions, Premium) and sub-line values for Engineering, Liability, Crime, Bonds, Personal Accident, Miscellaneous"
+    impact: "Values answer PQ02 in part; several fields have no place on our product or version."
+    action: Add to our FRS
+    detail: "Load the values as configuration (CI-01, CI-02); fields per sheet 9."
+  - ref: "Annex A, B, C"
+    item: "Lines of insurance: Motor, Property, Engineering, EEI, Floater, Marine Cargo, Marine Hull, Aviation, Stock Throughput, Liability, Crime, Bonds, Personal Accident, Miscellaneous"
+    impact: "BDOI's list of product lines for the catalogue."
+    action: Add to our FRS
+    detail: "Use as the product line list (CI-01)."
+  - ref: "Annex B, C"
+    item: "Non-package fields per line (for example Vehicle Type, Engine Type, Basis of Valuation, Building Description, Contractor's Name, Vessel and Aircraft details, Bond Amount, No. of Persons) and Transaction Type with expiring policy, insurer, share, rate and commission per insurer"
+    impact: "BIBS captures most of these as risk details text or field rules; no dedicated fields."
+    action: Ask BDOI
+    detail: "After C01; sheet 9."
+  - ref: "Annex D, F"
+    item: "Quotation slip templates for 14 lines, package and non-package (letterhead text, law and jurisdiction clause, TSU handler signature, insured's conforme)"
+    impact: "The layouts our FRS waits for (Q03, CLR-PM-02)."
+    action: Add to our FRS
+    detail: "Load as template versions (CI-08)."
+  - ref: "FRPM.014.01"
+    item: "ManCom approver list, several approvers in parallel, the President last, approval progress per approver, e-mail via Microsoft 365"
+    impact: "BIBS completes the step with one member."
+    action: Ask BDOI
+    detail: "C17."
+  - ref: "FRPM.015.01, 016.01"
+    item: "Request for Deployment with a Deployment Request Number; MBS Deployment Queue with statuses For Deployment, Draft Setup, Pending Approval, Approved, Deployed, Returned"
+    impact: "BIBS forwards to MBS automatically and uses its own stage names."
+    action: Ask BDOI
+    detail: "C20."
+  - ref: "FRPM.017.01"
+    item: "Notice to the original reviewer or approver when reassigned"
+    impact: "Only the new assignee is notified in BIBS."
+    action: Platform change needed
+    detail: "Small change."
+  - ref: "FRPM.019.01"
+    item: "Renewal Request Report of expiring package accounts regardless of a renewal request"
+    impact: "Close to our Package Expiry Report; may mean client accounts."
+    action: Ask BDOI
+    detail: "C22."
+  - ref: "FRPM.020.01"
+    item: "Reports Builder: choose fields from a data source, save report templates, print"
+    impact: "BIBS has saved variants, no designer."
+    action: Ask BDOI
+    detail: "C21."
+  - ref: "FRPM.021.01, 021.02"
+    item: "Audit Logs menu with filters by action type and reference number, Old Value and New Value columns, export file name; audit section with export on each record"
+    impact: "BIBS Audit Trail filters by date, user and record type; record history has no export."
+    action: Platform change needed
+    detail: "Add filters and export."
+  - ref: "Process flows"
+    item: "'Upload ISACOM Approval' and 'Generate and send Placement Update to Marketing' in the non-package flow; MBS 'Maintain package as draft' and TSU 'Review package configuration' for non-package products"
+    impact: "ISACOM approval is not described anywhere else; non-package products would also be set up by MBS."
+    action: Ask BDOI
+    detail: "What ISACOM approval is and when it is needed; after C01."
+  - ref: "Signoff Sheet"
+    item: "ITG roles: System Analyst (prepared), Tech Lead and Application or Platform Owner (reviewed), Project Owner / Sponsor (approved)"
+    impact: "Our signature page has business units only."
+    action: Add to our FRS
+    detail: "Use BDOI's sheet with the business unit signatories added."
+
+# ------------------------------------------------------------------ 9 Field comparison
+# For each annex field of BDOI's FRS (bdoi_frs_brd03.yaml): our screen and field, mandatory and type in ours, and the
+# difference. 'match' is Same, Partial, Different or Not in ours. Fields not listed under a key fall back to the default
+# of their annex.
+fields:
+  A:
+    default: {screen: "-", field: "-", mandatory: "-", type: "-", match: Not in ours, difference: "No such field on our product or package version."}
+    map:
+      Policy Type: {screen: "SCR-PM-11 Products (New product › Features)", field: "Fleet (several vehicles)", mandatory: N, type: Check box, match: Partial, difference: "Ours has a Fleet feature only; no Policy Type list (Individual, Fleet, Group, Single Location, Various Locations)."}
+      Sub-Line: {screen: "SCR-PM-11 Products", field: "Cover type (subtype under it)", mandatory: "Y for a package", type: Drop-down, match: Partial, difference: "Same role in the hierarchy under another name; values not yet loaded (PQ02) – BDOI's sub-line lists give them."}
+      Package Name: {screen: "SCR-PM-11 Products; SCR-PM-03", field: "Name; Package / programme name", mandatory: Y, type: "Text, up to 120 / 200 characters", match: Same, difference: "-"}
+      Package Description: {screen: "SCR-PM-03; SCR-PM-13", field: "Requested terms (heading and details); Change summary", mandatory: N, type: Text, match: Partial, difference: "No description field on the product itself."}
+      Insurer: {screen: "SCR-PM-13 Package Version › Insurers", field: "Insurer, Role, Share %, Rate %, Minimum Premium", mandatory: "Y (at least one)", type: "Drop-down per row", match: Different, difference: "Ours holds several insurers per version with role and share; BDOI one Insurer per record."}
+      Business Origin: {screen: "-", field: "-", mandatory: "-", type: "-", match: Not in ours, difference: "Not on product or version; meaning to confirm (source channel or market segment?)."}
+      Account Officer: {screen: "-", field: "-", mandatory: "-", type: "-", match: Not in ours, difference: "The requester is recorded on the package request; no Account Officer on the product."}
+      Unit Head: {screen: "-", field: "-", mandatory: "-", type: "-", match: Not in ours, difference: "The Marketing approver is recorded in the request history."}
+      Insured's Name: {screen: "SCR-PM-03 New Package Request", field: "Client or prospect", mandatory: "Cond. (client-specific)", type: Look-up (client master), match: Partial, difference: "On the request of a client-specific package, not on the product."}
+      Mailing Address: {screen: "-", field: "-", mandatory: "-", type: "-", match: Not in ours, difference: "Held in the client master, not on the package."}
+      Perils/Coverages: {screen: "SCR-PM-13 Package Version › Coverages", field: "Coverage, Included / Optional, Limit / Deductible", mandatory: "Y (one basic coverage)", type: "Table from the coverage master", match: Partial, difference: "Structured list of coverages from a master, not free text."}
+      Benefits/Coverages: {screen: "SCR-PM-13 Package Version › Coverages", field: Coverage, mandatory: N, type: "Table from the coverage master", match: Partial, difference: "As Perils/Coverages."}
+      Type of Cover: {screen: "SCR-PM-11 Products", field: Cover type, mandatory: "Y for a package", type: Drop-down, match: Partial, difference: "Values All-Risk, F/L Only, Named Perils to be loaded as cover types of Property."}
+      Description of Cover: {screen: "SCR-PM-03", field: "Requested terms (heading and details)", mandatory: "Cond. (on submission)", type: Text, match: Partial, difference: "Free sections on the request; not kept as a product field."}
+      Extensions of Cover: {screen: "SCR-PM-15 Coverages & Clauses", field: "Coverage kind Extension", mandatory: N, type: List, match: Partial, difference: "Extensions are coverages of kind Extension, not free text."}
+      Warranties, Clauses: {screen: "SCR-PM-13 Package Version › Insurer Terms", field: Clauses, mandatory: N, type: "Multi-select from the clause library", match: Same, difference: "Same: a list; ours names the source (clause library)."}
+      Other Conditions, Subjectivities, Exclusions: {screen: "SCR-PM-15 Clause Library; SCR-PM-05", field: "Clause kind Exclusion; Conditions and warranties (insurer response)", mandatory: N, type: "List; text", match: Partial, difference: "Split between clause library and response text."}
+      Deductibles: {screen: "SCR-PM-13 Package Version › Insurer Terms", field: "Limit / Deductible / Deductible Wording", mandatory: N, type: "Amount, % or wording per insurer and coverage", match: Partial, difference: "Structured per insurer and coverage, not one text."}
+      Maximum Limit/s: {screen: "SCR-PM-13 Package Version", field: "Coverage Limit; Package TSI Limit", mandatory: N, type: Amount, match: Partial, difference: "Amount fields, not text."}
+      Premium: {screen: "SCR-PM-13 Package Version › Rate Scheme", field: Minimum Premium, mandatory: Y, type: Amount, match: Different, difference: "Ours has a minimum premium, not a premium amount."}
+      Premium Rates: {screen: "SCR-PM-13 Package Version › Rate Scheme; Insurers", field: "Package Rate %; insurer Rate %", mandatory: "Cond. (package rate or rate per insurer)", type: Percent, match: Same, difference: "-"}
+      Commission Rates: {screen: "SCR-PM-13 Package Version › Rate Scheme; SCR-PM-18", field: "Commission %; insurer commission rate per product", mandatory: Y, type: Percent, match: Same, difference: "-"}
+      Effectivity Date: {screen: "SCR-PM-13 Package Version › Dates", field: Effective From, mandatory: Y, type: "Date (today or later)", match: Same, difference: "-"}
+      Expiry Date: {screen: "SCR-PM-13 Package Version › Dates", field: Package End, mandatory: "N (Y on the request at submission)", type: Date, match: Same, difference: "Name differs (Package End)."}
+      Incentive Eligible: {screen: "SCR-PM-16 Incentive Criteria", field: "Products matrix (criterion applies to the product)", mandatory: "-", type: Picker, match: Different, difference: "No flag on the product; a product is eligible when an active criterion names it (C19)."}
+      Incentive Amount: {screen: "SCR-PM-16 Incentive Criteria", field: "Value (value basis Fixed amount)", mandatory: "Cond.", type: Number, match: Different, difference: "Held on the criterion, not on the product."}
+      Incentive Commission Rate: {screen: "SCR-PM-16 Incentive Criteria", field: "Value (value basis Rate)", mandatory: "Cond.", type: Number, match: Different, difference: "Held on the criterion, not on the product."}
+  E:
+    default: {screen: "-", field: "-", mandatory: "-", type: "-", match: Not in ours, difference: "Not on our New Package Request."}
+    map:
+      Line of Insurance: {screen: "SCR-PM-03 New Package Request", field: Product line, mandatory: Y, type: Drop-down, match: Same, difference: "-"}
+      Sub-Line: {screen: "SCR-PM-03", field: "Cover type / subtype", mandatory: "Cond. (Y for a new package)", type: Drop-down, match: Partial, difference: "Name differs; values to load (PQ02)."}
+      Insurer/s: {screen: "SCR-PM-03", field: Target insurers, mandatory: "Cond. (at least one when negotiated)", type: Check boxes, match: Same, difference: "-"}
+      Business Origin: {screen: "-", field: "-", mandatory: "-", type: "-", match: Not in ours, difference: "Missing; meaning to confirm."}
+      Account Officer: {screen: "-", field: "-", mandatory: "-", type: "-", match: Not in ours, difference: "Requester recorded automatically; no field to name another AO."}
+      Unit Head: {screen: "-", field: "-", mandatory: "-", type: "-", match: Not in ours, difference: "Marketing approver recorded in the history."}
+      Estimated No. of Policies to be Issued: {screen: "-", field: "-", mandatory: "-", type: "-", match: Not in ours, difference: "Missing with BDOI's rule 'must be at least 20'."}
+      Estimated Total Basic Premium to be Issued: {screen: "-", field: "-", mandatory: "-", type: "-", match: Not in ours, difference: "Missing with BDOI's rule 'must be at least PHP 5M'."}
+      Insured's Name: {screen: "SCR-PM-03", field: Client or prospect, mandatory: "Cond. (client-specific)", type: Look-up, match: Partial, difference: "Only for client-specific packages."}
+      Perils/Coverages: {screen: "SCR-PM-03 › Coverages and perils", field: "Coverage, Included, Limit, Deductible", mandatory: N, type: Table, match: Same, difference: "-"}
+      Type of Cover: {screen: "SCR-PM-03", field: "Cover type / subtype", mandatory: "Cond.", type: Drop-down, match: Partial, difference: "Values to load."}
+      Description of Cover: {screen: "SCR-PM-03 › Requested terms", field: "Heading / Details", mandatory: "Cond. (on submission)", type: Text, match: Partial, difference: "Free sections."}
+      Benefits/Coverages: {screen: "SCR-PM-03 › Coverages and perils", field: Coverage, mandatory: N, type: Table, match: Partial, difference: "Coverage list for Personal Accident."}
+      Cover: {screen: "SCR-PM-03 › Requested terms", field: "Heading / Details", mandatory: "Cond.", type: Text, match: Partial, difference: "Free sections."}
+      Cover / Undertaking: {screen: "SCR-PM-03 › Requested terms", field: "Heading / Details", mandatory: "Cond.", type: Text, match: Partial, difference: "Free sections."}
+      Extensions of Cover: {screen: "SCR-PM-03 › Coverages and perils", field: "Coverage (kind Extension)", mandatory: N, type: Table, match: Partial, difference: "Extensions as coverages."}
+      Warranties, Clauses: {screen: "-", field: "-", mandatory: "-", type: "-", match: Not in ours, difference: "Clauses are set on the version's insurer terms, not requested on the form."}
+      Other Instructions: {screen: "SCR-PM-03 › Requested terms", field: "Heading / Details", mandatory: N, type: Text, match: Partial, difference: "Free sections."}
+      Deductibles: {screen: "SCR-PM-03 › Coverages and perils", field: Deductible, mandatory: N, type: Amount, match: Same, difference: "-"}
+      Maximum Limit/s: {screen: "SCR-PM-03", field: "Limit (per coverage); Package TSI limit", mandatory: N, type: Amount, match: Partial, difference: "Amounts, not text."}
+      Premium: {screen: "SCR-PM-03 › Rate scheme and package term", field: Minimum premium, mandatory: N, type: Amount, match: Different, difference: "Minimum premium, not a premium amount."}
+      Premium Rates: {screen: "SCR-PM-03 › Rate scheme and package term", field: Requested rate %, mandatory: N, type: Percent, match: Same, difference: "-"}
+      Commission Rates: {screen: "SCR-PM-03 › Rate scheme and package term", field: Commission %, mandatory: N, type: Percent, match: Same, difference: "-"}
+  BC:
+    default: {screen: "BRD-1 SCR-NB-10 New Proposal Request", field: "Risk details (heading and details)", mandatory: "Cond. (risk details or items)", type: Text, match: Not in ours, difference: "Not in the BRD-3 FRS (non-package). BIBS New Business captures it as free risk details or as a field rule of the product; no dedicated field."}
+    map:
+      Line of Insurance: {screen: "BRD-1 SCR-NB-10", field: "Product line and risk code", mandatory: Y, type: Drop-down, match: Not in ours, difference: "BRD-3 FRS: not covered. BIBS New Business: same."}
+      Transaction Type: {screen: "-", field: "-", mandatory: "-", type: "-", match: Not in ours, difference: "BIBS proposal requests are new business; renewal (BRD-6) and endorsement (BRD-2) have their own processes."}
+      Expiring / Existing Policy No.: {screen: "-", field: "-", mandatory: "-", type: "-", match: Not in ours, difference: "Not on the proposal request."}
+      Preferred / Expiring / Existing Insurer/s: {screen: "BRD-1 SCR-NB-10", field: Insurers requested, mandatory: N, type: Check boxes, match: Not in ours, difference: "BIBS: insurers requested; no expiring insurer."}
+      Expiring / Existing Share per Insurer: {screen: "-", field: "-", mandatory: "-", type: "-", match: Not in ours, difference: "Not on the proposal request."}
+      Expiring / Existing Premium Rate per Insurer: {screen: "-", field: "-", mandatory: "-", type: "-", match: Not in ours, difference: "Not on the proposal request."}
+      Expiring / Existing Commission Rate per Insurer: {screen: "-", field: "-", mandatory: "-", type: "-", match: Not in ours, difference: "Not on the proposal request."}
+      Policy Type: {screen: "-", field: "-", mandatory: "-", type: "-", match: Not in ours, difference: "No Policy Type list; product features (fleet, multi-year)."}
+      Sub-Line: {screen: "BRD-1 SCR-NB-10", field: "Product line and risk code", mandatory: Y, type: Drop-down, match: Not in ours, difference: "The risk code within the line plays the sub-line role."}
+      Business Origin: {screen: "BRD-1 SCR-NB-06 / 14", field: "Source channel (nearest, to confirm)", mandatory: N, type: Drop-down, match: Not in ours, difference: "Not on the proposal request; meaning to confirm."}
+      Account Officer: {screen: "-", field: "-", mandatory: "-", type: "-", match: Not in ours, difference: "Not a field of the proposal request."}
+      Unit Head: {screen: "-", field: "-", mandatory: "-", type: "-", match: Not in ours, difference: "Not a field; Marketing approver in the history."}
+      Insured's Name: {screen: "BRD-1 SCR-NB-10", field: Client or prospect, mandatory: Y, type: Look-up, match: Not in ours, difference: "BIBS New Business: same."}
+      Mailing Address: {screen: "BRD-1 SCR-NB-14 New Account", field: Mailing address, mandatory: N, type: Text, match: Not in ours, difference: "On the account and client master, not on the request."}
+      Effectivity Date: {screen: "BRD-1 SCR-NB-10", field: Period from, mandatory: N, type: Date, match: Not in ours, difference: "BIBS New Business: same."}
+      Expiry Date: {screen: "BRD-1 SCR-NB-10", field: Period to, mandatory: N, type: Date, match: Not in ours, difference: "BIBS New Business: same."}
+      Mortgagee: {screen: "BRD-1 SCR-NB-14 New Account", field: Mortgagee bank, mandatory: "N (mortgage products)", type: Drop-down, match: Not in ours, difference: "On the account, not on the request."}
+      Premium: {screen: "BRD-1 SCR-NB-11 Terms dialog", field: Premium, mandatory: "Y when terms are received", type: Amount, match: Not in ours, difference: "Captured from the insurer's response."}
+      Premium Rates: {screen: "BRD-1 SCR-NB-06 / 10 risk items", field: "Rate % (non-motor)", mandatory: N, type: Number, match: Not in ours, difference: "Per risk item."}
+      Commission Rates: {screen: "BRD-1 SCR-NB-14 New Account", field: Commission % override, mandatory: N, type: Number, match: Not in ours, difference: "On the account."}
+      Vehicle Type: {screen: "BRD-1 risk items (vehicle)", field: Body type, mandatory: "Per field rules", type: "Drop-down (vehicle body types)", match: Not in ours, difference: "Values differ from BDOI's (PC Sedan, PC SUV/AUV, CV, Motorcycle, LTO, Various)."}
+      Year Model: {screen: "BRD-1 risk items (vehicle)", field: Year model, mandatory: "Per field rules", type: Number, match: Not in ours, difference: "BIBS New Business: same."}
+      Manufacturer: {screen: "BRD-1 risk items (vehicle)", field: Make, mandatory: "Per field rules", type: Text, match: Not in ours, difference: "Text in BIBS; drop-down in BDOI's."}
+      Model / Variant: {screen: "BRD-1 risk items (vehicle)", field: Model, mandatory: "Per field rules", type: Text, match: Not in ours, difference: "Text in BIBS; drop-down in BDOI's."}
+      Sum Insured per Peril: {screen: "BRD-1 risk items", field: Sum insured, mandatory: "Y to rate", type: Amount, match: Not in ours, difference: "One sum insured per item, not per peril."}
+      Currency: {screen: "BRD-1 SCR-NB-14 New Account", field: Currency, mandatory: N, type: Text, match: Not in ours, difference: "On the account."}
+      Location/s of Risk: {screen: "BRD-1 risk items (location)", field: Address, mandatory: "Y for a location", type: Text, match: Not in ours, difference: "BIBS New Business: same."}
+      Location/s of Risk City: {screen: "BRD-1 risk items (location)", field: City, mandatory: "Per field rules", type: Text, match: Not in ours, difference: "BIBS New Business: same."}
+      "Location/s of Risk: Province": {screen: "BRD-1 risk items (location)", field: Province, mandatory: "Per field rules", type: Text, match: Not in ours, difference: "BIBS New Business: same."}
+      Location of Risk: {screen: "BRD-1 risk items (location)", field: Address, mandatory: "Y for a location", type: Text, match: Not in ours, difference: "BIBS New Business: same."}
+      Properties Insured: {screen: "BRD-1 risk items (location)", field: "Insured items (description, sum insured)", mandatory: N, type: Table, match: Not in ours, difference: "Free description, no property type list."}
+      Description of Properties Insured: {screen: "BRD-1 risk items (location)", field: "Insured items: description", mandatory: N, type: Text, match: Not in ours, difference: "BIBS New Business: same."}
+      Sum Insured per Property Insured: {screen: "BRD-1 risk items (location)", field: "Insured items: sum insured", mandatory: N, type: Amount, match: Not in ours, difference: "BIBS New Business: same."}
+      Total Sum Insured: {screen: "BRD-1 SCR-NB-11 Summary", field: Total sum insured, mandatory: "-", type: "Amount (computed)", match: Not in ours, difference: "BIBS New Business: computed, same."}
+      Building Description: {screen: "BRD-1 risk items (location)", field: Construction class, mandatory: "Per field rules", type: Drop-down, match: Not in ours, difference: "Values to align with Class A, Class B, Light Material."}
+      Building Occupancy: {screen: "BRD-1 risk items (location)", field: Occupancy, mandatory: "Per field rules", type: Drop-down, match: Not in ours, difference: "Values to align with Residential, General, Warehouse, Industrial."}
+      No. of Persons to be Covered: {screen: "BRD-1 risk items (person)", field: "Person rows (name, birth date, relationship)", mandatory: "Name Y per person", type: Table, match: Not in ours, difference: "Persons listed one by one, not counted."}
+      Incentive Eligible: {screen: "BRD-1 invoice", field: Incentive eligibility indicator, mandatory: "-", type: "Rule-based", match: Not in ours, difference: "Set at booking when paid, not entered on the request."}
+      Incentive Amount: {screen: "-", field: "-", mandatory: "-", type: "-", match: Not in ours, difference: "Held on incentive criteria."}
+      Incentive Commission Rate: {screen: "-", field: "-", mandatory: "-", type: "-", match: Not in ours, difference: "Held on incentive criteria."}
+  # Our fields that BDOI's annexes do not list (package request and package version).
+  ours_only:
+    - {annex: "Not in Annex E", screen: "SCR-PM-03 New Package Request", field: Request type, mandatory: Y, type: Drop-down, difference: "Six request types; BDOI has New and Update in the list only."}
+    - {annex: "Not in Annex E", screen: "SCR-PM-03", field: Scope, mandatory: Y, type: Option, difference: "Generic programme or client-specific package."}
+    - {annex: "Not in Annex E", screen: "SCR-PM-03", field: Package product, mandatory: "Cond. (except new)", type: Drop-down, difference: "The existing package of an amend, update, renew, reactivate or retire request (BDOI: Reference Number for update requests)."}
+    - {annex: "Not in Annex E", screen: "SCR-PM-03", field: "Reason; Comment on the reason", mandatory: "Y; Cond. (Others)", type: "Drop-down; Text", difference: "Request reason list."}
+    - {annex: "Not in Annex E", screen: "SCR-PM-03", field: Negotiate with the insurers, mandatory: "Cond.", type: Check box, difference: "For update, renew and reactivate requests."}
+    - {annex: "Not in Annex E", screen: "SCR-PM-03", field: Market segments, mandatory: N, type: Multi-select, difference: "-"}
+    - {annex: "Not in Annex E", screen: "SCR-PM-03", field: Package TSI limit, mandatory: N, type: Amount, difference: "-"}
+    - {annex: "Not in Annex E", screen: "SCR-PM-03", field: "Effective from; Package start; Package end; Anniversary", mandatory: "Package end Y on submission", type: Date, difference: "BDOI's request has no dates (Annex A has Effectivity and Expiry on the product)."}
+    - {annex: "Not in Annex E", screen: "SCR-PM-03", field: Documents, mandatory: N, type: Attachment, difference: "BDOI states attachments in FRPM.011.02."}
+    - {annex: "Not in Annex A", screen: "SCR-PM-11 Products", field: Code (risk code), mandatory: Y, type: Text, difference: "Risk code per line pattern (PMADD01)."}
+    - {annex: "Not in Annex A", screen: "SCR-PM-11 Products", field: "Default rate %; Default commission %; Maximum term (years); Placement after; TSU review", mandatory: N, type: "Number; Drop-down", difference: "Product defaults and routing."}
+    - {annex: "Not in Annex A", screen: "SCR-PM-11 Products", field: "Features (package, fleet, mortgage related, direct payment, multi-year, Free First Year)", mandatory: N, type: Check boxes, difference: "-"}
+    - {annex: "Not in Annex A", screen: "SCR-PM-13 Package Version", field: "Package Start; Anniversary", mandatory: N, type: Date, difference: "-"}
+    - {annex: "Not in Annex A", screen: "SCR-PM-13 Package Version", field: "ManCom Sign-off Reference; Computation Basis; Change Summary", mandatory: N, type: Text, difference: "Origin of the version."}
+    - {annex: "Not in Annex A", screen: "SCR-PM-13 Package Version › Insurers", field: "Role; Share %", mandatory: "Y; N", type: "Drop-down; Number", difference: "Co-insurance roles and shares (PQ03)."}
+
+# Quotation slip templates of Annex D (non-package) and F (package) against the BIBS quotation slips. 'covered' are the
+# labels of BDOI's templates that the BIBS slip also fills; the other labels are listed as the difference.
+qs_compare:
+  package:
+    annex: "Annex F – Package QS template"
+    screen: "Package quotation slip (draft layout), Negotiation tab (FR-PM-030, DO-02)"
+    ours: "One slip per round: slip number, round, request, package, line, client or programme, reply date; round notes; requested terms (sections; coverages with included, limit, sub-limit, deductible; rate %, minimum premium, commission %, TSI limit, computation basis, dates; insurers); opening text; signature lines Prepared by and Approved by."
+    covered: [Reference No, Line of Insurance, Insured’s Name, Perils / Coverages, Perils/Coverages, Cover, Deductibles, Maximum Limit/s, Premium Rates/ Commission Rates, Premium Rates / Commission Rates, Description of Cover, Benefits / Coverages, Extensions of Cover, Cover / Undertaking, Type of Cover]
+    extra: "BDOI's template also has the law and jurisdiction clause, the TSU handler's signature and the insured's conforme; ours adds the round, reply due date and round notes."
+  non_package:
+    annex: "Annex D – Non-package QS template"
+    screen: "BIBS New Business quotation slip, Proposal Request record (FR-NB-053, BRD-1 DO-02)"
+    ours: "One slip per insurer approached: QS number, PRF, ARN, client, product, period, reply date; risk details and risk items with sums insured; request text with the reply date."
+    covered: [Reference No, Line of Insurance, Insured’s Name, Period of Insurance]
+    extra: "Line-specific details appear only as keyed in the risk details or risk items of the request. BDOI's template also has the law and jurisdiction clause, the TSU handler's signature and the insured's conforme."

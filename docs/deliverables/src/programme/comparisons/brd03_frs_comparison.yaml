@@ -1,0 +1,1470 @@
+# Comparison of BDOI's Product Maintenance FRS (BDO ITG, v1.0 of 19-Aug-2026) with the BIBS FRS BRD-3 Product
+# Maintenance v2.1 (8-Oct-2026): summary, structure, pros and cons, BRD coverage, requirement mapping, conflicts and the
+# incorporation plan. The lists (only in ours, only in BDOI's, field mapping) are in brd03_frs_comparison_lists.yaml;
+# BDOI's own text is in bdoi_frs_brd03.yaml. Read by build_frs_comparison.py.
+meta:
+  title: "BDOI FRS vs BIBS FRS – Product Maintenance"
+  subtitle: "Comparison of BDOI's FRS (BDO ITG, v1.0, 19-Aug-2026) with the BIBS FRS BRD-3 v2.1 (8-Oct-2026), and the plan to bring our content into BDOI's format"
+  doc_type: Comparison workbook
+  brd: BRD-03
+  version: "1.0"
+  date: 9 October 2026
+  filename: BIBS_Comparison_BRD-03_BDOI_FRS_vs_BIBS_FRS_Product_Maintenance_v1.0.xlsx
+  ours:
+    title: "BIBS FRS BRD-3 Product Maintenance v2.1, 8-Oct-2026 (iorta TechNXT), with its sign-off workbook, test plan, configuration input templates and UX screen documents"
+    baseline: "Product Maintenance BRD v1.0 (24-Nov-2025, approved Nov-2025 to Jan-2026) and Addendum v1.1 (10-Apr-2026), the baseline restated in our FRS v2.1 of 8-Oct-2026 (no newer BRD received)"
+
+# ------------------------------------------------------------------ 1 Summary and recommendation
+summary:
+  purpose:
+    - doc: BDOI's FRS
+      text: >-
+        Written by BDO ITG (System Analyst Angela V. Ramirez) in the BDO ITG FRS template for project PRJ0012475. It is
+        meant to become "the official baseline of functional requirements" after approval, owned by BDO ITG and changed
+        through the project's change management. It maps each BRD requirement to functional requirement IDs (FRPM.001 to
+        FRPM.021, 35 numbered sub-items), describes the capabilities as "The system shall ..." statements, shows two
+        swimlane process flows (non-package and new package request) and lists the fields per product line in Annex A to
+        F, with the quotation slip templates of 14 lines embedded in Annex D and F.
+    - doc: Our FRS (BIBS FRS BRD-3 v2.1)
+      text: >-
+        Written by the iorta TechNXT project team as the business sign-off document of the BIBS release set BRD-3. It
+        turns each BRD requirement into 39 functional requirements (FR-PM-001 to FR-PM-081) with actors, flows, business
+        rules, validations and messages, fields, notifications, audit and 104 numbered acceptance criteria, and adds the
+        business view of the proposed system: workflow and status model, reports, 22 screen specifications with
+        screenshots, two end-to-end walkthroughs, the messages and notifications catalogues, document outputs,
+        configuration inputs, cross-BRD contract, sign-off and change control and 24 proposed rules for confirmation.
+        It is traced to the 270 test cases of the test plan.
+  headline_pros:
+    BDOI's FRS:
+      - "In BDO ITG's own FRS template, prepared by ITG: BDOI owns it and it fits ITG's approval and change process."
+      - "Concise (about 8,900 words): one table of capabilities that a business reader can review in one sitting."
+      - "Named field lists per product line (Annex A, B, C, E) with list values (policy types, sub-lines, vehicle and engine types, building classes, occupancy, basis of valuation)."
+      - "The real quotation slip templates of 14 lines for package and non-package requests (Annex D and F), which our FRS still waits for (Q03)."
+      - "Covers the non-package quotation request, proposal and client response in the same module, as Marketing and TSU work today, with two process flows."
+      - "Concrete operational choices: 90-day expiry alerts, a weekly Placement Update Report (Thursday 8am), file naming conventions, dashboard filters and export formats."
+    Our FRS:
+      - "Every BRD requirement (31 IDs) is met by at least one FR, with BRD page references, and each FR has numbered acceptance criteria traced to 270 test cases."
+      - "Business rules, validations and the exact messages, the segregation of duties (four-eyes) rules and the full status model with service levels are stated."
+      - "Covers the BRD points BDOI's FRS leaves out or waives: rate-scheme versions and the approval of non-current rates (BRPM.007), advisories (BRPM.016), document protection (BRPM.020), negotiation rounds (PMADD04), the requirements pack and the post set-up validation checklist (BRPM.015, PMADD06)."
+      - "Screen specifications with screenshots, walkthroughs, messages and notifications catalogues that match the proposed system, so the business sees what it signs."
+      - "Lists every point that needs a BDOI decision (CLR-PM-01 to 24, PM-Q01 to PM-Q58)."
+  headline_cons:
+    BDOI's FRS:
+      - "No acceptance criteria and no validation messages; several items say what the system shall show but not the rule (for example the Placement Update Status rules are announced but missing)."
+      - "BRPM.020 document security is marked 'Under negotiation if can be waived'; BRPM.007 non-current rate approval, BRPM.016 advisories and BRPM.017 renewal requests are only partly addressed."
+      - "Package and non-package text is copied between items, with some inconsistencies (status names, list headings, 'Renewal' in the audit fields)."
+      - "Approvers are chosen by name by the user; segregation of duties and service levels are not stated."
+      - "Not aligned with the proposed system on several points (deployment request, sequential Marketing approval, ManCom routing, proposal slips in the package path, reports builder)."
+    Our FRS:
+      - "Long (about 30,000 words of source, 22 screen specifications and over 100 figures and screenshots): heavy for a business reader."
+      - "Not in BDO ITG's template and numbering; ITG did not prepare it."
+      - "Scoped to package products only; the non-package quotation request is in the New Business FRS (BRD-1), not in Product Maintenance."
+      - "Field lists per product line are generic (configurable field rules) rather than BDOI's named fields; document layouts are draft until BDOI provides its own."
+      - "Some BDOI operational choices are not reflected (90-day alerts, weekly scheduled report, dashboard filters, named approver selection)."
+  recommendation:
+    title: "Recommended: merge our content into BDOI's FRS, keep BDOI's template and FRPM numbering as primary, carry our FR-PM IDs as cross-reference"
+    text: >-
+      Use BDOI's FRS v1.0 as the master document and issue it as BDOI's v1.1 (draft for review), owned by BDO ITG, with our
+      content inserted: our rules, validations and acceptance criteria as numbered sub-items under each FRPM item, our
+      functional requirements that BDOI's FRS lacks as new FRPM items (FRPM.022 onwards), and our screen specifications,
+      messages, notifications, walkthroughs and storyboard, role-to-action matrix, workflow and configuration and
+      traceability as Annex G to M. BDOI's FRPM.nnn.nn stays the primary ID; each sub-item carries the FR-PM-nnn it
+      matches in brackets, and the Business Requirements Mapping table gets a fourth column "BIBS FR (cross-reference)",
+      so our test plan, sign-off workbook and UX screen documents stay valid without renumbering. Before merging, BDOI
+      decides the conflicts in sheet 8 in one working session with TSU, MBS, Marketing and ITG; the decisions set the
+      text that goes in. Our BIBS sign-off set then becomes the supporting pack referenced from Annex G to M.
+    why:
+      - "BDOI ITG's process makes the approved FRS the official baseline; working in its template avoids a second baseline and a later reconciliation."
+      - "BDOI's document is short and structured by capability; our detail fits under each capability as sub-items and annexes without rewriting either side."
+      - "Keeping FR-PM IDs as cross-reference keeps the 270 test cases, the 325 field rows and the 276 messages traced."
+      - "BDOI's annexes (fields, sub-line values, quotation slip templates) answer open questions of ours (PQ02, Q03) and go in unchanged."
+  alternatives:
+    - option: "A. Keep both documents: BDOI's FRS as the business baseline, our FRS as its detailed specification referenced from it"
+      tradeoff: "Least effort now (about 3 person-days for a cross-reference table). Two documents to keep in step; the conflicts of sheet 8 remain in two places and every change is made twice; a reader must open both."
+    - option: "B. Reverse merge: our FRS stays the master, BDOI's annexes, process flows and operational choices are merged into it"
+      tradeoff: "Our document is already sign-off ready and test-traced (about 10 person-days). It is not in BDO ITG's template and ITG did not prepare it, so ITG may not accept it as the baseline; BDOI's numbering is lost."
+    - option: "C. Rewrite in BDOI's template with our FR-PM IDs as the primary numbering"
+      tradeoff: "One numbering across our test plan and BDOI's document. Every FRPM reference in BDOI's mapping table and process notes changes; the most effort (about 45 person-days) and the least familiar to BDOI readers."
+  notes:
+    - "Counts are taken from the documents: BDOI's FRS as received (19-Aug-2026); our FRS v2.1 with its sign-off workbook (22 screens, 325 fields, 104 actions, 84 screen rules, 276 messages, 11 notifications) and test plan (138 test conditions, 270 test cases)."
+    - "Platform status says whether BIBS supports the item today: Yes, Partly or No. Where BIBS supports a non-package item, it is described in the BIBS FRS BRD-1 New Business (FR-NB-050 to FR-NB-057), not in the BRD-3 FRS."
+
+# ------------------------------------------------------------------ 2 Structure comparison
+structure:
+  - bdoi: "Cover table (project, title, version, preparer)"
+    ours: "Cover and document control (version history v0.9 to v2.1, distribution list)"
+    bdoi_content: "PRJ0012475, title, v1.0, 'Prepared by: Angela V. Ramirez'"
+    ours_content: "Document ID, version 2.1, status 'Issued for BDOI business sign-off', four versions with author, reviewer and approver, distribution to six parties"
+    depth: "BDOI: minimal; ours: full control"
+    assessment: "Keep BDOI's cover; add our distribution list to its revision log."
+  - bdoi: "Document Revision Log"
+    ours: "Document control (front matter)"
+    bdoi_content: "One row: 19-Aug-2026, 1.0, Initial Document"
+    ours_content: "Change summary per version"
+    depth: Equal purpose
+    assessment: "Use BDOI's log; record the merge as v1.1."
+  - bdoi: "1 Introduction – Document Purpose; Project Overview; Document Preparation, Review and Approval"
+    ours: "1 Introduction (purpose, scope with in and out of scope, references R1-R10, definitions and acronyms, how to read an FR); 2 Business context and process overview (current vs envisioned, 12 process steps, figure, request types)"
+    bdoi_content: "Purpose of an FR document, project overview (manual processes today, controlled and auditable workflow), who prepares and approves"
+    ours_content: "Scope table by area and BRD ID, out-of-scope items with reasons, references with versions, glossary (26 terms), before/after process, request types"
+    depth: "BDOI: short and generic; ours: specific"
+    assessment: "Keep BDOI's three sub-sections; add our scope table, out-of-scope list, references and glossary as new sub-sections 1.4 to 1.7."
+  - bdoi: "2 Business Requirements Mapping (31 BRD IDs to FRPM IDs)"
+    ours: "11 Traceability (BRD ID to FR, screen and test cases); Appendix User-story view"
+    bdoi_content: "BRD Req No, the BRD text, FR IDs; PMADD05, BRPM.001 and 002 refer to the User Access Maintenance FRS; BRPM.020 'Under negotiation if can be waived'"
+    ours_content: "Each BRD ID with its FRs, main screen and test cases; user story per BRD ID with acceptance criteria and test cases"
+    depth: "Equal coverage of IDs; ours adds screens and tests"
+    assessment: "Keep BDOI's table; add a column 'BIBS FR (cross-reference)' and move our test-case trace to Annex M."
+  - bdoi: "3 Functional Requirements (table FRPM.001 to FRPM.021, 35 sub-items)"
+    ours: "3 Personas and roles; 4 Functional requirements (39 FRs in 9 areas, each with flows, rules, validations, fields, notifications, audit and acceptance criteria)"
+    bdoi_content: "Component / module / screen, capability, 'The system shall ...' statements with displayed fields and statuses"
+    ours_content: "Header (BRD trace, actor, priority, screens), description, preconditions, main and alternate flows, business rules (fixed or configurable), validations with messages, fields, notifications, audit, acceptance criteria"
+    depth: "BDOI: capability level; ours: rule and test level"
+    assessment: "Keep BDOI's table as the frame; add our rules, validations and acceptance criteria as numbered sub-items; add our FRs that BDOI lacks as FRPM.022 onwards (sheet 10)."
+  - bdoi: "(none)"
+    ours: "5 Workflow and status model (stages, owners, service levels, transitions, package version states, escalation)"
+    bdoi_content: "Statuses are listed inside FRPM.005.01, 011.01 and 016.01"
+    ours_content: "15 stages with owner and service level, 23 transitions with reason lists, 5 version states"
+    depth: "Only ours"
+    assessment: "Add as Annex L with the status names agreed in sheet 8."
+  - bdoi: "4 Process Flow – Non-Package Request; New Request"
+    ours: "2.2 Process overview figure (package lifecycle by actor); 5 workflow figure; 14 walkthroughs"
+    bdoi_content: "Two swimlane flows (Marketing, TSU, Insurer, MBS) including 'Upload ISACOM Approval' and 'Generate and send Placement Update to Marketing'"
+    ours_content: "Lifecycle figure by actor, workflow figure, two walkthroughs with 36 steps and screenshots"
+    depth: "BDOI: flow level; ours: flow and screen level"
+    assessment: "Keep BDOI's flows; align the package flow with the decisions of sheet 8; add our walkthroughs and storyboard as Annex J."
+  - bdoi: "(none)"
+    ours: "6 Reports and documents (3 report layouts with parameters and columns; 6 document templates)"
+    bdoi_content: "Report columns inside FRPM.007.01 and FRPM.019.01; documents in Annex D and F"
+    ours_content: "Package Status Update Report, Package Expiry Report, Package Version History with columns; document templates with sections"
+    depth: "Ours more complete for reports; BDOI's real templates for the quotation slip"
+    assessment: "Put our report layouts under FRPM.007 and FRPM.019; take BDOI's templates as the quotation slip layouts."
+  - bdoi: "(none)"
+    ours: "7 Interfaces and integration; 20 Cross-BRD dependencies and interface contract"
+    bdoi_content: "Notification via Microsoft 365 in FRPM.014.01; no interface section"
+    ours_content: "10 interfaces with direction, trigger and scope; contract with the other BRDs"
+    depth: "Only ours"
+    assessment: "Add as a new FRPM item for BRPM.022 and reference the contract as a supporting document."
+  - bdoi: "(none)"
+    ours: "8 Non-functional requirements"
+    bdoi_content: "-"
+    ours_content: "Users, volumes, response time, peaks, availability, recovery, devices, security, audit, retention"
+    depth: "Only ours"
+    assessment: "BDOI's template has no NFR section; keep as supporting document (programme NFR catalogue) and reference it."
+  - bdoi: "(none)"
+    ours: "9 Configuration items (parameters, lists of values, masters and rules maintained by the business)"
+    bdoi_content: "'configurable' is stated for the report schedule and file naming"
+    ours_content: "14 parameters with defaults, 10 lists of values, 10 masters with maker and authoriser"
+    depth: "Only ours"
+    assessment: "Add as Annex L (with the workflow)."
+  - bdoi: "(none)"
+    ours: "10 Assumptions, dependencies and open questions; 22 Proposed business rules and clarifications"
+    bdoi_content: "BRPM.020 note only"
+    ours_content: "8 assumptions, 6 dependencies, 17 open questions, 24 clarifications with the decision requested"
+    depth: "Only ours"
+    assessment: "Resolve in the decision session; keep the open items in the clarification register, not in the FRS."
+  - bdoi: "(none)"
+    ours: "12 Navigation; 13 Screen specifications (22 screens); 15 Messages; 16 Notifications; 17 Document outputs; 18 Upload screens"
+    bdoi_content: "Displayed fields listed per list screen in the FRPM text"
+    ours_content: "Screen index, flow, menu by persona, common elements; per screen: purpose, access, fields (325), actions (104), rules (84), outcome, tests; 276 messages; 11 notifications"
+    depth: "Only ours"
+    assessment: "Add as Annex G (screens), H (messages), I (notifications)."
+  - bdoi: "(none)"
+    ours: "19 Configuration inputs the business provides (CI-01 to CI-10)"
+    bdoi_content: "-"
+    ours_content: "Ten templates with owner, due date and order"
+    depth: "Only ours"
+    assessment: "Keep as supporting document (workbook 06); reference it from Annex L."
+  - bdoi: "5 Signoff Sheet"
+    ours: "21 Sign-off and change control (what is signed, how the review is recorded, what signing freezes, change after sign-off, signatures)"
+    bdoi_content: "Prepared by System Analyst; reviewed by Tech Lead and Application or Platform Owner; approved by Project Owner / Project Sponsor (add BU signatories)"
+    ours_content: "Seven signatories (Product Owner, MBS, TSU, Retail Marketing, Comptrollership, BPS, iorta TechNXT PM) and the freeze rules"
+    depth: "BDOI: ITG roles; ours: business units"
+    assessment: "Keep BDOI's sheet; add the business unit signatories 'as applicable' from our list and the freeze rules as a note."
+  - bdoi: "Annex A – Package Product Fields; Sub Line Dropdown Values"
+    ours: "Screen specifications SCR-PM-11 Products, SCR-PM-13 Package Version"
+    bdoi_content: "27 fields with type, product lines and list values; sub-line values for 6 lines"
+    ours_content: "Generic product and version fields; product lines and coverages from master data"
+    depth: "BDOI: named per line; ours: structured but generic"
+    assessment: "Keep Annex A; add our field per row (sheet 9) and list the fields still missing."
+  - bdoi: "Annex B – Non-Package Product Fields; Annex C – Non-Package Quotation Request Fields"
+    ours: "(not in BRD-3; BRD-1 New Proposal Request SCR-NB-10 and risk items)"
+    bdoi_content: "85 and 91 fields per product line"
+    ours_content: "-"
+    depth: "Only BDOI"
+    assessment: "Keep; reference the BRD-1 screens once the scope decision is taken."
+  - bdoi: "Annex D – Non-Package Quotation Slip Templates; Annex F – Package Quotation Slip Templates"
+    ours: "17 Document outputs (draft layout of the package quotation slip; New Business quotation slip of BRD-1)"
+    bdoi_content: "14 Word templates each, embedded as zip files"
+    ours_content: "Draft layouts waiting for BDOI's (Q03, CLR-PM-02)"
+    depth: "BDOI provides the layouts"
+    assessment: "Keep; load as the template versions of the quotation slip (configuration input CI-08)."
+  - bdoi: "Annex E – Package Request Fields"
+    ours: "SCR-PM-03 New Package Request"
+    bdoi_content: "26 fields with types, product lines and two minimums"
+    ours_content: "26 fields of the request form"
+    depth: Equal size, different fields
+    assessment: "Merge (sheet 9): add BDOI's fields to the form; keep ours that BDOI lacks."
+  - bdoi: "(none)"
+    ours: "Appendix User-story view; Appendix Storyboard index; Appendix Screen standards"
+    bdoi_content: "-"
+    ours_content: "31 user stories; 36 storyboard frames; 15 screen standards"
+    depth: "Only ours"
+    assessment: "Storyboard to Annex J; user-story view and screen standards stay supporting documents."
+
+# ------------------------------------------------------------------ 3 Pros and cons
+pros_cons:
+  - group: Completeness
+    BDOI's FRS:
+      pros: "Covers package and non-package work in one module (quotation request, quotation slip, comparative, proposal, client response) as the business works today; includes dashboard, reports, audit logs and incentives."
+      cons: "No FR for BRPM.020 (waiver under negotiation); BRPM.007 (non-current rate approval), BRPM.016 (advisory drafting and sending), BRPM.017 (renewal request routing) and BRPM.022 (integration with BDOI systems) only partly; Placement Update Status rules missing; incentive criteria content not defined."
+    Our FRS:
+      pros: "39 FRs cover all 31 BRD IDs with flows, rules and alternate paths; workflow, reports, interfaces, NFRs and configuration are stated."
+      cons: "Package products only; non-package requests are in the New Business FRS. No reports builder, weekly scheduled report or anniversary-based alert."
+  - group: Traceability
+    BDOI's FRS:
+      pros: "One mapping table from each BRD ID to FRPM IDs; FRPM sub-item numbering is easy to cite."
+      cons: "Some mappings point to items that do not hold the requirement (BRPM.005 to the reports builder, BRPM.016 to package request attachments, BRPM.011 to the non-package quotation request); no BRD page references; no trace to tests."
+    Our FRS:
+      pros: "Each FR cites BRD ID and page; traceability to screens and 270 test cases; user-story view per BRD ID."
+      cons: "Its own FR-PM numbering, not BDOI's; the trace lives in several places (FR headers, chapter 11, appendix, test plan)."
+  - group: Testability and acceptance criteria
+    BDOI's FRS:
+      pros: "Many statements are concrete and testable as written (for example 'Remarks shall be mandatory for Rejected and Returned requests', 'must be at least 20')."
+      cons: "No acceptance criteria and no negative cases; UAT cases would have to be derived."
+    Our FRS:
+      pros: "104 numbered acceptance criteria and 92 validations with messages, the basis of 138 test conditions and 270 test cases."
+      cons: "Acceptance criteria are written against the proposed system; any BDOI decision that differs needs the criteria and cases updated."
+  - group: Screens and fields
+    BDOI's FRS:
+      pros: "Named fields per product line with list values (Annex A, B, C, E); list screen columns stated for each list."
+      cons: "No screen layouts, actions or mandatory flags per field; some data types blank (for example Currency, Basis of Valuation, Cover/Undertaking in Annex B)."
+    Our FRS:
+      pros: "22 screen specifications with screenshots, 325 fields (type, mandatory, source, validation, message) and 104 actions."
+      cons: "Line-specific fields are configured as field rules rather than listed per line; no Business Origin, Unit Head, estimated policies or premium on the request."
+  - group: Rules and validations
+    BDOI's FRS:
+      pros: "Clear numeric rules where given: incentive amount above zero, rate above 0% and up to 100%, 20 policies and PHP 5M minimum, deactivation effective date today or later, expiry date the later of effective and approval date."
+      cons: "Most rules are left to 'configure rules per field'; no segregation of duties; no service levels; no rule for who may approve."
+    Our FRS:
+      pros: "115 business rules marked fixed or configurable, four-eyes rules that cannot be switched off, service level hours per stage."
+      cons: "Some rules are proposals awaiting BDOI (PQ05 to PQ12); the volume can hide the few that need a decision."
+  - group: Messages and notifications
+    BDOI's FRS:
+      pros: "Notifications are named at each step (notify approver, requestor, next approver, MBS user, replacement and original assignee); e-mail to ManCom via Microsoft 365."
+      cons: "No message texts; no catalogue of notifications with recipients and content."
+    Our FRS:
+      pros: "Messages catalogue (276 texts word for word) and notifications catalogue (11 notices with trigger, recipient and text)."
+      cons: "Mostly in-app notices; the e-mail channel for internal users depends on user preferences."
+  - group: Process flows
+    BDOI's FRS:
+      pros: "Two readable swimlane flows that show the real hand-offs, including the insurer lane and MBS set-up loop."
+      cons: "Flows and text differ in places (for example Marketing 'Agree on Terms and select insurer/s' vs requestor selection in FRPM.008; 'Upload ISACOM Approval' not described in the text)."
+    Our FRS:
+      pros: "Lifecycle figure, workflow figure with every transition, version states and two walkthroughs with screenshots."
+      cons: "No non-package flow in this FRS (it is in BRD-1)."
+  - group: Approvals and maker-checker
+    BDOI's FRS:
+      pros: "Approve, Return and Reject at most steps with mandatory remarks; Marketing chain until Unit Head; ManCom parallel approval with the President last; reassignment of approvers."
+      cons: "Approvers are picked by name by the requester; no rule that a maker cannot approve; deactivation and matrix approval by one selected approver."
+    Our FRS:
+      pros: "Role-based approval queues with four-eyes rules everywhere (request, slip, ManCom, version validation, masters, rate exceptions); validation checklist with test premium (PMADD06)."
+      cons: "One Marketing approval and one ManCom signature until BDOI states the chain and quorum (PQ07, PQ08); no explicit 'Reject' outcome (return, void or not proceeded instead)."
+  - group: Reports
+    BDOI's FRS:
+      pros: "Weekly Consolidated Placement Update Report with columns, file name and repository; Renewal Request Report; reports builder; export to Excel, PDF and CSV."
+      cons: "Placement Update Status rules missing; the report is on quotation requests, not on package creation status as BRPM.018 describes."
+    Our FRS:
+      pros: "Three report layouts with parameters and columns; runs logged; export to PDF, Excel, ODS and CSV; saved variants."
+      cons: "No scheduled run or report repository; report name and columns still to confirm (PQ15)."
+  - group: Non-functional
+    BDOI's FRS:
+      pros: "Audit of all report generation, download, print and export activities stated."
+      cons: "No non-functional section (volumes, response time, availability, retention)."
+    Our FRS:
+      pros: "NFR table from the BRD (users, response time under 5 seconds, 99.9% availability, RTO 4 hours, RPO 24 hours) with the proposed approach."
+      cons: "Several NFR values still to be agreed BIBS-wide (PQ18, XQ08)."
+  - group: Sign-off readiness
+    BDOI's FRS:
+      pros: "Sign-off sheet in ITG's format; BDOI authored, so approval by ITG roles is straightforward."
+      cons: "Version 1.0 with an empty revision history beyond the first issue; several open points (BRPM.020 waiver, missing rules) to close before sign-off."
+    Our FRS:
+      pros: "Issued for business sign-off with the sign-off workbook, test plan, configuration templates and UX screen documents; 'what signing freezes' and change control stated."
+      cons: "Not in ITG's template; ITG roles (System Analyst, Tech Lead, Application Owner) are not on its signature page."
+  - group: Ease of maintenance
+    BDOI's FRS:
+      pros: "One Word table; easy to edit by ITG."
+      cons: "Repeated text between package and non-package items (FRPM.006 and 012, 009 and 013) makes changes error-prone; manual numbering."
+    Our FRS:
+      pros: "Generated from structured sources with automatic consistency checks; messages and notifications taken from the system."
+      cons: "Needs the project team's tooling to regenerate; long."
+  - group: "Alignment with the BRD (baseline of 8-Oct-2026: BRD v1.0 and Addendum v1.1)"
+    BDOI's FRS:
+      pros: "Uses the BRD's own wording for the requirements in the mapping table; covers PMADD01 to 08."
+      cons: "Goes beyond the BRD in places (non-package in scope although the BRD revision of 27-Oct-2025 excluded it; deployment request; reports builder for BRPM.005) and below it in others (BRPM.020 waiver; BRPM.009 recommendation step; BRPM.012 sending from the system with confirmation and resend)."
+    Our FRS:
+      pros: "Follows the BRD acceptance criteria closely (for example BRPM.009 TL recommendation then TH approval; BRPM.015 automatic forwarding to MBS; BRPM.012 sent history and resend)."
+      cons: "Reads 'TL, TH or UH' in BRPM.008 as one approval and states proposals where the BRD is silent; both need BDOI confirmation."
+  - group: Alignment with the platform
+    BDOI's FRS:
+      pros: "Many items match BIBS already (package request, quotation slip approval, comparative export, ManCom step, MBS set-up and approval, expiry, incentive rules, audit)."
+      cons: "Items that BIBS does not support today: deployment request, sequential Marketing approval, ManCom parallel routing with the President, proposal slips in the package path, multiple options per insurer, reports builder, weekly scheduled report, anniversary alerts, dashboard filters."
+    Our FRS:
+      pros: "Written against the proposed system: screens, messages and notifications are taken from it, so what is signed is what is delivered."
+      cons: "Because it follows the system, operational choices of BDOI not yet in the system are absent until decided."
+
+# ------------------------------------------------------------------ 4 BRD coverage (BDOI's FR IDs come from bdoi_frs_brd03.yaml)
+coverage:
+  - id: PMADD01
+    bdoi_status: Partial
+    bdoi_note: "Product Matrix by Line of Insurance with sub-lines and line-specific fields; no explicit levels for type, subtype, coverage and peril."
+    ours_frs: FR-PM-010
+    ours_status: Full
+    note: "Ours holds line > cover type > subtype > product, and coverages / perils per line. BDOI's sub-line lists (Annex A) give the values ours waits for (PQ02)."
+  - id: PMADD02
+    bdoi_status: Partial
+    bdoi_note: "One Insurer per Product Matrix record with perils, deductibles and warranties as fields; no terms per insurer and coverage."
+    ours_frs: FR-PM-011, FR-PM-014
+    ours_status: Full
+    note: "Ours keeps terms per insurer and coverage (included, limit, deductible, clauses) on each package version and a clause library."
+  - id: PMADD03
+    bdoi_status: Partial
+    bdoi_note: "Fields chosen for the comparative table and for what is sent to the client; export to Excel and PDF. No retained 'master version'."
+    ours_frs: FR-PM-034, FR-PM-035
+    ours_status: Full
+    note: "The addendum asks for 'an auditable master version'; ours keeps one current master and every superseded one."
+  - id: PMADD04
+    bdoi_status: Partial
+    bdoi_note: "Insurer response values Approved, Not Covered, Others; responses can be modified. No negotiation rounds or revision log."
+    ours_frs: FR-PM-031, FR-PM-032
+    ours_status: Full
+    note: "Ours records six outcomes (list to confirm, PQ05) and numbered rounds with their slips and responses."
+  - id: PMADD05
+    bdoi_status: By reference
+    bdoi_note: "'Refer to User Access Maintenance FRS'."
+    ours_frs: FR-PM-002, FR-PM-003
+    ours_status: Full
+    note: "Ours states the Product Maintenance role-to-action matrix (proposal) and follows BRD-11 for role changes."
+  - id: PMADD06
+    bdoi_status: Partial
+    bdoi_note: "Approver approves, returns or rejects the matrix request (FRPM.003.03); no checklist; the approver is selected by the user."
+    ours_frs: FR-PM-043
+    ours_status: Full
+    note: "Ours: validation by the TSU Head or the Business Administrator, never the maker, with a checklist and test premium."
+  - id: PMADD07
+    bdoi_status: Partial
+    bdoi_note: "Incentive Eligible indicator with amount or rate per product (FRPM.003.02) and incentive eligibility rules (FRPM.018); criteria content not defined."
+    ours_frs: FR-PM-080, FR-PM-081
+    ours_status: Full
+    note: "Ours: criteria linked to products of the matrix, maker-checker, successors; the criteria types wait for BDOI (PQ04)."
+  - id: PMADD08
+    bdoi_status: Partial
+    bdoi_note: "As PMADD07; CPC2 not described."
+    ours_frs: FR-PM-080, FR-PM-081
+    ours_status: Full
+    note: "As PMADD07."
+  - id: BRPM.001
+    bdoi_status: By reference
+    bdoi_note: "'Refer to User Access Maintenance FRS'."
+    ours_frs: FR-PM-001
+    ours_status: Full
+    note: "Both point to BRD-11 for sign-in; ours repeats the Product Maintenance view (CLR-PM-23)."
+  - id: BRPM.002
+    bdoi_status: By reference
+    bdoi_note: "'Refer to User Access Maintenance FRS'."
+    ours_frs: FR-PM-002
+    ours_status: Full
+    note: "-"
+  - id: BRPM.003
+    bdoi_status: Full
+    bdoi_note: "Mandatory fields by Line of Insurance and product type with named field lists (Annex A, B, C, E)."
+    ours_frs: FR-PM-012
+    ours_status: Partial
+    note: "Ours provides the rule mechanism (presence, list, range, pattern) per line or product but no named field list per line; BDOI's annexes fill this."
+  - id: BRPM.004
+    bdoi_status: Full
+    bdoi_note: "'enforce mandatory fields based on the selected Line of Insurance and Product Type'; 'configure rules per field'."
+    ours_frs: FR-PM-012
+    ours_status: Full
+    note: "-"
+  - id: BRPM.005
+    bdoi_status: Partial
+    bdoi_note: "Mapped to FRPM.020 Reports Builder; the shared document templates of the BRD are the QS templates of Annex D and F."
+    ours_frs: FR-PM-013
+    ours_status: Full
+    note: "The BRD speaks of 'shared document templates' that adjust to each product line; ours reads it as document templates. Layouts are draft until BDOI's are loaded (Q03)."
+  - id: BRPM.006
+    bdoi_status: Partial
+    bdoi_note: "Expired Products tab (FRPM.002.02); no reactivation path or access restriction stated."
+    ours_frs: FR-PM-052, FR-PM-045, FR-PM-071
+    ours_status: Full
+    note: "-"
+  - id: BRPM.007
+    bdoi_status: Partial
+    bdoi_note: "Approved package becomes available (FRPM.003.03); no rule against outdated rates, no approval of non-current rates, no log of the rate scheme version per transaction."
+    ours_frs: FR-PM-050, FR-PM-051
+    ours_status: Full
+    note: "BRD acceptance criteria 2 to 4 (approval workflow for non-current rates, version logged) are only in ours."
+  - id: BRPM.008
+    bdoi_status: Full
+    bdoi_note: "Package Request with Marketing approval hierarchy until Unit Head (FRPM.011)."
+    ours_frs: FR-PM-020, FR-PM-021
+    ours_status: Full
+    note: "Approval chain differs (sheet 8)."
+  - id: BRPM.009
+    bdoi_status: Partial
+    bdoi_note: "One TSU review with approve, return or reject (FRPM.011.03); no TSU TL recommendation followed by TSU TH approval."
+    ours_frs: FR-PM-022, FR-PM-023
+    ours_status: Full
+    note: "The BRD asks for the TL recommendation 'visible to TSU TH' and TH approval."
+  - id: BRPM.010
+    bdoi_status: Full
+    bdoi_note: "Comparative table, insurer selection, final terms, proposal and client response."
+    ours_frs: FR-PM-032, FR-PM-033, FR-PM-036
+    ours_status: Full
+    note: "Different paths (proposal slips vs terms final and package slip), sheet 8."
+  - id: BRPM.011
+    bdoi_status: Partial
+    bdoi_note: "Mapped to the non-package quotation request (FRPM.005) and reassignment (FRPM.017); package request types are New and Update only; deletion is the deactivation request; auto-population from Marketing input not stated."
+    ours_frs: FR-PM-020, FR-PM-024, FR-PM-045
+    ours_status: Full
+    note: "-"
+  - id: BRPM.012
+    bdoi_status: Partial
+    bdoi_note: "QS generated, approved and downloaded for 'manual email transmission'; no send from the system, transmission confirmation, sent history or resend; editing until ManCom sign-off not stated."
+    ours_frs: FR-PM-030
+    ours_status: Full
+    note: "BRD expected result 4 and acceptance criteria 5 and 6 ask for sending from the system, confirmation, sent history and resend."
+  - id: BRPM.013
+    bdoi_status: Partial
+    bdoi_note: "Responses keyed in and edited in the comparative table; Marketing view-only access and Marketing review of client-specific packages not stated."
+    ours_frs: FR-PM-031, FR-PM-034, FR-PM-036
+    ours_status: Full
+    note: "-"
+  - id: BRPM.014
+    bdoi_status: Full
+    bdoi_note: "One side-by-side comparative table per request with the latest responses; export to Excel and PDF."
+    ours_frs: FR-PM-034
+    ours_status: Full
+    note: "-"
+  - id: BRPM.015
+    bdoi_status: Partial
+    bdoi_note: "ManCom approval, then a manual 'Request for Deployment' to MBS (FRPM.014 to 016); the BRD asks for automatic forwarding after sign-off; requirements content not defined."
+    ours_frs: FR-PM-040, FR-PM-041, FR-PM-042, FR-PM-043
+    ours_status: Full
+    note: "-"
+  - id: BRPM.016
+    bdoi_status: Partial
+    bdoi_note: "Attach, preview and download documents on the package request (FRPM.011); no advisory drafting, sending or block when documents are missing."
+    ours_frs: FR-PM-044
+    ours_status: Full
+    note: "-"
+  - id: BRPM.017
+    bdoi_status: Partial
+    bdoi_note: "Expiry and anniversary alerts at 90 days (FRPM.004) and the Renewal Request Report (FRPM.019); no renewal request pre-filled and routed, no MBS acceptance, no renewal advisory."
+    ours_frs: FR-PM-060, FR-PM-061, FR-PM-044
+    ours_status: Full
+    note: "Ours alerts on the end date only (60, 30, 7 days by default); anniversary alerts are only in BDOI's."
+  - id: BRPM.018
+    bdoi_status: Partial
+    bdoi_note: "Weekly Consolidated Placement Update Report of quotation requests (FRPM.007); package creation status and individual report not stated."
+    ours_frs: FR-PM-071
+    ours_status: Full
+    note: "Ours: Package Status Update Report for one or all requests; name and columns to confirm (PQ15)."
+  - id: BRPM.019
+    bdoi_status: Full
+    bdoi_note: "Dashboard with KPIs, filters, drill-down, aging and export (FRPM.001)."
+    ours_frs: FR-PM-070
+    ours_status: Partial
+    note: "Ours has tiles, drill-down and Excel export of the lists but no filters by period, TSU officer or product line; the BRD asks users to 'filter, customize, and export'."
+  - id: BRPM.020
+    bdoi_status: Not covered
+    bdoi_note: "'Under negotiation if can be waived'."
+    ours_frs: FR-PM-004
+    ours_status: Full
+    note: "BRD priority 'Must have'; BIBS protects every document e-mailed outside it (sheet 8)."
+  - id: BRPM.021
+    bdoi_status: Full
+    bdoi_note: "Approve, return and reject at each step; remarks mandatory."
+    ours_frs: FR-PM-073, FR-PM-021
+    ours_status: Full
+    note: "Service levels per approval step are only in ours."
+  - id: BRPM.022
+    bdoi_status: Partial
+    bdoi_note: "Notifications at each step; data synchronised with BDOI systems not stated."
+    ours_frs: FR-PM-072
+    ours_status: Partial
+    note: "Ours notifies and records every product change for the transfer, which waits for BDOI to name the systems (PQ16)."
+  - id: BRPM.024
+    bdoi_status: Full
+    bdoi_note: "Audit Logs menu and per-record audit logs with old and new values (FRPM.021)."
+    ours_frs: FR-PM-005
+    ours_status: Full
+    note: "-"
+
+# ------------------------------------------------------------------ 5 Requirement mapping (one row per FRPM.nnn.nn)
+mapping:
+  - id: FRPM.001.01
+    quote: "dashboard that delivers real-time visibility ... filter ... Period From Date, Period To Date, TSU Officer, Product Line, Package Type ... export ... Excel, PDF, CSV"
+    ours: FR-PM-070, FR-PM-073
+    match: Partial
+    difference: "BDOI: six KPIs (incoming, in progress, for approval, expiring packages, issued proposals, deactivation requests), five filters, drill-down with eight columns, aging per stage, export to Excel, PDF and CSV. Ours: tiles by stage with overdue marking, packages ending in 30/60/90 days, versions for validation, advisories pending, comparative outputs of the week; each tile opens its list, exported to Excel; no filters."
+    platform: Partly
+    action: Platform change
+    action_detail: "Adopt BDOI's KPIs and filters in the FRS text; add the filters and PDF/CSV export to the home page; keep our service-level colours."
+  - id: FRPM.002.01
+    quote: "centralized repository for package-related configurations and quotation requests for non-package products"
+    ours: "FR-PM-010; Navigation (chapter 12)"
+    also: "FR-NB-050 to FR-NB-057 (non-package)"
+    match: Partial
+    difference: "BDOI puts non-package quotation requests in the Product Maintenance module. Ours covers packages only; BIBS handles non-package proposal requests under New Business."
+    platform: Partly
+    action: Needs BDOI decision
+    action_detail: "Decide where non-package requests are documented and placed in the menu (sheet 8, C01)."
+  - id: FRPM.002.02
+    quote: "landing page ... tabs: Product Matrix (Active Products, Expiring Products ... within 90 days, Expired Products), Quotation Request List, Package Request List"
+    ours: FR-PM-070, FR-PM-024, FR-PM-052, FR-PM-060
+    also: FR-NB-052
+    match: Different
+    difference: "BDOI: one landing page with three tabs and the stated list columns. Ours: a home page of tiles; Products (lifecycle filter), Package Requests and Package Expiry (Expiring, Renewal in Progress, Expired) are separate screens; non-package Proposal Requests are under New Business. Our Package Requests list has no Account Officer or submission date column."
+    platform: Partly
+    action: Adopt BDOI wording
+    action_detail: "Describe the landing page in BDOI's terms with our screens behind each tab; add Account Officer and Submission Date to the Package Requests list (small platform change)."
+  - id: FRPM.003.01
+    quote: "Line of Insurance, Sub-Line, Package Name, Package Description, Insurer, Status, Effective Date, Expiry Date, Last Updated By, Last Updated Date ... Search, Filter, Sort, Pagination, Export"
+    ours: FR-PM-010, FR-PM-050, FR-PM-052
+    match: Partial
+    difference: "Our Products list shows code, name, line, package flag, version, segments, rate and minimum premium, status, with filters; it has no insurer, effective or expiry date, last-updated columns or export."
+    platform: Partly
+    action: Platform change
+    action_detail: "Add BDOI's columns and the export to the Products list."
+  - id: FRPM.003.02
+    quote: "create and update a Product Matrix record. Product type: Package/ Non-Package ... Incentive Eligible indicator ... select an approver and send the 'Draft' matrix for approval"
+    ours: FR-PM-010, FR-PM-012, FR-PM-014, FR-PM-042, FR-PM-050, FR-PM-080
+    match: Different
+    difference: "BDOI: authorised users create and update package and non-package records directly, with line-specific fields, incentive flag with amount or rate, supporting documents, Draft status and a named approver. Ours: a package is created from a signed-off package request by MBS set-up; its terms live in versions changed only through a new version; masters are maker-checker with any authoriser; no non-package records; no incentive flag on the product (criteria are separate)."
+    platform: Partly
+    action: Needs BDOI decision
+    action_detail: "Decide direct maintenance vs request route, the incentive flag and named approvers (sheet 8, C09, C19, C08); add Annex A fields to the package version (platform change)."
+  - id: FRPM.003.03
+    quote: "approve, return, or reject ... Remarks shall be mandatory for Rejected and Returned ... Upon approval ... status to Active ... available ... Proposal Creation, New Business Account Creation, and Renewal Account Creation"
+    ours: FR-PM-043, FR-PM-010
+    match: Partial
+    difference: "Ours validates a package version with a checklist and test premium and releases it or returns it to MBS with a reason; there is no Reject; the validator is never the maker or submitter; released versions are used by new quotations from their effective date."
+    platform: "Yes"
+    action: Keep ours
+    action_detail: "Keep the checklist (PMADD06); adopt BDOI's wording on availability for proposals, new business and renewal; decide on Reject (sheet 8, C04)."
+  - id: FRPM.003.04
+    quote: "Deactivate Package button ... Deactivation Effective Date (current and future dates only), Reason, Remarks, Supporting Documents ... select an Approver"
+    ours: FR-PM-045
+    match: Different
+    difference: "Ours retires a package through a package request of type Retire package: Marketing approval, TSU review and approval, ManCom sign-off, then MBS retires it; no effective date. Masters (not packages) are deactivated under maker-checker."
+    platform: Partly
+    action: Needs BDOI decision
+    action_detail: "Choose the deactivation route (sheet 8, C10)."
+  - id: FRPM.003.05
+    quote: "Once the package expiry date is reached, the system shall automatically update the package status to Inactive"
+    ours: FR-PM-052
+    match: Partial
+    difference: "Same automatic step; ours calls the status Expired and allows a Reactivate expired package request (BRPM.006 'potential reactivation'); BDOI says the package is no longer available for update requests."
+    platform: "Yes"
+    action: Needs BDOI decision
+    action_detail: "Confirm the label (Expired or Inactive) and whether an expired package can be reactivated (sheet 8, C11)."
+  - id: FRPM.003.06
+    quote: "Deactivation Request List ... Request Number, Package Name, Deactivation Effective Date, Approval Status, Requested By, Request Date, Package Expiry Date"
+    ours: FR-PM-024, FR-PM-045
+    match: Partial
+    difference: "Ours lists retirement requests in Package Requests with the request type filter Retire package; no dedicated list or effective date column."
+    platform: Partly
+    action: Adopt BDOI wording
+    action_detail: "Describe the list as a filtered view of Package Requests; add the effective date if the deactivation route of C10 is adopted."
+  - id: FRPM.003.07
+    quote: "Upon approval ... package expiry date shall be set using the later of: Deactivation Effective Date or Approval Date"
+    ours: FR-PM-045
+    match: Different
+    difference: "Ours sets the product to Retired when MBS retires it after ManCom sign-off; the end date of the version is not changed."
+    platform: "No"
+    action: Needs BDOI decision
+    action_detail: "Follows C10; platform change if the effective-dated deactivation is adopted."
+  - id: FRPM.004.01
+    quote: "generate alerts beginning: 90 calendar days before the package expiry date; 90 calendar days before the package anniversary date. Notification Recipients: TSU Officer, TSU Team Lead"
+    ours: FR-PM-060, FR-PM-061
+    match: Different
+    difference: "Ours alerts on the package end date at 60 days with reminders at 30 and 7 (parameters), to TSU and MBS users, shows the anniversary date but does not alert on it, and can draft the renewal request; BDOI alerts at 90 days on expiry and anniversary, to the TSU Officer and Team Lead, and covers non-package products too."
+    platform: Partly
+    action: Platform change
+    action_detail: "Set the notice period to 90 days (configuration); add the anniversary alert (platform change); confirm recipients (sheet 8, C02)."
+  - id: FRPM.005.01
+    quote: "Quotation Request List ... Draft, Pending Marketing Approval, For TSU Review, For Quotation Slip Creation ... Proposal Ready, Proposal Rejected, For Deployment, Deployed"
+    ours: "-"
+    also: "FR-NB-050, FR-NB-052 (Proposal Requests, TSU Workbench)"
+    match: Not in ours
+    difference: "Non-package requests are out of scope of our BRD-3 FRS (BRD revision of 27-Oct-2025). BIBS lists them as Proposal Requests under New Business with its own stages; BDOI's statuses For Deployment and Deployed (MBS set-up of non-package) are not in BIBS."
+    platform: Partly
+    action: Needs BDOI decision
+    action_detail: "Scope and status names (sheet 8, C01, C16)."
+  - id: FRPM.005.02
+    quote: "approvers ... approve, return, or reject the quotation request with 'For TSU Review' status"
+    ours: "-"
+    also: "FR-NB-051, FR-NB-052"
+    match: Not in ours
+    difference: "BIBS: Marketing approval of the proposal request, then TSU accepts, amends, returns or voids it."
+    platform: "Yes"
+    action: Needs BDOI decision
+    action_detail: "Cross-reference to the BRD-1 FRS or bring into this FRS (C01)."
+  - id: FRPM.006.01
+    quote: "generate a Quotation Slip (QS) per insurer ... Format: QS_<Reference Number>_<Insurer>_MMDDYYYY.pdf ... may be used by users for manual email transmission"
+    ours: "FR-PM-030 (package)"
+    also: FR-NB-053
+    match: Not in ours
+    difference: "Non-package slips are in BIBS New Business: one slip per insurer approached, approved by a second TSU officer and e-mailed protected by BIBS. BDOI's file name convention and the manual e-mail are not in BIBS."
+    platform: Partly
+    action: Platform change
+    action_detail: "File naming per BDOI's convention (C23); keep sending from the system (C12)."
+  - id: FRPM.006.02
+    quote: "side-by-side comparison ... The second column shall display the corresponding QS value ... capture multiple quotation options from the same insurer ... Approved, Not Covered, Others"
+    ours: "FR-PM-031, FR-PM-034, FR-PM-035 (package)"
+    also: FR-NB-054, FR-NB-055
+    match: Not in ours
+    difference: "BIBS non-package: responses keyed in per insurer (terms received or declined) with revisions; compiled comparative table sorted by premium, lowest flagged, export PDF and Excel. No QS value column, no field selection before capture, one option per insurer."
+    platform: Partly
+    action: Needs BDOI decision
+    action_detail: "Multiple options per insurer and the response list (C14, C15)."
+  - id: FRPM.007.01
+    quote: "automatically generate a Consolidated Placement Update Report every Thursday at 8am ... File naming convention: PlacementUpdate_MMDDYYYY.xlsx ... repository"
+    ours: FR-PM-071
+    also: "FR-NB-121 (Placement Update Report of accounts)"
+    match: Different
+    difference: "Ours: Package Status Update Report run on demand for one or all package requests; BRD-1 has the Placement Update Report of accounts, also on demand. BDOI: weekly scheduled report of quotation requests with 12 columns, a file name, a repository and preview; the status rules are announced but missing."
+    platform: Partly
+    action: Needs BDOI decision
+    action_detail: "Scope (quotation requests, package requests or accounts), schedule and columns (C03); platform change for the weekly run and repository."
+  - id: FRPM.008.01
+    quote: "allow the requestor to select one or more insurers ... Proceed to Proposal button ... status to 'Terms Agreed'"
+    ours: "FR-PM-033 (package)"
+    also: FR-NB-054, FR-NB-056
+    match: Partial
+    difference: "In ours TSU chooses the insurers when making the terms final (only insurers that offered terms; every insurer of the round needs an outcome first). BDOI lets the requestor select once at least one insurer has responded."
+    platform: Partly
+    action: Needs BDOI decision
+    action_detail: "Who selects the insurers and when (C18)."
+  - id: FRPM.009.01
+    quote: "additional column labeled: Final Terms for Proposal ... official source of information for Proposal generation"
+    ours: "FR-PM-033, FR-PM-040 (package)"
+    match: Different
+    difference: "Ours takes the chosen insurers' terms as the proposed package terms and completes the rate scheme in the requirements pack; there is no editable final-terms column in the comparative table."
+    platform: "No"
+    action: Platform change
+    action_detail: "Add the Final Terms column if BDOI keeps the proposal step (C18)."
+  - id: FRPM.009.02
+    quote: "generate separate Proposal Slips for one or more selected insurers ... ProposalSlip_<Reference Number>_<Insurer Name>_<Version Number>_MMDDYYYY.pdf"
+    ours: "-"
+    also: FR-NB-056
+    match: Not in ours
+    difference: "BIBS non-package: proposal slip from the chosen insurer's terms, versioned, approved by a second TSU officer and released to Marketing. One insurer per slip; BDOI's file naming not used."
+    platform: Partly
+    action: Platform change
+    action_detail: "Several insurers per generation and the file naming."
+  - id: FRPM.010.01
+    quote: "Record Client Response ... Accepted, Rejected, Return for Revision"
+    ours: "-"
+    also: FR-NB-057
+    match: Not in ours
+    difference: "BIBS non-package: send to client, record acceptance with the accepted risk groups and create the accounts, or record Client declined. No 'Return for Revision' by the client."
+    platform: Partly
+    action: Platform change
+    action_detail: "Client return for revision, if BDOI keeps it."
+  - id: FRPM.011.01
+    quote: "Draft, Pending Marketing TL Approval, Pending Marketing TH Approval, Pending Marketing UH Approval ... Awaiting Mancom Approval, For Deployment, Package Deployment for Review, Package Deployment Returned, Deployed"
+    ours: FR-PM-024, FR-PM-073
+    match: Partial
+    difference: "Both list package requests with status, assignee and aging. Statuses differ (BDOI 20, ours 15 stages), and BDOI's list shows request date, effective and expiry date and requestor; ours shows type, scope, client or programme, product and stage age."
+    platform: "Yes"
+    action: Adopt BDOI wording
+    action_detail: "Status names per the decision of C16; add effective and expiry date and requestor columns."
+  - id: FRPM.011.02
+    quote: "Source of the package request: Marketing, TSU, Insurer ... route ... through the Marketing approval hierarchy (until Unit Head) ... If Source is Insurer, proceed to proposal preparation"
+    ours: FR-PM-020, FR-PM-021
+    match: Partial
+    difference: "Both: create, number, save as draft, attach documents, submit with validation, edit in Draft and Returned. Ours has request types (new, amend, update, renew, reactivate, retire), scope, reason and pre-filled terms; every request goes through one Marketing approval. BDOI has a Source field, a three-level Marketing chain, a TSU chain for TSU and Insurer sources and Annex E fields (business origin, AO, UH, estimated policies and premium)."
+    platform: Partly
+    action: Needs BDOI decision
+    action_detail: "Approval chain and source routing (C05, C07); add Annex E fields to the form (platform change)."
+  - id: FRPM.011.03
+    quote: "approve, return, or reject ... Remarks shall be mandatory for Rejected and Returned requests ... status to 'For Quotation Slip Creation'"
+    ours: FR-PM-022, FR-PM-023
+    match: Partial
+    difference: "Ours: TSU TL review with a mandatory written recommendation, then TSU Head approval by another user; return to requester with a reason; no Reject (void instead)."
+    platform: "Yes"
+    action: Keep ours
+    action_detail: "Keep the two steps of BRPM.009 (C06); adopt BDOI's remarks wording."
+  - id: FRPM.012.01
+    quote: "Generate QS ... review and update the values ... version history ... QS_<Reference Number>_<Insurer>_MMDDYYYY.pdf ... manual email transmission ... Approve, Reject, Return for Revision ... status to 'For Negotiation'"
+    ours: FR-PM-030, FR-PM-013
+    match: Partial
+    difference: "Ours: one slip per round (same slip to every insurer), number and reply due date, approval by a TL or co-officer other than the preparer, sent by BIBS as protected e-mail per insurer with resend and sent history, locked at ManCom sign-off; draft layout until BDOI's templates. BDOI: slip per insurer, editable QS values, regeneration versions, file name convention, manual e-mail, Reject outcome, Annex F templates."
+    platform: Partly
+    action: Adopt BDOI wording
+    action_detail: "Load Annex F as the slip templates (configuration); keep system e-mail (C12); file naming and slip per insurer as platform changes if confirmed."
+  - id: FRPM.012.02
+    quote: "Comparative Table that allows users to capture and maintain insurer responses directly within the table"
+    ours: FR-PM-031, FR-PM-032, FR-PM-034, FR-PM-035
+    match: Partial
+    difference: "Ours captures each insurer's response in a dialog per round (outcome, rate, minimum premium, terms per coverage, conditions, validity, remarks, document, history), compiles one master per request and derives client views with chosen fields and insurers. BDOI captures in the table, with a QS value column, field selection before capture and several options per insurer."
+    platform: Partly
+    action: Needs BDOI decision
+    action_detail: "Keep rounds and master (PMADD03, 04); decide options per insurer and response values (C14, C15); QS value column is a platform change."
+  - id: FRPM.013.01
+    quote: "Generate Proposal button within the package request screen ... separate Proposal Slips for one or more selected insurers ... status to 'Proposal Ready'"
+    ours: FR-PM-033, FR-PM-036, FR-PM-040
+    match: Different
+    difference: "Ours has no proposal slip in the package path: Terms Final, TSU Head review, Marketing review for client-specific packages, then the requirements pack with the generated package slip whose signed copy is uploaded before ManCom."
+    platform: "No"
+    action: Needs BDOI decision
+    action_detail: "Proposal slips per insurer or the package slip (C18)."
+  - id: FRPM.014.01
+    quote: "select one or more approvers from the maintained ManCom approver list ... email notifications ... via Microsoft 365 ... parallel approval for all approvers except the President"
+    ours: FR-PM-041
+    match: Different
+    difference: "Ours: one ManCom member's sign-off completes the step (PQ07); return to TSU with a reason; signed sheet can be uploaded; slips lock; request moves to MBS automatically; in-app notice."
+    platform: Partly
+    action: Needs BDOI decision
+    action_detail: "Quorum, President and routing (C17); platform change for parallel then sequential routing."
+  - id: FRPM.015.01
+    quote: "Request for Deployment button ... Assign a unique Deployment Request Number ... status to: For Deployment ... notify the designated MBS user"
+    ours: FR-PM-041, FR-PM-042
+    match: Different
+    difference: "Ours forwards the request to MBS automatically at ManCom sign-off and notifies MBS; no separate deployment request or number."
+    platform: "No"
+    action: Keep ours
+    action_detail: "BRPM.015 asks for automatic forwarding; confirm with BDOI (C20)."
+  - id: FRPM.016.01
+    quote: "MBS Deployment Queue ... For Deployment, Draft Setup, Pending Approval, Approved, Deployed, Returned"
+    ours: FR-PM-024, FR-PM-042, FR-PM-043
+    match: Partial
+    difference: "Ours: the With MBS tab of Package Requests and the Validation Queue; version states Draft, For validation, Released; return to MBS. Equivalent steps under other names; no package name, effective date or requestor columns in one queue."
+    platform: "Yes"
+    action: Adopt BDOI wording
+    action_detail: "Map BDOI's six statuses to ours in the FRS; add missing columns (small platform change)."
+  - id: FRPM.017.01
+    quote: "update the assigned reviewer or approver in case the initial assignee is not available ... notify the replacement ... notify the original reviewer"
+    ours: FR-PM-024
+    match: Partial
+    difference: "Ours: team leaders assign or reassign requests and officers claim them; the new assignee is notified; approvals are open to every holder of the approval permission, so an absent approver does not block. The original assignee is not notified."
+    platform: Partly
+    action: Adopt BDOI wording
+    action_detail: "Add the notice to the original assignee (small platform change)."
+  - id: FRPM.018.01
+    quote: "create and maintain Incentive Eligibility rules ... Add Rule, Edit Rule, Activate Rule, Deactivate Rule, View Rule Details ... Users shall be able to define one or more criteria"
+    ours: FR-PM-080, FR-PM-081
+    match: Same
+    difference: "Same purpose; ours is more detailed (type, value basis, value, rule parameters, products matrix, maker-checker, successor on amendment, review alert when a product ends). BDOI calls it 'Incentive Eligibility rules' with 'Activate'; ours 'Incentive Criteria' with authorisation."
+    platform: "Yes"
+    action: Keep ours
+    action_detail: "Keep our detail under BDOI's heading; agree the name."
+  - id: FRPM.019.01
+    quote: "Renewal Request Report ... all expiring package accounts within the selected reporting period, regardless of whether a renewal request has been created"
+    ours: FR-PM-071, FR-PM-060
+    match: Partial
+    difference: "Ours: Package Expiry Report of released packages by end date with the open renewal request and its stage, and the expiry list for a date range. 'Package accounts' may mean the client accounts sold on packages, which BRD-6 Renewal reports."
+    platform: "Yes"
+    action: Needs BDOI decision
+    action_detail: "Confirm packages or client accounts on packages (C22)."
+  - id: FRPM.020.01
+    quote: "generate, preview, download, print, and export custom reports using the Reports Builder ... save report definitions as reusable report templates"
+    ours: FR-PM-071
+    also: "FR-NB-123 (saved report variants)"
+    match: Not in ours
+    difference: "BIBS offers defined reports with parameters, saved and shared variants and export to PDF, Excel, ODS and CSV; there is no ad-hoc report designer (BRD-1 CLR-NB-14). Ours reads BRPM.005 as document templates."
+    platform: Partly
+    action: Needs BDOI decision
+    action_detail: "Reports builder vs saved variants (C21)."
+  - id: FRPM.021.01
+    quote: "'Audit Logs' section within the menu ... filter ... Date range, Action Type, Reference Number, User ... export ... CSV or Excel ... File name: Audit Logs_MMDDYYYY"
+    ours: FR-PM-005
+    also: "FR-NB-136 (BIBS Audit Trail screen)"
+    match: Partial
+    difference: "Ours: every action audited with before and after values, append-only. The BIBS Audit Trail screen filters by date range, user and record type and exports PDF, Excel and CSV; no filter by action type or reference number; BDOI's file name not used."
+    platform: Partly
+    action: Platform change
+    action_detail: "Add the action type and reference number filters and the file name."
+  - id: FRPM.021.02
+    quote: "Upon opening a specific record, the system shall display a new section for audit logs ... export audit log details as a CSV or Excel file"
+    ours: FR-PM-005
+    match: Partial
+    difference: "Ours: the History tab of a request lists the workflow history and the insurer response revisions; product, version and criteria histories are shown on their records. No export from the record."
+    platform: Partly
+    action: Platform change
+    action_detail: "Add export of the record history."
+
+# ------------------------------------------------------------------ 8 Conflicts
+# brd: which side matches the BRD; platform: which side matches BIBS today. Values: BDOI's, Ours, Both, Neither,
+# Not stated (the BRD is silent).
+conflicts:
+  - id: C01
+    kind: Between the documents
+    topic: "Scope: non-package requests and products in Product Maintenance"
+    bdoi: "'centralized repository for package-related configurations and quotation requests for non-package products' (FRPM.002.01); Product type 'Package/ Non-Package' (FRPM.003.02); Annex B, C, D."
+    ours: "'Maintenance of non-package products' is out of scope; 'The BRD revision log of 27-Oct-2025 (p.11) moved it to an addendum' (FRS 1.2). Non-package proposals are in the New Business FRS (FR-NB-050 to 057)."
+    brd: Ours
+    brd_note: "BRD revision log 27-Oct-2025: 'Exclude Non-Package and include this as part of an' addendum; the addendum's PMADD01 speaks of 'packaged and non-packaged products' for the product structure only."
+    platform: Both
+    decision: "Confirm whether the non-package quotation request, proposal and client response are specified in the Product Maintenance FRS or in the New Business FRS, and under which menu they appear."
+    recommendation: "Specify them once, in the New Business FRS where BIBS already supports them; in the Product Maintenance FRS keep FRPM.005 to 010 as short items that refer to it, and keep Annex B, C and D as the field lists of that process."
+  - id: C02
+    kind: Between the documents
+    topic: "Expiry alerts: notice days, anniversary alerts, recipients"
+    bdoi: "'alerts beginning: 90 calendar days before the package expiry date; 90 calendar days before the package anniversary date'; recipients 'TSU Officer, TSU Team Lead' (FRPM.004.01); Expiring Products tab 'expiring within 90 days' (FRPM.002.02)."
+    ours: "'First alert 60 days before the end date (default)'; 'Reminders at 30 and 7 days (default)'; to TSU and MBS users (FR-PM-060); home tiles at 30, 60 and 90 days."
+    brd: Not stated
+    brd_note: "BRPM.017 asks to monitor 'the expiry or anniversary date' without days or recipients."
+    platform: Ours
+    decision: "Confirm the notice days (90, with or without reminders), whether the anniversary date raises its own alert, and the recipients (TSU Officer and Team Lead; MBS too?)."
+    recommendation: "Adopt 90 days as the default value (a parameter, no change to the system) and keep the 30 and 7-day reminders; add the anniversary alert if BDOI confirms; keep MBS among the recipients for renewal set-up."
+  - id: C03
+    kind: Between the documents
+    topic: "Placement Update Report: schedule, scope and columns"
+    bdoi: "'automatically generate a Consolidated Placement Update Report every Thursday at 8am. The schedule shall be configurable'; 'all quotation requests that are active or processed within the reporting period'; 12 columns; 'PlacementUpdate_MMDDYYYY.xlsx'; repository (FRPM.007.01)."
+    ours: "Package Status Update Report run on demand for one or all package requests, 'distinct from the BRD-1 Placement Update Report (name and columns to confirm, PQ15)' (FR-PM-071)."
+    brd: Neither
+    brd_note: "BRPM.018: 'generate Placement Update Reports (both for individual accounts and collectively for all accounts) ... to track and report the status of package creation'; no schedule."
+    platform: Ours
+    decision: "Say what the report covers (package requests, non-package quotation requests or accounts), whether it runs weekly on Thursday 08:00 and is kept in a repository, and give the Placement Update Status rules that BDOI's text announces but does not list."
+    recommendation: "Keep the on-demand individual and collective report (BRD) and add the weekly scheduled run with BDOI's columns and file name as a configurable schedule (platform change)."
+  - id: C04
+    kind: Between the documents
+    topic: "Decision outcomes: Reject as well as Return"
+    bdoi: "'approve, return, or reject' at the matrix, quotation request, package request, quotation slip, proposal and ManCom steps; 'Remarks shall be mandatory for Rejected and Returned'."
+    ours: "Approve or Return to requester (with a reason) at each step; a request is ended by Void (before negotiation) or Not proceeded (from negotiation); versions are returned, not rejected."
+    brd: Not stated
+    brd_note: "The BRD uses 'approved', 'returns incomplete submissions' and negative scenarios; it does not define a rejected state."
+    platform: Ours
+    decision: "Confirm whether a Reject outcome distinct from Return is needed, and what happens to a rejected request (closed, cannot be resubmitted)."
+    recommendation: "Map BDOI's Reject to our Void / Not proceeded with a reason (same effect: the request closes); rename the action 'Reject' if BDOI prefers the word."
+  - id: C05
+    kind: Between the documents
+    topic: "Marketing approval chain"
+    bdoi: "'route the Package Request through the Marketing approval hierarchy (until Unit Head) ... Each approver shall approve or reject independently ... shall not proceed to TSU until the Marketing Unit Head has approved' (FRPM.011.02); statuses Pending Marketing TL, TH, UH Approval."
+    ours: "'One approval by TL, TH or UH is enough (a chain by segment or amount waits for PQ08)' (FR-PM-021, CLR-PM-03)."
+    brd: Both
+    brd_note: "BRPM.008: 'reviewed and approved by the Marketing Team Lead (TL), Team Head (TH), or Marketing Unit Head (UH)'; BRPM.021: 'multi-level approvals'."
+    platform: Ours
+    decision: "One approval by any of TL, TH or UH, or the sequential chain TL, TH, UH for every request (or by segment or amount)."
+    recommendation: "If BDOI wants the chain, specify three stages and their service levels; it is a workflow change with no effect on the other steps."
+  - id: C06
+    kind: Between the documents
+    topic: "TSU review: one step or recommendation then approval"
+    bdoi: "'enable approvers to approve, return, or reject the quotation request with For TSU Review status' (FRPM.011.03), then 'For Quotation Slip Creation'."
+    ours: "TSU TL reviews and writes a mandatory recommendation; the TSU Head approves, never the recommender (FR-PM-022, 023)."
+    brd: Ours
+    brd_note: "BRPM.009: 'TSU TL provides a recommendation for approval ... TSU Team Head (TH) reviews the recommendation and provides formal approval'."
+    platform: Ours
+    decision: "Confirm the two TSU steps of the BRD."
+    recommendation: "Keep ours; write it into FRPM.011.03 as two sub-items."
+  - id: C07
+    kind: Between the documents
+    topic: "Source of a package request and its routing"
+    bdoi: "Source 'Marketing / TSU / Insurer'; 'When source is TSU or Insurer, ... route ... through the TSU approval hierarchy'; 'If Source is Insurer, proceed to proposal preparation' (no quotation slip)."
+    ours: "Requester is a Marketing AO or a TSU Officer; every request goes to Marketing approval, then TSU review and approval; negotiation is always, never or chosen by request type."
+    brd: Not stated
+    brd_note: "BRPM.008 persona 'Marketing AO / TSU' with approval by Marketing TL, TH or UH; insurer-initiated packages are not mentioned."
+    platform: Ours
+    decision: "Should a TSU-raised request skip Marketing approval; and is an insurer-offered package a request source that skips the quotation slip?"
+    recommendation: "Add the Source field; route TSU and Insurer sources to TSU approval only; for Insurer source open the request with the insurer's offer as the first response (platform change)."
+  - id: C08
+    kind: Between the documents
+    topic: "Who approves: approver picked by name or role queue with four-eyes"
+    bdoi: "'select an approver and send the Draft matrix for approval' (FRPM.003.02); 'require the user to select an Approver' (FRPM.003.04); ManCom approvers selected (FRPM.014.01); reassignment (FRPM.017.01)."
+    ours: "Each step is owned by a permission; any holder other than the maker approves; team leaders assign work; 'a request is never approved by its maker' (FRS 3.3)."
+    brd: Not stated
+    brd_note: "BRPM.021: 'Each approval step is completed by the designated authority (e.g., TSU TL, TSU TH, Marketing TL/TH/UH)'."
+    platform: Ours
+    decision: "Confirm role-based approval queues, or named approver selection by the requester."
+    recommendation: "Keep role queues (no blocked items when an approver is absent; four-eyes enforced); allow an optional 'preferred approver' notice if BDOI wants to name one."
+  - id: C09
+    kind: Between the documents
+    topic: "How a package is created and changed"
+    bdoi: "Authorised users 'create and update a Product Matrix record' directly, Draft, then approval; MBS 'Maintain package as draft' after ManCom (process flow)."
+    ours: "A package exists only through a signed-off package request; MBS sets up a draft version; 'A package is never edited in place' (FR-PM-050); validation and release (FR-PM-043)."
+    brd: Ours
+    brd_note: "BRPM.015 (set-up by MBS after ManCom) and BRPM.007 (latest approved rate scheme; old packages locked) support versions set up from signed-off requirements."
+    platform: Ours
+    decision: "Confirm that package terms change only through a request and a new version; say whether direct edits of non-commercial details (description, documents) are allowed."
+    recommendation: "Keep the request and version route for terms and rates; allow direct maker-checker edits of descriptive fields only."
+  - id: C10
+    kind: Between the documents
+    topic: "Package deactivation route and dates"
+    bdoi: "Deactivation request with 'Deactivation Effective Date ... current and future dates only', one selected approver; on approval 'expiry date shall be set using the later of: Deactivation Effective Date or Approval Date' (FRPM.003.04 to 07)."
+    ours: "Retire package request: Marketing approval, TSU review and approval, ManCom sign-off; MBS retires the product (Retired), retirement advisory (FR-PM-045)."
+    brd: Not stated
+    brd_note: "BRPM.011 lists 'deletion' among requests; the route is not described."
+    platform: Ours
+    decision: "Full retirement route with ManCom, or a lighter deactivation with one approval and an effective date."
+    recommendation: "If BDOI wants the lighter route, add it as a request type with effective-dated end (platform change) and keep the retirement advisory."
+  - id: C11
+    kind: Between the documents
+    topic: "Expired package: label and reactivation"
+    bdoi: "'automatically update the package status to Inactive. The package shall no longer be available for: Update Package Requests ...' (FRPM.003.05)."
+    ours: "Status Expired; an expired package returns to sale only through a request of type Reactivate expired package (FR-PM-052)."
+    brd: Ours
+    brd_note: "BRPM.006: 'store and archive details of expired insurance products ... for future reference or potential reactivation'."
+    platform: Ours
+    decision: "Label (Expired or Inactive) and whether an expired package can be reactivated by request."
+    recommendation: "Keep reactivation (BRD); use the label BDOI prefers."
+  - id: C12
+    kind: Between the documents
+    topic: "Quotation slip: sent by the system or by the user; one slip per insurer or per round"
+    bdoi: "'generate a Quotation Slip (QS) per insurer'; 'The downloaded QS shall be the official insurer-facing document and may be used by users for manual email transmission' (FRPM.006.01, 012.01)."
+    ours: "One slip per round, the same to every insurer; 'BIBS then sends one protected e-mail per insurer and opens a pending response for each'; resend and sent history (FR-PM-030)."
+    brd: Ours
+    brd_note: "BRPM.012: 'send ... to insurers directly from the system (e.g., via email ...)'; 'Users receive confirmation of successful transmission'; 'view sent history and resend'."
+    platform: Ours
+    decision: "Sending from BIBS (with download kept) or manual e-mail; slip per insurer or one per round for packages."
+    recommendation: "Keep sending from BIBS and allow download; produce one slip per insurer if BDOI's templates name the insurer (platform change for packages; non-package already one per insurer)."
+  - id: C13
+    kind: Between the documents
+    topic: "Document security (BRPM.020)"
+    bdoi: "'Under negotiation if can be waived' (Business Requirements Mapping)."
+    ours: "'Every Product Maintenance document e-mailed outside BIBS is protected; protection cannot be switched off per e-mail'; password in a separate e-mail (FR-PM-004)."
+    brd: Ours
+    brd_note: "BRPM.020 'Must have': 'All shared documents are password protected or encrypted'."
+    platform: Ours
+    decision: "Is BRPM.020 waived? If not, confirm the password convention (Q07, PQ21)."
+    recommendation: "Do not waive: BIBS already protects the documents at no extra effort; confirm the password convention."
+  - id: C14
+    kind: Between the documents
+    topic: "Insurer response values and options per insurer"
+    bdoi: "'Approved', 'Not Covered', 'Others' (specify); 'capture multiple quotation options from the same insurer' (FRPM.006.02, 012.02)."
+    ours: "'Pending, Accepted as requested, Approved with changes, Counter-proposal, Declined, No response (list to confirm, PQ05)'; one response per insurer per round, with revisions (FR-PM-031)."
+    brd: Ours
+    brd_note: "PMADD04 asks for 'explicit exception states'; options per insurer are not mentioned."
+    platform: Ours
+    decision: "The response list (BDOI's three values or ours) and whether one insurer may give several options in one round."
+    recommendation: "Keep our list as a list of values and add BDOI's labels if wanted (configuration); several options per insurer is a platform change."
+  - id: C15
+    kind: Between the documents
+    topic: "Comparative table: capture in the table, QS value column, retained master"
+    bdoi: "'The second column shall display the corresponding QS value'; 'Users shall be able to input insurer responses directly into the corresponding insurer column'; 'The table shall always reflect the latest available insurer responses'."
+    ours: "Responses keyed in per insurer; 'One current MASTER per request'; earlier masters kept as superseded; client views derived from the master (FR-PM-034, 035)."
+    brd: Ours
+    brd_note: "PMADD03: 'retaining an auditable master version'; BRPM.014: one consolidated table per package."
+    platform: Ours
+    decision: "Confirm the master and client-view model; whether the QS value column is shown."
+    recommendation: "Keep the master; add the QS value column (platform change)."
+  - id: C16
+    kind: Between the documents
+    topic: "Status names of package and quotation requests"
+    bdoi: "20 statuses for package requests (for example 'Pending Marketing TL Approval', 'QS for Approval', 'Under Negotiation', 'Terms Agreed', 'Proposal Ready', 'Awaiting Mancom Approval', 'For Deployment', 'Deployed')."
+    ours: "15 stages (for example 'For Marketing approval', 'For TSU Head approval', 'Insurer negotiation', 'Negotiated terms review', 'For ManCom sign-off', 'With MBS for set-up', 'Package version for validation', 'Released')."
+    brd: Not stated
+    brd_note: "The BRD does not name statuses."
+    platform: Ours
+    decision: "Agree one list of status names (after C04 to C20 are decided)."
+    recommendation: "Take BDOI's names where the step exists in both; keep ours for steps BDOI lacks (review, requirements, validation); the stage list is configurable labels (CLR-PM-17, CLR-PM-20)."
+  - id: C17
+    kind: Between the documents
+    topic: "ManCom approval routing"
+    bdoi: "'select one or more approvers from the maintained ManCom approver list'; 'parallel approval for all approvers except the President'; 'Route the request to the President only after all preceding approvers have approved'; e-mail 'via Microsoft 365'."
+    ours: "'One member's sign-off completes the step (quorum PQ07)'; signed sheet may be uploaded; in-app notices (FR-PM-041, CLR-PM-05)."
+    brd: Not stated
+    brd_note: "BRPM.015: 'ManCom reviews and signs off within the system; approval is mandatory and logged'."
+    platform: Ours
+    decision: "ManCom membership list, who selects the approvers, parallel approval and the President's final approval, and e-mail notice."
+    recommendation: "Adopt BDOI's routing if confirmed (platform change: parallel approvals then the President); keep the slip lock and the automatic hand-over to MBS."
+  - id: C18
+    kind: Between the documents
+    topic: "Package path after negotiation: proposal slips or package slip; who selects insurers"
+    bdoi: "Requestor selects insurers, 'Proceed to Proposal', status 'Terms Agreed' (FRPM.008); 'Final Terms for Proposal' column (FRPM.009.01); 'Generate Proposal ... separate Proposal Slips' then ManCom (FRPM.013, 014)."
+    ours: "TSU makes the terms final (chosen insurers, roles, shares); TSU Head review; Marketing review for client-specific packages; requirements pack with the package slip, signed copy uploaded; ManCom (FR-PM-033, 036, 040)."
+    brd: Ours
+    brd_note: "BRPM.013: Marketing reviews client-specific terms before any client presentation; BRPM.015: 'Product requirements and details from TSU are submitted ... triggering a ManCom review'; BRPM.016: 'Package slip (signed)'."
+    platform: Ours
+    decision: "Is a proposal slip per insurer produced for packages; does Marketing select the insurers; is the signed package slip still required before ManCom?"
+    recommendation: "Keep the package slip and requirements pack (BRD); if Marketing selects insurers, add that as Marketing's 'Accept Terms' with insurer choice; proposal slips per insurer for packages only if BDOI confirms (platform change)."
+  - id: C19
+    kind: Between the documents
+    topic: "Incentive eligibility on the product or in criteria"
+    bdoi: "'Incentive Eligible indicator. Default value is No ... require ... either: Incentive Amount; or Incentive Commission Rate' on the product (FRPM.003.02) and incentive rules (FRPM.018)."
+    ours: "Incentive criteria (for example CPC2) list the products of the matrix they apply to, with value basis rate, fixed amount or rule; at booking the matched criteria set the incentive flag (FR-PM-080, 081; BRD-1 FR-NB-118)."
+    brd: Both
+    brd_note: "PMADD07: 'define and maintain Incentive criteria based on the Maintained Products Matrix'."
+    platform: Ours
+    decision: "One place for incentive eligibility: on the product record, in the criteria, or both (and which wins)."
+    recommendation: "Keep the criteria as the single source and show on the product whether an active criterion covers it (read-only); avoids two values that can disagree."
+  - id: C20
+    kind: Between the documents
+    topic: "Hand-over to MBS after ManCom"
+    bdoi: "'Request for Deployment button ... available when all required approvals have been completed ... Assign a unique Deployment Request Number' (FRPM.015.01)."
+    ours: "'The sign-off locks the quotation slips and forwards the request to MBS automatically' (FR-PM-041)."
+    brd: Ours
+    brd_note: "BRPM.015: 'Only after ManCom’s in-system approval are requirements automatically forwarded to MBS'."
+    platform: Ours
+    decision: "Automatic forwarding (BRD) or a manual deployment request with its own number."
+    recommendation: "Keep automatic forwarding; show BDOI's 'For Deployment' as the label of the With MBS stage if wanted."
+  - id: C21
+    kind: Between the documents
+    topic: "BRPM.005 shared templates: reports builder or document templates"
+    bdoi: "BRPM.005 mapped to FRPM.020 'custom reports using the Reports Builder'."
+    ours: "BRPM.005 met by versioned document templates with line-specific sections (FR-PM-013); reports have saved variants, no designer."
+    brd: Ours
+    brd_note: "BRPM.005: 'shared document templates that can dynamically adjust to include fields specific to each insurance product line (e.g., CGL, Equipment Floater, Marine Cargo, Fire, Motor, etc.)'."
+    platform: Ours
+    decision: "Is a reports builder required (and under which BRD requirement)?"
+    recommendation: "Map BRPM.005 to the document templates (BDOI's Annex D and F); treat a reports builder as a programme-wide request, not a Product Maintenance one."
+  - id: C22
+    kind: Between the documents
+    topic: "Renewal Request Report: packages or client accounts"
+    bdoi: "'all expiring package accounts within the selected reporting period, regardless of whether a renewal request has been created' (FRPM.019.01)."
+    ours: "Package Expiry Report: released packages by end date with the open renewal request and its stage (FR-PM-071)."
+    brd: Not stated
+    brd_note: "BRPM.017 asks to monitor the expiry or anniversary of each package."
+    platform: Ours
+    decision: "Does the report list packages or the client accounts sold on packages?"
+    recommendation: "Packages: use our Package Expiry Report with a date range; client accounts: refer to the Renewal (BRD-6) listing."
+  - id: C23
+    kind: Between the documents
+    topic: "File names and document numbers"
+    bdoi: "'QS_<Reference Number>_<Insurer>_MMDDYYYY.pdf'; 'ProposalSlip_<Reference Number>_<Insurer Name>_<Version Number>_MMDDYYYY.pdf'; 'PlacementUpdate_MMDDYYYY.xlsx'; 'Audit Logs_MMDDYYYY'."
+    ours: "Slip numbers PQS-yyyy-n and request numbers PKR-yyyy-n; files named after the slip or request number."
+    brd: Not stated
+    brd_note: "-"
+    platform: Ours
+    decision: "Confirm BDOI's file naming for downloads and attachments."
+    recommendation: "Adopt BDOI's file names (platform change, small) and keep our document numbers inside the documents."
+  - id: D01
+    kind: Within BDOI's FRS
+    topic: "Package Request List heading"
+    bdoi: "FRPM.011.01 'Package Request List': 'The system shall provide a Quotation Request List screen displaying all Quotation Requests'."
+    ours: "-"
+    brd: Not stated
+    brd_note: "-"
+    platform: "-"
+    decision: "Correct to 'Package Request List ... all Package Requests'."
+    recommendation: "Correct in BDOI's v1.1."
+  - id: D02
+    kind: Within BDOI's FRS
+    topic: "Package request review refers to quotation requests"
+    bdoi: "FRPM.011.03 (package): 'approve, return, or reject the quotation request with For TSU Review status'."
+    ours: "-"
+    brd: Not stated
+    brd_note: "-"
+    platform: "-"
+    decision: "Correct to 'package request'."
+    recommendation: "Correct in BDOI's v1.1."
+  - id: D03
+    kind: Within BDOI's FRS
+    topic: "'For Negotiation' vs 'Under Negotiation'"
+    bdoi: "FRPM.006.01 and 012.01: 'update the status to For Negotiation'; the status lists of FRPM.005.01 and 011.01 have 'Under Negotiation'."
+    ours: "-"
+    brd: Not stated
+    brd_note: "-"
+    platform: "-"
+    decision: "One name."
+    recommendation: "Settle with C16."
+  - id: D04
+    kind: Within BDOI's FRS
+    topic: "'Proposal Released' status"
+    bdoi: "FRPM.010.01: 'available for proposals with a status of: Proposal Released'; the status lists have 'Proposal Ready', not 'Proposal Released'."
+    ours: "-"
+    brd: Not stated
+    brd_note: "-"
+    platform: "-"
+    decision: "One name."
+    recommendation: "Settle with C16."
+  - id: D05
+    kind: Within BDOI's FRS
+    topic: "Placement Update Status rules missing"
+    bdoi: "FRPM.007.01: 'determine the Placement Update Status using the following rules:' followed by no rules."
+    ours: "-"
+    brd: Not stated
+    brd_note: "-"
+    platform: "-"
+    decision: "Provide the rules."
+    recommendation: "Part of C03."
+  - id: D06
+    kind: Within BDOI's FRS
+    topic: "'Renewal' among the audit log fields"
+    bdoi: "FRPM.021.01 field list: 'Timestamp ... Module, Renewal, Reference Number ...'."
+    ours: "-"
+    brd: Not stated
+    brd_note: "-"
+    platform: "-"
+    decision: "Remove or explain 'Renewal'."
+    recommendation: "Correct in BDOI's v1.1."
+  - id: D07
+    kind: Within BDOI's FRS
+    topic: "Package path lacks insurer selection and Final Terms column"
+    bdoi: "FRPM.013 is titled 'Insurer Selection for Proposal Creation' but only generates proposals; the selection (FRPM.008) and Final Terms column (FRPM.009.01) are written for non-package requests."
+    ours: "-"
+    brd: Not stated
+    brd_note: "-"
+    platform: "-"
+    decision: "State whether FRPM.008 and 009.01 also apply to package requests."
+    recommendation: "Settle with C18."
+  - id: D08
+    kind: Within BDOI's FRS
+    topic: "Two status sets for MBS deployment"
+    bdoi: "FRPM.011.01 has 'Package Deployment for Review', 'Package Deployment Returned', 'Deployed'; FRPM.016.01 has 'For Deployment, Draft Setup, Pending Approval, Approved, Deployed, Returned'."
+    ours: "-"
+    brd: Not stated
+    brd_note: "-"
+    platform: "-"
+    decision: "One set."
+    recommendation: "Settle with C16 and C20."
+  - id: D09
+    kind: Within BDOI's FRS
+    topic: "Field types differ between annexes"
+    bdoi: "'Warranties, Clauses' is Dropdown in Annex A and E but Text in Annex B and C; 'Perils/Coverages' Text in Annex A, Dropdown in Annex E; 'Benefits/Coverages' Text in Annex A, Dropdown in Annex B and C; 'Incentive Amount' Float in Annex A and E, Currency in B and C; several types blank in Annex B."
+    ours: "-"
+    brd: Not stated
+    brd_note: "-"
+    platform: "-"
+    decision: "One type per field."
+    recommendation: "Settle in the field review (sheet 9)."
+  - id: D10
+    kind: Within BDOI's FRS
+    topic: "'Aircraft Usage' under Marine Hull"
+    bdoi: "Annex B: 'Aircraft Usage ... Marine Hull'; Annex C: 'Vessel Usage ... Marine Hull'."
+    ours: "-"
+    brd: Not stated
+    brd_note: "-"
+    platform: "-"
+    decision: "Confirm 'Vessel Usage'."
+    recommendation: "Correct in BDOI's v1.1."
+  - id: D11
+    kind: Within BDOI's FRS
+    topic: "Incentive eligibility criteria not defined"
+    bdoi: "FRPM.018.01: 'Users shall be able to define one or more criteria' without the criteria attributes; CPC2 not described."
+    ours: "-"
+    brd: Not stated
+    brd_note: "-"
+    platform: "-"
+    decision: "Define the criteria attributes and CPC2 (PQ04)."
+    recommendation: "Use our attributes (product, cover type, segment, channel, insurer, value basis) as the starting point."
+
+# ------------------------------------------------------------------ 10 Incorporation plan
+# part: A ID scheme; B Section by section; C Order of work; D What BDOI ITG reviews; E Platform changes implied.
+# effort: indicative person-days of the iorta TechNXT project team (0 = none).
+plan:
+  - part: A. ID scheme
+    bdoi_section: All
+    insert: "Keep BDOI's FRPM.nnn and FRPM.nnn.nn as the primary IDs. Number the requirements of ours that BDOI's FRS lacks FRPM.022 onwards."
+    how: "Primary numbering, unchanged for FRPM.001 to FRPM.021."
+    source: "-"
+    effort: 0
+    itg: "Approve the numbering."
+  - part: A. ID scheme
+    bdoi_section: All
+    insert: "Carry our FR ID as a cross-reference in square brackets at the end of each sub-item heading, for example 'FRPM.011.02 Create/Edit Package Request Details [FR-PM-020, FR-PM-021]'."
+    how: "Cross-reference; one FR-PM may appear under several FRPM items."
+    source: "FR headers"
+    effort: 0
+    itg: "-"
+  - part: A. ID scheme
+    bdoi_section: All
+    insert: "Number our rules, validations and acceptance criteria under the sub-item: FRPM.011.02-R1, -V1, -AC1 and so on, keeping the text of ours."
+    how: "Numbered sub-items in FRPM style."
+    source: "FR rules, validations, acceptance"
+    effort: 0
+    itg: "-"
+  - part: A. ID scheme
+    bdoi_section: Annexes G to M
+    insert: "Keep our IDs for screens (SCR-PM-nn), notifications (NT-nn), walkthrough steps (WT-A.n), test cases (TC-PM-...) and clarifications (CLR-PM-nn); the test plan and sign-off workbook get an FRPM column."
+    how: "Annex IDs unchanged."
+    source: "Sign-off workbook, test plan"
+    effort: 0
+    itg: "-"
+  - part: B. Section by section
+    bdoi_section: Document Revision Log
+    insert: "Entry v1.1: content of the BIBS FRS BRD-3 v2.1 merged; decisions of the BDOI session applied."
+    how: Row in the log
+    source: "-"
+    effort: 0.1
+    itg: "Confirm version and author."
+  - part: B. Section by section
+    bdoi_section: "1.1 Document Purpose; 1.3 Document Preparation, Review and Approval"
+    insert: "One paragraph naming the supporting documents (sign-off workbook, test plan, configuration input templates, UX screen documents) and their role."
+    how: Paragraph
+    source: "FRS 1.1, 21.1"
+    effort: 0.2
+    itg: "-"
+  - part: B. Section by section
+    bdoi_section: "1.2 Project Overview"
+    insert: "Scope by area and BRD ID; out of scope (as decided under C01: non-package if kept in New Business; renewal of client policies (BRD-6); computation and payout of incentives; transfer to other BDOI systems until named)."
+    how: "Table and list under 1.2"
+    source: "FRS 1.2"
+    effort: 0.5
+    itg: "Confirm scope."
+  - part: B. Section by section
+    bdoi_section: "New 1.4 References, 1.5 Definitions and Acronyms, 1.6 Personas and Roles"
+    insert: "References (BRD v1.0, Addendum v1.1, BRD-11 FRS); glossary of 26 terms; 10 personas with responsibilities."
+    how: New sub-sections
+    source: "FRS 1.3, 1.4, 3.1"
+    effort: 0.5
+    itg: "Template allows new sub-sections?"
+  - part: B. Section by section
+    bdoi_section: "2 Business Requirements Mapping"
+    insert: "Column 'BIBS FR (cross-reference)'; BRD page; re-mapping of BRPM.005 (document templates), BRPM.007 (FRPM.024), BRPM.016 (FRPM.029), BRPM.017 (add FRPM.030), BRPM.020 (FRPM.031 unless waived), BRPM.009 (two TSU steps)."
+    how: "Fourth column and corrected FR IDs"
+    source: "FRS 11 Traceability"
+    effort: 1.0
+    itg: "Review every changed mapping."
+  - part: B. Section by section
+    bdoi_section: "3 Functional Requirements, FRPM.001 to FRPM.021"
+    insert: "For each of the 35 sub-items: the decided wording (sheet 5 'Proposed action'), then our business rules, validations with their messages and acceptance criteria of the matching FR, numbered as in part A."
+    how: "Sub-items under each FRPM row"
+    source: "FR-PM-001 to FR-PM-081"
+    effort: 10.5
+    itg: "Review each sub-item."
+  - part: B. Section by section
+    bdoi_section: "3 Functional Requirements, new FRPM.022 to FRPM.034"
+    insert: "FRPM.022 Product hierarchy and clause library [FR-PM-010, 011]; FRPM.023 Insurer-specific package terms [FR-PM-014]; FRPM.024 Package versions and rate schemes for new business [FR-PM-050, 051]; FRPM.025 Negotiation rounds and terms final [FR-PM-032, 033]; FRPM.026 Review of negotiated terms [FR-PM-036]; FRPM.027 Requirements pack and package slip [FR-PM-040]; FRPM.028 Package set-up and validation checkpoint [FR-PM-042, 043]; FRPM.029 Package advisories [FR-PM-044]; FRPM.030 Renewal requests [FR-PM-061]; FRPM.031 Document protection [FR-PM-004]; FRPM.032 Workflow enforcement and service levels [FR-PM-073]; FRPM.033 Product master changes to BDOI systems [FR-PM-072]; FRPM.034 Shared document templates [FR-PM-013]."
+    how: "New rows of the FR table in BDOI's style (component, capability, sub-items)"
+    source: "Sheet 6"
+    effort: 6.5
+    itg: "Review new items."
+  - part: B. Section by section
+    bdoi_section: "4 Process Flow"
+    insert: "Package flow aligned with the decisions (C05 to C20); a table of stages and transitions under each flow, pointing to Annex L."
+    how: "Updated diagram and table"
+    source: "FRS 2.2, 5"
+    effort: 1.0
+    itg: "Approve the updated flow."
+  - part: B. Section by section
+    bdoi_section: "5 Signoff Sheet"
+    insert: "Business unit signatories 'as applicable': Product Owner Marketing Business System; Head MBS; Head TSU; Head Retail Marketing; Head Comptrollership; Program Manager BPS. Note on what signing freezes and change after sign-off."
+    how: "Rows under 'Approved by'; note"
+    source: "FRS 21"
+    effort: 0.2
+    itg: "Confirm signatories."
+  - part: B. Section by section
+    bdoi_section: "Annex A and Sub-Line Dropdown Values"
+    insert: "Columns 'Mandatory' and 'BIBS field'; the gaps of sheet 9 closed or listed; sub-line values loaded as configuration (templates CI-01, CI-02)."
+    how: "Two columns; notes"
+    source: "Sheet 9; screens SCR-PM-11, 13"
+    effort: 1.0
+    itg: "Confirm field types (D09)."
+  - part: B. Section by section
+    bdoi_section: "Annex B and Annex C"
+    insert: "Column 'BIBS field' pointing to the New Business screens once C01 is decided."
+    how: Column
+    source: "Sheet 9; BRD-1 SCR-NB-10"
+    effort: 1.0
+    itg: "-"
+  - part: B. Section by section
+    bdoi_section: "Annex D and Annex F"
+    insert: "Unchanged templates; a note that BIBS loads them as the template versions of the quotation slip and fills the fields listed in sheet 9."
+    how: Note
+    source: "FRS 17; CI-08"
+    effort: 0.5
+    itg: "-"
+  - part: B. Section by section
+    bdoi_section: "Annex E"
+    insert: "Columns 'Mandatory' and 'BIBS field'; our request fields that BDOI lacks (request type, scope, reason, package dates, market segments, negotiation flag)."
+    how: "Columns and rows"
+    source: "Sheet 9; SCR-PM-03"
+    effort: 0.5
+    itg: "-"
+  - part: B. Section by section
+    bdoi_section: "New Annex G – Screen Specifications"
+    insert: "22 screens: purpose, access, navigation, fields (325), actions (104), rules (84), screenshots; menu by persona and common screen elements."
+    how: "Annex, one sub-section per screen"
+    source: "FRS 12, 13; sign-off workbook"
+    effort: 2.0
+    itg: "Business content only; no technical detail."
+  - part: B. Section by section
+    bdoi_section: "New Annex H – Messages"
+    insert: "276 messages by screen with type and what the user does."
+    how: Annex table
+    source: "FRS 15"
+    effort: 0.5
+    itg: "-"
+  - part: B. Section by section
+    bdoi_section: "New Annex I – Notifications"
+    insert: "11 notifications with trigger, recipient, channel and text (with the Microsoft 365 e-mail if C17 is adopted)."
+    how: Annex table
+    source: "FRS 16"
+    effort: 0.3
+    itg: "-"
+  - part: B. Section by section
+    bdoi_section: "New Annex J – Walkthroughs and Storyboard"
+    insert: "WT-A (24 steps) and WT-B (12 steps) with screenshots; storyboard index of 36 frames."
+    how: Annex
+    source: "FRS 14; storyboard appendix"
+    effort: 1.0
+    itg: "-"
+  - part: B. Section by section
+    bdoi_section: "New Annex K – Role-to-Action Matrix"
+    insert: "Product Maintenance permissions by role and the segregation of duties rules; points to the User Access Maintenance FRS for sign-in and role changes."
+    how: Annex table
+    source: "FRS 3.2, 3.3"
+    effort: 0.3
+    itg: "Consistency with the UAM FRS."
+  - part: B. Section by section
+    bdoi_section: "New Annex L – Workflow, Statuses and Configuration"
+    insert: "Stages with owners and service levels, transitions with reason lists, version states, parameters with defaults, lists of values, masters maintained by the business."
+    how: Annex tables
+    source: "FRS 5, 9"
+    effort: 0.5
+    itg: "-"
+  - part: B. Section by section
+    bdoi_section: "New Annex M – Traceability"
+    insert: "BRD ID → FRPM → FR-PM → screen → test cases; user-story view."
+    how: Annex table
+    source: "FRS 11; user-story appendix; test plan"
+    effort: 0.5
+    itg: "-"
+  - part: B. Section by section
+    bdoi_section: "FRPM.007 and FRPM.019 (reports)"
+    insert: "Report parameters, layout and columns of the Package Status Update Report, Package Expiry Report and Package Version History."
+    how: "Sub-items"
+    source: "FRS 6.1"
+    effort: 0.5
+    itg: "-"
+  - part: B. Section by section
+    bdoi_section: "Supporting documents (referenced, not merged)"
+    insert: "Non-functional requirements (programme NFR catalogue), configuration input templates (06), test plan (04, 05), sign-off workbook (03), UX screen documents (07 to 09), cross-BRD contract, screen standards, open clarifications."
+    how: "Reference list in 1.1"
+    source: "BIBS release set BRD-3 v2.1"
+    effort: 0.3
+    itg: "Agree the reference list."
+  - part: B. Section by section
+    bdoi_section: "Our sign-off set"
+    insert: "FRPM column in the test plan and the sign-off workbook; FRS v2.2 replaced by a pointer to BDOI's v1.1."
+    how: "Column; note"
+    source: "Test plan, sign-off workbook"
+    effort: 1.5
+    itg: "-"
+  - part: C. Order of work
+    bdoi_section: "1 Decision session"
+    insert: "Prepare and hold one session with TSU, MBS, Marketing, the Product Owner and BDO ITG on C01 to C23; record each decision."
+    how: "Minutes; decisions in sheet 8"
+    source: "Sheet 8"
+    effort: 2.0
+    itg: "Attend; own the minutes."
+  - part: C. Order of work
+    bdoi_section: "2 Corrections"
+    insert: "Agree the corrections D01 to D11 with the author."
+    how: "Tracked changes"
+    source: "Sheet 8"
+    effort: 0.5
+    itg: "Author confirms."
+  - part: C. Order of work
+    bdoi_section: "3 Merge"
+    insert: "Parts B in the order: mapping table, existing FRPM items, new FRPM items, process flows, annexes A to F, annexes G to M."
+    how: "BDOI's v1.1 draft"
+    source: "-"
+    effort: 0
+    itg: "-"
+  - part: C. Order of work
+    bdoi_section: "4 Quality check"
+    insert: "Check every sub-item against the screens, messages and test cases; check business wording and the restricted terms."
+    how: "Checklist"
+    source: "-"
+    effort: 2.0
+    itg: "-"
+  - part: C. Order of work
+    bdoi_section: "5 Review and sign-off"
+    insert: "BDO ITG review (template, numbering, mapping); business unit review; sign-off on BDOI's sheet; platform changes raised through change management."
+    how: "Review cycle"
+    source: "-"
+    effort: 1.0
+    itg: "Lead the review."
+  - part: D. What BDOI ITG reviews
+    bdoi_section: Template and numbering
+    insert: "New sub-sections 1.4 to 1.6, new FRPM.022 onwards, annexes G to M, the cross-reference column."
+    how: "-"
+    source: "-"
+    effort: 0
+    itg: "Accept or adjust."
+  - part: D. What BDOI ITG reviews
+    bdoi_section: Changed mappings
+    insert: "BRPM.005, 007, 009, 016, 017 and 020 point to new or changed items."
+    how: "-"
+    source: "-"
+    effort: 0
+    itg: "Confirm."
+  - part: D. What BDOI ITG reviews
+    bdoi_section: Decisions applied
+    insert: "Each of C01 to C23 as decided, in the FRPM text, process flows and status lists."
+    how: "-"
+    source: "-"
+    effort: 0
+    itg: "Confirm against the minutes."
+  - part: D. What BDOI ITG reviews
+    bdoi_section: Business content only
+    insert: "Annexes G to M hold business content (screens, fields, messages); technical detail goes to the Technical Specification reviewed by BDOI IT."
+    how: "-"
+    source: "-"
+    effort: 0
+    itg: "Confirm."
+  - part: D. What BDOI ITG reviews
+    bdoi_section: Platform changes
+    insert: "The changes of part E: impact and priority through the project's change management."
+    how: "-"
+    source: "-"
+    effort: 0
+    itg: "Assess impact."
+  - part: E. Platform changes implied
+    bdoi_section: "FRPM.001.01"
+    insert: "Dashboard filters (period, TSU officer, product line, package type) and PDF/CSV export."
+    how: "If adopted"
+    source: "Sheet 5"
+    effort: 0
+    itg: "-"
+  - part: E. Platform changes implied
+    bdoi_section: "FRPM.002.02, 003.01, 011.01, 016.01"
+    insert: "Extra list columns (Account Officer, submission date, insurer, effective and expiry dates, last updated, requestor) and export of the Products list."
+    how: "If adopted"
+    source: "Sheet 5"
+    effort: 0
+    itg: "-"
+  - part: E. Platform changes implied
+    bdoi_section: "FRPM.004.01"
+    insert: "Alert on the anniversary date (90 days is a parameter value only)."
+    how: "If C02 confirms"
+    source: "Sheet 8"
+    effort: 0
+    itg: "-"
+  - part: E. Platform changes implied
+    bdoi_section: "FRPM.007.01"
+    insert: "Weekly scheduled Placement Update Report with repository and BDOI's columns."
+    how: "If C03 confirms"
+    source: "Sheet 8"
+    effort: 0
+    itg: "-"
+  - part: E. Platform changes implied
+    bdoi_section: "FRPM.011.02"
+    insert: "Request Source with routing; Marketing chain TL, TH, UH; Annex E fields with the 20-policy and PHP 5M minimums."
+    how: "If C05, C07 confirm"
+    source: "Sheets 8, 9"
+    effort: 0
+    itg: "-"
+  - part: E. Platform changes implied
+    bdoi_section: "FRPM.006, 012"
+    insert: "Quotation slip per insurer for packages; QS value column; several options per insurer; BDOI file names."
+    how: "If C12, C14, C15, C23 confirm"
+    source: "Sheet 8"
+    effort: 0
+    itg: "-"
+  - part: E. Platform changes implied
+    bdoi_section: "FRPM.009, 013, 014"
+    insert: "Final Terms column and proposal slips in the package path; ManCom parallel approval with the President last."
+    how: "If C17, C18 confirm"
+    source: "Sheet 8"
+    effort: 0
+    itg: "-"
+  - part: E. Platform changes implied
+    bdoi_section: "FRPM.003.04 to 07"
+    insert: "Effective-dated deactivation with one approval."
+    how: "If C10 confirms"
+    source: "Sheet 8"
+    effort: 0
+    itg: "-"
+  - part: E. Platform changes implied
+    bdoi_section: "FRPM.017.01, 021"
+    insert: "Notice to the original assignee on reassignment; audit filters by action type and reference number; export of a record's history; BDOI's audit file name."
+    how: "If adopted"
+    source: "Sheet 5"
+    effort: 0
+    itg: "-"

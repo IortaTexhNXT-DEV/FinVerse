@@ -969,7 +969,7 @@ new_items:
     subitems:
       - id: FRS.CSH.10.01.01
         title: Interfaces of Cashiering
-        refs: [FR-OP-130]
+        refs: [FR-OP-130, FR-OP-120, FR-OP-121]
         shall:
           - "The system shall exchange with the systems and modules of Appendix N: payment files of OBPCS and the matured post-dated checks of PMS via MFT; Trade (TFS) and Direct Credit files by upload; Collections (disposition requests, commission payment details); Disbursement (refund requests and their status, insurer settlement approvals for the automatic OR); New Business (booked accounts, payment confirmation); Remittance (remittance status of the accounts); Accounting (journals of every posting)."
           - Work that a module cannot complete because the other module is not in use shall be handed over to the responsible team as an open item, which the team closes with what was done.

@@ -607,6 +607,7 @@
             "/renewal/dashboard",
             "/renewal/accounts",
             "/renewal/expiry",
+            "/renewal/rmu-officers",
             "/renewal/audit-logs",
             "/renewal/budget",
             "/renewal/setup"
@@ -617,7 +618,7 @@
           "seedUser": "lamd",
           "permissionScope": "RNW_",
           "permissions": ["RNW_LAMD_UPLOAD", "RNW_VALIDATE", "RNW_VIEW"],
-          "screens": ["/renewal", "/renewal/expiry", "/renewal/lamd"]
+          "screens": ["/renewal", "/renewal/expiry", "/renewal/lamd", "/renewal/rmu-officers"]
         },
         "RNW:CONTACT_CENTER": {
           "role": "CONTACT_CENTER",

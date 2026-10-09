@@ -14,6 +14,7 @@ import {
   RefreshCcw,
   ScrollText,
   Settings2,
+  ShieldAlert,
   UserCheck,
   Workflow,
 } from 'lucide-react';
@@ -131,6 +132,14 @@ export const renewalModule: FeatureModule = {
       icon: ListChecks,
       permission: 'RNW_LAMD_UPLOAD',
       component: lazy(() => import('./lamd/LamdPage')),
+    },
+    {
+      path: '/renewal/rmu-officers',
+      label: 'RMU Account Maintenance',
+      icon: ShieldAlert,
+      permission: 'RNW_RMU_MAINTAIN',
+      alsoPermissions: ['RNW_LAMD_UPLOAD'],
+      component: lazy(() => import('./uploads/RmuOfficersPage')),
     },
     {
       path: '/renewal/audit-logs',

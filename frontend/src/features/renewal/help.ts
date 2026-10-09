@@ -143,6 +143,16 @@ export const RENEWAL_HELP: HelpSection = {
       controls: ['A renewal has one open transfer request at a time.'],
     },
     {
+      name: 'RMU Account Maintenance',
+      path: '/renewal/rmu-officers',
+      summary: 'Account Officer codes of the Remedial Management Unit used by the LAMD upload.',
+      workflow: [
+        'Add an AO code with the officer name; update the name or remarks, or deactivate a code that no longer applies.',
+        'A loan of the CBG loans list whose Account Officer is in the list has the loan status RMU and routes its renewal account to RMU.',
+      ],
+      controls: ['An active AO code is listed once; every change is in the audit log.'],
+    },
+    {
       name: 'Transfer Requests',
       path: '/renewal/referrals',
       summary:

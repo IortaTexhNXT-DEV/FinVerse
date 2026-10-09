@@ -39,7 +39,7 @@ export interface PostingApprovers {
   approvers: { username: string; fullName: string }[];
 }
 
-const R = '/api/v1/renewal/referrals';
+const R = '/renewal/referrals';
 const co = (companyId: number) => toQuery({ companyId });
 
 export const renewalReferralsApi = {
@@ -63,7 +63,5 @@ export const renewalReferralsApi = {
   createNewBusiness: (companyId: number, id: number, input: NewBusinessInput) =>
     api.post<ReferralView>(`${R}/${String(id)}/new-business${co(companyId)}`, input),
   postingApprovers: (companyId: number, renewalRef?: string) =>
-    api.get<PostingApprovers>(
-      `/api/v1/renewal/posting-approvers${toQuery({ companyId, renewalRef })}`,
-    ),
+    api.get<PostingApprovers>(`/renewal/posting-approvers${toQuery({ companyId, renewalRef })}`),
 };

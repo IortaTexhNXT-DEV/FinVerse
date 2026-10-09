@@ -32,7 +32,7 @@ export interface AutoValueRow {
   difference: number | null;
 }
 
-const BASE = '/api/v1/renewal';
+const BASE = '/renewal';
 
 export const renewalUpdatesApi = {
   createManual: (companyId: number, invoiceNo: string, confirmed: boolean) =>

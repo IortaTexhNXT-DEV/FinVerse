@@ -91,6 +91,50 @@ public class LamdService {
    * @return the line
    */
   public LamdLine line(Long companyId, String jobNo, Header header, int rowNo, LamdLine.Loan loan) {
+    return record(companyId, jobNo, header, rowNo, loan, match(companyId, loan.pnNo()));
+  }
+
+  /**
+   * Records and routes one line already matched to a renewal (BDOI's LAMD lists, matched on the PN
+   * and, for a motor loan, the serial and motor numbers).
+   *
+   * @param companyId company
+   * @param jobNo upload job
+   * @param header report type and period
+   * @param rowNo row of the file
+   * @param loan loan
+   * @param matched the renewal matched
+   * @return the line
+   */
+  public LamdLine lineFor(
+      Long companyId,
+      String jobNo,
+      Header header,
+      int rowNo,
+      LamdLine.Loan loan,
+      RenewalCandidate matched) {
+    return record(companyId, jobNo, header, rowNo, loan, List.of(matched));
+  }
+
+  /**
+   * The open renewals of a PN.
+   *
+   * @param companyId company
+   * @param pn PN number
+   * @return renewals
+   */
+  @Transactional(readOnly = true)
+  public List<RenewalCandidate> openByPn(Long companyId, String pn) {
+    return match(companyId, pn);
+  }
+
+  private LamdLine record(
+      Long companyId,
+      String jobNo,
+      Header header,
+      int rowNo,
+      LamdLine.Loan loan,
+      List<RenewalCandidate> matches) {
     LamdReport report =
         reports
             .findByJobNo(jobNo)
@@ -103,7 +147,6 @@ public class LamdService {
                             header.type(),
                             header.period(),
                             jobNo)));
-    List<RenewalCandidate> matches = match(companyId, loan.pnNo());
     String outcome =
         matches.isEmpty()
             ? LamdLine.UNMATCHED

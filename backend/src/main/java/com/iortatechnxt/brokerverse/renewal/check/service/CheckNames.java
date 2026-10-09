@@ -26,6 +26,8 @@ public final class CheckNames {
           Map.entry("RISK_CODE_DEFINED", "Risk code defined"),
           Map.entry("INSURER_RENEWABLE_LIST", "Insurer renewable list"),
           Map.entry("TOTAL_LOSS", "Total loss claim"),
+          Map.entry("BDOFC_SOLD", "BDOFC or BDOSOLD report"),
+          Map.entry("INSURER_DISPOSITION", "Insurer disposition"),
           Map.entry("DUPLICATE_ACCOUNT", "Potential duplicate account"));
 
   private CheckNames() {}

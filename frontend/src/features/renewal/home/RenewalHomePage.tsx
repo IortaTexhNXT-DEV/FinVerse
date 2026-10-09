@@ -8,6 +8,7 @@ import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Kpi } from '@/components/ui/Kpi';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { LandingUploads } from '../uploads/LandingUploads';
 import { UserName } from '@/components/ui/UserName';
 import { useCompanyId } from '@/context/workspaceContext';
 import { BucketPill } from '../common/RenewalBits';
@@ -147,6 +148,7 @@ export default function RenewalHomePage() {
           />
         </Card>
       </div>
+      <LandingUploads />
     </div>
   );
 }

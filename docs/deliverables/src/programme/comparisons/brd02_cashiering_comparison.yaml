@@ -1,0 +1,2009 @@
+# Comparison of BDOI's Operations Cashiering FRS (BDO ITG) with the BIBS FRS BRD-2 Operations v2.1, cashiering scope.
+# Read by build_brd02_cashiering_comparison.py (same folder). Sheets 1-5, 8 and 10; the lists of sheets 6, 7 and 9 are in
+# brd02_cashiering_comparison_lists.yaml. Quotes of BDOI's FRS are short and word for word (typing errors kept).
+# Values of the drop-down columns are listed in the builder (MATCH, PLATFORM, ACTIONS, COVERAGE and the others).
+
+meta:
+  title: BDOI FRS vs BIBS FRS – Operations Cashiering
+  doc_type: Comparison workbook
+  brd: BRD-02
+  version: "1.0"
+  date: 09 October 2026
+  filename: BIBS_Comparison_BRD-02_BDOI_FRS_vs_BIBS_FRS_Operations_Cashiering_v1.0.xlsx
+  subtitle: >-
+    BDOI's FRS “Operations - Cashiering” (BDO ITG, revision 1.1 of 09-Oct-2026) and the BIBS FRS BRD-2 Operations v2.1
+    (08-Oct-2026), cashiering scope: pros and cons, coverage, mapping, conflicts and the plan to bring our content into
+    BDOI's format
+  bdoi_file: FRS - BDOI Core Replacement Operations Cashiering v3.1 (BDOI).docx
+  ours_name: BIBS FRS BRD-2 Operations v2.1 (08-Oct-2026), cashiering scope
+
+# ---------------------------------------------------------------------------------------------------------- 1 Summary
+summary:
+  purpose:
+    - item: What the document is for
+      bdoi: >-
+        BDO ITG's Functional Requirements Specification of the Cashiering module of the New BDO Insure Brokering System
+        (project PRJ0012475, Drop 1): “how business requirements which are baselined in the Business Requirements
+        Document (BRD) ... are to be implemented in the IT systems”. Once approved it is “the official baseline of
+        functional requirements” under BDOI's change management.
+      ours: >-
+        The project team's FRS of BRD-2 Operations v2.1, issued for BDOI business sign-off: how BIBS meets every
+        Operations requirement with actors, flows, rules, validations, screens, messages, notifications, audit and
+        acceptance criteria. Cashiering is one of eight areas; it is the basis of the BRD-2 test plan and UAT.
+      note: >-
+        The two documents serve the same purpose for the same BRD. BDOI's is the document BDOI's SDLC signs; ours is the
+        detailed specification of the proposed BIBS screens and the source of the test plan.
+    - item: Author, version and status
+      bdoi: >-
+        Prepared by Abegail Panghulan (System Analyst, BDO ITG). Revision log: 1.0 of 26-Aug-2026 (initial) and 1.1 of
+        09-Oct-2026 (“Updated Automatic Generation of OR – coming from Disbursement”); the file is named v3.1. Reviewers
+        and approvers not yet named on the sign-off sheet; 15 review comments in the file.
+      ours: >-
+        iorta TechNXT Business Analysis; v2.1 of 08-Oct-2026, re-based on the Operations BRD v1.01 and the May 2026
+        annexes; status “Issued for BDOI business sign-off”; approvers named in the distribution list.
+      note: Ask BDOI ITG which number is the version of record (1.1 in the log, 3.1 in the file name).
+    - item: Scope and structure
+      bdoi: >-
+        One document for Cashiering: Introduction, Business Requirements Mapping (33 BRD IDs), one Functional
+        Requirements table of 18 FR items in 9 groups, Signoff Sheet, Appendix A (sample AR, Billspayment, CLPC and
+        Trade files) and Appendix B (references). 95 pages.
+      ours: >-
+        One FRS for all of Operations (24 chapters, 82 FRs). Cashiering scope: FR-OP-008 to FR-OP-028 and FR-OP-132
+        (20 FRs; FR-OP-017 and FR-OP-026 removed from scope), with the access FRs FR-OP-001 to 003, 15 screen
+        specifications, messages, notifications, walkthroughs, documents, upload layouts and traceability.
+      note: Sheet 2 compares the structure section by section.
+  pros_cons:
+    bdoi_pros:
+      - Written by BDO ITG in its own FRS template with the sign-off sheet that BDOI's SDLC expects; BDOI owns it.
+      - "Concise: the whole cashiering cycle in one table of 18 FR items, in the order the cashier works."
+      - "Exact field lists for creating an AR or OR (types, defaults, bank accounts, receipting branches, limits) and for every list and filter."
+      - 18 reports with description, fields, file name and format; this fills 11 of the 12 report layouts that are draft in ours.
+      - "Business rules we lack: remitted and not remitted cases on cancellation and reinstatement, legacy matching keys (QPS, ISYS, Ebix, loan application number), Direct Credit identification, the AR template with its certificate number, and four sample files."
+    bdoi_cons:
+      - "Blank placeholders: “User Role:” in every item, GL entries without accounts, certificate number convention, staging fields, Commission Schedule fields, PDC layout, unapplied data elements, OR mapping."
+      - No acceptance criteria, worked examples, screen layouts, message catalogue, notifications or process flows; not testable as it stands.
+      - "Traceability gaps: BRQID.001-007 and CSHID.011 have no FR ID; no BRD page references; reason lists shorter than the BRD (CSHID.003, 004); the encoded fields of CSHID.005 are not captured."
+      - "Internal inconsistencies: AR number “10” digits vs AR20260000000001 vs “AR 000149”; minimal balance ±1.00 vs Php 10.00; “.csv format, pipe delimiter” vs TXT and Excel files; numbering gaps and duplicates."
+      - "Not yet sign-off ready: reviewers and approvers blank, 15 open review comments, revision 1.1 in a file named v3.1."
+    ours_pros:
+      - Every in-scope BRD ID of the cashiering scope traced with its page to FRs, screens and test cases (76 test cases for the cashiering FRs).
+      - "Testable: 55 numbered acceptance criteria with worked amounts and 52 validations with the exact message."
+      - "The screens as BIBS shows them: 15 screen specifications with screenshots, field and action tables; 124 messages quoted; notifications."
+      - Rules marked configurable or fixed with default values and where they are maintained; default accounting entries per event.
+      - Re-based on BRD v1.01 and the May 2026 Cashiering annex; removed IDs explained; open questions and clarifications listed for decision.
+    ours_cons:
+      - "Length and spread: Cashiering is one area of a 24-chapter Operations FRS; a cashier reads chapters 4, 5, 6, 9, 11 and 13 to 18."
+      - Not in BDO ITG's template and not authored by BDOI; FR-OP IDs differ from BDOI's FRS.CSH IDs.
+      - 12 of the 24 cashiering report layouts and the AR / OR layout are draft (OQ42); BDOI's FRS gives 11 of the 12.
+      - "Reads some requirements differently from BDOI: no posting step for AR / OR issuance, reinstatement only of a cancelled receipt, Direct Credit as new payments, remitted AR cancellation (sheet 8)."
+      - "Technical traces in a business document: message codes, list and parameter names, seed references in acceptance criteria."
+  recommendation:
+    - item: Recommended way forward
+      note: >-
+        Option A. Make BDOI's ITG FRS the master document of the Cashiering sign-off and bring our content into it. Keep
+        BDOI's FR IDs (FRS.CSH.nn.nn.nn) as the primary IDs and write our FR-OP-nnn, screen IDs and test case IDs as
+        cross-references in BDOI's own empty column “Application Feature Model”. Fill BDOI's blanks from ours (user
+        roles, GL entries, field lists, report rules); add our rules, validations and acceptance criteria to each FR item
+        as numbered sub-items in BDOI's “The system shall ...” style; add Annexes C to K (upload layouts, report layouts,
+        roles and configuration, accounting entries, screen specifications, messages, notifications, walkthroughs and
+        storyboard, open items). First settle the decisions of sheet 8 with BDOI Cashiering, Comptrollership and ITG.
+        Our FRS v2.1 stays the supporting specification of the screens and the test plan until the merged document is
+        signed; its cashiering chapter then refers to BDOI's IDs. Sheet 10 gives the order of work and the effort.
+    - item: Why this option
+      note: >-
+        BDOI's SDLC signs ITG's template and ITG keeps it after go-live; BDOI's business users already know its
+        structure; our detail closes its gaps without changing its shape; one document is signed, so the two cannot
+        drift; the cross-reference column keeps the test plan and the screens traceable.
+    - item: "Alternative B: our FRS as the master"
+      note: >-
+        Wrap our cashiering chapter in BDOI's cover, revision log and sign-off sheet and list BDOI's FR IDs as
+        cross-references. Fastest to complete (the content exists), but BDOI ITG loses authorship, reviews a long vendor
+        document and must maintain a structure it did not choose; BDOI's own field and report lists still have to be
+        merged in.
+    - item: "Alternative C: two documents side by side"
+      note: >-
+        Sign BDOI's FRS as the business baseline and our FRS as the system specification, linked by sheet 5 of this
+        workbook. Least editing now, but two documents to keep in step after every change, the decisions of sheet 8 are
+        still needed, and the test plan traces to a document that is not the signed baseline.
+  decisions_intro: >-
+    Decisions needed from BDOI before the merge (sheet 8 gives each side's text and our recommendation):
+
+# ---------------------------------------------------------------------------------------------------------- 2 Structure
+structure:
+  - bdoi: Cover (project, title, prepared by)
+    ours: Front matter (title page, document control, distribution)
+    bdoi_content: "“PRJ0012475 – New BDO Insure Brokering System | Operations - Cashiering”, preparer."
+    ours_content: Title, BRD, version, status, document control 0.9 to 2.1, distribution with 12 roles and their purpose.
+    depth: Ours deeper
+    assessment: Keep BDOI's cover; add the distribution of ours as a table after the revision log.
+  - bdoi: Document Revision Log
+    ours: Document control
+    bdoi_content: Two entries (1.0 of 26-Aug-2026, 1.1 of 09-Oct-2026).
+    ours_content: Six versions with author, reviewer, approver and the change of each.
+    depth: Similar
+    assessment: Keep BDOI's log; add an entry for the merged version (for example 1.2) naming the BIBS content added.
+  - bdoi: "Introduction: Document Purpose; Project Overview with Key Objectives; Document Preparation, Review and Approval"
+    ours: "1 Introduction (purpose, scope, references, definitions, how to read); 2 Business context and process overview"
+    bdoi_content: Purpose of an FR document, module overview and six objectives, who prepares and approves.
+    ours_content: Scope table with BRD IDs, removed and moved IDs, out of scope items, 8 references with pages, glossary of 36 terms, before / after process, process figure, invoice statuses.
+    depth: Ours deeper
+    assessment: Keep BDOI's text; add scope (in, out, removed CSHID.009, 026, 027), definitions and the process overview of the cashiering steps.
+  - bdoi: Business Requirements Mapping (BRD Req No → FR IDs) and List of Integrations
+    ours: 11 Traceability; 7 Interfaces and integration; 22 User-story view
+    bdoi_content: 33 BRD IDs with the BRD text and the FR IDs; two integrations (OBPCS via MFT, PMS for PDC).
+    ours_content: Every BRD ID with page, FRs, screens and test cases; coverage summary; 20 interfaces and feeds with direction and scope; user story per BRD ID.
+    depth: Ours deeper
+    assessment: "Keep BDOI's table; fill the eight blank rows; add columns for the BRD page, our FR-OP IDs and the test cases; complete the list of integrations."
+  - bdoi: "Functional Requirements: Log in and Dashboard (FRS.CSH.01.01-01.03)"
+    ours: 4.1 FR-OP-001 to 003; 12 Navigation; SCR-OP-07
+    bdoi_content: BDO device, log-in, profile-based access, dashboard tiles with count and amount, main navigation, lists per group.
+    ours_content: Log-in and lock rules, permissions and four-eyes rules, home by role with live tiles, menus by persona.
+    depth: Similar
+    assessment: Merge; BDOI's tile list is more detailed (amounts, per type), ours adds roles and permissions.
+  - bdoi: "Creation of AR/OR (FRS.CSH.02.01-02.06)"
+    ours: FR-OP-010, 011, 012, 018 to 021, 023, 025, 027; SCR-OP-08, 09, 10, 18, 20, 21
+    bdoi_content: Create AR, create OR with commission schedule upload, series, batch printing, manual posting with application, minimal balance, BIR 2307, GL posting, AR / OR template.
+    ours_content: Same topics with rules, validations, fields, ACs; no posting step and no template set-up; default entries in chapter 5.
+    depth: Both detailed
+    assessment: Merge sub-item by sub-item (sheet 5); decide the posting step first (C1).
+  - bdoi: "Cancellation of AR/OR (FRS.CSH.03.01)"
+    ours: FR-OP-013; workflow OPS_RECEIPT_ACTION (chapter 5)
+    bdoi_content: Search, select one or many, reasons, save, submit, post, remitted and not remitted reversal, GL, audit.
+    ours_content: Request, approval by the Cashiering TL / TH, reversal of every application, reasons of the BRD, validations, ACs.
+    depth: Both detailed
+    assessment: Merge; decide the remitted case (C9) and the numbering (C3).
+  - bdoi: "Reinstatement of AR/OR (FRS.CSH.04.01)"
+    ours: FR-OP-014; Incoming Requests (payment reversals)
+    bdoi_content: Reinstatement of an issued receipt by account, with remitted, not remitted and OR branches.
+    ours_content: Reinstatement of a cancelled receipt, full or by amount, with the BRD's encoded fields.
+    depth: Both detailed
+    assessment: The two read the requirement differently (C2); merge after the decision.
+  - bdoi: "Automatic Payment Processing (FRS.CSH.05.01)"
+    ours: FR-OP-008, 015, 016, 018, 132; SCR-OP-14, 15, 16; chapter 18 Bank payment files
+    bdoi_content: Manual and MFT intake, validation, file names, matching priorities with legacy keys, Direct Credit matching, ARs, application, run report.
+    ours_content: Uploads per channel with configurable layouts, PDC warehouse, pre-booked queue and re-matching, payment gate of New Business, run report.
+    depth: Both detailed
+    assessment: Merge; Direct Credit (C8), PDC (C15) and MFT intake to decide.
+  - bdoi: "Unapplied Payment Disposition Facility (FRS.CSH.06.01-06.02)"
+    ours: FR-OP-022, 023; SCR-OP-11, 12, 13; workflow OPS_DISPOSITION
+    bdoi_content: Sources of unapplied records, filters and columns, disposition types, tabs.
+    ours_content: Origins, disposition types with actions and approval, reversal, bulk actions, requests of other modules, 11 validations.
+    depth: Ours deeper
+    assessment: Merge; decide who disposes (C13) and the AP Unapplied Commission type.
+  - bdoi: "Automatic Generation of OR (FRS.CSH.07.01)"
+    ours: FR-OP-021; FR-OP-035 (Remittance)
+    bdoi_content: OR generated when Disbursement approves the insurer settlement; one OR per insurer per batch; mapping blank.
+    ours_content: Commission OR issued at the approval of the remittance batch; commission ORs from Collection details.
+    depth: Similar
+    assessment: Decide the trigger (C12).
+  - bdoi: "Record Inquiry (FRS.CSH.08.01)"
+    ours: FR-OP-024, FR-OP-004, FR-OP-005; SCR-OP-02, 03, 09
+    bdoi_content: Payment record inquiry and account record inquiry with policy, endorsement, payment and remittance details.
+    ours_content: Receipt search on the ten BRD criteria with search log; Invoice 360 with the payment history and the records of every team.
+    depth: Similar
+    assessment: Adopt BDOI's two inquiries as the headings and map them to our two screens.
+  - bdoi: "Generate Reports (FRS.CSH.09.01-09.02)"
+    ours: FR-OP-009, 028; 6.1 Cashiering reports
+    bdoi_content: Report facility and 18 reports with fields, file names and formats.
+    ours_content: Report Centre with view and export rights, archive; 24 reports, 12 with draft layouts.
+    depth: BDOI's deeper
+    assessment: Take BDOI's report fields into Annex D; add our six reports BDOI does not list.
+  - bdoi: (no section)
+    ours: 3 Personas and roles; permissions matrix
+    bdoi_content: "“User Group: Cashiering”, “User Role:” blank in every item."
+    ours_content: 15 personas with their BIBS role, the Operations permissions, role-to-permission matrix, segregation of duties.
+    depth: Only ours
+    assessment: Fill the user role line of each FR item; matrix as Annex E.
+  - bdoi: (no section)
+    ours: 5 Workflows and accounting events
+    bdoi_content: "Statuses inside the FR text; GL entries “Debit: Credit:” left blank."
+    ours_content: Workflows with stages, owners and SLA hours; diagrams; default entry of every cashiering event.
+    depth: Only ours
+    assessment: Workflow stages into the FR items; entries as Annex F, confirmed by Comptrollership.
+  - bdoi: (no section)
+    ours: 8 Non-functional requirements; 9 Configuration items; 10 Assumptions, dependencies and open questions
+    bdoi_content: Only the 50 MB file limit and the BDO device.
+    ours_content: NFR targets from BRD p.178-183, parameters, lists of values, jobs, masters; assumptions, dependencies, open questions.
+    depth: Only ours
+    assessment: Configuration as Annex E; open items as Annex K; NFRs stay in the programme NFR catalogue.
+  - bdoi: (no section)
+    ours: 13 Screen specifications; 14 Walkthroughs; 15 Messages; 16 Notifications; 17 Documents; 18 Upload screens; 19 Cross-BRD contract; 21 Clarifications; 23 Storyboard; Appendix screen standards
+    bdoi_content: None.
+    ours_content: The business view of the screens, messages, notifications, documents and uploads, with screenshots.
+    depth: Only ours
+    assessment: Annexes G to K of the merged document; the cross-BRD contract stays a supporting document.
+  - bdoi: Signoff Sheet
+    ours: 20 Sign-off and change control
+    bdoi_content: Prepared by (System Analyst), Reviewed by (Tech Lead, Application or Platform Owner), Approved by (Project Owner / Sponsor, BU signatories).
+    ours_content: What is signed, how the review is recorded, what signing freezes, change after sign-off, signatures.
+    depth: Similar
+    assessment: Keep BDOI's sheet; fill the names from the BRD approval sheet; our change-control text is not needed in BDOI's document.
+  - bdoi: Template Revision Log
+    ours: (none)
+    bdoi_content: History of ITG's template (1.0 of 11-May-21 to 2.0 of 10-Mar-25).
+    ours_content: "-"
+    depth: Only BDOI's
+    assessment: Keep as it is.
+  - bdoi: Appendix A – Templates (Sample AR, Sample Billspayment file, Sample CLPC file, Sample Trade file)
+    ours: 17 Document outputs; 18 Upload screens and Bank payment files
+    bdoi_content: Four images of real documents and files.
+    ours_content: AR / OR and Certification of Payment PDFs (layout draft); column lists of the four bank files and the upload templates.
+    depth: Similar
+    assessment: Keep BDOI's images; add the field-by-field layouts of sheet 9 as Annex C.
+  - bdoi: Appendix B – References
+    ours: 1.3 References
+    bdoi_content: "“Operations_WS Addendum”."
+    ours_content: R1 to R9 with versions, dates and the page ranges of the 321-page file.
+    depth: Ours deeper
+    assessment: Add the BRD v1.01, the May 2026 Cashiering annex and the e-mail record with their pages.
+
+# ---------------------------------------------------------------------------------------------------------- 3 Pros and cons
+pros_cons:
+  - group: Completeness
+    bdoi:
+      pros: ["Covers the whole cycle, including items absent from the BRD and from ours: the OR from Disbursement approval, the Commission Schedule upload, the AR / OR template set-up, the account record inquiry with remittance details.", "18 reports with their fields."]
+      cons: ["Placeholders left blank: “User Role:” in every item, GL entries, certificate number “Convention:”, “See template:”, the example “Application of 5000”, staging fields per file, “Commission Schedule list of fields”, PDC header and details, data elements of the unapplied record (FRS.CSH.06.01.07), OR mapping (FRS.CSH.07.01.04).", "Open marks: “Refund to Client (?)”, “Payment to Premium (manual?)”."]
+    ours:
+      pros: ["All 33 in-scope BRD IDs of the cashiering scope have FRs; removed IDs (CSHID.009, 026, 027) are explained.", "PDC warehouse, pre-booked queue, payment gate, AR Insurance, series warning level, minimal balance safety net, requests of other modules."]
+      cons: ["12 of 24 report layouts and the AR / OR layout are draft (OQ42).", "No posting step, no MFT intake, no legacy matching keys, no AR template set-up (see sheet 7)."]
+  - group: Traceability
+    bdoi:
+      pros: ["One mapping table in BRD order that a business reader checks at a glance."]
+      cons: ["BRQID.001-007 and CSHID.011 have no FR ID; MKTID.013 and DBMID.001 point to “Com rec”.", "No BRD page references; FRS.CSH.02.06, 06.02 and 09.02 are not referenced from any BRD row.", "Wrong cross-reference: “Allow the user to print the AR (see FRS.CSH.02.03)” (printing is FRS.CSH.02.04)."]
+    ours:
+      pros: ["Each FR cites the BRD ID and page; traceability to screens and test cases; coverage summary; user-story view per BRD ID."]
+      cons: ["Traceability is kept in three places (FR headers, chapter 11, chapter 22)."]
+  - group: Testability and acceptance criteria
+    bdoi:
+      pros: ["Statuses, confirmations and messages are written out (“Record will be Saved. Do you wish to continue?”), so many statements can be tested as written."]
+      cons: ["No acceptance criteria, no negative scenarios, no worked examples (the 5,000 example is blank)."]
+    ours:
+      pros: ["55 numbered acceptance criteria with worked amounts (a payment of 9,995.00 on 10,000.00 clears 5.00); 76 test cases in the test plan."]
+      cons: ["Acceptance criteria use seed references (ARN-2026-940001) that BDOI's testers map to their own data."]
+  - group: Screens and fields
+    bdoi:
+      pros: ["Field-level detail of the create AR / OR screens: types, defaults, bank accounts, branches, maximum 1B, remarks 200 characters; filters and columns of every list."]
+      cons: ["No screen images or layouts; fields are nested lists inside a table cell; the mandatory list contains “Details”."]
+    ours:
+      pros: ["15 cashiering screen specifications with screenshots, numbered field tables (type, length, mandatory, source, default, editable status, validation, message) and action tables."]
+      cons: ["Some screenshots still show items withdrawn in v2.1 (Check Pick-ups Due tile, BIR 2307 to Validate), explained in notes."]
+  - group: Rules and validations
+    bdoi:
+      pros: ["Clear accounting rules for the remitted and not remitted cases of cancellation and reinstatement, matching priorities with legacy numbers, Direct Credit priorities, excess formula with PR 2307."]
+      cons: ["Ambiguous or inconsistent rules: “Check date should be less than Current Date – 4 working days”; minimal balance “-1.00<= x <=1.00” against the BRD's Php 10.00; “PR2307 = 2% of Premium Amount” (which premium); cancellation reasons shorter than the BRD."]
+    ours:
+      pros: ["47 rules, each marked configurable or fixed with where it is maintained; 52 validations with message and code."]
+      cons: ["Some proposed rules go beyond the BRD and wait for BDOI's confirmation (TL approval of cancellations, OQ06; OR grouping, OQ49)."]
+  - group: Messages and notifications
+    bdoi:
+      pros: ["Key messages quoted (“Receipt Number series for this Branch is depleted. Contact your Administrator.”)."]
+      cons: ["No message catalogue and no notifications (only “Record will be assigned to Approver/Poster”); typing errors in quoted messages (“You you wish to continue”)."]
+    ours:
+      pros: ["124 messages of the cashiering screens quoted as the screens show them, with what the user does; notifications NT-06 to NT-09 and the common ones."]
+      cons: ["Some messages carry a BRD reference inside the user text (“... for this branch (CSHID.015)”)."]
+  - group: Process flows
+    bdoi:
+      pros: ["Each FR walks through save, submit, post and return step by step."]
+      cons: ["No process flow diagram; the five images are the BDO logo and the four sample files."]
+    ours:
+      pros: ["Process overview figure, workflow diagrams of the receipt action and the disposition, walkthroughs WT-A and WT-D with screenshots."]
+      cons: ["Walkthroughs span all Operations teams; only part of WT-A and WT-D is Cashiering."]
+  - group: Approvals and maker-checker
+    bdoi:
+      pros: ["Maker-checker on every receipt transaction, issuance included (“Submit for Posting”, “Return to creator”)."]
+      cons: ["The approver is not named (“Based on UAM”); no segregation rule that the creator cannot post."]
+    ours:
+      pros: ["Four-eyes rules that cannot be switched off; the requester never approves; TL approval of cancellations, reinstatements, dispositions and series."]
+      cons: ["AR / OR issuance posts on save without a posting approval, unlike BDOI's FRS (C1)."]
+  - group: Reports
+    bdoi:
+      pros: ["Description, file name, format, rules and fields of 18 reports, including the 28 columns of the unapplied premium payment report with ageing brackets."]
+      cons: ["Rules blank for 11 of 18 reports; “Cancelled Acknowledgement Receipts” rule reads “Extract all cancelled OR”; three reports of the BRD annex (PDC Warehousing, Priority Posted Accounts, Payment Reversals) are not listed."]
+    ours:
+      pros: ["24 reports including AR outstanding with ageing and the batch run report; view and export rights; archive of every run."]
+      cons: ["12 layouts draft until BDOI gives them (OQ42); ageing buckets open (OQ43)."]
+  - group: Non-functional
+    bdoi:
+      pros: ["States the 50 MB file limit and the BDO-issued device."]
+      cons: ["No NFR section (response time, availability, retention, volumes)."]
+    ours:
+      pros: ["NFR table from BRD p.178-183 with targets, including the audit standard required at the BRD sign-off."]
+      cons: ["NFRs cover all of Operations; cashiering volumes are not stated (OQ44)."]
+  - group: Sign-off readiness
+    bdoi:
+      pros: ["ITG template with the sign-off statement and roles BDOI's SDLC requires; prepared by BDOI."]
+      cons: ["Reviewer and approver names blank; 15 open review comments; revision 1.1 in a file named v3.1; document properties still titled “Business Requirements Document Template”."]
+    ours:
+      pros: ["Issued for sign-off with distribution, change control and a list of clarifications for confirmation."]
+      cons: ["Not in BDOI ITG's template; BDOI ITG has to review a vendor document."]
+  - group: Ease of maintenance
+    bdoi:
+      pros: ["Short and in Word; ITG edits it without tools."]
+      cons: ["Repeated blocks (create AR and create OR repeat about 15 statements; cancellation and reinstatement repeat the save and submit cycle); numbering gaps and duplicates (FRS.CSH.02.02.05 missing, FRS.CSH.03.01.05 and 04.01.03 used twice)."]
+    ours:
+      pros: ["Produced from one source with the screens, messages and test plan, so they stay consistent; IDs stable across versions."]
+      cons: ["Length: the whole Operations FRS in one document; a cashiering change touches several chapters."]
+  - group: Alignment with the BRD of 08-Oct-2026
+    bdoi:
+      pros: ["Uses the BRD v1.01 IDs including BRQID.007; drops CSHID.009, 026 and 027 consistently."]
+      cons: ["Differs from the BRD on the minimal balance (±1.00 vs “Php 10.00 and below”), the reinstatement (“Due to Cancellation” reason dropped), the cancellation reasons (CSHID.003) and the encoded fields (CSHID.005)."]
+    ours:
+      pros: ["Re-based on BRD v1.01 and the May 2026 annex with page citations; “Changed in v2.1” notes."]
+      cons: ["Proposes approvals and rules the BRD does not state (OQ06, CLR-OP-06)."]
+  - group: Alignment with the platform
+    bdoi:
+      pros: ["Most of the core matches BIBS: matching categories, application hierarchy, minimal balance at processing, series depletion, unapplied tabs, full and partial reinstatement, report facility."]
+      cons: ["Asks for what BIBS does not do today: posting step, MFT intake, record-type Bills Payment file, Direct Credit identification, legacy matching keys, reprint watermark, ZIP download, AR template set-up, OR on Disbursement approval, AP Unapplied Commission."]
+    ours:
+      pros: ["Describes the screens as BIBS shows them, with screenshots and messages quoted from the platform."]
+      cons: ["Draft report layouts mean the reports shown may change after BDOI's answer."]
+
+# ---------------------------------------------------------------------------------------------------------- 4 BRD coverage
+coverage:
+  - id: "BRQID.001"
+    page: "p.79"
+    req: "Access and log-in to the system."
+    bdoi_fr: "(blank)"
+    bdoi_status: "Full"
+    bdoi_note: "Content in FRS.CSH.01.01-01.02 (FRS.OPS.001-002); the mapping row is blank."
+    ours_fr: "FR-OP-001"
+    ours_status: "Full"
+    note: "Fill the mapping row with FRS.CSH.01.01-01.02."
+  - id: "BRQID.002"
+    page: "p.79"
+    req: "Restrict access to authorized users."
+    bdoi_fr: "(blank)"
+    bdoi_status: "Full"
+    bdoi_note: "FRS.CSH.01.02 loads modules, fields and data access by profile."
+    ours_fr: "FR-OP-002"
+    ours_status: "Full"
+    note: "Ours adds the permission per action and the four-eyes rules."
+  - id: "BRQID.003"
+    page: "p.80"
+    req: "Operations functionality on the dashboard after login; switch between sections."
+    bdoi_fr: "(blank)"
+    bdoi_status: "Full"
+    bdoi_note: "FRS.CSH.01.03 dashboard and main navigation."
+    ours_fr: "FR-OP-003"
+    ours_status: "Full"
+    note: "Ours filters sections by role; a personal pin of sections is not proposed (CLR-OP-01)."
+  - id: "BRQID.004"
+    page: "p.81"
+    req: "Integrate with other systems (Collection, Accounting, Disbursement, Marketing, Claims)."
+    bdoi_fr: "(blank)"
+    bdoi_status: "Partial"
+    bdoi_note: "List of Integrations names only OBPCS (MFT) and PMS."
+    ours_fr: "FR-OP-130"
+    ours_status: "Partial"
+    note: "Ours: uploads and the in-app Disbursement queue; electronic transfers on hold (OQ17, OQ22, OQ29)."
+  - id: "BRQID.005"
+    page: "p.81"
+    req: "Fetch data from other systems to support Operations."
+    bdoi_fr: "(blank)"
+    bdoi_status: "Partial"
+    bdoi_note: "FRS.CSH.05.01.04 receipt of OBPCS and PMS files via MFT."
+    ours_fr: "FR-OP-131"
+    ours_status: "Full"
+    note: "Ours has flow-in feeds with runs and alerts."
+  - id: "BRQID.006"
+    page: "p.82-83"
+    req: "Batch processing continues past failed records; failed records logged; run report."
+    bdoi_fr: "(blank)"
+    bdoi_status: "Partial"
+    bdoi_note: "Payment files: “Partial failures ... shall still produce an output file” (FRS.CSH.05.01.06). Commission Schedule: “The system shall not process the file if there are failed validations” (FRS.CSH.02.02.06), which runs against BRQID.006."
+    ours_fr: "FR-OP-008"
+    ours_status: "Full"
+    note: "See conflict C10."
+  - id: "BRQID.007"
+    page: "annex p.3"
+    req: "Remittance details at invoice level and visible payment histories (dates, amounts, AR numbers)."
+    bdoi_fr: "(blank)"
+    bdoi_status: "Partial"
+    bdoi_note: "Account Record Inquiry shows payment and remittance details (FRS.CSH.08.01); not mapped."
+    ours_fr: "FR-OP-004, FR-OP-005"
+    ours_status: "Full"
+    note: "Ours keeps the payment history in the invoice ledger and Invoice 360."
+  - id: "CSHID.001"
+    page: "p.86-87"
+    req: "Create, cancel and reinstate AR (premium and non-premium payments)."
+    bdoi_fr: "FRS.CSH.02.01, 02.05, 03.01, 04.01"
+    bdoi_status: "Partial"
+    bdoi_note: "Reinstatement only of issued ARs; the BRD reason “Due to Cancellation” is not carried."
+    ours_fr: "FR-OP-011, 013, 014"
+    ours_status: "Full"
+    note: "See conflict C2."
+  - id: "CSHID.002"
+    page: "p.87-88"
+    req: "Create, cancel and reinstate OR (service fee, profit share, commissions, incentives, others)."
+    bdoi_fr: "FRS.CSH.02.02, 02.05, 03.01, 04.01"
+    bdoi_status: "Full"
+    bdoi_note: "OR types as a maintenance table."
+    ours_fr: "FR-OP-012, 013"
+    ours_status: "Full"
+    note: "BDOI lists “Contingent Profit Commission (CPC)” where the BRD says “Insurance Profit Share”."
+  - id: "CSHID.003"
+    page: "p.88-89"
+    req: "Reason for AR or OR cancellation (lists for premium, commission, PDC and general)."
+    bdoi_fr: "FRS.CSH.03.01"
+    bdoi_status: "Partial"
+    bdoi_note: "Shorter list: Check not picked-up, Negative VAT, Discount not applied, PDC retrieval / replacement, Bounced or returned check and Error printing are missing."
+    ours_fr: "FR-OP-013"
+    ours_status: "Full"
+    note: "Ours keeps the BRD list in four groups (C21)."
+  - id: "CSHID.004"
+    page: "p.89-90"
+    req: "Reason for reinstatement (premium and direct payment lists)."
+    bdoi_fr: "FRS.CSH.04.01"
+    bdoi_status: "Partial"
+    bdoi_note: "Premium: Mis-application, Withholding Tax Adjustment, Others; OR: Withholding Tax Adjustment, Others. “Due to Cancellation”, “Due to double reversal” and “Due to wrong details of OR” are missing."
+    ours_fr: "FR-OP-014"
+    ours_status: "Full"
+    note: "Depends on C2."
+  - id: "CSHID.005"
+    page: "p.90-91"
+    req: "Encode the required information for reinstatement (invoice, AR / OR no., assured / payor, amount, AO, Unit Head, Team Leader)."
+    bdoi_fr: "FRS.CSH.04.01"
+    bdoi_status: "Partial"
+    bdoi_note: "Inputs are type, account numbers, remarks and reason; the AO, Unit Head and Team Leader of the BRD are not captured."
+    ours_fr: "FR-OP-014"
+    ours_status: "Full"
+    note: "Ours captures the BRD fields (C23)."
+  - id: "CSHID.006"
+    page: "p.91-92"
+    req: "Auto-assign AR / OR numbers per branch; OR by Head Office only."
+    bdoi_fr: "FRS.CSH.02.05, 02.03"
+    bdoi_status: "Full"
+    bdoi_note: "Numbers generated at posting; HO only for ORs."
+    ours_fr: "FR-OP-010"
+    ours_status: "Full"
+    note: "Format to decide (C4)."
+  - id: "CSHID.007"
+    page: "p.92"
+    req: "Individual OR per commission check or consolidated per insurer / payee and certificate."
+    bdoi_fr: "FRS.CSH.02.02, 07.01"
+    bdoi_status: "Partial"
+    bdoi_note: "One OR per commission schedule or check; the same-certificate rule of the BRD is not stated."
+    ours_fr: "FR-OP-021"
+    ours_status: "Full"
+    note: "Grouping open (OQ49; C11)."
+  - id: "CSHID.008"
+    page: "p.92-95"
+    req: "Uploads for Bills, Trade, CLPC, matured PDC and Direct Credit; PDC list with its own system number."
+    bdoi_fr: "FRS.CSH.05.01"
+    bdoi_status: "Partial"
+    bdoi_note: "The PDC warehouse of the BRD (system number, repository, list) is not covered; only the matured list from PMS."
+    ours_fr: "FR-OP-015, 016"
+    ours_status: "Full"
+    note: "Both let the cashier upload, where the BRD has IT run Trade, Direct Credit and CLPC (C30)."
+  - id: "CSHID.009"
+    page: "annex p.4-6"
+    req: "Check pick-up from Collection (removed)."
+    bdoi_fr: "-"
+    bdoi_status: "Removed"
+    bdoi_note: "Not listed."
+    ours_fr: "FR-OP-017 (removed)"
+    ours_status: "Removed"
+    note: "Removed by the Cashiering annex of May 2026."
+  - id: "CSHID.010"
+    page: "p.96-97"
+    req: "Search by ten parameters."
+    bdoi_fr: "FRS.CSH.08.01"
+    bdoi_status: "Full"
+    bdoi_note: "Split into payment record and account record inquiries; search log (AC7) not stated."
+    ours_fr: "FR-OP-024"
+    ours_status: "Full"
+    note: "Ours keeps a search log (OQ47)."
+  - id: "CSHID.011"
+    page: "p.97-98"
+    req: "AR number and user name in the audit trail."
+    bdoi_fr: "(blank)"
+    bdoi_status: "Full"
+    bdoi_note: "An audit trail statement in every FR item; not mapped."
+    ours_fr: "FR-OP-024"
+    ours_status: "Full"
+    note: "Ours applies the seven items of the IT audit standard (CLR-OP-37)."
+  - id: "CSHID.012"
+    page: "p.98"
+    req: "Accounting entries on cancellation; peso conversion at the Comptrollership rate (2 decimals)."
+    bdoi_fr: "FRS.CSH.03.01"
+    bdoi_status: "Partial"
+    bdoi_note: "Entries left blank (“Debit: Credit:”); rate named “effective revaluation rate”."
+    ours_fr: "FR-OP-013, 027"
+    ours_status: "Full"
+    note: "C20."
+  - id: "CSHID.013"
+    page: "p.98-99"
+    req: "Accounting entries on reinstatement."
+    bdoi_fr: "FRS.CSH.04.01"
+    bdoi_status: "Partial"
+    bdoi_note: "Entries left blank."
+    ours_fr: "FR-OP-014, 027"
+    ours_status: "Full"
+    note: "-"
+  - id: "CSHID.014"
+    page: "p.99"
+    req: "Accounting entries for AR / OR."
+    bdoi_fr: "FRS.CSH.02.05"
+    bdoi_status: "Partial"
+    bdoi_note: "Entries left blank."
+    ours_fr: "FR-OP-027"
+    ours_status: "Full"
+    note: "Default entries in chapter 5.3 of ours."
+  - id: "CSHID.015"
+    page: "p.100"
+    req: "Validate that the series is not depleted."
+    bdoi_fr: "FRS.CSH.02.05"
+    bdoi_status: "Full"
+    bdoi_note: "FRS.CSH.02.05.09 with message."
+    ours_fr: "FR-OP-010"
+    ours_status: "Full"
+    note: "-"
+  - id: "CSHID.016"
+    page: "p.100-101; annex p.4 and 6-7"
+    req: "Clear minimal balances automatically unless equal to the 2% CWT, the DST or the entire premium."
+    bdoi_fr: "FRS.CSH.02.05"
+    bdoi_status: "Partial"
+    bdoi_note: "Rule and exceptions as the BRD; default threshold “-1.00<= x <=1.00” where the BRD says Php 10.00."
+    ours_fr: "FR-OP-023"
+    ours_status: "Full"
+    note: "C5."
+  - id: "CSHID.017"
+    page: "p.101"
+    req: "Generate, download or print reports."
+    bdoi_fr: "FRS.CSH.09.01"
+    bdoi_status: "Full"
+    bdoi_note: "-"
+    ours_fr: "FR-OP-009"
+    ours_status: "Full"
+    note: "-"
+  - id: "CSHID.018"
+    page: "p.101"
+    req: "Selected users view generated reports without download unless permitted."
+    bdoi_fr: "FRS.CSH.09.01"
+    bdoi_status: "Partial"
+    bdoi_note: "“Based on UAM”; the view-only restriction is not stated."
+    ours_fr: "FR-OP-009"
+    ours_status: "Full"
+    note: "Ours separates view and export rights."
+  - id: "CSHID.019"
+    page: "p.102-103"
+    req: "Batch printing of AR / OR."
+    bdoi_fr: "FRS.CSH.02.04"
+    bdoi_status: "Full"
+    bdoi_note: "-"
+    ours_fr: "FR-OP-025"
+    ours_status: "Full"
+    note: "-"
+  - id: "CSHID.020"
+    page: "p.103-104"
+    req: "Matching at acceptance except issued PDC; pre-booked; no match; excess; cancelled reference."
+    bdoi_fr: "FRS.CSH.05.01"
+    bdoi_status: "Full"
+    bdoi_note: "Matching priorities for files; manual ARs select the accounts."
+    ours_fr: "FR-OP-018, 132"
+    ours_status: "Full"
+    note: "Match keys differ (sheet 5)."
+  - id: "CSHID.021"
+    page: "p.104"
+    req: "Flow-in of insurer non-premium payments to AR Insurance the same business day."
+    bdoi_fr: "FRS.CSH.06.01"
+    bdoi_status: "Partial"
+    bdoi_note: "AR Insurance is a non-premium AR type (FRS.CSH.02.01); same-day posting not stated; mapped to the unapplied facility."
+    ours_fr: "FR-OP-020"
+    ours_status: "Full"
+    note: "-"
+  - id: "CSHID.022"
+    page: "p.105"
+    req: "Hierarchy DST, VAT, LGT, other charges, basic premium; mode of payment check then cash."
+    bdoi_fr: "FRS.CSH.02.05"
+    bdoi_status: "Full"
+    bdoi_note: "Both hierarchies stated."
+    ours_fr: "FR-OP-019"
+    ours_status: "Partial"
+    note: "Ours adds FST and leaves check before cash open (OQ09; C6)."
+  - id: "CSHID.023"
+    page: "p.105; p.314-316"
+    req: "Reports of the Cashiering annex."
+    bdoi_fr: "FRS.CSH.09.01"
+    bdoi_status: "Full"
+    bdoi_note: "18 reports with fields (FRS.CSH.09.02)."
+    ours_fr: "FR-OP-028"
+    ours_status: "Partial"
+    note: "12 layouts draft in ours."
+  - id: "CSHID.024"
+    page: "p.105-106"
+    req: "Manage dispositions of unapplied payments with approvals and reversals."
+    bdoi_fr: "FRS.CSH.06.01"
+    bdoi_status: "Full"
+    bdoi_note: "-"
+    ours_fr: "FR-OP-022"
+    ours_status: "Full"
+    note: "Who disposes differs (C13)."
+  - id: "CSHID.025"
+    page: "p.106-107"
+    req: "Disposition tabs Unapplied, Monitoring, For Approval, For Reversal."
+    bdoi_fr: "FRS.CSH.06.02"
+    bdoi_status: "Full"
+    bdoi_note: "The mapping row quotes three tabs; FRS.CSH.06.02.02 has the four."
+    ours_fr: "FR-OP-022"
+    ours_status: "Full"
+    note: "Ours adds a Done tab."
+  - id: "CSHID.026"
+    page: "p.67-69, 186-188 (deleted)"
+    req: "Cashiering processing of BIR 2307 (deleted in BRD v1.01)."
+    bdoi_fr: "-"
+    bdoi_status: "Removed"
+    bdoi_note: "Not listed."
+    ours_fr: "FR-OP-026 (removed)"
+    ours_status: "Removed"
+    note: "-"
+  - id: "CSHID.027"
+    page: "p.67-69, 186-188 (deleted)"
+    req: "Cashiering 2307 reversal and routing (deleted in BRD v1.01)."
+    bdoi_fr: "-"
+    bdoi_status: "Removed"
+    bdoi_note: "Not listed."
+    ours_fr: "FR-OP-026 (removed)"
+    ours_status: "Removed"
+    note: "-"
+  - id: "MKTID.013"
+    page: "p.107-108"
+    req: "Marketing tags BIR 2307 reversals and the system validates the amounts."
+    bdoi_fr: "Com rec"
+    bdoi_status: "By reference"
+    bdoi_note: "Left to another FRS."
+    ours_fr: "FR-OP-113"
+    ours_status: "Full"
+    note: "In our Marketing Collection chapter."
+  - id: "DBMID.001"
+    page: "p.109"
+    req: "Disbursement receives and releases the BIR 2307 certificates."
+    bdoi_fr: "Com rec"
+    bdoi_status: "By reference"
+    bdoi_note: "Left to another FRS."
+    ours_fr: "FR-OP-120, 121"
+    ours_status: "Full"
+    note: "In our Disbursement queue chapter."
+
+# ---------------------------------------------------------------------------------------------------------- 5 Requirement mapping
+mapping:
+  - id: "FRS.CSH.01.01"
+    capability: "Access / Log in"
+    quote: "“System shall be accessible using BDO issued device”"
+    ours: "FR-OP-001"
+    match: "Different"
+    difference: "Ours does not restrict the device; the BRD asks for the same performance on mobile and desktop."
+    platform: "No"
+    action: "Needs BDOI decision"
+    action_detail: "C24. A device restriction is enforced by BDO's network and device policy, not by a screen."
+  - id: "FRS.CSH.01.02"
+    capability: "Role / Profile Log In"
+    quote: "“block access ... User is not defined; User access is already expired”"
+    ours: "FR-OP-001, 002"
+    match: "Same"
+    difference: "Ours shows one message for every refused log-in (“Invalid user name or password”) so that the reason is not revealed."
+    platform: "Yes"
+    action: "Keep ours"
+    action_detail: "Keep the single message; the lock shows to the System Administrator."
+  - id: "FRS.CSH.01.03.01-.02"
+    capability: "Dashboard"
+    quote: "“display both count and amount per item” for AR / OR for posting by type, cancellation and reinstatement for posting, returned lists, unapplied by type and auto payment files"
+    ours: "FR-OP-003; SCR-OP-07"
+    match: "Partial"
+    difference: "Ours shows live counts per queue (unapplied, dispositions and receipt actions for approval, pre-booked, PDCs) without amounts and without per-type rows; no “for posting” or “returned” tiles because issuance posts at once."
+    platform: "Partly"
+    action: "Platform change"
+    action_detail: "Add amounts and per-type tiles; the posting tiles depend on C1."
+  - id: "FRS.CSH.01.03.03"
+    capability: "Main navigation"
+    quote: "Create AR/OR, Post- Issuance, Edit, Cancel AR/OR, Reinstate AR/OR, Batch Print, Unapplied Payments, Automatic Payment Processing Uploading, Reports"
+    ours: "FR-OP-002, 003; chapter 12"
+    match: "Partial"
+    difference: "Ours: Receive Payment, Receipts, Unapplied Payments, Incoming Requests, Pre-booked Payments, Payment Uploads, PDC Warehouse, Batch Print, Commission ORs, Receipt Series, Cashiering Setup; no separate posting entries."
+    platform: "Partly"
+    action: "Needs BDOI decision"
+    action_detail: "Follows C1."
+  - id: "FRS.CSH.01.03.04"
+    capability: "Lists per summary group"
+    quote: "tabular form ... Allow user to filter status"
+    ours: "SCR-OP-09; SCR-OP-11"
+    match: "Partial"
+    difference: "Ours lists receipts and unapplied payments with filters; BDOI's columns (creation record number, receipt type, account / invoice, client, insurer) are partly shown."
+    platform: "Partly"
+    action: "Adopt BDOI wording"
+    action_detail: "Take BDOI's column lists into the screen specifications."
+  - id: "FRS.CSH.02.01.01-.02"
+    capability: "Create AR – inputs"
+    quote: "Receipt Type; AR type Premium / Non-Premium (Refund from Insurer, Other Expenses, AR Insurance); Entry Type Client / Insurer / Other; Post to Bank Account; Paid Amount (max of 1B); Remarks (max 200); Receipting Branch"
+    ours: "FR-OP-011, 020; SCR-OP-08"
+    match: "Partial"
+    difference: "Ours has the AR class (channels and non-premium types), payor, references, amount, currency, mode, check no. and bank, payment date. Not in ours: entry type, bank account to post to, receipting branch choice (ours uses the user's branch), the 1B limit, remarks."
+    platform: "Partly"
+    action: "Platform change"
+    action_detail: "Add entry type, bank account and branch; adopt BDOI's lists (bank accounts and branches maintained as lists, per the review comments)."
+  - id: "FRS.CSH.02.01.03-.05"
+    capability: "Create AR – account table"
+    quote: "Premium Receivable, Commission Receivable, Total Invoice, Total Paid, Outstanding, PR 2307 Amount, Paid Amount (per account), Excess Amount; “Add” button"
+    ours: "FR-OP-011, 018, 019; SCR-OP-08 preview"
+    match: "Partial"
+    difference: "Ours previews each invoice by component with the amount applied, the 2% CWT withheld and the excess; the payment is applied oldest first, not split per account by the user."
+    platform: "Partly"
+    action: "Needs BDOI decision"
+    action_detail: "Manual split per account (BRD summary 1.j) or automatic oldest first; to settle in the decision session with C1."
+  - id: "FRS.CSH.02.01.06"
+    capability: "Create AR – mandatory fields"
+    quote: "required fields ... Payor Name, Payment Type, Post to Bank Account, Paid Amount, ... Currency, Remarks"
+    ours: "SCR-OP-08"
+    match: "Different"
+    difference: "Remarks and bank account are mandatory in BDOI's; ours has neither field."
+    platform: "No"
+    action: "Needs BDOI decision"
+    action_detail: "C25."
+  - id: "FRS.CSH.02.01.08 (currency)"
+    capability: "Create AR – validation"
+    quote: "“Account's booked currency should be the same as the receipt record currency”"
+    ours: "FR-OP-011"
+    match: "Not in ours"
+    difference: "Ours receipts in the currency received and converts at the BOOK rate; no check against the booked currency."
+    platform: "No"
+    action: "Platform change"
+    action_detail: "Add the check (or the conversion rule if a USD payment of a peso account is allowed)."
+  - id: "FRS.CSH.02.01.08 (check date)"
+    capability: "Create AR – validation"
+    quote: "“Check date should be less than Current Date – 4 working days (holding period)”"
+    ours: "FR-OP-031 (Remittance)"
+    match: "Different"
+    difference: "Ours has no check-date check at receipt; a 3 banking day holding period applies before the payment is remitted (RMTID.017)."
+    platform: "No"
+    action: "Needs BDOI decision"
+    action_detail: "C7."
+  - id: "FRS.CSH.02.01.08.02-.12"
+    capability: "Create AR – save, request number, submit for posting"
+    quote: "Set AR Creation Record Status = Created ... <Prefix>-<Receipt Type>-<Sequence Number> ... “Record is now submitted for Posting”"
+    ours: "FR-OP-011"
+    match: "Different"
+    difference: "Ours issues the AR when the cashier saves (“Issue AR and Apply”); there is no created record, request number or posting step."
+    platform: "No"
+    action: "Needs BDOI decision"
+    action_detail: "C1 and C3."
+  - id: "FRS.CSH.02.01.13"
+    capability: "Create AR – edit"
+    quote: "“edit created AR Creation Record if status is not equal to ... For Posting, Issued”"
+    ours: "-"
+    match: "Not in ours"
+    difference: "No draft receipt to edit in ours."
+    platform: "No"
+    action: "Needs BDOI decision"
+    action_detail: "Follows C1."
+  - id: "FRS.CSH.02.01.14"
+    capability: "Create AR – audit trail"
+    quote: "Module, Transaction type, Username, Date and Timestamp, Transaction Number, AR Number, modifications"
+    ours: "FR-OP-024"
+    match: "Same"
+    difference: "Ours records the seven items of the IT audit standard (adds origin of the event and success or failure)."
+    platform: "Yes"
+    action: "Keep ours"
+    action_detail: "Use the seven items in every audit sub-item."
+  - id: "FRS.CSH.02.02.01-.02"
+    capability: "Create OR – inputs"
+    quote: "Official Receipt Type: Fee Invoice, Contingent Profit Commission (CPC), Commissions, Incentives, Others; Receipting Branch default HO; Entry Type Insurer (default); Payment Type Cash, Check, Direct Credit; Post to Bank Account"
+    ours: "FR-OP-012; SCR-OP-09 Issue Official Receipt"
+    match: "Partial"
+    difference: "Ours: OR type (service fee, profit share, commission, incentive, others), payor, currency, mode, gross, VAT, withholding tax, 2307 certificate ref.; no bank account and no entry type."
+    platform: "Partly"
+    action: "Adopt BDOI wording"
+    action_detail: "OR types as a maintained list with BDOI's values; bank account as in FRS.CSH.02.01."
+  - id: "FRS.CSH.02.02.03-.07"
+    capability: "Create OR – Commission Schedule file intake"
+    quote: "“.csv format, pipe delimiter”; “max of 50MB”; duplicate check; validation report; “shall not process the file if there are failed validations”"
+    ours: "FR-OP-021; SCR-OP-20"
+    match: "Partial"
+    difference: "Ours uploads the commission payment details (insurer, payee, certificate, payment ref., invoice, basic commission, VAT, WTAX, date) from the Excel template; failed rows stay staged with their reason. BDOI's field list is blank."
+    platform: "Partly"
+    action: "Needs BDOI decision"
+    action_detail: "C10; BDOI to give the Commission Schedule fields."
+  - id: "FRS.CSH.02.02.08"
+    capability: "Create OR – other income"
+    quote: "incentive payments, allow selection of Valid for Collection SOA; Fee Policy payment, allow selection of Fee Policy invoice"
+    ours: "FR-OP-012"
+    match: "Not in ours"
+    difference: "Ours enters OR lines with a description; no selection of the SOA or the fee invoice."
+    platform: "No"
+    action: "Platform change"
+    action_detail: "Link the OR to the SOA or fee invoice it settles."
+  - id: "FRS.CSH.02.02.09.01-.05"
+    capability: "Create OR – matching of the schedule"
+    quote: "Match Reference Number ... Account Number (new core); Paid amount = outstanding balance; “If unmatched, the system shall not process the file”"
+    ours: "FR-OP-021"
+    match: "Different"
+    difference: "Ours does not require the paid commission to equal the outstanding amount and processes the valid lines."
+    platform: "No"
+    action: "Needs BDOI decision"
+    action_detail: "C10."
+  - id: "FRS.CSH.02.02.09.10-.19"
+    capability: "Create OR – save, submit, edit, audit"
+    quote: "Same cycle as the AR (Created, request number CR-OR, For Posting)"
+    ours: "FR-OP-012"
+    match: "Different"
+    difference: "Ours issues the OR at once from the Head Office series."
+    platform: "No"
+    action: "Needs BDOI decision"
+    action_detail: "C1."
+  - id: "FRS.CSH.02.03.01-.04"
+    capability: "AR / OR series maintenance"
+    quote: "“<Prefix>-<Year>-<Branch Indicator>-<Sequence>”; “AR number digits: 10”; start and end series per branch for the year; branches Head office, Cebu, Angeles, Davao, General Santos, CDO"
+    ours: "FR-OP-010; SCR-OP-21"
+    match: "Partial"
+    difference: "Ours keeps a series per kind and branch with prefix, range, BIR ATP no. and warning level, authorised by a second user; no year field (the prefix can carry it)."
+    platform: "Partly"
+    action: "Needs BDOI decision"
+    action_detail: "C4; keep ATP, warning level and maker-checker of ours."
+  - id: "FRS.CSH.02.03.05"
+    capability: "Series – audit trail"
+    quote: "Previous value, New value, status, remarks"
+    ours: "FR-OP-010"
+    match: "Same"
+    difference: "Ours audits before and after values and the authorisation."
+    platform: "Yes"
+    action: "Keep ours"
+    action_detail: "-"
+  - id: "FRS.CSH.02.04.01-.05"
+    capability: "Batch printing – search and select"
+    quote: "AR: Receipting Branch, Issued Date; OR: Insurer Name, Issued Date; Re-printing by AR / OR Number; bulk printing"
+    ours: "FR-OP-025; SCR-OP-18"
+    match: "Partial"
+    difference: "Ours filters by kind, insurer and dates, up to 500 receipts per batch; the FR names the BDOI location but the screen has no branch filter; no separate re-print search."
+    platform: "Partly"
+    action: "Adopt BDOI wording"
+    action_detail: "Add the branch filter and the re-print search."
+  - id: "FRS.CSH.02.04.06-.07"
+    capability: "Batch printing – format and certificate number"
+    quote: "“print ready ... based on AR and OR templates”; “assign a certificate number per printed receipt. Convention:” (blank)"
+    ours: "FR-OP-025; chapter 17"
+    match: "Partial"
+    difference: "Ours prints the AR / OR PDF (layout draft); no acknowledgement certificate number."
+    platform: "No"
+    action: "Needs BDOI decision"
+    action_detail: "C4: certificate number convention (the sample AR shows “AC_125_022025_00482”)."
+  - id: "FRS.CSH.02.04.08-.09"
+    capability: "Batch printing – download"
+    quote: "“single ZIP archive”; “<Receipt Type>_<Receipt Number>.pdf”"
+    ours: "FR-OP-025"
+    match: "Different"
+    difference: "Ours produces one merged PDF per print batch."
+    platform: "Partly"
+    action: "Platform change"
+    action_detail: "Offer a ZIP of one PDF per receipt with BDOI's file names."
+  - id: "FRS.CSH.02.04.10-.11"
+    capability: "Batch printing – print and preview"
+    quote: "print queue; “Print Preview”"
+    ours: "FR-OP-025"
+    match: "Partial"
+    difference: "Ours previews the list and prints the merged PDF from the browser."
+    platform: "Partly"
+    action: "Adopt BDOI wording"
+    action_detail: "-"
+  - id: "FRS.CSH.02.04.12"
+    capability: "Re-print watermark"
+    quote: "“Re-printed AR/OR should have re-print watermark”"
+    ours: "-"
+    match: "Not in ours"
+    difference: "Ours counts prints (“Printed <n>x”) but prints no re-print mark."
+    platform: "No"
+    action: "Platform change"
+    action_detail: "Print “REPRINT” on every copy after the first."
+  - id: "FRS.CSH.02.04.13-.15"
+    capability: "Printing errors"
+    quote: "“Action: Retry or Skip”"
+    ours: "FR-OP-025"
+    match: "Partial"
+    difference: "Ours lists failures and retries them; skip is implicit."
+    platform: "Partly"
+    action: "Adopt BDOI wording"
+    action_detail: "-"
+  - id: "FRS.CSH.02.04.16"
+    capability: "Printing – audit"
+    quote: "... AR/OR Number, re-print count"
+    ours: "FR-OP-025"
+    match: "Partial"
+    difference: "Ours logs user, time and count per batch and the print count per receipt."
+    platform: "Yes"
+    action: "Adopt BDOI wording"
+    action_detail: "-"
+  - id: "FRS.CSH.02.05.01-.07"
+    capability: "Manual posting of issuance"
+    quote: "“AR/OR will be issued. Payments will be applied ...” Action: Yes or Return"
+    ours: "-"
+    match: "Not in ours"
+    difference: "No posting list or poster role for issuance in ours."
+    platform: "No"
+    action: "Needs BDOI decision"
+    action_detail: "C1."
+  - id: "FRS.CSH.02.05.08"
+    capability: "AR / OR number assignment"
+    quote: "“should not allow duplicate AR numbers to be assigned nor skipped AR numbers”"
+    ours: "FR-OP-010"
+    match: "Partial"
+    difference: "Ours guarantees no duplicates; a sequence without gaps is not stated."
+    platform: "Partly"
+    action: "Adopt BDOI wording"
+    action_detail: "State the no-gap rule; the platform to confirm the sequence after a failed posting."
+  - id: "FRS.CSH.02.05.09"
+    capability: "Series depleted"
+    quote: "“Receipt Number series for this Branch is depleted. Contact your Administrator.”"
+    ours: "FR-OP-010"
+    match: "Same"
+    difference: "Same rule; ours shows “No authorized <kind> series with numbers left for this branch (CSHID.015)”."
+    platform: "Yes"
+    action: "Adopt BDOI wording"
+    action_detail: "BDOI's message is clearer and carries no BRD reference."
+  - id: "FRS.CSH.02.05.10"
+    capability: "Apply payment and excess"
+    quote: "apply payments to outstanding balance, less PR 2307 ... create an Excess payment record"
+    ours: "FR-OP-018, 019, 022"
+    match: "Same"
+    difference: "-"
+    platform: "Yes"
+    action: "Keep ours"
+    action_detail: "-"
+  - id: "FRS.CSH.02.05.11"
+    capability: "Application hierarchy"
+    quote: "Check, Cash ... DST, Premium Tax (VAT), LGT, Other Charges, Basic Premium"
+    ours: "FR-OP-019"
+    match: "Partial"
+    difference: "Ours inserts FST after LGT; check before cash is open (OQ09). BDOI's review comment: “Confirm first with Insurers for payment hierarchy”."
+    platform: "Partly"
+    action: "Needs BDOI decision"
+    action_detail: "C6."
+  - id: "FRS.CSH.02.05.12"
+    capability: "Minimal balance"
+    quote: "“Minimal Balance (default PHP -1.00<= x <=1.00)” with the three exceptions"
+    ours: "FR-OP-023"
+    match: "Partial"
+    difference: "Same rule and exceptions; ours defaults to 10.00 (BRD Php 10.00) and moves a minimal excess to AP overages."
+    platform: "Yes"
+    action: "Needs BDOI decision"
+    action_detail: "C5 (the threshold is configuration)."
+  - id: "FRS.CSH.02.05.13"
+    capability: "BIR 2307"
+    quote: "PR2307 = 2% of Premium Amount; Excess amount = Paid Amount – Outstanding balance - PR 2307 amount"
+    ours: "FR-OP-018"
+    match: "Partial"
+    difference: "Ours applies up to 98% of the premium for a 2% CWT client; BDOI tags the account. The premium base (basic or gross) and the source of the tag are open (OQ10)."
+    platform: "Partly"
+    action: "Needs BDOI decision"
+    action_detail: "C26."
+  - id: "FRS.CSH.02.05.14"
+    capability: "Application of OR payment"
+    quote: "Generate/Issue one OR for the total commission schedule/commission check ... Automatically queue OR receipt for printing"
+    ours: "FR-OP-021"
+    match: "Partial"
+    difference: "Ours issues one OR per insurer, certificate and payment; the OR is not queued for printing."
+    platform: "Partly"
+    action: "Needs BDOI decision"
+    action_detail: "C11."
+  - id: "FRS.CSH.02.05.15"
+    capability: "GL posting"
+    quote: "“effective revaluation rate (Revaluation - Transaction Rate)”; GL Reference AR or OR Number; Debit / Credit blank"
+    ours: "FR-OP-027; chapter 5.3"
+    match: "Partial"
+    difference: "Ours posts at the Comptrollership BOOK rate (2 decimals) and gives the default entries."
+    platform: "Yes"
+    action: "Keep ours"
+    action_detail: "Entries from ours into Annex F; rate name per C20."
+  - id: "FRS.CSH.02.06.01-.03"
+    capability: "AR / OR template set-up"
+    quote: "configure an AR or OR template online ... User Group: MBS; header, footer lines, body fields"
+    ours: "chapter 17 (AR / OR PDF)"
+    match: "Not in ours"
+    difference: "Ours prints a fixed draft layout (OQ42); no on-line set-up."
+    platform: "No"
+    action: "Platform change"
+    action_detail: "Adopt BDOI's layout (Appendix A) as the AR / OR form; template set-up if BDOI keeps it (C16)."
+  - id: "FRS.CSH.03.01.01-.04"
+    capability: "Cancel – search and list"
+    quote: "Receipt Number ... partial matches ... AR Number, AR Creation Record Number, Issued Date, Payment Type ..."
+    ours: "FR-OP-013; SCR-OP-09, 10"
+    match: "Partial"
+    difference: "Ours searches receipts and cancels from the receipt page."
+    platform: "Yes"
+    action: "Adopt BDOI wording"
+    action_detail: "Use BDOI's columns."
+  - id: "FRS.CSH.03.01.05 (selection)"
+    capability: "Cancel – several receipts"
+    quote: "“select all AR numbers only or all OR numbers only. Allow single or multiple selection”"
+    ours: "FR-OP-013"
+    match: "Different"
+    difference: "Ours cancels one receipt per request."
+    platform: "No"
+    action: "Platform change"
+    action_detail: "Bulk cancellation request with one reason."
+  - id: "FRS.CSH.03.01.05-.06 (reasons)"
+    capability: "Cancel – reasons"
+    quote: "Error in Issuance Details, Double issuance, Others ... check payments only: Discrepancy in check amount, No signature, Incorrect payee, Incorrect check details"
+    ours: "FR-OP-013"
+    match: "Different"
+    difference: "Ours has the BRD list in four groups (premium, commission, PDC, general); no restriction by payment type."
+    platform: "Partly"
+    action: "Needs BDOI decision"
+    action_detail: "C21."
+  - id: "FRS.CSH.03.01.06.03-.07"
+    capability: "Cancel – save and submit"
+    quote: "Generate Cancellation Record Number; Set Cancellation Record status = Created; submit for Posting"
+    ours: "FR-OP-013; workflow OPS_RECEIPT_ACTION"
+    match: "Same"
+    difference: "Same maker-checker; ours numbers CAN-yyyy-n (BDOI CN-AR / CN-OR) and its stages are Requested, For approval, Posted."
+    platform: "Yes"
+    action: "Needs BDOI decision"
+    action_detail: "C3 numbering only."
+  - id: "FRS.CSH.03.01.07"
+    capability: "Cancel – edit"
+    quote: "“edit ... if status is equal to either Created or Returned”"
+    ours: "FR-OP-013"
+    match: "Same"
+    difference: "Ours lets the requester correct and resubmit a returned request or withdraw it."
+    platform: "Yes"
+    action: "Keep ours"
+    action_detail: "-"
+  - id: "FRS.CSH.03.01.08"
+    capability: "Cancel – posting"
+    quote: "If already remitted, Create/re-class reversed payment to AR Insurer Refund ... If not remitted, Reverse entry PR, DTIP ... For OR Cancellation ... re-class ... to Commission Receivable"
+    ours: "FR-OP-013"
+    match: "Different"
+    difference: "Ours reverses every application so the invoices are outstanding again; there is no remitted / not remitted branch."
+    platform: "Partly"
+    action: "Needs BDOI decision"
+    action_detail: "C9."
+  - id: "FRS.CSH.03.01.09"
+    capability: "Cancel – GL posting"
+    quote: "“Description: Cancellation of AR or OR due to” <cancellation reason> + <AR or OR Number>; effective revaluation rate"
+    ours: "FR-OP-027"
+    match: "Partial"
+    difference: "Ours re-posts the original events negative at the original BOOK rate."
+    platform: "Yes"
+    action: "Needs BDOI decision"
+    action_detail: "C20; adopt BDOI's description text."
+  - id: "FRS.CSH.03.01.10"
+    capability: "Cancel – audit"
+    quote: "Username, Date and Timestamp, Transaction Number, Module, AR/OR Number"
+    ours: "FR-OP-013"
+    match: "Same"
+    difference: "-"
+    platform: "Yes"
+    action: "Keep ours"
+    action_detail: "-"
+  - id: "FRS.CSH.04.01.02-.05"
+    capability: "Reinstate – search"
+    quote: "“display issued AR/OR (AR or OR Number Status = Issued)”"
+    ours: "FR-OP-014; SCR-OP-10, 13"
+    match: "Different"
+    difference: "Ours reinstates a cancelled receipt; reversing the application of an issued receipt is the payment reversal requested by Accounting Controls and approved by the Cashiering TL."
+    platform: "Partly"
+    action: "Needs BDOI decision"
+    action_detail: "C2."
+  - id: "FRS.CSH.04.01.06"
+    capability: "Reinstate – inputs"
+    quote: "Partial Reinstatement (not applicable for OR), Full Reinstatement; Account number; Remarks (max 100); reasons"
+    ours: "FR-OP-014"
+    match: "Different"
+    difference: "Ours: full or partial by amount, reason groups of the BRD and the encoded fields (invoice, AR / OR no., assured, AO, Unit Head, Team Leader)."
+    platform: "Partly"
+    action: "Needs BDOI decision"
+    action_detail: "C2, C22, C23."
+  - id: "FRS.CSH.04.01.07-.08"
+    capability: "Reinstate – save, submit, edit"
+    quote: "Generate Reinstatement Record Number ... For Posting ... Created or Returned"
+    ours: "FR-OP-014; workflow OPS_RECEIPT_ACTION"
+    match: "Same"
+    difference: "Same maker-checker; ours numbers RIN-yyyy-n."
+    platform: "Yes"
+    action: "Needs BDOI decision"
+    action_detail: "C3 numbering only."
+  - id: "FRS.CSH.04.01.09"
+    capability: "Reinstate – posting"
+    quote: "Retain OR/AR Number status to Issued ... If already remitted ... AR Insurer Refund ... Reverse Remittance status ... If not remitted ... unapplied payment ... OR Reinstatement ... AP Unapplied Commission"
+    ours: "FR-OP-014, 057"
+    match: "Different"
+    difference: "Ours restores the receipt, posts the reinstated amount and applies it to the encoded invoice; remitted premium is handled by Adjustment (AR Insurer) for endorsements; no AP Unapplied Commission."
+    platform: "Partly"
+    action: "Needs BDOI decision"
+    action_detail: "C2, C9."
+  - id: "FRS.CSH.04.01.10"
+    capability: "Reinstate – GL posting"
+    quote: "“Conversion rate at time of issuance. Same with remittance.”"
+    ours: "FR-OP-027"
+    match: "Partial"
+    difference: "Ours posts the reinstatement at the receipt's BOOK rate; entries given in chapter 5.3."
+    platform: "Yes"
+    action: "Keep ours"
+    action_detail: "C20."
+  - id: "FRS.CSH.04.01.11"
+    capability: "Reinstate – audit"
+    quote: "Same audit fields"
+    ours: "FR-OP-014"
+    match: "Same"
+    difference: "-"
+    platform: "Yes"
+    action: "Keep ours"
+    action_detail: "-"
+  - id: "FRS.CSH.05.01.01-.03"
+    capability: "Upload payment files"
+    quote: "Bills Payment, CLPC, Trade, Direct Credit ... Select multiple payment files per Payment file type; Add another/multiple Payment file types per uploading activity"
+    ours: "FR-OP-015; SCR-OP-15"
+    match: "Partial"
+    difference: "Ours uploads one file at a time on the tab of its type (Bills Payment, Trade, CLPC, Direct Credit, PDC)."
+    platform: "Partly"
+    action: "Platform change"
+    action_detail: "Several files per upload event."
+  - id: "FRS.CSH.05.01.04"
+    capability: "Files received via MFT"
+    quote: "receive files from OBPCS via MFT ... List of matured check payments shall be integrated from PMS ... display in the dashboard if there are PMS files received"
+    ours: "FR-OP-015, 016; chapter 7"
+    match: "Different"
+    difference: "Ours takes the files by upload; transfers from the bank channels are on hold (OQ03, OQ17). PDCs are warehoused in BIBS and matured by its daily run."
+    platform: "No"
+    action: "Platform change"
+    action_detail: "MFT intake of OBPCS and PMS files; C15 for the PDC source."
+  - id: "FRS.CSH.05.01.05"
+    capability: "File validation"
+    quote: "“.csv format with pipe delimiter”; “max of 50MB”; “previously accepted file or source transaction should not be processed”"
+    ours: "FR-OP-008, 015"
+    match: "Partial"
+    difference: "Ours refuses an identical file (fingerprint) and keys each payment by its source; layouts are configurable per channel; upload limit 25 MB per file."
+    platform: "Partly"
+    action: "Adopt BDOI wording"
+    action_detail: "Raise the limit to 50 MB (C18); state the duplicate transaction rule."
+  - id: "FRS.CSH.05.01.06 (templates)"
+    capability: "File templates and names"
+    quote: "BDOIYYYYMMDD.txt; BDOIYYYYMMDDPMS.txt; CLPC-MonDDYYYY.xlsx; UploadTrade_MM.DD.YYYY.txt; OTCYYYYMMDD-<branch>.txt"
+    ours: "FR-OP-015; chapter 18"
+    match: "Partial"
+    difference: "Ours gives the columns of the BRD for each file; no file-name convention; the PDC file layout is in neither (BDOI's header and details are blank)."
+    platform: "Partly"
+    action: "Adopt BDOI wording"
+    action_detail: "Sheet 9; check the file name on upload (platform change)."
+  - id: "FRS.CSH.05.01.06 (results)"
+    capability: "Validation report and stored file"
+    quote: "validation report ... download ... xlsx ... protected, non-editable record ... Partial failures ... still produce an output file"
+    ours: "FR-OP-008, 015"
+    match: "Same"
+    difference: "Ours shows the run summary, downloads the run report and stores each file read-only."
+    platform: "Yes"
+    action: "Keep ours"
+    action_detail: "-"
+  - id: "FRS.CSH.05.01.07"
+    capability: "Staging"
+    quote: "“store uploaded items in a staging table” (mapping blank)"
+    ours: "FR-OP-015"
+    match: "Partial"
+    difference: "Ours validates every row before the valid rows are processed; the holding area is a technical matter."
+    platform: "Yes"
+    action: "Keep ours"
+    action_detail: "Mapping detail belongs to the Technical Specification."
+  - id: "FRS.CSH.05.01.08"
+    capability: "Matching rules (Bills, CLPC, PDC, Trade)"
+    quote: "Priority 1 ... QPS Number, ISYS Number, Ebix Number, PN Number, Loan Application Number, Account Number (new core); Priority 2 ... Pre-booked"
+    ours: "FR-OP-018"
+    match: "Partial"
+    difference: "Ours matches on ARN, invoice, policy and PN numbers, then pre-booked accounts; QPS, ISYS, Ebix and loan application numbers are not match keys. Categories are the same."
+    platform: "Partly"
+    action: "Platform change"
+    action_detail: "Add the legacy numbers and the loan application number as match keys (with the migrated references)."
+  - id: "FRS.CSH.05.01.09"
+    capability: "Matching rules for Direct Credit"
+    quote: "Priority 1 (File vs Payment table) BP Filename and Transaction Number ... Record Status = Unbooked/Unmatched ... tag as Invalid BP filename / Invalid Transaction Number / Duplicate"
+    ours: "FR-OP-015"
+    match: "Different"
+    difference: "Ours treats every Direct Credit row as a new payment with its own AR."
+    platform: "No"
+    action: "Needs BDOI decision"
+    action_detail: "C8."
+  - id: "FRS.CSH.05.01.10"
+    capability: "AR receipts of uploads"
+    quote: "generate an Acknowledgement Receipt Number for all payments uploaded ... AR Number status = For Printing ... If a Pre-booked payment becomes Applied payment, no AR should be generated"
+    ours: "FR-OP-015, 018"
+    match: "Partial"
+    difference: "Ours issues an AR per payment and keeps it when a pre-booked payment is applied; no “For Printing” status."
+    platform: "Partly"
+    action: "Adopt BDOI wording"
+    action_detail: "Add the print queue of system ARs (review comment: auto-triggered batch printing)."
+  - id: "FRS.CSH.05.01.11"
+    capability: "Application of payment"
+    quote: "No outstanding balance (Fully Paid) ... create Excess Payment record equal to the paid amount ... Module source: Auto Payment Processing"
+    ours: "FR-OP-018, 019"
+    match: "Same"
+    difference: "-"
+    platform: "Yes"
+    action: "Keep ours"
+    action_detail: "-"
+  - id: "FRS.CSH.05.01.12"
+    capability: "Hierarchy and run report"
+    quote: "Summary (count and amount) Matched, Applied, Excess, Matched on Pre-booked, Unbooked/Unmatched ... Transaction Date, BP filename, Transaction Number, Amount, Reference Number, Account Number, Record Status"
+    ours: "FR-OP-008 (CSH-BATCH-RUN), 019"
+    match: "Partial"
+    difference: "Ours reports counts per outcome and the rows with their messages; amounts per category and some columns are not listed."
+    platform: "Partly"
+    action: "Adopt BDOI wording"
+    action_detail: "Use BDOI's report fields."
+  - id: "FRS.CSH.06.01.01-.02"
+    capability: "Unapplied – users and sources"
+    quote: "User Group: Marketing, Cashiering, Commission Receivable ... AR Insurer Refund ... AP Unapplied Commission"
+    ours: "FR-OP-022, 057"
+    match: "Partial"
+    difference: "Ours: a Cashiering workbench; Collections asks through Incoming Requests; AR Insurer is a receivable from the insurer, not an unapplied item; no AP Unapplied Commission."
+    platform: "Partly"
+    action: "Needs BDOI decision"
+    action_detail: "C13."
+  - id: "FRS.CSH.06.01.03-.05"
+    capability: "Unapplied – filters and columns"
+    quote: "Unapplied Payment Type, Payment Date, Insurer Code, Client Code, Assured's Name, Account Reference Number; ... PN No and/or Loan Application Number"
+    ours: "FR-OP-022; SCR-OP-11"
+    match: "Partial"
+    difference: "Ours searches reference or payor and filters origin; columns reference, payor, client, unit, amount, balance, disposition, received, stage."
+    platform: "Partly"
+    action: "Adopt BDOI wording"
+    action_detail: "Add BDOI's filters and columns."
+  - id: "FRS.CSH.06.01.06-.07"
+    capability: "Unapplied – transfer and record"
+    quote: "Allow transfer of outstanding balance; data elements (blank)"
+    ours: "FR-OP-022"
+    match: "Partial"
+    difference: "Ours transfers the whole remaining balance; the unapplied item fields are listed in ours."
+    platform: "Yes"
+    action: "Keep ours"
+    action_detail: "Fill BDOI's blank data elements from ours."
+  - id: "FRS.CSH.06.02.01"
+    capability: "Disposition types"
+    quote: "Apply to Other Invoice, Reclass (Cashiering user), Refund (under Disbursement), Transfer to other marketing unit ... If responsible unit is unknown, Marketing can transfer the responsibility to Cashiering"
+    ours: "FR-OP-022"
+    match: "Partial"
+    difference: "Ours adds DST payment application and Others, with an approval rule per type; reclass and transfer move the whole balance."
+    platform: "Partly"
+    action: "Needs BDOI decision"
+    action_detail: "C13."
+  - id: "FRS.CSH.06.02.02"
+    capability: "Disposition tabs"
+    quote: "Unapplied, Monitoring, For Approval, For Reversal"
+    ours: "FR-OP-022"
+    match: "Same"
+    difference: "Ours adds a Done tab."
+    platform: "Yes"
+    action: "Keep ours"
+    action_detail: "-"
+  - id: "FRS.CSH.06.02.03"
+    capability: "Pre-booked applied when booked"
+    quote: "“automatically applied once account is booked”"
+    ours: "FR-OP-018"
+    match: "Same"
+    difference: "Ours also re-matches every 2 hours."
+    platform: "Yes"
+    action: "Keep ours"
+    action_detail: "-"
+  - id: "FRS.CSH.07.01.01-.02"
+    capability: "Automatic OR"
+    quote: "Insurer Settlement coming from Disbursement; OR to be generated once disbursement is approved; single OR per Insurer or Payee, per batch"
+    ours: "FR-OP-021, 035"
+    match: "Different"
+    difference: "Ours issues the commission OR when the remittance batch is approved."
+    platform: "Partly"
+    action: "Needs BDOI decision"
+    action_detail: "C12."
+  - id: "FRS.CSH.07.01.03-.04"
+    capability: "Automatic OR – template and mapping"
+    quote: "“follow the OR template”; mapping blank"
+    ours: "FR-OP-035"
+    match: "Partial"
+    difference: "The fields of the remittance OR are listed in ours (one line per invoice)."
+    platform: "Partly"
+    action: "Adopt BDOI wording"
+    action_detail: "Complete BDOI's mapping from ours."
+  - id: "FRS.CSH.08.01"
+    capability: "Record inquiry"
+    quote: "Payment Record Inquiry ... Account Record Inquiry ... Remittance Details ... Manual Adjustments (from ACSL)"
+    ours: "FR-OP-024, 004, 005; SCR-OP-03, 09"
+    match: "Partial"
+    difference: "Ours: one receipt search on the ten BRD criteria and Invoice 360 with components, receipts, remittances, adjustments and history; ACSL manual adjustments are not named."
+    platform: "Partly"
+    action: "Adopt BDOI wording"
+    action_detail: "Use BDOI's two inquiries as headings over our two screens."
+  - id: "FRS.CSH.09.01"
+    capability: "Report generation"
+    quote: "on demand, based on UAM ... preview ... save locally ... print ... retry ... Report generated by name, Report name, timestamp"
+    ours: "FR-OP-009"
+    match: "Same"
+    difference: "Ours separates view and export rights and archives every run."
+    platform: "Yes"
+    action: "Keep ours"
+    action_detail: "-"
+  - id: "FRS.CSH.09.02.01"
+    capability: "Applied Premium Reports"
+    quote: "AR No., Date Paid, Amount Paid, Invoice No., Payor/Client Name, Bank, Branch, Check No., Risk Code; file “Manually Applied Payments_<date of extraction>”"
+    ours: "FR-OP-028 (CSH-APPLIED-PREM)"
+    match: "Partial"
+    difference: "Ours lacks bank, branch and check no.; BDOI's rule asks “Payment to Premium (manual?)”."
+    platform: "Partly"
+    action: "Adopt BDOI wording"
+    action_detail: "C28."
+  - id: "FRS.CSH.09.02.02"
+    capability: "Applied Commission Reports"
+    quote: "OR No., Number of Accounts, Invoice Number, Insurance Company, Basic Commission, Withholding Tax, EVAT, Net Commission, Total Amount Applied"
+    ours: "FR-OP-028 (CSH-APPLIED-COMM)"
+    match: "Same"
+    difference: "-"
+    platform: "Yes"
+    action: "Keep ours"
+    action_detail: "-"
+  - id: "FRS.CSH.09.02.03"
+    capability: "Minimal Balance of Unapplied Payments"
+    quote: "AR No., AR Date, Market Unit, Section Unit, Minimal Amount; “Extract all AR and OR with reversed minimal balances”"
+    ours: "FR-OP-028 (CSH-MINBAL-EXCESS)"
+    match: "Partial"
+    difference: "Same fields; ours lists the minimal excess payments only."
+    platform: "Yes"
+    action: "Adopt BDOI wording"
+    action_detail: "-"
+  - id: "FRS.CSH.09.02.04"
+    capability: "Cancelled Official Receipts"
+    quote: "Date Issued, OR Number, Assured, Gross Amount, VAT, WTAX, Amount, Reason for Cancellation"
+    ours: "FR-OP-028 (CSH-CANCELLED-OR)"
+    match: "Partial"
+    difference: "Ours has no reason column."
+    platform: "Partly"
+    action: "Adopt BDOI wording"
+    action_detail: "Add the reason."
+  - id: "FRS.CSH.09.02.05"
+    capability: "Cancelled Acknowledgement Receipts"
+    quote: "Date Issued, Reason for Cancellation, AR Number, Assured, Gross Amount, VAT, WTAX, Amount"
+    ours: "FR-OP-028 (CSH-CANCELLED-AR)"
+    match: "Same"
+    difference: "BDOI's rule says “Extract all cancelled OR” (typing error)."
+    platform: "Yes"
+    action: "Keep ours"
+    action_detail: "-"
+  - id: "FRS.CSH.09.02.06"
+    capability: "Unapplied Commission Receivable Extract for Mancom"
+    quote: "18 fields from Insurance Company Name to Age"
+    ours: "FR-OP-028 (CSH-UNAPPLIED-COMM-MANCOM)"
+    match: "Partial"
+    difference: "Layout draft in ours."
+    platform: "Partly"
+    action: "Adopt BDOI wording"
+    action_detail: "Annex D."
+  - id: "FRS.CSH.09.02.07"
+    capability: "Unapplied Commission Receivable Payments YTD balance per Criteria"
+    quote: "Criteria No., Description, Count, Amount Balance"
+    ours: "FR-OP-028 (CSH-UNAPPLIED-COMM-YTD)"
+    match: "Partial"
+    difference: "Layout draft in ours; the criteria are not defined in either."
+    platform: "Partly"
+    action: "Needs BDOI decision"
+    action_detail: "BDOI to list the criteria."
+  - id: "FRS.CSH.09.02.08"
+    capability: "Unapplied Premium Minimal Balance"
+    quote: "AR Number, AR Date, Market Unit, Section Unit, Minimal Amount; “Outstanding Amount <1, Excess Amount < 1”"
+    ours: "FR-OP-028 (CSH-MINBAL-PREMIUM)"
+    match: "Partial"
+    difference: "Layout draft in ours; BDOI's rule uses 1.00 where ours uses 10.00."
+    platform: "Partly"
+    action: "Needs BDOI decision"
+    action_detail: "C5."
+  - id: "FRS.CSH.09.02.09"
+    capability: "Unapplied Commission Minimal Balance"
+    quote: "OR Number, Invoice Number, OR Date, Market Unit, Section Unit, Minimal Amount"
+    ours: "FR-OP-028 (CSH-MINBAL-COMMISSION)"
+    match: "Partial"
+    difference: "Layout draft in ours; the commission rule is inactive until BDOI confirms it (OQ11)."
+    platform: "Partly"
+    action: "Adopt BDOI wording"
+    action_detail: "-"
+  - id: "FRS.CSH.09.02.10"
+    capability: "Daily Cash Reconciliation Reports"
+    quote: "Encoder, Client/Payor Name, OR Number, Deposit In Bank"
+    ours: "FR-OP-028 (CSH-DAILY-CASH-REC)"
+    match: "Partial"
+    difference: "Layout draft in ours; BDOI lists OR numbers only (no AR)."
+    platform: "Partly"
+    action: "Adopt BDOI wording"
+    action_detail: "Ask whether ARs are included."
+  - id: "FRS.CSH.09.02.11"
+    capability: "Unapplied Premium Payment Transaction"
+    quote: "28 fields with ageing brackets 0-30 to above 365 and payment statuses"
+    ours: "FR-OP-028 (CSH-ADVANCE-PAYMENT)"
+    match: "Partial"
+    difference: "Ours names it “Advance Payment Transactions (Auto-Credit)”, layout draft."
+    platform: "Partly"
+    action: "Adopt BDOI wording"
+    action_detail: "Also answers OQ43 for this report."
+  - id: "FRS.CSH.09.02.12"
+    capability: "Direct Payment"
+    quote: "Invoice Number, Assured's Name, Policy Number, AR Balance, Payment Type, OR Number, OR Date, OR Amount, Reversal Amount, OR Balance, Requestor, Processor, Remarks"
+    ours: "FR-OP-028 (CSH-DIRECT-PAYMENT)"
+    match: "Partial"
+    difference: "Layout draft in ours."
+    platform: "Partly"
+    action: "Adopt BDOI wording"
+    action_detail: "-"
+  - id: "FRS.CSH.09.02.13"
+    capability: "Reinstatement Monitoring Report"
+    quote: "Date Requested, Invoice Number, AR Number, Amount Reinstated, Assured Name, Date Processed, Requestor, Processor"
+    ours: "FR-OP-028 (CSH-REINSTATEMENT-MON)"
+    match: "Partial"
+    difference: "Layout draft in ours."
+    platform: "Partly"
+    action: "Adopt BDOI wording"
+    action_detail: "-"
+  - id: "FRS.CSH.09.02.14"
+    capability: "Re-Application Report"
+    quote: "Date Posted by GL, Date Applied, Invoice Number, Assured Name, Amount for Reapplication, Reinstatement Transaction No., Requested by, Reason, TAT Reapplication, TAT Reinstatement process"
+    ours: "FR-OP-028 (CSH-REAPPLICATION)"
+    match: "Partial"
+    difference: "Layout draft in ours."
+    platform: "Partly"
+    action: "Adopt BDOI wording"
+    action_detail: "-"
+  - id: "FRS.CSH.09.02.15"
+    capability: "Certification of Payment"
+    quote: "AR Number, Policy Number, Requesting Market Unit, Date (COP) Issued, Series Number"
+    ours: "FR-OP-028 (CSH-CERT-OF-PAYMENT)"
+    match: "Partial"
+    difference: "Ours has no series number of the certificate."
+    platform: "Partly"
+    action: "Platform change"
+    action_detail: "Number the certificates."
+  - id: "FRS.CSH.09.02.16"
+    capability: "Reinstatement"
+    quote: "Invoice Number, Assured, AR Number, Months, No. of Request, Date Processed (TAT), Date Re-applied (TAT), Instance of Mis-application"
+    ours: "FR-OP-028 (CSH-REINSTATEMENT)"
+    match: "Partial"
+    difference: "Layout draft in ours."
+    platform: "Partly"
+    action: "Adopt BDOI wording"
+    action_detail: "-"
+  - id: "FRS.CSH.09.02.17"
+    capability: "CWT Monitoring Report (Premium)"
+    quote: "Item No., Invoice No., Assured Name, Inception Date, Expiry Date, Policy No., Insurance Company, Basic Premium, W/held, Prepared by, Reviewed by, Received by"
+    ours: "FR-OP-028 (CSH-CWT)"
+    match: "Partial"
+    difference: "Layout draft in ours."
+    platform: "Partly"
+    action: "Adopt BDOI wording"
+    action_detail: "-"
+  - id: "FRS.CSH.09.02.18"
+    capability: "Summary Per Disposition – Remittance"
+    quote: "For Booking, For Reinstatement, For Refund, For Re-application, For Advanced OR / Pre-signed OR, For Client Identification, For AO/Unit Head review"
+    ours: "-"
+    match: "Not in ours"
+    difference: "No such report in ours; the disposition values differ from our disposition types."
+    platform: "No"
+    action: "Needs BDOI decision"
+    action_detail: "Owner (Cashiering or Remittance) and the list of dispositions; see C13."
+
+# ---------------------------------------------------------------------------------------------------------- 8 Conflicts
+conflicts:
+  - id: C1
+    kind: Between the documents
+    priority: High
+    topic: Posting step for AR / OR issuance (maker-checker)
+    bdoi: "The creator saves (status Created), submits for posting; the poster posts and only then the AR / OR number is generated (FRS.CSH.02.01.08-.10, 02.05)."
+    ours: "“Issue AR and Apply” issues the AR from the branch series, applies the payment and opens the receipt (FR-OP-011); ORs likewise (FR-OP-012)."
+    brd: Both
+    brd_note: "CSHID.006 AC4: numbering “will be generated upon posting”; no BRD ID asks for a second person to post an issuance."
+    platform: Our FRS
+    decision: Must every AR and OR be posted by a second user before its number is issued?
+    recommendation: "Issue at save for counter, file and PDC payments, so the client gets the AR at once and the series is used in order; give the TL a daily review list. If BDOI keeps the posting step, make it a configurable approval per receipt type (for example manual ORs only)."
+  - id: C2
+    kind: Between the documents
+    priority: High
+    topic: Meaning of reinstatement
+    bdoi: "Reinstate an issued AR / OR: the receipt stays Issued and the payment is reversed to unapplied, AR Insurer Refund or AP Unapplied Commission (FRS.CSH.04.01)."
+    ours: "Reinstate a cancelled receipt in full or in part; the reinstated amount is applied to the encoded invoice (FR-OP-014). Reversal of an issued receipt's application is the payment reversal of Incoming Requests."
+    brd: Both
+    brd_note: "CSHID.004 lists “Due to Cancellation” and “Mis-application of payment”; the BRD summary speaks of “payment application reinstatement” (p.84)."
+    platform: Our FRS
+    decision: Does reinstatement mean restoring a cancelled receipt, reversing a payment application, or both?
+    recommendation: "Both, under one Reinstate action with the BRD's reasons: “Due to Cancellation” and bounced check restore a cancelled receipt; mis-application and withholding tax adjustment reverse the application of an issued receipt for re-application."
+  - id: C3
+    kind: Between the documents
+    priority: Medium
+    topic: Numbers of creation, cancellation and reinstatement records
+    bdoi: "“<Prefix>-<Receipt Type>-<Sequence Number>” with CR, CN, RE and AR / OR (FRS.CSH.02.01.09)."
+    ours: Cancellation CAN-yyyy-n and reinstatement RIN-yyyy-n (FR-OP-013, 014).
+    brd: BRD silent
+    brd_note: "CSHID.001: “auto-generates a transaction number for reinstatement”."
+    platform: Our FRS
+    decision: Which numbering applies?
+    recommendation: Adopt BDOI's prefixes with the year (for example CN-AR-2026-000001); the numbering is configuration.
+  - id: C4
+    kind: Within BDOI's FRS
+    priority: Medium
+    topic: AR / OR number format and acknowledgement certificate number
+    bdoi: "“<Prefix>-<Year>-<Branch Indicator>-<Sequence>”, “AR number digits: 10”; example AR20260000000001; the sample AR shows “AR 000149” and certificate “AC_125_022025_00482”; certificate convention blank."
+    ours: Prefix per series (AR-HO-, AR-CEB-, OR-HO-) with a number range and the BIR ATP number (FR-OP-010).
+    brd: BRD silent
+    brd_note: "CSHID.006: “sequential or predefined format”."
+    platform: Our FRS
+    decision: The BIR-registered format of AR and OR numbers and of the certificate number (OQ05).
+    recommendation: BDOI to give one format per receipt kind; BIBS sets it as the series prefix and range without a change.
+  - id: C5
+    kind: Between the documents
+    priority: High
+    topic: Minimal balance threshold
+    bdoi: "“Minimal Balance (default PHP -1.00<= x <=1.00)” (FRS.CSH.02.05.12.01); report rule “Outstanding Amount <1”; its own mapping row quotes “Php 10.00 and below”."
+    ours: Default 10.00 for premium and excess, configurable (FR-OP-023).
+    brd: Our FRS
+    brd_note: "CSHID.016: “Php 10.00 and below”; the Cashiering annex: “the defined minimal balance threshold”, configurable."
+    platform: Our FRS
+    decision: The threshold value for premium and for excess (OQ11).
+    recommendation: Keep 10.00 as in the BRD unless BDOI decides otherwise; it is a parameter.
+  - id: C6
+    kind: Between the documents
+    priority: High
+    topic: Application hierarchy
+    bdoi: "Check before cash; DST, Premium Tax (VAT), LGT, Other Charges, Basic Premium (FRS.CSH.02.05.11); review comment “Confirm first with Insurers for payment hierarchy”."
+    ours: "DST, VAT, LGT, FST, other charges, basic premium; check before cash open (FR-OP-019, OQ09)."
+    brd: BDOI's FRS
+    brd_note: "CSHID.022 lists the five components without FST and “Mode of Payment hierarchy: Check, Cash”."
+    platform: Our FRS
+    decision: Where Fire Service Tax sits, and what “check before cash” means when one receipt has both.
+    recommendation: "Keep FST as its own component after LGT (it is booked on fire policies); apply check payments before cash payments on the same invoice on the same day."
+  - id: C7
+    kind: Between the documents
+    priority: Medium
+    topic: Check holding period
+    bdoi: "AR validation: “Check date should be less than Current Date – 4 working days (holding period)” (FRS.CSH.02.01.08)."
+    ours: No check-date validation at receipt; 3 banking days before the payment is remitted (FR-OP-031, RMTID.017).
+    brd: Our FRS
+    brd_note: "No receipting rule in CSHID; RMTID.017: checks held 3 banking days before remittance."
+    platform: Our FRS
+    decision: Is a check refused at the counter within 4 working days of its date, and is it 4 working or 3 banking days?
+    recommendation: Accept the check when it is presented (a post-dated check goes to the PDC warehouse); keep the holding period for remittance only.
+  - id: C8
+    kind: Between the documents
+    priority: High
+    topic: Direct Credit file
+    bdoi: "Priority 1 matches the file against the payment records on BP filename and transaction number; the record must be Unbooked / Unmatched; else Invalid BP filename, Invalid Transaction Number or Duplicate (FRS.CSH.05.01.09)."
+    ours: Every Direct Credit row is a new payment with its own AR (FR-OP-015).
+    brd: BDOI's FRS
+    brd_note: "CSHID.008 Direct Credit fields include BP Filename and Transaction No, which point to an earlier bills payment."
+    platform: Our FRS
+    decision: Is the Direct Credit file an identification of payments already received, or new money?
+    recommendation: "Adopt BDOI's reading: the file identifies unmatched payments already receipted, so no second AR; new money arrives through the other channels."
+  - id: C9
+    kind: Between the documents
+    priority: High
+    topic: Cancellation of a remitted AR
+    bdoi: "“If already remitted, Create/re-class reversed payment to AR Insurer Refund ... If not remitted, Reverse entry PR, DTIP” (FRS.CSH.03.01.08)."
+    ours: "Every application is reversed and the invoices are outstanding again (FR-OP-013)."
+    brd: BRD silent
+    brd_note: "CSHID.012: “Post Accounting entries once cancellation is posted”."
+    platform: Our FRS
+    decision: How a cancelled AR whose premium was already remitted is accounted for.
+    recommendation: Adopt BDOI's rule; it matches how our Adjustment FRs handle remitted premium (AR Insurer, FR-OP-057).
+  - id: C10
+    kind: Between the documents
+    priority: Medium
+    topic: Commission Schedule with failed or unmatched lines
+    bdoi: "“The system shall not process the file if there are failed validations”; “If unmatched, the system shall not process the file”; paid amount must equal the outstanding balance."
+    ours: Valid lines are staged and issued; failed lines stay staged with their reason (FR-OP-021).
+    brd: Our FRS
+    brd_note: "BRQID.006: batch processing continues when records fail and logs them."
+    platform: Our FRS
+    decision: Whole-file rejection or line-level processing; exact amount match or partial commission payments.
+    recommendation: Line-level processing as BRQID.006 asks, with the exceptions listed; partial payments allowed and shown as such.
+  - id: C11
+    kind: Between the documents
+    priority: Medium
+    topic: One OR per commission schedule or per insurer and certificate
+    bdoi: "“Generate/Issue one OR for the total commission schedule/commission check” (FRS.CSH.02.05.14); “single OR per Insurer or Payee, per batch” (FRS.CSH.07.01.02)."
+    ours: One OR per insurer, certificate and payment for Collection details; one OR per remittance batch (FR-OP-021, OQ49).
+    brd: Both
+    brd_note: "CSHID.007: individual OR per check, or consolidated when the same insurer / payee and the same certificate; “One OR per Remittance Batch number”."
+    platform: Our FRS
+    decision: The consolidation rule of commission ORs.
+    recommendation: One OR per insurer / payee and certificate per schedule or batch, as CSHID.007 states.
+  - id: C12
+    kind: Between the documents
+    priority: High
+    topic: When the remittance OR is generated
+    bdoi: "“Insurer Settlement coming from Disbursement ... OR to be generated once disbursement is approved” (FRS.CSH.07.01.01, added 09-Oct-2026)."
+    ours: The commission OR is issued when the Remittance TL approves the batch (FR-OP-035).
+    brd: Both
+    brd_note: "BRD p.84: “OR issuance for commission deducted from for remittance. There should be one OR per settlement batch per Insurer.”"
+    platform: Our FRS
+    decision: The trigger of the commission OR (remittance approval or Disbursement approval).
+    recommendation: "Comptrollership decides the point at which the commission OR is issued; moving it to the Disbursement approval is a platform change."
+  - id: C13
+    kind: Between the documents
+    priority: Medium
+    topic: Who works the unapplied payments
+    bdoi: "Marketing, Cashiering and Commission Receivable users; Marketing Support and Cashiering assign dispositions; reclass by Cashiering only; Marketing may transfer to Cashiering (FRS.CSH.06.01-06.02)."
+    ours: The Cashier assigns and the Cashiering TL approves; Collections asks through Incoming Requests (FR-OP-022; BRD-4).
+    brd: BRD silent
+    brd_note: "CSHID.024: “Users can assign a disposition” (no persona)."
+    platform: Our FRS
+    decision: Do Marketing and Commission Receivable users work the unapplied list directly?
+    recommendation: Keep Cashiering ownership with requests from Collections, as the BRD-4 Collections FRS specifies; give Marketing read access to the items of its unit.
+  - id: C14
+    kind: Between the documents
+    priority: Medium
+    topic: AP Unapplied Commission and AR Insurer Refund as unapplied types
+    bdoi: "Unapplied types include “AR Insurer Refund” and “AP Unapplied Commission ... for Commission Receivable users” (FRS.CSH.06.01.03)."
+    ours: AR Insurer is a receivable from the insurer set up by Adjustment; no AP Unapplied Commission.
+    brd: BRD silent
+    brd_note: No BRD ID names these types.
+    platform: Our FRS
+    decision: Are these two types items of the unapplied list?
+    recommendation: Add AP Unapplied Commission for reversed ORs; keep AR Insurer as a receivable, shown on the list for information.
+  - id: C15
+    kind: Between the documents
+    priority: Medium
+    topic: Post-dated checks
+    bdoi: "“The system shall process list of matured post dated checks ... integrated from PMS to new Core via MFT” (FRS.CSH.05.01.04)."
+    ours: Checks are warehoused in BIBS with a PDCW number and matured by the daily run (FR-OP-016).
+    brd: Our FRS
+    brd_note: "CSHID.008: upload of the list of received PDCs for the day, a system-generated number, a repository, a list; matured checks transacted automatically."
+    platform: Our FRS
+    decision: Is PMS or BIBS the warehouse of post-dated checks?
+    recommendation: "Keep the BIBS warehouse (BRD); load it from the PMS list, so PMS stays the source of the checks."
+  - id: C16
+    kind: Between the documents
+    priority: Medium
+    topic: AR form and signature
+    bdoi: "“THIS IS A SYSTEM GENERATED RECEIPT. NO SIGNATURE IS REQUIRED.”; header, footer and certificate lines (FRS.CSH.02.06.03, Sample AR)."
+    ours: The AR / OR PDF has a Cashier signature line; layout draft (chapter 17).
+    brd: BRD silent
+    brd_note: "CSHID.019: “formatted according to standards”."
+    platform: Our FRS
+    decision: Confirm BDOI's AR and OR forms as the standard.
+    recommendation: Adopt BDOI's forms.
+  - id: C17
+    kind: Within BDOI's FRS
+    priority: Low
+    topic: Note on the AR
+    bdoi: "FRS text: “Note: Official receipt to be issued by the insurance company.”; Sample AR: “Note: Invoice to be issued by the insurance company”."
+    ours: "-"
+    brd: Not stated
+    brd_note: "-"
+    platform: "-"
+    decision: Which note is printed?
+    recommendation: BDOI to choose; the text is part of the form.
+  - id: C18
+    kind: Between the documents
+    priority: Low
+    topic: File size limit
+    bdoi: "“File size is within limit (max of 50MB)”."
+    ours: Not stated; BIBS accepts files up to 25 MB.
+    brd: Not stated
+    brd_note: "-"
+    platform: Neither
+    decision: Confirm 50 MB.
+    recommendation: Set 50 MB.
+  - id: C19
+    kind: Within BDOI's FRS
+    priority: Medium
+    topic: File formats
+    bdoi: "“Uploaded files are in .csv format with pipe delimiter”, but Bills Payment, PDC and Trade are .txt, CLPC is .xlsx, Direct Credit .txt or Excel; the Trade sample is separated by spaces or tabs, not pipes."
+    ours: One configurable layout per channel (any of Excel, CSV, delimited or fixed-width text).
+    brd: Our FRS
+    brd_note: "CSHID.008: Bills TXT, Trade TXT, CLPC Excel, PDC Excel, Direct Credit TXT."
+    platform: Our FRS
+    decision: The definitive format of each channel's file (OQ03).
+    recommendation: Keep one layout per channel as configuration; BDOI to confirm each layout with the channel owner.
+  - id: C20
+    kind: Between the documents
+    priority: Medium
+    topic: Exchange rate for USD receipts
+    bdoi: "“effective revaluation rate (Revaluation - Transaction Rate)” for issuance and cancellation; “Conversion rate at time of issuance” for reinstatement."
+    ours: Comptrollership BOOK rate with 2 decimals at the receipt date; cancellation and reinstatement at the receipt's rate (FR-OP-027).
+    brd: Our FRS
+    brd_note: "CSHID.012-014: “Comptrollership exchange rate table”, 2 decimals."
+    platform: Our FRS
+    decision: Name and source of the rate.
+    recommendation: One rate from the Comptrollership table; reversals at the rate of the original receipt.
+  - id: C21
+    kind: Between the documents
+    priority: Low
+    topic: Cancellation reasons
+    bdoi: "Error in Issuance Details, Double issuance, Others; for checks only Discrepancy in check amount, No signature, Incorrect payee, Incorrect check details; Incorrect payment details."
+    ours: "The BRD lists in four groups, including Check not picked-up, Negative VAT, Discount not applied, PDC retrieval / replacement, Bounced or returned check, Error printing."
+    brd: Our FRS
+    brd_note: CSHID.003 lists all of ours.
+    platform: Our FRS
+    decision: Which reasons stay, and whether check payments are limited to check reasons.
+    recommendation: Keep the BRD list (it is a maintained list); add the check-payment restriction if BDOI wants it.
+  - id: C22
+    kind: Between the documents
+    priority: Low
+    topic: Partial reinstatement
+    bdoi: "“select single or multiple account numbers within the selected AR number”; not for ORs."
+    ours: Partial reinstatement by amount.
+    brd: Both
+    brd_note: "CSHID.001 AC9: “Full / Partial Reinstatement”; CSHID.005: “Amount reinstated”."
+    platform: Our FRS
+    decision: Partial by account, by amount, or both.
+    recommendation: By account, with the amount per account shown.
+  - id: C23
+    kind: Between the documents
+    priority: Low
+    topic: Encoded reinstatement fields
+    bdoi: "Inputs: type, account numbers, remarks (100 characters), reason."
+    ours: "Invoice, AR / OR no., assured / payor, amount, Account Officer, Unit Head, Team Leader (premium); not required for a bounced check."
+    brd: Our FRS
+    brd_note: CSHID.005 lists the fields of ours.
+    platform: Our FRS
+    decision: Are the BRD's fields still required?
+    recommendation: Keep them, defaulted from the receipt.
+  - id: C24
+    kind: Between the documents
+    priority: Low
+    topic: Device for access
+    bdoi: "“System shall be accessible using BDO issued device” (FRS.CSH.01.01)."
+    ours: Log-in from a browser; responsive screens.
+    brd: Our FRS
+    brd_note: "NFR: “same performance on mobile and desktop”."
+    platform: Our FRS
+    decision: Is access limited to BDO-issued devices?
+    recommendation: Enforce it through BDO's network and device policy if required; no change to the screens.
+  - id: C25
+    kind: Between the documents
+    priority: Low
+    topic: Remarks and bank account mandatory on the AR
+    bdoi: "Remarks (max 200 characters) and Post to Bank Account are required fields (FRS.CSH.02.01.06)."
+    ours: Neither field exists on Receive Payment.
+    brd: BRD silent
+    brd_note: "-"
+    platform: Our FRS
+    decision: Are remarks and the bank account mandatory?
+    recommendation: Bank account mandatory (defaulted by currency as BDOI proposes); remarks optional.
+  - id: C26
+    kind: Between the documents
+    priority: Medium
+    topic: PR 2307 base and tag
+    bdoi: "Account “BIR 2307 tag”; “PR2307 = 2% of Premium Amount” (FRS.CSH.02.05.13)."
+    ours: 2% CWT client flag; 98% of the premium applied (FR-OP-018; OQ10).
+    brd: Both
+    brd_note: "CSHID.020: “only 98% will be applied” for accounts with 2% CWT."
+    platform: Our FRS
+    decision: Is the tag on the client or the account, and is the 2% of the basic premium or of the gross premium?
+    recommendation: "Tag per account, defaulted from the client; Comptrollership states the base of the 2% (basic or gross premium); BIBS keeps the share applied as a parameter."
+  - id: C27
+    kind: Within BDOI's FRS
+    priority: Low
+    topic: Sample Billspayment file
+    bdoi: "Appendix A “Sample Billspayment file” shows a file named “BDOI202504031PMSEBIX_sample.TXT”, which follows the PDC convention BDOIYYYYMMDDPMS.txt, not BDOIYYYYMMDD.txt."
+    ours: Bills Payment columns of the BRD (chapter 18).
+    brd: Not stated
+    brd_note: CSHID.008 gives the Bills Payment fields.
+    platform: Neither
+    decision: Is the sample a Bills Payment (OBPCS) file or a PMS / Ebix file?
+    recommendation: BDOI to supply one real file of each channel for the layouts of Annex C.
+  - id: C28
+    kind: Between the documents
+    priority: Low
+    topic: Applied Premium report scope
+    bdoi: "File “Manually Applied Payments_<date of extraction>”; rule “Payment to Premium (manual?)”."
+    ours: CSH-APPLIED-PREM lists every applied premium payment.
+    brd: Not stated
+    brd_note: "Annex II #1 Applied Premium Report."
+    platform: Our FRS
+    decision: Manual applications only, or all?
+    recommendation: All applications, with a filter on the source (manual, file, PDC).
+  - id: C29
+    kind: Between the documents
+    priority: Low
+    topic: Who uploads the channel files
+    bdoi: Authorised users upload, or the files arrive via MFT (FRS.CSH.05.01.02).
+    ours: The Cashier uploads (FR-OP-015).
+    brd: Neither
+    brd_note: "CSHID.008: Trade, Direct Credit and CLPC “manually prepared by BU, send to IT, IT to run batch process – FS04”."
+    platform: Our FRS
+    decision: Confirm that IT no longer runs the batch.
+    recommendation: Both documents propose the business uploads; record the change against the BRD (CLR-OP-08).
+
+decisions_order: [C1, C2, C8, C9, C12, C5, C6, C26, C7, C4, C3, C10, C11, C13, C14, C15]
+
+# ---------------------------------------------------------------------------------------------------------- 10 Incorporation plan
+plan:
+  - part: "A ID scheme"
+    bdoi_section: "Whole document"
+    insert: "BDOI's FR IDs stay primary (FRS.CSH.nn.nn and the numbered sub-items); our IDs go into BDOI's column “Application Feature Model” as cross-references: FR-OP-nnn, screen IDs (SCR-OP-nn) and test conditions (TC-OP-nnn.n). New items continue BDOI's numbering (for example FRS.CSH.05.02 PDC warehouse)."
+    how: "Rule written in the Introduction"
+    source: "Sheet 5"
+    effort: 0.5
+    itg: "Confirms the ID scheme and the use of the column."
+  - part: "A ID scheme"
+    bdoi_section: "Whole document"
+    insert: "Annex letters after BDOI's Appendix A and B: C upload file layouts, D report layouts, E roles, permissions and configuration, F accounting entries, G screen specifications, H messages, I notifications, J walkthroughs and storyboard, K open items and decisions. Annexes G to J hold the same kind of content as in the Product Maintenance merge."
+    how: "Annex list in the table of contents"
+    source: "-"
+    effort: 0
+    itg: "Confirms the annex list."
+  - part: "B Section by section"
+    bdoi_section: "Document Revision Log"
+    insert: "New entry for the merged version (for example 1.2): “BIBS FRS v2.1 content merged: rules, validations, acceptance criteria, Annexes C-K; decisions of the session of <date>”."
+    how: "Row in the log"
+    source: "Document control"
+    effort: 0.1
+    itg: "Owns the version number (1.x or 3.x)."
+  - part: "B Section by section"
+    bdoi_section: "Introduction"
+    insert: "Scope (in scope, out of scope, CSHID.009, 026 and 027 removed), definitions of the cashiering terms (AR, OR, PR, DTIP, PR 2307, pre-booked, unapplied, minimal balance), the process overview of the cashiering steps."
+    how: "New sub-sections 1.4 to 1.6"
+    source: "Chapters 1 and 2"
+    effort: 1
+    itg: "Reviews wording."
+  - part: "B Section by section"
+    bdoi_section: "Business Requirements Mapping"
+    insert: "Fill the eight blank rows (BRQID.001-007, CSHID.011); point MKTID.013 and DBMID.001 to the Marketing Collection and Disbursement FRS; add columns BRD page, our FR-OP IDs and test conditions; complete the List of Integrations (Collections, Disbursement, Accounting, New Business payment gate)."
+    how: "Extra columns and rows"
+    source: "Chapters 7 and 11; sheet 4"
+    effort: 1
+    itg: "Checks the trace."
+  - part: "B Section by section"
+    bdoi_section: "FRS.CSH.01 Log in and Dashboard"
+    insert: "User role and permission per item (fills “User Role:”); four-eyes rules; dashboard tiles with counts and amounts as decided."
+    how: "Numbered sub-items"
+    source: "Chapter 3; FR-OP-001 to 003"
+    effort: 1
+    itg: "UAM alignment with BRD-11."
+  - part: "B Section by section"
+    bdoi_section: "FRS.CSH.02 Creation of AR/OR"
+    insert: "Our rules, validations (with the exact messages) and acceptance criteria as sub-items of each item; AR Insurance (FR-OP-020); matching preview (FR-OP-018, 019); minimal balance at processing and safety net (FR-OP-023); series warning level, ATP and maker-checker (FR-OP-010); Head Office rule; default GL entries."
+    how: "Numbered sub-items “The system shall ...”; ACs as “Acceptance: ...” sub-items"
+    source: "FR-OP-010 to 012, 018 to 021, 023, 025, 027"
+    effort: 3
+    itg: "Decisions C1 and C3 to C7 applied."
+  - part: "B Section by section"
+    bdoi_section: "FRS.CSH.03 and 04 Cancellation and Reinstatement"
+    insert: "Workflow stages and owners, segregation of duties, BRD reason lists, encoded fields, validations and ACs; the remitted case per C9; reinstatement per C2."
+    how: "Numbered sub-items"
+    source: "FR-OP-013, 014; chapter 5"
+    effort: 2
+    itg: "Decisions C2 and C9 applied."
+  - part: "B Section by section"
+    bdoi_section: "FRS.CSH.05 Automatic Payment Processing"
+    insert: "New items FRS.CSH.05.02 PDC warehouse, 05.03 pre-booked payments, 05.04 payment gate of New Business; run report; duplicate rules; layouts moved to Annex C."
+    how: "New FR items and sub-items"
+    source: "FR-OP-008, 015, 016, 018, 132"
+    effort: 2
+    itg: "Decisions C8 and C15; MFT intake with ITG."
+  - part: "B Section by section"
+    bdoi_section: "FRS.CSH.06 Unapplied Payment Disposition Facility"
+    insert: "Disposition types with action and approval rule, reversal, bulk submit and approve, 11 validations; new item FRS.CSH.06.03 requests of other modules (Collections, Payment Requests, Accounting Controls); minimal balances never in the tabs."
+    how: "Sub-items and one new item"
+    source: "FR-OP-022, 023; SCR-OP-11 to 13"
+    effort: 1.5
+    itg: "Decisions C13 and C14."
+  - part: "B Section by section"
+    bdoi_section: "FRS.CSH.07 Automatic Generation of OR"
+    insert: "Trigger per C12; commission OR rules (consolidation per C11); the fields of the remittance OR to fill FRS.CSH.07.01.04."
+    how: "Sub-items"
+    source: "FR-OP-021, 035"
+    effort: 1
+    itg: "Decision C12 with Comptrollership."
+  - part: "B Section by section"
+    bdoi_section: "FRS.CSH.08 Record Inquiry"
+    insert: "Receipt search on the ten BRD criteria with the search log; Invoice 360 with the payment history (BRQID.007)."
+    how: "Sub-items under BDOI's two inquiries"
+    source: "FR-OP-004, 005, 024"
+    effort: 0.5
+    itg: "-"
+  - part: "B Section by section"
+    bdoi_section: "FRS.CSH.09 Generate Reports"
+    insert: "View and export rights, report archive; our six reports BDOI does not list (PDC Warehousing, Priority Posted Accounts, Payment Reversals, AR Outstanding with Ageing, Batch Run, BIR 2307 transaction report); report layouts to Annex D."
+    how: "Sub-items; layouts in Annex D"
+    source: "FR-OP-009, 028; chapter 6.1"
+    effort: 1.5
+    itg: "Confirms the report list."
+  - part: "B Section by section"
+    bdoi_section: "Annex C Upload file layouts"
+    insert: "Bills Payment, PDC, CLPC, Trade, Direct Credit and Commission Schedule: field, position, format, mandatory, as compared in sheet 9, with BDOI's file names."
+    how: "One table per file"
+    source: "Chapter 18; sheet 9"
+    effort: 1
+    itg: "Confirms with the channel owners (OBPCS, PMS, TFS)."
+  - part: "B Section by section"
+    bdoi_section: "Annex D Report layouts"
+    insert: "BDOI's 18 reports with fields and file names, plus our six; ageing buckets."
+    how: "One table per report"
+    source: "FRS.CSH.09.02; chapter 6.1"
+    effort: 1
+    itg: "-"
+  - part: "B Section by section"
+    bdoi_section: "Annex E Roles and configuration"
+    insert: "Personas and roles, permissions matrix, parameters (thresholds, CWT share), lists of values (AR class, OR type, reasons, disposition types, bank accounts, branches), jobs with their times."
+    how: "Tables"
+    source: "Chapters 3 and 9"
+    effort: 1
+    itg: "UAM and configuration owners."
+  - part: "B Section by section"
+    bdoi_section: "Annex F Accounting entries"
+    insert: "Default entry of each cashiering event (receipt, application, minimal balance, excess to overages, refund, reclass, reinstatement, AR Insurance, OR issue, cancellation), filling BDOI's “Debit: Credit:” blanks."
+    how: "Table"
+    source: "Chapter 5.3"
+    effort: 1
+    itg: "Comptrollership confirms the accounts."
+  - part: "B Section by section"
+    bdoi_section: "Annex G Screen specifications"
+    insert: "The 15 cashiering screen specifications with screenshots, field and action tables, and the screen standards."
+    how: "Annex produced from our sign-off pack"
+    source: "Chapter 13; appendix"
+    effort: 1
+    itg: "-"
+  - part: "B Section by section"
+    bdoi_section: "Annex H Messages"
+    insert: "The 124 messages of the cashiering screens with what the user does (without the internal codes)."
+    how: "Table per screen"
+    source: "Chapter 15"
+    effort: 0.5
+    itg: "-"
+  - part: "B Section by section"
+    bdoi_section: "Annex I Notifications"
+    insert: "NT-01 to NT-03 (common) and NT-06 to NT-09 (receipt series low, approval request, requests from other modules, pre-booked ageing)."
+    how: "Table"
+    source: "Chapter 16"
+    effort: 0.5
+    itg: "-"
+  - part: "B Section by section"
+    bdoi_section: "Annex J Walkthroughs and storyboard"
+    insert: "The cashier steps of WT-A and WT-D with screenshots; workflow diagrams of the receipt action and the disposition; storyboard index."
+    how: "Steps and figures"
+    source: "Chapters 5.2, 14 and 23"
+    effort: 1
+    itg: "-"
+  - part: "B Section by section"
+    bdoi_section: "Annex K Open items and decisions"
+    insert: "Open questions OQ03 to OQ15, OQ42, OQ43, OQ47 to OQ49 and clarifications CLR-OP-06 to 09 and 37 to 40, with the decisions of sheet 8 recorded."
+    how: "Table"
+    source: "Chapters 10.3 and 21; sheet 8"
+    effort: 0.5
+    itg: "Records each decision."
+  - part: "B Section by section"
+    bdoi_section: "Appendix A and B"
+    insert: "Keep BDOI's four images; add the BIBS AR, OR and Certification of Payment forms once agreed. References: BRD v1.01 (p.71-185), the Cashiering annex (p.1-8), the e-mail record (p.67-70) and our FRS and test plan as supporting documents."
+    how: "Images and a reference table"
+    source: "Chapters 1.3 and 17"
+    effort: 0.5
+    itg: "-"
+  - part: "B Section by section"
+    bdoi_section: "Signoff Sheet"
+    insert: "Names from the BRD approval sheet: prepared by BDO ITG; reviewed by the Tech Lead and the Application Owner; approved by the Project Owner (Shellah Marie C. Miranda) with the Operations signatories of the BRD (Jose Melvin M. Jarin; for the Cashiering annex Perjelyn Joy Gutierrez, with the reviewers Ronna Marie Go, Aimee Lynne Medina and Shirley Catapang)."
+    how: "Names on BDOI's sheet"
+    source: "Distribution list"
+    effort: 0.2
+    itg: "Confirms the signatories."
+  - part: "C Order of work"
+    bdoi_section: "-"
+    insert: "1. Decision session on sheet 8 (C1, C2, C8, C9, C12 first) with Cashiering, Financial Transactions and Processing, Comptrollership and ITG. 2. ID scheme and annexes. 3. FR items 02 to 06 (the decided topics). 4. Annexes C to F. 5. FR items 01, 07 to 09. 6. Annexes G to K. 7. Quality pass. 8. ITG review. 9. Our FRS refers to BDOI's IDs and the test plan carries both IDs."
+    how: "-"
+    source: "-"
+    effort: 2
+    itg: "Chairs the decision session."
+  - part: "C Order of work"
+    bdoi_section: "Whole document"
+    insert: "Quality pass: numbering (no gaps or duplicates), cross-references, blank placeholders filled, restricted wording, BRD trace complete."
+    how: "Check list"
+    source: "-"
+    effort: 1
+    itg: "-"
+  - part: "D ITG review"
+    bdoi_section: "Whole document"
+    insert: "BDOI ITG reviews the merged document: the template and numbering, the user roles against UAM, the integrations (MFT, PMS, OBPCS), the file layouts and the report list; the business reviews the decided rules; Comptrollership the entries. One review cycle of five working days, then one update."
+    how: "Review comments in the document"
+    source: "-"
+    effort: 1
+    itg: "System Analyst, Tech Lead, Application Owner; business and Comptrollership reviewers."
+  - part: "E Platform changes"
+    bdoi_section: "-"
+    insert: "Changes that follow from BDOI's FRS once decided: bank account, entry type and branch on receipts; posting step (if kept); legacy match keys; Direct Credit identification; remitted AR cancellation; AP Unapplied Commission; multi-file upload and MFT intake; file-name check and 50 MB limit; reprint watermark, certificate number, ZIP download; AR / OR forms; dashboard amounts; report fields. Each goes through the change control of the merged FRS."
+    how: "Change requests"
+    source: "Sheets 5 and 7"
+    effort: 0
+    itg: "Prioritises with the Product Owner."
+  - part: "C Order of work"
+    bdoi_section: "Our FRS and test plan"
+    insert: "After signature: the cashiering chapter of our FRS refers to the signed BDOI document for the business rules; the test plan lists BDOI's IDs next to ours."
+    how: "Cross-reference column"
+    source: "-"
+    effort: 1
+    itg: "-"

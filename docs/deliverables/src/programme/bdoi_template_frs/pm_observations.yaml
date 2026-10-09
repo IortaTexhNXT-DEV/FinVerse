@@ -1,0 +1,259 @@
+# Annex M of the Product Maintenance FRS in BDOI's template, v1.1: observations and points for BDOI decision.
+# Read by build_bdoi_frs_pm.py.
+#
+#   conflicts   the conflicts (C01-C23) and the slips within BDOI's FRS (D01-D11) of the comparison workbook
+#               (docs/deliverables/src/programme/comparisons/brd03_frs_comparison.yaml). Topic, BDOI's text and the BRD
+#               text come from that file; this file adds what version 1.1 proposes, the impact and who decides.
+#   others      the other observations of version 1.1: BDOI's open item BRPM.020, scope points, requirements added
+#               next to BDOI's text that BDOI should confirm, and the rows added to Annex A, B, C and E. The changes
+#               of the Business Requirements Mapping are logged by the builder from pm_document.yaml (mapping).
+#
+# Every observation starts with the status Open.
+
+roles:
+  PO: Product Owner, Marketing Business System
+  TSU: Head, Technical Support Unit (TSU)
+  MBS: Head, Marketing Business Services and System Support (MBS)
+  MKT: Head, Retail Marketing
+  MANCOM: Management Committee (ManCom)
+  SA: BDO ITG System Analyst
+  BPS: Program Manager, Business Project Services
+  ITG: BDO ITG Tech Lead
+
+conflicts:
+  C01:
+    proposes: "BDOI's non-package items FRPM.005 to FRPM.010 and Annex B, C and D are kept and completed with the rules of the New Business FRS (proposal request, quotation slip, insurer terms, comparative table, proposal slip, client acceptance). The non-package process is specified in one place only; v1.1 proposes that it stays in this FRS as BDOI wrote it, and that the New Business FRS refers to it."
+    impact: "Scope of this FRS and of its sign-off; menu placement of non-package quotation requests."
+    role: [PO, BPS]
+  C02:
+    proposes: "BDOI's 90-day alerts, anniversary alerts and recipients (TSU Officer and TSU Team Lead) are kept. v1.1 adds configurable reminder days and the rule that each alert is raised once per alert day (FRPM.004.01). MBS is proposed as an additional recipient, for the set-up of renewals."
+    impact: "Alert days are a configurable value; the anniversary alert and MBS as recipient need confirmation."
+    role: [TSU]
+  C03:
+    proposes: "BDOI's weekly report of quotation requests is kept and v1.1 adds on-request individual and collective runs (FRPM.007.01). The package creation status asked by BRPM.018 is covered by the new Package Status Update Report (FRPM.007.02)."
+    impact: "Two reports instead of one; BDOI to confirm the scope and columns of each, and the Placement Update Status rules (see D05)."
+    role: [TSU, MKT]
+  C04:
+    proposes: "BDOI's Reject outcome is kept at every step. v1.1 proposes that a rejected request closes and cannot be resubmitted (the requester raises a new request), and that the reason is recorded."
+    impact: "Status lists and closing reasons."
+    role: [PO]
+  C05:
+    proposes: "BDOI's sequential Marketing approval (TL, TH, then UH) is kept. v1.1 adds that no approver approves a request he or she created (FRPM.011.02). BDOI to confirm that every request passes all three levels, or state the levels by market segment or amount."
+    impact: "Number of approval steps and service levels before TSU receives a request."
+    role: [MKT, PO]
+  C06:
+    proposes: "BDOI's single TSU review (FRPM.011.03) is kept. The BRD (BRPM.009) asks for a written recommendation by the TSU Team Lead followed by the formal approval of the TSU Team Head. v1.1 adds that the reviewer's remarks are kept and shown to the next approver; it recommends two sub-items under FRPM.011: TSU Team Lead review with mandatory recommendation, then TSU Team Head approval, never by the recommender."
+    impact: "Full coverage of BRPM.009 depends on this decision; one more approval step for TSU."
+    role: [TSU, BPS]
+  C07:
+    proposes: "BDOI's Source field (Marketing, TSU, Insurer) and its routing are kept. v1.1 proposes that, for the Insurer source, the insurer's offer is recorded as the first insurer response so that the Comparative Table and audit trail stay complete."
+    impact: "Routing of TSU- and insurer-initiated requests."
+    role: [TSU, MKT]
+  C08:
+    proposes: "BDOI's selection of the approver by name is kept. v1.1 adds that the maker is never offered as approver and that the segregation of duties applies at every step (FRPM.028.01). Work queues by role, with reassignment (FRPM.017.01), are proposed so that requests do not wait when a named approver is absent."
+    impact: "How approvers receive work; segregation of duties."
+    role: [PO, TSU]
+  C09:
+    proposes: "BDOI's direct creation and update of Product Matrix records with Draft and approval is kept. v1.1 adds package versions (FRPM.024.01): the commercial terms of an active package change through a new version, validated before it takes effect, while descriptive details may be edited directly with approval."
+    impact: "How rates and terms of an active package are changed; history for BRPM.007."
+    role: [MBS, TSU]
+  C10:
+    proposes: "BDOI's deactivation request with an effective date and one approver is kept (FRPM.003.04 to 07). v1.1 adds that nothing is deleted, that incentive rules are flagged for review and that a deactivation advisory is drafted. BDOI to confirm whether a ManCom sign-off is needed for a deactivation."
+    impact: "Approval route of a deactivation."
+    role: [TSU, MANCOM]
+  C11:
+    proposes: "BDOI's label Inactive and its rule that an expired package is no longer available are kept. The BRD (BRPM.006) mentions potential reactivation; v1.1 recommends that an expired package can return to sale only through an approved package request that creates a new version."
+    impact: "Whether expired packages can be reactivated; label shown to users."
+    role: [TSU, MBS]
+  C12:
+    proposes: "BDOI's Quotation Slip per insurer and its download for manual e-mail are kept. To cover BRPM.012 (send from the system, confirmation, sent history and resend), v1.1 adds sending from the system as a protected document, with send status and resend (FRPM.006.01, FRPM.012.01)."
+    impact: "How slips reach insurers; evidence of transmission."
+    role: [TSU]
+  C13:
+    proposes: "See section M.2 (BDOI's open item BRPM.020): v1.1 maps BRPM.020 to the new item FRPM.027 (document protection) and recommends not to waive it."
+    impact: "BRD priority Must have."
+    role: [PO, BPS]
+  C14:
+    proposes: "BDOI's response values (Approved, Not Covered, Others) and multiple options per insurer are kept. For PMADD04 (explicit exception states), v1.1 proposes to complete the list with Approved with changes, Counter-proposal, Declined and No response, as a configurable list, and adds negotiation rounds (FRPM.012.03)."
+    impact: "Response values used in the Comparative Table and reports."
+    role: [TSU]
+  C15:
+    proposes: "BDOI's capture of responses in the Comparative Table, the QS value column and the latest responses are kept. For PMADD03 (auditable master version), v1.1 adds one current master with superseded masters retained and client views derived from it (FRPM.012.04)."
+    impact: "Audit of what was presented to the client."
+    role: [TSU]
+  C16:
+    proposes: "BDOI's status lists are kept. v1.1 adds the stages BDOI's lists do not have (TSU Head approval, negotiated terms review, Marketing review, requirements preparation, post-setup validation). One list of status names is to be agreed once C04 to C20 are decided; status names are configurable labels."
+    impact: "Status names on screens, reports and notifications."
+    role: [PO, SA]
+  C17:
+    proposes: "BDOI's ManCom routing (selected approvers in parallel, then the President, with e-mail notice) is kept. v1.1 adds that the submitter cannot approve, the optional upload of the signed sheet, the sign-off reference and the locking of the Quotation Slips (FRPM.014.01). BDOI to give the ManCom approver list and confirm the quorum."
+    impact: "ManCom approval time and evidence."
+    role: [MANCOM, PO]
+  C18:
+    proposes: "BDOI's Proposal path for packages (FRPM.013.01) is kept. v1.1 adds the review of negotiated terms by the TSU Head and, for client-specific packages, by Marketing (FRPM.013.02), and the product requirements with the signed package slip before ManCom (FRPM.014.02), as BRPM.013, 015 and 016 ask. BDOI to confirm whether proposal slips per insurer are produced for packages and who selects the insurers."
+    impact: "Steps between negotiation and ManCom for packages."
+    role: [TSU, MKT]
+  C19:
+    proposes: "BDOI's Incentive Eligible indicator on the product and the incentive rules (FRPM.018.01) are kept. v1.1 adds the content of the rules and their application at booking (FRPM.018.02) and recommends one source of truth: the indicator on the product shown from the active rules, so that the two cannot disagree."
+    impact: "Where incentive eligibility is maintained."
+    role: [MBS, PO]
+  C20:
+    proposes: "BDOI's Request for Deployment step is kept (FRPM.015.01). The BRD (BRPM.015) asks for automatic forwarding to MBS after ManCom approval; v1.1 adds that a deployment request is never possible without the completed ManCom approval and recommends that the deployment request be created automatically on ManCom approval."
+    impact: "One manual step less for TSU if automatic."
+    role: [MBS, TSU]
+  C21:
+    proposes: "BDOI's Reports Builder (FRPM.020.01) is kept. BRPM.005 asks for shared document templates with product-specific fields; v1.1 adds FRPM.030 (shared document templates, loaded from BDOI's Annex D and F) and maps BRPM.005 to FRPM.020 and FRPM.030."
+    impact: "Coverage of BRPM.005."
+    role: [PO, BPS]
+  C22:
+    proposes: "BDOI's Renewal Request Report of expiring package accounts is kept and v1.1 adds the renewal request and its stage (FRPM.019.01). A Package Expiry Report of the packages themselves is added (FRPM.019.02). BDOI to confirm whether FRPM.019.01 lists packages or client accounts sold on packages."
+    impact: "Report content for TSU monitoring."
+    role: [TSU]
+  C23:
+    proposes: "BDOI's file names are kept. v1.1 adds the request and slip numbers printed in the documents (PKR-yyyy-nnnnnn, PQS-yyyy-nnnnnn)."
+    impact: "Names of downloaded files and document references."
+    role: [SA]
+  D01:
+    proposes: "Proposed correction (not applied in the text): 'The system shall provide a Package Request List screen displaying all Package Requests created within the system.'"
+    impact: "Wording only."
+    role: [SA]
+  D02:
+    proposes: "Proposed correction (not applied in the text): 'approve, return, or reject the package request with \"For TSU Review\" status'."
+    impact: "Wording only."
+    role: [SA]
+  D03:
+    proposes: "Proposed correction: use 'Under Negotiation' in FRPM.006.01 and FRPM.012.01, as in the status lists."
+    impact: "Status name."
+    role: [SA]
+  D04:
+    proposes: "Proposed correction: use 'Proposal Ready' in FRPM.010.01, as in the status lists, or add 'Proposal Released' to the lists."
+    impact: "Status name."
+    role: [SA]
+  D05:
+    proposes: "The rules are to be supplied. Proposed starting point: Received (request submitted, not yet with TSU); For QS (with TSU, slip not sent); With Insurers (slip sent, responses pending); Terms Received (at least one response); Proposal Ready; Client Response Received; Closed (deployed, rejected or not proceeded)."
+    impact: "Content of the Placement Update Report."
+    role: [TSU, SA]
+  D06:
+    proposes: "Proposed correction: remove 'Renewal' under Module, or list the modules (Product Maintenance, Package Request, Quotation Request)."
+    impact: "Wording only."
+    role: [SA]
+  D07:
+    proposes: "State in FRPM.013 that FRPM.008.01 and FRPM.009.01 also apply to package requests, if confirmed under C18."
+    impact: "Package path completeness."
+    role: [SA, TSU]
+  D08:
+    proposes: "Use one status set for the MBS deployment: For Deployment, Draft Setup, Pending Approval (post-setup validation), Approved, Deployed, Returned; map 'Package Deployment for Review' and 'Package Deployment Returned' to these."
+    impact: "Status names."
+    role: [SA, MBS]
+  D09:
+    proposes: "One type per field: Warranties, Clauses as Dropdown (from the clause library, FRPM.022.02); Perils/Coverages and Benefits/Coverages as Dropdown (from the coverage list, FRPM.022.01); Incentive Amount as Currency; blank types in Annex B to be completed."
+    impact: "Field types on screens."
+    role: [SA, MBS]
+  D10:
+    proposes: "Proposed correction in Annex B: 'Vessel Usage' (Dropdown) under Marine Hull, as in Annex C."
+    impact: "Field name."
+    role: [SA]
+  D11:
+    proposes: "v1.1 adds the criteria attributes (FRPM.018.01): type, value basis and value, rule parameters, applicable products with cover type, segment, channel and insurer. BDOI to define CPC2 and the other incentive types."
+    impact: "Incentive set-up."
+    role: [MBS, PO]
+
+others:
+  - ref: BRPM.020
+    topic: "BDOI's open item: document security (BRPM.020)"
+    bdoi: "Business Requirements Mapping: 'Under negotiation if can be waived'."
+    brd: "BRPM.020 (Must have): 'Capability to check for document security (password protection/ encryption).' All shared documents are password protected or encrypted."
+    proposes: "Mapping changed from 'Under negotiation if can be waived' to FRPM.027 (new: password protection of documents shared outside the system, password in a separate e-mail). Recommendation: do not waive; BDOI to confirm the password convention."
+    impact: "Coverage of a Must-have requirement; protection of client and insurer documents."
+    role: [PO, BPS]
+  - ref: Scope
+    topic: "Non-package flows in this FRS"
+    bdoi: "FRPM.002.01: 'centralized repository for package-related configurations and quotation requests for non-package products'; FRPM.005 to FRPM.010; Annex B, C and D."
+    brd: "BRD revision log of 27-Oct-2025: non-package excluded and to be part of an addendum; PMADD01 speaks of 'packaged and non-packaged products' for the product structure."
+    proposes: "BDOI's non-package items are kept and completed from the New Business FRS (numbering, mandatory documents, return reasons, approval by someone other than the maker, sending from the system, insurer terms and history, proposal versions, client acceptance and account creation). See C01."
+    impact: "The non-package requirements are signed off with this FRS."
+    role: [PO, BPS]
+  - ref: Terms
+    topic: "Name of the non-package request"
+    bdoi: "'Quotation Request' (FRPM.005)."
+    brd: "New Business BRD: 'Proposal Request Form (PRF)'."
+    proposes: "The two names refer to the same request; v1.1 keeps BDOI's 'Quotation Request' and quotes the system messages, which say 'PRF'. BDOI to confirm one name for screens and messages."
+    impact: "Labels and messages."
+    role: [PO]
+  - ref: Request types
+    topic: "Types of package request"
+    bdoi: "FRPM.002.02: 'Request Type (New/ Update)'; FRPM.003.04 deactivation request."
+    brd: "BRPM.011: requests for product creation, amend, updating or deletion; BRPM.006: potential reactivation; BRPM.017: renewal of packages."
+    proposes: "BDOI's New and Update are kept. v1.1 proposes that the Request Type list also distinguishes Renew (FRPM.026.01) and Reactivate (C11), and that Update covers both changes of terms (with negotiation) and of details (without), chosen on the form."
+    impact: "Request type list and routing; Annex E remarks."
+    role: [TSU, MBS]
+  - ref: FRPM.013.02
+    topic: "Review of negotiated terms added"
+    bdoi: "FRPM.013.01: proposal ready, then FRPM.014.01 Select ManCom Approvers."
+    brd: "BRPM.013: Marketing reviews client-specific terms before any client presentation; BRPM.010: TSU negotiates and finalises terms."
+    proposes: "New sub-item FRPM.013.02: the TSU Head reviews the proposed terms; for client-specific packages Marketing accepts them or requests changes before the ManCom step."
+    impact: "One review step before ManCom for client-specific packages."
+    role: [TSU, MKT]
+  - ref: FRPM.014.02
+    topic: "Product requirements before ManCom added"
+    bdoi: "FRPM.014.01: 'Select ManCom Approvers button once proposal is ready'."
+    brd: "BRPM.015: product requirements (computation and details that Marketing needs) submitted via the system; BRPM.016: package slip (signed)."
+    proposes: "New sub-item FRPM.014.02: TSU completes the product requirements and attaches the signed package slip before the ManCom approvers are selected."
+    impact: "Completeness of what ManCom approves and MBS sets up."
+    role: [TSU, MANCOM]
+  - ref: FRPM.016.02
+    topic: "Post-setup validation checklist added"
+    bdoi: "PMADD06 mapped to FRPM.003.03 (approve, return or reject the matrix request); MBS statuses 'Pending Approval', 'Approved' (FRPM.016.01)."
+    brd: "PMADD06: explicit post-setup validation checkpoint (e.g. by TSU Head / Business Administrator) so that incorrect configurations do not propagate downstream."
+    proposes: "New sub-item FRPM.016.02 with the checklist, the test premium and the validation record; FRPM.003.03 refers to it. The final checklist is for BDOI to confirm."
+    impact: "Who validates (TSU Head, Business Administrator or either) and the checklist content."
+    role: [TSU, MBS]
+  - ref: FRPM.022-030
+    topic: "New requirement items FRPM.022 to FRPM.030"
+    bdoi: "BDOI's table ends at FRPM.021."
+    brd: "PMADD01, PMADD02, BRPM.005, 006, 007, 016, 017, 020, 021 and 022 (see the mapping)."
+    proposes: "Nine new items for capabilities BDOI's FRS does not have: FRPM.022 product hierarchy and clause library; FRPM.023 insurer-specific terms; FRPM.024 package versions and latest approved rate scheme; FRPM.025 advisories; FRPM.026 renewal requests; FRPM.027 document protection; FRPM.028 workflow enforcement and service levels; FRPM.029 notifications and product master changes; FRPM.030 shared document templates."
+    impact: "Numbering and review of the new items by BDO ITG."
+    role: [SA, ITG]
+  - ref: Service levels
+    topic: "Service levels per workflow stage"
+    bdoi: "Aging shown on the dashboard (FRPM.001.01) and lists; no service levels stated."
+    brd: "BRPM.021: validation and approval workflow enforcement; BRPM.019: real-time tracking."
+    proposes: "Default service levels per stage (FRPM.028.01) with amber and red marking (FRPM.001.01). The values are placeholders for BDOI to confirm."
+    impact: "Overdue marking and alerts."
+    role: [TSU, MKT]
+  - ref: BRPM.022
+    topic: "Receiving BDOI systems for product master changes"
+    bdoi: "BRPM.022 mapped to notifications in FRPM.003 to FRPM.017."
+    brd: "BRPM.022: notification and integration for seamless data flow; data synchronized with BDOI systems."
+    proposes: "FRPM.029.01 records every released and expired version as a product master change; BDOI to name the receiving systems, format and timing."
+    impact: "Coverage of the integration part of BRPM.022."
+    role: [PO, ITG]
+  - ref: Annex A
+    topic: "Rows added to Annex A – Package Product Fields"
+    bdoi: "Annex A lists 27 package product fields."
+    brd: "PMADD01, PMADD02, BRPM.007, BRPM.015."
+    proposes: "Rows added (shaded in the review copy): Risk Code; Cover Type / Subtype; Version Number; Insurer Role; Insurer Share; Minimum Premium; Package TSI Limit; Package Start Date; Anniversary Date; Computation Basis; ManCom Sign-off Reference; Change Summary; Market Segments; Version Status."
+    impact: "Fields of the package record."
+    role: [MBS, SA]
+  - ref: Annex B / C
+    topic: "Rows added to Annex B and Annex C – Non-Package fields"
+    bdoi: "Annex B (85 fields) and Annex C (91 fields)."
+    brd: "New Business BRD (proposal request); BRPM.003."
+    proposes: "Rows added (shaded in the review copy) to Annex C: Market Segment; Risk Details (sections); Risk Items; Mandatory Documents; Recommended Insurer. Annex B: Market Segment. The vessel and aircraft rows are unchanged (see D10)."
+    impact: "Fields of the quotation request."
+    role: [MKT, SA]
+  - ref: Annex E
+    topic: "Rows added to Annex E – Package Request Fields"
+    bdoi: "Annex E lists 26 package request fields."
+    brd: "BRPM.008, BRPM.011, BRPM.017."
+    proposes: "Rows added (shaded in the review copy): Request Type; Scope; Package / Programme Name; Package Product (for changes); Reason for Request; Comment on the Reason; Negotiation Required; Market Segments; Effective From; Package Start Date; Package Expiry Date; Anniversary Date; Minimum Premium; Package TSI Limit; Supporting Documents."
+    impact: "Fields of the Package Request Form."
+    role: [MKT, TSU, SA]
+  - ref: Annex E rule
+    topic: "Minimum policies and premium of a package request"
+    bdoi: "Annex E: 'Estimated No. of Policies to be Issued ... must be at least 20'; 'Estimated Total Basic Premium ... must be at least PHP 5M'."
+    brd: "Not stated in the BRD."
+    proposes: "Kept as BDOI's validation of the Package Request Form. v1.1 proposes that both minimums are configurable values and that a request below them can be submitted with the approval of the Marketing Unit Head."
+    impact: "Which package requests TSU receives."
+    role: [MKT, TSU]

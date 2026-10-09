@@ -1,0 +1,899 @@
+# Product Maintenance FRS in BDOI's template, v1.1: the requirements added to BDOI's Functional Requirements table.
+# Read by build_bdoi_frs_pm.py.
+#
+#   items         further requirements and acceptance criteria under each of BDOI's sub-items (FRPM.nnn.nn); BDOI's
+#                 own text is kept word for word and nothing here contradicts it (conflicts are in Annex M)
+#   new_subitems  new sub-items inside one of BDOI's rows, numbered after BDOI's last sub-item of the row
+#   new_items     new rows of the table for capabilities BDOI's FRS does not have (FRPM.022 onwards)
+#
+# Each requirement is a string (first level) or {text, sub} (sub = second-level list; a sub entry may itself be
+# {text, sub} for a third level). "refs" are the BIBS reference requirements (FR-PM-nnn of the BIBS FRS BRD-3 v2.1,
+# FR-NB-nnn of the BIBS FRS BRD-1) the text comes from; they appear in Annex L. "ac" are the acceptance criteria.
+
+items:
+  FRPM.001.01:
+    refs: [FR-PM-070, FR-PM-073]
+    shall:
+      - "The dashboard counts shall follow the user's access: a user sees only the requests and packages of the company and areas the user's role allows."
+      - text: "The system shall show, besides the KPIs above, the following tiles, each opening its filtered list:"
+        sub:
+          - "Package requests by stage (Drafts, For Approval, TSU Review, Negotiation, ManCom, With MBS, For Validation, Released)"
+          - "Packages ending within 30, 60 and 90 days"
+          - "Package configurations waiting for the post-setup validation"
+          - "Advisories drafted and not yet sent"
+          - "Comparative outputs generated in the last seven days"
+      - text: "The system shall mark each pending request against the service level of its workflow stage:"
+        sub:
+          - "Amber from 80% of the stage service level (due soon)"
+          - "Red once the stage service level has passed (overdue); the tile shows the number of overdue requests"
+      - "Each filtered list opened from a tile shall be exportable to Excel with the same rows as on the screen."
+    ac:
+      - "A request past the service level of its stage is counted in a red tile and shown as overdue."
+      - "Clicking the tile of packages ending within 30 days opens the expiry list filtered to 30 days."
+      - "A user sees only the counts of the requests and packages the user's role and company allow."
+
+  FRPM.002.01:
+    refs: [FR-PM-002, FR-PM-070]
+    shall:
+      - "The menu shall show only the Product Maintenance screens the user's role allows; buttons for actions the user may not perform shall be hidden."
+      - text: "Besides the landing page, the module shall give authorized users access to:"
+        sub:
+          - "Product Maintenance dashboard (FRPM.001)"
+          - "TSU Workbench (the TSU queues by stage)"
+          - "Package Expiry (FRPM.004)"
+          - "Validation Queue (FRPM.016.02)"
+          - "Coverages & Clauses, Incentive Criteria, Insurers, Rates & Taxes and Sales Organisation (product masters)"
+          - "Premium Calculator (FRPM.024.02)"
+      - "A user who opens a Product Maintenance screen through a direct link without the access shall see the message \"You do not have access to this screen. Contact your administrator if you need it.\"; a direct request for an action without the access shall be refused with \"You are not permitted to perform this action\" and logged."
+    ac:
+      - "A Marketing Account Officer sees the dashboard, Package Requests and the product screens, and does not see the Validation Queue or the TSU Workbench."
+      - "A direct approval request by a user without the approval access is refused and logged."
+
+  FRPM.002.02:
+    refs: [FR-PM-024, FR-PM-052, FR-PM-073]
+    shall:
+      - "The Expired Products sub-tab shall be shown only to users authorized to view archived packages (TSU Head, MBS, Business Administrator and Auditor)."
+      - text: "The Package Request List tab shall also display:"
+        sub:
+          - "Scope (Generic programme or Client-specific package)"
+          - "Client or programme name"
+          - "Days in the current stage, marked overdue when the stage service level has passed"
+      - text: "Users shall also be able to:"
+        sub:
+          - "Search by part of the request number"
+          - "Show only the requests they created or that are assigned to them (Only My Requests)"
+          - "Filter by request type"
+    ac:
+      - "A request submitted by Marketing appears in the Package Request List with its type, client or programme, line and stage."
+      - "A Marketing Account Officer does not see the Expired Products sub-tab."
+
+  FRPM.003.01:
+    refs: [FR-PM-010, FR-PM-050, FR-PM-052]
+    shall:
+      - text: "The Product Matrix list shall also display, for package products:"
+        sub:
+          - "Risk code"
+          - "Cover type"
+          - "Version in force and its effective date"
+      - "The list shall be filterable by Line of Insurance and by status (Active, Expiring, Expired, Deactivated)."
+      - "Opening a package shall show its record with the versions of its terms in time order, each with its status and effective dates, and allow two versions to be compared (FRPM.024.01)."
+    ac:
+      - "The versions of a package are listed with their status and effective dates."
+      - "The Product Matrix export contains the same rows as the filtered list."
+
+  FRPM.003.02:
+    refs: [FR-PM-010, FR-PM-012, FR-PM-014]
+    shall:
+      - "A package product shall not be saved without its Sub-Line / cover type, and a package configuration shall not be sent for approval without at least one basic coverage."
+      - "The risk code of a new product shall follow the naming convention of its Line of Insurance, once BDOI has stated the convention of the line."
+      - "The approver selected shall not be the user who created or last updated the record; the system shall not offer the maker in the approver list."
+      - "Warranties and clauses shall be selected from the clause library (FRPM.022.02); deductibles, limits and clauses shall be held per insurer and per coverage where the insurers' terms differ (FRPM.023)."
+      - text: "The system shall show the following messages:"
+        sub:
+          - "\"A package needs its cover type (PMADD01)\" when a package product has no cover type"
+          - "\"Risk code <code> does not follow the naming convention of <line>\" when the risk code breaks the convention of the line"
+          - "\"The rate, minimum premium, commission and TSI limit of package <code> change through a new version (Versions tab)\" when a user edits these values directly on an active package"
+    ac:
+      - "A package product without a cover type cannot be saved."
+      - "A risk code that does not follow the naming convention of its line is refused with the message above."
+      - "A changed rate of an active package takes effect only through a new version that is approved; the version in force keeps selling until then."
+
+  FRPM.003.03:
+    refs: [FR-PM-043, FR-PM-050]
+    shall:
+      - "The approver shall not be the maker or the submitter of the configuration (\"A package version is validated by someone other than its maker and submitter\")."
+      - "Before approving a package configuration, the approver shall confirm the post-setup validation checklist (FRPM.016.02); the approval is not available until every checklist item is confirmed."
+      - "The system shall record the approval with the checklist results, the approver and the date and time; the record shall stay visible on the package."
+      - "When a new version of an active package is approved, the previous version shall end on the day before the new effective date, so that one version is in force at any date."
+      - "Only approved and active configurations shall be used for new business; configurations in Draft or pending approval shall not be selectable."
+    ac:
+      - "The user who set up a package configuration cannot approve it."
+      - "An approved version is used by new quotations from its effective date; before approval it is not."
+      - "A returned configuration is editable again by its maker, with the approver's remarks shown."
+
+  FRPM.003.04:
+    refs: [FR-PM-045]
+    shall:
+      - "A deactivated package and all its versions, documents and request history shall stay readable and searchable by authorized users; nothing shall be deleted."
+      - "On deactivation, the system shall flag the active incentive criteria of the package for review and notify the users who maintain incentive criteria (FRPM.018.02)."
+      - "The system shall draft a deactivation advisory for the package (FRPM.025)."
+      - "A new-business quotation on a deactivated package shall be refused with the message \"Product <code> is <status> and cannot be sold\"."
+    ac:
+      - "After deactivation, a new quotation on the package is refused."
+      - "The deactivated package and its versions remain searchable for users authorized to view archived packages."
+
+  FRPM.003.05:
+    refs: [FR-PM-052]
+    shall:
+      - "The system shall check the package expiry dates every day and update the status of each package whose expiry date has passed without a newer approved version."
+      - "Expired packages shall be retained with all their versions, terms, documents and communications, tagged \"Expired\", and shall be visible only to users authorized to view archived packages."
+      - "The system shall notify the TSU and MBS users when a package expires."
+    ac:
+      - "A package past its expiry date without a renewal is tagged Expired and cannot be sold."
+      - "Its versions, documents and request history remain retrievable by authorized users."
+      - "A Marketing Account Officer does not see expired packages."
+
+  FRPM.003.06:
+    refs: [FR-PM-024, FR-PM-045]
+    shall:
+      - "Opening a deactivation request shall show its details, the approval decision and its history with the user and date and time of each action."
+    ac:
+      - "A submitted deactivation request appears in the list with its approval status and requester."
+
+  FRPM.003.07:
+    refs: [FR-PM-045, FR-PM-073]
+    shall:
+      - "The approver shall not be the requester of the deactivation."
+      - "The decision shall be recorded in the history of the package with the user, date and time and remarks."
+    ac:
+      - "The requester cannot approve his or her own deactivation request."
+      - "A rejected deactivation request shows the approval remarks and the package stays active."
+
+  FRPM.004.01:
+    refs: [FR-PM-060]
+    shall:
+      - "The system shall raise each alert once per package, version and alert day, never twice for the same alert day."
+      - "Further reminder days before the expiry date shall be configurable by the System Administrator."
+      - text: "The system shall provide a Package Expiry screen listing the active packages by expiry date, with tabs:"
+        sub:
+          - "Expiring (with the days left and the anniversary date)"
+          - "Renewal in Progress (with the open renewal request and its stage)"
+          - "Expired"
+      - "Users shall be able to set \"Packages ending within (days)\" and export the expiry list for a date range (Generate Expiry List)."
+    ac:
+      - "A package ending in 45 days appears in the Expiring tab with 45 days left."
+      - "The alert of a package is raised once at each alert day and never twice for the same day."
+
+  FRPM.005.01:
+    refs: [FR-NB-050, FR-NB-052]
+    shall:
+      - "On first save the system shall assign the request number from a gap-free yearly sequence; the number shall be shown on the request and in every list and shall not be editable."
+      - "Before submission the system shall check the header (client and product), the risk description (sections or risk items), the period and the mandatory documents of the product's document checklist; the checklist shall show each document as Attached or Missing."
+      - "The product of a request shall not change after the first save."
+      - "TSU shall be able to amend a received request, return it to Marketing with a reason from the return reason list, or void it while it is with TSU; the Account Officer shall see each return with its reason."
+      - text: "The system shall show the following messages:"
+        sub:
+          - "\"Complete the PRF header\" when the client or the product is missing"
+          - "\"Describe the risk (sections or risk items) before submitting\""
+          - "\"Attach the mandatory documents: <types>\""
+          - "\"The period end must be after the period start\""
+          - "\"Product <code> is not offered to segment <segment>\""
+          - "\"PRF <number> cannot be changed while <stage>\" when a user edits the request in a stage that does not allow it"
+    ac:
+      - "A new quotation request gets the next number of the year; no two requests share a number and the number cannot be edited."
+      - "A request without its mandatory documents cannot be submitted."
+      - "A request returned by TSU is back with the Account Officer with the reason shown."
+
+  FRPM.005.02:
+    refs: [FR-NB-051, FR-NB-052]
+    shall:
+      - "The approver shall not be the maker or submitter of the request (\"A PRF is approved by someone other than its maker\")."
+      - "A return shall require a reason (\"Select a reason for '<action>'\"); the return reasons are: Incomplete or incorrect details; Missing supporting documents; Declined by insurer; Additional insurer requirements; Rate or terms to be reviewed; Insurer underwriting review; Others."
+    ac:
+      - "The Account Officer who submitted the request cannot approve it."
+      - "An approved request appears in the TSU Workbench."
+
+  FRPM.006.01:
+    refs: [FR-NB-053]
+    shall:
+      - "The system shall number each Quotation Slip on submission for approval and set the date by which insurers are asked to reply (default: the send date plus 5 days, configurable)."
+      - "The approver of a Quotation Slip shall not be its preparer (\"The quotation slip is approved by another TSU officer\")."
+      - "In addition to the download, the system shall allow the approved Quotation Slip to be e-mailed from the system to each insurer's placement e-mail address as a password-protected document, with the password in a separate e-mail (FRPM.027), and shall show the send status of each e-mail; a failed e-mail can be resent."
+      - text: "The system shall show the following messages:"
+        sub:
+          - "\"Select at least one insurer of the panel for the quotation slip\""
+          - "\"<insurer> has no placement e-mail address\" when the slip is sent to an insurer without a placement e-mail"
+          - "\"No quotation slip has been prepared yet\" when approval is attempted before preparation"
+    ac:
+      - "The preparer cannot approve his or her own Quotation Slip."
+      - "An approved Quotation Slip sent from the system reaches each selected insurer as a protected document, and each send is listed with its status."
+      - "A failed send can be resent."
+
+  FRPM.006.02:
+    refs: [FR-NB-054, FR-NB-055]
+    shall:
+      - "An insurer response with offered terms shall require the premium quoted (\"Enter the premium quoted by <insurer>\")."
+      - "Each change to a saved response shall keep the previous values in the response history with the user and date and time."
+      - "The Comparative Table shall list the insurers with offered terms first, lowest premium first, then the insurers that declined, then those that have not responded; the lowest premium shall be flagged and the recommended insurer marked."
+      - "The Comparative Table shall always be compiled from the current responses, so a changed response shows at once."
+      - "Insurer responses shall be keyed in only after the Quotation Slip is sent (\"Insurer terms are keyed in after the quotation slip is sent\")."
+    ac:
+      - "TSU records terms for two insurers and a decline for a third; the Comparative Table shows the two offers, the lowest premium first."
+      - "A change of premium on a saved response keeps the earlier premium in the history."
+      - "The Excel export contains the same rows as the screen."
+
+  FRPM.007.01:
+    refs: [FR-NB-121, FR-NB-123]
+    shall:
+      - "Besides the scheduled run, authorized users shall be able to generate the report on request for one quotation request (individual report) or for a period (collective report), optionally for one insurer or Account Officer."
+      - "Every generation of the report, scheduled or on request, shall be recorded with the user (or the schedule), the parameters and the date and time."
+    ac:
+      - "The report generated on the scheduled day lists the quotation requests active or processed in the period with their latest status."
+      - "The report for one request number shows only that request."
+      - "The Excel file in the repository contains the same rows as the preview."
+
+  FRPM.008.01:
+    refs: [FR-NB-054]
+    shall:
+      - "The requestor shall be able to mark one insurer as the recommended insurer; only an insurer with received terms can be recommended (\"Only received terms can be recommended\")."
+      - "Proceed to Proposal shall not be available while an insurer response is still pending unless the pending responses are closed (\"<n> insurer(s) have not answered: close the request to proceed\")."
+    ac:
+      - "An insurer that declined cannot be selected for the Proposal."
+      - "Proceed to Proposal is enabled only after at least one insurer with a response is selected."
+
+  FRPM.009.01:
+    refs: [FR-NB-054, FR-NB-056]
+    shall:
+      - "The Final Terms for Proposal shall be taken by default from the selected insurer's response and may then be edited; the change shall be recorded in the history."
+    ac:
+      - "The Final Terms column shows the selected insurer's terms, and an edited value is kept in the history."
+
+  FRPM.009.02:
+    refs: [FR-NB-056]
+    shall:
+      - "Each generation shall be a new version of the Proposal Slip; earlier versions shall stay searchable and downloadable."
+      - "The approver of a Proposal shall not be its preparer (\"The proposal slip is approved by another TSU officer\"); the Proposal shall reach Marketing only after approval."
+      - text: "The system shall show the following messages:"
+        sub:
+          - "\"Choose the insurer (or flag the recommended one) for the proposal slip\""
+          - "\"<insurer> has not quoted terms\""
+          - "\"No proposal slip has been prepared yet\""
+    ac:
+      - "A Proposal cannot reach Marketing before a second TSU officer approves it."
+      - "After a return and a new generation, both versions are listed."
+
+  FRPM.010.01:
+    refs: [FR-NB-057]
+    shall:
+      - "The system shall send the released Proposal and the Comparative Table to the client as password-protected documents, with the password in a separate e-mail (FRPM.027)."
+      - "Recording an Accepted response shall require the client's acceptance e-mail as an attachment (\"Attach the client's acceptance e-mail first\")."
+      - "After acceptance, the system shall allow the Account Officer to create one draft account per accepted risk group, carrying the request's reference number, the accepted insurer and its quoted rate; account creation shall require a confirmed client (\"Client <code> is not yet confirmed (onboarding and KYC incomplete)\")."
+      - "Accepted proposals shall be listed on the client record under Confirmed Proposals."
+    ac:
+      - "An accepted request creates its account with the accepted insurer and the quoted rate."
+      - "The client record lists the accepted request under Confirmed Proposals."
+      - "Acceptance cannot be recorded without the client's acceptance e-mail."
+
+  FRPM.011.01:
+    refs: [FR-PM-024]
+    shall:
+      - "Package Request Numbers shall follow the format PKR-yyyy-nnnnnn, from a yearly sequence, and shall not be editable."
+      - text: "The list shall also display:"
+        sub:
+          - "Request Type"
+          - "Scope (Generic programme or Client-specific package)"
+          - "Client or Programme"
+          - "Days in the current stage, marked overdue when the stage service level has passed"
+      - "Users shall be able to search by part of the request number, filter by request type and show only their own requests."
+    ac:
+      - "A request submitted by Marketing appears in the list for TSU review with its type, client, line and reason."
+      - "A request assigned to a TSU officer shows the officer as Assigned TSU User."
+
+  FRPM.011.02:
+    refs: [FR-PM-020, FR-PM-021]
+    shall:
+      - "For a request on an existing package, the system shall pre-fill the requested terms from the package's version in force, so nothing is keyed in twice."
+      - "A client-specific package request shall name the client (from the client master); a generic programme shall not need one."
+      - "Before submission, the request shall have the requested terms, the package expiry date and, when insurers are to be approached, at least one target insurer; the system shall name every missing item."
+      - "The type of a saved request shall not change."
+      - "The requester shall be able to void a draft with a reason; the request then closes as Voided."
+      - "No Marketing approver shall approve a request he or she created or submitted (\"A package request is approved by someone other than its maker\")."
+      - text: "The system shall show the following messages:"
+        sub:
+          - "\"Enter the package or programme name\""
+          - "\"Select the product line\""
+          - "\"Select the reason\""
+          - "\"Select the client of the client-specific package (PQ14)\""
+          - "\"The package end date must be after its start date\""
+          - "\"Rates and amounts cannot be negative\""
+          - "\"Complete the request: <items>\""
+          - "\"The type of a request cannot change\""
+    ac:
+      - "A Marketing Account Officer submits a complete request; it receives a Package Request Number and moves to Marketing approval."
+      - "Submission with missing mandatory fields is refused and each missing item is named."
+      - "A request on an existing package opens with the current terms pre-filled."
+      - "A client-specific request without a client cannot be saved."
+      - "The requester cannot approve his or her own request."
+
+  FRPM.011.03:
+    refs: [FR-PM-022, FR-PM-023, FR-PM-024]
+    shall:
+      - "The reviewer shall be able to correct the request before the decision; the correction shall be recorded in the history."
+      - "The reviewer's remarks shall be stored on the request and displayed to every later approver."
+      - "A return shall require a reason (\"Select a reason for '<action>'\"); the returned request shall show the reason to the requester."
+      - "The reviewer shall not be the creator of the request."
+    ac:
+      - "A returned request is back with the requester as Returned for Revision with the reason visible on the request."
+      - "The reviewer's remarks are visible to the next approver of the request."
+
+  FRPM.012.01:
+    refs: [FR-PM-030, FR-PM-013]
+    shall:
+      - "Each Quotation Slip shall be numbered PQS-yyyy-nnnnnn on submission for approval, with the date by which insurers are asked to reply (default: the send date plus 5 days, configurable)."
+      - "The approver of a Quotation Slip shall be a TSU Team Lead or a co-officer and shall not be its preparer (\"The quotation slip is approved by a TL or a co-officer\")."
+      - "In addition to the download, the system shall allow the approved Quotation Slip to be e-mailed from the system to each insurer as a password-protected document, with the password in a separate e-mail (FRPM.027), and shall show the send confirmation per insurer."
+      - "The officer shall be able to view the sent history and resend the slip to one insurer (for example after a bounced e-mail); each resend shall be logged."
+      - "The Quotation Slips shall remain editable by TSU until the ManCom approval and shall then be locked (\"The slips are locked since the ManCom sign-off\")."
+      - "The Quotation Slip shall be generated from the template of the Line of Insurance (Annex F), so that the Marketing details flow into it without re-keying (FRPM.030)."
+      - text: "The system shall show the following messages:"
+        sub:
+          - "\"Select at least one insurer for the quotation slip\""
+          - "\"Round <n> is already sent\""
+          - "\"Only the slip of an open, sent round can be resent\""
+    ac:
+      - "The preparer cannot approve his or her own Quotation Slip."
+      - "An approved Quotation Slip sent from the system reaches each insurer as a protected document, and each send is listed."
+      - "The officer can view the sent history and resend the slip to one insurer."
+      - "After the ManCom approval the Quotation Slip cannot be edited or resent."
+
+  FRPM.012.02:
+    refs: [FR-PM-031, FR-PM-034]
+    shall:
+      - "For each insurer response the system shall capture the offered rate and minimum premium, the terms per coverage (included, limit, deductible, clauses), conditions and warranties, validity date, remarks and the insurer's reply document."
+      - "A response with offered terms shall require a rate (\"Enter the rate offered by <insurer> (<outcome>)\"); rates and amounts shall not be negative."
+      - "When an insurer does not respond by the reply date, the user shall be able to record that no response was received."
+      - "Every change to a saved response shall be kept in the response history with the earlier values, the user and the date and time."
+      - "Marketing users shall have view-only access to the Comparative Table."
+    ac:
+      - "An offer without a rate is refused."
+      - "The response history shows every earlier value with the user and date and time."
+      - "A Marketing user can open the Comparative Table but cannot change it."
+
+  FRPM.013.01:
+    refs: [FR-PM-033, FR-PM-040]
+    shall:
+      - "Only insurers that offered terms shall be selectable for the Proposal (\"<insurer> did not offer terms in this round\")."
+      - "When several insurers share the package, the user shall give each insurer's role (Lead, Participant or Panel) and share; the shares shall total 100% (\"The co-insurance shares must add up to 100%\")."
+      - "The approver of a Proposal shall not be its preparer."
+    ac:
+      - "An insurer that did not offer terms cannot be selected."
+      - "Shares that do not total 100% are refused."
+
+  FRPM.014.01:
+    refs: [FR-PM-041]
+    shall:
+      - "A ManCom approver shall not be the user who submitted the product requirements (\"ManCom signs off requirements submitted by someone else\")."
+      - "An approver may upload a physically signed sign-off sheet; without an upload, the system shall attach a generated sign-off record to the package request. The sign-off reference shall be MC-<package request number>."
+      - "On completion of the ManCom approval the Quotation Slips of every round shall be locked."
+      - "The product requirements shall not reach MBS before the ManCom approval."
+    ac:
+      - "The requirements reach MBS only after the ManCom approval."
+      - "After the approval, the Quotation Slips can no longer be edited or resent."
+      - "A request without an uploaded sheet carries a generated ManCom sign-off record."
+
+  FRPM.015.01:
+    refs: [FR-PM-041, FR-PM-073]
+    shall:
+      - "A Package Deployment Request shall not be possible without the completed ManCom approval, whatever the access of the user."
+    ac:
+      - "A package request cannot be sent to MBS without the ManCom approval."
+
+  FRPM.016.01:
+    refs: [FR-PM-024, FR-PM-042]
+    shall:
+      - "The MBS Deployment Queue shall also show the ManCom sign-off reference and the days in the current status."
+      - "MBS shall be able to return an incomplete deployment request to TSU with a reason (Returned); the request returns to TSU with the reason shown."
+    ac:
+      - "Incomplete requirements returned by MBS reach TSU with the reason."
+
+  FRPM.017.01:
+    refs: [FR-PM-024]
+    shall:
+      - "A TSU Team Lead or Head shall be able to assign several selected requests of one stage to a user of the team at once, or return them to the team queue."
+      - "A TSU officer shall be able to claim an unassigned request of the team queue."
+      - "The assignee shall be shown on the request and in the lists."
+    ac:
+      - "A request assigned to an officer shows the officer as assignee, and the officer is notified."
+
+  FRPM.018.01:
+    refs: [FR-PM-080]
+    shall:
+      - text: "Information Captured shall also include:"
+        sub:
+          - "Incentive Type (list supplied by BDOI)"
+          - "Value Basis (fixed amount or rate) and Value"
+          - "Rule parameters (each with its value)"
+          - "Applicable products, picked from the active products of the Product Matrix, optionally narrowed by cover type, market segment, channel and insurer"
+      - "Only products and insurers active on the effective date shall be selectable (\"Product <code> is not an active product of the matrix\")."
+      - "Two rules with the same code shall not overlap in time (\"Criterion <code> already covers part of this period\")."
+      - "Every new or changed rule shall be authorized by a user other than its maker before it applies."
+      - "An active rule shall not be edited; an amendment shall create a successor that takes effect when authorized, and the previous rule shall then end on the day before, with no gap. Deactivation shall end-date the rule. The history of every rule shall be kept."
+      - text: "The system shall show the following messages:"
+        sub:
+          - "\"Select at least one product of the products matrix\""
+          - "\"Enter the value of the incentive criterion\""
+          - "\"Enter a value for each parameter\""
+          - "\"<parameter> cannot be negative\""
+          - "\"An active criterion is changed by amending it (successor)\""
+    ac:
+      - "A rule on an inactive product cannot be saved."
+      - "An amended active rule stays active until its successor is authorized, with no gap."
+      - "The history shows every earlier version of the rule."
+
+  FRPM.019.01:
+    refs: [FR-PM-060, FR-PM-071]
+    shall:
+      - "For each expiring package, the report shall show whether a renewal request is open and its current stage."
+      - "The report shall be exportable to PDF, Excel and CSV, and every generation shall be logged."
+    ac:
+      - "A package expiring in the period is listed whether or not a renewal request exists, with the renewal request and its stage when one is open."
+
+  FRPM.020.01:
+    refs: [FR-PM-071]
+    shall:
+      - "Saved report definitions shall be shareable with other authorized users."
+      - "Only users with report access shall be able to generate Product Maintenance reports."
+    ac:
+      - "A report saved by one user can be run by another authorized user with the same result."
+      - "A user without report access cannot generate the reports."
+      - "A report exported to PDF and to Excel contains the same rows."
+
+  FRPM.021.01:
+    refs: [FR-PM-005]
+    shall:
+      - "Audit log entries can only be added: no user, including the System Administrator, shall be able to change or delete them."
+      - "The system shall write the audit entry together with the change it records, so that a change is never kept without its audit entry."
+      - "Audit entries shall be retained 5 years online and 15 years in the archive, unless BDOI states another retention for Product Maintenance."
+      - "Each e-mail sent from Product Maintenance shall be logged with the recipient, the date and time, the subject and the name and fingerprint of the attachment."
+    ac:
+      - "No screen or direct request allows an audit entry to be edited or deleted."
+      - "The audit logs of a released package list every step from submission to release with the user and date and time."
+
+  FRPM.021.02:
+    refs: [FR-PM-005]
+    shall:
+      - "The record's audit section shall show the workflow history and the audit entries in time order."
+    ac:
+      - "A changed insurer response shows its earlier values in the record's audit section."
+
+new_subitems:
+  - row: FRPM.003
+    id: FRPM.003.08
+    title: Field Rules per Line of Insurance and Product
+    brd: [BRPM.003, BRPM.004]
+    refs: [FR-PM-012]
+    shall:
+      - "The system shall allow MBS to maintain, per Line of Insurance or per product, which fields a quotation or account must capture and how their values are checked, without IT intervention."
+      - text: "Check types:"
+        sub:
+          - "Presence (mandatory field)"
+          - "List (the value is one of a maintained list of values)"
+          - "Range (minimum and maximum)"
+          - "Pattern (the format of the value)"
+      - "A rule shall apply to all products, to one Line of Insurance or to one product; the most specific rules apply in addition to the wider ones."
+      - "Each new or changed rule shall be authorized by a user other than its maker."
+      - "When a quotation or account of the product is submitted, the system shall check all rules in scope and list every violation against its field."
+      - "A pattern that cannot be evaluated safely shall be refused when the rule is saved."
+      - text: "The system shall show the following messages:"
+        sub:
+          - "\"<Field> is required for <product>\""
+          - "\"<Field> must be between <min> and <max>\""
+          - "\"<Field> is not a valid value\""
+    ac:
+      - "A Motor product rule \"plate number required\" stops the submission of a Motor account without a plate number and names the field."
+      - "A range rule refuses a value outside the range and accepts the limits."
+      - "MBS adds a field rule for a line that has none, and the rule applies to the next account of that line."
+
+  - row: FRPM.007
+    id: FRPM.007.02
+    title: Package Status Update Report (individual and all package requests)
+    brd: [BRPM.018]
+    refs: [FR-PM-071]
+    shall:
+      - "The system shall allow authorized users to generate a Package Status Update Report for one package request (individual report) or for all package requests."
+      - text: "Report parameters:"
+        sub:
+          - "Request Number (individual report)"
+          - "Status (all or one stage)"
+          - "Request Type"
+          - "Line of Insurance"
+          - "Insurer"
+          - "Package ends within (days)"
+      - text: "Information displayed:"
+        sub:
+          - "Request Number"
+          - "Request Type"
+          - "Client or Programme"
+          - "Package Name"
+          - "Risk Code and Version"
+          - "Current Status"
+          - "Days in Status"
+          - "Package Expiry Date"
+          - "Rate % of the proposed terms"
+          - "Insurers (chosen or targeted)"
+          - "Last Action, with its date and user"
+      - "The report shall be printed in landscape, one row per request sorted by request number, with the parameters in the report header, and shall be exportable to PDF, Excel and CSV."
+    ac:
+      - "The report for one Request Number shows only that request."
+      - "The report exports to PDF and Excel with the same rows."
+
+  - row: FRPM.012
+    id: FRPM.012.03
+    title: Negotiation Rounds and Exception Outcomes
+    brd: [PMADD04, BRPM.010]
+    refs: [FR-PM-032, FR-PM-031]
+    shall:
+      - "The system shall allow TSU to open a further negotiation round (Revise Quotation Slip) when terms need to be renegotiated, stating what changes in the round."
+      - "The new round shall propose, by default, the insurers of the previous round that did not decline; TSU may adjust the insurers. The Quotation Slip of the new round follows the same approval and sending as the first (FRPM.012.01)."
+      - "All rounds, their Quotation Slips and the insurer responses of each round shall stay on the package request."
+      - "There shall be no maximum number of rounds unless BDOI sets one."
+      - "TSU or the TSU Head shall be able to close a request as Not Proceeded with a reason: Declined by the insurers; Negotiated terms not accepted; Client withdrew the request; Business decision; Others (with a comment). A request closed as Not Proceeded cannot be reopened."
+      - "A further round shall not be opened before the Quotation Slip of the current round is sent (\"Send the slip of round <n> first\")."
+    ac:
+      - "A request negotiated in two rounds shows both rounds, their Quotation Slip numbers and the responses of each."
+      - "Round 2 opens by default without the insurers that declined in round 1."
+      - "A request closed as Not Proceeded shows the reason and cannot be reopened."
+
+  - row: FRPM.012
+    id: FRPM.012.04
+    title: Comparative Table Master and Client Views
+    brd: [BRPM.014, PMADD03]
+    refs: [FR-PM-034, FR-PM-035]
+    shall:
+      - "The system shall keep one current master Comparative Table per package request, compiled from the responses of the latest round; a new compilation shall mark the previous master as superseded, and every superseded master shall remain downloadable (auditable master version)."
+      - "Each master and client view shall be stored as PDF and Excel on the package request with the date and time, the user and the template version, and shall show the same content whenever it is downloaded later."
+      - "The system shall allow TSU to generate a client view from the current master by choosing a title, the fields and the insurers to show; a client view never changes values and keeps a link to its master."
+      - "Fields selectable for a client view: Outcome, Rate %, Minimum Premium, Coverages, Deductibles, Conditions / Warranties, Valid Until and Remarks (list to be confirmed by BDOI)."
+      - text: "The system shall show the following messages:"
+        sub:
+          - "\"Send the quotation slip of round <n> first\" when a master is compiled before the slip of the round is sent"
+          - "\"Compile the comparative master first\""
+          - "\"Enter the title of the view\""
+          - "\"Select at least one insurer of the master\""
+    ac:
+      - "A request with three responses has one current master listing the three insurers with their terms."
+      - "After a second compilation the first master is marked superseded and is still downloadable."
+      - "A client view that excludes one insurer and the Remarks field shows neither, and its values equal the master's."
+
+  - row: FRPM.013
+    id: FRPM.013.02
+    title: Review of Negotiated Terms (TSU Head and Marketing)
+    brd: [BRPM.013, BRPM.010]
+    refs: [FR-PM-036]
+    shall:
+      - "The TSU Head shall review the proposed terms and the master Comparative Table before the product requirements are prepared."
+      - "For a client-specific package, the TSU Head shall release the terms to the Marketing requestor, who reviews them before any client presentation and either accepts them or requests changes with a reason; a change request returns the package request to negotiation."
+      - "A generic programme has no client presentation; the TSU Head sends it straight to the preparation of the product requirements."
+      - "Marketing shall be able to close the request as Not Proceeded with a reason."
+    ac:
+      - "A client-specific package cannot skip the Marketing review."
+      - "Marketing's change request returns the package request to negotiation with the reason shown."
+
+  - row: FRPM.014
+    id: FRPM.014.02
+    title: Product Requirements for ManCom Approval
+    brd: [BRPM.015]
+    refs: [FR-PM-040]
+    shall:
+      - text: "Before the ManCom approvers are selected, TSU shall complete the product requirements that Marketing needs for its transactions:"
+        sub:
+          - "Package rate (or a rate per insurer), minimum premium, commission and package TSI limit"
+          - "Computation basis"
+          - "Effective date, package start, expiry and anniversary dates"
+          - "Insurers with their role and share"
+          - "Signed package slip (the system generates the unsigned package slip for signature)"
+      - "The system shall refuse the submission while an item is missing and name every missing item (\"Complete the requirements: <missing items>\"); the package expiry date shall be after the effective date."
+    ac:
+      - "Submission without a signed package slip is refused and names the missing slip."
+      - "A complete set of requirements can be submitted for ManCom approval, and the ManCom approvers are notified."
+
+  - row: FRPM.016
+    id: FRPM.016.02
+    title: Package Set-up and Post-Setup Validation
+    brd: [BRPM.015, PMADD06]
+    refs: [FR-PM-042, FR-PM-043]
+    shall:
+      - "MBS shall set up the package from the ManCom-approved terms; the system creates a draft package configuration (rate scheme, dates, coverages, insurers and insurer terms) with the package request number and the ManCom sign-off reference as its origin. For a new package, MBS gives the risk code and name of the new product."
+      - "A product shall have only one configuration in set-up or in validation at a time (\"Product <code> already has a version being set up\")."
+      - "A new product created by the set-up stays pending until its first configuration is validated."
+      - "The package configuration shall not be ready for use until it is validated by the TSU Head or the Business Administrator, who shall be neither its maker nor its submitter."
+      - text: "Post-setup validation checklist (final list to be confirmed by BDOI):"
+        sub:
+          - "Hierarchy complete (cover type and at least one basic coverage)"
+          - "Every insurer of the package has terms for each included coverage"
+          - "Co-insurance shares total 100% where shares are used"
+          - "Rates and minimum premiums match the ManCom-approved terms"
+          - "Dates and package term are correct; the effective date is today or later and after the latest approved version"
+          - "Test premium computed on a sample item reviewed"
+      - "The validator shall either release the configuration (Validate and Release) or return it to MBS with a reason; the validation record shall show the result, the validator, the date and time, the test premium and each check with Passed, Failed or Not Applicable."
+      - "On release, the package becomes available to Marketing, which is notified, and the advisory is drafted (FRPM.025)."
+      - text: "The system shall show the following messages:"
+        sub:
+          - "\"Insurer <code> has no terms for coverage <coverage>\""
+          - "\"Enter the package rate or a rate for every insurer\""
+          - "\"Enter the effective date\""
+          - "\"A package version is validated by someone other than its maker and submitter\""
+    ac:
+      - "MBS cannot set up a package before the ManCom approval."
+      - "Set-up creates a draft configuration whose terms equal the ManCom-approved terms."
+      - "The MBS user who set up the configuration cannot validate it."
+      - "A returned configuration is editable again and the request is back with MBS."
+
+  - row: FRPM.018
+    id: FRPM.018.02
+    title: Application of Incentive Rules and Review when Products End
+    brd: [PMADD07, PMADD08]
+    refs: [FR-PM-081]
+    shall:
+      - "At booking, the system shall match the active incentive rules against the transaction (product, cover type, market segment, channel, lead insurer and booking date) and store the matched incentive codes on the invoice; the incentive indicator of the transaction is set when at least one rule matches."
+      - "Endorsements shall keep the incentive codes of the original invoice."
+      - "When a product expires or is deactivated, its active incentive rules shall be flagged for review and the users who maintain them notified; the rules are never deleted."
+      - "The computation and payout of incentives are outside Product Maintenance."
+    ac:
+      - "An invoice on a product covered by CPC2 carries CPC2 and the incentive indicator."
+      - "Deactivating the product raises the review notice for CPC2."
+
+  - row: FRPM.019
+    id: FRPM.019.02
+    title: Package Expiry Report
+    brd: [BRPM.017]
+    refs: [FR-PM-071, FR-PM-060]
+    shall:
+      - "The system shall allow authorized users to generate a Package Expiry Report of the active packages by expiry date, with the parameter Ending Within (days), default 90."
+      - text: "Information displayed:"
+        sub:
+          - "Risk Code and Package Name"
+          - "Version in force"
+          - "Package Expiry Date and Days Left"
+          - "Anniversary Date"
+          - "Renewal Request (open request, or None) and its stage"
+      - "The report shall be exportable to PDF, Excel and CSV."
+    ac:
+      - "A package ending within the parameter days is listed with its days left and its renewal request."
+
+  - row: FRPM.019
+    id: FRPM.019.03
+    title: Package Version History Report
+    brd: [BRPM.006, BRPM.007]
+    refs: [FR-PM-071, FR-PM-050]
+    shall:
+      - "The system shall allow authorized users to generate a Package Version History of every version of the package products, grouped by product with the versions in ascending order, optionally for one product."
+      - text: "Information displayed:"
+        sub:
+          - "Risk Code and Version"
+          - "Status (Draft, For Validation, Released, Superseded, Expired)"
+          - "Effective From and Effective To"
+          - "Package Expiry Date"
+          - "Submitted By, Validated By and Validated On"
+          - "Validation Result (Passed or Returned, with the return reason)"
+          - "Source Package Request"
+          - "Change Summary"
+    ac:
+      - "Every version of a package appears with its validator, dates and source request."
+
+new_items:
+  - id: FRPM.022
+    component: Product Matrix
+    capability: Product Hierarchy, Coverages and Clause Library
+    brd: [PMADD01, PMADD02]
+    subitems:
+      - id: FRPM.022.01
+        title: Product Hierarchy and Coverages
+        refs: [FR-PM-010]
+        shall:
+          - text: "The system shall hold one product hierarchy for all packaged and non-packaged products:"
+            sub:
+              - "Level 1: Line of Insurance (for example Motor, Fire)"
+              - "Level 2: Sub-Line / cover type, with an optional subtype under it (at most two levels)"
+              - "Level 3: Product (risk code)"
+              - "Level 4: Coverages and perils of the line, used in each package configuration"
+          - "Coverage kinds shall be Section, Coverage, Peril and Extension (configurable list)."
+          - "Each new or changed hierarchy record shall be authorized by a user other than its maker before it can be used; a rejected record stays unusable and the maker can correct it."
+          - "A subtype shall not be created under a subtype."
+        ac:
+          - "A new coverage is usable in package configurations only after another user authorizes it."
+          - "A subtype under a subtype is refused."
+      - id: FRPM.022.02
+        title: Clause Library
+        refs: [FR-PM-011]
+        shall:
+          - "The system shall hold warranties, clauses, exclusions and deductible wordings once, in a clause library, with their kind, Line of Insurance (or all lines), title, wording and effective dates."
+          - "Package configurations shall refer to the clauses of the library for each insurer and coverage (FRPM.023)."
+          - "Each new or changed clause shall be authorized by a user other than its maker."
+          - "A clause shall never be deleted; it is end-dated or deactivated and stays readable on the configurations that used it."
+          - text: "The system shall show the following messages:"
+            sub:
+              - "\"Enter the wording\""
+              - "\"The end date must be on or after the start date\""
+        ac:
+          - "A clause is selectable in insurer terms only after authorization and within its effective dates."
+          - "An end-dated clause stays readable on the versions that used it."
+
+  - id: FRPM.023
+    component: Product Matrix
+    capability: Insurer-Specific Package Terms
+    brd: [PMADD02]
+    subitems:
+      - id: FRPM.023.01
+        title: Insurer-Specific Coverages, Deductibles and Warranties
+        refs: [FR-PM-014]
+        shall:
+          - "Each package configuration shall list its insurers with their role (Lead, Participant or Panel), share (co-insurance), rate and minimum premium."
+          - "For each insurer and coverage, the configuration shall hold whether the coverage is included, the limit and sub-limit, the deductible (amount, percentage or wording) and the clauses that apply, maintained by MBS without IT intervention."
+          - "Insurer terms shall be maintained on a draft configuration only and reach new business after validation and release (FRPM.016.02), so that a change never alters a package already on sale."
+          - "When shares are used they shall total 100%, and every insurer shall have terms for every included coverage before the configuration is submitted for validation."
+          - "A new-business transaction with an insurer that is not on the package's panel shall be refused (\"Insurer <code> is not on the panel of <package>\")."
+          - text: "The system shall show the following messages:"
+            sub:
+              - "\"The co-insurance shares must add up to 100%\""
+              - "\"Insurer <code> has no terms for coverage <coverage>\""
+        ac:
+          - "MBS maintains different deductibles for two insurers on the same coverage without IT."
+          - "A configuration whose insurer has no terms for an included coverage cannot be submitted."
+          - "A quotation on the package with an insurer outside the panel is refused."
+
+  - id: FRPM.024
+    component: Product Matrix / New Business
+    capability: Package Versions and Latest Approved Rate Scheme
+    brd: [BRPM.007, BRPM.006]
+    subitems:
+      - id: FRPM.024.01
+        title: Package Versions
+        refs: [FR-PM-050]
+        shall:
+          - "The commercial terms of a package (rate scheme, coverages, insurers, insurer terms and dates) shall be held in numbered versions with an effective date; a package shall never be edited in place."
+          - "MBS shall create a new draft version (New Version) as a copy of the version in force, effective the next day; the version in force keeps selling while the new version is validated and released."
+          - "Version statuses: Draft; For Validation; Released; Superseded (ended by a newer released version); Expired (expiry date passed with no newer version)."
+          - "One released version shall be in force per package at any date; the previous one ends on the day before the next takes effect."
+          - "The packages in force at go-live shall be set up through package requests with their signed package slip and ManCom reference, and validated before go-live."
+          - "Users shall be able to compare two versions of a package."
+        ac:
+          - "Changing the rate of a released package creates version n+1; version n stays in force until n+1 takes effect."
+          - "The versions of a package are shown with their status and effective dates."
+      - id: FRPM.024.02
+        title: New Business on the Latest Approved Rate Scheme
+        refs: [FR-PM-051]
+        shall:
+          - "A new-business quotation or account on a package shall be priced on the version in force on the transaction date, whatever the period start, so that an outdated rate cannot be selected."
+          - "The version number shall be stored on the quotation, the account and the invoice, and shown to the user (\"Priced on version n\")."
+          - "An item rate different from the scheme rate, or the use of a version that is not current, shall require an approved rate-scheme exception; without it the submission is refused (\"Package <code> is priced on the current rate scheme: rate <n>% needs an approved rate exception\")."
+          - "The requester shall state the reason of the exception; the approver, who is not the requester, compares the requested rate with the scheme in force on the exception record and approves it (optional comment) or rejects it (reason required). The requester is notified of the decision."
+          - "An approved exception shall be valid for 30 days."
+          - "Renewals and endorsements shall use the version of the original account."
+          - "Statutory charges (documentary stamp tax, VAT, premium tax and local government tax) keep their own effective dates."
+          - "Whether a package version allows manual item rates shall be a setting of the version, off unless BDOI decides otherwise."
+          - "A quotation priced on a version that changed while it was in draft shall be refused on submission until it is repriced on the current version."
+        ac:
+          - "A quotation with a period start before the new version's effective date is priced on the new version."
+          - "Submission with a manual rate different from the scheme is refused without an approved exception and accepted with one."
+          - "The approver approves or rejects the exception on its record; the requester cannot decide it and a rejection needs its reason."
+          - "The quotation, account and invoice show the version number that priced them."
+
+  - id: FRPM.025
+    component: Package Request
+    capability: Package Advisories
+    brd: [BRPM.016, BRPM.017]
+    subitems:
+      - id: FRPM.025.01
+        title: Draft and Send Package Advisories
+        refs: [FR-PM-044]
+        shall:
+          - text: "On release, the system shall draft the advisory automatically:"
+            sub:
+              - "New package advisory, for a new or reactivated package"
+              - "Renewal advisory, for a renewed package (with the previous and new term dates)"
+              - "Package update advisory, for other changes"
+              - "Deactivation advisory, for a deactivated package"
+          - "The user shall check and edit the recipients, the subject and the text before sending."
+          - "Recipient groups: Marketing, TSU, MBS, Processing and Operations; default Marketing, TSU, MBS and Operations (configurable)."
+          - "Sending shall be blocked until the supporting documents are on the request: the signed package slip and the ManCom sign-off (for a deactivation, the ManCom sign-off only) (\"Attach the supporting documents before sending: <documents>\")."
+          - "Recipients shall receive an in-system notification; e-mail addresses given on the advisory shall receive the advisory as a password-protected document."
+          - "The sent advisory shall be stored on the package request with its supporting documents listed."
+        ac:
+          - "An advisory cannot be sent while the signed package slip is missing."
+          - "A sent advisory reaches the users of each selected group in the system and lists the supporting documents."
+          - "The advisory document is stored on the request."
+
+  - id: FRPM.026
+    component: Package Request
+    capability: Package Renewal Requests
+    brd: [BRPM.017]
+    subitems:
+      - id: FRPM.026.01
+        title: Generate Renewal Requests from the Expiry List
+        refs: [FR-PM-061, FR-PM-060]
+        shall:
+          - "The TSU Officer shall be able to select expiring packages on the Package Expiry screen and generate one renewal request per package (Generate Renewal Request)."
+          - "Each renewal request shall be pre-filled from the version in force, with the next term's dates (start = previous expiry date + 1 day, same length); the officer edits dates, terms and rates as needed and submits it through the normal package request workflow, with or without negotiation."
+          - "A package shall have at most one open renewal request (\"Select the packages to renew\" when none is selected)."
+          - "When automatic drafting is switched on by the System Administrator, the system shall draft the renewal request at the first expiry alert and the TSU Officer completes and submits it; no second request is drafted while one is open."
+          - "MBS shall accept or return the renewal documentation at the set-up step; the renewal advisory follows FRPM.025."
+        ac:
+          - "A generated renewal request has the terms of the current version and the next term's dates."
+          - "A package with an open renewal request cannot get a second one."
+          - "With automatic drafting switched on, the first alert of a package also drafts its renewal request."
+
+  - id: FRPM.027
+    component: Documents
+    capability: Document Protection
+    brd: [BRPM.020]
+    subitems:
+      - id: FRPM.027.01
+        title: Password Protection of Documents Shared Outside the System
+        refs: [FR-PM-004]
+        shall:
+          - "Quotation Slips, Comparative Tables and client views, Proposals, package slips and advisories e-mailed from the system shall be sent as password-protected PDF or password-protected Excel files, with the password in a separate e-mail."
+          - "Protection shall apply to every document e-mailed outside the system and shall not be switched off per e-mail."
+          - "The password convention shall be the one BDOI confirms; until then the system generates a password per e-mail."
+          - "Inside the system, package documents shall open only for users with access to the package request."
+          - "Each e-mail shall be logged on the request with its status; a failed e-mail can be resent."
+        ac:
+          - "A Quotation Slip e-mailed to an insurer arrives as a protected document, and the password arrives in a separate e-mail."
+          - "A user without access to the package request cannot open its documents."
+
+  - id: FRPM.028
+    component: Workflow
+    capability: Workflow Enforcement, Segregation of Duties and Service Levels
+    brd: [BRPM.021]
+    subitems:
+      - id: FRPM.028.01
+        title: Enforce Validations, Approvals and Service Levels
+        refs: [FR-PM-073, FR-PM-002]
+        shall:
+          - "Each workflow stage shall have an owner and a service level in hours; each action shall check the user's access, the segregation of duties and the data of the action before the request moves on."
+          - "A request or document shall not move, be sent or be finalised until its checks and approvals are complete; only the transitions of the workflow are possible (\"'<action>' is not allowed while <reference> is in stage <stage name>\")."
+          - text: "Segregation of duties, which no role setting can switch off:"
+            sub:
+              - "A request is never approved by its maker"
+              - "A Quotation Slip or Proposal is never approved by its preparer"
+              - "ManCom never approves requirements submitted by the same user"
+              - "A package configuration is never validated by its maker or submitter"
+              - "A rate exception is never decided by its requester"
+          - "Pending actions shall appear in the owners' work queues; when the service level of a stage passes, the stage owners shall be alerted."
+          - "Default service levels (hours, configurable): Marketing approval 24; TSU review 24; TSU Head approval 24; negotiation 120; negotiated terms review 24; Marketing review 48; requirements preparation 48; ManCom approval 72; MBS set-up 48; validation 24."
+        ac:
+          - "A request cannot be sent to MBS without the ManCom approval, even by a direct request."
+          - "A request past its stage service level raises an alert to the stage owners."
+
+  - id: FRPM.029
+    component: Notifications
+    capability: Notifications and Product Master Changes to BDOI Systems
+    brd: [BRPM.022]
+    subitems:
+      - id: FRPM.029.01
+        title: Notifications and Product Master Change Records
+        refs: [FR-PM-072]
+        shall:
+          - "The system shall notify the users concerned on every stage entry, return, service-level breach, release, expiry and advisory, in the system and, where set in the user's preferences, by e-mail (Annex I)."
+          - "Users shall set their notification preferences (in-system or e-mail) per event type."
+          - "Released and expired package versions shall be recorded as product master changes with product, version and effective date, for the BDOI tracking and reporting systems that BDOI names; the transfer to those systems shall follow BDOI's choice of systems, format and timing."
+        ac:
+          - "The TSU Team Lead receives a notification when a request enters TSU review."
+          - "A release records a product master change with the product, version and effective date."
+
+  - id: FRPM.030
+    component: Documents
+    capability: Shared Document Templates
+    brd: [BRPM.005]
+    subitems:
+      - id: FRPM.030.01
+        title: Shared Templates with Product-Specific Sections
+        refs: [FR-PM-013]
+        shall:
+          - "Product Maintenance documents (package request form, Quotation Slip, Comparative Table, package slip and advisories) shall be generated from versioned templates with line-specific sections, so that one template serves Motor, Fire, Liability, Engineering, Marine and the other lines."
+          - "BDOI's Quotation Slip templates (Annex D and F) shall be loaded as the templates of the lines they cover."
+          - "Each generated document shall record the template version used, and a document regenerated later shall show the same content."
+          - "A document shall not be generated when no active template of its type exists (\"The template <code> is not available\")."
+        ac:
+          - "A Quotation Slip for a Motor package shows the Motor coverages and deductibles; one for a Fire package shows the Fire coverages."
+          - "Each generated document shows the template version in its record."

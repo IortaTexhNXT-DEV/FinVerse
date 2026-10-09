@@ -1,0 +1,1038 @@
+# Additions of version 3.2 to BDOI's Operations Cashiering FRS (BDO ITG, PRJ0012475), in BDOI's style: "The system
+# shall ..." statements and numbered acceptance criteria. Read by build_brd02_bdoi_frs.py.
+#
+#   items         elaboration under one of BDOI's sub-items (key = BDOI's number without spaces; a number BDOI uses
+#                 twice is keyed "<number> (2nd)" for the second one). The statements are placed after the last
+#                 paragraph of the sub-item and of its own sub-items, before BDOI's next sub-item.
+#   new_subitems  new sub-items of BDOI's entries, numbered after BDOI's last sub-item of the entry
+#   new_items     new entries (capabilities BDOI's FRS does not have): FRS.CSH.05.02 onwards; "group" opens a new
+#                 group row of BDOI's table
+# refs: the BIBS reference requirements (FR-OP-nnn of the BIBS FRS BRD-2 Operations v2.1) each item incorporates;
+# they drive Appendix Q (traceability) and the column "Application Feature Model".
+# brd: the BRD IDs (Operations BRD v1.01 and the Cashiering annex of May 2026) each new item serves.
+# Wording: business words only; "Appendix R" is the observations annex where a point is open for BDOI's decision.
+
+items:
+  # ------------------------------------------------------------------------------------- Log in and Dashboard
+  FRS.OPS.001:
+    refs: [FR-OP-001]
+    shall:
+      - The system shall be used through the web browser of the device; access only from BDO-issued devices shall be enforced by the BDO network and device policy at sign-in, without a change to the Cashiering screens (Appendix R).
+      - The system shall present the same Cashiering screens, fields and actions on the desktop and on the tablet browser of a BDO-issued device (BRD non-functional requirement "same performance on mobile and desktop").
+    ac:
+      - A cashier opens the system from the browser of a BDO-issued laptop and reaches the Login page.
+      - The Receive Payment and Receipts screens keep their fields and actions on a BDO-issued tablet.
+
+  FRS.OPS.002.02:
+    refs: [FR-OP-001, FR-OP-002]
+    shall:
+      - The system shall show in the menu only the Cashiering screens that the user's roles allow (Finance › Cashiering), and hide the buttons of the actions the user may not perform.
+      - "The system shall refuse an action for which the user holds no permission with the message \"You are not permitted to perform this action\" and record the refusal in the audit trail with the failure indicator."
+      - The data access of a user (company and branch) shall be applied to every Cashiering list, search and report.
+    ac:
+      - A Cashier sees Finance › Cashiering with Receive Payment, Receipts, Unapplied Payments, Payment Uploads and Batch Print, and does not see the authorisation of receipt series.
+      - A user without the posting permission does not see the Post action, and a direct posting attempt is refused with "You are not permitted to perform this action".
+
+  FRS.OPS.002.03:
+    refs: [FR-OP-001]
+    shall:
+      - "The system shall give the same message, \"Invalid user name or password\", for a user that is not defined, an expired or locked access and a wrong password, so that the reason is not disclosed; the System Administrator sees the reason on the user record (User Access Maintenance FRS)."
+      - The system shall record every refused sign-in in the audit trail with the user ID entered, the date and time and the origin of the attempt.
+    ac:
+      - A sign-in with a user ID that is not defined is refused with "Invalid user name or password", and the attempt is in the audit trail.
+      - A user whose access has expired cannot sign in and receives the same message.
+
+  FRS.CSH.01.03.02:
+    refs: [FR-OP-003]
+    shall:
+      - The system shall count the items and total their amounts when the dashboard opens and when the user refreshes it, with the amounts per currency (PHP and USD) and two decimals.
+      - Each item shall open the list of FRS.CSH.01.03.04 already filtered on that item (receipt type, AR or OR type and status).
+      - The dashboard shall show only the items of the user's role; an item the user cannot act on is not shown.
+    ac:
+      - After sign-in a Cashier sees the count and the amount of every item of the dashboard; the amount of "AR for Posting – Premium" equals the total of the premium AR creation records in status For Posting.
+      - Clicking "Cancellation (AR/OR) for Posting – OR – Commissions" opens the list of OR cancellation records For Posting of the type Commissions.
+      - The dashboard opens within 5 seconds (BRD non-functional requirement).
+
+  FRS.CSH.01.03.04:
+    refs: [FR-OP-003, FR-OP-022]
+    shall:
+      - The system shall show each list as a table with paging, sorting by any column and a row action menu (Open, Post, Return, Edit, according to the status and the user's role); amounts with thousands separators and two decimals, dates as dd-MMM-yyyy.
+      - The system shall let the user filter each list by status, receipt type, branch and date range and export the list to Excel.
+    ac:
+      - The AR/OR for Issuance Posting list shows the records For Posting by default; changing the status filter to Returned lists the returned records.
+      - Exporting a list gives an Excel file with the columns shown on the screen.
+
+  # ------------------------------------------------------------------------------------- Creation of AR / OR
+  FRS.CSH.02.01.01:
+    refs: [FR-OP-011, FR-OP-002]
+    shall:
+      - "User Role (proposed, Appendix H): Cashier (Head Office and branches) creates, edits, saves, submits and cancels the AR creation record; the Approver/Poster is the Cashiering Team Leader or Team Head."
+    ac:
+      - A user with the Cashier role opens Create AR; a Remittance Processor does not see it.
+
+  FRS.CSH.02.01.02:
+    refs: [FR-OP-011, FR-OP-018]
+    shall:
+      - The system shall default the Receipting Branch to the branch of the user and offer only the branches that have a usable AR series for the year (FRS.CSH.02.03).
+      - The lists Post to Bank Account, Receipting Branch, Acknowledgement Receipt Type and Non-Premium Payment type shall be maintained lists (add, edit, deactivate) kept by the System Administrator (Appendix H).
+      - The system shall find the account by its account number, invoice number, ARN, policy number or promissory note (PN) number, partially and without regard to case, and allow several accounts of the payor in one receipt (FRS.CSH.02.01.04).
+      - When the account found is not yet booked (pre-booked), the system shall accept the payment and record it as a Pre-booked payment in the Unapplied list, to be applied when the account is booked (FRS.CSH.05.03; CSHID.020).
+      - The system shall show the rate of the day of the Comptrollership exchange rate table with two decimals when the currency is USD (CSHID.012).
+      - Payor Name shall take up to 250 characters and Check Number up to 40 characters; the bank of the check shall be chosen from the list of banks.
+    ac:
+      - A cashier of the Cebu branch opens Create AR; Receipting Branch shows Cebu and only branches with a usable AR series are offered.
+      - Selecting Currency USD shows the rate of the day and defaults Post to Bank Account to DFLB Savings FX (BDO Ortigas).
+      - Searching "940001" in Account Number lists the accounts whose numbers contain it.
+      - A payment for an account that is not yet booked is saved and, once posted, is shown in the Unapplied list as a Pre-booked payment.
+
+  FRS.CSH.02.01.03:
+    refs: [FR-OP-018, FR-OP-019]
+    shall:
+      - The system shall show, for each selected account, the outstanding balance by component in the order of application of FRS.CSH.02.05.11 (DST, Premium Tax (VAT), LGT, Other Charges, Basic Premium) as a preview of how the paid amount will be applied.
+      - The system shall show the amount that will be kept as Excess payment (FRS.CSH.02.05.10) and the amount that will be reversed as minimal balance (FRS.CSH.02.05.12) before the record is saved.
+      - The PR 2307 Amount shall be shown only for accounts with the BIR 2307 tag; the amount waiting for the BIR 2307 certificate is never applied (FRS.CSH.02.05.13).
+    ac:
+      - "For an account with DST 1,000.00, Premium Tax (VAT) 1,200.00 and Basic Premium 10,000.00, a paid amount of 1,500.00 shows 1,000.00 against DST and 500.00 against Premium Tax (VAT) in the preview."
+      - An account without the BIR 2307 tag shows the PR 2307 Amount as blank.
+
+  FRS.CSH.02.01.08:
+    refs: [FR-OP-011]
+    shall:
+      - "The system shall show the message of each failed validation next to its field: \"<Field> is required\"; \"Paid Amount must be above zero and not more than 1,000,000,000.00\"; \"The currency of account <account> is <currency>; the receipt is in <currency>\"; \"The check date must be at least 4 working days before today (holding period)\" (messages proposed for BDOI's confirmation, Appendix F)."
+      - The working days of the holding period shall be counted on the holiday calendar maintained by Comptrollership.
+    ac:
+      - Saving without Post to Bank Account is refused with "Post to Bank Account is required" and nothing is saved.
+      - Saving a Paid Amount of 0.00 or of 1,500,000,000.00 is refused.
+      - Saving a USD receipt for a peso account is refused with the currency message.
+      - Saving a check payment whose check date is within the holding period is refused with the holding-period message.
+
+  FRS.CSH.02.01.09:
+    refs: [FR-OP-013]
+    shall:
+      - The sequence number of the request number shall be unique per prefix and receipt type, generated by the system and never reused, even when a record is cancelled (Appendix R).
+      - The prefixes shall be maintained values (CR-AR, CR-OR, CN-AR, CN-OR, RE-AR, RE-OR) kept by the System Administrator.
+    ac:
+      - Two AR creation records saved one after the other receive consecutive numbers CR-AR-<sequence> and CR-AR-<sequence + 1>.
+      - A cancelled creation record keeps its number; the number is not given to another record.
+
+  FRS.CSH.02.01.10:
+    refs: [FR-OP-011, FR-OP-002]
+    shall:
+      - The system shall notify the Approver/Poster in the system (bell in the page header) when a record is submitted for posting (Appendix G).
+      - The system shall not offer the Post action to the user who created the record (FRS.OPS.002.05).
+    ac:
+      - After Submit for Posting the record shows For Posting, it is on the Approver/Poster's list and the Approver/Poster has a notice that opens it.
+      - The creator of the record does not see the Post action on it.
+
+  FRS.CSH.02.01.14:
+    refs: [FR-OP-024]
+    shall:
+      - "Each audit record shall hold the seven items of the BDO IT audit trail standard: the user who started the activity, the event type, the module, the values before and after, the origin of the event (IP address, terminal ID or equivalent), the date and time, and the success or failure indicator; a refused action is recorded with the failure indicator (Appendix R)."
+      - Audit records shall not be changed or deleted by any user; they are shown on the History tab of the record.
+    ac:
+      - The History tab of an AR creation record shows its creation, edit, save and submission with the user, date and time and the changed values.
+      - A save refused for a missing field is recorded with the failure indicator.
+
+  FRS.CSH.02.02.01:
+    refs: [FR-OP-012, FR-OP-002]
+    shall:
+      - "User Role (proposed, Appendix H): Head Office Cashier creates the OR creation record; the Approver/Poster is the Cashiering Team Leader or Team Head of Head Office."
+      - "The system shall refuse an OR creation record from a branch other than Head Office with the message \"Official receipts are issued by Head Office only\" (CSHID.006)."
+    ac:
+      - A branch cashier cannot create an OR creation record.
+
+  FRS.CSH.02.02.02:
+    refs: [FR-OP-012]
+    shall:
+      - The Official Receipt Types and their lists (service fees, incentives) shall be maintained lists kept by the System Administrator; each type names the income account of its accounting entry (Appendix I).
+      - "For an OR on which tax is withheld or VAT is due, the system shall capture per line the gross amount, the VAT and the withholding tax, and the BIR 2307 certificate reference when tax is withheld (CSHID.002 \"Commissions (e.g. VAT or W/Tax)\")."
+      - Receipt Issuance Date shall be the posting date (FRS.CSH.02.05.08).
+    ac:
+      - An OR of type Fee Invoice of 11,200.00 with VAT 1,200.00 is saved with status Created and number CR-OR-<sequence>.
+      - An OR of type Commissions with withholding tax requires the BIR 2307 certificate reference.
+
+  FRS.CSH.02.02.04:
+    refs: [FR-OP-021, FR-OP-008]
+    shall:
+      - "The system shall refuse a file already uploaded (same content) with the message \"This file was already uploaded\" and a file larger than 50 MB with the message \"The file is larger than 50 MB\"."
+      - The validation report shall be shown on the screen right after the upload and kept with the upload reference for later download.
+    ac:
+      - A Commission Schedule file in pipe-delimited .csv format with all mandatory fields is accepted and listed with its upload reference.
+      - The same file uploaded again is refused with "This file was already uploaded".
+      - A file with a row without the payment reference is not processed and the validation report lists the row with the reason.
+
+  FRS.CSH.02.02.07:
+    refs: [FR-OP-021]
+    shall:
+      - "Until BDOI gives the Commission Schedule list of fields, the system shall read the fields proposed in Appendix D.6: insurer code, payee name, certificate reference, payment reference, invoice number, basic commission, VAT, withholding tax, payment date."
+    ac:
+      - A Commission Schedule file with the nine fields of Appendix D.6 passes the template check; a file without the payment date column fails it.
+
+  FRS.CSH.02.02.08:
+    refs: [FR-OP-012, FR-OP-094]
+    shall:
+      - For an incentive payment the system shall list the Valid for Collection SOAs of the insurer with their outstanding amounts; for a Fee Policy payment the open Fee Policy invoices of the client; the OR settles the items selected.
+    ac:
+      - An incentive OR for an insurer lists that insurer's Valid for Collection SOAs; selecting one fills the paid amount with its outstanding amount.
+
+  FRS.CSH.02.02.09:
+    refs: [FR-OP-021]
+    shall:
+      - When a commission schedule holds payments of more than one insurer or payee, the system shall issue one OR per insurer or payee (FRS.CSH.07.01.02; CSHID.007).
+      - The matched and unmatched list shall show for each line the reference number, the paid amount, the outstanding balance and the result (matched reference number or "unmatched").
+    ac:
+      - A schedule of three lines of one insurer, all matched with paid amount equal to outstanding, is processed and issues one OR for the total.
+      - A schedule with one line whose paid amount differs from the outstanding balance shows that line as "unmatched" and is not processed.
+
+  FRS.CSH.02.03.03:
+    refs: [FR-OP-010]
+    shall:
+      - The system shall also keep for each series the receipt kind (AR or OR), the prefix, the BIR Authority to Print (ATP) number and the warning level of numbers left; OR series are kept for Head Office only.
+      - A new or changed series shall be usable only after another authorised user authorises it; the user who maintained it cannot authorise it (maker-checker).
+      - The end series cannot be set below the last number already issued.
+      - "When the numbers left in a series reach its warning level, the system shall alert the Cashiering Team Leader: \"<kind> series <prefix> has <n> numbers left\" (Appendix G)."
+      - Deactivating a series shall move the numbering of the branch to its next authorised series for the year.
+    ac:
+      - A series for Head Office for 2027 maintained by one user becomes usable only when another authorised user authorises it.
+      - The user who maintained a series cannot authorise it.
+      - Setting the end series below the last AR number issued is refused.
+      - When the numbers left reach the warning level, the Cashiering Team Leader receives the alert.
+      - An OR series for the Cebu branch is refused.
+
+  FRS.CSH.02.03.04:
+    refs: [FR-OP-010]
+    shall:
+      - The Branch Location List shall be a maintained list (add, edit, deactivate) with the branch indicator used in the AR number (FRS.CSH.02.03.02).
+    ac:
+      - A deactivated branch is no longer offered as Receipting Branch; its issued ARs keep their branch.
+
+  FRS.CSH.02.04.02:
+    refs: [FR-OP-025, FR-OP-015]
+    shall:
+      - The system shall list in a print queue the ARs and ORs generated by the system (uploaded payments, matured post-dated checks, automatic ORs) with the status For Printing, so that they are printed in one action (FRS.CSH.05.01.10).
+      - The re-printing search shall find a receipt by its full or partial AR or OR number.
+    ac:
+      - After a Bills Payment upload, its ARs are in the print queue with the status For Printing and are printed with one Print action.
+
+  FRS.CSH.02.04.05:
+    refs: [FR-OP-025]
+    shall:
+      - "The system shall allow at most 500 receipts per print batch and refuse a larger selection with the message \"Select between 1 and 500 receipts to print\"."
+    ac:
+      - Selecting 501 receipts is refused; selecting 500 starts the print batch.
+
+  FRS.CSH.02.04.07:
+    refs: [FR-OP-025]
+    shall:
+      - "Until BDOI gives the convention, the certificate number shall follow the sample AR of Appendix A: AC_<branch indicator>_<MMYYYY of the print date>_<5-digit sequence>, for example AC_125_022025_00482, unique and never reused (Appendix R)."
+    ac:
+      - The first printed AR of the Head Office branch in October 2026 carries a certificate number AC_<branch>_102026_<sequence>, and the next printed receipt the next sequence.
+
+  FRS.CSH.02.04.12:
+    refs: [FR-OP-025]
+    shall:
+      - The first print of a receipt shall carry no re-print mark; every later print shall carry the watermark and the <Reprint tag> REPRINT of the AR template, and increase the print count of the receipt.
+    ac:
+      - The second print of an AR shows REPRINT; the first does not; the History tab shows the print count 2.
+
+  FRS.CSH.02.04.16:
+    refs: [FR-OP-025, FR-OP-024]
+    shall:
+      - The print log shall also keep the print batch number, the number of receipts printed, the failures with their reason and whether the user retried or skipped them.
+    ac:
+      - A print batch of 50 ARs of one branch is ready to print within 10 seconds (BRD non-functional requirement) and the print log shows 50 receipts printed.
+      - A receipt skipped after a printer error is listed in the print log as skipped.
+
+  FRS.CSH.02.05.06:
+    refs: [FR-OP-011, FR-OP-002]
+    shall:
+      - The system shall refuse the posting by the user who created the record with the message "The requester cannot approve <record number>" (FRS.OPS.002.05).
+      - When several records are posted together and one fails a check, the system shall post the others and keep the failed record in its status with the reason shown in the posting result.
+    ac:
+      - The Approver/Poster posts an AR creation record For Posting; the AR number is the next of the branch series, the AR number status is Issued and the record status is AR/OR Issued.
+      - The creator of the record cannot post it.
+      - Posting ten records of which one is in a depleted series posts nine and lists the tenth with the depleted-series message.
+
+  FRS.CSH.02.05.07:
+    refs: [FR-OP-013]
+    shall:
+      - The Approver/Poster shall enter a reason when returning a record; the creator is notified in the system and sees the reason on the record (Appendix G).
+    ac:
+      - A record returned with the reason "Wrong account" shows Returned with the reason, and the creator has a notice that opens it.
+
+  FRS.CSH.02.05.08.03:
+    refs: [FR-OP-010]
+    shall:
+      - The system shall take the next AR or OR number under a lock, so that two postings at the same time never receive the same number; a number is used only when the posting completes.
+    ac:
+      - Two Approvers/Posters posting at the same time receive two consecutive AR numbers.
+
+  FRS.CSH.02.05.10:
+    refs: [FR-OP-018, FR-OP-019, FR-OP-022]
+    shall:
+      - The Excess payment record shall carry its source (AR number, account and the module source, for example Manual AR or Auto Payment Processing) and the marketing unit of the account.
+      - An excess within the minimal balance threshold shall not create an Excess payment record; it is cleared as a minimal balance (FRS.CSH.02.05.12).
+      - After posting, the system shall update the payment status of each account (Unpaid, Partially Paid, Paid) and its payment history with the payment date, the amount applied and the AR number (BRQID.007).
+    ac:
+      - A payment of 10,050.00 on an account with outstanding 10,000.00 applies 10,000.00 and creates an Excess payment record of 50.00 in the Unapplied list (with the default threshold of FRS.CSH.02.05.12.01).
+      - The account then shows Paid and its payment history lists the AR number, the payment date and 10,000.00.
+
+  FRS.CSH.02.05.11.01:
+    refs: [FR-OP-019]
+    shall:
+      - The system shall never apply a payment to the premium due to the insurer or to the commission of the account.
+      - "Worked example (completing BDOI's sample): an application of 5,000.00 on an account with DST 1,000.00, Premium Tax (VAT) 1,200.00, LGT 200.00, Other Charges 100.00 and Basic Premium 10,000.00 is broken down as DST 1,000.00, Premium Tax (VAT) 1,200.00, LGT 200.00, Other Charges 100.00 and Basic Premium 2,500.00."
+    ac:
+      - The application of 5,000.00 of the worked example gives the five amounts stated, and the account keeps Basic Premium 7,500.00 outstanding.
+      - When a check payment and a cash payment are posted for the same account on the same day, the check payment is applied first.
+
+  FRS.CSH.02.05.12:
+    refs: [FR-OP-023]
+    shall:
+      - The system shall clear the minimal balance in the same posting as the payment, with no user action, approval or tagging; minimal balances never appear in the Unapplied, Monitoring or For Approval tabs (Cashiering annex of May 2026, CSHID.016).
+      - The threshold shall be a parameter maintained by the Cashiering Team Leader (Appendix H), with separate values for the outstanding premium receivable and for the excess payment; its default value is decided in Appendix R.
+      - Each component of an account shall be cleared once; an account already written off by the minimal balance file of Adjustment is skipped, so that no balance is reversed twice.
+      - A daily run (04:00) shall clear only a balance that a later event (for example a decrease posted by Adjustment) left within the threshold; after a normal payment it finds nothing to clear.
+    ac:
+      - A payment of 9,999.40 on an account with outstanding 10,000.00 reverses the remaining 0.60 in the same posting; no Unapplied record is created.
+      - A remaining balance within the threshold that equals the DST charged on the account is not reversed.
+      - The receipt shows the minimal balance line in its applications and journal, and the Minimal Balance reports list it.
+      - Running the daily run after these payments changes nothing.
+
+  FRS.CSH.02.05.13:
+    refs: [FR-OP-018, FR-OP-113]
+    shall:
+      - The BIR 2307 tag of the account shall be shown on the account table and on the account record inquiry (FRS.CSH.08.01); the PR 2307 amount waits for the client's BIR 2307 certificate, which Marketing Collection tags and reverses (MKTID.013, outside this FRS).
+      - "The share of the premium applied for an account with the BIR 2307 tag (98% as delivered) and the base of the 2% shall be parameters confirmed by Comptrollership (Appendix R)."
+    ac:
+      - "For an account with the BIR 2307 tag and a premium of 10,000.00 (PR 2307 = 200.00), a payment of 9,800.00 clears the premium receivable except the PR 2307 of 200.00, and no Excess payment record is created."
+
+  FRS.CSH.02.05.14:
+    refs: [FR-OP-021, FR-OP-025]
+    shall:
+      - The generated OR shall be numbered from the Head Office OR series and placed in the print queue with the status For Printing (FRS.CSH.02.04.02).
+    ac:
+      - After a Commission Schedule of five accounts is processed, one OR is in the print queue, and each of the five accounts shows the OR number in its payment history.
+
+  FRS.CSH.02.05.15:
+    refs: [FR-OP-027]
+    shall:
+      - The default entries of each event (AR issued, payment applied, Excess, minimal balance reversal, OR issuance, cancellation, reinstatement, AR Insurance) are listed in Appendix I; Comptrollership maintains the accounts of each entry with maker-checker, and no account is fixed in the system.
+      - Every journal shall be balanced and linked to the AR or OR number (GL Reference), and shown on the Journal tab of the receipt.
+    ac:
+      - Posting an AR applied to one account produces balanced journals for the receipt and the application, with the AR number as GL Reference.
+      - A USD AR posts pesos at the rate of FRS.CSH.02.05.15.01 with two decimals.
+
+  FRS.CSH.02.06.01:
+    refs: [FR-OP-025]
+    shall:
+      - A template change made by MBS shall take effect only after another authorised user approves it; the earlier versions of the template are kept with their effective dates.
+    ac:
+      - A change of the footer line 1 of the OR template approved on a date is printed on the ORs printed from that date.
+
+  FRS.CSH.02.06.02:
+    refs: [FR-OP-012, FR-OP-025]
+    shall:
+      - Company Address and Company VAT shall be taken from the company record, as on the sample AR of Appendix A (43F to 44F BDO Corporate Center Ortigas, 12 ADB Avenue, Ortigas Center, Wack-Wack Greenhills, City of Mandaluyong, Philippines 1550; VAT TIN 005-058-126-00000).
+      - The Paid Amount in words shall be written in English with the pesos and the centavos, as on the sample AR ("Five Million Five Hundred Forty One Thousand One Pesos and Twenty Six Centavos").
+    ac:
+      - A printed OR shows the company address and VAT TIN of the company record and the paid amount in words and in figures.
+
+  FRS.CSH.02.06.03:
+    refs: [FR-OP-011, FR-OP-025]
+    shall:
+      - The AR shall be printed with the AR number and the copy label (Client's Copy or BDOI Copy) at the top right, as on the sample AR of Appendix A; the date as Month DD, YYYY.
+      - The Note line printed on the AR shall be the one BDOI confirms (Appendix R).
+    ac:
+      - A printed AR shows the AR number, the copy label, RECEIVED FROM, TIN, THE SUM OF in words and in figures, the insurer, the remarks, the reference and policy numbers, the form of payment, the check details and the footer lines of FRS.CSH.02.06.03.
+
+  # ------------------------------------------------------------------------------------- Cancellation of AR / OR
+  FRS.CSH.03.01.01:
+    refs: [FR-OP-013, FR-OP-002]
+    shall:
+      - "User Role (proposed, Appendix H): Cashier creates and submits the cancellation record; the Approver/Poster (Cashiering Team Leader or Team Head) posts or returns it."
+    ac:
+      - A Cashier creates a cancellation record; only a user with the posting role posts it.
+
+  FRS.CSH.03.01.05 (2nd):
+    refs: [FR-OP-013]
+    shall:
+      - The reasons for cancellation shall be a maintained list kept by the System Administrator (add, deactivate), so that the reasons of the BRD (CSHID.003) can be added after BDOI's decision (Appendix R); "Others" requires the free text.
+    ac:
+      - A reason added to the list by the System Administrator is offered on the next cancellation record.
+
+  FRS.CSH.03.01.06:
+    refs: [FR-OP-013]
+    shall:
+      - "The system shall show the messages: \"Select a reason\"; \"Specify the reason when 'Others' is selected\"; \"The reason <reason> is not allowed for a check payment\"; \"Receipt <number> is already cancelled\"; \"Receipt <number> already has a cancellation or reinstatement record waiting\"."
+      - The system shall refuse the cancellation of a receipt whose Unapplied payment record has a disposition in process until the disposition is withdrawn, with the message "Unapplied payment <number> of the receipt is <status>".
+    ac:
+      - A cancellation record without a reason is refused with "Select a reason".
+      - The reason "Double issuance" on a check payment is refused with the check-payment message.
+      - A receipt that already has a cancellation record For Posting cannot get a second one.
+
+  FRS.CSH.03.01.08:
+    refs: [FR-OP-013, FR-OP-002]
+    shall:
+      - The system shall refuse the posting by the user who created the cancellation record (FRS.OPS.002.05) and require a reason for a return.
+      - For an AR not yet remitted, the account shall show the reversed amount as outstanding again and its payment status shall be updated (Unpaid or Partially Paid).
+      - The Excess payment or AR Insurer Refund record created by the cancellation shall carry the cancellation record number as its source.
+    ac:
+      - "Posting the cancellation of an AR of 10,000.00 applied to one account not yet remitted sets the AR number status to Cancelled and the record to AR/OR Cancelled, and the account shows 10,000.00 outstanding again."
+      - The cancellation of an AR whose payment was already remitted creates an AR Insurer Refund record for each account and insurer.
+      - The cancellation of an OR re-classes the reversed payment to the Commission Receivable payment of each account and insurer.
+      - The creator of the cancellation record cannot post it; a returned record shows Returned with the reason and can be edited.
+
+  FRS.CSH.03.01.09:
+    refs: [FR-OP-027]
+    shall:
+      - The default reversal entries are listed in Appendix I; the journal of the cancellation is linked to the cancellation record number and shown on the receipt.
+    ac:
+      - The journal of a posted cancellation has the GL Reference <Cancellation Record Number> and the description "Cancellation of AR due to <reason> <AR number>".
+
+  # ------------------------------------------------------------------------------------- Reinstatement of AR / OR
+  FRS.CSH.04.01.01:
+    refs: [FR-OP-014, FR-OP-002]
+    shall:
+      - "User Role (proposed, Appendix H): Cashier creates and submits the reinstatement record; the Approver/Poster (Cashiering Team Leader or Team Head) posts or returns it."
+    ac:
+      - A Cashier creates a reinstatement record; only a user with the posting role posts it.
+
+  FRS.CSH.04.01.06:
+    refs: [FR-OP-014]
+    shall:
+      - "For a premium reinstatement (AR) the system shall also capture the information of CSHID.005, defaulted from the AR and its accounts: invoice number, AR number, assured / payor name, amount reinstated, Account Officer, Unit Head and Team Leader; for a direct payment reinstatement (OR): invoice number, OR number, assured / payor name and amount reinstated."
+      - The reasons for reinstatement shall be maintained lists kept by the System Administrator, one per receipt type (Appendix R).
+    ac:
+      - A premium reinstatement record shows the invoice number, AR number, assured, amount, Account Officer, Unit Head and Team Leader of the selected accounts; saving it without the Unit Head is refused with "Enter the Unit Head".
+      - Partial Reinstatement is not offered for an OR.
+
+  FRS.CSH.04.01.07:
+    refs: [FR-OP-014]
+    shall:
+      - "The system shall show the messages: \"Select a reason\"; \"Select the type of reinstatement\"; \"Select at least one account for a partial reinstatement\"; \"Receipt <number> already has a cancellation or reinstatement record waiting\"."
+    ac:
+      - A partial reinstatement without an account is refused with "Select at least one account for a partial reinstatement".
+
+  FRS.CSH.04.01.09:
+    refs: [FR-OP-014, FR-OP-002, FR-OP-057]
+    shall:
+      - The system shall refuse the posting by the user who created the reinstatement record (FRS.OPS.002.05) and require a reason for a return.
+      - Each Unapplied, AR Insurer Refund or AP Unapplied Commission record created by the reinstatement shall carry the reinstatement record number and the AR or OR number as its source.
+    ac:
+      - "Posting a partial reinstatement of ACCT002 (3,000.00) and ACCT003 (2,000.00) of an AR not yet remitted keeps the AR Issued, creates Unapplied payment records of 3,000.00 and 2,000.00 for the two accounts and shows 3,000.00 and 2,000.00 outstanding again on them."
+      - Posting a full reinstatement of an AR already remitted creates an AR Insurer Refund record per account and insurer and reverses the remittance status of the accounts.
+      - Posting the reinstatement of an OR creates an AP Unapplied Commission record per account and insurer.
+      - The creator of the reinstatement record cannot post it.
+
+  FRS.CSH.04.01.10:
+    refs: [FR-OP-027]
+    shall:
+      - The default entries of the reinstatement are listed in Appendix I; the journal is linked to the reinstatement record number and shown on the receipt.
+    ac:
+      - The journal of a posted reinstatement has the GL Reference <Reinstatement Record Number> and the description "Reinstatement of AR due to <reason> <AR number>".
+
+  # ------------------------------------------------------------------------------------- Automatic Payment Processing
+  FRS.CSH.05.01.01:
+    refs: [FR-OP-015, FR-OP-002]
+    shall:
+      - "User Role (proposed, Appendix H): Cashier (Head Office) uploads the payment files; the Cashiering Team Leader follows the runs and the files received via MFT."
+    ac:
+      - A Cashier of Head Office uploads a payment file; a Remittance Processor cannot.
+
+  FRS.CSH.05.01.04:
+    refs: [FR-OP-015, FR-OP-016, FR-OP-131]
+    shall:
+      - The system shall check each file received via MFT at the times agreed with BDOI IT (Appendix N) and process it as an uploaded file; a file that fails the file checks is kept with its error and the Cashiering Team Leader is alerted.
+      - The dashboard item For Auto Payment Processing shall count the files received and not yet processed per payment file type.
+    ac:
+      - A Bills Payment file placed by OBPCS in the agreed MFT folder is received, processed and its run is shown with the source MFT.
+      - A received file with a wrong file name is not processed and the Cashiering Team Leader is alerted.
+
+  FRS.CSH.05.01.05:
+    refs: [FR-OP-015, FR-OP-008]
+    shall:
+      - "The system shall check the file name against the convention of its payment file type (FRS.CSH.05.01.06) and refuse a file that does not follow it with the message \"The file name <name> does not follow the convention of <type>\"."
+      - The system shall refuse a file whose content was already accepted ("This file was already uploaded"), and process no row whose source transaction (file name and transaction number, or reference, amount and date of payment for the files without a transaction number) was already accepted.
+    ac:
+      - A Bills Payment file named "payments.txt" is refused with the file-name message.
+      - The same Bills Payment file uploaded twice is refused the second time.
+      - A row already accepted in an earlier file is reported as Duplicate and not processed again.
+
+  FRS.CSH.05.01.06:
+    refs: [FR-OP-015]
+    shall:
+      - The layout of each payment file type (fields, order, separator, date format, header and control records) shall be maintained without a change to the system (Cashiering Setup); the layouts are listed in Appendix D.
+      - The system shall read the header record of the Bills Payment file (record count, total amount and date) and check the detail records against it; a file whose count or total differs is not processed (Appendix D.1).
+      - A row labelled TOTAL at the end of the CLPC file shall be read as the control total and not as a payment (Appendix D.3).
+    ac:
+      - A Bills Payment file whose header count is 48 and that holds 47 detail records is not processed, and the validation report says so.
+      - The CLPC file of Appendix A is read with 10 payments and its TOTAL row is checked against them.
+
+  FRS.CSH.05.01.08:
+    refs: [FR-OP-018]
+    shall:
+      - The legacy numbers (QPS, ISYS, Ebix, PN and Loan Application Number) of the accounts migrated at go-live shall be loaded with the accounts (Appendix P), so that payments that quote them are matched.
+      - The system shall match again the Unbooked/Unmatched and Pre-booked payment records every hour (configurable) and apply those whose account is now booked; each run is listed in the run reports.
+    ac:
+      - A Bills Payment row quoting the QPS number of a migrated account is matched on Priority 1 and applied.
+      - A Pre-booked payment record is applied by the hourly run after its account is booked, and leaves the Unapplied list.
+
+  FRS.CSH.05.01.10:
+    refs: [FR-OP-015, FR-OP-025]
+    shall:
+      - The AR numbers of uploaded payments shall be taken from the AR series of Head Office, or of the receipting branch named for the file, and listed in the print queue (FRS.CSH.02.04.02).
+    ac:
+      - "A Bills Payment file of 20 rows, of which 18 match booked accounts, 1 matches a pre-booked account and 1 matches nothing, gives 20 ARs with status For Printing: 18 Applied (or Excess), 1 Pre-booked and 1 Unbooked/Unmatched."
+
+  FRS.CSH.05.01.12:
+    refs: [FR-OP-008, FR-OP-019]
+    shall:
+      - The run report shall be shown on the screen at the end of the run, downloadable in Excel, and kept with the run (uploader or MFT, date and time, file names, counts and amounts per category).
+      - Failed rows shall be listed with their reason and can be corrected and processed again without processing again the rows already accepted (BRQID.006).
+    ac:
+      - The run report of a file of 10 rows with one row without amount shows 9 rows processed by category and 1 failed row with its reason.
+      - Processing again the corrected failed row applies it and does not change the other nine.
+
+  # ------------------------------------------------------------------------------------- Unapplied payments
+  FRS.CSH.06.01.01:
+    refs: [FR-OP-022, FR-OP-002]
+    shall:
+      - "User Role (proposed, Appendix H): Cashier assigns dispositions and submits them; Cashiering Team Leader approves; Marketing users see and work the Unapplied payment records of their marketing unit; Commission Receivable users work the AP Unapplied Commission records."
+    ac:
+      - A Marketing user sees the Unapplied payment records of his or her marketing unit only.
+
+  FRS.CSH.06.01.03:
+    refs: [FR-OP-022]
+    shall:
+      - The search shall also accept the Unapplied Payment No., the reference number and the payor name, partially and without regard to case.
+    ac:
+      - Searching part of the assured's name in any case lists the matching Unapplied payment records.
+
+  FRS.CSH.06.01.07:
+    refs: [FR-OP-022]
+    shall:
+      - "The system shall associate in each Unapplied payment record: Unapplied Payment No. (generated by the system), source (module and record number: AR, cancellation, reinstatement, upload run, endorsement request), Unapplied Payment Type, payment or creation date, account number, PN number and/or Loan Application Number, client code and name, assured, insurer, marketing unit, currency, amount, outstanding, status, the disposition (type, amount, target account, client or unit, remarks) and the history of every action (user, date and time, action, reason)."
+    ac:
+      - The Unapplied payment record created by an excess shows the AR number and the account as its source and the amount and outstanding of the excess.
+
+  FRS.CSH.06.02.01:
+    refs: [FR-OP-022, FR-OP-120]
+    shall:
+      - "Apply to Other Invoice applies the amount through the hierarchy of FRS.CSH.02.05.11 to another booked invoice; DST payment application applies it to the DST of another invoice only; Refund sends a payment request to Disbursement (Refund to client) once approved, and the record is Done when Disbursement pays it; Reclass and Transfer move the outstanding balance to another client or unit; Others closes the balance settled outside the system with remarks."
+      - Whether a disposition type needs Team approval shall be a setting of the type kept by the System Administrator (Appendix S).
+      - "The system shall show the messages: \"The amount must be above zero and at most the outstanding <amount>\"; \"Enter the target invoice\"; \"Unknown invoice <number>\"; \"Invoice <number> has nothing outstanding to apply to\"; \"The requester cannot approve the disposition\"."
+    ac:
+      - An Excess of 500.00 applied to another booked invoice of the client clears 500.00 of that invoice in the order of FRS.CSH.02.05.11.
+      - A Refund needs Team approval and, once approved, creates a payment request in the Disbursement queue; the record moves to Done when Disbursement pays it.
+      - The user who submitted a Refund cannot approve it.
+      - A transfer of an Unapplied payment record with a partial application moves only its remaining balance to the other marketing unit.
+
+  FRS.CSH.06.02.02:
+    refs: [FR-OP-022]
+    shall:
+      - The system shall also show a Done tab with the dispositions completed, and allow the submission and the approval of several records selected together.
+      - A completed disposition shall be marked for reversal only with a reason; a Refund is reversed only after Disbursement returned the payment request.
+    ac:
+      - Each Unapplied payment record is shown in the tab of its status only.
+      - Marking a completed disposition for reversal without a reason is refused with "Enter the reason for the reversal".
+
+  # ------------------------------------------------------------------------------------- Automatic Generation of OR
+  FRS.CSH.07.01.01:
+    refs: [FR-OP-021, FR-OP-035]
+    shall:
+      - The automatic OR shall be numbered from the Head Office OR series, posted with its journal and placed in the print queue with the status For Printing (FRS.CSH.02.04.02).
+    ac:
+      - When Disbursement approves an insurer settlement, one OR is generated for the insurer with the next Head Office OR number and is in the print queue.
+
+  FRS.CSH.07.01.04:
+    refs: [FR-OP-035, FR-OP-021]
+    shall:
+      - "For a Remittance triggered OR the system shall map: OR date = date of the approval; Received From = the insurer (name, address and TIN of the insurer record); In payment of = Commissions; one line per account of the settlement with invoice number, basic commission, VAT on commission, withholding tax and net commission; total = commission retained in the settlement; GL Reference = OR number."
+    ac:
+      - The OR of a settlement of five accounts shows five lines and a total equal to the commission retained in the settlement.
+
+  # ------------------------------------------------------------------------------------- Record Inquiry
+  FRS.CSH.08.01.01:
+    refs: [FR-OP-024, FR-OP-005]
+    shall:
+      - Names (payor, assured, insurer) shall be found by part of the name and without regard to case; results are paged.
+      - Each search shall be recorded in the search log with the user, the criteria and the date and time (CSHID.010).
+    ac:
+      - A search by part of the assured's name and a date range lists the matching ARs.
+      - The search log shows the search with the user and the criteria.
+
+  FRS.CSH.08.01.03:
+    refs: [FR-OP-005, FR-OP-004]
+    shall:
+      - The Account Record Inquiry shall open the account view with its components, payment history, remittances and adjustments, and its BIR 2307 tag; the Payment Record Inquiry opens the receipt with its applications, journal and history.
+    ac:
+      - Opening an account from the inquiry shows its receipts with AR numbers, its remittance batch and its outstanding balance.
+
+  # ------------------------------------------------------------------------------------- Reports
+  FRS.CSH.09.01.01:
+    refs: [FR-OP-009, FR-OP-028]
+    shall:
+      - "User Group and User Role (proposed, Appendix H): view on the screen: Cashier, Cashiering Team Leader, Comptrollership, Auditor; download and print: Cashier, Cashiering Team Leader, Comptrollership."
+    ac:
+      - An Auditor opens the reports facility and sees the Cashiering reports.
+
+  FRS.CSH.09.01.02:
+    refs: [FR-OP-009]
+    shall:
+      - View and export (download, print) shall be separate permissions per report (CSHID.018); a user with the view permission only sees the report on the screen without download or print.
+      - Every run shall be kept in the Report Archive with the report name, the parameters, the user, the date and time and the file.
+      - "The file name of each report shall follow FRS.CSH.09.02: <Report Name>_<date of extraction MMDDYYYY>, in the formats listed for the report."
+    ac:
+      - An Auditor views the Applied Premium Report on the screen but has no download or print.
+      - A Cashier downloads the same report as Excel named "Manually Applied Payments_10092026.xlsx".
+      - The Report Archive lists the run with its parameters and the user.
+
+  FRS.CSH.09.02:
+    refs: [FR-OP-028]
+    shall:
+      - For each report the columns shall be in the order listed, amounts with thousands separators and two decimals, dates as dd-MMM-yyyy in the report, with a total line and a footer with the user, the date and time of generation and the page number; the filters, sort and schedule of each report are in Appendix M.
+    ac:
+      - Each report of FRS.CSH.09.02 opens with its columns in the listed order and its total line.
+
+new_subitems:
+  # ------------------------------------------------------------------------------------- Log in
+  - row: FRS.CSH.01.02
+    id: FRS.OPS.002.04
+    title: Permissions per Cashiering action
+    brd: [BRQID.002]
+    refs: [FR-OP-002]
+    shall:
+      - "The system shall require a permission for each Cashiering action: create AR / OR; post AR / OR; create cancellation and reinstatement records; post them; upload payment files; maintain the post-dated check warehouse; assign and submit dispositions; approve dispositions; maintain and authorise receipt series; print and re-print receipts; maintain templates; view reports; download and print reports."
+      - The permissions shall be granted to the roles of Appendix H.2 until BDOI confirms the access matrix in the User Access Maintenance FRS ("Based on UAM").
+    ac:
+      - A Branch Cashier holds create AR and print but not post AR / OR; the Post action is not shown to him or her.
+      - A Cashiering Team Leader holds post AR / OR and approve dispositions.
+
+  - row: FRS.CSH.01.02
+    id: FRS.OPS.002.05
+    title: Segregation of duties
+    brd: [BRQID.002, CSHID.001, CSHID.002, CSHID.024]
+    refs: [FR-OP-002]
+    shall:
+      - "The system shall not allow the user who created a record to post, approve or authorise it: AR and OR creation records, cancellation and reinstatement records, dispositions, receipt series and template changes. The message is \"The requester cannot approve <record number>\". This rule cannot be switched off."
+    ac:
+      - A Cashiering Team Leader who created an AR creation record cannot post it; another Approver/Poster can.
+
+  # ------------------------------------------------------------------------------------- Dashboard
+  - row: FRS.CSH.01.03
+    id: FRS.CSH.01.03.05
+    title: Invoice search and links to the applications Cashiering works with
+    brd: [BRQID.003]
+    refs: [FR-OP-003]
+    shall:
+      - The dashboard shall have a search box for an account, invoice, ARN, AR or OR number and a list of links to the applications Cashiering works with (name and address of each link maintained by the System Administrator).
+    ac:
+      - Typing an AR number in the dashboard search opens the receipt.
+      - A link added by the System Administrator appears on the dashboard and opens the application in a new tab.
+
+  # ------------------------------------------------------------------------------------- Create AR
+  - row: FRS.CSH.02.01
+    id: FRS.CSH.02.01.15
+    title: Non-premium payments of insurers (AR Insurance)
+    brd: [CSHID.021]
+    refs: [FR-OP-020]
+    shall:
+      - For a Non-Premium Payment (Refund from Insurer, Other Expenses, AR Insurance) the Entry Type shall be Insurer and the insurer shall be mandatory; the system shall show the AR Insurer Refund accounts of the insurer for a Refund from Insurer.
+      - "The system shall post the non-premium payment to AR Insurer of the insurer the same business day it is posted (CSHID.021), and shall never match it to a client account or extract it for remittance."
+      - "The system shall refuse a Non-Premium AR without an insurer with the message \"A non-premium AR needs the paying insurer's code\"."
+    ac:
+      - An insurer refund of 25,000.00 received as Non-Premium – Refund from Insurer and posted the same day credits AR Insurer of the insurer and changes no client account.
+      - A Non-Premium AR without an insurer is refused.
+
+  - row: FRS.CSH.02.01
+    id: FRS.CSH.02.01.16
+    title: Cashier's day-end list
+    brd: [CSHID.001, CSHID.023]
+    refs: [FR-OP-011, FR-OP-028]
+    shall:
+      - The system shall give each cashier the list of the AR creation records of the day with their status (Created, For Posting, Returned, AR/OR Issued, Record Cancelled) and the total paid amount per payment type and bank account, as input to the Daily Cash Reconciliation Report (FRS.CSH.09.02.10).
+    ac:
+      - At the end of the day a cashier sees the records of the day with the totals of cash and of checks per bank account.
+
+  # ------------------------------------------------------------------------------------- Create OR
+  - row: FRS.CSH.02.02
+    id: FRS.CSH.02.02.10
+    title: Taxes on official receipts
+    brd: [CSHID.002]
+    refs: [FR-OP-012, FR-OP-027]
+    shall:
+      - The system shall post for each OR the income of its Official Receipt Type, the output VAT and the creditable withholding tax withheld by the payor, with the accounts of Appendix I.
+      - The VAT rate shall be taken from the tax code of the Official Receipt Type maintained by Comptrollership.
+    ac:
+      - An OR of type Fee Invoice for 11,200.00 with VAT 1,200.00 posts the service fee income of 10,000.00 and output VAT of 1,200.00.
+      - An OR of type Commissions with withholding tax of 200.00 posts the creditable withholding tax of 200.00.
+
+  # ------------------------------------------------------------------------------------- Series
+  - row: FRS.CSH.02.03
+    id: FRS.CSH.02.03.06
+    title: Receipt series in use at go-live
+    brd: [CSHID.006, CSHID.015]
+    refs: [FR-OP-010]
+    shall:
+      - The series in use at go-live (receipting branch, kind, prefix, start and end series, BIR ATP number and the next number) shall be loaded before go-live from the template "Receipt series in use" (Appendix P), so that the numbering continues without a gap.
+    ac:
+      - After the go-live load, the first AR of each branch takes the next number given in the template.
+
+  # ------------------------------------------------------------------------------------- Batch printing
+  - row: FRS.CSH.02.04
+    id: FRS.CSH.02.04.17
+    title: Copy label
+    brd: [CSHID.019]
+    refs: [FR-OP-025]
+    shall:
+      - The system shall print the copy label of the template (Client's Copy or BDOI Copy) according to the copy chosen at printing; the BDOI Copy is kept as a PDF with the receipt.
+    ac:
+      - Printing the Client's Copy and the BDOI Copy of an OR gives two documents with their labels, and the BDOI Copy is on the Documents tab of the receipt.
+
+  # ------------------------------------------------------------------------------------- Posting
+  - row: FRS.CSH.02.05
+    id: FRS.CSH.02.05.16
+    title: Accounts locked by another team
+    brd: [CSHID.020, CSHID.022]
+    refs: [FR-OP-006]
+    shall:
+      - A payment shall still be applied to an account locked by Remittance or Adjustment; any other Cashiering action on the account (cancellation, reinstatement, disposition) shall be refused with the name of the team holding the lock.
+    ac:
+      - A payment for an account in a remittance batch is applied; a disposition to that account is refused with the message that the account is locked by Remittance.
+
+  # ------------------------------------------------------------------------------------- Template
+  - row: FRS.CSH.02.06
+    id: FRS.CSH.02.06.04
+    title: Certification of Payment
+    brd: [CSHID.023]
+    refs: [FR-OP-028]
+    shall:
+      - The system shall issue on request a Certification of Payment of an AR as a PDF with its series number, AR number, policy number, payor, amount, date paid, requesting market unit and date issued, and record it for the Certification of Payment report (FRS.CSH.09.02.15).
+    ac:
+      - A Certification of Payment issued for an AR has the next series number and appears in the Certification of Payment report.
+
+  # ------------------------------------------------------------------------------------- Cancellation
+  - row: FRS.CSH.03.01
+    id: FRS.CSH.03.01.11
+    title: Notices of cancellation records
+    brd: [CSHID.001, CSHID.002]
+    refs: [FR-OP-013]
+    shall:
+      - The system shall notify the Approver/Poster in the system when a cancellation record is submitted for posting, and the creator when it is returned or posted (Appendix G).
+    ac:
+      - After Submit for Posting the Approver/Poster has a notice "<Cancellation Record Number> for approval" that opens the record.
+
+  # ------------------------------------------------------------------------------------- Reinstatement
+  - row: FRS.CSH.04.01
+    id: FRS.CSH.04.01.12
+    title: Notices of reinstatement records
+    brd: [CSHID.001, CSHID.002]
+    refs: [FR-OP-014]
+    shall:
+      - The system shall notify the Approver/Poster in the system when a reinstatement record is submitted for posting, and the creator when it is returned or posted (Appendix G).
+    ac:
+      - After Submit for Posting the Approver/Poster has a notice "<Reinstatement Record Number> for approval" that opens the record.
+
+  # ------------------------------------------------------------------------------------- Auto payment processing
+  - row: FRS.CSH.05.01
+    id: FRS.CSH.05.01.13
+    title: Processing of each row on its own
+    brd: [BRQID.006, CSHID.008]
+    refs: [FR-OP-008]
+    shall:
+      - Each row of a file shall be processed on its own; a failed row never stops the others and is kept with its reason for correction and reprocessing (FRS.CSH.10.03).
+    ac:
+      - A file of 10 rows with one unknown reference processes 10 rows; the unknown one becomes Unbooked/Unmatched and none is lost.
+
+  # ------------------------------------------------------------------------------------- Unapplied
+  - row: FRS.CSH.06.01
+    id: FRS.CSH.06.01.08
+    title: Minimal balances outside the Unapplied list
+    brd: [CSHID.016]
+    refs: [FR-OP-023]
+    shall:
+      - Excess payments and outstanding balances within the minimal balance threshold shall never be created as Unapplied payment records; they are cleared when the payment is processed (FRS.CSH.02.05.12).
+    ac:
+      - A payment exceeding the outstanding by an amount within the threshold creates no Unapplied payment record.
+
+  # ------------------------------------------------------------------------------------- OR generation
+  - row: FRS.CSH.07.01
+    id: FRS.CSH.07.01.05
+    title: Commission ORs from the Commission Schedule
+    brd: [CSHID.007]
+    refs: [FR-OP-021]
+    shall:
+      - The ORs of a processed Commission Schedule (FRS.CSH.02.05.14) and the automatic ORs shall be listed together on the Commission ORs list with their insurer, schedule or settlement, amount, status and print status.
+    ac:
+      - The OR of a processed Commission Schedule is on the Commission ORs list with its schedule reference.
+
+  # ------------------------------------------------------------------------------------- Inquiry
+  - row: FRS.CSH.08.01
+    id: FRS.CSH.08.01.04
+    title: Search log
+    brd: [CSHID.010]
+    refs: [FR-OP-024]
+    shall:
+      - The search log shall be viewed by the Auditor and the Cashiering Team Leader and kept for the retention period BDOI confirms (Appendix S).
+    ac:
+      - The Auditor lists the searches of a user for a date range.
+
+  # ------------------------------------------------------------------------------------- Reports
+  - row: FRS.CSH.09.01
+    id: FRS.CSH.09.01.05
+    title: Reports on a schedule
+    brd: [CSHID.017, CSHID.023]
+    refs: [FR-OP-009]
+    shall:
+      - The system shall produce the reports marked as scheduled in Appendix M at their time and keep them in the Report Archive for the users with the view permission.
+    ac:
+      - The Daily Cash Reconciliation Report of the business day is in the Report Archive after its scheduled time.
+
+  - row: FRS.CSH.09.02
+    id: FRS.CSH.09.02.19
+    title: "Report Name: Post-dated Checks Warehousing"
+    brd: [CSHID.023, CSHID.008]
+    refs: [FR-OP-028, FR-OP-016]
+    shall:
+      - "Description: lists the post-dated checks in the warehouse (FRS.CSH.05.02) by maturity date. Filename Convention: Post-dated Checks Warehousing_<date of extraction MMDDYYYY>. File format: Excel, PDF. Rules: checks with status Warehoused at the end of the covered period."
+      - "Fields: AR Date; AR Number; Maturity Date; Client; Amount; Bank Code; Branch; Check No.; Market Segment."
+    ac:
+      - The report lists every check of the warehouse with its maturity date within the covered period.
+
+  - row: FRS.CSH.09.02
+    id: FRS.CSH.09.02.20
+    title: "Report Name: Priority Posted Accounts"
+    brd: [CSHID.023]
+    refs: [FR-OP-028]
+    shall:
+      - "Description: lists the payments posted for accounts marked as priority (BRD annex report 8). Filename Convention: Priority Posted Accounts_<date of extraction MMDDYYYY>. File format: Excel, PDF. Rules: payments posted within the covered period for accounts with the priority tag."
+      - "Fields: OR / AR Number; Payor; Amount Paid; Date Paid; Encoder; Branch; Status; Invoice Number; Policy Number; Risk Code; Corporate Department."
+    ac:
+      - The report lists the payments of the priority accounts posted within the covered period.
+
+  - row: FRS.CSH.09.02
+    id: FRS.CSH.09.02.21
+    title: "Report Name: Payment Reversals"
+    brd: [CSHID.023]
+    refs: [FR-OP-028]
+    shall:
+      - "Description: lists the payment reversals (cancellations and reinstatements posted) within the covered period (BRD annex report 15). Filename Convention: Payment Reversals_<date of extraction MMDDYYYY>. File format: Excel, PDF. Rules: cancellation and reinstatement records posted within the covered period."
+      - "Fields: Record Number; Type (Cancellation / Reinstatement); AR / OR Number; Account Number; Assured; Amount Reversed; Reason; Created by; Posted by; Date Posted."
+    ac:
+      - A cancellation posted within the period appears with its reason, creator and poster.
+
+  - row: FRS.CSH.09.02
+    id: FRS.CSH.09.02.22
+    title: "Report Name: AR Outstanding with Ageing"
+    brd: [CSHID.023]
+    refs: [FR-OP-028]
+    shall:
+      - "Description: outstanding premium receivable per client and account with ageing (BRD section 4.c). Filename Convention: AR Outstanding with Ageing_<date of extraction MMDDYYYY>. File format: Excel, PDF. Rules: accounts with an outstanding premium receivable at the end of the covered period; ageing from the booking date in the brackets of FRS.CSH.09.02.11 (0-30, 31-60, 61-90, 91-120, 121-180, 181-365, above 365)."
+      - "Fields: Client; Account Number; Invoice Number; Policy Number; Insurer; Booking Date; Outstanding Amount; Ageing Bracket; Marketing Unit; Account Officer."
+    ac:
+      - An account booked 45 days before the end of the period is in the bracket 31-60.
+
+  - row: FRS.CSH.09.02
+    id: FRS.CSH.09.02.23
+    title: "Report Name: Payment Batch Run Report"
+    brd: [BRQID.006, CSHID.008]
+    refs: [FR-OP-008]
+    shall:
+      - "Description: the outcome of each automatic payment processing run (FRS.CSH.05.01.12). Filename Convention: Payment Batch Run Report_<run date MMDDYYYY>. File format: Excel. Rules: the runs of the covered period."
+      - "Fields: Run Number; Source (Upload / MFT); Payment File Type; File Name; Uploaded by; Date and Time; Rows Read; Applied; Excess; Matched on Pre-booked; Unbooked/Unmatched; Failed; Amount per category."
+    ac:
+      - The report of a run gives the counts and amounts per category equal to the run report on the screen.
+
+new_items:
+  - after: FRS.CSH.05.01
+    id: FRS.CSH.05.02
+    component: Cashiering – PDC Warehouse
+    capability: Post-dated check warehouse
+    brd: [CSHID.008]
+    subitems:
+      - id: FRS.CSH.05.02.01
+        title: Warehousing of post-dated checks
+        refs: [FR-OP-016]
+        shall:
+          - "The system shall keep every post-dated check received in a warehouse with a system number (PDC warehouse number), the client, the account number (invoice, ARN, policy or PN number), the check number, the bank and branch, the maturity date, the amount and the market segment (CSHID.008: \"system-generated number\", \"repository\", \"list\")."
+          - The checks shall be added one by one on the screen or from the list of received post-dated checks (the matured list of PMS received via MFT, FRS.CSH.05.01.04, or the PDC Excel file of Appendix D.2).
+          - "The system shall refuse a check already in the warehouse (same bank and check number) with the message \"Check <bank> <number> is already in the warehouse\"."
+        ac:
+          - A check added on the screen receives its PDC warehouse number and shows Warehoused.
+          - The same check added twice is refused.
+      - id: FRS.CSH.05.02.02
+        title: Maturity of post-dated checks
+        refs: [FR-OP-016, FR-OP-018]
+        shall:
+          - "On the maturity date the daily run (08:30) shall turn each matured check into a payment with its AR, matched and applied like any payment (FRS.CSH.05.01.08 to FRS.CSH.05.01.12); the check becomes Applied. Matching is not done before maturity (CSHID.020: \"except for issued PDC\")."
+          - The Cashier may mature the checks due on demand (Mature Now).
+        ac:
+          - A check with maturity today is applied by the daily run with its AR and shows Applied.
+      - id: FRS.CSH.05.02.03
+        title: Release of a check before maturity
+        refs: [FR-OP-016]
+        shall:
+          - "Before maturity a check shall leave the warehouse only as Returned, Replaced or Pulled Out, with a reason; the message for another outcome is \"A check leaves the warehouse as returned, replaced or pulled out\"."
+        ac:
+          - A check released as Replaced is no longer matured by the daily run and keeps its history.
+
+  - after: FRS.CSH.05.02
+    id: FRS.CSH.05.03
+    component: Cashiering – Pre-booked Payments
+    capability: Pre-booked payments
+    brd: [CSHID.020]
+    subitems:
+      - id: FRS.CSH.05.03.01
+        title: Pre-booked payment list
+        refs: [FR-OP-018]
+        shall:
+          - The system shall list the Pre-booked payment records with the reference quoted, the payor, the amount, the date received and the days waiting; the Cashier may match one again at once (Re-match Now) or release it to the Unapplied list as Unbooked/Unmatched (Release).
+          - "When a Pre-booked payment waits for the booking of its account beyond the ageing threshold (5 days as delivered), the system shall alert the Cashiering Team Leader: \"Payment for <ARN> waits for the booking since <date>\" (Appendix G)."
+        ac:
+          - A Pre-booked payment is applied when its account is booked and leaves the list; no new AR is generated (FRS.CSH.05.01.10).
+          - A Pre-booked payment waiting 6 days raises the ageing alert.
+
+  - after: FRS.CSH.05.03
+    id: FRS.CSH.05.04
+    component: Cashiering – New Business payment gate
+    capability: Payment confirmation to New Business
+    brd: [CSHID.020]
+    subitems:
+      - id: FRS.CSH.05.04.01
+        title: Payment confirmation for placement
+        refs: [FR-OP-132]
+        shall:
+          - The system shall make every payment applied or recorded as Pre-booked on an account available to New Business as the confirmation of payment of the account, so that placement does not wait for the booking (New Business FRS).
+        ac:
+          - A payment by ARN before booking shows on the New Business account as payment confirmed, with the AR number as evidence.
+
+  - after: FRS.CSH.06.02
+    id: FRS.CSH.06.03
+    component: Cashiering – Incoming Requests
+    capability: Requests of other modules on payments
+    brd: [CSHID.024, BRQID.004]
+    subitems:
+      - id: FRS.CSH.06.03.01
+        title: Disposition requests of Collections
+        refs: [FR-OP-022, FR-OP-130]
+        shall:
+          - The system shall receive the requests of collectors (Collections) to apply, refund or transfer an Unapplied payment record, list them for the Cashier with the record and the invoice, and let the Cashier accept them (the disposition is created) or reject them with a reason; the collector sees the result.
+        ac:
+          - A collector's request to apply an Unapplied payment to an invoice, accepted by the Cashier, creates the disposition Apply to Other Invoice for that invoice.
+      - id: FRS.CSH.06.03.02
+        title: Refund validation and payment reversal requests
+        refs: [FR-OP-022, FR-OP-130]
+        shall:
+          - "The system shall receive the refund validation requests of Payment Requests (\"Confirm that the premium of <invoice> is back in the unapplied list\") and the payment reversal requests of Accounting Controls, list them for the Cashier and the Cashiering Team Leader, and record the confirmation or the approval with the user and the date and time."
+          - A payment reversal request shall be approved by the Cashiering Team Leader; its requester cannot approve it.
+        ac:
+          - A payment reversal requested by Accounting Controls is applied only after the Cashiering Team Leader approves it.
+
+  - after: FRS.CSH.08.01
+    id: FRS.CSH.08.02
+    component: Cashiering – Account payment history
+    capability: Payment history at invoice level
+    brd: [BRQID.007]
+    subitems:
+      - id: FRS.CSH.08.02.01
+        title: Payment history of each account
+        refs: [FR-OP-004, FR-OP-005]
+        shall:
+          - The system shall keep for every booked account (invoice) the history of its payments and remittances, with the payment date, the amount applied per component, the AR number, the remittance batch and the date (BRQID.007).
+          - The history shall be updated as soon as a payment is applied and shall be view-only outside Cashiering; payments are applied and corrected in Cashiering only.
+        ac:
+          - A payment applied to an invoice shows at once in its payment history with the AR number, the date and the amount.
+          - A Remittance Processor sees the payment history of the invoice and has no action to change it.
+
+  - after: FRS.CSH.08.02
+    id: FRS.CSH.08.03
+    component: Cashiering – Receipt audit trail
+    capability: AR and OR audit trail
+    brd: [CSHID.011]
+    subitems:
+      - id: FRS.CSH.08.03.01
+        title: Audit trail of receipts
+        refs: [FR-OP-024]
+        shall:
+          - The system shall log in the audit trail every action on an AR or OR (create, edit, submit, post, return, print, re-print, cancel, reinstate, apply) with the AR or OR number and the user name (CSHID.011), and the seven items of FRS.CSH.02.01.14.
+          - The History tab of each receipt shall show its audit trail; the Auditor sees every receipt's history.
+        ac:
+          - The History tab of a cancelled AR shows its creation, posting, cancellation record and its posting, each with the user, the date and time and the AR number.
+
+  - group: Interfaces, Batch Processing and Notices
+    after: FRS.CSH.09.02
+    id: FRS.CSH.10.01
+    component: Cashiering – Interfaces
+    capability: Integration with other systems and modules
+    brd: [BRQID.004]
+    subitems:
+      - id: FRS.CSH.10.01.01
+        title: Interfaces of Cashiering
+        refs: [FR-OP-130]
+        shall:
+          - "The system shall exchange with the systems and modules of Appendix N: payment files of OBPCS and the matured post-dated checks of PMS via MFT; Trade (TFS) and Direct Credit files by upload; Collections (disposition requests, commission payment details); Disbursement (refund requests and their status, insurer settlement approvals for the automatic OR); New Business (booked accounts, payment confirmation); Remittance (remittance status of the accounts); Accounting (journals of every posting)."
+          - Work that a module cannot complete because the other module is not in use shall be handed over to the responsible team as an open item, which the team closes with what was done.
+        ac:
+          - A refund approved in Cashiering appears in the Disbursement queue with its amount and payee.
+      - id: FRS.CSH.10.01.02
+        title: Links to the applications Cashiering works with
+        refs: [FR-OP-003]
+        shall:
+          - The links of the dashboard (FRS.CSH.01.03.05) shall open the applications Cashiering works with (BRQID.003).
+        ac:
+          - Each link of the dashboard opens its application.
+
+  - after: FRS.CSH.10.01
+    id: FRS.CSH.10.02
+    component: Cashiering – Flow-in of data
+    capability: Fetch the data that flows in to Cashiering
+    brd: [BRQID.005]
+    subitems:
+      - id: FRS.CSH.10.02.01
+        title: Flow-in runs
+        refs: [FR-OP-131]
+        shall:
+          - "Each flow-in of data (booked accounts, payment files via MFT, commission payment details) shall be recorded as a run with its trigger, start and end, records read, accepted and failed, status and errors; each record is accepted only once, so a file received twice creates no duplicate."
+          - "A failed run or failed records shall alert the System Administrator: \"Interface run <status>\" (Appendix G)."
+        ac:
+          - A flow-in file with one invalid record records a run with one failed record and raises the alert.
+          - The same file received again accepts no new record.
+
+  - after: FRS.CSH.10.02
+    id: FRS.CSH.10.03
+    component: Cashiering – Batch processing
+    capability: Batch job processing that continues past failed records
+    brd: [BRQID.006]
+    subitems:
+      - id: FRS.CSH.10.03.01
+        title: Batch runs and their report
+        refs: [FR-OP-008]
+        shall:
+          - "Every batch run of Cashiering (payment file processing, re-matching, post-dated check maturity, minimal balance run, automatic OR generation) shall process each record on its own, log the failed records with their reason for evaluation and reprocessing, and give a report of the run (count per outcome)."
+          - "A run that fails as a whole shall be reported by e-mail to the addresses of the failed-run recipients setting: subject \"BIBS: batch job <job name> failed\" (Appendix G)."
+        ac:
+          - A run with one failed record completes for the others and its report lists the failed record with its reason.
+          - A failed run sends the failed-run e-mail to the configured recipients.
+
+  - after: FRS.CSH.10.03
+    id: FRS.CSH.10.04
+    component: Cashiering – Notices
+    capability: Notices and alerts of Cashiering
+    brd: [CSHID.001, CSHID.015, CSHID.020, CSHID.024]
+    subitems:
+      - id: FRS.CSH.10.04.01
+        title: Notices in the system
+        refs: [FR-OP-013, FR-OP-022, FR-OP-120]
+        shall:
+          - "The system shall give the notices of Appendix G in the system (bell in the page header), each opening its record: records for posting or approval, records returned or posted, dispositions for approval, requests of other modules, payment requests to Disbursement and their status."
+          - Each user may switch off the in-system notices of an event on the Notification Settings screen, except the approval requests.
+        ac:
+          - A disposition submitted for approval gives the Cashiering Team Leaders the notice "<Unapplied Payment No.> disposition for approval" with the type and the amount.
+      - id: FRS.CSH.10.04.02
+        title: Alerts
+        refs: [FR-OP-010, FR-OP-018]
+        shall:
+          - "The system shall raise the alerts of Appendix G to the Cashiering Team Leader: receipt series reaching its warning level; Pre-booked payment waiting beyond the ageing threshold; payment file received via MFT and refused."
+        ac:
+          - The alerts are listed in the alert inbox of the Cashiering Team Leader with the record they concern.

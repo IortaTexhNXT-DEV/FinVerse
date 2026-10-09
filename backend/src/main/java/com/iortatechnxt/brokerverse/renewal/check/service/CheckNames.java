@@ -24,7 +24,9 @@ public final class CheckNames {
           Map.entry("PACKAGE_REMAP", "Package of a migrated policy"),
           Map.entry("TSI_THRESHOLD", "Total sum insured threshold"),
           Map.entry("RISK_CODE_DEFINED", "Risk code defined"),
-          Map.entry("INSURER_RENEWABLE_LIST", "Insurer renewable list"));
+          Map.entry("INSURER_RENEWABLE_LIST", "Insurer renewable list"),
+          Map.entry("TOTAL_LOSS", "Total loss claim"),
+          Map.entry("DUPLICATE_ACCOUNT", "Potential duplicate account"));
 
   private CheckNames() {}
 

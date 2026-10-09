@@ -11,5 +11,7 @@ public enum ExtractionTrigger {
   /** Migrated policies (daily extraction). */
   LEGACY,
   /** The go-live take-over. */
-  GOLIVE;
+  GOLIVE,
+  /** One expiring account chosen by a user (manual creation, FRRN.005.01). */
+  MANUAL_ACCOUNT;
 }

@@ -21,6 +21,7 @@ import com.iortatechnxt.brokerverse.renewal.domain.CheckTrigger;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalCandidate;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalStage;
 import com.iortatechnxt.brokerverse.renewal.rules.service.ReevaluationService;
+import com.iortatechnxt.brokerverse.renewal.rules.service.RenewalDraftRules;
 import com.iortatechnxt.brokerverse.renewal.service.RenewalCodes;
 import com.iortatechnxt.brokerverse.renewal.service.RenewalRecords;
 import java.time.LocalDate;
@@ -66,6 +67,7 @@ public class RenewalAccountService {
   private final ReevaluationService reevaluation;
   private final AuditTrailService audit;
   private final DocumentService documents;
+  private final RenewalDraftRules draftRules;
 
   /**
    * Creates the service.
@@ -77,6 +79,7 @@ public class RenewalAccountService {
    * @param reevaluation checks
    * @param audit audit trail
    * @param documents documents of the expiring account
+   * @param draftRules term of a manual renewal and the CBG Motor automatic values
    */
   public RenewalAccountService(
       RenewalRecords records,
@@ -85,7 +88,8 @@ public class RenewalAccountService {
       AccountRepository accountRepository,
       ReevaluationService reevaluation,
       AuditTrailService audit,
-      DocumentService documents) {
+      DocumentService documents,
+      RenewalDraftRules draftRules) {
     this.records = records;
     this.accounts = accounts;
     this.accountQueries = accountQueries;
@@ -93,6 +97,7 @@ public class RenewalAccountService {
     this.reevaluation = reevaluation;
     this.audit = audit;
     this.documents = documents;
+    this.draftRules = draftRules;
   }
 
   /**
@@ -123,7 +128,7 @@ public class RenewalAccountService {
                       "Renewal account " + c.getRenewalArn() + " not found"));
     }
     RenewalRecords.requireStage(c, RenewalStage.FOR_PROCESSING, RenewalStage.IN_PROCESSING);
-    AccountDraft draft = draft(c);
+    AccountDraft draft = draftRules.apply(c, draft(c));
     String renewalOf = c.getExpiringArn() != null ? c.getExpiringArn() : c.getSourceRef();
     Integer version =
         c.getResolvedVersionNo() != null ? c.getResolvedVersionNo() : c.getSnapshot().versionNo();

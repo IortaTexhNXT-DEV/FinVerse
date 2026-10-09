@@ -21,6 +21,7 @@ import {
 } from '../common/presentation';
 import { BucketPill } from '../common/RenewalBits';
 import { severityLabel } from '../setup/setupCodes';
+import { AutoValuesCard, RefreshEndorsementsButton } from '../updates/AutoValuesCard';
 
 type Props = Readonly<{ detail: CandidateDetail }>;
 
@@ -72,7 +73,11 @@ export function ChecksTab({ detail }: Props) {
           ]}
         />
       </Card>
-      <Card title="Endorsements linked" flush>
+      <Card
+        title="Endorsements linked"
+        flush
+        actions={<RefreshEndorsementsButton renewalRef={ref} />}
+      >
         <DataTable
           rows={d?.endorsements ?? []}
           rowKey={(e) => e.reference}
@@ -141,6 +146,7 @@ export function ComputationsTab({ detail }: Props) {
           />
         </div>
       )}
+      <AutoValuesCard renewalRef={ref} />
     </div>
   );
 }

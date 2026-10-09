@@ -64,6 +64,9 @@ public final class RenewalCodes {
   /** Reason: the insurer declined. */
   public static final String REASON_INSURER_DECLINED = "INSURER_DECLINED";
 
+  /** Non-renewal reason of a total loss claim of the expiring term. */
+  public static final String REASON_TOTAL_LOSS = "TOTAL_LOSS_CLAIM";
+
   /** Return reason counted as Disapproved. */
   public static final String RETURN_DISAPPROVED = "DISAPPROVED";
 

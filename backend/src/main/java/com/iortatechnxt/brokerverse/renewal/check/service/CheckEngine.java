@@ -193,27 +193,35 @@ public class CheckEngine {
   }
 
   private Optional<Evaluation.SystemTag> systemTag(List<Finding> findings) {
-    for (Finding f : findings) {
-      if (!f.failed() || f.severity() != CheckSeverity.SYSTEM) {
-        continue;
-      }
-      if (RiskCodeRenewableCheck.CODE.equals(f.code())) {
-        return Optional.of(
-            new Evaluation.SystemTag(
-                RenewalCodes.REASON_NON_RENEWABLE,
-                DispositionSource.SYSTEM_CHECK,
-                f.message(),
-                null));
-      }
-      if (LamdStatusCheck.CODE.equals(f.code())) {
-        boolean paidOff = "PAID_OFF".equals(f.detail());
-        return Optional.of(
-            new Evaluation.SystemTag(
-                paidOff ? RenewalCodes.REASON_LOAN_PAID : RenewalCodes.REASON_RMU,
-                DispositionSource.LAMD,
-                f.message(),
-                paidOff ? null : parameters.rmuUnit().orElse(null)));
-      }
+    return findings.stream()
+        .filter(f -> f.failed() && f.severity() == CheckSeverity.SYSTEM)
+        .map(this::tagOf)
+        .flatMap(Optional::stream)
+        .findFirst();
+  }
+
+  private Optional<Evaluation.SystemTag> tagOf(Finding f) {
+    if (RiskCodeRenewableCheck.CODE.equals(f.code())) {
+      return Optional.of(
+          new Evaluation.SystemTag(
+              RenewalCodes.REASON_NON_RENEWABLE,
+              DispositionSource.SYSTEM_CHECK,
+              f.message(),
+              null));
+    }
+    if (TotalLossCheck.CODE.equals(f.code())) {
+      return Optional.of(
+          new Evaluation.SystemTag(
+              RenewalCodes.REASON_TOTAL_LOSS, DispositionSource.SYSTEM_CHECK, f.message(), null));
+    }
+    if (LamdStatusCheck.CODE.equals(f.code())) {
+      boolean paidOff = "PAID_OFF".equals(f.detail());
+      return Optional.of(
+          new Evaluation.SystemTag(
+              paidOff ? RenewalCodes.REASON_LOAN_PAID : RenewalCodes.REASON_RMU,
+              DispositionSource.LAMD,
+              f.message(),
+              paidOff ? null : parameters.rmuUnit().orElse(null)));
     }
     return Optional.empty();
   }

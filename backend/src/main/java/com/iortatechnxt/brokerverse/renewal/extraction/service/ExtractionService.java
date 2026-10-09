@@ -269,6 +269,24 @@ public class ExtractionService {
         });
   }
 
+  /**
+   * Creates the renewal account of one expiring account chosen by a user (FRRN.005.01): a run of
+   * its own, then the checks, the classification and the routing like a generated one.
+   *
+   * @param companyId company
+   * @param invoice expiring account
+   * @return the renewal
+   */
+  public RenewalCandidate createManual(Long companyId, ExpiringInvoice invoice) {
+    LocalDate expiry = invoice.facts().expiry();
+    ExtractionRun run = start(companyId, ExtractionTrigger.MANUAL_ACCOUNT, expiry, expiry);
+    createInvoice(companyId, invoice, run.getId());
+    complete(run.getId(), new ExtractionRun.Counts(1, 1, 0, 0, 0));
+    return candidates
+        .findByCompanyIdAndExpiringInvoiceNo(companyId, invoice.invoiceNo())
+        .orElseThrow();
+  }
+
   /** Range, trigger and due-date rule of a run. */
   private record Window(
       LocalDate from, LocalDate to, ExtractionTrigger trigger, Predicate<ExpiringInvoice> due) {}

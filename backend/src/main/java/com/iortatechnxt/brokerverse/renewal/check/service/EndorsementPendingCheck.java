@@ -5,7 +5,9 @@ import com.iortatechnxt.brokerverse.adjustment.service.AdjustmentQueryService;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.renewal.domain.CandidateEndorsement;
 import com.iortatechnxt.brokerverse.renewal.domain.CandidateEndorsementRepository;
+import com.iortatechnxt.brokerverse.renewal.domain.CheckOutcome;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalCandidate;
+import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -25,19 +27,30 @@ public class EndorsementPendingCheck implements RenewalCheck {
   /** Check code. */
   public static final String CODE = "ENDORSEMENT_PENDING";
 
+  /**
+   * Parameter: ANY (BDOI: every endorsement of the term routes the renewal to Review) or
+   * IN_PROGRESS (only an endorsement in progress).
+   */
+  public static final String ROUTE = "RNW_ENDORSEMENT_ROUTE";
+
   private final AdjustmentQueryService adjustments;
   private final CandidateEndorsementRepository links;
+  private final SystemParameterService parameters;
 
   /**
    * Creates the check.
    *
    * @param adjustments endorsement requests
    * @param links endorsements linked to renewals
+   * @param parameters system parameters (route of the endorsements of the term)
    */
   public EndorsementPendingCheck(
-      AdjustmentQueryService adjustments, CandidateEndorsementRepository links) {
+      AdjustmentQueryService adjustments,
+      CandidateEndorsementRepository links,
+      SystemParameterService parameters) {
     this.adjustments = adjustments;
     this.links = links;
+    this.parameters = parameters;
   }
 
   @Override
@@ -70,6 +83,22 @@ public class EndorsementPendingCheck implements RenewalCheck {
     if (!open.isEmpty()) {
       return Verdict.fail(
           "Endorsement in progress (" + String.join(", ", open) + ")", String.join(",", open));
+    }
+    return termVerdict(context, requests);
+  }
+
+  private Verdict termVerdict(CheckContext context, Map<String, EndorsementRequest> requests) {
+    String expiring = context.candidate().getExpiringInvoiceNo();
+    List<String> term = new ArrayList<>(requests.keySet());
+    context.family().stream()
+        .map(OpsInvoice::getInvoiceNo)
+        .filter(n -> !n.equals(expiring))
+        .forEach(term::add);
+    if (!term.isEmpty() && "ANY".equals(parameters.text(ROUTE, "ANY").strip())) {
+      return new Verdict(
+          CheckOutcome.WARN,
+          "Endorsements of the expiring term (" + String.join(", ", term) + "): review",
+          String.join(",", term));
     }
     return Verdict.pass(
         requests.isEmpty() ? "No endorsement in progress" : "Endorsements posted or cancelled");

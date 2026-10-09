@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { CalendarPlus, Send, UserPlus } from 'lucide-react';
+import { CalendarPlus, FilePlus, Send, UserPlus } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import { renewalApi } from '@/api/renewal';
 import type { ExtractionRunView } from '@/api/renewal';
@@ -19,9 +19,10 @@ import { ExtractDialog } from '../common/MoreDialogs';
 import { EXPIRY_TABS, RENEWAL_SECTION, tabOf } from '../common/renewalCodes';
 import { useBatchAction } from '../common/useBatchAction';
 import { useListDialogs } from '../common/useListDialogs';
+import { ManualCreationDialog } from '../updates/ManualCreationDialog';
 import '../renewal.css';
 
-type Open = 'assign' | 'transfer' | 'extract';
+type Open = 'assign' | 'transfer' | 'extract' | 'manual';
 
 function RunsCard() {
   const companyId = useCompanyId();
@@ -118,7 +119,13 @@ export default function ExpiryListPage() {
       renewalApi.extract(companyId, range.from, range.to),
     onSuccess: async (run) => {
       close();
-      toast.success(`${countOf(run.counts.created, 'renewal')} extracted`);
+      if (run.counts.created === 0) {
+        toast.info('No records found.');
+      } else {
+        toast.success(
+          `Generation of RMEL successful! ${countOf(run.counts.created, 'renewal')} extracted`,
+        );
+      }
       await queryClient.invalidateQueries({ queryKey: ['renewal'] });
     },
   });
@@ -129,11 +136,22 @@ export default function ExpiryListPage() {
         title="Expiry List"
         description="Accounts expiring within the renewal horizon, from extraction to disposition."
         actions={
-          can('RNW_EXTRACT') && (
-            <Button icon={<CalendarPlus size={16} />} onClick={() => show('extract')}>
-              Generate Expiry List
-            </Button>
-          )
+          <span className="rnw-actions">
+            {can('RNW_EXTRACT') && (
+              <Button icon={<CalendarPlus size={16} />} onClick={() => show('extract')}>
+                Generate Expiry List
+              </Button>
+            )}
+            {(can('RNW_EXTRACT') || can('RNW_DISPOSE') || can('RNW_PROCESS')) && (
+              <Button
+                variant="secondary"
+                icon={<FilePlus size={16} />}
+                onClick={() => show('manual')}
+              >
+                Create Renewal Account
+              </Button>
+            )}
+          </span>
         }
       />
       <CandidateList
@@ -193,6 +211,7 @@ export default function ExpiryListPage() {
           onConfirm={(from, to) => extract.mutate({ from, to })}
         />
       )}
+      {open === 'manual' && <ManualCreationDialog onClose={close} />}
       {open === 'assign' && (
         <AssignDialog
           count={refs.length}

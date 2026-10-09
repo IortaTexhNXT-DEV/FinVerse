@@ -2,8 +2,10 @@ package com.iortatechnxt.brokerverse.renewal.check.service;
 
 import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.renewal.domain.CandidateSnapshot.SnapshotPremium;
+import com.iortatechnxt.brokerverse.renewal.domain.CheckOutcome;
 import com.iortatechnxt.brokerverse.renewal.domain.CheckSetting;
 import com.iortatechnxt.brokerverse.renewal.domain.CheckSettingRepository;
+import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.math.BigDecimal;
 import org.springframework.stereotype.Component;
 
@@ -19,18 +21,24 @@ public class TsiThresholdCheck implements RenewalCheck {
   /** Check code. */
   public static final String CODE = "TSI_THRESHOLD";
 
+  /** Detail of a TSI above the threshold under BDOI's rule (Clean, For Quotation). */
+  public static final String QUOTATION_DETAIL = "quotation";
+
   /** Default threshold. */
   static final BigDecimal DEFAULT_THRESHOLD = new BigDecimal("250000000");
 
   private final CheckSettingRepository settings;
+  private final SystemParameterService parameters;
 
   /**
    * Creates the check.
    *
    * @param settings check settings (threshold)
+   * @param parameters system parameters (route of a TSI above the threshold)
    */
-  public TsiThresholdCheck(CheckSettingRepository settings) {
+  public TsiThresholdCheck(CheckSettingRepository settings, SystemParameterService parameters) {
     this.settings = settings;
+    this.parameters = parameters;
   }
 
   @Override
@@ -46,6 +54,16 @@ public class TsiThresholdCheck implements RenewalCheck {
       return Verdict.notApplicable("No total sum insured");
     }
     BigDecimal threshold = threshold();
+    if (tsi.compareTo(threshold) > 0 && quotation()) {
+      return new Verdict(
+          CheckOutcome.INFO,
+          "Total sum insured "
+              + DisplayFormat.amount(tsi)
+              + " is above "
+              + DisplayFormat.amount(threshold)
+              + ": For Quotation (TSU)",
+          QUOTATION_DETAIL);
+    }
     return tsi.compareTo(threshold) > 0
         ? Verdict.fail(
             "Total sum insured "
@@ -55,6 +73,14 @@ public class TsiThresholdCheck implements RenewalCheck {
                 + ": TSU or proposal handling",
             "tsi " + tsi.toPlainString() + ", threshold " + threshold.toPlainString())
         : Verdict.pass("Total sum insured within " + DisplayFormat.amount(threshold));
+  }
+
+  /**
+   * Whether a TSI above the threshold is Clean with For Quotation (BDOI's rule: the parameter
+   * RNW_TSI_ABOVE_ROUTE is QUOTATION) rather than Review with a proposal (REVIEW).
+   */
+  private boolean quotation() {
+    return "QUOTATION".equals(parameters.text("RNW_TSI_ABOVE_ROUTE", "QUOTATION").strip());
   }
 
   private BigDecimal threshold() {

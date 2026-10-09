@@ -18,6 +18,7 @@ import com.iortatechnxt.brokerverse.renewal.service.RenewalParameters;
 import java.time.Clock;
 import java.util.EnumSet;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,6 +52,7 @@ public class RoutingService {
   private static final String ROUTE_UNASSIGNED = "route_unassigned";
 
   private final DecisionMatrixEvaluator matrix;
+  private final BdoiSanitation sanitation;
   private final RenewalDispositions dispositions;
   private final RenewalFlow flow;
   private final RenewalParameters parameters;
@@ -60,6 +62,7 @@ public class RoutingService {
    * Creates the routing.
    *
    * @param matrix decision matrix
+   * @param sanitation BDOI's sanitation rules of Clean renewals
    * @param dispositions disposition writer
    * @param flow workflow
    * @param parameters renewal parameters
@@ -67,11 +70,13 @@ public class RoutingService {
    */
   public RoutingService(
       DecisionMatrixEvaluator matrix,
+      BdoiSanitation sanitation,
       RenewalDispositions dispositions,
       RenewalFlow flow,
       RenewalParameters parameters,
       Clock clock) {
     this.matrix = matrix;
+    this.sanitation = sanitation;
     this.dispositions = dispositions;
     this.flow = flow;
     this.parameters = parameters;
@@ -93,8 +98,12 @@ public class RoutingService {
       DispositionProposal proposal =
           matrix.propose(candidate, evaluation, BusinessClock.today(clock));
       candidate.propose(proposal);
+      Optional<BdoiSanitation.Rule> rule =
+          proposal.isAuto() ? Optional.empty() : sanitation.dispositionOf(candidate, evaluation);
       if (proposal.isAuto() && candidate.getBucket() == Bucket.CLEAN) {
         automatic(candidate, proposal);
+      } else if (rule.isPresent()) {
+        sanitationRule(candidate, rule.get());
       } else {
         flow.system(candidate, ROUTE_UNASSIGNED, "For disposition by Marketing");
       }
@@ -142,6 +151,26 @@ public class RoutingService {
       flow.system(candidate, "route_letter", comment);
     } else {
       flow.system(candidate, "route_review", comment);
+    }
+  }
+
+  /**
+   * A Clean renewal disposed by BDOI's sanitation rules: For Renewal goes to processing (Posted),
+   * For Quotation and For Proposal to the Team Leader for the New Business path.
+   */
+  private void sanitationRule(RenewalCandidate candidate, BdoiSanitation.Rule rule) {
+    dispositions.record(
+        candidate,
+        new CurrentDisposition(
+            rule.disposition(), null, DispositionSource.SYSTEM_CHECK, rule.reason(), null),
+        null,
+        null);
+    if (rule.disposition() == RenewalDisposition.FOR_RENEWAL && parameters.stpSkipsReview()) {
+      candidate.getFlags().setStp(true);
+      candidate.takePath(RenewalPath.STP);
+      flow.system(candidate, "route_processing", rule.reason());
+    } else {
+      flow.system(candidate, "route_review", rule.reason());
     }
   }
 

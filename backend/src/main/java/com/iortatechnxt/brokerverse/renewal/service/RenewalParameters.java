@@ -191,6 +191,16 @@ public class RenewalParameters {
    * @param line product line
    * @return true for the STP path
    */
+  /**
+   * Whether a segment is one of the CBG segments.
+   *
+   * @param segment segment
+   * @return true for a CBG segment
+   */
+  public boolean cbgSegment(String segment) {
+    return listed(CBG_SEGMENTS, segment);
+  }
+
   public boolean loanDriven(String segment, String line) {
     return listed(CBG_SEGMENTS, segment) && listed(CBG_STP_LINES, line);
   }

@@ -14,10 +14,12 @@ import com.iortatechnxt.brokerverse.renewal.domain.InsurerRenewableRisk;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalCandidate;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalCandidateRepository;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalDisposition;
+import com.iortatechnxt.brokerverse.renewal.rules.service.BdoiSanitation;
 import com.iortatechnxt.brokerverse.renewal.rules.service.ReevaluationService;
 import com.iortatechnxt.brokerverse.renewal.setup.service.InsurerRenewableListService;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
+import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -27,7 +29,8 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * The sanitation criteria of the Walkthrough addendum (Annex BRRN.020; FR-RN-020, 022, 023): the
- * TSI threshold with the proposal for TSU or proposal handling, and the insurer renewable list.
+ * TSI threshold with the proposal for TSU or proposal handling (the Review setting of the TSI rule),
+ * and the insurer renewable list.
  */
 @IntegrationTest
 class RenewalSanitationIT {
@@ -40,6 +43,7 @@ class RenewalSanitationIT {
   @Autowired private AsUser as;
   @Autowired private JdbcTemplate jdbc;
   @Autowired private TransactionTemplate tx;
+  @Autowired private SystemParameterService parameters;
 
   private CheckOutcome outcome(RenewalCandidate c, String check) {
     return as.run(PROC_TL, () -> queries.latestResults(fx.reload(c))).stream()
@@ -60,6 +64,7 @@ class RenewalSanitationIT {
   void aSumInsuredAboveTheThresholdIsReviewedAndProposedForProposal() {
     RenewalCandidate c = fx.extractedMotor();
     assertThat(outcome(c, "TSI_THRESHOLD")).isEqualTo(CheckOutcome.PASS);
+    as.run("badmin", () -> parameters.update(BdoiSanitation.TSI_ROUTE, "REVIEW"));
     try {
       jdbc.update(
           "update rnw_check_setting set parameters = '1000' where check_code = 'TSI_THRESHOLD'");
@@ -72,6 +77,7 @@ class RenewalSanitationIT {
         assertThat(after.getProposal().isAuto()).isFalse();
       }
     } finally {
+      as.run("badmin", () -> parameters.update(BdoiSanitation.TSI_ROUTE, "QUOTATION"));
       jdbc.update(
           "update rnw_check_setting set parameters = '250000000'"
               + " where check_code = 'TSI_THRESHOLD'");

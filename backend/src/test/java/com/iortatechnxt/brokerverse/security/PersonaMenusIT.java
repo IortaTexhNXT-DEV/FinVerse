@@ -85,6 +85,14 @@ class PersonaMenusIT {
           Map.entry(
               "/legacy-inquiry/access-log", "/api/v1/legacy-inquiry/access-log?companyId={c}"),
           Map.entry("/renewal", "/api/v1/renewal/home?companyId={c}"),
+          Map.entry("/renewal/dashboard", "/api/v1/renewal/dashboard?companyId={c}"),
+          Map.entry(
+              "/renewal/accounts", "/api/v1/renewal/candidates?companyId={c}&tab=BUCKET_CLEAN"),
+          Map.entry(
+              "/renewal/processing-dashboard",
+              "/api/v1/renewal/processing-dashboard?companyId={c}"),
+          Map.entry("/renewal/budget", "/api/v1/renewal/budgets?companyId={c}&fiscalYear=2027"),
+          Map.entry("/renewal/audit-logs", "/api/v1/renewal/audit-logs?companyId={c}"),
           Map.entry("/renewal/expiry", "/api/v1/renewal/candidates?companyId={c}&tab=EXTRACTED"),
           Map.entry("/renewal/mine", "/api/v1/renewal/candidates?companyId={c}&mine=true"),
           Map.entry("/renewal/review", "/api/v1/renewal/candidates?companyId={c}&tab=REVIEW"),

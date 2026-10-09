@@ -32,6 +32,7 @@ import { DetailsTab } from './DetailsTab';
 import { HoldCoverTab } from './HoldCoverTab';
 import { AccountHistoryTab, HistoryTab, NotesTab } from './HistoryTabs';
 import { ChecksTab, ComputationsTab, InsurerTab, LettersTab } from './RecordTabs';
+import { AuditLogTable } from '../audit/AuditLogTable';
 import '../renewal.css';
 import { Notice } from '@/components/ui/Notice';
 import { LoadingPanel } from '@/components/ui/LoadingPanel';
@@ -47,6 +48,7 @@ const TABS = [
   { id: 'documents', label: 'Documents' },
   { id: 'notes', label: 'Remarks & Follow-ups' },
   { id: 'history', label: 'History' },
+  { id: 'audit', label: 'Audit Logs' },
 ] as const;
 
 type TabId = (typeof TABS)[number]['id'];
@@ -103,6 +105,8 @@ function Body({ tab, detail }: Readonly<{ tab: TabId; detail: CandidateDetail }>
       return <NotesTab detail={detail} />;
     case 'history':
       return <HistoryTab detail={detail} />;
+    case 'audit':
+      return <AuditLogTable filters={{ ref: detail.row.renewalRef }} showReference={false} />;
     default:
       return <DetailsTab detail={detail} />;
   }

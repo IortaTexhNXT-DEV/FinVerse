@@ -1,4 +1,4 @@
-import { FileOutput, Landmark, LayoutList, Receipt, ShieldCheck } from 'lucide-react';
+import { FileOutput, Gauge, Landmark, LayoutList, Receipt, ShieldCheck } from 'lucide-react';
 import { lazy } from 'react';
 import type { FeatureModule } from '@/navigation/types';
 
@@ -17,6 +17,14 @@ export const placementModule: FeatureModule = {
       permission: 'ACCOUNT_VIEW',
       alsoPermissions: ['PLACEMENT_MANAGE', 'BILLING_MANAGE'],
       component: lazy(() => import('./PlacementWorkbenchPage')),
+    },
+    {
+      path: '/placement/processing-dashboard',
+      label: 'Processing Dashboard',
+      icon: Gauge,
+      permission: 'PLACEMENT_MANAGE',
+      alsoPermissions: ['BOOKING_PROCESS', 'EPOLICY_MANAGE'],
+      component: lazy(() => import('../renewal/dashboard/ProcessingDashboardPage')),
     },
     {
       path: '/placement/slips',

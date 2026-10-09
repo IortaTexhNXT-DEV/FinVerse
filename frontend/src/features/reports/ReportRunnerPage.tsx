@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { saveFile } from '@/api/client';
 import { reportApi } from '@/api/reports';
 import type { ExportFormat, ReportResult } from '@/api/reports';
@@ -57,7 +57,11 @@ export default function ReportRunnerPage() {
   const { company, branchId } = useWorkspace();
   const catalogue = useQuery({ queryKey: ['report-catalogue'], queryFn: reportApi.catalogue });
   const entry = catalogue.data?.find((e) => e.code === code);
-  const [values, setValues] = useState<Record<string, string>>({});
+  const [search] = useSearchParams();
+  // A link from a dashboard figure opens the report with its parameters filled in.
+  const [values, setValues] = useState<Record<string, string>>(() =>
+    Object.fromEntries(search.entries()),
+  );
   const [checked, setChecked] = useState(false);
   const [filters, setFilters] = useState<ColumnFilters>({});
   const [print, setPrint] = useState<PrintOptions>(DEFAULT_PRINT);

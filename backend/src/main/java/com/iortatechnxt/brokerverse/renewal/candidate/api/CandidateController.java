@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.renewal.candidate.api;
 
 import com.iortatechnxt.brokerverse.common.api.ContentDispositions;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.messaging.domain.MessageFile;
 import com.iortatechnxt.brokerverse.renewal.candidate.api.dto.CandidateDtos.CandidateRow;
 import com.iortatechnxt.brokerverse.renewal.candidate.api.dto.CandidateRecordDtos.AssignmentView;
@@ -17,6 +18,7 @@ import com.iortatechnxt.brokerverse.renewal.candidate.api.dto.CandidateRecordDto
 import com.iortatechnxt.brokerverse.renewal.candidate.api.dto.CandidateRecordDtos.OverrideView;
 import com.iortatechnxt.brokerverse.renewal.candidate.service.AccountHistoryService;
 import com.iortatechnxt.brokerverse.renewal.candidate.service.AccountHistoryService.AccountHistory;
+import com.iortatechnxt.brokerverse.renewal.candidate.service.BucketPanels;
 import com.iortatechnxt.brokerverse.renewal.candidate.service.CandidateDocuments;
 import com.iortatechnxt.brokerverse.renewal.candidate.service.CandidateQueryService;
 import com.iortatechnxt.brokerverse.renewal.check.service.BlockingChecks;
@@ -28,7 +30,9 @@ import com.iortatechnxt.brokerverse.renewal.service.RenewalScope.Scope;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import java.time.Clock;
 import java.util.List;
+import java.util.Map;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -65,6 +69,8 @@ public class CandidateController {
   private final BlockingChecks blocking;
   private final CandidateDocuments documents;
   private final InitiationService initiation;
+  private final BucketPanels panels;
+  private final Clock clock;
 
   /**
    * Creates the controller.
@@ -75,6 +81,8 @@ public class CandidateController {
    * @param blocking blocking checks
    * @param documents downloads
    * @param initiation initiation
+   * @param panels bucket panels and sort
+   * @param clock clock (file name of the RMEL)
    */
   public CandidateController(
       CandidateQueryService queries,
@@ -82,13 +90,17 @@ public class CandidateController {
       AccountHistoryService history,
       BlockingChecks blocking,
       CandidateDocuments documents,
-      InitiationService initiation) {
+      InitiationService initiation,
+      BucketPanels panels,
+      Clock clock) {
     this.queries = queries;
     this.rows = rows;
     this.history = history;
     this.blocking = blocking;
     this.documents = documents;
     this.initiation = initiation;
+    this.panels = panels;
+    this.clock = clock;
   }
 
   /**
@@ -105,9 +117,11 @@ public class CandidateController {
   public PageResponse<CandidateRow> list(
       @ModelAttribute CandidateListParams params,
       @RequestParam(defaultValue = "0") int page,
-      @RequestParam(defaultValue = "200") int size) {
+      @RequestParam(defaultValue = "200") int size,
+      @RequestParam(required = false) String sort) {
     Scope scope = queries.scope(params.companyId());
-    Page<RenewalCandidate> chunk = queries.list(params.filter(), page, size);
+    Page<RenewalCandidate> chunk =
+        queries.list(panels.apply(params.filter()), page, size, BucketPanels.sort(sort));
     List<CandidateRow> mapped = rows.rows(chunk.getContent(), scope);
     return new PageResponse<>(
         mapped,
@@ -115,6 +129,17 @@ public class CandidateController {
         chunk.getSize(),
         chunk.getTotalElements(),
         chunk.getTotalPages());
+  }
+
+  /**
+   * The bucket panels in use (FRRN.002.05): the third panel is NON_RENEWABLE or EXCEPTION.
+   *
+   * @return setting
+   */
+  @GetMapping("/panels")
+  @PreAuthorize(VIEW)
+  public Map<String, String> panels() {
+    return Map.of("thirdBucket", panels.thirdBucket());
   }
 
   /**
@@ -126,7 +151,7 @@ public class CandidateController {
   @GetMapping("/count")
   @PreAuthorize(VIEW)
   public long count(@ModelAttribute CandidateListParams params) {
-    return queries.count(params.filter());
+    return queries.count(panels.apply(params.filter()));
   }
 
   /**
@@ -138,7 +163,12 @@ public class CandidateController {
   @GetMapping("/export.xlsx")
   @PreAuthorize(EXPORT)
   public ResponseEntity<byte[]> export(@ModelAttribute CandidateListParams params) {
-    return file(documents.export(params.filter()));
+    MessageFile list = documents.export(panels.apply(params.filter()));
+    return file(
+        new MessageFile(
+            BucketPanels.rmelFileName(params.expiryFrom(), BusinessClock.today(clock)),
+            list.mimeType(),
+            list.content()));
   }
 
   /**

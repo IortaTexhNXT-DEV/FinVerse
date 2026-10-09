@@ -22,6 +22,72 @@ export const RENEWAL_HELP: HelpSection = {
       ],
     },
     {
+      name: 'Renewal Dashboard',
+      path: '/renewal/dashboard',
+      summary:
+        'Production against the Annual Renewal Budget, the pipeline by business type and stage, the outstanding renewal accounts by ageing, the closing ratio, the biggest open deals, the renewal persistency, the product mix, the insurer approvals and the KPI cards of your scope.',
+      workflow: [
+        'Choose the period, the market segment and the Account Officer: every figure follows the filters.',
+        'Click a figure or a card to open the accounts it counts; Export and Print opens the same list in the Report Centre.',
+      ],
+      controls: [
+        'The figures and the lists use the same accounts, so a list holds exactly the accounts of its figure.',
+        'Percentages are shown with two decimals; a percentage of a zero base is shown as a dash.',
+      ],
+    },
+    {
+      name: 'Renewal Accounts',
+      path: '/renewal/accounts',
+      summary:
+        'The renewal accounts of the current and previous years in four panels: Clean, Review, Non-Renewable (or Exception, by the setting) and All, with the same columns in every panel.',
+      workflow: [
+        'Scroll the list: further rows load as you scroll; the number of renewal accounts is shown above.',
+        'Sort by a column header and search across the reference, invoice, policy, PN and client.',
+        'Select a row to open the renewal account.',
+      ],
+      controls: [
+        'A renewal account with an open claim is never in the Clean panel.',
+        'An account locked after posting and placement shows Locked after placement.',
+      ],
+    },
+    {
+      name: 'Processing Dashboard',
+      path: '/renewal/processing-dashboard',
+      summary:
+        'One dashboard of New Business and renewal processing: For Placement, For Booking, With and Without Policy, For Releasing, Released, Unreleased, Directly Booked and Returned, in the Combined, New Business or Renewal view.',
+      workflow: [
+        'Click a card to list its accounts; For Placement has the Unassigned and Assigned tabs and the assignment of the Placement Processor.',
+        'Export and Print opens the list in the Report Centre.',
+      ],
+      controls: [
+        'Ageing counts business days; a placement sent after the cut-off hour counts from the next business day.',
+      ],
+    },
+    {
+      name: 'Audit Logs',
+      path: '/renewal/audit-logs',
+      summary:
+        'Every recorded activity on the renewal accounts: the actions, the status changes, the dispositions and the classifications, with the old and new values, the user and the time.',
+      workflow: [
+        'Filter by date range, action type, reference number and user.',
+        'Export the entries of the filters as CSV or Excel.',
+      ],
+      controls: ['The entries cannot be changed or deleted.'],
+    },
+    {
+      name: 'Renewal Annual Budget',
+      path: '/renewal/budget',
+      summary:
+        'The new, renewal and organic budgets of a fiscal year by market segment and hierarchy, with the annual totals, the history of every change and the budget upload.',
+      workflow: [
+        'New Budget creates a record; Update Budget changes its monthly amounts; View Budget History lists the previous and updated values.',
+        'Upload Budget loads a file of the template, one row per record and month.',
+      ],
+      controls: [
+        'Fiscal year and market segment are required; the region for the segments other than Corporate, the team and sub-team for Corporate; amounts cannot be negative.',
+      ],
+    },
+    {
       name: 'Expiry List',
       path: '/renewal/expiry',
       summary:

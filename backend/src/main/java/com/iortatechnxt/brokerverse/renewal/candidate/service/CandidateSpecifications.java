@@ -122,7 +122,7 @@ final class CandidateSpecifications {
       case ATTENTION -> cb.isNotNull(root.get("attention").get("flag"));
       case NAL_DUE -> closingDue(root, cb, CandidateExpiry.NAL);
       case NRL_DUE -> closingDue(root, cb, CandidateExpiry.NRL);
-      default -> cb.conjunction();
+      default -> BucketPanelSpecifications.of(root, cb, tab);
     };
   }
 

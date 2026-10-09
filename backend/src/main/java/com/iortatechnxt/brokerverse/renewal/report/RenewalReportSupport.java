@@ -51,8 +51,12 @@ public class RenewalReportSupport {
           + " and (cast(:stage_all as boolean) or ((c.stage = any(cast(:stage as varchar[])))"
           + " <> cast(:stage_ex as boolean)))"
           + " and (cast(:scope_all as boolean) or c.owner_unit = any(cast(:scope_units as varchar[]))"
-          + " or c.assigned_ao = :scope_user or exists (select 1 from rnw_assignment sa"
-          + " where sa.candidate_id = c.id and sa.role = 'AO' and sa.username = :scope_user))";
+          + " or (cast(:scope_role as varchar) = 'AO' and (c.assigned_ao = :scope_user"
+          + " or exists (select 1 from rnw_assignment sa"
+          + " where sa.candidate_id = c.id and sa.role = 'AO' and sa.username = :scope_user)))"
+          + " or (cast(:scope_role as varchar) = 'PO' and (c.assigned_po = :scope_user"
+          + " or exists (select 1 from rnw_assignment sp"
+          + " where sp.candidate_id = c.id and sp.role = 'PO' and sp.username = :scope_user))))";
 
   private static final List<String[]> CODE_SETS =
       List.of(
@@ -142,7 +146,16 @@ public class RenewalReportSupport {
         .with(
             "scope_units",
             s.units().isEmpty() ? new String[] {""} : s.units().toArray(String[]::new))
-        .with("scope_user", s.kind() == RenewalScope.Kind.ASSIGNED ? s.username() : "");
+        .with("scope_user", s.username() == null ? "" : s.username())
+        .with("scope_role", role(s.kind()));
+  }
+
+  private static String role(RenewalScope.Kind kind) {
+    return switch (kind) {
+      case ASSIGNED -> "AO";
+      case ASSIGNED_PO -> "PO";
+      default -> "";
+    };
   }
 
   /**

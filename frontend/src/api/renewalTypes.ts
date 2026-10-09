@@ -150,6 +150,19 @@ export interface CandidateRow {
   daysToExpiry: number;
   /** Names of the insurer and the owner unit, read by the server for every Renewal user. */
   names?: { insurer: string | null; ownerUnit: string | null; product?: string | null };
+  /** The columns BDOI's FRS adds to the lists (renewal status, invoice, address, padlock...). */
+  bdoi?: BucketColumns | null;
+}
+
+/** BDOI's list columns of a renewal (FRRN.002.05, FRRN.002.08). */
+export interface BucketColumns {
+  statusName: string;
+  invoiceNo: string | null;
+  commissionAmount: number | null;
+  mailingAddress: string | null;
+  placementLocked: boolean;
+  endorsedOn: string | null;
+  returnRemarks: string | null;
 }
 
 export interface Lifecycle {

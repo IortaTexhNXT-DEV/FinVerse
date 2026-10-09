@@ -25,6 +25,16 @@ export const PLACEMENT_HELP: HelpSection = {
       ],
     },
     {
+      name: 'Processing Dashboard',
+      path: '/placement/processing-dashboard',
+      summary:
+        'One dashboard of New Business and renewal processing: the accounts for placement, for booking, with and without policy, for releasing, released and unreleased, directly booked and returned.',
+      workflow: [
+        'Choose the Combined, New Business or Renewal view and click a card to list its accounts.',
+      ],
+      controls: ['Ageing counts business days from the date the account was submitted or placed.'],
+    },
+    {
       name: 'Placement Slips',
       path: '/placement/slips',
       summary:

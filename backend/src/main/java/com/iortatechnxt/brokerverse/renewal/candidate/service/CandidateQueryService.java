@@ -115,8 +115,23 @@ public class CandidateQueryService {
    * @return chunk with the total row count
    */
   public Page<RenewalCandidate> list(CandidateFilter filter, int page, int size) {
+    return list(filter, page, size, null);
+  }
+
+  /**
+   * A chunk of a renewal list in the user's scope, in a given order.
+   *
+   * @param filter criteria
+   * @param page chunk number
+   * @param size chunk size (at most {@value #MAX_CHUNK})
+   * @param sort order, or null for the default order (urgent first, then by expiry)
+   * @return chunk with the total row count
+   */
+  public Page<RenewalCandidate> list(CandidateFilter filter, int page, int size, Sort sort) {
     Scope userScope = scope.current(filter.companyId());
-    Pageable pageable = PageRequest.of(Math.max(page, 0), Math.clamp(size, 1, MAX_CHUNK), ORDER);
+    Pageable pageable =
+        PageRequest.of(
+            Math.max(page, 0), Math.clamp(size, 1, MAX_CHUNK), sort == null ? ORDER : sort);
     return candidates.findAll(
         userScope
             .specification()

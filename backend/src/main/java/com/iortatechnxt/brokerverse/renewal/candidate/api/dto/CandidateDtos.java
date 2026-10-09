@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.renewal.candidate.api.dto;
 
+import com.iortatechnxt.brokerverse.renewal.candidate.service.BucketColumnsReader.BucketColumns;
 import com.iortatechnxt.brokerverse.renewal.domain.CandidateFlags;
 import com.iortatechnxt.brokerverse.renewal.domain.CandidateSnapshot;
 import com.iortatechnxt.brokerverse.renewal.domain.CandidateSnapshot.SnapshotClient;
@@ -54,7 +55,8 @@ public final class CandidateDtos {
       FlagChips flags,
       LocalDate expiry,
       long daysToExpiry,
-      Names names) {
+      Names names,
+      BucketColumns bdoi) {
 
     /**
      * Maps a candidate.
@@ -63,10 +65,15 @@ public final class CandidateDtos {
      * @param money premium, outstanding and claims columns
      * @param daysToExpiry days to expiry
      * @param names names of the insurer and the owner unit
+     * @param bdoi BDOI's list columns
      * @return row
      */
     public static CandidateRow of(
-        RenewalCandidate c, MoneyColumns money, long daysToExpiry, Names names) {
+        RenewalCandidate c,
+        MoneyColumns money,
+        long daysToExpiry,
+        Names names,
+        BucketColumns bdoi) {
       return new CandidateRow(
           c.getRenewalRef(),
           c.getStage().name(),
@@ -81,7 +88,8 @@ public final class CandidateDtos {
           FlagChips.of(c),
           c.getExpiryDate(),
           daysToExpiry,
-          names);
+          names,
+          bdoi);
     }
   }
 

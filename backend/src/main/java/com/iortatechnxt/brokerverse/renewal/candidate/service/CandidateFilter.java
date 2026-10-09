@@ -154,6 +154,24 @@ public record CandidateFilter(
     /** New Business path. */
     NB_PATH,
     /** Closed and renewed. */
-    CLOSED
+    CLOSED,
+    /** Bucket panel Clean (FRRN.002.05): Clean, not Not for Renewal. */
+    BUCKET_CLEAN,
+    /** Bucket panel Review: Review (and Exception when the third bucket is Non-Renewable). */
+    BUCKET_REVIEW,
+    /** Bucket panel Review of the Clean / Review / Exception setting: Review only. */
+    BUCKET_REVIEW_ONLY,
+    /** Bucket panel Non-Renewable: disposition Not for Renewal. */
+    BUCKET_NON_RENEWABLE
+  }
+
+  /**
+   * The same criteria on another tab.
+   *
+   * @param other tab
+   * @return criteria
+   */
+  public CandidateFilter withTab(Tab other) {
+    return new CandidateFilter(companyId, other, search, expiryFrom, expiryTo, codes, flags);
   }
 }

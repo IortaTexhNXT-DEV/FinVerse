@@ -10,6 +10,8 @@ import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.renewal.candidate.api.dto.CandidateDtos.CandidateRow;
 import com.iortatechnxt.brokerverse.renewal.candidate.api.dto.CandidateDtos.MoneyColumns;
 import com.iortatechnxt.brokerverse.renewal.candidate.api.dto.CandidateDtos.Names;
+import com.iortatechnxt.brokerverse.renewal.candidate.service.BucketColumnsReader;
+import com.iortatechnxt.brokerverse.renewal.candidate.service.BucketColumnsReader.BucketColumns;
 import com.iortatechnxt.brokerverse.renewal.check.service.ClaimsCheck;
 import com.iortatechnxt.brokerverse.renewal.check.service.OutstandingPremiumCheck;
 import com.iortatechnxt.brokerverse.renewal.domain.CandidateSnapshot.SnapshotPremium;
@@ -27,6 +29,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -49,9 +52,10 @@ public class CandidateRowMapper {
   private final InsurerProfileRepository insurers;
   private final SalesUnitRepository units;
   private final RiskProductRepository products;
+  private final BucketColumnsReader bucketColumns;
 
   /**
-   * Creates the mapper.
+   * Creates the mapper without BDOI's list columns (unit tests of the row mapping).
    *
    * @param results check results
    * @param clock clock
@@ -65,11 +69,33 @@ public class CandidateRowMapper {
       InsurerProfileRepository insurers,
       SalesUnitRepository units,
       RiskProductRepository products) {
+    this(results, clock, insurers, units, products, null);
+  }
+
+  /**
+   * Creates the mapper.
+   *
+   * @param results check results
+   * @param clock clock
+   * @param insurers insurers (names)
+   * @param units sales units (names)
+   * @param products products (names)
+   * @param bucketColumns BDOI's list columns
+   */
+  @Autowired
+  public CandidateRowMapper(
+      CheckResultRepository results,
+      Clock clock,
+      InsurerProfileRepository insurers,
+      SalesUnitRepository units,
+      RiskProductRepository products,
+      BucketColumnsReader bucketColumns) {
     this.results = results;
     this.clock = clock;
     this.insurers = insurers;
     this.units = units;
     this.products = products;
+    this.bucketColumns = bucketColumns;
   }
 
   /**
@@ -82,9 +108,18 @@ public class CandidateRowMapper {
   public List<CandidateRow> rows(List<RenewalCandidate> candidates, Scope scope) {
     LocalDate today = BusinessClock.today(clock);
     Map<String, String> names = new HashMap<>();
+    Map<Long, BucketColumns> bdoi =
+        bucketColumns == null ? Map.of() : bucketColumns.read(candidates);
     if (scope.hidePremium()) {
       return candidates.stream()
-          .map(c -> CandidateRow.of(c, MoneyColumns.HIDDEN, c.daysToExpiry(today), names(c, names)))
+          .map(
+              c ->
+                  CandidateRow.of(
+                      c,
+                      MoneyColumns.HIDDEN,
+                      c.daysToExpiry(today),
+                      names(c, names),
+                      bdoi.get(c.getId())))
           .toList();
     }
     Map<Long, Map<String, CheckResult>> latest = latest(candidates);
@@ -95,7 +130,8 @@ public class CandidateRowMapper {
                     c,
                     money(c, latest.getOrDefault(c.getId(), Map.of())),
                     c.daysToExpiry(today),
-                    names(c, names)))
+                    names(c, names),
+                    bdoi.get(c.getId())))
         .toList();
   }
 

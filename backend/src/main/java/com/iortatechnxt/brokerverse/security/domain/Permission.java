@@ -444,6 +444,16 @@ public enum Permission {
   RNW_TEMPLATE_MAINTAIN,
   // Package version of a migrated policy whose legacy package is not mapped (DMQ36)
   RNW_PACKAGE_REMAP,
+  // Annual Renewal Budget maintenance (BDOI Renewal FRS FRRN.042; V2800)
+  RNW_BUDGET,
+  // KYC review activities of renewal accounts (FRRN.039.02)
+  RNW_KYC,
+  // RMU Account Officer codes (FRRN.041)
+  RNW_RMU_MAINTAIN,
+  // Audit Logs menu of the Renewal module (FRRN.043)
+  RNW_AUDIT_VIEW,
+  // CLPC billing files of renewal accounts (FRRN.027)
+  RNW_BILLING,
 
   // Submitted Policies (BDOI BRD-12). See docs/architecture/SUBMITTED_POLICIES_DESIGN.md section
   // 6.1 and V1070. The data scope (segments, own records of an AO) is applied by SbmScopeService

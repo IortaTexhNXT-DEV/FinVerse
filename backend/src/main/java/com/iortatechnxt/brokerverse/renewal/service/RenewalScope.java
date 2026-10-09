@@ -7,6 +7,7 @@ import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalAssignment;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalCandidate;
+import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import jakarta.persistence.criteria.Subquery;
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -29,6 +30,9 @@ import org.springframework.transaction.annotation.Transactional;
  *   <li>A Marketing Team Leader ({@code RNW_REVIEW}) sees the renewals of his sales units: his own
  *       team and every unit under a unit he heads.
  *   <li>A Marketing AO sees the renewals ever assigned to him (BRRN.011).
+ *   <li>A Processing Officer without the assignment function sees the renewals ever assigned to him
+ *       when the parameter {@value #PROCESSING_SCOPE} is ASSIGNED (BDOI's role-based access: "a
+ *       user can manage only records assigned to him"); with ALL he sees every renewal.
  * </ul>
  *
  * <p>Jobs (no user) see everything.
@@ -37,9 +41,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class RenewalScope {
 
+  /** Parameter: ASSIGNED (a Processing Officer sees his renewals) or ALL. */
+  public static final String PROCESSING_SCOPE = "RNW_PROCESSING_SCOPE";
+
   private final CurrentUser currentUser;
   private final SalesOrganisationService sales;
   private final SalesUnitRepository units;
+  private final SystemParameterService parameters;
 
   /**
    * Creates the scope.
@@ -47,12 +55,17 @@ public class RenewalScope {
    * @param currentUser current user
    * @param sales sales organisation (the user's team)
    * @param units sales units (units headed by the user)
+   * @param parameters system parameters (processing scope)
    */
   public RenewalScope(
-      CurrentUser currentUser, SalesOrganisationService sales, SalesUnitRepository units) {
+      CurrentUser currentUser,
+      SalesOrganisationService sales,
+      SalesUnitRepository units,
+      SystemParameterService parameters) {
     this.currentUser = currentUser;
     this.sales = sales;
     this.units = units;
+    this.parameters = parameters;
   }
 
   /**
@@ -70,13 +83,26 @@ public class RenewalScope {
         (has(RenewalCodes.LAMD_UPLOAD) || has(RenewalCodes.FOLLOWUP))
             && !has(RenewalCodes.DISPOSE)
             && !has(RenewalCodes.PROCESS);
+    Kind kind = kind();
+    return switch (kind) {
+      case ALL -> Scope.all(hidePremium);
+      case UNITS -> new Scope(Kind.UNITS, unitsOf(companyId, user), user, hidePremium);
+      default -> new Scope(kind, Set.of(), user, hidePremium);
+    };
+  }
+
+  private Kind kind() {
     if (!has(RenewalCodes.PROCESS) && has(RenewalCodes.REVIEW)) {
-      return new Scope(Kind.UNITS, unitsOf(companyId, user), user, hidePremium);
+      return Kind.UNITS;
     }
     if (!has(RenewalCodes.PROCESS) && has(RenewalCodes.DISPOSE)) {
-      return new Scope(Kind.ASSIGNED, Set.of(), user, hidePremium);
+      return Kind.ASSIGNED;
     }
-    return Scope.all(hidePremium);
+    boolean ownOnly =
+        has(RenewalCodes.PROCESS)
+            && !has(RenewalCodes.PROCESS_ASSIGN)
+            && "ASSIGNED".equals(parameters.text(PROCESSING_SCOPE, "ALL").strip());
+    return ownOnly ? Kind.ASSIGNED_PO : Kind.ALL;
   }
 
   /**
@@ -123,6 +149,8 @@ public class RenewalScope {
           case UNITS -> scope.units().contains(candidate.getOwnerUnit());
           case ASSIGNED ->
               assignedToUser || Objects.equals(candidate.getAssignedAo(), scope.username());
+          case ASSIGNED_PO ->
+              assignedToUser || Objects.equals(candidate.getAssignedPo(), scope.username());
         };
     if (!visible) {
       throw new ResourceNotFoundException("Renewal", candidate.getRenewalRef());
@@ -140,7 +168,9 @@ public class RenewalScope {
     /** The renewals of the user's sales units. */
     UNITS,
     /** The renewals ever assigned to the user. */
-    ASSIGNED
+    ASSIGNED,
+    /** The renewals ever assigned to the user as Processing Officer. */
+    ASSIGNED_PO
   }
 
   /**
@@ -179,17 +209,19 @@ public class RenewalScope {
         case UNITS ->
             (root, query, cb) ->
                 units.isEmpty() ? cb.disjunction() : root.get("ownerUnit").in(units);
-        case ASSIGNED ->
-            (root, query, cb) -> {
-              Subquery<Long> assigned = query.subquery(Long.class);
-              var a = assigned.from(RenewalAssignment.class);
-              assigned
-                  .select(a.get("candidateId"))
-                  .where(
-                      cb.equal(a.get("username"), username),
-                      cb.equal(a.get("role"), RenewalAssignment.Role.AO));
-              return cb.or(cb.equal(root.get("assignedAo"), username), root.get("id").in(assigned));
-            };
+        case ASSIGNED -> assigned(RenewalAssignment.Role.AO, "assignedAo");
+        case ASSIGNED_PO -> assigned(RenewalAssignment.Role.PO, "assignedPo");
+      };
+    }
+
+    private Specification<RenewalCandidate> assigned(RenewalAssignment.Role role, String field) {
+      return (root, query, cb) -> {
+        Subquery<Long> assigned = query.subquery(Long.class);
+        var a = assigned.from(RenewalAssignment.class);
+        assigned
+            .select(a.get("candidateId"))
+            .where(cb.equal(a.get("username"), username), cb.equal(a.get("role"), role));
+        return cb.or(cb.equal(root.get(field), username), root.get("id").in(assigned));
       };
     }
   }

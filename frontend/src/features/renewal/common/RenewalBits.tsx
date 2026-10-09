@@ -7,6 +7,7 @@ import { Modal } from '@/components/ui/Modal';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tag } from '@/components/ui/Tag';
 import { bucketTone } from './renewalCodes';
+import { formatDate } from '@/utils/format';
 import { expiryChips } from './expiryChips';
 
 const BUCKET_LABELS: Record<string, string> = {
@@ -78,7 +79,15 @@ const CHIPS: { key: BooleanFlag; label: string; tone: ChipTone }[] = [
 
 /** The flag chips of a renewal, next to its reference (never inside the pill). */
 export function FlagChips({ row }: Readonly<{ row: CandidateRow }>) {
-  const chips = [...CHIPS.filter((c) => row.flags[c.key]), ...expiryChips(row.flags)];
+  const chips = [...CHIPS.filter((c) => row.flags[c.key]), ...expiryChips(row.flags)].map((c) =>
+    c.key === 'endorsed' && row.bdoi?.endorsedOn
+      ? { ...c, label: `Endorsed ${formatDate(row.bdoi.endorsedOn)}` }
+      : c,
+  );
+  if (row.bdoi?.placementLocked === true) {
+    chips.push({ key: 'placementLocked', label: 'Locked after placement', tone: 'neutral' });
+  }
+  const remarks = row.flags.returned ? row.bdoi?.returnRemarks : null;
   if (chips.length === 0) {
     return null;
   }
@@ -89,6 +98,7 @@ export function FlagChips({ row }: Readonly<{ row: CandidateRow }>) {
           {c.label}
         </Tag>
       ))}
+      {remarks && <span className="muted">{remarks}</span>}
     </span>
   );
 }

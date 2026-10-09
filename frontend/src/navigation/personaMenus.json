@@ -476,9 +476,11 @@
           "permissions": [
             "RNW_ACCEPT",
             "RNW_ASSIGN",
+            "RNW_AUDIT_VIEW",
             "RNW_DISPOSE",
             "RNW_EXPORT",
             "RNW_EXTRACT",
+            "RNW_KYC",
             "RNW_OVERRIDE",
             "RNW_RA_GENERATE",
             "RNW_RA_SEND",
@@ -488,11 +490,14 @@
           ],
           "screens": [
             "/renewal",
+            "/renewal/dashboard",
+            "/renewal/accounts",
             "/renewal/expiry",
             "/renewal/mine",
             "/renewal/review",
             "/renewal/transfers",
-            "/renewal/letters"
+            "/renewal/letters",
+            "/renewal/audit-logs"
           ]
         },
         "RNW:MKT_AO": {
@@ -504,6 +509,7 @@
             "RNW_ASSIGN",
             "RNW_DISPOSE",
             "RNW_EXPORT",
+            "RNW_KYC",
             "RNW_RA_GENERATE",
             "RNW_RA_SEND",
             "RNW_REPORT_VIEW",
@@ -511,6 +517,8 @@
           ],
           "screens": [
             "/renewal",
+            "/renewal/dashboard",
+            "/renewal/accounts",
             "/renewal/expiry",
             "/renewal/mine",
             "/renewal/transfers",
@@ -523,6 +531,8 @@
           "permissionScope": "RNW_",
           "permissions": [
             "RNW_ACCEPT",
+            "RNW_AUDIT_VIEW",
+            "RNW_BILLING",
             "RNW_EXPORT",
             "RNW_EXTRACT",
             "RNW_INSURER",
@@ -537,10 +547,14 @@
           ],
           "screens": [
             "/renewal",
+            "/renewal/dashboard",
+            "/renewal/accounts",
+            "/renewal/processing-dashboard",
             "/renewal/expiry",
             "/renewal/processing",
             "/renewal/insurer",
             "/renewal/letters",
+            "/renewal/audit-logs",
             "/renewal/setup"
           ]
         },
@@ -550,6 +564,8 @@
           "permissionScope": "RNW_",
           "permissions": [
             "RNW_ACCEPT",
+            "RNW_BILLING",
+            "RNW_EXPORT",
             "RNW_INSURER",
             "RNW_PACKAGE_REMAP",
             "RNW_PROCESS",
@@ -561,6 +577,9 @@
           ],
           "screens": [
             "/renewal",
+            "/renewal/dashboard",
+            "/renewal/accounts",
+            "/renewal/processing-dashboard",
             "/renewal/expiry",
             "/renewal/processing",
             "/renewal/insurer",
@@ -572,8 +591,24 @@
           "role": "BUSINESS_ADMIN",
           "seedUser": "badmin",
           "permissionScope": "RNW_",
-          "permissions": ["RNW_REPORT_VIEW", "RNW_SETUP", "RNW_TEMPLATE_MAINTAIN", "RNW_VIEW"],
-          "screens": ["/renewal", "/renewal/expiry", "/renewal/setup"]
+          "permissions": [
+            "RNW_AUDIT_VIEW",
+            "RNW_BUDGET",
+            "RNW_REPORT_VIEW",
+            "RNW_RMU_MAINTAIN",
+            "RNW_SETUP",
+            "RNW_TEMPLATE_MAINTAIN",
+            "RNW_VIEW"
+          ],
+          "screens": [
+            "/renewal",
+            "/renewal/dashboard",
+            "/renewal/accounts",
+            "/renewal/expiry",
+            "/renewal/audit-logs",
+            "/renewal/budget",
+            "/renewal/setup"
+          ]
         },
         "RNW:LAMD": {
           "role": "LAMD",

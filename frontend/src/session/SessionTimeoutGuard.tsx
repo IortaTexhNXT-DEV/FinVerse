@@ -2,20 +2,80 @@ import { useQuery } from '@tanstack/react-query';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { tokenStore } from '@/api/client';
 import { systemApi } from '@/api/system';
+import type { SessionPolicy } from '@/api/system';
 import { useAuth } from '@/auth/authContext';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { useToast } from '@/components/ui/toastContext';
+import { authApi } from '@/api/auth';
 import { formatDateTime } from '@/utils/format';
 import { createIdleTracker } from './idleTimer';
 import type { IdlePhase, IdleTracker } from './idleTimer';
 import { tabSession } from './tabSession';
+import { inactivityText, markTimedOut } from './timedOut';
 import { useSessionExpiry } from './useSessionExpiry';
 
 const ACTIVITY_EVENTS = ['mousedown', 'keydown', 'wheel', 'touchstart', 'scroll'] as const;
-const DEFAULT_TIMEOUT_MINUTES = 30;
-const DEFAULT_WARNING_SECONDS = 900;
-const DEFAULT_EXPIRY_WARNING_MINUTES = 30;
+/** The delivered values, for what the server does not say. */
+const DEFAULT_POLICY: Required<SessionPolicy> = {
+  timeoutMinutes: 30,
+  warningSeconds: 900,
+  expiryWarningMinutes: 30,
+  idleWarningMinutes: 15,
+  bdoiDialog: true,
+  timeoutPage: true,
+};
+
+interface InactivityDialogProps {
+  open: boolean;
+  bdoiDialog: boolean;
+  idleMinutes: number;
+  secondsLeft: number;
+  onStay: () => void;
+  onLogOut: () => void;
+}
+
+/** The inactivity warning: BDOI's text and buttons, or the earlier wording. */
+function InactivityDialog({
+  open,
+  bdoiDialog,
+  idleMinutes,
+  secondsLeft,
+  onStay,
+  onLogOut,
+}: Readonly<InactivityDialogProps>) {
+  return (
+    <Modal
+      title="Your session is about to expire"
+      open={open}
+      onClose={onStay}
+      footer={
+        <>
+          <Button variant="secondary" onClick={onLogOut}>
+            {bdoiDialog ? 'Log Out' : 'Sign Out Now'}
+          </Button>
+          <Button variant="accent" onClick={onStay}>
+            {bdoiDialog ? 'Stay Logged In' : 'Stay Signed In'}
+          </Button>
+        </>
+      }
+    >
+      {bdoiDialog ? (
+        <>
+          <p>{inactivityText(idleMinutes)}</p>
+          <p role="timer" aria-live="polite" className="muted">
+            Your session ends in <strong>{secondsLeft}</strong> seconds.
+          </p>
+        </>
+      ) : (
+        <p role="timer" aria-live="polite">
+          You have been inactive for a while. For your security you will be signed out in{' '}
+          <strong>{secondsLeft}</strong> seconds.
+        </p>
+      )}
+    </Modal>
+  );
+}
 /** Activity is shared with the other tabs at most this often. */
 const SHARE_ACTIVITY_MS = 30_000;
 
@@ -44,6 +104,9 @@ function ExpiryWarning({ minutes, onClose }: Readonly<{ minutes: number; onClose
  * Session policy (BRNB.040/082): warns after the configured inactivity (SESSION_IDLE_WARNING_MINUTES)
  * and signs out at SESSION_TIMEOUT_MINUTES; warns SESSION_EXPIRY_WARNING_MINUTES before the
  * system-triggered sign-out at the token expiry. Activity in any tab keeps every tab signed in.
+ * With SESSION_BDOI_DIALOG the warning carries BDOI's text and the buttons Stay Logged In and Log
+ * Out (FRUM.001.03) and is recorded in the audit trail; with SESSION_TIMEOUT_PAGE the inactivity
+ * sign-out opens the page "Your session timed out" (FRUM.001.04).
  */
 export function SessionTimeoutGuard() {
   const { logout } = useAuth();
@@ -57,9 +120,14 @@ export function SessionTimeoutGuard() {
   const [secondsLeft, setSecondsLeft] = useState(0);
   const tracker = useRef<IdleTracker | null>(null);
 
-  const timeoutMinutes = policy.data?.timeoutMinutes ?? DEFAULT_TIMEOUT_MINUTES;
-  const warningSeconds = policy.data?.warningSeconds ?? DEFAULT_WARNING_SECONDS;
-  const expiryWarning = policy.data?.expiryWarningMinutes ?? DEFAULT_EXPIRY_WARNING_MINUTES;
+  const {
+    timeoutMinutes,
+    warningSeconds,
+    expiryWarningMinutes: expiryWarning,
+    idleWarningMinutes: idleMinutes,
+    bdoiDialog,
+    timeoutPage,
+  } = { ...DEFAULT_POLICY, ...policy.data };
 
   const onExpired = useCallback(() => {
     toast.error('Your session has ended. Please sign in again.');
@@ -70,14 +138,27 @@ export function SessionTimeoutGuard() {
   useEffect(() => {
     const sync = tabSession();
     let lastShared = 0;
+    let warned = false;
     const instance = createIdleTracker({
       timeoutMs: timeoutMinutes * 60_000,
       warningMs: warningSeconds * 1000,
       onChange: (next, left) => {
         setPhase(next);
         setSecondsLeft(left);
+        if (next === 'warning' && !warned) {
+          warned = true;
+          authApi.reportInactivity().catch(() => undefined);
+        } else if (next === 'active') {
+          warned = false;
+        }
         if (next === 'expired') {
-          toast.error(`You were signed out after ${String(timeoutMinutes)} minutes of inactivity.`);
+          if (timeoutPage) {
+            markTimedOut();
+          } else {
+            toast.error(
+              `You were signed out after ${String(timeoutMinutes)} minutes of inactivity.`,
+            );
+          }
           logout('IDLE_TIMEOUT');
         }
       },
@@ -107,7 +188,7 @@ export function SessionTimeoutGuard() {
       unsubscribe();
       ACTIVITY_EVENTS.forEach((e) => window.removeEventListener(e, onActivity));
     };
-  }, [timeoutMinutes, warningSeconds, logout, toast]);
+  }, [timeoutMinutes, warningSeconds, timeoutPage, logout, toast]);
 
   const stay = () => {
     tracker.current?.extend();
@@ -116,26 +197,14 @@ export function SessionTimeoutGuard() {
 
   return (
     <>
-      <Modal
-        title="Your session is about to expire"
+      <InactivityDialog
         open={phase === 'warning'}
-        onClose={stay}
-        footer={
-          <>
-            <Button variant="secondary" onClick={() => logout()}>
-              Sign Out Now
-            </Button>
-            <Button variant="accent" onClick={stay}>
-              Stay Signed In
-            </Button>
-          </>
-        }
-      >
-        <p role="timer" aria-live="polite">
-          You have been inactive for a while. For your security you will be signed out in{' '}
-          <strong>{secondsLeft}</strong> seconds.
-        </p>
-      </Modal>
+        bdoiDialog={bdoiDialog}
+        idleMinutes={idleMinutes}
+        secondsLeft={secondsLeft}
+        onStay={stay}
+        onLogOut={() => logout()}
+      />
       {expiry.phase === 'warning' && !expiry.dismissed && phase !== 'warning' && (
         <ExpiryWarning minutes={expiry.minutesLeft} onClose={expiry.dismiss} />
       )}

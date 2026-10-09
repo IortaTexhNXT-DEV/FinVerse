@@ -208,7 +208,7 @@ export const HELP_SECTIONS: HelpSection[] = [
           'Recent sessions: your sign-ins with the last activity and how each session ended (log-out, inactivity, end of session, ended by the administrator or account locked).',
         ],
         controls: [
-          'A new password has at least 10 characters with upper and lower case letters, a digit and a symbol; it must differ from your last PASSWORD_HISTORY_COUNT (8) passwords, cannot be changed again within PASSWORD_MIN_AGE_DAYS (1) and expires after PASSWORD_MAX_AGE_DAYS (90). You are told 7 days before it expires.',
+          'A new password has at least 10 characters with upper and lower case letters, a digit and a symbol; it must differ from your last PASSWORD_HISTORY_COUNT (10) passwords, cannot be changed again within PASSWORD_MIN_AGE_DAYS (1) and expires after PASSWORD_MAX_AGE_DAYS (90). You are told 7 days before it expires.',
           'After an administrator reset, on first use or once it has expired, you must change the password before the home page opens. Forgot password? on the login page e-mails a link that works once, within 30 minutes.',
           'You are signed out automatically after the configured period of inactivity; a warning appears after SESSION_IDLE_WARNING_MINUTES (15) of inactivity.',
           'The session also ends at a fixed time after sign-in; a warning appears SESSION_EXPIRY_WARNING_MINUTES (30) before. While you work, the access to the system is renewed in the background every few minutes (ACCESS_TOKEN_MINUTES).',

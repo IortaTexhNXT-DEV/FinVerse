@@ -5,6 +5,7 @@ import type { PasswordChangeReason } from '@/api/auth';
 import { api, onUnauthorized, tokenStore } from '@/api/client';
 import type { LoginResponse, UserProfile } from '@/api/types';
 import { tabSession } from '@/session/tabSession';
+import { clearTimedOut } from '@/session/timedOut';
 import type { SharedSession } from '@/session/tabSync';
 import { AuthContext } from './authContext';
 import type { SignOutReason } from './authContext';
@@ -100,6 +101,9 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
         const query = reason === undefined ? '' : `?reason=${reason}`;
         api.post(`/auth/logout${query}`).catch(() => undefined);
       }
+      if (reason === undefined) {
+        clearTimedOut();
+      }
       signOutHere();
       tabSession().announceLogout();
     },
@@ -155,6 +159,7 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
       return;
     }
     tokenStore.set(result.accessToken, result.expiresAt, result.accessTokenExpiresAt);
+    clearTimedOut();
     rememberDevice(result.user.username, result.deviceToken);
     setPasswordChange(
       result.mustChangePassword === true ? (result.passwordChangeReason ?? 'RESET') : null,

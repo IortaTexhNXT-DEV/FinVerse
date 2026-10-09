@@ -34,7 +34,7 @@ public class AuthPasswordPolicy {
   /** Parameter: days before a changed password may be changed again. */
   public static final String MIN_AGE_DAYS = "PASSWORD_MIN_AGE_DAYS";
 
-  private static final int DEFAULT_HISTORY = 8;
+  private static final int DEFAULT_HISTORY = 10;
   private static final int DEFAULT_MAX_AGE = 90;
   private static final int DEFAULT_MIN_AGE = 1;
   private static final int MAX_HISTORY = 24;

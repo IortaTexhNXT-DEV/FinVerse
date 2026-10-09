@@ -11,8 +11,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.nbadmin.service.PasswordExpiryNoticeJob;
 import com.iortatechnxt.brokerverse.security.api.dto.UserRequest;
+import com.iortatechnxt.brokerverse.security.service.PasswordResetRules;
 import com.iortatechnxt.brokerverse.security.service.UserAdminService;
 import com.iortatechnxt.brokerverse.security.service.directory.AuthMode;
+import com.iortatechnxt.brokerverse.support.Api;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
@@ -55,6 +57,7 @@ class SignInPasswordIT {
   @Autowired private SystemParameterService parameters;
   @Autowired private PasswordExpiryNoticeJob expiryJob;
   @Autowired private AsUser as;
+  @Autowired private Api api;
 
   private static String unique() {
     return "u1b" + IDS.incrementAndGet();
@@ -132,7 +135,7 @@ class SignInPasswordIT {
                 .header(HttpHeaders.AUTHORIZATION, BEARER + expired.get("accessToken").asText()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.changeDue").value(true))
-        .andExpect(jsonPath("$.historyCount").value(8))
+        .andExpect(jsonPath("$.historyCount").value(10))
         .andExpect(jsonPath("$.authMode").value("LOCAL"));
   }
 
@@ -160,7 +163,55 @@ class SignInPasswordIT {
   }
 
   @Test
+  void aNewPasswordEqualToOneOfTheLastTenIsRefused() throws Exception {
+    String username = newUser(null);
+    String token = token(username, INITIAL);
+    String current = INITIAL;
+    for (int i = 1; i <= 10; i++) {
+      ageThePassword(username, 2);
+      String next = "Hist!Passw0rd" + i;
+      change(token, current, next).andExpect(status().isNoContent());
+      current = next;
+    }
+    ageThePassword(username, 2);
+    change(token, current, "Hist!Passw0rd1")
+        .andExpect(jsonPath("$.code").value("PASSWORD_REUSED"))
+        .andExpect(
+            jsonPath("$.detail").value("You used this password recently. Choose another one"));
+    change(token, current, INITIAL).andExpect(status().isNoContent());
+  }
+
+  @Test
+  void withBdoisRulesThereIsNoForgottenPasswordLinkAndNoResetOfOnesOwnPassword() throws Exception {
+    String username = newUser("bdoi-reset-" + IDS.get() + "@example.ph");
+    mvc.perform(get("/api/v1/auth/sign-in-options"))
+        .andExpect(jsonPath("$.passwordReset").value(false));
+    int before = resetMails();
+    anonymous("request", Map.of("userId", username)).andExpect(status().isAccepted());
+    assertThat(resetMails()).isEqualTo(before);
+    Long adminId =
+        jdbc.queryForObject("select id from sec_user where username = 'admin'", Long.class);
+    api.doPost(
+            "admin",
+            "/api/v1/admin/users/" + adminId + "/reset-password",
+            Map.of("newPassword", "N3w!Password99"))
+        .andExpect(status().isUnprocessableEntity())
+        .andExpect(jsonPath("$.code").value("OWN_PASSWORD_RESET"));
+  }
+
+  @Test
   void theResetLinkWorksOnceAndNotAfterItExpires() throws Exception {
+    setResetRules(false);
+    try {
+      resetLinkWorksOnce();
+    } finally {
+      setResetRules(true);
+    }
+  }
+
+  private void resetLinkWorksOnce() throws Exception {
+    mvc.perform(get("/api/v1/auth/sign-in-options"))
+        .andExpect(jsonPath("$.passwordReset").value(true));
     String username = newUser("reset-" + IDS.get() + "@example.ph");
     anonymous("request", Map.of("userId", username)).andExpect(status().isAccepted());
     String link = latestLink(username);
@@ -227,6 +278,15 @@ class SignInPasswordIT {
       setMode(AuthMode.LOCAL);
     }
     login(username, INITIAL).andExpect(status().isOk());
+  }
+
+  private void setResetRules(boolean bdoi) {
+    as.run(
+        "admin",
+        () -> {
+          parameters.update(PasswordResetRules.SETTING, String.valueOf(bdoi));
+          return null;
+        });
   }
 
   private void setMode(AuthMode mode) {

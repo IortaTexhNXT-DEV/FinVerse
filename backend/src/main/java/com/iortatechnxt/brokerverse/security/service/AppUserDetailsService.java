@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.security.service;
 
+import com.iortatechnxt.brokerverse.audit.domain.ActorContext;
 import com.iortatechnxt.brokerverse.security.domain.AppUser;
 import com.iortatechnxt.brokerverse.security.domain.AppUserRepository;
 import com.iortatechnxt.brokerverse.security.domain.Role;
@@ -17,7 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
  * Loads users and maps their effective permissions to Spring Security authorities. The user is read
  * on every request (status and roles take effect at once); the permissions of each role come from
  * the role cache ({@link RolePermissionLookup}). A permission of switched-off product modules
- * grants nothing ({@link ProductModules#isPermissionActive}).
+ * grants nothing ({@link ProductModules#isPermissionActive}). The role names of the user are
+ * remembered on the request for the audit entries of the action ({@link ActorContext}).
  */
 @Service
 public class AppUserDetailsService implements UserDetailsService {
@@ -55,6 +57,7 @@ public class AppUserDetailsService implements UserDetailsService {
             .filter(modules::isPermissionActive)
             .map(SimpleGrantedAuthority::new)
             .toList();
+    ActorContext.rememberRoles(AuditActorRoles.names(user));
     return User.withUsername(user.getUsername())
         .password(user.getPasswordHash())
         .authorities(authorities)

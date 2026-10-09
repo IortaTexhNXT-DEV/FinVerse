@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.security.domain;
 
+import com.iortatechnxt.brokerverse.audit.domain.ActorContext;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -57,6 +58,12 @@ public class AccessChangeLog {
   @Column(name = "approved_by", updatable = false, length = 50)
   private String approvedBy;
 
+  @Column(name = "ip_address", updatable = false, length = ActorContext.MAX_ADDRESS)
+  private String ipAddress;
+
+  @Column(name = "role_names", updatable = false, length = ActorContext.MAX_ROLES)
+  private String roleNames;
+
   protected AccessChangeLog() {}
 
   /**
@@ -77,6 +84,8 @@ public class AccessChangeLog {
     this.requestNo = source.requestNo();
     this.doneBy = source.doneBy();
     this.approvedBy = source.approvedBy();
+    this.ipAddress = ActorContext.address();
+    this.roleNames = ActorContext.roles();
   }
 
   private static String clip(String value) {
@@ -125,5 +134,23 @@ public class AccessChangeLog {
 
   public String getApprovedBy() {
     return approvedBy;
+  }
+
+  /**
+   * Source (IP) address of the request that made the entry.
+   *
+   * @return address, null for background work
+   */
+  public String getIpAddress() {
+    return ipAddress;
+  }
+
+  /**
+   * Group profiles of the actor at the time of the entry.
+   *
+   * @return role names, null when not known
+   */
+  public String getRoleNames() {
+    return roleNames;
   }
 }

@@ -8,6 +8,7 @@ import com.iortatechnxt.brokerverse.security.api.dto.UserRequest;
 import com.iortatechnxt.brokerverse.security.domain.Permission;
 import com.iortatechnxt.brokerverse.security.domain.Role;
 import com.iortatechnxt.brokerverse.security.service.ChangeAuthority;
+import com.iortatechnxt.brokerverse.security.service.PasswordResetRules;
 import com.iortatechnxt.brokerverse.security.service.RoleEditGuard;
 import com.iortatechnxt.brokerverse.security.service.UserAdminService;
 import com.iortatechnxt.brokerverse.system.service.ProductModules;
@@ -41,6 +42,7 @@ public class UserAdminController {
   private final UserAdminService service;
   private final RoleEditGuard guard;
   private final ProductModules modules;
+  private final PasswordResetRules resetRules;
 
   /**
    * Creates the controller.
@@ -48,10 +50,15 @@ public class UserAdminController {
    * @param service user administration
    * @param guard role edit guard
    * @param modules product module switches
+   * @param resetRules who may reset a password (PASSWORD_RESET_BDOI_RULES)
    */
   public UserAdminController(
-      UserAdminService service, RoleEditGuard guard, ProductModules modules) {
+      UserAdminService service,
+      RoleEditGuard guard,
+      ProductModules modules,
+      PasswordResetRules resetRules) {
     this.service = service;
+    this.resetRules = resetRules;
     this.guard = guard;
     this.modules = modules;
   }
@@ -108,7 +115,8 @@ public class UserAdminController {
   }
 
   /**
-   * Resets a user's password.
+   * Resets a user's password; with BDOI's rules only another System Administrator resets it, and
+   * with single sign-on only for a break-glass account.
    *
    * @param id id
    * @param request new password
@@ -118,6 +126,7 @@ public class UserAdminController {
   @PreAuthorize(USERS)
   public void resetPassword(
       @PathVariable Long id, @Valid @RequestBody PasswordChangeRequest request) {
+    resetRules.checkAdministratorReset(id);
     service.resetPassword(id, request.newPassword());
   }
 

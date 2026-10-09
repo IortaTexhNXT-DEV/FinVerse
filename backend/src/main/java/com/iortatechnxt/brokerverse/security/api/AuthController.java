@@ -18,6 +18,7 @@ import com.iortatechnxt.brokerverse.security.service.AuthPasswordService;
 import com.iortatechnxt.brokerverse.security.service.AuthProfileService;
 import com.iortatechnxt.brokerverse.security.service.AuthService;
 import com.iortatechnxt.brokerverse.security.service.AuthSessionService;
+import com.iortatechnxt.brokerverse.security.service.PasswordResetRules;
 import com.iortatechnxt.brokerverse.security.service.SignInResult;
 import com.iortatechnxt.brokerverse.security.service.SignInSessions;
 import com.iortatechnxt.brokerverse.security.service.directory.AuthMode;
@@ -69,6 +70,7 @@ public class AuthController {
   private final AuthPasswordPolicy passwordPolicy;
   private final SsoProperties sso;
   private final String environment;
+  private final PasswordResetRules resetRules;
 
   /**
    * Creates the controller.
@@ -83,6 +85,7 @@ public class AuthController {
    * @param passwordPolicy sign-in mode
    * @param sso single sign-on settings
    * @param environment {@code brokerverse.environment}, shown on the sign-in page
+   * @param resetRules whether "Forgot password?" is offered (PASSWORD_RESET_BDOI_RULES)
    */
   @SuppressWarnings("java:S107") // endpoints of the sign-in
   public AuthController(
@@ -95,7 +98,9 @@ public class AuthController {
       RefreshCookies cookies,
       AuthPasswordPolicy passwordPolicy,
       SsoProperties sso,
-      @Value("${brokerverse.environment:local}") String environment) {
+      @Value("${brokerverse.environment:local}") String environment,
+      PasswordResetRules resetRules) {
+    this.resetRules = resetRules;
     this.authService = authService;
     this.passwords = passwords;
     this.profiles = profiles;
@@ -122,7 +127,7 @@ public class AuthController {
         mode.singleSignOn(),
         mode.singleSignOn() ? sso.label() : null,
         !mode.singleSignOn(),
-        mode == AuthMode.LOCAL,
+        resetRules.selfServiceOffered(),
         environment);
   }
 
@@ -264,8 +269,9 @@ public class AuthController {
   }
 
   /**
-   * "Forgot password?": e-mails a single-use link to the registered address. The answer is the same
-   * for every user ID.
+   * "Forgot password?": e-mails a single-use link to the registered address, when the link is
+   * offered (local sign-in, PASSWORD_RESET_BDOI_RULES off). The answer is the same for every user
+   * ID.
    *
    * @param request user ID
    */
@@ -273,7 +279,9 @@ public class AuthController {
   @PreAuthorize(ANYONE)
   @ResponseStatus(HttpStatus.ACCEPTED)
   public void requestReset(@Valid @RequestBody PasswordResetLinkRequest request) {
-    passwords.requestReset(request.userId());
+    if (resetRules.selfServiceOffered()) {
+      passwords.requestReset(request.userId());
+    }
   }
 
   /**

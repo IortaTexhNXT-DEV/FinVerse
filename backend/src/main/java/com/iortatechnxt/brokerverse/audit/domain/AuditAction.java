@@ -17,5 +17,9 @@ public enum AuditAction {
   LOGIN,
   LOGIN_FAILED,
   LOGOUT,
+  /** The inactivity warning was shown to the user (BDOI FRS FRUM.001.03). */
+  INACTIVITY,
+  /** The session timed out: inactivity sign-out or end of the session (FRUM.001.04). */
+  TIMEOUT,
   EXPORT
 }

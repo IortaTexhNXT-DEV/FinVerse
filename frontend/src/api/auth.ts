@@ -60,6 +60,8 @@ export const authApi = {
   /** "Forgot password?": the answer is the same for every user ID. */
   requestReset: (userId: string) => api.post<undefined>('/auth/password-reset/request', { userId }),
   signInOptions: () => api.get<SignInOptions>('/auth/sign-in-options'),
+  /** The identity provider's sign-out page (single sign-on), or none. */
+  ssoSignOut: () => api.get<{ redirectUrl?: string | null }>('/auth/sso/sign-out'),
   /** Records in the audit trail that the inactivity warning was shown. */
   reportInactivity: () => api.post<undefined>('/auth/session/inactivity'),
   /** Address of the identity provider's sign-in page. */

@@ -18,6 +18,7 @@ describe('SessionTimedOutPage', () => {
       passwordReset: false,
       environment: 'sit',
     });
+    vi.spyOn(authApi, 'ssoSignOut').mockResolvedValue({ redirectUrl: null });
     markTimedOut();
     render(
       <MemoryRouter initialEntries={['/session-timed-out']}>

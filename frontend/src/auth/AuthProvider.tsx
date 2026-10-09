@@ -9,6 +9,7 @@ import { clearTimedOut } from '@/session/timedOut';
 import type { SharedSession } from '@/session/tabSync';
 import { AuthContext } from './authContext';
 import type { SignOutReason } from './authContext';
+import { signOutAtProvider } from './providerSignOut';
 import { useServerKeepAlive } from './useServerKeepAlive';
 import { loadUserDirectory, resetUserDirectory } from '@/api/users';
 import { modulesApi } from '@/api/modules';
@@ -103,6 +104,7 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
       }
       if (reason === undefined) {
         clearTimedOut();
+        void signOutAtProvider();
       }
       signOutHere();
       tabSession().announceLogout();

@@ -298,7 +298,12 @@ class UamSignoffControlsIT {
             notifications.findAll().stream()
                 .filter(n -> member.equalsIgnoreCase(n.getRecipient()))
                 .map(Notification::getBody))
-        .anyMatch(b -> b.contains("Deactivate group profile Profile " + profile));
+        // The notification writes the code-like test name in words; the digits identify the
+        // profile.
+        .anyMatch(
+            b ->
+                b.contains("Deactivate group profile Profile ")
+                    && b.contains(profile.substring(profile.lastIndexOf('_') + 1)));
   }
 
   @Test

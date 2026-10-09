@@ -184,7 +184,7 @@ class ClaimsWorkIT {
                 String.class,
                 String.valueOf(open)))
         .isEqualTo("clmofficer2");
-    assertThat(notifications("clmofficer2", "2 claim(s) assigned")).isPositive();
+    assertThat(notifications("clmofficer2", "2 claims assigned")).isPositive();
   }
 
   private List<WorklistRow> search(Tab tab, String text) {

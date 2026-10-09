@@ -703,7 +703,7 @@ observations:
   - topic: Wording of three system texts
     bdoi: "-"
     brd: "-"
-    proposal: "Proposed wording for BDOI's approval: NT-17 \"New rule <rule>: <reason>\" instead of \"The new rule of rule <rule>\"; NT-13 \"(emergency role edit)\" instead of the setting code shown today; NT-18 \"<user> asks to change it from ... to ...\" as written in Annex L of version 1.2."
+    proposal: "Proposed wording for BDOI's approval: NT-17 \"New rule <rule>: <reason>\" instead of \"The new rule of rule <rule>\"; NT-13 \"(emergency role edit)\" instead of the setting code shown today; NT-18: the system says \"<user> requests a change from ... to ...\" while Annex L of version 1.2 showed \"asks to change it from\"; Annex L now quotes the system and BDOI chooses the wording."
     impact: "Annexes L and T."
     decide_by: Process Owner (Business Administration)
   - topic: Approval times, reminders and escalation

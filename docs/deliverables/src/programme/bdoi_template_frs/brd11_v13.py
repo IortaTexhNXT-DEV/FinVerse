@@ -356,7 +356,7 @@ class NewAnnexes:
         a = self.a
         a.h1("Annex X – Non-functional Requirements")
         a.p(x["intro"])
-        a.table(x["header"], self.nfr_rows, [0.75, 0.9, 2.0, 2.15, 0.8, 0.8], size=7)
+        a.table(x["header"], self.nfr_rows, [0.7, 0.85, 1.85, 2.0, 0.85, 1.15], size=7)
         self.b.stats["nfr_rows"] = len(self.nfr_rows)
 
     # Y
@@ -418,7 +418,7 @@ class NewAnnexes:
         a.h1("Annex AB – Business Unit Review Checklist")
         a.p(c["intro"])
         rows = [[str(i), r[0], r[1], r[2], r[3], "☐"] for i, r in enumerate(c["rows"], 1)]
-        a.table(c["header"], rows, [0.4, 1.4, 1.5, 2.4, 1.3, 0.4], size=8)
+        a.table(c["header"], rows, [0.4, 1.4, 1.5, 2.3, 1.3, 0.5], size=8)
         self.b.stats["checklist"] = len(rows)
 
 

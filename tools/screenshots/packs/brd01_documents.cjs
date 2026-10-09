@@ -9,53 +9,29 @@ const { execFileSync } = require('child_process');
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'nb-pack-docs-'));
 const SOFFICE = process.env.SOFFICE || 'soffice';
 
-/** Renders the first page of a PDF, Word, Excel or OpenDocument file to a PNG at `out`. */
-function render(buffer, ext, out, dpi = Number(process.env.DOC_DPI || 200), keep = []) {
+const HELPER = path.join(__dirname, '..', 'doc_render.py');
+const PYTHON = process.env.PYTHON || 'python3';
+
+/**
+ * Renders the first page of a PDF, Word, Excel or OpenDocument file, or a text file, to a PNG at `out`.
+ *
+ * A workbook prints landscape, fitted to the page width, every column shown as wide as its content (doc_render.py).
+ * `keep` names the columns to show (a wide file would print too small to read); `options.rows` keeps only the rows of
+ * one value of a column (an extract) and `options.first` the first rows; `options.above` = 'drop' leaves out the rows
+ * above the headings (the guide band of a template), with their images, while by default the report header (logo,
+ * title, parameters) stays above the columns shown. A text file is drawn in a monospace font without wrapping; a file
+ * of delimited records field by field.
+ */
+function render(buffer, ext, out, dpi = Number(process.env.DOC_DPI || 200), keep = [], options = {}) {
   const base = path.join(TMP, `doc-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
   let pdfFile = `${base}.${ext}`;
   fs.writeFileSync(pdfFile, buffer);
+  if (ext === 'txt') {
+    execFileSync(PYTHON, [HELPER, 'text', pdfFile, out, String(dpi)], { cwd: TMP });
+    return;
+  }
   if (ext === 'xlsx') {
-    // Print every column on one landscape page, as the reader opens the file on screen.
-    const fit = [
-      'import sys, openpyxl',
-      'wb = openpyxl.load_workbook(sys.argv[1])',
-      'for ws in wb.worksheets:',
-      '    ws.page_setup.orientation = "landscape"',
-      '    ws.sheet_properties.pageSetUpPr.fitToPage = True',
-      '    ws.page_setup.fitToWidth = 1',
-      '    ws.page_setup.fitToHeight = 0',
-      // Only the named columns are shown (a wide file would print too small to read). A file in the template layout
-      // has its headers under the guide band: the guide rows are left out so that the rows show at a readable size.
-      'keep = [k for k in sys.argv[2].split("|") if k]',
-      'if keep:',
-      '    from openpyxl.utils import get_column_letter',
-      '    clean = lambda v: str(v or "").replace("*", "").strip()',
-      '    for ws in wb.worksheets:',
-      '        hr = next((r for r in range(1, ws.max_row + 1) if any(clean(ws.cell(r, c).value) in keep for c in range(1, ws.max_column + 1))), None)',
-      '        if hr is None:',
-      '            continue',
-      '        for m in list(ws.merged_cells.ranges):',
-      '            ws.unmerge_cells(str(m))',
-      '        if hr > 1:',
-      '            ws.delete_rows(1, hr - 1)',
-      '        from openpyxl.worksheet.pagebreak import RowBreak',
-      '        ws.print_title_rows = None',
-      '        ws.print_area = None',
-      '        ws.row_breaks = RowBreak()',
-      '        ws.freeze_panes = None',
-      '        for part in (ws.oddHeader, ws.oddFooter, ws.evenHeader, ws.evenFooter, ws.firstHeader, ws.firstFooter):',
-      '            part.left.text = part.center.text = part.right.text = None',
-      '        for r in range(1, ws.max_row + 1):',
-      '            ws.row_dimensions[r].hidden = False',
-      '            ws.row_dimensions[r].height = None',
-      '        for c in range(1, ws.max_column + 1):',
-      '            name = clean(ws.cell(1, c).value)',
-      '            dim = ws.column_dimensions[get_column_letter(c)]',
-      '            dim.hidden = name not in keep',
-      '            dim.width = 60 if name == keep[-1] else 20',
-      'wb.save(sys.argv[1])',
-    ].join('\n');
-    execFileSync(process.env.PYTHON || 'python3', ['-c', fit, pdfFile, keep.join('|')], { cwd: TMP, stdio: 'ignore' });
+    execFileSync(PYTHON, [HELPER, 'xlsx', pdfFile, JSON.stringify({ keep, ...options })], { cwd: TMP, stdio: 'ignore' });
   }
   if (ext !== 'pdf') {
     execFileSync(SOFFICE, ['--headless', '--convert-to', 'pdf', '--outdir', TMP, pdfFile], { stdio: 'ignore',
@@ -64,18 +40,7 @@ function render(buffer, ext, out, dpi = Number(process.env.DOC_DPI || 200), keep
   }
   execFileSync('pdftoppm', ['-png', '-r', String(dpi), '-f', '1', '-l', '1', '-singlefile', pdfFile, base]);
   if (ext === 'xlsx') {
-    // A spreadsheet fills only the top of the page: keep the used part with a margin.
-    const crop = [
-      'import sys',
-      'from PIL import Image, ImageOps',
-      'im = Image.open(sys.argv[1]).convert("RGB")',
-      'box = ImageOps.invert(im).getbbox()',
-      'if box:',
-      '    l, t, r, b = box',
-      '    im = im.crop((max(0, l - 40), max(0, t - 40), min(im.width, r + 40), min(im.height, max(b + 40, t + 120))))',
-      'im.save(sys.argv[1])',
-    ].join('\n');
-    execFileSync(process.env.PYTHON || 'python3', ['-c', crop, `${base}.png`], { cwd: TMP });
+    execFileSync(PYTHON, [HELPER, 'crop', `${base}.png`], { cwd: TMP });
   }
   fs.copyFileSync(`${base}.png`, out);
 }
@@ -88,13 +53,13 @@ function extOf(buffer) {
   return 'xlsx';
 }
 
-/** Downloads a file from the API as `user` and renders its first page. */
-async function download(ctx, user, url, out, ext, keep = []) {
+/** Downloads a file from the API as `user` and renders its first page (`keep` and `options` as for render). */
+async function download(ctx, user, url, out, ext, keep = [], options = {}) {
   const data = await ctx.api(user, 'GET', url);
   if (!Buffer.isBuffer(data)) {
     throw new Error(`${url} did not return a file`);
   }
-  render(data, ext || extOf(data), out, undefined, keep);
+  render(data, ext || extOf(data), out, undefined, keep, options);
 }
 
 const one = (ctx, q) => ctx.one(q);

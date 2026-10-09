@@ -160,17 +160,35 @@ public class ReceiptDocument {
     return out.toByteArray();
   }
 
+  /**
+   * The item of an OR line: the invoice and the description, the invoice once when the description
+   * already names it ("Commission BI-HO-2026-000001", not "BI-HO-2026-000001 Commission
+   * BI-HO-2026-000001").
+   *
+   * @param invoiceNo invoice, may be null
+   * @param description description, may be null
+   * @return item text
+   */
+  static String item(String invoiceNo, String description) {
+    boolean hasInvoice = invoiceNo != null && !invoiceNo.isBlank();
+    boolean hasText = description != null && !description.isBlank();
+    if (hasInvoice && hasText && description.contains(invoiceNo)) {
+      return description.strip();
+    }
+    return String.join(
+        " ",
+        java.util.stream.Stream.of(invoiceNo, description)
+            .filter(v -> v != null && !v.isBlank())
+            .toList());
+  }
+
   private Table details(Receipt r) {
     List<List<String>> rows = new ArrayList<>();
     if (r.getKind() == ReceiptKind.OR) {
       for (ReceiptLine l : r.getLines()) {
         rows.add(
             List.of(
-                String.join(
-                    " ",
-                    java.util.stream.Stream.of(l.getInvoiceNo(), l.getDescription())
-                        .filter(v -> v != null && !v.isBlank())
-                        .toList()),
+                item(l.getInvoiceNo(), l.getDescription()),
                 amount(l.getNet()),
                 amount(l.getVat()),
                 amount(l.getWtax())));

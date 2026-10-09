@@ -68,6 +68,7 @@ public class AdjustmentRegisterReport implements ReportDefinition {
     List<Map<String, Object>> rows =
         support.created(p, filter).stream().map(AdjustmentRegisterReport::row).toList();
     return TabularReportBuilder.of(p)
+        .labelCodes("class", "stage")
         .columns(
             ReportColumn.text("requestNo", "Request No."),
             ReportColumn.date("date", "Date"),

@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.nbreport.report;
 
 import com.iortatechnxt.brokerverse.nbreport.service.NbReportJdbc;
 import com.iortatechnxt.brokerverse.nbreport.service.StallRule;
+import com.iortatechnxt.brokerverse.report.core.ColumnType;
 import com.iortatechnxt.brokerverse.report.core.ParameterSpec;
 import com.iortatechnxt.brokerverse.report.core.ParameterType;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
@@ -42,8 +43,8 @@ public class AccountStatusReport implements ReportDefinition {
           + " c.stage_entered_at as since, c.due_at as due, "
           + NbReportSupport.userName("c.assignee")
           + " as assignee,"
-          + " round(cast(extract(epoch from (cast(:now as timestamptz) - c.stage_entered_at))"
-          + " / 86400 as numeric), 1) as age,"
+          + " cast(floor(extract(epoch from (cast(:now as timestamptz) - c.stage_entered_at))"
+          + " / 86400) as integer) as age,"
           + " (not s.terminal and s.owner_permission is not null and c.due_at < :now) as breached,"
           + " (not s.terminal and s.owner_permission is not null"
           + " and c.stage_entered_at < :stalledBefore) as stalled"
@@ -126,7 +127,7 @@ public class AccountStatusReport implements ReportDefinition {
             ReportColumn.text("product", "Product"),
             ReportColumn.text(OFFICER, "Officer"),
             ReportColumn.date("since", "In Stage Since"),
-            ReportColumn.amountNoTotal("age", "Age (days)"),
+            new ReportColumn("age", "Age (days)", ColumnType.NUMBER, false),
             ReportColumn.date("due", "SLA Due"),
             ReportColumn.text("breached", "SLA Breached"),
             ReportColumn.text(STALLED_KEY, "Stalled"),

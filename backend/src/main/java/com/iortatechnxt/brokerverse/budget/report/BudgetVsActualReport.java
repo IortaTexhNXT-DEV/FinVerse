@@ -66,6 +66,7 @@ public class BudgetVsActualReport implements ReportDefinition {
             p.flag(BY_COST_CENTRE));
     List<Map<String, Object>> rows = c.lines().stream().map(BudgetVsActualReport::row).toList();
     return TabularReportBuilder.of(p)
+        .labelCodes("accountClass")
         .columns(
             ReportColumn.text("code", "Account"),
             ReportColumn.text("name", "Account Name"),

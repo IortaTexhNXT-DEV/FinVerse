@@ -143,7 +143,7 @@ public class PackageDocuments {
                 "roundNo",
                 String.valueOf(r.getRoundNo()),
                 "replyBy",
-                String.valueOf(r.getReplyDue())));
+                DisplayFormat.date(r.getReplyDue())));
     List<Section> sections = new ArrayList<>();
     sections.add(new Text(null, text.text()));
     sections.add(new Fields(PACKAGE, requestFields(p)));
@@ -179,7 +179,7 @@ public class PackageDocuments {
                 "roundNo",
                 String.valueOf(table.roundNo()),
                 "variant",
-                variant));
+                "View: " + variant + "."));
     ComparativeTable shown = table.select(selection);
     List<String> headers = shown.headers();
     List<Section> sections =

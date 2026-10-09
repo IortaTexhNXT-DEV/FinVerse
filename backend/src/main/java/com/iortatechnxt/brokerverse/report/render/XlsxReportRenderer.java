@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.report.render;
 
+import com.iortatechnxt.brokerverse.common.excel.SheetColumnWidths;
 import com.iortatechnxt.brokerverse.common.office.BrandAssets;
 import com.iortatechnxt.brokerverse.common.office.PdfBrandFooter;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
@@ -21,17 +22,16 @@ import java.util.Map;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.ClientAnchor;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.Footer;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.PrintSetup;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.util.Units;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.DefaultIndexedColorMap;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
@@ -52,14 +52,9 @@ public class XlsxReportRenderer implements ReportRenderer {
 
   private static final int WINDOW = 200;
   private static final short TITLE_POINTS = 12;
-  private static final float LOGO_ROW_POINTS = 30f;
   // Excel header / footer codes of the page number and the page count.
   private static final String PAGE_CODE = "&P";
   private static final String PAGES_CODE = "&N";
-  private static final double LOGO_POINTS = 22;
-  private static final int LABEL_WIDTH = 36 * 256;
-  private static final int TEXT_WIDTH = 28 * 256;
-  private static final int NUMBER_WIDTH = 16 * 256;
   private static final String AMOUNT_FORMAT = "#,##0.00;(#,##0.00)";
   private static final DateTimeFormatter STAMP =
       DateTimeFormatter.ofPattern("dd-MMM-yyyy HH:mm", Locale.ENGLISH)
@@ -76,23 +71,26 @@ public class XlsxReportRenderer implements ReportRenderer {
         ByteArrayOutputStream out = new ByteArrayOutputStream()) {
       Styles styles = new Styles(wb);
       Sheet sheet = wb.createSheet(result.code());
-      logo(wb, sheet);
+      List<ReportColumn> cols = result.columns();
+      boolean labels = LabelLayout.needsLabelColumn(result);
+      int first = labels ? 1 : 0;
+      // Column widths in column order (Excel refuses a sheet whose column list is not sorted),
+      // from the content so that a date or amount never runs into the next column.
+      double points = XlsxReportLayout.columnWidths(sheet, result, labels);
+      XlsxReportLayout.logo(wb, sheet, points);
       int r = writeHeader(sheet, result, context, styles);
       int headerRow = r;
       Row head = sheet.createRow(r++);
-      text(head, 0, "", styles.head);
-      // Column widths in column order: Excel refuses a sheet whose column list is not sorted.
-      sheet.setColumnWidth(0, LABEL_WIDTH);
-      List<ReportColumn> cols = result.columns();
+      if (labels) {
+        text(head, 0, "", styles.head);
+      }
       for (int i = 0; i < cols.size(); i++) {
-        text(head, i + 1, cols.get(i).label(), styles.head);
-        sheet.setColumnWidth(
-            i + 1, cols.get(i).type() == ColumnType.TEXT ? TEXT_WIDTH : NUMBER_WIDTH);
+        text(head, i + first, cols.get(i).label(), styles.head);
       }
       sheet.createFreezePane(1, headerRow + 1);
       printSetup(sheet, result, context, headerRow);
       for (ReportRow row : result.rows()) {
-        writeRow(sheet.createRow(r++), row, cols, styles);
+        writeRow(sheet.createRow(r++), row, cols, labels, styles);
       }
       for (String note : result.notes()) {
         text(sheet.createRow(++r), 0, "Note: " + note, styles.meta);
@@ -102,22 +100,6 @@ public class XlsxReportRenderer implements ReportRenderer {
     } catch (IOException ex) {
       throw new UncheckedIOException("Excel rendering failed", ex);
     }
-  }
-
-  /** The BDO Insure logo in the first row, above the company. */
-  private static void logo(SXSSFWorkbook wb, Sheet sheet) {
-    Row row = sheet.createRow(0);
-    row.setHeightInPoints(LOGO_ROW_POINTS);
-    int picture = wb.addPicture(BrandAssets.logoPng(), Workbook.PICTURE_TYPE_PNG);
-    ClientAnchor anchor = wb.getCreationHelper().createClientAnchor();
-    anchor.setCol1(0);
-    anchor.setRow1(0);
-    anchor.setCol2(0);
-    anchor.setRow2(0);
-    anchor.setDx2(Units.toEMU(LOGO_POINTS * BrandAssets.LOGO_RATIO));
-    anchor.setDy2(Units.toEMU(LOGO_POINTS));
-    anchor.setAnchorType(ClientAnchor.AnchorType.MOVE_DONT_RESIZE);
-    sheet.createDrawingPatriarch().createPicture(anchor, picture);
   }
 
   /**
@@ -174,13 +156,26 @@ public class XlsxReportRenderer implements ReportRenderer {
     return r + 1;
   }
 
-  private static void writeRow(Row x, ReportRow row, List<ReportColumn> cols, Styles s) {
+  private static void writeRow(
+      Row x, ReportRow row, List<ReportColumn> cols, boolean labels, Styles s) {
     boolean emphasis = row.kind() != RowKind.DETAIL;
-    String label = row.label() == null ? "" : "  ".repeat(row.level()) + row.label();
-    text(x, 0, label, emphasis ? s.bold : s.body);
+    String label = LabelLayout.label(row);
+    int first = labels ? 1 : 0;
+    if (labels) {
+      text(x, 0, label, emphasis ? s.bold : s.body);
+    }
+    // Without a label column the label goes into the first column, which the row leaves empty,
+    // and shows across the empty columns next to it.
+    boolean inFirst = !labels && !label.isEmpty();
     for (int i = 0; i < cols.size(); i++) {
       ReportColumn c = cols.get(i);
-      writeCell(x.createCell(i + 1), row.cells().get(c.key()), c.type(), emphasis, s);
+      Cell cell = x.createCell(i + first);
+      if (inFirst && i == 0) {
+        cell.setCellValue(label);
+        cell.setCellStyle(s.bold);
+      } else {
+        writeCell(cell, row.cells().get(c.key()), c.type(), emphasis, s);
+      }
     }
   }
 
@@ -191,8 +186,12 @@ public class XlsxReportRenderer implements ReportRenderer {
     } else if (v instanceof LocalDate d) {
       cell.setCellValue(d);
       cell.setCellStyle(s.date);
+    } else if (v == null) {
+      // A blank cell, so that a label in a column before shows across it.
+      cell.setBlank();
+      cell.setCellStyle(emphasis ? s.bold : s.body);
     } else {
-      cell.setCellValue(v == null ? "" : v.toString());
+      cell.setCellValue(v.toString());
       cell.setCellStyle(emphasis ? s.bold : s.body);
     }
   }
@@ -245,14 +244,24 @@ public class XlsxReportRenderer implements ReportRenderer {
       headStyle.setFillForegroundColor(brand);
       headStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
       headStyle.setBorderBottom(BorderStyle.THIN);
+      headStyle.setWrapText(true);
+      headStyle.setVerticalAlignment(VerticalAlignment.TOP);
+      headStyle.setAlignment(HorizontalAlignment.LEFT);
+      headStyle.setIndention(SheetColumnWidths.TEXT_INDENT);
       head = headStyle;
       Font bodyFont = font(wb);
+      // Texts start one indent from the cell border, so a date or amount of the column before
+      // never runs into them.
       body = wb.createCellStyle();
       body.setFont(bodyFont);
+      body.setAlignment(HorizontalAlignment.LEFT);
+      body.setIndention(SheetColumnWidths.TEXT_INDENT);
       Font boldFont = font(wb);
       boldFont.setBold(true);
       bold = wb.createCellStyle();
       bold.setFont(boldFont);
+      bold.setAlignment(HorizontalAlignment.LEFT);
+      bold.setIndention(SheetColumnWidths.TEXT_INDENT);
       date = wb.createCellStyle();
       date.setFont(bodyFont);
       date.setDataFormat(wb.createDataFormat().getFormat("dd-mmm-yyyy"));

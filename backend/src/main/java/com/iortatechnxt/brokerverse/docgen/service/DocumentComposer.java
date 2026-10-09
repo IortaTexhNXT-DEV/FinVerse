@@ -2,6 +2,8 @@ package com.iortatechnxt.brokerverse.docgen.service;
 
 import com.iortatechnxt.brokerverse.common.office.BrandAssets;
 import com.iortatechnxt.brokerverse.common.office.PdfBrandFooter;
+import com.iortatechnxt.brokerverse.common.office.PdfColumnWidths;
+import com.iortatechnxt.brokerverse.common.office.PdfWordBreaks;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec.Field;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec.Fields;
@@ -66,6 +68,8 @@ public class DocumentComposer {
   private static final Font BODY = new Font(Font.HELVETICA, 9, Font.NORMAL, Color.BLACK);
   private static final Font HEAD = new Font(Font.HELVETICA, 8.5f, Font.BOLD, Color.WHITE);
   private static final Font SMALL = new Font(Font.HELVETICA, 7, Font.NORMAL, Color.GRAY);
+  private static final Font SMALL_HEAD = new Font(Font.HELVETICA, 7.5f, Font.BOLD, Color.WHITE);
+  private static final Font SMALL_BODY = new Font(Font.HELVETICA, 7.5f, Font.NORMAL, Color.BLACK);
 
   private final Clock clock;
   private final DocumentRenditionService renditions;
@@ -168,19 +172,26 @@ public class DocumentComposer {
     }
   }
 
-  private static void heading(Document doc, String heading) {
+  /**
+   * The heading of a section; a section without a heading keeps a gap to the text above, so that
+   * its table never touches the reference line.
+   */
+  private static float heading(Document doc, String heading) {
     if (heading != null && !heading.isBlank()) {
       Paragraph p = new Paragraph(heading, HEADING);
       p.setSpacingBefore(HEADING_SPACING);
       p.setSpacingAfter(PADDING);
       doc.add(p);
+      return 0;
     }
+    return SPACING;
   }
 
   private static void fields(Document doc, Fields f) {
-    heading(doc, f.heading());
+    float gap = heading(doc, f.heading());
     PdfPTable table = new PdfPTable(new float[] {LABEL_WIDTH, VALUE_WIDTH});
     table.setWidthPercentage(100);
+    table.setSpacingBefore(gap);
     for (Field field : f.fields()) {
       table.addCell(cell(field.label(), LABEL, SHADE, Element.ALIGN_LEFT));
       table.addCell(
@@ -190,20 +201,47 @@ public class DocumentComposer {
   }
 
   private static void table(Document doc, Table t) {
-    heading(doc, t.heading());
-    PdfPTable table = new PdfPTable(t.columnWeights());
+    float gap = heading(doc, t.heading());
+    float width = doc.getPageSize().getWidth() - doc.leftMargin() - doc.rightMargin();
+    // A schedule too wide for its words at the body size is printed in the small table size.
+    boolean small = !columnWidths(t, HEAD, BODY).fits(width);
+    Font head = small ? SMALL_HEAD : HEAD;
+    Font body = small ? SMALL_BODY : BODY;
+    PdfPTable table = new PdfPTable(columnWidths(t, head, body).fit(width));
     table.setWidthPercentage(100);
+    table.setSpacingBefore(gap);
     table.setHeaderRows(1);
     for (int c = 0; c < t.headers().size(); c++) {
-      table.addCell(cell(t.headers().get(c), HEAD, NAVY, align(t, c)));
+      table.addCell(cell(t.headers().get(c), head, NAVY, align(t, c)));
     }
     for (List<String> row : t.rows()) {
       for (int c = 0; c < t.headers().size(); c++) {
         String v = c < row.size() && row.get(c) != null ? row.get(c) : "";
-        table.addCell(cell(v, BODY, null, align(t, c)));
+        table.addCell(cell(v, body, null, align(t, c)));
       }
     }
     doc.add(table);
+  }
+
+  /**
+   * Column widths that break headings and values only between words ("Endorsement Number" never as
+   * "Endorseme nt"), shared in proportion to the column weights; in the small table size when the
+   * body size does not fit.
+   */
+  static float[] widths(Document doc, Table t) {
+    float width = doc.getPageSize().getWidth() - doc.leftMargin() - doc.rightMargin();
+    PdfColumnWidths regular = columnWidths(t, HEAD, BODY);
+    return regular.fits(width)
+        ? regular.fit(width)
+        : columnWidths(t, SMALL_HEAD, SMALL_BODY).fit(width);
+  }
+
+  private static PdfColumnWidths columnWidths(Table t, Font head, Font body) {
+    PdfColumnWidths widths = new PdfColumnWidths(t.columnWeights(), 2 * PADDING);
+    for (int c = 0; c < t.headers().size(); c++) {
+      widths.heading(c, t.headers().get(c), head);
+    }
+    return widths.values(t.rows(), body);
   }
 
   private static int align(Table t, int column) {
@@ -238,7 +276,7 @@ public class DocumentComposer {
   }
 
   private static PdfPCell cell(String text, Font font, Color background, int alignment) {
-    PdfPCell c = new PdfPCell(new Phrase(text, font));
+    PdfPCell c = new PdfPCell(PdfWordBreaks.phrase(text, font));
     c.setPadding(PADDING);
     c.setBorderColor(GRID);
     c.setHorizontalAlignment(alignment);

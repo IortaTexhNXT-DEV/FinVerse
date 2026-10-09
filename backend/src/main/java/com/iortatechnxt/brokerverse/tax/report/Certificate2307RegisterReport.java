@@ -70,6 +70,7 @@ public class Certificate2307RegisterReport implements ReportDefinition {
       rows.add(row);
     }
     return TabularReportBuilder.of(p)
+        .labelCodes("status")
         .columns(
             ReportColumn.text("certificateNo", "Certificate"),
             ReportColumn.text("batchNo", "Batch"),

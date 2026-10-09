@@ -55,6 +55,7 @@ public class MinimalBalanceFileReport implements ReportDefinition {
             .map(MinimalBalanceFileReport::row)
             .toList();
     return TabularReportBuilder.of(p)
+        .labelCodes("action")
         .columns(
             ReportColumn.text("file", "File / Request"),
             ReportColumn.date("date", "Date"),

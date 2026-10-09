@@ -90,6 +90,7 @@ documents:
       - "One row per invoice of the booking period: Month of Production, Insurer, Invoice Number, Booking Date, Inception Date, Expiry Date, Policy No., Endorsement No., PN No., Assured Name, Risk Type, Basic Premium, Gross Commission, A/R Client, Gross Premium, Booked VAT, Amount Paid, Date Paid, AR / OR Number, Adjustment Type, Remittance Status, Incentive, Remarks – from the Operations ledger"
       - "The image shows a selection of the columns"
     shot: doc-production-register
+    shot_caption: "first page as generated, with a selection of the columns"
     frs: [FR-OP-072, FR-OP-073]
   - id: DO-08
     name: Direct payment commission billing
@@ -101,4 +102,5 @@ documents:
       - "One row per direct payment account: Billing No., Invoice No., Policy No., Assured Name, Premium, Commission, VAT, Withholding Tax, Net Commission – from the billing"
       - "Decision, Reason and Comment columns completed by the insurer (Approved or Rejected) and read back on Insurer Responses"
     shot: doc-dp-billing
+    shot_caption: "first page as generated, with a selection of the columns"
     frs: [FR-OP-092]

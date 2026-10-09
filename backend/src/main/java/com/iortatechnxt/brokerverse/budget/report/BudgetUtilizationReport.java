@@ -65,6 +65,7 @@ public class BudgetUtilizationReport implements ReportDefinition {
             p.longValue(GlReportSupport.COMPANY), p.date(GlReportSupport.AS_OF), false);
     List<Map<String, Object>> rows = c.lines().stream().map(l -> row(l, threshold)).toList();
     return TabularReportBuilder.of(p)
+        .labelCodes("accountClass")
         .columns(
             ReportColumn.text("code", "Account"),
             ReportColumn.text("name", "Account Name"),

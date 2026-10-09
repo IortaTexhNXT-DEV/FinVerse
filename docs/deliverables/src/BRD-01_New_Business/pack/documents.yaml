@@ -109,6 +109,7 @@ documents:
     fields:
       - "Columns: PN No., Loan Application No., Booking Date, Borrower, Originating Unit, Premium, Reference (the ARN), BDOI Location, Amortised – from the CBG Fire accounts of the batch"
     shot: doc-clpc-billing
+    shot_caption: "first page as generated, with six of its nine columns"
     frs: [FR-NB-090]
   - id: DO-10
     name: Reports (New Business Reports)

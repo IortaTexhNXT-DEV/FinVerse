@@ -89,6 +89,7 @@ public class KycReviewDueReport implements ReportDefinition {
             .map(this::row)
             .toList();
     return TabularReportBuilder.of(p)
+        .labelCodes("type")
         .columns(
             ReportColumn.text("code", "Client Code"),
             ReportColumn.text("name", "Client"),

@@ -99,6 +99,7 @@ public class JournalRegisterReport implements ReportDefinition {
         page.getContent().stream().map(JournalRegisterReport::row).toList();
     TabularReportBuilder builder =
         TabularReportBuilder.of(p)
+            .labelCodes("type", STATUS)
             .columns(
                 ReportColumn.text(BATCH_NO, "Batch No"),
                 ReportColumn.text("type", "Type"),

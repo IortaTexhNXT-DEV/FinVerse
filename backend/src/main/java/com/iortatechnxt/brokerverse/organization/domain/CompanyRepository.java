@@ -21,4 +21,11 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
    * @return true when taken
    */
   boolean existsByCode(String code);
+
+  /**
+   * The first company set up (the operating company of the deployment).
+   *
+   * @return the company with the lowest id, empty when none exists
+   */
+  Optional<Company> findFirstByOrderByIdAsc();
 }

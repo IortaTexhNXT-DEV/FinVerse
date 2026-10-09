@@ -86,6 +86,7 @@ public class ExceptionReport implements ReportDefinition {
             .map(a -> row(a, names))
             .toList();
     return TabularReportBuilder.of(p)
+        .labelCodes("severity", STATUS)
         .columns(
             ReportColumn.text("raised", "Raised On"),
             ReportColumn.text("severity", "Severity"),

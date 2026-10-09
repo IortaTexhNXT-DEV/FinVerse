@@ -906,7 +906,8 @@ const bulk = {
   'scr-nb-36-04-errorfile': async (ctx, shot, file) => {
     const { render } = require('./brd01_documents.cjs');
     const data = await ctx.api('ao', 'GET', `/bulk/jobs/${ctx.state.bulkJob}/error-file`);
-    render(data, 'xlsx', file, undefined, ['Client Type', 'Last Name', 'First Name', 'Birth Date', 'TIN', 'Error']);
+    render(data, 'xlsx', file, undefined, ['Client Type', 'Last Name', 'First Name', 'Birth Date', 'TIN', 'Error'],
+      { above: 'drop' });
     return null;
   },
   // The corrected rows uploaded through Upload Corrected File, validated and processed.

@@ -76,7 +76,9 @@ documents:
     produced: User Access Matrix › Export to Excel
     protected: No
     fields:
-      - "Sheet User Access Matrix: Permission, Area (area code), Action class and one column per group profile code, with Y where the profile holds the permission; the first row gives the enabled users of each profile – from the role grants in force"
+      - "Header: the company, the title, run by and run date, and the number of permissions and group profiles – from the run"
+      - "Sheet User Access Matrix: Permission, Area (area code), Action class and one column per group profile code (written upright), with Y where the profile holds the permission; the first row gives the enabled users of each profile – from the role grants in force. The headings and the first three columns stay in view when scrolling, and every column has a filter"
       - "Sheet By Action: Area, Action class, Permissions and, per profile, the permissions it holds there"
     shot: doc-access-matrix
+    shot_caption: "extract – the header of the workbook and the permissions of the User Access area against the group profiles UAM_REQUESTOR, UAM_APPROVER, UAM_SECOND_APPROVER, INFOSEC_OFFICER, SYSADMIN and AUDITOR (the full matrix: 293 permissions x 94 group profiles in the SIT/UAT data)"
     frs: [FR-UA-051]

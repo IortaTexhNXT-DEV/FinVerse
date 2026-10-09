@@ -288,7 +288,8 @@ class Ux:
                                section=self.section_of(w["id"])))
         for d in p.documents:
             out.append(Img(d["shot"], p.shot_file(d["shot"]), d["id"], d["name"], "document",
-                           unique(f"{d['id']}_document.png"), f"{d['name']}: first page as generated", "document",
+                           unique(f"{d['id']}_document.png"),
+                           f"{d['name']}: {d.get('shot_caption') or 'first page as generated'}", "document",
                            [], frs=list(d.get("frs") or []), section=self.section_of(d["id"])))
         shots = list(p.ux_shots())
         # Landing pages and menus shown with the image of another persona or set (identical images are kept once).

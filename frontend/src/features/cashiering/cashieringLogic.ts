@@ -213,6 +213,28 @@ export function seriesUsedPercent(s: Pick<Series, 'fromNo' | 'toNo' | 'remaining
   return Math.min(100, Math.max(0, Math.round(((size - s.remaining) / size) * 100)));
 }
 
+/**
+ * The first number of a new series in its number format (FRS.CSH.02.03.02): the tokens {PREFIX},
+ * {YEAR}, {BRANCH} (branch indicator) and {SEQ} (padded to the width of the last number); a blank
+ * format gives the prefix followed by the sequence.
+ */
+export function seriesNumberExample(
+  format: string,
+  s: { prefix: string; year?: number; branchCode?: string; fromNo: number; toNo: number },
+): string {
+  const width = String(s.toNo).length;
+  const sequence = String(s.fromNo).padStart(width, '0');
+  if (format.trim() === '') {
+    return s.prefix + sequence;
+  }
+  const stem = s.prefix.endsWith('-') ? s.prefix.slice(0, -1) : s.prefix;
+  return format
+    .replaceAll('{PREFIX}', stem)
+    .replaceAll('{YEAR}', s.year === undefined ? '' : String(s.year))
+    .replaceAll('{BRANCH}', s.branchCode ?? '')
+    .replaceAll('{SEQ}', sequence);
+}
+
 /** Ageing bucket of a pre-booked payment (PREBOOKED_AGEING alert). */
 export function ageBucket(days: number): 'fresh' | 'ageing' | 'overdue' {
   if (days > 30) {
@@ -295,11 +317,12 @@ export function journalRows(r: ReceiptDetail): JournalRow[] {
   return rows;
 }
 
-export type ReceiptTabId = 'applications' | 'lines' | 'journal' | 'history';
+export type ReceiptTabId = 'applications' | 'lines' | 'journal' | 'history' | 'documents';
 
 export const RECEIPT_TABS: readonly { id: ReceiptTabId; label: string }[] = [
   { id: 'applications', label: 'Applications' },
   { id: 'lines', label: 'Lines' },
   { id: 'journal', label: 'Journal' },
   { id: 'history', label: 'History' },
+  { id: 'documents', label: 'Documents' },
 ];

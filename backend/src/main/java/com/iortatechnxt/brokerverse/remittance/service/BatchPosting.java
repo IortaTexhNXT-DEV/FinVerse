@@ -212,7 +212,7 @@ public class BatchPosting {
 
   private void issueReceipts(RemittanceBatch batch, String insurerName, LocalDate today) {
     List<String> messages = new ArrayList<>();
-    if (batch.getTotals().commission().signum() > 0 && batch.getCommissionOrStatus() == null) {
+    if (batch.getTotals().commission().signum() > 0 && pending(batch.getCommissionOrStatus())) {
       IssuedReceipt or =
           issue(
               batch,
@@ -223,7 +223,7 @@ public class BatchPosting {
       batch.commissionReceipt(or.status().name(), or.receiptNo());
       messages.add("Commission OR: " + or.message());
     }
-    if (batch.getTotals().incentive().signum() > 0 && batch.getIncentiveOrStatus() == null) {
+    if (batch.getTotals().incentive().signum() > 0 && pending(batch.getIncentiveOrStatus())) {
       IssuedReceipt or =
           issue(
               batch,
@@ -240,6 +240,17 @@ public class BatchPosting {
     if (!messages.isEmpty()) {
       batch.receiptMessage(String.join("; ", messages));
     }
+  }
+
+  /**
+   * Whether the OR is still to be asked for: none asked yet, or deferred (a batch approved again
+   * after Disbursement cancelled its payment request asks again; the request is idempotent).
+   *
+   * @param status OR status of the batch
+   * @return true when the OR is asked for
+   */
+  private static boolean pending(String status) {
+    return status == null || ReceiptIssuer.Status.DEFERRED.name().equals(status);
   }
 
   private IssuedReceipt issue(
@@ -278,6 +289,10 @@ public class BatchPosting {
             today,
             lines,
             new ReceiptIssuer.Source(
-                RemittanceSettings.MODULE, batch.getBatchNo() + ":" + orType, si, remarks)));
+                RemittanceSettings.MODULE,
+                batch.getBatchNo() + ":" + orType,
+                si,
+                remarks,
+                batch.getDisbursementRequestNo() == null ? null : batch.cycleReference())));
   }
 }

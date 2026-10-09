@@ -681,8 +681,8 @@ def build_cr(data: Data) -> tuple[Path, dict]:
         form_cols, [{"field": f, "value": "", "by": ""} for f in fields],
         {"field": "CR No.", "value": "CR-CSH-001", "by": "Project analyst"})
     dec = [{"no": q["no"], "section": q["section"], "topic": q["topic"], "proposal": q["proposal"],
-            "by": q["decide_by"], "decision": "", "dby": "", "ddate": "", "cr": "", "status": "Open"}
-           for q in data.b.q_rows]
+            "by": q["decide_by"], "decision": "", "dby": "", "ddate": "", "cr": "",
+            "status": q["status"]} for q in data.b.q_rows]
     if len(dec) != data.b.stats["observations"]:
         raise SystemExit("decision log differs from Appendix R")
     wb.sheet("Decisions log", [
@@ -691,7 +691,8 @@ def build_cr(data: Data) -> tuple[Path, dict]:
         Column("by", "Decision by", 26, ""), Column("decision", "Decision", 30, "Adopt proposal / Keep BDOI text / Other"),
         Column("dby", "Decided by (name)", 18, ""), Column("ddate", "Date", 12, ""),
         Column("cr", "CR No. (if a change follows)", 14, ""),
-        Column("status", "Status", 12, "", values=["Open", "Decided", "Withdrawn"], status=True)],
+        Column("status", "Status", 12, "", values=["Open", annexes.CONFIGURABLE_STATUS, "Decided", "Withdrawn"],
+               status=True)],
         dec, description="One row per observation of Appendix R, for the decision of the Business Unit")
     path = wb.save(FOLDER / "BIBS_CR_BRD-02_Change_Request_Register_v1.0.xlsx")
     return path, {"candidates": len(rows), "decisions": len(dec)}
@@ -883,6 +884,13 @@ def build_uat(data: Data) -> tuple[Path, dict]:
 
 
 # ------------------------------------------------------------------------------------------------- 6 coverage
+def available_evidence(item_id: str) -> str:
+    """The evidence of an item available in full: the longest prefix of coverage_available it starts with."""
+    base = re.sub(r"\s*\(.*\)$", "", item_id).strip()
+    hits = [k for k in WB.get("coverage_available", {}) if base == k or base.startswith(k + ".")]
+    return WB["coverage_available"][max(hits, key=len)] if hits else ""
+
+
 def build_coverage(data: Data) -> tuple[Path, dict]:
     item_rows, ac_rows = [], []
     for it in data.items:
@@ -896,7 +904,10 @@ def build_coverage(data: Data) -> tuple[Path, dict]:
         steps = sorted({s for f in refs for s in data.steps_by_fr.get(f, [])}, key=step_key)
         if steps:
             evidence.append("Walkthrough " + ", ".join(steps[:8]))
-        if it["id"] in WB["coverage_items"]:
+        avail = available_evidence(it["id"])
+        if avail:
+            status, note = "Yes", avail
+        elif it["id"] in WB["coverage_items"]:
             status, note = WB["coverage_items"][it["id"]]
         elif cmp:
             status = cmp[0] if cmp[0] in ("Yes", "Partly", "No") else "Partly"
@@ -914,7 +925,12 @@ def build_coverage(data: Data) -> tuple[Path, dict]:
                           "note": note})
         for n, ac in enumerate(it["ac"], 1):
             ast = status
-            anote = "Available; confirmed with the acceptance test case in UAT." if status == "Yes" else note
+            if avail:
+                anote = "Available: " + avail
+            elif status == "Yes":
+                anote = "Available; confirmed with the acceptance test case in UAT."
+            else:
+                anote = note
             key = it["id"].replace("FRS.", "FRS-").replace(" (2nd)", "-2ND")
             ac_rows.append({"group": it["entry"], "id": it["id"], "no": n, "ac": ac, "status": ast,
                             "evidence": f"TC-{key}-AC{n:02d}", "note": anote})

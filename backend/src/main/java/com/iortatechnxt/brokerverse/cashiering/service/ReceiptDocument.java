@@ -113,18 +113,21 @@ public class ReceiptDocument {
    * @param r receipt
    * @param policyNo policy number
    * @param requestingUnit requesting marketing unit
+   * @param seriesNo series number of the certification (FRS.CSH.02.06.04)
    * @return PDF
    */
-  public byte[] certificateOfPayment(Receipt r, String policyNo, String requestingUnit) {
+  public byte[] certificateOfPayment(
+      Receipt r, String policyNo, String requestingUnit, String seriesNo) {
     return composer.pdf(
         new DocumentSpec(
             companyName(r.getCompanyId()),
             "CERTIFICATION OF PAYMENT",
-            r.getReceiptNo(),
+            seriesNo,
             List.of(
                 new Fields(
                     "This certifies that payment was received",
                     List.of(
+                        new Field("Series number", seriesNo),
                         new Field("From", r.getPayorName()),
                         new Field("AR number", r.getReceiptNo()),
                         new Field("Date paid", DisplayFormat.date(r.getReceiptDate())),

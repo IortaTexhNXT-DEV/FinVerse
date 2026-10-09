@@ -24,104 +24,67 @@ public class CashieringControlReports {
       "at time zone '" + BusinessClock.zoneId() + "' as date) between :from and :to";
 
   private static final String AMOUNT = "amount";
+  private static final int SQL_CAPACITY = 512;
+  private static final int[][] BRACKETS = {
+    {0, 30}, {31, 60}, {61, 90}, {91, 120}, {121, 180}, {181, 365}
+  };
   private static final String AMOUNT_LABEL = "Amount";
-  private static final String RECEIPT = "receipt_no";
-  private static final String RECEIPT_LABEL = "Receipt No.";
   private static final String INVOICE = "invoice_no";
   private static final String INVOICE_LABEL = "Invoice No.";
-  private static final String STATUS = "status";
   private static final String REFERENCE_LABEL = "Reference";
-  private static final String TRANSACTION = "transaction_no";
-  private static final String TRANSACTION_LABEL = "Transaction No.";
-
-  private static final String DAILY_CASH =
-      "select r.receipt_date, r.kind, r.payment_mode, r.currency, count(*) as receipts,"
-          + " sum(case when r.status <> 'CANCELLED' then r.amount else 0 end) as collected,"
-          + " sum(case when r.status = 'CANCELLED' then r.amount else 0 end) as cancelled,"
-          + " sum(r.applied_amount) as applied from csh_receipt r where r.company_id = :company"
-          + " and r.receipt_date between :from and :to group by r.receipt_date, r.kind,"
-          + " r.payment_mode, r.currency order by r.receipt_date, r.kind, r.payment_mode, r.currency";
 
   private static final String ADVANCE =
-      "select p.first_seen as payment_date, r.receipt_no as ar_no, p.arn, p.reference, p.amount,"
-          + " p.status, p.rematch_count, cast(p.resolved_at at time zone '"
+      "select cast(:to as date) - coalesce(r.receipt_date, cast(u.created_at as date)) as age_days,"
+          + bracket("cast(:to as date) - coalesce(r.receipt_date, cast(u.created_at as date))")
+          + " as bucket,"
+          + " r.receipt_date as date_booked, coalesce(p.channel, r.payment_mode) as payment_type,"
+          + " coalesce(p.value_date, r.receipt_date) as date_paid, cf.file_name, p.payment_no,"
+          + " u.reference, r.receipt_no, u.payor_name, coalesce(p.reference, u.invoice_no)"
+          + " as declared_ref, r.book_rate, u.amount, u.amount - u.balance as applied, u.balance,"
+          + " case when u.balance = 0 then 'APPLIED' else u.origin end as payment_status,"
+          + " u.invoice_no, a.market_segment, u.sales_unit, a.account_officer,"
+          + " (select d.disposition_type from csh_disposition d where d.unapplied_id = u.id"
+          + " order by d.created_at desc limit 1) as disposition, u.remarks,"
+          + " coalesce(su.full_name, u.created_by) as processor,"
+          + " coalesce(ins.name, i.insurer_code) as insurer"
+          + " from csh_unapplied u left join csh_receipt r on r.id = u.receipt_id"
+          + " left join csh_payment p on p.id = u.payment_id"
+          + " left join csh_channel_file cf on cf.bulk_job_no = p.batch_ref"
+          + " left join ops_invoice i on i.invoice_no = u.invoice_no"
+          + " left join acc_account a on a.id = i.account_id"
+          + " left join pty_party ins on ins.company_id = u.company_id and ins.code = i.insurer_code"
+          + " left join sec_user su on su.username = u.created_by"
+          + " where u.company_id = :company and cast(u.created_at at time zone '"
           + BusinessClock.zoneId()
-          + "' as date) as resolved_on, p.remarks"
-          + " from csh_prebooked p join csh_receipt r on r.id = p.receipt_id"
-          + " where p.company_id = :company and p.first_seen between :from and :to"
-          + " order by p.first_seen, p.id";
-
-  private static final String REVERSALS =
-      "select cast(a.reversed_at at time zone '"
-          + BusinessClock.zoneId()
-          + "' as date) as reversed_on, r.receipt_no, a.invoice_no, a.amount,"
-          + " a.source, a.reversal_ref, a.reversal_reason from csh_application a"
-          + " left join csh_receipt r on r.id = a.receipt_id where a.company_id = :company"
-          + " and a.status = 'REVERSED' and cast(a.reversed_at "
-          + BUSINESS_DAY_IN_PERIOD
-          + " order by a.reversed_at, a.id";
-
-  private static final String DIRECT_PAYMENT =
-      "select i.booking_date, i.invoice_no, i.arn, i.assured_name, i.insurer_code,"
-          + " i.gross_premium, i.commission, i.vat_on_commission, i.remittance_status"
-          + " from ops_invoice i where i.company_id = :company and i.dp_flag"
-          + " and i.booking_date between :from and :to order by i.booking_date, i.invoice_no";
-
-  private static final String REINSTATEMENTS =
-      "select cast(x.created_at at time zone '"
-          + BusinessClock.zoneId()
-          + "' as date) as requested_on, cast(x.approved_at at time zone '"
-          + BusinessClock.zoneId()
-          + "' as date) as posted_on,"
-          + " x.transaction_no, r.receipt_no, x.action, x.reason_code, x.amount, x.invoice_no,"
-          + " x.document_no, x.payor_name, x.account_officer, x.stage, x.created_by as requested_by,"
-          + " x.approved_by, x.journal_batch_no from csh_receipt_action x"
-          + " join csh_receipt r on r.id = x.receipt_id where x.company_id = :company"
-          + " and x.action <> 'CANCEL' and cast(x.created_at "
-          + BUSINESS_DAY_IN_PERIOD;
-
-  private static final String REAPPLICATIONS =
-      "select cast(ra.created_at at time zone '"
-          + BusinessClock.zoneId()
-          + "' as date) as reapplied_on, ra.invoice_no, ra.source_module,"
-          + " ra.source_ref, ra.unapplied, ra.excess, ra.receipt_nos, ra.unapplied_ref, ra.reason"
-          + " from csh_reapplication ra where ra.company_id = :company"
-          + " and cast(ra.created_at at time zone '"
-          + BusinessClock.zoneId()
-          + "' as date) between :from and :to order by ra.created_at, ra.id";
+          + "' as date) between :from and :to order by u.created_at, u.id";
 
   private static final String COP =
       "select c.receipt_no as ar_no, c.policy_no, c.requesting_unit, cast(c.issued_at at time zone '"
           + BusinessClock.zoneId()
           + "' as date)"
-          + " as issued_on, c.issued_by, 1 as cnt from csh_certificate_of_payment c"
+          + " as issued_on, c.series_no, coalesce(u.full_name, c.issued_by) as issued_by, 1 as cnt"
+          + " from csh_certificate_of_payment c left join sec_user u on u.username = c.issued_by"
           + " where c.company_id = :company and cast(c.issued_at "
           + BUSINESS_DAY_IN_PERIOD
           + " order by c.issued_at, c.id";
 
-  private static final String CWT_TAGS =
-      "select cast(t.created_at at time zone '"
-          + BusinessClock.zoneId()
-          + "' as date) as tagged_on, t.reference, t.invoice_no, t.client_code,"
-          + " t.insurer_code, t.path, t.certificate_no, t.amount, t.stage, t.receipt_no"
-          + " from csh_cwt_tag t where t.company_id = :company"
-          + " and cast(t.created_at at time zone '"
-          + BusinessClock.zoneId()
-          + "' as date) between :from and :to order by t.created_at, t.id";
-
   private static final String AR_OUTSTANDING =
-      "select i.client_code, i.assured_name, i.invoice_no, i.booking_date,"
-          + " cast(:to as date) - i.booking_date as age_days,"
-          + " case when cast(:to as date) - i.booking_date <= 30 then '0-30'"
-          + " when cast(:to as date) - i.booking_date <= 60 then '31-60'"
-          + " when cast(:to as date) - i.booking_date <= 90 then '61-90'"
-          + " when cast(:to as date) - i.booking_date <= 120 then '91-120' else 'Over 120' end as bucket,"
+      "select coalesce(a.client_name, i.client_code) as client, i.client_code, i.arn,"
+          + " i.invoice_no, i.policy_no, coalesce(ins.name, i.insurer_code) as insurer,"
+          + " i.booking_date, cast(:to as date) - i.booking_date as age_days,"
+          + bracket("cast(:to as date) - i.booking_date")
+          + " as bucket,"
+          + " a.market_segment as marketing_unit, a.account_officer,"
           + " sum(c.balance) as outstanding from ops_invoice i join ops_invoice_component c"
           + " on c.invoice_id = i.id and c.component in ('BASIC', 'DST', 'PREMIUM_TAX_VAT', 'LGT',"
-          + " 'FST', 'OTHER') where i.company_id = :company and not i.cancelled"
+          + " 'FST', 'OTHER') left join acc_account a on a.id = i.account_id"
+          + " left join pty_party ins on ins.company_id = i.company_id and ins.code = i.insurer_code"
+          + " where i.company_id = :company and not i.cancelled"
           + ReportOrigin.sql("i.origin")
-          + " and i.booking_date <= :to group by i.client_code, i.assured_name, i.invoice_no,"
-          + " i.booking_date having sum(c.balance) > 0 order by i.client_code, i.booking_date, i.invoice_no";
+          + " and i.booking_date <= :to group by a.client_name, i.client_code, i.arn, i.invoice_no,"
+          + " i.policy_no, ins.name, i.insurer_code, i.booking_date, a.market_segment,"
+          + " a.account_officer having sum(c.balance) > 0"
+          + " order by client, i.booking_date, i.invoice_no";
 
   private static final String BATCH_RUN =
       "select p.batch_ref, p.channel, count(*) as payments,"
@@ -148,33 +111,7 @@ public class CashieringControlReports {
           + " order by b.batch_no, t.reference";
 
   /**
-   * Annex II #13 Daily Cash Reconciliation (draft).
-   *
-   * @param jdbc JDBC
-   * @return report
-   */
-  @Bean
-  SqlReport dailyCashReport(NamedParameterJdbcTemplate jdbc) {
-    return report(
-        jdbc,
-        "CSH-DAILY-CASH-REC",
-        "Daily Cash Reconciliation",
-        "Receipts per day, kind and mode with collections, cancellations and applications",
-        DAILY_CASH,
-        List.of(
-            ReportColumn.text("kind", "Kind"),
-            ReportColumn.text("payment_mode", "Mode"),
-            ReportColumn.text("currency", "Currency"),
-            ReportColumn.count("receipts", "Receipts"),
-            ReportColumn.amount("collected", "Collected"),
-            ReportColumn.amount("cancelled", "Cancelled"),
-            ReportColumn.amount("applied", "Applied")),
-        "receipt_date",
-        "Receipt Date");
-  }
-
-  /**
-   * Annex II #14 Advance Payment Transaction (Auto-Credit) (draft).
+   * Unapplied Premium Payment Transaction (FRS.CSH.09.02.11; Annex II #14).
    *
    * @param jdbc JDBC
    * @return report
@@ -184,148 +121,34 @@ public class CashieringControlReports {
     return report(
         jdbc,
         "CSH-ADVANCE-PAYMENT",
-        "Advance Payment Transactions (Auto-Credit)",
-        "Payments received before booking and their automatic application",
+        "Unapplied Premium Payment Transaction",
+        "Unapplied premium payments with their ageing, application and disposition",
         ADVANCE,
         List.of(
-            ReportColumn.date("payment_date", "Payment Date"),
-            ReportColumn.text("ar_no", "AR No."),
-            ReportColumn.text("arn", "ARN"),
-            ReportColumn.text("reference", REFERENCE_LABEL),
-            ReportColumn.amount(AMOUNT, AMOUNT_LABEL),
-            ReportColumn.text(STATUS, "Status"),
-            ReportColumn.count("rematch_count", "Re-match Runs"),
-            ReportColumn.date("resolved_on", "Applied On"),
-            ReportColumn.text("remarks", "Remarks")));
-  }
-
-  /**
-   * Annex II #15 Payment Reversal (draft).
-   *
-   * @param jdbc JDBC
-   * @return report
-   */
-  @Bean
-  SqlReport paymentReversalReport(NamedParameterJdbcTemplate jdbc) {
-    return report(
-        jdbc,
-        "CSH-PAYMENT-REVERSAL",
-        "Payment Reversals",
-        "Applications reversed by cancellation, re-application or disposition",
-        REVERSALS,
-        List.of(
-            ReportColumn.date("reversed_on", "Reversed On"),
-            ReportColumn.text(RECEIPT, RECEIPT_LABEL),
-            ReportColumn.text(INVOICE, INVOICE_LABEL),
-            ReportColumn.amount(AMOUNT, AMOUNT_LABEL),
-            ReportColumn.text("source", "Applied By"),
-            ReportColumn.text("reversal_ref", "Reversal Ref."),
-            ReportColumn.text("reversal_reason", "Reason")));
-  }
-
-  /**
-   * Annex II #16 Direct Payment (draft).
-   *
-   * @param jdbc JDBC
-   * @return report
-   */
-  @Bean
-  SqlReport directPaymentReport(NamedParameterJdbcTemplate jdbc) {
-    return report(
-        jdbc,
-        "CSH-DIRECT-PAYMENT",
-        "Direct Payment Accounts",
-        "Invoices paid directly to the insurer with the commission to collect",
-        DIRECT_PAYMENT,
-        List.of(
-            ReportColumn.date("booking_date", "Booking Date"),
-            ReportColumn.text(INVOICE, INVOICE_LABEL),
-            ReportColumn.text("arn", "ARN"),
-            ReportColumn.text("assured_name", "Assured"),
-            ReportColumn.text("insurer_code", "Insurer"),
-            ReportColumn.amount("gross_premium", "Gross Premium"),
-            ReportColumn.amount("commission", "Commission"),
-            ReportColumn.amount("vat_on_commission", "VAT on Commission"),
-            ReportColumn.text("remittance_status", "Remittance Status")));
-  }
-
-  /**
-   * Annex II #17 Reinstatement Monitoring (draft) and #20 Reinstatement (draft).
-   *
-   * @param jdbc JDBC
-   * @return report
-   */
-  @Bean
-  SqlReport reinstatementMonitoringReport(NamedParameterJdbcTemplate jdbc) {
-    return report(
-        jdbc,
-        "CSH-REINSTATEMENT-MON",
-        "Reinstatement Monitoring",
-        "Reinstatement requests in every stage",
-        REINSTATEMENTS + " order by x.created_at, x.id",
-        reinstatementColumns(),
-        "stage",
-        "Stage");
-  }
-
-  /**
-   * Annex II #20 Reinstatement (draft).
-   *
-   * @param jdbc JDBC
-   * @return report
-   */
-  @Bean
-  SqlReport reinstatementReport(NamedParameterJdbcTemplate jdbc) {
-    return report(
-        jdbc,
-        "CSH-REINSTATEMENT",
-        "Reinstatements",
-        "Reinstatements posted with the encoded fields",
-        REINSTATEMENTS + " and x.stage = 'POSTED' order by x.approved_at, x.id",
-        reinstatementColumns());
-  }
-
-  private static List<ReportColumn> reinstatementColumns() {
-    return List.of(
-        ReportColumn.date("requested_on", "Requested On"),
-        ReportColumn.date("posted_on", "Posted On"),
-        ReportColumn.text(TRANSACTION, TRANSACTION_LABEL),
-        ReportColumn.text(RECEIPT, RECEIPT_LABEL),
-        ReportColumn.text("action", "Type"),
-        ReportColumn.text("reason_code", "Reason"),
-        ReportColumn.amount(AMOUNT, "Amount Reinstated"),
-        ReportColumn.text(INVOICE, INVOICE_LABEL),
-        ReportColumn.text("document_no", "AR / OR No."),
-        ReportColumn.text("payor_name", "Assured / Payor"),
-        ReportColumn.text("account_officer", "Account Officer"),
-        ReportColumn.text("requested_by", "Requested By"),
-        ReportColumn.text("approved_by", "Approved By"));
-  }
-
-  /**
-   * Annex II #18 Re-Application (draft).
-   *
-   * @param jdbc JDBC
-   * @return report
-   */
-  @Bean
-  SqlReport reapplicationReport(NamedParameterJdbcTemplate jdbc) {
-    return report(
-        jdbc,
-        "CSH-REAPPLICATION",
-        "Re-Application",
-        "Payments re-applied after endorsements",
-        REAPPLICATIONS,
-        List.of(
-            ReportColumn.date("reapplied_on", "Re-applied On"),
-            ReportColumn.text(INVOICE, INVOICE_LABEL),
-            ReportColumn.text("source_module", "Module"),
-            ReportColumn.text("source_ref", REFERENCE_LABEL),
-            ReportColumn.amount("unapplied", "Payments Re-applied"),
-            ReportColumn.amount("excess", "Excess"),
-            ReportColumn.text("receipt_nos", "Receipts"),
-            ReportColumn.text("unapplied_ref", "Unapplied Item"),
-            ReportColumn.text("reason", "Reason")));
+            new ReportColumn("age_days", "Aging (Per Date Booked)", ColumnType.NUMBER, false),
+            ReportColumn.text("bucket", "Aging Bracket"),
+            ReportColumn.date("date_booked", "Date Booked"),
+            ReportColumn.text("payment_type", "Payment Type"),
+            ReportColumn.date("date_paid", "Date Paid"),
+            ReportColumn.text("file_name", "Filename"),
+            ReportColumn.text("payment_no", "Transaction No"),
+            ReportColumn.text("reference", "Receipt No."),
+            ReportColumn.text("receipt_no", "AR #"),
+            ReportColumn.text("payor_name", "Payor Name"),
+            ReportColumn.text("declared_ref", "Declared Ref. No."),
+            new ReportColumn("book_rate", "Dollar Rate Used", ColumnType.NUMBER, false),
+            ReportColumn.amount(AMOUNT, "Amount Paid"),
+            ReportColumn.amount("applied", "Amount Applied"),
+            ReportColumn.amount("balance", "Amount Balance"),
+            ReportColumn.text("payment_status", "Payment Status"),
+            ReportColumn.text(INVOICE, "Invoice"),
+            ReportColumn.text("sales_unit", "Department"),
+            ReportColumn.text("market_segment", "Market Segment"),
+            ReportColumn.text("account_officer", "Account Officer"),
+            ReportColumn.text("disposition", "Marketing Disposition"),
+            ReportColumn.text("remarks", "Remarks"),
+            ReportColumn.text("processor", "Processor Name"),
+            ReportColumn.text("insurer", "Insurer")));
   }
 
   /**
@@ -347,39 +170,13 @@ public class CashieringControlReports {
                 ReportColumn.text("policy_no", "Policy Number"),
                 ReportColumn.text("requesting_unit", "Requesting Market Unit"),
                 ReportColumn.date("issued_on", "Date (COP) Issued"),
+                ReportColumn.text("series_no", "Series Number"),
                 ReportColumn.text("issued_by", "Issued By"),
                 ReportColumn.count("cnt", "Count")),
             null,
             null,
             null),
         jdbc);
-  }
-
-  /**
-   * Annex II #21 CWT (draft).
-   *
-   * @param jdbc JDBC
-   * @return report
-   */
-  @Bean
-  SqlReport cwtReport(NamedParameterJdbcTemplate jdbc) {
-    return report(
-        jdbc,
-        "CSH-CWT",
-        "CWT",
-        "BIR 2307 tags and their status",
-        CWT_TAGS,
-        List.of(
-            ReportColumn.date("tagged_on", "Tagged On"),
-            ReportColumn.text("reference", REFERENCE_LABEL),
-            ReportColumn.text(INVOICE, INVOICE_LABEL),
-            ReportColumn.text("client_code", "Client"),
-            ReportColumn.text("insurer_code", "Insurer"),
-            ReportColumn.text("path", "Path"),
-            ReportColumn.text("certificate_no", "Certificate"),
-            ReportColumn.amount(AMOUNT, AMOUNT_LABEL),
-            ReportColumn.text("stage", "Stage"),
-            ReportColumn.text(RECEIPT, "AR (cash path)")));
   }
 
   /**
@@ -394,18 +191,22 @@ public class CashieringControlReports {
         new Spec(
             "CSH-AR-OUTSTANDING",
             "AR Outstanding with Ageing",
-            "Premium receivable outstanding per client and invoice at the end date, aged from booking (KC 4.c)",
+            "Premium receivable outstanding per client and account at the end date, aged from booking (KC 4.c)",
             AR_OUTSTANDING,
             List.of(
+                ReportColumn.text("client", "Client"),
+                ReportColumn.text("arn", "Account Number"),
                 ReportColumn.text(INVOICE, INVOICE_LABEL),
-                ReportColumn.text("assured_name", "Assured"),
+                ReportColumn.text("policy_no", "Policy Number"),
+                ReportColumn.text("insurer", "Insurer"),
                 ReportColumn.date("booking_date", "Booking Date"),
-                new ReportColumn("age_days", "Age (days)", ColumnType.NUMBER, false),
-                ReportColumn.text("bucket", "Ageing Bucket"),
-                ReportColumn.amount("outstanding", "Outstanding")),
-            "client_code",
-            "Client",
-            "Ageing buckets 0-30 / 31-60 / 61-90 / 91-120 / over 120 days."),
+                ReportColumn.amount("outstanding", "Outstanding Amount"),
+                ReportColumn.text("bucket", "Ageing Bracket"),
+                ReportColumn.text("marketing_unit", "Marketing Unit"),
+                ReportColumn.text("account_officer", "Account Officer")),
+            null,
+            null,
+            "Ageing brackets 0-30 / 31-60 / 61-90 / 91-120 / 121-180 / 181-365 / above 365 days."),
         jdbc);
   }
 
@@ -494,5 +295,28 @@ public class CashieringControlReports {
             group.length > 1 ? group[1] : null,
             null),
         jdbc);
+  }
+
+  /**
+   * The ageing bracket of a number of days (FRS.CSH.09.02.11): 0-30, 31-60, 61-90, 91-120, 121-180,
+   * 181-365, above 365.
+   *
+   * @param days SQL expression of the days
+   * @return SQL case expression
+   */
+  static String bracket(String days) {
+    StringBuilder sql = new StringBuilder(SQL_CAPACITY).append(" case");
+    for (int[] b : BRACKETS) {
+      sql.append(" when ")
+          .append(days)
+          .append(" <= ")
+          .append(b[1])
+          .append(" then '")
+          .append(b[0])
+          .append('-')
+          .append(b[1])
+          .append('\'');
+    }
+    return sql.append(" else 'above 365' end").toString();
   }
 }

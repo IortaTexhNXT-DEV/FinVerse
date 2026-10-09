@@ -32,8 +32,10 @@ public class CashieringReceiptReports {
   private static final String INSURER_LABEL = "Insurance Company";
 
   private static final String APPLIED_PREMIUM =
-      "select r.receipt_no as ar_no, a.value_date, a.amount, a.invoice_no, r.payor_name, i.risk_code,"
+      "select r.receipt_no as ar_no, a.value_date, a.amount, a.invoice_no, r.payor_name,"
+          + " r.check_bank as bank, b.name as branch, r.check_no, i.risk_code,"
           + " 1 as cnt from csh_application a join csh_receipt r on r.id = a.receipt_id"
+          + " left join org_branch b on b.id = r.branch_id"
           + " left join ops_invoice i on i.invoice_no = a.invoice_no"
           + " where a.company_id = :company and a.status = 'ACTIVE' and r.kind = 'AR'"
           + ReportOrigin.sql("coalesce(i.origin, 'BIBS')")
@@ -61,21 +63,6 @@ public class CashieringReceiptReports {
           + " where m.company_id = :company and m.kind = 'EXCESS' and m.swept_on between :from and :to"
           + " order by m.swept_on, m.subject_ref";
 
-  private static final String CANCELLED =
-      "select r.receipt_date as date_issued, x.reason_code as reason, r.receipt_no,"
-          + " coalesce(r.assured_name, r.payor_name) as assured,"
-          + " case when r.kind = 'OR' then r.gross else r.amount end as gross, r.vat, r.wtax, r.amount,"
-          + " cast(x.approved_at at time zone '"
-          + BusinessClock.zoneId()
-          + "' as date) as cancelled_on, x.transaction_no from csh_receipt r"
-          + " join csh_receipt_action x on x.receipt_id = r.id and x.action = 'CANCEL'"
-          + " and x.stage = 'POSTED' where r.company_id = :company and r.kind = ";
-
-  private static final String CANCELLED_PERIOD =
-      " and cast(x.approved_at at time zone '"
-          + BusinessClock.zoneId()
-          + "' as date) between :from and :to order by x.approved_at";
-
   private static final String PICKUP =
       "select cast(p.requested_at at time zone '"
           + BusinessClock.zoneId()
@@ -98,29 +85,6 @@ public class CashieringReceiptReports {
           + " left join ops_invoice i on i.invoice_no = a.invoice_no where a.company_id = :company"
           + " and a.value_date between :from and :to order by a.value_date, r.receipt_no, a.id";
 
-  private static final String COMMISSION_OUTSTANDING =
-      "select i.insurer_code, i.invoice_no, i.arn, i.assured_name, i.booking_date,"
-          + " c.booked as commission, c.balance as outstanding, cast(:to as date) - i.booking_date as age_days"
-          + " from ops_invoice i join ops_invoice_component c on c.invoice_id = i.id"
-          + " and c.component = 'COMMISSION' where i.company_id = :company and c.balance > 0"
-          + ReportOrigin.sql("i.origin")
-          + " and i.booking_date between :from and :to order by i.insurer_code, i.booking_date, i.invoice_no";
-
-  private static final String COMMISSION_YTD =
-      "select i.insurer_code, i.segment, count(*) as invoices, sum(c.booked) as commission,"
-          + " sum(c.balance) as outstanding from ops_invoice i join ops_invoice_component c"
-          + " on c.invoice_id = i.id and c.component = 'COMMISSION' where i.company_id = :company"
-          + ReportOrigin.sql("i.origin")
-          + " and c.balance > 0 and i.booking_date between cast(date_trunc('year', cast(:to as date)) as date)"
-          + " and :to group by i.insurer_code, i.segment order by i.insurer_code, i.segment";
-
-  private static final String MINBAL =
-      "select m.swept_on, m.invoice_no, m.client_code, m.sales_unit, m.components, m.amount,"
-          + " m.journal_batch_no, 1 as cnt from csh_minimal_balance m where m.company_id = :company"
-          + " and m.swept_on between :from and :to and m.kind = ";
-
-  private static final String MINBAL_ORDER = " order by m.swept_on, m.invoice_no";
-
   /**
    * Annex II #1 Applied Premium Reports.
    *
@@ -136,11 +100,14 @@ public class CashieringReceiptReports {
             "Premium applied to invoices by AR in the period",
             APPLIED_PREMIUM,
             List.of(
-                ReportColumn.text(AR_NO, "AR No."),
-                ReportColumn.date("value_date", "Date"),
+                ReportColumn.text(AR_NO, "Acknowledgement Receipt No."),
+                ReportColumn.date("value_date", "Date Paid"),
                 ReportColumn.amount(AMOUNT, "Amount Paid"),
                 ReportColumn.text(INVOICE, INVOICE_LABEL),
                 ReportColumn.text(PAYOR, "Payor / Client Name"),
+                ReportColumn.text("bank", "Bank"),
+                ReportColumn.text("branch", "Branch"),
+                ReportColumn.text("check_no", "Check No."),
                 ReportColumn.text("risk_code", "Risk Code"),
                 ReportColumn.count(COUNT, COUNT_LABEL)),
             null,
@@ -241,53 +208,6 @@ public class CashieringReceiptReports {
   }
 
   /**
-   * Annex II #5 Cancelled Official Receipts.
-   *
-   * @param jdbc JDBC
-   * @return report
-   */
-  @Bean
-  SqlReport cancelledOrReport(NamedParameterJdbcTemplate jdbc) {
-    return cancelled(jdbc, "CSH-CANCELLED-OR", "Cancelled Official Receipts", "'OR'");
-  }
-
-  /**
-   * Annex II #6 Cancelled Acknowledgment Receipts.
-   *
-   * @param jdbc JDBC
-   * @return report
-   */
-  @Bean
-  SqlReport cancelledArReport(NamedParameterJdbcTemplate jdbc) {
-    return cancelled(jdbc, "CSH-CANCELLED-AR", "Cancelled Acknowledgment Receipts", "'AR'");
-  }
-
-  private static SqlReport cancelled(
-      NamedParameterJdbcTemplate jdbc, String code, String title, String kind) {
-    return new SqlReport(
-        new Spec(
-            code,
-            title,
-            "Receipts cancelled in the period with the reason",
-            CANCELLED + kind + CANCELLED_PERIOD,
-            List.of(
-                ReportColumn.date("date_issued", "Date Issued"),
-                ReportColumn.text("reason", "Reason for Cancellation"),
-                ReportColumn.text("receipt_no", "Receipt Number"),
-                ReportColumn.text("assured", "Assured"),
-                ReportColumn.amount("gross", "Gross Amount"),
-                ReportColumn.amount("vat", "VAT"),
-                ReportColumn.amount("wtax", "WTAX"),
-                ReportColumn.amount(AMOUNT, AMOUNT_LABEL),
-                ReportColumn.date("cancelled_on", "Cancelled On"),
-                ReportColumn.text("transaction_no", "Transaction No.")),
-            null,
-            null,
-            null),
-        jdbc);
-  }
-
-  /**
    * Annex II #7 Check Pick-Up Request Reports.
    *
    * @param jdbc JDBC
@@ -347,105 +267,6 @@ public class CashieringReceiptReports {
             null,
             null,
             "All priority postings are listed."),
-        jdbc);
-  }
-
-  /**
-   * Annex II #9 Unapplied Commission Receivable Extract for Mancom (draft layout).
-   *
-   * @param jdbc JDBC
-   * @return report
-   */
-  @Bean
-  SqlReport commissionMancomReport(NamedParameterJdbcTemplate jdbc) {
-    return new SqlReport(
-        new Spec(
-            "CSH-UNAPPLIED-COMM-MANCOM",
-            "Unapplied Commission Receivable Extract for Mancom",
-            "Commission receivable not yet collected per insurer",
-            COMMISSION_OUTSTANDING,
-            List.of(
-                ReportColumn.text(INVOICE, INVOICE_LABEL),
-                ReportColumn.text("arn", "ARN"),
-                ReportColumn.text("assured_name", "Assured"),
-                ReportColumn.date("booking_date", "Booking Date"),
-                ReportColumn.amount("commission", "Commission"),
-                ReportColumn.amount("outstanding", "Outstanding"),
-                new ReportColumn("age_days", "Age (days)", ColumnType.NUMBER, false)),
-            INSURER,
-            INSURER_LABEL,
-            null),
-        jdbc);
-  }
-
-  /**
-   * Annex II #10 Unapplied Commission Receivable Payments YTD balance per criteria (draft).
-   *
-   * @param jdbc JDBC
-   * @return report
-   */
-  @Bean
-  SqlReport commissionYtdReport(NamedParameterJdbcTemplate jdbc) {
-    return new SqlReport(
-        new Spec(
-            "CSH-UNAPPLIED-COMM-YTD",
-            "Unapplied Commission Receivable YTD Balance",
-            "Year-to-date commission receivable balance per insurer and segment",
-            COMMISSION_YTD,
-            List.of(
-                ReportColumn.text(INSURER, INSURER_LABEL),
-                ReportColumn.text("segment", "Segment"),
-                ReportColumn.count("invoices", "Invoices"),
-                ReportColumn.amount("commission", "Commission"),
-                ReportColumn.amount("outstanding", "Outstanding")),
-            null,
-            null,
-            null),
-        jdbc);
-  }
-
-  /**
-   * Annex II #11 Premium Minimal Balance (draft).
-   *
-   * @param jdbc JDBC
-   * @return report
-   */
-  @Bean
-  SqlReport premiumMinimalReport(NamedParameterJdbcTemplate jdbc) {
-    return minimal(jdbc, "CSH-MINBAL-PREMIUM", "Premium Minimal Balance", "'PREMIUM'");
-  }
-
-  /**
-   * Annex II #12 Commission Minimal Balance (draft; rule inactive until OQ11).
-   *
-   * @param jdbc JDBC
-   * @return report
-   */
-  @Bean
-  SqlReport commissionMinimalReport(NamedParameterJdbcTemplate jdbc) {
-    return minimal(jdbc, "CSH-MINBAL-COMMISSION", "Commission Minimal Balance", "'COMMISSION'");
-  }
-
-  private static SqlReport minimal(
-      NamedParameterJdbcTemplate jdbc, String code, String title, String kind) {
-    return new SqlReport(
-        new Spec(
-            code,
-            title,
-            "Minimal balances reversed by the sweep",
-            MINBAL + kind + MINBAL_ORDER,
-            List.of(
-                ReportColumn.date("swept_on", "Swept On"),
-                ReportColumn.text(INVOICE, INVOICE_LABEL),
-                ReportColumn.text("client_code", "Client"),
-                ReportColumn.text("sales_unit", "Market Unit"),
-                ReportColumn.text("components", "Components"),
-                ReportColumn.amount(AMOUNT, AMOUNT_LABEL),
-                ReportColumn.text("journal_batch_no", "Journal"),
-                ReportColumn.count(COUNT, COUNT_LABEL)),
-            null,
-            null,
-            null),
         jdbc);
   }
 }

@@ -31,7 +31,7 @@ const TABS = [
 ] as const;
 type TabId = (typeof TABS)[number]['id'];
 
-type Filters = Omit<ReceiptCriteria, 'companyId'>;
+type Filters = Omit<ReceiptCriteria, 'companyId' | 'branchId' | 'printed' | 'systemOnly'>;
 
 const FILTER_FIELDS: readonly [keyof Filters, string, 'text' | 'number' | 'date'][] = [
   ['clientCode', 'Client Code', 'text'],

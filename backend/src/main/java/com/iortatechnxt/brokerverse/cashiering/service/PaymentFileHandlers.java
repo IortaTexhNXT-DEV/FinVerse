@@ -157,24 +157,33 @@ public class PaymentFileHandlers {
             "Direct Credit File",
             PaymentChannel.DIRECT_CREDIT,
             "DIRECT_CREDIT",
-            List.of(
-                date(TX_DATE, SAMPLE_DATE),
-                BulkColumn.optional("BP filename", "Bills payment file name", ""),
-                BulkColumn.required("Transaction no", "Transaction number", "DC-0001"),
-                number("Paid amount", "Amount paid", SAMPLE_AMOUNT),
-                BulkColumn.optional("Payment type", "Payment type", "ONLINE"),
-                BulkColumn.required("Payor", "Payor", "Maria Clara Santos"),
-                BulkColumn.optional(
-                    "Account ref no", "Invoice, ARN, policy or PN number", "BI-2026-000001"),
-                BulkColumn.optional(ASSURED, ASSURED, ""),
-                BulkColumn.optional("EBIX_RefNo", "EBIX reference", ""),
-                BulkColumn.optional("Logged by", "Logged by", ""),
-                BulkColumn.optional("Requestor", "Requestor", "")),
+            directCreditColumns(),
             NOTE,
             PaymentFileHandlers::directCredit),
         intake,
         layouts,
         settings);
+  }
+
+  /**
+   * The columns of the Direct Credit file (FS01/04; Appendix D.5).
+   *
+   * @return columns
+   */
+  static List<BulkColumn> directCreditColumns() {
+    return List.of(
+        date(TX_DATE, SAMPLE_DATE),
+        BulkColumn.optional("BP filename", "Bills payment file name", ""),
+        BulkColumn.required("Transaction no", "Transaction number", "DC-0001"),
+        number("Paid amount", "Amount paid", SAMPLE_AMOUNT),
+        BulkColumn.optional("Payment type", "Payment type", "ONLINE"),
+        BulkColumn.required("Payor", "Payor", "Maria Clara Santos"),
+        BulkColumn.optional(
+            "Account ref no", "Invoice, ARN, policy or PN number", "BI-2026-000001"),
+        BulkColumn.optional(ASSURED, ASSURED, ""),
+        BulkColumn.optional("EBIX_RefNo", "EBIX reference", ""),
+        BulkColumn.optional("Logged by", "Logged by", ""),
+        BulkColumn.optional("Requestor", "Requestor", ""));
   }
 
   private static BulkColumn number(String header, String description, String example) {

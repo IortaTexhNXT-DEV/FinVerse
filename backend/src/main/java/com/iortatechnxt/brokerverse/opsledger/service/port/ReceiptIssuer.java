@@ -24,7 +24,10 @@ public interface ReceiptIssuer {
   enum Status {
     /** OR issued and posted. */
     ISSUED,
-    /** Not issued now (no cashiering module): handed over for manual issuance. */
+    /**
+     * Not issued now: handed over for manual issuance (no cashiering module), or kept until
+     * Disbursement approves the payment request (FRS.CSH.07.01.01).
+     */
     DEFERRED
   }
 
@@ -79,8 +82,24 @@ public interface ReceiptIssuer {
    * @param reference source reference (e.g. settlement batch number)
    * @param certificateRef BIR certificate of the withholding tax, may be null
    * @param remarks remarks, may be null
+   * @param awaitRef reference of the payment request sent to Disbursement whose approval the OR
+   *     waits for (FRS.CSH.07.01.01), null when the OR is issued at once
    */
-  record Source(String module, String reference, String certificateRef, String remarks) {}
+  record Source(
+      String module, String reference, String certificateRef, String remarks, String awaitRef) {
+
+    /**
+     * A source whose OR is issued at once.
+     *
+     * @param module source module
+     * @param reference source reference
+     * @param certificateRef BIR certificate, may be null
+     * @param remarks remarks, may be null
+     */
+    public Source(String module, String reference, String certificateRef, String remarks) {
+      this(module, reference, certificateRef, remarks, null);
+    }
+  }
 
   /**
    * One OR line.

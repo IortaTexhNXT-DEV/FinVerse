@@ -11,6 +11,7 @@ import { CodeSelect, InsurerField, TextField } from './CashFields';
 import type { RecordForm } from './recordLogic';
 import { currenciesOf, defaultBankAccount, isNonPremium, NON_PREMIUM_TYPES } from './recordLogic';
 import type { FormSettings } from './recordsApi';
+import { OtherIncomeSelect } from './OtherIncomeSelect';
 
 /** What every section of the Create AR / OR form receives. */
 export interface SectionProps {
@@ -250,7 +251,7 @@ export function PaymentSection({ form, settings, set, update, error }: Readonly<
   );
 }
 
-function OrTaxFields({ form, set, error }: Readonly<SectionProps>) {
+function OrTaxFields({ form, set, update, error }: Readonly<SectionProps>) {
   return (
     <>
       <TextField label="VAT" type="number" value={form.vat} onChange={(v) => set('vat', v)} />
@@ -266,12 +267,7 @@ function OrTaxFields({ form, set, error }: Readonly<SectionProps>) {
         onChange={(v) => set('certificateRef', v)}
         error={error('certificateRef')}
       />
-      <TextField
-        label="SOA or Fee Invoice"
-        value={form.otherIncomeRef}
-        onChange={(v) => set('otherIncomeRef', v)}
-        hint="Valid for Collection SOA of an incentive, or the Fee Policy invoice"
-      />
+      <OtherIncomeSelect form={form} update={update} />
     </>
   );
 }

@@ -261,7 +261,7 @@ export default function PostingListPage() {
       width: '56px',
       render: (r: ReceiptRecord) => (
         <RowActionMenu
-          label={`Actions for ${r.recordNo}`}
+          label={r.recordNo}
           actions={[
             { label: 'Open', onSelect: () => void navigate(`/cashiering/records/${r.id}`) },
             { label: 'Post', onSelect: () => post.mutate([r.id]), disabled: !postable(r) },

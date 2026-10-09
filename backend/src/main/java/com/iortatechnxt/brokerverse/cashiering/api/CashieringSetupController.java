@@ -100,7 +100,8 @@ public class CashieringSetupController {
                 r.fromNo(),
                 r.toNo(),
                 r.atpNo(),
-                r.warnAt())));
+                r.warnAt(),
+                new ReceiptSeriesService.Numbering(r.seriesYear(), r.numberFormat()))));
   }
 
   /**

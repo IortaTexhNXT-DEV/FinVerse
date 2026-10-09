@@ -32,6 +32,9 @@ public class CashieringDecisions {
   /** Remarks required (C25). */
   public static final String REMARKS_REQUIRED = "CASH_AR_REMARKS_REQUIRED";
 
+  /** When the OR of an insurer settlement is issued (C12). */
+  public static final String SETTLEMENT_OR_TRIGGER = "CASH_SETTLEMENT_OR_TRIGGER";
+
   private static final String YES = "Y";
   private static final String ON = "ON";
   private static final int DEFAULT_HOLDING_DAYS = 4;
@@ -163,6 +166,16 @@ public class CashieringDecisions {
    */
   public boolean checkBeforeCash() {
     return YES.equals(text("CASH_CHECK_BEFORE_CASH", YES));
+  }
+
+  /**
+   * Whether the OR of an insurer settlement sent to Disbursement waits for Disbursement's approval
+   * (C12).
+   *
+   * @return true for DISBURSEMENT_APPROVAL (the default), false for REMITTANCE_APPROVAL
+   */
+  public boolean orAtDisbursementApproval() {
+    return !"REMITTANCE_APPROVAL".equals(text(SETTLEMENT_OR_TRIGGER, "DISBURSEMENT_APPROVAL"));
   }
 
   /**

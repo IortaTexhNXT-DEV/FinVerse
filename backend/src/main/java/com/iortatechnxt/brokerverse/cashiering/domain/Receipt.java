@@ -127,6 +127,12 @@ public class Receipt extends BaseEntity {
   @Column(name = "last_printed_at")
   private Instant lastPrintedAt;
 
+  @Column(name = "certificate_no", length = 40)
+  private String certificateNo;
+
+  @Column(name = "certificate_date")
+  private LocalDate certificateDate;
+
   @Column(name = "journal_batch_no", length = 40)
   private String journalBatchNo;
 
@@ -264,6 +270,28 @@ public class Receipt extends BaseEntity {
   public void printed(Instant at) {
     printedCount++;
     lastPrintedAt = at;
+  }
+
+  /**
+   * Gives the receipt its certificate number at its first print (FRS.CSH.02.04.07); kept for the
+   * reprints.
+   *
+   * @param number certificate number
+   * @param date print date
+   */
+  public void certified(String number, LocalDate date) {
+    if (certificateNo == null) {
+      this.certificateNo = number;
+      this.certificateDate = date;
+    }
+  }
+
+  public String getCertificateNo() {
+    return certificateNo;
+  }
+
+  public LocalDate getCertificateDate() {
+    return certificateDate;
   }
 
   /**

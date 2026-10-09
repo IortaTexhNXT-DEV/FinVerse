@@ -110,8 +110,8 @@ emails:
     angle brackets are filled in by the system. A notice "in the system" appears under the bell in the page header
     and opens the record; an alert appears in the alert inbox of the role. The system sends one e-mail for
     Cashiering: the failed batch run. BDOI has not given wordings for these messages: the texts below are proposed
-    by iorta TechNXT for BDOI's approval (requirements collection workbook, sheet E-mail wordings). The notices
-    marked "Proposed" follow BDOI's posting step and are not given by the system today.
+    by iorta TechNXT for BDOI's approval (requirements collection workbook, sheet E-mail wordings). The notices of
+    the posting step, of the payment files received via MFT and of the AR and OR forms are G-15 to G-18.
   common:
     attachments: None
     protection: "No attachment, amount above the record's own or personal data beyond the names; the link opens the record only for a signed-in user who holds the right."
@@ -285,41 +285,53 @@ emails:
       frs: "FRS.CSH.10.03.01"
       code: ['"The batch job "', '": batch job "']
     - id: G-15
-      platform: Proposed
-      name: AR / OR creation record for posting
-      trigger: "An AR or OR creation record is submitted for posting (BDOI FRS.CSH.02.01.10)."
-      recipients: "The Approver / Poster of the branch (Head Office for ORs)."
-      channel: "Notice in the system (proposed)"
+      platform: NT-07
+      name: AR / OR record for posting
+      trigger: "An AR or OR creation, cancellation or reinstatement record is submitted for posting (BDOI FRS.CSH.02.01.10)."
+      recipients: "Every holder of the posting right (Cashiering Team Leaders and Team Heads)."
+      channel: Notice in the system
       subject: "<record number> for posting"
-      body: "<Acknowledgement / Official Receipt> <type>, <payor>, <currency> <amount>"
+      body: "<record type> of <amount> waits for posting"
       frequency: "Once per submission or re-submission."
       brd: "CSHID.001, CSHID.002"
       frs: "FRS.CSH.02.01.10"
-      code: []
+      code: ['" for posting"', '" waits for posting"']
     - id: G-16
-      platform: Proposed
-      name: AR / OR creation record returned or posted
-      trigger: "The Approver / Poster returns or posts an AR or OR creation record."
+      platform: NT-07
+      name: AR / OR record posted or returned
+      trigger: "The Approver / Poster posts or returns an AR or OR record."
       recipients: "The creator of the record."
-      channel: "Notice in the system (proposed)"
-      subject: "<record number> returned / <record number> posted: <AR / OR number>"
-      body: "Returned: <reason>. Posted: <AR / OR number> issued and applied to <n> account(s)."
-      frequency: "Once per return or posting."
+      channel: Notice in the system
+      subject: "<record number> posted / <record number> returned"
+      body: "Posted: <record type>: <AR / OR> <number>. Returned: Reason: <reason>."
+      frequency: "Once per posting or return."
       brd: "CSHID.001, CSHID.002"
       frs: "FRS.CSH.02.05.07"
-      code: []
+      code: ['" posted"', '" returned"', '"Reason: "']
     - id: G-17
-      platform: Proposed
+      platform: NT-06
       name: File received via MFT refused
       trigger: "A payment file received via MFT fails the file checks (FRS.CSH.05.01.04)."
       recipients: "Cashiering Team Leader (alert inbox)."
-      channel: "Alert (proposed)"
-      subject: "Payment file <file name> refused: <reason>"
-      body: "The file and its validation report."
+      channel: Alert
+      subject: "Payment file <file name> received via MFT was refused: <reason>"
+      body: "The file with its reason; the file is kept in the refused folder."
       frequency: "Once per file."
       brd: "CSHID.008; BRQID.005"
       frs: "FRS.CSH.05.01.04, FRS.CSH.10.04.02"
-      code: []
+      code: ['" received via MFT was refused: "']
+    - id: G-18
+      platform: NT-07
+      name: AR or OR form change for approval
+      trigger: "A new version of the AR or OR form is saved (FRS.CSH.02.06.01)."
+      recipients: "Every holder of the master data approval right, except the user who changed the form."
+      channel: Notice in the system
+      subject: "<AR / OR> form version <number> for approval"
+      body: "Effective <date>, changed by <user>"
+      frequency: "Once per version."
+      brd: "CSHID.019"
+      frs: "FRS.CSH.02.06.01"
+      code: ['" form version "', '", changed by "']
 
 # ------------------------------------------------------------------------------- Appendix L documents and formats
 documents:

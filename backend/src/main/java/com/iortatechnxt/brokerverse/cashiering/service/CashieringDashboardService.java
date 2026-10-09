@@ -28,13 +28,15 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class CashieringDashboardService {
 
+  private static final String COMMISSION_TYPE = "COMMISSION";
+
   /** AR types of the dashboard. */
   static final List<String> AR_TYPES =
       List.of("PREMIUM", "REFUND", "OTHER_EXPENSES", "AR_INSURANCE");
 
   /** OR types of the dashboard. */
   static final List<String> OR_TYPES =
-      List.of("SERVICE_FEE", "PROFIT_SHARE", "COMMISSION", "INCENTIVE", "OTHERS");
+      List.of("SERVICE_FEE", "PROFIT_SHARE", COMMISSION_TYPE, "INCENTIVE", "OTHERS");
 
   private static final Map<String, String> TYPE_LABELS =
       Map.ofEntries(
@@ -44,7 +46,7 @@ public class CashieringDashboardService {
           Map.entry("AR_INSURANCE", "Non-Premium - AR Insurance"),
           Map.entry("SERVICE_FEE", "Service Fee"),
           Map.entry("PROFIT_SHARE", "Insurance Profit Share"),
-          Map.entry("COMMISSION", "Commissions"),
+          Map.entry(COMMISSION_TYPE, "Commissions"),
           Map.entry("INCENTIVE", "Incentives"),
           Map.entry("OTHERS", "Others"));
 
@@ -80,7 +82,7 @@ public class CashieringDashboardService {
           new String[] {"REFUND_INSURER", "Refund to Insurer"},
           new String[] {"UNBOOKED", "Unbooked/Unmatched"},
           new String[] {"UNAPPLIED", "Unapplied"},
-          new String[] {"COMMISSION", "Unapplied Commission"});
+          new String[] {COMMISSION_TYPE, "Unapplied Commission"});
 
   private static final List<String[]> FILE_ITEMS =
       List.of(
@@ -173,17 +175,25 @@ public class CashieringDashboardService {
     return new Group("RETURNED", "Returned List", items);
   }
 
+  /**
+   * The list an unapplied payment item opens: the list of the unapplied payments of its type, or
+   * the disposition workbench for the refunds to clients.
+   */
+  private static String unappliedLink(String key) {
+    return switch (key) {
+      case "REFUND_CLIENT" -> "/cashiering/unapplied";
+      case "REFUND_INSURER" -> "/cashiering/unapplied-inquiry?type=AR_INSURER_REFUND";
+      case COMMISSION_TYPE -> "/cashiering/unapplied-inquiry?type=AP_UNAPPLIED_COMMISSION";
+      default -> "/cashiering/unapplied-inquiry?type=" + key;
+    };
+  }
+
   private Group unapplied(Long companyId) {
     Map<String, Item> byType = new LinkedHashMap<>();
     for (String[] item : UNAPPLIED_ITEMS) {
       byType.put(
           item[0],
-          new Item(
-              "UNAPPLIED_" + item[0],
-              item[1],
-              0,
-              new TreeMap<>(),
-              "/cashiering/unapplied?type=" + item[0]));
+          new Item("UNAPPLIED_" + item[0], item[1], 0, new TreeMap<>(), unappliedLink(item[0])));
     }
     jdbc.query(
         UNAPPLIED,

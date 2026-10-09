@@ -56,6 +56,16 @@ public class CashieringSettings {
   }
 
   /**
+   * The base of the PR 2307 of a 2% CWT account (FRS.CSH.02.05.13; Appendix R, C26): the premium
+   * amount (every premium receivable component, as delivered) or the basic premium only.
+   *
+   * @return true when the base is the basic premium ({@code CASH_PR2307_BASE = BASIC})
+   */
+  public boolean pr2307OnBasicPremium() {
+    return "BASIC".equals(parameters.text("CASH_PR2307_BASE", "PREMIUM").strip());
+  }
+
+  /**
    * Whether commission is realized when premium is applied.
    *
    * @return true for ON_COLLECTION (the default)

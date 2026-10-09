@@ -131,6 +131,19 @@ public class ReceiptSeries extends AuthorizableEntity {
     }
     long number = nextNo;
     nextNo = nextNo + 1;
+    return format(number);
+  }
+
+  /**
+   * The number the series gives next, without taking it.
+   *
+   * @return formatted number, null when depleted
+   */
+  public String preview() {
+    return isDepleted() ? null : format(nextNo);
+  }
+
+  private String format(long number) {
     String digits = Long.toString(number);
     int width = String.valueOf(toNo).length();
     String sequence = "0".repeat(Math.max(0, width - digits.length())) + digits;

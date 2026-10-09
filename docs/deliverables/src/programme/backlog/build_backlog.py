@@ -1048,6 +1048,8 @@ def totals(model: Backlog) -> dict[str, Any]:
                          "split_stories": sum(len(p) for p in (CONFIG.get("splits") or {}).values()),
                          "merged": sum(1 for s in model.stories() if len(s.frs) > 1),
                          "labels": label_columns(model), "version": VERSION, "date": DATE}
+    per_brd = Counter(e.brd for e in model.epics)
+    t["epics_min"], t["epics_max"] = min(per_brd.values()), max(per_brd.values())
     for drop in FILE_DROPS:
         k = brand.drop_code(drop).replace("-", "").lower()
         st = model.stories(drop)
@@ -1059,7 +1061,21 @@ def totals(model: Backlog) -> dict[str, Any]:
     t["brd_ids"] = sum(r["ids"] for r in cov)
     t["no_story"] = sum(r["no_story"] for r in cov)
     t["gaps"] = sum(r["gap"] for r in cov) + sum(r["fr_gap"] for r in cov)
-    t["in_story"] = t["brd_ids"] - t["no_story"] - sum(r["gap"] for r in cov)
+    t["in_story"] = sum(r["in_story"] for r in cov)
+    t["phase2"] = sum(1 for s in model.stories() if s.version == "Phase 2")
+    t["components"] = ", ".join(CONFIG["brds"][b]["component"] for b in BRDS)
+    groups: dict[str, list[str]] = defaultdict(list)
+    for key, level in CONFIG["priority"]:
+        groups[level].append(key)
+    moved: list[str] = []
+    for brd in BRDS:
+        by_drop: dict[str, list[str]] = defaultdict(list)
+        for k, v in (CONFIG["drops"].get(brd, {}).get("sections") or {}).items():
+            by_drop[v].append(k.lower() if not k[:3].isupper() else k)
+        if by_drop:
+            moved.append(f"{brd} " + " and ".join(f"{', '.join(ks)} in {v}" for v, ks in by_drop.items()))
+    t["drop_text"] = "; ".join(moved)
+    t["priority_text"] = "; ".join(f"{', '.join(keys)}: {level}" for level, keys in groups.items())
     return t
 
 
@@ -1088,14 +1104,15 @@ def render(model: Backlog, name: str) -> list[str]:
         for drop in FILE_DROPS:
             st = model.stories(drop)
             p2 = [s for s in st if s.version == "Phase 2"]
-            rows.append([drop, len(model.epics_of(drop)), len(st), sum(s.points for s in st), len(p2),
-                         len(st) + len(model.epics_of(drop))])
+            rows.append([f"BIBS_Jira_Import_{brand.drop_code(drop)}.csv", len(model.epics_of(drop)), len(st),
+                         sum(s.points for s in st), len(p2), len(st) + len(model.epics_of(drop))])
         rows.append(["Total", t["epics"], t["stories"], t["points"],
                      sum(1 for s in model.stories() if s.version == "Phase 2"),
                      t["epics"] + t["stories"]])
         return table(["Import file", "Epics", "Stories", "Story points", "of which Phase 2 stories", "Issues"],
-                     rows, "3,1.8,1.8,2,2.6,1.8", "Issues per import file (compare with the Summary sheet)")
+                     rows, "5,1.6,1.6,1.8,2.4,1.6", "Issues per import file (the Summary sheet of each workbook)")
     if name == "brds":
+        cov = {r["brd"]: r for r in coverage(model)[0]}
         rows = []
         for brd in BRDS:
             ep = [e for e in model.epics if e.brd == brd]
@@ -1103,20 +1120,32 @@ def render(model: Backlog, name: str) -> list[str]:
             for drop in FILE_DROPS:
                 st = [s for e in ep if e.file_drop == drop for s in e.stories]
                 row.append(f"{len(st)} / {sum(s.points for s in st)}" if st else "-")
+            c = cov[brd]
+            row += [c["ids"], c["in_story"], c["no_story"], c["frs"], c["frs"] - c["fr_gap"]]
             rows.append(row)
+        rows.append(["Total", "", t["epics"]] + [f"{t[k + '_stories']} / {t[k + '_points']}"
+                                                  for k in ("drop0", "drop1", "drop2")]
+                    + [t["brd_ids"], t["in_story"], t["no_story"], t["frs"], t["frs"]])
         return table(["BRD", "Module (component)", "Epics", "Drop 0 stories / points", "Drop 1 stories / points",
-                      "Drop 2 stories / points"], rows, "1.4,4.6,1.2,2.6,2.6,2.6",
-                     "Epics, stories and story points per BRD and import file", size="8")
+                      "Drop 2 stories / points", "BRD IDs", "in a story", "without a story", "FRs",
+                      "FRs in a story"], rows, "1.3,3.6,1,1.7,1.7,1.7,1.2,1.2,1.3,1,1.3",
+                     "Epics, stories and story points per BRD and import file, and the coverage of the BRD IDs and "
+                     "FRs", size="7.5")
     if name == "drops":
         rows = []
         for brd in BRDS:
             spec = CONFIG["drops"].get(brd, {})
+            if not spec.get("sections"):
+                continue
             primary = spec.get("default") if brd == "BRD-00" else brand.BRD_DROP[brd]
-            moved = "; ".join(f"{k}: {v}" for k, v in (spec.get("sections") or {}).items()) or "-"
+            by_drop: dict[str, list[str]] = defaultdict(list)
+            for k, v in (spec.get("sections") or {}).items():
+                by_drop[v].append(k)
+            moved = "; ".join(f"{v}: {', '.join(ks)}" for v, ks in by_drop.items())
             rows.append([brd, primary, moved])
-        rows.append(["BRD-12", "Story FR-SP-002", "Phase 2 (BRD Release 2), in the Drop 1 file"])
-        return table(["BRD", "Drop of the epics", "Epics in another drop or phase"], rows, "1.4,3,12.6",
-                     "Drop of the epics (fix version)", size="8")
+        rows.append(["BRD-12", "Drop 1", "Story FR-SP-002 (BRD Release 2): Phase 2, in the Drop 1 file"])
+        return table(["BRD", "Drop of the other epics", "Epics in another drop or phase"], rows, "1.4,2.6,13",
+                     "Epics outside the primary drop of their BRD", size="8")
     if name == "components":
         rows = [[CONFIG["brds"][b]["component"], b, brand.BRD_NAMES.get(b, "Core Replacement (umbrella)")]
                 for b in BRDS]
@@ -1137,7 +1166,7 @@ def render(model: Backlog, name: str) -> list[str]:
     if name == "mapping":
         rows = [[r["csv"], r["company"], r["team"]] for r in field_mapping() if r["csv"] != "-"]
         return table(["Column of the import file", "Map to (company-managed)", "Map to (team-managed)"], rows,
-                     "4.6,6,6.4", "Mapping of each column in the importer", size="8")
+                     "4,6,7", "Mapping of each column in the importer", size="8")
     if name == "priority":
         rows = [[k, v] for k, v in CONFIG["priority"]]
         return table(["Priority of the FR (MoSCoW or BRD level)", "Jira priority"], rows, "8,4",
@@ -1149,13 +1178,13 @@ def render(model: Backlog, name: str) -> list[str]:
         return table(["Story", "Story points"], rows, "8,5", "First estimate of the story points")
     if name == "checks":
         rows = []
-        for drop in FILE_DROPS:
-            code = brand.drop_code(drop)
-            st = model.stories(drop)
-            rows.append([f"fixVersion and file {drop}", len(model.epics_of(drop)), len(st),
-                         sum(s.points for s in st)])
-        return table(["After importing", "Epics", "Stories", "Sum of story points"], rows, "6,2,2,3",
-                     "Counts to compare after each import")
+        for v in VERSIONS:
+            ep = [e for e in model.epics if e.version == v]
+            st = [x for x in model.stories() if x.version == v]
+            rows.append([f'fixVersion = "{v}"', len(ep), len(st), sum(x.points for x in st)])
+        rows.append(["Total", t["epics"], t["stories"], t["points"]])
+        return table(["Filter of the BIBS project", "Epics", "Stories", "Sum of story points"], rows, "6,2,2,3",
+                     "Counts per fix version to compare after the three imports")
     if name == "coverage":
         cov, _ = coverage(model)
         rows = [[r["brd"], r["ids"], r["ids"] - r["no_story"] - r["gap"], r["no_story"], r["gap"], r["frs"],
@@ -1207,6 +1236,19 @@ def check(model: Backlog) -> list[str]:
         for k, v in expected.items():
             if counts.get(k, 0) != v:
                 errors.append(f"{path.name}: {k} {counts.get(k, 0)} in the file, {v} in the backlog")
+    for drop in FILE_DROPS:
+        path = OUT / brand.output_name("Backlog", "BRD-00", f"User Story Backlog {brand.drop_code(drop)}", VERSION,
+                                       "xlsx")
+        if not path.exists():
+            errors.append(f"{path.name} missing")
+            continue
+        import openpyxl  # noqa: PLC0415
+        ws = openpyxl.load_workbook(path, read_only=True)["Summary"]
+        rows = [r for r in ws.iter_rows(min_row=5, values_only=True) if r and r[0] == "Total"]
+        st = model.stories(drop)
+        want = (len(model.epics_of(drop)), len(st), sum(s.points for s in st))
+        if not rows or tuple(rows[0][2:5]) != want:
+            errors.append(f"{path.name}: Summary total {rows[0][2:5] if rows else None}, backlog {want}")
     cov, trace = coverage(model)
     for r in trace:
         if r["status"] == "Gap":

@@ -87,6 +87,7 @@ sign-off per BRD"). Each document is kept once, in its latest version.
 | BDOI FRS vs BIBS FRS Operations Cashiering | BRD-02 | Comparisons | 1.0 | [`Comparisons/BIBS_Comparison_BRD-02_BDOI_FRS_vs_BIBS_FRS_Operations_Cashiering_v1.0.xlsx`](Comparisons/BIBS_Comparison_BRD-02_BDOI_FRS_vs_BIBS_FRS_Operations_Cashiering_v1.0.xlsx) |
 | BDOI FRS vs BIBS FRS Product Maintenance | BRD-03 | Comparisons | 1.0 | [`Comparisons/BIBS_Comparison_BRD-03_BDOI_FRS_vs_BIBS_FRS_Product_Maintenance_v1.0.xlsx`](Comparisons/BIBS_Comparison_BRD-03_BDOI_FRS_vs_BIBS_FRS_Product_Maintenance_v1.0.xlsx) |
 | BDOI FRS vs BIBS FRS Renewal | BRD-06 | Comparisons | 1.0 | [`Comparisons/BIBS_Comparison_BRD-06_BDOI_FRS_vs_BIBS_FRS_Renewal_v1.0.xlsx`](Comparisons/BIBS_Comparison_BRD-06_BDOI_FRS_vs_BIBS_FRS_Renewal_v1.0.xlsx) |
+| BDOI FRS vs BIBS FRS User Access Maintenance | BRD-11 | Comparisons | 1.0 | [`Comparisons/BIBS_Comparison_BRD-11_BDOI_FRS_vs_BIBS_FRS_User_Access_Maintenance_v1.0.xlsx`](Comparisons/BIBS_Comparison_BRD-11_BDOI_FRS_vs_BIBS_FRS_User_Access_Maintenance_v1.0.xlsx) |
 
 ## Still to write
 

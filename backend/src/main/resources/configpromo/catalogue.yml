@@ -390,7 +390,8 @@ excluded:
      sl_open_item, tax_2307_batch, tax_2307_certificate, tax_2307_line, tax_certificate_received,
      tax_certificate_received_line, tax_remittance, tax_return, tax_return_line, wf_case,
      pm_deactivation_request, pm_marketing_approval, pm_mancom_approval, pm_master_change,
-     pm_terms_option, pm_terms_setting, pm_final_term, pm_proposal_file, pm_client_response]
+     pm_terms_option, pm_terms_setting, pm_final_term, pm_proposal_file, pm_client_response,
+     pm_placement_report]
   CLIENT_DATA:
     [crm_client, crm_client_instruction, crm_client_payout_account, crm_client_tag, crm_kyc_document,
      csf_contact_change, csf_contact_change_field, csf_sync_outbox, csf_verification,

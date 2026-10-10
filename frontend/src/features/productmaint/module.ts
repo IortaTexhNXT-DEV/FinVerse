@@ -7,6 +7,7 @@ import {
   PackageX,
   RefreshCcwDot,
   ScrollText,
+  FileSpreadsheet,
   Workflow,
 } from 'lucide-react';
 import { lazy } from 'react';
@@ -100,6 +101,13 @@ export const PACKAGE_REQUEST_SCREENS: readonly ScreenDef[] = [
     permission: 'PRODUCT_MAINTAIN',
     alsoPermissions: ['PKG_REPORT_VIEW'],
     component: lazy(() => import('./workspace/MasterChangesPage')),
+  },
+  {
+    path: '/product-maintenance/placement-reports',
+    label: 'Placement Update Reports',
+    icon: FileSpreadsheet,
+    permission: 'PKG_REPORT_VIEW',
+    component: lazy(() => import('./placement/PlacementReportsPage')),
   },
   {
     path: '/product-maintenance/audit-logs',

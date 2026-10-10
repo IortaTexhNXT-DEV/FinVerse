@@ -107,6 +107,18 @@ export const PACKAGE_REQUEST_HELP_SCREENS: readonly HelpScreen[] = [
     ],
   },
   {
+    name: 'Placement Update Reports',
+    path: '/product-maintenance/placement-reports',
+    summary:
+      "The Consolidated Placement Update Report lists the quotation requests active or processed in the reporting period: Item No., Insured's Name, Marketing Segment, Team, Account Officer, TSU Handler, Line of Insurance, Sub-Line, PRF Received Date and Time, Aging and Status.",
+    workflow: [
+      'It is generated every week on the configured day and time (Thursday 08:00 by default) as PlacementUpdate_MMDDYYYY.xlsx and kept in the repository.',
+      'Generate Now produces the report of today on request; Preview shows the rows of the Excel file and Download saves it again.',
+      'Report Builder opens the custom report of quotation requests, package requests or products: choose the columns, filters and sort, then save it as a template shared with the other users.',
+    ],
+    controls: ['The schedule, the period and the scope are system parameters.'],
+  },
+  {
     name: 'Audit Logs',
     path: '/product-maintenance/audit-logs',
     summary:

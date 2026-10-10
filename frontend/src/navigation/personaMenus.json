@@ -498,6 +498,7 @@
             "/renewal/review",
             "/renewal/transfers",
             "/renewal/referrals",
+            "/renewal/approvals",
             "/renewal/letters",
             "/renewal/channels",
             "/renewal/audit-logs"
@@ -526,6 +527,7 @@
             "/renewal/mine",
             "/renewal/transfers",
             "/renewal/referrals",
+            "/renewal/approvals",
             "/renewal/letters"
           ]
         },
@@ -557,7 +559,9 @@
             "/renewal/processing-dashboard",
             "/renewal/expiry",
             "/renewal/processing",
+            "/renewal/approvals",
             "/renewal/placement",
+            "/renewal/billing",
             "/renewal/epolicies",
             "/renewal/insurer",
             "/renewal/letters",
@@ -592,6 +596,7 @@
             "/renewal/expiry",
             "/renewal/processing",
             "/renewal/placement",
+            "/renewal/billing",
             "/renewal/epolicies",
             "/renewal/insurer",
             "/renewal/letters",

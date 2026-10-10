@@ -144,14 +144,24 @@ export default function CandidatePage() {
         description={`Renewal of ${d.row.policy.policyNo ?? d.row.policy.expiringArn ?? ''} for ${d.row.parties.clientName}`}
         actions={
           can('RNW_EXPORT') && (
-            <Button
-              variant="secondary"
-              icon={<Download size={16} />}
-              busy={download.isPending}
-              onClick={() => download.mutate(() => renewalApi.details(companyId, ref))}
-            >
-              Details PDF
-            </Button>
+            <>
+              <Button
+                variant="secondary"
+                icon={<Download size={16} />}
+                busy={download.isPending}
+                onClick={() => download.mutate(() => renewalApi.detailsSheet(companyId, ref))}
+              >
+                Account Details
+              </Button>
+              <Button
+                variant="secondary"
+                icon={<Download size={16} />}
+                busy={download.isPending}
+                onClick={() => download.mutate(() => renewalApi.details(companyId, ref))}
+              >
+                Details PDF
+              </Button>
+            </>
           )
         }
       />

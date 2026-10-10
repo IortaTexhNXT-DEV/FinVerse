@@ -69,6 +69,8 @@ export const renewalApi = {
     api.post<AccountHistory>(`${ref(renewalRef)}/account-history${co(companyId)}`),
   details: (companyId: number, renewalRef: string) =>
     api.getFile(`${ref(renewalRef)}/details.pdf${co(companyId)}`),
+  detailsSheet: (companyId: number, renewalRef: string) =>
+    api.getFile(`${ref(renewalRef)}/details.xlsx${co(companyId)}`),
   initiate: (companyId: number, renewalRefs: string[]) =>
     api.post<{ initiated: string[]; refused: Record<string, string> }>(`${C}/initiate`, {
       companyId,

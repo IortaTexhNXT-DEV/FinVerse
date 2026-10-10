@@ -1,5 +1,7 @@
 package com.iortatechnxt.brokerverse.renewal.service;
 
+import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.renewal.domain.RenewalDisposition;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -358,6 +360,38 @@ public class RenewalParameters {
   public Optional<String> rmuUnit() {
     String unit = parameters.text(RMU_UNIT, "");
     return unit == null || unit.isBlank() ? Optional.empty() : Optional.of(unit.strip());
+  }
+
+  /**
+   * Whether Lost Business is a reason of Not for Renewal rather than a disposition (disposition set
+   * CLIENT).
+   *
+   * @return true for the CLIENT set
+   */
+  public boolean lostBusinessIsReason() {
+    return "CLIENT".equals(parameters.text("RNW_DISPOSITION_SET", "SYSTEM").strip());
+  }
+
+  /**
+   * Refuses a disposition the disposition set does not offer (Lost Business with the CLIENT set).
+   *
+   * @param code disposition
+   */
+  public void requireOffered(RenewalDisposition code) {
+    if (code == RenewalDisposition.LOST_BUSINESS && lostBusinessIsReason()) {
+      throw new BusinessRuleException(
+          "RNW_DISPOSITION_SET", "Select Not for Renewal with the reason Lost Business");
+    }
+  }
+
+  /**
+   * Whether the account is locked only once posted and its placement sent (lock point PLACEMENT),
+   * instead of when the Renewal Advice is generated (RA_GENERATION, the default).
+   *
+   * @return true for the lock at placement
+   */
+  public boolean lockAtPlacement() {
+    return "PLACEMENT".equals(parameters.text("RNW_LOCK_POINT", "RA_GENERATION").strip());
   }
 
   /**

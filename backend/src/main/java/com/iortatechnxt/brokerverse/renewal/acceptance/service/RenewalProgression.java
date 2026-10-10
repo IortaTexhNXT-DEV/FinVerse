@@ -8,8 +8,10 @@ import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.booking.domain.QueueSource;
 import com.iortatechnxt.brokerverse.booking.service.BookingQueueService;
+import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.placement.domain.PlacementSlip;
 import com.iortatechnxt.brokerverse.placement.service.PlacementSlipService;
+import com.iortatechnxt.brokerverse.renewal.approval.service.SubmissionGate;
 import com.iortatechnxt.brokerverse.renewal.domain.ClosedAs;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalCandidate;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalCandidateRepository;
@@ -50,6 +52,7 @@ public class RenewalProgression {
   private final RenewalRemarkRepository remarks;
   private final AuditTrailService audit;
   private final Clock clock;
+  private final SubmissionGate gate;
 
   /**
    * Creates the progression.
@@ -65,6 +68,7 @@ public class RenewalProgression {
    * @param remarks remarks
    * @param audit audit trail
    * @param clock clock
+   * @param gate second approval and the tags checked before the placement
    */
   @SuppressWarnings({"java:S107", "PMD.ExcessiveParameterList"}) // constructor injection
   public RenewalProgression(
@@ -78,7 +82,8 @@ public class RenewalProgression {
       RenewalNotices notices,
       RenewalRemarkRepository remarks,
       AuditTrailService audit,
-      Clock clock) {
+      Clock clock,
+      SubmissionGate gate) {
     this.candidates = candidates;
     this.accounts = accounts;
     this.accountService = accountService;
@@ -90,6 +95,7 @@ public class RenewalProgression {
     this.remarks = remarks;
     this.audit = audit;
     this.clock = clock;
+    this.gate = gate;
   }
 
   /**
@@ -99,7 +105,7 @@ public class RenewalProgression {
    */
   public void fastTrack(Long candidateId) {
     RenewalCandidate c = candidates.findById(candidateId).orElseThrow();
-    if (c.getStage() != RenewalStage.ACCEPTED || c.getRenewalArn() == null) {
+    if (c.getStage() != RenewalStage.ACCEPTED || c.getRenewalArn() == null || !submittable(c)) {
       return;
     }
     accountService.fastTrackRenewal(c.getRenewalArn());
@@ -109,6 +115,19 @@ public class RenewalProgression {
         c.getRenewalRef(),
         AuditAction.SUBMIT,
         "Renewal account " + c.getRenewalArn() + " fast-tracked to the payment gate");
+  }
+
+  private boolean submittable(RenewalCandidate c) {
+    if (gate.awaitsApproval(c)) {
+      return false;
+    }
+    try {
+      gate.requireSubmittable(c);
+      return true;
+    } catch (BusinessRuleException ex) {
+      failed(c.getId(), ex.getMessage());
+      return false;
+    }
   }
 
   /**

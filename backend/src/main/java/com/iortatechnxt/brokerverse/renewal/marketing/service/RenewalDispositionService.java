@@ -132,6 +132,7 @@ public class RenewalDispositionService {
     if (input.code() == null) {
       throw new BusinessRuleException("RNW_DISPOSITION_REQUIRED", "Select the disposition");
     }
+    parameters.requireOffered(input.code());
     String text = optionalText(input.remarks());
     String reason = reason(input);
     if (RenewalCodes.REASON_TRANSFER.equals(reason)) {

@@ -183,6 +183,9 @@ public class PlacementSending {
       return;
     }
     c.getPlacement().status(CandidatePlacement.FOR_BOOKING);
+    if (c.getPlacement().getTags().isLockAtPlacement()) {
+      c.lockMarketing(clock.instant());
+    }
     audit.record(RenewalCodes.ENTITY, ref, AuditAction.UPDATE, "Placement sent - For Booking");
     advices.afterPlacement(c, "PLACEMENT_SENT");
     summary.done(ref);

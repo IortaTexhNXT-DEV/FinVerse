@@ -105,6 +105,9 @@ class PersonaMenusIT {
               "/api/v1/renewal/candidates?companyId={c}&stage=FOR_PLACEMENT_BOOKING"),
           Map.entry("/renewal/epolicies", "/api/v1/renewal/epolicy/receipts?companyId={c}"),
           Map.entry(
+              "/renewal/approvals", "/api/v1/renewal/candidates?companyId={c}&stage=ACCEPTED"),
+          Map.entry("/renewal/billing", "/api/v1/renewal/billing-files?companyId={c}"),
+          Map.entry(
               "/renewal/processing", "/api/v1/renewal/candidates?companyId={c}&tab=FOR_PROCESSING"),
           Map.entry("/renewal/insurer", "/api/v1/renewal/insurer-batches?companyId={c}"),
           Map.entry("/renewal/letters", "/api/v1/renewal/candidates?companyId={c}&tab=RA_READY"),

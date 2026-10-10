@@ -149,7 +149,11 @@ public class LetterService {
     writer.generate(c, kind, LetterSource.USER, run.getId(), late ? currentUser.username() : null);
     c.noticed(kind.notice());
     if (kind.notice() == RaNotice.FIRST) {
-      c.lockMarketing(clock.instant());
+      if (parameters.lockAtPlacement()) {
+        c.getPlacement().getTags().lockAtPlacement(true);
+      } else {
+        c.lockMarketing(clock.instant());
+      }
       flow.act(c, "generate_ra", TransitionNote.comment("Renewal Advice generated"));
     }
   }

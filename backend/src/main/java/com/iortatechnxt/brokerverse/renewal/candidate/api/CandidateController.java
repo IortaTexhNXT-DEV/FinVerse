@@ -279,6 +279,20 @@ public class CandidateController {
   }
 
   /**
+   * The account details as the workbook "Renewal Account Details.xlsx".
+   *
+   * @param companyId company
+   * @param ref renewal reference
+   * @return workbook
+   */
+  @GetMapping("/{ref}/details.xlsx")
+  @PreAuthorize(EXPORT)
+  public ResponseEntity<byte[]> detailsSheet(
+      @RequestParam Long companyId, @PathVariable String ref) {
+    return file(documents.detailsSheet(companyId, ref));
+  }
+
+  /**
    * Initiates extracted renewals (FR-RN-003): checks, bucket, matrix proposal and routing.
    *
    * @param request renewals

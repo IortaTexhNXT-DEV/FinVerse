@@ -21,6 +21,7 @@ import com.iortatechnxt.brokerverse.docgen.service.DocumentComposer;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec.Field;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec.Fields;
+import com.iortatechnxt.brokerverse.docgen.service.SheetSpec;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import com.iortatechnxt.brokerverse.organization.domain.Company;
 import com.iortatechnxt.brokerverse.organization.service.OrganizationService;
@@ -131,6 +132,35 @@ class RenewalDocumentWordsTest {
         .containsEntry("Expiry date", "15-Nov-2027")
         .containsEntry("Account Officer", "Aileen Account Officer")
         .doesNotContainKey("Bucket");
+  }
+
+  @Test
+  void theAccountDetailsDownloadIsTheWorkbookRenewalAccountDetails() {
+    CandidateQueryService queries = mock(CandidateQueryService.class);
+    DocumentComposer composer = mock(DocumentComposer.class);
+    UserDisplayNames users = mock(UserDisplayNames.class);
+    when(users.displayName("ao")).thenReturn("Aileen Account Officer");
+    RenewalCandidate c = candidate();
+    when(queries.get(1L, "RNW-2027-000001")).thenReturn(c);
+    when(queries.scope(1L)).thenReturn(new Scope(null, null, "ao", true));
+    ArgumentCaptor<SheetSpec> sheet = ArgumentCaptor.forClass(SheetSpec.class);
+    when(composer.xlsx(sheet.capture())).thenReturn(new byte[0]);
+
+    var file =
+        new CandidateDocuments(
+                queries,
+                composer,
+                mock(OrganizationService.class),
+                insurers,
+                users,
+                mock(LovService.class))
+            .detailsSheet(1L, "RNW-2027-000001");
+
+    assertThat(file.fileName()).isEqualTo("Renewal Account Details.xlsx");
+    assertThat(sheet.getValue().rows())
+        .contains(
+            List.of("Account Officer", "Aileen Account Officer"),
+            List.of("Effective expiry", "15-Nov-2027"));
   }
 
   @Test

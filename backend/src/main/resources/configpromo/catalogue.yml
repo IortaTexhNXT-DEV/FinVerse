@@ -397,7 +397,7 @@ excluded:
      tax_certificate_received_line, tax_remittance, tax_return, tax_return_line, wf_case,
      rnw_bdofc_line, rnw_channel_message, rnw_insurer_disposition_line, rnw_lamd_loan, rnw_paid_off_account, rnw_placement_tracking, rnw_processing_assignment, rnw_referral,
      rnw_hold_cover_request, rnw_insurer_allocation, rnw_placement, rnw_placement_file, rnw_insurance_advice,
-     rnw_epolicy_receipt, rnw_epolicy_line,
+     rnw_epolicy_receipt, rnw_epolicy_line, rnw_billing_file,
      pm_deactivation_request, pm_marketing_approval, pm_mancom_approval, pm_master_change,
      pm_terms_option, pm_terms_setting, pm_final_term, pm_proposal_file, pm_client_response,
      pm_placement_report]

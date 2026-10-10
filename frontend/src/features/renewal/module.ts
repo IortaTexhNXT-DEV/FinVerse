@@ -1,4 +1,6 @@
 import {
+  CheckCheck,
+  Receipt,
   FileCheck2,
   Send,
   ArrowLeftRight,
@@ -109,11 +111,26 @@ export const renewalModule: FeatureModule = {
       component: lazy(() => import('./processing/ProcessingPage')),
     },
     {
+      path: '/renewal/approvals',
+      label: 'Submitted for Approval',
+      icon: CheckCheck,
+      permission: 'RNW_REVIEW',
+      alsoPermissions: ['RNW_DISPOSE', 'RNW_PROCESS_ASSIGN'],
+      component: lazy(() => import('./approval/ApprovalsPage')),
+    },
+    {
       path: '/renewal/placement',
       label: 'Submitted for Placement',
       icon: Send,
       permission: 'RNW_PROCESS',
       component: lazy(() => import('./placement/PlacementPage')),
+    },
+    {
+      path: '/renewal/billing',
+      label: 'CLPC Billing Files',
+      icon: Receipt,
+      permission: 'RNW_PROCESS',
+      component: lazy(() => import('./billing/BillingFilesPage')),
     },
     {
       path: '/renewal/epolicies',

@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.renewal.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import jakarta.persistence.Embedded;
 import java.time.Instant;
 
 /**
@@ -45,6 +46,10 @@ public class CandidatePlacement {
   @Column(name = "epolicy_updated_by", length = 50)
   private String epolicyUpdatedBy;
 
+  @Embedded private CandidateDecision decision = new CandidateDecision();
+
+  @Embedded private final CandidateTags tags = new CandidateTags();
+
   /**
    * Sets the placement status.
    *
@@ -76,6 +81,27 @@ public class CandidatePlacement {
     this.epolicyBatch = batch;
     this.epolicyUpdatedBy = user;
     this.epolicyUpdatedAt = at;
+  }
+
+  /**
+   * The client's answer and the second approval (FRRN.025.01, FRRN.26.01).
+   *
+   * @return decision, never null
+   */
+  public CandidateDecision getDecision() {
+    if (decision == null) {
+      decision = new CandidateDecision();
+    }
+    return decision;
+  }
+
+  /**
+   * The For Booking Only, Direct-to-Insurer Payment and billing tags (FRRN.014.04, FRRN.014.05).
+   *
+   * @return tags
+   */
+  public CandidateTags getTags() {
+    return tags;
   }
 
   public String getStatus() {

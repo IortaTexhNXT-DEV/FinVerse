@@ -112,7 +112,10 @@ public class RenewalRecords {
    * @param candidate candidate
    */
   public static void requireUnlocked(RenewalCandidate candidate) {
-    if (candidate.getMarketingLockedAt() != null || candidate.getStage().isMarketingLocked()) {
+    boolean stageLocked =
+        candidate.getStage().isMarketingLocked()
+            && !candidate.getPlacement().getTags().isLockAtPlacement();
+    if (candidate.getMarketingLockedAt() != null || stageLocked) {
       throw new BusinessRuleException(
           "RENEWAL_LOCKED",
           "Renewal "

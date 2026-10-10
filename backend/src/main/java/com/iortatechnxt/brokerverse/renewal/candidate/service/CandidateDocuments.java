@@ -115,24 +115,7 @@ public class CandidateDocuments {
    */
   public MessageFile details(Long companyId, String renewalRef) {
     RenewalCandidate c = queries.get(companyId, renewalRef);
-    boolean hide = queries.scope(companyId).hidePremium();
-    CandidateSnapshot s = c.getSnapshot();
-    List<Field> fields = new ArrayList<>();
-    fields.add(new Field("Renewal reference", c.getRenewalRef()));
-    fields.add(new Field("Status", c.getStage().label()));
-    fields.add(new Field("Classification", c.getBucket() == null ? "" : c.getBucket().label()));
-    fields.add(new Field("Client", s.clientName()));
-    fields.add(new Field("Expiring invoice", c.getExpiringInvoiceNo()));
-    fields.add(new Field("Expiring ARN", c.getExpiringArn()));
-    fields.add(new Field("Policy number", s.policyNo()));
-    fields.add(new Field("Insurer", insurer(c.getCompanyId(), s.insurerCode())));
-    fields.add(new Field("Expiry date", DisplayFormat.date(c.getExpiryDate())));
-    fields.add(new Field("Account Officer", name(c.getAssignedAo())));
-    fields.add(new Field("Processing Officer", name(c.getAssignedPo())));
-    if (!hide && s.premium() != null) {
-      fields.add(new Field("Gross premium", DisplayFormat.value(s.premium().grossPremium())));
-      fields.add(new Field("Sum insured", DisplayFormat.value(s.premium().totalSumInsured())));
-    }
+    List<Field> fields = fields(c, queries.scope(companyId).hidePremium());
     List<List<String>> checks =
         queries.latestResults(c).stream().map(CandidateDocuments::checkRow).toList();
     List<List<String>> dispositions =
@@ -155,6 +138,47 @@ public class CandidateDocuments {
                 List.of(),
                 null));
     return new MessageFile(c.getRenewalRef() + ".pdf", PDF, pdf);
+  }
+
+  /**
+   * The details of a renewal account as the workbook {@code Renewal Account Details.xlsx}.
+   *
+   * @param companyId company
+   * @param renewalRef renewal reference
+   * @return file
+   */
+  public MessageFile detailsSheet(Long companyId, String renewalRef) {
+    RenewalCandidate c = queries.get(companyId, renewalRef);
+    List<List<Object>> rows = new ArrayList<>();
+    for (Field f : fields(c, queries.scope(companyId).hidePremium())) {
+      rows.add(List.of(f.label(), Objects.toString(f.value(), "")));
+    }
+    byte[] xlsx =
+        composer.xlsx(new SheetSpec("Renewal Account Details", List.of("Field", "Value"), rows));
+    return new MessageFile("Renewal Account Details.xlsx", XLSX, xlsx);
+  }
+
+  private List<Field> fields(RenewalCandidate c, boolean hide) {
+    CandidateSnapshot s = c.getSnapshot();
+    List<Field> fields = new ArrayList<>();
+    fields.add(new Field("Renewal reference", c.getRenewalRef()));
+    fields.add(new Field("Status", c.getStage().label()));
+    fields.add(new Field("Classification", c.getBucket() == null ? "" : c.getBucket().label()));
+    fields.add(new Field("Client", s.clientName()));
+    fields.add(new Field("Expiring invoice", c.getExpiringInvoiceNo()));
+    fields.add(new Field("Expiring ARN", c.getExpiringArn()));
+    fields.add(new Field("Policy number", s.policyNo()));
+    fields.add(new Field("Insurer", insurer(c.getCompanyId(), s.insurerCode())));
+    fields.add(new Field("Expiry date", DisplayFormat.date(c.getExpiryDate())));
+    fields.add(new Field("Effective expiry", DisplayFormat.date(c.effectiveExpiry())));
+    fields.add(new Field("Account Officer", name(c.getAssignedAo())));
+    fields.add(new Field("Processing Officer", name(c.getAssignedPo())));
+    fields.add(new Field("Renewal ARN", c.getRenewalArn()));
+    if (!hide && s.premium() != null) {
+      fields.add(new Field("Gross premium", DisplayFormat.value(s.premium().grossPremium())));
+      fields.add(new Field("Sum insured", DisplayFormat.value(s.premium().totalSumInsured())));
+    }
+    return fields;
   }
 
   /**

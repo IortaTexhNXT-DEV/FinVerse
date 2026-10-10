@@ -202,7 +202,10 @@ public class LetterSweeps {
     }
     holdCovers.refresh(c);
     c.getFlags().setNrns(true);
-    String route = raSent(c) ? CandidateExpiry.NAL : CandidateExpiry.NRL;
+    boolean rejected =
+        com.iortatechnxt.brokerverse.renewal.domain.CandidateDecision.REJECTED.equals(
+            c.getPlacement().getDecision().getClientStatus());
+    String route = raSent(c) && !rejected ? CandidateExpiry.NAL : CandidateExpiry.NRL;
     c.getExpiry().route(route);
     RenewalLetter letter =
         writer.generate(

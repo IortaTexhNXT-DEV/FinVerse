@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
+import { renewalApi } from '@/api/renewal';
 import { renewalProposalApi } from '@/api/renewalProposal';
 import type { RiskCodeEntry, RiskCodeView } from '@/api/renewalProposal';
 import { useAuth } from '@/auth/authContext';
@@ -151,6 +152,39 @@ export default function RiskCodesPage() {
     queryFn: () => renewalProposalApi.riskCodes(companyId, search, renewable),
   });
   const maintain = can('RNW_SETUP');
+  const qc = useQueryClient();
+  const toast = useToast();
+  const act = useMutation({
+    mutationFn: (v: { id: number; action: 'AUTHORIZE' | 'DEACTIVATE' }) =>
+      renewalApi.riskCodeAction(companyId, v.id, v.action),
+    onSuccess: () => {
+      toast.success('Record successfully updated.');
+      void qc.invalidateQueries({ queryKey: ['renewal', 'risk-codes'] });
+    },
+  });
+  const rowActions = (c: RiskCodeView) => [
+    {
+      label: 'Update',
+      onSelect: () =>
+        setEditing({
+          id: c.id,
+          entry: {
+            riskCode: c.riskCode,
+            description: c.description ?? '',
+            lineCode: c.lineCode,
+            renewable: c.renewable,
+            effectiveDate: c.effectiveDate,
+            remarks: c.remarks,
+          },
+        }),
+    },
+    ...(c.status === 'PENDING_AUTHORIZATION'
+      ? [{ label: 'Authorize', onSelect: () => act.mutate({ id: c.id, action: 'AUTHORIZE' }) }]
+      : []),
+    ...(c.status === 'ACTIVE'
+      ? [{ label: 'Deactivate', onSelect: () => act.mutate({ id: c.id, action: 'DEACTIVATE' }) }]
+      : []),
+  ];
   return (
     <div className="stack">
       <PageHeader
@@ -188,7 +222,7 @@ export default function RiskCodesPage() {
         </select>
       </div>
       <Card flush>
-        <ErrorAlert error={codes.error} />
+        <ErrorAlert error={codes.error ?? act.error} />
         <DataTable<RiskCodeView>
           loading={codes.isLoading}
           rows={codes.data ?? []}
@@ -223,28 +257,7 @@ export default function RiskCodesPage() {
               key: 'actions',
               header: 'Actions',
               render: (c) =>
-                maintain && (
-                  <RowActionMenu
-                    label={c.riskCode}
-                    actions={[
-                      {
-                        label: 'Update',
-                        onSelect: () =>
-                          setEditing({
-                            id: c.id,
-                            entry: {
-                              riskCode: c.riskCode,
-                              description: c.description ?? '',
-                              lineCode: c.lineCode,
-                              renewable: c.renewable,
-                              effectiveDate: c.effectiveDate,
-                              remarks: c.remarks,
-                            },
-                          }),
-                      },
-                    ]}
-                  />
-                ),
+                maintain && <RowActionMenu label={c.riskCode} actions={rowActions(c)} />,
             },
           ]}
         />

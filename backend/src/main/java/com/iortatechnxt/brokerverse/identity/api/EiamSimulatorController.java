@@ -222,14 +222,15 @@ public class EiamSimulatorController {
 
   private ResponseEntity<String> redirect(
       EiamSimulator.AuthorizationRequest request, DirectoryAccount account) {
+    // The code is sent to the registered callback address only, with the state kept for the code.
     String code = simulator.code(account, request);
     String target =
-        request.redirectUri()
-            + (request.redirectUri().contains("?") ? "&" : "?")
-            + "code="
+        sso.base()
+            + OidcClient.CALLBACK_PATH
+            + "?code="
             + encode(code)
             + "&state="
-            + encode(request.state());
+            + encode(simulator.state(code));
     return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(target)).build();
   }
 

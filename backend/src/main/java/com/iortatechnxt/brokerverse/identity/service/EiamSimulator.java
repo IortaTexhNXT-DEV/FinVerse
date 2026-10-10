@@ -51,6 +51,7 @@ public class EiamSimulator {
   private final Clock clock;
   private final RSAKey key;
   private final Map<String, Grant> codes = new ConcurrentHashMap<>();
+  private final Map<String, String> states = new ConcurrentHashMap<>();
   private final Map<String, String> sessions = new ConcurrentHashMap<>();
 
   /**
@@ -169,7 +170,19 @@ public class EiamSimulator {
             request.codeChallenge(),
             request.redirectUri(),
             clock.instant().plus(CODE_VALIDITY)));
+    states.put(code, request.state() == null ? "" : request.state());
     return code;
+  }
+
+  /**
+   * The state of the authorisation request a code was issued for, returned to the client with the
+   * code.
+   *
+   * @param code code
+   * @return the state, empty when the code is unknown
+   */
+  public String state(String code) {
+    return states.getOrDefault(code, "");
   }
 
   /**

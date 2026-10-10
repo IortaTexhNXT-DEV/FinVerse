@@ -527,15 +527,9 @@ class Annexes:
     def kv(self, rows, widths=(1.6, 5.8), size=8.5):
         self.table(["Item", "Detail"], rows, list(widths), size=size)
 
-    def shot(self, png: Path, max_h=4.6):
-        from PIL import Image  # noqa: PLC0415
-        target = self.work / png.name
-        with Image.open(png) as im:
-            im = im.convert("RGB")
-            if im.width > 1500:
-                im = im.resize((1500, int(im.height * 1500 / im.width)))
-            im.save(target, optimize=True)
-        self.els.append(self.b.picture(target, max_w=6.6, max_h=max_h))
+    def shot(self, png: Path, max_h=4.6):  # noqa: ARG002  (the shared helper sets the size)
+        # every screenshot at the standard width of the screen annexes, a tall screen in parts, with a light border
+        self.els.extend(final.screenshot(self.b, png, self.work))
 
     # AA - screens
     def screens(self, review):
@@ -1050,6 +1044,26 @@ def build_review(figs_dir: Path | None = None) -> Builder:
     return b
 
 
+def _shrink_closing_paragraph(doc) -> None:
+    """The empty paragraph Word needs after the closing glossary table: one point high, so that it never
+    opens a blank last page."""
+    from docx.shared import Pt  # noqa: PLC0415
+    last = doc.paragraphs[-1]
+    if not last.text.strip():
+        fmt = last.paragraph_format
+        fmt.space_before = fmt.space_after = Pt(0)
+        fmt.line_spacing = Pt(1)
+        for r in last.runs:
+            r.font.size = Pt(1)
+        rpr = last._p.get_or_add_pPr().get_or_add_rPr() if hasattr(last._p.get_or_add_pPr(), "get_or_add_rPr") else None
+        if rpr is not None:
+            from docx.oxml import OxmlElement  # noqa: PLC0415
+            from docx.oxml.ns import qn  # noqa: PLC0415
+            sz = OxmlElement("w:sz")
+            sz.set(qn("w:val"), "2")
+            rpr.append(sz)
+
+
 def main(argv=None) -> int:
     import brd06_review_edition as review  # noqa: PLC0415
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
@@ -1064,6 +1078,7 @@ def main(argv=None) -> int:
         for highlight, name in ((False, DOC["meta"]["clean"]), (True, DOC["meta"]["highlighted"])):
             b = build(highlight, our, lines, functions, trace, brrn, figs)
             path = OUT / name
+            _shrink_closing_paragraph(b.doc)
             b.doc.save(str(path))
             n_ids = check_bdoi_text(path)
             results[name] = (b, n_ids)

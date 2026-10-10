@@ -262,7 +262,7 @@ screens:
       - "Filters | Channel / Delivery status / Search reference | Drop-down, drop-down, text | CCM, MFT, LMS; statuses | N | - | All | Always | - | -"
       - "List | Channel / Reference Number / File Name / Recipients / Delivery Status / CCM Transaction Reference / Error / Queued | Column | dd-MMM-yyyy HH:mm | - | Messages of the channels | - | Read only | - | No message"
       - "Delivery History | When / Status / Detail / By | Table in a dialog | dd-MMM-yyyy HH:mm | - | Events of the message | - | Read only | - | No status yet"
-      - "Connection | Mode / Endpoint / Access key | Display | The mode of the channel (live or simulator in SIT and UAT) | - | Settings of the channel | - | Read only | - | -"
+      - "Connection | Mode / Address / Access key | Display | The mode of the channel (live or simulator in SIT and UAT) | - | Settings of the channel | - | Read only | - | -"
     actions:
       - "Resend | System Administrator | Message failed | Sends the message again | Queued | -"
       - "Cancel | System Administrator | Message queued | Cancels the message | Cancelled | -"

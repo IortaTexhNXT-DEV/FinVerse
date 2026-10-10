@@ -19,6 +19,7 @@ from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 
 import brd11_figures
+import brd_common_final as final
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[4]
@@ -326,7 +327,16 @@ class NewAnnexes:
             png = RN / "screenshots" / f"{doc['shot']}.png"
             if not png.exists():
                 raise SystemExit(f"image missing: {png}")
-            a.shot(png, max_h=4.4)
+            from PIL import Image  # noqa: PLC0415
+            with Image.open(png) as im:
+                portrait = im.height >= im.width
+            # an A4 page at the width of every document print; a wide extract at the width of the screenshots
+            if portrait:
+                a.els.append(final.document_image(a.b, png))
+            else:
+                # a wide extract in two halves, left columns above the right ones, so that its text stays legible
+                for part in _halves(png, a.work):
+                    a.els.extend(final.screenshot(a.b, part, a.work))
             a.p(f"Figure AF.{k}: current layout of the {clean(doc['name'])}", italic=True, size=8, jc="center")
         for doc in d["extra"]:
             k += 1
@@ -452,5 +462,21 @@ class NewAnnexes:
         a.h1("Annex AQ – Business Unit Review Checklist")
         a.p(" ".join(c["intro"].split()))
         rows = [[str(i), r[0], r[1], r[2], r[3], "☐"] for i, r in enumerate(c["rows"], 1)]
-        a.table(c["header"], rows, [0.4, 1.7, 2.5, 3.0, 1.9, 0.5], size=8)
+        a.table(c["header"], rows, [0.5, 1.6, 2.4, 2.9, 1.8, 0.6], size=8)
         self.b.stats["checklist"] = len(rows)
+
+
+def _halves(png: Path, work: Path) -> list[Path]:
+    """A very wide extract (more than four times as wide as high) cut into its left and right halves."""
+    from PIL import Image  # noqa: PLC0415
+    with Image.open(png) as im:
+        if im.width <= 4 * im.height:
+            return [png]
+        work.mkdir(parents=True, exist_ok=True)
+        mid = im.width // 2
+        out = []
+        for k, box in enumerate(((0, 0, mid, im.height), (mid, 0, im.width, im.height))):
+            target = work / f"{png.stem}-part{k + 1}.png"
+            im.crop(box).save(target, optimize=True)
+            out.append(target)
+        return out

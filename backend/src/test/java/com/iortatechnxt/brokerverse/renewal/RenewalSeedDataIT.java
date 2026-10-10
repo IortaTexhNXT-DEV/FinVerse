@@ -44,6 +44,8 @@ class RenewalSeedDataIT {
             RenewalStage.FOR_TL_REVIEW,
             RenewalStage.TRANSFER_PENDING,
             RenewalStage.LETTER_PENDING);
+    // the insurer batch of the seed leaves one renewal with the insurer for the response screen
+    assertThat(stages).contains(RenewalStage.WITH_INSURER, RenewalStage.RA_READY);
     assertThat(all).anyMatch(c -> c.getBucket() == Bucket.EXCEPTION);
     assertThat(all).anyMatch(c -> c.getFlags().isUrgent());
     long count = candidates.count();

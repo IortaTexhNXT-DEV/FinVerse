@@ -326,6 +326,8 @@ public class RenewalSeedData implements ApplicationRunner {
     List<RenewalCandidate> stp =
         candidates.findByCompanyIdAndStageIn(co, List.of(RenewalStage.FOR_PROCESSING)).stream()
             .filter(c -> c.getExpiringArn() != null)
+            // in reference order: the first two share the expiry and the insurer of one batch
+            .sorted(java.util.Comparator.comparing(RenewalCandidate::getRenewalRef))
             .toList();
     if (stp.isEmpty()) {
       return;

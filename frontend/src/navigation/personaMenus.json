@@ -464,7 +464,7 @@
     },
     {
       "id": "BRD-6",
-      "description": "Renewal (V1010): the Renewal screens of Marketing, the Renewal processing team, Business Admin, LAMD and the Contact Center; each role is listed for its RNW_ permissions (its other grants belong to other suites)",
+      "description": "Renewal (V1010): the Renewal screens of Marketing, the Renewal processing team, Business Admin, LAMD, the Contact Center and the TSU group; each role is listed for its RNW_ permissions (its other grants belong to other suites)",
       "sections": ["renewal"],
       "sharedGroups": ["home", "client-policy", "reports"],
       "sharedModules": ["help"],
@@ -652,6 +652,13 @@
           "permissionScope": "RNW_",
           "permissions": ["RNW_FOLLOWUP", "RNW_VIEW"],
           "screens": ["/renewal", "/renewal/expiry", "/renewal/followups"]
+        },
+        "RNW:TSU": {
+          "role": "TSU",
+          "seedUser": "tsu",
+          "permissionScope": "RNW_",
+          "permissions": ["RNW_TSU_QUEUE"],
+          "screens": ["/renewal/tsu-requests"]
         }
       }
     },

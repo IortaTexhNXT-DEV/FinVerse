@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Download } from 'lucide-react';
 import { useState } from 'react';
-import { CHANNEL_STATUS_LABELS, renewalChannelsApi } from '@/api/renewalChannels';
+import { CHANNEL_STATUS_LABELS, channelLabel, renewalChannelsApi } from '@/api/renewalChannels';
 import type { ChannelRow } from '@/api/renewalChannels';
 import { useFileDownload } from '@/components/broking/useFileDownload';
 import { Button } from '@/components/ui/Button';
@@ -150,7 +150,7 @@ export default function ChannelMonitorPage() {
           emptyMessage="No message"
           columns={[
             { key: 'no', header: 'Message', kind: 'code', render: (r) => r.messageNo },
-            { key: 'channel', header: 'Channel', render: (r) => r.channel },
+            { key: 'channel', header: 'Channel', render: (r) => channelLabel(r.channel) },
             {
               key: 'ref',
               header: 'Reference Number',

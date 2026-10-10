@@ -458,6 +458,8 @@ public enum Permission {
   RNW_CHANNEL_MONITOR,
   // Connection settings of CCM and MFT
   RNW_CHANNEL_SETUP,
+  // Renewal TSU queue of the TSU group: quotations and proposals requested by Marketing (FRRN.018)
+  RNW_TSU_QUEUE,
 
   // Submitted Policies (BDOI BRD-12). See docs/architecture/SUBMITTED_POLICIES_DESIGN.md section
   // 6.1 and V1070. The data scope (segments, own records of an AO) is applied by SbmScopeService

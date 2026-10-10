@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { channelLabel } from '@/api/renewalChannels';
 import { useState } from 'react';
 import { HOLD_COVER_KINDS, renewalHoldCoverRequestsApi } from '@/api/renewalHoldCoverRequests';
 import type { HoldCoverRequestView } from '@/api/renewalHoldCoverRequests';
@@ -95,7 +96,7 @@ export function HoldCoverRequestsCard({ renewalRef }: Readonly<{ renewalRef: str
           { key: 'share', header: 'Share (%)', kind: 'amount', render: (r) => r.share ?? '' },
           { key: 'start', header: 'Start', kind: 'date', render: (r) => formatDate(r.start) },
           { key: 'end', header: 'End', kind: 'date', render: (r) => formatDate(r.end) },
-          { key: 'sent', header: 'Sent By', render: (r) => r.channel ?? '' },
+          { key: 'sent', header: 'Sent By', render: (r) => channelLabel(r.channel) },
           {
             key: 'status',
             header: 'Status',

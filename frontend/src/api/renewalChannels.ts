@@ -94,6 +94,18 @@ export const renewalChannelsApi = {
 };
 
 /** The delivery status as users read it. */
+/** Labels of the delivery channels. */
+export const CHANNEL_LABELS: Record<string, string> = {
+  CCM: 'CCM',
+  MFT: 'MFT',
+  EMAIL: 'E-mail',
+};
+
+/** The label of a delivery channel. */
+export function channelLabel(channel: string | null | undefined): string {
+  return channel === null || channel === undefined ? '' : (CHANNEL_LABELS[channel] ?? channel);
+}
+
 export const CHANNEL_STATUS_LABELS: Record<string, string> = {
   PENDING_TRANSMISSION: 'Pending Transmission',
   SUBMITTED: 'Submitted to CCM',

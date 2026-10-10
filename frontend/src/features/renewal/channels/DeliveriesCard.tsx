@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { CHANNEL_STATUS_LABELS, renewalChannelsApi } from '@/api/renewalChannels';
+import { CHANNEL_STATUS_LABELS, channelLabel, renewalChannelsApi } from '@/api/renewalChannels';
 import type { Delivery } from '@/api/renewalChannels';
 import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
@@ -30,7 +30,7 @@ export function DeliveriesCard({ renewalRef }: Readonly<{ renewalRef: string }>)
         emptyMessage="No delivery"
         columns={[
           { key: 'file', header: 'File Name', render: (d) => d.fileName ?? d.docKind },
-          { key: 'channel', header: 'Channel', render: (d) => d.channel },
+          { key: 'channel', header: 'Channel', render: (d) => channelLabel(d.channel) },
           {
             key: 'status',
             header: 'Delivery Status',

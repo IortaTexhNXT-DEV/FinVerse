@@ -5,6 +5,7 @@ import { renewalApi } from '@/api/renewal';
 import { renewalProposalApi } from '@/api/renewalProposal';
 import type { RiskCodeEntry, RiskCodeView } from '@/api/renewalProposal';
 import { useAuth } from '@/auth/authContext';
+import { LineLabel } from '@/components/broking/LovLabel';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
@@ -231,7 +232,11 @@ export default function RiskCodesPage() {
           columns={[
             { key: 'code', header: 'Risk Code', kind: 'code', render: (c) => c.riskCode },
             { key: 'desc', header: 'Risk Description', render: (c) => c.description ?? '' },
-            { key: 'line', header: 'Product Line', render: (c) => c.lineCode ?? 'All' },
+            {
+              key: 'line',
+              header: 'Product Line',
+              render: (c) => (c.lineCode ? <LineLabel code={c.lineCode} /> : 'All'),
+            },
             {
               key: 'ind',
               header: 'Renewable Indicator',

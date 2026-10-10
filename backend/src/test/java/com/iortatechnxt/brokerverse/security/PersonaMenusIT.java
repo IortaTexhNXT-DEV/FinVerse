@@ -155,7 +155,7 @@ class PersonaMenusIT {
   @Test
   void everyRoleHoldsExactlyThePermissionsTheMenuIsBuiltFrom() throws Exception {
     Map<String, Persona> personas = PersonaMenus.load();
-    assertThat(personas).hasSize(48);
+    assertThat(personas).hasSize(49);
     for (Persona p : personas.values()) {
       assertThat(p.inScope(granted(p.role()))).as(p.role()).isEqualTo(p.permissions());
       JsonNode me = api.read(api.doGet(p.seedUser(), "/api/v1/auth/me"));

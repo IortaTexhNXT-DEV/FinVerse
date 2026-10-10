@@ -130,15 +130,7 @@ export const renewalModule: FeatureModule = {
       label: 'TSU Requests',
       icon: FileText,
       permission: 'RNW_REVIEW',
-      component: lazy(() => import('./proposal/TsuQueuePage')),
-    },
-    {
-      path: '/renewal/tsu-queue',
-      label: 'Renewal TSU Requests',
-      icon: FileText,
-      permission: 'TSU_PROCESS',
-      alsoPermissions: ['TSU_APPROVE'],
-      hidden: true,
+      alsoPermissions: ['RNW_TSU_QUEUE'],
       component: lazy(() => import('./proposal/TsuQueuePage')),
     },
     {

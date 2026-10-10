@@ -34,7 +34,7 @@ public class RenewalProposalController {
 
   private static final String VIEW = "hasAuthority('RNW_VIEW')";
   private static final String MARKETING = "hasAnyAuthority('RNW_DISPOSE','RNW_REVIEW')";
-  private static final String TSU = "hasAnyAuthority('TSU_PROCESS','TSU_APPROVE')";
+  private static final String TSU = "hasAnyAuthority('TSU_PROCESS','TSU_APPROVE','RNW_TSU_QUEUE')";
 
   private static final Set<String> PICKABLE = Set.of("RNW_REVIEW", "TSU_PROCESS");
 
@@ -266,7 +266,7 @@ public class RenewalProposalController {
    * @return requests
    */
   @GetMapping("/tsu-requests")
-  @PreAuthorize("hasAnyAuthority('RNW_REVIEW','TSU_PROCESS','TSU_APPROVE')")
+  @PreAuthorize("hasAnyAuthority('RNW_REVIEW','RNW_TSU_QUEUE','TSU_PROCESS','TSU_APPROVE')")
   public List<TsuRequests.View> inStatus(
       @RequestParam Long companyId, @RequestParam String status) {
     return tsu.inStatus(companyId, status);

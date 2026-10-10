@@ -29,6 +29,7 @@ personas:
   BUSINESS_ADMIN: {name: Business Administrator, user: badmin}
   SYSADMIN: {name: System Administrator, user: admin}
   AUDITOR: {name: Auditor, user: auditor}
+  TSU: {name: Technical Support Unit (TSU) officer, user: tsu}
 
 # Packs of other BRDs whose screens a walkthrough step may show (the renewal account of New Business).
 foreign_packs: [../../BRD-01_New_Business/pack/pack.yaml]

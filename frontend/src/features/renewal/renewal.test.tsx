@@ -58,17 +58,10 @@ describe('Renewal module', () => {
     const group = NAV_GROUPS.find((g) => g.id === 'client-policy');
     const ids = group?.modules.map((m) => m.id) ?? [];
     expect(ids[ids.indexOf('renewal') - 1]).toBe('booking');
-    renewalModule.screens
-      .filter((s) => s.path !== '/renewal/tsu-queue')
-      .forEach((s) => expect(s.permission).toMatch(/^RNW_/));
+    renewalModule.screens.forEach((s) => expect(s.permission).toMatch(/^RNW_/));
     expect(renewalModule.screens.filter((s) => s.hidden === true).map((s) => s.path)).toEqual([
-      '/renewal/tsu-queue',
       '/renewal/candidates/:ref',
     ]);
-    // The TSU officers of New Business open the renewal TSU requests by their own permission.
-    expect(renewalModule.screens.find((s) => s.path === '/renewal/tsu-queue')?.permission).toBe(
-      'TSU_PROCESS',
-    );
   });
 
   it('opens the Contact Center screens only for the follow-up role', () => {
@@ -78,6 +71,13 @@ describe('Renewal module', () => {
       '/renewal/followups',
     ]);
     expect(openFor(['RNW_VIEW', 'RNW_PACKAGE_REMAP'])).toContain('/renewal/setup');
+  });
+
+  it('gives the TSU group the Renewal TSU queue in its menu', () => {
+    expect(openFor(['TSU_PROCESS', 'TSU_APPROVE', 'RNW_TSU_QUEUE'])).toEqual([
+      '/renewal/tsu-requests',
+    ]);
+    expect(openFor(['TSU_PROCESS', 'TSU_APPROVE'])).toEqual([]);
   });
 
   it('maps the tabs, tones, labels and batch outcomes', () => {

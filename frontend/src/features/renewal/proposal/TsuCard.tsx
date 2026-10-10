@@ -246,7 +246,7 @@ function OpenRequest({ r, run }: Readonly<{ r: TsuView; run: Run }>) {
         </Button>
       )}
       {can('RNW_REVIEW') && <TlActions r={open} run={run} />}
-      {can('TSU_PROCESS') && <TsuActions r={open} run={run} />}
+      {(can('TSU_PROCESS') || can('RNW_TSU_QUEUE')) && <TsuActions r={open} run={run} />}
       <QuotesTable r={open} run={run} />
       {open.proposalAttachmentId !== null && (
         <Button

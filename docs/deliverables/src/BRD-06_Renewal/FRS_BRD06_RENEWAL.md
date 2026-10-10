@@ -267,6 +267,7 @@ The BRD lists 25 functions that the System Administrator assigns to profiles (6.
 | RNW_SETUP | Non-renewable risk codes, check settings, bucket rules, decision matrix, lead days | 23 (rules) |
 | RNW_TEMPLATE_MAINTAIN | Update the renewal templates | 25 |
 | RNW_PACKAGE_REMAP | Choose the BIBS package version of a migrated policy whose legacy package is not mapped (FR-RN-028) | BRRN.020; DMQ36 |
+| RNW_TSU_QUEUE | Renewal TSU Requests in the menu of the TSU group: quotations and proposals requested by Marketing (FRRN.018.01) | BRRN.033 |
 | ATTACHMENT_MANAGE, LOV_MANAGE, ACCESS_REQUEST (existing) | Acquire documents, maintain LOVs, request user access | 1, 23, 24 |
 
 Function 2 (open the application in several tabs) needs no permission; it is the platform behaviour for every user.
@@ -303,6 +304,8 @@ The table is the proposed role-to-permission matrix ("Y" = granted; "T" = transf
 | RNW_PACKAGE_REMAP | | | Y | Y | | | | |
 | LOV_MANAGE | | | | | Y | | | |
 | Role-permission change requests | | | | | | Y | | |
+
+RNW_TSU_QUEUE is granted to the TSU group profile (outside the Renewal roles of this matrix): its officers open Renewal TSU Requests from the Renewal menu.
 
 **Data scope.** Marketing users see the candidates of their sales units, and an AO sees the candidates assigned to him. Processing users see the processing stages. LAMD and Contact Center users see a read-only projection without premium columns (to confirm, RQ21). The scope is applied by the server, never by the screen only.
 

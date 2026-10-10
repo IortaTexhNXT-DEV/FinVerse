@@ -83,6 +83,7 @@ CODES = {
     "RNW_VALIDATE": "the validation function", "RNW_REPORT_VIEW": "the report function",
     "RNW_EXPORT": "the export function", "RNW_SETUP": "the set-up function",
     "RNW_TEMPLATE_MAINTAIN": "the template function", "RNW_PACKAGE_REMAP": "the package function",
+    "RNW_TSU_QUEUE": "the Renewal TSU queue function",
     "MASTER_AUTHORIZE": "the authorisation function", "LOV_MANAGE": "the list maintenance function",
     "ACCESS_REQUEST": "the access request function", "ATTACHMENT_MANAGE": "the document function",
     "RA_ACCEPTANCE": "acceptance e-mail", "SIGNED_RA": "signed Renewal Advice", "LAMD_REPORT": "LAMD report",

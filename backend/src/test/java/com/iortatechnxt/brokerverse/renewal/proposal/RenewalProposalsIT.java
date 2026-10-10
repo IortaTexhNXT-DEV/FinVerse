@@ -43,6 +43,12 @@ class RenewalProposalsIT {
   @Autowired private TsuRequests tsu;
   @Autowired private ClientDecisions decisions;
   @Autowired private KycMonitoring kyc;
+  @Autowired private com.iortatechnxt.brokerverse.renewal.check.service.CheckEngine engine;
+
+  @Autowired
+  private com.iortatechnxt.brokerverse.renewal.domain.RenewalCandidateRepository candidates;
+
+  @Autowired private org.springframework.transaction.support.TransactionTemplate tx;
   @Autowired private RiskCodeMaintenance riskCodes;
   @Autowired private JdbcTemplate jdbc;
   @Autowired private Clock clock;
@@ -182,6 +188,29 @@ class RenewalProposalsIT {
     Map<String, Object> counts = as.run(AO, () -> kyc.dashboard(fx.company()));
     assertThat(((Number) counts.get("completed")).intValue()).isPositive();
     assertThat(as.run(AO, () -> kyc.accounts(fx.company(), KycMonitoring.COMPLETED)))
+        .anyMatch(r -> c.getRenewalRef().equals(r.get("renewalRef")));
+  }
+
+  @Test
+  void theKycCountsMatchTheKycDueTagsOfTheChecks() {
+    RenewalCandidate c = fx.unassignedRetail();
+    Long clientId = c.getSnapshot().client().clientId();
+    jdbc.update(
+        "update crm_client set kyc_review_due = ? where id = ?",
+        java.sql.Date.valueOf(BusinessClock.today(clock)),
+        clientId);
+    boolean tagged =
+        tx.execute(
+            s -> {
+              RenewalCandidate fresh = candidates.findById(c.getId()).orElseThrow();
+              engine.run(
+                  fresh, com.iortatechnxt.brokerverse.renewal.domain.CheckTrigger.INITIATION);
+              return fresh.getFlags().isKycDue();
+            });
+    assertThat(tagged).isTrue();
+    Map<String, Object> counts = as.run(AO, () -> kyc.dashboard(fx.company()));
+    assertThat(((Number) counts.get("due")).intValue()).isPositive();
+    assertThat(as.run(AO, () -> kyc.accounts(fx.company(), KycMonitoring.DUE)))
         .anyMatch(r -> c.getRenewalRef().equals(r.get("renewalRef")));
   }
 

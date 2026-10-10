@@ -1,15 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
 import { nbadminApi } from '@/api/nbadmin';
 import { Field } from '@/components/ui/Field';
-import { areaLabel, groupByArea } from './accessMatrix';
+import { PermissionPicker as GroupedPermissionPicker } from '@/components/broking/PermissionPicker';
+import { useSodRules } from '@/components/broking/useSodRules';
 import type { AccessRequestErrors, AccessRequestForm } from './accessRequest';
-import { roleChanges } from './accessRequest';
-import { PermissionName } from '@/components/ui/PermissionName';
-import { permissionLabels } from '@/utils/permissionLabel';
 
 /**
- * Permission picker grouped by functional area (PMADD05; BRD 3.002 "tasks by module"), with the
- * permissions added and removed against the current ones.
+ * Permission picker of the group-profile requests (PMADD05; BRD 3.002 "tasks by module"): the
+ * permissions by business area with search, the selection, separation-of-duties and privilege
+ * warnings and, for a change, the permissions added and removed against the current ones.
  */
 export function PermissionPicker({
   legend,
@@ -17,53 +16,36 @@ export function PermissionPicker({
   selected,
   onChange,
   error,
+  offerCopy = false,
 }: Readonly<{
   legend: string;
   current: string[];
   selected: string[];
   onChange: (permissions: string[]) => void;
   error?: string;
+  offerCopy?: boolean;
 }>) {
   const matrix = useQuery({ queryKey: ['nbadmin', 'matrix'], queryFn: nbadminApi.matrix });
-  const groups = groupByArea(matrix.data?.permissions ?? []);
-  const { added, removed } = roleChanges(current, selected);
-  const toggle = (permission: string, on: boolean) =>
-    onChange(on ? [...selected, permission] : selected.filter((p) => p !== permission));
+  const roles = useQuery({ queryKey: ['nbadmin', 'roles'], queryFn: nbadminApi.roles });
+  const rules = useSodRules();
+  const catalog = matrix.data?.permissions ?? [];
+  const approving = new Set(
+    catalog.filter((p) => p.actions.includes('APPROVE')).map((p) => p.permission),
+  );
   return (
-    <fieldset className="stack permission-picker">
-      <legend className="required">{legend}</legend>
-      {groups.map((g) => (
-        <div key={g.area}>
-          <div className="permission-area">{areaLabel(g.area)}</div>
-          <div className="form-grid">
-            {g.permissions.map((p) => (
-              <label key={p} className="checkbox-field" htmlFor={`perm-${p}`}>
-                <input
-                  id={`perm-${p}`}
-                  type="checkbox"
-                  checked={selected.includes(p)}
-                  onChange={(e) => toggle(p, e.target.checked)}
-                />
-                <span>
-                  <PermissionName code={p} />
-                </span>
-              </label>
-            ))}
-          </div>
-        </div>
-      ))}
-      {error && (
-        <span className="field-error" role="alert">
-          {error}
-        </span>
-      )}
-      <dl className="detail-list">
-        <dt>Added</dt>
-        <dd>{permissionLabels(added) || '—'}</dd>
-        <dt>Removed</dt>
-        <dd>{permissionLabels(removed) || '—'}</dd>
-      </dl>
-    </fieldset>
+    <GroupedPermissionPicker
+      legend={legend}
+      required
+      permissions={catalog.map((p) => p.permission)}
+      approving={approving}
+      current={current}
+      selected={selected}
+      onChange={onChange}
+      profiles={roles.data ?? []}
+      rules={rules}
+      offerCopy={offerCopy}
+      error={error}
+    />
   );
 }
 

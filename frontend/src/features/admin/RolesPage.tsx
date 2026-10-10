@@ -1,3 +1,4 @@
+import { PermissionChanges } from '@/components/broking/PermissionPicker';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Wrench } from 'lucide-react';
 import { useState } from 'react';
@@ -20,7 +21,7 @@ import { UserName } from '@/components/ui/UserName';
 import { displayNameOf } from '@/api/users';
 import { Notice } from '@/components/ui/Notice';
 import { PermissionName } from '@/components/ui/PermissionName';
-import { permissionLabel, permissionLabels } from '@/utils/permissionLabel';
+import { permissionLabel } from '@/utils/permissionLabel';
 import { ConfigUploadButton } from '@/features/configpromo/ConfigUploadButton';
 import { CellStack } from '@/components/ui/CellStack';
 
@@ -117,11 +118,11 @@ function ToImplement() {
           <div className="stack">
             <ErrorAlert error={implement.error} />
             <p>{chosen.summary}</p>
+            <PermissionChanges
+              current={chosen.permissionsRemoved}
+              selected={chosen.permissionsAdded}
+            />
             <dl className="detail-list">
-              <dt>Permissions added</dt>
-              <dd>{permissionLabels(chosen.permissionsAdded) || '—'}</dd>
-              <dt>Permissions removed</dt>
-              <dd>{permissionLabels(chosen.permissionsRemoved) || '—'}</dd>
               <dt>Approved by</dt>
               <dd>
                 <UserName login={chosen.decidedBy} />

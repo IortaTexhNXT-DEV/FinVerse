@@ -175,8 +175,7 @@ public class RenewalAuditLogService {
   }
 
   private static Entry entry(Map<String, Object> r) {
-    Object at = r.get("occurred_at");
-    Instant when = at instanceof Timestamp t ? t.toInstant() : null;
+    Instant when = instant(r.get("occurred_at"));
     String description = (String) r.get("description");
     return new Entry(
         when,
@@ -189,6 +188,23 @@ public class RenewalAuditLogService {
         label(description, (String) r.get("new_value")),
         (String) r.get("performed_by"),
         (String) r.get("remarks"));
+  }
+
+  /**
+   * The time of an entry whatever type the driver returns for it (timestamp with or without time
+   * zone).
+   *
+   * @param at value of the column
+   * @return instant, null when absent
+   */
+  static Instant instant(Object at) {
+    return switch (at) {
+      case Timestamp t -> t.toInstant();
+      case java.time.OffsetDateTime o -> o.toInstant();
+      case Instant i -> i;
+      case java.time.LocalDateTime l -> l.atZone(BusinessClock.zone()).toInstant();
+      case null, default -> null;
+    };
   }
 
   /** The name of a disposition or classification code; other values as they are. */

@@ -110,6 +110,13 @@ const steps = {
     const page = await openRecord(ctx, CORP_AO, ref);
     if (stageOf(ctx, ref) === 'FOR_DISPOSITION') {
       await button(page, /^push$/i).click();
+      await settle(page, 800);
+      // Push asks for the approver (every Team Leader of the unit by default) and submits for posting.
+      const d = dialogOf(page);
+      if (await d.isVisible().catch(() => false)) {
+        await d.getByRole('button', { name: /^submit for posting$/i }).click();
+        await d.waitFor({ state: 'hidden', timeout: 15000 }).catch(() => {});
+      }
       await settle(page, 1500);
     }
     return page;

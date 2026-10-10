@@ -494,7 +494,8 @@ class Annexes:
 
     def frrn_of(self, frs) -> str:
         lm = line_items_map()
-        return ", ".join(sorted({x for fr in frs for x in lm.get(fr, [])}, key=frrn_key))
+        items = {x for fr in frs for x in lm.get(fr, [])} | {fr for fr in frs if str(fr).startswith("FRRN.")}
+        return ", ".join(sorted(items, key=frrn_key))
 
     def h1(self, text):
         p = OxmlElement("w:p")

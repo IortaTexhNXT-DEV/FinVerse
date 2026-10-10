@@ -1,0 +1,340 @@
+# Screen specifications of BRD-6 Renewal added with the full coverage of the BRD (10 Oct 2026): the dashboards and
+# the bucket panels, transfers to New Business, approvals and placement, proposals and the TSU requests, KYC, risk
+# codes, billing, e-policies, the RMU officers, the channels to CCM, MFT and LMS, the audit logs, the budget and the
+# tabs added to the Renewal record (hold cover, proposal, acceptance and approval, KYC, placement, audit logs).
+area: Dashboards, placement and the services of Renewal
+screens:
+  - id: SCR-RN-21
+    title: Renewal Dashboard
+    route: /renewal/dashboard
+    purpose: >-
+      The Marketing view of the renewals for a period: the KPI cards (basic premium and gross commission against the
+      budget, pipeline, closing ratio, persistency), the outstanding renewal accounts by product, the biggest open
+      deals, the insurer approval monitoring and the open renewal accounts per officer. Each figure opens the
+      accounts behind it.
+    entry:
+      - Client & Policy › Renewal › Renewal Dashboard
+      - Home after sign-in of the Marketing users
+    frs: [FRRN.002, FRRN.042, FRRN.044]
+    shots:
+      - {state: view, user: mkttl, caption: "Renewal Dashboard of the Marketing Team Leader: KPI cards, pipeline and the open accounts per officer"}
+    fields:
+      - "Filters | Period From / Period To / Market Segment / Account Officer | Date, date, drop-down, drop-down | dd-MMM-yyyy; names | N | Market segments; users of the unit | The current month; all | Always | Period To not before Period From | -"
+      - "KPI summary cards | Basic Premium and Gross Commission / Pipeline Summary / Closing Ratio / Renewal Persistency Ratio | Card | Actual, Budget, % vs Budget, Variance, Growth; counts and amounts | - | Renewals, budget | - | Read only | - | -"
+      - "Biggest Open Deals | Ranking / Account Number / Assured Name / Risk Code / Team / Premium Amount / Commission Amount | Table | Two decimals | - | Open renewals | - | Read only | - | No open deals"
+      - "Insurer Renewal Approval Monitoring | Insurer Name / Number of Pending Accounts / % of Approval | Table | Counts and percentages | - | Renewals with the insurer | - | Read only | - | No pending accounts"
+      - "Open Renewal Accounts per Officer | Officer / Open Renewal Accounts | Table | Counts | - | Assignments | - | Read only | - | No renewal accounts assigned"
+      - "Drill-down | Reference Number / Premium / Commission / Assigned User / Expiry Date | Table in a dialog | Two decimals; dd-MMM-yyyy | - | The accounts behind a figure | - | Read only | - | No records found."
+    actions:
+      - "[Figure or row] | Marketing users | Always | Opens the accounts behind the figure; a row opens the renewal | - | -"
+
+  - id: SCR-RN-22
+    title: Renewal Accounts
+    route: /renewal/accounts
+    purpose: >-
+      The renewal accounts of the user's unit in BDOI's bucket panels: Clean, Review, the third panel of the setting
+      (Non-Renewable by default) and All, with the expiring invoice, the renewal reference, the claim flag, the amounts
+      and the disposition. The account tags of a file are uploaded here.
+    entry:
+      - Client & Policy › Renewal › Renewal Accounts
+      - Renewal Dashboard › a figure
+    frs: [FRRN.002, FRRN.008, FRRN.009, FRRN.015]
+    shots:
+      - {state: clean, user: mkttl, caption: "Renewal Accounts, Clean panel: the accounts with their amounts, status and assigned user"}
+    fields:
+      - "Panels | Clean / Review / Non-Renewable / All | Tab | Count on each tab | - | Bucket classification of the account (Annex AC.9, C01) | Clean | - | - | -"
+      - "Search | Search the renewal accounts | Text | Reference, invoice, client or assured | N | - | Blank | Always | - | -"
+      - "List | Expiring Invoice Number / Renewal Reference Number / With Claim / Invoice Number / Assured / Client / Expiry Date / Sum Insured / Premium Rate / Premium / Commission Rate / Commission Amount / Mailing Address / Mortgaged (Y/N) / Renewal Status / Renewal Disposition / Assigned User | Column | Two decimals; dd-MMM-yyyy; labels | - | Renewal accounts | - | Read only | - | No renewal accounts in this panel"
+      - "Upload Account Tags | [Upload of the file of account tags] | Upload | Template of the account tags | - | Renewal accounts | - | Marketing users | Every row checked before anything is saved | -"
+    actions:
+      - "Upload Account Tags | Marketing users (update permission) | Always | Uploads the tags of the accounts of the file (bulk update) | - | -"
+      - "[Row] | Marketing users | Always | Opens the renewal | - | -"
+
+  - id: SCR-RN-23
+    title: Processing Dashboard
+    route: /renewal/processing-dashboard
+    purpose: >-
+      The Processing view of the month: KPI cards of the accounts to process, a combined, New Business or Renewal
+      view, and the accounts by Placement Processor, assigned or unassigned.
+    entry:
+      - Client & Policy › Renewal › Processing Dashboard
+      - Home after sign-in of the Processing users
+    frs: [FRRN.003, FRRN.010]
+    shots:
+      - {state: view, user: proctl, caption: "Processing Dashboard of the Processing Team Leader: KPI cards and the accounts of the month"}
+    fields:
+      - "View | Combined View / New Business View / Renewal View | Toggle | One at a time | - | - | Combined View | Always | - | -"
+      - "Processing KPI cards | Accounts by stage of processing | Card | Counts | - | Renewals and New Business accounts | - | Read only | - | -"
+      - "Filter | Placement Processor / Unassigned / Assigned | Toggle | One at a time | - | Processing Officers | All | Always | - | -"
+      - "List | Account Reference Number / Month and the counts of the stages | Table | Counts | - | Accounts of the month | - | Read only | - | No records found."
+    actions:
+      - "[Figure or row] | Processing users | Always | Opens the accounts behind the figure | - | -"
+
+  - id: SCR-RN-24
+    title: Transfer Requests
+    route: /renewal/referrals
+    purpose: >-
+      The requests to transfer a renewal account to another Marketing unit as a New Business opportunity: the source
+      unit raises the request with a justification, the receiving unit accepts, rejects or returns it for
+      clarification and creates the New Business account; the requester may cancel it while it is open.
+    entry:
+      - Client & Policy › Renewal › Transfer Requests
+      - Renewal › Transfer to Another Unit
+    frs: [FRRN.011]
+    shots:
+      - {state: list, user: mkttl, caption: "Transfer Request Monitoring with the requests and their status"}
+    fields:
+      - "List | Transfer Request Number / Renewal Account Number / Assured / Source Marketing Unit / Receiving Marketing Unit / Request Date / Transfer Status / Accepted By / Remarks / New Business Account Number | Column | dd-MMM-yyyy; names of the units | - | Transfer requests | - | Read only | - | No transfer request"
+      - "Transfer request dialog | Receiving Marketing Unit / Business Justification | Drop-down, text area | Marketing units; up to 500 characters | Y / Y | Marketing units | Blank | Renewal not yet transferred | Another unit than the source | Enter the business justification"
+      - "Decision dialog | Remarks | Text area | Up to 500 characters | Cond.: reject or return | - | Blank | Request open | - | Enter the remarks"
+      - "Create New Business Account dialog | Risk Code / Market Segment / Period From / Period To | Drop-down, drop-down, date, date | Names; dd-MMM-yyyy | Y | Risk codes, market segments | From the renewal | Request accepted | Period To after Period From | -"
+    actions:
+      - "Accept | Receiving unit (Team Leader) | Request open | Accepts the transfer | Accepted | Transfer accepted"
+      - "Reject / Return for Clarification | Receiving unit (Team Leader) | Request open | Records the decision with the remarks | Rejected / Returned | Transfer decided"
+      - "Create New Business Account | Receiving unit | Request accepted | Creates the New Business account of the opportunity; its number is shown on the request | Completed | -"
+      - "Cancel Request | Source unit | Request open | Cancels the request | Cancelled | -"
+
+  - id: SCR-RN-25
+    title: Submitted for Approval
+    route: /renewal/approvals
+    purpose: >-
+      The renewal accounts accepted by the client that wait for the second approval of the setting (Annex AC.9, C23),
+      with the client payment confirmation. The approver approves or rejects each account with the reason.
+    entry:
+      - Client & Policy › Renewal › Submitted for Approval
+      - Notification Renewal submitted for approval
+    frs: [FRRN.016, FRRN.026]
+    shots:
+      - {state: list, user: mkttl, caption: "Submitted for Approval with the accounts waiting for the approver"}
+    fields:
+      - "List | Reference / Client / Disposition / Premium / Submitted by / Submitted on | Column | Two decimals; dd-MMM-yyyy | - | Renewals Submitted for Approval | - | Read only | - | No renewal account is Submitted for Approval"
+      - "Approve dialog | Client payment confirmation | Tick box | Confirmed by the client | Cond.: payment before placement | - | Blank | Submitted for Approval | - | -"
+      - "Reject dialog | Reason or remarks | Text area | Up to 500 characters | Y | - | Blank | Submitted for Approval | - | Enter the reason"
+    actions:
+      - "Approve | Approver (not the submitter) | Submitted for Approval | Approves the account; it goes to the payment check and placement | For Placement | Renewal approved"
+      - "Reject | Approver (not the submitter) | Submitted for Approval | Returns the account to the Account Officer with the reason | Returned | Renewal returned"
+
+  - id: SCR-RN-26
+    title: Submitted for Placement
+    route: /renewal/placement
+    purpose: >-
+      The renewal accounts submitted for placement with the insurers: the Processing Officer sends the placement slip
+      to each insurer through CCM or by protected e-mail (setting, Annex AC.9, C17), records the insurer's response and
+      returns an account that cannot be placed.
+    entry:
+      - Client & Policy › Renewal › Submitted for Placement
+    frs: [FRRN.029, FRRN.030, FRRN.031, FRRN.032]
+    shots:
+      - {state: list, user: proc, caption: "Submitted for Placement with the accounts waiting for the insurers"}
+    fields:
+      - "List | Reference / Client / Insurer / Premium / Submitted / TAT (business days) / SLA | Column | Two decimals; dd-MMM-yyyy | - | Renewals submitted for placement | - | Read only | - | No renewal account is submitted for placement"
+      - "Send dialog | Recipients / CC recipients | E-mail addresses | Separated by commas | Y / N | Insurer contacts | The insurer's placement contact | For Placement | Valid e-mail addresses | -"
+      - "Return dialog | Return reason / Remarks | Drop-down, text area | Return reasons; up to 500 characters | Y / Y | Renewal return reason | Blank | For Placement | - | Select a return reason"
+    actions:
+      - "Send / Send via CCM | Processing Officers | For Placement | Sends the placement slip to the insurer by the channel of the setting | With Insurer | -"
+      - "Record Insurer Response | Processing Officers | With Insurer | Opens the response of the insurer (SCR-RN-36, Placement tab) | Placed or Rejected | -"
+      - "Return | Processing Officers | For Placement | Returns the account to Marketing with the reason | Returned | Renewal returned"
+
+  - id: SCR-RN-27
+    title: TSU Requests
+    route: /renewal/tsu-requests
+    purpose: >-
+      The requests of the Account Officers to the Technical Support Unit for a quotation or a proposal of a renewal,
+      by status: pending the Team Lead's approval, approved, for TSU processing and completed.
+    entry:
+      - Client & Policy › Renewal › TSU Requests
+      - Renewal › Proposal & TSU tab
+    frs: [FRRN.017, FRRN.018, FRRN.019]
+    shots:
+      - {state: list, user: mkttl, caption: "TSU Requests with the requests of the unit by status"}
+    fields:
+      - "Status tabs | Pending Team Lead Approval / Approved / For TSU Processing / Completed | Tab | Count on each tab | - | TSU requests | Pending Team Lead Approval | - | - | -"
+      - "List | Request / Reference Number / Client / Risk Code / Status / TSU Officer | Column | Names of the users | - | TSU requests | - | Read only | - | No TSU request"
+    actions:
+      - "[Row] | Marketing and TSU users | Always | Opens the renewal on its Proposal & TSU tab | - | -"
+
+  - id: SCR-RN-28
+    title: KYC Monitoring
+    route: /renewal/kyc
+    purpose: >-
+      The renewal accounts whose client is due for the KYC review: due, upcoming, completed and pending follow-up.
+      KYC is for information and never blocks the renewal.
+    entry:
+      - Client & Policy › Renewal › KYC Monitoring
+    frs: [FRRN.039]
+    shots:
+      - {state: view, user: mkttl, caption: "KYC Monitoring with the counts and the accounts due for the KYC review"}
+    fields:
+      - "Counts | Total Accounts Due for KYC Review / Total Accounts with Upcoming KYC Reviews / Total Accounts Completed KYC / Total Accounts Pending Follow-up | Card | Counts; each opens its accounts | - | KYC of the clients | - | Read only | - | -"
+      - "List | Reference Number / Client / KYC Review Date / Expiry Date / Account Officer | Column | dd-MMM-yyyy | - | Accounts of the card chosen | - | Read only | - | No account"
+    actions:
+      - "[Card or row] | Marketing users | Always | Lists the accounts of the card; a row opens the renewal on its KYC tab | - | -"
+
+  - id: SCR-RN-29
+    title: Risk Code Maintenance
+    route: /renewal/risk-codes
+    purpose: >-
+      The risk codes of Renewal with their renewable indicator: a non-renewable risk code keeps its accounts out of
+      renewal. A change takes effect from its effective date once a second authorised user authorises it.
+    entry:
+      - Client & Policy › Renewal › Risk Code Maintenance
+    frs: [FRRN.038]
+    shots:
+      - {state: list, user: badmin, caption: "Risk Code Maintenance with the risk codes and their renewable indicator"}
+    fields:
+      - "List | Risk Code / Risk Description / Product Line / Renewable Indicator / Effective Date / Status / Created By / Created Date / Last Updated By / Last Updated Date | Column | dd-MMM-yyyy; names | - | Risk codes | - | Read only | - | No risk code"
+      - "Risk code dialog | Risk Code / Risk Code Description / Product Line / Renewable Indicator / Effective Date / Remarks | Text, text, drop-down, Yes/No, date, text area | dd-MMM-yyyy; up to 500 characters | Y / Y / Y / Y / Y / N | Product lines | Today | Business Administrator | Effective date today or later | -"
+    actions:
+      - "Add / Update | Business Administrator | Always | Saves the risk code for authorisation | For Authorization | -"
+      - "Authorize | Another Business Administrator | For Authorization | Authorises the change; it applies from the effective date | Active | -"
+      - "Deactivate | Business Administrator | Active | Deactivates the risk code for authorisation | For Authorization | -"
+
+  - id: SCR-RN-30
+    title: CLPC Billing Files
+    route: /renewal/billing
+    purpose: >-
+      The billing files of the CLPC renewals: the file of the renewals billed through the loan of the client is
+      generated for a period, sent to LMS and kept with its delivery status.
+    entry:
+      - Client & Policy › Renewal › CLPC Billing Files
+    frs: [FRRN.027, FRRN.028]
+    shots:
+      - {state: list, user: proc, caption: "CLPC Billing Files with the files generated and their delivery status"}
+    fields:
+      - "Generate Billing File dialog | From Date / To Date | Date | dd-MMM-yyyy | Y | - | The coming billing period | Always | To Date not before From Date | -"
+      - "List | File Name / File Type / Generated By / Accounts / Delivery Status / Error Reason / LMS Upload / Generated On | Column | Names; dd-MMM-yyyy HH:mm | - | Billing files | - | Read only | - | No billing file generated"
+    actions:
+      - "Generate Billing File | Processing users | Always | Generates the file of the period and sends it to LMS | Generated | -"
+      - "Download / Download As | Processing users | Always | Downloads the file under its name or another name | - | -"
+
+  - id: SCR-RN-31
+    title: E-Policies
+    route: /renewal/epolicies
+    purpose: >-
+      The e-policies of the insurers: the files received (summary file and ZIP of the policies) matched to the renewal
+      accounts, the accounts For E-Policy Sending with the policy to send to the client, and the upload of the e-policy
+      numbers.
+    entry:
+      - Client & Policy › Renewal › E-Policies
+    frs: [FRRN.033]
+    shots:
+      - {state: receipts, user: proc, caption: "E-Policies, E-Policy Receipts: the files received and the matching of each policy"}
+    fields:
+      - "Tabs | E-Policy Receipts / For E-Policy Sending / Upload E-Policy Numbers | Tab | - | - | - | E-Policy Receipts | - | - | -"
+      - "E-Policy Receipts | E-Policy Summary File (.txt) / E-Policy ZIP File | Upload | The summary file and the ZIP of the policies of an insurer | Y | - | - | Processing users | The ZIP holds the documents of the summary | -"
+      - "Files received | ID / File Name / Receipt Date and Time / Receipt Type / Processing Status / Matched / Reason/Remarks | Column | dd-MMM-yyyy HH:mm | - | E-policy files | - | Read only | - | No e-policy file received"
+      - "Policies of a file | Sequence / Renewal Reference Number / Policy Number / Document / Matching Status / Remarks | Column | Matched, Not matched | - | Lines of the file | - | Read only | - | No record"
+      - "For E-Policy Sending | Select / Renewal Reference Number / Client / Policy Number / Client Email / E-Policy / Not Eligible / CC recipients | Column, tick box, e-mail | - | - | Accounts with an e-policy | - | Processing users | - | No account is For E-Policy Sending"
+    actions:
+      - "Upload | Processing users | Always | Receives the e-policy files and matches each policy to its renewal | Matched or Not matched | -"
+      - "Send | Processing users | Accounts ticked | Sends the e-policy to the client by the channel of the setting | Sent | -"
+
+  - id: SCR-RN-32
+    title: RMU Account Maintenance
+    route: /renewal/rmu-officers
+    purpose: >-
+      The Account Officers of the RMU (past-due loans) whose renewal accounts are handled apart, maintained by the
+      Business Administrator.
+    entry:
+      - Client & Policy › Renewal › RMU Account Maintenance
+    frs: [FRRN.041]
+    shots:
+      - {state: list, user: badmin, caption: "RMU Account Maintenance with the RMU Account Officers"}
+    fields:
+      - "List | AO Code / Account Officer Name / Status / Remarks / Updated By / Updated | Column | Names; dd-MMM-yyyy | - | RMU Account Officers | - | Read only | - | No RMU Account Officer"
+      - "RMU officer dialog | AO Code / Account Officer Name / Remarks | Text | Up to 500 characters | Y / Y / N | - | Blank | Business Administrator | AO code not yet listed | -"
+    actions:
+      - "Add / Update | Business Administrator | Always | Saves the RMU Account Officer | Active | -"
+
+  - id: SCR-RN-33
+    title: Channel Monitor
+    route: /renewal/channels
+    purpose: >-
+      The documents of Renewal sent through the channels (CCM to the clients, MFT to the insurers, LMS for billing):
+      each message with its status, reference, recipients and error, its delivery history and the connection of each
+      channel. A failed message may be sent again.
+    entry:
+      - Client & Policy › Renewal › Channel Monitor
+    frs: [FRRN.022, FRRN.024, FRRN.027]
+    shots:
+      - {state: list, user: badmin, caption: "Channel Monitor with the messages sent through CCM, MFT and LMS"}
+    fields:
+      - "Filters | Channel / Delivery status / Search reference | Drop-down, drop-down, text | CCM, MFT, LMS; statuses | N | - | All | Always | - | -"
+      - "List | Channel / Reference Number / File Name / Recipients / Delivery Status / CCM Transaction Reference / Error / Queued | Column | dd-MMM-yyyy HH:mm | - | Messages of the channels | - | Read only | - | No message"
+      - "Delivery History | When / Status / Detail / By | Table in a dialog | dd-MMM-yyyy HH:mm | - | Events of the message | - | Read only | - | No status yet"
+      - "Connection | Mode / Endpoint / Access key | Display | The mode of the channel (live or simulator in SIT and UAT) | - | Settings of the channel | - | Read only | - | -"
+    actions:
+      - "Resend | System Administrator | Message failed | Sends the message again | Queued | -"
+      - "Cancel | System Administrator | Message queued | Cancels the message | Cancelled | -"
+      - "Check | System Administrator | Always | Checks the connection of the channel | - | -"
+
+  - id: SCR-RN-34
+    title: Audit Logs
+    route: /renewal/audit-logs
+    purpose: >-
+      Every action on the renewal accounts with its old and new value, who did it and when, filtered by date, action
+      type, reference and user. Nobody can change or delete an entry.
+    entry:
+      - Client & Policy › Renewal › Audit Logs
+      - Renewal › Audit Logs tab
+    frs: [FRRN.043]
+    shots:
+      - {state: list, user: badmin, caption: "Audit Logs of Renewal with the actions of the period"}
+    fields:
+      - "Filters | Date From / Date To / Action Type / Reference Number / User | Date, date, drop-down, text, drop-down | dd-MMM-yyyy; action types in words; names | N | Action types; users | The current month | Always | Date To not before Date From | -"
+      - "List | Timestamp / Module / Reference Number / Client / Assured / Action Type / Description / Old Value / New Value / Performed By / Remarks | Column | dd-MMM-yyyy HH:mm; values in words | - | Audit trail | - | Read only | - | No audit log entries"
+    actions:
+      - "Export | Auditor, Business Administrator | Always | Downloads the entries of the filters | - | -"
+
+  - id: SCR-RN-35
+    title: Renewal Annual Budget
+    route: /renewal/budget
+    purpose: >-
+      The annual budget of the renewals per fiscal year, measure, market segment and team, uploaded and updated by
+      month, with the history of every change. The Renewal Dashboard compares the actuals with it.
+    entry:
+      - Client & Policy › Renewal › Renewal Annual Budget
+    frs: [FRRN.042]
+    shots:
+      - {state: view, user: badmin, caption: "Renewal Annual Budget of the fiscal year by team and month"}
+    fields:
+      - "Filters | Fiscal Year / Measure / Market Segment / Team Lead | Drop-down | Years; measures; segments; users | Y / N / N / N | - | The current year | Always | - | -"
+      - "Budget | Region / Team / Sub-Team / Section Head / Team Head / Team Lead / Account Officer / Annual New Budget / Annual Renewal Budget / Annual Organic Budget / Grand Total | Column | Two decimals | - | Budget of the year | - | Read only | - | No budget for this fiscal year"
+      - "Update Budget dialog | Month / Budget | Table | Two decimals | Y | - | The current budget | Business Administrator | Not negative | -"
+      - "Budget History | Month / Previous Budget / Updated Budget / Modified By / Modification Date | Table in a dialog | dd-MMM-yyyy | - | Changes of the budget | - | Read only | - | No changes since the budget was created"
+    actions:
+      - "Upload Budget | Business Administrator | Always | Uploads the budget file of the fiscal year | - | -"
+      - "Update Budget | Business Administrator | Budget loaded | Changes the budget of a month | - | -"
+      - "View Budget History | Business Administrator | Always | Opens the history of the changes | - | -"
+
+  - id: SCR-RN-36
+    title: "Renewal: Hold Cover, Proposal & TSU, Acceptance & Approval, KYC, Placement and Audit Logs"
+    route: /renewal/candidates/:ref
+    purpose: >-
+      The tabs of the renewal record added with the full coverage: the hold cover requests of the account with the
+      insurers' shares, the proposals and the TSU request, the client's acceptance with the approval and the payment,
+      the KYC status, the Insurance Advice and the placement with each insurer's response, and the audit trail of
+      the renewal.
+    entry:
+      - Renewal › Hold Cover, Proposal & TSU, Acceptance & Approval, KYC, Placement or Audit Logs tab
+    frs: [FRRN.016, FRRN.017, FRRN.025, FRRN.029, FRRN.030, FRRN.032, FRRN.036, FRRN.037, FRRN.039, FRRN.043]
+    shots:
+      - {state: placement, user: proc, open_renewal: processing, tab: Placement, caption: "Placement tab: the Insurance Advice and the placement slip of each insurer with its response"}
+    fields:
+      - "Hold Cover tab: Insurers | Insurer / Share (%) / Coverage / Premium | Table | Two decimals | - | Insurers of the account | - | Read only | - | No insurer"
+      - "Hold Cover tab: Hold Cover Requests | Reference Number / Request / Insurer / Share (%) / Start / End / Sent By / Status / Insurer Remarks | Table | dd-MMM-yyyy | - | Hold cover requests | - | Read only | - | No hold cover request"
+      - "Hold Cover tab: extension | Extension days | Number | 15 or 30 days (setting, Annex AC.9, C12) | Y | - | 30 | Hold cover approved | Within the extension window | -"
+      - "Proposal & TSU tab: Proposals | File Name / Proposal / Status / CCM Message / Generated On | Table | dd-MMM-yyyy HH:mm | - | Proposals of the renewal | - | Read only | - | No proposal generated"
+      - "Proposal & TSU tab: TSU Request | TSU Officer / Remarks / Insurer / Premium / Terms and conditions / Proposal | Drop-down, text, drop-down, amount, text area, file | Names; two decimals | Y | TSU officers, insurers | Blank | For Quotation, For Proposal | - | -"
+      - "Acceptance & Approval tab | Client Acceptance Status / For Booking Only / Direct-to-Insurer Payment / Approval and Payment: Status / Remarks / Policy Number / OR Number / Override reason or justification / Option / Rejection reason | Drop-down, text | Labels | Cond. | Acceptance statuses | Blank | After the Renewal Advice | An override needs a justification | -"
+      - "KYC tab | Status / Activity / Remarks or follow-up note | Drop-down, drop-down, text area | Labels | N | KYC statuses and activities | From the client | Always | - | -"
+      - "Placement tab: Insurance Advice | Version / File Name / Generated By / Generated On / CCM Message | Table | dd-MMM-yyyy HH:mm | - | Insurance Advices (mortgaged accounts) | - | Read only | - | No Insurance Advice (mortgaged accounts only)"
+      - "Placement tab: Placement | Insurer / Share (%) / Premium / Placement Slip / Status / Transmission / Submitted / TAT (business days) / SLA / With Issue / Insurer Response | Table | Two decimals; dd-MMM-yyyy | - | Placement of each insurer | - | Read only | - | No placement generated"
+      - "Record Insurer Response dialog | Insurer Response / Rejection Reason / Insurer Remarks | Drop-down, drop-down, text area | Approved, Rejected; rejection reasons | Y / Cond. / N | Insurer responses | Blank | With Insurer | A rejection needs its reason | -"
+      - "Audit Logs tab | Timestamp / Action Type / Description / Old Value / New Value / Performed By / Remarks | Table | dd-MMM-yyyy HH:mm | - | Audit trail of the renewal | - | Read only | - | No audit log entries"
+    actions:
+      - "Request Hold Cover / Record Approval | Account Officer; Processing Officer | Before expiry, payment pending | Sends the hold cover request to the insurers; records the insurer's approval with the extension | Hold cover requested / approved | -"
+      - "Generate Proposal / Send via CCM / Download As | Account Officer | For Proposal | Generates the quick or full proposal and sends it to the client | Proposal sent | -"
+      - "Submit to TSU | Account Officer | For Quotation or For Proposal | Sends the request to the TSU after the Team Lead's approval | Pending Team Lead Approval | -"
+      - "Record Acceptance / Approve / Reject | Account Officer; approver | After the Renewal Advice | Records the client's acceptance and the second approval of the setting | Accepted / Submitted for Approval | -"
+      - "Download Slip / Download Placement File / Record Insurer Response | Processing Officer | For Placement, With Insurer | Downloads the slip and records the insurer's response | Placed or Rejected | -"

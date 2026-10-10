@@ -137,6 +137,11 @@ public class RenewalAssignmentService {
     return batch.run(refs, ref -> assignOne(records.get(companyId, ref), officer, reason));
   }
 
+  /** The display name of a user (the sign-in ID when the user is unknown). */
+  private String nameOf(String login) {
+    return users.findByUsernameIgnoreCase(login).map(AppUser::getFullName).orElse(login);
+  }
+
   private void assignOne(RenewalCandidate c, AppUser officer, String reason) {
     requireAssignable(c, officer);
     String ao = officer.getUsername();
@@ -156,7 +161,8 @@ public class RenewalAssignmentService {
         RenewalCodes.ENTITY,
         c.getRenewalRef(),
         AuditAction.UPDATE,
-        (previous == null ? "Assigned to " : "Re-assigned from " + previous + " to ") + ao);
+        (previous == null ? "Assigned to " : "Re-assigned from " + nameOf(previous) + " to ")
+            + officer.getFullName());
     notices.users(
         List.of(ao),
         RenewalCodes.EVENT_ASSIGNED,

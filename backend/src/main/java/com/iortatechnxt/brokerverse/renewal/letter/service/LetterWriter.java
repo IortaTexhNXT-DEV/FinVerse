@@ -148,9 +148,7 @@ public class LetterWriter {
         label(kind)
             + " "
             + no
-            + " generated (template "
-            + rendered.templateCode()
-            + " v"
+            + " generated (template version "
             + rendered.templateVersion()
             + ")");
     return letter;

@@ -8,6 +8,7 @@ import { useAuth } from '@/auth/authContext';
 import { LineLabel } from '@/components/broking/LovLabel';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import { UserName } from '@/components/ui/UserName';
 import { DataTable } from '@/components/ui/DataTable';
 import { DateInput } from '@/components/ui/DateInput';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
@@ -254,9 +255,13 @@ export default function RiskCodesPage() {
               kind: 'status',
               render: (c) => <StatusBadge status={c.status} />,
             },
-            { key: 'cb', header: 'Created By', render: (c) => c.createdBy },
+            { key: 'cb', header: 'Created By', render: (c) => <UserName login={c.createdBy} /> },
             { key: 'cd', header: 'Created Date', render: (c) => formatDateTime(c.createdAt) },
-            { key: 'ub', header: 'Last Updated By', render: (c) => c.updatedBy ?? '' },
+            {
+              key: 'ub',
+              header: 'Last Updated By',
+              render: (c) => <UserName login={c.updatedBy} />,
+            },
             { key: 'ud', header: 'Last Updated Date', render: (c) => formatDateTime(c.updatedAt) },
             {
               key: 'actions',

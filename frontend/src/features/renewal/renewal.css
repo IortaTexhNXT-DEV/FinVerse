@@ -39,6 +39,18 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
   gap: var(--space-3);
+  /* a list of cards: no bullets, no list indent */
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.rnw-kpi-cards > li {
+  display: flex;
+}
+
+.rnw-kpi-cards > li > .rnw-kpi-card {
+  flex: 1;
 }
 
 .rnw-kpi-card {

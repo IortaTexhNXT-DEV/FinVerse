@@ -15,14 +15,14 @@ meta:
 cover:
   drafting: "Drafting support: iorta TechNXT Project Team"
 
-revision_row: ["09 Oct 2026", "3.2", "Draft for BDOI review: full coverage of the Cashiering scope of the Operations BRD (v1.01 with the Cashiering annex of May 2026; version of 8-Oct-2026), functional requirements elaborated with numbered acceptance criteria, new items FRS.CSH.05.02 to FRS.CSH.10.04, Appendices C to V added, observations and points for decision in Appendix R; Business Unit review edition: summary for the Business Unit, end-to-end flows, workflow and approvals, e-mail texts, document prints and formats, reports and schedules, integrations, non-functional requirements, data set-up, open questions not answered in the BDOI FRS, change control, review checklist", "iorta TechNXT Project Team (drafting); for review by Abegail Panghulan"]
+revision_row: ["09 Oct 2026 - 10 Oct 2026", "3.2", "Draft for BDOI review:full coverage of the Cashiering scope of the Operations BRD (v1.01 with the Cashiering annex of May 2026; version of 8-Oct-2026), functional requirements elaborated with numbered acceptance criteria, new items FRS.CSH.05.02 to FRS.CSH.10.04, Appendices C to V added, observations and points for decision in Appendix R; Business Unit review edition: summary for the Business Unit, end-to-end flows, workflow and approvals, e-mail texts, document prints and formats, reports and schedules, integrations, non-functional requirements, data set-up, open questions not answered in the BDOI FRS, change control, review checklist; aligned on 10 Oct 2026 with BIBS: the screens of the posting step, payment files and their monitor, AR and OR forms, day-end list, search log, unapplied payment list and settlement ORs with current screenshots, the settings for the points BDOI decides (Appendix H.8), messages, integrations and schedules", "iorta TechNXT Project Team (drafting support); for review by Abegail Panghulan"]
 
 signoff:
   drafting: "iorta TechNXT Project Team (drafting support)"
 
 introduction:
   preparation: >-
-    Version 3.2 of this document was drafted with the iorta TechNXT Project Team, from the inputs of the business unit
+    Version 3.2 of this document was elaborated with the iorta TechNXT Project Team (drafting support), from the inputs of the business unit
     and BDO ITG, for review by the System Analyst. BDOI's text of version 3.1 is kept as issued; the additions are
     written in the same style and listed in the change summary of the review copy; the points where a decision is
     needed are in Appendix R.
@@ -32,13 +32,11 @@ introduction:
     and clears minimal balances when the payment is processed (CSHID.016). This FRS covers the Cashiering
     requirements (BRQID.001 to BRQID.007, CSHID.001 to CSHID.025) and states where MKTID.013 and DBMID.001 are
     specified; the rest of Operations (Remittance, Adjustment / Cancellation, Production Reconciliation, Commission
-    Receivables and the Marketing activities) stays in the BIBS FRS BRD-2 Operations v2.1.
+    Receivables and the Marketing activities) is specified in separate FRS documents of the Operations BRD.
   references_title: "References added in version 3.2:"
   references:
     - "- Operations BRD v1.01 (15-Apr-2026, signed 23 to 28-Apr-2026): pages 71-185 of the file Operations_WS Addendum; the Cashiering annex of May 2026 (Operations Central - Addendum 1, pages 1-8); the e-mail record of the BIR 2307 changes (pages 67-70 and 186-189)."
-    - "- BIBS FRS BRD-2 Operations v2.1 (8-Oct-2026) and its test plan: the reference requirements FR-OP-nnn and the test conditions TC-OP-nnn.n quoted in Appendix Q."
-    - "- Comparison of BDOI's Operations Cashiering FRS with the BIBS FRS BRD-2 Operations, v1.0 (9-Oct-2026): the conflicts and slips of Appendix R."
-    - "- Review workbooks of BRD-02 Operations Cashiering, v1.0 (9-Oct-2026): Business Unit Requirements Collection; BRD vs Out-of-the-Box vs Best Practice; Change Request Register; Test Cases and Traceability; Business Unit Walkthrough Users."
+    - "- Review workbooks of BRD-02 Operations Cashiering, v1.0 (9-Oct-2026): Business Unit Requirements Collection; BRD vs Out-of-the-Box vs Best Practice; Change Request Register; Test Cases and Traceability (the test conditions TC-OP-nnn.n and the test cases quoted in Appendix Q); Business Unit Walkthrough Users."
     - "- BIBS Non-Functional Requirements Register v1.0; BIBS Master Data and Configuration Upload Templates v1.2; BDOI Requirements and Inputs by BRD v1.2."
 
 # ------------------------------------------------------------------------------------- Business Requirements Mapping
@@ -289,6 +287,28 @@ annex_h:
     - ["Maximum receipts per print batch", "500", "Batch printing", "System Administrator"]
     - ["Failed-run recipients", "(addresses to give)", "E-mail of a failed batch run", "System Administrator"]
     - ["Exchange rate", "Comptrollership table, 2 decimals", "Conversion of USD receipts (FRS.CSH.02.05.15.01)", "Comptrollership"]
+  decision_settings:
+    - ["Posting step of ARs and ORs", "The receipt kinds whose number is issued only when a second user posts the creation record: AR and OR; AR only; OR only; none (number issued at save)", "AR and OR (BDOI's FRS)", "C1", "Cashiering Team Leader; Comptrollership"]
+    - ["What Reinstate does", "Reverse the payment of an issued receipt; restore a cancelled receipt; both", "Both", "C2", "Cashiering Team Leader"]
+    - ["Record number format", "Parts of the creation, cancellation and reinstatement record numbers: prefix (CR, CN, RE), receipt type (AR, OR), year, sequence", "CR-AR-nnnnnn (prefix, type, sequence)", "C3", "Cashiering Team Leader"]
+    - ["AR and OR number format", "Parts of the number of a new series: prefix, year, branch indicator, sequence", "<prefix>-<year>-<branch>-<sequence>", "C4", "Comptrollership (Tax)"]
+    - ["Acknowledgement certificate number", "Number given to each printed receipt: AC, branch, month and year of the print, sequence of 5 digits", "AC_<branch>_<MMYYYY>_<sequence>", "C4", "Comptrollership (Tax)"]
+    - ["Minimal balance threshold", "Amount up to which a premium balance or an excess is cleared when the payment is processed", "10.00 (the BRD)", "C5", "Comptrollership"]
+    - ["Order of the payments of a posting run", "Checks before cash; or in the order selected", "Checks before cash", "C6", "Cashiering Team Leader"]
+    - ["Check date rule and holding period", "On: a check dated within the holding period is refused at receipting; Off: accepted when presented; the holding period in working days", "On; 4 working days (BDOI's FRS)", "C7", "Cashiering Team Leader"]
+    - ["Reading of the Direct Credit file", "Identifies payments already received (BP filename and transaction number); or every row is a new payment with its own AR", "Identifies payments already received (BDOI's FRS)", "C8", "Cashiering Team Leader; BDOI IT"]
+    - ["Cancellation of a remitted AR", "The payment becomes an AR Insurer Refund; or every application is reversed", "AR Insurer Refund (BDOI's FRS)", "C9", "Comptrollership"]
+    - ["Commission Schedule with failed or unmatched lines", "The valid lines are processed; or a file with a failed or unmatched line, or a paid amount different from the outstanding, is not processed", "Valid lines processed (the BRD)", "C10", "Commission Receivables"]
+    - ["When the settlement ORs are issued", "When Disbursement approves the payment request; or at the approval of the remittance", "At the Disbursement approval (BDOI's FRS)", "C12", "Comptrollership"]
+    - ["Unapplied payments seen by Marketing", "The records of the user's marketing unit; or every record", "The marketing unit (BDOI's FRS)", "C13", "Head of Marketing"]
+    - ["Size limit per payment file type", "Highest size of one payment file, per type", "50 MB", "C18", "System Administrator"]
+    - ["Cancellation reasons of a check payment", "The reasons allowed when the payment is a check; blank = every reason", "Discrepancy in check amount; No signature; Incorrect payee; Incorrect check details", "C21", "Cashiering Team Leader"]
+    - ["Company-issued devices only", "On: the system is used only from company networks or devices marked by the device-management gateway (with the networks and the device marker of BDOI IT); Off: any device", "Off for SIT; on with the values of BDOI IT", "C24", "BDOI IT; Information Security"]
+    - ["Remarks of an AR or OR record", "Mandatory; or optional", "Mandatory", "C25", "Cashiering Team Leader"]
+    - ["Base of the PR 2307", "The premium amount; or the basic premium", "The premium amount", "C26", "Comptrollership (Tax)"]
+    - ["Amount in words per currency","The words of the units and hundredths printed on a receipt for each currency, for example PHP Pesos / Centavos, USD US Dollars / Cents", "PHP Pesos / Centavos; USD US Dollars / Cents", "-", "Comptrollership"]
+    - ["Company that receives the MFT files", "The company whose payments the files of the MFT folders are; blank = the first company", "Blank (the first company)", "-", "System Administrator; BDOI IT"]
+    - ["Highest paid amount of one record", "Amount above which an AR or OR creation record is refused", "1,000,000,000.00", "-", "Cashiering Team Leader"]
   lists:
     - ["Receipt Type", "Acknowledgement Receipt; Official Receipt"]
     - ["Acknowledgement Receipt Type", "Premium Payment; Non-Premium Payment (Refund from Insurer, Other Expenses, AR Insurance)"]
@@ -442,7 +462,7 @@ observations:
   - topic: Owner of MKTID.013 and DBMID.001
     bdoi: "Mapping rows MKTID.013 and DBMID.001: \"Com rec\" (the Commission Receivable FRS)."
     brd: "MKTID.013 (Marketing Collection tags and validates the BIR 2307 reversals); DBMID.001 (Disbursement receives the certificates)."
-    proposal: "Specify them in the FRS of Commission Receivables as BDOI maps them, or in the Marketing Collection and Disbursement FRS (BIBS FRS BRD-2 v2.1 FR-OP-113, FR-OP-121); Cashiering keeps the PR 2307 outstanding at payment (FRS.CSH.02.05.13)."
+    proposal: "Specify them in the FRS of Commission Receivables as BDOI maps them, or in the FRS of Marketing Collection and Disbursement; Cashiering keeps the PR 2307 outstanding at payment (FRS.CSH.02.05.13)."
     impact: "Owner of two BRD IDs."
     decide_by: "Product Owner; BDO ITG"
   - topic: Notices by e-mail
@@ -504,6 +524,7 @@ glossary:
   - ["AP Unapplied Commission", "Commission payment reversed by the reinstatement of an OR, kept for Commission Receivable"]
   - ["ARN", "Account Reference Number of a New Business account"]
   - ["ATP", "BIR Authority to Print of a receipt series"]
+  - ["BIBS", "BDO Insure Brokering System, the system specified in this document"]
   - ["BIR", "Bureau of Internal Revenue"]
   - ["BIR 2307", "Certificate of Creditable Tax Withheld at Source given by a client who withholds 2% on the premium"]
   - ["CLPC", "Consumer Lending Processing Center"]

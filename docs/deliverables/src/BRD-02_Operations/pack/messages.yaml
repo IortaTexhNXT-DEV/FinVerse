@@ -46,6 +46,13 @@ places:
   - [ "^(HandoffsPage|HandoffService|OpsHandoff|ExtractRepositoryService)$", "Hand-offs and Extracts (SCR-OP-04)" ]
   - [ "^(ReportArchivePage|reportRuns)$", "Report Archive (SCR-OP-05)" ]
   - [ "^(NotificationSettingsPage)$", "Notification Settings (SCR-OP-06)" ]
+  - [ "^(ReceiptRecordService|ReceiptRecordPoster|ReceiptRecord|ReceiptRecordController|RecordAccounts|ReversalChecks|ReversalRecordService|RecordFormPage|RecordFormSections|RecordDetailPage|recordLogic|PostingListPage)$", "AR / OR records and posting (SCR-OP-65, SCR-OP-66, SCR-OP-67)" ]
+  - [ "^(ChannelFileService|ChannelFileController|ChannelRunReport|MftIntakeService|CommissionScheduleCheck|ChannelProfiles|PaymentFilesPage)$", "Payment Files (SCR-OP-68)" ]
+  - [ "^(ReceiptFormService|ReceiptFormController|ReceiptFormsPage|ReceiptPrintService|PrintBatches)$", "AR and OR Forms and printing (SCR-OP-69, SCR-OP-18)" ]
+  - [ "^(DayEndListPage)$", "Day-End List (SCR-OP-70)" ]
+  - [ "^(SearchLogPage|SearchLogService)$", "Search Log (SCR-OP-71)" ]
+  - [ "^(UnappliedInquiryPage|UnappliedInquiryService)$", "Unapplied Payment List (SCR-OP-72)" ]
+  - [ "^(SettlementOrService|SettlementOrsPage|SettlementOrController)$", "Settlement ORs (SCR-OP-73)" ]
   - [ "^(ReceivePaymentPage|PaymentPreviewPane|CashReceiptService|cashieringLogic|CashFields|PaymentIntakeService|PaymentMatcher|ApplicationService|Application)$", "Receive Payment (SCR-OP-08) and the application of payments" ]
   - [ "^(ReceiptsPage|IssueOrDialog|ReceiptSeries|ReceiptSeriesService|CashieringSettings)$", "Receipts, Issue Official Receipt and the receipt series (SCR-OP-09, SCR-OP-21)" ]
   - [ "^(ReceiptDetailPage|ReceiptParts|ReceiptTabs|ReceiptActionsTab|ReinstateDialog|Receipt|ReceiptActionService|ReceiptReversalService|ReinstatementRules)$", "Receipt: cancellation and reinstatement (SCR-OP-10)" ]
@@ -94,6 +101,31 @@ places:
 # The fix the user makes. Messages that tell the user what to do ("Enter ...", "Select ...") are their own fix and are
 # not repeated here. Keys are message codes; frontend messages without a code use their text.
 fixes:
+  # AR / OR records, posting, payment files, forms and settlement ORs (BDOI's FRS v3.2)
+  RECEIPT_NOT_ISSUED: Choose an issued receipt; a cancelled receipt is reinstated from its own record.
+  RECORD_CHECK_REASON: Choose a reason of the list for check payments.
+  RECORD_KIND_MISMATCH: Open the record from Posting and edit it there.
+  RECORD_NOT_CREATED: No action; only a record still Created can be cancelled. Ask the Approver/Poster to return it first.
+  RECORD_NOT_EDITABLE: Refresh the record; it has moved on. A returned record can be edited again.
+  RECORD_NOT_FOR_POSTING: Refresh the list; the record is not waiting for posting.
+  RECORD_PARTIAL_OR: Choose Full Reinstatement for an OR.
+  RECORD_REMARKS_LENGTH: Shorten the remarks to 100 characters.
+  RECORD_WAITING: Post or cancel the record already waiting for the receipt first.
+  REINSTATEMENT_SCOPE: Ask the System Administrator whether the reinstatement setting should include this case.
+  CHANNEL_FILE_NOT_PROCESSED: Upload the file again, or ask the System Administrator to check the run.
+  CHANNEL_SIMULATOR_OFF: No action; the channel simulator is for SIT and UAT only.
+  MFT_FOLDER_OUTSIDE: Ask the System Administrator to correct the MFT folder of the payment file type.
+  MFT_NO_COMPANY: Ask the System Administrator to set the company that receives the MFT files.
+  FORM_EFFECTIVE_DATE: Enter today or a later date.
+  SETTLEMENT_OR_NOT_FAILED: No action; the OR was issued or is still waiting for the Disbursement approval.
+  SERIES_FORMAT_INVALID: Add {SEQ} to the number format.
+  PRINT_NO_ZIP: Download the PDF of the batch instead.
+  "The number format must hold the sequence {SEQ}": Add {SEQ} to the number format.
+  CHANNEL_FILE_UNREADABLE: Save the file again as an Excel workbook and upload it again.
+  CHANNEL_NAME_PATTERN: Correct the file name convention of the payment file type.
+  FORM_NOT_PENDING: Refresh the list; the version was already decided.
+  MFT_NO_FOLDER: Ask the System Administrator to set the MFT folder of the payment file type.
+  RECEIPT_POSTING_STEP: Create the receipt with Create AR or Create OR and submit it for posting.
   REPLAY_SCOPE: Give an invoice number or an ARN, or leave both blank to replay the whole company.
   DISBURSEMENT_REFERENCES: Split the payment request into requests with fewer references.
   DISBURSEMENT_STATUS: Refresh the queue; the request has already moved on.

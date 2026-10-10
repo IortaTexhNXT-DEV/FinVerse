@@ -56,6 +56,7 @@ HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[4]
 sys.path.insert(0, str(HERE))
 import brd03_v12 as v12  # noqa: E402
+import brd_common_final as final  # noqa: E402
 
 v12.bind(sys.modules[__name__])
 SRC = REPO / "docs" / "deliverables" / "src"
@@ -676,7 +677,7 @@ def edit_process_flows(b: Builder):
     work = Path(tempfile.mkdtemp(prefix="pmflows_"))
     for flow in DOC["process_flows"]:
         png = work / (Path(flow["dot"]).stem + ".png")
-        subprocess.run(["dot", "-Tpng", "-Gdpi=200", str(HERE / flow["dot"]), "-o", str(png)], check=True)
+        subprocess.run(["dot", "-Tpng", "-Gdpi=240", str(HERE / flow["dot"]), "-o", str(png)], check=True)
         head = strip_ids(copy.deepcopy(el))
         for r in head.findall(qn("w:r")):
             head.remove(r)
@@ -816,7 +817,7 @@ class Annexes:
                     n = int(s["id"].split("-")[-1])
                     png = PM / "screenshots" / f"scr-pm-{n:02d}-01-{shots[0]['state']}.png"
                     if png.exists():
-                        self.els.append(self.b.picture(png, max_w=6.6, max_h=4.6))
+                        self.els.append(final.screenshot(self.b, png))
                         self.p(f"Figure G.{k}: {clean(shots[0].get('caption', s['title']))}", italic=True, size=8,
                                jc="center")
                         self.b.stats["screenshots"] += 1
@@ -966,32 +967,39 @@ class Annexes:
         nb_cases = test_cases(NB / "brd01_cases.yaml", "NB")
         self.h1("Annex L – Requirements Traceability")
         self.p("L.1 traces every requirement of the Product Maintenance BRD to the functional requirements of this "
-               "FRS (FRPM), to the reference requirements of the BIBS FRS BRD-3 Product Maintenance (FR-PM) and to the "
-               "test conditions of the BIBS test plan BRD-3 (TC-PM-nnn.n; the cases of each condition are listed in "
-               "the test plan workbook). L.2 lists every reference requirement with the FRPM items that incorporate it.")
-        self.h2("L.1 BRD requirement to FRPM, BIBS reference and test cases")
+               "FRS (FRPM) and to the test conditions of the Test Cases and Traceability workbook issued with this FRS "
+               "(TC-PM-nnn.n and TC-NB-nnn.n; the cases of each condition, with the screen and the walkthrough step "
+               "where it is run, are in the workbook). L.2 lists every FRPM item with its BRD IDs and test conditions.")
+        self.h2("L.1 BRD requirement to FRPM and test conditions")
         by_brd: dict[str, list[str]] = {}
         for fr_id, fr in our.items():
             for x in fr["brd"]:
                 by_brd.setdefault(x.split(" ")[0], []).append(fr_id)
         rows = []
+        item_brd: dict[str, set] = {}
         for rid in self.ids:
-            frpm = ", ".join(re.findall(r"FRPM\.\d{3}(?:\.\d{2})?", self.mapping[rid])) or \
-                "Refer to User Access Maintenance FRS"
+            found = re.findall(r"FRPM\.\d{3}(?:\.\d{2})?", self.mapping[rid])
+            for it in found:
+                item_brd.setdefault(it, set()).add(rid)
+            frpm = ", ".join(found) or "Refer to User Access Maintenance FRS"
             refs = by_brd.get(rid, [])
-            rows.append([rid, frpm, ", ".join(refs), "; ".join(tc_text(r, pm_cases) for r in refs)])
-        self.table(["BRD ID", "FRPM (this FRS)", "BIBS reference (FR-PM)", "Test conditions (BIBS test plan BRD-3)"],
-                   rows, [0.9, 3.4, 2.2, 3.4], size=7.5)
-        self.h2("L.2 BIBS reference requirement to FRPM")
-        rows = []
+            rows.append([rid, frpm, "; ".join(tc_text(r, pm_cases) for r in refs) or "-"])
+        self.table(["BRD ID", "FRPM (this FRS)", "Test conditions"], rows, [0.9, 4.6, 4.4], size=7.5)
+        self.h2("L.2 FRPM item to BRD IDs and test conditions")
+        item_tcs: dict[str, list[str]] = {}
+        listed = set()
         for fr_id, fr in list(our.items()) + [(k, nb[k]) for k in sorted(self.b.fr_to_frpm) if k.startswith("FR-NB")]:
-            frpm = ", ".join(self.b.fr_to_frpm.get(fr_id, [])) or "Refer to User Access Maintenance FRS"
             cases = pm_cases if fr_id.startswith("FR-PM") else nb_cases
-            rows.append([fr_id, clean(fr["title"]), ", ".join(b.split(" ")[0] for b in fr["brd"]), frpm,
-                         tc_text(fr_id, cases)])
-        self.table(["Reference", "Title", "BRD", "FRPM (this FRS)", "Test conditions"], rows,
-                   [0.85, 2.9, 1.5, 2.55, 2.1], size=7.5)
-        self.listed_refs = {r[0] for r in rows}
+            text = tc_text(fr_id, cases)
+            for it in self.b.fr_to_frpm.get(fr_id, []):
+                if text and text != "-":
+                    item_tcs.setdefault(it, []).append(text)
+            listed.add(fr_id)
+        rows = []
+        for it in sorted(set(item_tcs) | set(item_brd)):
+            rows.append([it, ", ".join(sorted(item_brd.get(it, []))) or "-", "; ".join(item_tcs.get(it, [])) or "-"])
+        self.table(["FRPM item (this FRS)", "BRD IDs", "Test conditions"], rows, [1.6, 3.8, 4.5], size=7.5)
+        self.listed_refs = listed
 
     # Annex M – observations
     def observations(self):
@@ -999,12 +1007,13 @@ class Annexes:
         cmp_data = yaml.safe_load(CMP.read_text(encoding="utf-8"))
         roles = OBS["roles"]
         self.h1("Annex M – Observations and Points for BDOI Decision")
-        self.p("Every point where BDOI's FRS and the BIBS reference FRS differ, BDOI's open item, the changes made to "
-               "the Business Requirements Mapping, the slips noticed in BDOI's text and the other observations of "
-               "this version. BDOI's text is kept in the body of the document; this annex gives both readings, the "
+        self.p("Every point where the proposed behaviour differs from the original text of this FRS, BDOI's open "
+               "item, the changes made to the Business Requirements Mapping, the slips noticed in BDOI's text and the "
+               "other observations of this version. BDOI's text is kept in the body of the document; this annex gives "
+               "the original text, the "
                "BRD text, what version 1.1 proposes, the impact and who decides. Every point starts as Open; a point that "
                "BIBS offers both ways, chosen by a system setting, reads Configurable - BDOI to confirm the setting.")
-        header = ["No.", "Ref.", "Topic", "BDOI FRS text", "BRD text", "Proposed in v1.1", "Impact", "Decision by",
+        header = ["No.", "Ref.", "Topic", "Original text of this FRS", "BRD text", "Proposed in v1.1", "Impact", "Decision by",
                   "Status"]
         widths = [0.45, 0.5, 0.95, 1.75, 1.45, 2.15, 1.05, 1.0, 0.5]
         no = 0
@@ -1013,12 +1022,13 @@ class Annexes:
             nonlocal no
             no += 1
             who = "; ".join(roles[r] for r in role_keys)
+            topic, bdoi, brd, prop, impact = (self.refs(x) for x in (topic, bdoi, brd, prop, impact))
             out = [f"M-{no:02d}", ref, topic, bdoi, brd, prop, impact, who, status]
             self.b.obs_rows.append(out + [section or current[0]])
             return out
         current = ["M.1"]
 
-        groups = [("M.1 Conflicts between BDOI's FRS and the BIBS reference FRS", "C"),
+        groups = [("M.1 Points where the proposed behaviour differs from the original text of this FRS", "C"),
                   ("M.3 Slips noticed in BDOI's FRS (proposed corrections; the text is not changed)", "D")]
         conf = {c["id"]: c for c in cmp_data["conflicts"]}
         self.listed_conflicts = set()
@@ -1142,7 +1152,7 @@ def change_summary(b: Builder):
         f"T Non-functional Requirements ({s['nfr']}); U Data Set-up and Migration at Go-live ({s['data_setup']}); "
         f"V Assumptions, Dependencies and Open Questions ({s['open_kept']} items); W Change Control after "
         f"Sign-off; X Business Unit Review Checklist ({s['checklist']} points).",
-        f"Open items: {len(oi['answered'])} assumptions, open questions and proposed rules of the BIBS reference FRS "
+        f"Open items: {len(oi['answered'])} assumptions, open questions and proposed rules of the earlier reviews "
         f"are answered by BDOI's FRS (or were closed earlier) and are no longer asked; {len(oi['partly'])} are "
         "answered in part and only the remaining part is asked (Annex V).",
     ]
@@ -1157,8 +1167,8 @@ def change_summary(b: Builder):
     n = b.new_num()
     for pt in points:
         els.append(b.para(pt, style="ListParagraph", num=(n, 0), size=9.5, hl=False))
-    els.append(b.para("Where BDOI's FRS and the BIBS reference FRS differ, BDOI's text is kept and the point is listed "
-                      "in Annex M with both readings and a recommendation.", size=9.5, hl=False))
+    els.append(b.para("Where another behaviour is proposed, BDOI's text is kept and the point is listed in Annex M with "
+                      "the original text, the proposed behaviour and a recommendation.", size=9.5, hl=False))
     els.append(b.para("Shading used in this copy: ", size=9.5, hl=False))
     els[-1].append(b.run("text added in version 1.2", size=9.5, hl=True))
     # the summary is a section of its own, with the page set-up of the cover, so the cover keeps its first page
@@ -1393,7 +1403,12 @@ def main(argv=None) -> int:
         results[name] = (b, n_ids)
         print(f"wrote {path.relative_to(REPO)} ({path.stat().st_size // 1024} KB)")
     b, n_ids = results[DOC["meta"]["clean"]]
+    for name in (DOC["meta"]["clean"], DOC["meta"]["highlighted"]):
+        print(f"final clean-up of {name}: {final.finalise_docx(OUT / name)}")
+    final.check_no_references([OUT / DOC["meta"]["clean"], OUT / DOC["meta"]["highlighted"]])
     if not args.no_pdf:
+        for name in (DOC["meta"]["clean"], DOC["meta"]["highlighted"]):
+            print(f"table of contents of {name}: {final.populate_toc(OUT / name)} entries")
         pdf = OUT / DOC["meta"]["clean"].replace(".docx", ".pdf")
         to_pdf(OUT / DOC["meta"]["clean"], pdf)
         print(f"wrote {pdf.relative_to(REPO)} ({pdf.stat().st_size // 1024} KB)")

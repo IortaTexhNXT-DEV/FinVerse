@@ -22,7 +22,7 @@ revision:
   date: 09 Oct 2026 - 10 Oct 2026
   version: "1.2"
   description: "Business Unit review edition: summary for the Business Unit, end-to-end flows, workflow and approvals, e-mail texts, document formats, reports and schedules, integrations, non-functional requirements, open questions not answered in the BDOI FRS, change control, review checklist; aligned on 10 Oct 2026 with BIBS: new and changed screens with current screenshots (workspace, dashboard, deactivation, routing and deployment, product master transfer, comparative table with Final Terms, proposal slips and client response, Consolidated Placement Update Report, audit logs), settings for the points BDOI decides (Annex J.7)"
-  by: "iorta TechNXT Project Team (drafting)"
+  by: "iorta TechNXT Project Team (drafting support)"
 
 intro_note: "Version 1.2 adds, for the review of the Business Unit, a summary of the module in pictures and tables (section 1.4), the end-to-end process flows and status life-cycles of every process of the BRD, and Annexes O to X: workflow and approvals, e-mail and notification texts, document prints, reports and schedules, integrations, non-functional requirements, data set-up at go-live, the open questions that BDOI's FRS does not answer, change control after sign-off and the review checklist. BDOI's text and the content of version 1.1 are unchanged."
 
@@ -842,7 +842,7 @@ observations:
     topic: "Open questions answered by BDOI's FRS"
     bdoi: "BDOI's FRS states the Marketing approval chain (TL, TH, UH), the ManCom routing, the Placement Update Report columns, the client-view fields, the status names, the sign-in reference and the non-package scope."
     brd: "-"
-    proposes: "The open questions of the BIBS FRS that BDOI's FRS answers are no longer asked (Annex V); they are listed with BDOI's clause in the traceability workbook (sheet 'Answered in the BDOI FRS'). Where BDOI's answer differs from the earlier BIBS proposal, the point is in M.1 (C05, C17, C03, C16)."
+    proposes: "The open questions of the earlier reviews that BDOI's FRS answers are no longer asked (Annex V); they are listed with BDOI's clause in the traceability workbook (sheet 'Answered in the BDOI FRS'). Where BDOI's answer differs from the earlier proposal, the point is in M.1 (C05, C17, C03, C16)."
     impact: "Fewer open questions for the Business Unit."
     role: [PO, SA]
   - ref: "Annex P"

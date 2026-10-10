@@ -378,11 +378,11 @@ class NewAnnexes:
         a.h1("Annex Z – Assumptions, Dependencies and Open Questions")
         a.p(o["intro"])
         a.h2("Z.1 Assumptions")
-        a.table(["No.", "Our reference", "Assumption", "Related"], [[f"Z.1.{i}", r[0], r[1], r[2]] for i, r in
+        a.table(["No.", "Reference", "Assumption", "Related"], [[f"Z.1.{i}", r[0], r[1], r[2]] for i, r in
                                                                     enumerate(o["assumptions"], 1)],
                 [0.5, 0.9, 4.4, 1.6], size=8)
         a.h2("Z.2 Dependencies")
-        a.table(["No.", "Our reference", "Dependency", "Needed for"], [[f"Z.2.{i}", r[0], r[1], r[2]] for i, r in
+        a.table(["No.", "Reference", "Dependency", "Needed for"], [[f"Z.2.{i}", r[0], r[1], r[2]] for i, r in
                                                                       enumerate(o["dependencies"], 1)],
                 [0.5, 0.9, 4.4, 1.6], size=8)
         a.h2("Z.3 Open questions not answered in BDOI's FRS")

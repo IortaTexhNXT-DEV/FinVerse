@@ -18,10 +18,10 @@ revision_log:
   date: 09 Oct 2026
   version: "1.1"
   description: "Draft for BDOI review: full coverage of the Product Maintenance BRD (version of 8-Oct-2026), functional requirements elaborated with acceptance criteria, annexes G onward added, observations and points for decision listed in Annex M"
-  by: "iorta TechNXT Project Team (drafting); for review by Angela V. Ramirez"
+  by: "iorta TechNXT Project Team (drafting support); for review by Angela V. Ramirez"
 
 introduction:
-  preparation: "This version 1.1 was drafted with the iorta TechNXT Project Team, from the inputs of the business unit and BDO ITG, for review by the System Analyst."
+  preparation: "This version 1.1 was elaborated with the iorta TechNXT Project Team (drafting support), from the inputs of the business unit and BDO ITG, for review by the System Analyst."
   overview: "Version 1.1 also covers the points of the Product Maintenance BRD (version of 8-Oct-2026) that version 1.0 did not detail: the product hierarchy and clause library, insurer-specific package terms, package versions with the latest approved rate scheme for new business and the approval of rate exceptions, the review of negotiated terms and the product requirements submitted to ManCom, the post-setup validation checkpoint, package advisories, renewal requests, the password protection of documents shared outside the system, the enforcement of approvals and service levels, and the recording of product master changes for other BDOI systems. The requirements added in this version are listed under each functional requirement with their acceptance criteria; the points that need a BDOI decision are listed in Annex M."
 
 # Changes of the Business Requirements Mapping: FRPM items added to BDOI's mapping (BDOI's own IDs are kept), and the
@@ -200,13 +200,13 @@ annex_j:
 glossary:
   - [Advisory, "Notice to the business units that a package is available, renewed, updated or deactivated, with its supporting documents"]
   - [AO, Account Officer (Marketing)]
+  - [BIBS, "BDO Insure Brokering System, the system specified in this document"]
   - [BRD, Business Requirements Document]
   - [BRPM, Requirement ID prefix of the Product Maintenance BRD (BRPM.001 to BRPM.024; there is no BRPM.023)]
   - [Client view, "Comparative output for a client presentation, derived from the master Comparative Table with selected fields and insurers"]
   - [Comparative Table, "Side-by-side comparison of the insurer responses of a request"]
   - [CPC2, "An incentive type named in PMADD08 as an example; its definition is to be supplied by BDOI"]
   - [FRPM, Functional requirement ID prefix of this FRS]
-  - [FR-PM, "Functional requirement ID prefix of the BIBS FRS BRD-3 Product Maintenance, used as the reference in Annex L"]
   - [Generic programme, "Package offered to a market segment, not to one client"]
   - [Client-specific package, "Package negotiated for one client"]
   - [Line of Insurance, "Level 1 of the product hierarchy (for example Motor, Property, Engineering)"]
@@ -245,4 +245,4 @@ change_summary:
     - "Process Flow: BDOI's two figures kept; {flows} figures added."
     - "Annexes A to F kept; rows added to Annex A, B, C and E ({annex_rows} rows)."
     - "New annexes: G Screen specifications ({screens} screens), H Messages and validations ({messages} messages), I Notifications ({notifications}), J Business rules and configurable parameters, K Process walkthroughs ({walk_steps} steps), L Requirements traceability, M Observations and points for BDOI decision ({observations} items, all Open), N Glossary ({glossary} terms)."
-  legend: "Where BDOI's FRS and the BIBS reference FRS differ, BDOI's text is kept and the point is listed in Annex M with both readings, the BRD text and a recommendation. Slips noticed in BDOI's text are proposed for correction in Annex M only; they are not changed in the text."
+  legend: "Where another behaviour is proposed, BDOI's text is kept and the point is listed in Annex M with the original text, the proposed behaviour, the BRD text and a recommendation. Slips noticed in BDOI's text are proposed for correction in Annex M only; they are not changed in the text."

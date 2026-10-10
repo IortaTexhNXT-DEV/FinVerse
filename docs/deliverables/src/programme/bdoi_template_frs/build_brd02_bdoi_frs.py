@@ -50,6 +50,7 @@ import yaml
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import brd11_figures  # noqa: E402
+import brd_common_final as final  # noqa: E402
 import build_brd11_bdoi_frs as u11  # noqa: E402
 from docx.oxml import OxmlElement  # noqa: E402
 from docx.oxml.ns import qn  # noqa: E402
@@ -241,6 +242,7 @@ class Builder(u11.Builder):
         self.stats: Counter = Counter()
         self.log: list[dict] = []
         self.fr_to_frum = fr_to_items()
+        self.cases = test_cases()
         self.added_text: list[str] = []
         self.q_rows: list[dict] = []
 
@@ -505,7 +507,8 @@ def edit_functional_requirements(b: Builder):
         refs = sorted(set(row_refs.get(rid, [])))
         paras = tc.findall(qn("w:p"))
         empty = len(paras) == 1 and not u11.el_text(paras[0]).strip()
-        texts = [f"Feature: {feature}", "BIBS reference: " + (", ".join(refs) if refs else "-")]
+        tcs = "; ".join(x for x in (tc_text(r, b.cases) for r in refs) if x != "-")
+        texts = [f"Feature: {feature}", "Test conditions: " + (tcs or "-")]
         new = [b.para(x, size=10) for x in texts]
         if not paras:
             for el in new:
@@ -583,7 +586,7 @@ def check_words(b: Builder):
     hits = set()
     for t in b.added_text:
         for m in list(u11.RESTRICTED.finditer(t)) + list(u11.RESTRICTED_CS.finditer(t)):
-            hits.add(m.group(0))
+                hits.add(m.group(0))
         for m in CODE_RE.finditer(t):
             if m.group(0) not in BDOI_CODES:
                 hits.add(m.group(0))
@@ -675,7 +678,12 @@ def main(argv=None) -> int:
     finally:
         shutil.rmtree(work, ignore_errors=True)
     b, n_ids = results[DOC["meta"]["clean"]]
+    for name in (DOC["meta"]["clean"], DOC["meta"]["highlighted"]):
+        print(f"final clean-up of {name}: {final.finalise_docx(OUT / name)}")
+    final.check_no_references([OUT / DOC["meta"]["clean"], OUT / DOC["meta"]["highlighted"]])
     if not args.no_pdf:
+        for name in (DOC["meta"]["clean"], DOC["meta"]["highlighted"]):
+            print(f"table of contents of {name}: {final.populate_toc(OUT / name)} entries")
         pdf = OUT / DOC["meta"]["clean"].replace(".docx", ".pdf")
         u11.to_pdf(OUT / DOC["meta"]["clean"], pdf)
         print(f"wrote {pdf.relative_to(REPO)} ({pdf.stat().st_size // 1024} KB)")

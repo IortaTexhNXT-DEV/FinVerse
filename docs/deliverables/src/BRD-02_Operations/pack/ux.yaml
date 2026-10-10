@@ -51,7 +51,6 @@ personas:
 
 # The UX state of an image when its name does not say it.
 classify:
-  scr-op-09-03-issue_or: filled
   scr-op-10-02-cancel: confirmation
   scr-op-12-01-record: filled
   scr-op-13-02-accept: confirmation

@@ -239,7 +239,7 @@ frs:
         type: Positive
         persona: TSU
         title: Single sign-on of a TSU Officer (BRD-11)
-        pre: Single sign-on through EIAM switched on in the test environment (BRD-11 FR-UA-003); the EIAM test account of tsu.
+        pre: Single sign-on through EIAM switched on in the test environment (User Access Maintenance FRS); the EIAM test account of tsu.
         steps:
           - Open BIBS and click Sign in with the BDO identity provider; sign in at EIAM with the test account of tsu.
           - Open the side menu.

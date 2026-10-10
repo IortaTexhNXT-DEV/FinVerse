@@ -44,7 +44,7 @@ import subprocess
 import sys
 import tempfile
 import time
-from collections import Counter, OrderedDict
+from collections import Counter, OrderedDict, defaultdict
 from pathlib import Path
 
 import docx
@@ -52,6 +52,7 @@ import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import brd11_figures  # noqa: E402
+import brd_common_final as final  # noqa: E402
 import brd11_v13 as v13  # noqa: E402
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
@@ -889,7 +890,7 @@ class Annexes:
                     png = UA / "screenshots" / f"scr-ua-{n:02d}-{pick + 1:02d}-{shots[pick]['state']}.png"
                     if not png.exists():
                         raise SystemExit(f"screenshot missing: {png}")
-                    self.els.append(self.b.picture(png, max_w=6.4, max_h=4.8 if s["id"] != "SCR-UA-07" else 7.5))
+                    self.els.append(final.screenshot(self.b, png))
                     self.p(f"Figure J.{k}: {clean(shots[pick].get('caption', s['title']))}", italic=True, size=8,
                            jc="center")
                     self.b.stats["screenshots"] += 1
@@ -1098,70 +1099,76 @@ class Annexes:
         cases = test_cases()
         self.h1("Annex P – Requirements Traceability")
         self.p("P.1 traces every requirement line of the User Access Maintenance BRD, and the non-functional rows that "
-               "carry a function, to the functional requirements of this FRS (FRUM), to the reference requirements of "
-               "the BIBS FRS BRD-11 User Access Maintenance (FR-UA) and to the test conditions of the BIBS test plan "
-               "BRD-11 (TC-UA-nnn.n; the cases of each condition are in the test plan). The BRD gives no IDs to its "
-               "non-functional rows; they carry the IDs UAM-NFR-nn of the BIBS FRS. P.2 lists every reference "
-               "requirement with the FRUM items that incorporate it.")
-        self.h2("P.1 BRD requirement to FRUM, BIBS reference and test cases")
+               "carry a function, to the functional requirements of this FRS (FRUM) and to the test conditions of the "
+               "Test Cases and Traceability workbook issued with this FRS (TC-UA-nnn.n; the cases of each condition, "
+               "with the screen and the walkthrough step where it is run, are in the workbook). The BRD gives no IDs "
+               "to its non-functional rows; this FRS gives them the IDs UAM-NFR-nn of Annex X. P.2 lists every FRUM "
+               "item with its BRD lines and test conditions.")
+        self.h2("P.1 BRD requirement to FRUM and test conditions")
         rows = []
+        item_refs = defaultdict(set)
+        item_brd = defaultdict(set)
         for rid, _ in self.lines:
-            frum = ", ".join(FRUM_RE.findall(self.mapping[rid]))
+            found = FRUM_RE.findall(self.mapping[rid])
             refs = self.trace[rid]["frs"]
-            rows.append([rid, frum, ", ".join(refs), "; ".join(tc_text(r, cases) for r in refs)])
+            for it in found:
+                item_brd[it].add(rid)
+            rows.append([rid, ", ".join(found), "; ".join(tc_text(r, cases) for r in refs)])
         for n in nfr:
             if not n["frs"]:
                 continue
-            rows.append([f"{n['id']} ({clean(n['topic'])})", self.frum_of(n["frs"]), ", ".join(n["frs"]),
+            rows.append([f"{n['id']} ({clean(n['topic'])})", self.frum_of(n["frs"]),
                          "; ".join(tc_text(r, cases) for r in n["frs"])])
-        self.table(["BRD ID", "FRUM (this FRS)", "BIBS reference (FR-UA)", "Test conditions (BIBS test plan BRD-11)"],
-                   rows, [1.7, 3.2, 1.6, 3.4], size=7.5)
+        self.table(["BRD ID", "FRUM (this FRS)", "Test conditions"], rows, [1.9, 3.9, 4.1], size=7.5)
         self.b.stats["trace_rows"] = len(rows)
-        self.h2("P.2 BIBS reference requirement to FRUM")
-        rows = []
+        self.h2("P.2 FRUM item to BRD lines and test conditions")
         self.listed_refs = set()
-        for fr_id, fr in self.our.items():
+        for fr_id in self.our:
             frum = self.frum_of([fr_id])
             if not frum:
                 raise SystemExit(f"{fr_id} is not incorporated in any FRUM item")
-            brd = ", ".join(x.split(" (")[0] for x in fr["brd"] if isinstance(x, str))
-            rows.append([fr_id, clean(fr["title"]), clean(brd), frum, tc_text(fr_id, cases)])
+            for it in FRUM_RE.findall(frum):
+                item_refs[it].add(fr_id)
             self.listed_refs.add(fr_id)
-        self.table(["Reference", "Title", "BRD", "FRUM (this FRS)", "Test conditions"], rows,
-                   [0.85, 2.6, 2.4, 2.2, 1.85], size=7.5)
+        rows = []
+        for it in sorted(set(item_refs) | set(item_brd), key=lambda x: [int(n) if n.isdigit() else n for n in re.split(r"(\d+)", x)]):
+            tcs = "; ".join(x for x in (tc_text(r, cases) for r in sorted(item_refs.get(it, []))) if x and x != "-")
+            rows.append([it, ", ".join(sorted(item_brd.get(it, []))) or "-", tcs or "-"])
+        self.table(["FRUM item (this FRS)", "BRD lines", "Test conditions"], rows, [1.6, 3.8, 4.5], size=7.5)
 
     # Annex Q - observations
     def observations(self):
         cmp_data = yaml.safe_load(CMP.read_text(encoding="utf-8"))
         self.h1("Annex Q – Observations and Points for BDOI Decision")
-        self.p("Every point where BDOI's FRS and the BIBS reference FRS differ, the slips noticed in BDOI's text, the "
-               "changes made to the Business Requirements Mapping, the rows added to BDOI's annexes and the other "
-               "observations of this version. BDOI's text is kept in the body of the document; this annex gives both "
-               "readings, the BRD text, what version 1.2 proposes, the impact and who decides. Every point starts as "
+        self.p("Every point where the proposed behaviour differs from the original text of this FRS, the slips noticed "
+               "in BDOI's text, the changes made to the Business Requirements Mapping, the rows added to BDOI's annexes "
+               "and the other observations of this version. BDOI's text is kept in the body of the document; this annex "
+               "gives the original text, the BRD text, what version 1.2 proposes, the impact and who decides. Every point starts as "
                "Open; a point that BIBS offers both ways, chosen by a system setting, reads Configurable - BDOI to "
                "confirm the setting.")
-        header = ["No.", "Topic", "BDOI FRS text", "BRD text", "Proposed in v1.2", "Impact", "Decision by", "Status"]
+        header = ["No.", "Topic", "Original text of this FRS", "BRD text", "Proposed in v1.2", "Impact", "Decision by", "Status"]
         widths = [0.75, 1.0, 1.9, 1.5, 2.2, 0.95, 1.0, 0.6]
         no = 0
 
         def row(ref, topic, bdoi, brd, prop, impact, who, status="Open"):
             nonlocal no
             no += 1
-            out = [f"Q-{no:02d}" + (f" ({ref})" if ref else ""), topic, bdoi, brd, prop, impact, who, status]
+            shown = ref if ref and not ref.startswith("CLR-") else ""
+            out = [f"Q-{no:02d}" + (f" ({shown})" if shown else ""), topic, bdoi, brd, prop, impact, who, status]
             self.b.q_rows.append(dict(zip(["no", "topic", "bdoi", "brd", "proposal", "impact", "decide_by", "status"],
                                           out), section=section))
             return out
         section = "Q.1"
         self.listed_conflicts = set()
-        self.h2("Q.1 Conflicts between BDOI's FRS and the BIBS reference FRS")
+        self.h2("Q.1 Points where the proposed behaviour differs from the original text of this FRS")
         rows = []
         for c in cmp_data["conflicts"]:
             if c["kind"] != "Between the documents":
                 continue
-            prop = f"{clean(c['recommendation'])} (BIBS reference FRS: {clean(c['ours'])})"
+            prop = f"{self.refs(c['recommendation'])} Proposed behaviour: {self.refs(c['ours'])}"
             if c.get("setting"):
-                prop += f" Available in BIBS: {clean(c['setting'])}"
-            rows.append(row(c["id"], clean(c["topic"]), clean(c["bdoi"]), clean(c["brd"]), prop, clean(c["impact"]),
+                prop += f" Available in BIBS: {self.refs(c['setting'])}"
+            rows.append(row(c["id"], self.refs(c["topic"]), self.refs(c["bdoi"]), self.refs(c["brd"]), prop, self.refs(c["impact"]),
                             c["decide_by"], status=c.get("status", "Open")))
             self.listed_conflicts.add(c["id"])
         self.table(header, rows, widths, size=7)
@@ -1171,8 +1178,8 @@ class Annexes:
         for c in cmp_data["conflicts"]:
             if c["kind"] == "Between the documents":
                 continue
-            rows.append(row(c["id"], clean(c["topic"]), clean(c["bdoi"]), clean(c["brd"]), clean(c["recommendation"]),
-                            clean(c["impact"]), c["decide_by"]))
+            rows.append(row(c["id"], self.refs(c["topic"]), self.refs(c["bdoi"]), self.refs(c["brd"]), self.refs(c["recommendation"]),
+                            self.refs(c["impact"]), c["decide_by"]))
             self.listed_conflicts.add(c["id"])
         self.table(header, rows, widths, size=7)
         section = "Q.3"
@@ -1250,7 +1257,7 @@ def add_annexes(b: Builder, mapping, lines, trace, our, nfr, figs, nums, where):
     a = Annexes(b, mapping, lines, trace, our)
     a.screens()
     b.round13 = True
-    new = v13.NewAnnexes(a, figs, nums, v13.nfr_rows(nfr, a.frum_of, clean), b.q_rows)
+    new = v13.NewAnnexes(a, figs, nums, v13.nfr_rows(nfr, a.frum_of, a.refs), b.q_rows)
     new.menus()
     b.round13 = False
     a.messages()
@@ -1351,7 +1358,7 @@ def key_numbers(b: Builder, nfr) -> list[list[str]]:
         ["Reports / scheduled runs", f"{s['reports']} / {s['schedules']}", "Annex V"],
         ["Integrations", str(s["integrations"]), "Annex W"],
         ["Figures added in version 1.3", str(len(v13.FLOWS)), "1.8; Annexes A, J, S"],
-        ["Test cases (BIBS test plan and one per acceptance criterion)", str(bibs_case_count() + s["ac"]),
+        ["Test cases (Test Cases and Traceability workbook, with one per acceptance criterion)", str(bibs_case_count() + s["ac"]),
          "Test Cases and Traceability workbook"],
         ["Open questions not answered in BDOI's FRS / answered and not repeated", f"{s['open_kept']} / {s['answered']}",
          "Annex Z"],
@@ -1581,7 +1588,12 @@ def main(argv=None) -> int:
     finally:
         shutil.rmtree(work, ignore_errors=True)
     b, n_ids = results[DOC["meta"]["clean"]]
+    for name in (DOC["meta"]["clean"], DOC["meta"]["highlighted"]):
+        print(f"final clean-up of {name}: {final.finalise_docx(OUT / name)}")
+    final.check_no_references([OUT / DOC["meta"]["clean"], OUT / DOC["meta"]["highlighted"]])
     if not args.no_pdf:
+        for name in (DOC["meta"]["clean"], DOC["meta"]["highlighted"]):
+            print(f"table of contents of {name}: {final.populate_toc(OUT / name)} entries")
         pdf = OUT / DOC["meta"]["clean"].replace(".docx", ".pdf")
         to_pdf(OUT / DOC["meta"]["clean"], pdf)
         print(f"wrote {pdf.relative_to(REPO)} ({pdf.stat().st_size // 1024} KB)")

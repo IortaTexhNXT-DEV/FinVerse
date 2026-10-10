@@ -22,7 +22,7 @@ revision_log:
 
 introduction:
   preparation: >-
-    This version 1.2 was drafted with the iorta TechNXT Project Team, from the inputs of the business unit and BDO
+    This version 1.2 was elaborated with the iorta TechNXT Project Team (drafting support), from the inputs of the business unit and BDO
     ITG, for review by the System Analyst. BDOI's text of version 1.1 is kept as issued; the additions elaborate it,
     and every point where the additions differ from it, or where BDOI's text needs a correction, is listed for BDOI's
     decision in Annex Q.
@@ -170,7 +170,7 @@ annex_m:
     - [Inactivity sign-out, 30 minutes without activity, "The session ends with the reason inactivity; the page Session Timed Out: Your session timed out. Please log in again to continue, with Log In"]
     - [Session-end warning, 30 minutes before the fixed end of a session, BRD x.001.1.3]
     - [Several tabs, One session for all the tabs of a user, Activity in any tab counts]
-    - [One session per device, Not enforced; every session is in the session log, Open point UQ09 of the BIBS FRS]
+    - [One session per device, Not enforced; every session is in the session log, Open point UQ09 of Annex Z]
   controls:
     - "Four eyes: the requester and the user a request is about never decide it."
     - "The second approver differs from the first approver, the requester and the user concerned."
@@ -297,7 +297,6 @@ glossary:
   - [Four eyes, The rule that an access change is decided by a user other than the one who requested it]
   - [FR, Functional requirement]
   - [FRUM, Functional requirement of User Access Maintenance in this document]
-  - [FR-UA, Functional requirement of the BIBS FRS BRD-11 User Access Maintenance (reference of Annex P)]
   - [Group profile, A set of permissions assigned to a group of users (BRD 1.3); a role]
   - [Information Security Officer, "The BDOI Information Security user who authorises separation-of-duties rules and changes of security settings"]
   - [OpenID Connect, A single sign-on standard; the proposed way for the system to sign users in through EIAM]
@@ -341,7 +340,7 @@ observations:
   - topic: Non-functional rows of the BRD
     bdoi: "-"
     brd: "Section 6 has no IDs; most rows read \"Follow existing QPS set up\"."
-    proposal: "Annex P lists the rows that carry a function with the analyst's IDs UAM-NFR-nn of the BIBS FRS; the infrastructure rows are answered in the Technical Specification reviewed by BDOI IT."
+    proposal: "Annex P lists the rows that carry a function with the IDs UAM-NFR-nn of Annex X; the infrastructure rows are answered in the Technical Specification reviewed by BDOI IT."
     impact: Annex P.
     decide_by: BDOI IT
   - topic: User Access Matrix (Annex C)
@@ -359,7 +358,7 @@ observations:
   - topic: Acceptance criteria of version 1.2
     bdoi: No acceptance criteria.
     brd: "Usage instruction 4: all requirements testable."
-    proposal: The numbered acceptance criteria added under each item are the basis of the BIBS test plan BRD-11 (Annex P); BDOI accepts or amends them with the review.
+    proposal: The numbered acceptance criteria added under each item are the basis of the test cases of the Test Cases and Traceability workbook (Annex P); BDOI accepts or amends them with the review.
     impact: All FRUM items.
     decide_by: Process Owner (Business Administration); Information Security
 

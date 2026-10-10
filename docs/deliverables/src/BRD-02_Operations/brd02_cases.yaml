@@ -46,6 +46,15 @@ screens:
   ARCHIVE: Operations > Report Archive
   NOTIFSET: Operations > Notification Settings
   CASHWB: Cashiering > Cashiering Workbench
+  RECFORM: Cashiering > Create AR/OR
+  RECORD: Cashiering > Posting > Cashiering Record
+  POSTING: Cashiering > Posting
+  PAYFILES: Cashiering > Payment Files
+  RCPFORMS: Cashiering > AR and OR Forms
+  DAYEND: Cashiering > Day-End List
+  SEARCHLOG: Cashiering > Search Log
+  UNAPPLIST: Cashiering > Unapplied Payment List
+  SETTLEOR: Cashiering > Settlement ORs
   RECEIVE: Cashiering > Receive Payment
   RECEIPTS: Cashiering > Receipts
   RECEIPT: Cashiering > Receipts > Receipt page
@@ -262,7 +271,16 @@ frs:
       - The home shows a card only for the teams whose permissions the user holds, with its tiles.
       - A tile opens the filtered list.
       - A role without an Operations section sees an empty-state message.
+      - The Cashiering Dashboard shows the count and amount of each item of the user's role, and an item opens its filtered list.
     cases:
+      - c: 4
+        type: Positive
+        persona: CASHIER_TL
+        screen: CASHWB
+        title: Cashiering Dashboard of the Approver/Poster
+        steps:
+          - As cashtl open Cashiering; click the row AR - Premium of AR/OR for Posting.
+        expected: The groups for posting, the unapplied payments and the payment files show their counts and amounts in PHP; the row opens Posting filtered on the AR premium records.
       - c: 1
         type: Positive
         title: Cashier's home
@@ -575,7 +593,38 @@ frs:
       - An OTC payment on a booked invoice issues an AR with the next number and applies it; the invoice becomes PAID when covered.
       - A foreign-currency payment shows and posts at the BOOK rate; the AR prints with its details.
       - A zero amount or a missing mandatory field is refused.
+      - With the posting step (as delivered) the AR is a creation record submitted for posting; a second user posts it and the AR number is issued then; the creator cannot post it.
     cases:
+      - c: 4
+        type: Workflow
+        screen: RECFORM
+        title: AR creation record posted by a second user
+        steps:
+          - As cashier open Create AR, enter a premium payment of a client with one account and its paid amount, Save, then Submit for Posting.
+          - As cashtl open Posting, open the record and Post.
+        expected: The record CR-AR-nnnnnn is For Posting, then AR/OR Issued with the AR number of the branch series; the payment is applied and any excess is listed as unapplied.
+      - c: 4
+        type: Security-access
+        screen: RECORD
+        title: The creator cannot post the own record
+        steps:
+          - As cashier open the record submitted for posting.
+        expected: Post and Return are not offered to the creator; a direct posting request is refused.
+      - c: 4
+        type: Negative
+        screen: RECFORM
+        title: Accounts that do not add up to the paid amount
+        steps:
+          - Enter a Paid Amount of 1,000.00 and one account with 900.00; Save.
+        expected: "The message \"The amounts of the accounts must add up to the Paid Amount\" is shown and nothing is saved."
+      - c: 4
+        type: Positive
+        persona: CASHIER_TL
+        screen: POSTING
+        title: Return to the creator and cancellation of a record
+        steps:
+          - Return a record For Posting with a reason; as cashier open it and Cancel Record.
+        expected: The record is Returned with the reason, then Record Cancelled; no receipt number is used.
       - c: 1
         type: Workflow
         title: OTC payment of an invoice
@@ -732,7 +781,23 @@ frs:
       - A payment file issues one AR per row and applies the rows with a booked invoice.
       - The same file cannot be uploaded twice.
       - A changed file layout is used by the next upload without a release; invalid layouts are refused.
+      - Files received via MFT and uploaded files are checked (name, size, duplicate, header and TOTAL), processed, listed with their run report per category, and a refused file is alerted.
     cases:
+      - c: 4
+        type: Upload-download
+        screen: PAYFILES
+        title: Bills Payment file received via MFT
+        pre: The test lead drops a Bills Payment file of the channel simulator in the MFT folder.
+        steps:
+          - On Payment Files click Receive MFT Files Now; open Run Report of the file.
+        expected: The file is listed with the source MFT, its rows and status; the run report shows the applied payments, the payment matched on a pre-booked account and the unknown reference as Unbooked/Unmatched.
+      - c: 4
+        type: Negative
+        screen: PAYFILES
+        title: File with a wrong name refused
+        steps:
+          - Upload a Bills Payment file named payments.txt.
+        expected: The file is listed as Refused with the reason of the file name convention; nothing is processed.
       - c: 1
         type: Upload-download
         title: Bills Payment file of 20 rows
@@ -907,7 +972,15 @@ frs:
     conditions:
       - Payment lines of one insurer and certificate are issued as one OR; an approved remittance batch carries one commission OR.
       - A group with different payees stays staged with the reason; incomplete feed records are refused.
+      - The commission and incentive ORs of an insurer settlement are issued when Disbursement approves the payment request (as delivered).
     cases:
+      - c: 3
+        type: Workflow
+        screen: SETTLEOR
+        title: Settlement OR issued at the Disbursement approval
+        steps:
+          - Open Settlement ORs; as the Disbursement approver approve the payment request of the settlement; open Settlement ORs again.
+        expected: The OR waits for the Disbursement approval, then is Issued with its OR number from the Head Office series.
       - c: 1
         type: Workflow
         title: Three lines, one OR
@@ -947,7 +1020,15 @@ frs:
       - Applying an excess to another invoice of the client needs no approval and follows the hierarchy.
       - A refund needs TL approval, creates a Disbursement request and is Done when paid; the requester cannot approve.
       - Amounts, targets and whole-balance rules are checked; each item is in the tab of its stage.
+      - The Unapplied Payment List shows the outstanding unapplied payments by type, date, insurer, client and account.
     cases:
+      - c: 4
+        type: Positive
+        screen: UNAPPLIST
+        title: Unapplied Payment List by type
+        steps:
+          - Open the Unapplied Payment List; choose the type Unbooked/Unmatched Payment and search.
+        expected: Only the unbooked or unmatched payments with an outstanding amount are listed, with their number, date, client, amount and outstanding.
       - c: 1
         type: Workflow
         title: Apply the excess to another invoice
@@ -1046,7 +1127,16 @@ frs:
       - A search by partial assured name and date range returns the matching ARs.
       - The History tab of a cancelled AR shows creation, request and approval with users and times; audit rows cannot change.
       - Each audit record holds the user, event type, module, from and to values, origin, date and time and the success or failure indicator.
+      - Every receipt search is in the Search Log with the user, the criteria and the number of results.
     cases:
+      - c: 4
+        type: Positive
+        persona: CASHIER_TL
+        screen: SEARCHLOG
+        title: Receipt search logged
+        steps:
+          - As cashier search the receipts of an assured; as cashtl open the Search Log.
+        expected: The search is listed with the date and time, the cashier's name, the criteria and the number of receipts found.
       - c: 1
         type: Positive
         title: Partial name and date range
@@ -1093,7 +1183,22 @@ frs:
     conditions:
       - A batch of ARs of one branch is produced as one PDF; failures are listed and printed on retry.
       - A selection of 0 or more than 500 receipts is refused; retry without failures is refused.
+      - The receipt prints in the AR or OR form in use, with the copy chosen, the certificate number and REPRINT on a re-print; a new form version applies once approved by a second user.
     cases:
+      - c: 3
+        type: Report-output
+        title: Client's and company copy with the certificate number
+        steps:
+          - Select two ARs, choose Client's Copy and Company Copy and Print Selected; open the Print Log; re-print one AR.
+        expected: Each AR prints in the AR form with both copies and a certificate number AC_<branch>_<MMYYYY>_<sequence>; the re-print is marked REPRINT.
+      - c: 3
+        type: Workflow
+        persona: CASHIER_TL
+        screen: RCPFORMS
+        title: New version of the AR form
+        steps:
+          - On AR and OR Forms click Change AR Form, change Footer Line 2, Submit for Approval; as a second user Approve.
+        expected: The version is Pending approval, then In use from its effective date; the next AR prints the new footer.
       - c: 1
         type: Upload-download
         title: Batch of ARs
@@ -1156,7 +1261,15 @@ frs:
     conditions:
       - CSH-APPLIED-PREM lists the applied premium for the chosen dates in PDF and Excel.
       - CSH-CANCELLED-AR lists the cancelled ARs with their reason; users without report rights cannot run them.
+      - The Day-End List shows the records of the day with the totals per payment type and bank account.
     cases:
+      - c: 3
+        type: Positive
+        screen: DAYEND
+        title: Day-end totals per payment type and bank account
+        steps:
+          - After posting a cash AR and a check OR, open the Day-End List of today.
+        expected: The records of the day are listed with their status; the totals show cash and check and each bank account with their counts and amounts.
       - c: 1
         type: Report-output
         title: Applied premium report

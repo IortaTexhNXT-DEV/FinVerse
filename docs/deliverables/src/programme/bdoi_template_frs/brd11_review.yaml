@@ -8,7 +8,7 @@ meta:
   date: 10 Oct 2026
   clean: BIBS_FRS-BDOI_BRD-11_User_Access_Maintenance_v1.3.docx
   highlighted: BIBS_FRS-BDOI_BRD-11_User_Access_Maintenance_v1.3_Changes_Highlighted.docx
-  revision_row: ["09 Oct 2026 - 10 Oct 2026", "1.3", "Business Unit review edition: summary for the Business Unit, end-to-end flows, workflow and approvals, e-mail texts, document formats, reports and schedules, integrations, non-functional requirements, open questions not answered in the BDOI FRS, change control, review checklist; aligned on 10 Oct 2026 with BIBS: new and changed screens with current screenshots (Identity Synchronisation, directory details, conflicting permission combinations, Session Timed Out, inactivity warning, Audit Trail), settings for the points BDOI decides (Annex M.10), notices and integrations", "iorta TechNXT Project Team (drafting)"]
+  revision_row: ["09 Oct 2026 - 10 Oct 2026", "1.3", "Business Unit review edition: summary for the Business Unit, end-to-end flows, workflow and approvals, e-mail texts, document formats, reports and schedules, integrations, non-functional requirements, open questions not answered in the BDOI FRS, change control, review checklist; aligned on 10 Oct 2026 with BIBS: new and changed screens with current screenshots (Identity Synchronisation, directory details, conflicting permission combinations, Session Timed Out, inactivity warning, Audit Trail), settings for the points BDOI decides (Annex M.10), notices and integrations", "iorta TechNXT Project Team (drafting support)"]
   references: >-
     References added in version 1.3: the review workbooks of BRD-11 issued with this edition (Business Unit
     Requirements Collection, BRD vs Out-of-the-Box vs Best Practice, Change Request Register, Test Cases and
@@ -459,8 +459,8 @@ integrations:
 # --------------------------------------------------------------------------------- Annex X non-functional requirements
 nfr:
   intro: >-
-    Every non-functional row of the BRD (section 6, pages 11 to 18). The BRD gives these rows no IDs; they carry the
-    IDs UAM-NFR-01 to UAM-NFR-41 of the BIBS FRS. For each: the BRD requirement, how the system meets it, the FR item
+    Every non-functional row of the BRD (section 6, pages 11 to 18). The BRD gives these rows no IDs; this FRS gives
+    them the IDs UAM-NFR-01 to UAM-NFR-41. For each: the BRD requirement, how the system meets it, the FR item
     of this FRS or where it is specified, and the row of the BIBS Non-Functional Requirements Register. Rows answered
     "Follow existing QPS set up" in the BRD follow the BIBS standards agreed for all BRDs (Annex Z, UA-Q57).
   header: ["ID", "Topic", "BRD requirement (page)", "How the system meets it", "Specified in", "NFR register"]
@@ -552,7 +552,7 @@ data_setup:
 # from the document, listed in the RTM workbook sheet "Answered in the BDOI FRS" with the BDOI clause).
 open_items:
   intro: >-
-    Only the points that BDOI's FRS does not answer. Each of our earlier references (CLR-UA, UQ, IQ, UA-Q, A-UA,
+    Only the points that BDOI's FRS does not answer. Each reference of the earlier reviews (CLR-UA, UQ, IQ, UA-Q, A-UA,
     D-UA) is kept in a column so that the link to earlier decisions is not lost. The points that BDOI's FRS answers
     were checked one by one and are listed, with the clause of BDOI's FRS that answers them, in the Test Cases and
     Traceability workbook (sheet "Answered in the BDOI FRS"). The values and data the Business Unit provides are in
@@ -570,7 +570,7 @@ open_items:
     - [D-UA-03, "BDOI names the Requestors, Approvers, Second Approvers and the high-privilege profiles.", "Section 3; FRUM.010.05 (UQ01, UQ07)"]
     - [D-UA-05, "The e-mail relay of each BIBS environment is available.", "FRUM.013 (UA-Q56)"]
     - [D-UA-07, "The decision on C01 (where requests are raised) is taken before the provisioning from UIDM-ISC is set up.", "FRUM.002, FRUM.003, FRUM.009 to FRUM.011"]
-  open_header: ["No.", "Our references", "Question", "Why it matters", "Format of the answer needed", "Owner", "Needed by"]
+  open_header: ["No.", "References", "Question", "Why it matters", "Format of the answer needed", "Owner", "Needed by"]
   open:
     - {refs: "CLR-UA-01; UA-Q06; IQ04", q: "Which single sign-on standard does EIAM use for BIBS (OpenID Connect proposed, SAML 2.0 fall-back), and when is BIBS registered for each environment?", why: "BDOI's FRS onboards BIBS in the Enterprise SSO (FRUM.001.02) but does not name the standard or the registration.", fmt: "Choice: OpenID Connect or SAML 2.0; per environment: registration date, sign-in and sign-out addresses, identifier returned, two test accounts", owner: BDOI IT, by: 2026-12-01}
     - {refs: "CLR-UA-23; UA-Q12", q: "Should Log Out also end the user's EIAM session (single sign-out)?", why: "Ending the EIAM session also signs the user out of the other BDO applications.", fmt: "Yes / No", owner: BDOI IT, by: 2026-12-01}
@@ -757,7 +757,7 @@ observations:
   - topic: Open questions answered in BDOI's FRS
     bdoi: "Sections 1 to 3 and Annexes E to I."
     brd: "-"
-    proposal: "Our earlier questions that BDOI's FRS answers are no longer asked; each is listed with the BDOI clause that answers it in the Test Cases and Traceability workbook (sheet Answered in the BDOI FRS). Where BDOI's answer differs from the BRD, the decision stays in Annex Q."
+    proposal: "The earlier questions that BDOI's FRS answers are no longer asked; each is listed with the BDOI clause that answers it in the Test Cases and Traceability workbook (sheet Answered in the BDOI FRS). Where BDOI's answer differs from the BRD, the decision stays in Annex Q."
     impact: "Annex Z."
     decide_by: System Analyst (BDO ITG) - for information
   - topic: E-mail sender and footer

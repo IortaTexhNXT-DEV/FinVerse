@@ -517,11 +517,16 @@ figures:
       }
     # the rows are read from the sign-off workbook of BRD-02 (sheet Menu by persona) for these screens and personas
     menu_screens: ["Operations › Operations › Operations Home", "Operations › Operations › Invoice Search",
-                   "Finance › Cashiering › Cashiering Workbench", "Finance › Cashiering › Receive Payment",
+                   "Finance › Cashiering › Cashiering Workbench", "Finance › Cashiering › Create AR/OR",
+                   "Finance › Cashiering › Posting", "Finance › Cashiering › Receive Payment",
                    "Finance › Cashiering › Receipts", "Finance › Cashiering › Unapplied Payments",
+                   "Finance › Cashiering › Unapplied Payment List", "Finance › Cashiering › Day-End List",
+                   "Finance › Cashiering › Search Log",
                    "Finance › Cashiering › Incoming Requests", "Finance › Cashiering › Pre-booked Payments",
-                   "Finance › Cashiering › Payment Uploads", "Finance › Cashiering › PDC Warehouse",
+                   "Finance › Cashiering › Payment Uploads", "Finance › Cashiering › Payment Files",
+                   "Finance › Cashiering › PDC Warehouse",
                    "Finance › Cashiering › Batch Print", "Finance › Cashiering › Commission ORs",
+                   "Finance › Cashiering › Settlement ORs", "Finance › Cashiering › AR and OR Forms",
                    "Finance › Cashiering › Receipt Series", "Finance › Cashiering › Cashiering Setup",
                    "Operations › Operations › Disbursement Queue", "Operations › Operations › Interfaces",
                    "Operations › Operations › Report Archive", "Reports › Reports › Report Centre",

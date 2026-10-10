@@ -37,6 +37,7 @@ import yaml
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
+import brd_common_final as final  # noqa: E402
 import brd02_annexes as annexes  # noqa: E402
 import build_brd02_bdoi_frs as frs  # noqa: E402
 import build_brd11_bdoi_frs as u11  # noqa: E402
@@ -252,7 +253,7 @@ class Data:
                     "expected": frs.clean(exp),
                     "type": "Negative" if c["type"] == "Negative" or c.get("neg") else "Positive",
                     "priority": "High" if str(prio).startswith("Must") else "Medium",
-                    "source": "BIBS test plan BRD-2 v2.1"})
+                    "source": "Test conditions of this FRS"})
         return out
 
     def make_acceptance_cases(self) -> list[dict]:
@@ -621,7 +622,6 @@ def build_fitgap(data: Data) -> tuple[Path, dict]:
         Column("text", "BRD text", 46, "Requirement as printed in the BRD"),
         Column("group", "Function", 24, "Function of the BRD"),
         Column("item", "FR item (BDOI format)", 24, f"FR items of the FRS v{VERSION}"),
-        Column("fr", "BIBS reference FR", 16, "FR of the BIBS FRS BRD-2"),
         Column("features", "Feature list reference", 40, "Rows of the BIBS Feature List vs OOTB workbook"),
         Column("ootb", "What BIBS offers out of the box", 46, "Standard capability or configuration"),
         Column("best", "Insurance-broking best practice", 46, "Practice of the Philippine market and international broking"),
@@ -762,7 +762,7 @@ def build_rtm(data: Data) -> tuple[Path, dict]:
          "proof": f"{sum(1 for r in item_rows if r['n'])} with at least one test case (sheet FR items)"},
         {"what": "Acceptance criteria", "n": data.b.stats["ac"], "proof": "One acceptance test case each"},
         {"what": "Test cases", "n": len(cases),
-         "proof": f"{len(data.bibs_cases)} of the BIBS test plan BRD-2 re-keyed to the FR items; {len(data.acc_cases)} acceptance cases"},
+         "proof": f"{len(data.bibs_cases)} cases of the test conditions keyed to the FR items; {len(data.acc_cases)} acceptance cases"},
         {"what": "Positive / negative", "n": f"{sum(1 for c in cases if c['type'] == 'Positive')} / "
                                              f"{sum(1 for c in cases if c['type'] == 'Negative')}", "proof": "-"},
         {"what": "Questions answered in the BDOI FRS", "n": len(ans), "proof": "Sheet Answered in the BDOI FRS"},
@@ -772,18 +772,18 @@ def build_rtm(data: Data) -> tuple[Path, dict]:
     wb.sheet("Traceability", [
         Column("id", "BRD ID", 14, "BRD requirement ID"), Column("text", "BRD requirement", 46, ""),
         Column("item", "FR item (BDOI format)", 26, f"FR items of the FRS v{VERSION}"),
-        Column("fr", "BIBS reference FR", 18, "FR of the BIBS FRS BRD-2"), Column("n", "Test cases", 10, "Count"),
+        Column("n", "Test cases", 10, "Count"),
         Column("cases", "Test case IDs", 60, "Sheet Test cases"), Column("screens", "Screen", 34, "Screens of Appendix E"),
         Column("steps", "Walkthrough steps", 26, "Steps of the walkthrough users workbook")],
-        trace_rows, description="BRD ID -> FR item -> BIBS reference FR -> test cases -> screen -> walkthrough step")
+        trace_rows, description="BRD ID -> FR item -> test cases -> screen -> walkthrough step")
     wb.sheet("FR items", [Column("id", "FR item", 22, ""), Column("title", "Title", 44, ""), Column("origin", "Origin", 22, ""),
                           Column("ac", "Acceptance criteria", 12, ""), Column("n", "Test cases", 10, ""),
                           Column("cases", "Test case IDs", 70, "")],
              item_rows, description=f"Every FR item of the FRS v{VERSION} with its test cases")
     case_cols = [
-        Column("id", "Test case ID", 28, "TC-OP-nnn.c-ss: BIBS test plan; TC-FRS-...-ACnn: acceptance criterion"),
+        Column("id", "Test case ID", 28, "TC-OP-nnn.c-ss: test condition c and its case ss; TC-FRS-...-ACnn: acceptance criterion"),
         Column("title", "Title", 36, ""), Column("brd", "BRD ID", 22, ""), Column("item", "FR item", 22, ""),
-        Column("fr", "BIBS reference FR", 14, ""), Column("persona", "Persona", 18, ""),
+        Column("persona", "Persona", 18, ""),
         Column("user", "Sign-in ID", 12, "The password is issued separately by the iorta TechNXT Project Team"),
         Column("screen", "Screen", 22, ""), Column("pre", "Preconditions", 30, ""), Column("steps", "Steps", 50, ""),
         Column("data", "Test data", 22, ""), Column("expected", "Expected result", 50, ""),
@@ -796,7 +796,7 @@ def build_rtm(data: Data) -> tuple[Path, dict]:
         c.update({"result": "Not run", "tester": "", "date": "", "obs": "", "remarks": ""})
     wb.sheet("Test cases", case_cols, cases, description=f"Test cases of the FRS v{VERSION} with the execution columns")
     wb.sheet("Answered in the BDOI FRS", [
-        Column("ref", "Our reference", 14, "OQ, CLR-OP"), Column("q", "Our question", 60, ""),
+        Column("ref", "Reference", 14, "OQ, CLR-OP"), Column("q", "Question", 60, ""),
         Column("clause", "BDOI FRS clause", 30, ""), Column("answer", "Answer in BDOI's FRS", 60, ""),
         Column("kept", "Still a decision?", 18, "Where BDOI's answer differs from the BRD, the decision stays in Appendix R")],
         ans, description="Open items dropped from the FRS because BDOI's FRS answers them")
@@ -986,6 +986,8 @@ def main() -> int:
                      ("rtm", build_rtm), ("uat", build_uat), ("coverage", build_coverage)):
         path, stats = fn(data)
         print(f"wrote {path.relative_to(REPO)} ({path.stat().st_size // 1024} KB): {stats}")
+        if name != "coverage":  # the internal coverage workbook may keep the earlier references
+            final.check_no_references([path])
     return 0
 
 

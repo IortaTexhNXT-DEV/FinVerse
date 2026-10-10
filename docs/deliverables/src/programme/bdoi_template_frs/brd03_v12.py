@@ -6,7 +6,7 @@ build_brd03_workbooks.py. It adds, in BDOI's template:
   * Introduction > Summary for the Business Unit Review (scope, end-to-end picture, key numbers, decisions, how to
     review, the checklist count);
   * the captions of every process flow, the process flows still missing, the status life-cycles and the integration
-    context diagram (Graphviz, 200 dpi);
+    context diagram (Graphviz, 240 dpi);
   * a menu-by-persona page in Annex G, section M.5 of Annex M, terms added to Annex N;
   * Annexes O to X (workflow and approvals, e-mail and notification texts, document prints, reports and schedules,
     integrations, non-functional requirements, data set-up at go-live, assumptions / dependencies / open questions
@@ -213,7 +213,7 @@ def test_cases() -> list[dict]:
                     "persona": names.get(c.persona, c.persona), "signin": users.get(c.persona, "-"),
                     "pre": c.pre, "steps": c.steps, "data": ", ".join(c.data), "expected": c.expected,
                     "type": "Negative" if c.negative else "Positive", "priority": c.priority, "screen": c.screen,
-                    "wt": _wt_of([c.fr]), "source": "BIBS test plan BRD-3"})
+                    "wt": _wt_of([c.fr]), "source": "Test conditions of this FRS"})
     nb_frs = {r for r in f2f if r.startswith("FR-NB")}
     nb = _plan(NB / "brd01_cases.yaml")
     nusers = {k: v.get("user", "-") for k, v in nb.personas.items()}
@@ -227,7 +227,7 @@ def test_cases() -> list[dict]:
                     "ref": c.fr, "persona": nnames.get(c.persona, c.persona), "signin": nusers.get(c.persona, "-"),
                     "pre": c.pre, "steps": c.steps, "data": ", ".join(c.data), "expected": c.expected,
                     "type": "Negative" if c.negative else "Positive", "priority": c.priority, "screen": c.screen,
-                    "wt": "-", "source": "BIBS test plan BRD-1 (non-package)"})
+                    "wt": "-", "source": "Test conditions of this FRS (non-package)"})
     screens = pm.screens
     for it in frpm_items():
         persona, screen = ITEMS["frpm_tests"][it["id"]]
@@ -239,7 +239,7 @@ def test_cases() -> list[dict]:
                 "brd": ", ".join(brd_of_item(it["id"])), "frpm": it["id"], "frpm_list": [it["id"]],
                 "ref": ", ".join(it["refs"]), "persona": names.get(persona, persona),
                 "signin": users.get(persona, "-"),
-                "pre": "SIT/UAT data of the BIBS test plan BRD-3; the user holds the role of the persona",
+                "pre": "SIT/UAT data of the test plan; the user holds the role of the persona",
                 "steps": (f"1. Sign in as {users.get(persona, '-')} ({names.get(persona, persona)}).\n"
                           f"2. Open {screen}.\n"
                           "3. Carry out the situation the criterion describes, with the test data.\n"
@@ -277,7 +277,7 @@ def this_round(b):
         b.hl = old
 
 
-def _render(b, dot_rel: str, dpi: int = 200) -> Path:
+def _render(b, dot_rel: str, dpi: int = 240) -> Path:
     if not hasattr(b, "tmp"):
         b.tmp = Path(tempfile.mkdtemp(prefix="pm12_"))
     png = b.tmp / (Path(dot_rel).stem + f"_{dpi}.png")
@@ -286,7 +286,7 @@ def _render(b, dot_rel: str, dpi: int = 200) -> Path:
     return png
 
 
-def _render_text(b, name: str, dot: str, dpi: int = 200) -> Path:
+def _render_text(b, name: str, dot: str, dpi: int = 240) -> Path:
     if not hasattr(b, "tmp"):
         b.tmp = Path(tempfile.mkdtemp(prefix="pm12_"))
     src = b.tmp / f"{name}.dot"
@@ -385,7 +385,7 @@ def summary(b, numbers: list[list[str]], checklist_count: int):
 
 def introduction(b):
     """The preparation sentence of v1.1 extended to v1.2, and the note on what v1.2 adds."""
-    p = CORE.find_par(b, "This version 1.1 was drafted")
+    p = CORE.find_par(b, "This version 1.1 was elaborated")
     text = DOC["introduction"]["preparation"].replace("This version 1.1 was", "Versions 1.1 and 1.2 were")
     new = CORE.clone_par(b, p._p, text)
     p._p.addnext(new)
@@ -658,11 +658,11 @@ def annex_v(a):
     oi = open_items()
     a.h1("Annex V – Assumptions, Dependencies and Open Questions")
     a.p("Only the items that BDOI's FRS does not answer are listed. Each assumption, dependency, open question and "
-        "proposed rule of the BIBS reference FRS was checked against BDOI's FRS: "
+        "proposed rule of the earlier reviews was checked against BDOI's FRS: "
         f"{len(oi['answered'])} are answered by BDOI's FRS (or were closed earlier) and are not repeated here; they "
         "are listed with BDOI's clause in the traceability workbook (BIBS_RTM_BRD-03, sheet 'Answered in the BDOI "
         f"FRS'). {len(oi['partly'])} are answered in part: only the remaining part is asked below. The reference "
-        "numbers of the BIBS FRS (A-PM, D-PM, PQ, CLR-PM) are kept so that the earlier decisions can be traced; the "
+        "numbers of the earlier reviews (A-PM, D-PM, PQ, CLR-PM) are kept so that the earlier decisions can be traced; the "
         "last column gives the item of the requirements-collection workbook where the answer is recorded.")
     groups = [("V.1 Assumptions", "Assumption", "BDOI confirms each assumption with the sign-off of this FRS."),
               ("V.2 Dependencies", "Dependency", "Inputs other parties provide."),

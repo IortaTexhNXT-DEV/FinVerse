@@ -1116,15 +1116,16 @@ class Annexes:
                "changes made to the Business Requirements Mapping, the rows added to BDOI's annexes and the other "
                "observations of this version. BDOI's text is kept in the body of the document; this annex gives both "
                "readings, the BRD text, what version 1.2 proposes, the impact and who decides. Every point starts as "
-               "Open.")
+               "Open; a point that BIBS offers both ways, chosen by a system setting, reads Configurable - BDOI to "
+               "confirm the setting.")
         header = ["No.", "Topic", "BDOI FRS text", "BRD text", "Proposed in v1.2", "Impact", "Decision by", "Status"]
         widths = [0.75, 1.0, 1.9, 1.5, 2.2, 0.95, 1.0, 0.6]
         no = 0
 
-        def row(ref, topic, bdoi, brd, prop, impact, who):
+        def row(ref, topic, bdoi, brd, prop, impact, who, status="Open"):
             nonlocal no
             no += 1
-            out = [f"Q-{no:02d}" + (f" ({ref})" if ref else ""), topic, bdoi, brd, prop, impact, who, "Open"]
+            out = [f"Q-{no:02d}" + (f" ({ref})" if ref else ""), topic, bdoi, brd, prop, impact, who, status]
             self.b.q_rows.append(dict(zip(["no", "topic", "bdoi", "brd", "proposal", "impact", "decide_by", "status"],
                                           out), section=section))
             return out
@@ -1136,8 +1137,10 @@ class Annexes:
             if c["kind"] != "Between the documents":
                 continue
             prop = f"{clean(c['recommendation'])} (BIBS reference FRS: {clean(c['ours'])})"
+            if c.get("setting"):
+                prop += f" Available in BIBS: {clean(c['setting'])}"
             rows.append(row(c["id"], clean(c["topic"]), clean(c["bdoi"]), clean(c["brd"]), prop, clean(c["impact"]),
-                            c["decide_by"]))
+                            c["decide_by"], status=c.get("status", "Open")))
             self.listed_conflicts.add(c["id"])
         self.table(header, rows, widths, size=7)
         section = "Q.2"

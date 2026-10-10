@@ -16,7 +16,9 @@ and signed off together; in an
 issued sign-off set the files carry the reading-order prefix 00_ to 05_ (deliverables README, "Release and
 sign-off per BRD"). Each document is kept once, in its latest version.
 
-The sets of BRD-01, BRD-02, BRD-04, BRD-05, BRD-06 also carry the UX screen documents for the BDOI UX Design team: 07 the UX Screen Deck (every screen persona by persona and flow by flow, with all its states), 08 the UX screen register (one row per screen image with the FRS section, the UXD status and the change flag) and 09 the image package (every screen image at twice the screen resolution, with the register as CSV). A change of the FRS names the screens it affects, so the UX Design team revises only those screens.
+For BRD-02 Operations (FRS v3.2); BRD-06 Renewal (FRS v1.1) the FRS in BDOI's format and its review workbooks (business unit requirements collection, fit-gap, test cases and traceability, change request register, walkthrough users) in `../Programme/BDOI_Template_FRS/` are the only documents (decision of the BIBS Product Owner of 10-Oct-2026); the earlier sign-off set of each is withdrawn and its row below points to that folder. The signatories of such a document are on the Signoff Sheet of its FRS.
+
+The sets of BRD-01, BRD-04, BRD-05 also carry the UX screen documents for the BDOI UX Design team: 07 the UX Screen Deck (every screen persona by persona and flow by flow, with all its states), 08 the UX screen register (one row per screen image with the FRS section, the UXD status and the change flag) and 09 the image package (every screen image at twice the screen resolution, with the register as CSV). A change of the FRS names the screens it affects, so the UX Design team revises only those screens.
 
 | Document | BRD | Kind | Version | File |
 |---|---|---|---|---|
@@ -29,15 +31,7 @@ The sets of BRD-01, BRD-02, BRD-04, BRD-05, BRD-06 also carry the UX screen docu
 | New Business | BRD-01 | UX screen deck (PowerPoint) | 2.1 | [`BRD-01_New_Business/07_BIBS_UXDeck_BRD-01_New_Business_v2.1.pptx`](BRD-01_New_Business/07_BIBS_UXDeck_BRD-01_New_Business_v2.1.pptx) |
 | New Business | BRD-01 | UX screen register (Excel) | 2.1 | [`BRD-01_New_Business/08_BIBS_UXScreens_BRD-01_New_Business_v2.1.xlsx`](BRD-01_New_Business/08_BIBS_UXScreens_BRD-01_New_Business_v2.1.xlsx) |
 | New Business | BRD-01 | UX screen images, 2x PNG with the register as CSV (ZIP) | 2.1 | [`BRD-01_New_Business/09_BIBS_UXScreens_BRD-01_New_Business_v2.1.zip`](BRD-01_New_Business/09_BIBS_UXScreens_BRD-01_New_Business_v2.1.zip) |
-| Operations | BRD-02 | Start here guide | 2.1 | [`BRD-02_Operations/00_BIBS_StartHere_BRD-02_Operations_v2.1.docx`](BRD-02_Operations/00_BIBS_StartHere_BRD-02_Operations_v2.1.docx) |
-| Operations | BRD-02 | Sign-off pack guide deck | 2.1 | [`BRD-02_Operations/01_BIBS_GuideDeck_BRD-02_Operations_v2.1.pptx`](BRD-02_Operations/01_BIBS_GuideDeck_BRD-02_Operations_v2.1.pptx) |
-| Operations | BRD-02 | FRS | 2.1 | [`BRD-02_Operations/02_BIBS_FRS_BRD-02_Operations_v2.1.docx`](BRD-02_Operations/02_BIBS_FRS_BRD-02_Operations_v2.1.docx) |
-| Operations | BRD-02 | Sign-off workbook (Excel) | 2.1 | [`BRD-02_Operations/03_BIBS_Signoff_BRD-02_Operations_v2.1.xlsx`](BRD-02_Operations/03_BIBS_Signoff_BRD-02_Operations_v2.1.xlsx) |
-| Operations | BRD-02 | Test plan workbook (Excel) | 2.1 | [`BRD-02_Operations/04_BIBS_TestPlan_BRD-02_Operations_v2.1.xlsx`](BRD-02_Operations/04_BIBS_TestPlan_BRD-02_Operations_v2.1.xlsx) |
-| Operations | BRD-02 | Test plan summary (Word) | 2.1 | [`BRD-02_Operations/05_BIBS_TestPlan_BRD-02_Operations_Summary_v2.1.docx`](BRD-02_Operations/05_BIBS_TestPlan_BRD-02_Operations_Summary_v2.1.docx) |
-| Operations | BRD-02 | UX screen deck (PowerPoint) | 2.1 | [`BRD-02_Operations/07_BIBS_UXDeck_BRD-02_Operations_v2.1.pptx`](BRD-02_Operations/07_BIBS_UXDeck_BRD-02_Operations_v2.1.pptx) |
-| Operations | BRD-02 | UX screen register (Excel) | 2.1 | [`BRD-02_Operations/08_BIBS_UXScreens_BRD-02_Operations_v2.1.xlsx`](BRD-02_Operations/08_BIBS_UXScreens_BRD-02_Operations_v2.1.xlsx) |
-| Operations | BRD-02 | UX screen images, 2x PNG with the register as CSV (ZIP) | 2.1 | [`BRD-02_Operations/09_BIBS_UXScreens_BRD-02_Operations_v2.1.zip`](BRD-02_Operations/09_BIBS_UXScreens_BRD-02_Operations_v2.1.zip) |
+| Operations | BRD-02 | FRS in BDOI's format and the review workbooks | 3.2 | [`../Programme/BDOI_Template_FRS/BRD-02_Operations_Cashiering/`](../Programme/BDOI_Template_FRS/BRD-02_Operations_Cashiering/) |
 | Collections | BRD-04 | Start here guide | 2.1 | [`BRD-04_Collections/00_BIBS_StartHere_BRD-04_Collections_v2.1.docx`](BRD-04_Collections/00_BIBS_StartHere_BRD-04_Collections_v2.1.docx) |
 | Collections | BRD-04 | Sign-off pack guide deck | 2.1 | [`BRD-04_Collections/01_BIBS_GuideDeck_BRD-04_Collections_v2.1.pptx`](BRD-04_Collections/01_BIBS_GuideDeck_BRD-04_Collections_v2.1.pptx) |
 | Collections | BRD-04 | FRS | 2.1 | [`BRD-04_Collections/02_BIBS_FRS_BRD-04_Collections_v2.1.docx`](BRD-04_Collections/02_BIBS_FRS_BRD-04_Collections_v2.1.docx) |
@@ -56,15 +50,7 @@ The sets of BRD-01, BRD-02, BRD-04, BRD-05, BRD-06 also carry the UX screen docu
 | Accounting Disbursement ACSL | BRD-05 | UX screen deck (PowerPoint) | 2.1 | [`BRD-05_Accounting_Disbursement_ACSL/07_BIBS_UXDeck_BRD-05_Accounting_Disbursement_ACSL_v2.1.pptx`](BRD-05_Accounting_Disbursement_ACSL/07_BIBS_UXDeck_BRD-05_Accounting_Disbursement_ACSL_v2.1.pptx) |
 | Accounting Disbursement ACSL | BRD-05 | UX screen register (Excel) | 2.1 | [`BRD-05_Accounting_Disbursement_ACSL/08_BIBS_UXScreens_BRD-05_Accounting_Disbursement_ACSL_v2.1.xlsx`](BRD-05_Accounting_Disbursement_ACSL/08_BIBS_UXScreens_BRD-05_Accounting_Disbursement_ACSL_v2.1.xlsx) |
 | Accounting Disbursement ACSL | BRD-05 | UX screen images, 2x PNG with the register as CSV (ZIP) | 2.1 | [`BRD-05_Accounting_Disbursement_ACSL/09_BIBS_UXScreens_BRD-05_Accounting_Disbursement_ACSL_v2.1.zip`](BRD-05_Accounting_Disbursement_ACSL/09_BIBS_UXScreens_BRD-05_Accounting_Disbursement_ACSL_v2.1.zip) |
-| Renewal | BRD-06 | Start here guide | 2.0 | [`BRD-06_Renewal/00_BIBS_StartHere_BRD-06_Renewal_v2.0.docx`](BRD-06_Renewal/00_BIBS_StartHere_BRD-06_Renewal_v2.0.docx) |
-| Renewal | BRD-06 | Sign-off pack guide deck | 2.0 | [`BRD-06_Renewal/01_BIBS_GuideDeck_BRD-06_Renewal_v2.0.pptx`](BRD-06_Renewal/01_BIBS_GuideDeck_BRD-06_Renewal_v2.0.pptx) |
-| Renewal | BRD-06 | FRS | 2.0 | [`BRD-06_Renewal/02_BIBS_FRS_BRD-06_Renewal_v2.0.docx`](BRD-06_Renewal/02_BIBS_FRS_BRD-06_Renewal_v2.0.docx) |
-| Renewal | BRD-06 | Sign-off workbook (Excel) | 2.0 | [`BRD-06_Renewal/03_BIBS_Signoff_BRD-06_Renewal_v2.0.xlsx`](BRD-06_Renewal/03_BIBS_Signoff_BRD-06_Renewal_v2.0.xlsx) |
-| Renewal | BRD-06 | Test plan workbook (Excel) | 2.0 | [`BRD-06_Renewal/04_BIBS_TestPlan_BRD-06_Renewal_v2.0.xlsx`](BRD-06_Renewal/04_BIBS_TestPlan_BRD-06_Renewal_v2.0.xlsx) |
-| Renewal | BRD-06 | Test plan summary (Word) | 2.0 | [`BRD-06_Renewal/05_BIBS_TestPlan_BRD-06_Renewal_Summary_v2.0.docx`](BRD-06_Renewal/05_BIBS_TestPlan_BRD-06_Renewal_Summary_v2.0.docx) |
-| Renewal | BRD-06 | UX screen deck (PowerPoint) | 2.0 | [`BRD-06_Renewal/07_BIBS_UXDeck_BRD-06_Renewal_v2.0.pptx`](BRD-06_Renewal/07_BIBS_UXDeck_BRD-06_Renewal_v2.0.pptx) |
-| Renewal | BRD-06 | UX screen register (Excel) | 2.0 | [`BRD-06_Renewal/08_BIBS_UXScreens_BRD-06_Renewal_v2.0.xlsx`](BRD-06_Renewal/08_BIBS_UXScreens_BRD-06_Renewal_v2.0.xlsx) |
-| Renewal | BRD-06 | UX screen images, 2x PNG with the register as CSV (ZIP) | 2.0 | [`BRD-06_Renewal/09_BIBS_UXScreens_BRD-06_Renewal_v2.0.zip`](BRD-06_Renewal/09_BIBS_UXScreens_BRD-06_Renewal_v2.0.zip) |
+| Renewal | BRD-06 | FRS in BDOI's format and the review workbooks | 1.1 | [`../Programme/BDOI_Template_FRS/BRD-06_Renewal/`](../Programme/BDOI_Template_FRS/BRD-06_Renewal/) |
 | Customer Servicing Facility | BRD-09 | FRS | 1.1 | [`BRD-09_Customer_Servicing_Facility/BIBS_FRS_BRD-09_Customer_Servicing_Facility_v1.1.docx`](BRD-09_Customer_Servicing_Facility/BIBS_FRS_BRD-09_Customer_Servicing_Facility_v1.1.docx) |
 | Customer Servicing Facility | BRD-09 | Test plan summary (Word) | 1.1 | [`BRD-09_Customer_Servicing_Facility/BIBS_TestPlan_BRD-09_Customer_Servicing_Facility_Summary_v1.1.docx`](BRD-09_Customer_Servicing_Facility/BIBS_TestPlan_BRD-09_Customer_Servicing_Facility_Summary_v1.1.docx) |
 | Customer Servicing Facility | BRD-09 | Test plan workbook (Excel) | 1.1 | [`BRD-09_Customer_Servicing_Facility/BIBS_TestPlan_BRD-09_Customer_Servicing_Facility_v1.1.xlsx`](BRD-09_Customer_Servicing_Facility/BIBS_TestPlan_BRD-09_Customer_Servicing_Facility_v1.1.xlsx) |
@@ -80,7 +66,8 @@ The sets of BRD-01, BRD-02, BRD-04, BRD-05, BRD-06 also carry the UX screen docu
 The sign-off sets hold business content only (screens, fields, list and template columns, validations, rules,
 messages, notifications, documents, walkthroughs, reports); the technical content is in the Technical
 Specification of each set, reviewed by BDOI IT. The signatories are the roles of the BRD approval sheet;
-the matrix per part of the set is in the 00 Start Here and the 01 guide deck of each set.
+the matrix per part of the set is in the 00 Start Here and the 01 guide deck of each set, and on the
+Signoff Sheet of an FRS in BDOI's format.
 
 | Set | Prepared by | Input provided by | Reviewed by | Approved by | Approval sheet |
 |---|---|---|---|---|---|
@@ -96,7 +83,7 @@ A BRD that spans drops lives in the folder of its primary drop; nothing is copie
 
 | BRD | Part in this drop | Documents (in the primary drop folder) |
 |---|---|---|
-| BRD-03 | Quotation or proposal with packages (item 1.U2) | [`02_BIBS_FRS_BRD-03_Product_Maintenance_v2.1.docx`](../Drop-0_Setup_and_Data_Migration/BRD-03_Product_Maintenance/02_BIBS_FRS_BRD-03_Product_Maintenance_v2.1.docx)<br>[`04_BIBS_TestPlan_BRD-03_Product_Maintenance_v2.1.xlsx`](../Drop-0_Setup_and_Data_Migration/BRD-03_Product_Maintenance/04_BIBS_TestPlan_BRD-03_Product_Maintenance_v2.1.xlsx)<br>[`05_BIBS_TestPlan_BRD-03_Product_Maintenance_Summary_v2.1.docx`](../Drop-0_Setup_and_Data_Migration/BRD-03_Product_Maintenance/05_BIBS_TestPlan_BRD-03_Product_Maintenance_Summary_v2.1.docx) |
+| BRD-03 | Quotation or proposal with packages (item 1.U2) | [`Programme/BDOI_Template_FRS/BRD-03_Product_Maintenance/`](../Programme/BDOI_Template_FRS/BRD-03_Product_Maintenance/) (FRS in BDOI's format and the review workbooks) |
 | BRD-08 | EB placement and ePolicy, EB upstream reports (items 1.U6, 1.U9) | [`BIBS_FRS_BRD-08_Employee_Benefits_v1.1.docx`](../Drop-2_Independent/BRD-08_Employee_Benefits/BIBS_FRS_BRD-08_Employee_Benefits_v1.1.docx)<br>[`BIBS_TestPlan_BRD-08_Employee_Benefits_Summary_v1.1.docx`](../Drop-2_Independent/BRD-08_Employee_Benefits/BIBS_TestPlan_BRD-08_Employee_Benefits_Summary_v1.1.docx)<br>[`BIBS_TestPlan_BRD-08_Employee_Benefits_v1.1.xlsx`](../Drop-2_Independent/BRD-08_Employee_Benefits/BIBS_TestPlan_BRD-08_Employee_Benefits_v1.1.xlsx) |
 | BRD-13 | Legacy invoices in cashiering, commission and BIR reports (items 1.U1, 1.D2, 1.D6) | [`02_BIBS_Handbook_BRD-13_Data_Migration_v2.1.docx`](../Drop-0_Setup_and_Data_Migration/BRD-13_Data_Migration/02_BIBS_Handbook_BRD-13_Data_Migration_v2.1.docx)<br>[`04_BIBS_TestPlan_BRD-13_Data_Migration_v2.1.xlsx`](../Drop-0_Setup_and_Data_Migration/BRD-13_Data_Migration/04_BIBS_TestPlan_BRD-13_Data_Migration_v2.1.xlsx)<br>[`05_BIBS_TestPlan_BRD-13_Data_Migration_Summary_v2.1.docx`](../Drop-0_Setup_and_Data_Migration/BRD-13_Data_Migration/05_BIBS_TestPlan_BRD-13_Data_Migration_Summary_v2.1.docx) |
 

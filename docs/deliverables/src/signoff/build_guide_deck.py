@@ -486,7 +486,9 @@ def build(brd: str) -> Path:
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("brd", help="BRD of the pack, e.g. BRD-01")
+    ap.add_argument("--force", action="store_true", help="build the old-format set of a BRD retired by an FRS in BDOI's format (brand.BDOI_FRS_SETS)")
     args = ap.parse_args(argv)
+    brand.refuse_retired(brand.brd_of_code(args.brd), args.force)  # superseded by the FRS in BDOI's format
     print(f"pptx: {build(args.brd)}")
     return 0
 

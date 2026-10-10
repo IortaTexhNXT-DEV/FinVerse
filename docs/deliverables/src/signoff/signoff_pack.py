@@ -5,6 +5,8 @@ Usage (the pack of a BRD is docs/deliverables/src/<BRD-nn_Name>/pack/pack.yaml, 
   python docs/deliverables/src/signoff/signoff_pack.py BRD-01
   python docs/deliverables/src/signoff/signoff_pack.py BRD-01 --check                 # checks only
   python docs/deliverables/src/signoff/signoff_pack.py BRD-01 --manifest m.json       # screenshot manifest (JSON)
+  A BRD whose set is superseded by an FRS in BDOI's format (brand.BDOI_FRS_SETS) is checked but not rebuilt
+  without --force.
 
 What it reads
   * <brd>/pack.yaml             metadata, personas, sections of the BRD, screen-flow links, common screen elements;
@@ -1290,11 +1292,15 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("pack", help="BRD of the pack (e.g. BRD-01) or the path of its pack.yaml")
     ap.add_argument("--check", action="store_true", help="check the pack against the code and the FRS only")
     ap.add_argument("--manifest", metavar="JSON", help="write the screenshot manifest for capture_pack.cjs")
+    ap.add_argument("--force", action="store_true", help="build the old-format set of a BRD retired by an FRS in BDOI's format (brand.BDOI_FRS_SETS)")
     args = ap.parse_args(argv)
     path = Path(args.pack)
     if not path.exists():
         path = brand.src_dir(brand.brd_of_code(args.pack)) / "pack" / "pack.yaml"
     pack = Pack(path)
+    # A retired set (superseded by the FRS in BDOI's format) is checked but not rebuilt
+    if not (args.check or args.manifest):
+        brand.refuse_retired(pack.meta["brd"], args.force)
     problems = pack.check()
     for p in problems:
         print(f"{path.parent.name}: {p}")

@@ -935,6 +935,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--no-pdf", action="store_true", help="skip the PDF pass (TOC page numbers stay blank)")
     ap.add_argument("--keep-pdf", action="store_true", help="keep the PDF of the Word summary")
     ap.add_argument("--previews", action="store_true", help="render page previews of the Word summary")
+    ap.add_argument("--force", action="store_true", help="build the old-format set of a BRD retired by an FRS in BDOI's format (brand.BDOI_FRS_SETS)")
     args = ap.parse_args(argv)
     failed = False
     for y in args.yaml:
@@ -952,6 +953,7 @@ def main(argv: list[str] | None = None) -> int:
             continue
         if args.check:
             continue
+        brand.refuse_retired(plan.meta["brd"], args.force)  # superseded by the FRS in BDOI's format
         front, _ = load_source(plan.path.parent / plan.meta["summary"])
         print(f"xlsx: {build_xlsx(plan, list(front.get('control') or []))}")
         keep = args.keep_pdf or args.previews

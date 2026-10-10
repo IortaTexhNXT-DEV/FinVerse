@@ -89,9 +89,9 @@ The roles-and-access sheet checks each access-maintenance function against the r
 <!-- table: widths=1.2,8.6,4.2 caption="Reference documents" -->
 | Ref. | Document | Version |
 |---|---|---|
-| R1 | Functional Requirements Specification BRD-11 User Access Maintenance (`02_BIBS_FRS_BRD-11_User_Access_Maintenance_v2.1.docx`) | 2.1, 8 Oct 2026 |
+| R1 | Functional Requirements Specification BRD-11 User Access Maintenance in BDOI's format (`BIBS_FRS-BDOI_BRD-11_User_Access_Maintenance_v1.3.docx`) | 1.3 |
 | R2 | QPS User Access Maintenance Module BRD | v1, 15-Apr-2025; signed April-May 2025 |
-| R3 | Test plan workbook BRD-11 (`04_BIBS_TestPlan_BRD-11_User_Access_Maintenance_v2.1.xlsx`) | 2.1 |
+| R3 | Test cases and traceability BRD-11 (`BIBS_RTM_BRD-11_Test_Cases_and_Traceability_v1.0.xlsx`) | 1.0 |
 | R7 | Authentication and Identity Integration Requirements | v1.0, 03-Oct-2026 |
 | R5 | FRS BRD-3 Product Maintenance (role-permission change requests, PMADD05) | 2.0 |
 | R6 | BRD discrepancy and clarification register (`BIBS_Register_BRD-00_Discrepancies_and_Clarifications_v1.2.xlsx`) | 1.2 |

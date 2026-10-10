@@ -1,6 +1,6 @@
 # Drop 0 (Setup and Data Migration) closure: the source of
-#   01_BIBS_Drop-0_Configuration_Inputs_v2.0.xlsx  (every configuration input BDOI provides before go-live) and
-#   the tables of 02_BIBS_Drop-0_Closure_Summary_v2.0.docx (CLOSURE_SUMMARY_DROP0.md, ```pack blocks).
+#   01_BIBS_Drop-0_Configuration_Inputs_v2.1.xlsx  (every configuration input BDOI provides before go-live) and
+#   the tables of 02_BIBS_Drop-0_Closure_Summary_v2.1.docx (CLOSURE_SUMMARY_DROP0.md, ```pack blocks).
 # Built by tools/deliverables/drop_closure.py:
 #   python tools/deliverables/drop_closure.py            # workbook and summary
 #   python tools/deliverables/drop_closure.py --check    # checks only
@@ -8,8 +8,8 @@
 # What is typed here and what is read:
 #   * typed: the register items (one per configuration item, with its owner, due date and one route), the Drop 0
 #     templates D0-nn, the owner of each module, the due milestones, the decisions and the risks of the summary;
-#   * read from the BRD-03 and BRD-11 packs: their configuration input templates (pack/config_inputs.yaml), the same
-#     source as their 06 workbooks;
+#   * read from the BRD-03 and BRD-11 packs: their configuration input templates (pack/config_inputs.yaml); since the
+#     FRS in BDOI's format superseded their sign-off sets (10-Oct-2026), this workbook is where BDOI fills them in;
 #   * read from the BRD-13 pack: the migration objects, milestones, proposals and open decisions (pack/catalogue.yaml);
 #   * read from the platform: every system parameter, list of values, notification event and document template the
 #     platform delivers, the chart of accounts upload template, the screens of the menu and the master tables that the
@@ -95,6 +95,9 @@ parameter_text:
   DISB_AUTO_APPROVER_ROUTING: "Request types whose disbursement voucher is prepared automatically and routed straight to the approver"
   CSF_SEARCH_MAX_RESULTS: "Maximum clients a customer search returns before the contact centre officer must refine it"
   EPOLICY_PASSWORD_HINT: "Text telling the client how the password of the e-policy is formed"
+  RNW_CCM_MODE: "Connection of CCM: LIVE (the CCM interface at the address below) or SIMULATOR (the CCM simulator of SIT and UAT)"
+  RNW_CCM_KEY_SETTING: "Name of the environment setting that holds the CCM access key (kept by BDOI IT, never shown in BIBS)"
+  RNW_MFT_KEY_SETTING: "Name of the environment setting that holds the MFT access key (kept by BDOI IT, never shown in BIBS)"
 
 # Module of each list of values: by the start of the list code (longest match first), then by the full code.
 lov_prefixes:
@@ -173,6 +176,7 @@ event_modules:
   OPSLEDGER: OPS
   PAYREQUEST: ACC
   PRODRECON: OPS
+  PRODUCT_MAINTENANCE: PM
   REMITTANCE: OPS
   RENEWAL: RNW
   SCREENING: SCR
@@ -250,7 +254,7 @@ items:
      tables: [dim_value]}
   - {id: CFG-005, area: Organisation, module: ORG, name: Employees, due: D5, route: template, template: D0-05, screen: /setup/employees,
      provides: "Employees with their branch and cost centre, for the cost-centre rules, petty cash custodians and staff advances",
-     tables: []}
+     tables: [org_employee]}
   - {id: CFG-006, area: Organisation, module: ORG, name: Cost-centre rules, due: D5, route: screen, screen: /setup/cost-centre-rules,
      provides: "Which cost centre an automatic posting takes by module, event, branch, party or account",
      tables: []}
@@ -279,7 +283,7 @@ items:
      tables: [acc_rule, acc_rule_line]}
   - {id: CFG-023, area: Chart of accounts and accounting, module: ORG, name: Legacy control accounts and Migration Clearing, due: D1, route: template, template: D0-09, screen: /gl/accounts,
      provides: "The account codes of the legacy control accounts and of Migration Clearing in the production chart (proposed rule PR-DM-02)",
-     tables: []}
+     tables: [acc_account_legacy]}
   - {id: CFG-024, area: Chart of accounts and accounting, module: DM, name: Chart of accounts mapping (legacy GL account to BIBS account), due: D4, route: migration, object: R08, screen: /migration/maps,
      provides: "The map of every legacy GL account of EBIX and ISYS to a BIBS account; control accounts to Migration Clearing",
      tables: []}
@@ -413,7 +417,7 @@ items:
      tables: [pty_party]}
   - {id: CFG-103, area: Insurers and partners, module: ACC, name: Payees, due: D3, route: migration, object: R09, screen: /disbursement/payees,
      provides: "Active payees of EBIX, loaded by the payee registration of Disbursement if BDOI brings R09 into scope (conditional object, DMQ30); otherwise registered on Payees",
-     tables: []}
+     tables: [dsb_payee]}
   - {id: CFG-104, area: Insurers and partners, module: CLM, name: Insurer location references (claims), due: D5, route: screen, screen: /claims-handling/location-refs,
      provides: "The claim location references of each insurer, entered or uploaded on Insurer Location References",
      tables: [bcl_location_ref]}
@@ -487,6 +491,14 @@ records_not_configuration:
   - [quo_quotation, quo_quotation_account, quo_request, quo_version, sbm_lamd_loan]
   - [scr_case, scr_case_event, scr_committee_vote, scr_ingestion_error, scr_ingestion_run, scr_match, scr_screening_run, scr_str, scr_str_extraction, scr_str_extraction_item, scr_str_transaction]
   - [sec_access_change_log, wf_case, wf_case_history]
+  # transactions and run records of the SIT seed data of October 2026 (bookings, cashiering, disbursement, remittance,
+  # renewal, submitted policies, product maintenance requests, migration runs, directory sign-in records) and its helpers
+  - [bkg_invoice, bulk_job, bulk_row, clx_item, cmr_certificate, cmr_certificate_or, cmr_incentive_run, cmr_incentive_run_line]
+  - [csh_application, csh_certificate_of_payment, csh_cwt_batch, csh_cwt_tag, csh_legacy_batch, csh_legacy_batch_line, csh_minimal_balance, csh_payment, csh_reapplication, csh_receipt, csh_receipt_action, csh_receipt_line, csh_unapplied]
+  - [dsb_eod_run, dsb_instrument, dsb_request, dsb_voucher, dsb_voucher_tag, eb_franchise_request, idn_directory_profile, idn_identity_event, idn_sim_directory_account]
+  - [mig_batch, mig_client_match, mig_extract, mig_issue, mig_ra_sent, mig_recon_line, mig_recon_run, mig_stage_row, pm_deactivation_request, pm_master_change, prq_request, prq_request_line]
+  - [rcv_pdc, rem_batch, rem_batch_line, rem_extraction_tag, rem_special_request, rnw_budget, rnw_budget_month, rnw_lamd_line, rnw_lamd_report]
+  - [sbm_iaaf, sbm_intake_run, sbm_letter, sbm_policy, sbm_renewal, seed_csh_receipt, seed_dsb, seed_eb_account, seed_mig_policy, seed_rem_batch, seed_sbm]
 
 # --------------------------------------------------------------------------------------------------------------
 # Drop 0 templates. Columns: header | mandatory (Y, N or the condition) | format | what to enter | example, as in
@@ -850,9 +862,11 @@ templates:
 # --------------------------------------------------------------------------------------------------------------
 # Closure summary data (02 Closure Summary, pack blocks). The decision refs are checked against the clarification
 # chapters of the three sets (CLR-PM, CLR-UA, PR-DM) and the open decisions of the Data Migration set (DMQ, DCR).
+# BRD-03 and BRD-11: the FRS in BDOI's format (v1.2, v1.3) and its review workbooks in folder (under out/Programme/
+# BDOI_Template_FRS/) are the only documents; source is the FRS source whose clarification chapter they carry.
 sets:
   - brd: BRD-03
-    folder: BRD-03_Product_Maintenance
+    folder: Programme/BDOI_Template_FRS/BRD-03_Product_Maintenance
     source: BRD-03_Product_Maintenance/FRS_BRD03_PRODUCT_MAINTENANCE.md
     clarifications: CLR-PM
     questions: PQ
@@ -863,7 +877,7 @@ sets:
       - "The masters of Product Maintenance: product catalogue, coverages and clauses, rates and taxes, insurers and sales organisation"
       - "The configuration inputs of templates CI-01 to CI-10 and who provides each"
   - brd: BRD-11
-    folder: BRD-11_User_Access_Maintenance
+    folder: Programme/BDOI_Template_FRS/BRD-11_User_Access_Maintenance
     source: BRD-11_User_Access_Maintenance/FRS_BRD11_USER_ACCESS_MAINTENANCE.md
     clarifications: CLR-UA
     questions: UQ
@@ -920,18 +934,18 @@ decisions:
 
 entry_exit:
   close_entry:
-    - "The three sign-off sets v2.0 of Drop 0 are issued: BRD-03 Product Maintenance, BRD-11 User Access Maintenance and BRD-13 Data Migration, each with its test plan."
+    - "The three Drop 0 sets are issued: the FRS in BDOI's format of BRD-03 Product Maintenance (v1.2) and of BRD-11 User Access Maintenance (v1.3), each with its review workbooks (business unit requirements collection, fit-gap, test cases and traceability, change request register, walkthrough users), and the BRD-13 Data Migration sign-off set v2.1 with its test plan."
     - "The configuration inputs workbook of Drop 0 is issued and each owner has received the sheets of the items it owns."
     - "The walkthrough sessions of each set are held on the SIT environment with seed data."
   close_exit:
-    - "The sign-off certificate of each of the three sets is signed (BRD-13 by 30-Oct-2026, BRD-03 by 30-Nov-2026, BRD-11 by 1-Dec-2026)."
+    - "The Signoff Sheet of the BRD-03 and BRD-11 FRS and the sign-off certificate of the BRD-13 set are signed (BRD-13 by 30-Oct-2026, BRD-03 by 30-Nov-2026, BRD-11 by 1-Dec-2026)."
     - "Every proposed rule and clarification of the three sets is decided, or accepted as the working assumption with its decision date."
     - "Every consolidated decision of this summary has an owner and a date; those due at M1 and M2 are taken."
     - "Every configuration item of the workbook has an owner, a due date and one route; the items due at D1 are Provided or In progress."
-    - "The comments logs of the three sets are closed: answered, corrected in v2.1, or raised as change requests."
+    - "The review comments of the three sets are closed: answered, corrected in the next version of the document, or raised in the change request register."
   drop1_entry:
     - "Drop 0 is closed: the three sets are signed and the decisions of this summary are recorded."
-    - "The BRD-1 New Business sign-off set v2.0 is issued (folder Drop-1_Transactional); its review and sign-off follow the same steps."
+    - "The BRD-1 New Business sign-off set v2.1 is issued (folder Drop-1_Transactional); its review and sign-off follow the same steps."
     - "The platform set-up that Drop 1 SIT uses is provided by D2 (4-Jan-2027): company, branches, holidays, dimensions, chart of accounts and numbering, accounting rules, bank accounts."
     - "The users and group profiles of the SIT and UAT reviewers are created through access requests."
     - "The lists of values and parameters of New Business are confirmed on the sheets Lists of values and System parameters."

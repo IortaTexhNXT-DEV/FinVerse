@@ -9,6 +9,8 @@ Errors:
   * an older version of a document next to a newer one in the same folder of out/ (only current documents remain);
   * a BRD folder of an issued sign-off release set (brand.SIGNOFF_SETS) without one of the standard files 00 to 05
     (brand.READING_ORDER); for the other BRDs a missing standard file is only a warning until their set is issued;
+  * a BRD retired by an FRS in BDOI's format (brand.BDOI_FRS_SETS) whose old-format set folder is still in out/, or
+    whose BDOI-format FRS is missing from Programme/BDOI_Template_FRS (the only documents of such a BRD);
   * a set of brand.UX_SETS without its UX screen documents 07 to 09 (brand.READING_ORDER_UX: deck, register, image
     package); for the other issued sets they are a warning until the set is re-issued;
   * a drop-level set (brand.DROP_SETS, for example the Drop 0 closure set) without one of its files, or with a file
@@ -202,6 +204,15 @@ def release_sets() -> tuple[list[str], list[str]]:
     warnings: list[str] = []
     for brd, name in brand.BRD_NAMES.items():
         folder = brand.out_dir(brd, "FRS")
+        if brd in brand.BDOI_FRS_SETS:  # retired set: only the BDOI-format pack remains
+            frs = brand.bdoi_frs_dir(brd) / brand.BDOI_FRS_SETS[brd]["frs"]
+            if not frs.exists():
+                errors.append(f"{brd} {name}: FRS in BDOI's format missing: {rel(frs)}")
+            left = [p.name for p in folder.glob("*") if p.is_file() and not p.name.startswith(("~$", "."))]
+            if left:
+                errors.append(f"{brd} {name}: old-format set retired (brand.BDOI_FRS_SETS) but {rel(folder)} still "
+                              f"holds {', '.join(sorted(left)[:4])}")
+            continue
         present = {NAME_RE.match(p.name)["order"] for p in folder.glob("*") if NAME_RE.match(p.name)}
         missing = [f"{order} {kind}" for kind, order in brand.READING_ORDER.items() if order not in present]
         ux_missing = [f"{order} {kind} ({ext})" for (kind, ext), order in brand.READING_ORDER_UX.items()

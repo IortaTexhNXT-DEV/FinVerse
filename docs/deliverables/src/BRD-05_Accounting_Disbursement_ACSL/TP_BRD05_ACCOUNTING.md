@@ -100,7 +100,7 @@ The roles-and-access sheet checks each action against the roles that may and may
 | R2 | BRD-5 Accounting, Disbursement and ACSL with Addenda 1 and 2 | as signed |
 | R3 | Test plan workbook BRD-5 (`04_BIBS_TestPlan_BRD-05_Accounting_Disbursement_ACSL_v2.1.xlsx`) | 2.1 |
 | R4 | Sign-off workbook BRD-5 (`03_BIBS_Signoff_BRD-05_Accounting_Disbursement_ACSL_v2.1.xlsx`) | 2.1 |
-| R5 | Test plan BRD-2 Operations (`04_BIBS_TestPlan_BRD-02_Operations_v2.0.xlsx`) | 2.0 |
+| R5 | Test cases and traceability BRD-2 Operations Cashiering, review workbook of the FRS in BDOI's format (`BIBS_RTM_BRD-02_Test_Cases_and_Traceability_v1.0.xlsx`) | 1.0 |
 
 # Test approach
 

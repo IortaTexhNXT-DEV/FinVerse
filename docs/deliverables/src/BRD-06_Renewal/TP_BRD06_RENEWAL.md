@@ -89,9 +89,9 @@ The main BRD repeats most capabilities once per persona. The FRS traces its 1,03
 <!-- table: widths=1.2,8.6,4.2 caption="Reference documents" -->
 | Ref. | Document | Version |
 |---|---|---|
-| R1 | Functional Requirements Specification BRD-6 Renewal (`02_BIBS_FRS_BRD-06_Renewal_v2.0.docx`) | 2.0, 8 Oct 2026 |
+| R1 | Functional Requirements Specification BRD-6 Renewal in BDOI's format (`BIBS_FRS-BDOI_BRD-06_Renewal_v1.1.docx`) | 1.1 |
 | R2 | Renewal BRD pack: Workshop addendum, Addendum 1 and RMEL Phase 2 BRD | BRD v1.0 9-May-2025; addenda 18-Nov-2025 and 8-Apr-2026 |
-| R3 | Test plan workbook BRD-6 (`04_BIBS_TestPlan_BRD-06_Renewal_v2.0.xlsx`) | 2.0 |
+| R3 | Test cases and traceability BRD-6 (`BIBS_RTM_BRD-06_Test_Cases_and_Traceability_v1.0.xlsx`) | 1.0 |
 | R6 | BRD discrepancy and clarification register (`BIBS_Register_BRD-00_Discrepancies_and_Clarifications_v1.2.xlsx`) | 1.2 |
 
 # Test approach

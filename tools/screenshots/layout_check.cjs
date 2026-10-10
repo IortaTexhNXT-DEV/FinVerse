@@ -92,17 +92,18 @@ async function main() {
   const failures = [];
   let checked = 0;
   for (const size of SIZES) {
-    const pages = new Map();
+    let current = null;
+    let page = null;
     for (const [user, route] of SCREENS) {
-      let page = pages.get(user);
-      if (!page) {
+      if (user !== current) {
+        await page?.context().close();
         page = await (await browser.newContext({ viewport: size })).newPage();
         await page.goto(`${BASE}/login`);
         await page.getByLabel('User ID').fill(user);
         await page.getByLabel('Password', { exact: true }).fill(PASSWORD);
         await page.getByRole('button', { name: /^(login|sign in)$/i }).click();
         await page.waitForURL((u) => !u.pathname.startsWith('/login'), { timeout: 30000 });
-        pages.set(user, page);
+        current = user;
       }
       await page.goto(BASE + route);
       await page.waitForLoadState('networkidle').catch(() => {});
@@ -127,6 +128,7 @@ async function main() {
         await page.screenshot({ path: path.join(SHOTS, name) });
       }
     }
+    await page?.context().close();
   }
   await browser.close();
   console.log(`${checked} checks, ${failures.length} failed`);

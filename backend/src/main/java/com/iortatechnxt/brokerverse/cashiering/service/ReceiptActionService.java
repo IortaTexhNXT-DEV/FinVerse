@@ -148,7 +148,7 @@ public class ReceiptActionService {
       throw new BusinessRuleException(
           "REINSTATEMENT_SCOPE",
           "Reinstatement of a cancelled receipt is not enabled (setting "
-              + CashieringDecisions.REINSTATEMENT_SCOPE
+              + CashieringDecisions.REINSTATEMENT_SCOPE_NAME
               + ")");
     }
     Receipt receipt = receipt(receiptId);

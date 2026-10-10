@@ -148,55 +148,100 @@
   padding-left: var(--space-5);
 }
 
-/* User access matrix */
+/* User access matrix: one scroll box (both directions) sized to the window, sticky header row and
+   sticky first column, so both scroll bars are always in sight. */
 .matrix-wrap {
   overflow: auto;
+  height: calc(100vh - 300px);
+  min-height: 320px;
 }
 
 .matrix {
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   font-size: 12px;
+  font-family: var(--font-body, inherit);
 }
 
 .matrix th,
 .matrix td {
-  border: 1px solid var(--color-border);
+  border-right: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
   padding: var(--space-1) var(--space-2);
   text-align: center;
-  white-space: nowrap;
+  vertical-align: middle;
 }
 
 .matrix thead th {
   position: sticky;
   top: 0;
+  z-index: 2;
   background: var(--color-surface-alt);
-  z-index: 1;
+  width: 96px;
+  min-width: 96px;
+  max-width: 120px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.25;
 }
 
-.matrix tbody th {
+.matrix .matrix-role-name {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-weight: 600;
+}
+
+.matrix .matrix-sticky-col {
   position: sticky;
   left: 0;
+  z-index: 1;
   text-align: left;
   background: var(--color-surface);
-  font-family: var(--font-mono);
+  min-width: 260px;
+  max-width: 340px;
+  white-space: normal;
+  box-shadow: 1px 0 0 var(--color-border);
+}
+
+.matrix thead th.matrix-sticky-col {
+  z-index: 3;
+  background: var(--color-surface-alt);
+}
+
+.matrix .matrix-narrow {
+  white-space: nowrap;
+  text-align: left;
+}
+
+.matrix .permission-name > :first-child {
+  font-weight: 600;
+}
+
+.matrix tbody tr:nth-child(even) td,
+.matrix tbody tr:nth-child(even) th {
+  background: var(--color-surface-alt);
+}
+
+.matrix tbody tr:hover td,
+.matrix tbody tr:hover th,
+.matrix .matrix-col-hover {
+  background: var(--brand-blue-050);
 }
 
 .matrix-granted {
   color: var(--color-success);
-  font-weight: 700;
+  display: block;
+  margin: 0 auto;
 }
 
 /* Role-to-action view (PMADD05): permissions behind each granted cell */
 .matrix-cell-permissions {
-  font-family: var(--font-mono);
   font-size: 11px;
-  text-align: left;
+  text-align: left !important;
   white-space: normal;
-  min-width: 120px;
-}
-
-.matrix tbody th.matrix-area {
-  font-family: var(--font-heading);
+  min-width: 140px;
 }
 
 /* List-of-values types with pending values */

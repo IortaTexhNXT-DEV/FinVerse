@@ -810,9 +810,9 @@ data_setup:
 # Annex AN - Assumptions, dependencies and open questions; classification of every earlier question
 open_items:
   intro: >-
-    Only the points that BDOI's FRS does not answer. Every open question, assumption and clarification of the BIBS
-    FRS of Renewal (references RQ, CLR-RN, A-RN, D-RN, DMQ) and every Renewal row of the BDOI Requirements and Inputs
-    by BRD v1.2 was checked against BDOI's FRS: a point BDOI's FRS answers is not repeated here and is listed, with
+    Only the points that BDOI's FRS does not answer. Every open question, assumption and clarification of the earlier
+    reviews of Renewal (references RQ, CLR-RN, A-RN, D-RN, DMQ) and every Renewal row of the BDOI Requirements and
+    Inputs by BRD v1.2 was checked against BDOI's FRS: a point BDOI's FRS answers is not repeated here and is listed, with
     BDOI's clause, in the sheet "Answered in the BDOI FRS" of the Test Cases and Traceability workbook; where BDOI's
     answer differs from the BRD, the decision is in Annex AO. Values and data the Business Unit provides are in the
     requirements collection workbook. The reference numbers keep the link to the earlier decisions.

@@ -52,6 +52,7 @@ from docx.oxml.ns import qn
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import brd06_brd  # noqa: E402
+import brd_common_final as final  # noqa: E402
 import build_brd11_bdoi_frs as base  # noqa: E402  (the helpers of the BDOI-template builders)
 from build_brd11_bdoi_frs import (cell_shade, el_text, last_content, ppr_insert, rpr_shade,  # noqa: E402
                                   set_update_fields, shd_el, strip_ids, subsequence, texts_of, to_pdf)
@@ -651,6 +652,32 @@ class Annexes:
         self.table(["List", "Values"], m["lists"], [2.0, 5.4])
         self.b.stats["parameters"] = len(m["parameters"])
         self.b.stats["lists"] = len(m["lists"])
+        self.settings()
+
+    def settings(self):
+        """AC.9: the points where BDOI's FRS and the BRD differ that BIBS offers both ways, each chosen by a setting the
+        Business Administrator changes with maker-checker, without a release; plus the inputs BDOI gives as settings."""
+        cmp_data = yaml.safe_load(CMP.read_text(encoding="utf-8"))
+        self.h2("AC.9 Settings for the points BDOI decides")
+        self.p("The points where BDOI's FRS and the BRD differ are offered both ways in BIBS, each chosen by a setting "
+               "that the Business Administrator changes with maker-checker, without a release. BDOI's decision only "
+               "confirms the value; the points stay in Annex AO as Configurable - BDOI to confirm the setting. The "
+               "settings without a point number are inputs BDOI gives.")
+        rows = []
+        for k, c in enumerate(cmp_data["conflicts"], 1):
+            if not c.get("setting"):
+                continue
+            cid = f"C{k:02d}"
+            text = clean(c["setting"])
+            m = re.search(r"\(default[,:]?\s*([^)]*)\)", text)
+            default = clean(m.group(1)) if m and m.group(1).strip() else ("As delivered" if m else "-")
+            rows.append([clean(c["topic"]), text, default or "As delivered", cid,
+                         DOC["conflict_owner"].get(cid, "Product Owner, Renewal")])
+        for extra in DOC.get("settings_extra", []):
+            rows.append(list(extra))
+        self.table(["Setting", "Values", "Default", "Settles (Annex AO)", "Decided by"], rows,
+                   [1.4, 3.2, 1.4, 0.8, 1.2], size=7.5)
+        self.b.stats["settings"] = len(rows)
 
     # AL - walkthroughs
     def walkthroughs(self):
@@ -686,61 +713,72 @@ class Annexes:
         cases = test_cases()
         self.h1("Annex AM – Requirements Traceability")
         self.p("AM.1 traces the 42 BRRN requirements of the addenda, and AM.2 the 1,033 requirement lines of the main "
-               "BRD (grouped as in the BIBS FRS), to the FR items of this FRS (FRRN), to the reference requirements of "
-               "the BIBS FRS BRD-06 Renewal v2.0 (FR-RN) and to the test conditions of the BIBS test plan BRD-06 "
-               "(TC-RN-nnn.n). AM.3 lists every reference requirement with the FR items that incorporate it. The test "
-               "cases of each FR item, its acceptance criteria included, are in the Test Cases and Traceability "
-               "workbook.")
+               "BRD (grouped by BRD function), to the FR items of this FRS (FRRN) and to the test conditions of the "
+               "Test Cases and Traceability workbook issued with this FRS (TC-RN-nnn.n; the cases of each condition, "
+               "with the screen and the walkthrough step where it is run, are in the workbook). AM.3 lists every FR "
+               "item of this FRS with its BRD IDs and test conditions.")
+        lm = line_items_map()
+        conds_of: dict[str, list[str]] = defaultdict(list)  # FRRN item -> test conditions
+        brd_of: dict[str, list[str]] = defaultdict(list)  # FRRN item -> BRD IDs
+        for ref, items in list(self.b.fr_to_frum.items()) + list(lm.items()):
+            t = tc_text(ref, cases)
+            for it in items:
+                if t != "-" and t not in conds_of[it]:
+                    conds_of[it].append(t)
         self.h2("AM.1 BRRN requirements")
         rows = []
         for rid, info in self.brrn.items():
-            rows.append([f"{rid} ({info['pages']})", ", ".join(FRRN_RE.findall(self.mapping[rid])),
-                         ", ".join(info["frs"]), "; ".join(tc_text(r, cases) for r in info["frs"])])
-        self.table(["BRD ID", "FR items (this FRS)", "BIBS reference", "Test conditions"], rows,
-                   [1.5, 3.6, 1.5, 3.4], size=7.5)
+            items = FRRN_RE.findall(self.mapping[rid])
+            for it in items:
+                if rid not in brd_of[it]:
+                    brd_of[it].append(rid)
+            rows.append([f"{rid} ({info['pages']})", ", ".join(items),
+                         "; ".join(dict.fromkeys(tc_text(r, cases) for r in info["frs"] if tc_text(r, cases) != "-"))
+                         or "-"])
+        self.table(["BRD ID", "FR items (this FRS)", "Test conditions"], rows, [1.6, 4.2, 4.2], size=7.5)
         n = len(rows)
         self.h2("AM.2 Requirement lines of the main BRD")
         rows = []
-        lm = line_items_map()
         for g in trace_groups():
-            frrn = ", ".join(sorted({x for fr in g["frs"] for x in lm.get(fr, [])}, key=frrn_key)
-                             or sorted({x for i in g["ids"] for x in DOC["out_of_scope"].get(i, [])}))
+            items = sorted({x for fr in g["frs"] for x in lm.get(fr, [])}, key=frrn_key) \
+                or sorted({x for i in g["ids"] for x in DOC["out_of_scope"].get(i, [])})
             ids = g["ids"]
             span = ids[0] if len(ids) == 1 else f"{ids[0]} to {ids[-1]} ({len(ids)} lines)"
+            for it in items:
+                if FRRN_RE.fullmatch(it) and span not in brd_of[it]:
+                    brd_of[it].append(span)
             rows.append([clean(g["function"]), span, g["pages"],
-                         ("Out of scope (p.60); " if g["out"] else "") + frrn, ", ".join(g["frs"]),
-                         "; ".join(tc_text(r, cases) for r in g["frs"])])
-        self.table(["BRD function", "Line IDs", "Pages", "FR items (this FRS)", "BIBS reference", "Test conditions"],
-                   rows, [1.6, 1.9, 0.8, 2.3, 1.2, 2.2], size=7)
+                         ("Out of scope (p.60); " if g["out"] else "") + ", ".join(items),
+                         "; ".join(dict.fromkeys(tc_text(r, cases) for r in g["frs"] if tc_text(r, cases) != "-"))
+                         or "-"])
+        self.table(["BRD function", "Line IDs", "Pages", "FR items (this FRS)", "Test conditions"],
+                   rows, [1.7, 2.0, 0.8, 2.6, 2.9], size=7)
         n += len(rows)
         if sum(len(g["ids"]) for g in trace_groups()) != len(self.lines):
-            raise SystemExit("Annex AN.2 does not hold every line of the BRD")
-        self.h2("AM.3 BIBS reference requirement to FR items")
+            raise SystemExit("Annex AM.2 does not hold every line of the BRD")
+        self.h2("AM.3 FR item to BRD IDs and test conditions")
         rows = []
-        self.listed_refs = set()
-        for fr_id, fr in self.our.items():
-            frrn = ", ".join(self.b.fr_to_frum.get(fr_id, []))
-            if not frrn:
-                raise SystemExit(f"{fr_id} is not incorporated in any FRRN item")
-            brd = ", ".join(x.split(" (")[0] for x in fr["brd"] if isinstance(x, str))
-            rows.append([fr_id, clean(fr["title"]), clean(brd)[:160], frrn, tc_text(fr_id, cases)])
-            self.listed_refs.add(fr_id)
-        self.table(["Reference", "Title", "BRD", "FR items (this FRS)", "Test conditions"], rows,
-                   [0.9, 2.6, 2.4, 2.4, 1.7], size=7)
+        for it in sorted(set(conds_of) | set(brd_of), key=frrn_key):
+            if not FRRN_RE.fullmatch(it):
+                continue
+            rows.append([it, ", ".join(brd_of.get(it, [])) or "-", "; ".join(conds_of.get(it, [])) or "-"])
+        self.table(["FR item (this FRS)", "BRD IDs", "Test conditions"], rows, [1.5, 4.0, 4.5], size=7)
         self.b.stats["trace_rows"] = n + len(rows)
 
     # AO - observations
     def observations(self, review):
         cmp_data = yaml.safe_load(CMP.read_text(encoding="utf-8"))
         self.h1("Annex AO – Observations and Points for BDOI Decision")
-        self.p("Every point where BDOI's FRS and the BRD of 8-Oct-2026 or the BIBS reference FRS differ, the slips "
+        self.p("Every point where the proposed behaviour differs from the original text of this FRS or from the BRD "
+               "of 8-Oct-2026, the slips "
                "noticed in BDOI's text, the changes made to the Business Requirements Mapping, the rows added to "
                "BDOI's annexes and the other observations of this version. BDOI's text is kept in the body of the "
                "document; this annex gives both readings, the BRD text, what version 1.1 proposes, the impact and who "
                "decides. Every point starts as Open; a point that BIBS offers both ways, chosen by a system setting, "
                "reads Configurable - BDOI to confirm the setting. The Business Unit records its decision in the "
                "Change Request Register workbook (sheet Decisions log).")
-        header = ["No.", "Topic", "BDOI FRS text", "BRD text", "Proposed in v1.1", "Impact", "Decision by", "Status"]
+        header = ["No.", "Topic", "Original text of this FRS", "BRD text", "Proposed in v1.1", "Impact", "Decision by",
+                  "Status"]
         widths = [0.7, 1.1, 1.9, 1.5, 2.3, 1.0, 1.0, 0.5]
         no = 0
         section = ""
@@ -753,14 +791,13 @@ class Annexes:
                                           out), section=section))
             return out
         section = "AO.1"
-        self.h2("AO.1 Conflicts between BDOI's FRS, the BRD and the BIBS reference FRS")
+        self.h2("AO.1 Points where the proposed behaviour differs from the original text of this FRS")
         rows = []
         self.cmp_ids = []
         for k, c in enumerate(cmp_data["conflicts"], 1):
             cid = f"C{k:02d}"
             self.cmp_ids.append(cid)
-            prop = (f"{clean(c['recommendation'])} (BIBS reference FRS: {clean(c['ours'])} The system today: "
-                    f"{clean(c['platform'])}.)")
+            prop = f"{clean(c['recommendation'])} (The system today: {clean(c['platform'])}.)"
             if c.get("setting"):
                 prop += f" Available in BIBS: {clean(c['setting'])}"
             rows.append(row(cid, f"{clean(c['topic'])} ({c['kind']})", clean(c["bdoi"]), clean(c["brd"]), prop,
@@ -969,9 +1006,10 @@ def build(highlight: bool, our, lines, functions, trace, brrn, figs: dict):
     a = Annexes(b, mapping, lines, trace, our, brrn)
     a.where = where
     add_annexes(b, a, review, figs)
-    missing_fr = [f for f in our if f not in a.listed_refs]
+    # every requirement of the source specification is carried by at least one FR item of this FRS
+    missing_fr = [f for f in our if not b.fr_to_frum.get(f)]
     if missing_fr:
-        raise SystemExit(f"Annex AM lacks {missing_fr}")
+        raise SystemExit(f"requirements not carried by an FR item: {missing_fr}")
     cmp_n = len(yaml.safe_load(CMP.read_text(encoding="utf-8"))["conflicts"])
     if len(a.listed_conflicts) != cmp_n:
         raise SystemExit("Annex AO lacks conflicts of the comparison")
@@ -1032,7 +1070,12 @@ def main(argv=None) -> int:
     finally:
         shutil.rmtree(work, ignore_errors=True)
     b, n_ids = results[DOC["meta"]["clean"]]
+    for name in (DOC["meta"]["clean"], DOC["meta"]["highlighted"]):
+        print(f"final clean-up of {name}: {final.finalise_docx(OUT / name)}")
+    final.check_no_references([OUT / DOC["meta"]["clean"], OUT / DOC["meta"]["highlighted"]])
     if not args.no_pdf:
+        for name in (DOC["meta"]["clean"], DOC["meta"]["highlighted"]):
+            print(f"table of contents of {name}: {final.populate_toc(OUT / name)} entries")
         pdf = OUT / DOC["meta"]["clean"].replace(".docx", ".pdf")
         to_pdf(OUT / DOC["meta"]["clean"], pdf)
         pages = subprocess.run(["pdfinfo", str(pdf)], capture_output=True, text=True).stdout

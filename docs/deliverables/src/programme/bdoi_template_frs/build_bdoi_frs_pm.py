@@ -70,6 +70,9 @@ OBS = yaml.safe_load((HERE / "pm_observations.yaml").read_text(encoding="utf-8")
 OUT = REPO / "docs" / "deliverables" / "out" / DOC["meta"]["out_folder"]
 
 HL_FILL = "FFF59D"          # light yellow of the review copy
+# Screens added or changed with the full-coverage build of October 2026 (shaded in the review copy of version 1.2)
+SCREENS_V12 = {"SCR-PM-01", "SCR-PM-03", "SCR-PM-04", "SCR-PM-06", "SCR-PM-12", "SCR-PM-16", "SCR-PM-23", "SCR-PM-24",
+               "SCR-PM-25", "SCR-PM-26", "SCR-PM-27", "SCR-PM-28", "SCR-PM-29"}
 HEAD_FILL = "D9E1F2"        # header fill of BDOI's annex tables
 W14 = "http://schemas.microsoft.com/office/word/2010/wordml"
 
@@ -799,6 +802,7 @@ class Annexes:
         for f in files:
             for s in yaml.safe_load(f.read_text(encoding="utf-8"))["screens"]:
                 k += 1
+                self.b.hl = self.b.highlight and s["id"] in SCREENS_V12
                 frpm = sorted({x for fr in s.get("frs", []) for x in self.b.fr_to_frpm.get(fr, [])})
                 frs_titles[s["id"]] = s["title"]
                 self.h2(f"G.{k} {s['title']} ({s['id']})")
@@ -839,6 +843,7 @@ class Annexes:
                 if s.get("rules"):
                     self.p("Rules:", bold=True, keep_next=True)
                     self.bullets([self.refs(r) for r in s["rules"]])
+                self.b.hl = False
         self.b.stats["screens"] = k
         return frs_titles
 
@@ -918,6 +923,15 @@ class Annexes:
         self.table(["Action"] + j["matrix_roles"], j["matrix"], [2.25] + [0.55] * len(j["matrix_roles"]), size=7.5)
         self.h2("J.6 Masters maintained by the business")
         self.table(["Master", "Maintained by", "Authorized by", "Requirement"], j["masters"], [2.6, 1.6, 1.8, 1.2])
+        with v12.this_round(self.b):
+            self.h2("J.7 Settings for the points BDOI decides")
+            self.p("The points where BDOI's FRS and the BRD or the earlier BIBS behaviour differ are offered both ways "
+                   "in BIBS, each chosen by a setting that the System Administrator changes with maker-checker, "
+                   "without a release. BDOI's decision only confirms the value; the points stay in Annex M as "
+                   "Configurable - BDOI to confirm the setting.")
+            self.table(["Setting", "Values", "Default", "Settles (Annex M)", "Decided by"], j["decision_settings"],
+                       [1.5, 2.8, 1.6, 0.7, 1.0], size=8)
+        self.b.stats["decision_settings"] = len(j["decision_settings"])
 
     # Annex K – walkthroughs
     def walkthroughs(self, screen_titles):
@@ -1112,8 +1126,13 @@ def change_summary(b: Builder):
         "the review checklist); a note on what version 1.2 adds.",
         f"Process Flow: a caption under every figure; {s['flows_v12']} process flows, {s['lifecycles']} status "
         "life-cycles and the integration context diagram added (Graphviz, by persona, with service levels).",
-        f"Annex G: section G.23 'Navigation: menu by persona' ({s['menu_personas']} personas, {s['menu_entries']} "
-        f"menu entries). Annex M: section M.5 with {s['observations_v12']} observations of version 1.2. Annex N: "
+        f"Annex G: section G.{s['screens'] + 1} 'Navigation: menu by persona' ({s['menu_personas']} personas, "
+        f"{s['menu_entries']} menu entries). Aligned with BIBS on 10 Oct 2026: screens G.23 to G.29 added "
+        "(Product Maintenance Dashboard, Deactivation Requests, Product Master Transfers, Placement Update Reports, "
+        "Audit Logs, the comparative table of the proposal requests with the proposal slips and the client "
+        "response, and the Routing & Approvals tab), Home, the request form and record, the Comparative tab, the "
+        "product record and Incentive Criteria updated, every screenshot taken again; Annex J.7 with the "
+        f"{s['decision_settings']} settings for the points BDOI decides. Annex M: section M.5 with {s['observations_v12']} observations of version 1.2. Annex N: "
         f"{s['glossary_v12']} terms added.",
         f"New annexes: O Workflow and Approvals ({s['workflow_processes']} processes, {s['workflow_rows']} stages, "
         f"role-to-stage matrix, status names); P E-mail and Notification Texts ({s['notices']}: "
@@ -1132,7 +1151,8 @@ def change_summary(b: Builder):
            b.para("This review copy is BDOI's Functional Requirements Specifications for Product Maintenance with the "
                   "changes of version 1.2 (Business Unit review edition). The passages added in version 1.2 are "
                   "shaded light yellow; BDOI's text and the content of version 1.1 are not shaded and are "
-                  "unchanged. The clean copy has the same content without shading and without this page.",
+                  "unchanged, except the screen specifications of Annex G brought in line with BIBS, which are "
+                  "shaded. The clean copy has the same content without shading and without this page.",
                   size=9.5, hl=False)]
     n = b.new_num()
     for pt in points:

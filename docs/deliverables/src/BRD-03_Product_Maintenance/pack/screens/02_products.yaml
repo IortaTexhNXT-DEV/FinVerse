@@ -98,14 +98,20 @@ screens:
       - "New Rule (field) | List of values / Minimum / Maximum / Pattern | Text / Number | List code; range; regular expression | Cond.: by check | Lists of values | Blank | New rule | Known list; valid pattern | Unknown list of values <lov type>"
       - "New Rule (document) | Document type | Drop-down | Document types | Y | List DOCUMENT_TYPE | Blank | New rule | Active value | -"
       - "New Rule | Mandatory | Check box | - | N | - | Ticked | New rule | - | -"
+      - "Product dialog | Policy Type / Insured's Name | Drop-down; text | Package or non-package policy type; name of the insured of a client-specific package | N | List of values | Blank | Edit | - | -"
+      - "Product dialog | Incentive Amount / Incentive Commission Rate (%) / Approver | Numbers; look-up | Amount in PHP; percentage; name of the approver of the change | Cond.: Approver for a direct change | Users with the approval right | Blank | Edit | Amount above zero; rate above 0% and at most 100% | -"
+      - "Audit Logs | Timestamp / Action Type / Description / Old Value / New Value / Performed By / Remarks | Table | Every change of the product, newest first; CSV and Excel exports | - | Audit trail | - | Read only | - | No activity recorded yet."
     actions:
       - "Edit | PRODUCT_MAINTAIN or MASTER_MAINTAIN | Always | Opens the product dialog (as New product, code fixed); Save for Authorization | Pending Authorization | -"
       - "Authorize / Deactivate | As on Products | As on Products | As on Products | Active / Inactive | -"
       - "New Version | MBS (PRODUCT_MAINTAIN) | Package product with a version in force and no version being set up | Opens New Version; Create Draft copies the version in force into a new draft effective tomorrow and opens it | Draft version | -"
       - "Add Product Rule | PRODUCT_MAINTAIN or MASTER_MAINTAIN | Field Rules & Documents tab | Opens New Rule with the scope set to this product; Save for Authorization | Pending Authorization | -"
       - "[Open a version row] | Every user of the screen | Versions tab | Opens the Package Version | - | -"
+      - "Deactivate Package | MBS (product maintenance right) | Active package without a deactivation waiting | Opens Deactivate Package (SCR-PM-24): effective date, reason, approver and remarks; Submit for Approval | Pending Approval | Workflow notice to the approver"
     rules:
       - "A non-package product has no versions; it is rated on the product rate (FR-PM-050)."
+      - "The product dialog carries the Product Matrix fields of BDOI's FRS: Policy Type, Insured's Name, Incentive Amount, Incentive Commission Rate (%) and the Approver of the change; a change made directly on the Product Matrix waits for that approval (setting Direct maintenance of the Product Matrix) (FR-PM-010, FR-PM-080)."
+      - "The Audit Logs of the product list every change with the old and new value, by whom and when (FR-PM-005)."
       - "A package has at most one version being set up (draft or for validation) at a time (FR-PM-042, FR-PM-050)."
       - "Every version is kept: superseded and expired versions stay readable with their validator and source request (FR-PM-050, FR-PM-005)."
       - "Field rules of all products, of the line and of the product apply together; the account checks refuse a missing or invalid value (FR-PM-012)."
@@ -267,7 +273,7 @@ screens:
       - The incentive alert when a product of a criterion expires or is retired
     shots:
       - {state: list, user: mbs, caption: "Incentive Criteria, Current tab"}
-      - {state: new, user: mbs, click: "^new criterion$", caption: "New Incentive Criterion dialog with its rule parameters"}
+      - {state: new, user: mbs, click: "^add incentive criterion$", caption: "New Incentive Criterion dialog with its rule parameters"}
     fields:
       - "Tabs | Current / Pending Authorization / History | Tab | - | - | Fixed | Current | - | Current = active and not ended; History = ended, replaced or inactive | -"
       - "Search | Search Criterion or Product | Text | Code of a criterion or a product | N | - | Blank | - | Contains search | -"
@@ -283,7 +289,7 @@ screens:
       - "New Incentive Criterion | Description | Text | Free text | N | - | Blank | Pending; amendment | - | -"
       - "New Incentive Criterion | Products matrix | Drop-down and rows | Active product, with a segment per product (Any segment) | Y (at least one) | Active products; list MARKET_SEGMENT | None | Pending; amendment | Active products only | Select at least one product of the matrix"
     actions:
-      - "New Criterion | MBS (INCENTIVE_CRITERIA_MAINTAIN) | Always | Opens New Incentive Criterion; Save for Authorization | Pending Authorization | -"
+      - "Add Incentive Criterion | MBS (INCENTIVE_CRITERIA_MAINTAIN) | Always | Opens New Incentive Criterion; Save for Authorization | Pending Authorization | -"
       - "[Open a row] | MBS (INCENTIVE_CRITERIA_MAINTAIN) | Row not inactive | Opens Change <code> (pending row) or Amend <code> (active row: a successor from a later date) | Pending Authorization | -"
       - "Authorize | PRODUCT_AUTHORIZE (Business Administrator, New Business Approver), not the maker | Pending row | From the row action menu, after the confirmation: authorises the criterion; an authorised amendment ends the active row the day before it starts | Active | -"
       - "Deactivate | MBS (INCENTIVE_CRITERIA_MAINTAIN) | Active row | From the row action menu (last, in red); asks the reason, kept in the audit trail, and ends the criterion; its history stays | Inactive | -"

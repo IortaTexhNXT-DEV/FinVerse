@@ -471,15 +471,16 @@ def menu_page(a):
            f'<TR><TD BGCOLOR="#014EA9"><FONT COLOR="white">Product Maintenance menu</FONT></TD>{head}</TR>'
            f'{body}</TABLE>>]; }}')
     png = _render_text(b, "menu_persona", dot)
+    g = b.stats["screens"] + 1
     with this_round(b):
-        a.h2("G.23 Navigation: menu by persona")
+        a.h2(f"G.{g} Navigation: menu by persona")
         a.p("The Product Maintenance entries of the menu (Client & Policy › Product Maintenance) that each persona "
             "sees, with the sign-in ID of the persona in the BIBS UAT environment. A green cell means the persona "
             "sees the entry; the actions inside each screen follow the role (Annex J.5). The screen standards "
             "(layout, tables with row action menus, dates dd-MMM-yyyy, formatted amounts, messages) are those of "
             "the programme screen standards and are not repeated here.")
         a.els.append(b.picture(png, max_w=7.2, max_h=6.0))
-        a.els.append(caption(b, "Figure G.23 – Product Maintenance menu by persona"))
+        a.els.append(caption(b, f"Figure G.{g} – Product Maintenance menu by persona"))
         b.stats["menu_personas"] = len(roles)
         b.stats["menu_entries"] = len(screens)
 

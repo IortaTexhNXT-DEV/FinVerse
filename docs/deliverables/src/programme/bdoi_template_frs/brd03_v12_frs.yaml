@@ -19,9 +19,9 @@
 # feeds the workbooks.
 
 revision:
-  date: 09 Oct 2026
+  date: 09 Oct 2026 - 10 Oct 2026
   version: "1.2"
-  description: "Business Unit review edition: summary for the Business Unit, end-to-end flows, workflow and approvals, e-mail texts, document formats, reports and schedules, integrations, non-functional requirements, open questions not answered in the BDOI FRS, change control, review checklist"
+  description: "Business Unit review edition: summary for the Business Unit, end-to-end flows, workflow and approvals, e-mail texts, document formats, reports and schedules, integrations, non-functional requirements, open questions not answered in the BDOI FRS, change control, review checklist; aligned on 10 Oct 2026 with BIBS: new and changed screens with current screenshots (workspace, dashboard, deactivation, routing and deployment, product master transfer, comparative table with Final Terms, proposal slips and client response, Consolidated Placement Update Report, audit logs), settings for the points BDOI decides (Annex J.7)"
   by: "iorta TechNXT Project Team (drafting)"
 
 intro_note: "Version 1.2 adds, for the review of the Business Unit, a summary of the module in pictures and tables (section 1.4), the end-to-end process flows and status life-cycles of every process of the BRD, and Annexes O to X: workflow and approvals, e-mail and notification texts, document prints, reports and schedules, integrations, non-functional requirements, data set-up at go-live, the open questions that BDOI's FRS does not answer, change control after sign-off and the review checklist. BDOI's text and the content of version 1.1 are unchanged."
@@ -690,7 +690,9 @@ reports:
     - ["Daily package check", "Daily 01:00", "Expiry and anniversary alerts from 90 days (NT-08); expiry of packages past their expiry date (NT-04); automatic drafting of renewal requests when switched on; review notice of incentive rules (NT-09)", "TSU, MBS, Alerts screen", "FRPM.003.05, FRPM.004.01, FRPM.018.02, FRPM.026.01"]
     - ["Daily version check", "Daily 01:00", "A released version takes effect on its effective date; the previous version is superseded", "-", "FRPM.024.01"]
     - ["Daily service-level check", "Daily 09:30", "Requests past the service level of their stage are marked red and raise 'Work item overdue' (NT-11)", "Alerts screen; dashboards", "FRPM.028.01"]
-    - ["Weekly Placement Update Report", "Thursday 08:00 (configurable)", "Generates and stores the Consolidated Placement Update Report; notice NT-17 (proposed)", "TSU, Marketing", "FRPM.007.01"]
+    - ["Weekly Placement Update Report", "Thursday 08:00 for the last 7 days (settings of Annex J.7)", "Generates and stores the Consolidated Placement Update Report in the repository of Placement Update Reports; notice NT-17", "TSU, Marketing", "FRPM.007.01"]
+    - ["Package deactivation", "Daily 01:05", "Deactivates the packages whose approved deactivation is effective today and queues the change for the product master transfer", "The requester; MBS", "FRPM.003.05, FRPM.003.07"]
+    - ["Product master transfer", "Every 30 minutes, and Send Now", "Writes the waiting product master changes to the file ProductMaster_yyyyMMddHHmmss.csv for the receiving systems; a failure is alerted", "MBS (Product Master Transfers screen)", "FRPM.029.01"]
     - ["E-mail sending", "Every 2 minutes", "Sends the queued e-mails (Quotation Slips, advisories, passwords) and records their status", "-", "FRPM.012.01, FRPM.027.01"]
 
 # ------------------------------------------------------------------------------------------------ Annex S
@@ -708,7 +710,7 @@ integrations:
     - ["IN-08", "E-mail channel of BDOI (Microsoft 365 or CCM)", "From Product Maintenance", "Quotation Slips, advisories, ManCom notices, password e-mails", "On each send", "Tens a month", "TSU", "E-mail channel and sender address", "To be provided (PM-Q46)", "FRPM.012.01, FRPM.014.01, FRPM.027.01; BRPM.012, BRPM.020"]
     - ["IN-09", "Insurers", "To insurers (by e-mail)", "Protected Quotation Slips; replies received by e-mail and keyed in", "Per round", "Per round", "TSU", "-", "Insurer placement e-mails (PM-Q52)", "FRPM.012.01; BRPM.012, BRPM.013"]
     - ["IN-10", "Document store (ECM)", "From Product Maintenance", "Package documents and attachments", "On upload or generation", "Per document", "TSU, MBS", "Document store access", "Given (programme)", "BRPM.016, BRPM.024"]
-    - ["IN-11", "Other BDOI systems (to be named)", "From Product Maintenance", "Product master changes: product, version, effective date, status", "On each release and expiry", "Low", "MBS", "Receiving systems, format, timing", "To be provided (PQ16)", "FRPM.029.01; BRPM.022"]
+    - ["IN-11", "Other BDOI systems (to be named)", "From Product Maintenance", "Product master changes (package added, updated, deactivated or expired: product, version, effective date, request, status) in the file ProductMaster_yyyyMMddHHmmss.csv", "Every 30 minutes and on Send Now, for each approved change, deactivation and expiry", "Low", "MBS", "Receiving systems, the folder they read and the timing", "Available in BIBS and run end to end in SIT and UAT against the receiving system simulator (Product Master Transfers screen); folder and receiving systems from BDOI IT at SIT (PQ16)", "FRPM.029.01; BRPM.022"]
 
 # ------------------------------------------------------------------------------------------------ Annex T
 nfr:

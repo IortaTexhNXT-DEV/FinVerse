@@ -9,29 +9,43 @@ screens:
     title: Product Maintenance Home
     route: /product-maintenance
     purpose: >-
-      The starting point of Product Maintenance: where every package request stands, by stage, with the requests past
-      their service level; the packages ending within 30, 60 and 90 days; the package versions waiting for validation,
-      the advisories not yet sent and the comparative outputs of the week. Every tile opens its list.
+      The workspace of Product Maintenance: the Product Matrix of every package and non-package product (active,
+      expiring within 90 days and expired) with its filters and exports, the Quotation Request List of the non-package
+      products and the Package Request List, each with its row actions; the figures and stage tiles are on the
+      Product Maintenance Dashboard (SCR-PM-23).
     entry:
       - Sign in, then the sidebar entry Product Maintenance Home
     shots:
-      - {state: view, user: tsuhead, caption: "Product Maintenance Home of the TSU Head"}
+      - {state: view, user: tsuhead, caption: "Product Maintenance Home: the Product Matrix"}
+      - {state: quotations, user: tsuhead, tab: Quotation Request List, caption: "Product Maintenance Home: the Quotation Request List"}
+      - {state: packages, user: tsuhead, tab: Package Request List, caption: "Product Maintenance Home: the Package Request List"}
     fields:
-      - "Package requests by stage | Drafts / For Approval / TSU Review / Negotiation / ManCom / With MBS / For Validation / Released | Tile | Count of requests; '· n overdue' added when a request of the tile is past its due time | - | Package requests of the company | - | Read only | Red marker when a request is overdue or due within eight hours | -"
-      - "Packages ending soon | Within 30 days / Within 60 days / Within 90 days | Tile | Count of released packages whose package end date falls in the window | - | Package versions in force | - | Read only | The 30-day tile is always marked | -"
-      - "Shortcuts | Versions for validation | Tile | 'n set up by MBS, waiting for the checkpoint' | - | Package requests in For Validation | - | Read only | - | -"
-      - "Shortcuts | Advisories pending | Tile | 'n drafted, not sent yet' | - | Draft advisories of the company | - | Read only | - | -"
-      - "Shortcuts | Comparative outputs this week | Tile | 'n master and client outputs generated' | - | Comparative outputs of the last seven days | - | Read only | - | -"
-      - "Shortcuts | Package Expiry | Tile | Link | - | - | - | Read only | - | -"
+      - "Product Matrix | Active Products / Expiring Products (90 days) / Expired Products | Tab | Products in force, ending within 90 days, ended | - | Products and package versions | Active Products | - | - | -"
+      - "Product Matrix | Search Package Name or Risk Code | Text | Part of the name or the risk code | N | - | Blank | - | - | -"
+      - "Product Matrix | Line of Insurance / Product Type | Filters | Line names; Package, Non-Package | N | Product lines; fixed list | All | - | - | -"
+      - "Product Matrix | Line of Insurance / Sub-Line / Package Name | Columns | Line; sub-line; name with the risk code and Package or Non-Package | - | Products | - | Read only | - | -"
+      - "Product Matrix | Package Description / Insurer / Status | Columns | Description; insurer of the package; Active, Expiring, Expired, Deactivated | - | Products | - | Read only | - | -"
+      - "Product Matrix | Effective Date / Expiry Date | Columns | dd-MMM-yyyy | - | Package versions | - | Read only | - | -"
+      - "Product Matrix | Last Updated By / Last Updated Date | Columns | Name; dd-MMM-yyyy | - | Products | - | Read only | - | -"
+      - "Quotation Request List | Search Request Number or Assured / Open Requests Only | Text; check box | Part of the number or the name | N | - | Blank | - | - | -"
+      - "Quotation Request List | Quotation Request Number / Related Reference Number / Business Type / Assured's Name | Columns | PRF-yyyy-nnnnnn with its date; ARN; New Business or Renewal; name | - | Proposal requests | - | Read only | - | -"
+      - "Quotation Request List | Product Line / Account Officer / Assigned TSU User / Submission Date | Columns | Line; names; dd-MMM-yyyy | - | Proposal requests | - | Read only | - | -"
+      - "Quotation Request List | Effective / Expiry Date / Current Status / Aging (Days) | Columns | Period; status; working days since the submission | - | Proposal requests | - | Read only | - | -"
+      - "Package Request List | Search Request Number or Package | Text | Part of the number or the name | N | - | Blank | - | - | -"
+      - "Package Request List | Package Request Number / Reference Number / Request Type / Product Line | Columns | PKR-yyyy-nnnnnn; package code; type; line | - | Package requests | - | Read only | - | -"
+      - "Package Request List | Account Officer / Assigned TSU User / Submission Date / Current Status | Columns | Names; dd-MMM-yyyy; status | - | Package requests | - | Read only | - | -"
     actions:
-      - "New Package Request | Marketing AO, Marketing TL, TSU Officer (permission PKG_REQUEST) | Always | Opens the New Package Request form | - | -"
-      - "[A stage tile] | Every user of the screen | Always | Opens Package Requests on the tab of the tile | - | -"
-      - "[An expiry tile] | Every user of the screen | Always | Opens Package Expiry with the window of the tile | - | -"
+      - "New Package Request | Marketing AO, Marketing TL, TSU Officer (package request right) | Always | Opens the New Package Request form | - | -"
+      - "Excel / PDF / CSV | Every user of the screen | Always | Exports the Product Matrix of the filters on screen, named by the convention <name>_MMDDYYYY | - | -"
+      - "View Package / Update Package | Every user; Update Package for MBS while direct maintenance is on | A row of the Product Matrix | Opens the product record, or its editor for the update with approval | - | -"
+      - "View Quotation Request | Every user of the screen | A row of the Quotation Request List | Opens the proposal request (SCR-PM-28) | - | -"
+      - "[A row of the Package Request List] | Every user of the screen | Always | Opens the package request (SCR-PM-04) | - | -"
     rules:
-      - "The counts are those of the company selected in the page header (FR-PM-070)."
-      - "A request is marked overdue when its stage due time has passed and due soon within eight hours of it; the due time comes from the service level hours of the stage (FR-PM-073)."
-    outcome: Each user sees at once the package work waiting in each stage and the packages that end soon, and opens the list in one click.
-    frs: [FR-PM-070, FR-PM-073]
+      - "The lists are those of the company selected in the page header (FR-PM-070)."
+      - "Expiring Products lists the packages that end within 90 days, the alert period of BDOI's FRPM.004.01 (FR-PM-060, FR-PM-070)."
+      - "The Product Matrix is maintained directly by MBS with approval while the setting Direct maintenance of the Product Matrix is on (as delivered); with the setting off new packages come only from package requests (FR-PM-010, FR-PM-070)."
+    outcome: Each user finds every product, quotation request and package request of Product Maintenance in one place and opens it in one click.
+    frs: [FR-PM-070, FR-PM-024, FR-PM-010]
     tests: [HOME]
 
   - id: SCR-PM-02
@@ -95,6 +109,13 @@ screens:
       - {state: filled, user: ao, fill: new_request, caption: "New Package Request with the requested terms and target insurers entered"}
       - {state: error, user: ao, fill: new_request_invalid, submit: "^save draft$", caption: "Field messages after Save Draft without the name, line and reason"}
     fields:
+      - "Source and Package Details | Source | Radio buttons | Marketing (Marketing approval first, then TSU review), TSU (goes to TSU review at once), Insurer | Y | Fixed list | Marketing | Draft; TSU review | - | -"
+      - "Source and Package Details | Business Origin | Drop-down | Bank referral, Direct client, Insurer offer, Affinity or programme | N | List of values | Select | Draft; TSU review | - | -"
+      - "Source and Package Details | Account Officer / Unit Head | Look-up | Names of the Marketing users | N | Users | Blank | Draft; TSU review | - | -"
+      - "Source and Package Details | Insured's Name / Type of Cover / Description of Cover / Cover / Undertaking / Extensions of Cover / Warranties, Clauses / Other Instructions / Maximum Limit/s / Premium | Text | As BDOI's Annex E of the request form | N | - | Blank | Draft; TSU review | - | -"
+      - "Source and Package Details | Estimated No. of Policies to be Issued | Number | Whole number | N | - | Blank | Draft; TSU review | At least the least number of policies (20 as delivered) | Enter at least 20 policies"
+      - "Source and Package Details | Estimated Total Basic Premium to be Issued | Number | Amount in PHP | N | - | Blank | Draft; TSU review | At least the least premium (5,000,000.00 as delivered) | Enter at least 5,000,000.00"
+      - "Source and Package Details | Incentive Eligible / Incentive Amount / Incentive Commission Rate (%) | Check box; numbers | Amount in PHP; percentage | Cond.: amount or rate when eligible | - | Not eligible | Draft; TSU review | Amount above zero; rate above 0% and at most 100% | Enter the incentive amount or the incentive commission rate"
       - "Request | Request type | Drop-down | New package, Amend package terms, Update package details, Renew package, Retire package, Reactivate expired package | Y | List PKG_REQUEST_TYPE | New package | New request only (fixed once saved) | The type of a saved request cannot change | The type of a request cannot change"
       - "Request | Scope | Drop-down | Generic programme or Client-specific package | Y | Fixed list | Generic programme | Draft; TSU review | - | Select the request type and the package scope"
       - "Request | Package / programme name | Text | Up to 200 characters | Y | - | Blank | Draft; TSU review | Not blank | Enter the package or programme name"
@@ -133,6 +154,8 @@ screens:
       - "Before submission the request needs its requested terms (coverages or sections), at least one target insurer when negotiated, and the package end date; a retirement needs none of these (FR-PM-020)."
       - "What is still missing for the submission is shown in the information notice Before submitting above the form; the coverages are chosen by name from the coverages of the product line (FR-PM-020)."
       - "The type and the product of a saved request cannot change (FR-PM-020)."
+      - "A request from Marketing goes to the Marketing approval first; a request from TSU or from an insurer goes to the TSU review at once (FR-PM-020, FR-PM-021)."
+      - "The least estimated number of policies and the least estimated total basic premium are settings (20 and 5,000,000.00 as delivered) (FR-PM-020)."
       - "A draft is edited by the Marketing or TSU users who create requests; during the TSU review, by the TSU Team Lead (FR-PM-020, FR-PM-022)."
     outcome: The package request is numbered, complete and waiting for the Marketing approval, with its supporting documents attached.
     frs: [FR-PM-020, FR-PM-010, FR-PM-045]
@@ -146,8 +169,9 @@ screens:
       One package request: its number, stage and flags, the key facts (type, client or programme, line and product,
       scheme rate, package term, insurers), the workflow header (stage stepper, then Current Stage, Since, Due and Assigned To) with the actions of the stage, and the tabs
       Details, Requested Terms, Negotiation, Comparative, Requirements & Sign-off, Set-up, Advisories, Documents,
-      E-mails and History. This section specifies the header, the stage actions and the tabs Details, Requested Terms,
-      Documents, E-mails and History; the other tabs have their own sections (SCR-PM-05 to SCR-PM-08).
+      E-mails, History, Routing & Approvals and Audit Logs. This section specifies the header, the stage actions and the
+      tabs Details, Requested Terms, Documents, E-mails, History and Audit Logs; the other tabs have their own sections
+      (SCR-PM-05 to SCR-PM-08, Routing & Approvals SCR-PM-29).
     entry:
       - Package Requests › a row
       - TSU Workbench › a row
@@ -176,6 +200,7 @@ screens:
       - "History › Insurer response revisions | Changed / By / Rev. / Outcome / Rate % / Remarks | Table | Every saved revision of every insurer response | - | Response history | - | Read only | - | No insurer response keyed in yet"
       - "Documents | [Documents panel] | Table and upload | See Common screen elements | - | Attachments of the request | - | Every stage (PKG_REQUEST, PKG_NEGOTIATE, attachment permission) | File checks | -"
       - "E-mails | [Sent e-mails] | Table | Recipient, subject, attachments, status | - | Outbound messages of the request | - | Read only | - | -"
+      - "Audit Logs | Timestamp / Action Type / Description / Old Value / New Value / Performed By / Remarks | Table | Every change of the request, newest first; CSV and Excel exports | - | Audit trail | - | Read only | - | No activity recorded yet."
     actions:
       - "Request Form | Every user of the screen | Always | Downloads the Package Request Form (PDF) with the requested terms | Unchanged | -"
       - "Edit | PKG_REQUEST in Draft; PKG_TSU_RECOMMEND (TSU Team Lead) in For TSU review | Draft or For TSU review | Opens Edit Package Request | Unchanged | -"
@@ -273,8 +298,10 @@ screens:
     route: /product-maintenance/requests/:id
     parent: /product-maintenance/requests
     purpose: >-
-      The comparison of the insurer terms of the latest round, the one current comparative master kept for audit, and
-      the client views derived from it for a client presentation. Every output is stored with its PDF and Excel file.
+      The comparison of the insurer terms of the latest round, the one current comparative master kept for audit, the
+      client views derived from it for a client presentation, and the comparative table with the options of each
+      insurer and the final terms, from which the proposal slips per insurer are generated (as for the quotation
+      requests, SCR-PM-28). Every output is stored with its PDF and Excel file.
     entry:
       - Package Request record › Comparative tab
     shots:
@@ -291,12 +318,21 @@ screens:
       - "Generate Client View | Title | Text | Up to 200 characters | Y | - | Client view – <client or package name> | - | Not blank | Enter the title of the view"
       - "Generate Client View | Fields shown | Check boxes | Outcome, Rate %, Minimum Premium, Coverages, Deductibles, Conditions / Warranties, Valid Until, Remarks | Y (at least one) | Fixed list | Outcome, Rate %, Coverages, Deductibles | - | Known fields only | -"
       - "Generate Client View | Insurers shown | Check boxes | Insurers of the master | Y (at least one) | Current master | Every insurer | - | Insurers of the master | Select at least one insurer of the master"
+      - "Comparative Table | Field / QS Value / Final Terms for Proposal | Grid | One row per comparison field (Coverage, Sum Insured, Period of Insurance, Premium, Premium Rate (%), Commission Rate (%), Deductibles, Terms and Conditions, Warranties, Clauses, Extensions of Cover, Other Quotation Details); the value of the quotation slip; one column per option of each insurer with its response; the final terms keyed by TSU | - | Insurer responses and options | - | Final terms: negotiation stages | - | -"
+      - "Comparative Table | Insurer Response | Drop-down | Approved, Not Covered, Others | Y | Fixed list | - | Option dialog | Others needs the actual response | Specify the insurer's actual response for Others"
+      - "Insurers for the Proposal | [Insurer check boxes] | Check boxes | Insurers that gave terms | Y (at least one) | Insurer responses | None | Terms agreed | - | -"
+      - "Proposal Slips | Insurer / Version / File Name / Generated By / Generated On | Table | One proposal slip per selected insurer, numbered by version | - | Proposal files | - | Read only | - | No proposal has been generated yet"
     actions:
       - "Compile Master | PKG_NEGOTIATE | The slip of the latest round was sent | Compiles a new comparative master from the latest round; the previous master becomes Superseded | - | -"
       - "Generate Client View | PKG_NEGOTIATE | A current master exists | Opens Generate Client View; Generate stores a view with the chosen fields and insurers, taken from the master's values | - | -"
       - "PDF / Excel | Every user of the screen | Always | Downloads the stored output | - | -"
+      - "Choose Fields | TSU (negotiation right) | Always | Chooses the comparison fields shown in the table and to the client | - | -"
+      - "Edit / Add Option | TSU (negotiation right) | Insurer column | Keys the response of the insurer and its values, or a further option of the same insurer | - | -"
+      - "Final Terms History | Every user of the screen | Always | Shows every change of the final terms with the previous and new value, by whom and when | - | -"
+      - "Proceed to Proposal | TSU (negotiation right) | Terms agreed; at least one insurer selected | Generates one proposal slip per selected insurer and lists it under Proposal Slips | - | Workflow notice"
     rules:
       - "There is one current comparative master per request; a new master supersedes the previous one (FR-PM-034)."
+      - "The comparative table shows the value of the quotation slip, every option of every insurer and the final terms for the proposal; every change of a final term is kept with its old and new value (FR-PM-033, FR-PM-034)."
       - "A client view is taken from the current master and never changes a value; it shows only the fields and insurers chosen (FR-PM-035)."
       - "Every output is attached to the request with its SHA-256 and written to the audit trail (FR-PM-034, FR-PM-005)."
     outcome: TSU and Marketing compare the insurers on one current table and give the client a tailored view that matches it.

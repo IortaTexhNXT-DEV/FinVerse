@@ -129,6 +129,11 @@ const opens = {
   with_mbs: (ctx) => `/product-maintenance/requests/${ctx.sql("select id from pm_request where status = 'WITH_MBS' order by request_no desc limit 1")[0]?.[0] ?? requestId(ctx, 'PKR-2026-900005')}`,
   released: (ctx) => `/product-maintenance/requests/${requestId(ctx, 'PKR-2026-900006')}`,
   packaged_product: () => '/catalog/products/MTR12',
+  // A package without a deactivation request (the seed requests are on MTR27 to MTR29).
+  deactivation_product: () => '/catalog/products/CAR02',
+  // The proposal requests of the Non-Package Management (BRD-1): terms received, and accepted by the client.
+  terms_received: (ctx) => `/proposals/${ctx.one("select id from npk_proposal where prf_no = 'PRF-2026-900004'")}`,
+  accepted: (ctx) => `/proposals/${ctx.one("select id from npk_proposal where prf_no = 'PRF-2026-900005'")}`,
   released_product: () => '/catalog/products/PAR25',
   draft_version: () => '/catalog/products/MTR12/versions/2',
   version_for_validation: async (ctx) => {
@@ -189,7 +194,94 @@ async function rowMenu(page, label) {
   await page.waitForTimeout(400);
 }
 
+/** The comparative table of PRF-2026-900004 with the Final Terms for Proposal keyed from the best option. */
+async function finalTerms(ctx) {
+  const id = ctx.one("select id from npk_proposal where prf_no = 'PRF-2026-900004'");
+  const view = await ctx.api('tsu', 'GET', `/product-maintenance/terms/quotation/${id}`);
+  const t = view.table;
+  const best = t.columns.filter((c) => c.answer === 'APPROVED')
+    .sort((x, y) => Number(x.values.premium ?? 9e15) - Number(y.values.premium ?? 9e15))[0];
+  if (best && Object.values(t.finalTerms || {}).every((v) => v === null || v === '')) {
+    const values = {};
+    t.fields.forEach((f) => {
+      const v = best.values[f] ?? t.qsValues[f];
+      if (v !== null && v !== undefined && v !== '') {
+        values[f] = String(v);
+      }
+    });
+    await ctx.api('tsu', 'PUT', `/product-maintenance/terms/quotation/${id}/final-terms`, values);
+  }
+  return { id, view: await ctx.api('tsu', 'GET', `/product-maintenance/terms/quotation/${id}`) };
+}
+
+const custom = {
+  'scr-pm-28-01-table': async (ctx) => {
+    const { id } = await finalTerms(ctx);
+    const page = await ctx.pageOf('tsu');
+    await page.goto(`${ctx.BASE}/proposals/${id}`);
+    await ctx.settle(page);
+    await ctx.openTab(page, 'Comparative Table');
+    return page;
+  },
+  // The insurers that approved are selected, then the proposal slips are generated for them.
+  'scr-pm-28-03-proposals': async (ctx) => {
+    const { id, view } = await finalTerms(ctx);
+    const insurers = [...new Set(view.table.columns.filter((c) => c.answer === 'APPROVED').map((c) => c.insurerCode))];
+    const files = await ctx.api('tsu', 'GET', `/product-maintenance/terms/quotation/${id}/proposals`);
+    if (files.length === 0) {
+      if ((view.table.selectedInsurers || []).length === 0) {
+        await ctx.api('ao', 'POST', `/product-maintenance/terms/quotation/${id}/proceed`,
+          { insurers, comment: 'Client prefers the two lowest premiums' });
+      }
+      await ctx.api('tsu', 'POST', `/product-maintenance/terms/quotation/${id}/proposals`, { comment: 'Proposal slips per insurer' });
+    }
+    const page = await ctx.pageOf('tsu');
+    await page.goto(`${ctx.BASE}/proposals/${id}`);
+    await ctx.settle(page);
+    await ctx.openTab(page, 'Comparative Table');
+    // The card is far down the tab: the cards above it are folded away so that it is within the captured window.
+    await page.evaluate(() => document.querySelectorAll('main section.card').forEach((c) => {
+      const h = c.querySelector(':scope > header h2');
+      if (!h || !/Proposal Slips|Insurers for the Proposal/.test(h.textContent || '')) {
+        c.style.display = 'none';
+      }
+    }));
+    await page.waitForTimeout(300);
+    return page;
+  },
+  // The Deactivate Package dialog filled in by MBS (effective in 30 days).
+  'scr-pm-24-03-new': async (ctx) => {
+    const page = await ctx.pageOf('mbs');
+    await page.goto(`${ctx.BASE}/catalog/products/CAR02`);
+    await ctx.settle(page);
+    await ctx.clickButton(page, '^deactivate package$');
+    const dialog = page.locator('dialog[open]').last();
+    const d = new Date(Date.now() + (8 + 24 * 30) * 3600 * 1000);
+    const mon = d.toLocaleString('en-GB', { month: 'short', timeZone: 'UTC' });
+    await dialog.getByLabel(/^deactivation effective date/i).fill(`${String(d.getUTCDate()).padStart(2, '0')}-${mon}-${d.getUTCFullYear()}`);
+    await dialog.getByLabel(/^reason for deactivation/i).selectOption({ label: 'Replaced by another package' });
+    await dialog.getByLabel(/^remarks/i).fill('Replaced by the Commercial Banking Insurance Program of 2027');
+    await dialog.getByLabel(/^approver/i).click();
+    await page.getByRole('option').first().click().catch(() => {});
+    await page.waitForTimeout(500);
+    return page;
+  },
+};
+
 const after = {
+  'scr-pm-27-01-list': async (page, ctx) => {
+    await ctx.fillField(page, 'From', '01-Sep-2026');
+    // The filter (not the sortable column header of the same name).
+    const box = page.locator('main').getByRole('combobox', { name: /^action type$/i }).first();
+    await box.click();
+    await page.getByRole('option', { name: /^create$/i }).first().click();
+    await page.waitForLoadState('networkidle').catch(() => {});
+    await page.waitForTimeout(800);
+  },
+  'scr-pm-28-02-option': async (page) => {
+    await page.getByRole('button', { name: /^add option$/i }).first().click();
+    await page.waitForTimeout(600);
+  },
   // The dialog with an incentive type and one rule parameter row filled (fictitious values).
   'scr-pm-16-02-new': async (page) => {
     const dialog = page.locator('dialog[open]');
@@ -280,6 +372,11 @@ const callouts = {
 const exceptionsCard = '[data-callout="rate-exceptions"]';
 const crops = {
   'scr-pm-01-01-view': 'full',
+  // The comparison of the round of a package request (its comparative table follows on the tab).
+  'scr-pm-06-01-tab': 'section.card:has(button:text-is("Compile Master"))',
+  'scr-pm-28-01-table': 'section.card:has(button:text-is("Choose Fields"))',
+  'scr-pm-28-03-proposals': 'section.card:has(> header h2:text-is("Proposal Slips"))',
+  'scr-pm-28-04-response': 'section.card:has(> header h2:text-is("Client Response"))',
   // The quotation steps of walkthrough A show the Rate Exceptions card with its rows.
   'wt-a-22': exceptionsCard,
   'wt-a-24': exceptionsCard,
@@ -287,6 +384,6 @@ const crops = {
 };
 
 module.exports = {
-  crops, opens, fills, selects: {}, uploads: {}, after, custom: {}, walkthrough: walkthrough.steps, documents: docs, callouts,
+  crops, opens, fills, selects: {}, uploads: {}, after, custom, walkthrough: walkthrough.steps, documents: docs, callouts,
   prepare: walkthrough.prepare, render,
 };

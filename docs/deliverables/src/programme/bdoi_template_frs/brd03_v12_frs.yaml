@@ -401,7 +401,7 @@ notifications:
       attachments: "None"
       protection: "-"
       frequency: "Once per reassignment"
-      source: "Proposed (BDOI's FRPM.017.01; BIBS notifies the new assignee, NT-10)"
+      source: "Sent by BIBS (the new assignee receives NT-10)"
       frpm: "FRPM.017.01"
     - id: NT-16
       name: Quotation Slip decision to the preparer
@@ -418,14 +418,14 @@ notifications:
     - id: NT-17
       name: Weekly Placement Update Report available
       trigger: "The scheduled run of the Consolidated Placement Update Report (Thursday 08:00)"
-      recipients: "TSU Head, TSU Team Leads and Marketing unit heads (to be confirmed, Annex V)"
+      recipients: "The users who may view the Product Maintenance reports"
       channel: In-system notice
-      subject: "Placement Update Report of <dd-MMM-yyyy>"
-      body: "The Consolidated Placement Update Report of <dd-MMM-yyyy> (<n> requests) is available in the report repository."
+      subject: "PlacementUpdate_<MMDDYYYY>.xlsx generated"
+      body: "<n> request(s) of <period from> to <period to>"
       attachments: "None; the notice opens the report repository"
       protection: "-"
-      frequency: "Weekly"
-      source: "Proposed (BDOI's FRPM.007.01)"
+      frequency: "Weekly, and at each run on request"
+      source: "Sent by BIBS"
       frpm: "FRPM.007.01"
     - id: NT-18
       name: Non-package Quotation Slip to insurers
@@ -451,6 +451,102 @@ notifications:
       frequency: "Once per send"
       source: "Sent by BIBS (New Business FRS, NT-12)"
       frpm: "FRPM.009.02, FRPM.010.01"
+    - id: NT-20
+      name: Package anniversary
+      trigger: "The daily check finds a package version whose anniversary date is within the anniversary notice days (90 by default)"
+      recipients: "TSU Officers and TSU Team Leads; MBS as well when the setting is on"
+      channel: In-system notice
+      subject: "Package anniversary: <risk code>"
+      body: "<package name> reaches its anniversary on <dd-MMM-yyyy>."
+      attachments: "None; the notice opens the record"
+      protection: "-"
+      frequency: "Once per anniversary"
+      source: "Sent by BIBS"
+      frpm: "FRPM.004.01"
+    - id: NT-21
+      name: Product Matrix record for approval
+      trigger: "A Product Matrix record is added or updated directly and sent to the named approver"
+      recipients: "The approver named on the record"
+      channel: E-mail and in-system notice
+      subject: "Product Matrix record for approval: <risk code>"
+      body: "<user> sent <package name> for your approval."
+      attachments: "None; the notice opens the record"
+      protection: "-"
+      frequency: "Once per record sent"
+      source: "Sent by BIBS"
+      frpm: "FRPM.003.02"
+    - id: NT-22
+      name: Package deactivation for approval
+      trigger: "A Deactivate Package request is submitted"
+      recipients: "The approver named on the request"
+      channel: E-mail and in-system notice
+      subject: "<deactivation request no.>: deactivation of <risk code> for your approval"
+      body: "<package name>, effective <dd-MMM-yyyy>: <reason>"
+      attachments: "None; the notice opens the record"
+      protection: "-"
+      frequency: "Once per request"
+      source: "Sent by BIBS"
+      frpm: "FRPM.003.04"
+    - id: NT-23
+      name: Package deactivation decided
+      trigger: "The approver approves or rejects a deactivation request"
+      recipients: "The requester"
+      channel: E-mail and in-system notice
+      subject: "<deactivation request no.>: <approved or rejected>"
+      body: "<package name> - <approver's remarks>"
+      attachments: "None; the notice opens the record"
+      protection: "-"
+      frequency: "Once per decision"
+      source: "Sent by BIBS"
+      frpm: "FRPM.003.07"
+    - id: NT-24
+      name: Insurers selected for the proposal
+      trigger: "The requestor selects the insurers and proceeds to the proposal"
+      recipients: "The TSU Officer who prepared the Quotation Slip"
+      channel: In-system notice
+      subject: "<reference no.>: Terms Agreed"
+      body: "The requestor selected <insurers> for the proposal of <client>. Generate the proposal."
+      attachments: "None; the notice opens the record"
+      protection: "-"
+      frequency: "Once per selection"
+      source: "Sent by BIBS"
+      frpm: "FRPM.008.01"
+    - id: NT-25
+      name: Proposal approved or returned
+      trigger: "The second TSU officer approves or returns the proposal"
+      recipients: "The TSU Officer who generated it; the requestor when it is approved"
+      channel: In-system notice
+      subject: "<reference no.>: proposal <approved or returned> (to the requestor: <reference no.>: Proposal Ready)"
+      body: "<comment> (to the requestor: The proposal for <client> is ready to be sent to the client.)"
+      attachments: "None; the notice opens the record"
+      protection: "-"
+      frequency: "Once per decision"
+      source: "Sent by BIBS"
+      frpm: "FRPM.009.02"
+    - id: NT-26
+      name: Client response recorded
+      trigger: "The Account Officer records the client response"
+      recipients: "The TSU Officer who generated the proposal and the requestor"
+      channel: In-system notice
+      subject: "<reference no.>: client response <Accepted, Rejected or Return for Revision>"
+      body: "<client> - <client remarks>"
+      attachments: "None; the notice opens the record"
+      protection: "-"
+      frequency: "Once per response"
+      source: "Sent by BIBS"
+      frpm: "FRPM.010.01"
+    - id: NT-27
+      name: Package deployment request
+      trigger: "The deployment of a ManCom-approved package is requested (automatically or with Request for Deployment)"
+      recipients: "MBS and the requester"
+      channel: In-system notice
+      subject: "Package deployment request <deployment request no.>"
+      body: "<package name>"
+      attachments: "None; the notice opens the record"
+      protection: "-"
+      frequency: "Once per request"
+      source: "Sent by BIBS"
+      frpm: "FRPM.015.01"
 
 # ------------------------------------------------------------------------------------------------ Annex Q
 documents:

@@ -757,7 +757,7 @@ def report_names() -> list[str]:
         "report"
     names = []
     for f in sorted(base.glob("*Report.java")):
-        m = re.search(r"\"(Package [A-Z][\w ]+?)\"", f.read_text(encoding="utf-8"))
+        m = re.search(r"\"(Package [A-Z][\w ]+?(?:Report|History))\"", f.read_text(encoding="utf-8"))
         if m:
             names.append(m.group(1))
     return names

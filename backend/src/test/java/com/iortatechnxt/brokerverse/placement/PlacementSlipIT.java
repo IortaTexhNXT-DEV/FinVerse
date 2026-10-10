@@ -86,7 +86,7 @@ class PlacementSlipIT {
         .endsWith(".xlsx");
 
     SlipEmail draft = slips.draft(slip.getId());
-    assertThat(draft.to()).containsExactly("uw.makati@mabuhaygeneral.example");
+    assertThat(draft.to()).containsExactly("uw.makati@mabuhaygeneral.com.ph");
     assertThat(draft.protect()).isTrue();
     as.run("proc", () -> slips.send(slip.getId(), draft));
     assertThat(status(one)).isEqualTo(AccountStatus.PLACED);

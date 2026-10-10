@@ -171,12 +171,12 @@ public class ExtractionWork {
    */
   public Decision check(OpsInvoice invoice, LocalDate businessDate) {
     HoldingPeriod holding = positions.holdingPeriod(settings.checkHoldDays(), businessDate);
-    LocalDate lastPaid = positions.lastPaidOn(invoice.getInvoiceNo()).orElse(null);
-    return RemittanceRules.decide(facts(invoice, lastPaid, holding, settings.capOverDtip()));
+    LocalDate lastCheck = positions.lastClearingPaidOn(invoice.getInvoiceNo()).orElse(null);
+    return RemittanceRules.decide(facts(invoice, lastCheck, holding, settings.capOverDtip()));
   }
 
   private static Facts facts(
-      OpsInvoice invoice, LocalDate lastPaid, HoldingPeriod holding, boolean cap) {
+      OpsInvoice invoice, LocalDate lastCheck, HoldingPeriod holding, boolean cap) {
     String owner = invoice.getLockOwner();
     String lockedBy = owner == null || RemittanceSettings.MODULE.equals(owner) ? null : owner;
     return new Facts(
@@ -184,7 +184,7 @@ public class ExtractionWork {
         invoice.isHoldFlag(),
         invoice.isPendingNegAdj(),
         invoice.isWrittenOff(),
-        lastPaid != null && holding.holds(invoice.getBranchId(), lastPaid),
+        lastCheck != null && holding.holds(invoice.getBranchId(), lastCheck),
         lockedBy,
         cap);
   }
@@ -242,13 +242,14 @@ public class ExtractionWork {
       return;
     }
     LocalDate lastPaid = positions.lastPaidOn(invoice.getInvoiceNo()).orElse(null);
-    Decision decision = decide(ctx, invoice, lastPaid);
+    LocalDate lastCheck = positions.lastClearingPaidOn(invoice.getInvoiceNo()).orElse(null);
+    Decision decision = decide(ctx, invoice, lastCheck);
     ctx.run.count(decision.tag());
     record(ctx, new Examined(invoice, type, incentive, lastPaid), decision);
   }
 
-  private Decision decide(Context ctx, OpsInvoice invoice, LocalDate lastPaid) {
-    Decision decision = RemittanceRules.decide(facts(invoice, lastPaid, ctx.holding, ctx.cap));
+  private Decision decide(Context ctx, OpsInvoice invoice, LocalDate lastCheck) {
+    Decision decision = RemittanceRules.decide(facts(invoice, lastCheck, ctx.holding, ctx.cap));
     if (decision.overDtip()) {
       raiseOverDtip(invoice, decision);
     }

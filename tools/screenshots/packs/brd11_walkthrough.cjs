@@ -2,7 +2,7 @@
 // (see walkthroughs.yaml of the pack). Each step signs in as the persona of the step, does what the step says on the
 // screen and returns the page to capture. The walkthroughs run in order: B changes and deactivates the user enrolled
 // in A. The records created carry fictitious seed values only; the SIT/UAT password comes from SEED_PASSWORD.
-const { act, press, tab, go, button, settle } = require('./brd01_walkthrough.cjs');
+const { act, press, tab, go, button, settle, chooseOption } = require('./brd01_walkthrough.cjs');
 
 const REQUESTS = '/user-access/requests';
 const NEW_USER = 'a013000196';
@@ -22,13 +22,8 @@ async function fill(page, label, value) {
     field = matches.and(page.locator('select, input:not([type=checkbox]), textarea')).first();
   }
   const tag = await field.evaluate((e) => e.tagName.toLowerCase());
-  if (tag === 'select') {
-    const options = await field.locator('option').allTextContents();
-    const hit = options.find((o) => new RegExp(value, 'i').test(o));
-    if (hit === undefined) {
-      throw new Error(`option ${value} not in ${label}: ${options.slice(0, 10).join(', ')}`);
-    }
-    await field.selectOption({ label: hit });
+  if (tag === 'select' || (await field.getAttribute('role')) === 'combobox') {
+    await chooseOption(page, field, value);
   } else if ((await field.getAttribute('type')) === 'checkbox') {
     await field.check();
   } else {

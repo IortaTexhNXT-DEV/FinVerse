@@ -1,7 +1,7 @@
 // End-to-end walkthroughs of BRD-03 Product Maintenance, performed live on the seed profile by capture_pack.cjs (see
 // walkthroughs.yaml of the pack). Each step signs in as the persona of the step, does what the step says on the
 // screen and returns the page to capture. The records created carry fictitious seed values only.
-const { pdf, act, press, tab, go, button, settle } = require('./brd01_walkthrough.cjs');
+const { pdf, act, press, tab, go, button, settle, chooseOption } = require('./brd01_walkthrough.cjs');
 
 const TITLE = 'Motor Fleet Plus';
 const RISK_CODE = 'MTR30';
@@ -30,7 +30,12 @@ async function openRequest(ctx, user, id, tabName) {
 
 async function fill(page, label, value) {
   const field = page.getByLabel(new RegExp(`^${label}`)).first();
-  await field.fill(String(value));
+  const tag = await field.evaluate((e) => e.tagName.toLowerCase());
+  if (tag === 'select' || (await field.getAttribute('role')) === 'combobox') {
+    await chooseOption(page, field, value);
+  } else {
+    await field.fill(String(value));
+  }
   await page.waitForTimeout(150);
 }
 

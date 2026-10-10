@@ -65,6 +65,17 @@ async function pendingEnrolment(ctx, username, fullName) {
 
 // ------------------------------------------------------------------ forms
 
+/** Whether Forgot password? is offered (setting PASSWORD_RESET_BDOI_RULES off): a security setting, changed by the
+ * System Administrator and approved by the Information Security Officer. */
+async function resetOffered(ctx, on) {
+  const wanted = on ? 'false' : 'true';
+  const current = ctx.one("select param_value from sys_parameter where param_key = 'PASSWORD_RESET_BDOI_RULES'");
+  if (current !== wanted) {
+    await ctx.api('admin', 'PUT', '/system/parameters/PASSWORD_RESET_BDOI_RULES', { value: wanted });
+    await ctx.api('infosec', 'POST', '/system/parameters/PASSWORD_RESET_BDOI_RULES/approve');
+  }
+}
+
 const forgot = async (page) => {
   await page.getByRole('button', { name: /^forgot password\?$/i }).click();
   await page.waitForTimeout(400);
@@ -80,7 +91,7 @@ const fills = {
     }
     return [['User ID', 'a013000102'], ['Password', process.env.SEED_PASSWORD]];
   },
-  forgot_user: [forgot, ['User ID', 'requestor']],
+  forgot_user: async (ctx) => { await resetOffered(ctx, true); return [forgot, ['User ID', 'requestor']]; },
   enrol_user: [
     ['User ID', 'a013000197'], ['Full Name', 'Andrea Mercado'], ['E-mail', 'andrea.mercado@brokerverse-seed.ph'],
     ['Windows ID', 'AMERCADO'], ['Home Branch', 'HO'],
@@ -146,6 +157,7 @@ const BULK_HEADERS = ['Action', 'User ID', 'Full Name', 'E-mail', 'Windows ID', 
 const custom = {
   // The forced change: the System Administrator sets a password for a013000104, who then signs in.
   'scr-ua-03-01-reset': async (ctx) => {
+    await resetOffered(ctx, false);
     const set = `Tmp#${Date.now().toString(36)}Aa9`;
     const id = ctx.one("select id from sec_user where username = 'a013000104'");
     await ctx.api('admin', 'POST', `/admin/users/${id}/reset-password`, { newPassword: set });

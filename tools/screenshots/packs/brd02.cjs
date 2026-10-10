@@ -7,7 +7,7 @@ const walkthrough = require('./brd02_walkthrough.cjs');
 const { download, render } = require('./brd01_documents.cjs');
 const { settle } = require('./brd01_walkthrough.cjs');
 
-const { fill, firstOption, dateText, isoDate, invoiceA } = walkthrough;
+const { fill, firstOption, dateText, isoDate, invoiceA, postingStep } = walkthrough;
 
 // ------------------------------------------------------------------ records made on demand
 
@@ -333,13 +333,18 @@ async function records(ctx) {
   });
   const reason = ctx.one("select code from lov_value where type_code = 'RECEIPT_CANCEL_REASON' order by sort_order, id limit 1");
   const receiptId = Number(ctx.one("select id from csh_receipt where receipt_no = 'AR-HO-000010'"));
-  const cancels = await ctx.api('cashier', 'POST', '/cashiering/records/cancellations', {
-    companyId, receiptIds: [receiptId], reasonCode: reason, reasonText: 'Double issuance of the AR',
-  });
-  if (cancels[0]) {
-    await ctx.api('cashier', 'POST', `/cashiering/records/${cancels[0].id}/submit`).catch(() => {});
+  // The cancellation record of AR-HO-000010, made once (a receipt carries one open cancellation).
+  let cancelId = ctx.sql(`select id from csh_receipt_record where record_kind = 'CANCELLATION' and receipt_id = ${receiptId} order by id desc limit 1`)[0]?.[0];
+  if (!cancelId) {
+    const cancels = await ctx.api('cashier', 'POST', '/cashiering/records/cancellations', {
+      companyId, receiptIds: [receiptId], reasonCode: reason, reasonText: 'Double issuance of the AR',
+    });
+    if (cancels[0]) {
+      await ctx.api('cashier', 'POST', `/cashiering/records/${cancels[0].id}/submit`).catch(() => {});
+      cancelId = cancels[0].id;
+    }
   }
-  ctx.state.records = { ar: ar.id, or: or.id, draft: draft.id, cancel: cancels[0] && cancels[0].id };
+  ctx.state.records = { ar: ar.id, or: or.id, draft: draft.id, cancel: cancelId };
   return ctx.state.records;
 }
 
@@ -370,6 +375,16 @@ async function withoutHistory(page) {
   return page;
 }
 
+/** Receive Payment as it shows when the posting step of the ARs is off (a full page load reads the settings again;
+ * no second load right after it, which would race the rotation of the session's refresh token). */
+async function receivePayment(ctx) {
+  await postingStep(ctx, 'OR');
+  const page = await ctx.pageOf('cashier');
+  await page.goto(`${ctx.BASE}/cashiering/receive`);
+  await ctx.settle(page, 1500);
+  return page;
+}
+
 async function open(ctx, user, path) {
   const page = await ctx.pageOf(user);
   await page.goto(`${ctx.BASE}${path}`);
@@ -378,7 +393,26 @@ async function open(ctx, user, path) {
 }
 
 const custom = {
-  'scr-op-07-01-home': async (ctx) => { await records(ctx); return open(ctx, 'cashtl', '/cashiering'); },
+  'scr-op-08-01-preview': async (ctx) => {
+    const page = await receivePayment(ctx);
+    for (const step of fills.receive_payment) {
+      if (typeof step === 'function') {
+        await step(page);
+      } else {
+        await fill(page, step[0], step[1]);
+      }
+    }
+    return page;
+  },
+  'scr-op-08-02-error': async (ctx) => {
+    const page = await receivePayment(ctx);
+    await page.getByRole('button', { name: /^issue ar and apply$/i }).click();
+    await ctx.settle(page, 800);
+    return page;
+  },
+  // Receipts, with the posting step of the ARs back on (as delivered) for the screens that follow.
+  'scr-op-09-01-list': async (ctx) => { await postingStep(ctx, 'AR,OR'); return open(ctx, 'cashier', '/cashiering/receipts'); },
+  'scr-op-07-01-home': async (ctx) => { await postingStep(ctx, 'AR,OR'); await records(ctx); return open(ctx, 'cashtl', '/cashiering'); },
   'scr-op-65-02-filled': async (ctx) => open(ctx, 'cashier', `/cashiering/records/${(await records(ctx)).draft}/edit`),
   'scr-op-65-03-error': async (ctx) => {
     const page = await open(ctx, 'cashier', '/cashiering/records/new?kind=AR');

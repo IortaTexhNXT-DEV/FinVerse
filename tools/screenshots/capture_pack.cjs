@@ -234,12 +234,34 @@ async function fillField(page, label, value) {
   const tag = await field.evaluate((e) => e.tagName.toLowerCase());
   const type = await field.evaluate((e) => (e.getAttribute('type') || '').toLowerCase());
   if (tag === 'select') {
+    for (let i = 0; i < 25 && (await field.locator('option').count()) < 2; i += 1) {
+      await page.waitForTimeout(200);  // a list of values loads after the field shows
+    }
     const options = await field.locator('option').allTextContents();
     const hit = options.find((o) => rx(value).test(o)) ?? options.find((o) => o.includes(value));
     if (hit === undefined) {
       throw new Error(`option ${value} not in ${label}: ${options.slice(0, 12).join(', ')}`);
     }
     await field.selectOption({ label: hit });
+  } else if ((await field.getAttribute('role')) === 'combobox') {
+    // A searchable list: the list opens on click; the entry matching the value is clicked.
+    await field.click();
+    const listId = await field.getAttribute('aria-controls');
+    const list = listId ? page.locator(`[id="${listId}"]`) : page.getByRole('listbox').last();
+    await list.waitFor({ state: 'visible', timeout: 5000 });
+    for (let i = 0; i < 25 && (await list.getByRole('option').count()) === 0; i += 1) {
+      await page.waitForTimeout(200);
+    }
+    const entries = list.getByRole('option');
+    const texts = await entries.allTextContents();
+    let index = texts.findIndex((o) => rx(value).test(o));
+    if (index < 0) {
+      index = texts.findIndex((o) => o.includes(String(value)));
+    }
+    if (index < 0) {
+      throw new Error(`entry ${value} not in ${label}: ${texts.slice(0, 12).join(', ')}`);
+    }
+    await entries.nth(index).click();
   } else if (type === 'checkbox' || type === 'radio') {
     if (value) {
       await field.check();

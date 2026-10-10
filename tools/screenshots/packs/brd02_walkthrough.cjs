@@ -4,9 +4,18 @@
 // that A books, pays and remits. The records created carry fictitious seed values only.
 const fs = require('fs');
 const path = require('path');
-const { act, tab, go, button, settle, csv, TMP } = require('./brd01_walkthrough.cjs');
+const { act, tab, go, button, settle, csv, chooseOption, TMP } = require('./brd01_walkthrough.cjs');
 
 const ARN_A = 'ARN-2026-940007';
+
+/** The posting step of the receipts (setting CASH_POSTING_STEP_RECEIPTS): "AR,OR" as delivered; "OR" while walkthrough
+ * A receives the payment over the counter with Issue AR and Apply (ARs issued at save, decision C1). */
+async function postingStep(ctx, kinds) {
+  const current = ctx.one("select param_value from sys_parameter where param_key = 'CASH_POSTING_STEP_RECEIPTS'");
+  if (current !== kinds) {
+    await ctx.api('admin', 'PUT', '/system/parameters/CASH_POSTING_STEP_RECEIPTS', { value: kinds });
+  }
+}
 
 // ------------------------------------------------------------------ helpers
 
@@ -31,13 +40,8 @@ async function fill(page, label, value, scope) {
   const field = root.getByLabel(label instanceof RegExp ? label : new RegExp(`^${label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*\\*?$`)).first();
   await field.waitFor({ state: 'visible', timeout: 15000 });
   const tag = await field.evaluate((e) => e.tagName.toLowerCase());
-  if (tag === 'select') {
-    const options = await field.locator('option').allTextContents();
-    const hit = options.find((o) => (value instanceof RegExp ? value : new RegExp(value, 'i')).test(o));
-    if (hit === undefined) {
-      throw new Error(`option ${value} not in ${label}: ${options.slice(0, 12).join(', ')}`);
-    }
-    await field.selectOption({ label: hit });
+  if (tag === 'select' || (await field.getAttribute('role')) === 'combobox') {
+    await chooseOption(page, field, value);
   } else {
     await field.fill('');
     await field.pressSequentially(String(value), { delay: 5 });
@@ -48,11 +52,7 @@ async function fill(page, label, value, scope) {
 
 /** Opens the first option other than the empty one of a select in a dialog. */
 async function firstOption(select) {
-  const options = await select.locator('option').allTextContents();
-  const pick = options.find((o, i) => i > 0 && o.trim() !== '');
-  if (pick) {
-    await select.selectOption({ label: pick });
-  }
+  await chooseOption(select.page(), select, null);
 }
 
 /** Ticks the check box of the table row whose text matches. */
@@ -134,6 +134,7 @@ const steps = {
   },
   // 3. Receive Payment with the live preview (the payment dated a week back so that remittance may extract it).
   'wt-a-03': async (ctx) => {
+    await postingStep(ctx, 'OR');
     const invoice = invoiceA(ctx);
     const gross = ctx.one(`select gross_premium from ops_invoice where invoice_no = '${invoice}'`);
     const page = await go(ctx, 'cashier', '/cashiering/receive');
@@ -156,6 +157,7 @@ const steps = {
   },
   // 5. Extraction of the invoice into a batch; the run with its tag.
   'wt-a-05': async (ctx) => {
+    await postingStep(ctx, 'AR,OR');
     const invoice = invoiceA(ctx);
     const page = await go(ctx, 'remit', '/remittance/extraction');
     if (ctx.sql(`select 1 from rem_batch_line where invoice_no = '${invoice}'`).length === 0) {
@@ -531,4 +533,4 @@ async function prepare() {
   fs.mkdirSync(TMP, { recursive: true });
 }
 
-module.exports = { steps, prepare, fill, tickRow, openRow, firstOption, dateText, isoDate, invoiceA, sqlText, path };
+module.exports = { steps, prepare, fill, tickRow, openRow, firstOption, dateText, isoDate, invoiceA, sqlText, path, postingStep };

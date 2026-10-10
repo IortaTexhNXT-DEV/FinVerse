@@ -44,7 +44,7 @@ templates:
       - "Action | Y | ENROL, MODIFY, DEACTIVATE or REACTIVATE | ENROL for the go-live load | ENROL"
       - "User ID | Y | A letter and nine digits (BDOI format a999999999) | The BIBS user ID; unique | a013000201"
       - "Full Name | Cond.: ENROL | Up to 120 characters | Name shown on screens and reports | Andrea Mercado"
-      - "E-mail | N | Company e-mail address | Receives the access-changed notices and the reset links | andrea.mercado@brokerverse-seed.ph"
+      - "E-mail | N | Company e-mail address | Receives the access-changed notices and the reset links | andrea.mercado@uat.brokerverse.cloud"
       - "Windows ID | N | Windows log-on name; unique | Used for the BDO directory sign-in when it is enabled | AMERCADO"
       - "Home Branch Code | N | Branch code | Home branch of the user | HO"
       - "Business Unit | N | Code of the list Business unit group (CI-06) | Business unit group | -"

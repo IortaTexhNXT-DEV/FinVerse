@@ -110,7 +110,7 @@ public class DisbursementFixtures {
         klass,
         name,
         "Makati City",
-        "payee@brokerverse-seed.ph",
+        "payee@uat.brokerverse.cloud",
         null,
         mode,
         List.of(mode, DisbursementMode.CHECK, DisbursementMode.CTA).stream().distinct().toList(),

@@ -12,7 +12,7 @@ walkthroughs:
       signs in, must choose a personal password first, and then sees exactly the sidebar of the Marketing Account
       Officer given in chapter 12 and checked by the persona menu test. The Auditor finds the enrolment, the approval
       and the first sign-in in the User Access Audit Log.
-    data: "Seed data: new user a013000196, Isabel Navarro (fictitious), e-mail isabel.navarro@brokerverse-seed.ph, Windows ID INAVARRO, home branch HO, group profile Marketing Account Officer; Requestor requestor, Approver uamapprover, Auditor auditor"
+    data: "Seed data: new user a013000196, Isabel Navarro (fictitious), e-mail isabel.navarro@uat.brokerverse.cloud, Windows ID INAVARRO, home branch HO, group profile Marketing Account Officer; Requestor requestor, Approver uamapprover, Auditor auditor"
     steps:
       - [UAM_REQUESTOR, SCR-UA-07, "Opens User Access › Access Requests › New Request, keeps Enrol new user, enters the user ID a013000196, the full name, e-mail, Windows ID and home branch, ticks Marketing Account Officer, chooses the approver Ulysses Access Approver, writes the justification and clicks Save Draft", "Toast: AR-yyyy-nnnnnn saved as a draft; the request opens as Draft with Approver Chosen on submission", Draft request, wt-a-01]
       - [UAM_REQUESTOR, SCR-UA-08, "Clicks Edit Request, checks the data and clicks Submit", "Toast: AR-yyyy-nnnnnn submitted; the status is Pending Approval and the History tab lists Saved and Submitted", Pending Approval, wt-a-02]

@@ -1725,7 +1725,7 @@ frs:
         title: Send the advisory to Marketing and Operations
         steps:
           - Upload the signed package slip.
-          - Edit the advisory - groups Marketing and Operations, e-mail operations@brokerverse-seed.ph, subject "MTR15 renewed", text; save.
+          - Edit the advisory - groups Marketing and Operations, e-mail operations@uat.brokerverse.cloud, subject "MTR15 renewed", text; save.
           - Click Send. As ao open the notification bell.
         expected: The advisory is SENT; ao and the Operations users have an in-app notification; one protected e-mail is logged; the advisory PDF is stored on the request and lists the signed slip and the ManCom sign-off.
       - c: 3

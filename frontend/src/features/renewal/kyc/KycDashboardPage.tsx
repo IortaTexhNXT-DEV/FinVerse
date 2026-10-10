@@ -1,3 +1,4 @@
+import { UserName } from '@/components/ui/UserName';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -102,7 +103,11 @@ export default function KycDashboardPage() {
               kind: 'date',
               render: (a) => formatDate(a.expiryDate),
             },
-            { key: 'ao', header: 'Account Officer', render: (a) => a.accountOfficer ?? '' },
+            {
+              key: 'ao',
+              header: 'Account Officer',
+              render: (a) => <UserName login={a.accountOfficer} />,
+            },
           ]}
         />
       </Card>

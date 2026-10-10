@@ -29,7 +29,7 @@
     <re2j.version>1.8</re2j.version>
     <zxing.version>3.5.3</zxing.version>
     <zonky.embedded-db.version>2.6.0</zonky.embedded-db.version>
-    <zonky.embedded-pg.version>2.1.0</zonky.embedded-pg.version>
+    <zonky.embedded-pg.version>2.2.2</zonky.embedded-pg.version>
     <archunit.version>1.4.1</archunit.version>
     <jedis-mock.version>1.1.19</jedis-mock.version>
     <awssdk.version>2.55.6</awssdk.version>

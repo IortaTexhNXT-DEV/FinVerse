@@ -57,6 +57,7 @@ public class ReceiptRecordService {
   private final CashieringDecisions decisions;
   private final CashieringSettings settings;
   private final RecordFacts facts;
+  private final RecordWording wording;
   private final NotificationService notifications;
   private final AuditTrailService audit;
   private final CurrentUser currentUser;
@@ -83,6 +84,7 @@ public class ReceiptRecordService {
       CashieringDecisions decisions,
       CashieringSettings settings,
       RecordFacts facts,
+      RecordWording wording,
       NotificationService notifications,
       AuditTrailService audit,
       CurrentUser currentUser,
@@ -93,6 +95,7 @@ public class ReceiptRecordService {
     this.decisions = decisions;
     this.settings = settings;
     this.facts = facts;
+    this.wording = wording;
     this.notifications = notifications;
     this.audit = audit;
     this.currentUser = currentUser;
@@ -117,7 +120,8 @@ public class ReceiptRecordService {
     record.describe(
         draft.receiptType(), draft.branchId(), draft.party(), draft.tender(), draft.accounts());
     ReceiptRecord saved = records.save(record);
-    audit.record(ENTITY, saved.getRecordNo(), AuditAction.CREATE, "Saved: " + summary(saved));
+    audit.record(
+        ENTITY, saved.getRecordNo(), AuditAction.CREATE, "Saved: " + wording.summary(saved));
     return saved;
   }
 
@@ -136,14 +140,14 @@ public class ReceiptRecordService {
           "RECORD_KIND_MISMATCH", record.getRecordNo() + " is not an " + draft.kind() + " record");
     }
     validate(record.getCompanyId(), draft);
-    String before = summary(record);
+    String before = wording.summary(record);
     record.describe(
         draft.receiptType(), draft.branchId(), draft.party(), draft.tender(), draft.accounts());
     audit.record(
         ENTITY,
         record.getRecordNo(),
         AuditAction.UPDATE,
-        "Edited. Before: " + before + ". After: " + summary(record));
+        "Edited. Before: " + before + ". After: " + wording.summary(record));
     return record;
   }
 
@@ -214,7 +218,9 @@ public class ReceiptRecordService {
       Collection<RecordStage> stages,
       RecordCriteria criteria,
       Pageable pageable) {
-    return records.search(companyId, kind, stages, criteria, pageable);
+    Page<ReceiptRecord> found = records.search(companyId, kind, stages, criteria, pageable);
+    found.forEach(ReceiptRecord::getAccounts);
+    return found;
   }
 
   /**
@@ -226,12 +232,15 @@ public class ReceiptRecordService {
    */
   @Transactional(readOnly = true)
   public List<ReceiptRecord> dayList(Long companyId, LocalDate day) {
-    return records.dayList(
-        companyId,
-        RecordKind.CREATION,
-        currentUser.username(),
-        BusinessClock.startOf(day),
-        BusinessClock.startOf(day.plusDays(1)));
+    List<ReceiptRecord> found =
+        records.dayList(
+            companyId,
+            RecordKind.CREATION,
+            currentUser.username(),
+            BusinessClock.startOf(day),
+            BusinessClock.startOf(day.plusDays(1)));
+    found.forEach(ReceiptRecord::getAccounts);
+    return found;
   }
 
   /**
@@ -304,18 +313,5 @@ public class ReceiptRecordService {
    */
   static String link(ReceiptRecord record) {
     return "/cashiering/records/" + record.getId();
-  }
-
-  private static String summary(ReceiptRecord r) {
-    var party = r.getParty();
-    var tender = r.getTender();
-    return String.join(
-        ", ",
-        "type " + r.getReceiptType(),
-        "branch " + r.getBranchId(),
-        "payor " + (party == null ? "" : party.payorName()),
-        "amount " + (tender == null ? "" : tender.currency() + " " + tender.amount()),
-        "bank account " + (tender == null ? "" : tender.bankAccount()),
-        "accounts " + r.getAccounts());
   }
 }

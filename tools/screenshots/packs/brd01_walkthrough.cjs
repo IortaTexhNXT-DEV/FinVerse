@@ -144,6 +144,57 @@ async function press(page, name) {
   return page;
 }
 
+/**
+ * Chooses the entry of a drop-down field: a <select> (option by label) or the searchable list of the screens
+ * (a combobox: the list opens on click, the entry is clicked). `want` is a RegExp or text matched against the
+ * entries; `null` takes the first entry other than the empty one. Returns the entry chosen.
+ */
+async function chooseOption(page, field, want) {
+  const rx = want === null ? null : want instanceof RegExp ? want : new RegExp(want, 'i');
+  const tag = await field.evaluate((e) => e.tagName.toLowerCase());
+  if (tag === 'select') {
+    // The entries of a list of values load after the field shows: wait for them.
+    for (let i = 0; i < 25 && (await field.locator('option').count()) < 2; i += 1) {
+      await page.waitForTimeout(200);
+    }
+    const options = await field.locator('option').allTextContents();
+    const hit = rx === null ? options.find((o, i) => i > 0 && o.trim() !== '') : options.find((o) => rx.test(o));
+    if (hit === undefined) {
+      throw new Error(`option ${want} not in the list: ${options.slice(0, 12).join(', ')}`);
+    }
+    await field.selectOption({ label: hit });
+    return hit;
+  }
+  if ((await field.getAttribute('role')) === 'combobox') {
+    await field.click();
+    const listId = await field.getAttribute('aria-controls');
+    const list = listId ? page.locator(`[id="${listId}"]`) : page.getByRole('listbox').last();
+    await list.waitFor({ state: 'visible', timeout: 5000 });
+    for (let i = 0; i < 25 && (await list.getByRole('option').count()) === 0; i += 1) {
+      await page.waitForTimeout(200);
+    }
+    const entries = list.getByRole('option');
+    const texts = await entries.allTextContents();
+    let index = rx === null ? texts.findIndex((o) => o.trim() !== '') : texts.findIndex((o) => rx.test(o));
+    if (index < 0 && rx !== null) {
+      // The list is searchable: narrow it with the text and take the first entry.
+      await field.fill(typeof want === 'string' ? want : '');
+      await page.waitForTimeout(400);
+      if ((await entries.count()) > 0) {
+        index = 0;
+      }
+    }
+    if (index < 0) {
+      throw new Error(`entry ${want} not in the list: ${texts.slice(0, 12).join(', ')}`);
+    }
+    const label = (await entries.nth(index).textContent()) || '';
+    await entries.nth(index).click();
+    await page.waitForTimeout(200);
+    return label;
+  }
+  throw new Error(`not a drop-down field: ${tag}`);
+}
+
 async function act(page, name, opts = {}) {
   const target = button(page, name);
   try {
@@ -173,13 +224,9 @@ async function act(page, name, opts = {}) {
     if (opts.fill) {
       await opts.fill(dialog);
     }
-    const reason = dialog.locator('select').first();
+    const reason = dialog.locator('select, [role=combobox]').first();
     if (opts.reason !== false && (await reason.count()) > 0) {
-      const options = await reason.locator('option').allTextContents();
-      const pick = opts.reason ? options.find((o) => new RegExp(opts.reason, 'i').test(o)) : options.find((o, i) => i > 0);
-      if (pick) {
-        await reason.selectOption({ label: pick });
-      }
+      await chooseOption(page, reason, opts.reason ? new RegExp(opts.reason, 'i') : null).catch(() => {});
     }
     if (opts.comment) {
       await dialog.locator('textarea').first().fill(opts.comment);
@@ -934,4 +981,4 @@ async function prepare(ctx) {
   }
 }
 
-module.exports = { steps, bulk, prepare, rowAction, rowOffers, tabsToTop, addItem, bulkClientFile, pdf, csv, act, press, tab, go, button, settle, uploadDocument, TMP };
+module.exports = { steps, bulk, prepare, rowAction, rowOffers, tabsToTop, addItem, bulkClientFile, pdf, csv, act, press, tab, go, button, settle, uploadDocument, chooseOption, TMP };

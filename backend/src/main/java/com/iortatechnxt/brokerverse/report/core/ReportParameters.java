@@ -185,7 +185,8 @@ public final class ReportParameters {
 
   /**
    * Human readable "Label : value" lines of supplied parameters, in declaration order. Ids are
-   * shown as the user knows them ("Company : FVI – BrokerVerse Insurance"), not as database ids.
+   * shown as the user knows them ("Company : FVI – BrokerVerse Insurance"), not as database ids,
+   * and the labels are those of the form (without technical suffixes such as "(code)").
    *
    * @return echo lines
    */
@@ -194,7 +195,7 @@ public final class ReportParameters {
     for (ParameterSpec spec : metadata.parameters()) {
       String value = values.get(spec.name());
       if (value != null) {
-        lines.add(spec.label() + " : " + shown(spec, value));
+        lines.add(ParameterLookups.refine(spec).label() + " : " + shown(spec, value));
       }
     }
     return lines;

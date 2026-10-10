@@ -65,7 +65,21 @@ async function pendingEnrolment(ctx, username, fullName) {
 
 // ------------------------------------------------------------------ forms
 
+/** Whether Forgot password? is offered (setting PASSWORD_RESET_BDOI_RULES off): a security setting, changed by the
+ * System Administrator and approved by the Information Security Officer. */
+async function resetOffered(ctx, on) {
+  const wanted = on ? 'false' : 'true';
+  const current = ctx.one("select param_value from sys_parameter where param_key = 'PASSWORD_RESET_BDOI_RULES'");
+  if (current !== wanted) {
+    await ctx.api('admin', 'PUT', '/system/parameters/PASSWORD_RESET_BDOI_RULES', { value: wanted });
+    await ctx.api('infosec', 'POST', '/system/parameters/PASSWORD_RESET_BDOI_RULES/approve');
+  }
+}
+
 const forgot = async (page) => {
+  // The sign-in options (whether the reset is offered) are read when the page opens: the setting was changed after.
+  await page.reload();
+  await page.waitForLoadState('networkidle');
   await page.getByRole('button', { name: /^forgot password\?$/i }).click();
   await page.waitForTimeout(400);
 };
@@ -80,7 +94,7 @@ const fills = {
     }
     return [['User ID', 'a013000102'], ['Password', process.env.SEED_PASSWORD]];
   },
-  forgot_user: [forgot, ['User ID', 'requestor']],
+  forgot_user: async (ctx) => { await resetOffered(ctx, true); return [forgot, ['User ID', 'requestor']]; },
   enrol_user: [
     ['User ID', 'a013000197'], ['Full Name', 'Andrea Mercado'], ['E-mail', 'andrea.mercado@brokerverse-seed.ph'],
     ['Windows ID', 'AMERCADO'], ['Home Branch', 'HO'],
@@ -105,7 +119,7 @@ const fills = {
   modify_profile: [['Request Type', 'Modify group profile'], ['Group Profile', '^Marketing Account Officer'],
     async (page) => page.locator('#perm-UAM_VIEW').check()],
   deactivate_profile: [['Request Type', 'Deactivate group profile'], ['Group Profile', '^Processing Team Lead']],
-  report_profile: [['Group Profile (code)', 'UAM_APPROVER']],
+  report_profile: [['Group Profile', 'User Access Approver']],
 };
 
 // ------------------------------------------------------------------ records by status
@@ -146,6 +160,7 @@ const BULK_HEADERS = ['Action', 'User ID', 'Full Name', 'E-mail', 'Windows ID', 
 const custom = {
   // The forced change: the System Administrator sets a password for a013000104, who then signs in.
   'scr-ua-03-01-reset': async (ctx) => {
+    await resetOffered(ctx, false);
     const set = `Tmp#${Date.now().toString(36)}Aa9`;
     const id = ctx.one("select id from sec_user where username = 'a013000104'");
     await ctx.api('admin', 'POST', `/admin/users/${id}/reset-password`, { newPassword: set });
@@ -202,6 +217,36 @@ const custom = {
     await ctx.settle(page, 800);
     return page;
   },
+  // The directory details of a013000103 (a user synchronised from the Enterprise SSO simulator), from the row menu.
+  'scr-ua-15-03-directory': async (ctx) => {
+    const page = await ctx.pageOf('admin');
+    await page.goto(`${ctx.BASE}/admin/users`);
+    await ctx.settle(page);
+    await page.getByPlaceholder(/search user id/i).first().fill('a013000103');
+    await ctx.settle(page, 800);
+    const row = page.locator('table tbody tr').filter({ hasText: 'a013000103' }).first();
+    const menu = row.getByRole('button', { name: /^Actions for/ });
+    await menu.evaluate((el) => el.scrollIntoView({ block: 'center', inline: 'nearest' }));
+    await menu.click();
+    await page.getByRole('menuitem', { name: /^directory details$/i }).click();
+    await ctx.settle(page, 1000);
+    return page;
+  },
+  // A rule of two permissions (conflicting permission combination) asked by the Business Administrator, listed with
+  // the seed rules of group profiles as the Information Security Officer sees them.
+  'scr-ua-19-01-list': async (ctx) => {
+    const rules = await ctx.api('badmin', 'GET', '/nbadmin/sod-rules');
+    if (!rules.some((r) => r.kind === 'PERMISSIONS')) {
+      await ctx.api('badmin', 'POST', '/nbadmin/sod-rules', {
+        kind: 'PERMISSIONS', profileA: 'CASH_RECEIPT', profileB: 'CASH_APPROVE',
+        description: 'The user who creates a receipt record may not post it',
+      });
+    }
+    const page = await ctx.pageOf('infosec');
+    await page.goto(`${ctx.BASE}/user-access/sod-rules`);
+    await ctx.settle(page, 1000);
+    return page;
+  },
   // The sessions of the Requestor, opened from the Users screen.
   'scr-ua-15-02-sessions': async (ctx) => {
     const page = await ctx.pageOf('admin');
@@ -248,11 +293,35 @@ const documents = {
 // Shots kept as the whole window (the sign-in pages have no menu and are always whole; the home page shows the
 // menu of the persona); every other shot is cropped to its dialog or content area (capture_pack.cjs, cropOf).
 // The password steps of walkthrough C show the Change password card (below the second factor card).
-const PASSWORD_CARD = 'section.card:has(> header h2:text-is("Change password"))';
+const PASSWORD_CARD = 'section.card:has(> header h2:text-is("Change Password"))';
 const crops = { 'scr-ua-05-01-view': 'full', 'wt-c-10': PASSWORD_CARD, 'wt-c-11': PASSWORD_CARD };
 
 // UX deck: a search of the access requests that finds nothing (the empty state of the list).
 const after = {
+  // The New Rule dialog for a rule of two permissions.
+  'scr-ua-19-02-new': async (page, ctx) => {
+    await ctx.fillField(page, 'Rule Type', 'Two permissions not held together');
+    await page.waitForTimeout(800);
+    const dialog = page.locator('dialog.modal[open]').last();
+    await dialog.getByLabel(/^permission/i).first().selectOption('CASH_RECEIPT');
+    await dialog.getByLabel(/^may not be held with/i).first().selectOption('CASH_APPROVE');
+    await ctx.fillField(page, 'Reason', 'The user who creates a receipt record may not post it');
+  },
+  // Create User from Enterprise SSO with the simulator account of Bea Santos looked up.
+  'scr-ua-20-02-create': async (page, ctx) => {
+    const box = page.locator('dialog.modal[open]').last();
+    await box.getByLabel(/^windows id/i).first().fill('BDO\\bsantos');
+    await box.getByRole('button', { name: /^look up account$/i }).click();
+    await ctx.settle(page, 800);
+    await page.waitForTimeout(800);
+  },
+  // The audit trail of the sign-in actions (Action Type Login).
+  'scr-ua-22-01-list': async (page) => {
+    await page.getByLabel(/^action type$/i).first().click();
+    await page.getByRole('option', { name: /^login$/i }).first().click();
+    await page.waitForLoadState('networkidle').catch(() => {});
+    await page.waitForTimeout(1000);
+  },
   'ux-scr-ua-06-empty': async (page) => {
     await page.getByPlaceholder(/^search request no/i).fill('AR-2099-999999');
     await page.getByRole('button', { name: /^search$/i }).first().click();

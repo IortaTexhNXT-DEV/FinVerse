@@ -1,7 +1,7 @@
 // End-to-end walkthroughs of BRD-03 Product Maintenance, performed live on the seed profile by capture_pack.cjs (see
 // walkthroughs.yaml of the pack). Each step signs in as the persona of the step, does what the step says on the
 // screen and returns the page to capture. The records created carry fictitious seed values only.
-const { pdf, act, press, tab, go, button, settle } = require('./brd01_walkthrough.cjs');
+const { pdf, act, press, tab, go, button, settle, chooseOption } = require('./brd01_walkthrough.cjs');
 
 const TITLE = 'Motor Fleet Plus';
 const RISK_CODE = 'MTR30';
@@ -30,16 +30,20 @@ async function openRequest(ctx, user, id, tabName) {
 
 async function fill(page, label, value) {
   const field = page.getByLabel(new RegExp(`^${label}`)).first();
-  await field.fill(String(value));
+  const tag = await field.evaluate((e) => e.tagName.toLowerCase());
+  if (tag === 'select' || (await field.getAttribute('role')) === 'combobox') {
+    await chooseOption(page, field, value);
+  } else {
+    await field.fill(String(value));
+  }
   await page.waitForTimeout(150);
 }
 
 /** Attaches a file of a document type in the Documents panel (the upload starts when the file is chosen). */
 async function attach(page, type, file) {
   const main = page.locator('main');
-  const select = main.getByLabel(/^Document type/).first();
-  const options = await select.locator('option').allTextContents();
-  await select.selectOption({ label: options.find((o) => new RegExp(type, 'i').test(o)) });
+  // The document types are a searchable list when the module holds many: chosen through chooseOption.
+  await chooseOption(page, main.getByLabel(/^Document type/).first(), new RegExp(type, 'i'));
   await main.getByLabel(/^Files to attach/).first().setInputFiles(file);
   await settle(page, 1800);
 }
@@ -60,8 +64,8 @@ const steps = {
     const d = dialog(page);
     await d.getByLabel(/^Code/).fill('FLEET_REPAIR');
     const kind = d.getByLabel(/^Kind/);
-    await kind.selectOption({ label: (await kind.locator('option').allTextContents()).find((o) => /^Clause$/i.test(o.trim())) });
-    await d.getByLabel(/^Product line/).selectOption({ label: 'Motor' });
+    await chooseOption(page, kind, /^\s*Clause\s*$/i);
+    await chooseOption(page, d.getByLabel(/^Product line/).first(), /^Motor$/);
     await d.getByLabel(/^Title/).fill('Accredited repair shops for fleets');
     await d.getByLabel(/^Effective from/).fill(new Date(Date.now() + 8 * 3600 * 1000).toISOString().slice(0, 10)); // Philippine date
     await d.getByLabel(/^Wording/).fill('Repairs of insured fleet vehicles are made at the accredited repair shops of the insurer (seed data).');
@@ -160,7 +164,7 @@ const steps = {
       await page.waitForTimeout(600);
       const d = dialog(page);
       const select = d.getByLabel(/^Outcome/);
-      await select.selectOption({ label: (await select.locator('option').allTextContents()).find((o) => outcome.test(o)) });
+      await chooseOption(page, select, outcome);
       await d.getByLabel(/^Rate %/).fill(rate);
       await d.getByLabel(/^Minimum premium/).fill(minimum);
       await d.locator('input[type=file]').first().setInputFiles(pdf(`${insurer}-reply.pdf`, `${insurer} reply to the quotation slip`,
@@ -192,11 +196,24 @@ const steps = {
       [`Package ${TITLE}`, 'Signed by the TSU Head and the insurer (seed data)']));
     page = await openRequest(ctx, 'tsu', id, 'Requirements');
     await act(page, /^submit requirements for mancom sign-off$/i);
+    // BDOI's routing: TSU selects the ManCom approvers (the President approves last).
+    page = await openRequest(ctx, 'tsu', id, 'Routing');
+    for (const approver of ['Manuel ManCom Member', 'Patricia ManCom President']) {
+      await page.getByLabel(new RegExp(`^${approver}`)).check();
+    }
+    await button(page, /^send for mancom approval$/i).click();
+    await settle(page, 1500);
     return page;
   },
+  // The selected approvers approve in parallel, the President last: the last approval signs the request off and
+  // forwards it to MBS (deployment request automatic).
   'wt-a-14': async (ctx) => {
-    const page = await openRequest(ctx, 'mancom', requestA(ctx), 'Requirements');
-    await act(page, /^sign off and send to mbs$/i);
+    let page = await openRequest(ctx, 'mancom', requestA(ctx), 'Routing');
+    await button(page, /^approve$/i).click();
+    await settle(page, 1500);
+    page = await openRequest(ctx, 'mancompres', requestA(ctx), 'Routing');
+    await button(page, /^approve$/i).click();
+    await settle(page, 1500);
     return page;
   },
   // 15-17. Set-up and validation.
@@ -224,11 +241,8 @@ const steps = {
     await tab(page, 'Insurer Terms');
     const clauses = page.getByLabel(/^Clauses of INS-MGIC on OD_THEFT/);
     if (await clauses.count()) {
-      const options = await clauses.locator('option').allTextContents();
-      const pick = options.find((o) => /accredited repair shops for fleets/i.test(o));
-      if (pick) {
-        await clauses.selectOption({ label: pick });
-      }
+      // The clause of walkthrough step 2 is in the list when the step ran; a searchable list when the insurer holds many.
+      await chooseOption(page, clauses.first(), /accredited repair shops for fleets/i).catch(() => {});
     }
     await press(page, /^submit for validation$/i);
     await settle(page, 1500);
@@ -250,7 +264,7 @@ const steps = {
     await button(page, /^add rate$/i).click();
     const d = dialog(page);
     const product = d.getByLabel(/^Product/);
-    await product.selectOption({ label: (await product.locator('option').allTextContents()).find((o) => o.startsWith(RISK_CODE)) });
+    await chooseOption(page, product, new RegExp(`^${RISK_CODE}`));
     await d.getByLabel(/^Commission %/).fill('15');
     await d.getByRole('button', { name: /save for authorization/i }).click();
     await settle(page, 1200);

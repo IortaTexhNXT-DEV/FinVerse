@@ -10,6 +10,7 @@ import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.organization.domain.BranchRepository;
 import com.iortatechnxt.brokerverse.organization.domain.Company;
 import com.iortatechnxt.brokerverse.organization.domain.CompanyRepository;
+import com.iortatechnxt.brokerverse.report.core.CodeSetSources;
 import com.iortatechnxt.brokerverse.report.core.ReportArchiveService;
 import com.iortatechnxt.brokerverse.report.core.ReportRegistry;
 import com.iortatechnxt.brokerverse.report.core.ReportResult;
@@ -58,6 +59,7 @@ class ReportServiceCompanyTest {
             user,
             mock(UserDirectory.class),
             parameters,
+            mock(CodeSetSources.class),
             Clock.systemUTC());
     ReportResult result =
         new ReportResult(

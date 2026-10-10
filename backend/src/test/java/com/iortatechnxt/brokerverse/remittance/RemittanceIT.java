@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.iortatechnxt.brokerverse.booking.BookingFixtures;
+import com.iortatechnxt.brokerverse.cashiering.CashFixtures;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.DisbursementRequest;
@@ -48,6 +49,7 @@ class RemittanceIT {
   private static final String REMITTL = "remittl";
 
   @Autowired private RemittanceFixtures fx;
+  @Autowired private CashFixtures cashFixtures;
   @Autowired private ExtractionService extraction;
   @Autowired private RemittanceExtractionJob job;
   @Autowired private BatchService batches;
@@ -94,6 +96,18 @@ class RemittanceIT {
     assertThat(fx.lineOf(holding.getInvoiceNo())).isNull();
     assertThat(fx.lineOf(unpaid.getInvoiceNo())).isNull();
     assertThat(fx.reload(unpaid.getInvoiceNo()).getLockOwner()).isNull();
+  }
+
+  @Test
+  void aCashPaymentAppliedTodayIsExtractedWhileACheckWaitsForTheHoldingPeriod() {
+    // RMTID.018: the holding period applies to checks, not to a cash payment received over the
+    // counter today (walkthrough A: Receive Payment, then the extraction of the invoice).
+    OpsInvoice cash = fx.invoice();
+    cashFixtures.pay(cash.getInvoiceNo(), cash.premiumBalance());
+    ExtractionRun run = fx.extract(cash.getInvoiceNo());
+    assertThat(run.getStatus()).isEqualTo(RunStatus.SUCCEEDED);
+    assertThat(run.getExtractedCount()).isEqualTo(1);
+    assertThat(fx.lineOf(cash.getInvoiceNo())).isNotNull();
   }
 
   @Test

@@ -7,7 +7,7 @@ const walkthrough = require('./brd02_walkthrough.cjs');
 const { download, render } = require('./brd01_documents.cjs');
 const { settle } = require('./brd01_walkthrough.cjs');
 
-const { fill, firstOption, dateText, isoDate, invoiceA } = walkthrough;
+const { fill, firstOption, dateText, isoDate, invoiceA, postingStep } = walkthrough;
 
 // ------------------------------------------------------------------ records made on demand
 
@@ -254,7 +254,7 @@ const postedWithSlip = (ctx) => ctx.one("select id from adj_request where stage 
 
 const documents = {
   'doc-ar': (ctx, out) => download(ctx, 'cashier', `/cashiering/receipts/${receiptOf(ctx, 'AR-HO-000001')}/pdf`, out),
-  'doc-or': (ctx, out) => download(ctx, 'cashier', `/cashiering/receipts/${receiptOf(ctx, 'OR-HO-100002')}/pdf`, out),
+  'doc-or': (ctx, out) => download(ctx, 'cashier', `/cashiering/receipts/${receiptOf(ctx, 'OR-HO-100001')}/pdf`, out),
   'doc-remittance-schedule': (ctx, out) => download(ctx, 'remittl', `/remittance/batches/${batchOr(ctx)}/documents/SCHEDULE_PDF`, out),
   'doc-payment-request': (ctx, out) => download(ctx, 'remittl', `/remittance/batches/${batchOr(ctx)}/documents/PAYMENT_REQUEST_PDF`, out),
   'doc-endorsement-slip': (ctx, out) => download(ctx, 'adjust', `/adjustment/requests/${postedWithSlip(ctx)}/endorsement-slip`, out),
@@ -282,5 +282,150 @@ const widths = {};
   widths[slug] = 1600;
 });
 
-module.exports = { opens, fills, selects, after, crops, widths, custom: {}, walkthrough: walkthrough.steps, documents,
+// ------------------------------------------------------------------ BDOI's AR / OR records (posting step)
+
+const company = (ctx) => Number(ctx.one("select id from org_company where code = 'FVI'"));
+
+/** A date some days before an ISO date (a check past its holding period). */
+const daysBefore = (iso, n) => {
+  const d = new Date(`${iso}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() - n);
+  return d.toISOString().slice(0, 10);
+};
+
+/**
+ * The records of the posting lists, made once per run through the screens' own services: an AR creation record of
+ * a premium payment for an account with an outstanding balance and an OR creation record of a service fee, both
+ * submitted for posting, an AR record left Created, and a cancellation record of an issued AR.
+ */
+async function records(ctx) {
+  if (ctx.state.records) {
+    return ctx.state.records;
+  }
+  const companyId = company(ctx);
+  const s = await ctx.api('cashier', 'GET', `/cashiering/records/settings?companyId=${companyId}`);
+  const bank = (s.bankAccounts.find((b) => b.currency === 'PHP' && b.defaultForCurrency) || s.bankAccounts[0]).code;
+  const head = s.arBranches.find((b) => /head office/i.test(b.name)) || s.arBranches[0];
+  const rows = await ctx.api('cashier', 'GET', `/cashiering/records/accounts?companyId=${companyId}&q=ARN-2026-94`);
+  const acc = rows.find((r) => Number(r.outstanding) > 1000 && !r.prebooked) || rows[0];
+  const amount = Math.round(Number(acc.outstanding) * 100) / 100;
+  const ar = await ctx.api('cashier', 'POST', '/cashiering/records', {
+    companyId, receiptKind: 'AR', receiptType: 'PREMIUM', branchId: head.id, entryType: 'CLIENT',
+    clientCode: acc.clientCode, clientName: acc.assuredName, payorName: acc.assuredName, tenderType: 'CASH',
+    currency: 'PHP', bankAccount: bank, amount, remarks: 'Premium paid at the Head Office counter',
+    accounts: [{ reference: acc.invoiceNo || acc.arn, amount }],
+  });
+  await ctx.api('cashier', 'POST', `/cashiering/records/${ar.id}/submit`);
+  const orType = ctx.one("select code from lov_value where type_code = 'OR_TYPE' order by sort_order, id limit 1");
+  const insurer = ctx.one("select party_code from cat_insurer where party_code = 'INS-MGIC' limit 1");
+  const or = await ctx.api('cashier', 'POST', '/cashiering/records', {
+    companyId, receiptKind: 'OR', receiptType: orType, branchId: (s.orBranches[0] || head).id, entryType: 'INSURER',
+    insurerCode: insurer, insurerName: 'Mabuhay General Insurance Corp.', payorName: 'Mabuhay General Insurance Corp.',
+    tenderType: 'CHECK', currency: 'PHP', bankAccount: bank, amount: 11200, vat: 1200, wtax: 0,
+    checkNo: '0045871', checkDate: daysBefore(s.today, 14), checkBank: 'BDO Unibank', remarks: 'Risk management fee of September',
+    accounts: [],
+  });
+  await ctx.api('cashier', 'POST', `/cashiering/records/${or.id}/submit`);
+  const draft = await ctx.api('cashier', 'POST', '/cashiering/records', {
+    companyId, receiptKind: 'AR', receiptType: 'PREMIUM', branchId: head.id, entryType: 'OTHER',
+    payorName: 'Walk-in Payor', tenderType: 'CASH', currency: 'PHP', bankAccount: bank, amount: 3500,
+    remarks: 'Payment without an account reference', accounts: [],
+  });
+  const reason = ctx.one("select code from lov_value where type_code = 'RECEIPT_CANCEL_REASON' order by sort_order, id limit 1");
+  const receiptId = Number(ctx.one("select id from csh_receipt where receipt_no = 'AR-HO-000010'"));
+  // The cancellation record of AR-HO-000010, made once (a receipt carries one open cancellation).
+  let cancelId = ctx.sql(`select id from csh_receipt_record where record_kind = 'CANCELLATION' and receipt_id = ${receiptId} order by id desc limit 1`)[0]?.[0];
+  if (!cancelId) {
+    const cancels = await ctx.api('cashier', 'POST', '/cashiering/records/cancellations', {
+      companyId, receiptIds: [receiptId], reasonCode: reason, reasonText: 'Double issuance of the AR',
+    });
+    if (cancels[0]) {
+      await ctx.api('cashier', 'POST', `/cashiering/records/${cancels[0].id}/submit`).catch(() => {});
+      cancelId = cancels[0].id;
+    }
+  }
+  ctx.state.records = { ar: ar.id, or: or.id, draft: draft.id, cancel: cancelId };
+  return ctx.state.records;
+}
+
+/** A Bills Payment file written by the channel simulator in BDOI's layout and uploaded on Payment Files. */
+async function paymentFile(ctx) {
+  if (!ctx.state.paymentFile) {
+    const companyId = company(ctx);
+    const content = await ctx.api('cashier', 'POST', `/cashiering/payment-files/simulator?companyId=${companyId}&fileType=BILLS_PAYMENT&rows=4`);
+    const form = new FormData();
+    form.append('companyId', String(companyId));
+    form.append('types', 'BILLS_PAYMENT');
+    form.append('files', new Blob([content]), 'BDOI20261009.txt');
+    await ctx.api('cashier', 'POST', '/cashiering/payment-files', form);
+    ctx.state.paymentFile = true;
+  }
+}
+
+async function open(ctx, user, path) {
+  const page = await ctx.pageOf(user);
+  await page.goto(`${ctx.BASE}${path}`);
+  await ctx.settle(page, 1000);
+  return page;
+}
+
+const custom = {
+  'scr-op-08-01-preview': async (ctx) => {
+    const page = await receivePayment(ctx);
+    for (const step of fills.receive_payment) {
+      if (typeof step === 'function') {
+        await step(page);
+      } else {
+        await fill(page, step[0], step[1]);
+      }
+    }
+    return page;
+  },
+  'scr-op-08-02-error': async (ctx) => {
+    const page = await receivePayment(ctx);
+    await page.getByRole('button', { name: /^issue ar and apply$/i }).click();
+    await ctx.settle(page, 800);
+    return page;
+  },
+  // Receipts, with the posting step of the ARs back on (as delivered) for the screens that follow.
+  'scr-op-09-01-list': async (ctx) => { await postingStep(ctx, 'AR,OR'); return open(ctx, 'cashier', '/cashiering/receipts'); },
+  'scr-op-07-01-home': async (ctx) => { await postingStep(ctx, 'AR,OR'); await records(ctx); return open(ctx, 'cashtl', '/cashiering'); },
+  'scr-op-65-02-filled': async (ctx) => open(ctx, 'cashier', `/cashiering/records/${(await records(ctx)).draft}/edit`),
+  'scr-op-65-03-error': async (ctx) => {
+    const page = await open(ctx, 'cashier', '/cashiering/records/new?kind=AR');
+    await ctx.clickButton(page, '^save$');
+    await ctx.settle(page, 600);
+    return page;
+  },
+  'scr-op-66-01-record': async (ctx) => open(ctx, 'cashtl', `/cashiering/records/${(await records(ctx)).ar}`),
+  'scr-op-66-02-post': async (ctx) => {
+    const page = await open(ctx, 'cashtl', `/cashiering/records/${(await records(ctx)).or}`);
+    await page.getByRole('button', { name: /^post$/i }).first().click();
+    await ctx.settle(page, 600);
+    return page;
+  },
+  'scr-op-66-03-cancellation': async (ctx) => open(ctx, 'cashtl', `/cashiering/records/${(await records(ctx)).cancel}`),
+  'scr-op-67-01-list': async (ctx) => { await records(ctx); return open(ctx, 'cashtl', '/cashiering/posting'); },
+  'scr-op-67-02-cancellations': async (ctx) => {
+    await records(ctx);
+    return open(ctx, 'cashtl', '/cashiering/posting?kind=CANCELLATION');
+  },
+  'scr-op-68-01-files': async (ctx) => { await paymentFile(ctx); return open(ctx, 'cashier', '/cashiering/payment-files'); },
+  'scr-op-68-02-report': async (ctx) => {
+    await paymentFile(ctx);
+    const page = await open(ctx, 'cashier', '/cashiering/payment-files');
+    await page.locator('main table tbody tr').first().getByRole('button', { name: /^Actions for/ }).click();
+    await page.getByRole('menuitem', { name: /^run report$/i }).first().click();
+    await ctx.settle(page, 1000);
+    return page;
+  },
+  'scr-op-70-01-list': async (ctx) => { await records(ctx); return open(ctx, 'cashier', '/cashiering/day-end'); },
+};
+
+const recordCrops = {
+  'scr-op-68-02-report': 'section.card:has(> header h2:text-matches("^Run Report"))',
+};
+Object.assign(crops, recordCrops);
+
+module.exports = { opens, fills, selects, after, crops, widths, custom, walkthrough: walkthrough.steps, documents,
   prepare: walkthrough.prepare };

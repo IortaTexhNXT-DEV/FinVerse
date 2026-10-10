@@ -4,25 +4,33 @@
 area: Cashiering
 screens:
   - id: SCR-OP-07
-    title: Cashiering Workbench
+    title: Cashiering Dashboard
     route: /cashiering
     purpose: >-
-      The landing page of Cashiering: the work queues of the section counted live (unapplied payments, dispositions
-      and receipt actions for approval, pre-booked payments, post-dated checks, BIR 2307 to validate,
-      invoices with outstanding or partial premium, hand-offs), each opening its list.
+      The landing page of Cashiering as BDOI's FRS sets it: for each item of the user's role the count and the amount
+      per currency - the AR/OR, cancellation and reinstatement records for posting per receipt type, the returned
+      records, the unapplied payments for disposition per type and the payment files waiting for automatic processing
+      - each opening its list already filtered; the search of an account, invoice, ARN, AR or OR number; and the main
+      navigation of Cashiering.
     entry:
-      - Operations Home › Cashiering › Open
+      - Cashiering › Cashiering Workbench
     shots:
-      - {state: home, user: cashier, caption: "Cashiering Workbench with the work queues of the section"}
+      - {state: home, user: cashtl, caption: "Cashiering Dashboard of the Cashiering Team Leader"}
     fields:
-      - "Work Queues | [Work tiles: Unapplied Payments, Dispositions for Approval, Pre-booked Payments, Cancellations and Reinstatements for Approval, Post-dated Checks in the Warehouse, Check Pick-ups Due, BIR 2307 to Validate, Invoices with Outstanding Premium, Partially Paid Invoices, Hand-offs to Complete] | Tile | Live count; Needs attention on the queues waiting for action | - | Cashiering records and the invoice ledger | - | Read only | A tile opens its list | -"
+      - "Search | Search account, invoice, ARN, AR or OR number | Text | Account, invoice, ARN, AR or OR number | N | Receipts and the invoice ledger | Blank | - | - | -"
+      - "AR/OR for Posting / Cancellation (AR/OR) for Posting / Reinstatement (AR/OR) for Posting | Item / Count / Amount (PHP) | Table | One row per receipt type: AR - Premium, AR - Non-Premium (Refund, Other Expenses, AR Insurance), OR - Service Fee, Insurance Profit Share, Commissions, Incentives, Others; count and amount per currency | - | Creation, cancellation and reinstatement records | - | Read only | - | Nothing to show"
+      - "Returned List | Item / Count / Amount (PHP) | Table | AR and OR issuance, cancellation and reinstatement records returned to their creator | - | Records | - | Read only | - | -"
+      - "Unapplied Payments for Disposition | Item / Count / Amount (PHP) | Table | Pre-Booked, Excess, Refund to Client, Refund to Insurer, Unbooked/Unmatched, Unapplied, Unapplied Commission | - | Unapplied payments | - | Read only | - | -"
+      - "For Auto Payment Processing | Item / Count / Amount (PHP) | Table | PDC, Bills Payment, CLPC, Trade, Direct Credit files waiting | - | Payment files | - | Read only | - | -"
+      - "Main Navigation | Create AR/OR / Post - Issuance / Cancel AR/OR / Post - Cancellation / Reinstate AR/OR / Post - Reinstatement / Batch Print AR/OR Facility / Unapplied Payments Facility / Automatic Payment Processing Uploading Facility / Reports Generation | Links | Shown by the user's role | - | - | - | - | - | -"
     actions:
-      - "Search Invoices | Every Cashiering user | Always | Opens Invoice Search | - | -"
-      - "[A work tile] | Every Cashiering user | Always | Opens the list of the queue | - | -"
+      - "Refresh | Every Cashiering user | Always | Counts the items again | - | -"
+      - "Search | Every Cashiering user | A number entered | Opens the receipt found, or Invoice Search with the number | - | -"
+      - "[An item row] | Every Cashiering user | Always | Opens its list already filtered (Posting, Unapplied Payments, Payment Files) | - | -"
     rules:
-      - "The tiles are counted live from the Cashiering records and the invoice ledger (FR-OP-003)."
-      - "The Check Pick-ups Due tile of the screenshot is withdrawn with check pick-up (CSHID.009 removed from scope, FR-OP-017, CLR-OP-38); the BIR 2307 to Validate tile moves to the Marketing Collection work with the PR 2307 reversal (FR-OP-113, CLR-OP-40)."
-    outcome: The cashier sees the work waiting and opens it.
+      - "Each user sees only the groups of the role: the posting groups for the Approver/Poster, the returned list for the creators, the unapplied payments for the disposition and application rights, the payment files for the upload right (FR-OP-003)."
+      - "The counts and amounts are taken when the screen opens or is refreshed, per currency (FR-OP-003)."
+    outcome: The Cashiering team sees the records, payments and files waiting for each of them and opens the list in one click.
     frs: [FR-OP-003]
     tests: [CASHWB]
 
@@ -32,7 +40,9 @@ screens:
     purpose: >-
       The over-the-counter payment of a walk-in payor: the references typed are matched on ARN, invoice, policy or
       PN number, the live preview shows how the money is applied component by component, and Issue AR and Apply
-      issues the acknowledgement receipt, applies the payment and leaves any excess in unapplied collections.
+      issues the acknowledgement receipt, applies the payment and leaves any excess in unapplied collections. Shown
+      when the posting step of ARs is off (setting of Appendix H.8); as delivered BDOI's posting step applies and the
+      entry opens Create AR (SCR-OP-65).
     entry:
       - Cashiering Workbench
     shots:
@@ -77,7 +87,6 @@ screens:
     shots:
       - {state: list, user: cashier, caption: "Receipts: acknowledgement and official receipts"}
       - {state: actions, user: cashtl, tab: "Cancellations and Reinstatements", caption: "Cancellations and Reinstatements tab of the Cashiering Team Leader"}
-      - {state: issue_or, user: cashier, fill: issue_or, caption: "Issue Official Receipt dialog for a service fee"}
     fields:
       - "Tabs | Receipts / Cancellations and Reinstatements | Tab | - | - | Fixed | Receipts | - | - | -"
       - "Toolbar | Search Receipt No. | Text | Receipt number | N | Receipts | Blank | - | - | -"
@@ -92,7 +101,8 @@ screens:
       - "Issue Official Receipt dialog | Gross Amount / VAT / Withholding Tax | Number | Two decimals | Y / N / N | - | Blank / 0 / 0 | - | Gross above zero; VAT and withholding tax not negative | Enter the gross amount / VAT and withholding tax cannot be negative"
       - "Issue Official Receipt dialog | 2307 Certificate Ref. / Description | Text | Up to 60 / 250 characters | N | - | Blank | - | - | -"
     actions:
-      - "Issue Official Receipt / Issue OR | Cashier (Head Office) | Always | Issues the OR from the Head Office series with its VAT and withholding tax lines and opens it | OR issued | -"
+      - "Create OR | Cashier (Head Office) | The posting step of ORs is on (as delivered) | Opens Create OR (SCR-OP-65); the OR number is issued when the record is posted | Created | -"
+      - "Issue Official Receipt / Issue OR | Cashier (Head Office) | The posting step of ORs is off | Issues the OR from the Head Office series with its VAT and withholding tax lines and opens it | OR issued | -"
       - "Search / Filters | Every Cashiering user | Always | Filters the receipts | - | -"
       - "Open Receipt | Every Cashiering user | Always | Opens the receipt of the request | - | -"
       - "Approve | Cashiering Team Leader | Request for approval | Asks for confirmation and applies the cancellation or reinstatement to the receipt with its postings | Posted | Workflow notice (NT-01)"
@@ -126,7 +136,8 @@ screens:
       - "Header | [Flags] | Tag | With Unapplied, Printed <n>x, Reinstated | - | Receipts | - | Read only | - | -"
       - "Header | Receipt Date / Payor / Amount / Applied / Unapplied / Mode / Currency / BOOK Rate | Display | Amounts with two decimals; mode with the check number | - | Receipts | - | Read only | - | -"
       - "Workflow | [Receipt action workflow header] | Stepper | Requested, For approval, Posted with the history table | - | Receipt action | - | Read only | - | -"
-      - "Tabs | Applications / Lines / Journal / History | Tab | - | - | Fixed | Applications | - | - | -"
+      - "Tabs | Applications / Lines / Journal / History / Documents | Tab | - | - | Fixed | Applications | - | - | -"
+      - "Documents | Document / Printed By / Printed | Column | Every print of the receipt (client's and company copy, re-prints) with its PDF | - | Print lines | - | Read only | - | -"
       - "Applications | Invoice / Reference / By Component / Applied / Commission Realized / Value Date / Status | Column | Invoice with its ARN; the amount by component | - | Applications | - | Read only | - | Nothing applied from this receipt"
       - "Lines | Invoice / Item / Insurer / Gross / VAT / WTAX / Net | Column | OR lines | - | Receipt lines | - | Read only | - | -"
       - "Journal | Journal Batch / Posting | Column | Receipt, each application and each action | - | Journals (BRD-5) | - | Read only | - | No journal posted yet"
@@ -147,6 +158,7 @@ screens:
       - "A cancellation reverses every active application, reverses the receipt entry and closes the unapplied balance of the receipt (FR-OP-013, FR-OP-027)."
       - "A reinstatement restores the receipt for the full or partial amount, applies it to the invoice encoded and leaves the rest unapplied; a bounced check needs no encoded fields (FR-OP-014)."
       - "The requester never approves the own request (FR-OP-013, FR-OP-014)."
+      - "As delivered (posting step on, Appendix H.8) Cancel Receipt and Reinstate create a cancellation or reinstatement record, CN- or RE- numbered, that the Approver/Poster posts or returns on Posting (SCR-OP-66, SCR-OP-67) (FR-OP-013, FR-OP-014)."
       - "Every action on a receipt records the receipt number, the user and the time in the audit trail (FR-OP-024)."
     outcome: The receipt, its applications and its postings are visible; cancellations and reinstatements are approved by a second user.
     frs: [FR-OP-011, FR-OP-012, FR-OP-013, FR-OP-014, FR-OP-024, FR-OP-025, FR-OP-027]
@@ -347,24 +359,30 @@ screens:
     title: Batch Print
     route: /cashiering/print
     purpose: >-
-      Print receipts in one batch: choose them by kind, insurer and date, preview the list, print the selected
-      receipts into one PDF and retry the ones that failed.
+      Print and re-print ARs and ORs in their forms, at most 500 per batch: choose the receipts by type, branch and
+      issue date, choose the copy (Client's Copy, Company Copy or both), print the selected receipts and follow the
+      print batches with their log, preview, PDF or ZIP of single PDFs, and the retry or skip of the failures.
     entry:
-      - Cashiering Workbench
+      - Cashiering Dashboard › Batch Print AR/OR Facility
     shots:
-      - {state: list, user: cashier, caption: "Batch Print: receipts to print and the print batches"}
+      - {state: list, user: cashier, caption: "Batch Print: receipts for printing with the copy to print"}
     fields:
-      - "Receipts to Print | Kind / Insurer / Date From / Date To | Drop-down, date | All, Acknowledgement Receipt, Official Receipt; insurers by name | N | - | All | - | - | -"
-      - "Receipts to Print | Receipt No. / Date / Payor / Amount / Printed | Column | Printed <n>x or Not yet | - | Receipts | - | Read only | - | No receipts match the criteria"
-      - "Print Batches | Batch No. / Criteria / Progress / Printed / Failed / Created / Status | Column | Progress bar; red when a receipt failed | - | Print batches | - | Read only | - | No print batch yet"
+      - "Tabs | Print / Print Queue / Re-print | Tab | Receipts not printed yet; the print batches; receipts already printed | - | Fixed | Print | - | - | -"
+      - "Print | Receipt Type / Receipting Branch / Issued From / Issued To | Drop-down, date | Acknowledgement Receipt, Official Receipt; branches; dd-MMM-yyyy | N | - | Acknowledgement Receipt | - | - | -"
+      - "Print | Copy | Drop-down | Client's Copy, Company Copy, Client's Copy and Company Copy | Y | Fixed list | Client's Copy | - | - | -"
+      - "Print | AR or OR Number / Receipting Branch / Issued / Client Name / Insurer Name / AR or OR Amount / Printed | Columns | For Printing, or the number of prints | - | Receipts | - | Read only | - | No receipts match the criteria"
+      - "Print Queue | Batch No. / Criteria / Copy / Printed / Not Printed / Skipped / Printed By / Status | Columns | Counts of the batch | - | Print batches | - | Read only | - | -"
+      - "Print Log | Receipt Number / Certificate No. / Reprint / Status / Reason | Columns | The acknowledgement certificate number of each print (AC_<branch>_<MMYYYY>_<sequence> as delivered); REPRINT on a re-print | - | Print lines | - | Read only | - | -"
     actions:
-      - "Preview List | Cashier | Always | Lists the issued receipts of the criteria | - | -"
-      - "Print Selected (n) | Cashier | Receipts selected | Prints the selected receipts into one PDF and records each | Batch done or with failures | -"
-      - "Download | Cashier | Batch printed | Downloads the merged PDF | - | -"
-      - "Retry Failures | Cashier | Batch with failures | Prints the failed receipts again | - | -"
+      - "Search | Cashier | Always | Lists the receipts of the criteria | - | -"
+      - "Print Selected (n) | Cashier (print right) | Receipts selected, at most 500 | Prints the selected receipts in their form with the copy chosen and records each | Printed | -"
+      - "Print Log / Print Preview / Download PDF / Download ZIP | Cashier | A print batch | Shows the log; previews; downloads one PDF or a ZIP of one PDF per receipt | - | -"
+      - "Retry Failures / Skip Failures | Cashier | Batch with failures | Prints the failed receipts again, or closes them as skipped | - | -"
     rules:
-      - "A batch records each receipt printed, so a failure is retried without printing the others again (FR-OP-025)."
-    outcome: Receipts are printed in one run with a record of what was printed.
+      - "A batch records each receipt printed with its certificate number, so a failure is retried without printing the others again (FR-OP-025)."
+      - "A re-printed receipt is marked REPRINT (FR-OP-025)."
+      - "The receipt is printed in the AR or OR form in force (AR and OR Forms, SCR-OP-69), with the amount in words of its currency (setting of Appendix H.8) (FR-OP-025)."
+    outcome: Receipts are printed in one run with a record of what was printed and re-printed.
     frs: [FR-OP-025]
     tests: [PRINT]
 
@@ -443,11 +461,13 @@ screens:
       - {state: new, user: cashtl, fill: new_series, caption: "New Receipt Series dialog"}
     fields:
       - "Toolbar | Origin | Drop-down | All origins, BIBS, Migrated | N | Fixed list | All origins | - | - | -"
-      - "List | Series / Branch / Range / Next No. / Used / Status | Column | Prefix with the kind and ATP; gauge with the numbers left | - | Receipt series | - | Read only | - | No receipt series yet"
+      - "List | Series / Branch / Range / Year / Next Number / Used / Status | Column | Prefix with the kind and ATP; year or Every year; next number in its format; gauge with the numbers left | - | Receipt series | - | Read only | - | No receipt series yet"
       - "New Receipt Series dialog | Kind / Branch | Drop-down | AR or OR; an OR series only for the Head Office | Y | Branches | AR | - | - | -"
       - "New Receipt Series dialog | Prefix | Text | For example AR-HO- | Y | - | Blank | - | Not blank | Prefix is required"
       - "New Receipt Series dialog | From No. / To No. | Number | The range ends at or after its start | Y | - | Blank | - | Valid range | The range must end at or after its start"
       - "New Receipt Series dialog | BIR ATP No. / Warn When Remaining At | Text, number | - | N | - | Blank | - | - | -"
+      - "New Receipt Series dialog | Year | Number | Year of the series; blank for every year | N | - | Blank | - | - | -"
+      - "New Receipt Series dialog | Number Format | Text | Parts {PREFIX}, {YEAR}, {BRANCH}, {SEQ}; the first number is shown below the form; blank = prefix and sequence | N | Number format setting (Appendix H.8) | The proposed format | - | Only the parts listed | -"
     actions:
       - "New Series / Save Series | Cashiering Team Leader | Always | Saves the series for authorisation | Pending authorization | -"
       - "Authorize | A second user with the authorisation permission | Series pending | Asks for confirmation and activates the series | Active | -"

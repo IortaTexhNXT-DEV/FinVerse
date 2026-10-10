@@ -1,4 +1,4 @@
-"""Figures of the User Access Maintenance FRS in BDOI's template, version 1.3 (Graphviz, PNG at 200 dpi).
+"""Figures of the User Access Maintenance FRS in BDOI's template, version 1.3 (Graphviz, PNG at 240 dpi).
 
     python docs/deliverables/src/programme/bdoi_template_frs/brd11_figures.py OUT_DIR   # renders every figure
 
@@ -27,7 +27,7 @@ import yaml
 HERE = Path(__file__).resolve().parent
 SPEC = HERE / "brd11_flows.yaml"
 
-DPI = 200
+DPI = 240
 FONT = "Arial"
 INK = "#1F3864"
 LANE_FILLS = ["#EAF1FB", "#FFF7E0", "#EEF5EA", "#F6ECF7", "#FDEDEC", "#EAF6F6", "#F2F2F2"]

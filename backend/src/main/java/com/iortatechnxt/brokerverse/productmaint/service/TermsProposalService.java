@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -157,7 +158,11 @@ public class TermsProposalService {
         record.type(),
         facts.requestNo(),
         AuditAction.UPDATE,
-        "Insurers selected for the proposal: " + String.join(", ", chosen));
+        "Insurers selected for the proposal: "
+            + facts.insurers().stream()
+                .filter(i -> chosen.contains(i.insurerCode()))
+                .map(TermsSources.InsurerTerms::insurerName)
+                .collect(Collectors.joining(", ")));
     return tables.table(record);
   }
 

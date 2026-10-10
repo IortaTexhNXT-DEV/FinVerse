@@ -452,7 +452,7 @@ notifications:
 audit:
   - "Password change and reset recorded (no password value)."
 acceptance:
-  - A new password equal to one of the last 8 is refused.
+  - A new password equal to one of the last 10 is refused.
   - After an administrator reset, the user must change the password at the next log-in.
   - The reset link works once and not after 30 minutes.
 ```

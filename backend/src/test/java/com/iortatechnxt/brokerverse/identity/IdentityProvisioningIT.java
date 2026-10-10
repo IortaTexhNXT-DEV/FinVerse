@@ -228,6 +228,14 @@ class IdentityProvisioningIT {
                         + "\"value\":\"LOCKED\"}]}"))
         .andExpect(status().isOk());
     assertThat(enabled(userId)).isFalse();
+    // the event details read in words: the status by its label, never its code
+    assertThat(
+            jdbc.queryForList(
+                "select message from idn_identity_event where user_id = ? and event_type = 'STATUS'",
+                String.class,
+                userId))
+        .isNotEmpty()
+        .allMatch(m -> m.endsWith(" for the Enterprise SSO status Locked"));
   }
 
   @Test

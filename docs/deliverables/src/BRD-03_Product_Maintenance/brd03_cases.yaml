@@ -32,6 +32,13 @@ personas:
 screens:
   LOGIN: Login page
   HOME: Product Maintenance > Product Maintenance Home
+  DASH: Product Maintenance > Product Maintenance Dashboard
+  DEACT: Product Maintenance > Deactivation Requests
+  MASTERX: Product Maintenance > Product Master Transfers
+  PLACEMENT: Product Maintenance > Placement Update Reports
+  PMAUDIT: Product Maintenance > Audit Logs
+  PROPOSAL: Product Maintenance Home > Quotation Request List > proposal request (Comparative Table, Proposal Slip)
+  ROUTING: Product Maintenance > Package Requests > Package Request page > Routing & Approvals tab
   REQS: Product Maintenance > Package Requests
   NEWREQ: Product Maintenance > Package Requests > New Package Request
   REQ: Product Maintenance > Package Requests > Package Request page (workflow panel)
@@ -232,7 +239,7 @@ frs:
         type: Positive
         persona: TSU
         title: Single sign-on of a TSU Officer (BRD-11)
-        pre: Single sign-on through EIAM switched on in the test environment (BRD-11 FR-UA-003); the EIAM test account of tsu.
+        pre: Single sign-on through EIAM switched on in the test environment (User Access Maintenance FRS); the EIAM test account of tsu.
         steps:
           - Open BIBS and click Sign in with the BDO identity provider; sign in at EIAM with the test account of tsu.
           - Open the side menu.
@@ -420,7 +427,16 @@ frs:
       - The History tab of a released request lists every step from submission to release with user and time.
       - A changed insurer response keeps its earlier values in the response history.
       - No screen or direct request edits or deletes audit rows.
+      - The Audit Logs of Product Maintenance and of each request and product show every action with the old and new value, by whom and when, and export to CSV and Excel named Audit Logs_MMDDYYYY.
     cases:
+      - c: 4
+        type: Positive
+        persona: AUDITOR
+        screen: PMAUDIT
+        title: Audit Logs of Product Maintenance
+        steps:
+          - Open Product Maintenance › Audit Logs; set From to the first day of last month; filter the reference PKD; export to Excel.
+        expected: The deactivation requests are listed with module, reference, action type, description, old and new value and the user; the file Audit Logs_<MMDDYYYY>.xlsx has the same rows.
       - c: 1
         type: Positive
         title: History of a released request from submission to release
@@ -1196,7 +1212,32 @@ frs:
       - Terms Final is refused while an insurer of the latest round is Pending.
       - Only insurers that offered terms can be chosen, and shares total 100.
       - After Terms Final the request shows the proposed terms and a current comparative master.
+      - The comparative table holds the QS value, every option of every insurer and the Final Terms for Proposal; the requestor selects the insurers and one proposal slip is generated per insurer; the client response is recorded.
     cases:
+      - c: 4
+        type: Workflow
+        screen: PROPOSAL
+        title: Final terms, insurers selected and proposal slips per insurer
+        steps:
+          - On PRF-2026-900004 open the Comparative Table; Add Option for Luzon Assurance Co. with the response Approved; key the Final Terms for Proposal.
+          - As ao select Mabuhay General Insurance Corp. and Luzon Assurance Co. and Proceed to Proposal; as tsu generate the proposal.
+        expected: The table shows both options and the final terms; Final Terms History lists each change; two proposal slips (one per insurer, version 1) are listed under Proposal Slips.
+      - c: 4
+        type: Negative
+        screen: PROPOSAL
+        title: Others without the insurer's response
+        steps:
+          - Add an option with the response Others and no text.
+        expected: Refused with "Specify the insurer's actual response for Others".
+      - c: 4
+        type: Positive
+        persona: MKT_AO
+        screen: PROPOSAL
+        title: Client response recorded
+        pre: A proposal sent to the client.
+        steps:
+          - On the Proposal Slip tab click Record Client Response; choose Returned with remarks.
+        expected: The response is listed with the date, remarks and the user; the request goes back to TSU for revision.
       - c: 1
         type: Negative
         title: Terms Final with a pending insurer
@@ -1445,7 +1486,24 @@ frs:
       - After sign-off the QS of every round is locked.
       - Without an uploaded sheet the request carries a generated MANCOM_SIGNOFF document.
       - The member who submitted the requirements cannot sign them off; a return needs a reason.
+      - The selected ManCom approvers approve in parallel and the President last; the package then goes to MBS with its deployment request.
     cases:
+      - c: 5
+        type: Workflow
+        persona: TSU_HEAD
+        screen: ROUTING
+        title: ManCom approvers in parallel, then the President
+        steps:
+          - On PKR-2026-900004 open Routing & Approvals; select the ManCom member and the President; Send for ManCom Approval.
+          - As mancom approve; as the President approve.
+        expected: The President's approval shows Waiting for the others until the member approves; after the President the request is With MBS for set-up and the deployment request number is shown.
+      - c: 5
+        type: Negative
+        screen: ROUTING
+        title: Return without remarks
+        steps:
+          - As a selected ManCom approver click Return for Revision without remarks.
+        expected: Refused with "Enter the remarks of the rejection or the return".
       - c: 1
         type: Workflow
         title: ManCom signs off with an uploaded sheet
@@ -1717,7 +1775,23 @@ frs:
       - A retirement request retires the product at the MBS step; other request types cannot retire.
       - After retirement a new quotation on the product is refused.
       - The retired product and its versions stay searchable for users with PRODUCT_ARCHIVE_VIEW.
+      - Deactivate Package with an effective date, reason and approver is approved or rejected by the approver; on the effective date the package expires and the change is sent to the receiving systems.
     cases:
+      - c: 4
+        type: Workflow
+        screen: DEACT
+        title: Deactivate a package with an effective date
+        steps:
+          - As mbs open product CAR02, click Deactivate Package, enter an effective date 30 days ahead, the reason Replaced by another package and the approver tsuhead; Submit for Approval.
+          - As tsuhead open Deactivation Requests, View Details, Approve.
+        expected: The request PKD-yyyy-nnnnnn is Pending Approval, then Approved with the new expiry date; the requester is told; on the effective date the daily run sets the package to expired.
+      - c: 4
+        type: Negative
+        screen: DEACT
+        title: Effective date in the past and rejection without remarks
+        steps:
+          - In Deactivate Package enter yesterday as the effective date; then, as the approver of a pending request, click Reject without remarks.
+        expected: "\"The deactivation effective date must be today or later\" and \"Enter the approval remarks of the rejection\" are shown; nothing is saved."
       - c: 1
         type: Workflow
         title: Retire MTR32 through a retirement request
@@ -2076,12 +2150,14 @@ frs:
       - A request past its stage SLA is counted in a red tile, and amber from 80 % of the SLA.
       - A tile opens its filtered list, which exports to Excel.
       - Counts follow the user's access.
+      - Product Maintenance Home lists the Product Matrix (active, expiring within 90 days, expired), the quotation requests and the package requests; the Dashboard shows the key figures with their drill-down list and exports.
     cases:
       - c: 1
         type: Positive
+        screen: DASH
         title: Red tile for a request past its SLA
         steps:
-          - Open Product Maintenance Home.
+          - Open the Product Maintenance Dashboard.
         expected: PKR-2026-900002 (FOR_TSU_REVIEW since 21-Sep, SLA 24 hours) is counted in a red tile.
       - c: 1
         type: Boundary
@@ -2111,6 +2187,19 @@ frs:
           - Send a direct request to read the Product Maintenance counts, signed in as a user without PRODUCT_VIEW and PKG_REPORT_VIEW.
         expected: A direct request is refused with "You are not permitted to perform this action".
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
+      - c: 4
+        type: Positive
+        title: Product Matrix and request lists on the Home
+        steps:
+          - Open Product Maintenance Home; open Expiring Products (90 days); search MTR; open the Quotation Request List and the Package Request List.
+        expected: The matrix shows line, sub-line, package name, description, insurer, status, effective and expiry dates and last update; the two lists show the requests with their status and aging.
+      - c: 4
+        type: Report-output
+        screen: DASH
+        title: Key figures with their drill-down and exports
+        steps:
+          - On the Dashboard set the period to the last 60 days; click Expiring Packages; export to Excel.
+        expected: The list shows the packages ending within 90 days with request type, line, requester, TSU officer, status, submission date and aging; the Excel file has the same rows.
 
   FR-PM-071:
     scenario: SC-PM-07
@@ -2155,6 +2244,22 @@ frs:
           - Run PM-PKG-EXPIRY with Ending Within "abc".
         expected: The run does not start.
         msg: ["{Ending Within (days)} has an invalid value 'abc'", INVALID_REPORT_PARAMETERS]
+      - c: 1
+        type: Report-output
+        screen: PLACEMENT
+        title: Consolidated Placement Update Report on request
+        steps:
+          - On Placement Update Reports click Generate Now; preview and download the report.
+        expected: PlacementUpdate_<MMDDYYYY>.xlsx is listed with the report date, the period of the last 7 days, the user and the number of records; it lists the quotation requests of the period.
+      - c: 1
+        type: Positive
+        persona: SYSADMIN
+        screen: PLACEMENT
+        title: Weekly Consolidated Placement Update Report
+        pre: The test lead sets the scheduled day to today and the time to the next hour on System Parameters.
+        steps:
+          - After the time set, open Placement Update Reports.
+        expected: The report of the scheduled run is in the repository with the run Scheduled.
 
   FR-PM-072:
     scenario: SC-PM-07
@@ -2186,7 +2291,15 @@ frs:
         title: Release logged by the product master feed
         steps:
           - Release a version (TC-PM-043.2-01); open the application log or Integration Events for the feed entry.
-        expected: One entry with product, version and effective date; nothing is sent to an external system (PQ16).
+        expected: One change with product, version and effective date is listed on Product Master Transfers and sent in the file ProductMaster_<yyyyMMddHHmmss>.csv (to the receiving system simulator in SIT and UAT).
+      - c: 2
+        type: Positive
+        persona: MBS
+        screen: MASTERX
+        title: Send Now of the waiting product master changes
+        steps:
+          - After the approval of a deactivation, open Product Master Transfers and click Send Now.
+        expected: The change is Sent with its file and time; the simulator inbox shows the file with its records.
       - c: 1
         type: Negative
         persona: MKT_AO

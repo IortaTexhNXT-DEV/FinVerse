@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoiceComponent;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoiceMovement;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
+import com.iortatechnxt.brokerverse.opsledger.service.port.PaymentClearance;
 import com.iortatechnxt.brokerverse.organization.domain.Branch;
 import com.iortatechnxt.brokerverse.organization.service.OrganizationService;
 import com.iortatechnxt.brokerverse.remittance.domain.BatchLine.LineFacts;
@@ -30,6 +31,7 @@ public class LedgerPositions {
 
   private final InvoiceLedgerQueryService ledger;
   private final OrganizationService organization;
+  private final PaymentClearance clearance;
 
   /**
    * Creates the reader.
@@ -37,9 +39,13 @@ public class LedgerPositions {
    * @param ledger ledger reads
    * @param organization branches and holidays
    */
-  public LedgerPositions(InvoiceLedgerQueryService ledger, OrganizationService organization) {
+  public LedgerPositions(
+      InvoiceLedgerQueryService ledger,
+      OrganizationService organization,
+      PaymentClearance clearance) {
     this.ledger = ledger;
     this.organization = organization;
+    this.clearance = clearance;
   }
 
   /**
@@ -80,6 +86,22 @@ public class LedgerPositions {
   public Optional<LocalDate> lastPaidOn(String invoiceNo) {
     return ledger.movements(invoiceNo).stream()
         .filter(m -> m.getMovementType() == MovementType.APPLIED && m.getAmount().signum() > 0)
+        .map(OpsInvoiceMovement::getValueDate)
+        .max(Comparator.naturalOrder());
+  }
+
+  /**
+   * The value date of the last payment applied to an invoice that still clears (a check or a
+   * matured post-dated check, RMTID.018); a cash or channel payment is cleared when applied and
+   * never holds the remittance.
+   *
+   * @param invoiceNo invoice
+   * @return date, empty when no clearing payment was applied
+   */
+  public Optional<LocalDate> lastClearingPaidOn(String invoiceNo) {
+    return ledger.movements(invoiceNo).stream()
+        .filter(m -> m.getMovementType() == MovementType.APPLIED && m.getAmount().signum() > 0)
+        .filter(m -> clearance.clears(m.getArNo()))
         .map(OpsInvoiceMovement::getValueDate)
         .max(Comparator.naturalOrder());
   }

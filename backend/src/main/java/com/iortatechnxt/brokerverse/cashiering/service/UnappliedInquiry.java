@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.cashiering.service;
 
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.opsledger.domain.ModuleNames;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -72,6 +73,18 @@ public class UnappliedInquiry {
           + " coalesce(i.assured_name, u.payor_name) as assured, i.insurer_code,"
           + " coalesce(ins.name, i.insurer_code) as insurer_name, u.sales_unit, u.currency,"
           + " u.amount, u.balance, u.stage";
+
+  /** Prefix of the reference of a payment received by Cashiering. */
+  private static final String PAYMENT_REF = "PAY:";
+
+  /** Prefix of the reference of a payment migrated from a legacy system ("MIG:kind:system:ref"). */
+  private static final String MIGRATION_REF = "MIG:";
+
+  /** Index of the source system in the parts of a migration reference. */
+  private static final int MIGRATION_REF_SYSTEM = 2;
+
+  /** Prefix of the reference of a commission payment. */
+  private static final String COMMISSION_PAYMENT_REF = "CPAY:";
 
   private final NamedParameterJdbcTemplate jdbc;
   private final CurrentUser currentUser;
@@ -203,13 +216,38 @@ public class UnappliedInquiry {
     return units.isEmpty() ? "" : units.get(0);
   }
 
-  private static String source(String module, String ref) {
+  /**
+   * The source of an unapplied payment in words: the module by its name and the reference without
+   * its internal prefix ("Cashiering payment PAY-2026-000012", "Migrated from EBIX, reference
+   * UPP970002").
+   *
+   * @param module module code
+   * @param ref reference ("PAY:number", "CPAY:number" or a receipt or payment number)
+   * @return source
+   */
+  static String source(String module, String ref) {
     List<String> parts = new ArrayList<>();
+    if (present(ref) && ref.startsWith(MIGRATION_REF)) {
+      // "MIG:<kind>:<system>:<reference>" of a migrated payment
+      String[] bits = ref.split(":");
+      return bits.length > MIGRATION_REF_SYSTEM + 1
+          ? "Migrated from "
+              + bits[MIGRATION_REF_SYSTEM]
+              + ", reference "
+              + bits[MIGRATION_REF_SYSTEM + 1]
+          : "Migrated, reference " + bits[bits.length - 1];
+    }
     if (present(module)) {
-      parts.add(module);
+      parts.add(ModuleNames.of(module));
     }
     if (present(ref)) {
-      parts.add(ref);
+      if (ref.startsWith(COMMISSION_PAYMENT_REF)) {
+        parts.add("commission payment " + ref.substring(COMMISSION_PAYMENT_REF.length()));
+      } else if (ref.startsWith(PAYMENT_REF)) {
+        parts.add("payment " + ref.substring(PAYMENT_REF.length()));
+      } else {
+        parts.add(ref);
+      }
     }
     return String.join(" ", parts);
   }

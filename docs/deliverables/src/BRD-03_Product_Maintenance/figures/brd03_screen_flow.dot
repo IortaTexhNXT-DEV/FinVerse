@@ -38,7 +38,7 @@ digraph flow {
   "SCR-PM-04" -> "SCR-PM-05" [label="Approve for negotiation"];
   "SCR-PM-05" -> "SCR-PM-06" [label="Terms final"];
   "SCR-PM-06" -> "SCR-PM-07" [label="Proceed to requirements"];
-  "SCR-PM-07" -> "SCR-PM-08" [label="Sign off and send to MBS"];
+  "SCR-PM-07" -> "SCR-PM-08" [label="ManCom approvals (sign-off)"];
   "SCR-PM-08" -> "SCR-PM-13" [label="Open Version Editor"];
   "SCR-PM-14" -> "SCR-PM-13" [label="open"];
   "SCR-PM-13" -> "SCR-PM-08" [label="Validate and Release"];

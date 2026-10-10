@@ -18,10 +18,10 @@ revision_log:
   date: 09 Oct 2026
   version: "1.1"
   description: "Draft for BDOI review: full coverage of the Product Maintenance BRD (version of 8-Oct-2026), functional requirements elaborated with acceptance criteria, annexes G onward added, observations and points for decision listed in Annex M"
-  by: "iorta TechNXT Project Team (drafting); for review by Angela V. Ramirez"
+  by: "iorta TechNXT Project Team (drafting support); for review by Angela V. Ramirez"
 
 introduction:
-  preparation: "This version 1.1 was drafted with the iorta TechNXT Project Team, from the inputs of the business unit and BDO ITG, for review by the System Analyst."
+  preparation: "This version 1.1 was elaborated with the iorta TechNXT Project Team (drafting support), from the inputs of the business unit and BDO ITG, for review by the System Analyst."
   overview: "Version 1.1 also covers the points of the Product Maintenance BRD (version of 8-Oct-2026) that version 1.0 did not detail: the product hierarchy and clause library, insurer-specific package terms, package versions with the latest approved rate scheme for new business and the approval of rate exceptions, the review of negotiated terms and the product requirements submitted to ManCom, the post-setup validation checkpoint, package advisories, renewal requests, the password protection of documents shared outside the system, the enforcement of approvals and service levels, and the recording of product master changes for other BDOI systems. The requirements added in this version are listed under each functional requirement with their acceptance criteria; the points that need a BDOI decision are listed in Annex M."
 
 # Changes of the Business Requirements Mapping: FRPM items added to BDOI's mapping (BDOI's own IDs are kept), and the
@@ -121,8 +121,19 @@ annex_j:
     - [Placement Update Report schedule, "Thursday 08:00", "Schedule of the Consolidated Placement Update Report (FRPM.007.01)", System Administrator]
     - [Minimum policies of a package request, "20", "Estimated No. of Policies to be Issued (Annex E)", System Administrator]
     - [Minimum premium of a package request, "PHP 5,000,000.00", "Estimated Total Basic Premium to be Issued (Annex E)", System Administrator]
+  decision_settings:
+    - [Expiry and anniversary notices, "Days before the expiry date and before the anniversary date at which TSU is told; MBS told as well or not", "90 days and 90 days; TSU Officers and TSU Team Leads only (BDOI's FRS)", C02, Head TSU]
+    - [Consolidated Placement Update Report, "Weekday, time, length of the reporting period and scope (quotation requests, or quotation and package requests)", "Thursday 08:00, 7 days, quotation requests (BDOI's FRS)", C03, Head TSU; Head Retail Marketing]
+    - [Marketing approval chain, "One approval by the Marketing Team Leader, Team Head or Unit Head; or Team Leader, then Team Head, then Unit Head (BDOI's FRS)", "One approval (the BRD)", C05, Head Retail Marketing; Product Owner]
+    - [Direct maintenance of the Product Matrix, "On: authorised users add and update Product Matrix records directly, with the approval of the named approver; Off: new packages only from package requests", "On (BDOI's FRS)", C09, Head MBS; Head TSU]
+    - [Package deactivation route, "Deactivate Package with effective date, reason and approver (BDOI's FRS); or a retirement package request", "Deactivate Package (BDOI's FRS)", C10, Head TSU; ManCom]
+    - [ManCom routing, "The selected approvers approve in parallel, then the President (BDOI's FRS); or one sign-off by any member; the President is named in the setting", "Selected approvers, then the President (BDOI's FRS); President to be named", C17, ManCom; Product Owner]
+    - [Forwarding to MBS after ManCom, "Automatic at the ManCom approval (BRPM.015); or by the Request for Deployment button (BDOI's FRS)", "Automatic (the BRD)", C20, Head MBS; Head TSU]
+    - [File names of the documents and exports, "BDOI's names with MMDDYYYY (QS_, ProposalSlip_, PlacementUpdate_, Audit Logs_); or the reference numbers", "BDOI's names (BDOI's FRS)", C23, BDO ITG System Analyst]
+    - [Least volume of a package request, "Least estimated number of policies and least estimated total basic premium of a package request", "20 policies; PHP 5,000,000.00", "-", Head TSU]
+    - [Deactivation and deployment request numbers, "Prefixes of the deactivation and deployment requests; the year and a sequence are added", "PKD-; PDR-", "-", System Administrator]
   lists:
-    - [Request reasons, "Client requirement; New programme for a market segment; Market competitiveness; Change in insurer terms or rates; Loss experience; Regulatory change; Package expiry or anniversary; Others (see comment)"]
+    - [Request reasons,"Client requirement; New programme for a market segment; Market competitiveness; Change in insurer terms or rates; Loss experience; Regulatory change; Package expiry or anniversary; Others (see comment)"]
     - [Return reasons, "Incomplete or incorrect details; Missing supporting documents; Declined by insurer; Additional insurer requirements; Rate or terms to be reviewed; Insurer underwriting review; Others"]
     - [Not proceeded reasons, "Declined by the insurers; Negotiated terms not accepted; Client withdrew the request; Business decision; Others (see comment)"]
     - [Insurer response values, "Approved; Not Covered; Others (BDOI's list, FRPM.006.02); proposed additions: Approved with changes; Counter-proposal; Declined; No response (Annex M, C14)"]
@@ -189,13 +200,13 @@ annex_j:
 glossary:
   - [Advisory, "Notice to the business units that a package is available, renewed, updated or deactivated, with its supporting documents"]
   - [AO, Account Officer (Marketing)]
+  - [BIBS, "BDO Insure Brokering System, the system specified in this document"]
   - [BRD, Business Requirements Document]
   - [BRPM, Requirement ID prefix of the Product Maintenance BRD (BRPM.001 to BRPM.024; there is no BRPM.023)]
   - [Client view, "Comparative output for a client presentation, derived from the master Comparative Table with selected fields and insurers"]
   - [Comparative Table, "Side-by-side comparison of the insurer responses of a request"]
   - [CPC2, "An incentive type named in PMADD08 as an example; its definition is to be supplied by BDOI"]
   - [FRPM, Functional requirement ID prefix of this FRS]
-  - [FR-PM, "Functional requirement ID prefix of the BIBS FRS BRD-3 Product Maintenance, used as the reference in Annex L"]
   - [Generic programme, "Package offered to a market segment, not to one client"]
   - [Client-specific package, "Package negotiated for one client"]
   - [Line of Insurance, "Level 1 of the product hierarchy (for example Motor, Property, Engineering)"]
@@ -234,4 +245,4 @@ change_summary:
     - "Process Flow: BDOI's two figures kept; {flows} figures added."
     - "Annexes A to F kept; rows added to Annex A, B, C and E ({annex_rows} rows)."
     - "New annexes: G Screen specifications ({screens} screens), H Messages and validations ({messages} messages), I Notifications ({notifications}), J Business rules and configurable parameters, K Process walkthroughs ({walk_steps} steps), L Requirements traceability, M Observations and points for BDOI decision ({observations} items, all Open), N Glossary ({glossary} terms)."
-  legend: "Where BDOI's FRS and the BIBS reference FRS differ, BDOI's text is kept and the point is listed in Annex M with both readings, the BRD text and a recommendation. Slips noticed in BDOI's text are proposed for correction in Annex M only; they are not changed in the text."
+  legend: "Where another behaviour is proposed, BDOI's text is kept and the point is listed in Annex M with the original text, the proposed behaviour, the BRD text and a recommendation. Slips noticed in BDOI's text are proposed for correction in Annex M only; they are not changed in the text."

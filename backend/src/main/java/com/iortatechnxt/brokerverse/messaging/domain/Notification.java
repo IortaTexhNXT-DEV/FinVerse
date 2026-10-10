@@ -51,10 +51,31 @@ public class Notification {
    * @param notice content
    * @param createdAt time
    */
+  /** Longest title kept (the column size); a longer one is cut at a word with an ellipsis. */
+  public static final int TITLE_LENGTH = 200;
+
+  /** Longest body kept (the column size). */
+  public static final int BODY_LENGTH = 1000;
+
+  /**
+   * A text cut to a length at a word boundary, ending with an ellipsis when cut.
+   *
+   * @param text text, may be null
+   * @param length longest text kept
+   * @return the text, or its beginning
+   */
+  public static String clip(String text, int length) {
+    if (text == null || text.length() <= length) {
+      return text;
+    }
+    int cut = text.lastIndexOf(' ', length - 1);
+    return text.substring(0, cut > length / 2 ? cut : length - 1).stripTrailing() + "…";
+  }
+
   public Notification(String recipient, Notice notice, Instant createdAt) {
     this.recipient = recipient;
-    this.title = ReadableText.of(notice.title());
-    this.body = ReadableText.of(notice.body());
+    this.title = clip(ReadableText.of(notice.title()), TITLE_LENGTH);
+    this.body = clip(ReadableText.of(notice.body()), BODY_LENGTH);
     this.link = notice.link();
     this.entityType = notice.entityType();
     this.entityId = notice.entityId();

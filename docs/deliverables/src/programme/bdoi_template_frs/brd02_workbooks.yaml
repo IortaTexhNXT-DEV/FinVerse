@@ -246,7 +246,7 @@ fitgap_groups:
     name: BIR 2307 reversal and certificates
     features: []
     fit: Specified in another FRS
-    ootb: "Specified with Marketing Collection and Disbursement in the BIBS FRS BRD-2; Cashiering keeps the PR 2307 outstanding at payment."
+    ootb: "Specified in the FRS of Marketing Collection and Disbursement; Cashiering keeps the PR 2307 outstanding at payment."
     best: "The certificate validated against the computed amount before the premium receivable is reversed."
     rec: "Confirm the owner FRS (Appendix R)."
     impact: "FRS.CSH.02.05.13"

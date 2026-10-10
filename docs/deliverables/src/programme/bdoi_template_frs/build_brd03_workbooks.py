@@ -36,6 +36,7 @@ REPO = HERE.parents[4]
 sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(REPO / "tools" / "deliverables"))
 import brand  # noqa: E402
+import brd_common_final as final  # noqa: E402
 import build_bdoi_frs_pm as core  # noqa: E402
 from bdoi_xlsx import BdoiWorkbook, Column, _SheetInfo  # noqa: E402
 from guided_xlsx import GuidedBook, font as gfont, set_link, BORDER as GBORDER, HEADER_FILL as GHEAD  # noqa: E402
@@ -53,6 +54,20 @@ PW_TEXT = "Issued separately by the iorta TechNXT Project Team"
 ENVIRONMENT = "BIBS UAT environment (address issued with the passwords)"
 ITEMS = v12.ITEMS
 V12 = v12.V12
+
+
+
+_FRPM = None
+
+
+def this_frs(text):
+    """FR numbers of the earlier FRS in a text replaced by the FRPM items of this FRS that hold them."""
+    global _FRPM  # noqa: PLW0603
+    if not text:
+        return text
+    if _FRPM is None:
+        _FRPM = v12.fr_to_frpm()
+    return re.sub(r"FR-(?:PM|NB)-\d{3}", lambda m: ", ".join(_FRPM.get(m.group(0), [])[:2]) or "this FRS", str(text))
 
 
 def fmt_date(v) -> str:
@@ -234,7 +249,7 @@ def collection_items() -> "OrderedDict[str, list[dict]]":
         if part:
             need = f"{need} BDOI's FRS answers in part ({part[1]}: {part[2]}); still needed: {part[3]}"
         out[kind].append({"id": r["ref"], "item": r["type"], "brd": ", ".join(brd), "frs": frs_ref_for(r["ref"], brd),
-                          "need": need, "format": KINDS[kind][2], "example": r["proposal"] or "-",
+                          "need": this_frs(need), "format": KINDS[kind][2], "example": this_frs(r["proposal"]) or "-",
                           "by": r["owner"], "when": fmt_date(r["needed"]), "status": "Open",
                           "src": "Programme inputs workbook v1.2"})
     # e-mail wordings
@@ -411,7 +426,7 @@ def build_collection(items) -> Path:
         "Business Unit Requirements Collection", "BRD-03 Product Maintenance – what the Business Unit provides "
         "for the platform to work as specified in the FRS v1.2 (BDOI template)",
         [("Workbook", "BIBS_Inputs_BRD-03_Business_Unit_Requirements_Collection_v1.0"), ("Version", "1.0"),
-         ("Date", DATE), ("FRS", "BIBS FRS-BDOI BRD-03 Product Maintenance v1.2"),
+         ("Date", DATE), ("FRS", "FRS BRD-03 Product Maintenance v1.2 in BDOI's template"),
          ("Consistent with", "Programme inputs workbook BIBS_Inputs_BRD-00 v1.2 (sheet BRD-03): same IDs; "
           f"{len(answered)} of its items are answered by BDOI's FRS and are listed in the traceability workbook "
           "(sheet 'Answered in the BDOI FRS'); the upload templates v1.2 hold the master data templates"),
@@ -609,10 +624,10 @@ def build_rtm() -> tuple[Path, dict]:
         raise SystemExit("RTM checks failed:\n  " + "\n  ".join(problems))
     oi = v12.open_items()
     answered = [{"ref": i["id"], "kind": i["kind"], "text": i["text"], "status": i["status"], "clause": i["clause"],
-                 "answer": i["answer"], "remaining": "-", "src": "BIBS FRS BRD-3 v2.1"} for i in oi["answered"]]
+                 "answer": i["answer"], "remaining": "-", "src": "Earlier review"} for i in oi["answered"]]
     answered += [{"ref": i["id"], "kind": i["kind"], "text": i["text"], "status": "Partly answered",
                   "clause": i["clause"], "answer": i["answer"], "remaining": f"{i['remaining']} (FRS Annex V)",
-                  "src": "BIBS FRS BRD-3 v2.1"} for i in oi["partly"]]
+                  "src": "Earlier review"} for i in oi["partly"]]
     inputs = {r["ref"]: r for r in load_inputs()}
     for k, v in ITEMS["inputs_bdoi"].items():
         if k in {a["ref"] for a in answered}:
@@ -653,16 +668,15 @@ def build_rtm() -> tuple[Path, dict]:
         Column("brd", "BRD ID", 11, "Requirement ID of the BRD"), Column("text", "BRD requirement", 38, "BRD text"),
         Column("frpm", "BDOI FR item", 14, "FRPM sub-item of the FRS v1.2"),
         Column("title", "FR item title", 26, "Title of the sub-item"),
-        Column("ref", "BIBS reference FR", 18, "FR of the BIBS FRS BRD-3 (or BRD-1)"),
         Column("n", "Test cases (count)", 10, "Number of test cases"),
         Column("tc", "Test cases", 46, "Test case IDs (first twelve)"), Column("screen", "Screen", 34, "Screens"),
         Column("wt", "Walkthrough steps", 22, "Steps of the walkthrough script")], trace,
-        description="BRD ID -> BDOI FR item -> BIBS reference FR -> test cases -> screen -> walkthrough step")
+        description="BRD ID -> BDOI FR item -> test cases -> screen -> walkthrough step")
     rows = [{**t, "result": "Not run", "tester": None, "date": None, "obs": None, "remarks": None} for t in tcs]
     wb.sheet("Test cases", [
         Column("id", "Test case ID", 20, "Test case"), Column("title", "Title", 34, "What is tested"),
         Column("brd", "BRD ID", 12, "BRD requirement(s)"), Column("frpm", "FR item (BDOI)", 16, "FRPM sub-item(s)"),
-        Column("ref", "BIBS reference", 14, "FR of the BIBS FRS"), Column("persona", "Persona", 18, "Who tests"),
+        Column("persona", "Persona", 18, "Who tests"),
         Column("signin", "Sign-in ID", 10, "UAT sign-in ID (walkthrough users workbook)"),
         Column("pre", "Preconditions", 28, "Before the test"), Column("steps", "Steps", 46, "Steps"),
         Column("data", "Test data", 16, "Data sets of the test plan"),
@@ -676,7 +690,7 @@ def build_rtm() -> tuple[Path, dict]:
         Column("remarks", "Remarks", 26, "Remarks")], rows,
         description="The test cases of the FRS v1.2 with their execution columns")
     wb.sheet("Answered in the BDOI FRS", [
-        Column("ref", "Ref.", 12, "Reference in the BIBS FRS or the programme inputs workbook"),
+        Column("ref", "Ref.", 12, "Reference of the earlier reviews or of the programme inputs workbook"),
         Column("kind", "Kind", 16, "Assumption, dependency, open question, proposed rule, programme input"),
         Column("text", "Item", 46, "The item as asked"),
         Column("status", "Status", 16, "Answered, partly answered or answered earlier",
@@ -893,6 +907,7 @@ def main() -> int:
     p4, rtm = build_rtm()
     p5, nusers, nsteps = build_uat()
     p6, cov = build_coverage()
+    final.check_no_references([p1, p2, p3, p4, p5])  # p6, the internal coverage workbook, may keep them
     for p in (p1, p2, p3, p4, p5, p6):
         text = " ".join(str(c.value) for ws in openpyxl.load_workbook(p).worksheets for row in ws.iter_rows()
                         for c in row if c.value is not None)

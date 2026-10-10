@@ -19,7 +19,7 @@ summary:
     sections 2 and 3 and in the appendices; every statement traces to a BRD ID of the Operations BRD of 8-Oct-2026.
   scope_header: ["In scope of this FRS", "Out of scope", "Handled in another FRS or document"]
   scope:
-    - ["Log-in, access by role and the Cashiering dashboard (FRS.CSH.01)", "Check pick-up from Collection (CSHID.009, removed from the BRD)", "Remittance, Adjustment / Cancellation, Production Reconciliation, Commission Receivables and the Marketing activities: BIBS FRS BRD-2 Operations v2.1"]
+    - ["Log-in, access by role and the Cashiering dashboard (FRS.CSH.01)", "Check pick-up from Collection (CSHID.009, removed from the BRD)", "Remittance, Adjustment / Cancellation, Production Reconciliation, Commission Receivables and the Marketing activities: separate FRS documents of the Operations BRD"]
     - ["AR and OR creation, posting, number series, batch printing, templates (FRS.CSH.02)", "Cashiering processing and reversal of BIR 2307 (CSHID.026, CSHID.027, deleted in BRD v1.01)", "PR 2307 reversal and the release of the certificates (MKTID.013, DBMID.001): \"Com rec\" in BDOI's mapping (Appendix R)"]
     - ["Cancellation and reinstatement of ARs and ORs with their accounting (FRS.CSH.03, 04)", "The bank deposit slip of the day's collections (Accounting module; Appendix R)", "User access, roles and sign-in: User Access Maintenance FRS (\"Based on UAM\")"]
     - ["Automatic payment processing of the Bills Payment, CLPC, Trade, Direct Credit and post-dated check files; post-dated check warehouse; pre-booked payments (FRS.CSH.05)", "Transport of the channel files other than MFT (to be agreed with BDOI IT)", "GL accounts and the accounting rules: Accounting FRS (BRD-5); the default entries are in Appendix I"]
@@ -62,7 +62,7 @@ annex_c:
   intro: >-
     One figure for every process of the Cashiering scope of the BRD, drawn from end to end with one column per
     persona and one for the system, then the status life-cycles of the records. The figures follow BDOI's text of
-    section 3; where the BRD or the BIBS reference reads differently, the point is in Appendix R.
+    section 3; where the BRD reads differently or another behaviour is proposed, the point is in Appendix R.
 
 # ------------------------------------------------------------------------------------- Appendix J workflow and approvals
 workflow:
@@ -464,7 +464,7 @@ reports:
   schedules_intro: "Scheduled runs and timings (Philippine time; times proposed where BDOI's FRS gives none):"
   schedules_header: ["Run", "When", "What it does", "Who is told", "Owner of the setting", "Traces to"]
   schedules:
-    - ["Files received via MFT (OBPCS Bills Payment, PMS post-dated checks)", "At the times agreed with BDOI IT (proposed: every hour from 07:00 to 18:00)", "Files checked and processed as uploads (FRS.CSH.05.01.04)", "Cashiering Team Leader: alert when a file is refused", "BDOI IT; System Administrator", "CSHID.008; BRQID.005"]
+    - ["Files received via MFT (OBPCS Bills Payment, PMS post-dated checks)", "At the times agreed with BDOI IT (proposed: every hour from 07:00 to 18:00), and on Receive MFT Files Now", "Files checked and processed as uploads for the company of the setting MFT receiving company (FRS.CSH.05.01.04)", "Cashiering Team Leader: alert when a file is refused", "BDOI IT; System Administrator", "CSHID.008; BRQID.005"]
     - ["Re-matching of unapplied payments", "Every hour", "Unbooked/Unmatched and Pre-booked payment records matched again", "Run report", "System Administrator", "CSHID.020"]
     - ["Pre-booked re-matching and ageing", "Every 2 hours", "Pre-booked payments of booked accounts applied; ageing alert", "Cashiering Team Leader: alert after 5 days", "Cashiering Team Leader", "CSHID.020"]
     - ["Post-dated check maturity", "08:30 daily", "Matured checks turned into payments with their AR", "Run report", "System Administrator", "CSHID.008"]
@@ -478,11 +478,13 @@ integrations:
   intro: "Each interface of Operations Cashiering at business level: direction, what is exchanged, trigger and frequency, owner, what BDOI IT provides and the status of BDOI's input. The technical detail is in the Technical Specification reviewed by BDOI IT"
   header: ["Interface", "Direction", "What is exchanged", "Trigger / frequency", "Volumes", "Owner", "What BDOI IT provides", "BDOI input"]
   rows:
-    - ["OBPCS (Online Bills Payment Consolidation System)", "In", "Bills Payment file BDOIYYYYMMDD.txt (Appendix D.1)", "Daily, via MFT", "To be given (about 48 payments in the sample)", "BDOI IT; Cashiering", "MFT folder, arrival time, positions 7 to 13 of the layout", "Given in part (sample, file name)"]
-    - ["PMS (PDC Management System)", "In", "Matured post-dated checks BDOIYYYYMMDDPMS.txt (Appendix D.2)", "Daily, via MFT", "To be given", "BDOI IT; Cashiering", "MFT folder, time, the header and detail layout", "To be provided"]
-    - ["TFS / CIB (Trade)", "In", "Trade file UploadTrade_MM.DD.YYYY.txt (Appendix D.4)", "Daily, upload by the Cashier", "To be given", "Cashiering", "Separator of the file", "Given in part (sample)"]
-    - ["Direct Credit (bank credit of payments)", "In", "Direct Credit file OTCYYYYMMDD-<branch>.txt (Appendix D.5)", "Daily, upload", "To be given", "Cashiering", "Layout of the file", "To be provided"]
-    - ["CLPC (Consumer Lending Processing Center)", "In", "CLPC file CLPC-MonDDYYYY.xlsx (Appendix D.3)", "Daily, upload", "To be given", "Cashiering", "-", "Given (sample)"]
+    - ["OBPCS (Online Bills Payment Consolidation System)", "In", "Bills Payment file BDOIYYYYMMDD.txt with its header record (Appendix D.1)", "Daily, via MFT, taken at the times set and on Receive MFT Files Now", "To be given (about 48 payments in the sample)", "BDOI IT; Cashiering", "MFT folder, arrival time, positions 7 to 13 of the layout", "Given in part (sample, file name). Available in BIBS: intake with the name, size, duplicate and header checks, run report, refusal alert and processing again; run end to end in SIT and UAT against the channel simulator. Connection details from BDOI IT at SIT"]
+    - ["PMS (PDC Management System)", "In", "Matured post-dated checks BDOIYYYYMMDDPMS.txt (Appendix D.2)", "Daily, via MFT", "To be given", "BDOI IT; Cashiering", "MFT folder, time, the header and detail layout", "To be provided. Available in BIBS in the proposed layout and run end to end against the channel simulator; layout and folder from BDOI IT at SIT"]
+    - ["TFS / CIB (Trade)", "In", "Trade file UploadTrade_MM.DD.YYYY.txt (Appendix D.4)", "Daily, upload by the Cashier (several files in one upload)", "To be given", "Cashiering", "Separator of the file", "Given in part (sample). Available in BIBS; the channel simulator writes the file for SIT and UAT"]
+    - ["Direct Credit (bank credit of payments)", "In", "Direct Credit file OTCYYYYMMDD-<branch>.txt (Appendix D.5) identifying the payments of a Bills Payment file (setting, Appendix H.8)", "Daily, upload", "To be given", "Cashiering", "Layout of the file", "To be provided. Available in BIBS in the proposed layout; the channel simulator writes the file for SIT and UAT"]
+    - ["CLPC (Consumer Lending Processing Center)", "In", "CLPC file CLPC-MonDDYYYY.xlsx with its TOTAL row (Appendix D.3)", "Daily, upload", "To be given", "Cashiering", "-", "Given (sample). Available in BIBS; the channel simulator writes the file for SIT and UAT"]
+    - ["Insurers (Commission Schedule)", "In", "Commission Schedule of the commission paid by an insurer, matched to the commission receivable of each account", "At each insurer payment, upload", "To be given", "Commission Receivables; Cashiering", "-", "Layout proposed in BIBS (Appendix D); valid lines processed as delivered (setting, Appendix H.8)"]
+    - ["Channel simulator (SIT and UAT only)", "In", "Payment files of every type in BDOI's layouts for booked accounts, one account not yet booked and one unknown reference, dropped in the MFT folders or handed for upload", "On request of the test lead", "-", "iorta TechNXT Project Team", "-", "Not used in production; it cannot run outside SIT and UAT"]
     - ["BIBS New Business", "In / Out", "Booked accounts with their components (in); payment confirmation of each account (out)", "At booking; at each payment", "All booked accounts", "New Business; Cashiering", "-", "Not needed"]
     - ["BIBS Collections", "In / Out", "Collector requests on unapplied payments; commission payment details; their result", "At each request", "-", "Collections; Cashiering", "-", "Not needed"]
     - ["BIBS Disbursement", "Out / In", "Refund requests (out); their status and the approved insurer settlements that trigger the automatic OR (in)", "At approval; at each status", "-", "Disbursement; Cashiering", "-", "Not needed"]
@@ -541,8 +543,8 @@ open_items:
   intro: >-
     The assumptions and dependencies of this FRS and the questions that BDOI's FRS has not answered. Questions that
     BDOI's FRS answers are not repeated: they are listed in the Test Cases and Traceability workbook (sheet Answered
-    in the BDOI FRS) with BDOI's clause; where BDOI's answer differs from the BRD, the decision is in Appendix R. Our
-    reference numbers (OQ, CLR-OP, IQ, A-OP, D-OP) are kept so that the link to earlier decisions is not lost.
+    in the BDOI FRS) with BDOI's clause; where BDOI's answer differs from the BRD, the decision is in Appendix R. The
+    reference numbers of the earlier reviews (OQ, CLR-OP, IQ, A-OP, D-OP) are kept so that the link to earlier decisions is not lost.
   assumptions:
     - ["A-OP-01", "The Operations BRD v1.01 (p.71-185) is the baseline; the Cashiering annex of May 2026 governs where it changes a requirement; the e-mail record (p.67-70, 186-189) documents the BIR 2307 decision.", "Introduction"]
     - ["A-OP-02", "Every Cashiering function starts from the account booked in New Business; Cashiering does not book.", "BRQID.007"]
@@ -555,7 +557,7 @@ open_items:
     - ["D-OP-03", "Comptrollership gives the GL accounts of the entries and the source of the exchange rate.", "Appendix I"]
     - ["D-OP-04", "The BIBS Collections and Disbursement modules (BRD-4, BRD-5) are in use for the requests, refunds and settlements.", "FRS.CSH.06.03, 07.01, 10.01"]
     - ["D-OP-07", "The e-mail relay of the BIBS environment is available for the failed-run e-mail.", "Appendix G"]
-  open_header: ["No.", "Our reference", "Question", "Why it matters (BRD)", "Format of the answer", "Owner", "Needed by"]
+  open_header: ["No.", "Reference", "Question", "Why it matters (BRD)", "Format of the answer", "Owner", "Needed by"]
   open:
     - {refs: "OQ15", q: "Which disposition types need Team approval, and who approves each (Cashiering TL only, or the Marketing Unit Head for its unit)?", why: "CSHID.024 asks for approval of dispositions; FRS.CSH.06.02.02 lists For Approval \"if disposition needs approval\" without saying which.", fmt: "Per disposition type: Yes / No and the approver role", owner: "Cashiering Process Owner", by: 2026-12-01}
     - {refs: "OQ03", q: "Give the layouts not in BDOI's FRS: the PMS post-dated check file (header and details), the Direct Credit file, the Commission Schedule fields, and the meaning of positions 7 to 13 of the Bills Payment file.", why: "CSHID.008; FRS.CSH.05.01.06 and FRS.CSH.02.02.07 leave them blank.", fmt: "One real file of each channel and its field list", owner: "Cashiering Process Owner; BDOI IT", by: 2027-01-31}

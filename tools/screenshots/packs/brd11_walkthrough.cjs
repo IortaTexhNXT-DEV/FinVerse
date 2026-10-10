@@ -2,7 +2,7 @@
 // (see walkthroughs.yaml of the pack). Each step signs in as the persona of the step, does what the step says on the
 // screen and returns the page to capture. The walkthroughs run in order: B changes and deactivates the user enrolled
 // in A. The records created carry fictitious seed values only; the SIT/UAT password comes from SEED_PASSWORD.
-const { act, press, tab, go, button, settle } = require('./brd01_walkthrough.cjs');
+const { act, press, tab, go, button, settle, chooseOption } = require('./brd01_walkthrough.cjs');
 
 const REQUESTS = '/user-access/requests';
 const NEW_USER = 'a013000196';
@@ -22,19 +22,24 @@ async function fill(page, label, value) {
     field = matches.and(page.locator('select, input:not([type=checkbox]), textarea')).first();
   }
   const tag = await field.evaluate((e) => e.tagName.toLowerCase());
-  if (tag === 'select') {
-    const options = await field.locator('option').allTextContents();
-    const hit = options.find((o) => new RegExp(value, 'i').test(o));
-    if (hit === undefined) {
-      throw new Error(`option ${value} not in ${label}: ${options.slice(0, 10).join(', ')}`);
-    }
-    await field.selectOption({ label: hit });
+  if (tag === 'select' || (await field.getAttribute('role')) === 'combobox') {
+    await chooseOption(page, field, value);
   } else if ((await field.getAttribute('type')) === 'checkbox') {
     await field.check();
   } else {
     await field.fill(String(value));
   }
   await page.waitForTimeout(200);
+}
+
+/** Ticks a group profile in the profile picker: the areas are closed until a search opens the match. */
+async function pickProfile(page, name) {
+  const search = page.getByPlaceholder('Search profile, area or what it does').first();
+  await search.fill(name);
+  await page.waitForTimeout(400);
+  await page.getByLabel(new RegExp(`^${name}`)).first().check();
+  await search.fill('');
+  await page.waitForTimeout(300);
 }
 
 async function openRequest(ctx, user, id, tabName) {
@@ -82,7 +87,7 @@ const steps = {
     await fill(page, 'E-mail', 'isabel.navarro@brokerverse-seed.ph');
     await fill(page, 'Windows ID', 'INAVARRO');
     await fill(page, 'Home Branch', '^HO');
-    await page.getByLabel('Marketing Account Officer', { exact: true }).check();
+    await pickProfile(page, 'Marketing Account Officer');
     await fill(page, 'Approver', 'Ulysses');
     await fill(page, 'Remarks \\(Justification\\)', 'Joined Combank Marketing as account officer (seed data)');
     await button(page, /^save draft$/i).click();
@@ -140,7 +145,7 @@ const steps = {
   // ---------------------------------------------------------------- walkthrough B
   'wt-b-01': async (ctx) => {
     const page = await go(ctx, 'requestor', `${REQUESTS}/new?type=MODIFY_USER&user=${NEW_USER}`);
-    await page.getByLabel(/^Marketing Team Leader/).check();
+    await pickProfile(page, 'Marketing Team Leader');
     await fill(page, 'Approver', 'Ulysses');
     await fill(page, 'Remarks \\(Justification\\)', 'Covers as team leader during the leave of the unit head (seed data)');
     await press(page, /^submit$/i);
@@ -247,7 +252,7 @@ const steps = {
     const page = await go(ctx, 'requestor', `${REQUESTS}/new`);
     await fill(page, 'User ID', 'a01300019X');
     await fill(page, 'Full Name', 'Marco Salvador');
-    await page.getByLabel('Marketing Account Officer', { exact: true }).check();
+    await pickProfile(page, 'Marketing Account Officer');
     await fill(page, 'Approver', 'Ulysses');
     await fill(page, 'Remarks \\(Justification\\)', 'New hire (seed data)');
     await press(page, /^submit$/i);
@@ -265,7 +270,7 @@ const steps = {
   },
   'wt-c-04': async (ctx) => {
     const page = await go(ctx, 'requestor', `${REQUESTS}/new?type=MODIFY_USER&user=requestor`);
-    await page.getByLabel('Marketing Account Officer', { exact: true }).check();
+    await pickProfile(page, 'Marketing Account Officer');
     await fill(page, 'Approver', 'Ulysses');
     await fill(page, 'Remarks \\(Justification\\)', 'Also raises Marketing requests (seed data)');
     await press(page, /^submit$/i);
@@ -276,8 +281,8 @@ const steps = {
     const page = await go(ctx, 'requestor', `${REQUESTS}/new`);
     await fill(page, 'User ID', 'a013000197');
     await fill(page, 'Full Name', 'Paolo Mendoza');
-    await page.getByLabel('User Access Requestor', { exact: true }).check();
-    await page.getByLabel('User Access Approver', { exact: true }).check();
+    await pickProfile(page, 'User Access Requestor');
+    await pickProfile(page, 'User Access Approver');
     await fill(page, 'Approver', 'Ulysses');
     await fill(page, 'Remarks \\(Justification\\)', 'Raises and approves access requests (seed data)');
     await press(page, /^submit$/i);
@@ -361,8 +366,8 @@ const steps = {
     await settle(page, 600);
     return page;
   },
-  'wt-d-02': async (ctx) => runReport(ctx, 'auditor', 'UAM-GROUP-PROFILE', [['Group Profile \\(code\\)', 'UAM_APPROVER']]),
-  'wt-d-03': async (ctx) => runReport(ctx, 'auditor', 'UAM-GROUP-MEMBERS', [['Group Profile \\(code\\)', 'MKT_AO']]),
+  'wt-d-02': async (ctx) => runReport(ctx, 'auditor', 'UAM-GROUP-PROFILE', [['Group Profile', 'User Access Approver']]),
+  'wt-d-03': async (ctx) => runReport(ctx, 'auditor', 'UAM-GROUP-MEMBERS', [['Group Profile', 'Marketing Account Officer']]),
   'wt-d-04': async (ctx) => {
     const installed = ctx.one("select to_char(min(occurred_at), 'YYYY-MM-DD') from sec_access_change_log where activity = 'DEACTIVATE_ROLE'");
     return runReport(ctx, 'auditor', 'UAM-AUDIT-LOG', [['Date From', installed], ['Activity', 'Group Profile Changes']]);

@@ -11,6 +11,7 @@ import com.iortatechnxt.brokerverse.attachment.domain.AttachmentTarget;
 import com.iortatechnxt.brokerverse.attachment.service.DocumentService;
 import com.iortatechnxt.brokerverse.attachment.service.DocumentService.UploadOptions;
 import com.iortatechnxt.brokerverse.attachment.service.DocumentService.UploadedFile;
+import com.iortatechnxt.brokerverse.catalog.service.CatalogNames;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.crm.service.ClientService;
 import com.iortatechnxt.brokerverse.nonpackage.domain.InsurerResponse;
@@ -69,6 +70,7 @@ class TermsProposalIT {
   @Autowired private Api api;
   @Autowired private JdbcTemplate jdbc;
   @Autowired private Clock clock;
+  @Autowired private CatalogNames names;
 
   private Long quotationAtQsSent() {
     Long company = data.company().getId();
@@ -156,6 +158,9 @@ class TermsProposalIT {
     // FRPM.006.02 / FRPM.012.02: QS value column, several options per insurer, Others wording.
     JsonNode table = api.read(api.doGet("tsu", url).andExpect(status().isOk())).path("table");
     assertThat(table.path("qsValues").path("SUM_INSURED").asText()).isEqualTo("18,000,000.00");
+    assertThat(table.path("qsValues").path("COVERAGE").asText())
+        .isEqualTo(names.productName(p.getProductCode()) + " (" + names.line(p.getLineCode()) + ")")
+        .doesNotContain(p.getProductCode(), p.getLineCode());
     assertThat(table.path("columns")).hasSize(3);
     api.doPut(
             "tsu",

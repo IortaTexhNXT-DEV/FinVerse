@@ -347,7 +347,11 @@ class PackageRequestProcessIT {
                 PackageRequests.ENTITY,
                 released.getRequestNo()))
         .anyMatch(t -> t.startsWith("ManCom sign-off ") && t.endsWith(" by Manuel ManCom Member"))
-        .noneMatch(t -> t.endsWith(" by mancom"));
+        .noneMatch(t -> t.endsWith(" by mancom"))
+        // the history reads in words: outcomes by their label, insurers by their name
+        .anyMatch(t -> t.startsWith("Terms of Mabuhay General Insurance Corp.: Accepted"))
+        .anyMatch(t -> t.startsWith("New package request '"))
+        .noneMatch(t -> t.contains("ACCEPTED_AS_REQUESTED") || t.contains("INS-MGIC"));
 
     List<Advisory> drafted = advisories.ofRequest(id);
     assertThat(drafted).hasSize(1);

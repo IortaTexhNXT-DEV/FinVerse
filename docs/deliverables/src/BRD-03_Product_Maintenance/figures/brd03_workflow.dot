@@ -33,7 +33,7 @@ digraph pm_workflow {
   FOR_MKT_REVIEW -> NEGOTIATION [label=" Request changes", style=dashed, constraint=false];
   FOR_TSU_APPROVAL -> FOR_MANCOM [label=" Approve without negotiation", style=dashed];
   REQUIREMENTS_PREP -> FOR_MANCOM [label=" Submit requirements for ManCom sign-off"];
-  FOR_MANCOM -> WITH_MBS [label=" Sign off and send to MBS"];
+  FOR_MANCOM -> WITH_MBS [label=" ManCom approvals (sign-off)"];
   FOR_MANCOM -> REQUIREMENTS_PREP [label=" Return to requester", style=dashed, constraint=false];
   WITH_MBS -> REQUIREMENTS_PREP [label=" Return incomplete requirements to TSU", style=dashed, constraint=false];
   WITH_MBS -> FOR_VALIDATION [label=" Set up package version"];

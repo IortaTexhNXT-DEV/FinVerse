@@ -61,13 +61,15 @@ screens:
     purpose: >-
       The System Administrator's list of users with their Windows ID, group profiles, business unit, user level,
       authorisation limit, last sign-in and status (Active, Online, Disabled, Locked); unlock of a locked account and
-      the sessions of a user, with End Session. Users are created and changed only through access requests: Raise
-      Request, or a row, opens a request.
+      the sessions of a user, with End Session, and the directory details of a user from the Enterprise SSO platform
+      with Synchronise Now. Users are created and changed through access requests (Raise Request, or a row, opens a
+      request) and, as delivered, from the Enterprise SSO platform and UIDM-ISC (Identity Synchronisation, SCR-UA-20).
     entry:
       - Setup & Administration › Administration › Users
     shots:
       - {state: list, user: admin, caption: "Users with their status"}
       - {state: sessions, user: admin, caption: "Sessions of a user, with End Session"}
+      - {state: directory, user: admin, nocallouts: true, caption: "Directory Details of a user with Synchronise Now"}
     fields:
       - "Search | Search User ID, Name or Windows ID | Text | Part of the user ID, name or Windows ID | N | - | Blank | - | Contains search | -"
       - "Search | Status | Drop-down | All statuses, Active, Online, Disabled, Locked | N | Fixed list | All statuses | - | - | -"
@@ -81,11 +83,18 @@ screens:
       - "List | Last Login | Column | dd-MMM-yyyy HH:mm | - | Session log | - | Read only | - | -"
       - "List | Status | Column | Active, Online (open session), Disabled, Locked | - | User master and session log | - | Read only | - | -"
       - "Sessions of a user | Signed in / Last activity / Ended / Status | Columns | Date and time; Open, Logout, Idle Timeout, Expired, Admin Ended, Locked | - | Session log | - | Read only | - | -"
+      - "Directory Details | Latest synchronisation | Status and date | Synchronised or Failed, dd-MMM-yyyy HH:mm; the reason of a failure below | - | Enterprise SSO platform | - | Read only | - | This user has not been synchronised from the Enterprise SSO platform yet"
+      - "Directory Details | Windows ID / AD e-mail / AD group / AD status / AD sync date / time | Values | Domain\\account; e-mail; directory group; Active, Inactive, Locked, Disabled, Deactivated; dd-MMM-yyyy HH:mm | - | Enterprise SSO platform | - | Read only | - | -"
+      - "Directory Details | First name / Last name / Display name | Values | Names as kept by the directory | - | Enterprise SSO platform | - | Read only | - | -"
+      - "Directory Details | Team leader's name / Team head's name / Section head's name / Unit head's name | Values | Names of the reporting line | - | Enterprise SSO platform | - | Read only | - | -"
+      - "Directory Details | Unit / segment / Department / Location / UIDM request no. / Last event | Values | Organisation of the user; UIDM-yyyy-nnnnnn; the last event received with its date | - | Enterprise SSO platform and UIDM-ISC | - | Read only | - | -"
     actions:
       - "Raise Request | System Administrator | Always | Opens New Request (SCR-UA-07) | - | -"
       - "[Open a row] | System Administrator | Always | Opens a Modify user request for the user (SCR-UA-07) | - | -"
       - "Unlock | System Administrator (user management right) | The user is locked | Unlocks the account and resets the failed attempts; written to the access change log | Active | -"
       - "Sessions | System Administrator | Always | Opens the sessions of the user | - | -"
+      - "Directory details | System Administrator | Always | Opens the directory details of the user as last received from the Enterprise SSO platform | - | -"
+      - "Synchronise Now | System Administrator | Directory details open; the user has a Windows ID | Reads the account from the Enterprise SSO platform now and applies the changes (as a status or mover event). Toast: Synchronisation: Applied / No change / Refused / Failed | - | Alert to the System Administrator when refused"
       - "End Session | System Administrator | The session is open | Ends the session at once on every server; the user is signed out at the next action. Toast: Session ended | Admin Ended | -"
       - "New User (Emergency) | System Administrator, only while UAM_DIRECT_ROLE_EDIT is on | Emergency path open | Creates or edits a user directly (audited, alert raised); not offered as delivered | - | Alert UAM_DIRECT_ROLE_EDIT"
     rules:
@@ -93,6 +102,8 @@ screens:
       - "A user is shown Online while a session is open; Locked after 3 failed sign-ins; Disabled after a deactivation, by a request or by the dormant-user job (FR-UA-052, FR-UA-004, FR-UA-006)."
       - "A deactivated or locked user's open sessions end at once (FR-UA-013, FR-UA-004)."
       - "Unlock, password reset and the end of a session are written to the access change log or the audit trail with the administrator's name (FR-UA-064)."
+      - "Synchronise Now needs the Windows ID of the user: User <user> has no Windows ID to synchronise; an account the directory does not hold is recorded as a failed synchronisation (FR-UA-003)."
+      - "As delivered BDOI's rules apply to a password reset: an administrator never resets his own password (Your own password is reset by another System Administrator; change it from My Profile), and with single sign-on only the break-glass accounts have a password in BIBS (FR-UA-005)."
     outcome: The System Administrator sees every user's access and state, unlocks accounts and ends sessions, while every access change still goes through a request.
     frs: [FR-UA-052, FR-UA-004, FR-UA-064]
     tests: [USERS]
@@ -202,36 +213,121 @@ screens:
     title: Separation of Duties
     route: /user-access/sod-rules
     purpose: >-
-      The pairs of group profiles that one user may not hold together, with the reason of each. The Business
-      Administrator adds a rule or asks for its deactivation; the Information Security Officer authorises or rejects
-      each change. Every user request and bulk line is checked against the active rules.
+      The separation-of-duties rules, each with its reason: two group profiles that one user may not hold together,
+      and two permissions (the conflicting permission combinations) that neither one group profile nor one user may
+      hold together. The Business Administrator adds a rule or asks for its deactivation; the Information Security
+      Officer authorises or rejects each change. Every user request, bulk line and group-profile change is checked
+      against the active rules.
     entry:
       - Setup & Administration › User Access › Separation of Duties
       - The notice Separation-of-duties rule <rule> to authorise, and My Approvals (Information Security Officer)
     shots:
-      - {state: list, user: infosec, caption: "Separation of Duties with a rule to authorise"}
-      - {state: new, user: badmin, click: "^new rule$", caption: "New separation-of-duties rule"}
+      - {state: list, user: infosec, caption: "Separation of Duties with the rules of group profiles and of permissions"}
+      - {state: new, user: badmin, click: "^new rule$", caption: "New separation-of-duties rule of two permissions"}
     fields:
       - "Rules | Rule | Column | SOD-nnnnnn | - | Rules | - | Read only | - | -"
-      - "Rules | Group Profile / May Not Be Held With | Columns | Profile names | - | Rules | - | Read only | - | -"
+      - "Rules | Type | Column | Group profiles, Permissions | - | Rules | - | Read only | - | -"
+      - "Rules | Group Profile / Permission / May Not Be Held With | Columns | Profile names, or permission names | - | Rules | - | Read only | - | -"
       - "Rules | Reason | Column | Why one user may not hold both | - | Rules | - | Read only | - | -"
       - "Rules | Status | Column | Pending Authorization, Active, Inactive; under it New rule to authorise or Deactivation to authorise | - | Rules | - | Read only | - | -"
       - "Rules | Maker / Authorised | Columns | Name; name and dd-MMM-yyyy HH:mm | - | Rules | - | Read only | - | -"
       - "Rules | [Row action menu] | Row action menu | Authorise and Reject of a waiting change, Deactivate of an active rule, each confirmed in a dialog | - | - | - | - | - | -"
-      - "New Rule | Group Profile | Drop-down | Active group profiles by name | Y | Group profiles | Blank | New rule | - | Select the first group profile"
-      - "New Rule | May Not Be Held With | Drop-down | Active group profiles by name | Y | Group profiles | Blank | New rule | Different from the first | Choose two different group profiles"
+      - "New Rule | Rule Type | Drop-down | Two group profiles one user may not hold; Two permissions not held together | Y | Fixed list | Two group profiles one user may not hold | New rule | - | -"
+      - "New Rule | Group Profile | Drop-down | Active group profiles by name (rule of group profiles) | Cond.: rule of group profiles | Group profiles | Blank | New rule | - | Select the first group profile"
+      - "New Rule | Permission | Drop-down | Permissions by name (rule of permissions) | Cond.: rule of permissions | Permission catalogue | Blank | New rule | - | Select the first permission"
+      - "New Rule | May Not Be Held With | Drop-down | Active group profiles, or permissions, by name | Y | Group profiles or permission catalogue | Blank | New rule | Different from the first | Choose two different group profiles"
       - "New Rule | Reason | Text area | Up to 500 characters | Y | - | Blank | New rule | Not blank | Enter why the two profiles are not held together"
     actions:
       - "New Rule | Business Administrator (rule maintenance right) | Always | Opens the New Rule dialog | - | -"
-      - "Send for Authorisation | Business Administrator | Both profiles and the reason entered | Saves the rule as pending. Toast: Rule SOD-nnnnnn sent for authorisation | Pending Authorization | Separation-of-duties rule to authorise, to the Information Security Officers"
+      - "Send for Authorisation | Business Administrator | Both profiles or permissions and the reason entered | Saves the rule as pending. Toast: Rule SOD-nnnnnn sent for authorisation | Pending Authorization | Separation-of-duties rule to authorise, to the Information Security Officers"
       - "Deactivate | Business Administrator | Active rule, nothing waiting | Asks for the deactivation; the rule stays active until authorised | Active (deactivation to authorise) | Separation-of-duties rule to authorise"
       - "Authorise | Information Security Officer (rule authorisation right), not the maker | A creation or deactivation waits | A new rule becomes active; a deactivated rule becomes inactive. Toast: Rule <rule> authorised | Active or Inactive | -"
       - "Reject | Information Security Officer, not the maker | A creation or deactivation waits | A new rule is closed; a rule whose deactivation is rejected stays active. Toast: Rule <rule> rejected | Inactive or Active | -"
     rules:
       - "A rule applies only once authorised, and the maker never authorises it: A record cannot be authorized by the user who maintained it (FR-UA-053)."
-      - "One rule per pair of profiles, in either order: A rule for these two group profiles already exists (FR-UA-053)."
+      - "One rule per pair of profiles or permissions, in either order: A rule for these two group profiles already exists (FR-UA-053)."
       - "A request or bulk line that gives one user both profiles of an active rule is refused, on submission and at approval: One user may not hold both <profile> and <profile> (separation-of-duties rule <rule>) (FR-UA-053)."
-      - "A new rule does not change the users who already hold both profiles; they are found with the User Access Report and changed by requests (FR-UA-053, FR-UA-060)."
-    outcome: The combinations of profiles that Information Security forbids are refused by the system, not found afterwards.
+      - "Conflicting permission combinations: a group-profile change that gives one profile both permissions of an active rule is refused (Group profile <profile> may not hold both <permission> and <permission> (rule <rule>)), and so is a user request that gives one user both permissions through several profiles (One user may not hold both <permission> and <permission> through group profiles <profiles>) (FR-UA-053)."
+      - "A new rule does not change the users who already hold both profiles or permissions; they are found with the User Access Report and changed by requests (FR-UA-053, FR-UA-060)."
+    outcome: The combinations of profiles and permissions that Information Security forbids are refused by the system, not found afterwards.
     frs: [FR-UA-053]
     tests: [SOD]
+
+  - id: SCR-UA-20
+    title: Identity Synchronisation
+    route: /admin/identity-sync
+    purpose: >-
+      The users from the Enterprise SSO platform and UIDM-ISC: every provisioning event received (joiner, mover,
+      leaver, rehire, status change) with its outcome, the user it changed, the UIDM request number and the reason of
+      a refusal; Process again of a refused or failed event once the data is corrected; Create User from Enterprise
+      SSO for an active directory account; and, in SIT and UAT only, the Enterprise SSO simulator with its accounts,
+      from which the events are sent.
+    entry:
+      - Setup & Administration › Administration › Identity Synchronisation
+      - The alert Identity event refused, to the System Administrator
+    shots:
+      - {state: events, user: admin, caption: "Identity Synchronisation: events received from UIDM-ISC and the Enterprise SSO platform"}
+      - {state: create, user: admin, click: "^create user from enterprise sso$", caption: "Create User from Enterprise SSO with the account looked up"}
+      - {state: simulator, user: admin, tab: Enterprise SSO Simulator, caption: "Enterprise SSO simulator accounts (SIT and UAT only)"}
+    fields:
+      - "Events | Outcome | Drop-down | All, Applied, No change, Refused, Failed | N | Fixed list | All | - | - | -"
+      - "Events | Windows ID | Text | Part of the Windows ID | N | - | Blank | - | - | -"
+      - "Events | Received From / Received To | Date | dd-MMM-yyyy | N | - | Blank | - | - | -"
+      - "Events | Event No. / Received | Columns | Number; dd-MMM-yyyy HH:mm | - | Identity events | - | Read only | - | -"
+      - "Events | Source / Event | Columns | UIDM-ISC or Enterprise SSO; Joiner, Mover, Leaver, Rehire, Status change | - | Identity events | - | Read only | - | -"
+      - "Events | Windows ID / User ID / UIDM Request No. | Columns | Domain\\account; BIBS user ID; UIDM-yyyy-nnnnnn | - | Identity events | - | Read only | - | -"
+      - "Events | Outcome / Details | Columns | Applied, No change, Refused, Failed; what was done or why it was refused | - | Identity events | - | Read only | - | -"
+      - "Events | Processed By / Attempts | Columns | Name (or the source of an automatic run); number of times processed | - | Identity events | - | Read only | - | -"
+      - "Create User from Enterprise SSO | Windows ID | Text | Domain\\account | Y | Enterprise SSO platform | Blank | Dialog | The account must exist and be active | The user cannot be created from this Enterprise SSO account"
+      - "Create User from Enterprise SSO | User ID / Display name / AD e-mail / AD group / Unit / segment / Department / Location / Team leader / Unit head / UIDM request no. | Values | As kept by the directory, shown after Look Up Account | - | Enterprise SSO platform | - | Read only | User ID: a letter followed by nine digits; not an existing user; Windows ID not held by another user | The user ID must be a letter followed by nine digits, for example a013000196; User <user> already exists"
+      - "Enterprise SSO Simulator | Windows ID / User ID / Display Name / AD E-mail / Unit / Segment / Location / AD Status | Columns | Accounts of the simulator | - | Simulator | - | Read only | - | -"
+      - "Simulator account | Windows ID / User ID / AD status / First name / Last name / Display name / AD e-mail / AD group / Team leader's name / Team head's name / Section head's name / Unit head's name / Unit / segment / Department / Location / UIDM request no. | Form | Windows ID, User ID, AD e-mail, first and last name required | Cond. | - | AD status Active, AD group BIBS Users | Dialog | Required fields entered | Still needed: <fields>"
+    actions:
+      - "Process again | System Administrator (user management right) | A refused or failed event | Applies the event again after the data was corrected. Toast: Event <no> processed again: <outcome> | Applied, No change, Refused or Failed | -"
+      - "Create User from Enterprise SSO | System Administrator | Always | Opens the dialog | - | -"
+      - "Look Up Account | System Administrator | Windows ID entered | Reads the account from the Enterprise SSO platform and shows its details | - | -"
+      - "Create User | System Administrator | An active account looked up | Creates the BIBS user with the directory details (without group profiles, which follow an access request) and records a joiner event. Toast: User <user> created from the Enterprise SSO account | Active user | -"
+      - "New Account / Change | System Administrator, SIT and UAT only | Simulator shown | Adds or changes an account of the simulator. Toast: Enterprise SSO account <Windows ID> saved | - | -"
+      - "Send joiner / Send mover (details changed) / Send leaver / Send rehire / Send status change | System Administrator, SIT and UAT only | Simulator shown | Sends the event of the account to BIBS as the Enterprise SSO platform would; the outcome is shown and listed under Events | Applied, No change, Refused or Failed | Alert Identity event refused when refused"
+    rules:
+      - "As delivered (setting Users from the Enterprise SSO platform on, BDOI's FRS) the joiner, mover, leaver, rehire and status events create, update, deactivate and reactivate the users; with the setting off the events are recorded but not applied and users change only through access requests: Users are maintained through access requests; the events of the Enterprise SSO platform are not applied (FR-UA-003)."
+      - "The group profiles named in a UIDM-ISC event are given to the user only when the setting Group profiles from UIDM-ISC is on (off as delivered: group profiles follow an approved access request) (FR-UA-003)."
+      - "A leaver or a status other than Active deactivates the user and ends the open sessions at once; a rehire or the status Active reactivates the user (FR-UA-003, FR-UA-004)."
+      - "Every event is kept with its outcome; a refused event raises the alert Identity event refused to the System Administrator and can be processed again once the data is corrected; every applied change is written to the access change log with the UIDM request number (FR-UA-003, FR-UA-064)."
+      - "The simulator stands for the Enterprise SSO platform in SIT and UAT only; it cannot be switched on in production. At SIT the connection to the Enterprise SSO platform is set with the details of BDOI IT (FR-UA-003)."
+    outcome: The System Administrator sees every user change received from the bank's identity platforms, with its outcome, and corrects the refused ones.
+    frs: [FR-UA-003, FR-UA-004, FR-UA-064]
+    tests: [USERS]
+
+  - id: SCR-UA-22
+    title: Audit Trail
+    route: /admin/audit
+    purpose: >-
+      Every financial and non-financial action, who performed it, when and from where, as BDOI's FRS shows the audit
+      log: the module, the Windows ID, the name and the role of the user at the time, the action type, the activity,
+      the from and to values, the source address and the reference number, with filters, sortable columns and the
+      export in BDOI's audit log template, named Audit Logs_MMDDYYYY.
+    entry:
+      - Setup & Administration › Administration › Audit Trail
+    shots:
+      - {state: list, user: auditor, caption: "Audit Trail filtered on the sign-in actions"}
+    fields:
+      - "Filters | From / To | Date | dd-MMM-yyyy | N | - | Blank | - | To on or after From | The end date must be on or after the start date"
+      - "Filters | User | Look-up | Name of the user | N | User master | All | - | - | -"
+      - "Filters | Action Type | Drop-down | Create, Update, Delete/Deactivate, Submit, Approve, Reject, Login, Failed Login, Logout, Inactivity, Timeout, Generate, Export, Post, Reverse, Open, Close, Reopen | N | Fixed list | All | - | - | -"
+      - "Filters | Reference Number | Text | Part of the number | N | - | Blank | - | - | -"
+      - "Filters | Record Type | Text | Kind of record | N | - | Blank | - | - | -"
+      - "List | Timestamp / Module | Columns | dd-MMM-yyyy HH:mm; module of the action | - | Audit trail | - | Read only | - | -"
+      - "List | User Id / Performed By / Role | Columns | Windows ID; name; group profiles held at the time | - | Audit trail | - | Read only | - | -"
+      - "List | Action / Activity | Columns | Action type; what was done | - | Audit trail | - | Read only | - | -"
+      - "List | From / To | Columns | Value before and after the change | - | Audit trail | - | Read only | - | -"
+      - "List | IP Address / Reference | Columns | Source address; reference number of the record | - | Audit trail | - | Read only | - | -"
+    actions:
+      - "Excel / PDF / CSV | Auditor, Information Security Officer, System Administrator (audit right) | Always | Downloads the audit log of the filters on screen in BDOI's audit log template, named Audit Logs_MMDDYYYY. Toast: <file> downloaded | - | -"
+    rules:
+      - "No user can change or delete an audit record (FR-UA-064)."
+      - "Sign-ins, failed sign-ins, log-outs, the inactivity warning and the inactivity time-out are recorded with the user, the time and the source address (FR-UA-001, FR-UA-002, FR-UA-064)."
+      - "The exports are named by BDOI's convention <name>_MMDDYYYY with the extraction date as delivered; the setting Export file names gives the report code instead (FR-UA-064)."
+    outcome: Audit and Information Security find who did what, when, from where and with which role, and keep the export as evidence.
+    frs: [FR-UA-064, FR-UA-001, FR-UA-002]
+    tests: [AUDIT]

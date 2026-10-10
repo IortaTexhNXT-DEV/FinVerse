@@ -98,7 +98,7 @@ public class AuthController {
       RefreshCookies cookies,
       AuthPasswordPolicy passwordPolicy,
       SsoProperties sso,
-      @Value("${brokerverse.environment:local}") String environment,
+      @Value("${brokerverse.environment-name:${brokerverse.environment:local}}") String environment,
       PasswordResetRules resetRules) {
     this.resetRules = resetRules;
     this.authService = authService;

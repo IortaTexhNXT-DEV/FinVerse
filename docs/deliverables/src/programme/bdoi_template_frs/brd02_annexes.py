@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import copy
 import re
+import sys
 from collections import OrderedDict, defaultdict
 from pathlib import Path
 
@@ -17,6 +18,7 @@ from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 
 import build_brd02_bdoi_frs as m
+import brd_common_final as final
 import build_brd11_bdoi_frs as u11
 
 REPO = m.REPO
@@ -29,9 +31,12 @@ JAVA = REPO / "backend" / "src" / "main" / "java" / "com" / "iortatechnxt" / "br
 PORTRAIT_W = 7.4
 LANDSCAPE_W = 9.9
 # The screens of Appendix E, in order (cashiering screens, then inquiry, reports and interfaces)
-SCREENS = ["SCR-OP-07", "SCR-OP-08", "SCR-OP-09", "SCR-OP-10", "SCR-OP-11", "SCR-OP-12", "SCR-OP-13", "SCR-OP-14",
-           "SCR-OP-15", "SCR-OP-16", "SCR-OP-18", "SCR-OP-20", "SCR-OP-21", "SCR-OP-22", "SCR-OP-02", "SCR-OP-03",
-           "SCR-OP-05", "SCR-OP-63", "SCR-OP-64", "SCR-OP-61"]
+SCREENS = ["SCR-OP-07", "SCR-OP-65", "SCR-OP-66", "SCR-OP-67", "SCR-OP-08", "SCR-OP-09", "SCR-OP-10", "SCR-OP-11",
+           "SCR-OP-12", "SCR-OP-72", "SCR-OP-13", "SCR-OP-14", "SCR-OP-15", "SCR-OP-68", "SCR-OP-16", "SCR-OP-18",
+           "SCR-OP-69", "SCR-OP-20", "SCR-OP-73", "SCR-OP-21", "SCR-OP-22", "SCR-OP-70", "SCR-OP-71", "SCR-OP-02",
+           "SCR-OP-03", "SCR-OP-05", "SCR-OP-63", "SCR-OP-64", "SCR-OP-61"]
+# The places of the messages of the Cashiering screens added in October 2026 (read from the pack, Appendix F.3)
+NEW_MESSAGE_PLACES = re.compile(r"SCR-OP-(?:6[5-9]|7[0-3])\b")
 # The platform files whose notices, alerts and e-mails belong to Cashiering (every one must be quoted in Appendix G)
 NOTICE_SOURCES = ["cashiering/service/ReceiptActionService.java", "cashiering/service/DispositionService.java",
                   "cashiering/service/CashieringPaymentReversals.java",
@@ -48,7 +53,7 @@ NOTICE_DELEGATES = {"cashiering/service/PaymentReversalSupport.java"}
 # Places of the messages of the system (sign-off workbook of BRD-02, sheet Messages) that belong to Cashiering
 MESSAGE_PLACES = re.compile(r"SCR-OP-(?:0[2357]|0[89]|1[0-8]|2[0-2]|6[134])\b|Every screen|Several screens|"
                             r"every upload type|Post-dated Checks$|Commission Payment Details$")
-BRD_READS = {"Both": " (the BRD supports both readings)", "Our FRS": " (the BRD reads as the BIBS reference)",
+BRD_READS = {"Both": " (the BRD supports both readings)", "Our FRS": " (the BRD reads as the proposed behaviour)",
              "BDOI's FRS": " (the BRD reads as BDOI's FRS)"}
 WALK_STEPS = {"WT-A": [1, 2, 3, 4, 7], "WT-B": [8, 9, 10], "WT-D": [3, 4]}
 PERSONAS = {"CASHIER": ("Cashier (Head Office)", "cashier"), "CASHIER_BR": ("Cashier (Cebu branch)", "cashbr"),
@@ -80,6 +85,14 @@ def screens() -> dict[str, dict]:
     return out
 
 
+def pack_messages() -> list[dict]:
+    """The messages of the platform as the sign-off pack of BRD-02 reads them from the code at every build."""
+    sys.path.insert(0, str(REPO / "docs" / "deliverables" / "src" / "signoff"))
+    import signoff_pack  # noqa: PLC0415
+
+    return list(signoff_pack._pack(OPS / "pack" / "pack.yaml").messages)
+
+
 def signoff_sheet(name: str) -> list[tuple]:
     wb = openpyxl.load_workbook(m.SIGNOFF_XLSX, read_only=True)
     rows = [tuple(r) for r in wb[name].iter_rows(values_only=True)]
@@ -88,10 +101,20 @@ def signoff_sheet(name: str) -> list[tuple]:
 
 
 def menu_rows(spec: dict) -> list[list]:
+    """The menu entries of each persona: the sign-off workbook of BRD-02, completed with the menus the pack reads
+    from the code at every build (the screens added after the workbook was issued)."""
     seen = defaultdict(set)
     for r in signoff_sheet("Menu by persona")[3:]:
         if r[0]:
             seen[f"{r[1]} › {r[2]} › {r[3]}"].add(r[0])
+    sys.path.insert(0, str(REPO / "docs" / "deliverables" / "src" / "signoff"))
+    import signoff_pack  # noqa: PLC0415
+
+    pack = signoff_pack._pack(OPS / "pack" / "pack.yaml")
+    for role, items in pack.menus().items():
+        for x in items:
+            if x.get("own") == "Yes":
+                seen[f"{x['group']} › {x['section']} › {x['screen']}"].add(pack.persona_label(role))
     rows = []
     for screen in spec["menu_screens"]:
         if screen not in seen:
@@ -285,9 +308,9 @@ class Appendices:
                "each screen, how the user reaches it, the FR items it serves, one screenshot, its fields with type, "
                "mandatory marker, format, list or source and validation, its actions and its rules. Mandatory: Y = "
                "mandatory, N = optional, Cond. = mandatory when the condition stated applies. The screenshots were "
-               "taken on the SIT environment with SIT/UAT data. Where BDOI's FRS asks for a field, a filter or a step "
-               "that the screen does not show today (for example the posting step, the bank account or the entry "
-               "type), section 3 prevails and the point is in Appendix R.")
+               "taken on the BIBS test environment with SIT/UAT data; the screens of BDOI's posting step, payment "
+               "files, receipt forms and lists were taken on 10-Oct-2026. Where a point is offered both ways by a "
+               "setting, the screens show the value delivered (Appendix H.8) and the point is in Appendix R.")
         for sid in SCREENS:
             s = self.scr[sid]
             k = self.scr_no[sid]
@@ -304,7 +327,7 @@ class Appendices:
                 png = OPS / "screenshots" / f"scr-op-{n:02d}-01-{shots[0]['state']}.png"
                 if not png.exists():
                     raise SystemExit(f"screenshot missing: {png}")
-                self.els.append(self.b.picture(png, max_w=6.4, max_h=4.6))
+                self.els.extend(final.screenshot(self.b, png))
                 self.p(f"Screenshot {k}: {m.clean(shots[0].get('caption', s['title']))}", italic=True, size=8,
                        jc="center")
                 self.b.stats["screenshots"] += 1
@@ -359,6 +382,21 @@ class Appendices:
                              str(r[4]), str(r[5] or "-"), m.clean(r[6] or "-")])
         self.table(["No.", "Where it appears", "Message", "Type", "What the user does"], rows,
                    [0.55, 1.6, 2.6, 0.8, 1.85], size=7.5)
+        known = {r[2] for r in rows}
+        more = []
+        for msg in pack_messages():
+            if NEW_MESSAGE_PLACES.search(str(msg.get("place") or "")) and msg["text"] not in known:
+                known.add(msg["text"])
+                text = re.sub(r"\(setting [A-Z][A-Z0-9_]+\)", "(setting of Appendix H.8)", msg["text"])
+                more.append([f"M-N{len(more) + 1:02d}", m.clean(msg["place"], keep_refs=True), m.clean(text),
+                             msg["kind"], m.clean(msg["fix"]) if msg["fix"] != "-" else "-"])
+        if more:  # the messages of the screens aligned in v3.2 not yet in F.2 (none once the sign-off sheet holds them)
+            self.h2("F.3 Messages of the posting step, payment files, receipt forms and lists")
+            self.p("The messages of the Cashiering screens of BDOI's posting step, payment files, AR and OR forms, "
+                   "day-end list, search log, unapplied payment list and settlement ORs (Appendix E), word for word.")
+            self.table(["No.", "Where it appears", "Message", "Type", "What the user does"], more,
+                       [0.55, 1.6, 2.6, 0.8, 1.85], size=7.5)
+        rows = rows + more
         self.b.stats["messages"] = len(rows)
         self.b.stats["messages_all"] = len(rows) + self.b.stats["messages_bdoi"]
         self.message_rows = rows
@@ -404,6 +442,14 @@ class Appendices:
         self.table(["Run", "When", "What it does"], h["jobs"], [2.0, 1.6, 3.8], size=8)
         self.h2("H.7 Statuses")
         self.table(["Record", "Statuses", "Source"], h["statuses"], [1.8, 3.9, 1.7], size=8)
+        self.h2("H.8 Settings for the points BDOI decides")
+        self.p("The points where BDOI's FRS and the BRD or the earlier BIBS behaviour differ are offered both ways in "
+               "BIBS, each chosen by a setting that the System Administrator changes with maker-checker, without a "
+               "release. BDOI's decision only confirms the value; the points stay in Appendix R as Configurable - BDOI "
+               "to confirm the setting. The values without a conflict number are inputs BDOI gives.")
+        self.table(["Setting", "Values", "Default", "Settles (Appendix R)", "Decided by"], h["decision_settings"],
+                   [1.6, 2.8, 1.6, 0.6, 1.0], size=7.5)
+        self.b.stats["app_H_settings"] = len(h["decision_settings"])
         self.b.stats["app_H_parameters"] = len(h["parameters"])
         self.b.stats["app_H_lists"] = len(h["lists"])
 
@@ -431,7 +477,7 @@ class Appendices:
     def walkthroughs(self):
         data = yaml.safe_load((OPS / "pack" / "walkthroughs.yaml").read_text(encoding="utf-8"))["walkthroughs"]
         self.h1("Appendix K – Process Walkthroughs")
-        self.p("The Cashiering steps of the end-to-end walkthroughs of the BIBS release set BRD-02, step by step: who "
+        self.p("The Cashiering steps of the end-to-end walkthroughs of the Operations BRD, step by step: who "
                "acts, on which screen, what the user does, what the user sees and the result (the step numbers are "
                "those of the walkthroughs), then the walkthrough of this FRS for the Business Unit (WT-E). The "
                "screens are specified in Appendix E; the sign-in IDs are in the Business Unit Walkthrough Users "
@@ -489,7 +535,7 @@ class Appendices:
                 png = OPS / "screenshots" / f"{doc['shot']}.png"
                 if not png.exists():
                     raise SystemExit(f"image missing: {png}")
-                self.els.append(self.b.picture(png, max_w=6.4, max_h=4.6))
+                self.els.append(final.document_image(self.b, png))
                 self.p(f"Image {doc['id']}: {doc['shot_caption']}", italic=True, size=8, jc="center")
         self.b.stats["documents"] = len(d["items"])
 
@@ -539,45 +585,51 @@ class Appendices:
     def traceability(self):
         self.h1("Appendix Q – Requirements Traceability")
         self.p("Q.1 traces every BRD ID of the Cashiering scope of the Operations BRD (v1.01 with the Cashiering annex "
-               "of May 2026) to the FR items of this FRS, to the reference requirements of the BIBS FRS BRD-2 "
-               "Operations v2.1 (FR-OP) and to the test conditions of the BIBS test plan BRD-2 (TC-OP-nnn.n; the cases "
-               "of each condition are in the Test Cases and Traceability workbook). Q.2 lists every reference "
-               "requirement with the FR items that incorporate it.")
-        self.h2("Q.1 BRD requirement to FR items, BIBS reference and test conditions")
+               "of May 2026) to the FR items of this FRS and to the test conditions of the Test Cases and Traceability "
+               "workbook issued with this FRS (TC-OP-nnn.n; the cases of each condition, with the screen and the "
+               "walkthrough step where it is run, are in the workbook). Q.2 lists every FR item of this FRS with its "
+               "BRD IDs and test conditions.")
+        self.h2("Q.1 BRD requirement to FR items and test conditions")
         rows = []
+        item_tcs = defaultdict(list)
+        item_brd = defaultdict(set)
+        for fr_id, items in self.b.fr_to_frum.items():
+            for it in items:
+                item_tcs[it].append(fr_id)
+            self.listed_refs.add(fr_id)
         for rid in self.b.ids:
-            items = ", ".join(sorted(set(m.FRS_RE.findall(self.b.mapping[rid])), key=m.frs_key))
+            found = sorted(set(m.FRS_RE.findall(self.b.mapping[rid])), key=m.frs_key)
+            for it in found:
+                item_brd[it].add(rid)
+            items = ", ".join(found)
             tr = self.trace.get(rid, {"page": "-", "frs": []})
             refs = tr["frs"]
             if rid in m.REMOVED:
                 items = items or "Removed from the BRD"
-            rows.append([rid, tr["page"], items or "-", ", ".join(refs) or "-",
+            rows.append([rid, tr["page"], items or "-",
                          "; ".join(m.tc_text(r, self.cases) for r in refs) or "-"])
-        self.table(["BRD ID", "BRD page", "FR items (this FRS)", "BIBS reference (FR-OP)", "Test conditions"],
-                   rows, [1.0, 1.1, 4.0, 1.4, 2.4], size=7)
+        self.table(["BRD ID", "BRD page", "FR items (this FRS)", "Test conditions"],
+                   rows, [1.0, 1.1, 4.8, 3.0], size=7)
         self.b.stats["trace_rows"] = len(rows)
-        self.h2("Q.2 BIBS reference requirement to FR items")
+        self.h2("Q.2 FR item to BRD IDs and test conditions")
         rows = []
-        for fr_id, items in sorted(self.b.fr_to_frum.items()):
-            fr = self.our.get(fr_id)
-            if fr is None:
-                raise SystemExit(f"unknown BIBS reference {fr_id}")
-            brd = ", ".join(x.split(" (")[0] for x in fr["brd"] if isinstance(x, str))
-            rows.append([fr_id, m.clean(fr["title"]), brd, ", ".join(items), m.tc_text(fr_id, self.cases)])
-            self.listed_refs.add(fr_id)
-        self.table(["Reference", "Title", "BRD", "FR items (this FRS)", "Test conditions"], rows,
-                   [0.85, 2.3, 1.5, 3.4, 1.85], size=7)
+        for it in sorted(set(item_tcs) | set(item_brd), key=m.frs_key):
+            tcs = "; ".join(x for x in (m.tc_text(r, self.cases) for r in sorted(set(item_tcs.get(it, [])))) if x != "-")
+            brd = ", ".join(sorted(item_brd.get(it, []))) or "-"
+            rows.append([it, brd, tcs or "-"])
+        self.table(["FR item (this FRS)", "BRD IDs", "Test conditions"], rows, [1.6, 3.8, 4.5], size=7)
 
     # ---------------------------------------------------------------- R
     def observations(self):
         cmp_data = yaml.safe_load(m.CMP.read_text(encoding="utf-8"))
         self.h1("Appendix R – Observations and Points for BDOI Decision")
-        self.p("Every point where BDOI's FRS and the BIBS reference FRS differ, the slips noticed in BDOI's text, the "
-               "changes made to the Business Requirements Mapping and the other observations of this version. BDOI's "
-               "text is kept in the body of the document; this appendix gives both readings, the BRD text, what "
+        self.p("Every point where the proposed behaviour differs from the original text of this FRS, the slips noticed "
+               "in BDOI's text, the changes made to the Business Requirements Mapping and the other observations of "
+               "this version. BDOI's text is kept in the body of the document; this appendix gives the original text, "
+               "the BRD text, what "
                "version 3.2 proposes, the impact and who decides. Every point starts as Open; a point available as a "
                "setting of the system is marked Configurable – BDOI to confirm the setting.")
-        header = ["No.", "Topic", "BDOI FRS text", "BRD text", "Proposed in v3.2", "Impact", "Decision by", "Status"]
+        header = ["No.", "Topic", "Original text of this FRS", "BRD text", "Proposed in v3.2", "Impact", "Decision by", "Status"]
         widths = [0.75, 1.0, 1.9, 1.5, 2.2, 0.95, 1.0, 0.6]
         no = 0
         section = "R.1"
@@ -589,21 +641,22 @@ class Appendices:
             status = "Open"
             if ref in CONFIGURABLE:
                 prop, status = f"{prop} Available as a setting: {CONFIGURABLE[ref]}", CONFIGURABLE_STATUS
-            out = [f"R-{no:02d}" + (f" ({ref})" if ref else ""), topic, bdoi, brd, prop, impact, who, status]
+            shown = ref if ref and not ref.startswith("CLR-") else ""
+            out = [f"R-{no:02d}" + (f" ({shown})" if shown else ""), topic, bdoi, brd, prop, impact, who, status]
             q_rows.append(dict(zip(["no", "topic", "bdoi", "brd", "proposal", "impact", "decide_by", "status"], out),
                                section=section))
             return out
         decide = {"Between the documents": "Cashiering Process Owner; System Analyst (BDO ITG)",
                   "Within BDOI's FRS": "System Analyst (BDO ITG)"}
-        self.h2("R.1 Conflicts between BDOI's FRS and the BIBS reference FRS")
+        self.h2("R.1 Points where the proposed behaviour differs from the original text of this FRS")
         rows = []
         for c in cmp_data["conflicts"]:
             if c["kind"] != "Between the documents":
                 continue
-            prop = m.clean(f"{c['recommendation']} (BIBS reference FRS: {c['ours']})", keep_refs=True)
-            brd = m.clean(c["brd_note"], keep_refs=True) + BRD_READS.get(c["brd"], "")
-            rows.append(row(c["id"], m.clean(c["topic"], keep_refs=True), m.clean(c["bdoi"], keep_refs=True), brd,
-                            prop, m.clean(c["decision"], keep_refs=True), decide[c["kind"]]))
+            prop = m.clean(f"{c['recommendation']} Proposed behaviour: {c['ours']}", keep_refs=False)
+            brd = m.clean(c["brd_note"], keep_refs=False) + BRD_READS.get(c["brd"], "")
+            rows.append(row(c["id"], m.clean(c["topic"], keep_refs=False), m.clean(c["bdoi"], keep_refs=False), brd,
+                            prop, m.clean(c["decision"], keep_refs=False), decide[c["kind"]]))
             self.listed_conflicts.add(c["id"])
         self.table(header, rows, widths, size=7)
         section = "R.2"
@@ -612,9 +665,9 @@ class Appendices:
         for c in cmp_data["conflicts"]:
             if c["kind"] == "Between the documents":
                 continue
-            rows.append(row(c["id"], m.clean(c["topic"], keep_refs=True), m.clean(c["bdoi"], keep_refs=True),
-                            m.clean(c["brd_note"], keep_refs=True), m.clean(c["recommendation"], keep_refs=True),
-                            m.clean(c["decision"], keep_refs=True), decide[c["kind"]]))
+            rows.append(row(c["id"], m.clean(c["topic"], keep_refs=False), m.clean(c["bdoi"], keep_refs=False),
+                            m.clean(c["brd_note"], keep_refs=False), m.clean(c["recommendation"], keep_refs=False),
+                            m.clean(c["decision"], keep_refs=False), decide[c["kind"]]))
             self.listed_conflicts.add(c["id"])
         for o in DOC["slips"]:
             rows.append(row("", o["topic"], o["bdoi"], o["brd"], o["proposal"], o["impact"], o["decide_by"]))
@@ -647,11 +700,11 @@ class Appendices:
         self.h1("Appendix S – Assumptions, Dependencies and Open Questions")
         self.p(o["intro"])
         self.h2("S.1 Assumptions")
-        self.table(["No.", "Our reference", "Assumption", "Related"],
+        self.table(["No.", "Reference", "Assumption", "Related"],
                    [[f"S.1.{i}", r[0], r[1], r[2]] for i, r in enumerate(o["assumptions"], 1)],
                    [0.5, 0.9, 4.4, 1.6], size=8)
         self.h2("S.2 Dependencies")
-        self.table(["No.", "Our reference", "Dependency", "Needed for"],
+        self.table(["No.", "Reference", "Dependency", "Needed for"],
                    [[f"S.2.{i}", r[0], r[1], r[2]] for i, r in enumerate(o["dependencies"], 1)],
                    [0.5, 0.9, 4.4, 1.6], size=8)
         self.h2("S.3 Open questions not answered in BDOI's FRS")
@@ -749,7 +802,7 @@ def key_numbers(b) -> list[list[str]]:
         ["Documents and outputs", str(s["documents"]), "Appendix L"],
         ["Reports / scheduled runs", f"{s['reports']} / {s['schedules']}", "Appendix M"],
         ["Integrations", str(s["integrations"]), "Appendix N"],
-        ["Test cases (BIBS test plan and one per acceptance criterion)", str(n_cases + s["ac"]),
+        ["Test cases (Test Cases and Traceability workbook, with one per acceptance criterion)", str(n_cases + s["ac"]),
          "Test Cases and Traceability workbook"],
         ["Open questions not answered in BDOI's FRS / answered and not repeated", f"{s['open_kept']} / {s['answered']}",
          "Appendix S"],
@@ -814,6 +867,7 @@ CHANGE_POINTS = [
     "Business Requirements Mapping: {mapping} rows given FR items (the eight blank rows filled), {removed} BRD IDs removed from the BRD added as rows; List of Integrations completed.",
     "Functional Requirements: {elaborated} of BDOI's items elaborated, {new_sub} new sub-items continuing BDOI's numbering, {new_items} new entries FRS.CSH.05.02 to FRS.CSH.10.04 ({new_item_sub} sub-items); {statements} statements and {ac} numbered acceptance criteria; column Application Feature Model filled for every entry.",
     "Appendix B: references of version 3.2. New Appendices C To-Be Process Flows ({flows} figures); D Payment and Upload File Layouts ({files} files); E Screen Specifications ({screens} screens and the menu by persona); F Messages ({messages}); G Notifications and E-mail Texts ({emails}); H Business Rules, Roles and Parameters; I Accounting Entries ({entries} events); J Workflow and Approvals; K Process Walkthroughs ({walk} steps); L Document Prints ({documents}); M Reports and Schedules ({reports} reports, {schedules} runs); N Integrations ({integrations}); O Non-functional Requirements ({nfr}); P Data Set-up ({data}); Q Traceability ({trace} BRD IDs); R Observations ({obs}); S Open Questions ({open_kept} kept, {answered} answered by BDOI's FRS and not repeated); T Change Control; U Review Checklist ({checklist} points); V Glossary ({glossary} terms).",
+    "Aligned with BIBS on 10 Oct 2026: Appendix E with the screens of the posting step (Create AR/OR, Cashiering Record, Posting), Payment Files, AR and OR Forms, Day-End List, Search Log, Unapplied Payment List and Settlement ORs, the Cashiering Dashboard, Batch Print and Receipt Series updated, their screenshots taken again; Appendix F.3 with the messages of these screens; Appendix H.8 with the {settings} settings for the points BDOI decides, among them the amount in words per currency and the company that receives the MFT files; Appendices M and N with the MFT intake, the channel simulator and the Commission Schedule.",
     "BDOI's text of version 3.1 is unchanged: every paragraph, table row and FR ID of BDOI is still in place; the slips noticed are proposed in Appendix R only.",
 ]
 
@@ -828,7 +882,7 @@ def change_summary(b):
                   documents=s["documents"], reports=s["reports"], schedules=s["schedules"],
                   integrations=s["integrations"], nfr=s["nfr_rows"], data=s["data_rows"], trace=s["trace_rows"],
                   obs=s["observations"], open_kept=s["open_kept"], answered=s["answered"], checklist=s["checklist"],
-                  glossary=s["glossary"])
+                  glossary=s["glossary"], settings=s["app_H_settings"])
     els = [b.para("Summary of changes in version 3.2", bold=True, size=14, color="014EA9", hl=False,
                   space_after=120),
            b.para("This review copy shows in light yellow every passage added in version 3.2: the full coverage of the "

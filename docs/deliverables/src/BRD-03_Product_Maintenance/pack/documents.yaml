@@ -56,7 +56,7 @@ documents:
     name: ManCom sign-off record
     template: (standard layout of the system, ManCom Sign-off)
     format: PDF, attached as ManCom sign-off when no signed sheet was uploaded
-    produced: Automatically at Sign off and send to MBS
+    produced: Automatically at the ManCom sign-off (the last approval of the selected approvers, or Sign off and send to MBS)
     protected: No (kept in BIBS)
     fields:
       - "Package: request, package, line, client or programme – from the request"

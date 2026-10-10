@@ -1,5 +1,6 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
+import { pmRoutingApi } from '@/api/pmRouting';
 import { PACKAGE_REQUEST_ENTITY, productMaintApi } from '@/api/productmaint';
 import type { PackageRequest } from '@/api/productmaint';
 import type { ActionNote, WorkAction } from '@/api/workflow';
@@ -10,6 +11,7 @@ import { Button } from '@/components/ui/Button';
 import { useToast } from '@/components/ui/toastContext';
 import { titleCase } from '@/utils/format';
 import { RecommendDialog, ReviseDialog, SetupDialog, TermsFinalDialog } from './ActionDialogs';
+import { offeredActions } from './offeredActions';
 
 type Simple =
   | 'submit'
@@ -37,27 +39,7 @@ const SIMPLE: Record<Simple, (p: PackageRequest, text?: string) => Promise<unkno
   retire: (p, t) => productMaintApi.retire(p.id, t),
 };
 
-const DIALOGS = new Set(['recommend', 'revise_qs', 'terms_final', 'setup', 'return_incomplete']);
-
 /** The business actions this page runs; the catalog outcomes are system actions (never shown). */
-function offeredActions(p: PackageRequest, actions: WorkAction[]): WorkAction[] {
-  return actions.filter((a) => {
-    if (a.action === 'approve' && p.status === 'FOR_TSU_APPROVAL') {
-      return p.negotiationRequired;
-    }
-    if (a.action === 'approve_no_negotiation') {
-      return !p.negotiationRequired;
-    }
-    if (a.action === 'setup') {
-      return p.requestType !== 'RETIRE';
-    }
-    if (a.action === 'retire') {
-      return p.requestType === 'RETIRE';
-    }
-    return a.action in SIMPLE || DIALOGS.has(a.action);
-  });
-}
-
 /** The first action is the call to action; one that closes the request off its path is danger. */
 function actionVariant(a: WorkAction, index: number): 'accent' | 'secondary' | 'danger' {
   if (isExitStage(a.toStage)) {
@@ -78,6 +60,14 @@ export function PackageActions({
   const toast = useToast();
   const queryClient = useQueryClient();
   const [pending, setPending] = useState<WorkAction | null>(null);
+  const forManCom = request.status === 'FOR_MANCOM';
+  const routing = useQuery({
+    queryKey: ['package-request', request.id, 'routing'],
+    queryFn: () => pmRoutingApi.routing(request.id),
+    enabled: forManCom,
+  });
+  // Until the routing is known, a request waiting for ManCom offers no direct sign-off.
+  const manComRouted = routing.data?.mancom.selectedRouting ?? forManCom;
   const refresh = async (label: string) => {
     setPending(null);
     await queryClient.invalidateQueries({ queryKey: ['package-request', request.id] });
@@ -103,7 +93,7 @@ export function PackageActions({
   const kind = pending?.action;
   return (
     <>
-      {offeredActions(request, actions).map((a, i) => (
+      {offeredActions(request, actions, manComRouted).map((a, i) => (
         <Button
           key={a.action}
           size="sm"

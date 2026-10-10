@@ -159,15 +159,15 @@ annex_m:
   passwords:
     - [Sign-in of BDO users, "Single sign-on through EIAM; the password, its expiry and history, the lock-out and the second factor are EIAM's policies", All users except the break-glass accounts]
     - [Password length and composition, "At least 10 characters with upper- and lower-case letters, a digit and a symbol", Break-glass accounts]
-    - [Password history, "Last 10 passwords refused (BDOI's FRUM-004; delivered value 8, to be set to 10)", Break-glass accounts]
+    - [Password history, "Last 10 passwords refused (BDOI's FRUM-004)", Break-glass accounts]
     - [Password expiry, 90 days; a notice 7 days before, Break-glass accounts]
     - [Minimum password age, 1 day, Break-glass accounts]
     - [Lock-out, "3 consecutive failed attempts; unlocked by a System Administrator or a reactivation request", Break-glass accounts (EIAM's lock-out for the others)]
-    - [Password reset, "By a second System Administrator; temporary password shown once; change at the next sign-in; the self-service link switched off in production", Break-glass accounts]
+    - [Password reset, "By another System Administrator, never one's own; temporary password shown once; change at the next sign-in; no forgotten-password link on the Login page (setting Password reset rules, M.10)", Break-glass accounts]
     - [Second factor, "Code of an authenticator application at every sign-in; ten single-use recovery codes; a lost authenticator is reset by a System Administrator and approved by another", Break-glass accounts (EIAM's second factor for the others)]
   sessions:
     - [Inactivity warning, 15 minutes without activity, Stay Logged In / Log Out]
-    - [Inactivity sign-out, 30 minutes without activity, The session ends with the reason inactivity]
+    - [Inactivity sign-out, 30 minutes without activity, "The session ends with the reason inactivity; the page Session Timed Out: Your session timed out. Please log in again to continue, with Log In"]
     - [Session-end warning, 30 minutes before the fixed end of a session, BRD x.001.1.3]
     - [Several tabs, One session for all the tabs of a user, Activity in any tab counts]
     - [One session per device, Not enforced; every session is in the session log, Open point UQ09 of the BIBS FRS]
@@ -175,7 +175,7 @@ annex_m:
     - "Four eyes: the requester and the user a request is about never decide it."
     - "The second approver differs from the first approver, the requester and the user concerned."
     - "The implementer of a group-profile request is not its requester."
-    - "Separation-of-duties rules: pairs of group profiles one user may not hold together, kept by the Business Administrator and authorised by Information Security; checked on every request and bulk line, at submission and at approval."
+    - "Separation-of-duties rules: pairs of group profiles one user may not hold together, and pairs of permissions (the conflicting permission combinations) that neither one group profile nor one user may hold together, kept by the Business Administrator and authorised by Information Security; checked on every request, bulk line and group-profile change, at submission and at approval."
     - "A user never changes his or her own group profiles."
     - "Privilege level of each group profile (Low, Standard, High, Admin): a request that gives a High or Admin profile, or that is submitted or approved outside working hours, needs a second approval and raises an alert."
     - "Security settings change only with the approval of Information Security."
@@ -188,7 +188,7 @@ annex_m:
     - [Session timeout, 30 minutes, Inactivity time before the sign-out, Information Security]
     - [Session-end warning, 30 minutes, Warning before the fixed end of a session, Information Security]
     - [User ID format, A letter followed by nine digits (a999999999), Format of new user IDs, shown in words to the requester, Business Administration]
-    - [Password history, "8 (to be set to 10)", Previous passwords refused (local accounts), Information Security]
+    - [Password history, "10", Previous passwords refused (local accounts), Information Security]
     - [Password expiry, 90 days, Password expiry (local accounts), Information Security]
     - [Minimum password age, 1 day, Minimum days between changes (local accounts), Information Security]
     - [Working hours, "08:00 to 18:00, Monday to Friday", Hours outside which a change needs a second approval, Information Security]
@@ -202,6 +202,18 @@ annex_m:
     - [Daily run of effective changes, 00:05 daily, Applies the scheduled requests, System Administrator]
     - [Daily run of dormant users, 00:15 daily, Deactivates the dormant users and sends the notices, System Administrator]
     - [Password expiry notice, 06:00 daily, Notifies local-account users whose password expires within 7 days, System Administrator]
+  decision_settings:
+    - [Users from the Enterprise SSO platform, "On: users are created, updated, deactivated and reactivated from the Enterprise SSO and UIDM-ISC events, and from an active Enterprise SSO account; Off: only through approved access requests", "On (BDOI's FRS)", "C01, C04, C13, C14", Information Security; BDOI IT]
+    - [Group profiles from UIDM-ISC, "On: the group profiles named in a UIDM-ISC event are given to the user (option b); Off: group profiles only through approved requests in the system (option a)", "Off (option a)", C01, Information Security; BDOI IT]
+    - [Inactivity warning wording, "On: You have been inactive for x minutes ... stay logged in or log out? with Stay Logged In and Log Out; Off: the earlier wording with Stay Signed In and Sign Out Now", "On (BDOI's FRS)", C08, Process Owner (Business Administration)]
+    - [Session timed-out page, "On: after the inactivity sign-out the page Your session timed out. Please log in again to continue, with Log In; Off: a message on the Login page", "On (BDOI's FRS)", C07, Process Owner (Business Administration)]
+    - [Password reset rules, "On: no forgotten-password link; a password is reset only by another System Administrator, and with single sign-on only for the break-glass accounts; Off: the self-service reset link for local accounts and the administrator reset of any local account", "On (BDOI's FRS)", C11, Information Security]
+    - [Password history, "0 to 24 previous passwords that may not be reused", "10 (BDOI's FRS)", C10, Information Security]
+    - [Export file names, "On: <name>_MMDDYYYY with the extraction date (for example Audit Logs_10092026.xlsx); Off: the report code", "On (BDOI's FRS)", C18, Process Owner (Business Administration)]
+    - [Access request notices by e-mail, "On: the notices of access requests are also e-mailed to each user who chose e-mail in the notification preferences; Off: in the system only", "On (BDOI's FRS)", C25, Process Owner (Business Administration)]
+    - [Conflicting permission combinations, "Rules of two permissions that neither one group profile nor one user may hold, kept on Separation of Duties", "None delivered; BDOI lists the pairs", C16, Information Security]
+    - [Company-issued devices only, "On: the system is used only from company networks or devices marked by the device-management gateway (with the company networks and the device marker of BDOI IT); Off: any device", "Off as delivered; to be switched on with the values of BDOI IT", "-", BDOI IT; Information Security]
+    - [Break-glass alert recipients, "E-mail addresses of Information Security alerted at every break-glass sign-in", "Blank (to be given)", "-", Information Security]
   lists:
     - [Business unit group, Empty until BDOI supplies the values]
     - [User level, Empty until BDOI supplies the values]
@@ -244,26 +256,28 @@ annex_n:
     - An identity that matches no active user is refused with the not-linked message; EIAM unavailable shows "Your organisation's sign-in service could not complete the sign-in. Try again in a moment."
     - Log Out ends the session in the system and at EIAM; an inactivity sign-out asks for the EIAM sign-in again at the next access.
   rules:
-    - "The system never creates a user from a sign-in; users exist through an approved enrolment or the UIDM-ISC provisioning."
+    - "The system never creates a user from a sign-in; users exist through an approved enrolment, the UIDM-ISC and Enterprise SSO events, or Create User from Enterprise SSO by the System Administrator for an active directory account (Identity Synchronisation, Annex J)."
     - "Roles and permissions stay in the system and change only through requests; no EIAM group is mapped to a role. EIAM may restrict who reaches the system through a 'BIBS users' group kept by BDOI IT."
     - "The Windows ID held on each user identifies the EIAM account; the user ID keeps the BDOI format a999999999."
     - "Switching to single sign-on is a setting of the environment once BDOI IT has registered the system in EIAM, not a change request."
   provisioning:
-    - ["(a) UIDM-ISC provisions the user accounts; role changes stay requests in the system (proposed)", "Joiners, movers and leavers come from UIDM-ISC: create, change, deactivate and reactivate users, each with its UIDM request number. The assignment and change of group profiles and the group-profile requests stay requests in the system under four eyes (FRUM.009 to FRUM.011 for them).", "Standard user-provisioning interface (SCIM 2.0) from UIDM-ISC; extract of accounts, group profiles and permissions for certification"]
-    - ["(b) UIDM-ISC provisions users and roles", "Every access change is requested and approved in UIDM-ISC and applied by the system; requests in the system only for the break-glass path.", "The same interface with the group profiles as entitlements"]
-    - ["(c) No provisioning from UIDM-ISC", "Every access change is a request in the system, as the BRD reads; UIDM-ISC only reads the accounts for certification.", "Extract only"]
+    - ["(a) UIDM-ISC provisions the user accounts; role changes stay requests in the system (as delivered: Users from the Enterprise SSO platform on, Group profiles from UIDM-ISC off)", "Joiners, movers and leavers come from UIDM-ISC: create, change, deactivate and reactivate users, each with its UIDM request number. The assignment and change of group profiles and the group-profile requests stay requests in the system under four eyes (FRUM.009 to FRUM.011 for them).", "Standard user-provisioning interface from UIDM-ISC; extract of accounts, group profiles and permissions for certification"]
+    - ["(b) UIDM-ISC provisions users and roles (Group profiles from UIDM-ISC on)", "Every access change is requested and approved in UIDM-ISC and applied by the system; requests in the system only for the break-glass path.", "The same interface with the group profiles as entitlements"]
+    - ["(c) No provisioning from UIDM-ISC (Users from the Enterprise SSO platform off)", "Every access change is a request in the system, as the BRD reads; UIDM-ISC only reads the accounts for certification.", "Extract only"]
   provisioning_rules:
     - Every change applied from UIDM-ISC is recorded in the access-change log with the source UIDM-ISC and the UIDM request number, so the reports of FRUM.007 and FRUM.008 stay complete.
-    - A refused provisioning event is answered to UIDM-ISC and alerted to the System Administrators; it is re-sent from UIDM-ISC once corrected.
+    - A refused provisioning event is answered to UIDM-ISC, kept with its reason on Identity Synchronisation and alerted to the System Administrators; it is processed again there once the data is corrected, or re-sent from UIDM-ISC.
+    - "Each user shows the directory details last received (Windows ID, AD e-mail, group and status, names of the reporting line, unit, department, location, UIDM request number, date and time of the synchronisation); Synchronise Now on the Users screen reads the account from the Enterprise SSO platform again."
+    - "In SIT and UAT a simulator stands for the Enterprise SSO platform: its accounts sign in on a sign-in page of the simulator and send the joiner, mover, leaver, rehire and status events, so that the flows run end to end; it cannot be switched on in production. The live connection is set at SIT with the details of BDOI IT."
     - A leaver deactivates the user and ends the user's open sessions.
   break_glass:
     - [Who, "Two named System Administrators of BDOI IT, listed in the configuration of the environment; no shared account"]
     - [When, "EIAM, or the network path to it, is not available, or the single sign-on settings must be repaired"]
     - [How, "Local password (Annex M) and the second factor, always"]
-    - [Control, "Every sign-in recorded and alerted to Information Security; credentials kept in the BDOI privileged access vault; each use reviewed within one working day; password changed after each use"]
+    - [Control, "Every sign-in recorded and alerted to Information Security (in the system and by e-mail to the addresses of the setting Break-glass alert recipients); credentials kept in the BDOI privileged access vault; each use reviewed within one working day; password changed after each use"]
   bdoi_it:
     - "Registration of BIBS in EIAM for each environment: sign-in and sign-out addresses, the identifier of the user returned (Windows ID or user principal name) and test accounts for SIT and UAT."
-    - "The choice of the UIDM-ISC option (a, b or c) and, for (a) or (b), the connection of UIDM-ISC to the system."
+    - "The confirmation of the provisioning settings (option a, b or c of N.3, Annex M.10) and the connection details of UIDM-ISC and of the Enterprise SSO directory at SIT."
     - "Confirmation that EIAM's policies meet the BRD rules: lock-out after 3 invalid attempts, password expiry, second factor and BDO-issued devices."
     - "The holders of the break-glass accounts and the privileged access vault."
 
@@ -309,7 +323,7 @@ observations:
   - topic: Screenshots of New Request
     bdoi: "-"
     brd: "BRD 1.002.1.1.2 and 1.003.1.1.3: Select User Access Group profile."
-    proposal: "The screenshot of New Request in Annex J (J.7) was taken on 29-Sep-2026 and still shows the earlier check-box list of group profiles. The screen now offers the profile picker described in FRUM.009.02 and J.7 (profiles by business area, search, details, chosen profiles listed apart, Privileged marker, separation-of-duties warning). The screenshot is replaced at the next issue."
+    proposal: "The screen offers the profile picker described in FRUM.009.02 and J.7 (profiles by business area, search, details, chosen profiles listed apart, Privileged marker, separation-of-duties warning). Resolved in version 1.3: every screenshot of Annex J was taken again on 10-Oct-2026 and shows the picker."
     impact: Annex J only; no change to the requirements.
     decide_by: Process Owner (Business Administration) - for information
   - topic: Scope of FRUM.009 to FRUM.013

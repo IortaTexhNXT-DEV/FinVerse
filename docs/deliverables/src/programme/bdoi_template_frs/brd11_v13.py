@@ -31,7 +31,8 @@ NOTICE_SOURCES = ["nbadmin/service/AccessRequestNotifier.java", "nbadmin/service
                   "nbadmin/service/AccessScheduledChanges.java", "nbadmin/service/DirectRoleEditAlerts.java",
                   "nbadmin/service/SodRuleService.java", "nbadmin/service/SecurityParameterNotices.java",
                   "nbadmin/service/MfaResetNotices.java", "nbadmin/service/PasswordNoticeMailer.java",
-                  "messaging/service/JobFailureMailer.java", "nbadmin/service/AccessImplementationService.java"]
+                  "messaging/service/JobFailureMailer.java", "nbadmin/service/AccessImplementationService.java",
+                  "identity/service/IdentityAlerts.java", "identity/service/BreakGlassAlerts.java"]
 ANNEX_LETTERS = {"workflow": "S", "emails": "T", "documents": "U", "reports": "V", "integrations": "W",
                  "nfr": "X", "data": "Y", "open": "Z", "change": "AA", "checklist": "AB"}
 
@@ -131,7 +132,8 @@ def check_emails() -> int:
             if frag not in code:
                 raise SystemExit(f"{i['id']}: text {frag!r} not found in the platform")
     # every class of the platform that queues an e-mail or a notice in the user-access packages is a known source
-    for p in list((JAVA / "nbadmin" / "service").glob("*.java")) + list((JAVA / "security").rglob("*.java")):
+    for p in (list((JAVA / "nbadmin" / "service").glob("*.java")) + list((JAVA / "security").rglob("*.java"))
+              + list((JAVA / "identity").rglob("*.java"))):
         t = p.read_text(encoding="utf-8")
         if re.search(r"queueEmail\(|notifyUser\(|notifyPermission\(|alerts\.raise\(", t):
             rel = p.relative_to(JAVA).as_posix()

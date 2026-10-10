@@ -166,3 +166,21 @@ notifications:
     screen: System Parameters; My Approvals
     frs: [FR-UA-054]
     source: SecurityParameterNotices.on
+  - id: NT-21
+    channel: In-app (and e-mail by preference); alert
+    trigger: An event of UIDM-ISC or the Enterprise SSO platform is refused or fails
+    recipient: Every holder of the user management right (System Administrator)
+    template: "Title: Identity event <event no> needs review. Text: <source> event <type> of Windows ID <Windows ID> was <refused | failed>: <reason>"
+    content: The event, the Windows ID and the reason; the notice opens Identity Synchronisation
+    screen: Identity Synchronisation
+    frs: [FR-UA-003]
+    source: IdentityAlerts.refused
+  - id: NT-22
+    channel: In-app and e-mail; alert
+    trigger: A break-glass System Administrator signs in with a local password while single sign-on is on
+    recipient: Information Security Officers and the addresses of the setting Break-glass alert recipients
+    template: "Title: Break-glass sign-in. Text: Break-glass administrator <name> (<user ID>) signed in with a local password at <dd-MMM-yyyy HH:mm> from <address>. Review the use within one working day."
+    content: Who signed in, when and from where; the notice opens the Audit Trail
+    screen: Audit Trail
+    frs: [FR-UA-003]
+    source: BreakGlassAlerts.on

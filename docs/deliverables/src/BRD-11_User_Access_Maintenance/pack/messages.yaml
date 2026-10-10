@@ -57,7 +57,10 @@ places:
   - [ "^(UsersPage|UserSessionsDialog|UserAdminService|DataScopeService)$", "Users (SCR-UA-15)" ]
   - [ "^(RolesPage|RoleEditGuard|Role|AccessImplementationService)$", "Roles & Permissions: implementation (SCR-UA-16)" ]
   - [ "^(SystemParametersPage|SecurityParameterApprovals|SystemParameter)$", "System Parameters (SCR-UA-18)" ]
-  - [ "^(SodRulesPage|sodRules|SodRuleService|SodRule)$", "Separation of Duties (SCR-UA-19)" ]
+  - [ "^(SodRulesPage|sodRules|SodRuleService|SodRule|PermissionConflicts)$", "Separation of Duties (SCR-UA-19)" ]
+  - [ "^(timedOut|SessionTimedOutPage)$", "Inactivity warning and Session Timed Out (SCR-UA-04, SCR-UA-21)" ]
+  - [ "^(PasswordResetRules)$", "Users: password reset by the System Administrator (SCR-UA-15)" ]
+  - [ "^(DeviceAccessFilter)$", "Every screen: company-issued devices only (SCR-UA-01)" ]
 
 # The fix the user makes. Messages that tell the user what to do ("Enter ...", "Select ...") are their own fix and are
 # not repeated here. Keys are message codes; frontend messages without a code use their text.
@@ -67,7 +70,7 @@ fixes:
   LOGIN_RATE_LIMITED: Wait a minute before signing in again; repeated attempts from one computer are slowed down.
   SIGN_IN_UNAVAILABLE: Try again later; if the directory stays unavailable, report the time to BDOI IT and the System Administrator.
   INVALID_PASSWORD: Enter your current password again; use Forgot password? on the Login page if you no longer know it.
-  PASSWORD_REUSED: Choose a password you have not used for your last 8 changes.
+  PASSWORD_REUSED: Choose a password you have not used for your last 10 changes.
   PASSWORD_CHANGED_TOO_SOON: Wait until the minimum age has passed, or ask the System Administrator to reset the password.
   PASSWORD_MANAGED_BY_DIRECTORY: Change the password through the BDO directory (BDO network password).
   RESET_LINK_EXPIRED: Request a new link with Forgot password? on the Login page and use it within 30 minutes.
@@ -151,6 +154,12 @@ fixes:
   SOD_SAME_PROFILE: Choose two different group profiles.
   SOD_UNKNOWN_PROFILE: Choose the group profiles from the list.
   SOD_DESCRIPTION: Enter why the two profiles are not held together.
+  ACCESS_PERMISSION_COMBINATION: Remove one of the two permissions from the group profile, or one of the group profiles from the user, or ask Information Security whether the rule still applies.
+  DEVICE_NOT_ALLOWED: Use a device issued by the company on the company network; ask BDOI IT if the device should be accepted.
+  OWN_PASSWORD_RESET: Ask another System Administrator to reset your password, or change it yourself from My Profile.
+  SSO_PASSWORD_RESET: The user resets the password with the organisation's sign-in service (BDO network password).
+  "Type": Choose the type of the rule.
+  "You have been inactive for <minutes> minute / minutes. For your security, your session is about to expire. Would you like to stay logged in or log out?": Choose Stay Logged In to keep working, or Log Out.
   MAKER_CHECKER_VIOLATION: Ask another authoriser; the user who made the change never authorises it.
   PARAMETER_CHANGE_PENDING: Wait for the decision on the change already asked for, or withdraw it first.
   PARAMETER_NO_PENDING_CHANGE: Refresh the list; the change was already decided.

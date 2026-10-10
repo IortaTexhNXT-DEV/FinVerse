@@ -73,6 +73,8 @@ NEW_TERMS = {g[0] for g in v13.REV["glossary_add"]}
 OUT = REPO / "docs" / "deliverables" / "out" / DOC["meta"]["out_folder"]
 
 HL_FILL = "FFF59D"          # light yellow of the review copy
+# Screens added or changed with the full-coverage build of October 2026 (shaded in the review copy of version 1.3)
+SCREENS_V13 = {"SCR-UA-01", "SCR-UA-04", "SCR-UA-15", "SCR-UA-19", "SCR-UA-20", "SCR-UA-21", "SCR-UA-22"}
 HEAD_FILL = "D9E1F2"        # header fill of the annex tables
 W14 = "http://schemas.microsoft.com/office/word/2010/wordml"
 PORTRAIT_W = 7.4            # usable width (inches) of the portrait pages of BDOI's main section
@@ -853,8 +855,10 @@ class Annexes:
         for t in texts:
             self.els.append(self.b.para(t, style="ListParagraph", num=(n, 0)))
 
-    def table(self, header, rows, widths, size=8.5):
-        self.els.append(self.b.table(header, rows, widths, size=size))
+    def table(self, header, rows, widths, size=8.5, changed=None):
+        """A table; `changed` names the first cells of the rows corrected in this round (shaded in the review copy)."""
+        shade = None if not changed else {i for i, r in enumerate(rows, 1) if r[0] in changed}
+        self.els.append(self.b.table(header, rows, widths, size=size, shade_rows=shade))
         self.els.append(self.b.para("", space_after=0))
 
     # Annex J - screens
@@ -863,13 +867,14 @@ class Annexes:
         self.p("This annex specifies the User Access Maintenance screens: the purpose of each screen, how the user "
                "reaches it, the requirements it serves, one screenshot, its fields with type, mandatory marker, format, "
                "list or source and validation, its actions, and its rules. Mandatory: Y = mandatory, N = optional, "
-               "Cond. = mandatory when the condition stated applies. The screenshots were taken on the SIT "
-               "environment with SIT/UAT data on 29-Sep-2026.")
+               "Cond. = mandatory when the condition stated applies. The screenshots were taken on the BIBS test "
+               "environment with SIT/UAT data on 10-Oct-2026.")
         k = 0
         for f in sorted((UA / "pack" / "screens").glob("*.yaml")):
             for s in yaml.safe_load(f.read_text(encoding="utf-8"))["screens"]:
                 k += 1
                 self.screen_titles[s["id"]] = clean(s["title"])
+                self.b.round13 = s["id"] in SCREENS_V13
                 self.h2(f"J.{k} {clean(s['title'])} ({s['id']})")
                 self.p("Purpose: " + self.refs(" ".join(str(s["purpose"]).split())))
                 if s.get("entry"):
@@ -888,10 +893,6 @@ class Annexes:
                     self.p(f"Figure J.{k}: {clean(shots[pick].get('caption', s['title']))}", italic=True, size=8,
                            jc="center")
                     self.b.stats["screenshots"] += 1
-                if s["id"] == "SCR-UA-07":
-                    self.p("Note on the screenshot: it was taken on 29-Sep-2026 and still shows the earlier check-box "
-                           "list of group profiles. The screen now offers the profile picker described in the field "
-                           "table below and in FRUM.009.02 (Annex Q).", italic=True, size=9)
                 rows = []
                 for line in s.get("fields", []):
                     c = [x.strip() for x in str(line).split(" | ")]
@@ -928,6 +929,7 @@ class Annexes:
                 if s.get("rules"):
                     self.p("Rules:", bold=True, keep_next=True)
                     self.bullets([self.refs(r) for r in s["rules"]])
+                self.b.round13 = False
         self.b.stats["screens"] = k
 
     # Annex K - messages
@@ -1008,19 +1010,31 @@ class Annexes:
                "Matrix of Annex C; the segregation rules of M.6 apply whatever the roles grant.")
         self.table(["Function"] + m["matrix_roles"], m["matrix"], [2.2] + [0.65] * len(m["matrix_roles"]), size=7.5)
         self.h2("M.4 Password, lock-out and second factor")
-        self.table(["Rule", "Value", "Applies to"], m["passwords"], [1.6, 3.9, 1.9])
+        self.table(["Rule", "Value", "Applies to"], m["passwords"], [1.6, 3.9, 1.9],
+                   changed={"Password history", "Password reset"})
         self.h2("M.5 Session policy")
-        self.table(["Rule", "Value", "Note"], m["sessions"], [1.8, 3.0, 2.6])
+        self.table(["Rule", "Value", "Note"], m["sessions"], [1.8, 3.0, 2.6], changed={"Inactivity sign-out"})
         self.h2("M.6 Segregation and separation-of-duties rules")
         self.bullets(m["controls"])
         self.h2("M.7 Configurable parameters")
         self.table(["Parameter", "Default", "Meaning", "Value decided by"], m["parameters"], [1.7, 1.9, 2.6, 1.2],
-                   size=8)
+                   size=8, changed={"Password history"})
         self.h2("M.8 Lists of values")
         self.table(["List", "Values"], m["lists"], [1.8, 5.6])
         self.h2("M.9 Request statuses and transitions")
         self.table(["Status", "Meaning", "Who acts"], m["statuses"], [1.6, 3.6, 2.2])
         self.table(["From", "Action", "To", "Who", "Remarks"], m["transitions"], [1.6, 1.1, 1.9, 1.9, 0.9], size=8)
+        b13 = self.b.round13
+        self.b.round13 = True
+        self.h2("M.10 Settings for the points BDOI decides")
+        self.p("The points where BDOI's FRS and the BRD or the earlier BIBS behaviour differ are offered both ways in "
+               "BIBS, each chosen by a setting that the System Administrator changes with the approval of "
+               "Information Security, without a release. The default is BDOI's FRS unless stated. BDOI's decision "
+               "only confirms the value; the points stay in Annex Q as Configurable - BDOI to confirm the setting.")
+        self.table(["Setting", "Values", "Default", "Settles (Annex Q)", "Decided by"], m["decision_settings"],
+                   [1.5, 3.3, 1.1, 0.8, 1.2], size=8)
+        self.b.round13 = b13
+        self.b.stats["decision_settings"] = len(m["decision_settings"])
 
     # Annex N - sign-in and identity integration
     def identity(self):
@@ -1036,9 +1050,17 @@ class Annexes:
         self.p("Rules:", bold=True, keep_next=True)
         self.bullets(n["rules"])
         self.h2("N.3 Provisioning from UIDM-ISC")
-        self.p("BDOI IT chooses one option (Annex Q, conflict C01); option (a) is proposed.")
+        b13 = self.b.round13
+        self.b.round13 = True
+        self.p("BIBS offers the three options as settings (Annex M.10); as delivered option (a) applies. BDOI confirms "
+               "the settings (Annex Q, conflict C01).")
         self.table(["Option", "Requests and approvals", "Exchange with UIDM-ISC"], n["provisioning"], [2.0, 3.6, 1.8])
-        self.bullets(n["provisioning_rules"])
+        self.b.round13 = b13
+        self.bullets(n["provisioning_rules"][:1])
+        self.b.round13 = True
+        self.bullets(n["provisioning_rules"][1:4])
+        self.b.round13 = b13
+        self.bullets(n["provisioning_rules"][4:])
         self.h2("N.4 Break-glass administrators")
         self.table(["Rule", "Value"], n["break_glass"], [1.4, 6.0])
         self.h2("N.5 What BDOI IT provides")
@@ -1272,7 +1294,8 @@ CHANGE_POINTS = [
     "Annex A: {flows} figures added - one process flow by persona for every process of the BRD, the status life-cycles of the request, the group-profile request, the user account and the separation-of-duties rule, and the integration context.",
     "Annex J: menu by persona (figure) and the reference to the programme screen standards. Annex L: the channel of the request notices corrected. Annex Q.5: {obs13} observations of this round. Annex R: {terms} terms added.",
     "New annexes: S Workflow and Approvals ({workflow_rows} stages and the role-to-stage matrix); T E-mail and Notification Texts ({emails} notices and e-mails, word for word); U Document Prints and Output Formats ({documents}); V Reports and Schedules ({reports} reports, {schedules} runs); W Integrations ({integrations}); X Non-functional Requirements ({nfr_rows} rows); Y Data Set-up and Migration at Go-live ({data_rows}); Z Assumptions, Dependencies and Open Questions ({open_kept} open questions kept, {answered} answered by BDOI's FRS and not repeated); AA Change Control after Sign-off; AB Business Unit Review Checklist ({checklist} points).",
-    "BDOI's text of version 1.1 and the additions of version 1.2 are unchanged, except the Annex L correction shaded in this copy.",
+    "Aligned with BIBS on 10 Oct 2026: Annex J screens added (Identity Synchronisation, Session Timed Out, Audit Trail) and updated (Login, inactivity warning in BDOI's wording, Users with the directory details, Separation of Duties with the conflicting permission combinations), every screenshot taken again; Annex M.10 with the {decision_settings} settings for the points BDOI decides; Annex N (provisioning options as settings, simulator for SIT and UAT), Annex T (notices of refused identity events and break-glass sign-ins), Annexes V and W updated.",
+    "BDOI's text of version 1.1 and the additions of version 1.2 are unchanged, except the corrections shaded in this copy (Annex L channel, password history of 10, password reset, inactivity sign-out, provisioning options).",
 ]
 
 
@@ -1282,7 +1305,7 @@ def change_summary(b: Builder):
                   flows=sum(1 for f in v13.FLOWS if f["where"] == "A"), obs13=s["observations_v13"],
                   terms=len(v13.REV["glossary_add"]))
     for k in ("workflow_rows", "emails", "documents", "reports", "schedules", "integrations", "nfr_rows",
-              "data_rows", "open_kept", "answered", "checklist"):
+              "data_rows", "open_kept", "answered", "checklist", "decision_settings"):
         values[k] = s[k]
     els = [b.para(f"Summary of changes in version {values['version']}", bold=True, size=14, color="014EA9", hl=False,
                   space_after=120),
@@ -1293,7 +1316,8 @@ def change_summary(b: Builder):
     for pt in CHANGE_POINTS:
         els.append(b.para(pt.format(**values), style="ListParagraph", num=(n, 0), size=9.5, hl=False))
     els.append(b.para("The first decision BDOI must take is still where access requests are raised and approved "
-                      "(Annex Q, C01); section 1.8 lists the ten decisions.", size=9.5, hl=False))
+                      "(Annex Q, C01): BIBS offers each option as a setting (Annex M.10); section 1.8 lists the ten "
+                      "decisions.", size=9.5, hl=False))
     els.append(b.para("Shading used in this copy: ", size=9.5, hl=False))
     els[-1].append(b.run("text added or corrected in version 1.3", size=9.5, hl=True))
     brk = OxmlElement("w:p")

@@ -102,7 +102,7 @@ rules:
   - "A privileged change (a High or Admin profile) or a change outside working hours needs a second approval by another approver, and raises an alert."
   - "Group-profile changes are approved in order and implemented by a System Administrator who did not raise them; direct edits are an audited, alerted emergency path, closed as delivered."
   - "The account locks after 3 failed sign-ins; the session warns at 15 minutes of inactivity and ends at 30."
-  - "Passwords: at least 10 characters with upper and lower case, a digit and a symbol; not one of the last 8; expire after 90 days; changed at the first sign-in after an administrator sets them."
+  - "Passwords: at least 10 characters with upper and lower case, a digit and a symbol; not one of the last 10; expire after 90 days; changed at the first sign-in after an administrator sets them."
   - "Every change is logged, never to be changed, with its from and to values, approver and request number; four reports give the BRD samples A to D."
   - "Every persona sees exactly the menu of its group profiles; the insurer functions are hidden from BDOI."
 

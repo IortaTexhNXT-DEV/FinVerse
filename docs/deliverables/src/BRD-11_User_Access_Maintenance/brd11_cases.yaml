@@ -193,14 +193,15 @@ frs:
       - After 30 minutes without activity the user is signed out and the session ends with reason idle timeout.
       - Activity in any browser tab keeps all tabs signed in.
       - The user is warned 30 minutes before the fixed session expiry.
+      - The inactivity warning reads BDOI's text with Stay Logged In and Log Out, and the inactivity sign-out opens the page Session Timed Out with Log In (settings on as delivered).
     cases:
       - c: 1
         type: Boundary
         title: Warning after 15 minutes
         steps:
           - Log in as ao; leave the screen idle for 15 minutes.
-          - Click Continue in the warning.
-        expected: The warning appears at 15 minutes; after Continue it closes and the timer restarts.
+          - Click Stay Logged In in the warning.
+        expected: The warning appears at 15 minutes; after Stay Logged In it closes and the timer restarts.
       - c: 1
         type: Boundary
         neg: true
@@ -213,8 +214,8 @@ frs:
         neg: true
         title: Sign-out after 30 minutes
         steps:
-          - Stay idle for 30 minutes; then click a menu entry.
-        expected: The log-in screen shows; the session log shows the end reason idle timeout.
+          - Stay idle for 30 minutes.
+        expected: The page Session Timed Out shows "Your session timed out. Please log in again to continue"; the session log shows the end reason idle timeout.
       - c: 3
         type: Positive
         title: Activity in a second tab keeps the first tab signed in
@@ -228,6 +229,29 @@ frs:
         steps:
           - Keep working until 30 minutes before the session expiry.
         expected: The warning "For your security the system signs you out in n minute(s)" is shown while the user is active.
+      - c: 5
+        type: Positive
+        title: BDOI's inactivity warning and Log Out
+        steps:
+          - Log in as ao; leave the screen idle for 15 minutes.
+          - Read the warning; click Log Out.
+        expected: The warning reads "You have been inactive for 15 minutes. For your security, your session is about to expire. Would you like to stay logged in or log out?"; Log Out ends the session and opens the Login page; the audit trail shows the inactivity warning and the log-out.
+      - c: 5
+        type: Positive
+        title: Session Timed Out page and Log In
+        steps:
+          - Log in as ao; stay idle for 30 minutes.
+          - On the page Session Timed Out click Log In.
+        expected: The Login page opens; the audit trail shows the time-out of ao.
+      - c: 5
+        type: Positive
+        persona: SYSADMIN
+        screen: PARAMS
+        title: Earlier wording by setting
+        pre: Information Security approves the settings Inactivity warning wording and Session timed-out page set to off on the test environment.
+        steps:
+          - Log in as ao; stay idle for 15 minutes, then for 30 minutes.
+        expected: The warning shows Stay Signed In and Sign Out Now; after the sign-out the Login page shows "You were signed out after 30 minutes of inactivity."
 
   FR-UA-003:
     scenario: SC-UA-01
@@ -239,6 +263,8 @@ frs:
       - An identity that is not linked to an active BIBS user is refused with its message and the attempt is audited.
       - In OIDC mode a break-glass System Administrator signs in with the local password and the second factor; another user cannot sign in with a local password.
       - The menu after a single sign-on is that of the user's BIBS roles.
+      - Joiner, mover, leaver, rehire and status events of UIDM-ISC and the Enterprise SSO platform create, update, deactivate and reactivate the users; each event is listed with its outcome on Identity Synchronisation and a refused event is alerted and processed again once corrected.
+      - The System Administrator creates a user from an active Enterprise SSO account, sees the directory details of a user and synchronises a user on demand.
     cases:
       - c: 1
         type: Positive
@@ -275,6 +301,41 @@ frs:
         steps:
           - Sign in at EIAM with the test account of badmin.
         expected: The menu is that of the BIBS roles of badmin.
+      - c: 5
+        type: Workflow
+        persona: SYSADMIN
+        screen: USERS
+        title: Joiner and leaver from the Enterprise SSO simulator
+        pre: Enterprise SSO simulator of the SIT and UAT environment; setting Users from the Enterprise SSO platform on.
+        steps:
+          - On Identity Synchronisation › Enterprise SSO Simulator add the account BDO\uat.joiner with user ID a013000195 and send joiner.
+          - Change the account to the AD status Disabled and send status change.
+        expected: The joiner creates user a013000195 with its directory details (event Applied); the status change deactivates the user and ends the open sessions; both events are listed under Events.
+      - c: 5
+        type: Negative
+        persona: SYSADMIN
+        screen: USERS
+        title: Refused event processed again
+        steps:
+          - Send a joiner of an account whose Windows ID belongs to another user.
+          - Open the bell; correct the account in the simulator; on Events choose Process again.
+        expected: The event is Refused with the reason "Windows ID <Windows ID> belongs to another user" and the notice "Identity event <no> needs review" is shown to the System Administrators; after the correction Process again applies it.
+      - c: 6
+        type: Positive
+        persona: SYSADMIN
+        screen: USERS
+        title: Create User from Enterprise SSO
+        steps:
+          - On Identity Synchronisation click Create User from Enterprise SSO, enter BDO\bsantos, Look Up Account, then Create User.
+        expected: The account details are shown; user a013000301 is created without group profiles and a joiner event is listed.
+      - c: 6
+        type: Positive
+        persona: SYSADMIN
+        screen: USERS
+        title: Directory details and Synchronise Now
+        steps:
+          - On Users open the row menu of a013000103 and choose Directory details; click Synchronise Now.
+        expected: The directory details are shown with the latest synchronisation; Synchronise Now reports the outcome (Applied or No change).
 
   FR-UA-004:
     scenario: SC-UA-01
@@ -328,7 +389,7 @@ frs:
     data: [TD-UA-06, TD-UA-08]
     conditions:
       - A new password of at least 10 characters with upper and lower case, digit and symbol is saved; a weaker one or a wrong current password is refused.
-      - A new password equal to one of the last 8 is refused, and a second change within a day is refused.
+      - A new password equal to one of the last 10 is refused, and a second change within a day is refused.
       - After an administrator reset the user must change the password at the next log-in; a password older than 90 days must be changed at log-in.
       - The reset link works once and not after 30 minutes.
       - Users whose password expires within 7 days are notified.
@@ -1523,6 +1584,7 @@ frs:
       - A new rule waits for the authorisation of Information Security and applies once authorised; the maker never authorises it.
       - A request or bulk line that gives one user both profiles of an active rule is refused with the names of the two profiles.
       - A deactivation applies only once authorised; a rejected rule never applies.
+      - A rule of two permissions (conflicting permission combination) refuses a group profile that would hold both permissions and a user who would hold both through several profiles.
     cases:
       - c: 1
         type: Workflow
@@ -1562,6 +1624,22 @@ frs:
         steps:
           - As badmin deactivate the rule; as infosec reject, then after a new deactivation authorise.
         expected: The rule stays active after the rejection and becomes inactive after the authorisation; the enrolment of case 1 is then accepted.
+      - c: 4
+        type: Workflow
+        title: Conflicting permission combination enforced
+        steps:
+          - As badmin add a rule of the type Two permissions not held together on two permissions with a reason; as infosec authorise it.
+          - As badmin raise a group-profile request that gives one profile both permissions.
+        expected: The request is refused with "Group profile <profile> may not hold both <permission> and <permission> (rule <rule>)".
+        msg: [ACCESS_PERMISSION_COMBINATION]
+      - c: 4
+        type: Negative
+        persona: UAM_REQUESTOR
+        screen: NEWREQ
+        title: User holding both permissions through two profiles
+        steps:
+          - Enrol a user with two profiles that together hold both permissions of the active rule.
+        expected: Refused with "One user may not hold both <permission> and <permission> through group profiles <profiles> (rule <rule>)".
 
   FR-UA-054:
     scenario: SC-UA-06
@@ -1740,6 +1818,7 @@ frs:
     conditions:
       - Each attribute of a modified user has one log row with from and to values and the request number, written with the change.
       - An attempt to change or delete a log entry outside the screens is refused.
+      - The Audit Trail shows the module, Windows ID, name and role of the user, action type, activity, from and to values, source address and reference, with its filters, and exports the audit log named Audit Logs_MMDDYYYY.
     cases:
       - c: 1
         type: Positive
@@ -1755,6 +1834,22 @@ frs:
         steps:
           - As the infrastructure administrator try to change and then to delete an entry of the access-change log directly.
         expected: Both attempts are refused and the entry is unchanged.
+      - c: 3
+        type: Positive
+        persona: AUDITOR
+        screen: AUDIT
+        title: Audit Trail as BDOI's FRS shows it
+        steps:
+          - On Administration › Audit Trail filter today with the action type Login; click Excel.
+        expected: The sign-ins of today are listed with module, Windows ID, name, role, action, activity, IP address and reference; the file Audit Logs_<MMDDYYYY>.xlsx is downloaded.
+      - c: 3
+        type: Negative
+        persona: AUDITOR
+        screen: AUDIT
+        title: End date before the start date
+        steps:
+          - Enter a To date before the From date.
+        expected: "The message \"The end date must be on or after the start date\" is shown and nothing is searched."
 
   FR-UA-070:
     scenario: SC-UA-08

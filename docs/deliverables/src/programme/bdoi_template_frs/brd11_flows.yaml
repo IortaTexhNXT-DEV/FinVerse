@@ -514,6 +514,7 @@ figures:
       - ["User Access › Separation of Duties", "", "", "", Y, "", Y, ""]
       - ["User Access › User Access Reports", "", Y, "", Y, Y, Y, Y]
       - ["Administration › Users", "", "", "", "", Y, "", ""]
+      - ["Administration › Identity Synchronisation", "", "", "", "", Y, "", ""]
       - ["Administration › Roles & Permissions", "", "", "", "", Y, "", ""]
       - ["Administration › Second Factor", "", "", "", "", Y, Y, ""]
       - ["Administration › Audit Trail", "", "", "", Y, Y, Y, Y]

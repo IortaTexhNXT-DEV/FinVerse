@@ -49,7 +49,7 @@ public class LamdCbgLoansHandler extends LamdListHandler {
 
   @Override
   public List<BulkColumn> columns() {
-    return List.of(
+    return withBorrowerColumns(
         BulkColumn.optional("Original Source", "Source system of the loan record", "LOANS"),
         BulkColumn.required(PN, "Promissory Note number of the loan", "7001234567"),
         BulkColumn.optional("Short name", "Short name of the borrower", "DELA CRUZ J"),
@@ -70,15 +70,7 @@ public class LamdCbgLoansHandler extends LamdListHandler {
         BulkColumn.optional(TAG, "IBG or CBG", "CBG"),
         BulkColumn.optional("Home Contact No.", "Home telephone", "028881234"),
         BulkColumn.optional("Business Contact No.", "Business telephone", "028885678"),
-        BulkColumn.optional("Mobile No.", "Mobile phone", "09171234567"),
-        BulkColumn.optional(EMAIL, "E-mail address of the borrower", "juan@example.ph"),
-        BulkColumn.optional(ADDRESS, "Mailing address of the borrower", "1 Ayala Ave, Makati"),
-        BulkColumn.optional(
-            "Risk & Compliance Tagging (PEP, AMLA High Risk, RPT)", "Compliance tags", ""),
-        BulkColumn.optional("Source of Funds", "Declared source of funds", "SALARY"),
-        BulkColumn.optional(SERIAL, "Serial (chassis) number of a motor collateral", "MHF123"),
-        BulkColumn.optional(MOTOR, "Motor (engine) number of a motor collateral", "2TR456"),
-        BulkColumn.optional("Collateral Desc", "Description of the collateral", "2024 SEDAN"));
+        BulkColumn.optional("Mobile No.", "Mobile phone", "09171234567"));
   }
 
   @Override

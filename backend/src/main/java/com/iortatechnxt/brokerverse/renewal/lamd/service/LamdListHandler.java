@@ -41,6 +41,27 @@ abstract class LamdListHandler implements BulkImportHandler {
   /** The loan of a row. */
   abstract LamdLoanService.Loan loan(BulkRow row);
 
+  /**
+   * The columns that close every LAMD list: the e-mail and mailing address of the borrower, the
+   * compliance tags, the source of funds and the motor collateral.
+   *
+   * @param own the columns of the list before them
+   * @return the columns of the list
+   */
+  static List<BulkColumn> withBorrowerColumns(BulkColumn... own) {
+    List<BulkColumn> all = new ArrayList<>(List.of(own));
+    all.add(BulkColumn.optional(EMAIL, "E-mail address of the borrower", "juan@example.ph"));
+    all.add(BulkColumn.optional(ADDRESS, "Mailing address of the borrower", "1 Ayala Ave, Makati"));
+    all.add(
+        BulkColumn.optional(
+            "Risk & Compliance Tagging (PEP, AMLA High Risk, RPT)", "Compliance tags", ""));
+    all.add(BulkColumn.optional("Source of Funds", "Declared source of funds", "SALARY"));
+    all.add(BulkColumn.optional(SERIAL, "Serial (chassis) number of a motor collateral", "MHF123"));
+    all.add(BulkColumn.optional(MOTOR, "Motor (engine) number of a motor collateral", "2TR456"));
+    all.add(BulkColumn.optional("Collateral Desc", "Description of the collateral", "2024 SEDAN"));
+    return List.copyOf(all);
+  }
+
   /** Whether the Account Officer code is required in the list. */
   boolean aoRequired() {
     return true;

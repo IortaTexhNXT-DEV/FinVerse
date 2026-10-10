@@ -16,7 +16,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Base64;
 import java.util.LinkedHashMap;
-import java.util.Locale;
 import java.util.Map;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpHeaders;
@@ -54,6 +53,15 @@ public class EiamSimulatorController {
   private static final String SIGN_IN_PATH = "/login";
   private static final String INVALID_REDIRECT = "INVALID_REDIRECT";
   private static final String TOKEN_REFUSED = "The token request was refused";
+
+  /** The words of the refusal text of each account status that does not grant access. */
+  private static final Map<String, String> REFUSED_STATUS_WORDS =
+      Map.of(
+          DirectoryStatus.INACTIVE.name(), "inactive",
+          DirectoryStatus.LOCKED.name(), "locked",
+          DirectoryStatus.DISABLED.name(), "disabled",
+          DirectoryStatus.DEACTIVATED.name(), "deactivated");
+
   private static final Map<String, String> REFUSALS =
       Map.of(
           "DEVICE_NOT_ALLOWED",
@@ -281,12 +289,10 @@ public class EiamSimulatorController {
   /** A fixed text per refusal, so that no detail of the refusal reaches the page. */
   private static String refusalText(IdentityRefused ex) {
     if ("ACCOUNT_REFUSED".equals(ex.getCode())) {
-      String detail = String.valueOf(ex.getMessage()).toUpperCase(Locale.ROOT);
-      for (DirectoryStatus status : DirectoryStatus.values()) {
-        if (!status.grantsAccess() && detail.contains(status.name())) {
-          return "Your account is "
-              + status.name().toLowerCase(Locale.ROOT)
-              + "; contact the service desk";
+      String detail = String.valueOf(ex.getMessage());
+      for (Map.Entry<String, String> status : REFUSED_STATUS_WORDS.entrySet()) {
+        if (detail.contains(status.getValue())) {
+          return "Your account is " + status.getValue() + "; contact the service desk";
         }
       }
     }

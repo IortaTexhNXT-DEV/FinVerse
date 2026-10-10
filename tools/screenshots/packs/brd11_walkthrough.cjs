@@ -32,6 +32,16 @@ async function fill(page, label, value) {
   await page.waitForTimeout(200);
 }
 
+/** Ticks a group profile in the profile picker: the areas are closed until a search opens the match. */
+async function pickProfile(page, name) {
+  const search = page.getByPlaceholder('Search profile, area or what it does').first();
+  await search.fill(name);
+  await page.waitForTimeout(400);
+  await page.getByLabel(new RegExp(`^${name}`)).first().check();
+  await search.fill('');
+  await page.waitForTimeout(300);
+}
+
 async function openRequest(ctx, user, id, tabName) {
   const page = await go(ctx, user, `${REQUESTS}/${id}`);
   if (tabName) {
@@ -77,7 +87,7 @@ const steps = {
     await fill(page, 'E-mail', 'isabel.navarro@brokerverse-seed.ph');
     await fill(page, 'Windows ID', 'INAVARRO');
     await fill(page, 'Home Branch', '^HO');
-    await page.getByLabel('Marketing Account Officer', { exact: true }).check();
+    await pickProfile(page, 'Marketing Account Officer');
     await fill(page, 'Approver', 'Ulysses');
     await fill(page, 'Remarks \\(Justification\\)', 'Joined Combank Marketing as account officer (seed data)');
     await button(page, /^save draft$/i).click();
@@ -135,7 +145,7 @@ const steps = {
   // ---------------------------------------------------------------- walkthrough B
   'wt-b-01': async (ctx) => {
     const page = await go(ctx, 'requestor', `${REQUESTS}/new?type=MODIFY_USER&user=${NEW_USER}`);
-    await page.getByLabel(/^Marketing Team Leader/).check();
+    await pickProfile(page, 'Marketing Team Leader');
     await fill(page, 'Approver', 'Ulysses');
     await fill(page, 'Remarks \\(Justification\\)', 'Covers as team leader during the leave of the unit head (seed data)');
     await press(page, /^submit$/i);
@@ -242,7 +252,7 @@ const steps = {
     const page = await go(ctx, 'requestor', `${REQUESTS}/new`);
     await fill(page, 'User ID', 'a01300019X');
     await fill(page, 'Full Name', 'Marco Salvador');
-    await page.getByLabel('Marketing Account Officer', { exact: true }).check();
+    await pickProfile(page, 'Marketing Account Officer');
     await fill(page, 'Approver', 'Ulysses');
     await fill(page, 'Remarks \\(Justification\\)', 'New hire (seed data)');
     await press(page, /^submit$/i);
@@ -260,7 +270,7 @@ const steps = {
   },
   'wt-c-04': async (ctx) => {
     const page = await go(ctx, 'requestor', `${REQUESTS}/new?type=MODIFY_USER&user=requestor`);
-    await page.getByLabel('Marketing Account Officer', { exact: true }).check();
+    await pickProfile(page, 'Marketing Account Officer');
     await fill(page, 'Approver', 'Ulysses');
     await fill(page, 'Remarks \\(Justification\\)', 'Also raises Marketing requests (seed data)');
     await press(page, /^submit$/i);
@@ -271,8 +281,8 @@ const steps = {
     const page = await go(ctx, 'requestor', `${REQUESTS}/new`);
     await fill(page, 'User ID', 'a013000197');
     await fill(page, 'Full Name', 'Paolo Mendoza');
-    await page.getByLabel('User Access Requestor', { exact: true }).check();
-    await page.getByLabel('User Access Approver', { exact: true }).check();
+    await pickProfile(page, 'User Access Requestor');
+    await pickProfile(page, 'User Access Approver');
     await fill(page, 'Approver', 'Ulysses');
     await fill(page, 'Remarks \\(Justification\\)', 'Raises and approves access requests (seed data)');
     await press(page, /^submit$/i);

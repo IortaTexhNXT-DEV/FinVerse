@@ -24,7 +24,7 @@ import {
 import './cashiering.css';
 
 const COLUMNS: Column<UnappliedRow>[] = [
-  { key: 'source', header: 'Source', truncate: true, render: (u) => u.source },
+  { key: 'source', header: 'Source', width: '190px', render: (u) => u.source },
   { key: 'type', header: 'Unapplied Payment Type', render: (u) => UNAPPLIED_TYPE_LABELS[u.type] },
   { key: 'no', header: 'Unapplied Payment No.', render: (u) => <strong>{u.reference}</strong> },
   { key: 'date', header: 'Payment/Creation Date', render: (u) => formatDate(u.paidOn) },

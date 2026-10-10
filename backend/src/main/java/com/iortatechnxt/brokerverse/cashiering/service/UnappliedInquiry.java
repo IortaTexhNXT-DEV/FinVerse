@@ -77,6 +77,12 @@ public class UnappliedInquiry {
   /** Prefix of the reference of a payment received by Cashiering. */
   private static final String PAYMENT_REF = "PAY:";
 
+  /** Prefix of the reference of a payment migrated from a legacy system ("MIG:kind:system:ref"). */
+  private static final String MIGRATION_REF = "MIG:";
+
+  /** Index of the source system in the parts of a migration reference. */
+  private static final int MIGRATION_REF_SYSTEM = 2;
+
   /** Prefix of the reference of a commission payment. */
   private static final String COMMISSION_PAYMENT_REF = "CPAY:";
 
@@ -212,7 +218,8 @@ public class UnappliedInquiry {
 
   /**
    * The source of an unapplied payment in words: the module by its name and the reference without
-   * its internal prefix ("Cashiering payment PAY-2026-000012", "Commission Receivables payment").
+   * its internal prefix ("Cashiering payment PAY-2026-000012", "Migrated from EBIX, reference
+   * UPP970002").
    *
    * @param module module code
    * @param ref reference ("PAY:number", "CPAY:number" or a receipt or payment number)
@@ -220,6 +227,16 @@ public class UnappliedInquiry {
    */
   static String source(String module, String ref) {
     List<String> parts = new ArrayList<>();
+    if (present(ref) && ref.startsWith(MIGRATION_REF)) {
+      // "MIG:<kind>:<system>:<reference>" of a migrated payment
+      String[] bits = ref.split(":");
+      return bits.length > MIGRATION_REF_SYSTEM + 1
+          ? "Migrated from "
+              + bits[MIGRATION_REF_SYSTEM]
+              + ", reference "
+              + bits[MIGRATION_REF_SYSTEM + 1]
+          : "Migrated, reference " + bits[bits.length - 1];
+    }
     if (present(module)) {
       parts.add(ModuleNames.of(module));
     }

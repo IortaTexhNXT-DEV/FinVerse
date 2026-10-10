@@ -15,6 +15,8 @@ class UnappliedSourceTextTest {
         .isEqualTo("Commission Receivables commission payment 41");
     assertThat(UnappliedInquiry.source("MIGRATION", "AR-HO-000004"))
         .isEqualTo("Migration AR-HO-000004");
+    assertThat(UnappliedInquiry.source("MIGRATION", "MIG:UPP:EBIX:UPP970002"))
+        .isEqualTo("Migrated from EBIX, reference UPP970002");
     assertThat(UnappliedInquiry.source(null, null)).isEmpty();
   }
 }

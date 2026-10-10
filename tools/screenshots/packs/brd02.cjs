@@ -362,29 +362,6 @@ async function paymentFile(ctx) {
   }
 }
 
-/** The record without its History card: the saved-record entries of the history still print the stored values. */
-async function withoutHistory(page) {
-  await page.evaluate(() => {
-    for (const card of document.querySelectorAll('main section.card')) {
-      const h = card.querySelector(':scope > header h2');
-      if (h && /^History$/.test(h.textContent.trim())) {
-        card.style.display = 'none';
-      }
-    }
-  });
-  return page;
-}
-
-/** Receive Payment as it shows when the posting step of the ARs is off (a full page load reads the settings again;
- * no second load right after it, which would race the rotation of the session's refresh token). */
-async function receivePayment(ctx) {
-  await postingStep(ctx, 'OR');
-  const page = await ctx.pageOf('cashier');
-  await page.goto(`${ctx.BASE}/cashiering/receive`);
-  await ctx.settle(page, 1500);
-  return page;
-}
-
 async function open(ctx, user, path) {
   const page = await ctx.pageOf(user);
   await page.goto(`${ctx.BASE}${path}`);
@@ -420,14 +397,14 @@ const custom = {
     await ctx.settle(page, 600);
     return page;
   },
-  'scr-op-66-01-record': async (ctx) => withoutHistory(await open(ctx, 'cashtl', `/cashiering/records/${(await records(ctx)).ar}`)),
+  'scr-op-66-01-record': async (ctx) => open(ctx, 'cashtl', `/cashiering/records/${(await records(ctx)).ar}`),
   'scr-op-66-02-post': async (ctx) => {
     const page = await open(ctx, 'cashtl', `/cashiering/records/${(await records(ctx)).or}`);
     await page.getByRole('button', { name: /^post$/i }).first().click();
     await ctx.settle(page, 600);
     return page;
   },
-  'scr-op-66-03-cancellation': async (ctx) => withoutHistory(await open(ctx, 'cashtl', `/cashiering/records/${(await records(ctx)).cancel}`)),
+  'scr-op-66-03-cancellation': async (ctx) => open(ctx, 'cashtl', `/cashiering/records/${(await records(ctx)).cancel}`),
   'scr-op-67-01-list': async (ctx) => { await records(ctx); return open(ctx, 'cashtl', '/cashiering/posting'); },
   'scr-op-67-02-cancellations': async (ctx) => {
     await records(ctx);

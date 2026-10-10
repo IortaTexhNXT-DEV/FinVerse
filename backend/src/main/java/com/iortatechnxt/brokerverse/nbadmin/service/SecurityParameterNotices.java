@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.approval.service.ApprovalViewer;
 import com.iortatechnxt.brokerverse.approval.service.PendingApproval;
 import com.iortatechnxt.brokerverse.approval.service.PendingApprovalSource;
 import com.iortatechnxt.brokerverse.messaging.domain.Notice;
+import com.iortatechnxt.brokerverse.messaging.domain.Notification;
 import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
 import com.iortatechnxt.brokerverse.security.service.UserDirectory;
 import com.iortatechnxt.brokerverse.system.domain.SystemParameter;
@@ -54,12 +55,20 @@ public class SecurityParameterNotices implements PendingApprovalSource {
    *
    * @param event the change
    */
+  /** Longest part of a setting's description in the subject of the notice. */
+  static final int SUBJECT_LENGTH = 150;
+
+  /** The beginning of a setting's description, as the subject of the notice. */
+  static String summary(String description) {
+    return description == null ? "" : Notification.clip(description.strip(), SUBJECT_LENGTH);
+  }
+
   @EventListener
   public void on(SecurityParameterChangeRequested event) {
     notifications.notifyPermission(
         SecurityParameterApprovals.APPROVE,
         new Notice(
-            "Security setting to approve: " + event.description(),
+            "Security setting to approve: " + summary(event.description()),
             users.displayName(event.requestedBy())
                 + " requests a change from '"
                 + event.currentValue()

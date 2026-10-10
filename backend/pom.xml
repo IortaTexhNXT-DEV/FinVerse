@@ -429,6 +429,9 @@
           <effort>Max</effort>
           <threshold>Low</threshold>
           <failOnError>true</failOnError>
+          <!-- The analysis of the whole platform at maximum effort needs more than the default heap. -->
+          <maxHeap>3072</maxHeap>
+          <timeout>3600000</timeout>
           <excludeFilterFile>quality/spotbugs-exclude.xml</excludeFilterFile>
           <plugins>
             <plugin>

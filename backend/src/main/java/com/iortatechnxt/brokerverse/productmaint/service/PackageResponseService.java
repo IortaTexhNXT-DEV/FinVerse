@@ -174,7 +174,11 @@ public class PackageResponseService {
     if (ComparativeTable.offered(terms.outcome()) && terms.rate() == null) {
       throw new BusinessRuleException(
           "PKG_RESPONSE_RATE_REQUIRED",
-          "Enter the rate offered by " + response.getInsurerName() + " (" + terms.outcome() + ")");
+          "Enter the rate offered by "
+              + response.getInsurerName()
+              + " ("
+              + lovs.label("PKG_RESPONSE_OUTCOME", terms.outcome())
+              + ")");
     }
     if (negative(terms.rate()) || negative(terms.minimumPremium())) {
       throw new BusinessRuleException(
@@ -190,7 +194,13 @@ public class PackageResponseService {
             terms.validUntil(),
             terms.remarks()),
         clock.instant());
-    snapshot(id, response, "Terms of " + response.getInsurerName() + ": " + terms.outcome());
+    snapshot(
+        id,
+        response,
+        "Terms of "
+            + response.getInsurerName()
+            + ": "
+            + lovs.label("PKG_RESPONSE_OUTCOME", terms.outcome()));
     return response;
   }
 

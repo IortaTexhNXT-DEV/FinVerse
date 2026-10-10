@@ -10,6 +10,7 @@ import com.iortatechnxt.brokerverse.cashiering.domain.Receipt;
 import com.iortatechnxt.brokerverse.cashiering.domain.ReceiptLine;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -375,15 +376,15 @@ public class ReceiptSearchService {
       add(parts, "Payor", payor);
       add(parts, "Assured", assured);
       add(parts, "Amount", amount);
-      add(parts, "Issued from", from);
-      add(parts, "Issued to", to);
+      add(parts, "Issued from", DisplayFormat.date(from));
+      add(parts, "Issued to", DisplayFormat.date(to));
       add(parts, "Policy number", policyNo);
       add(parts, "Insurer", insurer);
       add(parts, "Receipt type", kind);
-      add(parts, "Status", status);
+      add(parts, "Status", DisplayFormat.label(status));
       if (print != null) {
         add(parts, "Receipting branch", print.branchId());
-        add(parts, "Printed", print.printed());
+        add(parts, "Printed", print.printed() == null ? null : print.printed() ? "Yes" : "No");
         add(parts, "Number", print.numberPart());
       }
       return parts.isEmpty() ? "All receipts" : String.join("; ", parts);

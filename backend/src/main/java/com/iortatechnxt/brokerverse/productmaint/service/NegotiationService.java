@@ -30,6 +30,7 @@ import com.iortatechnxt.brokerverse.workflow.service.TransitionNote;
 import com.iortatechnxt.brokerverse.workflow.service.WorkflowService;
 import java.time.Clock;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -173,13 +174,16 @@ public class NegotiationService {
           "QS_ALREADY_SENT", "Round " + roundNo + " was sent: revise the slip in a new round");
     }
     List<String> selected = insurerCodes.stream().distinct().toList();
-    selected.forEach(code -> insurers.requireUsableInsurer(p.getCompanyId(), code));
+    List<String> names =
+        selected.stream()
+            .map(code -> insurers.requireUsableInsurer(p.getCompanyId(), code).getName())
+            .toList();
     r.prepare(selected, notes);
     audit.record(
         PackageRequests.ENTITY,
         p.getRequestNo(),
         AuditAction.UPDATE,
-        "Quotation slip round " + roundNo + " insurers: " + String.join(", ", selected));
+        "Quotation slip round " + roundNo + " insurers: " + String.join(", ", names));
     return r;
   }
 
@@ -243,8 +247,10 @@ public class NegotiationService {
           "QS_FOUR_EYES", "The quotation slip is approved by a TL or a co-officer");
     }
     MessageFile slip = documents.quotationSlip(p, r);
+    List<String> sentTo = new ArrayList<>();
     for (String code : r.getInsurers()) {
       InsurerProfile insurer = insurers.requireUsableInsurer(p.getCompanyId(), code);
+      sentTo.add(insurer.getName());
       PackageInsurerResponse response =
           responses
               .findByRoundIdAndInsurerCode(r.getId(), code)
@@ -259,7 +265,7 @@ public class NegotiationService {
         PackageRequests.ENTITY,
         p.getRequestNo(),
         AuditAction.UPDATE,
-        "Quotation slip " + r.getQsNo() + " sent to " + String.join(", ", r.getInsurers()));
+        "Quotation slip " + r.getQsNo() + " sent to " + String.join(", ", sentTo));
     return r;
   }
 
@@ -288,7 +294,7 @@ public class NegotiationService {
         PackageRequests.ENTITY,
         p.getRequestNo(),
         AuditAction.UPDATE,
-        "Quotation slip " + r.getQsNo() + " resent to " + insurerCode);
+        "Quotation slip " + r.getQsNo() + " resent to " + insurer.getName());
     return response;
   }
 

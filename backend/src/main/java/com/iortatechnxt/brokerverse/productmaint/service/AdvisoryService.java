@@ -164,7 +164,7 @@ public class AdvisoryService {
         PackageRequests.ENTITY,
         p.getRequestNo(),
         AuditAction.CREATE,
-        type + " advisory drafted for " + p.getTargetProductCode());
+        DisplayFormat.label(type) + " advisory drafted for " + p.getTargetProductCode());
     return saved;
   }
 
@@ -300,7 +300,9 @@ public class AdvisoryService {
         PackageRequests.ENTITY,
         p.getRequestNo(),
         AuditAction.UPDATE,
-        a.getAdvisoryType() + " advisory sent to " + String.join(", ", a.getRecipientGroupList()));
+        DisplayFormat.label(a.getAdvisoryType())
+            + " advisory sent to "
+            + String.join(", ", a.getRecipientGroupList()));
     return a;
   }
 

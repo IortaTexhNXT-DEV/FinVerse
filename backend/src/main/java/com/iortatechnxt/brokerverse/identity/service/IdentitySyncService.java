@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.identity.domain.DirectoryAccount;
 import com.iortatechnxt.brokerverse.identity.domain.DirectoryProfile;
 import com.iortatechnxt.brokerverse.identity.domain.DirectoryProfileRepository;
@@ -328,7 +329,7 @@ public class IdentitySyncService {
             (account.status().grantsAccess() ? "Reactivated user " : "Deactivated user ")
                 + name
                 + " for the Enterprise SSO status "
-                + account.status());
+                + DisplayFormat.label(account.status()));
       }
       default -> {
         int n = changes.update(user, account, source);

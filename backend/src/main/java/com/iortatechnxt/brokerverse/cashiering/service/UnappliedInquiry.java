@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.cashiering.service;
 
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.opsledger.domain.ModuleNames;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -72,6 +73,12 @@ public class UnappliedInquiry {
           + " coalesce(i.assured_name, u.payor_name) as assured, i.insurer_code,"
           + " coalesce(ins.name, i.insurer_code) as insurer_name, u.sales_unit, u.currency,"
           + " u.amount, u.balance, u.stage";
+
+  /** Prefix of the reference of a payment received by Cashiering. */
+  private static final String PAYMENT_REF = "PAY:";
+
+  /** Prefix of the reference of a commission payment. */
+  private static final String COMMISSION_PAYMENT_REF = "CPAY:";
 
   private final NamedParameterJdbcTemplate jdbc;
   private final CurrentUser currentUser;
@@ -203,13 +210,27 @@ public class UnappliedInquiry {
     return units.isEmpty() ? "" : units.get(0);
   }
 
-  private static String source(String module, String ref) {
+  /**
+   * The source of an unapplied payment in words: the module by its name and the reference without
+   * its internal prefix ("Cashiering payment PAY-2026-000012", "Commission Receivables payment").
+   *
+   * @param module module code
+   * @param ref reference ("PAY:number", "CPAY:number" or a receipt or payment number)
+   * @return source
+   */
+  static String source(String module, String ref) {
     List<String> parts = new ArrayList<>();
     if (present(module)) {
-      parts.add(module);
+      parts.add(ModuleNames.of(module));
     }
     if (present(ref)) {
-      parts.add(ref);
+      if (ref.startsWith(COMMISSION_PAYMENT_REF)) {
+        parts.add("commission payment " + ref.substring(COMMISSION_PAYMENT_REF.length()));
+      } else if (ref.startsWith(PAYMENT_REF)) {
+        parts.add("payment " + ref.substring(PAYMENT_REF.length()));
+      } else {
+        parts.add(ref);
+      }
     }
     return String.join(" ", parts);
   }

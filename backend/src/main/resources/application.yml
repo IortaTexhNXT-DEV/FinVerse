@@ -141,6 +141,10 @@ brokerverse:
   # Kind of environment: local, sit, uat, training, preprod or production. "production" (or the prod
   # profile) turns on the start-up safeguards: no seed profile, every required secret present.
   environment: ${BROKERVERSE_ENVIRONMENT:local}
+  # Name of the environment shown on the sign-in page outside production (SIT, UAT, Training ...);
+  # the kind of environment when not set. Lets a test stack that runs with local safeguards
+  # present itself under the name of the environment it stands in for.
+  environment-name: ${BROKERVERSE_ENVIRONMENT_NAME:${brokerverse.environment}}
   # Time zone of the business day (BusinessClock): today, "not in the future" and cut-off checks,
   # periods, report date keywords and job run dates. Timestamps stay in UTC.
   business-zone: ${BROKERVERSE_BUSINESS_ZONE:Asia/Manila}

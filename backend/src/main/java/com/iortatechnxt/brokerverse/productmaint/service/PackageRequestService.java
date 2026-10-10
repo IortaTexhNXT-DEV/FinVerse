@@ -114,7 +114,7 @@ public class PackageRequestService {
         PackageRequests.ENTITY,
         saved.getRequestNo(),
         AuditAction.CREATE,
-        saved.getRequestType() + " package request '" + saved.getTitle() + "'");
+        saved.getRequestType().label() + " request '" + saved.getTitle() + "'");
     return saved;
   }
 

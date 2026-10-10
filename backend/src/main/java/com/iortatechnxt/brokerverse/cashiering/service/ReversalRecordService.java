@@ -45,6 +45,7 @@ public class ReversalRecordService {
   private final ReversalChecks checks;
   private final RecordNumbers numbers;
   private final CashieringDecisions decisions;
+  private final RecordWording wording;
   private final AuditTrailService audit;
 
   /**
@@ -56,6 +57,7 @@ public class ReversalRecordService {
    * @param checks validations of the records
    * @param numbers record numbers
    * @param decisions settings
+   * @param wording wording of the records in the audit trail
    * @param audit audit trail
    */
   public ReversalRecordService(
@@ -65,6 +67,7 @@ public class ReversalRecordService {
       ReversalChecks checks,
       RecordNumbers numbers,
       CashieringDecisions decisions,
+      RecordWording wording,
       AuditTrailService audit) {
     this.records = records;
     this.receipts = receipts;
@@ -72,6 +75,7 @@ public class ReversalRecordService {
     this.checks = checks;
     this.numbers = numbers;
     this.decisions = decisions;
+    this.wording = wording;
     this.audit = audit;
   }
 
@@ -145,7 +149,7 @@ public class ReversalRecordService {
     } else {
       checks.checkReinstatementDetails(receipt, reason, selectedAccounts);
     }
-    String before = String.valueOf(record.getReason());
+    String before = wording.reason(record.getRecordKind(), record.getReason());
     List<String> chosen =
         reason.reinstatementType() == ReinstatementType.PARTIAL ? selectedAccounts : List.of();
     record.target(receipt, reason, accounts(receipt, chosen));
@@ -153,7 +157,7 @@ public class ReversalRecordService {
         ReceiptRecordService.ENTITY,
         record.getRecordNo(),
         AuditAction.UPDATE,
-        "Edited. Before: " + before + ". After: " + reason);
+        "Edited. Before: " + before + ". After: " + wording.reason(record.getRecordKind(), reason));
     return record;
   }
 
@@ -183,7 +187,10 @@ public class ReversalRecordService {
         ReceiptRecordService.ENTITY,
         saved.getRecordNo(),
         AuditAction.CREATE,
-        "Saved for " + receipt.getReceiptNo() + ": " + reason);
+        "Saved for "
+            + receipt.getReceiptNo()
+            + ": "
+            + wording.reason(record.getRecordKind(), reason));
     return saved;
   }
 

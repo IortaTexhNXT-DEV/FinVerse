@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.productmaint.service;
 
+import com.iortatechnxt.brokerverse.catalog.service.CatalogNames;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.nonpackage.domain.InsurerResponse;
@@ -34,6 +35,7 @@ public class TermsSources {
   private final NegotiationRoundRepository rounds;
   private final PackageResponseService packageResponses;
   private final TermsCodec codec;
+  private final CatalogNames names;
 
   /**
    * Creates the sources.
@@ -44,6 +46,7 @@ public class TermsSources {
    * @param rounds negotiation rounds
    * @param packageResponses insurer responses of package requests
    * @param codec terms JSON
+   * @param names names of the products and lines
    */
   public TermsSources(
       ProposalRequestRepository proposals,
@@ -51,13 +54,15 @@ public class TermsSources {
       PackageRequests packages,
       NegotiationRoundRepository rounds,
       PackageResponseService packageResponses,
-      TermsCodec codec) {
+      TermsCodec codec,
+      CatalogNames names) {
     this.proposals = proposals;
     this.quotationResponses = quotationResponses;
     this.packages = packages;
     this.rounds = rounds;
     this.packageResponses = packageResponses;
     this.codec = codec;
+    this.names = names;
   }
 
   /**
@@ -73,7 +78,9 @@ public class TermsSources {
               .findById(record.id())
               .orElseThrow(() -> new ResourceNotFoundException("Quotation request", record.id()));
       Map<TermsField, String> qs = new EnumMap<>(TermsField.class);
-      qs.put(TermsField.COVERAGE, p.getProductCode() + " (" + p.getLineCode() + ")");
+      qs.put(
+          TermsField.COVERAGE,
+          names.productName(p.getProductCode()) + " (" + names.line(p.getLineCode()) + ")");
       qs.put(TermsField.SUM_INSURED, money(p.getTotalSumInsured()));
       qs.put(
           TermsField.PERIOD,

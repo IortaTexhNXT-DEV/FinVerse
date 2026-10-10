@@ -4,7 +4,11 @@
   grid-template-columns: var(--sidebar-width) 1fr;
   grid-template-rows: var(--header-height) 1fr;
   grid-template-areas: 'sidebar header' 'sidebar main';
-  height: 100%;
+  /* The shell is exactly the window: header and sidebar stay put and the content area is the one
+     scroll area. Nothing may reach past the window, so the window itself never scrolls. */
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
 }
 
 .app-header {
@@ -176,6 +180,11 @@
 
 .app-main {
   grid-area: main;
+  /* Containing block of absolutely placed content (screen-reader captions, chart tooltips and
+     legends): without it they are placed against the page and stretch the window beyond the shell,
+     leaving an empty band and a second scroll bar. */
+  position: relative;
+  min-height: 0;
   overflow-y: auto;
   padding: var(--space-5) var(--space-6);
 }

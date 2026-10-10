@@ -16,6 +16,8 @@ import { policyHint } from './passwordRules';
 import { SecondFactorCard } from './SecondFactorCard';
 import { SessionsTable } from './SessionsTable';
 import { Notice } from '@/components/ui/Notice';
+import { MyPermissions } from './MyPermissions';
+import { useRoleName } from '@/components/ui/useDisplayName';
 
 const SESSIONS_PAGE = 10;
 
@@ -114,6 +116,7 @@ export default function MyProfilePage() {
   const [saved, setSaved] = useState<typeof user>(null);
   const policy = useQuery({ queryKey: ['session-policy'], queryFn: systemApi.sessionPolicy });
   const status = useQuery({ queryKey: ['password-status'], queryFn: authApi.passwordStatus });
+  const roleName = useRoleName();
   if (user === null) {
     return null;
   }
@@ -159,19 +162,12 @@ export default function MyProfilePage() {
           <div className="row">
             {profile.roles.map((r) => (
               <span key={r} className="badge">
-                {humanize(r)}
+                {(profile.roles.length === 1 ? roleName(profile.username) : undefined) ??
+                  humanize(r)}
               </span>
             ))}
           </div>
-          <div className="row" style={{ flexWrap: 'wrap' }}>
-            {[...profile.permissions]
-              .sort((a, b) => a.localeCompare(b))
-              .map((p) => (
-                <span key={p} className="badge neutral">
-                  {humanize(p)}
-                </span>
-              ))}
-          </div>
+          <MyPermissions permissions={profile.permissions} />
         </div>
       </Card>
       <SecondFactorCard />

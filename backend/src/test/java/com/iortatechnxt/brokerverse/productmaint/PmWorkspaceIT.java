@@ -6,10 +6,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.iortatechnxt.brokerverse.account.domain.RiskItemData;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.crm.service.ClientService;
+import com.iortatechnxt.brokerverse.nonpackage.domain.RiskDetails;
+import com.iortatechnxt.brokerverse.nonpackage.service.ProposalDraft;
+import com.iortatechnxt.brokerverse.nonpackage.service.ProposalService;
 import com.iortatechnxt.brokerverse.support.Api;
+import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.support.TestData;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.sql.Date;
 import java.time.Clock;
@@ -57,6 +64,9 @@ class PmWorkspaceIT {
   @Autowired private Api api;
   @Autowired private TestData data;
   @Autowired private JdbcTemplate jdbc;
+  @Autowired private ProposalService proposals;
+  @Autowired private ClientService clients;
+  @Autowired private AsUser as;
 
   private String company() {
     return data.company().getId().toString();
@@ -244,18 +254,49 @@ class PmWorkspaceIT {
         .andExpect(status().isOk());
   }
 
+  /** A quotation request of its own, approved by Marketing and now with TSU. */
+  private Long quotationWithTsu() {
+    Long companyId = data.company().getId();
+    Long client = clients.requireByCode(companyId, "CL-2026-900003").getId();
+    ProposalDraft draft =
+        new ProposalDraft(
+            client,
+            "CAR00",
+            "CORBANK",
+            "EMAIL",
+            null,
+            LocalDate.of(2026, 12, 1),
+            LocalDate.of(2027, 12, 1),
+            new RiskDetails(
+                List.of(new RiskDetails.Section("Project", "Packing plant, 2 storeys")),
+                List.of(
+                    new RiskDetails.Item(
+                        1,
+                        RiskItemData.generic(
+                            "Civil works", new BigDecimal("12000000"), new BigDecimal("0.35"))))),
+            List.of("INS-MGIC"));
+    Long id = as.run("ao", () -> proposals.create(companyId, draft)).getId();
+    as.run("ao", () -> proposals.submit(id, "for approval"));
+    as.run("mkttl", () -> proposals.approve(id, "go"));
+    return id;
+  }
+
   @Test
   void aReturnedQuotationRequestShowsReturnedForRevisionAndItsRemarksInTheAuditLogs()
       throws Exception {
+    Long proposalId = quotationWithTsu();
     Map<String, Object> found =
         jdbc.queryForMap(
             "select c.id, c.reference, p.client_name from wf_case c join npk_proposal p"
                 + " on c.entity_type = 'ProposalRequest' and c.entity_id = cast(p.id as varchar)"
-                + " where c.stage_code = 'WITH_TSU' and not c.closed order by c.id limit 1");
+                + " where p.id = ? and c.stage_code = 'WITH_TSU' and not c.closed",
+            proposalId);
     String reason =
         jdbc.queryForObject(
-            "select code from lov_value where type_code = 'RETURN_REASON' order by sort_order"
-                + " limit 1",
+            "select code from lov_value where type_code = 'RETURN_REASON' and created_by = 'SYSTEM'"
+                + " and record_status = 'ACTIVE' and effective_from <= current_date"
+                + " and (effective_to is null or effective_to >= current_date)"
+                + " order by sort_order limit 1",
             String.class);
     String reference = (String) found.get("reference");
     api.doPost(

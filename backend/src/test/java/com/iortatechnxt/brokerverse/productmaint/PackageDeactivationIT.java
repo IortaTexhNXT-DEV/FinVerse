@@ -106,7 +106,10 @@ class PackageDeactivationIT {
     api.doGet("mbs", BASE + "/settings")
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.route").value("EFFECTIVE_DATED"))
-        .andExpect(jsonPath("$.approvers[0]").value("tsuhead"));
+        .andExpect(jsonPath("$.approvers").value(org.hamcrest.Matchers.hasItem("tsuhead")))
+        .andExpect(
+            jsonPath("$.approvers")
+                .value(org.hamcrest.Matchers.not(org.hamcrest.Matchers.hasItem("mbs"))));
     LocalDate effective = today().plusDays(10);
     String product = pkg("TDA01", true);
     JsonNode created = submit(product, effective);

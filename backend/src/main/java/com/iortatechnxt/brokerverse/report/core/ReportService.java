@@ -8,6 +8,7 @@ import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.organization.domain.BranchRepository;
 import com.iortatechnxt.brokerverse.organization.domain.Company;
 import com.iortatechnxt.brokerverse.organization.domain.CompanyRepository;
+import com.iortatechnxt.brokerverse.report.core.CodeSetSource.CodeOption;
 import com.iortatechnxt.brokerverse.report.domain.ReportRun;
 import com.iortatechnxt.brokerverse.report.domain.ReportRun.RunFile;
 import com.iortatechnxt.brokerverse.report.render.ExportFormat;
@@ -45,6 +46,7 @@ public class ReportService {
   private final CurrentUser currentUser;
   private final UserDirectory users;
   private final SystemParameterService parameters;
+  private final CodeSetSources codeSets;
   private final Clock clock;
 
   /**
@@ -59,6 +61,7 @@ public class ReportService {
    * @param currentUser current user
    * @param users user directory (the display name of the user in report headers)
    * @param parameters system parameters (report footer)
+   * @param codeSets the platform lists, for the names printed in the header
    * @param clock clock
    */
   @SuppressWarnings("java:S107") // constructor injection
@@ -72,6 +75,7 @@ public class ReportService {
       CurrentUser currentUser,
       UserDirectory users,
       SystemParameterService parameters,
+      CodeSetSources codeSets,
       Clock clock) {
     this.registry = registry;
     this.archive = archive;
@@ -82,6 +86,7 @@ public class ReportService {
     this.currentUser = currentUser;
     this.users = users;
     this.parameters = parameters;
+    this.codeSets = codeSets;
     this.clock = clock;
   }
 
@@ -274,8 +279,14 @@ public class ReportService {
               .findById(Long.valueOf(value))
               .map(b -> b.getCode() + ID_SEPARATOR + b.getName())
               .orElse(value);
-      default -> value;
+      default -> LookupNames.shown(spec, value, this::lookupOptions);
     };
+  }
+
+  /** The entries of a platform list, for the operating company where the list is per company. */
+  private List<CodeOption> lookupOptions(String source) {
+    Long company = companies.findFirstByOrderByIdAsc().map(Company::getId).orElse(0L);
+    return codeSets.options(source, company);
   }
 
   private ReportContext context(ReportParameters params) {

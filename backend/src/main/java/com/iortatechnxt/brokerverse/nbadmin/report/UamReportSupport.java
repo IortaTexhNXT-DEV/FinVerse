@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.nbadmin.report;
 
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.report.core.ParameterSpec;
 import com.iortatechnxt.brokerverse.report.core.ParameterType;
 import com.iortatechnxt.brokerverse.report.core.ReportCategory;
@@ -17,6 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -43,6 +45,29 @@ final class UamReportSupport {
 
   /** Text of an absent value in the from / to columns (sample D). */
   static final String NULL_TEXT = "Null";
+
+  /** The attribute of the home branch, logged by the branch id. */
+  static final String HOME_BRANCH = "homeBranchId";
+
+  /** The user attributes of the change log as the user screens name them. */
+  private static final Map<String, String> ATTRIBUTE_LABELS =
+      Map.of(
+          "fullName",
+          "Full Name",
+          "email",
+          "E-mail",
+          HOME_BRANCH,
+          "Home Branch",
+          "authorizationLimit",
+          "Authorisation Limit",
+          "windowsId",
+          "Windows ID",
+          "businessUnitCode",
+          "Business Unit",
+          "userLevel",
+          "User Level");
+
+  private static final Pattern CAMEL_CASE = Pattern.compile("([a-z])([A-Z])");
 
   private static final DateTimeFormatter DATE_TIME =
       DateTimeFormatter.ofPattern("dd-MMM-yyyy HH:mm", Locale.ENGLISH);
@@ -241,7 +266,56 @@ final class UamReportSupport {
    * @return text
    */
   static String orNull(String value) {
-    return value == null || value.isBlank() ? NULL_TEXT : value;
+    if (value == null || value.isBlank()) {
+      return NULL_TEXT;
+    }
+    if (Boolean.TRUE.toString().equals(value)) {
+      return "Yes";
+    }
+    if (Boolean.FALSE.toString().equals(value)) {
+      return "No";
+    }
+    return value;
+  }
+
+  /**
+   * The name of a logged attribute as the user screens show it: "fullName" reads "Full Name".
+   *
+   * @param attribute attribute of the change log
+   * @return label
+   */
+  static String attributeLabel(String attribute) {
+    if (attribute == null) {
+      return "";
+    }
+    String known = ATTRIBUTE_LABELS.get(attribute);
+    if (known != null) {
+      return known;
+    }
+    return DisplayFormat.label(CAMEL_CASE.matcher(attribute).replaceAll("$1_$2"));
+  }
+
+  /**
+   * A logged value in words: group profile codes as their names, a branch id as its code and name.
+   *
+   * @param attribute attribute of the change log
+   * @param value logged value, may be null
+   * @param roleNames group profile name by code
+   * @param branchNames branch code and name by id
+   * @return the value as users read it
+   */
+  static String shownValue(
+      String attribute,
+      String value,
+      Map<String, String> roleNames,
+      Map<String, String> branchNames) {
+    if (UserAccessHistory.ROLES.equals(attribute)) {
+      return roleNames(value, roleNames);
+    }
+    if (HOME_BRANCH.equals(attribute) && value != null) {
+      return branchNames.getOrDefault(value, value);
+    }
+    return value;
   }
 
   /**

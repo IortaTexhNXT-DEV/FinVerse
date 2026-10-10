@@ -188,9 +188,10 @@ public class AccessAuditLogReport implements ReportDefinition, NamedExport {
     String activity = p.text(ACTIVITY);
     String user = p.optionalText(USER).map(String::trim).orElse(null);
     Map<String, String> roleNames = roleNames();
+    Map<String, String> branchNames = branchNames();
     List<Map<String, Object>> rows = new ArrayList<>();
     if (!REQUESTS.equals(activity)) {
-      rows.addAll(changes(args, activity, roleNames));
+      rows.addAll(changes(args, activity, roleNames, branchNames));
     }
     if (UamReportSupport.ALL.equals(activity) || REQUESTS.equals(activity)) {
       rows.addAll(requestEvents(args));
@@ -227,7 +228,10 @@ public class AccessAuditLogReport implements ReportDefinition, NamedExport {
   }
 
   private List<Map<String, Object>> changes(
-      Map<String, Object> args, String activity, Map<String, String> roleNames) {
+      Map<String, Object> args,
+      String activity,
+      Map<String, String> roleNames,
+      Map<String, String> branchNames) {
     List<Map<String, Object>> rows = new ArrayList<>();
     for (Map<String, Object> c :
         jdbc.queryForList(
@@ -242,16 +246,17 @@ public class AccessAuditLogReport implements ReportDefinition, NamedExport {
         continue;
       }
       String attribute = UamReportSupport.text(c, "attribute");
-      boolean roles = UserAccessHistory.ROLES.equals(attribute);
       String from = UamReportSupport.text(c, "from_value");
       String to = UamReportSupport.text(c, "to_value");
       rows.add(
           entry(
               c.get(OCCURRED),
               UamReportSupport.activity(code, UamReportSupport.text(c, SUBJECT))
-                  + (PLAIN_ATTRIBUTES.contains(attribute) ? "" : " (" + attribute + ")"),
-              roles ? UamReportSupport.roleNames(from, roleNames) : from,
-              roles ? UamReportSupport.roleNames(to, roleNames) : to,
+                  + (PLAIN_ATTRIBUTES.contains(attribute)
+                      ? ""
+                      : " (" + UamReportSupport.attributeLabel(attribute) + ")"),
+              UamReportSupport.shownValue(attribute, from, roleNames, branchNames),
+              UamReportSupport.shownValue(attribute, to, roleNames, branchNames),
               new Source(
                   UamReportSupport.text(c, "done_by"),
                   UamReportSupport.text(c, "approved_by"),
@@ -394,6 +399,17 @@ public class AccessAuditLogReport implements ReportDefinition, NamedExport {
         "select code, name from sec_role",
         rs -> {
           names.put(rs.getString(1), rs.getString(2));
+        });
+    return names;
+  }
+
+  /** The branches by id, as the home branch of a user is logged by its id. */
+  private Map<String, String> branchNames() {
+    Map<String, String> names = new HashMap<>();
+    jdbc.query(
+        "select id, code, name from org_branch",
+        rs -> {
+          names.put(rs.getString("id"), rs.getString("code") + " - " + rs.getString("name"));
         });
     return names;
   }

@@ -261,9 +261,55 @@ def out_path(brd: str, kind: str, filename: str) -> Path:
 
 # Business sign-off release sets issued so far: BRD -> version of the set. The documents of such a set carry a
 # two-digit prefix so that they sort in reading order in the BRD folder (deliverables README, "Release and sign-off
-# per BRD").
-SIGNOFF_SETS = {"BRD-01": "2.1", "BRD-02": "2.1", "BRD-03": "2.1", "BRD-04": "2.1", "BRD-05": "2.1", "BRD-06": "2.0",
-                "BRD-11": "2.1", "BRD-13": "2.1"}
+# per BRD"). The sets of BDOI_FRS_SETS below are retired and no longer listed here.
+SIGNOFF_SETS = {"BRD-01": "2.1", "BRD-04": "2.1", "BRD-05": "2.1", "BRD-13": "2.1"}
+
+# BRDs whose business sign-off set is superseded by an FRS in BDOI's format (decision of the BIBS Product Owner of
+# 10-Oct-2026: after BDOI's content was incorporated, the BDOI-format FRS is the only final document; the old-format
+# sets were withdrawn from out/ and the folder keeps only the current documents). BRD -> the folder and the FRS file
+# under out/Programme/BDOI_Template_FRS/ and the version of the BDOI-format document; its review workbooks (inputs,
+# fit-gap, test cases and traceability, change requests, walkthrough users) are in the same folder. The sources of
+# the old sets stay in src/<BRD-nn_Name>/ (the BDOI-format builders read the pack data, screenshots and test cases
+# from there); the old builders (signoff_pack, the test plan, the guide deck, the UX deck, the configuration input
+# templates) refuse to rebuild a retired set unless --force, and check_pack, drop_index and drop_closure point to
+# the BDOI-format pack instead of the removed files.
+BDOI_FRS_SETS: dict[str, dict[str, str]] = {
+    "BRD-02": {"folder": "BRD-02_Operations_Cashiering",
+               "frs": "BIBS_FRS-BDOI_BRD-02_Operations_Cashiering_v3.2.docx", "version": "3.2"},
+    "BRD-03": {"folder": "BRD-03_Product_Maintenance",
+               "frs": "BIBS_FRS-BDOI_BRD-03_Product_Maintenance_v1.2.docx", "version": "1.2"},
+    "BRD-06": {"folder": "BRD-06_Renewal", "frs": "BIBS_FRS-BDOI_BRD-06_Renewal_v1.1.docx", "version": "1.1"},
+    "BRD-11": {"folder": "BRD-11_User_Access_Maintenance",
+               "frs": "BIBS_FRS-BDOI_BRD-11_User_Access_Maintenance_v1.3.docx", "version": "1.3"},
+}
+# The last version of the old-format set of each retired BRD (file names of the withdrawn documents).
+RETIRED_SETS = {"BRD-02": "2.1", "BRD-03": "2.1", "BRD-06": "2.0", "BRD-11": "2.1"}
+BDOI_FRS_KIND = "BDOI_Template_FRS"
+BDOI_FRS_LABEL = "FRS in BDOI's format and the review workbooks"
+
+
+def bdoi_frs_dir(brd: str) -> Path:
+    """Folder of the BDOI-format pack of a retired BRD: out/Programme/BDOI_Template_FRS/<folder>/."""
+    return OUT_DIR / DROPS["Programme"]["folder"] / BDOI_FRS_KIND / BDOI_FRS_SETS[brd]["folder"]
+
+
+def bdoi_frs_rel(brd: str) -> str:
+    """Path of the BDOI-format pack of a retired BRD, relative to out/ (as the indexes and the closure set cite it)."""
+    return f"{DROPS['Programme']['folder']}/{BDOI_FRS_KIND}/{BDOI_FRS_SETS[brd]['folder']}/"
+
+
+def retired_message(brd: str) -> str:
+    spec = BDOI_FRS_SETS[brd]
+    return (f"{brd} {BRD_NAMES[brd]}: the old-format sign-off set (v{RETIRED_SETS[brd]}) is retired; the FRS in "
+            f"BDOI's format v{spec['version']} and its review workbooks in {bdoi_frs_rel(brd)} are the only "
+            f"documents of this BRD (decision of the BIBS Product Owner of 10-Oct-2026). Not rebuilt; pass --force "
+            f"to build the old set anyway (it is not part of the client pack)")
+
+
+def refuse_retired(brd: str, force: bool = False) -> None:
+    """Stops a builder of the old-format sets for a BRD of BDOI_FRS_SETS, unless forced."""
+    if brd in BDOI_FRS_SETS and not force:
+        raise SystemExit(retired_message(brd))
 READING_ORDER = {"StartHere": "00", "GuideDeck": "01", "FRS": "02", "Signoff": "03", "TestPlan": "04",
                  "TestPlanSummary": "05"}
 # Further documents of a set that only some BRDs have (not required by check_pack): the configuration input templates
@@ -275,9 +321,10 @@ READING_ORDER_EXTRA = {"Templates": "06", "Handbook": "02", "Workbook": "03"}
 # the screen resolution, with the register as CSV). Two kinds share the name UXScreens, so the order is by kind and
 # extension. build_ux_deck.py builds the three; check_pack requires them in the sets of UX_SETS.
 READING_ORDER_UX = {("UXDeck", "pptx"): "07", ("UXScreens", "xlsx"): "08", ("UXScreens", "zip"): "09"}
-# Sign-off sets that carry the UX screen documents (07 to 09): the Drop 0 sets, BRD-02 Operations, BRD-04 Collections
-# and BRD-01 New Business first; the other Drop 1 sets follow when they are re-issued.
-UX_SETS = {"BRD-01", "BRD-02", "BRD-03", "BRD-04", "BRD-05", "BRD-06", "BRD-11", "BRD-13"}
+# Sign-off sets that carry the UX screen documents (07 to 09): the Drop 0 sets, BRD-04 Collections and BRD-01 New
+# Business first; the other Drop 1 sets follow when they are re-issued. The BRDs of BDOI_FRS_SETS are not listed: their
+# old-format sets are retired.
+UX_SETS = {"BRD-01", "BRD-04", "BRD-05", "BRD-13"}
 
 
 def output_name(doc_type: str, brd: str, name: str, version: str, ext: str) -> str:
@@ -286,10 +333,10 @@ def output_name(doc_type: str, brd: str, name: str, version: str, ext: str) -> s
 
     >>> output_name("FRS", "BRD-03", "Product Maintenance", "1.0", "docx")
     'BIBS_FRS_BRD-03_Product_Maintenance_v1.0.docx'
-    >>> output_name("FRS", "BRD-01", "New Business", "2.0", "docx")
-    '02_BIBS_FRS_BRD-01_New_Business_v2.0.docx'
-    >>> output_name("UXScreens", "BRD-03", "Product Maintenance", "2.0", "zip")
-    '09_BIBS_UXScreens_BRD-03_Product_Maintenance_v2.0.zip'
+    >>> output_name("FRS", "BRD-01", "New Business", "2.1", "docx")
+    '02_BIBS_FRS_BRD-01_New_Business_v2.1.docx'
+    >>> output_name("UXScreens", "BRD-01", "New Business", "2.1", "zip")
+    '09_BIBS_UXScreens_BRD-01_New_Business_v2.1.zip'
     """
     safe = "_".join(part for part in name.replace("&", "and").replace("/", " ").split() if part)
     key = doc_type + ("Summary" if safe.endswith("_Summary") else "")
@@ -330,8 +377,8 @@ def drop_set_dir(drop: str) -> Path:
 def drop_output_name(drop: str, name: str, version: str, ext: str) -> str:
     """File name of a document of a drop-level set, with its reading-order prefix.
 
-    >>> drop_output_name("Drop 0", "Configuration_Inputs", "2.0", "xlsx")
-    '01_BIBS_Drop-0_Configuration_Inputs_v2.0.xlsx'
+    >>> drop_output_name("Drop 0", "Configuration_Inputs", "2.1", "xlsx")
+    '01_BIBS_Drop-0_Configuration_Inputs_v2.1.xlsx'
     """
     files = DROP_SETS[drop]["files"]
     order = next((k for k, v in files.items() if v[0] == name), None)  # type: ignore[union-attr]

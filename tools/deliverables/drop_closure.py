@@ -13,7 +13,8 @@ Read, not typed:
   * the configuration input templates of BRD-03 and BRD-11 (pack/config_inputs.yaml of each BRD, the source of their
     06 workbooks), through src/signoff/config_inputs.py;
   * the migration objects, milestones, proposals and open decisions of BRD-13 (pack/catalogue.yaml);
-  * the clarification chapters and open questions of the FRS of BRD-03 and BRD-11 and of the BRD-13 handbook;
+  * the clarification chapters and open questions of the FRS sources of BRD-03 and BRD-11 (carried by their FRS in
+    BDOI's format, the only documents of these BRDs: brand.BDOI_FRS_SETS) and of the BRD-13 handbook;
   * from the platform: system parameters, lists of values, notification events, document templates, accounting
     events and code map sets of the migration scripts (sql_facts.py), the master tables the SIT seed data fills,
     the screens of the menu and the chart of accounts upload template (code_facts.py).
@@ -803,15 +804,19 @@ def render(doc: Any, render: str, **_: Any) -> None:  # noqa: A002 - block key
     if render == "sets":
         rows = []
         for s in d["sets"]:
-            folder = brand.out_dir(s["brd"], "FRS")
-            files = sorted(p.name for p in folder.glob(f"*_v{brand.SIGNOFF_SETS[s['brd']]}.*"))
+            if s["brd"] in brand.BDOI_FRS_SETS:  # the FRS in BDOI's format and its review workbooks
+                folder = brand.bdoi_frs_dir(s["brd"])
+                files = sorted(p.name for p in folder.glob("*.*") if p.suffix in (".docx", ".xlsx"))
+            else:
+                folder = brand.out_dir(s["brd"], "FRS")
+                files = sorted(p.name for p in folder.glob(f"*_v{brand.SIGNOFF_SETS[s['brd']]}.*"))
             # Who signs: the approvers and reviewers of the set's ownership.yaml (the BRD approval sheet)
             owners = brand.owners_by_capacity(s["brd"])
             signed = ([f"Approved by: {'; '.join(owners['Approved by'])}", f"Reviewed by: {'; '.join(owners['Reviewed by'])}"]
                       if owners["Approved by"] else s["owner"])
             rows.append([f"{s['brd']} {brand.BRD_NAMES[s['brd']]}", files, s["confirms"], signed, s["signoff"]])
-        doc.table(["Sign-off set", "Files", "What the business confirms", "Signed by", "Sign-off"], rows,
-                  widths=[2.2, 4.4, 5.0, 4.6, 1.4], caption="The three sign-off sets of Drop 0", size=7.5, keep_rows=False)
+        doc.table(["Set", "Files", "What the business confirms", "Signed by", "Sign-off"], rows,
+                  widths=[2.2, 4.4, 5.0, 4.6, 1.4], caption="The three Drop 0 sets", size=7.5, keep_rows=False)
         return
     if render == "clarifications":
         rows = [[f"{c['brd']} {c['name']}", c["rules"], c["questions"], c["open"], c["recommended"], c["answered"]]

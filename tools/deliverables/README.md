@@ -6,7 +6,7 @@ repository.
 
 | File | Purpose |
 |---|---|
-| `brand.py` | Colours (Header Blue #004EA8, CTA Blue #0072D8, Yellow #FDB913, Background Blue #E5F5FF, border #C2C2C1), logos, client and system names, status colours, `output_name()`; the **drop map** (`DROPS`, `BRD_DROP`, `BRD_NAMES`, `DROP_SHARED`, `out_dir()`, `out_path()`, `brd_folder()`) that places every output in the release-set folder of its BRD inside its BDOI drop folder |
+| `brand.py` | Colours (Header Blue #004EA8, CTA Blue #0072D8, Yellow #FDB913, Background Blue #E5F5FF, border #C2C2C1), logos, client and system names, status colours, `output_name()`; the issued sets (`SIGNOFF_SETS`, `UX_SETS`) and the **retired sets** (`BDOI_FRS_SETS`: the BRDs whose sign-off set is superseded by the FRS in BDOI's format under `Programme/BDOI_Template_FRS/`; the old builders refuse them without `--force` through `refuse_retired()`); the **drop map** (`DROPS`, `BRD_DROP`, `BRD_NAMES`, `DROP_SHARED`, `out_dir()`, `out_path()`, `brd_folder()`) that places every output in the release-set folder of its BRD inside its BDOI drop folder |
 | `bdoi_docx.py` | Word builder: Python API (`BdoiDocument`) and the Markdown-like source format (`build_markdown`, CLI) |
 | `bdoi_xlsx.py` | Excel builder (`BdoiWorkbook`, `Column`) |
 | `guided_xlsx.py` | Guided input workbooks (templates the business fills in): Start here index in fill-in order, one self-contained sheet per template with the guide band Mandatory / Format / Allowed values / What to enter above the header, example row, drop-downs and checks, Reference lists, Questions and comments; `verify()` checks a written workbook. Used by the 06 configuration input templates, the Drop 0 configuration inputs workbook and the BRD-13 load templates |
@@ -16,7 +16,7 @@ repository.
 | `drop_index.py` | Writes the index `README.md` of every drop folder |
 | `drop_closure.py` | The closure set of a drop (`brand.DROP_SETS`): for Drop 0 the configuration inputs workbook (01) and the closure summary (02) from `docs/deliverables/src/Drop-0_Closure/`, the BRD-03 and BRD-11 templates, the BRD-13 catalogue and the platform reference data; `--check` refuses a seeded master table without exactly one register item, a list, parameter, event or document template without one route, an unknown screen, migration object or template field, a template check naming an unknown list or column, and verifies the workbook written (guided_xlsx.verify) |
 | `sql_facts.py` | Reference rows of the migration scripts without a database (`rows`), table columns (`columns`) and the tables the seed data fills (`seed_tables`) |
-| `check_pack.py` | Fails on duplicated files (by content), older versions next to newer ones in `out/`, an issued sign-off set without its files 00-05, restricted words, development-status wording, and technical terms (API, endpoint, JSON, SQL, database, schema, table name, payload, Flyway, http, /api/, file-transfer protocols) in the client documents of the sign-off sets and in the client sources of every BRD, outside the allow-list `TECHNICAL_ALLOWED` (platform texts quoted word for word whose wording fix is requested, BDO system names); run before committing the pack |
+| `check_pack.py` | Fails on duplicated files (by content), older versions next to newer ones in `out/`, an issued sign-off set without its files 00-05, a retired set (`brand.BDOI_FRS_SETS`) whose old folder is still in `out/` or whose FRS in BDOI's format is missing, restricted words, development-status wording, and technical terms (API, endpoint, JSON, SQL, database, schema, table name, payload, Flyway, http, /api/, file-transfer protocols) in the client documents of the sign-off sets and in the client sources of every BRD, outside the allow-list `TECHNICAL_ALLOWED` (platform texts quoted word for word whose wording fix is requested, BDO system names); run before committing the pack |
 
 ## Set-up
 
@@ -40,7 +40,7 @@ python tools/deliverables/bdoi_docx.py docs/deliverables/src/BRD-03_Product_Main
 python tools/deliverables/bdoi_docx.py docs/deliverables/src/BRD-03_Product_Maintenance/FRS_BRD03_PRODUCT_MAINTENANCE.md --keep-pdf
 
 # any Office file: PDF plus previews
-python tools/deliverables/render.py docs/deliverables/out/Drop-0_Setup_and_Data_Migration/BRD-03_Product_Maintenance/BIBS_FRS_BRD-03_Product_Maintenance_v1.0.docx --previews
+python tools/deliverables/render.py docs/deliverables/out/Drop-1_Transactional/BRD-01_New_Business/02_BIBS_FRS_BRD-01_New_Business_v2.1.docx --previews
 ```
 
 Word and Excel files are the masters and are the only outputs kept in `docs/deliverables/out/`; PDFs are produced

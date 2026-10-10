@@ -54,7 +54,7 @@ distribution:
 
 ## Purpose
 
-This document summarises the test plan for BRD-2 Operations in BIBS (BDOI Broker System, on iNXT BrokerVerse). It tells the BDOI Operations teams what will be tested, how, with which data and by whom, and when testing is complete. The test conditions, scenarios and cases are in the Excel workbook of the same version, `04_BIBS_TestPlan_BRD-02_Operations_v2.1.xlsx`, which the testers use during execution.
+This document summarises the test plan for BRD-2 Operations in BIBS (BDOI Broker System, on iNXT BrokerVerse). It tells the BDOI Operations teams what will be tested, how, with which data and by whom, and when testing is complete. The test conditions, scenarios and cases are in the Excel workbook of the same version, `BIBS_RTM_BRD-02_Test_Cases_and_Traceability_v1.0.xlsx`, which the testers use during execution.
 
 Every case traces to a functional requirement (FR) of FRS BRD-2 v2.1 and to the BRD requirement IDs (BRQID, CSHID, RMTID, ADJID, PRCID, CMRID, MKTID, DBMID) that the FR meets. The expected results quote the messages, with their codes, as BIBS shows them.
 
@@ -86,9 +86,9 @@ The roles-and-access sheet checks each Operations action against the roles that 
 <!-- table: widths=1.2,8.6,4.2 caption="Reference documents" -->
 | Ref. | Document | Version |
 |---|---|---|
-| R1 | Functional Requirements Specification BRD-2 Operations (`02_BIBS_FRS_BRD-02_Operations_v2.1.docx`) | 2.1, 08 Oct 2026 |
+| R1 | Functional Requirements Specification BRD-2 Operations Cashiering in BDOI's format (`BIBS_FRS-BDOI_BRD-02_Operations_Cashiering_v3.2.docx`) | 3.2 |
 | R2 | Operations BRD v1.01 and the Operations Central Addendum 1 annexes of May 2026 (file Operations_WS Addendum) | BRD v1.01 15-Apr-2026; annexes 8 to 21-May-2026 |
-| R3 | Test plan workbook BRD-2 (`04_BIBS_TestPlan_BRD-02_Operations_v2.1.xlsx`) | 2.1 |
+| R3 | Test cases and traceability BRD-2 (`BIBS_RTM_BRD-02_Test_Cases_and_Traceability_v1.0.xlsx`) | 1.0 |
 | R6 | Test plan BRD-1 New Business (booking, payment gate) | 1.0 |
 
 # Test approach

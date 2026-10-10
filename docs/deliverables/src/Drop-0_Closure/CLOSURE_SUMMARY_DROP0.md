@@ -21,7 +21,7 @@ control:
     author: iorta TechNXT Project Manager
     reviewer: iorta TechNXT Business Analysis
     approver: ""
-    change: "Aligned with the three Drop 0 sign-off sets v2.1 (BRD versions of 8 October 2026); the group and inter-company input removed (BIBS is specific to BDOI as an insurance broker); the master data and configuration upload templates v1.1 named as the way BDOI provides the inputs"
+    change: "Aligned with the three Drop 0 sets (BRD versions of 8 October 2026); for BRD-03 and BRD-11 the FRS in BDOI's format (v1.2, v1.3) with its review workbooks replaces the earlier sign-off set (decision of the BIBS Product Owner, 10 October 2026); the group and inter-company input removed (BIBS is specific to BDOI as an insurance broker); the master data and configuration upload templates v1.1 named as the way BDOI provides the inputs"
   - version: "2.0"
     date: 5 Oct 2026
     author: iorta TechNXT Project Manager
@@ -57,9 +57,9 @@ Drop 0 prepares the platform on which every other drop runs and moves the legacy
 
 Requirements and mapping run from September to November 2026; the migration is prepared from November 2026 to March 2027, tested in SIT from April to July 2027 and in UAT from August to October 2027; the full migration and the cut-over run from November 2027 to January 2028.
 
-# The three sign-off sets
+# The three Drop 0 sets
 
-Each set is issued as one release set in its own folder of Drop 0 and is signed as one unit by the roles of its BRD approval sheet (the Who signs what chapter of its 00 Start Here): iorta TechNXT prepares it, the business units provide the input and review their parts, BDOI IT reviews the interfaces, the user access and the Technical Specification (a separate document), the Program Manager of Business Project Services reviews the traceability and the completeness, and the Product Owner approves the whole set. The sets hold business content only. Signing a set freezes its screens, fields, rules, messages, notifications and interface contract as specified.
+Drop 0 is confirmed through three sets. For BRD-03 Product Maintenance and BRD-11 User Access Maintenance the document is the Functional Requirements Specification in BDOI's format, kept with its review workbooks (business unit requirements collection, fit-gap against the BRD, test cases and traceability, change request register, walkthrough users) in the programme folder BDOI_Template_FRS; it replaces the earlier sign-off set of each BRD, and its Signoff Sheet names the signatories. BRD-13 Data Migration is issued as one release set in its own folder of Drop 0. Each set is signed as one unit by the roles of its BRD approval sheet: iorta TechNXT prepares it, the business units provide the input and review their parts, BDOI IT reviews the interfaces, the user access and the Technical Specification (a separate document), the Program Manager of Business Project Services reviews the traceability and the completeness, and the Product Owner approves the whole set. The sets hold business content only. Signing a set freezes its screens, fields, rules, messages, notifications and interface contract as specified.
 
 ```pack
 plugin: ../../../../tools/deliverables/drop_closure.py
@@ -68,7 +68,7 @@ render: sets
 
 # Proposed rules and clarifications for confirmation
 
-Each set closes with a chapter of proposed business rules and clarifications for confirmation: the points where the proposed rule differs from the BRD text or where BIBS needs a BDOI decision to complete the rule. The FRS of BRD-03 and BRD-11 also carry their open questions; the Data Migration Handbook carries its open decisions with the date each is needed by. The counts below are taken from those chapters.
+Each set carries its proposed business rules and clarifications for confirmation: the points where the proposed rule differs from the BRD text or where BIBS needs a BDOI decision to complete the rule. The FRS of BRD-03 and BRD-11 also carry their open questions; the Data Migration Handbook carries its open decisions with the date each is needed by. The counts below are taken from those chapters.
 
 ```pack
 plugin: ../../../../tools/deliverables/drop_closure.py
@@ -145,7 +145,7 @@ render: dependencies
 
 # Change control
 
-- **Before signature.** A question on a set is answered in the comments log of its sign-off workbook without changing the text; a correction is made once, in version 2.1 of the set, with the changed rows marked.
+- **Before signature.** A question on a set is answered in its review workbook (the comments log of the BRD-13 sign-off workbook) without changing the text; a correction is made once, in the next version of the document, with the changes marked.
 - **After signature.** Nothing in a signed set changes without a change request in the Change Management Register. The request states its effect on the other BRDs through the cross-BRD interface contract of the set and its mandays, is approved by the owners of every BRD it touches, and is delivered as a new version of the set (2.1, 2.2) in which only the changed pages are signed again.
 - **Configuration inputs.** A value in the workbook is changed by the owner of the row until the due date, and after it by a change request. The reference values and code maps freeze seven days before go-live (D7); a change after the freeze is a change request with a new code map version.
 - **Open items.** A question still open at signature stays open on its stated working assumption until BDOI answers it; the answer is applied as configuration or through a change request.

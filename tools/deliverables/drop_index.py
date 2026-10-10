@@ -147,6 +147,20 @@ def closure_note(key: str) -> list[str]:
             "route (screen, template or data migration object)."]
 
 
+def retired_note(key: str) -> list[str]:
+    """The BRDs of the drop whose old-format set is superseded by an FRS in BDOI's format (brand.BDOI_FRS_SETS)."""
+    brds = [b for b in sorted(brand.BDOI_FRS_SETS) if brand.drop_of(b) == key]
+    if not brds:
+        return []
+    parts = "; ".join(f"{b} {brand.BRD_NAMES[b]} (FRS v{brand.BDOI_FRS_SETS[b]['version']})" for b in brds)
+    return ["",
+            f"For {parts} the FRS in BDOI's format and its review workbooks (business unit requirements collection, "
+            "fit-gap, test cases and traceability, change request register, walkthrough users) in "
+            "`../Programme/BDOI_Template_FRS/` are the only documents (decision of the BIBS Product Owner of "
+            "10-Oct-2026); the earlier sign-off set of each is withdrawn and its row below points to that folder. The "
+            "signatories of such a document are on the Signoff Sheet of its FRS."]
+
+
 def ux_note(key: str) -> list[str]:
     """The UX screen documents 07 to 09 of the sets of the drop (brand.UX_SETS), for the BDOI UX Design team."""
     sets = [b for b in sorted(brand.UX_SETS) if brand.drop_of(b) == key]
@@ -176,6 +190,11 @@ def write_index(key: str) -> Path:
             if f.suffix == ".png":
                 label, brd = "IER diagram (PNG)", "BRD-00"
             rows.append((doc, brd, label, ver, rel))
+    if key != "Programme":  # the retired sets: one row per BRD pointing to its BDOI-format pack
+        for b in sorted(brand.BDOI_FRS_SETS):
+            if brand.drop_of(b) == key:
+                rows.append((brand.BRD_NAMES[b], b, brand.BDOI_FRS_LABEL, brand.BDOI_FRS_SETS[b]["version"],
+                             "../" + brand.bdoi_frs_rel(b)))
     rows.sort(key=brd_sort)
 
     lines = [
@@ -196,6 +215,7 @@ def write_index(key: str) -> Path:
         "and signed off together; in an",
         "issued sign-off set the files carry the reading-order prefix 00_ to 05_ (deliverables README, \"Release and",
         "sign-off per BRD\"). Each document is kept once, in its latest version.",
+        *retired_note(key),
         *ux_note(key),
         *closure_note(key),
         "",
@@ -213,7 +233,8 @@ def write_index(key: str) -> Path:
             "The sign-off sets hold business content only (screens, fields, list and template columns, validations, rules,",
             "messages, notifications, documents, walkthroughs, reports); the technical content is in the Technical",
             "Specification of each set, reviewed by BDOI IT. The signatories are the roles of the BRD approval sheet;",
-            "the matrix per part of the set is in the 00 Start Here and the 01 guide deck of each set.",
+            "the matrix per part of the set is in the 00 Start Here and the 01 guide deck of each set, and on the",
+            "Signoff Sheet of an FRS in BDOI's format.",
             "",
             "| Set | Prepared by | Input provided by | Reviewed by | Approved by | Approval sheet |",
             "|---|---|---|---|---|---|",
@@ -234,6 +255,10 @@ def write_index(key: str) -> Path:
             "|---|---|---|",
         ]
         for b, what in shared_here:
+            if b in brand.BDOI_FRS_SETS:
+                lines.append(f"| {b} | {what} | [`{brand.bdoi_frs_rel(b)}`](../{brand.bdoi_frs_rel(b)}) "
+                             f"({brand.BDOI_FRS_LABEL}) |")
+                continue
             home = brand.DROPS[brand.drop_of(b)]["folder"]
             folder = brand.out_dir(b, "FRS")
             files = sorted(f for f in folder.glob(f"*BIBS_*_{b}_*")

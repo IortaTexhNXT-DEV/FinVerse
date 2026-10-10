@@ -85,9 +85,9 @@ The roles-and-access sheet checks each Product Maintenance action against the ro
 <!-- table: widths=1.2,8.6,4.2 caption="Reference documents" -->
 | Ref. | Document | Version |
 |---|---|---|
-| R1 | Functional Requirements Specification BRD-3 Product Maintenance (`BIBS_FRS_BRD-03_Product_Maintenance_v1.0.docx`) | 1.0, 25 Sep 2026 |
+| R1 | Functional Requirements Specification BRD-3 Product Maintenance in BDOI's format (`BIBS_FRS-BDOI_BRD-03_Product_Maintenance_v1.2.docx`) | 1.2 |
 | R2 | Product Maintenance (Package) BRD and Workshop Addendum | BRD v1.0 24-Nov-2025; addendum v1.1 10-Apr-2026 |
-| R3 | Test plan workbook BRD-3 (`BIBS_TestPlan_BRD-03_Product_Maintenance_v1.0.xlsx`) | 1.0 |
+| R3 | Test cases and traceability BRD-3 (`BIBS_RTM_BRD-03_Test_Cases_and_Traceability_v1.0.xlsx`) | 1.0 |
 | R5 | BRD discrepancy and clarification register (`BIBS_Register_BRD-00_Discrepancies_and_Clarifications_v1.0.xlsx`) | 1.0 |
 
 # Test approach

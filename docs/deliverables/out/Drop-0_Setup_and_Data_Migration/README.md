@@ -16,7 +16,9 @@ and signed off together; in an
 issued sign-off set the files carry the reading-order prefix 00_ to 05_ (deliverables README, "Release and
 sign-off per BRD"). Each document is kept once, in its latest version.
 
-The sets of BRD-03, BRD-11, BRD-13 also carry the UX screen documents for the BDOI UX Design team: 07 the UX Screen Deck (every screen persona by persona and flow by flow, with all its states), 08 the UX screen register (one row per screen image with the FRS section, the UXD status and the change flag) and 09 the image package (every screen image at twice the screen resolution, with the register as CSV). A change of the FRS names the screens it affects, so the UX Design team revises only those screens.
+For BRD-03 Product Maintenance (FRS v1.2); BRD-11 User Access Maintenance (FRS v1.3) the FRS in BDOI's format and its review workbooks (business unit requirements collection, fit-gap, test cases and traceability, change request register, walkthrough users) in `../Programme/BDOI_Template_FRS/` are the only documents (decision of the BIBS Product Owner of 10-Oct-2026); the earlier sign-off set of each is withdrawn and its row below points to that folder. The signatories of such a document are on the Signoff Sheet of its FRS.
+
+The sets of BRD-13 also carry the UX screen documents for the BDOI UX Design team: 07 the UX Screen Deck (every screen persona by persona and flow by flow, with all its states), 08 the UX screen register (one row per screen image with the FRS section, the UXD status and the change flag) and 09 the image package (every screen image at twice the screen resolution, with the register as CSV). A change of the FRS names the screens it affects, so the UX Design team revises only those screens.
 
 The drop-level set `Drop-0_Closure/` (v2.1) covers the whole drop: 01 Configuration inputs workbook (Excel); 02 Closure summary (Word). Its workbook lists every configuration input BDOI provides before go-live with its owner, due date and one route (screen, template or data migration object).
 
@@ -24,26 +26,8 @@ The drop-level set `Drop-0_Closure/` (v2.1) covers the whole drop: 01 Configurat
 |---|---|---|---|---|
 | Configuration Inputs | - | Configuration inputs workbook (Excel) | 2.1 | [`Drop-0_Closure/01_BIBS_Drop-0_Configuration_Inputs_v2.1.xlsx`](Drop-0_Closure/01_BIBS_Drop-0_Configuration_Inputs_v2.1.xlsx) |
 | Closure Summary | - | Closure summary (Word) | 2.1 | [`Drop-0_Closure/02_BIBS_Drop-0_Closure_Summary_v2.1.docx`](Drop-0_Closure/02_BIBS_Drop-0_Closure_Summary_v2.1.docx) |
-| Product Maintenance | BRD-03 | Start here guide | 2.1 | [`BRD-03_Product_Maintenance/00_BIBS_StartHere_BRD-03_Product_Maintenance_v2.1.docx`](BRD-03_Product_Maintenance/00_BIBS_StartHere_BRD-03_Product_Maintenance_v2.1.docx) |
-| Product Maintenance | BRD-03 | Sign-off pack guide deck | 2.1 | [`BRD-03_Product_Maintenance/01_BIBS_GuideDeck_BRD-03_Product_Maintenance_v2.1.pptx`](BRD-03_Product_Maintenance/01_BIBS_GuideDeck_BRD-03_Product_Maintenance_v2.1.pptx) |
-| Product Maintenance | BRD-03 | FRS | 2.1 | [`BRD-03_Product_Maintenance/02_BIBS_FRS_BRD-03_Product_Maintenance_v2.1.docx`](BRD-03_Product_Maintenance/02_BIBS_FRS_BRD-03_Product_Maintenance_v2.1.docx) |
-| Product Maintenance | BRD-03 | Sign-off workbook (Excel) | 2.1 | [`BRD-03_Product_Maintenance/03_BIBS_Signoff_BRD-03_Product_Maintenance_v2.1.xlsx`](BRD-03_Product_Maintenance/03_BIBS_Signoff_BRD-03_Product_Maintenance_v2.1.xlsx) |
-| Product Maintenance | BRD-03 | Test plan workbook (Excel) | 2.1 | [`BRD-03_Product_Maintenance/04_BIBS_TestPlan_BRD-03_Product_Maintenance_v2.1.xlsx`](BRD-03_Product_Maintenance/04_BIBS_TestPlan_BRD-03_Product_Maintenance_v2.1.xlsx) |
-| Product Maintenance | BRD-03 | Test plan summary (Word) | 2.1 | [`BRD-03_Product_Maintenance/05_BIBS_TestPlan_BRD-03_Product_Maintenance_Summary_v2.1.docx`](BRD-03_Product_Maintenance/05_BIBS_TestPlan_BRD-03_Product_Maintenance_Summary_v2.1.docx) |
-| Configuration Inputs | BRD-03 | Templates | 2.1 | [`BRD-03_Product_Maintenance/06_BIBS_Templates_BRD-03_Configuration_Inputs_v2.1.xlsx`](BRD-03_Product_Maintenance/06_BIBS_Templates_BRD-03_Configuration_Inputs_v2.1.xlsx) |
-| Product Maintenance | BRD-03 | UX screen deck (PowerPoint) | 2.1 | [`BRD-03_Product_Maintenance/07_BIBS_UXDeck_BRD-03_Product_Maintenance_v2.1.pptx`](BRD-03_Product_Maintenance/07_BIBS_UXDeck_BRD-03_Product_Maintenance_v2.1.pptx) |
-| Product Maintenance | BRD-03 | UX screen register (Excel) | 2.1 | [`BRD-03_Product_Maintenance/08_BIBS_UXScreens_BRD-03_Product_Maintenance_v2.1.xlsx`](BRD-03_Product_Maintenance/08_BIBS_UXScreens_BRD-03_Product_Maintenance_v2.1.xlsx) |
-| Product Maintenance | BRD-03 | UX screen images, 2x PNG with the register as CSV (ZIP) | 2.1 | [`BRD-03_Product_Maintenance/09_BIBS_UXScreens_BRD-03_Product_Maintenance_v2.1.zip`](BRD-03_Product_Maintenance/09_BIBS_UXScreens_BRD-03_Product_Maintenance_v2.1.zip) |
-| User Access Maintenance | BRD-11 | Start here guide | 2.1 | [`BRD-11_User_Access_Maintenance/00_BIBS_StartHere_BRD-11_User_Access_Maintenance_v2.1.docx`](BRD-11_User_Access_Maintenance/00_BIBS_StartHere_BRD-11_User_Access_Maintenance_v2.1.docx) |
-| User Access Maintenance | BRD-11 | Sign-off pack guide deck | 2.1 | [`BRD-11_User_Access_Maintenance/01_BIBS_GuideDeck_BRD-11_User_Access_Maintenance_v2.1.pptx`](BRD-11_User_Access_Maintenance/01_BIBS_GuideDeck_BRD-11_User_Access_Maintenance_v2.1.pptx) |
-| User Access Maintenance | BRD-11 | FRS | 2.1 | [`BRD-11_User_Access_Maintenance/02_BIBS_FRS_BRD-11_User_Access_Maintenance_v2.1.docx`](BRD-11_User_Access_Maintenance/02_BIBS_FRS_BRD-11_User_Access_Maintenance_v2.1.docx) |
-| User Access Maintenance | BRD-11 | Sign-off workbook (Excel) | 2.1 | [`BRD-11_User_Access_Maintenance/03_BIBS_Signoff_BRD-11_User_Access_Maintenance_v2.1.xlsx`](BRD-11_User_Access_Maintenance/03_BIBS_Signoff_BRD-11_User_Access_Maintenance_v2.1.xlsx) |
-| User Access Maintenance | BRD-11 | Test plan workbook (Excel) | 2.1 | [`BRD-11_User_Access_Maintenance/04_BIBS_TestPlan_BRD-11_User_Access_Maintenance_v2.1.xlsx`](BRD-11_User_Access_Maintenance/04_BIBS_TestPlan_BRD-11_User_Access_Maintenance_v2.1.xlsx) |
-| User Access Maintenance | BRD-11 | Test plan summary (Word) | 2.1 | [`BRD-11_User_Access_Maintenance/05_BIBS_TestPlan_BRD-11_User_Access_Maintenance_Summary_v2.1.docx`](BRD-11_User_Access_Maintenance/05_BIBS_TestPlan_BRD-11_User_Access_Maintenance_Summary_v2.1.docx) |
-| Configuration Inputs | BRD-11 | Templates | 2.1 | [`BRD-11_User_Access_Maintenance/06_BIBS_Templates_BRD-11_Configuration_Inputs_v2.1.xlsx`](BRD-11_User_Access_Maintenance/06_BIBS_Templates_BRD-11_Configuration_Inputs_v2.1.xlsx) |
-| User Access Maintenance | BRD-11 | UX screen deck (PowerPoint) | 2.1 | [`BRD-11_User_Access_Maintenance/07_BIBS_UXDeck_BRD-11_User_Access_Maintenance_v2.1.pptx`](BRD-11_User_Access_Maintenance/07_BIBS_UXDeck_BRD-11_User_Access_Maintenance_v2.1.pptx) |
-| User Access Maintenance | BRD-11 | UX screen register (Excel) | 2.1 | [`BRD-11_User_Access_Maintenance/08_BIBS_UXScreens_BRD-11_User_Access_Maintenance_v2.1.xlsx`](BRD-11_User_Access_Maintenance/08_BIBS_UXScreens_BRD-11_User_Access_Maintenance_v2.1.xlsx) |
-| User Access Maintenance | BRD-11 | UX screen images, 2x PNG with the register as CSV (ZIP) | 2.1 | [`BRD-11_User_Access_Maintenance/09_BIBS_UXScreens_BRD-11_User_Access_Maintenance_v2.1.zip`](BRD-11_User_Access_Maintenance/09_BIBS_UXScreens_BRD-11_User_Access_Maintenance_v2.1.zip) |
+| Product Maintenance | BRD-03 | FRS in BDOI's format and the review workbooks | 1.2 | [`../Programme/BDOI_Template_FRS/BRD-03_Product_Maintenance/`](../Programme/BDOI_Template_FRS/BRD-03_Product_Maintenance/) |
+| User Access Maintenance | BRD-11 | FRS in BDOI's format and the review workbooks | 1.3 | [`../Programme/BDOI_Template_FRS/BRD-11_User_Access_Maintenance/`](../Programme/BDOI_Template_FRS/BRD-11_User_Access_Maintenance/) |
 | Data Migration | BRD-13 | Start here guide | 2.1 | [`BRD-13_Data_Migration/00_BIBS_StartHere_BRD-13_Data_Migration_v2.1.docx`](BRD-13_Data_Migration/00_BIBS_StartHere_BRD-13_Data_Migration_v2.1.docx) |
 | Data Migration | BRD-13 | Sign-off pack guide deck | 2.1 | [`BRD-13_Data_Migration/01_BIBS_GuideDeck_BRD-13_Data_Migration_v2.1.pptx`](BRD-13_Data_Migration/01_BIBS_GuideDeck_BRD-13_Data_Migration_v2.1.pptx) |
 | Data Migration | BRD-13 | Data Migration Handbook | 2.1 | [`BRD-13_Data_Migration/02_BIBS_Handbook_BRD-13_Data_Migration_v2.1.docx`](BRD-13_Data_Migration/02_BIBS_Handbook_BRD-13_Data_Migration_v2.1.docx) |
@@ -59,7 +43,8 @@ The drop-level set `Drop-0_Closure/` (v2.1) covers the whole drop: 01 Configurat
 The sign-off sets hold business content only (screens, fields, list and template columns, validations, rules,
 messages, notifications, documents, walkthroughs, reports); the technical content is in the Technical
 Specification of each set, reviewed by BDOI IT. The signatories are the roles of the BRD approval sheet;
-the matrix per part of the set is in the 00 Start Here and the 01 guide deck of each set.
+the matrix per part of the set is in the 00 Start Here and the 01 guide deck of each set, and on the
+Signoff Sheet of an FRS in BDOI's format.
 
 | Set | Prepared by | Input provided by | Reviewed by | Approved by | Approval sheet |
 |---|---|---|---|---|---|

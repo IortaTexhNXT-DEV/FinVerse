@@ -1457,7 +1457,10 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="Build the UX screen deck, register and image package of a set")
     ap.add_argument("brd", help="BRD of the set, e.g. BRD-03")
     ap.add_argument("--check", action="store_true", help="check the images and the files written only")
+    ap.add_argument("--force", action="store_true", help="build the old-format set of a BRD retired by an FRS in BDOI's format (brand.BDOI_FRS_SETS)")
     args = ap.parse_args(argv)
+    if not args.check:
+        brand.refuse_retired(brand.brd_of_code(args.brd), args.force)  # superseded by the FRS in BDOI's format
     ux = Ux(args.brd)
     states = {}
     for i in ux.images:

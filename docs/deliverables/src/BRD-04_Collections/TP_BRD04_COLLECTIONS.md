@@ -91,7 +91,7 @@ The roles-and-access sheet checks each Collections action against the roles that
 | R1 | Functional Requirements Specification BRD-4 Collections (`02_BIBS_FRS_BRD-04_Collections_v2.1.docx`) | 2.1, 8 Oct 2026 |
 | R2 | Collections (CLXN) BRD pack: CMS BRD, renumbering addendum, signed and draft Collections Addendum | CMS BRD v1 Jan-Mar 2025; addendum v1.0 10-Apr-2026 |
 | R3 | Test plan workbook BRD-4 (`04_BIBS_TestPlan_BRD-04_Collections_v2.1.xlsx`) | 2.1 |
-| R5 | Test plan BRD-2 Operations (Cashiering, Commission) (`04_BIBS_TestPlan_BRD-02_Operations_v2.0.xlsx`) | 2.0 |
+| R5 | Test cases and traceability BRD-2 Operations Cashiering (Cashiering, Commission), review workbook of the FRS in BDOI's format (`BIBS_RTM_BRD-02_Test_Cases_and_Traceability_v1.0.xlsx`) | 1.0 |
 | R6 | BRD discrepancy and clarification register (`BIBS_Register_BRD-00_Discrepancies_and_Clarifications_v1.0.xlsx`) | 1.0 |
 
 # Test approach

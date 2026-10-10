@@ -8,18 +8,20 @@ screens:
     purpose: >-
       Every group profile against every permission as granted today, or against the functional areas and action
       classes (view only, create, amend, approve / validate) with the permissions behind each cell, with the number
-      of active users of each profile. Read only; the Excel export holds both views.
+      of active users of each profile, in one scroll area with the header row and the first column pinned. Read
+      only; the Excel export holds both views.
     entry:
       - The old address Broking Setup › User Access Matrix opens this screen
     shots:
       - {state: permission, user: auditor, caption: "User Access Matrix by permission"}
       - {state: action, user: auditor, tab: By Action, caption: "User Access Matrix by area and action class"}
     fields:
-      - "Search | Find a permission or area | Text | Part of a permission name, code or area | N | - | Blank | - | - | -"
+      - "Search | Find a permission or area | Text | Part of a permission name, what it allows or an area | N | - | Blank | - | - | -"
       - "Views | By Permission / By Action | Tab | - | - | Fixed | By Permission | - | - | -"
-      - "By Permission | Permission / Area / Action class | Columns | Permission name with the code below in small print; functional area; View only, Create, Amend, Approve / Validate | - | Permission catalogue | - | Read only | - | -"
+      - "By Permission | Permission / Area / Action class | Columns | Permission name with what it allows below; functional area; View only, Create, Amend, Approve / Validate | - | Permission catalogue | - | Read only | - | -"
       - "Matrix | [Group profile columns] | Columns | Profile name with the number of active users; a tick where the profile holds the permission | - | Role grants | - | Read only | - | -"
       - "By Action | Area / Action class | Columns | One row per area and action class; each cell lists the names of the permissions the profile holds there | - | Role grants | - | Read only | - | -"
+      - "Matrix | [Scroll area] | Table | One scroll area in both directions sized to the window; the header row with the profiles and the first column stay in view while scrolling | - | - | - | Read only | - | -"
     actions:
       - "Export to Excel | Every user of the screen | Always | Downloads the matrix (both views) as an Excel file | - | -"
     rules:

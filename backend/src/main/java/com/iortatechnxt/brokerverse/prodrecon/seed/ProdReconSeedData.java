@@ -109,7 +109,7 @@ public class ProdReconSeedData implements ApplicationRunner {
           "Production reconciliation seed: {} with {} line(s)",
           extract.getExtractNo(),
           extract.getRowCount());
-      sender.send(extract.getId(), List.of("production@mgic-seed.ph"), null);
+      sender.send(extract.getId(), List.of("production@mabuhaygeneral.com.ph"), null);
       uploads.upload(
           companyId,
           "MGIC_PRODUCTION_202609.csv",

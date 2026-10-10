@@ -146,7 +146,7 @@ public class UnappliedSeedData implements ApplicationRunner {
                   new UserRequest(
                       UPP_HANDLER,
                       "Paula Unapplied Handler",
-                      "upphandler@brokerverse-seed.ph",
+                      "upphandler@uat.brokerverse.cloud",
                       null,
                       null,
                       Set.of("UNAPPLIED_HANDLER"),

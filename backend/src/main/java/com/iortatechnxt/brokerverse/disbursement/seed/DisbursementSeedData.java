@@ -213,7 +213,7 @@ public class DisbursementSeedData implements ApplicationRunner {
                         klass,
                         name,
                         "Makati City",
-                        "accounts.payable@payee.example",
+                        "accounts.payable@uat.brokerverse.cloud",
                         null,
                         mode,
                         List.of(mode, DisbursementMode.CHECK, DisbursementMode.CTA).stream()

@@ -51,7 +51,7 @@ CONFORMANCE = PROG / "Quality" / "BIBS_Conformance_BRD-00_End-to-End_Conformance
 CMP = REPO / "docs" / "deliverables" / "src" / "programme" / "comparisons" / "brd03_frs_comparison.yaml"
 DATE = "9 October 2026"
 PW_TEXT = "Issued separately by the iorta TechNXT Project Team"
-ENVIRONMENT = "BIBS UAT environment (address issued with the passwords)"
+ENVIRONMENT = "BIBS UAT environment: https://uat.brokerverse.cloud"
 ITEMS = v12.ITEMS
 V12 = v12.V12
 

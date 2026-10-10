@@ -110,7 +110,7 @@ public class ReversalRecordService {
       throw new BusinessRuleException(
           "REINSTATEMENT_SCOPE",
           "Reinstatement of an issued receipt is not enabled (setting "
-              + CashieringDecisions.REINSTATEMENT_SCOPE
+              + CashieringDecisions.REINSTATEMENT_SCOPE_NAME
               + ")");
     }
     List<Receipt> selected = checks.selection(receiptIds);

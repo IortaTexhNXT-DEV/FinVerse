@@ -186,7 +186,7 @@ screens:
       - "Details | Automatic sign-out | Text | After 30 minutes of inactivity | - | Parameter SESSION_TIMEOUT_MINUTES | - | Read only | - | -"
       - "Contact details | E-mail address | E-mail | Valid e-mail address | Y | User master | Current address | Always | A valid address | Enter your e-mail address"
       - "Contact details | Mobile number | Telephone | Digits with an optional +, spaces, brackets and dashes, 7 to 25 characters | N | User master | Current number | Always | Digits only, for example +63 917 123 4567 | Enter the mobile number with digits only, for example +63 917 123 4567"
-      - "Roles and permissions | [Group profiles and permissions] | Tags | Names of the group profiles and of the permissions | - | Role grants | - | Read only | - | -"
+      - "Roles and permissions | [Group profiles] / [Permissions by area] | Tags; collapsible tables | The names of the group profiles held; the permissions in words, one collapsible group per business area with its count, each a table of Permission and What it allows | - | Role grants | - | Read only | - | -"
       - "Change password | Current password | Password | Masked | Y | - | Blank | Local sign-in | Must be the current password | Current password is incorrect"
       - "Change password | New password | Password | At least 10 characters with upper and lower case, a digit and a symbol | Y | - | Blank | Local sign-in | Rules checked as the user types; history and minimum age checked on save | You changed your password less than a day ago"
       - "Change password | Confirm new password | Password | Same as New password | Y | - | Blank | Local sign-in | Both new passwords must match | Both new passwords must match"

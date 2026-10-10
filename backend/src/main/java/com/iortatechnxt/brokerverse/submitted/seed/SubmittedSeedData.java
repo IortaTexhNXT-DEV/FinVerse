@@ -232,7 +232,7 @@ public class SubmittedSeedData implements ApplicationRunner {
         null,
         "0917" + (MOBILE_BASE + Math.floorMod(r.assured().hashCode(), MOBILE_SPAN)),
         r.assured().toLowerCase(java.util.Locale.ROOT).replace(' ', '.') + "@example.ph",
-        "Branch.counterpart@bank-seed.ph");
+        "branch.counterpart@bdo.com.ph");
   }
 
   private static SbmTerms terms(SeedRow r, LocalDate expiry) {

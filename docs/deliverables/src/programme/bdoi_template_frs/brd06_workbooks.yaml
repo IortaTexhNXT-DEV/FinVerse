@@ -4,7 +4,7 @@ meta:
   version: "1.0"
   folder: Programme/BDOI_Template_FRS/BRD-06_Renewal
   quality: Programme/Quality
-  environment: BIBS UAT environment (address issued with the passwords)
+  environment: "BIBS UAT environment: https://uat.brokerverse.cloud"
   password_text: Issued separately by the iorta TechNXT Project Team
   dates: {decision: 2026-11-30, sit: 2027-01-31, uat: 2027-07-16}
 

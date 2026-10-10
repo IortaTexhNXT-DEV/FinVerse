@@ -4,6 +4,25 @@
 // in A. The records created carry fictitious seed values only; the SIT/UAT password comes from SEED_PASSWORD.
 const { act, press, tab, go, button, settle, chooseOption } = require('./brd01_walkthrough.cjs');
 
+// The permission picker of the group-profile requests: areas closed, check boxes found by the permission code at the end of
+// their id. Opens every area, ticks the permissions, closes the areas again and opens the area of the first one, so the
+// form stays short; the selected permissions show by area on the right.
+async function pickPermissions(page, codes) {
+  await page.getByRole('button', { name: /^expand all$/i }).click();
+  const areas = new Set();
+  for (const code of codes) {
+    const box = page.locator(`.permission-picker input[type=checkbox][id$="-${code}"]`);
+    await box.check();
+    const group = box.locator('xpath=ancestor::div[contains(concat(" ", @class, " "), " profile-group ")][1]');
+    areas.add((await group.locator('.profile-group-name').textContent()).trim());
+  }
+  await page.getByRole('button', { name: /^collapse all$/i }).click();
+  for (const area of [...areas].slice(0, 1)) {
+    const name = page.locator('.profile-group-name', { hasText: new RegExp(`^${area.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`) });
+    await page.locator('.profile-group-head').filter({ has: name }).first().click();
+  }
+}
+
 const REQUESTS = '/user-access/requests';
 const NEW_USER = 'a013000196';
 const PROFILE = 'RENEWAL_ENQUIRY';
@@ -84,7 +103,7 @@ const steps = {
     }
     await fill(page, 'User ID', NEW_USER);
     await fill(page, 'Full Name', 'Isabel Navarro');
-    await fill(page, 'E-mail', 'isabel.navarro@brokerverse-seed.ph');
+    await fill(page, 'E-mail', 'isabel.navarro@uat.brokerverse.cloud');
     await fill(page, 'Windows ID', 'INAVARRO');
     await fill(page, 'Home Branch', '^HO');
     await pickProfile(page, 'Marketing Account Officer');
@@ -175,9 +194,7 @@ const steps = {
     await fill(page, 'Profile Code', PROFILE);
     await fill(page, 'Name', 'Renewal enquiry');
     await fill(page, 'Description', 'Read-only enquiry of clients and reports for the contact centre (seed data)');
-    // Each permission shows its name; its check box is found by the permission code (id perm-CODE).
-    await page.locator('#perm-CLIENT_VIEW').check();
-    await page.locator('#perm-REPORT_VIEW').check();
+    await pickPermissions(page, ['CLIENT_VIEW', 'REPORT_VIEW']);
     await fill(page, 'Approvers in Order', 'Ulysses');
     await fill(page, 'Approvers in Order', '\\(approver\\)');
     await fill(page, 'Remarks \\(Justification\\)', 'Enquiry profile for the renewal follow-up (seed data)');
@@ -378,4 +395,4 @@ const steps = {
 /** Nothing to prepare: the records of each step come from the seed data or from the earlier steps. */
 async function prepare() {}
 
-module.exports = { steps, prepare };
+module.exports = { steps, prepare, pickPermissions };

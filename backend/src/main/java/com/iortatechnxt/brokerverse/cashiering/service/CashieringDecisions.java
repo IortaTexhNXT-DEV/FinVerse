@@ -23,6 +23,9 @@ public class CashieringDecisions {
   /** Scope of Reinstate (C2). */
   public static final String REINSTATEMENT_SCOPE = "CASH_REINSTATEMENT_SCOPE";
 
+  /** The name of the reinstatement setting as the users read it. */
+  public static final String REINSTATEMENT_SCOPE_NAME = "What Reinstate does";
+
   /** Record number format (C3). */
   public static final String RECORD_NO_FORMAT = "CASH_RECORD_NO_FORMAT";
 

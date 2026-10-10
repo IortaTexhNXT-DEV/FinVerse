@@ -195,7 +195,7 @@ public class CollectionsPlansSeedData implements ApplicationRunner {
     users.run(
         HANDLER,
         () -> {
-          String to = dispatch.clientEmail(soa.getId()).orElse("billing@brokerverse-seed.ph");
+          String to = dispatch.clientEmail(soa.getId()).orElse("billing@uat.brokerverse.cloud");
           dispatch.send(
               soa.getId(),
               new SoaDispatch.Mail(

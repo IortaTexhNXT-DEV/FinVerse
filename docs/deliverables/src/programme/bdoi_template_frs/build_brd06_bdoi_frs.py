@@ -736,17 +736,18 @@ class Annexes:
                "noticed in BDOI's text, the changes made to the Business Requirements Mapping, the rows added to "
                "BDOI's annexes and the other observations of this version. BDOI's text is kept in the body of the "
                "document; this annex gives both readings, the BRD text, what version 1.1 proposes, the impact and who "
-               "decides. Every point starts as Open; the Business Unit records its decision in the Change Request "
-               "Register workbook (sheet Decisions log).")
+               "decides. Every point starts as Open; a point that BIBS offers both ways, chosen by a system setting, "
+               "reads Configurable - BDOI to confirm the setting. The Business Unit records its decision in the "
+               "Change Request Register workbook (sheet Decisions log).")
         header = ["No.", "Topic", "BDOI FRS text", "BRD text", "Proposed in v1.1", "Impact", "Decision by", "Status"]
         widths = [0.7, 1.1, 1.9, 1.5, 2.3, 1.0, 1.0, 0.5]
         no = 0
         section = ""
 
-        def row(ref, topic, bdoi, brd, prop, impact, who):
+        def row(ref, topic, bdoi, brd, prop, impact, who, status="Open"):
             nonlocal no
             no += 1
-            out = [f"AO-{no:02d}" + (f" ({ref})" if ref else ""), topic, bdoi, brd, prop, impact, who, "Open"]
+            out = [f"AO-{no:02d}" + (f" ({ref})" if ref else ""), topic, bdoi, brd, prop, impact, who, status]
             self.b.q_rows.append(dict(zip(["no", "topic", "bdoi", "brd", "proposal", "impact", "decide_by", "status"],
                                           out), section=section))
             return out
@@ -759,8 +760,11 @@ class Annexes:
             self.cmp_ids.append(cid)
             prop = (f"{clean(c['recommendation'])} (BIBS reference FRS: {clean(c['ours'])} The system today: "
                     f"{clean(c['platform'])}.)")
+            if c.get("setting"):
+                prop += f" Available in BIBS: {clean(c['setting'])}"
             rows.append(row(cid, f"{clean(c['topic'])} ({c['kind']})", clean(c["bdoi"]), clean(c["brd"]), prop,
-                            f"Matches: {clean(c['matches'])}", DOC["conflict_owner"].get(cid, "Product Owner, Renewal")))
+                            f"Matches: {clean(c['matches'])}", DOC["conflict_owner"].get(cid, "Product Owner, Renewal"),
+                            status=c.get("status", "Open")))
         self.table(header, rows, widths, size=7)
         self.listed_conflicts = set(self.cmp_ids)
         section = "AO.2"

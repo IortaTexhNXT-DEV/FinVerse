@@ -746,6 +746,16 @@ def build_uat(data: Data):
 
 
 # ------------------------------------------------------------------------------------------------- 6 coverage
+def available_evidence(item_id: str) -> str:
+    """The evidence of an item available in full: the item itself, else the longest prefix it starts with."""
+    avail = WB.get("coverage_available", {})
+    if item_id in avail:
+        return avail[item_id]
+    base = re.sub(r"\s*\(.*\)$", "", item_id).strip()
+    hits = [k for k in avail if "(" not in k and (base == k or base.startswith(k + "."))]
+    return avail[max(hits, key=len)] if hits else ""
+
+
 def build_coverage(data: Data):
     item_rows, ac_rows = [], []
     for it in data.items:
@@ -758,7 +768,10 @@ def build_coverage(data: Data):
         steps = sorted({s for f in refs for s in data.steps_by_fr.get(f, [])})
         if steps:
             evidence.append("Walkthrough " + ", ".join(steps[:8]))
-        if it["id"] in data.cmp_platform:
+        avail = available_evidence(it["id"])
+        if avail:
+            status, note = "Yes", avail
+        elif it["id"] in data.cmp_platform:
             plat, cnote = data.cmp_platform[it["id"]]
             status = {"Yes": "Yes", "Partly": "Partly", "No": "No"}.get(plat, "Partly")
             note = "Comparison of BDOI's FRS with the system: " + frs.clean(cnote)

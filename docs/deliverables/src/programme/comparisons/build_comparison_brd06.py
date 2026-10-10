@@ -418,7 +418,10 @@ def build(src: dict) -> Path:
         Column("matches", "Matches the BRD / platform", 22, "Which side matches the BRD and the platform"),
         Column("decision", "BDOI to", 10, "Confirm the BRD rule or decide", values=DECISION, status=True),
         Column("recommendation", "Our recommendation", 44, "The project team's recommendation"),
-    ], [{"no": i, **c, "decision": "Confirm" if c["matches"].startswith("Ours (") else "Decide"}
+        Column("status", "Status", 18, "Open, or Configurable when BIBS offers both readings"),
+        Column("setting", "Setting in BIBS", 44, "The system setting that chooses the reading, with its default"),
+    ], [{"no": i, **c, "status": c.get("status", "Open"), "setting": c.get("setting", ""),
+         "decision": "Confirm" if c["matches"].startswith("Ours (") else "Decide"}
         for i, c in enumerate(CMP["conflicts"], start=1)],
         description="Where the two documents say different things, which side matches the BRD and the platform, "
                     "and the decision needed from BDOI")

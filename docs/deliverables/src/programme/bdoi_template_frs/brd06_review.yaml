@@ -518,6 +518,138 @@ emails:
       brd: BRRN.040
       frrn: FRRN.028.02
       code: ["public void failed(Long candidateId, String text)"]
+    - id: AE.34
+      name: "Hold cover rejected by the insurer"
+      trigger: "The insurer rejects a hold cover request in the Hold Cover Response upload (FRRN.037.02)."
+      recipients: "The responsible user of the account"
+      channel: "Notice in the system"
+      subject: "<renewal reference>: hold cover rejected by <insurer>"
+      body: "<insurer's remarks>, or Rejected by the insurer"
+      attachments: "None"
+      frequency: "Once per rejected request"
+      brd: "BRRN.042"
+      frrn: "FRRN.037.02"
+      code: ["\": hold cover rejected by \"", "\"Rejected by the insurer\""]
+    - id: AE.35
+      name: "Hold cover and placement files to the insurer"
+      trigger: "A hold cover request or a placement file is sent to an insurer not enrolled in MFT (FRRN.036.06, FRRN.29.04)."
+      recipients: "The placement e-mail addresses of the insurer in Insurer Maintenance"
+      channel: "E-mail with the file attached (MFT upload for the enrolled insurers)"
+      subject: "<document type> - <file name>"
+      body: "Please find attached <file name>."
+      attachments: "The file"
+      frequency: "Once per file and insurer"
+      brd: "BRRN.042; BRRN.040"
+      frrn: "FRRN.036.06; FRRN.29.04"
+      code: ["\"Please find attached \" + file.fileName() + \".\""]
+    - id: AE.36
+      name: "Placement not sent"
+      trigger: "A placement of the account could not be sent to an insurer (FRRN.29.04)."
+      recipients: "The Processing Officer of the account"
+      channel: "Notice in the system"
+      subject: "<renewal reference> placement not sent"
+      body: "Check the Channel Monitor"
+      attachments: "None"
+      frequency: "Once per sending that failed"
+      brd: "BRRN.040"
+      frrn: "FRRN.29.04"
+      code: ["\" placement not sent\"", "\"Check the Channel Monitor\""]
+    - id: AE.37
+      name: "Placement response received"
+      trigger: "The insurer's placement response is uploaded or received through MFT (FRRN.030.01)."
+      recipients: "The Processing Officer of the account"
+      channel: "Notice in the system"
+      subject: "<renewal reference> placement approved, or placement rejected"
+      body: "<reason of the rejection>"
+      attachments: "None"
+      frequency: "Once per response"
+      brd: "BRRN.040"
+      frrn: "FRRN.030.01"
+      code: ["\" placement \" + (response.approved() ? \"approved\" : \"rejected\")"]
+    - id: AE.38
+      name: "Account submitted for posting"
+      trigger: "An Account Officer submits an account for posting with an approver chosen (FRRN.016.01)."
+      recipients: "The approver chosen"
+      channel: "Notice in the system"
+      subject: "<renewal reference> submitted for posting"
+      body: "Approve the posting of the renewal of <client>"
+      attachments: "None"
+      frequency: "Once per submission"
+      brd: "BRD 1.008.3"
+      frrn: "FRRN.016.01"
+      code: ["\" submitted for posting\"", "\"Approve the posting of the renewal of \""]
+    - id: AE.39
+      name: "Transfer request received"
+      trigger: "A transfer request for a New Business opportunity is submitted to another Marketing unit (FRRN.011.01)."
+      recipients: "The Team Leads of the receiving unit"
+      channel: "Notice in the system"
+      subject: "<transfer request number>: transfer request for a New Business opportunity"
+      body: "Review the transfer request of <client> from <unit>: <justification>"
+      attachments: "None"
+      frequency: "Once per request"
+      brd: "BRD 1.006.5; 1.007.1"
+      frrn: "FRRN.011.01; FRRN.011.05"
+      code: ["\": transfer request for a New Business opportunity\"", "\"Review the transfer request of \""]
+    - id: AE.40
+      name: "Transfer request decided"
+      trigger: "The receiving Team Lead accepts, rejects or returns a transfer request (FRRN.011.02, FRRN.011.05)."
+      recipients: "The requesting user"
+      channel: "Notice in the system"
+      subject: "<transfer request number>: <Accepted, Rejected or Returned for Clarification>"
+      body: "Transfer request of <renewal reference> to <unit>: <outcome> - <remarks>"
+      attachments: "None"
+      frequency: "Once per decision"
+      brd: "BRD 1.007.4, 1.007.5"
+      frrn: "FRRN.011.05"
+      code: ["\"Transfer request of \""]
+    - id: AE.41
+      name: "Direct-to-Insurer Payment to approve"
+      trigger: "An account is tagged Direct-to-Insurer Payment with Route for UH Approval (FRRN.014.05)."
+      recipients: "The Unit Head of the assigned user"
+      channel: "Notice in the system"
+      subject: "<renewal reference>: Direct-to-Insurer Payment to approve"
+      body: "<client>"
+      attachments: "None"
+      frequency: "Once per tag"
+      brd: "BRRN.040"
+      frrn: "FRRN.014.05"
+      code: ["\": Direct-to-Insurer Payment to approve\""]
+    - id: AE.42
+      name: "Direct-to-Insurer Payment decided"
+      trigger: "The Unit Head approves or rejects a Direct-to-Insurer Payment (FRRN.014.05)."
+      recipients: "The Account Officer of the account"
+      channel: "Notice in the system"
+      subject: "<renewal reference>: Direct-to-Insurer Payment approved, or rejected"
+      body: "<rejection reason>"
+      attachments: "None"
+      frequency: "Once per decision"
+      brd: "BRRN.040"
+      frrn: "FRRN.014.05"
+      code: ["\": Direct-to-Insurer Payment \""]
+    - id: AE.43
+      name: "Account returned for correction"
+      trigger: "The approver rejects an account submitted for approval (FRRN.26.01)."
+      recipients: "The Account Officer of the account"
+      channel: "Notice in the system"
+      subject: "<renewal reference> returned for correction"
+      body: "<reason of the return>"
+      attachments: "None"
+      frequency: "Once per return"
+      brd: "BRRN.038"
+      frrn: "FRRN.26.01"
+      code: ["\" returned for correction\""]
+    - id: AE.44
+      name: "TSU request to approve, assigned and updated"
+      trigger: "A TSU request is submitted for the Team Lead's approval, assigned to a TSU officer, decided, given a comparative table or completed (FRRN.018.01)."
+      recipients: "The Team Lead (approval), the TSU officer (assignment), the requester and the Account Officer (decisions and updates)"
+      channel: "Notice in the system"
+      subject: "<request number> pending your approval; <request number> assigned to you; <request number>: <Approved, Rejected or Returned>, For TSU Processing, comparative table updated, proposal completed by TSU"
+      body: "<client>"
+      attachments: "None"
+      frequency: "Once per step of the request"
+      brd: "BRRN.033"
+      frrn: "FRRN.018.01"
+      code: ["\" pending your approval\"", "\": For TSU Processing\"", "\": comparative table updated\"", "\": proposal completed by TSU\""]
   # the notifications catalogue of the BIBS FRS (NT-nn) and the texts of this annex that quote them
   catalogue: {NT-01: [AE.01, AE.02, AE.03, AE.04], NT-02: [AE.05], NT-03: [AE.06], NT-04: [AE.07, AE.08, AE.09],
               NT-05: [AE.10], NT-06: [AE.11], NT-07: [AE.12, AE.13, AE.33], NT-08: [AE.14, AE.15], NT-09: [AE.16],

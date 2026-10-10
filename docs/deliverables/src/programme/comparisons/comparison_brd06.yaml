@@ -454,6 +454,8 @@ conflicts:
     platform: Clean, Review, Exception
     matches: Ours (BRD and platform)
     recommendation: Keep Clean / Review / Exception as the BRD says; show the Not for Renewal accounts as BDOI's "Non-Renewable" panel (a filter on the disposition).
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "the third panel of the renewal accounts is Non-Renewable (default, BDOI's panels Clean, Review, Non-Renewable and All, the Exception accounts shown under Review) or Exception (the BRD's Clean, Review and Exception)."
   - topic: TSI above PHP 250M
     kind: Rule
     bdoi: "FRRN.007.02: above the threshold \"Clean Record with 'For Quotation' disposition\", routed to the TSU queue, \"Review\" once the quotation is available."
@@ -462,6 +464,8 @@ conflicts:
     platform: Review with a proposed disposition
     matches: Both partly
     recommendation: Keep the Review bucket (the TSU route is manual work) and use BDOI's disposition word once the For Quotation / For Proposal meaning is settled.
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "an account above the sum insured threshold is Clean For Quotation and goes to the TSU (default, BDOI's rule) or Review with a proposal for the TSU."
   - topic: Meaning of For Quotation and For Proposal
     kind: Naming and routing
     bdoi: "FRRN.017: Quick and Full Proposal only for \"For Proposal\"; FRRN.018: \"For Quotation\" goes to a TSU request (non-package quotation, Annex K)."
@@ -494,6 +498,8 @@ conflicts:
     platform: Manual assignment
     matches: Ours (BRD and platform)
     recommendation: Keep the TL assignment of the BRD and add automatic assignment as an option per segment (platform change), if BDOI confirms.
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "the renewal accounts of the market segments chosen are assigned automatically to an Account Officer of the team, fewest open accounts first and then in turn, and the accounts routed to Processing to a Processing Officer when a second setting is on; with no segment chosen (default, the BRD) the Team Leader assigns."
   - topic: Transfer to another unit
     kind: Rule
     bdoi: "FRRN.011: \"the original renewal account shall remain under the ownership of the current Marketing Unit\"; the receiving unit creates a New Business account."
@@ -502,6 +508,8 @@ conflicts:
     platform: Ownership transfer
     matches: Ours (BRD and platform)
     recommendation: Keep the BRD transfer; add BDOI's referral as a second action (New Business opportunity) if BDOI wants both.
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "a transfer to another Marketing unit is a referral (the receiving unit opens a New Business account and the renewal keeps its owner, BDOI's text), a move of the account (the BRD), or both offered to the user (default)."
   - topic: Extraction trigger
     kind: Schedule
     bdoi: "Mapping of BRRN.030: \"User will select date range to generate RMEL\"."
@@ -534,6 +542,8 @@ conflicts:
     platform: Lock at RA generation
     matches: Ours (BRD and platform)
     recommendation: Keep the RA lock of the BRD and add BDOI's lock after placement (edits after placement are already refused by the account).
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "Marketing can no longer change the account once the Renewal Advice is generated (default, BDOI's text) or once it is posted and the placement is sent."
   - topic: Hold cover duration and trigger
     kind: Rule
     bdoi: "FRRN.036: default 30 days Non-CBG, 90 days CBG; transferred 30 (CBG Home) or 60 (CBG Motor); automatic request after RA acceptance (Non-CBG) and at 75 days before expiry (CBG Clean); extensions."
@@ -542,6 +552,8 @@ conflicts:
     platform: User request, 30 or 60 days
     matches: Both meet the BRD; BDOI more specific
     recommendation: Adopt BDOI's durations as parameters now; automatic requests and extensions are a platform change for BDOI to prioritise.
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "hold cover durations of 30 days (Non-CBG), 90 days (CBG), 60 days (CBG Motor after an insurer's rejection) and 30 days (CBG Home), extensions of 15 or 30 days from 7 days before the end, automatic requests for Non-CBG accounts after the client's confirmation and for Clean CBG accounts 75 days before expiry, and the monthly CBG Home extension on the 15th; each value is a setting."
   - topic: Renewal Advice notices
     kind: Schedule
     bdoi: "Annex M: first notice 75 days and last notice 45 days before expiry, automatic; FRRN.022.01: the system determines First or Second Notice; templates print \"FINAL NOTICE\"."
@@ -550,6 +562,8 @@ conflicts:
     platform: User choice; second-notice days parameter
     matches: Both meet the BRD
     recommendation: Adopt BDOI's 75 / 45 days and the automatic determination; name the notices First and Final as in the approved templates.
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "the Renewal Advice notice follows the expiry, First Notice from 75 days and Last Notice from 45 days before expiry (default, BDOI's text), or is chosen by the user."
   - topic: NRNS reminder
     kind: Schedule
     bdoi: "Annex M: NRNS Reminder for CBG Motor with an active loan and no policy in BDOI, 75 days before expiry."
@@ -566,6 +580,8 @@ conflicts:
     platform: Mutually exclusive, effective expiry date
     matches: Ours (BRD)
     recommendation: Keep the mutual exclusion and the effective expiry date of the BRD; adopt BDOI's day offsets (1 and 3 days) as parameters.
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "the No Advice Letter 1 day and the Non-Renewal Letter 1 day (CBG Motor) or 3 days (Non-CBG) after the effective expiry date, each a setting; the two letters exclude each other."
   - topic: Password of protected files
     kind: Rule
     bdoi: "FRRN.024.01: individuals - first three letters of first and last name in capitals; corporate - one lower case, one upper case, one special character and five digits; approved e-mail templates BDOI-009 to 011 explain it to clients."
@@ -574,6 +590,8 @@ conflicts:
     platform: Random 12-character password in a separate e-mail
     matches: Both meet the BRD; BDOI's is the approved convention
     recommendation: Adopt BDOI's convention (answers Q07); platform change of the password rule.
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "protected files use BDOI's password convention (default: the first three letters of the first and last names in capitals for an individual client, eight random characters for a corporate client) or a random password per file."
   - topic: Delivery channel to clients and insurers
     kind: Integration
     bdoi: "CCM for proposals, RA, letters, Insurance Advice, e-policies and placement files; MFT for placement, hold cover and e-policy files."
@@ -582,6 +600,8 @@ conflicts:
     platform: Outgoing e-mail; CCM listed as an option in the integration inventory (IQ11)
     matches: Neither stated in the BRD
     recommendation: BDO ITG decides whether CCM and MFT are in scope for go-live; BIBS keeps e-mail as the fallback channel.
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "client documents are sent through CCM (default) or by protected e-mail with the password in a separate e-mail; insurers receive their files through MFT when enrolled, otherwise by e-mail."
   - topic: Incentive timing
     kind: Rule
     bdoi: "FRRN.034.01: \"Upon booking, the system shall evaluate whether the renewal account is eligible\"."
@@ -606,6 +626,8 @@ conflicts:
     platform: Booking is a user action (automatic booking rules exist in New Business)
     matches: Ours (BRD)
     recommendation: Keep the booking a user action as the Walkthrough addendum says, unless BDOI changes it.
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "the insurer's approval of the placement leaves the account For Booking for the Processing Officer (default, the BRD) or books and locks it (BDOI's text)."
   - topic: Endorsements at sanitation
     kind: Rule
     bdoi: "FRRN.007.02: \"Records with endorsements shall be routed to the Review bucket\"."
@@ -614,6 +636,8 @@ conflicts:
     platform: Pending endorsement blocks
     matches: Both meet the BRD
     recommendation: Keep ours and add BDOI's Review routing for endorsements of the term if Marketing wants to see them.
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "every endorsement of the expiring term routes the account to Review (default, BDOI's text) or only an endorsement in progress."
   - topic: Dispositions and non-renewal reasons
     kind: Naming
     bdoi: "FRRN.014.02: four dispositions and 21 non-renewal reasons; FRRN.019.01: \"Lost Business\" is a reason."
@@ -622,6 +646,8 @@ conflicts:
     platform: Five dispositions; eleven reasons (list values)
     matches: Ours (BRD); BDOI's reasons extend the list
     recommendation: Keep the five dispositions of the BRD and add BDOI's eleven extra reasons as list values.
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "the dispositions offered to Marketing are For Renewal, Not for Renewal, For Quotation, For Proposal and Lost Business (default, the BRD) or the first four with Lost Business as a reason of Not for Renewal (BDOI's text); BDOI's non-renewal reasons are in the list of values."
   - topic: Second approval after acceptance
     kind: Approval
     bdoi: "FRRN.025, 026: accepted accounts go to \"Submitted for Approval\" and are approved again before placement."
@@ -630,6 +656,8 @@ conflicts:
     platform: No second approval
     matches: Ours (BRD)
     recommendation: Ask BDOI; a second approval is a platform change and slows BRRN.040.
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "an accepted account goes to the payment check and placement at once (default, the BRD) or is Submitted for Approval and goes to placement once an approver approves it (BDOI's text)."
   - topic: Clean accounts and posting
     kind: Status
     bdoi: "FRRN.008.01: Clean accounts get \"For Renewal\" and status \"For RA Generation\" (CBG) or \"Posted\" (Non-CBG)."
@@ -638,6 +666,8 @@ conflicts:
     platform: Matrix proposal or automatic disposition
     matches: Both meet the BRD
     recommendation: Keep the matrix and load BDOI's rule (Clean is automatic For Renewal) as its first content.
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "Clean accounts are disposed For Renewal automatically (default, BDOI's rule) or wait for the disposition of Marketing."
   - topic: Status names
     kind: Naming
     bdoi: "In Process Renewal, Submitted for Posting, Posted, Submitted for Approval, Submitted for Placement, For Booking, Booked, Returned - Renewal, Rejected Placement, For Billing Generation, For E-Policy Sending."
@@ -646,6 +676,8 @@ conflicts:
     platform: The BIBS stages
     matches: Ours (main BRD terms)
     recommendation: Map the two lists one to one in the status model annex and use BDOI's names where the BRD is silent.
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "the statuses read with BDOI's names (default: In Process Renewal, Submitted for Posting, Posted and the others) or with the workflow stage names."
   - topic: Name of the expiring list and letters
     kind: Naming
     bdoi: "RMEL (Renewal Master Expiry List); NRL (Non-Renewal Letter)."
@@ -654,6 +686,8 @@ conflicts:
     platform: Expiry List; NAL / NFR
     matches: Both used in the BRD
     recommendation: Use BDOI's names RMEL and NRL in the merged FRS and on the screens.
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "generated files are named with BDOI's convention <Product>_<Letter>_<Reference>_MMDDYYYY.pdf (default) or with the letter number."
   - topic: Reason of a non-renewable risk code
     kind: Naming
     bdoi: "FRRN.007.02: \"Non-Renewable Account\"; FRRN.038.03: \"Non-Renewable Risk Code\"."
@@ -662,6 +696,8 @@ conflicts:
     platform: Non-renewable Accounts
     matches: Ours (BRD)
     recommendation: Keep the BRD label and correct BDOI's two variants.
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "the reason recorded for a non-renewable risk code is Non-renewable Accounts (default, the BRD) or Non-Renewable Risk Code (BDOI's text)."
   - topic: Automatic placement status for paid CBG renewals
     kind: Status
     bdoi: "FRRN.028.02: a paid CBG renewal automatically becomes \"Submitted for Placement\"; FRRN.026.01 for CBG Motor."

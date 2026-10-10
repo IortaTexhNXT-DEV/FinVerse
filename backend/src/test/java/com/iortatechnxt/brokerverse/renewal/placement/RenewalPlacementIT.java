@@ -45,6 +45,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 class RenewalPlacementIT {
 
   private static final String MAILBOX = "placement@insurer.example.ph";
+  private static final String MFT_COMPANY = "RNW_MFT_COMPANY_CODE";
 
   @Autowired private RenewalFixtures fx;
   @Autowired private PlacementGeneration generation;
@@ -290,6 +291,20 @@ class RenewalPlacementIT {
 
   @Test
   void aPlacementResponseFileReceivedThroughMftIsProcessed() {
+    // Other tests create companies of their own; the inbox must deliver to the fixture company.
+    String mftCompany = parameters.text(MFT_COMPANY, "");
+    String company =
+        jdbc.queryForObject(
+            "select code from org_company where id = ?", String.class, fx.company());
+    as.run("admin", () -> parameters.update(MFT_COMPANY, company));
+    try {
+      placementResponseThroughMft();
+    } finally {
+      as.run("admin", () -> parameters.update(MFT_COMPANY, mftCompany));
+    }
+  }
+
+  private void placementResponseThroughMft() {
     RenewalCandidate c = submitted();
     as.run(PO, () -> generation.generate(fx.company(), List.of(c.getRenewalRef())));
     sendAll(c, c.getSnapshot().insurerCode());

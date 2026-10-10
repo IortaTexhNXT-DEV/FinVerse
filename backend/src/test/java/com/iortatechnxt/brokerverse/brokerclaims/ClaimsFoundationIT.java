@@ -131,7 +131,9 @@ class ClaimsFoundationIT {
   @Test
   void listsAreSeededFromTheBrd() {
     assertThat(lovs.activeValues(STATUS, TODAY)).hasSize(18);
-    assertThat(lovs.activeValues(ClaimCodes.LOV_SETTLEMENT_TYPE, TODAY)).hasSize(10);
+    // Ten settlement types of the Claims BRD plus Settled - Total Loss, which Renewal uses to mark
+    // total-loss accounts as not for renewal.
+    assertThat(lovs.activeValues(ClaimCodes.LOV_SETTLEMENT_TYPE, TODAY)).hasSize(11);
     assertThat(lovs.activeValues(ClaimCodes.LOV_ADJUSTER, TODAY)).hasSize(25);
     assertThat(lovs.activeValues(ClaimCodes.LOV_CATASTROPHE, TODAY)).hasSize(7);
     assertThat(lovs.activeValues(ClaimCodes.LOV_UNIT, TODAY)).hasSize(7);

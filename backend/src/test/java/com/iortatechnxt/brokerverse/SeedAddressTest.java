@@ -69,4 +69,20 @@ class SeedAddressTest {
       assertThat(m.group(1)).as("reference shown on the screens").doesNotContain("SEED");
     }
   }
+
+  @Test
+  void theSeedRunnersWriteAddressesOfTheUatDomain() throws IOException {
+    Path main = Path.of("").toAbsolutePath().getParent().resolve("backend/src/main/java");
+    try (Stream<Path> files = Files.walk(main)) {
+      for (Path f : files.filter(x -> x.toString().endsWith("SeedData.java")).toList()) {
+        String source = Files.readString(f, StandardCharsets.UTF_8);
+        assertThat(source)
+            .as("address domain in %s", main.relativize(f))
+            .doesNotContain("seed.ph\"");
+        assertThat(MARKED_ADDRESS.matcher(source).find())
+            .as("example address in %s", main.relativize(f))
+            .isFalse();
+      }
+    }
+  }
 }

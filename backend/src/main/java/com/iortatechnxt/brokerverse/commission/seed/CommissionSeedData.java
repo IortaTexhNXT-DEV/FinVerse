@@ -95,7 +95,9 @@ public class CommissionSeedData implements ApplicationRunner {
       if (billed != null && !billed.isEmpty()) {
         users.as(
             HANDLER,
-            () -> sender.send(billed.get(0).getId(), List.of("commission@mgic-seed.ph"), null));
+            () ->
+                sender.send(
+                    billed.get(0).getId(), List.of("commission@mabuhaygeneral.com.ph"), null));
       }
       LOG.info(
           "Commission seed: DP account {} billed to {}",

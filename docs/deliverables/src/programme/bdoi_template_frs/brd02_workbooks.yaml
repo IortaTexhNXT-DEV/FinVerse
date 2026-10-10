@@ -8,7 +8,7 @@ meta:
   folder: Programme/BDOI_Template_FRS/BRD-02_Operations_Cashiering
   quality: Programme/Quality
   frs: "FRS Operations Cashiering in BDOI's template v3.2"
-  environment: "BIBS UAT environment (address issued with the passwords)"
+  environment: "BIBS UAT environment: https://uat.brokerverse.cloud"
   password_text: "Issued separately by the iorta TechNXT Project Team"
   dates:
     decision: 2026-11-30      # sign-off of the BRD-02 FRS (drop plan, SO-02-1)

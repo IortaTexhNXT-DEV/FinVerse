@@ -57,7 +57,7 @@ async function pendingEnrolment(ctx, username, fullName) {
     return found[0];
   }
   const r = await ctx.api('requestor', 'POST', '/nbadmin/access-requests', {
-    type: 'CREATE_USER', userType: 'INTERNAL', username, fullName, email: `${username}@brokerverse-seed.ph`,
+    type: 'CREATE_USER', userType: 'INTERNAL', username, fullName, email: `${username}@uat.brokerverse.cloud`,
     roleCodes: ['MKT_AO'], justification: 'Joined Marketing (seed data)', approvers: ['uamapprover'],
   });
   return r.id;
@@ -96,7 +96,7 @@ const fills = {
   },
   forgot_user: async (ctx) => { await resetOffered(ctx, true); return [forgot, ['User ID', 'requestor']]; },
   enrol_user: [
-    ['User ID', 'a013000197'], ['Full Name', 'Andrea Mercado'], ['E-mail', 'andrea.mercado@brokerverse-seed.ph'],
+    ['User ID', 'a013000197'], ['Full Name', 'Andrea Mercado'], ['E-mail', 'andrea.mercado@uat.brokerverse.cloud'],
     ['Windows ID', 'AMERCADO'], ['Home Branch', 'HO'],
     // The profile picker groups the profiles by business area, closed: the search opens the match, the
     // ticked profile stays listed (its area open) once the search is cleared.
@@ -110,14 +110,12 @@ const fills = {
   new_profile: [
     ['Profile Code', 'UAT_ENQUIRY'], ['Name', 'Client enquiry (seed data)'],
     ['Description', 'Read-only enquiry of clients and reports'],
-    // Each permission shows its name; its check box is found by the permission code (id perm-CODE).
-    async (page) => page.locator('#perm-CLIENT_VIEW').check(),
-    async (page) => page.locator('#perm-REPORT_VIEW').check(),
+    async (page) => walkthrough.pickPermissions(page, ['CLIENT_VIEW', 'REPORT_VIEW']),
     ['Approvers in Order', 'Ulysses'], ['Approvers in Order', '\\(approver\\)'],
     ['Remarks (Justification)', 'Enquiry profile for the contact centre (seed data)'],
   ],
   modify_profile: [['Request Type', 'Modify group profile'], ['Group Profile', '^Marketing Account Officer'],
-    async (page) => page.locator('#perm-UAM_VIEW').check()],
+    async (page) => walkthrough.pickPermissions(page, ['UAM_VIEW'])],
   deactivate_profile: [['Request Type', 'Deactivate group profile'], ['Group Profile', '^Processing Team Lead']],
   report_profile: [['Group Profile', 'User Access Approver']],
 };
@@ -191,8 +189,8 @@ const custom = {
   'scr-ua-09-02-validated': async (ctx) => {
     const n = Number(ctx.one('select count(*) from bulk_job')) + 1;
     const file = csv(`uam-bulk-${n}.csv`, [BULK_HEADERS,
-      ['ENROL', `a01300030${n % 10}`, 'Rowena Castillo', 'rowena.castillo@brokerverse-seed.ph', '', 'HO', '', '', 'MKT_AO', '', 'Joined Marketing (seed data)'],
-      ['ENROL', `a01300031${n % 10}`, 'Dennis Aquino', 'dennis.aquino@brokerverse-seed.ph', '', 'HO', '', '', 'MKT_AO', '', 'Joined Marketing (seed data)'],
+      ['ENROL', `a01300030${n % 10}`, 'Rowena Castillo', 'rowena.castillo@uat.brokerverse.cloud', '', 'HO', '', '', 'MKT_AO', '', 'Joined Marketing (seed data)'],
+      ['ENROL', `a01300031${n % 10}`, 'Dennis Aquino', 'dennis.aquino@uat.brokerverse.cloud', '', 'HO', '', '', 'MKT_AO', '', 'Joined Marketing (seed data)'],
       ['PROMOTE', 'a013000101', '', '', '', '', '', '', '', '', 'Not an action of the template'],
     ]);
     const page = await ctx.pageOf('requestor');

@@ -54,7 +54,7 @@ distribution:
 
 ## Purpose
 
-This document summarises the test plan for BRD-2 Operations in BIBS (BDOI Broker System, on iNXT BrokerVerse). It tells the BDOI Operations teams what will be tested, how, with which data and by whom, and when testing is complete. The test conditions, scenarios and cases are in the Excel workbook of the same version, `04_BIBS_TestPlan_BRD-02_Operations_v2.1.xlsx`, which the testers use during execution.
+This document summarises the test plan for BRD-2 Operations in BIBS (BDOI Broker System, on iNXT BrokerVerse). It tells the BDOI Operations teams what will be tested, how, with which data and by whom, and when testing is complete. The test conditions, scenarios and cases are in the Excel workbook of the same version, `BIBS_RTM_BRD-02_Test_Cases_and_Traceability_v1.0.xlsx`, which the testers use during execution.
 
 Every case traces to a functional requirement (FR) of FRS BRD-2 v2.1 and to the BRD requirement IDs (BRQID, CSHID, RMTID, ADJID, PRCID, CMRID, MKTID, DBMID) that the FR meets. The expected results quote the messages, with their codes, as BIBS shows them.
 

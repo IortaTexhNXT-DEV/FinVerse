@@ -53,7 +53,7 @@ distribution:
 
 ## Purpose
 
-This document summarises the test plan for BRD-11 User Access Maintenance in BIBS (BDOI Broker System, on iNXT BrokerVerse). It tells the Business Administrators, the approvers and the system administrators what will be tested, how, with which data and by whom, and when testing is complete. The test conditions, scenarios and cases themselves are in the Excel workbook of the same version, `04_BIBS_TestPlan_BRD-11_User_Access_Maintenance_v2.1.xlsx`, which the testers use during execution.
+This document summarises the test plan for BRD-11 User Access Maintenance in BIBS (BDOI Broker System, on iNXT BrokerVerse). It tells the Business Administrators, the approvers and the system administrators what will be tested, how, with which data and by whom, and when testing is complete. The test conditions, scenarios and cases themselves are in the Excel workbook of the same version, `BIBS_RTM_BRD-11_Test_Cases_and_Traceability_v1.0.xlsx`, which the testers use during execution.
 
 Every case traces to a functional requirement (FR) of FRS BRD-11 v2.1, to the BRD requirement IDs (the printed BRD numbers 1.001 to 4.003, and the non-functional rows UAM-NFR-nn) that the FR meets, and to the screen of the FRS screen specifications where the tester starts. In this plan:
 

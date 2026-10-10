@@ -53,7 +53,7 @@ distribution:
 
 ## Purpose
 
-This document summarises the test plan for BRD-6 Renewal in BIBS (BDOI Broker System, on iNXT BrokerVerse). It tells the BDOI departments what will be tested, how, with which data and by whom, and when testing is complete. The test conditions, scenarios and cases are in the Excel workbook of the same version, `04_BIBS_TestPlan_BRD-06_Renewal_v2.0.xlsx`, which the testers use during execution.
+This document summarises the test plan for BRD-6 Renewal in BIBS (BDOI Broker System, on iNXT BrokerVerse). It tells the BDOI departments what will be tested, how, with which data and by whom, and when testing is complete. The test conditions, scenarios and cases are in the Excel workbook of the same version, `BIBS_RTM_BRD-06_Test_Cases_and_Traceability_v1.0.xlsx`, which the testers use during execution.
 
 Every case traces to a functional requirement (FR) of FRS BRD-6 v2.0 and to the BRD requirement IDs (BRRN.nnn and the persona line IDs 1.001 to 6.002) that the FR meets. The expected results quote the message texts of the FRS, and the screen paths are those of the FRS. Where a Renewal check reuses a message that the platform already shows (log-in, bulk upload, account completeness), the case quotes the text BIBS shows on that screen.
 

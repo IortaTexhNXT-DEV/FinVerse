@@ -17,7 +17,7 @@ import { useBatchAction } from '../common/useBatchAction';
 import { useListDialogs } from '../common/useListDialogs';
 import '../renewal.css';
 
-type Open = 'generate' | 'send' | 'closing' | 'expiry';
+type Open = 'generate' | 'generateSend' | 'send' | 'closing' | 'expiry';
 
 /**
  * Letters (FR-RN-080-084): Generate Renewal Advice (first or second notice) for the renewals with
@@ -50,6 +50,12 @@ export default function LettersPage() {
     'Generate Renewal Advice',
     'generated',
     ({ notice, late }) => renewalApi.generateRa(companyId, refs, notice, late),
+    done,
+  );
+  const generateSend = useBatchAction<{ notice: 'FIRST' | 'SECOND'; late: boolean }>(
+    'Generate and Send RA',
+    'generated and sent',
+    ({ notice, late }) => renewalApi.generateAndSendRa(companyId, refs, notice, late),
     done,
   );
   const send = useBatchAction<null>('Send', 'sent', () => renewalApi.sendRa(companyId, refs), done);
@@ -103,6 +109,16 @@ export default function LettersPage() {
                   Generate RA
                 </Button>
               )}
+              {shown.generate && can('RNW_RA_SEND') && (
+                <Button
+                  variant="secondary"
+                  icon={<Send size={16} />}
+                  disabled={none}
+                  onClick={() => show('generateSend', selected, selection.clear)}
+                >
+                  Generate and Send RA
+                </Button>
+              )}
               {shown.send && (
                 <Button
                   icon={<Send size={16} />}
@@ -143,6 +159,15 @@ export default function LettersPage() {
           onConfirm={(notice, late) => generate.mutation.mutate({ notice, late })}
         />
       )}
+      {open === 'generateSend' && (
+        <GenerateRaDialog
+          count={refs.length}
+          busy={generateSend.mutation.isPending}
+          error={generateSend.mutation.error}
+          onClose={close}
+          onConfirm={(notice, late) => generateSend.mutation.mutate({ notice, late })}
+        />
+      )}
       {open === 'send' && (
         <ConfirmDialog
           title="Send Renewal Advice"
@@ -178,6 +203,7 @@ export default function LettersPage() {
       )}
       {atExpiry.dialog}
       {generate.dialog}
+      {generateSend.dialog}
       {send.dialog}
       {closing.dialog}
     </div>

@@ -1,7 +1,7 @@
 import { api, toQuery } from './client';
 
 /** Upload outcome summaries of the Renewal uploads (BDOI Renewal FRS FRRN.012, 013, 015). */
-export type UploadKind = 'LAMD' | 'BDOFC' | 'INSURER' | 'UPDATE';
+export type UploadKind = 'LAMD' | 'BDOFC' | 'INSURER' | 'UPDATE' | 'HOLD_COVER' | 'PLACEMENT';
 
 export interface UploadSummary {
   uploadId: string;

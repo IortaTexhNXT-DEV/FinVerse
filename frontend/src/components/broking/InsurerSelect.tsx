@@ -22,6 +22,7 @@ export function InsurerSelect({
   exclude?: string | null;
   placeholder?: string;
   'aria-invalid'?: boolean;
+  'aria-label'?: string;
 }>) {
   const companyId = useCompanyId();
   const insurers = useQuery({

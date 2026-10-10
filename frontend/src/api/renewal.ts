@@ -57,6 +57,8 @@ export const renewalApi = {
     api.get<number>(`${C}/count${toQuery({ companyId, ...filters })}`),
   exportList: (companyId: number, filters: RenewalFilters) =>
     api.getFile(`${C}/export.xlsx${toQuery({ companyId, ...filters })}`),
+  exportListAs: (companyId: number, filters: RenewalFilters, format: 'pdf' | 'csv') =>
+    api.getFile(`${C}/export${toQuery({ companyId, ...filters, format })}`),
   get: (companyId: number, renewalRef: string) =>
     api.get<CandidateDetail>(`${ref(renewalRef)}${co(companyId)}`),
   checks: (companyId: number, renewalRef: string) =>
@@ -183,6 +185,23 @@ export const renewalApi = {
     confirmLate: boolean,
   ) =>
     api.post<BatchOutcome>(`${BASE}/letters/ra`, { companyId, renewalRefs, notice, confirmLate }),
+  generateAndSendRa: (
+    companyId: number,
+    renewalRefs: string[],
+    notice: 'FIRST' | 'SECOND',
+    confirmLate: boolean,
+  ) =>
+    api.post<BatchOutcome>(`${BASE}/letters/ra-send`, {
+      companyId,
+      renewalRefs,
+      notice,
+      confirmLate,
+    }),
+  resendLetter: (companyId: number, letterNo: string) =>
+    api.post<{ letterNo: string; refusal: string | null }>(
+      `${BASE}/letters/${encodeURIComponent(letterNo)}/resend${co(companyId)}`,
+      {},
+    ),
   sendRa: (companyId: number, renewalRefs: string[]) =>
     api.post<BatchOutcome>(`${BASE}/letters/send`, { companyId, renewalRefs }),
   closingLetters: (companyId: number, renewalRefs: string[]) =>

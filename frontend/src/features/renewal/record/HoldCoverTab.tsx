@@ -16,6 +16,8 @@ import { Notice } from '@/components/ui/Notice';
 import { UserName } from '@/components/ui/UserName';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
+import { HoldCoverRequestsCard } from '../holdcover/HoldCoverRequestsCard';
+import { InsurerAllocationCard } from '../holdcover/InsurerAllocationCard';
 import { formatDate, formatDateTime } from '@/utils/format';
 import { TextDialog } from '../common/ActionDialogs';
 import { holdCoverActions, holdCoverStatusLabel } from '../common/holdCover';
@@ -158,6 +160,8 @@ export function HoldCoverTab({ detail }: Props) {
           onConfirm={(text) => cancel.mutate(text)}
         />
       )}
+      <HoldCoverRequestsCard renewalRef={ref} />
+      <InsurerAllocationCard renewalRef={ref} />
     </div>
   );
 }

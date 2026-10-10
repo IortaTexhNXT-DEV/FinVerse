@@ -58,6 +58,7 @@ public class LetterWriter {
   private final AuditTrailService audit;
   private final Clock clock;
   private final PrintChannel print;
+  private final LetterDelivery delivery;
 
   /**
    * The mail house of the letters of submitted policies without an e-mail (wave R3).
@@ -82,6 +83,7 @@ public class LetterWriter {
    * @param clock clock
    * @param mailHouse print hand-over of Submitted Policies
    * @param handOffs terms of the submitted policies handed over
+   * @param delivery file name, password and CCM
    */
   @SuppressWarnings("java:S107") // constructor injection
   public LetterWriter(
@@ -95,7 +97,8 @@ public class LetterWriter {
       AuditTrailService audit,
       Clock clock,
       MailHouseGateway mailHouse,
-      SubmittedHandOffRecordRepository handOffs) {
+      SubmittedHandOffRecordRepository handOffs,
+      LetterDelivery delivery) {
     this.letters = letters;
     this.content = content;
     this.documents = documents;
@@ -106,6 +109,7 @@ public class LetterWriter {
     this.audit = audit;
     this.clock = clock;
     this.print = new PrintChannel(mailHouse, handOffs);
+    this.delivery = delivery;
   }
 
   /**
@@ -135,7 +139,7 @@ public class LetterWriter {
                 kind,
                 new RenewalLetter.Template(rendered.templateCode(), rendered.templateVersion()),
                 new RenewalLetter.Generation(source, batchId, lateConfirmedBy, clock.instant())));
-    Long fileId = store(c, kind.type(), no, rendered.pdf());
+    Long fileId = store(c, kind.type(), delivery.fileName(c, letter), rendered.pdf());
     letter.stored(fileId);
     audit.record(
         RenewalCodes.ENTITY,
@@ -180,24 +184,97 @@ public class LetterWriter {
             letter.getNotice(),
             letter.getLetterNo(),
             BusinessClock.today(clock));
-    QueuedEmail queued =
-        messages.queueEmail(
-            new OutboundEmail(
-                c.getCompanyId(),
-                RenewalCodes.PURPOSE_LETTER,
-                List.of(email.strip()),
-                List.of(),
-                rendered.subject(),
-                rendered.body(),
-                List.of(new MessageFile(letter.getLetterNo() + ".pdf", PDF, rendered.pdf())),
-                new OutboundEmail.Protection(null, true, null),
-                new RecordLink(RenewalCodes.ENTITY, c.getId().toString(), c.getRenewalRef())));
+    if (delivery.ccm()) {
+      return toCcm(
+          c, letter, new LetterDelivery.Mail(email.strip(), rendered.subject(), rendered.body()));
+    }
+    QueuedEmail queued = mail(c, letter, email.strip(), rendered);
     letter.queued(queued.messageId(), email.strip(), true);
     audit.record(
         RenewalCodes.ENTITY,
         c.getRenewalRef(),
         AuditAction.SUBMIT,
         letter.getLetterNo() + " sent to " + email.strip() + " (protected)");
+    return Optional.empty();
+  }
+
+  private Optional<String> toCcm(
+      RenewalCandidate c, RenewalLetter letter, LetterDelivery.Mail mail) {
+    LetterDelivery.Handoff handoff = delivery.toCcm(c, letter, mail);
+    letter.queued(null, mail.to(), true);
+    if (handoff.failure().isPresent()) {
+      letter.delivered(false, handoff.failure().get(), clock.instant());
+      return handoff.failure();
+    }
+    audit.record(
+        RenewalCodes.ENTITY,
+        c.getRenewalRef(),
+        AuditAction.SUBMIT,
+        letter.getLetterNo()
+            + " submitted to CCM for "
+            + mail.to()
+            + " ("
+            + handoff.messageNo()
+            + ")");
+    return Optional.empty();
+  }
+
+  private QueuedEmail mail(
+      RenewalCandidate c, RenewalLetter letter, String email, LetterContent.Rendered rendered) {
+    return messages.queueEmail(
+        new OutboundEmail(
+            c.getCompanyId(),
+            RenewalCodes.PURPOSE_LETTER,
+            List.of(email),
+            List.of(),
+            rendered.subject(),
+            rendered.body(),
+            List.of(new MessageFile(delivery.fileName(c, letter), PDF, rendered.pdf())),
+            delivery.protection(
+                c.getSnapshot().client() == null ? null : c.getSnapshot().client().clientId()),
+            new RecordLink(RenewalCodes.ENTITY, c.getId().toString(), c.getRenewalRef())));
+  }
+
+  /**
+   * Sends a letter again (delivery failed or the client asks for another copy): a new transmission
+   * of the same stored letter; the letter and its attachment stay as they are, the resend is in the
+   * audit trail (FRRN.022.01, FRRN.023.02).
+   *
+   * @param c renewal
+   * @param letter letter already sent or failed
+   * @return the refusal, empty when queued
+   */
+  public Optional<String> resend(RenewalCandidate c, RenewalLetter letter) {
+    String email = c.getSnapshot().client() == null ? null : c.getSnapshot().client().email();
+    if (email == null || email.isBlank()) {
+      return Optional.of("The client of " + c.getRenewalRef() + " has no registered e-mail");
+    }
+    LetterContent.Rendered rendered =
+        content.render(
+            c,
+            letter.getType(),
+            letter.getNotice(),
+            letter.getLetterNo(),
+            BusinessClock.dateOf(letter.getGeneratedAt()));
+    String channel;
+    if (delivery.ccm()) {
+      LetterDelivery.Handoff handoff =
+          delivery.toCcm(
+              c,
+              letter,
+              new LetterDelivery.Mail(email.strip(), rendered.subject(), rendered.body()));
+      if (handoff.failure().isPresent()) {
+        return handoff.failure();
+      }
+      channel = "CCM " + handoff.messageNo();
+    } else {
+      channel = "e-mail " + mail(c, letter, email.strip(), rendered).messageId();
+    }
+    audit.record(
+        RenewalCodes.ENTITY,
+        c.getRenewalRef(),
+        AuditAction.SUBMIT,
+        letter.getLetterNo() + " resent to " + email.strip() + " by " + channel);
     return Optional.empty();
   }
 
@@ -244,7 +321,8 @@ public class LetterWriter {
     return Optional.empty();
   }
 
-  private Long store(RenewalCandidate c, LetterType type, String no, byte[] pdf) {
+  private Long store(RenewalCandidate c, LetterType type, String fileName, byte[] pdf) {
+    String no = fileName.substring(0, fileName.length() - ".pdf".length());
     List<AttachmentTarget> targets = new ArrayList<>();
     if (c.getRenewalArn() != null) {
       accounts
@@ -258,7 +336,7 @@ public class LetterWriter {
         documents
             .upload(
                 new AttachmentTarget(RenewalCodes.ENTITY, c.getId().toString()),
-                List.of(new UploadedFile(no + ".pdf", pdf)),
+                List.of(new UploadedFile(fileName, pdf)),
                 new UploadOptions(
                     type == LetterType.RA
                         ? RenewalCodes.DOC_RENEWAL_ADVICE

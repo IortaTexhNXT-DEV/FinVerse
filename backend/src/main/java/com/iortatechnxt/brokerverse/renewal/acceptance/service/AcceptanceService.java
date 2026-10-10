@@ -16,6 +16,7 @@ import com.iortatechnxt.brokerverse.renewal.domain.RenewalAcceptance;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalAcceptanceRepository;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalCandidate;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalStage;
+import com.iortatechnxt.brokerverse.renewal.holdcover.service.HoldCoverBatches;
 import com.iortatechnxt.brokerverse.renewal.service.RenewalCodes;
 import com.iortatechnxt.brokerverse.renewal.service.RenewalFlow;
 import com.iortatechnxt.brokerverse.renewal.service.RenewalNotices;
@@ -47,6 +48,7 @@ public class AcceptanceService {
   private final RenewalNotices notices;
   private final AuditTrailService audit;
   private final Clock clock;
+  private final HoldCoverBatches holdCovers;
 
   /**
    * Creates the service.
@@ -59,6 +61,7 @@ public class AcceptanceService {
    * @param notices notifications
    * @param audit audit trail
    * @param clock clock
+   * @param holdCovers automatic hold cover request of a Non-CBG renewal
    */
   @SuppressWarnings("java:S107") // constructor injection
   public AcceptanceService(
@@ -69,7 +72,9 @@ public class AcceptanceService {
       RenewalFlow flow,
       RenewalNotices notices,
       AuditTrailService audit,
-      Clock clock) {
+      Clock clock,
+      HoldCoverBatches holdCovers) {
+    this.holdCovers = holdCovers;
     this.records = records;
     this.acceptances = acceptances;
     this.blocking = blocking;
@@ -130,7 +135,13 @@ public class AcceptanceService {
         new RenewalNotices.Text(
             c.getRenewalRef() + " accepted by the client",
             c.getSnapshot().clientName() + " accepted the renewal by " + label(input.method())));
+    requestHoldCover(c);
     return acceptance;
+  }
+
+  /** FRRN.036.02: the hold cover of a Non-CBG renewal is requested once the client confirms. */
+  private void requestHoldCover(RenewalCandidate c) {
+    holdCovers.afterAcceptance(c.getId());
   }
 
   /**

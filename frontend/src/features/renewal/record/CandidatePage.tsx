@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Building2, CalendarClock, Download, Layers, User, Users, Wallet } from 'lucide-react';
 import { useParams } from 'react-router-dom';
@@ -29,6 +30,7 @@ import { RENEWAL_SECTION, dispositionLabel } from '../common/renewalCodes';
 import { WORKFLOW_VIEW } from '../common/presentation';
 import { RecordActions } from './RecordActions';
 import { DetailsTab } from './DetailsTab';
+import { PlacementTab } from '../placement/PlacementTab';
 import { HoldCoverTab } from './HoldCoverTab';
 import { AccountHistoryTab, HistoryTab, NotesTab } from './HistoryTabs';
 import { ChecksTab, ComputationsTab, InsurerTab, LettersTab } from './RecordTabs';
@@ -45,6 +47,7 @@ const TABS = [
   { id: 'insurer', label: 'Insurer' },
   { id: 'letters', label: 'Letters' },
   { id: 'hold-cover', label: 'Hold Cover' },
+  { id: 'placement', label: 'Placement' },
   { id: 'documents', label: 'Documents' },
   { id: 'notes', label: 'Remarks & Follow-ups' },
   { id: 'history', label: 'History' },
@@ -78,38 +81,30 @@ function facts(d: CandidateDetail): Fact[] {
   ];
 }
 
+const BODIES: Partial<Record<TabId, (detail: CandidateDetail) => ReactNode>> = {
+  checks: (d) => <ChecksTab detail={d} />,
+  account: (d) => <AccountHistoryTab detail={d} />,
+  computations: (d) => <ComputationsTab detail={d} />,
+  insurer: (d) => <InsurerTab detail={d} />,
+  letters: (d) => <LettersTab detail={d} />,
+  'hold-cover': (d) => <HoldCoverTab detail={d} />,
+  placement: (d) => <PlacementTab detail={d} />,
+  documents: (d) => (
+    <Attachments
+      entityType={ENTITY}
+      entityId={d.lifecycle.id}
+      title="Documents"
+      reference={d.row.renewalRef}
+    />
+  ),
+  notes: (d) => <NotesTab detail={d} />,
+  history: (d) => <HistoryTab detail={d} />,
+  audit: (d) => <AuditLogTable filters={{ ref: d.row.renewalRef }} showReference={false} />,
+};
+
 function Body({ tab, detail }: Readonly<{ tab: TabId; detail: CandidateDetail }>) {
-  switch (tab) {
-    case 'checks':
-      return <ChecksTab detail={detail} />;
-    case 'account':
-      return <AccountHistoryTab detail={detail} />;
-    case 'computations':
-      return <ComputationsTab detail={detail} />;
-    case 'insurer':
-      return <InsurerTab detail={detail} />;
-    case 'letters':
-      return <LettersTab detail={detail} />;
-    case 'hold-cover':
-      return <HoldCoverTab detail={detail} />;
-    case 'documents':
-      return (
-        <Attachments
-          entityType={ENTITY}
-          entityId={detail.lifecycle.id}
-          title="Documents"
-          reference={detail.row.renewalRef}
-        />
-      );
-    case 'notes':
-      return <NotesTab detail={detail} />;
-    case 'history':
-      return <HistoryTab detail={detail} />;
-    case 'audit':
-      return <AuditLogTable filters={{ ref: detail.row.renewalRef }} showReference={false} />;
-    default:
-      return <DetailsTab detail={detail} />;
-  }
+  const body = BODIES[tab];
+  return body === undefined ? <DetailsTab detail={detail} /> : body(detail);
 }
 
 /**

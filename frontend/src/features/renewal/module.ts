@@ -1,4 +1,6 @@
 import {
+  FileCheck2,
+  Send,
   ArrowLeftRight,
   ChartColumn,
   Gauge,
@@ -14,6 +16,7 @@ import {
   RefreshCcw,
   ScrollText,
   Settings2,
+  RadioTower,
   ShieldAlert,
   UserCheck,
   Workflow,
@@ -106,6 +109,20 @@ export const renewalModule: FeatureModule = {
       component: lazy(() => import('./processing/ProcessingPage')),
     },
     {
+      path: '/renewal/placement',
+      label: 'Submitted for Placement',
+      icon: Send,
+      permission: 'RNW_PROCESS',
+      component: lazy(() => import('./placement/PlacementPage')),
+    },
+    {
+      path: '/renewal/epolicies',
+      label: 'E-Policies',
+      icon: FileCheck2,
+      permission: 'RNW_PROCESS',
+      component: lazy(() => import('./epolicy/EpolicyPage')),
+    },
+    {
       path: '/renewal/insurer',
       label: 'Insurer Batches',
       icon: Landmark,
@@ -140,6 +157,13 @@ export const renewalModule: FeatureModule = {
       permission: 'RNW_RMU_MAINTAIN',
       alsoPermissions: ['RNW_LAMD_UPLOAD'],
       component: lazy(() => import('./uploads/RmuOfficersPage')),
+    },
+    {
+      path: '/renewal/channels',
+      label: 'Channel Monitor',
+      icon: RadioTower,
+      permission: 'RNW_CHANNEL_MONITOR',
+      component: lazy(() => import('./channels/ChannelMonitorPage')),
     },
     {
       path: '/renewal/audit-logs',

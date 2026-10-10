@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.attachment.service.DocumentService;
 import com.iortatechnxt.brokerverse.common.api.ContentDispositions;
 import com.iortatechnxt.brokerverse.renewal.domain.RaNotice;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalLetter;
+import com.iortatechnxt.brokerverse.renewal.letter.service.LetterActions;
 import com.iortatechnxt.brokerverse.renewal.letter.service.LetterService;
 import com.iortatechnxt.brokerverse.renewal.service.BatchOutcome;
 import jakarta.validation.Valid;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class LetterController {
 
   private final LetterService letters;
+  private final LetterActions actions;
   private final DocumentService documents;
 
   /**
@@ -36,8 +38,10 @@ public class LetterController {
    *
    * @param letters letters
    * @param documents documents (letter files)
+   * @param actions Generate and Send RA, resend
    */
-  public LetterController(LetterService letters, DocumentService documents) {
+  public LetterController(LetterService letters, DocumentService documents, LetterActions actions) {
+    this.actions = actions;
     this.letters = letters;
     this.documents = documents;
   }
@@ -54,6 +58,40 @@ public class LetterController {
     return letters.generateRa(
         request.companyId(), request.renewalRefs(), request.notice(), request.confirmLate());
   }
+
+  /**
+   * Generates and sends Renewal Advices at once.
+   *
+   * @param request selection, notice and late confirmation
+   * @return outcome
+   */
+  @PostMapping("/letters/ra-send")
+  @PreAuthorize("hasAuthority('RNW_RA_GENERATE') and hasAuthority('RNW_RA_SEND')")
+  public BatchOutcome generateAndSendRa(@Valid @RequestBody RaRequest request) {
+    return actions.generateAndSendRa(
+        request.companyId(), request.renewalRefs(), request.notice(), request.confirmLate());
+  }
+
+  /**
+   * Sends a letter again.
+   *
+   * @param companyId company
+   * @param letterNo letter
+   * @return the refusal, null when sent
+   */
+  @PostMapping("/letters/{letterNo}/resend")
+  @PreAuthorize("hasAnyAuthority('RNW_RA_SEND','RNW_PROCESS')")
+  public Resent resend(@RequestParam Long companyId, @PathVariable String letterNo) {
+    return new Resent(letterNo, actions.resend(companyId, letterNo));
+  }
+
+  /**
+   * The outcome of a resend.
+   *
+   * @param letterNo letter
+   * @param refusal refusal, null when sent
+   */
+  public record Resent(String letterNo, String refusal) {}
 
   /**
    * Sends the generated Renewal Advices.

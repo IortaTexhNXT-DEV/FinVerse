@@ -143,6 +143,52 @@ export const RENEWAL_HELP: HelpSection = {
       controls: ['A renewal has one open transfer request at a time.'],
     },
     {
+      name: 'Channel Monitor',
+      path: '/renewal/channels',
+      summary:
+        'Documents sent to clients through CCM and to insurers through MFT, with their delivery status and the connection of each channel.',
+      workflow: [
+        'Filter by channel, delivery status or reference number; open the delivery history of a message.',
+        'Resend a failed or delivered document: a new transmission of the same stored document. Cancel a message not yet transmitted.',
+        'Download the error report of the failed messages to correct the recipients and resend.',
+      ],
+      controls: [
+        'Pending Transmission, Submitted to CCM, Sent, Delivered, Failed and Cancelled are kept with their time.',
+        'Each channel runs on its live interface or on the simulator of the test environments, by its setting.',
+      ],
+    },
+    {
+      name: 'Submitted for Placement',
+      path: '/renewal/placement',
+      summary:
+        'Renewal accounts posted and submitted for placement and booking: placement slips and placement files, their sending to the insurers, the Insurance Advice and the return to Marketing.',
+      workflow: [
+        'Select one or more accounts and Generate Placement: one placement slip per insurer of each account and, for packaged accounts, one placement file per insurer; accounts tagged For Booking Only are left out.',
+        'Send Placement: insurers enrolled in MFT receive the files in their MFT location; the others through CCM to the recipients of Insurer Maintenance, which can be changed, with copy recipients. A sent account is For Booking.',
+        'On the Placement tab of the account, follow the turnaround time and SLA, tag the placement With Issue with its resolution date, record the insurer response or cancel a rejected placement.',
+        'Send Insurance Advice sends the latest advice of the selected mortgaged accounts through CCM; Return sends an account Submitted for Placement or Rejected Placement back to Marketing with a reason.',
+      ],
+      controls: [
+        'Turnaround time in business days from the placement submission (after the cut-off hour, from the next business day): 3 days for packaged accounts and 10 for non-package accounts by default.',
+        'Whether the insurer approval books the account is a setting; the Insurance Advice gets a new version when the placement changes.',
+      ],
+    },
+    {
+      name: 'E-Policies',
+      path: '/renewal/epolicies',
+      summary:
+        'E-policy files from the insurers (summary file and ZIP file, by upload or MFT), the sending of the e-policies to the clients through CCM and the upload of e-policy numbers.',
+      workflow: [
+        'Upload the E-Policy Summary File and the E-Policy ZIP File; open a receipt to see each record matched or unmatched.',
+        'On For E-Policy Sending, select one, several or all eligible accounts, add copy recipients and send; the summary shows the accounts submitted, failed and pending.',
+        'Upload E-Policy Numbers with the template: reference number and policy number.',
+      ],
+      controls: [
+        'Both files are required and every document of the ZIP file must be in the summary file.',
+        'An e-policy number already held by another active account is refused into the exception report.',
+      ],
+    },
+    {
       name: 'RMU Account Maintenance',
       path: '/renewal/rmu-officers',
       summary: 'Account Officer codes of the Remedial Management Unit used by the LAMD upload.',

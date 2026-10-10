@@ -11,7 +11,9 @@ public enum UploadKind {
   /** Insurer disposition files (FRRN.013.01). */
   INSURER(List.of("RNW_INSURER_DISPOSITION", "RNW_INSURER_RESPONSE"), "Insurer Disposition"),
   /** Renewal Update files (FRRN.015.03). */
-  UPDATE(List.of("RNW_RENEWAL_UPDATE", "RNW_DISPOSITION_UPLOAD"), "Renewal Update");
+  UPDATE(List.of("RNW_RENEWAL_UPDATE", "RNW_DISPOSITION_UPLOAD"), "Renewal Update"),
+  /** Hold cover response files (FRRN.037.01). */
+  HOLD_COVER(List.of("RNW_HOLD_COVER_RESPONSE"), "Hold Cover Response");
 
   private final List<String> handlers;
   private final String resultPrefix;

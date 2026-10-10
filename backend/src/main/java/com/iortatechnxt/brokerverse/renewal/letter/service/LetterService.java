@@ -26,9 +26,7 @@ import com.iortatechnxt.brokerverse.renewal.service.RenewalParameters;
 import com.iortatechnxt.brokerverse.renewal.service.RenewalRecords;
 import com.iortatechnxt.brokerverse.workflow.service.TransitionNote;
 import java.time.Clock;
-import java.time.Instant;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
@@ -53,6 +51,7 @@ public class LetterService {
   private final BlockingChecks blocking;
   private final RenewalFlow flow;
   private final RenewalParameters parameters;
+  private final RaNotices notices;
   private final RenewalBatch batch;
   private final DocumentNumberService numbers;
   private final CurrentUser currentUser;
@@ -69,6 +68,7 @@ public class LetterService {
    * @param blocking blocking checks
    * @param flow workflow
    * @param parameters parameters
+   * @param notices notice and due-date rules of the letters
    * @param batch batch runner
    * @param numbers document numbers
    * @param currentUser current user
@@ -84,6 +84,7 @@ public class LetterService {
       BlockingChecks blocking,
       RenewalFlow flow,
       RenewalParameters parameters,
+      RaNotices notices,
       RenewalBatch batch,
       DocumentNumberService numbers,
       CurrentUser currentUser,
@@ -96,6 +97,7 @@ public class LetterService {
     this.blocking = blocking;
     this.flow = flow;
     this.parameters = parameters;
+    this.notices = notices;
     this.batch = batch;
     this.numbers = numbers;
     this.currentUser = currentUser;
@@ -124,11 +126,12 @@ public class LetterService {
   }
 
   private void generateOne(
-      RenewalCandidate c, LetterBatch.Kind kind, boolean confirmLate, LetterBatch run) {
+      RenewalCandidate c, LetterBatch.Kind requested, boolean confirmLate, LetterBatch run) {
     LocalDate today = BusinessClock.today(clock);
     long days = c.daysToExpiry(today);
+    LetterBatch.Kind kind = notices.kindOf(c, requested);
     if (kind.notice() == RaNotice.SECOND) {
-      requireSecondNotice(c, today);
+      notices.requireSecondNotice(c, today);
     } else {
       RenewalRecords.requireStage(c, RenewalStage.RA_READY);
       blocking.require(c, "have its Renewal Advice generated");
@@ -148,31 +151,6 @@ public class LetterService {
     if (kind.notice() == RaNotice.FIRST) {
       c.lockMarketing(clock.instant());
       flow.act(c, "generate_ra", TransitionNote.comment("Renewal Advice generated"));
-    }
-  }
-
-  private void requireSecondNotice(RenewalCandidate c, LocalDate today) {
-    RenewalRecords.requireStage(c, RenewalStage.RA_SENT);
-    Instant firstSent =
-        letters.findByCandidateIdOrderByIdDesc(c.getId()).stream()
-            .filter(l -> l.getType() == LetterType.RA && l.getNotice() == RaNotice.FIRST)
-            .map(RenewalLetter::getSentAt)
-            .filter(java.util.Objects::nonNull)
-            .findFirst()
-            .orElseThrow(
-                () ->
-                    new BusinessRuleException(
-                        "RNW_RA_SECOND",
-                        RENEWAL + c.getRenewalRef() + " has no first notice sent"));
-    long since = ChronoUnit.DAYS.between(BusinessClock.dateOf(firstSent), today);
-    if (since < parameters.raSecondNoticeDays()) {
-      throw new BusinessRuleException(
-          "RNW_RA_SECOND",
-          "The second notice of "
-              + c.getRenewalRef()
-              + " is due "
-              + parameters.raSecondNoticeDays()
-              + " days after the first");
     }
   }
 
@@ -266,6 +244,7 @@ public class LetterService {
           RenewalCandidate c = records.get(companyId, ref);
           LetterType type = closingTypeAtExpiry(c);
           requireNoOtherClosingLetter(c, type);
+          notices.requireClosingDue(c, type);
           RenewalLetter letter =
               pendingOptional(c, type)
                   .orElseGet(

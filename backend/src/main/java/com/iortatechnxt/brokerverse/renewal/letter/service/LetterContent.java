@@ -52,6 +52,7 @@ public class LetterContent {
   private final AppUserRepository users;
   private final LovService lovs;
   private final SubmittedHandOffRecordRepository handOffs;
+  private final AnnexTemplates annexTemplates;
 
   /**
    * Creates the content builder.
@@ -64,6 +65,7 @@ public class LetterContent {
    * @param users user names
    * @param lovs labels
    * @param handOffs terms of the submitted policies handed over (FFY template)
+   * @param annexTemplates the SFU letter and the FFY Reminder
    */
   @SuppressWarnings("java:S107") // constructor injection
   public LetterContent(
@@ -74,7 +76,8 @@ public class LetterContent {
       InsurerProfileRepository insurers,
       AppUserRepository users,
       LovService lovs,
-      SubmittedHandOffRecordRepository handOffs) {
+      SubmittedHandOffRecordRepository handOffs,
+      AnnexTemplates annexTemplates) {
     this.templates = templates;
     this.composer = composer;
     this.organization = organization;
@@ -83,6 +86,7 @@ public class LetterContent {
     this.users = users;
     this.lovs = lovs;
     this.handOffs = handOffs;
+    this.annexTemplates = annexTemplates;
   }
 
   /**
@@ -106,9 +110,9 @@ public class LetterContent {
   }
 
   /**
-   * The template of a letter of a renewal: the first RA of a Free First Year submitted policy is
-   * the FFY variant, and the no-response reminder of a mortgaged submitted policy is the follow-up
-   * letter SFU (wave R3).
+   * The template of a letter of a renewal (Annex M): the first RA of a Free First Year account is
+   * the FFY Reminder, the No Advice Letter of a mortgaged Motor account is the SFU letter, and the
+   * no-response reminder of a mortgaged submitted policy is the follow-up letter SFU (wave R3).
    *
    * @param c renewal
    * @param type letter type
@@ -116,6 +120,10 @@ public class LetterContent {
    * @return template code
    */
   public String templateOf(RenewalCandidate c, LetterType type, RaNotice notice) {
+    String annex = annexTemplates.of(c, type, notice);
+    if (annex != null) {
+      return annex;
+    }
     if (c.getSource() != CandidateSource.SUBMITTED_POLICY || c.getId() == null) {
       return template(type, notice);
     }

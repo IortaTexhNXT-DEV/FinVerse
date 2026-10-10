@@ -28,7 +28,7 @@ export interface UploadType {
 }
 
 export interface UploadDefinition {
-  kind: 'LAMD' | 'BDOFC' | 'INSURER' | 'UPDATE';
+  kind: 'LAMD' | 'BDOFC' | 'INSURER' | 'UPDATE' | 'HOLD_COVER' | 'PLACEMENT';
   button: string;
   permission: string;
   /** Completion message of BDOI. */
@@ -71,5 +71,19 @@ export const UPLOADS: UploadDefinition[] = [
     permission: 'RNW_UPLOAD',
     done: 'Renewal Update file is successfully processed. Records have been matched and updated accordingly.',
     types: [{ label: 'Renewal Update file', handler: 'RNW_RENEWAL_UPDATE' }],
+  },
+  {
+    kind: 'HOLD_COVER',
+    button: 'Hold Cover Response Upload',
+    permission: 'RNW_PROCESS',
+    done: 'Hold Cover Response file is successfully processed. Records have been matched and updated accordingly.',
+    types: [{ label: 'Hold cover response file', handler: 'RNW_HOLD_COVER_RESPONSE' }],
+  },
+  {
+    kind: 'PLACEMENT',
+    button: 'Placement Response Upload',
+    permission: 'RNW_PROCESS',
+    done: 'Placement Response file is successfully processed. Records have been matched and updated accordingly.',
+    types: [{ label: 'Placement response file', handler: 'RNW_PLACEMENT_RESPONSE' }],
   },
 ];

@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.renewal;
 
+import static com.iortatechnxt.brokerverse.renewal.RenewalFixtures.ADMIN;
 import static com.iortatechnxt.brokerverse.renewal.RenewalFixtures.AO;
 import static com.iortatechnxt.brokerverse.renewal.RenewalFixtures.PO;
 import static com.iortatechnxt.brokerverse.renewal.RenewalFixtures.PROC_TL;
@@ -75,6 +76,10 @@ class RenewalLettersIT {
   @Autowired private InsurerBatchService batches;
   @Autowired private RenewalInsurerResponseService responses;
   @Autowired private LetterService letters;
+
+  @Autowired
+  private com.iortatechnxt.brokerverse.renewal.letter.service.LetterActions letterActions;
+
   @Autowired private LetterSweeps sweeps;
   @Autowired private AcceptanceService acceptances;
   @Autowired private CandidateQueryService queries;
@@ -85,6 +90,14 @@ class RenewalLettersIT {
   @Autowired private DocumentService documents;
   @Autowired private TransactionTemplate tx;
   @Autowired private AsUser as;
+  @Autowired private com.iortatechnxt.brokerverse.renewal.channel.service.ChannelService channels;
+
+  @Autowired
+  private com.iortatechnxt.brokerverse.renewal.channel.domain.ChannelMessageRepository
+      channelMessages;
+
+  @Autowired private com.iortatechnxt.brokerverse.system.service.SystemParameterService parameters;
+  @Autowired private org.springframework.jdbc.core.JdbcTemplate jdbc;
 
   private RenewalCandidate raReady(PaymentArrangement arrangement) {
     RenewalCandidate c = fx.extracted(fx.book("MTR10", "RETAIL", arrangement));
@@ -248,5 +261,54 @@ class RenewalLettersIT {
     RenewalCandidate swept = fx.reload(other);
     assertThat(swept.getStage()).isEqualTo(RenewalStage.CLOSED);
     assertThat(swept.getClosedAs()).isEqualTo(ClosedAs.EXPIRED_UNRENEWED);
+  }
+
+  @Test
+  void generateAndSendRaHandsTheFirstNoticeToCcmUnderTheClientsFileNameAndItIsDelivered() {
+    RenewalCandidate c = raReady(PaymentArrangement.DIRECT_TO_INSURER);
+    List<String> ref = List.of(c.getRenewalRef());
+    BatchOutcome sent =
+        as.run(PO, () -> letterActions.generateAndSendRa(fx.company(), ref, RaNotice.SECOND, true));
+    assertThat(sent.refused()).as(failing(c).toString()).isEmpty();
+    assertThat(fx.reload(c).getStage()).isEqualTo(RenewalStage.RA_SENT);
+    RenewalLetter ra = as.run(PO, () -> letters.of(fx.company(), c.getRenewalRef())).get(0);
+    assertThat(ra.getNotice()).isEqualTo(RaNotice.FIRST);
+    var message =
+        channelMessages
+            .findByCompanyIdAndDocRefOrderByIdDesc(fx.company(), ra.getLetterNo())
+            .get(0);
+    assertThat(message.getExternalRef()).startsWith("CCMSIM-");
+    assertThat(message.getFileName())
+        .matches("MTR_RA_First Notice_" + c.getRenewalRef() + "_\\d{8}\\.pdf");
+    as.run(PO, () -> channels.refresh());
+    as.run(PO, () -> sweeps.refreshDeliveries());
+    RenewalLetter delivered = as.run(PO, () -> letters.letter(fx.company(), ra.getLetterNo()));
+    assertThat(delivered.getStatus()).isEqualTo(LetterStatus.SENT);
+    assertThat(as.run(PO, () -> letterActions.resend(fx.company(), ra.getLetterNo()))).isNull();
+    assertThat(
+            channelMessages.findByCompanyIdAndDocRefOrderByIdDesc(fx.company(), ra.getLetterNo()))
+        .hasSize(2);
+    assertThat(as.run(PO, () -> letters.letter(fx.company(), ra.getLetterNo())).getAttachmentId())
+        .isEqualTo(ra.getAttachmentId());
+  }
+
+  @Test
+  void byEmailTheRenewalAdviceIsAProtectedEmailWithItsPasswordInASeparateEmail() {
+    RenewalCandidate c = raReady(PaymentArrangement.DIRECT_TO_INSURER);
+    List<String> ref = List.of(c.getRenewalRef());
+    as.run(ADMIN, () -> parameters.update("RNW_DELIVERY_CHANNEL", "EMAIL"));
+    try {
+      as.run(PO, () -> letterActions.generateAndSendRa(fx.company(), ref, RaNotice.FIRST, true));
+    } finally {
+      as.run(ADMIN, () -> parameters.update("RNW_DELIVERY_CHANNEL", "CCM"));
+    }
+    RenewalLetter ra = as.run(PO, () -> letters.of(fx.company(), c.getRenewalRef())).get(0);
+    assertThat(ra.getMessageId()).isNotNull();
+    Integer mails =
+        jdbc.queryForObject(
+            "select count(*) from msg_outbound where entity_type = 'RenewalCandidate' and entity_id = ?",
+            Integer.class,
+            c.getId().toString());
+    assertThat(mails).isGreaterThanOrEqualTo(2);
   }
 }

@@ -165,7 +165,9 @@ class RenewalDocumentWordsTest {
             insurers,
             mock(com.iortatechnxt.brokerverse.security.domain.AppUserRepository.class),
             mock(LovService.class),
-            null);
+            null,
+            new com.iortatechnxt.brokerverse.renewal.letter.service.AnnexTemplates(
+                mock(com.iortatechnxt.brokerverse.account.domain.AccountRepository.class)));
 
     Map<String, Object> values = content.values(candidate(), EXPIRY.minusMonths(3));
 

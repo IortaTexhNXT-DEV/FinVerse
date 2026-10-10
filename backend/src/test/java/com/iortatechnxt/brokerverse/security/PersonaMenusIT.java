@@ -99,6 +99,7 @@ class PersonaMenusIT {
           Map.entry("/renewal/transfers", "/api/v1/renewal/transfers/incoming?companyId={c}"),
           Map.entry("/renewal/referrals", "/api/v1/renewal/referrals?companyId={c}"),
           Map.entry("/renewal/rmu-officers", "/api/v1/renewal/rmu-officers?companyId={c}"),
+          Map.entry("/renewal/channels", "/api/v1/renewal/channels?companyId={c}"),
           Map.entry(
               "/renewal/processing", "/api/v1/renewal/candidates?companyId={c}&tab=FOR_PROCESSING"),
           Map.entry("/renewal/insurer", "/api/v1/renewal/insurer-batches?companyId={c}"),

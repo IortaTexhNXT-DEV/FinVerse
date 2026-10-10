@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
-import { Download } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { renewalApi } from '@/api/renewal';
 import type { CandidateRow, RenewalFilters, RenewalTab } from '@/api/renewal';
+import type { ExportFormat } from '@/api/reports';
 import { useAuth } from '@/auth/authContext';
 import { selectionColumn, useRowSelection } from '@/components/broking/rowSelection';
 import type { RowSelection } from '@/components/broking/rowSelection';
@@ -17,6 +17,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageFooter } from '@/components/ui/Pager';
 import { Tabs } from '@/components/ui/Tabs';
 import { useCompanyId } from '@/context/workspaceContext';
+import { ExportButtons } from '@/features/reports/ExportButtons';
 import { CandidateFilters } from './CandidateFilters';
 import { candidateColumns } from './candidateColumns';
 import type { RenewalTabDef } from './renewalCodes';
@@ -62,15 +63,23 @@ function QuickFilters({
 function ExportButton({ filters }: Readonly<{ filters: RenewalFilters }>) {
   const companyId = useCompanyId();
   const download = useFileDownload();
+  const [format, setFormat] = useState<ExportFormat>('XLSX');
   return (
-    <Button
+    <ExportButtons
+      formats={['XLSX', 'PDF', 'CSV']}
       variant="ghost"
-      icon={<Download size={16} />}
-      busy={download.isPending}
-      onClick={() => download.mutate(() => renewalApi.exportList(companyId, filters))}
-    >
-      Download
-    </Button>
+      prefix="Download"
+      pending={download.isPending ? format : undefined}
+      onExport={(f) => {
+        setFormat(f);
+        const as = f === 'PDF' ? 'pdf' : 'csv';
+        download.mutate(() =>
+          f === 'XLSX'
+            ? renewalApi.exportList(companyId, filters)
+            : renewalApi.exportListAs(companyId, filters, as),
+        );
+      }}
+    />
   );
 }
 

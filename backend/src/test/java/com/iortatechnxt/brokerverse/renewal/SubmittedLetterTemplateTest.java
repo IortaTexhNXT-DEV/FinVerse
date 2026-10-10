@@ -26,7 +26,17 @@ class SubmittedLetterTemplateTest {
   private final SubmittedHandOffRecordRepository handOffs =
       mock(SubmittedHandOffRecordRepository.class);
   private final LetterContent content =
-      new LetterContent(null, null, null, null, null, null, null, handOffs);
+      new LetterContent(
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          handOffs,
+          new com.iortatechnxt.brokerverse.renewal.letter.service.AnnexTemplates(
+              mock(com.iortatechnxt.brokerverse.account.domain.AccountRepository.class)));
 
   private RenewalCandidate candidate(CandidateSource source, boolean mortgaged) {
     RenewalCandidate c =

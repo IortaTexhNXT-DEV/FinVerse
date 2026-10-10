@@ -108,6 +108,8 @@ public class RenewalParameters {
   /** Parameter: waiting days after the effective expiry before the NRNS tag (BRRN.037). */
   public static final String NRNS_WAITING_DAYS = "RNW_NRNS_WAITING_DAYS";
 
+  private static final int NON_CBG_NRL_OFFSET = 3;
+  private static final int DEFAULT_LAST_NOTICE = 45;
   private static final int DEFAULT_HOLD_COVER = 30;
   private static final int DEFAULT_LEAD = 140;
   private static final int DEFAULT_MIN_NOTICE = 30;
@@ -249,6 +251,41 @@ public class RenewalParameters {
    */
   public int raMinNoticeDays() {
     return parameters.intValue(RA_MIN_NOTICE, DEFAULT_MIN_NOTICE);
+  }
+
+  /**
+   * Whether the system determines the notice of a Renewal Advice (First Notice, Last Notice).
+   *
+   * @return true unless the user chooses
+   */
+  public boolean raNoticeAutomatic() {
+    return !"MANUAL".equals(parameters.text("RNW_RA_NOTICE_MODE", "AUTOMATIC").strip());
+  }
+
+  /**
+   * Days after the effective expiry date of a closing letter (Annex M): the No Advice Letter, or
+   * the Non-Renewal Letter of a CBG or Non-CBG account.
+   *
+   * @param nal true for the No Advice Letter
+   * @param segment market segment of the account
+   * @return days
+   */
+  public int closingLetterOffset(boolean nal, String segment) {
+    if (nal) {
+      return parameters.intValue("RNW_NAL_OFFSET_DAYS", 1);
+    }
+    return cbgSegment(segment)
+        ? parameters.intValue("RNW_NRL_OFFSET_DAYS_CBG", 1)
+        : parameters.intValue("RNW_NRL_OFFSET_DAYS_NON_CBG", NON_CBG_NRL_OFFSET);
+  }
+
+  /**
+   * Days before expiry of the Renewal Advice Last Notice.
+   *
+   * @return days
+   */
+  public int raLastNoticeDays() {
+    return parameters.intValue("RNW_RA_LAST_NOTICE_DAYS", DEFAULT_LAST_NOTICE);
   }
 
   /**

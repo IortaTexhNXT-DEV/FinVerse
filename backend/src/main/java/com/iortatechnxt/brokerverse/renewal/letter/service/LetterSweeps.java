@@ -6,6 +6,8 @@ import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.messaging.domain.MessageStatus;
 import com.iortatechnxt.brokerverse.messaging.domain.OutboundMessage;
 import com.iortatechnxt.brokerverse.messaging.domain.OutboundMessageRepository;
+import com.iortatechnxt.brokerverse.renewal.channel.domain.ChannelMessageRepository;
+import com.iortatechnxt.brokerverse.renewal.channel.domain.ChannelStatus;
 import com.iortatechnxt.brokerverse.renewal.domain.CandidateExpiry;
 import com.iortatechnxt.brokerverse.renewal.domain.ClosedAs;
 import com.iortatechnxt.brokerverse.renewal.domain.LetterBatch;
@@ -75,6 +77,7 @@ public class LetterSweeps {
   private final OutboundMessageRepository messages;
   private final AlertService alerts;
   private final RenewalHoldCoverService holdCovers;
+  private final ChannelMessageRepository channelMessages;
   private final Clock clock;
 
   /**
@@ -89,6 +92,7 @@ public class LetterSweeps {
    * @param messages outbound messages
    * @param alerts alerts
    * @param holdCovers hold covers of the renewals (effective expiry date)
+   * @param channelMessages CCM messages of the letters
    * @param clock clock
    */
   @SuppressWarnings("java:S107") // constructor injection
@@ -102,6 +106,7 @@ public class LetterSweeps {
       OutboundMessageRepository messages,
       AlertService alerts,
       RenewalHoldCoverService holdCovers,
+      ChannelMessageRepository channelMessages,
       Clock clock) {
     this.candidates = candidates;
     this.letters = letters;
@@ -112,6 +117,7 @@ public class LetterSweeps {
     this.messages = messages;
     this.alerts = alerts;
     this.holdCovers = holdCovers;
+    this.channelMessages = channelMessages;
     this.clock = clock;
   }
 
@@ -243,6 +249,10 @@ public class LetterSweeps {
   public int refreshDeliveries() {
     int failed = 0;
     for (RenewalLetter letter : letters.findByStatus(LetterStatus.QUEUED)) {
+      if (letter.getMessageId() == null) {
+        failed += fromCcm(letter);
+        continue;
+      }
       OutboundMessage m =
           letter.getMessageId() == null
               ? null
@@ -267,6 +277,29 @@ public class LetterSweeps {
       }
     }
     return failed;
+  }
+
+  /** The delivery of a letter handed to CCM, from its latest CCM message. */
+  private int fromCcm(RenewalLetter letter) {
+    var latest =
+        channelMessages
+            .findByCompanyIdAndDocRefOrderByIdDesc(letter.getCompanyId(), letter.getLetterNo())
+            .stream()
+            .findFirst();
+    if (latest.isEmpty()) {
+      return 0;
+    }
+    ChannelStatus s = latest.get().getStatus();
+    if (s == ChannelStatus.SENT || s == ChannelStatus.DELIVERED) {
+      letter.delivered(
+          true,
+          null,
+          latest.get().getSentAt() == null ? clock.instant() : latest.get().getSentAt());
+    } else if (s == ChannelStatus.FAILED) {
+      letter.delivered(false, latest.get().getLastError(), clock.instant());
+      return 1;
+    }
+    return 0;
   }
 
   private boolean reminded(RenewalCandidate c) {

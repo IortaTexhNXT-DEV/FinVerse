@@ -21,6 +21,8 @@ import {
 } from '../common/presentation';
 import { BucketPill } from '../common/RenewalBits';
 import { severityLabel } from '../setup/setupCodes';
+import { DeliveriesCard } from '../channels/DeliveriesCard';
+import { useResend } from '../channels/useResend';
 import { AutoValuesCard, RefreshEndorsementsButton } from '../updates/AutoValuesCard';
 
 type Props = Readonly<{ detail: CandidateDetail }>;
@@ -224,9 +226,10 @@ export function LettersTab({ detail }: Props) {
     queryKey: ['renewal', 'acceptances', companyId, ref],
     queryFn: () => renewalApi.acceptances(companyId, ref),
   });
+  const resend = useResend(companyId);
   return (
     <div className="stack">
-      <ErrorAlert error={letters.error ?? acceptances.error ?? download.error} />
+      <ErrorAlert error={letters.error ?? acceptances.error ?? download.error ?? resend.error} />
       <Card title="Letters" flush>
         <DataTable<LetterView>
           loading={letters.isLoading}
@@ -272,6 +275,11 @@ export function LettersTab({ detail }: Props) {
                       onSelect: () =>
                         download.mutate(() => renewalApi.letterFile(companyId, l.letterNo)),
                     },
+                    {
+                      label: 'Resend',
+                      hidden: !['SENT', 'FAILED', 'QUEUED'].includes(l.status),
+                      onSelect: () => resend.mutate(l.letterNo),
+                    },
                   ]}
                 />
               ),
@@ -302,6 +310,7 @@ export function LettersTab({ detail }: Props) {
           ]}
         />
       </Card>
+      <DeliveriesCard renewalRef={ref} />
     </div>
   );
 }

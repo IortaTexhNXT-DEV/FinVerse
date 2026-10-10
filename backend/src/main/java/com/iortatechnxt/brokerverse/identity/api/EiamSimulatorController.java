@@ -1,7 +1,6 @@
 package com.iortatechnxt.brokerverse.identity.api;
 
 import com.iortatechnxt.brokerverse.identity.domain.DirectoryAccount;
-import com.iortatechnxt.brokerverse.identity.domain.DirectoryStatus;
 import com.iortatechnxt.brokerverse.identity.service.EiamSimulator;
 import com.iortatechnxt.brokerverse.identity.service.IdentityRefused;
 import com.iortatechnxt.brokerverse.identity.service.IdentitySimulator;
@@ -54,24 +53,6 @@ public class EiamSimulatorController {
   private static final String INVALID_REDIRECT = "INVALID_REDIRECT";
   private static final String TOKEN_REFUSED = "The token request was refused";
 
-  /** The words of the refusal text of each account status that does not grant access. */
-  private static final Map<String, String> REFUSED_STATUS_WORDS =
-      Map.of(
-          DirectoryStatus.INACTIVE.name(), "inactive",
-          DirectoryStatus.LOCKED.name(), "locked",
-          DirectoryStatus.DISABLED.name(), "disabled",
-          DirectoryStatus.DEACTIVATED.name(), "deactivated");
-
-  private static final Map<String, String> REFUSALS =
-      Map.of(
-          "DEVICE_NOT_ALLOWED",
-          "Access blocked: your organisation's policy allows sign-in only from bank-issued devices",
-          "ACCOUNT_REFUSED",
-          "Your account cannot sign in; contact the service desk",
-          INVALID_REDIRECT,
-          "The redirect address is not registered",
-          "UNKNOWN_CLIENT",
-          "The application is not registered");
   private static final Duration SESSION_LIFE = Duration.ofHours(8);
   private static final int TOKEN_SECONDS = 300;
   private static final int PAGE_BUFFER = 512;
@@ -286,17 +267,20 @@ public class EiamSimulatorController {
             + "</fieldset><button type=\"submit\">Sign in</button></form>");
   }
 
-  /** A fixed text per refusal, so that no detail of the refusal reaches the page. */
+  /** A fixed text per refusal code, so that no detail of the refusal reaches the page. */
   private static String refusalText(IdentityRefused ex) {
-    if ("ACCOUNT_REFUSED".equals(ex.getCode())) {
-      String detail = String.valueOf(ex.getMessage());
-      for (Map.Entry<String, String> status : REFUSED_STATUS_WORDS.entrySet()) {
-        if (detail.contains(status.getValue())) {
-          return "Your account is " + status.getValue() + "; contact the service desk";
-        }
-      }
-    }
-    return REFUSALS.getOrDefault(ex.getCode(), "Sign-in was refused by the Enterprise SSO");
+    return switch (ex.getCode()) {
+      case "DEVICE_NOT_ALLOWED" ->
+          "Access blocked: your organisation's policy allows sign-in only from bank-issued devices";
+      case "ACCOUNT_INACTIVE" -> "Your account is inactive; contact the service desk";
+      case "ACCOUNT_LOCKED" -> "Your account is locked; contact the service desk";
+      case "ACCOUNT_DISABLED" -> "Your account is disabled; contact the service desk";
+      case "ACCOUNT_DEACTIVATED" -> "Your account is deactivated; contact the service desk";
+      case "ACCOUNT_REFUSED" -> "Your account cannot sign in; contact the service desk";
+      case INVALID_REDIRECT -> "The redirect address is not registered";
+      case "UNKNOWN_CLIENT" -> "The application is not registered";
+      default -> "Sign-in was refused by the Enterprise SSO";
+    };
   }
 
   /** The OAuth error code of a refused token request, from the standard codes only. */

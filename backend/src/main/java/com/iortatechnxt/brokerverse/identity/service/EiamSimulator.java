@@ -103,7 +103,8 @@ public class EiamSimulator {
    * @param windowsId account chosen
    * @param bdoDevice whether the device is a BDO-issued one
    * @return the account signed in
-   * @throws IdentityRefused DEVICE_NOT_ALLOWED, ACCOUNT_REFUSED
+   * @throws IdentityRefused DEVICE_NOT_ALLOWED, ACCOUNT_REFUSED (unknown account) or
+   *     ACCOUNT_<status>
    */
   public DirectoryAccount signIn(String windowsId, boolean bdoDevice) {
     if (!bdoDevice) {
@@ -117,7 +118,7 @@ public class EiamSimulator {
             .orElseThrow(() -> new IdentityRefused("ACCOUNT_REFUSED", "Unknown account"));
     if (!account.status().grantsAccess()) {
       throw new IdentityRefused(
-          "ACCOUNT_REFUSED",
+          "ACCOUNT_" + account.status().name(),
           "Your account is "
               + account.status().name().toLowerCase(Locale.ROOT)
               + "; contact the service desk");

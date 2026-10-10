@@ -199,19 +199,6 @@
   font-family: var(--font-heading);
 }
 
-/* Permission picker of a role-permission change request */
-.permission-picker {
-  border: 0;
-  padding: 0;
-  margin: 0;
-}
-
-.permission-area {
-  margin: var(--space-2) 0 var(--space-1);
-  font-weight: 700;
-  color: var(--color-heading);
-}
-
 /* List-of-values types with pending values */
 .nav-list-count {
   align-self: flex-start;

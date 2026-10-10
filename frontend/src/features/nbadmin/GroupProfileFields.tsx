@@ -147,6 +147,7 @@ export function GroupProfileFields({ form, set, errors }: Readonly<FieldsProps>)
           selected={form.permissions}
           onChange={(permissions) => set({ permissions })}
           error={errors.permissions}
+          offerCopy
         />
       </>
     );

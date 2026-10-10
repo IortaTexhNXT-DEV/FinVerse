@@ -9,7 +9,7 @@ import type { Column } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useLovLabel } from '@/components/broking/useLabels';
 import { formatAmount, formatDate, formatDateTime, humanize } from '@/utils/format';
-import { permissionLabels } from '@/utils/permissionLabel';
+import { PermissionChanges } from '@/components/broking/PermissionChanges';
 import { isGroupProfile, roleChanges } from './accessRequest';
 import { userStatus } from './accessUsers';
 import { accessStatusLabel } from './accessStages';
@@ -123,14 +123,6 @@ function profileRows(r: AccessRequest, names: Names): Row[] {
     { attribute: 'Name', requested: d.roleName },
     { attribute: 'Description', requested: d.roleDescription },
     { attribute: 'Privilege level', requested: d.privilegeLevel && humanize(d.privilegeLevel) },
-    {
-      attribute: 'Permissions added',
-      requested: permissionLabels(r.permissionsAdded) || undefined,
-    },
-    {
-      attribute: 'Permissions removed',
-      requested: permissionLabels(r.permissionsRemoved) || undefined,
-    },
   ].filter((row) => row.requested !== undefined && row.requested !== '');
 }
 
@@ -157,6 +149,21 @@ function extraFacts(
     facts.push(['Could not be applied', r.lifecycle.applyError]);
   }
   return facts;
+}
+
+/** The permissions a group-profile request adds and removes, by area (green and red). */
+function RequestPermissionChanges({ request: r }: Readonly<{ request: AccessRequest }>) {
+  if (r.permissionsAdded.length === 0 && r.permissionsRemoved.length === 0) {
+    return null;
+  }
+  return (
+    <section aria-label="Permissions added and removed">
+      <h3 style={{ margin: '0 0 var(--space-2)', fontSize: 'var(--font-size-md, 15px)' }}>
+        Permissions Added and Removed
+      </h3>
+      <PermissionChanges current={r.permissionsRemoved} selected={r.permissionsAdded} />
+    </section>
+  );
 }
 
 /** Current and requested values of a request (FR-UA-030). */
@@ -200,6 +207,7 @@ export function RequestDetails({ request: r }: Readonly<{ request: AccessRequest
             rowKey={(c) => `${c.change}-${c.code}`}
           />
         )}
+        {group && <RequestPermissionChanges request={r} />}
         {!group && <RequestedDataAccess text={r.details.dataScope} />}
         <dl className="detail-list">
           {extraFacts(r, members, reason).map(([label, value]) => (

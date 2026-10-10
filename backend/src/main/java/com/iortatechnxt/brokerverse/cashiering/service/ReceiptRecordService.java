@@ -214,7 +214,9 @@ public class ReceiptRecordService {
       Collection<RecordStage> stages,
       RecordCriteria criteria,
       Pageable pageable) {
-    return records.search(companyId, kind, stages, criteria, pageable);
+    Page<ReceiptRecord> found = records.search(companyId, kind, stages, criteria, pageable);
+    found.forEach(ReceiptRecord::getAccounts);
+    return found;
   }
 
   /**
@@ -226,12 +228,15 @@ public class ReceiptRecordService {
    */
   @Transactional(readOnly = true)
   public List<ReceiptRecord> dayList(Long companyId, LocalDate day) {
-    return records.dayList(
-        companyId,
-        RecordKind.CREATION,
-        currentUser.username(),
-        BusinessClock.startOf(day),
-        BusinessClock.startOf(day.plusDays(1)));
+    List<ReceiptRecord> found =
+        records.dayList(
+            companyId,
+            RecordKind.CREATION,
+            currentUser.username(),
+            BusinessClock.startOf(day),
+            BusinessClock.startOf(day.plusDays(1)));
+    found.forEach(ReceiptRecord::getAccounts);
+    return found;
   }
 
   /**

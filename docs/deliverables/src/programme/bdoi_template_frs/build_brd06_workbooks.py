@@ -38,6 +38,7 @@ import yaml
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import brd06_review_edition as review  # noqa: E402
+import brd_common_final as final  # noqa: E402
 import build_brd06_bdoi_frs as frs  # noqa: E402
 from brd11_xlsx import Column, ReviewWorkbook  # noqa: E402
 
@@ -136,6 +137,13 @@ class Data:
             for fr in frs_:
                 brd_of[fr].append(rid)
         lmap = frs.line_items_map()
+
+        def items_of(m):  # a requirement number of the source specification read as the FR items that carry it
+            its = lmap.get(m.group(0)) or self.fr_to_frrn.get(m.group(0))
+            return ", ".join(its[:2]) if its else m.group(0)
+
+        def txt(x):
+            return re.sub(r"FR-RN-\d{3}", items_of, frs.clean(x))
         out = []
         for fr_id, e in self.cases_yaml["frs"].items():
             n = fr_id.split("-")[-1]
@@ -151,18 +159,18 @@ class Data:
                     exp += " Message: " + "; ".join(re.sub(r"[{}]", "", m) for m in c["msg"])
                 ids = brd_of.get(fr_id, [])
                 out.append({
-                    "id": f"TC-RN-{n}.{ci}-{seq[ci]:02d}", "title": frs.clean(c["title"]), "fr": fr_id,
+                    "id": f"TC-RN-{n}.{ci}-{seq[ci]:02d}", "title": txt(c["title"]), "fr": fr_id,
                     "frrn": ", ".join(lmap.get(fr_id, self.fr_to_frrn.get(fr_id, []))),
                     "brd": (", ".join(ids[:6]) + (f" and {len(ids) - 6} more" if len(ids) > 6 else "")) or "-",
                     "persona": persona, "user": user,
                     "screen": frs.clean(screens.get(c.get("screen", e.get("screen")), c.get("screen", e.get("screen")))
                                         ).replace(">", "›"),
-                    "pre": frs.clean(pre), "steps": "\n".join(f"{i}. {frs.clean(s)}" for i, s in enumerate(c["steps"], 1)),
+                    "pre": txt(pre), "steps": "\n".join(f"{i}. {txt(s)}" for i, s in enumerate(c["steps"], 1)),
                     "data": "; ".join(f"{x} {data_names.get(x, '')}" for x in (c.get("data") or e.get("data") or [])),
-                    "expected": frs.clean(exp),
+                    "expected": txt(exp),
                     "type": "Negative" if c["type"] == "Negative" else "Positive",
                     "priority": "High" if str(prio).startswith("Must") else "Medium",
-                    "source": "BIBS test plan BRD-06 v2.0"})
+                    "source": "Test conditions of BRD-06"})
         return out
 
     def make_acceptance_cases(self) -> list[dict]:
@@ -501,7 +509,6 @@ def build_fitgap(data: Data):
         Column("text", "BRD text", 44, "Requirement as printed in the BRD"),
         Column("group", "Function", 24, "Function of the BRD"),
         Column("frrn", "FR item (BDOI format)", 22, "FR items of the FRS v1.1"),
-        Column("fr", "BIBS reference FR", 16, "FR of the BIBS FRS BRD-06"),
         Column("features", "Feature list reference", 40, "Rows of the BIBS Feature List vs OOTB workbook"),
         Column("ootb", "What BIBS offers out of the box", 46, "Standard capability or configuration"),
         Column("best", "Insurance-broking best practice", 46, "Practice of the Philippine market and international broking"),
@@ -579,7 +586,8 @@ def build_cr(data: Data):
 def frs_table_text(ref: str) -> str:
     text = (RN / "FRS_BRD06_RENEWAL.md").read_text(encoding="utf-8")
     m = re.search(r"^\| " + re.escape(ref) + r" \| ([^|]+)\|", text, re.M)
-    return frs.clean(m.group(1).strip()) if m else ""
+    # a requirement number of another specification in the quoted text is read as the module it belongs to
+    return re.sub(r"\s*\(FR-NB-[\d, ]+\)", " (New Business FRS)", frs.clean(m.group(1).strip())) if m else ""
 
 
 def answered_rows(data: Data) -> list[dict]:
@@ -635,7 +643,7 @@ def build_rtm(data: Data):
          "proof": f"{sum(1 for r in item_rows if r['n'])} with at least one test case (sheet FR items)"},
         {"what": "Acceptance criteria", "n": data.b.stats["ac"], "proof": "One acceptance test case each"},
         {"what": "Test cases", "n": len(cases),
-         "proof": f"{len(data.bibs_cases)} of the BIBS test plan BRD-06 re-keyed to the FR items; "
+         "proof": f"{len(data.bibs_cases)} cases of the test conditions TC-RN-nnn.n keyed to the FR items; "
                   f"{len(data.acc_cases)} acceptance cases"},
         {"what": "Positive / negative", "n": f"{sum(1 for c in cases if c['type'] == 'Positive')} / "
                                              f"{sum(1 for c in cases if c['type'] == 'Negative')}", "proof": "-"},
@@ -647,18 +655,18 @@ def build_rtm(data: Data):
     wb.sheet("Traceability", [
         Column("id", "BRD ID", 18, "BRD requirement ID"), Column("text", "BRD requirement", 44, ""),
         Column("frrn", "FR item (BDOI format)", 26, "FR items of the FRS v1.1"),
-        Column("fr", "BIBS reference FR", 16, "FR of the BIBS FRS BRD-06"), Column("n", "Test cases", 10, "Count"),
+        Column("n", "Test cases", 10, "Count"),
         Column("cases", "Test case IDs", 60, "Sheet Test cases"), Column("screens", "Screen", 30, "Screen of the FR"),
         Column("steps", "Walkthrough steps", 26, "Steps of the walkthrough users workbook")],
-        trace_rows, description="BRD ID -> FR item -> BIBS reference FR -> test cases -> screen -> walkthrough step")
+        trace_rows, description="BRD ID -> FR item -> test cases -> screen -> walkthrough step")
     wb.sheet("FR items", [Column("id", "FR item", 16, ""), Column("title", "Title", 44, ""), Column("origin", "Origin", 16, ""),
                           Column("ac", "Acceptance criteria", 12, ""), Column("n", "Test cases", 10, ""),
                           Column("cases", "Test case IDs", 70, "")],
              item_rows, description="Every FR item of the FRS v1.1 with its test cases")
     case_cols = [
-        Column("id", "Test case ID", 26, "TC-RN-nnn.c-ss: BIBS test plan; TC-FRRN-...-ACnn: acceptance criterion"),
+        Column("id", "Test case ID", 26, "TC-RN-nnn.c-ss: case ss of test condition nnn.c; TC-FRRN-...-ACnn: acceptance criterion"),
         Column("title", "Title", 36, ""), Column("brd", "BRD ID", 22, ""), Column("frrn", "FR item", 18, ""),
-        Column("fr", "BIBS reference FR", 14, ""), Column("persona", "Persona", 18, ""),
+        Column("persona", "Persona", 18, ""),
         Column("user", "Sign-in ID", 12, "The password is issued separately by the iorta TechNXT Project Team"),
         Column("screen", "Screen", 22, ""), Column("pre", "Preconditions", 30, ""), Column("steps", "Steps", 50, ""),
         Column("data", "Test data", 22, ""), Column("expected", "Expected result", 50, ""),
@@ -672,7 +680,7 @@ def build_rtm(data: Data):
     wb.sheet("Test cases", case_cols, cases, description="Test cases of the FRS v1.1 with the execution columns")
     ans = answered_rows(data)
     wb.sheet("Answered in the BDOI FRS", [
-        Column("ref", "Our reference", 14, "RQ, CLR-RN, A-RN, D-RN, DMQ"), Column("q", "Our question or assumption", 60, ""),
+        Column("ref", "Reference", 14, "RQ, CLR-RN, A-RN, D-RN, DMQ"), Column("q", "Question or assumption", 60, ""),
         Column("clause", "BDOI FRS clause", 30, ""), Column("answer", "Answer in BDOI's FRS", 60, ""),
         Column("kept", "Still a decision?", 16, "Where BDOI's answer differs from the BRD, the decision stays in Annex AO")],
         ans, description="Open items dropped from the FRS because BDOI's FRS answers them")
@@ -841,6 +849,8 @@ def main() -> int:
                      ("rtm", build_rtm), ("uat", build_uat), ("coverage", build_coverage)):
         path, stats = fn(data)
         print(f"wrote {path.relative_to(REPO)} ({path.stat().st_size // 1024} KB): {stats}")
+        if name != "coverage":  # the internal coverage workbook may keep the reference column
+            final.check_no_references([path])
     return 0
 
 

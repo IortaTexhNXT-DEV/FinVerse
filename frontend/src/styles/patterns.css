@@ -2144,3 +2144,176 @@ a.card.kpi:focus-visible .kpi-label {
   margin: 0;
   font-size: 13px;
 }
+
+/* ---------- Permission picker (group-profile requests) ---------------------------------------- */
+/* The profile picker's layout: areas with "n of m selected" and select all / clear per area, one
+   line per permission, the selection as removable chips by area, added (green) and removed (red). */
+.permission-group-head {
+  display: flex;
+  align-items: center;
+  background: var(--color-surface-alt);
+}
+
+.permission-group-head .profile-group-head {
+  flex: 1;
+  min-width: 0;
+}
+
+.permission-group-actions {
+  display: flex;
+  gap: var(--space-3);
+  padding-right: var(--space-3);
+  white-space: nowrap;
+}
+
+.permission-group-actions .link-button:disabled {
+  color: var(--color-text-muted);
+  cursor: default;
+  text-decoration: none;
+}
+
+.permission-option {
+  grid-template-columns: 20px minmax(0, 1fr);
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+.permission-option-text {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.permission-option-text .profile-option-name {
+  flex: none;
+  max-width: 45%;
+}
+
+.permission-option-text .profile-option-desc {
+  flex: 1;
+  min-width: 0;
+}
+
+.permission-option.added {
+  box-shadow: inset 3px 0 0 var(--color-success);
+}
+
+.permission-option.removed {
+  box-shadow: inset 3px 0 0 var(--color-danger);
+}
+
+.permission-copy {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 1 1 100%;
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.permission-copy .select {
+  flex: 0 1 320px;
+  min-width: 0;
+}
+
+.permission-none {
+  margin: 0;
+  padding: var(--space-3);
+}
+
+.permission-selected,
+.permission-changes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+.permission-chip-area-name {
+  margin-bottom: var(--space-1);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-heading);
+}
+
+.permission-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.permission-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  max-width: 100%;
+  padding: 1px var(--space-2);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 999px;
+  background: var(--color-surface-alt);
+  font-size: 12px;
+  color: var(--color-text);
+}
+
+.permission-chip-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.permission-chip.added {
+  border-color: var(--color-success);
+  background: var(--color-success-bg);
+  color: var(--color-success);
+}
+
+.permission-chip.removed {
+  border-color: var(--color-danger);
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+  text-decoration: line-through;
+}
+
+.permission-chip-remove {
+  display: inline-flex;
+  padding: 2px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.permission-chip-remove:hover,
+.permission-chip-remove:focus-visible {
+  background: var(--color-border);
+}
+
+.permission-added-text {
+  color: var(--color-success);
+}
+
+.permission-removed-text {
+  color: var(--color-danger);
+}
+
+@container (max-width: 560px) {
+  .permission-option-text {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .permission-option-text .profile-option-name {
+    max-width: 100%;
+  }
+
+  .permission-group-head {
+    flex-wrap: wrap;
+  }
+
+  .permission-group-actions {
+    padding: 0 var(--space-3) var(--space-2) var(--space-6);
+  }
+}

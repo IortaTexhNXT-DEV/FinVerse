@@ -1,9 +1,11 @@
 package com.iortatechnxt.brokerverse.identity.api;
 
 import com.iortatechnxt.brokerverse.identity.domain.DirectoryAccount;
+import com.iortatechnxt.brokerverse.identity.domain.DirectoryStatus;
 import com.iortatechnxt.brokerverse.identity.service.EiamSimulator;
 import com.iortatechnxt.brokerverse.identity.service.IdentityRefused;
 import com.iortatechnxt.brokerverse.identity.service.IdentitySimulator;
+import com.iortatechnxt.brokerverse.security.service.sso.OidcClient;
 import com.iortatechnxt.brokerverse.security.service.sso.SsoProperties;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -14,6 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Base64;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpHeaders;
@@ -48,6 +51,19 @@ public class EiamSimulatorController {
   private static final String CHALLENGE = "code_challenge";
   private static final String CLIENT_ID = "client_id";
   private static final String BASIC = "Basic ";
+  private static final String SIGN_IN_PATH = "/login";
+  private static final String INVALID_REDIRECT = "INVALID_REDIRECT";
+  private static final String TOKEN_REFUSED = "The token request was refused";
+  private static final Map<String, String> REFUSALS =
+      Map.of(
+          "DEVICE_NOT_ALLOWED",
+          "Access blocked: your organisation's policy allows sign-in only from bank-issued devices",
+          "ACCOUNT_REFUSED",
+          "Your account cannot sign in; contact the service desk",
+          INVALID_REDIRECT,
+          "The redirect address is not registered",
+          "UNKNOWN_CLIENT",
+          "The application is not registered");
   private static final Duration SESSION_LIFE = Duration.ofHours(8);
   private static final int TOKEN_SECONDS = 300;
   private static final int PAGE_BUFFER = 512;
@@ -119,7 +135,7 @@ public class EiamSimulatorController {
       try {
         return redirect(request, simulator.signIn(open, true));
       } catch (IdentityRefused ex) {
-        return page(ex.getMessage(), HttpStatus.FORBIDDEN);
+        return page(refusalText(ex), HttpStatus.FORBIDDEN);
       }
     }
     return ResponseEntity.ok().contentType(MediaType.TEXT_HTML).body(signInPage(params));
@@ -147,7 +163,7 @@ public class EiamSimulatorController {
           sessionCookie(simulator.openSession(account.windowsId()), SESSION_LIFE, http).toString());
       return redirect(request, account);
     } catch (IdentityRefused ex) {
-      return page(ex.getMessage(), HttpStatus.FORBIDDEN);
+      return page(refusalText(ex), HttpStatus.FORBIDDEN);
     }
   }
 
@@ -174,7 +190,7 @@ public class EiamSimulatorController {
       return ResponseEntity.ok(answer);
     } catch (IdentityRefused ex) {
       return ResponseEntity.badRequest()
-          .body(Map.of("error", ex.getCode(), "error_description", ex.getMessage()));
+          .body(Map.of("error", tokenError(ex), "error_description", TOKEN_REFUSED));
     }
   }
 
@@ -195,16 +211,17 @@ public class EiamSimulatorController {
       HttpServletResponse response) {
     simulator.endSession(session);
     response.addHeader(HttpHeaders.SET_COOKIE, sessionCookie("", Duration.ZERO, http).toString());
-    if (redirect != null && redirect.startsWith(sso.base())) {
-      return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(redirect)).build();
+    String home = sso.base() + SIGN_IN_PATH;
+    if (home.equals(redirect)) {
+      return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(home)).build();
     }
     return page("You are signed out of the Enterprise SSO simulator.", HttpStatus.OK);
   }
 
   private EiamSimulator.AuthorizationRequest request(Map<String, String> params) {
-    String redirect = params.getOrDefault(REDIRECT_URI, "");
-    if (!redirect.startsWith(sso.base())) {
-      throw new IdentityRefused("INVALID_REDIRECT", "The redirect address is not registered");
+    String redirect = sso.base() + OidcClient.CALLBACK_PATH;
+    if (!redirect.equals(params.get(REDIRECT_URI))) {
+      throw new IdentityRefused(INVALID_REDIRECT, "The redirect address is not registered");
     }
     return new EiamSimulator.AuthorizationRequest(
         params.get(CLIENT_ID),
@@ -259,6 +276,26 @@ public class EiamSimulatorController {
             + " name=\"device\" value=\"BANK\" checked> Bank-issued device</label><label><input"
             + " type=\"radio\" name=\"device\" value=\"PERSONAL\"> Personal device</label>"
             + "</fieldset><button type=\"submit\">Sign in</button></form>");
+  }
+
+  /** A fixed text per refusal, so that no detail of the refusal reaches the page. */
+  private static String refusalText(IdentityRefused ex) {
+    if ("ACCOUNT_REFUSED".equals(ex.getCode())) {
+      String detail = String.valueOf(ex.getMessage()).toUpperCase(Locale.ROOT);
+      for (DirectoryStatus status : DirectoryStatus.values()) {
+        if (!status.grantsAccess() && detail.contains(status.name())) {
+          return "Your account is "
+              + status.name().toLowerCase(Locale.ROOT)
+              + "; contact the service desk";
+        }
+      }
+    }
+    return REFUSALS.getOrDefault(ex.getCode(), "Sign-in was refused by the Enterprise SSO");
+  }
+
+  /** The OAuth error code of a refused token request, from the standard codes only. */
+  private static String tokenError(IdentityRefused ex) {
+    return "invalid_client".equals(ex.getCode()) ? "invalid_client" : "invalid_grant";
   }
 
   private static ResponseEntity<String> page(String message, HttpStatus status) {

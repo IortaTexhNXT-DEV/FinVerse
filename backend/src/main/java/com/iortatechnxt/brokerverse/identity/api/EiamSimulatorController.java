@@ -280,18 +280,28 @@ public class EiamSimulatorController {
 
   /** A fixed text per refusal code, so that no detail of the refusal reaches the page. */
   private static String refusalText(IdentityRefused ex) {
-    return switch (ex.getCode()) {
+    String code = ex.getCode();
+    if (code != null && code.startsWith("ACCOUNT_")) {
+      return accountRefusalText(code);
+    }
+    return switch (String.valueOf(code)) {
       case "DEVICE_NOT_ALLOWED" ->
           "Access blocked: your organisation's policy allows sign-in only from bank-issued devices";
-      case "ACCOUNT_INACTIVE" -> "Your account is inactive; contact the service desk";
-      case "ACCOUNT_LOCKED" -> "Your account is locked; contact the service desk";
-      case "ACCOUNT_DISABLED" -> "Your account is disabled; contact the service desk";
-      case "ACCOUNT_DEACTIVATED" -> "Your account is deactivated; contact the service desk";
-      case "ACCOUNT_REFUSED" -> "Your account cannot sign in; contact the service desk";
       case INVALID_REDIRECT -> "The redirect address is not registered";
       case INVALID_STATE -> "The state of the request is not a token";
       case "UNKNOWN_CLIENT" -> "The application is not registered";
       default -> "Sign-in was refused by the Enterprise SSO";
+    };
+  }
+
+  /** The page text of a refused account, by the status carried in the refusal code. */
+  private static String accountRefusalText(String code) {
+    return switch (code) {
+      case "ACCOUNT_INACTIVE" -> "Your account is inactive; contact the service desk";
+      case "ACCOUNT_LOCKED" -> "Your account is locked; contact the service desk";
+      case "ACCOUNT_DISABLED" -> "Your account is disabled; contact the service desk";
+      case "ACCOUNT_DEACTIVATED" -> "Your account is deactivated; contact the service desk";
+      default -> "Your account cannot sign in; contact the service desk";
     };
   }
 

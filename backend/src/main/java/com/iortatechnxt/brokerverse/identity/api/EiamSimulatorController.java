@@ -16,6 +16,7 @@ import java.time.Duration;
 import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -51,6 +52,11 @@ public class EiamSimulatorController {
   private static final String BASIC = "Basic ";
   private static final String SIGN_IN_PATH = "/login";
   private static final String INVALID_REDIRECT = "INVALID_REDIRECT";
+  private static final String INVALID_STATE = "INVALID_STATE";
+
+  /** The state of the client is an opaque token: letters, digits and the unreserved marks. */
+  private static final Pattern SAFE_STATE = Pattern.compile("[A-Za-z0-9._~-]{0,512}");
+
   private static final String TOKEN_REFUSED = "The token request was refused";
 
   private static final Duration SESSION_LIFE = Duration.ofHours(8);
@@ -224,13 +230,17 @@ public class EiamSimulatorController {
       EiamSimulator.AuthorizationRequest request, DirectoryAccount account) {
     // The code is sent to the registered callback address only, with the state kept for the code.
     String code = simulator.code(account, request);
+    String state = simulator.state(code);
+    if (!SAFE_STATE.matcher(state).matches()) {
+      throw new IdentityRefused(INVALID_STATE, "The state is not a token");
+    }
     String target =
         sso.base()
             + OidcClient.CALLBACK_PATH
             + "?code="
             + encode(code)
             + "&state="
-            + encode(simulator.state(code));
+            + encode(HtmlUtils.htmlEscape(state));
     return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(target)).build();
   }
 
@@ -279,6 +289,7 @@ public class EiamSimulatorController {
       case "ACCOUNT_DEACTIVATED" -> "Your account is deactivated; contact the service desk";
       case "ACCOUNT_REFUSED" -> "Your account cannot sign in; contact the service desk";
       case INVALID_REDIRECT -> "The redirect address is not registered";
+      case INVALID_STATE -> "The state of the request is not a token";
       case "UNKNOWN_CLIENT" -> "The application is not registered";
       default -> "Sign-in was refused by the Enterprise SSO";
     };

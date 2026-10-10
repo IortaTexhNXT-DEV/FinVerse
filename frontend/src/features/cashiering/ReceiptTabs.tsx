@@ -14,6 +14,7 @@ import { UserName } from '@/components/ui/UserName';
 import type { LedgerComponent } from '@/api/operations';
 import { countOf } from '@/utils/format';
 import { receiptActionLabel } from './cashieringLabels';
+import { ReceiptDocuments } from './ReceiptDocuments';
 
 /** The reason of a receipt transaction, from its list (cancellation or reinstatement reasons). */
 function ReasonLabel({ action }: Readonly<{ action: ReceiptAction }>) {
@@ -187,6 +188,8 @@ export function ReceiptTabContent({
           emptyMessage="No journal posted yet"
         />
       );
+    case 'documents':
+      return <ReceiptDocuments summary={receipt.summary} />;
     default:
       return (
         <DataTable

@@ -54,6 +54,28 @@ public record PaymentIntake(
   }
 
   /**
+   * The part of a payment for one account of a creation record (FRS.CSH.02.01.04).
+   *
+   * @param ref account reference, may be null
+   * @param amount amount for the account
+   * @param no part number (in the source key)
+   * @return the part
+   */
+  public PaymentIntake part(String ref, BigDecimal amount, int no) {
+    return new PaymentIntake(
+        channel,
+        batchRef,
+        sourceKey + ":" + no,
+        rowNo,
+        ref,
+        List.of(),
+        payor,
+        assuredName,
+        new Money(amount, money.currency(), money.valueDate()),
+        tender);
+  }
+
+  /**
    * The same payment in a currency when it arrives without one (channel files carry no currency;
    * the payment is in the base currency of the company).
    *

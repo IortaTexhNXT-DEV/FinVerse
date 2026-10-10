@@ -28,6 +28,9 @@ public class CashieringJobs {
   /** Minimal balance sweep job. */
   public static final String MINIMAL_BALANCE_SWEEP = "MINIMAL_BALANCE_SWEEP";
 
+  /** Payment files received via MFT. */
+  public static final String MFT_INTAKE = "CASH_MFT_INTAKE";
+
   /**
    * {@code PREBOOKED_REMATCH} (CSHID.020): applies pre-booked payments whose account is booked and
    * raises {@code PREBOOKED_AGEING}.
@@ -114,6 +117,27 @@ public class CashieringJobs {
                   + " premium balances reversed, "
                   + sweep.excess()
                   + " excess to overages");
+        });
+  }
+
+  /**
+   * {@code CASH_MFT_INTAKE} (FRS.CSH.05.01.04): takes the payment files placed in the MFT folders
+   * (Bills Payment of OBPCS, matured post-dated checks of PMS) at the times agreed with BDOI IT.
+   *
+   * @param service MFT intake
+   * @param cron schedule
+   * @return job
+   */
+  @Bean
+  ManagedJob mftIntakeJob(
+      MftIntakeService service, @Value("${brokerverse.jobs.cash-mft-intake-cron:-}") String cron) {
+    return new CashieringJob(
+        MFT_INTAKE,
+        "Takes the payment files received via MFT and processes them",
+        cron,
+        date -> {
+          int n = service.poll().size();
+          return new JobOutcome(n, n + " payment files received via MFT");
         });
   }
 

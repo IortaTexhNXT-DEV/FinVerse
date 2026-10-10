@@ -18,6 +18,85 @@ export const CASHIERING_HELP: HelpSection = {
       ],
     },
     {
+      name: 'Create AR/OR',
+      path: '/cashiering/records/new',
+      summary:
+        'Creation record of an acknowledgement receipt (premium or non-premium payment) or of a Head Office official receipt: receipt type, entry type with the client or insurer, payor, payment type, currency, Post to Bank Account, paid amount, check details, receipt issuance date, receipting branch, remarks and the accounts paid with the amount of each.',
+      workflow: [
+        'Save checks the required fields, the currency booked on each account and the holding period of a check, then gives the record its number (CR-AR-… or CR-OR-…) with the status Created.',
+        'A record in status Created or Returned can be edited; a record in status Created can be cancelled and keeps its number.',
+        'Submit for Posting sends the record to the Approver/Poster; the AR or OR number is issued only when the record is posted.',
+      ],
+      controls: [
+        'Whether ARs and ORs wait for the posting step is a setting of the System Administrator.',
+      ],
+    },
+    {
+      name: 'Posting',
+      path: '/cashiering/posting',
+      summary:
+        'The creation, cancellation and reinstatement records of ARs and ORs For Posting or Returned, filtered by status, receipt type, dates, record number and name, with the export to Excel.',
+      workflow: [
+        'Select one or several records and post them: each is posted on its own, so a record in a depleted series stays For Posting with its reason while the others are posted.',
+        'Return sends a record back to its creator with a reason; the creator is notified.',
+      ],
+      controls: ['The creator of a record can neither post nor return it.'],
+    },
+    {
+      name: 'Day-End List',
+      path: '/cashiering/day-end',
+      summary:
+        'The creation records of a day with their status, and the totals per payment type and per bank account for the reconciliation of the day.',
+    },
+    {
+      name: 'Search Log',
+      path: '/cashiering/search-log',
+      summary:
+        'Every receipt search with the user, the criteria in words, the date and time and the number of results.',
+      controls: ['Viewed by the Auditor and the Cashiering Team Leader.'],
+    },
+    {
+      name: 'Unapplied Payment List',
+      path: '/cashiering/unapplied-inquiry',
+      summary:
+        'Every unapplied payment with an outstanding amount: excess, unapplied, AR insurer refund, unbooked/unmatched, pre-booked and AP unapplied commission.',
+      workflow: [
+        'Filter by type, payment date, insurer, client, assured, account reference, or part of the number, reference or payor.',
+        'A payment fully applied leaves the list; open a row to work its disposition.',
+      ],
+      controls: ['A Marketing user sees the payments of his or her marketing unit only.'],
+    },
+    {
+      name: 'Settlement ORs',
+      path: '/cashiering/settlement-ors',
+      summary:
+        'The commission and incentive ORs of the insurer settlements: one OR per insurer and settlement batch, issued once Disbursement approves the payment request of the batch.',
+      workflow: [
+        'The approval of a remittance batch asks for its ORs; they wait for the approval of the payment request by Disbursement.',
+        'When Disbursement approves the voucher or releases the payment, the OR is issued and its number is shown on the remittance batch.',
+        'An OR that could not be issued is issued again from the row action menu.',
+      ],
+      controls: [
+        'A payment request cancelled by Disbursement cancels the OR waiting for it; the batch asks again when it is approved again.',
+        'The point the OR is issued (Disbursement approval or remittance approval) is a setting of Cashiering.',
+      ],
+    },
+    {
+      name: 'Payment Files',
+      path: '/cashiering/payment-files',
+      summary:
+        'Upload of the Bills Payment, CLPC, Trade, Direct Credit, post-dated check and Commission Schedule files in their bank and channel layouts, several files of several types at once, and the list of the files received by upload or via MFT.',
+      workflow: [
+        'Each file is checked: name convention of its type, size limit, a file already uploaded, the record count and total of the header, the TOTAL row.',
+        'A file that passes the checks is processed row by row; a failed row never stops the others and is listed with its reason in the run report.',
+        'The run report gives the count and amount per category and every payment record; the validation report, the failed rows and the raw file are downloadable.',
+      ],
+      controls: [
+        'A file received via MFT and refused is alerted to the Cashiering Team Leader.',
+        'The name convention, the layout, the size limit and the MFT folder of each type are kept in Cashiering Setup.',
+      ],
+    },
+    {
       name: 'Receive Payment',
       path: '/cashiering/receive',
       summary:
@@ -133,7 +212,14 @@ export const CASHIERING_HELP: HelpSection = {
       name: 'Batch Print',
       path: '/cashiering/print',
       summary:
-        'Choose receipts by kind, insurer and date, preview the list, print the selected receipts into one PDF and retry the ones that failed.',
+        'Print ARs by receipting branch and issue date and ORs by insurer and issue date, print the receipts the system generated from the print queue, and re-print by full or partial number.',
+      workflow: [
+        "Choose the Client's Copy, the company copy or both; at most 500 receipts are printed in one batch.",
+        'The first print gives the receipt its certificate number; a later print carries the REPRINT mark and adds to the print count.',
+        'The batch opens in Print Preview to print or download; the ZIP holds one PDF per receipt named after its type and number.',
+        'A receipt that could not be printed is listed with the reason in the print log, to retry or skip.',
+      ],
+      controls: ['The company copy is kept with the receipt on its Documents tab.'],
     },
     {
       name: 'BIR 2307',
@@ -157,8 +243,22 @@ export const CASHIERING_HELP: HelpSection = {
       name: 'Receipt Series',
       path: '/cashiering/series',
       summary:
-        'AR and OR number ranges per branch with their BIR ATP number and the numbers left. A new series is usable once authorized; an alert warns before a series runs out.',
-      controls: ['A series is created by one user and authorized by another (maker-checker).'],
+        'AR and OR number ranges per branch with their BIR ATP number, year and number format (prefix, year, branch indicator and sequence) and the numbers left. A new series is usable once authorized; an alert warns before a series runs out.',
+      controls: [
+        'A series is created by one user and authorized by another (maker-checker).',
+        'A series of a year gives numbers in that year only; OR series are kept for Head Office only.',
+      ],
+    },
+    {
+      name: 'AR and OR Forms',
+      path: '/cashiering/receipt-forms',
+      summary:
+        'The header, note and footer lines of the printed AR and OR, with their versions and effective dates.',
+      workflow: [
+        'Change Form proposes a new version with its effective date.',
+        'Another authorised user approves or rejects it; an approved version is printed from its effective date.',
+      ],
+      controls: ['The user who changed a form cannot approve it; earlier versions are kept.'],
     },
     {
       name: 'Cashiering Setup',

@@ -29,6 +29,9 @@ public class PaymentFileHandler implements BulkImportHandler {
   /** Permission of the payment uploads. */
   public static final String PERMISSION = "CASH_UPLOAD";
 
+  /** Outcome of a row whose source transaction was already accepted (FRS.CSH.05.01.05). */
+  public static final String DUPLICATE = "DUPLICATE";
+
   private final Spec spec;
   private final PaymentIntakeService intake;
   private final PaymentFileLayouts layouts;
@@ -116,13 +119,19 @@ public class PaymentFileHandler implements BulkImportHandler {
         intake.receive(
             new IntakeTarget(context.companyId(), branch, spec.arClass(), ReceiptSource.UPLOAD),
             spec.mapping().apply(row, context.jobNo()));
+    if (result.receipt() == null) {
+      return new BulkOutcome(result.payment().getPaymentNo(), DUPLICATE);
+    }
     return new BulkOutcome(
         result.payment().getPaymentNo(), result.payment().getMatchCategory().name());
   }
 
   @Override
   public List<String> outcomeCategories() {
-    return Arrays.stream(MatchCategory.values()).map(Enum::name).toList();
+    List<String> categories =
+        new ArrayList<>(Arrays.stream(MatchCategory.values()).map(Enum::name).toList());
+    categories.add(DUPLICATE);
+    return categories;
   }
 
   @Override

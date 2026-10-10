@@ -183,6 +183,9 @@ datasets:
   - {code: CSH_PAYMENT_FILE_LAYOUT, name: Payment file layouts, group: CASH_AND_BANKING, module: cashiering, table: csh_payment_file_layout, key: [handler_code]}
   - {code: CSH_DISPOSITION_TYPE_RULE, name: Disposition types of unapplied payments, group: CASH_AND_BANKING, module: cashiering, table: csh_disposition_type_rule, key: [type_code]}
   - {code: CSH_MINIMAL_BALANCE_RULE, name: Minimal balance rules, group: CASH_AND_BANKING, module: cashiering, table: csh_minimal_balance_rule, key: [kind]}
+  - {code: CSH_BANK_ACCOUNT, name: Bank accounts of the receipts, group: CASH_AND_BANKING, module: cashiering, table: csh_bank_account, key: [company_id, code]}
+  - {code: CSH_CHANNEL_PROFILE, name: Payment channel file profiles, group: CASH_AND_BANKING, module: cashiering, table: csh_channel_profile, key: [file_type], environment: [mft_folder, mft_enabled]}
+  - {code: CSH_RECEIPT_FORM, name: AR and OR forms, group: CASH_AND_BANKING, module: cashiering, table: csh_receipt_form, key: [company_id, form_kind, version_no], exclude: [decided_by, decided_at, decision_remarks]}
 
   # ---------- Operations, collections and commission rules -----------------------------------------
   - {code: BKG_AUTO_BOOK_RULE, name: Automatic booking rules, group: OPERATIONS, module: booking, table: bkg_auto_book_rule, key: [company_id, product_code, market_segment]}
@@ -341,11 +344,12 @@ excluded:
      clx_item_balance, clx_legacy_state, clx_outbox, clx_promise, clx_scheduled_file,
      clx_unapplied_disposition, cmr_billing, cmr_certificate, cmr_certificate_or, cmr_dp_item,
      cmr_dp_list, cmr_dppr_batch, cmr_dppr_batch_line, cmr_incentive_run, cmr_incentive_run_line,
-     csh_application, csh_application_line, csh_certificate_of_payment, csh_collector_request,
-     csh_commission_line, csh_cwt_batch, csh_cwt_tag, csh_disposition, csh_legacy_batch,
+     csh_application, csh_application_line, csh_certificate_of_payment, csh_channel_file,
+     csh_collector_request, csh_commission_line, csh_cwt_batch, csh_cwt_tag, csh_disposition, csh_legacy_batch,
      csh_legacy_batch_line, csh_minimal_balance, csh_payment, csh_payment_reversal, csh_pdc_item,
      csh_pickup_request, csh_prebooked, csh_print_batch, csh_print_line, csh_reapplication, csh_receipt,
-     csh_receipt_action, csh_receipt_line, csh_refund_validation, csh_unapplied, dsb_eod_output,
+     csh_receipt_action, csh_receipt_line, csh_receipt_record, csh_receipt_record_account,
+     csh_refund_validation, csh_settlement_or, csh_unapplied, csh_legacy_reference, dsb_eod_output,
      dsb_eod_run, dsb_funding_request, dsb_instrument, dsb_request, dsb_status_edit, dsb_voucher,
      dsb_voucher_line, dsb_voucher_tag, eb_bor, eb_client_confirmation, eb_comment, eb_comparative,
      eb_comparative_line, eb_comparative_signoff, eb_confirmation_line, eb_cycle, eb_cycle_account,

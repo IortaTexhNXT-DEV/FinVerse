@@ -18,7 +18,7 @@ import { useCompanyId, useDefaultBranchId, useWorkspace } from '@/context/worksp
 import { CodeSelect, TextField } from './CashFields';
 import { cashieringApi } from './cashieringApi';
 import type { ReceiptKind, Series, SeriesBody } from './cashieringApi';
-import { seriesUsedPercent } from './cashieringLogic';
+import { seriesNumberExample, seriesUsedPercent } from './cashieringLogic';
 import './cashiering.css';
 import { RowActions } from '@/components/ui/RowActions';
 
@@ -51,7 +51,11 @@ interface SeriesForm {
   atpNo: string;
   warnAt: string;
   branchId: string;
+  year: string;
+  numberFormat: string;
 }
+
+const STANDARD_FORMAT = '{PREFIX}-{YEAR}-{BRANCH}-{SEQ}';
 
 function SeriesDialog({
   onSave,
@@ -74,6 +78,8 @@ function SeriesDialog({
     atpNo: '',
     warnAt: '50',
     branchId: String(branchId),
+    year: String(new Date().getFullYear()),
+    numberFormat: STANDARD_FORMAT,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const set = (k: keyof SeriesForm) => (v: string) => setF((x) => ({ ...x, [k]: v }));
@@ -82,6 +88,8 @@ function SeriesDialog({
     if (f.prefix.trim() === '') e.prefix = 'Prefix is required';
     if (!(Number(f.toNo) >= Number(f.fromNo) && Number(f.fromNo) >= 1))
       e.toNo = 'The range must end at or after its start';
+    if (f.numberFormat.trim() !== '' && !f.numberFormat.includes('{SEQ}'))
+      e.numberFormat = 'The number format must hold the sequence {SEQ}';
     setErrors(e);
     if (Object.keys(e).length === 0) {
       onSave({
@@ -92,6 +100,8 @@ function SeriesDialog({
         atpNo: f.atpNo || undefined,
         warnAt: Number(f.warnAt || 0),
         branchId: Number(f.branchId),
+        seriesYear: f.year === '' ? undefined : Number(f.year),
+        numberFormat: f.numberFormat.trim(),
       });
     }
   };
@@ -161,7 +171,34 @@ function SeriesDialog({
             value={f.warnAt}
             onChange={set('warnAt')}
           />
+          <TextField
+            label="Year"
+            type="number"
+            value={f.year}
+            onChange={set('year')}
+            placeholder="Every year when blank"
+          />
+          <TextField
+            label="Number Format"
+            value={f.numberFormat}
+            onChange={set('numberFormat')}
+            error={errors.numberFormat}
+            maxLength={60}
+            placeholder="Prefix and sequence when blank"
+          />
         </div>
+        <p className="muted">
+          First number:{' '}
+          <strong>
+            {seriesNumberExample(f.numberFormat, {
+              prefix: f.prefix.trim(),
+              year: f.year === '' ? undefined : Number(f.year),
+              branchCode: branches.find((b) => String(b.id) === f.branchId)?.code,
+              fromNo: Number(f.fromNo || 1),
+              toNo: Number(f.toNo || f.fromNo || 1),
+            })}
+          </strong>
+        </p>
       </div>
     </Modal>
   );
@@ -216,7 +253,8 @@ export default function ReceiptSeriesPage() {
       header: 'Range',
       render: (s) => `${s.fromNo.toLocaleString()} – ${s.toNo.toLocaleString()}`,
     },
-    { key: 'next', header: 'Next No.', render: (s) => s.nextNo.toLocaleString() },
+    { key: 'year', header: 'Year', render: (s) => s.seriesYear ?? 'Every year' },
+    { key: 'next', header: 'Next Number', render: (s) => s.nextNumber ?? 'Depleted' },
     { key: 'gauge', header: 'Used', render: (s) => <Gauge s={s} /> },
     { key: 'status', header: 'Status', render: (s) => <StatusBadge status={s.recordStatus} /> },
     {

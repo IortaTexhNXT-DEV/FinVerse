@@ -336,3 +336,49 @@ uat_criteria:
     - "The walkthrough script is completed by the Business Unit with each step Pass."
     - "No open observation of severity High; the others have an owner and a date."
     - "The UAT sign-off certificate of BRD-02 (SO-02-3) is signed."
+
+# ------------------------------------------------------------------------------------------------ available in full
+# Items available in full in the BIBS environment, with the business evidence (automated test case or walkthrough
+# step). The longest matching prefix of an FR item gives its evidence; such an item is Yes and its acceptance
+# criteria are Yes. Points that are a setting are listed under configurable (Appendix R status).
+coverage_available:
+  FRS.OPS.001: "Device access test: with the device restriction set on, only the company networks and the company-issued devices reach the sign-in; the setting is off for SIT. Walkthrough on the browser of a laptop and of a tablet with the same screens."
+  FRS.CSH.01.03: "Cashiering dashboard test: count and amount per receipt type and status for issuance, cancellation, reinstatement, returned records, unapplied payments and payment files; each item opens its list; shown within 5 seconds."
+  FRS.CSH.02.01: "Receipt record tests: AR and OR creation records with entry type, bank account, receipting branch and remarks; the validation messages (currency, check date, amounts); submit for posting, return with a reason, edit and posting by another user with the AR or OR number issued. Day-end list test: totals per payment type and bank account."
+  FRS.CSH.02.02: "OR creation record tests (OR types, payee, amounts and taxes, save, validation, submit, return, edit, cancel, audit trail) and payment file test of the commission schedule (pipe-delimited template, size limit, validation report, failed and successful lists, raw file kept read-only, line or whole-file processing by setting)."
+  FRS.CSH.02.02.08: "Other income test: an incentive OR lists the Valid for Collection SOAs of the insurer with their outstanding amounts, a fee OR the fee invoices of the client; the outstanding amount falls once the OR is posted."
+  FRS.CSH.02.03: "Receipt series tests: series per receipting branch with its year and number format (prefix, year, branch indicator, sequence), authorised by another user, warning alert of the numbers left, OR series for Head Office only, end below the last number refused."
+  FRS.CSH.02.04: "Receipt printing tests: print by branch or insurer and issue dates, print queue of the receipts the system generated, re-print by part of the number with the REPRINT mark and the print count, certificate number at the first print, Client's and company copies with the company copy kept on the receipt, ZIP of one PDF per receipt, at most 500 per batch, retry and skip in the print log. Walkthrough of the print preview."
+  FRS.CSH.02.05: "Posting tests: posting list with filters, all or selected records, confirmation message, return with a reason, AR numbers by receipting branch and OR numbers of Head Office in sequence, check payments posted before cash, application hierarchy, BIR 2307 accounts applied less the PR 2307, one OR per commission schedule placed in the print queue, GL posting with the minimal balance reversal."
+  FRS.CSH.02.06: "Receipt form tests: AR and OR forms with the company address and VAT TIN, the amount in words and in figures, footer lines and copy label; a form change printed only after another user approved it. Certification of Payment test with its series number."
+  FRS.CSH.03.01: "Cancellation record tests: AR numbers only or OR numbers only, reasons by payment type, validation messages, edit, save or cancel the record, submit for posting, return, posting with a remitted AR as an AR insurer refund and a cancelled OR as commission receivable."
+  FRS.CSH.04.01: "Reinstatement record tests: search of issued receipts, full or partial reinstatement by account, reason and encoded fields, validation, submit, return and posting (remitted AR to AR insurer refund, AR not remitted to unapplied payment, OR to AP unapplied commission)."
+  FRS.CSH.05.01: "Payment file tests: Bills Payment, CLPC, Trade, Direct Credit, post-dated check and commission schedule files in the client's layouts; name convention, size limit, duplicate file and rows, header count and total, TOTAL row; run report per category; legacy numbers as match keys; Direct Credit identification; files received via MFT with the alert of a refused file; channel simulator end to end."
+  FRS.CSH.06.01: "Unapplied payment list test: filters by type, payment date, insurer, client, assured, account and part of the number in any case; source, account, PN and loan application numbers, client and insurer; a fully applied payment leaves the list; a Marketing user sees the payments of his or her unit only."
+  FRS.CSH.06.02: "Unapplied disposition tests: apply to another invoice through the hierarchy, refund through Disbursement with Team approval, reclass and transfer of the remaining balance, tabs per status and bulk submission and approval."
+  FRS.CSH.07.01: "Settlement OR tests: the commission OR of an insurer settlement waits for the approval of Disbursement and is then issued, one OR per insurer and batch with one line per invoice and the OR number on the batch; a cancelled payment request cancels it; issued at the remittance approval with the other setting."
+  FRS.CSH.08.01: "Receipt search tests on the inquiry criteria, single and combined, names by part in any case, and the search log listing each search with the user and the criteria in words for the Auditor and the Team Leader. Walkthrough of the account record inquiry."
+  FRS.CSH.09.01: "Report tests: every Cashiering report runs and exports in every format, view and export rights apart, each run archived, files named <Report Name>_<MMDDYYYY>."
+  FRS.CSH.09.02: "Report tests: columns in the client's order with totals, files named <Report Name>_<MMDDYYYY>, ageing brackets 0-30 to above 365, payment reversals with record, reason, creator and poster, summary per disposition, certification of payment with its series number."
+  FRS.CSH.10.04: "Payment file test: a file received via MFT and refused raises the alert to the Cashiering Team Leader; receipt series and pre-booked alerts."
+
+# Points of Appendix R available as a setting: the status of the point becomes "Configurable - BDOI to confirm the
+# setting" and the proposal names the setting and its value by default.
+configurable:
+  C1: "Setting of the receipts that need the posting step: AR and OR (BDOI's reading) by default; blank issues the number at save."
+  C2: "Setting of what Reinstate does: issued receipts (BDOI's reading), cancelled receipts, or both (by default)."
+  C3: "Setting of the record number format: prefix, type and sequence by default."
+  C4: "Settings of the AR and OR number format (prefix, year, branch indicator, sequence) and of the certificate number (AC, branch, month and year, sequence)."
+  C5: "Setting of the minimal balance threshold: 10.00 by default (BRD)."
+  C6: "Setting of the order of the payments of one posting run: checks before cash by default."
+  C7: "Settings of the check date rule (on) and of the holding period (4 working days)."
+  C8: "Setting of the reading of the Direct Credit file: identification of payments already received (BDOI's reading) by default."
+  C9: "Setting of the cancellation of a remitted AR: AR insurer refund (BDOI's reading) by default."
+  C10: "Setting of the commission schedule with failed or unmatched lines: valid lines processed (BRD) by default; whole file refused available."
+  C12: "Setting of the point the settlement OR is issued: at the approval of Disbursement (BDOI's reading) by default; at the remittance approval available."
+  C13: "Setting of what Marketing users see in the unapplied payment list: their marketing unit (BDOI's reading) by default."
+  C18: "Size limit per payment file type: 50 MB by default."
+  C21: "List of the cancellation reasons allowed for a check payment, by default."
+  C24: "Setting of the device restriction: off by default for SIT; on with the company networks and the device header of BDOI IT."
+  C25: "Setting of the remarks of an AR: mandatory by default."
+  C26: "Setting of the base of the PR 2307: the premium amount by default; the basic premium available."

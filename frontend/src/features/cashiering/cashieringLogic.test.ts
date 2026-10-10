@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { PaymentPreview, PdcItem, ReceiptDetail } from './cashieringApi';
 import {
+  seriesNumberExample,
   ageBucket,
   allocationRows,
   byMaturityMonth,
@@ -193,5 +194,15 @@ describe('queues', () => {
       actions: [{ journalBatchNo: 'JB-3', action: 'CANCEL', transactionNo: 'CAN-1' }],
     } as unknown as ReceiptDetail;
     expect(journalRows(detail).map((j) => j.batch)).toEqual(['JB-1', 'JB-2', 'JB-3']);
+  });
+});
+
+describe('receipt series numbering (FRS.CSH.02.03.02)', () => {
+  it('writes the prefix, year, branch indicator and padded sequence in the format', () => {
+    const series = { prefix: 'AR-', year: 2027, branchCode: 'HO', fromNo: 1, toNo: 9999999999 };
+    expect(seriesNumberExample('{PREFIX}-{YEAR}-{BRANCH}-{SEQ}', series)).toBe(
+      'AR-2027-HO-0000000001',
+    );
+    expect(seriesNumberExample('', series)).toBe('AR-0000000001');
   });
 });

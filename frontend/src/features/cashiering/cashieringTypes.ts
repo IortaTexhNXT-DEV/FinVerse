@@ -40,6 +40,10 @@ export interface ReceiptSummary {
   source: string;
   status: ReceiptStatus;
   printedCount: number;
+  /** Insurer the payment was received for (AR) or the OR was issued to. */
+  insurerCode?: string;
+  /** Certificate number given at the first print. */
+  certificateNo?: string;
 }
 
 export interface ReceiptLine {
@@ -129,6 +133,14 @@ export interface ReceiptCriteria {
   insurer?: string;
   kind?: ReceiptKind | '';
   status?: ReceiptStatus | '';
+  /** Receipting branch. */
+  branchId?: number;
+  /** True for printed receipts (re-printing), false for the print queue. */
+  printed?: boolean;
+  /** Only the receipts the system generated. */
+  systemOnly?: boolean;
+  /** Full or partial AR or OR number. */
+  numberPart?: string;
 }
 
 export interface ReinstateBody {

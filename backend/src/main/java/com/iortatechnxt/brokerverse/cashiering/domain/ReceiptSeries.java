@@ -20,6 +20,9 @@ import jakarta.persistence.Table;
 @Table(name = "csh_receipt_series")
 public class ReceiptSeries extends AuthorizableEntity {
 
+  /** Token of the sequence in a number format. */
+  public static final String SEQ = "{SEQ}";
+
   @Embedded private RecordOrigin recordOrigin = RecordOrigin.BIBS;
 
   @Column(name = "company_id", nullable = false, updatable = false)
@@ -49,6 +52,12 @@ public class ReceiptSeries extends AuthorizableEntity {
 
   @Column(name = "warn_at", nullable = false)
   private int warnAt;
+
+  @Column(name = "series_year")
+  private Integer seriesYear;
+
+  @Column(name = "number_format", length = 80)
+  private String numberFormat;
 
   protected ReceiptSeries() {}
 
@@ -122,9 +131,26 @@ public class ReceiptSeries extends AuthorizableEntity {
     }
     long number = nextNo;
     nextNo = nextNo + 1;
+    return format(number);
+  }
+
+  /**
+   * The number the series gives next, without taking it.
+   *
+   * @return formatted number, null when depleted
+   */
+  public String preview() {
+    return isDepleted() ? null : format(nextNo);
+  }
+
+  private String format(long number) {
     String digits = Long.toString(number);
     int width = String.valueOf(toNo).length();
-    return prefix + "0".repeat(Math.max(0, width - digits.length())) + digits;
+    String sequence = "0".repeat(Math.max(0, width - digits.length())) + digits;
+    if (numberFormat != null && numberFormat.contains(SEQ)) {
+      return numberFormat.replace(SEQ, sequence);
+    }
+    return prefix + sequence;
   }
 
   /**
@@ -152,6 +178,27 @@ public class ReceiptSeries extends AuthorizableEntity {
    */
   public boolean isLow() {
     return remaining() <= warnAt;
+  }
+
+  /**
+   * Sets the year of the series and its number format (FRS.CSH.02.03.02 / 02.03.03): the format
+   * holds the prefix, the year and the branch indicator already resolved and the token {@code
+   * {SEQ}}.
+   *
+   * @param year year the series serves, null for every year
+   * @param format number format, null for prefix and sequence
+   */
+  public void numbering(Integer year, String format) {
+    this.seriesYear = year;
+    this.numberFormat = format == null || format.isBlank() ? null : format.strip();
+  }
+
+  public Integer getSeriesYear() {
+    return seriesYear;
+  }
+
+  public String getNumberFormat() {
+    return numberFormat;
   }
 
   public Long getCompanyId() {

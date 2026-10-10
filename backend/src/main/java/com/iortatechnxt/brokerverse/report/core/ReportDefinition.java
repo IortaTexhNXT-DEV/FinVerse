@@ -22,4 +22,15 @@ public interface ReportDefinition {
    * @return result
    */
   ReportResult generate(ReportParameters params);
+
+  /**
+   * The name of an exported file without its extension, when the report has a naming convention
+   * (for example {@code <Report Name>_<MMDDYYYY>}); the report code otherwise.
+   *
+   * @param extractionDate date of the extraction
+   * @return file name without extension, null for the report code
+   */
+  default String exportName(java.time.LocalDate extractionDate) {
+    return null;
+  }
 }

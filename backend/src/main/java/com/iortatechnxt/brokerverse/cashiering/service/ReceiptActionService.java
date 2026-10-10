@@ -63,6 +63,7 @@ public class ReceiptActionService {
   private final CurrentUser currentUser;
   private final Clock clock;
   private final UserDirectory directory;
+  private final CashieringDecisions decisions;
 
   /**
    * Creates the service.
@@ -78,6 +79,7 @@ public class ReceiptActionService {
    * @param currentUser current user
    * @param clock clock
    * @param directory user directory (display names in texts)
+   * @param decisions settings (scope of Reinstate)
    */
   public ReceiptActionService(
       ReceiptActionRepository actions,
@@ -90,7 +92,8 @@ public class ReceiptActionService {
       AuditTrailService audit,
       CurrentUser currentUser,
       Clock clock,
-      UserDirectory directory) {
+      UserDirectory directory,
+      CashieringDecisions decisions) {
     this.actions = actions;
     this.receipts = receipts;
     this.reversal = reversal;
@@ -102,6 +105,7 @@ public class ReceiptActionService {
     this.currentUser = currentUser;
     this.clock = clock;
     this.directory = directory;
+    this.decisions = decisions;
   }
 
   /**
@@ -140,6 +144,13 @@ public class ReceiptActionService {
    * @return the action
    */
   public ReceiptAction requestReinstatement(Long receiptId, ReinstateRequest request) {
+    if (!decisions.reinstatesCancelledReceipts()) {
+      throw new BusinessRuleException(
+          "REINSTATEMENT_SCOPE",
+          "Reinstatement of a cancelled receipt is not enabled (setting "
+              + CashieringDecisions.REINSTATEMENT_SCOPE
+              + ")");
+    }
     Receipt receipt = receipt(receiptId);
     if (receipt.getStatus() != ReceiptStatus.CANCELLED) {
       throw new BusinessRuleException(

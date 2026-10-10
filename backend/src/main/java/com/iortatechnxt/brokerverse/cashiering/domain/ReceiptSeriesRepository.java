@@ -39,4 +39,24 @@ public interface ReceiptSeriesRepository extends JpaRepository<ReceiptSeries, Lo
    * @return series by branch, kind and id
    */
   List<ReceiptSeries> findByCompanyIdOrderByBranchIdAscKindAscIdAsc(Long companyId);
+
+  /**
+   * Branches with an authorized series of a kind that has numbers left for a year (a series without
+   * a year serves every year) (FRS.CSH.02.01.02 Receipting Branch).
+   *
+   * @param companyId company
+   * @param kind AR or OR
+   * @param status active
+   * @param year year of the receipt
+   * @return branch ids
+   */
+  @Query(
+      "select distinct s.branchId from ReceiptSeries s where s.companyId = :companyId"
+          + " and s.kind = :kind and s.recordStatus = :status and s.nextNo <= s.toNo"
+          + " and (s.seriesYear is null or s.seriesYear = :year)")
+  List<Long> usableBranchIds(
+      @Param("companyId") Long companyId,
+      @Param("kind") ReceiptKind kind,
+      @Param("status") RecordStatus status,
+      @Param("year") int year);
 }

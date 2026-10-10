@@ -268,4 +268,21 @@ public final class OpsLedgerEvents {
       boolean approved,
       String reference,
       String remarks) {}
+
+  /**
+   * An OR kept until Disbursement approved the payment request was issued (FRS.CSH.07.01.01;
+   * Appendix R, C12). Published by cashiering; consumed by the source module (remittance).
+   *
+   * @param companyId company
+   * @param sourceModule module that asked for the OR
+   * @param sourceRef its reference (batch number and OR type)
+   * @param receiptNo OR number
+   * @param journalBatchNo GL journal of the OR
+   */
+  public record SettlementReceiptIssued(
+      Long companyId,
+      String sourceModule,
+      String sourceRef,
+      String receiptNo,
+      String journalBatchNo) {}
 }

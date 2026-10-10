@@ -194,8 +194,9 @@ class OperationsEndToEndIT {
         .hasMessageContaining("another user");
     RemittanceBatch approved = journey.as("remittl", () -> batches.approve(batchId, "OK"));
     assertThat(approved.getStage()).isEqualTo(BatchStage.APPROVED);
-    assertThat(approved.getCommissionOrStatus()).isEqualTo("ISSUED");
-    assertThat(approved.getCommissionOrNo()).startsWith("OR-HO-");
+    // The commission OR waits for the approval of Disbursement (FRS.CSH.07.01.01).
+    assertThat(approved.getCommissionOrStatus()).isEqualTo("DEFERRED");
+    assertThat(approved.getCommissionOrNo()).isNull();
 
     OpsInvoice remitted = journey.invoice(invoiceNo);
     assertThat(remitted.getRemittanceStatus()).isEqualTo(RemittanceStatus.APPROVED);
@@ -222,6 +223,8 @@ class OperationsEndToEndIT {
     RemittanceBatch done = journey.as(REMIT, () -> batches.get(batchId));
     assertThat(done.getStage()).isEqualTo(BatchStage.FULLY_REMITTED);
     assertThat(done.getDvNo()).isEqualTo(dvNo);
+    assertThat(done.getCommissionOrStatus()).isEqualTo("ISSUED");
+    assertThat(done.getCommissionOrNo()).startsWith("OR-HO-");
     OpsInvoice full = journey.invoice(invoiceNo);
     assertThat(full.getRemittanceStatus()).isEqualTo(RemittanceStatus.FULLY_REMITTED);
     assertThat(full.getLockOwner()).isNull();

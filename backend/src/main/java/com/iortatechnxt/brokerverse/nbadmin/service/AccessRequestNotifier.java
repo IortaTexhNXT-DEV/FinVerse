@@ -5,6 +5,7 @@ import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.messaging.domain.Notice;
 import com.iortatechnxt.brokerverse.messaging.domain.OutboundMessage.RecordLink;
 import com.iortatechnxt.brokerverse.messaging.service.MessageService;
+import com.iortatechnxt.brokerverse.messaging.service.NoticeDelivery;
 import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
 import com.iortatechnxt.brokerverse.messaging.service.OutboundEmail;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequest;
@@ -12,6 +13,7 @@ import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestType;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRiskFlag;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessUserType;
 import com.iortatechnxt.brokerverse.security.domain.AppUserRepository;
+import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,6 +40,9 @@ public class AccessRequestNotifier {
   /** Event: the requesters are told which dormant users were deactivated. */
   public static final String DORMANT_DEACTIVATED = "UAM_DORMANT_DEACTIVATED";
 
+  /** Setting: the request notices are also e-mailed by preference (BDOI FRS FRUM.013.01). */
+  public static final String EMAIL_COPY = "UAM_REQUEST_NOTICE_EMAIL";
+
   private static final String ACCESS_REQUEST = "Access request ";
   private static final String YOUR_ACCESS_CHANGED = "Your access changed";
   private static final String PROFILE = "/profile";
@@ -46,6 +51,8 @@ public class AccessRequestNotifier {
   private final MessageService messages;
   private final AppUserRepository users;
   private final AccessRequestDescriber describer;
+  private final NoticeDelivery delivery;
+  private final SystemParameterService parameters;
 
   /**
    * Creates the notifier.
@@ -54,12 +61,18 @@ public class AccessRequestNotifier {
    * @param messages e-mail
    * @param users users (e-mail of the affected user)
    * @param describer descriptions of the requests
+   * @param delivery request notices in the system and by e-mail as each user prefers
+   * @param parameters the setting of the e-mail copy ({@value #EMAIL_COPY})
    */
   public AccessRequestNotifier(
       NotificationService notifications,
       MessageService messages,
       AppUserRepository users,
-      AccessRequestDescriber describer) {
+      AccessRequestDescriber describer,
+      NoticeDelivery delivery,
+      SystemParameterService parameters) {
+    this.delivery = delivery;
+    this.parameters = parameters;
     this.notifications = notifications;
     this.messages = messages;
     this.users = users;
@@ -76,9 +89,9 @@ public class AccessRequestNotifier {
   public void toApprove(AccessRequest r, String approvalPermission) {
     Notice notice = notice(r, "to approve", describer.describe(r));
     if (r.getAssignedApprover() == null) {
-      notifications.notifyPermission(approvalPermission, notice, TO_APPROVE);
+      toPermission(approvalPermission, notice, TO_APPROVE);
     } else {
-      notifications.notifyUser(r.getAssignedApprover(), notice, TO_APPROVE);
+      toUser(r.getAssignedApprover(), notice, TO_APPROVE);
     }
   }
 
@@ -88,7 +101,7 @@ public class AccessRequestNotifier {
    * @param r request
    */
   public void toSecondApprove(AccessRequest r) {
-    notifications.notifyPermission(
+    toPermission(
         "UAM_SECOND_APPROVE",
         notice(r, "for second approval", describer.describe(r) + " (" + riskLabels(r) + ")"),
         "UAM_SECOND_APPROVAL");
@@ -110,7 +123,7 @@ public class AccessRequestNotifier {
    * @param r request
    */
   public void toImplement(AccessRequest r) {
-    notifications.notifyPermission(
+    toPermission(
         "ROLE_MANAGE", notice(r, "to implement", describer.describe(r)), "UAM_FOR_IMPLEMENTATION");
   }
 
@@ -121,7 +134,7 @@ public class AccessRequestNotifier {
    * @param outcome outcome text
    */
   public void decided(AccessRequest r, String outcome) {
-    notifications.notifyUser(
+    toUser(
         requester(r),
         notice(
             r, outcome, describer.describe(r) + AccessRequestService.note(r.getDecisionComment())),
@@ -145,7 +158,7 @@ public class AccessRequestNotifier {
    * @param r request
    */
   public void returned(AccessRequest r) {
-    notifications.notifyUser(
+    toUser(
         requester(r),
         notice(r, "returned", describer.describe(r) + " - " + r.getDecisionComment()),
         "UAM_REQUEST_RETURNED");
@@ -159,7 +172,7 @@ public class AccessRequestNotifier {
    */
   public void cancelled(AccessRequest r, String approver) {
     if (approver != null) {
-      notifications.notifyUser(
+      toUser(
           approver,
           notice(r, "cancelled", describer.describe(r) + " - " + r.getCancelReason()),
           "UAM_REQUEST_CANCELLED");
@@ -283,6 +296,18 @@ public class AccessRequestNotifier {
                         List.of(),
                         null,
                         link)));
+  }
+
+  private void toUser(String username, Notice notice, String event) {
+    delivery.toUser(username, notice, event, emailCopy());
+  }
+
+  private void toPermission(String permission, Notice notice, String event) {
+    delivery.toPermission(permission, notice, event, emailCopy());
+  }
+
+  private boolean emailCopy() {
+    return Boolean.parseBoolean(parameters.text(EMAIL_COPY, "true").trim());
   }
 
   private Notice notice(AccessRequest r, String what, String body) {

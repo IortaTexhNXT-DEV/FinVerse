@@ -39,6 +39,9 @@ import { TermsView } from './TermsView';
 import '@/styles/quotation.css';
 import { InsurerNames, LineLabel } from '@/components/broking/LovLabel';
 import { LoadingPanel } from '@/components/ui/LoadingPanel';
+import { RecordAuditLog } from './workspace/RecordAuditLog';
+import { RoutingTab } from './workspace/RoutingTab';
+import { PackageTermsPanel } from './terms/PackageTermsPanel';
 
 const TABS = [
   { id: 'details', label: 'Details' },
@@ -51,6 +54,8 @@ const TABS = [
   { id: 'documents', label: 'Documents' },
   { id: 'emails', label: 'E-mails' },
   { id: 'history', label: 'History' },
+  { id: 'routing', label: 'Routing & Approvals' },
+  { id: 'audit', label: 'Audit Logs' },
 ] as const;
 
 type TabId = (typeof TABS)[number]['id'];
@@ -121,7 +126,12 @@ function TabBody({ tab, request }: Readonly<{ tab: TabId; request: PackageReques
     case 'negotiation':
       return <NegotiationTab request={request} />;
     case 'comparative':
-      return <ComparativeTab request={request} />;
+      return (
+        <div className="stack">
+          <ComparativeTab request={request} />
+          <PackageTermsPanel request={request} />
+        </div>
+      );
     case 'requirements':
       return <RequirementsTab request={request} />;
     case 'setup':
@@ -143,6 +153,10 @@ function TabBody({ tab, request }: Readonly<{ tab: TabId; request: PackageReques
           <SentMessages entityType={PACKAGE_REQUEST_ENTITY} entityId={request.id} />
         </Card>
       );
+    case 'audit':
+      return <RecordAuditLog reference={request.requestNo} />;
+    case 'routing':
+      return <RoutingTab request={request} />;
     default:
       return <HistoryTab requestId={request.id} />;
   }

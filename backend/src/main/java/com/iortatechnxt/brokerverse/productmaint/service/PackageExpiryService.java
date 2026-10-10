@@ -14,7 +14,6 @@ import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.messaging.domain.Notice;
-import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
 import com.iortatechnxt.brokerverse.productmaint.domain.PackageRequest;
 import com.iortatechnxt.brokerverse.productmaint.domain.PackageRequestRepository;
 import com.iortatechnxt.brokerverse.productmaint.domain.PackageTerms;
@@ -49,7 +48,7 @@ public class PackageExpiryService {
   /** Exception code of the expiry alert (V817). */
   public static final String ALERT = "PACKAGE_EXPIRING";
 
-  private static final int DEFAULT_NOTICE_DAYS = 60;
+  private static final int DEFAULT_NOTICE_DAYS = 90;
   private static final Set<RequestStage> OPEN =
       EnumSet.complementOf(EnumSet.copyOf(RequestStage.CLOSED));
 
@@ -59,7 +58,7 @@ public class PackageExpiryService {
   private final ProductCatalogService catalog;
   private final InsurerService insurers;
   private final AlertService alerts;
-  private final NotificationService notifications;
+  private final PackageDateNotices dateNotices;
   private final SystemParameterService parameters;
   private final Clock clock;
 
@@ -72,7 +71,7 @@ public class PackageExpiryService {
    * @param catalog products
    * @param insurers insurer panel of the company
    * @param alerts exception alerts
-   * @param notifications in-app notices to TSU and MBS
+   * @param dateNotices notices to TSU (and MBS by setting)
    * @param parameters business parameters
    * @param clock clock
    */
@@ -83,7 +82,7 @@ public class PackageExpiryService {
       ProductCatalogService catalog,
       InsurerService insurers,
       AlertService alerts,
-      NotificationService notifications,
+      PackageDateNotices dateNotices,
       SystemParameterService parameters,
       Clock clock) {
     this.versions = versions;
@@ -92,7 +91,7 @@ public class PackageExpiryService {
     this.catalog = catalog;
     this.insurers = insurers;
     this.alerts = alerts;
-    this.notifications = notifications;
+    this.dateNotices = dateNotices;
     this.parameters = parameters;
     this.clock = clock;
   }
@@ -252,6 +251,7 @@ public class PackageExpiryService {
         drafted++;
       }
     }
+    alerted += dateNotices.anniversaries(source, companyId);
     return new MonitorRun(alerted, drafted);
   }
 
@@ -315,7 +315,7 @@ public class PackageExpiryService {
                     ALERT + ":" + v.productCode() + ":" + v.versionNo() + ":" + bucket))
             .isPresent();
     if (raised) {
-      // The FRS alerts TSU and MBS, who may not see the exception alerts.
+      // BDOI's FRS tells the TSU Officers and Team Leads (MBS too by setting).
       Notice notice =
           new Notice(
               "Package ending: " + v.productCode(),
@@ -323,8 +323,7 @@ public class PackageExpiryService {
               "/product-maintenance/expiry",
               "Product",
               v.productCode());
-      notifications.notifyPermission("PKG_NEGOTIATE", notice);
-      notifications.notifyPermission("PRODUCT_MAINTAIN", notice);
+      dateNotices.tell(notice);
     }
     return raised;
   }

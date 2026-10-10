@@ -183,7 +183,7 @@ class ProductMaintenanceFoundationIT {
             "CLAUSE_KIND")) {
       assertThat(lovs.activeValues(type, today)).as(type).isNotEmpty();
     }
-    assertThat(parameters.intValue("PACKAGE_EXPIRY_NOTICE_DAYS", 0)).isEqualTo(60);
+    assertThat(parameters.intValue("PACKAGE_EXPIRY_NOTICE_DAYS", 0)).isEqualTo(90);
     assertThat(parameters.intValue("PKG_SLA_NEGOTIATION", 0)).isEqualTo(120);
     assertThat(parameters.text("PKG_REQUEST_PREFIX", "")).isEqualTo("PKR-");
     assertThat(environment.getProperty("brokerverse.jobs.package-expiry-cron"))

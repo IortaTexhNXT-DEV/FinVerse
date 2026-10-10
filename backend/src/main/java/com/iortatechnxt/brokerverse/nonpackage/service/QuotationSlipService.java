@@ -18,6 +18,8 @@ import com.iortatechnxt.brokerverse.nonpackage.domain.InsurerResponse;
 import com.iortatechnxt.brokerverse.nonpackage.domain.InsurerResponseRepository;
 import com.iortatechnxt.brokerverse.nonpackage.domain.ProposalRequest;
 import com.iortatechnxt.brokerverse.nonpackage.domain.ProposalStatus;
+import com.iortatechnxt.brokerverse.nonpackage.service.ProposalDocuments.InsurerFileName;
+import com.iortatechnxt.brokerverse.report.core.ExportFileNames;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import com.iortatechnxt.brokerverse.workflow.service.TransitionNote;
 import com.iortatechnxt.brokerverse.workflow.service.WorkflowService;
@@ -208,7 +210,12 @@ public class QuotationSlipService {
                 + p.getQsReplyBy()
                 + ". The document is password protected; the password follows separately.\n\n"
                 + documents.company(p),
-            List.of(slip),
+            List.of(
+                ProposalDocuments.forInsurer(
+                    slip,
+                    new InsurerFileName("QS", p.getArn(), insurer.getName()),
+                    BusinessClock.today(clock),
+                    ExportFileNames.bdoi(parameters))),
             new Protection(null, true, null),
             new RecordLink(ProposalService.ENTITY, String.valueOf(p.getId()), p.getPrfNo())));
   }

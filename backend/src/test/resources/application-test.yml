@@ -6,6 +6,12 @@ management:
     redis:
       enabled: false
 brokerverse:
+  # The flows of the Enterprise SSO platform run against its simulator in the tests.
+  identity:
+    simulator: true
+  # The product master changes are delivered to the simulated receiving system in the tests.
+  product-master:
+    simulator: true
   security:
     jwt-secret: test-secret-for-automated-tests-0123456789abcdef
     mfa:

@@ -6,32 +6,23 @@ import type { ExportFormat } from '@/api/reports';
 import { useAuth } from '@/auth/authContext';
 import { Button } from '@/components/ui/Button';
 import { useToast } from '@/components/ui/toastContext';
-
-interface AuditFilters {
-  from: string;
-  to: string;
-  username: string;
-  entityType: string;
-}
+import { exportParams } from './auditTrail';
+import type { AuditFilters } from './auditTrail';
 
 /**
  * Download of the audit log report CTL-AUDIT for the filters on screen (BRNB.086/089: view,
- * download and save the audit log report).
+ * download and save the audit log report; BDOI FRS FRUM.008.01: CSV, PDF and Excel, named
+ * "Audit Logs_MMDDYYYY", with a confirmation once saved).
  */
-export function AuditExportButtons({ filters }: Readonly<{ filters: AuditFilters }>) {
+export function AuditExportButtons({
+  filters,
+  formats = ['XLSX', 'PDF', 'CSV'],
+}: Readonly<{ filters: AuditFilters; formats?: ExportFormat[] }>) {
   const { can } = useAuth();
   const toast = useToast();
   const download = useMutation({
-    mutationFn: (format: ExportFormat) => {
-      const params: Record<string, string> = { fromDate: filters.from, toDate: filters.to };
-      if (filters.username.trim() !== '') {
-        params.username = filters.username.trim();
-      }
-      if (filters.entityType.trim() !== '') {
-        params.entityType = filters.entityType.trim();
-      }
-      return reportApi.export('CTL-AUDIT', params, format);
-    },
+    mutationFn: (format: ExportFormat) =>
+      reportApi.export('CTL-AUDIT', exportParams(filters), format),
     onSuccess: (file) => {
       saveFile(file.blob, file.fileName);
       toast.success(`${file.fileName} downloaded`);
@@ -43,7 +34,7 @@ export function AuditExportButtons({ filters }: Readonly<{ filters: AuditFilters
   }
   return (
     <>
-      {(['XLSX', 'PDF', 'CSV'] as ExportFormat[]).map((format) => (
+      {formats.map((format) => (
         <Button
           key={format}
           variant="secondary"

@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.nbadmin.report;
 import com.iortatechnxt.brokerverse.nbadmin.report.UserAccessHistory.Change;
 import com.iortatechnxt.brokerverse.nbadmin.report.UserAccessHistory.Snapshot;
 import com.iortatechnxt.brokerverse.nbadmin.report.UserAccessHistory.UserRow;
+import com.iortatechnxt.brokerverse.report.core.NamedExport;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
 import com.iortatechnxt.brokerverse.report.core.ReportDefinition;
 import com.iortatechnxt.brokerverse.report.core.ReportMetadata;
@@ -26,7 +27,7 @@ import org.springframework.stereotype.Component;
  * date is not listed.
  */
 @Component
-public class GroupMembersReport implements ReportDefinition {
+public class GroupMembersReport implements ReportDefinition, NamedExport {
 
   /** Report code. */
   public static final String CODE = "UAM-GROUP-MEMBERS";
@@ -46,6 +47,11 @@ public class GroupMembersReport implements ReportDefinition {
   public GroupMembersReport(UserAccessHistory history, Clock clock) {
     this.history = history;
     this.clock = clock;
+  }
+
+  @Override
+  public String exportName() {
+    return "Group Profile Membership List";
   }
 
   @Override

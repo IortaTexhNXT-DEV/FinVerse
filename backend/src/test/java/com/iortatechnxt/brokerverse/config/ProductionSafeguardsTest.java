@@ -85,6 +85,19 @@ class ProductionSafeguardsTest {
   }
 
   @Test
+  void theEnterpriseSsoSimulatorIsRefusedInProductionOnly() {
+    MockEnvironment env = completeProduction();
+    env.setProperty("brokerverse.identity.simulator", "true");
+    assertThat(ProductionSafeguards.problems(env))
+        .anySatisfy(p -> assertThat(p).contains("Enterprise SSO simulator"));
+    MockEnvironment uat =
+        new MockEnvironment()
+            .withProperty("brokerverse.environment", "local")
+            .withProperty("brokerverse.identity.simulator", "true");
+    assertThat(ProductionSafeguards.problems(uat)).isEmpty();
+  }
+
+  @Test
   void seedDataIsAllowedOutsideProduction() {
     MockEnvironment env = new MockEnvironment().withProperty("brokerverse.environment", "uat");
     env.setActiveProfiles("seed");

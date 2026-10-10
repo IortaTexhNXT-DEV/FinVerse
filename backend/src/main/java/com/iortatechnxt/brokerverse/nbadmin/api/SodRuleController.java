@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.common.api.ReasonRequest;
 import com.iortatechnxt.brokerverse.nbadmin.api.dto.SodRuleRequest;
 import com.iortatechnxt.brokerverse.nbadmin.api.dto.SodRuleResponse;
 import com.iortatechnxt.brokerverse.nbadmin.domain.SodRule;
+import com.iortatechnxt.brokerverse.nbadmin.domain.SodRuleKind;
 import com.iortatechnxt.brokerverse.nbadmin.service.AccessRequestDescriber;
 import com.iortatechnxt.brokerverse.nbadmin.service.SodRuleService;
 import jakarta.validation.Valid;
@@ -73,7 +74,12 @@ public class SodRuleController {
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize(MAINTAIN)
   public SodRuleResponse create(@Valid @RequestBody SodRuleRequest body) {
-    return view(rules.create(body.profileA(), body.profileB(), body.description()));
+    return view(
+        rules.create(
+            body.kind() == null ? SodRuleKind.PROFILES : body.kind(),
+            body.profileA(),
+            body.profileB(),
+            body.description()));
   }
 
   /**

@@ -36,6 +36,8 @@ import {
   QuotationSlipTab,
 } from './ProposalTabs';
 import { ResponsesTab } from './ResponsesTab';
+import { ClientResponseCard } from '@/features/productmaint/terms/ClientResponseCard';
+import { QuotationTermsPanel } from '@/features/productmaint/terms/QuotationTermsPanel';
 import '@/styles/quotation.css';
 import { ProductLineLabel, InsurerNames } from '@/components/broking/LovLabel';
 import { recordDescription } from '@/components/broking/recordDescription';
@@ -105,9 +107,19 @@ function TabBody({ tab, proposal }: Readonly<{ tab: TabId; proposal: Proposal }>
     case 'responses':
       return <ResponsesTab proposal={proposal} />;
     case 'comparative':
-      return <ComparativeTab proposal={proposal} />;
+      return (
+        <div className="stack">
+          <ComparativeTab proposal={proposal} />
+          <QuotationTermsPanel proposal={proposal} />
+        </div>
+      );
     case 'ps':
-      return <ProposalSlipTab proposal={proposal} />;
+      return (
+        <div className="stack">
+          <ProposalSlipTab proposal={proposal} />
+          <ClientResponseCard id={proposal.id} canRecord={proposal.status === 'SENT_TO_CLIENT'} />
+        </div>
+      );
     case 'documents':
       return (
         <Attachments

@@ -43,6 +43,12 @@ import java.util.List;
  * @param recordStatus maker-checker status
  * @param maker last maintainer
  * @param authorizedBy checker
+ * @param description package description (Product Matrix)
+ * @param incentiveEligible Incentive Eligible
+ * @param incentiveAmount incentive amount
+ * @param incentiveRate incentive commission rate
+ * @param policyType policy type
+ * @param insuredName Insured's Name
  * @param origin BIBS or MIGRATED with the legacy facts (unwrapped; LEGACY badge)
  */
 public record ProductResponse(
@@ -73,6 +79,12 @@ public record ProductResponse(
     RecordStatus recordStatus,
     String maker,
     String authorizedBy,
+    String description,
+    boolean incentiveEligible,
+    BigDecimal incentiveAmount,
+    BigDecimal incentiveRate,
+    String policyType,
+    String insuredName,
     @JsonUnwrapped RecordOrigin origin) {
 
   /**
@@ -121,6 +133,12 @@ public record ProductResponse(
         e.getRecordStatus(),
         e.getMaker(),
         e.getAuthorizedBy(),
+        e.getDescription(),
+        e.isIncentiveEligible(),
+        e.getIncentiveAmount(),
+        e.getIncentiveRate(),
+        e.getPolicyType(),
+        e.getInsuredName(),
         e.getRecordOrigin());
   }
 }

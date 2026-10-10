@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.productmaint.api;
 
+import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.productmaint.api.dto.OutputDtos.ClientViewBody;
 import com.iortatechnxt.brokerverse.productmaint.api.dto.OutputDtos.OutputView;
 import com.iortatechnxt.brokerverse.productmaint.api.dto.OutputDtos.RequirementsBody;
@@ -11,6 +12,7 @@ import com.iortatechnxt.brokerverse.productmaint.api.dto.RequestDtos.ReasonBody;
 import com.iortatechnxt.brokerverse.productmaint.api.dto.RequestDtos.RequestResponse;
 import com.iortatechnxt.brokerverse.productmaint.service.ComparativeService;
 import com.iortatechnxt.brokerverse.productmaint.service.ComparativeTable.Selection;
+import com.iortatechnxt.brokerverse.productmaint.service.ManComRouting;
 import com.iortatechnxt.brokerverse.productmaint.service.PackageSetupHandoff;
 import com.iortatechnxt.brokerverse.productmaint.service.PackageSetupHandoff.SetupInput;
 import com.iortatechnxt.brokerverse.productmaint.service.RequirementsService;
@@ -45,6 +47,7 @@ public class PackageOutputsController {
   private final RequirementsService requirements;
   private final PackageSetupHandoff setup;
   private final TermsCodec codec;
+  private final ManComRouting mancom;
 
   /**
    * Creates the controller.
@@ -53,16 +56,19 @@ public class PackageOutputsController {
    * @param requirements requirements and sign-off
    * @param setup MBS set-up
    * @param codec terms JSON
+   * @param mancom ManCom routing (selected approvers)
    */
   public PackageOutputsController(
       ComparativeService comparatives,
       RequirementsService requirements,
       PackageSetupHandoff setup,
-      TermsCodec codec) {
+      TermsCodec codec,
+      ManComRouting mancom) {
     this.comparatives = comparatives;
     this.requirements = requirements;
     this.setup = setup;
     this.codec = codec;
+    this.mancom = mancom;
   }
 
   /**
@@ -196,6 +202,11 @@ public class PackageOutputsController {
   @PostMapping("/signoff")
   @PreAuthorize("hasAuthority('PKG_MANCOM_SIGNOFF')")
   public SignoffView signoff(@PathVariable Long id, @Valid @RequestBody CommentBody body) {
+    if (mancom.selectedRouting()) {
+      throw new BusinessRuleException(
+          "PKG_MANCOM_ROUTING",
+          "Select the ManCom approvers; the request is signed off when all of them approved");
+    }
     return SignoffView.from(requirements.signoff(id, body.text()));
   }
 

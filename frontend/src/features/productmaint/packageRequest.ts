@@ -9,6 +9,8 @@ import type {
   RequestStage,
   RequestType,
 } from '@/api/productmaint';
+import { toDetails } from './requestDetails';
+import type { DetailsForm } from './requestDetails';
 
 /** Status tabs of the Package Requests work list (design section 11). */
 export const REQUEST_TABS = [
@@ -31,7 +33,7 @@ export const TAB_STAGES: Record<RequestTab, RequestStage[]> = {
   approval: ['FOR_MKT_APPROVAL'],
   tsu: ['FOR_TSU_REVIEW', 'FOR_TSU_APPROVAL'],
   negotiation: ['NEGOTIATION', 'TERMS_REVIEW', 'FOR_MKT_REVIEW', 'REQUIREMENTS_PREP'],
-  mancom: ['FOR_MANCOM'],
+  mancom: ['FOR_MANCOM', 'MANCOM_APPROVED'],
   mbs: ['WITH_MBS'],
   validation: ['FOR_VALIDATION'],
   released: ['RELEASED'],
@@ -114,6 +116,10 @@ export interface RequestForm {
   reasonNote: string;
   negotiationRequired: boolean;
   terms: PackageTerms;
+  /** Source of the request (BDOI FRS FRPM.011.02); Marketing when absent. */
+  source?: string;
+  /** The package details of the request form of BDOI's FRS. */
+  details?: DetailsForm;
 }
 
 /** Empty terms with the suggested sections. */
@@ -148,6 +154,22 @@ export function newRequestForm(): RequestForm {
     reasonNote: '',
     negotiationRequired: true,
     terms: emptyTerms(),
+  };
+}
+
+/**
+ * A new request opened from a link: the type and the package of the query (Deactivate Package on
+ * the Product Matrix opens a retirement request when the setting PM_DEACTIVATION_ROUTE asks for it).
+ */
+export function requestedForm(params: URLSearchParams): RequestForm {
+  const form = newRequestForm();
+  const type = params.get('type');
+  const product = params.get('product');
+  const types: readonly string[] = ['NEW', 'AMEND', 'UPDATE', 'RENEW', 'RETIRE', 'REACTIVATE'];
+  return {
+    ...form,
+    type: type !== null && types.includes(type) ? (type as RequestForm['type']) : form.type,
+    productCode: product ?? form.productCode,
   };
 }
 
@@ -232,6 +254,8 @@ export function toRequestInput(f: RequestForm, companyId: number): RequestInput 
       ...f.terms,
       sections: f.terms.sections.filter((s) => (s.text ?? '').trim() !== ''),
     },
+    source: f.source ?? 'MARKETING',
+    details: toDetails(f.details),
   };
 }
 

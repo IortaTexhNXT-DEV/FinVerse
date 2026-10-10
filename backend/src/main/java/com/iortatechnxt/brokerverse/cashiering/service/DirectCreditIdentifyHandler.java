@@ -96,6 +96,17 @@ public class DirectCreditIdentifyHandler implements BulkImportHandler {
   }
 
   @Override
+  public String filledBy() {
+    return "Cashiering officers, from the bank's Direct Credit file of the payments already received";
+  }
+
+  @Override
+  public String instructions() {
+    return "Each row names the Bills Payment file (BP filename) and the transaction number of a payment"
+        + " already received; the payment is identified and applied to its accounts.";
+  }
+
+  @Override
   public String uploadPath() {
     return "Cashiering > Payment Files, type Direct Credit";
   }

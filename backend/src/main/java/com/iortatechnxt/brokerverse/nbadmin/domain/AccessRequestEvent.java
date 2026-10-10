@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.nbadmin.domain;
 
+import com.iortatechnxt.brokerverse.audit.domain.ActorContext;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -49,6 +50,12 @@ public class AccessRequestEvent {
   @Column(name = "occurred_at", nullable = false, updatable = false)
   private Instant occurredAt;
 
+  @Column(name = "ip_address", updatable = false, length = ActorContext.MAX_ADDRESS)
+  private String ipAddress;
+
+  @Column(name = "role_names", updatable = false, length = ActorContext.MAX_ROLES)
+  private String roleNames;
+
   protected AccessRequestEvent() {}
 
   /**
@@ -77,6 +84,8 @@ public class AccessRequestEvent {
     this.remarks = remarks;
     this.actor = actor;
     this.occurredAt = occurredAt;
+    this.ipAddress = ActorContext.address();
+    this.roleNames = ActorContext.roles();
   }
 
   public Long getId() {
@@ -109,5 +118,23 @@ public class AccessRequestEvent {
 
   public Instant getOccurredAt() {
     return occurredAt;
+  }
+
+  /**
+   * Source (IP) address of the request that made the entry.
+   *
+   * @return address, null for background work
+   */
+  public String getIpAddress() {
+    return ipAddress;
+  }
+
+  /**
+   * Group profiles of the actor at the time of the entry.
+   *
+   * @return role names, null when not known
+   */
+  public String getRoleNames() {
+    return roleNames;
   }
 }

@@ -11,6 +11,7 @@ export type RequestStage =
   | 'FOR_MKT_REVIEW'
   | 'REQUIREMENTS_PREP'
   | 'FOR_MANCOM'
+  | 'MANCOM_APPROVED'
   | 'WITH_MBS'
   | 'FOR_VALIDATION'
   | 'RELEASED'
@@ -134,6 +135,10 @@ export interface RequestListItem {
   assignee?: string;
   createdBy: string;
   createdAt: string;
+  /** Submission date and time (BDOI FRS FRPM.002.02). */
+  submittedAt?: string;
+  /** Status in BDOI's words (FRPM.011.01). */
+  statusName?: string;
 }
 
 export interface RequestInput {
@@ -150,6 +155,31 @@ export interface RequestInput {
   reasonNote?: string;
   negotiationRequired?: boolean;
   terms: PackageTerms;
+  /** Source of the request: MARKETING, TSU or INSURER (BDOI FRS FRPM.011.02). */
+  source?: string;
+  /** The Annex E fields of the request. */
+  details?: RequestDetails;
+}
+
+/** The Annex E fields of a package request not held elsewhere (BDOI FRS FRPM.011.02). */
+export interface RequestDetails {
+  businessOrigin?: string;
+  accountOfficer?: string;
+  unitHead?: string;
+  insuredName?: string;
+  estimatedPolicies?: number;
+  estimatedPremium?: number;
+  typeOfCover?: string;
+  descriptionOfCover?: string;
+  cover?: string;
+  extensions?: string;
+  warranties?: string;
+  otherInstructions?: string;
+  maximumLimits?: string;
+  premium?: number;
+  incentiveEligible?: boolean;
+  incentiveAmount?: number;
+  incentiveRate?: number;
 }
 
 export interface RequestSearch {

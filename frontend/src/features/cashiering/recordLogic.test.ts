@@ -48,7 +48,7 @@ const settings: FormSettings = {
     { id: 2, code: 'CEB', name: 'Cebu' },
   ],
   orBranches: [{ id: 1, code: 'HO', name: 'Head Office' }],
-  usdRate: 56.12,
+  foreignRate: 56.12,
   today: '2026-10-09',
 };
 

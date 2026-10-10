@@ -258,6 +258,8 @@ conflicts:
     recommendation: "Option (a): UIDM-ISC provisions the user accounts (create, deactivate, reactivate) through the standard provisioning interface, each change logged with its UIDM request number; the assignment and change of group profiles and the group-profile requests stay as requests in the system under four eyes. FRUM.009 to FRUM.011 then apply to the changes not requested in UIDM; all of them apply if BDOI keeps every request in the system."
     impact: Scope of FRUM.002, FRUM.003 and the new FRUM.009 to FRUM.011; provisioning interface to agree with BDOI IT; Annex A flows.
     decide_by: BDOI IT; Process Owner (Business Administration); Information Security
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "user accounts are created, updated, deactivated and reactivated from the Enterprise SSO and UIDM-ISC events (setting on by default, BDOI's text) or only through approved requests; the group profiles named in a UIDM-ISC event are applied only when a second setting is on (default off, option a)."
   - id: C02
     kind: Between the documents
     topic: Assignment of roles to a user
@@ -291,6 +293,8 @@ conflicts:
     recommendation: Create the user from the UIDM-ISC provisioning (which carries the SSO account) or from an approved enrolment; the Windows ID is checked against EIAM at the first sign-in. A look-up of the SSO directory on the enrolment screen is a platform change for BDOI to decide.
     impact: FRUM.002.01, Annex N.
     decide_by: BDOI IT
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "the user is created from an active Enterprise SSO account when the provisioning setting is on (default)."
   - id: C05
     kind: Between the documents
     topic: Duplicate user check
@@ -324,6 +328,8 @@ conflicts:
     recommendation: Keep both - BDOI's message and Log In button after the inactivity sign-out (adopt the wording), and the warning before the fixed end of the session that the BRD asks.
     impact: FRUM.001.04; Annexes J and K.
     decide_by: Process Owner (Business Administration)
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "after the inactivity sign-out the page 'Your session timed out' with Log In is shown (setting on by default, BDOI's text) or a message on the Login page."
   - id: C08
     kind: Between the documents
     topic: Wording of the inactivity warning
@@ -335,6 +341,8 @@ conflicts:
     recommendation: Adopt BDOI's text and buttons (a screen text change, no rule change).
     impact: FRUM.001.03; Annex K.
     decide_by: Process Owner (Business Administration)
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "the inactivity warning uses BDOI's wording and the buttons Stay Logged In and Log Out (setting on by default) or the earlier wording."
   - id: C09
     kind: Between the documents
     topic: Lock-out after three invalid tries
@@ -357,6 +365,8 @@ conflicts:
     recommendation: Adopt 10 for the local accounts (a setting value, no change).
     impact: Annex M.
     decide_by: Information Security
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "the number of previous passwords that may not be reused is a security setting, delivered at 10 (BDOI's text)."
   - id: C11
     kind: Between the documents
     topic: Password reset and forgotten password
@@ -368,6 +378,8 @@ conflicts:
     recommendation: "SSO users: BDOI's rule (no reset in the application). Break-glass accounts: reset by a second administrator only; the self-service link switched off in production."
     impact: FRUM-004; Annexes M and N.
     decide_by: Information Security; BDOI IT
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "no forgotten-password link and reset by another System Administrator only (setting on by default, BDOI's text) or the self-service reset of local accounts."
   - id: C12
     kind: Between the documents
     topic: Detail of the sign-in error messages
@@ -390,6 +402,8 @@ conflicts:
     recommendation: With option (a), a leaver from UIDM-ISC deactivates the user and ends the open sessions at once (platform change); a deactivation request does the same on approval.
     impact: FRUM.003.02.01; Annex N.
     decide_by: BDOI IT; Information Security
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "access is revoked and restored from the Enterprise SSO status when the provisioning setting is on (default)."
   - id: C14
     kind: Between the documents
     topic: Synchronisation status and on-demand synchronisation
@@ -401,6 +415,8 @@ conflicts:
     recommendation: Show on each user the last provisioning event (time, source, UIDM request number); refuse a failed provisioning call back to UIDM-ISC and alert the System Administrator; replace the on-demand synchronisation by a re-send from UIDM-ISC.
     impact: FRUM.002.02, FRUM.003.03; Annex N; platform change.
     decide_by: BDOI IT
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "synchronisation from the Enterprise SSO runs on each event and on demand when the provisioning setting is on (default)."
   - id: C15
     kind: Between the documents
     topic: Supervisory and record-ownership access
@@ -423,6 +439,8 @@ conflicts:
     recommendation: Keep the rules at group-profile level (what one user may hold); BDOI lists the permission pairs it means and they become rules between profiles.
     impact: FRUM.006.03, FRUM.012.01.
     decide_by: Information Security
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "the conflicting permission combinations are rules maintained by Information Security under a second approval."
   - id: C17
     kind: Between the documents
     topic: Second approval of privileged and out-of-hours changes
@@ -445,6 +463,8 @@ conflicts:
     recommendation: Adopt BDOI's file names (a change of the download name).
     impact: FRUM.007.02, FRUM.008.01 (2nd).
     decide_by: Process Owner (Business Administration)
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "the exports are named by BDOI's convention <name>_MMDDYYYY (setting on by default) or by the report code."
   - id: C19
     kind: Between the documents
     topic: Role and IP address in the audit log
@@ -522,6 +542,8 @@ conflicts:
     recommendation: Add as FRUM.013.01.
     impact: FRUM.013.01; Annex L.
     decide_by: Process Owner (Business Administration)
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "the notices of access requests are also e-mailed by each user's notification preference (setting on by default) or shown in the system only."
   - id: C26
     kind: Between the documents
     topic: Dormant accounts

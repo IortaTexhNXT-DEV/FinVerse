@@ -26,6 +26,8 @@ public enum RequestStage {
   REQUIREMENTS_PREP("Requirements preparation"),
   /** Waiting for the ManCom sign-off (BRPM.015). */
   FOR_MANCOM("For ManCom sign-off"),
+  /** ManCom approved; the deployment is requested by the Request for Deployment button. */
+  MANCOM_APPROVED("ManCom approved, deployment to request"),
   /** With MBS for the package set-up (BRPM.015). */
   WITH_MBS("With MBS for set-up"),
   /** The catalog version waits for the validation checkpoint (PMADD06). */

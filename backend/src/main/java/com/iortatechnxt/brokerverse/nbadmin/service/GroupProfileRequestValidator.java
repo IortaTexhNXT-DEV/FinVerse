@@ -71,6 +71,7 @@ public class GroupProfileRequestValidator {
     }
     RolePermissionChangeValidator.requireKnown(permissions);
     RolePermissionChangeValidator.requireStorable(permissions);
+    permissionChanges.checkCombination(role.name(), permissions, permissions);
     RequestedRole data =
         new RequestedRole(
             role.name(),

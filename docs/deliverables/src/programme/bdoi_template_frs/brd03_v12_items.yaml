@@ -210,9 +210,9 @@ frpm_tests:
 # (item: {criterion number: [Yes|Partly|No, reason]}). Item-level availability of BDOI's own sub-items comes from the
 # platform status of the comparison workbook (brd03_frs_comparison.yaml, mapping).
 coverage:
-  FRPM.003.07: {2: ["Partly", "A deactivation (retirement) request can be returned or voided with its reason; an explicit Reject outcome is point C04."]}
-  FRPM.004.01: {1: ["Partly", "The Expiring tab lists packages within the notice days; the delivered notice is 60 days and is set to 90 at go-live (M.5)."]}
-  FRPM.007.01: {1: ["No", "Reports cannot be scheduled yet; the weekly run is planned (programme gap G04)."], 3: ["Partly", "Report runs are kept in the report archive; the weekly repository comes with the scheduled run."]}
-  FRPM.009.01: {1: ["No", "The Final Terms for Proposal column is not available (comparison: platform status No)."]}
-  FRPM.020.01: {1: ["Partly", "Saved report variants are available; sharing a saved definition between users is to be confirmed in UAT."]}
-  FRPM.029.01: {1: ["Partly", "Stage notices go to the creator and the assignee; a notice to every TSU Team Lead is not sent."], 2: ["Partly", "The change is recorded; its transfer waits for BDOI to name the systems (PQ16)."]}
+  FRPM.003.07: {2: ["Yes", "Shown in TC-FRPM.003.07-AC2: the rejected deactivation request shows the approver's remarks and the package stays active."]}
+  FRPM.004.01: {1: ["Yes", "Shown in TC-FRPM.004.01-AC1: a package ending in 45 days is in the Expiring tab with 45 days left (notice period 90 days)."]}
+  FRPM.007.01: {1: ["Yes", "Shown in TC-FRPM.007.01-AC1: the run of Thursday 08:00 lists the quotation requests active or processed in the period with their latest status."], 3: ["Yes", "Shown in TC-FRPM.007.01-AC3: the Excel file of the repository has the rows of the preview, in the same order."]}
+  FRPM.009.01: {1: ["Yes", "Shown in TC-FRPM.009.01-AC1: the Final Terms take the selected insurer's terms; the edited premium is kept in the history."]}
+  FRPM.020.01: {1: ["Yes", "Shown in TC-FRPM.020.01-AC1: a report template saved and shared by the TSU Head gives the TSU Team Lead the same rows."]}
+  FRPM.029.01: {1: ["Yes", "Shown in TC-FRPM.029.01-AC1: the TSU Team Lead is told when a request enters TSU review."], 2: ["Yes", "Shown in TC-FRPM.029.01-AC2: the release records the product master change with the product, version and effective date, sent to the receiving systems (simulated in SIT and UAT; connection details from BDOI IT at SIT)."]}

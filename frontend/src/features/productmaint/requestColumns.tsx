@@ -65,4 +65,46 @@ export const REQUEST_COLUMNS: Column<RequestListItem>[] = [
   { key: 'stage', header: 'Stage', render: (r) => <StatusBadge status={r.status} /> },
   { key: 'age', header: 'In Stage', render: (r) => <StageAge item={r} /> },
   { key: 'assignee', header: 'Assignee', render: (r) => <UserName login={r.assignee} /> },
+  { key: 'ao', header: 'Account Officer', render: (r) => <UserName login={r.createdBy} /> },
+  {
+    key: 'submitted',
+    header: 'Submission Date',
+    render: (r) => (r.submittedAt === undefined ? '' : formatDate(r.submittedAt.slice(0, 10))),
+  },
+];
+
+/**
+ * The Package Request List of the Product Maintenance landing page in BDOI's words (FRPM.002.02):
+ * Package Request Number, Reference Number (update requests), Request Type, Product Line, Account
+ * Officer, Assigned TSU User, Submission Date and Current Status.
+ */
+export const PACKAGE_REQUEST_LIST_COLUMNS: Column<RequestListItem>[] = [
+  {
+    key: 'no',
+    header: 'Package Request Number',
+    render: (r) => <ReferenceChip value={r.requestNo} />,
+  },
+  {
+    key: 'ref',
+    header: 'Reference Number',
+    render: (r) => (r.requestType === 'NEW' ? '' : productOf(r)),
+  },
+  { key: 'type', header: 'Request Type', render: (r) => typeLabel(r.requestType) },
+  { key: 'line', header: 'Product Line', render: (r) => <LineLabel code={r.lineCode} /> },
+  { key: 'ao', header: 'Account Officer', render: (r) => <UserName login={r.createdBy} /> },
+  {
+    key: 'tsu',
+    header: 'Assigned TSU User',
+    render: (r) => <UserName login={r.assignee} empty="Unassigned" />,
+  },
+  {
+    key: 'submitted',
+    header: 'Submission Date',
+    render: (r) => (r.submittedAt === undefined ? '' : formatDate(r.submittedAt.slice(0, 10))),
+  },
+  {
+    key: 'status',
+    header: 'Current Status',
+    render: (r) => <StatusBadge status={r.status} label={r.statusName} full />,
+  },
 ];

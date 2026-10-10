@@ -9,6 +9,8 @@ import com.iortatechnxt.brokerverse.productmaint.domain.RequestType;
 import com.iortatechnxt.brokerverse.productmaint.service.PackageQueryService;
 import com.iortatechnxt.brokerverse.productmaint.service.PackageQueryService.CaseFacts;
 import com.iortatechnxt.brokerverse.productmaint.service.PackageRequestService.Prefill;
+import com.iortatechnxt.brokerverse.productmaint.service.PmStatusNames;
+import com.iortatechnxt.brokerverse.productmaint.service.RequestDetails;
 import com.iortatechnxt.brokerverse.productmaint.service.RequestDraft;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -41,6 +43,8 @@ public final class RequestDtos {
    * @param reasonNote comment on the reason
    * @param negotiationRequired insurers approached (RENEW / UPDATE / REACTIVATE)
    * @param terms requested terms and target insurers
+   * @param source source of the request (Marketing, TSU or Insurer)
+   * @param details Annex E details of the request
    */
   public record FormBody(
       Long companyId,
@@ -56,7 +60,9 @@ public final class RequestDtos {
       @NotBlank @Size(max = 40) String reason,
       @Size(max = 500) String reasonNote,
       Boolean negotiationRequired,
-      PackageTerms terms) {
+      PackageTerms terms,
+      @Size(max = 20) String source,
+      RequestDetails details) {
 
     /**
      * The service draft.
@@ -139,8 +145,10 @@ public final class RequestDtos {
    * @param stageEnteredAt stage since
    * @param dueAt SLA due time
    * @param assignee assignee
-   * @param createdBy maker
+   * @param createdBy maker (the Account Officer of a Marketing request)
    * @param createdAt created
+   * @param submittedAt submission date and time
+   * @param statusName status in BDOI's words
    */
   public record ListItem(
       Long id,
@@ -158,7 +166,9 @@ public final class RequestDtos {
       Instant dueAt,
       String assignee,
       String createdBy,
-      Instant createdAt) {
+      Instant createdAt,
+      Instant submittedAt,
+      String statusName) {
 
     /**
      * Maps a request with its work case facts.
@@ -184,7 +194,12 @@ public final class RequestDtos {
           c == null ? null : c.dueAt(),
           c == null ? null : c.assignee(),
           p.getCreatedBy(),
-          p.getCreatedAt());
+          p.getCreatedAt(),
+          p.getMilestones().getSubmittedAt(),
+          PmStatusNames.packageRequest(
+              p.getStatus(),
+              c == null ? null : c.lastAction(),
+              p.getRouting().getMarketingLevel()));
     }
   }
 

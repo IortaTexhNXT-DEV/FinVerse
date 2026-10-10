@@ -988,17 +988,18 @@ class Annexes:
         self.p("Every point where BDOI's FRS and the BIBS reference FRS differ, BDOI's open item, the changes made to "
                "the Business Requirements Mapping, the slips noticed in BDOI's text and the other observations of "
                "this version. BDOI's text is kept in the body of the document; this annex gives both readings, the "
-               "BRD text, what version 1.1 proposes, the impact and who decides. Every point starts as Open.")
+               "BRD text, what version 1.1 proposes, the impact and who decides. Every point starts as Open; a point that "
+               "BIBS offers both ways, chosen by a system setting, reads Configurable - BDOI to confirm the setting.")
         header = ["No.", "Ref.", "Topic", "BDOI FRS text", "BRD text", "Proposed in v1.1", "Impact", "Decision by",
                   "Status"]
         widths = [0.45, 0.5, 0.95, 1.75, 1.45, 2.15, 1.05, 1.0, 0.5]
         no = 0
 
-        def row(ref, topic, bdoi, brd, prop, impact, role_keys, section=None):
+        def row(ref, topic, bdoi, brd, prop, impact, role_keys, section=None, status="Open"):
             nonlocal no
             no += 1
             who = "; ".join(roles[r] for r in role_keys)
-            out = [f"M-{no:02d}", ref, topic, bdoi, brd, prop, impact, who, "Open"]
+            out = [f"M-{no:02d}", ref, topic, bdoi, brd, prop, impact, who, status]
             self.b.obs_rows.append(out + [section or current[0]])
             return out
         current = ["M.1"]
@@ -1015,7 +1016,9 @@ class Annexes:
                     continue
                 o = OBS["conflicts"][cid]
                 brd = c["brd_note"] if c["brd_note"] not in ("-", "") else "Not stated in the BRD."
-                rows.append(row(cid, c["topic"], c["bdoi"], brd, o["proposes"], o["impact"], o["role"]))
+                prop = o["proposes"] + (f" Available in BIBS: {o['setting']}" if o.get("setting") else "")
+                rows.append(row(cid, c["topic"], c["bdoi"], brd, prop, o["impact"], o["role"],
+                                status=o.get("status", "Open")))
                 self.listed_conflicts.add(cid)
             self.table(header, rows, widths, size=7)
         self.h2("M.2 BDOI's open item and changes to the Business Requirements Mapping")

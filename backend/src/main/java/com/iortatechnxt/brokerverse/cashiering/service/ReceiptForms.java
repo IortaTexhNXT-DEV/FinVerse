@@ -275,8 +275,9 @@ public class ReceiptForms {
     return result;
   }
 
-  private static String words(Receipt r) {
-    return ReceiptAmountWords.of(r.getAmount(), r.getCurrency());
+  private String words(Receipt r) {
+    String[] units = forms.wordUnits(r.getCurrency());
+    return ReceiptAmountWords.of(r.getAmount(), units[0], units[1]);
   }
 
   private static String mode(PaymentMode mode) {

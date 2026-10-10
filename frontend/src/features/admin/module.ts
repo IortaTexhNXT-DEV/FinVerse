@@ -29,6 +29,13 @@ export const adminModule: FeatureModule = {
       component: lazy(() => import('./UsersPage')),
     },
     {
+      path: '/admin/identity-sync',
+      label: 'Identity Synchronisation',
+      icon: FolderSync,
+      permission: 'USER_MANAGE',
+      component: lazy(() => import('./IdentitySyncPage')),
+    },
+    {
       path: '/admin/roles',
       label: 'Roles & Permissions',
       icon: ShieldCheck,

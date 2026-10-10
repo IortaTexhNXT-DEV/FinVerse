@@ -135,7 +135,7 @@ export interface FormSettings {
   bankAccounts: BankOption[];
   arBranches: BranchOption[];
   orBranches: BranchOption[];
-  usdRate: number;
+  foreignRate?: number;
   today: string;
 }
 

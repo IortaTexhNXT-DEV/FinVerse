@@ -13,6 +13,7 @@ import com.iortatechnxt.brokerverse.catalog.domain.ProductLine;
 import com.iortatechnxt.brokerverse.catalog.domain.RiskProduct;
 import com.iortatechnxt.brokerverse.catalog.service.ProductCatalogService;
 import com.iortatechnxt.brokerverse.catalog.service.ProductCatalogService.ProductFilter;
+import com.iortatechnxt.brokerverse.catalog.service.ProductDescriptions;
 import com.iortatechnxt.brokerverse.catalog.service.ProductRuleService;
 import com.iortatechnxt.brokerverse.catalog.service.version.ProductVersionQueries;
 import com.iortatechnxt.brokerverse.catalog.service.version.ProductVersionQueries.VersionFacts;
@@ -43,6 +44,7 @@ public class ProductCatalogController {
   private final ProductRuleService rules;
   private final ProductVersionQueries versions;
   private final CurrentUser currentUser;
+  private final ProductDescriptions descriptions;
 
   /**
    * Creates the controller.
@@ -51,16 +53,19 @@ public class ProductCatalogController {
    * @param rules field and document rules
    * @param versions package versions (list facts)
    * @param currentUser current user (archive access)
+   * @param descriptions products with their package description
    */
   public ProductCatalogController(
       ProductCatalogService catalog,
       ProductRuleService rules,
       ProductVersionQueries versions,
-      CurrentUser currentUser) {
+      CurrentUser currentUser,
+      ProductDescriptions descriptions) {
     this.catalog = catalog;
     this.rules = rules;
     this.versions = versions;
     this.currentUser = currentUser;
+    this.descriptions = descriptions;
   }
 
   /**
@@ -215,7 +220,8 @@ public class ProductCatalogController {
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize(CatalogAccess.MAINTAIN_PRODUCTS)
   public ProductResponse createProduct(@Valid @RequestBody ProductRequest request) {
-    return ProductResponse.from(catalog.createProduct(request.code(), request.details()));
+    return ProductResponse.from(
+        descriptions.create(request.code(), request.details(), request.extras()));
   }
 
   /**
@@ -229,6 +235,6 @@ public class ProductCatalogController {
   @PreAuthorize(CatalogAccess.MAINTAIN_PRODUCTS)
   public ProductResponse updateProduct(
       @PathVariable String code, @Valid @RequestBody ProductRequest request) {
-    return ProductResponse.from(catalog.updateProduct(code, request.details()));
+    return ProductResponse.from(descriptions.update(code, request.details(), request.extras()));
   }
 }

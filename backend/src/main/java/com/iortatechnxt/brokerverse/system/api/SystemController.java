@@ -198,7 +198,10 @@ public class SystemController {
         timeout,
         warningSeconds,
         parameters.intValue(
-            SystemParameterService.SESSION_EXPIRY_WARNING_MINUTES, DEFAULT_EXPIRY_WARNING_MINUTES));
+            SystemParameterService.SESSION_EXPIRY_WARNING_MINUTES, DEFAULT_EXPIRY_WARNING_MINUTES),
+        Math.min(idleWarning, timeout),
+        Boolean.parseBoolean(parameters.text("SESSION_BDOI_DIALOG", "true").trim()),
+        Boolean.parseBoolean(parameters.text("SESSION_TIMEOUT_PAGE", "true").trim()));
   }
 
   /**

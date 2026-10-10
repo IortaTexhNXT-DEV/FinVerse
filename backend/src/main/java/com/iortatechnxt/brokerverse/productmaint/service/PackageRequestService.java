@@ -43,6 +43,7 @@ public class PackageRequestService {
   private final AuditTrailService audit;
   private final CurrentUser currentUser;
   private final Clock clock;
+  private final MarketingChain marketing;
 
   /**
    * Creates the service.
@@ -56,6 +57,7 @@ public class PackageRequestService {
    * @param audit audit trail
    * @param currentUser current user
    * @param clock clock
+   * @param marketing Marketing approval chain
    */
   public PackageRequestService(
       PackageRequests requests,
@@ -66,7 +68,8 @@ public class PackageRequestService {
       WorkflowService workflow,
       AuditTrailService audit,
       CurrentUser currentUser,
-      Clock clock) {
+      Clock clock,
+      MarketingChain marketing) {
     this.requests = requests;
     this.rules = rules;
     this.numbers = numbers;
@@ -76,6 +79,7 @@ public class PackageRequestService {
     this.audit = audit;
     this.currentUser = currentUser;
     this.clock = clock;
+    this.marketing = marketing;
   }
 
   /**
@@ -189,8 +193,11 @@ public class PackageRequestService {
       throw new BusinessRuleException(
           PackageRequestRules.INCOMPLETE, "Complete the request: " + String.join("; ", missing));
     }
+    // BDOI FRS FRPM.011.02: a request of TSU or an insurer goes to TSU review at once.
+    String action = p.getRouting().fromMarketing() ? "submit" : "submit_to_tsu";
     workflow.transition(
-        PackageRequests.ENTITY, String.valueOf(id), "submit", TransitionNote.comment(comment));
+        PackageRequests.ENTITY, String.valueOf(id), action, TransitionNote.comment(comment));
+    p.getRouting().resetLevels();
     p.getMilestones().submitted(currentUser.username(), clock.instant());
     return p;
   }
@@ -209,6 +216,17 @@ public class PackageRequestService {
         || CurrentUser.sameUser(user, p.getMilestones().getSubmittedBy())) {
       throw new BusinessRuleException(
           FOUR_EYES, "A package request is approved by someone other than its maker");
+    }
+    if (!marketing.approve(p, user, comment)) {
+      audit.record(
+          PackageRequests.ENTITY,
+          p.getRequestNo(),
+          AuditAction.AUTHORIZE,
+          "Marketing approval "
+              + p.getRouting().getMarketingLevel()
+              + " of "
+              + MarketingChain.LEVELS);
+      return p;
     }
     workflow.transition(
         PackageRequests.ENTITY, String.valueOf(id), "approve", TransitionNote.comment(comment));

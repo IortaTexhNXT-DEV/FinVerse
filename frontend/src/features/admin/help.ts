@@ -22,6 +22,23 @@ export const ADMIN_HELP: HelpSection = {
       ],
     },
     {
+      name: 'Identity Synchronisation',
+      path: '/admin/identity-sync',
+      summary:
+        'Joiner, mover, leaver and status events received from UIDM-ISC and the Enterprise SSO platform, with their outcome (Applied, Refused, Failed, No Change), and the on-demand synchronisation of a user.',
+      workflow: [
+        'Filter the events by date, source, type and outcome; open an event to read the details that were received.',
+        'Reprocess a refused or failed event once the cause is fixed; Synchronise User reads the Enterprise SSO account of one user again.',
+        'Create from Enterprise SSO creates the user of an active account that has no user yet.',
+        'In SIT and UAT the simulator tab holds the directory accounts and sends their events.',
+      ],
+      controls: [
+        'An inactive, disabled, locked or deactivated account deactivates the user and ends the open sessions; an active account reactivates the user with the group profiles held before.',
+        'Group profiles come from UIDM-ISC only when the setting UAM_PROVISIONING_ROLES is on.',
+        'Every change is written to the access change log with the source and the UIDM request number.',
+      ],
+    },
+    {
       name: 'Roles & Permissions',
       path: '/admin/roles',
       summary:

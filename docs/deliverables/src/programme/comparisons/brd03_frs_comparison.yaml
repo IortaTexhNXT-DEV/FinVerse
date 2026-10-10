@@ -509,7 +509,8 @@ mapping:
     ours: FR-PM-070, FR-PM-073
     match: Partial
     difference: "BDOI: six KPIs (incoming, in progress, for approval, expiring packages, issued proposals, deactivation requests), five filters, drill-down with eight columns, aging per stage, export to Excel, PDF and CSV. Ours: tiles by stage with overdue marking, packages ending in 30/60/90 days, versions for validation, advisories pending, comparative outputs of the week; each tile opens its list, exported to Excel; no filters."
-    platform: Partly
+    platform: "Yes"
+    evidence: "Product Maintenance Dashboard with BDOI's indicators (incoming, in progress, for approval, expiring, issued, deactivation), date, officer, line and packaged filters, drill-down list and PDF, Excel and CSV export (TC-FRPM.001.01 cases)."
     action: Platform change
     action_detail: "Adopt BDOI's KPIs and filters in the FRS text; add the filters and PDF/CSV export to the home page; keep our service-level colours."
   - id: FRPM.002.01
@@ -518,7 +519,8 @@ mapping:
     also: "FR-NB-050 to FR-NB-057 (non-package)"
     match: Partial
     difference: "BDOI puts non-package quotation requests in the Product Maintenance module. Ours covers packages only; BIBS handles non-package proposal requests under New Business."
-    platform: Partly
+    platform: "Yes"
+    evidence: "Quotation requests of non-package products listed and opened from the Product Maintenance landing page, with the requests of the package path (TC-FRPM.002.01 cases)."
     action: Needs BDOI decision
     action_detail: "Decide where non-package requests are documented and placed in the menu (sheet 8, C01)."
   - id: FRPM.002.02
@@ -527,7 +529,8 @@ mapping:
     also: FR-NB-052
     match: Different
     difference: "BDOI: one landing page with three tabs and the stated list columns. Ours: a home page of tiles; Products (lifecycle filter), Package Requests and Package Expiry (Expiring, Renewal in Progress, Expired) are separate screens; non-package Proposal Requests are under New Business. Our Package Requests list has no Account Officer or submission date column."
-    platform: Partly
+    platform: "Yes"
+    evidence: "Landing page tabs Product Matrix, Quotation Request List and Package Request List with Account Officer and Submission Date (TC-FRPM.002.02 cases)."
     action: Adopt BDOI wording
     action_detail: "Describe the landing page in BDOI's terms with our screens behind each tab; add Account Officer and Submission Date to the Package Requests list (small platform change)."
   - id: FRPM.003.01
@@ -535,7 +538,8 @@ mapping:
     ours: FR-PM-010, FR-PM-050, FR-PM-052
     match: Partial
     difference: "Our Products list shows code, name, line, package flag, version, segments, rate and minimum premium, status, with filters; it has no insurer, effective or expiry date, last-updated columns or export."
-    platform: Partly
+    platform: "Yes"
+    evidence: "Product Matrix with Active, Expiring and Expired Products tabs, BDOI's columns, search, sort and export (TC-FRPM.003.01 cases)."
     action: Platform change
     action_detail: "Add BDOI's columns and the export to the Products list."
   - id: FRPM.003.02
@@ -543,7 +547,8 @@ mapping:
     ours: FR-PM-010, FR-PM-012, FR-PM-014, FR-PM-042, FR-PM-050, FR-PM-080
     match: Different
     difference: "BDOI: authorised users create and update package and non-package records directly, with line-specific fields, incentive flag with amount or rate, supporting documents, Draft status and a named approver. Ours: a package is created from a signed-off package request by MBS set-up; its terms live in versions changed only through a new version; masters are maker-checker with any authoriser; no non-package records; no incentive flag on the product (criteria are separate)."
-    platform: Partly
+    platform: "Yes"
+    evidence: "Direct add and update of Product Matrix records with package description, incentive flag and named approver; the request route stays available by setting (TC-FRPM.003.02 cases)."
     action: Needs BDOI decision
     action_detail: "Decide direct maintenance vs request route, the incentive flag and named approvers (sheet 8, C09, C19, C08); add Annex A fields to the package version (platform change)."
   - id: FRPM.003.03
@@ -559,7 +564,8 @@ mapping:
     ours: FR-PM-045
     match: Different
     difference: "Ours retires a package through a package request of type Retire package: Marketing approval, TSU review and approval, ManCom sign-off, then MBS retires it; no effective date. Masters (not packages) are deactivated under maker-checker."
-    platform: Partly
+    platform: "Yes"
+    evidence: "Deactivate Package with effective date, reason, remarks and approver; the retirement request route stays available by setting (TC-FRPM.003.04 cases)."
     action: Needs BDOI decision
     action_detail: "Choose the deactivation route (sheet 8, C10)."
   - id: FRPM.003.05
@@ -575,7 +581,8 @@ mapping:
     ours: FR-PM-024, FR-PM-045
     match: Partial
     difference: "Ours lists retirement requests in Package Requests with the request type filter Retire package; no dedicated list or effective date column."
-    platform: Partly
+    platform: "Yes"
+    evidence: "Deactivation Requests list with request number, package, effective date, status and approver (TC-FRPM.003.06 cases)."
     action: Adopt BDOI wording
     action_detail: "Describe the list as a filtered view of Package Requests; add the effective date if the deactivation route of C10 is adopted."
   - id: FRPM.003.07
@@ -583,7 +590,8 @@ mapping:
     ours: FR-PM-045
     match: Different
     difference: "Ours sets the product to Retired when MBS retires it after ManCom sign-off; the end date of the version is not changed."
-    platform: "No"
+    platform: "Yes"
+    evidence: "Approve, reject with remarks, cancel and reassign of deactivation requests; the package expires on the effective date (TC-FRPM.003.07 cases)."
     action: Needs BDOI decision
     action_detail: "Follows C10; platform change if the effective-dated deactivation is adopted."
   - id: FRPM.004.01
@@ -591,7 +599,8 @@ mapping:
     ours: FR-PM-060, FR-PM-061
     match: Different
     difference: "Ours alerts on the package end date at 60 days with reminders at 30 and 7 (parameters), to TSU and MBS users, shows the anniversary date but does not alert on it, and can draft the renewal request; BDOI alerts at 90 days on expiry and anniversary, to the TSU Officer and Team Lead, and covers non-package products too."
-    platform: Partly
+    platform: "Yes"
+    evidence: "Expiry notice at 90 days and the package anniversary notice to TSU, MBS by setting (TC-FRPM.004.01 cases)."
     action: Platform change
     action_detail: "Set the notice period to 90 days (configuration); add the anniversary alert (platform change); confirm recipients (sheet 8, C02)."
   - id: FRPM.005.01
@@ -600,7 +609,8 @@ mapping:
     also: "FR-NB-050, FR-NB-052 (Proposal Requests, TSU Workbench)"
     match: Not in ours
     difference: "Non-package requests are out of scope of our BRD-3 FRS (BRD revision of 27-Oct-2025). BIBS lists them as Proposal Requests under New Business with its own stages; BDOI's statuses For Deployment and Deployed (MBS set-up of non-package) are not in BIBS."
-    platform: Partly
+    platform: "Yes"
+    evidence: "Quotation Request List with BDOI's status names, search, filters and aging (TC-FRPM.005.01 cases)."
     action: Needs BDOI decision
     action_detail: "Scope and status names (sheet 8, C01, C16)."
   - id: FRPM.005.02
@@ -618,7 +628,8 @@ mapping:
     also: FR-NB-053
     match: Not in ours
     difference: "Non-package slips are in BIBS New Business: one slip per insurer approached, approved by a second TSU officer and e-mailed protected by BIBS. BDOI's file name convention and the manual e-mail are not in BIBS."
-    platform: Partly
+    platform: "Yes"
+    evidence: "Quotation slip sent to each insurer as QS_<Reference>_<Insurer>_MMDDYYYY.pdf (TC-FRPM.006.01 cases)."
     action: Platform change
     action_detail: "File naming per BDOI's convention (C23); keep sending from the system (C12)."
   - id: FRPM.006.02
@@ -627,7 +638,8 @@ mapping:
     also: FR-NB-054, FR-NB-055
     match: Not in ours
     difference: "BIBS non-package: responses keyed in per insurer (terms received or declined) with revisions; compiled comparative table sorted by premium, lowest flagged, export PDF and Excel. No QS value column, no field selection before capture, one option per insurer."
-    platform: Partly
+    platform: "Yes"
+    evidence: "Comparative table with the QS value column, several quotation options per insurer and the responses Approved, Not Covered and Others (TC-FRPM.006.02 cases)."
     action: Needs BDOI decision
     action_detail: "Multiple options per insurer and the response list (C14, C15)."
   - id: FRPM.007.01
@@ -636,7 +648,8 @@ mapping:
     also: "FR-NB-121 (Placement Update Report of accounts)"
     match: Different
     difference: "Ours: Package Status Update Report run on demand for one or all package requests; BRD-1 has the Placement Update Report of accounts, also on demand. BDOI: weekly scheduled report of quotation requests with 12 columns, a file name, a repository and preview; the status rules are announced but missing."
-    platform: Partly
+    platform: "Yes"
+    evidence: "Consolidated Placement Update Report every Thursday at 08:00 (configurable) with BDOI's twelve columns, PlacementUpdate_MMDDYYYY.xlsx, repository with preview and download (TC-FRPM.007.01 cases)."
     action: Needs BDOI decision
     action_detail: "Scope (quotation requests, package requests or accounts), schedule and columns (C03); platform change for the weekly run and repository."
   - id: FRPM.008.01
@@ -645,7 +658,8 @@ mapping:
     also: FR-NB-054, FR-NB-056
     match: Partial
     difference: "In ours TSU chooses the insurers when making the terms final (only insurers that offered terms; every insurer of the round needs an outcome first). BDOI lets the requestor select once at least one insurer has responded."
-    platform: Partly
+    platform: "Yes"
+    evidence: "The requestor selects the insurers that gave terms and proceeds to the proposal; the request shows Terms Agreed and TSU is told (TC-FRPM.008.01 cases)."
     action: Needs BDOI decision
     action_detail: "Who selects the insurers and when (C18)."
   - id: FRPM.009.01
@@ -653,7 +667,8 @@ mapping:
     ours: "FR-PM-033, FR-PM-040 (package)"
     match: Different
     difference: "Ours takes the chosen insurers' terms as the proposed package terms and completes the rate scheme in the requirements pack; there is no editable final-terms column in the comparative table."
-    platform: "No"
+    platform: "Yes"
+    evidence: "Final Terms for Proposal column filled from the selected insurer, editable, every change kept in its history (TC-FRPM.009.01 cases)."
     action: Platform change
     action_detail: "Add the Final Terms column if BDOI keeps the proposal step (C18)."
   - id: FRPM.009.02
@@ -662,7 +677,8 @@ mapping:
     also: FR-NB-056
     match: Not in ours
     difference: "BIBS non-package: proposal slip from the chosen insurer's terms, versioned, approved by a second TSU officer and released to Marketing. One insurer per slip; BDOI's file naming not used."
-    platform: Partly
+    platform: "Yes"
+    evidence: "Generate Proposal: one proposal slip per selected insurer named ProposalSlip_<Reference>_<Insurer>_<Version>_MMDDYYYY.pdf, approved by a second TSU officer (TC-FRPM.009.02 cases)."
     action: Platform change
     action_detail: "Several insurers per generation and the file naming."
   - id: FRPM.010.01
@@ -671,7 +687,8 @@ mapping:
     also: FR-NB-057
     match: Not in ours
     difference: "BIBS non-package: send to client, record acceptance with the accepted risk groups and create the accounts, or record Client declined. No 'Return for Revision' by the client."
-    platform: Partly
+    platform: "Yes"
+    evidence: "Record Client Response: Accepted, Rejected or Return for Revision with remarks, response date and notices (TC-FRPM.010.01 cases)."
     action: Platform change
     action_detail: "Client return for revision, if BDOI keeps it."
   - id: FRPM.011.01
@@ -687,7 +704,8 @@ mapping:
     ours: FR-PM-020, FR-PM-021
     match: Partial
     difference: "Both: create, number, save as draft, attach documents, submit with validation, edit in Draft and Returned. Ours has request types (new, amend, update, renew, reactivate, retire), scope, reason and pre-filled terms; every request goes through one Marketing approval. BDOI has a Source field, a three-level Marketing chain, a TSU chain for TSU and Insurer sources and Annex E fields (business origin, AO, UH, estimated policies and premium)."
-    platform: Partly
+    platform: "Yes"
+    evidence: "Request source (Marketing, TSU, Insurer) with the details of BDOI's form and the three-level Marketing approval by setting (TC-FRPM.011.02 cases)."
     action: Needs BDOI decision
     action_detail: "Approval chain and source routing (C05, C07); add Annex E fields to the form (platform change)."
   - id: FRPM.011.03
@@ -703,7 +721,8 @@ mapping:
     ours: FR-PM-030, FR-PM-013
     match: Partial
     difference: "Ours: one slip per round (same slip to every insurer), number and reply due date, approval by a TL or co-officer other than the preparer, sent by BIBS as protected e-mail per insurer with resend and sent history, locked at ManCom sign-off; draft layout until BDOI's templates. BDOI: slip per insurer, editable QS values, regeneration versions, file name convention, manual e-mail, Reject outcome, Annex F templates."
-    platform: Partly
+    platform: "Yes"
+    evidence: "Package quotation slip per insurer with BDOI's file name, sent from the system (TC-FRPM.012.01 cases)."
     action: Adopt BDOI wording
     action_detail: "Load Annex F as the slip templates (configuration); keep system e-mail (C12); file naming and slip per insurer as platform changes if confirmed."
   - id: FRPM.012.02
@@ -711,7 +730,8 @@ mapping:
     ours: FR-PM-031, FR-PM-032, FR-PM-034, FR-PM-035
     match: Partial
     difference: "Ours captures each insurer's response in a dialog per round (outcome, rate, minimum premium, terms per coverage, conditions, validity, remarks, document, history), compiles one master per request and derives client views with chosen fields and insurers. BDOI captures in the table, with a QS value column, field selection before capture and several options per insurer."
-    platform: Partly
+    platform: "Yes"
+    evidence: "Comparative table of the package request with QS value, options per insurer and Final Terms; skipped for the source Insurer (TC-FRPM.012.02 cases)."
     action: Needs BDOI decision
     action_detail: "Keep rounds and master (PMADD03, 04); decide options per insurer and response values (C14, C15); QS value column is a platform change."
   - id: FRPM.013.01
@@ -719,7 +739,8 @@ mapping:
     ours: FR-PM-033, FR-PM-036, FR-PM-040
     match: Different
     difference: "Ours has no proposal slip in the package path: Terms Final, TSU Head review, Marketing review for client-specific packages, then the requirements pack with the generated package slip whose signed copy is uploaded before ManCom."
-    platform: "No"
+    platform: "Yes"
+    evidence: "Generate Proposal on the package request: one proposal slip per selected insurer (TC-FRPM.013.01 cases)."
     action: Needs BDOI decision
     action_detail: "Proposal slips per insurer or the package slip (C18)."
   - id: FRPM.014.01
@@ -727,7 +748,8 @@ mapping:
     ours: FR-PM-041
     match: Different
     difference: "Ours: one ManCom member's sign-off completes the step (PQ07); return to TSU with a reason; signed sheet can be uploaded; slips lock; request moves to MBS automatically; in-app notice."
-    platform: Partly
+    platform: "Yes"
+    evidence: "ManCom approvers selected, approving in parallel, then the President (setting) (TC-FRPM.014.01 cases)."
     action: Needs BDOI decision
     action_detail: "Quorum, President and routing (C17); platform change for parallel then sequential routing."
   - id: FRPM.015.01
@@ -735,7 +757,8 @@ mapping:
     ours: FR-PM-041, FR-PM-042
     match: Different
     difference: "Ours forwards the request to MBS automatically at ManCom sign-off and notifies MBS; no separate deployment request or number."
-    platform: "No"
+    platform: "Yes"
+    evidence: "Request for Deployment button or automatic forwarding by setting, with the deployment request number (TC-FRPM.015.01 cases)."
     action: Keep ours
     action_detail: "BRPM.015 asks for automatic forwarding; confirm with BDOI (C20)."
   - id: FRPM.016.01
@@ -751,7 +774,8 @@ mapping:
     ours: FR-PM-024
     match: Partial
     difference: "Ours: team leaders assign or reassign requests and officers claim them; the new assignee is notified; approvals are open to every holder of the approval permission, so an absent approver does not block. The original assignee is not notified."
-    platform: Partly
+    platform: "Yes"
+    evidence: "The original assignee is told when a request is reassigned (TC-FRPM.017.01 cases)."
     action: Adopt BDOI wording
     action_detail: "Add the notice to the original assignee (small platform change)."
   - id: FRPM.018.01
@@ -776,7 +800,8 @@ mapping:
     also: "FR-NB-123 (saved report variants)"
     match: Not in ours
     difference: "BIBS offers defined reports with parameters, saved and shared variants and export to PDF, Excel, ODS and CSV; there is no ad-hoc report designer (BRD-1 CLR-NB-14). Ours reads BRPM.005 as document templates."
-    platform: Partly
+    platform: "Yes"
+    evidence: "Report Builder of Product Maintenance: source, columns, filters and sort, preview, print and export, templates saved and shared (TC-FRPM.020.01 cases)."
     action: Needs BDOI decision
     action_detail: "Reports builder vs saved variants (C21)."
   - id: FRPM.021.01
@@ -785,7 +810,8 @@ mapping:
     also: "FR-NB-136 (BIBS Audit Trail screen)"
     match: Partial
     difference: "Ours: every action audited with before and after values, append-only. The BIBS Audit Trail screen filters by date range, user and record type and exports PDF, Excel and CSV; no filter by action type or reference number; BDOI's file name not used."
-    platform: Partly
+    platform: "Yes"
+    evidence: "Audit Logs with action type and reference number filters, sortable columns and export named Audit Logs_MMDDYYYY (TC-FRPM.021.01 cases)."
     action: Platform change
     action_detail: "Add the action type and reference number filters and the file name."
   - id: FRPM.021.02
@@ -793,7 +819,8 @@ mapping:
     ours: FR-PM-005
     match: Partial
     difference: "Ours: the History tab of a request lists the workflow history and the insurer response revisions; product, version and criteria histories are shown on their records. No export from the record."
-    platform: Partly
+    platform: "Yes"
+    evidence: "Audit logs of each record with their export (TC-FRPM.021.02 cases)."
     action: Platform change
     action_detail: "Add export of the record history."
 

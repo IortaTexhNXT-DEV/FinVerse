@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestStatus;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestType;
 import com.iortatechnxt.brokerverse.report.core.ColumnType;
+import com.iortatechnxt.brokerverse.report.core.NamedExport;
 import com.iortatechnxt.brokerverse.report.core.ParameterSpec;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
 import com.iortatechnxt.brokerverse.report.core.ReportDefinition;
@@ -34,7 +35,7 @@ import org.springframework.stereotype.Component;
  * today while open). Grouped by status.
  */
 @Component
-public class AccessRequestsReport implements ReportDefinition {
+public class AccessRequestsReport implements ReportDefinition, NamedExport {
 
   /** Report code. */
   public static final String CODE = "UAM-REQUESTS";
@@ -56,6 +57,11 @@ public class AccessRequestsReport implements ReportDefinition {
   public AccessRequestsReport(NamedParameterJdbcTemplate jdbc, Clock clock) {
     this.jdbc = jdbc;
     this.clock = clock;
+  }
+
+  @Override
+  public String exportName() {
+    return "Access Requests Report";
   }
 
   @Override

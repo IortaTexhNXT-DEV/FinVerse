@@ -797,8 +797,9 @@ def build_coverage() -> tuple[Path, dict]:
                 avail = "Partly"
             if RANK[agg] < RANK[avail]:
                 avail = agg
+            met = "BDOI's text is met" + (f": {comp[it['id']]['evidence']}" if comp[it["id"]].get("evidence") else "")
             note = (f"BDOI's text: {comp[it['id']]['action']} – {comp[it['id']]['action_detail']}" if p != "Yes" else
-                    "BDOI's text is met") + ("" if agg == "Yes" else "; some acceptance criteria partly available")
+                    met) + ("" if agg == "Yes" else "; some acceptance criteria partly available")
         else:
             avail, note = agg, ("Added in v1.1 from the BIBS reference FRS; " + why) if agg == "Yes" else \
                 "Added in v1.1; some acceptance criteria partly available"

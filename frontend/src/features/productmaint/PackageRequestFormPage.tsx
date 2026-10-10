@@ -1,9 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Download, Save, Send } from 'lucide-react';
 import { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { PACKAGE_REQUEST_ENTITY, productMaintApi } from '@/api/productmaint';
 import type { PackageRequest } from '@/api/productmaint';
+import { pmRoutingApi } from '@/api/pmRouting';
 import { Attachments } from '@/components/attachments/Attachments';
 import { Button } from '@/components/ui/Button';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
@@ -13,13 +14,15 @@ import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import {
   formOfRequest,
-  newRequestForm,
+  requestedForm,
   requestErrors,
   submissionGaps,
   toRequestInput,
 } from './packageRequest';
 import type { RequestForm } from './packageRequest';
 import { RequestHeaderCard } from './RequestHeaderCard';
+import { RequestDetailsCard } from './RequestDetailsCard';
+import { detailsErrors, detailsOf, emptyDetails } from './requestDetails';
 import { TermsEditor } from './TermsEditor';
 import '@/styles/quotation.css';
 import { refreshRecord } from '@/components/broking/recordRefresh';
@@ -70,7 +73,7 @@ function Form({ initial }: Readonly<{ initial: RequestForm }>) {
     },
   });
   const run = (action: typeof save) => {
-    const found = requestErrors(form);
+    const found = { ...requestErrors(form), ...detailsErrors(form.details) };
     setErrors(found);
     if (Object.keys(found).length === 0) {
       action.mutate(form);
@@ -123,6 +126,13 @@ function Form({ initial }: Readonly<{ initial: RequestForm }>) {
         </Notice>
       )}
       <RequestHeaderCard form={form} set={set} errors={errors} />
+      <RequestDetailsCard
+        source={form.source ?? 'MARKETING'}
+        details={form.details ?? emptyDetails()}
+        errors={errors}
+        onSource={(source) => set({ source })}
+        onDetails={(patch) => set({ details: { ...(form.details ?? emptyDetails()), ...patch } })}
+      />
       {form.type !== 'RETIRE' && (
         <TermsEditor
           terms={form.terms}
@@ -153,18 +163,34 @@ function Form({ initial }: Readonly<{ initial: RequestForm }>) {
  * review.
  */
 export default function PackageRequestFormPage() {
-  const params = useParams();
-  const id = params.id === undefined ? undefined : Number(params.id);
+  const routeParams = useParams();
+  const [params] = useSearchParams();
+  const id = routeParams.id === undefined ? undefined : Number(routeParams.id);
   const existing = useQuery({
     queryKey: ['package-request', id],
     queryFn: () => productMaintApi.get(id ?? 0),
     enabled: id !== undefined,
   });
+  const routing = useQuery({
+    queryKey: ['package-request', id, 'routing'],
+    queryFn: () => pmRoutingApi.routing(id ?? 0),
+    enabled: id !== undefined,
+  });
   if (id === undefined) {
-    return <Form initial={newRequestForm()} />;
+    return <Form initial={requestedForm(params)} />;
   }
-  if (existing.data === undefined) {
-    return existing.error ? <ErrorAlert error={existing.error} /> : <LoadingPanel />;
+  if (existing.data === undefined || routing.data === undefined) {
+    const error = existing.error ?? routing.error;
+    return error ? <ErrorAlert error={error} /> : <LoadingPanel />;
   }
-  return <Form key={existing.data.id} initial={formOfRequest(existing.data)} />;
+  return (
+    <Form
+      key={existing.data.id}
+      initial={{
+        ...formOfRequest(existing.data),
+        source: routing.data.source,
+        details: detailsOf(routing.data.details),
+      }}
+    />
+  );
 }

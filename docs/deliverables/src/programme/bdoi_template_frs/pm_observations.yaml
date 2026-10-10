@@ -29,10 +29,14 @@ conflicts:
     proposes: "BDOI's 90-day alerts, anniversary alerts and recipients (TSU Officer and TSU Team Lead) are kept. v1.1 adds configurable reminder days and the rule that each alert is raised once per alert day (FRPM.004.01). MBS is proposed as an additional recipient, for the set-up of renewals."
     impact: "Alert days are a configurable value; the anniversary alert and MBS as recipient need confirmation."
     role: [TSU]
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "the expiry notice period (90 days), the anniversary notice period (90 days) and whether MBS is also told (default: TSU Officers and TSU Team Leads only, as BDOI's text)."
   C03:
     proposes: "BDOI's weekly report of quotation requests is kept and v1.1 adds on-request individual and collective runs (FRPM.007.01). The package creation status asked by BRPM.018 is covered by the new Package Status Update Report (FRPM.007.02)."
     impact: "Two reports instead of one; BDOI to confirm the scope and columns of each, and the Placement Update Status rules (see D05)."
     role: [TSU, MKT]
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "the weekly Consolidated Placement Update Report runs on the day and at the time set (default Thursday 08:00) for a period of days set (default 7) and a scope set (default quotation requests, as BDOI's text); the on-request run is also available."
   C04:
     proposes: "BDOI's Reject outcome is kept at every step. v1.1 proposes that a rejected request closes and cannot be resubmitted (the requester raises a new request), and that the reason is recorded."
     impact: "Status lists and closing reasons."
@@ -41,6 +45,8 @@ conflicts:
     proposes: "BDOI's sequential Marketing approval (TL, TH, then UH) is kept. v1.1 adds that no approver approves a request he or she created (FRPM.011.02). BDOI to confirm that every request passes all three levels, or state the levels by market segment or amount."
     impact: "Number of approval steps and service levels before TSU receives a request."
     role: [MKT, PO]
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "the Marketing approval chain is a setting: one approval by the Team Leader, Team Head or Unit Head (default, as the BRD), or Team Leader, then Team Head, then Unit Head (BDOI's text)."
   C06:
     proposes: "BDOI's single TSU review (FRPM.011.03) is kept. The BRD (BRPM.009) asks for a written recommendation by the TSU Team Lead followed by the formal approval of the TSU Team Head. v1.1 adds that the reviewer's remarks are kept and shown to the next approver; it recommends two sub-items under FRPM.011: TSU Team Lead review with mandatory recommendation, then TSU Team Head approval, never by the recommender."
     impact: "Full coverage of BRPM.009 depends on this decision; one more approval step for TSU."
@@ -57,10 +63,14 @@ conflicts:
     proposes: "BDOI's direct creation and update of Product Matrix records with Draft and approval is kept. v1.1 adds package versions (FRPM.024.01): the commercial terms of an active package change through a new version, validated before it takes effect, while descriptive details may be edited directly with approval."
     impact: "How rates and terms of an active package are changed; history for BRPM.007."
     role: [MBS, TSU]
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "direct add and update of Product Matrix records with approval is a setting (default on, as BDOI's text); the request route stays available."
   C10:
     proposes: "BDOI's deactivation request with an effective date and one approver is kept (FRPM.003.04 to 07). v1.1 adds that nothing is deleted, that incentive rules are flagged for review and that a deactivation advisory is drafted. BDOI to confirm whether a ManCom sign-off is needed for a deactivation."
     impact: "Approval route of a deactivation."
     role: [TSU, MANCOM]
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "the deactivation route is a setting: Deactivate Package with effective date, reason and approver (default, as BDOI's text) or the retirement package request."
   C11:
     proposes: "BDOI's label Inactive and its rule that an expired package is no longer available are kept. The BRD (BRPM.006) mentions potential reactivation; v1.1 recommends that an expired package can return to sale only through an approved package request that creates a new version."
     impact: "Whether expired packages can be reactivated; label shown to users."
@@ -89,6 +99,8 @@ conflicts:
     proposes: "BDOI's ManCom routing (selected approvers in parallel, then the President, with e-mail notice) is kept. v1.1 adds that the submitter cannot approve, the optional upload of the signed sheet, the sign-off reference and the locking of the Quotation Slips (FRPM.014.01). BDOI to give the ManCom approver list and confirm the quorum."
     impact: "ManCom approval time and evidence."
     role: [MANCOM, PO]
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "the ManCom routing is a setting: the selected approvers approve in parallel, then the President (default, as BDOI's text), or one sign-off; the President is named in the settings."
   C18:
     proposes: "BDOI's Proposal path for packages (FRPM.013.01) is kept. v1.1 adds the review of negotiated terms by the TSU Head and, for client-specific packages, by Marketing (FRPM.013.02), and the product requirements with the signed package slip before ManCom (FRPM.014.02), as BRPM.013, 015 and 016 ask. BDOI to confirm whether proposal slips per insurer are produced for packages and who selects the insurers."
     impact: "Steps between negotiation and ManCom for packages."
@@ -101,6 +113,8 @@ conflicts:
     proposes: "BDOI's Request for Deployment step is kept (FRPM.015.01). The BRD (BRPM.015) asks for automatic forwarding to MBS after ManCom approval; v1.1 adds that a deployment request is never possible without the completed ManCom approval and recommends that the deployment request be created automatically on ManCom approval."
     impact: "One manual step less for TSU if automatic."
     role: [MBS, TSU]
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "the forwarding to MBS is a setting: automatic on the ManCom approval (default, as BRPM.015) or by the Request for Deployment button (BDOI's text)."
   C21:
     proposes: "BDOI's Reports Builder (FRPM.020.01) is kept. BRPM.005 asks for shared document templates with product-specific fields; v1.1 adds FRPM.030 (shared document templates, loaded from BDOI's Annex D and F) and maps BRPM.005 to FRPM.020 and FRPM.030."
     impact: "Coverage of BRPM.005."
@@ -113,6 +127,8 @@ conflicts:
     proposes: "BDOI's file names are kept. v1.1 adds the request and slip numbers printed in the documents (PKR-yyyy-nnnnnn, PQS-yyyy-nnnnnn)."
     impact: "Names of downloaded files and document references."
     role: [SA]
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "BDOI's file names (QS_, ProposalSlip_, PlacementUpdate_, Audit Logs_ with MMDDYYYY) are a setting, on by default."
   D01:
     proposes: "Proposed correction (not applied in the text): 'The system shall provide a Package Request List screen displaying all Package Requests created within the system.'"
     impact: "Wording only."

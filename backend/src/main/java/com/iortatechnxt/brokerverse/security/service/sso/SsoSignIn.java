@@ -25,6 +25,7 @@ import java.time.Instant;
 import java.util.HexFormat;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -247,6 +248,19 @@ public class SsoSignIn {
   }
 
   /**
+   * The address of the identity provider's sign-out page, which returns to the Login page of the
+   * system (BDOI FRS FRUM.001.05: with single sign-on, Log Out ends the BDO session too).
+   *
+   * @return the address, empty when the provider has none or single sign-on is not on
+   */
+  public Optional<String> signOutUrl() {
+    if (passwordPolicy.mode() != AuthMode.OIDC) {
+      return Optional.empty();
+    }
+    return oidc.signOutUrl(properties.base() + "/login");
+  }
+
+  /**
    * The web client's callback page.
    *
    * @return address
@@ -272,6 +286,7 @@ public class SsoSignIn {
     AppUser user =
         users
             .findByUsernameIgnoreCase(identity.username())
+            .or(() -> users.findByWindowsIdIgnoreCase(identity.username()))
             .orElseThrow(
                 () ->
                     notLinked(

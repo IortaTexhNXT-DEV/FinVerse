@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.nbadmin.report;
 
 import com.iortatechnxt.brokerverse.nbadmin.service.PermissionNames;
+import com.iortatechnxt.brokerverse.report.core.NamedExport;
 import com.iortatechnxt.brokerverse.report.core.ParameterSpec;
 import com.iortatechnxt.brokerverse.report.core.ParameterType;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
@@ -32,7 +33,7 @@ import org.springframework.stereotype.Component;
  * access. Inactive profiles are listed only when the Active filter asks for them.
  */
 @Component
-public class GroupProfileReport implements ReportDefinition {
+public class GroupProfileReport implements ReportDefinition, NamedExport {
 
   /** Report code. */
   public static final String CODE = "UAM-GROUP-PROFILE";
@@ -53,6 +54,11 @@ public class GroupProfileReport implements ReportDefinition {
    */
   public GroupProfileReport(NamedParameterJdbcTemplate jdbc) {
     this.jdbc = jdbc;
+  }
+
+  @Override
+  public String exportName() {
+    return "User Group Profile Report";
   }
 
   @Override

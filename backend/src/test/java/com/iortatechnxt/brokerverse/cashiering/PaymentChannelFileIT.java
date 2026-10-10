@@ -24,6 +24,7 @@ import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.domain.PaymentStatus;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
+import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -62,11 +63,14 @@ class PaymentChannelFileIT {
   @Autowired private JdbcTemplate jdbc;
   @Autowired private TransactionTemplate tx;
   @Autowired private AsUser as;
+  @Autowired private SystemParameterService parameters;
   @Autowired private ReceiptSearchService search;
   @Autowired private BatchPrintService printing;
 
   /** Date of the payments of the files (an open period); the file names carry another day. */
   private static final LocalDate PAID_ON = LocalDate.of(2026, 9, 24);
+
+  private static final String MFT_COMPANY = "CASH_MFT_COMPANY_CODE";
 
   private static final java.time.format.DateTimeFormatter US =
       java.time.format.DateTimeFormatter.ofPattern("MM/dd/yyyy");
@@ -319,6 +323,12 @@ class PaymentChannelFileIT {
   void filesReceivedViaMftAreProcessedAndARefusedOneIsAlerted() throws IOException {
     ChannelProfile profile = profiles.findById("BILLS_PAYMENT").orElseThrow();
     String folder = "it-mft-" + System.nanoTime();
+    // The MFT files go to the company of the fixtures, whatever companies other tests created.
+    String mftCompany = parameters.text(MFT_COMPANY, "");
+    String company =
+        jdbc.queryForObject(
+            "select code from org_company where id = ?", String.class, fx.company());
+    as.run("admin", () -> parameters.update(MFT_COMPANY, company));
     as.run(
         "admin",
         () ->
@@ -342,6 +352,7 @@ class PaymentChannelFileIT {
       assertThat(received).extracting(ChannelFile::getSource).containsOnly("MFT");
       assertThat(received)
           .extracting(ChannelFile::getStatus)
+          .as(() -> received.stream().map(this::failures).toList().toString())
           .containsExactlyInAnyOrder(ChannelFile.PROCESSED, ChannelFile.REFUSED);
       ChannelFile refused =
           received.stream()
@@ -369,6 +380,7 @@ class PaymentChannelFileIT {
                       profile.getMaxMb(),
                       profile.getMftFolder(),
                       false)));
+      as.run("admin", () -> parameters.update(MFT_COMPANY, mftCompany));
     }
   }
 

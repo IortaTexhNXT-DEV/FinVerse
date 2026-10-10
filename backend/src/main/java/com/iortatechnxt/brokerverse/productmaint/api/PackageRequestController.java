@@ -19,6 +19,7 @@ import com.iortatechnxt.brokerverse.productmaint.service.PackageQueryService;
 import com.iortatechnxt.brokerverse.productmaint.service.PackageQueryService.CaseFacts;
 import com.iortatechnxt.brokerverse.productmaint.service.PackageRequestService;
 import com.iortatechnxt.brokerverse.productmaint.service.PackageRequests;
+import com.iortatechnxt.brokerverse.productmaint.service.RequestDetailsService;
 import com.iortatechnxt.brokerverse.productmaint.service.TermsCodec;
 import jakarta.validation.Valid;
 import java.util.Map;
@@ -62,6 +63,7 @@ public class PackageRequestController {
   private final PackageDocuments documents;
   private final TermsCodec codec;
   private final CurrentUser currentUser;
+  private final RequestDetailsService details;
 
   /**
    * Creates the controller.
@@ -72,6 +74,7 @@ public class PackageRequestController {
    * @param documents request form PDF
    * @param codec terms JSON
    * @param currentUser current user
+   * @param details source and Annex E details
    */
   public PackageRequestController(
       PackageRequestService service,
@@ -79,13 +82,15 @@ public class PackageRequestController {
       PackageRequests requests,
       PackageDocuments documents,
       TermsCodec codec,
-      CurrentUser currentUser) {
+      CurrentUser currentUser,
+      RequestDetailsService details) {
     this.service = service;
     this.queries = queries;
     this.requests = requests;
     this.documents = documents;
     this.codec = codec;
     this.currentUser = currentUser;
+    this.details = details;
   }
 
   /**
@@ -132,7 +137,9 @@ public class PackageRequestController {
     if (body.companyId() == null) {
       throw new BusinessRuleException("COMPANY_REQUIRED", "Select the company");
     }
-    return view(service.create(body.companyId(), body.toDraft()));
+    details.check(body.source(), body.details());
+    PackageRequest created = service.create(body.companyId(), body.toDraft());
+    return view(details.describe(created.getId(), body.source(), body.details()));
   }
 
   /**
@@ -157,7 +164,9 @@ public class PackageRequestController {
   @PutMapping("/requests/{id}")
   @PreAuthorize("hasAnyAuthority('PKG_REQUEST', 'PKG_TSU_RECOMMEND')")
   public RequestResponse update(@PathVariable Long id, @Valid @RequestBody FormBody body) {
-    return view(service.update(id, body.toDraft()));
+    details.check(body.source(), body.details());
+    service.update(id, body.toDraft());
+    return view(details.describe(id, body.source(), body.details()));
   }
 
   /**

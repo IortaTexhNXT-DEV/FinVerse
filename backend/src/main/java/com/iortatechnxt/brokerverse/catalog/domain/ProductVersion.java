@@ -270,6 +270,21 @@ public class ProductVersion extends BaseEntity {
     return false;
   }
 
+  /**
+   * Sets the package expiry date on an approved deactivation request (BDOI FRS FRPM.003.07); the
+   * daily step expires the package once the date has passed.
+   *
+   * @param expiry new package expiry date
+   */
+  public void endPackageOn(LocalDate expiry) {
+    if (packageStartDate != null && !expiry.isAfter(packageStartDate)) {
+      throw new BusinessRuleException(
+          "PKG_DEACTIVATION_DATE",
+          "The expiry date must be after the package start date " + packageStartDate);
+    }
+    this.packageEndDate = expiry;
+  }
+
   /** Marks the version EXPIRED: its package end date passed without a successor (BRPM.006). */
   public void expire() {
     this.status = ProductVersionStatus.EXPIRED;

@@ -46,18 +46,37 @@ public class SodRule extends AuthorizableEntity {
   private String description;
 
   @Enumerated(EnumType.STRING)
+  @Column(name = "rule_kind", nullable = false, length = 15, updatable = false)
+  private SodRuleKind kind = SodRuleKind.PROFILES;
+
+  @Enumerated(EnumType.STRING)
   @Column(name = "pending_action", nullable = false, length = 20)
   private PendingAction pendingAction = PendingAction.CREATE;
 
   protected SodRule() {}
 
   /**
-   * A new rule, pending authorisation.
+   * A new rule of a kind, pending authorisation.
    *
+   * @param kind two group profiles or two permissions
    * @param ruleCode rule number
+   * @param first first group profile or permission
+   * @param second second group profile or permission
+   * @param description why the two may not be held together
+   */
+  public SodRule(
+      SodRuleKind kind, String ruleCode, String first, String second, String description) {
+    this(ruleCode, first, second, description);
+    this.kind = kind;
+  }
+
+  /**
+   * Creates a rule between two group profiles, pending authorisation.
+   *
+   * @param ruleCode rule code
    * @param profileA first group profile
    * @param profileB second group profile
-   * @param description why the two profiles may not be held together
+   * @param description why they may not be held together
    */
   public SodRule(String ruleCode, String profileA, String profileB, String description) {
     this.ruleCode = ruleCode;
@@ -150,6 +169,15 @@ public class SodRule extends AuthorizableEntity {
    */
   public boolean isPending() {
     return pendingAction != PendingAction.NONE && getRecordStatus() != RecordStatus.INACTIVE;
+  }
+
+  /**
+   * What the rule pairs: two group profiles or two permissions.
+   *
+   * @return kind
+   */
+  public SodRuleKind getKind() {
+    return kind;
   }
 
   public String getRuleCode() {

@@ -20,6 +20,11 @@ import java.time.Instant;
 @Table(name = "audit_log")
 public class AuditLog {
 
+  /** Longest old or new value kept on an entry. */
+  public static final int MAX_VALUE = 500;
+
+  private static final int MAX_REMARKS = 1000;
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
@@ -42,6 +47,21 @@ public class AuditLog {
 
   @Column(nullable = false, updatable = false, length = 500)
   private String summary;
+
+  @Column(name = "ip_address", updatable = false, length = ActorContext.MAX_ADDRESS)
+  private String ipAddress;
+
+  @Column(name = "role_names", updatable = false, length = ActorContext.MAX_ROLES)
+  private String roleNames;
+
+  @Column(name = "old_value", updatable = false, length = MAX_VALUE)
+  private String oldValue;
+
+  @Column(name = "new_value", updatable = false, length = MAX_VALUE)
+  private String newValue;
+
+  @Column(updatable = false, length = MAX_REMARKS)
+  private String remarks;
 
   protected AuditLog() {}
 
@@ -70,6 +90,48 @@ public class AuditLog {
     this.summary = summary;
   }
 
+  /**
+   * Adds where the action came from: the source address and the roles of the actor at the time.
+   *
+   * @param address source (IP) address, may be null
+   * @param roles role names of the actor, may be null
+   * @return this entry
+   */
+  public AuditLog from(String address, String roles) {
+    this.ipAddress = ActorContext.clip(address, ActorContext.MAX_ADDRESS);
+    this.roleNames = ActorContext.clip(roles, ActorContext.MAX_ROLES);
+    return this;
+  }
+
+  /**
+   * Adds the value before and after the change.
+   *
+   * @param before old value, may be null
+   * @param after new value, may be null
+   * @return this entry
+   */
+  public AuditLog values(String before, String after) {
+    this.oldValue = ActorContext.clip(before, MAX_VALUE);
+    this.newValue = ActorContext.clip(after, MAX_VALUE);
+    return this;
+  }
+
+  /**
+   * Adds the remarks of the action (the comment of an approval, a return or a rejection).
+   *
+   * @param text remarks, may be null
+   * @return this entry
+   */
+  public AuditLog remarks(String text) {
+    this.remarks =
+        text == null || text.isBlank() ? null : ActorContext.clip(text.strip(), MAX_REMARKS);
+    return this;
+  }
+
+  public String getRemarks() {
+    return remarks;
+  }
+
   public Long getId() {
     return id;
   }
@@ -96,5 +158,21 @@ public class AuditLog {
 
   public String getSummary() {
     return summary;
+  }
+
+  public String getIpAddress() {
+    return ipAddress;
+  }
+
+  public String getRoleNames() {
+    return roleNames;
+  }
+
+  public String getOldValue() {
+    return oldValue;
+  }
+
+  public String getNewValue() {
+    return newValue;
   }
 }

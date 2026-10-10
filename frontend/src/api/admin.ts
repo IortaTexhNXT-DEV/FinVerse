@@ -32,6 +32,35 @@ export interface AuditEntry {
   entityId?: string;
   action: string;
   summary: string;
+  /** Module of the record. */
+  module?: string;
+  /** Windows ID of the user (BDOI's User Id). */
+  windowsId?: string;
+  /** Action in BDOI's words (Create, Update, Approve, Login, Timeout ...). */
+  actionLabel?: string;
+  /** Group profiles of the user at the time of the action. */
+  roleNames?: string;
+  oldValue?: string;
+  newValue?: string;
+  /** Source (IP) address of the action. */
+  ipAddress?: string;
+  /** Client or assured's name of the record (Product Maintenance). */
+  subject?: string;
+  /** Remarks of the action (approval, return or rejection comment). */
+  remarks?: string;
+}
+
+/** Filters, sort and page of the Audit Trail. */
+export interface AuditQuery {
+  from: string;
+  to: string;
+  username?: string;
+  entityType?: string;
+  entityId?: string;
+  action?: string;
+  sort?: string;
+  direction?: 'asc' | 'desc';
+  page?: number;
 }
 
 export const adminApi = {
@@ -49,11 +78,6 @@ export const adminApi = {
   permissions: () => api.get<string[]>('/admin/permissions'),
   updateRole: (id: number, body: RoleInput) => api.put<Role>(`/admin/roles/${id}`, body),
   createRole: (body: RoleInput) => api.post<Role>('/admin/roles', body),
-  audit: (params: {
-    from: string;
-    to: string;
-    username?: string;
-    entityType?: string;
-    page?: number;
-  }) => api.get<PageResponse<AuditEntry>>(`/audit-logs${toQuery({ ...params, size: 50 })}`),
+  audit: (params: AuditQuery) =>
+    api.get<PageResponse<AuditEntry>>(`/audit-logs${toQuery({ ...params, size: 50 })}`),
 };

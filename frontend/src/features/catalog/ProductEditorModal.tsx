@@ -11,6 +11,7 @@ import { NumberInput, SelectInput, TextInput } from '@/features/assets/FormContr
 import { enumOptions } from '@/features/assets/options';
 import { productProblems, toProductInput, toggleSegment } from './productForm';
 import type { ProductForm } from './productForm';
+import { ProductMatrixFields } from './ProductMatrixFields';
 import { Notice } from '@/components/ui/Notice';
 
 const GATES = enumOptions(['PAID', 'CLIENT_CONFIRMATION']);
@@ -100,6 +101,11 @@ export function ProductEditorModal({ initial, onClose }: Readonly<Props>) {
           onChange={(code) => set({ code })}
         />
         <TextInput label="Name" required value={form.name} onChange={(name) => set({ name })} />
+        <TextInput
+          label="Package description"
+          value={form.description ?? ''}
+          onChange={(description) => set({ description })}
+        />
         <SelectInput
           label="Product line"
           required
@@ -175,6 +181,7 @@ export function ProductEditorModal({ initial, onClose }: Readonly<Props>) {
           ))}
         </div>
       </fieldset>
+      <ProductMatrixFields form={form} set={set} />
       <fieldset className="stack" style={{ border: 0, padding: 0 }}>
         <legend className="muted">Market segments (none = all)</legend>
         <div className="form-grid">

@@ -26,6 +26,7 @@ import { DataAccessDialog } from './DataAccessDialog';
 import { UserSessionsDialog } from './UserSessionsDialog';
 import { useLovLabel } from '@/components/broking/useLabels';
 import { ConfigUploadButton } from '@/features/configpromo/ConfigUploadButton';
+import { DirectoryProfileDialog } from './DirectoryProfileDialog';
 
 interface Editing {
   id?: number;
@@ -115,6 +116,7 @@ export default function UsersPage() {
   const [status, setStatus] = useState('');
   const [sessionsOf, setSessionsOf] = useState<string | null>(null);
   const [dataAccessOf, setDataAccessOf] = useState<UserProfile | null>(null);
+  const [directoryOf, setDirectoryOf] = useState<string | null>(null);
   const users = useQuery({ queryKey: ['users'], queryFn: adminApi.users });
   const sodRules = useSodRules();
   const onlineUsers = useQuery({
@@ -265,6 +267,7 @@ export default function UsersPage() {
                     ...(u.locked ? [{ label: 'Unlock', onSelect: () => unlock.mutate(u.id) }] : []),
                     { label: 'Sessions', onSelect: () => setSessionsOf(u.username) },
                     { label: 'Data access', onSelect: () => setDataAccessOf(u) },
+                    { label: 'Directory details', onSelect: () => setDirectoryOf(u.username) },
                   ]}
                 />
               ),
@@ -272,6 +275,7 @@ export default function UsersPage() {
           ]}
         />
       </Card>
+      <DirectoryProfileDialog username={directoryOf} onClose={() => setDirectoryOf(null)} />
       <RowDialogs
         sessionsOf={sessionsOf}
         dataAccessOf={dataAccessOf}

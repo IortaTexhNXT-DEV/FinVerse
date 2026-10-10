@@ -159,6 +159,19 @@ public final class ProductionSafeguards implements EnvironmentPostProcessor, Ord
           "the seed profile (SIT/UAT seed data) is active in production; remove 'seed' from"
               + " SPRING_PROFILES_ACTIVE");
     }
+    if (production
+        && Boolean.parseBoolean(environment.getProperty("brokerverse.identity.simulator", ""))) {
+      problems.add(
+          "the Enterprise SSO simulator is on in production; set BROKERVERSE_IDENTITY_SIMULATOR to"
+              + " false");
+    }
+    if (production
+        && Boolean.parseBoolean(
+            environment.getProperty("brokerverse.product-master.simulator", ""))) {
+      problems.add(
+          "the product master receiving system is simulated in production; set"
+              + " BROKERVERSE_PRODUCT_MASTER_SIMULATOR to false");
+    }
     if (!isLocal(environment)) {
       requireSecrets(environment, problems);
       requireSharedEnvironmentSettings(environment, problems);

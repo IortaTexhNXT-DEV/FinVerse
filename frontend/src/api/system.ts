@@ -74,6 +74,12 @@ export interface SessionPolicy {
   warningSeconds: number;
   /** Minutes before the absolute session end (token expiry) at which the user is warned. */
   expiryWarningMinutes?: number;
+  /** Minutes of inactivity after which the warning shows (the x minutes of BDOI's text). */
+  idleWarningMinutes?: number;
+  /** The warning uses BDOI's text and the buttons Stay Logged In and Log Out. */
+  bdoiDialog?: boolean;
+  /** The inactivity sign-out opens the page "Your session timed out" with the Log In button. */
+  timeoutPage?: boolean;
 }
 
 export const systemApi = {

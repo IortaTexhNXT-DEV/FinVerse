@@ -153,7 +153,10 @@ public class ReportService {
     }
     audit.record(
         "Report", code, AuditAction.EXPORT, "Exported " + format + " " + String.join(", ", echo));
-    String fileName = fileName(def, code, format);
+    String fileName =
+        def instanceof NamedExport
+            ? ExportFileNames.of(def, code, format.extension(), parameters, clock)
+            : fileName(def, code, format);
     archive.exported(
         def.metadata(),
         echo,

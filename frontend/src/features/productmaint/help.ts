@@ -9,13 +9,30 @@ export const PACKAGE_REQUEST_HELP_SCREENS: readonly HelpScreen[] = [
     name: 'Product Maintenance Home',
     path: '/product-maintenance',
     summary:
-      'Package requests by stage with their SLA state, packages ending within 30, 60 and 90 days, versions waiting for validation, advisories pending and the comparative outputs of the week.',
+      'The landing page of Product Maintenance: the Product Matrix (Active Products, Expiring Products within 90 days, Expired Products), the Quotation Request List and the Package Request List.',
     workflow: [
-      'Each tile opens its list: a stage tile opens the Package Requests tab, an expiry tile the Package Expiry list.',
-      'New Package Request starts the Package Request Form.',
+      'Product Matrix: search, filter by line and product type, sort any column and export to Excel, PDF or CSV; Add New Package, Update Package and Deactivate Package from the row menu.',
+      'Quotation Request List: the quotation requests of non-package products with their status and aging; a row opens the request.',
+      'Package Request List: the package creation and update requests with the Account Officer, the Assigned TSU User and the Submission Date.',
+      'Create Package Request starts the Package Request Form; Dashboard opens the key figures.',
     ],
     controls: [
-      'Tiles flag requests past their SLA (red) or due within eight hours; the SLA hours are the PKG_SLA_* parameters.',
+      'Expired Products need the archive permission.',
+      'Deactivate Package asks for the effective date, the reason and the approver when PM_DEACTIVATION_ROUTE is EFFECTIVE_DATED; otherwise it opens a retirement package request.',
+    ],
+  },
+  {
+    name: 'Product Maintenance Dashboard',
+    path: '/product-maintenance/dashboard',
+    summary:
+      'Key figures for the period, TSU officer, product line and package type: Incoming Requests, In-Progress Requests, For Approval, Expiring Packages, Issued Proposals and Deactivation Requests; below, the package requests by stage with their service levels.',
+    workflow: [
+      'Change a filter and the figures refresh; a figure opens its requests with the Request Number, Request Type, Product Line, Requested By, Assigned TSU Officer, Current Status, Submission Date and Aging, oldest first.',
+      'A row opens the request; Excel, PDF and CSV export the requests of the figure with the filters on screen.',
+    ],
+    controls: [
+      'TSU, MBS and management see every request; Marketing sees the requests it raised or holds.',
+      'Aging counts the days since the request entered its current stage.',
     ],
   },
   {
@@ -59,6 +76,58 @@ export const PACKAGE_REQUEST_HELP_SCREENS: readonly HelpScreen[] = [
       'A package with an open renewal request is never renewed twice.',
       'Expired packages are never deleted: they stay readable on the Products screen and are reactivated through a reactivation request.',
     ],
+  },
+  {
+    name: 'Deactivation Requests',
+    path: '/product-maintenance/deactivations',
+    summary:
+      'Package deactivation requests with the Request Number, Package Name, Deactivation Effective Date, Approval Status, Requested By, Request Date and Package Expiry Date.',
+    workflow: [
+      'Search by request number or package and filter by approval status and request date; a row opens the details and the supporting documents.',
+      'The selected approver approves or rejects with remarks; the requestor may withdraw a pending request and a team head may reassign it.',
+    ],
+    controls: [
+      'The effective date is today or later; a package has one pending request at a time.',
+      'On approval the package expiry date becomes the later of the effective date and the approval date; the package is deactivated after that date.',
+      'Remarks are mandatory for a rejection, and the package then stays active.',
+    ],
+  },
+  {
+    name: 'Product Master Transfers',
+    path: '/product-maintenance/master-changes',
+    summary:
+      'Every release, deactivation and expiry of a package is recorded for the other systems of the bank and sent in one file (header, one record per change, trailer with the count) on a schedule.',
+    workflow: [
+      'Send Now sends the waiting changes at once; a failed change is sent again from its row.',
+      'In SIT and UAT the receiving system is simulated: its tab shows the files received.',
+    ],
+    controls: [
+      'A failed transfer raises an alert and keeps the error on each change.',
+      'The folder of the receiving systems is set at deployment; until it is set the changes wait.',
+    ],
+  },
+  {
+    name: 'Placement Update Reports',
+    path: '/product-maintenance/placement-reports',
+    summary:
+      "The Consolidated Placement Update Report lists the quotation requests active or processed in the reporting period: Item No., Insured's Name, Marketing Segment, Team, Account Officer, TSU Handler, Line of Insurance, Sub-Line, PRF Received Date and Time, Aging and Status.",
+    workflow: [
+      'It is generated every week on the configured day and time (Thursday 08:00 by default) as PlacementUpdate_MMDDYYYY.xlsx and kept in the repository.',
+      'Generate Now produces the report of today on request; Preview shows the rows of the Excel file and Download saves it again.',
+      'Report Builder opens the custom report of quotation requests, package requests or products: choose the columns, filters and sort, then save it as a template shared with the other users.',
+    ],
+    controls: ['The schedule, the period and the scope are system parameters.'],
+  },
+  {
+    name: 'Audit Logs',
+    path: '/product-maintenance/audit-logs',
+    summary:
+      "Every activity on packages, products, package requests, quotation requests and deactivation requests: Timestamp, Module, Reference Number, Client/Assured's Name, Action Type, Description, Old Value, New Value, Performed By and Remarks.",
+    workflow: [
+      'Filter by date range, action type, reference number and user; sort by timestamp, reference, action or user.',
+      'CSV and Excel export the filtered entries as Audit Logs_MMDDYYYY.',
+    ],
+    controls: ['Each record also shows its own audit logs, with the same export.'],
   },
 ];
 

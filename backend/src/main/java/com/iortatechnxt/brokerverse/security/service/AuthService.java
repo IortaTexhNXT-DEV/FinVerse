@@ -178,6 +178,15 @@ public class AuthService {
           case EXPIRED -> "Logged out at the end of the session";
           default -> "Logged out";
         });
+    if (recorded != SessionEndReason.LOGOUT) {
+      audit.record(
+          ENTITY,
+          claims.username(),
+          AuditAction.TIMEOUT,
+          recorded == SessionEndReason.IDLE_TIMEOUT
+              ? "Session timed out after inactivity"
+              : "Session timed out at the end of the session");
+    }
   }
 
   /** The user a password sign-in is for, when it may use a password now. */

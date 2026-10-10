@@ -838,13 +838,15 @@ class Annexes:
     def frum_of(self, frs) -> str:
         return ", ".join(sorted({x for fr in frs for x in self.b.fr_to_frum.get(fr, [])}, key=frum_key))
 
-    def h1(self, text):
+    def h1(self, text, page=True):
         p = OxmlElement("w:p")
         ppr = strip_ids(copy.deepcopy(self.h1_ppr))
         for r in ppr.findall(qn("w:rPr")):
             ppr.remove(r)
-        if ppr.find(qn("w:pageBreakBefore")) is None:
+        if page and ppr.find(qn("w:pageBreakBefore")) is None:
             ppr_insert(ppr, OxmlElement("w:pageBreakBefore"))
+        for pbb in [] if page else ppr.findall(qn("w:pageBreakBefore")):
+            ppr.remove(pbb)
         p.append(ppr)
         p.append(self.b.run(text))
         self.els.append(p)
@@ -868,7 +870,8 @@ class Annexes:
 
     # Annex J - screens
     def screens(self):
-        self.h1("Annex J – Screen Specifications")
+        # follows BDOI's short Annex I on its page (no page of two lines)
+        self.h1("Annex J – Screen Specifications", page=False)
         self.p("This annex specifies the User Access Maintenance screens: the purpose of each screen, how the user "
                "reaches it, the requirements it serves, one screenshot, its fields with type, mandatory marker, format, "
                "list or source and validation, its actions, and its rules. Mandatory: Y = mandatory, N = optional, "

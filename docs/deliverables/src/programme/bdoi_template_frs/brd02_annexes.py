@@ -382,9 +382,6 @@ class Appendices:
                              str(r[4]), str(r[5] or "-"), m.clean(r[6] or "-")])
         self.table(["No.", "Where it appears", "Message", "Type", "What the user does"], rows,
                    [0.55, 1.6, 2.6, 0.8, 1.85], size=7.5)
-        self.h2("F.3 Messages of the posting step, payment files, receipt forms and lists")
-        self.p("The messages of the Cashiering screens of BDOI's posting step, payment files, AR and OR forms, day-end "
-               "list, search log, unapplied payment list and settlement ORs (Appendix E), word for word.")
         known = {r[2] for r in rows}
         more = []
         for msg in pack_messages():
@@ -393,8 +390,12 @@ class Appendices:
                 text = re.sub(r"\(setting [A-Z][A-Z0-9_]+\)", "(setting of Appendix H.8)", msg["text"])
                 more.append([f"M-N{len(more) + 1:02d}", m.clean(msg["place"], keep_refs=True), m.clean(text),
                              msg["kind"], m.clean(msg["fix"]) if msg["fix"] != "-" else "-"])
-        self.table(["No.", "Where it appears", "Message", "Type", "What the user does"], more,
-                   [0.55, 1.6, 2.6, 0.8, 1.85], size=7.5)
+        if more:  # the messages of the screens aligned in v3.2 not yet in F.2 (none once the sign-off sheet holds them)
+            self.h2("F.3 Messages of the posting step, payment files, receipt forms and lists")
+            self.p("The messages of the Cashiering screens of BDOI's posting step, payment files, AR and OR forms, "
+                   "day-end list, search log, unapplied payment list and settlement ORs (Appendix E), word for word.")
+            self.table(["No.", "Where it appears", "Message", "Type", "What the user does"], more,
+                       [0.55, 1.6, 2.6, 0.8, 1.85], size=7.5)
         rows = rows + more
         self.b.stats["messages"] = len(rows)
         self.b.stats["messages_all"] = len(rows) + self.b.stats["messages_bdoi"]

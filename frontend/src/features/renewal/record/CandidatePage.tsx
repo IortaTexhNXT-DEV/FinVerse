@@ -31,6 +31,8 @@ import { WORKFLOW_VIEW } from '../common/presentation';
 import { RecordActions } from './RecordActions';
 import { DetailsTab } from './DetailsTab';
 import { ApprovalTab } from '../approval/ApprovalTab';
+import { KycCard } from '../kyc/KycCard';
+import { ProposalTab } from '../proposal/ProposalTab';
 import { PlacementTab } from '../placement/PlacementTab';
 import { HoldCoverTab } from './HoldCoverTab';
 import { AccountHistoryTab, HistoryTab, NotesTab } from './HistoryTabs';
@@ -48,7 +50,9 @@ const TABS = [
   { id: 'insurer', label: 'Insurer' },
   { id: 'letters', label: 'Letters' },
   { id: 'hold-cover', label: 'Hold Cover' },
+  { id: 'proposal', label: 'Proposal & TSU' },
   { id: 'approval', label: 'Acceptance & Approval' },
+  { id: 'kyc', label: 'KYC' },
   { id: 'placement', label: 'Placement' },
   { id: 'documents', label: 'Documents' },
   { id: 'notes', label: 'Remarks & Follow-ups' },
@@ -90,7 +94,9 @@ const BODIES: Partial<Record<TabId, (detail: CandidateDetail) => ReactNode>> = {
   insurer: (d) => <InsurerTab detail={d} />,
   letters: (d) => <LettersTab detail={d} />,
   'hold-cover': (d) => <HoldCoverTab detail={d} />,
+  proposal: (d) => <ProposalTab detail={d} />,
   approval: (d) => <ApprovalTab detail={d} />,
+  kyc: (d) => <KycCard renewalRef={d.row.renewalRef} />,
   placement: (d) => <PlacementTab detail={d} />,
   documents: (d) => (
     <Attachments

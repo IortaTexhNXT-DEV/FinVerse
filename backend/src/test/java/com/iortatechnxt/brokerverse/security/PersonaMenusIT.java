@@ -108,6 +108,12 @@ class PersonaMenusIT {
               "/renewal/approvals", "/api/v1/renewal/candidates?companyId={c}&stage=ACCEPTED"),
           Map.entry("/renewal/billing", "/api/v1/renewal/billing-files?companyId={c}"),
           Map.entry(
+              "/renewal/tsu-requests",
+              "/api/v1/renewal/tsu-requests?companyId={c}&status=PENDING_TL_APPROVAL"),
+          Map.entry("/renewal/kyc", "/api/v1/renewal/kyc/dashboard?companyId={c}"),
+          Map.entry(
+              "/renewal/risk-codes", "/api/v1/renewal/setup/risk-code-maintenance?companyId={c}"),
+          Map.entry(
               "/renewal/processing", "/api/v1/renewal/candidates?companyId={c}&tab=FOR_PROCESSING"),
           Map.entry("/renewal/insurer", "/api/v1/renewal/insurer-batches?companyId={c}"),
           Map.entry("/renewal/letters", "/api/v1/renewal/candidates?companyId={c}&tab=RA_READY"),

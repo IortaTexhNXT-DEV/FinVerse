@@ -363,6 +363,18 @@ public class RenewalParameters {
   }
 
   /**
+   * The reason recorded when the risk code makes an account Not for Renewal: Non-renewable Accounts
+   * (SYSTEM, the default) or Non-Renewable Risk Code (CLIENT).
+   *
+   * @return reason code
+   */
+  public String riskCodeReason() {
+    return "CLIENT".equals(parameters.text("RNW_RISK_CODE_REASON", "SYSTEM").strip())
+        ? "NON_RENEWABLE_RISK_CODE"
+        : RenewalCodes.REASON_NON_RENEWABLE;
+  }
+
+  /**
    * Whether Lost Business is a reason of Not for Renewal rather than a disposition (disposition set
    * CLIENT).
    *

@@ -499,6 +499,9 @@
             "/renewal/transfers",
             "/renewal/referrals",
             "/renewal/approvals",
+            "/renewal/tsu-requests",
+            "/renewal/kyc",
+            "/renewal/risk-codes",
             "/renewal/letters",
             "/renewal/channels",
             "/renewal/audit-logs"
@@ -528,6 +531,7 @@
             "/renewal/transfers",
             "/renewal/referrals",
             "/renewal/approvals",
+            "/renewal/kyc",
             "/renewal/letters"
           ]
         },
@@ -561,6 +565,8 @@
             "/renewal/processing",
             "/renewal/approvals",
             "/renewal/placement",
+            "/renewal/kyc",
+            "/renewal/risk-codes",
             "/renewal/billing",
             "/renewal/epolicies",
             "/renewal/insurer",
@@ -596,6 +602,7 @@
             "/renewal/expiry",
             "/renewal/processing",
             "/renewal/placement",
+            "/renewal/kyc",
             "/renewal/billing",
             "/renewal/epolicies",
             "/renewal/insurer",
@@ -624,6 +631,7 @@
             "/renewal/dashboard",
             "/renewal/accounts",
             "/renewal/expiry",
+            "/renewal/risk-codes",
             "/renewal/rmu-officers",
             "/renewal/channels",
             "/renewal/audit-logs",

@@ -41,7 +41,7 @@ public class RiskCodeRenewableCheck implements RenewalCheck {
     }
     String line = s.product().lineCode();
     return codes.findByCompanyIdAndRiskCode(context.candidate().getCompanyId(), risk).stream()
-        .filter(c -> c.appliesTo(risk, line, context.today()))
+        .filter(c -> !c.isRenewable() && c.appliesTo(risk, line, context.today()))
         .findFirst()
         .map(
             c ->

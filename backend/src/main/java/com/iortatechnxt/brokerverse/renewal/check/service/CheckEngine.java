@@ -204,10 +204,7 @@ public class CheckEngine {
     if (RiskCodeRenewableCheck.CODE.equals(f.code())) {
       return Optional.of(
           new Evaluation.SystemTag(
-              RenewalCodes.REASON_NON_RENEWABLE,
-              DispositionSource.SYSTEM_CHECK,
-              f.message(),
-              null));
+              parameters.riskCodeReason(), DispositionSource.SYSTEM_CHECK, f.message(), null));
     }
     if (TotalLossCheck.CODE.equals(f.code())) {
       return Optional.of(

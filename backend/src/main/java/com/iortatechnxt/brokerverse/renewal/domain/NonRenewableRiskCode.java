@@ -34,6 +34,15 @@ public class NonRenewableRiskCode extends AuthorizableEntity {
   @Column(name = "effective_to")
   private LocalDate effectiveTo;
 
+  @Column(nullable = false)
+  private boolean renewable;
+
+  @Column(length = 200)
+  private String description;
+
+  @Column(length = 500)
+  private String remarks;
+
   protected NonRenewableRiskCode() {}
 
   /**
@@ -86,6 +95,31 @@ public class NonRenewableRiskCode extends AuthorizableEntity {
 
   private boolean inForce(LocalDate date) {
     return !date.isBefore(effectiveFrom) && (effectiveTo == null || !date.isAfter(effectiveTo));
+  }
+
+  /**
+   * Classifies the risk code (FRRN.038.03).
+   *
+   * @param isRenewable Renewable (true) or Non-Renewable
+   * @param text description
+   * @param note remarks
+   */
+  public void classify(boolean isRenewable, String text, String note) {
+    this.renewable = isRenewable;
+    this.description = text;
+    this.remarks = note;
+  }
+
+  public boolean isRenewable() {
+    return renewable;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public String getRemarks() {
+    return remarks;
   }
 
   public Long getCompanyId() {

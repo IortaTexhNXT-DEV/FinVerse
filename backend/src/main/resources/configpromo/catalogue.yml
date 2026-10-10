@@ -397,7 +397,7 @@ excluded:
      tax_certificate_received_line, tax_remittance, tax_return, tax_return_line, wf_case,
      rnw_bdofc_line, rnw_channel_message, rnw_insurer_disposition_line, rnw_lamd_loan, rnw_paid_off_account, rnw_placement_tracking, rnw_processing_assignment, rnw_referral,
      rnw_hold_cover_request, rnw_insurer_allocation, rnw_placement, rnw_placement_file, rnw_insurance_advice,
-     rnw_epolicy_receipt, rnw_epolicy_line, rnw_billing_file,
+     rnw_epolicy_receipt, rnw_epolicy_line, rnw_billing_file, rnw_proposal, rnw_tsu_request, rnw_tsu_quote,
      pm_deactivation_request, pm_marketing_approval, pm_mancom_approval, pm_master_change,
      pm_terms_option, pm_terms_setting, pm_final_term, pm_proposal_file, pm_client_response,
      pm_placement_report]
@@ -417,7 +417,7 @@ excluded:
      pm_insurer_response_history, rcv_pdc_event, rnw_bucket_history, rnw_history_view,
      sbm_policy_history, scr_case_event, scr_ingestion_error, sec_access_change_log, sys_job_run,
      wf_case_history,
-     rnw_budget_history, rnw_channel_event,
+     rnw_budget_history, rnw_channel_event, rnw_kyc_activity,
      idn_identity_event, pm_final_term_history]
   SECRET:
     [sec_mfa_recovery_code, sec_mfa_reset_request, sec_mfa_trusted_device, sec_password_history,

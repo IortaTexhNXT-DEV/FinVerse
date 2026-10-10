@@ -173,6 +173,48 @@ export const RENEWAL_HELP: HelpSection = {
       ],
     },
     {
+      name: 'TSU Requests',
+      path: '/renewal/tsu-requests',
+      summary:
+        'Quotation requests to TSU of the renewal accounts For Quotation, from the Team Lead approval to the proposal completed by TSU.',
+      workflow: [
+        'The Account Officer creates the request from the Proposal & TSU tab of the account; it is Pending Team Lead Approval and the Team Lead is notified.',
+        'The Team Lead approves, rejects or returns it for revision, then assigns the TSU Officer (For TSU Processing).',
+        'The TSU Officer records the insurer quotations of the comparative table and completes the request with the proposal; Marketing selects the insurers and sends the proposal.',
+      ],
+      controls: [
+        'An account has one open TSU request at a time; every change is notified to the requester.',
+      ],
+    },
+    {
+      name: 'KYC Monitoring',
+      path: '/renewal/kyc',
+      summary:
+        'Renewal accounts whose client is due for KYC review, with upcoming reviews, completed reviews and pending follow-ups.',
+      workflow: [
+        'Open a count to list its accounts; open an account to record the KYC review activity, remarks, follow-up notes or completion on its KYC tab.',
+        'Refresh KYC Status applies the KYC criteria now; the daily job does it every night.',
+      ],
+      controls: [
+        'The criteria are settings: review date window, upcoming days, market segments, bank or non-bank clients and products.',
+        'Every status change is kept in the history with the user and the time; the classification of the account does not change.',
+      ],
+    },
+    {
+      name: 'Risk Code Maintenance',
+      path: '/renewal/risk-codes',
+      summary:
+        'Risk codes with their Renewable or Non-Renewable indicator used at the generation of the renewal accounts.',
+      workflow: [
+        'Search a risk code or filter by indicator; the list shows who created and last updated each entry.',
+        'Add or update a risk code with its description, product line, indicator, effective date and remarks; another user authorizes the change in Renewal Setup.',
+      ],
+      controls: [
+        'A risk code already in the list is refused; the effective date is today or later.',
+        'Accounts on a Non-Renewable risk code are Not for Renewal at their generation, with the reason recorded.',
+      ],
+    },
+    {
       name: 'CLPC Billing Files',
       path: '/renewal/billing',
       summary:

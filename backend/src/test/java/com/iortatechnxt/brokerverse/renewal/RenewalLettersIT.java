@@ -277,7 +277,7 @@ class RenewalLettersIT {
         channelMessages
             .findByCompanyIdAndDocRefOrderByIdDesc(fx.company(), ra.getLetterNo())
             .get(0);
-    assertThat(message.getExternalRef()).startsWith("CCMSIM-");
+    assertThat(message.getExternalRef()).startsWith("TRN-CCM-");
     assertThat(message.getFileName())
         .matches("MTR_RA_First Notice_" + c.getRenewalRef() + "_\\d{8}\\.pdf");
     as.run(PO, () -> channels.refresh());

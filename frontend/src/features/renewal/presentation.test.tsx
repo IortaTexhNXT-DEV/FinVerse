@@ -218,6 +218,15 @@ describe('renewal lists that fit their card', () => {
     expect(candidateColumns(false)).toHaveLength(8);
   });
 
+  it('shows the whole stage name in the status column, never a cut-off pill', () => {
+    const stage = candidateColumns(true).find((c) => c.key === 'stage');
+    render(
+      <>{stage?.render(row({ stage: 'REVIEW_IN_PROGRESS', stageLabel: 'Review in Progress' }))}</>,
+    );
+    const pill = screen.getByText('Review in Progress');
+    expect(pill).toHaveClass('badge-full');
+  });
+
   it('counts the claims in words', () => {
     expect(claimsText(1)).toBe('1 claim');
     expect(claimsText(3)).toBe('3 claims');

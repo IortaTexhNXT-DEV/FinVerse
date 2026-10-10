@@ -87,7 +87,7 @@ export function candidateColumns(showMoney: boolean): Column<CandidateRow>[] {
       kind: 'status',
       render: (r) => (
         <span className="rnw-ref">
-          <StatusBadge status={r.stage} label={r.stageLabel} />
+          <StatusBadge status={r.stage} label={r.stageLabel} full />
           <BucketPill bucket={r.bucket} />
         </span>
       ),

@@ -21,4 +21,11 @@ class AuditEntryTimeTest {
     assertThat(RenewalAuditLogService.instant(AT)).isEqualTo(AT);
     assertThat(RenewalAuditLogService.instant(null)).isNull();
   }
+
+  @Test
+  void epochMillisOfTheQueryAreRead() {
+    // the report reader turns a timestamp column into a date, so the query also returns the time as
+    // millis
+    assertThat(RenewalAuditLogService.instant(AT.toEpochMilli())).isEqualTo(AT);
+  }
 }

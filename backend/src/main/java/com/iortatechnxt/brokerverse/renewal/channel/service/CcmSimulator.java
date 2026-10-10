@@ -16,6 +16,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class CcmSimulator implements ChannelGateway {
 
+  /** The CCM transaction reference: TRN- and the message number, as a business reference. */
+  static final String REFERENCE_PREFIX = "TRN-";
+
   static final Pattern EMAIL = Pattern.compile("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$");
 
   private final SystemParameterService parameters;
@@ -54,7 +57,7 @@ public class CcmSimulator implements ChannelGateway {
     if (t.content() == null || t.content().length == 0) {
       return Reply.refused(REJECTED, "The communication has no file");
     }
-    return Reply.accepted("CCMSIM-" + t.messageNo());
+    return Reply.accepted(REFERENCE_PREFIX + t.messageNo());
   }
 
   @Override

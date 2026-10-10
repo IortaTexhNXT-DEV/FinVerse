@@ -147,7 +147,10 @@ public class ProcessingService {
           }
           flow.assign(c, officer);
           audit.record(
-              RenewalCodes.ENTITY, ref, AuditAction.UPDATE, "Processing Officer " + officer);
+              RenewalCodes.ENTITY,
+              ref,
+              AuditAction.UPDATE,
+              "Processing Officer " + directory.displayName(officer));
           notices.users(
               List.of(officer),
               RenewalCodes.EVENT_ASSIGNED,

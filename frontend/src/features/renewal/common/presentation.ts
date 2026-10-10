@@ -292,3 +292,8 @@ export function rateText(rate: number | null | undefined): string {
   }
   return `${rate.toLocaleString('en-US', { maximumFractionDigits: 4 })}%`;
 }
+
+/** A sum insured band without either bound (missing or empty) reads Any. */
+export function isAnyBand(from: number | null | undefined, to: number | null | undefined): boolean {
+  return (from ?? null) === null && (to ?? null) === null;
+}

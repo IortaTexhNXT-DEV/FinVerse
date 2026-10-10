@@ -145,6 +145,8 @@ class RenewalListsIT {
                 audit.entries(
                     fx.company(), new RenewalAuditLogService.Query(null, null, null, ref, null)));
     assertThat(entries).isNotEmpty();
+    // every entry shows when it happened (date and time, not only the date)
+    assertThat(entries).allMatch(e -> e.at() != null);
     assertThat(entries)
         .anyMatch(
             e ->

@@ -336,7 +336,7 @@ class NewAnnexes:
             else:
                 # a wide extract in two halves, left columns above the right ones, so that its text stays legible
                 for part in _halves(png, a.work):
-                    a.els.extend(final.screenshot(a.b, part, a.work))
+                    a.els.extend(a.screenshot_parts(part))
             a.p(f"Figure AF.{k}: current layout of the {clean(doc['name'])}", italic=True, size=8, jc="center")
         for doc in d["extra"]:
             k += 1

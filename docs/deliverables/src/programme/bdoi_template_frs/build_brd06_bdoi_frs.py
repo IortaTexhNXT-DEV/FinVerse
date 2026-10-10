@@ -62,6 +62,24 @@ SRC = REPO / "docs" / "deliverables" / "src"
 RN = SRC / "BRD-06_Renewal"
 CMP = SRC / "programme" / "comparisons" / "comparison_brd06.yaml"
 ADD = yaml.safe_load((HERE / "brd06_frs_additions.yaml").read_text(encoding="utf-8"))
+
+
+def _check_statement_texts(node, path="additions") -> None:
+    """Every statement and acceptance criterion is plain text: a line with an unquoted ": " is read by YAML as a
+    mapping and would be printed with braces and quotes."""
+    if isinstance(node, dict):
+        for k, v in node.items():
+            if k in ("shall", "ac") and isinstance(v, list):
+                for i, x in enumerate(v):
+                    if not isinstance(x, str):
+                        raise SystemExit(f"{path}.{k}[{i}] is not plain text (quote the line): {x!r}"[:300])
+            _check_statement_texts(v, f"{path}.{k}")
+    elif isinstance(node, list):
+        for i, v in enumerate(node):
+            _check_statement_texts(v, f"{path}[{i}]")
+
+
+_check_statement_texts(ADD)
 DOC = yaml.safe_load((HERE / "brd06_document.yaml").read_text(encoding="utf-8"))
 OUT = REPO / "docs" / "deliverables" / "out" / DOC["meta"]["out_folder"]
 HL_FILL = base.HL_FILL
@@ -207,6 +225,24 @@ def line_items_map() -> dict[str, list[str]]:
 class Builder(base.Builder):
     """The BDOI-template builder of BRD-11 on BDOI's Renewal FRS; every addition of version 1.1 is shaded in the
     review copy."""
+
+    def clone_row(self, template_tr, values, font_size=None):
+        """BDOI's row copy; a cell left empty in BDOI's row takes the font of the row's first written cell, so that
+        every cell of an added row has the font of the table."""
+        tr = super().clone_row(template_tr, values, font_size)
+        rprs = [r.find(qn("w:rPr")) for r in tr.iter(qn("w:r"))]
+        model = next((x for x in rprs if x is not None and x.find(qn("w:rFonts")) is not None), None)
+        if model is not None:
+            for r in tr.iter(qn("w:r")):
+                old = r.find(qn("w:rPr"))
+                if old is None or old.find(qn("w:rFonts")) is None:
+                    new = copy.deepcopy(model)
+                    for b in new.findall(qn("w:b")) + new.findall(qn("w:bCs")):
+                        new.remove(b)
+                    if old is not None:
+                        r.remove(old)
+                    r.insert(0, new)
+        return tr
 
     def __init__(self, highlight: bool):  # noqa: D107  (no super(): another source document)
         self.highlight = highlight
@@ -374,6 +410,16 @@ def subitem_blocks(cell_tc, seen: Counter | None = None):
 
 
 def block_num(block, default=None):
+    """The list the added statements continue: that of the last top-level numbered paragraph of the item, so
+    that their numbers follow the last number shown (BDOI's item may hold several lists)."""
+    last = None
+    for el in block:
+        n = el.find(qn("w:pPr") + "/" + qn("w:numPr") + "/" + qn("w:numId")) if el.tag == qn("w:p") else None
+        lvl = el.find(qn("w:pPr") + "/" + qn("w:numPr") + "/" + qn("w:ilvl")) if el.tag == qn("w:p") else None
+        if n is not None and (lvl is None or lvl.get(qn("w:val")) == "0"):
+            last = int(n.get(qn("w:val")))
+    if last is not None:
+        return last
     ids = Counter()
     for el in block:
         n = el.find(qn("w:pPr") + "/" + qn("w:numPr") + "/" + qn("w:numId")) if el.tag == qn("w:p") else None
@@ -529,7 +575,10 @@ class Annexes:
 
     def shot(self, png: Path, max_h=4.6):  # noqa: ARG002  (the shared helper sets the size)
         # every screenshot at the standard width of the screen annexes, a tall screen in parts, with a light border
-        self.els.extend(final.screenshot(self.b, png, self.work))
+        self.els.extend(renewal_screenshot(self.b, png, self.work))
+
+    def screenshot_parts(self, png: Path) -> list:
+        return renewal_screenshot(self.b, png, self.work)
 
     # AA - screens
     def screens(self, review):
@@ -1044,6 +1093,37 @@ def build_review(figs_dir: Path | None = None) -> Builder:
     return b
 
 
+# A screenshot part is at most a third of the usable page high: when a part does not fit under the text
+# before it, the space it leaves at the foot of that page is under a third of the page.
+PART_H = 3.0
+
+
+def renewal_screenshot(b, png: Path, work: Path) -> list:
+    """A screenshot at the standard width of the screen annexes with a light border, in parts of at most
+    PART_H inches from top to bottom, "(continued below)" between them."""
+    width = final._shot_width(Path(png))  # noqa: SLF001
+    parts = final._parts(Path(png), width, PART_H, work, PART_H)  # noqa: SLF001
+    out = []
+    for k, part in enumerate(parts):
+        out.append(final.bordered(b.picture(part, max_w=width, max_h=PART_H + 0.2)))
+        if k < len(parts) - 1:
+            out.append(b.para("(continued below)", italic=True, size=7.5, jc="center", space_after=40))
+    return out
+
+
+def _drop_review_highlights(doc) -> None:
+    """BDOI's source carries a yellow review highlight on two list items of FRRN.003.02.03 (Policy Delivery
+    Aging, TAT Status) and a yellow cell shading on Annex C (branch 80810); the issued document shows no review marks (the additions of this version are shaded in
+    the Changes Highlighted copy only)."""
+    from docx.oxml.ns import qn  # noqa: PLC0415
+    for el in list(doc.element.body.iter(qn("w:highlight"))):
+        el.getparent().remove(el)
+    # the same review marks as yellow cell shading (two cells of the CBG Motor branch list of Annex C)
+    for el in doc.element.body.iter(qn("w:shd")):
+        if (el.get(qn("w:fill")) or "").upper() == "FFFF00":
+            el.set(qn("w:fill"), "auto")
+
+
 def _shrink_closing_paragraph(doc) -> None:
     """The empty paragraph Word needs after the closing glossary table: one point high, so that it never
     opens a blank last page."""
@@ -1079,6 +1159,7 @@ def main(argv=None) -> int:
             b = build(highlight, our, lines, functions, trace, brrn, figs)
             path = OUT / name
             _shrink_closing_paragraph(b.doc)
+            _drop_review_highlights(b.doc)
             b.doc.save(str(path))
             n_ids = check_bdoi_text(path)
             results[name] = (b, n_ids)

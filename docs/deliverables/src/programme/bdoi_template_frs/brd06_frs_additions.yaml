@@ -732,7 +732,7 @@ items:
     shall:
       - "The user shall record the method of the client's acceptance (e-mail, signed Renewal Advice or payment) and attach the evidence; the date of acceptance cannot be in the future (\"Select the acceptance method\", \"Attach the acceptance evidence\")."
       - The evidence shall be mandatory when the renewal has a financial impact (FRRN.009.01, BRRN.038).
-      - The acceptance shall be refused while a blocking sanitation rule fails ("Renewal <reference> cannot be accepted: <rule> failed").
+      - 'The acceptance shall be refused while a blocking sanitation rule fails ("Renewal <reference> cannot be accepted: <rule> failed").'
     ac:
       - An acceptance by e-mail with the client's e-mail attached sets the status Accepted and the account moves on as this item states.
       - An acceptance of a renewal with a financial impact cannot be saved without evidence.

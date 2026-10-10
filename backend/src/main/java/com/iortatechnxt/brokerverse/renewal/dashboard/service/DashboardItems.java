@@ -33,7 +33,8 @@ public class DashboardItems {
           + " c.unit_head, c.branch_code, c.account_officer, c.marketing_locked_at, c.kyc_due,"
           + " coalesce(a.net_premium, c.basic_premium, 0) as premium, "
           + COMMISSION
-          + " as commission, a.status as account_status, a.booked_at, a.cancelled_at,"
+          + " as commission, a.status as account_status, c.placement_status, a.booked_at,"
+          + " a.cancelled_at,"
           + " a.cancellation_reason, a.net_premium as booked_premium, a.commission as booked_commission,"
           + " r.response as insurer_response, r.remarks as insurer_remarks, r.received_on as insurer_on,"
           + " ret.occurred_at as returned_at, ret.reason_code as return_reason, ret.comment as return_remarks,"

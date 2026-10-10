@@ -118,7 +118,13 @@ function Lines({ receiptNo }: Readonly<{ receiptNo: string }>) {
             key: 'match',
             header: 'Matching Status',
             kind: 'status',
-            render: (l) => <StatusBadge status={MATCH[l.matchStatus] ?? l.matchStatus} />,
+            render: (l) => (
+              <StatusBadge
+                status={MATCH[l.matchStatus] ?? l.matchStatus}
+                label={MATCH[l.matchStatus] ?? l.matchStatus}
+                full
+              />
+            ),
           },
           { key: 'remarks', header: 'Remarks', render: (l) => l.remarks ?? '' },
         ]}
@@ -192,7 +198,13 @@ export function EpolicyReceiptsCard() {
               key: 'status',
               header: 'Processing Status',
               kind: 'status',
-              render: (r) => <StatusBadge status={STATUS[r.status] ?? r.status} />,
+              render: (r) => (
+                <StatusBadge
+                  status={STATUS[r.status] ?? r.status}
+                  label={STATUS[r.status] ?? r.status}
+                  full
+                />
+              ),
             },
             {
               key: 'records',

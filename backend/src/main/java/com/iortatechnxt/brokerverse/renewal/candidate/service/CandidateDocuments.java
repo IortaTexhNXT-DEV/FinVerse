@@ -164,6 +164,17 @@ public class CandidateDocuments {
    * @return file
    */
   public MessageFile export(CandidateFilter filter) {
+    byte[] xlsx = composer.xlsx(new SheetSpec("Renewals", HEADERS, rows(filter)));
+    return new MessageFile("renewals.xlsx", XLSX, xlsx);
+  }
+
+  /**
+   * The rows of a renewal list export (premium columns empty for LAMD and Contact Center).
+   *
+   * @param filter criteria
+   * @return rows in the order of {@link #headers()}
+   */
+  public List<List<Object>> rows(CandidateFilter filter) {
     boolean hide = queries.scope(filter.companyId()).hidePremium();
     List<List<Object>> rows = new ArrayList<>();
     int page = 0;
@@ -172,8 +183,16 @@ public class CandidateDocuments {
       chunk = queries.list(filter, page++, CandidateQueryService.MAX_CHUNK).getContent();
       chunk.forEach(c -> rows.add(exportRow(c, hide)));
     } while (chunk.size() == CandidateQueryService.MAX_CHUNK && rows.size() < MAX_EXPORT);
-    byte[] xlsx = composer.xlsx(new SheetSpec("Renewals", HEADERS, rows));
-    return new MessageFile("renewals.xlsx", XLSX, xlsx);
+    return rows;
+  }
+
+  /**
+   * The columns of a renewal list export.
+   *
+   * @return headers
+   */
+  public static List<String> headers() {
+    return HEADERS;
   }
 
   private List<Object> exportRow(RenewalCandidate c, boolean hide) {

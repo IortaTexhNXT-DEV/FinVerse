@@ -152,7 +152,13 @@ function usePlacementColumns(
       key: 'status',
       header: 'Status',
       kind: 'status' as const,
-      render: (p: PlacementView) => <StatusBadge status={PLACEMENT_STATUS[p.status] ?? p.status} />,
+      render: (p: PlacementView) => (
+        <StatusBadge
+          status={PLACEMENT_STATUS[p.status] ?? p.status}
+          label={PLACEMENT_STATUS[p.status] ?? p.status}
+          full
+        />
+      ),
     },
     {
       key: 'sent',
@@ -174,7 +180,8 @@ function usePlacementColumns(
     {
       key: 'sla',
       header: 'SLA',
-      render: (p: PlacementView) => (p.tat === null ? '' : <StatusBadge status={p.tat.status} />),
+      render: (p: PlacementView) =>
+        p.tat === null ? '' : <StatusBadge status={p.tat.status} label={p.tat.status} full />,
     },
     {
       key: 'issue',

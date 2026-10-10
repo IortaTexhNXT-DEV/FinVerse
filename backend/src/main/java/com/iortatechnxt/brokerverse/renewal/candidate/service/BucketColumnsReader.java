@@ -68,10 +68,14 @@ public class BucketColumnsReader {
     for (RenewalCandidate c : candidates) {
       Map<String, Object> r = rows.getOrDefault(c.getId(), Map.of());
       String accountStatus = (String) r.get("account_status");
+      String placement = c.getPlacement().getStatus();
       result.put(
           c.getId(),
           new BucketColumns(
-              statusNames.of(c.getStage().name(), c.getFlags().isReturned(), accountStatus),
+              statusNames.of(
+                  c.getStage().name(),
+                  c.getFlags().isReturned(),
+                  placement == null ? accountStatus : placement),
               c.getRenewedInvoiceNo(),
               commission(c),
               (String) r.get("address"),

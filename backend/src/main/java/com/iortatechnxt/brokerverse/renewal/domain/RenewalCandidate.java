@@ -104,6 +104,8 @@ public class RenewalCandidate extends BaseEntity {
 
   @Embedded private CandidateExpiry expiry = new CandidateExpiry();
 
+  @Embedded private final CandidatePlacement placement = new CandidatePlacement();
+
   @Embedded private CandidateAttention attention = new CandidateAttention();
 
   @Enumerated(EnumType.STRING)
@@ -514,6 +516,10 @@ public class RenewalCandidate extends BaseEntity {
       expiry = new CandidateExpiry();
     }
     return expiry;
+  }
+
+  public CandidatePlacement getPlacement() {
+    return placement;
   }
 
   /**

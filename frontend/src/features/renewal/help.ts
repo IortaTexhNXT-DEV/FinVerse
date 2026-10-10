@@ -158,6 +158,36 @@ export const RENEWAL_HELP: HelpSection = {
       ],
     },
     {
+      name: 'Submitted for Approval',
+      path: '/renewal/approvals',
+      summary:
+        'Accepted renewal accounts reviewed before their placement, with the For Booking Only and Direct-to-Insurer Payment tags.',
+      workflow: [
+        'Approve the selected accounts: a CBG Motor account proceeds to placement once its payment is posted; a Non-CBG account needs the client payment confirmation.',
+        'Return an account for correction with the reason; the Account Officer corrects it and resubmits it from the Acceptance & Approval tab.',
+        'Submit for Placement sends an account For Booking Only once its policy number, OR number, policy document and full payment are in, or its override is approved.',
+      ],
+      controls: [
+        'Whether an accepted account waits for this approval is a setting; without it the account goes to the payment gate at once.',
+        'A Direct-to-Insurer Payment routed to the Unit Head must be approved first; a rejected one must be removed before the account proceeds.',
+      ],
+    },
+    {
+      name: 'CLPC Billing Files',
+      path: '/renewal/billing',
+      summary:
+        'Billing files of the CBG Home and FFY Motor accounts For Billing Generation, sent to the nominated recipients and to the shared LMS directory.',
+      workflow: [
+        'The CBG Home job runs daily for the accounts the set days before expiry; the FFY Motor job runs on the set days of the month.',
+        'Generate Billing File for a period of at most 31 days ending today or earlier.',
+        'Download a file, or download it under another name; the attached file keeps its name.',
+      ],
+      controls: [
+        'Amortized accounts go in the Built-in file, the others in the Non-Built-in file, one pair per product line.',
+        'An account is billed once; the delivery status shows Delivered or Failed with the reason.',
+      ],
+    },
+    {
       name: 'Submitted for Placement',
       path: '/renewal/placement',
       summary:

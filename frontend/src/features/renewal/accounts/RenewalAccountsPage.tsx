@@ -1,8 +1,10 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import { Upload } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { CandidateRow } from '@/api/renewal';
 import { renewalDashboardApi } from '@/api/renewalDashboard';
+import { useAuth } from '@/auth/authContext';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
@@ -12,6 +14,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { Tabs } from '@/components/ui/Tabs';
 import { useCompanyId } from '@/context/workspaceContext';
 import { RENEWAL_SECTION } from '../common/renewalCodes';
+import { UploadPanel } from '../common/UploadPanel';
 import { bucketColumns, panelTabs } from './bucketColumns';
 import '../renewal.css';
 
@@ -25,6 +28,8 @@ const CHUNK = 500;
  */
 export default function RenewalAccountsPage() {
   const companyId = useCompanyId();
+  const { can } = useAuth();
+  const [upload, setUpload] = useState(false);
   const navigate = useNavigate();
   const [tab, setTab] = useState('BUCKET_CLEAN');
   const [search, setSearch] = useState('');
@@ -60,7 +65,21 @@ export default function RenewalAccountsPage() {
         section={RENEWAL_SECTION}
         title="Renewal Accounts"
         description="The renewal accounts of the current and previous years by classification panel."
+        actions={
+          can('RNW_DISPOSE') && (
+            <Button variant="secondary" icon={<Upload size={16} />} onClick={() => setUpload(true)}>
+              Upload Account Tags
+            </Button>
+          )
+        }
       />
+      {upload && (
+        <UploadPanel
+          label="Upload Account Tags"
+          handler="RNW_ACCOUNT_TAGS"
+          onClose={() => setUpload(false)}
+        />
+      )}
       <Tabs tabs={tabs} active={tab} onChange={setTab} />
       <div className="rnw-drill-tools">
         <input

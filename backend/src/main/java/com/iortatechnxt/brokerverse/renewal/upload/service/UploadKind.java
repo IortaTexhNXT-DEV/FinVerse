@@ -13,7 +13,11 @@ public enum UploadKind {
   /** Renewal Update files (FRRN.015.03). */
   UPDATE(List.of("RNW_RENEWAL_UPDATE", "RNW_DISPOSITION_UPLOAD"), "Renewal Update"),
   /** Hold cover response files (FRRN.037.01). */
-  HOLD_COVER(List.of("RNW_HOLD_COVER_RESPONSE"), "Hold Cover Response");
+  HOLD_COVER(List.of("RNW_HOLD_COVER_RESPONSE"), "Hold Cover Response"),
+  /** Placement response files (FRRN.030.01). */
+  PLACEMENT(List.of("RNW_PLACEMENT_RESPONSE"), "Placement Response"),
+  /** E-policy number files (FRRN.033.05). */
+  EPOLICY_NUMBERS(List.of("RNW_EPOLICY_NUMBERS"), "E-Policy Numbers");
 
   private final List<String> handlers;
   private final String resultPrefix;

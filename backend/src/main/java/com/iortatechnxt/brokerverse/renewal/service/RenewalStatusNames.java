@@ -45,6 +45,17 @@ public class RenewalStatusNames {
           Map.entry(RenewalStage.RENEWED, "Booked"),
           Map.entry(RenewalStage.CLOSED, "Closed"));
 
+  private static final Map<String, String> PLACEMENT_NAMES =
+      Map.of(
+          "PLACED", "For Booking",
+          "POLICY_ISSUED", "For Booking",
+          "FOR_BOOKING", "For Booking",
+          "RETURNED_BY_INSURER", "Rejected Placement",
+          "REJECTED_PLACEMENT", "Rejected Placement",
+          "BOOKED", "Booked",
+          "FOR_EPOLICY_SENDING", "For E-Policy Sending",
+          "EPOLICY_SENT", "E-Policy Sent");
+
   private final SystemParameterService parameters;
 
   /**
@@ -85,11 +96,7 @@ public class RenewalStatusNames {
       return "Returned - Renewal";
     }
     if (s == RenewalStage.FOR_PLACEMENT_BOOKING && accountStatus != null) {
-      return switch (accountStatus) {
-        case "PLACED", "POLICY_ISSUED" -> "For Booking";
-        case "RETURNED_BY_INSURER" -> "Rejected Placement";
-        default -> BDOI.get(s);
-      };
+      return PLACEMENT_NAMES.getOrDefault(accountStatus, BDOI.get(s));
     }
     return BDOI.get(s);
   }

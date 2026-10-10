@@ -20,6 +20,7 @@ import com.iortatechnxt.brokerverse.renewal.candidate.service.AccountHistoryServ
 import com.iortatechnxt.brokerverse.renewal.candidate.service.AccountHistoryService.AccountHistory;
 import com.iortatechnxt.brokerverse.renewal.candidate.service.BucketPanels;
 import com.iortatechnxt.brokerverse.renewal.candidate.service.CandidateDocuments;
+import com.iortatechnxt.brokerverse.renewal.candidate.service.CandidateExports;
 import com.iortatechnxt.brokerverse.renewal.candidate.service.CandidateQueryService;
 import com.iortatechnxt.brokerverse.renewal.check.service.BlockingChecks;
 import com.iortatechnxt.brokerverse.renewal.domain.CheckResult;
@@ -70,6 +71,7 @@ public class CandidateController {
   private final CandidateDocuments documents;
   private final InitiationService initiation;
   private final BucketPanels panels;
+  private final CandidateExports exports;
   private final Clock clock;
 
   /**
@@ -82,6 +84,7 @@ public class CandidateController {
    * @param documents downloads
    * @param initiation initiation
    * @param panels bucket panels and sort
+   * @param exports PDF and CSV exports
    * @param clock clock (file name of the RMEL)
    */
   public CandidateController(
@@ -92,6 +95,7 @@ public class CandidateController {
       CandidateDocuments documents,
       InitiationService initiation,
       BucketPanels panels,
+      CandidateExports exports,
       Clock clock) {
     this.queries = queries;
     this.rows = rows;
@@ -100,6 +104,7 @@ public class CandidateController {
     this.documents = documents;
     this.initiation = initiation;
     this.panels = panels;
+    this.exports = exports;
     this.clock = clock;
   }
 
@@ -167,6 +172,26 @@ public class CandidateController {
     return file(
         new MessageFile(
             BucketPanels.rmelFileName(params.expiryFrom(), BusinessClock.today(clock)),
+            list.mimeType(),
+            list.content()));
+  }
+
+  /**
+   * A list as a PDF or CSV file (the Excel file is {@code export.xlsx}).
+   *
+   * @param params criteria
+   * @param format pdf or csv
+   * @return file
+   */
+  @GetMapping("/export")
+  @PreAuthorize(EXPORT)
+  public ResponseEntity<byte[]> exportAs(
+      @ModelAttribute CandidateListParams params, @RequestParam String format) {
+    MessageFile list = exports.export(panels.apply(params.filter()), format);
+    String name = BucketPanels.rmelFileName(params.expiryFrom(), BusinessClock.today(clock));
+    return file(
+        new MessageFile(
+            name.substring(0, name.lastIndexOf('.') + 1) + format,
             list.mimeType(),
             list.content()));
   }

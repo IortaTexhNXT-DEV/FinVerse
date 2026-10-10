@@ -127,7 +127,13 @@ public class RenewalDashboardService {
 
   private void label(DashboardItem i) {
     if (i.renewal()) {
-      i.put("status", statusNames.of(i.stage(), i.flag("returned"), i.text("account_status")));
+      String placement = i.text("placement_status");
+      i.put(
+          "status",
+          statusNames.of(
+              i.stage(),
+              i.flag("returned"),
+              placement == null ? i.text("account_status") : placement));
     } else {
       i.put("status", i.stage());
     }

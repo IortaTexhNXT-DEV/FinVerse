@@ -1,4 +1,6 @@
+import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
+import { renewalApprovalApi } from '@/api/renewalApproval';
 import type { Disposition } from '@/api/renewal';
 import { LovSelect } from '@/components/broking/LovSelect';
 import { DateInput } from '@/components/ui/DateInput';
@@ -119,6 +121,11 @@ export function DispositionDialog({
   const [remarks, setRemarks] = useState('');
   const nfr = code === 'NOT_FOR_RENEWAL';
   const ready = dispositionReady({ code, reason, invoice, unit });
+  const offered = useQuery({
+    queryKey: ['renewal', 'dispositions'],
+    queryFn: renewalApprovalApi.dispositions,
+    staleTime: 60_000,
+  });
   return (
     <Modal
       open
@@ -139,7 +146,7 @@ export function DispositionDialog({
         {(id) => (
           <select id={id} className="select" value={code} onChange={(e) => setCode(e.target.value)}>
             <option value="">Select the disposition</option>
-            {DISPOSITION_OPTIONS.map((o) => (
+            {(offered.data ?? DISPOSITION_OPTIONS).map((o) => (
               <option key={o.code} value={o.code}>
                 {o.label}
               </option>

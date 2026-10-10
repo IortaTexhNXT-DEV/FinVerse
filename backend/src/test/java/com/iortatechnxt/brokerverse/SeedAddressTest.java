@@ -53,4 +53,20 @@ class SeedAddressTest {
       }
     }
   }
+
+  @Test
+  void theRenewalSeedReferencesCarryNoSeedMarker() throws IOException {
+    Path source =
+        Path.of("")
+            .toAbsolutePath()
+            .getParent()
+            .resolve(
+                "backend/src/main/java/com/iortatechnxt/brokerverse/renewal/seed/RenewalSeedData.java");
+    Matcher m =
+        Pattern.compile("\"([A-Z0-9]+-[A-Z0-9-]*)\"")
+            .matcher(Files.readString(source, StandardCharsets.UTF_8));
+    while (m.find()) {
+      assertThat(m.group(1)).as("reference shown on the screens").doesNotContain("SEED");
+    }
+  }
 }

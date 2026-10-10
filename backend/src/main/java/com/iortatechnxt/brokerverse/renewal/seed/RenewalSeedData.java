@@ -71,7 +71,7 @@ public class RenewalSeedData implements ApplicationRunner {
               "CBG",
               "CL-2026-000001",
               "2027-11-15",
-              "PN-SEED-0001",
+              "PN-2026-418001",
               false),
           new Legacy(
               "QPS-FI-0100002",
@@ -91,7 +91,7 @@ public class RenewalSeedData implements ApplicationRunner {
               "CBG",
               "CL-2026-000005",
               "2028-01-20",
-              "PN-SEED-0003",
+              "PN-2026-418003",
               true),
           new Legacy(
               "EBIX-CG-0100004",

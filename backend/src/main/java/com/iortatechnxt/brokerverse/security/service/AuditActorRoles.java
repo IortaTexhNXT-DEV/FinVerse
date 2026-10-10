@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,24 +22,38 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 public class AuditActorRoles implements ActorRoles {
 
+  private static final String ROLES_SQL =
+      "select coalesce(string_agg(r.name, ', ' order by r.name), '') from sec_user u"
+          + " left join sec_user_role ur on ur.user_id = u.id"
+          + " left join sec_role r on r.id = ur.role_id"
+          + " where lower(u.username) = lower(?) group by u.id";
+
   private final AppUserRepository users;
+  private final JdbcTemplate jdbc;
 
   /**
    * Creates the lookup.
    *
    * @param users users
+   * @param jdbc JDBC template (role names without touching the persistence context)
    */
-  public AuditActorRoles(AppUserRepository users) {
+  public AuditActorRoles(AppUserRepository users, JdbcTemplate jdbc) {
     this.users = users;
+    this.jdbc = jdbc;
   }
 
+  /**
+   * The role names of a user, read with plain SQL: the lookup runs inside the transaction of the
+   * audited action and must not flush or load its entities (a flush there would stamp the
+   * authorizer as the maker of a record being authorized).
+   */
   @Override
-  @Transactional(readOnly = true)
   public String rolesOf(String username) {
     if (username == null) {
       return null;
     }
-    return users.findByUsernameIgnoreCase(username).map(AuditActorRoles::names).orElse(null);
+    List<String> found = jdbc.queryForList(ROLES_SQL, String.class, username);
+    return found.isEmpty() ? null : found.get(0);
   }
 
   /**

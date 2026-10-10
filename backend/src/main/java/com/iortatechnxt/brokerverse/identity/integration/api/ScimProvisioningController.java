@@ -1,4 +1,4 @@
-package com.iortatechnxt.brokerverse.identity.api;
+package com.iortatechnxt.brokerverse.identity.integration.api;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

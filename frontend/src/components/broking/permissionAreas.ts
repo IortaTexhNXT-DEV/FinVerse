@@ -116,7 +116,7 @@ export function privilegeOf(
   permission: string,
   approving = APPROVING.test(permission),
 ): 'Administration' | 'Approval' | null {
-  if (ADMINISTERING.test(permission) && !/_VIEW$/.test(permission)) {
+  if (ADMINISTERING.test(permission) && !permission.endsWith('_VIEW')) {
     return 'Administration';
   }
   return approving ? 'Approval' : null;

@@ -1,15 +1,9 @@
-import { ChevronDown, ChevronRight, Search, X } from 'lucide-react';
+import { ChevronDown, ChevronRight, Search } from 'lucide-react';
 import { useId, useState } from 'react';
 import { Notice } from '@/components/ui/Notice';
-import { countOf } from '@/utils/format';
 import { permissionDescription, permissionLabel } from '@/utils/permissionLabel';
-import {
-  byArea,
-  groupPermissions,
-  permissionConflicts,
-  permissionDiff,
-  privilegeOf,
-} from './permissionAreas';
+import { byArea, groupPermissions, permissionConflicts, privilegeOf } from './permissionAreas';
+import { PermissionChanges, PermissionChip } from './PermissionChanges';
 import type { PermissionGroup } from './permissionAreas';
 import type { ProfileConflictRule, ProfileInfo } from './profileAreas';
 
@@ -128,94 +122,6 @@ function Area({ group, open, onToggle, selected, current, onPick }: Readonly<Are
   );
 }
 
-function Chip({
-  code,
-  tone,
-  onRemove,
-  action = 'Remove',
-}: Readonly<{
-  code: string;
-  tone?: 'added' | 'removed';
-  onRemove?: () => void;
-  action?: string;
-}>) {
-  const name = permissionLabel(code);
-  return (
-    <span
-      className={`permission-chip${tone ? ` ${tone}` : ''}`}
-      title={permissionDescription(code)}
-    >
-      {tone === 'added' && <span className="visually-hidden">Added: </span>}
-      {tone === 'removed' && <span className="visually-hidden">Removed: </span>}
-      <span className="permission-chip-name">{name}</span>
-      {onRemove && (
-        <button
-          type="button"
-          className="permission-chip-remove"
-          aria-label={`${action} ${name}`}
-          onClick={onRemove}
-        >
-          <X size={12} aria-hidden="true" />
-        </button>
-      )}
-    </span>
-  );
-}
-
-/**
- * The change of a profile's permissions: added (green) and removed (red), by area. Shown in the
- * picker of a change request and on the request and its approval, read only.
- */
-export function PermissionChanges({
-  current,
-  selected,
-  onRestore,
-}: Readonly<{
-  current: readonly string[];
-  selected: readonly string[];
-  onRestore?: (code: string) => void;
-}>) {
-  const { added, removed } = permissionDiff(current, selected);
-  if (added.length === 0 && removed.length === 0) {
-    return <p className="muted profile-picker-note">No change to the permissions.</p>;
-  }
-  return (
-    <div className="permission-changes">
-      <p className="profile-picker-note">
-        <strong className="permission-added-text">
-          {countOf(added.length, 'permission')} added
-        </strong>
-        {', '}
-        <strong className="permission-removed-text">
-          {countOf(removed.length, 'permission')} removed
-        </strong>
-      </p>
-      {byArea([...added, ...removed]).map(([area, codes]) => (
-        <div key={area} className="permission-chip-area">
-          <div className="permission-chip-area-name">{area}</div>
-          <span className="permission-chips">
-            {codes.map((c) => (
-              <Chip
-                key={c}
-                code={c}
-                tone={added.includes(c) ? 'added' : 'removed'}
-                action="Undo change of"
-                onRemove={
-                  onRestore === undefined
-                    ? undefined
-                    : () => {
-                        onRestore(c);
-                      }
-                }
-              />
-            ))}
-          </span>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 function CopyFrom({
   profiles,
   onCopy,
@@ -290,6 +196,35 @@ function Warnings({
         </Notice>
       )}
     </>
+  );
+}
+
+function SelectedSummary({
+  selected,
+  onRemove,
+}: Readonly<{ selected: readonly string[]; onRemove: (code: string) => void }>) {
+  if (selected.length === 0) {
+    return (
+      <p className="muted profile-selected-empty">
+        No permission selected yet. Tick the permissions in the list.
+      </p>
+    );
+  }
+  return (
+    <div className="permission-selected">
+      {byArea(selected).map(([area, codes]) => (
+        <div key={area} className="permission-chip-area">
+          <div className="permission-chip-area-name">
+            {area} <span className="muted">({codes.length})</span>
+          </div>
+          <span className="permission-chips">
+            {codes.map((c) => (
+              <PermissionChip key={c} code={c} onRemove={() => onRemove(c)} />
+            ))}
+          </span>
+        </div>
+      ))}
+    </div>
   );
 }
 
@@ -391,26 +326,7 @@ export function PermissionPicker({
               onRestore={(c) => pick([c], !selected.includes(c))}
             />
           )}
-          {selected.length === 0 ? (
-            <p className="muted profile-selected-empty">
-              No permission selected yet. Tick the permissions in the list.
-            </p>
-          ) : (
-            <div className="permission-selected">
-              {byArea(selected).map(([area, codes]) => (
-                <div key={area} className="permission-chip-area">
-                  <div className="permission-chip-area-name">
-                    {area} <span className="muted">({codes.length})</span>
-                  </div>
-                  <span className="permission-chips">
-                    {codes.map((c) => (
-                      <Chip key={c} code={c} onRemove={() => pick([c], false)} />
-                    ))}
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
+          <SelectedSummary selected={selected} onRemove={(c) => pick([c], false)} />
         </aside>
       </div>
       {error && (

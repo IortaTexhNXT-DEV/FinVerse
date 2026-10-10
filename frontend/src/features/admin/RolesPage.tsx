@@ -1,4 +1,4 @@
-import { PermissionChanges } from '@/components/broking/PermissionPicker';
+import { PermissionChanges } from '@/components/broking/PermissionChanges';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Wrench } from 'lucide-react';
 import { useState } from 'react';

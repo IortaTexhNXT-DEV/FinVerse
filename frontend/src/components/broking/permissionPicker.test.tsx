@@ -2,7 +2,8 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { permissionLabel } from '@/utils/permissionLabel';
-import { PermissionChanges, PermissionPicker } from './PermissionPicker';
+import { PermissionChanges } from './PermissionChanges';
+import { PermissionPicker } from './PermissionPicker';
 import {
   GENERAL,
   groupPermissions,
@@ -33,14 +34,13 @@ const PROFILES: ProfileInfo[] = [
   { code: 'OLD', name: 'Old Profile', permissions: ['USER_MANAGE'], active: false },
 ];
 
-const RULES = [
-  {
-    profileA: 'DISBURSEMENT',
-    profileB: 'DISB_APPROVER',
-    description: 'Maker and approver of the same voucher',
-    status: 'ACTIVE',
-  },
-];
+const RULE = {
+  profileA: 'DISBURSEMENT',
+  profileB: 'DISB_APPROVER',
+  description: 'Maker and approver of the same voucher',
+  status: 'ACTIVE',
+};
+const RULES = [RULE];
 
 function Harness({ initial = [], current }: Readonly<{ initial?: string[]; current?: string[] }>) {
   const [selected, setSelected] = useState(initial);
@@ -56,7 +56,9 @@ function Harness({ initial = [], current }: Readonly<{ initial?: string[]; curre
         rules={RULES}
         offerCopy
       />
-      <output data-testid="submitted">{[...selected].sort().join(',')}</output>
+      <output data-testid="submitted">
+        {[...selected].sort((a, b) => a.localeCompare(b)).join(',')}
+      </output>
     </>
   );
 }
@@ -72,7 +74,7 @@ describe('permission areas', () => {
       'Administration & Control',
       GENERAL,
     ]);
-    expect(groups[1].all).toHaveLength(3);
+    expect(groups[1]?.all).toHaveLength(3);
   });
 
   it('searches names and descriptions across areas', () => {
@@ -89,7 +91,7 @@ describe('permission areas', () => {
     expect(
       permissionConflicts(
         ['DISB_PROCESS', 'DISB_APPROVE'],
-        [{ ...RULES[0], status: 'INACTIVE' }],
+        [{ ...RULE, status: 'INACTIVE' }],
         PROFILES,
       ),
     ).toEqual([]);

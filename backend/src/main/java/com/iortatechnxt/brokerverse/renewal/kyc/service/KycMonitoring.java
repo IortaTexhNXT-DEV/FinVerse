@@ -140,7 +140,7 @@ public class KycMonitoring {
     Map<String, Object> current = current(c.getId());
     String status = (String) current.get("kyc_status");
     LocalDate previousDue = date(current.get("kyc_review_due"));
-    if (MANUAL.contains(status) && Objects.equals(due, previousDue)) {
+    if (status != null && MANUAL.contains(status) && Objects.equals(due, previousDue)) {
       return false;
     }
     String next = automatic(c, client, due);
@@ -242,12 +242,13 @@ public class KycMonitoring {
   }
 
   private boolean monitored(RenewalCandidate c, Optional<Client> client) {
+    // the same segment rule as the KYC due check, so that the counts match the KYC due tags
     CandidateSnapshot.SnapshotProduct p = c.getSnapshot().product();
-    if (p == null || !renewal.kycApplies(p.segment())) {
+    if (!renewal.kycApplies(p == null ? null : p.segment())) {
       return false;
     }
     List<String> products = parameters.items("RNW_KYC_PRODUCTS");
-    if (!products.isEmpty() && !products.contains(p.productCode())) {
+    if (p != null && !products.isEmpty() && !products.contains(p.productCode())) {
       return false;
     }
     String type = client.map(k -> k.isBankClient() ? "BANK" : "NON_BANK").orElse("NON_BANK");

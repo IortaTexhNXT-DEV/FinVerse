@@ -61,7 +61,7 @@ describe('Channel Monitor', () => {
         recipients: 'juan@example.ph',
         status: 'DELIVERED',
         statusLabel: 'Delivered',
-        externalRef: 'CCMSIM-CCM-2026-000006',
+        externalRef: 'TRN-CCM-2026-000006',
         error: null,
         queuedAt: '2026-10-01T02:00:00Z',
         sentAt: '2026-10-01T02:05:00Z',
@@ -71,7 +71,7 @@ describe('Channel Monitor', () => {
     ]);
     const wrap = renewalWrapper(new Set(['RNW_VIEW']));
     render(wrap(<DeliveriesCard renewalRef="RNW-1" />));
-    expect(await screen.findByText('CCMSIM-CCM-2026-000006')).toBeInTheDocument();
+    expect(await screen.findByText('TRN-CCM-2026-000006')).toBeInTheDocument();
     expect(screen.getByText('Delivered')).toBeInTheDocument();
   });
 });

@@ -1,3 +1,4 @@
+import { setUserDirectory } from '@/api/users';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { renewalProposalApi } from '@/api/renewalProposal';
 import type { CandidateDetail } from '@/api/renewal';
@@ -56,9 +57,13 @@ describe('Proposals, KYC and risk codes', () => {
         expiryDate: '2026-12-31',
       },
     ]);
+    setUserDirectory([{ username: 'ao', displayName: 'Ana Ocampo' }]);
     const wrap = renewalWrapper(new Set(['RNW_VIEW']));
     render(wrap(<KycDashboardPage />));
     expect(await screen.findByText('Juan Dela Cruz')).toBeInTheDocument();
+    // the Account Officer by name, not by sign-in
+    expect(screen.getByText('Ana Ocampo')).toBeInTheDocument();
+    setUserDirectory([]);
     fireEvent.click(screen.getByText('Total Accounts Completed KYC'));
     await waitFor(() => expect(accounts).toHaveBeenCalledWith(1, 'KYC_COMPLETED'));
   });

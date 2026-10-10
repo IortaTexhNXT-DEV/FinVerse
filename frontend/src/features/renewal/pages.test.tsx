@@ -204,6 +204,12 @@ describe('Renewal screens', () => {
     expect(screen.getByRole('button', { name: 'Send to Insurer' })).toBeInTheDocument();
   });
 
+  it('shows the month of a LAMD report as Sep-2026, not the stored form', async () => {
+    render(renewalWrapper(ALL)(<LamdPage />));
+    expect(await screen.findByText('Sep-2026')).toBeInTheDocument();
+    expect(screen.queryByText('2026-09')).toBeNull();
+  });
+
   it('opens the lines of a LAMD report', async () => {
     render(renewalWrapper(ALL)(<LamdPage />));
     fireEvent.click(await screen.findByText('LAMD-1'));

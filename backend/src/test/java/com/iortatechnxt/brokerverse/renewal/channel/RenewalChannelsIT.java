@@ -70,7 +70,7 @@ class RenewalChannelsIT {
     assertThat(sent.error()).isNull();
     ChannelMessage m = sent.message();
     assertThat(m.getStatus()).isEqualTo(ChannelStatus.SUBMITTED);
-    assertThat(m.getExternalRef()).startsWith("CCMSIM-");
+    assertThat(m.getExternalRef()).startsWith("TRN-CCM-");
     as.run(PO, () -> channels.refresh());
     as.run(PO, () -> channels.refresh());
     ChannelMessage after = as.run(PO, () -> channels.get(fx.company(), m.getMessageNo()));

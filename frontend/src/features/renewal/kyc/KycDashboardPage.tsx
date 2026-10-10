@@ -1,3 +1,4 @@
+import { UserName } from '@/components/ui/UserName';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -63,19 +64,21 @@ export default function KycDashboardPage() {
         }
       />
       <ErrorAlert error={counts.error ?? accounts.error ?? refresh.error} />
-      <div className="rnw-tiles">
+      <ul className="rnw-kpi-cards" aria-label="KYC counts">
         {CARDS.map((c) => (
-          <button
-            key={c.status}
-            type="button"
-            className={`rnw-tile${status === c.status ? ' active' : ''}`}
-            onClick={() => setStatus(c.status)}
-          >
-            <span className="rnw-tile-value">{counts.data?.[c.key] ?? 0}</span>
-            <span className="rnw-tile-label">{c.label}</span>
-          </button>
+          <li key={c.status}>
+            <button
+              type="button"
+              className={`card kpi rnw-kpi-card${status === c.status ? ' active' : ''}`}
+              aria-pressed={status === c.status}
+              onClick={() => setStatus(c.status)}
+            >
+              <span className="kpi-label">{c.label}</span>
+              <span className="kpi-value">{(counts.data?.[c.key] ?? 0).toLocaleString()}</span>
+            </button>
+          </li>
         ))}
-      </div>
+      </ul>
       <Card title={KYC_STATUS[status] ?? status} flush>
         <DataTable<KycAccount>
           loading={accounts.isLoading}
@@ -100,7 +103,11 @@ export default function KycDashboardPage() {
               kind: 'date',
               render: (a) => formatDate(a.expiryDate),
             },
-            { key: 'ao', header: 'Account Officer', render: (a) => a.accountOfficer ?? '' },
+            {
+              key: 'ao',
+              header: 'Account Officer',
+              render: (a) => <UserName login={a.accountOfficer} />,
+            },
           ]}
         />
       </Card>

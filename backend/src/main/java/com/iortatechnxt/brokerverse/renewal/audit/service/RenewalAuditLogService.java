@@ -40,7 +40,7 @@ public class RenewalAuditLogService {
       " from rnw_candidate c where c.company_id = :company" + RenewalReportSupport.FILTERS;
 
   private static final String SQL =
-      "select * from ("
+      "select x.*, cast(extract(epoch from x.occurred_at) * 1000 as bigint) as occurred_ms from ("
           + "select a.occurred_at, c.renewal_ref as ref, coalesce(c.assured_name, c.client_name) as client,"
           + " case a.action when 'CREATE' then 'Create' when 'DEACTIVATE' then 'Delete'"
           + " when 'AUTHORIZE' then 'Approve' when 'POST' then 'Approve' when 'SUBMIT' then 'Update Status'"
@@ -175,8 +175,9 @@ public class RenewalAuditLogService {
   }
 
   private static Entry entry(Map<String, Object> r) {
-    Object at = r.get("occurred_at");
-    Instant when = at instanceof Timestamp t ? t.toInstant() : null;
+    // the report reader keeps only the date of a timestamp column, so the time comes as epoch
+    // millis
+    Instant when = instant(r.get("occurred_ms"));
     String description = (String) r.get("description");
     return new Entry(
         when,
@@ -189,6 +190,24 @@ public class RenewalAuditLogService {
         label(description, (String) r.get("new_value")),
         (String) r.get("performed_by"),
         (String) r.get("remarks"));
+  }
+
+  /**
+   * The time of an entry whatever type the driver returns for it (timestamp with or without time
+   * zone).
+   *
+   * @param at value of the column
+   * @return instant, null when absent
+   */
+  static Instant instant(Object at) {
+    return switch (at) {
+      case Timestamp t -> t.toInstant();
+      case java.time.OffsetDateTime o -> o.toInstant();
+      case Instant i -> i;
+      case Number n -> Instant.ofEpochMilli(n.longValue());
+      case java.time.LocalDateTime l -> l.atZone(BusinessClock.zone()).toInstant();
+      case null, default -> null;
+    };
   }
 
   /** The name of a disposition or classification code; other values as they are. */

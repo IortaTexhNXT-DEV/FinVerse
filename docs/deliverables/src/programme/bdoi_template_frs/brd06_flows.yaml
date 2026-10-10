@@ -262,10 +262,10 @@ figures:
     brd: "BRRN.021, 023, 040; BRD 1.008, 2.004, 3.008; FRRN.004.04, 016, 020, 025, 026, 029, 030, 035"
     dot: |
       digraph A {
-        graph [rankdir=LR, nodesep=0.28, ranksep=0.4, fontname="Arial", pad=0.15, size="9.6,7"];
-        node [fontname="Arial", fontsize=9.5, shape=box, style="rounded,filled", fillcolor="#EAF1FB", color="#1F3864", margin="0.1,0.05"];
-        edge [fontname="Arial", fontsize=8, color="#404040", arrowsize=0.7];
-        new [label="(generated)", shape=circle, fillcolor="#C6E0B4", width=0.6, fixedsize=true];
+        graph [rankdir=TB, nodesep=0.5, ranksep=0.22, fontname="Arial", pad=0.15, size="7.2,8.2", newrank=true];
+        node [fontname="Arial", fontsize=11, shape=box, style="rounded,filled", fillcolor="#EAF1FB", color="#1F3864", margin="0.1,0.05"];
+        edge [fontname="Arial", fontsize=9.5, color="#404040", arrowsize=0.7];
+        new [label="(generated)", shape=circle, fillcolor="#C6E0B4", width=0.95, fixedsize=true];
         ipr [label="In Process\nRenewal"]; sfp [label="Submitted\nfor Posting"]; ret [label="Returned"];
         pst [label="Posted"]; wins [label="With Insurer"]; fra [label="For RA\nGeneration"]; ras [label="RA Sent /\nAwaiting Response"];
         sfa [label="Submitted for\nApproval"]; sfpl [label="Submitted for\nPlacement"]; fbk [label="For Booking"];

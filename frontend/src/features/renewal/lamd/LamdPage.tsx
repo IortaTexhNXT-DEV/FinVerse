@@ -15,6 +15,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { UserName } from '@/components/ui/UserName';
 import { useCompanyId } from '@/context/workspaceContext';
+import { formatMonth } from '@/utils/dateText';
 import { formatDate, formatDateTime } from '@/utils/format';
 import { RENEWAL_SECTION } from '../common/renewalCodes';
 import { UploadPanel } from '../common/UploadPanel';
@@ -159,7 +160,7 @@ export default function LamdPage() {
           columns={[
             { key: 'no', header: 'Report', kind: 'code', render: (r) => r.reportNo },
             { key: 'type', header: 'Type', render: (r) => TYPES[r.type] ?? r.type },
-            { key: 'period', header: 'Month', render: (r) => r.period },
+            { key: 'period', header: 'Month', render: (r) => formatMonth(r.period) },
             { key: 'lines', header: 'Lines', kind: 'amount', render: (r) => r.lines },
             { key: 'matched', header: 'Matched', kind: 'amount', render: (r) => r.matched },
             { key: 'by', header: 'Uploaded by', render: (r) => <UserName login={r.by} /> },

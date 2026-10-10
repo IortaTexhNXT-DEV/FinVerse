@@ -19,6 +19,7 @@ import com.iortatechnxt.brokerverse.renewal.domain.RenewalCandidate;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalOverride;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalOverrideRepository;
 import com.iortatechnxt.brokerverse.renewal.extraction.service.SnapshotRefresher;
+import com.iortatechnxt.brokerverse.renewal.kyc.service.KycMonitoring;
 import com.iortatechnxt.brokerverse.renewal.service.RenewalCodes;
 import com.iortatechnxt.brokerverse.renewal.service.RenewalParameters;
 import java.time.Clock;
@@ -31,6 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,6 +58,7 @@ public class CheckEngine {
   private final RenewalOverrideRepository overrides;
   private final RenewalParameters parameters;
   private final SnapshotRefresher snapshots;
+  private final ObjectProvider<KycMonitoring> kyc;
   private final Clock clock;
 
   /**
@@ -71,6 +74,7 @@ public class CheckEngine {
    * @param overrides overrides
    * @param parameters renewal parameters (RMU unit)
    * @param snapshots snapshot refresh of booked renewals
+   * @param kyc KYC monitoring, whose status follows the KYC due flag of the checks
    * @param clock clock
    */
   @SuppressWarnings("java:S107") // constructor injection
@@ -85,6 +89,7 @@ public class CheckEngine {
       RenewalOverrideRepository overrides,
       RenewalParameters parameters,
       SnapshotRefresher snapshots,
+      ObjectProvider<KycMonitoring> kyc,
       Clock clock) {
     this.checks = checks.stream().sorted(Comparator.comparing(RenewalCheck::code)).toList();
     this.settings = settings;
@@ -96,6 +101,7 @@ public class CheckEngine {
     this.overrides = overrides;
     this.parameters = parameters;
     this.snapshots = snapshots;
+    this.kyc = kyc;
     this.clock = clock;
   }
 
@@ -159,6 +165,10 @@ public class CheckEngine {
     Evaluation evaluation =
         new Evaluation(decision.bucket(), run.getId(), findings, systemTag(findings));
     flags(candidate, evaluation, now);
+    // the KYC Monitoring counts and lists follow the KYC due tag set by this run
+    if (candidate.getId() != null) {
+      kyc.ifAvailable(k -> k.refresh(candidate));
+    }
     endPassedOverrides(candidate, evaluation);
     return evaluation;
   }

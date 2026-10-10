@@ -17,7 +17,7 @@ import { UploadPanel } from '../common/UploadPanel';
 import { ApprovalCell } from './setupBits';
 import { numberOrNull, textOrNull } from './setupCodes';
 import { RowActions } from '@/components/ui/RowActions';
-import { mapSourceLabel, setupRecordActions, versionText } from '../common/presentation';
+import { isAnyBand, mapSourceLabel, setupRecordActions, versionText } from '../common/presentation';
 import { InsurerName, ProductName } from '@/components/broking/LovLabel';
 
 const EMPTY: PackageMapData = {
@@ -208,7 +208,7 @@ export function PackageMapTab() {
               key: 'si',
               header: 'Sum Insured band',
               render: (r) =>
-                r.data.siFrom === null && r.data.siTo === null ? (
+                isAnyBand(r.data.siFrom, r.data.siTo) ? (
                   'Any'
                 ) : (
                   <>

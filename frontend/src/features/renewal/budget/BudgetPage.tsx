@@ -3,7 +3,7 @@ import { Plus, Upload } from 'lucide-react';
 import { useState } from 'react';
 import { renewalDashboardApi } from '@/api/renewalDashboard';
 import type { BudgetBody, BudgetMonth, BudgetView } from '@/api/renewalDashboard';
-import { LovLabel } from '@/components/broking/LovLabel';
+import { LovLabel, SalesUnitName } from '@/components/broking/LovLabel';
 import { LovSelect } from '@/components/broking/LovSelect';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -319,9 +319,9 @@ export default function BudgetPage() {
               header: 'Market Segment',
               render: (b) => <LovLabel type="MARKET_SEGMENT" code={b.segment} />,
             },
-            { key: 'region', header: 'Region', render: (b) => b.region ?? '' },
-            { key: 'team', header: 'Team', render: (b) => b.team ?? '' },
-            { key: 'sub', header: 'Sub-Team', render: (b) => b.subTeam ?? '' },
+            { key: 'region', header: 'Region', render: (b) => <SalesUnitName code={b.region} /> },
+            { key: 'team', header: 'Team', render: (b) => <SalesUnitName code={b.team} /> },
+            { key: 'sub', header: 'Sub-Team', render: (b) => <SalesUnitName code={b.subTeam} /> },
             {
               key: 'sh',
               header: 'Section Head',

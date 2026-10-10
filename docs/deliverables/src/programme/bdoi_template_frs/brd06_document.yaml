@@ -24,12 +24,16 @@ revision_log:
     acceptance criteria, new sub-items and entries FRRN.045 to FRRN.049, annexes AA onwards added, observations and
     points for decision listed in Annex AO. Business Unit review edition: summary for the Business Unit, end-to-end
     flows, workflow and approvals, e-mail texts, document formats, reports and schedules, integrations,
-    non-functional requirements, open questions not answered in the BDOI FRS, change control, review checklist
-  by: iorta TechNXT Project Team (drafting); for review by Angela V. Ramirez
+    non-functional requirements, open questions not answered in the BDOI FRS, change control, review checklist;
+    aligned on 10 Oct 2026 with BIBS: the Renewal dashboards and bucket panels, sanitation, assignment and transfers,
+    LAMD and insurer uploads, the CCM, MFT and LMS channels, BDOI's letters, placement and e-policies, hold cover,
+    approvals and billing, proposals and the TSU Requests menu, with current screenshots and the settings for the
+    points BDOI decides
+  by: iorta TechNXT Project Team (drafting support); for review by Angela V. Ramirez
 
 introduction:
   preparation: >-
-    This version 1.1 was drafted with the iorta TechNXT Project Team, from the inputs of the business unit and BDO ITG
+    This version 1.1 was elaborated with the iorta TechNXT Project Team (drafting support), from the inputs of the business unit and BDO ITG
     and the Renewal BRD of 8-Oct-2026, for review by the System Analyst. BDOI's text of version 1.0 is kept word for
     word; every addition traces to a BRD requirement, and every point where the additions differ from BDOI's text is
     listed for decision in Annex AO.
@@ -46,8 +50,6 @@ introduction:
   references:
     - ["Renewal (RN) BRD, issued 8-Oct-2026 (Walkthrough addendum v01.01, Workshop addendum, Addendum 1, RMEL Phase 2 - Online Dispositioning; 215 pages)", "BDO Unibank ESG - Business Project Services", "The baseline of this FRS: every BRD ID is mapped in section Business Requirements Mapping"]
     - ["Concept Paper - Advance Implementation of Renewal Processing v1.0 (signed)", "BDOI", "Superseded by BDOI's decision of 26-Sep-2026 (single go-live; FRRN.045)"]
-    - ["BIBS Functional Requirements Specification BRD-06 Renewal v2.0 (8-Oct-2026), with its screens, messages, notifications, walkthroughs and test plan", "iorta TechNXT", "Reference requirements FR-RN-001 to FR-RN-112 incorporated in this FRS (Annex AM)"]
-    - ["Comparison of BDOI's Renewal FRS with the BIBS FRS v1.0 (9-Oct-2026)", "iorta TechNXT", "The conflicts and slips listed in Annex AO"]
     - ["User Access Maintenance FRS (BDOI format)", "BDO ITG", "Profiles, functions and access requests (FRRN.001.05)"]
     - ["Review workbooks of BRD-06 v1.0 (9-Oct-2026): Business Unit Requirements Collection; BRD vs Out-of-the-Box vs Best Practice; Change Request Register; Test Cases and Traceability; Business Unit Walkthrough Users", "iorta TechNXT", "Issued with this edition for the review of the Business Unit"]
     - ["BIBS Master Data and Configuration Upload Templates v1.2; BDOI Requirements and Inputs by BRD v1.2; BIBS Non-Functional Requirements Register v1.0", "iorta TechNXT", "Data set-up, inputs and non-functional requirements (Annexes AJ, AK)"]
@@ -268,6 +270,7 @@ observations:
 
 glossary:
   - ["Account Officer (AO)", "Marketing officer who gives the disposition of a renewal account"]
+  - ["BIBS", "BDO Insure Brokering System, the system specified in this document"]
   - ["ARN", "Account reference number of an account of the system"]
   - ["BDOFC / BDOSOLD (SOLD)", "Reports of BDO's finance company and of sold accounts, uploaded and matched on the PN (FRRN.012.06)"]
   - ["BRD", "Business Requirements Document; here the Renewal BRD of 8-Oct-2026"]
@@ -282,7 +285,6 @@ glossary:
   - ["Effective expiry date", "End of a confirmed hold cover, otherwise the policy expiry date; it drives the NRNS tag and the closing letters"]
   - ["FFY / FFYMI", "Free first year (motor insurance) accounts of CBG Motor"]
   - ["FRRN", "Functional requirement of this FRS"]
-  - ["FR-RN", "Reference requirement of the BIBS FRS BRD-06 Renewal, incorporated in this FRS (Annex AM)"]
   - ["Hold cover", "Temporary cover the insurer grants while the renewal is completed (FRRN.036)"]
   - ["IBG", "Institutional Banking Group segment"]
   - ["Initiation", "The explicit start of renewal processing of a generated account (BRRN.021)"]
@@ -338,6 +340,10 @@ line_items:
   FR-RN-112: [FRRN.040.01, FRRN.040.03]
 
 # Who decides each conflict of Annex AP.1 (C01-C28 in the order of the comparison workbook); default Product Owner
+# Inputs BDOI gives as settings of the system (Annex AC.9), next to the settings of the points of Annex AO
+settings_extra:
+  - ["Company that receives the MFT files", "The company whose renewal files of the MFT folders (placement and hold cover responses of the insurers, e-policies) are; blank = the first company", "Blank (the first company)", "-", "System Administrator; BDOI IT"]
+
 conflict_owner:
   C03: "Marketing; TSU"
   C04: "Product Owner, Renewal; CBG"

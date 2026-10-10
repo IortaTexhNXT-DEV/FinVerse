@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import com.iortatechnxt.brokerverse.renewal.check.service.CheckNames;
 import com.iortatechnxt.brokerverse.renewal.check.service.OutstandingPremiumCheck;
@@ -222,13 +223,13 @@ public class OverrideService {
         RenewalCodes.ENTITY,
         c.getRenewalRef(),
         AuditAction.UPDATE,
-        "Override "
-            + kind.name()
-            + (checkCode == null ? "" : " " + checkCode)
+        "Override of "
+            + DisplayFormat.label(kind.name()).toLowerCase(java.util.Locale.ROOT)
+            + (checkCode == null ? "" : " " + DisplayFormat.label(checkCode))
             + " from "
-            + change.from()
+            + DisplayFormat.label(change.from())
             + " to "
-            + change.to()
+            + DisplayFormat.label(change.to())
             + ": "
             + reason.remarks());
   }

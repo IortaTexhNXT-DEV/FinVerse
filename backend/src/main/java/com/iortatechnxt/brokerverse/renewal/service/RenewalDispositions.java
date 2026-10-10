@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.renewal.service;
 
 import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.renewal.domain.CurrentDisposition;
 import com.iortatechnxt.brokerverse.renewal.domain.Disposition;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalCandidate;
@@ -55,12 +56,26 @@ public class RenewalDispositions {
         RenewalCodes.ENTITY,
         candidate.getRenewalRef(),
         AuditAction.UPDATE,
-        "Disposition "
-            + disposition.code()
-            + (disposition.reasonCode() == null ? "" : " (" + disposition.reasonCode() + ")")
-            + " by "
-            + disposition.source()
-            + (matrixVersion == null ? "" : ", matrix v" + matrixVersion + " rule " + ruleId));
+        summary(disposition, matrixVersion));
     return saved;
+  }
+
+  /**
+   * The audit summary of a disposition in words: "Disposition For Renewal (Unit Sold), by User,
+   * decision matrix version 3".
+   *
+   * @param disposition the disposition given
+   * @param matrixVersion version of the decision matrix that proposed it, may be null
+   * @return summary
+   */
+  static String summary(CurrentDisposition disposition, Integer matrixVersion) {
+    return "Disposition "
+        + disposition.code().label()
+        + (disposition.reasonCode() == null
+            ? ""
+            : " (" + DisplayFormat.label(disposition.reasonCode()) + ")")
+        + ", by "
+        + disposition.source().label()
+        + (matrixVersion == null ? "" : ", decision matrix version " + matrixVersion);
   }
 }

@@ -21,7 +21,7 @@ export function ConnectionCard({ channel }: Readonly<{ channel: string }>) {
         <DefinitionGrid
           items={[
             { label: 'Mode', value: d.settings.mode === 'LIVE' ? 'Live interface' : 'Simulator' },
-            { label: 'Endpoint', value: d.settings.endpoint || 'Not set' },
+            { label: 'Address', value: d.settings.endpoint || 'Not set' },
             {
               label: 'Access key',
               value: d.settings.keySet ? `Set (${d.settings.keySetting})` : 'Not set',

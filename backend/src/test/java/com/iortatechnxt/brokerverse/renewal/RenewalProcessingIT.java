@@ -67,6 +67,9 @@ class RenewalProcessingIT {
   @Autowired private AsUser as;
 
   @Autowired
+  private com.iortatechnxt.brokerverse.renewal.audit.service.RenewalAuditLogService auditLogs;
+
+  @Autowired
   private com.iortatechnxt.brokerverse.renewal.candidate.service.CandidateQueryService queries;
 
   private RenewalCandidate inProcessing() {
@@ -94,6 +97,22 @@ class RenewalProcessingIT {
     assertThat(as.run(TL, () -> review.post(fx.company(), ref)).refused()).isEmpty();
     assertThat(as.run(PROC_TL, () -> processing.assign(fx.company(), ref, PO)).refused()).isEmpty();
     return fx.reload(c);
+  }
+
+  @Test
+  void theAuditLogNamesTheProcessingOfficerByName() {
+    RenewalCandidate c = inProcessing();
+    var entries =
+        as.run(
+            PROC_TL,
+            () ->
+                auditLogs.entries(
+                    fx.company(),
+                    new com.iortatechnxt.brokerverse.renewal.audit.service.RenewalAuditLogService
+                        .Query(null, null, null, c.getRenewalRef(), null)));
+    assertThat(entries)
+        .anyMatch(e -> e.description() != null && e.description().startsWith("Processing Officer "))
+        .noneMatch(e -> ("Processing Officer " + PO).equals(e.description()));
   }
 
   @Test

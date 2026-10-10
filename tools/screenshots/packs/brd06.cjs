@@ -221,5 +221,8 @@ const documents = {
   },
 };
 
-module.exports = { opens, fills, selects, after, crops, callouts, custom: {}, walkthrough: walkthrough.steps, documents,
+// A list with many columns is taken in a wider window, so every column is in the image.
+const widths = { 'scr-rn-22-01-clean': 1920 };
+
+module.exports = { opens, fills, selects, after, crops, callouts, widths, custom: {}, walkthrough: walkthrough.steps, documents,
   prepare: walkthrough.prepare, year, tickRow };

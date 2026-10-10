@@ -366,8 +366,8 @@ const steps = {
     await settle(page, 600);
     return page;
   },
-  'wt-d-02': async (ctx) => runReport(ctx, 'auditor', 'UAM-GROUP-PROFILE', [['Group Profile \\(code\\)', 'UAM_APPROVER']]),
-  'wt-d-03': async (ctx) => runReport(ctx, 'auditor', 'UAM-GROUP-MEMBERS', [['Group Profile \\(code\\)', 'MKT_AO']]),
+  'wt-d-02': async (ctx) => runReport(ctx, 'auditor', 'UAM-GROUP-PROFILE', [['Group Profile', 'User Access Approver']]),
+  'wt-d-03': async (ctx) => runReport(ctx, 'auditor', 'UAM-GROUP-MEMBERS', [['Group Profile', 'Marketing Account Officer']]),
   'wt-d-04': async (ctx) => {
     const installed = ctx.one("select to_char(min(occurred_at), 'YYYY-MM-DD') from sec_access_change_log where activity = 'DEACTIVATE_ROLE'");
     return runReport(ctx, 'auditor', 'UAM-AUDIT-LOG', [['Date From', installed], ['Activity', 'Group Profile Changes']]);

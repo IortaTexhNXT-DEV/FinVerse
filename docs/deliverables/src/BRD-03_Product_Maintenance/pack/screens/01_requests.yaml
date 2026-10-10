@@ -366,7 +366,7 @@ screens:
       - "Package Slip | Every user of the screen | Always | Downloads the package slip (PDF) with the proposed terms, to be printed and signed | Unchanged | -"
       - "Save Requirements | PKG_NEGOTIATE | Requirements preparation | Saves the rate scheme, computation basis and dates of the proposed terms | Unchanged | -"
       - "Submit requirements for ManCom sign-off | PKG_NEGOTIATE | Requirements preparation; the pack is complete | Sends the pack to ManCom | For ManCom sign-off | Workflow notice"
-      - "Sign off and send to MBS | ManCom (PKG_MANCOM_SIGNOFF), not the submitter of the requirements | For ManCom sign-off | Records the sign-off MC-<request no.>, locks the quotation slips and attaches the sign-off record (or links the uploaded ManCom sign-off sheet) | With MBS for set-up | Workflow notice"
+      - "Sign off and send to MBS | ManCom (PKG_MANCOM_SIGNOFF), not the submitter of the requirements | For ManCom sign-off, with the ManCom routing set to one sign-off by any member (under the routing by selected approvers the request is signed off by their approvals on the Routing & Approvals tab, SCR-PM-29) | Records the sign-off MC-<request no.>, locks the quotation slips and attaches the sign-off record (or links the uploaded ManCom sign-off sheet) | With MBS for set-up | Workflow notice"
     rules:
       - "The requirements pack needs the effective date and package end date, a scheme rate or a rate for every insurer, the computation basis, at least one chosen insurer and the signed package slip attached as Package slip (signed) (FR-PM-040)."
       - "ManCom never signs off requirements it submitted; a single ManCom sign-off is recorded (FR-PM-041)."

@@ -97,7 +97,7 @@ flow:
   - [SCR-PM-04, SCR-PM-05, Approve for negotiation]
   - [SCR-PM-05, SCR-PM-06, Terms final]
   - [SCR-PM-06, SCR-PM-07, Proceed to requirements]
-  - [SCR-PM-07, SCR-PM-08, Sign off and send to MBS]
+  - [SCR-PM-07, SCR-PM-08, ManCom approvals (sign-off)]
   - [SCR-PM-08, SCR-PM-13, Open Version Editor]
   - [SCR-PM-14, SCR-PM-13, open]
   - [SCR-PM-13, SCR-PM-08, Validate and Release]

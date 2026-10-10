@@ -77,6 +77,9 @@ async function resetOffered(ctx, on) {
 }
 
 const forgot = async (page) => {
+  // The sign-in options (whether the reset is offered) are read when the page opens: the setting was changed after.
+  await page.reload();
+  await page.waitForLoadState('networkidle');
   await page.getByRole('button', { name: /^forgot password\?$/i }).click();
   await page.waitForTimeout(400);
 };
@@ -116,7 +119,7 @@ const fills = {
   modify_profile: [['Request Type', 'Modify group profile'], ['Group Profile', '^Marketing Account Officer'],
     async (page) => page.locator('#perm-UAM_VIEW').check()],
   deactivate_profile: [['Request Type', 'Deactivate group profile'], ['Group Profile', '^Processing Team Lead']],
-  report_profile: [['Group Profile (code)', 'UAM_APPROVER']],
+  report_profile: [['Group Profile', 'User Access Approver']],
 };
 
 // ------------------------------------------------------------------ records by status
@@ -290,7 +293,7 @@ const documents = {
 // Shots kept as the whole window (the sign-in pages have no menu and are always whole; the home page shows the
 // menu of the persona); every other shot is cropped to its dialog or content area (capture_pack.cjs, cropOf).
 // The password steps of walkthrough C show the Change password card (below the second factor card).
-const PASSWORD_CARD = 'section.card:has(> header h2:text-is("Change password"))';
+const PASSWORD_CARD = 'section.card:has(> header h2:text-is("Change Password"))';
 const crops = { 'scr-ua-05-01-view': 'full', 'wt-c-10': PASSWORD_CARD, 'wt-c-11': PASSWORD_CARD };
 
 // UX deck: a search of the access requests that finds nothing (the empty state of the list).

@@ -369,7 +369,11 @@ def edit_mapping(b: Builder, ids: list[str]) -> dict[str, str]:
     b.stats["mapping_changes"] = len(DOC["mapping"])
     # list of integrations
     p = find_par(b, "PMS to BIBS for PDC")
-    els = [b.clone_par(p._p, DOC["integrations_title"])] + [b.clone_par(p._p, "- " + x) for x in DOC["integrations"]]
+    title = b.clone_par(p._p, DOC["integrations_title"])
+    num = title.find(f"{qn('w:pPr')}/{qn('w:numPr')}")
+    if num is not None:  # the line that introduces the added interfaces is not a bullet
+        num.getparent().remove(num)
+    els = [title] + [b.clone_par(p._p, x) for x in DOC["integrations"]]
     b.insert_after(p._p, els)
     return mapping
 
@@ -527,10 +531,7 @@ def edit_signoff(b: Builder):
     cell = b.tables[4].rows[0].cells[0]
     for p in cell.paragraphs:
         if p.text.strip() == "System Analyst":
-            new = u11.strip_ids(copy.deepcopy(p._p))
-            for r in new.findall(qn("w:r")):
-                new.remove(r)
-            new.append(b.run(DOC["signoff"]["drafting"]))
+            new = final.retext(u11.strip_ids(copy.deepcopy(p._p)), DOC["signoff"]["drafting"])
             p._p.addnext(new)
             return
     raise SystemExit("sign-off: 'System Analyst' not found")

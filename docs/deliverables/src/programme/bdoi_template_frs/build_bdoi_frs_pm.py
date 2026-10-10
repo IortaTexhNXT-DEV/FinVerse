@@ -683,7 +683,7 @@ def edit_process_flows(b: Builder):
             head.remove(r)
         ppr_insert(head.find(qn("w:pPr")), OxmlElement("w:pageBreakBefore"))
         head.append(b.run(flow["title"]))
-        anchor = b.insert_after(anchor, [head, b.picture(png, max_w=7.0, max_h=8.3)])
+        anchor = b.insert_after(anchor, [head, b.picture(png, max_w=7.0, max_h=7.8)])
         b.stats["flows"] += 1
     brk = OxmlElement("w:p")
     r = OxmlElement("w:r")
@@ -699,10 +699,7 @@ def edit_signoff(b: Builder):
     cell = b.doc.tables[4].rows[0].cells[0]
     for p in cell.paragraphs:
         if p.text.strip() == "System Analyst":
-            new = strip_ids(copy.deepcopy(p._p))
-            for r in new.findall(qn("w:r")):
-                new.remove(r)
-            new.append(b.run(DOC["signoff"]["drafting"]))
+            new = final.retext(strip_ids(copy.deepcopy(p._p)), DOC["signoff"]["drafting"])
             p._p.addnext(new)
             return
     raise SystemExit("sign-off: 'System Analyst' not found")
@@ -817,7 +814,7 @@ class Annexes:
                     n = int(s["id"].split("-")[-1])
                     png = PM / "screenshots" / f"scr-pm-{n:02d}-01-{shots[0]['state']}.png"
                     if png.exists():
-                        self.els.append(final.screenshot(self.b, png))
+                        self.els.extend(final.screenshot(self.b, png))
                         self.p(f"Figure G.{k}: {clean(shots[0].get('caption', s['title']))}", italic=True, size=8,
                                jc="center")
                         self.b.stats["screenshots"] += 1

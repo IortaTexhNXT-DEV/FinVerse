@@ -327,7 +327,7 @@ class Appendices:
                 png = OPS / "screenshots" / f"scr-op-{n:02d}-01-{shots[0]['state']}.png"
                 if not png.exists():
                     raise SystemExit(f"screenshot missing: {png}")
-                self.els.append(final.screenshot(self.b, png))
+                self.els.extend(final.screenshot(self.b, png))
                 self.p(f"Screenshot {k}: {m.clean(shots[0].get('caption', s['title']))}", italic=True, size=8,
                        jc="center")
                 self.b.stats["screenshots"] += 1
@@ -534,7 +534,7 @@ class Appendices:
                 png = OPS / "screenshots" / f"{doc['shot']}.png"
                 if not png.exists():
                     raise SystemExit(f"image missing: {png}")
-                self.els.append(self.b.picture(png, max_w=6.4, max_h=4.6))
+                self.els.append(final.document_image(self.b, png))
                 self.p(f"Image {doc['id']}: {doc['shot_caption']}", italic=True, size=8, jc="center")
         self.b.stats["documents"] = len(d["items"])
 

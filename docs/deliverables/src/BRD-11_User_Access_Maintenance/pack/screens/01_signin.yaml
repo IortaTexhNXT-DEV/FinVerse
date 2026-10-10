@@ -37,7 +37,7 @@ screens:
       - "More than 20 sign-in attempts within a minute from one computer are refused until the minute ends: Too many sign-in attempts. Wait a minute and try again. (FR-UA-001)."
       - "The menu shows only the screens of the user's active group profiles; a deactivated group profile grants nothing (FR-UA-001, FR-UA-042)."
       - "As delivered, BDOI's password reset rules apply: the page has no Forgot password? link, and a forgotten password of a local account is reset by another System Administrator; with single sign-on the password is kept by the Enterprise SSO platform. The setting Password reset rules (Annex M) brings back the self-service link for local accounts (FR-UA-005)."
-      - "Outside production the page shows the name of the environment above the sign-in card (for example LOCAL ENVIRONMENT, SIT ENVIRONMENT), and under it the notice on authorised use (FR-UA-001)."
+      - "Outside production the page shows the name of the environment above the sign-in card (for example SIT ENVIRONMENT, UAT ENVIRONMENT), and under it the notice on authorised use (FR-UA-001)."
       - "In directory mode the password is checked by the BDO directory and never stored in BIBS; until BDO supplies the directory interface that mode refuses every sign-in (FR-UA-003)."
     outcome: The user is signed in with exactly the menus of the assigned group profiles, or refused with a message that does not reveal which credential was wrong.
     frs: [FR-UA-001, FR-UA-003]

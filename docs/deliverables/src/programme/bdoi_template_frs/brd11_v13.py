@@ -17,6 +17,8 @@ import yaml
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 
+import brd_common_final as final  # noqa: E402
+
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[4]
 UA = REPO / "docs" / "deliverables" / "src" / "BRD-11_User_Access_Maintenance"
@@ -317,7 +319,7 @@ class NewAnnexes:
             png = UA / "screenshots" / f"{doc['shot']}.png"
             if not png.exists():
                 raise SystemExit(f"image missing: {png}")
-            a.els.append(self.b.picture(png, max_w=6.6, max_h=4.6))
+            a.els.append(final.document_image(self.b, png))
             a.p(f"Figure U.{k}: current layout of the {doc['name']}"
                 + (f" ({clean(doc['shot_caption'])})" if doc.get("shot_caption") else ""), italic=True, size=8, jc="center")
         for doc in d["extra"]:

@@ -1,5 +1,6 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
+import { pmRoutingApi } from '@/api/pmRouting';
 import { PACKAGE_REQUEST_ENTITY, productMaintApi } from '@/api/productmaint';
 import type { PackageRequest } from '@/api/productmaint';
 import type { ActionNote, WorkAction } from '@/api/workflow';
@@ -40,8 +41,21 @@ const SIMPLE: Record<Simple, (p: PackageRequest, text?: string) => Promise<unkno
 const DIALOGS = new Set(['recommend', 'revise_qs', 'terms_final', 'setup', 'return_incomplete']);
 
 /** The business actions this page runs; the catalog outcomes are system actions (never shown). */
-function offeredActions(p: PackageRequest, actions: WorkAction[]): WorkAction[] {
+/**
+ * The actions offered among those of the workflow: the approval that fits the request's negotiation
+ * need, set-up or retirement by the request type, and the direct ManCom sign-off only when the
+ * ManCom routing is one sign-off by any member (under the routing by selected approvers the
+ * request is signed off by their approvals on the Routing & Approvals tab).
+ */
+export function offeredActions(
+  p: PackageRequest,
+  actions: WorkAction[],
+  manComRouted = false,
+): WorkAction[] {
   return actions.filter((a) => {
+    if (a.action === 'signoff') {
+      return !manComRouted;
+    }
     if (a.action === 'approve' && p.status === 'FOR_TSU_APPROVAL') {
       return p.negotiationRequired;
     }
@@ -78,6 +92,14 @@ export function PackageActions({
   const toast = useToast();
   const queryClient = useQueryClient();
   const [pending, setPending] = useState<WorkAction | null>(null);
+  const forManCom = request.status === 'FOR_MANCOM';
+  const routing = useQuery({
+    queryKey: ['package-request', request.id, 'routing'],
+    queryFn: () => pmRoutingApi.routing(request.id),
+    enabled: forManCom,
+  });
+  // Until the routing is known, a request waiting for ManCom offers no direct sign-off.
+  const manComRouted = routing.data?.mancom.selectedRouting ?? forManCom;
   const refresh = async (label: string) => {
     setPending(null);
     await queryClient.invalidateQueries({ queryKey: ['package-request', request.id] });
@@ -103,7 +125,7 @@ export function PackageActions({
   const kind = pending?.action;
   return (
     <>
-      {offeredActions(request, actions).map((a, i) => (
+      {offeredActions(request, actions, manComRouted).map((a, i) => (
         <Button
           key={a.action}
           size="sm"

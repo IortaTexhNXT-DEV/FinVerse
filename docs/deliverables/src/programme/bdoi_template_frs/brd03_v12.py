@@ -33,6 +33,8 @@ import yaml
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 
+import brd_common_final as final  # noqa: E402
+
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[4]
 SRC = REPO / "docs" / "deliverables" / "src"
@@ -536,7 +538,7 @@ def annex_o(a):
            'l [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"><TR><TD>Legend</TD>'
            f'{legend}</TR><TR><TD></TD><TD>makes</TD><TD>approves</TD><TD>reviews</TD><TD>notified</TD>'
            '<TD>views</TD></TR></TABLE>>]; t -> l [style=invis]; }')
-    a.els.append(b.picture(_render_text(b, "role_matrix", dot), max_w=9.4, max_h=5.4))
+    a.els.append(b.picture(_render_text(b, "role_matrix", dot), max_w=9.4, max_h=4.6))
     a.els.append(caption(b, "Figure O.1 – Role-to-stage matrix of Product Maintenance"))
     a.p(w["matrix_intro"], size=9)
     a.h2("O.2 Stages, approvals and service levels per process")
@@ -605,7 +607,7 @@ def annex_q(a):
         a.els.append(kv_table(b, rows, (1.4, 6.0), size=8))
         img = _image(x["image"])
         if img:
-            a.els.append(b.picture(img, max_w=4.6, max_h=5.2))
+            a.els.append(final.document_image(b, img))
             a.els.append(caption(b, f"Figure Q.{x['id'][3:]} – {x['name']}: current layout in the BIBS UAT environment"))
             b.stats["doc_images"] += 1
         else:

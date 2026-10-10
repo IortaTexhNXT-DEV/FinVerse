@@ -522,8 +522,10 @@ class Builder:
     def clone_par(self, p_el, text):
         """A new paragraph with the paragraph and run formatting of one of BDOI's paragraphs."""
         new = strip_ids(copy.deepcopy(p_el))
-        runs = new.findall(qn("w:r"))
-        rpr = copy.deepcopy(runs[0].find(qn("w:rPr"))) if runs and runs[0].find(qn("w:rPr")) is not None else None
+        runs = [r for r in new.findall(qn("w:r")) if r.find(qn("w:t")) is not None] or new.findall(qn("w:r"))
+        # the formatting of the first run that names its font (the font of the text, not of a mark or a bookmark run)
+        model = next((r for r in runs if r.find(f"{qn('w:rPr')}/{qn('w:rFonts')}") is not None), runs[0] if runs else None)
+        rpr = copy.deepcopy(model.find(qn("w:rPr"))) if model is not None and model.find(qn("w:rPr")) is not None else None
         for el in list(new):
             if el.tag != qn("w:pPr"):
                 new.remove(el)
@@ -534,6 +536,11 @@ class Builder:
             r.replace(r.find(qn("w:rPr")), rpr)
             if self.hl:
                 rpr_shade(rpr)
+        else:
+            # the source paragraph takes its font from its style: the new text does the same
+            own = r.find(qn("w:rPr"))
+            for f in own.findall(qn("w:rFonts")) if own is not None else []:
+                own.remove(f)
         new.append(r)
         return new
 
@@ -790,10 +797,7 @@ def edit_signoff(b: Builder):
     cell = b.tables[12].rows[2].cells[0]
     for p in cell.paragraphs:
         if p.text.strip().endswith("Business System Analyst"):
-            new = strip_ids(copy.deepcopy(p._p))
-            for r in new.findall(qn("w:r")):
-                new.remove(r)
-            new.append(b.run(DOC["signoff"]["drafting"]))
+            new = final.retext(strip_ids(copy.deepcopy(p._p)), DOC["signoff"]["drafting"])
             p._p.addnext(new)
             return
     raise SystemExit("sign-off: 'Business System Analyst' not found")
@@ -890,7 +894,7 @@ class Annexes:
                     png = UA / "screenshots" / f"scr-ua-{n:02d}-{pick + 1:02d}-{shots[pick]['state']}.png"
                     if not png.exists():
                         raise SystemExit(f"screenshot missing: {png}")
-                    self.els.append(final.screenshot(self.b, png))
+                    self.els.extend(final.screenshot(self.b, png))
                     self.p(f"Figure J.{k}: {clean(shots[pick].get('caption', s['title']))}", italic=True, size=8,
                            jc="center")
                     self.b.stats["screenshots"] += 1

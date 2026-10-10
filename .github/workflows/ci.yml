@@ -40,6 +40,17 @@ jobs:
           cache: maven
       - name: Verify (format, compile -Werror, tests, coverage, checkstyle, PMD, CPD, SpotBugs, ArchUnit, SBOM)
         run: mvn -B verify
+      - name: Report failing tests and gate violations
+        if: failure()
+        run: |
+          for f in target/surefire-reports/*.txt target/failsafe-reports/*.txt; do
+            [ -f "$f" ] || continue
+            grep -h -A3 '<<< FAIL' "$f" | head -12 | tr '\n' ' ' | sed 's/^/::error title=Test failure::/' && echo
+          done
+          for f in target/checkstyle-result.xml target/pmd.xml target/cpd.xml target/spotbugsXml.xml; do
+            [ -f "$f" ] && grep -c -E '<error |<violation |<duplication |<BugInstance ' "$f" | sed "s|^|::notice title=$f findings::|"
+          done
+          true
       - name: SonarQube analysis
         if: env.SONAR_TOKEN != ''
         env:

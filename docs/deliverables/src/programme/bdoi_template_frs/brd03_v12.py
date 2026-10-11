@@ -50,6 +50,9 @@ LANDSCAPE_W = 9.8
 PORTRAIT_W = 7.4
 
 
+SHADE = True
+
+
 def bind(core) -> None:
     global CORE
     CORE = core
@@ -270,9 +273,10 @@ def open_items() -> dict:
 # ================================================================================================= document helpers
 @contextlib.contextmanager
 def this_round(b):
-    """The passages written inside are additions of version 1.2: shaded in the review copy."""
+    """The passages written inside are additions of version 1.2: shaded in the review copy while SHADE is on
+    (version 1.3 switches it off: its review copy shades only the changes of version 1.3)."""
     old = b.hl
-    b.hl = b.highlight
+    b.hl = b.highlight and SHADE
     try:
         yield
     finally:

@@ -5,10 +5,10 @@
 meta:
   source: "docs/source-documents/FRS - BDOI Core Replacement Operations Cashiering v3.1 (BDOI).docx"
   out_folder: Programme/BDOI_Template_FRS/BRD-02_Operations_Cashiering
-  clean: BIBS_FRS-BDOI_BRD-02_Operations_Cashiering_v3.2.docx
-  highlighted: BIBS_FRS-BDOI_BRD-02_Operations_Cashiering_v3.2_Changes_Highlighted.docx
+  clean: BIBS_FRS-BDOI_BRD-02_Operations_Cashiering_v3.3.docx
+  highlighted: BIBS_FRS-BDOI_BRD-02_Operations_Cashiering_v3.3_Changes_Highlighted.docx
   version_old: "3.1"
-  version_new: "3.2"
+  version_new: "3.3"
   date: 09 Oct 2026
   brd_pdf: "docs/source-documents/Operations_WS Addendum.pdf"
 

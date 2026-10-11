@@ -1,4 +1,4 @@
-"""Product Maintenance FRS in BDOI's template, version 1.2 (Business Unit review edition).
+"""Product Maintenance FRS in BDOI's template, version 1.3 (Business Unit review edition).
 
     python docs/deliverables/src/programme/bdoi_template_frs/build_bdoi_frs_pm.py [--no-pdf]
 
@@ -12,14 +12,16 @@ update when the document is opened). BDOI's text is kept word for word; the addi
   figures/*.dot           the process flows added after BDOI's two figures
   brd03_v12.py            version 1.2: summary for the Business Unit, flows and life-cycles, Annexes O to X, M.5
   brd03_v12_frs.yaml      the content of version 1.2; brd03_v12_items.yaml the open items checked against BDOI's FRS
+  brd03_v13.py            version 1.3: swimlane flows (flows/brd03), colour of the points beyond the BRD, Annex Y
+  brd03_v13.yaml          the content of version 1.3 (change requests with effort, green points, BRD line check)
 
 and from the BIBS release set BRD-3 (screens, notifications, walkthroughs, test cases, FRS) and the comparison data of
 docs/deliverables/src/programme/comparisons (conflicts and slips).
 
 Outputs in docs/deliverables/out/Programme/BDOI_Template_FRS/BRD-03_Product_Maintenance/:
-  BIBS_FRS-BDOI_BRD-03_Product_Maintenance_v1.2.docx                         clean copy
-  BIBS_FRS-BDOI_BRD-03_Product_Maintenance_v1.2.pdf                          the clean copy as PDF (not committed)
-  BIBS_FRS-BDOI_BRD-03_Product_Maintenance_v1.2_Changes_Highlighted.docx     the additions of version 1.2 shaded light
+  BIBS_FRS-BDOI_BRD-03_Product_Maintenance_v1.3.docx                         clean copy
+  BIBS_FRS-BDOI_BRD-03_Product_Maintenance_v1.3.pdf                          the clean copy as PDF (not committed)
+  BIBS_FRS-BDOI_BRD-03_Product_Maintenance_v1.3_Changes_Highlighted.docx     the changes of version 1.3 shaded light
                                                                              yellow, with a change summary at the front
 
 Self-checks (the build fails when one does not hold): every BRD ID of the Product Maintenance BRD is in the mapping and
@@ -56,9 +58,11 @@ HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[4]
 sys.path.insert(0, str(HERE))
 import brd03_v12 as v12  # noqa: E402
+import brd03_v13 as v13  # noqa: E402
 import brd_common_final as final  # noqa: E402
 
 v12.bind(sys.modules[__name__])
+v13.bind(sys.modules[__name__], v12)
 SRC = REPO / "docs" / "deliverables" / "src"
 PM = SRC / "BRD-03_Product_Maintenance"
 NB = SRC / "BRD-01_New_Business"
@@ -800,7 +804,7 @@ class Annexes:
         for f in files:
             for s in yaml.safe_load(f.read_text(encoding="utf-8"))["screens"]:
                 k += 1
-                self.b.hl = self.b.highlight and s["id"] in SCREENS_V12
+                self.b.hl = self.b.highlight and v12.SHADE and s["id"] in SCREENS_V12
                 frpm = sorted({x for fr in s.get("frs", []) for x in self.b.fr_to_frpm.get(fr, [])})
                 frs_titles[s["id"]] = s["title"]
                 self.h2(f"G.{k} {s['title']} ({s['id']})")
@@ -1116,6 +1120,7 @@ def add_annexes(b: Builder, mapping, ids, our, nb):
     a.glossary()
     v12.glossary_add(a)
     v12.annexes(a)
+    v13.annex_y(a)
     body_sect = b.body.find(qn("w:sectPr"))
     for el in a.els:
         body_sect.addprevious(el)
@@ -1346,22 +1351,29 @@ def key_numbers(b: Builder, ids) -> list[list[str]]:
 
 def build(highlight: bool, our, nb, ids) -> Builder:
     b = Builder(highlight)
-    b.fig_no = 1  # Figure 1 is the end-to-end picture of the summary in the Introduction
+    b.fig_no = 1  # Figure 1 is the simplified process flow of the summary in the Introduction
+    v13.begin(b)
     edit_cover(b)
     edit_revision_log(b)
+    v13.revision(b)
     edit_introduction(b)
     with v12.this_round(b):
         v12.introduction(b)
+    v13.introduction(b)
     mapping = edit_mapping(b, ids)
     edit_functional_requirements(b)
     edit_process_flows(b)
+    v13.e2e_figure(b)
     with v12.this_round(b):
         v12.process_flows(b)
+    v13.after_flows(b)
     edit_signoff(b)
     edit_annex_rows(b)
     a = add_annexes(b, mapping, ids, our, nb)
     with v12.this_round(b):
         v12.summary(b, key_numbers(b, ids), b.stats["checklist"])
+    v13.summary_figure(b)
+    v13.how_to_read(b)
     missing_fr = [f for f in our if f not in a.listed_refs]
     if missing_fr:
         raise SystemExit(f"Annex L lacks {missing_fr}")
@@ -1373,11 +1385,13 @@ def build(highlight: bool, our, nb, ids) -> Builder:
         raise SystemExit(f"unknown BIBS references: {unknown}")
     if b.fr_to_frpm != v12.fr_to_frpm():
         raise SystemExit("the FRPM references of the document and of the shared data differ")
+    v13.colour_points(b)
+    v13.scope_labels(b)
     if highlight:
-        change_summary(b)
+        v13.change_summary(b)
     set_update_fields(b)
     check_words(b)
-    problems = v12.self_checks(b, " ".join(b.added_text))
+    problems = v12.self_checks(b, " ".join(b.added_text)) + v13.self_checks(b)
     if problems:
         raise SystemExit("version 1.2 checks failed:\n  " + "\n  ".join(problems))
     return b

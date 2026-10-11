@@ -1,4 +1,4 @@
-"""Renewal FRS in BDOI's template, version 1.1 (full BRD coverage and Business Unit review edition).
+"""Renewal FRS in BDOI's template, version 1.2 (v1.1 with the Product Owner's review: colour code, CR effort).
 
     python docs/deliverables/src/programme/bdoi_template_frs/build_brd06_bdoi_frs.py [--no-pdf]
 
@@ -19,10 +19,12 @@ additions of version 1.1 come from:
 and from the BIBS release set BRD-06 (FRS v2.0, screens, screenshots, notifications, walkthroughs, test cases).
 
 Outputs in docs/deliverables/out/Programme/BDOI_Template_FRS/BRD-06_Renewal/:
-  BIBS_FRS-BDOI_BRD-06_Renewal_v1.1.docx                       clean copy
-  BIBS_FRS-BDOI_BRD-06_Renewal_v1.1.pdf                        the clean copy as PDF (not kept in git)
-  BIBS_FRS-BDOI_BRD-06_Renewal_v1.1_Changes_Highlighted.docx   every addition of version 1.1 shaded light yellow,
-                                                               change summary in front
+  BIBS_FRS-BDOI_BRD-06_Renewal_v1.2.docx                       clean copy
+  BIBS_FRS-BDOI_BRD-06_Renewal_v1.2.pdf                        the clean copy as PDF
+  BIBS_FRS-BDOI_BRD-06_Renewal_v1.2_Changes_Highlighted.docx   every addition or change of version 1.2 (against
+                                                               v1.1) shaded light yellow, change summary in front
+Version 1.2 (brd06_v12.yaml): colour code of the points beyond the BRD (green out of the box, orange change request),
+legend, Annex AJ programme rows, Annex AM.4 (Concept Paper), Annex AP.1 (points beyond the BRD and CR effort).
 
 Self-checks (the build fails when one does not hold): every BRRN ID and every line ID of the BRD is in the Business
 Requirements Mapping and maps to at least one FRRN item; every FR-RN of the BIBS FRS is in Annex AM with its FRRN
@@ -41,6 +43,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from contextlib import contextmanager
 from collections import Counter, OrderedDict, defaultdict
 from pathlib import Path
 
@@ -81,6 +84,7 @@ def _check_statement_texts(node, path="additions") -> None:
 
 _check_statement_texts(ADD)
 DOC = yaml.safe_load((HERE / "brd06_document.yaml").read_text(encoding="utf-8"))
+V12 = yaml.safe_load((HERE / "brd06_v12.yaml").read_text(encoding="utf-8"))
 OUT = REPO / "docs" / "deliverables" / "out" / DOC["meta"]["out_folder"]
 HL_FILL = base.HL_FILL
 HEAD_FILL = base.HEAD_FILL
@@ -257,10 +261,11 @@ class Builder(base.Builder):
         self.added_text: list[str] = []
         self.q_rows: list[dict] = []
         self.fig_no = 0
+        self.round12 = False  # True while the additions of version 1.2 are written (shaded in the review copy)
 
     @property
     def hl(self) -> bool:
-        return self.highlight
+        return self.highlight and self.round12
 
     def new_num(self, like_num_id: int = 48) -> int:
         return super().new_num(like_num_id)
@@ -268,9 +273,30 @@ class Builder(base.Builder):
     def figure(self, png: Path, caption: str, read: str, brd: str, max_h=8.4) -> list:
         self.fig_no += 1
         self.stats["figures_added"] += 1
-        return [self.picture(png, max_w=7.0, max_h=max_h),
+        return [keep_with_next(self.picture(png, max_w=7.0, max_h=max_h)),
                 self.para(f"Figure {self.fig_no} - {caption}", italic=True, size=8.5, jc="center", space_after=40),
                 self.para(f"How to read it: {read} Traces to: {brd}.", size=8.5, space_after=160)]
+
+
+@contextmanager
+def v12(b: Builder):
+    """The elements written inside are the additions of version 1.2 (shaded in the Changes Highlighted copy)."""
+    old, b.round12 = b.round12, True
+    try:
+        yield
+    finally:
+        b.round12 = old
+
+
+def keep_with_next(p):
+    """A figure paragraph kept on the page of its caption."""
+    ppr = p.get_or_add_pPr() if hasattr(p, "get_or_add_pPr") else p.find(qn("w:pPr"))
+    if ppr is None:
+        ppr = OxmlElement("w:pPr")
+        p.insert(0, ppr)
+    if ppr.find(qn("w:keepNext")) is None:
+        ppr_insert(ppr, OxmlElement("w:keepNext"))
+    return p
 
 
 def find_par(b: Builder, start: str, style: str | None = None):
@@ -304,15 +330,38 @@ def edit_cover(b: Builder):
 def edit_revision_log(b: Builder):
     t = b.tables[1]
     log = DOC["revision_log"]
-    for cell, v in zip(t.rows[2].cells, [log["date"], log["version"], " ".join(log["description"].split()), log["by"]]):
+    row = t.rows[2]
+    for cell, v in zip(row.cells, [log["date"], log["version"], " ".join(log["description"].split()), log["by"]]):
         cell.paragraphs[0]._p.append(b.run(v, size=9))
-        if b.highlight:
-            cell_shade(cell._tc)
+    new = V12["revision"]
+    with v12(b):
+        tr = b.clone_row(row._tr, [new["date"], new["version"], " ".join(new["description"].split()), new["by"]])
+    row._tr.addnext(tr)
 
 
 def edit_introduction(b: Builder):
     p = find_par(b, "The System Analyst or equivalent BDO ITG personnel")
-    p._p.addnext(b.clone_par(find_par(b, "This document once approved")._p, DOC["introduction"]["preparation"]))
+    prep = b.clone_par(find_par(b, "This document once approved")._p, DOC["introduction"]["preparation"])
+    p._p.addnext(prep)
+    lg = V12["legend"]
+    col = V12["colours"]
+    with v12(b):
+        body = find_par(b, "This document once approved")._p
+        title = b.clone_par(body, "")
+        title.append(b.run(lg["title"], bold=True, color="014EA9"))
+        els = [title, b.clone_par(body, " ".join(lg["intro"].split()))]
+        for el in els:
+            keep_with_next(el)
+        n = b.new_num()
+        for key in ("green", "orange"):
+            q = keep_with_next(b.para("", style="ListParagraph", num=(n, 0)))
+            head, rest = lg[key].split(":", 1)
+            q.append(b.run(head + ":", bold=True, size=10, color=col[key]))
+            q.append(b.run(rest, size=10, color=col[key]))
+            els.append(q)
+        els.append(b.clone_par(body, " ".join(lg["note"].split())))
+    # the legend closes section 1.3, after BDOI's last paragraph of the section
+    b.insert_after(find_par(b, "Following the approval of this document")._p, els)
     ov = [p for p in b.doc.paragraphs if p.text.strip().startswith("In addition, the platform improves")][0]
     ov._p.addnext(b.clone_par(ov._p, " ".join(DOC["introduction"]["overview"].split())))
 
@@ -351,7 +400,7 @@ def edit_mapping(b: Builder, lines: list[dict], functions, trace: dict, brrn: di
                     r.insert(0, rp)
                 fonts = rp.find(qn("w:rFonts"))
                 (fonts.addnext(OxmlElement("w:b")) if fonts is not None else rp.insert(0, OxmlElement("w:b")))
-            if not b.highlight:
+            if not b.hl:
                 cell_shade(tc)
                 tc.find(qn("w:tcPr")).find(qn("w:shd")).set(qn("w:fill"), "E7E6E6")
         anchor.addnext(tr)
@@ -451,6 +500,7 @@ def edit_functional_requirements(b: Builder):
     if set(all_blocks) != set(ADD["items"]):
         raise SystemExit(f"items differ: {sorted(set(all_blocks) ^ set(ADD['items']))}")
     b.bdoi_item_ids = list(all_blocks)
+    b.bdoi_blocks = {k: list(v) for k, v in all_blocks.items()}  # BDOI's own elements of each item (colour code)
     for sid, add in ADD["items"].items():
         block = all_blocks[sid]
         num = block_num(block) or b.new_num()
@@ -556,7 +606,9 @@ class Annexes:
         self.b.stats["annexes"] += 1
 
     def h2(self, text):
-        self.els.append(self.b.para(text, bold=True, size=11, color="014EA9", keep_next=True, space_after=80))
+        p = self.b.para(text, bold=True, size=11, color="014EA9", keep_next=True, space_after=80)
+        p.find(qn("w:pPr")).find(qn("w:spacing")).set(qn("w:before"), "200")  # air above each sub-heading
+        self.els.append(p)
 
     def p(self, text, **kw):
         self.els.append(self.b.para(text, **kw))
@@ -583,13 +635,15 @@ class Annexes:
     # AA - screens
     def screens(self, review):
         self.h1("Annex AA – Screen Specifications")
-        self.p("This annex specifies the Renewal screens of the system: the purpose of each screen, how the user reaches "
-               "it, the FR items it serves, one screenshot, its fields with type, mandatory marker, format, list or "
-               "source and validation, and its actions. Mandatory: Y = mandatory, N = optional, Cond. = mandatory when "
-               "the condition stated applies. The screenshots were taken on the SIT environment with SIT/UAT data; "
-               "the labels of the screens follow the BRD (for example Expiry List for the RMEL) and adopt BDOI's names "
-               "once decided (Annex AO). The screen standards (layout, dates dd-Mmm-yyyy, amounts with two decimals, "
-               "tables with row action menus) are those of the programme and are not repeated here.")
+        with v12(self.b):
+            self.p("This annex specifies the Renewal screens of the system: the purpose of each screen, how the user "
+                   "reaches it, the FR items it serves, one screenshot, its fields with type, mandatory marker, format, "
+                   "list or source and validation, and its actions. Mandatory: Y = mandatory, N = optional, Cond. = "
+                   "mandatory when the condition stated applies. The screenshots were taken on the "
+                   f"{V12['environment']} with SIT/UAT data; the labels of the screens follow the BRD (for example "
+                   "Expiry List for the RMEL) and adopt BDOI's names once decided (Annex AO). The screen standards "
+                   "(layout, dates dd-Mmm-yyyy, amounts with two decimals, tables with row action menus) are those of "
+                   "the programme and are not repeated here.")
         k = 0
         for f in sorted((RN / "pack" / "screens").glob("*.yaml")):
             for s in yaml.safe_load(f.read_text(encoding="utf-8"))["screens"]:
@@ -609,8 +663,8 @@ class Annexes:
                     if not png.exists():
                         raise SystemExit(f"screenshot missing: {png}")
                     self.shot(png)
-                    self.p(f"Figure AA.{k}: {clean(shots[0].get('caption', s['title']))}", italic=True, size=8,
-                           jc="center")
+                    self.p(f"Figure AA.{k} - {clean(shots[0].get('caption', s['title']))}", italic=True, size=8.5,
+                           jc="center", space_after=120)
                     self.b.stats["screenshots"] += 1
                 rows = []
                 for line in s.get("fields", []):
@@ -732,6 +786,8 @@ class Annexes:
         self.p("End-to-end walkthroughs of Renewal, step by step: who acts, on which screen, what the user does, what "
                "the user sees and the result. The screens are specified in Annex AA; the users who run the "
                "walkthrough with the Business Unit are in the Business Unit Walkthrough Users workbook.")
+        with v12(self.b):
+            self.p(f"The walkthroughs are run on the {V12['environment']}.", bold=True)
         total = 0
         for w in data:
             self.h2(f"{w['id']} {clean(w['title'])}")
@@ -808,6 +864,17 @@ class Annexes:
             rows.append([it, ", ".join(brd_of.get(it, [])) or "-", "; ".join(conds_of.get(it, [])) or "-"])
         self.table(["FR item (this FRS)", "BRD IDs", "Test conditions"], rows, [1.5, 4.0, 4.5], size=7)
         self.b.stats["trace_rows"] = n + len(rows)
+        cp = V12["concept_paper"]
+        with v12(self.b):
+            self.h2("AM.4 Signed Concept Paper (Advance Implementation of Renewal Processing v1.0)")
+            self.p(" ".join(cp["intro"].split()))
+            self.table(cp["header"], cp["rows"], [4.2, 3.4, 2.4], size=7.5)
+        known = b_items(self.b)
+        for r in cp["rows"]:
+            for it in FRRN_RE.findall(r[1]):
+                if not any(x == it or x.startswith(it + ".") for x in known):
+                    raise SystemExit(f"Annex AM.4: {it} is not an FR item of this FRS")
+        self.b.stats["concept_paper"] = len(cp["rows"])
 
     # AO - observations
     def observations(self, review):
@@ -898,6 +965,60 @@ class Annexes:
         self.b.stats["glossary"] = len(terms)
 
 
+def b_items(b: Builder) -> list[str]:
+    return [x.replace(" (2nd)", "") for x in b.bdoi_item_ids] + [i for i, _ in all_items()] + \
+        [it["id"] for it in ADD["new_items"]]
+
+
+# --------------------------------------------------------------------------------------- colour code (version 1.2)
+_RPR_AFTER_COLOR = ("spacing", "w", "kern", "position", "sz", "szCs", "highlight", "u", "effect", "bdr", "shd",
+                    "fitText", "vertAlign", "rtl", "cs", "em", "lang", "eastAsianLayout", "specVanish", "oMath")
+
+
+def colour_runs(el, colour: str) -> int:
+    after_tags = {qn("w:" + t) for t in _RPR_AFTER_COLOR}
+    n = 0
+    for r in el.iter(qn("w:r")):
+        rpr = r.find(qn("w:rPr"))
+        if rpr is None:
+            rpr = OxmlElement("w:rPr")
+            r.insert(0, rpr)
+        for c in rpr.findall(qn("w:color")):
+            rpr.remove(c)
+        c = OxmlElement("w:color")
+        c.set(qn("w:val"), colour)
+        after = next((x for x in rpr if x.tag in after_tags), None)
+        (after.addprevious(c) if after is not None else rpr.append(c))
+        n += 1
+    return n
+
+
+def el_text_all(el) -> str:
+    return "".join(t.text or "" for t in el.iter(qn("w:t")))
+
+
+def apply_scope_colours(b: Builder):
+    """Green: BDOI's text of the items beyond the BRD that the system offers out of the box, and the annex rows
+    named; orange: the annex rows of the points that need a change request. BRD points stay black."""
+    col = V12["colours"]
+    trs = list(b.body.iter(qn("w:tr")))
+    for kind in ("green", "orange"):
+        for g in V12[kind]:
+            if g.get("frrn"):
+                block = b.bdoi_blocks.get(g["frrn"])
+                if not block:
+                    raise SystemExit(f"colour code: {g['frrn']} not found")
+                for el in block:
+                    colour_runs(el, col[kind])
+            if g.get("match"):
+                hit = [tr for tr in trs if g["match"] in el_text_all(tr) and tr.find(".//" + qn("w:tr")) is None]
+                if not hit:
+                    raise SystemExit(f"colour code: row with {g['match']!r} not found")
+                for tr in hit:
+                    colour_runs(tr, col[kind])
+            b.stats[kind] += 1
+
+
 def section_break(b: Builder, landscape: bool):
     return base.section_break(b, landscape)
 
@@ -930,32 +1051,27 @@ def add_annexes(b: Builder, a: Annexes, review, figs):
 
 
 CHANGE_POINTS = [
-    "Cover: version 1.1 and \"Drafting support: iorta TechNXT Project Team\"; Document Revision Log: row 1.1; Signoff Sheet: \"iorta TechNXT Project Team (drafting support)\" under Prepared by. BDOI's signatories are unchanged.",
-    "Introduction: the Project Overview of the BRD of 8-Oct-2026, the preparation sentence, References, and the Summary for the Business Unit Review (scope on a page, the process from end to end, key numbers, the {decisions} decisions, how to review).",
-    "Business Requirements Mapping: FR items added to {mapping_changes} of BDOI's 42 BRRN rows, and the {lines} requirement lines of the main BRD added under their {functions} BRD functions, each with its FRRN items.",
-    "Functional Requirements: BDOI's {bdoi_items} items kept word for word and elaborated ({with_statements} with added statements, all with numbered acceptance criteria); {new_subitems} new sub-items; new entries FRRN.045 to FRRN.049 ({new_item_subitems} sub-items); {ac} acceptance criteria in all.",
-    "Process Flow: {flows} figures added (process flows by persona, life-cycles of the renewal account, letters, hold cover and uploads); BDOI's flowchart is kept.",
-    "Annexes A to Z: rows added to Annexes B, M and V (Annex AP.4).",
-    "New annexes: AA Screen Specifications ({screens} screens, menu by persona); AB Messages and Validations ({messages}); AC Business Rules and Configurable Parameters; AD Workflow and Approvals; AE E-mail and Notification Texts ({emails}); AF Document Prints and Output Formats ({documents}); AG Reports and Schedules ({reports} reports, {schedules} runs); AH Integrations ({integrations}); AJ Non-functional Requirements ({nfr_rows}); AK Data Set-up and Migration at Go-live ({data_rows}); AL Process Walkthroughs ({walk_steps} steps); AM Requirements Traceability; AN Assumptions, Dependencies and Open Questions ({open_kept} open, {answered} answered by BDOI's FRS and not repeated); AO Observations and Points for BDOI Decision ({observations}); AP Change Control after Sign-off; AQ Business Unit Review Checklist ({checklist} points); AR Glossary ({glossary} terms).",
+    "Cover: version 1.2; Document Revision Log: row 1.2. BDOI's text and the content of version 1.1 are unchanged.",
+    "Introduction: \"How to read this document\" - the colour code of the points beyond the BRD: green where the system offers the point out of the box ({green} points), orange where it needs a change request ({orange}).",
+    "Functional Requirements: BDOI's text of the {green_items} items beyond the BRD coloured green where it is stated.",
+    "Annex AA and AL: the environment of the screenshots and walkthroughs (BIBS DEV environment); figure captions kept on the page of their figure.",
+    "Annex AJ: RN-NFR-17 (one session per device) and RN-NFR-18 (source of the audit entries), requirements of other BRDs of the programme that also apply to Renewal; the accessibility row coloured orange.",
+    "Annex AM.4: the {concept_paper} points of the signed Concept Paper traced to this FRS.",
+    "Annex AP.1: the points beyond the BRD with what the system offers, and the change requests with their effort ({cr_mandays:.1f} man-days; CR Effort Estimate workbook).",
 ]
 
 
-def change_summary(b: Builder, review):
+def change_summary(b: Builder, review):  # noqa: ARG001
     s = dict(b.stats)
-    s["decisions"] = len(review.REV["summary"]["decisions"])
-    s["flows"] = sum(1 for f in review.FLOWS if f["where"] == "flow")
-    els = [b.para("Summary of changes in version 1.1", bold=True, size=14, color="014EA9", hl=False, space_after=120),
-           b.para("This review copy shows in light yellow every passage added in version 1.1. BDOI's text of version "
-                  "1.0 is not shaded and is unchanged; the points for decision are in Annex AO and the open questions "
-                  "in Annex AN.", size=9.5, hl=False)]
+    s["green_items"] = sum(1 for g in V12["green"] if g.get("frrn"))
+    els = [b.para("Summary of changes in version 1.2", bold=True, size=14, color="014EA9", hl=False, space_after=120),
+           b.para("This review copy shows in light yellow every passage added or changed in version 1.2, against "
+                  "version 1.1. The text of version 1.1 is not shaded and is unchanged.", size=9.5, hl=False)]
     n = b.new_num()
     for pt in CHANGE_POINTS:
         els.append(b.para(pt.format(**s), style="ListParagraph", num=(n, 0), size=9.5, hl=False))
-    els.append(b.para("The first decisions BDOI must take are listed in the Summary for the Business Unit Review "
-                      "(third classification, paid-off and RMU loans, assignment, transfer, extraction and "
-                      "initiation).", size=9.5, hl=False))
     els.append(b.para("Shading used in this copy: ", size=9.5, hl=False))
-    els[-1].append(b.run("text added in version 1.1", size=9.5, hl=True))
+    els[-1].append(b.run("text added or changed in version 1.2", size=9.5, hl=True))
     brk = OxmlElement("w:p")
     ppr = OxmlElement("w:pPr")
     ppr.append(copy.deepcopy(b.doc.sections[0]._sectPr))
@@ -1059,6 +1175,7 @@ def build(highlight: bool, our, lines, functions, trace, brrn, figs: dict):
         raise SystemExit("Annex AO lacks conflicts of the comparison")
     b.key_numbers = review.key_numbers(b)
     review.add_summary(b, figs)
+    apply_scope_colours(b)
     if highlight:
         change_summary(b, review)
     set_update_fields(b)

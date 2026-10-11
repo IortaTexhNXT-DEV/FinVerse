@@ -57,7 +57,13 @@ describe('loadRecovery', () => {
     expect(reload).not.toHaveBeenCalled();
   });
 
-  it('clears the reload guard after a successful load', async () => {
+  it('keeps the reload guard for a minute after a reload, whatever else loads', async () => {
+    window.sessionStorage.setItem(RELOAD_FLAG, String(Date.now()));
+    await importWithRetry(() => Promise.resolve({ default: 1 }), { delayMs: 0 });
+    expect(window.sessionStorage.getItem(RELOAD_FLAG)).not.toBeNull();
+  });
+
+  it('clears the reload guard after a successful load later on', async () => {
     window.sessionStorage.setItem(RELOAD_FLAG, '1');
     await importWithRetry(() => Promise.resolve({ default: 1 }), { delayMs: 0 });
     expect(window.sessionStorage.getItem(RELOAD_FLAG)).toBeNull();

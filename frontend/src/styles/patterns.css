@@ -862,6 +862,10 @@ dl.form-grid dd {
   color: var(--brand-blue);
 }
 
+.status-page .btn svg {
+  color: inherit;
+}
+
 .status-page h1 {
   margin: 0;
   font-size: 24px;

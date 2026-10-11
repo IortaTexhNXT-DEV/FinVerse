@@ -57,9 +57,18 @@ export function reloadOnce(reload: () => void = () => window.location.reload()):
   return true;
 }
 
-/** Clears the reload guard after a screen loaded, so a later release can recover the same way. */
-export function markLoadSucceeded(): void {
-  writeFlag(null);
+/** Time after a recovery reload during which the guard stays set, whatever loads meanwhile. */
+export const RELOAD_GUARD_MS = 60_000;
+
+/**
+ * Clears the reload guard after a screen loaded, so a later release can recover the same way. The
+ * guard stays for a minute after a reload: other screens loading fine must not re-arm a reload loop.
+ */
+export function markLoadSucceeded(now: number = Date.now()): void {
+  const reloadedAt = Number(readFlag());
+  if (readFlag() !== null && now - reloadedAt > RELOAD_GUARD_MS) {
+    writeFlag(null);
+  }
 }
 
 const wait = (ms: number) =>

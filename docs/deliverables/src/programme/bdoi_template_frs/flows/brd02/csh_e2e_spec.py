@@ -46,7 +46,7 @@ SPEC = dict(
            ("Reports &amp; Audit", "Cashiering, Auditor", 0.65)],
     boxes=[
         ("P1", 0, 1, .05, .1, .9, "id", "Payment received", ["Cash, check, bank credit, insurer commission"]),
-        ("P2", 0, 0, .05, .1, .9, "id", "Payment files", ["Bills Payment, CLPC, Trade, Direct Credit, post-dated checks (MFT)", "Simulator in SIT and UAT (Integration scope)"]),
+        ("P2", 0, 0, .05, .1, .9, "id", "Payment files", ["Bills Payment, CLPC, Trade, Direct Credit, post-dated checks (MFT)", "Delivered in the Integration scope"]),
         ("C1", 1, 1, .05, .05, .9, "req", "Create AR / OR record", ["Premium or non-premium; OR Head Office", "Accounts, amounts, bank; validations", "Commission Schedule upload"]),
         ("C2", 1, 0, .05, .1, .9, "req", "Upload payment files", ["Or received through MFT", "Post-dated checks to the warehouse"]),
         ("C3", 1, 4, .05, .05, .9, "req", "Cancel or reinstate", ["Record with reason; partial or full"]),

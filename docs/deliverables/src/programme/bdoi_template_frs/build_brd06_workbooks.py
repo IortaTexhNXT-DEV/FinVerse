@@ -523,8 +523,7 @@ def build_fitgap(data: Data):
         Column("best", "Insurance-broking best practice", 46, "Practice of the Philippine market and international broking"),
         Column("fit", "Fit", 16, "Fit class", values=WB["fit_values"], status=True),
         Column("rec", "Recommendation", 40, "What to do"),
-        Column("impact", "Impact", 22, "Where it lands"),
-        Column("env", "In the BIBS environment", 20, "Available / Partly available / Planned for")],
+        Column("impact", "Impact", 22, "Where it lands")],
         rows, description="One row per BRD requirement")
     path = wb.save(FOLDER / "BIBS_FitGap_BRD-06_BRD_vs_OOTB_vs_Best_Practice_v1.0.xlsx")
     if not set(data.brd_ids) <= {r["id"] for r in rows}:
@@ -805,10 +804,10 @@ def build_effort(data: Data):  # noqa: ARG001
     for k, o in enumerate(V12["orange"]):
         r = first + k
         rows.append({"no": o["id"], "title": o["title"], "frs": o["frs"], "brd": o["brd"], "source": o["source"],
-                     "feature": f"{o['feature']}: {o['ootb_status']}", "evidence": o["evidence"], "built": o["built"],
+                     "feature": f"{o['feature']}: {o['ootb_status']}", "evidence": o["evidence"],
                      "why": " ".join(o["why"].split()),
                      "a1": o["effort"][0], "a2": o["effort"][1], "a3": o["effort"][2], "a4": o["effort"][3],
-                     "a5": o["effort"][4], "total": f"=SUM(J{r}:N{r})", "cost": f"=O{r}*DayRate",
+                     "a5": o["effort"][4], "total": f"=SUM(I{r}:M{r})", "cost": f"=N{r}*DayRate",
                      "complexity": o["complexity"], "priority": o["priority"], "deps": o["dependencies"],
                      "assume": o["assumptions"]})
     last = first + len(rows) - 1
@@ -817,7 +816,6 @@ def build_effort(data: Data):  # noqa: ARG001
             Column("brd", "BRD reference", 22, "Not in BRD (what the BRD asks)"), Column("source", "Source", 20, ""),
             Column("feature", "Feature List ID / OOTB status", 20, "Feature List vs OOTB, column OOTB platform"),
             Column("evidence", "OOTB evidence (iNXT BrokerVerse)", 40, "Screen or module of the platform edition, or not found"),
-            Column("built", "Prepared for BIBS?", 10, "Prepared for BIBS in this project; the effort is still the value of the change"),
             Column("why", "Why needed", 40, "")]
     cols += [Column(f"a{i}", f"{a} (man-days)", 12, "Estimate in man-days", kind="percent") for i, a in
              enumerate(ACTIVITIES, 1)]
@@ -829,9 +827,9 @@ def build_effort(data: Data):  # noqa: ARG001
     # Summary first (formulas refer to the sheets written after it)
     summ = [{"item": "Change requests (orange points)", "value": f"=COUNTA('CR Effort'!A{first}:A{last})"}]
     for i, a in enumerate(ACTIVITIES):
-        letter = "JKLMN"[i]
+        letter = "IJKLM"[i]
         summ.append({"item": f"{a} (man-days)", "value": f"=SUM('CR Effort'!{letter}{first}:{letter}{last})"})
-    summ += [{"item": "Total man-days of the change requests", "value": f"=SUM('CR Effort'!O{first}:O{last})"},
+    summ += [{"item": "Total man-days of the change requests", "value": f"=SUM('CR Effort'!N{first}:N{last})"},
              {"item": "Low estimate (-20%)", "value": f"=B{first + 6}*(1-Accuracy)"},
              {"item": "High estimate (+20%)", "value": f"=B{first + 6}*(1+Accuracy)"},
              {"item": "Cost at the daily rate", "value": f"=B{first + 6}*DayRate"},
@@ -902,11 +900,9 @@ def build_effort(data: Data):  # noqa: ARG001
              {"item": "Daily rate (fill in, currency of the contract) - name DayRate", "value": 0},
              {"item": "Estimate accuracy (plus or minus) - name Accuracy", "value": 0.2},
              {"item": "Out of the box", "value": "The iNXT BrokerVerse platform edition (its code and manual), cross-checked "
-                                                  "with the Feature List vs OOTB workbook (column OOTB platform); the work "
-                                                  "prepared for BIBS in this project is not out of the box"},
-             {"item": "Basis", "value": "Effort for the missing part only, sized on the size of the Renewal work "
-                                         "prepared for BIBS (about 55,700 lines of rules and services, 83 screen "
-                                         "components)"},
+                                                  "with the Feature List vs OOTB workbook (column OOTB platform)"},
+             {"item": "Basis", "value": "Effort for the missing part only, sized against the iNXT BrokerVerse "
+                                         "platform edition and the requirements of the BRD and of BDOI's FRS"},
              {"item": "Not included", "value": "Integration and Data Migration scopes, infrastructure, licences, BDOI's "
                                                 "own testing time and travel"},
              {"item": "Validity", "value": "Until the FRS is signed; re-estimated in the impact assessment form of "
@@ -1078,6 +1074,8 @@ def build_coverage(data: Data):
 
 
 def main() -> int:
+    import bdoi_view  # noqa: PLC0415
+    bdoi_view.patch_workbooks()   # no description of the BIBS build in the workbooks
     data = Data()
     FOLDER.mkdir(parents=True, exist_ok=True)
     for name, fn in (("requirements", build_requirements), ("fitgap", build_fitgap), ("cr", build_cr), ("effort", build_effort),

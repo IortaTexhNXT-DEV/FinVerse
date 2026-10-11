@@ -1389,6 +1389,8 @@ def build(highlight: bool, our, nb, ids) -> Builder:
     v13.scope_labels(b)
     if highlight:
         v13.change_summary(b)
+    import bdoi_view  # noqa: PLC0415  (no description of the BIBS build: product owner, 11-Oct-2026)
+    b.stats.update(bdoi_view.apply_docx(b.doc, bdoi_view.source_texts(REPO / DOC["meta"]["source"])))
     set_update_fields(b)
     check_words(b)
     problems = v12.self_checks(b, " ".join(b.added_text)) + v13.self_checks(b)

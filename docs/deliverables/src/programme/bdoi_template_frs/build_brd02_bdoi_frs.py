@@ -643,6 +643,8 @@ def build(highlight: bool, ids, figs) -> Builder:
         raise SystemExit("version 3.3 checks failed:\n  " + "\n  ".join(problems))
     if highlight:
         v33.change_summary(b)
+    import bdoi_view  # noqa: PLC0415  (no description of the BIBS build: product owner, 11-Oct-2026)
+    b.stats.update(bdoi_view.apply_docx(b.doc, bdoi_view.source_texts(REPO / DOC["meta"]["source"])))
     u11.set_update_fields(b)
     check_words(b)
     b.where = where

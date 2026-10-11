@@ -472,12 +472,11 @@ class NewAnnexes:
             a.p("The points of this FRS that are not in the Renewal BRD or the signed Concept Paper are coloured where "
                 "they are stated (see How to read this document). Out of the box means the iNXT BrokerVerse platform "
                 "edition: its code and manual, cross-checked with the Feature List vs OOTB and Best Practice workbook "
-                "(column OOTB platform); the work prepared for BIBS in this project is not out of the box. Green points "
+                "(column OOTB platform). Green points "
                 "are offered by the platform and cost nothing. Orange points are in no BRD (only the part no BRD line "
                 "covers) and not in the platform, or only in part: "
                 "each is a change request whose effort (for the missing part) is in the CR Effort Estimate workbook "
-                "(one man-day = 8 hours, estimate within plus or minus 20 percent), also where the point is already "
-                "prepared for BIBS. Interfaces with external systems are delivered in the Integration scope and are "
+                "(one man-day = 8 hours, estimate within plus or minus 20 percent). Interfaces with external systems are delivered in the Integration scope and are "
                 "not change requests. All of them stay in the Change Request Register for BDOI's decision.")
             a.p("Green - beyond the BRD, out of the box", bold=True, keep_next=True, color=col["green"])
             rows = [[g["id"], g.get("frrn", "-"), g["title"], f"{g['feature']}: {g['ootb_status']}", g["brd"],
@@ -494,10 +493,10 @@ class NewAnnexes:
                 md = sum(o["effort"])
                 total += md
                 rows.append([o["id"], o["frs"], o["title"], f"{o['feature']}: {o['ootb_status']}",
-                             " ".join(o["ootb"].split()), o["built"], f"{md:.1f}", o["priority"]])
+                             " ".join(o["ootb"].split()), f"{md:.1f}", o["priority"]])
             a.table(["CR No.", "FRS reference", "Change", "Feature List / OOTB", "What is missing in the platform "
-                     "edition", "Prepared for BIBS", "Man-days", "Priority"], rows,
-                    [0.8, 1.0, 1.9, 1.3, 2.8, 0.7, 0.6, 0.6], size=7.5)
+                     "edition", "Man-days", "Priority"], rows,
+                    [0.8, 1.0, 1.9, 1.3, 3.5, 0.6, 0.6], size=7.5)
             for tr in a.els[-2].findall(qn("w:tr"))[1:]:
                 colour_runs(tr, col["orange"])
             a.p(f"Total of the change requests: {total:.1f} man-days ({len(rows)} change request"

@@ -190,7 +190,7 @@ class Data:
             for s in yaml.safe_load(f.read_text(encoding="utf-8"))["screens"]:
                 scr_frs[s["id"]] = s.get("frs", [])
         out = defaultdict(list)
-        for w in yaml.safe_load((UA / "pack" / "walkthroughs.yaml").read_text(encoding="utf-8"))["walkthroughs"]:
+        for w in v14.BDOI["walkthroughs"]:  # the walkthroughs of FRS Annex O
             for i, s in enumerate(w["steps"], 1):
                 for fr in scr_frs.get(s[1], []):
                     out[fr].append(f"{w['id']}.{i}")
@@ -513,8 +513,7 @@ def build_fitgap(data: Data) -> tuple[Path, dict]:
         Column("best", "Insurance-broking best practice", 46, "Practice of the Philippine market and international broking"),
         Column("fit", "Fit", 16, "Fit class", values=WB["fit_values"], status=True),
         Column("rec", "Recommendation", 40, "What to do"),
-        Column("impact", "Impact", 22, "Where it lands"),
-        Column("env", "In the BIBS environment", 20, "Available / Partly available / Planned for")],
+        Column("impact", "Impact", 22, "Where it lands")],
         rows, description="One row per BRD requirement")
     path = wb.save(FOLDER / ("BIBS_FitGap_BRD-11_BRD_vs_OOTB_vs_Best_Practice_v" + META["version"] + ".xlsx"))
     if {r["id"] for r in rows} < {rid for rid, _ in data.lines}:
@@ -552,7 +551,7 @@ def build_cr(data: Data) -> tuple[Path, dict]:
         if no in crs:
             cr = crs[no]
             row.update({"klass": "Change request (orange in the FRS)", "frs": cr["frs"], "brd": cr["brd"],
-                        "fl": cr["fl"], "built": cr["built"],
+                        "fl": cr["fl"],
                         "desc": f"{cr['title']}: {' '.join(cr['scope'].split())}", "reason": " ".join(cr["why"].split()),
                         "type": "Beyond the BRD" if cr["source"] != "BDOI FRS v1.1" else "Added by BDOI's FRS",
                         "cost": f"{v14.fmt(v14.days(cr['effort']))} man-days (CR Effort Estimate)",
@@ -563,7 +562,7 @@ def build_cr(data: Data) -> tuple[Path, dict]:
                      "BRD-OOTB": f"BRD requirement, offered by iNXT BrokerVerse OOTB ({ob}, black in the FRS, no effort)",
                      "INT": f"Integration scope ({ob}, grey label in the FRS)",
                      "DM": f"Data Migration scope ({ob}, grey label in the FRS)"}.get(kind, "BRD requirement (black in the FRS)")
-            row.update({"fl": fl, "built": "-", "klass": klass, "status": "Closed",
+            row.update({"fl": fl, "klass": klass, "status": "Closed",
                         "decision": f"Not a change request (review of 11-Oct-2026): {note}", "ddate": "11-Oct-2026",
                         "cost": "None", "approved": "iorta TechNXT Project Team (for BDOI confirmation)"})
             if kind in ("BRD", "BRD-OOTB"):
@@ -578,7 +577,6 @@ def build_cr(data: Data) -> tuple[Path, dict]:
         Column("no", "CR No.", 12, "Change request number"),
         Column("klass", "Classification (FRS v1.4)", 24, "Change request (orange) / offered by iNXT BrokerVerse OOTB (green) / BRD requirement (black) / integration or data migration scope (grey)"),
         Column("fl", "Feature List ID / OOTB status", 28, "Row of the Feature List vs OOTB workbook and its OOTB platform status"),
-        Column("built", "Prepared for BIBS?", 12, "Already available for BDOI in the BIBS system (still a change request when orange)"),
         Column("date", "Date raised", 12, "dd-Mmm-yyyy"),
         Column("by", "Raised by", 18, "Name and role"), Column("brd", "BRD ID", 16, "BRD requirement"),
         Column("frs", "FRS reference", 16, "FR item or annex"), Column("desc", "Description", 46, "The change"),
@@ -631,7 +629,7 @@ def build_effort(data: Data) -> tuple[Path, dict]:
     V = v14.V14
     wb = ReviewWorkbook("CR Effort Estimate", doc_type="Change requests - effort", brd="BRD-11", version="1.0",
                         subtitle="BRD-11 User Access Maintenance - change requests of the FRS v1.4 with their effort")
-    wb.legend = [("Change request", "In no BRD and not (or only partly) in the iNXT BrokerVerse OOTB platform (orange in the FRS); also when already available in BIBS"),
+    wb.legend = [("Change request", "In no BRD and not (or only partly) in the iNXT BrokerVerse OOTB platform (orange in the FRS)"),
                  ("Offered by OOTB", "Not in the BRD; offered by the iNXT BrokerVerse OOTB platform (brokerverse-platform), no cost (green in the FRS)"),
                  ("Integration / Data Migration scope", "Interfaces and data migration: covered by those workstreams, not a change request (grey label)"),
                  ("Best practice", "In no BRD, FRS or OOTB: recommendation with indicative effort, excluded from the CR total (blue)"),
@@ -682,7 +680,7 @@ def build_effort(data: Data) -> tuple[Path, dict]:
         e = c["effort"]
         rows.append({"no": c["id"], "title": c["title"], "frs": c["frs"], "brd": c["brd"], "source": c["source"],
                      "why": " ".join(c["why"].split()), "ootb": c["ootb"], "scope": " ".join(c["scope"].split()),
-                     "fl": c["fl"], "built": c["built"], "evidence": c["evidence"],
+                     "fl": c["fl"], "evidence": c["evidence"],
                      "a": e[0], "b": e[1], "f": e[2], "t": e[3], "d": e[4], "total": f"=SUM(I{r}:M{r})",
                      "low": f"=ROUND(N{r}*(1-Accuracy),1)", "high": f"=ROUND(N{r}*(1+Accuracy),1)",
                      "complexity": c["complexity"], "priority": c["priority"], "depends": c["depends"],
@@ -707,8 +705,7 @@ def build_effort(data: Data) -> tuple[Path, dict]:
         Column("depends", "Dependencies", 34, ""), Column("assumptions", "Assumptions", 34, ""),
         Column("cost", "Cost", 14, "Total man-days x day rate", kind="amount"),
         Column("fl", "Feature List ID / OOTB status", 30, "Row of the Feature List vs OOTB workbook (column OOTB platform)"),
-        Column("evidence", "OOTB evidence", 40, "Screen or function of the OOTB platform, or not found"),
-        Column("built", "Prepared for BIBS?", 14, "Already available for BDOI in the BIBS system; the effort is still the CR value")],
+        Column("evidence", "OOTB evidence", 40, "Screen or function of the OOTB platform, or not found"),],
         rows, description="One row per change request (orange point of the FRS v1.4); man-days of 8 hours, +-20%")
     for r in range(first, last + 2):
         for col in "IJKLMNOP":
@@ -752,7 +749,7 @@ def build_effort(data: Data) -> tuple[Path, dict]:
         e = t["effort"]
         due.append({"no": t["id"], "title": t["title"], "ref": t["ref"], "frs": t["frs"], "scope": t["scope"],
                      "a": e[0], "b": e[1] + e[2], "t": e[3] + e[4], "total": f"=SUM(F{r}:H{r})", "cost": "Not charged",
-                     "fl": t["fl"], "evidence": t["evidence"], "built": t["built"]})
+                     "fl": t["fl"], "evidence": t["evidence"]})
     ws = wb.sheet("BRD items to deliver", [
         Column("no", "No.", 11, ""), Column("title", "Item", 28, ""), Column("ref", "BRD reference", 30, ""),
         Column("frs", "FRS reference", 22, ""), Column("scope", "What is delivered", 50, ""),
@@ -760,8 +757,7 @@ def build_effort(data: Data) -> tuple[Path, dict]:
         Column("t", "Testing and UAT support", 11, "Man-days", **num), Column("total", "Total man-days", 11, "Formula", **num),
         Column("cost", "Cost", 14, "In scope"),
         Column("fl", "Feature List ID / OOTB status", 30, "Row of the Feature List vs OOTB workbook (column OOTB platform)"),
-        Column("evidence", "OOTB evidence", 36, "brokerverse-platform"),
-        Column("built", "Prepared for BIBS?", 14, "Already available for BDOI in the BIBS system")],
+        Column("evidence", "OOTB evidence", 36, "brokerverse-platform"),],
         due, description="BRD requirements not (fully) in the iNXT BrokerVerse OOTB platform (FRS Annex X.2, AA.4): in-scope delivery work, for planning")
     for r in range(first, first + len(due)):
         for col in "FGHI":
@@ -798,7 +794,7 @@ def build_effort(data: Data) -> tuple[Path, dict]:
         {"item": "Accuracy of the estimates", "value": 0.2, "note": "Plus or minus; the Low and High columns use it"},
         {"item": "Day rate", "value": None, "note": "Enter the rate of one man-day (currency below); the costs are computed from it"},
         {"item": "Currency", "value": "", "note": "For example PHP"},
-        {"item": "Basis", "value": "", "note": "Sized against the iNXT BrokerVerse OOTB platform (repo BDOI-OOTB, branch brokerverse-platform, checked in its code with the Feature List vs OOTB as a cross-check), not against the BIBS system configured for BDOI: a point OOTB offers is not a change request; for a partial point only the missing part is estimated; a change request already available in BIBS (column Prepared for BIBS?) keeps its effort as the CR value; interfaces and data migration are not change requests (sheet Integration & Data Migration); best practice is indicative and excluded (sheet Best practice (blue)) (sheet Beyond the BRD - OOTB)."},
+        {"item": "Basis", "value": "", "note": "Sized against the iNXT BrokerVerse OOTB platform (repo BDOI-OOTB, branch brokerverse-platform, checked in its code with the Feature List vs OOTB as a cross-check): a point OOTB offers is not a change request; for a partial point only the missing part is estimated; interfaces and data migration are not change requests (sheet Integration & Data Migration); best practice is indicative and excluded (sheet Best practice (blue)) (sheet Beyond the BRD - OOTB)."},
         {"item": "Activities", "value": "", "note": "Analysis and design (FRS update, rules), backend, frontend (screens), testing (test cases of the RTM, regression of the access functions), documentation and UAT support."},
         {"item": "Not included", "value": "", "note": "Work of BDOI and BDOI IT (decisions, identity systems, infrastructure), data migration, training beyond the UAT support."},
         {"item": "Validity", "value": "", "note": "Until the sign-off of the FRS v1.4; re-estimated when the decision of BDOI changes the scope of a change request."},
@@ -945,61 +941,94 @@ def v13_frum(data: Data, frs_ua: list[str]) -> str:
 
 
 # ------------------------------------------------------------------------------------------------- 5 UAT users
-PERSONA_MENU = {"Requestor": 1, "Approver": 2, "Second approver": 3, "Business Administrator": 4,
+PERSONA_MENU = {"Requestor": 1, "Approver": 2, "Second Approver": 3, "Business Administrator": 4,
                 "System Administrator": 5, "Information Security Officer": 6, "Auditor": 7}
+# The personas of the walkthroughs of FRS Annex O (brd11_v14_bdoi.yaml), each with its fictitious user (the people
+# named in Annex O where it names them), the sign-in ID of the persona account and the group profiles held.
+UAT_USERS = [
+    # persona, user name, sign-in ID, group profiles, menu column
+    ("Requestor", "Rhea Santiago", "requestor", "User Access Requestor", "Requestor"),
+    ("Approver", "Ulysses Abad", "uamapprover", "User Access Approver", "Approver"),
+    ("Second Approver", "Selina Reyes", "secapprover", "User Access Second Approver", "Second Approver"),
+    ("Second approver of the group profile", "Andres Bautista", "approver", "User Access Approver", "Approver"),
+    ("Another approver", "Andres Bautista", "approver", "User Access Approver", "Approver"),
+    ("Business Administrator", "Bea Villanueva", "badmin", "Business Administrator", "Business Administrator"),
+    ("System Administrator", "Samuel Cruz", "admin", "System Administrator", "System Administrator"),
+    ("New user (Marketing Account Officer)", "Isabel Navarro", "a013000196", "Marketing Account Officer", None),
+    ("Business user", "Maria Santos", "a013000101", "Marketing Account Officer", None),
+    ("Auditor", "Audrey Lim", "auditor", "Auditor", "Auditor"),
+]
+
+
+def screen_titles() -> dict[str, str]:
+    out = {}
+    for f in sorted((UA / "pack" / "screens").glob("*.yaml")):
+        for s in yaml.safe_load(f.read_text(encoding="utf-8"))["screens"]:
+            out[s["id"]] = frs.clean(s["title"])
+    return out
 
 
 def build_uat(data: Data) -> tuple[Path, dict]:
-    src = OUT / "Programme" / "UAT" / "BIBS_UAT_BRD-00_Walkthrough_Users_and_Sign-in_v1.0.xlsx"
-    w = openpyxl.load_workbook(src, read_only=True)
+    """Built from the walkthroughs of FRS Annex O: the same steps, personas, screens and fictitious users."""
     menus = next(f for f in v13.FLOWS if f["id"] == "brd11_fig_menus")["rows"]
+    titles = screen_titles()
+    walks = v14.BDOI["walkthroughs"]
+    known = {u[0] for u in UAT_USERS}
+    script, steps_of, first_screen, does = [], defaultdict(list), {}, defaultdict(list)
+    for w in walks:
+        for i, s in enumerate(w["steps"], 1):
+            persona = s[0]
+            if persona not in known:
+                raise SystemExit(f"persona of Annex O without a walkthrough user: {persona}")
+            user = next(u for u in UAT_USERS if u[0] == persona)
+            sid = f"{w['id']}.{i}"
+            label = " [Integration scope - UIDM-ISC]" if i in (w.get("uidm_steps") or []) else ""
+            screen = f"{titles.get(s[1], s[1])} ({s[1]})"
+            steps_of[persona].append(sid)
+            first_screen.setdefault(persona, screen)
+            script.append({"wt": f"{w['id']} {frs.clean(w['title'])}", "step": sid, "persona": persona,
+                           "user": user[1], "signin": user[2], "screen": screen, "action": v14._rewrite(s[2]),
+                           "expected": v14._rewrite(s[3]), "outcome": s[4] + label, "result": "Not run",
+                           "tester": "", "date": "", "remarks": ""})
     users = []
-    ws = w["BRD-11 User Access Maintenance"]
-    head = None
-    for r in ws.iter_rows(values_only=True):
-        if r and r[0] == "Persona":
-            head = list(r)
+    for persona, name, signin, profiles, menu_col in UAT_USERS:
+        if persona not in steps_of:
             continue
-        if head and r and r[0]:
-            row = dict(zip(head, r))
-            col = PERSONA_MENU.get(row["Persona"])
-            if col:
-                menu = "; ".join(m[0] for m in menus if m[col])
-            elif "New Business" in row["Persona"]:
-                menu = "Home › My Approvals; User Access › Access Requests, Group Profile Requests, Bulk Request, User Access Matrix; Help › My Profile"
-            else:
-                menu = "The menu of the Marketing Account Officer (no User Access entry); Help › My Profile"
-            users.append({"persona": row["Persona"], "name": row["User name"], "signin": row["Sign-in ID"],
-                          "profiles": row["Group profile"], "unit": row["Company / branch / unit"],
-                          "does": row["What this user does in the walkthrough"], "start": row["Menu path to start"],
-                          "menus": menu, "steps": row["Walkthrough steps"], "password": META["password_text"]})
-    script = []
-    for r in w["Walkthrough Script"].iter_rows(values_only=True):
-        if r and r[0] == "BRD-11":
-            script.append({"wt": r[1], "step": r[2], "persona": r[3], "signin": r[4], "action": r[5],
-                           "expected": r[6], "result": "Not run", "tester": "", "date": "", "remarks": ""})
-    w.close()
-    if not users or not script:
-        raise SystemExit("walkthrough users or script not found")
+        col = PERSONA_MENU.get(menu_col or "")
+        menu = ("; ".join(m[0] for m in menus if m[col]) if col else
+                "The menu of the Marketing Account Officer (no User Access entry); Help \u203a My Profile")
+        acts = sorted({next(x for x in script if x["step"] == st)["outcome"].split(" [")[0] for st in steps_of[persona]})
+        users.append({"persona": persona, "name": name, "signin": signin, "profiles": profiles,
+                      "unit": "BDO Insurance and Reinsurance Brokers, Inc. / Head Office",
+                      "does": "; ".join(acts), "start": first_screen[persona], "menus": menu,
+                      "steps": ", ".join(steps_of[persona]),
+                      "password": ("Temporary password shown once at step WT-A.4" if signin == "a013000196"
+                                   else META["password_text"])})
+    n_steps = sum(len(w["steps"]) for w in walks)
+    if len(script) != n_steps:
+        raise SystemExit("walkthrough script differs from FRS Annex O")
     wb = ReviewWorkbook("Business Unit Walkthrough Users", doc_type="UAT walkthrough", brd="BRD-11",
-                        version=META["version"], subtitle="BRD-11 User Access Maintenance - sign-in IDs for the walkthrough")
+                        version=META["version"], subtitle="BRD-11 User Access Maintenance - persona users for the walkthroughs")
     wb.cover_notes = [f"Environment: {META['environment']}. Passwords: {META['password_text']}; no password is "
-                      f"written in this workbook."]
+                      f"written in this workbook. The steps, personas, screens and users are those of FRS Annex O; "
+                      f"the people named are fictitious."]
     wb.sheet("Users", [
-        Column("persona", "Persona", 24, "Business role of the FRS"), Column("name", "User name", 22, "As shown on the screens"),
+        Column("persona", "Persona", 24, "Persona of FRS Annex O"), Column("name", "User name", 20, "Fictitious user of FRS Annex O"),
         Column("signin", "Sign-in ID", 14, "User ID to type on the Login page"),
-        Column("profiles", "Group profiles", 26, "Role held"), Column("unit", "Company / branch / unit", 30, ""),
-        Column("does", "What the user does in the walkthrough", 40, ""), Column("start", "Menu path to start", 30, ""),
+        Column("profiles", "Group profiles", 26, "Group profile held"), Column("unit", "Company / branch / unit", 30, ""),
+        Column("does", "What the user does in the walkthroughs", 40, "Results of the user's steps"),
+        Column("start", "Screen of the first step", 30, ""),
         Column("menus", "Menus the user should see", 50, "User Access Maintenance entries of the user's menu"),
         Column("steps", "Walkthrough steps", 24, "Steps of the sheet Walkthrough script"),
         Column("password", "Password", 26, "Never written here")],
         users, description=f"{META['environment']}. Password: {META['password_text']}")
     wb.sheet("Walkthrough script", [
         Column("wt", "Walkthrough", 30, ""), Column("step", "Step", 8, ""), Column("persona", "Persona", 22, ""),
-        Column("signin", "Sign-in ID", 14, ""), Column("action", "Action", 56, ""),
-        Column("expected", "Expected result", 56, ""), Column("result", "Result", 10, "", values=RESULT, status=True),
+        Column("user", "User", 16, ""), Column("signin", "Sign-in ID", 12, ""), Column("screen", "Screen", 26, ""),
+        Column("action", "What the user does", 56, ""), Column("expected", "What the user sees", 56, ""),
+        Column("outcome", "Result expected", 22, ""), Column("result", "Result", 10, "", values=RESULT, status=True),
         Column("tester", "Done by", 14, ""), Column("date", "Date", 12, ""), Column("remarks", "Remarks", 24, "")],
-        script, description="The walkthrough of BRD-11 for the Business Unit (FRS Annex O)")
+        script, description="The walkthroughs of BRD-11 for the Business Unit, step by step as in FRS Annex O")
     path = wb.save(FOLDER / ("BIBS_UAT_BRD-11_Business_Unit_Walkthrough_Users_v" + META["version"] + ".xlsx"))
     return path, {"users": len(users), "steps": len(script)}
 
@@ -1087,6 +1116,8 @@ def build_coverage(data: Data) -> tuple[Path, dict]:
 
 
 def main() -> int:
+    import bdoi_view  # noqa: PLC0415
+    bdoi_view.patch_workbooks()   # no description of the BIBS build in the workbooks
     data = Data()
     FOLDER.mkdir(parents=True, exist_ok=True)
     results = {}

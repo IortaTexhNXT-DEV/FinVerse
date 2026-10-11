@@ -1210,6 +1210,8 @@ def build(highlight: bool, our, lines, functions, trace, brrn, figs: dict):
     apply_scope_colours(b)
     if highlight:
         change_summary(b, review)
+    import bdoi_view  # noqa: PLC0415  (no description of the BIBS build: product owner, 11-Oct-2026)
+    b.stats.update(bdoi_view.apply_docx(b.doc, bdoi_view.source_texts(REPO / DOC["meta"]["source"])))
     set_update_fields(b)
     check_words(b)
     b.mapping = mapping

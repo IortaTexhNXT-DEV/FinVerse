@@ -7,9 +7,9 @@
 #   green  - the point is in no BRD and the iNXT BrokerVerse OOTB platform offers it: feature "Available" (or "OOTB
 #            extra") in column "OOTB platform" of the BIBS BDOI Feature List vs OOTB workbook; no cost;
 #   orange - the point is in no BRD and the OOTB platform does not offer it (Not available, Partial, BDOI-specific or no
-#            feature row): a change request (CR) with an effort - also when it was already built for BDOI in BIBS.
+#            feature row): a change request (CR) with an effort.
 # OOTB is the iNXT BrokerVerse OOTB platform (repo IortaTexhNXT-DEV/BDOI-OOTB, branch brokerverse-platform), tested in its
-# code with the Feature List as a cross-check; NOT the BIBS build of this project (which holds BDOI-specific work).
+# code with the Feature List as a cross-check.
 #   grey label - integration (EIAM / Entra ID SSO, UIDM-ISC, any external interface) or data migration (BRD-13) scope;
 #   blue       - insurance-broking best practice in no BRD, FRS or OOTB: separate table (Annex AA.7), indicative effort.
 
@@ -47,7 +47,7 @@ legend:
 # ------------------------------------------------------------------------------------------------ change requests
 # One row per orange point. effort: [analysis and design, backend, frontend, testing, documentation / UAT support]
 # in man-days of 8 hours (+-20%), sized against the OOTB platform (for a Partial feature: the missing part only).
-# fl: Feature List ID / OOTB status; built: already built for BDOI in the BIBS system of this repository.
+# fl: Feature List ID / OOTB status.
 crs:
   - id: CR-UA-003
     evidence: "Not found: no break-glass account or break-glass sign-in alert in the OOTB sign-in"
@@ -58,7 +58,6 @@ crs:
     brd: Not in BRD
     source: Best practice (iorta TechNXT)
     fl: "No feature row (related UAM-007 two-factor authentication: Available)"
-    built: "Yes"
     why: >-
       BDOI's FRS signs every user in through EIAM; two named administrator accounts must still get in when EIAM is
       down, with each such sign-in alerted to Information Security. The OOTB platform has local accounts only and no
@@ -82,7 +81,6 @@ crs:
     brd: Not in BRD
     source: BDOI FRS v1.1
     fl: "UAM-017 Data-scope restriction: Partial"
-    built: "Partly (data scope by company and branch; no supervisor link)"
     why: >-
       BDOI's FRS asks that a user with a supervisory role sees and manages the records of the personnel assigned to
       him or her, with record-ownership rules per role. The OOTB platform limits scoped roles to their own records and
@@ -106,7 +104,6 @@ crs:
     brd: "Not in BRD (UAM BRD Other BU NFR 11 asks for a configurable, monitored workflow with escalation of risky changes, not for time limits or reminders)"
     source: Best practice (iorta TechNXT)
     fl: "WFL-007 Turnaround-time tracking and escalation: Partial (UAM-019 access requests: Not available)"
-    built: "No"
     verdict: PARTLY
     quote: "UAM BRD Other BU NFR 11: \"With configurable workflow for user access requests and approvals - any changes on the access to user privileges are systematically monitored, evaluated and if necessary escalated for additional review. For example, modifications done outside working hours or from low privilege to high-privilege access, etc.\""
     why: >-
@@ -133,7 +130,6 @@ crs:
     brd: "Not in BRD (BRD NFR 1.k asks for an effective date of user and role changes; the removal of access on a date is that BRD item)"
     source: Best practice (iorta TechNXT)
     fl: "UAM-024 Effective-dated access changes: Not available"
-    built: "No"
     verdict: PARTLY
     quote: "UAM BRD NFR System Operation 1.k: \"Ability to specify effective date for user and role changes\""
     why: >-
@@ -159,7 +155,6 @@ crs:
     brd: Not in BRD
     source: Best practice (iorta TechNXT)
     fl: "No feature row (UAM-022 group profile requests: Not available)"
-    built: "Yes"
     why: >-
       With group profiles changed only by approved requests, an emergency path lets the System Administrator edit
       users and group profiles directly, when Information Security opens it, with every edit audited and alerted.
@@ -254,7 +249,7 @@ programme_nfr:
   - ["Operations addendum", "Segregation of duties between the maker and the checker of a change.", "FRUM.010.02, FRUM.012.01", "Met (UAM-018)"]
 
 # In-scope items to deliver (BRD requirements, no change request): the gaps of the OOTB platform (Feature List) against
-# the BRDs. Effort for planning only, not charged. built: already built for BDOI in the BIBS system.
+# the BRDs. Effort for planning only, not charged.
 brd_to_deliver:
   - id: BRD-UA-01
     evidence: "Not found (several sessions per user)"
@@ -262,7 +257,6 @@ brd_to_deliver:
     ref: "Collections addendum NFR 10.07"
     frs: "FRUM.001.01; Annex M.5"
     fl: "UAM-005: Not available"
-    built: "No"
     scope: "A sign-in on another device ends the user's earlier session, with the reason in the session log and a message on the earlier device."
     effort: [0.5, 2, 1, 1, 0.5]
   - id: BRD-UA-02
@@ -271,7 +265,6 @@ brd_to_deliver:
     ref: "Collections addendum NFR 2.04"
     frs: "FRUM-004; Annex M.4"
     fl: "UAM-008: Available (one minimum length only)"
-    built: "No"
     scope: "Minimum length 12 for the accounts with administrator privileges, 8 or more for any other local account; as a setting."
     effort: [0.25, 0.5, 0.25, 0.5, 0]
   - id: BRD-UA-03
@@ -280,7 +273,6 @@ brd_to_deliver:
     ref: "UAM BRD x.001.1.2, x.001.1.3; Collections addendum NFR 10.01"
     frs: "FRUM.001.03, FRUM.001.04; Annex M.5"
     fl: "UAM-003: Partial"
-    built: "Yes"
     scope: "A warning after 15 minutes of inactivity with Stay Logged In and Log Out, besides the sign-out after 30 minutes; both times settings (BDOI confirms 15 or 30 minutes)."
     effort: [0.25, 1, 0.5, 0.5, 0.25]
   - id: BRD-UA-05
@@ -289,7 +281,6 @@ brd_to_deliver:
     ref: "UAM BRD NFR 13, 15; Collections addendum NFR 2.09"
     frs: "FRUM.002.03; Annex M"
     fl: "UAM-012: Partial"
-    built: "Yes"
     scope: "The fields of the BRD on the user record, screens and reports; the user ID pattern as a setting."
     effort: [0.5, 2, 1.5, 1, 0.5]
   - id: BRD-UA-07
@@ -298,7 +289,6 @@ brd_to_deliver:
     ref: "UAM BRD 4.002.2 to 4.002.2.10; report sample B"
     frs: "FRUM.006; Annex C"
     fl: "UAM-015: Partial"
-    built: "Yes"
     scope: "Rights by function (view, add, amend, delete, approve and the tasks of the BRD) per module and group profile, in the screens, the checks and the Group Profile Access Report."
     effort: [1, 4, 2, 2, 0.5]
   - id: BRD-UA-08
@@ -307,7 +297,6 @@ brd_to_deliver:
     ref: "UAM BRD 1.002 to 1.005 (the change applied), 3.003.1.6 (added / modified / deactivated / reactivated by)"
     frs: "FRUM.002, FRUM.003, FRUM.009.10; Annex N.3"
     fl: "UAM-019, UAM-020, UAM-021: Not available"
-    built: "Yes"
     scope: "The access change approved in UIDM-ISC applied to the user's group profiles with the UIDM request number, its history on the user and in the reports, and the notice Your access changed to the user. The raising, correction, cancellation, viewing and approval of the requests are done in UIDM-ISC (IS-UA-06, IS-UA-08; BDOI's review comments): their effort is removed (was 39 man-days)."
     effort: [0.5, 1.5, 1, 1, 0.25]
   - id: BRD-UA-09
@@ -316,7 +305,6 @@ brd_to_deliver:
     ref: "UAM BRD 3.002.1 to 3.002.4"
     frs: "FRUM.005, FRUM.011"
     fl: "UAM-022: Not available"
-    built: "Yes"
     scope: "Requests to create or change a group profile approved by the approvers in order and implemented by the System Administrator."
     effort: [2, 6, 4, 4, 1]
   - id: BRD-UA-11
@@ -325,7 +313,6 @@ brd_to_deliver:
     ref: "UAM BRD NFR 14 (1.k)"
     frs: "FRUM.009.10; Annex Z"
     fl: "UAM-024: Not available"
-    built: "Yes"
     scope: "An effective date on the requests; a daily run applies the scheduled changes, checked again on the day."
     effort: [1, 3, 1.5, 2, 0.5]
   - id: BRD-UA-12
@@ -334,7 +321,6 @@ brd_to_deliver:
     ref: "UAM BRD NFR 40 (Other BU NFR 11)"
     frs: "FRUM.010.02; Annex S"
     fl: "UAM-025: Not available"
-    built: "Yes"
     scope: "Privilege level on the group profiles and the working-hours rule; a second approval of the privileged or out-of-hours changes made in the system (group-profile requests, security settings); for the user access requests the second approval is given in UIDM-ISC (IS-UA-08)."
     effort: [1, 3, 1, 2, 0.5]
   - id: BRD-UA-13
@@ -343,7 +329,6 @@ brd_to_deliver:
     ref: "UAM BRD NFR 16, NFR 40"
     frs: "FRUM.012.02; Annex M"
     fl: "UAM-026: Partial"
-    built: "Yes"
     scope: "A change of a sign-in, password, session or access setting applies only after the approval of Information Security (in the OOTB platform these settings apply at once)."
     effort: [0.5, 2.5, 1.5, 1.5, 0.5]
   - id: BRD-UA-14
@@ -352,7 +337,6 @@ brd_to_deliver:
     ref: "UAM BRD 3.002 (group profile requests); NFR 39 (notification for access changes)"
     frs: "FRUM.013; Annex T"
     fl: "UAM-027: Partial"
-    built: "Yes"
     scope: "In-system notices of the group-profile request steps (to approve, decided, to implement, implemented) and the notice Your access changed to the affected user. The notices of the user access request steps (BRD 1.006.1.1, 1.008.1.4, 2.002.1) are sent by UIDM-ISC (IS-UA-09): their effort is removed (was 4.5 man-days)."
     effort: [0.25, 0.5, 0.25, 0.25, 0.25]
   - id: BRD-UA-15
@@ -361,7 +345,6 @@ brd_to_deliver:
     ref: "UAM BRD 3.003, 4.003.1; samples A to D; NFR 10, NFR 41"
     frs: "FRUM.007; Annex V"
     fl: "UAM-029: Partial"
-    built: "Yes"
     scope: "User Access Report with an 'as of' date, group profile membership, Group Profile Access Report and the from / to User Access Audit Log in the BDOI layout with the header of the BRD."
     effort: [1, 4, 2, 2, 0.5]
   - id: BRD-UA-16
@@ -370,7 +353,6 @@ brd_to_deliver:
     ref: "UAM BRD NFR 15 (status online), NFR 35"
     frs: "FRUM.001.05; Annex V"
     fl: "UAM-004: Partial"
-    built: "Yes"
     scope: "The list of the users signed in (on-line status) with their sessions; end of a session by the System Administrator."
     effort: [0.25, 1, 1, 0.5, 0.25]
   - id: BRD-UA-17
@@ -379,7 +361,6 @@ brd_to_deliver:
     ref: "UAM BRD 1.001.1, 2.001.1, 3.001.1, 4.001.1"
     frs: "FRUM.001.01; Technical Specification"
     fl: "UAM-033: Partial"
-    built: "Partly (network and IP rules)"
     scope: "Access limited to BDO's network and devices: network zone and IP rules of the OOTB platform, plus the device check BDOI IT chooses."
     effort: [0.5, 2, 0.5, 1, 0.5]
 
@@ -389,7 +370,6 @@ brd_to_deliver:
     ref: "UAM BRD NFR 2.a-2.b (data validation of user and role data, b.1 prevents entry of incorrect data); Other BU NFR 2-3 (define roles and assign permission; permission management)"
     frs: "FRUM.006.03"
     fl: "UAM-018: Available (pairs of roles only)"
-    built: "Yes"
     scope: "Rules on pairs of permissions kept by the Business Administrator; check on every group profile change and access request; message naming the conflict; audit."
     effort: [0.5, 2, 1, 1, 0.25]
   - id: BRD-UA-19
@@ -398,7 +378,6 @@ brd_to_deliver:
     ref: "UAM BRD NFR 1.g (report can be exported); Other BU NFR 6 (audit log reports); report samples A to D"
     frs: "FRUM.007.02; Annex V"
     fl: "RPT-009: Not available"
-    built: "Yes"
     scope: "File names of the User Access reports and of the audit log export by BDOI's convention, as a setting; test of every export."
     effort: [0.25, 1, 0.25, 0.5, 0.25]
   - id: BRD-UA-22
@@ -407,7 +386,6 @@ brd_to_deliver:
     ref: "UAM BRD NFR 1.k (effective date for user and role changes)"
     frs: "FRUM.009.10; Annex Z"
     fl: "UAM-024: Not available"
-    built: "No"
     scope: "A request to remove a group profile with an effective date; the daily run of BRD-UA-11 removes the access on that date, with audit of each removal."
     effort: [0.5, 1.5, 0.5, 1, 0.25]
 

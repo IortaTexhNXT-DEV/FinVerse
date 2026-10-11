@@ -385,7 +385,11 @@ def page_size(model_sect, landscape: bool) -> tuple[float, float]:
 
 
 def is_wide(png: Path) -> bool:
+    """A wide screen gets a landscape page; the screens of BDOI["portrait_screens"] stay on a portrait page (scaled to
+    its width) where a landscape section would leave the end of the text before it alone on a page."""
     from PIL import Image  # noqa: PLC0415
+    if png.stem in (BDOI.get("portrait_screens") or []):
+        return False
     with Image.open(png) as im:
         w, h = im.size
     return w / h > 1.15
@@ -448,6 +452,68 @@ def figure_run(b, model_sect, figures: list[tuple[Path, str]], first_break: bool
             out.extend([pic, cap])
     close_group()
     return out
+
+
+def figure_with_intro(b, model_sect, intro: list, png: Path, caption: str) -> list:
+    """A screen section whose heading and introduction share the page of its screenshot: the picture is scaled to the
+    room left under the introduction, so that the introduction never ends alone on a page before the figure."""
+    import math  # noqa: PLC0415
+    from build_brd11_bdoi_frs import ppr_insert  # noqa: PLC0415
+    import brd_common_final as final  # noqa: PLC0415
+    wide = is_wide(png)
+    w, h = page_size(model_sect, wide)
+    used = 0.0
+    for k, el in enumerate(intro):
+        text = _text(el)
+        if k == 0:
+            used += 0.55
+        else:
+            used += 0.14 + 0.19 * max(1, math.ceil(len(text) * 0.078 / w))
+        ppr = el.find(qn("w:pPr"))
+        if ppr is None:
+            ppr = OxmlElement("w:pPr")
+            el.insert(0, ppr)
+        if ppr.find(qn("w:keepNext")) is None:
+            ppr_insert(ppr, OxmlElement("w:keepNext"))
+    pic = final.bordered(b.picture(png, max_w=w - 0.2, max_h=h - 0.9 - used - (0 if wide else 0.7)))
+    ppr = pic.find(qn("w:pPr"))
+    ppr_insert(ppr, OxmlElement("w:keepNext"))
+    ppr_insert(ppr, OxmlElement("w:keepLines"))
+    cap = b.para(caption, italic=True, size=8, jc="center", space_after=60, space_before=60)
+    b.stats["page_figures"] = b.stats.get("page_figures", 0) + 1
+    if wide:
+        return landscape_page(model_sect, intro + [pic, cap])
+    return intro + [pic, cap]   # kept together: on the page where the text before ends, or on the next
+
+
+def drop_breaks_after_sections(b) -> int:
+    """A paragraph that follows a section break (which already starts a new page) loses its own page break, so that no
+    blank page follows a landscape page."""
+    n = 0
+    for p in list(b.doc.element.body.iter(qn("w:p"))):
+        ppr = p.find(qn("w:pPr"))
+        if ppr is None or ppr.find(qn("w:sectPr")) is None or len(p.attrib):   # only the breaks this builder adds
+            continue
+        typ = ppr.find(f"{qn('w:sectPr')}/{qn('w:type')}")
+        if typ is not None and typ.get(qn("w:val")) in ("continuous", "evenPage", "oddPage"):
+            continue
+        nxt = p.getnext()
+        while nxt is not None and nxt.tag == qn("w:p") and not _text(nxt).strip() and \
+                nxt.find(f"{qn('w:pPr')}/{qn('w:sectPr')}") is None and not list(nxt.iter(qn("w:drawing"))):
+            nxt.getparent().remove(nxt)   # an empty paragraph at the top of the new section only pushes the text
+            n += 1
+            nxt = p.getnext()
+        if nxt is None or nxt.tag != qn("w:p"):
+            continue
+        for pbb in nxt.findall(f"{qn('w:pPr')}/{qn('w:pageBreakBefore')}"):
+            pbb.getparent().remove(pbb)
+            n += 1
+        for br in list(nxt.iter(qn("w:br"))):
+            if br.get(qn("w:type")) == "page":
+                br.getparent().remove(br)
+                n += 1
+                break
+    return n
 
 
 def user_access_report_annex(a):

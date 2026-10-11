@@ -13,7 +13,7 @@ how_to_read:
     - [green, "Green text", "Not in the BRD, and available out of the box in the iNXT BrokerVerse OOTB platform. No development needed; the Business Unit may keep or drop it.", "No cost; listed in Appendix W.3"]
     - [grey, "[Integration scope] / [Data Migration scope]", "Grey label on an interface with another system or on a data load at go-live: covered by the Integration scope or the Data Migration scope (BRD-13), not a change request.", "Listed in Appendix W.5"]
     - [blue, "Blue table", "Insurance-broking best practice for this area that is not in the BRD, this FRS or the OOTB platform: a recommendation with an indicative effort, not a commitment.", "Appendix W.6; not in the change request total"]
-    - [orange, "Orange text", "Not in the BRD and not available, or only partly available, in the iNXT BrokerVerse OOTB platform edition: a change request (CR-CSH-1nn), even where it was already delivered for BIBS in this project. It is delivered only if the Business Unit approves it.", "Effort in Appendix W.2 and the CR effort workbook"]
+    - [orange, "Orange text", "Not in the BRD and not available, or only partly available, in the iNXT BrokerVerse OOTB platform edition: a change request (CR-CSH-1nn). It is delivered only if the Business Unit approves it.", "Effort in Appendix W.2 and the CR effort workbook"]
   after: "In the end-to-end process flow (Figure 2, Appendix C) the change requests are tagged: yellow for a change request not in any BRD, blue for a change request that extends a BRD requirement, green for a point that is already a BRD requirement (the programme NFRs 10.07 and 4.03). The walkthroughs and screenshots use the BIBS DEV environment: https://dev.brokerverse.cloud."
 
 figures:
@@ -56,7 +56,6 @@ crs:
     brd: "Not in BRD"
     tag: NEW
     fl: "WFL-007 Partial (deadlines and escalation for claims, complaints, leads and collections; no general turnaround engine)"
-    built: "No: BIBS shows the records For Posting and For Approval with their age, without a time rule"
     source: "FRS v3.2 Appendix J (times proposed by iorta TechNXT; the BRD and BDOI's FRS set no time)"
     why: "Records waiting for posting or approval are visible on the dashboard but nothing marks them late; a time rule per stage with a marker and a reminder keeps receipts issued the same day."
     ootb: "Partial in BrokerVerse OOTB; the effort covers the missing part only: time rules, overdue marker and reminder for the Cashiering stages."
@@ -74,7 +73,6 @@ crs:
     brd: "Not in BRD"
     tag: NEW
     fl: "WFL-011 Available (e-mail notifications from templates); WFL-012 Partial. Disagreement: the Feature List says Available, the OOTB code has no per-user e-mail choice"
-    built: "Yes: the Notification Settings screen of BIBS gives this choice"
     source: "FRS v3.2 Appendix G (proposed, Appendix R)"
     why: "Team Leaders who post from branches want the notices also by e-mail; the choice per user and per notice avoids e-mail floods."
     ootb: "Partial in BrokerVerse OOTB; the effort is that of the missing part (per-user, per-notice e-mail choice)."

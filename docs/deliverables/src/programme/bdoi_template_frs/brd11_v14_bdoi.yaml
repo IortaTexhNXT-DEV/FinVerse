@@ -10,6 +10,8 @@
 #   FULL_PAGE=1 OUT_DIR=<this folder>/figures/brd11_screens node tools/screenshots/capture_pack.cjs brd11 <regex>
 # (tools/screenshots/packs/brd11.cjs, brd11_walkthrough.cjs and brd11_realistic.sql). One screenshot per figure.
 screens_dir: figures/brd11_screens
+# Wide screens kept on a portrait page (scaled to its width): the text before them ends just over a page.
+portrait_screens: [scr-ua-13-01-permission]
 screen_note: >-
   Each screen is shown by one full-page screenshot (the whole window with the page header and the menu of the
   persona), taken on the DEV environment with realistic, fictitious data, so that the reader can picture the screen

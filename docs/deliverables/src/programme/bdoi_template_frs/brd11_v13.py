@@ -268,9 +268,9 @@ class NewAnnexes:
         a.p("The User Access Maintenance entries of the menu of each persona (the sidebar shows an entry only when "
             "one of the user's active group profiles holds its permission). The figure is the one-page view for the "
             "review.")
-        a.els += figure_elements(self.b, self.figs, "brd11_fig_menus", self.nums, max_h=6.0)
         a.p("Screen standards: the layout, formats of dates and amounts, tables with row action menus and the "
             "common screen elements follow the programme screen standards; they are not repeated here.")
+        a.els += figure_elements(self.b, self.figs, "brd11_fig_menus", self.nums, max_h=4.3)
 
     # S
     def workflow(self):

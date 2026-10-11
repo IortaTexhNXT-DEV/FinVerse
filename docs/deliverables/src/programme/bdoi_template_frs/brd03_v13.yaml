@@ -29,7 +29,7 @@ how_to_read:
     - [green, "Green text", "Not in the BRD, and available out of the box in the iNXT BrokerVerse OOTB platform. No development needed; the Business Unit may keep or drop it.", "No cost; listed in Annex Y.3"]
     - [grey, "[Integration scope] / [Data Migration scope]", "Grey label on an interface with another system or on a data load at go-live: covered by the Integration scope or the Data Migration scope (BRD-13), not a change request.", "Listed in Annex Y.5"]
     - [blue, "Blue table", "Insurance-broking best practice for this area that is not in the BRD, this FRS or the OOTB platform: a recommendation with an indicative effort, not a commitment.", "Annex Y.6; not in the change request total"]
-    - [orange, "Orange text", "Not in the BRD and not available, or only partly available, in the iNXT BrokerVerse OOTB platform edition: a change request (CR-PM-1nn), even where it was already delivered for BIBS in this project. It is delivered only if the Business Unit approves it.", "Effort in Annex Y.2 and the CR effort workbook"]
+    - [orange, "Orange text", "Not in the BRD and not available, or only partly available, in the iNXT BrokerVerse OOTB platform edition: a change request (CR-PM-1nn). It is delivered only if the Business Unit approves it.", "Effort in Annex Y.2 and the CR effort workbook"]
   after: "In the end-to-end process flow (Figure 2) the change requests are tagged: yellow for a change request not in any BRD, blue for a change request that extends a BRD requirement, green for a point that is already a BRD requirement (for example the programme NFRs 10.07 and 4.03). The walkthroughs of Annex K and the screenshots of Annex G use the BIBS DEV environment: https://dev.brokerverse.cloud."
 
 figures:
@@ -77,7 +77,6 @@ crs:
     brd: "Not in BRD"
     tag: NEW
     fl: "NFR-021 Partial (contrast checked to WCAG AA in the theme; no accessibility statement or full WCAG audit)"
-    built: "Partly: the screens prepared for BIBS use the platform components; about 8 of 35 screen files carry accessibility labels"
     source: "Programme register of non-functional requirements (NFR-ACC-01, NFR-ACC-02), proposed in FRS v1.2 Annex T"
     why: "No BDOI BRD asks for an accessibility level; the programme register proposes WCAG 2.2 AA so that keyboard and screen-reader users can work in the module."
     ootb: "Partial in BrokerVerse OOTB; the effort covers the missing part only: the WCAG 2.2 AA check and fixes of the module screens."
@@ -86,7 +85,7 @@ crs:
     priority: Low
     deps: "BDOI's decision on the accessibility level (Annex V, PQ18)"
     assumptions: "Check and fixes on the 35 Product Maintenance screen files (about 3,800 lines) and the product master screens; no redesign."
-    basis: "Product Maintenance screens of BIBS: 35 files, about 3,800 lines."
+    basis: "Product Maintenance screens: 35 screen files, about 3,800 lines."
 
 # BDOI FRS points first proposed as change requests and found to be covered, fully or partly, by a BRD line:
 # BRD requirements (black, in scope); their gap against the OOTB platform is delivery work, with planning effort.
@@ -103,7 +102,7 @@ brd_deliver:
   brd: 'BRPM.015: ''a ManCom review and signoff workflow with audit logging''; BRPM.022: ''Notification and integration for seamless data flow'''
   frs: FRPM.014.01; Annex P NT-13, NT-14
   fl: PRD-021 Not available (no committee step or hand-off)
-  gap: Not available in BrokerVerse OOTB. The effort is for the two BDOI texts on top of the routing already delivered for BIBS.
+  gap: Not available in BrokerVerse OOTB. The effort is for the routing and the two BDOI texts.
   md: 2.5
 - id: D-PM-03
   title: '''Due soon'' marker at 80% of the stage service level'

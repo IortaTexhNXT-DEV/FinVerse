@@ -952,6 +952,7 @@ class Annexes:
                 k += 1
                 self.screen_titles[s["id"]] = clean(s["title"])
                 self.b.round13 = s["id"] in SCREENS_V13
+                start = len(self.els)
                 self.h2(f"J.{k} {clean(s['title'])} ({s['id']})")
                 self.p("Purpose: " + self.refs(" ".join(str(s["purpose"]).split())))
                 if s.get("entry"):
@@ -961,7 +962,10 @@ class Annexes:
                     self.p("Requirements: " + frum)
                 fig = v14.BDOI["screens"].get(s["id"])
                 if fig:
-                    self.els.extend(v14.figure_run(self.b, model, [(v14.shot(fig[0]), f"Figure J.{k}: {fig[1]}")]))
+                    intro = self.els[start:]
+                    del self.els[start:]
+                    self.els.extend(v14.figure_with_intro(self.b, model, intro, v14.shot(fig[0]),
+                                                          f"Figure J.{k}: {fig[1]}"))
                     self.b.stats["screenshots"] += 1
                 rows = []
                 for line in s.get("fields", []):
@@ -1186,10 +1190,14 @@ class Annexes:
             total += len(rows)
             self.table(["Step", "Persona", "Screen", "What the user does", "What the user sees", "Result"], rows,
                        [0.6, 0.95, 1.15, 1.95, 1.75, 1.0], size=7.5)
-            if w.get("downstream"):
+            last = w is data[-1]
+            if w.get("downstream") and last:
                 self.p("Afterwards:", bold=True, keep_next=True)
                 self.bullets(w["downstream"])
             self.els.extend(v14.figure_run(self.b, model, figs))
+            if w.get("downstream") and not last:   # flows on with the next walkthrough, never alone on a page
+                self.p("Afterwards:", bold=True, keep_next=True)
+                self.bullets(w["downstream"])
         self.b.stats["walk_steps"] = total
 
     # Annex P - traceability
@@ -1237,7 +1245,7 @@ class Annexes:
     # Annex Q - observations
     def observations(self):
         cmp_data = yaml.safe_load(CMP.read_text(encoding="utf-8"))
-        self.h1("Annex Q – Observations and Points for BDOI Decision")
+        self.h1("Annex Q – Observations and Points for BDOI Decision", page=False)  # follows the short end of P
         self.p("Every point where the proposed behaviour differs from the original text of this FRS, the slips noticed "
                "in BDOI's text, the changes made to the Business Requirements Mapping, the rows added to BDOI's annexes "
                "and the other observations of this version. BDOI's text is kept in the body of the document; this annex "
@@ -1656,6 +1664,9 @@ def build(highlight: bool, our, lines, trace, nfr, figs: dict) -> Builder:
     if highlight:
         change_summary(b)
     b.stats.update(v14.bdoi_view(b, BDOI_TEXTS))
+    import bdoi_view  # noqa: PLC0415  (the shared phrases of the BDOI view of all four packs)
+    b.stats.update(bdoi_view.apply_docx(b.doc, BDOI_TEXTS))
+    b.stats["breaks_after_sections"] = v14.drop_breaks_after_sections(b)
     fr_blocks = OrderedDict()
     for row in b.tables[4].rows[1:]:
         fr_blocks.update(subitem_blocks(row.cells[3]._tc))

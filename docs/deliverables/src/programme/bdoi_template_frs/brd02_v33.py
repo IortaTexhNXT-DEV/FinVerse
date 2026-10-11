@@ -202,9 +202,7 @@ def appendix_w(a) -> None:
             "Cashiering scope and the non-functional table) and with the programme NFRs of the BDOI addenda.",
             "A point not in the BRD was looked up in the programme Feature List (column 'OOTB platform': the iNXT "
             "BrokerVerse OOTB platform edition): Available or OOTB extra = green; Partial, Not available, BDOI-specific "
-            "or not listed = orange (change request), with the effort of the missing part only for a Partial feature. "
-            "A point already delivered for BIBS in this project is still classified by the OOTB platform; the effort "
-            "workbook says so in a separate column.",
+            "or not listed = orange (change request), with the effort of the missing part only for a Partial feature.",
             "Effort is in man-days of 8 hours, estimated from the size of the platform components each change touches, "
             "with a range of plus or minus 20%; the detail, the assumptions and the cost (rate cell) are in the "
             "workbook BIBS_CR_BRD-02_Effort_Estimate_v1.0.xlsx. The change requests are also in the change request "

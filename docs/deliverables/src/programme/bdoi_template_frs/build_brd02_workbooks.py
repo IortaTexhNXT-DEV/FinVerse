@@ -631,8 +631,7 @@ def build_fitgap(data: Data) -> tuple[Path, dict]:
         Column("best", "Insurance-broking best practice", 46, "Practice of the Philippine market and international broking"),
         Column("fit", "Fit", 18, "Fit class", values=fv, status=True),
         Column("rec", "Recommendation", 40, "What to do"),
-        Column("impact", "Impact", 22, "Where it lands"),
-        Column("env", "In the BIBS environment", 20, "Available / Partly available / Planned for")],
+        Column("impact", "Impact", 22, "Where it lands")],
         rows, description="One row per BRD requirement")
     path = wb.save(FOLDER / "BIBS_FitGap_BRD-02_BRD_vs_OOTB_vs_Best_Practice_v1.0.xlsx")
     if not set(data.ids) <= {r["id"] for r in rows}:
@@ -1031,23 +1030,23 @@ def write_estimate(wb, data: dict, version: str, frs_annex: str, scope_rows: lis
     One man-day = 8 hours; range plus or minus 20%; cost = man-days x the day rate cell of Assumptions."""
     crs = data["crs"]
     first, last = 5, 5 + len(crs) - 1
-    act_cols = ["M", "N", "O", "P", "Q"]
+    act_cols = ["L", "M", "N", "O", "P"]
     rows = []
     for i, c in enumerate(crs):
         r = first + i
         row = {"no": c["cr"], "title": c["title"], "frs": c["frs"], "brd": c["brd"],
                "kind": "Extends a BRD requirement" if c["tag"] == "EXT" else "Not in any BRD", "source": c["source"],
-               "why": c["why"], "fl": c["fl"], "ev": c["ev"], "built": c["built"], "ootb": c["ootb"],
+               "why": c["why"], "fl": c["fl"], "ev": c["ev"], "ootb": c["ootb"],
                "basis": c["basis"]}
         row.update({k: v for (k, _), v in zip(EST_ACT, c["md"])})
-        row.update({"total": f"=SUM(M{r}:Q{r})", "low": f"=ROUND(R{r}*(1-Assumptions!$B$6),1)",
-                    "high": f"=ROUND(R{r}*(1+Assumptions!$B$6),1)", "cost": f"=R{r}*Assumptions!$B$7",
+        row.update({"total": f"=SUM(L{r}:P{r})", "low": f"=ROUND(Q{r}*(1-Assumptions!$B$6),1)",
+                    "high": f"=ROUND(Q{r}*(1+Assumptions!$B$6),1)", "cost": f"=Q{r}*Assumptions!$B$7",
                     "cx": c["complexity"], "prio": c["priority"], "deps": c["deps"], "ass": c["assumptions"]})
         rows.append(row)
     total = {"no": "Total", "title": f"{len(crs)} change requests"}
     total.update({k: f"=SUM({col}{first}:{col}{last})" for (k, _), col in zip(EST_ACT, act_cols)})
-    total.update({"total": f"=SUM(R{first}:R{last})", "low": f"=SUM(S{first}:S{last})",
-                  "high": f"=SUM(T{first}:T{last})", "cost": f"=SUM(U{first}:U{last})"})
+    total.update({"total": f"=SUM(Q{first}:Q{last})", "low": f"=SUM(R{first}:R{last})",
+                  "high": f"=SUM(S{first}:S{last})", "cost": f"=SUM(T{first}:T{last})"})
     rows.append(total)
     num = dict(kind="number", wrap=False)
     cols = [Column("no", "CR No.", 12, f"Change request (FRS {frs_annex}.2 and the CR register)"),
@@ -1060,8 +1059,6 @@ def write_estimate(wb, data: dict, version: str, frs_annex: str, scope_rows: lis
             Column("why", "Why needed", 38, "Business reason"),
             Column("fl", "Feature List ID / OOTB status", 34, "Programme Feature List, column OOTB platform"),
             Column("ev", "OOTB evidence", 34, "Screen or function of brokerverse-platform, or 'not found'"),
-            Column("built", "Prepared for BIBS?", 26, "Yes / No / Partly, with what was done for BIBS in this project "
-                                                   "(the effort is given anyway: the value of the change request)"),
             Column("ootb", "Effort covers", 34, "For a Partial feature: the missing part only"),
             Column("basis", "Estimate basis", 28, "Size of the platform parts the change touches")]
     cols += [Column(k, f"{h} (md)", 10, "Man-days", **num) for k, h in EST_ACT]
@@ -1082,10 +1079,10 @@ def write_estimate(wb, data: dict, version: str, frs_annex: str, scope_rows: lis
                {"k": "Change requests (orange)", "v": len(crs)}]
     summary += [{"k": f"Man-days: {h}", "v": f"=SUM({ref}{col}{first}:{col}{last})"}
                 for (_, h), col in zip(EST_ACT, act_cols)]
-    summary += [{"k": "Total change request man-days", "v": f"=SUM({ref}R{first}:R{last})"},
-                {"k": "Range low (-20%)", "v": f"=SUM({ref}S{first}:S{last})"},
-                {"k": "Range high (+20%)", "v": f"=SUM({ref}T{first}:T{last})"},
-                {"k": "Cost in PHP at the day rate of the Assumptions sheet", "v": f"=SUM({ref}U{first}:U{last})"},
+    summary += [{"k": "Total change request man-days", "v": f"=SUM({ref}Q{first}:Q{last})"},
+                {"k": "Range low (-20%)", "v": f"=SUM({ref}R{first}:R{last})"},
+                {"k": "Range high (+20%)", "v": f"=SUM({ref}S{first}:S{last})"},
+                {"k": "Cost in PHP at the day rate of the Assumptions sheet", "v": f"=SUM({ref}T{first}:T{last})"},
                 {"k": "Items covered by the Integration or Data Migration scope (no CR cost)", "v": len(scope_rows)},
                 {"k": "Best-practice recommendations (blue; indicative, not in the CR total)",
                  "v": len(data["best_practice"])},
@@ -1190,6 +1187,8 @@ def build_estimate(data: Data) -> tuple[Path, dict]:
 
 
 def main() -> int:
+    import bdoi_view  # noqa: PLC0415
+    bdoi_view.patch_workbooks()   # no description of the BIBS build in the workbooks
     data = Data()
     FOLDER.mkdir(parents=True, exist_ok=True)
     for name, fn in (("requirements", build_requirements), ("fitgap", build_fitgap), ("cr", build_cr),

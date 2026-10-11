@@ -203,7 +203,7 @@ def add_summary(b, figs):
     els = [h2(intro["references_title"]), body(intro["references_intro"]),
            b.table(["Document", "Owner", "Use in this FRS"], intro["references"], [3.6, 1.5, 2.3], size=8),
            b.para("")]
-    els += [h2("Summary for the Business Unit Review", page=True), body(s["intro"])]
+    els += [h2("Summary for the Business Unit Review", page=False), body(s["intro"])]
     els += [sub("Scope on a page"), b.table(s["scope_header"], s["scope"], [2.7, 2.2, 2.5], size=8), b.para("")]
     els += [sub("The process from end to end")] + figure_elements(b, figs, "brd06_fig_e2e", max_h=8.0)
     els += [sub("Key numbers"), body(s["numbers_intro"]),

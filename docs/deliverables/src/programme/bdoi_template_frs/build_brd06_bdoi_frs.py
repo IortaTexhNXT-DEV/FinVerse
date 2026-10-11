@@ -352,7 +352,7 @@ def edit_introduction(b: Builder):
         els = [title, b.clone_par(body, " ".join(lg["intro"].split()))]
         for el in els:
             keep_with_next(el)
-        n = b.new_num()
+        n = b.new_bullets()
         for key in ("green", "orange"):
             q = keep_with_next(b.para("", style="ListParagraph", num=(n, 0)))
             head, rest = lg[key].split(":", 1)
@@ -614,7 +614,7 @@ class Annexes:
         self.els.append(self.b.para(text, **kw))
 
     def bullets(self, texts):
-        n = self.b.new_num()
+        n = self.b.new_bullets()
         for t in texts:
             self.els.append(self.b.para(t, style="ListParagraph", num=(n, 0)))
 

@@ -1009,8 +1009,16 @@ def apply_scope_colours(b: Builder):
                 block = b.bdoi_blocks.get(g["frrn"])
                 if not block:
                     raise SystemExit(f"colour code: {g['frrn']} not found")
-                for el in block:
-                    colour_runs(el, col[kind])
+                if g.get("text"):   # only the paragraphs of the part beyond the BRD (the rest of the item is BRD)
+                    hits = [p for el in block for p in ([el] if el.tag == qn("w:p") else el.iter(qn("w:p")))
+                            if any(t in el_text_all(p) for t in g["text"])]
+                    if len(hits) < len(g["text"]):
+                        raise SystemExit(f"colour code: text of {g['id']} not found in {g['frrn']}")
+                    for p in hits:
+                        colour_runs(p, col[kind])
+                else:
+                    for el in block:
+                        colour_runs(el, col[kind])
             if g.get("match"):
                 hit = [tr for tr in trs if g["match"] in el_text_all(tr) and tr.find(".//" + qn("w:tr")) is None]
                 if not hit:
@@ -1075,12 +1083,12 @@ def add_annexes(b: Builder, a: Annexes, review, figs):
 
 CHANGE_POINTS = [
     "Cover: version 1.2; Document Revision Log: row 1.2. BDOI's text and the content of version 1.1 are unchanged.",
-    "Introduction: \"How to read this document\" - black for the BRD; green for BDOI's points offered by the iNXT BrokerVerse platform out of the box ({green} points); orange for change requests ({orange}); grey labels for the Integration and Data Migration scopes ({integration} points); blue for best-practice recommendations.",
+    "Introduction: \"How to read this document\" - black for the BRD; green for BDOI's points offered by the iNXT BrokerVerse platform out of the box ({green} points); orange for change requests, only for points in no BRD ({orange}); grey labels for the Integration and Data Migration scopes ({integration} points); blue for best-practice recommendations.",
     "Functional Requirements: BDOI's text of the {green_items} items beyond the BRD coloured or labelled where it is stated.",
     "Annex AA and AL: the environment of the screenshots and walkthroughs (BIBS DEV environment); figure captions kept on the page of their figure.",
     "Annex AJ: RN-NFR-17 (one session per device) and RN-NFR-18 (source of the audit entries), requirements of other BRDs of the programme that also apply to Renewal; the accessibility row coloured orange and the CCM row labelled Integration scope.",
     "Annex AM.4: the {concept_paper} points of the signed Concept Paper traced to this FRS.",
-    "Annex AP.1: the points beyond the BRD - out of the box, change requests with their effort ({cr_mandays:.1f} man-days; CR Effort Estimate workbook) and the Integration scope; Annex AP.2: best-practice recommendations ({bp} with indicative effort).",
+    "Annex AP.1: the points beyond the BRD - out of the box, change requests with their effort ({cr_mandays:.1f} man-days; CR Effort Estimate workbook), the BRD requirements that were first listed as change requests and are BRD items to deliver ({brd_items} items, {brd_mandays:.1f} man-days of planning effort, black) and the Integration scope; Annex AP.2: best-practice recommendations ({bp} with indicative effort).",
 ]
 
 

@@ -473,7 +473,8 @@ class NewAnnexes:
                 "they are stated (see How to read this document). Out of the box means the iNXT BrokerVerse platform "
                 "edition: its code and manual, cross-checked with the Feature List vs OOTB and Best Practice workbook "
                 "(column OOTB platform); the work prepared for BIBS in this project is not out of the box. Green points "
-                "are offered by the platform and cost nothing. Orange points are not in the platform, or only in part: "
+                "are offered by the platform and cost nothing. Orange points are in no BRD (only the part no BRD line "
+                "covers) and not in the platform, or only in part: "
                 "each is a change request whose effort (for the missing part) is in the CR Effort Estimate workbook "
                 "(one man-day = 8 hours, estimate within plus or minus 20 percent), also where the point is already "
                 "prepared for BIBS. Interfaces with external systems are delivered in the Integration scope and are "
@@ -503,6 +504,24 @@ class NewAnnexes:
                 f"{'s' if len(rows) != 1 else ''}). The requirements of other BRDs of the programme that also apply "
                 "to Renewal (Annex AJ, RN-NFR-17 and RN-NFR-18) are BRD requirements and are not change requests of "
                 "Renewal.", size=9)
+            a.p("Black - BRD requirements to deliver (first listed as change requests; not change requests)", bold=True,
+                keep_next=True)
+            a.p("These points are in the BRD: fully, or as a BRD line that BDOI's FRS elaborates (the FRS defines the "
+                "metrics of a dashboard the BRD asks for, automates a step the BRD names, or adds the rule of a value the "
+                "BRD lists). They are black, in scope, and their gap against the iNXT BrokerVerse platform edition is "
+                "delivery work, planned in the sheet BRD items to deliver of the CR Effort Estimate workbook. Where only "
+                "a part of a point is beyond the BRD, that part alone stays orange above.", size=9)
+            rows, btotal = [], 0.0
+            for d in V12.get("brd_deliver") or []:
+                md = sum(d["effort"])
+                btotal += md
+                rows.append([d["id"], d["frs"], d["title"], d["quote"], " ".join(d["ootb"].split()), f"{md:.1f}"])
+            a.table(["Former CR No.", "FRS reference", "Point", "BRD line (quoted)", "Gap against the platform edition",
+                     "Man-days"], rows, [0.9, 0.9, 1.6, 3.0, 2.5, 0.6], size=7.5)
+            a.p(f"Total planning effort of these BRD items: {btotal:.1f} man-days ({len(rows)} items); not in the change "
+                "request total.", size=9)
+            b.stats["brd_items"] = len(rows)
+            b.stats["brd_mandays"] = btotal
             lab = V12["labels"]
             a.p("Grey - covered by the Integration and Data Migration scopes (not change requests)", bold=True,
                 keep_next=True, color=lab["colour"])

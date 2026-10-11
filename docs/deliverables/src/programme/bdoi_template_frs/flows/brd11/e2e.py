@@ -10,20 +10,24 @@ def tag(t):
 
 # Change requests: in no BRD and not (or only partly) in the iNXT BrokerVerse OOTB platform (orange in the FRS)
 CR = [("CR-UA-003", "Break-glass administrators"), ("CR-UA-007", "Supervisory / record-ownership access"),
-      ("CR-UA-008", "No conflicting permissions in a role"), ("CR-UA-009", "Export file names"),
-      ("CR-UA-011", "Approval times, reminders, escalation"), ("CR-UA-013", "E-mail copy of notices"),
-      ("CR-UA-014", "Temporary access with an end date"), ("CR-UA-016", "Emergency role edit")]
+      ("CR-UA-011", "Approval time limits and reminders"), ("CR-UA-014", "End date on the grant (temporary access)"),
+      ("CR-UA-016", "Emergency role edit")]
 # Beyond the BRD, offered by the iNXT BrokerVerse OOTB platform (green in the FRS): no change request, no cost
 OOTB = [("OB-UA-01", "Separation-of-duties rules (was CR-UA-001)"), ("OB-UA-02", "Dormant users (was CR-UA-002)"),
         ("OB-UA-03", "Second factor of local accounts"), ("OB-UA-04", "Settings without a release"),
-        ("OB-UA-05", "Access review, report schedules (was CR-UA-012)")]
+        ("OB-UA-05", "Access review, schedules (was CR-UA-012)")]
 # Integration and data migration scope (grey label in the FRS): not change requests
 INT = [("IS-UA-01", "UIDM-ISC synchronisation (was CR-UA-005)"), ("IS-UA-02", "Revoke on SSO status (was CR-UA-006)"),
        ("IS-UA-03", "Sign-in through Entra ID / EIAM"), ("IS-UA-05", "EIAM / UIDM-ISC simulator (SIT, UAT)"),
        ("DM-UA-01", "Users and group profiles at go-live (BRD-13)")]
-BRD = [("BRD 1.001.1.3", "Session-end warning (30 min), UAM BRD; was CR-UA-004"),
-       ("NFR 4.03", "Source / IP address in audit log, CLM, CLXN, RI addenda; was CR-UA-010"),
-       ("NFR 10.07", "One session per device, CLXN addendum; was CR-UA-015")]
+BRD = [("BRD 1.001.1.3", "Session-end warning; was CR-UA-004"),
+       ("NFR 4.03", "Source IP in audit log; was CR-UA-010"),
+       ("NFR 10.07", "One session per device; was CR-UA-015"),
+       ("BRD-UA-18", "No conflicting permissions; was CR-UA-008"),
+       ("BRD-UA-19", "Export file names; was CR-UA-009"),
+       ("BRD-UA-20", "E-mail copy of notices; was CR-UA-013"),
+       ("BRD-UA-21", "Pending-request monitoring (CR-UA-011 part)"),
+       ("BRD-UA-22", "Removal on effective date (CR-UA-014 part)")]
 
 
 def grp(title, rows, kind, cols):
@@ -35,7 +39,7 @@ def grp(title, rows, kind, cols):
 FOOT = f'''<div style="display:flex;gap:10px;font-size:11.5px;color:#1f2937">
 <div style="flex:1;border:1.5px solid #F9A825;border-radius:7px;padding:5px 9px;background:#FFFDF3">
 <div style="display:flex;gap:14px"><div style="flex:1">{grp("Change requests &#8211; in no BRD, for decision by BDOI (effort in the CR Effort Estimate)", CR, "", 2)}</div>
-<div style="flex:1">{grp("Already BRD requirements &#8211; not change requests", BRD, "BRD:", 1)}</div></div>
+<div style="flex:1">{grp("In the BRD &#8211; BRD items to deliver, not change requests", BRD, "BRD:", 2)}</div></div>
 <div style="display:flex;gap:14px"><div style="flex:1">{grp("Beyond the BRD, offered by iNXT BrokerVerse OOTB &#8211; no cost", OOTB, "OOTB:", 2)}</div>
 <div style="flex:1">{grp("Integration / Data Migration scope &#8211; not change requests", INT, "INT:", 2)}</div></div></div>
 <div style="width:300px;border:1.5px solid #c5ccd6;border-radius:7px;padding:6px 9px;line-height:1.55">
@@ -73,14 +77,14 @@ SPEC = dict(
             "Create / change / deactivate / reactivate user with the UIDM no.", "Leaver or SSO inactive: deactivate, end sessions",
             "Refused event queued and alerted; Synchronise Now"], ["INT:IS-UA-01", "INT:IS-UA-02"]),
         ("BG", 4, 0, .04, .66, .92, "sys", "Break-glass sign-in", ["Two named admins, local password + second factor; alert"], ["CR-UA-003"]),
-        ("BV", 4, 1, .04, .04, .92, "sys", "Checks on submit", ["Mandatory fields, profile state", "Separation-of-duties rules", "No conflicting permissions in a role"], ["OOTB:OB-UA-01", "CR-UA-008"]),
+        ("BV", 4, 1, .04, .04, .92, "sys", "Checks on submit", ["Mandatory fields, profile state", "Separation-of-duties rules", "No conflicting permissions in a role"], ["OOTB:OB-UA-01", "BRD:BRD-UA-18"]),
         ("BS", 4, 1, .04, .55, .92, "sys", "Session and data access", ["Menus of the group profile", "Time-out and session-end warning", "Own / supervised records"], ["BRD:BRD 1.001.1.3", "BRD:NFR 10.07", "CR-UA-007"]),
-        ("BT", 4, 2, .06, .55, .88, "sys", "Time rules", ["2 working days per stage", "Reminder, then escalation to the Business Administrator"], ["CR-UA-011"]),
+        ("BT", 4, 2, .06, .55, .88, "sys", "Time rules", ["2 working days per stage", "Reminder, then escalation to the Business Administrator"], ["CR-UA-011", "BRD:BRD-UA-21"]),
         ("BI", 4, 3, .03, .04, .55, "sys", "Implement", ["On the effective date", "Group profiles, permissions", "Access-change log, before / after"]),
-        ("BD", 4, 3, .03, .62, .94, "sys", "Daily runs", ["Dormant 90 days: deactivate (notice 7 days before)", "Temporary access removed at end date"], ["OOTB:OB-UA-02", "CR-UA-014"]),
-        ("BN", 4, 4, .06, .1, .88, "ntf", "Notices", ["In BIBS: to approve, returned, decided, implemented", "E-mail copy by preference"], ["CR-UA-013"]),
+        ("BD", 4, 3, .03, .62, .94, "sys", "Daily runs", ["Dormant 90 days: deactivate (notice 7 days before)", "Temporary access removed at end date"], ["OOTB:OB-UA-02", "CR-UA-014", "BRD:BRD-UA-22"]),
+        ("BN", 4, 4, .06, .1, .88, "ntf", "Notices", ["In BIBS: to approve, returned, decided, implemented", "E-mail copy by preference"], ["BRD:BRD-UA-20"]),
         ("AL", 5, 4, .06, .1, .88, "aud", "User Access Audit Log", ["Every action, before / after", "IP address and role"], ["BRD:NFR 4.03"]),
-        ("AR", 5, 5, .04, .1, .92, "aud", "Reports", ["User Access Report, Matrix, group profiles; export", "Monthly review to Information Security"], ["CR-UA-009", "OOTB:OB-UA-05"]),
+        ("AR", 5, 5, .04, .1, .92, "aud", "Reports", ["User Access Report, Matrix, group profiles; export", "Monthly review to Information Security"], ["BRD:BRD-UA-19", "OOTB:OB-UA-05"]),
     ],
     edges=[
         ["U1", "B0", "i", "", "down"], ["E1", "R1", "i", "", "down"],

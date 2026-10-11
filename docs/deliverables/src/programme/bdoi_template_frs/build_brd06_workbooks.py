@@ -46,6 +46,7 @@ from brd11_xlsx import Column, ReviewWorkbook  # noqa: E402
 V12 = frs.V12
 GREEN_OF = {g["cr"]: g for g in V12["green"]}
 ORANGE_OF = {o["id"]: o for o in V12["orange"]}
+BRD_OF = {d["id"]: d for d in V12.get("brd_deliver") or []}
 INTEG_OF = {x["id"]: x for x in V12["integration"] + (V12.get("data_migration") or [])}
 FEATURE_XLSX = frs.REPO / "docs" / "deliverables" / "out" / "Programme" / "Feature_List" / "BIBS_BDOI_FeatureList_vs_OOTB_and_Best_Practice_v1.0.xlsx"
 ACTIVITIES = ["Analysis and design", "Back end", "Front end", "Testing", "Documentation and UAT support"]
@@ -541,10 +542,25 @@ def build_cr(data: Data):
     rows = []
     for k, c in enumerate(WB["cr_candidates"], 1):
         no = f"CR-RN-{k:03d}"
-        g = GREEN_OF.get(no) or ORANGE_OF.get(no) or INTEG_OF.get(no)
+        g = GREEN_OF.get(no) or ORANGE_OF.get(no) or INTEG_OF.get(no) or BRD_OF.get(no)
         if g is None or g["frrn"] != c[0]:
             raise SystemExit(f"{no}: not in brd06_v12.yaml")
         orange = no in ORANGE_OF
+        if no in BRD_OF:
+            md = sum(g["effort"])
+            rows.append({"no": no, "date": "09-Oct-2026", "by": "iorta TechNXT Project Team", "brd": g["brd"], "frs": c[0],
+                         "desc": f"{c[2]}: {c[3]}", "reason": "In the BRD: " + g["quote"], "type": c[5],
+                         "scope": "In scope (BRD)", "schedule": "Delivery plan",
+                         "cost": f"Not a CR - BRD item to deliver ({md:.1f} man-days, planning)", "other": c[9],
+                         "tests": c[10], "priority": c[11], "feature": f"{g['feature']}: {g['ootb_status']}",
+                         "colour": "Black (in the BRD)", "status": "Closed",
+                         "decision": "Closed as a change request: BRD requirement, delivered in scope (sheet BRD items "
+                                     "to deliver of the CR Effort Estimate)", "approved": "", "ddate": "11-Oct-2026",
+                         "drop": "", "linked": ", ".join(data.cases_of_item(c[0])[:5])})
+            continue
+        if orange and g.get("verdict") == "PARTLY":
+            c = list(c)
+            c[3] = " ".join(g["title"].split())
         if no in INTEG_OF:
             rows.append({"no": no, "date": "09-Oct-2026", "by": "iorta TechNXT Project Team", "brd": c[1], "frs": c[0],
                          "desc": f"{c[2]}: {c[3]}", "reason": c[4], "type": "Integration", "scope": g["interface"],
@@ -742,6 +758,9 @@ def scope_of(item: str) -> str:
     for x in V12["integration"] + (V12.get("data_migration") or []):
         if x.get("frrn") == item:
             return f"Beyond BRD - {x['scope']} ({x['id']})"
+    for d in V12.get("brd_deliver") or []:
+        if d.get("frrn") == item:
+            return f"BRD - item to deliver (was {d['id']}; {sum(d['effort']):.1f} man-days planning)"
     return "BRD"
 
 
@@ -803,6 +822,8 @@ def build_effort(data: Data):  # noqa: ARG001
              {"item": "Green points (beyond the BRD, out of the box, no cost)", "value": len(V12["green"])},
              {"item": "Integration and Data Migration scope (not change requests)",
               "value": len(V12["integration"]) + len(V12.get("data_migration") or [])},
+             {"item": "BRD items to deliver that were CR candidates (in the BRD; planning man-days, not in the CR total)",
+              "value": sum(sum(d["effort"]) for d in V12.get("brd_deliver") or [])},
              {"item": "Best practice (blue), indicative man-days - not in the totals",
               "value": sum(x["effort"] for x in V12["best_practice"])}]
     ws = wb.sheet("Summary", [Column("item", "Item", 56, ""), Column("value", "Value", 18, "", kind="percent")], summ,
@@ -835,12 +856,19 @@ def build_effort(data: Data):  # noqa: ARG001
         Column("priority", "Suggested priority", 12, "", values=["High", "Medium", "Low"]),
         Column("effort", "Indicative man-days", 12, "Excluded from the CR totals", kind="percent")], bp,
         description="Insurance-broking renewal practices not in the BRD, the FRS or the platform (Annex AP.2); recommendations")
-    deliver = brd_items_to_deliver()
+    moved = [{"id": d["id"], "feature": " ".join(d["title"].split()), "refs": f"{d['brd']} | {d['frs']}",
+              "quote": d["quote"], "ootb": f"{d['feature']}: {d['ootb_status']}", "note": " ".join(d["ootb"].split()),
+              "assessment": f"{d['verdict']} - was a CR candidate", "mandays": sum(d["effort"])}
+             for d in V12.get("brd_deliver") or []]
+    deliver = moved + [dict(x, quote="-", mandays=None) for x in brd_items_to_deliver()]
     wb.sheet("BRD items to deliver", [
-        Column("id", "Feature List ID", 12, ""), Column("feature", "Feature (BRD requirement)", 50, ""),
-        Column("refs", "BRD and FRS references", 40, ""), Column("ootb", "OOTB platform", 14, ""),
-        Column("note", "What the platform offers", 50, ""), Column("assessment", "Assessment", 14, "")], deliver,
-        description="BRD requirements not fully in the platform edition: in-scope delivery work for planning, not change requests")
+        Column("id", "ID (former CR / Feature List)", 16, ""), Column("feature", "Feature (BRD requirement)", 50, ""),
+        Column("refs", "BRD and FRS references", 40, ""), Column("quote", "BRD line (quoted)", 60, ""),
+        Column("ootb", "OOTB platform", 14, ""),
+        Column("note", "What the platform offers / gap", 50, ""), Column("assessment", "Assessment", 18, ""),
+        Column("mandays", "Planning man-days", 12, "Delivery effort of the gap (not a change request)", kind="percent")],
+        deliver, description="BRD requirements not fully in the platform edition: in-scope delivery work for planning, "
+                             "not change requests; the first rows were CR candidates and are in the BRD")
     assum = [{"item": "Hours per man-day", "value": 8},
              {"item": "Daily rate (fill in, currency of the contract) - name DayRate", "value": 0},
              {"item": "Estimate accuracy (plus or minus) - name Accuracy", "value": 0.2},

@@ -33,13 +33,15 @@ legend:
   intro: 'The colour of a point tells where it comes from and whether it costs a change:'
   items:
   - - black
-    - 'Black: in the Renewal BRD (or the signed Concept Paper, or a programme-wide requirement of another BRD); in scope.'
+    - 'Black: in the Renewal BRD (or the signed Concept Paper, or a programme-wide requirement of another BRD), also where
+      BDOI''s FRS elaborates a BRD line; in scope. A gap against the platform is a BRD item to deliver (Annex AP.1), not a
+      change request.'
   - - green
     - 'Green: not in the BRD, from BDOI''s FRS; offered by the iNXT BrokerVerse platform out of the box, at no cost (Annex
       AP.1).'
   - - orange
-    - 'Orange: not in the BRD and not (or only partly) in the iNXT BrokerVerse platform; a change request with its effort
-      (Annex AP.1; CR Effort Estimate workbook).'
+    - 'Orange: in no BRD line at all and not (or only partly) in the iNXT BrokerVerse platform; a change request with its
+      effort for that part only (Annex AP.1; CR Effort Estimate workbook).'
   - - grey
     - '[Integration scope] / [Data Migration scope]: an interface with an external system or a migration item, delivered in
       that scope; not a change request (Annex AP.1).'
@@ -82,106 +84,6 @@ green:
   ootb_status: Available
   evidence: Audit trail module with filters (Administration > Audit)
 orange:
-- id: CR-RN-001
-  frrn: FRRN.010.01
-  frs: FRRN.010.01
-  title: Automatic assignment by team and sub-team (Annex F)
-  brd: Not in BRD (BRD 1.005, 3.005 (the Team Lead assigns))
-  source: BDOI's FRS
-  feature: RNW-012
-  ootb_status: Partial
-  built: 'Yes'
-  why: BDOI's FRS asks for it beyond the BRD; assignment and reassignment exist; automatic round-robin assignment of renewals
-    by team and sub-team (Annex F) is the missing part in the iNXT BrokerVerse platform edition.
-  ootb: 'Partial: Assignment and reassignment exist; automatic round-robin assignment of renewals by team and sub-team (Annex
-    F) is the missing part.'
-  effort:
-  - 1
-  - 2
-  - 1
-  - 1.5
-  - 0.5
-  complexity: Low
-  priority: High
-  type: Enhancement
-  dependencies: BDOI confirms the point is in scope (Change Request Register)
-  assumptions: Prepared for BIBS in this project; the effort is the value of the change for the missing part
-  evidence: Lead assignment rules only (Leads); renewal queue without automatic assignment (Operations > Renewals > Renewal
-    Queue)
-- id: CR-RN-002
-  frrn: FRRN.011.03
-  frs: FRRN.011.03
-  title: New Business account from an accepted referral
-  brd: Not in BRD (BRD 1.006 (transfer of the account))
-  source: BDOI's FRS
-  feature: RNW-013
-  ootb_status: Not available
-  built: 'Yes'
-  why: BDOI's FRS asks for it beyond the BRD; no transfer or referral of renewal accounts between units with acceptance in
-    the iNXT BrokerVerse platform edition.
-  ootb: 'Not available: No transfer or referral of renewal accounts between units with acceptance.'
-  effort:
-  - 1.5
-  - 4
-  - 2
-  - 2
-  - 0.5
-  complexity: Medium
-  priority: Medium
-  type: Enhancement
-  dependencies: BDOI confirms the point is in scope (Change Request Register)
-  assumptions: Prepared for BIBS in this project; the effort is the value of the change for the missing part
-  evidence: not found (no transfer or referral of renewals between units)
-- id: CR-RN-003
-  frrn: FRRN.002.02.01
-  frs: FRRN.002.02.01
-  title: Marketing dashboard metrics (budget, pipeline, closing ratio, top deals, persistency, product mix)
-  brd: Not in BRD (BRD 1.009.7 (accounts per officer))
-  source: BDOI's FRS
-  feature: RNW-032; ACC-023
-  ootb_status: Partial
-  built: 'Yes'
-  why: BDOI's FRS asks for it beyond the BRD; renewal dashboards are standard; the budget, closing ratio, top deals, persistency
-    and product mix metrics of BDOI are not in the iNXT BrokerVerse platform edition.
-  ootb: 'Partial: Renewal dashboards are standard; the budget, closing ratio, top deals, persistency and product mix metrics
-    of BDOI are not.'
-  effort:
-  - 1
-  - 3
-  - 3
-  - 2
-  - 0.5
-  complexity: Medium
-  priority: Medium
-  type: Enhancement
-  dependencies: BDOI confirms the point is in scope (Change Request Register)
-  assumptions: Prepared for BIBS in this project; the effort is the value of the change for the missing part
-  evidence: Renewal Queue dashboard counters (total, due soon, at risk, grace); no budget, closing ratio, persistency or product
-    mix
-- id: CR-RN-004
-  frrn: FRRN.003.02
-  frs: FRRN.003.02
-  title: Processing dashboard cards and drill-downs
-  brd: Not in BRD (BRD 3.010.7)
-  source: BDOI's FRS
-  feature: QPL-032
-  ootb_status: Partial
-  built: 'Yes'
-  why: BDOI's FRS asks for it beyond the BRD; placement reports exist; the processing cards and drill-downs of BDOI are not
-    in the iNXT BrokerVerse platform edition.
-  ootb: 'Partial: Placement reports exist; the processing cards and drill-downs of BDOI are not.'
-  effort:
-  - 1
-  - 3
-  - 3
-  - 2
-  - 0.5
-  complexity: Medium
-  priority: Medium
-  type: Enhancement
-  dependencies: BDOI confirms the point is in scope (Change Request Register)
-  assumptions: Prepared for BIBS in this project; the effort is the value of the change for the missing part
-  evidence: Placement screens without processing cards or drill-downs
 - id: CR-RN-005
   frrn: FRRN.042.01
   frs: FRRN.042.01
@@ -206,48 +108,32 @@ orange:
   dependencies: BDOI confirms the point is in scope (Change Request Register)
   assumptions: Prepared for BIBS in this project; the effort is the value of the change for the missing part
   evidence: not found (budget exists only on win-back campaigns)
-- id: CR-RN-006
-  frrn: FRRN.039.02
-  frs: FRRN.039.02
-  title: KYC monitoring statuses, history and dashboard
-  brd: Not in BRD (BRRN.028 (KYC flag))
-  source: BDOI's FRS
-  feature: RNW-010; CRM-010
-  ootb_status: Partial
-  built: 'Yes'
-  why: BDOI's FRS asks for it beyond the BRD; a periodic KYC review list is standard; the KYC monitoring statuses, history
-    and dashboard of Renewal are not in the iNXT BrokerVerse platform edition.
-  ootb: 'Partial: A periodic KYC review list is standard; the KYC monitoring statuses, history and dashboard of Renewal are
-    not.'
-  effort:
-  - 1
-  - 3
-  - 2
-  - 2
-  - 0.5
-  complexity: Medium
-  priority: Medium
-  type: Enhancement
-  dependencies: BDOI confirms the point is in scope (Change Request Register)
-  assumptions: Prepared for BIBS in this project; the effort is the value of the change for the missing part
-  evidence: 'AML: KYC refresh due list; no renewal KYC monitoring statuses or dashboard'
+  verdict: NOT IN BRD
+  quote: "No BRD line asks for a renewal budget: BRD 1.009.7 asks for \"the assigned accounts per Marketing AO in a dashboard\" only; the budget figures, their upload, inquiry and history are BDOI's FRS (FRRN.042)"
 - id: CR-RN-008
   frrn: FRRN.009.01
   frs: FRRN.009.01
-  title: CBG Motor automatic update (depreciation, BI / PD tiers, Auto Promo to Regular)
-  brd: Not in BRD (BRRN.039)
+  text:
+  - See Annex D for CBG Motor Automatic Field Update Details
+  - See Annex E for Automatic Field Update Details (Auto Promo to Regular)
+  title: 'CBG Motor rules of Annexes D and E only: depreciation schedule of the sum insured, BI / PD tier table and the
+    Auto Promo to Regular conversion'
+  brd: Not in BRD (BRRN.039 asks for straight-through CBG Motor renewals, not these rules)
   source: BDOI's FRS (Annexes D, E)
   feature: Not in the feature list
   ootb_status: BDOI-specific
   built: 'Yes'
-  why: BDOI's FRS (Annexes D, E) asks for it beyond the BRD; bDOI rules for CBG Motor renewals (Annexes D, E) in the iNXT
-    BrokerVerse platform edition.
-  ootb: 'BDOI-specific: BDOI rules for CBG Motor renewals (Annexes D, E).'
+  why: 'Only the BDOI product rules of Annexes D and E are beyond the BRD: the yearly depreciation of the CBG Motor sum
+    insured, the BI / PD coverage tier table and the conversion of an Auto Promo policy to a Regular policy. The automatic
+    update of the renewal account fields for straight-through CBG Motor renewals is the BRD (BRRN.039) and is a BRD item
+    to deliver.'
+  ootb: 'BDOI-specific: no depreciation schedule, BI / PD tier table or Auto Promo to Regular rule (Annexes D, E); the
+    field update itself is a BRD item to deliver.'
   effort:
-  - 2
-  - 5
   - 1
   - 3
+  - 0.5
+  - 1.5
   - 0.5
   complexity: High
   priority: High
@@ -255,80 +141,8 @@ orange:
   dependencies: BDOI confirms the point is in scope (Change Request Register)
   assumptions: Prepared for BIBS in this project; the effort is the value of the change for the missing part
   evidence: not found
-- id: CR-RN-010
-  frrn: FRRN.014.05
-  frs: FRRN.014.05
-  title: Direct-to-Insurer Payment approval (blanket or Unit Head)
-  brd: Not in BRD (BRRN.040)
-  source: BDOI's FRS
-  feature: POL-016; REM-019
-  ootb_status: Partial
-  built: 'Yes'
-  why: BDOI's FRS asks for it beyond the BRD; direct-payment accounts are standard; the blanket or Unit Head approval of the
-    renewal is not in the iNXT BrokerVerse platform edition.
-  ootb: 'Partial: Direct-payment accounts are standard; the blanket or Unit Head approval of the renewal is not.'
-  effort:
-  - 1
-  - 2
-  - 1
-  - 1.5
-  - 0.5
-  complexity: Low
-  priority: Medium
-  type: Enhancement
-  dependencies: BDOI confirms the point is in scope (Change Request Register)
-  assumptions: Prepared for BIBS in this project; the effort is the value of the change for the missing part
-  evidence: not found (direct payment only in commission computation)
-- id: CR-RN-011
-  frrn: FRRN.036.03
-  frs: FRRN.036.03
-  title: Hold cover automation (CBG at 75 days, extensions, CBG Home on the 15th)
-  brd: Not in BRD (BRRN.042)
-  source: BDOI's FRS
-  feature: RNW-028
-  ootb_status: Partial
-  built: 'Yes'
-  why: BDOI's FRS asks for it beyond the BRD; cover notes of 30 days are standard; automatic CBG requests at 75 days, extensions
-    and insurer batches are not in the iNXT BrokerVerse platform edition.
-  ootb: 'Partial: Cover notes of 30 days are standard; automatic CBG requests at 75 days, extensions and insurer batches are
-    not.'
-  effort:
-  - 2
-  - 6
-  - 3
-  - 3
-  - 1
-  complexity: High
-  priority: High
-  type: Enhancement
-  dependencies: BDOI confirms the point is in scope (Change Request Register)
-  assumptions: Prepared for BIBS in this project; the effort is the value of the change for the missing part
-  evidence: Cover notes of 30 days from an accepted quotation (Cover Notes); no automatic CBG requests, extensions or batches
-- id: CR-RN-014
-  frrn: FRRN.033.01
-  frs: FRRN.033.01
-  title: E-policy batch processing (summary file and ZIP)
-  brd: Not in BRD (BRRN.040)
-  source: BDOI's FRS
-  feature: POL-009
-  ootb_status: Partial
-  built: 'Yes'
-  why: BDOI's FRS asks for it beyond the BRD; protected e-policy dispatch is partly standard; the summary file and ZIP receipt,
-    matching and batch sending are not in the iNXT BrokerVerse platform edition.
-  ootb: 'Partial: Protected e-policy dispatch is partly standard; the summary file and ZIP receipt, matching and batch sending
-    are not.'
-  effort:
-  - 1.5
-  - 4
-  - 2
-  - 2.5
-  - 0.5
-  complexity: Medium
-  priority: Medium
-  type: Enhancement
-  dependencies: BDOI confirms the point is in scope (Change Request Register)
-  assumptions: Prepared for BIBS in this project; the effort is the value of the change for the missing part
-  evidence: E-policy issue for packages; no summary file and ZIP receipt or batch sending
+  verdict: PARTLY
+  quote: "BRRN.039 \"support LAMD-driven matching and categorization for CBG Motor and Fire renewals, including straight-through processing\"; BRD 3.009.1.4.24 \"Bodily Injury and Property Damage for Motor Accounts value\"; no BRD line holds the depreciation schedule or the Auto Promo to Regular conversion of Annexes D and E"
 - id: CR-RN-015
   frrn: FRRN.29.05
   frs: FRRN.29.05
@@ -353,125 +167,8 @@ orange:
   dependencies: BDOI confirms the point is in scope (Change Request Register)
   assumptions: Prepared for BIBS in this project; the effort is the value of the change for the missing part
   evidence: not found
-- id: CR-RN-016
-  frrn: FRRN.26.01
-  frs: FRRN.26.01
-  title: Second approval after acceptance
-  brd: Not in BRD (BRRN.040 (no delay))
-  source: BDOI's FRS
-  feature: RNW-016
-  ootb_status: Partial
-  built: 'Yes'
-  why: BDOI's FRS asks for it beyond the BRD; maker-checker on renewal terms is standard; Submitted for Approval after acceptance
-    is not in the iNXT BrokerVerse platform edition.
-  ootb: 'Partial: Maker-checker on renewal terms is standard; Submitted for Approval after acceptance is not.'
-  effort:
-  - 1
-  - 2
-  - 1.5
-  - 1.5
-  - 0.5
-  complexity: Low
-  priority: Medium
-  type: Enhancement
-  dependencies: BDOI confirms the point is in scope (Change Request Register)
-  assumptions: Prepared for BIBS in this project; the effort is the value of the change for the missing part
-  evidence: Maker-checker on other masters; no Submitted for Approval of an accepted renewal
-- id: CR-RN-017
-  frrn: FRRN.013.02
-  frs: FRRN.013.02
-  title: Nine insurer disposition values
-  brd: Not in BRD (BRRN.035 (three outcomes))
-  source: BDOI's FRS
-  feature: RNW-021
-  ootb_status: BDOI-specific
-  built: 'Yes'
-  why: BDOI's FRS asks for it beyond the BRD; bDOI's nine insurer values and their mapping to the BRD outcomes in the iNXT
-    BrokerVerse platform edition.
-  ootb: 'BDOI-specific: BDOI''s nine insurer values and their mapping to the BRD outcomes.'
-  effort:
-  - 1
-  - 2
-  - 1
-  - 1.5
-  - 0.5
-  complexity: Low
-  priority: Medium
-  type: Enhancement
-  dependencies: BDOI confirms the point is in scope (Change Request Register)
-  assumptions: Prepared for BIBS in this project; the effort is the value of the change for the missing part
-  evidence: not found (insurer responses not recorded as dispositions)
-- id: CR-RN-018
-  frrn: FRRN.006.01
-  frs: FRRN.006.01
-  title: Duplicate criteria per line and segment (Annex B)
-  brd: Not in BRD (BRRN.005)
-  source: BDOI's FRS
-  feature: POL-003
-  ootb_status: Partial
-  built: 'Yes'
-  why: BDOI's FRS asks for it beyond the BRD; duplicate account prevention is partly standard; criteria per line and segment
-    (Annex B) are not in the iNXT BrokerVerse platform edition.
-  ootb: 'Partial: Duplicate account prevention is partly standard; criteria per line and segment (Annex B) are not.'
-  effort:
-  - 1
-  - 2
-  - 0.5
-  - 1.5
-  - 0.5
-  complexity: Low
-  priority: Medium
-  type: Enhancement
-  dependencies: BDOI confirms the point is in scope (Change Request Register)
-  assumptions: Prepared for BIBS in this project; the effort is the value of the change for the missing part
-  evidence: Duplicate checks on journals and data load; none per line and segment on renewals
-- id: CR-RN-020
-  frrn: FRRN.024.01
-  frs: FRRN.024.01
-  title: Password convention of protected files
-  brd: Not in BRD (BRRN.010 (encrypt and add password))
-  source: BDOI's FRS
-  feature: RNW-023; QPL-031
-  ootb_status: Not available
-  built: 'Yes'
-  why: BDOI's FRS asks for it beyond the BRD; documents are sent as plain PDF; no password convention in the iNXT BrokerVerse
-    platform edition.
-  ootb: 'Not available: Documents are sent as plain PDF; no password convention.'
-  effort:
-  - 0.5
-  - 2
-  - 0.5
-  - 1
-  - 0.5
-  complexity: Low
-  priority: High
-  type: Enhancement
-  dependencies: BDOI confirms the point is in scope (Change Request Register)
-  assumptions: Prepared for BIBS in this project; the effort is the value of the change for the missing part
-  evidence: not found (documents sent as plain PDF)
-- id: CR-RN-022
-  frrn: FRRN.041.01
-  frs: FRRN.041.01
-  title: RMU Account Officer maintenance
-  brd: Not in BRD (BRRN.029)
-  source: BDOI's FRS
-  feature: RNW-009; INT-009
-  ootb_status: BDOI-specific
-  built: 'Yes'
-  why: BDOI's FRS asks for it beyond the BRD; bank-specific RMU Account Officer codes in the iNXT BrokerVerse platform edition.
-  ootb: 'BDOI-specific: Bank-specific RMU Account Officer codes.'
-  effort:
-  - 0.5
-  - 1.5
-  - 1.5
-  - 1
-  - 0.5
-  complexity: Low
-  priority: Low
-  type: Enhancement
-  dependencies: BDOI confirms the point is in scope (Change Request Register)
-  assumptions: Prepared for BIBS in this project; the effort is the value of the change for the missing part
-  evidence: not found
+  verdict: NOT IN BRD
+  quote: "Nearest line BRRN.040 \"automatically proceed to placement and booking ... without delay ... and the policy can be issued on time\"; no BRD line sets a placement turnaround time, SLA days, 3 PM cut-off, With Issue status or resolution date"
 - id: CR-RN-024
   match: WCAG 2.2
   frs: Annex AJ RN-NFR-16
@@ -499,6 +196,376 @@ orange:
   ootb_status: Partial
   built: 'No'
   evidence: 'Partial: ARIA labels on many screens; no WCAG 2.2 AA conformance check or statement'
+  verdict: NOT IN BRD
+  quote: "No BRD or programme NFR names an accessibility standard: the nearest are NFR 9.01 of the Collections addendum \"The system user interface must follow existing BDOI Application UI\" and the Customer Servicing BRD \"Usability - Intuitive user interface and easy navigation\""
+# BRD requirements that were orange in the first issue of v1.2: the point is in the BRD (fully, or as a BRD line
+# that BDOI's FRS elaborates), so it is black, in scope, and its gap against the platform is delivery work (sheet
+# BRD items to deliver of the CR Effort Estimate, Annex AP.1), not a change request. effort = planning effort.
+brd_deliver:
+- id: CR-RN-008 (BRD part)
+  frs: FRRN.009.01
+  title: Automatic update of the CBG Motor renewal account fields (straight-through renewal)
+  brd: BRRN.039; BRD 3.009.1.4.24
+  source: BDOI's FRS
+  feature: Not in the feature list
+  ootb_status: BDOI-specific
+  built: 'Yes'
+  ootb: 'Not available: the renewal account fields of FRRN.009.01 (risk code and rate, insurer, dates, OD / theft, BI and
+    PD coverages and premiums, taxes, total premium) are not set by the system for a straight-through CBG Motor renewal.'
+  effort:
+  - 1
+  - 2
+  - 0.5
+  - 1.5
+  - 0
+  priority: High
+  evidence: not found
+  verdict: PARTLY
+  quote: "BRRN.039 \"support LAMD-driven matching and categorization for CBG Motor and Fire renewals, including straight-through processing\"; BRD 3.009.1.4.24 \"Bodily Injury and Property Damage for Motor Accounts value\""
+- id: CR-RN-001
+  frrn: FRRN.010.01
+  frs: FRRN.010.01
+  title: Automatic assignment by team and sub-team (Annex F)
+  brd: "BRD 1.005.1, 3.005; BRRN.031"
+  source: BDOI's FRS
+  feature: RNW-012
+  ootb_status: Partial
+  built: 'Yes'
+  why: BDOI's FRS asks for it beyond the BRD; assignment and reassignment exist; automatic round-robin assignment of renewals
+    by team and sub-team (Annex F) is the missing part in the iNXT BrokerVerse platform edition.
+  ootb: 'Partial: Assignment and reassignment exist; automatic round-robin assignment of renewals by team and sub-team (Annex
+    F) is the missing part.'
+  effort:
+  - 1
+  - 2
+  - 1
+  - 1.5
+  - 0.5
+  complexity: Low
+  priority: High
+  type: Enhancement
+  dependencies: BDOI confirms the point is in scope (Change Request Register)
+  assumptions: Prepared for BIBS in this project; the effort is the value of the change for the missing part
+  evidence: Lead assignment rules only (Leads); renewal queue without automatic assignment (Operations > Renewals > Renewal
+    Queue)
+  verdict: IN BRD
+  quote: "BRD 1.005.1 \"a. Assign account to Marketing Account Officers (AO)\"; BRD 3.005 (assignment to the Processing Officer); BRRN.031 \"apply rule-based disposition automatically ... so that straight-through renewals proceed without manual effort\""
+- id: CR-RN-002
+  frrn: FRRN.011.03
+  frs: FRRN.011.03
+  title: New Business account from an accepted referral
+  brd: "BRD 1.006, 1.007.3; BRRN.033"
+  source: BDOI's FRS
+  feature: RNW-013
+  ootb_status: Not available
+  built: 'Yes'
+  why: BDOI's FRS asks for it beyond the BRD; no transfer or referral of renewal accounts between units with acceptance in
+    the iNXT BrokerVerse platform edition.
+  ootb: 'Not available: No transfer or referral of renewal accounts between units with acceptance.'
+  effort:
+  - 1.5
+  - 4
+  - 2
+  - 2
+  - 0.5
+  complexity: Medium
+  priority: Medium
+  type: Enhancement
+  dependencies: BDOI confirms the point is in scope (Change Request Register)
+  assumptions: Prepared for BIBS in this project; the effort is the value of the change for the missing part
+  evidence: not found (no transfer or referral of renewals between units)
+  verdict: IN BRD
+  quote: "BRD 1.006 \"Transfer account to other units\" (1.006.3 \"Select from the drop-down the Marketing unit where the account will be transferred to\", 1.006.4 \"Submit transfer request\"); BRD 1.007.3 \"Accept transferred account/s\"; BRRN.033 \"allow renewal-identified accounts to follow the New Business flow\""
+- id: CR-RN-003
+  frrn: FRRN.002.02.01
+  frs: FRRN.002.02.01
+  title: Marketing dashboard metrics (budget, pipeline, closing ratio, top deals, persistency, product mix)
+  brd: "BRD 1.009.7; BRRN.021; BRD-00 BR-203"
+  source: BDOI's FRS
+  feature: RNW-032; ACC-023
+  ootb_status: Partial
+  built: 'Yes'
+  why: BDOI's FRS asks for it beyond the BRD; renewal dashboards are standard; the budget, closing ratio, top deals, persistency
+    and product mix metrics of BDOI are not in the iNXT BrokerVerse platform edition.
+  ootb: 'Partial: Renewal dashboards are standard; the budget, closing ratio, top deals, persistency and product mix metrics
+    of BDOI are not.'
+  effort:
+  - 1
+  - 3
+  - 3
+  - 2
+  - 0.5
+  complexity: Medium
+  priority: Medium
+  type: Enhancement
+  dependencies: BDOI confirms the point is in scope (Change Request Register)
+  assumptions: Prepared for BIBS in this project; the effort is the value of the change for the missing part
+  evidence: Renewal Queue dashboard counters (total, due soon, at risk, grace); no budget, closing ratio, persistency or product
+    mix
+  verdict: IN BRD
+  quote: "BRD 1.009.7 \"g. View the assigned accounts per Marketing AO in a dashboard\"; BRRN.021 \"displayed on the screen/dashboard\"; BRD-00 BR-203 \"Dashboards and reports for real-time tracking and reporting\""
+- id: CR-RN-004
+  frrn: FRRN.003.02
+  frs: FRRN.003.02
+  title: Processing dashboard cards and drill-downs
+  brd: "BRD 3.010.7; BRD-00 BR-203"
+  source: BDOI's FRS
+  feature: QPL-032
+  ootb_status: Partial
+  built: 'Yes'
+  why: BDOI's FRS asks for it beyond the BRD; placement reports exist; the processing cards and drill-downs of BDOI are not
+    in the iNXT BrokerVerse platform edition.
+  ootb: 'Partial: Placement reports exist; the processing cards and drill-downs of BDOI are not.'
+  effort:
+  - 1
+  - 3
+  - 3
+  - 2
+  - 0.5
+  complexity: Medium
+  priority: Medium
+  type: Enhancement
+  dependencies: BDOI confirms the point is in scope (Change Request Register)
+  assumptions: Prepared for BIBS in this project; the effort is the value of the change for the missing part
+  evidence: Placement screens without processing cards or drill-downs
+  verdict: IN BRD
+  quote: "BRD 3.010.7 \"g. View the assigned accounts per Processing Officer in a dashboard\"; BRD-00 BR-203 \"Dashboards and reports for real-time tracking and reporting\""
+- id: CR-RN-006
+  frrn: FRRN.039.02
+  frs: FRRN.039.02
+  title: KYC monitoring statuses, history and dashboard
+  brd: "BRRN.028"
+  source: BDOI's FRS
+  feature: RNW-010; CRM-010
+  ootb_status: Partial
+  built: 'Yes'
+  why: BDOI's FRS asks for it beyond the BRD; a periodic KYC review list is standard; the KYC monitoring statuses, history
+    and dashboard of Renewal are not in the iNXT BrokerVerse platform edition.
+  ootb: 'Partial: A periodic KYC review list is standard; the KYC monitoring statuses, history and dashboard of Renewal are
+    not.'
+  effort:
+  - 1
+  - 3
+  - 2
+  - 2
+  - 0.5
+  complexity: Medium
+  priority: Medium
+  type: Enhancement
+  dependencies: BDOI confirms the point is in scope (Change Request Register)
+  assumptions: Prepared for BIBS in this project; the effort is the value of the change for the missing part
+  evidence: 'AML: KYC refresh due list; no renewal KYC monitoring statuses or dashboard'
+  verdict: IN BRD
+  quote: "BRRN.028 \"I want the system to identify and view accounts that are due or upcoming for KYC review, so that compliance monitoring and follow up can be performed without blocking or interrupting the renewal process\""
+- id: CR-RN-010
+  frrn: FRRN.014.05
+  frs: FRRN.014.05
+  title: Direct-to-Insurer Payment approval (blanket or Unit Head)
+  brd: "BRD 2.004.4.4; BRD-00 BR-035"
+  source: BDOI's FRS
+  feature: POL-016; REM-019
+  ootb_status: Partial
+  built: 'Yes'
+  why: BDOI's FRS asks for it beyond the BRD; direct-payment accounts are standard; the blanket or Unit Head approval of the
+    renewal is not in the iNXT BrokerVerse platform edition.
+  ootb: 'Partial: Direct-payment accounts are standard; the blanket or Unit Head approval of the renewal is not.'
+  effort:
+  - 1
+  - 2
+  - 1
+  - 1.5
+  - 0.5
+  complexity: Low
+  priority: Medium
+  type: Enhancement
+  dependencies: BDOI confirms the point is in scope (Change Request Register)
+  assumptions: Prepared for BIBS in this project; the effort is the value of the change for the missing part
+  evidence: not found (direct payment only in commission computation)
+  verdict: IN BRD
+  quote: "BRD 2.004.4.4 \"4. Direct to Insurer\" (reason for non-renewal); BRD-00 BR-035 \"allow user to tag of Direct Payment (DP)\""
+- id: CR-RN-011
+  frrn: FRRN.036.03
+  frs: FRRN.036.03
+  title: Hold cover automation (CBG at 75 days, extensions, CBG Home on the 15th)
+  brd: "BRRN.042; BRD-00 BR-034"
+  source: BDOI's FRS
+  feature: RNW-028
+  ootb_status: Partial
+  built: 'Yes'
+  why: BDOI's FRS asks for it beyond the BRD; cover notes of 30 days are standard; automatic CBG requests at 75 days, extensions
+    and insurer batches are not in the iNXT BrokerVerse platform edition.
+  ootb: 'Partial: Cover notes of 30 days are standard; automatic CBG requests at 75 days, extensions and insurer batches are
+    not.'
+  effort:
+  - 2
+  - 6
+  - 3
+  - 3
+  - 1
+  complexity: High
+  priority: High
+  type: Enhancement
+  dependencies: BDOI confirms the point is in scope (Change Request Register)
+  assumptions: Prepared for BIBS in this project; the effort is the value of the change for the missing part
+  evidence: Cover notes of 30 days from an accepted quotation (Cover Notes); no automatic CBG requests, extensions or batches
+  verdict: IN BRD
+  quote: "BRRN.042 \"I want to be able to send request for Hold Cover to insurer/s and to record the Hold Cover confirmation details received from the insurer\"; BRD-00 BR-034 \"the system sends a 30 days Hold Cover (HC) request to Insurer/s\""
+- id: CR-RN-014
+  frrn: FRRN.033.01
+  frs: FRRN.033.01
+  title: E-policy batch processing (summary file and ZIP)
+  brd: "BRD-00 BR-040 to BR-042; BRRN.040"
+  source: BDOI's FRS
+  feature: POL-009
+  ootb_status: Partial
+  built: 'Yes'
+  why: BDOI's FRS asks for it beyond the BRD; protected e-policy dispatch is partly standard; the summary file and ZIP receipt,
+    matching and batch sending are not in the iNXT BrokerVerse platform edition.
+  ootb: 'Partial: Protected e-policy dispatch is partly standard; the summary file and ZIP receipt, matching and batch sending
+    are not.'
+  effort:
+  - 1.5
+  - 4
+  - 2
+  - 2.5
+  - 0.5
+  complexity: Medium
+  priority: Medium
+  type: Enhancement
+  dependencies: BDOI confirms the point is in scope (Change Request Register)
+  assumptions: Prepared for BIBS in this project; the effort is the value of the change for the missing part
+  evidence: E-policy issue for packages; no summary file and ZIP receipt or batch sending
+  verdict: IN BRD
+  quote: "BRD-00 BR-040 \"allow users to receive e-policy. (Individual or Batch)\", BR-041 \"send e-policy to client. (Individual or Batch)\", BR-042 \"updates client record to add e-policy and policy number. (Individual or Batch)\"; BRRN.040 \"the policy can be issued on time\""
+- id: CR-RN-016
+  frrn: FRRN.26.01
+  frs: FRRN.26.01
+  title: Second approval after acceptance
+  brd: "BRD 1.008.1, 1.009.3.2.10; BRRN.038"
+  source: BDOI's FRS
+  feature: RNW-016
+  ootb_status: Partial
+  built: 'Yes'
+  why: BDOI's FRS asks for it beyond the BRD; maker-checker on renewal terms is standard; Submitted for Approval after acceptance
+    is not in the iNXT BrokerVerse platform edition.
+  ootb: 'Partial: Maker-checker on renewal terms is standard; Submitted for Approval after acceptance is not.'
+  effort:
+  - 1
+  - 2
+  - 1.5
+  - 1.5
+  - 0.5
+  complexity: Low
+  priority: Medium
+  type: Enhancement
+  dependencies: BDOI confirms the point is in scope (Change Request Register)
+  assumptions: Prepared for BIBS in this project; the effort is the value of the change for the missing part
+  evidence: Maker-checker on other masters; no Submitted for Approval of an accepted renewal
+  verdict: IN BRD
+  quote: "BRD 1.008.1 \"Review and Post Disposition Accounts - a. Review Accounts\"; BRD 1.009.3.2.10 \"Total No. of Awaiting Marketing TL Approval (For Renewal)\"; BRRN.038 \"routing of renewal changes based on financial impact, ensuring proper approval\""
+- id: CR-RN-017
+  frrn: FRRN.013.02
+  frs: FRRN.013.02
+  title: Nine insurer disposition values
+  brd: "BRRN.035"
+  source: BDOI's FRS
+  feature: RNW-021
+  ootb_status: BDOI-specific
+  built: 'Yes'
+  why: BDOI's FRS asks for it beyond the BRD; bDOI's nine insurer values and their mapping to the BRD outcomes in the iNXT
+    BrokerVerse platform edition.
+  ootb: 'BDOI-specific: BDOI''s nine insurer values and their mapping to the BRD outcomes.'
+  effort:
+  - 1
+  - 2
+  - 1
+  - 1.5
+  - 0.5
+  complexity: Low
+  priority: Medium
+  type: Enhancement
+  dependencies: BDOI confirms the point is in scope (Change Request Register)
+  assumptions: Prepared for BIBS in this project; the effort is the value of the change for the missing part
+  evidence: not found (insurer responses not recorded as dispositions)
+  verdict: IN BRD
+  quote: "BRRN.035 \"capture insurer responses (e.g., Approve/ Renew As-Is, Reject, Revise) and automatically apply them to the renewal workflow\""
+- id: CR-RN-018
+  frrn: FRRN.006.01
+  frs: FRRN.006.01
+  title: Duplicate criteria per line and segment (Annex B)
+  brd: "BRRN.005; BRD-00 BR-026"
+  source: BDOI's FRS
+  feature: POL-003
+  ootb_status: Partial
+  built: 'Yes'
+  why: BDOI's FRS asks for it beyond the BRD; duplicate account prevention is partly standard; criteria per line and segment
+    (Annex B) are not in the iNXT BrokerVerse platform edition.
+  ootb: 'Partial: Duplicate account prevention is partly standard; criteria per line and segment (Annex B) are not.'
+  effort:
+  - 1
+  - 2
+  - 0.5
+  - 1.5
+  - 0.5
+  complexity: Low
+  priority: Medium
+  type: Enhancement
+  dependencies: BDOI confirms the point is in scope (Change Request Register)
+  assumptions: Prepared for BIBS in this project; the effort is the value of the change for the missing part
+  evidence: Duplicate checks on journals and data load; none per line and segment on renewals
+  verdict: IN BRD
+  quote: "BRRN.005 negative scenario \"List contains duplicate or irrelevant accounts\"; BRD-00 BR-026 \"sanitize ... based on configurable business rules ... such as duplicate detection\""
+- id: CR-RN-020
+  frrn: FRRN.024.01
+  frs: FRRN.024.01
+  title: Password convention of protected files
+  brd: "BRRN.010; BRD 1.010.7.1"
+  source: BDOI's FRS
+  feature: RNW-023; QPL-031
+  ootb_status: Not available
+  built: 'Yes'
+  why: BDOI's FRS asks for it beyond the BRD; documents are sent as plain PDF; no password convention in the iNXT BrokerVerse
+    platform edition.
+  ootb: 'Not available: Documents are sent as plain PDF; no password convention.'
+  effort:
+  - 0.5
+  - 2
+  - 0.5
+  - 1
+  - 0.5
+  complexity: Low
+  priority: High
+  type: Enhancement
+  dependencies: BDOI confirms the point is in scope (Change Request Register)
+  assumptions: Prepared for BIBS in this project; the effort is the value of the change for the missing part
+  evidence: not found (documents sent as plain PDF)
+  verdict: IN BRD
+  quote: "BRRN.010 \"Send RA in batch, with encryption and password protection\"; BRD 1.010.7.1 \"1. Encrypt and add password prior to sending\""
+- id: CR-RN-022
+  frrn: FRRN.041.01
+  frs: FRRN.041.01
+  title: RMU Account Officer maintenance
+  brd: "BRD 2.004.4.1; BRRN.029"
+  source: BDOI's FRS
+  feature: RNW-009; INT-009
+  ootb_status: BDOI-specific
+  built: 'Yes'
+  why: BDOI's FRS asks for it beyond the BRD; bank-specific RMU Account Officer codes in the iNXT BrokerVerse platform edition.
+  ootb: 'BDOI-specific: Bank-specific RMU Account Officer codes.'
+  effort:
+  - 0.5
+  - 1.5
+  - 1.5
+  - 1
+  - 0.5
+  complexity: Low
+  priority: Low
+  type: Enhancement
+  dependencies: BDOI confirms the point is in scope (Change Request Register)
+  assumptions: Prepared for BIBS in this project; the effort is the value of the change for the missing part
+  evidence: not found
+  verdict: IN BRD
+  quote: "BRD 2.004.4.1 \"1. Remedial Management Unit (RMU)\"; BRRN.029 \"ingest LAMD-provided reports and match paid-off loan records ... to determine renewal eligibility and proper routing\""
 programme_nfr:
 - - RN-NFR-17
   - One session per device

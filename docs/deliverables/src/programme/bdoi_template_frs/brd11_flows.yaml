@@ -21,7 +21,7 @@ figures:
     picture: flows/brd11/e2e.png
     where: N
     caption: "User Access Maintenance - end-to-end process flow with the identity integration (EIAM, UIDM-ISC) and the change requests"
-    read: "Tags on the boxes: yellow CR-UA-nnn = change request in no BRD (Annex AA.2, orange in this document); grey OB-UA-nn = beyond the BRD, offered as standard, no cost (Annex AA.3, green); green = already a BRD requirement. The walkthroughs of Annex O follow these routes step by step."
+    read: "Tags on the boxes: yellow CR-UA-nnn = change request in no BRD (Annex AA.2, orange in this document); grey OB-UA-nn = beyond the BRD, offered by the iNXT BrokerVerse OOTB platform, no cost (Annex AA.3, green); dark grey IS-UA-nn / DM-UA-nn = integration or data migration scope, not a change request (Annex AA.5); green = already a BRD requirement. The walkthroughs of Annex O follow these routes step by step."
     brd: "BRD sections A to D; NFR 1.h, 4, 9 to 11; CLM / CLXN / RI NFR 4.03; CLXN NFR 10.07"
   # ------------------------------------------------------------------------------------------ Annex A
   - id: brd11_fig_e2e

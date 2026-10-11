@@ -4,7 +4,8 @@
 
 A SPEC module gives the stages (columns), the lanes (rows), the boxes and the connectors. A box may carry tags:
 "CR-UA-nnn" (yellow: change request, in no BRD), "EXT:CR-UA-nnn" (blue: change request that extends a BRD
-requirement), "BRD:<ref>" (green: a BRD requirement) and "OOTB:<text>" (grey: beyond the BRD, delivered as standard).
+requirement), "BRD:<ref>" (green: a BRD requirement) "OOTB:<text>" (grey: beyond the BRD, offered by the iNXT BrokerVerse OOTB platform) and "INT:<text>" (dark grey:
+integration or data migration scope, not a change request).
 """
 import base64, html, json, sys
 from pathlib import Path
@@ -24,7 +25,7 @@ KIND = {  # fill, border
 
 
 def tag_class(t):
-    return {"BRD": "brd", "EXT": "ext", "OOTB": "ootb"}.get(t.split(":", 1)[0], "") if ":" in t else ""
+    return {"BRD": "brd", "EXT": "ext", "OOTB": "ootb", "INT": "int"}.get(t.split(":", 1)[0], "") if ":" in t else ""
 
 
 def page(spec):
@@ -73,7 +74,7 @@ def page(spec):
 .box .t{{font-weight:700;font-size:12.5px;margin-bottom:2px}} .box ul{{margin:0;padding-left:14px}}
 .box.dec{{border-radius:22px;text-align:center}}
 .cr{{display:inline-block;background:#FFD54F;color:#5d4300;font-size:10px;font-weight:700;border-radius:3px;padding:0 4px;margin-left:4px}}
-.cr.brd{{background:#C8E6C9;color:#1B5E20}} .cr.ext{{background:#BBDEFB;color:#0D47A1}} .cr.ootb{{background:#ECEFF1;color:#37474F;box-shadow:inset 0 0 0 1px #90A4AE}}
+.cr.brd{{background:#C8E6C9;color:#1B5E20}} .cr.ext{{background:#BBDEFB;color:#0D47A1}} .cr.ootb{{background:#ECEFF1;color:#37474F;box-shadow:inset 0 0 0 1px #90A4AE}} .cr.int{{background:#616161;color:#FFFFFF}}
 svg{{position:absolute;left:0;top:0;z-index:1}}
 .lbl{{font:700 11px 'DejaVu Sans',Arial;}}
 .foot span{{white-space:nowrap}} .foot{{position:absolute;left:10px;top:{H-spec.get('foot',0)-6}px;width:{W-20}px}}

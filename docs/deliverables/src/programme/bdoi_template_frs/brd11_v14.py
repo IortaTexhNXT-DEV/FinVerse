@@ -241,7 +241,7 @@ def cr_annex(a):
                      c["priority"], fmt(days(c["effort"]))])
     rows.append(["Total", f"{len(V14['crs'])} change requests", "", "", "", "", "", fmt(cr_total())])
     a.table(["CR No.", "Change", "FRS reference", "Feature List / OOTB", "Why it is needed", "Prepared for BIBS?",
-             "Priority", "Man-days"], rows, [0.75, 1.1, 1.0, 1.1, 2.15, 0.55, 0.55, 0.6], size=7.5)
+             "Priority", "Man-days"], rows, [0.75, 1.05, 0.95, 1.05, 1.95, 0.8, 0.6, 0.6], size=7.5)
     colour_column(last_table(a), (0, 1), COLOURS["orange"], skip_last=True)
     a.h2("AA.3 Beyond the BRD, offered by the iNXT BrokerVerse OOTB platform (no change request)")
     a.p("The points of this FRS that no BRD asks for and that the iNXT BrokerVerse OOTB platform offers, found in its "

@@ -1,13 +1,13 @@
 # Data of the five review workbooks of BRD-11 User Access Maintenance and of the internal coverage workbook, read by
-# build_brd11_workbooks.py together with the FRS v1.3 (built in memory, so that every number agrees with it),
+# build_brd11_workbooks.py together with the FRS v1.4 (built in memory, so that every number agrees with it),
 # brd11_review.yaml, the BIBS FRS BRD-11, its test plan and the programme workbooks. Business wording only.
 
 meta:
-  version: "1.0"
-  date: 9 October 2026
+  version: "1.1"
+  date: 11 October 2026
   folder: Programme/BDOI_Template_FRS/BRD-11_User_Access_Maintenance
   quality: Programme/Quality
-  frs: "FRS User Access Maintenance in BDOI's template v1.3"
+  frs: "FRS User Access Maintenance in BDOI's template v1.4"
   environment: "BIBS DEV environment: https://dev.brokerverse.cloud"
   password_text: "Issued separately by the iorta TechNXT Project Team"
   dates:
@@ -220,7 +220,7 @@ coverage_acs:
 # ------------------------------------------------------------------------------------ requirements collection
 uat_criteria:
   entry:
-    - "The FRS v1.3 is signed, or the open decisions of Annex Q that affect the cases are recorded."
+    - "The FRS v1.4 is signed, or the open decisions of Annex Q that affect the cases are recorded."
     - "The UAT environment is ready with the users of the walkthrough users workbook and the SIT/UAT data."
     - "The SIT exit report shows no open severity 1 or 2 finding on User Access Maintenance."
     - "The testers are named (TD-11) and have their sign-in IDs; the passwords are issued separately by the iorta TechNXT Project Team."

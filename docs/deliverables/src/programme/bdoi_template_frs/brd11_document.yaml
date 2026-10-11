@@ -170,7 +170,7 @@ annex_m:
     - [Inactivity sign-out, 30 minutes without activity, "The session ends with the reason inactivity; the page Session Timed Out: Your session timed out. Please log in again to continue, with Log In"]
     - [Session-end warning, 30 minutes before the fixed end of a session, BRD x.001.1.3]
     - [Several tabs, One session for all the tabs of a user, Activity in any tab counts]
-    - [One session per device, Not enforced; every session is in the session log, Open point UQ09 of Annex Z]
+    - [One session per device, "Required by the Collections addendum NFR 10.07: a sign-in on another device ends the earlier session; to be delivered before UAT (Annex AA.4)", "BRD requirement (programme-wide); every session is in the session log"]
   controls:
     - "Four eyes: the requester and the user a request is about never decide it."
     - "The second approver differs from the first approver, the requester and the user concerned."

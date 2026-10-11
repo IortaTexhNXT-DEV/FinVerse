@@ -216,6 +216,13 @@ class Swimlane:
 
 def render(spec: dict, out: Path) -> Path:
     png = out / f"{spec['id']}.png"
+    if spec["kind"] == "picture":
+        # a picture rendered beforehand (flows/brd11/render.sh), used as it is
+        src_png = HERE / spec["picture"]
+        if not src_png.exists():
+            raise SystemExit(f"figure {spec['id']}: {src_png} missing (run flows/brd11/render.sh)")
+        png.write_bytes(src_png.read_bytes())
+        return png
     if spec["kind"] == "swimlane":
         src = Swimlane(spec).dot()
         cmd = ["neato", "-n2", "-Tpng", f"-Gdpi={DPI}"]

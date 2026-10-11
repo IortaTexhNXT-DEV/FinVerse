@@ -273,15 +273,35 @@ SIGNOFF_SETS = {"BRD-01": "2.1", "BRD-04": "2.1", "BRD-05": "2.1", "BRD-13": "2.
 # from there); the old builders (signoff_pack, the test plan, the guide deck, the UX deck, the configuration input
 # templates) refuse to rebuild a retired set unless --force, and check_pack, drop_index and drop_closure point to
 # the BDOI-format pack instead of the removed files.
+# The FRS file and its version are read from the folder (the highest version of BIBS_FRS-BDOI_<BRD>_<Name>_v<n>.docx,
+# the highlighted copy excepted), so that a new version of one pack needs no change here; "frs" and "version" below
+# are only used when the folder holds no FRS yet.
 BDOI_FRS_SETS: dict[str, dict[str, str]] = {
     "BRD-02": {"folder": "BRD-02_Operations_Cashiering",
                "frs": "BIBS_FRS-BDOI_BRD-02_Operations_Cashiering_v3.2.docx", "version": "3.2"},
     "BRD-03": {"folder": "BRD-03_Product_Maintenance",
                "frs": "BIBS_FRS-BDOI_BRD-03_Product_Maintenance_v1.2.docx", "version": "1.2"},
-    "BRD-06": {"folder": "BRD-06_Renewal", "frs": "BIBS_FRS-BDOI_BRD-06_Renewal_v1.1.docx", "version": "1.1"},
+    "BRD-06": {"folder": "BRD-06_Renewal", "frs": "BIBS_FRS-BDOI_BRD-06_Renewal_v1.2.docx", "version": "1.2"},
     "BRD-11": {"folder": "BRD-11_User_Access_Maintenance",
-               "frs": "BIBS_FRS-BDOI_BRD-11_User_Access_Maintenance_v1.3.docx", "version": "1.3"},
+               "frs": "BIBS_FRS-BDOI_BRD-11_User_Access_Maintenance_v1.4.docx", "version": "1.4"},
 }
+
+
+def _current_bdoi_frs() -> None:
+    import re as _re  # noqa: PLC0415
+
+    for brd, entry in BDOI_FRS_SETS.items():
+        folder = OUT_DIR / "Programme" / "BDOI_Template_FRS" / entry["folder"]
+        found = []
+        for f in folder.glob(f"BIBS_FRS-BDOI_{brd}_*_v*.docx") if folder.is_dir() else []:
+            m = _re.search(r"_v(\d+(?:\.\d+)*)\.docx$", f.name)
+            if m:
+                found.append((tuple(int(x) for x in m.group(1).split(".")), f.name, m.group(1)))
+        if found:
+            _, entry["frs"], entry["version"] = max(found)
+
+
+_current_bdoi_frs()
 # The last version of the old-format set of each retired BRD (file names of the withdrawn documents).
 RETIRED_SETS = {"BRD-02": "2.1", "BRD-03": "2.1", "BRD-06": "2.0", "BRD-11": "2.1"}
 BDOI_FRS_KIND = "BDOI_Template_FRS"

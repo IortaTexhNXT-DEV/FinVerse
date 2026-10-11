@@ -7,9 +7,26 @@
 #   summary (Introduction), A (Annex A), S (Annex S), J (Annex J), W (Annex W).
 figures:
   # ------------------------------------------------------------------------------------------ Introduction
+  # picture: a PNG of flows/brd11 (rendered by flows/brd11/render.sh), placed on a landscape page of its own
+  - id: brd11_fig_simple
+    kind: picture
+    picture: flows/brd11/simple.png
+    where: summary
+    caption: "User Access Maintenance - simplified process flow: identity and sign-in, request, review and approval, implementation, notification, reporting and audit"
+    read: "Read from left to right by stage and from top to bottom by actor. Solid arrows are the process, dashed blue arrows the exchange with BDOI's identity systems (EIAM, UIDM-ISC), dashed purple the return for correction, red the rejection. The end-to-end flow with the change requests is Figure @E2E@ (Annex N); the flow by persona is Figure @SWIM@ (Annex A)."
+    brd: "BRD sections A to D; NFR 4, 9 to 11"
+  # ------------------------------------------------------------------------------------------ Annex N
+  - id: brd11_fig_e2e_identity
+    kind: picture
+    picture: flows/brd11/e2e.png
+    where: N
+    caption: "User Access Maintenance - end-to-end process flow with the identity integration (EIAM, UIDM-ISC) and the change requests"
+    read: "Tags on the boxes: yellow CR-UA-nnn = change request in no BRD (Annex AA.2, orange in this document); grey OB-UA-nn = beyond the BRD, offered as standard, no cost (Annex AA.3, green); green = already a BRD requirement. The walkthroughs of Annex O follow these routes step by step."
+    brd: "BRD sections A to D; NFR 1.h, 4, 9 to 11; CLM / CLXN / RI NFR 4.03; CLXN NFR 10.07"
+  # ------------------------------------------------------------------------------------------ Annex A
   - id: brd11_fig_e2e
     kind: swimlane
-    where: summary
+    where: A
     caption: "User Access Maintenance from end to end: who does what, from the access request to the evidence of access"
     read: "Read from top to bottom. Each column is a persona; the green column is what the system does by itself. The numbers in brackets are the FR items of section 3."
     brd: "BRD sections A to D; NFR 9 to 11"

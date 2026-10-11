@@ -54,6 +54,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import brd11_figures  # noqa: E402
 import brd_common_final as final  # noqa: E402
 import brd11_v13 as v13  # noqa: E402
+import brd11_v14 as v14  # noqa: E402
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.shared import Inches
@@ -66,18 +67,20 @@ CMP = SRC / "programme" / "comparisons" / "brd11_comparison.yaml"
 
 ADD = yaml.safe_load((HERE / "brd11_frs_additions.yaml").read_text(encoding="utf-8"))
 DOC = yaml.safe_load((HERE / "brd11_document.yaml").read_text(encoding="utf-8"))
-DOC["meta"].update({k: v13.REV["meta"][k] for k in ("clean", "highlighted")})
-DOC["meta"]["version_new"] = v13.REV["meta"]["version"]
+DOC["meta"].update({k: v14.V14["meta"][k] for k in ("clean", "highlighted")})
+DOC["meta"]["version_new"] = v14.V14["meta"]["version"]
 DOC["revision_log"]["rows"].append(v13.REV["meta"]["revision_row"])
+DOC["revision_log"]["rows"].append(v14.V14["meta"]["revision_row"])
 DOC["glossary"] = DOC["glossary"] + v13.REV["glossary_add"]
 NEW_TERMS = {g[0] for g in v13.REV["glossary_add"]}
 OUT = REPO / "docs" / "deliverables" / "out" / DOC["meta"]["out_folder"]
 
-HL_FILL = "FFF59D"          # light yellow of the review copy
+HL_FILL = "FFF59D"          # light yellow of the review copy (the changes of version 1.4 against 1.3)
 # Screens added or changed with the full-coverage build of October 2026 (shaded in the review copy of version 1.3)
 SCREENS_V13 = {"SCR-UA-01", "SCR-UA-04", "SCR-UA-15", "SCR-UA-19", "SCR-UA-20", "SCR-UA-21", "SCR-UA-22"}
 HEAD_FILL = "D9E1F2"        # header fill of the annex tables
 W14 = "http://schemas.microsoft.com/office/word/2010/wordml"
+TABLE_FONT = "Arial"         # the font of BDOI's template, in the added tables as in the text
 PORTRAIT_W = 7.4            # usable width (inches) of the portrait pages of BDOI's main section
 LANDSCAPE_W = 9.9
 
@@ -315,7 +318,8 @@ def fr_to_frum_map() -> dict[str, list[str]]:
 class Builder:
     def __init__(self, highlight: bool):
         self.highlight = highlight
-        self.round13 = False        # True while the additions of version 1.3 are made (shaded in the review copy)
+        self.round13 = False        # True while the additions of version 1.3 are made
+        self.round14 = False        # True while the additions of version 1.4 are made (shaded in the review copy)
         self.doc = docx.Document(str(REPO / DOC["meta"]["source"]))
         self.body = self.doc.element.body
         self.tables = list(self.doc.tables)          # BDOI's tables, before any insertion
@@ -328,7 +332,7 @@ class Builder:
 
     @property
     def hl(self) -> bool:
-        return self.highlight and self.round13
+        return self.highlight and self.round14
 
     def run(self, text, bold=False, italic=False, size=None, font="Arial", color=None, hl=None):
         r = OxmlElement("w:r")
@@ -362,7 +366,8 @@ class Builder:
         return r
 
     def para(self, text="", style=None, num=None, bold=False, italic=False, size=None, font="Arial", jc=None,
-             keep_next=False, page_break_before=False, no_num=False, color=None, hl=None, space_after=None):
+             keep_next=False, page_break_before=False, no_num=False, color=None, hl=None, space_after=None,
+             space_before=None):
         p = OxmlElement("w:p")
         ppr = OxmlElement("w:pPr")
         if style:
@@ -382,9 +387,12 @@ class Builder:
             n.append(il)
             n.append(ni)
             ppr.append(n)
-        if space_after is not None:
+        if space_after is not None or space_before is not None:
             sp = OxmlElement("w:spacing")
-            sp.set(qn("w:after"), str(space_after))
+            if space_before is not None:
+                sp.set(qn("w:before"), str(space_before))
+            if space_after is not None:
+                sp.set(qn("w:after"), str(space_after))
             ppr.append(sp)
         if jc:
             j = OxmlElement("w:jc")
@@ -429,6 +437,53 @@ class Builder:
         mac = self.numbering.find(qn("w:numIdMacAtCleanup"))
         (mac.addprevious(n) if mac is not None else self.numbering.append(n))
         return new_id
+
+    def new_bullets(self) -> int:
+        """A new bulleted list (a bullet in place of 1., 2., for legends and lists without an order); returns its
+        numId. The bullet is indented as BDOI's lists: text at 0.5 inch, bullet hanging 0.25 inch."""
+        absts = self.numbering.findall(qn("w:abstractNum"))
+        aid = max(int(a.get(qn("w:abstractNumId"))) for a in absts) + 1
+        ab = OxmlElement("w:abstractNum")
+        ab.set(qn("w:abstractNumId"), str(aid))
+        mlt = OxmlElement("w:multiLevelType")
+        mlt.set(qn("w:val"), "hybridMultilevel")
+        ab.append(mlt)
+        for lvl, (char, left) in enumerate((("\u2022", 720), ("\u2013", 1080), ("\u2022", 1440))):
+            lv = OxmlElement("w:lvl")
+            lv.set(qn("w:ilvl"), str(lvl))
+            for tag, val in (("w:start", "1"), ("w:numFmt", "bullet"), ("w:lvlText", char), ("w:lvlJc", "left")):
+                e = OxmlElement(tag)
+                e.set(qn("w:val"), val)
+                lv.append(e)
+            ppr = OxmlElement("w:pPr")
+            ind = OxmlElement("w:ind")
+            ind.set(qn("w:left"), str(left))
+            ind.set(qn("w:hanging"), "360")
+            ppr.append(ind)
+            lv.append(ppr)
+            rpr = OxmlElement("w:rPr")
+            f = OxmlElement("w:rFonts")
+            for a in ("w:ascii", "w:hAnsi", "w:cs"):
+                f.set(qn(a), TABLE_FONT)
+            rpr.append(f)
+            lv.append(rpr)
+            ab.append(lv)
+        (absts[-1].addnext(ab) if absts else self.numbering.insert(0, ab))
+        nums = self.numbering.findall(qn("w:num"))
+        new_id = max(int(n.get(qn("w:numId"))) for n in nums) + 1
+        n = OxmlElement("w:num")
+        n.set(qn("w:numId"), str(new_id))
+        a = OxmlElement("w:abstractNumId")
+        a.set(qn("w:val"), str(aid))
+        n.append(a)
+        mac = self.numbering.find(qn("w:numIdMacAtCleanup"))
+        (mac.addprevious(n) if mac is not None else self.numbering.append(n))
+        return new_id
+
+    def bullets(self, entries, level=0, **kw):
+        """Paragraphs of a bulleted list (new_bullets)."""
+        num = self.new_bullets()
+        return [self.para(e, style="ListParagraph", num=(num, level), **kw) for e in entries]
 
     def items(self, entries, num_id, level=0):
         out = []
@@ -493,14 +548,14 @@ class Builder:
                 tcw.set(qn("w:w"), str(int(widths[ci] * 1440)))
                 tcw.set(qn("w:type"), "dxa")
                 tcpr.append(tcw)
-                shaded = (self.hl and shade_body) if shade_rows is None else (self.highlight and ri in shade_rows)
+                shaded = (self.hl and shade_body) if shade_rows is None else (self.highlight and getattr(self, "round14", True) and ri in shade_rows)
                 fill = head_fill if ri == 0 else (HL_FILL if shaded else None)
                 if fill:
                     tcpr.append(shd_el(fill))
                 for p in list(tc.findall(qn("w:p"))):
                     tc.remove(p)
                 for line in str(vals[ci] if vals[ci] is not None else "").split("\n"):
-                    tc.append(self.para(line, bold=(ri == 0), size=size, font="Calibri", hl=False, space_after=0))
+                    tc.append(self.para(line, bold=(ri == 0), size=size, font=TABLE_FONT, hl=False, space_after=0))
         return tbl
 
     def picture(self, path: Path, max_w=6.8, max_h=8.6):
@@ -619,15 +674,19 @@ def add_revision_log(b: Builder):
         if el.tag != qn("w:pPr"):
             head.remove(el)
     head.append(b.run(DOC["revision_log"]["title"]))
+    b.round14 = True
     tbl = b.table(DOC["revision_log"]["header"], DOC["revision_log"]["rows"], [1.5, 0.8, 3.4, 1.7], size=9,
                   shade_rows={len(DOC["revision_log"]["rows"])})
+    legend = v14.legend_elements(b, toc)
+    b.round14 = False
     brk = OxmlElement("w:p")
     r = OxmlElement("w:r")
     br = OxmlElement("w:br")
     br.set(qn("w:type"), "page")
     r.append(br)
     brk.append(r)
-    for el in (head, tbl, b.para("", hl=False), brk):
+    brk2 = copy.deepcopy(brk)
+    for el in [head, tbl, b.para("", hl=False), brk] + legend + [brk2]:
         toc.addprevious(el)
 
 
@@ -638,8 +697,12 @@ def edit_introduction(b: Builder):
     ref12 = b.clone_par(p._p, DOC["introduction"]["references"])
     p._p.addnext(ref12)
     b.round13 = True
-    ref12.addnext(b.clone_par(p._p, v13.REV["meta"]["references"]))
+    ref13 = b.clone_par(p._p, v13.REV["meta"]["references"])
+    ref12.addnext(ref13)
     b.round13 = False
+    b.round14 = True
+    ref13.addnext(b.clone_par(p._p, v14.V14["meta"]["references"]))
+    b.round14 = False
 
 
 def bdoi_row_key(rid: str) -> str:
@@ -858,7 +921,7 @@ class Annexes:
         self.els.append(self.b.para(text, **kw))
 
     def bullets(self, texts):
-        n = self.b.new_num()
+        n = self.b.new_bullets()
         for t in texts:
             self.els.append(self.b.para(t, style="ListParagraph", num=(n, 0)))
 
@@ -875,8 +938,8 @@ class Annexes:
         self.p("This annex specifies the User Access Maintenance screens: the purpose of each screen, how the user "
                "reaches it, the requirements it serves, one screenshot, its fields with type, mandatory marker, format, "
                "list or source and validation, its actions, and its rules. Mandatory: Y = mandatory, N = optional, "
-               "Cond. = mandatory when the condition stated applies. The screenshots were taken on the BIBS test "
-               "environment with SIT/UAT data on 10-Oct-2026.")
+               "Cond. = mandatory when the condition stated applies. The screenshots were taken on the "
+               + v14.V14["meta"]["environment"] + " with SIT/UAT data on 10-Oct-2026.")
         k = 0
         for f in sorted((UA / "pack" / "screens").glob("*.yaml")):
             for s in yaml.safe_load(f.read_text(encoding="utf-8"))["screens"]:
@@ -1051,6 +1114,21 @@ class Annexes:
         self.p("The business view of the sign-in through the Enterprise SSO platform (EIAM), the provisioning of user "
                "accounts from UIDM-ISC and the break-glass access. The technical settings are in the Authentication "
                "and Identity Integration Requirements reviewed by BDOI IT.")
+        b14 = self.b.round14
+        self.b.round14 = True
+        no = self.nums["brd11_fig_e2e_identity"]
+        self.p(f"N.0 shows the process from end to end with the identity systems (Figure {no}); the walkthroughs of "
+               f"Annex O follow its routes step by step.")
+        model = self.b.doc.sections[-1]._sectPr
+        lw, lh = v14.landscape_size(model)
+        start = len(self.els)
+        self.h2("N.0 End-to-end process and identity integration")
+        self.els += v13.figure_elements(self.b, self.figs, "brd11_fig_e2e_identity", self.nums, max_h=lh - 1.7,
+                                        max_w=lw - 0.1)
+        page = self.els[start:]
+        del self.els[start:]
+        self.els += v14.landscape_page(model, page)
+        self.b.round14 = b14
         self.h2("N.1 Sign-in modes")
         self.table(["Mode", "How the user signs in", "Who"], n["modes"], [1.6, 4.3, 1.5])
         self.h2("N.2 Single sign-on with EIAM")
@@ -1082,6 +1160,13 @@ class Annexes:
         self.h1("Annex O – Process Walkthroughs")
         self.p("End-to-end walkthroughs of User Access Maintenance, step by step: who acts, on which screen, what the "
                "user does, what the user sees and the result. The screens are specified in Annex J.")
+        b14 = self.b.round14
+        self.b.round14 = True
+        self.p(f"The walkthroughs are run on the {v14.V14['meta']['environment']} with the sign-in IDs of the "
+               f"Business Unit Walkthrough Users workbook (passwords issued separately by the iorta TechNXT Project "
+               f"Team); their routes are those of the end-to-end flow, Figure {self.nums['brd11_fig_e2e_identity']} "
+               f"(Annex N.0).")
+        self.b.round14 = b14
         total = 0
         for w in data:
             self.h2(f"{w['id']} {clean(w['title'])}")
@@ -1262,6 +1347,7 @@ def section_break(b: Builder, landscape: bool):
 
 def add_annexes(b: Builder, mapping, lines, trace, our, nfr, figs, nums, where):
     a = Annexes(b, mapping, lines, trace, our)
+    a.nums, a.figs = nums, figs
     a.screens()
     b.round13 = True
     new = v13.NewAnnexes(a, figs, nums, v13.nfr_rows(nfr, a.frum_of, a.refs), b.q_rows)
@@ -1284,9 +1370,16 @@ def add_annexes(b: Builder, mapping, lines, trace, our, nfr, figs, nums, where):
     new.reports()
     new.integrations()
     new.nfr()
+    b.round14 = True
+    v14.programme_nfr(a)
+    b.round14 = False
     new.data_setup()
     new.open_items(where)
     new.change_control()
+    b.round14 = True
+    v14.cr_annex(a)
+    b.round14 = False
+    b.round13 = True
     new.checklist()
     b.round13 = False
     # before the page break that precedes the Signoff Sheet
@@ -1302,38 +1395,22 @@ def add_annexes(b: Builder, mapping, lines, trace, our, nfr, figs, nums, where):
     return a
 
 
-CHANGE_POINTS = [
-    "Cover: revision {version}; Document Revision Log: row {version} (Business Unit review edition).",
-    "Introduction: new section 1.8 Summary for the Business Unit Review - scope on a page, the process from end to end, key numbers, the {decisions} decisions the Business Unit must take and how to review; references of version {version}.",
-    "Annex A: {flows} figures added - one process flow by persona for every process of the BRD, the status life-cycles of the request, the group-profile request, the user account and the separation-of-duties rule, and the integration context.",
-    "Annex J: menu by persona (figure) and the reference to the programme screen standards. Annex L: the channel of the request notices corrected. Annex Q.5: {obs13} observations of this round. Annex R: {terms} terms added.",
-    "New annexes: S Workflow and Approvals ({workflow_rows} stages and the role-to-stage matrix); T E-mail and Notification Texts ({emails} notices and e-mails, word for word); U Document Prints and Output Formats ({documents}); V Reports and Schedules ({reports} reports, {schedules} runs); W Integrations ({integrations}); X Non-functional Requirements ({nfr_rows} rows); Y Data Set-up and Migration at Go-live ({data_rows}); Z Assumptions, Dependencies and Open Questions ({open_kept} open questions kept, {answered} answered by BDOI's FRS and not repeated); AA Change Control after Sign-off; AB Business Unit Review Checklist ({checklist} points).",
-    "Aligned with BIBS on 10 Oct 2026: Annex J screens added (Identity Synchronisation, Session Timed Out, Audit Trail) and updated (Login, inactivity warning in BDOI's wording, Users with the directory details, Separation of Duties with the conflicting permission combinations), every screenshot taken again; Annex M.10 with the {decision_settings} settings for the points BDOI decides; Annex N (provisioning options as settings, simulator for SIT and UAT), Annex T (notices of refused identity events and break-glass sign-ins), Annexes V and W updated.",
-    "BDOI's text of version 1.1 and the additions of version 1.2 are unchanged, except the corrections shaded in this copy (Annex L channel, password history of 10, password reset, inactivity sign-out, provisioning options).",
-]
-
-
 def change_summary(b: Builder):
-    s = b.stats
-    values = dict(version=v13.REV["meta"]["version"], decisions=len(v13.REV["summary"]["decisions"]),
-                  flows=sum(1 for f in v13.FLOWS if f["where"] == "A"), obs13=s["observations_v13"],
-                  terms=len(v13.REV["glossary_add"]))
-    for k in ("workflow_rows", "emails", "documents", "reports", "schedules", "integrations", "nfr_rows",
-              "data_rows", "open_kept", "answered", "checklist", "decision_settings"):
-        values[k] = s[k]
-    els = [b.para(f"Summary of changes in version {values['version']}", bold=True, size=14, color="014EA9", hl=False,
+    """The page in front of the review copy: what changed in version 1.4 against version 1.3."""
+    ver = v14.V14["meta"]["version"]
+    nums = v13.figure_numbers()
+    points = v14.change_summary_points(nums["brd11_fig_e2e_identity"], b.stats["programme_nfr"])
+    els = [b.para(f"Summary of changes in version {ver}", bold=True, size=14, color="014EA9", hl=False,
                   space_after=120),
-           b.para("This review copy shows in light yellow every passage added in version 1.3, the Business Unit "
-                  "review edition. BDOI's text of version 1.1 and the additions of version 1.2 are not shaded; the "
-                  "points for decision are in Annex Q and the open questions in Annex Z.", size=9.5, hl=False)]
+           b.para(f"This review copy shows in light yellow every passage added or changed in version {ver} against "
+                  f"version {v14.V14['meta']['previous']} (product owner review of 11-Oct-2026). The colour of the text "
+                  f"(green, orange) is the colour code of the requirements explained in How to read this document; it "
+                  f"is the same in the clean copy.", size=9.5, hl=False)]
     n = b.new_num()
-    for pt in CHANGE_POINTS:
-        els.append(b.para(pt.format(**values), style="ListParagraph", num=(n, 0), size=9.5, hl=False))
-    els.append(b.para("The first decision BDOI must take is still where access requests are raised and approved "
-                      "(Annex Q, C01): BIBS offers each option as a setting (Annex M.10); section 1.8 lists the ten "
-                      "decisions.", size=9.5, hl=False))
+    for pt in points:
+        els.append(b.para(pt, style="ListParagraph", num=(n, 0), size=9.5, hl=False))
     els.append(b.para("Shading used in this copy: ", size=9.5, hl=False))
-    els[-1].append(b.run("text added or corrected in version 1.3", size=9.5, hl=True))
+    els[-1].append(b.run(f"text added or changed in version {ver}", size=9.5, hl=True))
     brk = OxmlElement("w:p")
     ppr = OxmlElement("w:pPr")
     ppr.append(copy.deepcopy(b.doc.sections[0]._sectPr))
@@ -1364,12 +1441,14 @@ def key_numbers(b: Builder, nfr) -> list[list[str]]:
         ["Documents and outputs", str(s["documents"]), "Annex U"],
         ["Reports / scheduled runs", f"{s['reports']} / {s['schedules']}", "Annex V"],
         ["Integrations", str(s["integrations"]), "Annex W"],
-        ["Figures added in version 1.3", str(len(v13.FLOWS)), "1.8; Annexes A, J, S"],
+        ["Figures (process flows, life-cycles, context, menus)", str(len(v13.FLOWS)), "1.8; Annexes A, J, N, S"],
         ["Test cases (Test Cases and Traceability workbook, with one per acceptance criterion)", str(bibs_case_count() + s["ac"]),
          "Test Cases and Traceability workbook"],
         ["Open questions not answered in BDOI's FRS / answered and not repeated", f"{s['open_kept']} / {s['answered']}",
          "Annex Z"],
         ["Observations and points for decision", str(s["observations"]), "Annex Q"],
+        ["Change requests (orange) / points beyond the BRD offered as standard (green)",
+         f"{len(v14.V14['crs'])} / {len(v14.V14['ootb'])}", "Annex AA.2, AA.3"],
         ["Review checklist points", str(s["checklist"]), "Annex AB"],
     ]
 
@@ -1547,6 +1626,12 @@ def build(highlight: bool, our, lines, trace, nfr, figs: dict) -> Builder:
     add_revision_log(b)
     if highlight:
         change_summary(b)
+    fr_blocks = OrderedDict()
+    for row in b.tables[4].rows[1:]:
+        fr_blocks.update(subitem_blocks(row.cells[3]._tc))
+    b.colour_hits = v14.apply_colours(b, fr_blocks)
+    if highlight:
+        b.stats["shaded_v14"] = v14.shade_changed(b, shd_el)
     set_update_fields(b)
     check_words(b)
     b.mapping = mapping

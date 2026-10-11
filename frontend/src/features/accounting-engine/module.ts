@@ -1,8 +1,8 @@
 import { Activity, FlaskConical, ListChecks, Workflow, Zap } from 'lucide-react';
-import { lazy } from 'react';
+import { lazyWithRetry } from '@/app/loadRecovery';
 import type { FeatureModule } from '@/navigation/types';
 
-const RuleEditorPage = lazy(() => import('./RuleEditorPage'));
+const RuleEditorPage = lazyWithRetry(() => import('./RuleEditorPage'));
 
 export const accountingEngineModule: FeatureModule = {
   id: 'accounting-engine',
@@ -13,14 +13,14 @@ export const accountingEngineModule: FeatureModule = {
       label: 'Event Types',
       icon: Zap,
       permission: 'MASTER_VIEW',
-      component: lazy(() => import('./EventTypesPage')),
+      component: lazyWithRetry(() => import('./EventTypesPage')),
     },
     {
       path: '/accounting/rules',
       label: 'Accounting Rules',
       icon: Workflow,
       permission: 'MASTER_VIEW',
-      component: lazy(() => import('./RulesPage')),
+      component: lazyWithRetry(() => import('./RulesPage')),
     },
     {
       path: '/accounting/rules/new',
@@ -43,14 +43,14 @@ export const accountingEngineModule: FeatureModule = {
       label: 'Rule Simulator',
       icon: FlaskConical,
       permission: 'MASTER_VIEW',
-      component: lazy(() => import('./SimulatorPage')),
+      component: lazyWithRetry(() => import('./SimulatorPage')),
     },
     {
       path: '/accounting/events',
       label: 'Event Register',
       icon: Activity,
       permission: 'JOURNAL_VIEW',
-      component: lazy(() => import('./EventRegisterPage')),
+      component: lazyWithRetry(() => import('./EventRegisterPage')),
     },
   ],
 };

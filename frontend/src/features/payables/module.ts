@@ -1,5 +1,5 @@
 import { Banknote, CalendarClock, FileText, Landmark, Wallet } from 'lucide-react';
-import { lazy } from 'react';
+import { lazyWithRetry } from '@/app/loadRecovery';
 import type { FeatureModule } from '@/navigation/types';
 
 export const payablesModule: FeatureModule = {
@@ -11,14 +11,14 @@ export const payablesModule: FeatureModule = {
       label: 'Supplier Invoices',
       icon: FileText,
       permission: 'JOURNAL_VIEW',
-      component: lazy(() => import('./SupplierInvoicesPage')),
+      component: lazyWithRetry(() => import('./SupplierInvoicesPage')),
     },
     {
       path: '/payables/invoices/new',
       label: 'New Supplier Invoice',
       icon: FileText,
       permission: 'RECEIPT_PAYMENT_MAINTAIN',
-      component: lazy(() => import('./InvoiceEntryPage')),
+      component: lazyWithRetry(() => import('./InvoiceEntryPage')),
       hidden: true,
     },
     {
@@ -26,14 +26,14 @@ export const payablesModule: FeatureModule = {
       label: 'Payment Vouchers',
       icon: Banknote,
       permission: 'JOURNAL_VIEW',
-      component: lazy(() => import('./PaymentVouchersPage')),
+      component: lazyWithRetry(() => import('./PaymentVouchersPage')),
     },
     {
       path: '/payables/vouchers/new',
       label: 'New Payment',
       icon: Banknote,
       permission: 'RECEIPT_PAYMENT_MAINTAIN',
-      component: lazy(() => import('./PaymentEntryPage')),
+      component: lazyWithRetry(() => import('./PaymentEntryPage')),
       hidden: true,
     },
     {
@@ -41,21 +41,21 @@ export const payablesModule: FeatureModule = {
       label: 'PDC Issued',
       icon: CalendarClock,
       permission: 'JOURNAL_VIEW',
-      component: lazy(() => import('./PdcIssuedPage')),
+      component: lazyWithRetry(() => import('./PdcIssuedPage')),
     },
     {
       path: '/payables/petty-cash',
       label: 'Petty Cash',
       icon: Wallet,
       permission: 'JOURNAL_VIEW',
-      component: lazy(() => import('./PettyCashPage')),
+      component: lazyWithRetry(() => import('./PettyCashPage')),
     },
     {
       path: '/payables/bank-accounts',
       label: 'Bank Accounts',
       icon: Landmark,
       permission: 'MASTER_VIEW',
-      component: lazy(() => import('./BankAccountsPage')),
+      component: lazyWithRetry(() => import('./BankAccountsPage')),
     },
   ],
 };

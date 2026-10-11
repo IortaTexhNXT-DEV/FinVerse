@@ -7,10 +7,10 @@ import {
   Search,
   Upload,
 } from 'lucide-react';
-import { lazy } from 'react';
+import { lazyWithRetry } from '@/app/loadRecovery';
 import type { FeatureModule } from '@/navigation/types';
 
-const JournalEntryPage = lazy(() => import('./JournalEntryPage'));
+const JournalEntryPage = lazyWithRetry(() => import('./JournalEntryPage'));
 
 export const glModule: FeatureModule = {
   id: 'gl',
@@ -21,7 +21,7 @@ export const glModule: FeatureModule = {
       label: 'Journals',
       icon: BookOpen,
       permission: 'JOURNAL_VIEW',
-      component: lazy(() => import('./JournalsPage')),
+      component: lazyWithRetry(() => import('./JournalsPage')),
     },
     {
       path: '/gl/journals/new',
@@ -35,7 +35,7 @@ export const glModule: FeatureModule = {
       label: 'Journal',
       icon: BookOpen,
       permission: 'JOURNAL_VIEW',
-      component: lazy(() => import('./JournalDetailPage')),
+      component: lazyWithRetry(() => import('./JournalDetailPage')),
       hidden: true,
     },
     {
@@ -51,35 +51,35 @@ export const glModule: FeatureModule = {
       label: 'Account Inquiry',
       icon: Search,
       permission: 'JOURNAL_VIEW',
-      component: lazy(() => import('./AccountInquiryPage')),
+      component: lazyWithRetry(() => import('./AccountInquiryPage')),
     },
     {
       path: '/gl/party-statement',
       label: 'Party Statement',
       icon: BookUser,
       permission: 'JOURNAL_VIEW',
-      component: lazy(() => import('./PartyLedgerPage')),
+      component: lazyWithRetry(() => import('./PartyLedgerPage')),
     },
     {
       path: '/gl/accounts',
       label: 'Chart of Accounts',
       icon: ListTree,
       permission: 'MASTER_VIEW',
-      component: lazy(() => import('./ChartOfAccountsPage')),
+      component: lazyWithRetry(() => import('./ChartOfAccountsPage')),
     },
     {
       path: '/gl/accounts/upload',
       label: 'Chart Upload',
       icon: Upload,
       permission: 'COA_UPLOAD',
-      component: lazy(() => import('./ChartUploadPage')),
+      component: lazyWithRetry(() => import('./ChartUploadPage')),
     },
     {
       path: '/gl/periods',
       label: 'Financial Periods',
       icon: CalendarRange,
       permission: 'MASTER_VIEW',
-      component: lazy(() => import('./PeriodsPage')),
+      component: lazyWithRetry(() => import('./PeriodsPage')),
     },
   ],
 };

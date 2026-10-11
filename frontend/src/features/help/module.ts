@@ -1,5 +1,5 @@
 import { CircleHelp, UserRound } from 'lucide-react';
-import { lazy } from 'react';
+import { lazyWithRetry } from '@/app/loadRecovery';
 import type { FeatureModule } from '@/navigation/types';
 
 export const helpModule: FeatureModule = {
@@ -10,13 +10,13 @@ export const helpModule: FeatureModule = {
       path: '/help',
       label: 'Help Center',
       icon: CircleHelp,
-      component: lazy(() => import('./HelpPage')),
+      component: lazyWithRetry(() => import('./HelpPage')),
     },
     {
       path: '/profile',
       label: 'My Profile',
       icon: UserRound,
-      component: lazy(() => import('@/features/profile/MyProfilePage')),
+      component: lazyWithRetry(() => import('@/features/profile/MyProfilePage')),
     },
   ],
 };

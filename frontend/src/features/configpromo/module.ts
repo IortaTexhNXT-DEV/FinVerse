@@ -6,7 +6,7 @@ import {
   Layers,
   SlidersVertical,
 } from 'lucide-react';
-import { lazy } from 'react';
+import { lazyWithRetry } from '@/app/loadRecovery';
 import type { FeatureModule } from '@/navigation/types';
 
 const ANY = [
@@ -50,7 +50,7 @@ export const configPromotionModule: FeatureModule = {
       label: 'Export Configuration',
       icon: ArrowUpFromLine,
       permission: 'CONFIG_EXPORT',
-      component: lazy(() => import('./ExportPage')),
+      component: lazyWithRetry(() => import('./ExportPage')),
     },
     {
       path: '/admin/config-promotion/imports',
@@ -59,7 +59,7 @@ export const configPromotionModule: FeatureModule = {
       permission: 'CONFIG_IMPORT_PREPARE',
       // The approvers open the imports waiting for them.
       alsoPermissions: ['CONFIG_IMPORT_APPROVE'],
-      component: lazy(() => import('./ImportsPage')),
+      component: lazyWithRetry(() => import('./ImportsPage')),
     },
     {
       path: '/admin/config-promotion/packages',
@@ -67,7 +67,7 @@ export const configPromotionModule: FeatureModule = {
       icon: Layers,
       permission: 'CONFIG_EXPORT',
       alsoPermissions: ANY,
-      component: lazy(() => import('./PackagesPage')),
+      component: lazyWithRetry(() => import('./PackagesPage')),
     },
     {
       path: '/admin/config-promotion/baselines',
@@ -75,7 +75,7 @@ export const configPromotionModule: FeatureModule = {
       icon: Flag,
       permission: 'CONFIG_BASELINE_MANAGE',
       alsoPermissions: ANY,
-      component: lazy(() => import('./BaselinesPage')),
+      component: lazyWithRetry(() => import('./BaselinesPage')),
     },
     {
       path: '/admin/config-promotion/overrides',
@@ -83,7 +83,7 @@ export const configPromotionModule: FeatureModule = {
       icon: SlidersVertical,
       permission: 'CONFIG_EXPORT',
       alsoPermissions: ANY,
-      component: lazy(() => import('./OverridesPage')),
+      component: lazyWithRetry(() => import('./OverridesPage')),
     },
     {
       path: '/admin/config-uploads',
@@ -93,7 +93,7 @@ export const configPromotionModule: FeatureModule = {
       hidden: true,
       permission: 'MASTER_AUTHORIZE',
       alsoPermissions: UPLOADS,
-      component: lazy(() => import('./ConfigUploadsPage')),
+      component: lazyWithRetry(() => import('./ConfigUploadsPage')),
     },
   ],
 };

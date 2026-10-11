@@ -7,7 +7,7 @@ import {
   Landmark,
   TrendingDown,
 } from 'lucide-react';
-import { lazy } from 'react';
+import { lazyWithRetry } from '@/app/loadRecovery';
 import type { FeatureModule } from '@/navigation/types';
 
 /** Fixed assets and the investment portfolio. */
@@ -20,49 +20,49 @@ export const assetsModule: FeatureModule = {
       label: 'Asset Categories',
       icon: FolderTree,
       permission: 'MASTER_VIEW',
-      component: lazy(() => import('./AssetCategoriesPage')),
+      component: lazyWithRetry(() => import('./AssetCategoriesPage')),
     },
     {
       path: '/assets/register',
       label: 'Asset Register',
       icon: Boxes,
       permission: 'MASTER_VIEW',
-      component: lazy(() => import('./AssetRegisterPage')),
+      component: lazyWithRetry(() => import('./AssetRegisterPage')),
     },
     {
       path: '/assets/depreciation',
       label: 'Depreciation Run',
       icon: TrendingDown,
       permission: 'MASTER_VIEW',
-      component: lazy(() => import('./DepreciationRunPage')),
+      component: lazyWithRetry(() => import('./DepreciationRunPage')),
     },
     {
       path: '/investments/portfolios',
       label: 'Investment Portfolios',
       icon: Briefcase,
       permission: 'MASTER_VIEW',
-      component: lazy(() => import('./PortfoliosPage')),
+      component: lazyWithRetry(() => import('./PortfoliosPage')),
     },
     {
       path: '/investments/holdings',
       label: 'Investments',
       icon: Landmark,
       permission: 'MASTER_VIEW',
-      component: lazy(() => import('./InvestmentsPage')),
+      component: lazyWithRetry(() => import('./InvestmentsPage')),
     },
     {
       path: '/investments/runs',
       label: 'Accrual & Amortization',
       icon: CalendarClock,
       permission: 'MASTER_VIEW',
-      component: lazy(() => import('./InvestmentRunsPage')),
+      component: lazyWithRetry(() => import('./InvestmentRunsPage')),
     },
     {
       path: '/investments/maturities',
       label: 'Maturities & Sales',
       icon: ArrowLeftRight,
       permission: 'MASTER_VIEW',
-      component: lazy(() => import('./HoldingEventsPage')),
+      component: lazyWithRetry(() => import('./HoldingEventsPage')),
     },
   ],
 };

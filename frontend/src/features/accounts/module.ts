@@ -1,5 +1,5 @@
 import { FilePlus2, FileStack, Gift, Upload, Wallet } from 'lucide-react';
-import { lazy } from 'react';
+import { lazyWithRetry } from '@/app/loadRecovery';
 import type { FeatureModule } from '@/navigation/types';
 
 /**
@@ -15,21 +15,21 @@ export const accountsModule: FeatureModule = {
       label: 'Accounts',
       icon: FileStack,
       permission: 'ACCOUNT_VIEW',
-      component: lazy(() => import('./AccountsPage')),
+      component: lazyWithRetry(() => import('./AccountsPage')),
     },
     {
       path: '/accounts/new',
       label: 'New Account',
       icon: FilePlus2,
       permission: 'ACCOUNT_MAINTAIN',
-      component: lazy(() => import('./AccountWizardPage')),
+      component: lazyWithRetry(() => import('./AccountWizardPage')),
     },
     {
       path: '/accounts/:id',
       label: 'Account',
       icon: FileStack,
       permission: 'ACCOUNT_VIEW',
-      component: lazy(() => import('./AccountDetailPage')),
+      component: lazyWithRetry(() => import('./AccountDetailPage')),
       hidden: true,
     },
     {
@@ -37,7 +37,7 @@ export const accountsModule: FeatureModule = {
       label: 'Edit Account',
       icon: FilePlus2,
       permission: 'ACCOUNT_MAINTAIN',
-      component: lazy(() => import('./AccountWizardPage')),
+      component: lazyWithRetry(() => import('./AccountWizardPage')),
       hidden: true,
     },
     {
@@ -45,7 +45,7 @@ export const accountsModule: FeatureModule = {
       label: 'Account by ARN',
       icon: FileStack,
       permission: 'ACCOUNT_VIEW',
-      component: lazy(() => import('./AccountByArnPage')),
+      component: lazyWithRetry(() => import('./AccountByArnPage')),
       hidden: true,
     },
     {
@@ -53,14 +53,14 @@ export const accountsModule: FeatureModule = {
       label: 'FFY Register',
       icon: Gift,
       permission: 'ACCOUNT_VIEW',
-      component: lazy(() => import('./FfyRegisterPage')),
+      component: lazyWithRetry(() => import('./FfyRegisterPage')),
     },
     {
       path: '/accounts/direct-payment',
       label: 'Direct Payment',
       icon: Wallet,
       permission: 'ACCOUNT_VIEW',
-      component: lazy(() => import('./DirectPaymentPage')),
+      component: lazyWithRetry(() => import('./DirectPaymentPage')),
     },
     {
       // More specific than /bulk/:handler: account uploads need the product parameter.
@@ -68,7 +68,7 @@ export const accountsModule: FeatureModule = {
       label: 'Bulk Account Creation',
       icon: Upload,
       permission: 'BULK_PROCESS',
-      component: lazy(() => import('./AccountBulkPage')),
+      component: lazyWithRetry(() => import('./AccountBulkPage')),
       hidden: true,
     },
   ],

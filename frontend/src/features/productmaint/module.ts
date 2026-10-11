@@ -10,7 +10,7 @@ import {
   FileSpreadsheet,
   Workflow,
 } from 'lucide-react';
-import { lazy } from 'react';
+import { lazyWithRetry } from '@/app/loadRecovery';
 import type { FeatureModule, ScreenDef } from '@/navigation/types';
 
 /**
@@ -26,7 +26,7 @@ export const PACKAGE_REQUEST_SCREENS: readonly ScreenDef[] = [
     icon: LayoutDashboard,
     permission: 'PRODUCT_VIEW',
     alsoPermissions: ['PKG_REPORT_VIEW'],
-    component: lazy(() => import('./ProductMaintenanceHomePage')),
+    component: lazyWithRetry(() => import('./ProductMaintenanceHomePage')),
   },
   {
     path: '/product-maintenance/dashboard',
@@ -34,7 +34,7 @@ export const PACKAGE_REQUEST_SCREENS: readonly ScreenDef[] = [
     icon: BarChart3,
     permission: 'PRODUCT_VIEW',
     alsoPermissions: ['PKG_REPORT_VIEW'],
-    component: lazy(() => import('./workspace/PmDashboardPage')),
+    component: lazyWithRetry(() => import('./workspace/PmDashboardPage')),
   },
   {
     path: '/product-maintenance/requests',
@@ -42,14 +42,14 @@ export const PACKAGE_REQUEST_SCREENS: readonly ScreenDef[] = [
     icon: FileStack,
     permission: 'PRODUCT_VIEW',
     alsoPermissions: ['PKG_REPORT_VIEW'],
-    component: lazy(() => import('./PackageRequestsPage')),
+    component: lazyWithRetry(() => import('./PackageRequestsPage')),
   },
   {
     path: '/product-maintenance/requests/new',
     label: 'New Package Request',
     icon: FilePlus2,
     permission: 'PKG_REQUEST',
-    component: lazy(() => import('./PackageRequestFormPage')),
+    component: lazyWithRetry(() => import('./PackageRequestFormPage')),
     hidden: true,
   },
   {
@@ -58,7 +58,7 @@ export const PACKAGE_REQUEST_SCREENS: readonly ScreenDef[] = [
     icon: FileStack,
     permission: 'PRODUCT_VIEW',
     alsoPermissions: ['PKG_REPORT_VIEW'],
-    component: lazy(() => import('./PackageRequestPage')),
+    component: lazyWithRetry(() => import('./PackageRequestPage')),
     hidden: true,
   },
   {
@@ -67,7 +67,7 @@ export const PACKAGE_REQUEST_SCREENS: readonly ScreenDef[] = [
     icon: FilePlus2,
     permission: 'PKG_REQUEST',
     alsoPermissions: ['PKG_TSU_RECOMMEND'],
-    component: lazy(() => import('./PackageRequestFormPage')),
+    component: lazyWithRetry(() => import('./PackageRequestFormPage')),
     hidden: true,
   },
   {
@@ -76,7 +76,7 @@ export const PACKAGE_REQUEST_SCREENS: readonly ScreenDef[] = [
     icon: Workflow,
     permission: 'PKG_NEGOTIATE',
     alsoPermissions: ['PKG_TSU_RECOMMEND', 'PKG_TSU_APPROVE'],
-    component: lazy(() => import('./PackageTsuWorkbenchPage')),
+    component: lazyWithRetry(() => import('./PackageTsuWorkbenchPage')),
   },
   {
     path: '/product-maintenance/expiry',
@@ -84,7 +84,7 @@ export const PACKAGE_REQUEST_SCREENS: readonly ScreenDef[] = [
     icon: Hourglass,
     permission: 'PKG_NEGOTIATE',
     alsoPermissions: ['PRODUCT_MAINTAIN', 'PKG_REPORT_VIEW'],
-    component: lazy(() => import('./PackageExpiryPage')),
+    component: lazyWithRetry(() => import('./PackageExpiryPage')),
   },
   {
     path: '/product-maintenance/deactivations',
@@ -92,7 +92,7 @@ export const PACKAGE_REQUEST_SCREENS: readonly ScreenDef[] = [
     icon: PackageX,
     permission: 'PRODUCT_VIEW',
     alsoPermissions: ['PKG_REPORT_VIEW'],
-    component: lazy(() => import('./workspace/DeactivationsPage')),
+    component: lazyWithRetry(() => import('./workspace/DeactivationsPage')),
   },
   {
     path: '/product-maintenance/master-changes',
@@ -100,14 +100,14 @@ export const PACKAGE_REQUEST_SCREENS: readonly ScreenDef[] = [
     icon: RefreshCcwDot,
     permission: 'PRODUCT_MAINTAIN',
     alsoPermissions: ['PKG_REPORT_VIEW'],
-    component: lazy(() => import('./workspace/MasterChangesPage')),
+    component: lazyWithRetry(() => import('./workspace/MasterChangesPage')),
   },
   {
     path: '/product-maintenance/placement-reports',
     label: 'Placement Update Reports',
     icon: FileSpreadsheet,
     permission: 'PKG_REPORT_VIEW',
-    component: lazy(() => import('./placement/PlacementReportsPage')),
+    component: lazyWithRetry(() => import('./placement/PlacementReportsPage')),
   },
   {
     path: '/product-maintenance/audit-logs',
@@ -115,7 +115,7 @@ export const PACKAGE_REQUEST_SCREENS: readonly ScreenDef[] = [
     icon: ScrollText,
     permission: 'PRODUCT_VIEW',
     alsoPermissions: ['PKG_REPORT_VIEW', 'AUDIT_VIEW'],
-    component: lazy(() => import('./workspace/PmAuditLogsPage')),
+    component: lazyWithRetry(() => import('./workspace/PmAuditLogsPage')),
   },
 ];
 

@@ -1,5 +1,5 @@
 import { BookOpenCheck, Calculator, FileText, Layers, Settings2 } from 'lucide-react';
-import { lazy } from 'react';
+import { lazyWithRetry } from '@/app/loadRecovery';
 import type { FeatureModule } from '@/navigation/types';
 
 const FEE_ROLES = ['SERVICE_FEE_MANAGE', 'SERVICE_FEE_APPROVE', 'SERVICE_FEE_TAG'];
@@ -17,7 +17,7 @@ export const frbsModule: FeatureModule = {
       label: 'Report Pack',
       icon: BookOpenCheck,
       permission: 'FRBS_REPORT_VIEW',
-      component: lazy(() => import('./FrbsHomePage')),
+      component: lazyWithRetry(() => import('./FrbsHomePage')),
     },
     {
       path: '/frbs/schedules',
@@ -25,7 +25,7 @@ export const frbsModule: FeatureModule = {
       icon: Layers,
       permission: 'FRBS_REPORT_VIEW',
       alsoPermissions: ['REPORT_FINANCIAL', 'MASTER_MAINTAIN'],
-      component: lazy(() => import('./SchedulesPage')),
+      component: lazyWithRetry(() => import('./SchedulesPage')),
     },
     {
       path: '/frbs/service-fee',
@@ -33,7 +33,7 @@ export const frbsModule: FeatureModule = {
       icon: Calculator,
       permission: 'SERVICE_FEE_MANAGE',
       alsoPermissions: [...FEE_ROLES, 'FRBS_REPORT_VIEW'],
-      component: lazy(() => import('./ServiceFeeRunsPage')),
+      component: lazyWithRetry(() => import('./ServiceFeeRunsPage')),
     },
     {
       path: '/frbs/service-fee/setup',
@@ -41,7 +41,7 @@ export const frbsModule: FeatureModule = {
       icon: Settings2,
       permission: 'SERVICE_FEE_APPROVE',
       alsoPermissions: [...FEE_ROLES, 'FRBS_REPORT_VIEW'],
-      component: lazy(() => import('./ServiceFeeSetupPage')),
+      component: lazyWithRetry(() => import('./ServiceFeeSetupPage')),
     },
     {
       path: '/frbs/service-fee/runs/:id',
@@ -49,7 +49,7 @@ export const frbsModule: FeatureModule = {
       icon: FileText,
       permission: 'SERVICE_FEE_MANAGE',
       alsoPermissions: [...FEE_ROLES, 'FRBS_REPORT_VIEW'],
-      component: lazy(() => import('./ServiceFeeRunPage')),
+      component: lazyWithRetry(() => import('./ServiceFeeRunPage')),
       hidden: true,
     },
   ],

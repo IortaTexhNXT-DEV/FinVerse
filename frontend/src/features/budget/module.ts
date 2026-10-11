@@ -1,5 +1,5 @@
 import { ChartColumn, Wallet } from 'lucide-react';
-import { lazy } from 'react';
+import { lazyWithRetry } from '@/app/loadRecovery';
 import type { ScreenDef } from '@/navigation/types';
 
 /** Budget screens (listed in the "Planning & Closing" section, see closing/module.ts). */
@@ -9,14 +9,14 @@ export const budgetScreens: ScreenDef[] = [
     label: 'Budgets',
     icon: Wallet,
     permission: 'BUDGET_MANAGE',
-    component: lazy(() => import('./BudgetsPage')),
+    component: lazyWithRetry(() => import('./BudgetsPage')),
   },
   {
     path: '/planning/budgets/:id',
     label: 'Budget',
     icon: Wallet,
     permission: 'BUDGET_MANAGE',
-    component: lazy(() => import('./BudgetEditorPage')),
+    component: lazyWithRetry(() => import('./BudgetEditorPage')),
     hidden: true,
   },
   {
@@ -24,6 +24,6 @@ export const budgetScreens: ScreenDef[] = [
     label: 'Budget vs Actual',
     icon: ChartColumn,
     permission: 'REPORT_FINANCIAL',
-    component: lazy(() => import('./BudgetVsActualPage')),
+    component: lazyWithRetry(() => import('./BudgetVsActualPage')),
   },
 ];

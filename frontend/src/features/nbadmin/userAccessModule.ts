@@ -6,7 +6,7 @@ import {
   ShieldCheck,
   UserCheck,
 } from 'lucide-react';
-import { lazy } from 'react';
+import { lazyWithRetry } from '@/app/loadRecovery';
 import type { FeatureModule } from '@/navigation/types';
 
 /** Anyone taking part in access requests. */
@@ -45,7 +45,7 @@ export const userAccessModule: FeatureModule = {
       icon: UserCheck,
       permission: 'UAM_VIEW',
       alsoPermissions: VIEW,
-      component: lazy(() => import('./AccessRequestsPage')),
+      component: lazyWithRetry(() => import('./AccessRequestsPage')),
     },
     {
       path: '/user-access/requests/new',
@@ -53,7 +53,7 @@ export const userAccessModule: FeatureModule = {
       icon: UserCheck,
       permission: 'UAM_ENROLL',
       alsoPermissions: REQUEST,
-      component: lazy(() => import('./AccessRequestFormPage')),
+      component: lazyWithRetry(() => import('./AccessRequestFormPage')),
       hidden: true,
     },
     {
@@ -62,7 +62,7 @@ export const userAccessModule: FeatureModule = {
       icon: UserCheck,
       permission: 'UAM_VIEW',
       alsoPermissions: VIEW,
-      component: lazy(() => import('./AccessRequestPage')),
+      component: lazyWithRetry(() => import('./AccessRequestPage')),
       hidden: true,
     },
     {
@@ -71,7 +71,7 @@ export const userAccessModule: FeatureModule = {
       icon: UserCheck,
       permission: 'UAM_ENROLL',
       alsoPermissions: REQUEST,
-      component: lazy(() => import('./AccessRequestFormPage')),
+      component: lazyWithRetry(() => import('./AccessRequestFormPage')),
       hidden: true,
     },
     {
@@ -80,7 +80,7 @@ export const userAccessModule: FeatureModule = {
       icon: ShieldCheck,
       permission: 'UAM_GROUP_REQUEST',
       alsoPermissions: VIEW,
-      component: lazy(() => import('./GroupProfileRequestsPage')),
+      component: lazyWithRetry(() => import('./GroupProfileRequestsPage')),
     },
     {
       path: '/user-access/bulk',
@@ -88,7 +88,7 @@ export const userAccessModule: FeatureModule = {
       icon: FileSpreadsheet,
       permission: 'UAM_ENROLL',
       alsoPermissions: ['UAM_MODIFY', 'ACCESS_APPROVE'],
-      component: lazy(() => import('./BulkRequestPage')),
+      component: lazyWithRetry(() => import('./BulkRequestPage')),
     },
     {
       path: '/user-access/bulk/:id',
@@ -96,7 +96,7 @@ export const userAccessModule: FeatureModule = {
       icon: FileSpreadsheet,
       permission: 'UAM_ENROLL',
       alsoPermissions: ['UAM_MODIFY', 'ACCESS_APPROVE', 'UAM_VIEW'],
-      component: lazy(() => import('./AccessBatchPage')),
+      component: lazyWithRetry(() => import('./AccessBatchPage')),
       hidden: true,
     },
     {
@@ -106,7 +106,7 @@ export const userAccessModule: FeatureModule = {
       permission: 'ACCESS_REQUEST',
       // The permissions of the matrix endpoint: UAM_VIEW alone showed an entry that answers 403.
       alsoPermissions: ['ACCESS_APPROVE', 'ROLE_MANAGE', 'AUDIT_VIEW'],
-      component: lazy(() => import('./AccessMatrixPage')),
+      component: lazyWithRetry(() => import('./AccessMatrixPage')),
     },
     {
       path: '/user-access/sod-rules',
@@ -114,14 +114,14 @@ export const userAccessModule: FeatureModule = {
       icon: Scale,
       permission: 'UAM_SOD_MAINTAIN',
       alsoPermissions: ['UAM_SOD_AUTHORIZE'],
-      component: lazy(() => import('./SodRulesPage')),
+      component: lazyWithRetry(() => import('./SodRulesPage')),
     },
     {
       path: '/user-access/reports',
       label: 'User Access Reports',
       icon: FileBarChart,
       permission: 'UAM_REPORT_VIEW',
-      component: lazy(() => import('./UserAccessReportsPage')),
+      component: lazyWithRetry(() => import('./UserAccessReportsPage')),
     },
   ],
 };

@@ -1,5 +1,5 @@
 import { Banknote, BookKey, FilePen, FilePlus2, FileText, FileX2 } from 'lucide-react';
-import { lazy } from 'react';
+import { lazyWithRetry } from '@/app/loadRecovery';
 import type { FeatureModule } from '@/navigation/types';
 
 const REQUEST_ROLES = ['PRQ_CREATE', 'PRQ_REVIEW', 'PRQ_APPROVE', 'PRQ_HR_APPROVE'];
@@ -21,28 +21,28 @@ export const payRequestModule: FeatureModule = {
       icon: FilePen,
       permission: 'PRQ_VIEW',
       alsoPermissions: REQUEST_ROLES,
-      component: lazy(() => import('./PayRequestsHomePage')),
+      component: lazyWithRetry(() => import('./PayRequestsHomePage')),
     },
     {
       path: '/payment-requests/new-refund',
       label: 'New Refund Request',
       icon: FilePlus2,
       permission: 'PRQ_CREATE',
-      component: lazy(() => import('./RefundFormPage')),
+      component: lazyWithRetry(() => import('./RefundFormPage')),
     },
     {
       path: '/payment-requests/new-cash-advance',
       label: 'New Cash Advance',
       icon: Banknote,
       permission: 'PRQ_CREATE',
-      component: lazy(() => import('./CashAdvanceFormPage')),
+      component: lazyWithRetry(() => import('./CashAdvanceFormPage')),
     },
     {
       path: '/payment-requests/check-cancellation',
       label: 'Cancel a Check',
       icon: FileX2,
       permission: 'PRQ_CREATE',
-      component: lazy(() => import('./CheckCancellationPage')),
+      component: lazyWithRetry(() => import('./CheckCancellationPage')),
     },
     {
       path: '/payment-requests/liquidation-accounts',
@@ -50,7 +50,7 @@ export const payRequestModule: FeatureModule = {
       icon: BookKey,
       permission: 'ACCOUNTING_RULE_MANAGE',
       alsoPermissions: ['PRQ_REVIEW'],
-      component: lazy(() => import('./LiquidationAccountsPage')),
+      component: lazyWithRetry(() => import('./LiquidationAccountsPage')),
     },
     {
       path: '/payment-requests/requests/:id',
@@ -58,7 +58,7 @@ export const payRequestModule: FeatureModule = {
       icon: FileText,
       permission: 'PRQ_VIEW',
       alsoPermissions: REQUEST_ROLES,
-      component: lazy(() => import('./RequestDetailPage')),
+      component: lazyWithRetry(() => import('./RequestDetailPage')),
       hidden: true,
     },
     {
@@ -66,7 +66,7 @@ export const payRequestModule: FeatureModule = {
       label: 'Change Refund Request',
       icon: FilePen,
       permission: 'PRQ_CREATE',
-      component: lazy(() => import('./RefundFormPage')),
+      component: lazyWithRetry(() => import('./RefundFormPage')),
       hidden: true,
     },
     {
@@ -74,7 +74,7 @@ export const payRequestModule: FeatureModule = {
       label: 'Change Cash Advance',
       icon: FilePen,
       permission: 'PRQ_CREATE',
-      component: lazy(() => import('./CashAdvanceFormPage')),
+      component: lazyWithRetry(() => import('./CashAdvanceFormPage')),
       hidden: true,
     },
   ],

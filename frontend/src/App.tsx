@@ -1,5 +1,6 @@
 import { QueryClientProvider } from '@tanstack/react-query';
-import { lazy, Suspense } from 'react';
+import { Suspense } from 'react';
+import { lazyWithRetry } from '@/app/loadRecovery';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from '@/auth/AuthProvider';
 import { useAuth } from '@/auth/authContext';
@@ -13,11 +14,13 @@ import { MODULES } from '@/navigation/modules';
 import type { ScreenDef } from '@/navigation/types';
 import { createQueryClient } from '@/queryClient';
 import { LoadingPanel } from '@/components/ui/LoadingPanel';
+import { LoadErrorBoundary } from '@/components/ui/LoadErrorBoundary';
+import { SlowLoadingFallback } from '@/components/ui/SlowLoadingFallback';
 
-const LoginPage = lazy(() => import('@/auth/LoginPage'));
-const ResetPasswordPage = lazy(() => import('@/auth/ResetPasswordPage'));
-const SsoCallbackPage = lazy(() => import('@/auth/SsoCallbackPage'));
-const SessionTimedOutPage = lazy(() => import('@/auth/SessionTimedOutPage'));
+const LoginPage = lazyWithRetry(() => import('@/auth/LoginPage'));
+const ResetPasswordPage = lazyWithRetry(() => import('@/auth/ResetPasswordPage'));
+const SsoCallbackPage = lazyWithRetry(() => import('@/auth/SsoCallbackPage'));
+const SessionTimedOutPage = lazyWithRetry(() => import('@/auth/SessionTimedOutPage'));
 
 const queryClient = createQueryClient();
 
@@ -44,35 +47,43 @@ function GuardedScreen({ screen }: Readonly<{ screen: ScreenDef }>) {
 /** Root component: providers, authentication gate and routes generated from the module registry. */
 export function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ToastProvider>
-        <AuthProvider>
-          <BrowserRouter>
-            <Suspense fallback={<LoadingPanel />}>
-              <Routes>
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/reset-password" element={<ResetPasswordPage />} />
-                <Route path="/sso/callback" element={<SsoCallbackPage />} />
-                <Route path="/session-timed-out" element={<SessionTimedOutPage />} />
-                <Route
-                  element={
-                    <RequireAuth>
-                      <WorkspaceProvider>
-                        <AppShell />
-                      </WorkspaceProvider>
-                    </RequireAuth>
-                  }
-                >
-                  {screens.map((s) => (
-                    <Route key={s.path} path={s.path} element={<GuardedScreen screen={s} />} />
-                  ))}
-                  <Route path="*" element={<StatusPage kind="notFound" />} />
-                </Route>
-              </Routes>
-            </Suspense>
-          </BrowserRouter>
-        </AuthProvider>
-      </ToastProvider>
-    </QueryClientProvider>
+    <LoadErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <ToastProvider>
+          <AuthProvider>
+            <BrowserRouter>
+              <Suspense
+                fallback={
+                  <SlowLoadingFallback>
+                    <LoadingPanel />
+                  </SlowLoadingFallback>
+                }
+              >
+                <Routes>
+                  <Route path="/login" element={<LoginPage />} />
+                  <Route path="/reset-password" element={<ResetPasswordPage />} />
+                  <Route path="/sso/callback" element={<SsoCallbackPage />} />
+                  <Route path="/session-timed-out" element={<SessionTimedOutPage />} />
+                  <Route
+                    element={
+                      <RequireAuth>
+                        <WorkspaceProvider>
+                          <AppShell />
+                        </WorkspaceProvider>
+                      </RequireAuth>
+                    }
+                  >
+                    {screens.map((s) => (
+                      <Route key={s.path} path={s.path} element={<GuardedScreen screen={s} />} />
+                    ))}
+                    <Route path="*" element={<StatusPage kind="notFound" />} />
+                  </Route>
+                </Routes>
+              </Suspense>
+            </BrowserRouter>
+          </AuthProvider>
+        </ToastProvider>
+      </QueryClientProvider>
+    </LoadErrorBoundary>
   );
 }

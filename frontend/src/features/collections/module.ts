@@ -7,7 +7,7 @@ import {
   Users,
   WalletCards,
 } from 'lucide-react';
-import { lazy } from 'react';
+import { lazyWithRetry } from '@/app/loadRecovery';
 import type { FeatureModule } from '@/navigation/types';
 import { BILLING_SCREENS } from './billing/screens';
 import { ESCALATION_SCREENS } from './escalations/screens';
@@ -31,21 +31,21 @@ export const collectionsModule: FeatureModule = {
       icon: CircleDollarSign,
       permission: 'CLX_VIEW',
       alsoPermissions: ['CLX_UNAPPLIED_WORK', 'CLX_SETUP', 'CLX_REPORT_VIEW', 'CLX_AUDIT_VIEW'],
-      component: lazy(() => import('./CollectionsHomePage')),
+      component: lazyWithRetry(() => import('./CollectionsHomePage')),
     },
     {
       path: '/collections/worklist',
       label: 'PR Worklist',
       icon: ListChecks,
       permission: 'CLX_VIEW',
-      component: lazy(() => import('./WorklistPage')),
+      component: lazyWithRetry(() => import('./WorklistPage')),
     },
     {
       path: '/collections/items/:invoiceNo',
       label: 'Collection Account',
       icon: WalletCards,
       permission: 'CLX_VIEW',
-      component: lazy(() => import('./AccountPage')),
+      component: lazyWithRetry(() => import('./AccountPage')),
       hidden: true,
     },
     {
@@ -53,7 +53,7 @@ export const collectionsModule: FeatureModule = {
       label: 'Client View',
       icon: Users,
       permission: 'CLX_VIEW',
-      component: lazy(() => import('./ClientViewPage')),
+      component: lazyWithRetry(() => import('./ClientViewPage')),
       hidden: true,
     },
     ...PLAN_SCREENS,
@@ -65,7 +65,7 @@ export const collectionsModule: FeatureModule = {
       label: 'Assignments',
       icon: UserCog,
       permission: 'CLX_ASSIGN',
-      component: lazy(() => import('./AssignmentsPage')),
+      component: lazyWithRetry(() => import('./AssignmentsPage')),
     },
     {
       path: '/collections/files',
@@ -73,14 +73,14 @@ export const collectionsModule: FeatureModule = {
       icon: FileSpreadsheet,
       permission: 'CLX_REPORT_VIEW',
       alsoPermissions: ['CLX_EXPORT'],
-      component: lazy(() => import('./FilesPage')),
+      component: lazyWithRetry(() => import('./FilesPage')),
     },
     {
       path: '/collections/setup',
       label: 'Collections Setup',
       icon: Settings2,
       permission: 'CLX_SETUP',
-      component: lazy(() => import('./SetupPage')),
+      component: lazyWithRetry(() => import('./SetupPage')),
     },
   ],
 };

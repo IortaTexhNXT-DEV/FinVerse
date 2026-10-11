@@ -1,5 +1,5 @@
 import { FileText, Mail } from 'lucide-react';
-import { lazy } from 'react';
+import { lazyWithRetry } from '@/app/loadRecovery';
 import { NBADMIN_SCREENS } from '@/features/nbadmin/screens';
 import type { FeatureModule } from '@/navigation/types';
 
@@ -17,14 +17,14 @@ export const brokingSetupModule: FeatureModule = {
       label: 'Document Templates',
       icon: FileText,
       permission: 'MASTER_VIEW',
-      component: lazy(() => import('./DocumentTemplatesPage')),
+      component: lazyWithRetry(() => import('./DocumentTemplatesPage')),
     },
     {
       path: '/broking-setup/messages',
       label: 'Outbound Messages',
       icon: Mail,
       permission: 'MESSAGE_VIEW',
-      component: lazy(() => import('./OutboundMessagesPage')),
+      component: lazyWithRetry(() => import('./OutboundMessagesPage')),
     },
   ],
 };

@@ -14,7 +14,7 @@ import {
   TriangleAlert,
   Users,
 } from 'lucide-react';
-import { lazy } from 'react';
+import { lazyWithRetry } from '@/app/loadRecovery';
 import type { FeatureModule } from '@/navigation/types';
 
 export const adminModule: FeatureModule = {
@@ -26,21 +26,21 @@ export const adminModule: FeatureModule = {
       label: 'Users',
       icon: Users,
       permission: 'USER_MANAGE',
-      component: lazy(() => import('./UsersPage')),
+      component: lazyWithRetry(() => import('./UsersPage')),
     },
     {
       path: '/admin/identity-sync',
       label: 'Identity Synchronisation',
       icon: FolderSync,
       permission: 'USER_MANAGE',
-      component: lazy(() => import('./IdentitySyncPage')),
+      component: lazyWithRetry(() => import('./IdentitySyncPage')),
     },
     {
       path: '/admin/roles',
       label: 'Roles & Permissions',
       icon: ShieldCheck,
       permission: 'ROLE_MANAGE',
-      component: lazy(() => import('./RolesPage')),
+      component: lazyWithRetry(() => import('./RolesPage')),
     },
     {
       path: '/admin/second-factor',
@@ -49,14 +49,14 @@ export const adminModule: FeatureModule = {
       permission: 'MFA_RESET',
       // The approvers of a reset open the screen to approve it.
       alsoPermissions: ['MFA_RESET_APPROVE'],
-      component: lazy(() => import('./SecondFactorPage')),
+      component: lazyWithRetry(() => import('./SecondFactorPage')),
     },
     {
       path: '/admin/audit',
       label: 'Audit Trail',
       icon: History,
       permission: 'AUDIT_VIEW',
-      component: lazy(() => import('./AuditTrailPage')),
+      component: lazyWithRetry(() => import('./AuditTrailPage')),
     },
     {
       path: '/admin/parameters',
@@ -65,35 +65,35 @@ export const adminModule: FeatureModule = {
       permission: 'SYSTEM_MONITOR',
       // The approvers of the security parameters open the screen to approve a change.
       alsoPermissions: ['SYSTEM_PARAMETER_MANAGE', 'SECURITY_PARAMETER_APPROVE'],
-      component: lazy(() => import('@/features/system/SystemParametersPage')),
+      component: lazyWithRetry(() => import('@/features/system/SystemParametersPage')),
     },
     {
       path: '/admin/exception-codes',
       label: 'Exception Codes',
       icon: TriangleAlert,
       permission: 'ALERT_VIEW',
-      component: lazy(() => import('@/features/alerts/ExceptionCodesPage')),
+      component: lazyWithRetry(() => import('@/features/alerts/ExceptionCodesPage')),
     },
     {
       path: '/admin/jobs',
       label: 'Scheduled Jobs',
       icon: Timer,
       permission: 'SYSTEM_MONITOR',
-      component: lazy(() => import('@/features/system/ScheduledJobsPage')),
+      component: lazyWithRetry(() => import('@/features/system/ScheduledJobsPage')),
     },
     {
       path: '/admin/integration-events',
       label: 'Integration Events',
       icon: Cable,
       permission: 'SYSTEM_PARAMETER_MANAGE',
-      component: lazy(() => import('@/features/system/IntegrationEventsPage')),
+      component: lazyWithRetry(() => import('@/features/system/IntegrationEventsPage')),
     },
     {
       path: '/admin/caches',
       label: 'Caches',
       icon: DatabaseZap,
       permission: 'SYSTEM_PARAMETER_MANAGE',
-      component: lazy(() => import('@/features/system/CachesPage')),
+      component: lazyWithRetry(() => import('@/features/system/CachesPage')),
     },
     {
       path: '/admin/record-classes',
@@ -101,7 +101,7 @@ export const adminModule: FeatureModule = {
       icon: Archive,
       permission: 'FILE_LEGAL_HOLD_APPROVE',
       alsoPermissions: ['FILE_LEGAL_HOLD_REQUEST', 'AUDIT_VIEW', 'SYSTEM_PARAMETER_MANAGE'],
-      component: lazy(() => import('@/features/system/RecordClassesPage')),
+      component: lazyWithRetry(() => import('@/features/system/RecordClassesPage')),
     },
     {
       path: '/admin/legal-holds',
@@ -109,7 +109,7 @@ export const adminModule: FeatureModule = {
       icon: FileLock,
       permission: 'FILE_LEGAL_HOLD_REQUEST',
       alsoPermissions: ['FILE_LEGAL_HOLD_APPROVE', 'AUDIT_VIEW'],
-      component: lazy(() => import('@/features/system/LegalHoldsPage')),
+      component: lazyWithRetry(() => import('@/features/system/LegalHoldsPage')),
     },
     {
       path: '/admin/content-migration',
@@ -117,7 +117,7 @@ export const adminModule: FeatureModule = {
       icon: FolderSync,
       permission: 'SYSTEM_MONITOR',
       alsoPermissions: ['SYSTEM_PARAMETER_MANAGE', 'AUDIT_VIEW'],
-      component: lazy(() => import('@/features/system/ContentMigrationPage')),
+      component: lazyWithRetry(() => import('@/features/system/ContentMigrationPage')),
     },
     {
       path: '/admin/modules',
@@ -125,14 +125,14 @@ export const adminModule: FeatureModule = {
       icon: Blocks,
       permission: 'MODULE_SWITCH_MANAGE',
       alsoPermissions: ['MODULE_SWITCH_APPROVE', 'SYSTEM_MONITOR'],
-      component: lazy(() => import('@/features/system/ProductModulesPage')),
+      component: lazyWithRetry(() => import('@/features/system/ProductModulesPage')),
     },
     {
       path: '/admin/info',
       label: 'Application Info',
       icon: Server,
       permission: 'SYSTEM_MONITOR',
-      component: lazy(() => import('@/features/system/ApplicationInfoPage')),
+      component: lazyWithRetry(() => import('@/features/system/ApplicationInfoPage')),
     },
   ],
 };

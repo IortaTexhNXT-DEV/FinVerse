@@ -1,5 +1,5 @@
 import { CalendarCheck, CalendarClock, Coins } from 'lucide-react';
-import { lazy } from 'react';
+import { lazyWithRetry } from '@/app/loadRecovery';
 import { budgetScreens } from '@/features/budget/module';
 import type { FeatureModule } from '@/navigation/types';
 
@@ -16,21 +16,21 @@ export const planningModule: FeatureModule = {
       label: 'FX Revaluation',
       icon: Coins,
       permission: 'PERIOD_END_RUN',
-      component: lazy(() => import('./FxRevaluationPage')),
+      component: lazyWithRetry(() => import('./FxRevaluationPage')),
     },
     {
       path: '/planning/closing',
       label: 'Period-End & Year-End',
       icon: CalendarCheck,
       permission: 'PERIOD_END_RUN',
-      component: lazy(() => import('./PeriodEndPage')),
+      component: lazyWithRetry(() => import('./PeriodEndPage')),
     },
     {
       path: '/planning/gl-close',
       label: 'GL Close & Cut-Off',
       icon: CalendarClock,
       permission: 'GL_CLOSE_SCHEDULE',
-      component: lazy(() => import('./GlClosePage')),
+      component: lazyWithRetry(() => import('./GlClosePage')),
     },
   ],
 };

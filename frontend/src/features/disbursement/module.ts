@@ -10,7 +10,7 @@ import {
   UserRound,
   Users,
 } from 'lucide-react';
-import { lazy } from 'react';
+import { lazyWithRetry } from '@/app/loadRecovery';
 import type { FeatureModule } from '@/navigation/types';
 
 const PROCESSORS = ['DISB_PROCESS', 'DISB_REVIEW', 'DISB_APPROVE'];
@@ -33,14 +33,14 @@ export const disbursementModule: FeatureModule = {
       icon: Landmark,
       permission: 'DISB_VIEW',
       alsoPermissions: [...PROCESSORS, ...PAYEE_ROLES, ...FUNDING_ROLES, 'DISB_EOD'],
-      component: lazy(() => import('./DisbursementHomePage')),
+      component: lazyWithRetry(() => import('./DisbursementHomePage')),
     },
     {
       path: '/disbursement/requests/new',
       label: 'Encode Payment Request',
       icon: FilePlus2,
       permission: 'DISB_PROCESS',
-      component: lazy(() => import('./EncodeRequestPage')),
+      component: lazyWithRetry(() => import('./EncodeRequestPage')),
       hidden: true,
     },
     {
@@ -49,7 +49,7 @@ export const disbursementModule: FeatureModule = {
       icon: FileText,
       permission: 'DISB_VIEW',
       alsoPermissions: PROCESSORS,
-      component: lazy(() => import('./VoucherPage')),
+      component: lazyWithRetry(() => import('./VoucherPage')),
       hidden: true,
     },
     {
@@ -58,7 +58,7 @@ export const disbursementModule: FeatureModule = {
       icon: Users,
       permission: 'DISB_VIEW',
       alsoPermissions: PAYEE_ROLES,
-      component: lazy(() => import('./PayeesPage')),
+      component: lazyWithRetry(() => import('./PayeesPage')),
     },
     {
       path: '/disbursement/payees/:id',
@@ -66,7 +66,7 @@ export const disbursementModule: FeatureModule = {
       icon: UserRound,
       permission: 'DISB_VIEW',
       alsoPermissions: PAYEE_ROLES,
-      component: lazy(() => import('./PayeePage')),
+      component: lazyWithRetry(() => import('./PayeePage')),
       hidden: true,
     },
     {
@@ -75,7 +75,7 @@ export const disbursementModule: FeatureModule = {
       icon: Upload,
       permission: 'DISB_UPLOAD',
       alsoPermissions: ['DISB_PAYEE_MAINTAIN'],
-      component: lazy(() => import('./UploadsPage')),
+      component: lazyWithRetry(() => import('./UploadsPage')),
     },
     {
       path: '/disbursement/eod',
@@ -83,7 +83,7 @@ export const disbursementModule: FeatureModule = {
       icon: CalendarCheck,
       permission: 'DISB_EOD',
       alsoPermissions: ['DISB_VIEW'],
-      component: lazy(() => import('./EodPage')),
+      component: lazyWithRetry(() => import('./EodPage')),
     },
     {
       path: '/disbursement/funding',
@@ -91,7 +91,7 @@ export const disbursementModule: FeatureModule = {
       icon: ArrowRightLeft,
       permission: 'DISB_VIEW',
       alsoPermissions: FUNDING_ROLES,
-      component: lazy(() => import('./FundingPage')),
+      component: lazyWithRetry(() => import('./FundingPage')),
     },
     {
       path: '/disbursement/funding/:id',
@@ -99,7 +99,7 @@ export const disbursementModule: FeatureModule = {
       icon: ArrowRightLeft,
       permission: 'DISB_VIEW',
       alsoPermissions: FUNDING_ROLES,
-      component: lazy(() => import('./FundingDetailPage')),
+      component: lazyWithRetry(() => import('./FundingDetailPage')),
       hidden: true,
     },
     {
@@ -108,7 +108,7 @@ export const disbursementModule: FeatureModule = {
       icon: Building2,
       permission: 'DISB_VIEW',
       alsoPermissions: ['DISB_REVIEW', 'DISB_APPROVE'],
-      component: lazy(() => import('./BanksPage')),
+      component: lazyWithRetry(() => import('./BanksPage')),
     },
     {
       path: '/disbursement/reports',
@@ -116,7 +116,7 @@ export const disbursementModule: FeatureModule = {
       icon: FileBarChart,
       permission: 'DISB_REPORT_VIEW',
       alsoPermissions: ['DISB_VIEW'],
-      component: lazy(() => import('./ReportsPage')),
+      component: lazyWithRetry(() => import('./ReportsPage')),
     },
   ],
 };

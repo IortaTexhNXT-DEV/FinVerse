@@ -1,5 +1,5 @@
 import { FileCheck2, FileSpreadsheet, FolderSearch, Scale, Scale3d } from 'lucide-react';
-import { lazy } from 'react';
+import { lazyWithRetry } from '@/app/loadRecovery';
 import type { FeatureModule } from '@/navigation/types';
 
 const ACSL_ROLES = ['ACSL_PROCESS', 'ACSL_ASSIGN', 'ACSL_REVIEW', 'ACSL_APPROVE'];
@@ -19,7 +19,7 @@ export const acslModule: FeatureModule = {
       icon: Scale,
       permission: 'ACSL_VIEW',
       alsoPermissions: ACSL_ROLES,
-      component: lazy(() => import('./AcslHomePage')),
+      component: lazyWithRetry(() => import('./AcslHomePage')),
     },
     {
       path: '/acsl/corrections',
@@ -27,7 +27,7 @@ export const acslModule: FeatureModule = {
       icon: FileCheck2,
       permission: 'ACSL_VIEW',
       alsoPermissions: ACSL_ROLES,
-      component: lazy(() => import('./CorrectionsPage')),
+      component: lazyWithRetry(() => import('./CorrectionsPage')),
     },
     {
       path: '/acsl/soa',
@@ -35,7 +35,7 @@ export const acslModule: FeatureModule = {
       icon: FileSpreadsheet,
       permission: 'ACSL_VIEW',
       alsoPermissions: [...ACSL_ROLES, 'ACSL_UPLOAD'],
-      component: lazy(() => import('./SoaUploadsPage')),
+      component: lazyWithRetry(() => import('./SoaUploadsPage')),
     },
     {
       path: '/acsl/gl-sl',
@@ -43,7 +43,7 @@ export const acslModule: FeatureModule = {
       icon: Scale3d,
       permission: 'ACSL_VIEW',
       alsoPermissions: ACSL_ROLES,
-      component: lazy(() => import('./GlSlPage')),
+      component: lazyWithRetry(() => import('./GlSlPage')),
     },
     {
       path: '/acsl/cases/:id',
@@ -51,7 +51,7 @@ export const acslModule: FeatureModule = {
       icon: FolderSearch,
       permission: 'ACSL_VIEW',
       alsoPermissions: ACSL_ROLES,
-      component: lazy(() => import('./CaseDetailPage')),
+      component: lazyWithRetry(() => import('./CaseDetailPage')),
       hidden: true,
     },
     {
@@ -60,7 +60,7 @@ export const acslModule: FeatureModule = {
       icon: FileCheck2,
       permission: 'ACSL_VIEW',
       alsoPermissions: ACSL_ROLES,
-      component: lazy(() => import('./CorrectionDetailPage')),
+      component: lazyWithRetry(() => import('./CorrectionDetailPage')),
       hidden: true,
     },
     {
@@ -69,7 +69,7 @@ export const acslModule: FeatureModule = {
       icon: FileSpreadsheet,
       permission: 'ACSL_VIEW',
       alsoPermissions: [...ACSL_ROLES, 'ACSL_UPLOAD'],
-      component: lazy(() => import('./SoaUploadDetailPage')),
+      component: lazyWithRetry(() => import('./SoaUploadDetailPage')),
       hidden: true,
     },
   ],

@@ -9,7 +9,7 @@ import {
   Send,
   Zap,
 } from 'lucide-react';
-import { lazy } from 'react';
+import { lazyWithRetry } from '@/app/loadRecovery';
 import type { FeatureModule } from '@/navigation/types';
 
 const TEAM = ['REMIT_PROCESS', 'REMIT_EXTRACT', 'REMIT_APPROVE', 'REMIT_OR_UPLOAD'];
@@ -45,7 +45,7 @@ export const remittanceModule: FeatureModule = {
         'SPECIAL_REMIT_REQUEST',
         'SPECIAL_REMIT_APPROVE',
       ],
-      component: lazy(() => import('./RemittanceHomePage')),
+      component: lazyWithRetry(() => import('./RemittanceHomePage')),
     },
     {
       path: '/remittance/extraction',
@@ -53,7 +53,7 @@ export const remittanceModule: FeatureModule = {
       icon: PackageSearch,
       permission: 'REMIT_EXTRACT',
       alsoPermissions: TEAM,
-      component: lazy(() => import('./ExtractionPage')),
+      component: lazyWithRetry(() => import('./ExtractionPage')),
     },
     {
       path: '/remittance/batches',
@@ -61,7 +61,7 @@ export const remittanceModule: FeatureModule = {
       icon: Layers,
       permission: 'REMIT_PROCESS',
       alsoPermissions: TEAM,
-      component: lazy(() => import('./BatchesPage')),
+      component: lazyWithRetry(() => import('./BatchesPage')),
     },
     {
       path: '/remittance/batches/:id',
@@ -69,7 +69,7 @@ export const remittanceModule: FeatureModule = {
       icon: Layers,
       permission: 'REMIT_PROCESS',
       alsoPermissions: TEAM,
-      component: lazy(() => import('./BatchDetailPage')),
+      component: lazyWithRetry(() => import('./BatchDetailPage')),
       hidden: true,
     },
     {
@@ -77,7 +77,7 @@ export const remittanceModule: FeatureModule = {
       label: 'Insurer OR Upload',
       icon: FileCheck,
       permission: 'REMIT_OR_UPLOAD',
-      component: lazy(() => import('./InsurerOrPage')),
+      component: lazyWithRetry(() => import('./InsurerOrPage')),
     },
     {
       path: '/remittance/holds',
@@ -85,7 +85,7 @@ export const remittanceModule: FeatureModule = {
       icon: CirclePause,
       permission: 'HOLD_REQUEST',
       alsoPermissions: ['HOLD_APPROVE', 'REMIT_PROCESS', 'REMIT_APPROVE'],
-      component: lazy(() => import('./HoldsPage')),
+      component: lazyWithRetry(() => import('./HoldsPage')),
     },
     {
       path: '/remittance/holds/:id',
@@ -93,7 +93,7 @@ export const remittanceModule: FeatureModule = {
       icon: CirclePause,
       permission: 'HOLD_REQUEST',
       alsoPermissions: ['HOLD_APPROVE', 'REMIT_PROCESS', 'REMIT_APPROVE'],
-      component: lazy(() => import('./HoldDetailPage')),
+      component: lazyWithRetry(() => import('./HoldDetailPage')),
       hidden: true,
     },
     {
@@ -102,7 +102,7 @@ export const remittanceModule: FeatureModule = {
       icon: Zap,
       permission: 'SPECIAL_REMIT_REQUEST',
       alsoPermissions: ['SPECIAL_REMIT_APPROVE', 'REMIT_PROCESS'],
-      component: lazy(() => import('./SpecialPage')),
+      component: lazyWithRetry(() => import('./SpecialPage')),
     },
     {
       path: '/remittance/special/:id',
@@ -110,7 +110,7 @@ export const remittanceModule: FeatureModule = {
       icon: Zap,
       permission: 'SPECIAL_REMIT_REQUEST',
       alsoPermissions: ['SPECIAL_REMIT_APPROVE', 'REMIT_PROCESS'],
-      component: lazy(() => import('./SpecialDetailPage')),
+      component: lazyWithRetry(() => import('./SpecialDetailPage')),
       hidden: true,
     },
     {
@@ -119,7 +119,7 @@ export const remittanceModule: FeatureModule = {
       icon: Scale,
       permission: 'REMIT_PROCESS',
       alsoPermissions: TEAM,
-      component: lazy(() => import('./DtipStatusPage')),
+      component: lazyWithRetry(() => import('./DtipStatusPage')),
     },
     {
       path: '/remittance/deductions',
@@ -127,7 +127,7 @@ export const remittanceModule: FeatureModule = {
       icon: MinusCircle,
       permission: 'ACSL_PROCESS',
       alsoPermissions: DEDUCTION_READERS,
-      component: lazy(() => import('./DeductionsPage')),
+      component: lazyWithRetry(() => import('./DeductionsPage')),
     },
     {
       path: '/remittance/deductions/:id',
@@ -135,7 +135,7 @@ export const remittanceModule: FeatureModule = {
       icon: MinusCircle,
       permission: 'ACSL_PROCESS',
       alsoPermissions: DEDUCTION_READERS,
-      component: lazy(() => import('./DeductionDetailPage')),
+      component: lazyWithRetry(() => import('./DeductionDetailPage')),
       hidden: true,
     },
     {
@@ -144,7 +144,7 @@ export const remittanceModule: FeatureModule = {
       icon: Percent,
       permission: 'REMIT_APPROVE',
       alsoPermissions: TEAM,
-      component: lazy(() => import('./IncentiveRulesPage')),
+      component: lazyWithRetry(() => import('./IncentiveRulesPage')),
     },
   ],
 };

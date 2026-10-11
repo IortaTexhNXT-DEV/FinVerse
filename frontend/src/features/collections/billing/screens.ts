@@ -1,5 +1,5 @@
 import { ReceiptText } from 'lucide-react';
-import { lazy } from 'react';
+import { lazyWithRetry } from '@/app/loadRecovery';
 import type { ScreenDef } from '@/navigation/types';
 
 /**
@@ -13,14 +13,14 @@ export const BILLING_SCREENS: ScreenDef[] = [
     icon: ReceiptText,
     permission: 'CLX_VIEW',
     alsoPermissions: ['CLX_SOA_ISSUE'],
-    component: lazy(() => import('./BillingStatementsPage')),
+    component: lazyWithRetry(() => import('./BillingStatementsPage')),
   },
   {
     path: '/collections/billing/:id',
     label: 'Statement of Account',
     icon: ReceiptText,
     permission: 'CLX_VIEW',
-    component: lazy(() => import('./StatementDetailPage')),
+    component: lazyWithRetry(() => import('./StatementDetailPage')),
     hidden: true,
   },
 ];

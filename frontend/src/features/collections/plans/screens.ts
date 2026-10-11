@@ -1,5 +1,5 @@
 import { CalendarClock, HandCoins, ListChecks } from 'lucide-react';
-import { lazy } from 'react';
+import { lazyWithRetry } from '@/app/loadRecovery';
 import type { ScreenDef } from '@/navigation/types';
 
 /**
@@ -12,14 +12,14 @@ export const PLAN_SCREENS: ScreenDef[] = [
     label: 'Installment Plans',
     icon: ListChecks,
     permission: 'CLX_VIEW',
-    component: lazy(() => import('./PlansPage')),
+    component: lazyWithRetry(() => import('./PlansPage')),
   },
   {
     path: '/collections/plans/:id',
     label: 'Installment Plan',
     icon: ListChecks,
     permission: 'CLX_VIEW',
-    component: lazy(() => import('./PlanDetailPage')),
+    component: lazyWithRetry(() => import('./PlanDetailPage')),
     hidden: true,
   },
   {
@@ -27,13 +27,13 @@ export const PLAN_SCREENS: ScreenDef[] = [
     label: 'Installments Due',
     icon: CalendarClock,
     permission: 'CLX_VIEW',
-    component: lazy(() => import('./InstallmentsDuePage')),
+    component: lazyWithRetry(() => import('./InstallmentsDuePage')),
   },
   {
     path: '/collections/promises',
     label: 'Promises to Pay',
     icon: HandCoins,
     permission: 'CLX_VIEW',
-    component: lazy(() => import('./PromisesPage')),
+    component: lazyWithRetry(() => import('./PromisesPage')),
   },
 ];

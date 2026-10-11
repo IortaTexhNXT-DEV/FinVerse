@@ -42,6 +42,7 @@ import brd11_v13 as v13  # noqa: E402
 import brd11_v14 as v14  # noqa: E402
 import build_brd11_bdoi_frs as frs  # noqa: E402
 from brd11_xlsx import Column, ReviewWorkbook  # noqa: E402
+from colour_code import OOTB_HEADER  # noqa: E402
 
 REPO = frs.REPO
 UA = frs.UA
@@ -508,7 +509,7 @@ def build_fitgap(data: Data) -> tuple[Path, dict]:
         Column("group", "Function", 24, "Function of the BRD"),
         Column("frum", "FR item (BDOI format)", 22, "FR items of the FRS v1.4"),
         Column("features", "Feature list reference", 40, "Rows of the BIBS Feature List vs OOTB workbook"),
-        Column("ootb", "What BIBS offers out of the box", 46, "Standard capability or configuration"),
+        Column("ootb", OOTB_HEADER, 46, "Standard capability or configuration of brokerverse-platform"),
         Column("best", "Insurance-broking best practice", 46, "Practice of the Philippine market and international broking"),
         Column("fit", "Fit", 16, "Fit class", values=WB["fit_values"], status=True),
         Column("rec", "Recommendation", 40, "What to do"),
@@ -551,14 +552,17 @@ def build_cr(data: Data) -> tuple[Path, dict]:
         if no in crs:
             cr = crs[no]
             row.update({"klass": "Change request (orange in the FRS)", "frs": cr["frs"], "brd": cr["brd"],
+                        "fl": cr["fl"], "built": cr["built"],
                         "desc": f"{cr['title']}: {' '.join(cr['scope'].split())}", "reason": " ".join(cr["why"].split()),
                         "type": "Beyond the BRD" if cr["source"] != "BDOI FRS v1.1" else "Added by BDOI's FRS",
                         "cost": f"{v14.fmt(v14.days(cr['effort']))} man-days (CR Effort Estimate)",
                         "priority": cr["priority"], "schedule": cr["complexity"] + " complexity"})
         elif no in closed:
-            kind, ob, note = closed[no]
-            row.update({"klass": "Offered as standard (" + ob + ", green in the FRS)" if kind == "OOTB"
-                        else "BRD requirement (black in the FRS)", "status": "Closed",
+            kind, ob, note, fl = closed[no]
+            klass = {"OOTB": f"Offered by iNXT BrokerVerse OOTB ({ob}, green in the FRS)",
+                     "INT": f"Integration scope ({ob}, grey label in the FRS)",
+                     "DM": f"Data Migration scope ({ob}, grey label in the FRS)"}.get(kind, "BRD requirement (black in the FRS)")
+            row.update({"fl": fl, "built": "-", "klass": klass, "status": "Closed",
                         "decision": f"Not a change request (review of 11-Oct-2026): {note}", "ddate": "11-Oct-2026",
                         "cost": "None", "approved": "iorta TechNXT Project Team (for BDOI confirmation)"})
             if kind == "BRD":
@@ -571,7 +575,9 @@ def build_cr(data: Data) -> tuple[Path, dict]:
     data.cr_rows = rows
     wb.sheet("Register", [
         Column("no", "CR No.", 12, "Change request number"),
-        Column("klass", "Classification (FRS v1.4)", 24, "Change request (orange) / offered as standard (green) / BRD requirement (black)"),
+        Column("klass", "Classification (FRS v1.4)", 24, "Change request (orange) / offered by iNXT BrokerVerse OOTB (green) / BRD requirement (black) / integration or data migration scope (grey)"),
+        Column("fl", "Feature List ID / OOTB status", 28, "Row of the Feature List vs OOTB workbook and its OOTB platform status"),
+        Column("built", "Prepared for BIBS?", 12, "Already available for BDOI in the BIBS system (still a change request when orange)"),
         Column("date", "Date raised", 12, "dd-Mmm-yyyy"),
         Column("by", "Raised by", 18, "Name and role"), Column("brd", "BRD ID", 16, "BRD requirement"),
         Column("frs", "FRS reference", 16, "FR item or annex"), Column("desc", "Description", 46, "The change"),
@@ -583,7 +589,7 @@ def build_cr(data: Data) -> tuple[Path, dict]:
         Column("decision", "Decision", 24, "Decision of the approvers"), Column("approved", "Approved by", 18, ""),
         Column("ddate", "Decision date", 12, ""), Column("drop", "Target drop", 12, ""),
         Column("linked", "Linked test cases", 30, "Test cases of the Test Cases and Traceability workbook")],
-        rows, description="Change requests known at v1.4 (status Candidate - for decision, effort in the CR Effort Estimate), the earlier candidates closed as BRD requirements or offered as standard, and new requests")
+        rows, description="Change requests known at v1.4 (status Candidate - for decision, effort in the CR Effort Estimate), the earlier candidates closed as BRD requirements, integration scope or offered by iNXT BrokerVerse OOTB (brokerverse-platform), and new requests")
     form_cols = [
         {"key": "field", "header": "Field", "width": 30, "mandatory": True, "what": "Part of the assessment"},
         {"key": "value", "header": "Assessment", "width": 70, "mandatory": True, "what": "Filled in by the project"},
@@ -624,8 +630,10 @@ def build_effort(data: Data) -> tuple[Path, dict]:
     V = v14.V14
     wb = ReviewWorkbook("CR Effort Estimate", doc_type="Change requests - effort", brd="BRD-11", version="1.0",
                         subtitle="BRD-11 User Access Maintenance - change requests of the FRS v1.4 with their effort")
-    wb.legend = [("Change request", "In no BRD and not offered by the standard system (orange in the FRS)"),
-                 ("Offered as standard", "Not in the BRD, offered by the standard system at no cost (green in the FRS)"),
+    wb.legend = [("Change request", "In no BRD and not (or only partly) in the iNXT BrokerVerse OOTB platform (orange in the FRS); also when already available in BIBS"),
+                 ("Offered by OOTB", "Not in the BRD; offered by the iNXT BrokerVerse OOTB platform (brokerverse-platform), no cost (green in the FRS)"),
+                 ("Integration / Data Migration scope", "Interfaces and data migration: covered by those workstreams, not a change request (grey label)"),
+                 ("Best practice", "In no BRD, FRS or OOTB: recommendation with indicative effort, excluded from the CR total (blue)"),
                  ("BRD requirement", "In scope; delivered without a change request (black in the FRS)")]
     first = 5                      # first data row of every sheet (title band in rows 1-3, header in row 4)
     n = len(V["crs"])
@@ -642,11 +650,16 @@ def build_effort(data: Data) -> tuple[Path, dict]:
                     "low": f"=SUM(C{first}:C{tot - 1})", "high": f"=SUM(D{first}:D{tot - 1})",
                     "cost": f'=IF(DayRate="","",SUM(E{first}:E{tot - 1}))',
                     "note": "Cost appears when the day rate is entered on the sheet Assumptions"})
-    summary.append({"item": f"Points beyond the BRD offered as standard ({len(V['ootb'])})", "days": 0, "low": 0,
+    summary.append({"item": f"Points beyond the BRD offered by iNXT BrokerVerse OOTB ({len(V['ootb'])})", "days": 0, "low": 0,
                     "high": 0, "cost": 0, "note": "No change request, no cost (sheet Beyond the BRD - OOTB)"})
     summary.append({"item": f"BRD requirements to deliver ({len(V['brd_to_deliver'])}, in scope)",
                     "days": f"=SUM('BRD items to deliver'!I{first}:I{first + len(V['brd_to_deliver']) - 1})",
                     "low": "", "high": "", "cost": "Not charged", "note": "For planning only (FRS Annex AA.4)"})
+    summary.append({"item": f"Integration and Data Migration scope ({len(V['integration'])})", "days": "", "low": "",
+                    "high": "", "cost": "Not here", "note": "Covered by the Integration and Data Migration workstreams (FRS Annex AA.5)"})
+    summary.append({"item": f"Best-practice recommendations ({len(V['best_practice'])}, blue)",
+                    "days": f"=SUM('Best practice (blue)'!E{first}:E{first + len(V['best_practice']) - 1})",
+                    "low": "", "high": "", "cost": "Indicative", "note": "Excluded from the CR total (FRS Annex AA.6)"})
     ws = wb.sheet("Summary", [Column("item", "Item", 52, "Change request or group"),
                               Column("days", "Man-days", 12, "Total effort (8-hour days)", kind="number"),
                               Column("low", "Low (-20%)", 12, "Lower end of the range", kind="number"),
@@ -666,6 +679,7 @@ def build_effort(data: Data) -> tuple[Path, dict]:
         e = c["effort"]
         rows.append({"no": c["id"], "title": c["title"], "frs": c["frs"], "brd": c["brd"], "source": c["source"],
                      "why": " ".join(c["why"].split()), "ootb": c["ootb"], "scope": " ".join(c["scope"].split()),
+                     "fl": c["fl"], "built": c["built"], "evidence": c["evidence"],
                      "a": e[0], "b": e[1], "f": e[2], "t": e[3], "d": e[4], "total": f"=SUM(I{r}:M{r})",
                      "low": f"=ROUND(N{r}*(1-Accuracy),1)", "high": f"=ROUND(N{r}*(1+Accuracy),1)",
                      "complexity": c["complexity"], "priority": c["priority"], "depends": c["depends"],
@@ -678,8 +692,8 @@ def build_effort(data: Data) -> tuple[Path, dict]:
         Column("no", "CR No.", 11, "Change request number (Change Request Register)"),
         Column("title", "Title", 26, ""), Column("frs", "FRS reference", 22, "FR item or annex of the FRS v1.4"),
         Column("brd", "BRD reference", 20, "'Not in BRD' for every change request"),
-        Column("source", "Source", 18, "BDOI FRS v1.1 / best practice / iorta TechNXT"),
-        Column("why", "Why needed", 46, ""), Column("ootb", "OOTB status", 30, "What the standard system offers today"),
+        Column("source", "Source", 18, "BDOI FRS / best practice / iorta TechNXT"),
+        Column("why", "Why needed", 46, ""), Column("ootb", "OOTB status", 30, "What the iNXT BrokerVerse OOTB platform offers (brokerverse-platform)"),
         Column("scope", "Scope of the change", 46, ""),
         Column("a", ACT[0], 11, "Man-days", **num), Column("b", ACT[1], 10, "Man-days", **num),
         Column("f", ACT[2], 10, "Man-days", **num), Column("t", ACT[3], 10, "Man-days", **num),
@@ -688,7 +702,10 @@ def build_effort(data: Data) -> tuple[Path, dict]:
         Column("complexity", "Complexity", 11, "", values=["Low", "Medium", "High"]),
         Column("priority", "Priority", 10, "", values=["High", "Medium", "Low"]),
         Column("depends", "Dependencies", 34, ""), Column("assumptions", "Assumptions", 34, ""),
-        Column("cost", "Cost", 14, "Total man-days x day rate", kind="amount")],
+        Column("cost", "Cost", 14, "Total man-days x day rate", kind="amount"),
+        Column("fl", "Feature List ID / OOTB status", 30, "Row of the Feature List vs OOTB workbook (column OOTB platform)"),
+        Column("evidence", "OOTB evidence", 40, "Screen or function of the OOTB platform, or not found"),
+        Column("built", "Prepared for BIBS?", 14, "Already available for BDOI in the BIBS system; the effort is still the CR value")],
         rows, description="One row per change request (orange point of the FRS v1.4); man-days of 8 hours, +-20%")
     for r in range(first, last + 2):
         for col in "IJKLMNOP":
@@ -701,13 +718,15 @@ def build_effort(data: Data) -> tuple[Path, dict]:
         ws[f"B{r}"].font = orange
     # ---------------------------------------------------------------- green items
     green = [{"no": o[0], "point": o[1], "frs": o[2], "what": o[3], "note": o[4], "brd": "Not in BRD",
-              "ootb": "Offered as standard", "cost": 0} for o in V["ootb"]]
+              "ootb": "Offered by OOTB", "fl": o[5], "evidence": o[6], "cost": 0} for o in V["ootb"]]
     ws = wb.sheet("Beyond the BRD - OOTB", [
         Column("no", "No.", 10, "OB-UA-nn"), Column("point", "Point", 30, ""), Column("frs", "FRS reference", 24, ""),
         Column("brd", "BRD reference", 14, ""), Column("what", "What BDOI gets", 60, ""),
         Column("ootb", "OOTB status", 18, ""), Column("cost", "Cost (man-days)", 12, "No change request", kind="number"),
-        Column("note", "Note", 40, "Former change request number, BRD it extends")],
-        green, description="Points of the FRS v1.4 that no BRD asks for and the standard system offers (green): no cost")
+        Column("note", "Note", 40, "Former change request number, BRD it extends"),
+        Column("fl", "Feature List ID / OOTB status", 34, "Row of the Feature List vs OOTB workbook (column OOTB platform)"),
+        Column("evidence", "OOTB evidence", 44, "Screen or function of the OOTB platform")],
+        green, description="Points of the FRS v1.4 that no BRD asks for and the iNXT BrokerVerse OOTB platform offers (green): no cost")
     gfont = Font(name=ws["B5"].font.name, color=v14.COLOURS["green"], bold=True)
     for r in range(first, first + len(green)):
         ws[f"A{r}"].font = gfont
@@ -718,24 +737,54 @@ def build_effort(data: Data) -> tuple[Path, dict]:
         r = first + i
         e = t["effort"]
         due.append({"no": t["id"], "title": t["title"], "ref": t["ref"], "frs": t["frs"], "scope": t["scope"],
-                     "a": e[0], "b": e[1] + e[2], "t": e[3] + e[4], "total": f"=SUM(F{r}:H{r})", "cost": "Not charged"})
+                     "a": e[0], "b": e[1] + e[2], "t": e[3] + e[4], "total": f"=SUM(F{r}:H{r})", "cost": "Not charged",
+                     "fl": t["fl"], "evidence": t["evidence"], "built": t["built"]})
     ws = wb.sheet("BRD items to deliver", [
         Column("no", "No.", 11, ""), Column("title", "Item", 28, ""), Column("ref", "BRD reference", 30, ""),
         Column("frs", "FRS reference", 22, ""), Column("scope", "What is delivered", 50, ""),
         Column("a", "Analysis and design", 11, "Man-days", **num), Column("b", "Backend and frontend", 11, "Man-days", **num),
         Column("t", "Testing and UAT support", 11, "Man-days", **num), Column("total", "Total man-days", 11, "Formula", **num),
-        Column("cost", "Cost", 14, "In scope")],
-        due, description="BRD requirements found in the validation of the FRS v1.4 (Annex X.2, AA.4): in scope, for planning")
+        Column("cost", "Cost", 14, "In scope"),
+        Column("fl", "Feature List ID / OOTB status", 30, "Row of the Feature List vs OOTB workbook (column OOTB platform)"),
+        Column("evidence", "OOTB evidence", 36, "brokerverse-platform"),
+        Column("built", "Prepared for BIBS?", 14, "Already available for BDOI in the BIBS system")],
+        due, description="BRD requirements not (fully) in the iNXT BrokerVerse OOTB platform (FRS Annex X.2, AA.4): in-scope delivery work, for planning")
     for r in range(first, first + len(due)):
         for col in "FGHI":
             ws[f"{col}{r}"].number_format = "0.0#"
+    # ---------------------------------------------------------------- Integration and Data Migration scope
+    scope = [{"no": x[0], "point": x[1], "frs": x[2], "scope": x[3], "stream": x[4], "fl": x[5], "note": x[6],
+              "cost": "Not a CR"} for x in V["integration"]]
+    ws = wb.sheet("Integration & Data Migration", [
+        Column("no", "No.", 10, "IS-UA-nn / DM-UA-nn"), Column("point", "Point", 34, ""), Column("frs", "FRS reference", 24, ""),
+        Column("scope", "Scope", 50, ""), Column("stream", "Workstream", 18, ""),
+        Column("fl", "Feature List ID / OOTB status", 24, ""), Column("note", "Note", 22, ""),
+        Column("cost", "Cost", 12, "No CR cost here")],
+        scope, description="Covered by the Integration and Data Migration scope (grey label in the FRS, Annex AA.5): no change request, no cost here")
+    grey = Font(name=ws["B5"].font.name, color=v14.COLOURS["grey"], bold=True)
+    for r in range(first, first + len(scope)):
+        ws[f"A{r}"].font = grey
+    # ---------------------------------------------------------------- Best practice (blue)
+    bp = [{"no": x[0], "practice": x[1], "why": x[2], "priority": x[3], "days": x[4]} for x in V["best_practice"]]
+    bp.append({"no": "Total", "practice": f"{len(bp)} recommendations (indicative, excluded from the CR total)",
+               "days": f"=SUM(E{first}:E{first + len(bp) - 1})"})
+    ws = wb.sheet("Best practice (blue)", [
+        Column("no", "ID", 10, "BP-UA-nn"), Column("practice", "Practice", 34, ""),
+        Column("why", "Why it matters for a broker", 70, "Philippine market (IC, Data Privacy Act, AMLA) where relevant"),
+        Column("priority", "Suggested priority", 12, "", values=["High", "Medium", "Low"]),
+        Column("days", "Indicative man-days", 12, "Not part of the CR total", kind="number")],
+        bp, description="Insurance-broking best practices in no BRD, not in the FRS and not in OOTB (blue, FRS Annex AA.6): recommendations, not commitments")
+    blue = Font(name=ws["B5"].font.name, color=v14.COLOURS["blue"], bold=True)
+    for r in range(first, first + len(bp) - 1):
+        ws[f"A{r}"].font = blue
+        ws[f"B{r}"].font = blue
     # ---------------------------------------------------------------- Assumptions with the rate cell
     assum = [
         {"item": "Man-day", "value": 8, "note": "Hours of work in one man-day"},
         {"item": "Accuracy of the estimates", "value": 0.2, "note": "Plus or minus; the Low and High columns use it"},
         {"item": "Day rate", "value": None, "note": "Enter the rate of one man-day (currency below); the costs are computed from it"},
         {"item": "Currency", "value": "", "note": "For example PHP"},
-        {"item": "Basis", "value": "", "note": "Sized on the work needed in the standard iNXT BrokerVerse system as it stands on 11-Oct-2026: a point the system already offers is not a change request (sheet Beyond the BRD - OOTB)."},
+        {"item": "Basis", "value": "", "note": "Sized against the iNXT BrokerVerse OOTB platform (repo BDOI-OOTB, branch brokerverse-platform, checked in its code with the Feature List vs OOTB as a cross-check), not against the BIBS system configured for BDOI: a point OOTB offers is not a change request; for a partial point only the missing part is estimated; a change request already available in BIBS (column Prepared for BIBS?) keeps its effort as the CR value; interfaces and data migration are not change requests (sheet Integration & Data Migration); best practice is indicative and excluded (sheet Best practice (blue)) (sheet Beyond the BRD - OOTB)."},
         {"item": "Activities", "value": "", "note": "Analysis and design (FRS update, rules), backend, frontend (screens), testing (test cases of the RTM, regression of the access functions), documentation and UAT support."},
         {"item": "Not included", "value": "", "note": "Work of BDOI and BDOI IT (decisions, identity systems, infrastructure), data migration, training beyond the UAT support."},
         {"item": "Validity", "value": "", "note": "Until the sign-off of the FRS v1.4; re-estimated when the decision of BDOI changes the scope of a change request."},
@@ -795,9 +844,12 @@ def build_rtm(data: Data) -> tuple[Path, dict]:
     for c in v14.V14["crs"]:
         for it in FRUM_RE.findall(c["frs"]):
             marks[it].append(f"{c['id']} (change request)")
+    for o in v14.V14["integration"]:
+        for it in FRUM_RE.findall(o[2]):
+            marks[it].append(f"{o[0]} (integration scope)")
     for o in v14.V14["ootb"]:
         for it in FRUM_RE.findall(o[2]):
-            marks[it].append(f"{o[0]} (offered as standard)")
+            marks[it].append(f"{o[0]} (offered by iNXT BrokerVerse OOTB)")
     item_rows = []
     for it in data.items:
         ids = data.cases_of_item(it["id"])
@@ -830,7 +882,7 @@ def build_rtm(data: Data) -> tuple[Path, dict]:
         Column("steps", "Walkthrough steps", 26, "Steps of the walkthrough users workbook")],
         trace_rows, description="BRD ID -> FR item -> test cases -> screen -> walkthrough step")
     wb.sheet("FR items", [Column("id", "FR item", 16, ""), Column("title", "Title", 44, ""), Column("origin", "Origin", 16, ""),
-                          Column("beyond", "Beyond the BRD (FRS v1.4 colour code)", 30, "CR-UA-nnn: change request (orange); OB-UA-nn: offered as standard (green)"),
+                          Column("beyond", "Beyond the BRD (FRS v1.4 colour code)", 30, "CR-UA-nnn: change request (orange); OB-UA-nn: offered by iNXT BrokerVerse OOTB (green); IS-UA-nn: integration scope"),
                           Column("ac", "Acceptance criteria", 12, ""), Column("n", "Test cases", 10, ""),
                           Column("cases", "Test case IDs", 70, "")],
              item_rows, description="Every FR item of the FRS v1.4 with its test cases")

@@ -293,6 +293,30 @@ def retext(p_element, text: str):
     return p_element
 
 
+MIN_COL = 920   # twips (about 0.64 inch): narrowest column after a refit, so short headers ("Priority") do not break
+
+
+def fit_widths(widths: list[int], room: int, min_col: int = MIN_COL) -> list[int]:
+    """Column widths scaled to fit `room` (twips), no column below min_col (or its own width when it was already
+    narrower); the other columns share what is left in proportion."""
+    total = sum(widths)
+    if total <= 0:
+        return widths
+    floor = [min(w, min_col) for w in widths]
+    fixed: set[int] = set()
+    while True:
+        free = room - sum(floor[i] for i in fixed)
+        rest = sum(widths[i] for i in range(len(widths)) if i not in fixed)
+        if rest <= 0:
+            break
+        f = free / rest
+        low = {i for i in range(len(widths)) if i not in fixed and widths[i] * f < floor[i]}
+        if not low:
+            break
+        fixed |= low
+    return [floor[i] if i in fixed else max(int(widths[i] * f), 1) for i in range(len(widths))]
+
+
 def finalise_docx(path: Path) -> dict:
     """The clean-up of a built .docx: the template's guidance sentences removed and every table fitted to the text
     width of its section. Returns what was changed."""
@@ -334,12 +358,20 @@ def finalise_docx(path: Path) -> dict:
             room = (limit or 0) - max(indent, 0)
             if not limit or total <= room + 15:
                 continue
-            f = room / total
-            for c in cols:
-                c.set(qn("w:w"), str(int(int(c.get(qn("w:w"))) * f)))
-            for tcw in tbl.iter(qn("w:tcW")):
-                if tcw.get(qn("w:type")) in (None, "dxa") and tcw.get(qn("w:w")):
-                    tcw.set(qn("w:w"), str(int(int(tcw.get(qn("w:w"))) * f)))
+            old = [int(c.get(qn("w:w")) or 0) for c in cols]
+            new = fit_widths(old, room)
+            for c, w in zip(cols, new):
+                c.set(qn("w:w"), str(w))
+            for tr in tbl.findall(qn("w:tr")):        # cell widths follow the grid (gridSpan summed)
+                gi = 0
+                for tc in tr.findall(qn("w:tc")):
+                    tcpr = tc.find(qn("w:tcPr"))
+                    span_el = tcpr.find(qn("w:gridSpan")) if tcpr is not None else None
+                    span = int(span_el.get(qn("w:val"))) if span_el is not None else 1
+                    tcw = tcpr.find(qn("w:tcW")) if tcpr is not None else None
+                    if tcw is not None and tcw.get(qn("w:type")) in (None, "dxa") and tcw.get(qn("w:w")):
+                        tcw.set(qn("w:w"), str(sum(new[gi:gi + span]) or int(int(tcw.get(qn("w:w"))) * room / total)))
+                    gi += span
             tblw = tbl.find(f"{qn('w:tblPr')}/{qn('w:tblW')}")
             if tblw is not None and tblw.get(qn("w:type")) == "dxa":
                 tblw.set(qn("w:w"), str(room))

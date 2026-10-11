@@ -1,0 +1,115 @@
+# Version 1.2 of BDOI's Renewal FRS: the review points of the Product Owner on v1.1 (11-Oct-2026). Read by
+# build_brd06_bdoi_frs.py (colour code, legend, Annex AJ rows, Annex AM.4, Annex AP.1) and build_brd06_workbooks.py
+# (CR effort estimate, CR register, RTM). Business words only.
+#
+#   green   points of this FRS that are not in the Renewal BRD or the signed Concept Paper but that the system offers
+#           out of the box (no cost); `frrn` colours BDOI's text of that item, `match` colours the annex row holding
+#           the text. Each was checked against the Renewal module of the system (screen or run named in `ootb`).
+#   orange  points that are neither in the BRD nor out of the box: each is a change request with its effort.
+#   Points of the BRD stay black. A requirement of another BRD of the programme (for example the non-functional
+#   requirements of the Collections, Claims and Reinsurance addenda) is a BRD requirement, not a new point.
+
+version: "1.2"
+date: 11 Oct 2026
+colours: {green: "2E7D32", orange: "E65100"}
+
+revision:
+  date: 11 Oct 2026
+  version: "1.2"
+  description: >-
+    Review of the Product Owner on version 1.1: colour code of the points beyond the BRD (green out of the box,
+    orange change request) with its legend; Annex AP.1 lists them with the effort of each change request (CR effort
+    workbook); the requirement lines of the BRD and the signed Concept Paper validated end to end (Annex AM.4); the
+    programme non-functional requirements of the other BRDs that also apply to Renewal (Annex AJ); the environment
+    of the screenshots and walkthroughs; figure captions kept with their figures
+  by: iorta TechNXT Project Team (drafting support); for review by Angela V. Ramirez
+
+legend:
+  title: How to read this document
+  intro: >-
+    BDOI's text of version 1.0 and every point that traces to the Renewal BRD (or to the signed Concept Paper) is in
+    black. The points of this FRS that are not in the BRD are coloured where they are stated:
+  green: "Green: not in the BRD; offered by the system out of the box, at no cost (listed in Annex AP.1)."
+  orange: "Orange: not in the BRD and not offered out of the box; needs a change request with the effort of Annex AP.1 and the CR Effort Estimate workbook."
+  note: >-
+    A requirement of another BRD of the programme that also applies to Renewal (for example the session and audit
+    rules of the Collections, Claims and Reinsurance addenda) is a BRD requirement and stays black; its source is
+    named where it is stated (Annex AJ).
+
+environment: "BIBS DEV environment: https://dev.brokerverse.cloud"
+
+# [id, FR item or annex, title, BRD reference, source, what the system offers out of the box, earlier candidate]
+green:
+  - {id: G-01, frrn: FRRN.010.01, title: "Automatic assignment by team and sub-team (Annex F)", brd: "BRD 1.005, 3.005 (the Team Lead assigns)", source: "BDOI's FRS", ootb: "Automatic assignment of the market segments chosen to the Account Officer of the team with the fewest open accounts; a setting of Renewal Setup", cr: CR-RN-001}
+  - {id: G-02, frrn: FRRN.011.03, title: "New Business account from an accepted referral", brd: "BRD 1.006 (transfer of the account)", source: "BDOI's FRS", ootb: "Referral to another unit, accepted by the receiving unit, which opens the New Business account; transfer or referral is a setting", cr: CR-RN-002}
+  - {id: G-03, frrn: FRRN.002.02.01, title: "Marketing dashboard metrics (budget, pipeline, closing ratio, top deals, persistency, product mix)", brd: "BRD 1.009.7 (accounts per officer)", source: "BDOI's FRS", ootb: "Renewal Dashboard with the budget, pipeline, closing ratio, top deals, persistency and product mix tiles and their drill-downs", cr: CR-RN-003}
+  - {id: G-04, frrn: FRRN.003.02, title: "Processing dashboard cards and drill-downs", brd: "BRD 3.010.7", source: "BDOI's FRS", ootb: "Processing Dashboard with the placement, booking, policy and releasing cards and drill-downs", cr: CR-RN-004}
+  - {id: G-05, frrn: FRRN.042.01, title: "Annual renewal budget maintenance, upload, inquiry and history", brd: "BRD 1.009.7 (dashboard)", source: "BDOI's FRS", ootb: "Renewal Budget screen: maintenance with four eyes, upload, inquiry and history", cr: CR-RN-005}
+  - {id: G-06, frrn: FRRN.039.02, title: "KYC monitoring statuses, history and dashboard", brd: "BRRN.028 (KYC flag)", source: "BDOI's FRS", ootb: "KYC Monitoring screen with statuses, history and counts, and the daily KYC run", cr: CR-RN-006}
+  - {id: G-07, frrn: FRRN.012.06, title: "BDOFC and SOLD uploads and matching", brd: "BRRN.029", source: "BDOI's FRS", ootb: "Upload of the BDOFC and SOLD reports in the Upload Centre with matching on the PN and the sanitation rule", cr: CR-RN-007}
+  - {id: G-08, frrn: FRRN.009.01, title: "CBG Motor automatic update (depreciation, BI / PD tiers, Auto Promo to Regular)", brd: "BRRN.039", source: "BDOI's FRS (Annexes D, E)", ootb: "Automatic update of CBG Motor renewals with the depreciation and tier tables maintained by the Business Administrator", cr: CR-RN-008}
+  - {id: G-09, frrn: FRRN.014.03, title: "Allocation to several insurers by percentage or amount", brd: "BRRN.040", source: "BDOI's FRS", ootb: "Insurer allocation on the renewal account by percentage or amount", cr: CR-RN-009}
+  - {id: G-10, frrn: FRRN.014.05, title: "Direct-to-Insurer Payment approval (blanket or Unit Head)", brd: "BRRN.040", source: "BDOI's FRS", ootb: "Direct-to-Insurer Payment tag with blanket or Unit Head approval in the Approvals screen", cr: CR-RN-010}
+  - {id: G-11, frrn: FRRN.036.03, title: "Hold cover automation (CBG at 75 days, extensions, CBG Home on the 15th)", brd: "BRRN.042", source: "BDOI's FRS", ootb: "Hold Cover Requests with the automatic CBG requests, extensions and insurer batches", cr: CR-RN-011}
+  - {id: G-12, frrn: FRRN.022.02, title: "Delivery through CCM", brd: "BRRN.010 (sending)", source: "BDOI's FRS", ootb: "CCM channel with delivery statuses in the Channel Monitor; the e-mail of the system as the fall-back. The connection details come from BDO ITG", cr: CR-RN-012, match: "Through CCM when in scope"}
+  - {id: G-13, frrn: FRRN.29.03, title: "MFT exchange with insurers", brd: "BRRN.040", source: "BDOI's FRS", ootb: "MFT inbox and per-insurer delivery of placement, hold cover and e-policy files", cr: CR-RN-013}
+  - {id: G-14, frrn: FRRN.033.01, title: "E-policy batch processing (summary file and ZIP)", brd: "BRRN.040", source: "BDOI's FRS", ootb: "E-policy screen: receipt of the summary file and ZIP, matching and batch sending", cr: CR-RN-014}
+  - {id: G-15, frrn: FRRN.29.05, title: "Placement turnaround time (business days, With Issue, resolution date)", brd: "BRRN.040", source: "BDOI's FRS", ootb: "Placement tracking with the TAT in business days, With Issue and resolution date", cr: CR-RN-015}
+  - {id: G-16, frrn: FRRN.26.01, title: "Second approval after acceptance", brd: "BRRN.040 (no delay)", source: "BDOI's FRS", ootb: "Submitted for Approval before placement, a setting (Annex AO C23)", cr: CR-RN-016}
+  - {id: G-17, frrn: FRRN.013.02, title: "Nine insurer disposition values", brd: "BRRN.035 (three outcomes)", source: "BDOI's FRS", ootb: "BDOI's nine values mapped to the three outcomes of the BRD in the insurer disposition list", cr: CR-RN-017}
+  - {id: G-18, frrn: FRRN.006.01, title: "Duplicate criteria per line and segment (Annex B)", brd: "BRRN.005", source: "BDOI's FRS", ootb: "Duplicate check of the sanitation with criteria per line and segment", cr: CR-RN-018}
+  - {id: G-19, frrn: FRRN.022.01, title: "Renewal Advice per line; first and last notice set by the system", brd: "BRRN.010", source: "BDOI's FRS (Annex L)", ootb: "BDOI's Renewal Advice templates per line; notice set from the days before expiry (setting, Annex AO C13)", cr: CR-RN-019}
+  - {id: G-20, frrn: FRRN.024.01, title: "Password convention of protected files", brd: "BRRN.010 (encrypt and add password)", source: "BDOI's FRS", ootb: "BDOI's password convention, a setting (Annex AO C16)", cr: CR-RN-020}
+  - {id: G-21, frrn: FRRN.27.01, title: "Scheduled CLPC billing (CBG Home, FFY Motor) and the e-mail of Annex S", brd: "BRRN.040", source: "BDOI's FRS", ootb: "Billing Files screen and the scheduled billing runs", cr: CR-RN-021}
+  - {id: G-22, frrn: FRRN.041.01, title: "RMU Account Officer maintenance", brd: "BRRN.029", source: "BDOI's FRS", ootb: "RMU Officers screen", cr: CR-RN-022}
+  - {id: G-23, frrn: FRRN.043.01, title: "Audit Logs menu with filters and export", brd: "BRRN.021", source: "BDOI's FRS", ootb: "Audit Logs screen with filters and export", cr: CR-RN-023}
+
+# Change requests: neither in the BRD nor out of the box. effort = man-days [analysis and design, back end, front end,
+# testing, documentation and UAT support]; based on the Renewal screens of the system (83 screen components,
+# about 14,400 lines of screen code, 16 screens of Annex AA).
+orange:
+  - id: CR-RN-024
+    match: "WCAG 2.2"
+    frs: "Annex AJ RN-NFR-16"
+    title: "Accessibility conformance (WCAG 2.2 level AA) of the Renewal screens"
+    brd: Not in BRD
+    source: "Programme register of non-functional requirements (NFR-ACC-01); market practice for bank systems"
+    why: >-
+      The BRD has no accessibility requirement; BDO's policies and the programme register expect screens usable with
+      the keyboard and a screen reader, with sufficient contrast. A conformance claim needs a check of every Renewal
+      screen and the corrections it finds.
+    ootb: >-
+      Partly: the screens have labelled fields, keyboard navigation and the programme colours; no conformance check
+      of the Renewal screens against WCAG 2.2 AA and no conformance statement.
+    effort: [2.0, 0.0, 12.0, 4.0, 2.0]
+    complexity: Medium
+    priority: Medium
+    type: Enhancement
+    dependencies: "BDOI confirms the accessibility standard (WCAG 2.2 AA or BDO's own); shared screen components of the programme"
+    assumptions: "16 Renewal screens and their dialogs; corrections in the shared components benefit every module and are counted once here; no change to the business rules"
+
+# Requirements of other BRDs of the programme that also apply to Renewal (Annex AJ, black: BRD requirements)
+programme_nfr:
+  - ["RN-NFR-17", "One session per device", "\"Limit the number of concurrent sessions to a single device; an opened session on a different device prompts a log-off of the previous device session\" (Collections addendum NFR 10.07; the same programme rule for every module)", "Every sign-in is recorded in the session log; the single-device rule is a programme setting that BDOI confirms for all modules (programme change CR-0025; discrepancy DCR-044: NFR 9.02 allows concurrent sessions)", "FRRN.001.01", "NFR-SEC-05"]
+  - ["RN-NFR-18", "Audit source", "Each audit entry records the source of the event (workstation, device or IP address; behind a load balancer the original address) (Claims, Collections and Reinsurance addenda NFR 4.03)", "Audit entries with the user, time, action and source address; read-only for every user", "FRRN.043.01", "NFR-AUD-01, NFR-AUD-02"]
+
+# Annex AM.4 - the signed Concept Paper (Advance Implementation of Renewal Processing v1.0, 9-Jun-2026)
+concept_paper:
+  intro: >-
+    The signed Concept Paper proposed an early release of Renewal before the core cut-over. BDOI decided on
+    26-Sep-2026 that every module goes live together in January 2028; the points of the Concept Paper are traced
+    below with that decision.
+  header: ["Concept Paper point", "Where in this FRS", "Status"]
+  rows:
+    - ["Renewal intake and pipeline tracking; RMEL extract ingestion and validation", "FRRN.002, FRRN.004, FRRN.045", "Covered"]
+    - ["Data sanitation and enrichment; RMEL data quality with exception handling (Annex C risk)", "FRRN.006 to FRRN.009, FRRN.040.02; Annex AC.4", "Covered"]
+    - ["Disposition management", "FRRN.014 to FRRN.016, FRRN.020", "Covered"]
+    - ["Proposal / quotation generation; TSU quotation capability", "FRRN.017 to FRRN.019 (Product Maintenance and New Business FRS for the quotation)", "Covered; TSU functions in their own FRS"]
+    - ["Insurer engagement and approval tracking", "FRRN.013, FRRN.021, FRRN.029", "Covered"]
+    - ["Renewal Advice generation; NAL and NRL processing", "FRRN.022 to FRRN.024; Annex AE", "Covered"]
+    - ["Pre-placement adjustments", "FRRN.018.02, FRRN.025", "Covered"]
+    - ["Submitted Policy and Free First Year renewal processing", "FRRN.048.01; FRRN.27.01", "Covered"]
+    - ["Package remapping: design decision on upload or sanitation", "FRRN.046.01 (at sanitation); Annex AO", "Covered; BDOI confirms (Concept Paper decision owner)"]
+    - ["Early migration of the Client Master and reference data (LOV, MIS, insurer, branch, product)", "Annex AK", "Covered"]
+    - ["User readiness: role-based training and a pilot or batch dry run", "Annex AQ; walkthrough users workbook (Annex AL)", "Covered by the programme's training and UAT plan"]
+    - ["Early release by 15-Aug-2027 for January to May 2028 expiries; no placement or booking before the January 2028 cut-over", "FRRN.045 (go-live take-over of expiries to 31-May-2028)", "Superseded by BDOI's decision of 26-Sep-2026: single go-live in January 2028, so no pre-cut-over placement rule is needed"]

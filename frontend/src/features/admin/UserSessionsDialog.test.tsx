@@ -30,7 +30,7 @@ describe('UserSessionsDialog', () => {
       </QueryClientProvider>,
     );
     expect(
-      await screen.findByText('Sessions of Rhea Access Requestor (requestor)'),
+      await screen.findByText('Sessions of Rhea Access Requestor'),
     ).toBeInTheDocument();
   });
 });

@@ -59,10 +59,8 @@ export function UserSessionsDialog({
   );
 }
 
-/** The title of the dialog: the user by name with the user ID, never the user ID alone. */
+/** The title of the dialog: the user by name; the user ID only when the name is not known. */
 function sessionsTitle(username: string): string {
   const name = displayNameOf(username);
-  return name && name !== username
-    ? `Sessions of ${name} (${username})`
-    : `Sessions of ${username}`;
+  return `Sessions of ${name || username}`;
 }

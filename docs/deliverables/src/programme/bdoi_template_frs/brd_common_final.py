@@ -934,6 +934,26 @@ def _word_twips(word: str, half_points: int) -> int:
     return int(_BOLD.getlength(word) / 100 * half_points / 2 * 20)
 
 
+_SMALL_WORDS = {"a", "an", "the", "and", "or", "nor", "but", "of", "in", "on", "to", "for", "by", "with", "from",
+                "at", "as", "per", "vs", "via", "into", "than", "is", "are", "be", "its", "not"}
+
+
+def _title_case(s: str, first: bool) -> str:
+    """Title case as BDOI's headings: each word capitalised except the short joining words; words already holding a
+    capital or a digit (IDs, acronyms, screen codes) kept as written."""
+    import re as _re  # noqa: PLC0415
+
+    def fix(m):
+        w = m.group(0)
+        start = m.start() == 0 and first
+        if any(c.isupper() or c.isdigit() for c in w):
+            return w
+        if w in _SMALL_WORDS and not start:
+            return w
+        return w[0].upper() + w[1:]
+    return _re.sub(r"[A-Za-z][A-Za-z'\-]*", fix, s)
+
+
 def conform_to_template(doc, path) -> dict:
     """Every run, heading, table and caption in BDOI's template styles (TEMPLATE_STYLE); BDOI's own paragraphs keep
     their text (only their font is made the template's Arial where a run named none or another family)."""
@@ -1011,6 +1031,13 @@ def conform_to_template(doc, path) -> dict:
                 size = H2_SIZE
             else:
                 size = "keep"
+            if level in ("1", "2"):
+                # BDOI's headings are in title case (Document Purpose, Business Requirements Mapping)
+                first = True
+                for tt in p.iter(qn("w:t")):
+                    if tt.text:
+                        tt.text = _title_case(tt.text, first)
+                        first = False
             for r in runs:
                 rpr = rpr_of(r)
                 rf = rpr.find(qn("w:rFonts"))
@@ -1099,7 +1126,7 @@ def conform_to_template(doc, path) -> dict:
             continue
         for t in p.iter(qn("w:t")):
             if t.text and "  " in t.text:
-                new = _re.sub(r"(?<=\S) {2,}(?=\S)", " ", t.text)
+                new = _re.sub(r"(?<=\S) {2,}", " ", t.text)
                 if new != t.text:
                     t.text = new
                     out["spaces"] += 1
@@ -1108,6 +1135,27 @@ def conform_to_template(doc, path) -> dict:
             if t1.text.endswith(" ") and t2.text.startswith(" ") and t1.text.strip():
                 t2.text = t2.text.lstrip(" ")
                 out["spaces"] += 1
+    # a tall figure with a caption and a "How to read it" note under it is made smaller, so that the note stays on
+    # the figure's page
+    ns_wp = "http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
+    ns_a = "http://schemas.openxmlformats.org/drawingml/2006/main"
+    for p in body.findall(qn("w:p")):
+        if p.find(f".//{qn('w:drawing')}") is None:
+            continue
+        cap = p.getnext()
+        note = cap.getnext() if cap is not None else None
+        if note is None or note.tag != qn("w:p") or not text(note).strip().startswith("How to read it"):
+            continue
+        for ext in p.iter(f"{{{ns_wp}}}extent"):
+            cy = int(ext.get("cy") or 0)
+            if cy > int(4.6 * 914400):
+                cx, cy2 = int(int(ext.get("cx")) * 0.86), int(cy * 0.86)
+                ext.set("cx", str(cx))
+                ext.set("cy", str(cy2))
+                for xe in ext.getparent().iter(f"{{{ns_a}}}ext"):
+                    xe.set("cx", str(cx))
+                    xe.set("cy", str(cy2))
+        _set_child(_ppr(cap), "keepNext", _PPR_ORDER, replace=False)
     # a short note right after a table never goes alone to a page of its own: the last row of the table goes with it
     for tbl in body.findall(qn("w:tbl")):
         nxt = tbl.getnext()

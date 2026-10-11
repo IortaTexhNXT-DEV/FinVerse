@@ -93,6 +93,7 @@ replace:
   - ["On Identity Synchronisation › Enterprise SSO Simulator add the account", "With the Enterprise SSO test accounts provided under the Integration scope, set up the account"]
   - ["correct the account in the simulator", "correct the account in the Enterprise SSO test accounts"]
   - ["the the system", "the system"]
+  - ["renewal renewal", "renewal"]
   - ["The the system", "The system"]
 # Regular expressions (applied after the phrases): the build's behaviour quoted beside a proposal.
 regex:

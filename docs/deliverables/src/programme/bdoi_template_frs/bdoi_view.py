@@ -140,6 +140,10 @@ def normalise_workbook(wb, filename: str) -> dict:
         ps.fitToWidth = 1
         ps.fitToHeight = 0
         ws.sheet_properties.pageSetUpPr = PageSetupProperties(fitToPage=True)
+        # a very wide sheet prints on A3 landscape, so that one page wide stays readable
+        total = sum((ws.column_dimensions[get_column_letter(k)].width or 13) for k in range(1, ws.max_column + 1))
+        if ws.title != "Cover" and total > 260:
+            ps.paperSize = ws.PAPERSIZE_A3
         if ws.title in ("Cover",):
             continue
         # the header row: the first row with two or more cells on the header blue

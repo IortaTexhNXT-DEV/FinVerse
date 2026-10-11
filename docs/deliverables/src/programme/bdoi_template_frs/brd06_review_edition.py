@@ -433,13 +433,13 @@ class NewAnnexes:
             ref = q["refs"] if q["refs"] not in ("BDOFC", "CBG-HOME") else "New in v1.1"
             rows.append([f"AN.3.{i}", ref, q["q"], q["why"], q["fmt"], q["owner"],
                          q["by"].strftime("%d-%b-%Y") if hasattr(q["by"], "strftime") else str(q["by"])])
-        a.table(["No.", "Our reference", "Question", "Why (BDOI's FRS)", "Format of the answer", "Owner", "Needed by"],
-                rows, [0.6, 0.9, 2.1, 1.6, 1.1, 0.8, 0.7], size=7)
         n_answered = sum(1 for k in where.values() if k == "answered")
         a.p(f"{n_answered} earlier questions, clarifications and assumptions are answered by BDOI's FRS and are not "
             f"repeated here (sheet Answered in the BDOI FRS of the Test Cases and Traceability workbook); "
             f"{sum(1 for k in where.values() if k == 'input')} items are values, templates, data or signatures the "
             f"Business Unit provides (requirements collection workbook).", italic=True, size=9)
+        a.table(["No.", "Our reference", "Question", "Why (BDOI's FRS)", "Format of the answer", "Owner", "Needed by"],
+                rows, [0.6, 0.9, 2.1, 1.6, 1.1, 0.8, 0.7], size=7)
         clash = [r for r, k in where.items() if k == "open" and r in o["answered"]]
         if clash:
             raise SystemExit(f"open questions answered in BDOI's FRS: {clash}")

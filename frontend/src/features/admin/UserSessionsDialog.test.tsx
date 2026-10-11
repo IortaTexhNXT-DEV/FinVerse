@@ -29,8 +29,6 @@ describe('UserSessionsDialog', () => {
         </ToastContext.Provider>
       </QueryClientProvider>,
     );
-    expect(
-      await screen.findByText('Sessions of Rhea Access Requestor'),
-    ).toBeInTheDocument();
+    expect(await screen.findByText('Sessions of Rhea Access Requestor')).toBeInTheDocument();
   });
 });

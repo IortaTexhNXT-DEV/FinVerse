@@ -239,6 +239,7 @@ class Builder(u11.Builder):
     def __init__(self, highlight: bool):  # noqa: D107  (the parent's init reads the BRD-11 source)
         self.highlight = highlight
         self.round13 = True
+        self.round14 = True     # the name the shared builder reads since BRD-11 v1.4
         self.doc = docx.Document(str(REPO / DOC["meta"]["source"]))
         self.body = self.doc.element.body
         self.tables = list(self.doc.tables)

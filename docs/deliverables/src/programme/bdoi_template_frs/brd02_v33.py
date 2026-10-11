@@ -70,17 +70,17 @@ def total_days() -> float:
 
 @contextlib.contextmanager
 def this_round(b):
-    old = b.round13
-    b.round13 = True
+    old = (b.round13, b.round14)
+    b.round13 = b.round14 = True
     try:
         yield
     finally:
-        b.round13 = old
+        b.round13, b.round14 = old
 
 
 def begin(b) -> None:
     """The content of version 3.2 is no longer shaded in the review copy."""
-    b.round13 = False
+    b.round13 = b.round14 = False
 
 
 def revision(b) -> None:

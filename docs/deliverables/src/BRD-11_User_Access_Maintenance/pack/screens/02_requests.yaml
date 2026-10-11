@@ -82,7 +82,7 @@ screens:
       - "Group Profiles | [Group profile check boxes] | Check boxes | Name of each active group profile, grouped by product module; the count of profiles selected; (current) after a profile the user holds | Cond.: enrolment (at least one) | Active group profiles | None (new); the profiles held (modify) | Draft; Returned | Active profiles only; a user cannot change his own profiles; no two profiles of an active separation-of-duties rule | Select at least one role; One user may not hold both <profile> and <profile> (separation-of-duties rule <rule>)"
       - "Deactivation | Reason | Drop-down | Resigned, Transferred to another unit, Long leave, Security, Others, No sign-in for the dormancy period (values to confirm with BDOI) | N | List UAM_DEACTIVATION_REASON | Blank | Draft; Returned | - | -"
       - "Reactivation | Also unlock the account | Check box | Shown when the user is locked | N | - | Not ticked | Draft; Returned | - | -"
-      - "Approval | Approver | Drop-down | Name (user ID) of each eligible approver | Y | Holders of the approval right, less the requester and the user concerned | Blank | Draft; Returned | An eligible approver; one approver for a user request | Select the approver"
+      - "Approval | Approver | Drop-down | Name of each eligible approver (with the user ID only when two approvers share a name) | Y | Holders of the approval right, less the requester and the user concerned | Blank | Draft; Returned | An eligible approver; one approver for a user request | Select the approver"
       - "Approval | Remarks (Justification) | Text area | Up to 1,000 characters | Y | - | Blank | Draft; Returned | Not blank on submission | Enter the justification"
       - "Approval | Correction Remarks | Text area | Up to 1,000 characters; shown for a returned request | Cond.: resubmission | - | Blank | Returned | Not blank on resubmission | Enter the correction remarks"
     actions:
@@ -207,7 +207,7 @@ screens:
       - "Summary | Requested By | Text | Name of the requester | - | Bulk batch | - | Read only | - | -"
       - "Summary | Requested On | Date and time | dd-MMM-yyyy HH:mm | - | Bulk batch | - | Read only | - | -"
       - "Lines | Request / Type / User / Change / Status / Error | Table | One access request per line | - | Line requests | - | Read only | - | -"
-      - "Submit Batch | Approver | Drop-down | Name (user ID) of each eligible approver | Y | Holders of the approval right, less the requester | Blank | Draft or Returned batch | An eligible approver | Select the approver"
+      - "Submit Batch | Approver | Drop-down | Name of each eligible approver (with the user ID only when two approvers share a name) | Y | Holders of the approval right, less the requester | Blank | Draft or Returned batch | An eligible approver | Select the approver"
       - "Submit Batch | Remarks | Text area | Up to 1,000 characters | Y | - | Blank | Draft or Returned batch | Not blank | Enter the remarks"
     actions:
       - "Submit Batch | The creator of the batch | Draft or Returned | Submits every draft line to the chosen approver with the batch remarks | Pending Approval | Access request AR-yyyy-nnnnnn to approve, per line"

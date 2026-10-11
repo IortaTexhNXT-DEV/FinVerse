@@ -180,6 +180,7 @@ cr_candidates:
   - [FRUM.013.01, "BRD 1.006.1.1, 1.008.1.4, 2.002.1", "E-mail copy of the request notices", "The notices to approve, returned and decided also sent by e-mail by the user's preference.", "The BRD asks for a notification (met in the system); Annex Z.", Proposal for best practice, "E-mail of the notices", "Small", "Low", "-", "FRUM.013.01 cases", Low]
   - [FRUM.009.10, "BRD NFR p.13 (1.k)", "Temporary access with an end date", "Access given until an end date, removed by the daily run.", "Open question CLR-UA-13 (Annex Z).", Beyond the BRD, "End date on requests", "Small", "Low", "-", "FRUM.009.10 cases", Low]
   - [FRUM.001.01, "BRD NFR p.14", "One session per user or device", "A new sign-in ends the earlier session of the same user (or device).", "Open question CLR-UA-09 (Annex Z).", Beyond the BRD, "Session rule", "Small", "Low", "All users", "FRUM.001 cases", Low]
+  - [FRUM.005.01, "BRD 3.002", "Emergency role edit", "A direct edit of users and group profiles by the System Administrator while Information Security has opened the emergency path; every edit audited and alerted.", "Best practice; no controlled emergency path in the OOTB platform.", Beyond the BRD, "Emergency edit setting, audit and alert", "Small", "See CR Effort Estimate", "-", "FRUM.005.01 cases", Medium]
 
 # --------------------------------------------------------------------------------------- coverage (internal)
 # Item-level status of BDOI's items comes from the comparison workbook (platform column) and the conformance

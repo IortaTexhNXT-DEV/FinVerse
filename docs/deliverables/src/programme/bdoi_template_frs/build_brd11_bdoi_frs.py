@@ -1447,8 +1447,11 @@ def key_numbers(b: Builder, nfr) -> list[list[str]]:
         ["Open questions not answered in BDOI's FRS / answered and not repeated", f"{s['open_kept']} / {s['answered']}",
          "Annex Z"],
         ["Observations and points for decision", str(s["observations"]), "Annex Q"],
-        ["Change requests (orange) / points beyond the BRD offered as standard (green)",
+        ["Change requests (orange) / points beyond the BRD offered by iNXT BrokerVerse OOTB (green)",
          f"{len(v14.V14['crs'])} / {len(v14.V14['ootb'])}", "Annex AA.2, AA.3"],
+        ["BRD items to deliver / integration and data migration items / best-practice recommendations (blue)",
+         f"{len(v14.V14['brd_to_deliver'])} / {len(v14.V14['integration'])} / {len(v14.V14['best_practice'])}",
+         "Annex AA.4, AA.5, AA.6"],
         ["Review checklist points", str(s["checklist"]), "Annex AB"],
     ]
 

@@ -4,8 +4,14 @@
 #
 # Colour code of the FRS (legend in "How to read this document"):
 #   black  - the point is in the BRD (User Access Maintenance BRD, or a programme-wide NFR of another BRD / addendum);
-#   green  - the point is not in the BRD and the standard system (iNXT BrokerVerse) already offers it (OOTB), no cost;
-#   orange - the point is in no BRD and not offered by the standard system: a change request (CR) with an effort.
+#   green  - the point is in no BRD and the iNXT BrokerVerse OOTB platform offers it: feature "Available" (or "OOTB
+#            extra") in column "OOTB platform" of the BIBS BDOI Feature List vs OOTB workbook; no cost;
+#   orange - the point is in no BRD and the OOTB platform does not offer it (Not available, Partial, BDOI-specific or no
+#            feature row): a change request (CR) with an effort - also when it was already built for BDOI in BIBS.
+# OOTB is the iNXT BrokerVerse OOTB platform (repo IortaTexhNXT-DEV/BDOI-OOTB, branch brokerverse-platform), tested in its
+# code with the Feature List as a cross-check; NOT the BIBS build of this project (which holds BDOI-specific work).
+#   grey label - integration (EIAM / Entra ID SSO, UIDM-ISC, any external interface) or data migration (BRD-13) scope;
+#   blue       - insurance-broking best practice in no BRD, FRS or OOTB: separate table (Annex AA.7), indicative effort.
 
 meta:
   version: "1.4"
@@ -13,61 +19,131 @@ meta:
   clean: BIBS_FRS-BDOI_BRD-11_User_Access_Maintenance_v1.4.docx
   highlighted: BIBS_FRS-BDOI_BRD-11_User_Access_Maintenance_v1.4_Changes_Highlighted.docx
   previous: "1.3"
-  revision_row: ["11 Oct 2026", "1.4", "Product owner review: colour code of the points beyond the BRD (green: offered as standard; orange: change request) with its legend; simplified and end-to-end process flows (section 1.8, Annex N); BRD and programme-wide NFR validation (Annex X.2); change requests with effort and the points delivered as standard (Annex AA.2 to AA.4); uniform fonts, tables, captions and page layout.", "iorta TechNXT Project Team (drafting support); for review by John Barbachano"]
+  revision_row: ["11 Oct 2026", "1.4", "Product owner review: colour code of the points beyond the BRD against the iNXT BrokerVerse OOTB platform (Feature List vs OOTB; green: offered by the OOTB platform; orange: change request) with its legend; simplified and end-to-end process flows (section 1.8, Annex N); BRD and programme-wide NFR validation (Annex X.2); change requests with effort, the points offered by the OOTB platform and the BRD items to deliver (Annex AA.2 to AA.4); uniform fonts, tables, captions and page layout.", "iorta TechNXT Project Team (drafting support); for review by John Barbachano"]
   references: >-
     References added in version 1.4: BIBS CR Effort Estimate BRD-11 v1.0 and Change Request Register BRD-11 v1.1 of
-    11-Oct-2026; the non-functional requirements of the Collections (CLXN), Claims (CLM) and ReInsurance addenda and of
-    the Operations addendum, read for the programme-wide security rules (Annex X.2).
+    11-Oct-2026; BIBS BDOI Feature List vs OOTB and Best Practice v1.0 (column "OOTB platform", the baseline of the
+    colour code); the non-functional requirements of the Collections (CLXN), Claims (CLM) and ReInsurance addenda and
+    of the Operations addendum, read for the programme-wide security rules (Annex X.2).
   environment: "BIBS DEV environment (https://dev.brokerverse.cloud)"
 
 colours:
   green: "2E7D32"
   orange: "E65100"
 
+feature_list: "BIBS BDOI Feature List vs OOTB and Best Practice v1.0 (sheet Feature Comparison, column OOTB platform)"
+
 legend:
   intro: >-
-    The requirements of this document are written in three colours, so that the reader sees at once what the BRD asks
-    for, what the system offers beyond it at no cost, and what would need a change request. The colour is applied to
-    the requirement or rule where it is stated (section 3 and the annexes); headings, tables of reference and BDOI's
-    original wording keep their colours otherwise.
-  rows:
-    - ["Black", "In the BRD", "The point is a requirement of the User Access Maintenance BRD, or a programme-wide non-functional requirement of another BRD or addendum (Annex X.2).", "In scope."]
-    - ["Green", "Not in the BRD - offered as standard (OOTB)", "The point is not asked by any BRD; the standard iNXT BrokerVerse system already offers it, usually behind a setting BDOI confirms (Annex M.10). Listed in Annex AA.3.", "No change request, no cost."]
-    - ["Orange", "Not in the BRD - change request", "The point is asked by neither the BRD nor offered by the standard system; it is a candidate change request with its effort (Annex AA.2 and the CR Effort Estimate workbook).", "Delivered only when BDOI approves the change request."]
+    The requirements of this document are written in colours, so that the reader sees at once what the BRD asks for,
+    what the iNXT BrokerVerse OOTB platform offers beyond it at no cost, and what would need a change request. OOTB
+    (out of the box) means the iNXT BrokerVerse OOTB platform (brokerverse-platform), checked in its code and against
+    the BIBS BDOI Feature List vs OOTB workbook (column "OOTB platform"); it is not the BIBS system configured and
+    extended for BDOI during this project. The colour is applied to the requirement or rule where it is stated
+    (section 3 and the annexes); headings, tables of reference and BDOI's original wording keep their colours
+    otherwise.
+  # rows: colour_code.legend_rows (shared by the packs)
 
 # ------------------------------------------------------------------------------------------------ change requests
 # One row per orange point. effort: [analysis and design, backend, frontend, testing, documentation / UAT support]
-# in man-days of 8 hours, estimated on the size of the work in the system today (+-20%).
+# in man-days of 8 hours (+-20%), sized against the OOTB platform (for a Partial feature: the missing part only).
+# fl: Feature List ID / OOTB status; built: already built for BDOI in the BIBS system of this repository.
 crs:
+  - id: CR-UA-003
+    evidence: "Not found: no break-glass account or break-glass sign-in alert in the OOTB sign-in"
+    title: Break-glass administrators
+    frs: "FRUM.001.06; Annex N.4, Annex Q.5"
+    brd: Not in BRD
+    source: Best practice (iorta TechNXT)
+    fl: "No feature row (related UAM-007 two-factor authentication: Available)"
+    built: "Yes"
+    why: >-
+      BDOI's FRS signs every user in through EIAM; two named administrator accounts must still get in when EIAM is
+      down, with each such sign-in alerted to Information Security. The OOTB platform has local accounts only and no
+      break-glass accounts or alert.
+    ootb: "Not offered: no feature row; the OOTB platform has local accounts with a second factor (UAM-007) but no break-glass accounts kept beside the Enterprise SSO and no sign-in alert."
+    scope: >-
+      Two named System Administrator accounts with a local password and second factor while every other user signs
+      in through EIAM; the sign-in method recorded; a notice and e-mail to Information Security at each break-glass
+      sign-in; the setting of the alert addresses.
+    effort: [1, 2, 1, 1.5, 0.5]
+    complexity: Medium
+    priority: High
+    depends: "Sign-in through EIAM (IS-UA-03, Integration scope)."
+    assumptions: "Uses the second factor of the OOTB platform (UAM-007)."
   - id: CR-UA-007
+    evidence: "Partial: own-records scope of scoped roles and the reporting line on the user; no branch or unit scope, no supervisor rule"
     title: Supervisory and record-ownership access
     frs: "FRUM.001.02 (b), FRUM.005.01; Annex Q (C15)"
     brd: Not in BRD
     source: BDOI FRS v1.1
+    fl: "UAM-017 Data-scope restriction: Partial"
+    built: "Partly (data scope by company and branch; no supervisor link)"
     why: >-
       BDOI's FRS asks that a user with a supervisory role sees and manages the records of the personnel assigned to
-      him or her, with record-ownership rules per role. The system limits each user's data by company and branch
-      (data scope) and by role; it has no supervisor-to-personnel link and no record-owner rule.
-    ootb: "Partly: data scope by company and branch on every user; no supervisor hierarchy or record-owner rule."
+      him or her, with record-ownership rules per role. The OOTB platform limits scoped roles to their own records and
+      clients (UAM-017 Partial); it has no scope by branch or unit, no supervisor-to-personnel link and no
+      record-owner rule per role.
+    ootb: "Partial (UAM-017): scoped roles see only their own records and clients. Missing, and estimated here: scope by company, branch and unit, the supervisor link and the record-owner rule per role."
     scope: >-
-      Supervisor (reports-to) on the user record and in the access requests; data scope "own records", "own and
-      assigned personnel" and "unit" per group profile; the rule applied to the lists, records, documents and reports
-      of every module; audit of the scope changes; screens of the user and the group profile.
-    effort: [3, 10, 3, 5, 2]
+      Data scope by company, branch and unit on the user and the group profile; supervisor (reports-to) on the user
+      record and in the access requests; data scope "own records", "own and assigned personnel" and "unit" per group
+      profile; the rule applied to the lists, records, documents and reports of every module; audit of the scope
+      changes; screens of the user and the group profile.
+    effort: [3.5, 12, 4, 6, 2]
     complexity: High
     priority: Medium
     depends: "BDOI to name the supervisory roles and the record owner of each module (User Access Matrix, Annex C); module FRS of each BRD for the records concerned."
-    assumptions: "The rule reuses the data scope of the system; the personnel of a supervisor come from the user record (or UIDM-ISC), not from a separate organisation chart."
+    assumptions: "Effort for the missing part only (the own-records scope of the OOTB platform is reused); the personnel of a supervisor come from the user record (or UIDM-ISC), not from a separate organisation chart."
+  - id: CR-UA-008
+    evidence: "Partial: Access Control > Separation-of-duties rules on pairs of roles; no rule on pairs of permissions"
+    title: No conflicting permissions inside a group profile
+    frs: "FRUM.006.03"
+    brd: Not in BRD
+    source: BDOI FRS v1.1
+    fl: "UAM-018 Segregation of duties rules: Available (pairs of roles only)"
+    built: "Yes"
+    why: >-
+      BDOI's FRS asks that a group profile cannot hold two permissions that conflict. The OOTB platform checks pairs
+      of roles held by one user (separation-of-duties rules); it has no rule on pairs of permissions inside a role.
+    ootb: "Partial: rules on pairs of roles (checked at role assignment). Missing, and estimated here: rules on pairs of permissions, checked when a group profile is changed and when a user is given access."
+    scope: "Rules on pairs of permissions kept by the Business Administrator; check on every group profile change and access request; message naming the conflict; audit."
+    effort: [0.5, 2, 1, 1, 0.25]
+    complexity: Low
+    priority: Medium
+    depends: "BRD items BRD-UA-07 and BRD-UA-09 (rights by function, group profile requests)."
+    assumptions: "Effort for the permission pairs only; the role-pair rules of the OOTB platform are reused."
+  - id: CR-UA-009
+    evidence: "Not found: export file names fixed per report (Reports)"
+    title: Export file names
+    frs: "FRUM.007.02; Annex V"
+    brd: Not in BRD
+    source: BDOI FRS v1.1
+    fl: "RPT-009 Report file naming conventions: Not available"
+    built: "Yes"
+    why: >-
+      BDOI's FRS names the exports <Report name>_MMDDYYYY and Audit Logs_MMDDYYYY. In the OOTB platform the file names
+      are fixed per report (RPT-009 Not available).
+    ootb: "Not offered: RPT-009 Not available (file names fixed per report)."
+    scope: "File names of the User Access reports and of the audit log export by BDOI's convention, as a setting; test of every export."
+    effort: [0.25, 1, 0.25, 0.5, 0.25]
+    complexity: Low
+    priority: Low
+    depends: "-"
+    assumptions: "The convention of the access reports only; the naming of the other modules' reports is in their own FRS."
   - id: CR-UA-011
+    evidence: "Not found for access requests: escalation only in the AML and user screens; no access request flow"
     title: Approval times, reminders and escalation
     frs: "Annex S (time rules), Annex Q.5, Annex Z"
     brd: Not in BRD
     source: Best practice (iorta TechNXT)
+    fl: "WFL-007 Turnaround-time tracking and escalation: Partial (UAM-019 access requests: Not available)"
+    built: "No"
     why: >-
-      The BRD sets no service level for the approval of access requests. Today the age of each request shows on the
-      Access Requests list and report; a reminder and an escalation after a number of working days keep requests
-      from waiting unseen.
-    ootb: "No: the age of each request is shown; no reminder or escalation run for access requests."
+      The BRD sets no service level for the approval of access requests. A reminder and an escalation after a number
+      of working days keep requests from waiting unseen. The OOTB platform has deadlines and escalation for claims,
+      complaints, leads and collections only, and no access requests (WFL-007 Partial).
+    ootb: "Partial (WFL-007): deadlines and escalation exist in other modules, not for access requests. Missing, and estimated here: the time rules, reminder and escalation of access requests."
     scope: >-
       Settings for the working days per stage, the reminder day and the escalation role; a daily run that sends the
       reminder notice and escalates overdue requests to the Business Administrator; the overdue marker on the lists;
@@ -75,35 +151,39 @@ crs:
     effort: [1, 3, 1, 2, 1]
     complexity: Medium
     priority: Medium
-    depends: "Working-day calendar with the public holidays (shared with the out-of-hours rule, Annex Z)."
+    depends: "BRD item BRD-UA-08 (access requests); working-day calendar of the OOTB platform (ADM-008)."
     assumptions: "Reminders use the notices and e-mails of Annex T; one escalation level."
-  - id: CR-UA-012
-    title: Monthly access review report to Information Security
-    frs: "Annex V, Annex Q.5 (UA-Q51)"
-    brd: "Not in BRD (BRD p.11 lists report volumes only)"
+  - id: CR-UA-013
+    evidence: "Partial: in-system access-control notices and the e-mail outbox; no e-mail copy of access notices"
+    title: E-mail copy of the request notices
+    frs: "FRUM.013.01; Annex T"
+    brd: Not in BRD
     source: Best practice (iorta TechNXT)
+    fl: "UAM-027 Notices of access changes: Partial"
+    built: "Yes"
     why: >-
-      Information Security practice is a periodic review of who holds which access. The reports exist and run on
-      demand; producing them each month for Information Security makes the review routine.
-    ootb: "Partly: User Access Report and User Access Audit Log run on demand and export; no monthly schedule."
-    scope: >-
-      A monthly run on the first working day that produces the User Access Report and the audit log of the month,
-      keeps the files for download and notifies Information Security (in the system and by e-mail, with no
-      attachment); run history and failure notice as for the other runs.
-    effort: [1, 2.5, 0.5, 1.5, 0.5]
+      BDOI's FRS asks that the notices to approve, returned and decided are also e-mailed, by the user's preference.
+      The OOTB platform sends in-system notices for access-control events (UAM-027 Partial); it has e-mail templates
+      (WFL-011) but no e-mail copy of the access notices.
+    ootb: "Partial (UAM-027): in-system notices only. Missing, and estimated here: the e-mail copy and the user's preference."
+    scope: "E-mail copy of the request notices (to approve, returned, decided) from templates, by the user's preference (setting); the outbox status; tests."
+    effort: [0.5, 1.5, 0.5, 1, 0.25]
     complexity: Low
-    priority: Low
-    depends: "UA-Q51 answered (reports, frequency and recipients)."
-    assumptions: "No new report layout; the files follow the export names of FRUM.007.02."
+    priority: Medium
+    depends: "BRD item BRD-UA-14 (notices of the access requests)."
+    assumptions: "Effort for the e-mail copy only; uses the e-mail templates and outbox of the OOTB platform (WFL-011)."
   - id: CR-UA-014
+    evidence: "Not found: no effective or end date on role assignment"
     title: Temporary access with an end date
     frs: "Annex Z (CLR-UA-06, CLR-UA-13); FRUM.009.10"
     brd: "Not in BRD (BRD NFR 1.k asks for an effective date only)"
     source: Best practice (iorta TechNXT)
+    fl: "UAM-024 Effective-dated access changes: Not available"
+    built: "No"
     why: >-
-      Access given for a project or a leave cover should end by itself. The system applies changes on an effective
-      date; it has no end date on access.
-    ootb: "Partly: effective date and the daily run of scheduled changes; no end date."
+      Access given for a project or a leave cover should end by itself. The OOTB platform applies changes at once,
+      with no effective or end date (UAM-024 Not available); the effective date is a BRD requirement (Annex AA.4).
+    ootb: "Not offered: UAM-024 Not available (no effective or end date). The effective date is in scope as BRD item BRD-UA-11; this CR is the end date only."
     scope: >-
       End date on the user requests and the bulk template; validation (after the effective date); the end date on the
       user's group profiles and in the reports; the daily run removes the access on the end date with a notice a
@@ -111,120 +191,274 @@ crs:
     effort: [1.5, 4, 2.5, 2.5, 1]
     complexity: Medium
     priority: Low
-    depends: "Answers to CLR-UA-06 and CLR-UA-13 (Annex Z): who is told and how many days before."
-    assumptions: "The removal is a scheduled change of the existing daily run, checked again as the other scheduled changes."
+    depends: "BRD item BRD-UA-11 (effective dates); answers to CLR-UA-06 and CLR-UA-13 (Annex Z)."
+    assumptions: "The removal is a scheduled change of the daily run of BRD-UA-11, checked again as the other scheduled changes."
+  - id: CR-UA-016
+    evidence: "Not found: roles edited directly, no emergency path"
+    title: Emergency role edit
+    frs: "FRUM.005.01; Annex J"
+    brd: Not in BRD
+    source: Best practice (iorta TechNXT)
+    fl: "No feature row (UAM-022 group profile requests: Not available)"
+    built: "Yes"
+    why: >-
+      With group profiles changed only by approved requests, an emergency path lets the System Administrator edit
+      users and group profiles directly, when Information Security opens it, with every edit audited and alerted.
+      The OOTB platform has no request flow and no emergency edit; the feature list has no row for it.
+    ootb: "Not offered: no feature row; in the OOTB platform roles are edited directly with no request, so no controlled emergency path exists."
+    scope: >-
+      The emergency role edit setting, opened by Information Security; the direct edit of users and group profiles by
+      the System Administrator while it is open, closed as delivered; every edit audited and alerted to Information
+      Security; the marker on the screens.
+    effort: [1, 2.5, 1, 1.5, 0.5]
+    complexity: Medium
+    priority: Medium
+    depends: "BRD items BRD-UA-09 and BRD-UA-13 (group profile requests, second approval of security settings)."
+    assumptions: "Alerts use the notices and e-mails of Annex T."
 
 # Former candidates of the register v1.0 that are not change requests (status in the register v1.1)
+# [kind, OB number, note, Feature List ID / OOTB status]
 closed:
-  CR-UA-001: ["OOTB", "OB-UA-01", "Offered as standard (separation-of-duties rules, authorised by Information Security); extends the segregation-of-duties principle of the Operations addendum. No change request, no cost."]
-  CR-UA-002: ["OOTB", "OB-UA-02", "Offered as standard (dormant-user run, setting of 90 days and notice of 7 days). No change request, no cost."]
-  CR-UA-003: ["OOTB", "OB-UA-03", "Offered as standard (two break-glass administrators, sign-in alerted to Information Security). No change request, no cost."]
-  CR-UA-004: ["BRD", "", "Already a BRD requirement: User Access Maintenance BRD 1.001.1.3, 2.001.1.3, 3.001.1.3, 4.001.1.3 (warning prior to system triggered log out). Offered as standard."]
-  CR-UA-005: ["OOTB", "OB-UA-04", "Offered as standard (identity synchronisation with UIDM-ISC and EIAM, Synchronise Now); refines the BRD requirement 'Integration with SSO or LDAP: Yes'. No change request, no cost."]
-  CR-UA-006: ["OOTB", "OB-UA-05", "Offered as standard (a leaver or an inactive, locked or disabled SSO account deactivates the user and ends the sessions). No change request, no cost."]
-  CR-UA-008: ["OOTB", "OB-UA-06", "Offered as standard (rules on permission pairs, checked on roles and on users). No change request, no cost."]
-  CR-UA-009: ["OOTB", "OB-UA-07", "Offered as standard (exports named <Report name>_MMDDYYYY and Audit Logs_MMDDYYYY). No change request, no cost."]
-  CR-UA-010: ["BRD", "", "Already a BRD requirement: NFR 4.03 of the Claims, Collections and ReInsurance addenda (source workstation, device or IP address of each audit event). Offered as standard."]
-  CR-UA-013: ["OOTB", "OB-UA-08", "Offered as standard (setting: request notices also e-mailed by the user's preference). No change request, no cost."]
-  CR-UA-015: ["BRD", "", "Already a BRD requirement: NFR 10.07 of the Collections addendum (one session per device; a sign-in on another device ends the earlier session). In scope; to be delivered before UAT (Annex AA.4)."]
+  CR-UA-001: ["OOTB", "OB-UA-01", "Offered by the iNXT BrokerVerse OOTB platform (separation-of-duties rules on pairs of roles, block or warn); extends the segregation-of-duties principle of the Operations addendum. No change request, no cost.", "UAM-018 Segregation of duties rules: Available"]
+  CR-UA-002: ["OOTB", "OB-UA-02", "Offered by the iNXT BrokerVerse OOTB platform (daily run deactivating accounts without a sign-in for 90 days, setting). No change request, no cost.", "UAM-028 Dormant account deactivation: Available"]
+  CR-UA-005: ["INT", "IS-UA-01", "Integration scope: synchronisation of user details and status from UIDM-ISC / EIAM is an interface with BDOI's identity systems, covered by the Integration workstream (Annex AA.5). Not a change request.", "UAM-011 Directory / LDAP authentication: Not available"]
+  CR-UA-006: ["INT", "IS-UA-02", "Integration scope: revocation on an SSO status change comes with the identity events of UIDM-ISC / EIAM, covered by the Integration workstream (Annex AA.5). Not a change request.", "UAM-011 Directory / LDAP authentication: Not available"]
+  CR-UA-004: ["BRD", "", "Already a BRD requirement: User Access Maintenance BRD 1.001.1.3, 2.001.1.3, 3.001.1.3, 4.001.1.3 (warning prior to system triggered log out). The OOTB platform warns one minute before the sign-out only; the warning at 15 minutes is in scope (BRD-UA-03, Annex AA.4).", "UAM-003 Inactivity warning and automatic sign-out: Partial"]
+  CR-UA-010: ["BRD", "", "Already a BRD requirement: NFR 4.03 of the Claims, Collections and ReInsurance addenda (source workstation, device or IP address of each audit event). Met by the OOTB platform.", "UAM-031 Access-change log: Available"]
+  CR-UA-012: ["OOTB", "OB-UA-05", "Offered by the iNXT BrokerVerse OOTB platform (periodic access entitlement review; report schedules with recipients). No change request, no cost; the BDOI report layouts are BRD work (BRD-UA-15).", "UAM-030 Periodic access entitlement review: Available; RPT-007 User-scheduled reports: Available"]
+  CR-UA-015: ["BRD", "", "Already a BRD requirement: NFR 10.07 of the Collections addendum (one session per device; a sign-in on another device ends the earlier session). Not in the OOTB platform; in scope, to be delivered before UAT (BRD-UA-01, Annex AA.4).", "UAM-005 Single session per user or device: Not available"]
 
-# ------------------------------------------------------------------------- beyond the BRD, offered as standard
+# ------------------------------------------------------- beyond the BRD, offered by the OOTB platform (green)
+# [No., point, FRS reference, what BDOI gets, note, Feature List ID / OOTB status]
 ootb:
-  - [OB-UA-01, "Separation-of-duties rules", "FRUM.012.01; Annex M.6", "Pairs of group profiles (and of permissions) one user may not hold, kept by the Business Administrator and authorised by Information Security; checked on every request.", "Extends the segregation-of-duties principle of the Operations addendum; was CR-UA-001"]
-  - [OB-UA-02, "Dormant-user deactivation", "FRUM.003.04; Annex V", "Users without a sign-in for 90 days deactivated by the daily run, with a notice 7 days before (settings).", "Was CR-UA-002"]
-  - [OB-UA-03, "Break-glass administrators", "FRUM.001.06; Annex N.4", "Two named System Administrators with a local password and second factor while sign-in is through EIAM; each sign-in alerted to Information Security.", "Was CR-UA-003"]
-  - [OB-UA-04, "Synchronisation with UIDM-ISC and EIAM", "FRUM.002.02, FRUM.003.03; Annex N.3", "Joiner, mover, leaver and rehire events applied with the UIDM request number; refused events queued and alerted; Synchronise Now per user.", "Refines the BRD requirement 'Integration with SSO or LDAP'; was CR-UA-005"]
-  - [OB-UA-05, "Revocation on an SSO status change", "FRUM.003.02.01; Annex N", "A leaver, or an SSO account inactive, locked or disabled, deactivates the user and ends the open sessions.", "Was CR-UA-006"]
-  - [OB-UA-06, "No conflicting permissions in a role", "FRUM.006.03", "Rules on permission pairs refuse a group profile, or a user, that would hold both permissions.", "Was CR-UA-008"]
-  - [OB-UA-07, "Export file names", "FRUM.007.02; Annex V", "Exports named <Report name>_MMDDYYYY and Audit Logs_MMDDYYYY (setting).", "Was CR-UA-009"]
-  - [OB-UA-08, "E-mail copy of the request notices", "FRUM.013.01; Annex T", "The notices to approve, returned and decided also e-mailed, by the user's preference (setting).", "Was CR-UA-013"]
-  - [OB-UA-09, "Second approval of security settings", "FRUM.012.02; Annex M", "A change of a sign-in, password, session or access setting applies only after the approval of Information Security.", "-"]
-  - [OB-UA-10, "Emergency role edit", "FRUM.005.01; Annex J", "A direct edit of users and group profiles by the System Administrator, closed as delivered; when opened by Information Security every edit is audited and alerted.", "-"]
-  - [OB-UA-11, "Second factor of the local accounts", "FRUM-004; Annex M.4", "Authenticator code at every local sign-in, ten single-use recovery codes, reset of a lost authenticator by one administrator and approved by another.", "-"]
-  - [OB-UA-12, "Settings for the points BDOI decides", "Annex M.10", "Each point where BDOI's FRS and the BRD differ is offered both ways, chosen by a setting changed with the approval of Information Security, without a release.", "-"]
-  - [OB-UA-13, "Identity simulator for SIT and UAT", "Annex N", "EIAM sign-in and UIDM-ISC events simulated in the test environments until BDOI IT connects the real services.", "-"]
+  - [OB-UA-01, "Separation-of-duties rules", "FRUM.012.01; Annex M.6", "Pairs of group profiles one user may not hold (block or warn), kept by the Business Administrator; checked on every assignment.", "Extends the segregation-of-duties principle of the Operations addendum; was CR-UA-001", "UAM-018 Segregation of duties rules: Available", "Access Control > Separation-of-duties rules (pairs of roles, block or warn, checked at assignment)"]
+  - [OB-UA-02, "Dormant-user deactivation", "FRUM.003.04; Annex V", "Users without a sign-in for 90 days deactivated by the daily run (setting Dormant days).", "Was CR-UA-002; the notice 7 days before is a detail BDOI confirms", "UAM-028 Dormant account deactivation: Available", "Daily run Dormant accounts (setting Dormant days, 90)"]
+  - [OB-UA-03, "Second factor of the local accounts", "FRUM-004; Annex M.4", "Authenticator code at sign-in, compulsory per role, and reset of a lost authenticator by an administrator.", "-", "UAM-007 Two-factor authentication: Available", "Sign-in with authenticator code; two-factor per role on the user screen"]
+  - [OB-UA-04, "Business settings without a release", "Annex M.10", "Parameters applied at once and audited, so a point where BDOI's FRS and the BRD differ is chosen by a setting without a release.", "The options themselves follow the colour of their own point", "ADM-011 Business parameters without a release: Available", "Settings screen: parameters applied at once and audited"]
+  - [OB-UA-05, "Periodic access review and scheduled reports", "Annex V, Annex Q.5 (UA-Q51)", "Recertification campaigns over every active user (revoke deactivates the account) and report schedules with recipients, so the monthly access review reaches Information Security.", "Was CR-UA-012", "UAM-030 Periodic access entitlement review: Available; RPT-007 User-scheduled reports: Available", "Access Control > Access Reviews; Reports > Schedules (recipients, format, timing)"]
+
+# ------------------------------------------- integration and data migration scope (grey label; not change requests)
+# [No., point, FRS reference, scope, workstream, Feature List ID / OOTB status, former number]
+integration:
+  - [IS-UA-01, "Synchronisation with UIDM-ISC and EIAM (joiner, mover, leaver, rehire; Synchronise Now)", "FRUM.002.02, FRUM.003.03; Annex N.3", "Events approved in UIDM-ISC applied with the UIDM request number; refused events queued and alerted.", "Integration", "UAM-011: Not available", "Was CR-UA-005"]
+  - [IS-UA-02, "Revocation on an SSO status change", "FRUM.003.02.01; Annex N", "A leaver, or an SSO account inactive, locked or disabled, deactivates the user and ends the open sessions.", "Integration", "UAM-011: Not available", "Was CR-UA-006"]
+  - [IS-UA-03, "Sign-in through Microsoft Entra ID / EIAM with the Windows ID", "FRUM.001.02; Annex N", "Single sign-on of every user (BRD UAM-NFR 11, 17, 33; CLXN NFR 1.01): a BRD requirement delivered by the Integration workstream.", "Integration", "UAM-011: Not available", "Was BRD item to deliver"]
+  - [IS-UA-04, "External access-control list interface", "Annex W", "Interface with the access-control list of the system BDOI names (BRD UAM-NFR 12; UQ14).", "Integration", "UAM-013: Not available", "BRD requirement"]
+  - [IS-UA-05, "EIAM and UIDM-ISC simulator for SIT and UAT", "Annex N", "Sign-in and identity events simulated in the test environments until BDOI IT connects the real services.", "Integration", "No feature row", "-"]
+  - [DM-UA-01, "Users and group profiles at go-live", "Annex W (BRD-13 Data Migration)", "Users and their group profiles loaded before go-live and at the dress rehearsal (users are not migrated from the legacy systems; loaded by bulk request).", "Data Migration (BRD-13)", "MIG-014 Users migration: Available", "-"]
+
+# ------------------------------------------------ best practice (blue): in no BRD, not in the FRS, not in OOTB
+# [ID, practice, why it matters for a broker, suggested priority, indicative man-days]
+best_practice:
+  - [BP-UA-01, "Monitoring of privileged sessions", "System Administrator and break-glass sessions logged in detail (screens opened, data exported) and reviewed by Information Security; expected by the IC and by the BDO group's IT risk rules for privileged access to client and policy data.", High, 8]
+  - [BP-UA-02, "Alert on unusual sign-in", "Sign-in at an unusual hour, from a new device or network, or many failures across users raised to Information Security; early sign of account takeover of client personal data (Data Privacy Act, NPC breach rules).", Medium, 6]
+  - [BP-UA-03, "Log of views of sensitive records", "Who viewed (not only changed) the records of PEP, high-risk and claims clients; supports AMLA confidentiality and Data Privacy Act accountability.", Medium, 6]
+  - [BP-UA-04, "Joiner-mover-leaver timeliness report", "Time from the UIDM-ISC approval to access given or removed, and leavers still active; evidence for internal audit that leavers lose access the same day.", Medium, 4]
+  - [BP-UA-05, "Separation-of-duties what-if check", "Before a request is submitted the requester sees which separation-of-duties rules the new access would break, so conflicts are fixed before approval.", Low, 4]
+  - [BP-UA-06, "Generic and shared account register", "Every non-personal account (service, interface, training) with an owner, purpose and review date; a common audit finding in Philippine financial institutions.", Low, 3]
 
 # --------------------------------------------------- BRD requirements found during the validation of version 1.4
 # Programme-wide NFRs of the other BRDs and addenda (Collections addendum section 6; the Claims and ReInsurance
-# addenda carry the same security rows). status: Met / Configure / To deliver (in scope, no CR) / BDOI to decide.
+# addenda carry the same security rows). status against the iNXT BrokerVerse OOTB platform (Feature List):
+# Met / Configure / To deliver (in scope, no CR, Annex AA.4) / BDOI to decide.
 programme_nfr:
-  - ["CLXN 1.01", "Sign-in with the Windows credentials through SSO; only users with a user profile get in.", "FRUM.001.02; Annex N", "Met"]
+  - ["CLXN 1.01", "Sign-in with the Windows credentials through SSO; only users with a user profile get in.", "FRUM.001.02; Annex N", "[Integration scope] IS-UA-03 (Annex AA.5): the OOTB platform has local accounts only (UAM-011)"]
   - ["CLXN 1.03", "Sign-in errors in plain words, not codes.", "Annex K", "Met"]
-  - ["CLXN 1.04, 2.02", "All valid and invalid sign-in attempts logged, seen by the System Administrator only; lock-out after 3 invalid attempts.", "FRUM.001.05; Annex M.4", "Met"]
-  - ["CLXN 2.03, 2.06, 2.07", "Password change every 90 days; last 8 passwords refused; minimum age 1 day.", "FRUM-004; Annex M.4", "Met (history of 10 is stricter)"]
-  - ["CLXN 2.04", "Minimum password length 8; 12 for accounts with administrator privileges.", "FRUM-004; Annex M.4", "To deliver: break-glass (administrator) passwords at least 12 characters (today 10)"]
-  - ["CLXN 2.08", "Password reset verifies the identity out of band.", "FRUM-004.02; Annex M.4", "Met (reset by another System Administrator; e-mailed single-use link when the setting allows it)"]
-  - ["CLXN 2.09", "User ID of ten characters, permitted characters only.", "FRUM.002.03", "Met (user ID format a999999999, setting)"]
-  - ["CLXN 2.10", "Password parameters changeable without a release.", "Annex M.7", "Met"]
-  - ["CLXN 3.01 to 3.03", "User administration (create, update, deactivate, lock / unlock); role-based access; custom roles and granular access.", "FRUM.002 to FRUM.006", "Met"]
+  - ["CLXN 1.04, 2.02", "All valid and invalid sign-in attempts logged, seen by the System Administrator only; lock-out after 3 invalid attempts.", "FRUM.001.05; Annex M.4", "Configure: attempt log offered (UAM-002); lock-out count is a setting (UAM-001, delivered 5)"]
+  - ["CLXN 2.03, 2.06, 2.07", "Password change every 90 days; last 8 passwords refused; minimum age 1 day.", "FRUM-004; Annex M.4", "Configure: expiry 90 days offered; history (delivered 5) and minimum age are settings (UAM-008)"]
+  - ["CLXN 2.04", "Minimum password length 8; 12 for accounts with administrator privileges.", "FRUM-004; Annex M.4", "To deliver (BRD-UA-02): one minimum length for every account in the OOTB platform (UAM-008)"]
+  - ["CLXN 2.08", "Password reset verifies the identity out of band.", "FRUM-004.02; Annex M.4", "Met (reset code e-mailed, only the latest valid; UAM-009)"]
+  - ["CLXN 2.09", "User ID of ten characters, permitted characters only.", "FRUM.002.03", "To deliver (BRD-UA-05): no user ID pattern rule in the OOTB platform (UAM-012)"]
+  - ["CLXN 2.10", "Password parameters changeable without a release.", "Annex M.7", "Met (UAM-008: all values are settings)"]
+  - ["CLXN 3.01 to 3.03", "User administration (create, update, deactivate, lock / unlock); role-based access; custom roles and granular access.", "FRUM.002 to FRUM.006", "Met for roles (UAM-014); granular rights to deliver (BRD-UA-07, UAM-015 Partial)"]
   - ["CLXN 3.04", "The system should not allow users to have multiple roles.", "FRUM.005; Annex M", "BDOI to decide: the User Access Maintenance BRD (NFR 1.d) allows more than one role per user, which this FRS follows"]
-  - ["CLXN 4.01, 4.02", "Audit of access attempts, privileged use, account and role changes, admin maintenance.", "FRUM-008, FRUM.008.01", "Met"]
-  - ["CLM / CLXN / RI 4.03", "Audit event with timestamp, account, source (workstation, device or IP address; original IP behind a load balancer) and resource.", "FRUM.008.01; Annex V", "Met (IP address and role on each record)"]
+  - ["CLXN 4.01, 4.02", "Audit of access attempts, privileged use, account and role changes, admin maintenance.", "FRUM-008, FRUM.008.01", "Met (UAM-031)"]
+  - ["CLM / CLXN / RI 4.03", "Audit event with timestamp, account, source (workstation, device or IP address; original IP behind a load balancer) and resource.", "FRUM.008.01; Annex V", "Met (UAM-031: user, IP address and time on each record)"]
   - ["CLXN 4.05", "Audit logs exportable or sent to a remote log monitoring system.", "FRUM.007.02, FRUM.008; Annex W", "Met (export); forwarding to BDO's monitoring per the Technical Specification"]
-  - ["CLXN 9.02", "For internal systems, concurrent open sessions allowed under the session rules.", "FRUM.001.01", "Met (several tabs, one session); read together with 10.07"]
-  - ["CLXN 10.01", "Idle time-out of 15 minutes; time-outs set on a System Administration screen.", "FRUM.001.03, FRUM.001.04; Annex M.5", "Configure: the UAM BRD asks for a warning at 15 and sign-out at 30 minutes; BDOI confirms which applies (setting)"]
+  - ["CLXN 9.02", "For internal systems, concurrent open sessions allowed under the session rules.", "FRUM.001.01", "Met (UAM-006: several tabs, one session); read together with 10.07"]
+  - ["CLXN 10.01", "Idle time-out of 15 minutes; time-outs set on a System Administration screen.", "FRUM.001.03, FRUM.001.04; Annex M.5", "To deliver (BRD-UA-03): the OOTB platform signs out after 30 minutes (setting) with a one-minute warning; no warning at 15 minutes (UAM-003)"]
   - ["CLXN 10.02 to 10.06", "Random session IDs renewed at sign-in and ended on log-out; secure cookies; no access without sign-in.", "FRUM.001.05; Technical Specification", "Met"]
-  - ["CLXN 10.07", "One session per device: a session opened on another device signs out the earlier one.", "FRUM.001.01; Annex M.5", "To deliver (in scope, no CR): today several sessions of a user may stay open"]
-  - ["Operations addendum", "Segregation of duties between the maker and the checker of a change.", "FRUM.010.02, FRUM.012.01", "Met"]
+  - ["CLXN 10.07", "One session per device: a session opened on another device signs out the earlier one.", "FRUM.001.01; Annex M.5", "To deliver (BRD-UA-01): several sessions per user are allowed in the OOTB platform (UAM-005)"]
+  - ["Operations addendum", "Segregation of duties between the maker and the checker of a change.", "FRUM.010.02, FRUM.012.01", "Met (UAM-018)"]
 
-# In-scope items to deliver (BRD requirements, no change request): effort for planning only, not charged.
+# In-scope items to deliver (BRD requirements, no change request): the gaps of the OOTB platform (Feature List) against
+# the BRDs. Effort for planning only, not charged. built: already built for BDOI in the BIBS system.
 brd_to_deliver:
   - id: BRD-UA-01
+    evidence: "Not found (several sessions per user)"
     title: One session per device
     ref: "Collections addendum NFR 10.07"
     frs: "FRUM.001.01; Annex M.5"
+    fl: "UAM-005: Not available"
+    built: "No"
     scope: "A sign-in on another device ends the user's earlier session, with the reason in the session log and a message on the earlier device."
     effort: [0.5, 2, 1, 1, 0.5]
   - id: BRD-UA-02
+    evidence: "Password policy: one minimum length"
     title: Administrator passwords of 12 characters
     ref: "Collections addendum NFR 2.04"
     frs: "FRUM-004; Annex M.4"
-    scope: "Minimum length 12 for the break-glass (administrator) accounts, 10 for any other local account; as a setting."
+    fl: "UAM-008: Available (one minimum length only)"
+    built: "No"
+    scope: "Minimum length 12 for the accounts with administrator privileges, 8 or more for any other local account; as a setting."
     effort: [0.25, 0.5, 0.25, 0.5, 0]
   - id: BRD-UA-03
-    title: Idle time-out per the BDO standard
-    ref: "Collections addendum NFR 10.01; UAM BRD x.001.1.2, x.001.1.3"
+    evidence: "Partial: idle sign-out with one-minute warning"
+    title: Inactivity warning at 15 minutes
+    ref: "UAM BRD x.001.1.2, x.001.1.3; Collections addendum NFR 10.01"
     frs: "FRUM.001.03, FRUM.001.04; Annex M.5"
-    scope: "Configuration only: the inactivity warning and sign-out times are settings; BDOI confirms 15 or 30 minutes."
-    effort: [0, 0, 0, 0, 0]
+    fl: "UAM-003: Partial"
+    built: "Yes"
+    scope: "A warning after 15 minutes of inactivity with Stay Logged In and Log Out, besides the sign-out after 30 minutes; both times settings (BDOI confirms 15 or 30 minutes)."
+    effort: [0.25, 1, 0.5, 0.5, 0.25]
+  - id: BRD-UA-05
+    evidence: "Partial: users table without Windows ID, BU group, user level"
+    title: Windows ID, business unit group, user level and user ID rule on the user record
+    ref: "UAM BRD NFR 13, 15; Collections addendum NFR 2.09"
+    frs: "FRUM.002.03; Annex M"
+    fl: "UAM-012: Partial"
+    built: "Yes"
+    scope: "The fields of the BRD on the user record, screens and reports; the user ID pattern as a setting."
+    effort: [0.5, 2, 1.5, 1, 0.5]
+  - id: BRD-UA-07
+    evidence: "Partial: read / write / approve per module"
+    title: Add, amend, delete and task-level rights per group profile
+    ref: "UAM BRD 4.002.2 to 4.002.2.10; report sample B"
+    frs: "FRUM.006; Annex C"
+    fl: "UAM-015: Partial"
+    built: "Yes"
+    scope: "Rights by function (view, add, amend, delete, approve and the tasks of the BRD) per module and group profile, in the screens, the checks and the Group Profile Access Report."
+    effort: [1, 4, 2, 2, 0.5]
+  - id: BRD-UA-08
+    evidence: "Not found (no access requests)"
+    title: Access request lifecycle with approval and automatic provisioning
+    ref: "UAM BRD 1.002 to 1.008, 2.002 (approver chosen by the requester; approve, reject or return)"
+    frs: "FRUM.002, FRUM.003, FRUM.009, FRUM.010"
+    fl: "UAM-019, UAM-020, UAM-021: Not available"
+    built: "Yes"
+    scope: "Requests to enrol, modify, deactivate and reactivate with draft, cancel and submit; the approver chosen by the requester; approve, reject or return with remarks; the access applied on approval; request history and lists."
+    effort: [4, 14, 10, 8, 3]
+  - id: BRD-UA-09
+    evidence: "Not found (roles edited directly)"
+    title: Group profile requests approved in sequence and implemented
+    ref: "UAM BRD 3.002.1 to 3.002.4"
+    frs: "FRUM.005, FRUM.011"
+    fl: "UAM-022: Not available"
+    built: "Yes"
+    scope: "Requests to create or change a group profile approved by the approvers in order and implemented by the System Administrator."
+    effort: [2, 6, 4, 4, 1]
+  - id: BRD-UA-10
+    evidence: "Partial: bulk user load by the System Administrator"
+    title: Bulk access requests with approval
+    ref: "UAM BRD 1.009; NFR 38"
+    frs: "FRUM.002.04; Annex M"
+    fl: "UAM-023: Partial"
+    built: "Yes"
+    scope: "The bulk template raised as a request, checked row by row with an error file and decided by the approver as a whole (the bulk load of the OOTB platform is reused)."
+    effort: [0.5, 3, 2, 1.5, 0.5]
+  - id: BRD-UA-11
+    evidence: "Not found"
+    title: Effective-dated access changes
+    ref: "UAM BRD NFR 14 (1.k)"
+    frs: "FRUM.009.10; Annex Z"
+    fl: "UAM-024: Not available"
+    built: "Yes"
+    scope: "An effective date on the requests; a daily run applies the scheduled changes, checked again on the day."
+    effort: [1, 3, 1.5, 2, 0.5]
+  - id: BRD-UA-12
+    evidence: "Not found"
+    title: Escalation of privileged or out-of-hours changes
+    ref: "UAM BRD NFR 40 (Other BU NFR 11)"
+    frs: "FRUM.010.02; Annex S"
+    fl: "UAM-025: Not available"
+    built: "Yes"
+    scope: "Privilege level on the group profiles and the working-hours rule; a second approval of the privileged or out-of-hours changes."
+    effort: [1, 3, 1, 2, 0.5]
+  - id: BRD-UA-13
+    evidence: "Partial: settings apply at once (audited)"
+    title: Second approval of security settings
+    ref: "UAM BRD NFR 16, NFR 40"
+    frs: "FRUM.012.02; Annex M"
+    fl: "UAM-026: Partial"
+    built: "Yes"
+    scope: "A change of a sign-in, password, session or access setting applies only after the approval of Information Security (in the OOTB platform these settings apply at once)."
+    effort: [0.5, 2.5, 1.5, 1.5, 0.5]
+  - id: BRD-UA-14
+    evidence: "Partial: in-app access-control notices"
+    title: Notices of the access requests to the requester and the user
+    ref: "UAM BRD 1.006.1.1, 1.008.1.4, 2.002.1; NFR 39"
+    frs: "FRUM.013; Annex T"
+    fl: "UAM-027: Partial"
+    built: "Yes"
+    scope: "In-system notices of each request step (to approve, returned, decided, implemented) to the requester, the approver and the affected user."
+    effort: [0.5, 2, 0.5, 1, 0.5]
+  - id: BRD-UA-15
+    evidence: "Partial: user access matrix and role permission matrix"
+    title: Access reports in the BDOI layout
+    ref: "UAM BRD 3.003, 4.003.1; samples A to D; NFR 10, NFR 41"
+    frs: "FRUM.007; Annex V"
+    fl: "UAM-029: Partial"
+    built: "Yes"
+    scope: "User Access Report with an 'as of' date, group profile membership, Group Profile Access Report and the from / to User Access Audit Log in the BDOI layout with the header of the BRD."
+    effort: [1, 4, 2, 2, 0.5]
+  - id: BRD-UA-16
+    evidence: "Partial: end all sessions of a user; no on-line list"
+    title: On-line status of the users
+    ref: "UAM BRD NFR 15 (status online), NFR 35"
+    frs: "FRUM.001.05; Annex V"
+    fl: "UAM-004: Partial"
+    built: "Yes"
+    scope: "The list of the users signed in (on-line status) with their sessions; end of a session by the System Administrator."
+    effort: [0.25, 1, 1, 0.5, 0.25]
+  - id: BRD-UA-17
+    evidence: "Partial: network / IP rules outside the application"
+    title: Access from BDO devices only
+    ref: "UAM BRD 1.001.1, 2.001.1, 3.001.1, 4.001.1"
+    frs: "FRUM.001.01; Technical Specification"
+    fl: "UAM-033: Partial"
+    built: "Partly (network and IP rules)"
+    scope: "Access limited to BDO's network and devices: network zone and IP rules of the OOTB platform, plus the device check BDOI IT chooses."
+    effort: [0.5, 2, 0.5, 1, 0.5]
 
 # ------------------------------------------------------------------------------------------- colour coding
 # Each point colours the paragraphs (and table-cell lines) where it is stated. items: FR items of section 3 coloured
 # whole (title, requirements, acceptance criteria). text: a paragraph containing one of the texts is coloured.
 # Every item and text must be found (build check).
 points:
+  - {ref: CR-UA-003, colour: orange, items: [FRUM.001.06], text: ["Two named System Administrators of BDOI IT"]}
   - {ref: CR-UA-007, colour: orange, text: ["User with Supervisory roles have", "configure record ownership access rules", "configure supervisory access rules", "Supervisory and record-ownership access"]}
+  - {ref: CR-UA-008, colour: orange, text: ["conflicting or invalid permission"]}
+  - {ref: CR-UA-009, colour: orange, text: ["MMDDYYYY is the"]}
   - {ref: CR-UA-011, colour: orange, text: ["Proposed: decision within", "An automatic reminder and escalation after a number of", "Approval times, reminders and escalation", "Approval times: how many working days"]}
-  - {ref: CR-UA-012, colour: orange, text: ["a monthly access review report to Information Security is a", "Scheduled access review report"]}
+  - {ref: CR-UA-013, colour: orange, items: [FRUM.013.01]}
   - {ref: CR-UA-014, colour: orange, text: ["until an end date (temporary access)", "If temporary access is needed"]}
+  - {ref: CR-UA-016, colour: orange, text: ["unless the emergency role edit is", "Switching on the emergency role edit needs"]}
   - {ref: OB-UA-01, colour: green, items: [FRUM.012.01]}
   - {ref: OB-UA-02, colour: green, items: [FRUM.003.04]}
-  - {ref: OB-UA-03, colour: green, items: [FRUM.001.06], text: ["Two named System Administrators of BDOI IT"]}
-  - {ref: OB-UA-04, colour: green, items: [FRUM.002.02, FRUM.003.03]}
-  - {ref: OB-UA-05, colour: green, text: ["whose Enterprise SSO accounts are"]}
-  - {ref: OB-UA-06, colour: green, text: ["conflicting or invalid permission"]}
-  - {ref: OB-UA-07, colour: green, text: ["MMDDYYYY is the"]}
-  - {ref: OB-UA-08, colour: green, items: [FRUM.013.01]}
-  - {ref: OB-UA-09, colour: green, items: [FRUM.012.02]}
-  - {ref: OB-UA-10, colour: green, text: ["unless the emergency role edit is", "Switching on the emergency role edit needs"]}
-  - {ref: OB-UA-12, colour: green, text: ["are offered both ways in"]}
-  - {ref: OB-UA-13, colour: green, text: ["simulator"]}
+  - {ref: OB-UA-04, colour: green, text: ["are offered both ways in"]}
+  - {ref: OB-UA-05, colour: green, text: ["a monthly access review report to Information Security is", "Scheduled access review report"]}
+  # grey label (text colour unchanged): the label is added once at the first paragraph of each item / text
+  - {ref: IS-UA-01, label: integration, items: [FRUM.002.02, FRUM.003.03]}
+  - {ref: IS-UA-02, label: integration, text: ["whose Enterprise SSO accounts are"]}
+  - {ref: IS-UA-03, label: integration, items: [FRUM.001.02]}
+  - {ref: IS-UA-05, label: integration, text: ["simulator"]}
+  - {ref: DM-UA-01, label: migration, text: ["The users and their group profiles at go-live"]}
 
 # Texts changed in version 1.4 in the data of earlier versions (shaded in the review copy)
 changed_texts:
   - "One session per device"
   - "The system records every break-glass sign-in"
   - "CR-UA-011"
-  - "CR-UA-012"
+  - "OB-UA-05"
   - "CR-UA-014"
   - "CR-UA-007"
   - "https://dev.brokerverse.cloud"
 
 change_points:
-  - "Front matter: How to read this document, with the colour code of the requirements (black: in the BRD; green: not in the BRD, offered as standard; orange: not in the BRD, change request)."
-  - "Colour code applied in section 3 and the annexes: {green} points offered as standard (Annex AA.3) and {orange} change requests (Annex AA.2) where they are stated."
+  - "Front matter: How to read this document, with the colour code of the requirements (black: in the BRD; green: not in the BRD, offered by the iNXT BrokerVerse OOTB platform (brokerverse-platform, cross-checked with the Feature List vs OOTB); orange: change request; grey label: integration or data migration scope; blue: best-practice table)."
+  - "Colour code applied in section 3 and the annexes: {green} points offered by the OOTB platform (Annex AA.3) and {orange} change requests (Annex AA.2) where they are stated; {integration} integration and data migration items labelled (Annex AA.5); {bp} best-practice recommendations in blue (Annex AA.6)."
   - "Section 1.8: the simplified process flow (Figure 1); Annex N: the end-to-end process flow with the identity integration and the change requests (Figure {e2e}); Annex O refers to it. The earlier end-to-end swimlane moves to Annex A."
-  - "Validation against the BRD: every BRD line and the 41 non-functional rows mapped (Annex P, X); Annex X.2 with {nfr} programme-wide security rows of the Collections, Claims, ReInsurance and Operations addenda; {gaps} in-scope items to deliver (Annex AA.4)."
-  - "Change requests: Annex AA.2 lists the {orange} change requests with their effort ({days} man-days, CR Effort Estimate workbook); CR-UA-004, 010 and 015 are BRD requirements and eight former candidates are offered as standard (Change Request Register v1.1)."
-  - "Corrections: Annex M.5 one session per device (BRD requirement, CLXN NFR 10.07); Annex Q.5 break-glass sign-in alert (offered); the DEV environment address in Annexes J and O."
+  - "Validation against the BRD and the OOTB platform: every BRD line and the 41 non-functional rows mapped (Annex P, X); Annex X.2 with {nfr} programme-wide security rows of the Collections, Claims, ReInsurance and Operations addenda; {gaps} BRD items that the OOTB platform does not meet in full, in scope (Annex AA.4)."
+  - "Change requests: Annex AA.2 lists the {orange} change requests with their effort ({days} man-days, CR Effort Estimate workbook), sized against the OOTB platform also where the point is already available for BDOI; CR-UA-004, 010 and 015 are BRD requirements, CR-UA-005 and 006 are integration scope, and three former candidates are offered by the OOTB platform (Change Request Register v1.1)."
+  - "Corrections: Annex M.5 one session per device (BRD requirement, CLXN NFR 10.07); Annex Q.5 break-glass sign-in alert; the DEV environment address in Annexes J and O."
   - "Layout: one font family (Arial) in text and tables, uniform table headers, cell spacing and widths, figures centred with their captions kept on the same page, headings kept with their text."

@@ -46,8 +46,7 @@ def render_png(folder: str, name: str) -> Path:
         shutil.copy(LOGO, work / "logo.png")
         (work / "page.html").write_text(gen.page(spec), encoding="utf-8")
         raw = work / "raw.png"
-        subprocess.run([str(chrome), "--headless", "--no-sandbox", "--disable-gpu", "--hide-scrollbars",
-                        "--force-device-scale-factor=2", f"--window-size={w},{h + 150}", f"--screenshot={raw}",
+        subprocess.run(["bash", str(HERE / "shot.sh"), str(chrome), f"{w},{h + 150}", str(raw),
                         (work / "page.html").as_uri()], check=True, capture_output=True, timeout=180)
         Image.open(raw).crop((0, 0, 2 * w, 2 * h)).convert("RGB").save(out, optimize=True)
     finally:

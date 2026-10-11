@@ -267,10 +267,10 @@ class NewAnnexes:
         a.h2(f"J.{k} Menu by persona")
         a.p("The User Access Maintenance entries of the menu of each persona (the sidebar shows an entry only when "
             "one of the user's active group profiles holds its permission). The figure is the one-page view for the "
-            "review; the full sidebar of every persona of BIBS is in the BIBS sign-off workbook of BRD-11.")
+            "review.")
         a.els += figure_elements(self.b, self.figs, "brd11_fig_menus", self.nums, max_h=6.0)
         a.p("Screen standards: the layout, formats of dates and amounts, tables with row action menus and the "
-            "common screen elements follow the BIBS programme screen standards; they are not repeated here.")
+            "common screen elements follow the programme screen standards; they are not repeated here.")
 
     # S
     def workflow(self):
@@ -327,12 +327,10 @@ class NewAnnexes:
                      ["Fields in order", fields], ["BDOI reference", extra["bdoi"]],
                      ["Layout", "Current layout of the system below; the Business Unit confirms it or gives its "
                                 f"layout: requirements collection workbook, item {extra['rc']}"]], size=8)
-            png = UA / "screenshots" / f"{doc['shot']}.png"
-            if not png.exists():
-                raise SystemExit(f"image missing: {png}")
-            a.els.append(final.document_image(self.b, png))
-            a.p(f"Figure U.{k}: current layout of the {doc['name']}"
-                + (f" ({clean(doc['shot_caption'])})" if doc.get("shot_caption") else ""), italic=True, size=8, jc="center")
+            import brd11_v14 as v14  # noqa: PLC0415
+            cap = (f"Figure U.{k}: proposed layout of the {doc['name']}"
+                   + (f" ({clean(doc['shot_caption'])})" if doc.get("shot_caption") else ""))
+            a.els.extend(v14.figure_run(self.b, self.b.doc.sections[-1]._sectPr, [(v14.shot(doc["shot"]), cap)]))
         for doc in d["extra"]:
             k += 1
             a.h2(f"U.{k} {doc['name']} ({doc['id']})")

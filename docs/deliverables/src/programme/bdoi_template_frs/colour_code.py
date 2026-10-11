@@ -24,7 +24,8 @@ from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 
 COLOURS = {"black": "000000", "green": "2E7D32", "orange": "E65100", "grey": "616161", "blue": "1565C0"}
-LABELS = {"integration": "[Integration scope]", "migration": "[Data Migration scope]"}
+LABELS = {"integration": "[Integration scope]", "migration": "[Data Migration scope]",
+          "integration_uidm": "[Integration scope \u2013 UIDM-ISC]"}
 OOTB_HEADER = "What iNXT BrokerVerse offers out of the box"
 OOTB_NAME = "iNXT BrokerVerse OOTB platform"
 

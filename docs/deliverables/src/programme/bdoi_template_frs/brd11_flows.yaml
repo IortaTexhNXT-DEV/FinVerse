@@ -509,7 +509,7 @@ figures:
     tick: true
     where: J
     caption: "Menu by persona: the User Access Maintenance screens each persona sees"
-    read: "A tick means the screen is in the persona's menu; a screen without a tick is neither shown nor opened by its address. The full menus of every persona are in the BIBS sign-off workbook of BRD-11."
+    read: "A tick means the screen is in the persona's menu; a screen without a tick is neither shown nor opened by its address."
     brd: "BRD 4.002.2; FRUM.001.02, FRUM.005.06"
     dot: |
       digraph M {

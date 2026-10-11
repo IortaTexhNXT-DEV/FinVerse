@@ -57,7 +57,7 @@ async function pendingEnrolment(ctx, username, fullName) {
     return found[0];
   }
   const r = await ctx.api('requestor', 'POST', '/nbadmin/access-requests', {
-    type: 'CREATE_USER', userType: 'INTERNAL', username, fullName, email: `${username}@uat.brokerverse.cloud`,
+    type: 'CREATE_USER', userType: 'INTERNAL', username, fullName, email: `${username}@dev.brokerverse.cloud`,
     roleCodes: ['MKT_AO'], justification: 'Joined Marketing', approvers: ['uamapprover'],
   });
   return r.id;
@@ -94,9 +94,9 @@ const fills = {
     }
     return [['User ID', 'a013000102'], ['Password', process.env.SEED_PASSWORD]];
   },
-  forgot_user: async (ctx) => { await resetOffered(ctx, true); return [forgot, ['User ID', 'requestor']]; },
+  forgot_user: async (ctx) => { await resetOffered(ctx, true); return [forgot, ['User ID', 'a013000101']]; },
   enrol_user: [
-    ['User ID', 'a013000197'], ['Full Name', 'Andrea Mercado'], ['E-mail', 'andrea.mercado@uat.brokerverse.cloud'],
+    ['User ID', 'a013000197'], ['Full Name', 'Andrea Mercado'], ['E-mail', 'andrea.mercado@dev.brokerverse.cloud'],
     ['Windows ID', 'AMERCADO'], ['Home Branch', 'HO'],
     // The profile picker groups the profiles by business area, closed: the search opens the match, the
     // ticked profile stays listed (its area open) once the search is cleared.
@@ -106,12 +106,12 @@ const fills = {
     ['Approver', 'Ulysses'], ['Remarks (Justification)', 'Joined Combank Marketing as account officer'],
   ],
   enrol_invalid: [['User ID', 'ab']],
-  modify_user: [['Request Type', 'Modify user'], ['User ID', 'a013000101'], ['Full Name', 'SIT Enrolled User Santos']],
+  modify_user: [['Request Type', 'Modify user'], ['User ID', 'a013000101'], ['Full Name', 'Maria Santos Reyes']],
   new_profile: [
-    ['Profile Code', 'UAT_ENQUIRY'], ['Name', 'Client enquiry'],
+    ['Profile Code', 'CLIENT_ENQUIRY'], ['Name', 'Client enquiry'],
     ['Description', 'Read-only enquiry of clients and reports'],
     async (page) => walkthrough.pickPermissions(page, ['CLIENT_VIEW', 'REPORT_VIEW']),
-    ['Approvers in Order', 'Ulysses'], ['Approvers in Order', 'Andres Approver'],
+    ['Approvers in Order', 'Ulysses'], ['Approvers in Order', 'Andres'],
     ['Remarks (Justification)', 'Enquiry profile for the contact centre'],
   ],
   modify_profile: [['Request Type', 'Modify group profile'], ['Group Profile', '^Marketing Account Officer'],
@@ -189,8 +189,8 @@ const custom = {
   'scr-ua-09-02-validated': async (ctx) => {
     const n = Number(ctx.one('select count(*) from bulk_job')) + 1;
     const file = csv(`uam-bulk-${n}.csv`, [BULK_HEADERS,
-      ['ENROL', `a01300030${n % 10}`, 'Rowena Castillo', 'rowena.castillo@uat.brokerverse.cloud', '', 'HO', '', '', 'MKT_AO', '', 'Joined Marketing'],
-      ['ENROL', `a01300031${n % 10}`, 'Dennis Aquino', 'dennis.aquino@uat.brokerverse.cloud', '', 'HO', '', '', 'MKT_AO', '', 'Joined Marketing'],
+      ['ENROL', `a01300030${n % 10}`, 'Rowena Castillo', 'rowena.castillo@dev.brokerverse.cloud', '', 'HO', '', '', 'MKT_AO', '', 'Joined Marketing'],
+      ['ENROL', `a01300031${n % 10}`, 'Dennis Aquino', 'dennis.aquino@dev.brokerverse.cloud', '', 'HO', '', '', 'MKT_AO', '', 'Joined Marketing'],
       ['PROMOTE', 'a013000101', '', '', '', '', '', '', '', '', 'Not an action of the template'],
     ]);
     const page = await ctx.pageOf('requestor');

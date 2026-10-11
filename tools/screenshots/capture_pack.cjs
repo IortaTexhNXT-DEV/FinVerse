@@ -39,6 +39,9 @@ const MAX_HEIGHT = Number(process.env.MAX_HEIGHT || 2000);
 const MAX_WIDTH = Number(process.env.MAX_WIDTH || 1920);  // a list wider than its card widens the window up to this
 const MENU_MAX_HEIGHT = Number(process.env.MENU_MAX_HEIGHT || 12000);  // the full menu of a persona (UX deck)
 const MARGIN = 12;  // CSS pixels of page kept around a cropped region
+// FULL_PAGE=1: every shot is the whole window (application header and menu included) at the standard width, without
+// callout badges, into OUT_DIR (a folder of the checkout) - the full-screen images of the BDOI-template FRS.
+const FULL_PAGE = process.env.FULL_PAGE === '1';
 const READY_TIMEOUT_MS = 20 * 60 * 1000;
 
 if (!PASSWORD) {
@@ -529,7 +532,7 @@ function optimise(file, crop = '') {
  * A named region is widened to the callout badges and the last message (toast) that belong to it.
  */
 async function cropOf(page, shot, recipe) {
-  const rule = (recipe.crops && recipe.crops[shot.slug]) || shot.crop || 'auto';
+  const rule = FULL_PAGE ? 'full' : (recipe.crops && recipe.crops[shot.slug]) || shot.crop || 'auto';
   if (rule === 'full') {
     return { kind: 'full', clip: null };
   }
@@ -651,7 +654,7 @@ async function cropOf(page, shot, recipe) {
 (async () => {
   const manifest = loadManifest();
   const recipe = require(path.join(__dirname, 'packs', `brd${brd.replace(/\D/g, '').slice(0, 2)}.cjs`));
-  const OUT = path.resolve(manifest.out);
+  const OUT = path.resolve(process.env.OUT_DIR || manifest.out);
   // Images are written and old ones removed only inside the checkout that holds this script.
   if (path.relative(ROOT, OUT).startsWith('..') || path.isAbsolute(path.relative(ROOT, OUT))) {
     throw new Error(`screenshot folder ${OUT} is outside ${ROOT}`);
@@ -737,13 +740,13 @@ async function cropOf(page, shot, recipe) {
       // A walkthrough step shows the top of the page (record header, stepper, the message of the step) at a
       // size that stays readable next to its text; the recipe sets `tall` for a step that needs the whole page.
       // A step cropped to a named region (recipe.crops) gets the whole page, so the region is in view.
-      const named = recipe.crops && recipe.crops[shot.slug] && !['main', 'dialog', 'full'].includes(recipe.crops[shot.slug]);
+      const named = !FULL_PAGE && recipe.crops && recipe.crops[shot.slug] && !['main', 'dialog', 'full'].includes(recipe.crops[shot.slug]);
       if (shot.state === 'menu') {
         await fitSidebar(page);
       } else if (shot.state !== 'landing') {
         // A list wider than its card at the standard window (recipe.widths[slug], CSS pixels) is taken in a wider
         // window, so every column is in the image.
-        const width = (recipe.widths && recipe.widths[shot.slug]) || WIDTH;
+        const width = FULL_PAGE ? WIDTH : (recipe.widths && recipe.widths[shot.slug]) || WIDTH;
         if (width !== WIDTH) {
           await page.setViewportSize({ width, height: HEIGHT });
           await page.waitForTimeout(500);
@@ -754,18 +757,18 @@ async function cropOf(page, shot, recipe) {
           .filter((w) => w.getBoundingClientRect().width > 0)
           .map((w) => w.scrollWidth - w.clientWidth)));
         // A matrix far wider than any window (the role matrix) keeps the standard window and its own scroll.
-        const wide = over > 1 && width + over + 24 <= MAX_WIDTH ? width + over + 24 : width;
+        const wide = !FULL_PAGE && over > 1 && width + over + 24 <= MAX_WIDTH ? width + over + 24 : width;
         if (wide !== width) {
           await page.setViewportSize({ width: wide, height: HEIGHT });
           await page.waitForTimeout(500);
         }
-        await fitViewport(page, shot.state === 'walkthrough' ? (shot.tall ?? Boolean(named)) : shot.tall, wide);
+        await fitViewport(page, FULL_PAGE ? true : shot.state === 'walkthrough' ? (shot.tall ?? Boolean(named)) : shot.tall, wide);
       }
       if (named) {
         // A message of the step would cover the rows of the region.
         await page.evaluate(() => document.querySelectorAll('.toast-region .toast').forEach((t) => { t.style.display = 'none'; }));
       }
-      const bare = shot.state === 'walkthrough' || shot.nocallouts;
+      const bare = FULL_PAGE || shot.state === 'walkthrough' || shot.nocallouts;
       const missing = bare ? [] : await drawCallouts(page, calloutsOf[shot.screen]);
       const { kind, clip } = await cropOf(page, shot, recipe);
       await page.screenshot(clip ? { path: file, clip } : { path: file });

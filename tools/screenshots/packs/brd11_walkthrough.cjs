@@ -103,7 +103,7 @@ const steps = {
     }
     await fill(page, 'User ID', NEW_USER);
     await fill(page, 'Full Name', 'Isabel Navarro');
-    await fill(page, 'E-mail', 'isabel.navarro@uat.brokerverse.cloud');
+    await fill(page, 'E-mail', 'isabel.navarro@dev.brokerverse.cloud');
     await fill(page, 'Windows ID', 'INAVARRO');
     await fill(page, 'Home Branch', '^HO');
     await pickProfile(page, 'Marketing Account Officer');
@@ -196,7 +196,7 @@ const steps = {
     await fill(page, 'Description', 'Read-only enquiry of clients and reports for the contact centre');
     await pickPermissions(page, ['CLIENT_VIEW', 'REPORT_VIEW']);
     await fill(page, 'Approvers in Order', 'Ulysses');
-    await fill(page, 'Approvers in Order', 'Andres Approver');
+    await fill(page, 'Approvers in Order', 'Andres');
     await fill(page, 'Remarks \\(Justification\\)', 'Enquiry profile for the renewal follow-up');
     await press(page, /^submit$/i);
     await settle(page, 1500);
@@ -278,7 +278,7 @@ const steps = {
   },
   'wt-c-03': async (ctx) => {
     const page = await go(ctx, 'requestor', `${REQUESTS}/new?type=MODIFY_USER&user=a013000101`);
-    await fill(page, 'Full Name', 'SIT Enrolled User Reyes');
+    await fill(page, 'Full Name', 'Maria Santos Reyes');
     await fill(page, 'Approver', 'Ulysses');
     await fill(page, 'Remarks \\(Justification\\)', 'Name corrected');
     await press(page, /^submit$/i);
@@ -391,6 +391,18 @@ const steps = {
   },
   'wt-d-05': async (ctx) => go(ctx, 'badmin', `${REQUESTS}/new?kind=group`),
 };
+
+// FULL_PAGE capture (BDOI-template FRS): D.4 is the audit log of the group-profile changes of the day (the profile
+// created in walkthrough B) and D.5 the User Access Report as of today.
+if (process.env.FULL_PAGE === '1') {
+  Object.assign(steps, {
+    'wt-d-04': async (ctx) => {
+      const day = ctx.one("select to_char(now() at time zone 'Asia/Manila', 'YYYY-MM-DD')");
+      return runReport(ctx, 'auditor', 'UAM-AUDIT-LOG', [['Date From', day], ['Activity', 'Group Profile Changes']]);
+    },
+    'wt-d-05': async (ctx) => runReport(ctx, 'auditor', 'UAM-USER-ACCESS', []),
+  });
+}
 
 /** Nothing to prepare: the records of each step come from the seed data or from the earlier steps. */
 async function prepare() {}

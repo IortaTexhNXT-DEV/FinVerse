@@ -18,7 +18,9 @@ OOTB = [("OB-UA-02", "Dormant users (was CR-UA-002)"),
         ("OB-UA-05", "Access review, schedules (was CR-UA-012)")]
 # Integration and data migration scope (grey label in the FRS): not change requests
 INT = [("IS-UA-01", "UIDM-ISC synchronisation (was CR-UA-005)"), ("IS-UA-02", "Revoke on SSO status (was CR-UA-006)"),
-       ("IS-UA-03", "Sign-in through Entra ID / EIAM"), ("IS-UA-05", "EIAM / UIDM-ISC simulator (SIT, UAT)"),
+       ("IS-UA-03", "Sign-in through Entra ID / EIAM"), ("IS-UA-05", "Test accounts and events (SIT, UAT)"),
+       ("IS-UA-06", "Requests raised, corrected, cancelled in UIDM-ISC"), ("IS-UA-07", "Bulk requests in UIDM-ISC"),
+       ("IS-UA-08", "Approve / reject / return in UIDM-ISC"), ("IS-UA-09", "Request notices in UIDM-ISC"),
        ("DM-UA-01", "Users and group profiles at go-live (BRD-13)")]
 BRD = [("OB-UA-01", "SoD rules (OOTB); was CR-UA-001"),
        ("BRD 1.001.1.3", "Session-end warning; was CR-UA-004"),
@@ -26,8 +28,6 @@ BRD = [("OB-UA-01", "SoD rules (OOTB); was CR-UA-001"),
        ("NFR 10.07", "One session per device; was CR-UA-015"),
        ("BRD-UA-18", "No conflicting permissions; was CR-UA-008"),
        ("BRD-UA-19", "Export file names; was CR-UA-009"),
-       ("BRD-UA-20", "E-mail copy of notices; was CR-UA-013"),
-       ("BRD-UA-21", "Pending-request monitoring (CR-UA-011 part)"),
        ("BRD-UA-22", "Removal on effective date (CR-UA-014 part)")]
 
 
@@ -53,7 +53,7 @@ FOOT = f'''<div style="display:flex;gap:10px;font-size:11.5px;color:#1f2937">
 SPEC = dict(
     size=(1800, 1290), foot=200,
     title="BDO BIBS &#8211; User Access Maintenance &#8211; End-to-End Process Flow",
-    tag="Based on FRS v1.4<br>Provisioning option (a), as delivered",
+    tag="Based on FRS v1.4<br>User access requests in UIDM-ISC (BDOI review comments)",
     stages=["1. Identity &amp; Sign-in", "2. Request &amp; Validation", "3. Approval", "4. Implementation", "5. Notification", "6. Reporting &amp; Audit"],
     lanes=[("EIAM", "BDO Enterprise Identity<br>Access Management on<br>Microsoft Entra ID", 0.72),
            ("UIDM-ISC", "BDOI identity<br>governance", 0.62),
@@ -67,10 +67,10 @@ SPEC = dict(
         ("U2", 1, 5, .04, .1, .92, "id", "Access certification campaign", ["Reads the BIBS extract"]),
         ("R1", 2, 1, .04, .05, .92, "req", "Raise request (Access Requests)", [
             "User request: assign / change group profile, revoke", "Group-profile request: new, modify, deactivate, reactivate",
-            "Bulk request: template and error file", "Effective date, justification, attachments; approvers in order; draft"], ["CR-UA-014"]),
-        ("R2", 2, 2, .1, .2, .8, "ret", "Correct and resubmit, or void", ["Returned request edited by the requestor"]),
+            "Bulk request: template and error file", "Effective date, justification, attachments; approvers in order; draft"], ["CR-UA-014", "INT:IS-UA-06", "INT:IS-UA-07"]),
+        ("R2", 2, 2, .1, .2, .8, "ret", "Correct and resubmit, or void", ["Returned request edited by the requestor"], ["INT:IS-UA-06"]),
         ("R3", 2, 4, .06, .2, .88, "ntf", "My Requests", ["Status: submitted, pending, returned, approved, rejected, implemented"]),
-        ("A1", 3, 2, .08, .05, .84, "apr", "Review (Assigned to Me)", ["Details, attachments", "Permissions added / removed", "Separation-of-duties notice"]),
+        ("A1", 3, 2, .08, .05, .84, "apr", "Review (Assigned to Me)", ["Details, attachments", "Permissions added / removed", "Separation-of-duties notice"], ["INT:IS-UA-08"]),
         ("D1", 3, 2, .22, .7, .56, "dec", "Decision?", []),
         ("A2", 3, 3, .03, .05, .55, "apr", "Second approval", ["High / Admin privilege", "Not the requestor", "Information Security for SoD rules"], ["BRD:OB-UA-01"]),
         ("RJ", 3, 3, .6, .62, .38, "rej", "Rejected", ["With reason"]),
@@ -80,10 +80,10 @@ SPEC = dict(
         ("BG", 4, 0, .04, .66, .92, "sys", "Break-glass sign-in", ["Two named admins, local password + second factor; alert"], ["CR-UA-003"]),
         ("BV", 4, 1, .04, .04, .92, "sys", "Checks on submit", ["Mandatory fields, profile state", "Separation-of-duties rules", "No conflicting permissions in a role"], ["BRD:OB-UA-01", "BRD:BRD-UA-18"]),
         ("BS", 4, 1, .04, .55, .92, "sys", "Session and data access", ["Menus of the group profile", "Time-out and session-end warning", "Own / supervised records"], ["BRD:BRD 1.001.1.3", "BRD:NFR 10.07", "CR-UA-007"]),
-        ("BT", 4, 2, .06, .55, .88, "sys", "Time rules", ["2 working days per stage", "Reminder, then escalation to the Business Administrator"], ["CR-UA-011", "BRD:BRD-UA-21"]),
+        ("BT", 4, 2, .06, .55, .88, "sys", "Time rules", ["2 working days per stage", "Reminder, then escalation to the Business Administrator"], ["CR-UA-011", "INT:IS-UA-09"]),
         ("BI", 4, 3, .03, .04, .55, "sys", "Implement", ["On the effective date", "Group profiles, permissions", "Access-change log, before / after"]),
         ("BD", 4, 3, .03, .62, .94, "sys", "Daily runs", ["Dormant 90 days: deactivate (notice 7 days before)", "Temporary access removed at end date"], ["OOTB:OB-UA-02", "CR-UA-014", "BRD:BRD-UA-22"]),
-        ("BN", 4, 4, .06, .1, .88, "ntf", "Notices", ["In BIBS: to approve, returned, decided, implemented", "E-mail copy by preference"], ["BRD:BRD-UA-20"]),
+        ("BN", 4, 4, .06, .1, .88, "ntf", "Notices", ["In the system: group-profile steps, access applied", "User access request steps: UIDM-ISC"], ["INT:IS-UA-09", "BRD:BRD-UA-14"]),
         ("AL", 5, 4, .06, .1, .88, "aud", "User Access Audit Log", ["Every action, before / after", "IP address and role"], ["BRD:NFR 4.03"]),
         ("AR", 5, 5, .04, .1, .92, "aud", "Reports", ["User Access Report, Matrix, group profiles; export", "Monthly review to Information Security"], ["BRD:BRD-UA-19", "OOTB:OB-UA-05"]),
     ],

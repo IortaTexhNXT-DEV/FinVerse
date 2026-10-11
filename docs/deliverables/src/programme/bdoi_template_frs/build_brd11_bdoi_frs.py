@@ -75,6 +75,13 @@ DOC["glossary"] = DOC["glossary"] + v13.REV["glossary_add"]
 NEW_TERMS = {g[0] for g in v13.REV["glossary_add"]}
 OUT = REPO / "docs" / "deliverables" / "out" / DOC["meta"]["out_folder"]
 
+def _bdoi_texts() -> set[str]:
+    """Paragraph texts of BDOI's FRS (never rewritten by the BDOI view of version 1.4)."""
+    d = docx.Document(str(REPO / "docs" / "source-documents" / "FRS - BDOI BROKERSYS User Access Maintenance v1.1 (BDOI).docx"))
+    return {"".join(t.text or "" for t in p.iter(qn("w:t"))) for p in d.element.body.iter(qn("w:p"))}
+
+
+BDOI_TEXTS = _bdoi_texts()
 HL_FILL = "FFF59D"          # light yellow of the review copy (the changes of version 1.4 against 1.3)
 # Screens added or changed with the full-coverage build of October 2026 (shaded in the review copy of version 1.3)
 SCREENS_V13 = {"SCR-UA-01", "SCR-UA-04", "SCR-UA-15", "SCR-UA-19", "SCR-UA-20", "SCR-UA-21", "SCR-UA-22"}
@@ -937,9 +944,8 @@ class Annexes:
         self.h1("Annex J – Screen Specifications", page=False)
         self.p("This annex specifies the User Access Maintenance screens: the purpose of each screen, how the user "
                "reaches it, the requirements it serves, one screenshot, its fields with type, mandatory marker, format, "
-               "list or source and validation, its actions, and its rules. Mandatory: Y = mandatory, N = optional, "
-               "Cond. = mandatory when the condition stated applies. The screenshots were taken on the "
-               + v14.V14["meta"]["environment"] + " with SIT/UAT data on 10-Oct-2026.")
+               "list or source and validation, its actions, and its rules. " + " ".join(v14.BDOI["screen_note"].split()))
+        model = self.b.doc.sections[-1]._sectPr
         k = 0
         for f in sorted((UA / "pack" / "screens").glob("*.yaml")):
             for s in yaml.safe_load(f.read_text(encoding="utf-8"))["screens"]:
@@ -953,16 +959,9 @@ class Annexes:
                 frum = self.frum_of(s.get("frs", []))
                 if frum:
                     self.p("Requirements: " + frum)
-                shots = s.get("shots") or []
-                n = int(s["id"].split("-")[-1])
-                pick = 1 if s["id"] == "SCR-UA-07" and len(shots) > 1 else 0
-                if shots:
-                    png = UA / "screenshots" / f"scr-ua-{n:02d}-{pick + 1:02d}-{shots[pick]['state']}.png"
-                    if not png.exists():
-                        raise SystemExit(f"screenshot missing: {png}")
-                    self.els.extend(final.screenshot(self.b, png))
-                    self.p(f"Figure J.{k}: {clean(shots[pick].get('caption', s['title']))}", italic=True, size=8,
-                           jc="center")
+                fig = v14.BDOI["screens"].get(s["id"])
+                if fig:
+                    self.els.extend(v14.figure_run(self.b, model, [(v14.shot(fig[0]), f"Figure J.{k}: {fig[1]}")]))
                     self.b.stats["screenshots"] += 1
                 rows = []
                 for line in s.get("fields", []):
@@ -1098,10 +1097,10 @@ class Annexes:
         b13 = self.b.round13
         self.b.round13 = True
         self.h2("M.10 Settings for the points BDOI decides")
-        self.p("The points where BDOI's FRS and the BRD or the earlier BIBS behaviour differ are offered both ways in "
-               "BIBS, each chosen by a setting that the System Administrator changes with the approval of "
-               "Information Security, without a release. The default is BDOI's FRS unless stated. BDOI's decision "
-               "only confirms the value; the points stay in Annex Q as Configurable - BDOI to confirm the setting.")
+        self.p("The points where BDOI's FRS and the BRD differ are offered both ways, each chosen by a setting that "
+               "the System Administrator changes with the approval of Information Security, without a release. The "
+               "default is BDOI's FRS unless stated. BDOI's decision only confirms the value; the points stay in "
+               "Annex Q as Configurable - BDOI to confirm the setting.")
         self.table(["Setting", "Values", "Default", "Settles (Annex Q)", "Decided by"], m["decision_settings"],
                    [1.5, 3.3, 1.1, 0.8, 1.2], size=8)
         self.b.round13 = b13
@@ -1138,8 +1137,13 @@ class Annexes:
         self.h2("N.3 Provisioning from UIDM-ISC")
         b13 = self.b.round13
         self.b.round13 = True
-        self.p("BIBS offers the three options as settings (Annex M.10); as delivered option (a) applies. BDOI confirms "
-               "the settings (Annex Q, conflict C01).")
+        self.p("The three options are settings (Annex M.10); BDOI confirms the option (Annex Q, conflict C01). BDOI's "
+               "review comments on the mapping (Annex Q.6) place the user access request steps in UIDM-ISC: raising, "
+               "correcting, cancelling and viewing a request, bulk requests and the approver's decision (\"c/o UIDM\"). "
+               "They are integration scope, labelled [Integration scope \u2013 UIDM-ISC] (Annex AA.5, IS-UA-06 to "
+               "IS-UA-09); the system receives the approved change through the provisioning interface, records it with "
+               "the UIDM request number and applies it. The group-profile requests (BRD 3.002) stay in the system; the "
+               "assignment of group profiles stays a request in the system only under option (a).")
         self.table(["Option", "Requests and approvals", "Exchange with UIDM-ISC"], n["provisioning"], [2.0, 3.6, 1.8])
         self.b.round13 = b13
         self.bullets(n["provisioning_rules"][:1])
@@ -1156,34 +1160,36 @@ class Annexes:
     def walkthroughs(self):
         cases = yaml.safe_load((UA / "brd11_cases.yaml").read_text(encoding="utf-8"))
         personas = {k: clean(v["name"]) for k, v in cases["personas"].items()}
-        data = yaml.safe_load((UA / "pack" / "walkthroughs.yaml").read_text(encoding="utf-8"))["walkthroughs"]
+        data = v14.BDOI["walkthroughs"]
         self.h1("Annex O – Process Walkthroughs")
-        self.p("End-to-end walkthroughs of User Access Maintenance, step by step: who acts, on which screen, what the "
-               "user does, what the user sees and the result. The screens are specified in Annex J.")
         b14 = self.b.round14
         self.b.round14 = True
-        self.p(f"The walkthroughs are run on the {v14.V14['meta']['environment']} with the sign-in IDs of the "
-               f"Business Unit Walkthrough Users workbook (passwords issued separately by the iorta TechNXT Project "
-               f"Team); their routes are those of the end-to-end flow, Figure {self.nums['brd11_fig_e2e_identity']} "
-               f"(Annex N.0).")
+        self.p(" ".join(v14.BDOI["walk_intro"].split()).replace("@E2E@", str(self.nums["brd11_fig_e2e_identity"])))
+        self.p(" ".join(v14.BDOI["walk_uidm"].split()))
         self.b.round14 = b14
+        model = self.b.doc.sections[-1]._sectPr
         total = 0
+        fig_no = 0
         for w in data:
             self.h2(f"{w['id']} {clean(w['title'])}")
             self.p(self.refs(" ".join(str(w["summary"]).split())))
             if w.get("data"):
                 self.p(clean(w["data"]), italic=True, size=9)
             rows = []
+            figs = []
             for i, s in enumerate(w["steps"], 1):
-                rows.append([f"{w['id']}.{i}", personas.get(s[0], clean(s[0])),
-                             f"{self.screen_titles.get(s[1], s[1])} ({s[1]})", self.refs(s[2]), self.refs(s[3]),
-                             clean(s[4])])
+                fig_no += 1
+                label = " [Integration scope \u2013 UIDM-ISC]" if i in (w.get("uidm_steps") or []) else ""
+                rows.append([f"{w['id']}.{i}", s[0], f"{self.screen_titles.get(s[1], s[1])} ({s[1]})", s[2], s[3],
+                             f"{s[4]} (Figure O.{fig_no}){label}"])
+                figs.append((v14.shot(s[5]), f"Figure O.{fig_no}: {w['id']}.{i} {s[0]} \u2013 {s[4]}"))
             total += len(rows)
             self.table(["Step", "Persona", "Screen", "What the user does", "What the user sees", "Result"], rows,
                        [0.6, 0.95, 1.15, 1.95, 1.75, 1.0], size=7.5)
             if w.get("downstream"):
                 self.p("Afterwards:", bold=True, keep_next=True)
-                self.bullets([self.refs(x) for x in w["downstream"]])
+                self.bullets(w["downstream"])
+            self.els.extend(v14.figure_run(self.b, model, figs))
         self.b.stats["walk_steps"] = total
 
     # Annex P - traceability
@@ -1236,7 +1242,7 @@ class Annexes:
                "in BDOI's text, the changes made to the Business Requirements Mapping, the rows added to BDOI's annexes "
                "and the other observations of this version. BDOI's text is kept in the body of the document; this annex "
                "gives the original text, the BRD text, what version 1.2 proposes, the impact and who decides. Every point starts as "
-               "Open; a point that BIBS offers both ways, chosen by a system setting, reads Configurable - BDOI to "
+               "Open; a point offered both ways, chosen by a system setting, reads Configurable - BDOI to "
                "confirm the setting.")
         header = ["No.", "Topic", "Original text of this FRS", "BRD text", "Proposed in v1.2", "Impact", "Decision by", "Status"]
         widths = [0.75, 1.0, 1.9, 1.5, 2.2, 0.95, 1.0, 0.6]
@@ -1259,7 +1265,7 @@ class Annexes:
                 continue
             prop = f"{self.refs(c['recommendation'])} Proposed behaviour: {self.refs(c['ours'])}"
             if c.get("setting"):
-                prop += f" Available in BIBS: {self.refs(c['setting'])}"
+                prop += f" Proposed (setting): {self.refs(c['setting'])}"
             rows.append(row(c["id"], self.refs(c["topic"]), self.refs(c["bdoi"]), self.refs(c["brd"]), prop, self.refs(c["impact"]),
                             c["decide_by"], status=c.get("status", "Open")))
             self.listed_conflicts.add(c["id"])
@@ -1306,6 +1312,23 @@ class Annexes:
         self.table(header, rows, widths, size=7)
         self.b.round13 = False
         self.b.stats["observations_v13"] = len(rows)
+        section = "Q.6"
+        self.b.round14 = True
+        self.h2("Q.6 BDOI's review comments and our responses")
+        self.p("The comments of BDOI's reviewers carried in this document (on the rows of the Business Requirements "
+               "Mapping, section 2) are kept as BDOI wrote them; each has its response below. The last row is the open "
+               "question that the sixth comment raises.")
+        rows = []
+        for c in v14.BDOI["bdoi_comments"]:
+            rows.append(row("", f"Review comment on {c['anchor']}", f"{c['author']}: \"{c['text']}\"",
+                            c["anchor"].split(" \u2013 ")[0], " ".join(c["response"].split()),
+                            c["frum"], "BDOI (comment author)", "Answered"))
+        rq = v14.BDOI["ruby_question"]
+        rows.append(row("", rq["topic"], rq["bdoi"], rq["brd"], " ".join(rq["proposal"].split()), rq["impact"],
+                        rq["decide_by"], rq["status"]))
+        self.table(header, rows, widths, size=7)
+        self.b.round14 = False
+        self.b.stats["bdoi_comments"] = len(v14.BDOI["bdoi_comments"])
         self.b.stats["observations"] = no
         self.b.stats["conflicts"] = sum(1 for c in self.listed_conflicts if c.startswith("C"))
         self.b.stats["slips"] = sum(1 for c in self.listed_conflicts if c.startswith("S"))
@@ -1382,6 +1405,9 @@ def add_annexes(b: Builder, mapping, lines, trace, our, nfr, figs, nums, where):
     b.round13 = True
     new.checklist()
     b.round13 = False
+    b.round14 = True
+    v14.user_access_report_annex(a)
+    b.round14 = False
     # before the page break that precedes the Signoff Sheet
     sign = find_par(b, "Signoff Sheet", "Heading 1")._p
     anchor = sign
@@ -1629,6 +1655,7 @@ def build(highlight: bool, our, lines, trace, nfr, figs: dict) -> Builder:
     add_revision_log(b)
     if highlight:
         change_summary(b)
+    b.stats.update(v14.bdoi_view(b, BDOI_TEXTS))
     fr_blocks = OrderedDict()
     for row in b.tables[4].rows[1:]:
         fr_blocks.update(subitem_blocks(row.cells[3]._tc))

@@ -160,7 +160,11 @@ class RolePermissionRequestIT {
     assertThat(m.permissions())
         .filteredOn(r -> r.permission().equals("JOURNAL_CREATE"))
         .singleElement()
-        .satisfies(r -> assertThat(r.actions()).isEmpty());
+        .satisfies(
+            r -> {
+              assertThat(r.area()).isEqualTo("ACCOUNTING");
+              assertThat(r.actions()).containsExactly("CREATE");
+            });
 
     AccessMatrix.ByAction pkg = matrix.byAction("PACKAGE_REQUEST");
     assertThat(pkg.rows())

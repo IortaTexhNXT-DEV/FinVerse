@@ -58,7 +58,7 @@ async function pendingEnrolment(ctx, username, fullName) {
   }
   const r = await ctx.api('requestor', 'POST', '/nbadmin/access-requests', {
     type: 'CREATE_USER', userType: 'INTERNAL', username, fullName, email: `${username}@uat.brokerverse.cloud`,
-    roleCodes: ['MKT_AO'], justification: 'Joined Marketing (seed data)', approvers: ['uamapprover'],
+    roleCodes: ['MKT_AO'], justification: 'Joined Marketing', approvers: ['uamapprover'],
   });
   return r.id;
 }
@@ -103,16 +103,16 @@ const fills = {
     async (page) => page.getByPlaceholder('Search profile, area or what it does').fill('Marketing Account Officer'),
     ['Marketing Account Officer', true],
     async (page) => page.getByPlaceholder('Search profile, area or what it does').fill(''),
-    ['Approver', 'Ulysses'], ['Remarks (Justification)', 'Joined Combank Marketing as account officer (seed data)'],
+    ['Approver', 'Ulysses'], ['Remarks (Justification)', 'Joined Combank Marketing as account officer'],
   ],
   enrol_invalid: [['User ID', 'ab']],
   modify_user: [['Request Type', 'Modify user'], ['User ID', 'a013000101'], ['Full Name', 'SIT Enrolled User Santos']],
   new_profile: [
-    ['Profile Code', 'UAT_ENQUIRY'], ['Name', 'Client enquiry (seed data)'],
+    ['Profile Code', 'UAT_ENQUIRY'], ['Name', 'Client enquiry'],
     ['Description', 'Read-only enquiry of clients and reports'],
     async (page) => walkthrough.pickPermissions(page, ['CLIENT_VIEW', 'REPORT_VIEW']),
-    ['Approvers in Order', 'Ulysses'], ['Approvers in Order', '\\(approver\\)'],
-    ['Remarks (Justification)', 'Enquiry profile for the contact centre (seed data)'],
+    ['Approvers in Order', 'Ulysses'], ['Approvers in Order', 'Andres Approver'],
+    ['Remarks (Justification)', 'Enquiry profile for the contact centre'],
   ],
   modify_profile: [['Request Type', 'Modify group profile'], ['Group Profile', '^Marketing Account Officer'],
     async (page) => walkthrough.pickPermissions(page, ['UAM_VIEW'])],
@@ -189,8 +189,8 @@ const custom = {
   'scr-ua-09-02-validated': async (ctx) => {
     const n = Number(ctx.one('select count(*) from bulk_job')) + 1;
     const file = csv(`uam-bulk-${n}.csv`, [BULK_HEADERS,
-      ['ENROL', `a01300030${n % 10}`, 'Rowena Castillo', 'rowena.castillo@uat.brokerverse.cloud', '', 'HO', '', '', 'MKT_AO', '', 'Joined Marketing (seed data)'],
-      ['ENROL', `a01300031${n % 10}`, 'Dennis Aquino', 'dennis.aquino@uat.brokerverse.cloud', '', 'HO', '', '', 'MKT_AO', '', 'Joined Marketing (seed data)'],
+      ['ENROL', `a01300030${n % 10}`, 'Rowena Castillo', 'rowena.castillo@uat.brokerverse.cloud', '', 'HO', '', '', 'MKT_AO', '', 'Joined Marketing'],
+      ['ENROL', `a01300031${n % 10}`, 'Dennis Aquino', 'dennis.aquino@uat.brokerverse.cloud', '', 'HO', '', '', 'MKT_AO', '', 'Joined Marketing'],
       ['PROMOTE', 'a013000101', '', '', '', '', '', '', '', '', 'Not an action of the template'],
     ]);
     const page = await ctx.pageOf('requestor');

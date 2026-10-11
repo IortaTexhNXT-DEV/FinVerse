@@ -68,7 +68,7 @@ const steps = {
     await chooseOption(page, d.getByLabel(/^Product line/).first(), /^Motor$/);
     await d.getByLabel(/^Title/).fill('Accredited repair shops for fleets');
     await d.getByLabel(/^Effective from/).fill(new Date(Date.now() + 8 * 3600 * 1000).toISOString().slice(0, 10)); // Philippine date
-    await d.getByLabel(/^Wording/).fill('Repairs of insured fleet vehicles are made at the accredited repair shops of the insurer (seed data).');
+    await d.getByLabel(/^Wording/).fill('Repairs of insured fleet vehicles are made at the accredited repair shops of the insurer.');
     await d.getByRole('button', { name: /save for authorization/i }).click();
     await settle(page, 1200);
     return page;
@@ -137,7 +137,7 @@ const steps = {
   // 7-10. Negotiation.
   'wt-a-07': async (ctx) => {
     const page = await openRequest(ctx, 'tsu', requestA(ctx), 'Negotiation');
-    await page.getByLabel(/^Notes to the insurers/).fill('Please quote the fleet programme as requested (seed data).');
+    await page.getByLabel(/^Notes to the insurers/).fill('Please quote the fleet programme as requested.');
     await press(page, /^submit for approval$/i);
     await settle(page, 1500);
     return page;
@@ -168,7 +168,7 @@ const steps = {
       await d.getByLabel(/^Rate %/).fill(rate);
       await d.getByLabel(/^Minimum premium/).fill(minimum);
       await d.locator('input[type=file]').first().setInputFiles(pdf(`${insurer}-reply.pdf`, `${insurer} reply to the quotation slip`,
-        [`Rate ${rate}%, minimum premium PHP ${minimum}`, 'Seed data for the SIT environment']));
+        [`Rate ${rate}%, minimum premium PHP ${minimum}`, 'Rates agreed for the fleet programme']));
       await d.getByRole('button', { name: /^save terms$/i }).click();
       await settle(page, 1500);
     }
@@ -193,7 +193,7 @@ const steps = {
     await settle(page, 1200);
     page = await openRequest(ctx, 'tsu', id, 'Documents');
     await attach(page, 'Package slip', pdf('package-slip-signed.pdf', 'Package slip (signed)',
-      [`Package ${TITLE}`, 'Signed by the TSU Head and the insurer (seed data)']));
+      [`Package ${TITLE}`, 'Signed by the TSU Head and the insurer']));
     page = await openRequest(ctx, 'tsu', id, 'Requirements');
     await act(page, /^submit requirements for mancom sign-off$/i);
     // BDOI's routing: TSU selects the ManCom approvers (the President approves last).
@@ -325,7 +325,7 @@ const steps = {
     const page = await go(ctx, 'ao', `/quotations/${q[0]}`);
     await act(page, /^request rate exception$/i, {
       confirm: /^request exception$/i,
-      fill: async (d) => d.getByLabel(/^Reason/).fill('Fleet of 30 vehicles with no claims in three years (seed data).'),
+      fill: async (d) => d.getByLabel(/^Reason/).fill('Fleet of 30 vehicles with no claims in three years.'),
     });
     return page;
   },
@@ -341,7 +341,7 @@ const steps = {
     await settle(page, 1200);
     await act(page, /^approve$/i, {
       confirm: /^approve$/i,
-      comment: 'Loss-free fleet of 30 vehicles; approved for this quotation only (seed data).',
+      comment: 'Loss-free fleet of 30 vehicles; approved for this quotation only.',
     });
     return page;
   },
@@ -374,7 +374,7 @@ const steps = {
       const p = await ctx.api('mkttl', 'POST', REQUESTS, {
         companyId: company, type: 'NEW', scope: 'GENERIC', title: 'Bancassurance Motor Programme', lineCode: 'MOTOR',
         coverTypeCode: 'COMPREHENSIVE', marketSegments: [], reason: 'NEW_PROGRAMME', negotiationRequired: true,
-        terms: { sections: [{ heading: 'Requested cover and features', text: 'Comprehensive motor cover for bank clients (seed data).' }],
+        terms: { sections: [{ heading: 'Requested cover and features', text: 'Comprehensive motor cover for bank clients.' }],
           coverages: [], scheme: {}, dates: { packageEndDate: end.toISOString().slice(0, 10) }, insurers: [{ insurerCode: 'INS-MGIC', terms: [] }] },
       });
       await ctx.api('mkttl', 'POST', `${REQUESTS}/${p.id}/submit`, {});
@@ -396,7 +396,7 @@ const steps = {
       const p = await ctx.api('tsu', 'POST', REQUESTS, {
         companyId: company, type: 'NEW', scope: 'GENERIC', title, lineCode: 'PROPERTY', coverTypeCode: 'FIRE_LIGHTNING',
         marketSegments: [], reason: 'NEW_PROGRAMME', negotiationRequired: true,
-        terms: { sections: [{ heading: 'Requested cover and features', text: 'Fire cover of farm equipment sheds (seed data).' }],
+        terms: { sections: [{ heading: 'Requested cover and features', text: 'Fire cover of farm equipment sheds.' }],
           coverages: [], scheme: {}, dates: { packageEndDate: end.toISOString().slice(0, 10) }, insurers: [{ insurerCode: 'INS-MGIC', terms: [] }] },
       });
       id = p.id;

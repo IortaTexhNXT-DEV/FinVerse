@@ -26,7 +26,7 @@ function terms(insurers) {
   end.setFullYear(end.getFullYear() + 1);
   const iso = (d) => d.toISOString().slice(0, 10);
   return {
-    sections: [{ heading: 'Target market / client', text: 'Owners of residential condominium units in Metro Manila (seed data).' }],
+    sections: [{ heading: 'Target market / client', text: 'Owners of residential condominium units in Metro Manila.' }],
     coverages: [{ coverageCode: 'FIRE_LIGHTNING', included: true, optional: false, clauseCodes: [], limitAmount: 5000000 }],
     scheme: { defaultRate: 0.25, minimumPremium: 1500, commissionRate: 20, maxSumInsured: 10000000 },
     dates: { effectiveFrom: iso(start), packageStartDate: iso(start), packageEndDate: iso(end) },
@@ -86,7 +86,7 @@ const newRequest = [
   ['Product line', 'Motor'],
   ['Cover type / subtype', 'Comprehensive'],
   ['Reason', 'New programme'],
-  ['Comment on the reason', 'SME fleets of 5 to 50 vehicles (seed data)'],
+  ['Comment on the reason', 'SME fleets of 5 to 50 vehicles'],
   ['Requested rate %', '1.2'],
   ['Minimum premium', '5000'],
   ['Commission %', '15'],
@@ -165,7 +165,7 @@ const opens = {
     }
     const created = await ctx.api('ao', 'POST', '/catalog/rate-scheme-exceptions', {
       productCode: 'MTR30', requestedRate: 1.05, transactionRef: q[0],
-      reason: 'Fleet grows to 40 vehicles at renewal of the client programme (seed data).',
+      reason: 'Fleet grows to 40 vehicles at renewal of the client programme.',
     });
     return `/catalog/rate-exceptions/${created.referenceNo}`;
   },

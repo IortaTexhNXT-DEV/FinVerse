@@ -108,7 +108,7 @@ const steps = {
     await fill(page, 'Home Branch', '^HO');
     await pickProfile(page, 'Marketing Account Officer');
     await fill(page, 'Approver', 'Ulysses');
-    await fill(page, 'Remarks \\(Justification\\)', 'Joined Combank Marketing as account officer (seed data)');
+    await fill(page, 'Remarks \\(Justification\\)', 'Joined Combank Marketing as account officer');
     await button(page, /^save draft$/i).click();
     await settle(page, 1500);
     return page;
@@ -166,7 +166,7 @@ const steps = {
     const page = await go(ctx, 'requestor', `${REQUESTS}/new?type=MODIFY_USER&user=${NEW_USER}`);
     await pickProfile(page, 'Marketing Team Leader');
     await fill(page, 'Approver', 'Ulysses');
-    await fill(page, 'Remarks \\(Justification\\)', 'Covers as team leader during the leave of the unit head (seed data)');
+    await fill(page, 'Remarks \\(Justification\\)', 'Covers as team leader during the leave of the unit head');
     await press(page, /^submit$/i);
     await settle(page, 1500);
     return page;
@@ -193,11 +193,11 @@ const steps = {
     }
     await fill(page, 'Profile Code', PROFILE);
     await fill(page, 'Name', 'Renewal enquiry');
-    await fill(page, 'Description', 'Read-only enquiry of clients and reports for the contact centre (seed data)');
+    await fill(page, 'Description', 'Read-only enquiry of clients and reports for the contact centre');
     await pickPermissions(page, ['CLIENT_VIEW', 'REPORT_VIEW']);
     await fill(page, 'Approvers in Order', 'Ulysses');
-    await fill(page, 'Approvers in Order', '\\(approver\\)');
-    await fill(page, 'Remarks \\(Justification\\)', 'Enquiry profile for the renewal follow-up (seed data)');
+    await fill(page, 'Approvers in Order', 'Andres Approver');
+    await fill(page, 'Remarks \\(Justification\\)', 'Enquiry profile for the renewal follow-up');
     await press(page, /^submit$/i);
     await settle(page, 1500);
     await tab(page, 'Approvers');
@@ -237,7 +237,7 @@ const steps = {
     }
     await fill(page, 'Reason', 'Resigned');
     await fill(page, 'Approver', 'Ulysses');
-    await fill(page, 'Remarks \\(Justification\\)', 'Resigned effective today (seed data)');
+    await fill(page, 'Remarks \\(Justification\\)', 'Resigned effective today');
     await press(page, /^submit$/i);
     await settle(page, 1500);
     return page;
@@ -271,7 +271,7 @@ const steps = {
     await fill(page, 'Full Name', 'Marco Salvador');
     await pickProfile(page, 'Marketing Account Officer');
     await fill(page, 'Approver', 'Ulysses');
-    await fill(page, 'Remarks \\(Justification\\)', 'New hire (seed data)');
+    await fill(page, 'Remarks \\(Justification\\)', 'New hire');
     await press(page, /^submit$/i);
     await settle(page, 800);
     return page;
@@ -280,7 +280,7 @@ const steps = {
     const page = await go(ctx, 'requestor', `${REQUESTS}/new?type=MODIFY_USER&user=a013000101`);
     await fill(page, 'Full Name', 'SIT Enrolled User Reyes');
     await fill(page, 'Approver', 'Ulysses');
-    await fill(page, 'Remarks \\(Justification\\)', 'Name corrected (seed data)');
+    await fill(page, 'Remarks \\(Justification\\)', 'Name corrected');
     await press(page, /^submit$/i);
     await settle(page, 1200);
     return page;
@@ -289,7 +289,7 @@ const steps = {
     const page = await go(ctx, 'requestor', `${REQUESTS}/new?type=MODIFY_USER&user=requestor`);
     await pickProfile(page, 'Marketing Account Officer');
     await fill(page, 'Approver', 'Ulysses');
-    await fill(page, 'Remarks \\(Justification\\)', 'Also raises Marketing requests (seed data)');
+    await fill(page, 'Remarks \\(Justification\\)', 'Also raises Marketing requests');
     await press(page, /^submit$/i);
     await settle(page, 1200);
     return page;
@@ -301,7 +301,7 @@ const steps = {
     await pickProfile(page, 'User Access Requestor');
     await pickProfile(page, 'User Access Approver');
     await fill(page, 'Approver', 'Ulysses');
-    await fill(page, 'Remarks \\(Justification\\)', 'Raises and approves access requests (seed data)');
+    await fill(page, 'Remarks \\(Justification\\)', 'Raises and approves access requests');
     await press(page, /^submit$/i);
     await settle(page, 1200);
     return page;
@@ -316,7 +316,7 @@ const steps = {
         + "where r.code = 'CONTACT_CENTER') limit 1");
       const r = await ctx.api('admin', 'POST', '/nbadmin/access-requests', {
         type: 'MODIFY_ROLE_PERMISSIONS', roleCode: 'CONTACT_CENTER', permissionsAdded: [added], permissionsRemoved: [],
-        justification: 'Enquiry right for the contact centre (seed data)', approvers: ['uamapprover'],
+        justification: 'Enquiry right for the contact centre', approvers: ['uamapprover'],
       });
       id = r.id;
       await ctx.api('uamapprover', 'POST', `/nbadmin/access-requests/${id}/approve`, { comment: 'Approved' });

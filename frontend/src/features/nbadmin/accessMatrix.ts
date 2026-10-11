@@ -15,6 +15,7 @@ const AREA_LABELS: Record<string, string> = {
   DISBURSEMENT: 'Disbursement',
   PAYMENT_REQUESTS: 'Refund & Cash Advance Requests',
   ACSL: 'ACSL',
+  ACCOUNTING: 'Accounting & Finance',
   [UNCLASSIFIED]: 'Other (not classified)',
 };
 

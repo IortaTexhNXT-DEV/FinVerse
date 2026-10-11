@@ -4,6 +4,7 @@ import { nbadminApi } from '@/api/nbadmin';
 import type { AccessUserType } from '@/api/nbadmin';
 import { Button } from '@/components/ui/Button';
 import { Field } from '@/components/ui/Field';
+import { approverLabels } from './approverLabels';
 
 interface ApproverPickerProps {
   userType: AccessUserType;
@@ -33,7 +34,8 @@ export function ApproverPicker({
     queryFn: () => nbadminApi.approvers(userType, subject === '' ? undefined : subject),
   });
   const eligible = options.data ?? [];
-  const nameOf = (u: string) => eligible.find((o) => o.username === u)?.fullName ?? u;
+  const labels = approverLabels(eligible);
+  const nameOf = (u: string) => labels.get(u) ?? u;
   if (!multiple) {
     return (
       <Field label="Approver" required error={error} hint="The approver you choose is notified.">
@@ -47,7 +49,7 @@ export function ApproverPicker({
             <option value="">Select the approver…</option>
             {eligible.map((o) => (
               <option key={o.username} value={o.username}>
-                {o.fullName} ({o.username})
+                {nameOf(o.username)}
               </option>
             ))}
           </select>
@@ -74,16 +76,14 @@ export function ApproverPicker({
             <ol className="stack">
               {value.map((u, i) => (
                 <li key={u} className="row">
-                  <span>
-                    {nameOf(u)} ({u})
-                  </span>
+                  <span>{nameOf(u)}</span>
                   <span className="spacer" />
                   {i > 0 && (
                     <Button
                       size="sm"
                       variant="ghost"
                       icon={<ArrowUp size={14} />}
-                      aria-label={`Move ${u} up`}
+                      aria-label={`Move ${nameOf(u)} up`}
                       onClick={() => move(i)}
                     />
                   )}
@@ -91,7 +91,7 @@ export function ApproverPicker({
                     size="sm"
                     variant="ghost"
                     icon={<X size={14} />}
-                    aria-label={`Remove ${u}`}
+                    aria-label={`Remove ${nameOf(u)}`}
                     onClick={() => onChange(value.filter((x) => x !== u))}
                   />
                 </li>
@@ -109,7 +109,7 @@ export function ApproverPicker({
               .filter((o) => !value.includes(o.username))
               .map((o) => (
                 <option key={o.username} value={o.username}>
-                  {o.fullName} ({o.username})
+                  {nameOf(o.username)}
                 </option>
               ))}
           </select>

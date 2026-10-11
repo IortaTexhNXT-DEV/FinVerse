@@ -4,6 +4,7 @@ describe('access matrix helpers (PMADD05)', () => {
   it('labels areas', () => {
     expect(areaLabel('PACKAGE_REQUEST')).toBe('Package Requests');
     expect(areaLabel('BULK_PROCESSING')).toBe('Bulk Processing');
+    expect(areaLabel('ACCOUNTING')).toBe('Accounting & Finance');
     expect(areaLabel(UNCLASSIFIED)).toBe('Other (not classified)');
   });
 

@@ -353,11 +353,12 @@ def edit_introduction(b: Builder):
         for el in els:
             keep_with_next(el)
         n = b.new_bullets()
-        for key in ("green", "orange"):
+        shades = dict(col, black="000000", grey=V12["labels"]["colour"], blue=V12["labels"]["blue"])
+        for key, line in lg["items"]:
             q = keep_with_next(b.para("", style="ListParagraph", num=(n, 0)))
-            head, rest = lg[key].split(":", 1)
-            q.append(b.run(head + ":", bold=True, size=10, color=col[key]))
-            q.append(b.run(rest, size=10, color=col[key]))
+            head, rest = line.split(":", 1)
+            q.append(b.run(head + ":", bold=True, size=10, color=shades[key]))
+            q.append(b.run(rest, size=10, color=shades[key]))
             els.append(q)
         els.append(b.clone_par(body, " ".join(lg["note"].split())))
     # the legend closes section 1.3, after BDOI's last paragraph of the section
@@ -1017,6 +1018,28 @@ def apply_scope_colours(b: Builder):
                 for tr in hit:
                     colour_runs(tr, col[kind])
             b.stats[kind] += 1
+    lab = V12["labels"]
+    for kind in ("integration", "data_migration"):
+        for g in V12.get(kind) or []:
+            targets = []
+            if g.get("frrn"):
+                block = b.bdoi_blocks.get(g["frrn"])
+                if not block:
+                    raise SystemExit(f"scope label: {g['frrn']} not found")
+                # BDOI's text is kept word for word: the label is a paragraph of its own above the item
+                with v12(b):
+                    block[0].addprevious(keep_with_next(b.para(lab[kind], bold=True, size=8, color=lab["colour"],
+                                                               space_after=0)))
+            if g.get("match"):
+                targets += [next(tr.iter(qn("w:p"))) for tr in trs if g["match"] in el_text_all(tr)
+                            and tr.find(".//" + qn("w:tr")) is None]
+            if not targets and not g.get("frrn"):
+                raise SystemExit(f"scope label: {g['id']} not found")
+            for p in targets:
+                r = b.run(lab[kind] + " ", bold=True, size=8, color=lab["colour"])
+                ppr = p.find(qn("w:pPr"))
+                (ppr.addnext(r) if ppr is not None else p.insert(0, r))
+            b.stats[kind] += 1
 
 
 def section_break(b: Builder, landscape: bool):
@@ -1052,18 +1075,19 @@ def add_annexes(b: Builder, a: Annexes, review, figs):
 
 CHANGE_POINTS = [
     "Cover: version 1.2; Document Revision Log: row 1.2. BDOI's text and the content of version 1.1 are unchanged.",
-    "Introduction: \"How to read this document\" - the colour code of the points beyond the BRD: green where the system offers the point out of the box ({green} points), orange where it needs a change request ({orange}).",
-    "Functional Requirements: BDOI's text of the {green_items} items beyond the BRD coloured green where it is stated.",
+    "Introduction: \"How to read this document\" - black for the BRD; green for BDOI's points offered by the iNXT BrokerVerse platform out of the box ({green} points); orange for change requests ({orange}); grey labels for the Integration and Data Migration scopes ({integration} points); blue for best-practice recommendations.",
+    "Functional Requirements: BDOI's text of the {green_items} items beyond the BRD coloured or labelled where it is stated.",
     "Annex AA and AL: the environment of the screenshots and walkthroughs (BIBS DEV environment); figure captions kept on the page of their figure.",
-    "Annex AJ: RN-NFR-17 (one session per device) and RN-NFR-18 (source of the audit entries), requirements of other BRDs of the programme that also apply to Renewal; the accessibility row coloured orange.",
+    "Annex AJ: RN-NFR-17 (one session per device) and RN-NFR-18 (source of the audit entries), requirements of other BRDs of the programme that also apply to Renewal; the accessibility row coloured orange and the CCM row labelled Integration scope.",
     "Annex AM.4: the {concept_paper} points of the signed Concept Paper traced to this FRS.",
-    "Annex AP.1: the points beyond the BRD with what the system offers, and the change requests with their effort ({cr_mandays:.1f} man-days; CR Effort Estimate workbook).",
+    "Annex AP.1: the points beyond the BRD - out of the box, change requests with their effort ({cr_mandays:.1f} man-days; CR Effort Estimate workbook) and the Integration scope; Annex AP.2: best-practice recommendations ({bp} with indicative effort).",
 ]
 
 
 def change_summary(b: Builder, review):  # noqa: ARG001
     s = dict(b.stats)
-    s["green_items"] = sum(1 for g in V12["green"] if g.get("frrn"))
+    s["green_items"] = sum(1 for g in V12["green"] + V12["orange"] + V12["integration"] if g.get("frrn"))
+    s["bp"] = len(V12["best_practice"])
     els = [b.para("Summary of changes in version 1.2", bold=True, size=14, color="014EA9", hl=False, space_after=120),
            b.para("This review copy shows in light yellow every passage added or changed in version 1.2, against "
                   "version 1.1. The text of version 1.1 is not shaded and is unchanged.", size=9.5, hl=False)]

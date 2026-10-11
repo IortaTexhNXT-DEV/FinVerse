@@ -34,8 +34,10 @@ points:
   # Feature List as a cross-check. Green = not in the BRD and available OOTB; orange = not in the BRD and partial or
   # not available OOTB. The run report of each automatic payment run is a BRD requirement (BRQID.006) and stays black.
   # The payment channel simulator of SIT and UAT is an interface tool: Integration scope (grey label).
+  # ---- class brd: former green points that a BRD line asks for (product owner decision of 11-Oct-2026: BRD-00
+  # and programme NFRs count; elaboration of a BRD line stays in the BRD): black, in scope, offered OOTB, no effort
   # ---- green
-  - {id: G-01, class: ootb, frs: "FRS.CSH.09.02.10; Appendix M", fl: "RPT-007 Available (user-scheduled reports with recipients)", ev: "Reports > Schedules: timing, format and recipients", match: "Daily, after the close of the business day (proposed 18:30); on demand", title: "Scheduled daily run of the Daily Cash Reconciliation Reports", where: "Report schedules"}
+  - {id: G-01, class: brd, brd_line: "CSHID.023 \"Capability to generate reports. See Cashiering Reports list under Annex\"; Report List (Operations - Cashiering): \"Daily Cash Reconciliation Reports - Summarizes daily cash receipts and deposits\", frequency \"Daily\"", frs: "FRS.CSH.09.02.10; Appendix M", fl: "RPT-007 Available (user-scheduled reports with recipients)", ev: "Reports > Schedules: timing, format and recipients", match: "Daily, after the close of the business day (proposed 18:30); on demand", title: "Scheduled daily run of the Daily Cash Reconciliation Reports", where: "Report schedules"}
   - {id: G-01b, class: ootb, frs: "FRS.CSH.09.02.11; Appendix M", fl: "RPT-007 Available (user-scheduled reports with recipients)", ev: "Reports > Schedules: timing, format and recipients", match: "On demand; weekly (proposed Monday 08:00)", title: "Scheduled weekly run of the Unapplied Premium Payment Transaction report", where: "Report schedules"}
   # ---- orange: change requests
   - {id: CR-CSH-101, class: cr, match: "Proposed: posted the same business day"}

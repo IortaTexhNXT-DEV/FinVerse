@@ -47,6 +47,7 @@ V12 = frs.V12
 GREEN_OF = {g["cr"]: g for g in V12["green"]}
 ORANGE_OF = {o["id"]: o for o in V12["orange"]}
 BRD_OF = {d["id"]: d for d in V12.get("brd_deliver") or []}
+BRD_OOTB_OF = {g["cr"]: g for g in V12.get("brd_ootb") or []}
 INTEG_OF = {x["id"]: x for x in V12["integration"] + (V12.get("data_migration") or [])}
 FEATURE_XLSX = frs.REPO / "docs" / "deliverables" / "out" / "Programme" / "Feature_List" / "BIBS_BDOI_FeatureList_vs_OOTB_and_Best_Practice_v1.0.xlsx"
 ACTIVITIES = ["Analysis and design", "Back end", "Front end", "Testing", "Documentation and UAT support"]
@@ -542,10 +543,22 @@ def build_cr(data: Data):
     rows = []
     for k, c in enumerate(WB["cr_candidates"], 1):
         no = f"CR-RN-{k:03d}"
-        g = GREEN_OF.get(no) or ORANGE_OF.get(no) or INTEG_OF.get(no) or BRD_OF.get(no)
+        g = GREEN_OF.get(no) or ORANGE_OF.get(no) or INTEG_OF.get(no) or BRD_OF.get(no) or BRD_OOTB_OF.get(no)
         if g is None or g["frrn"] != c[0]:
             raise SystemExit(f"{no}: not in brd06_v12.yaml")
         orange = no in ORANGE_OF
+        if no in BRD_OOTB_OF:
+            rows.append({"no": no, "date": "09-Oct-2026", "by": "iorta TechNXT Project Team", "brd": g["brd"], "frs": c[0],
+                         "desc": f"{c[2]}: {c[3]}", "reason": "In the BRD: " + g["quote"], "type": c[5],
+                         "scope": "In scope (BRD)", "schedule": "None",
+                         "cost": "Not a CR - BRD requirement offered out of the box (0 man-days)", "other": c[9],
+                         "tests": c[10], "priority": c[11], "feature": f"{g['feature']}: {g['ootb_status']}",
+                         "colour": f"Black (in the BRD; out of the box, {g['id']})", "status": "Closed",
+                         "decision": "Closed as a change request: BRD requirement (product owner decision of 11-Oct-2026), "
+                                     "offered by the iNXT BrokerVerse platform; no effort (sheet BRD covered - OOTB of "
+                                     "the CR Effort Estimate)", "approved": "", "ddate": "11-Oct-2026",
+                         "drop": "", "linked": ", ".join(data.cases_of_item(c[0])[:5])})
+            continue
         if no in BRD_OF:
             md = sum(g["effort"])
             rows.append({"no": no, "date": "09-Oct-2026", "by": "iorta TechNXT Project Team", "brd": g["brd"], "frs": c[0],
@@ -758,6 +771,9 @@ def scope_of(item: str) -> str:
     for x in V12["integration"] + (V12.get("data_migration") or []):
         if x.get("frrn") == item:
             return f"Beyond BRD - {x['scope']} ({x['id']})"
+    for g in V12.get("brd_ootb") or []:
+        if g.get("frrn") == item:
+            return f"BRD - offered out of the box, no effort ({g['id']}; was {g['cr']})"
     for d in V12.get("brd_deliver") or []:
         if d.get("frrn") == item:
             return f"BRD - item to deliver (was {d['id']}; {sum(d['effort']):.1f} man-days planning)"
@@ -820,6 +836,8 @@ def build_effort(data: Data):  # noqa: ARG001
              {"item": "High estimate (+20%)", "value": f"=B{first + 6}*(1+Accuracy)"},
              {"item": "Cost at the daily rate", "value": f"=B{first + 6}*DayRate"},
              {"item": "Green points (beyond the BRD, out of the box, no cost)", "value": len(V12["green"])},
+             {"item": "BRD requirements offered out of the box (black; in scope; no effort)",
+              "value": len(V12.get("brd_ootb") or [])},
              {"item": "Integration and Data Migration scope (not change requests)",
               "value": len(V12["integration"]) + len(V12.get("data_migration") or [])},
              {"item": "BRD items to deliver that were CR candidates (in the BRD; planning man-days, not in the CR total)",
@@ -842,6 +860,17 @@ def build_effort(data: Data):  # noqa: ARG001
         Column("cr", "Register", 12, "Candidate of the Change Request Register"),
         Column("cost", "Man-days", 10, "Zero: out of the box", kind="percent")], green,
         description="Points beyond the BRD that the iNXT BrokerVerse platform offers out of the box (green; no cost)")
+    covered = [{"id": g["id"], "frrn": g.get("frrn", "-"), "title": g["title"], "quote": g["quote"],
+                "feature": f"{g['feature']}: {g['ootb_status']}", "evidence": g["evidence"], "cr": g["cr"], "cost": 0}
+               for g in V12.get("brd_ootb") or []]
+    wb.sheet("BRD covered - OOTB", [
+        Column("id", "No.", 8, "Former green number"), Column("frrn", "FR item", 16, ""), Column("title", "Point", 44, ""),
+        Column("quote", "BRD line (quoted)", 60, "BRD, BRD-00 or programme-wide NFR"),
+        Column("feature", "Feature List ID / OOTB status", 20, "Feature List vs OOTB, column OOTB platform"),
+        Column("evidence", "OOTB evidence (iNXT BrokerVerse)", 50, "Screen or module of the platform edition"),
+        Column("cr", "Register", 12, "Closed candidate of the Change Request Register"),
+        Column("cost", "Man-days", 10, "Zero: BRD requirement offered out of the box", kind="percent")], covered,
+        description="BRD requirements (black in the FRS, in scope) that the iNXT BrokerVerse platform offers out of the box: no effort")
     integ = [{"id": x["id"], "frrn": x.get("frrn", "-"), "title": x["title"], "interface": x["interface"],
               "scope": x["scope"], "note": x["note"]} for x in V12["integration"] + (V12.get("data_migration") or [])]
     wb.sheet("Integration & DM scope", [

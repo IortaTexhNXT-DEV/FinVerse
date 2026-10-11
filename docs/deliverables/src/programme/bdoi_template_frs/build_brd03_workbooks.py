@@ -678,7 +678,9 @@ def write_estimate(wb, data: dict, version: str, frs_annex: str, scope_rows: lis
     green = [p for p in data["points"] if p["class"] == "ootb"]
 
     ref = "'CR Effort'!"
+    covered = [p for p in data["points"] if p["class"] == "brd"]
     summary = [{"k": "Points beyond the BRD available OOTB (green, no cost)", "v": len(green)},
+               {"k": "BRD requirements offered OOTB (black, in scope, no effort)", "v": len(covered)},
                {"k": "Change requests (orange)", "v": len(crs)}]
     summary += [{"k": f"Man-days: {h}", "v": f"=SUM({ref}{col}{first}:{col}{last})"}
                 for (_, h), col in zip(EST_ACT, act_cols)]
@@ -705,6 +707,16 @@ def write_estimate(wb, data: dict, version: str, frs_annex: str, scope_rows: lis
         [{"no": p["id"], "title": p["title"], "frs": p["frs"], "fl": p["fl"], "ev": p["ev"],
           "brd": "Not in BRD", "cost": 0} for p in green],
         description="Points beyond the BRD that the iNXT BrokerVerse OOTB platform provides (green): no cost")
+    wb.sheet("BRD covered - OOTB", [
+        Column("no", "No.", 8, "Former green point"), Column("title", "Point", 44, "The point of the FRS"),
+        Column("frs", "FRS reference", 16, "FR item or annex"),
+        Column("brd", "BRD line", 60, "The BRD line that asks for it (BRD, BRD-00 or programme-wide NFR)"),
+        Column("fl", "Feature List ID / OOTB status", 34, "Programme Feature List, column OOTB platform"),
+        Column("ev", "OOTB evidence", 40, "Screen or function of brokerverse-platform"),
+        Column("cost", "Effort (md)", 10, "Zero: offered OOTB", kind="number")],
+        [{"no": p["id"], "title": p["title"], "frs": p["frs"], "brd": p["brd_line"], "fl": p["fl"], "ev": p["ev"],
+          "cost": 0} for p in covered],
+        description="BRD requirements (black in the FRS, in scope) that the iNXT BrokerVerse OOTB platform provides: no change request, no effort")
     wb.sheet("Integration & DM scope", [
         Column("item", "Item", 34, "Interface or data load"), Column("scope", "Scope", 20, "Integration or Data Migration",
                                                                        values=["Integration scope", "Data Migration scope"]),

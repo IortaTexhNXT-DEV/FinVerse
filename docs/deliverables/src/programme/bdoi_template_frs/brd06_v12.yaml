@@ -62,6 +62,10 @@ green:
   feature: QPL-016
   ootb_status: Available
   evidence: Placement participants with insurer shares (Placement)
+# BRD requirements offered by the iNXT BrokerVerse platform out of the box (black; in scope; no effort). Former green
+# points that a BRD line asks for (product owner decision of 11-Oct-2026: BRD-00 and the programme-wide NFRs count, and
+# a point stays in the BRD where BDOI's FRS elaborates the BRD line).
+brd_ootb:
 - id: G-19
   frrn: FRRN.022.01
   title: Renewal Advice per line; first and last notice set by the system
@@ -73,6 +77,7 @@ green:
   feature: RNW-022
   ootb_status: Available
   evidence: Renewal Batch with first, second and final notices from templates (Operations > Renewals)
+  quote: "BRRN.010 \"Generate Renewal Advice (RA) ... Identify if RA is for first or second notice\"; acceptance: \"The system generates Renewal Advice (RA) for each selected account, using the latest BDOI-approved RA template\" and \"Each RA clearly displays whether it is a First Notice or Second Notice\""
 - id: G-23
   frrn: FRRN.043.01
   title: Audit Logs menu with filters and export
@@ -83,6 +88,7 @@ green:
   feature: RNW-037
   ootb_status: Available
   evidence: Audit trail module with filters (Administration > Audit)
+  quote: "BRD-00 User & Data Management, User access and record: \"audit logs are viewable/exportable\"; programme NFR 4.05 (Collections, Claims, ReInsurance addenda) \"Audit logs should be exportable\"; Renewal BRD BRRN.010 \"All actions ... are logged with user ID, timestamp, and affected account(s)\""
 orange:
 - id: CR-RN-005
   frrn: FRRN.042.01

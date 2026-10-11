@@ -520,6 +520,14 @@ class NewAnnexes:
                      "Man-days"], rows, [0.9, 0.9, 1.6, 3.0, 2.5, 0.6], size=7.5)
             a.p(f"Total planning effort of these BRD items: {btotal:.1f} man-days ({len(rows)} items); not in the change "
                 "request total.", size=9)
+            a.p("Black - BRD requirements offered out of the box (in scope; no effort)", bold=True, keep_next=True)
+            a.p("Points first listed as green that a BRD line asks for, read with BRD-00 and the programme-wide NFRs "
+                "(product owner decision of 11-Oct-2026). They are black and in scope; the iNXT BrokerVerse platform "
+                "offers them, so they need no change request and no delivery effort.", size=9)
+            orows = [[g["id"], g.get("frrn", "-"), g["title"], g["quote"], f"{g['feature']}: {g['ootb_status']}", "0.0"]
+                     for g in V12.get("brd_ootb") or []]
+            a.table(["No.", "FR item", "Point", "BRD line (quoted)", "Feature List / OOTB", "Man-days"], orows,
+                    [0.5, 0.9, 1.6, 3.4, 1.5, 0.6], size=7.5)
             b.stats["brd_items"] = len(rows)
             b.stats["brd_mandays"] = btotal
             lab = V12["labels"]

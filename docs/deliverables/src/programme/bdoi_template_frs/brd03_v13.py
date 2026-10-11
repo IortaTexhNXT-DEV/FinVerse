@@ -156,8 +156,8 @@ def how_to_read(b) -> None:
                 _colour(tr.findall(qn("w:tc"))[0], colours[x[0]], bold=True)
         els += [tbl, b.para("", space_after=0), b.para(h["after"])]
         n_cr, n_g = len(V13["crs"]), sum(1 for p in V13["points"] if p["class"] == "ootb")
-        els.append(b.para(f"In this version: {n_cr} change requests ({total_days():g} man-days in all) and {n_g} "
-                          "points beyond the BRD available OOTB in iNXT BrokerVerse; every line of the BRD is covered (Annex Y.4)."))
+        els.append(b.para(f"In this version: {n_cr} change request{'s' if n_cr != 1 else ''} ({total_days():g} man-days in all) and {n_g} point{'s' if n_g != 1 else ''} "
+                          "beyond the BRD available OOTB in iNXT BrokerVerse; every line of the BRD is covered (Annex Y.4)."))
     for e in els:
         anchor.addprevious(e)
 
@@ -212,7 +212,8 @@ def colour_points(b) -> Counter:
             target = _ancestor(p, "w:tr") if pt.get("scope") == "row" else p
             if target is None:
                 continue
-            _colour(target, GREEN if pt["class"] == "ootb" else ORANGE)
+            if pt["class"] != "brd":      # class brd: a BRD requirement offered OOTB, stays black
+                _colour(target, GREEN if pt["class"] == "ootb" else ORANGE)
             found[pt["id"]] += 1
     missing = [pt["id"] for pt in V13["points"] if not found[pt["id"]]]
     if missing:
@@ -260,6 +261,12 @@ def annex_y(a) -> None:
         rows = [[x["id"], x["title"], x["brd"], x["frs"], f"{x['md']:g}"] for x in DATA["brd_deliver"]]
         a.table(["No.", "Point", "BRD line that covers it", "FRS reference", "Planning man-days"], rows,
                 [0.65, 1.7, 2.6, 1.35, 0.7], size=7.5)
+        a.p("Points first listed as green that a BRD line asks for, read with BRD-00 and the programme-wide NFRs "
+            "(product owner decision of 11-Oct-2026): BRD requirements (black, in scope) that the iNXT BrokerVerse OOTB "
+            "platform offers, so they need no change request and no delivery effort.")
+        rows = [[p["id"], p["title"], p["brd_line"], p["frs"], p["fl"], "0"] for p in V13["points"] if p["class"] == "brd"]
+        a.table(["No.", "Point", "BRD line that covers it", "FRS reference", "Feature List / OOTB", "Man-days"], rows,
+                [0.5, 1.5, 2.4, 1.0, 1.1, 0.5], size=7.5)
         a.h2("Y.3 Points beyond the BRD available OOTB in iNXT BrokerVerse (green)")
         rows = [[p["id"], p["title"], p["frs"], p["fl"], "Available; no cost"] for p in V13["points"]
                 if p["class"] == "ootb"]
@@ -332,7 +339,7 @@ def change_summary(b) -> None:
         "(Figure 1); new section 1.5 'How to Read this Document' with the colour legend.",
         "Process Flow: the end-to-end process flow by actor and system opens section 4 (Figure 2), with the change "
         "requests tagged; the figures after it are numbered from Figure 3.",
-        f"Colour of the points not in the BRD: {s['green']} points in green (available OOTB in iNXT BrokerVerse) and the "
+        f"Colour of the points not in the BRD: {s['green']} point{'s' if s['green'] != 1 else ''} in green (available OOTB in iNXT BrokerVerse) and the "
         f"{s['crs']} change requests in orange where they are stated (FRPM items, Annexes M, P and T).",
         f"Annex T: rows T-18 to T-21 for the BRD lines and programme NFRs not yet listed ({s['brd_gaps']} gaps "
         "found in the BRD check). Annex X: one checklist point for the points beyond the BRD.",

@@ -246,7 +246,7 @@ def cr_annex(a):
     a.h2("AA.3 Beyond the BRD, offered by the iNXT BrokerVerse OOTB platform (no change request)")
     a.p("The points of this FRS that no BRD asks for and that the iNXT BrokerVerse OOTB platform offers, found in its "
         "code (column OOTB evidence) and Available in the Feature List vs OOTB (green in this document). They come at no cost; most sit "
-        "behind a setting that BDOI confirms (Annex M.10). Three of them were candidate change requests in the "
+        "behind a setting that BDOI confirms (Annex M.10). Two of them were candidate change requests in the "
         "register of version 1.3 and are closed there.")
     a.table(["No.", "Point", "FRS reference", "What BDOI gets", "Feature List / OOTB", "OOTB evidence (code)"],
             [[o[0], o[1], o[2], o[3], o[5], o[6]] for o in V14["ootb"]], [0.7, 1.1, 1.0, 2.2, 1.2, 1.6], size=7.5)
@@ -259,6 +259,12 @@ def cr_annex(a):
     rows = [[d["id"], d["title"], d["ref"], d["fl"], d["scope"], fmt(days(d["effort"]))] for d in V14["brd_to_deliver"]]
     a.table(["No.", "Item", "BRD reference", "Feature List / OOTB", "What is delivered", "Man-days"], rows,
             [0.75, 1.3, 1.4, 1.1, 2.3, 0.6], size=7.5)
+    a.p("Also BRD requirements, offered by the iNXT BrokerVerse OOTB platform (black in this document; in scope, no "
+        "effort): points first listed as beyond the BRD that a BRD line asks for, read with BRD-00 and the "
+        "programme-wide NFRs of the addenda (product owner decision of 11-Oct-2026). The OOTB platform offers them, "
+        "so they are delivered without a change request and without effort.")
+    a.table(["No.", "Point", "FRS reference", "BRD line", "What BDOI gets", "Feature List / OOTB"],
+            [[o[0], o[1], o[2], o[3], o[4], o[5]] for o in V14["brd_ootb"]], [0.7, 1.0, 0.9, 2.0, 1.6, 1.2], size=7.5)
     a.h2("AA.5 Covered by the Integration and Data Migration scope (not change requests)")
     a.p("The points of this FRS that are interfaces with BDOI's external systems (Microsoft Entra ID / EIAM sign-in, "
         "UIDM-ISC provisioning, any other interface) or data migration (BRD-13). They are labelled "
@@ -280,6 +286,7 @@ def cr_annex(a):
     colour_column(last_table(a), (0, 1, 2), COLOURS["blue"])
     b.stats["crs"] = len(V14["crs"])
     b.stats["ootb_items"] = len(V14["ootb"])
+    b.stats["brd_ootb_items"] = len(V14["brd_ootb"])
 
 
 def change_summary_points(e2e_no: int, nfr_rows: int) -> list[str]:

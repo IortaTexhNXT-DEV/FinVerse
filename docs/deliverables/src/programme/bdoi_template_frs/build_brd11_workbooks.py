@@ -560,12 +560,13 @@ def build_cr(data: Data) -> tuple[Path, dict]:
         elif no in closed:
             kind, ob, note, fl = closed[no]
             klass = {"OOTB": f"Offered by iNXT BrokerVerse OOTB ({ob}, green in the FRS)",
+                     "BRD-OOTB": f"BRD requirement, offered by iNXT BrokerVerse OOTB ({ob}, black in the FRS, no effort)",
                      "INT": f"Integration scope ({ob}, grey label in the FRS)",
                      "DM": f"Data Migration scope ({ob}, grey label in the FRS)"}.get(kind, "BRD requirement (black in the FRS)")
             row.update({"fl": fl, "built": "-", "klass": klass, "status": "Closed",
                         "decision": f"Not a change request (review of 11-Oct-2026): {note}", "ddate": "11-Oct-2026",
                         "cost": "None", "approved": "iorta TechNXT Project Team (for BDOI confirmation)"})
-            if kind == "BRD":
+            if kind in ("BRD", "BRD-OOTB"):
                 row["brd"] = note.split(": ", 1)[1].split(" (")[0] if ": " in note else row["brd"]
         else:
             raise SystemExit(f"{no} is neither a change request nor closed in brd11_v14.yaml")
@@ -652,6 +653,8 @@ def build_effort(data: Data) -> tuple[Path, dict]:
                     "note": "Cost appears when the day rate is entered on the sheet Assumptions"})
     summary.append({"item": f"Points beyond the BRD offered by iNXT BrokerVerse OOTB ({len(V['ootb'])})", "days": 0, "low": 0,
                     "high": 0, "cost": 0, "note": "No change request, no cost (sheet Beyond the BRD - OOTB)"})
+    summary.append({"item": f"BRD requirements offered by iNXT BrokerVerse OOTB ({len(V['brd_ootb'])}, in scope)", "days": 0,
+                    "low": 0, "high": 0, "cost": 0, "note": "BRD-covered, no effort (sheet BRD covered - OOTB)"})
     summary.append({"item": f"BRD requirements to deliver ({len(V['brd_to_deliver'])}, in scope)",
                     "days": f"=SUM('BRD items to deliver'!I{first}:I{first + len(V['brd_to_deliver']) - 1})",
                     "low": "", "high": "", "cost": "Not charged", "note": "For planning only (FRS Annex AA.4)"})
@@ -731,6 +734,17 @@ def build_effort(data: Data) -> tuple[Path, dict]:
     for r in range(first, first + len(green)):
         ws[f"A{r}"].font = gfont
         ws[f"B{r}"].font = gfont
+    # ---------------------------------------------------------------- BRD requirements offered by OOTB (no effort)
+    covered = [{"no": o[0], "point": o[1], "frs": o[2], "brd": o[3], "what": o[4], "ootb": "Offered by OOTB",
+                "fl": o[5], "evidence": o[6], "cost": 0} for o in V["brd_ootb"]]
+    wb.sheet("BRD covered - OOTB", [
+        Column("no", "No.", 10, "Former OB-UA-nn"), Column("point", "Point", 30, ""), Column("frs", "FRS reference", 24, ""),
+        Column("brd", "BRD line", 60, "The BRD line that asks for it (BRD, BRD-00 or programme-wide NFR)"),
+        Column("what", "What BDOI gets", 50, ""), Column("ootb", "OOTB status", 18, ""),
+        Column("cost", "Effort (man-days)", 12, "Offered by OOTB: no effort", kind="number"),
+        Column("fl", "Feature List ID / OOTB status", 34, "Row of the Feature List vs OOTB workbook (column OOTB platform)"),
+        Column("evidence", "OOTB evidence", 44, "Screen or function of the OOTB platform")],
+        covered, description="BRD requirements (black in the FRS, in scope) that the iNXT BrokerVerse OOTB platform offers: no change request, no effort (FRS Annex AA.4)")
     # ---------------------------------------------------------------- BRD items to deliver
     due = []
     for i, t in enumerate(V["brd_to_deliver"]):
@@ -850,6 +864,9 @@ def build_rtm(data: Data) -> tuple[Path, dict]:
     for o in v14.V14["ootb"]:
         for it in FRUM_RE.findall(o[2]):
             marks[it].append(f"{o[0]} (offered by iNXT BrokerVerse OOTB)")
+    for o in v14.V14["brd_ootb"]:
+        for it in FRUM_RE.findall(o[2]):
+            marks[it].append(f"{o[0]} (BRD requirement, offered by iNXT BrokerVerse OOTB, no effort)")
     item_rows = []
     for it in data.items:
         ids = data.cases_of_item(it["id"])
@@ -882,7 +899,7 @@ def build_rtm(data: Data) -> tuple[Path, dict]:
         Column("steps", "Walkthrough steps", 26, "Steps of the walkthrough users workbook")],
         trace_rows, description="BRD ID -> FR item -> test cases -> screen -> walkthrough step")
     wb.sheet("FR items", [Column("id", "FR item", 16, ""), Column("title", "Title", 44, ""), Column("origin", "Origin", 16, ""),
-                          Column("beyond", "Beyond the BRD (FRS v1.4 colour code)", 30, "CR-UA-nnn: change request (orange); OB-UA-nn: offered by iNXT BrokerVerse OOTB (green); IS-UA-nn: integration scope"),
+                          Column("beyond", "Beyond the BRD (FRS v1.4 colour code)", 30, "CR-UA-nnn: change request (orange); OB-UA-nn: offered by iNXT BrokerVerse OOTB (green, or a BRD requirement when so marked); IS-UA-nn: integration scope"),
                           Column("ac", "Acceptance criteria", 12, ""), Column("n", "Test cases", 10, ""),
                           Column("cases", "Test case IDs", 70, "")],
              item_rows, description="Every FR item of the FRS v1.4 with its test cases")

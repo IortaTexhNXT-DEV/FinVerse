@@ -508,7 +508,7 @@ def build_fitgap() -> tuple[Path, list[dict]]:
         Column("id", "BRD ID", 11, "Requirement ID of the BRD"),
         Column("text", "BRD requirement", 40, "Text of the BRD (as in the Business Requirements Mapping)"),
         Column("frpm", "FRPM items", 18, "Functional requirements of the FRS v1.3"),
-        Column("ootb", "What the platform offers out of the box", 45, "Standard capability of the base platform "
+        Column("ootb", "What iNXT BrokerVerse offers out of the box", 45, "Standard capability of the base platform "
                "(programme Feature List)"),
         Column("bibs", "What BIBS offers for BDOI", 42, "Capability and configuration of BIBS for this BRD"),
         Column("best", "Insurance-broking best practice", 42, "Philippine market and international broking practice"),
@@ -608,113 +608,171 @@ def build_cr(b) -> tuple[Path, int, int]:
     return path, len(rows), len(obs)
 
 
-# ======================================================================================= 3b. CR effort estimate
-ACTIVITIES = ["Analysis & design", "Backend", "Frontend", "Testing", "Documentation / UAT support"]
-ACT_KEYS = ("a", "b", "f", "t", "d")
-ACT_COLS = ("J", "K", "L", "M", "N")
+# ------------------------------------------------------------------------------------------ CR effort estimate
+EST_ACT = [("a", "Analysis & design"), ("b", "Backend"), ("f", "Frontend"), ("t", "Testing"),
+           ("d", "Documentation / UAT support")]
 
 
-def build_estimate() -> tuple[Path, float]:
-    """BIBS_CR_BRD-03_Effort_Estimate: one row per change request (orange point of the FRS, Annex Y.2) with its
-    effort by activity, a summary, the green points (no cost) and the assumptions with the day rate that turns
-    man-days into cost by formula."""
-    crs = V13["crs"]
-    wb = Book("Change Request Effort Estimate", doc_type="Estimate", brd="BRD-03", version="1.0",
-              date="11 October 2026", subtitle="BRD-03 Product Maintenance – change requests of the FRS v1.3 "
-                                                "(orange points) with their effort")
+def _fitgap_to_deliver(path: Path) -> list[dict]:
+    """The BRD requirements whose fit is not 'Fit' in the pack fit-gap workbook: delivery work in scope."""
+    wb = openpyxl.load_workbook(path, read_only=True)
+    rows = list(wb["Fit-Gap"].iter_rows(values_only=True))
+    wb.close()
+    hi = next(i for i, r in enumerate(rows) if r and r[0] == "BRD ID")
+    head = [str(h or "") for h in rows[hi]]
+    fit = head.index("Fit")
+    ootb = next(i for i, h in enumerate(head) if "out of the box" in h.lower())
+    text = 1
+    return [{"brd": r[0], "text": r[text], "fit": r[fit], "ootb": r[ootb]} for r in rows[hi + 1:]
+            if r and r[0] and r[fit] and r[fit] != "Fit"]
+
+
+def write_estimate(wb, data: dict, version: str, frs_annex: str, scope_rows: list[dict], fitgap: Path, out: Path):
+    """BIBS_CR_BRD-0n_Effort_Estimate (rules v2 of the product owner): Summary; CR Effort (orange only); Beyond the
+    BRD - OOTB (green); Integration & Data Migration scope; Best practice (blue); BRD items to deliver; Assumptions.
+    One man-day = 8 hours; range plus or minus 20%; cost = man-days x the day rate cell of Assumptions."""
+    crs = data["crs"]
     first, last = 5, 5 + len(crs) - 1
+    act_cols = ["M", "N", "O", "P", "Q"]
     rows = []
     for i, c in enumerate(crs):
         r = first + i
         row = {"no": c["cr"], "title": c["title"], "frs": c["frs"], "brd": c["brd"],
                "kind": "Extends a BRD requirement" if c["tag"] == "EXT" else "Not in any BRD", "source": c["source"],
-               "why": c["why"], "ootb": c["ootb"], "basis": c["basis"]}
-        row.update(dict(zip(ACT_KEYS, c["md"])))
-        row.update({"total": f"=SUM(J{r}:N{r})", "low": f"=ROUND(O{r}*(1-Assumptions!$B$6),1)",
-                    "high": f"=ROUND(O{r}*(1+Assumptions!$B$6),1)", "cost": f"=O{r}*Assumptions!$B$7",
+               "why": c["why"], "fl": c["fl"], "ev": c["ev"], "built": c["built"], "ootb": c["ootb"],
+               "basis": c["basis"]}
+        row.update({k: v for (k, _), v in zip(EST_ACT, c["md"])})
+        row.update({"total": f"=SUM(M{r}:Q{r})", "low": f"=ROUND(R{r}*(1-Assumptions!$B$6),1)",
+                    "high": f"=ROUND(R{r}*(1+Assumptions!$B$6),1)", "cost": f"=R{r}*Assumptions!$B$7",
                     "cx": c["complexity"], "prio": c["priority"], "deps": c["deps"], "ass": c["assumptions"]})
         rows.append(row)
     total = {"no": "Total", "title": f"{len(crs)} change requests"}
-    total.update({k: f"=SUM({col}{first}:{col}{last})" for k, col in zip(ACT_KEYS, ACT_COLS)})
-    total.update({"total": f"=SUM(O{first}:O{last})", "low": f"=SUM(P{first}:P{last})",
-                  "high": f"=SUM(Q{first}:Q{last})", "cost": f"=SUM(R{first}:R{last})"})
+    total.update({k: f"=SUM({col}{first}:{col}{last})" for (k, _), col in zip(EST_ACT, act_cols)})
+    total.update({"total": f"=SUM(R{first}:R{last})", "low": f"=SUM(S{first}:S{last})",
+                  "high": f"=SUM(T{first}:T{last})", "cost": f"=SUM(U{first}:U{last})"})
     rows.append(total)
     num = dict(kind="number", wrap=False)
-    cols = [Column("no", "CR No.", 11, "Change request number (also in the CR register and FRS Annex Y.2)"),
-            Column("title", "Title", 30, "The change"), Column("frs", "FRS reference", 20, "FRPM item or annex row"),
+    cols = [Column("no", "CR No.", 12, f"Change request (FRS {frs_annex}.2 and the CR register)"),
+            Column("title", "Title", 30, "The change"),
+            Column("frs", "FRS reference", 22, "FR item or annex row"),
             Column("brd", "BRD reference", 15, "BRD ID it extends, or 'Not in BRD'"),
             Column("kind", "BRD relation", 16, "Extends a BRD requirement / Not in any BRD",
                    values=["Extends a BRD requirement", "Not in any BRD"]),
-            Column("source", "Source", 26, "Where the point comes from"),
-            Column("why", "Why needed", 40, "Business reason"),
-            Column("ootb", "OOTB status (BIBS today)", 40, "What the platform offers today"),
-            Column("basis", "Estimate basis", 30, "Size of the platform parts the change touches"),
-            Column("a", "Analysis & design (md)", 10, "Man-days", **num),
-            Column("b", "Backend (md)", 10, "Man-days", **num), Column("f", "Frontend (md)", 10, "Man-days", **num),
-            Column("t", "Testing (md)", 10, "Man-days", **num),
-            Column("d", "Documentation / UAT support (md)", 12, "Man-days", **num),
-            Column("total", "Total (md)", 10, "Sum of the activities", **num),
-            Column("low", "Low (-20%)", 9, "Total less the range", **num),
-            Column("high", "High (+20%)", 9, "Total plus the range", **num),
-            Column("cost", "Cost (PHP)", 13, "Total x day rate (Assumptions)", kind="amount", wrap=False),
-            Column("cx", "Complexity", 11, "Low / Medium / High", values=["Low", "Medium", "High"]),
-            Column("prio", "Priority", 10, "High / Medium / Low", values=["High", "Medium", "Low"], status=True),
-            Column("deps", "Dependencies", 26, "What the change needs first"),
-            Column("ass", "Assumptions", 34, "Scope assumed by the estimate")]
-    ref = "'Change requests'!"
-    summary = [{"k": "Change requests (orange points of the FRS)", "v": len(crs)},
-               {"k": "  of which extend a BRD requirement", "v": sum(1 for c in crs if c["tag"] == "EXT")},
-               {"k": "  of which are not in any BRD", "v": sum(1 for c in crs if c["tag"] != "EXT")}]
-    summary += [{"k": f"Man-days: {a}", "v": f"=SUM({ref}{col}{first}:{col}{last})"}
-                for a, col in zip(ACTIVITIES, ACT_COLS)]
-    summary += [{"k": "Total man-days", "v": f"=SUM({ref}O{first}:O{last})"},
-                {"k": "Range low (-20%)", "v": f"=SUM({ref}P{first}:P{last})"},
-                {"k": "Range high (+20%)", "v": f"=SUM({ref}Q{first}:Q{last})"},
-                {"k": "Cost in PHP at the day rate of the Assumptions sheet", "v": f"=SUM({ref}R{first}:R{last})"},
-                {"k": "Points beyond the BRD available in BIBS (green, no cost)",
-                 "v": sum(1 for p in V13["points"] if p["class"] == "ootb")}]
-    wb.sheet("Summary", [Column("k", "Item", 60, "What is counted"),
+            Column("source", "Where the point comes from", 26, "Document and section"),
+            Column("why", "Why needed", 38, "Business reason"),
+            Column("fl", "Feature List ID / OOTB status", 34, "Programme Feature List, column OOTB platform"),
+            Column("ev", "OOTB evidence", 34, "Screen or function of brokerverse-platform, or 'not found'"),
+            Column("built", "Prepared for BIBS?", 26, "Yes / No / Partly, with what was done for BIBS in this project "
+                                                   "(the effort is given anyway: the value of the change request)"),
+            Column("ootb", "Effort covers", 34, "For a Partial feature: the missing part only"),
+            Column("basis", "Estimate basis", 28, "Size of the platform parts the change touches")]
+    cols += [Column(k, f"{h} (md)", 10, "Man-days", **num) for k, h in EST_ACT]
+    cols += [Column("total", "Total (md)", 10, "Sum of the activities", **num),
+             Column("low", "Low (-20%)", 9, "Total less the range", **num),
+             Column("high", "High (+20%)", 9, "Total plus the range", **num),
+             Column("cost", "Cost (PHP)", 13, "Total x day rate (Assumptions)", kind="amount", wrap=False),
+             Column("cx", "Complexity", 11, "Low / Medium / High", values=["Low", "Medium", "High"]),
+             Column("prio", "Priority", 10, "High / Medium / Low", values=["High", "Medium", "Low"]),
+             Column("deps", "Dependencies", 26, "What the change needs first"),
+             Column("ass", "Assumptions", 34, "Scope assumed by the estimate")]
+    green = [p for p in data["points"] if p["class"] == "ootb"]
+
+    ref = "'CR Effort'!"
+    summary = [{"k": "Points beyond the BRD available OOTB (green, no cost)", "v": len(green)},
+               {"k": "Change requests (orange)", "v": len(crs)}]
+    summary += [{"k": f"Man-days: {h}", "v": f"=SUM({ref}{col}{first}:{col}{last})"}
+                for (_, h), col in zip(EST_ACT, act_cols)]
+    summary += [{"k": "Total change request man-days", "v": f"=SUM({ref}R{first}:R{last})"},
+                {"k": "Range low (-20%)", "v": f"=SUM({ref}S{first}:S{last})"},
+                {"k": "Range high (+20%)", "v": f"=SUM({ref}T{first}:T{last})"},
+                {"k": "Cost in PHP at the day rate of the Assumptions sheet", "v": f"=SUM({ref}U{first}:U{last})"},
+                {"k": "Items covered by the Integration or Data Migration scope (no CR cost)", "v": len(scope_rows)},
+                {"k": "Best-practice recommendations (blue; indicative, not in the CR total)",
+                 "v": len(data["best_practice"])},
+                {"k": "Best-practice indicative man-days (not in the CR total)",
+                 "v": sum(r[4] for r in data["best_practice"])}]
+    wb.sheet("Summary", [Column("k", "Item", 70, "What is counted"),
                          Column("v", "Value", 16, "Count, man-days or cost", kind="number")], summary,
-             description="Totals of the change requests of the FRS BRD-03 v1.3 (Annex Y)")
-    wb.sheet("Change requests", cols, rows,
-             description="One row per orange point of the FRS v1.3 (Annex Y.2), effort in man-days by activity")
-    green = [{"no": p["id"], "title": p["title"], "frs": p["frs"], "where": p["where"], "brd": "Not in BRD",
-              "status": "Available in BIBS", "cost": 0} for p in V13["points"] if p["class"] == "ootb"]
-    wb.sheet("Green items (OOTB)", [
-        Column("no", "No.", 8, "Point number (FRS Annex Y.3)"), Column("title", "Point", 46, "The point of the FRS"),
-        Column("frs", "FRS reference", 14, "FRPM item"), Column("where", "Where in BIBS", 34, "Screen or function"),
-        Column("brd", "BRD reference", 12, "Not in the BRD"), Column("status", "OOTB status", 18, "Available"),
-        Column("cost", "Cost (md)", 10, "Zero: no development", kind="number")], green,
-        description="Points of the FRS beyond the BRD that BIBS already provides (green in the FRS): no cost")
-    ws = wb.free("Assumptions", "Man-day, range and day rate used by the formulas")
+             description=f"Totals of the points beyond the BRD of the FRS v{version} ({frs_annex})")
+    wb.sheet("CR Effort", cols, rows,
+             description=f"One row per orange point of the FRS v{version} ({frs_annex}.2), effort in man-days")
+    wb.sheet("Beyond the BRD - OOTB", [
+        Column("no", "No.", 8, f"Point ({frs_annex}.3)"), Column("title", "Point", 44, "The point of the FRS"),
+        Column("frs", "FRS reference", 16, "FR item or annex"),
+        Column("fl", "Feature List ID / OOTB status", 34, "Programme Feature List, column OOTB platform"),
+        Column("ev", "OOTB evidence", 40, "Screen or function of brokerverse-platform"),
+        Column("brd", "BRD reference", 12, "Not in the BRD"), Column("cost", "Cost (md)", 10, "Zero", kind="number")],
+        [{"no": p["id"], "title": p["title"], "frs": p["frs"], "fl": p["fl"], "ev": p["ev"],
+          "brd": "Not in BRD", "cost": 0} for p in green],
+        description="Points beyond the BRD that the iNXT BrokerVerse OOTB platform provides (green): no cost")
+    wb.sheet("Integration & DM scope", [
+        Column("item", "Item", 34, "Interface or data load"), Column("scope", "Scope", 20, "Integration or Data Migration",
+                                                                       values=["Integration scope", "Data Migration scope"]),
+        Column("what", "What", 60, "What is exchanged or loaded"), Column("where", "Where in the FRS", 22, "Annex")],
+        scope_rows, description="Covered by the Integration scope or the Data Migration scope (BRD-13): no CR cost here")
+    wb.sheet("Best practice (blue)", [
+        Column("id", "ID", 11, "Best practice"), Column("practice", "Practice", 60, "Insurance-broking practice"),
+        Column("why", "Why it matters for a broker", 60, "Philippine market where relevant"),
+        Column("prio", "Suggested priority", 12, "High / Medium / Low", values=["High", "Medium", "Low"]),
+        Column("md", "Indicative man-days", 12, "Indicative; not in the CR total", kind="number")],
+        [{"id": r[0], "practice": r[1], "why": r[2], "prio": r[3], "md": r[4]} for r in data["best_practice"]],
+        description=f"Not in the BRD, the FRS or the OOTB platform: recommendations ({frs_annex}.6), not commitments")
+    wb.sheet("BRD items to deliver", [
+        Column("brd", "BRD ID", 12, "BRD requirement"), Column("text", "BRD requirement", 60, "Text of the BRD"),
+        Column("fit", "Fit", 16, "Fit class of the fit-gap workbook"),
+        Column("ootb", "What iNXT BrokerVerse offers out of the box", 60, "OOTB capability")],
+        _fitgap_to_deliver(fitgap),
+        description="BRD requirements not fully met by the OOTB platform: in-scope delivery work for planning, not CRs")
+    ws = wb.wb.create_sheet("Assumptions")
+    ws.sheet_view.showGridLines = False
+    wb._sheets.append(_SheetInfo(ws.title, "Man-day, range and day rate used by the formulas", [], 0))
     ws["A1"] = "Assumptions"
     ws["A1"].font = Font(name=brand.FONT, size=14, bold=True, color=brand.HEADER_BLUE)
+    thin = Side(style="thin", color=brand.BORDER)
+    box = Border(left=thin, right=thin, top=thin, bottom=thin)
     for col, head in zip("ABC", ("Item", "Value", "Note")):
         cell = ws[f"{col}3"]
         cell.value = head
         cell.font = Font(name=brand.FONT, size=10, bold=True, color=brand.WHITE)
         cell.fill = PatternFill("solid", fgColor=brand.HEADER_BLUE)
-    data = [("Hours in a man-day", 8, "One man-day (md) = 8 working hours"),
-            ("Currency", "PHP", "Philippine peso"),
-            ("Estimate range (plus or minus)", 0.2, "Each total is an estimate within plus or minus 20%"),
-            ("Day rate (PHP per man-day)", None, "Enter the agreed day rate; the cost columns follow by formula"),
-            ("Basis", "Platform size", "Effort estimated from the size of the platform parts each change touches "
-                                       "(services, screens, notices) and a similar existing function"),
-            ("Activities", 5, "Analysis & design, backend, frontend, testing, documentation / UAT support"),
-            ("Excluded", "-", "BDOI decisions and inputs, BDOI testing time, data migration, infrastructure"),
-            ("Validity", "30 days", "Estimated again if the scope of a change request changes")]
-    for i, (k, v, n) in enumerate(data, start=4):
+    items = [("Hours in a man-day", 8, "One man-day (md) = 8 working hours"),
+             ("Currency", "PHP", "Philippine peso"),
+             ("Estimate range (plus or minus)", 0.2, "Each total is an estimate within plus or minus 20%"),
+             ("DayRate (PHP per man-day)", None, "Enter the agreed day rate; the cost columns follow by formula"),
+             ("OOTB baseline", "brokerverse-platform", "iNXT BrokerVerse OOTB platform (brokerverse-platform), with the programme "
+                                                       "Feature List (column OOTB platform) as a cross-check"),
+             ("Basis", "Platform size", "Effort from the size of the platform parts each change touches and a "
+                                        "similar existing function; for a Partial feature, the missing part only"),
+             ("Not change requests", "-", "BRD requirements (in scope), Integration scope and Data Migration scope "
+                                          "items, best-practice recommendations"),
+             ("Excluded", "-", "BDOI decisions and inputs, BDOI testing time, infrastructure"),
+             ("Validity", "30 days", "Estimated again if the scope of a change request changes")]
+    for i, (k, v, n) in enumerate(items, start=4):
         for c, val in enumerate((k, v, n), start=1):
             cell = ws.cell(row=i, column=c, value=val)
             cell.font = Font(name=brand.FONT, size=10)
             cell.alignment = Alignment(wrap_text=True, vertical="top")
-            cell.border = BOX
+            cell.border = box
     ws["B6"].number_format = "0%"
     ws["B7"].number_format = "#,##0.00"
     ws["B7"].fill = PatternFill("solid", fgColor="FFF59D")
-    for col, w in zip("ABC", (34, 16, 80)):
+    for col, w in zip("ABC", (34, 20, 80)):
         ws.column_dimensions[col].width = w
-    path = wb.save(OUT_DIR / "BIBS_CR_BRD-03_Effort_Estimate_v1.0.xlsx")
+    return wb.save(out)
+
+
+def build_estimate() -> tuple[Path, float]:
+    """BIBS_CR_BRD-03_Effort_Estimate (see write_estimate)."""
+    wb = Book("Change Request Effort Estimate", doc_type="Estimate", brd="BRD-03", version="1.0",
+              date="11 October 2026", subtitle="BRD-03 Product Maintenance – points beyond the BRD of the FRS v1.3: "
+                                                "change requests with their effort")
+    scope = [{"item": f"{x[0]} {x[1]}", "scope": "Integration scope", "what": x[3], "where": "FRS Annex S"}
+             for x in V12["integrations"]["items"]]
+    scope += [{"item": x[0], "scope": "Data Migration scope", "what": x[1], "where": "FRS Annex U"}
+              for x in V12["data_setup"]["items"]]
+    path = write_estimate(wb, V13, "1.3", "Annex Y", scope,
+                          OUT_DIR / "BIBS_FitGap_BRD-03_BRD_vs_OOTB_vs_Best_Practice_v1.0.xlsx",
+                          OUT_DIR / "BIBS_CR_BRD-03_Effort_Estimate_v1.0.xlsx")
     return path, v13.total_days()
 
 

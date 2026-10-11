@@ -1,0 +1,140 @@
+# Operations Cashiering FRS in BDOI's template, version 3.3: the content of this round. Read by brd02_v33.py and
+# build_brd02_workbooks.py. Same layout as brd03_v13.yaml (see there for the meaning of each key).
+
+revision_row: ["11 Oct 2026", "3.3", "Simplified and end-to-end swimlane process flows; colour coding of the points not in the BRD (green: available in the iNXT BrokerVerse OOTB edition; orange: change request); Appendix W with the change requests and their effort, the points beyond the BRD available OOTB in iNXT BrokerVerse and the check of the BRD non-functional lines; Appendix O: BRD maintenance and disaster lines and programme NFRs 10.07 and 4.03 added, peak hours aligned with the BRD", "iorta TechNXT Project Team (drafting support)"]
+
+intro_note: "Version 3.3 adds the simplified process flow (Figure 1, section 1.4) and the end-to-end process flow by actor and system (Figure 2, Appendix C) with the change requests marked; it colours the points of this FRS that are not requirements of the BRD (section 1.5); it adds Appendix W with the change requests and their effort, the points beyond the BRD that the iNXT BrokerVerse OOTB edition already provides, and the check of the non-functional lines of the BRD. BDOI's text and the content of version 3.2 are otherwise unchanged."
+
+how_to_read:
+  title: How to Read this Document
+  intro: "Most of this FRS states requirements of the Operations BRD for Cashiering (BRQID and CSHID IDs, and its non-functional table) or of the programme-wide non-functional requirements of the BDOI addenda. BDOI's own text (version 3.1) is kept word for word. Where version 3.2 or 3.3 states a point that is not a BRD requirement, the point is coloured where it is stated, so that the Business Unit sees at once what goes beyond the BRD and whether it costs anything. Out of the box (OOTB) means the iNXT BrokerVerse OOTB platform (brokerverse-platform), checked against the platform itself with the programme Feature List as a cross-check, not the work done for BDOI in this project:"
+  legend:
+    - [black, "Black text", "A BRD requirement, BDOI's own FRS text, or the detail needed to meet a BRD requirement.", "In scope"]
+    - [green, "Green text", "Not in the BRD, and available out of the box in the iNXT BrokerVerse OOTB platform. No development needed; the Business Unit may keep or drop it.", "No cost; listed in Appendix W.3"]
+    - [grey, "[Integration scope] / [Data Migration scope]", "Grey label on an interface with another system or on a data load at go-live: covered by the Integration scope or the Data Migration scope (BRD-13), not a change request.", "Listed in Appendix W.5"]
+    - [blue, "Blue table", "Insurance-broking best practice for this area that is not in the BRD, this FRS or the OOTB platform: a recommendation with an indicative effort, not a commitment.", "Appendix W.6; not in the change request total"]
+    - [orange, "Orange text", "Not in the BRD and not available, or only partly available, in the iNXT BrokerVerse OOTB platform edition: a change request (CR-CSH-1nn), even where it was already delivered for BIBS in this project. It is delivered only if the Business Unit approves it.", "Effort in Appendix W.2 and the CR effort workbook"]
+  after: "In the end-to-end process flow (Figure 2, Appendix C) the change requests are tagged: yellow for a change request not in any BRD, blue for a change request that extends a BRD requirement, green for a point that is already a BRD requirement (the programme NFRs 10.07 and 4.03). The walkthroughs and screenshots use the BIBS DEV environment: https://dev.brokerverse.cloud."
+
+figures:
+  simple: {png: csh_simple, caption: "Operations Cashiering – simplified process flow (swimlanes by actor, stages across)", read: "Each lane is an actor or system and the columns are the stages of a payment, from its receipt to the reports. The end-to-end flow with every unit and the change requests is Figure 2 (Appendix C); each process is drawn in detail in Appendix C.", brd: "BRQID and CSHID IDs of the Cashiering scope"}
+  e2e: {id: brd02_fig_e2e_swimlane, png: csh_e2e, caption: "End-to-end process flow of Operations Cashiering (all actors and systems)", read: "The lanes are the payors and channels, the Cashier, the Approver / Poster, BIBS, Marketing, the accounting units, Disbursement and the reports and audit; the tags name the change requests of Appendix W.2 (blue: extends a BRD requirement; yellow: not in any BRD) and the programme NFRs that are BRD requirements (green). The figures that follow draw each process in detail.", brd: "BRQID and CSHID IDs of the Cashiering scope; programme NFRs 10.07 and 4.03"}
+
+nfr_fix:
+  CSH-NFR-06: ["CSH-NFR-06", "Peak", "15th and 30th of the month; peak hours 08:00-17:30", "Runs scheduled outside the peak hours (Appendix M)", "FRS.CSH.10.03", "NFR-CAP-05, NFR-PRF-07"]
+
+nfr_add:
+  - ["CSH-NFR-15", "Maintenance", "As per bank standard", "Planned maintenance within the maintenance windows of the bank standard; users told in advance", "-", "NFR-AVL-03"]
+  - ["CSH-NFR-16", "Disaster", "Business continuity threshold: RTO 4 hours, RPO 24 hours", "Programme disaster recovery; the targets of CSH-NFR-08 apply", "-", "NFR-REC-01, NFR-REC-02"]
+  - ["CSH-NFR-17", "Sessions", "Programme NFR 10.07 (Collections addendum): one session per device", "A second sign-in on another device ends the first (User Access Maintenance FRS)", "FRS.CSH.01.02", "NFR 10.07"]
+  - ["CSH-NFR-18", "Audit source", "Programme NFR 4.03 (CLM, CLXN, RI addenda): source / IP address in the audit log", "The audit log records the workstation / IP address of every action", "FRS.CSH.08.03", "NFR 4.03"]
+
+points:
+  # Classified against the code of the iNXT BrokerVerse OOTB platform (brokerverse-platform), with the programme
+  # Feature List as a cross-check. Green = not in the BRD and available OOTB; orange = not in the BRD and partial or
+  # not available OOTB. The run report of each automatic payment run is a BRD requirement (BRQID.006) and stays black.
+  # The payment channel simulator of SIT and UAT is an interface tool: Integration scope (grey label).
+  # ---- green
+  - {id: G-01, class: ootb, frs: "FRS.CSH.09.02.10; Appendix M", fl: "RPT-007 Available (user-scheduled reports with recipients)", ev: "Reports > Schedules: timing, format and recipients", match: "Daily, after the close of the business day (proposed 18:30); on demand", title: "Scheduled daily run of the Daily Cash Reconciliation Reports", where: "Report schedules"}
+  - {id: G-01b, class: ootb, frs: "FRS.CSH.09.02.11; Appendix M", fl: "RPT-007 Available (user-scheduled reports with recipients)", ev: "Reports > Schedules: timing, format and recipients", match: "On demand; weekly (proposed Monday 08:00)", title: "Scheduled weekly run of the Unapplied Premium Payment Transaction report", where: "Report schedules"}
+  # ---- orange: change requests
+  - {id: CR-CSH-101, class: cr, match: "Proposed: posted the same business day"}
+  - {id: CR-CSH-101b, class: cr, match: "Proposed: posted within 1 working day"}
+  - {id: CR-CSH-101c, class: cr, match: "Proposed: disposition assigned within 2 working days"}
+  - {id: CR-CSH-101d, class: cr, match: "Proposed: decided within 1 working day"}
+  - {id: CR-CSH-101e, class: cr, match: "Proposed: 1 working day", exact: true}
+  - {id: CR-CSH-102, class: cr, match: "The e-mail addresses of the failed-run recipients setting"}
+  - {id: CR-CSH-103, class: cr, match: "The system shall let the user filter each list by status, receipt type, branch and date range and export the list to Excel."}
+  - {id: CR-CSH-104, class: cr, match: "the user may also choose an e-mail copy on Notification Settings"}
+
+crs:
+  - cr: CR-CSH-101
+    ev: "not found for receipts: deadlines exist for claims, leads and collections only"
+    title: "Time rules of the Cashiering stages: overdue marker and reminder"
+    frs: "Appendix J (time rules); FRS.CSH.02.05, FRS.CSH.03.01, FRS.CSH.04.01, FRS.CSH.06.02"
+    brd: "Not in BRD"
+    tag: NEW
+    fl: "WFL-007 Partial (deadlines and escalation for claims, complaints, leads and collections; no general turnaround engine)"
+    built: "No: BIBS shows the records For Posting and For Approval with their age, without a time rule"
+    source: "FRS v3.2 Appendix J (times proposed by iorta TechNXT; the BRD and BDOI's FRS set no time)"
+    why: "Records waiting for posting or approval are visible on the dashboard but nothing marks them late; a time rule per stage with a marker and a reminder keeps receipts issued the same day."
+    ootb: "Partial in BrokerVerse OOTB; the effort covers the missing part only: time rules, overdue marker and reminder for the Cashiering stages."
+    md: [1.0, 2.5, 1.0, 1.5, 0.5]
+    complexity: Medium
+    priority: Medium
+    deps: "BDOI to confirm the times (Appendix R, Appendix S)"
+    assumptions: "Four stages (posting, cancellation / reinstatement posting, disposition, approval); times as parameters; one reminder to the poster or approver; no escalation."
+    basis: "Turnaround parts of the platform reused; Cashiering decision services and dashboard counts extended."
+  - cr: CR-CSH-102
+    ev: "My Work: count of failed jobs; no e-mail to a recipient list"
+    title: "E-mail to a recipient list when a scheduled Cashiering run fails"
+    frs: "FRS.CSH.10.03; Appendix G (failed batch run)"
+    brd: "BRQID.006 (extends)"
+    tag: EXT
+    fl: "WFL-013 Partial (a failed job raises an in-app notification to the schedule administrators; no e-mail to a recipient list)"
+    built: "Yes: the e-mail to the failed-run recipients setting was prepared for BIBS in this project"
+    source: "FRS v3.2 Appendix G (failed batch run notice and its recipients)"
+    why: "The BRD asks that users are alerted when a run fails; an e-mail to named recipients makes sure a failed overnight run is seen before the business day starts."
+    ootb: "Partial in BrokerVerse OOTB; the effort is that of the missing part (e-mail to a recipient list)."
+    md: [0.5, 1.0, 0, 0.5, 0.5]
+    complexity: Low
+    priority: Medium
+    deps: "E-mail channel of BDOI"
+    assumptions: "One recipient list setting for all Cashiering runs; the in-app notice stays."
+    basis: "One mail service and one setting over the job scheduler of the platform."
+  - cr: CR-CSH-103
+    ev: "Receipts list: filters and PDF export only (no Excel)"
+    title: "Excel export of the Cashiering lists"
+    frs: "FRS.CSH.01.03.04"
+    brd: "CSHID.023 (extends)"
+    tag: EXT
+    fl: "BIL-016 Available (receipts register with filters); RPT-003 Partial. Disagreement: the Feature List says Available, the OOTB code exports the receipt list to PDF only"
+    built: "Yes: the Cashiering lists of BIBS export to Excel"
+    source: "FRS v3.2 FRS.CSH.01.03.04"
+    why: "Cashiers and Team Leaders work the lists in Excel for reconciliation and follow-up; the BRD asks for extracts of the reports, the FRS extends it to every list."
+    ootb: "Partial in BrokerVerse OOTB; the effort is that of the missing part (Excel export of the lists)."
+    md: [0.5, 1.0, 0.5, 0.5, 0.5]
+    complexity: Low
+    priority: Low
+    deps: "-"
+    assumptions: "Same columns as on the screen; up to the report row limit."
+    basis: "List services of the receipts module; export pattern of the reports module."
+  - cr: CR-CSH-104
+    ev: "Notifications: in-app notices; no per-user choice of an e-mail copy"
+    title: "Each user chooses an e-mail copy of the Cashiering notices"
+    frs: "Appendix G (channel of each notice)"
+    brd: "Not in BRD"
+    tag: NEW
+    fl: "WFL-011 Available (e-mail notifications from templates); WFL-012 Partial. Disagreement: the Feature List says Available, the OOTB code has no per-user e-mail choice"
+    built: "Yes: the Notification Settings screen of BIBS gives this choice"
+    source: "FRS v3.2 Appendix G (proposed, Appendix R)"
+    why: "Team Leaders who post from branches want the notices also by e-mail; the choice per user and per notice avoids e-mail floods."
+    ootb: "Partial in BrokerVerse OOTB; the effort is that of the missing part (per-user, per-notice e-mail choice)."
+    md: [0.5, 1.0, 1.0, 0.5, 0.5]
+    complexity: Low
+    priority: Low
+    deps: "E-mail channel of BDOI"
+    assumptions: "Choice per user and per notice type; default in-app only."
+    basis: "Notification service of the platform; one settings screen."
+
+brd_lines:
+  - ["Non-functional: users", "HO 11, branches 5; TL / TH 5 + 5", "Appendix O CSH-NFR-01", "Covered"]
+  - ["Non-functional: response", "Under 5 seconds for every function", "Appendix O CSH-NFR-03", "Covered"]
+  - ["Non-functional: peak", "15th and 30th of the month; 08:00-17:30", "Appendix O CSH-NFR-06 (peak hours aligned with the BRD in v3.3)", "Gap fixed"]
+  - ["Non-functional: devices", "Same speed on mobile and desktop", "Appendix O CSH-NFR-10", "Covered"]
+  - ["Non-functional: availability", "99.9%; used 07:00-18:30", "Appendix O CSH-NFR-07", "Covered"]
+  - ["Non-functional: downtime", "RTO 4 hours, RPO 24 hours", "Appendix O CSH-NFR-08", "Covered"]
+  - ["Non-functional: maintenance", "As per bank standard", "Appendix O CSH-NFR-15 (added in v3.3)", "Gap fixed"]
+  - ["Non-functional: disaster", "Business continuity threshold RTO 4 hours, RPO 24 hours", "Appendix O CSH-NFR-16 (added in v3.3)", "Gap fixed"]
+  - ["Programme NFR 10.07", "One session per device (Collections addendum)", "Appendix O CSH-NFR-17 (added in v3.3)", "Gap fixed"]
+  - ["Programme NFR 4.03", "Source / IP address in the audit log (CLM, CLXN, RI addenda)", "Appendix O CSH-NFR-18 (added in v3.3); FRS.CSH.08.03", "Gap fixed"]
+
+scope_labels:
+  - {match: "Appendix N – Integrations", label: "[Integration scope]"}
+  - {match: "Appendix P – Data Set-up and Migration at Go-live", label: "[Data Migration scope]"}
+  - {match: "Channel simulator (SIT and UAT only)", label: "[Integration scope]", exact: true}
+
+best_practice:
+  - [BP-CSH-01, "End-of-day cash count by denomination for each cashier, compared with the receipts of the day, with any variance explained and approved by the Team Leader", "Cash handling control expected by auditors; shortages and overages are found the same day", High, 6]
+  - [BP-CSH-02, "Cash acceptance limits per cashier and per payment, with a supervisor override recorded with its reason", "Limits the cash held at branches and supports AMLA vigilance on large cash payments", Medium, 4]
+  - [BP-CSH-03, "Dormant unapplied money: unapplied payments older than a set period are flagged for client contact and, after the legal period, reported under the Unclaimed Balances Law (Act No. 3936)", "Client money left unapplied must be returned or reported; the law sets the reporting duty for dormant balances", Medium, 5]

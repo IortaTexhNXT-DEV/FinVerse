@@ -1,4 +1,4 @@
-"""Operations Cashiering FRS in BDOI's template, version 3.2 (full BRD coverage and Business Unit review edition).
+"""Operations Cashiering FRS in BDOI's template, version 3.3 (full BRD coverage and Business Unit review edition).
 
     python docs/deliverables/src/programme/bdoi_template_frs/build_brd02_bdoi_frs.py [--no-pdf]
 
@@ -12,6 +12,9 @@ word for word; the additions of version 3.2 come from:
                              observations of Appendix R, glossary
   brd02_review.yaml          the Business Unit review edition: summary (1.4), Appendices G and J to U, walkthrough WT-E
   brd02_flows.yaml           the figures (drawn by brd11_figures.render)
+  brd02_v33.py, brd02_v33.yaml  version 3.3: swimlane flows (flows/brd02), colour of the points beyond the BRD,
+                             Appendix W (change requests with effort, green points, BRD line check)
+  brd02_signoff_sheets.yaml  the menu and message sheets of the retired BRD-02 sign-off workbook v2.1
   ../comparisons/brd02_cashiering_comparison.yaml   the conflicts of the comparison workbook (Appendix R)
 
 and from the BIBS release set BRD-02 (FRS v2.1, screens, screenshots, notifications, walkthroughs, test cases), its
@@ -19,9 +22,9 @@ sign-off workbook (messages, menus) and the Operations BRD (docs/source-document
 every build. The appendices are written by brd02_annexes.py.
 
 Outputs in docs/deliverables/out/Programme/BDOI_Template_FRS/BRD-02_Operations_Cashiering/:
-  BIBS_FRS-BDOI_BRD-02_Operations_Cashiering_v3.2.docx                      clean copy
-  BIBS_FRS-BDOI_BRD-02_Operations_Cashiering_v3.2.pdf                       the clean copy as PDF (not kept in git)
-  BIBS_FRS-BDOI_BRD-02_Operations_Cashiering_v3.2_Changes_Highlighted.docx  every addition of version 3.2 shaded light
+  BIBS_FRS-BDOI_BRD-02_Operations_Cashiering_v3.3.docx                      clean copy
+  BIBS_FRS-BDOI_BRD-02_Operations_Cashiering_v3.3.pdf                       the clean copy as PDF (not kept in git)
+  BIBS_FRS-BDOI_BRD-02_Operations_Cashiering_v3.3_Changes_Highlighted.docx  the changes of version 3.3 shaded light
                                                                             yellow, change summary in front
 
 Self-checks (the build fails when one does not hold): every BRD ID of the Cashiering scope of the BRD is in the
@@ -64,8 +67,9 @@ DOC = yaml.safe_load((HERE / "brd02_document.yaml").read_text(encoding="utf-8"))
 REV = yaml.safe_load((HERE / "brd02_review.yaml").read_text(encoding="utf-8"))
 FLOWS = yaml.safe_load((HERE / "brd02_flows.yaml").read_text(encoding="utf-8"))["figures"]
 OUT = REPO / "docs" / "deliverables" / "out" / DOC["meta"]["out_folder"]
-SIGNOFF_XLSX = (REPO / "docs" / "deliverables" / "out" / "Drop-1_Transactional" / "BRD-02_Operations" /
-                "03_BIBS_Signoff_BRD-02_Operations_v2.1.xlsx")
+import brd02_v33 as v33  # noqa: E402
+
+v33.bind(sys.modules[__name__])
 
 ID_RE = re.compile(r"^\s*(FRS\s*\.\s*(?:CSH|OPS)[\d .]*\d)")
 FRS_RE = re.compile(r"FRS\.(?:CSH|OPS)\.\d{2,3}(?:\.\d{1,2})*")
@@ -79,7 +83,7 @@ SCOPE_FRS = ["FR-OP-%03d" % n for n in (1, 2, 3, 4, 5, 8, 9, 10, 11, 12, 13, 14,
                                         25, 27, 28, 113, 120, 121, 130, 131, 132)]
 CALIBRI = "Calibri"
 # Values of BDOI's own FRS that look like codes (the certificate number of the sample AR)
-BDOI_CODES = {"AC_125_022025_00482"}
+BDOI_CODES = {"AC_125_022025_00482", "BIBS_CR_BRD"}  # a BDOI account code; the name of the CR workbooks
 
 # ------------------------------------------------------------------------------------------------ wording
 CODES = {
@@ -602,6 +606,7 @@ def build(highlight: bool, ids, figs) -> Builder:
     import brd02_annexes as annexes  # noqa: PLC0415
     b = Builder(highlight)
     b.ids = ids
+    v33.begin(b)
     b.screen_numbers = annexes.screen_numbers()
     b.fig_numbers = annexes.figure_numbers()
     where = annexes.classify_items()
@@ -609,7 +614,9 @@ def build(highlight: bool, ids, figs) -> Builder:
     b.stats["emails_checked"] = annexes.check_emails()
     edit_cover(b)
     edit_revision_log(b)
+    v33.revision(b)
     edit_introduction(b)
+    v33.introduction(b)
     mapping = edit_mapping(b, ids)
     b.mapping = mapping
     edit_functional_requirements(b)
@@ -617,6 +624,7 @@ def build(highlight: bool, ids, figs) -> Builder:
     last_ref = edit_references(b)
     a = annexes.Appendices(b, figs, where)
     a.write_all()
+    v33.appendix_w(a)
     a.place(last_ref)
     b.annex = a
     missing_fr = [f for f in SCOPE_FRS if f not in a.listed_refs]
@@ -626,8 +634,14 @@ def build(highlight: bool, ids, figs) -> Builder:
         raise SystemExit(f"Appendix R lacks {sorted(a.cmp_ids - a.listed_conflicts)}")
     b.key_numbers = annexes.key_numbers(b)
     annexes.add_summary(b, figs)
+    v33.how_to_read(b)
+    v33.colour_points(b)
+    v33.scope_labels(b)
+    problems = v33.self_checks(b)
+    if problems:
+        raise SystemExit("version 3.3 checks failed:\n  " + "\n  ".join(problems))
     if highlight:
-        annexes.change_summary(b)
+        v33.change_summary(b)
     u11.set_update_fields(b)
     check_words(b)
     b.where = where
@@ -653,6 +667,9 @@ def render_figures(work: Path) -> dict[str, Path]:
     work.mkdir(parents=True, exist_ok=True)
     out = {}
     for spec in FLOWS:
+        if spec.get("png"):          # the swimlane flows of version 3.3 (flows/brd02)
+            out[spec["id"]] = v33.flows.render_png("brd02", spec["png"])
+            continue
         if spec["id"] == "brd02_fig_menus":
             spec = dict(spec, rows=annexes.menu_rows(spec))
         out[spec["id"]] = brd11_figures.render(spec, work)

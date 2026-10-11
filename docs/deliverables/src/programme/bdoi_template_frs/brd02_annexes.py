@@ -22,6 +22,7 @@ import brd_common_final as final
 import build_brd11_bdoi_frs as u11
 
 REPO = m.REPO
+HERE = Path(__file__).resolve().parent
 OPS = m.OPS
 DOC, REV, ADD, FLOWS = m.DOC, m.REV, m.ADD, m.FLOWS
 CONFIGURABLE = yaml.safe_load((Path(__file__).resolve().parent / "brd02_workbooks.yaml").read_text(
@@ -94,10 +95,9 @@ def pack_messages() -> list[dict]:
 
 
 def signoff_sheet(name: str) -> list[tuple]:
-    wb = openpyxl.load_workbook(m.SIGNOFF_XLSX, read_only=True)
-    rows = [tuple(r) for r in wb[name].iter_rows(values_only=True)]
-    wb.close()
-    return rows
+    """A sheet of the BRD-02 sign-off workbook v2.1, row by row (kept in brd02_signoff_sheets.yaml since the
+    old-format set was retired)."""
+    return [tuple(r) for r in yaml.safe_load((HERE / "brd02_signoff_sheets.yaml").read_text(encoding="utf-8"))[name]]
 
 
 def menu_rows(spec: dict) -> list[list]:
@@ -118,7 +118,7 @@ def menu_rows(spec: dict) -> list[list]:
     rows = []
     for screen in spec["menu_screens"]:
         if screen not in seen:
-            raise SystemExit(f"menu entry {screen} not in the sign-off workbook")
+            raise SystemExit(f"menu entry {screen} not in the sign-off workbook menu")
         label = screen.split(" › ", 1)[1] if screen.startswith("Finance") else screen
         rows.append([label] + [p in seen[screen] for p in spec["menu_personas"]])
     return rows

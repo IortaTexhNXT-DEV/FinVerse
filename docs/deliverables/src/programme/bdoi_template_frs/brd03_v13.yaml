@@ -16,18 +16,20 @@
 revision:
   date: 11 Oct 2026
   version: "1.3"
-  description: "Simplified and end-to-end swimlane process flows; colour coding of the points not in the BRD (green: available in BIBS; orange: change request); Annex Y with the change requests and their effort, the points beyond the BRD available in BIBS and the check of every BRD line; BRD non-functional lines and programme NFRs 10.07 and 4.03 added to Annex T"
+  description: "Simplified and end-to-end swimlane process flows; colour coding of the points not in the BRD (green: available in the iNXT BrokerVerse OOTB edition; orange: change request); Annex Y with the change requests and their effort, the points beyond the BRD available OOTB in iNXT BrokerVerse and the check of every BRD line; BRD non-functional lines and programme NFRs 10.07 and 4.03 added to Annex T"
   by: "iorta TechNXT Project Team (drafting support)"
 
-intro_note: "Version 1.3 adds the simplified process flow (Figure 1) and the end-to-end process flow by actor and system (Figure 2, section 4) with the change requests marked; it colours the points of this FRS that are not requirements of the BRD (section 1.5); it adds Annex Y with the change requests and their effort, the points beyond the BRD that BIBS already provides, and the check of every line of the BRD against this FRS. BDOI's text and the content of versions 1.1 and 1.2 are otherwise unchanged."
+intro_note: "Version 1.3 adds the simplified process flow (Figure 1) and the end-to-end process flow by actor and system (Figure 2, section 4) with the change requests marked; it colours the points of this FRS that are not requirements of the BRD (section 1.5); it adds Annex Y with the change requests and their effort, the points beyond the BRD that the iNXT BrokerVerse OOTB edition already provides, and the check of every line of the BRD against this FRS. BDOI's text and the content of versions 1.1 and 1.2 are otherwise unchanged."
 
 how_to_read:
   title: How to Read this Document
-  intro: "Most of this FRS states requirements of the Product Maintenance BRD (BRPM.001 to BRPM.024, PMADD01 to PMADD08 and its non-functional table) or of the programme-wide non-functional requirements of the BDOI addenda. BDOI's own text (version 1.0) is kept word for word. Where version 1.1 to 1.3 states a point that is not a BRD requirement, the point is coloured where it is stated, so that the Business Unit sees at once what goes beyond the BRD and whether it costs anything:"
+  intro: "Most of this FRS states requirements of the Product Maintenance BRD (BRPM.001 to BRPM.024, PMADD01 to PMADD08 and its non-functional table) or of the programme-wide non-functional requirements of the BDOI addenda. BDOI's own text (version 1.0) is kept word for word. Where version 1.1 to 1.3 states a point that is not a BRD requirement, the point is coloured where it is stated, so that the Business Unit sees at once what goes beyond the BRD and whether it costs anything. Out of the box (OOTB) means the iNXT BrokerVerse OOTB platform (brokerverse-platform), checked against the platform itself with the programme Feature List as a cross-check, not the work done for BDOI in this project:"
   legend:
     - [black, "Black text", "A BRD requirement, BDOI's own FRS text, or the detail needed to meet a BRD requirement.", "In scope"]
-    - [green, "Green text", "Not in the BRD, and already available in BIBS (out of the box). No development needed; the Business Unit may keep or drop it.", "No cost; listed in Annex Y.3"]
-    - [orange, "Orange text", "Not in the BRD and not yet available in BIBS: a change request (CR-PM-1nn). It is delivered only if the Business Unit approves it.", "Effort in Annex Y.2 and the CR effort workbook"]
+    - [green, "Green text", "Not in the BRD, and available out of the box in the iNXT BrokerVerse OOTB platform. No development needed; the Business Unit may keep or drop it.", "No cost; listed in Annex Y.3"]
+    - [grey, "[Integration scope] / [Data Migration scope]", "Grey label on an interface with another system or on a data load at go-live: covered by the Integration scope or the Data Migration scope (BRD-13), not a change request.", "Listed in Annex Y.5"]
+    - [blue, "Blue table", "Insurance-broking best practice for this area that is not in the BRD, this FRS or the OOTB platform: a recommendation with an indicative effort, not a commitment.", "Annex Y.6; not in the change request total"]
+    - [orange, "Orange text", "Not in the BRD and not available, or only partly available, in the iNXT BrokerVerse OOTB platform edition: a change request (CR-PM-1nn), even where it was already delivered for BIBS in this project. It is delivered only if the Business Unit approves it.", "Effort in Annex Y.2 and the CR effort workbook"]
   after: "In the end-to-end process flow (Figure 2) the change requests are tagged: yellow for a change request not in any BRD, blue for a change request that extends a BRD requirement, green for a point that is already a BRD requirement (for example the programme NFRs 10.07 and 4.03). The walkthroughs of Annex K and the screenshots of Annex G use the BIBS DEV environment: https://dev.brokerverse.cloud."
 
 figures:
@@ -51,97 +53,95 @@ checklist_add:
   - ["Points beyond the BRD and change requests", "Section 1.5; Annex Y", "Keep or drop each green point; approve, defer or reject each orange change request", "Product Owner; Head, MBS; Head, TSU"]
 
 points:
-  # ---- green: not in the BRD, available in BIBS (verified in the platform)
-  - {id: G-01, class: ootb, frs: FRPM.001.01, match: "Each filtered list opened from a tile shall be exportable to Excel", title: "Excel export of the list behind each dashboard tile", where: "Product Maintenance dashboard, export buttons"}
-  - {id: G-02, class: ootb, frs: FRPM.001.01, match: "Packages ending within 30, 60 and 90 days", title: "Dashboard tiles of packages ending within 30, 60 and 90 days", where: "Dashboard stage tiles"}
-  - {id: G-03, class: ootb, frs: FRPM.001.01, match: "Advisories drafted and not yet sent", title: "Dashboard tile of advisories drafted and not sent", where: "Dashboard stage tiles"}
-  - {id: G-04, class: ootb, frs: FRPM.001.01, match: "Comparative outputs generated in the last seven days", title: "Dashboard tile of the comparative outputs of the week", where: "Dashboard stage tiles"}
-  - {id: G-05, class: ootb, frs: FRPM.002.01, match: "TSU Workbench (the TSU queues by stage)", title: "TSU Workbench with the TSU queues by stage", where: "TSU Workbench screen"}
-  - {id: G-06, class: ootb, frs: FRPM.002.01, match: "Premium Calculator (FRPM.024.02)", title: "Premium Calculator on the package rate scheme", where: "Premium Calculator screen"}
-  - {id: G-07, class: ootb, frs: FRPM.019.01, match: "The report shall be exportable to PDF, Excel and CSV, and every generation shall be logged.", title: "Renewal Request Report exported to PDF, Excel and CSV, every run logged", where: "Report engine of the platform"}
-  - {id: G-08, class: ootb, frs: FRPM.021.01, match: "Each e-mail sent from Product Maintenance shall be logged with the recipient", title: "E-mail log with recipient, time, subject and attachment fingerprint", where: "Message log of the platform"}
-  # ---- orange: change requests (not in the BRD and not available in BIBS)
+  # Classified against the iNXT BrokerVerse OOTB platform edition: column 'OOTB platform' of the programme Feature
+  # List (BIBS_BDOI_FeatureList_vs_OOTB_and_Best_Practice_v1.0.xlsx, sheet Feature Comparison). Green = not in the
+  # BRD and the feature is Available (or an OOTB extra); orange = not in the BRD and Partial, Not available,
+  # BDOI-specific or absent from the list. The dashboard tiles of FRPM.001.01 are the detail of BRPM.019 (black).
+  # ---- green
+  - {id: G-01, class: ootb, ev: "My Work: personal and team worklists", frs: FRPM.002.01, fl: "WFL-005 Available", match: "TSU Workbench (the TSU queues by stage)", title: "TSU Workbench with the TSU queues by stage (team worklist)", where: "Personal and team worklists of BrokerVerse"}
+  - {id: G-02, class: ootb, ev: "Product Configurator > Rating Engine: premium calculation", frs: FRPM.002.01, fl: "PRD-005 Available", match: "Premium Calculator (FRPM.024.02)", title: "Premium Calculator on the package rate scheme", where: "Rating engine test calculator of BrokerVerse"}
+  - {id: G-03, class: ootb, ev: "Reports: exports and history of produced files", frs: FRPM.019.01, fl: "RPT-011 Available; RPT-003 Partial (PDF, Excel and CSV available; Word and text exports, not asked here, are the missing part)", match: "The report shall be exportable to PDF, Excel and CSV, and every generation shall be logged.", title: "Report exported to PDF, Excel and CSV, every run logged", where: "Report catalogue, exports and run audit of BrokerVerse"}
+  - {id: G-04, class: ootb, ev: "E-mail outbox with the status of each e-mail", frs: FRPM.021.01, fl: "WFL-011 Available", match: "Each e-mail sent from Product Maintenance shall be logged with the recipient", title: "E-mail log with recipient, time, subject and attachment", where: "E-mail outbox with status of BrokerVerse"}
+  - {id: G-05, class: ootb, ev: "Audit trail: before and after values of every change", frs: "FRPM.021.01; Annex M.5", fl: "ADM-012 Available", match: "Old and new values of changed master records in the audit logs", scope: row, title: "Old and new field values of changed master records", where: "Field-level change log of master data of BrokerVerse (to be applied to the product masters of BIBS)"}
+  # ---- orange: change requests
   - {id: CR-PM-101, class: cr, match: "Quotation Slip decision to the preparer", scope: row}
+  - {id: CR-PM-101t, class: cr, match: "NT-16 Quotation Slip decision to the preparer", exact: true}
   - {id: CR-PM-102, class: cr, match: "ManCom approval request", exact: true, scope: row}
-  - {id: CR-PM-102b, cr: CR-PM-102, class: cr, match: "ManCom approval request to the President", exact: true, scope: row}
-  - {id: CR-PM-103, class: cr, match: "Old and new values of changed master records in the audit logs", scope: row}
-  - {id: CR-PM-104, class: cr, match: "T-15", exact: true, scope: row}
-  - {id: CR-PM-101t, cr: CR-PM-101, class: cr, match: "NT-16 Quotation Slip decision to the preparer", exact: true}
-  - {id: CR-PM-102t, cr: CR-PM-102, class: cr, match: "NT-13 ManCom approval request", exact: true}
-  - {id: CR-PM-102u, cr: CR-PM-102, class: cr, match: "NT-14 ManCom approval request to the President", exact: true}
-  - {id: CR-PM-105, class: cr, match: "Amber from 80% of the stage service level (due soon)"}
+  - {id: CR-PM-102b, class: cr, match: "ManCom approval request to the President", exact: true, scope: row}
+  - {id: CR-PM-102t, class: cr, match: "NT-13 ManCom approval request", exact: true}
+  - {id: CR-PM-102u, class: cr, match: "NT-14 ManCom approval request to the President", exact: true}
+  - {id: CR-PM-103, class: cr, match: "T-15", exact: true, scope: row}
+  - {id: CR-PM-104, class: cr, match: "Amber from 80% of the stage service level (due soon)"}
 
 crs:
   - cr: CR-PM-101
+    ev: "not found: Packages has no slip approval and no notice to the preparer"
     title: "Quotation Slip decision notice to the preparer"
     frs: "FRPM.006.01, FRPM.012.01; Annex P NT-16"
     brd: "BRPM.012 (extends)"
     tag: EXT
+    fl: "PRD-019 Partial (no negotiation rounds or slip approval for a programme); WFL-010 Available (in-app notices)"
+    built: "No"
     source: "BDOI FRS v1.0 FRPM.006.01 and FRPM.012.01; FRS v1.2 Annex P (proposed text NT-16)"
     why: "The TSU Officer who prepares a Quotation Slip learns of its approval or return only by opening the request; the notice lets the slip go to the insurers the same day."
-    ootb: "Not available: the slip approval (negotiation service) sends the slip to the insurers but no notice to the preparer; the notice service of the platform is available and is reused."
+    ootb: "Partial in BrokerVerse OOTB: notices are available, the package slip approval is not; effort for the notice of the slip decision only."
     md: [0.5, 1.5, 0, 1.0, 0.5]
     complexity: Low
     priority: Medium
     deps: "Notice service and e-mail channel (Annex S, IN-08)"
     assumptions: "Text NT-16 of Annex P approved as written; in-system notice with e-mail copy by preference."
-    basis: "Negotiation service about 410 lines; stage notices about 70 lines used as the pattern."
+    basis: "Negotiation service of BIBS about 410 lines; stage notices about 70 lines used as the pattern."
   - cr: CR-PM-102
+    ev: "not found: no ManCom or committee step"
     title: "ManCom e-mails in BDOI's wording, with the President's text"
     frs: "FRPM.014.01; Annex P NT-13, NT-14"
     brd: "BRPM.015 (extends)"
     tag: EXT
+    fl: "PRD-021 Not available (no committee step or hand-off)"
+    built: "Partly: the ManCom routing with one standard notice and e-mail copy was prepared for BIBS in this project"
     source: "BDOI FRS v1.0 FRPM.014.01; FRS v1.2 Annex P (proposed texts NT-13, NT-14)"
     why: "BDOI's FRS asks for the ManCom approval e-mail in its own wording and a separate text when the request reaches the President."
-    ootb: "Partly available: each ManCom approver is told in the system with an e-mail copy, in one standard text; the two BDOI texts are to be added."
+    ootb: "Not available in BrokerVerse OOTB. The effort is for the two BDOI texts on top of the routing already delivered for BIBS."
     md: [0.5, 1.0, 0, 0.5, 0.5]
     complexity: Low
     priority: Medium
     deps: "E-mail channel of BDOI (Annex S, IN-08)"
     assumptions: "Two texts; no attachment beyond the link to the request."
-    basis: "ManCom routing about 270 lines; one notice method to extend."
+    basis: "ManCom routing of BIBS about 270 lines; one notice method to extend."
   - cr: CR-PM-103
-    title: "Old and new field values of product master changes in the audit log"
-    frs: "FRPM.021.01, FRPM.021.02; Annex M.5"
-    brd: "BRPM.024 (extends)"
-    tag: EXT
-    source: "FRS v1.2 Annex M.5 (observation: planned with the programme master data change log)"
-    why: "BRPM.024 asks for the audit trail of every action; the auditors also expect to see, for a changed master record, which field changed from which value to which value."
-    ootb: "Partly available: every create, change and authorize of a product master is in the audit log with user and time; the field-by-field old and new values are kept today for package terms only."
-    md: [1.0, 4.0, 1.5, 2.0, 0.5]
-    complexity: Medium
-    priority: High
-    deps: "Audit log of the platform (old and new value columns exist)"
-    assumptions: "Product masters of the catalogue (products, coverages, clauses, field rules, incentive criteria, insurers, rates and taxes, sales organisation); values shown on the record audit tab."
-    basis: "15 catalogue services write the audit log; catalogue services about 35 files; record audit tab of the screens to show the two values."
-  - cr: CR-PM-104
+    ev: "Branding: contrast check only; no WCAG audit"
     title: "Accessibility of the Product Maintenance screens (WCAG 2.2 level AA)"
     frs: "Annex T, T-15"
     brd: "Not in BRD"
     tag: NEW
+    fl: "NFR-021 Partial (contrast checked to WCAG AA in the theme; no accessibility statement or full WCAG audit)"
+    built: "Partly: the screens prepared for BIBS use the platform components; about 8 of 35 screen files carry accessibility labels"
     source: "Programme register of non-functional requirements (NFR-ACC-01, NFR-ACC-02), proposed in FRS v1.2 Annex T"
     why: "No BDOI BRD asks for an accessibility level; the programme register proposes WCAG 2.2 AA so that keyboard and screen-reader users can work in the module."
-    ootb: "Partly available: the screens use the platform components and are usable with the keyboard; no WCAG 2.2 AA conformance check has been made on the module (about 8 of 35 screen files carry accessibility labels)."
+    ootb: "Partial in BrokerVerse OOTB; the effort covers the missing part only: the WCAG 2.2 AA check and fixes of the module screens."
     md: [1.5, 0, 6.0, 3.0, 1.0]
     complexity: Medium
     priority: Low
     deps: "BDOI's decision on the accessibility level (Annex V, PQ18)"
     assumptions: "Check and fixes on the 35 Product Maintenance screen files (about 3,800 lines) and the product master screens; no redesign."
-    basis: "Product Maintenance screens: 35 files, about 3,800 lines."
-  - cr: CR-PM-105
+    basis: "Product Maintenance screens of BIBS: 35 files, about 3,800 lines."
+  - cr: CR-PM-104
+    ev: "not found for packages; Renewals use a fixed number of days"
     title: "'Due soon' marker at 80% of the stage service level"
     frs: "FRPM.001.01"
     brd: "BRPM.021 (extends)"
     tag: EXT
+    fl: "WFL-007 Partial (deadlines and escalation for claims, complaints, leads and collections; no general turnaround engine)"
+    built: "Partly: BIBS marks a package request 'due soon' 8 hours before its stage deadline and 'overdue' after it"
     source: "FRS v1.1 FRPM.001.01 (amber from 80% of the stage service level)"
     why: "BRPM.021 asks that each approval step is completed within the defined service level; an amber marker relative to each stage's own service level warns before the breach on short and long stages alike."
-    ootb: "Partly available: a request is marked 'due soon' when it is due within 8 hours, whatever the service level of the stage; overdue (red) is available."
+    ootb: "Partial in BrokerVerse OOTB; the effort covers the missing part only: the marker at a percentage of each stage's service level."
     md: [0.5, 1.0, 0.5, 1.0, 0.5]
     complexity: Low
     priority: Medium
     deps: "-"
     assumptions: "The percentage is a parameter (default 80%) maintained by the System Administrator."
-    basis: "Package query service about 275 lines (fixed 8-hour window); stage age marker of the screens."
+    basis: "Package query service of BIBS about 275 lines (fixed 8-hour window); stage age marker of the screens."
 
 brd_lines:
   - ["Executive summary", "Direct management and update capability for Package Products", "FRPM.003, FRPM.022 to FRPM.024", "Covered"]
@@ -169,3 +169,12 @@ brd_lines:
   - ["Non-functional: disaster", "Business continuity threshold RTO 4 hours, RPO 24 hours", "Annex T T-21 (added in v1.3)", "Gap fixed"]
   - ["Programme NFR 10.07", "One session per device (Collections addendum)", "Annex T T-19 (added in v1.3); User Access Maintenance FRS", "Gap fixed"]
   - ["Programme NFR 4.03", "Source / IP address in the audit log (CLM, CLXN, RI addenda)", "Annex T T-20 (added in v1.3); FRPM.021.01", "Gap fixed"]
+
+scope_labels:
+  - {match: "Annex S – Integrations", label: "[Integration scope]"}
+  - {match: "Annex U – Data Set-up and Migration at Go-live", label: "[Data Migration scope]"}
+
+best_practice:
+  - [BP-PM-01, "Periodic package performance review: take-up, premium, claims experience and loss ratio per package, with a recorded decision to keep, redesign or retire it before renewal", "Packages sold through the bank stay fair value for clients and viable for insurers; Insurance Commission conduct expectations for products sold through banks", Medium, 6]
+  - [BP-PM-02, "Product disclosure sheet per package for the bank channel (key features, exclusions, insurer, BDOI's role as broker), produced from the released package version", "Bancassurance sales need clear pre-sale disclosure; one source avoids outdated brochures (Insurance Commission and BSP bancassurance rules)", High, 5]
+  - [BP-PM-03, "Data-sharing record on client-specific packages: the basis for sharing with each insurer of the package and the client data sent in Quotation Slips", "Data Privacy Act: personal data shared with insurers needs a documented basis and only the minimum data", Medium, 3]

@@ -1386,6 +1386,7 @@ def build(highlight: bool, our, nb, ids) -> Builder:
     if b.fr_to_frpm != v12.fr_to_frpm():
         raise SystemExit("the FRPM references of the document and of the shared data differ")
     v13.colour_points(b)
+    v13.scope_labels(b)
     if highlight:
         v13.change_summary(b)
     set_update_fields(b)

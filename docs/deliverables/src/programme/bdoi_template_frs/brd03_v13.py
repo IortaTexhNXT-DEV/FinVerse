@@ -3,8 +3,8 @@
   * the swimlane process flows: the simplified flow replaces the persona chart of section 1.4.2 (Figure 1) and the
     end-to-end flow opens section 4 (Figure 2); both drawn by flows/brd03 (spec, generator, renderer, PNG);
   * section 1.5 'How to Read this Document' with the colour legend;
-  * the colour of the points that are not BRD requirements (green: available in BIBS; orange: change request);
-  * Annex Y: change requests with their effort, points beyond the BRD available in BIBS, the check of the BRD lines;
+  * the colour of the points that are not BRD requirements (green: available in the iNXT BrokerVerse OOTB edition; orange: change request);
+  * Annex Y: change requests with their effort, points beyond the BRD available OOTB in iNXT BrokerVerse, the check of the BRD lines;
   * rows added to Annex T (BRD non-functional lines and programme NFRs 10.07 and 4.03) and to Annex X;
   * the Document Revision Log row, the Introduction note and the change summary of the review copy (only the
     changes of version 1.3 are shaded there).
@@ -24,8 +24,8 @@ from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 
 HERE = Path(__file__).resolve().parent
-V13 = yaml.safe_load((HERE / "brd03_v13.yaml").read_text(encoding="utf-8"))
-sys.path.insert(0, str(HERE / "flows" / "brd03"))
+V13 = DATA = yaml.safe_load((HERE / "brd03_v13.yaml").read_text(encoding="utf-8"))
+sys.path.insert(0, str(HERE / "flows"))
 import render as flows  # noqa: E402
 
 GREEN, ORANGE = "2E7D32", "E65100"
@@ -96,7 +96,7 @@ def introduction(b) -> None:
 
 # ============================================================================================== figures
 def _picture(b, name: str, max_h: float):
-    return b.picture(flows.render_png(name), max_w=6.7, max_h=max_h)
+    return b.picture(flows.render_png("brd03", name), max_w=6.7, max_h=max_h)
 
 
 def summary_figure(b) -> None:
@@ -148,14 +148,14 @@ def how_to_read(b) -> None:
         els = [V12M.heading(b, h["title"], 2), b.para(h["intro"], keep_next=True)]
         tbl = b.table(["Colour", "Meaning", "Cost"], [[x[1], x[2], x[3]] for x in h["legend"]], [1.2, 4.3, 1.4],
                       size=8.5)
-        colours = {"green": GREEN, "orange": ORANGE}
+        colours = {"green": GREEN, "orange": ORANGE, "grey": "616161", "blue": "1565C0"}
         for tr, x in zip(tbl.findall(qn("w:tr"))[1:], h["legend"]):
             if x[0] in colours:
                 _colour(tr.findall(qn("w:tc"))[0], colours[x[0]], bold=True)
         els += [tbl, b.para("", space_after=0), b.para(h["after"])]
         n_cr, n_g = len(V13["crs"]), sum(1 for p in V13["points"] if p["class"] == "ootb")
         els.append(b.para(f"In this version: {n_cr} change requests ({total_days():g} man-days in all) and {n_g} "
-                          "points available in BIBS beyond the BRD; every line of the BRD is covered (Annex Y.4)."))
+                          "points beyond the BRD available OOTB in iNXT BrokerVerse; every line of the BRD is covered (Annex Y.4)."))
     for e in els:
         anchor.addprevious(e)
 
@@ -192,6 +192,11 @@ def _ancestor(el, tag):
     return el
 
 
+def _text(p) -> str:
+    return "".join(t.text or "" for t in p.iter(qn("w:t")))
+
+
+
 def colour_points(b) -> Counter:
     found: Counter = Counter()
     for p in list(b.body.iter(qn("w:p"))):
@@ -219,7 +224,7 @@ def annex_y(a) -> None:
     with this_round(b):
         a.h1("Annex Y – Points beyond the BRD and Change Requests")
         a.p("This annex lists what this FRS states beyond the Product Maintenance BRD: the change requests (orange in "
-            "the text) with their effort, and the points that BIBS already provides (green in the text). It ends "
+            "the text) with their effort, and the points that the iNXT BrokerVerse OOTB platform edition already provides (green in the text). It ends "
             "with the check of every line of the BRD outside its requirement table. The legend is in section 1.5. "
             "The programme-wide non-functional requirements of the other BDOI addenda (Collections NFR 10.07; "
             "Claims, Collections and Reinsurance NFR 4.03) are BRD requirements, not change requests.")
@@ -228,26 +233,30 @@ def annex_y(a) -> None:
             "Every point added in versions 1.1 to 1.3 was compared with the BRD (BRPM.001 to BRPM.024, PMADD01 to "
             "PMADD08, the summary, envisioned process, key capabilities and non-functional table) and with the "
             "programme NFRs of the BDOI addenda.",
-            "A point not in the BRD was checked in the BIBS platform (screens, services and scheduled runs) and in "
-            "the pack fit-gap workbook: available = green; not available, or available only in part = orange "
-            "(change request).",
+            "A point not in the BRD was looked up in the programme Feature List (column 'OOTB platform': the iNXT "
+            "BrokerVerse OOTB platform edition): Available or OOTB extra = green; Partial, Not available, BDOI-specific "
+            "or not listed = orange (change request), with the effort of the missing part only for a Partial feature. "
+            "A point already delivered for BIBS in this project is still classified by the OOTB platform; the effort "
+            "workbook says so in a separate column.",
             "Effort is in man-days of 8 hours, estimated from the size of the platform components each change touches, "
             "with a range of plus or minus 20%; the detail, the assumptions and the cost (rate cell) are in the "
             "workbook BIBS_CR_BRD-03_Effort_Estimate_v1.0.xlsx. The change requests are also in the change "
             "request register (status 'Candidate - for decision').",
         ])
         a.h2("Y.2 Change requests (orange)")
-        rows = [[c["cr"], c["title"], c["frs"], c["brd"], c["ootb"], f"{man_days(c):g}", c["complexity"],
+        rows = [[c["cr"], c["title"], c["frs"], c["brd"], c["fl"], f"{man_days(c):g}", c["complexity"],
                  c["priority"]] for c in V13["crs"]]
         rows.append(["Total", f"{len(V13['crs'])} change requests", "", "", "", f"{total_days():g}", "", ""])
-        a.table(["CR No.", "Change", "FRS reference", "BRD reference", "In BIBS today", "Man-days", "Complexity",
-                 "Priority"], rows, [0.75, 1.45, 1.05, 0.85, 1.85, 0.55, 0.65, 0.55], size=7.5)
+        a.table(["CR No.", "Change", "FRS reference", "BRD reference", "OOTB status (Feature List)",
+                 "Man-days", "Complexity", "Priority"], rows, [0.75, 1.45, 1.05, 0.85, 1.85, 0.55, 0.65, 0.55],
+                size=7.5)
         for tr in a.els[-2].findall(qn("w:tr"))[1:]:
             _colour(tr, ORANGE)
-        a.h2("Y.3 Points beyond the BRD available in BIBS (green)")
-        rows = [[p["id"], p["title"], p["frs"], p["where"], "Available; no cost"] for p in V13["points"]
+        a.h2("Y.3 Points beyond the BRD available OOTB in iNXT BrokerVerse (green)")
+        rows = [[p["id"], p["title"], p["frs"], p["fl"], "Available; no cost"] for p in V13["points"]
                 if p["class"] == "ootb"]
-        a.table(["No.", "Point", "FRS reference", "Where in BIBS", "Status"], rows, [0.5, 2.6, 1.0, 1.9, 1.2],
+        a.table(["No.", "Point", "FRS reference", "Feature List ID / OOTB status", "Status"], rows,
+                [0.5, 2.6, 1.0, 1.9, 1.2],
                 size=8)
         for tr in a.els[-2].findall(qn("w:tr"))[1:]:
             _colour(tr, GREEN)
@@ -257,9 +266,53 @@ def annex_y(a) -> None:
             "programme NFRs; the gaps found were fixed in this version.")
         a.table(["BRD part", "BRD line", "Where in this FRS", "Result"], V13["brd_lines"], [1.3, 2.9, 2.2, 0.8],
                 size=8)
+        scope_and_practice(a, "Y", [[f"{x[0]} {x[1]}", x[3]] for x in V12M.V12["integrations"]["items"]], [[x[0], x[1]] for x in V12M.V12["data_setup"]["items"]])
     b.stats["crs"] = len(V13["crs"])
     b.stats["green"] = sum(1 for p in V13["points"] if p["class"] == "ootb")
     b.stats["brd_gaps"] = sum(1 for r in V13["brd_lines"] if r[3] == "Gap fixed")
+
+
+GREY, BLUE = "616161", "1565C0"
+
+
+def scope_labels(b) -> int:
+    """The grey label [Integration scope] / [Data Migration scope] after each heading or row it names."""
+    n = 0
+    for p in list(b.body.iter(qn("w:p"))):
+        text = _text(p).strip()
+        for sl in DATA["scope_labels"]:
+            if (text == sl["match"]) if sl.get("exact") else text.startswith(sl["match"]):
+                p.append(b.run(" " + sl["label"], color=GREY, hl=False))
+                n += 1
+    if n < len(DATA["scope_labels"]):
+        raise SystemExit("a scope label did not find its heading or row")
+    return n
+
+
+def scope_and_practice(a, ann: str, integrations: list, data_loads: list) -> None:
+    """{ann}.5 the items covered by the Integration and Data Migration scope; {ann}.6 the best practices (blue)."""
+    b = a.b
+    a.h2(f"{ann}.5 Covered by the Integration scope and the Data Migration scope")
+    a.p("The interfaces with other systems and the data loaded at go-live are delivered under the Integration scope "
+        "and the Data Migration scope (BRD-13). They carry a grey label in this document and are not change requests.")
+    rows = [[x[0], "Integration scope", x[1]] for x in integrations] + \
+           [[x[0], "Data Migration scope", x[1]] for x in data_loads]
+    a.table(["Item", "Scope", "What"], rows, [1.6, 1.4, 4.4], size=8)
+    for tr in a.els[-2].findall(qn("w:tr"))[1:]:
+        for tc in tr.findall(qn("w:tc"))[1:2]:
+            _colour(tc, GREY)
+    head = b.para(f"{ann}.6 Best-practice recommendations (blue)", style="Heading2", no_num=True, keep_next=True,
+                  color=BLUE)
+    a.els.append(head)
+    a.p("Insurance-broking practices for this area that are not in the BRD, in this FRS or in the iNXT BrokerVerse OOTB "
+        "platform. They are recommendations for the Business Unit, with an indicative effort; they are not change "
+        "requests and are not in the change request total.", color=BLUE)
+    rows = [[r[0], r[1], r[2], r[3], f"{r[4]:g}"] for r in DATA["best_practice"]]
+    a.table(["ID", "Practice", "Why it matters for a broker", "Priority", "Indicative man-days"], rows,
+            [0.8, 2.6, 2.6, 0.7, 0.7], size=8)
+    for tr in a.els[-2].findall(qn("w:tr"))[1:]:
+        _colour(tr, BLUE)
+    b.stats["best_practice"] = len(rows)
 
 
 # ============================================================================================== review copy
@@ -271,12 +324,12 @@ def change_summary(b) -> None:
         "(Figure 1); new section 1.5 'How to Read this Document' with the colour legend.",
         "Process Flow: the end-to-end process flow by actor and system opens section 4 (Figure 2), with the change "
         "requests tagged; the figures after it are numbered from Figure 3.",
-        f"Colour of the points not in the BRD: {s['green']} points in green (available in BIBS) and the "
+        f"Colour of the points not in the BRD: {s['green']} points in green (available OOTB in iNXT BrokerVerse) and the "
         f"{s['crs']} change requests in orange where they are stated (FRPM items, Annexes M, P and T).",
         f"Annex T: rows T-18 to T-21 for the BRD lines and programme NFRs not yet listed ({s['brd_gaps']} gaps "
         "found in the BRD check). Annex X: one checklist point for the points beyond the BRD.",
         f"New Annex Y: change requests with their effort ({total_days():g} man-days), points beyond the BRD "
-        "available in BIBS, check of the BRD lines. New workbook BIBS_CR_BRD-03_Effort_Estimate_v1.0.xlsx; the "
+        "available OOTB in iNXT BrokerVerse, check of the BRD lines. New workbook BIBS_CR_BRD-03_Effort_Estimate_v1.0.xlsx; the "
         "change request register lists the change requests.",
     ]
     els = [b.para("Version 1.3 – summary of changes", bold=True, size=14, color="014EA9", hl=False, space_after=120),

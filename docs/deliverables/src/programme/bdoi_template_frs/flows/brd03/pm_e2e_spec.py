@@ -1,11 +1,10 @@
 """Product Maintenance - end-to-end process flow (FRS BRD-03 v1.3, section 4). Drawn from the FRS only (FRPM.001 to
 FRPM.030, Annexes O, P, R, S, T, Y) and the BRD; CR tags from Annex Y and the CR effort workbook."""
 
-CR_NEW = [("CR-PM-104", "Accessibility (WCAG 2.2 AA) of the module screens")]
+CR_NEW = [("CR-PM-103", "Accessibility (WCAG 2.2 AA) of the module screens")]
 CR_EXT = [("CR-PM-101", "Quotation Slip decision notice to the preparer (BRPM.012)"),
           ("CR-PM-102", "ManCom e-mails in BDOI's wording, President text (BRPM.015)"),
-          ("CR-PM-103", "Old and new field values of product master changes (BRPM.024)"),
-          ("CR-PM-105", "'Due soon' at 80% of the stage service level (BRPM.021)")]
+          ("CR-PM-104", "'Due soon' at 80% of the stage service level (BRPM.021)")]
 BRD = [("NFR 10.07", "One session per device (Collections addendum)"),
        ("NFR 4.03", "Source / IP address in the audit log (CLM, CLXN, RI addenda)")]
 
@@ -62,13 +61,13 @@ SPEC = dict(
         ("B1", 4, 4, .05, .06, .9, "sys", "Package set-up", ["New version (copy of the one in force)", "Rates, coverages, clauses, field rules", "Incentive rules (maker-checker)"]),
         ("B2", 4, 4, .05, .72, .9, "apr", "Post-setup validation", ["Checklist by another user; release"]),
         ("S0", 5, 0, .3, .05, .66, "sys", "Request register", ["Reference number, stage stepper", "One session per device"], ["BRD:NFR 10.07"]),
-        ("S1", 5, 1, .05, .05, .9, "sys", "Workflow rules", ["Mandatory fields and checks", "Stage service levels, reminders", "Reassignment of work"], ["EXT:CR-PM-105"]),
+        ("S1", 5, 1, .05, .05, .9, "sys", "Workflow rules", ["Mandatory fields and checks", "Stage service levels, reminders", "Reassignment of work"], ["EXT:CR-PM-104"]),
         ("S2", 5, 2, .05, .05, .9, "ntf", "Notices", ["Stage moves, assignments, decisions", "In system with e-mail copy"]),
-        ("SA", 5, 0, .05, .62, .9, "sys", "Screens of the module", ["Role-based menus and actions"], ["CR-PM-104"]),
+        ("SA", 5, 0, .05, .62, .9, "sys", "Screens of the module", ["Role-based menus and actions"], ["CR-PM-103"]),
         ("S3", 5, 4, .05, .05, .9, "sys", "Product master records", ["Approved changes and deactivations", "Transfer file every 30 minutes"]),
         ("S4", 5, 5, .05, .05, .9, "sys", "Daily expiry check", ["Alerts from 90 days; anniversary", "Renewal request drafted; deactivation"]),
         ("X1", 6, 5, .05, .1, .9, "id", "Consumers of the package", ["New Business, Renewal, Operations", "Other BDOI systems (product master)"]),
-        ("A1", 7, 4, .05, .1, .9, "aud", "Audit logs", ["Every action, user, time, IP address", "Old and new values of masters"], ["BRD:NFR 4.03", "EXT:CR-PM-103"]),
+        ("A1", 7, 4, .05, .1, .9, "aud", "Audit logs", ["Every action, user, time, IP address", "Old and new values of masters"], ["BRD:NFR 4.03"]),
         ("A2", 7, 5, .05, .1, .9, "aud", "Reports and dashboard", ["Placement Update, expiry, versions", "Export to PDF, Excel, CSV"]),
     ],
     edges=[

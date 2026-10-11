@@ -203,7 +203,7 @@ def add_summary(b, figs):
     els = [h2(intro["references_title"]), body(intro["references_intro"]),
            b.table(["Document", "Owner", "Use in this FRS"], intro["references"], [3.6, 1.5, 2.3], size=8),
            b.para("")]
-    els += [h2("Summary for the Business Unit Review", page=True), body(s["intro"])]
+    els += [h2("Summary for the Business Unit Review", page=False), body(s["intro"])]
     els += [sub("Scope on a page"), b.table(s["scope_header"], s["scope"], [2.7, 2.2, 2.5], size=8), b.para("")]
     els += [sub("The process from end to end")] + figure_elements(b, figs, "brd06_fig_e2e", max_h=8.0)
     els += [sub("Key numbers"), body(s["numbers_intro"]),
@@ -470,14 +470,20 @@ class NewAnnexes:
         with v12(b):
             a.h2("AP.1 Points beyond the BRD: out of the box and change requests")
             a.p("The points of this FRS that are not in the Renewal BRD or the signed Concept Paper are coloured where "
-                "they are stated (see How to read this document). Green points are offered by the system out of the "
-                "box and cost nothing; they stay in the Change Request Register as candidates for BDOI's "
-                "confirmation of scope. Orange points need a change request; their effort, by activity, is in the CR "
-                "Effort Estimate workbook (one man-day = 8 hours, estimate within plus or minus 20 percent).")
+                "they are stated (see How to read this document). Out of the box means the iNXT BrokerVerse platform "
+                "edition: its code and manual, cross-checked with the Feature List vs OOTB and Best Practice workbook "
+                "(column OOTB platform); the work prepared for BIBS in this project is not out of the box. Green points "
+                "are offered by the platform and cost nothing. Orange points are not in the platform, or only in part: "
+                "each is a change request whose effort (for the missing part) is in the CR Effort Estimate workbook "
+                "(one man-day = 8 hours, estimate within plus or minus 20 percent), also where the point is already "
+                "prepared for BIBS. Interfaces with external systems are delivered in the Integration scope and are "
+                "not change requests. All of them stay in the Change Request Register for BDOI's decision.")
             a.p("Green - beyond the BRD, out of the box", bold=True, keep_next=True, color=col["green"])
-            rows = [[g["id"], g.get("frrn", "-"), g["title"], g["brd"], g["ootb"], g["cr"]] for g in V12["green"]]
-            a.table(["No.", "FR item", "Point", "BRD (what it asks)", "Offered by the system", "Register"], rows,
-                    [0.5, 1.0, 1.9, 1.3, 2.1, 0.7], size=7.5)
+            rows = [[g["id"], g.get("frrn", "-"), g["title"], f"{g['feature']}: {g['ootb_status']}", g["brd"],
+                     g["evidence"], g["cr"]] for g in V12["green"]]
+            a.table(["No.", "FR item", "Point", "Feature List / OOTB", "BRD (what it asks)",
+                     "Offered by iNXT BrokerVerse (screen)", "Register"], rows, [0.5, 1.0, 1.9, 1.2, 1.4, 2.6, 0.8],
+                    size=7.5)
             from build_brd06_bdoi_frs import colour_runs  # noqa: PLC0415
             for tr in a.els[-2].findall(qn("w:tr"))[1:]:
                 colour_runs(tr, col["green"])
@@ -486,14 +492,34 @@ class NewAnnexes:
             for o in V12["orange"]:
                 md = sum(o["effort"])
                 total += md
-                rows.append([o["id"], o["frs"], o["title"], o["brd"], " ".join(o["why"].split()),
-                             f"{md:.1f}", o["priority"]])
-            a.table(["CR No.", "FRS reference", "Change", "BRD", "Why it is needed", "Man-days", "Priority"], rows,
-                    [0.8, 0.9, 1.6, 0.6, 2.4, 0.6, 0.6], size=7.5)
+                rows.append([o["id"], o["frs"], o["title"], f"{o['feature']}: {o['ootb_status']}",
+                             " ".join(o["ootb"].split()), o["built"], f"{md:.1f}", o["priority"]])
+            a.table(["CR No.", "FRS reference", "Change", "Feature List / OOTB", "What is missing in the platform "
+                     "edition", "Prepared for BIBS", "Man-days", "Priority"], rows,
+                    [0.8, 1.0, 1.9, 1.3, 2.8, 0.7, 0.6, 0.6], size=7.5)
+            for tr in a.els[-2].findall(qn("w:tr"))[1:]:
+                colour_runs(tr, col["orange"])
             a.p(f"Total of the change requests: {total:.1f} man-days ({len(rows)} change request"
                 f"{'s' if len(rows) != 1 else ''}). The requirements of other BRDs of the programme that also apply "
                 "to Renewal (Annex AJ, RN-NFR-17 and RN-NFR-18) are BRD requirements and are not change requests of "
                 "Renewal.", size=9)
+            lab = V12["labels"]
+            a.p("Grey - covered by the Integration and Data Migration scopes (not change requests)", bold=True,
+                keep_next=True, color=lab["colour"])
+            rows = [[x["id"], x.get("frrn", "-"), x["title"], x["interface"], x["scope"]]
+                    for x in V12["integration"] + V12.get("data_migration", [])]
+            a.table(["Register", "FR item", "Point", "Interface", "Covered by"], rows, [0.9, 1.0, 2.6, 3.0, 1.4],
+                    size=7.5)
+            a.h2("AP.2 Best-practice recommendations (not in the BRD, this FRS or the platform)")
+            blue = lab["blue"]
+            a.p("Insurance-broking practices for renewals that neither the BRD, this FRS nor the iNXT BrokerVerse "
+                "platform covers. They are recommendations for BDOI's consideration, with an indicative effort; they "
+                "are not commitments and are not in the change request totals.", color=blue)
+            rows = [[x["id"], x["practice"], x["why"], x["priority"], f"{x['effort']:.1f}"] for x in V12["best_practice"]]
+            a.table(["ID", "Practice", "Why it matters for a broker", "Suggested priority", "Indicative man-days"],
+                    rows, [0.8, 3.2, 3.6, 0.9, 0.9], size=7.5)
+            for tr in a.els[-2].findall(qn("w:tr"))[1:]:
+                colour_runs(tr, blue)
         b.stats["cr_mandays"] = total
 
     # AQ

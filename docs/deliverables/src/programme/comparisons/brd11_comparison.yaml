@@ -425,7 +425,7 @@ conflicts:
     brd: Not stated in the BRD.
     platform: Data scope by organisation unit per user.
     matches: Not stated
-    recommendation: Hold the data scope on the user record (unit, team, supervisor) as part of FRUM.002.03, with the values per persona from the User Access Matrix.
+    recommendation: Hold the data scope on the user record (unit, team, supervisor) as part of FRUM.002.03, with the values per persona from the User Access Matrix; the supervisor and record-owner rules are change request CR-UA-007 (Annex AA.2).
     impact: FRUM.001.02, FRUM.002.03, FRUM.005.01.
     decide_by: Process Owner (Business Administration)
   - id: C16

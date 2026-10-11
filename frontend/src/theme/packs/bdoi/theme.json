@@ -1,0 +1,17 @@
+{
+  "id": "bdoi",
+  "product": "BIBS",
+  "productName": "BDOI Broker System",
+  "client": "BDO Insure",
+  "clientShortName": "BDOI",
+  "groupName": "BDO",
+  "description": "BIBS - BDOI Broker System, powered by iorta TechNXT",
+  "printTitle": "BIBS – BDOI Broker System",
+  "legalName": "BDO Insurance and Reinsurance Brokers, Inc.",
+  "signInTagline": "The broking system of BDO Insure: clients, placement, policies, renewals, collections, remittance and accounting in one place.",
+  "signInHighlights": [
+    "Client, placement and policy servicing",
+    "Billing, collections and remittance to insurers",
+    "Accounting, disbursement and BIR reporting"
+  ]
+}

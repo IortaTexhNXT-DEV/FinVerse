@@ -1,0 +1,108 @@
+# Screen specifications of BRD-4 Collections: escalations, the escalation record with its workflow and the escalation
+# rules (maker-checker master data).
+area: Escalation
+screens:
+  - id: SCR-CL-11
+    title: Escalations
+    route: /collections/escalations
+    purpose: >-
+      The accounts escalated to the team lead or to the unit / section head, automatically by the escalation rules
+      (aging, no commitment, broken promises, overdue installments, amount) or by a user, by stage; Escalate Accounts
+      escalates one or several invoices by hand.
+    entry:
+      - Finance › Collections › Escalations
+    shots:
+      - {state: list, user: clxtl, caption: "Escalations with the team lead: by rule or by a user, with the reason and the time in stage"}
+      - {state: new, user: clxhandler, fill: escalate_manual, caption: "Escalate Accounts dialog: the invoices, the level and the reason"}
+    fields:
+      - "Tabs | With Team Lead / With Unit / Section Head / In Action / Returned / Resolved | Tab | - | - | Escalation stage | With Team Lead | - | - | -"
+      - "Toolbar | Search Escalation, ARN or Invoice No. | Text | - | N | Escalations | Blank | - | Contains | -"
+      - "List | Escalation No. | Column | ESC-yyyy-nnnnnn; the rule or the name of the user who raised it under it | - | Escalations | - | Read only | - | No escalations to display"
+      - "List | ARN / Name of Assured / Reason / Escalated To | Column | Label of the reason; the level or the user's name | - | Escalations | - | Read only | - | -"
+      - "List | Outstanding / In Stage Since / Status | Column | Two decimals; date and time with Past SLA when overdue | - | Escalations | - | Read only | - | -"
+      - "Escalate Accounts dialog | Invoice Nos. | Text area | One per line; the invoices of one account are escalated together | Y | Collection accounts | Blank | - | Account with something to collect | Enter at least one invoice number"
+      - "Escalate Accounts dialog | Escalate To / User | Drop-down, text | Team Lead, Unit Head, Section Head or Designated User; the user for a designated user | Y / Cond.: designated user | Users who handle escalations | Team Lead | - | The user handles escalations | Name the user who receives the escalation"
+      - "Escalate Accounts dialog | Reason / Remarks | Drop-down, text area | Escalation reason list | Y / N | Escalation reason list | Blank | - | - | Choose the reason"
+    actions:
+      - "Escalate Accounts | Collectors with the escalate permission | Always | Opens the dialog | - | -"
+      - "Escalate | Collectors with the escalate permission | The form is complete | Raises one escalation per account and lists the outcome per invoice | With Team Lead or With Unit / Section Head | Account escalated (NT-02)"
+      - "[Row] | Every Collections user | Always | Opens the escalation | - | -"
+    rules:
+      - "The rules escalate an account once per rule and month; the escalation job runs every night after the promise check (FR-CL-051)."
+      - "A user escalates one or several invoices regardless of the rules; the invoices of one account become one escalation (FR-CL-052)."
+      - "Each stage has the SLA of its rule; past it the escalation shows Past SLA and the overdue alert is raised (FR-CL-053)."
+    outcome: Accounts that need a decision reach the team lead or the head.
+    frs: [FR-CL-051, FR-CL-052, FR-CL-053]
+    tests: [ESC]
+
+  - id: SCR-CL-12
+    title: Escalation
+    route: /collections/escalations/:id
+    parent: /collections/escalations
+    purpose: >-
+      One escalation: the account, the reason, the receiving level or user, the outstanding and the SLA; the workflow
+      header with the actions of the stage (acknowledge, escalate to the unit / section head, return to the handler,
+      resubmit, resolve) and the history; the escalated invoices.
+    entry:
+      - Escalations › open a row
+      - Notification Account escalated
+    shots:
+      - {state: record, user: clxtl, open_escalation: with_tl, caption: "Escalation with the team lead: workflow header, actions and the escalated invoices"}
+      - {state: resolve, user: clxtl, open_escalation: second, caption: "Resolve Escalation dialog with the resolution, after the escalation is acknowledged"}
+    fields:
+      - "Header | [Escalation and ARN chips, status pill, By Rule or Manual tag, Past SLA] | Reference chip, status pill, tag | - | - | Escalation | - | Read only | - | -"
+      - "Facts | Reason / Escalated To / Outstanding / In Stage Since / Raised By | Display | Label of the reason; level or user's name; amount with the currency; time with the SLA in hours; the rule or the user's name | - | Escalation | - | Read only | - | -"
+      - "Workflow | [Escalation workflow header] | Stepper | Raised, With the team lead, With the unit / section head, In action, Returned to the handler, Resolved with the history table | - | Escalation workflow | - | Read only | - | -"
+      - "Escalated Invoices | Invoice No. / Policy No. / Days Since Booking / Outstanding When Escalated | Column | - | - | Escalation | - | Read only | - | -"
+      - "Action dialog | Reason / Comment | Drop-down, text area | Escalation reason list or return reason list | Y / N | Lists of values | Blank | With Team Lead, With Unit / Section Head, In Action | - | -"
+      - "Resolve Escalation dialog | Resolution | Text area | Up to 1,000 characters | Y | - | Blank | In Action | Not blank | Describe how the escalation was resolved"
+    actions:
+      - "Acknowledge | Team leads and heads (escalation permission) | With Team Lead or With Unit / Section Head | Takes the escalation into action | In action | Workflow notice (NT-01)"
+      - "Escalate to the unit / section head | Team leads and heads (escalation permission) | With Team Lead or In Action | Asks for the reason and moves it to the unit / section head | With the unit / section head | Workflow notice (NT-01)"
+      - "Return to the handler | Team leads and heads (escalation permission) | With Team Lead or With Unit / Section Head | Asks for the reason and the instruction and returns it to the handler | Returned to the handler | Workflow notice (NT-01)"
+      - "Resubmit to the team lead | The handler (work or escalate permission) | Returned | Sends it back to the team lead once the instruction is done | With the team lead | Workflow notice (NT-01)"
+      - "Resolve | Team leads and heads (escalation permission) | In Action | Asks for the resolution and closes it | Resolved | Workflow notice (NT-01)"
+    rules:
+      - "An escalation whose invoices are collected is closed automatically (FR-CL-053)."
+      - "Acting on an escalation needs the escalation permission; the target and the account officers are notified (FR-CL-053)."
+    outcome: The escalation is acted on and closed with its resolution.
+    frs: [FR-CL-053]
+    tests: [ESCD]
+
+  - id: SCR-CL-13
+    title: Escalation Rules
+    route: /collections/escalation-rules
+    purpose: >-
+      What escalates an account automatically: the basis and threshold, the segment, the receiving level or user, the
+      reason, the SLA in hours and the effective dates. Preview lists the accounts a rule escalates today. A new or
+      changed rule applies once another user authorizes it.
+    entry:
+      - Finance › Collections › Escalation Rules
+      - My Approvals (a rule waiting for authorization)
+    shots:
+      - {state: list, user: clxuh, caption: "Escalation Rules with their row menu: the rules in force and one waiting for authorization"}
+      - {state: new, user: clxuh, fill: new_escalation_rule, caption: "New Escalation Rule dialog"}
+    fields:
+      - "List | Rule | Column | Code with the name under it | - | Escalation rules | - | Read only | - | No escalation rules"
+      - "List | Escalates When | Column | Basis, threshold and receiving level or user's name, for example Days since booking ≥ 45 → Team Lead | - | Escalation rules | - | Read only | - | -"
+      - "List | Segment / Reason / SLA (h) / Effective / Status | Column | All or the segment; label of the reason; hours; Active, Pending Authorization or Inactive | - | Escalation rules | - | Read only | - | -"
+      - "New Escalation Rule dialog | Code / Name | Text | Up to 60 characters; the code of a new rule only | Y | - | Blank | New | Not blank | Enter the rule code"
+      - "New Escalation Rule dialog | Basis | Drop-down | Days since booking; Days since inception; Days since booking without a promise; Broken promises; Days an installment is overdue; Outstanding at or above | Y | Fixed list | Days since booking | Pending, Active | - | -"
+      - "New Escalation Rule dialog | Threshold | Number | Days, a number of promises or an amount, depending on the basis | Y | - | 45 | Pending, Active | Above zero | Enter a positive threshold"
+      - "New Escalation Rule dialog | Segment / Escalate To / User | Text, drop-down | Empty for every segment; Team Lead, Unit Head, Section Head or Designated User | N / Y / Cond.: designated user | Sales organisation, users | Team Lead | Pending, Active | The user handles escalations | Name the user who receives the escalations"
+      - "New Escalation Rule dialog | Reason | Drop-down | Escalation reason list | Y | Escalation reason list | Blank | Pending, Active | - | Choose the escalation reason"
+      - "New Escalation Rule dialog | SLA (Hours) / Effective From / Effective To | Number, date | 1 to 720 hours; dd-MMM-yyyy | Y / Y / N | - | 48 / today | Pending, Active | The rule cannot end before it starts | Enter between 1 and 720 hours"
+    actions:
+      - "New Rule | Users with the Collections set-up permission | Always | Opens the dialog | - | -"
+      - "Save Rule | Users with the Collections set-up permission | The form is complete | Saves the rule; it applies once authorized | Pending Authorization | -"
+      - "Preview (row menu) | Set-up and authorizing users | Always | Lists the accounts the rule escalates today | - | -"
+      - "Change (row menu) | Users with the Collections set-up permission | Not inactive | Opens the rule; the change waits for authorization | Pending Authorization | -"
+      - "Authorize (row menu) | Authorizers of master data, other than the maker | Pending Authorization | Asks for confirmation; the rule takes effect for new escalations | Active | -"
+      - "Deactivate (row menu) | Users with the Collections set-up permission | Active | Asks for confirmation; the rule no longer applies | Inactive | -"
+    rules:
+      - "Maker-checker: the maker of a rule cannot authorize it; pending rules also appear in My Approvals (FR-CL-050)."
+      - "The defaults of the process: 45 days after booking to the team lead, the 60th day from inception to the unit head, a broken promise to the team lead, an installment 15 days overdue to the team lead (FR-CL-050)."
+      - "A rule is deactivated, never deleted (FR-CL-050)."
+    outcome: The escalation rules agreed by the business apply every night.
+    frs: [FR-CL-050, FR-CL-051]
+    tests: [RULES]

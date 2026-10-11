@@ -1,0 +1,51 @@
+// Package expiry, renewal and deactivation (FRPM.003.04 to 003.07, 004.01, 019.02, 025.01, 026.01; BRPM.006, 017).
+digraph expiry_renewal {
+  graph [rankdir=TB, newrank=true, fontname="Arial", nodesep=0.25, ranksep=0.32, bgcolor="white", pad=0.2, splines=ortho];
+  node  [shape=box, style="filled", fontname="Arial", fontsize=10, width=1.6, height=0.55, margin="0.08,0.04"];
+  edge  [arrowsize=0.6, penwidth=0.9, fontname="Arial", fontsize=9, color="#333333"];
+
+  subgraph cluster_sys { label="System"; fontname="Arial Bold"; fontsize=11; style="rounded"; color="#666666";
+    node [fillcolor="#F5F5F5", color="#666666"];
+    h1 [label="", shape=plaintext, style="", width=0.1, height=0.1];
+    start [label="Start", shape=ellipse, fillcolor="#D5E8D4", color="#82B366", width=0.8, height=0.35];
+    s1 [label="Daily check of expiry\nand anniversary dates"];
+    s2 [label="Alert from 90 days\nbefore expiry; draft\nrenewal request if set"];
+    s3 [label="On approval: set\nexpiry date; flag\nincentive rules"];
+    s4 [label="On expiry date:\nstatus Inactive; archive;\nnotify TSU and MBS"];
+    end_ [label="End", shape=ellipse, fillcolor="#D5E8D4", color="#82B366", width=0.8, height=0.35];
+  }
+  subgraph cluster_tsu { label="TSU"; fontname="Arial Bold"; fontsize=11; style="rounded"; color="#6C8EBF";
+    node [fillcolor="#DAE8FC", color="#6C8EBF"];
+    h2 [label="", shape=plaintext, style="", width=0.1, height=0.1];
+    t1 [label="Review Package\nExpiry list and\nreports"];
+    t2 [label="Renew?", shape=diamond, width=1.0, height=0.7];
+    t3 [label="Generate renewal\nrequest pre-filled from\nversion in force"];
+    t4 [label="Deactivate?", shape=diamond, width=1.0, height=0.7];
+    t5 [label="Submit deactivation\nrequest with effective\ndate"];
+    t6 [label="Send renewal or\ndeactivation advisory"];
+  }
+  subgraph cluster_appr { label="Approvers (Marketing, TSU, ManCom)"; fontname="Arial Bold"; fontsize=11; style="rounded"; color="#82B366";
+    node [fillcolor="#D5E8D4", color="#82B366"];
+    h3 [label="", shape=plaintext, style="", width=0.1, height=0.1];
+    a1 [label="Package request\nworkflow: approvals,\nnegotiation, ManCom"];
+    a2 [label="Approve or reject\ndeactivation"];
+  }
+  subgraph cluster_mbs { label="MBS / Validator"; fontname="Arial Bold"; fontsize=11; style="rounded"; color="#D6B656";
+    node [fillcolor="#FFF2CC", color="#D6B656"];
+    h4 [label="", shape=plaintext, style="", width=0.1, height=0.1];
+    b1 [label="Set up renewed\nversion; validate\nand release"];
+  }
+  { rank=same; h1; h2; h3; h4; }
+  h1 -> h2 -> h3 -> h4 [style=invis];
+  h1 -> start [style=invis];
+
+  start -> s1 -> s2 -> t1 -> t2;
+  t2 -> t3 [xlabel="Yes"];
+  t3 -> a1 -> b1 -> t6;
+  t2 -> t4 [xlabel="No"];
+  t4 -> t5 [xlabel="Yes"];
+  t5 -> a2 -> s3 -> t6;
+  t4 -> s4 [xlabel="No"];
+  t6 -> end_;
+  s4 -> end_;
+}

@@ -1,0 +1,1583 @@
+# BIBS Non-Functional Requirements catalogue (BRD-00, programme level).
+# Read by build_requirements_quality.py for the NFR register (Excel), the tables of the NFR catalogue (Word) and the
+# NFR targets quoted in the SRS and the Test Strategy ({{nfr:<ID>}} tokens), so every document carries the same values.
+#
+# Precedence of the sources for a target: (1) a BDOI decision or answer; (2) the IER workbook v20 (BDO Cloud and
+# Digital Operations Engineering); (3) the BIBS-wide value proposed in the discrepancy register v1.2 (NFR comparison
+# sheet); (4) the BRD values; (5) a value proposed by iorta TechNXT. Status ALIGNED = the sources agree or BDOI has
+# answered; DECISION = the BRDs conflict and BDOI decides (register item named); PROPOSED = our value, to confirm.
+#
+# Row keys: id, cat, title, req (requirement), target (measurable), measure (how it is measured), method (Test |
+# Analysis | Inspection | Walk-through), test (test type of the Test Strategy), stage (where it is verified), owner
+# (iorta TechNXT role accountable for meeting it), acceptor (BDOI role that accepts the evidence), source, frs (how it
+# reconciles with the FRS non-functional chapters), status, prio (Must | Should).
+
+meta:
+  version: "1.0"
+  date: 8 October 2026
+
+categories:
+  PRF: Performance
+  CAP: Capacity and volume
+  AVL: Availability
+  REC: Recovery (RTO, RPO, backup and DR)
+  SCL: Scalability
+  SEC: Security
+  PRV: Privacy
+  ACC: Accessibility
+  USE: Usability and low-click workflows
+  RSP: Responsive and mobile-first
+  LOC: Localisation
+  MNT: Maintainability
+  CFG: Configurability
+  OBS: Observability
+  SUP: Supportability
+  AUD: Auditability
+  RET: Data retention
+  INT: Interoperability
+
+statuses:
+  ALIGNED: The sources agree, or BDOI has answered; the target stands unless BDOI changes it
+  DECISION: The BRDs give conflicting values; BDOI decides (register item named in Source); our proposal applies until then
+  PROPOSED: No BDOI value exists; iorta TechNXT proposes the target for BDOI to confirm
+
+nfrs:
+  # ------------------------------------------------------------------ Performance
+  - id: NFR-PRF-01
+    cat: PRF
+    title: Screen response time
+    req: Every screen opens, and every single-record action (save, submit, approve) completes, within the target at the design load.
+    target: "p95 at most 2.0 seconds and p99 at most 4.0 seconds"
+    measure: Click to usable screen, measured by the load tool over a 60-minute run at the design load of NFR-CAP-01 with the transaction mix of NFR-CAP-02, from the BDO network to the production-sized Pre-Prod
+    method: Test
+    test: Performance (load)
+    stage: Baseline in SIT (Jun 2027); NFT on Pre-Prod (1 Nov to 15 Dec 2027)
+    owner: iorta Performance Test Lead
+    acceptor: BIBS Product Owner
+    source: "BRD-00 p.42 (under 5 s for every role); BRD-12 p.13 (2 s); BRD-9 p.13 (3 s); BRD-1 p.210 and BRD-6 p.186 (10 s); register DCR-137, DCR-165; CRQ21"
+    frs: "FRS BRD-00 and BRD-12 state 2 s; FRS BRD-01 to BRD-10 state online p95 under 3 s. The catalogue sets 2 s; the FRS chapters take this value at their next issue once BDOI confirms (XQ08)."
+    status: DECISION
+    prio: Must
+  - id: NFR-PRF-02
+    cat: PRF
+    title: Search and work-list response time
+    req: The first page of any search result or work list is shown within the target; lists are paged on the server.
+    target: "First page (up to 50 rows) p95 at most 3.0 seconds; each further page p95 at most 2.0 seconds"
+    measure: Load-tool timing of the searches of each persona (client, account, invoice, receipt, claim, case) at the design load
+    method: Test
+    test: Performance (load)
+    stage: NFT on Pre-Prod
+    owner: iorta Performance Test Lead
+    acceptor: BIBS Product Owner
+    source: "BRD-9 p.13 (retrieval and search under 3 s); BRD-4 NFR 15 (5 s); BRD-10 p.22-24 (3 to 5 s)"
+    frs: "FRS BRD-04 and BRD-09 (server-side paging, indexed search keys) meet this target; no FRS states a slower value."
+    status: PROPOSED
+    prio: Must
+  - id: NFR-PRF-03
+    cat: PRF
+    title: Interactive reports
+    req: An on-screen report or its export is produced within the target; larger reports run as background jobs (NFR-PRF-04).
+    target: "At most 20 seconds (p95) for a report of up to 30,000 rows"
+    measure: Report run time from request to the first page shown or the file offered, at year-5 data volume
+    method: Test
+    test: Performance (volume)
+    stage: NFT on Pre-Prod
+    owner: iorta Performance Test Lead
+    acceptor: BIBS Product Owner
+    source: "BRD-6 p.186 and BRD-11 p.11 (20 s); BRD-5 p.133-137 (10 to 20 s first load); register DCR-137"
+    frs: "FRS BRD-06 states 20 s at 30,000 rows; FRS BRD-05 and BRD-11 run heavy reports in batches. Aligned."
+    status: DECISION
+    prio: Must
+  - id: NFR-PRF-04
+    cat: PRF
+    title: Long-running reports, extracts and scheduled files
+    req: Reports and files that exceed NFR-PRF-03 run as background jobs with progress shown; the user keeps working meanwhile.
+    target: "Daily file at most 3 minutes, weekly at most 10 minutes, monthly at most 15 minutes, at year-5 volumes"
+    measure: Job run history (start, end, rows) of the scheduled report jobs during the volume test
+    method: Test
+    test: Performance (volume)
+    stage: NFT on Pre-Prod; dress rehearsal (15 to 26 Nov 2027)
+    owner: iorta Performance Test Lead
+    acceptor: Head, Operations
+    source: "BRD-4 NFR 15 (daily 3 min, weekly 10 min, monthly 15 min); BRD-7 p.39-40 (reports 5 min)"
+    frs: "FRS BRD-04 generates the files off-peak in the background; FRS BRD-07 runs reports under 5 minutes. Aligned."
+    status: ALIGNED
+    prio: Must
+  - id: NFR-PRF-05
+    cat: PRF
+    title: Bulk uploads
+    req: An upload file is acknowledged at once and processed in the background with a result per row.
+    target: "Acknowledgement within 3 seconds; a 5,000-row file validated and committed within 10 minutes"
+    measure: Upload of a 5,000-row file of each bulk template during the volume test
+    method: Test
+    test: Performance (volume)
+    stage: NFT on Pre-Prod
+    owner: iorta Performance Test Lead
+    acceptor: BIBS Product Owner
+    source: "BRD-5 p.133-137 (upload or download 3 s per file); FRS BRD-01 (bulk uploads up to 5,000 rows per file)"
+    frs: "FRS BRD-01 commits row by row; the 10-minute ceiling is new and is added at the next issue."
+    status: PROPOSED
+    prio: Should
+  - id: NFR-PRF-06
+    cat: PRF
+    title: Document generation and batch printing
+    req: Business documents (slips, advices, receipts, SOA, vouchers) are generated within the target.
+    target: "One document p95 at most 5 seconds; a batch of 50 documents at most 10 seconds"
+    measure: Time from request to the PDF offered, at the design load
+    method: Test
+    test: Performance (load)
+    stage: NFT on Pre-Prod
+    owner: iorta Performance Test Lead
+    acceptor: Head, Operations
+    source: "BRD-2 p.115 (batch print of 50 documents under 10 s)"
+    frs: "FRS BRD-02 runs batch print as a background job with progress. Aligned."
+    status: ALIGNED
+    prio: Must
+  - id: NFR-PRF-07
+    cat: PRF
+    title: Night batch window
+    req: The scheduled jobs of the night (booking batch, remittance extraction, GL-SL reconciliation, Collections files, renewal extraction, screening, application file) finish before the service window opens.
+    target: "The chain from 20:00 to 05:30 PHT completes before 06:00 PHT at year-5 volumes; a failed job can be re-run within the window"
+    measure: Run history of every scheduled job in the volume test and the dress rehearsal
+    method: Test
+    test: Performance (volume)
+    stage: NFT on Pre-Prod; dress rehearsal
+    owner: iorta Solution Architect
+    acceptor: Head, BDOI IT
+    source: "Register DCR-133 (service window from 06:00); programme alignment pack, section 6.5 (job times)"
+    frs: "Each FRS names the times of its jobs (for example FRS BRD-02 remittance extraction 20:00 PHT, FRS BRD-12 processing 21:30 PHT). Aligned."
+    status: PROPOSED
+    prio: Must
+  - id: NFR-PRF-08
+    cat: PRF
+    title: Notifications and e-mail
+    req: Users are told of status changes, approvals and pending work without delay.
+    target: "In-app notification within 1 minute of the event; e-mail handed to CCM within 5 minutes"
+    measure: Time stamps of the event, the notification and the hand-over to CCM in SIT and NFT
+    method: Test
+    test: System integration
+    stage: SIT; NFT on Pre-Prod
+    owner: iorta QA lead
+    acceptor: BIBS Product Owner
+    source: "FRS BRD-00 FR-CR-020; integration INT-13 (CCM)"
+    frs: "No FRS gives a time; new value."
+    status: PROPOSED
+    prio: Should
+  - id: NFR-PRF-09
+    cat: PRF
+    title: Sign-in time
+    req: Single sign-on through EIAM completes quickly once the identity provider answers.
+    target: "p95 at most 3 seconds from the identity provider's answer to the role home page, excluding the user's own MFA entry"
+    measure: Load-tool timing of the sign-in journey at the morning peak (08:00 to 10:00)
+    method: Test
+    test: Performance (load)
+    stage: NFT on Pre-Prod
+    owner: iorta Performance Test Lead
+    acceptor: Head, BDOI IT
+    source: "Integration INT-01 (EIAM); BRD-1 p.210 peak hours 08:00-10:00"
+    frs: "No FRS gives a time; new value."
+    status: PROPOSED
+    prio: Should
+
+  # ------------------------------------------------------------------ Capacity and volume
+  - id: NFR-CAP-01
+    cat: CAP
+    title: Users
+    req: BIBS serves every named user of BDOI and the concurrent sessions of the peak.
+    target: "1,344 named users; design load 150 concurrent users in year 1, growing 20% a year (311 in year 5); peak test at 429 concurrent sessions"
+    measure: Concurrent sessions in the load and peak tests; named users from the user register at go-live
+    method: Test
+    test: Performance (peak)
+    stage: NFT on Pre-Prod
+    owner: iorta Performance Test Lead
+    acceptor: BIBS Product Owner
+    source: "BRD-00 p.42 (1,344 named, 429 concurrent); BRD-1 p.210 (485 / 145, growth 20%); IER architecture sheet (about 1,200 internal users); register DCR-166, DCR-232; CRQ21, CRQ24"
+    frs: "FRS BRD-01 sizes for 150 concurrent plus 20% a year; the other FRS fall within that sizing. Aligned; the peak case follows the umbrella BRD."
+    status: DECISION
+    prio: Must
+  - id: NFR-CAP-02
+    cat: CAP
+    title: Transaction volumes
+    req: BIBS carries the business volumes of the BRDs for five years.
+    target: "Year 1: New Business 21,200 transactions and 1,300 endorsements a month; Renewal 25,800 a month; Collections 1,200 updates a day; Claims 55 bookings and 1,096 updates a day; CSF 144,400 a year; Submitted Policies 63,000 sanitations a year. Growth 20% a year (Submitted Policies 25%)"
+    measure: Volume test at year-5 volumes (year 1 x 2.07; Submitted Policies x 2.44); job and screen timings within NFR-PRF targets
+    method: Test
+    test: Performance (volume)
+    stage: NFT on Pre-Prod
+    owner: iorta Performance Test Lead
+    acceptor: BIBS Product Owner
+    source: "BRD-1 p.210; BRD-6 p.186; BRD-4 NFR 15.01-15.05; BRD-7 p.39; BRD-9 p.13; BRD-12 p.13; BRD-00 p.42-45"
+    frs: "Same values in the FRS of BRD-01, 04, 06, 07, 09 and 12; FRS BRD-02 assumes its volumes within the BRD-1 sizing (OQ44)."
+    status: ALIGNED
+    prio: Must
+  - id: NFR-CAP-03
+    cat: CAP
+    title: Data and document volume
+    req: Storage is sized for five years of data and documents with headroom.
+    target: "Five years (60 months) at 20% growth a year with at least 30% free capacity at the end of year 5; migrated base up to 1,000,000 client rows and 500,000 open items"
+    measure: Capacity plan from the profiling extracts (M3) and the trial migrations, reviewed each quarter
+    method: Analysis
+    test: Capacity analysis
+    stage: After Trial migration 2 (Jul 2027); before go-live
+    owner: iorta Solution Architect
+    acceptor: Cloud and Digital Operations Engineering (IER owner)
+    source: "IER HW & SW Requirements (60 months; 15% growth a year); Data Migration Handbook (1,000,000 clients, 500,000 open items); programme alignment pack 6.3 (database re-sized without documents)"
+    frs: "The Handbook states the migration sizing. The IER uses 15% growth; the catalogue uses the 20% of the BRDs, so the IER sizing is updated (open point)."
+    status: PROPOSED
+    prio: Must
+  - id: NFR-CAP-04
+    cat: CAP
+    title: File sizes
+    req: Users attach and upload files up to the limits; larger bulk files go straight to the document store.
+    target: "Attachments up to 10 MB a file; uploads through the screens up to 25 MB; bulk files up to 5 GB by direct transfer; limits are parameters"
+    measure: Upload at and one step above each limit in SIT
+    method: Test
+    test: System (boundary)
+    stage: SIT
+    owner: iorta QA lead
+    acceptor: Head, BDOI IT
+    source: "Platform configuration (attachment and upload limits); BDO UX guidelines (format hint on upload fields)"
+    frs: "The upload screens of each FRS show the limit. Aligned."
+    status: PROPOSED
+    prio: Should
+  - id: NFR-CAP-05
+    cat: CAP
+    title: Peak periods
+    req: The month-end, mid-month and year-end peaks are carried without missing the response targets.
+    target: "1.5 times the average daily volume on the 15th, the 30th, month-end and year-end, within NFR-PRF-01 and NFR-PRF-02"
+    measure: Peak scenario of the load test (one hour at 1.5 times the design hourly rate)
+    method: Test
+    test: Performance (peak)
+    stage: NFT on Pre-Prod
+    owner: iorta Performance Test Lead
+    acceptor: Head, Comptrollership
+    source: "BRD-2 (15th and 30th); BRD-5 (month-end and year-end); BRD-9 (first quarter); BRD-1 and BRD-6 (08:00-10:00 and 15:00-17:00)"
+    frs: "The FRS list the peaks and keep batch jobs outside them. Aligned."
+    status: PROPOSED
+    prio: Must
+
+  # ------------------------------------------------------------------ Availability
+  - id: NFR-AVL-01
+    cat: AVL
+    title: Availability in the service window
+    req: BIBS is available to users throughout the service window.
+    target: "99.9% of the service window each month (about 25 minutes of unplanned unavailability in a month of 26 service days)"
+    measure: Synthetic sign-in and screen check every minute from the BDO network; monthly service report
+    method: Analysis
+    test: Operational acceptance
+    stage: Pre-Prod soak (Nov 2027); measured monthly from go-live
+    owner: iorta Solution Architect
+    acceptor: Head, BDOI IT
+    source: "Register DCR-134 (99.9% in service hours); BRD-2, 3, 9, 10, 12 (99.9%); BRD-8 (99.99%); BRD-5 Add.1 (100%)"
+    frs: "FRS BRD-05 notes that 100% is not measurable; FRS BRD-08 notes 99.99% applied to the dropped portal. The catalogue sets 99.9% for all modules."
+    status: DECISION
+    prio: Must
+  - id: NFR-AVL-02
+    cat: AVL
+    title: Service window
+    req: One service window serves every module; production runs 24 x 7 so jobs and interfaces run outside it.
+    target: "06:00 to 22:00 PHT Monday to Saturday, plus month-end weekends; production infrastructure 24 x 7"
+    measure: Configuration of the monitoring calendar and the job schedule
+    method: Inspection
+    test: Operational acceptance
+    stage: ORR / PRR (Dec 2027)
+    owner: iorta Solution Architect
+    acceptor: BIBS Product Owner
+    source: "Register DCR-133; IER Assumptions 3 and 4 (non-production 12 x 5, production 24 x 7); BRD service hours from 06:00 (BRD-4, 7, 9) to 22:00 (BRD-1, 4, 6, 9)"
+    frs: "FRS BRD-02, 03, 05 and 07 refer to the BRD-1 window 07:00-22:00; the catalogue opens at 06:00 for Collections, Claims and CSF."
+    status: DECISION
+    prio: Must
+  - id: NFR-AVL-03
+    cat: AVL
+    title: Planned maintenance
+    req: Planned work happens in one window outside every module's service hours.
+    target: "00:00 to 04:00 PHT; at most 45 minutes of planned downtime a month; announced 5 business days ahead; releases without downtime where the change allows"
+    measure: Change calendar and monthly service report
+    method: Inspection
+    test: Operational acceptance
+    stage: ORR / PRR; monthly from go-live
+    owner: iorta Solution Architect
+    acceptor: Head, BDOI IT
+    source: "Register DCR-138 and DCR-134; BRD-10 p.25 and BRD-12 p.14 (00:00-04:00, 45 minutes a month)"
+    frs: "FRS BRD-09 notes the BRD window 21:00-05:00 overlaps use (CSQ12); FRS BRD-05 notes 19:00-07:00. The catalogue takes 00:00-04:00."
+    status: DECISION
+    prio: Must
+  - id: NFR-AVL-04
+    cat: AVL
+    title: No single point of failure
+    req: Production keeps running when one pod, node or availability zone fails.
+    target: "Backend at least 3 pods over 3 availability zones (at least 2 available during changes); web tier at least 2 pods; PostgreSQL 16 Multi-AZ; Kafka 3 brokers; Valkey primary and replica in two zones"
+    measure: Resilience test - stop a pod, drain a node, fail over the database and one zone - with users signed in; no lost transaction
+    method: Test
+    test: Resilience
+    stage: NFT on Pre-Prod
+    owner: iorta DevOps and Platform Lead
+    acceptor: Cloud and Digital Operations Engineering (IER owner)
+    source: "IER HW & SW Requirements (Multi-AZ PROD, MSK 3 brokers); programme alignment pack 6.4 (Kubernetes sizing); component baseline of 8-Oct-2026"
+    frs: "The FRS refer to the platform deployment. Aligned."
+    status: ALIGNED
+    prio: Must
+  - id: NFR-AVL-05
+    cat: AVL
+    title: Graceful degradation
+    req: A failed cache or event-streaming service does not stop screen work.
+    target: "Valkey outage - sign-in checks fall back to PostgreSQL; Kafka outage - events wait in the outbox and are delivered on recovery with none lost or delivered twice to the consumer"
+    measure: Resilience test with Valkey and Kafka stopped for 15 minutes under load
+    method: Test
+    test: Resilience
+    stage: NFT on Pre-Prod
+    owner: iorta Solution Architect
+    acceptor: Head, BDOI IT
+    source: "Security controls (fail-closed fallback of the token checks); platform cache and events design (transactional outbox, dead letters)"
+    frs: "Not in the FRS (platform behaviour)."
+    status: ALIGNED
+    prio: Must
+
+  # ------------------------------------------------------------------ Recovery
+  - id: NFR-REC-01
+    cat: REC
+    title: Recovery point objective (RPO)
+    req: At most the target of committed work is lost in a disaster.
+    target: "RPO at most 15 minutes for data and documents"
+    measure: DR drill - time of the last transaction recovered against the time of the declared failure
+    method: Test
+    test: Disaster recovery
+    stage: DR drill on the DR environment (Dec 2027), then twice a year
+    owner: iorta DevOps and Platform Lead
+    acceptor: Cloud and Digital Operations Engineering (IER owner)
+    source: "IER Architecture Diagram and HW & SW Requirements (RPO 15 minutes, DR replica RPO at most 15 min); register DCR-135, DCR-225; BRD-9 BRCSF-011.001 (backup every 15 minutes)"
+    frs: "FRS BRD-02, 03 and 08 quote the BRD value of 24 hours and FRS BRD-04, 07 and 09 4 hours; the IER value of 15 minutes is stricter and governs."
+    status: ALIGNED
+    prio: Must
+  - id: NFR-REC-02
+    cat: REC
+    title: Recovery time objective (RTO)
+    req: Service is restored within the target after a declared disaster; critical services first.
+    target: "RTO at most 4 hours; sign-in, Cashiering, Remittance, booking and the GL first"
+    measure: DR drill - time from the DR decision to the service open in the DR region with business verification passed
+    method: Test
+    test: Disaster recovery
+    stage: DR drill (Dec 2027), then twice a year
+    owner: iorta DevOps and Platform Lead
+    acceptor: Head, BDOI IT
+    source: "IER (RTO 4 hours); BRD-2, 3, 4, 7, 8, 9 (4 hours); BRD-12 p.14 (critical services 4 hours, full recovery 24 hours); register DCR-135"
+    frs: "Every FRS that states an RTO states 4 hours. Aligned."
+    status: ALIGNED
+    prio: Must
+  - id: NFR-REC-03
+    cat: REC
+    title: Backup
+    req: Data and documents are backed up continuously and kept for the retention period.
+    target: "Continuous transaction-log archiving plus a base backup every 4 hours; backups encrypted and kept 7 years; document store versioned with cross-region replication"
+    measure: Backup reports and the restore test of NFR-REC-04
+    method: Inspection
+    test: Operational acceptance
+    stage: ORR / PRR
+    owner: iorta DevOps and Platform Lead
+    acceptor: Cloud and Digital Operations Engineering (IER owner)
+    source: "Register DCR-102, DCR-135, DCR-136; BRD-00 p.45 (every 4 hours, kept 5 years); BRD-2 and BRD-8 (kept 7 years)"
+    frs: "FRS BRD-02 and BRD-08 keep backups 7 years; FRS BRD-01, 04, 05, 10, 12 quote 5 years. The catalogue takes 7 years (the longest)."
+    status: DECISION
+    prio: Must
+  - id: NFR-REC-04
+    cat: REC
+    title: Restore and DR drills
+    req: Recovery is proven before go-live and kept proven afterwards.
+    target: "Point-in-time restore tested every quarter; DR failover drill before go-live (Dec 2027) and twice a year after; each with a written result"
+    measure: Drill reports with RPO and RTO achieved
+    method: Test
+    test: Disaster recovery
+    stage: Pre-Prod and DR (Dec 2027); quarterly and half-yearly after go-live
+    owner: iorta DevOps and Platform Lead
+    acceptor: Head, BDOI IT
+    source: "Operations runbook (quarterly restore test); IER DR environment"
+    frs: "Not in the FRS."
+    status: PROPOSED
+    prio: Must
+  - id: NFR-REC-05
+    cat: REC
+    title: DR region
+    req: A second AWS region hosts the DR copy of BIBS once BDOI confirms data residency.
+    target: "Database cross-region replica, document store cross-region replication, standby Kubernetes cluster scaled from 0 to 6 backend pods at failover"
+    measure: DR environment acceptance and the DR drill
+    method: Test
+    test: Disaster recovery
+    stage: DR environment ready by 1 Nov 2027 (DEP-25)
+    owner: iorta DevOps and Platform Lead
+    acceptor: Cloud and Digital Operations Engineering (IER owner)
+    source: "IER PROD DR (cross-region read replica) and diagram (warm standby); register DCR-225; programme alignment pack 6.4; IQ26"
+    frs: "Not in the FRS."
+    status: DECISION
+    prio: Must
+
+  # ------------------------------------------------------------------ Scalability
+  - id: NFR-SCL-01
+    cat: SCL
+    title: Horizontal scaling without downtime
+    req: The web, jobs and integration workloads scale out and in without interrupting users.
+    target: "Production backend 3 to 6 pods in year 1 and 4 to 8 in year 5 by CPU-based autoscaling; a scale-out completes within 5 minutes"
+    measure: Step-load test from the design load to the peak; pod count and response times recorded
+    method: Test
+    test: Performance (stress)
+    stage: NFT on Pre-Prod
+    owner: iorta DevOps and Platform Lead
+    acceptor: Cloud and Digital Operations Engineering (IER owner)
+    source: "Programme alignment pack 6.4; BRD-7 p.37 (no downtime when scaling the application); IER Kubernetes guideline 9 (autoscaling)"
+    frs: "FRS BRD-07 refers to the Technical Specification. Aligned."
+    status: ALIGNED
+    prio: Must
+  - id: NFR-SCL-02
+    cat: SCL
+    title: Data-tier scaling
+    req: Database storage grows online; a compute change of the managed database fits the maintenance window.
+    target: "Storage grows without downtime; a compute class change at most 120 minutes of downtime, inside the maintenance window"
+    measure: Change rehearsal on Pre-Prod
+    method: Test
+    test: Operational acceptance
+    stage: Pre-Prod (Nov 2027)
+    owner: iorta DevOps and Platform Lead
+    acceptor: Cloud and Digital Operations Engineering (IER owner)
+    source: "BRD-4 p.54-55 and BRD-7 p.37 (up to 120 minutes for data storage scaling)"
+    frs: "FRS BRD-04 and BRD-07 quote the BRD. Aligned."
+    status: ALIGNED
+    prio: Should
+  - id: NFR-SCL-03
+    cat: SCL
+    title: Stateless application tier
+    req: Any pod serves any request; a scheduled job runs once across pods.
+    target: "No user session state in the pods; each job run holds a cluster-wide lock; 0 duplicate job runs in the volume test"
+    measure: Inspection of the deployment; job run history with several pods in SIT and NFT
+    method: Inspection
+    test: System integration
+    stage: SIT (two pods from Jan 2027); NFT
+    owner: iorta Solution Architect
+    acceptor: Head, BDOI IT
+    source: "Operations runbook (stateless application, job lock); programme alignment pack 6.4 (SIT runs two pods to test the job lock)"
+    frs: "Not in the FRS."
+    status: ALIGNED
+    prio: Must
+  - id: NFR-SCL-04
+    cat: SCL
+    title: Growth headroom
+    req: The production cluster carries the year-5 load with headroom.
+    target: "At the year-5 peak, CPU and memory use of the cluster below 70%"
+    measure: Resource metrics during the year-5 volume and peak tests
+    method: Test
+    test: Performance (stress)
+    stage: NFT on Pre-Prod
+    owner: iorta Performance Test Lead
+    acceptor: Cloud and Digital Operations Engineering (IER owner)
+    source: "IER K8S sheets (threshold 0.79 on worker nodes); programme alignment pack 6.4"
+    frs: "Not in the FRS."
+    status: PROPOSED
+    prio: Should
+
+  # ------------------------------------------------------------------ Security
+  - id: NFR-SEC-01
+    cat: SEC
+    title: Single sign-on with EIAM
+    req: BDO users sign in once with their enterprise identity; BIBS keeps the roles.
+    target: "Every BDO user signs in through EIAM (Microsoft Entra ID) by OpenID Connect or SAML 2.0; local passwords only for the named break-glass administrators"
+    measure: SIT sign-in cases for both protocols; list of local accounts at go-live
+    method: Test
+    test: System integration; security
+    stage: SIT (after the EIAM specification, DEP-07)
+    owner: iorta Security Lead
+    acceptor: BDOI Information Security
+    source: "Drop plan integration EIAM (INT-01); security controls (single sign-on, break-glass); BRD-11 UAM-NFR-11, 17, 33"
+    frs: "FRS BRD-11 FR-UA-003 describes directory sign-in through EUA; the EIAM single sign-on replaces it at the next issue (IQ04)."
+    status: ALIGNED
+    prio: Must
+  - id: NFR-SEC-02
+    cat: SEC
+    title: Second factor
+    req: Privileged users prove a second factor.
+    target: "TOTP second factor for every privileged role and every break-glass administrator; EIAM conditional access for single sign-on users"
+    measure: Security-access cases of the BRD-11 test plan; configuration review of the MFA policy
+    method: Test
+    test: Security
+    stage: SIT
+    owner: iorta Security Lead
+    acceptor: BDOI Information Security
+    source: "Security controls (TOTP, policy PRIVILEGED as delivered); drop plan EIAM"
+    frs: "FRS BRD-11 covers the sign-in; the MFA policy is a security parameter changed under a second approval."
+    status: PROPOSED
+    prio: Must
+  - id: NFR-SEC-03
+    cat: SEC
+    title: User provisioning and leavers
+    req: Joiners, movers and leavers reach BIBS from UIDM-ISC; dormant accounts are disabled.
+    target: "SCIM 2.0 provisioning from UIDM-ISC (planned); a leaver disabled in BIBS within 1 hour of the UIDM-ISC change; accounts dormant for 90 days disabled by the daily job"
+    measure: SIT provisioning cases; access review report after the first month of production
+    method: Test
+    test: System integration; security
+    stage: SIT (after DEP-08)
+    owner: iorta Security Lead
+    acceptor: BDOI Information Security
+    source: "Drop plan integration UIDM-ISC (INT-02); BRD-11 UAM-NFR-09 (dormant users disabled); IQ05, DCR-229"
+    frs: "FRS BRD-11 keeps access requests in BIBS; the share between UIDM-ISC and BIBS requests is open (IQ05)."
+    status: DECISION
+    prio: Must
+  - id: NFR-SEC-04
+    cat: SEC
+    title: Role and data-scope access control
+    req: Every function is checked against the user's permissions and every record against the user's companies and branches; makers never approve their own work.
+    target: "0 successful unauthorised accesses in the security-access cases of every test plan and in the penetration test; every refusal logged"
+    measure: Security-access test cases (one per protected action) and the penetration test
+    method: Test
+    test: Security
+    stage: SIT; UAT; penetration test
+    owner: iorta QA lead
+    acceptor: BDOI Information Security
+    source: "Security controls (permissions, company and branch scope, segregation of duties); BRD-4 NFR 3 and BRD-7 NFR (protection against direct object reference)"
+    frs: "Each FRS has a role-access FR (for example FR-PM-002, FR-OP-002, FR-CL-001, FR-CM-002, FR-SS-001)."
+    status: ALIGNED
+    prio: Must
+  - id: NFR-SEC-05
+    cat: SEC
+    title: Session and lock-out
+    req: Idle sessions end and repeated failures lock the account.
+    target: "Inactivity warning at 15 minutes and sign-out at 30 minutes; absolute session end 8 hours; lock-out after 3 consecutive failed attempts"
+    measure: Security-access cases of the BRD-11 test plan
+    method: Test
+    test: Security
+    stage: SIT
+    owner: iorta Security Lead
+    acceptor: BDOI Information Security
+    source: "BRD-11 UAM-NFR-19, 34; BRD-1 p.93 and BRD-6 p.44 (warning 15, log-out 30); BRD-4 p.53 and BRD-7 p.35 (15 minutes); register DCR-140, DCR-142"
+    frs: "FRS BRD-11 FR-UA-001 and 002 apply 15 / 30 minutes and 3 attempts; FRS BRD-07 aligns its 15 minutes under CLQ24."
+    status: DECISION
+    prio: Must
+  - id: NFR-SEC-06
+    cat: SEC
+    title: Encryption in transit and at rest
+    req: Data is encrypted on every connection and in every store.
+    target: "TLS 1.2 or higher on every connection (browser, Gateway API, between workloads, to the managed services); database, document store and backups encrypted with customer-managed keys per environment"
+    measure: Configuration review and TLS scan of every listener
+    method: Inspection
+    test: Security
+    stage: Pre-Prod; ORR / PRR
+    owner: iorta Security Lead
+    acceptor: BDOI Information Security
+    source: "Security controls (TLS at the edge and to the pods); programme alignment pack 6.3 (KMS keys per environment); BRD-8 derived privacy requirement (encryption in transit and at rest)"
+    frs: "FRS BRD-08 states encryption of sensitive personal information. Aligned."
+    status: PROPOSED
+    prio: Must
+  - id: NFR-SEC-07
+    cat: SEC
+    title: Secure development gates
+    req: Every change passes the security gates of the CI pipeline before it can be released.
+    target: "SAST (CodeQL and SonarQube security rules) with no new high finding; Java dependencies fail at CVSS 7.0 or higher; web packages fail on high or critical advisories; container images fail on high or critical findings with a fix; secret detection over the full history; a software bill of materials kept with every release"
+    measure: CI pipeline reports attached to each release note
+    method: Inspection
+    test: Security (SAST and dependency scanning)
+    stage: Every change, from development to production
+    owner: iorta Security Lead
+    acceptor: BDOI Information Security
+    source: "Quality gates (dependency and supply-chain checks, SAST, SBOM)"
+    frs: "Not in the FRS."
+    status: ALIGNED
+    prio: Must
+  - id: NFR-SEC-08
+    cat: SEC
+    title: DAST and penetration test
+    req: The running application is tested from outside before go-live.
+    target: "DAST scan of each release candidate in SIT and Pre-Prod with no open high or critical finding; early scan in SIT in June 2027; independent penetration test 1 Nov to 15 Dec 2027; critical and high findings closed before go-live"
+    measure: Scan and penetration test reports with the re-test of each finding
+    method: Test
+    test: Security (DAST, penetration test)
+    stage: SIT (Jun 2027); Pre-Prod (Nov to Dec 2027)
+    owner: iorta Security Lead
+    acceptor: BDOI Information Security
+    source: "BDOI programme timeline (performance and penetration test Nov to Dec 2027); programme alignment pack (early security scan, IQ35); project plan DEP-19"
+    frs: "Not in the FRS."
+    status: PROPOSED
+    prio: Must
+  - id: NFR-SEC-09
+    cat: SEC
+    title: Integration security
+    req: System-to-system traffic is authenticated separately from users.
+    target: "Every inbound interface passes the Apigee X gateway with its own client credentials; user tokens are refused on the integration paths; each partner system has its own credentials"
+    measure: Security cases of the interface tests in SIT
+    method: Test
+    test: Security; system integration
+    stage: SIT (after DEP-13)
+    owner: iorta Security Lead
+    acceptor: Head, BDOI IT
+    source: "Security controls (separate security chain of the integration services); drop plan integrations; brief of 8-Oct-2026 (Apigee X gateway)"
+    frs: "Not in the FRS."
+    status: ALIGNED
+    prio: Must
+  - id: NFR-SEC-10
+    cat: SEC
+    title: Protection of documents that leave BDOI
+    req: Documents sent outside BDOI are protected.
+    target: "Every outbound document (slips, advices, SOA, schedules, reports) is a password-protected PDF or Excel file with the password sent separately; e-mail only to approved domains"
+    measure: Document-output cases of the test plans; review of the recipient policy
+    method: Test
+    test: System
+    stage: SIT; UAT
+    owner: iorta QA lead
+    acceptor: BDOI Information Security
+    source: "FRS BRD-00 FR-CR-071; BRD-1 security (outbound documents encrypted or password protected); BRD-6 (encrypted, password-protected RA and insurer files)"
+    frs: "FRS BRD-01, 02, 03, 06 and 08 apply it. Aligned."
+    status: ALIGNED
+    prio: Must
+  - id: NFR-SEC-11
+    cat: SEC
+    title: Uploaded files
+    req: Uploaded files cannot carry malware into BIBS.
+    target: "Every uploaded file scanned for malware and held in quarantine until clean; Office files refused above 1,000 parts or 100 times expansion"
+    measure: Upload cases with a test malware signature and an oversized archive in SIT
+    method: Test
+    test: Security
+    stage: SIT
+    owner: iorta Security Lead
+    acceptor: BDOI Information Security
+    source: "Programme alignment pack 6.3 (quarantine prefix, malware scan); platform configuration (Office file limits)"
+    frs: "Not in the FRS."
+    status: ALIGNED
+    prio: Must
+  - id: NFR-SEC-12
+    cat: SEC
+    title: Vulnerability remediation
+    req: Security findings in production are fixed within set times.
+    target: "Critical within 7 days, high within 30 days, medium within 90 days; an accepted finding expires after at most 6 months"
+    measure: Monthly vulnerability report
+    method: Inspection
+    test: Operational acceptance
+    stage: From go-live, monthly
+    owner: iorta Security Lead
+    acceptor: BDOI Information Security
+    source: "Quality gates (accepted findings expire after at most six months)"
+    frs: "Not in the FRS."
+    status: PROPOSED
+    prio: Must
+
+  # ------------------------------------------------------------------ Privacy
+  - id: NFR-PRV-01
+    cat: PRV
+    title: Masked data outside production
+    req: Personal data never reaches a non-production environment unmasked.
+    target: "Names, TIN, addresses, contact details and bank account numbers masked in DEV, SIT, training and UAT; 0 unmasked records found in the masking verification of each migration load"
+    measure: Masking verification report of each trial migration and of each copy to UAT
+    method: Test
+    test: Data migration; security
+    stage: Trial migrations 1 to 4 (Apr to Oct 2027)
+    owner: iorta Migration Lead
+    acceptor: Data Protection Officer, BDOI
+    source: "FRS BRD-00 NFR table (non-production data masked, hosting appendix); Data Migration Handbook (staging security)"
+    frs: "FRS BRD-00 and the Handbook state it. Aligned."
+    status: ALIGNED
+    prio: Must
+  - id: NFR-PRV-02
+    cat: PRV
+    title: Data residency and support access
+    req: Production data stays in the agreed region and is reached only by authorised personnel in the Philippines.
+    target: "Production in AWS ap-southeast-1; DR region confirmed by BDOI after the data-residency check; production access only by named personnel in the Philippines, each session logged"
+    measure: Access review of the AWS accounts and the bastion log before go-live and every quarter
+    method: Inspection
+    test: Security
+    stage: ORR / PRR; quarterly
+    owner: iorta DevOps and Platform Lead
+    acceptor: Data Protection Officer, BDOI
+    source: "FRS BRD-00 NFR table (hosting appendix: AWS ap-southeast-1, access from the Philippines); register DCR-225; IQ26"
+    frs: "FRS BRD-00 states it. Aligned."
+    status: DECISION
+    prio: Must
+  - id: NFR-PRV-03
+    cat: PRV
+    title: Sensitive personal information
+    req: Health-related and member data of Employee Benefits is handled as sensitive personal information.
+    target: "Access by department access class; every download logged; no health data in the member roster"
+    measure: Security-access and document cases of the BRD-08 test plan
+    method: Test
+    test: Security
+    stage: SIT and UAT of Drop 2
+    owner: iorta QA lead
+    acceptor: Data Protection Officer, BDOI
+    source: "FRS BRD-08 NFR table (data privacy, derived; EBQ15)"
+    frs: "FRS BRD-08 states it. Aligned."
+    status: ALIGNED
+    prio: Must
+  - id: NFR-PRV-04
+    cat: PRV
+    title: Data-subject requests
+    req: BDOI can answer a client's request to access or correct personal data.
+    target: "The personal data held on one client found and exported within 1 business day; corrections recorded with the audit trail"
+    measure: UAT scenario run by the DPO's delegate
+    method: Test
+    test: User acceptance
+    stage: UAT (Drop 1)
+    owner: iorta Business Analyst lead
+    acceptor: Data Protection Officer, BDOI
+    source: "Data Privacy Act 2012 (rights of the data subject); FRS BRD-09 (contact update with audit trail)"
+    frs: "FRS BRD-09 FR-CSF-040 records contact changes; the export for a data-subject request is new."
+    status: PROPOSED
+    prio: Should
+  - id: NFR-PRV-05
+    cat: PRV
+    title: Migration staging purge
+    req: Migration staging data does not outlive its purpose.
+    target: "Staged data and files purged within 5 days of the batch sign-off; access only for the migration roles"
+    measure: Purge job history and access log after each trial migration
+    method: Inspection
+    test: Data migration
+    stage: Trial migrations; cut-over
+    owner: iorta Migration Lead
+    acceptor: Data Protection Officer, BDOI
+    source: "Data Migration Handbook (staging security); platform configuration (staging retention 5 days)"
+    frs: "The Handbook states it. Aligned."
+    status: ALIGNED
+    prio: Must
+  - id: NFR-PRV-06
+    cat: PRV
+    title: Security event alerts
+    req: Events that may indicate a personal-data breach reach BDO Information Security quickly.
+    target: "Alerts within 15 minutes for repeated failed sign-ins, privilege changes, refused data-scope access and exports above 10,000 rows"
+    measure: Alert test in Pre-Prod with the SIEM of BDO
+    method: Test
+    test: Security
+    stage: Pre-Prod (Nov 2027)
+    owner: iorta Security Lead
+    acceptor: BDOI Information Security
+    source: "Data Privacy Act 2012 (security incident management by the personal information controller); BRD-4 NFR 4 (audit exportable); BRD-11 UAM-NFR-40 (escalation of privilege changes)"
+    frs: "FRS BRD-11 raises an alert for privilege increases (UQ07); the other alerts are new."
+    status: PROPOSED
+    prio: Should
+
+  # ------------------------------------------------------------------ Accessibility
+  - id: NFR-ACC-01
+    cat: ACC
+    title: WCAG 2.2 level AA
+    req: Every screen meets the success criteria of WCAG 2.2 at levels A and AA.
+    target: "0 open level A or AA failures on the screens of each sign-off set; 0 serious or critical issues in the scan of every screen"
+    measure: Scan of every screen with an accessibility checker plus a manual check of keyboard use, focus order and screen-reader labels on the main journey of each persona
+    method: Test
+    test: Accessibility
+    stage: SIT of each drop; re-check in UAT
+    owner: iorta UX Lead
+    acceptor: BIBS Product Owner
+    source: "BRD-11 UAM-NFR-05 (options for impaired vision or colour blindness); BDO UX guidelines (AA contrast, keyboard use)"
+    frs: "FRS BRD-11 applies the BDO UX contrast rules; the WCAG 2.2 AA level is new and is added to the screen standards appendix at the next issue."
+    status: PROPOSED
+    prio: Must
+  - id: NFR-ACC-02
+    cat: ACC
+    title: Keyboard use
+    req: Every function works with the keyboard alone.
+    target: "Every action reachable by keyboard with a visible focus ring; rows open with Enter; tabs move with the arrow keys"
+    measure: Manual keyboard pass on each screen family
+    method: Test
+    test: Accessibility
+    stage: SIT
+    owner: iorta UX Lead
+    acceptor: BIBS Product Owner
+    source: "BDO UX guidelines (keyboard use of tabs and tables, visible focus rings)"
+    frs: "Screen standards appendix of the FRS. Aligned."
+    status: ALIGNED
+    prio: Must
+  - id: NFR-ACC-03
+    cat: ACC
+    title: Contrast and colour
+    req: Text and status are readable for users with low vision or colour blindness.
+    target: "Text contrast at least 4.5:1 (3:1 for large text and controls); a status is never shown by colour alone"
+    measure: Contrast check of every colour token and pill tone; screen review
+    method: Inspection
+    test: Accessibility
+    stage: SIT
+    owner: iorta UX Lead
+    acceptor: BIBS Product Owner
+    source: "BDO UX guidelines (contrast, AA contrast of every pill and tag tone, overdue shown with icon and text)"
+    frs: "Screen standards appendix of the FRS. Aligned."
+    status: ALIGNED
+    prio: Must
+  - id: NFR-ACC-04
+    cat: ACC
+    title: Zoom and reflow
+    req: Screens stay usable when users enlarge the text.
+    target: "Usable at 200% browser zoom and at a 320-pixel reflow width without loss of content or function"
+    measure: Manual check of each screen family at 200% zoom
+    method: Test
+    test: Accessibility
+    stage: SIT
+    owner: iorta UX Lead
+    acceptor: BIBS Product Owner
+    source: "WCAG 2.2 success criteria 1.4.4 and 1.4.10"
+    frs: "New; added to the screen standards appendix at the next issue."
+    status: PROPOSED
+    prio: Should
+
+  # ------------------------------------------------------------------ Usability
+  - id: NFR-USE-01
+    cat: USE
+    title: Low-click navigation
+    req: Daily work starts from the role home page with few clicks.
+    target: "Any daily task reached in at most 2 clicks from the role home page or the menu; a record opened from a search result in 1 click; the main action of a record (submit, approve) at most 1 click away"
+    measure: Click count of the top 5 tasks of each persona in the end-to-end walkthroughs of the FRS
+    method: Walk-through
+    test: Usability
+    stage: SIT (screen review); UAT
+    owner: iorta UX Lead
+    acceptor: BIBS Product Owner
+    source: "BRD-00 p.5 (role-based self-service, centralised dashboards); FRS BRD-00 FR-CR-001 and FR-CR-010 (persona menus, role home)"
+    frs: "The FRS walkthroughs and storyboard indexes give the click paths; the counts are new targets."
+    status: PROPOSED
+    prio: Must
+  - id: NFR-USE-02
+    cat: USE
+    title: Work lists and bulk actions
+    req: Queues let users act on many items at once where the FRS allows bulk processing.
+    target: "Every queue offers filters, saved views and an action on selected rows; 50 items dispositioned without opening each record"
+    measure: Walk-through of each queue of the FRS with 50 seed items
+    method: Walk-through
+    test: Usability
+    stage: SIT; UAT
+    owner: iorta UX Lead
+    acceptor: BIBS Product Owner
+    source: "FRS BRD-00 FR-CR-083 (bulk and individual processing); BRD-1 p.142-144 (bulk processing across segments)"
+    frs: "FRS BRD-01, 04, 06 and 10 specify bulk actions. Aligned."
+    status: ALIGNED
+    prio: Must
+  - id: NFR-USE-03
+    cat: USE
+    title: Data entry
+    req: Users key each value once, with defaults and look-ups.
+    target: "A value is never asked twice in one journey; known values defaulted; dates dd-MMM-yyyy; amounts with thousands separators and two decimals; field errors shown inline with what to do"
+    measure: Screen review against the screen standards appendix of each FRS
+    method: Inspection
+    test: Usability
+    stage: SIT
+    owner: iorta UX Lead
+    acceptor: BIBS Product Owner
+    source: "BDO UX guidelines (input fields, error text); client screen rules (dd-MMM-yyyy dates, formatted amounts)"
+    frs: "Screen standards appendix of the FRS. Aligned."
+    status: ALIGNED
+    prio: Must
+  - id: NFR-USE-04
+    cat: USE
+    title: Consistent screens
+    req: Every screen follows the BDO UX guidelines and the BDOI UX design.
+    target: "Records shown in tables or tree tables with row action menus, never as free text; labels not codes; user names not log-ins; 0 deviations open at the end of SIT"
+    measure: Screen-by-screen review of the UX screen register of each sign-off set
+    method: Inspection
+    test: Usability
+    stage: SIT
+    owner: iorta UX Lead
+    acceptor: BIBS Product Owner
+    source: "FRS BRD-00 FR-CR-092 (BDO brand, design system and user journeys); BDO UX guidelines; BDOI UX design"
+    frs: "Every FRS has the screen standards appendix. Aligned."
+    status: ALIGNED
+    prio: Must
+  - id: NFR-USE-05
+    cat: USE
+    title: Learnability
+    req: Trained users complete their main tasks without help.
+    target: "90% of first attempts at the top task of each persona completed without help in UAT; System Usability Scale score of at least 75 in the UAT survey"
+    measure: UAT observation sheet and SUS survey of the UAT testers
+    method: Test
+    test: Usability
+    stage: UAT
+    owner: iorta UX Lead
+    acceptor: BIBS Product Owner
+    source: "BRD-9 p.13 (user-friendly, intuitive); BRD-00 BR-178 to BR-181 (design system and user journeys)"
+    frs: "New target."
+    status: PROPOSED
+    prio: Should
+  - id: NFR-USE-06
+    cat: USE
+    title: Help and messages
+    req: Users find help in the application and messages say what to do next.
+    target: "Help page for every screen family; every message of the messages catalogue states the next action"
+    measure: Review of the messages catalogue of each FRS and of the Help Center pages
+    method: Inspection
+    test: Usability
+    stage: SIT
+    owner: iorta Business Analyst lead
+    acceptor: BIBS Product Owner
+    source: "FRS BRD-11 (in-app Help Center, UQ18); messages catalogue chapter of each FRS"
+    frs: "Messages catalogue of each FRS. Aligned."
+    status: ALIGNED
+    prio: Should
+
+  # ------------------------------------------------------------------ Responsive
+  - id: NFR-RSP-01
+    cat: RSP
+    title: Responsive layout
+    req: Screens work on phone, tablet and desktop widths.
+    target: "Every screen usable from 360 to 1920 pixels wide with no horizontal page scroll; wide tables scroll inside their frame or collapse to cards on phones"
+    measure: Check of each screen family at 360, 768, 1280 and 1920 pixels
+    method: Test
+    test: Responsive (cross-device)
+    stage: SIT
+    owner: iorta UX Lead
+    acceptor: BIBS Product Owner
+    source: "BRD-2, 3, 5, 6, 8, 9, 10 (same performance on mobile and desktop); BRD-1 p.210 (any BDO-issued device)"
+    frs: "The FRS state responsive screens. Aligned."
+    status: ALIGNED
+    prio: Must
+  - id: NFR-RSP-02
+    cat: RSP
+    title: Mobile parity
+    req: The same functions and response times apply on BDO-issued mobile devices.
+    target: "Same functions and NFR-PRF targets on a BDO-issued phone or tablet on the BDO network; touch targets at least 44 pixels"
+    measure: Main journey of each persona run on a BDO-issued phone and tablet
+    method: Test
+    test: Responsive (cross-device)
+    stage: SIT; UAT
+    owner: iorta UX Lead
+    acceptor: BIBS Product Owner
+    source: "BRD rows 'same performance on mobile and desktop'; BDO UX guidelines (buttons 44 to 48 pixels)"
+    frs: "The FRS state no device restriction. Aligned."
+    status: ALIGNED
+    prio: Must
+  - id: NFR-RSP-03
+    cat: RSP
+    title: Supported browsers
+    req: Users need only a browser.
+    target: "Current and previous major versions of Microsoft Edge and Google Chrome on Windows, Safari on iOS and Chrome on Android; no plug-in or local install"
+    measure: Main journeys run on each browser
+    method: Test
+    test: Responsive (cross-device)
+    stage: SIT
+    owner: iorta QA lead
+    acceptor: Head, BDOI IT
+    source: "BRD-11 UAM-NFR-28 (browser only on workstations)"
+    frs: "FRS BRD-11 states it. Aligned."
+    status: PROPOSED
+    prio: Must
+
+  # ------------------------------------------------------------------ Localisation
+  - id: NFR-LOC-01
+    cat: LOC
+    title: Language and business terms
+    req: The screens use English and BDOI's own business terms.
+    target: "English user interface; BDOI terms (ARN, PRF, TSU, DP, RA, CLPC, FFY) exactly as in the BRDs; every acronym in the glossary"
+    measure: Review of the labels in the UX screen register of each sign-off set
+    method: Inspection
+    test: Usability
+    stage: SIT
+    owner: iorta Business Analyst lead
+    acceptor: BIBS Product Owner
+    source: "Writing standard of the client documents; BRD glossaries"
+    frs: "Glossary of each FRS. Aligned."
+    status: ALIGNED
+    prio: Must
+  - id: NFR-LOC-02
+    cat: LOC
+    title: Dates and time zone
+    req: Business dates follow Philippine time.
+    target: "Business date in Asia/Manila (PHT); dates shown dd-MMM-yyyy and times in PHT; time stamps stored in UTC"
+    measure: Cut-off and date cases around midnight PHT in SIT
+    method: Test
+    test: System (boundary)
+    stage: SIT
+    owner: iorta QA lead
+    acceptor: Head, Comptrollership
+    source: "Platform configuration (business zone Asia/Manila); screen rules (dd-MMM-yyyy)"
+    frs: "The FRS quote job times in PHT. Aligned."
+    status: ALIGNED
+    prio: Must
+  - id: NFR-LOC-03
+    cat: LOC
+    title: Currency and amounts
+    req: Amounts follow the company's base currency and BDOI's foreign-currency rules.
+    target: "Base currency PHP from the company record; USD and other currencies with daily and month-end revaluation rates; amounts with two decimals and thousands separators; reports in several currencies"
+    measure: Currency cases of the BRD-01 and BRD-05 test plans
+    method: Test
+    test: System
+    stage: SIT
+    owner: iorta QA lead
+    acceptor: Head, Comptrollership
+    source: "FRS BRD-00 FR-CR-091; FRS BRD-05 (monthly revaluation rate, USD revaluation)"
+    frs: "FRS BRD-00 and BRD-05 state it. Aligned."
+    status: ALIGNED
+    prio: Must
+  - id: NFR-LOC-04
+    cat: LOC
+    title: Philippine formats and calendar
+    req: Philippine identifiers, addresses and working days are handled correctly.
+    target: "TIN, mobile numbers and addresses (region, province, city or municipality, barangay) validated to Philippine formats; business-day rules follow the holiday calendar kept by the Business Administrator"
+    measure: Validation cases of client onboarding and date rules in SIT
+    method: Test
+    test: System
+    stage: SIT
+    owner: iorta QA lead
+    acceptor: BIBS Product Owner
+    source: "FRS BRD-01 (client record, EOPT details: TIN and registered address); programme alignment pack 4.2 (non-working days of the go-live calendar)"
+    frs: "FRS BRD-01 validates the client record; the holiday calendar is a list maintained on screen."
+    status: PROPOSED
+    prio: Should
+
+  # ------------------------------------------------------------------ Maintainability
+  - id: NFR-MNT-01
+    cat: MNT
+    title: Code quality gates
+    req: Every change passes the static quality gates before it is merged.
+    target: "Formatting, compiler warnings as errors, Checkstyle, PMD with duplication at 120 tokens, SpotBugs, ArchUnit architecture rules, TypeScript strict and SonarJS rules; cognitive complexity at most 15 per function in the web client"
+    measure: CI pipeline report of every change
+    method: Inspection
+    test: Static analysis
+    stage: Every change
+    owner: iorta Development Lead
+    acceptor: Head, BDOI IT
+    source: "Quality gates (backend and frontend gates)"
+    frs: "Not in the FRS."
+    status: ALIGNED
+    prio: Must
+  - id: NFR-MNT-02
+    cat: MNT
+    title: Code coverage
+    req: New and changed code is covered by unit testing.
+    target: "Line coverage above 90% on new and changed code (new-code gate of SonarQube); overall line coverage at least 80% and branch coverage at least 65%"
+    measure: Coverage reports of the CI pipeline and the SonarQube quality gate of each change
+    method: Inspection
+    test: Unit testing
+    stage: Every change
+    owner: iorta Development Lead
+    acceptor: Head, BDOI IT
+    source: "Quality gates (overall gate 80% lines, 65% branches); programme target for new code"
+    frs: "Not in the FRS."
+    status: PROPOSED
+    prio: Must
+  - id: NFR-MNT-03
+    cat: MNT
+    title: Modular structure
+    req: Each business area is a separate module of one application, with checked boundaries.
+    target: "One package per bounded context; 0 cycles between modules; boundary rules checked on every change"
+    measure: Architecture rules in the CI pipeline
+    method: Inspection
+    test: Static analysis
+    stage: Every change
+    owner: iorta Solution Architect
+    acceptor: Head, BDOI IT
+    source: "Architecture option decision (modular monolith); quality gates (ArchUnit)"
+    frs: "Not in the FRS."
+    status: ALIGNED
+    prio: Must
+  - id: NFR-MNT-04
+    cat: MNT
+    title: Technology baseline and support horizon
+    req: Every component runs on a version under upstream support.
+    target: "PostgreSQL 16, Valkey 8, Apache Kafka 3.9, OpenJDK 21 LTS, Spring Boot 3.5, React (compiled with Node 22 LTS, not used in production), nginx, managed Kubernetes with the Gateway API; baseline reviewed every year and before go-live"
+    measure: Technology review record; software bill of materials of each release
+    method: Inspection
+    test: Operational acceptance
+    stage: Before go-live; yearly
+    owner: iorta Solution Architect
+    acceptor: Head, BDOI IT
+    source: "Client decisions of 8-Oct-2026 (component baseline; Valkey replaces Redis; Gateway API replaces ingress-nginx)"
+    frs: "Not in the FRS. The IER rows for Redis 7, Kafka 3.6 and ingress-nginx are updated (open point)."
+    status: ALIGNED
+    prio: Must
+  - id: NFR-MNT-05
+    cat: MNT
+    title: Releases and rollback
+    req: Releases do not stop users and can be rolled back.
+    target: "Rolling deployment with no pod unavailable; data changes compatible with the previous release; rollback by redeploying the previous release within 30 minutes"
+    measure: Release and rollback rehearsal on Pre-Prod
+    method: Test
+    test: Operational acceptance
+    stage: Pre-Prod (Nov 2027)
+    owner: iorta DevOps and Platform Lead
+    acceptor: Head, BDOI IT
+    source: "Operations runbook (rolling update, expand-migrate-contract, rollback by previous image)"
+    frs: "Not in the FRS."
+    status: PROPOSED
+    prio: Must
+  - id: NFR-MNT-06
+    cat: MNT
+    title: Documentation kept current
+    req: The technical and support documents match each release.
+    target: "Technical specification, configuration guide, runbook and data dictionary updated with each release; release notes list every changed function"
+    measure: Release checklist
+    method: Inspection
+    test: Operational acceptance
+    stage: Each release; ORR / PRR
+    owner: iorta Project Manager
+    acceptor: Head, BDOI IT
+    source: "BRD-11 UAM-NFR-29 (system documentation); deliverables plan items 23 to 25"
+    frs: "FRS BRD-11 points to the administration guide. Aligned."
+    status: PROPOSED
+    prio: Should
+
+  # ------------------------------------------------------------------ Configurability
+  - id: NFR-CFG-01
+    cat: CFG
+    title: No hard-coded business rules
+    req: Business rule values are data maintained on screen, not program code.
+    target: "Every rate, limit, number of days, threshold, numbering prefix, approver and message text is a parameter, list of values, rule table or template; 0 client names, codes or currency literals in the application code, checked on every change"
+    measure: Rule column of every FR (Configurable or Fixed) and the code check of the CI pipeline
+    method: Inspection
+    test: Static analysis; configuration review
+    stage: Every change; SIT
+    owner: iorta Solution Architect
+    acceptor: BIBS Product Owner
+    source: "Deliverables plan item 16 (configuration over code); client review of hard-coded rules; FRS rule tables"
+    frs: "Every FRS rule states Configurable or Fixed and where it is maintained."
+    status: ALIGNED
+    prio: Must
+  - id: NFR-CFG-02
+    cat: CFG
+    title: Effective dates and approval of configuration
+    req: Configuration changes are dated, kept in history and approved by a second user.
+    target: "Every change of a list, parameter or rule has an effective date and a second-user approval; security parameters need a second approval by a security administrator"
+    measure: Configuration cases of the BRD-00 and BRD-11 test plans
+    method: Test
+    test: System
+    stage: SIT
+    owner: iorta QA lead
+    acceptor: BIBS Product Owner
+    source: "FRS BRD-00 FR-CR-060; security controls (security parameters under a second approval)"
+    frs: "FRS BRD-00 and BRD-11 state it. Aligned."
+    status: ALIGNED
+    prio: Must
+  - id: NFR-CFG-03
+    cat: CFG
+    title: Configurable workflows
+    req: Approval stages, approver matrices, SLA timers and escalations change without a release.
+    target: "Each workflow of the FRS configurable on screen: stages, approver matrix, SLA hours, escalation rules"
+    measure: Workflow configuration cases in SIT
+    method: Test
+    test: System
+    stage: SIT
+    owner: iorta QA lead
+    acceptor: BIBS Product Owner
+    source: "FRS BRD-00 FR-CR-080; FRS BRD-10 FR-SS-013 to 015; FRS BRD-11 (approver rules are parameters)"
+    frs: "Workflow chapters of each FRS. Aligned."
+    status: ALIGNED
+    prio: Must
+  - id: NFR-CFG-04
+    cat: CFG
+    title: Document and e-mail templates
+    req: Business users maintain the templates of documents and e-mails.
+    target: "Every document and e-mail template edited by the Business Administrator, downloaded and uploaded as Word, under maker-checker"
+    measure: Template cases in SIT
+    method: Test
+    test: System
+    stage: SIT
+    owner: iorta QA lead
+    acceptor: BIBS Product Owner
+    source: "FRS BRD-00 FR-CR-050; deliverables plan item 17 (templates to and from Word)"
+    frs: "Document outputs chapter of each FRS. Aligned."
+    status: ALIGNED
+    prio: Should
+  - id: NFR-CFG-05
+    cat: CFG
+    title: Branding by theme pack
+    req: Brand, logo and colours come from configuration.
+    target: "BDO Insure brand applied from the theme pack of the deployment; no brand element fixed in the screens"
+    measure: Inspection of the theme pack and the screens
+    method: Inspection
+    test: Configuration review
+    stage: SIT
+    owner: iorta UX Lead
+    acceptor: BIBS Product Owner
+    source: "Client review of hard-coded rules (theme pack); FRS BRD-00 FR-CR-092"
+    frs: "FRS BRD-00 states the brand. Aligned."
+    status: ALIGNED
+    prio: Should
+
+  # ------------------------------------------------------------------ Observability
+  - id: NFR-OBS-01
+    cat: OBS
+    title: Metrics and dashboards
+    req: Operations sees the health and load of every workload.
+    target: "Application, JVM, request, connection-pool and business metrics sent to the BDO monitoring platform; dashboards per workload (web, jobs, integration, web tier) and for the managed services"
+    measure: Dashboard review in Pre-Prod during the NFT
+    method: Inspection
+    test: Operational acceptance
+    stage: Pre-Prod; ORR / PRR
+    owner: iorta DevOps and Platform Lead
+    acceptor: Head, BDOI IT
+    source: "Operations runbook (metrics on the management port); IER VDI and K8S sheets (Dynatrace); IQ30"
+    frs: "Not in the FRS."
+    status: DECISION
+    prio: Must
+  - id: NFR-OBS-02
+    cat: OBS
+    title: Logs
+    req: Logs let support trace every event without exposing personal data.
+    target: "One line per event with time stamp, correlation ID, user and module; shipped to the BDO log platform within 1 minute; no passwords or full personal identifiers in logs"
+    measure: Log review in Pre-Prod; search of a correlation ID from a user error
+    method: Inspection
+    test: Operational acceptance
+    stage: Pre-Prod; ORR / PRR
+    owner: iorta DevOps and Platform Lead
+    acceptor: BDOI Information Security
+    source: "Operations runbook (logs, correlation ID); security controls (no passwords in logs); BRD-11 UAM-NFR-21 (error log sent to a remote log server)"
+    frs: "FRS BRD-11 refers to the Technical Specification. Aligned."
+    status: PROPOSED
+    prio: Must
+  - id: NFR-OBS-03
+    cat: OBS
+    title: Alerts
+    req: Faults raise alerts before users report them.
+    target: "Alerts for an error rate above 1% over 5 minutes, p95 above its NFR-PRF target for 10 minutes, a failed job, a new dead letter, a security-store failure and a certificate expiring within 30 days; the on-call person notified within 5 minutes"
+    measure: Alert test in Pre-Prod (each condition provoked once)
+    method: Test
+    test: Operational acceptance
+    stage: Pre-Prod (Nov 2027)
+    owner: iorta DevOps and Platform Lead
+    acceptor: Head, BDOI IT
+    source: "Operations runbook (security-store alert, dead letters); BRD-11 UAM-NFR-25 (failed batch e-mail)"
+    frs: "FRS BRD-11 FR-UA-071 e-mails failed runs. Aligned."
+    status: PROPOSED
+    prio: Must
+  - id: NFR-OBS-04
+    cat: OBS
+    title: Correlation of requests and events
+    req: One reference follows a request from the screen to the logs and the integration events.
+    target: "Every request carries a correlation ID; an unexpected error shows the user a reference found in the logs; integration events carry the same ID"
+    measure: SIT case - provoke an error and find its reference in the logs
+    method: Test
+    test: System integration
+    stage: SIT
+    owner: iorta QA lead
+    acceptor: Head, BDOI IT
+    source: "Operations runbook (correlation ID, error reference)"
+    frs: "Not in the FRS."
+    status: ALIGNED
+    prio: Must
+  - id: NFR-OBS-05
+    cat: OBS
+    title: Job monitoring
+    req: Every scheduled job is visible on screen with its history.
+    target: "Run history (start, end, records, result, trigger, user) for every job; failures e-mailed to the job's recipients; manual runs restricted to authorised roles"
+    measure: Job cases of the BRD-04 and BRD-11 test plans
+    method: Test
+    test: System
+    stage: SIT
+    owner: iorta QA lead
+    acceptor: Head, Operations
+    source: "BRD-11 UAM-NFR-24, 25; BRD-4 NFR 12 (batch security)"
+    frs: "FRS BRD-04 and BRD-11 state it. Aligned."
+    status: ALIGNED
+    prio: Must
+
+  # ------------------------------------------------------------------ Supportability
+  - id: NFR-SUP-01
+    cat: SUP
+    title: Support levels
+    req: Each support level has a defined role from go-live.
+    target: "L1 BDOI service desk, L2 BDOI application support, L3 iorta TechNXT; each level named and trained before the hypercare exit (2 Feb 2028)"
+    measure: Knowledge-transfer sign-off and support roster
+    method: Inspection
+    test: Operational acceptance
+    stage: ORR / PRR; hypercare exit
+    owner: iorta Project Manager
+    acceptor: Head, BDOI IT
+    source: "Production support approach (support levels); project plan DEP-18 (named L1 and L2 team)"
+    frs: "Not in the FRS."
+    status: ALIGNED
+    prio: Must
+  - id: NFR-SUP-02
+    cat: SUP
+    title: Incident handling within the agreed service levels
+    req: Production incidents are answered and resolved within the response and resolution times of their priority (P1 to P4) in the support service levels.
+    target: "At least 95% of incidents each month within the response and resolution times of their priority"
+    measure: Monthly service report
+    method: Analysis
+    test: Operational acceptance
+    stage: From go-live, monthly
+    owner: iorta Project Manager
+    acceptor: Head, BDOI IT
+    source: "Production support approach and service levels (priorities P1 to P4)"
+    frs: "Not in the FRS."
+    status: PROPOSED
+    prio: Must
+  - id: NFR-SUP-03
+    cat: SUP
+    title: Error references and coded messages
+    req: Support finds the cause of a reported error quickly.
+    target: "Every unexpected error shows a reference found in the logs; every business error shows a message of the messages catalogue with its code"
+    measure: Message cases of each test plan
+    method: Test
+    test: System
+    stage: SIT
+    owner: iorta QA lead
+    acceptor: Head, BDOI IT
+    source: "Operations runbook (error reference); messages catalogue of each FRS"
+    frs: "Messages catalogue of each FRS. Aligned."
+    status: ALIGNED
+    prio: Must
+  - id: NFR-SUP-04
+    cat: SUP
+    title: Hypercare
+    req: The project team supports the first month of production.
+    target: "Hypercare from T+1 to T+30 (4 Jan to 2 Feb 2028) with issue triage at 10:00 and 16:00 each business day"
+    measure: Hypercare log and exit report
+    method: Inspection
+    test: Operational acceptance
+    stage: Hypercare
+    owner: iorta Project Manager
+    acceptor: BIBS Product Owner
+    source: "Cut-over plan of the Data Migration Handbook (T-30 to T+30); project plan phase G"
+    frs: "The Handbook states it. Aligned."
+    status: ALIGNED
+    prio: Must
+  - id: NFR-SUP-05
+    cat: SUP
+    title: Administration without a command line
+    req: Support runs routine tasks from screens.
+    target: "Jobs started, stopped and re-run, caches cleared and integration events re-sent from administration screens; 0 routine tasks that need a command line"
+    measure: Walk-through of the runbook's routine tasks with L2 support
+    method: Walk-through
+    test: Operational acceptance
+    stage: Knowledge transfer (from Jun 2027); ORR / PRR
+    owner: iorta DevOps and Platform Lead
+    acceptor: Head, BDOI IT
+    source: "BRD-11 UAM-NFR-24, 26 (no command line); operations runbook (routine support tasks)"
+    frs: "FRS BRD-11 refers to the platform tools. Aligned."
+    status: ALIGNED
+    prio: Should
+
+  # ------------------------------------------------------------------ Auditability
+  - id: NFR-AUD-01
+    cat: AUD
+    title: Complete audit trail
+    req: Every action is recorded with who, what, when and from where.
+    target: "Every create, update, approve, post, reverse, sign-in, sign-out, report run and export recorded with the user, time, source IP, module, record, old and new values and a success or failure indicator, in the same transaction as the change"
+    measure: Audit cases of each test plan
+    method: Test
+    test: System
+    stage: SIT
+    owner: iorta QA lead
+    acceptor: Internal Audit, BDOI
+    source: "Security controls (audit); BRD-2 p.67, p.186 (IT audit trail standard, seven items); BRD-4 NFR 4; register DCR-145"
+    frs: "Each FRS has an audit FR (for example FR-CR-030, FR-NB-016, FR-PM-005, FR-CM-003, FR-SS-091). Aligned."
+    status: ALIGNED
+    prio: Must
+  - id: NFR-AUD-02
+    cat: AUD
+    title: Audit records cannot be changed
+    req: No one changes or deletes an audit record.
+    target: "0 successful changes or deletions of audit records by any user, administrator or the application"
+    measure: Security case - attempt to change an audit record through the screens and the data store
+    method: Test
+    test: Security
+    stage: SIT; penetration test
+    owner: iorta Security Lead
+    acceptor: Internal Audit, BDOI
+    source: "Security controls (insert-only audit trail, refused in the data store)"
+    frs: "FRS BRD-10 FR-SS-091 (immutable audit log). Aligned."
+    status: ALIGNED
+    prio: Must
+  - id: NFR-AUD-03
+    cat: AUD
+    title: Audit enquiry and export
+    req: Auditors find and export audit records themselves.
+    target: "Audit trail filtered by user, period, module and record on screen; one month for one user exported within 2 minutes"
+    measure: Audit report case at year-1 data volume
+    method: Test
+    test: Performance (volume)
+    stage: NFT on Pre-Prod
+    owner: iorta QA lead
+    acceptor: Internal Audit, BDOI
+    source: "BRD-4 NFR 4 (exportable audit log); BRD-11 UAM-NFR-41 (User Access Audit Log report)"
+    frs: "FRS BRD-04 and BRD-11 state the reports. Aligned."
+    status: PROPOSED
+    prio: Should
+  - id: NFR-AUD-04
+    cat: AUD
+    title: Master-data change log
+    req: Changes to master data keep old and new values field by field.
+    target: "Users and roles, products and versions, insurers and branches, commission rates, lists of values, chart of accounts, payees and parameters logged field by field with old and new values"
+    measure: Change-log cases of the BRD-00 and BRD-05 test plans
+    method: Test
+    test: System
+    stage: SIT
+    owner: iorta QA lead
+    acceptor: Internal Audit, BDOI
+    source: "FRS BRD-00 FR-CR-031 (CRQ07)"
+    frs: "FRS BRD-00 states it. Aligned."
+    status: ALIGNED
+    prio: Must
+
+  # ------------------------------------------------------------------ Data retention
+  - id: NFR-RET-01
+    cat: RET
+    title: Retention per record type
+    req: Each record type has its retention rule.
+    target: "Default 5 years online and 15 years archive; Claims 10 years online and 15 archive; Accounting vouchers and reports, Sanction Screening and Submitted Policies 5 years online and 5 archive"
+    measure: Retention rule list reviewed by the record owners; monthly retention review report
+    method: Inspection
+    test: Configuration review
+    stage: UAT (Drop 1); before go-live
+    owner: iorta Business Analyst lead
+    acceptor: BIBS Product Owner
+    source: "BRD-00 p.45 (5 / 15 years); BRD-7 p.41 (10 / 15); BRD-5 Add.1, BRD-10 p.25, BRD-12 p.14 (5 / 5); register DCR-136; CRQ22"
+    frs: "Each FRS names the retention rule of its records (for example renewal candidates, broker claims, submitted policies); the values wait for CRQ22 and Q39."
+    status: DECISION
+    prio: Must
+  - id: NFR-RET-02
+    cat: RET
+    title: Archive, purge and legal hold
+    req: Records leave the online store only under approved rules.
+    target: "Monthly review lists eligible records; archive and purge run only after BDOI approves the retention decision (Q39); records and files under legal hold never purged"
+    measure: Retention review report; legal-hold case in SIT
+    method: Test
+    test: System
+    stage: SIT
+    owner: iorta Solution Architect
+    acceptor: Head, Comptrollership
+    source: "FRS BRD-01 FR-NB-137; programme alignment pack 6.3 (Object Lock, legal hold)"
+    frs: "FRS BRD-01 states it. Aligned."
+    status: ALIGNED
+    prio: Must
+  - id: NFR-RET-03
+    cat: RET
+    title: Audit log retention
+    req: Audit records outlive the records they describe.
+    target: "Audit records 5 years online and archived to 16 years"
+    measure: Retention rule of the audit records
+    method: Inspection
+    test: Configuration review
+    stage: Before go-live
+    owner: iorta Solution Architect
+    acceptor: Internal Audit, BDOI
+    source: "BRD-7 p.41 (audit logs archive 16 years); BRD-00 p.45 (5 / 15 years)"
+    frs: "FRS BRD-07 aligns the 16-year audit archive under CLQ24."
+    status: DECISION
+    prio: Must
+  - id: NFR-RET-04
+    cat: RET
+    title: Document storage tiers
+    req: Older documents move to cheaper storage and stay retrievable.
+    target: "Documents to infrequent-access storage after 90 days and to archive storage after 1 year; any document retrieved within 1 minute"
+    measure: Lifecycle configuration review; retrieval case of an archived document
+    method: Test
+    test: System
+    stage: Pre-Prod
+    owner: iorta DevOps and Platform Lead
+    acceptor: Cloud and Digital Operations Engineering (IER owner)
+    source: "Programme alignment pack 6.3 (lifecycle to Standard-IA and Glacier Instant Retrieval); IER (S3 lifecycle)"
+    frs: "Not in the FRS."
+    status: ALIGNED
+    prio: Should
+  - id: NFR-RET-05
+    cat: RET
+    title: AML records
+    req: KYC and screening records are kept as AMLA requires.
+    target: "KYC documents and screening cases kept at least 5 years after the end of the client relationship"
+    measure: Retention rules of screening cases and list entries reviewed by Compliance
+    method: Inspection
+    test: Configuration review
+    stage: UAT (Drop 1)
+    owner: iorta Business Analyst lead
+    acceptor: Compliance Officer, BDOI
+    source: "BRD-10 p.25 (5 years online, 5 archive); RA 9160 (AMLA), as amended"
+    frs: "FRS BRD-10 states the rules of screening cases and list entries (5 / 5). Aligned."
+    status: ALIGNED
+    prio: Must
+
+  # ------------------------------------------------------------------ Interoperability
+  - id: NFR-INT-01
+    cat: INT
+    title: Integration gateway and contracts
+    req: Every system-to-system interface is published through the BDO gateway with a written contract.
+    target: "Every service interface through Apigee X, described in OpenAPI 3 with versioned contracts; every file interface with an agreed layout and control totals"
+    measure: Interface catalogue review; contract tests in SIT
+    method: Inspection
+    test: Service interface (API)
+    stage: SIT
+    owner: iorta Solution Architect
+    acceptor: Head, BDOI IT
+    source: "Drop plan integrations (all external touch-points owned by BDOI IT); brief of 8-Oct-2026 (Apigee X)"
+    frs: "Interfaces and integration chapter of each FRS. Aligned."
+    status: ALIGNED
+    prio: Must
+  - id: NFR-INT-02
+    cat: INT
+    title: Business events
+    req: Business events reach their consumers exactly once from the consumer's view.
+    target: "Events published through a transactional outbox; 0 events lost in the resilience test; failed events kept as dead letters and re-sent from the administration screen"
+    measure: Resilience test with the event stream stopped (NFR-AVL-05); dead-letter case in SIT
+    method: Test
+    test: Resilience
+    stage: SIT; NFT
+    owner: iorta Solution Architect
+    acceptor: Head, BDOI IT
+    source: "Platform cache and events design (outbox, dead letters); operations runbook"
+    frs: "Not in the FRS."
+    status: ALIGNED
+    prio: Must
+  - id: NFR-INT-03
+    cat: INT
+    title: Identity standards
+    req: Identity interfaces use open standards.
+    target: "OpenID Connect and SAML 2.0 with EIAM; SCIM 2.0 provisioning from UIDM-ISC"
+    measure: Interface tests in SIT
+    method: Test
+    test: System integration
+    stage: SIT
+    owner: iorta Security Lead
+    acceptor: Head, BDOI IT
+    source: "Drop plan integrations EIAM and UIDM-ISC; security controls"
+    frs: "FRS BRD-11 (directory sign-in, IQ04, IQ05)."
+    status: ALIGNED
+    prio: Must
+  - id: NFR-INT-04
+    cat: INT
+    title: File interfaces
+    req: Inbound files are validated, reconciled and reported.
+    target: "Every inbound file (PDC list, bills payment, bank and insurer files) validated against its layout; each run reconciled to its control totals; errors reported per row; a failed transfer retried up to 3 times"
+    measure: File cases of the BRD-02 and BRD-05 test plans
+    method: Test
+    test: System integration
+    stage: SIT
+    owner: iorta QA lead
+    acceptor: Head, Operations
+    source: "Programme alignment pack 5 (PMS, OBPCS, Old BOB, CMS / New BOB, insurer systems); FRS BRD-02 (payment files)"
+    frs: "FRS BRD-02 and BRD-05 specify the layouts. Aligned."
+    status: PROPOSED
+    prio: Must
+  - id: NFR-INT-05
+    cat: INT
+    title: E-mail through CCM
+    req: All outbound e-mail goes through the BDO communications service.
+    target: "100% of outbound e-mail sent through CCM with its delivery status recorded"
+    measure: E-mail cases in SIT
+    method: Test
+    test: System integration
+    stage: SIT (after DEP-12)
+    owner: iorta Solution Architect
+    acceptor: Head, BDOI IT
+    source: "Drop plan integration CCM (INT-13); IQ11"
+    frs: "Notifications chapters of the FRS. The sending mode (SMTP or service call) is open (IQ11)."
+    status: DECISION
+    prio: Must
+  - id: NFR-INT-06
+    cat: INT
+    title: Unavailable partner systems
+    req: An unavailable external system does not block users.
+    target: "Outbound messages queued and retried for 24 hours; an alert after 3 failed attempts; users keep working"
+    measure: Resilience case with a partner simulator switched off in SIT
+    method: Test
+    test: Resilience
+    stage: SIT; NFT
+    owner: iorta Solution Architect
+    acceptor: Head, BDOI IT
+    source: "Programme alignment pack 5 (integration inventory)"
+    frs: "Not in the FRS."
+    status: PROPOSED
+    prio: Should
+
+# Reconciliation of the catalogue with the FRS non-functional chapters, the register and the IER workbook:
+# [theme, BRD values, FRS statements, IER workbook, catalogue, difference and action, register refs]
+reconciliation:
+  - ["Screen response", "Under 5 s (BRD-00); 2 s (BRD-12); 3 s (BRD-9); 3 to 5 s (BRD-10); 5 s (BRD-2, 3, 4, 7); 5 to 10 s (BRD-5); 10 s (BRD-1, 6, 11)", "Online p95 under 3 s (FRS BRD-01 to BRD-10); 2 s (FRS BRD-00, BRD-12)", "Not stated", "NFR-PRF-01: p95 2.0 s, p99 4.0 s", "Stricter than nine FRS; the FRS take the value at their next issue after BDOI confirms", "DCR-137, DCR-165, XQ08"]
+  - ["Reports", "20 s (BRD-6, 11); 10 to 20 s (BRD-5); 5 min (BRD-7); daily 3 / weekly 10 / monthly 15 min (BRD-4)", "Same values; heavy reports as jobs", "Not stated", "NFR-PRF-03 and NFR-PRF-04", "None", "DCR-137"]
+  - ["Users", "1,344 named / 429 concurrent (BRD-00); 485 / 145 (BRD-1); module counts in each BRD", "150 concurrent plus 20% a year (FRS BRD-01); others within that sizing", "About 1,200 internal users (architecture sheet); growth 15% a year", "NFR-CAP-01: design 150 + 20% a year; peak test 429", "IER growth 15% against 20% in the BRDs; IER re-sized with 20%", "DCR-166, DCR-232, CRQ21, CRQ24"]
+  - ["Availability", "99.9% (BRD-2, 3, 9, 10, 12); 99.99% (BRD-8); 100% (BRD-5 Add.1); 'follow QPS' (BRD-1, 6, 11)", "Same deployment as BRD-1; one BIBS-wide set being agreed", "Production 24 x 7", "NFR-AVL-01: 99.9% of the service window", "BRD-5 and BRD-8 values withdrawn when BDOI confirms", "DCR-134, DCR-057"]
+  - ["Service window", "From 06:00-22:00 Mon-Fri plus month-end weekends (BRD-4) to 08:00-18:00 Mon-Fri (BRD-10)", "BRD-1 window 07:00-22:00 governs (OQ44)", "Non-production 12 x 5", "NFR-AVL-02: 06:00-22:00 Mon-Sat plus month-end weekends", "Earlier opening (06:00) than the FRS state; FRS aligned at next issue", "DCR-133"]
+  - ["Maintenance window", "00:00-04:00 (BRD-10, 12); 19:00-07:00 (BRD-5); 21:00-05:00 (BRD-9); bank standard (others)", "CSQ12 overlap noted (FRS BRD-09)", "Not stated", "NFR-AVL-03: 00:00-04:00, 45 minutes a month", "BRD-5 and BRD-9 windows withdrawn", "DCR-138, CSQ12"]
+  - ["RPO", "24 h (BRD-2, 3, 8); 4 h (BRD-4, 7, 9); backup every 15 min (BRD-9)", "Quoted from the BRDs", "15 minutes", "NFR-REC-01: 15 minutes", "IER value governs; stricter than every BRD", "DCR-135, DCR-225"]
+  - ["RTO", "4 h (BRD-2, 3, 4, 7, 8, 9); critical 4 h, full 24 h (BRD-12)", "4 h", "4 hours", "NFR-REC-02: 4 hours", "None", "DCR-135"]
+  - ["Backup", "Every 4 h, kept 5 years (BRD-00, 1, 4, 7); kept 7 years (BRD-2, 8); daily (BRD-5, 10, 12)", "Platform backup; 7 years (FRS BRD-02, 08)", "Automated backups; DR replica", "NFR-REC-03: continuous log archiving, base every 4 h, kept 7 years", "Longest retention taken", "DCR-102, DCR-136"]
+  - ["Retention", "5 / 15 years (BRD-00, 1, 2, 4, 8, 9); 10 / 15, audit 16 (BRD-7); 5 / 5 (BRD-5, 10, 12)", "Rules per record type; values wait for CRQ22 and Q39", "S3 lifecycle to IA and Glacier", "NFR-RET-01, NFR-RET-03", "Per record type; BDOI confirms values", "DCR-136, CRQ22, Q39"]
+  - ["Session and lock-out", "Warning 15, log-out 30 min (BRD-1, 6, 11); 15 min (BRD-4, 7); lock-out 3 attempts (BRD-4, 7, 11)", "FRS BRD-11: 15 / 30 minutes, 3 attempts", "Not stated", "NFR-SEC-05", "BRD-4 and BRD-7 15-minute log-out replaced by 30 minutes", "DCR-140, DCR-142"]
+  - ["Sign-in", "Windows credentials, EUA, SSO or LDAP (BRD-4, 7, 11)", "Directory sign-in through EUA (FRS BRD-11, Q42)", "Not stated", "NFR-SEC-01: EIAM single sign-on, OIDC or SAML 2.0", "EIAM replaces EUA; FRS BRD-11 updated at next issue", "DCR-143, IQ04"]
+  - ["Platform components", "Not stated", "Not stated", "Redis 7, Kafka 3.6, ingress-nginx, JDK 17 and Node 20 on the VDI list", "NFR-MNT-04: Valkey 8, Kafka 3.9, OpenJDK 21, Node 22, Gateway API", "IER rows updated to the baseline of 8-Oct-2026", "DCR-224, DCR-228"]
+  - ["DR region", "DR server (BRD-4, 7)", "Platform HA and DR", "Cross-region read replica; diagram shows ap-southeast-1 warm standby", "NFR-REC-05", "BDOI IT names the region after the data-residency check", "DCR-225, IQ26"]
+  - ["Accessibility", "Options for impaired vision or colour blindness (BRD-11)", "BDO UX contrast rules (FRS BRD-11)", "Not stated", "NFR-ACC-01 to 04: WCAG 2.2 AA", "New level; screen standards appendix updated", "-"]

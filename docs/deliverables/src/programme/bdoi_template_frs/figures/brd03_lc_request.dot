@@ -1,0 +1,49 @@
+// Life-cycle of a package request (FRPM.011.01, 013.02, 014.01-02, 015.01, 016.01-02, 026.01, 028.01).
+// Names in brackets are the statuses of BDOI's FRPM.011.01 that correspond to the stage (Annex O.4).
+digraph lc_request {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.25, ranksep=0.28, bgcolor="white", pad=0.15];
+  node  [shape=box, style="rounded,filled", fillcolor="#DAE8FC", color="#6C8EBF", fontname="Arial", fontsize=10, width=1.9, height=0.5, margin="0.06,0.03"];
+  edge  [arrowsize=0.55, penwidth=0.8, color="#333333", fontname="Arial", fontsize=8.5];
+  d  [label="Draft\n(Draft; Returned for Revision)"];
+  m  [label="For Marketing approval\n(Pending Marketing TL / TH / UH)"];
+  r  [label="For TSU review\n(For TSU Review)"];
+  a  [label="For TSU Head approval"];
+  n  [label="Insurer negotiation\n(For QS Creation; QS for Approval;\nUnder Negotiation)"];
+  t  [label="Negotiated terms review\n(Terms Agreed)"];
+  k  [label="Marketing review\n(client-specific only)"];
+  q  [label="Requirements preparation\n(Proposal Ready)"];
+  c  [label="For ManCom sign-off\n(Awaiting ManCom Approval)"];
+  b  [label="With MBS for set-up\n(For Deployment; Draft Setup)"];
+  v  [label="Package version for validation\n(Package Deployment for Review)"];
+  ok [label="Released\n(Deployed)", fillcolor="#D5E8D4", color="#82B366"];
+  np [label="Not proceeded", fillcolor="#EEEEEE", color="#888888"];
+  vo [label="Voided\n(Rejected)", fillcolor="#EEEEEE", color="#888888"];
+  rt [label="Retired\n(deactivation request approved)", fillcolor="#EEEEEE", color="#888888"];
+  d -> m [xlabel="submit"];
+  m -> r [xlabel="UH approves"];
+  r -> a [xlabel="recommend"];
+  a -> n [xlabel="approve"];
+  a -> c [xlabel="approve without\nnegotiation", style=dashed];
+  n -> t [xlabel="terms final"];
+  t -> k [xlabel="client-specific"];
+  t -> q [xlabel="generic"];
+  k -> q [xlabel="accept"];
+  k -> n [xlabel="changes", style=dashed];
+  q -> c [xlabel="submit with\nsigned slip"];
+  c -> b [xlabel="sign off"];
+  c -> q [xlabel="return", style=dashed];
+  b -> v [xlabel="set up version"];
+  b -> q [xlabel="incomplete", style=dashed];
+  b -> rt [xlabel="retire\n(deactivation)"];
+  v -> ok [xlabel="validated"];
+  v -> b [xlabel="returned", style=dashed];
+  m -> d [xlabel="return", style=dashed];
+  r -> d [style=dashed];
+  a -> d [style=dashed];
+  n -> np [xlabel="not proceeded", style=dotted];
+  k -> np [style=dotted];
+  m -> vo [xlabel="void / reject", style=dotted];
+  { rank=same; d; vo; }
+  { rank=same; n; np; }
+  { rank=same; b; rt; }
+}

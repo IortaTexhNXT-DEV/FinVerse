@@ -1,0 +1,165 @@
+# BIBS programme plan (BRD-00): timeline, milestones, sign-offs, test windows, trial migrations, cut-over, hypercare
+# and the dependencies on BDOI. Read by build_delivery_adoption.py for the Project Plan workbook, the Gantt figure and
+# the tables of the Project Plan summary.
+#
+# Sources of the dates: BDOI drop plan and programme timeline (26-Sep-2026); Drop 0 closure summary v2.0 (due
+# milestones D1-D7, decisions DEC-01..15, dependencies DEP-01..07); BRD-13 Data Migration Handbook (milestones M0-M6,
+# trial migrations, dress rehearsal, cut-over phases A-H, hypercare); programme alignment pack (delivery dates per
+# stream, IQ01-IQ35). Dates marked "proposed" are iorta TechNXT proposals that BDOI confirms (open points).
+
+as_of: 2026-10-08
+go_live: 2028-01-03
+months: {start: 2026-09, end: 2028-05}
+
+# Kinds give the bar colour of the Gantt chart and the legend.
+kinds:
+  req: Requirements and sign-off
+  dev: Development and configuration
+  test: Testing
+  mig: Data migration
+  ready: Readiness, training and support
+  live: Cut-over, go-live and hypercare
+
+# [id, stream, activity, drop, start, end, owner, gate or output, kind]
+timeline:
+  - [P-01, Requirements, "Drop 0 and Drop 1 requirements and FRS (setup, upstream, downstream)", "Drop 0, Drop 1", 2026-09-01, 2026-11-30, "Business owners; iorta Business Analyst lead", "FRS signed (BRD-03, 11 and the Drop 1 BRDs)", req]
+  - [P-02, Requirements, "Absorb the BRD versions of 8-Oct-2026 (FRS re-base, traceability, test cases, sign-off sets v2.1)", "All", 2026-10-08, 2026-11-13, "iorta Business Analyst lead", "FRS and sets re-issued; clarifications raised", req]
+  - [P-03, Requirements, "Data migration requirements, object decisions and mapping", "Drop 0", 2026-09-01, 2026-11-30, "Data Migration Lead", "Gate G1; layouts frozen v1 (M2)", req]
+  - [P-04, Requirements, "Drop 2 requirements and FRS (Claims, Employee Benefits, Production Reconciliation, Marketing Collection extraction)", "Drop 2", 2026-12-01, 2027-02-26, "Business owners; iorta Business Analyst lead", "Drop 2 FRS signed", req]
+  - [P-05, Requirements, "Customer Servicing Case Management (CSF addendum) through change control", "Drop 2 (proposed)", 2026-10-12, 2027-02-26, "Product Owner, CSF; Change Control Board", "CR decided; FRS BRD-09 extended", req]
+  - [P-06, Development, "Component baseline of 8-Oct-2026: Valkey 8 and the Kubernetes Gateway API", "Programme", 2026-10-08, 2026-11-30, "iorta Solution Architect; BDOI IT", "Platform release on the agreed baseline", dev]
+  - [P-07, Development, "Drop 1 development, first wave (setup and upstream: Submitted Policies, Renewal foundation, EIAM sign-in, document store)", "Drop 0, Drop 1", 2026-11-02, 2026-12-23, "iorta development team", "Release into SIT", dev]
+  - [P-08, Development, "Drop 1 development, second wave (downstream: Renewal completion, bank channels, changes from the signed FRS)", "Drop 1", 2027-01-04, 2027-02-26, "iorta development team", "Release into SIT", dev]
+  - [P-09, Development, "Migration Console and loaders", "Drop 0", 2026-11-02, 2027-03-31, "iorta Migration Lead", "Ready for Trial migration 1", dev]
+  - [P-10, Development, "Drop 2 development, third wave (Claims, Employee Benefits without portal, CSF, EGL, EDP and insurer exchanges, other reports)", "Drop 2", 2027-03-01, 2027-04-30, "iorta development team", "Release into SIT", dev]
+  - [P-11, Development, "Integrations with BDO systems through Apigee X (EIAM, UIDM-ISC, CCM, LMS, HL-LOAS, PMS, CMS / New BOB, OBPCS, Old BOB, AFTS)", "Drop 0, Drop 1", 2027-01-04, 2027-06-30, "BDOI IT; BDO IT EIAM, IGA and API teams; iorta Solution Architect", "Integration test passed in SIT", dev]
+  - [P-12, Development, "Spring Boot 4 assessment (proposed) and upgrade window if BDOI approves", "Programme", 2027-01-11, 2027-06-25, "iorta Solution Architect; BDOI IT; Change Control Board", "Decision by 31-Mar-2027; upgraded release before Trial migration 2", dev]
+  - [P-13, Testing, "Drop 1 system integration test (SIT)", "Drop 0, Drop 1", 2027-01-04, 2027-07-30, "iorta QA lead", "SIT exit report; UAT readiness statement", test]
+  - [P-14, Testing, "Drop 2 system integration test (SIT)", "Drop 2", 2027-07-01, 2027-09-30, "iorta QA lead", "SIT exit report; UAT readiness statement", test]
+  - [P-15, Testing, "Drop 1 user acceptance test (UAT), end to end on migrated data", "Drop 0, Drop 1", 2027-08-02, 2027-12-17, "BIBS Product Owner; business owners", "UAT sign-off certificates", test]
+  - [P-16, Testing, "Drop 2 user acceptance test (UAT)", "Drop 2", 2027-10-01, 2027-11-30, "Business owners of BRD-07 and BRD-08", "UAT sign-off certificates", test]
+  - [P-17, Testing, "Early security scan in SIT (proposed)", "Programme", 2027-06-01, 2027-06-30, "BDOI Information Security", "Findings triaged before UAT", test]
+  - [P-18, Testing, "Performance and penetration test", "Programme", 2027-11-01, 2027-12-15, "BDOI IT; BDOI Information Security", "Test reports; no open critical or high finding", test]
+  - [P-19, Data migration, "SIT migration: Trial migrations 1 (19-30 Apr) and 2 (5-16 Jul)", "Drop 0", 2027-04-19, 2027-07-16, "Data Migration Lead; iorta Migration Lead", "L1-L5 reconciled; Migration Clearing 0.00", mig]
+  - [P-20, Data migration, "UAT migration: Trial migrations 3 (2-13 Aug) and 4 (4-15 Oct)", "Drop 0", 2027-08-02, 2027-10-15, "Data Migration Lead; iorta Migration Lead", "Business verification on screen; timed as a cut-over", mig]
+  - [P-21, Data migration, "Dress rehearsal on production-sized data (reserve slot 6-10 Dec 2027)", "Drop 0", 2027-11-15, 2027-11-26, "Data Migration Lead; iorta Migration Lead", "Dress rehearsal report signed", mig]
+  - [P-22, Readiness, "Environments: SIT, UAT, Pre-Prod, production and DR on managed Kubernetes", "Programme", 2026-11-02, 2027-11-01, "BDOI IT; iorta infrastructure team", "Each environment accepted on its date", ready]
+  - [P-23, Readiness, "Organisational change management and communications", "Programme", 2026-10-12, 2028-02-02, "BIBS Product Owner; iorta change and training lead", "Readiness surveys; go-live communications", ready]
+  - [P-24, Readiness, "Key user training (UAT testers) and train-the-trainer", "Programme", 2027-07-19, 2027-09-17, "iorta change and training lead", "Key users certified; BDOI trainers certified", ready]
+  - [P-25, Readiness, "End-user training by persona", "Programme", 2027-10-18, 2027-12-10, "BDOI trainers; iorta change and training lead", "95 percent of named users trained and assessed", ready]
+  - [P-26, Readiness, "Knowledge transfer to BDOI application support and BDO IT operations", "Programme", 2027-06-07, 2028-02-02, "iorta Project Manager; BDOI IT", "Readiness assessment passed; hand-over at hypercare exit", ready]
+  - [P-27, Readiness, "Operational and production readiness review (ORR / PRR)", "Programme", 2027-12-01, 2027-12-31, "BDOI IT; iorta Project Manager", "Evidence pack by 15-Dec-2027; ORR / PRR approved", ready]
+  - [P-28, Cut-over, "Cut-over phases A-E: readiness, pre-load and deltas, legacy freeze, production load, reconciliation and go / no-go", "Programme", 2027-12-04, 2028-01-02, "Go / no-go board; Data Migration Lead", "Go decision on T-1 (2-Jan-2028)", live]
+  - [P-29, Cut-over, "Go-live of all modules together (T = Monday 3-Jan-2028)", "Programme", 2028-01-03, 2028-01-03, "Steering committee", "BIBS in production", live]
+  - [P-30, Cut-over, "Hypercare and true-up 1 (T+1 to T+30)", "Programme", 2028-01-04, 2028-02-02, "iorta Project Manager; BDOI application support", "Hypercare exit; hand-over to production support", live]
+  - [P-31, Cut-over, "Final true-up and legacy GL close (T+31 to T+120)", "Programme", 2028-02-03, 2028-05-02, "Head, Comptrollership", "True-ups closed; legacy GL locked 18-Apr-2028", live]
+
+# [id, date, milestone, drop, gate or sign-off, owner, status, source]
+milestones:
+  - [MS-01, 2026-10-05, "Drop 0 sign-off sets v2.0 issued (BRD-03, BRD-11, BRD-13) with the BDOI answers to DMQ36-DMQ39 (M0)", "Drop 0", "Issue", "iorta Project Manager", Done, "Drop 0 closure summary; Handbook M0"]
+  - [MS-02, 2026-10-08, "New versions of ten BDOI documents received; component baseline decided (PostgreSQL 16, Valkey 8, Kafka 3.9, OpenJDK 21, Spring Boot 3.5, Node 22 LTS, nginx, managed Kubernetes, Gateway API)", "All", "Baseline", "BIBS Product Owner; BDOI IT", Done, "Source documents of 8-Oct-2026; client decisions of 8-Oct-2026"]
+  - [MS-03, 2026-10-16, "Scope-shaping migration decisions (M1): DEC-02, DEC-03 (part), DEC-11, DEC-12", "Drop 0", "Decision", "Business owners; Head, Comptrollership", Open, "Handbook M1; Drop 0 closure DEP-01"]
+  - [MS-04, 2026-10-23, "FRS re-based on the BRD versions of 8-Oct-2026 issued for review (proposed)", "All", "Issue", "iorta Business Analyst lead", Open, "Proposed"]
+  - [MS-05, 2026-10-30, "BRD-13 Data Migration set signed; object decisions (gate G1); layouts frozen v1 (M2); decision on the Data Migration V0.03 conflicts and on Customer Servicing Case Management (proposed)", "Drop 0", "Sign-off", "Data Migration Lead; Program Manager", Open, "Drop 0 closure exit criteria; Handbook M2"]
+  - [MS-06, 2026-11-13, "Drop 1 FRS issued with the BDOI comments resolved", "Drop 1", "Issue", "iorta Business Analyst lead", Open, "Programme alignment pack, section 4.1"]
+  - [MS-07, 2026-11-30, "BRD-03 Product Maintenance set signed; Drop 1 FRS signed (BRD-01, 02, 04, 05, 06, 09, 10, 12)", "Drop 0, Drop 1", "Sign-off", "Product owners of each BRD", Open, "Drop 0 closure; alignment pack"]
+  - [MS-08, 2026-12-01, "BRD-11 User Access Maintenance set signed; configuration drafts due (D1)", "Drop 0", "Sign-off", "Product Owner, Marketing Business System; BDOI Information Security; BDOI IT", Open, "Drop 0 closure D1"]
+  - [MS-09, 2026-12-09, "Drop 0 closed by the steering committee; Drop 1 opened (proposed date)", "Drop 0", "Steering committee", "Program Manager, Business Project Services", Open, "Drop 0 closure summary, chapter 9"]
+  - [MS-10, 2026-12-18, "Drop 1 test plans approved", "Drop 1", "Approval", "Business owners; iorta QA lead", Open, "Alignment pack"]
+  - [MS-11, 2027-01-04, "SIT environment ready; platform set-up for Drop 1 SIT (D2); Drop 1 SIT starts", "Drop 1", "Entry", "BDOI IT; Head, Comptrollership", Open, "Drop 0 closure D2, DEP-02"]
+  - [MS-12, 2027-01-29, "First full extracts with control files and volumes (M3)", "Drop 0", "Data", "BDOI IT", Open, "Handbook M3; DEP-03"]
+  - [MS-13, 2027-01-31, "Drop 2 integration specifications (EGL, EDP, CARMS, insurer exchanges); EIAM and UIDM-ISC specifications (proposed date within Q1 2027)", "Drop 1, Drop 2", "Data", "BDOI IT; BDO IT EIAM and IGA teams", Open, "Alignment pack; DEC-05"]
+  - [MS-14, 2027-02-26, "Drop 2 FRS signed (BRD-07, BRD-08); Drop 1 development complete", "Drop 1, Drop 2", "Sign-off", "Product Owners, Claims and Employee Benefits", Open, "Alignment pack"]
+  - [MS-15, 2027-03-31, "Migration Console and loaders ready; Spring Boot 4 decision (proposed)", "Drop 0", "Readiness", "iorta Migration Lead; BDOI IT", Open, "Alignment pack; proposed"]
+  - [MS-16, 2027-04-09, "Extracts for Trial migration 1 (M4); reference data for SIT (D3); role-to-permission matrix and SIT / UAT users", "Drop 0", "Data", "BDOI IT; Business Administration; BDOI Information Security", Open, "Handbook M4; D3; DEP-05"]
+  - [MS-17, 2027-04-30, "Drop 2 development complete", "Drop 2", "Release", "iorta Project Manager", Open, "Alignment pack"]
+  - [MS-18, 2027-06-18, "Code maps approved, including the package code map (M5, D4)", "Drop 0", "Approval", "Data owners; TSU", Open, "Handbook M5; DEP-06"]
+  - [MS-19, 2027-06-30, "Drop 2 test plans approved; early security scan in SIT completed (proposed)", "Drop 2", "Approval", "Business owners; BDOI Information Security", Open, "Alignment pack"]
+  - [MS-20, 2027-07-16, "UAT plans and sign-off forms issued; values for UAT (D5); UAT testers named", "Drop 1", "Readiness", "BIBS Product Owner; business owners", Open, "Drop 0 closure D5"]
+  - [MS-21, 2027-07-30, "Drop 1 SIT exit; UAT readiness statement; key users trained", "Drop 1", "Exit", "iorta QA lead; BIBS Product Owner", Open, "Alignment pack"]
+  - [MS-22, 2027-08-02, "Drop 1 UAT starts on migrated data (Trial migration 3)", "Drop 1", "Entry", "BIBS Product Owner", Open, "BDOI timeline"]
+  - [MS-23, 2027-09-30, "Drop 2 SIT exit and UAT readiness statement", "Drop 2", "Exit", "iorta QA lead", Open, "Alignment pack"]
+  - [MS-24, 2027-10-01, "Pre-Prod ready; cut-over date, window, fallback and decommissioning criteria agreed; year-end option A confirmed (M6)", "Programme", "Decision", "Program Manager; Head, Comptrollership; BDOI IT", Open, "Handbook M6; DEC-01; DEC-13"]
+  - [MS-25, 2027-11-01, "Production values of every configuration item (D6); production and DR environments ready (proposed)", "Programme", "Readiness", "Configuration owners; BDOI IT", Open, "Drop 0 closure D6"]
+  - [MS-26, 2027-11-26, "Dress rehearsal completed and its report signed", "Drop 0", "Exit", "Data Migration Lead; iorta Migration Lead", Open, "Handbook"]
+  - [MS-27, 2027-11-30, "Drop 2 UAT signed", "Drop 2", "Sign-off", "Product Owners, Claims and Employee Benefits", Open, "BDOI timeline"]
+  - [MS-28, 2027-12-14, "Renewal processing team ready for the January expiries (T-20)", "Drop 1", "Readiness", "Head of the Renewal processing team", Open, "Cut-over task CT-013"]
+  - [MS-29, 2027-12-15, "ORR / PRR evidence pack; performance and penetration test closed", "Programme", "Readiness", "BDOI IT; BDOI Information Security", Open, "Alignment pack"]
+  - [MS-30, 2027-12-17, "Drop 1 UAT signed; end-user training complete; go-live readiness review (proposed)", "Drop 1", "Sign-off", "Steering committee", Open, "Proposed"]
+  - [MS-31, 2027-12-27, "Code map and reference value freeze (D7, T-7)", "Drop 0", "Freeze", "Data Migration Lead", Open, "Drop 0 closure D7"]
+  - [MS-32, 2027-12-31, "Last legacy end of day and final extracts (T-3)", "Programme", "Cut-over", "BDOI IT", Open, "Cut-over phase C"]
+  - [MS-33, 2028-01-02, "Reconciliation, verification and go / no-go (T-1)", "Programme", "Go / no-go", "Go / no-go board", Open, "Cut-over phase E"]
+  - [MS-34, 2028-01-03, "Go-live of BIBS, all modules together (T)", "Programme", "Go-live", "Steering committee", Open, "BDOI answer A1"]
+  - [MS-35, 2028-01-21, "True-up 1 posted, reconciled and signed (T+18)", "Programme", "Sign-off", "Head, Comptrollership", Open, "Cut-over CT-084"]
+  - [MS-36, 2028-02-02, "First month-end close completed; hypercare exit; hand-over to production support (T+30)", "Programme", "Exit", "Go / no-go board", Open, "Cut-over CT-085, CT-086"]
+  - [MS-37, 2028-05-02, "True-ups closed (T+120); legacy GL locked on 18-Apr-2028", "Programme", "Closure", "Head, Comptrollership", Open, "Cut-over phase H"]
+
+# Sign-offs per document set: [set, BRDs, drop, version, due, signatories, status]
+signoffs:
+  - ["Data Migration sign-off set", "BRD-13", "Drop 0", "v2.0 (re-base on BRD V0.03 in v2.1)", 2026-10-30, "Program Manager, Business Project Services; Data Migration Lead; Head, Comptrollership; Head, Operations; BDOI IT", Open]
+  - ["Product Maintenance sign-off set", "BRD-03", "Drop 0", "v2.0", 2026-11-30, "Product Owner, Marketing Business System; MBS; TSU; Business Project Services", Open]
+  - ["User Access Maintenance sign-off set", "BRD-11", "Drop 0", "v2.0", 2026-12-01, "Product Owner, Marketing Business System; BDOI Information Security; BDOI IT; Business Administrators", Open]
+  - ["Drop 0 closure summary and configuration inputs", "BRD-03, 11, 13", "Drop 0", "v2.0", 2026-12-09, "Steering committee (chair: Program Manager, Business Project Services)", Open]
+  - ["Drop 1 FRS and sign-off sets", "BRD-01, 02, 04, 05, 06, 09, 10, 12", "Drop 1", "v2.1 / next minor (re-base on 8-Oct-2026)", 2026-11-30, "Product owner of each BRD; Business Project Services (traceability); BDOI IT (Technical Specification)", Open]
+  - ["Drop 1 test plans", "Drop 1 BRDs", "Drop 1", "v1.x", 2026-12-18, "Business owners; iorta QA lead", Open]
+  - ["Drop 2 FRS", "BRD-07, BRD-08 (and CSF Case Management if approved)", "Drop 2", "v1.x", 2027-02-26, "Product Owners, Claims and Employee Benefits; Business Project Services", Open]
+  - ["Drop 2 test plans", "BRD-07, BRD-08", "Drop 2", "v1.x", 2027-06-30, "Business owners; iorta QA lead", Open]
+  - ["Drop 1 UAT sign-off certificates", "Drop 0 and Drop 1 BRDs", "Drop 1", "-", 2027-12-17, "Product owner of each BRD; BIBS Product Owner", Open]
+  - ["Drop 2 UAT sign-off certificates", "BRD-07, BRD-08", "Drop 2", "-", 2027-11-30, "Product owners of BRD-07 and BRD-08", Open]
+  - ["Dress rehearsal report", "BRD-13", "Drop 0", "-", 2027-11-26, "Data Migration Lead; iorta Migration Lead", Open]
+  - ["ORR / PRR approval", "Programme", "Programme", "-", 2027-12-31, "Head, BDOI IT; Head, BDOI Information Security; iorta Project Manager", Open]
+  - ["Go / no-go decision", "Programme", "Programme", "-", 2028-01-02, "Go / no-go board", Open]
+  - ["Hypercare exit and hand-over", "Programme", "Programme", "-", 2028-02-02, "Go / no-go board; BDOI application support; BDO IT operations", Open]
+
+# Test windows: [window, drop, start, end, environment, entry criteria, exit criteria]
+test_windows:
+  - ["Drop 1 SIT", "Drop 0, Drop 1", 2027-01-04, 2027-07-30, SIT, "Test plans approved (18-Dec-2026); SIT environment and D2 set-up ready (4-Jan-2027); release notes delivered", "All Must-have cases passed; no open Severity 1 or 2 incident; Severity 3 with a workaround agreed; regression passed on the last release"]
+  - ["Drop 2 SIT", "Drop 2", 2027-07-01, 2027-09-30, SIT, "Drop 2 test plans approved (30-Jun-2027); integration specifications agreed", "As Drop 1 SIT; integration test with EGL, EDP and insurer exchanges passed"]
+  - ["Trial migration 1", "Drop 0", 2027-04-19, 2027-04-30, SIT, "Extracts M4 received (9-Apr-2027); Migration Console ready", "Profiling report to the owners; timings recorded"]
+  - ["Trial migration 2", "Drop 0", 2027-07-05, 2027-07-16, SIT, "Code maps approved (M5, 18-Jun-2027)", "All objects end to end; L1-L5 reconciled; Migration Clearing 0.00"]
+  - ["Drop 1 UAT (end to end)", "Drop 0, Drop 1", 2027-08-02, 2027-12-17, UAT, "SIT exit; UAT readiness statement (30-Jul-2027); UAT plans and sign-off forms (16-Jul-2027); key users trained; Trial migration 3 loaded", "Every UAT scenario passed or accepted with a workaround; sign-off certificate per BRD"]
+  - ["Trial migration 3", "Drop 0", 2027-08-02, 2027-08-13, UAT, "Trial migration 2 exit", "Business verification on screen; UAT runs on migrated data"]
+  - ["Drop 2 UAT", "Drop 2", 2027-10-01, 2027-11-30, UAT, "Drop 2 readiness statement (30-Sep-2027)", "Sign-off certificates of BRD-07 and BRD-08"]
+  - ["Trial migration 4", "Drop 0", 2027-10-04, 2027-10-15, UAT, "Fixes from Trial migration 3 released", "Timed as a cut-over; go-live renewal extraction; a test opening-balance adjustment"]
+  - ["Performance and penetration test", "Programme", 2027-11-01, 2027-12-15, Pre-Prod, "Pre-Prod ready (1-Oct-2027) at production size", "Peak of 429 concurrent users within the response-time targets; no open critical or high finding"]
+  - ["Dress rehearsal", "Drop 0", 2027-11-15, 2027-11-26, Pre-Prod, "Production values D6 loaded (1-Nov-2027)", "Full volume within the window with 20 percent margin; rollback rehearsed"]
+
+# Cut-over and hypercare phases: [phase, name, days, dates, main activities, owner]
+cutover:
+  - [A, Readiness, "T-30 to T-15", "4 to 19 Dec 2027", "Dress rehearsal confirmed; cut-over team, command centre and hypercare roster named; communications to branches, insurers and bank channels; Renewal team readiness (14-Dec-2027)", "Program Manager; Data Migration Lead"]
+  - [B, "Pre-load and daily deltas", "T-14 to T-4", "20 to 30 Dec 2027", "Reference data and clients pre-loaded; daily deltas; map freeze on 27-Dec-2027 (T-7)", "Data Migration Lead; BDOI IT"]
+  - [C, "Legacy freeze and final extracts", "T-3", "Fri 31 Dec 2027", "Last legacy end of day; preliminary December trial balance signed as the provisional opening", "BDOI IT; Head, Comptrollership"]
+  - [D, "Production load", "T-2", "Sat 1 Jan 2028", "Final extracts validated and loaded in load order", "iorta Migration Lead"]
+  - [E, "Reconciliation, verification and go / no-go", "T-1", "Sun 2 Jan 2028", "L1-L5 reconciliation; business verification; go / no-go decision", "Go / no-go board"]
+  - [F, "Go-live", "T", "Mon 3 Jan 2028", "Command centre opens 07:00; go-live renewal extraction; users start", "iorta Project Manager"]
+  - [G, "Hypercare and true-up 1", "T+1 to T+30", "4 Jan to 2 Feb 2028", "Daily hypercare check; issue triage at 10:00 and 16:00; week-1 review; true-up 1 (21-Jan-2028); first month-end close; hypercare exit (2-Feb-2028)", "iorta Project Manager; BDOI application support"]
+  - [H, "Final true-up and legacy GL close", "T+31 to T+120", "Feb to 2 May 2028", "Interim true-up 2 if needed; audited FY2027 statements; final true-up; legacy GL locked (18-Apr-2028); true-ups closed", "Head, Comptrollership"]
+
+# Dependencies on BDOI: [id, type, dependency, provided by, needed by, needed for, effect if late]
+dependencies:
+  - [DEP-01, Decision, "Answers to the M1 and M2 decisions of the Data Migration set (DEC-02, DEC-03, DEC-11, DEC-12)", "BDOI business owners", 2026-10-16, "Migration layouts and object scope", "Layouts frozen late; Trial migration 1 scope reduced"]
+  - [DEP-02, Decision, "Position on the Data Migration BRD V0.03 conflicts: renewals in progress (BRID_MIG 12.1 against DMQ37), claims, submitted policies, payees and e-policy linking in scope", "Program Manager; Head of the Renewal processing team; Head, Comptrollership", 2026-10-30, "Data object register and Handbook v2.1", "New layouts after M2; migration effort and trial scope change"]
+  - [DEP-03, Decision, "Scope and drop of Customer Servicing Case Management (CSF addendum, BRCSFCM.001-.012)", "Product Owner, CSF; Change Control Board", 2026-10-30, "FRS BRD-09 extension and the Drop 2 plan", "Case Management cannot be delivered for go-live"]
+  - [DEP-04, Decision, "Sign-off of the Drop 0 sets (BRD-13, BRD-03, BRD-11) and of the Drop 1 FRS", "Product owners", 2026-11-30, "Freeze of the Drop 1 development scope", "Development starts on unsigned scope; rework"]
+  - [DEP-05, Data, "Organisation, chart of accounts, accounting rules and bank accounts for Drop 1 SIT (D2)", "Head, Comptrollership", 2027-01-04, "Drop 1 SIT postings", "SIT runs on seed values; postings retested"]
+  - [DEP-06, Environment, "SIT environment on managed Kubernetes with PostgreSQL 16, Valkey 8, Kafka 3.9, document store and Gateway API", "BDOI IT", 2027-01-04, "Drop 1 SIT", "SIT start slips day for day"]
+  - [DEP-07, Integration, "EIAM sign-in specification (tenant, claims, session life, OIDC or SAML 2.0) and application registration", "BDO IT EIAM team", 2027-01-31, "Directory sign-in in SIT", "Sign-in stays local in SIT; directory sign-in tested late"]
+  - [DEP-08, Integration, "UIDM-ISC option (accounts only, accounts and roles, or aggregation only) and SCIM provisioning connector", "BDO IT IGA team", 2027-01-31, "Provisioning in SIT", "User provisioning tested late; manual user loading at go-live"]
+  - [DEP-09, Data, "First full extracts with control files and volumes (M3)", "BDOI IT", 2027-01-29, "Profiling and load sizing", "Trial migration 1 on partial data"]
+  - [DEP-10, Integration, "Drop 2 integration specifications: EGL, EDP (SD 11), CARMS, insurer exchanges", "BDOI IT", 2027-01-31, "Drop 2 development (Mar-Apr 2027)", "Drop 2 interfaces descoped or delivered after go-live"]
+  - [DEP-11, Integration, "Bank channel layouts and transport: CMS / New BOB, OBPCS, Old BOB, AFTS, PMS", "BDOI IT", 2027-02-26, "Cashiering and Disbursement channels in SIT", "Manual uploads at go-live"]
+  - [DEP-12, Integration, "CCM sending mode, sender addresses and attachment limits", "BDOI IT", 2027-02-26, "Renewal Advices, e-policies and notifications", "E-mail tested late"]
+  - [DEP-13, Integration, "Apigee X proxies, products and credentials for the BIBS integrations in SIT, UAT and production", "BDO IT API team", 2027-03-31, "Integration test", "Integration test slips into UAT"]
+  - [DEP-14, Decision, "Spring Boot 4 upgrade before go-live or after hypercare", "BDOI IT; Change Control Board", 2027-03-31, "Upgrade window May-Jun 2027", "Upgrade forced late or carried into production support"]
+  - [DEP-15, Decision, "DR region and data residency (IQ26)", "BDOI IT; BDOI Information Security", 2027-03-31, "Production and DR set-up", "DR not ready at go-live"]
+  - [DEP-16, Data, "Role-to-permission matrix and the users of the SIT and UAT testers (D3)", "Business Administration; BDOI Information Security", 2027-04-09, "Access in SIT and UAT", "Testers without access; UAT starts late"]
+  - [DEP-17, Data, "Code maps approved, including the package code map (M5)", "Data owners; TSU", 2027-06-18, "Trial migration 2", "Trial migration 2 incomplete"]
+  - [DEP-18, Resource, "Named application support team (L1 and L2) and BDO IT operations staff for knowledge transfer", "BDOI IT; BDO IT operations", 2027-05-31, "Knowledge transfer from 7-Jun-2027", "Hand-over at hypercare exit at risk"]
+  - [DEP-19, Resource, "Penetration test provider named; early SIT scan approved (IQ35)", "BDOI Information Security", 2027-05-31, "Security tests", "Findings arrive in December 2027"]
+  - [DEP-20, Resource, "UAT testers named per BRD (at least two per business unit) and released for the UAT windows", "Business owners", 2027-07-16, "UAT", "UAT coverage reduced"]
+  - [DEP-21, Environment, "UAT environment and training environment with training users", "BDOI IT", 2027-07-19, "Key user training and UAT", "Training and UAT start late"]
+  - [DEP-22, Resource, "BDOI trainers named for train-the-trainer (one per business unit and persona group)", "Business owners", 2027-07-30, "Train-the-trainer from 6-Sep-2027", "End-user training delivered by iorta only; capacity limit"]
+  - [DEP-23, Environment, "Pre-Prod at production size", "BDOI IT", 2027-10-01, "Performance test and dress rehearsal", "Dress rehearsal not production-sized"]
+  - [DEP-24, Decision, "Year-end option A confirmed; point of no return confirmed (DEC-01, DEC-13)", "Head, Comptrollership; Program Manager", 2027-10-01, "Cut-over calendar and GL opening", "Cut-over calendar changes"]
+  - [DEP-25, Environment, "Production and DR environments", "BDOI IT", 2027-11-01, "Production values, ORR and cut-over", "Go-live date at risk"]
+  - [DEP-26, Data, "Production values of every configuration item (D6)", "Configuration owners", 2027-11-01, "Dress rehearsal", "Dress rehearsal on non-production values"]

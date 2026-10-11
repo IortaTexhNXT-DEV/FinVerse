@@ -1,0 +1,30 @@
+// Primary and DR regions, replication and failover (Infrastructure Architecture, chapter 7).
+digraph ia_dr {
+  graph [rankdir=LR, fontname="Arial", nodesep=0.3, ranksep=1.4, bgcolor="white", pad=0.2, newrank=true,
+         label=<<font point-size="15" color="@HEADER_BLUE"><b>High availability and disaster recovery</b></font><br/><font point-size="9" color="@MUTED">RPO 15 minutes, RTO 4 hours. DR region to be approved by BDOI (IQ26, DSQ01).</font>>,
+         labelloc=t, labeljust=l];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.0, fontname="Arial", fontsize=11,
+         fontcolor="@NEAR_BLACK", margin="0.1,0.05", fillcolor="@WHITE"];
+  edge  [color="@DANGER", arrowsize=0.55, penwidth=0.9, fontname="Arial", fontsize=8, fontcolor="@MUTED", style=dashed];
+
+  subgraph cluster_p {
+    label=<<b>Primary: ap-southeast-1, three zones</b>>; fontsize=10; style="rounded"; color="@HEADER_BLUE";
+    peks [label=<<b>EKS: four workloads</b><br/><font point-size="10">PROD sizing, HPA</font>>, fillcolor="@BG_BLUE"];
+    prds [label=<<b>RDS Multi-AZ</b><br/><font point-size="10">synchronous standby, PITR,<br/>snapshots every 4 h</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+    ps3 [label=<<b>S3 buckets</b><br/><font point-size="10">versioning, Object Lock</font>>, fillcolor="@AMBER_BG"];
+    pecr [label=<<b>ECR images, Secrets, KMS</b>>];
+  }
+  subgraph cluster_d {
+    label=<<b>DR region (warm standby)</b>>; fontsize=10; style="rounded,dashed"; color="@DANGER";
+    deks [label=<<b>EKS standby</b><br/><font point-size="10">bibs-web and bibs-frontend at 1 pod;<br/>jobs and integration at 0 until failover</font>>];
+    drds [label=<<b>RDS cross-region read replica</b><br/><font point-size="10">asynchronous, lag in seconds;<br/>promoted at failover</font>>];
+    ds3 [label=<<b>S3 replica buckets</b><br/><font point-size="10">replication time control 15 min</font>>];
+    decr [label=<<b>ECR replica, Secrets replica,<br/>multi-Region KMS keys</b>>];
+    dnew [label=<<b>Created at failover</b><br/><font point-size="10">ElastiCache Valkey (caches refill),<br/>MSK (outbox resends PENDING events)</font>>, fillcolor="@DANGER_BG"];
+  }
+  prds -> drds [label="async replication"];
+  ps3 -> ds3 [label="CRR + RTC"];
+  pecr -> decr [label="replication"];
+  peks -> deks [label="same image digest and overlay"];
+  drds -> dnew [style=invis];
+}

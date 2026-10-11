@@ -1,0 +1,1461 @@
+/* ---------- Application shell ---------------------------------------------------------- */
+.app-shell {
+  display: grid;
+  grid-template-columns: var(--sidebar-width) 1fr;
+  grid-template-rows: var(--header-height) 1fr;
+  grid-template-areas: 'sidebar header' 'sidebar main';
+  /* The shell is exactly the window: header and sidebar stay put and the content area is the one
+     scroll area. Nothing may reach past the window, so the window itself never scrolls. */
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.app-header {
+  grid-area: header;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: 0 var(--space-5);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  z-index: 10;
+}
+
+.brand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  text-decoration: none;
+  padding: var(--space-2) var(--space-3) var(--space-5);
+}
+
+.brand-client-logo {
+  height: 36px;
+  width: auto;
+}
+
+.brand-product {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  color: var(--color-text-muted);
+}
+
+.header-context .select {
+  min-width: 200px;
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.header-context {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.header-user {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--brand-blue);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+/* Header shortcuts (approvals inbox, alerts, help, about) with count badges */
+.header-tools {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.header-tool {
+  position: relative;
+  color: var(--brand-navy);
+}
+
+.header-count {
+  position: absolute;
+  top: -4px;
+  right: -6px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--color-danger);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 18px;
+  text-align: center;
+}
+
+.app-sidebar {
+  grid-area: sidebar;
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-border);
+  overflow-y: auto;
+  padding: var(--space-4) var(--space-3);
+}
+
+.nav-group {
+  margin-bottom: var(--space-2);
+}
+
+.nav-group-toggle {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: var(--space-3);
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 14px;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+}
+
+.nav-group-toggle:hover {
+  background: var(--color-bg);
+}
+
+.nav-group-toggle svg {
+  margin-left: auto;
+  color: var(--brand-blue);
+}
+
+.nav-section {
+  margin-bottom: var(--space-2);
+}
+
+.nav-section-title {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--color-placeholder);
+  padding: var(--space-2) var(--space-3) var(--space-1);
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 10px var(--space-3);
+  border-radius: var(--radius-sm);
+  color: var(--brand-navy);
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.nav-link svg {
+  color: var(--brand-blue);
+  flex-shrink: 0;
+}
+
+.nav-link:hover {
+  background: var(--color-bg);
+}
+
+.nav-link.active {
+  background: var(--brand-blue-050);
+  color: var(--brand-navy);
+  font-weight: 700;
+}
+
+.app-main {
+  grid-area: main;
+  /* Containing block of absolutely placed content (screen-reader captions, chart tooltips and
+     legends): without it they are placed against the page and stretch the window beyond the shell,
+     leaving an empty band and a second scroll bar. */
+  position: relative;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--space-5) var(--space-6);
+}
+
+/* ---------- Page header ----------------------------------------------------------------- */
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+  flex-wrap: wrap;
+}
+
+.page-back {
+  display: grid;
+  place-items: center;
+  color: var(--brand-blue);
+  border-radius: var(--radius-sm);
+}
+
+.page-back:hover {
+  background: var(--brand-blue-050);
+}
+
+.page-header p {
+  margin: var(--space-1) 0 0;
+  color: var(--color-text-muted);
+}
+
+.breadcrumb {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-1);
+}
+
+/* ---------- Cards ----------------------------------------------------------------------- */
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-6) var(--space-4);
+  color: var(--color-text-muted);
+  font-size: 16px;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.card-body {
+  padding: var(--space-5);
+}
+
+.card-body.flush {
+  padding: 0;
+}
+
+.kpi {
+  padding: var(--space-4) var(--space-5);
+  border-top: 4px solid var(--brand-blue);
+}
+
+.kpi.accent {
+  border-top-color: var(--brand-gold);
+}
+
+.kpi-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.kpi-value {
+  font-family: var(--font-heading);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--brand-navy);
+  margin-top: var(--space-1);
+}
+
+.kpi-hint {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+/* Figures inside a dashboard widget card (smaller than KPI tiles). */
+.widget-figures {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.widget-figure-value {
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--brand-navy);
+  font-variant-numeric: tabular-nums;
+}
+
+.widget-figure-value.danger {
+  color: var(--color-danger);
+}
+
+.widget-bar {
+  height: 6px;
+  border-radius: var(--radius-sm);
+  background: var(--brand-blue-050);
+}
+
+.widget-bar > div {
+  height: 6px;
+  border-radius: var(--radius-sm);
+  background: var(--brand-blue);
+}
+
+.widget-bar.over > div {
+  background: var(--color-danger);
+}
+
+/* ---------- Buttons --------------------------------------------------------------------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  height: var(--control-height);
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  white-space: nowrap;
+  text-decoration: none;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+}
+
+.btn-primary:disabled,
+.btn-accent:disabled {
+  background: var(--color-border-strong);
+  color: #fff;
+}
+
+.btn-secondary:disabled,
+.btn-ghost:disabled,
+.btn-danger:disabled {
+  color: var(--color-placeholder);
+  border-color: var(--color-border-strong);
+}
+
+.btn-primary {
+  background: var(--brand-blue);
+  color: #fff;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--brand-blue-600);
+}
+
+/* The screen's main call to action. BDO style guide: CTA Blue; yellow is kept for accents. */
+.btn-accent {
+  background: var(--brand-blue);
+  color: #fff;
+}
+
+.btn-accent:hover:not(:disabled) {
+  background: var(--brand-blue-600);
+}
+
+.btn-secondary {
+  background: var(--color-surface);
+  color: var(--brand-blue);
+  border-color: var(--brand-blue);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--brand-blue-050);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--brand-blue);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: var(--brand-blue-050);
+}
+
+/* Destructive actions are outlined in red, so the screen keeps one filled primary button */
+.btn-danger {
+  background: var(--color-surface);
+  color: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: var(--color-danger-bg);
+}
+
+.btn-sm {
+  height: var(--control-height-sm);
+  padding: 0 var(--space-3);
+  font-size: 13px;
+}
+
+/* ---------- Forms ----------------------------------------------------------------------- */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 160px;
+}
+
+.field label {
+  font-size: 14px;
+  color: var(--color-heading);
+}
+
+.field .required::after {
+  content: ' *';
+  color: var(--color-danger);
+}
+
+.input,
+.select,
+.textarea {
+  height: var(--control-height);
+  border: 1px solid var(--brand-field-blue);
+  border-radius: var(--radius-sm);
+  padding: 0 var(--space-3);
+  font: inherit;
+  background: var(--color-surface);
+  color: var(--color-text);
+  width: 100%;
+}
+
+.textarea {
+  height: auto;
+  min-height: 72px;
+  padding: var(--space-2) var(--space-3);
+  resize: vertical;
+}
+
+.input:focus,
+.select:focus,
+.textarea:focus {
+  border-color: var(--brand-blue);
+  box-shadow: var(--focus-ring);
+  outline: none;
+}
+
+.input:disabled,
+.select:disabled,
+.textarea:disabled,
+.input:read-only {
+  background: var(--color-bg);
+  border-color: var(--color-border-strong);
+}
+
+.input[aria-invalid='true'],
+.select[aria-invalid='true'],
+.textarea[aria-invalid='true'] {
+  border-color: var(--color-danger);
+}
+
+.field-hint {
+  color: var(--color-text-muted);
+  font-size: 12px;
+}
+
+.field-error {
+  color: var(--color-danger);
+  font-size: 12px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--space-4);
+}
+
+.checkbox {
+  display: inline-flex;
+  gap: var(--space-2);
+  align-items: center;
+  font-weight: 500;
+}
+
+/* ---------- Tables ---------------------------------------------------------------------- */
+/* A table scrolls inside its card (BDO style guide) with its header row sticky. The card is as
+   high as its rows; a long list is capped so that the page keeps one vertical scroll bar
+   (DataTable sets the cap from the room left in the window, never a fixed share of it). */
+.table-wrap {
+  overflow: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: var(--table-font-size);
+}
+
+.table th {
+  position: sticky;
+  top: 0;
+  background: var(--brand-navy);
+  color: #fff;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: var(--table-font-size);
+  text-align: left;
+  padding: 10px var(--space-3);
+  border-right: 1px solid rgba(255, 255, 255, 0.18);
+  white-space: nowrap;
+}
+
+.table th:last-child {
+  border-right: none;
+}
+
+/* A row header (the first cell of a row that names it: a rule, a field) reads as data, never as a
+   column header: no navy band, no sticky position, the text colour of the row. */
+.table tbody th {
+  position: static;
+  background: transparent;
+  color: var(--color-text);
+  font-family: inherit;
+  font-weight: 600;
+  padding: 12px var(--space-3);
+  border-right: none;
+  white-space: normal;
+}
+
+.table th button,
+.table th a {
+  color: inherit;
+}
+
+.table td {
+  padding: 10px var(--space-3);
+  vertical-align: middle;
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* BDO style guide: alternating white / Background Blue rows with a row divider. */
+.table tbody tr:nth-child(even) {
+  background: var(--table-row-alt);
+}
+
+.table tbody tr:hover {
+  background: var(--table-row-hover);
+}
+
+.table tbody tr:has(.empty-state),
+.table tbody tr:has(.empty-state):hover {
+  background: var(--color-surface);
+}
+
+.table tr.clickable {
+  cursor: pointer;
+}
+
+.table .row-group td {
+  background: var(--brand-blue-050);
+  color: var(--brand-navy);
+  font-weight: 700;
+}
+
+.table .row-section td {
+  background: var(--brand-navy);
+  color: #fff;
+  font-weight: 700;
+  font-family: var(--font-heading);
+}
+
+.table .row-subtotal td {
+  font-weight: 700;
+  background: var(--color-surface-alt);
+}
+
+.table .row-total td {
+  font-weight: 800;
+  border-top: 2px solid var(--brand-gold);
+  background: var(--brand-gold-050);
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  font-size: 14px;
+  color: var(--color-text);
+  border-top: 1px solid var(--color-border);
+  font-variant-numeric: tabular-nums;
+}
+
+.pagination-summary {
+  color: var(--color-text-muted);
+}
+
+/* Numbered pages (BDO table pattern): square buttons, the current page filled CTA Blue */
+.page-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--brand-blue);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.page-button:hover:not(:disabled) {
+  background: var(--brand-blue-050);
+}
+
+.page-button[aria-current='page'] {
+  background: var(--brand-blue);
+  border-color: var(--brand-blue);
+  color: #fff;
+}
+
+.page-button:disabled {
+  color: var(--color-placeholder);
+  cursor: not-allowed;
+}
+
+.page-gap {
+  color: var(--color-text-muted);
+}
+
+/* ---------- Badges / alerts -------------------------------------------------------------- */
+/*
+ * Status pills (BDO): one height, one font size and weight, centred text and a fixed minimum width.
+ * Long labels are cut with an ellipsis (the full label is in the tooltip); a pill never wraps.
+ */
+.badge {
+  --pill-fg: var(--brand-navy);
+  --pill-bg: var(--color-surface);
+  display: inline-block;
+  box-sizing: border-box;
+  height: 24px;
+  min-width: var(--badge-min-width);
+  max-width: var(--badge-max-width);
+  padding: 0 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--pill-border, var(--pill-fg));
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 22px;
+  text-align: center;
+  background: var(--pill-bg);
+  color: var(--pill-fg);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* In a table cell a pill on its own takes the column's width: every pill of a column is one size. */
+.table td > .badge:only-child,
+.table td > .badge-pair > .badge {
+  display: block;
+  width: 100%;
+}
+
+/* History tables: the full label, never the short form; the pill grows to fit and may wrap. */
+.badge.badge-full {
+  height: auto;
+  min-height: 24px;
+  max-width: none;
+  white-space: normal;
+  overflow: visible;
+  line-height: 1.3;
+  padding: 3px 10px;
+}
+
+/* Two statuses of one record (e.g. Unapplied and a Queued request): two aligned pills. */
+.badge-pair {
+  display: inline-flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+/* One pill style (BDO style guide: outlined and tinted): only the tone changes between states. */
+.badge.success {
+  --pill-fg: var(--color-success);
+  --pill-bg: var(--color-success-bg);
+}
+
+.badge.danger {
+  --pill-fg: var(--color-danger);
+  --pill-bg: var(--color-danger-bg);
+}
+
+.badge.warning {
+  --pill-fg: var(--color-warning);
+  --pill-bg: var(--color-warning-bg);
+  --pill-border: var(--brand-gold);
+}
+
+.badge.neutral {
+  --pill-fg: var(--color-text-muted);
+  --pill-bg: var(--color-surface-alt);
+  --pill-border: var(--color-border-strong);
+}
+
+/* In process (e.g. "Ready for Placement"): CTA Blue outline (BDO status pill colours) */
+.badge.info {
+  --pill-fg: var(--brand-blue);
+  --pill-bg: var(--color-info-bg);
+}
+
+.badge,
+.tag {
+  vertical-align: middle;
+}
+
+/* Record flags (FFY, Direct Payment ...): small filled chips, distinct from status pills */
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  align-items: center;
+}
+
+.tag {
+  display: inline-block;
+  box-sizing: border-box;
+  height: 22px;
+  min-width: var(--tag-min-width);
+  max-width: var(--badge-max-width);
+  padding: 0 8px;
+  border-radius: 4px;
+  background: var(--brand-gold-050);
+  border: 1px solid var(--brand-gold);
+  color: var(--color-heading);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 20px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tag.neutral {
+  background: var(--color-surface-alt);
+  border-color: var(--color-border-strong);
+  color: var(--color-text);
+}
+
+.tag.info {
+  background: var(--brand-blue-050);
+  border-color: var(--brand-field-blue);
+  color: var(--brand-navy);
+}
+
+.tag.danger {
+  background: var(--color-danger-bg);
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+}
+
+/* ---------- Notices: one standard for error, warning, info and success -------------------
+ * White surface, thin border, a 4 px accent bar in the semantic colour and its icon; bold short
+ * title, business message, bullets. No tinted or pastel fills (BDO_UX_GUIDELINES section 8.6).
+ */
+.notice,
+.alert {
+  --notice-accent: var(--color-info);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--notice-accent);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.alert {
+  display: block;
+}
+
+.notice-error,
+.alert.danger {
+  --notice-accent: var(--color-danger);
+}
+
+.notice-warning,
+.alert.warning {
+  --notice-accent: var(--color-warning-accent);
+}
+
+.notice-success,
+.alert.success {
+  --notice-accent: var(--color-success);
+}
+
+.notice-info,
+.alert.info {
+  --notice-accent: var(--color-info);
+}
+
+.notice-icon {
+  flex: none;
+  margin-top: 1px;
+  color: var(--notice-accent);
+}
+
+.notice-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.notice-title {
+  font-weight: 700;
+  color: var(--color-heading);
+}
+
+.notice-text {
+  color: var(--color-text);
+}
+
+.notice-items,
+.alert .field-errors {
+  margin: var(--space-1) 0 0;
+  padding-left: var(--space-5);
+}
+
+.notice-items li + li {
+  margin-top: 2px;
+}
+
+.notice-actions {
+  flex: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+  margin-left: auto;
+}
+
+.notice-reference {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin-top: var(--space-1);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.notice-details {
+  font-size: 12px;
+}
+
+/* A subtle one-line notice above a table (e.g. "Submission needs an approved rate exception"). */
+.notice.subtle {
+  padding: var(--space-2) var(--space-3);
+  border-color: var(--color-border);
+  border-left-width: 3px;
+}
+
+/* ---------- Modal / toast ----------------------------------------------------------------- */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(46, 46, 46, 0.45);
+  display: grid;
+  place-items: center;
+  z-index: 50;
+}
+
+.modal {
+  width: min(920px, 94vw);
+  color: var(--color-text);
+  max-height: 90vh;
+  overflow: auto;
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  border: none;
+  padding: 0;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border-top: 1px solid var(--color-border);
+}
+
+.toast-region {
+  position: fixed;
+  right: var(--space-5);
+  bottom: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  z-index: 60;
+}
+
+.toast {
+  --notice-accent: var(--color-success);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  min-width: 280px;
+  max-width: 420px;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--notice-accent);
+  background: var(--color-surface);
+  color: var(--color-heading);
+  box-shadow: var(--shadow-lg);
+}
+
+.toast .notice-icon {
+  margin-top: 1px;
+}
+
+.toast.error {
+  --notice-accent: var(--color-danger);
+}
+
+.toast.warning {
+  --notice-accent: var(--color-warning-accent);
+}
+
+.toast.info {
+  --notice-accent: var(--color-info);
+}
+
+/* ---------- Tabs ------------------------------------------------------------------------ */
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+
+.tab {
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border-strong);
+  border-bottom: none;
+  border-top: 4px solid transparent;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  background: linear-gradient(var(--color-surface), var(--brand-blue-050));
+  font-family: var(--font-heading);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-heading);
+  cursor: pointer;
+}
+
+.tab:hover {
+  color: var(--brand-navy);
+}
+
+.tab[aria-selected='true'] {
+  background: var(--color-surface);
+  color: var(--brand-blue);
+  border-top-color: var(--brand-gold);
+}
+
+/* Status tabs of a work list card: on the card's top edge, standing on a separator line */
+.card-body.flush .tabs {
+  gap: var(--space-2);
+  margin-bottom: 0;
+  padding: var(--space-4) var(--space-4) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.card-body.flush .tab {
+  margin-bottom: -1px;
+}
+
+.card-body.flush .tab[aria-selected='true'] {
+  border-bottom: 1px solid var(--color-surface);
+}
+
+/* ---------- Sign-in (BIBS enterprise layout) ------------------------------------------------ */
+.signin-page {
+  min-height: 100%;
+  display: grid;
+  grid-template-columns: minmax(380px, 36%) 1fr;
+  background: var(--color-bg);
+}
+
+.signin-brand {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--space-6);
+  padding: 56px 56px 40px;
+  overflow: hidden;
+  color: #ffffff;
+  background:
+    radial-gradient(circle at 110% -10%, rgba(253, 185, 19, 0.18) 0, rgba(253, 185, 19, 0) 38%),
+    linear-gradient(160deg, var(--brand-navy) 0%, #003a7d 55%, #002a5c 100%);
+}
+
+/* Fine diagonal lines: a quiet texture instead of a photo. */
+.signin-brand::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.045) 0,
+    rgba(255, 255, 255, 0.045) 1px,
+    transparent 1px,
+    transparent 22px
+  );
+  pointer-events: none;
+}
+
+.signin-brand > * {
+  position: relative;
+}
+
+.signin-brand-body {
+  display: grid;
+  gap: var(--space-3);
+  margin-top: 12vh;
+  max-width: 460px;
+}
+
+.signin-brand-product {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 56px;
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.signin-brand-name {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  opacity: 0.92;
+}
+
+.signin-brand-rule {
+  display: block;
+  width: 56px;
+  height: 4px;
+  margin: var(--space-2) 0;
+  border-radius: 2px;
+  background: var(--brand-gold);
+}
+
+.signin-brand-tagline {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.6;
+  opacity: 0.88;
+}
+
+.signin-brand-points {
+  display: grid;
+  gap: 10px;
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+}
+
+.signin-brand-points li {
+  position: relative;
+  padding-left: 22px;
+  opacity: 0.92;
+}
+
+.signin-brand-points li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.45em;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--brand-gold);
+}
+
+.signin-brand-company {
+  margin: 0;
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.signin-main {
+  display: grid;
+  grid-template-rows: auto 1fr auto auto;
+  justify-items: center;
+  padding: var(--space-5) var(--space-6);
+}
+
+.signin-topbar {
+  justify-self: end;
+  min-height: 28px;
+}
+
+.signin-env {
+  display: inline-block;
+  padding: 4px 12px;
+  border: 1px solid var(--brand-gold-600);
+  border-radius: 999px;
+  background: var(--brand-gold-050);
+  color: #6b4a00;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.signin-card {
+  align-self: center;
+  width: min(420px, 100%);
+  gap: var(--space-4);
+  padding: 40px 40px 32px;
+  border: 1px solid var(--color-border);
+  border-top: 4px solid var(--brand-navy);
+  border-radius: 8px;
+  background: var(--color-surface);
+  box-shadow: 0 12px 32px rgba(0, 42, 92, 0.1);
+}
+
+.signin-logo {
+  display: block;
+  height: 44px;
+  width: auto;
+}
+
+.signin-title {
+  margin: 0;
+  font-size: 24px;
+  line-height: 32px;
+  color: var(--color-heading);
+}
+
+.signin-subtitle {
+  margin: 2px 0 0;
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+.signin-card .input {
+  height: 44px;
+  font-size: 15px;
+}
+
+.signin-card .btn {
+  width: 100%;
+  height: 44px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.password-input {
+  position: relative;
+}
+
+.password-input .input {
+  padding-right: 64px;
+}
+
+.signin-card .password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  padding: 4px 8px;
+  border: 0;
+  background: none;
+  color: var(--color-info);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.signin-card .password-toggle:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: 4px;
+}
+
+.caps-lock {
+  margin: -8px 0 0;
+  color: #8a5a00;
+  font-size: 13px;
+}
+
+.signin-legal {
+  max-width: 520px;
+  margin: var(--space-5) 0 var(--space-3);
+  color: var(--color-text-muted);
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.signin-footer .powered-by img {
+  height: 22px;
+}
+
+.signin-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2) var(--space-5);
+  color: var(--color-text-muted);
+  font-size: 12px;
+}
+
+.powered-by {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  color: var(--color-text-muted);
+  font-size: 12px;
+}
+
+.powered-by img {
+  height: 28px;
+  width: auto;
+}
+
+.about-body {
+  text-align: center;
+  align-items: center;
+}
+
+.about-body p,
+.about-body h2 {
+  margin: 0;
+}
+
+.about-client-logo {
+  height: 44px;
+  width: auto;
+}
+
+.about-facts {
+  margin: 0;
+}
+
+.about-facts dd {
+  margin: 0 0 var(--space-2);
+  font-weight: 600;
+}
+
+.spinner {
+  width: 22px;
+  height: 22px;
+  border: 3px solid var(--brand-blue-050);
+  border-top-color: var(--brand-blue);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 960px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+    grid-template-areas: 'header' 'main';
+  }
+
+  .app-sidebar {
+    display: none;
+  }
+
+  .signin-page {
+    grid-template-columns: 1fr;
+  }
+
+  .signin-brand {
+    display: none;
+  }
+
+  .signin-main {
+    padding: var(--space-4);
+  }
+}
+
+/* ---------- Report Centre ------------------------------------------------------------------ */
+.report-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--space-3);
+}
+
+.report-card {
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: inherit;
+  text-decoration: none;
+}
+
+.report-card:hover,
+.report-card:focus-visible {
+  border-color: var(--brand-blue);
+  box-shadow: var(--shadow-md);
+}
+
+.report-card svg {
+  flex: none;
+  color: var(--brand-blue);
+}
+
+.report-card strong {
+  display: block;
+  color: var(--color-heading);
+  font-family: var(--font-heading);
+}
+
+.report-card .muted {
+  font-size: 13px;
+}
+
+.report-variants,
+.report-downloads {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-2) var(--space-3);
+}
+
+.report-variants .field {
+  min-width: 280px;
+}
+
+.report-downloads {
+  align-items: center;
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+}
+
+.report-search {
+  width: 280px;
+}
+
+.report-echo {
+  padding: var(--space-2) var(--space-4);
+}
+
+.report-note {
+  margin: var(--space-3);
+}
+
+/* Two values stacked in one table cell (e.g. period and effectivity chip, maker and checker) */
+.cell-stack {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.report-label {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+.notice .tag-list {
+  margin-top: var(--space-1);
+}
+
+/* Row action menu of a table (RowActions): one menu button at the end of a row. */
+.row-actions {
+  position: relative;
+  display: inline-block;
+}
+
+.row-actions-button {
+  padding: 0 var(--space-2);
+}
+
+.row-actions-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  z-index: 20;
+  min-width: 200px;
+  margin: 0;
+  padding: var(--space-1) 0;
+  list-style: none;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+}
+
+.row-actions-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-2) var(--space-4);
+  border: 0;
+  background: none;
+  text-align: left;
+  font: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.row-actions-item:hover:not(:disabled),
+.row-actions-item:focus-visible {
+  background: var(--brand-blue-050);
+}
+
+.row-actions-item:disabled {
+  color: var(--color-placeholder);
+  cursor: not-allowed;
+}
+
+.row-actions-item.danger {
+  color: var(--color-danger);
+}

@@ -1,0 +1,591 @@
+# Architecture document set (BRD-00, Programme/Architecture): shared tables of the six documents.
+# Read by build_architecture_pack.py, which replaces the lines <!-- arch:<name> --> of the Word sources with tables
+# built from this file, so that every document shows the same names, versions and targets.
+#
+# Sources: docs/architecture (option decision, platform cache and events, data scope, document storage, user access),
+# docs/operations (deployment, configuration, runbook), docs/security, docs/quality, the IER workbook v20, the
+# programme alignment pack v1.0 (integration inventory INT-01 to INT-20, questions IQ01 to IQ35) and the client
+# decisions of 26 September and 8 October 2026.
+
+meta:
+  version: '1.0'
+  date: 08 October 2026
+
+# ------------------------------------------------------------------------------------------------------------
+# Bounded contexts (domain-driven design) and the backend modules (top-level packages) that implement them.
+contexts:
+  - id: BC01
+    name: Client management
+    brd: BRD-01
+    drop: Drop 1
+    modules: {crm: Clients (CRM)}
+    responsibility: Prospects and KYC-verified clients, contacts, tags, special instructions, duplicate detection, client 360 view
+  - id: BC02
+    name: Product catalogue and maintenance
+    brd: BRD-03
+    drop: Drop 0
+    modules: {catalog: Product catalogue, productmaint: Package requests}
+    responsibility: Product lines, cover types, BDOI risk products and package versions, insurer panel, rate, commission and tax tables, minimum-field matrix, TSU routing rules, package request approvals
+  - id: BC03
+    name: New business broking
+    brd: BRD-01
+    drop: Drop 1
+    modules: {account: Accounts (ARN), quotation: Package quotations, nonpackage: Non-package proposals, placement: Placement, issuance: Issuance, booking: Booking, nbreport: New Business reports}
+    responsibility: Account (ARN) from quotation to invoice, quotation and PRF, placement slips and hold covers, e-policy receipt and Insurance Advice, booking with the broker accounting entry and service invoice
+  - id: BC04
+    name: Renewal
+    brd: BRD-06
+    drop: Drop 1
+    modules: {renewal: Renewal}
+    responsibility: Expiry list extraction, sanitation buckets, disposition, insurer batches, renewal advice, NAL and NRL letters
+  - id: BC05
+    name: Submitted policies
+    brd: BRD-12
+    drop: Drop 1
+    modules: {submitted: Submitted policies}
+    responsibility: Policies bought elsewhere and submitted for loan collateral, IAAF and TOR approvals, letters, hand-off to Renewal
+  - id: BC06
+    name: Operations
+    brd: BRD-02
+    drop: Drop 1
+    modules: {opsledger: Operations invoice ledger, cashiering: Cashiering, remittance: Remittance, adjustment: Adjustment, commission: Commission receivables, prodrecon: Production reconciliation}
+    responsibility: Invoice ledger, receipts (AR and OR), payment matching, remittance to insurers, adjustments, commission receivables, production reconciliation
+  - id: BC07
+    name: Collections
+    brd: BRD-04
+    drop: Drop 1
+    modules: {collections: Collections}
+    responsibility: Collection worklist from the invoice ledger, assignment and escalation rules, promises to pay, daily, weekly and monthly files
+  - id: BC08
+    name: Accounting, disbursement and ACSL
+    brd: BRD-05
+    drop: Drop 1
+    modules: {acsl: ACSL, disbursement: Disbursement, payrequest: Refund and cash-advance requests, frbs: FRBS reports and service fee}
+    responsibility: Accounting control and sub-ledger, payee master, payment requests and vouchers, refunds and cash advances, management report pack
+  - id: BC09
+    name: Finance core
+    brd: BRD-05
+    drop: Drop 1
+    modules: {coa: Chart of accounts, journal: Journals, ledger: General ledger, period: Fiscal periods, currency: Currencies and rates, dimension: Dimensions, accounting: Accounting engine, subledger: Open-item sub-ledger, party: Business partners, finreport: Financial reports, closing: Period and year-end closing, budget: Budgets, fixedasset: Fixed assets, investment: Investments, payables: Payables and bank accounts, receivables: Receivables and bank reconciliation, tax: BIR tax and certificates}
+    responsibility: Event-driven accounting rules, journals with maker-checker, immutable ledger and daily balances, open items and ageing, BIR returns and certificates of the broker, financial statements
+  - id: BC10
+    name: Claims handling
+    brd: BRD-07
+    drop: Drop 2
+    modules: {brokerclaims: Claims handling}
+    responsibility: The broker's claim case file on a cover, documents, insurer follow-up, settlement tracking, claim reports
+  - id: BC11
+    name: Employee benefits
+    brd: BRD-08
+    drop: Drop 2
+    modules: {eb: Employee benefits}
+    responsibility: EB programmes of corporate clients (HMO, group life, group personal accident), yearly cycles, member changes, statements of account
+  - id: BC12
+    name: Customer servicing
+    brd: BRD-09
+    drop: Drop 1
+    modules: {csf: Customer servicing}
+    responsibility: Contact Center workspace over clients, accounts, invoices, payments and e-policies; service requests and cases
+  - id: BC13
+    name: Sanction screening and risk profiling
+    brd: BRD-10
+    drop: Drop 1
+    modules: {screening: Sanction screening}
+    responsibility: Watchlist sources and ingestion, name matching, screening cases, risk profiling, STR preparation and extraction
+  - id: BC14
+    name: User access and identity
+    brd: BRD-11
+    drop: Drop 0
+    modules: {security: "Users, roles and sign-in", nbadmin: Access requests and administration}
+    responsibility: Users, roles and permissions, sign-in (local, OIDC, SAML), second factor, sessions, access requests under four eyes, data scope, separation-of-duties rules, retention rules
+  - id: BC15
+    name: Data migration
+    brd: BRD-13
+    drop: Drop 0
+    modules: {migration: Data migration}
+    responsibility: Migration Console - intake of legacy extracts, masking, mapping and code maps, validation, load, reconciliation and rollback per batch
+  - id: BC16
+    name: Platform services
+    brd: BRD-00
+    drop: Programme
+    modules: {common: Common services, config: Configuration, organization: Companies and branches, lov: Lists of values, workflow: Workflow, bulk: Bulk upload, messaging: Messaging and notifications, docgen: Document templates, attachment: Attachments, storage: File storage, audit: Audit trail, alert: Exception codes and alerts, approval: Approval inbox, system: Jobs and parameters, report: Report centre, dashboard: Executive dashboard}
+    responsibility: Generic subdomains used by every business context - companies and branches, parameters, lists of values, workflow engine, bulk upload, e-mail and notifications, document templates, file storage, audit trail, alerts, approval inbox, jobs, reports
+  - id: BC17
+    name: Integration and shared state
+    brd: BRD-00
+    drop: Programme
+    modules: {events: Integration events, integration: Integration APIs, cache: Cache administration, sharedstate: Shared state}
+    responsibility: Transactional outbox and Kafka topics, consumers and dead letters, system integration interface for Apigee X, reference-data cache and cluster-wide job locks on Valkey
+
+# ------------------------------------------------------------------------------------------------------------
+# Component baseline (client decision of 8 October 2026). Support horizon: upstream or managed-service policy.
+baseline:
+  - [PostgreSQL, '16.x', PostgreSQL Licence, 'Relational data store (Amazon RDS for PostgreSQL 16)', 'Community support of the major version until 09-Nov-2028']
+  - [Valkey, '8.x', BSD-3-Clause, 'Reference-data cache, job locks, token deny-list, shared counters (Amazon ElastiCache for Valkey)', 'Follows the Valkey release policy and the ElastiCache engine calendar; checked at each annual technology review']
+  - [Apache Kafka, '3.9 (KRaft)', Apache 2.0, 'Event streaming with the transactional outbox (Amazon MSK)', 'Last 3.x line; the move to Kafka 4.x (KRaft only) is planned at the first annual technology review after go-live']
+  - [OpenJDK (Eclipse Temurin), '21 LTS', GPLv2 with Classpath Exception, 'Application runtime of the backend', 'Adoptium LTS support at least until Dec-2029']
+  - [Spring Boot, '3.5.x', Apache 2.0, 'Application framework of the backend', 'Open-source and commercial support windows differ; the support route is an open point (SA-07)']
+  - [React with TypeScript and Vite, 'React 19.x, TypeScript 6, Vite 8', MIT, 'Web user interface (single-page application)', 'Follows the current major version']
+  - [Node (JavaScript runtime), '22 LTS', MIT, 'Compiles and packages the web user interface in the pipeline; not a production runtime', 'End of life 30-Apr-2027: move to Node 24 LTS before UAT (SA-08)']
+  - [nginx (unprivileged image), '1.30', BSD-2-Clause, 'Serves the web user interface over TLS', 'Until the next stable line; image refreshed with each release']
+  - [Kubernetes (Amazon EKS), 'Version supported by EKS', Apache 2.0, 'Container orchestration', 'Standard support of each version for 14 months after its EKS release']
+  - [Kubernetes Gateway API controller, 'Gateway API v1 (standard channel); AWS Load Balancer Controller 2.14 or later', Apache 2.0, 'Edge routing (Gateway, HTTPRoute) to the internal load balancer', 'Per release of the controller; checked at each annual technology review']
+
+# Further components of the platform (libraries and tools that the documents name).
+components_more:
+  - [Spring Security, 'With Spring Boot 3.5', Apache 2.0, 'Authentication, OIDC and SAML 2.0 sign-in, method security']
+  - [Hibernate ORM and Spring Data JPA, 'With Spring Boot 3.5', 'LGPL 2.1 (Hibernate), Apache 2.0', 'Persistence of the domain model']
+  - [Schema migration library (Community edition), 'With Spring Boot 3.5', Apache 2.0, 'Versioned, forward-only schema changes applied at start-up']
+  - [Spring for Apache Kafka, 'With Spring Boot 3.5', Apache 2.0, 'Kafka producer of the outbox relay and the consumers']
+  - [Spring Data Redis with Lettuce, 'With Spring Boot 3.5', Apache 2.0 / MIT, 'Valkey client (same protocol)']
+  - [springdoc-openapi, '2.8', Apache 2.0, 'OpenAPI 3 description of the user interface operations (developer environments only)']
+  - [OpenPDF and Apache POI, 'OpenPDF 2.0, POI 5.4', 'LGPL / MPL (OpenPDF), Apache 2.0 (POI)', 'PDF, Excel and Word renditions of documents and reports']
+  - [AWS SDK for Java v2, 'Current 2.x', Apache 2.0, 'S3 file store with SSE-KMS, presigned links']
+  - ['TanStack Query, React Router, Recharts', 'Pinned in the web client', MIT, 'Web client data access, navigation, charts']
+  - [cert-manager with the AWS Private CA issuer, 'Current release', Apache 2.0, 'In-cluster certificates, rotated automatically']
+
+# ------------------------------------------------------------------------------------------------------------
+# Non-functional targets used in every document (umbrella BRD p.42-46, register proposals, IER).
+nfr:
+  - [Users, '1,344 named users; 429 concurrent sessions as the peak case of the performance test', 'Umbrella BRD p.42 (CF-04); CRQ21, IQ32 decide which figure governs']
+  - [Response time, 'Screens p95 under 2 seconds; every role under 5 seconds; reports and batch runs to the BRD value of each module', 'Umbrella BRD p.42; register proposal; BRD-4, BRD-6, BRD-7 report values']
+  - [Volumes, 'New Business 21,200 transactions a month; Renewal 25,800 a month; CSF 144,400 a year; 15 % growth a year over 60 months', 'Umbrella BRD p.42-45; IER HW and SW sheet']
+  - [Availability, '99.9 % in service hours 06:00-22:00 Monday to Saturday; maintenance window 00:00-04:00', 'Register proposal (umbrella "Refer to BRD")']
+  - [Recovery, 'RPO 15 minutes; RTO 4 hours', 'IER architecture sheets; register DCR-135']
+  - [Backup, 'Continuous log archiving with point-in-time recovery; snapshot every 4 hours; monthly copies kept 7 years', 'Umbrella p.45 (every 4 hours, 5 years); register proposal 7 years']
+  - [Retention, '5 years online, 15 years offline as the platform rule; BRD-7 10 / 15; BRD-5, BRD-10, BRD-12 5 / 5', 'Umbrella p.45; CRQ22']
+  - [Security, 'TLS 1.2 or higher on every hop; data encrypted at rest with BDOI-owned KMS keys; MFA for privileged users; audit of every change', 'BDOI decisions of 26-Sep-2026; BRD-11']
+  - [Data residency, 'Production data in AWS ap-southeast-1; access restricted to personnel in the Philippines; DR region to be approved', 'Hosting appendix; IQ26, DSQ01']
+
+# ------------------------------------------------------------------------------------------------------------
+# Environments.
+environments:
+  - [DEV, 'Development and integration of changes by the project team', 'Seed data (SIT/UAT users)', '12 x 5', 'Single-AZ', 'iorta TechNXT']
+  - [SIT, 'System integration test per drop; trial migrations 1 and 2', 'Seed data and masked trial-migration data', '12 x 5, extended for batch and trial migrations', 'Single-AZ', 'iorta TechNXT, BDOI IT for the interfaces']
+  - [UAT, 'User acceptance test end to end; trial migration 3 and the re-load', 'Masked migrated data', '12 x 5, extended for month-end cycles', 'Single-AZ', 'BDOI business owners']
+  - [Pre-Prod, 'Performance and penetration tests, dress rehearsal of the cut-over', 'Production-sized, masked', '12 x 5, extended for tests and rehearsal', 'Multi-AZ', 'BDOI IT']
+  - [PROD, 'Production', 'Production data', '24 x 7', 'Multi-AZ, three availability zones', 'BDOI IT operations']
+  - [DR, 'Warm standby of production in the DR region', 'Replica of production', '12 x 7 standby; 24 x 7 after failover', 'Multi-AZ after failover', 'BDOI IT operations']
+
+# Proposed Kubernetes sizing per environment (four workloads from two images). Pods: min / max.
+sizing:
+  - [DEV, '1 / 2', '1', '1', '1 / 2', '2 x m5.xlarge (4 vCPU, 16 GiB)']
+  - [SIT, '2 / 3', '2', '1', '2 / 2', '2 to 3 x m5.xlarge (4 vCPU, 16 GiB)']
+  - [UAT, '2 / 4', '2', '2', '2 / 4', '3 x m5.xlarge (4 vCPU, 16 GiB), one per zone']
+  - [Pre-Prod, '3 / 10', '2', '2', '2 / 4', '3 to 6 x m5.2xlarge (8 vCPU, 32 GiB)']
+  - [PROD Y1, '3 / 10', '2', '2', '2 / 4', '3 to 6 x m5.2xlarge (8 vCPU, 32 GiB), one or more per zone']
+  - [PROD Y5, '4 / 12', '2', '2', '2 / 4', '4 to 8 x m5.2xlarge (15 % growth a year, proved by the performance test)']
+  - [DR standby, '1 / 10', '0', '0', '1 / 4', '2 x m5.2xlarge, scaled to the PROD node count at failover']
+
+workloads:
+  - [bibs-web, bibs-backend, web, 'Screens and user operations (prefix api)', '1 CPU, 2 GiB', '2 CPU, 3 GiB', 'Horizontal Pod Autoscaler on CPU 65 % and memory 80 %; pod disruption budget minimum 1; spread across zones']
+  - [bibs-jobs, bibs-backend, jobs, 'Scheduled and batch jobs; HTTP limited to the probes and metrics', '1 CPU, 3 GiB', '2 CPU, 4 GiB', 'Fixed replicas; the Valkey job lock runs each job once; 120-second grace period']
+  - [bibs-integration, bibs-backend, integration, 'Outbox relay, Kafka consumers, inbound files, system integration operations (prefix integration)', '0.5 CPU, 1.5 GiB', '2 CPU, 2 GiB', 'Fixed replicas; consumers share their consumer groups; spread across zones']
+  - [bibs-frontend, bibs-frontend, '-', 'nginx serving the React single-page application over TLS', '0.05 CPU, 64 MiB', '0.5 CPU, 256 MiB', 'Horizontal Pod Autoscaler on CPU 70 %; spread across zones']
+
+# Data services per environment (IER HW and SW sheet, adjusted to the component baseline).
+data_services:
+  - [DEV, 'RDS PostgreSQL 16, Single-AZ, 4 vCPU, 16 GiB, 200 GB gp3', 'ElastiCache for Valkey 8, one node cache.t4g.medium', 'MSK Kafka 3.9 KRaft, 2 brokers kafka.t3.small, replication factor 2', 'Four buckets, SSE-KMS']
+  - [SIT, 'RDS PostgreSQL 16, Single-AZ, 4 vCPU, 16 GiB, 200 GB gp3', 'ElastiCache for Valkey 8, one node cache.t4g.medium', 'MSK Kafka 3.9 KRaft, 2 brokers kafka.t3.small, replication factor 2', 'Four buckets, SSE-KMS']
+  - [UAT, 'RDS PostgreSQL 16, Single-AZ, 8 vCPU, 32 GiB, 500 GB gp3', 'ElastiCache for Valkey 8, primary and replica cache.t4g.medium', 'MSK Kafka 3.9 KRaft, 2 brokers kafka.m5.large, replication factor 2', 'Four buckets, SSE-KMS']
+  - [Pre-Prod, 'RDS PostgreSQL 16, Multi-AZ, 8 vCPU, 64 GiB, 1,000 GB gp3', 'ElastiCache for Valkey 8, primary and replica cache.r7g.large, Multi-AZ', 'MSK Kafka 3.9 KRaft, 3 brokers kafka.m5.large, replication factor 3', 'Four buckets, SSE-KMS, Object Lock']
+  - [PROD, 'RDS PostgreSQL 16, Multi-AZ, 16 vCPU, 128 GiB, 2,000 GB gp3 (re-sized once the document content is in S3)', 'ElastiCache for Valkey 8, primary and replica cache.r7g.large, Multi-AZ, cluster mode disabled', 'MSK Kafka 3.9 KRaft, 3 brokers kafka.m5.large, replication factor 3, minimum in-sync replicas 2', 'Four buckets, SSE-KMS, Object Lock, cross-region replication']
+  - [DR, 'RDS cross-region read replica, 16 vCPU, 128 GiB, 2,000 GB; promoted at failover', 'ElastiCache for Valkey 8 created at failover (caches refill)', 'MSK Kafka 3.9 created at failover; undelivered events resent from the outbox', 'Replica buckets (replication time control 15 minutes)']
+
+# ------------------------------------------------------------------------------------------------------------
+# Integration catalogue. IDs INT-01 to INT-20 are those of the alignment pack integration inventory; INT-21 onwards
+# are the further interfaces named in the BRDs and the platform decisions.
+# pattern: Sync API | Event | File | Browser redirect | E-mail | Manual | Internal store
+integrations:
+  - id: INT-01
+    name: EIAM single sign-on
+    system: Microsoft Entra ID (EIAM)
+    drop: Drop 0
+    pattern: Browser redirect
+    direction: Both
+    transport: 'OpenID Connect authorisation code with PKCE S256 (SAML 2.0 supported as the alternative); BIBS issues its own session after the identity is linked to an active BIBS user'
+    data: 'User name claim (UPN or Windows ID), name, e-mail; optional group claim for the group check'
+    security: 'Confidential client; ID token signature from the tenant key set, issuer, audience, expiry and nonce checked; roles stay in BIBS; break-glass administrators keep a local password with TOTP'
+    errors: 'Unknown, inactive or locked user refused with the standard sign-in message; provider errors logged with a reference; break-glass sign-in meanwhile'
+    recon: 'Monthly comparison of active BIBS users with the EIAM directory through the UIDM-ISC aggregation (INT-02)'
+    owner: BDOI IT Identity and Access Management
+    bibs: 'User access and identity (security); bibs-web'
+    questions: IQ04
+  - id: INT-02
+    name: UIDM-ISC provisioning
+    system: UIDM-ISC (identity governance)
+    drop: Drop 0
+    pattern: Sync API
+    direction: Both
+    transport: 'SCIM 2.0 Users (and Groups for option b) published through Apigee X; account and entitlement aggregation for certification'
+    data: 'User accounts (create, update, enable, disable), group profiles (BIBS roles) as entitlements, data scope'
+    security: 'Apigee X OAuth 2.0 client credentials token with the SCIM scopes; TLS over the private route from Apigee X to the internal load balancer'
+    errors: 'SCIM error responses; a change that breaks a BIBS rule (separation of duties, data scope) is refused and returned to the requester in UIDM-ISC'
+    recon: 'Daily aggregation; differences listed in the access change log report'
+    owner: BDOI IT Identity Governance
+    bibs: 'User access and identity (nbadmin, security); bibs-integration'
+    questions: IQ05
+  - id: INT-03
+    name: LMS loan data
+    system: Loans Management System
+    drop: Drop 0
+    pattern: File
+    direction: Inbound
+    transport: 'Daily file to the inbound bucket (managed transfer or presigned upload through Apigee X)'
+    data: 'PN number, loan status (paid-off, RMU), loan release and amortisation for CLPC billing'
+    security: 'File encrypted in transit (TLS); SSE-KMS at rest; malware scan before processing'
+    errors: 'Row errors listed in the upload result; the file is re-sent after correction'
+    recon: 'Record count and control totals per file against the file trailer'
+    owner: BDOI IT (LMS owner)
+    bibs: 'Renewal, Submitted policies, Placement; bibs-integration'
+    questions: IQ06
+  - id: INT-04
+    name: HL-LOAS quotation requests and loan data
+    system: Home Loan System (Loan Origination and Admin)
+    drop: Drop 0 (HLS) and Drop 2 (LOAS)
+    pattern: Sync API
+    direction: Inbound
+    transport: 'Quotation requests through Apigee X into the quotation request inbox; HLS insurance report and amortised loan data as daily files'
+    data: 'Borrower, property, sum insured, PN; HLS insurance report; amortised loan release'
+    security: 'Apigee X token with the quotation-request scope; files as INT-03'
+    errors: 'Invalid request refused with a problem response; duplicates refused on the source reference'
+    recon: 'Daily count of requests received against HL-LOAS sent'
+    owner: BDOI IT (HL-LOAS owner)
+    bibs: 'Package quotations, Placement; bibs-integration'
+    questions: IQ07
+  - id: INT-05
+    name: LFS insurance report
+    system: Loan Front-End System (SaaS)
+    drop: Not on the drop plan; proposed Drop 1
+    pattern: File
+    direction: Inbound
+    transport: 'Daily file to the inbound bucket'
+    data: 'Loan-linked policies submitted by borrowers'
+    security: 'As INT-03'
+    errors: 'As INT-03'
+    recon: 'Count per file; unmatched rows listed for Submitted Policies'
+    owner: BDOI IT (LFS owner)
+    bibs: 'Submitted policies; bibs-integration'
+    questions: IQ08
+  - id: INT-06
+    name: PMS post-dated checks
+    system: PDC Management System
+    drop: Drop 0
+    pattern: File
+    direction: Inbound (status outbound to confirm)
+    transport: 'Daily PDC list to the inbound bucket'
+    data: 'PDC number, bank, date, amount, payor, account or invoice reference'
+    security: 'As INT-03'
+    errors: 'Rejected rows in the upload result'
+    recon: 'PDC count and amount per file; maturity run reconciles warehoused PDCs'
+    owner: BDOI IT (PMS owner)
+    bibs: 'Cashiering; bibs-jobs'
+    questions: IQ09
+  - id: INT-07
+    name: CMS / New BOB outward payments
+    system: Cash Management System (New BOB)
+    drop: Drop 0
+    pattern: File
+    direction: Both
+    transport: 'Payment instruction file from Disbursement; status and debit confirmation file back (host-to-host or user upload, IQ10)'
+    data: 'Payee, account, amount, currency, value date, voucher reference; status per transaction'
+    security: 'Signed and encrypted file per bank standard; approvals in BIBS before the file is released'
+    errors: 'Rejected instructions return to the disbursement queue with the bank reason'
+    recon: 'Voucher totals against the bank confirmation; bank reconciliation in Receivables'
+    owner: BDOI Treasury with BDOI IT
+    bibs: 'Disbursement; bibs-jobs'
+    questions: IQ10
+  - id: INT-08
+    name: OBPCS bills payment collections
+    system: Online Bills Payment Consolidation System
+    drop: Drop 0
+    pattern: File
+    direction: Inbound
+    transport: 'Consolidated bills-payment file uploaded to Cashiering'
+    data: 'Payment date, reference (ARN, invoice, PN), payor, amount, channel'
+    security: 'As INT-03'
+    errors: 'Unmatched payments go to the unapplied queue'
+    recon: 'File total against the bank credit; automatching report'
+    owner: BDOI Operations with BDOI IT
+    bibs: 'Cashiering; bibs-jobs'
+    questions: IQ10
+  - id: INT-09
+    name: Old BOB SOA funds transfers
+    system: Old Business Online Banking Collection System
+    drop: Drop 0
+    pattern: File
+    direction: Inbound
+    transport: 'Collection file applied in Cashiering'
+    data: 'Funds-transfer credits with SOA or invoice reference'
+    security: 'As INT-03'
+    errors: 'Unmatched credits to the unapplied queue'
+    recon: 'File total against the bank statement'
+    owner: BDOI Operations with BDOI IT
+    bibs: 'Cashiering; bibs-jobs'
+    questions: IQ10
+  - id: INT-10
+    name: AFTS automatic fund transfer
+    system: Automatic Fund Transfer System
+    drop: Drop 0
+    pattern: File
+    direction: To confirm
+    transport: 'To be agreed with BDOI IT (IQ10)'
+    data: 'To be agreed'
+    security: 'As INT-07'
+    errors: 'As INT-07'
+    recon: 'As INT-07'
+    owner: BDOI IT
+    bibs: 'Cashiering or Disbursement'
+    questions: IQ10
+  - id: INT-12
+    name: ECM records archive
+    system: Enterprise Content Management
+    drop: Drop 0
+    pattern: Event
+    direction: Outbound
+    transport: 'Final records of the "archive to ECM" record classes published on the topic bibs.storage.ecm-archive-requested.v1; the ECM connector stores the ECM reference back on the file record'
+    data: 'Stored file identifier, record class, document type, owner, content type, size, SHA-256, object location (no file name)'
+    security: 'Kafka SASL_SSL; S3 read through a presigned link or the ECM role; payload without personal data'
+    errors: 'Retries, then dead-letter topic and the Integration Events screen'
+    recon: 'ECM status per stored file (pending, archived, failed) in the file store report'
+    owner: BDOI IT (ECM owner)
+    bibs: 'File storage; bibs-integration'
+    questions: IQ13, DSQ02
+  - id: INT-13
+    name: CCM outbound e-mail
+    system: Centralized Communications Management
+    drop: Drop 0
+    pattern: E-mail
+    direction: Outbound
+    transport: 'SMTP relay with STARTTLS on port 587 (or the CCM API, IQ11) through the private route'
+    data: 'Recipient, subject, body, password-protected PDF attachments, template'
+    security: 'TLS; authenticated relay; attachments protected with the document password policy'
+    errors: 'Failed sends stay queued and are retried by the mail dispatch job up to the MAIL_MAX_ATTEMPTS parameter; bounces reported'
+    recon: 'Send log per message; daily sent and failed counts'
+    owner: BDOI IT (CCM owner)
+    bibs: 'Messaging; bibs-integration (consumer) and bibs-jobs (dispatch)'
+    questions: IQ11
+  - id: INT-14
+    name: M365 Exchange mailboxes
+    system: Microsoft 365 Exchange
+    drop: Drop 0
+    pattern: Sync API
+    direction: Inbound
+    transport: 'Microsoft Graph read of the quotation-request and insurer-reply mailboxes, if BDOI confirms the use (IQ12)'
+    data: 'E-mails and attachments'
+    security: 'Application permission limited to the named mailboxes'
+    errors: 'Mail not read stays in the mailbox and is listed for manual capture'
+    recon: 'Mailbox count against requests captured'
+    owner: BDOI IT (M365)
+    bibs: 'Package quotations; bibs-integration'
+    questions: IQ12
+  - id: INT-15
+    name: TFS trade clients (manual)
+    system: Trade Finance System
+    drop: Drop 0
+    pattern: Manual
+    direction: Inbound
+    transport: 'Users key the client in BIBS and upload the Trade payment file'
+    data: 'Trade client details; Trade payment file'
+    security: 'User permissions and upload checks'
+    errors: 'Upload result per row'
+    recon: 'Upload totals'
+    owner: BDOI Operations
+    bibs: 'Clients, Cashiering; bibs-web'
+    questions: IQ14
+  - id: INT-16
+    name: EDP data ingestion (SD 11)
+    system: Enterprise Data Platform
+    drop: Drop 2
+    pattern: File
+    direction: Outbound
+    transport: 'Daily extracts written to an EDP landing bucket (or events, IQ15)'
+    data: 'Clients, accounts, invoices, receipts, remittances, GL; history and daily changes'
+    security: 'Cross-account bucket policy with the EDP role; SSE-KMS; personal data masked unless EDP is authorised'
+    errors: 'Extract job failure raises the JOB_FAILURE alert; re-run for the business date'
+    recon: 'Control file with counts and amount totals per extract'
+    owner: BDO Data Office with BDOI IT
+    bibs: 'Report centre and extracts; bibs-jobs'
+    questions: IQ15
+  - id: INT-17
+    name: EGL general ledger feed
+    system: Enterprise General Ledger
+    drop: Drop 2
+    pattern: File
+    direction: Outbound
+    transport: 'Daily journal detail or balance file (IQ16) through Apigee X or a file exchange'
+    data: 'Journals or trial balance by account, branch, cost centre, currency, mapped to EGL accounts'
+    security: 'Apigee X token or signed file; SSE-KMS'
+    errors: 'Rejected lines returned and corrected by Accounting; the feed is re-sent for the business date'
+    recon: 'Trial balance of BIBS against EGL per period, owned by Comptrollership'
+    owner: BDOI Comptrollership with BDO EGL team
+    bibs: 'Finance core; bibs-jobs'
+    questions: IQ16
+  - id: INT-18
+    name: CARMS
+    system: CARMS
+    drop: Drop 2
+    pattern: To confirm
+    direction: To confirm
+    transport: 'To be agreed (IQ17)'
+    data: 'To be agreed'
+    security: 'Apigee X or file exchange, per the agreed pattern'
+    errors: 'Per the agreed pattern'
+    recon: 'Per the agreed pattern'
+    owner: BDOI IT
+    bibs: 'To be placed'
+    questions: IQ17
+  - id: INT-19
+    name: Insurer interfaces
+    system: Insurer systems (per insurer)
+    drop: Drop 2
+    pattern: File
+    direction: Both
+    transport: 'Per insurer: e-mail with protected attachments today; SFTP or API through Apigee X where the insurer offers it (IQ18)'
+    data: 'Placement slips, production reports and feedback, remittance schedules and ORs, DP billing responses, renewal responses, SOAs, e-policies, claims'
+    security: 'Password-protected PDFs by e-mail; for files, insurer-specific keys; inbound files scanned for malware'
+    errors: 'Insurer file errors in the insurer file inbox with the reason; follow-up in the Operations work queues'
+    recon: 'Production reconciliation (PRCID), SOA reconciliation in ACSL, remittance confirmation'
+    owner: BDOI Operations with each insurer
+    bibs: 'Placement, Issuance, Remittance, Production reconciliation, ACSL, Claims handling; bibs-integration and bibs-jobs'
+    questions: IQ18
+  - id: INT-20
+    name: Bridger Insight XG screening (manual)
+    system: Bridger Insight XG
+    drop: Drop 2
+    pattern: Manual
+    direction: Inbound
+    transport: 'Compliance screens names in Bridger and records the result in the BIBS screening case'
+    data: 'Screening result and evidence'
+    security: 'User permissions; evidence stored as an attachment'
+    errors: '-'
+    recon: 'Screening case report'
+    owner: BDOI Compliance
+    bibs: 'Sanction screening; bibs-web'
+    questions: IQ19
+  - id: INT-21
+    name: Watchlist feeds (AML advisory, NLDS PEP)
+    system: AMLC advisory lists, BDO Negative List Database System
+    drop: Drop 1
+    pattern: File
+    direction: Inbound
+    transport: 'List files uploaded or dropped in the inbound bucket; daily ingestion job before business hours'
+    data: 'Sanction and PEP entries with aliases'
+    security: 'As INT-03; list changes under maker-checker'
+    errors: 'Ingestion errors listed per run; error digest to Compliance'
+    recon: 'Entries added, changed and removed per run; delta screening of clients'
+    owner: BDOI Compliance with BDO AML unit
+    bibs: 'Sanction screening; bibs-integration'
+    questions: SQ01
+  - id: INT-22
+    name: AMLC STR filing
+    system: AMLC portal
+    drop: Drop 1
+    pattern: Manual
+    direction: Outbound
+    transport: 'STR file extracted by BIBS in the configured layout; filed by Compliance on the AMLC portal; the AMLC reference recorded in BIBS'
+    data: 'Suspicious transaction report and its transactions'
+    security: 'Extraction permission; file under legal hold'
+    errors: '-'
+    recon: 'STR register with the AMLC reference per report'
+    owner: BDOI Compliance
+    bibs: 'Sanction screening; bibs-web'
+    questions: SQ09
+  - id: INT-23
+    name: BIR e-filing
+    system: BIR eFPS and eBIRForms
+    drop: Drop 1
+    pattern: Manual
+    direction: Outbound
+    transport: 'Returns, certificates (2307) and alphalists produced by BIBS; filed by Comptrollership on eFPS or eBIRForms; filing reference recorded'
+    data: '2550Q, 0619-E, 1601-EQ with QAP, 2307, alphalists'
+    security: 'Tax permissions; filed forms under legal hold'
+    errors: '-'
+    recon: 'Tax worksheet against the ledger per tax account'
+    owner: BDOI Comptrollership
+    bibs: 'Finance core (tax); bibs-web'
+    questions: AQ31
+  - id: INT-24
+    name: Shared folders and file server (extract repository)
+    system: BDOI file server FS04 and shared drive folders
+    drop: Drop 1
+    pattern: File
+    direction: Outbound
+    transport: 'Scheduled files (Collections daily files, application-to-invoice file, remittance and DP lists) written to the reports bucket and offered for download; delivery to FS04 when the folder route is agreed'
+    data: 'Report and extract files'
+    security: 'Presigned links of 5 minutes after the permission check; SSE-KMS'
+    errors: 'Job failure alert; re-run for the business date'
+    recon: 'File register per run with name, size and SHA-256'
+    owner: BDOI IT (file server)
+    bibs: 'Collections, Remittance, Production reconciliation; bibs-jobs'
+    questions: OQ17
+  - id: INT-25
+    name: Mail house print batches
+    system: Mail house (COG)
+    drop: Drop 1
+    pattern: File
+    direction: Outbound
+    transport: 'Merged PDF print batch with a control list per run'
+    data: 'Renewal advice and submitted-policy letters for printing'
+    security: 'Presigned link or managed transfer; SSE-KMS'
+    errors: 'Batch re-generated on request'
+    recon: 'Control list count against letters printed'
+    owner: BDOI Operations
+    bibs: 'Submitted policies, Renewal; bibs-jobs'
+    questions: SQ09
+  - id: INT-26
+    name: Document store
+    system: Amazon S3 (BDOI AWS account)
+    drop: Drop 0
+    pattern: Internal store
+    direction: Both
+    transport: 'AWS SDK over the S3 VPC gateway; presigned links of 5 minutes for the browser'
+    data: 'Attachments, generated documents, report files, inbound files, migration extracts'
+    security: 'IRSA role per workload; SSE-KMS with BDOI-owned keys; Object Lock governance mode and legal hold; GuardDuty malware protection'
+    errors: 'Files without a clean scan cannot be downloaded; infected files quarantined with an alert'
+    recon: 'Nightly orphan reconciliation (objects without a record after 24 hours); SHA-256 on every file'
+    owner: BDOI IT cloud platform
+    bibs: 'File storage; all backend workloads'
+    questions: IQ31, DSQ01-DSQ04
+  - id: INT-27
+    name: Legacy systems for data migration
+    system: EBIX, QPS, ISYS, Collection Management System, Excel trackers
+    drop: Drop 0
+    pattern: File
+    direction: Inbound
+    transport: 'Extracts with a control file uploaded to the migration bucket (expiry after 5 days)'
+    data: 'Migration objects R, C, P and the opening balances'
+    security: 'Migration role only; masking of personal data outside production'
+    errors: 'Batch validation report; rejected batch resubmitted'
+    recon: 'Control totals per object and the reconciliation reports of the Migration Console'
+    owner: BDOI data stewards with BDOI IT
+    bibs: 'Data migration; bibs-jobs'
+    questions: DMQ28
+  - id: INT-28
+    name: SMS notifications
+    system: BDO SMS gateway (if required)
+    drop: '-'
+    pattern: Not in scope
+    direction: Outbound
+    transport: 'No BRD requires SMS; notifications go by e-mail (INT-13) and in-app. An SMS channel would be added as a further transport of the messaging module through Apigee X'
+    data: '-'
+    security: '-'
+    errors: '-'
+    recon: '-'
+    owner: BDOI IT
+    bibs: 'Messaging'
+    questions: IN-05
+
+# ------------------------------------------------------------------------------------------------------------
+# Kafka topics (all with a dead-letter topic <topic>.dlt).
+topics:
+  - [bibs.booking.invoice-booked.v1, 'Invoice booked', 'Invoice number', Booking]
+  - [bibs.cashiering.payment-applied.v1, 'Payment applied or unapplied', 'Invoice number', 'Operations invoice ledger']
+  - [bibs.cashiering.receipt-issued.v1, 'Receipt issued', 'Receipt number', Cashiering]
+  - [bibs.remittance.batch-status.v1, 'Remittance batch stage changed', 'Batch number', Remittance]
+  - [bibs.disbursement.status-changed.v1, 'Disbursement request status changed', 'Request number', Disbursement]
+  - [bibs.collections.feed-ready.v1, 'Collection feed ready', 'Feed code', 'Operations invoice ledger']
+  - [bibs.catalog.product-version-released.v1, 'Package version released', 'Product code', 'Product catalogue']
+  - [bibs.crm.client-changed.v1, 'Client registered or changed', 'Client identifier', 'Clients (CRM)']
+  - [bibs.messaging.notification-requested.v1, 'E-mail or notification queued', 'Message identifier', Messaging]
+  - [bibs.storage.ecm-archive-requested.v1, 'Final record ready for the ECM archive', 'Stored file', 'File storage']

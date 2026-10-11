@@ -1,0 +1,282 @@
+# Guide to the BRD-13 Data Migration business sign-off pack: the content of the 01 Guide deck (shared guide deck
+# builder, with the migration slides of module_slides) and of the 00 Start Here guide (START_HERE_BRD13.md, ```pack
+# blocks "guide-*"). The layout is the same for every BRD set; only this file changes.
+meta:
+  deck_title: Sign-off Pack Guide
+  module: Data Migration
+  owner: Program Manager, Business Project Services (BDO Unibank ESG)
+  issued: Mon 5-Oct-2026
+  signoff_date: Fri 30-Oct-2026
+  # What the pack holds, on the purpose slide (every set has its own).
+  purpose_detail: "Every screen of the Migration Console with numbered fields, the migration catalogue (objects, load templates, code maps, rules, owners), the cut-over plan and the reconciliation sign-off"
+  # The process flow slide (figures/brd13_process_flow.png).
+  process_caption: "The way of every data object: from its decision to its acceptance, with the gates G1 to G6"
+  process_notes: "Each object goes through the same steps in every trial migration, the dress rehearsal and the production cut-over. The gates are signed in the Migration Console; a break sends the batch back to validation with a fix at source, a new code map version or a waiver. Gate G7 is the go / no-go of the whole cut-over."
+  # The workbook slide: which sheet is pictured, with which columns, and what the reviewer does.
+  workbook_sheet: "Object catalogue"
+  workbook_columns: ["Object", "Data object", "Decision (proposed)", "Rationale", "BU review", "BU comment", "Reviewer", "Review date"]
+  workbook_example: "Load the inactive account officers only when they still hold open items"
+  workbook_caption: "Object catalogue sheet of the Migration Workbook"
+  workbook_side:
+    - "Review the rows of your objects: Object catalogue, Data owners, Code maps, Validation rules, Cut-over tasks, Reconciliation sign-off"
+    - "Load templates: in load order; on each template sheet the BU review rows sit above the columns"
+    - "BU review: Accept, Change requested or Comment"
+    - "BU comment: the change asked for"
+    - "Proposed rules: the BDOI decision on each rule"
+    - "Questions go to the Comments log"
+    - "Leave the other columns unchanged; one workbook per unit"
+  # References of the deck notes to the chapters of the 02 document of this set.
+  chapters:
+    document: Data Migration Handbook
+    screens: Handbook Part B, chapter 19
+    menus: Handbook Part B, chapter 17
+    messages: Handbook Part B, chapter 21
+    contract: Handbook Part B, chapter 28
+    walkthroughs: the trial migrations of Handbook Part A, chapter 10
+
+# The documents of the set in reading order. kind = document type of the file name (brand.READING_ORDER and
+# READING_ORDER_EXTRA).
+documents:
+  - {kind: StartHere, name: Data Migration, ext: docx, what: "Start Here: the map of the set, who reads what, the steps up to sign-off and the dates", readers: Everyone, when: "First, on issue"}
+  - {kind: GuideDeck, name: Data Migration, ext: pptx, what: "Guide deck: the migration approach, the objects and decisions, roles and data owners, trial migrations and dress rehearsal, sign-off gates, cut-over and go / no-go, migrated and new data, caveats, entry and exit criteria, handover", readers: "Business owner, data owners, Comptrollership, BDOI IT; presented at the kick-off", when: "Kick-off session"}
+  - {kind: Handbook, name: Data Migration, ext: docx, what: "Data Migration Handbook: A strategy and approach; B functional specification of the Migration Console with screenshots, fields, actions, rules and messages, the markers of migrated data and the legacy batches; C reconciliation and the sign-off gates per object; D the cut-over runbook, run-off and decommissioning; the proposed rules for confirmation", readers: "Data owners and Comptrollership for their objects and parts; BDOI IT; the Renewal processing team", when: "During the review, with the console walkthroughs"}
+  - {kind: Workbook, name: Data Migration, ext: xlsx, what: "Migration Workbook: object catalogue and decisions, extract planning, the load templates (one sheet per layout), code maps, validation rules, data owners, cut-over task plan, reconciliation sign-off per object, proposed rules with the BDOI decision, the screens; comments log, meeting minutes, version history, sign-off certificate", readers: "Every reviewer; the signatories sign it", when: "During the review and at sign-off"}
+  - {kind: TestPlan, name: Data Migration, ext: xlsx, what: "Test plan workbook: the test cases traced to the requirements and to the screens, with the trial migration, reconciliation, rollback, rerun and cut-over rehearsal scenarios", readers: "Data owners who verify the trial migrations; BDOI IT", when: "After the handbook; used again in the trial migrations"}
+  - {kind: TestPlan, name: Data Migration Summary, ext: docx, what: "Test plan summary: scope, approach, coverage and the cases by area", readers: "Business owner, BDOI IT", when: "Before sign-off"}
+  - {kind: UXDeck, name: Data Migration, ext: pptx, what: "UX Screen Deck for the BDOI UX Design team: design foundation, navigation and personas, every flow step by step and every screen with all its states", readers: "BDOI UX Design team", when: "From the issue, in parallel with the review; re-issued with each version of the set"}
+  - {kind: UXScreens, name: Data Migration, ext: xlsx, what: "UX screen register: one row per screen image with the screen, personas, flow and step, state, FRS section and requirements, UXD status and comments, and the Changed in this issue flag", readers: "BDOI UX Design team", when: "Kept by the UX Design team; the changed rows are flagged at each issue"}
+  - {kind: UXScreens, name: Data Migration, ext: zip, what: "Image package: every screen image at twice the screen resolution (PNG), the component crops and the register as CSV", readers: "BDOI UX Design team", when: "Imported into the design tool at each issue"}
+
+# Reading order per role (Handbook parts and chapter numbers of v2.1).
+reading:
+  - role: "Approver (Product Owner, Marketing Business System) and Program Manager, Business Project Services"
+    order: "00 Start Here; 01 Guide deck; Handbook Part A (approach, objects and decisions, cycles, cut-over) and the chapter Proposed business rules and clarifications for confirmation; workbook sheets Object catalogue, Proposed rules and Sign-off certificate"
+  - role: "Data owners per object: Marketing Business System (R01, R05, R06, C01, C03); Heads of Retail and Corporate Marketing (R03, C01); Operations (R04, R07, P01, F01-F04, F06); Comptrollership (R02, R08, F01, F02, G01, G03); Disbursement (R09, C03); Compliance and Analytics (C04, H01, H02); Renewal processing team (P03)"
+    order: "Handbook Part A chapter 3 (objects and decisions) and chapter 6 (templates and mapping); the load template sheets of your objects, Code maps and Validation rules; Part C chapters 32 and 34 for the reconciliation and the samples you verify; workbook sheets Object catalogue, Data owners, Extract planning, Reconciliation sign-off"
+  - role: Comptrollership
+    order: "Handbook Part A chapter 7 (legacy invoices and sub-ledgers) and chapter 11 (cut-over strategy); Part D chapter 44 (year-end cut-over); Part B screens Reconciliation and Opening-Balance Adjustments; Part C chapter 33 (Migration Clearing and the adjustment reconciliation); the proposed rules PR-DM-01, 02, 06, 10 and 14; workbook sheets G01, G03, G03D, F01C and Reconciliation sign-off"
+  - role: Renewal processing team
+    order: "Handbook Part A chapter 8 (renewal-driven transition); Part B Batches (resubmissions of the RA-sent file); Part D tasks of the go-live renewal extraction and the day-1 queue; workbook sheet P03 and the load template workbook of P03 exported by the console"
+  - role: BDOI IT
+    order: "Handbook Part A chapter 6 (templates, secure transfer, masking) and chapter 12 (data security); Part B Extracts and Layouts and Rules; Part D (freeze, final extracts, rollback, decommissioning); proposed rules PR-DM-03 and PR-DM-04; workbook sheets File rules, Load templates, Control file, Cut-over tasks"
+  - role: BDOI UX Design team
+    order: "07 UX Screen Deck: design foundation and navigation first, then the personas, flows and screens of the design work; 08 UX screen register (filter Changed in this issue at each new issue); 09 image package in the design tool"
+  - role: iorta TechNXT project team
+    order: "All documents; keeps the comments log, the meeting minutes and the version history of the workbook, answers every comment and keeps the traceability to the trial migrations, SIT and UAT"
+
+# Steps from issue to closure. raci: R responsible, A accountable, C consulted, I informed.
+steps:
+  - step: 1
+    name: Set issued
+    who: "R: iorta TechNXT Project Manager; A: iorta TechNXT delivery lead; I: all reviewers"
+    inputs: "Handbook, Migration Workbook, test plan, guide and deck"
+    outputs: "Release set v2.0 in the BRD-13 folder of Drop 0; invitations to the sessions; release set v2.1 re-based on the Data Migration BRD V0.03 on Thu 8-Oct-2026"
+    duration: "Day 0 (Mon 5-Oct-2026); v2.1 on Thu 8-Oct-2026"
+  - step: 2
+    name: Kick-off and walkthrough of the Migration Console on SIT
+    who: "R: iorta TechNXT Business Analysis; A: Program Manager; C: data owners, Comptrollership, BDOI IT, Renewal processing team"
+    inputs: "Guide deck; SIT users with seed data; one object from extract to acceptance"
+    outputs: "Console shown live; first questions logged in the comments log; minutes"
+    duration: "3 sessions, 7 to 9-Oct-2026"
+  - step: 3
+    name: Review with the workbook; decisions on the proposed rules
+    who: "R: data owners and their stewards, Comptrollership, BDOI IT; A: Program Manager; C: iorta TechNXT (questions)"
+    inputs: "Handbook parts of each role; workbook sheets with the BU review columns; the proposed rules"
+    outputs: "Every row marked Accept, Change requested or Comment; decisions on the rules needed by 16-Oct-2026 (M1); comments log entries"
+    duration: "Until Wed 21-Oct-2026 (M1 rules by Fri 16-Oct-2026)"
+  - step: 4
+    name: Comments consolidated and a Q&A session
+    who: "R: iorta TechNXT Project Manager and Business Analysis; A: Program Manager; C: reviewers"
+    inputs: "Returned workbooks"
+    outputs: "One consolidated comments log, each item typed (clarification, correction, change request) and answered; Q&A minutes"
+    duration: "3 working days, Q&A on Mon 26-Oct-2026"
+  - step: 5
+    name: One revision cycle (v2.2)
+    who: "R: iorta TechNXT Business Analysis; A: iorta TechNXT delivery lead; C: reviewers who raised the items"
+    inputs: "Agreed clarifications and corrections; decisions on the proposed rules"
+    outputs: "Release set v2.2 with the changed rows marked and the decided rules and clarifications applied; change requests raised for the rest"
+    duration: "v2.2 on Wed 28-Oct-2026; check by the reviewers until Thu 29-Oct-2026"
+  - step: 6
+    name: Sign-off meeting and signature
+    who: "R: iorta TechNXT Project Manager; A: Product Owner, Marketing Business System; C: Program Manager, data owners, Comptrollership, BDOI IT"
+    inputs: "v2.2 (or v2.1 when no revision is needed); open decisions with their date"
+    outputs: "Signed sign-off certificate; minutes; objects decided (G1) and layouts frozen, version 1 (M2)"
+    duration: "Fri 30-Oct-2026 (M2)"
+  - step: 7
+    name: Handover to the migration runs
+    who: "R: iorta TechNXT delivery lead; A: Program Manager; I: BDOI IT, other BRD owners"
+    inputs: "Signed set; decided objects; frozen layouts; named owners and stewards"
+    outputs: "Decisions and owners entered in the Migration Console; first full extracts in the templates by 29-Jan-2027 (M3)"
+    duration: "From Mon 2-Nov-2026"
+  - step: 8
+    name: Traceability into the trial migrations, SIT and UAT
+    who: "R: iorta TechNXT test lead; A: Program Manager; C: data owners"
+    inputs: "Signed handbook, workbook and test plan"
+    outputs: "Trial migrations 1 to 4 and the dress rehearsal run and signed against the set; results against each row"
+    duration: "Trial migrations Apr - Oct 2027; dress rehearsal Nov 2027; cut-over Jan 2028"
+
+# The module at a glance: key screenshots (file names in the screenshot folder of the pack).
+key_screens:
+  - {image: scr-dm-01-01-view, caption: "Migration Home"}
+  - {image: scr-dm-07-01-validated, caption: "A batch from validation to acceptance"}
+  - {image: scr-dm-09-01-list, caption: "Reconciliation by level"}
+  - {image: scr-dm-17-01-legacy, caption: "A legacy invoice on Invoice 360"}
+
+# Key business rules (highlights; the full list is in the workbook and Handbook Part B).
+rules:
+  - "Every object has one decision (migrate, carry forward, conditional, archive, excluded) approved by its business owner (G1)."
+  - "Only approved code map versions are used; a batch with an unmapped code in a mandatory column is not loaded."
+  - "Master data loads with at most 0.5 percent of rows failing or waived; open items and the trial balance with none."
+  - "Records are created through the BIBS services, never written directly; migrated records carry the origin Migrated and raise no notification."
+  - "Every object is reconciled at up to five levels; a break is explained and approved before the reconciliation is signed (G5)."
+  - "The maker never approves: decisions, code maps, loads, rollbacks, adjustments, resubmissions and legacy batches."
+  - "Migration Clearing is 0.00 per branch and currency at go-live; the go-live decision is taken on twelve measured criteria."
+  - "A legacy invoice keeps its number, is processed with the BIBS screens and posts to the legacy accounts until it is settled."
+
+# The migration slides of the deck (after the module at a glance). kind: content | table | columns | image.
+module_slides:
+  - kind: content
+    title: "The migration approach"
+    items:
+      - "Selective, not a conversion: each legacy object gets one decision"
+      - [1, "Master and reference data are migrated; open items are carried forward; history stays in read-only legacy or the BIBS archive"]
+      - "Load through the BIBS services, so every BIBS rule, audit entry and accounting entry applies"
+      - "Reconcile everything and keep the evidence: counts, amounts, hash totals, fields, GL"
+      - "Rehearse before production: four trial migrations and a dress rehearsal on masked data"
+      - "One processing system per item from the freeze; no parallel run"
+      - "Go-live Monday 3 January 2028 at the year-end boundary (option A, for Comptrollership to confirm)"
+    notes: "The approach follows the BRD: a stable Day-1 with clean master data and the open positions carried forward. History is not converted into BIBS transactions."
+  - kind: table
+    title: "The data objects and their decisions"
+    plugin: build_dm_pack.py
+    source: objects
+    notes: "The decisions are proposals that each business owner confirms at gate G1 in the Migration Console. Conditional objects wait for BDOI's decision (proposed rule PR-DM-05)."
+  - kind: table
+    title: "Roles and the named data owners"
+    headers: ["Role", "Who", "Does"]
+    widths: [3.0, 4.0, 5.6]
+    rows:
+      - ["Approver of the set", "Product Owner, Marketing Business System", "Owns the set and approves all of its contents, with the approvers of the BRD-13 approval pages"]
+      - ["Author of the BRD; cut-over", "Program Manager, Business Project Services", "Reviews the traceability and the completeness; accountable for the cut-over; chairs the go / no-go board"]
+      - ["Data Migration Lead", "BDOI (to name)", "Object register and decisions, load approvals (G4), acceptance with the owners (G6), cut-over plan"]
+      - ["Data owners", "Department heads per object (workbook sheet Data owners)", "Decide the class (G1), approve the code maps (G2), waivers, accept the object (G6)"]
+      - ["Data stewards", "Named staff per object", "Profiling review, cleansing at source, code maps, client match review"]
+      - ["Reconciliation approver", "Head, Comptrollership (financial objects)", "Signs the reconciliation (G5); approves breaks, rollbacks and the opening-balance adjustments"]
+      - ["BDOI IT", "Legacy system owners", "Extracts and control files, transfer, freeze and read-only mode, decommissioning"]
+      - ["iorta TechNXT", "Project Manager, Migration Lead, Migration Operator", "Loads, reconciliation runs, profiling, the console, the rehearsals"]
+    notes: "BDOI names the owners and stewards by 30 October 2026 (M2). The workbook sheet Data owners has the columns for the names."
+  - kind: table
+    title: "Trial migrations and the dress rehearsal"
+    headers: ["Run", "When and where", "What it proves"]
+    widths: [2.6, 3.4, 6.6]
+    rows:
+      - ["Trial migration 1", "19-30 Apr 2027, SIT", "Reference data and clients first, then policy headers and the RA-sent file; timings; profiling report to the owners"]
+      - ["Trial migration 2", "5-16 Jul 2027, SIT", "All objects end to end; L1-L5 reconciled; Migration Clearing 0.00"]
+      - ["Trial migration 3", "2-13 Aug 2027, UAT", "Business verification on screen; the Drop 1 UAT runs on migrated data"]
+      - ["Trial migration 4", "4-15 Oct 2027, UAT", "Timed as a cut-over; go-live renewal extraction; a test opening-balance adjustment"]
+      - ["Dress rehearsal", "15-26 Nov 2027, production-sized", "Full volume within the window with 20 percent margin; rollback rehearsed"]
+    notes: "Each run uses fresh masked extracts, so every fix is proven with new data. The production cut-over repeats the rehearsed plan."
+  - kind: table
+    title: "The sign-off gates of every object"
+    headers: ["Gate", "What is signed", "By"]
+    widths: [2.4, 6.6, 3.6]
+    rows:
+      - ["G1 Decision", "The class of the object with the four criteria", "Business owner"]
+      - ["G2 Mapping", "Layouts frozen; the code maps used approved", "Business owner"]
+      - ["G3 Validation", "Error rate within the limit; waivers approved; no pair to review", "Data Steward (waivers by the owner)"]
+      - ["G4 Load approval", "The batch may be loaded", "Data Migration Lead; Head of Comptrollership for an adjustment"]
+      - ["G5 Reconciliation", "L1-L5 matched or explained", "Reconciliation approver"]
+      - ["G6 Acceptance", "Samples verified on the BIBS screens", "Business owner and Data Migration Lead"]
+      - ["G7 Go-live", "Day-1 objects accepted; the twelve criteria met", "Go / no-go board"]
+    notes: "The maker of a batch cannot sign its reconciliation or acceptance, and one person cannot sign two gates of one batch."
+  - kind: columns
+    title: "Cut-over and go / no-go"
+    blocks:
+      - ["Before the freeze", ["Pre-load of reference data and clients from 20 Dec 2027", "Daily client deltas", "Code map freeze 27 Dec", "December soft close by 20 Dec"]]
+      - ["Cut-over weekend", ["Legacy freeze Fri 31 Dec 22:00", "Final extracts and loads Sat 1 Jan", "Reconciliation, samples, smoke test Sun 2 Jan", "Go / no-go Sun 2 Jan 18:00"]]
+      - ["Go-live", ["Renewal extraction Mon 3 Jan 04:00", "BIBS open 08:00", "Point of no return 18:00", "Hypercare to the January close"]]
+    notes: "Until the go / no-go decision the rollback restores the snapshot taken before the production load and legacy reopens. After the point of no return issues are fixed forward in BIBS."
+  - kind: content
+    title: "How migrated and new data are told apart"
+    items:
+      - "LEGACY badge next to the number on the lists and records, with the source system, legacy reference and batch in its tooltip"
+      - "Origin filter on the lists that hold migrated records: All origins, BIBS, Migrated"
+      - "Legacy numbers stay searchable: clients, policies and invoices are found by their legacy numbers"
+      - "Invoice 360 of a legacy invoice shows the values at cut-over, never changed after the load"
+      - "Legacy invoices and unapplied payments post to the legacy accounts until they are settled"
+      - "Migrated records raise no notification to clients or insurers"
+    notes: "Users work migrated and new records on the same screens. The report Changes to Legacy Invoices shows every change made in BIBS to a legacy invoice."
+
+# Caveats and possibilities, and how each is handled.
+caveats:
+  - topic: Additional requirements
+    text: "New needs can surface during the review, the trial migrations or UAT."
+    handling: "In-scope clarification when the signed text already covers it; otherwise a change request with mandays."
+    example: "A data owner asks for an extra column in the client template: a new layout version, so a change request; asking which rule rejects a row is a clarification."
+  - topic: Decisions still open
+    text: "The year-end option, the codes of the legacy accounts, the conditional objects, the approvers of the legacy batches and the clarifications raised by BRD V0.03 (renewals in progress, claims, e-policies, history, tolerance) wait for BDOI."
+    handling: "Each is a proposed rule with its decision date; the proposal stands until BDOI decides, and most answers are configuration."
+    example: "If Comptrollership chooses option B, go-live moves to April 2028 and the opening loads the year-to-date P&L: a change request with its mandays."
+  - topic: Legacy data quality
+    text: "Profiling of the first full extracts may show fewer components, shares or references than expected."
+    handling: "Cleansing at source by the stewards; code maps; waivers within the thresholds; open-balance mode for invoices without their original amounts."
+    example: "Legacy cannot give paid and remitted per component: invoices load with their open balance and the Legacy Invoice card says so."
+  - topic: Other BRDs change the migrated objects
+    text: "Operations, Collections, Accounting, Renewal and Product Maintenance own the records the migration creates."
+    handling: "The change is raised against the other BRD and assessed against the cross-BRD contract of this set; a delta sign-off of the affected layouts."
+    example: "Renewal adds a mandatory field to the policy header: the P01 layout gets a new version, signed as a delta."
+  - topic: Items that depend on BDOI IT
+    text: "The secure file drop, the legacy document folder and the read-only links wait for BDOI IT."
+    handling: "Until named, files are uploaded on the Extracts screen and documents are loaded with their index; nothing else changes."
+    example: "When BDOI IT names the secure file drop, extracts arrive there instead of the upload; the checks and templates stay the same."
+
+# Entry and exit criteria of the sign-off, and the definition of done.
+entry:
+  - "The set is issued with the screenshots of the Migration Console taken on the SIT environment with seed data."
+  - "Reviewers have their SIT users and the walkthrough sessions are held."
+  - "The test plan is traced to the handbook and to the screens."
+exit:
+  - "Every row of the workbook reviewed by its unit (Accept, Change requested or Comment)."
+  - "Every proposed rule decided, or accepted as the working assumption with its decision date."
+  - "Every comments log item closed: answered, corrected in v2.2, or raised as a change request."
+  - "The sign-off certificate signed as on the BRD-13 approval pages: prepared by iorta TechNXT and the Program Manager, input from the Data Migration Lead and the data owners, reviewed by the BA Unit Head of Business Project Services, MBS and BDOI IT, approved by the Product Owner and the approvers."
+done:
+  - "Signed certificate filed with the set; version history updated."
+  - "Objects decided (G1) and layouts frozen, version 1, in the Migration Console (M2)."
+  - "Owners and stewards named per object; deltas listed in the Change Management Register with mandays."
+  - "Test plan agreed for the trial migrations, SIT and UAT."
+
+# Handover to the migration runs.
+handover:
+  - "Signed handbook, Migration Workbook and screens"
+  - "Decisions of the objects entered in the Migration Console (G1)"
+  - "Layouts frozen, version 1; templates issued to BDOI IT"
+  - "Owners and stewards named per object"
+  - "Proposed rules decided or accepted as assumptions"
+  - "Agreed test plan and trial migration calendar"
+handover_note: "Handover means the objects are decided, the layouts are frozen and the first full extracts are prepared for 29 January 2027."
+
+# Governance and contacts.
+governance:
+  - {role: "Approver", who: "Product Owner, Marketing Business System, with the approvers of the BRD-13 approval pages", does: "Owns the set and approves all of its contents; chairs the sign-off meeting"}
+  - {role: "BRD author and cut-over owner", who: "Program Manager, Business Project Services", does: "Reviews the traceability and the completeness; accountable for the cut-over; chairs the go / no-go board"}
+  - {role: "Data owners", who: "Department heads per object", does: "Review and sign their objects, templates, code maps and reconciliation"}
+  - {role: "Comptrollership", who: "Head, Comptrollership", does: "Legacy accounts, GL opening, reconciliation approver, opening-balance adjustments"}
+  - {role: "BDOI IT", who: "Head, BDOI IT", does: "Extracts, transfer, freeze, read-only access, decommissioning"}
+  - {role: "Compliance", who: "Compliance; Analytics and Risk Management", does: "Masking, archive, Legacy Inquiry and its access log"}
+  - {role: "Delivery", who: "iorta TechNXT Project Manager, Business Analysis, Migration Lead, test lead", does: "Sessions, answers, comments log, revisions, change requests, the migration runs"}
+next_steps:
+  - "Kick-off and first console walkthrough on Wed 7-Oct-2026"
+  - "Decisions on the M1 rules by Fri 16-Oct-2026; workbooks returned by Wed 21-Oct-2026"
+  - "Q&A on Mon 26-Oct-2026; sign-off on Fri 30-Oct-2026 (M2)"
+  - "First full extracts in the templates by Fri 29-Jan-2027 (M3); Trial migration 1 from 19-Apr-2027"
+
+# How the business unit reviews the Migration Workbook (sheet How to review).
+howto:
+  - "Read the Handbook part of your role with the screenshots, or walk through the Migration Console on the SIT environment during the sessions of the Start Here guide."
+  - "On the sheets of your objects (Object catalogue, Data owners, Extract planning, Code maps, Validation rules, Reconciliation sign-off) and on the screen sheets, set BU review to Accept, Change requested or Comment for each row you review, and write the change in BU comment. On a load template sheet the BU review and BU comment rows sit above each column."
+  - "On the Proposed rules sheet, record the BDOI decision (Agree, Agree with change, Disagree, Need more information), the change asked for, who decided and the date."
+  - "Put your name in Reviewer and the date in Review date. Leave the other columns unchanged."
+  - "The sheet Load templates lists the load templates in load order with a link to each. A load template sheet is the layout of the Migration Console column for column, with the guide of each column (Mandatory, Format, Allowed values, What to enter, the check when loaded) directly above the header row; the console exports the same templates (Layouts and Rules, Load Templates Workbook)."
+  - "Return the workbook to the iorta TechNXT project team by the date of the Start Here guide. Every Change requested row is answered in the Comments log before sign-off."
+  - "Questions and change requests go to the Comments log, with the load template and the column when they concern one; the project team answers each one there. On the Sign-off certificate sheet, each signatory records the decision and the date. The screenshots use fictitious seed data."

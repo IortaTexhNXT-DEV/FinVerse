@@ -1,0 +1,24 @@
+// Monitoring stack (Infrastructure Architecture, chapter 8).
+digraph ia_monitoring {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.3, ranksep=0.45, bgcolor="white", pad=0.2, newrank=true,
+         label=<<font point-size="15" color="@HEADER_BLUE"><b>Monitoring and alerting</b></font><br/><font point-size="9" color="@MUTED">Metrics, logs and alerts of the application, the cluster and the managed services in one view for BDOI operations (tool choice IQ30).</font>>,
+         labelloc=t, labeljust=l];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.0, fontname="Arial", fontsize=11,
+         fontcolor="@NEAR_BLACK", margin="0.1,0.05", fillcolor="@WHITE"];
+  edge  [color="@HEADER_BLUE", arrowsize=0.55, penwidth=0.9, fontname="Arial", fontsize=8, fontcolor="@MUTED"];
+
+  subgraph cluster_src {
+    label=<<b>Sources</b>>; fontsize=10; style="rounded,dashed"; color="@MUTED";
+    app [label=<<b>BIBS pods</b><br/><font point-size="9.5">Prometheus metrics on port 9090; JSON console<br/>logs with correlation id; job runs; alerts</font>>, fillcolor="@BG_BLUE"];
+    k8s [label=<<b>Cluster</b><br/><font point-size="9.5">nodes, pods, HPA, events</font>>, fillcolor="@BG_BLUE"];
+    aws [label=<<b>Managed services</b><br/><font point-size="9.5">RDS, ElastiCache, MSK, S3, ALB, WAF</font>>, fillcolor="@BG_BLUE"];
+  }
+  dt [label=<<b>Dynatrace (BDO standard in the IER)</b><br/><font point-size="9.5">APM, host and Kubernetes monitoring,<br/>Prometheus scrape from namespace monitoring</font>>, fillcolor="@DIRTY_WHITE"];
+  cw [label=<<b>Amazon CloudWatch</b><br/><font point-size="9.5">service metrics, container logs (Fluent Bit),<br/>WAF and load balancer logs, CloudTrail</font>>, fillcolor="@DIRTY_WHITE"];
+  siem [label=<<b>BDO log platform and SIEM</b><br/><font point-size="9.5">security events, retention per BDO policy</font>>, fillcolor="@AMBER_BG"];
+  ops [label=<<b>BDOI IT operations and iorta TechNXT support</b><br/><font point-size="9.5">dashboards, alert routing, incidents</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  inapp [label=<<b>In BIBS</b><br/><font point-size="9.5">Scheduled Jobs monitor, Integration Events,<br/>exception codes and alerts, audit trail</font>>, fillcolor="@BG_BLUE"];
+  app -> dt; k8s -> dt; app -> cw [label=" logs"]; aws -> cw;
+  cw -> siem; dt -> ops; cw -> ops; inapp -> ops [style=dashed];
+  {rank=same; dt; cw}
+}

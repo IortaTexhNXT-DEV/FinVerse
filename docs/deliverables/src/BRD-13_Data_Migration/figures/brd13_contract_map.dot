@@ -1,0 +1,32 @@
+digraph contract {
+  graph [rankdir=LR, fontname="Arial", nodesep=0.12, ranksep=0.9, bgcolor="white"];
+  node [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@FIELD_BLUE", fontname="Arial", fontsize=9, fontcolor="@NEAR_BLACK", margin="0.1,0.05"];
+  edge [color="@CTA_BLUE", arrowsize=0.6];
+  core [label="Data Migration", fillcolor="@HEADER_BLUE", fontcolor="white", fontsize=16, color="@HEADER_BLUE", margin="0.3,0.25"];
+  in0 [label="BDOI IT (legacy EBIX, QPS, ISYS, CMS)\n- Extracts in the load templates with their contro"];
+  in0 -> core;
+  in1 [label="BRD-11 User Access Maintenance\n- The users of the migration roles and of every pe"];
+  in1 -> core;
+  in2 [label="BRD-3 Product Maintenance\n- Products"];
+  in2 -> core;
+  in3 [label="BRD-5 Accounting (FRBS, ACSL)\n- In: the chart of accounts"];
+  in3 -> core;
+  out0 [label="BRD-1 New Business\n- Migrated clients (C01) with their identity"];
+  core -> out0;
+  out1 [label="BRD-1 New Business; BRD-2 Operations\n- In-force policy headers (P01"];
+  core -> out1;
+  out2 [label="BRD-10 Sanction Screening\n- Migrated clients for one full screening run afte"];
+  core -> out2;
+  out3 [label="BRD-2 Operations\n- Open legacy invoices (F01"];
+  core -> out3;
+  out4 [label="BRD-2 Operations (Cashiering)\n- Legacy unapplied payments (F02) with the legacy "];
+  core -> out4;
+  out5 [label="BRD-2 Operations (Commission); BRD-4\n- The DP PR Legacy Reversal of legacy invoices pai"];
+  core -> out5;
+  out6 [label="BRD-4 Collections\n- Open collection state (F03) - dispositions"];
+  core -> out6;
+  out7 [label="BRD-5 Accounting (FRBS, ACSL)\n- In: the chart of accounts"];
+  core -> out7;
+  out8 [label="BRD-6 Renewal\n- The migrated policy headers expiring from go-liv"];
+  core -> out8;
+}

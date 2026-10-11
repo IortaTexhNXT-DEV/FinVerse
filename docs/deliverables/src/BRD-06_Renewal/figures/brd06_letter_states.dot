@@ -1,0 +1,35 @@
+// BRD-6: insurer batch and letter states (FRS section 5.4; BRD 3.009, BRRN.001, 010, 025, 035, 037).
+digraph rn_letters {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.45, ranksep=0.4, bgcolor="white", pad=0.15];
+  node  [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@HEADER_BLUE", penwidth=1.1,
+         fontname="Arial", fontsize=13, fontcolor="@NEAR_BLACK", width=2.1, height=0.55];
+  edge  [color="@MUTED", arrowsize=0.6, fontname="Arial", fontsize=11.5, fontcolor="@TEXT"];
+
+  subgraph cluster_batch {
+    label="Insurer batch (RIB-yyyy)"; labeljust=l; fontcolor="@HEADER_BLUE"; fontsize=13;
+    style=rounded; color="@BG_BLUE";
+    B_DRAFT   [label="DRAFT"];
+    B_SENT    [label="SENT"];
+    B_PART    [label="PARTIALLY_\nRESPONDED"];
+    B_CLOSED  [label="CLOSED", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+    B_DRAFT -> B_SENT [label=" send (protected)"];
+    B_SENT -> B_PART [label=" first response"];
+    B_PART -> B_CLOSED [label=" all lines\n answered"];
+    B_SENT -> B_CLOSED [label=" all answered", style=dashed];
+  }
+
+  subgraph cluster_letter {
+    label="Letter (RA, NAL, NFR, reminder, non-acceptance)"; labeljust=l; fontcolor="@HEADER_BLUE"; fontsize=13;
+    style=rounded; color="@BG_BLUE";
+    L_GEN   [label="GENERATED"];
+    L_Q     [label="QUEUED"];
+    L_SENT  [label="SENT", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+    L_FAIL  [label="FAILED", fillcolor="@DANGER_BG", color="@DANGER"];
+    L_CAN   [label="CANCELLED", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+    L_GEN -> L_Q [label=" send"];
+    L_Q -> L_SENT [label=" delivered"];
+    L_Q -> L_FAIL [label=" error"];
+    L_FAIL -> L_Q [label=" resend", style=dashed, constraint=false];
+    L_GEN -> L_CAN [label=" RA cancelled\n (unlock)", style=dashed];
+  }
+}

@@ -1,0 +1,206 @@
+# Screen specifications of BRD-5 Accounting (FRBS): the financial periods, the month-end GL close and the cut-off of
+# the broking books, the period-end and year-end close, the FX revaluation and the bank reconciliation.
+area: Closing, revaluation and bank reconciliation
+screens:
+  - id: SCR-AC-10
+    title: Financial Periods
+    route: /gl/periods
+    purpose: >-
+      The fiscal years and their monthly periods with the status of each period (Future, Open, Closing, Closed,
+      Reopened), the last change and its reason; only open periods accept normal postings. The GL Team Lead opens,
+      closes and reopens a period with a reason and creates the next fiscal year.
+    shots:
+      - {state: list, user: gltl, caption: "Financial Periods: the periods of the fiscal year with their status, last change and reason"}
+    fields:
+      - "Fiscal year | Fiscal year | Drop-down | The fiscal years of the company | Y | Fiscal years | Current year | - | - | -"
+      - "Periods | Period / From / To | Column | Period name and its dates, dd-MMM-yyyy | - | Periods | - | Read only | - | -"
+      - "Periods | Status | Column | Future, Open, Closing, Closed, Reopened | - | Periods | - | Read only | - | -"
+      - "Periods | Last Change / Reason | Column | The user's name and the time of the last change; the reason given | - | Periods | - | Read only | - | -"
+      - "Period dialog | Reason | Text area | The reason of the change; mandatory to reopen a period | Cond.: reopen | - | Blank | - | - | Enter the reason"
+    actions:
+      - "Create Next Fiscal Year | GL Team Lead (period manage) | The last year exists | Creates the next fiscal year with its periods in Future | Future | -"
+      - "Open / Start closing / Close / Back to open / Reopen / Close again | GL Team Lead, GL Section Head (period manage) | As the period's status allows | Changes the status of the period after the confirmation | Open, Closing, Closed or Reopened | -"
+    rules:
+      - "Only open periods accept normal postings; a closed period of a closed fiscal year cannot be reopened (FR-AC-040, FR-AC-041)."
+    outcome: The GL team controls which months accept postings.
+    frs: [FR-AC-040, FR-AC-041]
+    tests: [GLCLOSE]
+
+  - id: SCR-AC-11
+    title: GL Close & Cut-Off
+    route: /planning/gl-close
+    purpose: >-
+      The month-end close of the GL books and the cut-off of the broking books. The GL Team Lead schedules the close
+      of the previous month on a preferred date and time; the checklist runs at that time and closes the month or
+      records why it failed. The broking books close by themselves on the last day of the month; the tab Broking
+      Books Cut-Off shows each period's books with who closed or reopened them.
+    entry:
+      - Financial Periods › the period to close
+    shots:
+      - {state: close, user: gltl, caption: "GL Close & Cut-Off: the close settings and the scheduled and past closes"}
+      - {state: schedule, user: gltl, click: "^schedule close$", caption: "Schedule month-end close: the period and the date and time of the close"}
+      - {state: books, user: gltl, tab: "Broking Books Cut-Off", caption: "Broking Books Cut-Off: the books of each period, closed and reopened"}
+    fields:
+      - "Settings | Close only the previous month / Broking books close (Manila) / Year-end close deadline / Scheduled closes | Display | The close parameters and the number of closes waiting | - | Parameters | - | Read only | - | -"
+      - "Tabs | Month-End Close / Broking Books Cut-Off | Tab | - | - | - | Month-End Close | - | - | -"
+      - "Scheduled and past closes | Period / Scheduled For / Status / Run At / Outcome / Scheduled By | Column | Scheduled, Completed, Failed or Cancelled; dates and times dd-MMM-yyyy HH:mm; the name of the scheduler | - | Close schedules | - | Read only | - | -"
+      - "Broking books by period | Period / Books / Closed / Reopened / Note | Column | Open or Closed; who closed or reopened them and when | - | Broking books | - | Read only | - | -"
+      - "Schedule month-end close dialog | Fiscal year / Period | Drop-down | The previous month by default | Y | Periods | Previous month | - | Previous month only, unless the parameter allows another | Only the previous month can be closed"
+      - "Schedule month-end close dialog | Close on | Date and time | dd-MMM-yyyy date and HH:mm time, in the future | Y | - | 2nd banking day of the next month, 17:00 | - | In the future | -"
+      - "Close or reopen the broking books dialog | Reason | Text area | Mandatory to reopen the books | Cond.: reopen | - | Blank | - | - | Enter the reason"
+    actions:
+      - "Schedule Close | GL Team Lead, GL Section Head (GL close schedule) | Always | Schedules the close of the period; the job runs the checklist at that time | Scheduled | -"
+      - "Withdraw | GL Team Lead, GL Section Head | A scheduled close | Withdraws the close before its time | Cancelled | -"
+      - "Close Broking Books / Reopen Books | GL Team Lead, GL Section Head | Books open, or closed | Closes the broking books of a period now, or reopens them with the reason | Closed or Open | -"
+    rules:
+      - "Only the previous month is closed by default; a close fails and records its blocking items when the checklist does not pass (FR-AC-040)."
+      - "The broking books close at 23:00 Manila on the last day of the month; after the cut-off the broking modules post into the next month (FR-AC-042)."
+    outcome: The previous month closes on the chosen date and the broking books are cut off on time.
+    frs: [FR-AC-040, FR-AC-042]
+    tests: [GLCLOSE]
+
+  - id: SCR-AC-12
+    title: Period-End & Year-End
+    route: /planning/closing
+    purpose: >-
+      The closing controls of a period and of the fiscal year with their pass or fail result. The period tab shows the
+      closing checklist of a month with Start Soft Close and Close Period; the year tab shows the pre-close checklist,
+      the preview of the closing entries, Close Fiscal Year and, once closed, the post-close verification that the
+      nominal accounts are zero.
+    entry:
+      - GL Close & Cut-Off › the checklist of a close
+    shots:
+      - {state: period, user: gltl, caption: "Period-End: the closing checklist of the month with the result of each control"}
+      - {state: year, user: gltl, tab: "Year-end", caption: "Year-End: the pre-close checklist and the closing entries preview"}
+    fields:
+      - "Selectors | Fiscal year / Period | Drop-down | The fiscal year and the month | Y | Periods | Current | - | - | -"
+      - "Closing checklist | Result / Control / Detail | Column | Pass, Fail or Warning; the control; what it found | - | Closing controls | - | Read only | - | -"
+      - "Closing entries preview | Branch / Account / Cost Centre / Line of Business / Balance (Dr +) | Column | The nominal balances to close, with the net result | - | General ledger | - | Read only | - | -"
+      - "FY close | Closed by / Closed on / Net result / Transferred to / Closing journals | Display | Name, date and time, amount, the retained earnings account and the journals | - | Year-end close | - | Read only | - | -"
+      - "Post-close verification | Result / Control / Detail | Column | Nominal accounts at zero after the close | - | Closing controls | - | Read only | - | -"
+    actions:
+      - "Start Soft Close / Close Period | GL Team Lead, GL Section Head (period-end run) | The checklist passes | Moves the period to Closing, then Closed | Closing or Closed | -"
+      - "FX Revaluation | GL Team Lead, GL Section Head | Revaluation pending | Opens FX Revaluation for the period | - | -"
+      - "Close Fiscal Year | GL Team Lead, GL Section Head (period-end run) | Pre-close checklist passed | Posts the closing entries to retained earnings after the confirmation | Closed | -"
+      - "Verify Again | GL Team Lead, GL Section Head | Year closed | Runs the post-close verification again | - | -"
+    rules:
+      - "The year closes on or before the year-end deadline (15 April by default); a reminder alert is raised before it (FR-AC-041)."
+      - "After the close, every nominal account of the year is verified to be zero (FR-AC-041)."
+    outcome: The month and the year close with their controls passed and verified.
+    frs: [FR-AC-040, FR-AC-041]
+    tests: [YEAREND]
+
+  - id: SCR-AC-13
+    title: FX Revaluation
+    route: /planning/fx-revaluation
+    purpose: >-
+      Restates the foreign-currency balances of the revaluation accounts at the closing rate of the period: the
+      preview of each balance with the booked and the revalued base amount and the gain or loss, the foreign-currency
+      open items for information, the posting of the revaluation journals with their automatic reversal and the
+      revaluation runs.
+    entry:
+      - Currencies & Rates › the revaluation rate of the month
+      - Period-End & Year-End › FX Revaluation
+    shots:
+      - {state: preview, user: gltl, caption: "FX Revaluation: the period, the preview of the balances revalued and the runs"}
+    fields:
+      - "Criteria | Fiscal year / Period | Drop-down | The period to revalue | Y | Periods | Current period | - | Period open | -"
+      - "Criteria | Auto-reverse on the first day of the next period | Check box | Reverses the revaluation on the first day of the next period | N | - | Ticked | - | - | -"
+      - "Preview | Revaluation date / Balances revalued / Net unrealized gain / FC open items | Total | Date and counts; amount in the base currency | - | General ledger | - | Read only | - | No closing rate for the date"
+      - "GL balances (preview) | Branch / Account / Ccy / FC Balance / Booked Base / Closing Rate / Revalued Base / Gain / (loss) | Column | One row per revaluation account and currency | - | General ledger, exchange rates | - | Read only | - | -"
+      - "Foreign currency open items | Party / Document / Ccy / Outstanding / Booked Base / Revalued Base / Gain / (loss) | Column | Information only | - | Sub-ledger | - | Read only | - | -"
+      - "Revaluation runs | Period / Status / Journal / Reversal / Gain / Loss / By | Column | The runs of the company with the journal posted and its reversal | - | Revaluation runs | - | Read only | - | -"
+    actions:
+      - "Post revaluation | GL Team Lead, GL Section Head (period-end run) | A closing rate exists and the period is not revalued | Posts the revaluation journals of the period after the confirmation | Posted | -"
+      - "Register | Every user who opens the screen | Always | Opens the revaluation register report | - | -"
+    rules:
+      - "Revaluation uses the closing rate of the month end entered by the GL Section Head; a period is revalued once (FR-AC-043)."
+      - "The revaluation is reversed on the first day of the next period when Auto-reverse is ticked (FR-AC-043)."
+    outcome: The foreign-currency balances are restated at the month-end rate.
+    frs: [FR-AC-043, FR-AC-010]
+    tests: [FXREV]
+
+  - id: SCR-AC-14
+    title: Bank Statement Layouts
+    route: /setup/statement-layouts
+    purpose: >-
+      The layout of each bank's statement file: the columns of the date, description, check or reference number,
+      the signed amount or the withdrawals and deposits, and the running balance, with the date pattern; and the
+      import of a statement file through its layout, matched at once.
+    shots:
+      - {state: list, user: accountant, caption: "Bank Statement Layouts: the layout of each bank account and its cheque matching"}
+      - {state: form, user: accountant, click: "^add layout$", caption: "Statement layout: the bank account and the columns of its file"}
+    fields:
+      - "List | Bank Account / Layout / Date Column / Amounts / Cheque No. / Cheque Matching | Column | One row per layout | - | Statement layouts | - | Read only | - | -"
+      - "Layout form | Bank account | Drop-down | GL bank accounts | Y | Bank accounts | Blank | - | One layout per account | Select the bank account"
+      - "Layout form | Layout name / Date column / Date pattern / Description column / Cheque / reference column | Text | Column names of the file; date pattern such as MM/dd/yyyy | Y / Y / Y / N / N | - | Blank | - | A valid date pattern | Invalid date pattern <pattern>"
+      - "Layout form | Signed amount column / Withdrawals column / Deposits column / Running balance column | Text | A signed amount, or both withdrawals and deposits | Cond. | - | Blank | - | Either a signed amount or both columns | Map either a signed amount column or both debit and credit columns"
+      - "Import bank statement dialog | Bank account / Statement file | Drop-down, file | The layout's account; Excel, ODS or CSV file | Y | Bank accounts | - | - | Every row read with the layout | Row <n> - invalid date / amount '<value>'"
+    actions:
+      - "Add Layout / Save Layout | Accountant (bank reconciliation) | Always | Saves the layout of the bank account | - | -"
+      - "Import Statement / Import and Match | Accountant (bank reconciliation) | A layout exists | Imports the bank file through the layout and runs the automatic matching | - | -"
+    rules:
+      - "Each bank account has its layout; the first matching rule pairs a book entry and a bank line with the same check number and amount (FR-AC-050)."
+    outcome: The bank's files are read without manual re-keying.
+    frs: [FR-AC-050]
+    tests: [LAYOUTS]
+
+  - id: SCR-AC-15
+    title: Bank Statements
+    route: /receivables/bank-statements
+    purpose: >-
+      The import of a bank statement (CSV) for a GL bank account, with its reference and opening balance, and the
+      statements imported with their period, opening, debits, credits, closing and lines; the lines of a statement
+      show whether they are reconciled.
+    entry:
+      - Bank Statement Layouts › Import Statement
+    shots:
+      - {state: list, user: accountant, caption: "Bank Statements: the import of a statement and the statements imported"}
+    fields:
+      - "Import statement | Bank account / CSV file | Drop-down, file | GL bank account; CSV of the statement | Y | Bank accounts | - | - | - | Select the bank account"
+      - "Import statement | Statement reference / Opening balance | Text, number | Defaults to the file name; derived from the first line when blank | N | - | Blank | - | - | -"
+      - "Imported statements | Bank / Reference / From / To / Opening / Debits / Credits / Closing / Lines / Imported by | Column | One row per statement | - | Bank statements | - | Read only | - | -"
+      - "Statement lines | # / Value Date / Description / Reference / Debit / Credit / Balance / Reconciled | Column | The lines of the statement chosen | - | Bank statements | - | Read only | - | -"
+    actions:
+      - "Import | Accountant (bank reconciliation) | Account and file chosen | Imports the statement | - | -"
+      - "[Row] | Accountant | Always | Shows the lines of the statement | - | -"
+    rules:
+      - "A statement file imported before is refused (FR-AC-050)."
+    outcome: The bank statement is in BIBS for the reconciliation.
+    frs: [FR-AC-050]
+    tests: [BANKST]
+
+  - id: SCR-AC-16
+    title: Bank Reconciliation
+    route: /receivables/bank-reconciliation
+    purpose: >-
+      The reconciliation of a bank account as of a statement date: the match workbench with the book entries and the
+      bank lines not reconciled (automatic and manual matching, recent matches and unmatch), the reconciliation
+      statement with the balance per book and per bank and the four groups of reconciling items, and the
+      reconciliations finalised.
+    entry:
+      - Bank Statements › the statement to reconcile
+    shots:
+      - {state: match, user: accountant, fill: recon_account, caption: "Bank Reconciliation, Match workbench: book entries and bank lines not reconciled"}
+      - {state: brs, user: accountant, fill: recon_account, tab: "Reconciliation statement", caption: "Reconciliation statement: balances and the reconciling items"}
+    fields:
+      - "Criteria | Bank account / Statement date (as of) | Drop-down, date | GL bank account; dd-MMM-yyyy | Y | Bank accounts | Today | - | - | -"
+      - "Tabs | Match workbench / Reconciliation statement / Reconciliations | Tab | - | - | - | Match workbench | - | - | -"
+      - "Match workbench | Date window (days) | Number | Days around the date for the amount rules | N | - | 3 | - | - | -"
+      - "Match workbench | Book entries not reconciled | Column | Select / Date / Reference / Narration / Debit / Credit | - | General ledger | - | Read only | - | -"
+      - "Match workbench | Bank lines not reconciled | Column | Select / Date / Reference / Description / Deposit / Withdrawal | - | Bank statements | - | Read only | - | -"
+      - "Match workbench | Recent matches | Column | Match / Method / Date / Amount / By | - | Matches | - | Read only | - | -"
+      - "Reconciliation statement | Balance as per book / Balance per bank (computed) / Balance per bank statement / Unexplained difference | Total | Two decimals | - | General ledger, statement | - | Read only | - | -"
+      - "Reconciliation statement | [Reconciling items] | Column | Book debits not accounted by bank, book credits not accounted by bank, bank debits and bank credits not accounted in book | - | Matches | - | Read only | - | -"
+      - "Reconciliations | Bank / As of / Book Balance / Statement Balance / Difference / Status / Finalized by | Column | One row per reconciliation | - | Reconciliations | - | Read only | - | -"
+    actions:
+      - "Auto-match | Accountant (bank reconciliation) | Lines not reconciled | Runs the matching rules: check number and amount first, then amount within the date window | - | -"
+      - "Match Selected | Accountant | Book entries and bank lines of the same total selected | Matches them by hand | - | -"
+      - "Unmatch | Accountant | A recent match | Undoes the match | - | -"
+      - "Save / Finalize | Accountant | Statement prepared | Saves the reconciliation statement, then finalises it | Finalized | -"
+    rules:
+      - "The first rule pairs a book entry and a bank line with the same check number and amount on any date; the other rules match on amount within the date window (FR-AC-050)."
+      - "The unmatched items are listed on the reconciliation statement and in the unmatched report (FR-AC-051)."
+    outcome: The bank account is reconciled and the differences are explained.
+    frs: [FR-AC-050, FR-AC-051]
+    tests: [BANKREC]

@@ -1,0 +1,31 @@
+// Support model: the three support levels of BIBS and the resolver groups around them.
+digraph sup_tiers {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.6, ranksep=0.45, bgcolor="white", pad=0.15, newrank=true];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.3, fontname="Arial",
+         fontsize=14, fontcolor="@NEAR_BLACK", width=4.2, height=0.75, margin="0.14,0.06", fillcolor="@WHITE"];
+  edge  [color="@HEADER_BLUE", arrowsize=0.9, penwidth=1.3, fontname="Arial", fontsize=12, fontcolor="@MUTED"];
+
+  users [label=<<b>BIBS users</b><br/><font point-size="12">1,344 named; 429 concurrent at peak</font>>, fillcolor="@DIRTY_WHITE"];
+  mon   [label=<<b>Monitoring and alerts</b><br/><font point-size="12">checks, metrics, logs, job alerts</font>>, fillcolor="@DIRTY_WHITE"];
+  l1 [label=<<b>L1 - BDOI service desk</b><br/><font point-size="12">log, classify, first fix (L1 guide)</font>>, fillcolor="@BG_BLUE"];
+  l2 [label=<<b>L2 - BDOI application support</b><br/><font point-size="12">triage, configuration, jobs, workarounds</font>>, fillcolor="@BG_BLUE"];
+  l3 [label=<<b>L3 - iorta TechNXT</b><br/><font point-size="12">fixes, releases, data fixes, RCA</font>>, fillcolor="@BG_BLUE"];
+  cloud [label=<<b>BDO Cloud Operations</b><br/><font point-size="12">AWS platform, backups, DR</font>>, fillcolor="@AMBER_BG"];
+  integ [label=<<b>BDOI IT system owners</b><br/><font point-size="12">EIAM, Apigee X, CCM, bank channels</font>>, fillcolor="@AMBER_BG"];
+  biz   [label=<<b>Business process owners</b><br/><font point-size="12">decisions on data and rules</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+
+  users -> l1 [label=" call, e-mail, portal "];
+  l1 -> l2 [label=" not solved in 30 min, or P1 / P2 "];
+  l2 -> l3 [label=" BIBS fault, release, data fix "];
+  mon -> cloud [label=" platform alert "];
+  cloud -> integ [style=invis];
+  integ -> biz [style=invis];
+  mon -> l2 [label=" alert ticket ", constraint=false];
+  l2 -> cloud [style=dashed, dir=both, constraint=false];
+  l2 -> integ [label=" interface ", style=dashed, constraint=false];
+  l2 -> biz [label=" decision ", style=dashed, constraint=false];
+  {rank=same; users -> mon [style=invis]}
+  {rank=same; l1 -> cloud [style=invis]}
+  {rank=same; l2 -> integ [style=invis]}
+  {rank=same; l3 -> biz [style=invis]}
+}

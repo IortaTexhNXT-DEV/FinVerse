@@ -1,0 +1,37 @@
+// Data Architecture: lineage from the sources through BIBS to the general ledger, reports and regulators.
+digraph da_lineage {
+  graph [rankdir=LR, fontname="Arial", nodesep=0.18, ranksep=0.7, bgcolor="white", pad=0.15, newrank=true];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", fontname="Arial", fontsize=10, fillcolor="@WHITE", margin="0.10,0.05", width=2.4];
+  edge  [color="@CTA_BLUE", arrowsize=0.6, penwidth=1.0, fontname="Arial", fontsize=8];
+  subgraph cluster_src { label=<<b>Sources</b>>; style="rounded,dashed"; color="@MUTED"; fontcolor="@HEADER_BLUE"; fontsize=11;
+    ui   [label=<<b>BIBS screens</b><br/><font point-size="8">users, maker-checker</font>>, fillcolor="@BG_BLUE"];
+    up   [label=<<b>Uploads</b><br/><font point-size="8">Excel, CSV, TXT templates</font>>, fillcolor="@BG_BLUE"];
+    bank [label=<<b>Bank channels</b><br/><font point-size="8">OBPCS, Old BOB, PMS, CMS status</font>>, fillcolor="@BG_BLUE"];
+    insf [label=<<b>Insurer files</b><br/><font point-size="8">SOA, production feedback, policies</font>>, fillcolor="@BG_BLUE"];
+    loan [label=<<b>Loan systems</b><br/><font point-size="8">LMS, HL-LOAS, LFS</font>>, fillcolor="@BG_BLUE"];
+    wl   [label=<<b>Watchlists</b><br/><font point-size="8">sanctions, PEP, NLDS</font>>, fillcolor="@BG_BLUE"];
+    leg  [label=<<b>Legacy systems</b><br/><font point-size="8">migration (BRD-13), once</font>>, fillcolor="@DIRTY_WHITE"];
+  }
+  subgraph cluster_bibs { label=<<b>BIBS (PostgreSQL 16, one transaction per business record)</b>>; style="rounded"; color="@HEADER_BLUE"; fontcolor="@HEADER_BLUE"; fontsize=11;
+    ops  [label=<<b>Operational records</b><br/><font point-size="8">clients, accounts, invoices, receipts,<br/>remittances, vouchers, claims</font>>];
+    evt  [label=<<b>Accounting events</b><br/><font point-size="8">event register, rules (Comptrollership)</font>>];
+    gl   [label=<<b>Journals and ledger</b><br/><font point-size="8">immutable entries, daily balances,<br/>open items</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+    rep  [label=<<b>Report Centre</b><br/><font point-size="8">operational, finance, FRBS pack,<br/>tax, compliance reports</font>>];
+    out  [label=<<b>Outbox</b><br/><font point-size="8">integration events</font>>];
+  }
+  subgraph cluster_tgt { label=<<b>Consumers</b>>; style="rounded,dashed"; color="@MUTED"; fontcolor="@HEADER_BLUE"; fontsize=11;
+    egl  [label=<<b>EGL</b><br/><font point-size="8">BDO enterprise general ledger</font>>, fillcolor="@AMBER_BG"];
+    edp  [label=<<b>EDP</b><br/><font point-size="8">enterprise data platform</font>>, fillcolor="@AMBER_BG"];
+    cms  [label=<<b>CMS / New BOB</b><br/><font point-size="8">payments</font>>, fillcolor="@AMBER_BG"];
+    bir  [label=<<b>BIR</b><br/><font point-size="8">VAT, withholding, income tax returns,<br/>2307, SAWT, QAP, books</font>>, fillcolor="@DANGER_BG", color="@DANGER"];
+    ic   [label=<<b>Insurance Commission</b><br/><font point-size="8">broker reports</font>>, fillcolor="@DANGER_BG", color="@DANGER"];
+    amlc [label=<<b>AMLC</b><br/><font point-size="8">STRs</font>>, fillcolor="@DANGER_BG", color="@DANGER"];
+    mgmt [label=<<b>BDOI management</b><br/><font point-size="8">Mancom, dashboards</font>>, fillcolor="@BG_BLUE"];
+    ecm  [label=<<b>ECM</b><br/><font point-size="8">final records archive</font>>, fillcolor="@AMBER_BG"];
+  }
+  {rank=same; ops; evt; gl; rep; out}
+  ui -> ops; up -> ops; bank -> ops; insf -> ops; loan -> ops; wl -> ops; leg -> ops; leg -> gl [label="opening\nbalances", fontsize=8];
+  ops -> evt -> gl; ops -> rep; gl -> rep; ops -> out;
+  gl -> egl [label="journals / TB", fontsize=8]; out -> edp; rep -> edp [style=dashed]; ops -> cms [label="approved DV", fontsize=8];
+  rep -> bir; rep -> ic; ops -> amlc [label="STR", fontsize=8]; rep -> mgmt; ops -> ecm [style=dashed];
+}

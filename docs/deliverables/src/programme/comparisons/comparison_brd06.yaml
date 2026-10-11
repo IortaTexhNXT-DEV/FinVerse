@@ -1,0 +1,918 @@
+# Comparison of BDOI's Renewal FRS (BDO ITG, v1.0 of 11-Jun-2026) with the BIBS FRS of BRD-6 Renewal (v2.0 of
+# 8-Oct-2026): the assessment, the mapping of every BDOI functional requirement item, the conflicts, the annex
+# comparison and the incorporation plan. BDOI's text comes from bdoi_frs_brd06.yaml; the BIBS FRs, their acceptance
+# criteria and the BRD traceability are read from the BIBS FRS source at build time (build_comparison_brd06.py).
+#
+# Values used in the sheets
+#   match:    Same | Partial | Different | Not in ours
+#   platform: Yes (the BIBS platform provides it) | Partly (it provides part; the rest is configuration or a change)
+#             | No (it needs a platform change)
+#   action:   Adopt BDOI wording | Keep ours | Needs BDOI decision | Platform change
+meta:
+  title: BDOI Renewal FRS compared with the BIBS Renewal FRS
+  subtitle: BRD-6 Renewal - BDOI's FRS v1.0 (BDO ITG) and the BIBS FRS v2.0, with the incorporation plan
+  version: "1.0"
+  date: 09 October 2026
+  file: BIBS_Comparison_BRD-06_BDOI_FRS_vs_BIBS_FRS_Renewal_v1.0.xlsx
+  ours_version: "2.0"
+  ours_date: 8-Oct-2026
+  bdoi_version: "1.0"
+  bdoi_date: 11-Jun-2026
+
+purpose:
+  bdoi: >-
+    BDOI's FRS is the BDO ITG Functional Requirements Specifications of project PRJ0012475 "BDO Insurance Brokering
+    System - Renewal" (v1.0, 11-Jun-2026, prepared by Angela V. Ramirez, System Analyst). It states, in the ITG
+    template, how the 42 BRRN requirements of the Renewal addenda are met by 44 functional requirement items
+    (FRRN.001-044, 143 numbered items) and 26 annexes of rules, layouts and templates, for review by the Tech Lead and
+    the Application Owner and approval by the Project Owner and Sponsor.
+  ours: >-
+    The BIBS FRS of BRD-6 (v2.0, 8-Oct-2026, iorta TechNXT) is the business sign-off specification of the Renewal
+    module of BIBS, re-based on the Renewal BRD pack of 8-Oct-2026 with the Walkthrough addendum. It turns every BRD
+    requirement (42 BRRN IDs and 1,033 line IDs of the main BRD) into 58 functional requirements with flows, rules,
+    messages, screens, notifications, audit and numbered acceptance criteria, and carries the screen specifications,
+    walkthroughs, catalogues, traceability and test basis of the sign-off set.
+
+recommendation:
+  title: Use BDOI's FRS as the master document and insert the BIBS content into it
+  text: >-
+    Keep BDOI's ITG template, its section order and its FRRN numbering as the signed baseline, because BDO ITG owns
+    the FRS and its sign-off route. Insert the BIBS detail into it: each BIBS functional requirement becomes numbered
+    items of the matching FRRN entry in BDOI's "The system shall ..." style (rules, validations and messages, then the
+    acceptance criteria as items FRRN.nnn.mm.ACn), the BIBS-only requirements become new FRRN entries 045 onwards, and
+    the BIBS screen specifications, messages, notifications, walkthroughs, status model, configuration items, report
+    specifications and the line-ID traceability become new annexes after Annex Z (Annex AA onwards, because BDOI's
+    letters A to Z are already used). Every FRRN entry carries a "Related BIBS FR" cross-reference (FR-RN-nnn), so
+    the BIBS test plan and screens stay traceable. Before the merge, BDOI decides the conflicts of sheet 8 in one
+    workshop; the merged FRS then states one rule per point.
+  alternatives:
+    - name: "B. BIBS FRS as the master, re-laid in BDOI's ITG template"
+      tradeoff: >-
+        Fastest for the project team (our structure and IDs stay; BDOI's FRRN become a cross-reference column), and
+        the 1,033 line IDs stay traced. But BDO ITG loses its numbering and wording, must re-review a 69,000-word
+        document, and the BDOI annexes (rules, layouts, approved templates) have to be re-homed.
+    - name: "C. Two documents: BDOI's FRS signed as the baseline, the BIBS FRS kept as the supporting
+        specification"
+      tradeoff: >-
+        Least effort now, and each team keeps its document. But there are two sources of truth: the 28 conflicts stay
+        open in two places, every later change is made twice, and UAT is tested against the BIBS acceptance criteria
+        that the signed FRS does not contain.
+    - name: "D. A new joint document with new numbering"
+      tradeoff: >-
+        Cleanest result, with one numbering for BRD, FRS and tests. But it has the highest effort (both documents and
+        the test plan are renumbered) and BDO ITG has to re-baseline a document it has already issued.
+
+# Sheet 2: section by section
+structure:
+  - bdoi: Cover, Table of Contents, Document Revision Log
+    ours: Cover, document control (versions 0.9 to 2.0), distribution list
+    bdoi_has: ITG cover with project PRJ0012475, revision log (one row, v1.0 of June 11, 2026)
+    ours_has: Version history with author, reviewer, approver and change; distribution with role and purpose
+    depth: Both short
+    assessment: Equivalent. Keep BDOI's cover and log; add the BIBS version history as rows of the log.
+  - bdoi: "Introduction: Document Purpose, Project Overview, Document Preparation, Review and Approval"
+    ours: "1 Introduction (purpose, scope with out-of-scope items, references R0 to R9, definitions of 35 terms, how to
+      read the FRs); 2 Business context and process overview"
+    bdoi_has: Purpose of an FRS, a three-paragraph overview of the module, who prepares and approves
+    ours_has: Scope table by area, out-of-scope list (BDOIsys, EBIX, QPS references; EB renewals; package renewal),
+      BRD pack references with page rule and order of precedence, glossary, before/after process, 14 process steps,
+      dispositions and their paths
+    depth: BDOI brief; ours detailed
+    assessment: Ours adds the scope boundaries, the order of precedence of the addenda and the glossary that BDOI's
+      FRS lacks. Insert them in BDOI's Introduction.
+  - bdoi: Business Requirements Mapping
+    ours: 11 Traceability (BRRN IDs; 1,033 main BRD line IDs; out-of-scope IDs), each with screens and test cases
+    bdoi_has: 42 rows BRRN.001-042 with the requirement text and FRRN IDs (two rows refer to the User Access Matrix
+      only)
+    ours_has: 42 BRRN rows and every line ID of the main BRD (RMEL Phase 2) with page, FR, screen and test cases
+    depth: BDOI covers the addenda only; ours covers the addenda and the main BRD
+    assessment: BDOI's mapping leaves the 1,033 line IDs of the main BRD untraced. Keep BDOI's table and add the
+      line-ID trace as an annex.
+  - bdoi: Functional Requirements (table of 44 FRRN entries with component, capability and numbered descriptions)
+    ours: 4 Functional requirements (58 FRs in 13 groups)
+    bdoi_has: 143 numbered items, each a list of "The system shall" statements, field lists, messages and file names
+    ours_has: Per FR the BRD trace, actor, priority, screens, description, preconditions, main and alternate flows,
+      business rules (configurable or fixed), validations and messages, fields, notifications, audit and numbered
+      acceptance criteria
+    depth: BDOI broader in placement, billing, e-policy, dashboards and maintenance; ours deeper per requirement
+    assessment: Complementary. BDOI's breadth beyond Renewal (placement, booking, issuance, billing) is specified in
+      BIBS by the New Business FRS; ours gives the testable detail BDOI's items lack (actors, flows, acceptance).
+  - bdoi: Process Flow (one flowchart image)
+    ours: 2.2 Process overview (figure by actor), 5 Workflow and status model (stages, transitions, checks and
+      buckets, insurer batch and letter states, SLA), 12 Navigation (screen flow)
+    bdoi_has: One end-to-end flowchart from Generate RMEL to Book account
+    ours_has: Process figure by actor, two workflow figures, the stage and transition tables, the screen flow
+    depth: BDOI one diagram; ours diagrams with state tables
+    assessment: BDOI's flow differs from its own Annex C on paid-off and RMU loans (sheet 8). Keep BDOI's flow after
+      the decision and add our status model as an annex.
+  - bdoi: Signoff Sheet
+    ours: 20 Sign-off and change control (what is signed, how the review is recorded, what signing freezes, change
+      after sign-off, signatures), sign-off workbook (03)
+    bdoi_has: Prepared by System Analyst; reviewed by Tech Lead and Application Owner; approved by Project Owner and
+      Sponsor (BU signatories as applicable)
+    ours_has: The BRD approvers by part (Who signs what), the review record and the change rule after sign-off
+    depth: BDOI ITG roles only; ours business signatories
+    assessment: Combine. BDOI's ITG roles and the business approvers of the Renewal BRD sign the same sheet.
+  - bdoi: "Annex A - Renewal Fields (embedded PDF, 224 fields)"
+    ours: 6.2 Expiring list columns, 13 Screen specifications (fields), New Business account fields
+    bdoi_has: 224 fields by section and sub-section with line of business, applicability and data type
+    ours_has: The listing columns of the BRD and the fields per screen
+    depth: BDOI one field catalogue; ours fields per screen
+    assessment: Keep Annex A as the field catalogue; link each screen field of ours to it.
+  - bdoi: "Annexes B to H - duplicate criteria, sanitation rules, CBG Motor field updates, assignment logic, LAMD and
+      insurer disposition layouts"
+    ours: 5.3 Checks, buckets and decision matrix; FR-RN-020 to 028; 18 Upload screens
+    bdoi_has: Rule tables per market segment and line, upload layouts with data types
+    ours_has: Named checks with severities, bucket rule sets, decision matrix, upload layouts of the BIBS uploads
+    depth: BDOI more specific for CBG Motor; ours more general and configurable
+    assessment: BDOI's rule tables are the business content our default rule sets need. Several rules conflict
+      (sheet 8).
+  - bdoi: "Annexes I to Z - proposal, quotation request, letter, billing, placement, return, advice, e-policy, invoice
+      and hold cover templates and the letter eligibility matrix"
+    ours: 6.6 Documents, 17 Document outputs (5 documents), FR-RN-080 to 087
+    bdoi_has: Approved templates for the Renewal Advice (4 lines, 3 e-mails), Insurance Advice (4), e-policy e-mails
+      (3), billing e-mail, placement file fields, return reasons, the letter matrix; 9 annexes have a heading only
+    ours_has: Field lists and sources of the RA, closing letters, insurer extract, list download and account details
+      (wording to confirm, RQ26)
+    depth: BDOI has the approved wording; ours has the data sources
+    assessment: Adopt BDOI's approved templates in place of our draft wording; BDOI still owes the 9 empty annexes.
+  - bdoi: "-"
+    ours: 3 Personas and roles (personas, 22 permissions, role-to-permission matrix)
+    bdoi_has: Refers to the User Access Matrix
+    ours_has: Ten personas, permissions with the BRD functions they carry, the matrix and the data scope
+    depth: Ours only
+    assessment: Add as an annex "Roles and access" or point to the User Access Maintenance FRS.
+  - bdoi: "-"
+    ours: 7 Interfaces, 8 Non-functional requirements, 9 Configuration items, 10 Assumptions, dependencies and open
+      questions
+    bdoi_has: Not in the ITG template
+    ours_has: 15 interfaces with scope, 10 NFR topics of BRD p.212-214, parameters, lists of values, masters, open
+      questions
+    depth: Ours only
+    assessment: Add as annexes; the open questions move to the decision log after the workshop.
+  - bdoi: "-"
+    ours: 12 Navigation, 13 Screen specifications (20 screens), 14 Walkthroughs (5), 15 Messages, 16 Notifications
+      (19), 17 Document outputs, 18 Upload screens, 19 Cross-BRD contract
+    bdoi_has: Messages are quoted inside the FR items; no screen specification
+    ours_has: The business view of every screen with screenshots, the persona journeys and the catalogues
+    depth: Ours only
+    assessment: Add as annexes after Z.
+  - bdoi: "-"
+    ours: 21 Proposed business rules and clarifications (40); appendices User-story view (89 stories), Storyboard index
+      (25 frames), Screen standards
+    bdoi_has: Not in the ITG template
+    ours_has: The points needing BDOI's confirmation; the story view for the backlog; the storyboard
+    depth: Ours only
+    assessment: The clarifications become BDOI's decision log; the story view and storyboard stay supporting
+      documents.
+
+# Sheet 3: pros and cons
+pros_cons:
+  - [BDOI, Completeness, Pro, "Covers the whole renewal chain to booking in one document: dashboards, placement, billing, e-policy, Insurance Advice, service invoice, hold cover and its extensions, risk code, RMU and budget maintenance."]
+  - [BDOI, Completeness, Con, "Nine annexes are a heading only (I, J, N to R, T, Z) and the CBG Home sanitation rules are empty; FRRN.009 ends with an empty list for CBG Home and Non-CBG; FRRN.044 refers to report specifications \"in the Annex\" that the document does not contain."]
+  - [Ours, Completeness, Pro, "Every BRD requirement is specified: 42 BRRN IDs and every one of the 1,033 line IDs of the main BRD, with the out-of-scope IDs named."]
+  - [Ours, Completeness, Con, "Placement, CLPC billing, e-policy, Insurance Advice and booking are referred to the New Business FRS, so a reader of the Renewal FRS alone does not see them; no CBG Motor field update, no auto-assignment, no budget or RMU maintenance."]
+  - [BDOI, Traceability, Pro, "A compact mapping table from each BRRN to the FRRN items."]
+  - [BDOI, Traceability, Con, "Only the 42 BRRN IDs are mapped; the main BRD is not; two IDs point to the User Access Matrix only (BRRN.024, 026); two references are mistyped (\"RRN.040\", \"FRRN.08\"); item numbers repeat or skip (two FRRN.004.06, two FRRN.038.03, FRRN.012.03/.04 inside FRRN.013, FRRN.015 starts at .03)."]
+  - [Ours, Traceability, Pro, "Every FR cites the BRD IDs with their pages; every BRD ID leads to the FR, the screen and the test cases."]
+  - [Ours, Traceability, Con, "The traceability summary table of chapter 11 repeats the Walkthrough row six times; the line-ID table is long (112 rows)."]
+  - [BDOI, Testability and acceptance criteria, Con, "No acceptance criteria; the expected results must be derived from the \"shall\" statements, and several have no measurable value (\"appropriate error message\", \"configurable criteria\")."]
+  - [Ours, Testability and acceptance criteria, Pro, "160 numbered acceptance criteria that are the basis of 236 test conditions and 406 test cases of the BRD-6 test plan."]
+  - [BDOI, Screens and fields, Pro, "Named field lists everywhere: 224 renewal fields (Annex A), listing and drill-down columns, upload layouts (Annexes G, H, K, S, U), placement risk description syntax per line."]
+  - [BDOI, Screens and fields, Con, "No screen layout or screen flow; fields are lists without mandatory flags (the \"Required?\" column of Annex A holds the applicability, not the mandatory flag)."]
+  - [Ours, Screens and fields, Pro, "20 screen specifications with screenshots, the fields of each screen with type, mandatory flag, source and validation, and the navigation by persona."]
+  - [Ours, Screens and fields, Con, "No single field catalogue like Annex A; the CBG Motor and line-specific fields are those of the New Business account."]
+  - [BDOI, Rules and validations, Pro, "Concrete business rules from the business: CBG Motor sanitation matrix, depreciation and BI/PD tier rules, DST rounding, duplicate criteria per line, the letter eligibility matrix with schedules, hold cover durations, password convention."]
+  - [BDOI, Rules and validations, Con, "Some rules contradict each other: the process flow sends paid-off and RMU loans to Not for Renewal while Annex C makes them Clean / For Renewal; Annex C rows 2 and 3 have the same criterion with two dispositions; FRRN.008 requires a single insurer for Clean while Annex C row 5 makes multi-insurer accounts Clean."]
+  - [Ours, Rules and validations, Pro, "Every rule is marked configurable or fixed with its parameter or list; named checks with severities, versioned bucket rules and decision matrix with maker-checker."]
+  - [Ours, Rules and validations, Con, "Many defaults are placeholders awaiting BDOI (lead days, notice days, NRNS checkpoint, matrix content), while BDOI's FRS already gives several of these values."]
+  - [BDOI, Messages and notifications, Pro, "Exact message texts for uploads, saves, CCM sending and the inactivity dialog, ready for the screens."]
+  - [BDOI, Messages and notifications, Con, "Notifications appear in a few items (transfer request, TSU request, MFT failure) without a catalogue of recipients, channels and texts."]
+  - [Ours, Messages and notifications, Pro, "A messages catalogue (about 150 messages read from the platform, with where they appear and the user's fix) and 19 notifications with trigger, recipient, channel and template."]
+  - [Ours, Messages and notifications, Con, "Many Renewal message codes are still \"To be confirmed\"; texts are the platform's wording, not BDOI's."]
+  - [BDOI, Process flows, Pro, "One end-to-end flowchart that a business reader follows at a glance."]
+  - [BDOI, Process flows, Con, "One flow only, without swimlanes, statuses or exception paths; it differs from Annex C on paid-off and RMU loans."]
+  - [Ours, Process flows, Pro, "Process by actor, Marketing and Processing workflows, stage and transition tables, five end-to-end walkthroughs with screenshots."]
+  - [BDOI, Approvals and maker-checker, Pro, "Approvals named where BDOI wants them: TL approval of TSU requests, Unit Head approval of Direct-to-Insurer payment, override approval for For Booking Only, second approval after client acceptance."]
+  - [BDOI, Approvals and maker-checker, Con, "No maker-checker on rule and risk code changes; manual reclassification needs only a justification."]
+  - [Ours, Approvals and maker-checker, Pro, "Maker-checker on bucket rules, decision matrix, non-renewable risk codes, package choices and go-live corrections; overrides need remarks and are logged."]
+  - [Ours, Approvals and maker-checker, Con, "No approver step on overrides (TL override with remarks only) and no second approval after the client's acceptance."]
+  - [BDOI, Reports, Pro, "A list of 24 named reports that BDOI needs, including LAMD reconciliation reports and the insurer scorecard; rich dashboard metrics (budget, pipeline, closing ratio, persistency)."]
+  - [BDOI, Reports, Con, "No report layout, column list or filter is given for any of the 24 reports."]
+  - [Ours, Reports, Pro, "The renewal status report with 37 or 40 columns and 34 summary counters, the listing with attention flags and seven operational reports, each with columns and filters."]
+  - [Ours, Reports, Con, "No production dashboard (budget against actual, closing ratio, persistency, biggest open deals, product mix)."]
+  - [BDOI, Non-functional, Con, "No non-functional section; only the inactivity timings and the \"no pagination\" rule appear."]
+  - [Ours, Non-functional, Pro, "Users, volumes, response times, peaks, availability, retention, security and audit from BRD p.212-214 with the BIBS target."]
+  - [BDOI, Sign-off readiness, Pro, "In BDO ITG's own template, owned by BDO ITG, with the ITG review and approval route; BDOI's business users know the RMEL vocabulary it uses."]
+  - [BDOI, Sign-off readiness, Con, "Version 1.0 of 11-Jun-2026 predates the Renewal BRD pack of 8-Oct-2026; nine annexes are empty; open contradictions remain."]
+  - [Ours, Sign-off readiness, Pro, "Issued for business sign-off with the Who-signs-what matrix of the BRD approval sheets, a sign-off workbook, a test plan and a UX screen deck in the same release set."]
+  - [Ours, Sign-off readiness, Con, "Not in BDO ITG's template, and 40 proposed rules and clarifications still need BDOI's confirmation."]
+  - [BDOI, Ease of maintenance, Pro, "Concise: about 27,700 words plus about 11,800 in embedded annexes; one table holds all FR items."]
+  - [BDOI, Ease of maintenance, Con, "Embedded PDF and packages hide content from search and review; repeated and skipped item numbers make references fragile."]
+  - [Ours, Ease of maintenance, Pro, "Generated from one source with the test plan, screens and catalogues, so the documents cannot drift."]
+  - [Ours, Ease of maintenance, Con, "Long: about 69,000 words and 78 figures; some codes of the configuration (parameter and list names) appear in the business text."]
+  - [BDOI, Alignment with the BRD of 8-Oct-2026, Pro, "Carries the Walkthrough addendum items that BDOI knew in June: hold cover (BRRN.042), incentive (BRRN.041), TSI threshold to TSU."]
+  - [BDOI, Alignment with the BRD of 8-Oct-2026, Con, "Departs from the BRD in places: automatic assignment and referral-style transfer instead of BRD 1.005-1.007; extraction only by user date range instead of BRRN.030 lead days; incentive \"upon booking\" instead of after full payment; no re-open of Not for Renewal (BRD 2.004.10); a Non-Renewable bucket instead of Exception (BRRN.023)."]
+  - [Ours, Alignment with the BRD of 8-Oct-2026, Pro, "Re-based on the BRD pack of 8-Oct-2026, with the Walkthrough addendum applied and every difference from the BRD text listed for confirmation."]
+  - [Ours, Alignment with the BRD of 8-Oct-2026, Con, "Where the BRD is silent, BDOI's FRS has the business answer that ours still lists as an open question (letter schedules, hold cover durations, password convention, return and non-renewal reasons)."]
+  - [BDOI, Alignment with the platform, Con, "Assumes CCM for every client and insurer communication and MFT for insurer files, which the BIBS platform does not provide; adds placement, billing and e-policy automation beyond the platform."]
+  - [Ours, Alignment with the platform, Pro, "Describes what the BIBS screens and rules do, with screenshots of the platform."]
+  - [Ours, Alignment with the platform, Con, "Takes the platform as given where BDOI wants more (automatic assignment, hold cover automation, CBG Motor field updates)."]
+
+# Sheet 5: the mapping of each BDOI item, in BDOI's order (id, BIBS FRs, match, platform, action, the difference)
+mapping:
+  - [FRRN.001.01, FR-RN-001, Same, "Yes", Keep ours, "Both: any BDO-issued device and several browser tabs in one session."]
+  - [FRRN.001.02, "FR-RN-001, FR-RN-002", Partial, Partly, Adopt BDOI wording, "Ours scopes records by role and sales unit (TL sees the unit's, AO his own); BDOI adds the Team Head and Unit Head levels of the reporting hierarchy."]
+  - [FRRN.001.03, FR-RN-001, Partial, "Yes", Adopt BDOI wording, "Same 15-minute warning; BDOI gives the dialog text and the buttons \"Stay Logged In\" and \"Log Out\", ours does not."]
+  - [FRRN.001.04, FR-RN-001, Different, Partly, Needs BDOI decision, "BDOI ends the session after 30 minutes of inactivity and then shows \"Your session timed out\"; ours warns 30 minutes before the system log-out, as BRD x.001 reads."]
+  - [FRRN.002.01, "FR-RN-100, FR-RN-013", Partial, Partly, Adopt BDOI wording, "Ours has Renewal Home, Expiry List, LAMD Reports, Insurer Batches and Letters as separate screens; BDOI puts the bucket lists, uploads (insurer disposition, account update, placement report, hold cover response) and LAMD on one landing page."]
+  - [FRRN.002.02, FR-RN-100, Partial, Partly, Adopt BDOI wording, "Ours shows tiles by stage, bucket and expiry window that open filtered lists; BDOI adds the period, market segment and Account Officer filters and a fixed drill-down column set."]
+  - [FRRN.002.02.01, "-", Not in ours, Partly, Platform change, "Premium and commission against budget, variance, growth and adjustments; BIBS has production against target per team in the New Business dashboard, not a renewal budget."]
+  - [FRRN.002.02.02, "-", Not in ours, Partly, Needs BDOI decision, "Pipeline by business type (New, Organic, Submitted, Renewal, Deferred) and stages For Survey to For Delivery; the BIBS stages have other names."]
+  - [FRRN.002.02.03, "FR-RN-100, FR-RN-102", Partial, Partly, Adopt BDOI wording, "Ours counts accounts expiring in 30, 60, 90 and 140 days; BDOI ages unrenewed accounts by month (prior, current, +1, +2) with premium and commission."]
+  - [FRRN.002.02.04, "-", Not in ours, "No", Platform change, "Closing ratio by business type (booked over total accounts) with the in-process, posted and booked pipeline tiers."]
+  - [FRRN.002.02.05, "-", Not in ours, "No", Platform change, "Top 50, 75 or 100 open deals by premium."]
+  - [FRRN.002.02.06, "-", Not in ours, Partly, Platform change, "Renewal persistency by count, premium and commission for six months and year to date; BIBS has a persistency report for submitted policies only."]
+  - [FRRN.002.02.07, "-", Not in ours, "No", Platform change, "Production by product line on the dashboard; BIBS reports production per unit and officer in New Business, not by product line."]
+  - [FRRN.002.02.08, "FR-RN-100, FR-RN-103", Partial, Partly, Adopt BDOI wording, "Ours shows overdue insurer batches and the insurer extract; BDOI adds the approval monitoring table (Renew As Is, approved, pending, returned, % approval) and pending accounts per insurer."]
+  - [FRRN.002.02.09, "FR-RN-100, FR-RN-101", Partial, Partly, Adopt BDOI wording, "Ours has 34 summary counters of the status report and the home tiles; BDOI adds cards from Cashiering (bounced checks, unapplied payments, refunds) and hold covers expiring in 7 days."]
+  - [FRRN.002.05, FR-RN-013, Different, Partly, Needs BDOI decision, "BDOI shows four panels Clean, Review, Non-Renewable and All; ours shows tabs by disposition and an Exceptions tab, with the Clean / Review / Exception pill (BRRN.023)."]
+  - [FRRN.002.06, FR-RN-013, Same, "Yes", Keep ours, "Global search, column filters and sorting on every column in both."]
+  - [FRRN.002.07, "FR-RN-014, FR-RN-103", Partial, "Yes", Keep ours, "Both export the list as shown and print with a preview; BDOI asks page size, orientation and margins on screen, ours sets A4 or Legal landscape and leaves margins to the print dialog."]
+  - [FRRN.003.01, FR-RN-100, Partial, Partly, Platform change, "BDOI wants one processing dashboard for New Business and Renewal with a combined view; ours has the Processing TL view per officer on Renewal Home."]
+  - [FRRN.003.02, "-", Not in ours, Partly, Platform change, "KPI cards For Placement, For Booking, With and Without Policy, For Releasing, Released, Unreleased, Directly Booked, Returned; BIBS shows these queues on the New Business placement, booking and e-policy screens, not as cards."]
+  - [FRRN.003.02.01, "-", Not in ours, Partly, Platform change, "Assigned and Unassigned tabs with ageing in business days from Submitted for Placement."]
+  - [FRRN.003.02.02, "-", Not in ours, Partly, Platform change, "For Booking drill-down with ageing from the placement date."]
+  - [FRRN.003.02.03, "-", Not in ours, Partly, Platform change, "With / Without Policy drill-down with policy status, TAT status, placement issue and resolution date."]
+  - [FRRN.003.02.04, "-", Not in ours, Partly, Platform change, "Policy transmittal drill-down (sent, pending, unsuccessful) with reason for reject."]
+  - [FRRN.003.02.05, "-", Not in ours, Partly, Platform change, "Direct Booking drill-down; BIBS books directly in New Business."]
+  - [FRRN.003.02.06, "FR-RN-045, FR-RN-065", Partial, Partly, Adopt BDOI wording, "Ours flags returned accounts and filters them; BDOI adds a Returned card with the reason for return."]
+  - [FRRN.003.03, FR-RN-062, Same, "Yes", Keep ours, "Same grid behaviour; BDOI sorts descending here and ascending in FRRN.002.06."]
+  - [FRRN.003.04, "FR-RN-014, FR-RN-103", Partial, "Yes", Keep ours, "As FRRN.002.07."]
+  - [FRRN.004.01, FR-RN-011, Same, "Yes", Keep ours, "Generate dialog with date range, filters and Generate / Cancel; BDOI calls the list RMEL, ours the Expiry List (sheet 8)."]
+  - [FRRN.004.02, FR-RN-011, Same, "Yes", Keep ours, "Start and end date pickers; start not after end."]
+  - [FRRN.004.03, FR-RN-012, Same, "Yes", Keep ours, "Single, multiple, all and all-except selections with Apply, Cancel and Clear; ours names the 13 criteria of the BRD, BDOI says all fields."]
+  - [FRRN.004.04, "FR-RN-010, FR-RN-011, FR-RN-015", Different, Partly, Needs BDOI decision, "BDOI creates a renewal account per listed account at generation (disposition For Disposition, status In Process Renewal); ours creates a renewal record with a renewal reference, starts nothing until an explicit initiation (BRRN.021) and creates the renewal account when processing starts. BDOI also lists Free-First-Year accounts in process."]
+  - [FRRN.004.06, FR-RN-027, Partial, Partly, Platform change, "BDOI offers a Refresh Endorsements action that re-reads the mother policy and recalculates; ours creates the renewal account from the policy as of the last posted endorsement and blocks post and RA while an endorsement is in progress."]
+  - [FRRN.004.06, FR-RN-014, Partial, Partly, Adopt BDOI wording, "Same export and print; BDOI fixes the file name RMEL_<MMM>_<YYYY>_<MMDDYYYY>.xlsx, ours does not name the file."]
+  - [FRRN.005.01, FR-RN-063, Partial, Partly, Needs BDOI decision, "Ours creates the renewal account from a renewal record (Create Renewal Account on the record); BDOI lets a user create a renewal account for any expiring account, inception one day after the old expiry and expiry one year later, then sanitises it. Ours keeps the term of the expiring policy."]
+  - [FRRN.006.01, FR-RN-020, Different, Partly, Platform change, "Ours checks that no other open renewal exists for the same expiring policy; BDOI checks client number, risk code, PN and expiring policy number (configurable per line, Annex B), tells exact from potential duplicates, warns on manual creation and puts generated ones in Review with a link; a cancelled match does not block."]
+  - [FRRN.007.01, "FR-RN-020, FR-RN-112", Same, "Yes", Keep ours, "Sanitation runs on creation and every update and is a mandatory step before classification; rules configurable on screen."]
+  - [FRRN.007.02, "FR-RN-020, FR-RN-022, FR-RN-024", Partial, Partly, Needs BDOI decision, "Several rules differ: missing data is Review in BDOI and Exception in ours; TSI above PHP 250M is Clean / For Quotation in BDOI and Review / For Proposal in ours; any endorsement is Review in BDOI, only an endorsement in progress blocks in ours; PA and GPA are Clean / For Proposal in BDOI only; a total loss is Not for Renewal in BDOI, a manual reason in ours until Claims gives the indicator."]
+  - [FRRN.008.01, "FR-RN-022, FR-RN-023, FR-RN-051", Different, Partly, Needs BDOI decision, "Third bucket Non-Renewable (BDOI) against Exception (ours, BRRN.023); BDOI sets Clean accounts For Renewal with status For RA Generation (CBG) or Posted (Non-CBG); ours lets the decision matrix propose or apply the disposition and a failed check can never be Clean."]
+  - [FRRN.009.01, "FR-RN-063, FR-RN-064", Not in ours, Partly, Platform change, "Automatic CBG Motor renewal values (Annexes D and E: depreciation, BI/PD tiers, Auto Promo to Regular, DST, VAT, LGT); ours rates the renewal account on the package of the expiring account. BDOI's list for CBG Home and Non-CBG is empty."]
+  - [FRRN.010.01, "FR-RN-030, FR-RN-061", Different, "No", Needs BDOI decision, "BDOI assigns automatically by team and sub-team with round robin (Annex F) for Marketing and Processing; ours lets the TL assign (BRD 1.005, 3.005) and does not assign CBG accounts."]
+  - [FRRN.010.02, FR-RN-030, Same, "Yes", Keep ours, "Re-assignment within the unit with single, multiple, all and all-except selection and a search by name."]
+  - [FRRN.011, "FR-RN-031, FR-RN-032", Different, Partly, Needs BDOI decision, "BDOI's transfer is a referral: the renewal stays with its unit and the receiving unit opens a New Business account; ours moves the renewal to the receiving unit (BRD 1.006, 1.007, 2.005)."]
+  - [FRRN.011.01, FR-RN-031, Partial, Partly, Adopt BDOI wording, "Same request with target unit and justification; BDOI adds a Transfer Request Number and status Pending Acceptance."]
+  - [FRRN.011.02, FR-RN-032, Partial, Partly, Platform change, "Ours accepts or declines with remarks; BDOI adds Return for Clarification."]
+  - [FRRN.011.03, "-", Not in ours, "No", Needs BDOI decision, "Creation of a New Business account from the copied renewal data on acceptance."]
+  - [FRRN.011.04, "FR-RN-031, FR-RN-032", Partial, Partly, Adopt BDOI wording, "Ours has Transfers (incoming and outgoing); BDOI lists the statuses Draft to Returned for Clarification and the New Business account number."]
+  - [FRRN.011.05, "FR-RN-031, FR-RN-032", Partial, Partly, Adopt BDOI wording, "Ours notifies the request and the decision; BDOI also notifies a return for clarification."]
+  - [FRRN.012.01, FR-RN-025, Different, Partly, Platform change, "Ours uploads LAMD reports of paid-off and RMU loans; BDOI uploads the full CBG loan list (excluding personal loans) and the paid-off list and derives the loan status (Active, Loan Fully Paid, RMU, Unmatched); required fields PN and AO code, plus serial and motor number for Motor."]
+  - [FRRN.012.02, FR-RN-025, Partial, Partly, Platform change, "Ours matches on PN; BDOI matches CBG Motor on PN, serial number and motor number."]
+  - [FRRN.012.03, FR-RN-025, Partial, Partly, Adopt BDOI wording, "Ours shows the match results of each report; BDOI fixes the file-level summary columns, statuses and the result file name."]
+  - [FRRN.012.04, FR-RN-025, Partial, Partly, Adopt BDOI wording, "Record-level results with matching and processing status and the reason."]
+  - [FRRN.012.05, FR-RN-025, Partial, Partly, Adopt BDOI wording, "BDOI keeps a cumulative list of paid-off accounts without duplicates; ours keeps the lines of each report."]
+  - [FRRN.012.06, "-", Not in ours, "No", Platform change, "BDOFC and BDOSOLD report upload (PN, assured's name, remarks)."]
+  - [FRRN.012.07, "-", Not in ours, "No", Platform change, "BDOFC / SOLD matching on PN; BDOI does not say what a match changes."]
+  - [FRRN.012.08, "-", Not in ours, "No", Platform change, "Upload summary of the BDOFC / SOLD files."]
+  - [FRRN.012.09, "-", Not in ours, "No", Platform change, "Record-level results of the BDOFC / SOLD files."]
+  - [FRRN.013.01, FR-RN-071, Partial, Partly, Platform change, "Ours uploads the insurer's response file keyed by the renewal reference; BDOI fixes the CBG layout of Annex H (17 fields) and a Non-CBG layout, with its messages."]
+  - [FRRN.013.02, FR-RN-071, Different, Partly, Needs BDOI decision, "BDOI maps nine insurer dispositions to bucket and disposition (Rejected goes to Review / For Disposition, Total Loss to Non-Renewable); ours has three responses (Renew As Is, Revise, Reject; Reject tags Not for Renewal or returns to Marketing)."]
+  - [FRRN.012.03, FR-RN-071, Partial, Partly, Adopt BDOI wording, "Upload summary of the insurer disposition files (numbered 012.03 inside FRRN.013 in BDOI's FRS)."]
+  - [FRRN.012.04, FR-RN-071, Partial, Partly, Adopt BDOI wording, "Record-level view with \"Record not found\" (numbered 012.04 inside FRRN.013)."]
+  - [FRRN.014.01, "FR-RN-041, FR-RN-042", Partial, Partly, Adopt BDOI wording, "Both show every renewal field and the account history (policies, endorsements, payments, claims) with download and print; BDOI adds the refund link."]
+  - [FRRN.014.02, "FR-RN-043, FR-RN-063, FR-RN-080", Partial, Partly, Needs BDOI decision, "Ours has five dispositions (with Lost Business) and ten non-renewal reasons and locks the account when the RA is generated (BRD 2.004.9); BDOI has four dispositions, 21 reasons and locks when posted and placed. File types and messages are BDOI's."]
+  - [FRRN.014.03, "-", Not in ours, Partly, Platform change, "Allocation of the renewal to several insurers by percentage (total 100%) or amount (total = TSI); BIBS takes the insurers and shares from the package."]
+  - [FRRN.014.04, "-", Not in ours, Partly, Adopt BDOI wording, "For Booking Only tag with policy number, OR number, policy document and full payment checks and an override approval; BIBS books directly in New Business."]
+  - [FRRN.014.05, "-", Not in ours, Partly, Platform change, "Direct-to-Insurer Payment tag with blanket approval or Unit Head approval; BIBS has the direct payment tag of New Business without the approval route. Ours has only the non-renewal reason Direct to Insurer."]
+  - [FRRN.014.06, FR-RN-041, Partial, "Yes", Adopt BDOI wording, "Both download and print the details; BDOI fixes the file name Renewal Account Details.xlsx."]
+  - [FRRN.015.03, FR-RN-060, Partial, Partly, Adopt BDOI wording, "Ours uploads dispositioned files on the Processing Worklist; BDOI has a general Renewal Update upload with a downloadable template on the landing page."]
+  - [FRRN.015.04, "FR-RN-060, FR-RN-021", Same, "Yes", Keep ours, "Rows matched on the reference number (ours: the renewal reference, mandatory)."]
+  - [FRRN.015.05, FR-RN-060, Partial, Partly, Adopt BDOI wording, "Upload summary columns and statuses."]
+  - [FRRN.015.06, FR-RN-060, Partial, Partly, Adopt BDOI wording, "Record-level results with filter, sort and search."]
+  - [FRRN.016.01, FR-RN-043, Partial, Partly, Needs BDOI decision, "Ours pushes the account to the unit's TLs (Review in Progress); BDOI makes the user pick the approver and names the status Submitted for Posting."]
+  - [FRRN.017.01, FR-RN-048, Partial, Partly, Adopt BDOI wording, "Ours sends For Quotation and For Proposal to the New Business quotation or proposal request; BDOI generates a Quick or Full Proposal from the renewal with file names and two or three signatories by TSI (500M)."]
+  - [FRRN.017.02, FR-RN-048, Different, Partly, Needs BDOI decision, "BDOI sends the proposal through CCM with six delivery statuses; BIBS sends by its own e-mail with a send log."]
+  - [FRRN.018.01, FR-RN-048, Partial, Partly, Needs BDOI decision, "BDOI sends For Quotation to TSU with TL approval, TSU officer, comparative table and proposal; ours sends For Proposal to the non-package proposal request (TSU) and For Quotation to the package quotation: the two words are swapped (sheet 8)."]
+  - [FRRN.019.01, "FR-RN-048, FR-RN-084", Partial, Partly, Adopt BDOI wording, "BDOI records the client's answer to the proposal (Pending, Accepted, Rejected, Request for Revision; rejected becomes Not for Renewal, Lost Business); ours closes the renewal as Lost when the quotation is declined."]
+  - [FRRN.020.01, "FR-RN-050, FR-RN-070", Partial, "Yes", Keep ours, "Both post and route by disposition; BDOI sends For Proposal / Quotation straight to placement and For Renewal to the RA when the insurer already approved, else to the insurer disposition file; ours routes For Renewal through processing and the insurer round-trip and For Quotation / Proposal through the New Business path."]
+  - [FRRN.020.02, FR-RN-050, Same, "Yes", Keep ours, "Return with reason and remarks; BDOI's status In Process Renewal is ours Returned."]
+  - [FRRN.021, FR-RN-070, Partial, "Yes", Keep ours, "Ours creates one batch per insurer with the 28 columns of BRD 3.009; BDOI lets the user choose the fields and the accounts (all, selected, filtered)."]
+  - [FRRN.022.01, "FR-RN-080, FR-RN-081", Partial, Partly, Adopt BDOI wording, "Ours lets the user choose First or Second Notice; BDOI determines the notice (Annex M: 75 and 45 days before expiry), names the file <Product>_RA_<Notice#>_<Ref>_<Date>.pdf and uses four approved RA templates by line (Annex L)."]
+  - [FRRN.022.02, FR-RN-081, Different, Partly, Needs BDOI decision, "BDOI sends the RA through CCM with delivery statuses; BIBS sends a protected e-mail and the password in a separate e-mail."]
+  - [FRRN.023.01, "FR-RN-082, FR-RN-083, FR-RN-090", Partial, Partly, Platform change, "Ours has the RA, NAL, Not for Renewal Letter, NRNS reminder and non-acceptance letter; FFY reminder and SFU letters appear only for submitted policies (FR-RN-090). Eligibility and schedules differ (Annex M, sheet 8)."]
+  - [FRRN.023.02, "FR-RN-082, FR-RN-111", Partial, Partly, Adopt BDOI wording, "Same generation, storage, preview and resend; BDOI fixes the file name <Product>_<Letter Type>_<Ref>_<Date>.pdf and the messages; channel CCM against BIBS e-mail."]
+  - [FRRN.024.01, FR-RN-081, Different, Partly, Platform change, "BDOI's password: individuals - first three letters of the first and last names in capitals; corporate - eight random characters (one lower case, one upper case, one special, five digits). BIBS generates a random 12-character password, pending the convention (Q07)."]
+  - [FRRN.025.01, FR-RN-084, Partial, Partly, Adopt BDOI wording, "Ours records the acceptance with its method and evidence; BDOI uses statuses (Pending, Accepted, Rejected, Request for Revision, Not Applicable), exempts CBG Home and FFY accounts (they go to For Billing Generation) and sends the Non-Renewal Letter on rejection."]
+  - [FRRN.26.01, FR-RN-084, Different, Partly, Needs BDOI decision, "BDOI adds a second approval after acceptance (Submitted for Approval), auto-submits CBG Motor on payment and requires the payment confirmation for Non-CBG; ours moves the accepted account to placement and booking once the payment rules are met, without a second approval."]
+  - [FRRN.27.01, "-", Not in ours, Partly, Platform change, "Scheduled CLPC billing (CBG Home daily at 10 days before expiry; FFY Motor on the 10th and 25th), Built-in and Non-Built-in files; BIBS creates the CLPC billing batch on demand and the file is sent outside BIBS."]
+  - [FRRN.27.02, "-", Not in ours, Partly, Platform change, "Manual billing file with a From / To window of at most 31 days."]
+  - [FRRN.27.03, "-", Not in ours, Partly, Platform change, "Sending the billing file with delivery status (Annex S e-mail)."]
+  - [FRRN.028.01, "FR-RN-084, FR-RN-087", Partial, Partly, Adopt BDOI wording, "Ours reads the payment status of the payment gate; BDOI names Paid, Partially Paid and Unpaid from the outstanding balance."]
+  - [FRRN.028.02, FR-RN-084, Partial, Partly, Adopt BDOI wording, "BDOI moves a paid CBG renewal to Submitted for Placement automatically; ours moves an accepted renewal to placement and booking once the payment rules are met and leaves the placement itself to the user."]
+  - [FRRN.029.01, "-", Not in ours, "Yes", Adopt BDOI wording, "The Submitted for Placement list; ours refers to the New Business placement."]
+  - [FRRN.029.02, "-", Not in ours, Partly, Platform change, "One slip per insurer per account and a consolidated Excel file per insurer for packaged accounts, excluding For Booking Only; BIBS makes one slip per insurer branch."]
+  - [FRRN.029.02.01, "-", Not in ours, Partly, Adopt BDOI wording, "Placement slip file name and stored details; BDOI's example name carries two product codes."]
+  - [FRRN.029.02.02, "-", Not in ours, Partly, Platform change, "Consolidated placement file per insurer; BDOI's example is a .pdf with a reference number although the file is an .xlsx per insurer."]
+  - [FRRN.29.03, "-", Not in ours, "No", Needs BDOI decision, "Automatic upload of placement files through MFT; ours has no file-transfer channel with insurers (on hold)."]
+  - [FRRN.29.04, "-", Not in ours, Partly, Needs BDOI decision, "Sending placement files through CCM with recipients from Insurer Maintenance; BIBS sends the slips by e-mail."]
+  - [FRRN.29.05, FR-RN-070, Partial, Partly, Platform change, "Ours sets a reply due date for insurer batches and alerts when overdue; BDOI measures placement TAT in business days (3 packaged, 10 non-package, 3PM cut-off) with a With Issue tag and resolution date."]
+  - [FRRN.030.01, "-", Not in ours, Partly, Adopt BDOI wording, "Placement response by upload or MFT, matched on the renewal reference; ours covers the insurer's renewal response before the RA, not the placement response."]
+  - [FRRN.030.01.01, FR-RN-084, Different, Partly, Needs BDOI decision, "BDOI books the account and locks it when the insurer approves the placement; ours keeps booking a user action (Walkthrough addendum p.4)."]
+  - [FRRN.030.01.02, "-", Not in ours, Partly, Adopt BDOI wording, "Rejected placement with seven reasons, status Rejected Placement, return to Marketing or cancel the placement."]
+  - [FRRN.030.03, "-", Not in ours, Partly, Adopt BDOI wording, "Summary of the placement response files."]
+  - [FRRN.030.04, "-", Not in ours, Partly, Adopt BDOI wording, "Record-level view of the placement responses."]
+  - [FRRN.031.01, FR-RN-065, Partial, Partly, Adopt BDOI wording, "Ours returns from processing to the AO or TL with five return reasons; BDOI returns from Submitted for Placement and Rejected Placement with status Returned - Renewal and 39 reasons (Annex V)."]
+  - [FRRN.032.01, "-", Not in ours, Partly, Adopt BDOI wording, "Insurance Advice for mortgaged accounts when the placement is sent, versioned on change; BIBS generates it for mortgaged accounts on the event set by a parameter (policy issue by default)."]
+  - [FRRN.032.02, "-", Not in ours, Partly, Needs BDOI decision, "Sending the Insurance Advice through CCM with CC recipients; BIBS sends by e-mail."]
+  - [FRRN.033, "-", Not in ours, Partly, Adopt BDOI wording, "E-policy processing in the Renewal FRS; ours refers to New Business issuance."]
+  - [FRRN.033.01, "-", Not in ours, Partly, Platform change, "One summary text file and one ZIP per upload, or MFT; BIBS uploads policy PDFs matched on the account reference in the file name."]
+  - [FRRN.033.02, "-", Not in ours, Partly, Platform change, "Receipt summary of e-policy files."]
+  - [FRRN.033.03, "-", Not in ours, Partly, Platform change, "Record-level view of e-policy files."]
+  - [FRRN.033.04, "-", Not in ours, Partly, Needs BDOI decision, "Bulk e-policy sending through CCM with eligibility checks; BIBS sends encrypted e-policies by e-mail."]
+  - [FRRN.033.05, "-", Not in ours, Partly, Platform change, "Batch upload of e-policy numbers with a duplicate check across active accounts and an exception report."]
+  - [FRRN.034.01, FR-RN-087, Different, "Yes", Keep ours, "BDOI evaluates the incentive upon booking; ours after booking, confirmed acceptance and full payment, as BRRN.041 reads."]
+  - [FRRN.035.01, FR-RN-084, Partial, "Yes", Keep ours, "Invoice number, accounting entries and service invoice on booking: ours books through the New Business booking with business type RENEWAL and posts nothing itself."]
+  - [FRRN.036.01, FR-RN-086, Different, Partly, Needs BDOI decision, "BDOI defaults 30 days (Non-CBG) and 90 days (CBG), and 30 (CBG Home) or 60 (CBG Motor) for transferred accounts; ours offers 30 or 60 days, 30 by default."]
+  - [FRRN.036.02, FR-RN-086, Different, Partly, Needs BDOI decision, "BDOI generates the Non-CBG request automatically after the client's confirmation, one per co-insurer; ours sends it when the user requests it."]
+  - [FRRN.036.03, "-", Not in ours, "No", Platform change, "Extension of 15 or 30 days from 7 days before the hold cover ends; ours allows a new request only after the previous hold cover expired or was cancelled."]
+  - [FRRN.036.04, "-", Not in ours, "No", Platform change, "Automatic CBG requests for Clean accounts 75 days before expiry, one Excel file per insurer."]
+  - [FRRN.036.05, "-", Not in ours, "No", Platform change, "Automatic 30-day extension for expired and unbooked CBG Home accounts on the 15th of each month."]
+  - [FRRN.036.06, FR-RN-086, Partial, Partly, Needs BDOI decision, "Ours e-mails the request from the hold cover template; BDOI uploads to MFT for enrolled insurers and e-mails the others."]
+  - [FRRN.037.01, FR-RN-086, Partial, Partly, Platform change, "Ours records the confirmation by hand; BDOI also uploads response files (or MFT) matched on the reference number."]
+  - [FRRN.037.02, FR-RN-086, Partial, Partly, Adopt BDOI wording, "Approved and Rejected responses update the hold cover; a rejection returns the account to the user."]
+  - [FRRN.037.03, "-", Not in ours, "No", Platform change, "Summary of hold cover response files."]
+  - [FRRN.037.04, "-", Not in ours, "No", Platform change, "Record-level view of hold cover responses."]
+  - [FRRN.037.05, FR-RN-086, Same, "Yes", Keep ours, "Manual update of the response, dates, remarks and documents; remarks mandatory on rejection."]
+  - [FRRN.038.01, "FR-RN-024, FR-RN-112", Partial, Partly, Adopt BDOI wording, "Ours keeps a list of non-renewable risk codes; BDOI keeps every risk code with a Renewable / Non-Renewable indicator, read-only to other users."]
+  - [FRRN.038.02, FR-RN-024, Partial, Partly, Adopt BDOI wording, "View with description, line, indicator, status and the audit fields."]
+  - [FRRN.038.03, FR-RN-024, Partial, Partly, Adopt BDOI wording, "Ours has effective-from and effective-to dates and a checker; BDOI blocks retroactive dates and duplicates with its messages and records the reason \"Non-Renewable Risk Code\" (ours \"Non-renewable Accounts\")."]
+  - [FRRN.038.03, "FR-RN-024, FR-RN-110", Partial, Partly, Adopt BDOI wording, "Update of a risk code with the same validations and log."]
+  - [FRRN.039.01, FR-RN-026, Partial, Partly, Adopt BDOI wording, "Both flag KYC due without blocking; BDOI makes the criteria configurable (schedules, expiry, bank / non-bank, product, regulation), ours reads the client's KYC review date."]
+  - [FRRN.039.02, "-", Not in ours, "No", Platform change, "KYC statuses (Due, Upcoming, Not Required, Pending Follow-Up, Completed) with history and review activities."]
+  - [FRRN.039.03, "-", Not in ours, "No", Platform change, "KYC monitoring dashboard with drill-down."]
+  - [FRRN.040.01, FR-RN-112, Partial, "Yes", Keep ours, "Both maintain effective-dated rules on screen; ours versions rule sets and the decision matrix with a checker; BDOI clones a rule as Draft and re-validates the list on save."]
+  - [FRRN.041.01, FR-RN-025, Different, "No", Platform change, "BDOI keeps a list of RMU Account Officer codes and derives RMU from the AO code of the loan; ours takes RMU from the LAMD report."]
+  - [FRRN.042.01, "-", Not in ours, Partly, Platform change, "Renewal annual budget maintenance; BIBS has production targets per sales unit in New Business."]
+  - [FRRN.042.02, "-", Not in ours, Partly, Platform change, "Monthly new, renewal and organic budgets per unit, segment, region, team and officer with annual totals."]
+  - [FRRN.042.03, "-", Not in ours, Partly, Platform change, "Budget upload with a template."]
+  - [FRRN.042.04, "-", Not in ours, Partly, Platform change, "Budget validations (mandatory fiscal year and segment, region or team by segment, no negative values)."]
+  - [FRRN.042.05, "-", Not in ours, Partly, Platform change, "Budget inquiry screen."]
+  - [FRRN.042.06, "-", Not in ours, Partly, Platform change, "Budget history with previous and updated values."]
+  - [FRRN.043.01, FR-RN-004, Partial, Partly, Adopt BDOI wording, "Ours keeps an unchangeable history and audit per renewal with decision and sanitation reports; BDOI adds an Audit Logs menu with old and new values and export."]
+  - [FRRN.043.02, FR-RN-004, Same, "Yes", Keep ours, "Audit section on the record (ours: History tab)."]
+  - [FRRN.044.01, "FR-RN-101, FR-RN-102, FR-RN-103", Partial, Partly, Needs BDOI decision, "Ours specifies the status report, the listing and six operational reports with their columns; BDOI lists 24 reports without layouts."]
+
+# Sheet 6: BIBS content that BDOI's FRS does not have
+only_ours:
+  - [FR, "FR-RN-015 Explicit initiation: extraction shows accounts but nothing starts until an authorised user initiates them (bulk for CLG)", "FRRN.004 Generate List", Include]
+  - [FR, "FR-RN-016 Go-live take-over of the expiries up to 31 May 2028, urgent January expiries, record of RAs already sent (DMQ37, DMQ38)", "New FRRN.045", Include]
+  - [FR, "FR-RN-021 Unique renewal reference as the matching key of every upload (BRRN.022)", "FRRN.004.04", Include]
+  - [FR, "FR-RN-023 Versioned decision matrix with automatic or manual outcome, maker-checker, stored matrix version and rule (BRRN.031, 034)", "FRRN.040 (new item)", Include]
+  - [FR, "FR-RN-028 Package of a migrated policy resolved at sanitation, with maker-checker choice (DMQ36)", "New FRRN.046", Include]
+  - [FR, "FR-RN-042 The disposition is refused until the user has opened the account history (BRRN.027 AC4)", "FRRN.014.01", Include]
+  - [FR, "FR-RN-044 Remarks of up to 200 characters stamped with user, date and stage (BRD 2.004.6-8, 2.006.1.5)", "FRRN.014.02", Include]
+  - [FR, "FR-RN-045 List of dispositioned accounts with Endorsed and Claims flags and the lock padlock (BRD 2.006)", "FRRN.002.05", Include]
+  - [FR, "FR-RN-047 Re-open an account tagged Not for Renewal until expiry plus 30 days (BRD 2.004.10, 3.004.5)", "New FRRN.047", Include]
+  - [FR, "FR-RN-051 Outstanding-balance override by the TL and the other controlled overrides with remarks (BRD 1.011)", "FRRN.020 (new item)", Include]
+  - [FR, "FR-RN-060 Declaring a dispositioned file complete tags the missing accounts Not for Renewal (BRD 3.004.4)", "FRRN.015", Include]
+  - [FR, "FR-RN-064 Computations tab and the financial-impact check with tolerance (BRRN.038)", "FRRN.009 / FRRN.014", Include]
+  - [FR, "FR-RN-083 Effective expiry date from the confirmed hold cover for NRNS and closing letters (R37-HC-01 to 12)", "FRRN.023", Include]
+  - [FR, "FR-RN-085 Contact Center follow-ups with channel, outcome and next action (BRRN.026); BDOI only refers to the access matrix", "New FRRN.048", Include]
+  - [FR, "FR-RN-090 Renewal of submitted policies handed over by Submitted Policies (decision D2)", "New FRRN.049", Include]
+  - [FR, "FR-RN-101 Renewal status report with 37 (Marketing) or 40 (Processing) columns and 34 summary counters (BRRN.019, BRD 1.009)", "FRRN.044 and Annex AM Report specifications", Include as annex]
+  - [FR, "FR-RN-102 Centralised listing with attention flags (ageing, overdue, high risk) and no automatic escalation (BRRN.036)", "FRRN.002", Include]
+  - [FR, "FR-RN-110 and 111 Maintenance of the renewal lists of values and of the letter templates (BRD 5.003, 5.005)", "New FRRN.050", Include]
+  - [Rule, "Exception ageing alert after 5 working days (R29-05)", "FRRN.008", Include]
+  - [Rule, "Insurer renewable list check (SC-10)", "FRRN.007.02", Include]
+  - [Rule, "Employee Benefits lines excluded from the renewal lists (decision D3)", "FRRN.004.04", Include]
+  - [Rule, "A failed check can never give Clean, by rule or by override (BRRN.023)", "FRRN.008", Include]
+  - [Rule, "Rule and matrix changes apply to accounts not yet initiated; in-progress accounts keep their results (Annex BRRN.020)", "FRRN.040", Include]
+  - [Rule, "150 business rules marked configurable or fixed, with their parameter or list", "Each FRRN entry", Include]
+  - [Acceptance criteria, "160 numbered acceptance criteria, basis of 236 test conditions and 406 test cases", "Each FRRN entry as items FRRN.nnn.mm.ACn", Include]
+  - [Screens, "20 screen specifications with screenshots, fields, actions and states", "Annex AA Screen specifications", Include as annex]
+  - [Screens, "Navigation, screen flow, menu by persona and common screen elements", "Annex AA (introduction)", Include as annex]
+  - [Messages, "Messages catalogue (about 150 messages) and 93 validations with their messages in the FRs", "Annex AB Messages", Include as annex]
+  - [Notifications, "19 notifications with trigger, recipient, channel and template", "Annex AC Notifications", Include as annex]
+  - [Walkthroughs, "Five end-to-end walkthroughs and the storyboard index (25 frames)", "Annex AD Walkthroughs and storyboard", Include as annex]
+  - [Status model, "Stages, transitions, checks and buckets, insurer batch and letter states, SLA", "Annex AE Status model", Include as annex]
+  - [Roles, "Ten personas, 22 permissions, role-to-permission matrix, data scope and segregation of duties", "Annex AF Roles and access (or the User Access Maintenance FRS)", Include as annex]
+  - [Configuration inputs, "Renewal parameters with defaults, lists of values and business-maintained masters", "Annex AG Configuration items", Include as annex]
+  - [Documents, "Five document outputs with fields and their sources", "Annexes L, W, X (field sources)", Include]
+  - [Uploads, "Seven upload screens with columns and validations (dispositions, insurer responses, acceptances, LAMD, package map, migrated policies, RAs already sent)", "Annex AK Upload layouts", Include as annex]
+  - [Traceability, "Every one of the 1,033 line IDs of the main BRD traced to an FR, screen and test cases; nine out-of-scope IDs named", "Annex AJ Traceability to the main BRD", Include as annex]
+  - [Interfaces, "Interfaces of Renewal with direction, trigger and scope (in scope, on hold) and the cross-BRD contract (14 exchanges)", "Annex AH Interfaces and cross-BRD contract", Include as annex]
+  - [Non-functional, "Users, volumes, response times, availability, retention, security and audit (BRD p.212-214)", "Annex AL Non-functional requirements", Include as annex]
+  - [Clarifications, "40 proposed business rules and clarifications, 38 open questions", "Decision log after BDOI's workshop", Keep as supporting document]
+  - [User-story view, "89 user stories of the BRD requirements", "Working backlog of the project", Keep as supporting document]
+  - [Test basis, "Test plan with 236 test conditions and 406 test cases", "BRD-6 test plan", Keep as supporting document]
+  - [Screen standards, "Screen standards appendix (pills, chips, dates, amounts, row actions)", "UX screen deck", Keep as supporting document]
+  - [Sign-off, "Who signs what by BRD part and the change rule after sign-off", "Signoff Sheet", Include]
+
+# Sheet 7: annex items of BDOI's FRS that ours lacks or treats differently (the FR items come from the mapping)
+only_bdoi_annex:
+  - [Annex A, "224 renewal fields by section with line and data type (embedded PDF)", "One field catalogue for screens, uploads and reports; legacy reference fields (BDO ISYS, EBIX, QPS) are out of scope (BRD p.60)", "Add to our FRS; ask BDOI which fields are mandatory"]
+  - [Annex B, "Duplicate checking criteria for 15 lines and four segments", "Duplicate warnings on manual creation and on generation", "Platform change needed"]
+  - [Annex C, "Non-CBG sanitation rules (8 rows)", "TSI, dollar-denominated TSI, outstanding balance, multi-insurer, mortgaged and risk-code rules with bucket and disposition", "Add to our FRS; ask BDOI (rows 2 and 3 conflict)"]
+  - [Annex C, "CBG Motor sanitation matrix (26 rows) and criteria definitions (loan status, premium package, BI/PD, MYP periods, branch codes, employee product types, FFYMI risk codes, double booking)", "The CBG Motor straight-through rules of BRRN.039", "Add to our FRS; platform change needed"]
+  - [Annex C, "CTPL rule: CTP01 with a one-year policy is Clean / For Renewal, otherwise Review", "CTPL renewals", "Add to our FRS"]
+  - [Annex C, "CBG Home rules: heading only", "No rule given for CBG Home", "Ask BDOI"]
+  - [Annex D, "CBG Motor automatic field updates for Regular, Auto Promo and CTPL (34 rows)", "Renewal premium and sum insured computed without re-keying", "Platform change needed"]
+  - [Annex E, "Auto Promo to Regular conversion: risk codes MTR70-73 to MTR22, 23, 25, 73, rates and Auto PA cover 100,000", "Conversion of FFYMI accounts at renewal", "Platform change needed"]
+  - [Annex F, "Assignment hierarchy per segment: Corporate (7 groups, embedded PDF), Retail (40 rows), CBG Motor (17 rows), CBG Home (8 rows)", "Data for automatic assignment and data scope", "Ask BDOI (assignment rule); load as sales organisation data"]
+  - [Annex G, "LAMD layouts: CBG Loans excluding Personal (26 fields) and List of Paid Off Accounts (16 fields)", "Upload layouts of the LAMD reports", "Add to our FRS; platform change needed"]
+  - [Annex H, "Insurer disposition upload layout for CBG (17 fields)", "Upload layout of insurer responses", "Add to our FRS; platform change needed"]
+  - [Annex I, "Quick Proposal template: heading only", "No template given", "Ask BDOI"]
+  - [Annex J, "Full Proposal template: heading only", "No template given", "Ask BDOI"]
+  - [Annex K, "Non-package quotation request fields for 14 lines (embedded workbook, 26 to 37 fields each, with drop-down rules)", "Content of the TSU request", "Add to our FRS (via the New Business proposal request)"]
+  - [Annex L, "Four approved RA letter templates (Motor, PAR CLG, PAR Non-CLG, Other Lines) and three RA e-mail templates", "Approved wording of the RA and its e-mails", "Add to our FRS; platform change needed (templates)"]
+  - [Annex M, "Letter eligibility matrix with schedules (8 rows)", "When each letter is sent", "Add to our FRS; ask BDOI (conflicts with the Walkthrough addendum)"]
+  - [Annex N, "NRNS Reminder Letter template: heading only", "No template given", "Ask BDOI"]
+  - [Annex O, "No Advice Letter template: heading only", "No template given", "Ask BDOI"]
+  - [Annex P, "Non-Renewal Letter template: heading only", "No template given", "Ask BDOI"]
+  - [Annex Q, "SFU Letter template: heading only", "No template given", "Ask BDOI"]
+  - [Annex R, "FFY Reminder Letter template: heading only", "No template given", "Ask BDOI"]
+  - [Annex S, "Billing file attachment (13 fields) and e-mail to BDO CBG Loan Services (form BFP-001-2026-0)", "CLPC billing file content", "Add to our FRS; platform change needed"]
+  - [Annex T, "Placement Slip template: heading only", "No template given", "Ask BDOI"]
+  - [Annex U, "Placement file fields (42), package risk description syntax (10 packages), non-package risk description syntax (14 lines)", "Placement file content", "Add to our FRS (via New Business placement); platform change needed"]
+  - [Annex V, "39 return reasons with description and line", "Return reason list", "Add to our FRS (list values)"]
+  - [Annex W, "Four approved Insurance Advice templates (Motor, Fire, Other Lines, Marine Cargo Trade; IA-001 to IA-004)", "Approved Insurance Advice wording", "Add to our FRS; platform change needed (templates)"]
+  - [Annex X, "Three approved e-policy e-mail templates (Individual, Corporate, Corporate password)", "Approved e-policy e-mail wording", "Add to our FRS; platform change needed (templates)"]
+  - [Annex Y, "Service invoice layout (image)", "Service invoice of the renewal", "Add to our FRS (via New Business booking)"]
+  - [Annex Z, "Hold Cover template: heading only", "No template given", "Ask BDOI"]
+  - [Process Flow, "One flowchart from Generate RMEL to Book account", "End-to-end view in BDOI's vocabulary", "Add to our FRS after the paid-off / RMU decision"]
+
+# Sheet 8: conflicts
+conflicts:
+  - topic: Third bucket and missing data
+    kind: Rule
+    bdoi: "FRRN.008.01: \"Clean ... Review ... Non-Renewable\"; FRRN.007.02: missing mandatory fields \"flag as Review Record\"."
+    ours: "FR-RN-022: buckets Clean, Review and Exception; missing mandatory data is a sanitation failure (Exception)."
+    brd: "BRRN.023: \"Clean, Review, Exception\"; the Walkthrough annex rules R23 (p.21) make missing mandatory data a sanitation failure."
+    platform: Clean, Review, Exception
+    matches: Ours (BRD and platform)
+    recommendation: Keep Clean / Review / Exception as the BRD says; show the Not for Renewal accounts as BDOI's "Non-Renewable" panel (a filter on the disposition).
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "the third panel of the renewal accounts is Non-Renewable (default, BDOI's panels Clean, Review, Non-Renewable and All, the Exception accounts shown under Review) or Exception (the BRD's Clean, Review and Exception)."
+  - topic: TSI above PHP 250M
+    kind: Rule
+    bdoi: "FRRN.007.02: above the threshold \"Clean Record with 'For Quotation' disposition\", routed to the TSU queue, \"Review\" once the quotation is available."
+    ours: "FR-RN-020: above PHP 250M the candidate is Review and the decision matrix proposes For Proposal to TSU."
+    brd: "Walkthrough SC-12, SC-13: above the threshold the renewal goes to TSU or proposal handling."
+    platform: Review with a proposed disposition
+    matches: Both partly
+    recommendation: Keep the Review bucket (the TSU route is manual work) and use BDOI's disposition word once the For Quotation / For Proposal meaning is settled.
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "an account above the sum insured threshold is Clean For Quotation and goes to the TSU (default, BDOI's rule) or Review with a proposal for the TSU."
+  - topic: Meaning of For Quotation and For Proposal
+    kind: Naming and routing
+    bdoi: "FRRN.017: Quick and Full Proposal only for \"For Proposal\"; FRRN.018: \"For Quotation\" goes to a TSU request (non-package quotation, Annex K)."
+    ours: "Dispositions table: For Quotation - a package quotation; For Proposal - a non-package proposal request (TSU)."
+    brd: "BRD 2.004.3 lists both dispositions without defining the route."
+    platform: For Quotation to the package quotation, For Proposal to the proposal request
+    matches: Not stated
+    recommendation: Adopt BDOI's meaning (BDOI's process vocabulary) after Marketing confirms it; the platform change is the routing of the two values.
+  - topic: Paid-off loans (Loan Fully Paid)
+    kind: Rule
+    bdoi: "Annex C CBG Motor: \"Loan Fully Paid ... Renew As Is ... Clean / For renewal\" (account type becomes CLG Auto Open Market, Annex D); Process Flow: Paid goes to \"Not For Renewal\" and \"Flag as Exception\"."
+    ours: "FR-RN-025: a paid-off loan tags the account Not for Renewal with reason \"Loan fully paid\"."
+    brd: "BRRN.029: match paid-off loans \"to determine renewal eligibility and proper routing\"."
+    platform: Not for Renewal, reason Loan fully paid
+    matches: Ours and BDOI's flow; not BDOI's Annex C
+    recommendation: Ask BDOI which of its two rules applies; we recommend Annex C (renew in the open market) as the detailed rule, with the change of account type.
+  - topic: RMU loans
+    kind: Rule
+    bdoi: "Annex C: RMU with Renew As Is is \"Clean / For renewal\"; Process Flow: RMU goes to \"Not For Renewal\"; RMU is derived from the AO code in the RMU list (FRRN.041)."
+    ours: "FR-RN-025: RMU tags Not for Renewal with reason RMU, or transfers to the Corporate RMU unit; RMU comes from the LAMD report."
+    brd: "BRRN.029, BRD 2.004.4.1 (reason RMU)."
+    platform: Not for Renewal or transfer; RMU from the report
+    matches: Ours and BDOI's flow; not BDOI's Annex C
+    recommendation: Ask BDOI; take RMU from the AO code list if LAMD sends the full loan list (FRRN.012).
+  - topic: Assignment of accounts
+    kind: Rule
+    bdoi: "FRRN.010.01: \"automatic assignment ... based on teams and sub teams\", round robin, for Marketing and Processing."
+    ours: "FR-RN-030, 061: the TL assigns and re-assigns; CBG accounts are not assigned."
+    brd: "BRD 1.005, 3.005: the TL assigns accounts to the AO or Processing Officer."
+    platform: Manual assignment
+    matches: Ours (BRD and platform)
+    recommendation: Keep the TL assignment of the BRD and add automatic assignment as an option per segment (platform change), if BDOI confirms.
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "the renewal accounts of the market segments chosen are assigned automatically to an Account Officer of the team, fewest open accounts first and then in turn, and the accounts routed to Processing to a Processing Officer when a second setting is on; with no segment chosen (default, the BRD) the Team Leader assigns."
+  - topic: Transfer to another unit
+    kind: Rule
+    bdoi: "FRRN.011: \"the original renewal account shall remain under the ownership of the current Marketing Unit\"; the receiving unit creates a New Business account."
+    ours: "FR-RN-031, 032: the renewal moves to the receiving unit when it accepts."
+    brd: "BRD 1.006, 1.007, 2.005: transfer the account to another unit; the receiving unit accepts or declines."
+    platform: Ownership transfer
+    matches: Ours (BRD and platform)
+    recommendation: Keep the BRD transfer; add BDOI's referral as a second action (New Business opportunity) if BDOI wants both.
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "a transfer to another Marketing unit is a referral (the receiving unit opens a New Business account and the renewal keeps its owner, BDOI's text), a move of the account (the BRD), or both offered to the user (default)."
+  - topic: Extraction trigger
+    kind: Schedule
+    bdoi: "Mapping of BRRN.030: \"User will select date range to generate RMEL\"."
+    ours: "FR-RN-010, 011: a daily run extracts at 140 lead days (configurable); users also generate any range."
+    brd: "BRRN.030: \"automatically extract renewal candidates ... using configurable lead days (e.g., -140 days)\"."
+    platform: Daily run and on-demand range
+    matches: Ours (BRD and platform)
+    recommendation: Keep both triggers; BDOI confirms the lead days per segment.
+  - topic: When the renewal account is created
+    kind: Status
+    bdoi: "FRRN.004.04: generation creates a renewal account per listed account with \"For Disposition\" and \"In Process Renewal\"."
+    ours: "FR-RN-010, 015, 063: extraction creates a renewal record; nothing starts until initiation; the renewal account is created when processing starts."
+    brd: "BRRN.021: renewal processing starts \"only upon explicit user initiation\"."
+    platform: Renewal record first, account at processing
+    matches: Ours (BRD and platform)
+    recommendation: Keep ours; use BDOI's status names on the renewal record (In Process Renewal for an initiated renewal).
+  - topic: Insurer disposition values
+    kind: Rule
+    bdoi: "FRRN.013.02: nine values (Renew As Is / Approved, Rejected, Total Loss, Renew with surcharge, Renew under another package, three non-renewal causes, Apply minimum premium); Rejected goes to Review / For Disposition."
+    ours: "FR-RN-071: Renew As Is, Revise, Reject; Reject tags Not for Renewal (insurer declined) or returns to Marketing."
+    brd: "BRRN.035: insurer responses Approve / Renew As-Is, Reject and Revise."
+    platform: Three responses
+    matches: Ours (BRD wording); BDOI more detailed
+    recommendation: Adopt BDOI's nine values as a list mapped to the three BRD outcomes, with BDOI's bucket and disposition per value (platform change).
+  - topic: Lock of the account
+    kind: Status
+    bdoi: "FRRN.014.02: lock \"when already posted and placement has been completed\"; FRRN.022.01: RA generation disabled for locked accounts."
+    ours: "FR-RN-080: RA generation locks the account on the Marketing side; an RA cancellation unlocks it."
+    brd: "BRD 2.004.9: the account is locked once the RA is generated."
+    platform: Lock at RA generation
+    matches: Ours (BRD and platform)
+    recommendation: Keep the RA lock of the BRD and add BDOI's lock after placement (edits after placement are already refused by the account).
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "Marketing can no longer change the account once the Renewal Advice is generated (default, BDOI's text) or once it is posted and the placement is sent."
+  - topic: Hold cover duration and trigger
+    kind: Rule
+    bdoi: "FRRN.036: default 30 days Non-CBG, 90 days CBG; transferred 30 (CBG Home) or 60 (CBG Motor); automatic request after RA acceptance (Non-CBG) and at 75 days before expiry (CBG Clean); extensions."
+    ours: "FR-RN-086: the user requests 30 or 60 days (default 30) when the renewal will not complete in time."
+    brd: "BRRN.042: \"send request for Hold Cover to insurer/s and ... record the Hold Cover confirmation\"."
+    platform: User request, 30 or 60 days
+    matches: Both meet the BRD; BDOI more specific
+    recommendation: Adopt BDOI's durations as parameters now; automatic requests and extensions are a platform change for BDOI to prioritise.
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "hold cover durations of 30 days (Non-CBG), 90 days (CBG), 60 days (CBG Motor after an insurer's rejection) and 30 days (CBG Home), extensions of 15 or 30 days from 7 days before the end, automatic requests for Non-CBG accounts after the client's confirmation and for Clean CBG accounts 75 days before expiry, and the monthly CBG Home extension on the 15th; each value is a setting."
+  - topic: Renewal Advice notices
+    kind: Schedule
+    bdoi: "Annex M: first notice 75 days and last notice 45 days before expiry, automatic; FRRN.022.01: the system determines First or Second Notice; templates print \"FINAL NOTICE\"."
+    ours: "FR-RN-080: the user chooses First or Second Notice; second notice after 15 days without acceptance; warning below 30 days."
+    brd: "BRRN.010: \"Identify if RA is for first or second notice\"."
+    platform: User choice; second-notice days parameter
+    matches: Both meet the BRD
+    recommendation: Adopt BDOI's 75 / 45 days and the automatic determination; name the notices First and Final as in the approved templates.
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "the Renewal Advice notice follows the expiry, First Notice from 75 days and Last Notice from 45 days before expiry (default, BDOI's text), or is chosen by the user."
+  - topic: NRNS reminder
+    kind: Schedule
+    bdoi: "Annex M: NRNS Reminder for CBG Motor with an active loan and no policy in BDOI, 75 days before expiry."
+    ours: "FR-RN-083: accounts not yet submitted at the checkpoint, 90 days before expiry by default, all segments."
+    brd: "BRRN.025: \"at the defined follow-up checkpoint (e.g., +90 days)\"; BRRN.037."
+    platform: 90-day parameter
+    matches: Both (example value)
+    recommendation: Adopt BDOI's definition and 75 days (parameter value).
+  - topic: NAL and Non-Renewal Letter
+    kind: Rule and schedule
+    bdoi: "Annex M: NAL 1 day after expiry when an RA was issued and not answered; NRL 1 day (CBG Motor) or 3 days (Non-CBG) after expiry, the Non-CBG NRL after an NAL was sent."
+    ours: "FR-RN-082: at the effective expiry date (hold cover end), NAL when an RA was sent, NRL when none; the two exclude each other."
+    brd: "Walkthrough R37-HC-05 to 10: no letter before the effective expiry date; NAL and NRL are mutually exclusive."
+    platform: Mutually exclusive, effective expiry date
+    matches: Ours (BRD)
+    recommendation: Keep the mutual exclusion and the effective expiry date of the BRD; adopt BDOI's day offsets (1 and 3 days) as parameters.
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "the No Advice Letter 1 day and the Non-Renewal Letter 1 day (CBG Motor) or 3 days (Non-CBG) after the effective expiry date, each a setting; the two letters exclude each other."
+  - topic: Password of protected files
+    kind: Rule
+    bdoi: "FRRN.024.01: individuals - first three letters of first and last name in capitals; corporate - one lower case, one upper case, one special character and five digits; approved e-mail templates BDOI-009 to 011 explain it to clients."
+    ours: "FR-RN-081: password convention per Q07; until then a generated password per e-mail."
+    brd: "BRRN.010: send RA \"with encryption and password protection\"."
+    platform: Random 12-character password in a separate e-mail
+    matches: Both meet the BRD; BDOI's is the approved convention
+    recommendation: Adopt BDOI's convention (answers Q07); platform change of the password rule.
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "protected files use BDOI's password convention (default: the first three letters of the first and last names in capitals for an individual client, eight random characters for a corporate client) or a random password per file."
+  - topic: Delivery channel to clients and insurers
+    kind: Integration
+    bdoi: "CCM for proposals, RA, letters, Insurance Advice, e-policies and placement files; MFT for placement, hold cover and e-policy files."
+    ours: "Outgoing e-mail, protected, with a send log; no file-transfer channel with insurers (on hold)."
+    brd: "The BRD asks for sending; it does not name CCM or MFT."
+    platform: Outgoing e-mail; CCM listed as an option in the integration inventory (IQ11)
+    matches: Neither stated in the BRD
+    recommendation: BDO ITG decides whether CCM and MFT are in scope for go-live; BIBS keeps e-mail as the fallback channel.
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "client documents are sent through CCM (default) or by protected e-mail with the password in a separate e-mail; insurers receive their files through MFT when enrolled, otherwise by e-mail."
+  - topic: Incentive timing
+    kind: Rule
+    bdoi: "FRRN.034.01: \"Upon booking, the system shall evaluate whether the renewal account is eligible\"."
+    ours: "FR-RN-087: after booking, confirmed acceptance and full payment."
+    brd: "BRRN.041: \"after successful placement, booking, and full payment confirmation\"."
+    platform: After booking and full payment
+    matches: Ours (BRD and platform)
+    recommendation: Keep ours; align BDOI's wording with BRRN.041.
+  - topic: Session timeout
+    kind: Rule
+    bdoi: "FRRN.001.04: notify \"30 minutes after inactivity that the session automatically ended\"."
+    ours: "FR-RN-001: warning 30 minutes before the system-triggered log-out."
+    brd: "BRD x.001: warning after 15 minutes of inactivity and 30 minutes before the system-triggered log-out."
+    platform: Idle warning and log-out timings by parameter
+    matches: Ours (BRD wording)
+    recommendation: Ask BDOI which timing it means; both are parameter values.
+  - topic: Booking on the insurer's approval
+    kind: Status
+    bdoi: "FRRN.030.01.01: on \"Approved\" the system shall \"Update the status to 'Booked'\" and lock the account."
+    ours: "FR-RN-084: placement and booking stay user actions."
+    brd: "Walkthrough addendum p.4: client confirmation, placement and booking stay under manual control."
+    platform: Booking is a user action (automatic booking rules exist in New Business)
+    matches: Ours (BRD)
+    recommendation: Keep the booking a user action as the Walkthrough addendum says, unless BDOI changes it.
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "the insurer's approval of the placement leaves the account For Booking for the Processing Officer (default, the BRD) or books and locks it (BDOI's text)."
+  - topic: Endorsements at sanitation
+    kind: Rule
+    bdoi: "FRRN.007.02: \"Records with endorsements shall be routed to the Review bucket\"."
+    ours: "FR-RN-027: posted endorsements are taken into the renewal; an endorsement in progress blocks post, RA and acceptance."
+    brd: "BRRN.032: endorsements must be reflected on the mother policy before renewal approval."
+    platform: Pending endorsement blocks
+    matches: Both meet the BRD
+    recommendation: Keep ours and add BDOI's Review routing for endorsements of the term if Marketing wants to see them.
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "every endorsement of the expiring term routes the account to Review (default, BDOI's text) or only an endorsement in progress."
+  - topic: Dispositions and non-renewal reasons
+    kind: Naming
+    bdoi: "FRRN.014.02: four dispositions and 21 non-renewal reasons; FRRN.019.01: \"Lost Business\" is a reason."
+    ours: "FR-RN-043: five dispositions (with Lost Business) and ten reasons."
+    brd: "BRD 2.004.3 (dispositions) and 2.004.4.1-10 (ten reasons)."
+    platform: Five dispositions; eleven reasons (list values)
+    matches: Ours (BRD); BDOI's reasons extend the list
+    recommendation: Keep the five dispositions of the BRD and add BDOI's eleven extra reasons as list values.
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "the dispositions offered to Marketing are For Renewal, Not for Renewal, For Quotation, For Proposal and Lost Business (default, the BRD) or the first four with Lost Business as a reason of Not for Renewal (BDOI's text); BDOI's non-renewal reasons are in the list of values."
+  - topic: Second approval after acceptance
+    kind: Approval
+    bdoi: "FRRN.025, 026: accepted accounts go to \"Submitted for Approval\" and are approved again before placement."
+    ours: "FR-RN-084: the accepted account moves to placement and booking without resubmission."
+    brd: "BRRN.040: proceed to placement and booking \"without delay, duplicate handling, or manual re initiation\"."
+    platform: No second approval
+    matches: Ours (BRD)
+    recommendation: Ask BDOI; a second approval is a platform change and slows BRRN.040.
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "an accepted account goes to the payment check and placement at once (default, the BRD) or is Submitted for Approval and goes to placement once an approver approves it (BDOI's text)."
+  - topic: Clean accounts and posting
+    kind: Status
+    bdoi: "FRRN.008.01: Clean accounts get \"For Renewal\" and status \"For RA Generation\" (CBG) or \"Posted\" (Non-CBG)."
+    ours: "FR-RN-023: the decision matrix gives a system disposition to Clean accounts whose rule is automatic; others are proposed to the AO; the TL posts."
+    brd: "BRRN.031, 034: rule-based disposition and a matrix of automated versus manual scenarios."
+    platform: Matrix proposal or automatic disposition
+    matches: Both meet the BRD
+    recommendation: Keep the matrix and load BDOI's rule (Clean is automatic For Renewal) as its first content.
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "Clean accounts are disposed For Renewal automatically (default, BDOI's rule) or wait for the disposition of Marketing."
+  - topic: Status names
+    kind: Naming
+    bdoi: "In Process Renewal, Submitted for Posting, Posted, Submitted for Approval, Submitted for Placement, For Booking, Booked, Returned - Renewal, Rejected Placement, For Billing Generation, For E-Policy Sending."
+    ours: "Extracted, Evaluating, Unassigned Disposition, For Disposition, Review in Progress, For Processing, With Insurer, RA Ready, RA Sent, Accepted, For Placement and Booking, Renewed, Closed."
+    brd: "The main BRD uses Review in progress, Returned and the RA statuses."
+    platform: The BIBS stages
+    matches: Ours (main BRD terms)
+    recommendation: Map the two lists one to one in the status model annex and use BDOI's names where the BRD is silent.
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "the statuses read with BDOI's names (default: In Process Renewal, Submitted for Posting, Posted and the others) or with the workflow stage names."
+  - topic: Name of the expiring list and letters
+    kind: Naming
+    bdoi: "RMEL (Renewal Master Expiry List); NRL (Non-Renewal Letter)."
+    ours: "Expiry List; Not for Renewal Letter (NFR)."
+    brd: "RMEL in the BRD title; NFR in BRRN.009, NRL in the Walkthrough addendum."
+    platform: Expiry List; NAL / NFR
+    matches: Both used in the BRD
+    recommendation: Use BDOI's names RMEL and NRL in the merged FRS and on the screens.
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "generated files are named with BDOI's convention <Product>_<Letter>_<Reference>_MMDDYYYY.pdf (default) or with the letter number."
+  - topic: Reason of a non-renewable risk code
+    kind: Naming
+    bdoi: "FRRN.007.02: \"Non-Renewable Account\"; FRRN.038.03: \"Non-Renewable Risk Code\"."
+    ours: "FR-RN-024: \"Non-renewable Accounts\"."
+    brd: "BRD 2.004.4.9: Non-renewable Accounts."
+    platform: Non-renewable Accounts
+    matches: Ours (BRD)
+    recommendation: Keep the BRD label and correct BDOI's two variants.
+    status: "Configurable - BDOI to confirm the setting"
+    setting: "the reason recorded for a non-renewable risk code is Non-renewable Accounts (default, the BRD) or Non-Renewable Risk Code (BDOI's text)."
+  - topic: Automatic placement status for paid CBG renewals
+    kind: Status
+    bdoi: "FRRN.028.02: a paid CBG renewal automatically becomes \"Submitted for Placement\"; FRRN.026.01 for CBG Motor."
+    ours: "FR-RN-084: the accepted renewal moves to placement and booking when the payment rules are met; automatic placement is off for renewals."
+    brd: "BRRN.040 (automatic progression) and the Walkthrough addendum p.4 (manual placement)."
+    platform: Fast track to placement; placement by the user
+    matches: Both
+    recommendation: Adopt BDOI's automatic status change; the placement itself stays a user action.
+
+# Sheet 9: annex comparison (annex, item, BDOI, ours or the platform, difference)
+annexes:
+  - [A, Renewal fields, "224 fields in 8 sections (General Info, Contact, Package Details, Risk Information Details, Coverages, Premiums, Others, MYP) with line and data type; the \"Required?\" column holds I / B / A applicability", "Listing columns (section 6.2, 24 columns), screen fields (chapter 13) and the New Business account fields", "BDOI has one catalogue; ours spreads fields by screen. BDOI does not mark mandatory fields; several fields are legacy references out of scope (BRD p.60)."]
+  - [B, Duplicate criteria, "Per line (15) and segment (Non-CBG Corporate, Non-CBG Retail, CBG Fire, CBG Motor): e.g. Motor - plate, serial, motor number and policy period", "One open renewal per expiring policy; New Business duplicate fall-out on accounts", "Criteria per line are not in ours."]
+  - [C, Non-CBG sanitation rules, "8 rows: TSI > PHP 250M For Quotation / Clean; USD TSI rows 2 and 3 identical with For Quotation and For Proposal; outstanding balance Review; multi-insurer For Proposal; mortgaged Review; Bonds / GPA / Motor Fleet For Proposal; 11 risk families For Quotation", "Checks of the TSI threshold (Review), the outstanding premium (Review) and the renewable risk code; mortgaged and multi-insurer are decision-matrix conditions only", "Disposition by risk family, the mortgaged and multi-insurer rules are not in ours; rows 2 and 3 contradict each other."]
+  - [C, CBG Motor sanitation matrix, "26 rows by branch (HO, Provincial), policy type (Regular, Auto Promo / FFYMI), loan status, employee, MYP, premium package, BI/PD, insurer disposition, double booking", "LAMD routing (paid-off, RMU) and the PN check; Clean candidates follow STP", "BDOI renews Loan Fully Paid and RMU accounts that are Renew As Is; ours tags them Not for Renewal (sheet 8)."]
+  - [C, Criteria definitions, "Loan status from the LAMD lists and the RMU AO codes; premium package against the BDOI premium table; policy period days for 1 to 5 years and pro-rata; 30 branch codes in HO and Provincial groups; employee product types 502, 505, 506; FFYMI risk codes MTR70-73", "Not in ours", "Reference data to load as lists or masters."]
+  - [C, CTPL, "CTP01 with a one-year policy: Clean / For Renewal; otherwise Review / For Disposition", "Not in ours", "Rule to add."]
+  - [C, CBG Home, "Heading only", "Not in ours", "BDOI to supply."]
+  - [D, CBG Motor automatic field update, "Regular, Auto Promo and CTPL: insurer = previous, inception = expiry, expiry by term, OD/Theft depreciated 10% a year (MYP factors), BI / PD stepped down by tier, premiums, DST 12.5% rounded up to PHP 0.50, VAT 12%, LGT pro rata", "Renewal account rated on the expiring package (purpose RENEWAL); DST half-peso rounding exists in the rating", "Depreciation and BI / PD tier rules are not in ours; Annex D gives the 3, 4 and 5-year expiry as +365 days while the 2-year is +730."]
+  - [E, Auto Promo to Regular, "MTR70 to MTR22, MTR71 to MTR23, MTR72 to MTR25, MTR73 unchanged; rates 2.4230% to 2.3760%, 1.9450% to 1.6060%, 2.0400% to 1.9630%, 3.0000% unchanged; Auto PA 100,000", "Not in ours", "Conversion rule to add (platform change)."]
+  - [F, Assignment logic, "Team, AO, Team Leader, Team Head, Section Head, Unit Head per segment: Corporate (7 groups, embedded PDF), Retail (40 rows), CBG Motor (17 rows, 2 vacant AOs), CBG Home (8 rows)", "Sales organisation of BRD-11; manual assignment by the TL", "Data for the sales organisation; the round robin rule is not in ours."]
+  - [G, LAMD layouts, "CBG Loans excluding Personal: 26 fields (PN, branch, product, book and maturity dates, amounts, AO code, IBG / CBG tag, contacts, risk tagging, serial and motor numbers, collateral); Paid Off: 16 fields", "LAMD report with PN and loan status (paid-off, RMU) by upload", "BDOI's layouts are richer and carry contact data; ours needs the loan status in the file."]
+  - [H, Insurer disposition upload (CBG), "17 fields: item, assured, expiring reference and policy, dates, location of risk, unit description, serial, motor, plate, colour, TSI, rate, insurer, branch, insurer's approval", "Renewal reference, expiring policy number, response, insurer reference, revised premium, sum insured, rate or terms", "BDOI's key is the expiring reference or policy; ours the renewal reference (BRRN.022)."]
+  - [I, Quick Proposal template, "Heading only", "New Business proposal slip", "BDOI to supply."]
+  - [J, Full Proposal template, "Heading only", "New Business proposal slip", "BDOI to supply."]
+  - [K, Non-package quotation request, "14 line worksheets (Motor 29 fields to Marine Hull 37) with drop-down and free-text rules", "New Business proposal request (PRF) pre-filled from the renewal", "Field set to align with the proposal request of New Business."]
+  - [L, Renewal Advice templates, "Approved BDOI-005 to 008 (Motor, PAR CLG, PAR Non-CLG, Other Lines) with bills payment slip (BDOIR, institution code 0017), Final Notice marker, conforme and renewal instruction, data privacy consent; e-mails BDOI-009 to 011", "Two RA templates (first and second notice) with policy, terms, premium and how to accept; wording to confirm (RQ26)", "Use BDOI's approved wording; one template per line instead of per notice."]
+  - [M, Letter eligibility matrix, "8 letters: RA first (75 days) and last (45 days), FFY reminder (75), NRNS reminder (75), NAL (+1 day), SFU (+1), NRL CBG Motor (+1), NRL Non-CBG (+3, after NAL)", "RA by user choice; NRNS at 90 days; NAL / NRL at the effective expiry date, mutually exclusive; SFU and FFY for submitted policies only", "Schedules and the NAL-then-NRL rule differ (sheet 8)."]
+  - [N, NRNS Reminder Letter template, "Heading only", "NRNS reminder letter in the letter templates", "BDOI to supply."]
+  - [O, No Advice Letter template, "Heading only", "Closing letter template (DO-02)", "BDOI to supply."]
+  - [P, Non-Renewal Letter template, "Heading only", "Closing letter template (DO-02)", "BDOI to supply."]
+  - [Q, SFU Letter template, "Heading only", "SFU letter for submitted policies (FR-RN-090)", "BDOI to supply."]
+  - [R, FFY Reminder Letter template, "Heading only", "FFY RA template for submitted policies (FR-RN-090)", "BDOI to supply."]
+  - [S, Billing file e-mail and attachment, "13 fields (PN, account no., assured, loan dates, policy dates, loan type, total premium, branch, BDO Insure branch, enrolled account) and the e-mail to BDO CBG Loan Services (BFP-001-2026-0)", "CLPC billing file of New Business: PN, loan application number, booking date, borrower, originating unit, premium, ARN, BDOI location, amortised Y/N; sent outside BIBS", "Field sets differ; no e-mail template in BIBS."]
+  - [T, Placement Slip template, "Heading only", "New Business placement slip template", "BDOI to supply."]
+  - [U, Placement file fields, "42 fields, package risk description syntax for 10 packages, non-package syntax for 14 lines with single and multiple risk examples", "Insurer extract of 28 BRD columns (before the RA) and the New Business placement slip", "BDOI's file is for placement after acceptance; ours is the pre-renewal extract."]
+  - [V, Return reasons, "39 reasons with description and line", "Five return reasons (Disapproved, Incomplete details, Disposition to be reviewed, For correction, Others)", "Load BDOI's 39 reasons as list values."]
+  - [W, Insurance Advice templates, "Approved IA-001 to IA-004 (Motor, Fire, Other Lines, Marine Cargo Trade)", "Insurance Advice for mortgaged accounts from the platform template", "Use BDOI's approved wording per line."]
+  - [X, E-policy e-mail templates, "Approved BDOI-012 to 014 (Individual with the password rule, Corporate, Corporate password)", "Encrypted e-policy e-mail with the password sent separately", "Use BDOI's wording and password rule."]
+  - [Y, Service invoice, "Layout image: invoice number, insurer, assured, VATable sales, VAT 12%, withholding tax, net amount due", "Service invoice of the New Business booking", "Compare the layout with the New Business service invoice."]
+  - [Z, Hold Cover template, "Heading only", "Hold cover request template of New Business", "BDOI to supply."]
+  - [Process Flow, Flowchart, "One flow from Generate RMEL to Book account", "Process figure by actor, Marketing and Processing workflows, status model", "BDOI's flow differs from its Annex C (paid-off and RMU)."]
+
+# Sheet 10: incorporation plan (step, BDOI section, what to insert from ours, form in BDOI's style, effort in days, who)
+plan:
+  - [1, "All", "Decision workshop on the conflicts of sheet 8 and the empty annexes", "Decision log appended to the Revision Log", "2", "BDOI Marketing, Processing, ITG; iorta TechNXT"]
+  - [2, "Business Requirements Mapping", "Keep the 42 BRRN rows; add the column \"Related BIBS FR\"; correct the two mistyped references; add the line-ID trace as Annex AJ", "One table plus an annex", "1", "iorta TechNXT; BDO ITG review"]
+  - [3, "Functional Requirements FRRN.001-044", "For each FRRN entry: insert the BIBS rules, validations with message texts and the decided values as numbered items; add the acceptance criteria as FRRN.nnn.mm.ACn; add \"Related BIBS FR: FR-RN-nnn\"", "\"The system shall ...\" items under the existing numbers; renumber the repeated items (two 004.06, two 038.03, 012.03 / 012.04 under 013)", "11", "iorta TechNXT; BDOI SA review"]
+  - [4, "Functional Requirements (new entries)", "Add FRRN.045 onwards for the BIBS-only requirements: go-live take-over, package remap, re-open Not for Renewal, Contact Center follow-up, submitted policies, list and template maintenance", "New FRRN rows in the same table", "3", "iorta TechNXT"]
+  - [5, "Process Flow", "Redraw after the paid-off / RMU decision; add the status model as Annex AE", "Flowchart plus an annex", "1", "iorta TechNXT"]
+  - [6, "Annexes A to Z", "Keep BDOI's annexes; add the field sources of the BIBS documents to L, W and X; BDOI supplies I, J, N to R, T, Z and the CBG Home rules", "Annex content as BDOI's", "2 (iorta) + BDOI", "BDOI business owners"]
+  - [7, "Annex AA Screen specifications", "20 screen specifications with screenshots and fields", "Annex after Z", "3", "iorta TechNXT"]
+  - [8, "Annexes AB Messages and AC Notifications", "Messages catalogue and 19 notifications", "Annexes after Z", "2", "iorta TechNXT"]
+  - [9, "Annex AD Walkthroughs and storyboard", "Five walkthroughs and the storyboard index", "Annex after Z", "1", "iorta TechNXT"]
+  - [10, "Annexes AE to AL", "Status model, roles and access, configuration items, interfaces and cross-BRD contract, traceability to the main BRD, upload layouts, non-functional requirements", "Annexes after Z", "3", "iorta TechNXT"]
+  - [11, "Annex AM Report specifications", "Columns, filters and counters of the status report, listing and operational reports; specifications of BDOI's other 24 reports", "Annex after Z", "3", "iorta TechNXT; BDOI report owners"]
+  - [12, "Signoff Sheet", "Add the business approvers of the Renewal BRD (Who signs what) next to the ITG roles", "Signoff Sheet", "0.5", "iorta TechNXT; BDOI PMO"]
+  - [13, "All", "Quality check of the merged FRS: one rule per point, numbering, cross-references, restricted and technical terms", "Review record", "2", "iorta TechNXT"]
+  - [14, "All", "BDO ITG review of the merged FRS (template, numbering, annexes after Z, CCM and MFT scope) and business sign-off", "Review comments and sign-off", "5 (elapsed)", "BDO ITG; BDOI business units"]
+
+id_scheme:
+  recommended: >-
+    BDOI's FRRN IDs stay primary (FRRN.nnn and FRRN.nnn.mm); each item carries "Related BIBS FR: FR-RN-nnn", and the
+    acceptance criteria take FRRN.nnn.mm.ACn. The BIBS test cases keep their FR-RN numbers and add the FRRN item, so
+    UAT traces to the signed numbers.
+  alternative: >-
+    FR-RN IDs primary with FRRN as cross-reference: less renumbering for the project team but a new numbering for
+    BDO ITG, against its ownership of the FRS.
+itg_review:
+  - The template deviations (annexes after Z, the acceptance criteria items, the Related BIBS FR column)
+  - The renumbered repeated items and the new FRRN entries 045 onwards
+  - The scope of CCM and MFT for go-live and the e-mail fallback
+  - The completed annexes I, J, N to R, T, Z and the CBG Home rules
+  - The decision log of the conflicts and their values (parameters)
+  - The sign-off roles (ITG and business approvers)
+
+# Summary sheet: the five headline pros and cons of each document
+headline:
+  bdoi_pros:
+    - In BDO ITG's own template, owned and routed for approval by BDO ITG
+    - "Concise: about 27,700 words, one table of 44 FRRN entries"
+    - Named field lists and layouts (224 renewal fields, LAMD, insurer, billing and placement files, 14 quotation request sheets)
+    - "Business rules from the business: CBG Motor matrix and field updates, letter matrix with schedules, hold cover durations, password convention"
+    - Approved templates (Renewal Advice, Insurance Advice, e-policy e-mails) and the whole chain to booking in one document
+  bdoi_cons:
+    - Maps the 42 BRRN IDs only; the 1,033 line IDs of the main BRD are untraced
+    - No acceptance criteria, screen specifications or non-functional requirements
+    - Nine annexes are a heading only and the 24 reports have no specification
+    - "Contradictions (paid-off and RMU loans in the flow against Annex C) and repeated or skipped item numbers"
+    - "Departs from the BRD in places (automatic assignment, referral transfer, extraction by date range only, incentive upon booking, no re-open) and predates the BRD pack of 8-Oct-2026"
+  ours_pros:
+    - Every BRD ID traced (42 BRRN and 1,033 line IDs) with pages, screens and test cases
+    - 160 numbered acceptance criteria, the basis of 406 test cases
+    - 20 screen specifications with screenshots, five walkthroughs, messages and notifications catalogues
+    - Rules marked configurable or fixed, with maker-checker and versioned rule sets
+    - Re-based on the BRD pack of 8-Oct-2026 and describing what the BIBS screens do
+  ours_cons:
+    - "Long: about 69,000 words and 78 figures"
+    - Not in BDO ITG's template and not owned by BDO ITG
+    - Placement, billing, e-policy and booking are left to the New Business FRS
+    - No CBG Motor field updates, automatic assignment, budget or RMU maintenance, production dashboard
+    - 40 points still await BDOI although BDOI's FRS answers several; the letter wording is a draft
+
+# Sheet 4: notes per BRRN ID
+brrn_notes:
+  BRRN.001: "NAL 1 day after expiry for unanswered RAs (BDOI, Annex M) against the NAL / NRL routing at the effective expiry date (ours)."
+  BRRN.004: Both show one scrollable view without pagination.
+  BRRN.005: BDOI cites the generation (FRRN.004); ours adds the daily run and the no-omission rule.
+  BRRN.007: BDOI cites FRRN.004.06, a number BDOI uses twice (endorsements and export).
+  BRRN.008: BDOI cites FRRN.004.06, a number BDOI uses twice (endorsements and export).
+  BRRN.009: "Risk code maintenance with a Renewable indicator (BDOI) against a list of non-renewable codes (ours); reason wording differs."
+  BRRN.010: "Notice timing (75 / 45 days against the user's choice) and channel (CCM against e-mail) differ."
+  BRRN.011: BDOI cites FRRN.010 (assignment) for the AO's own list.
+  BRRN.018: A general update upload (BDOI) against the dispositioned-file upload of Processing (ours).
+  BRRN.019: BDOI lists 24 reports without layouts; ours specifies the status report, the listing and six other reports.
+  BRRN.020: BDOI's mapping reads "RRN.040", mistyped for FRRN.040.
+  BRRN.021: BDOI creates renewal accounts at generation; ours separates extraction and initiation.
+  BRRN.023: Third bucket Non-Renewable (BDOI) against Exception (ours, BRD).
+  BRRN.024: BDOI also refers to the User Access Matrix.
+  BRRN.025: NRNS checkpoint 75 days (BDOI) against 90 days (ours).
+  BRRN.026: BDOI refers to the User Access Matrix only; ours specifies the follow-ups (FR-RN-085).
+  BRRN.028: Both non-blocking; BDOI adds KYC statuses and a dashboard.
+  BRRN.029: Paid-off and RMU routing conflict (sheet 8).
+  BRRN.030: "User date range only (BDOI) against the daily run at the lead days and on demand (ours)."
+  BRRN.031: BDOI's mapping reads "FRRN.08".
+  BRRN.032: A Refresh action (BDOI) against the block of pending endorsements (ours).
+  BRRN.033: The meaning of For Quotation and For Proposal is swapped between the two FRS.
+  BRRN.034: BDOI maps the sanitation rule configuration; ours a versioned decision matrix.
+  BRRN.035: Nine insurer values (BDOI) against three (ours, BRD).
+  BRRN.036: BDOI cites the bucket list only; ours a listing with attention flags.
+  BRRN.039: BDOI's CBG Motor matrix (Annex C) differs from ours on paid-off and RMU loans.
+  BRRN.040: BDOI adds a second approval after acceptance and automatic placement status.
+  BRRN.041: BDOI evaluates upon booking; BRRN.041 and ours after full payment.
+  BRRN.042: Durations and automation of the hold cover differ.
+
+# Sheet 4: BDOI coverage of the main BRD line IDs, by ID prefix (the longest prefix wins)
+brd_functions:
+  "1.001": [FRRN.001, Covered (not traced), ""]
+  "2.001": [FRRN.001, Covered (not traced), ""]
+  "3.001": [FRRN.001, Covered (not traced), ""]
+  "4.001": [FRRN.001, Covered (not traced), ""]
+  "5.001": [FRRN.001, Covered (not traced), ""]
+  "6.001": [FRRN.001, Covered (not traced), ""]
+  "1.002": [FRRN.001.01, Covered (not traced), ""]
+  "2.002": [FRRN.001.01, Covered (not traced), ""]
+  "3.002": [FRRN.001.01, Covered (not traced), ""]
+  "4.002": [FRRN.001.01, Covered (not traced), ""]
+  "5.002": [FRRN.001.01, Covered (not traced), ""]
+  "1.003": [FRRN.004, Covered (not traced), ""]
+  "1.003.3": [FRRN.004.03, Covered (not traced), ""]
+  "1.003.4.1": [FRRN.002.05, Partly covered (not traced), BDOI's bucket list has 17 columns against the 24 of the BRD.]
+  "1.003.4.1.2": [FRRN.004.04, Covered (not traced), ""]
+  "1.003.4.1.3": [FRRN.002.06, Covered (not traced), ""]
+  "1.003.4.1.4": [FRRN.002.06, Covered (not traced), ""]
+  "1.003.5": [FRRN.004.06, Covered (not traced), ""]
+  "1.003.6": [FRRN.004.06, Covered (not traced), ""]
+  "1.003.7": [FRRN.004.06, Covered (not traced), ""]
+  "1.003.7.3": ["FRRN.007, FRRN.038", Covered (not traced), ""]
+  "1.004": [FRRN.014.01, Covered (not traced), ""]
+  "1.005": [FRRN.010, Partly covered (not traced), BDOI assigns automatically; manual re-assignment only.]
+  "1.006": [FRRN.011, Partly covered (not traced), A referral that keeps the account in its unit.]
+  "1.007": [FRRN.011, Partly covered (not traced), A referral that keeps the account in its unit.]
+  "2.005": [FRRN.011, Partly covered (not traced), A referral that keeps the account in its unit.]
+  "1.008": ["FRRN.016, FRRN.020", Covered (not traced), ""]
+  "1.009": [FRRN.044, Partly covered (not traced), "Renewal Status Report named without columns, filters or counters."]
+  "2.008": [FRRN.044, Partly covered (not traced), "Renewal Status Report named without columns, filters or counters."]
+  "3.010": [FRRN.044, Partly covered (not traced), "Renewal Status Report named without columns, filters or counters."]
+  "4.008": [FRRN.044, Partly covered (not traced), "Renewal Status Report named without columns, filters or counters."]
+  "1.009.7": ["FRRN.002.02, FRRN.003", Covered (not traced), ""]
+  "3.010.7": ["FRRN.002.02, FRRN.003", Covered (not traced), ""]
+  "1.010": ["FRRN.022, FRRN.024", Covered (not traced), ""]
+  "2.009": ["FRRN.022, FRRN.024", Covered (not traced), ""]
+  "3.011": ["FRRN.022, FRRN.024", Covered (not traced), ""]
+  "4.09": ["FRRN.022, FRRN.024", Covered (not traced), ""]
+  "1.011": [FRRN.014.04, Partly covered (not traced), "An override approval for For Booking Only accounts that are not fully paid only."]
+  "2.003": ["FRRN.002.05, FRRN.014", Covered (not traced), ""]
+  "2.004": [FRRN.014.02, Covered (not traced), ""]
+  "2.004.6": [Annex A, Partly covered (not traced), A Marketing Remarks field only.]
+  "2.004.7": [Annex A, Partly covered (not traced), A Marketing Remarks field only.]
+  "2.004.8": [Annex A, Partly covered (not traced), A Marketing Remarks field only.]
+  "2.004.9": [FRRN.014.02, Partly covered (not traced), "BDOI locks after posting and placement, not at the RA."]
+  "2.004.10": ["-", Not covered, No re-open of an account tagged Not for Renewal.]
+  "2.006": [FRRN.002.05, Partly covered (not traced), No Endorsed or Claims flag and no lock mark.]
+  "2.006.1.5": [Annex A, Partly covered (not traced), A Marketing Remarks field only.]
+  "2.006.1.6": [Annex A, Partly covered (not traced), A Marketing Remarks field only.]
+  "2.007": ["FRRN.020.02, FRRN.026.01", Covered (not traced), ""]
+  "3.003": [FRRN.004, Covered (not traced), ""]
+  "3.003.3": [FRRN.004.03, Covered (not traced), ""]
+  "3.003.4": [FRRN.002.05, Partly covered (not traced), BDOI's bucket list has 17 columns against the 21 of the BRD.]
+  "3.003.4.2": [FRRN.004.04, Covered (not traced), ""]
+  "3.003.4.3": [FRRN.002.06, Covered (not traced), ""]
+  "3.003.4.4": [FRRN.002.06, Covered (not traced), ""]
+  "3.003.5": [FRRN.004.06, Covered (not traced), ""]
+  "3.003.6": [FRRN.004.06, Covered (not traced), ""]
+  "3.003.7": [FRRN.004.06, Covered (not traced), ""]
+  "3.004": [FRRN.015, Covered (not traced), ""]
+  "4.004": [FRRN.015, Covered (not traced), ""]
+  "3.004.4": ["-", Not covered, No Not for Renewal tag of the accounts missing from a complete file.]
+  "3.004.5": ["-", Not covered, No re-open of an account tagged Not for Renewal.]
+  "3.005": [FRRN.010, Covered (not traced), ""]
+  "3.006": ["FRRN.003, FRRN.014.01", Covered (not traced), ""]
+  "4.003": ["FRRN.003, FRRN.014.01", Covered (not traced), ""]
+  "3.006.1.5": [FRRN.002.06, Covered (not traced), ""]
+  "4.003.1.5": [FRRN.002.06, Covered (not traced), ""]
+  "3.007": [FRRN.014.02, Covered (not traced), ""]
+  "4.005": [FRRN.014.02, Covered (not traced), ""]
+  "3.008.1": [FRRN.009, Partly covered (not traced), Automatic computation for CBG Motor only; no review of the computations.]
+  "4.006.1": [FRRN.009, Partly covered (not traced), Automatic computation for CBG Motor only; no review of the computations.]
+  "3.008.2": ["FRRN.031, FRRN.020.02", Covered (not traced), ""]
+  "4.006.2": ["FRRN.031, FRRN.020.02", Covered (not traced), ""]
+  "3.009": [FRRN.021, Partly covered (not traced), User-selected fields instead of the 28 columns of the BRD.]
+  "4.007": [FRRN.021, Partly covered (not traced), User-selected fields instead of the 28 columns of the BRD.]
+  "3.009.6": [FRRN.013, Covered (not traced), ""]
+  "4.007.6": [FRRN.013, Covered (not traced), ""]
+  "5.003": ["-", Not covered, "No list-of-values maintenance (only risk codes, RMU codes, budgets and sanitation rules)."]
+  "5.004": ["-", Not covered, Left to the User Access Maintenance FRS.]
+  "5.005": [FRRN.022.01, Partly covered (not traced), Uses the latest approved template; no maintenance of the template.]
+  "6.002": ["-", Not covered, Refers to the User Access Matrix.]

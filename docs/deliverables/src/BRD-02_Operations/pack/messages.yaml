@@ -1,0 +1,345 @@
+# Messages catalogue of BRD-2 Operations: sources, places and the fix the user makes.
+# The message texts are read from the platform at every build (never typed here). This file says where each message
+# appears (by the class or file that raises it) and what the user does. The batch screens of the legacy balances
+# (Unapplied to Income, Legacy PR 2307 Reversal, DP PR Legacy Reversal) are specified in the BRD-13 set and left out.
+sources:
+  backend_packages: [opsledger, cashiering, remittance, adjustment, prodrecon, commission]
+  exclude_classes: [LegacyBatch, LegacyBatchService, LegacyBatchPoster, LegacyInvoiceIntake, IncomeDispositions,
+                    DpprBatch, DpprBatchService, DpprBatchPoster, DpprOpenPremium, BookRates,
+                    PickupService, PickupRequest, PickupFlowInHandler]
+  exclude_codes: [NOT_FOUND, MIG_UPP_NOT_MIGRATED, MIG_UPP_WORKED]
+  exclude_texts: ["^<message>$", "^<errors>$"]
+  bulk_handlers: [CwtTagHandler, PdcFileHandler, CommissionPaymentHandler, AdjustmentBatchHandler, MinimalBalanceFileHandler]
+  bulk_screen: "Upload screens (Payment Uploads, BIR 2307, Commission ORs, Batch Request Upload, Minimal Balance File)"
+  frontend_dirs: [features/operations, features/remittance, features/adjustment, features/prodrecon,
+                  features/cashiering/BatchPrintPage.tsx, features/cashiering/CashFields.tsx,
+                  features/cashiering/CashieringHomePage.tsx, features/cashiering/CashieringRequestsPage.tsx,
+                  features/cashiering/CashieringSetupPage.tsx,
+                  features/cashiering/CommissionOrsPage.tsx, features/cashiering/Cwt2307Page.tsx,
+                  features/cashiering/CwtTagDialog.tsx, features/cashiering/DispositionForm.tsx,
+                  features/cashiering/IssueOrDialog.tsx, features/cashiering/PaymentPreviewPane.tsx,
+                  features/cashiering/PaymentUploadsPage.tsx, features/cashiering/PdcDialogs.tsx,
+                  features/cashiering/PdcWarehousePage.tsx, features/cashiering/PrebookedPage.tsx,
+                  features/cashiering/ReceiptActionsTab.tsx, features/cashiering/ReceiptDetailPage.tsx,
+                  features/cashiering/ReceiptParts.tsx, features/cashiering/ReceiptSeriesPage.tsx,
+                  features/cashiering/ReceiptTabs.tsx, features/cashiering/ReceiptsPage.tsx,
+                  features/cashiering/ReceivePaymentPage.tsx, features/cashiering/ReinstateDialog.tsx,
+                  features/cashiering/RequestDialogs.tsx, features/cashiering/RequestPanels.tsx,
+                  features/cashiering/UnappliedDetailPage.tsx, features/cashiering/UnappliedPage.tsx,
+                  features/cashiering/cashieringLogic.ts, features/cashiering/requestsApi.ts,
+                  features/commission/BillingDialogs.tsx, features/commission/CertificateDialog.tsx,
+                  features/commission/CertificatePage.tsx, features/commission/CertificatesPage.tsx,
+                  features/commission/CommissionHomePage.tsx, features/commission/DpBillingPage.tsx,
+                  features/commission/DpBillingsPage.tsx, features/commission/DpItemDialogs.tsx,
+                  features/commission/DpItemsPage.tsx, features/commission/DpListsPage.tsx,
+                  features/commission/DpResponsesPage.tsx, features/commission/EstimatedItemsPage.tsx,
+                  features/commission/IncentiveRunsPage.tsx, features/commission/IncentiveSchemesPage.tsx,
+                  features/commission/SchemeDialog.tsx, features/commission/commissionLogic.ts,
+                  components/broking/PolicyTransactions.tsx]
+
+# Where a message appears: the first rule whose pattern matches the class (backend) or file (frontend) wins.
+places:
+  - [ "^(OperationsHomePage|OperationsSectionHome|OpsParts|OperationsHomeService)$", "Operations Home and the team workbenches (SCR-OP-01)" ]
+  - [ "^(InvoiceSearchPage|invoiceSearch|InvoiceLedgerQueryService|OpsInvoiceController)$", "Invoice Search (SCR-OP-02)" ]
+  - [ "^(Invoice360Page|Invoice360Tabs|InvoiceFamilyTab|LegacyInvoiceBlock|opsLabels|PolicyTransactions)$", "Invoice 360 and Policy Transactions (SCR-OP-03)" ]
+  - [ "^(OpsInvoice|InvoiceLedgerService|LedgerPaymentReapplier)$", "Invoice ledger: locks and movements on every Operations screen" ]
+  - [ "^(HandoffsPage|HandoffService|OpsHandoff|ExtractRepositoryService)$", "Hand-offs and Extracts (SCR-OP-04)" ]
+  - [ "^(ReportArchivePage|reportRuns)$", "Report Archive (SCR-OP-05)" ]
+  - [ "^(NotificationSettingsPage)$", "Notification Settings (SCR-OP-06)" ]
+  - [ "^(ReceiptRecordService|ReceiptRecordPoster|ReceiptRecord|ReceiptRecordController|RecordAccounts|ReversalChecks|ReversalRecordService|RecordFormPage|RecordFormSections|RecordDetailPage|recordLogic|PostingListPage)$", "AR / OR records and posting (SCR-OP-65, SCR-OP-66, SCR-OP-67)" ]
+  - [ "^(ChannelFileService|ChannelFileController|ChannelRunReport|MftIntakeService|CommissionScheduleCheck|ChannelProfiles|PaymentFilesPage)$", "Payment Files (SCR-OP-68)" ]
+  - [ "^(ReceiptFormService|ReceiptFormController|ReceiptFormsPage|ReceiptPrintService|PrintBatches)$", "AR and OR Forms and printing (SCR-OP-69, SCR-OP-18)" ]
+  - [ "^(DayEndListPage)$", "Day-End List (SCR-OP-70)" ]
+  - [ "^(SearchLogPage|SearchLogService)$", "Search Log (SCR-OP-71)" ]
+  - [ "^(UnappliedInquiryPage|UnappliedInquiryService)$", "Unapplied Payment List (SCR-OP-72)" ]
+  - [ "^(SettlementOrService|SettlementOrsPage|SettlementOrController)$", "Settlement ORs (SCR-OP-73)" ]
+  - [ "^(ReceivePaymentPage|PaymentPreviewPane|CashReceiptService|cashieringLogic|CashFields|PaymentIntakeService|PaymentMatcher|ApplicationService|Application)$", "Receive Payment (SCR-OP-08) and the application of payments" ]
+  - [ "^(ReceiptsPage|IssueOrDialog|ReceiptSeries|ReceiptSeriesService|CashieringSettings)$", "Receipts, Issue Official Receipt and the receipt series (SCR-OP-09, SCR-OP-21)" ]
+  - [ "^(ReceiptDetailPage|ReceiptParts|ReceiptTabs|ReceiptActionsTab|ReinstateDialog|Receipt|ReceiptActionService|ReceiptReversalService|ReinstatementRules)$", "Receipt: cancellation and reinstatement (SCR-OP-10)" ]
+  - [ "^(UnappliedPage|UnappliedDetailPage|DispositionForm|Unapplied|UnappliedService|DispositionService|DispositionExecutor)$", "Unapplied Payments and dispositions (SCR-OP-11, SCR-OP-12)" ]
+  - [ "^(CashieringRequestsPage|RequestPanels|RequestDialogs|requestsApi|CollectorRequestService|CashieringRefundValidationSource|CashieringPaymentReversals)$", "Incoming Requests (SCR-OP-13)" ]
+  - [ "^(PrebookedPage|PrebookedService)$", "Pre-booked Payments (SCR-OP-14)" ]
+  - [ "^(PaymentUploadsPage|PaymentFileHandler|PaymentFileLayouts|PaymentFileLayout|CashieringSetupPage)$", "Payment Uploads and Cashiering Setup (SCR-OP-15, SCR-OP-22)" ]
+  - [ "^(PdcWarehousePage|PdcDialogs|PdcItem|PdcWarehouseService)$", "PDC Warehouse (SCR-OP-16)" ]
+  - [ "^(BatchPrintPage|BatchPrintService)$", "Batch Print (SCR-OP-18)" ]
+  - [ "^(Cwt2307Page|CwtTagDialog|CwtTag|CwtService|CwtPostings)$", "BIR 2307 (SCR-OP-19)" ]
+  - [ "^(CommissionOrsPage|CollectionFlowInFeeds)$", "Commission ORs (SCR-OP-20)" ]
+  - [ "^(RemittanceHomePage)$", "Remittance Workbench (SCR-OP-23)" ]
+  - [ "^(ExtractionPage|ExtractionService|ExtractionWork)$", "Extraction (SCR-OP-24)" ]
+  - [ "^(BatchesPage|BatchDetailPage|BatchDialogs|BatchLinesTab|BatchSettlementTab|RemittanceParts|remittanceLabels|RemittanceBatch|BatchLine|BatchService|BatchLedger|ScheduleDispatch)$", "Remittance Batches and Remittance Batch (SCR-OP-25, SCR-OP-26)" ]
+  - [ "^(InsurerOrPage|InsurerOrService|InsurerOrUploads|RemittanceFeedHandlers|CsvRows)$", "Insurer OR Upload and the Collection files of Remittance (SCR-OP-27, SCR-OP-28, SCR-OP-30)" ]
+  - [ "^(HoldsPage|HoldDetailPage|HoldDialogs|HoldRequest|HoldService)$", "Remittance Holds (SCR-OP-28, SCR-OP-29)" ]
+  - [ "^(SpecialPage|SpecialDetailPage|SpecialRemittance|SpecialRemittanceService)$", "Special Remittance (SCR-OP-30, SCR-OP-31)" ]
+  - [ "^(DtipStatusPage|RemittanceQueryService)$", "DTIP Status (SCR-OP-32)" ]
+  - [ "^(DeductionsPage|DeductionDetailPage|DeductionDialog|deductionForm|RemittanceDeduction|DeductionController)$", "Remittance Deductions (SCR-OP-33, SCR-OP-34)" ]
+  - [ "^(IncentiveRulesPage|IncentiveRuleService|RemittanceController)$", "Incentive Rules (SCR-OP-35)" ]
+  - [ "^(DisbursementQueuePage|DisbursementQueueService|DisbursementRequest)$", "Disbursement Queue (SCR-OP-36)" ]
+  - [ "^(AdjustmentHomePage)$", "Adjustment Workbench (SCR-OP-37)" ]
+  - [ "^(NewRequestPage|InvoicePicker|PolicyDetails|RequestFormFields|requestForm|RecomputePreview|RequestRules|RequestChecks|RequestConflicts|EndorsementRequestService|EndorsementRequestController)$", "New Endorsement Request (SCR-OP-38)" ]
+  - [ "^(RequestDetailPage|RequestActions|RequestTabs|RequestParts|EndorsementRequest|RequestWorkflowService|AdjustmentPostingService|AdjustmentDocuments|RequestActionController)$", "Endorsement Request (SCR-OP-39)" ]
+  - [ "^(PostingBatchesPage|BatchResultDialog|PostingBatchService)$", "Posting Batches (SCR-OP-40)" ]
+  - [ "^(BatchUploadPage|AdjustmentBatchHandler)$", "Batch Request Upload (SCR-OP-41)" ]
+  - [ "^(MinimalBalancePage|MinimalBalanceFileHandler|WriteOffService)$", "Minimal Balance File (SCR-OP-42)" ]
+  - [ "^(ProdReconHomePage)$", "Reconciliation Workbench (SCR-OP-43)" ]
+  - [ "^(ReconCyclesPage|ReconCyclePage|CycleItemsTab|ItemReviewDialog|ItemFilters|prodreconLogic|ReconCycleService|ReconMatchingService|ReconItemService)$", "Reconciliation Cycles and Reconciliation Cycle (SCR-OP-44, SCR-OP-45)" ]
+  - [ "^(ReconExtractsPage|ExtractParts|extractColumns|ProductionExtractService|ReconSendService)$", "Production Extracts (SCR-OP-46)" ]
+  - [ "^(ReconUploadsPage|ReconUploadService|ReconUploadRecorder|InsurerProductionHandler|InsurerRowParser)$", "Insurer Feedback (SCR-OP-47)" ]
+  - [ "^(UnbookedPage)$", "Unbooked Accounts (SCR-OP-48)" ]
+  - [ "^(ReconSchedulesPage|ReconScheduleService|ReconExtractController)$", "Extract Schedules (SCR-OP-49)" ]
+  - [ "^(CommissionHomePage)$", "Commission Workbench (SCR-OP-50)" ]
+  - [ "^(DpListsPage|DpListHandler|DpIntakeService|DpListService)$", "DP Lists (SCR-OP-51)" ]
+  - [ "^(DpItemsPage|DpItemDialogs|DpItem)$", "DP Accounts (SCR-OP-52)" ]
+  - [ "^(DpBillingsPage|DpBillingPage|BillingDialogs|DpBillingService|DpBillingSender|DpCollectionService|DpFeedbackService|DpPostings)$", "DP Billings and DP Billing (SCR-OP-53, SCR-OP-54)" ]
+  - [ "^(DpResponsesPage|DpResponseHandler)$", "Insurer Responses (SCR-OP-55)" ]
+  - [ "^(IncentiveSchemesPage|SchemeDialog|IncentiveSchemeService)$", "Incentive Schemes (SCR-OP-56)" ]
+  - [ "^(IncentiveRunsPage|IncentiveRun|IncentiveRunService|IncentivePosting)$", "Incentive Runs (SCR-OP-57)" ]
+  - [ "^(CertificatesPage|CertificatePage|CertificateDialog|CertificateService|CommissionController)$", "BIR Certificates (SCR-OP-58, SCR-OP-59)" ]
+  - [ "^(EstimatedItemsPage)$", "Estimated Items (SCR-OP-60)" ]
+  - [ "^(commissionLogic|commissionApi)$", "Commission Receivables screens (SCR-OP-51 to SCR-OP-60)" ]
+  - [ "^(InterfacesPage|InterfaceDialogs|FlowInService)$", "Interfaces (SCR-OP-61)" ]
+
+# The fix the user makes. Messages that tell the user what to do ("Enter ...", "Select ...") are their own fix and are
+# not repeated here. Keys are message codes; frontend messages without a code use their text.
+fixes:
+  # AR / OR records, posting, payment files, forms and settlement ORs (BDOI's FRS v3.2)
+  RECEIPT_NOT_ISSUED: Choose an issued receipt; a cancelled receipt is reinstated from its own record.
+  RECORD_CHECK_REASON: Choose a reason of the list for check payments.
+  RECORD_KIND_MISMATCH: Open the record from Posting and edit it there.
+  RECORD_NOT_CREATED: No action; only a record still Created can be cancelled. Ask the Approver/Poster to return it first.
+  RECORD_NOT_EDITABLE: Refresh the record; it has moved on. A returned record can be edited again.
+  RECORD_NOT_FOR_POSTING: Refresh the list; the record is not waiting for posting.
+  RECORD_PARTIAL_OR: Choose Full Reinstatement for an OR.
+  RECORD_REMARKS_LENGTH: Shorten the remarks to 100 characters.
+  RECORD_WAITING: Post or cancel the record already waiting for the receipt first.
+  REINSTATEMENT_SCOPE: Ask the System Administrator whether the reinstatement setting should include this case.
+  CHANNEL_FILE_NOT_PROCESSED: Upload the file again, or ask the System Administrator to check the run.
+  CHANNEL_SIMULATOR_OFF: No action; the channel simulator is for SIT and UAT only.
+  MFT_FOLDER_OUTSIDE: Ask the System Administrator to correct the MFT folder of the payment file type.
+  MFT_NO_COMPANY: Ask the System Administrator to set the company that receives the MFT files.
+  FORM_EFFECTIVE_DATE: Enter today or a later date.
+  SETTLEMENT_OR_NOT_FAILED: No action; the OR was issued or is still waiting for the Disbursement approval.
+  SERIES_FORMAT_INVALID: Add {SEQ} to the number format.
+  PRINT_NO_ZIP: Download the PDF of the batch instead.
+  "The number format must hold the sequence {SEQ}": Add {SEQ} to the number format.
+  CHANNEL_FILE_UNREADABLE: Save the file again as an Excel workbook and upload it again.
+  CHANNEL_NAME_PATTERN: Correct the file name convention of the payment file type.
+  FORM_NOT_PENDING: Refresh the list; the version was already decided.
+  MFT_NO_FOLDER: Ask the System Administrator to set the MFT folder of the payment file type.
+  RECEIPT_POSTING_STEP: Create the receipt with Create AR or Create OR and submit it for posting.
+  REPLAY_SCOPE: Give an invoice number or an ARN, or leave both blank to replay the whole company.
+  DISBURSEMENT_REFERENCES: Split the payment request into requests with fewer references.
+  DISBURSEMENT_STATUS: Refresh the queue; the request has already moved on.
+  HANDOFF_CLOSED: No action; the hand-off is already closed.
+  INVOICE_LOCKED: Wait until the team named releases the invoice, or ask it to finish its work first.
+  EXTRACT_FILE_INTEGRITY_FAILURE: Report it to the System Administrator; the stored file must be produced again.
+  FLOW_IN_NO_HANDLER: Use the screen of the team that takes this feed in, or report it to the System Administrator.
+  FLOW_IN_FEED_INACTIVE: Ask the System Administrator to activate the feed, then upload again.
+  MOVEMENT_WITHOUT_AMOUNT: Enter at least one amount other than zero.
+  MOVEMENT_TYPE_RESERVED: Report it to the System Administrator; booked amounts come from the booking of New Business.
+  PAYMENT_REAPPLIER_UNAVAILABLE: No action; the request waits in Payments to Re-apply until Cashiering re-applies the payments.
+  DISBURSEMENT_AMOUNT: Enter a payment request amount above zero.
+  APPLICATION_ALREADY_REVERSED: No action; the application was already reversed.
+  CWT_CERTIFICATE_REQUIRED: Enter the BIR 2307 certificate number, or choose the cash path.
+  PAYMENT_LAYOUT_KIND: Choose Automatic, Delimited or Fixed width.
+  PAYMENT_LAYOUT_DELIMITER: Enter a separator of one character.
+  PAYMENT_LAYOUT_FIELDS: Write each field as Header:start:length separated by semicolons.
+  PDC_RELEASE_STATUS: Choose Returned, Replaced or Pulled out.
+  PDC_NOT_WAREHOUSED: No action; the check has already left the warehouse.
+  RECEIPT_ALREADY_CANCELLED: No action; the receipt is already cancelled.
+  RECEIPT_NOT_CANCELLED: Cancel the receipt first; only a cancelled receipt is reinstated.
+  REINSTATEMENT_AMOUNT: Enter an amount above zero and at most the receipt amount.
+  RECEIPT_SERIES_RANGE: Correct the range so that the last number is not below the first or the numbers already issued.
+  RECEIPT_SERIES_NEXT_OUT_OF_RANGE: Enter a next number within the range of the series.
+  RECEIPT_SERIES_DEPLETED: Ask the Cashiering Team Leader to create and authorise a new series for the branch.
+  UNAPPLIED_BALANCE_EXCEEDED: Enter an amount within the unapplied balance.
+  PRINT_SELECTION: Select between 1 and 500 receipts.
+  PRINT_NOTHING_FAILED: No action; every receipt of the batch was printed.
+  COP_CANCELLED_RECEIPT: Choose a receipt that is not cancelled.
+  AR_INSURANCE_PAYOR_REQUIRED: Enter the code of the paying insurer in Payor / Client Code.
+  OR_WITHOUT_LINES: Enter the gross amount of the official receipt.
+  OR_HEAD_OFFICE_ONLY: Issue the official receipt from Head Office, or create the series under Head Office.
+  RECEIPT_AMOUNT: Enter an amount above zero.
+  MAKER_CHECKER_VIOLATION: Ask another Cashiering Team Leader to approve it.
+  PAYMENT_REVERSAL_RECEIPT_UNKNOWN: Check the receipt number with ACSL.
+  PAYMENT_REVERSAL_NOTHING_APPLIED: Reject the reversal with the reason, or ask ACSL for the right amount.
+  PAYMENT_REVERSAL_DECIDED: No action; the request was already decided.
+  REFUND_VALIDATION_DONE: No action; the validation was already decided.
+  BRANCH_OF_OTHER_COMPANY: Choose a branch of the company in the header.
+  NO_HEAD_OFFICE: Ask the System Administrator to set up the Head Office branch of the company.
+  FLOW_IN_COMPANY_UNKNOWN: Correct the company of the row and upload it again.
+  DISPOSITION_TYPE_NOT_CONFIGURED: Choose another disposition type, or ask the Cashiering Team Leader to set up its processing rule.
+  COLLECTOR_REQUEST_TYPE_MISMATCH: Choose a disposition type that carries out what the collector asked.
+  COLLECTOR_REQUEST_DECIDED: No action; the request was already decided.
+  CWT_AMOUNT_MISMATCH: Check the 2307 amount against the premium outstanding of the invoice and correct the tag.
+  CWT_INVOICE_UNKNOWN: Check the invoice number.
+  CWT_ALREADY_TAGGED: Open the 2307 tag already in process for the invoice.
+  CWT_AMOUNT: No action; the invoice has no 2% CWT left to settle.
+  CWT_NOT_CASH: Validate the certificate tag instead of settling it in cash.
+  CWT_BATCH_ROUTED: No action; the batch has already moved on.
+  CWT_BATCH_ONE_INSURER: Select the certificates of one insurer at a time.
+  CWT_CASH_IN_BATCH: Leave the cash-settled tag out of the report batch.
+  CWT_COPY_MISSING: Tick CWT copy received once the copy is in hand, then validate.
+  CWT_WRONG_STAGE: No action; the tag has already moved on.
+  DISPOSITION_WHOLE_BALANCE: Enter the whole balance as the amount of a reclass or transfer.
+  DISPOSITION_AMOUNT: Enter an amount above zero and at most the balance.
+  DISPOSITION_NO_APPLICATION: No action; the disposition applied nothing to reverse.
+  REFUND_NOT_RETURNED: Ask Disbursement to return the refund request first.
+  DISPOSITION_NOTHING_TO_APPLY: Choose another invoice that has premium outstanding.
+  DISPOSITION_INVOICE_UNKNOWN: Check the invoice number.
+  DISPOSITION_INVOICE_NOT_RECEIVABLE: Choose an invoice that takes client payments (not direct payment or a return invoice).
+  DISPOSITION_NEEDS_APPROVAL: Submit the disposition for approval.
+  UNAPPLIED_WRONG_STAGE: No action; the item has already moved on.
+  PDC_DUPLICATE: No action; the check is already in the warehouse.
+  PDC_AMOUNT: Enter an amount above zero.
+  PREBOOKED_NOT_OPEN: No action; the payment was already applied or released.
+  RECEIPT_ACTION_NOT_FOR_APPROVAL: No action; the request is not waiting for approval.
+  RECEIPT_ACTION_PENDING: Wait for the decision on the open request of the receipt.
+  RECEIPT_HAS_DISPOSITION: Withdraw or complete the disposition of the unapplied item first.
+  REINSTATEMENT_REASON_GROUP: Choose a direct payment reason for an official receipt, or a premium reason for an AR.
+  UNAPPLIED_AMOUNT: Enter an amount above zero.
+  REMIT_LINE_ALREADY_EXCLUDED: No action; the invoice is already excluded.
+  REMIT_LINE_NOT_EXCLUDED: No action; the invoice is in the batch.
+  HOLD_FOUR_EYES: Ask another Marketing Team Leader to decide it.
+  HOLD_EXTENSION_DATE: Enter a date later than the current hold date.
+  REMIT_BATCH_STAGE: No action; the batch has moved on and its lines are fixed.
+  REMIT_BATCH_EMPTY: Restore at least one invoice, or return the batch.
+  REMIT_FOUR_EYES: Ask another Remittance Team Leader to approve the batch.
+  REMIT_SCHEDULE_ALREADY_SENT: No action; the schedule was already sent to the insurer.
+  REMIT_DEDUCTION_STAGE: Ask the ACSL Team Leader to return the deduction to draft before changing it.
+  REMIT_DEDUCTION_AMOUNT: Enter a positive amount.
+  REMIT_DEDUCTION_UNCONFIRMED: Enter the insurer's confirmation reference and date, then submit.
+  REMIT_DEDUCTION_FOUR_EYES: Ask another ACSL Team Leader to confirm the deduction.
+  SPECIAL_REMIT_FOUR_EYES: Ask another Remittance Team Leader to approve the request.
+  REMIT_RESTORE_NOT_ELIGIBLE: Leave the invoice out; it has moved to another batch or another team holds it.
+  REMIT_SUBMISSION_INVALID: Exclude the invoices listed, or wait until their holds or adjustments are cleared, then submit again.
+  FEED_FILE_EMPTY: Upload a file with at least one line.
+  FEED_FILE_COLUMNS: Use the template with its columns unchanged.
+  FEED_FILE_UNREADABLE: Save the file again from the Excel template, or upload it as CSV or text.
+  FEED_VALUE_MISSING: Complete the column named on the line and upload the file again.
+  SPECIAL_REMIT_NOT_ELIGIBLE: Check that the invoice is paid, cleared and not on hold, and for a claims condition that the claim waits for the premium remittance.
+  REMIT_INVOICE_INSURER: Choose the insurer of the invoice, or leave the insurer blank.
+  REMIT_INVOICE_NOT_EXTRACTABLE: No action; the invoice is not due for remittance (direct payment, fully remitted or cancelled).
+  HOLD_INVOICE_NOT_HOLDABLE: No action; the invoice cannot be held in its remittance status.
+  HOLD_DUPLICATE: Open the hold already requested for the invoice.
+  HOLD_DATE: Enter a hold date after today.
+  HOLD_STAGE: No action; the hold is not in the stage for this action.
+  HOLD_ASSIGNEE_NOT_ELIGIBLE: Enter the user ID of an active Remittance Processor.
+  INCENTIVE_RULE_PERIOD: Correct the dates so that the rule ends after it starts.
+  REMIT_OR_BATCH_STAGE: Upload the insurer OR once the batch is approved.
+  REMIT_OR_LINE_EXCLUDED: Leave the excluded invoice out of the file.
+  REMIT_OR_DUPLICATE: No action; the OR is already recorded.
+  FEED_VALUE_INVALID: Correct the value of the column named on the line and upload the file again.
+  REMIT_SCHEDULE_NOT_APPROVED: Send the schedule once the batch is approved.
+  SPECIAL_REMIT_DUPLICATE: Open the request already made for the invoice.
+  ADJ_POSTING_FAILED: Read the reason in the batch result, correct the request or return it, and post again.
+  ADJ_REQUEST_NOT_EDITABLE: No action; the request can no longer be changed.
+  ADJ_NO_SLIP_FOR_INTERNAL: No action; internal adjustments have no endorsement slip.
+  ADJ_NOT_VALIDATED: Validate the request first.
+  ADJ_WRONG_STAGE: No action; the request is not in the stage for this action.
+  ADJ_QUOTATION_NOT_REQUIRED: No action; the request needs no quotation.
+  ADJ_DUPLICATE_REQUEST: Open the existing request, or give the justification to proceed.
+  ADJ_EFFECTIVE_DATE_OUTSIDE_TERM: Enter an effective date within the cover of the invoice.
+  ADJ_PERIOD_INVALID: Enter a new period that keeps the term of the policy.
+  ADJ_RETURN_INVOICE: Raise the request on the original invoice.
+  ADJ_INVOICE_CLOSED: No action; a cancelled or written-off invoice takes no request.
+  ADJ_INCOMPATIBLE_REQUEST: Wait until the open request is posted or cancelled, then raise the cancellation.
+  ADJ_TYPE_WITHOUT_CLASS: Ask the Business Administrator to put the endorsement type under Financial, Non-financial or Internal.
+  ADJ_NON_FINANCIAL_WITH_AMOUNTS: Remove the request type, sum insured and amounts, or choose a financial endorsement type.
+  ADJ_QUOTATION_REQUIRED: Ask Marketing for the quotation and link its number on the request.
+  ADJ_FOUR_EYES: Ask an Adjustment Team Leader who did not raise, submit or validate the request to approve it.
+  ADJ_OVER_BASELINE: Review the previous adjustments of the invoice and give the justification.
+  ADJ_NOTHING_TO_WRITE_OFF: No action; the invoice has no premium receivable balance.
+  ADJ_BALANCE_OUT_OF_RANGE: Leave the invoice out of the file; its balance is outside 10.00 to 100.00.
+  RECON_UPLOAD_DUPLICATE: No action; the same file was already uploaded.
+  RECON_ROW_INCOMPLETE: Complete the insurer, production month and invoice or policy number of the row.
+  RECON_FILE_LAYOUT: Return the register in the layout it was sent in, with its columns unchanged.
+  RECON_ROW_DATE: Correct the date of the row.
+  RECON_ROW_AMOUNT: Correct the amount of the row.
+  RECON_EXTRACT_PERIOD: Correct the period so that it ends after it starts.
+  RECON_NOTHING_TO_EXTRACT: No action; nothing was booked with the insurer in the period.
+  RECON_CYCLE_CLOSED: No action; the cycle is closed.
+  RECON_PAIR_INVALID: Pair a BDOI-only item with an insurer-only line of the same cycle.
+  RECON_SPLIT_INVALID: No action; only a paired item can be split.
+  DUPLICATE: Open the existing record instead of creating another.
+  RECON_NO_RECIPIENT: Enter the insurer's e-mail address in To.
+  RECON_COMPANY_UNKNOWN: Upload the insurer's file on Insurer Feedback.
+  DP_ITEM_BILLED: Cancel the billing first, then exclude the account.
+  DP_ITEM_STATE: No action; the account is not in the tag for this action.
+  INCENTIVE_RUN_STATE: No action; the run was already posted or cancelled.
+  CERT_NOT_REJECTED: No action; only a rejected submission is resubmitted.
+  CERT_PERIOD: Correct the period so that it ends after it starts.
+  CERT_AMOUNT: Enter a tax withheld above zero.
+  DP_BILLING_SENT: No action; the billing was already sent.
+  DP_NO_RECIPIENT: Enter the insurer's e-mail address in To.
+  DP_NOTHING_TO_BILL: Confirm the accounts paid to the insurer first.
+  DP_BILLING_NOT_APPROVED: Record the insurer's approval of at least one account first.
+  DP_TAG_INVALID: Ask Marketing to tag the account direct payment, or exclude it.
+  DP_BILLING_NOT_AWAITING: No action; the billing is not waiting for the insurer.
+  DP_NOT_ON_BILLING: Correct the invoice or the billing number of the answer.
+  DP_LIST_DUPLICATE: No action; the list was already taken in.
+  DP_LIST_LAYOUT: Use the DP list template with its Invoice No. column.
+  DP_LIST_NAME: Rename the file <Branch>_DP_<yyyyMMdd> and upload it again.
+  DP_LIST_COMPANY: Check the invoice numbers of the list; upload it from DP Lists.
+  DP_ROW_PREMIUM: Correct the premium of the row.
+  DP_LIST_REFUSED: Correct the list as the message says and upload it again.
+  DP_RESPONSE_LAYOUT: Use the answers template with its columns unchanged.
+  DP_BILLING_UNKNOWN: Check the billing number of the answer.
+  DP_RESPONSE_DECISION: Write Approved or Rejected (or Yes / No) in the Decision column.
+  INCENTIVE_RUN_NOTHING: No action; the run earned no incentive; cancel it.
+  INCENTIVE_NO_HEAD_OFFICE: Ask the System Administrator to set up the Head Office branch of the company.
+  INCENTIVE_RUN_PERIOD: Correct the period so that it ends after it starts.
+  INCENTIVE_SCHEME_EMPTY: Add the tiers of the scheme before computing it.
+  INCENTIVE_SCHEME_DATES: Correct the dates so that the scheme ends after it starts.
+  INCENTIVE_TIER_INVALID: Complete each tier with values above zero.
+  CERT_INSURER_REQUIRED: Choose the insurer of the certificate.
+  COMPANY_REQUIRED: Choose the company in the header.
+  RECON_SCHEDULE_INSURER: Enter the insurer of the schedule.
+  "The reference belongs to a cancelled invoice: the payment goes to unapplied collections.": No action; the payment will be kept unapplied for a disposition.
+  "The selected certificates are validated and the 2307 report is posted.": Confirm to validate and post, or close the dialog.
+  "The requested action is applied to the receipt.": Confirm to approve, or close the dialog.
+  "The series becomes active for issuing receipts.": Confirm to authorise the series, or close the dialog.
+  "The selected receipt is reversed as requested.": Confirm to reverse, or close the dialog.
+  "The invoice is paid: its payments are re-applied by Cashiering and the excess becomes an unapplied item.": No action; Cashiering re-applies the payments when the request is posted.
+  "The new sum insured exceeds the package limit: Marketing prepares a quotation.": Ask Marketing for the quotation and link it on the request.
+  "Payor name is required": Enter the payor name.
+  "Invoice number is required": Enter the invoice number.
+  "Certificate number is required for a certificate": Enter the certificate number, or choose the cash path.
+  "VAT and withholding tax cannot be negative": Enter VAT and withholding tax of zero or more.
+  "Check number is required for a check payment": Enter the check number.
+  "Prefix is required": Enter the prefix of the series.
+  "The range must end at or after its start": Correct the range.
+  "A reclass or transfer moves the whole balance": Enter the whole balance as the amount.
+  "Select the insurer": Choose the insurer from the list.
+  "Select the remittance processor": Choose the processor from the list.
+  "The scheme name is required": Enter the name of the scheme.
+  "Rate must be above 0 and at most 100": Enter a rate above 0 and at most 100.
+  "Window must be 1 to 366 days": Enter a window of 1 to 366 days.
+  "The rule cannot end before it starts": Correct the dates of the rule.
+  "Invoice No. is required": Enter the invoice number.
+  "Hold Until is required": Enter the hold date.
+  "Hold Until must be a future date": Enter a hold date after today.
+  "Source reference is required": Enter the source reference.
+  "The confirmation date cannot be in the future": Enter a confirmation date up to today.
+  "The new expiry must be after the new inception": Correct the new period.
+  "A financial endorsement needs its request type": Select the request type.
+  "<run no> failed: <message>": Read the reason, correct the extraction scope and run it again.
+  "<run no>: <run message>": Read the message of the run and correct the file as needed.
+  VALIDATION_FAILED: Correct the fields listed under the message.
+  CONCURRENT_MODIFICATION: Reload the record; another user changed it. Enter the change again.
+  ACCESS_DENIED: Ask for the permission; the menu shows only the screens of your role.
+  INTERNAL_ERROR: Report the message with its reference to the System Administrator.
+  MALFORMED_REQUEST: Reload the screen and try again; if it persists, report it with the time to the System Administrator.
+  UPLOAD_TOO_LARGE: Reduce the file (split it) and upload it again.
+  RECEIPT_REASON_TEXT_REQUIRED: Type the reason in the comment when Others is selected.
+  DP_ROW_INCOMPLETE: Complete the invoice number of the row and upload the list again.
+  CERT_NO_OR: Add the official receipts the certificate covers.
+  "<Column> '<value>' is not a valid <number, date (yyyy-mm-dd), Y/N value>": Correct the value in the file in the format of the column and upload the file again.
+  "<Column> is mandatory": Fill in the column in the file and upload the file again.
+  "A certificate tag needs the certificate number": Fill in the certificate number of the row, or make it a cash tag.
+  "Path must be CASH or CERTIFICATE": Write CASH or CERTIFICATE in the Path column.
+  "Possible duplicate of <preview>": Fill in the Duplicate Justification column of the row, or leave the row out.
+  "The amount must be above zero": Correct the amount of the row.
+  "The basic commission must be above zero": Correct the basic commission of the row.
+  "An active scheme needs at least one tier": Add a tier, or save the scheme as inactive.
+  "The scheme ends before it starts": Correct the dates of the scheme.
+  "The tax withheld must be above zero": Enter the tax withheld.

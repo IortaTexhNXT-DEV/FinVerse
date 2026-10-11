@@ -1,0 +1,52 @@
+// Programme alignment: the BDOI drops and their items.
+digraph al_drop_map {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.18, ranksep=0.12, bgcolor="white", pad=0.12, newrank=true];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.0, fontname="Arial",
+         fontsize=11, fontcolor="@NEAR_BLACK", width=3.1, height=0.36, margin="0.08,0.03", fillcolor="@WHITE"];
+  edge  [style=invis];
+
+  subgraph cluster_d0 {
+    label=<<b>Drop 0 - Setup and Data Migration</b>>; fontsize=12; fontcolor="@HEADER_BLUE"; style="rounded"; color="@HEADER_BLUE"; margin=8;
+    d01 [label="Accessibility & Login"];
+    d02 [label="Authorization"];
+    d03 [label="User Maintenance"];
+    d04 [label="Data Management"];
+    d05 [label="Workflow"];
+    d06 [label="Product Maintenance"];
+    d0m [label="Data Migration (BRD-13)"];
+    d0i [label=<<font point-size="9">EIAM, UIDM-ISC, LMS, HL-LOAS, PMS,<br/>CMS / New BOB, OBPCS, Old BOB, AFTS,<br/>ECM, CCM, M365, TFS (manual)</font>>, fillcolor="@DIRTY_WHITE", color="@MUTED", height=0.7];
+    d01 -> d02 -> d03 -> d04 -> d05 -> d06 -> d0m -> d0i;
+  }
+  subgraph cluster_d1 {
+    label=<<b>Drop 1 - Transactional</b>>; fontsize=12; fontcolor="@HEADER_BLUE"; style="rounded"; color="@HEADER_BLUE"; margin=8;
+    u1 [label="U1 Client Onboarding"];
+    u2 [label="U2 Quotation or Proposal"];
+    u3 [label="U3 Account Creation / Maint."];
+    u4 [label="U4 Submitted Policy"];
+    u5 [label="U5 Renewal"];
+    u6 [label="U6 Placement & ePolicy"];
+    u7 [label="U7 Booking"];
+    u8 [label="U8 Accounting / GL"];
+    u9 [label="U9 Reports (upstream)"];
+    x1 [label="D1 Disbursement"];
+    x2 [label="D2 Cashiering"];
+    x3 [label="D3 Remittance (+ RI transactions)"];
+    x4 [label="D4 Adjustment / Cancellation"];
+    x5 [label="D5 Accounting / GL"];
+    x6 [label="D6 Reports (BIR / regulatory)"];
+    x7 [label="D7 Commission Receivables (DP)"];
+    u1 -> u2 -> u3 -> u4 -> u5 -> u6 -> u7 -> u8 -> u9 -> x1 -> x2 -> x3 -> x4 -> x5 -> x6 -> x7;
+  }
+  subgraph cluster_d2 {
+    label=<<b>Drop 2 - Independent</b>>; fontsize=12; fontcolor="@HEADER_BLUE"; style="rounded"; color="@HEADER_BLUE"; margin=8;
+    i1 [label="Marketing Collection (extraction)"];
+    i2 [label="Claims"];
+    i3 [label="Production Reconciliation"];
+    i4 [label="Employee Benefits (no portal)"];
+    i5 [label="Other Reports"];
+    i0 [label=<<font point-size="9">EDP (SD 11), EGL, CARMS,<br/>HL-LOAS, Insurer System,<br/>Bridger Insight XG (manual)</font>>, fillcolor="@DIRTY_WHITE", color="@MUTED", height=0.7];
+    np [label=<<b>Not placed on the slide</b><br/><font point-size="9">BRD-10 Sanction Screening<br/>BRD-9 CSF service requests</font>>, fillcolor="@DANGER_BG", color="@DANGER", height=0.6];
+    i1 -> i2 -> i3 -> i4 -> i5 -> i0 -> np;
+  }
+  { rank=same; d01; u1; i1; }
+}

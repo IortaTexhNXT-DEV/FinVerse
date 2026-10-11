@@ -1,0 +1,159 @@
+# Screen specifications of BRD-4 Collections: the Collections Home, the PR Worklist with its bulk actions, the
+# collection account with its tabs and the client view.
+area: Home, PR worklist and collection account
+screens:
+  - id: SCR-CL-01
+    title: Collections Home
+    route: /collections
+    purpose: >-
+      The landing page of Collections: the collector's work queues counted live (own open accounts, all open
+      accounts, unassigned accounts, direct payments returned by insurers, credit balances, files ready this week,
+      unapplied payments awaiting a disposition, own requests in Cashiering), each opening its list, and the open
+      amounts per aging bracket for all market segments or one.
+    entry:
+      - Finance › Collections › Collections Home
+    shots:
+      - {state: home, user: clxhandler, caption: "Collections Home of the Collection Handler with the work tiles and the aging chart"}
+    fields:
+      - "Work tiles | [My Open Accounts, All Open Accounts, Unassigned Accounts, DP Returned by Insurer, Credit Balances, Files Ready This Week, Unapplied Awaiting Disposition, My Requests in Cashiering] | Tile | Live count; Needs attention on the queues waiting for action | - | Collection accounts, unapplied payments, files | - | Read only | A tile opens its list | -"
+      - "Open Accounts by Aging Bracket | Market segment | Drop-down | All segments or one segment | N | Segments of the open accounts | All segments | - | - | -"
+      - "Open Accounts by Aging Bracket | [Aging bracket bar] | Bar | Bracket (0-30, 31-45, 46-60, 61-90, 91-120, 121+), open amount and number of accounts | - | Collection accounts | - | Read only | Brackets of the aging brackets parameter | No open accounts"
+    actions:
+      - "Open PR Worklist | Every Collections user | Always | Opens the PR Worklist on the Open Accounts tab | - | -"
+      - "[A work tile] | Every Collections user | Always | Opens the list of the queue (for example the worklist filtered on the user's accounts) | - | -"
+    rules:
+      - "The tiles are counted live from the collection accounts, the unapplied payments, the requests and the files of the company in the header (FR-CL-085)."
+      - "The aging chart counts the open accounts and their net outstanding per bracket of the aging brackets parameter (FR-CL-085, FR-CL-011)."
+    outcome: The collector sees the work waiting and opens it.
+    frs: [FR-CL-085]
+    tests: [HOME]
+
+  - id: SCR-CL-02
+    title: PR Worklist
+    route: /collections/worklist
+    purpose: >-
+      One row per booked invoice with outstanding premium receivable above the threshold, refreshed nightly from the
+      Operations invoice ledger: status tabs, search, the Filters panel, Only mine, and the actions on the selected
+      accounts (log an effort, record a disposition, reassign). The totals under the list add up the filtered
+      accounts by client or by account; Export to Files publishes the list on Collections Files.
+    entry:
+      - Collections Home › Open PR Worklist or a work tile
+    shots:
+      - {state: list, user: clxtl, caption: "PR Worklist of the Collection Team Lead: open accounts with handler, disposition and status"}
+      - {state: filters, user: clxtl, click: "^filters$", caption: "PR Worklist with the Filters panel open"}
+      - {state: reassign, user: clxtl, fill: reassign_temporary, caption: "Reassign Accounts dialog for two selected accounts, temporary until an end date"}
+    fields:
+      - "Tabs | Open Accounts / Credit Balances / Completed Collections / Excluded / All | Tab | - | - | Collection status | Open Accounts | - | - | -"
+      - "Toolbar | Search Invoice, ARN, Policy or Client | Text | Invoice, ARN, policy number or client code | N | Collection accounts | Blank | - | Contains | -"
+      - "Toolbar | Only mine | Check box | Accounts handled by the user | N | - | Unticked | - | - | -"
+      - "Filters | Market Segment / Sales Unit / Unit Head / Handler / Account Officer | Text | Code or user | N | Sales organisation, users | Blank | - | Equal | -"
+      - "Filters | Aging Bracket / Category (A/B/C) / Disposition / Promise Status / Client Code | Text | Bracket label, A, B or C, disposition, promise status, client code | N | Aging brackets, disposition list | Blank | - | Equal | -"
+      - "Filters | Outstanding From / Outstanding To | Number | Amount | N | - | Blank | - | Range | -"
+      - "Filters | Unassigned only / Escalated only | Check box | - | N | - | Unticked | - | - | -"
+      - "List | Invoice No. | Column | Invoice number with a Legacy tag for a migrated invoice; policy number or ARN under it | - | Invoice ledger | - | Read only | - | No accounts match the filters"
+      - "List | Client / Assured | Column | Client code (opens the client view) with the name of the assured | - | Clients | - | Read only | - | -"
+      - "List | Segment / Unit | Column | Market segment and sales unit | - | Sales organisation | - | Read only | - | -"
+      - "List | Booked / Aging | Column | Booking date; aging in days with its bracket | - | Invoice ledger, aging brackets | - | Read only | - | -"
+      - "List | Outstanding | Column | Currency and net outstanding premium receivable, two decimals | - | Invoice ledger | - | Read only | - | -"
+      - "List | Handler | Column | Name of the current handler, or Unassigned | - | Assignments | - | Read only | - | -"
+      - "List | Disposition | Column | Label of the current disposition as a tag, with its category | - | PR collector disposition list | - | Read only | - | -"
+      - "List | Status | Column | Open, Credit, Completed or Excluded | - | Nightly refresh | Open | Read only | - | -"
+      - "Totals | By Client / By Account | Tab | Totals by client or by ARN of the filtered accounts: Accounts and Outstanding | - | Collection accounts | By Client | Read only | - | -"
+      - "Record Disposition dialog | Disposition | Drop-down | Active values of the PR collector disposition list; the category, who acts next and the reserved roles show under it | Y | PR collector disposition list | Blank | Open, Credit | Value allowed for the user's role | Choose a disposition"
+      - "Record Disposition dialog | 2307 Path / Certificate No. / Certificate Period From / Certificate Period To / 2% Amount | Drop-down, text, date, number | Shown for a disposition handed to BIR 2307: certificate received or paid in cash | Y / Cond.: certificate / N / N / N | - | Blank | Open | Certificate number for a certificate | A certificate tag needs the certificate number"
+      - "Record Disposition dialog | Remarks | Text area | Up to 1,000 characters | N | - | Blank | Open, Credit | - | -"
+      - "Log Collection Effort dialog | Effort / Channel / Contact Person / Remarks | Drop-down, text | Effort list; channel up to 30 and contact up to 120 characters | Y / N / N / N | Collection effort list | Blank | Open, Credit | - | Choose the effort"
+      - "Reassign Accounts dialog | New Handler / Kind / Until / Reason | Drop-down, text | Handlers by name; Permanent or Temporary; end date of a temporary reassignment | Y / Y / Cond.: temporary / Y | Active collection handlers | Permanent | Open | Temporary ends after today | A temporary reassignment ends after today"
+    actions:
+      - "Search / Filters / Apply Filters / Clear | Every Collections user | Always | Filters the accounts on the server | - | -"
+      - "Log Effort | Collectors with the work permission | One account selected; several with the bulk update permission | Logs the effort on each selected account under one bulk reference | - | -"
+      - "Record Disposition | Collectors with the work permission | One account selected; several with the bulk update permission | Records the disposition on each selected account; an Operations action is handed to Cashiering or Commission | Disposition recorded | -"
+      - "Reassign | Team leads and section heads (assignment permission) | Accounts selected | Moves the accounts to the new handler, permanently or until the end date | - | Account reassigned (NT-03)"
+      - "Export to Files | Users with the export permission | Always | Publishes the Outstanding PR List of the filters on Collections Files in the background | - | Collections file ready (NT-06)"
+      - "[Row] | Every Collections user | Always | Opens the collection account | - | -"
+    rules:
+      - "An invoice is listed when the total of its premium receivable components and PR2307 is above the minimal balance threshold (10.00 by default); a negative balance of a cancellation is excluded and other credits show on Credit Balances (FR-CL-010, FR-CL-011, FR-CL-013)."
+      - "The worklist is refreshed every night from the invoice ledger and after each payment; paid accounts move to Completed Collections and reopen when the balance comes back (FR-CL-017, FR-CL-018)."
+      - "Updating several accounts at once needs the bulk update permission; at most 500 accounts per action, one bulk reference for all (FR-CL-034)."
+      - "A disposition reserved to some roles is refused for the other roles (FR-CL-031)."
+      - "Exports run in the background and are capped at the maximum number of rows of the export parameter (FR-CL-084)."
+    outcome: The collector finds the accounts to follow up and records the work on one or many at once.
+    frs: [FR-CL-010, FR-CL-011, FR-CL-013, FR-CL-014, FR-CL-015, FR-CL-017, FR-CL-021, FR-CL-031, FR-CL-033, FR-CL-034, FR-CL-084]
+    tests: [WL]
+
+  - id: SCR-CL-03
+    title: Collection Account
+    route: /collections/items/:invoiceNo
+    parent: /collections/worklist
+    purpose: >-
+      One collection account: the assured, invoice and ARN chips, the collection, payment and remittance statuses, the
+      flags and the key facts; the collector's actions (update remarks and category, log an effort, record a
+      disposition) and the tabs Summary (net PR breakdown by component), Payments, Timeline, Policy & Co-insurance,
+      Dispositions & Efforts (with the hand-offs to Operations) and History (assignments and field changes). Opening
+      the account takes the edit lock.
+    entry:
+      - PR Worklist › open a row
+      - Client View › open a row
+    shots:
+      - {state: record, user: clxhandler, open_item: handled, caption: "Collection account: header, facts, actions and the net PR breakdown by component"}
+      - {state: dispositions, user: clxhandler, open_item: handled, tab: "Dispositions & Efforts", caption: "Dispositions & Efforts tab with the hand-off to Cashiering"}
+      - {state: history, user: clxtl, open_item: handled, tab: "History", caption: "History tab: assignments and the field changes with From, To, user and source"}
+      - {state: locked, user: clxtl, open_item: locked, caption: "The account while another user works on it: the editing notice and no actions"}
+    fields:
+      - "Header | [Invoice and ARN chips, status pills] | Reference chip, status pill | Collection status; payment status; remittance status | - | Collection account, invoice ledger | - | Read only | - | -"
+      - "Header | [Flags] | Tag | Direct Payment, 2% CWT, On Hold, Pending Negative Adjustment, Locked by <team>, Marketing Action or Operations Action | - | Invoice ledger, disposition | - | Read only | - | -"
+      - "Facts | Client / Outstanding / PR2307 / Aging / Insurer / Handler / AO / UH | Display | Client code; amounts with the currency; days with the bracket and the booking date; insurer name; names | - | Collection account | - | Read only | - | -"
+      - "Summary | Booked / Endorsements / Adjustments / Payments Applied / Written Off / Reversed / Net Outstanding | Total | Two decimals | - | Invoice ledger | - | Read only | - | -"
+      - "Summary | Component / Booked / Adjusted / Applied / Written Off / Outstanding | Column | One row per premium component by name (Basic Premium, DST, Premium Tax / VAT, LGT, FST, PR 2307, Other Charges) | - | Invoice ledger | - | Read only | - | The invoice is no longer in the ledger"
+      - "Summary | Remarks / Last Effort / Promise / Escalation | Display | Collector's remarks; label and time of the last effort; promise and escalation status | - | Collection account | - | Read only | - | -"
+      - "Payments | Premium Due / Paid / Outstanding | Total | Two decimals | - | Invoice ledger | - | Read only | - | -"
+      - "Payments | Date / Type / AR / OR / Reference / Amount | Column | One row per payment applied or reversed, with the module that applied it | - | Invoice ledger (Cashiering) | - | Read only | - | No payment applied yet"
+      - "Timeline | Date and Time / Type / Event / By / Amount | Column | Ledger movements and Collections actions, newest first | - | Invoice ledger, Collections | - | Read only | - | No history yet"
+      - "Policy & Co-insurance | Invoice No. / Kind / Booked / Gross / Balance / Status | Column | The invoice family of the policy year with the balance and payment status of each | - | Invoice ledger | - | Read only | - | -"
+      - "Policy & Co-insurance | Policy / Product / Risk / Period / Booked / Receipt Date (first AR) | Display | Policy with its year; period dd-MMM-yyyy to dd-MMM-yyyy | - | Booking (BRD-1) | - | Read only | - | -"
+      - "Policy & Co-insurance | Insurer / Share % / Lead | Column | Insurer name, share and the lead insurer | - | Booking (BRD-1) | - | Read only | - | -"
+      - "Dispositions & Efforts | Disposition / Remarks / Hand-off / Encoded By / Status | Column | Label of the disposition, current or superseded | - | Dispositions | - | Read only | - | No disposition yet"
+      - "Dispositions & Efforts | When / Effort / Channel / Contact / Remarks / Encoded By | Column | Label of the effort; names | - | Efforts | - | Read only | - | No effort logged yet"
+      - "Dispositions & Efforts | Feed / Reference / Sent / Taken / Status | Column | Hand-offs to Cashiering and Commission | - | Hand-offs | - | Read only | - | Nothing handed to Operations"
+      - "History | Date / Handler / Kind / Valid / Reason / By | Column | Assignments with the previous and new handler by name | - | Assignments | - | Read only | - | -"
+      - "History | Changed / Field / From / To / User / Source IP / Bulk Ref. | Column | One row per changed field: the field by name, the values by label and the handler by name | - | Collections audit log | - | Read only | - | -"
+      - "Update Remarks and Category dialog | Tagging Category / Remarks | Drop-down, text area | None, A, B or C; up to 1,000 characters | N | Fixed list | Current values | Open, Credit | Category A, B or C | The tagging category is A, B or C"
+    actions:
+      - "Open Invoice 360 | Users with Operations view | Always | Opens the invoice in Operations | - | -"
+      - "Refresh from Ledger | Collectors with the work permission | Always | Reads the balances of the invoice again from the invoice ledger | - | -"
+      - "Update Remarks | Collectors with the work permission | Open or Credit, not locked by another user | Saves the remarks and the tagging category | - | -"
+      - "Log Effort | Collectors with the work permission | Open or Credit, not locked by another user | Logs the effort with its channel and contact | - | -"
+      - "Record Disposition | Collectors with the work permission | Open or Credit, not locked by another user | Records the disposition; the previous one is kept as superseded; an Operations action is handed over | Disposition recorded | -"
+    rules:
+      - "The account is locked to the user who opened it to work on it for the edit-lock time (15 minutes by default); another user cannot change it meanwhile (FR-CL-005)."
+      - "Every change is recorded field by field with the old and new value, the user, the time and the source address (FR-CL-003)."
+      - "Dispositions are never deleted: a new one supersedes the previous one (FR-CL-018, FR-CL-031)."
+      - "The net PR breakdown is read live from the invoice ledger; Collections keeps no second copy of the money (FR-CL-016)."
+      - "A BIR 2307 tag is handed to Cashiering and a direct payment account to Commission Receivables; there is no check pick-up, which the Operations Cashiering annex removed from scope (FR-CL-032)."
+    outcome: The collector records the work on the account and sees everything that happened to it.
+    frs: [FR-CL-002, FR-CL-003, FR-CL-005, FR-CL-016, FR-CL-018, FR-CL-031, FR-CL-032, FR-CL-033, FR-CL-041, FR-CL-043, FR-CL-044]
+    tests: [ACC, SUM, DISP, HIST, TIMELINE, PAYTAB, POLTAB, HANDOFF]
+
+  - id: SCR-CL-04
+    title: Client View
+    route: /collections/clients/:clientCode
+    parent: /collections/worklist
+    purpose: >-
+      Every collection account of one client, open, completed or credit, with the number of open accounts, their
+      net outstanding and the open PR2307.
+    entry:
+      - PR Worklist › client code of a row, or a client of Totals by Client
+      - Collection Account › Client
+    shots:
+      - {state: client, user: clxtl, open_client: first, caption: "Client View: the accounts of a client with the totals of the open ones"}
+    fields:
+      - "Totals | Open Accounts / Net Outstanding / PR2307 Open | Total | Count; amounts with two decimals | - | Collection accounts | - | Read only | - | -"
+      - "List | Invoice No. / ARN / Policy / Booked / Aging / Outstanding | Column | Invoice, ARN and policy; booking date; days; currency and amount | - | Collection accounts | - | Read only | - | The client has no collection account"
+      - "List | Handler / Disposition / Status | Column | Handler's name or Unassigned; label of the disposition; collection status | - | Collection accounts | - | Read only | - | -"
+    actions:
+      - "[Row] | Every Collections user | Always | Opens the collection account | - | -"
+    rules:
+      - "The totals add up the open accounts of the client only (FR-CL-014)."
+    outcome: The collector sees the whole exposure of a client before calling.
+    frs: [FR-CL-014]
+    tests: [CLIENT]

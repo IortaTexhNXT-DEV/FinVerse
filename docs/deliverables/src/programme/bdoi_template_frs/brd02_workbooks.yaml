@@ -1,0 +1,384 @@
+# Data of the five review workbooks of BRD-02 Operations Cashiering and of the internal coverage workbook, read by
+# build_brd02_workbooks.py together with the FRS v3.2 (built in memory, so that every number agrees with it),
+# brd02_review.yaml, the BIBS FRS BRD-2, its test plan and the programme workbooks. Business wording only.
+
+meta:
+  version: "1.0"
+  date: 9 October 2026
+  folder: Programme/BDOI_Template_FRS/BRD-02_Operations_Cashiering
+  quality: Programme/Quality
+  frs: "FRS Operations Cashiering in BDOI's template v3.2"
+  environment: "BIBS UAT environment: https://uat.brokerverse.cloud"
+  password_text: "Issued separately by the iorta TechNXT Project Team"
+  dates:
+    decision: 2026-11-30      # sign-off of the BRD-02 FRS (drop plan, SO-02-1)
+    it: 2027-01-31            # integration inputs of BDOI IT
+    sit: 2027-04-09           # master data for trial migration 1 and the SIT reviewers
+    uat: 2027-07-16           # values for UAT
+    freeze: 2027-12-27        # map freeze (receipt series in use)
+
+# Persona of each FR entry for the acceptance test cases: persona code of the walkthrough users, screen
+entry_persona:
+  FRS.CSH.01.01: [CASHIER, "Login page"]
+  FRS.CSH.01.02: [CASHIER, "Login page; Finance › Cashiering"]
+  FRS.CSH.01.03: [CASHIER, "Finance › Cashiering › Cashiering Workbench"]
+  FRS.CSH.02.01: [CASHIER, "Finance › Cashiering › Receive Payment"]
+  FRS.CSH.02.02: [CASHIER, "Finance › Cashiering › Receipts › Issue Official Receipt; Commission ORs"]
+  FRS.CSH.02.03: [CASHIER_TL, "Finance › Cashiering › Receipt Series"]
+  FRS.CSH.02.04: [CASHIER, "Finance › Cashiering › Batch Print"]
+  FRS.CSH.02.05: [CASHIER_TL, "Finance › Cashiering › Receipts"]
+  FRS.CSH.02.06: [CASHIER_TL, "Setup › Document Templates; receipt PDF"]
+  FRS.CSH.03.01: [CASHIER, "Finance › Cashiering › Receipt › Cancel"]
+  FRS.CSH.04.01: [CASHIER, "Finance › Cashiering › Receipt › Reinstate"]
+  FRS.CSH.05.01: [CASHIER, "Finance › Cashiering › Payment Uploads"]
+  FRS.CSH.05.02: [CASHIER, "Finance › Cashiering › PDC Warehouse"]
+  FRS.CSH.05.03: [CASHIER, "Finance › Cashiering › Pre-booked Payments"]
+  FRS.CSH.05.04: [CASHIER, "Finance › Cashiering › Receive Payment; New Business account"]
+  FRS.CSH.06.01: [CASHIER, "Finance › Cashiering › Unapplied Payments"]
+  FRS.CSH.06.02: [CASHIER, "Finance › Cashiering › Unapplied Payments"]
+  FRS.CSH.06.03: [CASHIER, "Finance › Cashiering › Incoming Requests"]
+  FRS.CSH.07.01: [CASHIER, "Finance › Cashiering › Commission ORs"]
+  FRS.CSH.08.01: [CASHIER, "Finance › Cashiering › Receipts; Operations › Invoice Search"]
+  FRS.CSH.08.02: [CASHIER, "Operations › Invoice Search › Invoice 360"]
+  FRS.CSH.08.03: [AUDITOR, "Finance › Cashiering › Receipt › History"]
+  FRS.CSH.09.01: [CASHIER, "Reports › Report Centre"]
+  FRS.CSH.09.02: [CASHIER, "Reports › Report Centre"]
+  FRS.CSH.10.01: [CASHIER, "Operations › Hand-offs and Extracts; Disbursement Queue"]
+  FRS.CSH.10.02: [SYSADMIN, "Operations › Interfaces"]
+  FRS.CSH.10.03: [SYSADMIN, "Operations › Interfaces; Administration › Scheduled Jobs"]
+  FRS.CSH.10.04: [CASHIER_TL, "Notifications (bell); Alerts"]
+
+personas:
+  CASHIER: ["Cashier (Head Office)", cashier]
+  CASHIER_BR: ["Cashier (Cebu branch)", cashbr]
+  CASHIER_TL: ["Cashiering Team Leader / Head", cashtl]
+  SYSADMIN: ["System Administrator", admin]
+  AUDITOR: ["Auditor", auditor]
+
+# Personas of the walkthrough users workbook (sign-in IDs of the UAT workbook BRD-02 sheet)
+uat_signins: [proc, cashier, cashbr, cashtl, mktcoll, commrec, remittl, disb, comptrol, admin, auditor]
+uat_menu_persona:
+  cashier: Cashier
+  cashbr: Cashier
+  cashtl: Cashiering Team Leader / Head
+  mktcoll: Marketing Collection
+  commrec: Commission Receivables Handler
+  remittl: Remittance Team Leader / Head
+  disb: Disbursement
+  comptrol: Comptrollership
+  admin: System Administrator
+  auditor: Auditor
+  proc: Processing (books the accounts)
+uat_script_steps: ["WT-A.1", "WT-A.2", "WT-A.3", "WT-A.4", "WT-A.7", "WT-B.8", "WT-B.9", "WT-B.10", "WT-D.3", "WT-D.4"]
+
+# ------------------------------------------------------------------------------------------------ fit-gap
+fit_values: [Fit, Configure, Extend, Recommend change, Removed from the BRD, Specified in another FRS]
+fitgap_groups:
+  - ids: [BRQID.001, BRQID.002]
+    name: Log-in and access by role
+    features: []
+    fit: Configure
+    ootb: "Sign-in, roles and permissions per action and segregation of duties are standard; the Cashiering permissions are given to the roles by configuration (Appendix H)."
+    best: "Least privilege and four eyes on every cash movement; access only from managed devices (BSP IT risk management guidelines; ISO 27001 access control)."
+    rec: "Confirm the access matrix in the User Access Maintenance FRS; enforce BDO-issued devices through the network policy."
+    impact: "FRS.CSH.01.01, 01.02; Appendix H"
+  - ids: [BRQID.003]
+    name: Cashiering dashboard
+    features: []
+    fit: Extend
+    ootb: "Role home pages with live work counts are standard; the Cashiering dashboard with count and amount per receipt type and status is an extension (the counts are available, the amounts per type follow BDOI's FRS.CSH.01.03.02)."
+    best: "A cashier's work queue by status with amounts, so that the day closes with nothing For Posting."
+    rec: "Add the amounts and the per-type items of BDOI's dashboard."
+    impact: "FRS.CSH.01.03"
+  - ids: [BRQID.004, BRQID.005]
+    name: Integrations and flow-in
+    features: [INT-006]
+    fit: Extend
+    ootb: "File uploads with runs, records and alerts, and the exchanges between the BIBS modules are standard; the MFT intake of the OBPCS and PMS files is an extension to agree with BDOI IT."
+    best: "Bank and channel files received automatically through the bank's managed file transfer, with control totals and a missing-file alert."
+    rec: "Agree the MFT folders and times with BDOI IT (Appendix S)."
+    impact: "FRS.CSH.05.01.04, 10.01, 10.02; Appendix N"
+  - ids: [BRQID.006]
+    name: Batch runs past failed records
+    features: []
+    fit: Fit
+    ootb: "Every upload and scheduled run processes each record on its own, logs the failed records and reports the run; failed runs are e-mailed."
+    best: "Partial processing with reprocessing of corrected rows and a run report; never a whole batch lost for one row."
+    rec: "Keep line-level processing also for the Commission Schedule (Appendix R, C10)."
+    impact: "FRS.CSH.05.01.12, 10.03"
+  - ids: [BRQID.007]
+    name: Payment history at invoice level
+    features: [BIL-020]
+    fit: Fit
+    ootb: "Each booked account keeps its payment and remittance history with the AR numbers, view-only outside Cashiering."
+    best: "One view of an account with its payments, remittances and adjustments for every team."
+    rec: "None."
+    impact: "FRS.CSH.08.01, 08.02"
+  - ids: [CSHID.001]
+    name: Acknowledgement Receipts (premium and non-premium)
+    features: [BIL-003]
+    fit: Extend
+    ootb: "Receipts with payor, references, amount, currency and mode, matched and applied at once, are standard; the posting step by a second user, the entry type and the bank account of BDOI's FRS are extensions (Appendix R, C1)."
+    best: "A receipt given to the payor at once, from a BIR-registered series; premium received by a broker held in trust for the insurer and identified to the insurer."
+    rec: "Decide C1: issue at save with a daily review, or keep the posting step as a configurable approval."
+    impact: "FRS.CSH.02.01, 02.05"
+  - ids: [CSHID.002]
+    name: Official Receipts for BDOI income
+    features: [BIL-004, TAX-013]
+    fit: Configure
+    ootb: "Head Office receipts of income with VAT and withholding tax lines and the income account of each type are standard; the types are a maintained list."
+    best: "Under the Ease of Paying Taxes Act (RA 11976) the invoice is the primary document for services; series and forms registered with the BIR."
+    rec: "Comptrollership (Tax) confirms the document name, form and series (Appendix R)."
+    impact: "FRS.CSH.02.02, 02.06; Appendix L"
+  - ids: [CSHID.003, CSHID.004, CSHID.005]
+    name: Cancellation and reinstatement with reasons
+    features: [BIL-005, BIL-022]
+    fit: Extend
+    ootb: "Cancellation and reinstatement as requests with a reason, approved by a second user, with reversal entries, are standard; the remitted / not remitted branches and AP Unapplied Commission of BDOI's FRS are extensions."
+    best: "Every reversal of a receipt approved by a second person, with the reason, and the remitted premium recovered from the insurer."
+    rec: "Decide C2 (meaning of reinstatement) and C9 (remitted AR)."
+    impact: "FRS.CSH.03.01, 04.01"
+  - ids: [CSHID.006, CSHID.015]
+    name: Receipt numbering per branch and depletion
+    features: [BIL-006]
+    fit: Configure
+    ootb: "Series per branch and kind with ATP, range, warning level and maker-checker; numbering under a lock and a depleted-series stop are standard."
+    best: "Sequential numbers without gaps from the BIR-registered series; alert before depletion."
+    rec: "BDOI gives one format per receipt kind (Appendix R, C4)."
+    impact: "FRS.CSH.02.03, 02.05.08, 02.05.09"
+  - ids: [CSHID.007]
+    name: Commission ORs
+    features: [COM-003]
+    fit: Extend
+    ootb: "Commission payment details uploaded and issued as ORs per insurer and certificate are standard; the Commission Schedule matching and the trigger at the Disbursement approval of BDOI's FRS are extensions."
+    best: "One OR per insurer and settlement with the commission, VAT and withholding tax per account."
+    rec: "Decide C11 and C12."
+    impact: "FRS.CSH.02.02, 02.05.14, 07.01"
+  - ids: [CSHID.008]
+    name: Payment files and post-dated checks
+    features: [BIL-007, BIL-008, INT-006]
+    fit: Extend
+    ootb: "Uploads of the channel files with configurable layouts, duplicate refusal and the post-dated check warehouse with its daily maturity are standard; MFT intake, several files per event, file-name and header total checks are extensions."
+    best: "Channel files received automatically with control totals; post-dated checks warehoused and turned into payments on maturity."
+    rec: "BDOI gives the layouts not yet given (Appendix S); decide C8 (Direct Credit) and C15 (PDC source)."
+    impact: "FRS.CSH.05.01, 05.02; Appendix D"
+  - ids: [CSHID.009, CSHID.026, CSHID.027]
+    name: Removed from the BRD
+    features: []
+    fit: Removed from the BRD
+    ootb: "Not offered for Cashiering (check pick-up and the Cashiering BIR 2307 processing are withdrawn)."
+    best: "-"
+    rec: "None."
+    impact: "Section 2 (rows added with the reason)"
+  - ids: [CSHID.010, CSHID.011]
+    name: Search and audit trail
+    features: [BIL-016]
+    fit: Fit
+    ootb: "Receipt search on the ten criteria, a search log and an audit trail that no user can change are standard."
+    best: "The seven items of the IT audit trail standard, refused actions included."
+    rec: "Confirm the audit items and the search log retention (Appendix S)."
+    impact: "FRS.CSH.08.01, 08.03"
+  - ids: [CSHID.012, CSHID.013, CSHID.014]
+    name: Accounting entries
+    features: [BIL-017, ACC-002]
+    fit: Configure
+    ootb: "Every Cashiering event posts a balanced journal through rules maintained by Comptrollership; no account is fixed in the system."
+    best: "Rules owned by the controller with maker-checker; foreign currency at the official rate with two decimals."
+    rec: "Comptrollership gives the accounts of Appendix I."
+    impact: "Appendix I"
+  - ids: [CSHID.016]
+    name: Minimal balances
+    features: [BIL-013]
+    fit: Configure
+    ootb: "Minimal balances cleared when the payment is processed with a configurable threshold and the three exceptions are standard."
+    best: "Small differences cleared automatically under a threshold approved by the controller, never left in the unapplied list."
+    rec: "Decide the threshold (Appendix R, C5)."
+    impact: "FRS.CSH.02.05.12"
+  - ids: [CSHID.017, CSHID.018, CSHID.023]
+    name: Reports
+    features: [BIL-018]
+    fit: Extend
+    ootb: "Reports with separate view and export rights and an archive of every run are standard; the layouts of BDOI's FRS.CSH.09.02 are set up as report layouts."
+    best: "Daily cash reconciliation and ageing of unapplied payments for management."
+    rec: "BDOI confirms the filters and timing of Appendix M."
+    impact: "FRS.CSH.09; Appendix M"
+  - ids: [CSHID.019]
+    name: Batch printing
+    features: [BIL-015]
+    fit: Extend
+    ootb: "Batch printing of receipts with a print log is standard; the ZIP of single PDFs, the certificate number and the REPRINT mark of BDOI's FRS are extensions."
+    best: "Re-printed receipts visibly marked; every print logged."
+    rec: "Confirm the certificate number convention (Appendix R, C4)."
+    impact: "FRS.CSH.02.04"
+  - ids: [CSHID.020]
+    name: Matching at acceptance and pre-booked payments
+    features: [BIL-009, BIL-011]
+    fit: Extend
+    ootb: "Matching on the account references with pre-booked, excess, unmatched and cancelled-reference outcomes is standard; the legacy numbers as keys and the Direct Credit identification of BDOI's FRS are extensions."
+    best: "Straight-through matching of bank payments with the legacy references of migrated accounts."
+    rec: "Load the legacy numbers with the migrated accounts (Appendix P)."
+    impact: "FRS.CSH.05.01.08, 05.03, 05.04"
+  - ids: [CSHID.021]
+    name: Non-premium payments of insurers
+    features: [BIL-014]
+    fit: Fit
+    ootb: "Non-premium receipts of insurers posted to AR Insurer the same day, apart from client premium."
+    best: "Insurer refunds kept apart from client trust money."
+    rec: "None."
+    impact: "FRS.CSH.02.01.15"
+  - ids: [CSHID.022]
+    name: Application hierarchy
+    features: [BIL-010, TAX-018]
+    fit: Configure
+    ootb: "Application by component in a fixed order (DST, VAT, LGT, FST, other charges, basic premium), never to the premium due to the insurer."
+    best: "Taxes collected first so that DST, VAT and LGT are always covered; order confirmed with the insurers."
+    rec: "Decide C6 (FST and check before cash)."
+    impact: "FRS.CSH.02.05.11"
+  - ids: [CSHID.024, CSHID.025]
+    name: Unapplied payments and dispositions
+    features: [BIL-012]
+    fit: Extend
+    ootb: "Unapplied workbench with disposition types, approval rule per type, tabs by status, reversal and refund to Disbursement is an extension of BIBS, available in the BIBS environment."
+    best: "Every unapplied amount owned, aged and disposed with approval; refunds paid only by Disbursement."
+    rec: "Decide C13 and C14 and the types needing approval (Appendix S)."
+    impact: "FRS.CSH.06"
+  - ids: [MKTID.013, DBMID.001]
+    name: BIR 2307 reversal and certificates
+    features: []
+    fit: Specified in another FRS
+    ootb: "Specified in the FRS of Marketing Collection and Disbursement; Cashiering keeps the PR 2307 outstanding at payment."
+    best: "The certificate validated against the computed amount before the premium receivable is reversed."
+    rec: "Confirm the owner FRS (Appendix R)."
+    impact: "FRS.CSH.02.05.13"
+fitgap_nfr: {fit: Configure, rec: "Confirm the values of Appendix O (Appendix S)."}
+
+# ------------------------------------------------------------------------------------------------ change requests
+cr_types: [Beyond the BRD, Added by BDOI's FRS, Proposal for best practice, Correction]
+cr_status: [Candidate - for decision, Raised, Assessed, Approved, Rejected, Scheduled, In test, Closed]
+# [FR item, BRD ID, title, description, reason, type, scope, schedule, cost, other BRDs, tests, priority]
+cr_candidates:
+  - [FRS.CSH.02.05, CSHID.001, "Posting step for every AR and OR", "Created record, request number, submit for posting, poster's list, return; number generated at posting", "BDOI's FRS adds a second user to every issuance; the BRD does not ask for it (Appendix R, C1)", Added by BDOI's FRS, "Receive Payment, Receipts, dashboard", "Drop 1", "To assess", "None", "Posting cases", High]
+  - [FRS.CSH.02.01.02, CSHID.001, "Entry type, bank account and receipting branch on the AR", "Fields of BDOI's FRS.CSH.02.01.02 with maintained lists", "Each receipt debits the bank account chosen", Added by BDOI's FRS, "Receive Payment", "Drop 1", "To assess", "Accounting (BRD-5)", "Create AR cases", High]
+  - [FRS.CSH.05.01.08, CSHID.020, "Legacy numbers as match keys", "QPS, ISYS, Ebix, PN and Loan Application Number matched on Priority 1 and 2", "Payments of migrated accounts quote the legacy numbers", Added by BDOI's FRS, "Matching", "Drop 1", "To assess", "BRD-13 Data Migration", "Matching cases", High]
+  - [FRS.CSH.05.01.09, CSHID.008, "Direct Credit file as identification of payments", "Priority 1 match with the payment record; Invalid BP filename, Invalid Transaction Number, Duplicate", "Appendix R, C8", Added by BDOI's FRS, "Payment Uploads", "Drop 1", "To assess", "None", "Direct Credit cases", High]
+  - [FRS.CSH.03.01.08, CSHID.012, "Cancellation of a remitted AR to AR Insurer Refund", "Remitted / not remitted branches; OR cancellation to Commission Receivable", "Appendix R, C9", Added by BDOI's FRS, "Receipt cancellation", "Drop 1", "To assess", "Remittance; Accounting", "Cancellation cases", High]
+  - [FRS.CSH.04.01, CSHID.004, "Reinstatement of an issued receipt", "Partial by account; Unapplied, AR Insurer Refund, AP Unapplied Commission records", "Appendix R, C2, C14", Added by BDOI's FRS, "Receipt reinstatement; Unapplied", "Drop 1", "To assess", "Commission Receivables", "Reinstatement cases", High]
+  - [FRS.CSH.07.01.01, CSHID.007, "Automatic OR at the Disbursement approval", "OR generated once Disbursement approves the insurer settlement", "Appendix R, C12", Added by BDOI's FRS, "Commission ORs", "Drop 1", "To assess", "Disbursement (BRD-5); Remittance", "Automatic OR cases", High]
+  - [FRS.CSH.05.01.04, CSHID.008, "MFT intake of the OBPCS and PMS files", "Files received via MFT checked and processed; alert on a refused file", "BDOI's List of Integrations", Added by BDOI's FRS, "Payment Uploads", "Drop 1", "To assess", "BDOI IT", "Upload cases", Medium]
+  - [FRS.CSH.05.01.05, CSHID.008, "File name and header total checks; several files per upload", "Name conventions, 50 MB, header count and total", "BDOI's FRS.CSH.05.01.03 to .06", Added by BDOI's FRS, "Payment Uploads", "Drop 1", "To assess", "None", "Upload cases", Medium]
+  - [FRS.CSH.02.04.07, CSHID.019, "Acknowledgement certificate number and REPRINT mark", "Certificate number per printed receipt; REPRINT on every later print; ZIP of PDFs", "BDOI's FRS.CSH.02.04", Added by BDOI's FRS, "Batch Print; AR / OR forms", "Drop 1", "To assess", "None", "Printing cases", Medium]
+  - [FRS.CSH.02.06, CSHID.019, "AR and OR forms of BDOI and their template set-up", "BDOI's sample AR and OR body; template maintained by MBS with approval", "Appendix R, C16, C17", Added by BDOI's FRS, "Document templates", "Drop 1", "To assess", "None", "Form cases", Medium]
+  - [FRS.CSH.02.02.08, CSHID.002, "OR settling a Valid for Collection SOA or a Fee Policy invoice", "Selection of what the OR settles", "BDOI's FRS.CSH.02.02.08", Added by BDOI's FRS, "Issue Official Receipt", "Drop 1", "To assess", "Commission Receivables", "OR cases", Medium]
+  - [FRS.CSH.01.03.02, BRQID.003, "Dashboard amounts per receipt type and status", "Count and amount per item of BDOI's dashboard", "BDOI's FRS.CSH.01.03.02", Added by BDOI's FRS, "Cashiering Workbench", "Drop 1", "To assess", "None", "Dashboard cases", Low]
+  - [FRS.CSH.02.04.07, CSHID.019, "Certificate number convention", "AC_<branch>_<MMYYYY>_<sequence> until BDOI gives its convention", "Proposal of version 3.2", Beyond the BRD, "Batch Print", "Drop 1", "Low", "None", "Printing cases", Low]
+  - [FRS.CSH.02.01.16, CSHID.001, "Cashier's day-end list", "Records of the day with totals per payment type and bank account", "Proposal of version 3.2", Beyond the BRD, "Receipts", "Drop 1", "Low", "None", "-", Low]
+  - [FRS.CSH.06.02.02, CSHID.025, "Done tab of the Unapplied list", "Completed dispositions shown in their own tab", "Proposal of version 3.2", Beyond the BRD, "Unapplied Payments", "Drop 1", "None", "None", "-", Low]
+  - [FRS.CSH.09.02.19, CSHID.023, "Five reports added to BDOI's list", "PDC Warehousing, Priority Posted Accounts, Payment Reversals, AR Outstanding with Ageing, Payment Batch Run Report", "Reports of the BRD annex not in BDOI's list", Beyond the BRD, "Report Centre", "Drop 1", "Low", "None", "Report cases", Low]
+  - [FRS.CSH.02.02.10, CSHID.002, "Invoice under the Ease of Paying Taxes Act", "Document name, form and series of the income receipts", "RA 11976 (Appendix R)", Proposal for best practice, "OR form", "Drop 1", "To assess", "Accounting (BRD-5)", "OR cases", Medium]
+  - [FRS.CSH.05.01.06, CSHID.016, "Excess formula of BDOI's FRS corrected", "Excess = Paid Amount - (Outstanding - PR 2307)", "Slip in BDOI's FRS (Appendix R.2)", Correction, "Application", "Drop 1", "None", "None", "Application cases", Medium]
+
+# ------------------------------------------------------------------------------------------------ coverage
+# Status of the items added or elaborated in version 3.2 when the end-to-end conformance register alone does not tell
+# (Yes / Partly / No, note). BDOI's items take the platform status of the comparison workbook (sheet Requirement
+# mapping) unless listed here.
+coverage_items:
+  FRS.CSH.01.03.02: ["Partly", "Live counts per queue are available; the amounts per receipt type and status are planned for (C1 decides the posting items)."]
+  FRS.CSH.02.01.02: ["Partly", "Payor, references, currency, mode and matching are available; entry type, bank account and receipting branch are planned for."]
+  FRS.CSH.02.01.08: ["Partly", "Mandatory fields and amount checks are available; the currency and check-date checks are planned for (C7)."]
+  FRS.CSH.02.01.09: ["No", "The creation record numbers follow the posting step (C1, C3)."]
+  FRS.CSH.02.01.10: ["No", "Posting step planned for after decision C1."]
+  FRS.CSH.02.01.16: ["Partly", "The receipts of the day are listed with their status; the totals per bank account are planned for."]
+  FRS.CSH.02.02.04: ["Partly", "Duplicate refusal and the validation of the commission payment details are available; the .csv pipe template and 50 MB limit are planned for."]
+  FRS.CSH.02.02.07: ["Yes", "The nine fields of the commission payment details template are read."]
+  FRS.CSH.02.02.08: ["No", "Selection of the SOA or fee invoice is planned for."]
+  FRS.CSH.02.02.09: ["Partly", "One OR per insurer and certificate is available; the exact amount match and whole-file rule follow decision C10."]
+  FRS.CSH.02.04.02: ["Partly", "Selection by filter is available; the print queue of system receipts is planned for."]
+  FRS.CSH.02.04.07: ["No", "Certificate number planned for (C4)."]
+  FRS.CSH.02.04.12: ["No", "The print count is kept; the REPRINT mark is planned for."]
+  FRS.CSH.02.04.17: ["No", "Copy label planned for with BDOI's forms (C16)."]
+  FRS.CSH.02.05.06: ["No", "Posting step planned for after decision C1."]
+  FRS.CSH.02.05.07: ["No", "Return of a creation record follows the posting step (C1)."]
+  FRS.CSH.02.05.13: ["Partly", "The 98% application for 2% CWT clients is available; the tag per account follows decision C26."]
+  FRS.CSH.02.05.14: ["Partly", "One OR per group is issued; the print queue is planned for."]
+  FRS.CSH.02.06.01: ["No", "Template maintenance of the AR and OR forms planned for (C16)."]
+  FRS.CSH.02.06.02: ["Partly", "The OR PDF is available with the company name; BDOI's header, footer and words are planned for."]
+  FRS.CSH.02.06.03: ["Partly", "The AR PDF is available; BDOI's form is planned for."]
+  FRS.CSH.02.06.04: ["Partly", "The Certification of Payment PDF is available; its series number is planned for."]
+  FRS.CSH.03.01.06: ["Partly", "Reason, waiting request and disposition checks are available; the check-payment restriction is planned for (C21)."]
+  FRS.CSH.03.01.08: ["Partly", "Reversal and four eyes are available; the remitted branch follows decision C9."]
+  FRS.CSH.04.01.06: ["Partly", "The CSHID.005 information is captured; reinstatement of an issued receipt by account follows decision C2."]
+  FRS.CSH.04.01.09: ["No", "Reinstatement of an issued receipt follows decision C2."]
+  FRS.CSH.05.01.04: ["No", "MFT intake planned for with BDOI IT."]
+  FRS.CSH.05.01.05: ["Partly", "Duplicate file refusal is available; file-name check and 50 MB planned for."]
+  FRS.CSH.05.01.06: ["Partly", "Configurable layouts are available; header totals and the TOTAL row planned for."]
+  FRS.CSH.05.01.08: ["Partly", "Matching on account references and pre-booked is available; legacy numbers as keys planned for."]
+  FRS.CSH.05.01.10: ["Partly", "An AR per uploaded payment is available; the For Printing status is planned for."]
+  FRS.CSH.06.01.01: ["Partly", "Cashiering works the list; Marketing and Commission Receivable access follows decision C13."]
+  FRS.CSH.06.01.07: ["Partly", "The record holds its source, amounts and history; PN or loan application number and insurer columns planned for."]
+  FRS.CSH.07.01.01: ["No", "OR at the Disbursement approval follows decision C12; today the OR is issued at the remittance approval."]
+  FRS.CSH.07.01.04: ["Partly", "The remittance OR has one line per invoice; the mapping at the Disbursement approval follows C12."]
+  FRS.CSH.09.01.02: ["Partly", "View and export rights and the archive are available; BDOI's file names are planned for."]
+  FRS.CSH.09.02: ["Partly", "Report layouts of BDOI's list are being aligned; 12 layouts are draft."]
+  FRS.CSH.09.02.21: ["Partly", "Layout draft."]
+  FRS.CSH.09.02.22: ["Partly", "Ageing brackets of BDOI planned for."]
+  FRS.CSH.10.04.02: ["Partly", "Series and pre-booked alerts are available; the alert for a refused MFT file is planned for."]
+
+uat_criteria:
+  entry:
+    - "The FRS in BDOI's template v3.2 is signed, or the decisions of Appendix R that UAT depends on (C1, C2, C8, C9, C12) are recorded."
+    - "The receipt series, bank accounts, branches, lists and parameters of Appendix H are loaded with the values of the requirements collection workbook."
+    - "The UAT users of the Business Unit Walkthrough Users workbook can sign in with their passwords."
+    - "The UAT data hold booked accounts, pre-booked accounts, a payment file of each channel and post-dated checks."
+    - "The test cases of the Test Cases and Traceability workbook are reviewed by the Cashiering Process Owner."
+  exit:
+    - "Every test case of priority High is run and passed, or its failure has an agreed observation and date."
+    - "Every BRD ID of the Cashiering scope has at least one passed test case."
+    - "The walkthrough script is completed by the Business Unit with each step Pass."
+    - "No open observation of severity High; the others have an owner and a date."
+    - "The UAT sign-off certificate of BRD-02 (SO-02-3) is signed."
+
+# ------------------------------------------------------------------------------------------------ available in full
+# Items available in full in the BIBS environment, with the business evidence (automated test case or walkthrough
+# step). The longest matching prefix of an FR item gives its evidence; such an item is Yes and its acceptance
+# criteria are Yes. Points that are a setting are listed under configurable (Appendix R status).
+coverage_available:
+  FRS.OPS.001: "Device access test: with the device restriction set on, only the company networks and the company-issued devices reach the sign-in; the setting is off for SIT. Walkthrough on the browser of a laptop and of a tablet with the same screens."
+  FRS.CSH.01.03: "Cashiering dashboard test: count and amount per receipt type and status for issuance, cancellation, reinstatement, returned records, unapplied payments and payment files; each item opens its list; shown within 5 seconds."
+  FRS.CSH.02.01: "Receipt record tests: AR and OR creation records with entry type, bank account, receipting branch and remarks; the validation messages (currency, check date, amounts); submit for posting, return with a reason, edit and posting by another user with the AR or OR number issued. Day-end list test: totals per payment type and bank account."
+  FRS.CSH.02.02: "OR creation record tests (OR types, payee, amounts and taxes, save, validation, submit, return, edit, cancel, audit trail) and payment file test of the commission schedule (pipe-delimited template, size limit, validation report, failed and successful lists, raw file kept read-only, line or whole-file processing by setting)."
+  FRS.CSH.02.02.08: "Other income test: an incentive OR lists the Valid for Collection SOAs of the insurer with their outstanding amounts, a fee OR the fee invoices of the client; the outstanding amount falls once the OR is posted."
+  FRS.CSH.02.03: "Receipt series tests: series per receipting branch with its year and number format (prefix, year, branch indicator, sequence), authorised by another user, warning alert of the numbers left, OR series for Head Office only, end below the last number refused."
+  FRS.CSH.02.04: "Receipt printing tests: print by branch or insurer and issue dates, print queue of the receipts the system generated, re-print by part of the number with the REPRINT mark and the print count, certificate number at the first print, Client's and company copies with the company copy kept on the receipt, ZIP of one PDF per receipt, at most 500 per batch, retry and skip in the print log. Walkthrough of the print preview."
+  FRS.CSH.02.05: "Posting tests: posting list with filters, all or selected records, confirmation message, return with a reason, AR numbers by receipting branch and OR numbers of Head Office in sequence, check payments posted before cash, application hierarchy, BIR 2307 accounts applied less the PR 2307, one OR per commission schedule placed in the print queue, GL posting with the minimal balance reversal."
+  FRS.CSH.02.06: "Receipt form tests: AR and OR forms with the company address and VAT TIN, the amount in words and in figures, footer lines and copy label; a form change printed only after another user approved it. Certification of Payment test with its series number."
+  FRS.CSH.03.01: "Cancellation record tests: AR numbers only or OR numbers only, reasons by payment type, validation messages, edit, save or cancel the record, submit for posting, return, posting with a remitted AR as an AR insurer refund and a cancelled OR as commission receivable."
+  FRS.CSH.04.01: "Reinstatement record tests: search of issued receipts, full or partial reinstatement by account, reason and encoded fields, validation, submit, return and posting (remitted AR to AR insurer refund, AR not remitted to unapplied payment, OR to AP unapplied commission)."
+  FRS.CSH.05.01: "Payment file tests: Bills Payment, CLPC, Trade, Direct Credit, post-dated check and commission schedule files in the client's layouts; name convention, size limit, duplicate file and rows, header count and total, TOTAL row; run report per category; legacy numbers as match keys; Direct Credit identification; files received via MFT with the alert of a refused file; channel simulator end to end."
+  FRS.CSH.06.01: "Unapplied payment list test: filters by type, payment date, insurer, client, assured, account and part of the number in any case; source, account, PN and loan application numbers, client and insurer; a fully applied payment leaves the list; a Marketing user sees the payments of his or her unit only."
+  FRS.CSH.06.02: "Unapplied disposition tests: apply to another invoice through the hierarchy, refund through Disbursement with Team approval, reclass and transfer of the remaining balance, tabs per status and bulk submission and approval."
+  FRS.CSH.07.01: "Settlement OR tests: the commission OR of an insurer settlement waits for the approval of Disbursement and is then issued, one OR per insurer and batch with one line per invoice and the OR number on the batch; a cancelled payment request cancels it; issued at the remittance approval with the other setting."
+  FRS.CSH.08.01: "Receipt search tests on the inquiry criteria, single and combined, names by part in any case, and the search log listing each search with the user and the criteria in words for the Auditor and the Team Leader. Walkthrough of the account record inquiry."
+  FRS.CSH.09.01: "Report tests: every Cashiering report runs and exports in every format, view and export rights apart, each run archived, files named <Report Name>_<MMDDYYYY>."
+  FRS.CSH.09.02: "Report tests: columns in the client's order with totals, files named <Report Name>_<MMDDYYYY>, ageing brackets 0-30 to above 365, payment reversals with record, reason, creator and poster, summary per disposition, certification of payment with its series number."
+  FRS.CSH.10.04: "Payment file test: a file received via MFT and refused raises the alert to the Cashiering Team Leader; receipt series and pre-booked alerts."
+
+# Points of Appendix R available as a setting: the status of the point becomes "Configurable - BDOI to confirm the
+# setting" and the proposal names the setting and its value by default.
+configurable:
+  C1: "Setting of the receipts that need the posting step: AR and OR (BDOI's reading) by default; blank issues the number at save."
+  C2: "Setting of what Reinstate does: issued receipts (BDOI's reading), cancelled receipts, or both (by default)."
+  C3: "Setting of the record number format: prefix, type and sequence by default."
+  C4: "Settings of the AR and OR number format (prefix, year, branch indicator, sequence) and of the certificate number (AC, branch, month and year, sequence)."
+  C5: "Setting of the minimal balance threshold: 10.00 by default (BRD)."
+  C6: "Setting of the order of the payments of one posting run: checks before cash by default."
+  C7: "Settings of the check date rule (on) and of the holding period (4 working days)."
+  C8: "Setting of the reading of the Direct Credit file: identification of payments already received (BDOI's reading) by default."
+  C9: "Setting of the cancellation of a remitted AR: AR insurer refund (BDOI's reading) by default."
+  C10: "Setting of the commission schedule with failed or unmatched lines: valid lines processed (BRD) by default; whole file refused available."
+  C12: "Setting of the point the settlement OR is issued: at the approval of Disbursement (BDOI's reading) by default; at the remittance approval available."
+  C13: "Setting of what Marketing users see in the unapplied payment list: their marketing unit (BDOI's reading) by default."
+  C18: "Size limit per payment file type: 50 MB by default."
+  C21: "List of the cancellation reasons allowed for a check payment, by default."
+  C24: "Setting of the device restriction: off by default for SIT; on with the company networks and the device header of BDOI IT."
+  C25: "Setting of the remarks of an AR: mandatory by default."
+  C26: "Setting of the base of the PR 2307: the premium amount by default; the basic premium available."

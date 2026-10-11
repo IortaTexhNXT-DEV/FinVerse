@@ -1,0 +1,217 @@
+# BRD-11 User Access Maintenance – Business Sign-off Pack, release set v2.1 (Drop 0, Setup and Data Migration).
+# Built by docs/deliverables/src/signoff/signoff_pack.py (workbook, checks) and read by the FRS source through
+# ```pack blocks (tools/deliverables/bdoi_docx.py). Schema: docs/deliverables/src/signoff/README.md.
+meta:
+  brd: BRD-11
+  brd_label: BRD-11
+  name: User Access Maintenance
+  code: UA
+  version: "2.1"
+  date: 8 October 2026
+  status_as_of: 08-Oct-2026
+  release_set: BRD-11 User Access Maintenance – Business Sign-off Pack
+  frs: FRS_BRD11_USER_ACCESS_MAINTENANCE.md
+  test_plan: brd11_cases.yaml
+  screens_dir: screens
+  screenshot_dir: ../screenshots
+
+# The User Access Maintenance personas: role code, name, SIT/UAT user of the seed profile.
+personas:
+  UAM_REQUESTOR: {name: Requestor, user: requestor}
+  UAM_APPROVER: {name: Approver, user: uamapprover}
+  UAM_SECOND_APPROVER: {name: Second Approver, user: secapprover}
+  BUSINESS_ADMIN: {name: Business Administrator, user: badmin}
+  SYSADMIN: {name: System Administrator, user: admin}
+  AUDITOR: {name: Auditor, user: auditor}
+  INFOSEC_OFFICER: {name: Information Security Officer, user: infosec}
+  NB_APPROVER: {name: New Business Approver (keeps the access approval right), user: approver}
+
+# The other personas whose sidebar the set shows: every persona of the persona suites of the menu check
+# (menu_suites). Signing BRD-11 signs the role matrix, so each persona's menu is a table of the FRS and a sheet of
+# the workbook. The check refuses a suite persona without a menu here, another seed user, or a sidebar that differs
+# from the suite.
+menu_suites: frontend/src/navigation/personaMenus.json
+menu_sheets: per_persona
+menu_personas:
+  MKT_AO: {name: Marketing Account Officer, user: ao}
+  MKT_TL: {name: Marketing Team Leader / Head (approver), user: mkttl}
+  PROCESSING_TL: {name: Processing Team Leader, user: proctl}
+  PROCESSOR: {name: Processing, user: proc}
+  LAMD: {name: LAMD (loan status validation), user: lamd}
+  CONTACT_CENTER: {name: Contact Center (renewal follow-up), user: contactc}
+  COMPLIANCE_OFFICER: {name: Compliance Officer, user: compoff}
+  COMPLIANCE_CHECKER: {name: Compliance Officer (Checker), user: compchk}
+  UNIT_COMPLIANCE_COORD: {name: Unit Compliance Coordinator, user: ucc}
+  SCR_INVESTIGATOR: {name: Screening Investigator, user: investigator}
+  SCR_APPROVER: {name: Screening Approver / Unit Head, user: scrapprover}
+  AML_COMMITTEE: {name: AML Committee Member, user: amlcom1}
+  EB_AO: {name: Marketing Account Officer (Employee Benefits), user: ebao}
+  EB_TL: {name: Marketing Team Lead / Unit Head (Employee Benefits), user: ebtl}
+  EB_MANAGEMENT: {name: BDOI Management (Employee Benefits threshold approver), user: ebmgmt}
+  EB_PROCESSOR: {name: Processing (Employee Benefits), user: ebproc}
+  EB_PROC_SUPERVISOR: {name: Processing Supervisor (Employee Benefits), user: ebprocsup}
+  EB_COLLECTION: {name: Collection (Employee Benefits), user: ebcoll}
+  CLM_OFFICER: {name: Claims Officer / Claims Assistant, user: clmofficer}
+  CLM_TL: {name: Claims Team Lead, user: clmtl}
+  CLM_TH: {name: Claims Team Head, user: clmth}
+  CLM_UH: {name: Claims Unit Head, user: clmuh}
+  CLM_RISK: {name: Claims / Risk Analyst, user: clmrisk}
+  DATA_MIGRATION_LEAD: {name: Data Migration Lead, user: miglead}
+  DATA_STEWARD: {name: Data Steward, user: migsteward}
+  DATA_OWNER: {name: Data Owner, user: migowner}
+  MIGRATION_OPERATOR: {name: Migration Operator, user: migops}
+  MIGRATION_RECON_APPROVER: {name: Migration Reconciliation Approver, user: migrecon}
+  MIGRATION_GONOGO: {name: Go-Live Board (migration go / no-go), user: miggonogo}
+  LEGACY_INQUIRY: {name: Legacy Inquiry (auditor), user: legacyaudit}
+  LEGACY_ACCESS_REVIEWER: {name: Legacy Access Reviewer, user: legacyrev}
+  SBM_HANDLER: {name: Submitted Handler, user: sbmhandler}
+  SBM_CHECKER: {name: Submitted Checker, user: sbmchecker}
+  SBM_SANITATION: {name: Sanitation Handler (Submitted Policies), user: sanitation}
+  SBM_TL: {name: Submitted Policies Team Lead, user: sbmtl}
+  SBM_POLICY_REVIEWER: {name: Policy Review Officer (Submitted Policies), user: polreview}
+  SBM_UPP_HANDLER: {name: Handling Fee Handler (Unapplied Payments), user: sbmfee}
+  CSF_AGENT: {name: Customer Service Agent, user: csfagent}
+  CSF_SUPERVISOR: {name: Customer Service Supervisor, user: csfsup}
+  CSF_MANAGEMENT: {name: Customer Service Management, user: csfmgmt}
+
+# Packs of other BRDs whose screens a walkthrough step may show (My Approvals and Lists of Values of New Business).
+foreign_packs: [../../BRD-01_New_Business/pack/pack.yaml]
+
+# Signatories of the sign-off certificate and who signs what: ownership.yaml.
+
+# Sidebar sections that belong to this BRD (navigation/modules.ts module ids) and the BRD of every other section,
+# used to mark each menu entry of a persona.
+own_sections: [user-access]
+section_brd:
+  dashboard: Platform
+  nb-dashboard: BRD-1
+  workspace: BRD-1
+  crm: BRD-1
+  csf: BRD-9
+  screening: BRD-10
+  quotations: BRD-1
+  accounts: BRD-1
+  proposals: BRD-1
+  eb: BRD-8
+  placement: BRD-1
+  issuance: BRD-1
+  booking: BRD-1
+  renewal: BRD-6
+  prodrecon: BRD-2
+  adjustment: BRD-2
+  catalog: BRD-3
+  bulk: BRD-1
+  operations: BRD-2
+  collections: BRD-4
+  cashiering: BRD-2
+  remittance: BRD-2
+  commission: BRD-2 / BRD-4
+  disbursement: BRD-5
+  payrequest: BRD-5
+  acsl: BRD-5
+  frbs: BRD-5
+  gl: BRD-5
+  receivables: BRD-5
+  payables: BRD-5
+  assets: BRD-5
+  planning: BRD-5
+  tax: BRD-5
+  accounting-engine: BRD-5
+  brokerclaims: BRD-7
+  underwriting: Platform
+  claims: Platform
+  reinsurance: Platform
+  reserves: Platform
+  nb-reports: BRD-1
+  reports: Platform
+  broking-setup: BRD-1
+  submitted: BRD-12
+  migration: BRD-13
+  legacy-inquiry: BRD-13
+  screening-setup: BRD-10
+  setup: Platform
+  user-access: BRD-11
+  admin: Platform / BRD-11
+  help: Platform
+
+# Screen-flow figure: the links between the screens (list → record → action → next screen).
+flow:
+  - [SCR-UA-01, SCR-UA-02, "Forgot password?"]
+  - [SCR-UA-02, SCR-UA-01, Back to Login]
+  - [SCR-UA-01, SCR-UA-03, password set by an administrator or expired]
+  - [SCR-UA-03, SCR-UA-05, Change Password]
+  - [SCR-UA-01, SCR-UA-05, Login]
+  - [SCR-UA-05, SCR-UA-04, idle or session end]
+  - [SCR-UA-06, SCR-UA-07, New Request]
+  - [SCR-UA-06, SCR-UA-08, open]
+  - [SCR-UA-07, SCR-UA-08, Save Draft or Submit]
+  - [SCR-UA-08, SCR-UA-07, Edit Request]
+  - [SCR-UA-11, SCR-UA-12, New Group Profile Request]
+  - [SCR-UA-11, SCR-UA-08, open]
+  - [SCR-UA-12, SCR-UA-08, Save Draft or Submit]
+  - [SCR-UA-09, SCR-UA-10, open]
+  - [SCR-UA-10, SCR-UA-08, a line]
+  - [SCR-UA-15, SCR-UA-07, Raise Request or a row]
+  - [SCR-UA-16, SCR-UA-08, a request to implement]
+  - [SCR-UA-14, SCR-UA-17, a report]
+  - [SCR-UA-13, SCR-UA-16, the same grants]
+
+# Elements shared by many screens, described once.
+common:
+  - name: Page header
+    text: >-
+      Every page shows its section (User Access, Administration or Account) and title, a one-line description and its
+      actions on the right. A record page has a back arrow to its list.
+  - name: Work lists
+    text: >-
+      Lists show tabs, a search box with its Search button, a Filters button where the list has advanced filters, and
+      the paged table ("Showing 1 to n of N results"). Rows alternate white and Background Blue; a long list scrolls inside its card with the header row in view. A row opens its record. Dates show as dd-MMM-yyyy and times as
+      dd-MMM-yyyy HH:mm in Philippine time. Users are shown by their names, not their user IDs.
+  - name: Record summary and reference chips
+    text: >-
+      A request opens with its reference (AR-yyyy-nnnnnn for a request, BLK-yyyy-nnnnnn for a bulk batch), its status
+      pill, its risk flags (Privilege Increase, Outside Hours) and the key facts: requested by and when, approver,
+      effective date and decision. A reference chip copies the reference. Under the header a stepper shows the stages
+      of the request: Draft, Pending Approval, Second approval (where one is needed), then Approved, or For
+      implementation and Implemented for a group profile; Scheduled while an approved change waits for its effective
+      date; a returned request in amber, a rejected or cancelled one in red. Under the stepper one row gives Current
+      Stage, Since and Assigned To (the approver's name).
+  - name: Decisions with a reason
+    text: >-
+      Approve, Return, Reject, Cancel and Implement open a dialog that names the request and its change. Return,
+      Reject and Cancel need a text (remarks, reason); an approval comment is optional. The text is kept in the history
+      of the request and sent with the notice.
+  - name: Separation of duties
+    text: >-
+      Nothing changes access until a second person approves. The requester and the user the request is about never
+      decide it; a request goes to the approver chosen by the requester; a second approval is given by someone other
+      than the first approver; a group-profile request is implemented by a System Administrator who did not raise it.
+      The screens offer a decision only to the users who may take it, and the server refuses it for anyone else.
+  - name: Status pills and tags
+    text: >-
+      Request statuses (Draft, Pending Approval, Pending Second Approval, Returned, Scheduled, Approved, For Implementation,
+      Implemented, Rejected, Cancelled) and user statuses (Active, Online, Disabled, Locked) are outlined pills of one size and
+      colour per state group; a pill never wraps. Risk flags are tags next to the request title.
+  - name: Dates
+    text: >-
+      Dates are entered with the date picker and shown as dd-MMM-yyyy (for example 27-Sep-2026). An effective date
+      cannot be before today; blank means the change applies on approval.
+  - name: Notifications and help
+    text: >-
+      The bell in the header shows the unread count and opens the notifications panel, grouped by day; each notice
+      opens its request. Mark Read, Mark All Read and View All are offered. The Help button of each page explains the
+      screen.
+  - name: Session guard
+    text: >-
+      On every screen, after 15 minutes without activity a dialog warns that the user will be signed out and counts
+      down; Stay Signed In keeps the session and Sign Out Now ends it. After 30 minutes without activity the user is
+      signed out. Activity in any browser tab keeps every tab signed in. Separately, the session ends at a fixed time
+      after sign-in, whatever the activity, and a dialog warns 30 minutes before.
+  - name: Messages
+    text: >-
+      Every message follows one notice standard: a white notice with a thin bar and an icon in the colour of its kind
+      (red error, amber warning, blue information, green success), a bold short title, then the business message with
+      one bullet per missing item. Field errors appear under the field with the field outlined, and a long form lists
+      its errors in a notice at the top with a link to the first field. A refusal by a business rule shows the business
+      message only, without codes or references; only an unexpected system error offers Retry and a reference for
+      support behind Details. Success is confirmed by a short message in the same standard.

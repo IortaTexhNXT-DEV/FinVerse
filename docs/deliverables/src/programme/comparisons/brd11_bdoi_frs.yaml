@@ -1,0 +1,829 @@
+# BDOI's Functional Requirements Specifications for User Access Maintenance (BDO ITG template D051, FR document
+# PRJ0012475, revision 1.1), extracted word for word from the source document of the same name in
+# docs/source-documents by build_brd11_comparison.py --extract: the business requirements mapping, every FRUM
+# item with its text (list levels shown by indentation) and the field tables of Annexes E to H. The second
+# item numbered FRUM.008.01 (export of the audit trail) is keyed 'FRUM.008.01 (2nd)'.
+meta:
+  file: FRS - BDOI BROKERSYS User Access Maintenance v1.1 (BDOI).docx
+  template: D051
+  fr_document: PRJ0012475
+  prepared_by: John Barbachano
+  created: 09/21/2026
+  revision: '1.1'
+  last_updated: 10/09/2026
+  tables: 13
+  images: 9
+  approx_words: 6300
+brm:
+- id: BRD 1.001.1
+  requirement:
+  - I. Log in as a Requestor
+  - a. Access the application using any BDO issued device
+  - 1. Log in with a Requestor user profile
+  - 2. Receive the inactivity warning (15 minutes)
+  - 3. Receive warning prior to system triggered log out (30 minutes)
+  bdoi_frs: FRUM.001
+- id: BRD 1.002.1
+  requirement:
+  - II. Enroll New User
+  - a. Submit a new User Access request
+  - 1. Create request
+  - 1.1 Input New User data
+  - 1.2 Select User Access Group profile
+  - 1.3 Select approver from the drop-down
+  - 1.4 Add remarks (i.e justification, etc.)
+  - 1.5 Save remarks
+  - 2. Edit drafted request
+  - 3. Cancel drafted request
+  - 4. Submit request
+  bdoi_frs: FRUM.002
+- id: BRD 1.003.1.1
+  requirement:
+  - III. Modify Existing User
+  - a. Submit modify User Access/permission request
+  - 1. Create request
+  - 1.1. Search existing User
+  - 1.2 Edit/Update selected user data
+  - 1.3 Select User Access Group profile
+  - 1.4 Select approver from the drop-down
+  - 1.5 Add remarks (i.e Justification, etc.)
+  - 1.6 Save remarks
+  - 2. Edit a drafted request
+  - 3. Cancel a drafted request
+  - 4. Submit a request
+  bdoi_frs: FRUM.003, FRUM.004
+- id: BRD 1.004.1
+  requirement:
+  - IV. Deactivate User
+  - a. Submit a User Access deactivation request
+  - 1. Create a request
+  - 1.1 Search an existing User
+  - 1.2 Add remarks (i.e reason for deactivation)
+  - 1.3 Save remarks
+  - 1.4 Select approver from the drop-down
+  - 2. Edit a drafted request
+  - 3. Cancel a drafted request
+  - 4. Submit a request
+  bdoi_frs: FRUM.003
+- id: BRD 1.005
+  requirement:
+  - V. Reactivate User
+  - a. Submit a User Access reactivation request
+  - 1. Create a request
+  - 1.1 Search an existing User
+  - 1.2 Add remarks (i.e reason for reactivation)
+  - 1.3 Save remarks
+  - 1.4 Select approver from the drop-down
+  - 2. Edit a drafted request
+  - 3. Cancel a drafted request
+  - 4. Submit a request
+  bdoi_frs: FRUM.003
+- id: BRD 1.006.1
+  requirement:
+  - VI. Apply Correction
+  - a. Apply correction on returned requests
+  - 1. Receive notification on the returned request
+  - 2. Edit data on the returned request
+  - 3. Add remarks
+  - 4. Save remarks
+  - 5. Re-submit request
+  bdoi_frs: c/o UIDM
+- id: BRD 1.007.1
+  requirement:
+  - VII. Cancel a request
+  - a. Cancel a submitted request for approval
+  - 1. Search request
+  - 2. Add remarks(I,e reason for cancellation, etc.)
+  - 3. Save remarks
+  - 4. Re-submit request
+  bdoi_frs: c/o UIDM
+- id: BRD 1.008.1
+  requirement:
+  - VIII. View request/s
+  - a. View the submitted request/s
+  - 1. View the list of the submitted request/s
+  - 2. View the status of the submitted request/s
+  - 3. View the details of the submitted request/s
+  - 4. Receive notification on the approved/ rejected request
+  bdoi_frs: c/o UIDM
+- id: BRD 1.009.1
+  requirement:
+  - IX. Bulk Request
+  - a. Submit request for bulk creation/modification/deactivation/reactivation
+  - 1. Attach a file for bulk processing
+  - 2. Add remarks
+  - 3. Save remarks
+  - 4. Edit a drafted request
+  - 5. Cancel a drafted request
+  - 6. Submit a request
+  bdoi_frs: c/o UIDM
+- id: BRD 2.001.1
+  requirement:
+  - I. Log in as an Approver
+  - a. Access the application using any BDO issued device
+  - 1. Log in with an Approver user profile
+  - 2. Receive the inactivity warning (15 minutes)
+  - 3. Receive warning prior to system triggered log out (30 minutes)
+  bdoi_frs: FRUM.001
+- id: BRD 2.002.1
+  requirement:
+  - II. Review and approve request/s
+  - a. Receive notification on the request for approval
+  - b. View the list of requests for approval
+  - 1. Filter the list assigned to me
+  - c. Select request
+  - d. View request details
+  - e. Approve request
+  - f. Reject request
+  - 1. Add remarks (i.e rejection reason, etc.)
+  - 2. Save remarks
+  - g. Return request to Requestor
+  - 1. Add remarks (i.e reason for return, etc.)
+  - 2. Save remarks
+  bdoi_frs: c/o UIDM
+- id: BRD 3.001.1
+  requirement:
+  - I. Log in as a Business Administrator
+  - a. Access the application using any BDO issued device
+  - 1. Log in with a Business Administrator user profile
+  - 2. Receive the inactivity warning (15 minutes)
+  - 3. Receive warning prior to system triggered log out (30 minutes)
+  bdoi_frs: FRUM.001
+- id: BRD 3.002.1
+  requirement:
+  - II. Submit a User Access Group Profile Request
+  - a. Submit a new User Access Group Profiles request
+  - 1. Create a request
+  - 2. Select approver/s from the drop-down
+  - 3. Edit a drafted request
+  - 4. Cancel a drafted request
+  - 5. Submit a request
+  - 6. Add remarks
+  - 7. Save remarks
+  bdoi_frs: FRUM.005
+- id: BRD 3.002.2
+  requirement:
+  - b. Submit a new User Access Group Profiles request
+  - 1. Create a request
+  - 2. Search existing group profile from the drop-down
+  - 3. Select approver/s from the drop-down
+  - 4. Edit a drafted request
+  - 5. Cancel a drafted request
+  - 6. Submit a request
+  - 7. Add remarks
+  - 8. Save remarks
+  bdoi_frs: FRUM.005
+- id: BRD 3.002.3
+  requirement:
+  - c. Submit a User Access Group Profiles deactivation request
+  - 1. Create a request
+  - 2. Search existing group profile from the drop-down
+  - 3. Select approver/s from the drop-down
+  - 4. Edit a drafted request
+  - 5. Cancel a drafted request
+  - 6. Submit a request
+  - 7. Add remarks
+  - 8. Save remarks
+  bdoi_frs: FRUM.006
+- id: BRD 3.002.4
+  requirement:
+  - d. Submit a User Access Group Profiles reactivation request
+  - 1. Create a request
+  - 2. Search existing group profile from the drop-down
+  - 3. Select approver/s from the drop-down
+  - 4. Edit a drafted request
+  - 5. Cancel a drafted request
+  - 6. Submit a request
+  - 7. Add remarks
+  - 8. Save remarks
+  bdoi_frs: FRUM.006
+- id: BRD 3.003.1
+  requirement:
+  - III. Generate Reports
+  - a. Generate Reports
+  - 1. User Access Report
+  - 1.1. User name
+  - 1.2. Group profile
+  - 1.3. Date created
+  - 1.4. Date modified
+  - 1.5. Created by
+  - 1.6. Added/ Modified/ deactivated/ reactivated by
+  bdoi_frs: FRUM.007
+- id: BRD 3.003.2
+  requirement:
+  - 2. User Group Profile Report
+  - 2.1. Group profile name
+  - 2.2. Modules accessed under each Group profile
+  - 2.3. Date created
+  - 2.4. Date modified
+  - 2.5. Created by
+  - 2.6. Added/ Modified/ deactivated/ reactivated by
+  bdoi_frs: FRUM.007
+- id: BRD 3.003.3
+  requirement:
+  - 3. Group Profile Membership list
+  - 3.1. list of members under each profile
+  - 3.1.1 Group profile
+  - 3.1.2 User Name
+  bdoi_frs: FRUM.007
+- id: BRD 4.001.1
+  requirement:
+  - I. Log in as a Business Administrator
+  - a. Access the application using any BDO issued device
+  - 1. Log in with a System Administrator user profile
+  - 2. Receive the inactivity warning (15 minutes)
+  - 3. Receive warning prior to system triggered log out (30 minutes)
+  bdoi_frs: FRID.001
+- id: BRD 4.002.1
+  requirement:
+  - II. Manage users of the system
+  - a. Define User Profile/Role
+  - 1. Create user profile/role for Requestor
+  - 2. Create user profile/role for Approver
+  - 3. Create user profile/role for Business Administrator
+  bdoi_frs: FRID.005
+- id: BRD 4.002.2
+  requirement:
+  - II. Manage users of the system
+  - b. Define specific functionality or capability to a specific user profile/role
+  - 1. Assign Enroll New User to a specific user profile/role
+  - 2. Assign Modify Existing User function to a specific user profile/role
+  - 3. Assign Deactivate User function to a specific user profile/role
+  - 4. Assign Reactivate User function to a specific user profile/role
+  - 5. Assign Apply Correction function to a specific user profile/role
+  - 6. Assign Cancel a request function to a specific user profile/role
+  - 7. Assign View request/s function to a specific user profile/role
+  - 8. Assign Review and approve request/s function to a specific user profile/role
+  - 9. Assign Submit a User Access Group Profiles Request function to a specific user profile/role
+  - 10. Generate Reports Request function to a specific user profile/role
+  bdoi_frs: FRID.006
+- id: BRD 4.003.1
+  requirement:
+  - III. Generate Logs
+  - a. Generate Audit logs for compliance and audit purposes as needed
+  bdoi_frs: FRUM-008
+frum:
+- id: FRUM.001
+  component: Login
+  capability: Login, Inactivity Warning, and Timeout
+  scope: []
+  items:
+  - id: FRUM.001.01
+    title: The system shall allow the user to access BDOI-BROKERSYS application using any BDO-issued device and even on multiple
+      tabs on supported web browser.
+    text: []
+  - id: FRUM.001.02
+    title: Login and Role-Based Access
+    text:
+    - The system shall allow the user to log in using a valid profile.
+    - The BDOI-BROKERSYS application shall be onboarded as an authorized application in the Enterprise SSO platform to enable
+      Single Sign-On (SSO) authentication.
+    - The system shall require users to sign in using their authorized Enterprise SSO account.
+    - '  Access to the application disables after three (3) invalid password tries.'
+    - The system shall integrate with Enterprise SSO platform for user authentication.
+    - The system shall establish a session upon successful authentication and grant access based on the user's assigned roles
+      and permissions.
+    - '  User shall only access (read, update, approve) modules based on the permission on the access matrix provided and
+      approved by the Business. Refer to Annex C -User Access Matrix.'
+    - '  User with Supervisory roles have the same view as their assigned personnels (e.g. UH can manage the records of all
+      assigned personnels including access to uploaded documents).'
+    - '  Access to unauthorized records and documents shall be denied in the BDOI-BROKERSYS application or any document repositories
+      where the uploaded document is stored.'
+    - The system shall deny access to users whose Enterprise SSO accounts are inactive, locked, disabled, or unauthorized
+      to access the application.
+    - The system shall redirect unauthenticated users to page with appropriate error message.
+    - '  Users with unauthorized access to the page should be displayed an unauthorized error message.'
+    - '  Users with expired sessions attempting to access pages should be redirected to the Login page and should go through
+      re-authentication.'
+    - The system shall record account login and logout activities in the audit trail.
+  - id: FRUM.001.03
+    title: Inactivity Warning
+    text:
+    - The system shall monitor user activity and display an inactivity warning after the inactivity timer has elapsed.
+    - '  Default inactivity timeout setting to 15 minutes.'
+    - '  Inactivity timer shall be reset upon system detection of user activity.'
+    - The warning shall prompt the user to either stay logged in or log out.
+    - '  Message – “You have been inactive for x minutes. For your security, your session is about to expire. Would you like
+      to stay logged in or log out?”'
+    - '  x minutes refers to the configured inactivity timer.'
+    - 'The warning dialog shall display two buttons:'
+    - '  “Stay Logged In” – keeps the current session active and resets the inactivity timer.'
+    - '  “Log Out” – terminates the session and securely logs the user out of the system.'
+    - The system shall record user inactivity in the audit trail.
+  - id: FRUM.001.04
+    title: Session Timeout Warning
+    text:
+    - The system shall notify the user x minutes after inactivity that the session automatically ended due to timeout.
+    - '  The warning message shall clearly state: “Your session timed out. Please log in again to continue”'
+    - '  x minutes refer to the configurable timeout session.'
+    - '  Default session timeout setting for 30 minutes.'
+    - The notification shall display a “Log In” button that redirects the user to the Login page.
+    - The system shall record timeout in the audit trail.
+- id: FRUM.002
+  component: User Management
+  capability: User Creation
+  scope:
+  - 'In-Scope: Creation of new user and sync of user details to BDOI-BROKERSYS application'
+  - 'Out-of-Scope: New User request and Enterprise SSO account creation are done outside of the BDOI-BROKERSYS application.'
+  items:
+  - id: FRUM.002.01
+    title: New User Creation
+    text:
+    - New User requests and Enterprise SSO account creation shall be performed outside the BDOI-BROKERSYS application.
+    - The system shall allow authorized users to create a BDOI-BROKERSYS user using an existing and active Enterprise SSO
+      account.
+    - The system shall validate that the Enterprise SSO account exists and is active before allowing user creation.
+    - The system shall retrieve available user information from the Enterprise SSO platform during automatic user creation
+      via API.
+    - '  Windows ID'
+    - '  AD Email'
+    - '  AD Group'
+    - '  AD Status'
+    - '  AD Sync Date/Time'
+    - '  Firstname'
+    - '  Lastname'
+    - '  Display Name'
+    - '  Team Leader'' Name'
+    - '  Team Head'' Name'
+    - '  Section Head''s Name'
+    - '  Unit Head''s Name'
+    - '  Unit/Segment'
+    - '  Department'
+    - '  Location (i.e. CCO, Makati, etc.)'
+    - '  UIDM Request No'
+    - '  Created By'
+    - '  Created Date'
+    - '  Modified By'
+    - '  Modified Date'
+    - The system shall allow authorized users to assign the user's access role and applicable permissions.
+    - The system shall allow authorized users to assign the user's organizational hierarchy, region, branch, department, section,
+      or other attributes as per defined in the access matrix.
+    - The system shall prevent the creation of duplicate users mapped to the same Enterprise SSO account.
+    - '  Duplication Criteria: Validate if there is existing AD email AND Windows ID combination.'
+    - The system shall generate a unique user record within BDOI-BROKERSYS upon successful user creation.
+    - The system shall maintain the association between the BDOI-BROKERSYS user and Enterprise SSO account.
+    - The system shall record user creation activities in the audit trail.
+    - Only users with appropriate permissions shall be authorized to create users.
+    - The system shall display an appropriate error message when user creation cannot be completed due to invalid, inactive,
+      or unavailable Enterprise SSO account information.
+    - '  Error messages should not give clues on exact error.'
+  - id: FRUM.002.02
+    title: New User details sync to BDOI-BROKERSYS application
+    text:
+    - The system shall retrieve user details from the Enterprise SSO platform.
+    - The system shall synchronize user profile information maintained in the Enterprise SSO platform to the BDOI-BROKERSYS
+      application.
+    - The system shall update user details in BDOI-BROKERSYS whenever changes are detected from the Enterprise SSO platform.
+    - The system shall synchronize user status information including Active, Inactive, Locked, Disabled, and other supported
+      user status.
+    - The system shall synchronize user organizational attributes maintained in the Enterprise SSO platform.
+    - The system shall preserve application-specific roles and permissions maintained within BDOI-BROKERSYS application.
+    - The system shall prevent the creation of duplicate user records during synchronization.
+    - The system shall log all user synchronization activities and processing results in the audit trail.
+    - The system shall identify and record synchronization failures for administrative review.
+    - The system shall allow authorized users to initiate on-demand synchronization of user details.
+    - The system shall display the latest synchronization status and timestamp of the user.
+    - The system shall maintain data consistency between Enterprise SSO and BDOI-BROKERSYS user details based on the configured
+      synchronization rules.
+- id: FRUM.003
+  component: User Management
+  capability: User Details Update
+  scope:
+  - 'In-Scope: Sync of user details and status to BDOI-BROKERSYS application.'
+  - 'Out of Scope: User update request, User status update request and User details update done outside the BDOI-BROKERSYS
+    application.'
+  items:
+  - id: FRUM.003.01
+    title: User Details Update
+    text:
+    - The system shall retrieve updated user details from the Enterprise SSO platform.
+    - The system shall synchronize user details maintained in the Enterprise SSO platform to BDOI-BROKERSYS.
+    - The system shall update the corresponding BDOI-BROKERSYS user when changes are detected in the Enterprise SSO platform.
+    - The system shall synchronize the account details and other user attributes maintained in the Enterprise SSO platform.
+    - The system shall maintain the user's existing application-specific roles and permissions unless modified by an authorized
+      user.
+    - The system shall prevent the creation of duplicate user records during synchronization.
+    - The system shall record user detail update activities in the audit trail.
+    - The system shall identify and log synchronization failures for administrative review.
+    - The system shall display the latest synchronized user details within the BDOI-BROKERSYS application.
+    - The system shall update user details without requiring recreation of the user.
+  - id: FRUM.003.02
+    title: User Status Update
+    text: []
+  - id: FRUM.003.02.01
+    title: Deactivate User
+    text:
+    - The system shall retrieve user status changes from the Enterprise SSO platform.
+    - The system shall synchronize user deactivation status to BDOI-BROKERSYS.
+    - The system shall automatically revoke access to BDOI-BROKERSYS when the synchronized user status is marked as Inactive,
+      Disabled, Locked, or Deactivated.
+    - The system shall prevent deactivated users from logging in to the application.
+    - The system shall terminate active sessions upon detection of user deactivation.
+    - The system shall record user deactivation activities in the audit trail.
+  - id: FRUM.003.02.02
+    title: Reactivate User
+    text:
+    - The system shall retrieve user reactivation status changes from the Enterprise SSO platform.
+    - The system shall synchronize user reactivation status to BDOI-BROKERSYS.
+    - The system shall restore application access for users whose user status is changed to Active.
+    - The system shall maintain previously assigned application roles and permissions.
+    - The system shall allow reactivated users to access the application through Enterprise SSO authentication.
+    - The system shall record user reactivation activities in the audit trail.
+  - id: FRUM.003.03
+    title: User details sync to BDOI-BROKERSYS application
+    text:
+    - The system shall integrate with the Enterprise SSO platform as the source of user details
+    - The system shall retrieve and synchronize user details and status from the Enterprise SSO platform and update BDOI-BROKERSYS
+      whenever changes are detected.
+    - The system shall maintain data consistency between the Enterprise SSO platform and BDOI-BROKERSYS based on configured
+      synchronization rules.
+    - The system shall synchronize user status including Active, Inactive, Locked, Disabled, Deactivated, and Reactivated
+      statuses and reflect immediately to BIBS.
+    - The system shall preserve application-specific roles and permissions maintained within BDOI-BROKERSYS unless explicitly
+      configured.
+    - The system shall prevent duplicate user records from being created during synchronization.
+    - The system shall maintain the association between the Enterprise SSO account and the corresponding BDOI-BROKERSYS user.
+    - The system shall deny access to users whose synchronized user status indicates Inactive, Locked, Disabled, Deactivated,
+      or Unauthorized status.
+    - The system shall record all synchronization activities including successful and failed synchronization events in the
+      audit trail.
+    - The system shall identify, record, and notify authorized users of synchronization failures.
+    - The system shall display the latest synchronization status and timestamp for each user.
+- id: FRUM-004
+  component: User Management
+  capability: Password Maintenance
+  scope:
+  - 'In-Scope: All password maintenance activities should reflect immediately to the BDOI-BROKERSYS application.'
+  - 'Out of Scope: All password maintenance requests and servicing are done outside the BDOI-BROKERSYS application.'
+  items:
+  - id: FRUM-004.01
+    title: Password Expiry
+    text:
+    - The system shall integrate with the Enterprise SSO platform for user authentication.
+    - The system shall rely on the Enterprise SSO platform for password expiry validation.
+    - '  Expires at least once every 90 days.'
+    - The system shall prevent user access when the Enterprise SSO platform indicates that the user's password has expired.
+    - The system shall redirect users with expired passwords to the Login Page displaying applicable error message.
+    - '  Error messages should not give clues on exact error.'
+    - The system shall not allow users to bypass password expiry requirements enforced by the Enterprise SSO platform.
+    - The system shall automatically recognize password expiry status changes upon the user's next authentication attempt.
+    - The system shall display an appropriate message when access is denied due to password expiry.
+    - The system shall record authentication failures related to password expiry in the audit trail.
+  - id: FRUM-004.02
+    title: Reset Password
+    text:
+    - The system shall not provide a password reset function within the BDOI-BROKERSYS application.
+    - '  Prevent reuse of at least the last ten (10) passwords.'
+    - The system shall rely on the Enterprise SSO platform to validate user credentials during authentication.
+    - The system shall allow users to authenticate using their newly reset password.
+    - The system shall invalidate existing application sessions when required by the Enterprise SSO platform following a password
+      reset.
+    - The system shall require re-authentication after a password reset has been completed.
+    - The system shall prevent access when authentication using the updated credentials fails.
+    - The system shall record authentication events following password reset activities in the audit trail.
+  - id: FRUM-004.03
+    title: Forgot Password
+    text:
+    - The system shall not provide a forgot password function within the BDOI-BROKERSYS application.
+    - '  Prevent reuse of at least the last ten (10) passwords.'
+    - The system shall rely on the Enterprise SSO platform to perform identity verification and password recovery activities.
+    - The system shall not store, manage, retrieve, or disclose user passwords.
+    - The system shall allow users to authenticate after successful completion of the Enterprise SSO password recovery process.
+    - The system shall require successful authentication through the Enterprise SSO platform before granting access to the
+      application.
+    - The system shall display an appropriate error message when authentication fails.
+    - '  Error messages should not give clues on exact error.'
+    - The system shall maintain audit logs of login attempts and authentication outcomes.
+    - The system shall ensure that all password-related activities remain governed by the Enterprise SSO platform.
+- id: FRUM.005
+  component: Roles Management
+  capability: Role Creation
+  scope:
+  - 'In-Scope: Role creation and permission configuration in BDOI-BROKERSYS application.'
+  - 'Out of Scope: AD Group creation request and AD Group creation are done outside the BDOI-BROKERSYS application.'
+  items:
+  - id: FRUM.005.01
+    title: Role Creation and Permission configuration
+    text:
+    - The system shall allow authorized users to create application roles within BDOI-BROKERSYS Application.
+    - The system shall allow authorized users to define a unique role name and role description.
+    - The system shall prevent the creation of duplicate role names.
+    - The system shall allow authorized users to configure permissions for each role.
+    - The system shall allow permissions to be assigned based on modules, functions, transactions, pages, and actions within
+      the application.
+    - The system shall allow authorized users to configure record ownership access rules.
+    - The system shall allow authorized users to configure supervisory access rules for users managing subordinate personnel.
+    - The system shall enforce configured permissions during user access and transaction processing.
+    - The system shall prevent users from accessing functions and records not included in their assigned role.
+    - The system shall maintain role creation and permission configuration activities in the audit trail.
+    - The system shall allow authorized users to view all configured roles and associated permissions.
+- id: FRUM.006
+  component: Roles Management
+  capability: Role Details Update
+  scope:
+  - 'In-Scope: Role update and permission update to BDOI-BROKERSYS application.'
+  - 'Out of Scope: Role update request, permission update request are done outside the BDOI-BROKERSYS application.'
+  items:
+  - id: FRUM.006.01
+    title: Role Details Updates
+    text:
+    - The system shall allow authorized users to search for existing roles.
+    - The system shall allow authorized users to modify role information, including role name and role description.
+    - The system shall prevent the use of duplicate role names.
+    - The system shall validate role update before saving changes.
+    - The system shall display the current users assigned to the selected role.
+    - The system shall maintain the association between users and their assigned roles after role updates.
+    - The system shall apply approved role updates to all users assigned to the role.
+    - The system shall record role update activities in the audit trail.
+  - id: FRUM.006.02
+    title: Role Status Updates
+    text: []
+  - id: FRUM.006.02.01
+    title: Deactivate Role Status Updates
+    text:
+    - The system shall allow authorized users to search for existing roles.
+    - The system shall allow authorized users to deactivate an active role.
+    - The system shall display the users currently assigned to the selected role prior to deactivation.
+    - The system shall prevent deactivated roles from being assigned to new users.
+    - The system shall retain role assignments for historical and audit purposes.
+    - The system shall enforce access restrictions based on the deactivated role status.
+    - The system shall record role deactivation activities in the audit trail.
+    - The system shall maintain historical records of role status changes.
+  - id: FRUM.006.02.02
+    title: Reactivate Role Status Updates
+    text:
+    - The system shall allow authorized users to search for inactive user roles.
+    - The system shall allow authorized users to reactivate an inactive role.
+    - The system shall restore the role to Active status upon successful update.
+    - The system shall allow the reactivated role to be assigned to users.
+    - The system shall enforce permissions associated with the reactivated role.
+    - The system shall record role reactivation activities in the audit trail.
+    - The system shall maintain historical records of role status changes.
+  - id: FRUM.006.03
+    title: Permission Updates
+    text:
+    - The system shall allow authorized users to search for existing roles and permissions.
+    - The system shall allow authorized users to add, modify, or remove permissions assigned to a role.
+    - The system shall allow authorized users to update permissions based on the approved access matrix.
+    - The system shall validate permission configurations before saving changes.
+    - The system shall prevent the assignment of conflicting or invalid permission combinations.
+    - The system shall automatically enforce updated permissions after successful save.
+    - The system shall immediately restrict access to functions and records for permissions that have been removed.
+    - The system shall record all permission update activities in the audit trail.
+- id: FRUM.007
+  component: Reports Managements
+  capability: Reports Generation and Exports
+  scope: []
+  items:
+  - id: FRUM.007.01
+    title: View and filter reports
+    text:
+    - The system shall allow authorized users to access the Reports module and generate or export reports
+    - The system shall display only reports that the user is authorized to access.
+    - '  User Access Report'
+    - '  User Group Profile Report'
+    - '  Group Profile Membership List'
+    - The system shall follow the report design from the Annex C - Report Templates.
+    - The system shall allow users to filter report data using search criteria.
+    - The system shall allow users to sort report results based on available report fields.
+    - The system shall display the total number of records returned from the selected criteria.
+    - The system shall maintain audit logs of report generation activities.
+  - id: FRUM.007.02
+    title: Export Reports
+    text:
+    - The system shall allow authorized users to export reports below.
+    - '  User Access Report'
+    - '  User Group Profile Report'
+    - '  Group Profile Membership List'
+    - The system shall support report export in CSV, XLSX and PDF format.
+    - '  File name:<Report_Name>_MMDDYYYY where'
+    - '    Report_Name is the generated report'
+    - '    MMDDYYYY is the extraction date'
+    - The system shall export only the data returned by the user's selected filters and search criteria.
+    - The system shall preserve report headers and column formatting during export.
+    - The system shall prevent users from exporting data that they are not authorized to view.
+    - The system shall display a confirmation message upon successful report generation and export.
+    - The system shall record export activities in the audit trail.
+- id: FRUM-008
+  component: Generate Logs
+  capability: Audit Trail
+  scope: []
+  items:
+  - id: FRUM.008.01
+    title: Generate audit logs for compliance, monitoring, security, and audit purposes.
+    text:
+    - The system shall automatically record audit logs for all create, update, delete/deactivate, reactivate, submit, approve,
+      reject, cancel, login, logout, export and other actions.
+    - The system shall capture user activities performed within the application.
+    - 'The system shall record the following audit information for each transaction:'
+    - Timestamp
+    - Module
+    - User Id (Windows ID)
+    - Performed By (Username)
+    - Role
+    - Action (e.g. Create, Update, Delete, Submit, Approve, Reject, Cancel, Login, Logout, Inactivity, Timeout, Generate and
+      Export)
+    - Activity (Short description of action)
+    - From (Old Value)
+    - To (New Value)
+    - IP Address
+    - The system shall generate audit logs automatically upon successful completion or upon failure of the action.
+    - The system shall maintain audit logs prevent unauthorized modification or deletion.
+    - The system shall generate separate audit log entries for each action performed on a record.
+    - The system shall retain audit logs in accordance with the organization's data retention policy.
+  - id: FRUM.008.02
+    title: View audit trail records.
+    text:
+    - The system shall have a dedicated Audit Trail page.
+    - The system shall display audit logs in chronological order sorted by the most recent record.
+    - The system shall display the following audit details for each transaction.
+    - '  Timestamp'
+    - '  Module'
+    - '  User Id (Windows ID)'
+    - '  Performed By (Username)'
+    - '  Role'
+    - '  Action (e.g. Create, Update, Delete, Submit, Approve, Reject, Cancel, Login, Logout, Inactivity, Timeout, Generate
+      and Export)'
+    - '  Activity (Short description of action)'
+    - '  From (Old Value)'
+    - '  To (New Value)'
+    - '  IP Address'
+    - The system shall allow authorized users to filter audit logs based on selected criteria.
+    - The system shall allow authorized users to sort audit log records by available columns.
+    - Users without the required authorization shall be denied access to audit trail page.
+  - id: FRUM.008.01 (2nd)
+    title: Export audit trail records.
+    text:
+    - The system shall support export to CSV, PDF and XLSX.
+    - '  File name: Audit Logs_MMDDYYYY'
+    - '    Audit Logs_ is constant'
+    - '    MMDDYYYY is the extraction date'
+    - The system shall include all audit trail records in the exported file based on the applied search and filter criteria.
+    - The exported audit trail report shall follow template as per Annex D – Audit Log Export
+    - The system shall allow export only to users with the appropriate access rights.
+    - The system shall maintain an audit record of all audit trail exports for compliance purposes.
+annex_e:
+- - '1'
+  - User Name
+  - Text
+  - The full name of the user
+- - '2'
+  - User ID
+  - Text
+  - User's Windows ID
+- - '3'
+  - User Group Profile
+  - Text
+  - The group profile assigned to the user, defining access permissions.
+- - '4'
+  - Created by
+  - Text
+  - The user who originally created the record.
+- - '5'
+  - Date Created
+  - Date
+  - The date when the record was initially created in the system.
+- - '6'
+  - Modified by
+  - Date
+  - The user who last updated the record.
+- - '7'
+  - Date Modified
+  - Date
+  - The date when the record was last updated.
+- - '8'
+  - Date Coverage
+  - Date
+  - As of Date
+- - '9'
+  - Reported Generated by
+  - Text
+  - The user who generated the report.
+- - '10'
+  - Date and Time Generated
+  - Date and Time
+  - The exact date and time when the report was generated.
+annex_f:
+- - '1'
+  - Group Profile
+  - Text
+  - The name of the user group
+- - '2'
+  - Module Name
+  - Text
+  - The system module or functional area to which the permission applies.
+- - '3'
+  - Task Name
+  - Text
+  - The specific action or function within the module that the group profile is allowed or restricted to perform.
+- - '4'
+  - Access
+  - Text
+  - Indicates whether the group profile is granted or denied permission to perform the specified task.
+- - '5'
+  - Date Coverage
+  - Date
+  - As of Date
+- - '6'
+  - Reported Generated by
+  - Text
+  - The user who generated the report.
+- - '7'
+  - Date and Time Generated
+  - Date and Time
+  - The exact date and time when the report was generated.
+annex_g:
+- - '1'
+  - Group Profile
+  - Text
+  - The name of the user group or role to which the user is assigned.
+- - '2'
+  - Member Username
+  - Text
+  - The full name of the user
+- - '3'
+  - Member User ID
+  - Text
+  - The unique windows ID of the group member.
+- - '4'
+  - Created by
+  - Text
+  - The user who originally created the record.
+- - '5'
+  - Date Created
+  - Date
+  - The date when the record was initially created in the system.
+- - '6'
+  - Modified by
+  - Text
+  - The user who last updated the record.
+- - '7'
+  - Date Modified
+  - Date
+  - The date when the record was last updated.
+- - '8'
+  - Date Coverage
+  - Date
+  - As of Date
+- - '9'
+  - Reported Generated by
+  - Text
+  - The user who generated the report.
+- - '10'
+  - Date and Time Generated
+  - Date and Time
+  - The exact date and time when the report was generated.
+annex_h:
+- - '1'
+  - Timestamp
+  - Date and Time
+  - The date and time when the system activity or transaction occurred.
+- - '2'
+  - Module
+  - Text
+  - The module name where the activity was performed.
+- - '3'
+  - User Id
+  - Text
+  - User's Windows ID
+- - '4'
+  - Performed By
+  - Text
+  - The user who performed the recorded activity or action.
+- - '5'
+  - User Group Profile
+  - Text
+  - The role of the user of performed the Action
+- - '6'
+  - Action
+  - Text
+  - A description of the action performed in the system (e.g., view, create, update).
+- - '7'
+  - Old Value
+  - Text
+  - "The original value or state of the record before the change was made. \nPipe delimited if more than 1"
+- - '8'
+  - New Value
+  - Text
+  - 'The updated value or state of the record after the change was completed.
+
+    Pipe delimited if more than 1'
+- - '9'
+  - Date Coverage
+  - Date
+  - The start and end date range defining the period covered by the audit log entries in the report.
+- - '10'
+  - Report Generated by
+  - Text
+  - The user who generated the report.
+- - '11'
+  - Date & Time Generated
+  - Date and Time
+  - The exact date and time when the report was generated.
+annex_files:
+  C:
+  - User Access Matrix - Target State082626.xlsx
+  - List of BDOI Personnel _BDOI for Training.xlsx
+  I:
+  - Application Security Requirement (ASR).xlsx
+  - Password Protection Guidelines v2_10Sep2026.pdf

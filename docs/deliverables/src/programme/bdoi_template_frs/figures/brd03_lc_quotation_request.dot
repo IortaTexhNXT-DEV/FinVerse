@@ -1,0 +1,24 @@
+// Life-cycle of a non-package quotation request as stated in BDOI's FRPM.005.01, 006.01, 008.01, 009.02, 010.01
+// (statuses of BDOI's FRS; the corresponding steps of the New Business FRS are in Annex O.2).
+digraph lc_quotation_request {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.25, ranksep=0.26, bgcolor="white", pad=0.15];
+  node  [shape=box, style="rounded,filled", fillcolor="#D5E8D4", color="#82B366", fontname="Arial", fontsize=10, width=1.7, height=0.45];
+  edge  [arrowsize=0.55, penwidth=0.8, color="#333333", fontname="Arial", fontsize=8.5];
+  d [label="Draft"]; m [label="Pending Marketing\nApproval"]; r [label="For TSU Review"];
+  rr [label="Returned for\nRevision", fillcolor="#FFF2CC", color="#D6B656"];
+  q [label="For Quotation\nSlip Creation"]; qa [label="QS for Approval"];
+  qr [label="QS Returned /\nQS Rejected", fillcolor="#FFF2CC", color="#D6B656"];
+  n [label="Under Negotiation"]; t [label="Terms Agreed"]; p [label="Proposal Ready"];
+  pr [label="Proposal Rejected", fillcolor="#F8CECC", color="#B85450"];
+  c [label="Client response:\nAccepted", fillcolor="#C9E7C0"];
+  cr [label="Client: Rejected or\nReturn for Revision", fillcolor="#F8CECC", color="#B85450"];
+  fd [label="For Deployment"]; dp [label="Deployed", fillcolor="#82B366", fontcolor="#FFFFFF"];
+  rj [label="Rejected", fillcolor="#EEEEEE", color="#888888"];
+  d -> m -> r -> q -> qa -> n -> t -> p -> c -> fd -> dp;
+  r -> rr [style=dashed]; rr -> m [style=dashed];
+  r -> rj [style=dotted];
+  qa -> qr [style=dashed]; qr -> q [style=dashed];
+  p -> pr [style=dashed]; c -> cr [style=dashed, dir=back]; p -> cr [style=dashed];
+  cr -> n [xlabel="revision", style=dashed];
+  { rank=same; r; rr; } { rank=same; qa; qr; } { rank=same; p; pr; }
+}

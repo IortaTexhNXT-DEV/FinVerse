@@ -1,0 +1,67 @@
+// Product Maintenance end to end on one page, lanes by persona (Summary for the Business Unit Review, v1.2).
+// BRD: PMADD01-08, BRPM.006-022. Columns are the personas; the numbers are the order of the steps.
+digraph e2e_summary {
+  graph [rankdir=TB, newrank=true, fontname="Arial", nodesep=0.06, ranksep=0.22, bgcolor="white", pad=0.15, splines=polyline];
+  node  [shape=box, style="rounded,filled", fontname="Arial", fontsize=10, width=0.95, height=0.42, margin="0.03,0.02"];
+  edge  [arrowsize=0.55, penwidth=0.8, color="#333333", fontname="Arial", fontsize=8];
+
+  subgraph cluster_mkt { label="Marketing"; fontname="Arial Bold"; fontsize=10; style="rounded"; color="#82B366";
+    node [fillcolor="#D5E8D4", color="#82B366"];
+    h1 [label="", shape=plaintext, style="", width=0.1, height=0.1];
+    m1 [label="1 Raise package\nrequest"];
+    m2 [label="2 Approve\n(TL, TH, UH)"];
+    m3 [label="8 Review terms\n(client-specific\npackage)"];
+    m4 [label="16 Sell on the\nlatest approved\nrate scheme"];
+  }
+  subgraph cluster_tsu { label="TSU"; fontname="Arial Bold"; fontsize=10; style="rounded"; color="#6C8EBF";
+    node [fillcolor="#DAE8FC", color="#6C8EBF"];
+    h2 [label="", shape=plaintext, style="", width=0.1, height=0.1];
+    t1 [label="3 Review and\nrecommend"];
+    t2 [label="5 Quotation Slip;\napproval; send"];
+    t3 [label="6 Key in terms;\nComparative Table"];
+    t4 [label="9 Requirements,\nsigned package\nslip"];
+    t5 [label="15 Send advisory\nwith documents"];
+    t6 [label="17 Expiry alerts:\nrenewal or\ndeactivation\nrequest (step 1)"];
+  }
+  subgraph cluster_head { label="TSU Head"; fontname="Arial Bold"; fontsize=10; style="rounded"; color="#B85450";
+    node [fillcolor="#F8CECC", color="#B85450"];
+    h3 [label="", shape=plaintext, style="", width=0.1, height=0.1];
+    th1 [label="4 Approve for\nnegotiation"];
+    th2 [label="7 Review\nnegotiated terms"];
+    th3 [label="13 Post-setup\nvalidation"];
+  }
+  subgraph cluster_ins { label="Insurers"; fontname="Arial Bold"; fontsize=10; style="rounded"; color="#D79B00";
+    node [fillcolor="#FFE6CC", color="#D79B00"];
+    h4 [label="", shape=plaintext, style="", width=0.1, height=0.1];
+    i1 [label="Reply with\nterms (one or\nmore rounds)"];
+  }
+  subgraph cluster_mancom { label="ManCom"; fontname="Arial Bold"; fontsize=10; style="rounded"; color="#9673A6";
+    node [fillcolor="#E1D5E7", color="#9673A6"];
+    h5 [label="", shape=plaintext, style="", width=0.1, height=0.1];
+    c1 [label="10 Approve\nproduct\nrequirements"];
+  }
+  subgraph cluster_mbs { label="MBS"; fontname="Arial Bold"; fontsize=10; style="rounded"; color="#D6B656";
+    node [fillcolor="#FFF2CC", color="#D6B656"];
+    h6 [label="", shape=plaintext, style="", width=0.1, height=0.1];
+    b0 [label="0 Hierarchy,\nclauses, rules\n(authorized)"];
+    b1 [label="12 Set up package\nversion"];
+  }
+  subgraph cluster_sys { label="System"; fontname="Arial Bold"; fontsize=10; style="rounded"; color="#666666";
+    node [fillcolor="#F5F5F5", color="#666666"];
+    h7 [label="", shape=plaintext, style="", width=0.1, height=0.1];
+    s1 [label="11 Lock slips;\nforward to MBS"];
+    s2 [label="14 Release\nversion; notify\nMarketing"];
+    s3 [label="Daily checks:\nexpiry, service\nlevels"];
+  }
+  { rank=same; h1; h2; h3; h4; h5; h6; h7; }
+  h1 -> h2 -> h3 -> h4 -> h5 -> h6 -> h7 [style=invis];
+  h6 -> b0 [style=invis];
+  { rank=same; m1; b0; }
+
+  m1 -> m2 -> t1 -> th1 -> t2 -> i1 -> t3 -> th2;
+  th2 -> m3 [xlabel="client-\nspecific"];
+  th2 -> t4 [xlabel="generic"];
+  m3 -> t4 -> c1 -> s1 -> b1 -> th3 -> s2 -> t5 -> m4;
+  s3 -> t6 [style=dashed];
+  { rank=same; t5; s3; }
+}

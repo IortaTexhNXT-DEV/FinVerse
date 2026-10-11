@@ -1,0 +1,196 @@
+# Screen specifications of BRD-4 Collections: installment plans, installments due, promises to pay and the billing
+# statements (statements of account per billing cycle).
+area: Installments, promises and billing statements
+screens:
+  - id: SCR-CL-05
+    title: Installment Plans
+    route: /collections/plans
+    purpose: >-
+      The installment plans of multi-year and installment accounts by status, and a new plan: over the policy years of
+      a multi-year account, or the outstanding premium of one invoice split in equal installments.
+    entry:
+      - Finance › Collections › Installment Plans
+    shots:
+      - {state: list, user: clxhandler, caption: "Installment Plans: the active plans with their basis, total and paid"}
+      - {state: new, user: clxhandler, fill: new_plan, caption: "New Installment Plan dialog: installments of one invoice"}
+    fields:
+      - "Tabs | Active Plans / Completed / Cancelled | Tab | - | - | Plan status | Active Plans | - | - | -"
+      - "Toolbar | Search Plan No., ARN or Invoice No. | Text | - | N | Plans | Blank | - | Contains | -"
+      - "List | Plan No. / Invoice | Column | IPL-yyyy-nnnnnn with the invoice, or All policy years | - | Plans | - | Read only | - | No installment plans to display"
+      - "List | ARN / Name of Assured / Frequency / Basis / First Due / Installments | Column | Frequency label; Policy Years, Generated or Entered | - | Plans | - | Read only | - | -"
+      - "List | Total / Paid / Status | Column | Two decimals; Active, Completed or Cancelled | - | Plans, invoice ledger | - | Read only | - | -"
+      - "New Installment Plan dialog | Plan Basis | Drop-down | Policy years of a multi-year account; Installments of one invoice | Y | Fixed list | Policy years | - | - | -"
+      - "New Installment Plan dialog | Account Reference No. (ARN) | Text | Shown for policy years | Cond.: policy years | Booked accounts | Blank | - | The account has a booked policy year | Enter the account reference number"
+      - "New Installment Plan dialog | Invoice No. / First Due Date / Number of Installments | Text, date, number | Shown for one invoice; 1 to 120 installments | Cond.: one invoice | Invoice ledger | Blank / today / 4 | - | Invoice with outstanding premium; 1 to 120 | Enter between 1 and 120 installments"
+      - "New Installment Plan dialog | Billing Frequency / Remarks | Drop-down, text area | Annual, Semi-annual, Quarterly, Monthly | Y / N | Billing frequency list | Annual | - | - | Choose the billing frequency"
+    actions:
+      - "New Installment Plan | Users with the billing permission | Always | Opens the dialog | - | -"
+      - "Create Plan | Users with the billing permission | The form is complete | Creates the plan with its installments and opens it | Active | -"
+      - "[Row] | Every Collections user | Always | Opens the plan | - | -"
+    rules:
+      - "A policy-year plan bills every policy year of a multi-year account per cycle; a generated plan splits the outstanding premium of one invoice in equal installments (FR-CL-040)."
+      - "One live plan per invoice or account: a second plan is refused until the first is cancelled (FR-CL-040)."
+      - "A plan changes neither the booking nor the accounting; payments are allocated from the invoice ledger (FR-CL-041)."
+    outcome: The account is billed per cycle on a plan the collector can follow.
+    frs: [FR-CL-040, FR-CL-041]
+    tests: [PLANS]
+
+  - id: SCR-CL-06
+    title: Installment Plan
+    route: /collections/plans/:id
+    parent: /collections/plans
+    purpose: >-
+      One plan: the account and its facts, the installments (billing cycles) with the payments allocated from the
+      ledger and their status, the statements of account of the plan and the promises to pay on its invoices; the
+      row menu of an installment generates its statement of account or records a promise.
+    entry:
+      - Installment Plans › open a row
+      - Installments Due › open a row
+      - Statement of Account › Open Installment Plan
+    shots:
+      - {state: record, user: clxhandler, open_plan: seed, caption: "Installment Plan: the installments with their coverage, due date, amounts and status"}
+      - {state: actions, user: clxhandler, open_plan: walkthrough, caption: "The row menu of an installment: Generate SOA and Record Promise"}
+    fields:
+      - "Header | [Plan and ARN chips, status pill, basis tag] | Reference chip, status pill, tag | Active, Completed or Cancelled | - | Plan | - | Read only | - | -"
+      - "Facts | Invoice / Billing Frequency / Total / Paid / First Due / Created By | Display | Amounts with the currency; names | - | Plan | - | Read only | - | -"
+      - "Tabs | Installments / Statements of Account / Promises to Pay | Tab | - | - | Fixed | Installments | - | - | -"
+      - "Installments | Cycle / Policy Year / Invoice No. / Coverage / Due Date | Column | Coverage on two lines; Scheduled for a policy year not booked yet | - | Plan | - | Read only | - | No installments"
+      - "Installments | Amount / Paid / Balance / Status | Column | Two decimals; Not Due, Due, Overdue, Partial or Paid | - | Plan, invoice ledger | - | Read only | - | -"
+      - "Statements of Account | SOA No. / Cycle / Billing Cycle / Due Date / Amount Due / Status | Column | - | - | Statements | - | Read only | - | No statements generated yet"
+      - "Promises to Pay | Invoice No. / Promised On / Promised Date / Promised / Paid in Time / Recorded By / Status | Column | - | - | Promises | - | Read only | - | No promises to pay recorded"
+      - "Cancel Installment Plan dialog | Reason | Text area | Up to 1,000 characters | Y | - | Blank | Active | Not blank | Enter the reason"
+    actions:
+      - "Refresh Allocation | Collectors with the billing or work permission | Active | Allocates the latest ledger payments to the installments | - | -"
+      - "Cancel Plan | Users with the billing permission | Active | Asks for the reason and cancels the plan | Cancelled | -"
+      - "Generate SOA (row menu) | Operations billing user (statement permission) | Cycle not billed yet | Generates the statement of account of the cycle | Statement To Send | -"
+      - "Record Promise (row menu) | Collectors with the work permission | Booked installment not paid | Opens Record Promise to Pay for the invoice of the installment | Promise Open | -"
+    rules:
+      - "Payments are allocated from the invoice ledger, oldest due installment first (FR-CL-041)."
+      - "An installment past its due date and not fully paid is Overdue and can escalate the account through the escalation rules (FR-CL-041, FR-CL-051)."
+      - "One live statement per plan and billing cycle (FR-CL-060)."
+      - "The statement of a cycle is generated by the Operations billing user; the collector sees it on the Statements of Account tab (FR-CL-060)."
+    outcome: The collector follows each cycle of the plan, sees its statement and records the promises.
+    frs: [FR-CL-040, FR-CL-041, FR-CL-042, FR-CL-060]
+    tests: [PLAN]
+
+  - id: SCR-CL-07
+    title: Installments Due
+    route: /collections/installments-due
+    purpose: >-
+      The unpaid installments of the live plans falling due up to today, oldest first, with the overdue ones on their
+      own tab, for follow-up and escalation.
+    entry:
+      - Finance › Collections › Installments Due
+    shots:
+      - {state: list, user: clxhandler, caption: "Installments Due: the overdue installments of the live plans"}
+    fields:
+      - "Tabs | Overdue / Due to Date | Tab | - | - | Installment status | Overdue | - | - | -"
+      - "List | Plan No. / ARN / Name of Assured / Cycle / Invoice No. | Column | - | - | Plans | - | Read only | - | No installments due"
+      - "List | Due Date / Overdue Since / Amount / Balance / Status | Column | Dates dd-MMM-yyyy; two decimals | - | Plans, invoice ledger | - | Read only | - | -"
+    actions:
+      - "[Row] | Every Collections user | Always | Opens the installment plan | - | -"
+    rules:
+      - "An installment is due on its due date and overdue the day after when it is not fully paid (FR-CL-041)."
+    outcome: The collector sees the installments to chase today.
+    frs: [FR-CL-041]
+    tests: [DUE]
+
+  - id: SCR-CL-08
+    title: Promises to Pay
+    route: /collections/promises
+    purpose: >-
+      The promises made by clients to pay an amount by a date, checked every night against the payments applied in
+      the invoice ledger: open, broken, kept and withdrawn promises; Record Promise on one invoice, or the same promise
+      on several invoices with the bulk update permission; Withdraw Promise on the selected open promises.
+    entry:
+      - Finance › Collections › Promises to Pay
+      - Installment Plan › installment row menu › Record Promise
+    shots:
+      - {state: list, user: clxhandler, caption: "Promises to Pay: the open promises with the promised date and amount"}
+      - {state: new, user: clxhandler, fill: new_promise, caption: "Record Promise to Pay dialog"}
+      - {state: error, user: clxhandler, fill: promise_over_balance, caption: "A promised amount above the outstanding is refused, with the outcome per invoice"}
+    fields:
+      - "Tabs | Open Promises / Broken / Kept / Withdrawn | Tab | Kept includes partially kept | - | Promise status | Open Promises | - | - | -"
+      - "Toolbar | Search Invoice No. or ARN | Text | - | N | Promises | Blank | - | Contains | -"
+      - "List | Invoice No. / ARN / Name of Assured / Promised On / Promised Date | Column | - | - | Promises | - | Read only | - | No promises to pay to display"
+      - "List | Promised / Paid in Time / Recorded By / Status | Column | Two decimals; recorder's name with the bulk reference | - | Promises, invoice ledger | - | Read only | - | -"
+      - "Record Promise to Pay dialog | Invoice No. / Invoice Nos. | Text, text area | One invoice; several, one per line, with the bulk update permission | Y | Collection accounts | Blank | - | Account with something to collect | Enter at least one invoice number"
+      - "Record Promise to Pay dialog | Promised On | Date | The day the client made the promise | N | - | Today | - | Not in the future | The day of the promise cannot be in the future"
+      - "Record Promise to Pay dialog | Promised Payment Date | Date | dd-MMM-yyyy | Y | - | Blank | - | Not before the day of the promise | The promised date cannot be before the day of the promise"
+      - "Record Promise to Pay dialog | Promised Amount / Remarks | Number, text area | Empty for the whole outstanding | N | - | Blank | - | Above zero and at most the outstanding | Enter a positive amount, or leave it empty for the whole outstanding"
+      - "Withdraw Promise to Pay dialog | Reason | Text area | Up to 1,000 characters | Y | - | Blank | Open | Not blank | Enter the reason"
+    actions:
+      - "Record Promise | Collectors with the work permission | Always | Records the promise on each invoice and lists the outcome per invoice | Open | -"
+      - "Withdraw Promise | Collectors with the work permission | Open promises selected | Asks for the reason and withdraws them | Withdrawn | -"
+    rules:
+      - "A promise is kept when the promised amount was paid by the promised date (plus the grace days, 0 by default) or nothing is left to collect, partially kept when part of it was paid, otherwise broken (FR-CL-042)."
+      - "A new promise on the same invoice replaces the running one (FR-CL-042)."
+      - "A broken promise notifies the collector and the account officer and escalates the account through the broken-promise rules (FR-CL-042, FR-CL-051)."
+    outcome: The collector records what the client promised and the system checks it.
+    frs: [FR-CL-042, FR-CL-034]
+    tests: [PROM]
+
+  - id: SCR-CL-09
+    title: Billing Statements
+    route: /collections/billing
+    purpose: >-
+      The statements of account (SOA) per billing cycle of the installment plans: to send, sent and cancelled; the
+      Billing Run generates the statements of every billing cycle falling due in a period and not billed yet. The
+      statements are generated and sent by the Operations billing user; the Collections users see them, read only
+      (CLR-CL-32). In the screenshots the seed user of the Collection Handler generated the statements.
+    entry:
+      - Finance › Collections › Billing Statements
+    shots:
+      - {state: list, user: clxhandler, tab: "Sent", caption: "Billing Statements: the statements sent to the clients"}
+      - {state: run, user: clxhandler, click: "^billing run$", caption: "Billing Run dialog: the due period of the cycles to bill"}
+    fields:
+      - "Tabs | To Send / Sent / Cancelled | Tab | - | - | Statement status | To Send | - | - | -"
+      - "Toolbar | Search SOA No., ARN or Client | Text | - | N | Statements | Blank | - | Contains | -"
+      - "List | SOA No. / Cycle / ARN / Name of Assured / Frequency | Column | SOA-yyyy-nnnnnn with the cycle | - | Statements | - | Read only | - | No statements of account to display"
+      - "List | Billing Cycle / Due Date / Amount Due / Status | Column | Billing cycle on two lines; two decimals | - | Statements | - | Read only | - | -"
+      - "Billing Run dialog | Due From / Due To | Date | dd-MMM-yyyy | Y | - | Today | - | The period does not end before it starts | The period ends before it starts"
+    actions:
+      - "Billing Run | Operations billing user (statement permission) | Always | Opens the dialog | - | -"
+      - "Generate Statements | Operations billing user (statement permission) | Both dates entered | Generates one statement per billing cycle due in the period and not billed yet | To Send | -"
+      - "[Row] | Every Collections user | Always | Opens the statement | - | -"
+    rules:
+      - "One live statement per plan and billing cycle; a cancelled statement frees the cycle to be billed again (FR-CL-060, FR-CL-061)."
+      - "Billing is monitoring only: a statement creates no receivable and no commission billing (FR-CL-062)."
+      - "Operations generates and sends the statements; the Collections users have visibility only (FR-CL-060, minutes of 27-Apr-2026)."
+    outcome: The billing cycles due are billed to the clients by Operations and followed by Collections.
+    frs: [FR-CL-060, FR-CL-061, FR-CL-062]
+    tests: [BILL]
+
+  - id: SCR-CL-10
+    title: Statement of Account
+    route: /collections/billing/:id
+    parent: /collections/billing
+    purpose: >-
+      One statement of account: the billing cycle, the installments billed (the cycle and any arrears) with the
+      payments allocated, the PDF from the statement template, the e-mails sent; Send via Email sends the protected
+      PDF to the client, Cancel Statement frees the cycle. Send and cancel are actions of the Operations billing
+      user; the Collections users see the statement and its e-mails and download the PDF (CLR-CL-32).
+    entry:
+      - Billing Statements › open a row
+      - Installment Plan › Statements of Account tab
+    shots:
+      - {state: record, user: clxhandler, open_statement: first, caption: "Statement of Account with the installments billed and the e-mails sent"}
+      - {state: send, user: clxhandler, open_statement: to_send, click: "^send via email$", caption: "Send Statement of Account: the e-mail to the client with the protected PDF"}
+    fields:
+      - "Header | [SOA and ARN chips, status pill, billing tag] | Reference chip, status pill | To Send, Sent or Cancelled | - | Statement | - | Read only | - | -"
+      - "Facts | Billing Cycle / Due Date / Amount Due / Plan / Generated By | Display | Cycle number and period; the amount due of the total | - | Statement | - | Read only | - | -"
+      - "Installments Billed | Line / Invoice No. / Policy Year / Coverage / Due Date / Amount / Paid / Balance | Column | Current Cycle or Arrears | - | Statement lines | - | Read only | - | -"
+      - "E-mails Sent | Queued / Purpose / To / Subject / Outcome / Sent / Reason | Column | One row per e-mail with the protected attachment marked | - | Mail log | - | Read only | - | -"
+      - "Send Statement of Account dialog | To / Cc / Subject / Message | Text, text area | The client's e-mail address proposed; subject and message proposed | Y / N / Y / Y | Client profile | Proposed | To Send, Sent | At least one recipient | Enter at least one recipient"
+      - "Send Statement of Account dialog | Password hint for the recipient | Text | The hint sent with the password | N | - | Blank | To Send, Sent | - | -"
+      - "Cancel Statement of Account dialog | Reason | Text area | Up to 1,000 characters | Y | - | Blank | To Send, Sent | Not blank | Enter the reason"
+    actions:
+      - "Download PDF | Every Collections user | Always | Downloads the statement of account (PDF) | - | -"
+      - "Send via Email | Operations billing user (statement permission) | Not cancelled | Sends the PDF, protected by a password sent in a separate e-mail, and records the e-mail | Sent | Statement of account e-mail (NT-11, NT-12)"
+      - "Cancel Statement | Operations billing user (statement permission) | Not cancelled | Asks for the reason and cancels the statement; the cycle can be billed again | Cancelled | -"
+    rules:
+      - "The PDF comes from the statement of account template and records the template version used (FR-CL-060)."
+      - "The PDF e-mailed to the client is password protected; the password follows in a separate e-mail (FR-CL-061)."
+    outcome: The client receives the statement of the cycle.
+    frs: [FR-CL-060, FR-CL-061, FR-CL-062]
+    tests: [SOA]

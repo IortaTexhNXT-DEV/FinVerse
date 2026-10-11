@@ -1,0 +1,206 @@
+package com.iortatechnxt.brokerverse.configpromo.catalogue;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+/**
+ * The configuration catalogue: every configuration dataset of the platform and every table that is
+ * never promoted, with its reason. Read once from {@code configpromo/catalogue.yml}.
+ */
+public final class ConfigCatalogue {
+
+  /** Classpath location of the catalogue. */
+  public static final String RESOURCE = "configpromo/catalogue.yml";
+
+  private final List<CatalogueGroup> groups;
+  private final Map<String, CatalogueDataset> byCode;
+  private final Map<String, CatalogueDataset> byTable;
+  private final Map<String, String> excluded;
+  private final Map<String, String> reasons;
+
+  ConfigCatalogue(
+      List<CatalogueGroup> groups,
+      List<CatalogueDataset> datasets,
+      Map<String, String> excluded,
+      Map<String, String> reasons) {
+    this.groups = List.copyOf(groups);
+    this.byCode = index(datasets, CatalogueDataset::code, "dataset code");
+    this.byTable = tables(datasets);
+    this.excluded = Collections.unmodifiableMap(new LinkedHashMap<>(excluded));
+    this.reasons = Collections.unmodifiableMap(new LinkedHashMap<>(reasons));
+    validate();
+  }
+
+  /**
+   * Reads the catalogue of the application.
+   *
+   * @return catalogue
+   */
+  public static ConfigCatalogue load() {
+    try (InputStream in = ConfigCatalogue.class.getResourceAsStream("/" + RESOURCE)) {
+      if (in == null) {
+        throw new IllegalStateException("The configuration catalogue " + RESOURCE + " is missing");
+      }
+      return CatalogueYaml.read(in);
+    } catch (IOException e) {
+      throw new IllegalStateException("The configuration catalogue cannot be read", e);
+    }
+  }
+
+  /**
+   * Reads a catalogue in the format of {@value #RESOURCE}.
+   *
+   * @param in YAML
+   * @return catalogue
+   */
+  public static ConfigCatalogue read(InputStream in) {
+    return CatalogueYaml.read(in);
+  }
+
+  private static Map<String, CatalogueDataset> index(
+      List<CatalogueDataset> datasets, Function<CatalogueDataset, String> key, String what) {
+    Map<String, CatalogueDataset> map = new LinkedHashMap<>();
+    for (CatalogueDataset d : datasets) {
+      if (map.put(key.apply(d), d) != null) {
+        throw new IllegalStateException("Duplicate " + what + " in the catalogue: " + key.apply(d));
+      }
+    }
+    return Collections.unmodifiableMap(map);
+  }
+
+  /**
+   * The first dataset of every table. A table may hold several datasets only when each of them
+   * names its rows; references by id to such a table resolve through the first one.
+   */
+  private static Map<String, CatalogueDataset> tables(List<CatalogueDataset> datasets) {
+    Map<String, CatalogueDataset> map = new LinkedHashMap<>();
+    for (CatalogueDataset d : datasets) {
+      CatalogueDataset first = map.putIfAbsent(d.table(), d);
+      if (first != null && (first.rows() == null || d.rows() == null)) {
+        throw new IllegalStateException(
+            "Duplicate table in the catalogue without the rows of each dataset: " + d.table());
+      }
+    }
+    return Collections.unmodifiableMap(map);
+  }
+
+  private void validate() {
+    Map<String, CatalogueGroup> groupCodes =
+        groups.stream().collect(Collectors.toMap(CatalogueGroup::code, g -> g));
+    for (CatalogueDataset d : byCode.values()) {
+      require(groupCodes.containsKey(d.group()), d.code() + " has the unknown group " + d.group());
+      require(!d.key().isEmpty(), d.code() + " has no natural key");
+      require(!excluded.containsKey(d.table()), d.table() + " is both a dataset and excluded");
+      d.refs()
+          .values()
+          .forEach(
+              target ->
+                  require(
+                      byCode.containsKey(target),
+                      d.code() + " refers to the unknown dataset " + target));
+    }
+    excluded
+        .values()
+        .forEach(
+            reason ->
+                require(
+                    reasons.containsKey(reason),
+                    "Unknown reason " + reason + " of an excluded table"));
+  }
+
+  private static void require(boolean valid, String problem) {
+    if (!valid) {
+      throw new IllegalStateException(problem);
+    }
+  }
+
+  /**
+   * Groups in screen order.
+   *
+   * @return groups
+   */
+  public List<CatalogueGroup> groups() {
+    return groups;
+  }
+
+  /**
+   * Datasets in catalogue order.
+   *
+   * @return datasets
+   */
+  public List<CatalogueDataset> datasets() {
+    return List.copyOf(byCode.values());
+  }
+
+  /**
+   * A dataset by code.
+   *
+   * @param code dataset code
+   * @return dataset, empty when unknown
+   */
+  public Optional<CatalogueDataset> find(String code) {
+    return Optional.ofNullable(byCode.get(code));
+  }
+
+  /**
+   * A dataset by code that must exist.
+   *
+   * @param code dataset code
+   * @return dataset
+   */
+  public CatalogueDataset dataset(String code) {
+    CatalogueDataset d = byCode.get(code);
+    if (d == null) {
+      throw new IllegalArgumentException("Unknown configuration dataset " + code);
+    }
+    return d;
+  }
+
+  /**
+   * The dataset of a table (the first one when several datasets share the table).
+   *
+   * @param table table
+   * @return dataset, empty when the table is not configuration
+   */
+  public Optional<CatalogueDataset> byTable(String table) {
+    return Optional.ofNullable(byTable.get(table));
+  }
+
+  /**
+   * Tables never promoted, with their reason code.
+   *
+   * @return table to reason code
+   */
+  public Map<String, String> excludedTables() {
+    return excluded;
+  }
+
+  /**
+   * Reasons of the excluded tables in words.
+   *
+   * @return reason code to text
+   */
+  public Map<String, String> reasons() {
+    return reasons;
+  }
+
+  /**
+   * The group of a dataset.
+   *
+   * @param code group code
+   * @return group
+   */
+  public CatalogueGroup group(String code) {
+    return groups.stream()
+        .filter(g -> g.code().equals(code))
+        .findFirst()
+        .orElseThrow(() -> new IllegalArgumentException("Unknown catalogue group " + code));
+  }
+}

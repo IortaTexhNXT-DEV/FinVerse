@@ -1,0 +1,362 @@
+import type { AccessRequest, RoleInfo, UserAccess } from '@/api/nbadmin';
+import { stageSteps } from '@/components/broking/stageSteps';
+import { accessRequestMoves, accessRequestStages } from './accessStages';
+import {
+  EMPTY_ACCESS_REQUEST,
+  fromAccessRequest,
+  isCancellable,
+  isEditable,
+  roleChanges,
+  toAccessRequest,
+  validateAccessRequest,
+} from './accessRequest';
+import type { AccessRequestForm, ValidationContext } from './accessRequest';
+
+const USERS: UserAccess[] = [
+  { username: 'aileen', fullName: 'Aileen', enabled: true, roleCodes: ['MKT_AO'], locked: false },
+  { username: 'old', fullName: 'Old User', enabled: false, roleCodes: [], locked: false },
+  { username: 'locked', fullName: 'Locked', enabled: true, roleCodes: [], locked: true },
+];
+
+const SUBMIT: ValidationContext = {
+  users: USERS,
+  submit: true,
+  userIdPattern: '^[a-zA-Z][0-9]{9}$',
+  userIdFormatText: 'a letter followed by nine digits, for example a013000196',
+  today: '2026-09-25',
+};
+const DRAFT: ValidationContext = { users: USERS, submit: false };
+
+const form = (patch: Partial<AccessRequestForm>): AccessRequestForm => ({
+  ...EMPTY_ACCESS_REQUEST,
+  ...patch,
+});
+
+describe('user access request validation', () => {
+  it('checks only the formats of a draft', () => {
+    expect(validateAccessRequest(form({ username: 'a013000196' }), DRAFT)).toEqual({});
+    expect(validateAccessRequest(form({ username: 'ab' }), DRAFT)).toEqual({
+      username: 'Use 3 to 50 letters, digits, dots, dashes or underscores',
+    });
+  });
+
+  it('needs the new user data, a group profile, the remarks and the approver to submit', () => {
+    expect(validateAccessRequest(form({ username: 'a013000196' }), SUBMIT)).toEqual({
+      fullName: 'Enter the full name of the new user',
+      roleCodes: 'Select at least one role',
+      justification: 'Enter the justification',
+      approvers: 'Select the approver',
+    });
+    expect(validateAccessRequest(form({ username: 'AILEEN' }), SUBMIT).username).toBe(
+      'This user already exists',
+    );
+    expect(validateAccessRequest(form({ username: 'a01300019X' }), SUBMIT).username).toBe(
+      'The user ID must be a letter followed by nine digits, for example a013000196',
+    );
+    expect(
+      validateAccessRequest(form({ username: 'a01300019X' }), { ...SUBMIT, userIdFormatText: '' })
+        .username,
+    ).toBe('The user ID does not have the required format');
+    expect(
+      validateAccessRequest(
+        form({
+          username: 'a013000196',
+          fullName: 'UAT User One',
+          roleCodes: ['MKT_AO'],
+          justification: 'Joined',
+          approvers: ['uamapprover'],
+        }),
+        SUBMIT,
+      ),
+    ).toEqual({});
+  });
+
+  it('takes an authorisation limit of zero or more with up to 2 decimals', () => {
+    const base = form({ type: 'MODIFY_USER', username: 'aileen', authorizationLimit: '12.345' });
+    expect(validateAccessRequest(base, SUBMIT).authorizationLimit).toBe(
+      'Enter an amount of zero or more, with up to 2 decimals',
+    );
+    expect(
+      validateAccessRequest({ ...base, authorizationLimit: '1,500,000.50' }, SUBMIT)
+        .authorizationLimit,
+    ).toBeUndefined();
+    expect(
+      toAccessRequest({ ...base, authorizationLimit: '1,500,000.50' }).authorizationLimit,
+    ).toBe(1500000.5);
+    expect(toAccessRequest({ ...base, authorizationLimit: '' }).authorizationLimit).toBeUndefined();
+  });
+
+  it('needs an existing user in the right state and a date from today', () => {
+    const base = { justification: 'x', approvers: ['uamapprover'] };
+    expect(
+      validateAccessRequest(form({ ...base, type: 'MODIFY_USER', username: 'nobody' }), SUBMIT)
+        .username,
+    ).toBe('Select an existing user');
+    expect(
+      validateAccessRequest(form({ ...base, type: 'DISABLE_USER', username: 'old' }), SUBMIT)
+        .username,
+    ).toBe('This user is already deactivated');
+    expect(
+      validateAccessRequest(form({ ...base, type: 'ENABLE_USER', username: 'aileen' }), SUBMIT)
+        .username,
+    ).toBe('This user is already active');
+    expect(
+      validateAccessRequest(form({ ...base, type: 'ENABLE_USER', username: 'locked' }), SUBMIT),
+    ).toEqual({});
+    expect(
+      validateAccessRequest(
+        form({ ...base, type: 'DISABLE_USER', username: 'aileen', effectiveFrom: '2026-09-24' }),
+        SUBMIT,
+      ).effectiveFrom,
+    ).toBe('The effective date cannot be before today');
+  });
+
+  it('needs the party of an external user', () => {
+    expect(
+      validateAccessRequest(
+        form({ userType: 'EXTERNAL', username: 'hr.user', fullName: 'HR', justification: 'x' }),
+        SUBMIT,
+      ),
+    ).toEqual({
+      partyKind: 'Select the insurer or client',
+      partyCode: 'Enter the party code',
+      approvers: 'Select the approver',
+    });
+  });
+});
+
+describe('group-profile request validation', () => {
+  const base = { justification: 'x', approvers: ['uamapprover'] };
+
+  it('needs a code, a name and permissions for a new profile', () => {
+    expect(validateAccessRequest(form({ type: 'CREATE_ROLE' }), DRAFT)).toEqual({
+      roleCode: 'Enter the profile code',
+    });
+    expect(
+      validateAccessRequest(form({ ...base, type: 'CREATE_ROLE', roleCode: 'bad code' }), SUBMIT),
+    ).toEqual({
+      roleCode: 'Use up to 40 capital letters, digits or underscores',
+      roleName: 'Enter the name of the group profile',
+      permissions: 'Select at least one permission',
+    });
+    expect(
+      validateAccessRequest(form({ type: 'CREATE_ROLE', roleCode: 'X' }), SUBMIT).approvers,
+    ).toBe('Add at least one approver');
+  });
+
+  it('needs a role and a change for a modification', () => {
+    const change = { ...base, type: 'MODIFY_ROLE_PERMISSIONS' as const };
+    expect(validateAccessRequest(form(change), SUBMIT)).toEqual({
+      roleCode: 'Select the role to change',
+    });
+    expect(
+      validateAccessRequest(
+        form({ ...change, roleCode: 'TSU', currentPermissions: ['A'], permissions: ['A'] }),
+        SUBMIT,
+      ),
+    ).toEqual({ permissions: 'Grant or withdraw at least one permission' });
+    expect(
+      validateAccessRequest(
+        form({ ...change, roleCode: 'TSU', currentPermissions: ['A'], privilegeLevel: 'HIGH' }),
+        SUBMIT,
+      ),
+    ).toEqual({});
+  });
+});
+
+describe('access request mapping', () => {
+  it('sends only the fields of a user request type', () => {
+    expect(
+      toAccessRequest(
+        form({
+          type: 'DISABLE_USER',
+          username: ' aileen ',
+          fullName: 'ignored',
+          roleCodes: ['TSU'],
+          reasonCode: 'RESIGNED',
+          effectiveFrom: '2026-09-30',
+          justification: ' Left ',
+          approvers: ['uamapprover'],
+        }),
+      ),
+    ).toEqual({
+      type: 'DISABLE_USER',
+      username: 'aileen',
+      roleCodes: undefined,
+      reasonCode: 'RESIGNED',
+      unlock: undefined,
+      effectiveFrom: '2026-09-30',
+      justification: 'Left',
+      approvers: ['uamapprover'],
+    });
+    const create = toAccessRequest(
+      form({
+        username: 'n',
+        fullName: 'N',
+        homeBranchId: '3',
+        windowsId: 'W1',
+        roleCodes: ['TSU'],
+      }),
+    );
+    expect(create.homeBranchId).toBe(3);
+    expect(create.windowsId).toBe('W1');
+    expect(create.roleCodes).toEqual(['TSU']);
+    const external = toAccessRequest(
+      form({ userType: 'EXTERNAL', username: 'hr', partyKind: 'CLIENT', partyCode: 'C1' }),
+    );
+    expect(external.partyKind).toBe('CLIENT');
+    expect(external.roleCodes).toBeUndefined();
+  });
+
+  it('sends the permissions of a group-profile request', () => {
+    expect(
+      toAccessRequest(
+        form({
+          type: 'MODIFY_ROLE_PERMISSIONS',
+          roleCode: 'TSU',
+          currentPermissions: ['A', 'B'],
+          permissions: ['B', 'C'],
+          justification: ' Package requests ',
+        }),
+      ),
+    ).toMatchObject({
+      type: 'MODIFY_ROLE_PERMISSIONS',
+      roleCode: 'TSU',
+      permissionsAdded: ['C'],
+      permissionsRemoved: ['A'],
+      justification: 'Package requests',
+    });
+    expect(
+      toAccessRequest(form({ type: 'CREATE_ROLE', roleCode: 'NEW', permissions: ['A'] }))
+        .permissionsAdded,
+    ).toEqual(['A']);
+    expect(toAccessRequest(form({ type: 'DEACTIVATE_ROLE', roleCode: 'OLD' }))).toEqual({
+      type: 'DEACTIVATE_ROLE',
+      roleCode: 'OLD',
+      privilegeLevel: undefined,
+      justification: undefined,
+      approvers: [],
+    });
+  });
+
+  it('lists added and removed codes and reads a saved request back', () => {
+    expect(roleChanges(['A', 'B'], ['B', 'C'])).toEqual({ added: ['C'], removed: ['A'] });
+    const roles: RoleInfo[] = [
+      {
+        id: 1,
+        code: 'TSU',
+        name: 'TSU',
+        permissions: ['A', 'B'],
+        active: true,
+        privilegeLevel: 'STANDARD',
+      },
+    ];
+    const saved = {
+      id: 7,
+      requestNo: 'AR-1',
+      type: 'MODIFY_ROLE_PERMISSIONS',
+      userType: 'INTERNAL',
+      summary: '',
+      roleCodes: [],
+      status: 'RETURNED',
+      requestedBy: 'badmin',
+      requestedAt: '2026-09-25T00:00:00Z',
+      roleCode: 'TSU',
+      permissionsAdded: ['C'],
+      permissionsRemoved: ['A'],
+      returnedCount: 1,
+      details: { unlock: false },
+      lifecycle: {
+        approvers: [{ sequence: 1, approver: 'uamapprover', decision: 'RETURNED' }],
+        riskFlags: [],
+        secondApprovalRequired: false,
+      },
+    } satisfies AccessRequest;
+    const back = fromAccessRequest(saved, roles);
+    expect(back.permissions).toEqual(['B', 'C']);
+    expect(back.approvers).toEqual(['uamapprover']);
+    expect(isEditable('RETURNED')).toBe(true);
+    expect(isCancellable('APPROVED')).toBe(false);
+  });
+});
+
+describe('editing a saved draft', () => {
+  it('keeps every saved field and the chosen approver, so the submission does not ask again', () => {
+    const draft = {
+      id: 9,
+      requestNo: 'AR-9',
+      type: 'CREATE_USER',
+      userType: 'INTERNAL',
+      summary: '',
+      username: 'a013000196',
+      fullName: 'Nora Santos',
+      email: 'nora.santos@example.ph',
+      roleCodes: ['MKT_AO'],
+      homeBranchId: 3,
+      justification: 'New account officer',
+      status: 'DRAFT',
+      requestedBy: 'mktao',
+      requestedAt: '2026-09-25T00:00:00Z',
+      permissionsAdded: [],
+      permissionsRemoved: [],
+      returnedCount: 0,
+      details: {
+        unlock: false,
+        windowsId: 'BDO\\nsantos',
+        businessUnitCode: 'MKT',
+        userLevel: 'OFFICER',
+        effectiveFrom: '2026-10-01',
+        authorizationLimit: 250000,
+      },
+      lifecycle: {
+        approvers: [{ sequence: 1, approver: 'uamapprover', decision: 'PENDING' }],
+        riskFlags: [],
+        secondApprovalRequired: false,
+      },
+    } satisfies AccessRequest;
+    const edited = fromAccessRequest(draft, []);
+    expect(edited.approvers).toEqual(['uamapprover']);
+    expect(validateAccessRequest(edited, SUBMIT).approvers).toBeUndefined();
+    expect(toAccessRequest(edited)).toMatchObject({
+      username: 'a013000196',
+      fullName: 'Nora Santos',
+      email: 'nora.santos@example.ph',
+      roleCodes: ['MKT_AO'],
+      homeBranchId: 3,
+      windowsId: 'BDO\\nsantos',
+      businessUnitCode: 'MKT',
+      userLevel: 'OFFICER',
+      authorizationLimit: 250000,
+      effectiveFrom: '2026-10-01',
+      justification: 'New account officer',
+      approvers: ['uamapprover'],
+    });
+  });
+});
+
+describe('access request stepper', () => {
+  const lifecycle = { approvers: [], riskFlags: [], secondApprovalRequired: true };
+  const steps = (r: Parameters<typeof accessRequestStages>[0]) =>
+    stageSteps(accessRequestStages(r), r.status, accessRequestMoves(r)).map(
+      (s) => `${s.code}:${s.state}`,
+    );
+
+  it('builds the user request path with the second approval when needed', () => {
+    expect(steps({ type: 'CREATE_USER', status: 'PENDING_SECOND', lifecycle })).toEqual([
+      'DRAFT:done',
+      'PENDING:done',
+      'PENDING_SECOND:current',
+      'APPROVED:upcoming',
+    ]);
+  });
+
+  it('shows a rejected request as ended after the approval', () => {
+    expect(
+      steps({
+        type: 'CREATE_USER',
+        status: 'REJECTED',
+        lifecycle: { ...lifecycle, secondApprovalRequired: false, submittedAt: '2026-09-27' },
+      }),
+    ).toEqual(['DRAFT:done', 'PENDING:done', 'REJECTED:ended']);
+  });
+});

@@ -1,0 +1,7 @@
+voucher_key,branch_code,journal_type,value_date,currency,narration,reference,account_code,debit,credit,line_currency,exchange_rate,cost_center,business_line,party_code,line_reference,line_narration
+V1,HO,MANUAL,2026-09-15,PHP,Office rent for September,INV-2026-0915,5603,150000.00,,,,FIN,,,,Rent - head office
+V1,,,,,,,1111,,150000.00,,,,,,,Paid from BDO current account
+V2,HO,ACCRUAL,2026-09-30,PHP,"Accrued professional fees, September",,5605,8000.00,,,,FIN,,,,Audit retainer
+V2,,,,,,,2502,,8000.00,,,,,,,
+V3,CEB,ADJUSTMENT,2026-09-30,PHP,Reclass of suspense balance,ADJ-0930,1605,2500.00,,,,,,,,Inter-branch clearing
+V3,,,,,,,1606,,2500.00,,,,,,,Clear suspense

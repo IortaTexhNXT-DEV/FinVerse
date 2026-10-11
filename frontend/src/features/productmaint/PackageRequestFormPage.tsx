@@ -1,0 +1,196 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Download, Save, Send } from 'lucide-react';
+import { useState } from 'react';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { PACKAGE_REQUEST_ENTITY, productMaintApi } from '@/api/productmaint';
+import type { PackageRequest } from '@/api/productmaint';
+import { pmRoutingApi } from '@/api/pmRouting';
+import { Attachments } from '@/components/attachments/Attachments';
+import { Button } from '@/components/ui/Button';
+import { ErrorAlert } from '@/components/ui/ErrorAlert';
+import { Notice } from '@/components/ui/Notice';
+import { PageHeader } from '@/components/ui/PageHeader';
+import { useToast } from '@/components/ui/toastContext';
+import { useCompanyId } from '@/context/workspaceContext';
+import {
+  formOfRequest,
+  requestedForm,
+  requestErrors,
+  submissionGaps,
+  toRequestInput,
+} from './packageRequest';
+import type { RequestForm } from './packageRequest';
+import { RequestHeaderCard } from './RequestHeaderCard';
+import { RequestDetailsCard } from './RequestDetailsCard';
+import { detailsErrors, detailsOf, emptyDetails } from './requestDetails';
+import { TermsEditor } from './TermsEditor';
+import '@/styles/quotation.css';
+import { refreshRecord } from '@/components/broking/recordRefresh';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
+
+function useRequestSaver(setForm: (u: (f: RequestForm) => RequestForm) => void) {
+  const companyId = useCompanyId();
+  const navigate = useNavigate();
+  const toast = useToast();
+  const queryClient = useQueryClient();
+  const persist = async (f: RequestForm): Promise<PackageRequest> => {
+    const body = toRequestInput(f, companyId);
+    const saved =
+      f.id === undefined
+        ? await productMaintApi.create(body)
+        : await productMaintApi.update(f.id, body);
+    setForm((cur) => ({ ...cur, id: saved.id, requestNo: saved.requestNo }));
+    queryClient.setQueryData(['package-request', saved.id], saved);
+    await queryClient.invalidateQueries({ queryKey: ['package-requests'] });
+    return saved;
+  };
+  const save = useMutation({
+    mutationFn: persist,
+    onSuccess: (p) => toast.success(`${p.requestNo} saved`),
+  });
+  const submit = useMutation({
+    mutationFn: async (f: RequestForm) => productMaintApi.submit((await persist(f)).id),
+    onSuccess: async (p) => {
+      await refreshRecord(queryClient, ['package-request', p.id], PACKAGE_REQUEST_ENTITY, p.id, p);
+      toast.success(`${p.requestNo} submitted for Marketing approval`);
+      void navigate(`/product-maintenance/requests/${p.id}`);
+    },
+  });
+  return { save, submit };
+}
+
+function Form({ initial }: Readonly<{ initial: RequestForm }>) {
+  const toast = useToast();
+  const [form, setForm] = useState(initial);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const set = (patch: Partial<RequestForm>) => setForm((f) => ({ ...f, ...patch }));
+  const { save, submit } = useRequestSaver(setForm);
+  const prefill = useMutation({
+    mutationFn: () => productMaintApi.prefill(form.productCode),
+    onSuccess: (p) => {
+      set({ terms: { ...p.terms, sections: form.terms.sections } });
+      toast.success(`Terms of ${p.productCode} version ${p.versionNo} loaded`);
+    },
+  });
+  const run = (action: typeof save) => {
+    const found = { ...requestErrors(form), ...detailsErrors(form.details) };
+    setErrors(found);
+    if (Object.keys(found).length === 0) {
+      action.mutate(form);
+    }
+  };
+  const gaps = submissionGaps(form);
+  const saved = form.id !== undefined;
+  return (
+    <div className="stack">
+      <PageHeader
+        backTo="/product-maintenance/requests"
+        section="Product Maintenance · Package Requests"
+        title={saved ? `Package Request ${form.requestNo ?? ''}` : 'New Package Request'}
+        description="Describe the package, the requested terms and the insurers to approach."
+        actions={
+          <>
+            {form.type !== 'NEW' && form.productCode !== '' && (
+              <Button
+                variant="secondary"
+                icon={<Download size={16} />}
+                busy={prefill.isPending}
+                onClick={() => prefill.mutate()}
+              >
+                Load Current Terms
+              </Button>
+            )}
+            <Button
+              variant="secondary"
+              icon={<Save size={16} />}
+              busy={save.isPending}
+              onClick={() => run(save)}
+            >
+              Save Draft
+            </Button>
+            <Button
+              variant="accent"
+              icon={<Send size={16} />}
+              busy={submit.isPending}
+              onClick={() => run(submit)}
+            >
+              Submit for Approval
+            </Button>
+          </>
+        }
+      />
+      <ErrorAlert error={save.error ?? submit.error ?? prefill.error} />
+      {gaps.length > 0 && (
+        <Notice tone="info" title="Before submitting">
+          Complete {gaps.join('; ')}.
+        </Notice>
+      )}
+      <RequestHeaderCard form={form} set={set} errors={errors} />
+      <RequestDetailsCard
+        source={form.source ?? 'MARKETING'}
+        details={form.details ?? emptyDetails()}
+        errors={errors}
+        onSource={(source) => set({ source })}
+        onDetails={(patch) => set({ details: { ...(form.details ?? emptyDetails()), ...patch } })}
+      />
+      {form.type !== 'RETIRE' && (
+        <TermsEditor
+          terms={form.terms}
+          onChange={(terms) => set({ terms })}
+          errors={errors}
+          lineCode={form.lineCode}
+          withInsurers={form.negotiationRequired}
+        />
+      )}
+      {form.id === undefined ? (
+        <p className="muted">Save the draft to attach the supporting documents.</p>
+      ) : (
+        <Attachments
+          entityType={PACKAGE_REQUEST_ENTITY}
+          entityId={form.id}
+          title="Documents"
+          reference={form.requestNo}
+        />
+      )}
+    </div>
+  );
+}
+
+/**
+ * Package Request Form (BRPM.008/011): type and scope, client or programme, line, cover type and
+ * product, reason, requested terms by section and coverage, rate scheme and package term, target
+ * insurers and documents. Marketing or TSU edit a draft; the TSU Team Lead completes it during the
+ * review.
+ */
+export default function PackageRequestFormPage() {
+  const routeParams = useParams();
+  const [params] = useSearchParams();
+  const id = routeParams.id === undefined ? undefined : Number(routeParams.id);
+  const existing = useQuery({
+    queryKey: ['package-request', id],
+    queryFn: () => productMaintApi.get(id ?? 0),
+    enabled: id !== undefined,
+  });
+  const routing = useQuery({
+    queryKey: ['package-request', id, 'routing'],
+    queryFn: () => pmRoutingApi.routing(id ?? 0),
+    enabled: id !== undefined,
+  });
+  if (id === undefined) {
+    return <Form initial={requestedForm(params)} />;
+  }
+  if (existing.data === undefined || routing.data === undefined) {
+    const error = existing.error ?? routing.error;
+    return error ? <ErrorAlert error={error} /> : <LoadingPanel />;
+  }
+  return (
+    <Form
+      key={existing.data.id}
+      initial={{
+        ...formOfRequest(existing.data),
+        source: routing.data.source,
+        details: detailsOf(routing.data.details),
+      }}
+    />
+  );
+}

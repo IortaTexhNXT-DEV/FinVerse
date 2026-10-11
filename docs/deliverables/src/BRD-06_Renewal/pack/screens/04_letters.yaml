@@ -1,0 +1,123 @@
+# Screen specifications of BRD-6 Renewal: the Renewal Advice and the closing letters, the client's acceptance, the
+# Contact Center follow-ups and the LAMD loan reports.
+area: Letters, acceptance and follow-up
+screens:
+  - id: SCR-RN-13
+    title: Letters
+    route: /renewal/letters
+    purpose: >-
+      The letters of the renewals by tab: RA Ready (generate the Renewal Advice, first or second notice), RA
+      Generated (send it, protected, to the client), RA Sent, NAL / NFR (send the No Advice or Not for Renewal letter
+      that closes the renewal) and NRNS (renewals with no response). Client acceptances are recorded on the renewal
+      or uploaded here.
+    entry:
+      - Client & Policy › Renewal › Letters
+      - Renewal Home › NRNS or Letters failed
+    shots:
+      - {state: list, user: proc, caption: "Letters, tab RA Ready: the renewals whose Renewal Advice can be generated"}
+      - {state: generate, user: proc, select: first_renewal, click: "^generate ra$", caption: "Generate Renewal Advice dialog: first or second notice and the confirmation of a late Renewal Advice"}
+      - {state: closing, user: ao, tab: "NAL / NFR", caption: "Letters, tab NAL / NFR: the renewals waiting for their closing letter"}
+    fields:
+      - "Tabs | RA Ready / RA Generated / RA Sent / NAL / NFR / NRNS | Tab | - | - | Letter stage of the renewal | RA Ready | - | - | -"
+      - "List | [Columns of the renewal lists] | Column | As on the Expiry List (SCR-RN-02) | - | Renewals | - | Read only | - | No renewals to display"
+      - "Generate Renewal Advice dialog | Notice | Drop-down | First notice or Second notice | Y | Fixed list | First notice | RA Ready, RA Sent, NRNS | The second notice after the days from the first | The second notice of <renewal ref> is due <ra second notice days> days after the first"
+      - "Generate Renewal Advice dialog | Generate also when the minimum notice before expiry has passed (the confirmation is recorded) | Check box | - | Cond.: fewer than 30 days to expiry | - | Unticked | RA Ready | - | Renewal <renewal ref> expires in <days> day(s): confirm the late Renewal Advice"
+      - "Upload Acceptances | [Upload wizard: Renewal Reference, Method, Evidence Reference, Accepted On, Remarks] | Upload | Template of the client acceptances | - | Renewals | - | RA Sent / Awaiting Response | Every row checked before anything is saved | Method <method> is not valid (E-mail or Payment)"
+    actions:
+      - "Generate RA | Marketing and Processing (generate permission) | Tab RA Ready, RA Sent or NRNS, renewals ticked | Opens the dialog; Generate creates the Renewal Advice from the latest template and locks the renewal on the Marketing side | RA Generated | -"
+      - "Send | Marketing and Processing (send permission) | Tab RA Generated, renewals ticked | Asks for confirmation; the Renewal Advice is e-mailed protected to the client | RA Sent / Awaiting Response | Renewal Advice e-mail and password (NT-16, NT-17)"
+      - "Send Letters | Users with the generate and send permissions | Tab NAL / NFR, renewals ticked | Asks for confirmation; the No Advice or Not for Renewal letter is generated and e-mailed and the renewal is closed | Closed | Closing letter e-mail (NT-19)"
+      - "Upload Acceptances | Users with the acceptance permission | Always | Opens the upload of the client acceptances | Accepted | Renewal accepted (NT-07)"
+    rules:
+      - "A Renewal Advice is generated only for renewals without a failing blocking check, from the latest approved template (FR-RN-080)."
+      - "A Renewal Advice generated fewer days than the minimum notice before expiry (30 by default) needs the confirmation, which is recorded (FR-RN-080)."
+      - "The second notice is offered the second-notice days (15 by default) after the first without acceptance (FR-RN-080)."
+      - "Renewal Advices are sent one protected e-mail per client with the password in a separate e-mail; every send and failure is recorded (FR-RN-081)."
+      - "A reason for Not for Renewal of the No Advice list is answered with the No Advice Letter, the others with the Not for Renewal Letter (FR-RN-082, FR-RN-024)."
+    outcome: The clients receive their Renewal Advice or closing letter.
+    frs: [FR-RN-080, FR-RN-081, FR-RN-082, FR-RN-083, FR-RN-024]
+    tests: [LETTERS]
+
+  - id: SCR-RN-14
+    title: Record Acceptance
+    route: /renewal/candidates/:ref
+    parent: /renewal/letters
+    purpose: >-
+      The client's acceptance of the Renewal Advice: by e-mail or signed Renewal Advice (the file uploaded in the
+      Documents tab first) or by payment (with its reference), with the date and remarks. When the renewal terms
+      differ from the expiring terms, the user confirms that the client acknowledged the change. Once accepted, the
+      renewal account goes to placement and booking without re-keying.
+    entry:
+      - Renewal (RA Sent / Awaiting Response) › Record Acceptance
+    shots:
+      - {state: accept, user: ao2, open_renewal: ra_sent, fill: acceptance_payment, caption: "Record Acceptance dialog: acceptance by payment with its reference"}
+    fields:
+      - "Record Acceptance dialog | Method | Drop-down | E-mail from the client, Signed Renewal Advice, Payment | Y | Fixed list | E-mail from the client | RA Sent / Awaiting Response | - | Select the acceptance method"
+      - "Record Acceptance dialog | Evidence | Drop-down | A document of the renewal (Documents tab) | Cond.: e-mail or signed Renewal Advice | Documents of the renewal | Blank | RA Sent / Awaiting Response | A document of this renewal | The evidence is not a document of this renewal"
+      - "Record Acceptance dialog | Payment Reference / Reference | Text | The payment or e-mail reference | Cond.: payment | - | Blank | RA Sent / Awaiting Response | - | -"
+      - "Record Acceptance dialog | Accepted On | Date | dd-MMM-yyyy | N | - | Today | RA Sent / Awaiting Response | Not in the future | The acceptance date cannot be in the future"
+      - "Record Acceptance dialog | The client acknowledged the change of premium from the expiring terms | Check box | - | Cond.: financial impact | - | Unticked | RA Sent / Awaiting Response | - | The renewal terms differ from the expiring terms: confirm that the client accepted them"
+      - "Record Acceptance dialog | Remarks | Text area | Up to 200 characters | N | - | Blank | RA Sent / Awaiting Response | - | -"
+    actions:
+      - "Record Acceptance | Marketing and Processing (acceptance permission) | RA Sent / Awaiting Response | Opens the dialog; Record keeps the acceptance and moves the renewal account on to placement and booking | Accepted, then For Placement and Booking | Renewal accepted (NT-07)"
+    rules:
+      - "The acceptance is refused while a blocking check fails (FR-RN-084)."
+      - "Acceptance moves the renewal account to placement and booking under the standard New Business payment rules; the renewal books as business type Renewal (FR-RN-084)."
+    outcome: The accepted renewal goes to placement and booking.
+    frs: [FR-RN-084]
+    tests: [RACC]
+
+  - id: SCR-RN-15
+    title: Follow-ups
+    route: /renewal/followups
+    purpose: >-
+      The renewals waiting for the client's reply after the Renewal Advice, for the Contact Center, with the renewals
+      with no response and those on the quotation or proposal path. The Contact Center user opens a renewal to record
+      a call, e-mail or SMS with its outcome and next action date, and uploads the client's documents.
+    entry:
+      - Client & Policy › Renewal › Follow-ups
+    shots:
+      - {state: list, user: contactc, caption: "Follow-ups of the Contact Center, tab RA Sent"}
+      - {state: followup, user: contactc, open_renewal: ra_sent, fill: followup_call, caption: "Add Follow-up dialog: the channel, outcome, next action date and remarks"}
+    fields:
+      - "Tabs | RA Sent / NRNS / Quotation / Proposal | Tab | - | - | Stage of the renewal | RA Sent | - | - | -"
+      - "Quick filters | Due in 30 days / KYC due | Toggle button | One at a time | - | - | None | - | - | -"
+      - "List | [Columns of the renewal lists] | Column | As on the Expiry List (SCR-RN-02), without the premium amounts | - | Renewals | - | Read only | - | No renewals to follow up"
+      - "Add Follow-up dialog | Channel / Outcome | Drop-down | Renewal follow-up channel; renewal follow-up outcome | Y / Y | Lists of values | Blank | Any open stage | - | Select the channel and the outcome"
+      - "Add Follow-up dialog | Next Action Date | Date | dd-MMM-yyyy, from today on | N | - | Blank | Any open stage | Not in the past | The next action date cannot be in the past"
+      - "Add Follow-up dialog | Remarks | Text area | Up to 200 characters | Y | - | Blank | Any open stage | Not blank | Enter the remarks"
+    actions:
+      - "Add Follow-up (renewal) | Contact Center | Any open stage | Opens the dialog; Save keeps the follow-up on the Remarks & Follow-ups tab | - | -"
+      - "[Row] | Contact Center | Always | Opens the renewal | - | -"
+    rules:
+      - "The Contact Center sees the renewals without the premium amounts and never changes the disposition, the letters or the placement (FR-RN-085)."
+      - "A renewal not yet submitted at the reminder days before expiry (90 by default) is flagged NRNS and its reminder letter is sent (FR-RN-083)."
+    outcome: The client's replies are recorded for the officers.
+    frs: [FR-RN-083, FR-RN-085]
+    tests: [FOLLOWUPS]
+
+  - id: SCR-RN-16
+    title: LAMD Reports
+    route: /renewal/lamd
+    purpose: >-
+      The monthly paid-off and past-due (RMU) loan reports of the Loan and Mortgage department. Each line is matched
+      to the renewals by PN number: a paid-off loan proposes Not for Renewal, a past-due loan routes the renewal to
+      the Team Leader of its unit.
+    entry:
+      - Client & Policy › Renewal › LAMD Reports
+    shots:
+      - {state: list, user: lamd, click: "^upload lamd report$", caption: "LAMD Reports with the upload of a paid-off or past-due loan report"}
+    fields:
+      - "Upload LAMD Report | Report / Month | Drop-down, month | Paid-off loans or RMU (past due); the month of the report | Y / Y | Fixed list | Paid-off loans | New | - | Choose the period of the report"
+      - "Upload LAMD Report | [Upload wizard: PN Number, Status Date, Borrower] | Upload | Template of the LAMD loan report | - | - | - | New | Every row checked before anything is saved | The row has no PN number"
+      - "List | Report / Type / Month / Lines / Matched / Uploaded by / Uploaded | Column | Report number; Paid-off loans or RMU (past due); the month; counts; the user's name and the time | - | LAMD reports | - | Read only | - | No LAMD reports uploaded"
+      - "Lines | Row / PN / Borrower / Loan Status / Status date / Match / Renewal / Outcome | Column | The line of the report, the renewal matched and what followed | - | LAMD lines | - | Read only | - | No lines"
+    actions:
+      - "Upload LAMD Report | LAMD | Always | Opens the upload; each line is matched to the renewals by PN | - | Renewal assigned (NT-01) to the Team Leaders of the unit"
+      - "[Row] | LAMD | Always | Opens the lines of the report | - | -"
+    rules:
+      - "A paid-off loan proposes Not for Renewal (reason Loan fully paid); a past-due loan routes the renewal to the Team Leader (FR-RN-025)."
+      - "The LAMD role never places, books, sends letters or gives dispositions (FR-RN-025)."
+    outcome: The loan status of the mortgaged renewals is reflected before the disposition.
+    frs: [FR-RN-025]
+    tests: [LAMDR]

@@ -1,0 +1,440 @@
+# =====================================================================================================
+# Configuration catalogue of BIBS: every configuration dataset of the platform, with its owner module,
+# natural key and the attributes Configuration Promotion needs. Every table of the database is either
+# a dataset here or listed under "excluded" with the reason it is never promoted; the build fails
+# (ConfigCatalogueSchemaIT) when a table is in neither list, so a new table must be classified here.
+#
+# Dataset attributes
+#   code, name, group, module, table   identity of the dataset; group = section of the screens
+#   key        natural key columns; a column that references another table by id is resolved to the
+#              natural key of that row, so a package never carries database ids
+#   parent     column of the parent row for a collection (lines of a rule, permissions of a role): the
+#              collection of a parent in the package replaces the collection of the target
+#   refs       references by id without a foreign key in the database (column: dataset)
+#   exclude    columns never promoted (workflow state, history), besides the audit columns
+#   environment  columns the target environment keeps on an existing row (schedules, recipients,
+#              running numbers and balances); a new row takes the value of the package
+#   environmentRows  rows that belong to the environment and are never promoted (column and values)
+#   rows       rows of the table that make up the dataset (column and values), when one table holds
+#              several datasets (standard report variants and the variants the users saved)
+#   insertDefaults  value of a column on a new row: "=column" copies another column of the row
+#   userColumns  columns naming a user; the dry run warns when the user does not exist in the target
+#   optional   true = not selected by default (market data)
+#   users      true = user records, promoted only when "include users" is chosen
+#   usedBy     references by code without a foreign key, checked before an item is deactivated
+#              (table.column holding the value of the last key column)
+# =====================================================================================================
+groups:
+  - {code: ORGANISATION, name: Organisation}
+  - {code: REFERENCE, name: Lists of values, parameters and switches}
+  - {code: PRODUCTS, name: Product catalogue}
+  - {code: PARTNERS, name: Insurers and business partners}
+  - {code: ACCOUNTING, name: Accounting}
+  - {code: TAX, name: Tax}
+  - {code: CASH_AND_BANKING, name: Cash and banking}
+  - {code: OPERATIONS, name: Operations, collections and commission rules}
+  - {code: RENEWAL_SUBMITTED, name: Renewal and submitted policies rules}
+  - {code: CLAIMS_BENEFITS, name: Claims and employee benefits rules}
+  - {code: SCREENING, name: Sanction screening configuration}
+  - {code: WORKFLOW_DOCUMENTS, name: Workflows, notifications and document templates}
+  - {code: REPORTS, name: Report definitions and layouts}
+  - {code: SECURITY, name: Group profiles, permissions and separation of duties}
+  - {code: DATA_MIGRATION, name: Migration console layouts and code maps}
+  - {code: USERS, name: Users and their assignments (optional)}
+
+datasets:
+  # ---------- Organisation ------------------------------------------------------------------------
+  - {code: ORG_COMPANY, name: Companies, group: ORGANISATION, module: organization, table: org_company, key: [code]}
+  - {code: ORG_BRANCH, name: Branches, group: ORGANISATION, module: organization, table: org_branch, key: [company_id, code]}
+  - {code: ORG_EMPLOYEE, name: Employees, group: ORGANISATION, module: organization, table: org_employee, key: [company_id, employee_no]}
+  - {code: ORG_HOLIDAY, name: Holiday calendar, group: ORGANISATION, module: organization, table: org_holiday, key: [company_id, branch_id, holiday_date]}
+  - {code: DIM_VALUE, name: Cost centres and business lines, group: ORGANISATION, module: dimension, table: dim_value, key: [company_id, dimension_type, code]}
+  - {code: CAT_SALES_UNIT, name: Sales units, group: ORGANISATION, module: catalog, table: cat_sales_unit, key: [company_id, code], userColumns: [head_username]}
+  - {code: CAT_SALES_OFFICER, name: Account officers of the sales units, group: USERS, module: catalog, table: cat_sales_officer, key: [company_id, username], users: true}
+
+  # ---------- Lists of values, parameters and switches ---------------------------------------------
+  - {code: LOV_TYPE, name: Lists of values, group: REFERENCE, module: lov, table: lov_type, key: [code]}
+  - {code: LOV_VALUE, name: Values of the lists, group: REFERENCE, module: lov, table: lov_value, key: [type_code, code]}
+  - code: SYS_PARAMETER
+    name: System parameters and numbering prefixes
+    group: REFERENCE
+    module: system
+    table: sys_parameter
+    key: [param_key]
+    exclude: [pending_value, pending_by, pending_at]
+    environmentRows:
+      column: param_key
+      values: [MIG_ENVIRONMENT_CLASS, MAIL_FROM_ADDRESS, JOB_FAILURE_RECIPIENTS, SCR_INGEST_ALERT_RECIPIENTS,
+               MIG_LEGACY_LINK_EBIX, MIG_LEGACY_LINK_QPS, AUTH_MODE, MFA_POLICY, MFA_ISSUER_NAME,
+               CSF_LEGACY_SYNC_ENABLED, PRODRECON_FILE_PATTERN, REMIT_FILE_PATTERN,
+               CONFIG_PROMOTION_PRODUCTION_WINDOW, CONFIG_PROMOTION_NOTIFY, CONFIG_PROMOTION_MAX_PACKAGE_MB,
+               CONFIG_PROMOTION_PIPELINE_APPLY]
+  - {code: CUR_CURRENCY, name: Currencies, group: REFERENCE, module: currency, table: cur_currency, key: [code]}
+  - {code: CUR_EXCHANGE_RATE, name: Exchange rates, group: REFERENCE, module: currency, table: cur_exchange_rate, key: [currency_code, rate_type, effective_date], optional: true}
+  - code: SYS_PRODUCT_MODULE
+    name: Module switches
+    group: REFERENCE
+    module: system
+    table: sys_product_module
+    key: [code]
+    exclude: [pending_enabled, pending_reason, pending_by, pending_at, changed_reason, changed_by, changed_at, approved_by]
+  - {code: SYS_MODULE_PROFILE, name: Module profiles, group: REFERENCE, module: system, table: sys_module_profile, key: [code]}
+  - {code: SYS_MODULE_PROFILE_MODULE, name: Modules of the module profiles, group: REFERENCE, module: system, table: sys_module_profile_module, key: [profile_id, module_code], parent: profile_id}
+  - {code: STO_RECORD_CLASS, name: Record classes of stored files, group: REFERENCE, module: storage, table: sto_record_class, key: [code]}
+  - {code: ALT_EXCEPTION_CODE, name: Exception codes and alert thresholds, group: REFERENCE, module: alert, table: alt_exception_code, key: [code]}
+  - {code: ATT_DOCUMENT_ACCESS, name: Document access classes, group: REFERENCE, module: attachment, table: att_document_access, key: [document_type, permission]}
+  - {code: NBA_RETENTION_RULE, name: Retention rules, group: REFERENCE, module: nbadmin, table: nba_retention_rule, key: [record_type, statuses]}
+
+  # ---------- Product catalogue --------------------------------------------------------------------
+  - {code: CAT_PRODUCT_LINE, name: Product lines, group: PRODUCTS, module: catalog, table: cat_product_line, key: [code]}
+  - {code: CAT_COVER_TYPE, name: Cover types, group: PRODUCTS, module: catalog, table: cat_cover_type, key: [line_code, code]}
+  - {code: CAT_COVERAGE, name: Coverages, group: PRODUCTS, module: catalog, table: cat_coverage, key: [line_code, code]}
+  - code: CAT_PRODUCT
+    name: Products and risk codes
+    group: PRODUCTS
+    module: catalog
+    table: cat_product
+    key: [code]
+    usedBy: [bcl_claim.product_code, adj_request.product_code, rnw_candidate.product_code, eb_programme_line.product_code, pm_advisory.product_code]
+  - {code: CAT_PRODUCT_VERSION, name: Product and package versions, group: PRODUCTS, module: catalog, table: cat_product_version, key: [product_code, version_no]}
+  - {code: CAT_PACKAGE_COVERAGE, name: Coverages of the packages, group: PRODUCTS, module: catalog, table: cat_package_coverage, key: [version_id, coverage_code], parent: version_id}
+  - {code: CAT_PACKAGE_INSURER, name: Insurers of the packages, group: PRODUCTS, module: catalog, table: cat_package_insurer, key: [version_id, insurer_code], parent: version_id}
+  - {code: CAT_PACKAGE_INSURER_TERM, name: Insurer terms of the packages, group: PRODUCTS, module: catalog, table: cat_package_insurer_term, key: [version_id, insurer_code, coverage_code], parent: version_id}
+  - {code: CAT_RATE, name: Premium charges and rating factors, group: PRODUCTS, module: catalog, table: cat_rate, key: [rate_code, line_code, effective_from]}
+  - {code: CAT_SHORT_PERIOD_RATE, name: Short-period table, group: PRODUCTS, module: catalog, table: cat_short_period_rate, key: [months_covered, effective_from]}
+  - {code: CAT_MOTOR_LIMIT, name: Motor limit premiums, group: PRODUCTS, module: catalog, table: cat_motor_limit, key: [coverage, limit_amount, effective_from]}
+  - {code: CAT_CLAUSE, name: Clauses and wordings, group: PRODUCTS, module: catalog, table: cat_clause, key: [code]}
+  - {code: CAT_FIELD_RULE, name: Field rules and validations, group: PRODUCTS, module: catalog, table: cat_field_rule, key: [scope, scope_code, target, field_key]}
+  - {code: CAT_DOCUMENT_RULE, name: Document rules, group: PRODUCTS, module: catalog, table: cat_document_rule, key: [scope, scope_code, document_type]}
+  - {code: CAT_TSU_RULE, name: Technical support rules, group: PRODUCTS, module: catalog, table: cat_tsu_rule, key: [code]}
+  - {code: CAT_COMMISSION_RATE, name: Commission rates by insurer and product, group: PRODUCTS, module: catalog, table: cat_commission_rate, key: [company_id, insurer_code, product_code, effective_from]}
+  - {code: CAT_INCENTIVE_CRITERIA, name: Incentive criteria, group: PRODUCTS, module: catalog, table: cat_incentive_criteria, key: [company_id, code, effective_from]}
+  - {code: CAT_INCENTIVE_CRITERIA_PRODUCT, name: Products matrix of the incentive criteria, group: PRODUCTS, module: catalog, table: cat_incentive_criteria_product, key: [criteria_id, product_code, cover_type_code, market_segment, source_channel, insurer_code], parent: criteria_id}
+  - {code: PLC_PAYMENT_GATE_RULE, name: Payment gate rules, group: PRODUCTS, module: placement, table: plc_payment_gate_rule, key: [market_segment, line_code, priority]}
+  - {code: ISS_DOCUMENT_TRIGGER, name: Document triggers of issuance, group: PRODUCTS, module: issuance, table: iss_document_trigger, key: [document_type, action]}
+  - {code: ISS_EXTRACTION_PATTERN, name: Policy extraction patterns, group: PRODUCTS, module: issuance, table: iss_extraction_pattern, key: [insurer_code, kind, field, priority]}
+  - {code: CAT_OTHER_CHARGE, name: Other charges of the products, group: PRODUCTS, module: catalog, table: cat_other_charge, key: [charge_code, line_code, product_code, effective_from]}
+
+  # ---------- Insurers and business partners -------------------------------------------------------
+  - {code: CAT_INSURER, name: Insurers, group: PARTNERS, module: catalog, table: cat_insurer, key: [company_id, party_code], environment: [placement_emails]}
+  - {code: CAT_INSURER_BRANCH, name: Insurer branches, group: PARTNERS, module: catalog, table: cat_insurer_branch, key: [insurer_id, code], environment: [placement_email]}
+  - {code: PTY_PARTY, name: Business partners, group: PARTNERS, module: party, table: pty_party, key: [company_id, code]}
+  - {code: ACSL_SOA_LAYOUT, name: Insurer statement layouts, group: PARTNERS, module: acsl, table: acsl_soa_layout, key: [insurer_code]}
+
+  # ---------- Accounting ---------------------------------------------------------------------------
+  - {code: COA_CATEGORY, name: Account categories, group: ACCOUNTING, module: coa, table: coa_category, key: [code]}
+  - {code: COA_NUMBERING, name: Account numbering, group: ACCOUNTING, module: coa, table: coa_numbering, key: [company_id, parent_code]}
+  - code: COA_ACCOUNT
+    name: Chart of accounts
+    group: ACCOUNTING
+    module: coa
+    table: coa_account
+    key: [company_id, code]
+    usedBy: [acsl_correction_line.account_code, dsb_voucher_line.account_code, mig_tb_line.account_code]
+  - {code: COA_ACCOUNT_BRANCH, name: Branches of the accounts, group: ACCOUNTING, module: coa, table: coa_account_branch, key: [account_id, branch_id], parent: account_id}
+  - {code: COA_ACCOUNT_CURRENCY, name: Currencies of the accounts, group: ACCOUNTING, module: coa, table: coa_account_currency, key: [account_id, currency_code], parent: account_id}
+  - {code: COA_ACCOUNT_ROLE, name: Roles of the accounts, group: ACCOUNTING, module: coa, table: coa_account_role, key: [account_id, role_code], parent: account_id}
+  - {code: ACC_EVENT_TYPE, name: Accounting events, group: ACCOUNTING, module: accounting, table: acc_event_type, key: [code]}
+  - {code: ACC_RULE, name: Accounting rules, group: ACCOUNTING, module: accounting, table: acc_rule, key: [company_id, event_type, name, effective_from]}
+  - {code: ACC_RULE_LINE, name: Lines of the accounting rules, group: ACCOUNTING, module: accounting, table: acc_rule_line, key: [rule_id, line_no], parent: rule_id}
+  - {code: ACC_COST_CENTER_RULE, name: Cost-centre rules, group: ACCOUNTING, module: accounting, table: acc_cost_center_rule, key: [company_id, priority, source_module, event_type]}
+  - {code: ACSL_GLSL_CONTROL, name: Control accounts of the sub-ledger reconciliation, group: ACCOUNTING, module: acsl, table: acsl_glsl_control, key: [company_id, account_code]}
+  - {code: PRQ_LIQUIDATION_ACCOUNT, name: Liquidation accounts of marketing requests, group: ACCOUNTING, module: payrequest, table: prq_liquidation_account, key: [company_id, account_role]}
+  - {code: JNL_RECURRING_TEMPLATE, name: Recurring journal templates, group: ACCOUNTING, module: journal, table: jnl_recurring_template, key: [company_id, name], environment: [last_occurrence_date]}
+  - {code: JNL_RECURRING_LINE, name: Lines of the recurring journals, group: ACCOUNTING, module: journal, table: jnl_recurring_line, key: [template_id, line_no], parent: template_id}
+  - {code: FA_CATEGORY, name: Fixed asset categories, group: ACCOUNTING, module: fixedasset, table: fa_category, key: [company_id, code]}
+  - {code: INV_PORTFOLIO, name: Investment portfolios, group: ACCOUNTING, module: investment, table: inv_portfolio, key: [company_id, code]}
+
+  # ---------- Tax ----------------------------------------------------------------------------------
+  - {code: TAX_CODE, name: Tax codes and ATC, group: TAX, module: tax, table: tax_code, key: [company_id, code]}
+  - {code: TAX_FORM, name: Tax forms, group: TAX, module: tax, table: tax_form, key: [company_id, code]}
+  - {code: TAX_FORM_OUTPUT_LINE, name: Output lines of the tax forms, group: TAX, module: tax, table: tax_form_output_line, key: [form_code, line_no]}
+  - {code: TAX_BOOK_DEF, name: Books of accounts, group: TAX, module: tax, table: tax_book_def, key: [code]}
+
+  # ---------- Cash and banking ---------------------------------------------------------------------
+  - {code: PAY_BANK_ACCOUNT, name: Bank accounts, group: CASH_AND_BANKING, module: payables, table: pay_bank_account, key: [company_id, code], exclude: [requested_status]}
+  - code: PAY_CHEQUE_BOOK
+    name: Check books
+    group: CASH_AND_BANKING
+    module: payables
+    table: pay_cheque_book
+    key: [bank_account_id, first_no]
+    exclude: [edited_by, edited_at, previous_range]
+    environment: [next_no, status]
+    insertDefaults: {next_no: "=first_no"}
+  - code: PAY_PETTY_CASH_FUND
+    name: Petty cash funds
+    group: CASH_AND_BANKING
+    module: payables
+    table: pay_petty_cash_fund
+    key: [company_id, code]
+    environment: [cash_balance]
+    insertDefaults: {cash_balance: "=imprest_amount"}
+  - {code: BRS_STATEMENT_LAYOUT, name: Bank statement layouts, group: CASH_AND_BANKING, module: receivables, table: brs_statement_layout, key: [company_id, bank_account_code]}
+  - {code: BRS_MATCH_RULE, name: Bank reconciliation matching rules, group: CASH_AND_BANKING, module: receivables, table: brs_match_rule, key: [company_id, bank_account_code, rule_code]}
+  - code: CSH_RECEIPT_SERIES
+    name: Receipt series and prefixes
+    group: CASH_AND_BANKING
+    module: cashiering
+    table: csh_receipt_series
+    key: [company_id, prefix, from_no]
+    environment: [next_no]
+    insertDefaults: {next_no: "=from_no"}
+  - {code: CSH_PAYMENT_FILE_LAYOUT, name: Payment file layouts, group: CASH_AND_BANKING, module: cashiering, table: csh_payment_file_layout, key: [handler_code]}
+  - {code: CSH_DISPOSITION_TYPE_RULE, name: Disposition types of unapplied payments, group: CASH_AND_BANKING, module: cashiering, table: csh_disposition_type_rule, key: [type_code]}
+  - {code: CSH_MINIMAL_BALANCE_RULE, name: Minimal balance rules, group: CASH_AND_BANKING, module: cashiering, table: csh_minimal_balance_rule, key: [kind]}
+  - {code: CSH_BANK_ACCOUNT, name: Bank accounts of the receipts, group: CASH_AND_BANKING, module: cashiering, table: csh_bank_account, key: [company_id, code]}
+  - {code: CSH_CHANNEL_PROFILE, name: Payment channel file profiles, group: CASH_AND_BANKING, module: cashiering, table: csh_channel_profile, key: [file_type], environment: [mft_folder, mft_enabled]}
+  - {code: CSH_RECEIPT_FORM, name: AR and OR forms, group: CASH_AND_BANKING, module: cashiering, table: csh_receipt_form, key: [company_id, form_kind, version_no], exclude: [decided_by, decided_at, decision_remarks]}
+
+  # ---------- Operations, collections and commission rules -----------------------------------------
+  - {code: BKG_AUTO_BOOK_RULE, name: Automatic booking rules, group: OPERATIONS, module: booking, table: bkg_auto_book_rule, key: [company_id, product_code, market_segment]}
+  - {code: BKG_INCENTIVE_RULE, name: Booking incentive rules, group: OPERATIONS, module: booking, table: bkg_incentive_rule, key: [company_id, product_code, market_segment, source_channel, period_from]}
+  - {code: BKG_SI_TYPE, name: Service invoice types, group: OPERATIONS, module: booking, table: bkg_si_type, key: [code], userColumns: [owner_username]}
+  - {code: REM_INCENTIVE_RULE, name: Early remittance incentive rules, group: OPERATIONS, module: remittance, table: rem_incentive_rule, key: [company_id, insurer_code, product_line, segment, effective_from]}
+  - {code: CMR_INCENTIVE_SCHEME, name: Incentive schemes, group: OPERATIONS, module: commission, table: cmr_incentive_scheme, key: [company_id, code]}
+  - {code: CMR_INCENTIVE_TIER, name: Tiers of the incentive schemes, group: OPERATIONS, module: commission, table: cmr_incentive_tier, key: [scheme_id, tier_index], parent: scheme_id}
+  - {code: CLX_ASSIGNMENT_RULE, name: Collection assignment rules, group: OPERATIONS, module: collections, table: clx_assignment_rule, key: [company_id, priority, name], userColumns: [handler_username]}
+  - {code: CLX_ESCALATION_RULE, name: Collection escalation rules, group: OPERATIONS, module: collections, table: clx_escalation_rule, key: [company_id, code], userColumns: [target_username]}
+  - {code: CLX_LOV_ATTRIBUTE, name: Attributes of the collection lists, group: OPERATIONS, module: collections, table: clx_lov_attribute, key: [type_code, code, attribute]}
+  - code: PRC_SCHEDULE
+    name: Production reconciliation schedules
+    group: OPERATIONS
+    module: prodrecon
+    table: prc_schedule
+    key: [company_id, insurer_code]
+    environment: [recipients, next_run_date, last_run_at, last_extract_no]
+  - {code: OPS_FLOW_IN_FEED, name: Inbound feeds, group: OPERATIONS, module: opsledger, table: ops_flow_in_feed, key: [code], environment: [cron]}
+  - {code: FRBS_SERVICE_FEE_RULE, name: Service fee rules, group: OPERATIONS, module: frbs, table: frbs_service_fee_rule, key: [segment, effective_from]}
+  - {code: FRBS_SERVICE_FEE_RECIPIENT, name: Service fee recipients, group: OPERATIONS, module: frbs, table: frbs_service_fee_recipient, key: [company_id, sales_unit]}
+
+  # ---------- Renewal and submitted policies rules -------------------------------------------------
+  - {code: RNW_CHECK_SETTING, name: Renewal checks, group: RENEWAL_SUBMITTED, module: renewal, table: rnw_check_setting, key: [check_code]}
+  - {code: RNW_BUCKET_RULE_SET, name: Renewal bucket rule versions, group: RENEWAL_SUBMITTED, module: renewal, table: rnw_bucket_rule_set, key: [company_id, version_no]}
+  - {code: RNW_BUCKET_RULE, name: Renewal bucket rules, group: RENEWAL_SUBMITTED, module: renewal, table: rnw_bucket_rule, key: [rule_set_id, priority], parent: rule_set_id}
+  - {code: RNW_DECISION_MATRIX, name: Renewal decision matrix versions, group: RENEWAL_SUBMITTED, module: renewal, table: rnw_decision_matrix, key: [company_id, version_no]}
+  - {code: RNW_DECISION_RULE, name: Renewal decision rules, group: RENEWAL_SUBMITTED, module: renewal, table: rnw_decision_rule, key: [matrix_id, priority], parent: matrix_id}
+  - {code: RNW_NON_RENEWABLE_RISK_CODE, name: Non-renewable risk codes, group: RENEWAL_SUBMITTED, module: renewal, table: rnw_non_renewable_risk_code, key: [company_id, risk_code, effective_from]}
+  - {code: RNW_PACKAGE_MAP, name: Renewal package map, group: RENEWAL_SUBMITTED, module: renewal, table: rnw_package_map, key: [company_id, legacy_package_code, legacy_package_version, risk_code, insurer_code, si_from, map_version]}
+  - {code: RNW_INSURER_RENEWABLE_RISK, name: Risks each insurer renews, group: RENEWAL_SUBMITTED, module: renewal, table: rnw_insurer_renewable_risk, key: [company_id, insurer_code, risk_code, effective_from]}
+  - {code: RNW_RMU_OFFICER, name: RMU Account Officers, group: RENEWAL_SUBMITTED, module: renewal, table: rnw_rmu_officer, key: [company_id, ao_code]}
+  - {code: RNW_INSURER_DISPOSITION_MAP, name: Insurer dispositions of renewal, group: RENEWAL_SUBMITTED, module: renewal, table: rnw_insurer_disposition_map, key: [code]}
+  - {code: SBM_SOURCE, name: Submitted policy sources, group: RENEWAL_SUBMITTED, module: submitted, table: sbm_source, key: [code]}
+  - {code: SBM_STATUS_MAP, name: Submitted policy status map, group: RENEWAL_SUBMITTED, module: submitted, table: sbm_status_map, key: [legacy_status]}
+  - {code: SBM_RULE_SET, name: Submitted policy rule sets, group: RENEWAL_SUBMITTED, module: submitted, table: sbm_rule_set, key: [company_id, code, version_no]}
+  - {code: SBM_RULE, name: Submitted policy rules, group: RENEWAL_SUBMITTED, module: submitted, table: sbm_rule, key: [rule_set_id, priority], parent: rule_set_id}
+  - {code: SBM_RULE_CONDITION, name: Conditions of the submitted policy rules, group: RENEWAL_SUBMITTED, module: submitted, table: sbm_rule_condition, key: [rule_id, seq], parent: rule_id}
+  - {code: SBM_INSURER_RULE, name: Insurer selection rules, group: RENEWAL_SUBMITTED, module: submitted, table: sbm_insurer_rule, key: [company_id, segment, vehicle_type, occupancy, priority]}
+  - {code: SBM_LETTER_RULE, name: Letter rules, group: RENEWAL_SUBMITTED, module: submitted, table: sbm_letter_rule, key: [company_id, letter_type, segment, bucket, status]}
+  - {code: SBM_LIMIT_RULE, name: Insurer limit rules, group: RENEWAL_SUBMITTED, module: submitted, table: sbm_limit_rule, key: [company_id, insurer_code, segment, line, attribute]}
+  - {code: SBM_APPROVAL_MATRIX, name: Approval matrix of submitted policies, group: RENEWAL_SUBMITTED, module: submitted, table: sbm_approval_matrix, key: [company_id, document, segment, tsi_from, level], userColumns: [approver_username]}
+  - {code: SBM_NOMINATED_RATE, name: Nominated rates of the insurers, group: RENEWAL_SUBMITTED, module: submitted, table: sbm_nominated_rate, key: [company_id, segment, vehicle_type, insurer_code, effective_from]}
+  - {code: SBM_USER_SCOPE, name: Segments of the submitted policy users, group: USERS, module: submitted, table: sbm_user_scope, key: [company_id, username], users: true}
+
+  # ---------- Claims and employee benefits rules ---------------------------------------------------
+  - {code: BCL_LOV_ATTRIBUTE, name: Attributes of the claims lists, group: CLAIMS_BENEFITS, module: brokerclaims, table: bcl_lov_attribute, key: [type_code, code, attribute]}
+  - {code: BCL_STATUS_ACCESS, name: Claim status access, group: CLAIMS_BENEFITS, module: brokerclaims, table: bcl_status_access, key: [status_code, role_code, unit_code]}
+  - {code: BCL_HANDLER, name: Claim handlers, group: USERS, module: brokerclaims, table: bcl_handler, key: [username], users: true}
+  - {code: EB_REQUIRED_DOCUMENT, name: Required documents of employee benefits, group: CLAIMS_BENEFITS, module: eb, table: eb_required_document, key: [company_id, process_type, benefit_line, document_type]}
+  - {code: EB_THRESHOLD_RULE, name: Approval thresholds of employee benefits, group: CLAIMS_BENEFITS, module: eb, table: eb_threshold_rule, key: [company_id, benefit_line, measure, approval_level, effective_from]}
+
+  # ---------- Sanction screening configuration -----------------------------------------------------
+  - {code: SCR_WATCHLIST_SOURCE, name: Watchlist sources, group: SCREENING, module: screening, table: scr_watchlist_source, key: [code], environment: [schedule, drop_file]}
+  - {code: SCR_CONFIG_VERSION, name: Screening configuration versions, group: SCREENING, module: screening, table: scr_config_version, key: [company_id, config_type, scope, version_no]}
+  - {code: SCR_APPROVAL_ROUTE, name: Screening approval routes, group: SCREENING, module: screening, table: scr_approval_route, key: [version_id, sort_order], parent: version_id}
+  - {code: SCR_ASSIGNMENT_RULE, name: Screening assignment rules, group: SCREENING, module: screening, table: scr_assignment_rule, key: [version_id, sort_order], parent: version_id, userColumns: [user_name]}
+  - {code: SCR_MATCH_RULE, name: Screening match rules, group: SCREENING, module: screening, table: scr_match_rule, key: [version_id, list_type, subject_type, algorithm], parent: version_id}
+  - {code: SCR_RISK_CATEGORY, name: Risk categories, group: SCREENING, module: screening, table: scr_risk_category, key: [version_id, code], parent: version_id}
+  - {code: SCR_RISK_RULE, name: Risk profiling rules, group: SCREENING, module: screening, table: scr_risk_rule, key: [version_id, priority], parent: version_id}
+  - {code: SCR_SLA_RULE, name: Screening service levels, group: SCREENING, module: screening, table: scr_sla_rule, key: [version_id, stage, case_type, risk_category], parent: version_id}
+  - {code: SCR_VALIDATION_RULE, name: Screening validation rules, group: SCREENING, module: screening, table: scr_validation_rule, key: [version_id, stage, case_type, rule_kind], parent: version_id}
+  - {code: SCR_STR_LAYOUT, name: Suspicious transaction report layouts, group: SCREENING, module: screening, table: scr_str_layout, key: [version_id], parent: version_id}
+  - {code: SCR_STR_LAYOUT_COLUMN, name: Columns of the report layouts, group: SCREENING, module: screening, table: scr_str_layout_column, key: [layout_id, sort_order], parent: layout_id}
+  - {code: SCR_TEMPLATE, name: Screening review templates, group: SCREENING, module: screening, table: scr_template, key: [version_id], parent: version_id}
+  - {code: SCR_TEMPLATE_FIELD, name: Fields of the review templates, group: SCREENING, module: screening, table: scr_template_field, key: [template_id, code], parent: template_id}
+
+  # ---------- Workflows, notifications and document templates --------------------------------------
+  - {code: WF_STAGE, name: Workflow stages and service levels, group: WORKFLOW_DOCUMENTS, module: workflow, table: wf_stage, key: [workflow_code, stage_code]}
+  - {code: WF_TRANSITION, name: Workflow transitions, group: WORKFLOW_DOCUMENTS, module: workflow, table: wf_transition, key: [workflow_code, from_stage, action]}
+  - {code: MSG_NOTIFICATION_EVENT, name: Notification events, group: WORKFLOW_DOCUMENTS, module: messaging, table: msg_notification_event, key: [code]}
+  - {code: MSG_NOTIFICATION_PREFERENCE, name: Notification preferences of the users, group: USERS, module: messaging, table: msg_notification_preference, key: [username, event_code], users: true}
+  - {code: DOC_TEMPLATE, name: Document and letter templates, group: WORKFLOW_DOCUMENTS, module: docgen, table: doc_template, key: [code, version_no]}
+  - {code: ISS_ADVICE_RECIPIENT, name: Recipients of the insurance advices, group: WORKFLOW_DOCUMENTS, module: issuance, table: iss_advice_recipient, key: [company_id, mortgagee_bank, market_segment, effective_from], environment: [to_addresses, cc_addresses]}
+
+  # ---------- Report definitions and layouts -------------------------------------------------------
+  - {code: FIN_SCHEDULE_DEF, name: Finance schedule definitions, group: REPORTS, module: finreport, table: fin_schedule_def, key: [code]}
+  - {code: FIN_SCHEDULE_COLUMN, name: Columns of the finance schedules, group: REPORTS, module: finreport, table: fin_schedule_column, key: [schedule_id, measure], parent: schedule_id}
+  - {code: FIN_STATEMENT_FORMAT, name: Financial statement formats, group: REPORTS, module: finreport, table: fin_statement_format, key: [company_id, code]}
+  - {code: FIN_STATEMENT_FORMAT_LINE, name: Lines of the statement formats, group: REPORTS, module: finreport, table: fin_statement_format_line, key: [format_id, line_no], parent: format_id}
+  - {code: FRBS_REPORT_PACK_ENTRY, name: Report pack, group: REPORTS, module: frbs, table: frbs_report_pack_entry, key: [group_code, seq]}
+  - code: NBR_REPORT_STANDARD_VARIANT
+    name: Standard report variants
+    group: REPORTS
+    module: nbreport
+    table: nbr_report_variant
+    key: [owner, report_code, name]
+    rows: {column: standard, values: [true]}
+  - code: NBR_REPORT_VARIANT
+    name: Report variants saved by the users
+    group: USERS
+    module: nbreport
+    table: nbr_report_variant
+    key: [owner, report_code, name]
+    rows: {column: standard, values: [false]}
+    users: true
+
+  # ---------- Group profiles, permissions and separation of duties ---------------------------------
+  - {code: SEC_ROLE, name: Group profiles, group: SECURITY, module: security, table: sec_role, key: [code], exclude: [deactivated_at, deactivated_by]}
+  - {code: SEC_ROLE_PERMISSION, name: Permission grants of the group profiles, group: SECURITY, module: security, table: sec_role_permission, key: [role_id, permission], parent: role_id}
+  - {code: SEC_PERMISSION_ACTION, name: Action classes of the permissions, group: SECURITY, module: security, table: sec_permission_action, key: [permission, action]}
+  - {code: NBA_SOD_RULE, name: Separation-of-duties rules, group: SECURITY, module: nbadmin, table: nba_sod_rule, key: [rule_code]}
+
+  # ---------- Users (optional, off by default) -----------------------------------------------------
+  - code: SEC_USER
+    name: Users (without passwords or second factor)
+    group: USERS
+    module: security
+    table: sec_user
+    key: [username]
+    users: true
+    refs: {home_branch_id: ORG_BRANCH}
+    exclude: [password_hash, locked, failed_attempts, last_login_at, password_changed_at, must_change_password, last_logout_at]
+    insertDefaults: {password_hash: "!PROMOTED-WITHOUT-PASSWORD", must_change_password: "true"}
+  - {code: SEC_USER_ROLE, name: Group profiles of the users, group: USERS, module: security, table: sec_user_role, key: [user_id, role_id], parent: user_id, users: true}
+  - {code: SEC_USER_DATA_SCOPE, name: Data scope of the users, group: USERS, module: security, table: sec_user_data_scope, key: [user_id, company_id, branch_id], parent: user_id, users: true}
+
+  # ---------- Migration console layouts and code maps ----------------------------------------------
+  - {code: MIG_DATA_OBJECT, name: Migration objects, group: DATA_MIGRATION, module: migration, table: mig_data_object, key: [code]}
+  - {code: MIG_LAYOUT, name: Migration layouts, group: DATA_MIGRATION, module: migration, table: mig_layout, key: [code, version_no]}
+  - {code: MIG_LAYOUT_COLUMN, name: Columns of the migration layouts, group: DATA_MIGRATION, module: migration, table: mig_layout_column, key: [layout_id, name], parent: layout_id}
+  - {code: MIG_CODE_MAP_SET, name: Code map sets, group: DATA_MIGRATION, module: migration, table: mig_code_map_set, key: [code]}
+  - {code: MIG_CODE_MAP_VERSION, name: Code map versions, group: DATA_MIGRATION, module: migration, table: mig_code_map_version, key: [set_code, version_no]}
+  - {code: MIG_CODE_MAP_ENTRY, name: Code map entries, group: DATA_MIGRATION, module: migration, table: mig_code_map_entry, key: [version_id, source_system, legacy_code, qualifier, qualifier_value], parent: version_id}
+  - {code: MIG_MASKING_RULE, name: Masking rules, group: DATA_MIGRATION, module: migration, table: mig_masking_rule, key: [layout_code, column_name]}
+  - {code: MIG_RULE, name: Migration validation rules, group: DATA_MIGRATION, module: migration, table: mig_rule, key: [code]}
+  - {code: MIG_SURVIVORSHIP_RULE, name: Survivorship rules, group: DATA_MIGRATION, module: migration, table: mig_survivorship_rule, key: [field]}
+
+# Reasons a table is never promoted.
+reasons:
+  TRANSACTION: Business transactions, their lines, documents and work items
+  CLIENT_DATA: Clients, payees and their personal or tax details
+  LOG: Audit, access, event and processing logs
+  SECRET: Passwords, second-factor secrets, sign-in tokens and sessions
+  COUNTER: Running numbers of documents and shared counters
+  FILE: Stored files and attachments
+  STATE: Operational state of the environment (periods, runs, queues, schema history)
+  PLANNING: Budgets and sales targets, entered in each environment
+  LIST_CONTENT: Watchlist entries, loaded from the list sources in each environment
+  PROMOTION: Configuration Promotion's own packages, imports and baselines
+
+# Tables never promoted, by reason.
+excluded:
+  TRANSACTION:
+    [bkg_incentive_evaluation, sbm_loan_match, sbm_proposal, sbm_proposal_batch,
+     acc_account, acc_account_legacy, acc_account_pn, acc_account_policy, acc_risk_item,
+     acc_risk_item_detail, acsl_case, acsl_correction, acsl_correction_line, acsl_glsl_recon,
+     acsl_glsl_run, acsl_recon_result, acsl_recon_run, acsl_soa_line, acsl_soa_upload,
+     adj_min_balance_item, adj_posting_batch, adj_posting_batch_line, adj_request,
+     adj_request_component, adj_request_journal, adj_request_share, alt_alert, bcl_claim,
+     bcl_claim_location, bcl_diary_entry, bcl_insurer_claim, bcl_insurer_update, bcl_location_ref,
+     bcl_reserve_change, bkg_batch_row, bkg_batch_run, bkg_endorsement, bkg_invoice,
+     bkg_invoice_journal, bkg_invoice_open_item, bkg_invoice_share, bkg_queue, bkg_service_invoice,
+     brs_match, brs_match_book, brs_reconciliation, brs_statement, brs_statement_line,
+     cat_rate_scheme_exception, clx_application_request, clx_assignment, clx_billing_document,
+     clx_billing_statement, clx_billing_statement_line, clx_disposition, clx_effort, clx_escalation,
+     clx_escalation_item, clx_field_change, clx_inbox, clx_installment, clx_installment_plan, clx_item,
+     clx_item_balance, clx_legacy_state, clx_outbox, clx_promise, clx_scheduled_file,
+     clx_unapplied_disposition, cmr_billing, cmr_certificate, cmr_certificate_or, cmr_dp_item,
+     cmr_dp_list, cmr_dppr_batch, cmr_dppr_batch_line, cmr_incentive_run, cmr_incentive_run_line,
+     csh_application, csh_application_line, csh_certificate_of_payment, csh_channel_file,
+     csh_collector_request, csh_commission_line, csh_cwt_batch, csh_cwt_tag, csh_disposition, csh_legacy_batch,
+     csh_legacy_batch_line, csh_minimal_balance, csh_payment, csh_payment_reversal, csh_pdc_item,
+     csh_pickup_request, csh_prebooked, csh_print_batch, csh_print_line, csh_reapplication, csh_receipt,
+     csh_receipt_action, csh_receipt_line, csh_receipt_record, csh_receipt_record_account,
+     csh_refund_validation, csh_settlement_or, csh_unapplied, csh_legacy_reference, dsb_eod_output,
+     dsb_eod_run, dsb_funding_request, dsb_instrument, dsb_request, dsb_status_edit, dsb_voucher,
+     dsb_voucher_line, dsb_voucher_tag, eb_bor, eb_client_confirmation, eb_comment, eb_comparative,
+     eb_comparative_line, eb_comparative_signoff, eb_confirmation_line, eb_cycle, eb_cycle_account,
+     eb_document, eb_feedback, eb_franchise_request, eb_insurer_request, eb_proposal,
+     eb_proposal_factor, eb_proposal_item, eb_proposal_line, eb_renewal_advice, eb_revision_item,
+     eb_revision_request, eb_revision_target, eb_roster_version, eb_soa, eb_soa_invoice, eb_submission,
+     eb_submission_document, eb_tor, eb_tor_item, eb_tracked_item, fa_asset, fa_depreciation_line,
+     fa_depreciation_run, fa_movement, fin_statement_comment, frbs_service_fee_item,
+     frbs_service_fee_line, frbs_service_fee_run, fx_revaluation_line, fx_revaluation_run,
+     gl_daily_balance, gl_ledger_entry, inv_holding, inv_run, inv_transaction, iss_epolicy,
+     iss_insurance_advice, iss_upload_batch, iss_upload_item, jnl_batch, jnl_line,
+     jnl_recurring_occurrence, mig_archive_record, mig_batch, mig_batch_extract, mig_batch_map_version,
+     mig_client_match, mig_cutover_plan, mig_cutover_task, mig_decommission_item, mig_extract,
+     mig_gonogo_criterion, mig_gonogo_decision, mig_issue, mig_key_xref, mig_object_decision,
+     mig_package_map, mig_ra_sent, mig_recon_line, mig_recon_run, mig_resubmission, mig_runoff_cohort,
+     mig_signoff, mig_stage_row, mig_tb_line, mig_trueup, msg_notification, msg_outbound,
+     msg_outbound_attachment, nba_access_request, nba_access_request_approver, nba_access_request_batch,
+     npk_insurer_response, npk_proposal, npk_proposal_account, npk_proposal_insurer,
+     ops_disbursement_request, ops_extract_file, ops_handoff, ops_invoice, ops_invoice_adjustment_total,
+     ops_invoice_component, ops_invoice_movement, ops_invoice_origin_line, ops_invoice_origin_snapshot,
+     ops_invoice_share, pay_pdc_issued, pay_petty_cash_disbursement, pay_petty_cash_reimbursement,
+     pay_supplier_invoice, pay_supplier_invoice_line, pay_voucher, pay_voucher_allocation,
+     plc_billing_batch, plc_billing_item, plc_hold_cover, plc_insurer_return, plc_payment_evidence,
+     plc_payment_report, plc_payment_report_line, plc_slip, plc_slip_account, plc_slip_file,
+     pm_advisory, pm_comparative_output, pm_insurer_response, pm_negotiation_round, pm_request,
+     pm_round_insurer, pm_signoff, prc_cycle, prc_extract, prc_extract_line, prc_item, prc_upload,
+     prq_liquidation, prq_liquidation_line, prq_request, prq_request_line, prq_validation,
+     quo_quotation, quo_quotation_account, quo_request, quo_version, rcv_deposit_slip, rcv_pdc,
+     rcv_receipt, rcv_receipt_allocation, rem_batch, rem_batch_document, rem_batch_line, rem_deduction,
+     rem_deduction_application, rem_eod_request, rem_extraction_run, rem_extraction_tag,
+     rem_hold_request, rem_special_request, rnw_acceptance, rnw_assignment, rnw_candidate,
+     rnw_candidate_endorsement, rnw_check_result, rnw_check_run, rnw_disposition, rnw_extraction_run,
+     rnw_followup, rnw_insurer_batch, rnw_insurer_batch_line, rnw_insurer_response, rnw_lamd_line,
+     rnw_lamd_report, rnw_letter, rnw_letter_batch, rnw_override, rnw_package_choice,
+     rnw_ra_sent_request, rnw_remark, rnw_submitted_handoff, rnw_transfer, rnw_upload_scope,
+     sbm_extraction, sbm_extraction_field, sbm_handling_fee, sbm_iaaf, sbm_iaaf_link, sbm_iaaf_review,
+     sbm_intake_run, sbm_lamd_loan, sbm_letter, sbm_limit_check, sbm_no_touch_batch, sbm_no_touch_line,
+     sbm_policy, sbm_print_batch, sbm_renewal, sbm_run, sbm_run_result, sbm_signature, sbm_tor,
+     scr_case, scr_case_answer, scr_case_document, scr_case_review, scr_committee_vote,
+     scr_ingestion_run, scr_match, scr_match_suppression, scr_screening_run, scr_str,
+     scr_str_extraction, scr_str_extraction_item, scr_str_field, scr_str_transaction, sl_item_match,
+     sl_open_item, tax_2307_batch, tax_2307_certificate, tax_2307_line, tax_certificate_received,
+     tax_certificate_received_line, tax_remittance, tax_return, tax_return_line, wf_case,
+     rnw_bdofc_line, rnw_channel_message, rnw_insurer_disposition_line, rnw_lamd_loan, rnw_paid_off_account, rnw_placement_tracking, rnw_processing_assignment, rnw_referral,
+     rnw_hold_cover_request, rnw_insurer_allocation, rnw_placement, rnw_placement_file, rnw_insurance_advice,
+     rnw_epolicy_receipt, rnw_epolicy_line, rnw_billing_file, rnw_proposal, rnw_tsu_request, rnw_tsu_quote,
+     pm_deactivation_request, pm_marketing_approval, pm_mancom_approval, pm_master_change,
+     pm_terms_option, pm_terms_setting, pm_final_term, pm_proposal_file, pm_client_response,
+     pm_placement_report]
+  CLIENT_DATA:
+    [crm_client, crm_client_instruction, crm_client_payout_account, crm_client_tag, crm_kyc_document,
+     csf_contact_change, csf_contact_change_field, csf_sync_outbox, csf_verification,
+     csf_verification_check, dsb_payee, dsb_payee_account, dsb_payee_request, eb_member,
+     eb_member_change, eb_member_change_line, eb_programme, eb_programme_contact, eb_programme_line,
+     scr_client_risk_profile, tax_party_profile]
+  LIST_CONTENT:
+    [scr_watchlist_alias, scr_watchlist_change, scr_watchlist_entry]
+  LOG:
+    [acc_event_log, audit_log, bcl_claim_event, bcl_status_history, cat_version_validation_check,
+     crm_client_note_history, csf_activity, csh_search_log, dsb_instrument_event, eb_activity_log,
+     mig_access_log, mig_batch_log, nba_access_request_event, nba_retention_run,
+     npk_insurer_response_history, ops_invoice_status_change, pay_pdc_event,
+     pm_insurer_response_history, rcv_pdc_event, rnw_bucket_history, rnw_history_view,
+     sbm_policy_history, scr_case_event, scr_ingestion_error, sec_access_change_log, sys_job_run,
+     wf_case_history,
+     rnw_budget_history, rnw_channel_event, rnw_kyc_activity,
+     idn_identity_event, pm_final_term_history]
+  SECRET:
+    [sec_mfa_recovery_code, sec_mfa_reset_request, sec_mfa_trusted_device, sec_password_history,
+     sec_password_reset_token, sec_revoked_token, sec_sso_request, sec_sso_ticket, sec_user_mfa,
+     sec_user_session]
+  COUNTER:
+    [document_sequence, sys_shared_counter]
+  FILE:
+    [doc_attachment, doc_attachment_content, doc_attachment_link, doc_rendition, stored_file]
+  STATE:
+    [acc_period_close_schedule, acc_period_module_lock, bcl_attribute_change, bulk_job, bulk_row,
+     evt_archive, flyway_schema_history, evt_dead_letter, evt_outbox, ops_flow_in_record, ops_flow_in_run, per_fiscal_year,
+     per_period, report_batch, report_batch_item, report_run, report_run_file, scr_name_key,
+     sto_legal_hold_request, yec_year_end_close,
+     idn_directory_profile, idn_sim_directory_account, pm_master_sim_inbox]
+  PLANNING:
+    [bud_budget, bud_budget_amount, bud_budget_line, nbr_sales_target,
+     rnw_budget, rnw_budget_month]
+  PROMOTION:
+    [cfp_package, cfp_import, cfp_import_dataset, cfp_baseline]

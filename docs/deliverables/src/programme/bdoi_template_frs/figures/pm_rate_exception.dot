@@ -1,0 +1,45 @@
+// New business on a package: latest approved rate scheme and rate exception (FRPM.024.02; BRPM.007).
+digraph rate_exception {
+  graph [rankdir=TB, newrank=true, fontname="Arial", nodesep=0.3, ranksep=0.32, bgcolor="white", pad=0.2, splines=ortho];
+  node  [shape=box, style="filled", fontname="Arial", fontsize=10, width=1.7, height=0.55, margin="0.08,0.04"];
+  edge  [arrowsize=0.6, penwidth=0.9, fontname="Arial", fontsize=9, color="#333333"];
+
+  subgraph cluster_mkt { label="Marketing Account Officer"; fontname="Arial Bold"; fontsize=11; style="rounded"; color="#82B366";
+    node [fillcolor="#D5E8D4", color="#82B366"];
+    h1 [label="", shape=plaintext, style="", width=0.1, height=0.1];
+    start [label="Start", shape=ellipse, width=0.8, height=0.35];
+    m1 [label="Create new-business\nquotation on a package"];
+    m2 [label="Request rate exception\nwith reason"];
+    m3 [label="Reprice on the\nscheme rate"];
+    m4 [label="Submit quotation"];
+    end_ [label="End", shape=ellipse, width=0.8, height=0.35];
+  }
+  subgraph cluster_sys { label="System"; fontname="Arial Bold"; fontsize=11; style="rounded"; color="#666666";
+    node [fillcolor="#F5F5F5", color="#666666"];
+    h2 [label="", shape=plaintext, style="", width=0.1, height=0.1];
+    s1 [label="Price on the version\nin force on the\ntransaction date"];
+    s2 [label="Rate differs\nfrom scheme?", shape=diamond, width=1.2, height=0.8];
+    s3 [label="Record approved\nexception (valid\n30 days)"];
+    s4 [label="Store version number\non quotation, account\nand invoice"];
+  }
+  subgraph cluster_appr { label="Approver (not the requester)"; fontname="Arial Bold"; fontsize=11; style="rounded"; color="#B85450";
+    node [fillcolor="#F8CECC", color="#B85450"];
+    h3 [label="", shape=plaintext, style="", width=0.1, height=0.1];
+    a1 [label="Compare requested\nrate with scheme\nin force"];
+    a2 [label="Approve?", shape=diamond, width=1.0, height=0.7];
+    a3 [label="Reject with\nreason; requester\nnotified"];
+  }
+  { rank=same; h1; h2; h3; }
+  h1 -> h2 -> h3 [style=invis];
+  h1 -> start [style=invis];
+
+  start -> m1 -> s1 -> s2;
+  s2 -> m4 [xlabel="No"];
+  s2 -> m2 [xlabel="Yes"];
+  m2 -> a1 -> a2;
+  a2 -> s3 [xlabel="Yes"];
+  s3 -> m4;
+  a2 -> a3 [xlabel="No"];
+  a3 -> m3 -> s1;
+  m4 -> s4 -> end_;
+}

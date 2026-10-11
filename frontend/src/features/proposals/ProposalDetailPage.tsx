@@ -1,0 +1,212 @@
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  Building2,
+  CalendarRange,
+  FileSignature,
+  Layers,
+  Pencil,
+  ShieldCheck,
+  User,
+  Wallet,
+} from 'lucide-react';
+import { useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import { PROPOSAL_ENTITY, proposalsApi } from '@/api/proposals';
+import type { Proposal, ProposalStatus } from '@/api/proposals';
+import { useAuth } from '@/auth/authContext';
+import { Attachments } from '@/components/attachments/Attachments';
+import { ClientTagFlags, InstructionsBanner } from '@/components/broking/InstructionsBanner';
+import { ReferenceChip } from '@/components/broking/ReferenceChip';
+import { SentMessages } from '@/components/broking/SentMessages';
+import { WorkflowPanel } from '@/components/broking/WorkflowPanel';
+import { Card } from '@/components/ui/Card';
+import { ErrorAlert } from '@/components/ui/ErrorAlert';
+import { PageHeader } from '@/components/ui/PageHeader';
+import { StatusBadge } from '@/components/ui/StatusBadge';
+import { Tabs } from '@/components/ui/Tabs';
+import { RecordSummary } from '@/components/broking/RecordSummary';
+import type { Fact } from '@/components/broking/RecordSummary';
+import { formatAmount, formatPeriod } from '@/utils/format';
+import { ProposalActions } from './ProposalActions';
+import {
+  ComparativeTab,
+  DetailsTab,
+  HistoryTab,
+  ProposalSlipTab,
+  QuotationSlipTab,
+} from './ProposalTabs';
+import { ResponsesTab } from './ResponsesTab';
+import { ClientResponseCard } from '@/features/productmaint/terms/ClientResponseCard';
+import { QuotationTermsPanel } from '@/features/productmaint/terms/QuotationTermsPanel';
+import '@/styles/quotation.css';
+import { ProductLineLabel, InsurerNames } from '@/components/broking/LovLabel';
+import { recordDescription } from '@/components/broking/recordDescription';
+import { useProductName } from '@/components/broking/useLabels';
+import { LoadingPanel } from '@/components/ui/LoadingPanel';
+
+const TABS = [
+  { id: 'details', label: 'Details' },
+  { id: 'qs', label: 'Quotation Slip' },
+  { id: 'responses', label: 'Insurer Responses' },
+  { id: 'comparative', label: 'Comparative Table' },
+  { id: 'ps', label: 'Proposal Slip' },
+  { id: 'documents', label: 'Documents' },
+  { id: 'emails', label: 'E-mails' },
+  { id: 'history', label: 'History' },
+] as const;
+
+type TabId = (typeof TABS)[number]['id'];
+
+const MARKETING_EDIT: ProposalStatus[] = ['DRAFT'];
+const TSU_EDIT: ProposalStatus[] = ['WITH_TSU', 'QS_PREPARATION'];
+
+function facts(p: Proposal): Fact[] {
+  return [
+    { icon: User, label: 'Client', value: `${p.clientCode} – ${p.clientName}` },
+    {
+      icon: Layers,
+      label: 'Product',
+      value: <ProductLineLabel product={p.productCode} line={p.lineCode} />,
+    },
+    {
+      icon: CalendarRange,
+      label: 'Period',
+      value: formatPeriod(p.periodFrom, p.periodTo),
+    },
+    {
+      icon: Wallet,
+      label: 'Total sum insured',
+      value: `${p.currency} ${formatAmount(p.totalSumInsured)}`,
+    },
+    {
+      icon: Building2,
+      label: 'Insurers',
+      value: <InsurerNames codes={p.insurers} empty="To be selected" />,
+    },
+    {
+      icon: FileSignature,
+      label: 'Slips',
+      value: [p.slips.qsNo, p.slips.psNo].filter(Boolean).join(' · ') || '—',
+    },
+  ];
+}
+
+function canEdit(p: Proposal, can: (permission: string) => boolean): boolean {
+  return (
+    (MARKETING_EDIT.includes(p.status) && can('PROPOSAL_REQUEST')) ||
+    (TSU_EDIT.includes(p.status) && can('TSU_PROCESS'))
+  );
+}
+
+function TabBody({ tab, proposal }: Readonly<{ tab: TabId; proposal: Proposal }>) {
+  switch (tab) {
+    case 'details':
+      return <DetailsTab proposal={proposal} />;
+    case 'qs':
+      return <QuotationSlipTab key={proposal.status} proposal={proposal} />;
+    case 'responses':
+      return <ResponsesTab proposal={proposal} />;
+    case 'comparative':
+      return (
+        <div className="stack">
+          <ComparativeTab proposal={proposal} />
+          <QuotationTermsPanel proposal={proposal} />
+        </div>
+      );
+    case 'ps':
+      return (
+        <div className="stack">
+          <ProposalSlipTab proposal={proposal} />
+          <ClientResponseCard id={proposal.id} canRecord={proposal.status === 'SENT_TO_CLIENT'} />
+        </div>
+      );
+    case 'documents':
+      return (
+        <Attachments
+          entityType={PROPOSAL_ENTITY}
+          entityId={proposal.id}
+          title="Documents"
+          reference={proposal.arn}
+        />
+      );
+    case 'emails':
+      return (
+        <Card title="E-mails" flush>
+          <SentMessages entityType={PROPOSAL_ENTITY} entityId={proposal.id} />
+        </Card>
+      );
+    default:
+      return <HistoryTab proposalId={proposal.id} />;
+  }
+}
+
+/**
+ * One Proposal Request Form (BRNB.005-017): header with the PRF No., ARN chip and stage; the
+ * client's special instructions; the workflow panel with the Marketing and TSU actions; and tabs
+ * for details, quotation slip, insurer responses, comparative table, proposal slip, documents,
+ * e-mails and history.
+ */
+export default function ProposalDetailPage() {
+  const id = Number(useParams().id);
+  const { can } = useAuth();
+  const productName = useProductName();
+  const queryClient = useQueryClient();
+  const [tab, setTab] = useState<TabId>('details');
+  const proposal = useQuery({ queryKey: ['proposal', id], queryFn: () => proposalsApi.get(id) });
+  if (proposal.data === undefined) {
+    return proposal.error ? <ErrorAlert error={proposal.error} /> : <LoadingPanel />;
+  }
+  const p = proposal.data;
+  return (
+    <div className="stack">
+      <PageHeader
+        backTo="/proposals"
+        section="Non-Package Management · Proposal Request"
+        title={p.prfNo}
+        description={recordDescription(
+          productName(p.productCode),
+          'proposal request',
+          p.clientName,
+        )}
+        actions={
+          canEdit(p, can) && (
+            <Link className="btn btn-secondary" to={`/proposals/${p.id}/edit`}>
+              <Pencil size={16} aria-hidden="true" /> Edit
+            </Link>
+          )
+        }
+      />
+      <RecordSummary
+        title={p.clientName}
+        chips={
+          <>
+            <ReferenceChip label="ARN" value={p.arn} />
+            <StatusBadge status={p.status} />
+          </>
+        }
+        flags={
+          <>
+            {p.tsuReason && (
+              <span className="tag" title={p.tsuReason}>
+                <ShieldCheck size={12} aria-hidden="true" /> TSU
+              </span>
+            )}
+            <ClientTagFlags clientId={p.clientId} />
+          </>
+        }
+        facts={facts(p)}
+      />
+      <InstructionsBanner clientId={p.clientId} />
+      <WorkflowPanel
+        entityType={PROPOSAL_ENTITY}
+        entityId={p.id}
+        recordStatus={p.status}
+        showHistory={false}
+        onChanged={() => void queryClient.invalidateQueries({ queryKey: ['proposal', id] })}
+        renderBusinessActions={(actions) => <ProposalActions proposal={p} actions={actions} />}
+      />
+      <Tabs tabs={TABS} active={tab} onChange={setTab} />
+      <TabBody tab={tab} proposal={p} />
+    </div>
+  );
+}

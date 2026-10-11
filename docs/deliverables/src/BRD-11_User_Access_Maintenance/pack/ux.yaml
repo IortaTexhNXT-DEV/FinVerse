@@ -1,0 +1,95 @@
+# UX screen documents of the BRD-11 User Access Maintenance set for the BDOI UX Design team: 07 UX Screen Deck, 08
+# UX screen register, 09 image package (docs/deliverables/src/signoff/build_ux_deck.py). The screens, fields,
+# actions, walkthroughs and images come from the pack; this file holds what only the UX documents need: who each
+# persona is, the images taken for the deck only, the changes of the issue and the points to confirm.
+
+issue:
+  version: "2.1"
+  date: 8 October 2026
+  changes:
+    - ref: CHG-UA-2.1-SSO
+      what: >-
+        Login with single sign-on through EIAM: in the sign-in mode OIDC or SAML the Login page shows Sign in with
+        the BDO identity provider, and only the break-glass administrators keep the user ID and password form
+        (FR-UA-003, CLR-UA-01, CLR-UA-24). The images show the local sign-in of SIT; the single sign-on state is
+        captured once BIBS is registered in EIAM
+      screens: [SCR-UA-01]
+
+navigation:
+  # The same landing page and menu as in the BRD-3 set (identical images are kept once).
+  shared:
+    ux-nav-04-menu: BRD-03:ux-nav-08-menu
+    ux-nav-05-landing: BRD-03:ux-nav-10-landing
+    ux-nav-05-menu: BRD-03:ux-nav-10-menu
+    ux-nav-06-landing: BRD-03:ux-nav-11-landing
+    ux-nav-06-menu: BRD-03:ux-nav-11-menu
+    ux-nav-08-landing: BRD-03:ux-nav-09-landing
+    ux-nav-08-menu: BRD-03:ux-nav-09-menu
+
+personas:
+  UAM_REQUESTOR: {who: "One of the named user access requestors of the business units"}
+  UAM_APPROVER: {who: "One of the named user access approvers of the business units"}
+  UAM_SECOND_APPROVER: {who: "The second approver of privileged or out-of-hours access changes (Information Security)"}
+  BUSINESS_ADMIN: {who: "The business administrator of BIBS who owns the group profiles"}
+  SYSADMIN: {who: "The system administrator of BIBS (BDOI IT operations)"}
+  AUDITOR: {who: "An internal or external auditor with read access"}
+  INFOSEC_OFFICER: {who: "An officer of BDOI Information Security"}
+  NB_APPROVER: {who: "A New Business approver of Marketing who also approves access requests of the unit"}
+
+classify:
+  scr-ua-01-01-empty: default
+  scr-ua-01-03-locked: read-only
+  scr-ua-02-01-request: filled
+  scr-ua-02-02-sent: success
+  scr-ua-02-03-new_password: default
+  scr-ua-03-01-reset: default
+  scr-ua-04-01-idle: confirmation
+  scr-ua-07-01-empty: default
+  scr-ua-07-04-modify: filled
+  scr-ua-08-01-pending: pending-approval
+  scr-ua-08-02-approve: confirmation
+  scr-ua-08-03-second: pending-approval
+  scr-ua-08-04-history: rejected-returned
+  scr-ua-08-05-password: success
+  scr-ua-09-02-validated: validation-error
+  scr-ua-10-01-pending: pending-approval
+  scr-ua-12-01-new_profile: filled
+  scr-ua-12-02-modify_profile: filled
+  scr-ua-12-03-deactivate: confirmation
+  scr-ua-13-01-permission: read-only
+  scr-ua-13-02-action: read-only
+  scr-ua-15-02-sessions: default
+  scr-ua-16-02-dialog: confirmation
+  scr-ua-17-01-audit_log: read-only
+  scr-ua-17-02-group_profile: read-only
+  scr-ua-17-03-user_access: read-only
+  scr-ua-18-02-approve: pending-approval
+  scr-ua-19-01-list: pending-approval
+  scr-ua-19-02-new: default
+  wt-a-03: pending-approval
+  wt-a-05: default
+  wt-a-07: default
+  wt-a-08: read-only
+  wt-b-05: pending-approval
+  wt-b-06: success
+  wt-b-10: read-only
+  wt-c-06: validation-error
+  wt-c-07: validation-error
+  wt-c-08: success
+  wt-d-01: read-only
+  wt-d-02: read-only
+  wt-d-03: read-only
+  wt-d-04: read-only
+  wt-d-05: default
+
+states:
+  - {screen: SCR-UA-06, state: empty, user: requestor, ux: empty, nocallouts: true, caption: "A search that finds no access request"}
+  # Crop of the notice standard for the design foundation of every deck (ux_foundation.yaml).
+  - {screen: SCR-UA-07, state: cmp-notice, component: true, user: requestor, fill: enrol_invalid, submit: "^submit$", crop: "main .notice", nocallouts: true, caption: "Notice standard"}
+
+confirm:
+  clarifications: [CLR-UA-01, CLR-UA-10, CLR-UA-11, CLR-UA-18, CLR-UA-19, CLR-UA-20, CLR-UA-24]
+  findings:
+    - screens: [SCR-UA-06]
+      observation: The Change column of the request list names the subject user by the user ID only.
+      proposal: Name the user with the full name first and the user ID in brackets, as the request record does.

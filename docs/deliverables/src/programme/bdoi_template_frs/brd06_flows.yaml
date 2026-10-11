@@ -1,0 +1,453 @@
+# Figures of the Renewal FRS in BDOI's template, version 1.1, drawn with the figure helper of brd11_figures.py
+# (swim-lanes with fixed positions, life-cycles and context with Graphviz dot, tables as images).
+# swimlane: lanes (one per persona, system lanes marked system: true) and steps placed in rows (row 0 at the top);
+#   kind task (default), decision, start, end, note, system; edges [from, to, label, style, port].
+# where: summary (Introduction), flow (section Process Flow), AA (menu), AD (workflow), AH (integrations).
+figures:
+  # ------------------------------------------------------------------------------------------ Introduction
+  - id: brd06_fig_e2e
+    kind: swimlane
+    where: summary
+    caption: "Renewal from end to end: who does what, from the expiring account to the booked renewal"
+    read: "Read from top to bottom. Each column is a persona; the green column is what the system does by itself. The FR items of section Functional Requirements are in brackets."
+    brd: "BRRN.001-042; BRD 1.003-4.09"
+    lanes:
+      - {id: tl, label: Marketing Team Lead}
+      - {id: ao, label: Account Officer}
+      - {id: pr, label: Processing}
+      - {id: ins, label: Insurer}
+      - {id: cli, label: Client}
+      - {id: sys, label: System, system: true}
+    steps:
+      - {id: s0, lane: sys, row: 0, kind: start, text: Expiring}
+      - {id: y1, lane: sys, row: 1, kind: system, text: "RMEL: daily run and date range (FRRN.004)"}
+      - {id: y2, lane: sys, row: 2, kind: system, text: "Sanitation and classification (FRRN.007, 008)"}
+      - {id: t1, lane: tl, row: 3, text: "Initiate (FRRN.004.07)"}
+      - {id: d1, lane: sys, row: 4, kind: decision, text: "Clean, automatic rule?"}
+      - {id: t2, lane: tl, row: 5, text: "Assign to the AO (FRRN.010)"}
+      - {id: a1, lane: ao, row: 6, text: "Disposition and submit (FRRN.014, 016)"}
+      - {id: t3, lane: tl, row: 7, text: "Review and post (FRRN.020)"}
+      - {id: p1, lane: pr, row: 8, text: "Process; request to the insurer (FRRN.021)"}
+      - {id: n1, lane: sys, row: 8, kind: note, text: "Not for Renewal: letters (FRRN.023)"}
+      - {id: i1, lane: ins, row: 9, text: "Disposition (FRRN.013)"}
+      - {id: p2, lane: pr, row: 10, text: "Renewal Advice, protected (FRRN.022)"}
+      - {id: c1, lane: cli, row: 11, text: "Accepts (FRRN.025)"}
+      - {id: p3, lane: pr, row: 12, text: "Placement and booking (FRRN.029-035)"}
+      - {id: e1, lane: sys, row: 13, kind: end, text: Renewed}
+    edges:
+      - [s0, y1]
+      - [y1, y2]
+      - [y2, t1]
+      - [t1, d1]
+      - [d1, t2, "No"]
+      - [d1, p1, "Yes", "", right]
+      - [t2, a1]
+      - [a1, t3]
+      - [t3, p1, "For Renewal"]
+      - [t3, n1, "Not for Renewal", "dashed", right]
+      - [p1, i1]
+      - [i1, p2, "Approved"]
+      - [p2, c1]
+      - [c1, p3]
+      - [p3, e1]
+
+  # ------------------------------------------------------------------------------------------ Process Flow
+  - id: brd06_fig_rmel
+    kind: swimlane
+    where: flow
+    caption: "RMEL, sanitation, classification and initiation"
+    read: "Read from top to bottom. The daily run and the generation by date range create one renewal account per expiring policy; the sanitation rules of Annex C classify it; the user initiates it; the decision matrix proposes or gives the disposition."
+    brd: "BRRN.002-009, 020-024, 029-031, 034, 039; BRD 1.003, 3.003; FRRN.004-009, 012, 038-041"
+    lanes:
+      - {id: tl, label: "Marketing / Processing Team Lead"}
+      - {id: lamd, label: LAMD user}
+      - {id: ba, label: Business Administrator}
+      - {id: sys, label: System, system: true}
+    steps:
+      - {id: s0, lane: sys, row: 0, kind: start, text: Business date}
+      - {id: y1, lane: sys, row: 1, kind: system, text: "Daily run at the lead days (140)"}
+      - {id: t1, lane: tl, row: 2, text: "Generate RMEL for a date range"}
+      - {id: y2, lane: sys, row: 2, kind: system, text: "One renewal account per expiring policy; renewal reference"}
+      - {id: l1, lane: lamd, row: 3, text: "Upload LAMD and BDOFC / SOLD reports"}
+      - {id: b1, lane: ba, row: 4, text: "Rules, risk codes, parameters (four eyes)"}
+      - {id: y3, lane: sys, row: 3, kind: system, text: "Sanitation rules (Annex C), duplicates (Annex B)"}
+      - {id: y4, lane: sys, row: 4, kind: system, text: "Classify Clean, Review, Non-Renewable / Exception"}
+      - {id: n1, lane: ba, row: 5, kind: note, text: "Exception open 5 working days: alert"}
+      - {id: t2, lane: tl, row: 5, text: "Initiate (bulk for CLG)"}
+      - {id: d1, lane: sys, row: 6, kind: decision, text: "Clean, automatic rule?"}
+      - {id: y5, lane: sys, row: 7, kind: system, text: "Disposition by the decision matrix"}
+      - {id: t3, lane: tl, row: 7, text: "Assign to an officer (FRRN.010)"}
+      - {id: e1, lane: sys, row: 8, kind: end, text: "To RA / Proc."}
+      - {id: e2, lane: tl, row: 8, kind: end, text: "To the AO"}
+    edges:
+      - [s0, y1]
+      - [y1, y2]
+      - [t1, y2, "", "", right]
+      - [y2, y3]
+      - [l1, y3, "PN match", "", right]
+      - [b1, y4, "", "dashed", right]
+      - [y3, y4]
+      - [y4, t2]
+      - [t2, d1]
+      - [d1, y5, "Yes"]
+      - [d1, t3, "No", "", left]
+      - [y5, e1]
+      - [t3, e2]
+
+  - id: brd06_fig_marketing
+    kind: swimlane
+    where: flow
+    caption: "Assignment, transfer, disposition, review and posting by Marketing"
+    read: "Read from top to bottom. The Account Officer reads the Account History before the disposition; the Team Lead returns or posts; a blocking rule is cleared only by an override with remarks."
+    brd: "BRRN.011-017, 027; BRD 1.004-1.008, 1.011, 2.003-2.007; FRRN.002.08, 010, 011, 014, 016, 020"
+    lanes:
+      - {id: tl, label: Marketing Team Lead}
+      - {id: ao, label: Account Officer}
+      - {id: rtl, label: Receiving unit Team Lead}
+      - {id: sys, label: System, system: true}
+    steps:
+      - {id: s0, lane: tl, row: 0, kind: start, text: Unassigned}
+      - {id: t1, lane: tl, row: 1, text: "Assign or re-assign (FRRN.010)"}
+      - {id: a1, lane: ao, row: 2, text: "Open the account and its Account History (FRRN.014.01)"}
+      - {id: d1, lane: ao, row: 3, kind: decision, text: "Other unit?"}
+      - {id: r1, lane: rtl, row: 3, text: "Accept or decline (FRRN.011.06)"}
+      - {id: a2, lane: ao, row: 4, text: "Disposition, reason, remarks (FRRN.014.02)"}
+      - {id: a3, lane: ao, row: 5, text: "Submit for Posting (FRRN.016)"}
+      - {id: d2, lane: tl, row: 6, kind: decision, text: "Correct and complete?"}
+      - {id: t2, lane: ao, row: 7, text: "Returned: correct and resubmit"}
+      - {id: d3, lane: tl, row: 8, kind: decision, text: "Blocking rule failed?"}
+      - {id: t3, lane: tl, row: 9, text: "Override with remarks (FRRN.020.03)"}
+      - {id: t4, lane: tl, row: 10, text: "Post (FRRN.020.01)"}
+      - {id: y1, lane: sys, row: 11, kind: system, text: "Route: Processing, New Business path, letters or closed"}
+      - {id: e1, lane: sys, row: 12, kind: end, text: Posted}
+    edges:
+      - [s0, t1]
+      - [t1, a1]
+      - [a1, d1]
+      - [d1, r1, "Transfer", "", right]
+      - [d1, a2, "No"]
+      - [a2, a3]
+      - [a3, d2]
+      - [d2, t2, "No: return (FRRN.020.02)", "", right]
+      - [t2, a2, "", "dashed", right]
+      - [d2, d3, "Yes"]
+      - [d3, t3, "Yes"]
+      - [d3, t4, "No", "", left]
+      - [t3, t4]
+      - [t4, y1]
+      - [y1, e1]
+
+  - id: brd06_fig_processing
+    kind: swimlane
+    where: flow
+    caption: "Processing and the insurer's disposition"
+    read: "Read from top to bottom. A financial impact routes the renewal to the New Business path; a matched Approve moves the account to the Renewal Advice; a Revise or a Reject returns it."
+    brd: "BRRN.018, 033, 035, 038; BRD 3.004-3.009, 4.003-4.007; FRRN.003, 009, 013, 015, 018.02, 021, 031"
+    lanes:
+      - {id: ptl, label: Processing Team Lead}
+      - {id: po, label: Processing Officer}
+      - {id: ins, label: Insurer}
+      - {id: sys, label: System, system: true}
+    steps:
+      - {id: s0, lane: sys, row: 0, kind: start, text: Posted}
+      - {id: t1, lane: ptl, row: 1, text: "Assign to an officer; upload files (FRRN.015)"}
+      - {id: p1, lane: po, row: 2, text: "Update the account; computations (FRRN.009)"}
+      - {id: d1, lane: sys, row: 3, kind: decision, text: "Financial impact?"}
+      - {id: y1, lane: sys, row: 4, kind: system, text: "New Business path (FRRN.018.02)"}
+      - {id: p2, lane: po, row: 4, text: "Request per insurer, 28 fields, protected (FRRN.021)"}
+      - {id: i1, lane: ins, row: 5, text: "Disposition file (Annex H)"}
+      - {id: n1, lane: sys, row: 5, kind: note, text: "No answer by the reply date: alert"}
+      - {id: p3, lane: po, row: 6, text: "Upload or record the disposition (FRRN.013)"}
+      - {id: d2, lane: sys, row: 7, kind: decision, text: "Matched Approve?"}
+      - {id: p4, lane: po, row: 8, text: "Revise: update; Reject: return to Marketing (FRRN.031)"}
+      - {id: e1, lane: sys, row: 8, kind: end, text: RA ready}
+    edges:
+      - [s0, t1]
+      - [t1, p1]
+      - [p1, d1]
+      - [d1, y1, "Yes"]
+      - [d1, p2, "No", "", left]
+      - [p2, i1]
+      - [i1, p3]
+      - [p3, d2]
+      - [d2, e1, "Yes"]
+      - [d2, p4, "No", "", left]
+
+  - id: brd06_fig_letters
+    kind: swimlane
+    where: flow
+    caption: "Renewal Advice, client acceptance, hold cover and the letters"
+    read: "Read from top to bottom. The letters use the effective expiry date: the end of a confirmed hold cover, otherwise the policy expiry date. An account never receives both a No Advice Letter and a Non-Renewal Letter."
+    brd: "BRRN.001, 010, 025, 026, 037, 040, 042; BRD 1.010, 2.009, 3.011, 4.09; FRRN.022-025, 036-037, 047"
+    lanes:
+      - {id: usr, label: "Marketing / Processing user"}
+      - {id: cc, label: Contact Center}
+      - {id: cli, label: Client}
+      - {id: ins, label: Insurer}
+      - {id: sys, label: System, system: true}
+    steps:
+      - {id: s0, lane: sys, row: 0, kind: start, text: RA ready}
+      - {id: u1, lane: usr, row: 1, text: "Generate the RA, first or last notice (FRRN.022.01)"}
+      - {id: y1, lane: sys, row: 2, kind: system, text: "Lock; protected e-mail; password rule (FRRN.022.02, 024)"}
+      - {id: c0, lane: cc, row: 3, text: "Follow-up of the client (FRRN.047)"}
+      - {id: d1, lane: cli, row: 3, kind: decision, text: "Accepts?"}
+      - {id: u2, lane: usr, row: 4, text: "Record the acceptance with evidence (FRRN.025)"}
+      - {id: y2, lane: sys, row: 5, kind: system, text: "Hold cover request if not complete (FRRN.036)"}
+      - {id: i1, lane: ins, row: 5, text: "Confirms the hold cover (FRRN.037)"}
+      - {id: y3, lane: sys, row: 6, kind: system, text: "NRNS reminder at the checkpoint (FRRN.023.03)"}
+      - {id: d2, lane: sys, row: 7, kind: decision, text: "Effective expiry passed?"}
+      - {id: y4, lane: sys, row: 8, kind: system, text: "NAL if an RA was sent, else NRL; non-acceptance letter"}
+      - {id: e1, lane: usr, row: 8, kind: end, text: To placement}
+      - {id: e2, lane: sys, row: 9, kind: end, text: Closed}
+    edges:
+      - [s0, u1]
+      - [u1, y1]
+      - [y1, d1]
+      - [c0, d1, "", "dashed", right]
+      - [d1, u2, "Yes"]
+      - [d1, y2, "Not yet", "", right]
+      - [u2, e1]
+      - [y2, i1, "", "", left]
+      - [y2, y3]
+      - [y3, d2]
+      - [d2, y4, "Yes"]
+      - [y4, e2]
+
+  - id: brd06_fig_placement
+    kind: swimlane
+    where: flow
+    caption: "Payment, placement, booking and the e-policy"
+    read: "Read from top to bottom. Placement and booking stay actions of the user (Walkthrough addendum p.4); the incentive is evaluated after booking, confirmed acceptance and full payment (BRRN.041)."
+    brd: "BRRN.040, 041; FRRN.026-035"
+    lanes:
+      - {id: csh, label: Cashiering}
+      - {id: pr, label: Processing}
+      - {id: ins, label: Insurer}
+      - {id: mkt, label: Marketing}
+      - {id: sys, label: System, system: true}
+    steps:
+      - {id: s0, lane: sys, row: 0, kind: start, text: Accepted}
+      - {id: c1, lane: csh, row: 1, text: "Payment applied (FRRN.028)"}
+      - {id: d1, lane: sys, row: 2, kind: decision, text: "Paid (CBG) or confirmed (Non-CBG)?"}
+      - {id: y1, lane: sys, row: 3, kind: system, text: "Submitted for Placement"}
+      - {id: p1, lane: pr, row: 4, text: "Generate the placement slip and file (FRRN.029.02)"}
+      - {id: p2, lane: pr, row: 5, text: "Send the placement; Insurance Advice (FRRN.029.04, 032)"}
+      - {id: i1, lane: ins, row: 6, text: "Approves or rejects (FRRN.030)"}
+      - {id: d2, lane: sys, row: 7, kind: decision, text: "Approved?"}
+      - {id: m1, lane: mkt, row: 8, text: "Rejected: returned to Marketing (FRRN.031)"}
+      - {id: p3, lane: pr, row: 8, text: "Booking (FRRN.035)"}
+      - {id: y2, lane: sys, row: 9, kind: system, text: "Invoice, accounting entries, service invoice; incentive"}
+      - {id: p4, lane: pr, row: 10, text: "E-policy received and sent (FRRN.033)"}
+      - {id: e1, lane: sys, row: 11, kind: end, text: Renewed}
+    edges:
+      - [s0, c1]
+      - [c1, d1]
+      - [d1, y1, "Yes"]
+      - [y1, p1]
+      - [p1, p2]
+      - [p2, i1]
+      - [i1, d2]
+      - [d2, p3, "Yes", "", left]
+      - [d2, m1, "No"]
+      - [p3, y2]
+      - [y2, p4]
+      - [p4, e1]
+
+  # ---------------------------------------------------------------------------------------- life-cycles
+  - id: brd06_fig_states_account
+    kind: states
+    where: flow
+    caption: "Status life-cycle of a renewal account"
+    read: "Each box is a status of BDOI's FRS (with the BRD stage where it differs); each arrow is the action that moves it. Grey boxes are final. The mapping of BDOI's statuses to the stages of the system is in Annex AC."
+    brd: "BRRN.021, 023, 040; BRD 1.008, 2.004, 3.008; FRRN.004.04, 016, 020, 025, 026, 029, 030, 035"
+    dot: |
+      digraph A {
+        graph [rankdir=TB, nodesep=0.5, ranksep=0.22, fontname="Arial", pad=0.15, size="7.2,8.2", newrank=true];
+        node [fontname="Arial", fontsize=11, shape=box, style="rounded,filled", fillcolor="#EAF1FB", color="#1F3864", margin="0.1,0.05"];
+        edge [fontname="Arial", fontsize=9.5, color="#404040", arrowsize=0.7];
+        new [label="(generated)", shape=circle, fillcolor="#C6E0B4", width=0.95, fixedsize=true];
+        ipr [label="In Process\nRenewal"]; sfp [label="Submitted\nfor Posting"]; ret [label="Returned"];
+        pst [label="Posted"]; wins [label="With Insurer"]; fra [label="For RA\nGeneration"]; ras [label="RA Sent /\nAwaiting Response"];
+        sfa [label="Submitted for\nApproval"]; sfpl [label="Submitted for\nPlacement"]; fbk [label="For Booking"];
+        bkd [label="Booked", fillcolor="#D9D9D9"]; rjp [label="Rejected\nPlacement"]; nbp [label="New Business\npath"];
+        nfr [label="Not for Renewal:\nletters"]; cls [label="Closed (not renewed,\nlost, expired)", fillcolor="#D9D9D9"];
+        new -> ipr [label="Initiate"];
+        ipr -> sfp [label="Submit for Posting\n(AO)"];
+        sfp -> ret [label="Return (TL)"]; ret -> sfp [label="Correct and\nresubmit"];
+        sfp -> pst [label="Approve (TL)"];
+        pst -> wins [label="Request to\nthe insurer"]; pst -> fra [label="Insurer already\napproved / Clean CBG"];
+        wins -> fra [label="Approve"]; wins -> ipr [label="Revise / Reject"];
+        fra -> ras [label="Generate and\nsend RA"];
+        ras -> sfa [label="Client accepts"];
+        sfa -> sfpl [label="Approve;\npayment"];
+        sfpl -> fbk [label="Placement sent"];
+        fbk -> bkd [label="Insurer approves;\nbooking"]; fbk -> rjp [label="Insurer rejects"];
+        rjp -> ret [label="Return to\nMarketing"];
+        sfp -> nbp [label="For Quotation /\nProposal"]; nbp -> bkd [label="Quotation\nbooked"];
+        sfp -> nfr [label="Not for Renewal"]; ras -> nfr [label="Rejected /\nexpired"];
+        nfr -> cls; nfr -> ipr [label="Re-open"];
+      }
+
+  - id: brd06_fig_states_letter
+    kind: states
+    where: flow
+    caption: "Status life-cycle of a Renewal Advice or letter"
+    read: "A letter is generated, then sent through CCM or the e-mail of the system; a failed sending raises an alert and can be resent. A Renewal Advice is cancelled only by a controlled override, which unlocks the account."
+    brd: "BRRN.001, 010, 025, 037; FRRN.022, 023, 024"
+    dot: |
+      digraph L {
+        graph [rankdir=LR, nodesep=0.3, ranksep=0.5, fontname="Arial", pad=0.15, size="9.4,4"];
+        node [fontname="Arial", fontsize=10, shape=box, style="rounded,filled", fillcolor="#EAF1FB", color="#1F3864", margin="0.12,0.06"];
+        edge [fontname="Arial", fontsize=8.5, color="#404040", arrowsize=0.7];
+        new [label="(eligible)", shape=circle, fillcolor="#C6E0B4", width=0.6, fixedsize=true];
+        gen [label="Generated\n(attached)"]; snt [label="Submitted\nfor delivery"]; dlv [label="Delivered", fillcolor="#D9D9D9"];
+        fl [label="Failed"]; can [label="Cancelled\n(RA only)", fillcolor="#D9D9D9"];
+        new -> gen [label="Generate (user or\nletter run)"];
+        gen -> snt [label="Send: protected\nfile and password"];
+        snt -> dlv [label="Delivery\nconfirmed"]; snt -> fl [label="Not delivered:\nalert"];
+        fl -> snt [label="Resend"]; dlv -> snt [label="Resend on the\nclient's request"];
+        gen -> can [label="Override with\nremarks"];
+      }
+
+  - id: brd06_fig_states_hold
+    kind: states
+    where: flow
+    caption: "Status life-cycle of a hold cover"
+    read: "The end date of an approved hold cover becomes the effective expiry date of the renewal account; a new request is accepted only when no hold cover is requested or confirmed."
+    brd: "BRRN.037, 042; FRRN.036, 037"
+    dot: |
+      digraph H {
+        graph [rankdir=LR, nodesep=0.3, ranksep=0.5, fontname="Arial", pad=0.15, size="9.4,4"];
+        node [fontname="Arial", fontsize=10, shape=box, style="rounded,filled", fillcolor="#EAF1FB", color="#1F3864", margin="0.12,0.06"];
+        edge [fontname="Arial", fontsize=8.5, color="#404040", arrowsize=0.7];
+        new [label="(needed)", shape=circle, fillcolor="#C6E0B4", width=0.6, fixedsize=true];
+        req [label="Requested"]; apr [label="Approved\n(confirmed)"]; ext [label="Extension\nrequested"];
+        rej [label="Rejected"]; exp [label="Expired", fillcolor="#D9D9D9"]; can [label="Cancelled", fillcolor="#D9D9D9"];
+        new -> req [label="Generated (system)\nor requested (user)"];
+        req -> apr [label="Insurer approves\n(upload or by hand)"]; req -> rej [label="Insurer rejects\n(remarks)"];
+        rej -> req [label="Amend and\nresubmit"];
+        apr -> ext [label="7 days before\nthe end"]; ext -> apr [label="Approved"];
+        apr -> exp [label="End date\npassed"]; req -> can [label="Cancel\n(reason)"]; apr -> can;
+      }
+
+  - id: brd06_fig_states_upload
+    kind: states
+    where: flow
+    caption: "Status life-cycle of an upload (LAMD, BDOFC / SOLD, insurer disposition, renewal update, placement response, hold cover response, e-policy)"
+    read: "Every upload of Renewal follows the same life-cycle; the summary and record-level views of BDOI's items show the statuses."
+    brd: "BRRN.018, 029, 035; FRRN.012, 013, 015, 030, 033, 037"
+    dot: |
+      digraph U {
+        graph [rankdir=LR, nodesep=0.3, ranksep=0.5, fontname="Arial", pad=0.15, size="9.4,3.6"];
+        node [fontname="Arial", fontsize=10, shape=box, style="rounded,filled", fillcolor="#EAF1FB", color="#1F3864", margin="0.12,0.06"];
+        edge [fontname="Arial", fontsize=8.5, color="#404040", arrowsize=0.7];
+        new [label="(file)", shape=circle, fillcolor="#C6E0B4", width=0.6, fixedsize=true];
+        upl [label="Uploaded"]; prc [label="Processing"]; ok [label="Success", fillcolor="#D9D9D9"];
+        part [label="Partially\nprocessed", fillcolor="#D9D9D9"]; fail [label="Failed", fillcolor="#D9D9D9"];
+        new -> upl [label="Upload (checks: format,\nrequired fields, readable,\nnot uploaded before)"];
+        new -> fail [label="Refused\n(message)"];
+        upl -> prc; prc -> ok [label="All rows matched\nand applied"];
+        prc -> part [label="Some rows refused\n(record-level reasons)"]; prc -> fail [label="Processing error"];
+      }
+
+  # ---------------------------------------------------------------------------------------- Annex AA
+  - id: brd06_fig_menus
+    kind: table
+    where: AA
+    header: ["Menu entry (Client & Policy › Renewal)", "Mkt|TL", "Mkt|AO", "Proc.|TL", "Proc.|Officer", "Bus.|Admin", "LAMD", "Contact|Center"]
+    tick: true
+    caption: "Menu by persona: the Renewal screens each persona sees"
+    read: "A tick means the screen is in the persona's menu; a screen without a tick is neither shown nor opened by its address. The renewal account opens from any list."
+    brd: "BRD 6.002.2; FRRN.001.02, FRRN.001.05, FRRN.002.01"
+    dot: |
+      digraph M {
+        graph [pad=0.1];
+        node [shape=plaintext, fontname="Arial", fontsize=9];
+        m [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4" COLOR="#8EA9DB">
+          @HEADER@
+          @ROWS@
+        </TABLE>>];
+      }
+    rows:
+      - ["Renewal Home", Y, Y, Y, Y, Y, Y, Y]
+      - ["Expiry List (RMEL)", Y, Y, Y, Y, Y, Y, Y]
+      - ["My Dispositions", Y, Y, "", "", "", "", ""]
+      - ["TL Review", Y, "", "", "", "", "", ""]
+      - ["Transfers", Y, Y, "", "", "", "", ""]
+      - ["Processing Worklist", "", "", Y, Y, "", "", ""]
+      - ["Insurer Batches", "", "", Y, Y, "", "", ""]
+      - ["Letters", Y, Y, Y, Y, "", "", ""]
+      - ["Follow-ups", "", "", "", "", "", "", Y]
+      - ["LAMD Reports", "", "", "", "", "", Y, ""]
+      - ["Renewal Setup", "", "", Y, Y, Y, "", ""]
+      - ["Reports › Renewal reports", Y, Y, Y, Y, Y, "", ""]
+
+  # ---------------------------------------------------------------------------------------- Annex AD
+  - id: brd06_fig_approvals
+    kind: table
+    where: AD
+    header: ["Decision or change", "Made by", "Checked / approved by", "Applies"]
+    caption: "Who makes, who checks and who approves each decision of Renewal"
+    read: "Each row is a decision or a change, read from left to right. No one approves his or her own change."
+    brd: "BRD 1.008, 1.011; BRRN.020, 023, 031, 034, 040; FRRN.014.04-05, 016, 018, 020, 026, 038, 040, 045-046"
+    dot: |
+      digraph T {
+        graph [pad=0.1];
+        node [shape=plaintext, fontname="Arial", fontsize=9];
+        m [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="5" COLOR="#8EA9DB">
+          @HEADER@
+          @ROWS@
+        </TABLE>>];
+      }
+    rows:
+      - ["Disposition of an account", "Account Officer (or the decision matrix)", "Marketing Team Lead (posting)", "On posting"]
+      - ["Override of a blocking rule", "Marketing Team Lead", "Remarks recorded", "At once"]
+      - ["TSU quotation request", "Account Officer", "Marketing Team Lead", "After approval"]
+      - ["For Booking Only without full payment", "User", "Override approver", "After approval"]
+      - ["Direct-to-Insurer Payment", "User", "Unit Head (or blanket approval)", "After approval"]
+      - ["Accepted account (BDOI)", "Account Officer", "Approver of FRRN.26.01", "Submitted for Placement"]
+      - ["Rules, matrix, risk codes, parameters", "Business Administrator", "Second authorised user", "From the effective date"]
+      - ["Lists of values, templates", "Business Administrator", "Second authorised user", "From the effective date"]
+      - ["Package of a migrated policy", "Renewal processing team", "Second team member", "At once"]
+      - ["Renewal Advices sent before go-live", "Renewal processing team", "Second team member", "At once"]
+
+  # ---------------------------------------------------------------------------------------- Annex AH
+  - id: brd06_fig_context
+    kind: context
+    where: AH
+    caption: "Integration context of Renewal"
+    read: "Solid lines are exchanges in scope; dashed lines depend on a decision of BDO ITG (CCM, MFT, LMS). The details of each interface are in the table of this annex."
+    brd: "BRRN.010, 029, 035, 040; BRD 3.009; FRRN.012, 013, 021, 022, 027-033"
+    dot: |
+      digraph C {
+        graph [layout=dot, rankdir=LR, nodesep=0.3, ranksep=0.85, fontname="Arial", pad=0.15];
+        node [fontname="Arial", fontsize=10, shape=box, style="rounded,filled", fillcolor="#FFFFFF", color="#1F3864", margin="0.14,0.07"];
+        edge [fontname="Arial", fontsize=8.5, color="#404040", arrowsize=0.7];
+        rn [label="Renewal Module\n(RMEL, sanitation,\ndisposition, letters,\nacceptance)", fillcolor="#1F3864", fontcolor="white", fontsize=11];
+        nb [label="New Business\n(quotation, placement,\nissuance, booking)", fillcolor="#E2EFDA"];
+        ops [label="Operations ledger\nand Cashiering", fillcolor="#E2EFDA"];
+        clm [label="Claims", fillcolor="#E2EFDA"];
+        sp [label="Submitted Policies", fillcolor="#E2EFDA"];
+        pm [label="Product Maintenance\n(risk codes, packages,\nincentive criteria)", fillcolor="#E2EFDA"];
+        dm [label="Data Migration\n(go-live)", fillcolor="#E2EFDA"];
+        lamd [label="LAMD (BDO loans)\nreports", fillcolor="#EAF1FB"];
+        ins [label="Insurers", fillcolor="#EAF1FB"];
+        cli [label="Clients", fillcolor="#EAF1FB"];
+        ccm [label="CCM (BDO)", fillcolor="#F2F2F2", color="#808080"];
+        mft [label="MFT (BDO)", fillcolor="#F2F2F2", color="#808080"];
+        lms [label="CLPC / LMS", fillcolor="#F2F2F2", color="#808080"];
+        ops -> rn [label="expiring accounts,\npayments"];
+        rn -> nb [label="renewal account,\nquotation, placement"]; nb -> rn [label="booking"];
+        clm -> rn [label="claims of the term"];
+        sp -> rn [label="hand-off"]; rn -> sp [label="status"];
+        pm -> rn [label="risk codes,\npackages"];
+        dm -> rn [label="migrated policies,\nRAs already sent"];
+        lamd -> rn [label="upload"];
+        rn -> ins [label="requests, placement,\nhold cover (e-mail)"]; ins -> rn [label="dispositions,\nresponses (upload)"];
+        rn -> cli [label="RA and letters\n(e-mail, protected)"];
+        rn -> ccm [style=dashed]; ccm -> cli [style=dashed];
+        rn -> mft [style=dashed]; mft -> ins [style=dashed];
+        rn -> lms [style=dashed, label="billing files"];
+      }

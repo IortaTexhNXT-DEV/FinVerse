@@ -1,0 +1,87 @@
+# End-to-end walkthroughs of BRD-2 Operations, shown step by step with screenshots of the seed profile.
+# Each step: persona (role code), screen (SCR id), what the user does, what the user sees, the result, and the
+# screenshot taken after the step (captured live by tools/screenshots/capture_pack.cjs, which performs the steps).
+walkthroughs:
+  - id: WT-A
+    title: A booked invoice from the client's payment to the insurer's official receipt
+    summary: >-
+      Processing books a Fire account; the invoice reaches the Operations ledger. The cashier receives the client's
+      payment over the counter and applies it by component; Remittance extracts the paid premium into a batch per
+      insurer, submits it and the Remittance Team Leader approves it; Disbursement assigns the DV number; Remittance
+      uploads the insurer's official receipt and the invoice reads Paid and Fully Remitted.
+    data: "Seed data: account ARN-2026-940007 (product PAR01, client CL-2026-000005, insurer Mabuhay General Insurance Corp.), policy issued and ready to book"
+    steps:
+      - [PROCESSOR, SCR-NB-29, "Opens the account from Ready to Book, checks the invoice and the journal preview and clicks Book Account", "The Booked Invoice with its invoice number; the invoice is copied into the Operations ledger", Booked, wt-a-01]
+      - [CASHIER, SCR-OP-02, "Searches the ARN on Invoice Search", "The new invoice with its gross premium, outstanding premium, Unpaid and With Outstanding Balance", In the ledger, wt-a-02]
+      - [CASHIER, SCR-OP-08, "Opens Receive Payment, enters the ARN, the payor, the amount paid and the payment date, and checks the preview", "Application Preview: Booked, the invoice with each component and the amount applied to it, Excess to Unapplied 0.00", Preview, wt-a-03]
+      - [CASHIER, SCR-OP-10, "Clicks Issue AR and Apply", "Message: <AR> issued and applied to 1 invoice(s); the receipt opens with its application by component", AR issued and applied, wt-a-04]
+      - [REMIT_PROCESSOR, SCR-OP-24, "Enters the invoice number on Extraction and clicks Run Extraction, then opens the run", "The run tags the invoice Extracted with its paid AR and the batch number", Extracted into a batch, wt-a-05]
+      - [REMIT_PROCESSOR, SCR-OP-26, "Opens the batch, checks the totals strip and the account, clicks Preview and Submit and submits the batch", "The batch is For Approval; the history shows the submission", For approval, wt-a-06]
+      - [REMIT_TL, SCR-OP-26, "Opens the batch from For Approval and clicks Approve and Push", "The batch is Approved - with Disbursement with its payment request and the commission OR", Approved, wt-a-07]
+      - [DISBURSEMENT, SCR-OP-36, "Acknowledges the payment request and assigns the DV number", "The request is on the DV Assigned tab with its DV number", DV assigned, wt-a-08]
+      - [REMIT_PROCESSOR, SCR-OP-27, "Uploads the insurer's schedule with its OR number and opens the upload run", "Records Read 1, OR Matches Paid PR 1; the account shows the insurer OR as Matched", Insurer OR received, wt-a-09]
+      - [REMIT_PROCESSOR, SCR-OP-03, "Opens Invoice 360 of the invoice, Remittances tab", "Paid and Fully Remitted; the remittance batch of the invoice", Closed, wt-a-10]
+    downstream:
+      - "Production Reconciliation: the invoice is on the next production register of the insurer and is matched with the insurer's feedback."
+      - "Accounting (BRD-5): the journals of the receipt, the application and the remittance are in General Ledger › Journals; the payment request is paid through the Disbursement module when it replaces the queue."
+
+  - id: WT-B
+    title: Cancellation of a paid and remitted policy, from the request to the refund
+    summary: >-
+      Marketing Collection asks to cancel the policy of walkthrough A from inception. The request is raised on the
+      policy, recomputed per insurer, validated by Adjustment and approved by the Adjustment Team Leader; posting books
+      the return invoice, sets up the AR Insurer for the premium already remitted and has Cashiering re-apply the
+      payment, whose excess becomes an unapplied payment; the cashier refunds it with the Team Leader's approval and the
+      refund reaches the Disbursement queue.
+    data: "Seed data: the invoice of walkthrough A (paid and fully remitted), cancellation reason from the list of values"
+    steps:
+      - [MKT_COLLECTION, SCR-OP-38, "Opens New Request, searches the policy number and ticks the invoice", "The booked invoice with its policy number, ARN, assured, insurer, payment and lock; the policy details of the invoice", Policy chosen, wt-b-01]
+      - [MKT_COLLECTION, SCR-OP-38, "Chooses Financial – Change of Cover, Flat Cancellation, the reason, the effective date and the description, and clicks Recompute", "Recompute & Submit: the premium and commission change, before and after per component and per insurer", Recomputed, wt-b-02]
+      - [MKT_COLLECTION, SCR-OP-39, "Clicks Submit for Validation", "The request opens For Validation with the Policy No., ARN and Invoice chips; the invoice is locked by Adjustment", For validation, wt-b-03]
+      - [ADJUSTMENT, SCR-OP-39, "Opens the request from the workbench and clicks Validate", "The request is For Approval", Validated, wt-b-04]
+      - [ADJUSTMENT_TL, SCR-OP-39, "Opens the request and clicks Approve", "The request is For Posting", Approved, wt-b-05]
+      - [ADJUSTMENT, SCR-OP-40, "Ticks the request on Posting Batches and clicks Post Selected", "The batch result: the request Posted", Posted, wt-b-06]
+      - [ADJUSTMENT, SCR-OP-39, "Opens the Policy Transactions tab of the request and the journal of the last transaction", "The original booking, the cancellation with its premium, taxes and commission change and gross premium 0.00 after it, the refund of the excess payment to the client, and the journal lines of the re-applied payment", Policy history, wt-b-07]
+      - [CASHIER, SCR-OP-12, "Opens the unapplied payment left by the re-application, assigns a refund to the client and submits it", "The disposition is For Approval", Refund for approval, wt-b-08]
+      - [CASHIER_TL, SCR-OP-12, "Opens the unapplied payment and clicks Approve", "The disposition is Completed and the balance 0.00; the refund is sent to Disbursement", Refund approved, wt-b-09]
+      - [DISBURSEMENT, SCR-OP-36, "Opens the Disbursement Queue", "The refund request to the client in To Acknowledge", Refund with Disbursement, wt-b-10]
+    downstream:
+      - "Remittance: the pending negative adjustment keeps the invoice out of the extraction; the AR Insurer set up for the remitted premium is recovered from the insurer's next batch through a confirmed remittance deduction."
+      - "Accounting (BRD-5): the return invoice, the AR Insurer and the re-application journals are posted; the refund is paid through Disbursement."
+
+  - id: WT-C
+    title: Direct payment commission and the reconciliation of the insurer's production
+    summary: >-
+      The insurer answers the billing of a direct payment account: the Commission Receivables handler records the
+      approval and the collection, which reverses the premium receivable and requests the commission OR. The
+      Production Reconciliation handler then works the insurer's September feedback: a premium difference gets its
+      feedback and disposition, and the policy the insurer reported but BDOI did not book is followed on Unbooked
+      Accounts.
+    data: "Seed data: DP billing CRB-2026-000001 to Mabuhay General Insurance Corp. (account ARN-2026-940003), cycle PRC-INS-MGIC-202609-000001"
+    steps:
+      - [COMMREC_HANDLER, SCR-OP-54, "Opens the billing, clicks Record Answers, marks the account Approved and saves", "The billing is Approved by Insurer - to Collect", Insurer approved, wt-c-01]
+      - [COMMREC_HANDLER, SCR-OP-54, "Clicks Record Collection with the collection date and the bank account", "The billing is Closed - PR Reversed with the commission OR", Collected, wt-c-02]
+      - [COMMREC_HANDLER, SCR-OP-03, "Opens Invoice 360 of the direct payment invoice, Movements tab", "The premium receivable reversal and the commission applied", PR reversed, wt-c-03]
+      - [RECON_HANDLER, SCR-OP-45, "Opens the cycle, the With Discrepancy item, and records the company concerned, the disposition and the feedback", "The item review with the BDOI and insurer values side by side and the gross premium difference", Feedback recorded, wt-c-04]
+      - [RECON_HANDLER, SCR-OP-45, "Selects the insurer-only item and sets its disposition", "The item Unmatched No Booking with its disposition", Disposition set, wt-c-05]
+      - [RECON_HANDLER, SCR-OP-48, "Opens Unbooked Accounts", "The policy the insurer reported, not booked by BDOI, with its disposition", Followed, wt-c-06]
+    downstream:
+      - "Cashiering: the commission OR requested by the collection is issued from the Head Office series."
+      - "New Business: when the unbooked policy is booked, the waiting insurer-only line is matched automatically."
+
+  - id: WT-D
+    title: Controls and the messages the user sees
+    summary: >-
+      The controls of Operations on screen: a remittance hold raised by Marketing Collection and decided by the
+      Marketing Team Leader, an endorsement
+      refused on an invoice locked by Remittance, a receipt cancellation approved by a second user, and a remittance
+      batch that its submitter cannot approve.
+    data: "Seed data: invoice I97000011 with an outstanding balance, invoice BI-HO-2026-000005 in remittance batch RMB-INS-MGIC-2026-000002, receipt AR-HO-000009 (unapplied payment)"
+    steps:
+      - [MKT_TL, SCR-OP-29, "Marketing Collection raises a hold on the invoice with its reason and hold-until date; the Marketing Team Leader opens it and clicks Approve hold", "The hold is On Hold; the invoice is flagged On Hold and stays out of the extraction", Hold approved, wt-d-01]
+      - [MKT_COLLECTION, SCR-OP-38, "Searches on New Request the invoice that is in the remittance batch for approval", "The invoice reads Locked by Remittance and cannot be selected; a request on it is refused with the message Invoice <invoice> is locked by Remittance", Refused, wt-d-02]
+      - [CASHIER, SCR-OP-10, "Opens a receipt, clicks Cancel Receipt, chooses the reason and submits the cancellation", "The receipt shows the cancellation For Approval in its workflow header", Cancellation requested, wt-d-03]
+      - [CASHIER_TL, SCR-OP-10, "Opens the receipt and clicks Approve and Post", "The receipt is Cancelled; its unapplied balance is closed", Cancelled, wt-d-04]
+      - [REMIT_TL, SCR-OP-26, "Submits the batch in review for approval, then tries to approve it", "Message: Batch <batch> must be approved by another user", Refused, wt-d-05]
+    downstream:
+      - "Every refusal leaves the record unchanged; the right user completes the action."

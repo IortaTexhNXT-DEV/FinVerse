@@ -1,0 +1,51 @@
+// Observability: sources, signals, platforms and the people they reach.
+digraph ops_observability {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.25, ranksep=0.35, bgcolor="white", pad=0.15, newrank=true, compound=true];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.1, fontname="Arial",
+         fontsize=10, fontcolor="@NEAR_BLACK", width=2.2, height=0.5, margin="0.08,0.04", fillcolor="@WHITE"];
+  edge  [color="@HEADER_BLUE", arrowsize=0.7, penwidth=1.1];
+
+  subgraph cluster_src {
+    label=<<b>Sources (production, AWS ap-southeast-1)</b>>; fontsize=11; fontcolor="@HEADER_BLUE"; style=rounded; color="@HEADER_BLUE"; margin=10;
+    web [label=<<b>bibs-web</b><br/><font point-size="8">screens and user services</font>>];
+    job [label=<<b>bibs-jobs</b><br/><font point-size="8">scheduled and batch jobs</font>>];
+    int [label=<<b>bibs-integration</b><br/><font point-size="8">events, files, Apigee calls</font>>];
+    fe  [label=<<b>bibs-frontend</b><br/><font point-size="8">nginx web tier</font>>];
+    ms  [label=<<b>Managed services</b><br/><font point-size="8">RDS PostgreSQL 16, Valkey 8,<br/>MSK Kafka 3.9, S3, Gateway, WAF</font>>, width=2.8];
+  }
+  subgraph cluster_sig {
+    label=<<b>Signals</b>>; fontsize=11; fontcolor="@HEADER_BLUE"; style=rounded; color="@HEADER_BLUE"; margin=10;
+    hc  [label=<<b>Health checks</b><br/><font point-size="8">liveness, readiness, synthetic sign-in</font>>, fillcolor="@BG_BLUE"];
+    met [label=<<b>Metrics</b><br/><font point-size="8">JVM, requests, pool, business counters</font>>, fillcolor="@BG_BLUE"];
+    log [label=<<b>Logs</b><br/><font point-size="8">one line per event, correlation id</font>>, fillcolor="@BG_BLUE"];
+    trc [label=<<b>Traces</b><br/><font point-size="8">request path across tiers</font>>, fillcolor="@BG_BLUE"];
+    biz [label=<<b>Application alerts</b><br/><font point-size="8">job failures, exception codes</font>>, fillcolor="@BG_BLUE"];
+  }
+  subgraph cluster_plat {
+    label=<<b>Platforms (BDO standard, IER)</b>>; fontsize=11; fontcolor="@HEADER_BLUE"; style=rounded; color="@HEADER_BLUE"; margin=10;
+    apm [label=<<b>Dynatrace</b><br/><font point-size="8">APM, traces, dashboards</font>>, fillcolor="@AMBER_BG"];
+    prm [label=<<b>Metrics store</b><br/><font point-size="8">Prometheus scrape, CloudWatch</font>>, fillcolor="@AMBER_BG"];
+    lgs [label=<<b>Log platform and SIEM</b><br/><font point-size="8">CloudWatch Logs, BDO SIEM</font>>, fillcolor="@AMBER_BG"];
+    app [label=<<b>BIBS screens</b><br/><font point-size="8">Alerts, Scheduled Jobs,<br/>Integration Events</font>>, fillcolor="@AMBER_BG"];
+  }
+  subgraph cluster_out {
+    label=<<b>Response</b>>; fontsize=11; fontcolor="@HEADER_BLUE"; style=rounded; color="@HEADER_BLUE"; margin=10;
+    tkt [label=<<b>ITSM ticket</b><br/><font point-size="8">L1 / L2 queue</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+    pg  [label=<<b>On-call page</b><br/><font point-size="8">P1: L2, L3, Cloud Ops</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+    dsh [label=<<b>Dashboards</b><br/><font point-size="8">service, platform, business</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+    rpt [label=<<b>Monthly service report</b><br/><font point-size="8">SLA, SLO, error budget</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  }
+  edge [style=invis];
+  web -> job -> int -> fe -> ms;
+  hc -> met -> log -> trc -> biz;
+  apm -> prm -> lgs -> app;
+  tkt -> pg -> dsh -> rpt;
+  {rank=same; web; job; int; fe; ms}
+  {rank=same; hc; met; log; trc; biz}
+  {rank=same; apm; prm; lgs; app}
+  {rank=same; tkt; pg; dsh; rpt}
+  edge [style=solid];
+  int -> log [ltail=cluster_src, lhead=cluster_sig, label=<<font point-size="9"> emitted by every tier </font>>];
+  log -> lgs [ltail=cluster_sig, lhead=cluster_plat, label=<<font point-size="9"> collected and kept 5 years online </font>>];
+  lgs -> pg [ltail=cluster_plat, lhead=cluster_out, label=<<font point-size="9"> alert rules and thresholds </font>>];
+}

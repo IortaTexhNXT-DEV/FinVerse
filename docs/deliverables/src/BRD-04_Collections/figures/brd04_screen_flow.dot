@@ -1,0 +1,56 @@
+digraph flow {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.2, ranksep=0.35, bgcolor="white", newrank=true, compound=true];
+  node [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@HEADER_BLUE", fontname="Arial", fontsize=10, fontcolor="@NEAR_BLACK", margin="0.12,0.06"];
+  edge [color="@CTA_BLUE", fontname="Arial", fontsize=8, fontcolor="@MUTED", arrowsize=0.6];
+  subgraph "cluster_Home, PR worklist and collection account" { label="Home, PR worklist and collection account"; fontname="Arial"; fontsize=10; fontcolor="@HEADER_BLUE"; color="@BORDER"; style="rounded";
+    "SCR-CL-01" [label="Collections Home\nSCR-CL-01"];
+    "SCR-CL-02" [label="PR Worklist\nSCR-CL-02"];
+    "SCR-CL-03" [label="Collection Account\nSCR-CL-03"];
+    "SCR-CL-04" [label="Client View\nSCR-CL-04"];
+  }
+  subgraph "cluster_Installments, promises and billing statements" { label="Installments, promises and billing statements"; fontname="Arial"; fontsize=10; fontcolor="@HEADER_BLUE"; color="@BORDER"; style="rounded";
+    "SCR-CL-05" [label="Installment Plans\nSCR-CL-05"];
+    "SCR-CL-06" [label="Installment Plan\nSCR-CL-06"];
+    "SCR-CL-07" [label="Installments Due\nSCR-CL-07"];
+    "SCR-CL-08" [label="Promises to Pay\nSCR-CL-08"];
+    "SCR-CL-09" [label="Billing Statements\nSCR-CL-09"];
+    "SCR-CL-10" [label="Statement of Account\nSCR-CL-10"];
+  }
+  subgraph "cluster_Escalation" { label="Escalation"; fontname="Arial"; fontsize=10; fontcolor="@HEADER_BLUE"; color="@BORDER"; style="rounded";
+    "SCR-CL-11" [label="Escalations\nSCR-CL-11"];
+    "SCR-CL-12" [label="Escalation\nSCR-CL-12"];
+    "SCR-CL-13" [label="Escalation Rules\nSCR-CL-13"];
+  }
+  subgraph "cluster_Unapplied payments" { label="Unapplied payments"; fontname="Arial"; fontsize=10; fontcolor="@HEADER_BLUE"; color="@BORDER"; style="rounded";
+    "SCR-CL-14" [label="Unapplied Payments\nSCR-CL-14"];
+    "SCR-CL-15" [label="Unapplied Payment\nSCR-CL-15"];
+    "SCR-CL-16" [label="Requests to Cashiering\nSCR-CL-16"];
+  }
+  subgraph "cluster_Assignment, files and set-up" { label="Assignment, files and set-up"; fontname="Arial"; fontsize=10; fontcolor="@HEADER_BLUE"; color="@BORDER"; style="rounded";
+    "SCR-CL-17" [label="Assignments\nSCR-CL-17"];
+    "SCR-CL-18" [label="Collections Files\nSCR-CL-18"];
+    "SCR-CL-19" [label="Collections Setup\nSCR-CL-19"];
+  }
+  "SCR-CL-01" -> "SCR-CL-02" [label="Open PR Worklist"];
+  "SCR-CL-02" -> "SCR-CL-03" [label="open"];
+  "SCR-CL-02" -> "SCR-CL-04" [label="client"];
+  "SCR-CL-04" -> "SCR-CL-03" [label="open"];
+  "SCR-CL-03" -> "SCR-CL-08" [label="promise"];
+  "SCR-CL-03" -> "SCR-CL-11" [label="escalate"];
+  "SCR-CL-01" -> "SCR-CL-14" [label="unapplied tiles"];
+  "SCR-CL-05" -> "SCR-CL-06" [label="open"];
+  "SCR-CL-07" -> "SCR-CL-06" [label="open"];
+  "SCR-CL-06" -> "SCR-CL-10" [label="Generate SOA"];
+  "SCR-CL-09" -> "SCR-CL-10" [label="open"];
+  "SCR-CL-06" -> "SCR-CL-08" [label="Record Promise"];
+  "SCR-CL-08" -> "SCR-CL-11" [label="broken promise"];
+  "SCR-CL-07" -> "SCR-CL-11" [label="overdue installment"];
+  "SCR-CL-13" -> "SCR-CL-11" [label="rules"];
+  "SCR-CL-11" -> "SCR-CL-12" [label="open"];
+  "SCR-CL-14" -> "SCR-CL-15" [label="open"];
+  "SCR-CL-14" -> "SCR-CL-16" [label="Requests to Cashiering"];
+  "SCR-CL-16" -> "SCR-CL-15" [label="open"];
+  "SCR-CL-17" -> "SCR-CL-02" [label="reassigned accounts"];
+  "SCR-CL-02" -> "SCR-CL-18" [label="Export to Files"];
+  "SCR-CL-19" -> "SCR-CL-02" [label="Refresh Worklist Now"];
+}

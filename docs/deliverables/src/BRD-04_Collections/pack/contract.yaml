@@ -1,0 +1,114 @@
+# Cross-BRD dependencies and interface contract of BRD-4 Collections.
+# direction: In = Collections takes it from the other BRD or system; Out = Collections hands it over.
+# Columns: id | party | direction | what | when / how | owner of the data | Collections screens | FR
+# The technical detail of each interface is in the Technical Specification, reviewed by BDOI IT.
+contract:
+  - id: IC-01
+    party: BRD-2 Operations (invoice ledger)
+    direction: In
+    what: Every booked invoice with its premium receivable by component, PR2307, payment and remittance status, direct payment and CWT flags, holds, pending negative adjustments and the team that locks it
+    how: Read every night by the worklist refresh and after each payment; the account and its tabs read the balances live; Collections keeps no second copy of the money
+    owner: Operations (Cashiering, Remittance, Adjustment)
+    screens: PR Worklist, Collection Account, Client View
+    frs: [FR-CL-010, FR-CL-016, FR-CL-017]
+  - id: IC-02
+    party: BRD-1 New Business
+    direction: In
+    what: The account, client, policy, insurer shares, account officer, market segment and sales unit of each booked invoice
+    how: Read with the invoice by the worklist refresh; the Policy & Co-insurance tab reads the policy year
+    owner: Processing (BRD-1)
+    screens: PR Worklist, Collection Account (Policy & Co-insurance)
+    frs: [FR-CL-010, FR-CL-043]
+  - id: IC-04
+    party: BRD-2 Operations (Cashiering)
+    direction: Out
+    what: A BIR 2307 tag (path, certificate number and period, 2% amount) from the disposition PR 2307 for reversal
+    how: Handed over inside BIBS when the tag is an Operations action; Cashiering validates it on BIR 2307 and posts the reversal
+    owner: Collections (tag), Cashiering (validation and posting)
+    screens: Collection Account, PR Worklist, Collections Files (PR 2307 for Reversal)
+    frs: [FR-CL-032, FR-CL-081]
+  - id: IC-05
+    party: BRD-2 Operations (Commission Receivables)
+    direction: Out
+    what: A direct payment account from the disposition DP PR for reversal, for the direct payment list of Commission Receivables
+    how: Placed on the direct payment list at once; the monthly and weekly DP PR for Reversal files list the same accounts for audit
+    owner: Collections (tag), Commission Receivables (billing to the insurer and PR reversal)
+    screens: Collection Account, Collections Files (DP PR for Reversal)
+    frs: [FR-CL-032, FR-CL-080]
+  - id: IC-06
+    party: BRD-2 Operations (Commission Receivables)
+    direction: In
+    what: A direct payment account returned by the insurer
+    how: The account reopens in the worklist with the disposition DP returned by insurer and its handler is notified
+    owner: Commission Receivables
+    screens: Collections Home (DP Returned by Insurer), Collection Account
+    frs: [FR-CL-032]
+  - id: IC-07
+    party: BRD-2 Operations (Cashiering)
+    direction: In
+    what: The unapplied payments of Cashiering with their payment, matched account, Cashiering tab and status
+    how: Read from Cashiering as of today, never copied
+    owner: Cashiering
+    screens: Unapplied Payments, Unapplied Payment
+    frs: [FR-CL-070, FR-CL-071]
+  - id: IC-08
+    party: BRD-2 Operations (Cashiering)
+    direction: Out
+    what: A request on an unapplied payment (apply to an invoice, refund, reclass, transfer to another unit) from a collector disposition, and the answer of Cashiering (accepted, rejected, applied)
+    how: Sent to the Incoming Requests of Cashiering when the disposition is recorded; Cashiering carries it out with its own approvals and its answer updates the request; the daily For Application To Invoice file lists the application requests
+    owner: Collections (request), Cashiering (execution)
+    screens: Unapplied Payments, Requests to Cashiering
+    frs: [FR-CL-074, FR-CL-077]
+  - id: IC-09
+    party: BRD-2 Operations (Adjustment)
+    direction: Out
+    what: The cancellation of an account the client will not pay (disposition Cancel account)
+    how: No feed; the user raises the cancellation request in Adjustment; the account is excluded when the cancellation is posted
+    owner: Adjustment
+    screens: Collection Account
+    frs: [FR-CL-032, FR-CL-013]
+  - id: IC-10
+    party: BRD-3 Product Maintenance (sales organisation)
+    direction: In
+    what: Market segments, sales units and their Unit Heads
+    how: Read from the sales organisation; Collections Setup keeps the Unit Head of each unit for the worklist
+    owner: Product Maintenance, Collections Setup users
+    screens: PR Worklist (filters), Collections Setup
+    frs: [FR-CL-015]
+  - id: IC-11
+    party: BRD-11 User Access Maintenance
+    direction: In
+    what: Users, roles and the Collections permissions; the handlers that may receive accounts and escalations
+    how: Read on every action; the sidebar and the buttons follow the role grants
+    owner: System Administrator
+    screens: Every Collections screen
+    frs: [FR-CL-001]
+  - id: IC-12
+    party: BRD-13 Data Migration
+    direction: In
+    what: Legacy invoices open at cut-over and the collection follow-up carried from legacy (disposition, promises, installments, collector)
+    how: Loaded once at cut-over; a migrated invoice carries the Legacy tag and its follow-up shows on the account
+    owner: Data Migration
+    screens: PR Worklist, Collection Account
+    frs: [FR-CL-010]
+  - id: IC-13
+    party: Client (e-mail)
+    direction: Out
+    what: The statement of account of a billing cycle, password protected, and its password in a separate e-mail
+    how: Send via Email on the statement; the e-mail and its outcome are kept on the statement
+    owner: Collections
+    screens: Statement of Account
+    frs: [FR-CL-061]
+  - id: IC-14
+    party: BDOI file server (FS04)
+    direction: Out
+    what: The daily For Application To Invoice file
+    how: Kept on Collections Files and downloaded by the user until the transfer to FS04 is specified (OQ17)
+    owner: Collections, BDOI IT
+    screens: Requests to Cashiering, Collections Files
+    frs: [FR-CL-077]
+change_rule: >-
+  A change to anything in this contract is raised in the Change Management Register and assessed with the owners of
+  the other BRD: Collections reads the Operations invoice ledger and hands its work to Cashiering, Commission
+  Receivables and Adjustment, so a change of a disposition with an Operations action, of a request type or of a
+  balance component changes what Operations receives and is signed by both owners as a delta.

@@ -1,0 +1,265 @@
+# Screen specifications of BRD-2 Operations: the Cashiering screens of BDOI's FRS v3.2 - AR / OR creation,
+# cancellation and reinstatement records with the posting step, the posting lists, the payment files and their monitor,
+# the AR and OR forms, the day-end list, the search log, the unapplied payment list and the settlement ORs.
+# Field rows: section | label | type | length / format | mandatory | source / master | default | editable in |
+#             validation | message. Action rows: button | who | enabled when | what happens | resulting status | notice
+area: Cashiering records and files
+screens:
+  - id: SCR-OP-65
+    title: Create AR/OR and Edit Record
+    route: /cashiering/records/new
+    also: [/cashiering/records/:id/edit]
+    purpose: >-
+      The creation record of an acknowledgement receipt or an official receipt, as BDOI's FRS sets it: the receipt
+      type and the AR or OR type, the receipting branch, the payor (client, insurer or other), the payment (type,
+      currency, bank account, paid amount, with VAT, withholding tax and the BIR 2307 reference of an OR), the check
+      details and remarks, and the accounts paid with the amount of each. The receipt number is issued when the record
+      is posted by the Approver/Poster.
+    entry:
+      - Cashiering Dashboard › Create AR/OR
+      - Posting › Create AR, Create OR
+      - Receive Payment and Receipts › Create OR (posting step on)
+    shots:
+      - {state: empty, user: cashier, path: "/cashiering/records/new?kind=AR", caption: "Create AR: the creation record of an acknowledgement receipt"}
+      - {state: filled, user: cashier, caption: "Edit Record of an AR creation record"}
+      - {state: error, user: cashier, caption: "Create AR with the messages of the required fields"}
+      - {state: or, user: cashier, path: "/cashiering/records/new?kind=OR", caption: "Create OR with the OR types, VAT, withholding tax and the SOA or fee invoice"}
+    fields:
+      - "Receipt | Receipt Type | Drop-down | Acknowledgement Receipt or Official Receipt (from the entry) | Y | Fixed list | From the entry | - | - | -"
+      - "Receipt | Acknowledgement Receipt Type | Drop-down | Premium Payment; Non-Premium Payment: Refund from Insurer, Other Expenses, AR Insurance | Y (AR) | Fixed list | Premium Payment | Created, Returned | - | AR Type is required"
+      - "Receipt | Official Receipt Type | Drop-down | Service Fee Income, Insurance Profit Share, Commissions (with VAT / withholding tax), Incentives, Handling Fee, Others (discount) | Y (OR) | List of values OR type | Select… | Created, Returned | - | OR Type is required"
+      - "Receipt | Receipting Branch | Drop-down | Branches of the user; Head Office only for an OR | Y | Branches | The user's branch | Created, Returned | - | Receipting Branch is required"
+      - "Receipt | Receipt Number | Text | To be generated once posted | - | Receipt series | - | Read only | - | -"
+      - "Payor | Entry Type | Drop-down | Client, Insurer, Other; Insurer for a non-premium AR | Y | Fixed list | Client | Created, Returned | - | -"
+      - "Payor | Client / Client Name | Look-up | Client code and name | Cond.: entry type Client | Clients | Blank | Created, Returned | An active client | Client is required"
+      - "Payor | Insurer / Bank Name | Drop-down, text | Insurers by name; bank from the insurer banking list | Cond.: entry type Insurer or a non-premium AR | Insurers | Select… | Created, Returned | - | Insurer is required"
+      - "Payor | Payor Name | Text | Up to 250 characters; proposed from the client or insurer | Y | - | Blank | Created, Returned | - | Payor Name is required"
+      - "Payment | Payment Type | Drop-down | Cash, Check; Direct Credit for an OR | Y | Fixed list | Cash | Created, Returned | - | -"
+      - "Payment | Currency / Rate of the Day | Drop-down, value | PHP, USD; the rate of the day for a foreign currency | Y | Currencies of the bank accounts | PHP | Created, Returned | - | Currency is required"
+      - "Payment | Post to Bank Account | Drop-down | DFLB - Current (BDO Ortigas), DFLB Savings (BDO Ortigas), DFLB Savings Mall (Peso), DFLB Savings Trade (Peso), DFLB Savings FX (BDO Ortigas) | Y | Bank accounts | The default account of the currency | Created, Returned | - | Post to Bank Account is required"
+      - "Payment | Paid Amount | Number | Two decimals; at most 1,000,000,000.00 | Y | - | Blank | Created, Returned | Above zero and at most the maximum; equal to the sum of the accounts | Paid Amount must be above zero and not more than 1,000,000,000.00"
+      - "Payment (OR) | VAT / Withholding Tax / BIR 2307 Certificate Reference / SOA or Fee Invoice | Numbers, text, look-up | Two decimals; the statement or fee invoice paid | N | Statements of account and fee invoices | Blank | Created, Returned | - | -"
+      - "Check and Remarks | Check Number / Check Date / Bank of the Check | Text, date | Up to 40 characters; dd-MMM-yyyy, with the holding period shown | Cond.: check payment | - | Blank | Created, Returned | Date not within the holding period (setting) | Check Number is required; Check Date is required"
+      - "Check and Remarks | Receipt Issuance Date | Date | dd-MMM-yyyy | N (AR) | - | Today | Created, Returned | - | -"
+      - "Check and Remarks | Remarks | Text | Up to 200 characters | Y as delivered (setting) | - | Blank | Created, Returned | - | Remarks is required"
+      - "Accounts | Account Number | Look-up | Account, invoice or ARN number | N | Invoice ledger | Blank | Created, Returned | - | -"
+      - "Accounts | Account Number / Premium Receivable / Commission Receivable / Total Invoice Amount / Total Paid Amount / Outstanding Balance / BIR 2307 Tag / PR 2307 Amount / Paid Amount / Excess Amount | Columns | Amounts with two decimals; the paid amount keyed per account; the excess computed | Cond.: paid amount per account | Invoice ledger | Outstanding balance | Created, Returned | The paid amounts add up to the Paid Amount | The amounts of the accounts must add up to the Paid Amount"
+    actions:
+      - "Save | The creator (receipt right) | Required fields entered | Saves the record numbered CR-AR-nnnnnn or CR-OR-nnnnnn and opens it | Created | -"
+      - "Cancel | The creator | Always | Leaves the form without saving | - | -"
+    rules:
+      - "As delivered the ARs and ORs are issued through the posting step (setting Posting step of ARs and ORs, Appendix H.8): the record is created, submitted for posting and posted by an Approver/Poster other than its creator, who issues the receipt number (FR-OP-011, FR-OP-012)."
+      - "No account added: the payment will be recorded as unbooked / unmatched (FR-OP-018)."
+      - "A check dated within the holding period (4 working days as delivered) is refused at receipting while the check date rule is on (setting) (FR-OP-011)."
+      - "An OR is created only for the Head Office (FR-OP-012)."
+    outcome: The cashier records the payment received in BDOI's layout and sends it for posting.
+    frs: [FR-OP-011, FR-OP-012, FR-OP-018, FR-OP-019]
+    tests: [RECEIVE]
+
+  - id: SCR-OP-66
+    title: Cashiering Record
+    route: /cashiering/records/:id
+    parent: /cashiering/posting
+    purpose: >-
+      One creation, cancellation or reinstatement record of an AR or OR: its details, the accounts paid, its history,
+      and the actions of the user - Edit, Submit for Posting and Cancel Record for the creator; Post and Return for the
+      Approver/Poster, who is never the creator.
+    entry:
+      - Posting › a row
+      - Cashiering Dashboard › an item of the posting groups or the returned list
+    shots:
+      - {state: record, user: cashtl, caption: "AR creation record for posting, as the Approver/Poster sees it"}
+      - {state: post, user: cashtl, caption: "Post confirmation of an OR creation record"}
+      - {state: cancellation, user: cashtl, caption: "Cancellation record of an issued AR for posting"}
+    fields:
+      - "Record | Record Number / Receipt Type / AR / OR Type / Receipt Number / Receipting Branch | Values | CR-, CN- or RE- with AR or OR and a sequence; the receipt number once posted | - | Record | - | Read only | - | -"
+      - "Record | Payor Name / Client / Insurer / Payment Type / Post to Bank Account / Paid Amount / Currency / Check | Values | As entered; the check as bank, number and date | - | Record | - | Read only | - | -"
+      - "Record (cancellation, reinstatement) | Reason / Type of Reinstatement / Unit Head / Remarks | Values | The reason of the list; Full or Partial Reinstatement | - | Record | - | Read only | - | -"
+      - "Record | Returned / Last posting attempt / Created by / Posted by | Values | Reason and user of a return; result of the last posting; names with date and time | - | Record | - | Read only | - | -"
+      - "Accounts | Account Number / Invoice Number / Amount | Columns | Accounts of the record | - | Record accounts | - | Read only | - | No account on the record"
+      - "History | Date and Time / User / Activity / Details | Columns | Every action on the record | - | Record history | - | Read only | - | No activity yet"
+      - "Return to Creator | Reason | Text area | Why the record goes back | Y | - | Blank | Dialog | - | -"
+    actions:
+      - "Edit | The creator | Created or Returned | Opens Edit Record | - | -"
+      - "Submit for Posting | The creator | Created or Returned | Asks for confirmation (The record goes to the Approver/Poster for posting); toast Record is now submitted for Posting | For Posting | -"
+      - "Cancel Record | The creator | Created or Returned | Record will be Cancelled. Do you wish to continue? | Record Cancelled | -"
+      - "Post | Approver/Poster (posting right), not the creator | For Posting | Creation: AR/OR will be issued. Payments will be applied. Any excess payments will be reflected in the Unapplied List. Cancellation: AR/OR will be cancelled. Payments will be cancelled once cancellation is posted. Reinstatement: AR/OR will be reinstated. Payments will be reinstated once posted | AR/OR Issued, Cancelled or Reinstated | -"
+      - "Return | Approver/Poster | For Posting | Returns the record to its creator with the reason | Returned | Notice to the creator"
+    rules:
+      - "The creator never posts the own record (FR-OP-011, FR-OP-013, FR-OP-014)."
+      - "Posting issues the receipt number from the series of the branch in its number format and posts the accounting entries; a record that cannot be posted keeps its status with the reason in Last posting attempt (FR-OP-010, FR-OP-027)."
+      - "Checks are posted and applied before cash in one posting run as delivered (setting) (FR-OP-019)."
+      - "The cancellation of an AR already remitted turns the payment into an AR Insurer Refund as delivered (setting) (FR-OP-013)."
+    outcome: Every receipt is issued, cancelled or reinstated by a second person, with its history.
+    frs: [FR-OP-011, FR-OP-012, FR-OP-013, FR-OP-014, FR-OP-027]
+    tests: [RECEIPT]
+
+  - id: SCR-OP-67
+    title: Posting
+    route: /cashiering/posting
+    purpose: >-
+      The lists of the records waiting for posting or returned, in three tabs - AR/OR for Issuance Posting,
+      Cancellation (AR/OR) for Posting and Reinstatement (AR/OR) for Posting - with their filters, the posting of
+      several records at once, the export to Excel and the creation of a new AR or OR.
+    entry:
+      - Cashiering Dashboard › Post - Issuance, Post - Cancellation, Post - Reinstatement
+    shots:
+      - {state: list, user: cashtl, caption: "Posting: AR/OR records for issuance posting"}
+      - {state: cancellations, user: cashtl, caption: "Posting: cancellation records for posting"}
+    fields:
+      - "Tabs | [Tabs: AR/OR for Issuance Posting, Cancellation (AR/OR) for Posting, Reinstatement (AR/OR) for Posting] | Tab | - | - | Fixed | AR/OR for Issuance Posting | - | - | -"
+      - "Filters | Record Status / Receipt Type / Record Number / Client or Insurer Name / Created From / Created To | Drop-downs, text, dates | For Posting, Returned, Created, Posted, Record Cancelled; All, Acknowledgement Receipt, Official Receipt | N | Fixed lists | For Posting | - | - | -"
+      - "Records | Record Number / Receipt Type / Record Type / AR/OR Number / Amount | Columns | Creation, Cancellation or Reinstatement Record Number; AR or OR; the type; the receipt number | - | Records | - | Read only | - | No records match the filters"
+      - "Records | Account Number / Invoice Number / Client Name / Insurer Name / Receipting Branch / Created by / Date Created / Record Status | Columns | As recorded | - | Records | - | Read only | - | -"
+      - "Records not posted | [Outcome of a posting run] | Table | The records the run could not post, with the reason | - | Posting run | - | Read only | - | -"
+    actions:
+      - "Post Selected (n) | Approver/Poster | Records For Posting selected | Posts the selected records, checks before cash; lists those not posted with the reason | AR/OR Issued, Cancelled or Reinstated | -"
+      - "Open, Post, Return, Edit | As on the record | A row | From the row menu | - | -"
+      - "Create AR / Create OR | Cashier | Always | Opens Create AR/OR | - | -"
+      - "Export to Excel | Every user of the screen | Always | Downloads the list of the filters | - | -"
+    rules:
+      - "A user posts only the records he did not create (FR-OP-011)."
+    outcome: The Approver/Poster posts the records of the day in one run and returns the ones to correct.
+    frs: [FR-OP-011, FR-OP-012, FR-OP-013, FR-OP-014]
+    tests: [RECEIPTS]
+
+  - id: SCR-OP-68
+    title: Payment Files
+    route: /cashiering/payment-files
+    purpose: >-
+      The payment files of the banks and channels in BDOI's layouts - Bills Payment, CLPC, Trade, Direct Credit,
+      post-dated checks (PMS) and Commission Schedule - uploaded several at a time or received via MFT, with the checks
+      each file passed or the reason it was refused, and for each file the run report per category, the validation
+      report, the failed rows to correct, the raw file and processing again.
+    entry:
+      - Cashiering Dashboard › Automatic Payment Processing Uploading Facility, For Auto Payment Processing
+    shots:
+      - {state: files, user: cashier, caption: "Payment Files with a Bills Payment file received via MFT"}
+      - {state: report, user: cashier, caption: "Run report of a payment file per category and payment record"}
+    fields:
+      - "Upload Payment Files | Payment File Type | Drop-down | Bills Payment, CLPC, Trade, Direct Credit, Post-dated checks (PMS), Commission Schedule | Y | Payment file types | Bills Payment | - | - | -"
+      - "Upload Payment Files | File | File | One file per line; several lines and types in one upload | Y | - | - | - | File name, size, duplicate, header and TOTAL checks of the type | -"
+      - "Files Received | Upload Reference / Payment File Type / File Name / Source / Rows / Failed / Received / Status | Columns | Upload or MFT; counts; dd-MMM-yyyy HH:mm; Received, Refused, Processed, Partly processed | - | Payment files | - | Read only | - | No payment file received yet"
+      - "Run Report | Category / Count / Amount | Columns | Applied Payment, Excess Payment, Matched on Pre-booked, Unbooked/Unmatched, Invalid BP filename, Invalid Transaction Number, Duplicate, Failed | - | Run of the file | - | Read only | - | No payment record"
+      - "Run Report | Transaction Date / BP Filename / Transaction Number / Amount / Reference Number / Account Number / Record Status / Reason for Failure | Columns | One row per payment record | - | Run of the file | - | Read only | - | -"
+    actions:
+      - "Add File / Upload | Cashier (upload right) | Files chosen | Checks and processes each file; refused files are listed with the reason | Processed, Partly processed or Refused | -"
+      - "Receive MFT Files Now | Cashier (upload right) | Always | Takes the files placed in the MFT folders now instead of at the next scheduled run | - | Alert Payment file refused"
+      - "Run Report / Download Run Report / Validation Report / Failed Rows / Raw File | Cashier | A file | Shows or downloads the report or file | - | -"
+      - "Process Again | Cashier | Partly processed file | Processes the corrected failed rows again | Processed | -"
+    rules:
+      - "The file names follow BDOI's conventions (for example BDOIyyyymmddn.TXT for Bills Payment, CLPC-MmmDDYYYY.xlsx, UploadTrade_dd.mm.yyyy.TXT); a file with a wrong name, a size above the limit, a duplicate or a header or TOTAL that does not agree is refused with the reason (FR-OP-015)."
+      - "The Direct Credit file identifies payments already received (BP filename and transaction number) as delivered (setting); the Commission Schedule processes its valid lines as delivered (setting) (FR-OP-015, FR-OP-021)."
+      - "The files of the MFT folders are taken at the times agreed with BDOI IT for the company of the setting MFT receiving company; in SIT and UAT a channel simulator writes the files in BDOI's layouts (FR-OP-015)."
+    outcome: The channel payments are received in BDOI's layouts, applied, and the exceptions are listed for follow-up.
+    frs: [FR-OP-015, FR-OP-021]
+    tests: [PAYUP]
+
+  - id: SCR-OP-69
+    title: AR and OR Forms
+    route: /cashiering/receipt-forms
+    purpose: >-
+      The header, note and footer lines of the printed AR and OR, with their versions: a change takes effect on its
+      effective date once approved by a second user.
+    entry:
+      - Cashiering › AR and OR Forms
+    shots:
+      - {state: list, user: cashier, caption: "AR and OR Forms with the versions of the AR form"}
+    fields:
+      - "Tabs | AR Form / OR Form | Tab | - | - | Fixed | AR Form | - | - | -"
+      - "Form | Company Name / Company Description / Company Address / Company VAT TIN / Note Line (AR) / Footer Line 1 / Footer Line 2 / Footer Line 3 / Footer Line 4 | Text | As printed on the receipt | Y (name, address) | - | The form in use | New version | - | -"
+      - "Form | Effective From | Date | dd-MMM-yyyy | Y | - | Today | New version | - | -"
+      - "Versions | Version / Effective From / Footer Line 1 / Changed By / Approved / Rejected By / Status | Columns | Pending approval, In use, earlier versions, Rejected | - | Receipt forms | - | Read only | - | -"
+    actions:
+      - "[Change AR Form, Change OR Form] | Users with the series right | Always | Opens the form lines of the version in use for a change | - | -"
+      - "Submit for Approval | Users with the series right | Lines entered | Saves a new version for approval | Pending approval | Notice Receipt form for approval"
+      - "Approve / Reject | A second user with the series or authorisation right, not the maker | Pending approval | Puts the version in use from its effective date, or rejects it | In use or Rejected | -"
+    rules:
+      - "The receipt prints the form in use on its print date, with the amount in words in the words of its currency (setting Amount in words per currency, Appendix H.8) (FR-OP-025)."
+    outcome: The printed receipts carry BDOI's approved header and footer without a release.
+    frs: [FR-OP-025, FR-OP-010]
+    tests: [PRINT]
+
+  - id: SCR-OP-70
+    title: Day-End List
+    route: /cashiering/day-end
+    purpose: >-
+      The records of a day with the totals per payment type and bank account, for the day-end balancing of the
+      cashier.
+    entry:
+      - Cashiering › Day-End List
+    shots:
+      - {state: list, user: cashier, caption: "Day-End List with the totals of the day"}
+    fields:
+      - "Filter | Date | Date | dd-MMM-yyyy | Y | - | Today | - | - | -"
+      - "Totals | Total per / Payment Type / Bank Account / Currency / Records / Amount | Columns | Payment type or bank account; count; amount | - | Records of the day | - | Read only | - | No record on this day"
+      - "Records of the Day | Record Number / Receipt Type / AR / OR Number / Payor / Bank Account / Amount / Status | Columns | As recorded | - | Records of the day | - | Read only | - | No record on this day"
+    actions: []
+    rules:
+      - "The list holds the AR and OR records of the company of the chosen day with their status (FR-OP-028)."
+    outcome: The cashier balances the day's collections per payment type and bank account.
+    frs: [FR-OP-028]
+    tests: [RECEIPTS]
+
+  - id: SCR-OP-71
+    title: Search Log
+    route: /cashiering/search-log
+    purpose: The receipt searches with their user, criteria and number of results, kept as evidence of the inquiries.
+    entry:
+      - Cashiering › Search Log
+    shots:
+      - {state: list, user: cashtl, caption: "Search Log of the receipt searches"}
+    fields:
+      - "Filters | User / From / To | Look-up, dates | Name; dd-MMM-yyyy | N | Users | All | - | - | -"
+      - "List | Date and Time / User / Criteria / Results | Columns | dd-MMM-yyyy HH:mm; name; the criteria entered; number of receipts found | - | Search log | - | Read only | - | -"
+    actions:
+      - "Search | Cashiering Team Leader (posting right) | Always | Lists the searches of the filters | - | -"
+    rules:
+      - "Every receipt search is logged; no user can change the log (FR-OP-024)."
+    outcome: Audit sees who searched which receipts and when.
+    frs: [FR-OP-024]
+    tests: [RECEIPTS]
+
+  - id: SCR-OP-72
+    title: Unapplied Payment List
+    route: /cashiering/unapplied-inquiry
+    purpose: >-
+      The unapplied payments with an outstanding amount, by type, payment date, insurer, client and account, as BDOI's
+      FRS lists them for inquiry.
+    entry:
+      - Cashiering › Unapplied Payment List
+    shots:
+      - {state: list, user: cashier, caption: "Unapplied Payment List"}
+    fields:
+      - "Filters | Unapplied Payment Type | Drop-down | Excess Payment, Unapplied Payment, AR Insurer Refund, Unbooked/Unmatched Payment, Pre-booked Payment, AP Unapplied Commission | N | Fixed list | All types | - | - | -"
+      - "Filters | Payment Date From / Payment Date To / Insurer / Client Code / Assured's Name / Account Reference Number / Unapplied Payment No., Reference or Payor | Dates, drop-down, text | dd-MMM-yyyy; insurers by name | N | - | Blank | - | - | -"
+      - "List | Source / Unapplied Payment Type / Unapplied Payment No. / Payment/Creation Date / Account No. / PN / Loan Application No. | Columns | Origin of the payment; UNP-yyyy-nnnnnn; dd-MMM-yyyy | - | Unapplied payments | - | Read only | - | -"
+      - "List | Client Name / Insurer Name / Unapplied Payment Amount / Unapplied Payment Outstanding / Unapplied Payment Status | Columns | Names; amounts; Unapplied, Monitoring, For Approval, For Reversal, Done | - | Unapplied payments | - | Read only | - | -"
+    actions:
+      - "Search | Every Cashiering user | Always | Lists the unapplied payments of the filters | - | -"
+    rules:
+      - "A Marketing user sees the unapplied payments of his or her marketing unit as delivered (setting Unapplied payments seen by Marketing, Appendix H.8) (FR-OP-022)."
+    outcome: Cashiering and Marketing find every unapplied payment still outstanding.
+    frs: [FR-OP-022]
+    tests: [UNAPPLIED]
+
+  - id: SCR-OP-73
+    title: Settlement ORs
+    route: /cashiering/settlement-ors
+    purpose: >-
+      The commission and incentive ORs of the insurer settlements, issued once Disbursement approves the payment
+      request (as delivered), with the ones waiting and the ones that could not be issued.
+    entry:
+      - Cashiering › Settlement ORs
+    shots:
+      - {state: list, user: cashier, caption: "Settlement ORs waiting for the Disbursement approval"}
+    fields:
+      - "List | Settlement Batch / OR Type / Insurer / Payment Request / Currency / Amount | Columns | Remittance batch; Commission or Incentive; insurer; payment request; amount | - | Settlement ORs | - | Read only | - | -"
+      - "List | OR Number / Requested / Issued / Status / Remarks | Columns | OR number once issued; dates; Waiting for Disbursement approval, Issued, Cancelled, Failed | - | Settlement ORs | - | Read only | - | -"
+    actions:
+      - "Issue Again | Cashier | An OR that could not be issued | Issues the OR again | Issued | -"
+    rules:
+      - "The ORs of a settlement are issued when Disbursement approves the payment request as delivered, or at the approval of the remittance (setting When the settlement ORs are issued, Appendix H.8) (FR-OP-021)."
+    outcome: The commission and incentive ORs follow the settlement without manual issue.
+    frs: [FR-OP-021]
+    tests: [COMMOR]

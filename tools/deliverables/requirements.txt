@@ -1,0 +1,8 @@
+# BIBS client deliverables toolkit (tools/deliverables). Python 3.10+.
+# System tools: LibreOffice (soffice) for PDF conversion, Graphviz (dot) for .dot figures,
+# poppler-utils (pdftoppm) for page previews; pypdfium2 is the fallback when pdftoppm is missing.
+python-docx>=1.1
+openpyxl>=3.1
+python-pptx>=1.0
+PyYAML>=6.0
+pypdfium2>=4.0

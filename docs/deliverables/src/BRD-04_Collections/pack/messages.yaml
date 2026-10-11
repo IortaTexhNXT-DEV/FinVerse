@@ -1,0 +1,152 @@
+# Messages catalogue of BRD-4 Collections: sources, places and the fix the user makes.
+# The message texts are read from the platform at every build (never typed here). This file says where each message
+# appears (by the class or file that raises it) and what the user does. The legacy follow-up of migrated invoices is
+# specified in the BRD-13 set.
+sources:
+  backend_packages: [collections]
+  exclude_classes: [LegacyFollowUpService, LegacyFollowUpController]
+  # The check pick-up is removed from scope (Operations Cashiering annex, CSHID.009): its messages are not shown.
+  exclude_codes: [NOT_FOUND, CLX_PICKUP_DATE, CLX_PICKUP_AMOUNT]
+  exclude_texts: ["^<message>$", "^<errors>$", "^The pick-up date cannot be in the past$", "pick-up"]
+  bulk_handlers: [CollectionsBulkUpdateHandler]
+  bulk_screen: "Bulk Uploads (BRD-1 screen SCR-NB-36): Collections Bulk Update"
+  frontend_dirs: [features/collections/AccountHistoryTabs.tsx, features/collections/AccountPage.tsx,
+                  features/collections/AccountTabs.tsx, features/collections/AssignmentsPage.tsx,
+                  features/collections/ClientViewPage.tsx, features/collections/CollectionsHomePage.tsx,
+                  features/collections/FilesPage.tsx, features/collections/SetupPage.tsx,
+                  features/collections/WorkDialogs.tsx, features/collections/WorkInputs.tsx,
+                  features/collections/WorklistPage.tsx, features/collections/WorklistParts.tsx,
+                  features/collections/collectionsLogic.ts, features/collections/presentation.ts,
+                  features/collections/billing/BillingStatementsPage.tsx,
+                  features/collections/billing/StatementDetailPage.tsx, features/collections/billing/labels.ts,
+                  features/collections/escalations/EscalationDetailPage.tsx,
+                  features/collections/escalations/EscalationDialogs.tsx,
+                  features/collections/escalations/EscalationRulesPage.tsx,
+                  features/collections/escalations/EscalationsPage.tsx, features/collections/escalations/labels.ts,
+                  features/collections/plans/InstallmentsDuePage.tsx, features/collections/plans/Parts.tsx,
+                  features/collections/plans/PlanDetailPage.tsx, features/collections/plans/PlanDialogs.tsx,
+                  features/collections/plans/PlanTabs.tsx, features/collections/plans/PlansPage.tsx,
+                  features/collections/plans/PromisesPage.tsx, features/collections/plans/labels.ts,
+                  features/collections/plans/usePlanActions.ts, features/collections/plans/usePromiseSave.ts,
+                  features/collections/unapplied/DispositionDialog.tsx,
+                  features/collections/unapplied/UnappliedDetailPage.tsx,
+                  features/collections/unapplied/UnappliedParts.tsx,
+                  features/collections/unapplied/UnappliedPaymentsPage.tsx,
+                  features/collections/unapplied/UnappliedRequestsPage.tsx,
+                  features/collections/unapplied/columns.tsx, features/collections/unapplied/labels.ts]
+
+# Where a message appears: the first rule whose pattern matches the class (backend) or file (frontend) wins.
+places:
+  - [ "^(CollectionsHomePage|CollectionsHomeService|WorklistWorkCounts)$", "Collections Home (SCR-CL-01)" ]
+  - [ "^(WorklistPage|WorklistParts|WorklistController|CollectionsBulkActions|PendingWorklistUpdates|CollectionFiles)$", "PR Worklist and its bulk actions (SCR-CL-02)" ]
+  - [ "^(AccountPage|AccountTabs|AccountHistoryTabs|CollectionItems|EditLockService|LedgerBalances|LegacyFollowUpCard)$", "Collection Account (SCR-CL-03)" ]
+  - [ "^(WorkDialogs|WorkInputs|collectionsLogic|presentation|DispositionSupport|PrDispositionService|HandOffs|EffortService)$", "Record Disposition, Log Collection Effort and Update Remarks dialogs (SCR-CL-02, SCR-CL-03)" ]
+  - [ "^(ClientViewPage)$", "Client View (SCR-CL-04)" ]
+  - [ "^(PlansPage|PlanDialogs|PlanDetailPage|PlanTabs|usePlanActions|InstallmentPlan|InstallmentPlanService|BillingFrequency)$", "Installment Plans and Installment Plan (SCR-CL-05, SCR-CL-06)" ]
+  - [ "^(InstallmentsDuePage)$", "Installments Due (SCR-CL-07)" ]
+  - [ "^(PromisesPage|usePromiseSave|PaymentPromise|PromiseService)$", "Promises to Pay (SCR-CL-08)" ]
+  - [ "^(Parts)$", "Dialogs with a reason (cancel a plan, a statement, withdraw a promise)" ]
+  - [ "^(BillingStatementsPage|BillingStatementService)$", "Billing Statements (SCR-CL-09)" ]
+  - [ "^(StatementDetailPage|BillingStatement|SoaDispatch)$", "Statement of Account (SCR-CL-10)" ]
+  - [ "^(EscalationsPage|EscalationDialogs|EscalationService|EscalationNotices)$", "Escalations and Escalate Accounts (SCR-CL-11)" ]
+  - [ "^(EscalationDetailPage)$", "Escalation (SCR-CL-12)" ]
+  - [ "^(EscalationRulesPage|EscalationRule|EscalationRuleService|EscalationRuleController)$", "Escalation Rules (SCR-CL-13)" ]
+  - [ "^(UnappliedPaymentsPage|UnappliedParts|DispositionDialog|columns|UnappliedDispositionService|UnappliedRules)$", "Unapplied Payments and the disposition dialog (SCR-CL-14)" ]
+  - [ "^(UnappliedDetailPage)$", "Unapplied Payment (SCR-CL-15)" ]
+  - [ "^(UnappliedRequestsPage|ApplicationRequestService)$", "Requests to Cashiering (SCR-CL-16)" ]
+  - [ "^(AssignmentsPage|AssignmentService|AssignmentRuleService)$", "Assignments (SCR-CL-17)" ]
+  - [ "^(FilesPage|ScheduledFileService)$", "Collections Files (SCR-CL-18)" ]
+  - [ "^(SetupPage|CollectionsSetupService|LovAttributes|AgingBrackets)$", "Collections Setup (SCR-CL-19)" ]
+  - [ "^(labels)$", "Form checks of the Collections dialogs" ]
+
+# The fix the user makes. Messages that tell the user what to do ("Enter ...", "Choose ...") are their own fix and are
+# not repeated here. Keys are message codes; frontend messages without a code use their text.
+fixes:
+  CLX_SOA_CANCELLED: No action; the statement is cancelled. Generate a new statement for the cycle if it is still due.
+  CLX_PLAN_NOT_ACTIVE: No action; the plan is no longer active. Create a new plan if the account is still to be billed.
+  CLX_SOA_EXISTS: Open the statement already generated for the cycle, or cancel it first.
+  CLX_SOA_PERIOD: Correct the dates so that the period does not end before it starts.
+  CLX_SOA_RECIPIENT: Enter the e-mail address of at least one recipient.
+  CLX_NOTHING_TO_COLLECT: No action; the invoice has no premium left to collect.
+  CLX_WORKLIST_UNAVAILABLE: Wait a moment and try again; if it persists, report it to the System Administrator.
+  CLX_AGING_BRACKETS_INVALID: Write the brackets as from-to ranges in ascending order, the last one open (for example 121+).
+  CLX_ITEM_LOCKED: Wait until the user named leaves the account, or until the edit lock expires.
+  CLX_LOV_VALUE_UNKNOWN: Choose a value of the list, or add it on the Lists of Values screen first.
+  CLX_LOV_ATTRIBUTE_UNKNOWN: Choose an attribute of the list shown on Collections Setup.
+  CLX_LOV_ATTRIBUTE_VALUE: Enter a value allowed for the attribute, as the hint of the field says.
+  CLX_NO_ACCOUNT: Select at least one account in the list.
+  CLX_TOO_MANY_ACCOUNTS: Select at most 500 accounts, or narrow the filters.
+  CLX_BULK_NOT_ALLOWED: Work on one account at a time, or ask the team lead to update the accounts together.
+  CLX_ITEM_OTHER_COMPANY: Change the company in the header, or remove the account from the selection.
+  CLX_ITEM_CLOSED: No action; the account is no longer open. Refresh the list.
+  CLX_EFFORT_FUTURE: Enter a date and time that is not in the future.
+  CLX_CATEGORY: Choose A, B or C, or None.
+  CLX_CWT_PATH: Choose the 2307 path in the drop-down.
+  CLX_DISPOSITION_DETAIL: Complete or correct the detail named in the message.
+  CLX_DISPOSITION_NOT_ALLOWED: Choose another disposition, or ask a user of the roles named to record it.
+  CLX_RULE_CODE: Enter the code of the rule.
+  CLX_RULE_INVALID: Enter a threshold and SLA hours above zero.
+  CLX_RULE_TARGET: Enter the user who receives the escalations, or choose a level.
+  CLX_RULE_DATES: Correct the dates so that the rule does not end before it becomes effective.
+  CLX_RULE_AMOUNTS: Correct the amounts so that the range does not end below its start.
+  CLX_ESCALATION_TARGET: Choose the level, or a user who handles escalations.
+  DUPLICATE: Use another rule code; the code is taken.
+  CLX_ESCALATION_ACTION: Refresh the escalation and use an action shown in its header.
+  CLX_RESOLUTION_REQUIRED: Describe how the escalation was resolved.
+  CLX_EXPORT_TOO_LARGE: Narrow the filters so that the export has fewer rows than the limit.
+  CLX_FREQUENCY_UNSUPPORTED: Choose another billing frequency, or ask the System Administrator to set up its cycle length.
+  CLX_PLAN_EMPTY: Enter at least one installment.
+  CLX_CYCLE_UNKNOWN: Refresh the plan and choose a billing cycle shown on it.
+  CLX_PLAN_NOT_BOOKED: Check the ARN; a plan over the policy years needs at least one booked policy year.
+  CLX_PLAN_NOTHING_DUE: No action; the invoice has no outstanding premium to schedule.
+  CLX_PLAN_EXISTS: Open the existing plan, or cancel it before creating a new one.
+  CLX_PLAN_TOTAL_MISMATCH: Correct the installment amounts so that they add up to the outstanding premium.
+  CLX_PLAN_ENTRY_INVALID: Enter amounts above zero and due dates in increasing order.
+  CLX_INVOICE_UNKNOWN: Check the invoice number; it must be an invoice of the ledger.
+  CLX_INVOICE_NOT_COLLECTIBLE: No action; the invoice is paid directly to the insurer or cancelled.
+  CLX_PROMISE_DATES: Enter the promised date; the day of the promise is today or earlier.
+  CLX_PROMISE_AMOUNT: Enter a promised amount above zero, or leave it empty for the whole outstanding.
+  CLX_PROMISE_CLOSED: No action; the promise is already kept, broken or withdrawn.
+  CLX_PROMISE_NOTHING_DUE: No action; the invoice has nothing left to collect.
+  CLX_PROMISE_OVER_BALANCE: Enter an amount at most the outstanding, or leave it empty for the whole outstanding.
+  CLX_PROMISE_INSTALLMENT: Record the promise on the invoice of the installment.
+  CLX_PARAMETER_NOT_COLLECTIONS: Change the parameter on the System Parameters screen.
+  CLX_AGING_BASIS: Enter BOOKING or INCEPTION.
+  CLX_UNAPPLIED_NO_BALANCE: No action; the payment has been applied or refunded.
+  CLX_UNAPPLIED_AMOUNT: Enter an amount above zero and at most the unapplied balance.
+  CLX_INVOICE_REQUIRED: Enter the invoice number to apply the payment to.
+  CLX_INVOICE_FORMAT: Enter the invoice number as EBIX I######## or BIBS BI-...
+  CLX_RULE_NAME: Give the rule a name.
+  CLX_RULE_RANGE: Correct the range so that it starts before it ends.
+  CLX_REASSIGN_EMPTY: Change the criteria or the selection so that at least one open account is found.
+  CLX_REASSIGN_REASON: Give the reason of the reassignment.
+  CLX_REASSIGN_KIND: Choose Permanent or Temporary.
+  CLX_REASSIGN_END_DATE: Enter an end date after today, or choose Permanent.
+  CLX_HANDLER_NOT_ELIGIBLE: Choose another handler from the list.
+  "The pick-up date cannot be in the past": "None: the check pick-up is removed from scope (chapter 21, CLR-CL-33)."
+  "A certificate tag needs the certificate number": Enter the BIR 2307 certificate number.
+  "Enter CASH or CERTIFICATE": Choose the 2307 path in the drop-down.
+  "A temporary reassignment ends after today": Enter an end date after today, or choose Permanent.
+  "The rule cannot end before it starts": Correct the effective dates.
+  "The day of the promise cannot be in the future": Enter today or an earlier date.
+  "The promised date cannot be before the day of the promise": Enter a promised date on or after the day of the promise.
+  "The invoice number does not have the expected format": Enter the invoice number as EBIX I######## or BIBS BI-...
+  "The period ends before it starts": Correct the dates so that the period does not end before it starts.
+  "<label> is required": Complete the field named.
+  "Fill a promise, Escalate = Y or a worklist field": Fill a promise, Escalate = Y or a worklist field in the row.
+  "A promise amount needs the promise date": Enter the promise date of the row.
+  "Invoice <invoice> is not in the ledger": Correct the invoice number of the row.
+  "Invoice <invoice> has nothing to collect": Remove the row; the invoice has nothing to collect.
+  "You are not allowed to escalate accounts": Remove the escalation columns of the row, or ask a user who may escalate.
+  "Escalation Level must be one of <>": Enter TL, UH, SECTION_HEAD or USER.
+  "Name the user in Escalate To for a USER escalation": Enter the user in Escalate To.
+  "<target> does not handle escalations": Enter a user who handles escalations, or leave Escalate To empty.
+  "Escalation Reason must be a code of the escalation reason list": Enter a code of the escalation reason list.
+  VALIDATION_FAILED: Correct the fields listed under the message.
+  CONCURRENT_MODIFICATION: Reload the record; another user changed it. Enter the change again.
+  ACCESS_DENIED: Ask for the permission; the menu shows only the screens of your role.
+  INTERNAL_ERROR: Report the message with its reference to the System Administrator.
+  MALFORMED_REQUEST: Reload the screen and try again; if it persists, report it with the time to the System Administrator.
+  UPLOAD_TOO_LARGE: Reduce the file (split it) and upload it again.
+  "<Column> '<value>' is not a valid <number, date (yyyy-mm-dd), Y/N value>": Correct the value in the file in the format of the column and upload the file again.
+  "<Column> is mandatory": Fill in the column in the file and upload the file again.

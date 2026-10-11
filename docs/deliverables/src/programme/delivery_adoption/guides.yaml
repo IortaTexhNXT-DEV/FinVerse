@@ -1,0 +1,576 @@
+# Persona quick-reference guides (BRD-00). Read by build_delivery_adoption.py: one Word quick-reference guide per
+# persona, plus the persona tables of the User Manual Framework and of the OCM and Training Framework.
+# Every step, screen and message comes from the FRS walkthroughs (WT-x.n = walkthrough x, step n of the FRS of the
+# BRD) or from the main flow of the FR named in the reference. Screen IDs are those of the FRS screen specifications
+# and the UX screen register; screens of BRDs without a screen register yet are named as in the FR.
+#
+# Persona fields: key, name, file, brds, users (population for training sizing, from the user tables of the BRDs; proposed where the BRD gives none),
+# summary, home, menus, tasks [{title, ref, steps: [[what you do, screen, reference]]}], tips, help.
+
+help_common:
+  - "Help Center (sidebar, Help > Help Center): the help of every screen you may open, with How it works and Controls; search by word."
+  - "Info icons on field labels: the format and rule of the field; the short format hint under a field gives dates as dd-MMM-yyyy and the file limits."
+  - "Messages: a refused action shows the message on the screen in plain words; the message tells what to correct (the tips above list the frequent ones)."
+  - "My Work and My Approvals: every record waiting for you, with the action to take; notices in the bell icon link to the record."
+  - "Key user of your unit: first point of contact for how-to questions and for a second pair of eyes."
+  - "Service desk (BDOI IT): access problems, errors and anything the key user cannot solve; give the record number, the screen ID and the time."
+
+personas:
+  - key: AO
+    name: Marketing Account Officer
+    file: Account_Officer
+    brds: "BRD-01 New Business, BRD-03 Product Maintenance, BRD-04 Collections, BRD-05 Accounting (refund requests), BRD-06 Renewal"
+    users: "319 (BRD-06 user table; 485 Marketing users in all)"
+    summary: >-
+      You own the client relationship. In BIBS you onboard clients with their KYC, quote package products, raise proposal
+      requests (PRF) for risks no package covers, send quotations and proposals to the client, record the client's
+      acceptance, create and submit the accounts to Processing, request new packages, give the disposition of your
+      expiring accounts and raise refund requests for your clients.
+    home: "NB Dashboard and My Work: pipeline, expiring accounts, records returned to you"
+    menus:
+      - "Client & Policy > Clients: Clients, New Client, KYC Reviews Due"
+      - "Client & Policy > Quotation / Proposal: Quotations, New Quotation, Quotation Requests"
+      - "Client & Policy > Accounts & Placement: Accounts, New Account"
+      - "Client & Policy > Non-Package Management: Proposal Requests, New Proposal Request"
+      - "Client & Policy > Renewal: Renewal Home, Expiry List, My Dispositions, Transfers, Letters"
+      - "Client & Policy > Product Maintenance: Package Requests, Premium Calculator"
+      - "Finance > Collections: PR Worklist (your accounts); Finance > Refund & Cash Advance Requests: New Refund Request"
+      - "Reports > Report Centre; Help > Help Center, My Profile"
+    tasks:
+      - title: Onboard a client and complete the KYC
+        ref: "FRS BRD-01, walkthrough WT-A steps 1-4"
+        steps:
+          - ["Open Clients > New Client, enter the identity, contact, address and segment, and click Save as prospect. BIBS shows the prospect code PR-yyyy-nnnnnn.", "SCR-NB-02 New Client", "WT-A.1"]
+          - ["Open the client, upload the KYC form and a valid ID on the KYC & Documents tab and click Submit KYC. The workflow panel moves to KYC for verification.", "SCR-NB-03 Client record", "WT-A.2"]
+          - ["When your Team Lead has verified the KYC, click Confirm client. The client code CL-yyyy-nnnnnn appears in the header.", "SCR-NB-03 Client record", "WT-A.4"]
+      - title: Quote a package product and submit the account to Processing
+        ref: "FRS BRD-01, walkthrough WT-A steps 5-9"
+        steps:
+          - ["Click Generate Quotation, check the market segment taken from the client, choose the product, the insurer and its branch, add the location with its sum insured, review the live premium and click Submit for Review.", "SCR-NB-06 New Quotation", "WT-A.5"]
+          - ["After the approval, click Send via Email, keep the proposed e-mail and click Send. The E-mails tab lists the quotation e-mail and the password e-mail.", "SCR-NB-07 Quotation record", "WT-A.7"]
+          - ["Click Record acceptance, upload the client's reply, click Record Acceptance, then Create accounts. The Control card lists the account ARN.", "SCR-NB-07 Quotation record", "WT-A.8"]
+          - ["Open the draft account, complete the mortgagee bank and PN number, review the completeness check and click Submit to Processing.", "SCR-NB-14 Edit Account", "WT-A.9"]
+      - title: Place a non-package risk through a proposal request (PRF)
+        ref: "FRS BRD-01, walkthrough WT-B steps 1, 8 and 9"
+        steps:
+          - ["Open New Proposal Request, choose the client and the product, describe the risk, add the item, tick the insurers, attach the mandatory documents and click Submit for Approval.", "SCR-NB-10 New Proposal Request", "WT-B.1"]
+          - ["When TSU has released the proposal slip, click Send via Email to send the proposal slip and the comparative table to the client.", "SCR-NB-11 Proposal Request record", "WT-B.8"]
+          - ["Record the client's acceptance and click Create accounts. The account is created in draft under the PRF's ARN.", "SCR-NB-11 Proposal Request record", "WT-B.9"]
+      - title: Correct a record returned to you
+        ref: "FRS BRD-01, walkthrough WT-C step 7"
+        steps:
+          - ["Open Accounts, tab Returned to Me, open the account, attach the missing document and click Resubmit to Processing.", "SCR-NB-13 Accounts", "WT-C.7"]
+      - title: Request a new package and quote it
+        ref: "FRS BRD-03, walkthrough WT-A"
+        steps:
+          - ["Open Package Requests > New Package Request, choose the request type and programme, enter the name, line and cover type, attach the documents and click Submit for Approval.", "SCR-PM-03 New Package Request", "BRD-03 WT-A.3"]
+          - ["After the release, open Premium Calculator, choose the package and the insurer, enter the values and click Calculate.", "SCR-PM-21 Premium Calculator", "BRD-03 WT-A.21"]
+          - ["On a quotation of the package, click Request Rate Exception with the reason when the client needs a rate outside the scheme; open the quotation again after the approval.", "SCR-PM-22 Quotation: package rate scheme and rate exception", "BRD-03 WT-A.22, A.24"]
+      - title: Give the disposition of an expiring account
+        ref: "FRS BRD-06, FR-RN-040, FR-RN-043, FR-RN-044"
+        steps:
+          - ["Open My Dispositions; use the quick filters Returned to me, Due in 30 days or NRNS.", "My Dispositions", "FR-RN-040"]
+          - ["Open the account and its Disposition panel; select the disposition and, for Not for Renewal, the reason.", "Renewal record page", "FR-RN-043"]
+          - ["Complete the mandatory details and the remarks and click Save, then Push. The account goes to your Team Lead for review.", "Renewal record page", "FR-RN-043, FR-RN-044"]
+      - title: Raise a client refund request
+        ref: "FRS BRD-05, walkthrough WT-B steps 1-2 and 8"
+        steps:
+          - ["Fill in New Refund Request (segment, reference, purpose, credit to the client's account) with the account to refund and click Submit for Review.", "SCR-AC-40 New Refund Request; SCR-AC-43 Request", "WT-B.1, B.2"]
+          - ["Follow the payment on the Disbursement tab of the request.", "SCR-AC-43 Request", "WT-B.8"]
+    tips:
+      - "Submit KYC is refused without the mandatory documents: \"Upload the mandatory KYC documents before you submit the KYC: <documents>\" (BRD-01 WT-C.1)."
+      - "A quotation is approved by someone other than its maker (BRD-01 WT-C.3)."
+      - "Processing cannot validate an account whose client is not confirmed; confirm the client first (BRD-01 WT-C.5)."
+      - "The completeness check of the account lists what is missing before you submit."
+      - "A renewal account can be re-assigned until its Renewal Advice is generated."
+
+  - key: MKTTL
+    name: Marketing Team Lead
+    file: Marketing_Team_Lead
+    brds: "BRD-01 New Business, BRD-02 Operations (holds), BRD-03 Product Maintenance, BRD-04 Collections, BRD-06 Renewal"
+    users: "75 (BRD-06 user table)"
+    summary: >-
+      You lead a sales team (Team Leader, Team Head or Unit Head). In BIBS you verify the KYC of new clients, approve or
+      return quotations, proposal requests and package requests of your officers, assign and review the renewal
+      dispositions of your unit, approve remittance holds raised by Marketing Collection and follow your team's work
+      on the dashboards.
+    home: "My Approvals and the NB Dashboard: items waiting for your approval, pipeline and expiring accounts of the team"
+    menus:
+      - "Overview: My Approvals; New Business Dashboard; My Work"
+      - "Client & Policy > Clients, Quotation / Proposal, Accounts & Placement, Non-Package Management"
+      - "Client & Policy > Renewal: Renewal Home, Expiry List, My Dispositions, TL Review, Transfers, Letters"
+      - "Client & Policy > Product Maintenance: Package Requests, Package Expiry"
+      - "Finance > Collections: PR Worklist, Escalations, Assignments; Finance > Remittance: Remittance Holds"
+      - "Reports > New Business Reports, Production Targets, Report Centre"
+    tasks:
+      - title: Verify or return a client's KYC
+        ref: "FRS BRD-01, walkthroughs WT-A step 3 and WT-C step 2"
+        steps:
+          - ["Open the client from My Work and click Verify KYC. BIBS shows the next review date.", "SCR-NB-03 Client record", "WT-A.3"]
+          - ["To send it back, click Return To Account Officer, select the reason and write the comment. The officer is notified.", "SCR-NB-03 Client record", "WT-C.2"]
+      - title: Approve or return a quotation
+        ref: "FRS BRD-01, walkthroughs WT-A step 6 and WT-C step 4"
+        steps:
+          - ["Open the quotation from the For Review tab and click Approve.", "SCR-NB-07 Quotation record", "WT-A.6"]
+          - ["To return it, click Return To Maker with the reason (for example Rate or terms to be reviewed). The History tab keeps the reason.", "SCR-NB-07 Quotation record", "WT-C.4"]
+      - title: Approve a proposal request (PRF) and a package request
+        ref: "FRS BRD-01 WT-B step 2; FRS BRD-03 WT-A step 4"
+        steps:
+          - ["Open the PRF and click Approve and send to TSU.", "SCR-NB-11 Proposal Request record", "BRD-01 WT-B.2"]
+          - ["Open the package request from the For Approval tab and click Approve and send to TSU.", "SCR-PM-04 Package Request record", "BRD-03 WT-A.4"]
+      - title: Assign and review renewal dispositions
+        ref: "FRS BRD-06, FR-RN-011, FR-RN-030, FR-RN-050, FR-RN-051"
+        steps:
+          - ["On Expiry List, click Generate Expiry List, pick the start and end dates and click Generate.", "Expiry List", "FR-RN-011"]
+          - ["On the tab Unassigned Disposition, tick the accounts, click Assign Disposition, select the officer and click Assign and Push.", "Expiry List", "FR-RN-030"]
+          - ["Open TL Review, review the dispositioned accounts, select them and click Post; or Return with a reason.", "TL Review", "FR-RN-050"]
+          - ["For a flagged outstanding balance, select the accounts, click Override, choose the kind and the reason and write the remarks.", "TL Review", "FR-RN-051"]
+      - title: Approve a remittance hold
+        ref: "FRS BRD-02, walkthrough WT-D step 1"
+        steps:
+          - ["Open the hold raised by Marketing Collection, check the reason and the hold-until date and click Approve hold.", "SCR-OP-29 Remittance Hold", "WT-D.1"]
+    tips:
+      - "You cannot approve a quotation, PRF or package request that you made yourself (BRD-01 WT-C.3; BRD-03 WT-B.3)."
+      - "An account cannot be posted from TL Review while a blocking check fails, unless you override it with remarks; an override never turns a failed check into Clean."
+      - "Return reasons are kept in the history of the record; write a comment the officer can act on."
+
+  - key: PROC
+    name: Processing Officer
+    file: Processing
+    brds: "BRD-01 New Business, BRD-12 Submitted Policies"
+    users: "123: 50 Team Leaders and 73 officers (BRD-06 user table)"
+    summary: >-
+      You turn an accepted quotation into a booked policy. In BIBS you validate the accounts submitted by Marketing,
+      check the payment gate, place the account with the insurer, receive and confirm the e-policy, issue the Insurance
+      Advice and book the account, which creates the invoice, the journal and the open items for Operations and
+      Accounting.
+    home: "My Work: placement and booking queues"
+    menus:
+      - "Client & Policy > Accounts & Placement: Accounts"
+      - "Client & Policy > Placement & Booking: Placement Workbench, Placement Slips, CLPC Billing"
+      - "Client & Policy > Policy Issuance: Issuance Workbench, E-policy Upload, Insurance Advice, E-policy Dispatch"
+      - "Client & Policy > Booking: Booking Workbench, Endorsements, Service Invoices, Batch Runs"
+      - "Client & Policy > Submitted Policies; Bulk Processing > Bulk Uploads"
+    tasks:
+      - title: Validate an account or return it to Marketing
+        ref: "FRS BRD-01, walkthroughs WT-A step 10 and WT-C steps 5-6"
+        steps:
+          - ["Open the account from My Work and click Validate. It moves to Awaiting payment or Ready for placement.", "SCR-NB-15 Account record", "WT-A.10"]
+          - ["If documents are missing, click Return To Marketing with the reason.", "SCR-NB-15 Account record", "WT-C.6"]
+      - title: Pass the payment gate (CLPC accounts)
+        ref: "FRS BRD-01, walkthrough WT-A step 11"
+        steps:
+          - ["Bill the account on CLPC Billing and download the file.", "SCR-NB-21 CLPC Billing", "WT-A.11"]
+          - ["Upload CLPC's payment report and confirm the matches. Confirm Matches opens the payment gate.", "SCR-NB-22 Payment Report", "WT-A.11"]
+      - title: Place the account and confirm the policy
+        ref: "FRS BRD-01, walkthrough WT-A steps 12-14"
+        steps:
+          - ["Select the account on the Placement Workbench, click For Placement, then Generate Slips, then Send Slips.", "SCR-NB-18 Placement Workbench", "WT-A.12"]
+          - ["Upload the insurer's e-policy PDF with the ARN. The Extraction Review opens.", "SCR-NB-24 E-policy Upload", "WT-A.13"]
+          - ["Check the extracted policy number against the account and click Confirm Policy. The Insurance Advice is generated.", "SCR-NB-25 Extraction Review", "WT-A.14"]
+      - title: Book the account
+        ref: "FRS BRD-01, walkthrough WT-A steps 16-17"
+        steps:
+          - ["Open the account from Ready to Book, check the invoice and the journal preview and click Book Account.", "SCR-NB-29 Pre-booking Confirmation", "WT-A.16"]
+          - ["Review the Journal and Open Items tabs of the booked invoice.", "SCR-NB-30 Booked Invoice", "WT-A.17"]
+      - title: Handle an insurer return
+        ref: "FRS BRD-01, walkthrough WT-C steps 8-9"
+        steps:
+          - ["Record the insurer return on the placed account with the reason.", "SCR-NB-19 Account Placement", "WT-C.8"]
+          - ["Click Resubmit for Placement, then Generate Placement Slip, and send the new slip from the Placement Slips tab. The earlier version shows Superseded.", "SCR-NB-19 Account Placement", "WT-C.9"]
+    tips:
+      - "An account is booked once: a second booking of the same ARN and transaction is refused (Help Center, Booking Workbench)."
+      - "The booking date cannot be in the future and its accounting period must be open."
+      - "Validate is refused when the client is not confirmed: \"Client <code> is not yet confirmed (onboarding and KYC incomplete)\" (WT-C.5)."
+
+  - key: TSU
+    name: Technical Support Unit (TSU) Officer
+    file: TSU
+    brds: "BRD-01 New Business (non-package), BRD-03 Product Maintenance"
+    users: "13 TSU and 5 MBS (BRD-03 p.33)"
+    summary: >-
+      You run the insurer market work. In BIBS you take proposal requests (PRF) from the TSU Workbench, prepare and send
+      the quotation slips to insurers, key in and compare their terms and release the proposal slip; for new packages you
+      negotiate with the insurers, prepare the requirements for ManCom sign-off, send the advisories and, as TSU Team Lead
+      or Head, recommend, approve and validate package versions.
+    home: "TSU Workbench: PRFs and package requests to act on"
+    menus:
+      - "Client & Policy > Non-Package Management: Proposal Requests, TSU Workbench"
+      - "Client & Policy > Product Maintenance: Package Requests, TSU Workbench, Package Expiry, Products, Coverages & Clauses"
+      - "Client & Policy > Submitted Policies: Terms of Reference"
+    tasks:
+      - title: Work a proposal request to the proposal slip
+        ref: "FRS BRD-01, walkthrough WT-B steps 3-7"
+        steps:
+          - ["Claim the PRF on the TSU Workbench and open it.", "SCR-NB-12 TSU Workbench", "WT-B.3"]
+          - ["Click Accept and Prepare Quotation Slip, confirm the insurers on the Quotation Slip tab and click Submit quotation slip with the reply date. A second TSU officer clicks Approve and send to insurers.", "SCR-NB-11 Proposal Request record", "WT-B.4, B.5"]
+          - ["Key in the terms of each insurer on the Insurer Responses tab, recommend the best offer and click Insurer terms complete.", "SCR-NB-11 Proposal Request record", "WT-B.6"]
+          - ["Click Submit proposal slip for the recommended insurer; a second TSU officer approves and releases it to Marketing.", "SCR-NB-11 Proposal Request record", "WT-B.7"]
+      - title: Negotiate a new package
+        ref: "FRS BRD-03, walkthrough WT-A steps 7-11"
+        steps:
+          - ["Open the Negotiation tab, add a note to the insurers and click Submit for Approval; the TSU Team Lead clicks Approve and Send.", "SCR-PM-05 Negotiation tab", "BRD-03 WT-A.7, A.8"]
+          - ["Click Key In for each insurer, enter the outcome, rate, minimum premium and deductibles, attach the reply and click Save Terms.", "SCR-PM-05 Negotiation tab", "BRD-03 WT-A.9"]
+          - ["Click Terms final, tick the chosen offer and click Make Terms Final; check the Comparative tab.", "SCR-PM-05; SCR-PM-06 Comparative tab", "BRD-03 WT-A.10, A.11"]
+      - title: Complete the requirements and send the advisory
+        ref: "FRS BRD-03, walkthrough WT-A steps 13 and 20"
+        steps:
+          - ["Enter the computation basis, click Save Requirements, download the Package Slip, upload the signed slip on the Documents tab and submit the requirements for ManCom sign-off.", "SCR-PM-07 Requirements & Sign-off tab", "BRD-03 WT-A.13"]
+          - ["After the release, open the Advisories tab, check that the supporting documents are Attached and click Send Advisory.", "SCR-PM-08 Set-up and Advisories tabs", "BRD-03 WT-A.20"]
+      - title: Approve as TSU Team Lead or TSU Head
+        ref: "FRS BRD-03, walkthrough WT-A steps 5, 6 and 17"
+        steps:
+          - ["Team Lead: click Recommend for approval, write the recommendation and click Recommend.", "SCR-PM-04 Package Request record", "BRD-03 WT-A.5"]
+          - ["Head: read the recommendation and click Approve for negotiation.", "SCR-PM-04 Package Request record", "BRD-03 WT-A.6"]
+          - ["Head: open the version from the Validation Queue, tick the five checklist items and click Validate and Release.", "SCR-PM-13 Package Version; SCR-PM-14 Validation Queue", "BRD-03 WT-A.17"]
+    tips:
+      - "Terms final is refused while an insurer of the round is still pending (BRD-03 WT-B.6)."
+      - "The requirements cannot be submitted for ManCom sign-off before the signed package slip is uploaded (BRD-03 WT-B.8)."
+      - "A slip is approved by a second TSU officer, never by its maker (BRD-03 WT-B.5)."
+
+  - key: CASH
+    name: Cashier
+    file: Cashier
+    brds: "BRD-02 Operations (Cashiering), BRD-04 Collections (requests), BRD-13 (legacy items)"
+    users: "16: 11 head office, 5 branches (BRD-02 annex)"
+    summary: >-
+      You receive and apply client payments. In BIBS you find the invoice, receive the payment, issue the
+      acknowledgement receipt and apply it, process the payment uploads of the bank channels, act on the requests of the
+      collectors, prepare check pick-ups, refund unapplied payments and cancel receipts under approval.
+    home: "Cashiering Workbench: counts of payments, unapplied items and incoming requests"
+    menus:
+      - "Operations > Operations: Operations Home, Invoice Search"
+      - "Finance > Cashiering: Cashiering Workbench, Receive Payment, Receipts, Unapplied Payments, Incoming Requests, Pre-booked Payments, Payment Uploads, PDC Warehouse, Check Pick-up, Batch Print, Receipt Series"
+      - "Finance > Collections (read access and exports)"
+    tasks:
+      - title: Receive a payment and issue the receipt
+        ref: "FRS BRD-02, walkthrough WT-A steps 2-4"
+        steps:
+          - ["Search the ARN on Invoice Search.", "SCR-OP-02 Invoice Search", "WT-A.2"]
+          - ["Open Receive Payment, enter the ARN, the payor, the amount paid and the payment date, and check the preview.", "SCR-OP-08 Receive Payment", "WT-A.3"]
+          - ["Click Issue AR and Apply.", "SCR-OP-10 Receipt", "WT-A.4"]
+      - title: Act on a collector's request and a check pick-up
+        ref: "FRS BRD-04, walkthroughs WT-C step 3 and WT-A step 6"
+        steps:
+          - ["Open Incoming Requests, select the collector request and click Accept Request.", "SCR-OP-13 Incoming Requests", "BRD-04 WT-C.3"]
+          - ["Open Check Pick-up to see the pick-ups recorded by the collectors with date, address, contact and amount.", "Check Pick-up (Cashiering)", "BRD-04 WT-A.6"]
+      - title: Refund an unapplied payment
+        ref: "FRS BRD-02, walkthrough WT-B steps 8-9"
+        steps:
+          - ["Open the unapplied payment, assign a refund to the client and submit it.", "SCR-OP-12 Unapplied Payment", "WT-B.8"]
+          - ["The Cashiering Team Leader opens it and clicks Approve.", "SCR-OP-12 Unapplied Payment", "WT-B.9"]
+      - title: Cancel a receipt
+        ref: "FRS BRD-02, walkthrough WT-D steps 3-4"
+        steps:
+          - ["Open the receipt, click Cancel Receipt, choose the reason and submit the cancellation.", "SCR-OP-10 Receipt", "WT-D.3"]
+          - ["The Cashiering Team Leader opens the receipt and clicks Approve and Post.", "SCR-OP-10 Receipt", "WT-D.4"]
+    tips:
+      - "Payment Uploads accept the Excel template as well as CSV or TXT files."
+      - "A receipt cancellation is posted only after the Team Leader's approval."
+      - "Check the preview before Issue AR and Apply: the receipt number is issued from the receipt series."
+
+  - key: CLX
+    name: Collection Handler
+    file: Collection_Handler
+    brds: "BRD-04 Collections"
+    users: "130 Collections users, 56 concurrent (BRD-04 NFR)"
+    summary: >-
+      You collect the premium receivables of your accounts. In BIBS you work the PR Worklist, log your efforts, record
+      dispositions, promises to pay and check pick-ups, escalate accounts, set up installment plans with their
+      statements of account and ask Cashiering to apply unapplied payments.
+    home: "Collections Home: worklist, promises due, escalations"
+    menus:
+      - "Finance > Collections: Collections Home, PR Worklist, Installment Plans, Installments Due, Promises to Pay, Escalations, Billing Statements, Unapplied Payments, Requests to Cashiering, Collections Files"
+    tasks:
+      - title: Work an outstanding account
+        ref: "FRS BRD-04, walkthrough WT-A steps 2-5"
+        steps:
+          - ["Open Collections Home, then the PR Worklist with Only mine ticked.", "SCR-CL-01 Collections Home; SCR-CL-02 PR Worklist", "WT-A.2, A.3"]
+          - ["Open the account and click Log Effort (for example a phone call to the client's finance officer).", "SCR-CL-03 Collection Account", "WT-A.4"]
+          - ["Click Record Disposition, choose the disposition (for example For check pick-up) and enter the date, address, contact person and amount.", "SCR-CL-03 Collection Account", "WT-A.5"]
+      - title: Record a promise to pay and escalate an account
+        ref: "FRS BRD-04, walkthrough WT-B steps 1-2"
+        steps:
+          - ["Click Record Promise and enter the invoice, the promised payment date and the amount.", "SCR-CL-08 Promises to Pay", "WT-B.1"]
+          - ["Click Escalate Accounts and enter the invoice, the level (for example Team Lead) and the reason. The Team Lead acknowledges and resolves it.", "SCR-CL-11 Escalations; SCR-CL-12 Escalation", "WT-B.2-B.4"]
+      - title: Set up an installment plan and send its statement
+        ref: "FRS BRD-04, walkthrough WT-D"
+        steps:
+          - ["Click New Installment Plan: the invoice, the first due date, the number of installments and the frequency.", "SCR-CL-05 Installment Plans", "WT-D.1"]
+          - ["Open the row menu of cycle 1 and click Generate SOA, then the Statements of Account tab.", "SCR-CL-06 Installment Plan", "WT-D.2"]
+          - ["Open the statement, click Send via Email and Send.", "SCR-CL-10 Statement of Account", "WT-D.3, D.4"]
+      - title: Ask Cashiering to apply an unapplied payment
+        ref: "FRS BRD-04, walkthrough WT-C"
+        steps:
+          - ["Select the payment on Unapplied Payments, click Request Application and enter the invoice number.", "SCR-CL-14 Unapplied Payments", "WT-C.1"]
+          - ["Follow the request on Requests to Cashiering; the Executed tab shows it once Cashiering has applied it.", "SCR-CL-16 Requests to Cashiering", "WT-C.2, C.4"]
+    tips:
+      - "A promise above the outstanding amount of the account is refused (WT-E.3)."
+      - "An invoice number in the wrong format is refused when you request an application (WT-E.4)."
+      - "Your Team Lead can open the accounts you are working on (WT-E.2)."
+
+  - key: FRBS
+    name: Accountant and FRBS Officer
+    file: Accountant_FRBS
+    brds: "BRD-05 Accounting (FRBS, ACSL, bank reconciliation)"
+    users: "11: FRBS 5, ACSL 6 (BRD-05 p.133-137)"
+    summary: >-
+      You keep the books of BDOI. In BIBS you enter and post journals under maker-checker, inquire on accounts, run the
+      month-end revaluation and GL close, compute the service fee, reconcile the bank accounts and, in ACSL, reconcile the
+      insurers' statements of account and correct wrong postings.
+    home: "Finance dashboard; Journals and reconciliations to act on"
+    menus:
+      - "Finance > General Ledger: Journals, New Journal, Recurring Journals, Journal Upload, Account Inquiry, Party Statement, Chart of Accounts, Financial Periods"
+      - "Finance > Receivables & Banking: Bank Statements, Bank Reconciliation"
+      - "Finance > Accounting Reports: Report Pack, Account Schedules, Service Fee Runs, Service Fee Rates"
+      - "Finance > ACSL: ACSL Cases, Correction Entries, Insurer SOA Reconciliation, GL-SL Reconciliation"
+      - "Reports > Report Centre"
+    tasks:
+      - title: Enter and post a manual accrual
+        ref: "FRS BRD-05, walkthrough WT-A"
+        steps:
+          - ["Enter the accrual on New Journal: value date, Reverse on the first day of next month, the debit with its cost centre and the credit; save and submit.", "SCR-AC-02 New Journal", "WT-A.1"]
+          - ["Team Lead: select the voucher on Journals, click Assign and choose the GL Section Head.", "SCR-AC-01 Journals", "WT-A.2"]
+          - ["Section Head: choose Assigned to me, select the voucher, click Post Selected and confirm.", "SCR-AC-01 Journals", "WT-A.3"]
+          - ["Check the posting on the journal and on Account Inquiry for the month.", "SCR-AC-03 Journal; SCR-AC-04 Account Inquiry", "WT-A.4, A.5"]
+      - title: Close the month
+        ref: "FRS BRD-05, walkthrough WT-D"
+        steps:
+          - ["Enter the month-end rate of each currency on Monthly revaluation rates and click Save Rate.", "SCR-AC-08 Currencies & Rates", "WT-D.1"]
+          - ["Choose the month, check the preview and click Post revaluation.", "SCR-AC-13 FX Revaluation", "WT-D.2"]
+          - ["Click Schedule Close for the month at the proposed date and time; open Broking Books Cut-Off.", "SCR-AC-11 GL Close & Cut-Off", "WT-D.3, D.4"]
+          - ["Open the service-fee run of the month and tag a line Released with the date the recipient was credited.", "SCR-AC-22 Service Fee Run", "WT-D.5"]
+      - title: Reconcile a bank account
+        ref: "FRS BRD-05, FR-AC-050, FR-AC-051"
+        steps:
+          - ["Open Bank Statements and upload the statement file of the bank account; BIBS imports the lines and matches them.", "SCR-AC-15 Bank Statements", "FR-AC-050"]
+          - ["Review the reconciliation, adjust the matches and finalise.", "SCR-AC-16 Bank Reconciliation", "FR-AC-050"]
+          - ["Run the unmatched reports for the bank account and date.", "SCR-AC-17 Report Centre", "FR-AC-051"]
+      - title: Reconcile an insurer's statement and correct a posting (ACSL)
+        ref: "FRS BRD-05, walkthrough WT-C"
+        steps:
+          - ["Click Upload SOA, choose the insurer, the period and the file, and click Upload and Reconcile; open the upload.", "SCR-AC-49 Insurer SOA Reconciliation; SCR-AC-50 Insurer SOA", "WT-C.1, C.2"]
+          - ["Team Lead: open a case for the variance and assign it.", "SCR-AC-45 ACSL Cases; SCR-AC-46 ACSL Case", "WT-C.3, C.4"]
+          - ["Click Start Investigation, record the findings and click Raise Correction; correct the wrong line and submit for review, endorsement and approval.", "SCR-AC-46; SCR-AC-48 Correction Entry", "WT-C.5-C.9"]
+    tips:
+      - "A voucher whose debit and credit differ is refused (WT-E.1)."
+      - "The same insurer statement uploaded again is refused (WT-E.3)."
+      - "Posting is done by a user other than the preparer."
+
+  - key: DISB
+    name: Disbursement Processor
+    file: Disbursement
+    brds: "BRD-05 Disbursement, BRD-02 Operations (remittance payments)"
+    users: "8 (BRD-05 p.133-137)"
+    summary: >-
+      You pay what BDOI owes: insurer remittances, client refunds, supplier and other payments. In BIBS you work the
+      payment requests on the Disbursement Workbench, prepare the disbursement vouchers, maintain the payees, encode the
+      requests received by e-mail and run the end of day of Disbursement; the approver approves and posts the vouchers.
+    home: "Disbursement Workbench: requests by status"
+    menus:
+      - "Finance > Disbursement: Disbursement Workbench, Payees, Disbursement Uploads, Disbursement End of Day, Account Funding, Bank Accounts and Checks, Disbursement Reports"
+      - "Operations > Operations: Disbursement Queue"
+    tasks:
+      - title: Pay a refund or a remittance
+        ref: "FRS BRD-05 WT-B steps 5-7; FRS BRD-02 WT-A step 8"
+        steps:
+          - ["Acknowledge the remittance payment request on the Disbursement Queue and assign the DV number.", "SCR-OP-36 Disbursement Queue", "BRD-02 WT-A.8"]
+          - ["Open For Approval on the Disbursement Workbench and open the voucher.", "SCR-AC-25 Disbursement Workbench; SCR-AC-27 Disbursement Voucher", "BRD-05 WT-B.5, B.6"]
+          - ["Approver: click Approve and Post and confirm.", "SCR-AC-27 Disbursement Voucher", "BRD-05 WT-B.7"]
+      - title: Encode a request received by e-mail
+        ref: "FRS BRD-05, FR-DS-023"
+        steps:
+          - ["Open Encode Payment Request, fill it, attach the e-mail and documents and save. The request and its voucher are In Process.", "SCR-AC-26 Encode Payment Request", "FR-DS-023"]
+      - title: Maintain a payee
+        ref: "FRS BRD-05, FR-DS-010"
+        steps:
+          - ["Team Lead: click New Payee, enter the details and the accounts, save the draft and submit it for authorisation.", "SCR-AC-28 Payees; SCR-AC-29 Payee", "FR-DS-010"]
+          - ["Approver: authorise the payee; it becomes Active and usable on vouchers.", "SCR-AC-29 Payee", "FR-DS-010"]
+      - title: Run the end of day
+        ref: "FRS BRD-05, FR-DS-060"
+        steps:
+          - ["Choose the business date and click Run End of Day; check the outputs and their counts.", "SCR-AC-31 Disbursement End of Day", "FR-DS-060"]
+    tips:
+      - "A payment request for a payee code that is not maintained is held without a payee (WT-E.4)."
+      - "A payee is never authorised by its maker; only Active payees are used on vouchers."
+
+  - key: RNW
+    name: Renewal Officer
+    file: Renewal_Officer
+    brds: "BRD-06 Renewal, BRD-13 Data Migration (go-live takeover)"
+    users: "123 Processing users of the Renewal processing team (BRD-06), shared with Processing"
+    summary: >-
+      You are in the Renewal processing team (Processing Team Leader or Processing Officer). In BIBS you generate the
+      expiring list, upload dispositioned files, assign the accounts to officers, work the processing list, extract the
+      accounts per insurer and apply the insurers' responses, generate and send the Renewal Advices, record the client's
+      acceptance and, at go-live, take over the January to May 2028 expiries.
+    home: "Renewal Home and the Processing Worklist"
+    menus:
+      - "Client & Policy > Renewal: Renewal Home, Expiry List, Processing Worklist, Insurer Batches, Letters, Renewal Setup (Team Leader)"
+      - "Client & Policy > Bulk Processing: Bulk Uploads"
+    tasks:
+      - title: Prepare the processing list
+        ref: "FRS BRD-06, FR-RN-011, FR-RN-060, FR-RN-061"
+        steps:
+          - ["On Expiry List, click Generate Expiry List, pick the dates and click Generate.", "Expiry List", "FR-RN-011"]
+          - ["On the Processing Worklist, click Upload Dispositioned File, select the files, check the valid and invalid counts and confirm.", "Processing Worklist", "FR-RN-060"]
+          - ["Team Leader: tick the accounts and click Assign PO (or Assign to Me), select the officer and push.", "Processing Worklist", "FR-RN-061"]
+      - title: Process an account and work with the insurer
+        ref: "FRS BRD-06, FR-RN-062, FR-RN-064, FR-RN-070, FR-RN-071"
+        steps:
+          - ["Open the account from the tab For Processing or In Processing; check the Computations tab and the financial-impact result.", "Processing Worklist; Renewal record page", "FR-RN-062, FR-RN-064"]
+          - ["On Insurer Batches, click New Batch, select the range and the insurer, check the list and click Send (or Download).", "Insurer Batches", "FR-RN-070"]
+          - ["Click Upload Response on the batch, select the insurer's file, check matched, mismatched and late rows and confirm.", "Insurer Batches", "FR-RN-071"]
+      - title: Send the Renewal Advice and record the acceptance
+        ref: "FRS BRD-06, FR-RN-080, FR-RN-081, FR-RN-084"
+        steps:
+          - ["Open Letters, tab RA Ready, select the accounts, click Generate RA and choose First or Second Notice; preview or download.", "Letters", "FR-RN-080"]
+          - ["On the tab RA Generated, select the RAs and click Send in Batch; follow the status Queued, Sent or Failed.", "Letters", "FR-RN-081"]
+          - ["On the account, click Record Acceptance, choose the method and attach the evidence. Payment, placement, issuance and booking follow.", "Renewal record page", "FR-RN-084"]
+      - title: Take over the expiries at go-live
+        ref: "FRS BRD-06, FR-RN-016, FR-RN-028"
+        steps:
+          - ["After the go-live extraction, work the candidates flagged Urgent first (January 2028 expiries).", "Expiry List", "FR-RN-016"]
+          - ["Upload the tracker of Renewal Advices already sent in legacy; those advices are not generated or sent again.", "Processing Worklist", "FR-RN-016"]
+          - ["For a migrated policy whose package is not mapped, choose the package version with a reason; a second processor approves.", "Renewal record page (Checks & Bucket)", "FR-RN-028"]
+    tips:
+      - "Renewal Advices leave BIBS only as protected files; the password is sent separately."
+      - "BIBS warns when an RA is generated less than 30 days before expiry; the second notice follows after 15 days without acceptance (default)."
+      - "A response received after the reply due date is marked late."
+
+  - key: CLM
+    name: Claims Officer
+    file: Claims_Officer
+    brds: "BRD-07 Claims"
+    users: "37: 28 head office, 9 branches (BRD-07)"
+    summary: >-
+      You follow the clients' claims with the insurers. In BIBS you look up the cover, record the claim with its
+      locations and insurers, send the loss advice, record the insurer claim numbers and updates, keep the action plan
+      and the diary, and change the status up to the closure; the Team Lead and Team Head settle, close and reopen.
+    home: "Claims Home: open claims by age and next follow-up"
+    menus:
+      - "Claims & Insurance > Claims Handling: Claims Home, Claims Worklist, Record Claim, Cover Lookup, My Diary, Insurer Location References, Claims Reports"
+    tasks:
+      - title: Record a claim
+        ref: "FRS BRD-07, FR-CM-010, FR-CM-011, FR-CM-020"
+        steps:
+          - ["Open Cover Lookup and search by ARN, policy number or assured name; open the cover and start Record Claim.", "Cover Lookup", "FR-CM-010"]
+          - ["Check the cover card (policy number, version, period, premium check, Marketing unit, officer and branch) and pick the insured locations with the damage per location.", "Record Claim", "FR-CM-011, FR-CM-020"]
+          - ["Enter the loss details and the reported date, confirm the insurers proposed from the invoice shares and save. BIBS gives the claim number and the next follow-up date.", "Record Claim", "FR-CM-011"]
+      - title: Work with the insurers
+        ref: "FRS BRD-07, FR-CM-016, FR-CM-021, FR-CM-022, FR-CM-024"
+        steps:
+          - ["Click Send Loss Advice, select the insurers, check the preview and confirm.", "Claim record", "FR-CM-024"]
+          - ["On Insurers & Updates, click Add Insurer Claim Number on the insurer line and enter the number and the date reported.", "Claim record (Insurers & Updates)", "FR-CM-021"]
+          - ["Click Record Insurer Update with the date, source, reference and remarks, and attach the insurer's document.", "Claim record (Insurers & Updates)", "FR-CM-022"]
+          - ["When the premium check is Paid, click Generate Authorization Code.", "Claim record", "FR-CM-016"]
+      - title: Follow up and close
+        ref: "FRS BRD-07, FR-CM-042, FR-CM-045, FR-CM-051, FR-CM-052, FR-CM-055"
+        steps:
+          - ["Open Claims Home, click a tile and work the filtered Claims Worklist (for example Follow-ups Due).", "Claims Home; Claims Worklist", "FR-CM-055"]
+          - ["Update the Next Action Plan Summary and add diary entries with a due date and assignee.", "Claim record (Details, Diary); My Diary", "FR-CM-051, FR-CM-052"]
+          - ["Click Change Status, select the status and write a remark; tag a temporary closure when the claim waits outside BDOI. The Team Lead closes permanently with the settlement.", "Claim record", "FR-CM-042, FR-CM-045"]
+    tips:
+      - "The authorization code is issued only when the premium check is Paid."
+      - "Insurer updates are never edited or deleted; a wrong diary entry is marked done with a remark."
+      - "The combination of claim, insurer and insurer claim number is unique."
+
+  - key: BADM
+    name: Business Administrator
+    file: Business_Administrator
+    brds: "BRD-03 Product Maintenance, BRD-04 Collections, BRD-06 Renewal, BRD-11 User Access Maintenance"
+    users: "6 (proposed)"
+    summary: >-
+      You maintain the business set-up of BIBS: lists of values, document templates, renewal rules, escalation rules,
+      clauses and insurer commission rates, and you raise group-profile requests for the roles of the business units.
+      Every change you make is authorised by a second user before it takes effect.
+    home: "My Approvals and My Work: set-up changes waiting for authorisation"
+    menus:
+      - "Setup & Administration > Broking Setup: Lists of Values, Data Retention, Document Templates, Outbound Messages"
+      - "Setup & Administration > User Access: Access Requests, Group Profile Requests, Bulk Request, User Access Matrix, Separation of Duties, User Access Reports"
+      - "Client & Policy > Product Maintenance: Coverages & Clauses, Insurers, Rates & Taxes, Sales Organisation, Validation Queue"
+      - "Client & Policy > Renewal: Renewal Setup; Finance > Collections: Escalation Rules, Collections Setup"
+    tasks:
+      - title: Authorise a clause and add an insurer commission rate
+        ref: "FRS BRD-03, walkthrough WT-A steps 2, 18 and 19"
+        steps:
+          - ["Open the Clause Library and click Authorize on the clause entered by MBS.", "SCR-PM-15 Coverages & Clauses", "BRD-03 WT-A.2"]
+          - ["Open Insurers and the insurer, click Add rate, choose the package and the rate from the effective date and click Save for Authorization; the New Business Approver authorises it.", "SCR-PM-18 Insurer record", "BRD-03 WT-A.18, A.19"]
+      - title: Request a new group profile
+        ref: "FRS BRD-11, walkthrough WT-B step 4"
+        steps:
+          - ["Open Group Profile Requests > New Group Profile Request, enter the code, the name and description, keep the level, tick the permissions and submit; the approvers approve in order and the System Administrator implements it.", "SCR-UA-12 New Group Profile Request", "BRD-11 WT-B.4"]
+      - title: Maintain lists of values, templates and renewal rules
+        ref: "FRS BRD-06, FR-RN-110, FR-RN-111, FR-RN-112"
+        steps:
+          - ["Open the list, add or edit a value with its effective dates and save; a checker authorises it.", "Lists of Values (Broking Setup)", "FR-RN-110"]
+          - ["Update the Renewal Advice and letter templates on Document Templates.", "Document Templates", "FR-RN-111"]
+          - ["Draft a new version of a rule set or matrix on Renewal Setup and submit it; a checker compares it with the active version and activates it.", "Renewal Setup", "FR-RN-112"]
+    tips:
+      - "Values are end-dated, never deleted; disposition codes are fixed and only their labels change."
+      - "Insurer-side permissions (underwriting, insurer claims, reinsurance, reserves) are not offered to BDOI group profiles (BRD-11 WT-D.5)."
+
+  - key: SYSADM
+    name: System and Security Administrator
+    file: System_Security_Administrator
+    brds: "BRD-11 User Access Maintenance, BRD-00 (administration)"
+    users: "6 (proposed)"
+    summary: >-
+      You run access and the technical settings of BIBS (System Administrator) or own the security settings
+      (Information Security Officer). In BIBS you implement approved group-profile changes, unlock and review users,
+      maintain the sign-in, password and access parameters, watch the separation-of-duties rules and the scheduled
+      jobs.
+    home: "Dashboard, Alerts and My Approvals: requests to implement, locked users, failed jobs"
+    menus:
+      - "Setup & Administration > Administration: Users, Roles & Permissions, Second Factor, Audit Trail, System Parameters, Exception Codes, Scheduled Jobs"
+      - "Setup & Administration > User Access: Access Requests, Group Profile Requests, User Access Matrix, Separation of Duties, User Access Reports"
+    tasks:
+      - title: Implement an approved group-profile change
+        ref: "FRS BRD-11, walkthrough WT-B step 7"
+        steps:
+          - ["Open Roles & Permissions, find the request under Approved Requests to Implement, click Implement Request and confirm.", "SCR-UA-16 Roles & Permissions", "WT-B.7"]
+      - title: Unlock a user and review disabled users
+        ref: "FRS BRD-11, walkthroughs WT-C step 9 and WT-B step 10"
+        steps:
+          - ["Open Users with the status Locked and click Unlock on the user.", "SCR-UA-15 Users", "WT-C.9"]
+          - ["Open Users with the status Disabled to check the deactivations applied from approved requests.", "SCR-UA-15 Users", "WT-B.10"]
+      - title: Maintain the security parameters (Information Security)
+        ref: "FRS BRD-11, screens SCR-UA-18 and SCR-UA-19"
+        steps:
+          - ["Open System Parameters (sign-in, password and access settings) and change a value; the change is recorded in the audit trail.", "SCR-UA-18 System Parameters", "FRS BRD-11 SCR-UA-18"]
+          - ["Open Separation of Duties to review the conflicting profile pairs.", "SCR-UA-19 Separation of Duties", "FRS BRD-11 SCR-UA-19"]
+    tips:
+      - "You cannot implement a group-profile request that you raised yourself (WT-C.7)."
+      - "A locked or deactivated user sees \"Invalid user name or password\"; the lock shows to you on Users."
+      - "Group profiles and permissions change only through an approved request."
+
+  - key: AUD
+    name: Auditor
+    file: Auditor
+    brds: "BRD-11 User Access Maintenance; read access across BIBS"
+    users: "10 (proposed)"
+    summary: >-
+      You review BIBS without changing it. In BIBS you have read access to the records and reports of every module, run
+      the user access reports and audit logs, check the user access matrix and read the history tab of each record.
+    home: "Dashboard and Report Centre"
+    menus:
+      - "Every business menu in read-only mode; Reports > Report Centre"
+      - "Setup & Administration > User Access: User Access Matrix, User Access Reports; Administration: Audit Trail"
+    tasks:
+      - title: Review sign-ins and access changes
+        ref: "FRS BRD-11, walkthroughs WT-A step 8 and WT-D step 4"
+        steps:
+          - ["Open User Access Reports > User Access Audit Log for the period, tick Include Log-ins and Log-outs and click Run Report.", "SCR-UA-17 User access report", "WT-A.8"]
+          - ["Run the User Access Audit Log from the installation date with the activity Group Profile Changes.", "SCR-UA-17 User access report", "WT-D.4"]
+      - title: Check who may do what
+        ref: "FRS BRD-11, walkthrough WT-D steps 1-3"
+        steps:
+          - ["Open User Access Matrix, view By Action and search the action.", "SCR-UA-13 User Access Matrix", "WT-D.1"]
+          - ["Run the User Group Profile Report for a profile and Group Profile Membership as of a date.", "SCR-UA-17 User access report", "WT-D.2, D.3"]
+      - title: Trace a transaction
+        ref: "FRS of each BRD, History tabs"
+        steps:
+          - ["Open the record (for example a quotation, account, receipt or claim) and its History tab: every action with the user's name, date and remarks.", "Record pages of each module", "FR-CR audit requirements"]
+    tips:
+      - "Your role is read-only: action buttons are not shown to you."
+      - "Reports run on screen and export as the report allows; the user's role shows under the name in workflow history for users with audit rights."

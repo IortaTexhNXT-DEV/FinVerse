@@ -1,0 +1,18 @@
+/* Production Reconciliation screens. Colours and spacing come from the design tokens. */
+
+.prc-diff th[scope='row'] {
+  width: 32%;
+  font-weight: 600;
+}
+
+.prc-diff-row td,
+.prc-diff-row th {
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
+}
+
+.prc-counts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--space-3);
+}

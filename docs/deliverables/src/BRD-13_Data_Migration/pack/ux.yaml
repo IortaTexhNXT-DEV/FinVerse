@@ -1,0 +1,155 @@
+# UX screen documents of the BRD-13 Data Migration set for the BDOI UX Design team: 07 UX Screen Deck, 08 UX screen
+# register, 09 image package (docs/deliverables/src/signoff/build_ux_deck.py). The screens, fields, actions and
+# images come from the pack; this file holds what only the UX documents need: who each persona is, the images
+# taken for the deck only (more states of a screen, the landing page and menu of each persona), the end-to-end flows
+# (this set has no walkthrough captures: each step shows an image of the screen specifications), the changes of the
+# issue, and the points for the UX Design team to confirm.
+
+issue:
+  version: "2.1"
+  date: 8 October 2026
+  changes:
+    - ref: CHG-DM-2.1-01
+      what: >-
+        Re-based on the Data Migration BRD V0.03: the DP PR Legacy Reversal is requested by a Cashiering or Support
+        Team user and approved by the Cashiering team lead, the Legacy PR 2307 Reversal is requested by a Collections
+        user and approved by the Collections team lead (for BDOI confirmation, CLR-DM-16). The screens are unchanged;
+        the menu entry and the persona of the slides follow the role once confirmed
+      screens: [SCR-DM-19, SCR-DM-20]
+
+# Who each persona is (the what they do comes from the persona table of the handbook unless given here).
+navigation:
+  # Identical menus are kept once: the migration roles of the same menu, and the Marketing Account Officer of BRD-3.
+  shared:
+    ux-nav-03-menu: BRD-13:ux-nav-01-menu
+    ux-nav-05-menu: BRD-13:ux-nav-01-menu
+    ux-nav-06-menu: BRD-13:ux-nav-01-menu
+    ux-nav-15-menu: BRD-03:ux-nav-01-menu
+
+personas:
+  DATA_MIGRATION_LEAD: {who: "The BDOI lead of the migration, from the Business Project Services programme office"}
+  DATA_STEWARD: {who: "A data specialist of the business unit that owns the legacy data (Operations, Marketing, Comptrollership)"}
+  DATA_OWNER: {who: "The head of the business unit accountable for a data object"}
+  MIGRATION_OPERATOR: {who: "A member of the migration team who runs the files and batches"}
+  MIGRATION_RECON_APPROVER: {who: "The Head of Comptrollership, or the owner named for a non-financial object"}
+  MIGRATION_GONOGO: {who: "A member of the go / no-go board of the cut-over"}
+  COMPTROLLERSHIP: {who: "The GL lead of Comptrollership who prepares the year-end adjustments"}
+  LEGACY_INQUIRY: {who: "An Audit or Compliance officer who needs the closed legacy records"}
+  LEGACY_ACCESS_REVIEWER: {who: "A Compliance officer who reviews who opened the legacy archive and why"}
+  CASHIER: {who: "A Cashiering officer of Operations"}
+  CASHIER_TL:
+    who: "The team lead of Cashiering"
+    does: "Approves or returns the Unapplied to Income and Legacy PR 2307 Reversal batches of the Cashiering users (first approval)"
+  TOP_MANAGEMENT_APPROVER:
+    who: "A member of top management named for the reclassification of unapplied payments to income"
+    does: "Gives the second approval of an Unapplied to Income batch, or returns it with the reason"
+  COMMREC_HANDLER:
+    who: "A Commission officer of Operations"
+    does: "Requests the DP PR Legacy Reversal batches in the screens of this set; BRD V0.03 gives them to a Cashiering or Support Team user (CLR-DM-16)"
+  COMMREC_TL:
+    who: "The team lead of Commission"
+    does: "Approves or returns the DP PR Legacy Reversal batches of the Commission users"
+  MKT_AO:
+    who: "A Marketing account officer who serves the clients"
+    does: "Finds the migrated clients, policies and invoices on the usual screens, marked LEGACY, and works them like BIBS records"
+
+# The end-to-end flows of the set, shown with the images of the screen specifications.
+flows:
+  - id: UF-A
+    title: A data object from its decision to its acceptance
+    summary: >-
+      The Data Migration Lead proposes the class of an object and its business owner decides it; the Data Steward
+      maps the legacy codes and the owner signs the mapping; the operator receives the extract, plans and validates
+      a batch; the steward reviews the doubtful client pairs; the owner waives the rows that may load; the batch is
+      loaded and reconciled, the breaks explained, and the owner and the lead accept the object.
+    data: Object C01 (clients) of the seed data, its code maps, extracts and batches
+    steps:
+      - {role: DATA_MIGRATION_LEAD, screen: SCR-DM-02, image: scr-dm-02-01-list, does: "Opens Data Objects, finds the object and submits the proposed class for decision", system: "Shows the decision as For decision and notifies the business owner", sees: "The object in the register with its class and status"}
+      - {role: DATA_OWNER, screen: SCR-DM-02, image: scr-dm-02-02-object, does: "Opens the object, reads the four criteria and the rationale and clicks Approve", system: "Decides the class (gate G1) and keeps the decision in the history", sees: "Toast: the decision is approved; the history lists the decision with the name of the owner"}
+      - {role: DATA_STEWARD, screen: SCR-DM-03, image: scr-dm-03-03-entry, does: "Opens the code map, creates a draft version and adds the legacy codes with their BIBS values", system: "Keeps the draft; Submit sends it to the owner after a confirmation", sees: "The Add Entry dialog with the legacy code, the action and the BIBS value"}
+      - {role: DATA_STEWARD, screen: SCR-DM-03, image: scr-dm-03-04-unmapped, does: "Opens Unmapped Codes to see the legacy codes of the extracts that have no entry yet", system: "Lists each unmapped code with the extract and the count of rows", sees: "The unmapped codes to add before the validation"}
+      - {role: DATA_OWNER, screen: SCR-DM-10, image: scr-dm-10-01-matrix, does: "Approves the code map version and signs the mapping of the object", system: "Signs gate G2: the layouts are frozen and every code map is approved", sees: "The gate matrix with the signer and date of G1 and G2"}
+      - {role: MIGRATION_OPERATOR, screen: SCR-DM-05, image: scr-dm-05-01-list, does: "Uploads the extract with its control file and clicks Upload and Check", system: "Runs the intake checks (name, checksum, header, row count, totals) and stages the file", sees: "The extract listed as Staged with its rows and the masking applied"}
+      - {role: MIGRATION_OPERATOR, screen: SCR-DM-05, image: scr-dm-05-02-rejected, does: "Uploads a file whose control file announces more rows than the file holds", system: "Rejects the file as a whole with the reason", sees: "The error notice with the reason of the rejection; the extract listed as Rejected"}
+      - {role: MIGRATION_OPERATOR, screen: SCR-DM-06, image: scr-dm-06-02-plan, does: "Clicks Plan Batch, chooses the object and the staged extracts", system: "Plans the batch and opens it", sees: "The Plan Batch dialog with the staged extracts of the object"}
+      - {role: MIGRATION_OPERATOR, screen: SCR-DM-07, image: scr-dm-07-01-validated, does: "Clicks Validate on the planned batch", system: "Maps the rows with the approved code maps and checks them against the data-quality rules", sees: "The batch Validated with its counts, error rate and the Issues tab"}
+      - {role: DATA_STEWARD, screen: SCR-DM-08, image: scr-dm-08-02-pair, does: "Opens the doubtful client pair and merges it or keeps the clients separate", system: "Records the decision; the load waits until the queue is empty", sees: "The two records side by side with the matched keys marked"}
+      - {role: DATA_OWNER, screen: SCR-DM-07, image: scr-dm-07-03-waive, does: "Selects failing rows on the Rows tab and clicks Waive Rows with the reason", system: "Loads the rows despite their errors, with the waiver kept on the batch", sees: "The Waive Rows dialog with the count of rows and the mandatory reason"}
+      - {role: MIGRATION_RECON_APPROVER, screen: SCR-DM-09, image: scr-dm-09-01-list, does: "After the load, opens the reconciliation of the batch by level", system: "Compares counts, amounts, hash totals, fields and the general ledger between the source and BIBS", sees: "The lines by level with the breaks to explain"}
+      - {role: DATA_STEWARD, screen: SCR-DM-09, image: scr-dm-09-02-explain, does: "Explains a break with its reason", system: "Marks the line Explained for the approver", sees: "The Explain Break dialog with the reason and the explanation"}
+      - {role: DATA_MIGRATION_LEAD, screen: SCR-DM-07, image: scr-dm-07-04-signoffs, does: "After the reconciliation is signed, accepts the object as Migration Lead, after the owner", system: "Signs gate G6; with both acceptances the object is accepted", sees: "The Sign-offs tab with every gate, its signer and date"}
+  - id: UF-B
+    title: The cut-over from the mock run to the go / no-go decision and the run-off
+    summary: >-
+      The Data Migration Lead plans a mock run from the go-live date and follows its runbook; the go / no-go board
+      measures the criteria and decides; after go-live Comptrollership brings the FY2027 closing adjustments as
+      opening-balance adjustments, and the lead follows the run-off of the legacy policies and the
+      decommissioning checklists.
+    data: The mock run plan of the seed data
+    steps:
+      - {role: DATA_MIGRATION_LEAD, screen: SCR-DM-12, image: scr-dm-12-03-new, does: "Clicks New Plan, chooses the kind of run and the go-live date", system: "Creates the plan with its runbook tasks and the twelve criteria planned from the go-live date", sees: "The New Cutover Plan dialog"}
+      - {role: DATA_MIGRATION_LEAD, screen: SCR-DM-12, image: scr-dm-12-01-plans, does: "Records the start and end of each runbook task, or blocks a task with its reason", system: "Keeps the actual times and the owner of each task", sees: "The plans and the runbook of the mock run"}
+      - {role: MIGRATION_GONOGO, screen: SCR-DM-12, image: scr-dm-12-02-criteria, does: "Clicks Measure Criteria, reads the criteria and records GO or NO-GO", system: "Measures the criteria that BIBS measures; a GO with a criterion not met needs its justification", sees: "The Go / No-Go Criteria and the Decisions of the plan"}
+      - {role: COMPTROLLERSHIP, screen: SCR-DM-11, image: scr-dm-11-02-prepare, does: "After go-live, prepares an opening-balance adjustment on the validated adjustment batch", system: "Prepares the adjustment and sends it to the Head of Comptrollership on Submit", sees: "The Prepare Adjustment dialog with the batches of the same version"}
+      - {role: MIGRATION_RECON_APPROVER, screen: SCR-DM-11, image: scr-dm-11-01-list, does: "Approves the adjustment prepared by the GL lead, then signs it once reconciled", system: "Allows the load of the adjustment journals into the opening balances", sees: "The adjustments with their batches and status"}
+      - {role: DATA_MIGRATION_LEAD, screen: SCR-DM-13, image: scr-dm-13-01-view, does: "Opens Run-off and Decommissioning each month and records the checklist of a legacy system", system: "Shows the run-off by expiry month and source system and keeps the signed criteria", sees: "The run-off and the decommissioning checklists"}
+  - id: UF-C
+    title: Migrated records on the business screens and the legacy batches
+    summary: >-
+      The business users find the migrated records on their usual screens, marked LEGACY; Cashiering and
+      Commission settle the legacy items through their batches, each approved by a second user.
+    data: The migrated clients, invoices and unapplied payments of the seed data
+    steps:
+      - {role: MKT_AO, screen: SCR-DM-16, image: scr-dm-16-01-clients, does: "Searches the clients list for a migrated client", system: "Lists the client with the LEGACY badge and the legacy reference in its tooltip", sees: "The Clients list with the LEGACY badge"}
+      - {role: CASHIER, screen: SCR-DM-16, image: scr-dm-16-02-unapplied, does: "Sets the Origin filter of Unapplied Payments to Migrated", system: "Lists only the migrated unapplied payments", sees: "The Origin filter set to Migrated"}
+      - {role: CASHIER, screen: SCR-DM-17, image: scr-dm-17-01-legacy, does: "Opens a legacy invoice from Invoice Search", system: "Shows Invoice 360 with the LEGACY badge and the Legacy Invoice card with the values at cut-over", sees: "The Legacy Invoice card"}
+      - {role: CASHIER, screen: SCR-DM-18, image: scr-dm-18-02-draft, does: "Opens a draft Unapplied to Income batch, adds old unapplied payments and clicks Submit", system: "Sends the batch to the Cashiering team lead", sees: "The draft batch with its lines and the payments that may be added"}
+      - {role: TOP_MANAGEMENT_APPROVER, screen: SCR-DM-18, image: scr-dm-18-03-approve, does: "After the team lead, approves the batch", system: "Posts each line on its own and closes the payments", sees: "The batch waiting for top management with Approve and Return"}
+      - {role: CASHIER, screen: SCR-DM-19, image: scr-dm-19-01-draft, does: "Adds a legacy invoice with the PR 2307 amount to reverse and submits the batch", system: "Sends the batch to the team lead, who posts each line", sees: "The draft PR 2307 reversal batch"}
+      - {role: COMMREC_HANDLER, screen: SCR-DM-20, image: scr-dm-20-01-draft, does: "Adds the legacy invoices tagged DP PR for reversal and submits the batch", system: "Sends the batch to the Commission team lead, who posts each invoice", sees: "The draft DP PR reversal batch"}
+  - id: UF-D
+    title: A legacy archive inquiry and its review
+    summary: >-
+      An Audit or Compliance user gives the reason of the inquiry once per session, searches and opens the closed
+      legacy records read-only; every access is logged with the reason and reviewed by Compliance.
+    data: The legacy archive records of the seed data
+    steps:
+      - {role: LEGACY_INQUIRY, screen: SCR-DM-14, image: scr-dm-14-01-reason, does: "Opens Legacy Inquiry and gives the reason of the inquiry", system: "Keeps the reason for the session", sees: "The Reason of the Inquiry card"}
+      - {role: LEGACY_INQUIRY, screen: SCR-DM-14, image: scr-dm-14-02-results, does: "Searches the closed invoices", system: "Lists the matching records and logs the search", sees: "The search criteria and the records found"}
+      - {role: LEGACY_INQUIRY, screen: SCR-DM-14, image: scr-dm-14-03-record, does: "Opens a record and downloads a document", system: "Shows the record read-only and logs the view and the download", sees: "The legacy record with its legacy details and documents"}
+      - {role: LEGACY_ACCESS_REVIEWER, screen: SCR-DM-15, image: scr-dm-15-01-log, does: "Opens the Access Log and filters it by user and date", system: "Shows every access with the user, time, action, criteria and reason", sees: "The access log, which cannot be changed"}
+
+# The UX state of an image when its name does not say it.
+classify:
+  scr-dm-01-01-view: default
+  scr-dm-02-02-object: pending-approval
+  scr-dm-03-02-set: default
+  scr-dm-03-03-entry: filled
+  scr-dm-04-02-columns: default
+  scr-dm-05-02-rejected: validation-error
+  scr-dm-06-02-plan: filled
+  scr-dm-06-03-resubmissions: pending-approval
+  scr-dm-07-01-validated: default
+  scr-dm-07-03-waive: confirmation
+  scr-dm-07-04-signoffs: read-only
+  scr-dm-07-05-log: read-only
+  scr-dm-08-01-queue: pending-approval
+  scr-dm-09-02-explain: confirmation
+  scr-dm-10-01-matrix: read-only
+  scr-dm-11-02-prepare: filled
+  scr-dm-12-02-criteria: pending-approval
+  scr-dm-12-03-new: default
+  scr-dm-14-01-reason: default
+  scr-dm-14-03-record: read-only
+  scr-dm-15-01-log: read-only
+  scr-dm-17-01-legacy: read-only
+  scr-dm-18-03-approve: pending-approval
+
+# Images taken for the deck only: states the screen specifications do not show.
+states:
+  - {screen: SCR-DM-14, state: no-results, user: legacyaudit, ux: empty, nocallouts: true, caption: "A search that finds no legacy record"}
+
+# Points for the UX Design team to confirm with BDOI.
+confirm:
+  clarifications: [PR-DM-04, PR-DM-06, PR-DM-09, PR-DM-10, CLR-DM-12, CLR-DM-16]
+  findings: []

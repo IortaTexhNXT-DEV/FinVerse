@@ -1,0 +1,45 @@
+spring:
+  flyway:
+    locations: classpath:db/migration,classpath:db/seed,classpath:db/testdata
+management:
+  health:
+    redis:
+      enabled: false
+brokerverse:
+  # The flows of the Enterprise SSO platform run against its simulator in the tests.
+  identity:
+    simulator: true
+  # The product master changes are delivered to the simulated receiving system in the tests.
+  product-master:
+    simulator: true
+  security:
+    jwt-secret: test-secret-for-automated-tests-0123456789abcdef
+    mfa:
+      # Test key of the authenticator secrets (32 random bytes, Base64); never used elsewhere.
+      encryption-key: 1WTVN7hPMSpwjq805JP6+pTepzMSTL2k9AE0QCTcV4A=
+    login-protection:
+      # MockMvc logs in many times from one address; the limiter has its own tests.
+      max-attempts-per-window: 100000
+      reset-max-per-address: 100000
+  migration:
+    masking-key: test-masking-key-for-automated-tests-0123456789
+  # Test key of the configuration packages; never used elsewhere.
+  config-promotion:
+    signing-key: test-config-promotion-signing-key-0123456789abcdef
+  # No Valkey or Kafka in the test profile: in-memory cache, database fallbacks, events LOCAL.
+  redis:
+    enabled: false
+  kafka:
+    enabled: false
+  # Local file store under the build folder (document storage, ST0).
+  storage:
+    provider: local
+    local:
+      root: target/storage-files
+      link-secret: test-link-secret-for-local-file-links
+    # Module downloads answer with the presigned link (the target of ST1); stream is unit tested.
+    downloads:
+      mode: redirect
+logging:
+  level:
+    root: WARN

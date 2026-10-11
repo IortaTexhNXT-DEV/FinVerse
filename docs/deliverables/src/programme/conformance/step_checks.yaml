@@ -1,0 +1,174 @@
+# Screen checks of the walkthrough steps that no sign-off pack recipe performs (BRD-00 journeys, BRD-07 to BRD-10,
+# BRD-12 and BRD-13). For each step of the walkthrough script (UAT users workbook): the screens the persona opens
+# (path; a record page is opened from its list), the tabs, buttons or texts the step needs on them, and for a
+# BRD-00 journey the walkthroughs of the BRDs it is made of (their result counts for the journey).
+# blocked: the step cannot be performed on the platform for the reason given (outside the release, external party).
+# Read by run_steps.cjs and build_conformance.py.
+
+BRD-00:
+  J1.1: {refs: [BRD-11/WT-A], checks: [[/user-access/requests, null, [New Request]]]}
+  J1.2: {refs: [BRD-03/WT-A], checks: [[/product-maintenance/tsu, null, []]]}
+  J1.3: {checks: [[/broking-setup/lists, null, []], [/catalog/insurers/:id, /catalog/insurers, [Profile, Branches, Commission rates]]]}
+  J2.1: {refs: [BRD-01/WT-A.1-4], checks: [[/crm/clients/new, null, [Save as Prospect]], [/screening, null, []]]}
+  J2.2: {refs: [BRD-01/WT-A.5-8], checks: [[/quotations, null, []]]}
+  J2.3: {refs: [BRD-01/WT-B], checks: [[/proposals/tsu, null, []]]}
+  J2.4: {refs: [BRD-01/WT-A.9-10], checks: [[/accounts, null, []], [/submitted/masterlist, null, []]]}
+  J2.5: {refs: [BRD-01/WT-A.11-17], checks: [[/placement, null, []], [/booking, null, []]]}
+  J2.6: {refs: [BRD-01/WT-C], checks: [[/accounts, null, [Returned to Me]]]}
+  J3.1: {refs: [BRD-04/WT-A, BRD-04/WT-B, BRD-04/WT-C, BRD-04/WT-D, BRD-04/WT-E], checks: [[/collections, null, []]]}
+  J3.2: {refs: [BRD-02/WT-A], checks: [[/cashiering, null, []], [/remittance, null, []]]}
+  J3.3: {refs: [BRD-02/WT-B], checks: [[/adjustment, null, []]]}
+  J3.4: {refs: [BRD-02/WT-C], checks: [[/prodrecon, null, []], [/commission, null, []]]}
+  J3.5: {refs: [BRD-05/WT-A, BRD-05/WT-B, BRD-05/WT-C, BRD-05/WT-D, BRD-05/WT-E], checks: [[/gl/inquiry, null, []], [/acsl, null, []]]}
+  J4.1: {refs: [BRD-06/WT-A, BRD-06/WT-B, BRD-06/WT-C], checks: [[/renewal/processing, null, []]]}
+  J4.2: {refs: [BRD-07/P1, BRD-07/P2, BRD-07/P3, BRD-07/P4], checks: [[/claims-handling, null, []]]}
+  J4.3: {refs: [BRD-09/P1, BRD-09/P2], checks: [[/csf, null, []]]}
+  J4.4: {refs: [BRD-08/P1, BRD-08/P2, BRD-08/P3, BRD-08/P4, BRD-08/P5], checks: [[/eb, null, []]]}
+  J4.5: {refs: [BRD-10/P2, BRD-10/P3, BRD-10/P4], checks: [[/screening/cases, null, []]]}
+  J5.1: {checks: [[/, null, []], [/notifications, null, []], [/admin/audit, null, []]], user: admin}
+  J5.2: {checks: [[/reports, null, []], [/reports/:code, /reports, [Run Report]]]}
+
+BRD-07:
+  P1.1: {checks: [[/claims-handling/covers, null, []]]}
+  P1.2: {checks: [[/claims-handling/new, null, []]]}
+  P1.3: {checks: [[/claims-handling/:id, /claims-handling/worklist, [Premium]]]}
+  P1.4: {checks: [[/claims-handling/:id, /claims-handling/worklist, [Send Loss Advice]]]}
+  P1.5: {checks: [[/claims-handling/:id, /claims-handling/worklist, [Insurers]]]}
+  P2.1: {checks: [[/claims-handling/:id, /claims-handling/worklist, [Details, Reserve]]]}
+  P2.2: {checks: [[/claims-handling/:id, /claims-handling/worklist, [Change Status]]]}
+  P2.3: {checks: [[/claims-handling/:id, /claims-handling/worklist, [Diary]], [/claims-handling/diary, null, []]]}
+  P2.4: {checks: [[/claims-handling/:id, /claims-handling/worklist, []], [/remittance, null, []]], user: clmtl}
+  P3.1: {checks: [[/claims-handling/:id, /claims-handling/worklist, [Settlement]]]}
+  P3.2: {checks: [[/claims-handling/:id, /claims-handling/worklist, [Close]]]}
+  P3.3: {checks: [[/claims-handling/:id, /claims-handling/worklist, []]]}
+  P4.1: {checks: [[/claims-handling, null, []], [/reports/BCL-PENDING-ACTIONS, null, [Run Report]]]}
+  P4.2: {checks: [[/reports/BCL-AGEING, null, [Run Report]], [/reports/BCL-OUTSTANDING, null, [Run Report]], [/reports/BCL-SETTLED, null, [Run Report]], [/reports/BCL-LOSS-EXPERIENCE, null, [Run Report]], [/reports/BCL-LOSS-RATIO, null, [Run Report]]]}
+  P4.3: {checks: [[/reports/BCL-PRONE-LOCATIONS, null, [Run Report]], [/reports/BCL-DATA-EXTRACT, null, [Run Report]]]}
+  P4.4: {checks: [[/reports/BCL-LOSS-EXPERIENCE, null, [Run Report]], [/accounts/:id, /accounts, []]]}
+  P4.5: {checks: [[/reports/BCL-INSURER-CLAIMS, null, [Run Report]], [/reports/BCL-ACTIVITY-LOG, null, [Run Report]]]}
+
+BRD-08:
+  P1.1: {checks: [[/crm/clients, null, []], [/eb/programmes/new, null, []], [/eb/programmes, null, []]]}
+  P1.2: {blocked: "The insurer and client portal is outside Drop 2 (Employee Benefits without the portal feature)"}
+  P1.3: {blocked: "The insurer and client portal is outside Drop 2 (Employee Benefits without the portal feature)"}
+  P1.4: {blocked: "The insurer and client portal is outside Drop 2 (Employee Benefits without the portal feature)"}
+  P2.1: {checks: [[/eb/programmes/:id, /eb/programmes, [Documents]]]}
+  P2.2: {checks: [[/eb/programmes/:id, /eb/programmes, [Franchise]]]}
+  P2.3: {checks: [[/eb/programmes/:id, /eb/programmes, [TOR]]]}
+  P3.1: {blocked: "The insurer submits its proposal through the portal, outside Drop 2; the officer keys the proposal in BIBS instead"}
+  P3.2: {checks: [[/eb/programmes/:id, /eb/programmes, [Comparative]]]}
+  P3.3: {blocked: "The client confirms the comparative through the portal, outside Drop 2; the confirmation is recorded by the officer"}
+  P3.4: {checks: [[/eb/programmes/:id, /eb/programmes, []]]}
+  P4.1: {checks: [[/my-work, null, []]]}
+  P4.2: {checks: [[/accounts/:id, /accounts, []], [/booking, null, []]]}
+  P4.3: {checks: [[/eb/soa, null, []]]}
+  P4.4: {checks: [[/eb/member-changes, null, []]]}
+  P5.1: {checks: [[/reports/EB-NEW-BUSINESS, null, [Run Report]], [/reports/EB-PLACEMENT, null, [Run Report]], [/eb, null, []]]}
+  P5.2: {checks: [[/eb/pending-items, null, []]]}
+
+BRD-09:
+  P1.1: {checks: [[/, null, []]]}
+  P1.2: {checks: [[/csf, null, []]]}
+  P1.3: {checks: [[/csf/clients/:clientId, "/csf?q=Santos", [Accounts]]]}
+  P1.4: {checks: [[/csf/clients/:clientId, "/csf?q=Santos", [Payments]]]}
+  P1.5: {checks: [[/csf/clients/:clientId, "/csf?q=Santos", [Update Contact]]]}
+  P1.6: {checks: [[/csf/clients/:clientId, "/csf?q=Santos", [Update Contact]]]}
+  P1.7: {checks: [[/csf/clients/:clientId, "/csf?q=Santos", [Renewal Advice]]]}
+  P1.8: {checks: [[/csf/clients/:clientId, "/csf?q=Santos", [Renewal Advice]]]}
+  P1.9: {checks: [[/csf/clients/:clientId, "/csf?q=Santos", [E-policies]]]}
+  P1.10: {checks: [[/csf/clients/:clientId, "/csf?q=Santos", [Documents]]]}
+  P1.11: {checks: [[/csf/changes, null, []], [/csf/reports, null, []], [/admin/audit, null, []]]}
+  P2.1: {checks: [[/csf/clients/:clientId, "/csf?q=Santos", [Log Case]]], gap: CSF-CASES}
+  P2.2: {checks: [[/csf/clients/:clientId, "/csf?q=Santos", [Log Case]]], gap: CSF-CASES}
+  P2.3: {gap: CSF-CASES}
+  P2.4: {gap: CSF-CASES}
+  P2.5: {gap: CSF-CASES}
+  P2.6: {gap: CSF-CASES}
+  P2.7: {gap: CSF-CASES}
+  P2.8: {gap: CSF-CASES}
+  P2.9: {gap: CSF-CASES}
+  P2.10: {gap: CSF-CASES}
+  P2.11: {gap: CSF-CASES}
+  P2.12: {gap: CSF-CASES}
+
+BRD-10:
+  P1.1: {checks: [[/screening-setup/config, null, []], [/screening-setup/templates, null, []]]}
+  P1.2: {checks: [[/approvals, null, []]]}
+  P1.3: {checks: [[/screening-setup/sources, null, []]]}
+  P1.4: {checks: [[/screening-setup/watchlist, null, []], [/approvals, null, []]]}
+  P2.1: {checks: [[/screening, null, []], [/screening/runs, null, []]]}
+  P2.2: {checks: [[/screening/matches, null, []]]}
+  P2.3: {checks: [[/screening/cases, null, []], [/notifications, null, []]]}
+  P3.1: {checks: [[/screening/cases/:id, /screening/cases, [Documents]]]}
+  P3.2: {checks: [[/screening/cases/:id, /screening/cases, []]]}
+  P3.3: {checks: [[/screening/cases, null, []], [/screening/cases/:id, /screening/cases, []]]}
+  P3.4: {checks: [[/screening/cases, null, []]]}
+  P3.5: {checks: [[/screening/cases, null, []], [/screening/cases/:id, /screening/cases, []]]}
+  P3.6: {checks: [[/screening, null, []], [/screening/cases/:id, /screening/cases, []]]}
+  P4.1: {checks: [[/screening/cases/:id, /screening/cases, []]]}
+  P4.2: {checks: [[/screening/str, null, []]]}
+  P5.1: {checks: [[/reports/SCR-CASE-STATUS, null, [Run Report]], [/reports/SCR-HIGH-RISK-CLIENTS, null, [Run Report]], [/reports/SCR-SLA-BREACHES, null, [Run Report]]]}
+  P5.2: {checks: [[/screening/cases/:id, /screening/cases, []], [/reports/SCR-AUDIT-LOG, null, [Run Report]]]}
+
+BRD-12:
+  P1.1: {checks: [[/submitted/intake, null, []]]}
+  P1.2: {checks: [[/submitted/masterlist, null, [New Policy]], [/submitted/policies/:id, /submitted/masterlist, []]], gap: SBM-MANUAL}
+  P1.3: {checks: [[/submitted/intake, null, [Migration]], [/reports/SBM-MIGRATION-ERRORS, null, [Run Report]]]}
+  P1.4: {checks: [[/submitted/intake, null, [Upload Loan File]]]}
+  P1.5: {checks: [[/submitted/runs, null, []]]}
+  P1.6: {checks: [[/submitted/masterlist, null, [Fallout]], [/reports/SBM-PROCESS-FALLOUT, null, [Run Report]]]}
+  P1.7: {checks: [[/submitted/setup, null, []], [/approvals, null, []]]}
+  P2.1: {checks: [[/submitted/reviews, null, []]]}
+  P2.2: {checks: [[/approvals, null, []], [/submitted/reviews, null, []]]}
+  P2.3: {checks: [[/submitted/policies/:id, /submitted/masterlist, []], [/submitted/tors, null, []]]}
+  P2.4: {checks: [[/approvals, null, []], [/submitted/tors, null, []]]}
+  P3.1: {checks: [[/submitted/renewals, null, []]]}
+  P3.2: {checks: [[/submitted/proposals, null, []]]}
+  P3.3: {checks: [[/submitted/proposals, null, []]]}
+  P3.4: {checks: [[/submitted/renewals, null, []]]}
+  P3.5: {checks: [[/submitted/renewals, null, []]]}
+  P3.6: {checks: [[/placement, null, []], [/booking, null, []]]}
+  P4.1: {checks: [[/submitted/fees, null, []], [/cashiering/unapplied, null, []]]}
+  P4.2: {checks: [[/reports/SBM-SANITATION, null, [Run Report]], [/reports/SBM-DISPOSITION, null, [Run Report]], [/reports/SBM-CONVERSION, null, [Run Report]]]}
+  P4.3: {checks: [[/reports/SBM-EXPIRING-UNINSURED, null, [Run Report]]]}
+  P4.4: {checks: [[/submitted/setup, null, [Notification Recipients]]], gap: SBM-RECIPIENTS}
+  P4.5: {checks: [[/submitted/masterlist, null, []], [/submitted/policies/:id, /submitted/masterlist, [History]]]}
+
+BRD-13:
+  UF-A.1: {checks: [[/migration/objects, null, []]]}
+  UF-A.2: {checks: [[/migration/objects, null, []]]}
+  UF-A.3: {checks: [[/migration/maps, null, []]]}
+  UF-A.4: {checks: [[/migration/maps, null, [Unmapped Codes]]]}
+  UF-A.5: {checks: [[/migration/signoff, null, []]]}
+  UF-A.6: {checks: [[/migration/extracts, null, [Upload and Check]]]}
+  UF-A.7: {checks: [[/migration/extracts, null, []]]}
+  UF-A.8: {checks: [[/migration/batches, null, [Plan Batch]]]}
+  UF-A.9: {checks: [[/migration/batches/:batchNo, /migration/batches, [Issues]]]}
+  UF-A.10: {checks: [[/migration/matching, null, []]]}
+  UF-A.11: {checks: [[/migration/batches/:batchNo, /migration/batches, [Rows]]]}
+  UF-A.12: {checks: [[/migration/reconciliation, null, []]]}
+  UF-A.13: {checks: [[/migration/reconciliation, null, []]]}
+  UF-A.14: {checks: [[/migration/batches/:batchNo, /migration/batches, [Sign-offs]]]}
+  UF-B.1: {checks: [[/migration/cutover, null, [New Plan]]]}
+  UF-B.2: {checks: [[/migration/cutover, null, []]]}
+  UF-B.3: {checks: [[/migration/cutover, null, []]]}
+  UF-B.4: {checks: [[/migration/trueups, null, []]]}
+  UF-B.5: {checks: [[/migration/trueups, null, []]]}
+  UF-B.6: {checks: [[/migration/runoff, null, []]]}
+  UF-C.1: {checks: [[/crm/clients, null, [LEGACY]]]}
+  UF-C.2: {checks: [[/cashiering/unapplied, null, [Origin]]]}
+  UF-C.3: {checks: [[/operations/invoices/:no, /operations/invoices, []]]}
+  UF-C.4: {checks: [[/cashiering/unapplied-income, null, []]]}
+  UF-C.5: {checks: [[/cashiering/unapplied-income, null, []], [/approvals, null, []]]}
+  UF-C.6: {checks: [[/cashiering/legacy-pr2307, null, []]]}
+  UF-C.7: {checks: [[/commission/dppr-batches, null, []]]}
+  UF-D.1: {checks: [[/legacy-inquiry, null, []]]}
+  UF-D.2: {checks: [[/legacy-inquiry, null, []]]}
+  UF-D.3: {checks: [[/legacy-inquiry, null, []]]}
+  UF-D.4: {checks: [[/legacy-inquiry/access-log, null, []]]}
+  FR-DM-125.1: {blocked: "Compiled outside BIBS from the Excel trackers of the legacy renewal advices"}
+  FR-DM-125.2: {blocked: "Checked outside BIBS against the Excel trackers before the file goes to the Migration Operator"}
+  FR-DM-125.3: {checks: [[/migration/extracts, null, []], [/migration/batches, null, []]]}
+  FR-DM-125.4: {checks: [[/migration/batches, null, [Resubmissions]]]}
+  FR-DM-125.5: {checks: [[/migration/batches, null, [Resubmissions]]]}
+  FR-DM-125.6: {checks: [[/migration/batches, null, []]]}

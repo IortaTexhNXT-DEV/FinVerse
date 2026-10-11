@@ -1,0 +1,7 @@
+
+# Client-pack page previews (tools/deliverables/render.py)
+_previews/
+__pycache__/
+
+# Optimised print copies of images embedded in Word (tools/deliverables/bdoi_docx.py print_image)
+_print/

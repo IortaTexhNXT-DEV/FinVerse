@@ -1,0 +1,196 @@
+# Screen specifications of BRD-2 Operations: Production Reconciliation (the register of what BDOI booked sent to each
+# insurer, the insurer's feedback matched within the tolerance, every difference followed to closure, the unbooked
+# insurer production, the early incentive validation and the extract schedules).
+area: Production reconciliation
+screens:
+  - id: SCR-OP-43
+    title: Reconciliation Workbench
+    route: /prodrecon
+    purpose: >-
+      The landing page of Production Reconciliation: accounts booked this month, registers to send, cycles awaiting
+      the insurer's feedback or reconciling, and unbooked insurer production, each opening its list.
+    entry:
+      - Operations Home › Production Reconciliation › Open
+    shots:
+      - {state: home, user: recon, caption: "Reconciliation Workbench with the work queues"}
+    fields:
+      - "Work Queues | [Work tiles: Booked This Month, Registers to Send, Awaiting Insurer Feedback, Cycles Reconciling, Unbooked Insurer Production] | Tile | Live count; Needs attention on the queues waiting for action | - | Reconciliation cycles, invoice ledger | - | Read only | A tile opens its list | -"
+    actions:
+      - "Search Invoices | Production Reconciliation Handler | Always | Opens Invoice Search | - | -"
+      - "[A work tile] | Production Reconciliation Handler | Always | Opens the list of the queue | - | -"
+    rules:
+      - "The tiles are counted live from the reconciliation records and the invoice ledger (FR-OP-003)."
+    outcome: The handler sees the registers and cycles waiting.
+    frs: [FR-OP-003]
+    tests: [RECONWB]
+
+  - id: SCR-OP-44
+    title: Reconciliation Cycles
+    route: /prodrecon/cycles
+    purpose: >-
+      One cycle per insurer and production month: the register sent, the insurer's feedback and the matching of both
+      sides, with the counts of BDOI-only and insurer-only items and the share matched.
+    entry:
+      - Reconciliation Workbench › Awaiting Insurer Feedback and Cycles Reconciling tiles
+    shots:
+      - {state: list, user: recon, caption: "Reconciliation Cycles"}
+    fields:
+      - "Tabs | All / Extracted / Sent to Insurer / Reconciling / Closed | Tab | - | - | Fixed | All | - | - | -"
+      - "Toolbar | Insurer | Drop-down | All insurers or one by name | N | Insurers | All insurers | - | - | -"
+      - "List | Cycle No. / Insurer / Production Month / Items / BDOI Only / Insurer Only / Matched / Sent / Last Feedback / Stage | Column | PRC-<insurer>-yyyyMM-n; matched in %; month as Mmm yyyy | - | Reconciliation cycles | - | Read only | - | No items to display"
+    actions:
+      - "Open a row | Production Reconciliation Handler | Always | Opens the cycle | - | -"
+    rules:
+      - "One open cycle per insurer and production month (FR-OP-075)."
+    outcome: The handler sees every cycle and its progress.
+    frs: [FR-OP-075, FR-OP-079]
+    tests: [CYCLES]
+
+  - id: SCR-OP-45
+    title: Reconciliation Cycle
+    route: /prodrecon/cycles/:id
+    parent: /prodrecon/cycles
+    purpose: >-
+      One cycle: the production month, items and share matched, BDOI-only and insurer-only counts, the dates sent and
+      answered, the cycle workflow, the items by bucket with the side-by-side comparison, the feedback and disposition,
+      manual pairing, the registers sent, the early incentive validation and the documents.
+    entry:
+      - Reconciliation Cycles › open a row
+      - Invoice 360 › Reconciliation tab
+    shots:
+      - {state: items, user: recon, open_cycle: reconciling, caption: "Reconciliation cycle: workflow header and the items by bucket"}
+      - {state: review, user: recon, open_cycle: reconciling, after: open_discrepancy, caption: "Item review dialog: BDOI and insurer values side by side with the feedback"}
+      - {state: incentive, user: recon, open_cycle: reconciling, tab: "Early Incentive", caption: "Early Incentive tab: the incentive expected per invoice"}
+    fields:
+      - "Header | [Cycle chip and stage pill] | Reference chip, status pill | PRC-<insurer>-yyyyMM-n | - | Reconciliation cycle | - | Read only | - | -"
+      - "Header | Production Month / Items / Matched / BDOI Only / Insurer Only / Sent to Insurer / Last Feedback | Display | Matched in % with the number with differences | - | Reconciliation cycle | - | Read only | - | -"
+      - "Workflow | [Reconciliation workflow header] | Stepper | Register extracted, Awaiting insurer feedback, Reconciling, Closed | - | Reconciliation cycle | - | Read only | - | -"
+      - "Tabs | Items / Registers Sent / Early Incentive / Documents | Tab | - | - | Fixed | Items | - | - | -"
+      - "Items | [Bucket tabs] | Tab | All, Matched, With Discrepancy, BDOI Only, Insurer Only with their counts | - | Reconciliation items | All | - | - | -"
+      - "Items | Search Invoice, Policy or Assured | Text | - | N | - | Blank | - | - | -"
+      - "Items | Marketing AO / AB / Sales Unit / Market Segment / Product Line | Filter | - | N | Sales organisation, segments, product lines | Blank | - | - | -"
+      - "Items | Invoice / Policy / Assured / AO / Gross Premium (BDOI / Insurer) / Differences / Disposition / Status | Column | Differences name the fields that differ | - | Reconciliation items | - | Read only | - | No items to display"
+      - "Item review dialog | Policy No. / Invoice / Reference No. / Assured Name / Period From / Period To / Basic Premium / Gross Premium / Commission | Display | BDOI and insurer side by side; a difference highlighted | - | Reconciliation item | - | Read only | Amounts within the tolerance of 1.00 | -"
+      - "Item review dialog | Company Concerned / Disposition / Instruction / Insurer Feedback / Marketing Feedback | Drop-down, text | - | N | Lists of values company concerned and reconciliation disposition | Blank | Reconciling | - | -"
+      - "Set Disposition dialog | Company Concerned / Disposition | Drop-down | For the selected items | Y (disposition) | Lists of values | Blank | Reconciling | - | Disposition is required"
+      - "Pair dialog | Insurer Line | Drop-down | The insurer-only lines of the cycle | Y | Reconciliation items | Blank | BDOI-only item | - | -"
+      - "Registers Sent | Extract No. / Trigger / Booking Period / Accounts / New / Extracted / Sent | Column | Period cell; sent time and user | - | Production extracts | - | Read only | - | No items to display"
+      - "Early Incentive | Invoice No. / Assured / Inception / Remitted / Days / Expected / Per Insurer / Outcome | Column | Eligible, Late, No Rule | - | Incentive rules of Remittance | - | Read only | - | -"
+      - "Close Reconciliation Cycle dialog | Comment | Text area | Why the cycle is closed with items still open, if any | N | - | Blank | Reconciling | - | -"
+    actions:
+      - "Run Matching | Production Reconciliation Handler | Reconciling | Matches the open items again, including the accounts booked since | Unchanged | -"
+      - "Save Feedback | Production Reconciliation Handler | Reconciling | Saves the feedback and disposition of the item | Unchanged | -"
+      - "Set Disposition / Apply to Selected | Production Reconciliation Handler | Items selected | Sets the company concerned and disposition of the selected items | Unchanged | -"
+      - "Pair with Another Item / Pair Items | Production Reconciliation Handler | BDOI-only item | Pairs it with an insurer-only line | Matched or With Discrepancy | -"
+      - "Split Pairing | Production Reconciliation Handler | Manually paired item | Splits the pair back into its two sides | BDOI Only and Insurer Only | -"
+      - "Close Cycle | Production Reconciliation Handler | Reconciling | Closes the cycle with a comment; the cycle also closes by itself when every item is matched or for closure | Closed | Workflow notice (NT-01)"
+    rules:
+      - "Lines are paired on the match keys in order (by default the invoice number, then the policy number); commission, basic and gross premium match within 1.00 peso equivalent (a foreign currency difference is converted to pesos first); policy, reference and PN numbers and the period must be equal; names are compared ignoring case and spacing (FR-OP-075)."
+      - "An item with any difference is Matched with Discrepancy and lists the fields that differ (FR-OP-075)."
+      - "A BDOI-only item can be paired with an insurer-only line, and a wrong pair split (FR-OP-077)."
+      - "The early incentive applied by the insurer is checked against the rate and window of the Remittance incentive rules (FR-OP-078)."
+      - "Annotations (company concerned, instruction, feedback) are linked to the item and never change policy, invoice or amount data (FR-OP-077)."
+      - "The history of the cycle and of each item is kept (FR-OP-079)."
+    outcome: Every difference between BDOI's and the insurer's production is followed to closure.
+    frs: [FR-OP-075, FR-OP-077, FR-OP-078, FR-OP-079]
+    tests: [CYCLE]
+
+  - id: SCR-OP-46
+    title: Production Extracts
+    route: /prodrecon/extracts
+    purpose: >-
+      The registers of booked production extracted for each insurer, by schedule or on request, with their file, and
+      the sending of a register to the insurer with the cover letter.
+    entry:
+      - Reconciliation Workbench › Registers to Send tile
+    shots:
+      - {state: list, user: recon, caption: "Production Extracts"}
+      - {state: new, user: recon, click: "^new extract$", caption: "New Production Extract dialog"}
+    fields:
+      - "Toolbar | Insurer | Drop-down | All insurers or one by name | N | Insurers | All insurers | - | - | -"
+      - "List | Extract No. / Trigger / Booking Period / Accounts / New / Extracted / Sent | Column | PRX-yyyy-n with the file name; booking period in the period cell; sent time and user | - | Production extracts | - | Read only | - | No items to display"
+      - "New Production Extract dialog | Insurer / Production Month | Drop-down, month (MMM-yyyy) | Insurers by name; accounts booked in the month | Y | Insurers | Blank | - | Both given | Insurer and production month are required"
+      - "Send dialog | To / Cc | Text | E-mail addresses separated by commas | Y / N | The insurer's reconciliation contacts | Proposed | - | Valid addresses | Enter valid e-mail addresses"
+    actions:
+      - "New Extract / Extract Register | Production Reconciliation Handler | Always | Extracts the register of the insurer and month into its file | Register extracted | -"
+      - "Download | Production Reconciliation Handler | Always | Downloads the register workbook | - | -"
+      - "Send to Insurer / Resend to Insurer | Production Reconciliation Handler | Extracted / sent | E-mails the register with the cover letter as a password-protected attachment; the password follows in a separate e-mail | Awaiting insurer feedback | Production register e-mail (NT-25)"
+    rules:
+      - "The register is a protected workbook: only the Remarks and Incentive columns and 200 blank rows can be edited by the insurer (FR-OP-072)."
+      - "The file is named <insurer>_PRODREG_<yyyyMM>_<sequence> (FR-OP-072)."
+      - "The sent time and the recipients are kept on the extract (FR-OP-073)."
+    outcome: The insurer receives the register of what BDOI booked.
+    frs: [FR-OP-071, FR-OP-072, FR-OP-073]
+    tests: [EXTRACTS]
+
+  - id: SCR-OP-47
+    title: Insurer Feedback
+    route: /prodrecon/uploads
+    purpose: >-
+      The registers returned by the insurers, uploaded and matched against BDOI production at once, with every attempt
+      and its row counts.
+    entry:
+      - Reconciliation Workbench › Awaiting Insurer Feedback tile
+    shots:
+      - {state: list, user: recon, caption: "Insurer Feedback uploads"}
+      - {state: upload, user: recon, click: "^upload feedback$", caption: "Upload Insurer Feedback dialog"}
+    fields:
+      - "Toolbar | Insurer | Drop-down | All insurers or one by name | N | Insurers | All insurers | - | - | -"
+      - "List | File / Insurer / Production Month / Rows Read / Accepted / Failed / Message / Uploaded / Status | Column | File with the attempt number | - | Feedback uploads | - | Read only | - | No items to display"
+      - "Upload Insurer Feedback dialog | Insurer Feedback File | File | The register returned by the insurer | Y | - | - | - | A file with the same content as an earlier one is refused | -"
+    actions:
+      - "Upload Feedback / Upload and Match | Production Reconciliation Handler | File chosen | Takes in the insurer's rows and matches them with the register | Reconciling | Insurer reconciliation feedback (NT-19)"
+    rules:
+      - "Accounts the insurer reports that were not in the register are separated as insurer-only lines (FR-OP-074)."
+      - "A file with the same content as an earlier one is blocked (FR-OP-074)."
+    outcome: The insurer's answer is matched against BDOI's production.
+    frs: [FR-OP-074, FR-OP-075]
+    tests: [RECONUP]
+
+  - id: SCR-OP-48
+    title: Unbooked Accounts
+    route: /prodrecon/unbooked
+    purpose: >-
+      Accounts the insurers report that BDOI has not booked, followed until they are booked or closed: not booked,
+      pre-booked (an account exists but is not booked yet), booked since, closed.
+    entry:
+      - Reconciliation Workbench › Unbooked Insurer Production tile
+    shots:
+      - {state: list, user: recon, caption: "Unbooked Accounts, Not Booked tab"}
+    fields:
+      - "Tabs | Not Booked / Pre-booked / Booked Since / Closed | Tab | - | - | Fixed | Not Booked | - | - | -"
+      - "Toolbar | Search Policy, Reference or Assured | Text | - | N | - | Blank | - | - | -"
+      - "List | Policy / Reference / Assured / Period / Gross Premium / Pre-booked ARN / Booked As / Disposition / Status | Column | Period cell | - | Reconciliation items | - | Read only | - | No items to display"
+    actions:
+      - "Open a row | Production Reconciliation Handler | Always | Opens the item with its feedback | - | -"
+    rules:
+      - "An insurer-only line is looked up in New Business: with an account not yet booked it is Pre-booked, otherwise Not Booked (FR-OP-076)."
+      - "Booking a later invoice matches the waiting insurer-only line of the same insurer (FR-OP-075)."
+    outcome: Insurer production missing in BDOI's books is followed to booking or closure.
+    frs: [FR-OP-076]
+    tests: [UNBOOKED]
+
+  - id: SCR-OP-49
+    title: Extract Schedules
+    route: /prodrecon/schedules
+    purpose: >-
+      When the production register of each insurer is extracted (monthly on a day or weekly on a weekday), whether it
+      is sent automatically and to whom.
+    entry:
+      - Reconciliation Workbench
+    shots:
+      - {state: list, user: recon, caption: "Extract Schedules"}
+      - {state: new, user: recon, click: "^new schedule$", caption: "New Extract Schedule dialog"}
+    fields:
+      - "List | Insurer / Frequency / Next Run / Auto Send / Recipients / Last Run / Status | Column | Next run moved to the next working day | - | Extract schedules | - | Read only | - | No items to display"
+      - "Schedule dialog | Insurer | Drop-down | Insurers by name | Y | Insurers | Blank | - | Chosen | Select the insurer"
+      - "Schedule dialog | Frequency / Run Day | Drop-down, number | Monthly (day 1-28) or Weekly (1 = Monday … 7 = Sunday) | Y | Fixed list | Monthly | - | Within range | Run day is a day of the month from 1 to 28 / Run day is a weekday from 1 (Monday) to 7 (Sunday)"
+      - "Schedule dialog | Recipients | Text | Blank: the insurer's reconciliation contacts | N | - | Blank | - | Valid addresses | Enter valid e-mail addresses"
+      - "Schedule dialog | [Send automatically] | Check box | - | N | - | Not ticked | - | - | -"
+    actions:
+      - "New Schedule / Save Schedule | Production Reconciliation Handler | Always | Saves the schedule of the insurer | Active | -"
+    rules:
+      - "The daily production extract job extracts the registers due that day; the next run moves to the next working day on the head office calendar (FR-OP-070)."
+    outcome: The registers are extracted and sent on the agreed schedule.
+    frs: [FR-OP-070]
+    tests: [SCHEDULES]

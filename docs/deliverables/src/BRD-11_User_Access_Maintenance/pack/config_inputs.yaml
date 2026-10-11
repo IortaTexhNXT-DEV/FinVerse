@@ -1,0 +1,156 @@
+# Configuration inputs the business provides for BRD-11 User Access Maintenance (Drop 0, Setup and Data Migration).
+# Read by docs/deliverables/src/signoff/config_inputs.py: the FRS chapter "Configuration inputs the business provides"
+# (```pack blocks) and the workbook of input templates of the release set (a Start here sheet with the templates in
+# the order they are filled in, one self-contained sheet per template with its guide band above the column headers
+# and one fictitious example row, the Reference lists and the Questions and comments sheets). The columns follow the
+# fields of the screens (screens/*.yaml).
+# Columns of a template: header | mandatory (Y, N or the condition) | format | what to enter | example
+# checks, depends and lists: as in the BRD-03 file (docs/deliverables/src/BRD-03_Product_Maintenance/pack/
+# config_inputs.yaml).
+meta:
+  title: Configuration Input Templates
+  workbook_name: Configuration Inputs
+  subtitle: What the business provides to set up User Access Maintenance, its role matrix and its rules
+  due: "Drafts with the sign-off of this set; the role matrix and the users before the first data migration mock; the parameters agreed with Information Security before UAT"
+  codes_note: "Codes must be the codes of the other templates: the group profile codes of Role-to-permission matrix in Users and roles, and their names in Separation-of-duties rules, the list codes of Lists of values in Users and roles."
+lists:
+  UA_ACTION: {name: Bulk request action, values: [[ENROL, Enrol a new user], [MODIFY, Modify a user], [DEACTIVATE, Deactivate a user], [REACTIVATE, Reactivate a user]]}
+  PRIVILEGE_LEVEL: {name: Privilege level, values: [[Low, Low], [Standard, Standard], [High, "High: a second approval when given or raised"], [Admin, "Admin: a second approval when given or raised"]]}
+  KEEP_ADD_REMOVE: {name: Change against the matrix, values: [[KEEP, Keep the permission], [ADD, Add the permission], [REMOVE, Remove the permission]]}
+  UA_ROLE: {name: Role in user access, values: [[Requestor, Raises access requests for the unit], [Approver, Approves access requests], [Second Approver, Second approval of High and Admin privileges], [Group-profile requester, Raises group-profile requests], [Implementer, System Administrator who implements approved requests]]}
+  SOD_STATUS: {name: Separation-of-duties rule status, values: [[Enforced, A fixed rule of BIBS], [To confirm, Proposed; BDOI confirms], [New, Added by BDOI]]}
+  SOD_CONTROL: {name: Separation-of-duties control, values: [[Prevent, "A rule of Separation of Duties: BIBS refuses the request"], [Detect by review, Reviewed with the reports], [Second approval, A second approver decides]]}
+  REVIEW_FREQUENCY: {name: Review frequency, values: [[Monthly, Monthly], [Quarterly, Quarterly]]}
+  UA_PARAMETER: {name: Sign-in, password, session and access-request parameter, parameters_from_column: [CI-05, 1]}
+  UA_LIST: {name: User access list, lov_types: [UAM_BUSINESS_UNIT, UAM_USER_LEVEL, UAM_DEACTIVATION_REASON]}
+templates:
+  - id: CI-01
+    name: Users and roles load
+    sheet: Users and roles
+    content: Every BIBS user at go-live with the user data and the group profiles, in the columns of the Bulk Request template
+    owner: Business Administration, with the unit heads who name their users
+    source: The users of the legacy systems and the unit rosters; the HR list of employees for the full names and e-mails
+    load: "Bulk Request (SCR-UA-09): the file of this template is uploaded as a bulk batch, checked row by row and approved by an approver like single requests; users are out of the data migration scope (DMQ30)"
+    frs: [FR-UA-011, FR-UA-019]
+    checks:
+      Action: list:UA_ACTION
+      User ID: text:10
+      Full Name: text:120
+      Business Unit: ref:CI-06/Code
+      User Level: ref:CI-06/Code
+      Group Profiles: ref:CI-02/Group profile code
+      Remarks: text:1000
+    columns:
+      - "Action | Y | ENROL, MODIFY, DEACTIVATE or REACTIVATE | ENROL for the go-live load | ENROL"
+      - "User ID | Y | A letter and nine digits (BDOI format a999999999) | The BIBS user ID; unique | a013000201"
+      - "Full Name | Cond.: ENROL | Up to 120 characters | Name shown on screens and reports | Andrea Mercado"
+      - "E-mail | N | Company e-mail address | Receives the access-changed notices and the reset links | andrea.mercado@uat.brokerverse.cloud"
+      - "Windows ID | N | Windows log-on name; unique | Used for the BDO directory sign-in when it is enabled | AMERCADO"
+      - "Home Branch Code | N | Branch code | Home branch of the user | HO"
+      - "Business Unit | N | Code of the list Business unit group (CI-06) | Business unit group | -"
+      - "User Level | N | Code of the list User level (CI-06) | User level | -"
+      - "Group Profiles | Cond.: ENROL | Profile codes of CI-02 separated by ';' | The group profiles of the user | MKT_AO"
+      - "Effective Date | N | yyyy-MM-dd; blank = on approval | Date the change applies | -"
+      - "Remarks | Y | Up to 1,000 characters | Justification of the line | Joined Marketing"
+  - id: CI-02
+    name: Role-to-permission matrix
+    sheet: Role matrix
+    content: The group profiles BDOI keeps, their privilege level and the permissions of each, starting from the User Access Matrix as delivered
+    owner: Business Administration with the unit heads; reviewed and signed by BDOI Information Security
+    source: The User Access Matrix export of this set (DO-06) and the menus by persona of FRS chapter 12
+    load: "Group-profile requests (SCR-UA-12): one request per new or changed profile, approved in order and implemented by the System Administrator; checked with the User Group Profile Report"
+    frs: [FR-UA-040, FR-UA-041, FR-UA-050, FR-UA-051]
+    checks:
+      Group profile code: text:40
+      Name: text:120
+      Description: text:500
+      Privilege level: list:PRIVILEGE_LEVEL
+      Keep / Add / Remove: list:KEEP_ADD_REMOVE
+    columns:
+      - "Group profile code | Y | Up to 40 capital letters, digits or _ | Code of the profile; an existing code changes the profile | MKT_AO"
+      - "Name | Y | Up to 120 characters | Name shown on screens | Marketing Account Officer"
+      - "Description | N | Up to 500 characters | What the profile is for | Marketing account officers of the Combank and Corbank units"
+      - "Privilege level | Y | Low, Standard, High or Admin | High and Admin need a second approval when given or raised | Standard"
+      - "Permission | Y | Permission code of the User Access Matrix | One row per permission of the profile | QUOTE_MAINTAIN"
+      - "Action class | N | View only, Create, Amend, Approve / Validate | As shown by the matrix, for the review | Create, Amend"
+      - "Keep / Add / Remove | Y | KEEP, ADD or REMOVE | Change against the matrix as delivered | KEEP"
+      - "Approved by unit head | Y | Name | Unit head who confirms the row | Carla Reyes"
+  - id: CI-03
+    name: Approvers, approval rules and limits
+    sheet: Approval rules
+    content: Who requests and who approves user access, the order of the approvers of group-profile requests, the second approvers, the implementers, and the authorisation limits of the users whose work other modules approve by amount
+    owner: Business Administration; BDOI Information Security for the second approval; Comptrollership for the authorisation limits
+    source: BDOI's approval matrix (UQ01, UQ02)
+    load: "The users are given the Requestor, Approver, Second Approver and System Administrator profiles by requests (CI-01); the approvers are chosen on each request; UAM_ANY_APPROVER is set on System Parameters. The authorisation limit is set by an Enrol new user or Modify user request (field Authorisation Limit) decided by an approver; the bulk file has no limit column, so the limits are requested after the users are loaded"
+    frs: [FR-UA-011, FR-UA-012, FR-UA-015, FR-UA-034, FR-UA-044, FR-UA-045]
+    checks:
+      Role in user access: list:UA_ROLE
+      User ID: code:CI-01/User ID
+      Approver order for group profiles: whole:1-9
+      Any approver may decide: yn
+      Authorisation limit: number
+    columns:
+      - "Role in user access | Y | Requestor, Approver, Second Approver, Group-profile requester, Implementer | The user access role of the user | Approver"
+      - "User ID | Y | User ID of CI-01 | The user who holds the role | a013000205"
+      - "Unit | Y | Business unit | Unit the user requests or approves for | Combank Marketing"
+      - "Approver order for group profiles | Cond.: Approver | 1, 2, 3 | Usual order of the approvers of a group-profile request | 1"
+      - "Any approver may decide | N | Y or N | Y sets UAM_ANY_APPROVER: any approver decides any request, not only the chosen one | N"
+      - "Authorisation limit | N | Amount in PHP; blank = unlimited | Limit of the user's approvals by amount in the modules that use it (journals, payables) | 500000.00"
+  - id: CI-04
+    name: Separation-of-duties rules
+    sheet: SoD rules
+    content: The rules BIBS enforces, for confirmation, and the combinations of profiles or permissions that BDOI Information Security does not allow one user to hold
+    owner: BDOI Information Security
+    source: BDOI information security policy; the separation-of-duties rules of FRS chapter 13
+    load: "The rules marked Enforced are fixed in BIBS; the privileged profiles are set by the privilege level of CI-02. Each combination of two profiles is entered on Separation of Duties (SCR-UA-19) by the Business Administrator and authorised by Information Security; BIBS then refuses every request and bulk line that breaks it. A combination of permissions is reviewed with the reports"
+    frs: [FR-UA-031, FR-UA-034, FR-UA-045, FR-UA-053]
+    checks:
+      Status: list:SOD_STATUS
+      Profile or permission A: ref:CI-02/Group profile code
+      Profile or permission B: ref:CI-02/Group profile code
+      Control: list:SOD_CONTROL
+      Review frequency: list:REVIEW_FREQUENCY
+    columns:
+      - "Rule ID | Y | SOD-nn | Identifier of the rule | SOD-01"
+      - "Rule | Y | Text | The rule | The requester never decides his own request"
+      - "Status | Y | Enforced, To confirm, New | Enforced = a fixed rule of BIBS | Enforced"
+      - "Profile or permission A | Cond.: combination rule | Profile or permission of CI-02 | First profile or permission of a combination | User Access Requestor"
+      - "Profile or permission B | Cond.: combination rule | Profile or permission of CI-02 | Profile or permission that may not be held with A | User Access Approver"
+      - "Control | Y | Prevent (a rule of Separation of Duties, for two profiles), Detect by review, Second approval | How the rule is controlled | Prevent"
+      - "Review frequency | Cond.: Detect by review | Monthly, Quarterly | How often the reports are reviewed | Quarterly"
+  - id: CI-05
+    name: Password, session and sign-in parameters
+    sheet: Parameters
+    content: The values of the sign-in, password, session and access-request parameters, as delivered and as BDOI Information Security wants them
+    owner: BDOI Information Security; BDOI IT for the sign-in mode
+    source: BDOI security policy (UQ07, UQ08); the values delivered (FRS section 9.1)
+    load: "System Parameters (SCR-UA-18): entered by the System Administrator and approved by the Information Security Officer, audited; checked in SIT with the test plan"
+    frs: [FR-UA-001, FR-UA-002, FR-UA-005, FR-UA-006, FR-UA-034, FR-UA-052, FR-UA-054]
+    checks:
+      Parameter: list:UA_PARAMETER
+    columns:
+      - "Parameter | Y | LOGIN_MAX_FAILED_ATTEMPTS, SESSION_IDLE_WARNING_MINUTES, SESSION_TIMEOUT_MINUTES, SESSION_EXPIRY_WARNING_MINUTES, AUTH_MODE, USER_ID_PATTERN, USER_ID_FORMAT_TEXT, PASSWORD_HISTORY_COUNT, PASSWORD_MAX_AGE_DAYS, PASSWORD_MIN_AGE_DAYS, UAM_WORKING_HOURS, UAM_ANY_APPROVER, UAM_ROLE_APPLY_ON_APPROVAL, UAM_EXTERNAL_USERS, UAM_DORMANT_DAYS, UAM_DORMANT_NOTICE_DAYS, JOB_FAILURE_RECIPIENTS | One row per parameter | PASSWORD_MAX_AGE_DAYS"
+      - "Value as delivered | Y | As on System Parameters | The value proposed with the system | 90"
+      - "Value wanted | Y | Same type and range | The value BDOI wants | 90"
+      - "Reason | Cond.: value changed | Text | Policy reference or reason | BDO password policy"
+      - "Approved by | Y | Name | Information Security or BDOI IT approver of the value | Ramon Dizon"
+  - id: CI-06
+    name: Lists of values
+    sheet: Lists of values
+    content: The values of the lists of user access (business unit groups and user levels, empty as delivered; deactivation reasons, to confirm with BDOI; the reason No sign-in for the dormancy period is used by the dormant-user job and stays)
+    owner: Business Administration
+    source: BDOI organisation (UQ05)
+    load: "Lists of Values (New Business set) under maker-checker; before the users of CI-01 are loaded"
+    frs: [FR-UA-011, FR-UA-013, FR-UA-052]
+    checks:
+      List: list:UA_LIST
+      Code: text:30
+      Label: text:120
+      Sort order: whole
+      Effective from: date
+    columns:
+      - "List | Y | UAM_BUSINESS_UNIT, UAM_USER_LEVEL or UAM_DEACTIVATION_REASON | The list | UAM_BUSINESS_UNIT"
+      - "Code | Y | Up to 30 capitals, digits or _ | Code of the value | COMBANK_MKT"
+      - "Label | Y | Up to 120 characters | Label shown on screens | Combank Marketing"
+      - "Sort order | N | Whole number | Order in the drop-down | 10"
+      - "Effective from | Y | dd-MMM-yyyy | Date the value may be used | 04-Jan-2027"

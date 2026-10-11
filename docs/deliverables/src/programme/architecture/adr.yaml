@@ -1,0 +1,382 @@
+# Architecture decision records of BIBS (BRD-00, Programme/Architecture). One entry per decision.
+# Read by build_architecture_pack.py: the Word document (one chapter per ADR) and the ADR log workbook.
+# status: Accepted | Proposed | Superseded. decided_by: who took the decision (BDOI or the project).
+# Sources are named in "sources"; the client decisions are those of 26 September and 8 October 2026.
+
+adrs:
+  - id: ADR-01
+    title: One modular monolith for the BIBS backend
+    status: Accepted
+    date: 26-Sep-2026
+    decided_by: BDOI (architecture confirmation, IQ25 / DCR-222)
+    area: Application architecture
+    context:
+      - The IER workbook drew about ten microservices over three tenants, with one database per service, EventBridge, Istio and OPA. BDOI is a single broker with several companies and branches; the BRDs need a premium, its receivable, the remittance to the insurer, the commission and the GL entries to agree to the centavo.
+      - The volumes (1,344 named users, 429 concurrent at peak, 21,200 new-business and 25,800 renewal transactions a month) are within one horizontally scaled application on a Multi-AZ database.
+    decision:
+      - BIBS is one Spring Boot application (the backend) with one package per bounded context, plus one React single-page application. A business record, its journal, ledger and sub-ledger rows and its audit entry commit in one PostgreSQL transaction.
+      - Module boundaries are enforced at every compile by architecture rules (no cycles between modules, layered packages), so a module can later be deployed on its own if a real need appears.
+    alternatives:
+      - [Microservices with a database per service (IER picture), 'Needs sagas, compensations and reconciliation jobs to keep ledgers balanced; ten pipelines, a service mesh and more skills to operate; no BRD needs independent release cycles']
+      - [Modular monolith split by runtime role only, 'Retained as ADR-15 on top of this decision']
+    consequences:
+      - '+ Financial consistency by one transaction; one deployment, one log trail with correlation identifiers, one database to back up, replicate and restore.'
+      - '+ Lower infrastructure and licence cost than the IER picture (no mesh, no EventBridge, no MongoDB).'
+      - '- All modules share one release train; the release pipeline and the quality gates (ADR-13) keep each release safe.'
+      - '- Scaling is by replicas of the whole application; the runtime roles of ADR-15 separate the user, batch and integration load.'
+    sources: Application architecture option decision (26-Sep-2026); IER workbook v20; programme alignment pack section 6
+  - id: ADR-02
+    title: Java 21 LTS and Spring Boot 3.5 for the backend
+    status: Accepted
+    date: 08-Oct-2026
+    decided_by: BDOI (component baseline)
+    area: Technology
+    context:
+      - The IER VDI sheet listed Temurin 17. BIBS needs a long-term-support Java line that covers the 60-month horizon of the IER, with virtual threads and current language features, and a framework with first-class support for security, OIDC, SAML, JPA, Kafka and metrics.
+    decision:
+      - OpenJDK 21 LTS (Eclipse Temurin 21 JRE image) and Spring Boot 3.5.x. Compiler warnings are errors; the container runs as a non-root user on a pinned image digest.
+    alternatives:
+      - [Java 17 LTS, 'Shorter remaining support; no virtual threads']
+      - [Spring Boot 4.x, 'First releases at the time of the baseline; adopted through the annual technology review once the libraries BIBS uses support it']
+    consequences:
+      - '+ Supported runtime until at least December 2029 (Adoptium).'
+      - '- Spring Boot 3.5 open-source support ends before the 60-month horizon: the support route (commercial support or the move to 4.x) is decided before go-live (SA-07).'
+    sources: Component baseline (8-Oct-2026); deployment guide section 7
+  - id: ADR-03
+    title: PostgreSQL 16 with versioned, forward-only schema migrations
+    status: Accepted
+    date: 08-Oct-2026
+    decided_by: BDOI (component baseline)
+    area: Data
+    context:
+      - BIBS needs one relational store with strong transactions, row-level locking, JSON documents where useful, and a managed service with Multi-AZ, point-in-time recovery and cross-region replicas. Every environment must reach the same schema from the same release.
+    decision:
+      - PostgreSQL 16 on Amazon RDS. The schema is changed only by versioned migration scripts shipped in the application and applied at start-up by the schema owner login; the application connects with a least-privilege runtime login that cannot change the schema, truncate tables or disable the immutability triggers of the audit trail and the ledger.
+      - Each module owns a version range; changes follow expand, migrate, contract across releases, so the previous release still runs during a rolling update. A migration is never edited once applied; a fix is a new migration.
+    alternatives:
+      - [Aurora PostgreSQL, 'Also compatible; kept as an option for BDOI IT (no change in BIBS)']
+      - [MongoDB or a database per module (IER picture), 'Breaks the single financial transaction']
+      - [Schema changes by hand per environment, 'No guarantee that SIT, UAT and production run the same schema']
+    consequences:
+      - '+ Reproducible schema in every environment; the migration history is part of the release record.'
+      - '- Out-of-order versions are allowed because modules own ranges; the release notes list every migration applied.'
+    sources: Deployment guide section 4a (database roles); runbook section 3; component baseline
+  - id: ADR-04
+    title: Valkey 8 instead of Redis for cache and shared state
+    status: Accepted
+    date: 08-Oct-2026
+    decided_by: BDOI (component baseline)
+    area: Technology
+    context:
+      - BIBS keeps its reference-data cache, the cluster-wide job locks, the token deny-list and the sign-in counters in an in-memory store. Redis releases from 7.4 on are no longer under the BSD licence; BDOI requires open-source licences that allow commercial use without a fee.
+    decision:
+      - Valkey 8.x (BSD-3-Clause, Linux Foundation), on Amazon ElastiCache for Valkey, cluster mode disabled, primary and replica across zones, TLS and AUTH. The client library (Spring Data Redis with Lettuce) is unchanged because Valkey speaks the same protocol.
+      - BIBS keeps working when the store is unreachable - caches fall back to the database, counters and the deny-list to PostgreSQL tables - and a job is never run without a lock.
+    alternatives:
+      - [Redis 7.4 or later, 'Licence no longer BSD (RSALv2 / SSPL, later AGPL)']
+      - [Redis 7.2 (last BSD release), 'Out of upstream support']
+      - [No shared store (database only), 'Kept as the fallback; slower for every request that checks permissions and data scope']
+    consequences:
+      - '+ Open-source licence; same client and commands; managed service on AWS.'
+      - '- The deployment variables are renamed to the Valkey names; the former names are still read during the transition.'
+    sources: Platform cache and events architecture; component baseline; security controls (licences)
+  - id: ADR-05
+    title: Apache Kafka 3.9 (KRaft) with a transactional outbox for integration events
+    status: Accepted
+    date: 08-Oct-2026
+    decided_by: BDOI (component baseline); pattern by the project
+    area: Integration
+    context:
+      - Business facts (invoice booked, payment applied, receipt issued, client changed, records to archive) must reach e-mail delivery, the ECM archive and other systems without slowing or failing the user transaction, and without losing an event if a pod or the broker fails.
+    decision:
+      - Each business transaction writes its event to an outbox table in the same transaction. A relay (one at a time in the cluster, under the job lock) publishes the rows in order to Kafka topics named bibs.<domain>.<event>.v1, with acknowledgements from all in-sync replicas and producer idempotency. Delivery is at least once; consumers deduplicate on the event identifier. Every topic has a dead-letter topic and a support screen with retry and discard.
+      - In-process events stay for logic inside the same transaction; Kafka carries facts out of it. Amazon MSK runs Kafka 3.9 in KRaft mode with SASL_SSL.
+    alternatives:
+      - [Publish to Kafka inside the user transaction, 'An event can be lost or sent for a rolled-back change']
+      - [EventBridge with about 80 topics (IER picture), 'No business need for a second event bus; ten topics cover the BRDs']
+      - [Change-data capture from the database, 'Couples consumers to the table layout; more components to run']
+    consequences:
+      - '+ No lost or phantom events; business transactions keep working when Kafka is down (events wait in the outbox).'
+      - '- Consumers must deduplicate; a breaking payload change is a new topic version (.v2) published next to .v1.'
+    sources: Platform cache and events architecture sections 3.1 to 3.5
+  - id: ADR-06
+    title: Kubernetes Gateway API for edge routing (no ingress-nginx)
+    status: Accepted
+    date: 08-Oct-2026
+    decided_by: BDOI (component baseline)
+    area: Deployment
+    context:
+      - The Kubernetes project retired ingress-nginx in March 2026; the IER cluster sheets still list an ingress-nginx controller. BIBS needs host and path routing to three services, TLS on the listener and to the pods, and the BDOI WAF in front.
+    decision:
+      - One Gateway (HTTPS listener on 443 for the BIBS host name) and two HTTPRoutes - users (prefix api to bibs-web, all other paths to bibs-frontend) and systems (prefix integration to bibs-integration) - on the Gateway API v1 standard channel.
+      - The controller is chosen per environment by the overlay. Default is the AWS Load Balancer Controller (internal Application Load Balancer, ACM certificate, AWS WAF web ACL, HTTPS to the pods). Envoy Gateway behind an internal NLB is the alternative, used only with the BDO security team's agreement because an NLB carries no WAF.
+    alternatives:
+      - [Keep ingress-nginx, 'Retired upstream; no security fixes']
+      - [Ingress resources of the AWS Load Balancer Controller, 'Works today but ties the routing to annotations of one controller; Gateway API is the portable standard']
+    consequences:
+      - '+ Portable, role-oriented routing; the longest matching path prefix wins, so no rule ordering is needed.'
+      - '- Needs the Gateway API CRDs and a controller release with Gateway support (AWS Load Balancer Controller 2.14 or later) on every cluster.'
+    sources: Deployment guide section 3; component baseline
+  - id: ADR-07
+    title: React, TypeScript and Vite for the web client
+    status: Accepted
+    date: 08-Oct-2026
+    decided_by: BDOI (component baseline)
+    area: Technology
+    context:
+      - The IER VDI sheet named Angular. BIBS needs one accessible, themeable single-page application for all personas, with strict typing and fast compile times, served as static files.
+    decision:
+      - React 19 with TypeScript in strict mode, compiled and bundled by Vite; served by unprivileged nginx over TLS. Node 22 LTS is used only in the pipeline to compile and package the client; no Node runs in production.
+      - The client carries no client name, currency or logo in its code; the BDOI look and system name come from the theme pack chosen at packaging time.
+    alternatives:
+      - [Angular (IER VDI sheet), 'No advantage for BIBS; the client is already in React']
+      - [Server-rendered pages, 'Weaker interactivity for work queues, tree tables and row action menus']
+    consequences:
+      - '+ Static files only in production; small attack surface; accessibility and complexity rules enforced by the linters.'
+      - '- Node 22 reaches end of life on 30-Apr-2027: the pipeline moves to Node 24 LTS before UAT (SA-08).'
+    sources: Component baseline; quality gates (frontend)
+  - id: ADR-08
+    title: Company and branch data scope (attribute-based access control)
+    status: Accepted
+    date: 08-Oct-2026
+    decided_by: Project (platform capability); four business options for BDOI (SA-04)
+    area: Security
+    context:
+      - BIBS is multi-company. Permissions answer what a user may do, not for which company or branch. When the guard was introduced, 747 of 1,965 request mappings took a company; without a central check a user of one company could read another company's data by changing a parameter.
+    decision:
+      - Each user has a data scope - all companies (the default) or a list of companies, each with all or some branches. A guard checks it before the controller for the company and branch named in the query, the path or the request body, and list operations filter on the allowed companies. It fails closed (status 403, code DATA_SCOPE_DENIED). The compile fails when a controller takes a company that no check reads.
+      - The scope changes only through an access request under four eyes (or the audited emergency edit), only within the administrator's own scope, and every change is in the access change log.
+    alternatives:
+      - [Checks written by hand in each controller, 'Easy to miss one of hundreds of operations']
+      - [Separate database or schema per company, 'Breaks consolidated reporting and the shared masters']
+      - [Row-level security in PostgreSQL, 'Moves business rules into the database; harder to test and audit']
+    consequences:
+      - '+ One mechanism covers every operation that takes a company (all 747 at introduction, checked again at every compile); cached per user for 15 minutes, cleared on change.'
+      - '- Records addressed by identifier only are checked per module on load; BDOI decides whether branch scope also filters company-wide reports (SA-04).'
+    sources: Company and branch data scope architecture; security controls
+  - id: ADR-09
+    title: Single sign-on with EIAM (OpenID Connect; SAML 2.0 supported), break-glass and TOTP
+    status: Accepted
+    date: 26-Sep-2026
+    decided_by: BDOI (EIAM as a Drop 0 integration); protocol and claims open (IQ04)
+    area: Security
+    context:
+      - BDO users sign in through EIAM (Microsoft Entra ID). BRD-11 keeps roles, access requests and the audit in BIBS. An emergency path must exist when the identity provider is unavailable.
+    decision:
+      - The sign-in mode is a security parameter (LOCAL, DIRECTORY, OIDC, SAML), changed under a second approval. With OIDC, BIBS uses the authorisation code flow with PKCE S256 as a confidential client and validates the ID token; with SAML it validates signed responses with the configured provider key only. The identity is linked to an existing active BIBS user, never created; roles never come from the provider's groups (an optional group check can only refuse).
+      - Named break-glass administrators keep a local password and always confirm with an authenticator code (TOTP, RFC 6238). BIBS then issues its own short-lived access token (15 minutes) and a rotating refresh cookie; the session ends after the inactivity time-out or 8 hours.
+    alternatives:
+      - [BIBS passwords only, 'Against the BDO identity standard']
+      - [Roles from Entra ID groups, 'Bypasses the BRD-11 access request under four eyes']
+    consequences:
+      - '+ One BDO identity; MFA and conditional access enforced by Entra ID; the BIBS audit and session controls unchanged.'
+      - '- Entra ID tenant registration, the user name claim and the session lifetime against the 30-minute inactivity rule must be agreed (IQ04).'
+    sources: User access architecture section 10.1; security controls; configuration reference (authentication)
+  - id: ADR-10
+    title: SCIM 2.0 provisioning of user accounts from UIDM-ISC
+    status: Proposed
+    date: 08-Oct-2026
+    decided_by: For BDOI decision (IQ05, DCR-229)
+    area: Security
+    context:
+      - BDO's identity governance tool (UIDM-ISC) provisions joiners, movers and leavers and certifies access. BRD-11 says a request in BIBS is the only way to change access.
+    decision:
+      - 'Proposed option (a): UIDM-ISC creates, updates, disables and re-enables user accounts through a SCIM 2.0 Users interface published through Apigee X; role (group profile) and data scope changes stay BIBS access requests under four eyes. Each provisioning call becomes a system request with the UIDM-ISC reference in the access change log, and BIBS offers an aggregation of accounts and roles for certification.'
+    alternatives:
+      - ['(b) UIDM-ISC provisions users and roles (SCIM Users and Groups)', 'Approvals move to UIDM-ISC; BRD-11 request screens kept for break-glass only']
+      - ['(c) No provisioning; UIDM-ISC aggregates only', 'Leavers depend on a BIBS request being raised']
+    consequences:
+      - '+ Leavers are disabled from the authoritative source the same day; the BRD-11 four-eyes control and reports stay.'
+      - '- Needs the SCIM interface, an Apigee proxy and the connector configuration in UIDM-ISC.'
+    sources: User access architecture section 10.1; programme alignment IQ05
+  - id: ADR-11
+    title: Broker-only scope - the insurer-company suite is removed
+    status: Accepted
+    date: 08-Oct-2026
+    decided_by: BDOI
+    area: Scope
+    context:
+      - The platform carried modules of an insurance-company edition (insurer underwriting, insurer claims, reinsurance treaty and cession accounting, actuarial reserves, group consolidation, insurer premium taxes and statutory schedules). BDOI is an insurance broker; hidden modules still cost testing, security scanning and support.
+    decision:
+      - Every insurer-company function is removed from BIBS, with new migrations that drop its data structures. The broking modules (quotation, account, placement, issuance, booking, catalogue), broker claims handling and the finance core used by BRD-5 stay. The ReInsurance BRD remains phase 2 and will be specified for a broker.
+    alternatives:
+      - [Keep the modules hidden behind module switches, 'Code, permissions and data structures without a BDOI owner; larger attack surface']
+    consequences:
+      - '+ Smaller system to test, scan, document and support; every screen and API in BIBS serves a BDOI process.'
+      - '- Reinsurance broking in phase 2 starts from the broker model, not from the removed insurer treaty module.'
+    sources: Client decision of 8-Oct-2026; platform relevance audit of the modules
+  - id: ADR-12
+    title: Document storage in Amazon S3, metadata in PostgreSQL, short-lived links
+    status: Accepted
+    date: 26-Sep-2026
+    decided_by: BDOI (option C)
+    area: Data
+    context:
+      - BDOI instructed that documents and attachments live in an S3 bucket only. Keeping file content in the database would grow the PROD database (IER 2,000 GB) and slow backups, replication and DR tests.
+    decision:
+      - File content in S3 (four buckets per environment - documents, reports, inbound, migration), metadata in PostgreSQL (owner, type, name, size, SHA-256, object key, version, retention class, legal hold). BIBS checks the permission, writes the audit entry and returns a presigned link valid 5 minutes (parameter FILE_LINK_TTL_SECONDS).
+      - SSE-KMS with BDOI-owned keys, GuardDuty malware protection (only clean files can be downloaded), Object Lock in governance mode with legal hold under the DOA, cross-region replication for DR, no personal data in object keys. Final records of the "archive to ECM" classes are sent to ECM through the outbox.
+    alternatives:
+      - [Keep files in the database, 'Does not meet the instruction; database growth']
+      - [S3 with every download streamed through BIBS, 'Kept for protected e-mail attachments and ZIP bundles only']
+      - [ECM as the operational store, 'BDOI chose S3; ECM is the records archive']
+    consequences:
+      - '+ Small, fast database; durable, versioned, replicated file store; downloads do not pass through the pods.'
+      - '- Orphan objects are possible when a transaction fails after the upload: a nightly reconciliation removes objects without a record after 24 hours.'
+    sources: Document storage decision record (26-Sep-2026)
+  - id: ADR-13
+    title: Security scanning gates in the release pipeline
+    status: Accepted
+    date: 08-Oct-2026
+    decided_by: Project quality standard; for BDOI IT information (IQ29)
+    area: Security
+    context:
+      - BIBS handles personal and financial data and runs on BDOI's AWS account. Vulnerabilities in the application, the libraries, the images or leaked secrets must be found before a release, not in the penetration test of November 2027.
+    decision:
+      - Every pipeline run must pass - static analysis (SpotBugs with its security rule set, PMD, Checkstyle), architecture rules, CodeQL and SAST for Java and TypeScript, OWASP dependency-check (CVSS 7.0 or higher fails), npm audit (high or critical fails), Trivy on both images (high or critical with a fix fails), gitleaks over the whole history, and the SonarQube quality gate. Both images and their SBOMs (CycloneDX) are part of the release record. Pipeline actions are pinned by release digest and base images by image digest.
+    alternatives:
+      - [Periodic scans outside the pipeline, 'Findings arrive after the release']
+      - [Report-only scanning, 'Findings accumulate without an owner']
+    consequences:
+      - '+ No release with a known high or critical finding unless accepted under ADR-14.'
+      - '- Upstream releases sometimes block a release until a fixed version is out; ADR-14 governs the exception.'
+    sources: Quality gates; security controls
+  - id: ADR-14
+    title: CVE exception policy - accepted findings expire within six months
+    status: Proposed
+    date: 08-Oct-2026
+    decided_by: Project; for approval by the BDOI Information Security Officer (SA-10)
+    area: Security
+    context:
+      - A finding sometimes has no fixed release yet, or the vulnerable function is not reachable in BIBS. Silencing such findings without review would hide real risk; blocking every release would stop urgent fixes.
+    decision:
+      - A finding is fixed by upgrading the library, the base image or the package. An accepted finding is the exception - one entry per finding in the suppression file of its scanner, naming why it does not apply, the reviewer, the review date and an expiry date at most six months ahead; after the expiry the gate fails again. Critical findings that are reachable are never accepted.
+      - At 08-Oct-2026 two findings are accepted (CVE-2026-47884 and CVE-2026-47890 in Spring Web MVC 6.2.19, code paths not used by BIBS, no fixed 6.2 release), both expiring on 30-Nov-2026.
+    alternatives:
+      - [Permanent suppressions, 'Never re-checked']
+      - [No exceptions, 'Blocks releases on findings that do not apply']
+    consequences:
+      - '+ Every exception is visible, owned and time-boxed; the list is reviewed with BDOI security every month.'
+      - '- Exceptions need a reviewer named by BDOI for production releases (SA-10).'
+    sources: Quality gates (rule for findings); container scan and dependency-check suppression files
+  - id: ADR-15
+    title: One backend image, three workloads by runtime role
+    status: Accepted
+    date: 26-Sep-2026
+    decided_by: BDOI (with ADR-01)
+    area: Deployment
+    context:
+      - Month-end, remittance and renewal extraction, migration loads and report generation must not slow the screens; outbox relay and consumers must run apart from user traffic.
+    decision:
+      - The backend image runs as bibs-web (screens and user operations), bibs-jobs (scheduled and batch jobs; probes only) and bibs-integration (outbox relay, consumers, inbound files, system operations for Apigee X), selected by one variable. Each is sized, scaled and monitored on its own; the job lock keeps every job to one run per schedule.
+    alternatives:
+      - [All roles in every pod, 'Batch load competes with the screens']
+      - [Separate code bases per role, 'Duplicates the domain model']
+    consequences:
+      - '+ Batch never slows the screens; each workload has its own resources and alerts.'
+      - '- A manual run started from a screen executes on the bibs-web pod that receives it (still under the job lock).'
+    sources: Application architecture option decision sections 2 and 5.5; configuration reference (runtime role)
+  - id: ADR-16
+    title: Two edge paths - WAF and internal load balancer for users, Apigee X for systems
+    status: Accepted
+    date: 26-Sep-2026
+    decided_by: BDOI ("go ahead with the best practices")
+    area: Integration
+    context:
+      - Users reach BIBS from the BDO network and VDI; BDO systems exchange data with BIBS. BDO governs its APIs with Apigee X.
+    decision:
+      - Users - Route 53 private zone, AWS WAF, internal load balancer (Gateway, ADR-06), no public exposure. Systems - Apigee X with OAuth 2.0 client credentials, quotas and spike arrest, over a private route to the same load balancer on the prefix integration only; BIBS validates the Apigee token (issuer, audience, scopes per API) in a separate security chain. Outbound calls from BIBS to BDO systems also go through Apigee X.
+    alternatives:
+      - [Apigee X in front of the users too, 'Latency and cost on every screen action with no added control']
+      - [Direct system-to-system calls, 'Interfaces outside BDO API governance']
+    consequences:
+      - '+ Each path has the control that suits it; BDO IT governs every interface in one place.'
+      - '- Needs the private route between Google Cloud and the AWS VPC and the Apigee source ranges (BDO network team).'
+    sources: Application architecture option decision section 5.1 and 5.4
+  - id: ADR-17
+    title: TLS on every hop and deny-by-default network policies, no service mesh
+    status: Accepted
+    date: 26-Sep-2026
+    decided_by: BDOI
+    area: Security
+    context:
+      - BIBS has four workloads and almost no pod-to-pod calls; most traffic goes to managed AWS services.
+    decision:
+      - HTTPS from the load balancer to the pods with certificates from AWS Private CA through cert-manager (90 days, renewed 15 days before expiry); TLS to RDS (verify-full), Valkey and MSK (SASL_SSL); PrivateLink interfaces for AWS services; NetworkPolicies deny all traffic by default and open only the listed flows; one IAM role per workload through IRSA. A production start is refused if any connection could run in plaintext.
+    alternatives:
+      - [Service mesh with mTLS between all pods, 'Sidecars, certificates and upgrades for little gain; can be added later at platform level (ambient mode) without a BIBS change']
+    consequences:
+      - '+ Encryption in transit end to end with least-privilege network and identity.'
+      - '- nginx picks up a renewed certificate on its next restart (rollout restart after renewal).'
+    sources: Application architecture option decision section 5.2; deployment guide section 4
+  - id: ADR-18
+    title: Managed AWS services in ap-southeast-1, warm-standby DR
+    status: Accepted
+    date: 26-Sep-2026
+    decided_by: BDOI (IER enterprise elements); DR region open (IQ26, DSQ01)
+    area: Infrastructure
+    context:
+      - The IER sets RPO 15 minutes and RTO 4 hours and places BIBS on AWS. The hosting appendix restricts access to personnel in the Philippines.
+    decision:
+      - Amazon EKS, RDS for PostgreSQL 16 (Multi-AZ in Pre-Prod and PROD), ElastiCache for Valkey 8, MSK (Kafka 3.9 KRaft), S3 with KMS, in ap-southeast-1. DR is a warm standby in the approved DR region - RDS cross-region read replica, S3 replication with replication time control, images and configuration kept current; Valkey and MSK are created at failover and undelivered events are resent from the outbox.
+    alternatives:
+      - [Self-managed PostgreSQL, Kafka and cache on EC2, 'More operations effort; no gain']
+      - [Pilot-light DR (no replica), 'Restore time does not meet the 4-hour RTO for a 2 TB database']
+    consequences:
+      - '+ RPO and RTO met with managed replication; patching by AWS.'
+      - '- The DR region and its cross-border basis must be approved by BDOI (IQ26, DSQ01).'
+    sources: IER workbook; programme alignment section 6; document storage decision
+  - id: ADR-19
+    title: Business rules as configuration under maker-checker, not in code
+    status: Accepted
+    date: 08-Oct-2026
+    decided_by: Project (platform principle)
+    area: Application architecture
+    context:
+      - BDOI changes thresholds, lists, routing, posting rules and approval steps over the 10-year life of the system. A change of business rule must not need a release.
+    decision:
+      - Rules live in data - system parameters (with value type, range and category; security parameters need a second approval), lists of values with effectivity dates, rule tables per module (accounting rules, TSU routing, minimum fields, rate and commission tables, payment gate, assignment and escalation, screening match and risk rules, retention, separation of duties), workflow definitions (stages, transitions, permissions, SLA hours), exception codes with thresholds, notification events and versioned document templates. Each change is audited and, for masters, authorized by a second user. A missing value stops the action with PARAMETER_NOT_SET instead of falling back to a coded value.
+      - Platform code carries no client name, currency or logo; standing checks refuse them at every compile.
+    alternatives:
+      - [Rules in code, 'Every change needs a release and a test cycle']
+      - [A generic rules engine, 'Business users could not read or test the rules; the rule tables are specific and typed']
+    consequences:
+      - '+ BDOI administrators change rules on screens; the change is traceable in the audit trail.'
+      - '- Configuration is part of the release record: configuration inputs workbooks per drop carry each value to production.'
+    sources: Configuration reference (client-specific values, business rules as parameters); broking architecture section 3
+  - id: ADR-20
+    title: Event-driven accounting posted in the business transaction
+    status: Accepted
+    date: 08-Oct-2026
+    decided_by: Project (platform principle)
+    area: Application architecture
+    context:
+      - Accountants must change postings without code changes, and the ledger must always agree with the business records.
+    decision:
+      - Operational modules publish business events (receipt, payment, booking, commission, provision); the accounting engine selects the authorized rule for the event, line of business and currency and produces a balanced journal that is posted in the same transaction. Ledger entries are immutable (database trigger); corrections are reversals; daily balances are kept for fast trial balances and statements.
+    alternatives:
+      - [Postings coded in each module, 'Every change of account needs a release']
+      - [End-of-day batch posting, 'Ledger out of date during the day; harder to reconcile']
+    consequences:
+      - '+ Real-time ledger that agrees with the sub-ledgers; rule simulator before a change.'
+      - '- A missing or unauthorized rule stops the business transaction with NO_ACCOUNTING_RULE until the rule is maintained.'
+    sources: Solution architecture (platform modules); developer guide core flow; runbook business error codes
+  - id: ADR-21
+    title: Configuration promoted between environments as signed packages applied by the platform
+    status: Proposed
+    date: 08-Oct-2026
+    decided_by: Project (platform principle; BDOI IT to confirm the custody of the signing key)
+    area: Data
+    context:
+      - Development, SIT, UAT and production must run the same set-up (masters, configuration, rules and validations) without copying transactions or client data, and every production change must be traceable to a change request and approved by a second person.
+      - The configuration is spread over about 150 tables with references by database identifiers, which differ between environments.
+    decision:
+      - A configuration catalogue lists every configuration dataset with its natural key and references, and classifies every other table as never promoted (a build test fails on an unclassified table). Configuration moves as a versioned package of canonical JSON with a SHA-256 per file and an HMAC signature, exported by the platform in the source and imported by the platform in the target.
+      - An import is verified and compared in a dry run, approved by a second user, and applied in one transaction in dependency order with the identifiers remapped by natural key, after a snapshot that a rollback import restores. Items are deactivated, never deleted, and never when transactions use them. Production applies only in the change window with a change request number, never during a period close or a batch run.
+    alternatives:
+      - [Database dumps or SQL scripts per environment, 'Copies transactions and identifiers; no dry run, no approval, no field-level difference']
+      - [Manual re-entry on the screens of each environment, 'Slow and error-prone; environments drift apart']
+    consequences:
+      - '+ Same set-up in every environment, with a dry run, a field-level difference, maker-checker, audit, reconciliation and rollback; baselines show drift.'
+      - '- Every new table is placed in the catalogue with its change; the environments of one path share the signing key.'
+    sources: Configuration Promotion module guide; runbook "Promote configuration between environments"

@@ -1,0 +1,46 @@
+# Gateway controller: AWS Load Balancer Controller (Apache 2.0) with its Gateway API support (needs
+# the Gateway API standard CRDs and the controller's gateway.k8s.aws/v1 resources). Default of both
+# overlays: keeps the internal ALB with AWS WAF of ARCHITECTURE_OPTION_DECISION.md 5.1.
+#   GatewayClass bibs-alb          controller gateway.k8s.aws/alb
+#   LoadBalancerConfiguration      internal scheme, HTTPS 443 with the ACM certificate and the TLS
+#                                  1.3/1.2 policy, WAF web ACL, allowed source ranges, invalid header
+#                                  fields dropped, idle timeout 300 s
+#   TargetGroupConfiguration (x3)  target type ip, HTTPS to the pods, health check path per service
+# The listener certificate is the ACM certificate of the LoadBalancerConfiguration: this controller
+# does not read certificateRefs on the Gateway listener. Values from the overlay's environment.yaml.
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+labels:
+  - pairs:
+      app.kubernetes.io/part-of: bibs
+    includeSelectors: false
+resources:
+  - gateway-class.yaml
+  - load-balancer.yaml
+patches:
+  - target: { kind: Gateway, name: bibs }
+    patch: |-
+      - op: replace
+        path: /spec/gatewayClassName
+        value: bibs-alb
+      - op: add
+        path: /spec/infrastructure
+        value:
+          parametersRef: { group: gateway.k8s.aws, kind: LoadBalancerConfiguration, name: bibs-alb }
+replacements:
+  - source: { kind: ConfigMap, name: bibs-environment, fieldPath: data.albCertificateArn }
+    targets:
+      - select: { kind: LoadBalancerConfiguration, name: bibs-alb }
+        fieldPaths: [spec.listenerConfigurations.0.defaultCertificate]
+  - source: { kind: ConfigMap, name: bibs-environment, fieldPath: data.wafAclArn }
+    targets:
+      - select: { kind: LoadBalancerConfiguration, name: bibs-alb }
+        fieldPaths: [spec.wafV2.webACL]
+  - source: { kind: ConfigMap, name: bibs-environment, fieldPath: data.clientCidr }
+    targets:
+      - select: { kind: LoadBalancerConfiguration, name: bibs-alb }
+        fieldPaths: [spec.sourceRanges.0]
+  - source: { kind: ConfigMap, name: bibs-environment, fieldPath: data.apigeeCidr }
+    targets:
+      - select: { kind: LoadBalancerConfiguration, name: bibs-alb }
+        fieldPaths: [spec.sourceRanges.1]

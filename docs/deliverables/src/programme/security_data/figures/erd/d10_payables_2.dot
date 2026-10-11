@@ -1,0 +1,12 @@
+digraph erd {
+  graph [rankdir=LR, fontname="Arial", nodesep=0.3, ranksep=0.8, pad=0.2, bgcolor="white"];
+  node [shape=plain, fontname="Arial"];
+  edge [color="@CTA_BLUE", arrowsize=0.8, penwidth=1.2, dir=both];
+  "pay_supplier_invoice" [label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="3" color="@BORDER"><tr><td bgcolor="@HEADER_BLUE" align="left" colspan="2"><font color="@WHITE" point-size="12"><b>PAY_SUPPLIER_INVOICE</b></font></td></tr><tr><td align="left"><font point-size="10" color="@MUTED">PK</font></td><td align="left" port="id"><font point-size="11">ID</font></td></tr><tr><td align="left"><font point-size="10" color="@MUTED">FK</font></td><td align="left" port="party_id"><font point-size="11">PARTY_ID</font></td></tr><tr><td align="left"><font point-size="10" color="@MUTED">FK</font></td><td align="left" port="open_item_id"><font point-size="11">OPEN_ITEM_ID</font></td></tr><tr><td colspan="2" align="left"><font point-size="10" color="@MUTED">+ 28 columns</font></td></tr></table>>];
+  "pay_supplier_invoice_line" [label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="3" color="@BORDER"><tr><td bgcolor="@HEADER_BLUE" align="left" colspan="2"><font color="@WHITE" point-size="12"><b>PAY_SUPPLIER_INVOICE_LINE</b></font></td></tr><tr><td align="left"><font point-size="10" color="@MUTED">PK</font></td><td align="left" port="id"><font point-size="11">ID</font></td></tr><tr><td align="left"><font point-size="10" color="@MUTED">FK</font></td><td align="left" port="invoice_id"><font point-size="11">INVOICE_ID</font></td></tr><tr><td colspan="2" align="left"><font point-size="10" color="@MUTED">+ 7 columns</font></td></tr></table>>];
+  "pty_party" [shape=box, style="rounded,filled", fillcolor="@DIRTY_WHITE", color="@MUTED", fontsize=11, label=<<font color="@MUTED">PTY_PARTY<br/><font point-size="9">PARTY</font></font>>];
+  "sl_open_item" [shape=box, style="rounded,filled", fillcolor="@DIRTY_WHITE", color="@MUTED", fontsize=11, label=<<font color="@MUTED">SL_OPEN_ITEM<br/><font point-size="9">SUBLEDGER</font></font>>];
+  "pay_supplier_invoice":"open_item_id" -> "sl_open_item" [arrowtail=crow, arrowhead=teeodot];
+  "pay_supplier_invoice":"party_id" -> "pty_party" [arrowtail=crow, arrowhead=teetee];
+  "pay_supplier_invoice_line":"invoice_id" -> "pay_supplier_invoice" [arrowtail=crow, arrowhead=teetee];
+}

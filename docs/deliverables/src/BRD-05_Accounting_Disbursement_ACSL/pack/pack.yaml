@@ -1,0 +1,241 @@
+# BRD-5 Accounting, Disbursement and ACSL – Business Sign-off Pack, release set v2.1 (Drop 1, Transactional).
+# Built by docs/deliverables/src/signoff/signoff_pack.py (workbook, checks) and read by the FRS source through
+# ```pack blocks (tools/deliverables/bdoi_docx.py). Schema: docs/deliverables/src/signoff/README.md.
+meta:
+  brd: BRD-05
+  brd_label: BRD-5
+  name: Accounting Disbursement ACSL
+  code: AC
+  version: "2.1"
+  date: 8 October 2026
+  status_as_of: 08-Oct-2026
+  release_set: BRD-05 Accounting, Disbursement and ACSL – Business Sign-off Pack
+  frs: FRS_BRD05_ACCOUNTING.md
+  test_plan: brd05_cases.yaml
+  screens_dir: screens
+  screenshot_dir: ../screenshots
+
+# Permissions and roles are shown by their readable names, never by their codes.
+codes: labels
+
+# The personas of Accounting (FRBS), Disbursement, the Marketing refund and cash-advance requests and ACSL: role
+# code, name, SIT/UAT user of the seed profile.
+personas:
+  FRBS_PROCESSOR: {name: GL Officer (FRBS), user: glofficer}
+  FRBS_TL: {name: GL Team Lead, user: gltl}
+  FRBS_HEAD: {name: GL Section Head, user: glhead}
+  ACCOUNTANT: {name: Accountant (bank reconciliation), user: accountant}
+  FIN_ADMIN: {name: Comptrollership administrator (masters and rules), user: fmanager}
+  DISBURSEMENT: {name: Disbursement Processor, user: disb}
+  DISB_TL: {name: Disbursement Team Leader, user: disbtl}
+  DISB_APPROVER: {name: Disbursement Approver, user: disbappr}
+  PRQ_PROCESSOR: {name: Marketing Processor (AO), user: mktao}
+  PRQ_REVIEWER: {name: Marketing Reviewer, user: mktrev}
+  PRQ_APPROVER: {name: Marketing Approver, user: mktappr}
+  HR_APPROVER: {name: Human Resources Approver, user: hrappr}
+  ACSL_PROCESSOR: {name: ACSL Processor, user: acsl}
+  ACSL_TL: {name: ACSL Team Leader, user: acsltl}
+  ACSL_HEAD: {name: ACSL Head (approver), user: acslhead}
+  COMPTROLLERSHIP: {name: Comptrollership (read access), user: comptrol}
+  BUSINESS_ADMIN: {name: Business Administrator, user: badmin}
+  SYSADMIN: {name: System Administrator, user: admin}
+  AUDITOR: {name: Auditor, user: auditor}
+
+# Packs of other BRDs whose screens a walkthrough step may show (the Remittance Deductions of Operations).
+foreign_packs: [../../BRD-02_Operations/pack/pack.yaml]
+
+# Sidebar sections that belong to this BRD (navigation/modules.ts module ids) and the BRD of every other section,
+# used to mark each menu entry of a persona.
+own_sections: [disbursement, payrequest, acsl, frbs, gl, receivables, payables, assets, planning, tax,
+               accounting-engine]
+section_brd:
+  dashboard: Platform
+  nb-dashboard: BRD-1
+  workspace: BRD-1
+  crm: BRD-1
+  csf: BRD-9
+  screening: BRD-10
+  quotations: BRD-1
+  accounts: BRD-1
+  proposals: BRD-1
+  eb: BRD-8
+  placement: BRD-1
+  issuance: BRD-1
+  booking: BRD-1
+  renewal: BRD-6
+  submitted: BRD-12
+  prodrecon: BRD-2
+  adjustment: BRD-2
+  catalog: BRD-3
+  bulk: BRD-1
+  operations: BRD-2
+  collections: BRD-4
+  cashiering: BRD-2
+  remittance: BRD-2
+  commission: BRD-2
+  disbursement: BRD-5
+  payrequest: BRD-5
+  acsl: BRD-5
+  frbs: BRD-5
+  gl: BRD-5
+  receivables: BRD-5
+  payables: BRD-5
+  assets: BRD-5
+  planning: BRD-5
+  tax: BRD-5
+  accounting-engine: BRD-5
+  brokerclaims: BRD-7
+  underwriting: Platform
+  claims: Platform
+  reinsurance: Platform
+  reserves: Platform
+  migration: BRD-13
+  legacy-inquiry: BRD-13
+  nb-reports: BRD-1
+  reports: Platform
+  broking-setup: BRD-1
+  screening-setup: BRD-10
+  setup: Platform
+  user-access: BRD-11
+  admin: Platform / BRD-11
+  help: Platform
+
+# Screen-flow figure: the links between the screens (list → record → action → next screen).
+flow:
+  - [SCR-AC-01, SCR-AC-02, New Journal]
+  - [SCR-AC-01, SCR-AC-03, open]
+  - [SCR-AC-03, SCR-AC-02, Edit]
+  - [SCR-AC-03, SCR-AC-04, posted lines]
+  - [SCR-AC-06, SCR-AC-07, Chart Upload]
+  - [SCR-AC-08, SCR-AC-13, revaluation rate]
+  - [SCR-AC-09, SCR-AC-03, cost centre]
+  - [SCR-AC-10, SCR-AC-11, period]
+  - [SCR-AC-11, SCR-AC-12, checklist]
+  - [SCR-AC-14, SCR-AC-15, layout]
+  - [SCR-AC-15, SCR-AC-16, statement]
+  - [SCR-AC-17, SCR-AC-18, open]
+  - [SCR-AC-19, SCR-AC-18, open]
+  - [SCR-AC-19, SCR-AC-20, schedules]
+  - [SCR-AC-21, SCR-AC-22, open]
+  - [SCR-AC-23, SCR-AC-21, rates]
+  - [SCR-AC-22, SCR-AC-25, payout requests]
+  - [SCR-AC-25, SCR-AC-26, Encode Request]
+  - [SCR-AC-25, SCR-AC-27, Create Voucher]
+  - [SCR-AC-26, SCR-AC-27, saved]
+  - [SCR-AC-28, SCR-AC-29, open]
+  - [SCR-AC-29, SCR-AC-27, payee of the voucher]
+  - [SCR-AC-30, SCR-AC-25, uploaded requests]
+  - [SCR-AC-27, SCR-AC-31, approved vouchers]
+  - [SCR-AC-32, SCR-AC-33, open]
+  - [SCR-AC-34, SCR-AC-27, paying account]
+  - [SCR-AC-35, SCR-AC-27, cost centre]
+  - [SCR-AC-27, SCR-AC-36, CWT tag]
+  - [SCR-AC-36, SCR-AC-24, SAWT]
+  - [SCR-AC-38, SCR-AC-18, open]
+  - [SCR-AC-39, SCR-AC-40, New Refund Request]
+  - [SCR-AC-39, SCR-AC-41, New Cash Advance]
+  - [SCR-AC-39, SCR-AC-42, Cancel a Check]
+  - [SCR-AC-39, SCR-AC-43, open]
+  - [SCR-AC-40, SCR-AC-43, saved]
+  - [SCR-AC-41, SCR-AC-43, saved]
+  - [SCR-AC-43, SCR-AC-25, approved request]
+  - [SCR-AC-44, SCR-AC-43, liquidation]
+  - [SCR-AC-45, SCR-AC-46, open]
+  - [SCR-AC-46, SCR-AC-48, Raise Correction]
+  - [SCR-AC-47, SCR-AC-48, open]
+  - [SCR-AC-48, SCR-AC-03, posted journal]
+  - [SCR-AC-49, SCR-AC-50, open]
+  - [SCR-AC-50, SCR-AC-45, case]
+  - [SCR-AC-51, SCR-AC-47, difference]
+
+# Elements shared by many screens, described once.
+common:
+  - name: Page header and company
+    text: >-
+      Every page shows its section and title, a one-line description and its actions on the right. The company in the
+      header decides the records shown; lists, journals, reports and files are always of that company.
+  - name: Work lists
+    text: >-
+      Lists show status tabs (with their counts where useful), a search box, a Filters button for the other criteria
+      and the paged table ("Showing 1 to n of N results"). Rows alternate white and Background Blue; a long list
+      scrolls inside its card with the header row in view. A row opens its record. Selecting rows enables the bulk
+      actions of the tab (assign or post journals, approve vouchers, endorse or approve requests).
+  - name: Record summary and reference chips
+    text: >-
+      A record opens with its reference chips (voucher, request, journal, case, correction, root invoice), its status
+      pill, its flags (Automatic, Entry Edited, Posted, Returned) and the key facts. A reference chip copies the
+      reference.
+  - name: Workflow header and history
+    text: >-
+      A record with a workflow (disbursement voucher, payee, account funding, payment request, ACSL case and
+      correction, service-fee run) shows the workflow header under the record header: a stepper of the stages in their
+      order (passed stages ticked in blue, the current stage highlighted, the stages ahead in grey; a returned stage
+      in amber, the last stage in green once reached), and one row with Current Stage, Since, Due (with the Overdue
+      pill) and Assigned To, with the actions the user may take now on the right. The history table lists every step,
+      newest first: Stage, From Stage, Action, By (the user's name; the role under it for the users who may read the
+      roles of others: user administration, access review and audit), Date and Time, Remarks and Duration in Stage.
+      "Workflow notice" in the action tables means the in-app notice of the move.
+  - name: Maker-checker and separation of duties
+    text: >-
+      Every posting and every master change needs a second user: a journal is posted by another user than its
+      submitter; a disbursement voucher is checked and approved by other users than its processor; a funding request
+      is verified by another user than its maker and approved by two further users; a payee, a bank account and a
+      check series change take effect when the approver authorises them; a correction entry is reviewed and approved
+      by other users than its preparer; a service-fee run is approved by another user than its preparer. The action is
+      not offered to the user who may not take it, and a refusal names the rule.
+  - name: Accounting entries
+    text: >-
+      Every amount that BIBS posts goes through the accounting rules: the business event (a voucher approved, a check
+      negotiated, a funding, a correction, a service-fee accrual) proposes the entry from the rule, the user sees it as
+      Dr / Cr lines with the account, party, cost centre and amount, and the entry posts only when it balances. A
+      voucher entry that the processor edits is marked Entry Edited for the approver. Posted entries are never changed;
+      they are reversed by a linked entry.
+  - name: Status pills and tags
+    text: >-
+      Statuses are outlined pills of one size and colour per state group; a pill never wraps. Statuses show their full
+      label; an agreed short form, with the full label in the tooltip, is used only for a label longer than 21
+      characters. Flags (Automatic, Entry Edited, Posting Failed, Returned) are tags.
+  - name: Dates, amounts, rates and names
+    text: >-
+      Dates are entered with one date picker and shown as dd-MMM-yyyy; times as dd-MMM-yyyy HH:mm in Philippine time.
+      Amounts show two decimals and thousand separators, with the currency in the column header or before the amount;
+      negatives in brackets. Exchange rates show six decimals and percentage rates two to four. A period is shown in
+      lists on two lines, the start date and "to" the end date. Lists of values show their labels, insurers their
+      names and users their names.
+  - name: Uploads
+    text: >-
+      Uploads (payment requests, bank confirmations, payees, the chart of accounts, bank statements, insurer
+      statements) offer the template next to the upload; every row is checked before anything is saved and the rows
+      read, valid and rejected are shown with their messages; only the valid rows are processed and a file uploaded
+      before is refused.
+  - name: Hand-offs between the units
+    text: >-
+      Work moves inside BIBS: an approved refund, cash advance or check cancellation of Marketing becomes a payment
+      request in the Disbursement Workbench; a remittance, a commission refund or a service fee becomes a payment
+      request when its batch or run is approved; a cancelled voucher goes back to the request's source; an ACSL case
+      can ask Cashiering for a payment reversal and raise a correction entry. Each hand-off keeps the reference of its
+      source.
+  - name: Notifications and help
+    text: >-
+      The bell in the header shows the unread count and opens the notifications panel, grouped by day; each notice
+      shows its title, a one-line summary, the record reference and the time, and opens its record. Mark Read, Mark
+      All Read and View All are offered. Each user chooses the channels of the events on Notification Settings. The
+      Help button of each page explains the screen.
+  - name: Messages
+    text: >-
+      Every message follows one notice standard: a white notice with a thin bar and an icon in the colour of its kind
+      (red error, amber warning, blue information, green success), a bold short title, then the business message with
+      one bullet per missing item. Field errors appear under the field. A refusal by a business rule shows the
+      business message only, without codes; only an unexpected system error offers Retry and a reference for support.
+      Success is confirmed by a short message in the same standard.
+  - name: Confirmations and bulk results
+    text: >-
+      Every approve, post, authorise, cancel, reverse and deactivate asks for confirmation in a dialog that names the
+      record and the effect; actions that need a reason open a dialog with the reason and a comment. An action run on
+      several selected records (post journals, approve vouchers, endorse or approve requests) processes each on its own
+      and lists the outcome of each, so one failure does not stop the others.
+  - name: Reports and exports
+    text: >-
+      Reports open in the report runner with their parameters, column filters and the export to Excel, PDF, ODS or
+      CSV; several reports run together as a report batch. Large exports run in the background and are published
+      with the time from which they may be downloaded.

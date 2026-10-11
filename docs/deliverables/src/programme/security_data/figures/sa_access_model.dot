@@ -1,0 +1,17 @@
+// Security Architecture: how BIBS decides an access (identity, role permissions, data scope, approvals).
+digraph sa_access_model {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.3, ranksep=0.4, bgcolor="white", pad=0.15];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", fontname="Arial", fontsize=10, fillcolor="@WHITE", margin="0.12,0.06"];
+  edge  [color="@HEADER_BLUE", arrowsize=0.6, penwidth=1.1, fontname="Arial", fontsize=8, fontcolor="@NEAR_BLACK"];
+  req  [label=<<b>Request</b> with access token<br/><font point-size="8">Authorization: Bearer, session id inside</font>>, fillcolor="@BG_BLUE"];
+  s1   [label=<<b>1. Authentication</b><br/><font point-size="8">signature, expiry, live session in the session log, user enabled<br/>fail closed when the session store cannot be read</font>>];
+  s2   [label=<<b>2. Permission (RBAC)</b><br/><font point-size="8">user - roles (group profiles) - fine-grained permissions<br/>checked on every controller method</font>>];
+  s3   [label=<<b>3. Data scope (ABAC)</b><br/><font point-size="8">company and branch of the request against the user's scope<br/>("All companies" or listed companies and branches)</font>>];
+  s4   [label=<<b>4. Record rules</b><br/><font point-size="8">workflow stage, maker is not checker, authorisation limit,<br/>separation-of-duties rules</font>>];
+  s5   [label=<<b>5. Second approval</b><br/><font point-size="8">privileged or out-of-hours access change, security parameter,<br/>second-factor reset, legal hold</font>>];
+  ok   [label=<<b>Action applied</b><br/><font point-size="8">audit trail and access change log in the same transaction</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  no   [label=<<b>Refused</b><br/><font point-size="8">401, 403 or business rule (422)</font>>, fillcolor="@DANGER_BG", color="@DANGER"];
+  req -> s1 -> s2 -> s3 -> s4 -> s5 -> ok;
+  s1 -> no [style=dashed]; s2 -> no [style=dashed]; s3 -> no [style=dashed]; s4 -> no [style=dashed];
+  {rank=same; s3; no}
+}

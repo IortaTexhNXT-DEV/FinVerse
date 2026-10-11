@@ -1,0 +1,523 @@
+# Figures of the User Access Maintenance FRS in BDOI's template, version 1.3, drawn by brd11_figures.py.
+# swimlane: lanes (one per persona, system lanes marked system: true) and steps placed in rows (row 0 at the top);
+#   kind task (default), decision, start, end, note, system; edges [from, to, label, style, port] where port is the
+#   side the connector leaves from (left / right; default bottom).
+# states / context / matrix: Graphviz dot source.
+# caption: "Figure n - <caption>" under the figure; read: the line that tells the reader how to read it; where:
+#   summary (Introduction), A (Annex A), S (Annex S), J (Annex J), W (Annex W).
+figures:
+  # ------------------------------------------------------------------------------------------ Introduction
+  - id: brd11_fig_e2e
+    kind: swimlane
+    where: summary
+    caption: "User Access Maintenance from end to end: who does what, from the access request to the evidence of access"
+    read: "Read from top to bottom. Each column is a persona; the green column is what the system does by itself. The numbers in brackets are the FR items of section 3."
+    brd: "BRD sections A to D; NFR 9 to 11"
+    lanes:
+      - {id: req, label: Requestor}
+      - {id: app, label: Approver}
+      - {id: bad, label: Business Administrator}
+      - {id: sad, label: System Administrator}
+      - {id: sec, label: Information Security / Auditor}
+      - {id: sys, label: BIBS (system), system: true}
+    steps:
+      - {id: s0, lane: req, row: 0, kind: start, text: Joiner or mover}
+      - {id: r1, lane: req, row: 1, text: "Access request or bulk (FRUM.009, .011)"}
+      - {id: a1, lane: app, row: 2, text: "Approve, reject or return (FRUM.010)"}
+      - {id: c1, lane: sec, row: 2, text: "Second approval if privileged (FRUM.010.05)"}
+      - {id: y2, lane: sys, row: 3, kind: system, text: "Apply or schedule; notify the user (FRUM.013)"}
+      - {id: b0, lane: bad, row: 3, kind: start, text: New or changed role}
+      - {id: b1, lane: bad, row: 4, text: "Group-profile request (FRUM.005, .006)"}
+      - {id: c2, lane: sec, row: 4, text: "Authorise rules and settings (FRUM.012)"}
+      - {id: a2, lane: app, row: 5, text: "Approvers decide in order"}
+      - {id: m1, lane: sad, row: 6, text: "Implement the profile (FRUM.005.04)"}
+      - {id: y3, lane: sys, row: 7, kind: system, text: "Sign-in, sessions, daily runs, audit log (FRUM.001, .008)"}
+      - {id: c3, lane: sec, row: 8, text: "Reports and audit log as evidence (FRUM.007)"}
+      - {id: e1, lane: sec, row: 9, kind: end, text: Evidence}
+    edges:
+      - [s0, r1]
+      - [r1, a1]
+      - [a1, c1, "Privileged", "", right]
+      - [a1, y2, "Approved"]
+      - [c1, y2]
+      - [b0, b1]
+      - [b1, a2]
+      - [a2, m1]
+      - [m1, y3, "", "", right]
+      - [y2, y3]
+      - [c2, y3, "", "dashed"]
+      - [y3, c3]
+      - [c3, e1]
+
+  # ------------------------------------------------------------------------------------------ Annex A
+  - id: brd11_fig_signin
+    kind: swimlane
+    where: A
+    caption: "Sign-in, inactivity warning, session end and log-out with single sign-on through EIAM"
+    read: "Read from top to bottom. BDO users sign in at EIAM; only the named break-glass System Administrators keep a local password and the second factor (Annex N)."
+    brd: "BRD 1.001, 2.001, 3.001, 4.001; NFR p.14, p.17; FRUM.001, FRUM-004"
+    lanes:
+      - {id: usr, label: User}
+      - {id: eia, label: "EIAM (BDO single sign-on)"}
+      - {id: sys, label: BIBS (system), system: true}
+      - {id: adm, label: System Administrator}
+    steps:
+      - {id: s0, lane: usr, row: 0, kind: start, text: Open BIBS}
+      - {id: u1, lane: usr, row: 1, text: "Sign in with the BDO identity provider"}
+      - {id: e1, lane: eia, row: 1, text: "Password, second factor and BDO device rules; lock-out after 3 invalid tries"}
+      - {id: d1, lane: sys, row: 2, kind: decision, text: "Linked to an active user?"}
+      - {id: y0, lane: sys, row: 3, kind: system, text: "Refused: not linked to an active user; recorded"}
+      - {id: y1, lane: sys, row: 4, kind: system, text: "Session with the user's group profiles; menu by persona; sign-in recorded"}
+      - {id: y2, lane: sys, row: 5, kind: system, text: "15 minutes without activity: warning Stay Logged In / Log Out"}
+      - {id: d2, lane: usr, row: 6, kind: decision, text: "Stay logged in?"}
+      - {id: y3, lane: sys, row: 7, kind: system, text: "30 minutes without activity: sign-out, reason inactivity"}
+      - {id: u2, lane: usr, row: 8, text: "Log Out"}
+      - {id: y4, lane: sys, row: 9, kind: system, text: "Session ended and recorded; EIAM sign-out (proposed, Annex Z)"}
+      - {id: e9, lane: usr, row: 10, kind: end, text: Signed out}
+      - {id: b1, lane: adm, row: 2, text: "Break-glass only: local password and second factor"}
+      - {id: b2, lane: adm, row: 3, kind: note, text: "Each break-glass sign-in reviewed by Information Security"}
+    edges:
+      - [s0, u1]
+      - [u1, e1, "", "", right]
+      - [e1, d1]
+      - [d1, y0, "No"]
+      - [d1, y1, "Yes", "", right]
+      - [b1, y1]
+      - [y1, y2]
+      - [y2, d2]
+      - [d2, y1, "Yes", "", right]
+      - [d2, y3, "No answer"]
+      - [y3, u2, "", "dashed"]
+      - [u2, y4, "", "", right]
+      - [y4, e9]
+
+  - id: brd11_fig_access_request
+    kind: swimlane
+    where: A
+    caption: "User access request (enrol, modify, deactivate, reactivate): request, four-eyes decision, return, cancellation and effective date"
+    read: "Read from top to bottom. Each column is a persona; the green column is what the system does by itself. Diamonds are decisions; the yellow note gives the time rule."
+    brd: "BRD 1.002 to 1.008, 2.002; FRUM.009, FRUM.010"
+    lanes:
+      - {id: req, label: Requestor}
+      - {id: app, label: Approver}
+      - {id: sec, label: Second Approver (Information Security)}
+      - {id: sys, label: BIBS (system), system: true}
+      - {id: usr, label: User concerned}
+    steps:
+      - {id: s0, lane: req, row: 0, kind: start, text: Start}
+      - {id: r1, lane: req, row: 1, text: "Create request: user data, group profiles, approver, justification"}
+      - {id: r2, lane: req, row: 2, kind: decision, text: "Submit now?"}
+      - {id: r3, lane: req, row: 3, text: "Save draft; edit or cancel later"}
+      - {id: y1, lane: sys, row: 2, kind: system, text: "Checks: user ID format, open request, own access, separation of duties"}
+      - {id: y2, lane: sys, row: 3, kind: system, text: "Pending Approval; notice to the chosen approver"}
+      - {id: n1, lane: app, row: 3, kind: note, text: "No SLA in the BRD; proposed 2 working days (Annex S)"}
+      - {id: a1, lane: app, row: 4, text: "Open the request from Assigned to Me; compare current and requested values"}
+      - {id: a2, lane: app, row: 5, kind: decision, text: "Decision"}
+      - {id: r4, lane: req, row: 6, text: "Correct and re-submit, or cancel with a reason"}
+      - {id: y3, lane: sys, row: 6, kind: decision, text: "Privileged or out of hours?"}
+      - {id: c1, lane: sec, row: 7, text: "Second approval (not the first approver)"}
+      - {id: y4, lane: sys, row: 8, kind: system, text: "Apply now, or Scheduled until the effective date (daily run 00:05)"}
+      - {id: r5, lane: app, row: 9, kind: end, text: "Rejected"}
+      - {id: u1, lane: usr, row: 9, text: "Notice and e-mail: Your access changed"}
+      - {id: e1, lane: usr, row: 10, kind: end, text: "Approved"}
+    edges:
+      - [s0, r1]
+      - [r1, r2]
+      - [r2, r3, "No"]
+      - [r2, y1, "Yes", "", right]
+      - [y1, y2]
+      - [y2, a1]
+      - [a1, a2]
+      - [a2, r4, "Return", "", left]
+      - [r4, r2, "Re-submit"]
+      - [a2, y3, "Approve", "", right]
+      - [a2, r5, "Reject"]
+      - [y3, c1, "Yes", "", left]
+      - [y3, y4, "No"]
+      - [c1, y4]
+      - [y4, u1]
+      - [u1, e1]
+
+  - id: brd11_fig_bulk
+    kind: swimlane
+    where: A
+    caption: "Bulk request: template, row-by-row check, draft batch, decision of the approver on the batch"
+    read: "Read from top to bottom. A file of user requests becomes one batch; the approver decides the batch as a whole (open point CLR-UA-16 answered by BDOI's mapping \"c/o UIDM\", see Annex Q C24)."
+    brd: "BRD 1.009; NFR p.17 (9); FRUM.011"
+    lanes:
+      - {id: req, label: Requestor}
+      - {id: sys, label: BIBS (system), system: true}
+      - {id: app, label: Approver}
+      - {id: usr, label: Users concerned}
+    steps:
+      - {id: s0, lane: req, row: 0, kind: start, text: Start}
+      - {id: r1, lane: req, row: 1, text: "Download the template; one row per user"}
+      - {id: r2, lane: req, row: 2, text: "Upload the file (Excel, CSV or TXT) with remarks"}
+      - {id: y1, lane: sys, row: 2, kind: system, text: "Check every row: format, existing user, profiles, separation of duties"}
+      - {id: d1, lane: sys, row: 3, kind: decision, text: "Rows in error?"}
+      - {id: r3, lane: req, row: 4, text: "Download the error file, correct and upload again"}
+      - {id: y2, lane: sys, row: 5, kind: system, text: "Valid rows saved as the draft lines of a batch"}
+      - {id: r4, lane: req, row: 6, text: "Edit, cancel or submit the batch"}
+      - {id: a1, lane: app, row: 7, kind: decision, text: "Approve the batch?"}
+      - {id: y3, lane: sys, row: 8, kind: system, text: "Apply every line; Rejected or Returned as a whole"}
+      - {id: u1, lane: usr, row: 9, text: "Each user told: Your access changed"}
+      - {id: e1, lane: usr, row: 10, kind: end, text: Done}
+    edges:
+      - [s0, r1]
+      - [r1, r2]
+      - [r2, y1, "", "", right]
+      - [y1, d1]
+      - [d1, r3, "Yes", "", left]
+      - [r3, r2, "Upload again"]
+      - [d1, y2, "No"]
+      - [y2, r4, "", "", left]
+      - [r4, a1, "Submit", "", right]
+      - [a1, y3, "Decision", "", left]
+      - [y3, u1, "", "", right]
+      - [u1, e1]
+
+  - id: brd11_fig_group_profile
+    kind: swimlane
+    where: A
+    caption: "Group-profile request (new, change, deactivation, reactivation): approvers in order and implementation by the System Administrator"
+    read: "Read from top to bottom. The approvers decide one after the other; the System Administrator who implements cannot be the requester. BDOI's FRUM.005 and FRUM.006 let authorised users change roles directly (Annex Q, C03)."
+    brd: "BRD 3.002, 4.002; p.6; FRUM.005, FRUM.006"
+    lanes:
+      - {id: bad, label: Business Administrator}
+      - {id: ap1, label: First approver}
+      - {id: ap2, label: Next approver (in order)}
+      - {id: sad, label: System Administrator}
+      - {id: sys, label: BIBS (system), system: true}
+    steps:
+      - {id: s0, lane: bad, row: 0, kind: start, text: Start}
+      - {id: b1, lane: bad, row: 1, text: "Request: profile, permissions to add or remove, privilege level, approvers in order"}
+      - {id: y1, lane: sys, row: 2, kind: system, text: "Checks: unique name, no permission both added and removed; notice to the first approver"}
+      - {id: a1, lane: ap1, row: 3, kind: decision, text: "Approve?"}
+      - {id: a2, lane: ap2, row: 4, kind: decision, text: "Approve?"}
+      - {id: y2, lane: sys, row: 5, kind: system, text: "For Implementation; notice to the System Administrators"}
+      - {id: m1, lane: sad, row: 6, text: "Implement the request (not its requester)"}
+      - {id: y3, lane: sys, row: 7, kind: system, text: "Profile applied to all members; members told on deactivation or reactivation"}
+      - {id: e1, lane: sys, row: 8, kind: end, text: Implemented}
+      - {id: b2, lane: bad, row: 5, text: "Returned: correct and re-submit; or Rejected"}
+    edges:
+      - [s0, b1]
+      - [b1, y1, "Submit", "", right]
+      - [y1, a1, "", "", left]
+      - [a1, a2, "Yes", "", right]
+      - [a2, y2, "Yes", "", right]
+      - [a1, b2, "No / return", "", left]
+      - [a2, b2, "No / return"]
+      - [y2, m1, "", "", left]
+      - [m1, y3, "", "", right]
+      - [y3, e1]
+
+  - id: brd11_fig_reports
+    kind: swimlane
+    where: A
+    caption: "Generating a user access report or the audit log, exporting it and the record of the export"
+    read: "Read from top to bottom. Every report and export is limited to the holders of the report right and is itself recorded in the audit trail."
+    brd: "BRD 3.003, 4.003; p.18; FRUM.007, FRUM.008"
+    lanes:
+      - {id: usr, label: "Report user (Annex V)"}
+      - {id: sys, label: BIBS (system), system: true}
+    steps:
+      - {id: s0, lane: usr, row: 0, kind: start, text: Start}
+      - {id: u1, lane: usr, row: 1, text: "Open User Access Reports; choose the report"}
+      - {id: u2, lane: usr, row: 2, text: "Enter the filters: as-of date or period, user, profile, status"}
+      - {id: y1, lane: sys, row: 3, kind: system, text: "Run the report: header with name, generated by, coverage, date and time"}
+      - {id: u3, lane: usr, row: 4, text: "Sort, read the total; export PDF, Excel or CSV"}
+      - {id: y2, lane: sys, row: 5, kind: system, text: "File of the filtered rows only; export recorded in the audit trail"}
+      - {id: e1, lane: usr, row: 6, kind: end, text: Evidence kept}
+    edges:
+      - [s0, u1]
+      - [u1, u2]
+      - [u2, y1, "", "", right]
+      - [y1, u3, "", "", left]
+      - [u3, y2, "", "", right]
+      - [y2, e1, "", "", left]
+
+  - id: brd11_fig_controls
+    kind: swimlane
+    where: A
+    caption: "Controls kept by Information Security: separation-of-duties rules and changes of security settings"
+    read: "Read from top to bottom. Each rule or setting changes only after a second person of Information Security authorises it."
+    brd: "BRD NFR p.17 (11), p.14; FRUM.012"
+    lanes:
+      - {id: bad, label: Business Administrator}
+      - {id: sad, label: System Administrator}
+      - {id: sec, label: Information Security Officer}
+      - {id: sys, label: BIBS (system), system: true}
+    steps:
+      - {id: b1, lane: bad, row: 0, text: "New rule: two group profiles one user may not hold together, with the reason"}
+      - {id: m1, lane: sad, row: 1, text: "Change of a security setting: lock-out, timers, password, working hours, dormancy"}
+      - {id: y1, lane: sys, row: 2, kind: system, text: "Waits for authorisation; notice to Information Security"}
+      - {id: c1, lane: sec, row: 3, kind: decision, text: "Authorise?"}
+      - {id: y2, lane: sys, row: 4, kind: system, text: "Rule active: every request and bulk line checked / setting applied"}
+      - {id: y3, lane: sec, row: 5, kind: system, text: "Rejected: rule or setting unchanged; reason recorded"}
+      - {id: e1, lane: sys, row: 6, kind: end, text: Recorded}
+    edges:
+      - [b1, y1, "", "", right]
+      - [m1, y1, "", "", right]
+      - [y1, c1, "", "", left]
+      - [c1, y2, "Yes", "", right]
+      - [c1, y3, "No"]
+      - [y2, e1]
+      - [y3, e1, "", "", right]
+
+  - id: brd11_fig_daily
+    kind: swimlane
+    where: A
+    caption: "Daily runs: effective-dated changes, dormant users and password expiry, with the notice of a failed run"
+    read: "Read from top to bottom. The runs start by themselves at the times shown (Philippine time); a failed run is e-mailed to the named recipients."
+    brd: "BRD NFR p.13 (1.k), p.15; FRUM.003.04, FRUM.009.10, FRUM.013.02"
+    lanes:
+      - {id: sys, label: BIBS (system), system: true}
+      - {id: usr, label: Users}
+      - {id: adm, label: "Business and System Administrators"}
+      - {id: rcp, label: Recipients of failed runs}
+    steps:
+      - {id: y1, lane: sys, row: 0, kind: system, text: "00:05 Apply the scheduled requests of the day"}
+      - {id: d1, lane: sys, row: 1, kind: decision, text: "Applied?"}
+      - {id: a1, lane: adm, row: 1, text: "Alert: scheduled change failed; request stays Scheduled"}
+      - {id: u1, lane: usr, row: 2, text: "Your access changed"}
+      - {id: y2, lane: sys, row: 3, kind: system, text: "00:15 Dormant users: notice 7 days before; deactivation after 90 days without sign-in"}
+      - {id: u2, lane: usr, row: 4, text: "Your account will be deactivated / Your access changed"}
+      - {id: a2, lane: adm, row: 4, text: "Dormant users deactivated: list"}
+      - {id: y3, lane: sys, row: 5, kind: system, text: "06:00 Password expiry notice (break-glass accounts)"}
+      - {id: d2, lane: sys, row: 6, kind: decision, text: "Run failed?"}
+      - {id: f1, lane: rcp, row: 7, text: "E-mail: batch job <job> failed"}
+      - {id: e1, lane: sys, row: 8, kind: end, text: Next day}
+    edges:
+      - [y1, d1]
+      - [d1, a1, "No", "", right]
+      - [d1, u1, "Yes"]
+      - [u1, y2]
+      - [y2, u2]
+      - [y2, a2]
+      - [u2, y3]
+      - [y3, d2]
+      - [d2, f1, "Yes", "", right]
+      - [d2, e1, "No"]
+
+  - id: brd11_fig_uidm
+    kind: swimlane
+    where: A
+    caption: "Joiner, mover and leaver with UIDM-ISC and EIAM (BDOI's FRS: requests outside the system, details synchronised)"
+    read: "Read from top to bottom. This is option (a) of Annex N; the choice of option is decision C01 of Annex Q. Group profiles stay in the system and change only through approved requests."
+    brd: "BRD p.5-6 (request rule); FRUM.002, FRUM.003; Annex N"
+    lanes:
+      - {id: mgr, label: "Unit head (UIDM-ISC request)"}
+      - {id: idm, label: "UIDM-ISC and EIAM (BDOI IT)"}
+      - {id: sys, label: BIBS (system), system: true}
+      - {id: bad, label: Requestor / Approver}
+    steps:
+      - {id: s0, lane: mgr, row: 0, kind: start, text: "Joiner, mover or leaver"}
+      - {id: m1, lane: mgr, row: 1, text: "Request in UIDM-ISC, approved there"}
+      - {id: i1, lane: idm, row: 2, text: "EIAM account created, changed or disabled"}
+      - {id: i2, lane: idm, row: 3, text: "Provisioning event with the UIDM request number"}
+      - {id: d1, lane: sys, row: 4, kind: decision, text: "Valid and unique?"}
+      - {id: y1, lane: sys, row: 5, kind: system, text: "User created, changed, deactivated or reactivated; open sessions of a leaver end"}
+      - {id: y0, lane: sys, row: 6, kind: system, text: "Refused: answered to UIDM-ISC and alerted"}
+      - {id: b1, lane: bad, row: 6, text: "Group profiles given through access requests under four eyes"}
+      - {id: e1, lane: bad, row: 7, kind: end, text: "User ready"}
+    edges:
+      - [s0, m1]
+      - [m1, i1, "", "", right]
+      - [i1, i2]
+      - [i2, d1, "", "", right]
+      - [d1, y1, "Yes"]
+      - [d1, y0, "No", "", left]
+      - [y1, b1, "", "", right]
+      - [b1, e1]
+
+  # ---------------------------------------------------------------------------------------- life-cycles
+  - id: brd11_fig_states_request
+    kind: states
+    where: A
+    caption: "Status life-cycle of a user access request"
+    read: "Each box is a status shown on the screens; each arrow is an action with the persona who takes it. Grey boxes are final."
+    brd: "BRD 1.002 to 1.008, 2.002; FRUM.009, FRUM.010"
+    dot: |
+      digraph R {
+        graph [rankdir=LR, nodesep=0.3, ranksep=0.45, fontname="Arial", pad=0.15, size="9.4,6"];
+        node [fontname="Arial", fontsize=10, shape=box, style="rounded,filled", fillcolor="#EAF1FB", color="#1F3864", margin="0.12,0.06"];
+        edge [fontname="Arial", fontsize=8.5, color="#404040", arrowsize=0.7];
+        new [label="(new)", shape=circle, fillcolor="#C6E0B4", width=0.5, fixedsize=true];
+        draft [label="Draft"]; pend [label="Pending\nApproval"]; sec [label="Pending Second\nApproval"]; ret [label="Returned"];
+        sch [label="Scheduled"]; appr [label="Approved", fillcolor="#D9D9D9"]; rej [label="Rejected", fillcolor="#D9D9D9"]; can [label="Cancelled", fillcolor="#D9D9D9"];
+        new -> draft [label="Save\n(Requestor)"];
+        draft -> pend [label="Submit"];
+        draft -> can [label="Cancel"];
+        pend -> sec [label="Approve:\nprivileged or\nout of hours"];
+        pend -> appr [label="Approve\n(chosen approver)"];
+        pend -> sch [label="Approve with a\nlater effective date"];
+        sec -> appr [label="Second approval"];
+        sec -> sch;
+        pend -> ret [label="Return"]; sec -> ret;
+        ret -> pend [label="Correct and\nre-submit"];
+        pend -> rej [label="Reject\n(reason)"]; sec -> rej;
+        pend -> can [label="Cancel\n(requester)"]; ret -> can; sch -> can [label="Cancel"];
+        sch -> appr [label="Daily run on the\neffective date"];
+      }
+
+  - id: brd11_fig_states_group
+    kind: states
+    where: A
+    caption: "Status life-cycle of a group-profile request"
+    read: "As Figure of the access request, with approvers in order and the implementation step of the System Administrator."
+    brd: "BRD 3.002; p.6; FRUM.005, FRUM.006"
+    dot: |
+      digraph G {
+        graph [rankdir=LR, nodesep=0.3, ranksep=0.5, fontname="Arial", pad=0.15];
+        node [fontname="Arial", fontsize=10, shape=box, style="rounded,filled", fillcolor="#EAF1FB", color="#1F3864", margin="0.12,0.06"];
+        edge [fontname="Arial", fontsize=8.5, color="#404040", arrowsize=0.7];
+        new [label="(new)", shape=circle, fillcolor="#C6E0B4", width=0.5, fixedsize=true];
+        draft [label="Draft"]; pend [label="Pending Approval\n(approver 1 ... n)"]; ret [label="Returned"];
+        fi [label="For\nImplementation"]; impl [label="Implemented", fillcolor="#D9D9D9"]; rej [label="Rejected", fillcolor="#D9D9D9"]; can [label="Cancelled", fillcolor="#D9D9D9"];
+        new -> draft [label="Save (Business\nAdministrator)"];
+        draft -> pend [label="Submit"]; draft -> can [label="Cancel"];
+        pend -> pend [label="Approve: next\napprover in order"];
+        pend -> fi [label="Last approval"];
+        pend -> ret [label="Return"]; ret -> pend [label="Re-submit"];
+        pend -> rej [label="Reject"]; pend -> can [label="Cancel"]; ret -> can;
+        fi -> impl [label="Implement (System\nAdministrator, not\nthe requester)"];
+      }
+
+  - id: brd11_fig_states_user
+    kind: states
+    where: A
+    caption: "Status life-cycle of a user account"
+    read: "The statuses a user account takes in the system. With single sign-on, EIAM also refuses a disabled or locked BDO account at sign-in."
+    brd: "BRD 1.002, 1.004, 1.005; NFR p.13-14; FRUM.002, FRUM.003"
+    dot: |
+      digraph U {
+        graph [rankdir=LR, nodesep=0.35, ranksep=0.6, fontname="Arial", pad=0.15];
+        node [fontname="Arial", fontsize=10, shape=box, style="rounded,filled", fillcolor="#EAF1FB", color="#1F3864", margin="0.12,0.06"];
+        edge [fontname="Arial", fontsize=8.5, color="#404040", arrowsize=0.7];
+        new [label="(none)", shape=circle, fillcolor="#C6E0B4", width=0.55, fixedsize=true];
+        act [label="Active\n(Online while signed in)"]; lock [label="Locked"]; dis [label="Disabled\n(deactivated)"];
+        new -> act [label="Approved enrolment\nor provisioning (joiner)"];
+        act -> lock [label="3 invalid tries\n(local accounts)"];
+        lock -> act [label="Unlock (System Administrator)\nor reactivation request"];
+        act -> dis [label="Approved deactivation, leaver,\nor 90 days without sign-in"];
+        dis -> act [label="Approved reactivation:\nprofiles held before restored"];
+      }
+
+  - id: brd11_fig_states_sod
+    kind: states
+    where: A
+    caption: "Status life-cycle of a separation-of-duties rule"
+    read: "A rule is made by the Business Administrator and authorised by Information Security; its deactivation is authorised the same way."
+    brd: "BRD NFR p.17 (11); FRUM.012.01"
+    dot: |
+      digraph S {
+        graph [rankdir=LR, nodesep=0.35, ranksep=0.6, fontname="Arial", pad=0.15];
+        node [fontname="Arial", fontsize=10, shape=box, style="rounded,filled", fillcolor="#EAF1FB", color="#1F3864", margin="0.12,0.06"];
+        edge [fontname="Arial", fontsize=8.5, color="#404040", arrowsize=0.7];
+        new [label="(new)", shape=circle, fillcolor="#C6E0B4", width=0.5, fixedsize=true];
+        pa [label="Waiting for\nauthorisation"]; act [label="Active"]; pd [label="Deactivation waiting\nfor authorisation"]; ina [label="Inactive", fillcolor="#D9D9D9"];
+        new -> pa [label="Create (Business\nAdministrator)"];
+        pa -> act [label="Authorise (Information\nSecurity, not the maker)"];
+        pa -> ina [label="Reject"];
+        act -> pd [label="Ask deactivation\n(reason)"];
+        pd -> ina [label="Authorise"];
+        pd -> act [label="Reject"];
+      }
+
+  - id: brd11_fig_context
+    kind: context
+    where: A
+    caption: "Integration context of User Access Maintenance"
+    read: "Solid lines are in scope; dashed lines are on hold or replaced; the details of each interface are in Annex W."
+    brd: "BRD NFR p.13-15, p.17; FRUM.001 to FRUM.003, FRUM.013"
+    dot: |
+      digraph C {
+        graph [layout=dot, rankdir=LR, nodesep=0.35, ranksep=0.9, fontname="Arial", pad=0.15];
+        node [fontname="Arial", fontsize=10, shape=box, style="rounded,filled", fillcolor="#FFFFFF", color="#1F3864", margin="0.14,0.07"];
+        edge [fontname="Arial", fontsize=8.5, color="#404040", arrowsize=0.7];
+        uam [label="BIBS\nUser Access Maintenance\n(users, group profiles,\nrequests, logs)", fillcolor="#1F3864", fontcolor="white", fontsize=11];
+        eiam [label="EIAM\n(BDO single sign-on,\nMicrosoft Entra ID)", fillcolor="#EAF1FB"];
+        uidm [label="UIDM-ISC\n(identity governance:\njoiners, movers, leavers,\ncertification)", fillcolor="#EAF1FB"];
+        mail [label="BDO e-mail relay", fillcolor="#EAF1FB"];
+        eua [label="EUA / LDAP\n(replaced by EIAM)", fillcolor="#F2F2F2", color="#808080", fontcolor="#595959"];
+        acl [label="External access-\ncontrol list (on hold)", fillcolor="#F2F2F2", color="#808080", fontcolor="#595959"];
+        logs [label="BDO log server\n(on hold)", fillcolor="#F2F2F2", color="#808080", fontcolor="#595959"];
+        mods [label="All BIBS modules\n(BRD-1 to BRD-13)", fillcolor="#E2EFDA"];
+        dm [label="BRD-13 Data Migration\n(users at go-live by\nbulk request)", fillcolor="#E2EFDA"];
+        rep [label="Reports and audit log\n(Auditor, Information Security)", fillcolor="#E2EFDA"];
+        eiam -> uam [label="sign-in of BDO users"];
+        uidm -> uam [label="provisioning events\n(option decided in C01)"];
+        uam -> uidm [label="accounts and profiles\nfor certification"];
+        uam -> mail [label="access notices,\nfailed runs"];
+        eua -> uam [style=dashed]; acl -> uam [style=dashed]; uam -> logs [style=dashed];
+        uam -> mods [label="permissions and menus\nof the signed-in user"];
+        dm -> uam [label="users file"];
+        uam -> rep [label="evidence of access"];
+      }
+
+  # ---------------------------------------------------------------------------------------- Annex S
+  - id: brd11_fig_approvals
+    kind: table
+    where: S
+    caption: "Who makes, who checks and who approves each change of access"
+    read: "Each row is a kind of change, read from left to right: the maker, the checker or approver, the second approval where it applies and who applies the change. No one decides his or her own change."
+    brd: "BRD sections A to D; NFR p.17 (11); FRUM.005, FRUM.009 to FRUM.012"
+    dot: |
+      digraph T {
+        graph [pad=0.1];
+        node [shape=plaintext, fontname="Arial", fontsize=9];
+        m [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="5" COLOR="#8EA9DB">
+          @HEADER@
+          @ROWS@
+        </TABLE>>];
+      }
+    header: [Change, "Maker", "Checker / approver", "Second approval", "Applied by"]
+    tick: false
+    rows:
+      - ["User access request (enrol, modify, deactivate, reactivate)", Requestor, "Approver chosen on the request", "Second Approver, only for a privileged or out-of-hours change", "System, at once or on the effective date"]
+      - ["Bulk request", Requestor, "Approver chosen on the batch (whole batch)", "Second Approver for the flagged lines", System]
+      - ["Correction or cancellation of a request", "Requestor (creator)", "-", "-", System]
+      - ["Group-profile request (new, change, deactivate, reactivate)", Business Administrator, "Approvers chosen, in order; all must approve", "-", "System Administrator, not the requester"]
+      - ["Separation-of-duties rule (new or deactivation)", Business Administrator, "Information Security Officer, not the maker", "-", System]
+      - ["Security setting (lock-out, timers, password, working hours, dormancy, emergency edit)", System Administrator, "Information Security Officer", "-", System]
+      - ["Second-factor reset of a break-glass account", System Administrator, "Another holder of the reset approval right", "-", System]
+      - ["Unlock of a locked local account", System Administrator, "-", "-", "System (recorded in the access-change log)"]
+      - ["Dormant-user deactivation", "System (daily run)", "-", "-", "System; users told 7 days before"]
+
+  # ---------------------------------------------------------------------------------------- Annex J
+  - id: brd11_fig_menus
+    kind: table
+    header: ["Menu entry", Requestor, Approver, "Second|Approver", "Business|Admin.", "System|Admin.", "Information|Security", Auditor]
+    tick: true
+    where: J
+    caption: "Menu by persona: the User Access Maintenance screens each persona sees"
+    read: "A tick means the screen is in the persona's menu; a screen without a tick is neither shown nor opened by its address. The full menus of every persona are in the BIBS sign-off workbook of BRD-11."
+    brd: "BRD 4.002.2; FRUM.001.02, FRUM.005.06"
+    dot: |
+      digraph M {
+        graph [pad=0.1];
+        node [shape=plaintext, fontname="Arial", fontsize=9];
+        m [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4" COLOR="#8EA9DB">
+          @HEADER@
+          @ROWS@
+        </TABLE>>];
+      }
+    source: "Sidebars of the personas in the BIBS FRS BRD-11 v2.1 (tables 25 to 31), as given by the group profiles of the SIT/UAT data"
+    rows:
+      - ["Home › My Approvals", Y, Y, Y, Y, Y, Y, Y]
+      - ["User Access › Access Requests", Y, Y, Y, Y, Y, Y, Y]
+      - ["User Access › Bulk Request", Y, Y, "", Y, Y, "", ""]
+      - ["User Access › Group Profile Requests", "", Y, Y, Y, Y, Y, Y]
+      - ["User Access › User Access Matrix", "", Y, "", Y, Y, Y, Y]
+      - ["User Access › Separation of Duties", "", "", "", Y, "", Y, ""]
+      - ["User Access › User Access Reports", "", Y, "", Y, Y, Y, Y]
+      - ["Administration › Users", "", "", "", "", Y, "", ""]
+      - ["Administration › Identity Synchronisation", "", "", "", "", Y, "", ""]
+      - ["Administration › Roles & Permissions", "", "", "", "", Y, "", ""]
+      - ["Administration › Second Factor", "", "", "", "", Y, Y, ""]
+      - ["Administration › Audit Trail", "", "", "", Y, Y, Y, Y]
+      - ["Administration › System Parameters", "", "", "", Y, Y, Y, Y]
+      - ["Administration › Scheduled Jobs", "", "", "", Y, Y, "", Y]
+      - ["Help › My Profile (every user)", Y, Y, Y, Y, Y, Y, Y]

@@ -1,0 +1,46 @@
+// Maintenance of the product masters under maker-checker: hierarchy, coverages, clauses, field rules, insurer
+// commission rates and incentive rules (FRPM.003.02, 003.08, 018.01-02, 022.01-02, 023.01; PMADD01, 02, 07, 08;
+// BRPM.003, 004, 005).
+digraph master_maintenance {
+  graph [rankdir=TB, newrank=true, fontname="Arial", nodesep=0.12, ranksep=0.26, bgcolor="white", pad=0.15, splines=polyline];
+  node  [shape=box, style="rounded,filled", fontname="Arial", fontsize=10, width=1.2, height=0.45, margin="0.05,0.03"];
+  edge  [arrowsize=0.55, penwidth=0.8, color="#333333", fontname="Arial", fontsize=8.5];
+
+  subgraph cluster_mbs { label="MBS (maker)"; fontname="Arial Bold"; fontsize=10; style="rounded"; color="#D6B656";
+    node [fillcolor="#FFF2CC", color="#D6B656"];
+    h1 [label="", shape=plaintext, style="", width=0.1, height=0.1];
+    start [label="Start", shape=ellipse, fillcolor="#FFFFFF", width=0.7, height=0.3];
+    m1 [label="Add or change: line,\ncover type, coverage,\nclause, field rule,\nincentive rule"];
+    m2 [label="Save for\nauthorization"];
+    m3 [label="Correct and\nresubmit"];
+  }
+  subgraph cluster_ba { label="Business Administrator or\nNew Business Approver (checker)"; fontname="Arial Bold"; fontsize=10; style="rounded"; color="#10739E";
+    node [fillcolor="#B1DDF0", color="#10739E"];
+    h2 [label="", shape=plaintext, style="", width=0.1, height=0.1];
+    c1 [label="Review the change\nin My Approvals"];
+    c2 [label="Authorize?", shape=diamond, width=1.0, height=0.65, style="filled"];
+    c3 [label="Reject with\nreason"];
+  }
+  subgraph cluster_sys { label="System"; fontname="Arial Bold"; fontsize=10; style="rounded"; color="#666666";
+    node [fillcolor="#F5F5F5", color="#666666"];
+    h3 [label="", shape=plaintext, style="", width=0.1, height=0.1];
+    s1 [label="Checks: mandatory\nfields, dates, no\noverlap, pattern"];
+    s2 [label="Maker cannot\nauthorize own\nchange"];
+    s3 [label="Active from the\neffective date;\nused by packages,\nquotations, accounts"];
+    s4 [label="Never deleted:\nend-dated or\ndeactivated; audit\nkeeps every change"];
+    s5 [label="Product ends:\nincentive rules\nflagged for review"];
+  }
+  { rank=same; h1; h2; h3; }
+  h1 -> h2 -> h3 [style=invis];
+  h1 -> start [style=invis];
+  start -> m1 -> s1;
+  s1 -> m3 [xlabel="fails:\nmessage"];
+  m3 -> m1 [style=dashed];
+  s1 -> m2 [xlabel="passes"];
+  m2 -> s2 -> c1 -> c2;
+  c2 -> c3 [xlabel="No"];
+  c3 -> m3 [style=dashed];
+  c2 -> s3 [xlabel="Yes"];
+  s3 -> s4;
+  s4 -> s5 [style=dashed];
+}

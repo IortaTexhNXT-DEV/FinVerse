@@ -1,0 +1,248 @@
+# Product Maintenance FRS in BDOI's template, v1.1: the document-level changes (cover, revision log, introduction,
+# business requirements mapping, process flows, sign-off sheet, rows added to Annex A to E, Annex J and N, and the
+# change summary of the review copy). Read by build_bdoi_frs_pm.py.
+
+meta:
+  source: "docs/source-documents/FRS - BDOI BROKERSYS Product Maintenance v1.0 (BDOI, 19-Aug-2026).docx"
+  out_folder: "Programme/BDOI_Template_FRS/BRD-03_Product_Maintenance"
+  clean: BIBS_FRS-BDOI_BRD-03_Product_Maintenance_v1.2.docx
+  highlighted: BIBS_FRS-BDOI_BRD-03_Product_Maintenance_v1.2_Changes_Highlighted.docx
+  version_old: v1.0
+  version_new: v1.2
+  brd_version: "Product Maintenance BRD v1.0 (24-Nov-2025) and Addendum v1.1 (10-Apr-2026), version of 8-Oct-2026"
+
+cover:
+  drafting: "Drafting support: iorta TechNXT Project Team"
+
+revision_log:
+  date: 09 Oct 2026
+  version: "1.1"
+  description: "Draft for BDOI review: full coverage of the Product Maintenance BRD (version of 8-Oct-2026), functional requirements elaborated with acceptance criteria, annexes G onward added, observations and points for decision listed in Annex M"
+  by: "iorta TechNXT Project Team (drafting support); for review by Angela V. Ramirez"
+
+introduction:
+  preparation: "This version 1.1 was elaborated with the iorta TechNXT Project Team (drafting support), from the inputs of the business unit and BDO ITG, for review by the System Analyst."
+  overview: "Version 1.1 also covers the points of the Product Maintenance BRD (version of 8-Oct-2026) that version 1.0 did not detail: the product hierarchy and clause library, insurer-specific package terms, package versions with the latest approved rate scheme for new business and the approval of rate exceptions, the review of negotiated terms and the product requirements submitted to ManCom, the post-setup validation checkpoint, package advisories, renewal requests, the password protection of documents shared outside the system, the enforcement of approvals and service levels, and the recording of product master changes for other BDOI systems. The requirements added in this version are listed under each functional requirement with their acceptance criteria; the points that need a BDOI decision are listed in Annex M."
+
+# Changes of the Business Requirements Mapping: FRPM items added to BDOI's mapping (BDOI's own IDs are kept), and the
+# one row whose entry is replaced (BDOI's open item). Each change is logged in Annex M.
+mapping:
+  PMADD01: {add: [FRPM.022.01], why: "Product hierarchy with levels for line, sub-line / cover type, product and coverage / peril."}
+  PMADD02: {add: [FRPM.022.02, FRPM.023.01], why: "Clause library and terms per insurer and coverage."}
+  PMADD03: {add: [FRPM.012.04], why: "Auditable master Comparative Table and client views."}
+  PMADD04: {add: [FRPM.012.03], why: "Negotiation rounds and exception outcomes."}
+  PMADD06: {add: [FRPM.016.02], why: "Post-setup validation checklist and record."}
+  PMADD07: {add: [FRPM.018.02], why: "Application of the incentive rules at booking and review when products end."}
+  PMADD08: {add: [FRPM.018.02], why: "As PMADD07."}
+  BRPM.003: {add: [FRPM.003.08], why: "Field rules per line of insurance and product."}
+  BRPM.004: {add: [FRPM.003.08], why: "Validation rules by product type."}
+  BRPM.005: {add: [FRPM.030.01], why: "Shared document templates with product-specific sections (see C21)."}
+  BRPM.006: {add: [FRPM.003.05, FRPM.019.03], why: "Archive of expired packages and the version history report."}
+  BRPM.007: {add: [FRPM.024.01, FRPM.024.02], why: "Package versions; new business on the latest approved rate scheme; approval of rate exceptions; version logged on each transaction."}
+  BRPM.010: {add: [FRPM.012.03, FRPM.013.02], why: "Negotiation rounds and the review of negotiated terms."}
+  BRPM.011: {add: [FRPM.011.01, FRPM.011.02, FRPM.003.04], why: "BDOI's mapping points to the non-package quotation request; the package requests (creation, update, deactivation) are added."}
+  BRPM.013: {add: [FRPM.012.02, FRPM.013.02], why: "Insurer terms keyed in for packages; Marketing review of client-specific packages."}
+  BRPM.014: {add: [FRPM.012.04], why: "One consolidated master Comparative Table per package request."}
+  BRPM.015: {add: [FRPM.014.02, FRPM.016.02], why: "Product requirements before ManCom; MBS set-up and validation."}
+  BRPM.016: {add: [FRPM.025.01], why: "Advisories with their supporting documents."}
+  BRPM.017: {add: [FRPM.019.02, FRPM.025.01, FRPM.026.01], why: "Package Expiry Report, renewal advisory and renewal requests."}
+  BRPM.018: {add: [FRPM.007.02], why: "Package creation status, individual and for all requests."}
+  BRPM.020: {replace: [FRPM.027.01], why: "BDOI's open item; document protection added (see M.2)."}
+  BRPM.021: {add: [FRPM.028.01], why: "Workflow enforcement, segregation of duties and service levels."}
+  BRPM.022: {add: [FRPM.029.01], why: "Notifications and product master change records for BDOI systems."}
+
+signoff:
+  drafting: "iorta TechNXT Project Team (drafting support)"
+
+# Process flows added after BDOI's two figures; each is a Graphviz source in figures/ rendered by the builder.
+process_flows:
+  - title: Package Set-up, Validation and Release Process Flow
+    dot: figures/pm_setup_release.dot
+  - title: Package Expiry, Renewal and Deactivation Process Flow
+    dot: figures/pm_expiry_renewal.dot
+  - title: Rate Exception Process Flow (New Business on a Package)
+    dot: figures/pm_rate_exception.dot
+
+# Rows added to BDOI's annexes: [field, data type, product lines, remarks].
+annex_rows:
+  A:
+    - [Risk Code, Text, All, "Code of the package product; follows the naming convention of its Line of Insurance once stated (FRPM.003.02)"]
+    - [Cover Type / Subtype, Dropdown, All, "Level below the Line of Insurance; mandatory for a package (FRPM.022.01)"]
+    - [Version Number, Number, All, "Version of the package terms; set by the system (FRPM.024.01)"]
+    - [Version Status, Dropdown, All, "Values: Draft, For Validation, Released, Superseded, Expired"]
+    - [Insurer Role, Dropdown, All, "Values: Lead, Participant, Panel (per insurer of the package)"]
+    - [Insurer Share, Percentage, All, "Co-insurance share per insurer; shares total 100% when used"]
+    - [Minimum Premium, Currency, All, "Per package and per insurer"]
+    - [Package TSI Limit, Currency, All, "Maximum total sum insured of the package"]
+    - [Package Start Date, Date, All, "Start of the package term"]
+    - [Anniversary Date, Date, All, "Optional; used for the anniversary alert (FRPM.004.01)"]
+    - [Computation Basis, Text, All, "How the premium is computed, as approved by ManCom (FRPM.014.02)"]
+    - [ManCom Sign-off Reference, Text, All, "MC-<package request number>; set by the system"]
+    - [Change Summary, Text, All, "What changed in this version"]
+    - [Market Segments, Dropdown, All, "Multi-select; segments to which the package is offered"]
+  B:
+    - [Market Segment, Dropdown, All Product Lines, "Segment of the client; must be one allowed for the product"]
+  C:
+    - [Market Segment, Dropdown, All, "Segment of the client; must be one allowed for the product"]
+    - [Risk Details, Text, All, "Free sections (heading and details); risk details or risk items are required before submission"]
+    - [Risk Items, Table, All, "Items with sum insured and risk group, per the item fields of the line"]
+    - [Mandatory Documents, Attachment, All, "Document checklist of the product; each shown as Attached or Missing"]
+    - [Recommended Insurer, Dropdown, All, "Insurer with received terms flagged by TSU (FRPM.008.01)"]
+  E:
+    - [Request Type, Dropdown, All, "Values: New, Update (FRPM.002.02); Renew and Reactivate proposed (Annex M)"]
+    - [Scope, Option, All, "Values: Generic programme, Client-specific package; a client-specific package needs the Insured's Name"]
+    - [Package / Programme Name, Text, All, "Mandatory"]
+    - [Package Product, Dropdown, All, "The existing package of an update, renewal or deactivation request"]
+    - [Reason for Request, Dropdown, All, "Values: Client requirement; New programme for a market segment; Market competitiveness; Change in insurer terms or rates; Loss experience; Regulatory change; Package expiry or anniversary; Others"]
+    - [Comment on the Reason, Text, All, "Mandatory when the reason is Others"]
+    - [Negotiation Required, Boolean, All, "Whether insurers are approached; at least one Insurer when Yes"]
+    - [Market Segments, Dropdown, All, "Multi-select"]
+    - [Effective From, Date, All, "Date from which the package is offered"]
+    - [Package Start Date, Date, All, ""]
+    - [Package Expiry Date, Date, All, "Mandatory on submission; after the start date"]
+    - [Anniversary Date, Date, All, "Optional"]
+    - [Minimum Premium, Currency, All, "Cannot be negative"]
+    - [Package TSI Limit, Currency, All, "Cannot be negative"]
+    - [Supporting Documents, Attachment, All, "Preview and download (FRPM.011.02)"]
+
+# Annex J – Business rules and configurable parameters.
+annex_j:
+  parameters:
+    - [Package request number prefix, "PKR-", "Prefix of package request numbers; the year and a sequence are added (PKR-yyyy-nnnnnn)", System Administrator]
+    - [Quotation slip number prefix, "PQS-", "Prefix of package Quotation Slip numbers (PQS-yyyy-nnnnnn)", System Administrator]
+    - [Insurer reply days, "5", "Days insurers have to reply to a Quotation Slip (1 to 60)", System Administrator]
+    - [Expiry alert days, "90", "Days before the package expiry date of the first alert (FRPM.004.01)", System Administrator]
+    - [Expiry reminder days, "30, 7", "Days of the further reminders before the expiry date", System Administrator]
+    - [Automatic drafting of renewal requests, "Off (proposed On)", "The first expiry alert also drafts the renewal request (FRPM.026.01)", System Administrator]
+    - [Default advisory recipients, "Marketing, TSU, MBS, Operations", "Recipient groups proposed on a new advisory (FRPM.025.01)", System Administrator]
+    - [Service level per stage, "See FRPM.028.01", "Hours of each workflow stage; amber from 80%, red past the service level", System Administrator]
+    - [Rate exception validity, "30 days", "Days an approved rate exception can be used (FRPM.024.02)", System Administrator]
+    - [Daily package checks, "01:00 daily", "Time of the expiry alerts and of the expiry of packages", System Administrator]
+    - [Placement Update Report schedule, "Thursday 08:00", "Schedule of the Consolidated Placement Update Report (FRPM.007.01)", System Administrator]
+    - [Minimum policies of a package request, "20", "Estimated No. of Policies to be Issued (Annex E)", System Administrator]
+    - [Minimum premium of a package request, "PHP 5,000,000.00", "Estimated Total Basic Premium to be Issued (Annex E)", System Administrator]
+  decision_settings:
+    - [Expiry and anniversary notices, "Days before the expiry date and before the anniversary date at which TSU is told; MBS told as well or not", "90 days and 90 days; TSU Officers and TSU Team Leads only (BDOI's FRS)", C02, Head TSU]
+    - [Consolidated Placement Update Report, "Weekday, time, length of the reporting period and scope (quotation requests, or quotation and package requests)", "Thursday 08:00, 7 days, quotation requests (BDOI's FRS)", C03, Head TSU; Head Retail Marketing]
+    - [Marketing approval chain, "One approval by the Marketing Team Leader, Team Head or Unit Head; or Team Leader, then Team Head, then Unit Head (BDOI's FRS)", "One approval (the BRD)", C05, Head Retail Marketing; Product Owner]
+    - [Direct maintenance of the Product Matrix, "On: authorised users add and update Product Matrix records directly, with the approval of the named approver; Off: new packages only from package requests", "On (BDOI's FRS)", C09, Head MBS; Head TSU]
+    - [Package deactivation route, "Deactivate Package with effective date, reason and approver (BDOI's FRS); or a retirement package request", "Deactivate Package (BDOI's FRS)", C10, Head TSU; ManCom]
+    - [ManCom routing, "The selected approvers approve in parallel, then the President (BDOI's FRS); or one sign-off by any member; the President is named in the setting", "Selected approvers, then the President (BDOI's FRS); President to be named", C17, ManCom; Product Owner]
+    - [Forwarding to MBS after ManCom, "Automatic at the ManCom approval (BRPM.015); or by the Request for Deployment button (BDOI's FRS)", "Automatic (the BRD)", C20, Head MBS; Head TSU]
+    - [File names of the documents and exports, "BDOI's names with MMDDYYYY (QS_, ProposalSlip_, PlacementUpdate_, Audit Logs_); or the reference numbers", "BDOI's names (BDOI's FRS)", C23, BDO ITG System Analyst]
+    - [Least volume of a package request, "Least estimated number of policies and least estimated total basic premium of a package request", "20 policies; PHP 5,000,000.00", "-", Head TSU]
+    - [Deactivation and deployment request numbers, "Prefixes of the deactivation and deployment requests; the year and a sequence are added", "PKD-; PDR-", "-", System Administrator]
+  lists:
+    - [Request reasons,"Client requirement; New programme for a market segment; Market competitiveness; Change in insurer terms or rates; Loss experience; Regulatory change; Package expiry or anniversary; Others (see comment)"]
+    - [Return reasons, "Incomplete or incorrect details; Missing supporting documents; Declined by insurer; Additional insurer requirements; Rate or terms to be reviewed; Insurer underwriting review; Others"]
+    - [Not proceeded reasons, "Declined by the insurers; Negotiated terms not accepted; Client withdrew the request; Business decision; Others (see comment)"]
+    - [Insurer response values, "Approved; Not Covered; Others (BDOI's list, FRPM.006.02); proposed additions: Approved with changes; Counter-proposal; Declined; No response (Annex M, C14)"]
+    - [Advisory recipient groups, "Marketing; Technical Support Unit; Marketing Business Services; Processing; Operations"]
+    - [Coverage kinds, "Section; Coverage; Peril; Extension"]
+    - [Clause kinds, "Warranty; Clause; Exclusion; Deductible wording"]
+    - [Insurer roles, "Lead; Participant; Panel"]
+    - [Incentive types, "To be supplied by BDOI (for example CPC2)"]
+    - [Package documents, "Package request form; Quotation Slip; Insurer response; Comparative Table; Package slip (signed); ManCom sign-off; Advisory"]
+  stages:
+    - [Draft, Requester (Marketing Account Officer or TSU Officer), "-"]
+    - [Marketing approval, "Marketing TL, TH, UH", "24"]
+    - [TSU review, TSU Team Lead, "24"]
+    - [TSU Head approval, TSU Team Head, "24"]
+    - [Negotiation, TSU Officer / Team Lead, "120"]
+    - [Negotiated terms review, TSU Team Head, "24"]
+    - [Marketing review (client-specific), Marketing requestor, "48"]
+    - [Product requirements preparation, TSU Officer / Team Lead, "48"]
+    - [ManCom approval, ManCom approvers, "72"]
+    - [MBS set-up, MBS, "48"]
+    - [Post-setup validation, TSU Head or Business Administrator, "24"]
+  rules:
+    - ["A request, Quotation Slip, Proposal, ManCom approval, package configuration or rate exception is never approved by the user who made or submitted it.", FRPM.028.01]
+    - ["One released version of a package is in force at any date; the previous version ends on the day before the next takes effect.", FRPM.024.01]
+    - ["New business is priced on the version in force on the transaction date; another rate needs an approved rate exception.", FRPM.024.02]
+    - ["Renewals and endorsements use the version of the original account.", FRPM.024.02]
+    - ["Package records, versions, clauses, audit entries and documents are never deleted; they are end-dated, deactivated or expired.", "FRPM.003.04, FRPM.021.01"]
+    - ["Expired and deactivated packages are visible only to users authorized to view archived packages.", FRPM.003.05]
+    - ["Quotation Slips lock at the ManCom approval.", FRPM.014.01]
+    - ["MBS receives product requirements only after the ManCom approval.", "FRPM.014.01, FRPM.015.01"]
+    - ["A package configuration is used only after the post-setup validation.", FRPM.016.02]
+    - ["Every document e-mailed outside the system is password protected; the password is sent separately.", FRPM.027.01]
+    - ["Advisories are sent only with their supporting documents attached.", FRPM.025.01]
+    - ["A package has at most one open renewal request.", FRPM.026.01]
+    - ["Incentive rules apply only to products active on their effective date and do not overlap in time for the same code.", FRPM.018.01]
+  # Proposed role-to-action matrix (PMADD05 refers to the User Access Maintenance FRS for sign-in and role changes).
+  matrix_roles: [Mkt AO, "Mkt TL/TH/UH", TSU Officer, TSU TL, TSU Head, MBS, ManCom, Bus. Admin, Auditor]
+  matrix:
+    - [View Product Maintenance screens, Y, Y, Y, Y, Y, Y, Y, Y, Y]
+    - [View expired and deactivated packages, "", "", "", "", Y, Y, "", Y, Y]
+    - [Generate Product Maintenance reports, "", Y, "", Y, Y, Y, "", Y, Y]
+    - [Create and submit package requests, Y, Y, Y, "", "", "", "", "", ""]
+    - [Approve package requests (Marketing), "", Y, "", "", "", "", "", "", ""]
+    - [Review package requests (TSU), "", "", "", Y, "", "", "", "", ""]
+    - [Approve package requests (TSU Head), "", "", "", "", Y, "", "", "", ""]
+    - [Prepare Quotation Slips and record insurer responses, "", "", Y, Y, "", "", "", "", ""]
+    - [Approve Quotation Slips, "", "", "", Y, "", "", "", "", ""]
+    - [Approve product requirements (ManCom), "", "", "", "", "", "", Y, "", ""]
+    - [Send advisories, "", "", Y, Y, "", "", "", "", ""]
+    - [Set up package configurations and maintain coverages and clauses, "", "", "", "", "", Y, "", "", ""]
+    - [Validate and release package configurations, "", "", "", "", Y, "", "", Y, ""]
+    - ["Authorize product masters, incentive rules and rate exceptions", "", "", "", "", "", "", "", Y, ""]
+    - [Maintain incentive rules, "", "", "", "", "", Y, "", "", ""]
+  masters:
+    - ["Lines of insurance, sub-lines / cover types, coverages and perils", MBS, Business Administrator, FRPM.022.01]
+    - [Clause library, MBS, Business Administrator, FRPM.022.02]
+    - [Field rules, MBS, Business Administrator, FRPM.003.08]
+    - [Document templates, System Administrator, "-", FRPM.030.01]
+    - [Package versions and insurer terms, MBS, TSU Head or Business Administrator (validation), "FRPM.016.02, FRPM.023.01"]
+    - [Incentive rules, MBS, Business Administrator, FRPM.018.01]
+    - [Rate exceptions, Marketing Account Officer (request), Business Administrator or New Business approver, FRPM.024.02]
+
+# Annex N – Glossary.
+glossary:
+  - [Advisory, "Notice to the business units that a package is available, renewed, updated or deactivated, with its supporting documents"]
+  - [AO, Account Officer (Marketing)]
+  - [BIBS, "BDO Insure Brokering System, the system specified in this document"]
+  - [BRD, Business Requirements Document]
+  - [BRPM, Requirement ID prefix of the Product Maintenance BRD (BRPM.001 to BRPM.024; there is no BRPM.023)]
+  - [Client view, "Comparative output for a client presentation, derived from the master Comparative Table with selected fields and insurers"]
+  - [Comparative Table, "Side-by-side comparison of the insurer responses of a request"]
+  - [CPC2, "An incentive type named in PMADD08 as an example; its definition is to be supplied by BDOI"]
+  - [FRPM, Functional requirement ID prefix of this FRS]
+  - [Generic programme, "Package offered to a market segment, not to one client"]
+  - [Client-specific package, "Package negotiated for one client"]
+  - [Line of Insurance, "Level 1 of the product hierarchy (for example Motor, Property, Engineering)"]
+  - [ManCom, Management Committee]
+  - [Master Comparative Table, "The one current Comparative Table of a package request, compiled from the latest round; earlier masters are kept as superseded"]
+  - [MBS, Marketing Business Services and System Support]
+  - [Negotiation round, "One Quotation Slip sent to insurers and the responses received to it; a request may have several rounds"]
+  - [Package, "Pre-arranged insurance programme whose terms, rates and conditions BDOI negotiates with insurers and offers repeatedly through Marketing"]
+  - [Package slip, "Document of the agreed package terms, signed before the ManCom approval"]
+  - [Package version, "One effective-dated set of package terms (rate scheme, coverages, insurers, dates)"]
+  - [PKR, Prefix of package request numbers (PKR-yyyy-nnnnnn)]
+  - [PMADD, Requirement ID prefix of the Product Maintenance Addendum (PMADD01 to PMADD08)]
+  - [Post-setup validation, "Checkpoint by the TSU Head or the Business Administrator before a package configuration is used (PMADD06)"]
+  - [PQS, Prefix of package Quotation Slip numbers (PQS-yyyy-nnnnnn)]
+  - [PRF, "Proposal Request Form: the non-package request of the New Business BRD; called Quotation Request in this FRS"]
+  - [QS, Quotation Slip sent to insurers]
+  - [Rate exception, "Approved use of a rate different from the package rate scheme on one new-business transaction"]
+  - [Rate scheme, "Package rate, minimum premium, commission and TSI limit of a package version"]
+  - [Risk code, "Code of a product in the product hierarchy"]
+  - [Service level, "Target hours of a workflow stage"]
+  - [TH, Team Head]
+  - [TL, Team Lead]
+  - [TSI, Total sum insured]
+  - [TSU, Technical Support Unit]
+  - [UH, Unit Head (Marketing)]
+
+# One-page change summary at the front of the review copy (Changes_Highlighted) only. {counts} are filled in.
+change_summary:
+  title: "Version 1.1 – summary of changes for BDO ITG review"
+  intro: "This review copy is BDOI's Functional Requirements Specifications for Product Maintenance, version 1.0 of 19-Aug-2026, with the changes of version 1.1. Every passage added or extended in version 1.1 is shaded light yellow; BDOI's own text is not shaded and is unchanged. The clean copy has the same content without shading and without this page."
+  points:
+    - "Cover, Document Revision Log, Document Preparation and Signoff Sheet: version 1.1, drafting support by the iorta TechNXT Project Team; BDOI's details and signatories unchanged."
+    - "Project Overview: one paragraph on the BRD scope that version 1.0 did not detail."
+    - "Business Requirements Mapping: all {brd_ids} requirement IDs of the BRD (PMADD01 to PMADD08, BRPM.001 to BRPM.022 and BRPM.024) with BDOI's mappings kept; {mapping_changes} rows extended with the new or elaborated items; BRPM.020 'Under negotiation if can be waived' mapped to FRPM.027 (decision in Annex M)."
+    - "Functional Requirements: BDOI's {bdoi_items} items and {bdoi_subitems} sub-items kept word for word; {elaborated} sub-items elaborated with further requirements; {new_subitems} new sub-items within BDOI's items; {new_items} new items (FRPM.022 to FRPM.030); {ac_total} acceptance criteria added."
+    - "Process Flow: BDOI's two figures kept; {flows} figures added."
+    - "Annexes A to F kept; rows added to Annex A, B, C and E ({annex_rows} rows)."
+    - "New annexes: G Screen specifications ({screens} screens), H Messages and validations ({messages} messages), I Notifications ({notifications}), J Business rules and configurable parameters, K Process walkthroughs ({walk_steps} steps), L Requirements traceability, M Observations and points for BDOI decision ({observations} items, all Open), N Glossary ({glossary} terms)."
+  legend: "Where another behaviour is proposed, BDOI's text is kept and the point is listed in Annex M with the original text, the proposed behaviour, the BRD text and a recommendation. Slips noticed in BDOI's text are proposed for correction in Annex M only; they are not changed in the text."

@@ -1,0 +1,62 @@
+/* Sign-in pages: forgot password, reset link and the forced password change (BRD-11 FR-UA-005). */
+.login-card .btn.login-link {
+  width: auto;
+  height: auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-info);
+  font-size: 14px;
+  justify-self: end;
+}
+
+.login-card .btn.login-link:hover {
+  text-decoration: underline;
+}
+
+.login-links {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.login-notice {
+  margin: 0;
+  text-align: center;
+  color: var(--color-text-muted);
+}
+
+/* Second factor: QR code, key and recovery codes. */
+.mfa-qr {
+  width: 200px;
+  height: 200px;
+  justify-self: center;
+  image-rendering: pixelated;
+}
+
+.mfa-key {
+  font-size: 13px;
+  letter-spacing: 0.05em;
+  word-break: break-all;
+}
+
+.mfa-code {
+  font-size: 18px;
+  letter-spacing: 0.2em;
+  text-align: center;
+}
+
+.recovery-codes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px 16px;
+  margin: 0;
+  padding-left: 24px;
+  font-family: var(--font-mono, monospace);
+}
+
+.login-divider {
+  margin: 0;
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: 13px;
+}

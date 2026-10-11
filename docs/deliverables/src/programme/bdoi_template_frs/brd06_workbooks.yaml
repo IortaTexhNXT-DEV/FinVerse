@@ -1,0 +1,344 @@
+# The review workbooks of BRD-06 Renewal that go with the FRS in BDOI's template v1.1. Read by build_brd06_workbooks.py.
+
+meta:
+  version: "1.0"
+  folder: Programme/BDOI_Template_FRS/BRD-06_Renewal
+  quality: Programme/Quality
+  environment: "BIBS UAT environment: https://uat.brokerverse.cloud"
+  password_text: Issued separately by the iorta TechNXT Project Team
+  dates: {decision: 2026-11-30, sit: 2027-01-31, uat: 2027-07-16}
+
+# FR entry -> the persona and screen of its acceptance test cases
+entry_persona:
+  FRRN.001: [MKT_TL, Login and Renewal Home]
+  FRRN.002: [MKT_TL, Renewal Home and Expiry List]
+  FRRN.003: [PROCESSING_TL, Renewal Home and Processing Worklist]
+  FRRN.004: [MKT_TL, Expiry List]
+  FRRN.005: [PROCESSOR, Renewal account]
+  FRRN.006: [PROCESSOR, Renewal account]
+  FRRN.007: [PROCESSOR, Renewal account (Checks tab)]
+  FRRN.008: [MKT_TL, Expiry List and renewal account]
+  FRRN.009: [PROCESSOR, Renewal account (Computations tab)]
+  FRRN.010: [MKT_TL, Expiry List (Assign)]
+  FRRN.011: [MKT_TL, Transfers]
+  FRRN.012: [LAMD, LAMD Reports]
+  FRRN.013: [PROCESSOR, Insurer Batches]
+  FRRN.014: [MKT_AO, Renewal account]
+  FRRN.015: [PROCESSING_TL, Processing Worklist (upload)]
+  FRRN.016: [MKT_AO, Renewal account]
+  FRRN.017: [MKT_AO, Renewal account (proposal)]
+  FRRN.018: [MKT_AO, Renewal account (TSU request)]
+  FRRN.019: [MKT_AO, Renewal account]
+  FRRN.020: [MKT_TL, TL Review]
+  FRRN.021: [PROCESSOR, Insurer Batches]
+  FRRN.022: [MKT_AO, Letters]
+  FRRN.023: [PROCESSOR, Letters]
+  FRRN.024: [PROCESSOR, Letters]
+  FRRN.025: [MKT_AO, Record Acceptance]
+  FRRN.026: [MKT_TL, Renewal account]
+  FRRN.027: [PROCESSOR, Billing]
+  FRRN.028: [PROCESSOR, Renewal account]
+  FRRN.029: [PROCESSOR, Placement]
+  FRRN.030: [PROCESSOR, Placement responses]
+  FRRN.031: [PROCESSOR, Processing Worklist]
+  FRRN.032: [PROCESSOR, Placement]
+  FRRN.033: [PROCESSOR, E-policy]
+  FRRN.034: [PROCESSOR, Booking]
+  FRRN.035: [PROCESSOR, Booking]
+  FRRN.036: [PROCESSOR, Renewal account (Hold Cover)]
+  FRRN.037: [PROCESSOR, Renewal account (Hold Cover)]
+  FRRN.038: [BUSINESS_ADMIN, Renewal Setup]
+  FRRN.039: [MKT_AO, Expiry List]
+  FRRN.040: [BUSINESS_ADMIN, Renewal Setup]
+  FRRN.041: [BUSINESS_ADMIN, Renewal Setup]
+  FRRN.042: [BUSINESS_ADMIN, Budget maintenance]
+  FRRN.043: [MKT_TL, Renewal account (History tab)]
+  FRRN.044: [MKT_TL, Renewal reports]
+  FRRN.045: [PROCESSING_TL, Renewal Setup (Go-live)]
+  FRRN.046: [PROCESSING_TL, Renewal Setup (Package Choices)]
+  FRRN.047: [CONTACT_CENTER, Follow-ups]
+  FRRN.048: [MKT_AO, Renewal account]
+  FRRN.049: [BUSINESS_ADMIN, Lists of Values and Document Templates]
+
+fit_values: [Fit, Configure, Extend, Recommend change]
+
+# Fit-gap groups: BRD ID prefixes (main BRD functions or BRRN IDs), the features of the programme Feature List
+fitgap_groups:
+  - name: Log-in, session and several tabs
+    keys: ["1.001", "2.001", "3.001", "4.001", "5.001", "6.001", "1.002", "2.002", "3.002", "4.002", "5.002"]
+    features: [RNW-037]
+    ootb: "Standard sign-in with role-based menus, inactivity warning and session end by parameter, several tabs on one session."
+    best: "Single sign-on with the bank's identity provider; idle time-out of 15 to 30 minutes as Philippine bank IT practice (BSP Circular 982 on IT risk)."
+    fit: Fit
+    rec: "Keep; BDOI decides the session-end wording (Annex AO)."
+    impact: "FRRN.001"
+  - name: RMEL - extraction, generation, filters, list and export
+    keys: ["1.003", "3.003", "BRRN.002", "BRRN.003", "BRRN.004", "BRRN.005", "BRRN.006", "BRRN.007", "BRRN.008", "BRRN.021", "BRRN.022", "BRRN.030"]
+    features: [RNW-001, RNW-002, RNW-003, RNW-004]
+    ootb: "Daily extraction at lead days and generation by date range, multi-select filters, one scrollable list, export and print; explicit initiation."
+    best: "Brokers extract renewals 90 to 150 days before expiry with a unique renewal reference and no manual re-keying of the expiry list."
+    fit: Configure
+    rec: "Set the lead days per segment; decide extraction and initiation (Annex AO C08, C09)."
+    impact: "FRRN.004, FRRN.045"
+  - name: Sanitation, classification and decision matrix
+    keys: ["BRRN.009", "BRRN.020", "BRRN.023", "BRRN.031", "BRRN.034", "BRRN.039"]
+    features: [RNW-005, RNW-006, RNW-007, RNW-008]
+    ootb: "Rule checks with severities, Clean / Review / Exception classification with the rule shown, versioned decision matrix with maker-checker."
+    best: "Straight-through renewal of clean risks with exception queues; rules owned by the business with four eyes and effective dates."
+    fit: Extend
+    rec: "Load BDOI's Annex C rules into the rule sets; decide the third classification (Annex AO C01)."
+    impact: "FRRN.006-008, FRRN.038, FRRN.040"
+  - name: LAMD reports and RMU
+    keys: ["BRRN.024", "BRRN.029"]
+    features: [RNW-009]
+    ootb: "Upload of loan reports matched on the PN, with matching results; LAMD profile limited to validation."
+    best: "Mortgage-linked policies follow the loan status from the bank's loan system (bancassurance practice)."
+    fit: Extend
+    rec: "Adopt BDOI's layouts of Annex G; decide paid-off and RMU routing (Annex AO C04, C05)."
+    impact: "FRRN.012, FRRN.041"
+  - name: KYC visibility
+    keys: ["BRRN.028"]
+    features: [RNW-010]
+    ootb: "KYC due flag from the client's review date, for information."
+    best: "KYC refresh before renewal of high-risk clients (AMLC rules); gating is a compliance decision."
+    fit: Configure
+    rec: "Keep KYC non-blocking (BRRN.028); KYC statuses and dashboard as a candidate change."
+    impact: "FRRN.039"
+  - name: Endorsements before renewal
+    keys: ["BRRN.032"]
+    features: [RNW-011]
+    ootb: "Renewal prepared from the policy as of the last posted endorsement; open endorsements block the posting."
+    best: "Renewal terms always reflect the latest endorsed policy."
+    fit: Fit
+    rec: "Keep."
+    impact: "FRRN.004.06"
+  - name: View the account and its history
+    keys: ["1.004", "2.003", "3.006", "4.003", "BRRN.011", "BRRN.012", "BRRN.013", "BRRN.014", "BRRN.015", "BRRN.016", "BRRN.017", "BRRN.027"]
+    features: [RNW-015]
+    ootb: "Account details read live, account history with policies, endorsements, payments and claims; officer list without pages."
+    best: "Full client and policy history before the renewal decision (TCF / fair treatment of customers)."
+    fit: Fit
+    rec: "Keep."
+    impact: "FRRN.002.08, FRRN.014.01"
+  - name: Assignment of accounts
+    keys: ["1.005", "3.005"]
+    features: [RNW-012]
+    ootb: "Assignment and re-assignment by the Team Lead, single, multiple, all and all-except."
+    best: "Book-of-business ownership by officer, with rule-based allocation for high volumes."
+    fit: Configure
+    rec: "Keep the Team Lead's assignment; automatic round robin as a candidate change (Annex AO C06)."
+    impact: "FRRN.010"
+  - name: Transfer between units
+    keys: ["1.006", "1.007", "2.005"]
+    features: [RNW-013]
+    ootb: "Transfer request with acceptance or decline by the receiving unit."
+    best: "Hand-over of accounts between units with an audit trail."
+    fit: Extend
+    rec: "Decide referral or transfer (Annex AO C07)."
+    impact: "FRRN.011"
+  - name: Disposition, remarks and re-opening
+    keys: ["2.004", "2.006", "2.007", "3.004.5"]
+    features: [RNW-014]
+    ootb: "Disposition with reasons, remarks stamped with user and time, returned accounts, re-open of Not for Renewal."
+    best: "Documented reason for every non-renewal (Insurance Code, fair treatment)."
+    fit: Fit
+    rec: "Keep; add BDOI's reasons as list values."
+    impact: "FRRN.014, FRRN.016"
+  - name: Team Lead review and overrides
+    keys: ["1.008", "1.011"]
+    features: [RNW-016]
+    ootb: "Review, return and posting; controlled overrides with remarks."
+    best: "Four-eyes review of renewal decisions; overrides justified and logged."
+    fit: Configure
+    rec: "Keep; the approver selection of FRRN.016 is configured."
+    impact: "FRRN.020"
+  - name: Upload of dispositioned files
+    keys: ["3.004", "4.004", "BRRN.018"]
+    features: [RNW-017]
+    ootb: "Upload with row checks keyed on the renewal reference; complete-file declaration."
+    best: "Bulk handling of bancassurance renewals with reconciliation of every row."
+    fit: Extend
+    rec: "Adopt BDOI's Renewal Update template."
+    impact: "FRRN.015"
+  - name: Processing, computations and the New Business path
+    keys: ["3.007", "3.008", "4.005", "4.006", "BRRN.033", "BRRN.038"]
+    features: [RNW-018, RNW-019, RNW-020]
+    ootb: "Renewal account update, re-rating and comparison with the expiring terms, New Business path for changes."
+    best: "Material changes need the client's informed consent (Insurance Code disclosure)."
+    fit: Fit
+    rec: "BDOI defines a structural change (Annex AN)."
+    impact: "FRRN.009, FRRN.018.02, FRRN.031"
+  - name: Insurer round trip
+    keys: ["3.009", "4.007", "BRRN.035"]
+    features: [RNW-021]
+    ootb: "Request per insurer with the 28 fields, protected; upload of the insurer's file; responses drive the renewal."
+    best: "Electronic exchange of renewal terms with insurers; single source of the insurer's answer."
+    fit: Configure
+    rec: "Load the insurer dispositions of FRRN.013.02 as list values mapped to the three outcomes."
+    impact: "FRRN.013, FRRN.021"
+  - name: Renewal Advice and letters
+    keys: ["1.010", "2.009", "3.011", "4.09", "BRRN.001", "BRRN.010", "BRRN.025", "BRRN.037"]
+    features: [RNW-022, RNW-023, RNW-024, RNW-025]
+    ootb: "Renewal Advice from versioned templates, batch sending, password protection, letters with failure alerts, NRNS on the effective expiry date."
+    best: "Renewal notice before expiry (market practice 30-60 days; Insurance Code for non-renewal notice), data privacy (RA 10173) for documents sent."
+    fit: Configure
+    rec: "Load BDOI's Annex L templates; set 75 / 45 days; adopt BDOI's password rule."
+    impact: "FRRN.022-024"
+  - name: Acceptance, placement and booking
+    keys: ["BRRN.040"]
+    features: [RNW-026, RNW-027]
+    ootb: "Client acceptance with evidence; renewal account to placement and booking without re-keying."
+    best: "No duplicate keying between renewal and booking; payment before inception (premium payment warranty, Insurance Code)."
+    fit: Fit
+    rec: "Decide the second approval (Annex AO C23)."
+    impact: "FRRN.025-035"
+  - name: Hold cover
+    keys: ["BRRN.042"]
+    features: [RNW-028]
+    ootb: "Hold cover request and insurer confirmation from the renewal account."
+    best: "Cover note / hold cover to avoid a gap in cover while the renewal completes."
+    fit: Configure
+    rec: "Set BDOI's durations; automatic requests and extensions as candidate changes."
+    impact: "FRRN.036-037"
+  - name: Incentive eligibility
+    keys: ["BRRN.041"]
+    features: [RNW-029]
+    ootb: "Incentive evaluated after booking and full payment from the incentive criteria."
+    best: "Incentives paid on collected premium only."
+    fit: Configure
+    rec: "BDOI gives the criteria (Annex AN)."
+    impact: "FRRN.034"
+  - name: Contact Center follow-up
+    keys: ["BRRN.026"]
+    features: [RNW-030]
+    ootb: "Follow-ups with channel, outcome and next action; documents from the client."
+    best: "Multi-channel renewal reminders with consent."
+    fit: Fit
+    rec: "BDOI gives the outcome list."
+    impact: "FRRN.047"
+  - name: Reports, dashboards and listings
+    keys: ["1.009", "2.008", "3.010", "4.008", "BRRN.019", "BRRN.036"]
+    features: [RNW-032, RNW-033, RNW-034, RNW-035]
+    ootb: "Renewal home and dashboards, status report with summary counters, listing with attention flags, operational reports."
+    best: "Renewal retention ratio and pipeline by officer; exception ageing."
+    fit: Configure
+    rec: "BDOI defines the summary counters and gives the layouts of its other reports."
+    impact: "FRRN.002.02, FRRN.044"
+  - name: Maintenance, users and profiles
+    keys: ["5.003", "5.004", "5.005", "6.002"]
+    features: [RNW-036, RNW-037]
+    ootb: "Lists of values, templates and rules maintained by the business with four eyes; profiles and functions through access requests."
+    best: "Business-owned configuration with segregation of duties."
+    fit: Fit
+    rec: "Keep."
+    impact: "FRRN.001.05, FRRN.049"
+
+fitgap_nfr:
+  RN-NFR-07: [Configure, "BDOI gives the availability values (Annex AN)."]
+  RN-NFR-08: [Configure, "BDOI gives the recovery values."]
+  RN-NFR-09: [Configure, "BDOI gives the retention values."]
+  RN-NFR-15: [Extend, "CCM interface when BDO ITG confirms its scope."]
+
+cr_types: [Enhancement, Change of rule, Integration, Report or dashboard, Template or wording, Data]
+cr_status: [Raised, "Candidate - for decision", Assessed, Approved, Rejected, Scheduled, In test, Closed]
+# [FRS reference, BRD ID, title, description, reason, type, scope, schedule, cost, other BRDs, tests, priority]
+cr_candidates:
+  - [FRRN.010.01, "BRD 1.005, 3.005", "Automatic assignment", "Round-robin assignment by team and sub-team (Annex F)", "BDOI's FRS; the BRD has the Team Lead's assignment", Enhancement, "Assignment rules and the hierarchy of Annex F", "Medium", "To assess", "-", "New cases of FRRN.010.01", High]
+  - [FRRN.011.03, "BRD 1.006", "Referral to another unit", "New Business account created from an accepted referral", "BDOI's FRS; the BRD transfers the account", Enhancement, "Transfer and New Business", "Medium", "To assess", "New Business", "FRRN.011 cases", Medium]
+  - [FRRN.002.02.01, "BRD 1.009.7", "Marketing dashboard metrics", "Budget, pipeline, closing ratio, top deals, persistency, product mix", "BDOI's FRS beyond BRD 1.009.7", Report or dashboard, "Dashboard", "High", "To assess", "-", "FRRN.002.02 cases", Medium]
+  - [FRRN.003.02, "BRD 3.010.7", "Processing dashboard cards", "Cards and drill-downs of placement, booking, policy and releasing", "BDOI's FRS beyond BRD 3.010.7", Report or dashboard, "Dashboard", "Medium", "To assess", "New Business", "FRRN.003.02 cases", Medium]
+  - [FRRN.042.01, "BRD 1.009.7", "Annual renewal budget", "Budget maintenance, upload, inquiry and history", "Needed by the dashboard of FRRN.002.02.01", Data, "Maintenance", "Medium", "To assess", "-", "FRRN.042 cases", Medium]
+  - [FRRN.039.02, "BRRN.028", "KYC statuses and dashboard", "KYC monitoring statuses, history and dashboard", "BDOI's FRS beyond the KYC flag", Enhancement, "KYC", "Low", "To assess", "Customer Servicing", "FRRN.039 cases", Low]
+  - [FRRN.012.06, "BRRN.029", "BDOFC and SOLD uploads", "Upload and matching of BDOFC and SOLD reports", "BDOI's FRS; the effect of a match is open", Enhancement, "Uploads", "Low", "To assess", "-", "FRRN.012.06-09 cases", Medium]
+  - [FRRN.009.01, "BRRN.039", "CBG Motor automatic update", "Depreciation, BI / PD tiers, Auto Promo to Regular (Annexes D, E)", "BDOI's rules for straight-through CBG Motor renewals", Change of rule, "Rating of renewals", "High", "To assess", "Product Maintenance", "FRRN.009.01 cases", High]
+  - [FRRN.014.03, "BRRN.040", "Multiple insurer allocation", "Allocation by percentage or amount", "BDOI's FRS", Enhancement, "Renewal account", "Medium", "To assess", "New Business", "FRRN.014.03 cases", Medium]
+  - [FRRN.014.05, "BRRN.040", "Direct-to-Insurer Payment approval", "Blanket or Unit Head approval", "BDOI's FRS", Enhancement, "Approvals", "Low", "To assess", "Cashiering", "FRRN.014.05 cases", Medium]
+  - [FRRN.036.03, "BRRN.042", "Hold cover automation", "Automatic CBG requests at 75 days, extensions, CBG Home extension on the 15th", "BDOI's FRS beyond BRRN.042", Enhancement, "Hold cover", "Medium", "To assess", "New Business", "FRRN.036 cases", Medium]
+  - [FRRN.022.02, "BRRN.010", "CCM delivery", "Proposals, Renewal Advices, letters, Insurance Advices and e-policies through CCM", "BDOI's FRS; NFR-INT-05", Integration, "Sending", "High", "To assess", "All BRDs that send e-mail", "Sending cases", High]
+  - [FRRN.29.03, "BRRN.040", "MFT exchange with insurers", "Placement, hold cover and e-policy files through MFT", "BDOI's FRS", Integration, "Insurer exchange", "High", "To assess", "New Business", "Placement cases", Medium]
+  - [FRRN.033.01, "BRRN.040", "E-policy batch processing", "Summary file and ZIP, matching and batch sending", "BDOI's FRS", Enhancement, "Issuance", "Medium", "To assess", "New Business", "FRRN.033 cases", Medium]
+  - [FRRN.29.05, "BRRN.040", "Placement turnaround time", "TAT in business days, With Issue, resolution date", "BDOI's FRS", Enhancement, "Placement", "Low", "To assess", "New Business", "FRRN.29.05 cases", Medium]
+  - [FRRN.26.01, "BRRN.040", "Second approval after acceptance", "Submitted for Approval before placement", "BDOI's FRS; BRRN.040 asks for no delay", Change of rule, "Workflow", "Low", "To assess", "-", "FRRN.26.01 cases", High]
+  - [FRRN.013.02, "BRRN.035", "Insurer disposition values", "Nine values with their bucket and disposition", "BDOI's FRS; the BRD has three outcomes", Change of rule, "Insurer responses", "Low", "To assess", "-", "FRRN.013.02 cases", High]
+  - [FRRN.006.01, "BRRN.005", "Duplicate criteria per line", "Criteria of Annex B per line and segment", "BDOI's FRS", Change of rule, "Sanitation", "Medium", "To assess", "New Business", "FRRN.006.01 cases", Medium]
+  - [FRRN.022.01, "BRRN.010", "Renewal Advice per line and notice", "BDOI's four templates; first and last notice set by the system", "BDOI's FRS and Annex L", Template or wording, "Letters", "Medium", "To assess", "-", "FRRN.022 cases", High]
+  - [FRRN.024.01, "BRRN.010", "Password convention", "Password from the client's names; corporate rule", "BDOI's FRS", Change of rule, "Protection of files", "Low", "To assess", "All BRDs that send files", "FRRN.024.01 cases", High]
+  - [FRRN.27.01, "BRRN.040", "Scheduled CLPC billing", "CBG Home and FFY Motor billing jobs and the e-mail of Annex S", "BDOI's FRS", Integration, "Billing", "Medium", "To assess", "New Business; Cashiering", "FRRN.027 cases", Medium]
+  - [FRRN.041.01, "BRRN.029", "RMU account maintenance", "RMU Account Officer codes", "BDOI's FRS", Data, "Maintenance", "Low", "To assess", "-", "FRRN.041.01 cases", Medium]
+  - [FRRN.043.01, "BRRN.021", "Audit Logs menu", "Audit log list with filters and export", "BDOI's FRS", Enhancement, "Audit", "Low", "To assess", "User Access Maintenance", "FRRN.043 cases", Low]
+
+uat_criteria:
+  entry:
+    - "The FRS in BDOI's template v1.1 is signed, or signed with the open decisions listed in Annex AO."
+    - "The parameters, lists, rules, templates and data of Annex AK are loaded and checked."
+    - "The walkthrough users of the Business Unit Walkthrough Users workbook are active, with their passwords issued separately."
+    - "SIT is closed with no open severity-1 or severity-2 finding on Renewal."
+    - "The test cases of this workbook are reviewed by the Business Unit."
+  exit:
+    - "Every test case of priority High is passed."
+    - "No open severity-1 or severity-2 finding; the others have an agreed plan."
+    - "Every acceptance criterion of the FRS has a passed test case."
+    - "The walkthrough of Annex AL is run with the Business Unit users and signed."
+    - "The UAT sign-off certificate of BRD-06 is signed (SO-06-3)."
+
+# Items available in full in the BIBS environment, with the business tests that show them (longest prefix wins).
+coverage_available:
+  FRRN.001.02: "Data scope tests: an Account Officer sees My Dispositions and his assigned accounts only, a Team Lead the accounts of his units and of every unit under a unit he heads, LAMD and Contact Center users without premium columns; persona menu test of each Renewal role (no Processing Worklist or Renewal Setup for Marketing, no Renewal Advice for LAMD)."
+  FRRN.001.04: "Platform session tests of User Access Maintenance: sign-out after the inactivity time with the message Your session timed out. Please log in again to continue, the warning before the system-triggered end of the session, and the session log with the reason; the Renewal screens use the platform session."
+  FRRN.002.01: "Renewal module tests: the Processing Team Lead's menu with the Processing Worklist, Insurer Batches and uploads, none of them for a Marketing Account Officer; the same file uploaded twice is refused and nothing is updated; the upload result lists every refused row with its message and downloads."
+  FRRN.002.02: "Renewal dashboard tests: open accounts per Account Officer for the Team Lead, Expiring within 30 days opening exactly the accounts counted, every figure and drill-down following the Market Segment filter; production against the Annual Renewal Budget with % vs Budget and variance and Show Details totalling the actual; pipeline and ageing totals equal to the sum of their stages and buckets; closing ratio, Top 50/75/100 open deals, count and YTD persistency, product mix, insurer approval and the KPI cards with their drill-down lists."
+  FRRN.002.05: "Renewal Accounts panel tests: Clean, Review, Non-Renewable and All panels with BDOI's columns and sort, continuous scrolling with the row count, the Claims flag never in Clean, the padlock of a locked account; list export to Excel, PDF and CSV."
+  FRRN.002.08: "My Dispositions tests: the Account Officer's accounts of the current and previous years without a filter, sorted by expiry both ways, the Endorsed flag with its effective date, the red Returned flag with the Team Lead's remarks leaving Returned to me once submitted again."
+  FRRN.003.01: "Processing dashboard tests: Combined View equal to New Business View plus Renewal View, open accounts per Processing Officer for the Processing Team Lead."
+  FRRN.003.02: "Processing KPI card tests: For Placement, For Booking, With and Without Policy, Released and Unreleased with the reason, Directly Booked and Returned Accounts with the return reason, the ageing in business days from submission or sending, Unassigned and Assigned tabs with the Placement Processor, TAT Status Beyond TAT; each card lists exactly the accounts counted with search, filter, sort and export."
+  FRRN.003.05: "Processing Worklist tests: In Processing shows only the accounts assigned to the Processing Officer when the processing scope is set so; sorting and column filters on every column of every tab."
+  FRRN.004.04: "RMEL generation tests: a booked account expiring at the lead days is listed once with its renewal reference even after a second run, a change of the lead days applies at the next run, HMO accounts are left out, No records found. and Generation of RMEL successful! messages."
+  FRRN.004.06: "Endorsement synchronisation tests: posting is refused while an endorsement of the expiring policy is open and the message names it; Refresh Endorsements brings the endorsed sum insured and the endorsement number to the renewal account."
+  FRRN.004.06 (2nd): "RMEL export tests: the file named RMEL_<Month>_<Year>_<MMDDYYYY>.xlsx with the rows and columns of the screen; the RMEL report of the Report Centre printed with the paper size and orientation chosen in the print options."
+  FRRN.005.01: "Create Renewal Account tests: a renewal account from an expiring Motor account with the same client, vehicle, insurer and PN, the business type Renewal and the link to the expiring account; every missing mandatory field named; the new account goes through sanitation, assignment and classification."
+  FRRN.006.01: "Duplicate checking tests: the potential-duplicate warning on the same plate, serial and motor numbers and an overlapping period, the cancelled-match warning with the save allowed, a generated duplicate For Review with the reason Potential Duplicate Account and the link."
+  FRRN.007.02: "Sanitation rule tests per market segment: above the sum insured threshold For Quotation to the TSU, personal accident lines For Proposal, Risk Code is not maintained as Renewable/Not Renewable to Review, a non-renewable risk code Not for Renewal and out of the assignment list, a CBG Motor account without PN not Clean."
+  FRRN.008.01: "Classification tests: an open claim always Review, Clean at the next evaluation once the claim is closed with both classifications in the history, a manual reclassification to Clean refused when a rule failed, the rule version and the rule shown per classification."
+  FRRN.009.01: "CBG Motor automatic update tests: the Computations tab with the expiring values and the differences, own damage and theft sum insured depreciated by 10% for a Regular renewal with the other fields of Annex D, the financial impact flagged with the difference."
+  FRRN.010.01: "Automatic assignment tests: accounts assigned per segment to the Account Officer with the fewest open accounts and then in turn appear in his My Dispositions and leave the unassigned list, no assignment to an officer of another unit, the notice <reference> assigned to you."
+  FRRN.011: "Transfer request tests: a referral never changes the owner of the renewal account; Transfer Request Number with Pending Acceptance and the receiving Team Leads notified, a request to the own unit refused, acceptance with its date and time, rejection without remarks refused, the New Business account created from the copied data and linked to the request, Transfer Request Monitoring with the New Business account number, the audit log of every step and the requester notified of a rejection or return."
+  FRRN.011.06: "Tests of the transfer to another unit: the account leaves the sender's list for the receiving Team Lead's Transfers inbox, appears in the receiving unit's unassigned list with the Transferred flag once accepted, and returns to the sender with the decline remarks."
+  FRRN.012: "LAMD and BDOFC/SOLD upload tests: the success message of a processed report, the invalid format and missing-required-data refusals, paid-off and RMU matching on the PN and the motor serial and motor numbers with the Annex C rules, a PN on two accounts updating neither, one summary row per upload latest first with the Processing Result workbook, the record-level view filtered by Matched and Unmatched, the paid-off repository keeping an account once."
+  FRRN.012.03 (2nd): "Insurer disposition upload summary test: one row per upload with its status and counts, latest first."
+  FRRN.012.04 (2nd): "Insurer disposition record-level test: a reference not found is listed with Record not found and updates nothing."
+  FRRN.013: "Insurer disposition upload tests: the Annex H layout processed with the success messages, a missing required field refusing the file, Renew As Is setting Clean and For Renewal with premium and terms unchanged, a different expiring policy number flagged for review, Renew with surcharge setting Review, For Disposition and the financial impact."
+  FRRN.014.01: "Renewal account detail tests: every RMEL field of the account, the download Renewal Account Details.xlsx, the Account History with the previous ARN, endorsements, payments and claims, a disposition refused until the Account History is opened."
+  FRRN.014.02: "Disposition tests: For Renewal saved and submitted to the Team Lead's review list, Not for Renewal without reason and Booked to New Invoice without an invoice refused, remarks with the user, date and time and at most 200 characters, no change after the Renewal Advice is generated."
+  FRRN.014.03: "Multiple insurer allocation tests: shares of 60% and 40% saved and 60% and 30% refused, coverage amounts totalling the sum insured with the premium computed per insurer."
+  FRRN.014.04: "For Booking Only tests: an account not fully paid cannot be submitted and shows The account is not fully paid. Override approval is required, the override by another user with a justification in the audit log, the account then submitted."
+  FRRN.014.05: "Direct-to-Insurer Payment tests: Route for UH Approval sends the account to the Unit Head of the assigned user and it proceeds only once approved; a rejection without reason refused; after a rejection the account proceeds only once the tag is removed."
+  FRRN.015: "Renewal Update upload tests: a file with unknown references updating the other rows and listing the refused rows with their message, two files giving two results, one summary row per upload latest first, the record-level view with filter, sort and search."
+  FRRN.016.01: "Submission for posting tests: the status Submitted for Posting listed for the approver chosen, every missing required field named with the status unchanged."
+  FRRN.017: "Proposal tests: Generate Proposal Slip only for For Proposal, a Full Proposal of a non-package account above the sum insured threshold refused until three signatories are chosen, the file Renewal_QuickProposal_<reference>_<MMDDYYYY>.pdf attached, the CCM success message with the CCM transaction reference, an invalid recipient refused with nothing sent."
+  FRRN.018.01: "TSU request tests: Pending Team Lead Approval with the Team Lead notified, the TSU officer chosen on approval, quotations recorded per insurer, a second request for the same account refused."
+  FRRN.019.01: "Client acceptance tests: a proposal rejected by the client sets Not for Renewal with the reason Lost Business, a revised proposal returns the status to Pending Client Response."
+  FRRN.022: "Renewal Advice tests: the file <Product>_RA_<Notice>_<Reference>_<MMDDYYYY>.pdf attached, the user's confirmation when generated within 20 days of expiry, no disposition change after generation, the function refused without the permission; sending through CCM or protected e-mail with a password e-mail per account, failed sendings listed with the error and resent."
+  FRRN.023: "Client letter tests: no closing letter during a confirmed hold cover, No Advice Letter and Non-Renewal Letter excluding each other, the file <Product>_NRL_<Reference>_<MMDDYYYY>.pdf attached, a resend keeping the original letter with the resend in the audit log."
+  FRRN.024.01: "Password convention tests: JUADEL for Juan Dela Cruz and LIONG for Li Ong, eight characters with a lower-case letter, an upper-case letter, a special character and five digits for a corporate client, the PDF not opened without the password."
+  FRRN.025.01: "Client acceptance tests: an acceptance by e-mail with the client's e-mail attached sets Accepted and moves the account on; an acceptance with a financial impact refused without evidence."
+  FRRN.26.01: "Approval tests: an approved Non-CBG account without the payment confirmation status shows Please select the client's payment confirmation status., a rejected account Returned Account in its officer's queue with the resubmission date and time."
+  FRRN.27: "CLPC billing file tests: the daily CBG Home file of the accounts For Billing Generation expiring 10 days later attached to each account, the manual file with a period of at most 31 days and From Date not after To Date, the file sent to the recipients with its delivery status on the billing record."
+  FRRN.028: "Payment status tests: Paid, Partially Paid and Unpaid from the payments applied in Cashiering against the gross premium; a CBG account Paid moves to Submitted for Placement without a user action."
+  FRRN.029: "Placement tests: one slip per insurer of each account and none For Booking Only, one placement file per insurer for packaged accounts with each co-insurer's share, Is Generated Placement with the date and user, MFT upload for enrolled insurers and Upload Failed shown, CCM sending to the Insurer Maintenance recipients with an invalid address refused and the account then For Booking, TAT in business days from the next day after the cut-off with With Issue and the resolution date."
+  FRRN.29: "Placement sending tests: MFT upload for the insurers tagged MFT Enrolled with Upload Failed shown and the others waiting for e-mail, CCM sending to the Insurer Maintenance recipients changeable before sending with an invalid address refused, the account For Booking after a successful sending, the TAT counted from the next business day after the cut-off hour and Beyond TAT from the fourth business day, With Issue measured to the resolution date and a resolution date before the submission refused."
+  FRRN.030: "Placement response tests: responses matched on the renewal reference with the unmatched listed, Approved with the response date and remarks, Rejected with its reason and Rejected Placement then return to Marketing or cancellation, one summary row per file latest first, the record-level view filtered by Matched and Unmatched and by Approved and Rejected."
+  FRRN.031.01: "Return to Marketing tests: the account back in the Account Officer's list with the Returned flag and the reason, a return without reason refused."
+  FRRN.032: "Insurance Advice tests: IA_<reference>_<MMDDYYYY>.pdf generated for a mortgaged account when the placement is sent and versioned on a change, none for an account without mortgage, Send Insurance Advice disabled when a selected account has none, sending through CCM."
+  FRRN.033: "E-policy tests: the policy number of the summary file updating the matching account, a ZIP document not in the summary refused and a matched one attached, one summary row per received file with its type and status, the record-level matching view, sending through CCM excluding accounts without a valid e-mail or not For E-Policy Sending, an e-policy number held by another active account listed in the exception report."
+  FRRN.036: "Hold cover tests: 30 days Non-CBG, 90 days CBG and 60 days for a CBG Motor account after an insurer's rejection, one request per co-insurer after the client's confirmation, a second request refused until the first is cancelled, extensions of 15 or 30 days from 7 days before the end, the CBG files per insurer 75 days before expiry, the 30-day CBG Home extension on the 15th, MFT upload for enrolled insurers and e-mail with the document for the others."
+  FRRN.037: "Hold cover response tests: matched by the reference number, Approved confirming the hold cover with the effective expiry at its end, Rejected returning the account with the insurer's remarks, one summary row per file latest first, the record-level view filtered by Matched and Unmatched and by Approved and Rejected."
+  FRRN.038: "Risk Code Maintenance tests: read only without the maintenance function, a change in force only once another user authorises it, the list with description, line, indicator, status and created and updated by and on, Duplicate entry detected. The risk code already exists in the list., retroactive dates refused, Record successfully updated. with the old and new values in the log, a Non-Renewable risk code giving Not for Renewal with the reason at the next generation."
+  FRRN.039: "KYC tests: the KYC due flag without a change of classification, Completed recorded with the history of earlier statuses, user and time, the KYC Monitoring dashboard opening the accounts due."
+  FRRN.041.01: "RMU Account Maintenance tests: a second active record of the same Account Officer code refused, a LAMD loan of an RMU Account Officer identified as RMU."
+  FRRN.042: "Annual Renewal Budget tests: no menu without the budget function, the annual total equal to the twelve months, the upload creating or updating the records, negative amounts and a Corporate budget without team refused, Budget Inquiry by fiscal year, segment and hierarchy, the history of each monthly change with user and time."
+  FRRN.043.01: "Audit Logs tests: the extraction, sanitation, classification, disposition, posting, insurer disposition and later steps of a renewed account listed with old and new values, no screen to change or delete an entry, CSV and Excel export."
+  FRRN.044.01: "Report tests: every renewal report previewed, downloaded as Excel and PDF and printed, each user seeing only the accounts of his data scope; file names <Report>_<MMDDYYYY>."
+  FRRN.044.02: "Renewal Status Report tests: the month with Risk Code All Except leaving out the code and showing the 34 counters, Excel and PDF with the rows of the screen, the Processing variant with the renewal processor, the Account Officer and the sum insured per cover."
+  FRRN.048.01: "Submitted policies tests: a CBG Motor policy handed over creates one renewal account, one hold cover request and one Renewal Advice; the Submitted Policies masterlist shows it booked once the renewal account is booked."
+  FRRN.049.01: "List of values tests: a non-renewal reason effective next month offered from that date only, an ended reason still shown on the accounts that used it."
+  FRRN.049.02: "Template tests: a Renewal Advice generated after a new template version is activated shows the new layout and its version."

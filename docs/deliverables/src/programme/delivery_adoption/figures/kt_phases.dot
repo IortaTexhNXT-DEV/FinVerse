@@ -1,0 +1,18 @@
+// Knowledge Transfer Plan: phases from foundation to hand-over.
+digraph kt_phases {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.6, ranksep=0.25, bgcolor="white", pad=0.1, newrank=true];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", fillcolor="@WHITE", fontname="Arial", fontsize=10.5,
+         fontcolor="@NEAR_BLACK", width=3.4, height=0.75, margin="0.08,0.04"];
+  edge  [color="@HEADER_BLUE", penwidth=1.1, arrowsize=0.7];
+  p1 [label=<<b>1 Foundation</b><br/>7-Jun to 16-Jul-2027<br/><font point-size="9">classroom and walkthroughs</font>>];
+  p2 [label=<<b>2 Shadowing</b><br/>2-Aug to 12-Nov-2027<br/><font point-size="9">BDOI watches, iorta does (UAT, Trial 3-4)</font>>];
+  p3 [label=<<b>3 Reverse shadowing</b><br/>15-Nov to 31-Dec-2027<br/><font point-size="9">BDOI does, iorta watches (dress rehearsal, cut-over)</font>>];
+  p4 [label=<<b>4 Supported operation</b><br/>3-Jan to 2-Feb-2028<br/><font point-size="9">hypercare; BDOI runs L1 and L2</font>>];
+  a1 [label=<Readiness check 1<br/>16-Jul-2027>, fillcolor="@BG_BLUE", width=2.2, height=0.5];
+  a2 [label=<Readiness check 2<br/>12-Nov-2027>, fillcolor="@BG_BLUE", width=2.2, height=0.5];
+  a3 [label=<Readiness check 3<br/>17-Dec-2027>, fillcolor="@BG_BLUE", width=2.2, height=0.5];
+  ho [label=<Hand-over at hypercare exit<br/>2-Feb-2028>, fillcolor="@YELLOW", color="@NEAR_BLACK", width=2.2, height=0.5];
+  { rank=same; p1; a1; } { rank=same; p2; a2; } { rank=same; p3; a3; } { rank=same; p4; ho; }
+  p1 -> p2 -> p3 -> p4;
+  p1 -> a1; p2 -> a2; p3 -> a3; p4 -> ho;
+}

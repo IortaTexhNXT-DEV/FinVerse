@@ -1,0 +1,14 @@
+digraph erd {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.3, ranksep=0.8, pad=0.2, bgcolor="white"];
+  node [shape=plain, fontname="Arial"];
+  edge [color="@CTA_BLUE", arrowsize=0.8, penwidth=1.2, dir=both];
+  "bcl_lov_attribute" [label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="3" color="@BORDER"><tr><td bgcolor="@HEADER_BLUE" align="left" colspan="2"><font color="@WHITE" point-size="12"><b>BCL_LOV_ATTRIBUTE</b></font></td></tr><tr><td align="left"><font point-size="10" color="@MUTED">PK</font></td><td align="left" port="id"><font point-size="11">ID</font></td></tr><tr><td align="left"><font point-size="10" color="@MUTED">FK</font></td><td align="left" port="type_code"><font point-size="11">TYPE_CODE</font></td></tr><tr><td align="left"><font point-size="10" color="@MUTED">FK</font></td><td align="left" port="code"><font point-size="11">CODE</font></td></tr><tr><td colspan="2" align="left"><font point-size="10" color="@MUTED">+ 7 columns</font></td></tr></table>>];
+  "bcl_status_access" [label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="3" color="@BORDER"><tr><td bgcolor="@HEADER_BLUE" align="left" colspan="2"><font color="@WHITE" point-size="12"><b>BCL_STATUS_ACCESS</b></font></td></tr><tr><td align="left"><font point-size="10" color="@MUTED">PK</font></td><td align="left" port="id"><font point-size="11">ID</font></td></tr><tr><td align="left"><font point-size="10" color="@MUTED">FK</font></td><td align="left" port="status_code"><font point-size="11">STATUS_CODE</font></td></tr><tr><td align="left"><font point-size="10" color="@MUTED">FK</font></td><td align="left" port="status_type"><font point-size="11">STATUS_TYPE</font></td></tr><tr><td align="left"><font point-size="10" color="@MUTED">FK</font></td><td align="left" port="role_code"><font point-size="11">ROLE_CODE</font></td></tr><tr><td colspan="2" align="left"><font point-size="10" color="@MUTED">+ 9 columns</font></td></tr></table>>];
+  "lov_type" [shape=box, style="rounded,filled", fillcolor="@DIRTY_WHITE", color="@MUTED", fontsize=11, label=<<font color="@MUTED">LOV_TYPE<br/><font point-size="9">LOV</font></font>>];
+  "lov_value" [shape=box, style="rounded,filled", fillcolor="@DIRTY_WHITE", color="@MUTED", fontsize=11, label=<<font color="@MUTED">LOV_VALUE<br/><font point-size="9">LOV</font></font>>];
+  "sec_role" [shape=box, style="rounded,filled", fillcolor="@DIRTY_WHITE", color="@MUTED", fontsize=11, label=<<font color="@MUTED">SEC_ROLE<br/><font point-size="9">SECURITY</font></font>>];
+  "bcl_lov_attribute":"type_code" -> "lov_type" [arrowtail=crow, arrowhead=teetee];
+  "bcl_lov_attribute":"type_code" -> "lov_value" [arrowtail=crow, arrowhead=teetee];
+  "bcl_status_access":"role_code" -> "sec_role" [arrowtail=crow, arrowhead=teetee];
+  "bcl_status_access":"status_type" -> "lov_value" [arrowtail=crow, arrowhead=teetee];
+}

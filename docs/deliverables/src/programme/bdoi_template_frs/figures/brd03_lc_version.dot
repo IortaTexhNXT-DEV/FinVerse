@@ -1,0 +1,17 @@
+// Life-cycle of a package version (FRPM.003.05, 016.02, 024.01-02; BRPM.006, 007; PMADD06).
+digraph lc_version {
+  graph [rankdir=LR, fontname="Arial", nodesep=0.35, ranksep=0.45, bgcolor="white", pad=0.15];
+  node  [shape=box, style="rounded,filled", fillcolor="#FFF2CC", color="#D6B656", fontname="Arial", fontsize=10, width=1.3, height=0.55];
+  edge  [arrowsize=0.55, penwidth=0.8, color="#333333", fontname="Arial", fontsize=8.5];
+  dr [label="Draft\n(MBS set-up;\nnot rated)"];
+  fv [label="For validation\n(TSU Head or\nBus. Admin)"];
+  rl [label="Released\n(sells from its\neffective date)", fillcolor="#D5E8D4", color="#82B366"];
+  sp [label="Superseded\n(renewals and\nendorsements only)"];
+  ex [label="Expired / Inactive\n(archived; read only)", fillcolor="#EEEEEE", color="#888888"];
+  dr -> fv [label="submit for\nvalidation"];
+  fv -> rl [label="validated\n(checklist,\ntest premium)"];
+  fv -> dr [label="returned\nwith reason", style=dashed];
+  rl -> sp [label="newer version\ntakes effect"];
+  rl -> ex [label="expiry date or\ndeactivation date\nwithout renewal"];
+  sp -> ex [label="package\nexpires"];
+}

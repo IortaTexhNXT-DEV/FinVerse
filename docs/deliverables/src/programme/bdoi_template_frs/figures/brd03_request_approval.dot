@@ -1,0 +1,77 @@
+// Package request and approval, swimlanes by persona (FRPM.011.01-03, 017.01, 028.01; BRPM.008, 009, 011, 021).
+// Service levels are the defaults of FRPM.028.01, for BDOI to confirm (Annex O, Annex V).
+digraph request_approval {
+  graph [rankdir=TB, newrank=true, fontname="Arial", nodesep=0.1, ranksep=0.24, bgcolor="white", pad=0.15, splines=polyline];
+  node  [shape=box, style="rounded,filled", fontname="Arial", fontsize=10, width=1.0, height=0.45, margin="0.04,0.03"];
+  edge  [arrowsize=0.55, penwidth=0.8, color="#333333", fontname="Arial", fontsize=8.5];
+
+  subgraph cluster_req { label="Requester\n(Marketing AO or TSU)"; fontname="Arial Bold"; fontsize=10; style="rounded"; color="#82B366";
+    node [fillcolor="#D5E8D4", color="#82B366"];
+    h1 [label="", shape=plaintext, style="", width=0.1, height=0.1];
+    start [label="Start", shape=ellipse, fillcolor="#FFFFFF", width=0.7, height=0.3];
+    r1 [label="Create request:\ntype, scope,\nreason, terms"];
+    r2 [label="Attach supporting\ndocuments;\nsubmit"];
+    r3 [label="Update and\nresubmit"];
+  }
+  subgraph cluster_mkt { label="Marketing approvers\n(TL, then TH, then UH)"; fontname="Arial Bold"; fontsize=10; style="rounded"; color="#4E9A06";
+    node [fillcolor="#E8F5D0", color="#4E9A06"];
+    h2 [label="", shape=plaintext, style="", width=0.1, height=0.1];
+    m1 [label="Review the\nrequest"];
+    m2 [label="Approve?", shape=diamond, width=0.9, height=0.6, style="filled"];
+    m3 [label="Return with\nremarks or\nreject"];
+    ms [label="SLA 24 h\nper level", shape=note, fillcolor="#FFFBE6", color="#BFA000", fontsize=8.5, width=0.8];
+  }
+  subgraph cluster_tl { label="TSU Team Lead"; fontname="Arial Bold"; fontsize=10; style="rounded"; color="#6C8EBF";
+    node [fillcolor="#DAE8FC", color="#6C8EBF"];
+    h3 [label="", shape=plaintext, style="", width=0.1, height=0.1];
+    t1 [label="Review; assign\nTSU Officer"];
+    t2 [label="Recommend?", shape=diamond, width=0.95, height=0.6, style="filled"];
+    t3 [label="Return with\nremarks"];
+    ts [label="SLA 24 h", shape=note, fillcolor="#FFFBE6", color="#BFA000", fontsize=8.5, width=0.7];
+  }
+  subgraph cluster_th { label="TSU Head"; fontname="Arial Bold"; fontsize=10; style="rounded"; color="#B85450";
+    node [fillcolor="#F8CECC", color="#B85450"];
+    h4 [label="", shape=plaintext, style="", width=0.1, height=0.1];
+    a1 [label="Read the\nrecommendation"];
+    a2 [label="Approve?", shape=diamond, width=0.9, height=0.6, style="filled"];
+    a3 [label="Return or\nreject with\nremarks"];
+    as_ [label="SLA 24 h", shape=note, fillcolor="#FFFBE6", color="#BFA000", fontsize=8.5, width=0.7];
+  }
+  subgraph cluster_sys { label="System"; fontname="Arial Bold"; fontsize=10; style="rounded"; color="#666666";
+    node [fillcolor="#F5F5F5", color="#666666"];
+    h5 [label="", shape=plaintext, style="", width=0.1, height=0.1];
+    s0 [label="Complete?\n(mandatory\nfields, documents)", shape=diamond, width=1.15, height=0.8, style="filled"];
+    s1 [label="Number request;\nroute by source;\nnotify next approver"];
+    s2 [label="Maker never\noffered as\napprover"];
+    s3 [label="Daily 09:30:\noverdue marked\nred; alert"];
+    s4 [label="To negotiation\n(or straight to\nManCom)"];
+    end_ [label="Negotiation\n(next figure)", shape=ellipse, fillcolor="#FFFFFF", width=0.9, height=0.35];
+  }
+  { rank=same; h1; h2; h3; h4; h5; }
+  h1 -> h2 -> h3 -> h4 -> h5 [style=invis];
+  h1 -> start [style=invis];
+
+  start -> r1 -> r2 -> s0;
+  s0 -> r3 [xlabel="No: missing\nitems named"];
+  r3 -> r2;
+  s0 -> s1 [xlabel="Yes"];
+  s1 -> m1 [xlabel="source\nMarketing"];
+  s1 -> t1 [xlabel="source TSU\nor insurer"];
+  m1 -> m2;
+  m2 -> m3 [xlabel="No"];
+  m3 -> r3 [style=dashed];
+  m2 -> t1 [xlabel="Yes (UH)"];
+  m2 -> m1 [xlabel="Yes (TL, TH):\nnext level", style=dashed];
+  t1 -> t2;
+  t2 -> t3 [xlabel="No"];
+  t3 -> r3 [style=dashed];
+  t2 -> a1 [xlabel="Yes"];
+  a1 -> a2;
+  a2 -> a3 [xlabel="No"];
+  a3 -> r3 [style=dashed];
+  a2 -> s4 [xlabel="Yes"];
+  s4 -> end_;
+  s2 -> s3 [style=invis];
+  { rank=same; s1; s2; }
+  ms -> m1 [style=invis]; ts -> t1 [style=invis]; as_ -> a1 [style=invis];
+}

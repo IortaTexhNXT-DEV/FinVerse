@@ -1,0 +1,133 @@
+# Screen specifications of BRD-6 Renewal: the Account Officer's renewals, the disposition, the Team Leader review and
+# the transfers between Marketing units.
+area: "Marketing: disposition, review and transfers"
+screens:
+  - id: SCR-RN-06
+    title: My Dispositions
+    route: /renewal/mine
+    purpose: >-
+      The renewals assigned to the Account Officer, by disposition, with quick filters for the renewals to
+      disposition, returned to the officer, due in 30 days and with no response (NRNS). The officer opens a renewal to
+      read its history and give the disposition, pushes the dispositioned renewals to the Team Leader and transfers
+      one to another unit.
+    entry:
+      - Client & Policy › Renewal › My Dispositions
+      - Renewal Home › Returned
+      - Notification Renewal assigned
+    shots:
+      - {state: list, user: ao, caption: "My Dispositions of the Account Officer with the quick filters"}
+    fields:
+      - "Tabs | All / For Renewal / For Quotation / For Proposal / Not for Renewal / Lost Business / Exceptions | Tab | - | - | Disposition and classification | All | - | - | -"
+      - "Quick filters | To disposition / Returned to me / Due in 30 days / NRNS | Toggle button | One at a time | - | - | None | - | - | -"
+      - "List | [Columns of the renewal lists] | Column | As on the Expiry List (SCR-RN-02), the renewals assigned to the officer | - | Renewals | - | Read only | - | No renewals assigned to you"
+    actions:
+      - "Push | The Account Officer | Renewals ticked | Sends the dispositioned renewals to the Team Leader; each renewal without a complete disposition is refused with the reason | Review in Progress | -"
+      - "Transfer | Users with the assign permission | One renewal ticked | Opens the Transfer dialog (SCR-RN-02) | Transfer Pending | Renewal transfer requested (NT-02)"
+      - "Download | Users with the export permission | Always | Downloads the list as shown | - | -"
+    rules:
+      - "The officer sees the renewals assigned to him; a returned renewal carries the red Returned tag until it is pushed again (FR-RN-040, FR-RN-046)."
+      - "A renewal is pushed only with a complete disposition: Not for Renewal needs its reason (FR-RN-043, FR-RN-045)."
+    outcome: The officer works the assigned renewals and pushes them for review.
+    frs: [FR-RN-040, FR-RN-045, FR-RN-046]
+    tests: [MYDISP]
+
+  - id: SCR-RN-07
+    title: Set Disposition, Add Remark and Re-open
+    route: /renewal/candidates/:ref
+    parent: /renewal/mine
+    purpose: >-
+      The disposition of the renewal by the Account Officer (or the Team Leader): For Renewal, For Quotation, For
+      Proposal, Not for Renewal with its reason, or Lost Business, with remarks; Push sends it to the Team Leader.
+      Add Remark keeps a remark on the renewal. A renewal tagged Not for Renewal can be re-opened with a reason until
+      the re-open days after expiry. A renewal posted For Quotation or For Proposal starts its quotation or proposal
+      request here.
+    entry:
+      - Renewal › Set Disposition, Add Remark, Re-open or Start Quotation / Proposal
+    shots:
+      - {state: disposition, user: ao, open_renewal: for_disposition, fill: disposition_nfr, caption: "Set Disposition dialog: Not for Renewal with its reason and remarks"}
+    fields:
+      - "Set Disposition dialog | Disposition | Drop-down | For Renewal, Not for Renewal, For Quotation, For Proposal, Lost Business | Y | Renewal disposition list | The current disposition | For Disposition | Account history viewed | Select the disposition"
+      - "Set Disposition dialog | Reason for Not for Renewal | Drop-down | Reason for Not for Renewal list | Cond.: Not for Renewal | Reason for Not for Renewal | Blank | For Disposition | - | Select the reason for Not for Renewal"
+      - "Set Disposition dialog | New Invoice No. | Text | The invoice the policy was booked under | Cond.: reason Booked to New Invoice | Booking | Blank | For Disposition | Invoice of the ledger | Enter the new invoice number"
+      - "Set Disposition dialog | Receiving Unit | Drop-down | Name of the unit | Cond.: reason Transfer to Another Marketing Unit | Marketing units | Blank | For Disposition | Another active unit | Select the receiving unit"
+      - "Set Disposition dialog | Remarks | Text area | Up to 200 characters | N | - | Blank | For Disposition | At most 200 characters | Remarks may have at most 200 characters"
+      - "Add Remark dialog | Remark | Text area | Up to 200 characters | Y | - | Blank | Any open stage | Not blank | Enter the remarks"
+      - "Re-open dialog | Reason | Text area | Up to 200 characters | Y | - | Blank | Letter Pending, Closed as not renewed | Within the re-open days after expiry | Only a renewal tagged Not for Renewal can be re-opened"
+    actions:
+      - "Set Disposition | The assigned officer or a Team Leader | For Disposition | Opens the dialog; Save keeps the disposition, which supersedes the previous one | For Disposition | -"
+      - "Push | The assigned officer or a Team Leader | For Disposition with a disposition | Sends the renewal to the Team Leader | Review in Progress | -"
+      - "Start Quotation / Proposal | Account Officers and Team Leaders | Posted For Quotation or For Proposal, none started | Creates the quotation or the proposal request from the expiring account | For Proposal / New Business Path | -"
+      - "Add Remark | Marketing, Processing and Contact Center users | Any open stage | Keeps the remark on the Remarks & Follow-ups tab | - | -"
+      - "Re-open | Account Officers and the Processing Team Leader | Letter Pending or closed as not renewed | Asks for the reason and returns the renewal for a new disposition | For Disposition | Renewal returned (NT-04)"
+    rules:
+      - "The disposition needs the account history viewed first (FR-RN-042, FR-RN-043)."
+      - "Not for Renewal needs its reason; Booked to New Invoice needs the invoice and Transfer to Another Marketing Unit the receiving unit (FR-RN-043)."
+      - "A renewal with financial or structural changes is posted For Quotation or For Proposal and continues as a New Business quotation or proposal request (FR-RN-048)."
+      - "A Not for Renewal renewal can be re-opened until the re-open days after expiry (30 by default) (FR-RN-047)."
+    outcome: Each renewal has its disposition, with its reason and remarks.
+    frs: [FR-RN-042, FR-RN-043, FR-RN-044, FR-RN-047, FR-RN-048]
+    tests: [DISP, REMARKS]
+
+  - id: SCR-RN-08
+    title: TL Review
+    route: /renewal/review
+    purpose: >-
+      The dispositions of the unit waiting for the Team Leader, the exceptions, the unassigned renewals and the
+      renewals on the quotation or proposal path. The Team Leader posts the reviewed renewals (each moves on by its
+      disposition), returns them to the officer with a reason, overrides a failed check, the classification, the
+      disposition or the outstanding balance with a reason, and re-assigns them.
+    entry:
+      - Client & Policy › Renewal › TL Review
+      - Notification of a pushed renewal
+    shots:
+      - {state: list, user: mkttl, caption: "TL Review: the dispositions of the unit waiting for review with the actions of the Team Leader"}
+      - {state: override, user: mkttl, fill: override_balance, caption: "Override dialog: the outstanding balance with the reason and remarks"}
+      - {state: return, user: mkttl, fill: return_ao, caption: "Return to Account Officer dialog with the reason and remarks"}
+    fields:
+      - "Tabs | For Review / Exceptions / Unassigned / Quotation / Proposal / All | Tab | - | - | Stage and classification | For Review | - | - | -"
+      - "List | [Columns of the renewal lists] | Column | As on the Expiry List (SCR-RN-02), the renewals of the unit | - | Renewals | - | Read only | - | No renewals to display"
+      - "Return dialog | Reason / Remarks | Drop-down, text area | Renewal return reason list; up to 200 characters | Y / Y | Renewal return reason | Blank | Review in Progress | - | Select a reason for 'Return'"
+      - "Override dialog | Override | Drop-down | Outstanding balance, Failed check, Classification, Disposition, Insurer response mismatch, Unlock the Renewal Advice | Y | Fixed list | Blank | Any open stage | - | Select the kind of override"
+      - "Override dialog | Check / New value | Drop-down | The failing check; the new classification or disposition | Cond.: failed check, classification or disposition | Checks, classifications, dispositions | Blank | Any open stage | A failed check never turns Clean | An override never turns a failed check into Clean"
+      - "Override dialog | Reason / Remarks | Drop-down, text area | Renewal override reason list; up to 200 characters | Y / Y | Renewal override reason | Blank | Any open stage | - | Select the reason of the override"
+    actions:
+      - "Post | Marketing Team Leader | Renewals ticked | Asks for confirmation; For Renewal goes to Processing, For Quotation and For Proposal to the New Business path, Not for Renewal to the letter step, Lost Business is closed | For Processing, For Proposal / New Business Path, Letter Pending or Closed | Renewal posted (NT-05)"
+      - "Return | Marketing Team Leader | Renewals ticked | Opens the dialog; the renewal goes back to its officer with the Returned tag | For Disposition | Renewal returned (NT-04)"
+      - "Override | Marketing Team Leader (override permission) | Renewals ticked | Opens the dialog; the override is kept with its reason in the history | The stage the override allows | -"
+      - "Re-assign | Marketing Team Leader | Renewals ticked | Opens the Assign Disposition dialog (SCR-RN-02) | For Disposition | Renewal assigned (NT-01)"
+    rules:
+      - "A renewal For Renewal or on the New Business path with a failing blocking check is not posted until the check passes or is overridden (FR-RN-050)."
+      - "Straight-through renewals (an automatic disposition of a Clean renewal) move on without review (FR-RN-023)."
+      - "The outstanding balance of the expiring invoice is overridden by the Team Leader with mandatory remarks (FR-RN-051)."
+      - "Not for Renewal is given through the disposition with its reason, never by an override (FR-RN-051)."
+    outcome: The reviewed renewals move on by their disposition.
+    frs: [FR-RN-050, FR-RN-051, FR-RN-023]
+    tests: [TLREVIEW]
+
+  - id: SCR-RN-09
+    title: Transfers
+    route: /renewal/transfers
+    purpose: >-
+      The requests to move a renewal to another Marketing unit: Incoming for the receiving Team Leader, who accepts
+      or declines them with remarks; Outgoing for the requesting unit, which may cancel an open request.
+    entry:
+      - Client & Policy › Renewal › Transfers
+      - Notification Renewal transfer requested
+    shots:
+      - {state: incoming, user: rnwtl, caption: "Transfers, Incoming: the request from another unit with its row action menu"}
+    fields:
+      - "Tabs | Incoming / Outgoing | Tab | - | - | Transfer requests | Incoming | - | - | -"
+      - "List | Renewal Reference / Client | Column | Reference; client with the expiry under it | - | Transfers | - | Read only | - | No transfers"
+      - "List | From / To | Column | Name of the sending unit with the receiving unit under it | - | Sales organisation | - | Read only | - | -"
+      - "List | Remarks / Requested / Status | Column | Remarks of the request; the requester's name with the time; Requested, Accepted, Declined or Cancelled | - | Transfers | - | Read only | - | -"
+      - "Accept or Decline dialog | Remarks | Text area | Up to 200 characters | Cond.: decline | - | Blank | Requested | Not blank to decline | Enter the remarks"
+    actions:
+      - "Accept (row menu) | A Team Leader of the receiving unit | Requested | Asks for remarks; the renewal joins the unit, unassigned | Unassigned Disposition | Renewal transfer decided (NT-03)"
+      - "Decline (row menu) | A Team Leader of the receiving unit | Requested | Asks for the remarks; the renewal returns to the sending unit | The stage before the request | Renewal transfer decided (NT-03)"
+      - "Cancel Request (row menu) | The requester | Requested | Asks for confirmation; the renewal stays with the unit | The stage before the request | -"
+    rules:
+      - "Only a Team Leader of the receiving unit decides a transfer; only the requester cancels it (FR-RN-032)."
+      - "An accepted renewal waits in the Unassigned tab of the receiving unit for its Account Officer (FR-RN-032)."
+    outcome: The renewal is with the unit that handles the client.
+    frs: [FR-RN-031, FR-RN-032]
+    tests: [TRANSFERS]

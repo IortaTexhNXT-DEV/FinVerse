@@ -1,0 +1,38 @@
+// Runtime components of BIBS in one environment (Deployment Architecture, chapter 3).
+digraph da_runtime {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.25, ranksep=0.45, bgcolor="white", pad=0.2, newrank=true,
+         label=<<font point-size="15" color="@HEADER_BLUE"><b>Runtime components</b></font><br/><font point-size="9" color="@MUTED">Two images, four workloads in the namespace bibs. Pods never call each other; each backend workload reaches the data services directly.</font>>,
+         labelloc=t, labeljust=l];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.0, fontname="Arial", fontsize=11,
+         fontcolor="@NEAR_BLACK", margin="0.12,0.06", fillcolor="@WHITE"];
+  edge  [color="@HEADER_BLUE", arrowsize=0.55, penwidth=0.9, fontname="Arial", fontsize=8, fontcolor="@MUTED"];
+
+  users [label=<<b>Browsers</b><br/><font point-size="9.5">BDO network, VDI</font>>, fillcolor="@BG_BLUE"];
+  apigee [label=<<b>Apigee X</b><br/><font point-size="9.5">BDO systems</font>>, fillcolor="@BG_BLUE"];
+  gw [label=<<b>Gateway bibs (HTTPS 443)</b><br/><font point-size="9.5">internal load balancer + AWS WAF<br/>HTTPRoutes: api, integration, /</font>>, fillcolor="@DIRTY_WHITE"];
+  subgraph cluster_ns {
+    label=<<b>Kubernetes namespace bibs</b>>; fontsize=10; style="rounded"; color="@HEADER_BLUE";
+    fe  [label=<<b>bibs-frontend</b><br/><font point-size="9.5">nginx, React SPA<br/>2-4 pods, HPA</font>>, fillcolor="@BG_BLUE"];
+    web [label=<<b>bibs-web</b><br/><font point-size="9.5">role web: screens, user operations<br/>3-10 pods (PROD), HPA</font>>, fillcolor="@BG_BLUE"];
+    jobs [label=<<b>bibs-jobs</b><br/><font point-size="9.5">role jobs: scheduled and batch<br/>2 pods, job lock</font>>, fillcolor="@BG_BLUE"];
+    integ [label=<<b>bibs-integration</b><br/><font point-size="9.5">role integration: outbox relay,<br/>consumers, files, system operations<br/>2 pods</font>>, fillcolor="@BG_BLUE"];
+  }
+  subgraph cluster_data {
+    label=<<b>Managed data services (private data subnets)</b>>; fontsize=10; style="rounded,dashed"; color="@MUTED";
+    pg [label=<<b>PostgreSQL 16</b><br/><font point-size="9.5">Amazon RDS, TLS verify-full</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+    vk [label=<<b>Valkey 8</b><br/><font point-size="9.5">ElastiCache, TLS, AUTH</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+    kf [label=<<b>Kafka 3.9 KRaft</b><br/><font point-size="9.5">Amazon MSK, SASL_SSL</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  }
+  subgraph cluster_aws {
+    label=<<b>AWS services through PrivateLink and the S3 gateway</b>>; fontsize=10; style="rounded,dashed"; color="@MUTED";
+    s3 [label=<<b>Amazon S3</b><br/><font point-size="9.5">4 buckets, SSE-KMS</font>>, fillcolor="@AMBER_BG"];
+    sm [label=<<b>Secrets Manager, KMS, STS</b><br/><font point-size="9.5">secrets, keys, IRSA</font>>, fillcolor="@AMBER_BG"];
+  }
+  users -> gw; apigee -> gw [label=" private route"];
+  gw -> fe [label=" /"]; gw -> web [label=" api"]; gw -> integ [label=" integration"];
+  {web jobs integ} -> pg; {web jobs integ} -> vk; {web jobs integ} -> kf [style=dashed];
+  {web jobs integ} -> s3 [style=dashed];
+  integ -> sm [style=dashed];
+  {rank=same; fe; web; jobs; integ}
+  {rank=same; pg; vk; kf; s3; sm}
+}

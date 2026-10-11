@@ -1,0 +1,952 @@
+# Source of the two BDOI input workbooks of the programme (request of the BDOI product owner, 8 October 2026):
+#   (A) BIBS_Inputs_BRD-00_BDOI_Requirements_and_Inputs_by_BRD_v1.0.xlsx - what the project needs from the BDOI
+#       business users, one tab per BRD;
+#   (B) BIBS_Templates_BRD-00_Master_Data_and_Configuration_Upload_Templates_v1.0.xlsx and its short Word guide
+#       (MASTER_DATA_GUIDE.md) - every master, reference and configuration dataset BIBS needs before go-live.
+# Built by build_bdoi_inputs.py (same folder):
+#   python docs/deliverables/src/programme/bdoi_inputs/build_bdoi_inputs.py            # both workbooks and the guide
+#   python docs/deliverables/src/programme/bdoi_inputs/build_bdoi_inputs.py --check    # checks only
+#
+# What is typed here and what is read:
+#   * typed: the tabs, owners and default dates of workbook A, the rules that give each row its type, the
+#     reinsurance (phase 2) rows, the test-data and sign-off rows, and for workbook B the groups, the extra
+#     templates, the dependencies between the templates of the different sources and the gap notes;
+#   * read: the proposed rules and clarifications and the open questions of every FRS and of the BRD-13 handbook
+#     (pack/catalogue.yaml), the discrepancy and clarification register, the Drop 0 configuration register
+#     (Drop-0_Closure/drop0.yaml), the earlier Drop 0 requirements list (drop0_requirements.yaml), the NFR
+#     catalogue, the project plan (milestones, sign-offs, dependencies) and, for workbook B, the configuration input
+#     templates of BRD-03, BRD-11 and Drop 0, the Migration Console layouts and the upload definitions of the
+#     platform.
+
+meta:
+  version: "1.2"
+  date: 9 October 2026
+  today: 2026-10-09
+  title_a: BDOI Requirements and Inputs by BRD
+  title_b: Master Data and Configuration Upload Templates
+  title_guide: Master Data Upload Guide
+
+# ------------------------------------------------------------------------------------------- workbook A: tabs
+# brd: tab key; sheet: tab name; owner: BDOI owner (role) of the BRD; due: default Needed by (the FRS or sign-off
+# set sign-off of the project plan); drop.
+tabs:
+  - {brd: BRD-00, sheet: "BRD-00 Cross-cutting", name: "Core Replacement and cross-cutting points", drop: Programme,
+     owner: "BIBS Product Owner with the Program Manager, Business Project Services", due: 2026-11-30}
+  - {brd: BRD-01, sheet: "BRD-01 New Business", name: New Business, drop: "Drop 1",
+     owner: "Product Owner, New Business", due: 2026-11-30}
+  - {brd: BRD-02, sheet: "BRD-02 Operations", name: Operations, drop: "Drop 1",
+     owner: "Head, Operations Services", due: 2026-11-30}
+  - {brd: BRD-03, sheet: "BRD-03 Product Maintenance", name: Product Maintenance, drop: "Drop 0",
+     owner: "Product Owner, Marketing Business System (MBS)", due: 2026-11-30}
+  - {brd: BRD-04, sheet: "BRD-04 Collections", name: Collections, drop: "Drop 1",
+     owner: "VP and Head, BDOI Operations (Collections)", due: 2026-11-30}
+  - {brd: BRD-05, sheet: "BRD-05 Accounting and ACSL", name: "Accounting, Disbursement and ACSL", drop: "Drop 1",
+     owner: "Head, Comptrollership", due: 2026-11-30}
+  - {brd: BRD-06, sheet: "BRD-06 Renewal", name: Renewal, drop: "Drop 1",
+     owner: "Product Owner, Renewal", due: 2026-11-30}
+  - {brd: BRD-07, sheet: "BRD-07 Claims", name: Claims, drop: "Drop 2",
+     owner: "Product Owner, Claims", due: 2027-02-26}
+  - {brd: BRD-08, sheet: "BRD-08 Employee Benefits", name: Employee Benefits, drop: "Drop 2",
+     owner: "Product Owner, Employee Benefits", due: 2027-02-26}
+  - {brd: BRD-09, sheet: "BRD-09 Customer Servicing", name: Customer Servicing Facility, drop: "Drop 1",
+     owner: "Product Owner, Customer Servicing Facility", due: 2026-11-30}
+  - {brd: BRD-10, sheet: "BRD-10 Sanction Screening", name: Sanction Screening and Risk Profiling, drop: "Drop 1",
+     owner: "Chief Compliance Officer (Compliance)", due: 2026-11-30}
+  - {brd: BRD-11, sheet: "BRD-11 User Access", name: User Access Maintenance, drop: "Drop 0",
+     owner: "Product Owner, MBS, with Business Administration (User Access)", due: 2026-12-01}
+  - {brd: BRD-12, sheet: "BRD-12 Submitted Policies", name: Submitted Policies, drop: "Drop 1",
+     owner: "Product Owner, Submitted Policies", due: 2026-11-30}
+  - {brd: BRD-13, sheet: "BRD-13 Data Migration", name: Data Migration, drop: "Drop 0",
+     owner: "Program Manager, Business Project Services (Data Migration)", due: 2026-10-30}
+  - {brd: RI, sheet: "RI Reinsurance (phase 2)", name: "ReInsurance (phase 2)", drop: "Phase 2",
+     owner: "BIBS Product Owner with the Head, Operations (Remittance)", due: 2026-11-30}
+
+# BRD of the module codes of the Drop 0 configuration register (drop0.yaml modules) that are not a BRD of their own.
+module_tab: {PLATFORM: BRD-00, ORG: BRD-05, SEC: BRD-11}
+
+# Home BRD of the question ID prefixes (the BRD whose FRS answers the question).
+question_home:
+  CRQ: BRD-00
+  IQ: BRD-00
+  XQ: BRD-00
+  DSQ: BRD-00
+  Q: BRD-01
+  OQ: BRD-02
+  PQ: BRD-03
+  CQ: BRD-04
+  AQ: BRD-05
+  RQ: BRD-06
+  CLQ: BRD-07
+  EBQ: BRD-08
+  CSQ: BRD-09
+  SANC-SQ: BRD-10
+  UQ: BRD-11
+  SP-SQ: BRD-12
+  DMQ: BRD-13
+
+# Rows of the reinsurance tab: register items and questions moved there, and the rows of this file.
+ri_ids: [DCR-210, DCR-132, IQ20, Q44]
+ri_rows:
+  - ref: RI-01
+    type: Decision
+    need: "Confirm that ReInsurance stays phase 2 and give the planned date of the ReInsurance BRD, so that its FRS can be scheduled after go-live."
+    why: "The BDOI drop plan names a Reinsurance BRD for Remittance in Drop 1; BDOI answer A3 places the reinsurance module in phase 2. Without a date, phase 2 cannot be planned or sized."
+    proposal: "ReInsurance (treaty and facultative processing) is phase 2; its BRD is walked through after the go-live of January 2028."
+    source: "BDOI answer A3 (26-Sep-2026); programme assumption A-02; drop plan item 1.D3"
+    owner: "BIBS Product Owner"
+    due: 2026-11-30
+    priority: Medium
+    status: Partly answered
+    remarks: "Answer: BDOI answer A3 of 26-Sep-2026 (reinsurance module in phase 2); the BRD date is still open."
+  - ref: RI-02
+    type: Master data
+    need: "Name the reinsurers and reinsurance brokers that Remittance pays or collects from in Drop 1, with their codes, TIN, address, bank details and contacts, so that they exist as business partners at go-live."
+    why: "Remittance can only record a reinsurance transaction against a counterparty kept as a business partner (type Reinsurer or Reinsurance broker)."
+    proposal: "The counterparties are uploaded on Business Partners from template MD-01 of the master data workbook, approved by a second user."
+    source: "Programme alignment IQ20; business partner types of the platform (Reinsurer, Reinsurance broker)"
+    owner: "Head, Operations (Remittance) with the Head, Comptrollership"
+    due: 2027-07-16
+    priority: Medium
+    status: Open
+    remarks: "Template MD-01 Business partners of the Master Data and Configuration Upload Templates workbook."
+  - ref: RI-03
+    type: Report layout
+    need: "Confirm that the four Reinsurance reports of the Report List (#112 to #115) are phase 2, or name those needed at go-live with their layouts."
+    why: "The Report List asks for Reinsurance reports although no BRD of the current scope covers them."
+    proposal: "The four Reinsurance reports move to phase 2 with the ReInsurance BRD."
+    source: "Report List as of 27-Apr-2026, #112 to #115; register DCR-132"
+    owner: "BIBS Product Owner"
+    due: 2026-11-30
+    priority: Low
+    status: Open
+    remarks: ""
+
+# --------------------------------------------------------------------------------- workbook A: classification
+# The type of a row comes from the text of what is asked (first rule that matches, in this order); a source may
+# also set it. [type, pattern, scope]: the pattern is a regular expression, case-insensitive; scope "ask" applies it
+# to what is asked (after the topic), "all" to the topic and what is asked.
+types:
+  - Decision
+  - Clarification
+  - Business rule confirmation
+  - Configuration value
+  - Master data
+  - Sample document or template
+  - Report layout
+  - Integration detail
+  - Test data
+  - Sign-off
+type_rules:
+  - [Test data, '\b(test data|UAT testers?|test users?|testers|test cases? data)\b', all]
+  - [Decision, '^(please )?(decide|choose|select)\b', ask]
+  - [Integration detail, '\b(interfaces?|integrations?|feeds?|file layouts?|transport|EIAM|UIDM|ISC|SCIM|CCM|Apigee|HLS|LFS|OBPCS|AFTS|EGL|EDP|CARMS|Bridger|NLDS|ECM|TFS|M365|portal|secure file|connector|bank channels?|channel layouts?|directory sign-in)\b', all]
+  - [Report layout, '\b(reports?|extract layouts?|counters?|dashboards?|columns|variants?)\b', all]
+  - [Sample document or template, '\b(letters?|templates?|slips?|certificates?|cover letter|layouts? of the (letter|advice|slip|form|documents?)|document layouts?|forms? (layout|template)|sample (letter|advice|form)s?)\b', all]
+  - [Master data, '^(please )?(give|provide|name|list|supply|send|share|prepare)\b[^.]*\b(insurers?|branches|banks?|employees|products?|clients?|payees|partners|adjusters|account officers|cost cent(re|er)s|reinsurers|chart of accounts|master data|group profiles)\b', ask]
+  - [Master data, '\b(chart of accounts|holiday calendar|opening (balances|trial balance)|user access matrix|role matrix)\b', all]
+  - [Configuration value, '\b(thresholds?|limits?|days|hours|minutes|rates?|percent(age)?|prefix(es)?|parameters?|SLA|turnaround|TAT|lead days|tolerances?|frequenc(y|ies)|schedules?|numbering|lists? of values|brackets|buckets|ageing|aging|reminders?|cut-off|values)\b', all]
+  - [Decision, '^(which|whether|is|are|should|may|can|does|do|will|option)\b|\b(decide|choose|option [A-C]\b|in or out of scope|in scope|or not)\b', ask]
+  - [Business rule confirmation, '\bconfirms?\b', all]
+  - [Clarification, '.', all]
+# Drop 0 list categories and register types that fix the type of a row.
+category_type:
+  Decision: Decision
+  Confirmation: Business rule confirmation
+  Clarification: Clarification
+  Conflict in BRD: Clarification
+  Dependency: Integration detail
+  Data or input needed: Configuration value
+
+# Needed by of a row, by type, when the source gives none (otherwise the BRD default of the tab).
+type_due:
+  Integration detail: 2027-01-31
+  Test data: 2027-07-16
+
+# Milestones of the BRD-13 set (pack/catalogue.yaml) and of the Drop 0 register used in the Needed by texts.
+needed_by_text:
+  "Before Drop 0 sign-off": 2026-11-30
+
+# Rows of each BRD tab beyond the clarifications: the UAT test data (programme dependency DEP-20, milestone MS-20)
+# and the sign-off of the set, its test plan and its UAT certificate (project plan, sign-offs).
+test_data:
+  need: "Name the UAT testers of {name} (at least two per business unit, with their user IDs and group profiles) and provide the business data of the UAT scenarios: the clients, policies, insurers and amounts each scenario of the test plan uses, from the migrated data of Trial migration 3 or as additional cases."
+  why: "UAT of {drop} runs on migrated data and the production values; testers without access or scenarios without data stop the UAT."
+  proposal: "The test plan (04 workbook of the set) names the scenarios; the BDOI testers choose the cases from the migrated data and add the cases the legacy data does not hold."
+  source: "Project plan: dependency DEP-20 (UAT testers), milestone MS-20 (UAT plans, values for UAT and testers, 16-Jul-2027)"
+signoff_rows:
+  # brd -> list of [what, due, signatories]; Drop 1 and Drop 2 BRDs follow the plan rows.
+  BRD-00:
+    - ["Approve the Drop 0 closure summary and the configuration inputs at the steering committee", 2026-12-09, "Steering committee (chair: Program Manager, Business Project Services)"]
+    - ["Approve the ORR / PRR evidence pack (operational and production readiness)", 2027-12-31, "Head, BDOI IT; Head, BDOI Information Security"]
+    - ["Take the go / no-go decision for the go-live of Monday 3 January 2028", 2028-01-02, "Go / no-go board"]
+    - ["Sign the hypercare exit and the hand-over to production support", 2028-02-02, "Go / no-go board; BDOI application support; BDO IT operations"]
+  BRD-03:
+    - ["Sign the BRD-03 Product Maintenance sign-off set", 2026-11-30, "Product Owner, Marketing Business System; MBS; TSU; Business Project Services"]
+  BRD-11:
+    - ["Sign the BRD-11 User Access Maintenance sign-off set", 2026-12-01, "Product Owner, Marketing Business System; BDOI Information Security; BDOI IT; Business Administrators"]
+  BRD-13:
+    - ["Sign the BRD-13 Data Migration sign-off set (re-based on BRD V0.03)", 2026-10-30, "Program Manager, Business Project Services; Data Migration Lead; Head, Comptrollership; Head, Operations; BDOI IT"]
+    - ["Sign the dress rehearsal report", 2027-11-26, "Data Migration Lead"]
+    - ["Sign the reconciliation of the go-live migration and of each true-up", 2028-01-02, "Head, Comptrollership; Data Migration Lead"]
+signoff_drop:
+  "Drop 1":
+    - ["Sign the FRS and sign-off set of {brd} {name}", 2026-11-30, "{owner}; Business Project Services (traceability)"]
+    - ["Approve the test plan of {brd} {name}", 2026-12-18, "{owner}"]
+    - ["Sign the UAT sign-off certificate of {brd} {name}", 2027-12-17, "{owner}; BIBS Product Owner"]
+  "Drop 2":
+    - ["Sign the FRS of {brd} {name}", 2027-02-26, "{owner}; Business Project Services"]
+    - ["Approve the test plan of {brd} {name}", 2027-06-30, "{owner}"]
+    - ["Sign the UAT sign-off certificate of {brd} {name}", 2027-11-30, "{owner}"]
+  "Drop 0":
+    - ["Approve the test plan of {brd} {name}", 2026-12-18, "{owner}"]
+    - ["Sign the UAT sign-off certificate of {brd} {name}", 2027-12-17, "{owner}; BIBS Product Owner"]
+
+# Programme dependencies of the project plan that BDOI provides (rows on the BRD-00 tab, or on the named tab).
+dependency_tab: {DEP-01: BRD-13, DEP-02: BRD-13, DEP-03: BRD-09, DEP-05: BRD-05, DEP-09: BRD-13, DEP-16: BRD-11, DEP-17: BRD-13, DEP-26: BRD-00}
+dependency_type:
+  Decision: Decision
+  Data: Master data
+  Integration: Integration detail
+  Environment: Integration detail
+  Resource: Test data
+dependency_skip: [DEP-04, DEP-14, DEP-20]   # DEP-04 and DEP-20 are the sign-off and test-data rows; DEP-14 is a project decision
+
+# ----------------------------------------------------------------------------------------- workbook B
+# Groups of the index, in this order, and the templates of each group. A template ID is a Drop 0 template (D0-nn),
+# a BRD-03 or BRD-11 configuration template (PM-nn, UA-nn), a Migration Console layout (R01 ...) or a template of
+# this workbook (MD-nn: entered on a screen; UP-nn: a screen upload of the platform).
+groups:
+  - name: Organisation
+    templates: [D0-01, D0-02, R02, D0-03, D0-04, D0-05, R03]
+  - name: Users, access and approvals
+    templates: [UA-06, UA-02, UA-01, UA-03, UA-04, UA-05, D0-15]
+  - name: Chart of accounts, tax and accounting
+    templates: [D0-07, D0-06, R08, D0-09, D0-08, D0-10, TX-02, TX-01, MD-02, MD-03, G01]
+  - name: Banks, bank accounts and cheque books
+    templates: [D0-11, D0-12, D0-13, D0-14, R11]
+  - name: Products, packages and rates
+    templates: [PM-09, R05, PM-01, PM-02, PM-03, PM-04, PM-04C, PM-06, R06, PM-10, PM-08]
+  - name: Insurers, partners, intermediaries and payees
+    templates: [R04, R04B, R07, MD-01, UP-02]
+  - name: Clients and KYC
+    templates: [R01, C01, C02, C03, UP-01]
+  - name: Compliance
+    templates: [UP-03]
+
+# Templates of the Drop 0 workbook replaced here by the layout the platform loads (same content).
+replaced:
+  PM-05: [R04, R04B, R07]
+  PM-07: [R06]
+
+# Dependencies between templates of different sources (codes one uses from the other), added to their own.
+depends:
+  R02: [D0-02]
+  R03: [D0-02, D0-04]
+  R04B: [R04]
+  R05: [PM-09]
+  R07: [R04, R05]
+  R06: [R05, PM-06]
+  R08: [D0-06]
+  R11: [D0-02]
+  G01: [R08, D0-02]
+  C01: [R01, R03, D0-02]
+  C02: [C01]
+  C03: [C01]
+  PM-01: [R05]
+  PM-04C: [PM-01, D0-06]
+  PM-06: [R04]
+  MD-01: [D0-02]
+  UP-01: [R01]
+  UP-02: [MD-01]
+  UP-03: []
+
+# Due of the templates of this workbook (milestones of the Drop 0 register, drop0.yaml due).
+due:
+  MD-01: D3
+  PM-04C: D5
+  UP-01: D5
+  UP-02: D3
+  UP-03: D5
+
+# Upload definitions of the platform used as templates: ID -> upload code, name, provided by, load text.
+uploads:
+  UP-01:
+    handler: ClientBulkHandler
+    name: Clients not held in the legacy systems
+    sheet: Clients (upload)
+    owner: "Heads, Retail and Corporate Marketing; Product Owner, MBS"
+    purpose: "One row per individual or corporate client that is not in the legacy client master (for example a bank-referred prospect), with the KYC values BIBS keeps on the client: ID type and number, nationality, source of funds and risk rating. The legacy clients come through the Migration Console (C01 to C03); this upload also updates a client found by code, TIN, ID or name and birth date."
+    load: "Screen upload: Client & Policy › Clients › Clients, button Bulk Upload (upload type Bulk client creation and update); every row is checked and the result is shown per row"
+  UP-02:
+    handler: PayeeMigrationHandler
+    name: Payees
+    sheet: Payees (upload)
+    owner: "Product Owner, Comptrollership - Disbursement"
+    purpose: "One row per payee of Disbursement (suppliers, service providers, employees, government agencies and other payees) with the payment modes, currency and bank account. This is also the layout of the payees of the legacy systems (migration object R09, in scope if BDOI confirms it)."
+    load: "Screen upload: Finance › Disbursement › Disbursement Uploads, upload type Payee Migration; the payees and their bank accounts come in for authorisation"
+  UP-03:
+    handler: ListRecord
+    name: Watchlist entries (sanctions, PEP and internal lists)
+    sheet: Watchlist entries (upload)
+    owner: "Compliance (Chief Compliance Officer)"
+    purpose: "One row per listed person or entity of a sanctions, PEP or internal list that BIBS screens clients against; the BDO negative list and the lists BDOI keeps itself. A known reference changes the entry, a new one adds it; aliases are separated by semicolons."
+    load: "Screen upload: Setup & Administration › Compliance Setup › List Sources and Runs, action Upload List File for the list source; the changes wait for a Compliance checker before screening uses them"
+    codes:
+      Entity Type: [[INDIVIDUAL, Individual], [ENTITY, Entity]]
+      List Type: [[SANCTION, Sanctions list], [PEP, Politically exposed persons], [INTERNAL, Internal list]]
+
+# v1.2: the uploads of the configuration screens. Each template below is written in the exact layout of the Upload of
+# its screen (columns, headers, mandatory flags and allowed values read from the upload of the platform, handler =
+# its upload definition); the screen is the menu path where Upload is offered. The rows are applied when a second
+# user approves the upload. A template not yet in the workbook gives its title block here (name, sheet, owner,
+# purpose).
+config_uploads:
+  D0-01: {handler: CompanyUpload, screen: "Setup & Administration › Setup › Companies"}
+  D0-02: {handler: BranchUpload, screen: "Setup & Administration › Setup › Branches"}
+  D0-03: {handler: HolidayUpload, screen: "Setup & Administration › Setup › Holiday Calendar"}
+  D0-04: {handler: DimensionUpload, screen: "Setup & Administration › Setup › Dimensions"}
+  D0-05: {handler: EmployeeUpload, screen: "Setup & Administration › Setup › Employees"}
+  D0-07: {handler: CategoryNumberingUpload, screen: "Finance › General Ledger › Chart Upload"}
+  D0-08: {handler: AccountingRuleUpload, screen: "Finance › Accounting Engine › Accounting Rules"}
+  D0-09: {handler: LegacyAccountUpload, screen: "Finance › General Ledger › Chart of Accounts"}
+  D0-10: {handler: TaxCodeUpload, screen: "Finance › Tax & Statutory › Tax Codes & Forms"}
+  D0-11: {handler: BankAccountUpload, screen: "Finance › Disbursement › Bank Accounts and Checks"}
+  D0-12: {handler: CheckBookUpload, screen: "Finance › Disbursement › Bank Accounts and Checks"}
+  D0-13: {handler: PettyCashFundUpload, screen: "Finance › Payables & Cash › Petty Cash"}
+  D0-14: {handler: StatementLayoutUpload, screen: "Setup & Administration › Setup › Bank Statement Layouts"}
+  D0-15: {handler: ApprovalLimitUpload, screen: "Client & Policy › Submitted Policies › Submitted Policies Setup or Client & Policy › Employee Benefits › EB Setup"}
+  UA-02: {handler: RoleMatrixUpload, screen: "Setup & Administration › Administration › Roles & Permissions"}
+  UA-03: {handler: AccessRoleUpload, screen: "Setup & Administration › Administration › Users"}
+  UA-04: {handler: SodRuleUpload, screen: "Setup & Administration › User Access › Separation of Duties"}
+  UA-05: {handler: SecurityParameterUpload, screen: "Setup & Administration › Administration › System Parameters"}
+  UA-06: {handler: AccessListUpload, screen: "Setup & Administration › Broking Setup › Lists of Values"}
+  PM-02: {handler: CoverageRuleUpload, screen: "Client & Policy › Product Maintenance › Coverages & Clauses or Client & Policy › Product Maintenance › Products"}
+  PM-03: {handler: ClauseUpload, screen: "Client & Policy › Product Maintenance › Coverages & Clauses"}
+  PM-04: {handler: RateTableUpload, screen: "Client & Policy › Product Maintenance › Rates & Taxes"}
+  PM-04C:
+    handler: OtherChargeUpload
+    screen: "Client & Policy › Product Maintenance › Rates & Taxes"
+    name: Other charges billed with the premium
+    sheet: Other charges
+    owner: "Product Owner, MBS; Head, Comptrollership (charges and accounts)"
+    purpose: "One row per charge billed to clients with the premium besides the taxes of PM-04 (for example the CTPL COCAF / LTO authentication fee, a notarial fee, a policy or documentation fee), per line or product (blank = every product): a fixed amount or a rate of the net premium, its VAT treatment, the GL account it is credited to and its validity. BIBS bills these charges only while the system parameter Other charges enabled is on; it is delivered off until BDOI confirms which charges BIBS bills (question TX-Q04)."
+  PM-06: {handler: PackageUpload, screen: "Client & Policy › Product Maintenance › Products"}
+  PM-08: {handler: DocumentTemplateUpload, screen: "Setup & Administration › Broking Setup › Document Templates"}
+  PM-09: {handler: ListParameterUpload, screen: "Setup & Administration › Broking Setup › Lists of Values or Setup & Administration › Administration › System Parameters"}
+  PM-10: {handler: IncentiveCriteriaUpload, screen: "Client & Policy › Product Maintenance › Incentive Criteria"}
+  MD-01: {handler: BusinessPartnerUpload, screen: "Setup & Administration › Setup › Business Partners"}
+
+# Templates entered on a screen that this workbook adds (no upload or migration layout exists for them).
+screen_templates:
+  MD-01:
+    name: Business partners (reinsurers, intermediaries, suppliers)
+    sheet: Business partners
+    owner: "Head, Comptrollership; Head, Operations for the reinsurers and intermediaries"
+    purpose: "One row per business partner other than an insurer or a client: agents and brokers (intermediaries), reinsurers and reinsurance brokers, co-insurers, suppliers, garages, surveyors and banks. Insurers come from R04; clients from C01 and the client upload."
+    load: "Configuration screen: Setup & Administration › Setup › Business Partners, one partner at a time, authorised by a second user"
+    source: "BDOI partner lists; legacy supplier masters"
+    columns:
+      - [Party code, "Y", "Text, up to 30; capitals, digits, - and .", "Code of the partner, unique", "RI-0001", "text:30"]
+      - [Party type, "Y", "Code of the list", "Kind of partner", "REINSURER", "list:PARTY_TYPE"]
+      - [Name, "Y", "Text, up to 200", "Registered name", "Asia Pacific Reinsurance Corp.", "text:200"]
+      - ["TIN / tax id", "N", "000-000-000-000", "Tax identification number", "123-456-789-000", "text:30"]
+      - [Address, "N", "Text, up to 300", "Registered address", "Makati City", "text:300"]
+      - [E-mail, "N", "E-mail address", "E-mail for advices and statements", "treaty@apre.example.ph", "text:120"]
+      - [Phone, "N", "Text, up to 40", "Phone number", "+63 2 8888 0000", "text:40"]
+      - [Default currency, "Y", "ISO currency code, 3 letters", "Currency of the partner's transactions", "PHP", "list:CURRENCY"]
+      - [Bank name, "N", "Text, up to 120", "Bank of the partner's account", "BDO Unibank", "text:120"]
+      - [Bank account no., "N", "Text, up to 40", "Account number for payments", "001234567890", "text:40"]
+      - [Licence no., "Cond.: intermediaries (agent, broker, reinsurance broker)", "Text, up to 40", "Insurance Commission licence number of an intermediary", "IC-RB-2026-015", "text:40"]
+      - [Credit days, "N", "Whole number", "Credit days of the partner's items (0 when none)", "30", "whole:0-365"]
+      - [Commission rate %, "N", "Number, 0 to 100", "Commission rate of an intermediary", "", "number:0-100"]
+      - [Withholding tax rate %, "N", "Number, 0 to 100", "Withholding tax rate applied to the partner", "2", "number:0-100"]
+    lists:
+      PARTY_TYPE:
+        name: Business partner type
+        values: [[AGENT, Agent], [BROKER, Broker], [REINSURER, Reinsurer], [RI_BROKER, Reinsurance broker],
+                 [COINSURER, Co-insurer], [SUPPLIER, Supplier], [GARAGE, Garage], [SURVEYOR, Surveyor or adjuster],
+                 [BANK, Bank], [EMPLOYEE, Employee], [GOVERNMENT, Government agency], [OTHER_PAYEE, Other payee]]
+      CURRENCY:
+        name: Currency
+        values: [[PHP, Philippine peso], [USD, US dollar], [EUR, Euro], [JPY, Japanese yen], [GBP, Pound sterling],
+                 [SGD, Singapore dollar], [HKD, Hong Kong dollar], [AUD, Australian dollar], [CNY, Chinese yuan]]
+        strict: false
+
+# Notes on the gaps: datasets with a template whose rows the platform cannot take by file, keyed on the screen.
+route_screen: "Configuration screen – no upload: BDOI fills in this template and the rows are keyed on the screen, each record authorised by a second user"
+gap_note: "No new upload is provided for these datasets. The BDOI owner fills in the template; the BIBS configuration team keys the rows on the screen named, a second user authorises each record (maker-checker), and the owner checks the result against the template before the dress rehearsal."
+
+# --------------------------------------------------------------------------------- workbook A: owner roles
+# One name per BDOI role (sheet Owners and the drop-down of the Owner column). Derived from the RACI matrix of the
+# programme (delivery_adoption/raci.yaml) and the personas and approval sheets of the FRS. [role, who, organisation,
+# what the role answers or provides]
+owner_roles:
+  - [Steering Committee, "Chaired by the Program Manager, Business Project Services; BIBS Product Owner and the heads of Operations, Comptrollership, Marketing, Compliance, BDOI IT and Information Security; go / no-go board", BDOI, "Drop closure, go / no-go and programme-level approvals"]
+  - [Program Manager, "Program Manager and BA Unit Head, Enterprise Services Group - Business Project Services", BDO Unibank ESG, "Plan, drops, traceability, BRD baselines and the data migration programme"]
+  - [BIBS Product Owner, "Owner of the BIBS scope; chairs the Change Control Board", BDOI, "Cross-BRD decisions, NFR targets, scope and phase 2"]
+  - [Business Analyst (BPS), "Business Project Services analysts, authors of the BRDs", BDO Unibank ESG, "BRD wording, numbering and traceability"]
+  - [Head of Marketing, "Heads of Retail and Corporate Marketing and the marketing unit heads", BDOI, "Sales organisation, account officers, marketing rules and approvals"]
+  - ["Product Owner, MBS", "Product Owner, Marketing Business System (MBS)", BDOI, "Product Maintenance, products, lists of values, document templates, user access ownership"]
+  - [TSU Head, "Head of the Technical Support Unit (TSU)", BDOI, "Packages, wordings, clauses, rates and the package map"]
+  - ["Product Owner, New Business", "Product Owner of New Business (Marketing and Processing)", BDOI, "Quotation, placement, issuance and booking"]
+  - ["Product Owner, Renewal", "Product Owner of Renewal (RMEL)", BDOI, "Renewal extraction, dispositions, letters and insurer responses"]
+  - ["Product Owner, Claims", "Product Owner of Claims and Risk Management", BDOI, "Claims handling"]
+  - ["Product Owner, Employee Benefits", "Product Owner of Employee Benefits", BDOI, "Employee Benefits programmes"]
+  - ["Product Owner, Customer Servicing", "Product Owner of the Customer Servicing Facility (Contact Center Management)", BDOI, "Customer servicing and case management"]
+  - ["Product Owner, Submitted Policies", "Product Owner of Submitted Policies (CBG and Non-CBG Marketing)", BDOI, "Submitted policies, masterlists and handling fees"]
+  - [Operations Head, "Head, Operations Services (financial transactions, cashiering, remittance, adjustments)", BDOI, "Operations rules, insurers, receipts and remittance"]
+  - [Collections Head, "VP and Head, BDOI Operations (Collections)", BDOI, "Collections rules, dispositions and escalations"]
+  - [Accounting Head / Controller, "Head, Comptrollership (FRBS, ACSL, Disbursement, Treasury and Tax)", BDOI, "Chart of accounts, accounting rules, tax, banks and the GL opening"]
+  - [Compliance Officer, "Chief Compliance Officer and the Compliance unit", BDOI, "Screening, KYC, watchlists and retention"]
+  - [Information Security Officer, "Head, BDOI Information Security", BDOI, "Security settings, role matrix, separation of duties"]
+  - [User Access Administrator, "Business Administration (User Access), the process owner of user access maintenance", BDOI, "Users, group profiles, approvers"]
+  - [BDOI IT, "BDOI Information Technology Group", BDOI, "Environments, extracts, interfaces and the Technical Specification"]
+  - [IT Infrastructure (BDO IT), "BDO Unibank IT: the EIAM, IGA, gateway and IT operations teams", BDO Unibank, "Directory sign-in, provisioning, gateway, infrastructure and DR"]
+  - [Data Migration Lead, "Data Migration Lead with the data owners and stewards", BDOI, "Migration objects, extracts, code maps and reconciliation"]
+  - [Human Resources, "BDOI Human Resources", BDOI, "Employees and holidays"]
+  - [Internal Audit, "BDOI Internal Audit", BDOI, "Audit trail and audit reports"]
+
+# Owner of each tab as a role of owner_roles.
+tab_owner_role:
+  BRD-00: BIBS Product Owner
+  BRD-01: "Product Owner, New Business"
+  BRD-02: Operations Head
+  BRD-03: "Product Owner, MBS"
+  BRD-04: Collections Head
+  BRD-05: Accounting Head / Controller
+  BRD-06: "Product Owner, Renewal"
+  BRD-07: "Product Owner, Claims"
+  BRD-08: "Product Owner, Employee Benefits"
+  BRD-09: "Product Owner, Customer Servicing"
+  BRD-10: Compliance Officer
+  BRD-11: "Product Owner, MBS"
+  BRD-12: "Product Owner, Submitted Policies"
+  BRD-13: Data Migration Lead
+  RI: BIBS Product Owner
+
+# Rules from an owner text of the sources to a role, applied to the first role named (up to ';' or ' with '),
+# in this order; 'TAB' means the owner of the tab.
+owner_rules:
+  - ['steering committee|go / no-go board', Steering Committee]
+  - ['program(me)? manager', Program Manager]
+  - ['BIBS product owner', BIBS Product Owner]
+  - ['data migration lead|migration lead|data owners?|data steward', Data Migration Lead]
+  - ['information security|security officer', Information Security Officer]
+  - ['\bBDO IT\b|EIAM team|IGA team|API team|\bITIO\b|IT operations|BDO Unibank IT|ITSD|cloud and digital', IT Infrastructure (BDO IT)]
+  - ['\bBDOI IT\b|information technology', BDOI IT]
+  - ['compliance|data protection', Compliance Officer]
+  - ['internal audit', Internal Audit]
+  - ['employee benefits', "Product Owner, Employee Benefits"]
+  - ['collection', Collections Head]
+  - ['\bTSU\b|technical support', TSU Head]
+  - ['user access|business administra|\bUAM\b|system administrator|access review', User Access Administrator]
+  - ['\bMBS\b|marketing business|product maintenance|incentive maintenance', "Product Owner, MBS"]
+  - ['submitted polic|\bCBG\b', "Product Owner, Submitted Policies"]
+  - ['claims', "Product Owner, Claims"]
+  - ['customer servic|contact cent|\bCSF\b|alternative distribution', "Product Owner, Customer Servicing"]
+  - ['renewal|\bRMEL\b', "Product Owner, Renewal"]
+  - ['new business|placement|booking|quotation|issuance', "Product Owner, New Business"]
+  - ['comptrollership|accounting|controller|\bFRBS\b|\bACSL\b|treasury|disbursement|\btax\b|finance\b', Accounting Head / Controller]
+  - ['human resources|\bHR\b', Human Resources]
+  - ['operations|remittance|cashiering|financial transactions|production reconciliation', Operations Head]
+  - ['marketing|sales|account officer|unit head', Head of Marketing]
+  - ['business analyst|business project services|\bBPS\b', Business Analyst (BPS)]
+  - ['product owner|business owner|owners? of the|key users|testers|configuration owners', TAB]
+
+# Rows of the tabs typed here (other than the reinsurance tab).
+extra_rows:
+  - ref: PM-CON-01
+    tab: BRD-03
+    type: Master data
+    need: "Insurers, insurer branches, commission rates and the package map: provide them in the Migration Console templates R04 (insurers), R04B (insurer branches), R07 (commission rates by insurer and product) and R06 (package code map) of the Master Data and Configuration Upload Templates workbook. These replace templates CI-05 and CI-07 of the BRD-03 configuration inputs (PM-05 and PM-07 of the Drop 0 workbook): the content is the same, in the column layout BIBS loads."
+    why: "BIBS loads the insurers, their branches, the commission rates and the package map through the Data Migration Console; one layout per dataset avoids preparing the same data twice."
+    proposal: "Operations (insurers, branches, commission rates) and TSU (package map, approved by MBS) fill in the four console templates; BDOI IT extracts the legacy rows in the same layouts."
+    source: "BRD-03 configuration input templates CI-05 and CI-07; Drop 0 configuration register CFG-095, CFG-100 and CFG-101; Migration Console layouts R04, R04B, R06 and R07"
+    owner: "Product Owner, MBS"
+    due: 2027-04-09
+    priority: High
+    status: Open
+    remarks: "Templates R04, R04B, R07 and R06 of the Master Data and Configuration Upload Templates workbook."
+
+# Type of each row after the row-by-row review (overrides the rules); filled from type_review.yaml.
+
+# ------------------------------------------------------------------------- workbook B v1.1: taxes, charges, coverage
+# Templates added in v1.1 (entered on a screen; merged with screen_templates).
+screen_templates_more:
+  MD-02:
+    name: Currencies
+    sheet: Currencies
+    owner: "Head, Comptrollership (Treasury)"
+    purpose: "One row per currency BIBS accepts on transactions and bank accounts: the base currency PHP and each foreign currency BDOI deals in."
+    load: "Configuration screen: Setup & Administration › Setup › Currencies & Rates, authorised by a second user"
+    source: "BDOI currency list"
+    columns:
+      - [Currency code, "Y", "ISO 4217, 3 capitals", "Code of the currency", "USD", "text:3"]
+      - [Name, "Y", "Text, up to 60", "Name of the currency", "US dollar", "text:60"]
+      - [Symbol, "N", "Up to 5 characters", "Symbol printed on documents", "$", "text:5"]
+      - [Decimal places, "Y", "Whole number 0 to 4", "Decimals of the amounts in the currency", "2", "whole:0-4"]
+      - [Active, "Y", "Y or N", "Y when the currency may be used", "Y", "yn"]
+  MD-03:
+    name: Exchange rates and their source
+    sheet: Exchange rates
+    owner: "Head, Comptrollership (Treasury)"
+    purpose: "The opening exchange rates of each foreign currency per rate type at go-live. BIBS keeps four rate types: SPOT (daily rate of postings), CLOSING (month-end revaluation), AVERAGE (period average) and BUDGET. The source of the daily rates (for example the BDO Treasury board rate or the BSP reference rate) and who enters them are asked in the BDOI requirements workbook."
+    load: "Configuration screen: Setup & Administration › Setup › Currencies & Rates, one rate per currency, type and date"
+    source: "BDO Treasury or BSP reference rates"
+    columns:
+      - [Currency code, "Y", "Code of MD-02", "Currency of the rate (not PHP)", "USD", "code:MD-02/Currency code"]
+      - [Rate type, "Y", "Code of the list", "Kind of rate", "SPOT", "list:FX_RATE_TYPE"]
+      - [Effective date, "Y", "dd-mmm-yyyy", "Date from which the rate applies", "03-Jan-2028", "date"]
+      - [Rate, "Y", "Number, PHP per unit of the currency", "Pesos for one unit of the currency", "", "number:0-1000000"]
+    lists:
+      FX_RATE_TYPE:
+        name: Exchange rate type
+        values: [[SPOT, Daily transaction rate], [CLOSING, Month-end closing rate], [AVERAGE, Period average rate], [BUDGET, Planning rate]]
+  TX-01:
+    name: Party tax profiles (clients, insurers, payees)
+    sheet: Party tax profiles
+    owner: "Head, Comptrollership (Tax)"
+    purpose: "One row per client, insurer, intermediary or payee whose tax details BIBS uses on the BIR forms, the 2307 certificates, the alphalists and the VAT classification of sales: the registered TIN and branch code, the payee class, the registered name and address, the VAT treatment and the default ATC withheld. The party code is the code of the client (C01 or the client upload), insurer (R04), business partner (MD-01) or payee (UP-02)."
+    load: "Configuration screen: Finance › Tax & Statutory › Party Tax Profiles, authorised by a second user"
+    source: "BIR registrations (COR) of the parties; client KYC files"
+    columns:
+      - [Party code, "Y", "Text, up to 30", "Code of the client, insurer, partner or payee", "C-000101", "text:30"]
+      - [TIN, "Y", "Digits and dashes, up to 20", "Taxpayer identification number as registered", "123-456-789", "text:20"]
+      - [Branch code, "N", "Up to 5 digits", "TIN branch code (000 or 00000 for the head office)", "00000", "text:5"]
+      - [Payee class, "Y", "Code of the list", "Individual or corporate (decides the WI or WC ATC and the alphalist name)", "CORPORATE", "list:TAX_PAYEE_CLASS"]
+      - [Registered name, "Y", "Text, up to 200", "Name as registered with the BIR", "Juan Dela Cruz Trading Corp.", "text:200"]
+      - [Last name, "Cond.: individuals", "Text, up to 60", "Last name of an individual", "", "text:60"]
+      - [First name, "Cond.: individuals", "Text, up to 60", "First name of an individual", "", "text:60"]
+      - [Middle name, "N", "Text, up to 60", "Middle name of an individual", "", "text:60"]
+      - [Registered address, "N", "Text, up to 300", "Address as registered with the BIR", "Makati City", "text:300"]
+      - [ZIP code, "N", "Up to 10 characters", "ZIP code of the registered address", "1226", "text:10"]
+      - [VAT treatment, "N", "Code of the list", "How a premium without VAT is classified on the VAT return", "REGULAR", "list:VAT_TREATMENT"]
+      - [Default ATC, "N", "Tax code of D0-10", "Withholding tax code applied by default to payments to or from the party", "", "text:20"]
+      - [Withholding agent, "N", "Y or N (blank = N)", "Y when the party withholds tax on its payments to BDOI (2307 expected); set by BIBS when Top withholding agent or Government payor is Y", "Y", "yn"]
+      - [Top withholding agent, "N", "Y or N (blank = N)", "Y when the BIR classifies the party as a top withholding agent", "N", "yn"]
+      - [Government payor, "N", "Y or N (blank = N)", "Y for a government office or company that withholds the final VAT and the final tax on its payments to BDOI", "N", "yn"]
+      - [Tax exemption certificate no., "N", "Text, up to 40", "Number of the party's tax exemption certificate, when it has one", "", "text:40"]
+      - [Certificate valid from, "Cond.: certificate number given", "dd-mmm-yyyy", "First day of the certificate", "", "date"]
+      - [Certificate valid to, "Cond.: certificate number given", "dd-mmm-yyyy", "Last day of the certificate (not before the first day); a zero-rated or exempt invoice outside this period is flagged on the VAT worksheet", "", "date"]
+    lists:
+      TAX_PAYEE_CLASS:
+        name: Payee class (BIR)
+        values: [[INDIVIDUAL, Individual], [CORPORATE, Corporate (juridical person)]]
+      VAT_TREATMENT:
+        name: VAT treatment
+        values: [[REGULAR, "Regular: sales with VAT are taxable, without VAT exempt"], [ZERO_RATED, "Zero-rated (for example PEZA or BOI-registered exporters)"], [EXEMPT, Exempt]]
+  TX-02:
+    name: Tax forms and filing calendar
+    sheet: Tax forms
+    owner: "Head, Comptrollership (Tax)"
+    purpose: "One row per tax return or remittance form BDOI files, with its frequency and due date, so that the tax calendar warns before each deadline and the return worksheets post to the right accounts. The forms BIBS knows are listed on the sheet D0-10 Tax checklist; BDOI confirms which apply to it as a broker."
+    load: "Configuration screen: Finance › Tax & Statutory › Tax Codes & Forms (Forms panel), authorised by a second user"
+    source: "BDOI tax calendar"
+    columns:
+      - [Form code, "Y", "Up to 20 characters", "BIR or local form number", "2550Q", "text:20"]
+      - [Name, "Y", "Text, up to 150", "Name of the return", "Quarterly VAT return", "text:150"]
+      - [Authority, "Y", "Code of the list", "Who the form is filed with", "BIR", "list:TAX_AUTHORITY"]
+      - [Frequency, "Y", "Code of the list", "How often the form is filed", "QUARTERLY", "list:FILING_FREQUENCY"]
+      - [Worksheet, "Y", "Code of the list", "Computation worksheet behind the form (NONE: prepared outside BIBS, reminder only)", "VAT", "list:TAX_WORKSHEET"]
+      - [Months after period end, "Y", "Whole number", "Months after the end of the period in which the form is due", "0", "whole:0-12"]
+      - [Due day, "Y", "1 to 31 (31 = month end)", "Day of the month the form is due", "25", "whole:1-31"]
+      - [Tax payable account, "N", "Account of D0-06", "Account the tax payable is posted to", "", "code:D0-06/Account Code"]
+      - [Credit account, "N", "Account of D0-06", "Input VAT account credited against the output VAT (VAT return only)", "", "code:D0-06/Account Code"]
+      - [Tracked from, "Y", "dd-mmm-yyyy", "First period the filing is tracked", "01-Jan-2028", "date"]
+    lists:
+      TAX_AUTHORITY:
+        name: Tax authority
+        values: [[BIR, Bureau of Internal Revenue], [LGU, Local government unit], [BFP, Bureau of Fire Protection]]
+      FILING_FREQUENCY:
+        name: Filing frequency
+        values: [[MONTHLY, Monthly], [QUARTERLY, Quarterly], [MONTHLY_EXCEPT_QUARTER_END, "Monthly except the quarter-end month"], [ANNUAL, Annual]]
+      TAX_WORKSHEET:
+        name: Tax worksheet
+        values: [[VAT, VAT worksheet], [EWT, Withholding tax worksheet], [NONE, "Prepared outside BIBS (reminder only)"]]
+depends_more:
+  MD-03: [MD-02]
+  TX-01: [D0-10, R04, C01, MD-01, UP-02]
+  TX-02: [D0-06]
+due_more:
+  MD-02: D2
+  MD-03: D5
+  TX-01: D5
+  TX-02: D5
+
+# Platform values the workbook uses in place of the lists of the Drop 0 templates (exact values BIBS stores).
+list_overrides:
+  D0-10:
+    Tax type:
+      name: Tax type (BIBS)
+      values: [[VAT_OUTPUT, "Output VAT (12 %) on BDOI's sales"], [VAT_INPUT, Input VAT on purchases], [VAT_ZERO_RATED, Zero-rated sales and purchases], [VAT_EXEMPT, VAT-exempt sales and purchases], [PREMIUM_TAX, "Premium tax (insurer return; only if BDOI confirms)"], [DST, "Documentary stamp tax (insurer return; only if BDOI confirms)"], [LGT, "Local government tax (insurer return; only if BDOI confirms)"], [FST, "Fire service tax (insurer return; only if BDOI confirms)"], [EWT, Creditable (expanded) withholding tax per ATC], [FWT, "Final withholding tax per ATC (government payors, final tax on bank interest)"], [FINAL_VAT, Final VAT withheld by government payors], [PERCENTAGE_TAX, "Percentage tax on BDOI's own receipts not subject to VAT"]]
+    Payee class:
+      name: Payee class (BIR)
+      values: [[INDIVIDUAL, Individual], [CORPORATE, Corporate (juridical person)]]
+  PM-04:
+    Rate:
+      name: Premium charge or rating factor (BIBS)
+      values: [[DST, Documentary stamp tax], [PREMIUM_TAX, Premium tax], [VAT_PREMIUM, VAT on premium], [FIRE_SERVICE_TAX, Fire service tax], [VAT_COMMISSION, VAT on BDOI's commission], [MOTOR_OD_ANNUAL, "Motor own damage / theft coverage, % of TSI, annual"], [MOTOR_OD_MULTI_YEAR, "Motor own damage / theft coverage, % of TSI, multi-year"]]
+
+# Rows written into the input rows of a template (the checklist: one row per item; BDOI completes the blank cells).
+prefill:
+  PM-04:
+    - {Table: TAX, Rate: DST}
+    - {Table: TAX, Rate: PREMIUM_TAX}
+    - {Table: TAX, Rate: VAT_PREMIUM}
+    - {Table: TAX, Rate: FIRE_SERVICE_TAX}
+    - {Table: TAX, Rate: VAT_COMMISSION}
+    - {Table: TAX, Rate: MOTOR_OD_ANNUAL}
+    - {Table: TAX, Rate: MOTOR_OD_MULTI_YEAR}
+  D0-10:
+    - {Name: "Output VAT on commission and service fees", Tax type: VAT_OUTPUT}
+    - {Name: "Zero-rated sales (commission and fees on zero-rated clients)", Tax type: VAT_ZERO_RATED}
+    - {Name: "VAT-exempt sales", Tax type: VAT_EXEMPT}
+    - {Name: "Input VAT on purchases", Tax type: VAT_INPUT}
+    - {Name: "Creditable withholding tax withheld by insurers on BDOI's commission (2307 received)", Tax type: EWT}
+    - {Name: "Creditable withholding tax withheld by government and top withholding agent clients on service fees", Tax type: EWT}
+    - {Name: "EWT BDOI withholds on suppliers: one row per ATC (professional fees, rentals, contractors, goods, services, commissions)", Tax type: EWT}
+    - {Name: "Final VAT withheld by government payors on BDOI's commission and fees", Tax type: FINAL_VAT}
+    - {Name: "Final withholding tax: withheld by government payors, and the final tax on bank interest (one row per ATC)", Tax type: FWT}
+    - {Name: "Percentage tax on BDOI's own receipts not subject to VAT (only if BDOI confirms such income)", Tax type: PERCENTAGE_TAX}
+template_notes:
+  PM-04:
+    - "Checklist: One row per premium charge is written below the header (DST, premium tax, VAT on premium, fire service tax, VAT on commission and the motor factors); complete the rate per line and the dates, and add a row per line where the rate differs. The rules BIBS applies are on the sheet PM-04 Charges checklist"
+    - "LGT: The local government tax is not kept here: it is the rate of each insurer branch, column lgt_rate of template R04B"
+    - "Other charges: The charges billed besides these taxes (authentication, notarial or documentation fees) are given in template PM-04C, uploaded on the same screen"
+  D0-10:
+    - "Checklist: One row per kind of tax is written below the header; give the code, the ATC, the rate, the GL account and the dates of each (rates and ATCs as BDOI's tax adviser confirms them), and add one row per ATC. The sheet D0-10 Tax checklist says what each covers"
+    - "Tax types: Use only the twelve tax types of the list, as the upload accepts them; the ATC is mandatory for EWT and FWT (FWT, FINAL_VAT and PERCENTAGE_TAX are new in v1.2)"
+  D0-01:
+    - "Tax registration: Besides the TIN with its branch code, BIBS keeps the RDO code, the VAT registration and the CAS and e-invoicing permits (number and date); the RDO is printed on the BIR exports. The receipt series in use come from R11"
+  D0-02:
+    - "Tax registration: The BIR branch code and the RDO code of each branch registered with the BIR (blank for a branch that is not a separate registration)"
+  D0-11:
+    - "Payment notification format: FIXED_WIDTH, CSV or DCTF, the formats the upload accepts; an e-mail advice is not a format of the bank account"
+  D0-15:
+    - "Approver role: Give the permission that the approvers of the level hold (a permission of the role matrix UA-02, for example SBM_PROCESS), not a group profile: the upload checks the permission"
+    - "Refused rows: Rows of the modules Sanction Screening and Disbursement are refused by the upload: the approval routes of Sanction Screening are set in a draft configuration version on Compliance Setup, and disbursements follow the authorisation limit of the user (UA-03). Give those values in a BDOI comment; the configuration team sets them on those screens"
+  UA-04:
+    - "Refused rows: Only rules with the control Prevent between two group profiles are loaded; rules with the control Detect by review or Second approval are refused by the upload and are followed with the access reports. Keep them in this sheet for the review"
+  PM-04C:
+    - "Switch: The charges are billed only while the system parameter Other charges enabled is on (delivered off until BDOI confirms, question TX-Q04)"
+  TX-01:
+    - "Tax status: Withholding agent, top withholding agent, government payor and the tax exemption certificate with its validity are kept in the profile; a top withholding agent or a government payor is always a withholding agent"
+  C01:
+    - "Tax profile: The client's VAT treatment and default withholding code are kept in the party tax profile (template TX-01), not in the client master"
+  R04:
+    - "Tax profile: The insurer's registered TIN, VAT treatment and the ATC it withholds on BDOI's commission are kept in the party tax profile (template TX-01)"
+    - "Tax status: VAT-registered (VAT on premium) or not VAT-registered (premium tax) is not a column of this layout: it is entered on the insurer screen (Client & Policy › Product Maintenance › Insurers, field Tax status); blank keeps the tax of the product line"
+
+# Insurer-company items left out of the workbook (BDOI is a broker; the insurer modules are not used).
+insurer_exclusions:
+  parameters: [RESERVES_AUTO_RUN_COMPANIES, IC_RBC_HURDLE_PERCENT]
+  event_categories: [Claims, Coinsurance, Reinsurance]
+  events: [CLAIM_PAYMENT, RI_SETTLEMENT_PAYMENT, RI_SETTLEMENT_RECEIPT, POLICY_ISSUE, POLICY_ENDORSEMENT, POLICY_CANCELLATION, CLAIM_MARGIN_PROVISION, DAC_PROVISION, IBNR_PROVISION, PREMIUM_DEFICIENCY_PROVISION, TAKAFUL_SURPLUS, UPR_PROVISION]
+  config_items: [CFG-011]
+
+# Checklist of the premium charges (sheet PM-04 Charges checklist): [charge, how BIBS computes it, where the rate is
+# kept, what BDOI provides or confirms, held by BIBS (Yes / No), question in the requirements workbook]
+charges_checklist:
+  - [Documentary stamp tax (DST), "Rate % of the net (basic) premium of the line. The tax is rounded to centavos and then up to the next half peso: .01 to .49 becomes .50, .51 to .99 the next peso, .00 and .50 stay; a refund is rounded the same way.", "PM-04, Rate DST (per line, or blank line = every line)", "The DST rate per line, confirmation of the net premium as the basis and of the half-peso rounding, and the lines or clients exempt from DST", "Yes", TX-Q01]
+  - [Premium tax, "Rate % of the net premium of the line, rounded to centavos. BIBS applies it per product line; when the insurer's tax status is set, a VAT-registered insurer bills no premium tax and an insurer not VAT-registered bills premium tax instead of VAT.", "PM-04, Rate PREMIUM_TAX (per line); tax status of the insurer on the insurer screen", "The lines on which premium tax is billed instead of VAT, the rate, and the tax status of each insurer", "Yes", TX-Q02]
+  - [VAT on premium, "Rate % of the net premium of the line, rounded to centavos. The charge follows the line, unless the insurer's tax status is set: a VAT-registered insurer bills VAT and no premium tax, an insurer not VAT-registered bills premium tax and no VAT. A zero-rated or exempt client is classified on the VAT worksheet by its VAT treatment (TX-01).", "PM-04, Rate VAT_PREMIUM (per line); tax status of the insurer on the insurer screen", "The VAT rate per line, the lines that are VAT-exempt or zero-rated, and the tax status of each insurer", "Yes", TX-Q02]
+  - [Fire service tax (FST), "Rate % of the net premium of the lines it is set for, rounded to centavos.", "PM-04, Rate FIRE_SERVICE_TAX (fire lines)", "The fire lines that carry FST, the rate and the basis", "Yes", TX-Q01]
+  - [Local government tax (LGT), "Rate % of the net premium at the rate of the insurer branch that places the policy, rounded to centavos. BIBS keeps no rate per local government unit.", "R04B, column lgt_rate of each insurer branch", "The LGT rate of each insurer branch and the ordinance basis of the LGU behind it", "Yes", TX-Q03]
+  - [VAT on BDOI's commission, "Rate % of the commission (commission rate x net premium), rounded to centavos.", "PM-04, Rate VAT_COMMISSION", "The VAT rate on commission and the cases where it is zero-rated or exempt", "Yes", TX-Q05]
+  - [Motor own damage / theft coverage factors, "Percent of the sum insured taken as the own damage / theft coverage: one factor for annual cover, one for multi-year cover.", "PM-04, Rates MOTOR_OD_ANNUAL and MOTOR_OD_MULTI_YEAR", "The two factors", "Yes", TX-Q01]
+  - [Short-period table and motor BI / PD limit premiums, "Short period: percent of the annual premium by months covered; motor BI / PD: premium per limit.", "PM-04, Tables SHORT_PERIOD and MOTOR_LIMIT", "The short-period table and the limit premiums", "Yes", TX-Q01]
+  - [Order, basis, minimum and rounding of the charges, "Every charge is computed on the net premium after the minimum premium, independently of the others (no charge on another charge); gross premium = net premium + all charges; no minimum amount per charge; every amount rounded to centavos half-up except DST (half peso).", "Fixed in BIBS (no column)", "Confirmation of the rules, or the basis, order, minimum or rounding BDOI applies", "Yes", TX-Q01]
+  - [CTPL COCAF / LTO authentication fee, "Other charge of PM-04C: a fixed amount or a rate of the net premium per line or product, with its VAT treatment and GL account; billed only while the system parameter Other charges enabled is on.", "PM-04C (one row per charge and line or product)", "Whether BIBS bills it, its amount, VAT treatment and account", "Yes", TX-Q04]
+  - [Notarial fee, "Other charge of PM-04C, as above.", "PM-04C", "Whether BIBS bills it, its amount, VAT treatment and account", "Yes", TX-Q04]
+  - [Policy or documentation fee, "Other charge of PM-04C, as above.", "PM-04C", "Whether BIBS bills it, its amount, VAT treatment and account", "Yes", TX-Q04]
+  - [Any other charge BDOI bills, "Other charge of PM-04C, as above.", "PM-04C", "The charge, its basis, amount, VAT treatment and account", "Yes", TX-Q04]
+
+# Checklist of BDOI's own taxes (sheet D0-10 Tax checklist): [tax, what BIBS does, where it is set up, what BDOI
+# provides, held by BIBS, question]
+tax_checklist:
+  - [Output VAT on commission and service fees, "Tax type VAT_OUTPUT; the VAT worksheet prepares the quarterly VAT return (2550Q) from the sales.", "D0-10 (code, rate, GL account); TX-02 form 2550Q", "Code, rate and GL account of output VAT", "Yes", TX-Q05]
+  - [Zero-rated and VAT-exempt sales, "Tax types VAT_ZERO_RATED and VAT_EXEMPT; a client's VAT treatment (TX-01) classifies a sale without VAT.", "D0-10; TX-01 VAT treatment", "The zero-rated and exempt cases and the clients concerned", "Yes", TX-Q05]
+  - [Input VAT, "Tax type VAT_INPUT; credited against output VAT on the VAT return.", "D0-10; TX-02 credit account", "Code, rate and GL account of input VAT", "Yes", TX-Q05]
+  - [Creditable withholding tax withheld by insurers on BDOI's commission, "The 2307 certificates received are recorded on Certificates Received (ATC, income, tax) and posted against the receivable.", "D0-10 EWT codes; TX-01 default ATC of each insurer", "The ATCs and rates the insurers withhold on commission", "Yes", TX-Q05]
+  - [EWT BDOI withholds on suppliers, "Tax type EWT, one code per ATC; withheld on payments, 2307 issued, monthly 0619-E, quarterly 1601-EQ, QAP and alphalists.", "D0-10 (one row per ATC); TX-01 default ATC of each supplier; TX-02 forms", "The ATC list with rates, income nature and GL account", "Yes", TX-Q05]
+  - [Government payors (final VAT and final tax withheld), "Tax types FINAL_VAT (final VAT withheld) and FWT (final withholding tax, one code per ATC); the party tax profile marks the government payor, which is always a withholding agent.", "D0-10 (FINAL_VAT, FWT); TX-01 Government payor", "The codes, ATCs, rates and accounts, and the government payors among the clients", "Yes", TX-Q06]
+  - [Top withholding agent clients, "Withholding by a client is recorded as a 2307 received; the party tax profile marks the withholding agents and the top withholding agents.", "TX-01 Withholding agent, Top withholding agent", "The clients that are withholding agents or top withholding agents", "Yes", TX-Q09]
+  - [Final tax on bank interest, "Tax type FWT, one code per ATC.", "D0-10 (FWT)", "The ATC, rate and account of the final tax on bank interest", "Yes", TX-Q06]
+  - [Percentage tax on BDOI's own receipts, "Tax type PERCENTAGE_TAX on BDOI's own receipts not subject to VAT (the premium tax of PM-04 stays a charge on premiums).", "D0-10 (PERCENTAGE_TAX)", "Whether any BDOI income is subject to percentage tax, with its rate and account", "Yes", TX-Q06]
+  - [Tax returns and the filing calendar, "BIBS prepares the VAT return 2550Q and the withholding tax forms 0619-E and 1601-EQ from its worksheets and reminds of 1601-C (prepared in the payroll system). The premium-levy returns (DST, premium tax, local business tax, FST) are the insurers' returns and are not kept in BIBS.", "TX-02", "The forms BDOI files, their due dates and accounts", "Yes", TX-Q07]
+  - [Tax exemption certificates of clients, "The party tax profile keeps the certificate number and its validity; a zero-rated or exempt invoice dated outside the validity is flagged on the VAT worksheet for checking before the return is filed.", "TX-01 Tax exemption certificate no., Certificate valid from / to", "The certificates of the exempt parties", "Yes", TX-Q09]
+  - [Company tax registration, "BIBS keeps the TIN with its branch code, the RDO, the VAT registration and the CAS and e-invoicing permits of the company, and the BIR branch code and RDO of each branch; the RDO is printed on the BIR exports.", "D0-01 RDO code, VAT registered, CAS and e-invoicing permits; D0-02 BIR branch code, RDO code", "The registration details of the company and of each registered branch", "Yes", TX-Q08]
+
+# Coverage of the datasets the product owner asked about (sheet Coverage check): [dataset, where it is, held by BIBS
+# (Yes / Partly / No), note, question]
+coverage:
+  - ["Currencies and exchange-rate source", "MD-02 Currencies; MD-03 Exchange rates", "Yes", "Four rate types (spot, closing, average, budget); the source and owner of the daily rate is a question", MD-Q01]
+  - ["Geographic master (province, city / municipality, barangay, ZIP) and the LGU of the LGT", "Not held", "No", "Addresses are free text (address, city, province, postal code); LGT follows the insurer branch rate (R04B), not the LGU", MD-Q02]
+  - ["Motor vehicle master (make, model, body type, FMV / depreciation schedule)", "Lists of values: VEHICLE_BODY_TYPE", "Partly", "Make and model are free text; motor rating uses the sum insured, the own damage factor and the rate, with no FMV or depreciation schedule", MD-Q03]
+  - ["Fire occupancy and construction class codes", "Lists of values: OCCUPANCY, CONSTRUCTION_CLASS", "Yes", "Values given on the sheet Lists of values", ""]
+  - ["Industry codes (PSIC)", "Not held", "No", "No industry field on the client", MD-Q04]
+  - ["Countries and nationalities for KYC / AML", "Lists of values: NATIONALITY", "Partly", "Nationality is a list; there is no country list for addresses or residence", MD-Q04]
+  - ["AML risk rating matrix", "Lists of values: KYC_RISK_RATING; Configured on screens: CFG-126 Screening configuration", "Yes", "Risk categories and rules are set on Compliance Setup › Configuration Versions", ""]
+  - ["KYC document checklist by client type", "Lists of values: KYC_DOCS_INDIVIDUAL, KYC_DOCS_CORPORATE, ID_TYPE", "Yes", "", ""]
+  - ["Authorised signatories for letters, checks and BIR forms", "D0-15 (signatory title of the approval matrices)", "Partly", "Documents print signature lines; there is no signatory master for checks, letters and BIR forms", MD-Q05]
+  - ["Report recipients and schedules", "Configured on screens: CFG-130; System parameters (job failure recipients)", "Partly", "No report subscription: reports are run on demand except the production reconciliation extracts", MD-Q06]
+  - ["E-mail and SMS sender settings", "System parameters (Messaging: sender address, fixed recipients)", "Partly", "E-mail sender and fixed recipients are parameters; BIBS sends no SMS", MD-Q07]
+  - ["Data retention schedule", "Configured on screens: CFG-074 Data retention rules", "Yes", "", ""]
+  - ["Adjusters and surveyors", "Lists of values: BCL_ADJUSTER; MD-01 (type Surveyor or adjuster)", "Yes", "", ""]
+  - ["Insurer contacts", "R04 placement e-mail; R04B branch e-mail", "Partly", "No contact persons per insurer", MD-Q08]
+  - ["Premium charges (DST, premium tax, VAT, FST, LGT, VAT on commission) and other charges", "PM-04 with its charges checklist; PM-04C other charges; R04B LGT; insurer tax status on the insurer screen", "Yes", "Other charges (COCAF / LTO authentication, notarial, documentation fees) are billed only while the system parameter Other charges enabled is on", TX-Q04]
+  - ["BDOI's own taxes, tax profiles and tax forms", "D0-10 with its tax checklist; TX-01; TX-02; D0-01 and D0-02 tax registration", "Yes", "Final taxes, percentage tax, withholding agent and government payor flags and exemption certificates are kept", TX-Q06]
+
+# Questions of workbook B v1.1 (taxes, charges, coverage), rows of the BDOI requirements workbook.
+extra_rows_more:
+  - ref: TX-Q01
+    tab: BRD-03
+    type: Business rule confirmation
+    need: 'Premium charges: confirm the rules BIBS applies to the charges billed to clients: every charge (DST, premium tax,
+      VAT, fire service tax, LGT) is a rate of the net premium after the minimum premium, computed independently (no charge
+      on another charge); DST is rounded up to the next half peso, the others to centavos; there is no minimum amount per
+      charge. Give the rate of each charge per line in template PM-04.'
+    why: The charges are part of every invoice and of the remittance to the insurers; a different basis, order, minimum or
+      rounding changes every amount.
+    proposal: The rules as listed on the sheet PM-04 Charges checklist of the templates workbook.
+    source: Premium calculation of the platform (Appendix A of BRD-01); templates PM-04 and its charges checklist
+    owner: Accounting Head / Controller
+    due: '2027-04-09'
+    priority: High
+    status: Open
+    remarks: ''
+  - ref: TX-Q02
+    tab: BRD-03
+    type: Decision
+    need: 'VAT or premium tax: BIBS bills VAT on premium or premium tax according to the product line (rate per line in PM-04),
+      not according to the VAT or non-VAT registration of the insurer. Confirm this, or say that the insurer''s registration
+      must decide, and list the lines that are VAT-exempt or zero-rated.'
+    why: An insurer that is not VAT-registered on a line where VAT is set up would be billed the wrong tax.
+    proposal: Charges per line, with the exceptions agreed with Comptrollership.
+    source: Rate codes of the platform (VAT on premium, premium tax); insurer master R04 (no VAT registration field)
+    owner: Accounting Head / Controller
+    due: '2027-04-09'
+    priority: High
+    status: Answered
+    remarks: 'Answer (platform, 9-Oct-2026): the insurer master now keeps a tax status (VAT-registered: VAT on premium and no premium tax; not VAT-registered: premium tax and no VAT; blank: the tax of the product line), entered on the insurer screen (Client & Policy › Product Maintenance › Insurers). BDOI gives the tax status of each insurer and the VAT-exempt or zero-rated lines (templates workbook v1.2, PM-04 and its charges checklist).'
+  - ref: TX-Q03
+    tab: BRD-03
+    type: Configuration value
+    need: 'LGT: give the local government tax rate of each insurer branch (template R04B, column lgt_rate) with the LGU ordinance
+      it rests on; BIBS applies the rate of the insurer branch that places the policy and keeps no rate per LGU.'
+    why: LGT is computed on every premium from the insurer branch rate; a missing rate bills no LGT.
+    proposal: One rate per insurer branch, confirmed by Operations with the insurers.
+    source: Premium calculation of the platform; template R04B
+    owner: Operations Head
+    due: '2027-04-09'
+    priority: High
+    status: Open
+    remarks: ''
+  - ref: TX-Q04
+    tab: BRD-03
+    type: Decision
+    need: 'Other charges: does BIBS have to bill charges other than the taxes, such as the CTPL COCAF / LTO authentication
+      fee, notarial fees or policy and documentation fees? If yes, give each charge, its basis and amount and who receives
+      it. BIBS has no field for such a charge today (sheet Gaps of the templates workbook).'
+    why: A charge BDOI bills today would be missing from the BIBS invoices.
+    proposal: ''
+    source: Templates workbook, PM-04 Charges checklist and Gaps
+    owner: Accounting Head / Controller
+    due: '2026-11-30'
+    priority: High
+    status: Answered
+    remarks: 'Answer (platform, 9-Oct-2026): other charges are now kept per line or product as a fixed amount or a rate of the net premium, with their VAT treatment and GL account, and billed only while the system parameter Other charges enabled is on (delivered off). BDOI lists the charges it bills in template PM-04C of the templates workbook v1.2 and confirms the switch.'
+  - ref: TX-Q05
+    tab: BRD-05
+    type: Configuration value
+    need: 'BDOI''s own tax codes: give, with your tax adviser, the code, ATC, rate, GL account and dates of output VAT on
+      commission and service fees, zero-rated and exempt sales, input VAT, the withholding tax insurers withhold on BDOI''s
+      commission (2307 received) and every ATC BDOI withholds on suppliers (template D0-10; the rows to complete are written
+      in the template).'
+    why: Without the codes BIBS cannot compute the VAT and withholding taxes or produce the 2307, the returns and the alphalists.
+    proposal: 'No rate or ATC is proposed: the values are BDOI''s.'
+    source: Templates workbook, D0-10 and its tax checklist; tax module of the platform
+    owner: Accounting Head / Controller
+    due: '2027-01-04'
+    priority: High
+    status: Open
+    remarks: ''
+  - ref: TX-Q06
+    tab: BRD-05
+    type: Decision
+    need: 'Final taxes and percentage tax: BIBS has no final VAT or final withholding tax type. How must BDOI record the final
+      VAT and the withholding taxes withheld by government payors, the final tax on bank interest, and any percentage tax
+      on BDOI''s own receipts?'
+    why: These taxes would be posted by manual journal outside the tax worksheets and returns.
+    proposal: Record them by journal with their own GL accounts until BDOI decides otherwise.
+    source: Templates workbook, D0-10 Tax checklist and Gaps
+    owner: Accounting Head / Controller
+    due: '2026-11-30'
+    priority: Medium
+    status: Answered
+    remarks: 'Answer (platform, 9-Oct-2026): the tax types FWT (final withholding tax per ATC: government payors, final tax on bank interest), Final VAT (withheld by government payors) and Percentage tax (BDOI''s own receipts not subject to VAT) are now available, with the government payor flag on the party tax profile. BDOI gives the codes, ATCs, rates and accounts in D0-10 and the government payors in TX-01 (templates workbook v1.2).'
+  - ref: TX-Q07
+    tab: BRD-05
+    type: Clarification
+    need: 'Tax forms: confirm the forms BDOI files and their due dates and accounts (2550Q, 0619-E, 1601-EQ, 1601-C and others),
+      and confirm that the premium-levy returns (DST, premium tax, local business tax, FST) are filed by the insurers, not by BDOI, so that BIBS keeps no worksheet for them (template TX-02).'
+    why: The tax calendar warns before each deadline only for the forms set up.
+    proposal: BDOI files the VAT and withholding tax forms; the premium levies are the insurers' returns.
+    source: Templates workbook, TX-02 and D0-10 Tax checklist
+    owner: Accounting Head / Controller
+    due: '2027-07-16'
+    priority: Medium
+    status: Open
+    remarks: ''
+  - ref: TX-Q08
+    tab: BRD-05
+    type: Clarification
+    need: 'Company tax registration: BIBS keeps BDOI''s TIN with its branch code only. Say whether the RDO code, the VAT registration
+      and the CAS / e-invoicing permit must be kept in BIBS and printed on receipts and forms, and confirm the receipt series
+      in use (template R11).'
+    why: Receipts and BIR forms may need these details printed.
+    proposal: ''
+    source: Templates workbook, D0-01 and Gaps
+    owner: Accounting Head / Controller
+    due: '2026-11-30'
+    priority: Medium
+    status: Answered
+    remarks: 'Answer (platform, 9-Oct-2026): the company now keeps the RDO code, the VAT registration and the CAS and e-invoicing permits (number and date), and each branch its BIR branch code and RDO; the RDO is printed on the BIR exports. BDOI gives them in D0-01 and D0-02 of the templates workbook v1.2 and confirms the receipt series in use in R11.'
+  - ref: TX-Q09
+    tab: BRD-01
+    type: Decision
+    need: 'Client tax flags: BIBS keeps the client''s TIN, VAT treatment and default withholding code (template TX-01) but
+      no withholding agent, government or top withholding agent flag and no tax exemption certificate (number, validity).
+      Are these needed, and what must BIBS do with them?'
+    why: Withholding by these clients and exemptions would be handled by the users without a check in BIBS.
+    proposal: ''
+    source: Templates workbook, TX-01 and Gaps
+    owner: Accounting Head / Controller
+    due: '2026-11-30'
+    priority: Medium
+    status: Answered
+    remarks: 'Answer (platform, 9-Oct-2026): the party tax profile now keeps the withholding agent, top withholding agent and government payor flags and the tax exemption certificate with its validity; a zero-rated or exempt invoice outside the validity is flagged on the VAT worksheet. BDOI gives them in TX-01 of the templates workbook v1.2.'
+  - ref: TX-Q10
+    tab: BRD-05
+    type: Master data
+    need: 'Party tax profiles: provide the registered TIN, branch code, payee class, registered name and address, VAT treatment
+      and default ATC of the clients, insurers, intermediaries and payees used on BIR forms (template TX-01).'
+    why: The 2307 certificates, alphalists and the VAT classification of sales read these profiles.
+    proposal: ''
+    source: Templates workbook, TX-01
+    owner: Accounting Head / Controller
+    due: '2027-07-16'
+    priority: High
+    status: Open
+    remarks: ''
+  - ref: MD-Q01
+    tab: BRD-05
+    type: Configuration value
+    need: 'Currencies and exchange rates: give the currencies BDOI uses (template MD-02) and the opening rates (MD-03), and
+      name the source of the daily rate (for example the BDO Treasury board rate or the BSP reference rate) and who enters
+      it.'
+    why: Foreign-currency invoices, remittances and the revaluation need the rates.
+    proposal: Daily spot rate entered by Treasury from one named source.
+    source: Templates workbook, MD-02 and MD-03
+    owner: Accounting Head / Controller
+    due: '2027-01-04'
+    priority: Medium
+    status: Open
+    remarks: ''
+  - ref: MD-Q02
+    tab: BRD-01
+    type: Decision
+    need: 'Geographic master: BIBS keeps addresses as free text (address, city, province, postal code) and has no province,
+      city, barangay or ZIP master; LGT follows the insurer branch. Is a geographic master needed (for example for the claims-prone
+      areas or the LGU of the LGT)?'
+    why: Without a master, place names may be spelt differently and cannot be grouped reliably.
+    proposal: Free-text addresses at go-live.
+    source: Templates workbook, Coverage check
+    owner: Product Owner, New Business
+    due: '2026-11-30'
+    priority: Medium
+    status: Open
+    remarks: ''
+  - ref: MD-Q03
+    tab: BRD-01
+    type: Business rule confirmation
+    need: 'Motor vehicles: confirm that no vehicle master (make, model, FMV or depreciation schedule) is needed: BIBS keeps
+      the body type as a list, make and model as free text, and rates motor on the sum insured, the own damage factor and
+      the rate.'
+    why: A rating that depends on a market value or depreciation schedule cannot be applied.
+    proposal: No vehicle master.
+    source: Templates workbook, Coverage check; premium calculation of the platform
+    owner: Product Owner, New Business
+    due: '2026-11-30'
+    priority: Medium
+    status: Open
+    remarks: ''
+  - ref: MD-Q04
+    tab: BRD-10
+    type: Decision
+    need: 'Industry codes and countries: BIBS keeps nationality as a list but has no industry code (PSIC) and no country list
+      for addresses or residence. Are they needed for KYC and AML risk rating?'
+    why: The risk rating cannot use the industry or the country of the client.
+    proposal: ''
+    source: Templates workbook, Coverage check
+    owner: Compliance Officer
+    due: '2026-11-30'
+    priority: Medium
+    status: Open
+    remarks: ''
+  - ref: MD-Q05
+    tab: BRD-00
+    type: Decision
+    need: 'Authorised signatories: BIBS has no signatory master for checks, letters and BIR forms (documents print signature
+      lines; the approval matrices carry signatory titles). Name the signatories and say whether BIBS must print their names.'
+    why: Checks, letters and the 2307 would be signed by hand without a printed name.
+    proposal: ''
+    source: Templates workbook, Coverage check and D0-15
+    owner: Accounting Head / Controller
+    due: '2027-07-16'
+    priority: Medium
+    status: Open
+    remarks: ''
+  - ref: MD-Q06
+    tab: BRD-00
+    type: Clarification
+    need: 'Report recipients and schedules: BIBS runs reports on demand (except the production reconciliation extracts and
+      the job alerts). List the reports that must be sent automatically, to whom and how often.'
+    why: Scheduled reports would have to be run and sent by hand.
+    proposal: ''
+    source: Templates workbook, Coverage check; FRS BRD-00 CLR-CR-08
+    owner: BIBS Product Owner
+    due: '2026-11-30'
+    priority: Medium
+    status: Open
+    remarks: ''
+  - ref: MD-Q07
+    tab: BRD-00
+    type: Clarification
+    need: 'E-mail and SMS: give the sender address of BIBS e-mails and the fixed recipients (System parameters); confirm that
+      no SMS is sent, or name the SMS cases and the gateway.'
+    why: E-mails would go out from a wrong sender; SMS is not available.
+    proposal: E-mail only.
+    source: Templates workbook, System parameters and Coverage check
+    owner: BDOI IT
+    due: '2027-01-31'
+    priority: Low
+    status: Open
+    remarks: ''
+  - ref: MD-Q08
+    tab: BRD-03
+    type: Decision
+    need: 'Insurer contacts: BIBS keeps the placement e-mail of each insurer and branch but no contact persons. Are contact
+      persons (name, role, phone, e-mail) needed per insurer?'
+    why: Contacts would stay outside BIBS.
+    proposal: ''
+    source: Templates workbook, R04, R04B and Coverage check
+    owner: Operations Head
+    due: '2026-11-30'
+    priority: Low
+    status: Open
+    remarks: ''
+
+# Configuration items of the Drop 0 register that a template of this workbook now covers (no longer screen-only).
+covered_by:
+  CFG-010: [MD-02, MD-03]

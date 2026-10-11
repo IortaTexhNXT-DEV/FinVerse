@@ -1,0 +1,107 @@
+# iNXT BrokerVerse – local / seed stack.
+#   docker compose up -d --build        -> http://localhost:8081  (SIT/UAT users of the seed profile)
+# Production: use deploy/ (Kubernetes) or the same images with external PostgreSQL, Valkey (Amazon
+# ElastiCache for Valkey), Kafka (Amazon MSK) and secrets. See docs/architecture/PLATFORM_CACHE_AND_EVENTS.md.
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: brokerverse
+      POSTGRES_USER: brokerverse
+      POSTGRES_PASSWORD: ${BROKERVERSE_DB_PASSWORD:-brokerverse}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U brokerverse -d brokerverse"]
+      interval: 5s
+      retries: 20
+    ports:
+      - "5433:5432"
+
+  # Valkey 8 (BSD-3-Clause, Redis protocol): reference-data cache, cluster-wide job locks, token
+  # denylist, shared counters.
+  valkey:
+    image: valkey/valkey:8-alpine
+    command: ["valkey-server", "--save", "", "--appendonly", "no"]
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 5s
+      retries: 20
+    ports:
+      - "6379:6379"
+
+  # Apache Kafka 3.9 in KRaft mode (no ZooKeeper): integration events. Topics are created by the
+  # application (auto-creation off, as on Amazon MSK). Host clients use localhost:29092.
+  kafka:
+    image: apache/kafka:3.9.1
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093,HOST://:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,HOST:PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 > /dev/null"]
+      interval: 10s
+      retries: 20
+    ports:
+      - "29092:29092"
+
+  backend:
+    build: ./backend
+    depends_on:
+      db:
+        condition: service_healthy
+      valkey:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-seed}
+      BROKERVERSE_DB_URL: jdbc:postgresql://db:5432/brokerverse
+      BROKERVERSE_DB_USER: brokerverse
+      BROKERVERSE_DB_PASSWORD: ${BROKERVERSE_DB_PASSWORD:-brokerverse}
+      # Documented local values of this stack only (every shared environment sets its own secrets;
+      # a non-local BROKERVERSE_ENVIRONMENT refuses these development values at start-up).
+      BROKERVERSE_ENVIRONMENT: local
+      BROKERVERSE_JWT_SECRET: ${BROKERVERSE_JWT_SECRET:-change-me-local-only-0123456789abcdefghij}
+      BROKERVERSE_MIGRATION_MASKING_KEY: ${BROKERVERSE_MIGRATION_MASKING_KEY:-change-me-local-only-masking-key-0123456789}
+      BROKERVERSE_MFA_ENCRYPTION_KEY: ${BROKERVERSE_MFA_ENCRYPTION_KEY:-bG9jYWwtb25seS1rZXktb2YtdGhlLXNlY29uZC1mYWM=}
+      BROKERVERSE_ALLOWED_ORIGINS: http://localhost:8081
+      BROKERVERSE_PASSWORD_RESET_URL: http://localhost:8081/reset-password
+      BROKERVERSE_ADMIN_INITIAL_PASSWORD: ${BROKERVERSE_ADMIN_INITIAL_PASSWORD:-}
+      BROKERVERSE_SEED_PASSWORD: ${BROKERVERSE_SEED_PASSWORD:-}
+      BROKERVERSE_VALKEY_ENABLED: ${BROKERVERSE_VALKEY_ENABLED:-true}
+      BROKERVERSE_VALKEY_HOST: valkey
+      BROKERVERSE_VALKEY_PORT: "6379"
+      BROKERVERSE_KAFKA_ENABLED: ${BROKERVERSE_KAFKA_ENABLED:-true}
+      BROKERVERSE_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        # Theme pack of the client deployment (frontend/src/theme/packs/<pack>)
+        VITE_THEME_PACK: ${VITE_THEME_PACK:-bdoi}
+    depends_on:
+      - backend
+    environment:
+      BROKERVERSE_BACKEND_HOST: backend
+    ports:
+      - "8081:8080"
+
+volumes:
+  db-data:
+  kafka-data:

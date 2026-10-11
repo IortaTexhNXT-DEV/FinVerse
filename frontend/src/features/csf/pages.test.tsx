@@ -211,10 +211,15 @@ describe('Servicing View', () => {
     fireEvent.change(within(dialog).getByLabelText(/Mobile/), { target: { value: '0917' } });
     expect(within(dialog).getByText('Enter a valid mobile number')).toBeInTheDocument();
     fireEvent.change(within(dialog).getByLabelText(/Mobile/), { target: { value: '09179998888' } });
-    fireEvent.change(within(dialog).getByLabelText(/Reason/), {
-      target: { value: 'CLIENT_REQUEST' },
-    });
-    fireEvent.click(within(dialog).getByRole('button', { name: 'Save' }));
+    // The reasons are a list of values loaded on their own: wait for the option before choosing it.
+    const reason = within(dialog).getByLabelText(/Reason/);
+    await waitFor(() =>
+      expect(reason.querySelector('option[value="CLIENT_REQUEST"]')).not.toBeNull(),
+    );
+    fireEvent.change(reason, { target: { value: 'CLIENT_REQUEST' } });
+    const saveButton = within(dialog).getByRole('button', { name: 'Save' });
+    await waitFor(() => expect(saveButton).toBeEnabled());
+    fireEvent.click(saveButton);
     await waitFor(() =>
       expect(save).toHaveBeenCalledWith(1, 1, {
         verificationId: 5,

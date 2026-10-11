@@ -83,11 +83,25 @@ replace:
   - ["Within the BIBS sizing for all BRDs", "Within the programme sizing for all BRDs"]
   - ["the specifications of the BIBS reports", "the specifications of the reports of the system"]
   - ["The sign-in ID of every persona for the walkthrough in the BIBS DEV environment and the walkthrough script", "The persona accounts with which the Business Unit repeats the walkthroughs, and the walkthrough script"]
+  # test steps: the systems BDOI connects are exercised with test accounts / test files of BDOI's systems provided
+  # under the Integration scope (no simulator of the build is named)
+  - ["a Bills Payment file of the channel simulator", "a Bills Payment test file of BDOI's systems (provided under the Integration scope)"]
+  - ["(to the receiving system simulator in SIT and UAT)", "(in SIT and UAT, to the test account of BDOI's receiving system provided under the Integration scope)"]
+  - ["the simulator inbox shows the file with its records", "the test account of BDOI's receiving system (Integration scope) shows the file with its records"]
+  - ["Joiner and leaver from the Enterprise SSO simulator", "Joiner and leaver from the Enterprise SSO test accounts"]
+  - ["Enterprise SSO simulator of the SIT and UAT environment", "Test accounts of BDOI's Enterprise SSO provided under the Integration scope for SIT and UAT"]
+  - ["On Identity Synchronisation › Enterprise SSO Simulator add the account", "With the Enterprise SSO test accounts provided under the Integration scope, set up the account"]
+  - ["correct the account in the simulator", "correct the account in the Enterprise SSO test accounts"]
   - ["the the system", "the system"]
   - ["The the system", "The system"]
 # Regular expressions (applied after the phrases): the build's behaviour quoted beside a proposal.
 regex:
   - [' ?\(The system today: [^()]*(?:\([^()]*\)[^()]*)*\)', '']
+  # any other mention of a simulator of the build
+  - ['(?i)the Enterprise SSO simulator', "the Enterprise SSO test accounts provided under the Integration scope"]
+  - ['(?i)the (?:payment )?channel simulator', "the test files of BDOI's systems provided under the Integration scope"]
+  - ['(?i)the receiving[- ]system simulator', "the test account of BDOI's receiving system provided under the Integration scope"]
+  - ['(?i)\b(?:an?|the) simulator\b', "the test accounts and test files of BDOI's systems provided under the Integration scope"]
 # Paragraphs and table rows of the added FRS text that only described the build or its test tools: removed.
 drop:
   - "Channel simulator (SIT and UAT only)"

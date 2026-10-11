@@ -656,8 +656,9 @@ def finalise_docx(path: Path) -> dict:
         mark.getparent().remove(mark)
         accepted += 1
     layout = polish_layout(doc)
+    conform = conform_to_template(doc, path)
     doc.save(str(path))
-    return {"layout": layout, "guidance_removed": removed, "tables_fitted": fitted, "header_rows_repeated": headers,
+    return {"layout": layout, "template": conform, "guidance_removed": removed, "tables_fitted": fitted, "header_rows_repeated": headers,
             "figures_kept_with_caption": kept, "columns_widened": widened,
             "blank_pages_removed": blanks, "pictures_scaled": shrunk, "changes_accepted": accepted,
             "row_heights_removed": heights, "section_rows_numbered": numbered, "table_intros_kept": intros,
@@ -676,7 +677,7 @@ _RPR_ORDER = ["rStyle", "rFonts", "b", "bCs", "i", "iCs", "caps", "smallCaps", "
               "kern", "position", "sz", "szCs", "highlight", "u", "effect", "bdr", "shd", "fitText", "vertAlign",
               "rtl", "cs", "em", "lang", "eastAsianLayout", "specVanish", "oMath"]
 CAPTION_RE = re.compile(r"^\s*(?:Figure|Table|Screenshot)\s+[A-Z]{0,2}\.?\d+(?:\.\d+)*\s*(?:[-–:]|\()")
-CAPTION_SIZE = 17       # half-points: every caption at 8.5 pt, italic, centred, under its figure
+CAPTION_SIZE = 18       # half-points: every caption at 9 pt, italic, centred, under its figure
 CELL_SPACE = "20"       # twips before and after each paragraph of a table cell
 PICTURE_SPACE = ("120", "60")
 
@@ -887,6 +888,254 @@ def polish_layout(doc) -> dict:
                 _set_child(ppr, "spacing", _PPR_ORDER, {"after": "60"})
                 _set_child(ppr, "contextualSpacing", _PPR_ORDER, replace=False)
                 out["lists"] += 1
+    return out
+
+
+# ----------------------------------------------------------------------------------- BDOI's template styles
+# Measured from BDOI's own FRS (docs/source-documents, 11-Oct-2026); every paragraph, table and caption of the four
+# packs follows them, whatever part of the document a builder added:
+# - text: Arial (the font every run of BDOI's text names; the document default Times New Roman is never meant),
+#   10 pt (no size: the default 10 pt), justified where BDOI justifies;
+# - headings (styles Heading 1 / 2 / 3, Arial bold): a numbered chapter (1. Introduction) 14 pt; the unnumbered front
+#   and closing headings (Table of Contents, Document Revision Log, Signoff Sheet) at the style's 16 pt; an annex or
+#   appendix heading 12 pt; Heading 2 12 pt bold italic; Heading 3 12 pt bold;
+# - tables: Arial; BDOI's cells at their own size (10 to 11 pt); the added tables of annexes at 8 pt, the smallest
+#   size of BDOI's tables (User Access Maintenance), header row bold on the template's header fill (D9E2F3 in User
+#   Access Maintenance, D9E1F2 in the other three), single 0.5 pt black borders, repeated on each page;
+# - lists: ListParagraph, text at 0.5 in, bullet or number hanging 0.25 in (BDOI's lists);
+# - captions: BDOI's templates have no figure captions (the Caption style of Cashiering is never used); the added
+#   figures carry one italic 9 pt line, centred, directly under the figure.
+TEMPLATE_STYLE = {
+    "BRD-11": {"source": "FRS - BDOI BROKERSYS User Access Maintenance v1.1 (BDOI).docx", "head_fill": "D9E2F3"},
+    "BRD-06": {"source": "FRS - BDOI BROKERSYS Renewal v1.0 (BDOI).docx", "head_fill": "D9E1F2"},
+    "BRD-03": {"source": "FRS - BDOI BROKERSYS Product Maintenance v1.0 (BDOI, 19-Aug-2026).docx", "head_fill": "D9E1F2"},
+    "BRD-02": {"source": "FRS - BDOI Core Replacement Operations Cashiering v3.1 (BDOI).docx", "head_fill": "D9E1F2"},
+}
+TEXT_FONT = "Arial"
+TEXT_SIZE = "20"          # 10 pt
+TABLE_SIZE = "16"         # 8 pt: the added tables
+SMALL_NOTE_SIZE = "18"    # 9 pt: "(continued below)" between the parts of a screen
+H1_NUMBERED, H1_ANNEX, H2_SIZE = "28", "24", "24"
+FRONT_HEADINGS = ("Table of Contents", "Document Revision Log", "Signoff Sheet", "Sign-off Sheet",
+                  "Template Revision Log", "Process Flow")
+_ADDED_FILLS = ("D9E1F2", "D9E2F3")
+_SYMBOL_FONTS = ("Symbol", "Wingdings", "Courier New")
+# the width of a word at 1 pt (Liberation Sans Bold, metric-compatible with Arial Bold), in points
+try:
+    from PIL import ImageFont as _IF  # noqa: PLC0415
+    _BOLD = _IF.truetype("/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf", 100)
+except Exception:  # noqa: BLE001
+    _BOLD = None
+
+
+def _word_twips(word: str, half_points: int) -> int:
+    if _BOLD is None:
+        return int(len(word) * half_points / 2 * 0.62 * 20)
+    return int(_BOLD.getlength(word) / 100 * half_points / 2 * 20)
+
+
+def conform_to_template(doc, path) -> dict:
+    """Every run, heading, table and caption in BDOI's template styles (TEMPLATE_STYLE); BDOI's own paragraphs keep
+    their text (only their font is made the template's Arial where a run named none or another family)."""
+    from docx.oxml.ns import qn  # noqa: PLC0415
+
+    name = Path(path).name
+    tpl = next((v for k, v in TEMPLATE_STYLE.items() if k in name), None)
+    out = {"fonts": 0, "sizes": 0, "headings": 0, "fills": 0, "columns": 0, "spaces": 0, "empties": 0}
+    if tpl is None:
+        return out
+    body = doc.element.body
+
+    def text(el):
+        return "".join(x.text or "" for x in el.iter(qn("w:t")))
+
+    def rpr_of(r):
+        rpr = r.find(qn("w:rPr"))
+        if rpr is None:
+            rpr = r.makeelement(qn("w:rPr"), {})
+            r.insert(0, rpr)
+        return rpr
+
+    def set_font(rpr):
+        rf = rpr.find(qn("w:rFonts"))
+        if rf is not None and rf.get(qn("w:ascii")) in _SYMBOL_FONTS:
+            return
+        if rf is None or rf.get(qn("w:ascii")) != TEXT_FONT or rf.get(qn("w:hAnsi")) != TEXT_FONT:
+            rf = _set_child(rpr, "rFonts", _RPR_ORDER)
+            for a in list(rf.attrib):
+                if a.endswith("Theme"):
+                    del rf.attrib[a]
+            for a in ("ascii", "hAnsi", "cs"):
+                rf.set(qn(f"w:{a}"), TEXT_FONT)
+            out["fonts"] += 1
+
+    def set_size(rpr, val):
+        sz = rpr.find(qn("w:sz"))
+        if (sz.get(qn("w:val")) if sz is not None else None) != val:
+            if val is None:
+                for t in ("sz", "szCs"):
+                    el = rpr.find(qn(f"w:{t}"))
+                    if el is not None:
+                        rpr.remove(el)
+            else:
+                _set_child(rpr, "sz", _RPR_ORDER, {"val": val})
+                _set_child(rpr, "szCs", _RPR_ORDER, {"val": val})
+            out["sizes"] += 1
+
+    seen_numbered = False
+    for p in body.iter(qn("w:p")):
+        in_table = any(a.tag == qn("w:tc") for a in p.iterancestors())
+        ppr = p.find(qn("w:pPr"))
+        ps = ppr.find(qn("w:pStyle")) if ppr is not None else None
+        style = (ps.get(qn("w:val")) or "") if ps is not None else ""
+        if style.upper().startswith("TOC"):
+            continue
+        t = text(p).strip()
+        runs = [r for r in p.iter(qn("w:r")) if r.find(qn("w:t")) is not None]
+        # paragraph mark formatting follows the runs (font only)
+        mark = ppr.find(qn("w:rPr")) if ppr is not None else None
+        if mark is not None and not style.startswith("Heading"):
+            set_font(mark)
+        if style.startswith("Heading") and not in_table:
+            numbered = ppr is not None and ppr.find(qn("w:numPr")) is not None
+            level = style[7:]
+            if level == "1":
+                if numbered:
+                    seen_numbered = True
+                    size = H1_NUMBERED
+                elif not seen_numbered or t in FRONT_HEADINGS:
+                    size = None
+                else:
+                    size = H1_ANNEX
+            elif level == "2":
+                size = H2_SIZE
+            else:
+                size = "keep"
+            for r in runs:
+                rpr = rpr_of(r)
+                rf = rpr.find(qn("w:rFonts"))
+                if rf is not None and rf.get(qn("w:ascii")) not in _SYMBOL_FONTS:
+                    rpr.remove(rf)        # the heading style's Arial
+                    out["fonts"] += 1
+                if size != "keep":
+                    set_size(rpr, size)
+            out["headings"] += 1
+            continue
+        caption = not in_table and CAPTION_RE.match(t or "") and p.getprevious() is not None \
+            and p.getprevious().find(f".//{qn('w:drawing')}") is not None
+        for r in runs:
+            rpr = rpr_of(r)
+            set_font(rpr)
+            sz = rpr.find(qn("w:sz"))
+            cur = int(sz.get(qn("w:val"))) if sz is not None else 20
+            if in_table:
+                if cur < 16:
+                    set_size(rpr, TABLE_SIZE)
+                elif cur == 17:
+                    set_size(rpr, TABLE_SIZE)
+            elif caption:
+                set_size(rpr, str(CAPTION_SIZE))
+            elif t == "(continued below)":
+                set_size(rpr, SMALL_NOTE_SIZE)
+            elif cur < 24 and cur != 20:
+                set_size(rpr, TEXT_SIZE)
+    # the header fill of the template on the added tables
+    for tbl in body.iter(qn("w:tbl")):
+        rows = tbl.findall(qn("w:tr"))
+        if not rows:
+            continue
+        for shd in rows[0].iter(qn("w:shd")):
+            if shd.get(qn("w:fill")) in _ADDED_FILLS and shd.get(qn("w:fill")) != tpl["head_fill"]:
+                shd.set(qn("w:fill"), tpl["head_fill"])
+                for a in ("themeFill", "themeFillTint", "themeFillShade"):
+                    shd.attrib.pop(qn(f"w:{a}"), None)
+                out["fills"] += 1
+        # no header word broken mid-word: a column narrower than its longest header word takes the width it needs
+        # from the widest column of the table
+        grid = tbl.find(qn("w:tblGrid"))
+        cols = grid.findall(qn("w:gridCol")) if grid is not None else []
+        cells = rows[0].findall(qn("w:tc"))
+        if len(cells) != len(cols) or len(cols) < 2 or len(rows) < 2:
+            continue
+        widths = [int(c.get(qn("w:w")) or 0) for c in cols]
+        req = [0] * len(cols)        # the width the longest word of each header needs
+        for k, tc in enumerate(cells):
+            szs = [int(s.get(qn("w:val"))) for s in tc.iter(qn("w:sz"))] or [20]
+            words = text(tc).split()
+            if words:
+                req[k] = max(_word_twips(w, max(szs)) for w in words) + 2 * 108 + 40
+        need = [max(w, r) for w, r in zip(widths, req)]
+        extra = sum(n - w for n, w in zip(need, widths))
+        if extra <= 0:
+            continue
+        donors = sorted(range(len(cols)), key=lambda i: widths[i] - req[i], reverse=True)
+        new = list(need)
+        for i in donors:
+            if extra <= 0:
+                break
+            spare = new[i] - max(req[i], 900) if new[i] == widths[i] else 0
+            take = min(spare, extra)
+            if take > 0:
+                new[i] -= take
+                extra -= take
+        if extra > 0:
+            continue                    # no room: the table keeps its widths
+        for c, w in zip(cols, new):
+            c.set(qn("w:w"), str(w))
+        for tr in rows:
+            tcs = tr.findall(qn("w:tc"))
+            if len(tcs) != len(cols):
+                continue
+            for c, w in zip(tcs, new):
+                tcw = c.find(f"{qn('w:tcPr')}/{qn('w:tcW')}")
+                if tcw is not None and tcw.get(qn("w:type")) in (None, "dxa"):
+                    tcw.set(qn("w:w"), str(w))
+        out["columns"] += 1
+    # no double space inside a sentence (BDOI's justified text with several spaces between words included: the
+    # words are kept, the spaces between them made single)
+    import re as _re  # noqa: PLC0415
+    for p in body.iter(qn("w:p")):
+        if "  " not in text(p).strip():
+            continue
+        for t in p.iter(qn("w:t")):
+            if t.text and "  " in t.text:
+                new = _re.sub(r"(?<=\S) {2,}(?=\S)", " ", t.text)
+                if new != t.text:
+                    t.text = new
+                    out["spaces"] += 1
+        ts = [t for t in p.iter(qn("w:t")) if t.text]
+        for t1, t2 in zip(ts, ts[1:]):
+            if t1.text.endswith(" ") and t2.text.startswith(" ") and t1.text.strip():
+                t2.text = t2.text.lstrip(" ")
+                out["spaces"] += 1
+    # a short note right after a table never goes alone to a page of its own: the last row of the table goes with it
+    for tbl in body.findall(qn("w:tbl")):
+        nxt = tbl.getnext()
+        if nxt is None or nxt.tag != qn("w:p") or not (0 < len(text(nxt).strip()) < 500):
+            continue
+        rows = tbl.findall(qn("w:tr"))
+        if len(rows) < 2 or len(text(rows[-1])) > 600:
+            continue
+        for q in rows[-1].iter(qn("w:p")):
+            _set_child(_ppr(q), "keepNext", _PPR_ORDER, replace=False)
+    # no run of empty paragraphs after the front matter: one is kept
+    started = False
+    prev_empty = False
+    for el in list(body.iterchildren()):
+        if el.tag != qn("w:p"):
+            prev_empty = False
+            continue
+        ps = el.find(f"{qn('w:pPr')}/{qn('w:pStyle')}")
+        if ps is not None and ps.get(qn("w:val")) == "Heading1" and el.find(f"{qn('w:pPr')}/{qn('w:numPr')}") is not None:
+            started = True
+        is_empty = (not text(el).strip() and el.find(f".//{qn('w:drawing')}") is None
+                    and el.find(f".//{qn('w:sectPr')}") is None and el.find(f".//{qn('w:br')}") is None
+                    and el.find(f".//{qn('w:fldChar')}") is None and el.find(f".//{qn('w:pageBreakBefore')}") is None)
+        if started and is_empty and prev_empty:
+            body.remove(el)
+            out["empties"] += 1
+            continue
+        prev_empty = is_empty
     return out
 
 

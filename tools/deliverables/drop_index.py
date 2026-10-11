@@ -174,6 +174,15 @@ def ux_note(key: str) -> list[str]:
             "of the FRS names the screens it affects, so the UX Design team revises only those screens."]
 
 
+# Internal records that describe the BIBS build (coverage of an FRS in BIBS, comparisons of BDOI's FRS with the BIBS
+# FRS): kept for the project team, never sent with the BDOI-template FRS packs, which do not link to them.
+INTERNAL = re.compile(r"^(?:Quality/BIBS_Coverage_|Comparisons/BIBS_Comparison_)")
+
+
+def is_internal(rel: str) -> bool:
+    return bool(INTERNAL.match(rel))
+
+
 def write_index(key: str) -> Path:
     drop = brand.DROPS[key]
     root = brand.OUT_DIR / drop["folder"]
@@ -189,6 +198,8 @@ def write_index(key: str) -> Path:
             doc, brd, label, ver = describe(f, kind)
             if f.suffix == ".png":
                 label, brd = "IER diagram (PNG)", "BRD-00"
+            if is_internal(rel):
+                doc = f"{doc} (internal: iorta TechNXT record of the BIBS build, not part of the BDOI client packs)"
             rows.append((doc, brd, label, ver, rel))
     if key != "Programme":  # the retired sets: one row per BRD pointing to its BDOI-format pack
         for b in sorted(brand.BDOI_FRS_SETS):
@@ -218,6 +229,9 @@ def write_index(key: str) -> Path:
         *retired_note(key),
         *ux_note(key),
         *closure_note(key),
+        *([""] + ["Internal records: the workbooks FRS Coverage in BIBS (Quality/) and BDOI FRS vs BIBS FRS (Comparisons/)",
+                  "describe the BIBS build for the iorta TechNXT Project Team. They are not part of the BDOI-template FRS packs",
+                  "(BDOI_Template_FRS/) sent to BDOI, and nothing in those packs links to them."] if key == "Programme" else []),
         "",
         "| Document | BRD | Kind | Version | File |",
         "|---|---|---|---|---|",

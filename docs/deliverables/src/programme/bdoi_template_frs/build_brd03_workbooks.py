@@ -336,140 +336,82 @@ def collection_items() -> "OrderedDict[str, list[dict]]":
 
 
 def build_collection(items) -> Path:
+    """The Business Unit Requirements Collection in the layout of the other three packs (cover, README, Start here,
+    one fill-in sheet per kind of item, Questions and comments, Lists)."""
+    from brd11_xlsx import ReviewWorkbook  # noqa: PLC0415
+
     path = OUT_DIR / "BIBS_Inputs_BRD-03_Business_Unit_Requirements_Collection_v1.0.xlsx"
-    g = GuidedBook("Business Unit Requirements Collection – BRD-03 Product Maintenance", "1.0")
-    status = g.list_for_values("Status", STATUSES)
-    cols = [("ID *", 13, "Y", "Text", "Fixed", "The item number; keep it when you answer"),
-            ("Item", 26, "N", "Text", "Fixed", "What the item is about"),
-            ("BRD ID", 14, "N", "BRD IDs", "Fixed", "The BRD requirement(s) the item serves"),
-            ("FRS reference", 20, "N", "FRPM item or annex", "Fixed", "Where the item is in the FRS v1.3"),
-            ("What is needed", 46, "N", "Text", "Fixed", "What the Business Unit provides or decides"),
-            ("Format of the answer", 24, "N", "Text", "Fixed", "How to give the answer"),
-            ("Example", 26, "N", "Text", "Fixed", "An example or the proposal of the project team"),
-            ("Provided by", 18, "N", "Role", "Fixed", "The role that answers"),
-            ("Needed by", 13, "N", "dd-MMM-yyyy", "Fixed", "Date of the drop plan"),
-            ("BU response *", 40, "Y", "Text", "Free entry", "The answer of the Business Unit"),
-            ("Status *", 12, "Y", "List", ", ".join(STATUSES), "Open until answered; Received when answered; "
-             "Confirmed after review")]
-    index_rows = []
-    order = ["MDA", "LOV", "PAR", "SCH", "APR", "DOC", "EML", "INT", "DEC"]  # codes others use first
-    for step, kind in enumerate(order, 1):
-        name, purpose, _ = KINDS[kind]
-        rows = items[kind]
-        ws = g.wb.create_sheet(name[:31])
-        g._title(ws, f"{kind} {name}", purpose)
-        block = [("Purpose", purpose), ("Who fills it in", "The Business Unit owner named in 'Provided by'"),
-                 ("How it is used", "The answers are applied as configuration or recorded as decisions in the next "
-                                    "version of the FRS (Annex V); master data goes into the upload templates v1.2"),
-                 ("Due", "The date in 'Needed by' of each row"),
-                 ("Depends on", "Decisions of the sheet 'Open decisions' where a row says so")]
-        r = 3
-        for k, v in block:
-            ws.cell(row=r, column=1, value=k).font = gfont(9, True, brand.HEADER_BLUE)
-            ws.cell(row=r, column=2, value=v).font = gfont(9)
-            ws.merge_cells(start_row=r, start_column=2, end_row=r, end_column=8)
-            r += 1
-        guide_top = r + 1
-        labels = ["Mandatory", "Format", "Allowed values", "What to enter"]
-        for gi, lab in enumerate(labels):
-            cell = ws.cell(row=guide_top + gi, column=1, value=lab)
-            cell.font = gfont(8, True, brand.HEADER_BLUE)
-        header = guide_top + len(labels)
-        for c, (h, w, mand, fmt, allowed, what) in enumerate(cols, start=1):
-            ws.column_dimensions[get_column_letter(c)].width = w
-            for gi, val in enumerate([mand, fmt, allowed, what]):
-                cell = ws.cell(row=guide_top + gi, column=c, value=val if c > 1 or gi > 0 else val)
-                if c == 1:
-                    cell.value = f"{labels[gi]}: {val}"
-                cell.font = gfont(8, False, brand.MUTED, italic=True)
-                cell.fill = PatternFill("solid", fgColor=brand.DIRTY_WHITE)
-                cell.alignment = Alignment(wrap_text=True, vertical="top")
-                cell.border = GBORDER
-            cell = ws.cell(row=header, column=c, value=h)
-            cell.font = gfont(9, True, brand.WHITE)
-            cell.fill = GHEAD
-            cell.alignment = Alignment(wrap_text=True, vertical="center")
-            cell.border = GBORDER
-        ex = header + 1
-        example = ["Example – overwrite or delete", "Example item", "BRPM.021", "FRPM.028.01",
-                   "The service level of the Marketing approval", "Hours", "24", "Head, Retail Marketing",
-                   "30-Nov-2026", "24 hours", "Received"]
-        for c, v in enumerate(example, start=1):
-            cell = ws.cell(row=ex, column=c, value=v)
-            cell.font = gfont(9, False, brand.MUTED, italic=True)
-            cell.fill = PatternFill("solid", fgColor=brand.DIRTY_WHITE)
-            cell.border = GBORDER
-        first = ex + 1
-        for i, it in enumerate(rows):
-            vals = [it["id"], it["item"], it["brd"], it["frs"], it["need"], it["format"], it["example"], it["by"],
-                    it["when"], None, it["status"]]
-            for c, v in enumerate(vals, start=1):
-                cell = ws.cell(row=first + i, column=c, value=v)
-                cell.font = gfont(9, c == 1)
-                cell.alignment = Alignment(wrap_text=True, vertical="top")
-                cell.border = GBORDER
-        last = first + max(len(rows), 1) - 1 + 50
-        g._list_validation(ws, f"K{first}:K{last}", status, "Status", "Open, Received or Confirmed")
-        g._status_colours(ws, f"K{first}:K{last}", STATUSES)
-        ws.freeze_panes = ws.cell(row=first, column=2)
-        ws.auto_filter.ref = f"A{header}:K{first + max(len(rows), 1) - 1}"
-        g._print_setup(ws, f"{header}:{header}")
-        n = len(rows)
-        index_rows.append({"Step": step, "Sheet": (name, f"'{ws.title[:31]}'!A1"), "Owner": ", ".join(
-            sorted({str(x["by"]) for x in rows}))[:120], "Due": min((x["when"] for x in rows), default="-",
-                                                               key=lambda d: dt.datetime.strptime(d, "%d-%b-%Y")
-                                                               if re.match(r"\d\d-\w{3}-\d{4}$", str(d)) else
-                                                               dt.datetime(2099, 1, 1)),
-                           "Route": "Answer in the sheet; the project team applies it",
-                           "Items": n,
-                           "Answered": f"=COUNTIF('{ws.title}'!J{first}:J{last},\"?*\")",
-                           "Status": "Not started", "Open →": ("Open →", f"'{ws.title}'!A1")})
+    wb = ReviewWorkbook("Business Unit Requirements Collection", doc_type="Requirements collection", brd="BRD-03",
+                        version="1.0", date=DATE,
+                        subtitle="BRD-03 Product Maintenance - what the Business Unit provides for the FRS v1.3")
     answered = [k for k, v in ITEMS["inputs_bdoi"].items() if v[0] == "Answered"]
-    g.start_sheet(
-        "Business Unit Requirements Collection", "BRD-03 Product Maintenance – what the Business Unit provides "
-        "for the platform to work as specified in the FRS v1.3 (BDOI template)",
-        [("Workbook", "BIBS_Inputs_BRD-03_Business_Unit_Requirements_Collection_v1.0"), ("Version", "1.0"),
-         ("Date", DATE), ("FRS", "FRS BRD-03 Product Maintenance v1.3 in BDOI's template"),
-         ("Consistent with", "Programme inputs workbook BIBS_Inputs_BRD-00 v1.2 (sheet BRD-03): same IDs; "
-          f"{len(answered)} of its items are answered by BDOI's FRS and are listed in the traceability workbook "
-          "(sheet 'Answered in the BDOI FRS'); the upload templates v1.2 hold the master data templates"),
-         ("Prepared by", brand.VENDOR)],
-        ["Open the sheets in the order of the index: master data and lists first, decisions last.",
-         "For each row, write the answer in 'BU response' in the format asked, and set Status to Received.",
-         "Ask questions in the sheet 'Questions and comments'; the project team answers there.",
-         "The project team reviews each answer and sets Status to Confirmed."],
-        "Sheets in fill-in order", [("Step", 7), ("Sheet", 30), ("Owner", 34), ("Due", 13), ("Route", 30),
-                                    ("Items", 8), ("Answered", 10), ("Status", 14), ("Open →", 10)],
-        index_rows)
-    _questions(g, [KINDS[k][0] for k in order])
-    g.lists_sheet()
-    order_names = ["Start here"] + [KINDS[k][0][:31] for k in order] + ["Questions and comments", "Reference lists"]
-    return g.save(path, order_names, {"title": "Business Unit Requirements Collection BRD-03",
-                                      "keywords": "Inputs, BRD-03, BIBS, BDOI"})
-
-
-def _questions(g: GuidedBook, sheets):
-    ws = g.wb.create_sheet("Questions and comments")
-    g._title(ws, "Questions and comments", "Raise a question or a comment on a sheet or an item; the iorta TechNXT "
-                                           "Project Team answers here.")
-    cols = [("No.", 6), ("Sheet", 28), ("Item ID", 14), ("Question / comment", 50), ("Raised by", 20), ("Date", 13),
-            ("Answer", 50), ("Answered by", 20), ("Status", 12)]
-    for c, (h, w) in enumerate(cols, start=1):
-        cell = ws.cell(row=4, column=c, value=h)
-        cell.font = gfont(9, True, brand.WHITE)
-        cell.fill = GHEAD
-        cell.border = GBORDER
-        ws.column_dimensions[get_column_letter(c)].width = w
-    for r in range(5, 65):
-        ws.cell(row=r, column=1, value=r - 4)
-        for c in range(1, 10):
-            ws.cell(row=r, column=c).border = GBORDER
-    names = g.list_for_values("Sheet", list(sheets) + ["General"])
-    g._list_validation(ws, "B5:B64", names, "Sheet", "The sheet the question is about")
-    st = g.list_for_values("Question status", ["Open", "Answered", "Closed"])
-    g._list_validation(ws, "I5:I64", st, "Status", "Open, Answered or Closed")
-    ws.freeze_panes = "B5"
-    g._print_setup(ws, "4:4")
+    wb.cover_notes = ["Fill in the column BU response and set the Status of each row; questions go to the sheet "
+                      "Questions and comments. Items keep the IDs of the BDOI Requirements and Inputs by BRD v1.2 "
+                      f"workbook where they exist; {len(answered)} of its items are answered by BDOI's FRS and are "
+                      "listed in the traceability workbook (sheet 'Answered in the BDOI FRS'). Master data go "
+                      "through the Master Data and Configuration Upload Templates v1.2."]
+    cols = [
+        {"key": "id", "header": "ID", "width": 13, "mandatory": True, "what": "The item number; keep it when you answer"},
+        {"key": "item", "header": "Item", "width": 26, "mandatory": True, "what": "What the item is about"},
+        {"key": "brd", "header": "BRD ID", "width": 14, "what": "The BRD requirement(s) the item serves"},
+        {"key": "frs", "header": "FRS reference", "width": 20, "what": "FRPM item or annex of the FRS v1.3"},
+        {"key": "need", "header": "What is needed", "width": 46, "mandatory": True, "what": "What the Business Unit provides or decides"},
+        {"key": "format", "header": "Format of the answer", "width": 24, "mandatory": True, "what": "How to give the answer"},
+        {"key": "example", "header": "Example", "width": 26, "what": "An example or the proposal of the project team"},
+        {"key": "by", "header": "Provided by (role)", "width": 18, "mandatory": True, "what": "The role that answers"},
+        {"key": "when", "header": "Needed by", "width": 12, "mandatory": True, "format": "Date dd-Mmm-yyyy", "what": "Date of the drop plan"},
+        {"key": "resp", "header": "BU response", "width": 36, "what": "The answer of the Business Unit"},
+        {"key": "status", "header": "Status", "width": 12, "mandatory": True, "values": STATUSES,
+         "what": "Open until answered; Received when answered; Confirmed after review"}]
+    order = ["MDA", "LOV", "PAR", "SCH", "APR", "DOC", "EML", "INT", "DEC"]
+    index = []
+    for k, kind in enumerate(order, 1):
+        name = KINDS[kind][0][:31]
+        rows = items[kind]
+        owners = ", ".join(sorted({str(x["by"]) for x in rows}))[:120]
+        dues = sorted({str(x["when"]) for x in rows if re.match(r"\d\d-\w{3}-\d{4}$", str(x["when"]))},
+                      key=lambda x: dt.datetime.strptime(x, "%d-%b-%Y"))
+        index.append([k, name, f"{len(rows)} items", owners, dues[0] if dues else "", len(rows),
+                      f"=COUNTIF('{name}'!K:K,\"Open\")", "Not started", name])
+    index.append([len(index) + 1, "Questions and comments", "Questions of the Business Unit on any item",
+                  "Any reviewer", "", 0, "", "Not started", "Questions and comments"])
+    wb.index_sheet("Start here", "Start here – BRD-03 Product Maintenance: what the Business Unit provides",
+                   "Fill in the sheets in this order (master data and lists first, decisions last). Each sheet is "
+                   "self-contained: title block, column guide above the header, an example row to overwrite. "
+                   "Rows open: the formula counts the rows still Open.",
+                   ["No.", "Sheet", "Content", "Owner", "First due", "Rows", "Rows open", "Status", "Go to"],
+                   index, [5, 30, 18, 30, 12, 8, 10, 14, 10], link_col=9, status_col=8,
+                   status_values=["Not started", "In progress", "Completed"])
+    for kind in order:
+        name, purpose, _ = KINDS[kind]
+        rows = [dict(r, resp="") for r in items[kind]]
+        ex = {"id": "BRPM.021", "item": "Example item", "brd": "BRPM.021", "frs": "FRPM.028.01",
+              "need": "The service level of the Marketing approval", "format": "Hours", "example": "24",
+              "by": "Head, Retail Marketing", "when": "30-Nov-2026", "resp": "24 hours", "status": "Received"}
+        wb.template_sheet(name[:31], f"{kind} {name} – BRD-03 Product Maintenance",
+                          [("Purpose", purpose),
+                           ("Who fills it in", "The Business Unit owner named in 'Provided by (role)'"),
+                           ("How it is used", "The answers are applied as configuration or recorded as decisions in "
+                                              "the next version of the FRS (Annex V); master data go into the upload "
+                                              "templates v1.2"),
+                           ("Due", "The date in 'Needed by' of each row"),
+                           ("Depends on", "Decisions of the sheet 'Open decisions' where a row says so")],
+                          cols, rows, ex)
+    q_cols = [
+        {"key": "no", "header": "No.", "width": 6, "mandatory": True, "format": "Number", "what": "Running number"},
+        {"key": "ref", "header": "Item or section", "width": 20, "mandatory": True, "what": "ID of the item, or FRS section / annex"},
+        {"key": "q", "header": "Question or comment", "width": 60, "mandatory": True, "what": "The question or comment"},
+        {"key": "by", "header": "Raised by", "width": 20, "mandatory": True, "what": "Name and role"},
+        {"key": "date", "header": "Date", "width": 12, "format": "Date dd-Mmm-yyyy", "what": "Date raised"},
+        {"key": "answer", "header": "Answer of the project", "width": 50, "what": "Filled in by iorta TechNXT"},
+        {"key": "status", "header": "Status", "width": 12, "values": STATUSES, "what": "Open, Received, Confirmed"}]
+    wb.template_sheet("Questions and comments", "Questions and comments", [
+        ("Purpose", "Any question or comment of the Business Unit on the items or on the FRS v1.3."),
+        ("Who fills it in", "Any reviewer; the project answers."), ("How it is used", "Answered within 3 working days."),
+        ("Due", "Before the sign-off of the FRS."), ("Depends on", "-")], q_cols, [],
+        {"no": 1, "ref": "FRPM.028.01", "q": "Can the service level of the Marketing approval differ per product line?",
+         "by": "Product Owner", "date": "", "answer": "", "status": "Open"})
+    return wb.save(path)
 
 
 # ======================================================================================================= 2. fit-gap

@@ -64,51 +64,11 @@ points:
   - {id: G-04, class: ootb, ev: "E-mail outbox with the status of each e-mail", frs: FRPM.021.01, fl: "WFL-011 Available", match: "Each e-mail sent from Product Maintenance shall be logged with the recipient", title: "E-mail log with recipient, time, subject and attachment", where: "E-mail outbox with status of BrokerVerse"}
   - {id: G-05, class: ootb, ev: "Audit trail: before and after values of every change", frs: "FRPM.021.01; Annex M.5", fl: "ADM-012 Available", match: "Old and new values of changed master records in the audit logs", scope: row, title: "Old and new field values of changed master records", where: "Field-level change log of master data of BrokerVerse (to be applied to the product masters of BIBS)"}
   # ---- orange: change requests
-  - {id: CR-PM-101, class: cr, match: "Quotation Slip decision to the preparer", scope: row}
-  - {id: CR-PM-101t, class: cr, match: "NT-16 Quotation Slip decision to the preparer", exact: true}
-  - {id: CR-PM-102, class: cr, match: "ManCom approval request", exact: true, scope: row}
-  - {id: CR-PM-102b, class: cr, match: "ManCom approval request to the President", exact: true, scope: row}
-  - {id: CR-PM-102t, class: cr, match: "NT-13 ManCom approval request", exact: true}
-  - {id: CR-PM-102u, class: cr, match: "NT-14 ManCom approval request to the President", exact: true}
-  - {id: CR-PM-103, class: cr, match: "T-15", exact: true, scope: row}
-  - {id: CR-PM-104, class: cr, match: "Amber from 80% of the stage service level (due soon)"}
+  - {id: CR-PM-101, class: cr, match: "T-15", exact: true, scope: row}
 
 crs:
   - cr: CR-PM-101
-    ev: "not found: Packages has no slip approval and no notice to the preparer"
-    title: "Quotation Slip decision notice to the preparer"
-    frs: "FRPM.006.01, FRPM.012.01; Annex P NT-16"
-    brd: "BRPM.012 (extends)"
-    tag: EXT
-    fl: "PRD-019 Partial (no negotiation rounds or slip approval for a programme); WFL-010 Available (in-app notices)"
-    built: "No"
-    source: "BDOI FRS v1.0 FRPM.006.01 and FRPM.012.01; FRS v1.2 Annex P (proposed text NT-16)"
-    why: "The TSU Officer who prepares a Quotation Slip learns of its approval or return only by opening the request; the notice lets the slip go to the insurers the same day."
-    ootb: "Partial in BrokerVerse OOTB: notices are available, the package slip approval is not; effort for the notice of the slip decision only."
-    md: [0.5, 1.5, 0, 1.0, 0.5]
-    complexity: Low
-    priority: Medium
-    deps: "Notice service and e-mail channel (Annex S, IN-08)"
-    assumptions: "Text NT-16 of Annex P approved as written; in-system notice with e-mail copy by preference."
-    basis: "Negotiation service of BIBS about 410 lines; stage notices about 70 lines used as the pattern."
-  - cr: CR-PM-102
-    ev: "not found: no ManCom or committee step"
-    title: "ManCom e-mails in BDOI's wording, with the President's text"
-    frs: "FRPM.014.01; Annex P NT-13, NT-14"
-    brd: "BRPM.015 (extends)"
-    tag: EXT
-    fl: "PRD-021 Not available (no committee step or hand-off)"
-    built: "Partly: the ManCom routing with one standard notice and e-mail copy was prepared for BIBS in this project"
-    source: "BDOI FRS v1.0 FRPM.014.01; FRS v1.2 Annex P (proposed texts NT-13, NT-14)"
-    why: "BDOI's FRS asks for the ManCom approval e-mail in its own wording and a separate text when the request reaches the President."
-    ootb: "Not available in BrokerVerse OOTB. The effort is for the two BDOI texts on top of the routing already delivered for BIBS."
-    md: [0.5, 1.0, 0, 0.5, 0.5]
-    complexity: Low
-    priority: Medium
-    deps: "E-mail channel of BDOI (Annex S, IN-08)"
-    assumptions: "Two texts; no attachment beyond the link to the request."
-    basis: "ManCom routing of BIBS about 270 lines; one notice method to extend."
-  - cr: CR-PM-103
+    brd_check: "None found: the BRD and its non-functional table set no accessibility level"
     ev: "Branding: contrast check only; no WCAG audit"
     title: "Accessibility of the Product Maintenance screens (WCAG 2.2 level AA)"
     frs: "Annex T, T-15"
@@ -125,23 +85,31 @@ crs:
     deps: "BDOI's decision on the accessibility level (Annex V, PQ18)"
     assumptions: "Check and fixes on the 35 Product Maintenance screen files (about 3,800 lines) and the product master screens; no redesign."
     basis: "Product Maintenance screens of BIBS: 35 files, about 3,800 lines."
-  - cr: CR-PM-104
-    ev: "not found for packages; Renewals use a fixed number of days"
-    title: "'Due soon' marker at 80% of the stage service level"
-    frs: "FRPM.001.01"
-    brd: "BRPM.021 (extends)"
-    tag: EXT
-    fl: "WFL-007 Partial (deadlines and escalation for claims, complaints, leads and collections; no general turnaround engine)"
-    built: "Partly: BIBS marks a package request 'due soon' 8 hours before its stage deadline and 'overdue' after it"
-    source: "FRS v1.1 FRPM.001.01 (amber from 80% of the stage service level)"
-    why: "BRPM.021 asks that each approval step is completed within the defined service level; an amber marker relative to each stage's own service level warns before the breach on short and long stages alike."
-    ootb: "Partial in BrokerVerse OOTB; the effort covers the missing part only: the marker at a percentage of each stage's service level."
-    md: [0.5, 1.0, 0.5, 1.0, 0.5]
-    complexity: Low
-    priority: Medium
-    deps: "-"
-    assumptions: "The percentage is a parameter (default 80%) maintained by the System Administrator."
-    basis: "Package query service of BIBS about 275 lines (fixed 8-hour window); stage age marker of the screens."
+
+# BDOI FRS points first proposed as change requests and found to be covered, fully or partly, by a BRD line:
+# BRD requirements (black, in scope); their gap against the OOTB platform is delivery work, with planning effort.
+brd_deliver:
+- id: D-PM-01
+  title: Quotation Slip decision notice to the preparer
+  brd: 'BRPM.021 AC5: ''The system notifies users of pending validation or approval actions and tracks resolution within the SLA''; BRPM.012: ''Prepare and send quotation slip to Insurers'''
+  frs: FRPM.006.01, FRPM.012.01; Annex P NT-16
+  fl: PRD-019 Partial (no negotiation rounds or slip approval for a programme); WFL-010 Available (in-app notices)
+  gap: 'Partial in BrokerVerse OOTB: notices are available, the package slip approval is not; effort for the notice of the slip decision only.'
+  md: 3.5
+- id: D-PM-02
+  title: ManCom e-mails in BDOI's wording, with the President's text
+  brd: 'BRPM.015: ''a ManCom review and signoff workflow with audit logging''; BRPM.022: ''Notification and integration for seamless data flow'''
+  frs: FRPM.014.01; Annex P NT-13, NT-14
+  fl: PRD-021 Not available (no committee step or hand-off)
+  gap: Not available in BrokerVerse OOTB. The effort is for the two BDOI texts on top of the routing already delivered for BIBS.
+  md: 2.5
+- id: D-PM-03
+  title: '''Due soon'' marker at 80% of the stage service level'
+  brd: 'BRPM.021 ER3: ''Each approval step is completed by the designated authority ... within the defined SLA''; AC5 ''tracks resolution within the SLA'''
+  frs: FRPM.001.01
+  fl: WFL-007 Partial (deadlines and escalation for claims, complaints, leads and collections; no general turnaround engine)
+  gap: 'Partial in BrokerVerse OOTB; the planning effort covers the missing part only: the marker at a percentage of each stage''s service level.'
+  md: 3.5
 
 brd_lines:
   - ["Executive summary", "Direct management and update capability for Package Products", "FRPM.003, FRPM.022 to FRPM.024", "Covered"]

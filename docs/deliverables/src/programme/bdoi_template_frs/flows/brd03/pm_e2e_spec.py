@@ -1,10 +1,8 @@
 """Product Maintenance - end-to-end process flow (FRS BRD-03 v1.3, section 4). Drawn from the FRS only (FRPM.001 to
 FRPM.030, Annexes O, P, R, S, T, Y) and the BRD; CR tags from Annex Y and the CR effort workbook."""
 
-CR_NEW = [("CR-PM-103", "Accessibility (WCAG 2.2 AA) of the module screens")]
-CR_EXT = [("CR-PM-101", "Quotation Slip decision notice to the preparer (BRPM.012)"),
-          ("CR-PM-102", "ManCom e-mails in BDOI's wording, President text (BRPM.015)"),
-          ("CR-PM-104", "'Due soon' at 80% of the stage service level (BRPM.021)")]
+CR_NEW = [("CR-PM-101", "Accessibility (WCAG 2.2 AA) of the module screens")]
+CR_EXT = []
 BRD = [("NFR 10.07", "One session per device (Collections addendum)"),
        ("NFR 4.03", "Source / IP address in the audit log (CLM, CLXN, RI addenda)")]
 
@@ -22,9 +20,8 @@ def _grp(title, rows, kind, cols):
 
 FOOT = f'''<div style="display:flex;gap:10px;font-size:11.5px;color:#1f2937">
 <div style="flex:1;border:1.5px solid #F9A825;border-radius:7px;padding:5px 9px;background:#FFFDF3">
-<div style="display:flex;gap:14px"><div style="flex:1.5">{_grp("Change requests that extend a BRD requirement", CR_EXT, "EXT", 2)}</div>
-<div style="flex:1">{_grp("Change requests &#8211; not in any BRD", CR_NEW, "", 1)}
-{_grp("Already BRD requirements &#8211; not change requests", BRD, "BRD", 1)}</div></div></div>
+<div style="display:flex;gap:14px"><div style="flex:1.5">{_grp("Change requests &#8211; not in any BRD", CR_NEW, "", 1)}</div>
+<div style="flex:1">{_grp("Already BRD requirements &#8211; not change requests", BRD, "BRD", 1)}</div></div></div>
 <div style="width:300px;border:1.5px solid #c5ccd6;border-radius:7px;padding:6px 9px;line-height:1.55">
 <div><b style="color:#0D47A1">&#8594;</b> Process flow &nbsp; <b style="color:#C62828">&#8594;</b> Rejected</div>
 <div><b style="color:#0277BD">- - &#8594;</b> Exchange with insurers / systems</div>
@@ -52,18 +49,18 @@ SPEC = dict(
         ("M3", 0, 3, .05, .1, .9, "apr", "Review negotiated terms", ["Client-specific: accept or ask for changes"]),
         ("M4", 0, 5, .05, .07, .9, "ntf", "Advisory and renewal", ["Package advisory (in system, e-mail)", "Renewal request from the expiry list"]),
         ("T1", 1, 1, .05, .06, .9, "apr", "TSU review", ["Team Lead recommends", "TSU Head approves, not the recommender", "Return or reject"]),
-        ("T2", 1, 2, .05, .06, .9, "req", "Quotation Slip per insurer", ["Approved before sending (not by preparer)", "Protected PDF, password sent apart"], ["EXT:CR-PM-101"]),
+        ("T2", 1, 2, .05, .06, .9, "req", "Quotation Slip per insurer", ["Approved before sending (not by preparer)", "Protected PDF, password sent apart"]),
         ("T3", 1, 2, .05, .7, .9, "req", "Comparative Table", ["Master and client views per round"]),
         ("T4", 1, 3, .05, .06, .9, "req", "Product requirements", ["Approvers selected for ManCom"]),
         ("T5", 1, 4, .05, .1, .9, "req", "Request for deployment", ["To the MBS work queue"]),
         ("I1", 2, 2, .05, .1, .9, "id", "Insurer responses", ["Approved, Not Covered, Other; rounds"]),
-        ("C1", 3, 3, .05, .1, .9, "apr", "ManCom approval", ["In parallel, then the President", "Approve, return or reject"], ["EXT:CR-PM-102"]),
+        ("C1", 3, 3, .05, .1, .9, "apr", "ManCom approval", ["In parallel, then the President", "Approve, return or reject"]),
         ("B1", 4, 4, .05, .06, .9, "sys", "Package set-up", ["New version (copy of the one in force)", "Rates, coverages, clauses, field rules", "Incentive rules (maker-checker)"]),
         ("B2", 4, 4, .05, .72, .9, "apr", "Post-setup validation", ["Checklist by another user; release"]),
         ("S0", 5, 0, .3, .05, .66, "sys", "Request register", ["Reference number, stage stepper", "One session per device"], ["BRD:NFR 10.07"]),
-        ("S1", 5, 1, .05, .05, .9, "sys", "Workflow rules", ["Mandatory fields and checks", "Stage service levels, reminders", "Reassignment of work"], ["EXT:CR-PM-104"]),
+        ("S1", 5, 1, .05, .05, .9, "sys", "Workflow rules", ["Mandatory fields and checks", "Stage service levels, reminders", "Reassignment of work"]),
         ("S2", 5, 2, .05, .05, .9, "ntf", "Notices", ["Stage moves, assignments, decisions", "In system with e-mail copy"]),
-        ("SA", 5, 0, .05, .62, .9, "sys", "Screens of the module", ["Role-based menus and actions"], ["CR-PM-103"]),
+        ("SA", 5, 0, .05, .62, .9, "sys", "Screens of the module", ["Role-based menus and actions"], ["CR-PM-101"]),
         ("S3", 5, 4, .05, .05, .9, "sys", "Product master records", ["Approved changes and deactivations", "Transfer file every 30 minutes"]),
         ("S4", 5, 5, .05, .05, .9, "sys", "Daily expiry check", ["Alerts from 90 days; anniversary", "Renewal request drafted; deactivation"]),
         ("X1", 6, 5, .05, .1, .9, "id", "Consumers of the package", ["New Business, Renewal, Operations", "Other BDOI systems (product master)"]),

@@ -43,12 +43,11 @@ points:
   - {id: CR-CSH-101c, class: cr, match: "Proposed: disposition assigned within 2 working days"}
   - {id: CR-CSH-101d, class: cr, match: "Proposed: decided within 1 working day"}
   - {id: CR-CSH-101e, class: cr, match: "Proposed: 1 working day", exact: true}
-  - {id: CR-CSH-102, class: cr, match: "The e-mail addresses of the failed-run recipients setting"}
-  - {id: CR-CSH-103, class: cr, match: "The system shall let the user filter each list by status, receipt type, branch and date range and export the list to Excel."}
-  - {id: CR-CSH-104, class: cr, match: "the user may also choose an e-mail copy on Notification Settings"}
+  - {id: CR-CSH-102, class: cr, match: "the user may also choose an e-mail copy on Notification Settings"}
 
 crs:
   - cr: CR-CSH-101
+    brd_check: "None found: CSHID.024 asks to track the status of dispositions (pending, in process); no BRD line sets a time for posting or approval"
     ev: "not found for receipts: deadlines exist for claims, leads and collections only"
     title: "Time rules of the Cashiering stages: overdue marker and reminder"
     frs: "Appendix J (time rules); FRS.CSH.02.05, FRS.CSH.03.01, FRS.CSH.04.01, FRS.CSH.06.02"
@@ -66,40 +65,7 @@ crs:
     assumptions: "Four stages (posting, cancellation / reinstatement posting, disposition, approval); times as parameters; one reminder to the poster or approver; no escalation."
     basis: "Turnaround parts of the platform reused; Cashiering decision services and dashboard counts extended."
   - cr: CR-CSH-102
-    ev: "My Work: count of failed jobs; no e-mail to a recipient list"
-    title: "E-mail to a recipient list when a scheduled Cashiering run fails"
-    frs: "FRS.CSH.10.03; Appendix G (failed batch run)"
-    brd: "BRQID.006 (extends)"
-    tag: EXT
-    fl: "WFL-013 Partial (a failed job raises an in-app notification to the schedule administrators; no e-mail to a recipient list)"
-    built: "Yes: the e-mail to the failed-run recipients setting was prepared for BIBS in this project"
-    source: "FRS v3.2 Appendix G (failed batch run notice and its recipients)"
-    why: "The BRD asks that users are alerted when a run fails; an e-mail to named recipients makes sure a failed overnight run is seen before the business day starts."
-    ootb: "Partial in BrokerVerse OOTB; the effort is that of the missing part (e-mail to a recipient list)."
-    md: [0.5, 1.0, 0, 0.5, 0.5]
-    complexity: Low
-    priority: Medium
-    deps: "E-mail channel of BDOI"
-    assumptions: "One recipient list setting for all Cashiering runs; the in-app notice stays."
-    basis: "One mail service and one setting over the job scheduler of the platform."
-  - cr: CR-CSH-103
-    ev: "Receipts list: filters and PDF export only (no Excel)"
-    title: "Excel export of the Cashiering lists"
-    frs: "FRS.CSH.01.03.04"
-    brd: "CSHID.023 (extends)"
-    tag: EXT
-    fl: "BIL-016 Available (receipts register with filters); RPT-003 Partial. Disagreement: the Feature List says Available, the OOTB code exports the receipt list to PDF only"
-    built: "Yes: the Cashiering lists of BIBS export to Excel"
-    source: "FRS v3.2 FRS.CSH.01.03.04"
-    why: "Cashiers and Team Leaders work the lists in Excel for reconciliation and follow-up; the BRD asks for extracts of the reports, the FRS extends it to every list."
-    ootb: "Partial in BrokerVerse OOTB; the effort is that of the missing part (Excel export of the lists)."
-    md: [0.5, 1.0, 0.5, 0.5, 0.5]
-    complexity: Low
-    priority: Low
-    deps: "-"
-    assumptions: "Same columns as on the screen; up to the report row limit."
-    basis: "List services of the receipts module; export pattern of the reports module."
-  - cr: CR-CSH-104
+    brd_check: "None found: CSHID.019 AC7 asks for a notice when a document fails to print; no BRD line gives users a choice of channel"
     ev: "Notifications: in-app notices; no per-user choice of an e-mail copy"
     title: "Each user chooses an e-mail copy of the Cashiering notices"
     frs: "Appendix G (channel of each notice)"
@@ -116,6 +82,24 @@ crs:
     deps: "E-mail channel of BDOI"
     assumptions: "Choice per user and per notice type; default in-app only."
     basis: "Notification service of the platform; one settings screen."
+
+# BDOI FRS points first proposed as change requests and found to be covered, fully or partly, by a BRD line:
+# BRD requirements (black, in scope); their gap against the OOTB platform is delivery work, with planning effort.
+brd_deliver:
+- id: D-CSH-01
+  title: E-mail to a recipient list when a scheduled Cashiering run fails
+  brd: 'BRQID.005 AC5: ''System alerts users in case of failed data fetch or mismatched data''; BRQID.006 batch job processing'
+  frs: FRS.CSH.10.03; Appendix G (failed batch run)
+  fl: WFL-013 Partial (a failed job raises an in-app notification to the schedule administrators; no e-mail to a recipient list)
+  gap: Partial in BrokerVerse OOTB; the planning effort is that of the missing part (e-mail to a recipient list).
+  md: 2.5
+- id: D-CSH-02
+  title: Excel export of the Cashiering lists
+  brd: 'CSHID.017 AC4: ''Download reports in supported formats (e.g., PDF, Excel)''; CSHID.023 ''Capability to generate reports'''
+  frs: FRS.CSH.01.03.04
+  fl: 'BIL-016 Available (receipts register with filters); RPT-003 Partial. Disagreement: the Feature List says Available, the OOTB code exports the receipt list to PDF only'
+  gap: Partial in BrokerVerse OOTB; the planning effort is that of the missing part (Excel export of the lists).
+  md: 3.0
 
 brd_lines:
   - ["Non-functional: users", "HO 11, branches 5; TL / TH 5 + 5", "Appendix O CSH-NFR-01", "Covered"]

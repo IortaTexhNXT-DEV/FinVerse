@@ -28,7 +28,9 @@ V13 = DATA = yaml.safe_load((HERE / "brd03_v13.yaml").read_text(encoding="utf-8"
 sys.path.insert(0, str(HERE / "flows"))
 import render as flows  # noqa: E402
 
-GREEN, ORANGE = "2E7D32", "E65100"
+from colour_code import COLOURS  # noqa: E402  (the shared colours of the BDOI-template FRS)
+
+GREEN, ORANGE = COLOURS["green"], COLOURS["orange"]
 CORE = None
 V12M = None
 RPR_AFTER_COLOR = ["spacing", "w", "kern", "position", "sz", "szCs", "highlight", "u", "effect", "bdr", "shd",
@@ -252,6 +254,12 @@ def annex_y(a) -> None:
                 size=7.5)
         for tr in a.els[-2].findall(qn("w:tr"))[1:]:
             _colour(tr, ORANGE)
+        a.p("Points of BDOI's FRS checked and found to be covered, fully or partly, by a BRD line: they are BRD "
+            "requirements (black, in scope), not change requests; their gap against the OOTB platform is delivery "
+            "work, with a planning effort.")
+        rows = [[x["id"], x["title"], x["brd"], x["frs"], f"{x['md']:g}"] for x in DATA["brd_deliver"]]
+        a.table(["No.", "Point", "BRD line that covers it", "FRS reference", "Planning man-days"], rows,
+                [0.65, 1.7, 2.6, 1.35, 0.7], size=7.5)
         a.h2("Y.3 Points beyond the BRD available OOTB in iNXT BrokerVerse (green)")
         rows = [[p["id"], p["title"], p["frs"], p["fl"], "Available; no cost"] for p in V13["points"]
                 if p["class"] == "ootb"]
@@ -272,7 +280,7 @@ def annex_y(a) -> None:
     b.stats["brd_gaps"] = sum(1 for r in V13["brd_lines"] if r[3] == "Gap fixed")
 
 
-GREY, BLUE = "616161", "1565C0"
+GREY, BLUE = COLOURS["grey"], COLOURS["blue"]
 
 
 def scope_labels(b) -> int:
@@ -306,7 +314,7 @@ def scope_and_practice(a, ann: str, integrations: list, data_loads: list) -> Non
     a.els.append(head)
     a.p("Insurance-broking practices for this area that are not in the BRD, in this FRS or in the iNXT BrokerVerse OOTB "
         "platform. They are recommendations for the Business Unit, with an indicative effort; they are not change "
-        "requests and are not in the change request total.", color=BLUE)
+        "requests and are not in the change request total.", color=BLUE, keep_next=True)
     rows = [[r[0], r[1], r[2], r[3], f"{r[4]:g}"] for r in DATA["best_practice"]]
     a.table(["ID", "Practice", "Why it matters for a broker", "Priority", "Indicative man-days"], rows,
             [0.8, 2.6, 2.6, 0.7, 0.7], size=8)

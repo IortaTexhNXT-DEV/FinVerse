@@ -1118,8 +1118,11 @@ def write_estimate(wb, data: dict, version: str, frs_annex: str, scope_rows: lis
     wb.sheet("BRD items to deliver", [
         Column("brd", "BRD ID", 12, "BRD requirement"), Column("text", "BRD requirement", 60, "Text of the BRD"),
         Column("fit", "Fit", 16, "Fit class of the fit-gap workbook"),
-        Column("ootb", "What iNXT BrokerVerse offers out of the box", 60, "OOTB capability")],
-        _fitgap_to_deliver(fitgap),
+        Column("ootb", "What iNXT BrokerVerse offers out of the box", 60, "OOTB capability"),
+        Column("md", "Planning man-days", 12, "For the points of BDOI's FRS covered by a BRD line", kind="number")],
+        _fitgap_to_deliver(fitgap) + [{"brd": x["id"], "text": f"{x['title']} ({x['frs']}). BRD line: {x['brd']}",
+                                       "fit": "BRD point to deliver", "ootb": f"{x['fl']}. {x['gap']}", "md": x["md"]}
+                                      for x in data.get("brd_deliver", [])],
         description="BRD requirements not fully met by the OOTB platform: in-scope delivery work for planning, not CRs")
     ws = wb.wb.create_sheet("Assumptions")
     ws.sheet_view.showGridLines = False

@@ -2,9 +2,7 @@
 (FRS.CSH.01 to FRS.CSH.10, Appendices C, D, G, J, M, N, O, W) and the Operations BRD; CR tags from Appendix W."""
 
 CR_NEW = [("CR-CSH-101", "Time rules of the Cashiering stages: overdue marker and reminder"),
-          ("CR-CSH-104", "Each user chooses an e-mail copy of the notices")]
-CR_EXT = [("CR-CSH-102", "E-mail to a recipient list when a scheduled run fails (BRQID.006)"),
-          ("CR-CSH-103", "Excel export of the Cashiering lists (CSHID.023)")]
+          ("CR-CSH-102", "Each user chooses an e-mail copy of the notices")]
 BRD = [("NFR 10.07", "One session per device (Collections addendum)"),
        ("NFR 4.03", "Source / IP address in the audit log (CLM, CLXN, RI addenda)")]
 
@@ -23,7 +21,7 @@ def _grp(title, rows, kind):
 FOOT = f'''<div style="display:flex;gap:10px;font-size:11.5px;color:#1f2937">
 <div style="flex:1;border:1.5px solid #F9A825;border-radius:7px;padding:5px 9px;background:#FFFDF3">
 <div style="display:flex;gap:14px"><div style="flex:1">{_grp("Change requests &#8211; not in any BRD", CR_NEW, "")}
-{_grp("Change requests that extend a BRD requirement", CR_EXT, "EXT")}</div>
+</div>
 <div style="flex:1">{_grp("Already BRD requirements &#8211; not change requests", BRD, "BRD")}</div></div></div>
 <div style="width:300px;border:1.5px solid #c5ccd6;border-radius:7px;padding:6px 9px;line-height:1.55">
 <div><b style="color:#0D47A1">&#8594;</b> Process flow &nbsp; <b style="color:#EF6C00">&#8594;</b> Notice</div>
@@ -55,16 +53,16 @@ SPEC = dict(
         ("C4", 1, 4, .05, .58, .9, "req", "Unapplied disposition", ["Apply, refund, reverse; submit"]),
         ("A1", 2, 2, .05, .1, .9, "apr", "Post or return", ["Not the creator; series checked", "Number issued at posting"], ["CR-CSH-101"]),
         ("A2", 2, 4, .05, .1, .9, "apr", "Approve disposition / reversal", ["Team approval, not the submitter"]),
-        ("S0", 3, 0, .05, .05, .9, "sys", "Automatic payment processing", ["Rows matched to accounts", "Run report; failures alerted"], ["EXT:CR-CSH-102"]),
+        ("S0", 3, 0, .05, .05, .9, "sys", "Automatic payment processing", ["Rows matched to accounts", "Run report; failures alerted"]),
         ("SS", 3, 0, .05, .6, .9, "sys", "Session and access", ["Role menus; one session per device"], ["BRD:NFR 10.07"]),
         ("S1", 3, 3, .05, .05, .9, "sys", "Receipt issued and applied", ["AR / OR printed (batch print)", "Accounts paid; minimal balance, excess", "Accounting entries to the GL"]),
         ("S2", 3, 4, .05, .05, .9, "sys", "Unapplied payments", ["Pre-booked, unknown, excess", "Disposition status; ageing"]),
-        ("S3", 3, 2, .05, .62, .9, "ntf", "Notices", ["For posting, returned, decided", "E-mail copy by preference"], ["CR-CSH-104"]),
+        ("S3", 3, 2, .05, .62, .9, "ntf", "Notices", ["For posting, returned, decided", "E-mail copy by preference"], ["CR-CSH-102"]),
         ("S4", 3, 1, .05, .62, .9, "sys", "Number series", ["Maintained and authorised", "Warning before depletion"]),
         ("M1", 4, 4, .05, .1, .9, "id", "Own unit's unapplied", ["View and propose disposition"]),
         ("G1", 5, 4, .05, .1, .9, "id", "Payment reversal request", ["Accounting Controls, to the Cashiering TL"]),
         ("D1", 6, 5, .05, .1, .9, "id", "Refund paid", ["Returned to Cashiering for reversal"]),
-        ("R1", 7, 5, .05, .08, .9, "aud", "Reports and audit log", ["Daily cash reconciliation, unapplied", "Every action, user, time, IP address"], ["EXT:CR-CSH-103", "BRD:NFR 4.03"]),
+        ("R1", 7, 5, .05, .08, .9, "aud", "Reports and audit log", ["Daily cash reconciliation, unapplied", "Every action, user, time, IP address"], ["BRD:NFR 4.03"]),
     ],
     edges=[
         ["P1", "C1", "n", "", "down"], ["P2", "C2", "i", "", "down"], ["C2", "S0", "n", "", "down"],

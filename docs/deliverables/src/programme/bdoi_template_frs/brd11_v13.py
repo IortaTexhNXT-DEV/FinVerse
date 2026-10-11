@@ -42,7 +42,7 @@ ANNEX_LETTERS = {"workflow": "S", "emails": "T", "documents": "U", "reports": "V
 # ------------------------------------------------------------------------------------------- shared data
 def figure_numbers() -> dict[str, int]:
     """Figure numbers of the figures added in version 1.3, in the order they appear in the document."""
-    order = ["summary", "A", "J", "S", "W"]
+    order = ["summary", "A", "J", "N", "S", "W"]
     figs = sorted(FLOWS, key=lambda f: order.index(f["where"]))
     return {f["id"]: i for i, f in enumerate(figs, 1)}
 
@@ -154,11 +154,13 @@ def check_reports(rows: list[list[str]]) -> int:
 
 
 # ------------------------------------------------------------------------------------------- figures
-def figure_elements(b, figs: dict[str, Path], fid: str, nums: dict[str, int], max_h=8.4) -> list:
+def figure_elements(b, figs: dict[str, Path], fid: str, nums: dict[str, int], max_h=8.4, max_w=6.9) -> list:
     spec = next(f for f in FLOWS if f["id"] == fid)
-    els = [b.picture(figs[fid], max_w=6.9, max_h=max_h)]
+    read = spec["read"].replace("@E2E@", str(nums.get("brd11_fig_e2e_identity", ""))).replace(
+        "@SWIM@", str(nums.get("brd11_fig_e2e", "")))
+    els = [b.picture(figs[fid], max_w=max_w, max_h=max_h)]
     els.append(b.para(f"Figure {nums[fid]} - {spec['caption']}", italic=True, size=8.5, jc="center", space_after=40))
-    els.append(b.para(f"How to read it: {spec['read']} Traces to: {spec['brd']}.", size=8.5, space_after=160))
+    els.append(b.para(f"How to read it: {read} Traces to: {spec['brd']}.", size=8.5, space_after=160))
     b.stats["figures_added"] += 1
     return els
 
@@ -182,10 +184,10 @@ def add_summary(b, figs, nums, key_numbers: list[list[str]], q_rows: list[dict])
         for el in list(h):
             if el.tag != qn("w:pPr"):
                 h.remove(el)
+        # no forced page break: the summary follows the references on their page (no near-empty page)
         ppr = h.find(qn("w:pPr"))
-        if ppr is not None and ppr.find(qn("w:pageBreakBefore")) is None:
-            from build_brd11_bdoi_frs import ppr_insert  # noqa: PLC0415
-            ppr_insert(ppr, OxmlElement("w:pageBreakBefore"))
+        for pbb in ppr.findall(qn("w:pageBreakBefore")) if ppr is not None else []:
+            ppr.remove(pbb)
         h.append(b.run(text))
         return h
 
@@ -196,7 +198,15 @@ def add_summary(b, figs, nums, key_numbers: list[list[str]], q_rows: list[dict])
         return b.para(text, bold=True, keep_next=True, size=10.5, color="014EA9", space_after=60)
     els = [h2("Summary for the Business Unit Review"), body(s["intro"])]
     els += [sub("Scope on a page"), b.table(s["scope_header"], s["scope"], [2.6, 2.3, 2.5], size=8), b.para("")]
-    els += [sub("The process from end to end")] + figure_elements(b, figs, "brd11_fig_e2e", nums, max_h=7.6)
+    import brd11_v14 as v14  # noqa: PLC0415
+    anchor = find_par(b, "Business Requirements Mapping", "Heading 1")._p
+    sect = v14.governing_sect(anchor)
+    lw, lh = v14.landscape_size(sect)
+    els += [sub("The process from end to end"),
+            body(f"Figure {nums['brd11_fig_simple']}, on the page at the end of this section, shows User Access Maintenance on one page: who acts at each "
+                 f"stage, from the sign-in and the access request to the reports and the audit trail. The end-to-end "
+                 f"flow with the identity integration and the change requests is Figure {nums['brd11_fig_e2e_identity']} "
+                 f"in Annex N; the flow by persona is Figure {nums['brd11_fig_e2e']} in Annex A.")]
     els += [sub("Key numbers"), body(s["numbers_intro"]),
             b.table(["Item", "Number", "Where"], key_numbers, [3.6, 1.0, 2.8], size=8.5), b.para("")]
     rows = []
@@ -214,7 +224,8 @@ def add_summary(b, figs, nums, key_numbers: list[list[str]], q_rows: list[dict])
     n_check = len(REV["checklist"]["rows"])
     els.append(body(f"Before signing, the Business Unit confirms the {n_check} points of the review checklist in "
                     f"Annex AB."))
-    anchor = find_par(b, "Business Requirements Mapping", "Heading 1")._p
+    els += v14.landscape_page(sect, [sub("Simplified process flow")] + figure_elements(
+        b, figs, "brd11_fig_simple", nums, max_h=lh - 1.8, max_w=lw - 0.1))
     for el in els:
         anchor.addprevious(el)
 

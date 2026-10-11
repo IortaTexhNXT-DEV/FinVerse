@@ -1,8 +1,8 @@
-"""The review workbooks of BRD-11 User Access Maintenance that go with the FRS in BDOI's template v1.3.
+"""The review workbooks of BRD-11 User Access Maintenance that go with the FRS in BDOI's template v1.4.
 
     python docs/deliverables/src/programme/bdoi_template_frs/build_brd11_workbooks.py
 
-Builds the FRS v1.3 in memory first (build_brd11_bdoi_frs.build_review), so that every number of the workbooks is
+Builds the FRS v1.4 in memory first (build_brd11_bdoi_frs.build_review), so that every number of the workbooks is
 the number of the document, then writes:
 
   BDOI_Template_FRS/BRD-11_User_Access_Maintenance/
@@ -39,6 +39,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import brd_common_final as final  # noqa: E402
 import brd11_v13 as v13  # noqa: E402
+import brd11_v14 as v14  # noqa: E402
 import build_brd11_bdoi_frs as frs  # noqa: E402
 from brd11_xlsx import Column, ReviewWorkbook  # noqa: E402
 
@@ -54,6 +55,7 @@ DATES = {k: (v if isinstance(v, dt.date) else dt.date.fromisoformat(str(v))) for
 STATUS = ["Open", "Received", "Confirmed"]
 RESULT = ["Not run", "Pass", "Fail", "Blocked"]
 FRUM_RE = frs.FRUM_RE
+ACT = v14.ACTIVITIES
 
 
 def d(x) -> str:
@@ -210,7 +212,7 @@ def rc_cols():
         {"key": "id", "header": "ID", "width": 12, "mandatory": True, "format": "Text", "what": "Reference of the item (kept from the BDOI inputs workbook where it exists)"},
         {"key": "item", "header": "Item", "width": 28, "mandatory": True, "what": "What the item is about"},
         {"key": "brd", "header": "BRD ID", "width": 14, "what": "BRD requirement the item serves"},
-        {"key": "frs", "header": "FRS reference", "width": 16, "what": "FR item or annex of the FRS v1.3"},
+        {"key": "frs", "header": "FRS reference", "width": 16, "what": "FR item or annex of the FRS v1.4"},
         {"key": "need", "header": "What is needed", "width": 42, "mandatory": True, "what": "What the Business Unit provides or decides"},
         {"key": "fmt", "header": "Format of the answer", "width": 26, "mandatory": True, "what": "How to answer"},
         {"key": "example", "header": "Example", "width": 24, "what": "An example of an answer"},
@@ -239,7 +241,7 @@ def frs_table_text(ref: str) -> str:
 def build_requirements(data: Data) -> tuple[Path, dict]:
     wb = ReviewWorkbook("Business Unit Requirements Collection", doc_type="Requirements collection", brd="BRD-11",
                         version=META["version"], subtitle="BRD-11 User Access Maintenance - what the Business Unit "
-                                                          "provides for the FRS v1.3")
+                                                          "provides for the FRS v1.4")
     wb.cover_notes = ["Fill in the column BU response and set the Status of each row; questions go to the sheet "
                       "Questions and comments. Items keep the IDs of the BDOI Requirements and Inputs by BRD v1.2 "
                       "workbook where they exist."]
@@ -419,7 +421,7 @@ def build_requirements(data: Data) -> tuple[Path, dict]:
     for name, rows in sheets.items():
         ex = dict(rows[0], resp=rows[0]["example"] or "Confirmed", status="Received")
         wb.template_sheet(name, f"{name} – BRD-11 User Access Maintenance",
-                          [("Purpose", f"Items of the kind '{name}' the FRS v1.3 needs from the Business Unit."),
+                          [("Purpose", f"Items of the kind '{name}' the FRS v1.4 needs from the Business Unit."),
                            ("Who fills it in", owner[name]),
                            ("How it is used", "The project applies each confirmed answer to the FRS, the configuration or "
                                               "the templates; data go through the upload templates v1.2."),
@@ -435,12 +437,12 @@ def build_requirements(data: Data) -> tuple[Path, dict]:
         {"key": "answer", "header": "Answer of the project", "width": 50, "what": "Filled in by iorta TechNXT"},
         {"key": "status", "header": "Status", "width": 12, "values": STATUS, "what": "Open, Received, Confirmed"}]
     wb.template_sheet("Questions and comments", "Questions and comments", [
-        ("Purpose", "Any question or comment of the Business Unit on the items or on the FRS v1.3."),
+        ("Purpose", "Any question or comment of the Business Unit on the items or on the FRS v1.4."),
         ("Who fills it in", "Any reviewer; the project answers."), ("How it is used", "Answered within 3 working days."),
         ("Due", "Before the sign-off of the FRS."), ("Depends on", "-")], q_cols, [],
         {"no": 1, "ref": "NT-07", "q": "Can the e-mail also go to the unit head?", "by": "Process Owner", "date": "",
          "answer": "", "status": "Open"})
-    path = wb.save(FOLDER / "BIBS_Inputs_BRD-11_Business_Unit_Requirements_Collection_v1.0.xlsx")
+    path = wb.save(FOLDER / ("BIBS_Inputs_BRD-11_Business_Unit_Requirements_Collection_v" + META["version"] + ".xlsx"))
     return path, {"rows": sum(len(r) for r in sheets.values()), "sheets": len(sheets)}
 
 
@@ -504,7 +506,7 @@ def build_fitgap(data: Data) -> tuple[Path, dict]:
         Column("id", "BRD ID", 18, "BRD requirement ID (UAM-NFR-nn for the rows of section 6)"),
         Column("text", "BRD text", 44, "Requirement as printed in the BRD"),
         Column("group", "Function", 24, "Function of the BRD"),
-        Column("frum", "FR item (BDOI format)", 22, "FR items of the FRS v1.3"),
+        Column("frum", "FR item (BDOI format)", 22, "FR items of the FRS v1.4"),
         Column("features", "Feature list reference", 40, "Rows of the BIBS Feature List vs OOTB workbook"),
         Column("ootb", "What BIBS offers out of the box", 46, "Standard capability or configuration"),
         Column("best", "Insurance-broking best practice", 46, "Practice of the Philippine market and international broking"),
@@ -513,7 +515,7 @@ def build_fitgap(data: Data) -> tuple[Path, dict]:
         Column("impact", "Impact", 22, "Where it lands"),
         Column("env", "In the BIBS environment", 20, "Available / Partly available / Planned for")],
         rows, description="One row per BRD requirement")
-    path = wb.save(FOLDER / "BIBS_FitGap_BRD-11_BRD_vs_OOTB_vs_Best_Practice_v1.0.xlsx")
+    path = wb.save(FOLDER / ("BIBS_FitGap_BRD-11_BRD_vs_OOTB_vs_Best_Practice_v" + META["version"] + ".xlsx"))
     if {r["id"] for r in rows} < {rid for rid, _ in data.lines}:
         raise SystemExit("fit-gap lacks BRD IDs")
     return path, {"rows": len(rows), **counts}
@@ -531,20 +533,46 @@ def env_status(data: Data, frs_ua: list[str]) -> str:
 # ------------------------------------------------------------------------------------------------- 3 change requests
 def build_cr(data: Data) -> tuple[Path, dict]:
     wb = ReviewWorkbook("Change Request Register", doc_type="Change control", brd="BRD-11", version=META["version"],
-                        subtitle="BRD-11 User Access Maintenance - after the sign-off of the FRS v1.3")
+                        subtitle="BRD-11 User Access Maintenance - after the sign-off of the FRS v1.4")
     steps = [{"step": s[0], "what": s[1], "who": s[2], "record": s[3]} for s in REV["change_control"]["steps"]]
     wb.sheet("How to use", [Column("step", "Step", 12, "Step of the process"), Column("what", "What happens", 60, ""),
                             Column("who", "Who", 36, ""), Column("record", "Record in this workbook", 36, "")],
              steps, description="Raise -> assess -> approve -> schedule -> test -> close (FRS Annex AA)")
     rows = []
+    crs = {c["id"]: c for c in v14.V14["crs"]}
+    closed = v14.V14["closed"]
     for k, c in enumerate(WB["cr_candidates"], 1):
-        rows.append({"no": f"CR-UA-{k:03d}", "date": "09-Oct-2026", "by": "iorta TechNXT Project Team", "brd": c[1],
-                     "frs": c[0], "desc": f"{c[2]}: {c[3]}", "reason": c[4], "type": c[5], "scope": c[6],
-                     "schedule": c[7], "cost": c[8], "other": c[9], "tests": c[10], "priority": c[11],
-                     "status": "Candidate - for decision", "decision": "", "approved": "", "ddate": "", "drop": "",
-                     "linked": ", ".join(data.cases_of_item(c[0].split(",")[0])[:5]) if FRUM_RE.match(c[0]) else ""})
+        no = f"CR-UA-{k:03d}"
+        row = {"no": no, "date": "09-Oct-2026", "by": "iorta TechNXT Project Team", "brd": c[1],
+               "frs": c[0], "desc": f"{c[2]}: {c[3]}", "reason": c[4], "type": c[5], "scope": c[6],
+               "schedule": c[7], "cost": c[8], "other": c[9], "tests": c[10], "priority": c[11],
+               "status": "Candidate - for decision", "decision": "", "approved": "", "ddate": "", "drop": "",
+               "linked": ", ".join(data.cases_of_item(c[0].split(",")[0])[:5]) if FRUM_RE.match(c[0]) else ""}
+        if no in crs:
+            cr = crs[no]
+            row.update({"klass": "Change request (orange in the FRS)", "frs": cr["frs"], "brd": cr["brd"],
+                        "desc": f"{cr['title']}: {' '.join(cr['scope'].split())}", "reason": " ".join(cr["why"].split()),
+                        "type": "Beyond the BRD" if cr["source"] != "BDOI FRS v1.1" else "Added by BDOI's FRS",
+                        "cost": f"{v14.fmt(v14.days(cr['effort']))} man-days (CR Effort Estimate)",
+                        "priority": cr["priority"], "schedule": cr["complexity"] + " complexity"})
+        elif no in closed:
+            kind, ob, note = closed[no]
+            row.update({"klass": "Offered as standard (" + ob + ", green in the FRS)" if kind == "OOTB"
+                        else "BRD requirement (black in the FRS)", "status": "Closed",
+                        "decision": f"Not a change request (review of 11-Oct-2026): {note}", "ddate": "11-Oct-2026",
+                        "cost": "None", "approved": "iorta TechNXT Project Team (for BDOI confirmation)"})
+            if kind == "BRD":
+                row["brd"] = note.split(": ", 1)[1].split(" (")[0] if ": " in note else row["brd"]
+        else:
+            raise SystemExit(f"{no} is neither a change request nor closed in brd11_v14.yaml")
+        rows.append(row)
+    if {r["no"] for r in rows if r["status"] != "Closed"} != set(crs):
+        raise SystemExit("the open change requests of the register differ from Annex AA.2 of the FRS")
+    data.cr_rows = rows
     wb.sheet("Register", [
-        Column("no", "CR No.", 12, "Change request number"), Column("date", "Date raised", 12, "dd-Mmm-yyyy"),
+        Column("no", "CR No.", 12, "Change request number"),
+        Column("klass", "Classification (FRS v1.4)", 24, "Change request (orange) / offered as standard (green) / BRD requirement (black)"),
+        Column("date", "Date raised", 12, "dd-Mmm-yyyy"),
         Column("by", "Raised by", 18, "Name and role"), Column("brd", "BRD ID", 16, "BRD requirement"),
         Column("frs", "FRS reference", 16, "FR item or annex"), Column("desc", "Description", 46, "The change"),
         Column("reason", "Reason", 36, "Why"), Column("type", "Type", 18, "Kind of change", values=WB["cr_types"]),
@@ -555,7 +583,7 @@ def build_cr(data: Data) -> tuple[Path, dict]:
         Column("decision", "Decision", 24, "Decision of the approvers"), Column("approved", "Approved by", 18, ""),
         Column("ddate", "Decision date", 12, ""), Column("drop", "Target drop", 12, ""),
         Column("linked", "Linked test cases", 30, "Test cases of the Test Cases and Traceability workbook")],
-        rows, description="Candidate changes known at v1.3 (status Candidate - for decision) and new requests")
+        rows, description="Change requests known at v1.4 (status Candidate - for decision, effort in the CR Effort Estimate), the earlier candidates closed as BRD requirements or offered as standard, and new requests")
     form_cols = [
         {"key": "field", "header": "Field", "width": 30, "mandatory": True, "what": "Part of the assessment"},
         {"key": "value", "header": "Assessment", "width": 70, "mandatory": True, "what": "Filled in by the project"},
@@ -575,15 +603,153 @@ def build_cr(data: Data) -> tuple[Path, dict]:
     if len(dec) != data.b.stats["observations"]:
         raise SystemExit("decision log differs from Annex Q")
     wb.sheet("Decisions log", [
-        Column("no", "Annex Q No.", 14, "Row of Annex Q of the FRS v1.3"), Column("section", "Section", 8, ""),
+        Column("no", "Annex Q No.", 14, "Row of Annex Q of the FRS v1.4"), Column("section", "Section", 8, ""),
         Column("topic", "Topic", 26, ""), Column("proposal", "Proposed in the FRS", 60, ""),
         Column("by", "Decision by", 26, ""), Column("decision", "Decision", 30, "Adopt proposal / Keep BDOI text / Other"),
         Column("dby", "Decided by (name)", 18, ""), Column("ddate", "Date", 12, ""),
         Column("cr", "CR No. (if a change follows)", 14, ""),
         Column("status", "Status", 12, "", values=["Open", "Decided", "Withdrawn"], status=True)],
         dec, description="One row per observation of Annex Q, for the decision of the Business Unit")
-    path = wb.save(FOLDER / "BIBS_CR_BRD-11_Change_Request_Register_v1.0.xlsx")
+    path = wb.save(FOLDER / ("BIBS_CR_BRD-11_Change_Request_Register_v" + META["version"] + ".xlsx"))
     return path, {"candidates": len(rows), "decisions": len(dec)}
+
+
+# ------------------------------------------------------------------------------------------- 3b CR effort estimate
+def build_effort(data: Data) -> tuple[Path, dict]:
+    """The change requests of the FRS v1.4 (orange points) with their effort by activity, the points beyond the BRD
+    offered as standard (green, no cost), the in-scope items to deliver, and the assumptions with the day rate."""
+    from openpyxl.styles import Font, PatternFill  # noqa: PLC0415
+    from openpyxl.workbook.defined_name import DefinedName  # noqa: PLC0415
+
+    V = v14.V14
+    wb = ReviewWorkbook("CR Effort Estimate", doc_type="Change requests - effort", brd="BRD-11", version="1.0",
+                        subtitle="BRD-11 User Access Maintenance - change requests of the FRS v1.4 with their effort")
+    wb.legend = [("Change request", "In no BRD and not offered by the standard system (orange in the FRS)"),
+                 ("Offered as standard", "Not in the BRD, offered by the standard system at no cost (green in the FRS)"),
+                 ("BRD requirement", "In scope; delivered without a change request (black in the FRS)")]
+    first = 5                      # first data row of every sheet (title band in rows 1-3, header in row 4)
+    n = len(V["crs"])
+    last = first + n - 1
+    # ---------------------------------------------------------------- Summary (formulas on the other sheets)
+    summary = []
+    for i, c in enumerate(V["crs"]):
+        r = first + i
+        summary.append({"item": f"{c['id']} {c['title']}", "days": f"='CR Effort'!N{r}",
+                        "low": f"='CR Effort'!O{r}", "high": f"='CR Effort'!P{r}", "cost": f"='CR Effort'!U{r}",
+                        "note": f"{c['priority']} priority; {c['complexity']} complexity"})
+    tot = first + n
+    summary.append({"item": f"Total of the {n} change requests", "days": f"=SUM(B{first}:B{tot - 1})",
+                    "low": f"=SUM(C{first}:C{tot - 1})", "high": f"=SUM(D{first}:D{tot - 1})",
+                    "cost": f'=IF(DayRate="","",SUM(E{first}:E{tot - 1}))',
+                    "note": "Cost appears when the day rate is entered on the sheet Assumptions"})
+    summary.append({"item": f"Points beyond the BRD offered as standard ({len(V['ootb'])})", "days": 0, "low": 0,
+                    "high": 0, "cost": 0, "note": "No change request, no cost (sheet Beyond the BRD - OOTB)"})
+    summary.append({"item": f"BRD requirements to deliver ({len(V['brd_to_deliver'])}, in scope)",
+                    "days": f"=SUM('BRD items to deliver'!I{first}:I{first + len(V['brd_to_deliver']) - 1})",
+                    "low": "", "high": "", "cost": "Not charged", "note": "For planning only (FRS Annex AA.4)"})
+    ws = wb.sheet("Summary", [Column("item", "Item", 52, "Change request or group"),
+                              Column("days", "Man-days", 12, "Total effort (8-hour days)", kind="number"),
+                              Column("low", "Low (-20%)", 12, "Lower end of the range", kind="number"),
+                              Column("high", "High (+20%)", 12, "Upper end of the range", kind="number"),
+                              Column("cost", "Cost", 16, "Man-days x day rate (sheet Assumptions)", kind="amount"),
+                              Column("note", "Note", 50, "")],
+                  summary, description="Totals of the change requests of BRD-11 (FRS v1.4, Annex AA.2); figures by formula")
+    for r in range(first, first + len(summary)):
+        for col in "BCD":
+            ws[f"{col}{r}"].number_format = "0.0#"
+    for col in "ABCDE":
+        ws[f"{col}{tot}"].font = Font(name=ws[f"{col}{tot}"].font.name, bold=True)
+    # ---------------------------------------------------------------- CR Effort
+    rows = []
+    for i, c in enumerate(V["crs"]):
+        r = first + i
+        e = c["effort"]
+        rows.append({"no": c["id"], "title": c["title"], "frs": c["frs"], "brd": c["brd"], "source": c["source"],
+                     "why": " ".join(c["why"].split()), "ootb": c["ootb"], "scope": " ".join(c["scope"].split()),
+                     "a": e[0], "b": e[1], "f": e[2], "t": e[3], "d": e[4], "total": f"=SUM(I{r}:M{r})",
+                     "low": f"=ROUND(N{r}*(1-Accuracy),1)", "high": f"=ROUND(N{r}*(1+Accuracy),1)",
+                     "complexity": c["complexity"], "priority": c["priority"], "depends": c["depends"],
+                     "assumptions": c["assumptions"], "cost": f'=IF(DayRate="","",N{r}*DayRate)'})
+    rows.append({"no": "Total", "title": f"{n} change requests", **{k: f"=SUM({col}{first}:{col}{last})" for k, col in
+                 (("a", "I"), ("b", "J"), ("f", "K"), ("t", "L"), ("d", "M"), ("total", "N"), ("low", "O"),
+                  ("high", "P"))}, "cost": f'=IF(DayRate="","",SUM(U{first}:U{last}))'})
+    num = dict(kind="number", wrap=False)
+    ws = wb.sheet("CR Effort", [
+        Column("no", "CR No.", 11, "Change request number (Change Request Register)"),
+        Column("title", "Title", 26, ""), Column("frs", "FRS reference", 22, "FR item or annex of the FRS v1.4"),
+        Column("brd", "BRD reference", 20, "'Not in BRD' for every change request"),
+        Column("source", "Source", 18, "BDOI FRS v1.1 / best practice / iorta TechNXT"),
+        Column("why", "Why needed", 46, ""), Column("ootb", "OOTB status", 30, "What the standard system offers today"),
+        Column("scope", "Scope of the change", 46, ""),
+        Column("a", ACT[0], 11, "Man-days", **num), Column("b", ACT[1], 10, "Man-days", **num),
+        Column("f", ACT[2], 10, "Man-days", **num), Column("t", ACT[3], 10, "Man-days", **num),
+        Column("d", ACT[4], 13, "Man-days", **num), Column("total", "Total man-days", 11, "Formula", **num),
+        Column("low", "Low (-20%)", 10, "Formula", **num), Column("high", "High (+20%)", 10, "Formula", **num),
+        Column("complexity", "Complexity", 11, "", values=["Low", "Medium", "High"]),
+        Column("priority", "Priority", 10, "", values=["High", "Medium", "Low"]),
+        Column("depends", "Dependencies", 34, ""), Column("assumptions", "Assumptions", 34, ""),
+        Column("cost", "Cost", 14, "Total man-days x day rate", kind="amount")],
+        rows, description="One row per change request (orange point of the FRS v1.4); man-days of 8 hours, +-20%")
+    for r in range(first, last + 2):
+        for col in "IJKLMNOP":
+            ws[f"{col}{r}"].number_format = "0.0#"
+    for col in "ABIJKLMNOPU":
+        ws[f"{col}{last + 1}"].font = Font(name=ws[f"{col}{last + 1}"].font.name, bold=True)
+    orange = Font(name=ws["B5"].font.name, color=v14.COLOURS["orange"], bold=True)
+    for r in range(first, last + 1):
+        ws[f"A{r}"].font = orange
+        ws[f"B{r}"].font = orange
+    # ---------------------------------------------------------------- green items
+    green = [{"no": o[0], "point": o[1], "frs": o[2], "what": o[3], "note": o[4], "brd": "Not in BRD",
+              "ootb": "Offered as standard", "cost": 0} for o in V["ootb"]]
+    ws = wb.sheet("Beyond the BRD - OOTB", [
+        Column("no", "No.", 10, "OB-UA-nn"), Column("point", "Point", 30, ""), Column("frs", "FRS reference", 24, ""),
+        Column("brd", "BRD reference", 14, ""), Column("what", "What BDOI gets", 60, ""),
+        Column("ootb", "OOTB status", 18, ""), Column("cost", "Cost (man-days)", 12, "No change request", kind="number"),
+        Column("note", "Note", 40, "Former change request number, BRD it extends")],
+        green, description="Points of the FRS v1.4 that no BRD asks for and the standard system offers (green): no cost")
+    gfont = Font(name=ws["B5"].font.name, color=v14.COLOURS["green"], bold=True)
+    for r in range(first, first + len(green)):
+        ws[f"A{r}"].font = gfont
+        ws[f"B{r}"].font = gfont
+    # ---------------------------------------------------------------- BRD items to deliver
+    due = []
+    for i, t in enumerate(V["brd_to_deliver"]):
+        r = first + i
+        e = t["effort"]
+        due.append({"no": t["id"], "title": t["title"], "ref": t["ref"], "frs": t["frs"], "scope": t["scope"],
+                     "a": e[0], "b": e[1] + e[2], "t": e[3] + e[4], "total": f"=SUM(F{r}:H{r})", "cost": "Not charged"})
+    ws = wb.sheet("BRD items to deliver", [
+        Column("no", "No.", 11, ""), Column("title", "Item", 28, ""), Column("ref", "BRD reference", 30, ""),
+        Column("frs", "FRS reference", 22, ""), Column("scope", "What is delivered", 50, ""),
+        Column("a", "Analysis and design", 11, "Man-days", **num), Column("b", "Backend and frontend", 11, "Man-days", **num),
+        Column("t", "Testing and UAT support", 11, "Man-days", **num), Column("total", "Total man-days", 11, "Formula", **num),
+        Column("cost", "Cost", 14, "In scope")],
+        due, description="BRD requirements found in the validation of the FRS v1.4 (Annex X.2, AA.4): in scope, for planning")
+    for r in range(first, first + len(due)):
+        for col in "FGHI":
+            ws[f"{col}{r}"].number_format = "0.0#"
+    # ---------------------------------------------------------------- Assumptions with the rate cell
+    assum = [
+        {"item": "Man-day", "value": 8, "note": "Hours of work in one man-day"},
+        {"item": "Accuracy of the estimates", "value": 0.2, "note": "Plus or minus; the Low and High columns use it"},
+        {"item": "Day rate", "value": None, "note": "Enter the rate of one man-day (currency below); the costs are computed from it"},
+        {"item": "Currency", "value": "", "note": "For example PHP"},
+        {"item": "Basis", "value": "", "note": "Sized on the work needed in the standard iNXT BrokerVerse system as it stands on 11-Oct-2026: a point the system already offers is not a change request (sheet Beyond the BRD - OOTB)."},
+        {"item": "Activities", "value": "", "note": "Analysis and design (FRS update, rules), backend, frontend (screens), testing (test cases of the RTM, regression of the access functions), documentation and UAT support."},
+        {"item": "Not included", "value": "", "note": "Work of BDOI and BDOI IT (decisions, identity systems, infrastructure), data migration, training beyond the UAT support."},
+        {"item": "Validity", "value": "", "note": "Until the sign-off of the FRS v1.4; re-estimated when the decision of BDOI changes the scope of a change request."},
+    ]
+    ws = wb.sheet("Assumptions", [Column("item", "Assumption", 28, ""), Column("value", "Value", 14, "Enter the day rate here"),
+                                  Column("note", "Note", 90, "")],
+                  assum, description="Assumptions of the estimate; enter the day rate in the yellow cell")
+    ws["B6"].number_format = "0%"
+    ws["B7"].fill = PatternFill("solid", fgColor="FFF59D")
+    ws["B7"].number_format = "#,##0.00"
+    wb.wb.defined_names["DayRate"] = DefinedName("DayRate", attr_text="Assumptions!$B$7")
+    wb.wb.defined_names["Accuracy"] = DefinedName("Accuracy", attr_text="Assumptions!$B$6")
+    path = wb.save(FOLDER / "BIBS_CR_BRD-11_Effort_Estimate_v1.0.xlsx")
+    return path, {"crs": n, "man_days": v14.cr_total(), "ootb": len(green), "to_deliver": len(due)}
 
 
 # ------------------------------------------------------------------------------------------------- 4 RTM
@@ -625,18 +791,26 @@ def build_rtm(data: Data) -> tuple[Path, dict]:
     no_case = [r["id"] for r in trace_rows if r["n"] == 0]
     if no_case:
         raise SystemExit(f"BRD IDs without a test case: {no_case}")
+    marks = defaultdict(list)          # FR item -> change requests (orange) and points offered as standard (green)
+    for c in v14.V14["crs"]:
+        for it in FRUM_RE.findall(c["frs"]):
+            marks[it].append(f"{c['id']} (change request)")
+    for o in v14.V14["ootb"]:
+        for it in FRUM_RE.findall(o[2]):
+            marks[it].append(f"{o[0]} (offered as standard)")
     item_rows = []
     for it in data.items:
         ids = data.cases_of_item(it["id"])
         if not ids:
             raise SystemExit(f"{it['id']} has no test case")
         item_rows.append({"id": it["id"], "title": it["title"], "origin": it["origin"], "ac": len(it["ac"]),
+                          "beyond": "; ".join(marks.get(it["id"], [])) or "In the BRD",
                           "n": len(ids), "cases": ", ".join(ids[:12]) + (" ..." if len(ids) > 12 else "")})
     expected_total = frs.bibs_case_count() + data.b.stats["ac"]
     if len(cases) != expected_total:
         raise SystemExit("test case count differs from the FRS")
     wb = ReviewWorkbook("Test Cases and Traceability", doc_type="Requirements traceability", brd="BRD-11",
-                        version=META["version"], subtitle="BRD-11 User Access Maintenance - FRS in BDOI's template v1.3")
+                        version=META["version"], subtitle="BRD-11 User Access Maintenance - FRS in BDOI's template v1.4")
     summary = [
         {"what": "BRD requirement IDs", "n": len(data.lines), "proof": f"{sum(1 for r in trace_rows[:len(data.lines)] if r['n'])} with at least one test case (sheet Traceability)"},
         {"what": "Non-functional rows with a function", "n": len(trace_rows) - len(data.lines), "proof": "Each with at least one test case"},
@@ -650,15 +824,16 @@ def build_rtm(data: Data) -> tuple[Path, dict]:
              summary, description="Counts and the proof that every BRD ID and every FR item is covered")
     wb.sheet("Traceability", [
         Column("id", "BRD ID", 18, "BRD requirement ID"), Column("text", "BRD requirement", 44, ""),
-        Column("frum", "FR item (BDOI format)", 26, "FR items of the FRS v1.3"),
+        Column("frum", "FR item (BDOI format)", 26, "FR items of the FRS v1.4"),
         Column("n", "Test cases", 10, "Count"),
         Column("cases", "Test case IDs", 60, "Sheet Test cases"), Column("screens", "Screen", 30, "Screen of the FR"),
         Column("steps", "Walkthrough steps", 26, "Steps of the walkthrough users workbook")],
         trace_rows, description="BRD ID -> FR item -> test cases -> screen -> walkthrough step")
     wb.sheet("FR items", [Column("id", "FR item", 16, ""), Column("title", "Title", 44, ""), Column("origin", "Origin", 16, ""),
+                          Column("beyond", "Beyond the BRD (FRS v1.4 colour code)", 30, "CR-UA-nnn: change request (orange); OB-UA-nn: offered as standard (green)"),
                           Column("ac", "Acceptance criteria", 12, ""), Column("n", "Test cases", 10, ""),
                           Column("cases", "Test case IDs", 70, "")],
-             item_rows, description="Every FR item of the FRS v1.3 with its test cases")
+             item_rows, description="Every FR item of the FRS v1.4 with its test cases")
     case_cols = [
         Column("id", "Test case ID", 26, "TC-UA-nnn.c-ss: test condition c and its case ss; TC-FRUM-...-ACnn: acceptance criterion"),
         Column("title", "Title", 36, ""), Column("brd", "BRD ID", 22, ""), Column("frum", "FR item", 18, ""),
@@ -673,7 +848,14 @@ def build_rtm(data: Data) -> tuple[Path, dict]:
         Column("source", "Source", 22, "")]
     for c in cases:
         c.update({"result": "Not run", "tester": "", "date": "", "obs": "", "remarks": ""})
-    wb.sheet("Test cases", case_cols, cases, description="Test cases of the FRS v1.3 with the execution columns")
+    wb.sheet("Test cases", case_cols, cases, description="Test cases of the FRS v1.4 with the execution columns")
+    cr_rows = [{"no": r["no"], "klass": r["klass"], "title": r["desc"].split(":")[0], "frs": r["frs"], "brd": r["brd"],
+                "status": r["status"], "cases": r["linked"] or "-"} for r in data.cr_rows]
+    wb.sheet("Change requests", [
+        Column("no", "CR No.", 12, "Change Request Register"), Column("klass", "Classification (FRS v1.4)", 30, ""),
+        Column("title", "Title", 36, ""), Column("frs", "FRS reference", 28, ""), Column("brd", "BRD reference", 30, ""),
+        Column("status", "Status", 20, ""), Column("cases", "Linked test cases", 60, "")],
+        cr_rows, description="Every change request of the register with its FRS and BRD references and test cases")
     ans = answered_rows(data)
     wb.sheet("Answered in the BDOI FRS", [
         Column("ref", "Reference", 14, "CLR-UA, UQ, IQ, UA-Q, A-UA"), Column("q", "Question or assumption", 60, ""),
@@ -685,7 +867,7 @@ def build_rtm(data: Data) -> tuple[Path, dict]:
     wb.sheet("UAT entry and exit", [Column("kind", "Entry / exit", 12, ""), Column("no", "No.", 6, ""),
                                     Column("criterion", "Criterion", 100, ""),
                                     ], crit, description="UAT entry and exit criteria of BRD-11")
-    path = wb.save(FOLDER / "BIBS_RTM_BRD-11_Test_Cases_and_Traceability_v1.0.xlsx")
+    path = wb.save(FOLDER / ("BIBS_RTM_BRD-11_Test_Cases_and_Traceability_v" + META["version"] + ".xlsx"))
     return path, {"trace": len(trace_rows), "cases": len(cases), "answered": len(ans), "items": len(item_rows)}
 
 
@@ -749,7 +931,7 @@ def build_uat(data: Data) -> tuple[Path, dict]:
         Column("expected", "Expected result", 56, ""), Column("result", "Result", 10, "", values=RESULT, status=True),
         Column("tester", "Done by", 14, ""), Column("date", "Date", 12, ""), Column("remarks", "Remarks", 24, "")],
         script, description="The walkthrough of BRD-11 for the Business Unit (FRS Annex O)")
-    path = wb.save(FOLDER / "BIBS_UAT_BRD-11_Business_Unit_Walkthrough_Users_v1.0.xlsx")
+    path = wb.save(FOLDER / ("BIBS_UAT_BRD-11_Business_Unit_Walkthrough_Users_v" + META["version"] + ".xlsx"))
     return path, {"users": len(users), "steps": len(script)}
 
 
@@ -809,7 +991,7 @@ def build_coverage(data: Data) -> tuple[Path, dict]:
                      "in": ci["No"], "ipct": yi, "ippct": pi, "acs": len(ar), "ay": ca["Yes"], "ap": ca["Partly"],
                      "an": ca["No"], "apct": ya, "appct": pa})
     wb = ReviewWorkbook("FRS Coverage in BIBS", doc_type="Internal coverage", brd="BRD-11", version=META["version"],
-                        subtitle="BRD-11 User Access Maintenance - FRS in BDOI's template v1.3 (internal)",
+                        subtitle="BRD-11 User Access Maintenance - FRS in BDOI's template v1.4 (internal)",
                         classification="Internal - iorta TechNXT")
     wb.legend = [("Yes", "Available in the BIBS environment"), ("Partly", "Partly available (reason in the note)"),
                  ("No", "Planned for a later release (reason in the note)")]
@@ -819,19 +1001,19 @@ def build_coverage(data: Data) -> tuple[Path, dict]:
                          num("ippct", "% items available or partly", 16), num("acs", "Acceptance criteria", 14),
                          num("ay", "Yes"), num("ap", "Partly"), num("an", "No"), num("apct", "% criteria available", 14),
                          num("appct", "% criteria available or partly", 16)],
-             summ, description="Coverage of the FRS v1.3 in the BIBS environment, by item count and by acceptance criterion")
+             summ, description="Coverage of the FRS v1.4 in the BIBS environment, by item count and by acceptance criterion")
     st = ["Yes", "Partly", "No"]
     wb.sheet("FR items", [Column("group", "FR group", 12, ""), Column("id", "FR item", 16, ""), Column("title", "Title", 40, ""),
                           Column("origin", "Origin", 14, ""), Column("refs", "BIBS reference FR", 22, ""),
                           Column("status", "Available", 12, "", values=st, status=True),
                           Column("evidence", "Evidence", 60, ""), Column("note", "Note", 60, "")],
-             item_rows, description="Every FR item and sub-item of the FRS v1.3")
+             item_rows, description="Every FR item and sub-item of the FRS v1.4")
     wb.sheet("Acceptance criteria", [Column("group", "FR group", 12, ""), Column("id", "FR item", 16, ""),
                                      Column("no", "AC", 6, ""), Column("ac", "Acceptance criterion", 60, ""),
                                      Column("status", "Available", 12, "", values=st, status=True),
                                      Column("evidence", "Test case", 28, ""), Column("note", "Note", 50, "")],
-             ac_rows, description="Every acceptance criterion of the FRS v1.3")
-    path = wb.save(QUALITY / "BIBS_Coverage_BRD-11_FRS_Coverage_in_BIBS_v1.0.xlsx")
+             ac_rows, description="Every acceptance criterion of the FRS v1.4")
+    path = wb.save(QUALITY / ("BIBS_Coverage_BRD-11_FRS_Coverage_in_BIBS_v" + META["version"] + ".xlsx"))
     return path, {"items": len(item_rows), "acs": len(ac_rows), "all": summ[0]}
 
 
@@ -839,7 +1021,7 @@ def main() -> int:
     data = Data()
     FOLDER.mkdir(parents=True, exist_ok=True)
     results = {}
-    for name, fn in (("requirements", build_requirements), ("fitgap", build_fitgap), ("cr", build_cr),
+    for name, fn in (("requirements", build_requirements), ("fitgap", build_fitgap), ("cr", build_cr), ("effort", build_effort),
                      ("rtm", build_rtm), ("uat", build_uat), ("coverage", build_coverage)):
         path, stats = fn(data)
         results[name] = stats

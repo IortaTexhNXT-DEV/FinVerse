@@ -1,0 +1,630 @@
+# Version 1.2 of BDOI's Renewal FRS: the review points of the Product Owner on v1.1 (11-Oct-2026). Read by
+# build_brd06_bdoi_frs.py (colour code, legend, Annex AJ rows, Annex AM.4, Annex AP.1) and build_brd06_workbooks.py
+# (CR effort estimate, CR register, RTM). Business words only.
+#
+#   green   points of this FRS that are not in the Renewal BRD or the signed Concept Paper and that the iNXT BrokerVerse platform
+#           edition offers out of the box (Feature List: Available or OOTB extra; no cost); `frrn` colours BDOI's text of that item, `match` colours the annex row holding
+#           the text. Baseline: column "OOTB platform" of the Feature List vs OOTB workbook (sheet Feature Comparison), not
+#           the BIBS work of this project.
+#   orange  points neither in the BRD nor Available in the platform edition (Partial, Not available, BDOI-specific or
+#           not in the feature list): each is a change request with its effort, also when already prepared for BIBS.
+#   Points of the BRD stay black. A requirement of another BRD of the programme (for example the non-functional
+#   requirements of the Collections, Claims and Reinsurance addenda) is a BRD requirement, not a new point.
+
+#   integration / data_migration: interfaces and migration items - grey label, not change requests.
+#   best_practice: blue recommendations (Annex AP.2), excluded from the CR totals.
+
+version: '1.2'
+date: 11 Oct 2026
+colours:
+  green: 2E7D32
+  orange: E65100
+revision:
+  date: 11 Oct 2026
+  version: '1.2'
+  description: 'Review of the Product Owner on version 1.1: colour code of the points beyond the BRD (green out of the box,
+    orange change request) with its legend; Annex AP.1 lists them with the effort of each change request (CR effort workbook);
+    the requirement lines of the BRD and the signed Concept Paper validated end to end (Annex AM.4); the programme non-functional
+    requirements of the other BRDs that also apply to Renewal (Annex AJ); the environment of the screenshots and walkthroughs;
+    figure captions kept with their figures'
+  by: iorta TechNXT Project Team (drafting support); for review by Angela V. Ramirez
+legend:
+  title: How to read this document
+  intro: 'The colour of a point tells where it comes from and whether it costs a change:'
+  items:
+  - - black
+    - 'Black: in the Renewal BRD (or the signed Concept Paper, or a programme-wide requirement of another BRD); in scope.'
+  - - green
+    - 'Green: not in the BRD, from BDOI''s FRS; offered by the iNXT BrokerVerse platform out of the box, at no cost (Annex
+      AP.1).'
+  - - orange
+    - 'Orange: not in the BRD and not (or only partly) in the iNXT BrokerVerse platform; a change request with its effort
+      (Annex AP.1; CR Effort Estimate workbook).'
+  - - grey
+    - '[Integration scope] / [Data Migration scope]: an interface with an external system or a migration item, delivered in
+      that scope; not a change request (Annex AP.1).'
+  - - blue
+    - 'Blue: insurance-broking best practice not in the BRD, this FRS or the platform; a recommendation with indicative effort,
+      not a commitment (Annex AP.2).'
+  note: Out of the box means the iNXT BrokerVerse platform edition (its code and manual), cross-checked with the Feature List
+    vs OOTB workbook; the work prepared for BIBS in this project is not out of the box.
+environment: 'BIBS DEV environment: https://dev.brokerverse.cloud'
+green:
+- id: G-09
+  frrn: FRRN.014.03
+  title: Allocation to several insurers by percentage or amount
+  brd: BRRN.040
+  source: BDOI's FRS
+  ootb: 'iNXT BrokerVerse standard: Insurer allocation on the renewal account by percentage or amount'
+  cr: CR-RN-009
+  feature: QPL-016
+  ootb_status: Available
+  evidence: Placement participants with insurer shares (Placement)
+- id: G-19
+  frrn: FRRN.022.01
+  title: Renewal Advice per line; first and last notice set by the system
+  brd: BRRN.010
+  source: BDOI's FRS (Annex L)
+  ootb: 'iNXT BrokerVerse standard: BDOI''s Renewal Advice templates per line; notice set from the days before expiry (setting,
+    Annex AO C13)'
+  cr: CR-RN-019
+  feature: RNW-022
+  ootb_status: Available
+  evidence: Renewal Batch with first, second and final notices from templates (Operations > Renewals)
+- id: G-23
+  frrn: FRRN.043.01
+  title: Audit Logs menu with filters and export
+  brd: BRRN.021
+  source: BDOI's FRS
+  ootb: 'iNXT BrokerVerse standard: Audit Logs screen with filters and export'
+  cr: CR-RN-023
+  feature: RNW-037
+  ootb_status: Available
+  evidence: Audit trail module with filters (Administration > Audit)
+orange:
+- id: CR-RN-001
+  frrn: FRRN.010.01
+  frs: FRRN.010.01
+  title: Automatic assignment by team and sub-team (Annex F)
+  brd: Not in BRD (BRD 1.005, 3.005 (the Team Lead assigns))
+  source: BDOI's FRS
+  feature: RNW-012
+  ootb_status: Partial
+  built: 'Yes'
+  why: BDOI's FRS asks for it beyond the BRD; assignment and reassignment exist; automatic round-robin assignment of renewals
+    by team and sub-team (Annex F) is the missing part in the iNXT BrokerVerse platform edition.
+  ootb: 'Partial: Assignment and reassignment exist; automatic round-robin assignment of renewals by team and sub-team (Annex
+    F) is the missing part.'
+  effort:
+  - 1
+  - 2
+  - 1
+  - 1.5
+  - 0.5
+  complexity: Low
+  priority: High
+  type: Enhancement
+  dependencies: BDOI confirms the point is in scope (Change Request Register)
+  assumptions: Prepared for BIBS in this project; the effort is the value of the change for the missing part
+  evidence: Lead assignment rules only (Leads); renewal queue without automatic assignment (Operations > Renewals > Renewal
+    Queue)
+- id: CR-RN-002
+  frrn: FRRN.011.03
+  frs: FRRN.011.03
+  title: New Business account from an accepted referral
+  brd: Not in BRD (BRD 1.006 (transfer of the account))
+  source: BDOI's FRS
+  feature: RNW-013
+  ootb_status: Not available
+  built: 'Yes'
+  why: BDOI's FRS asks for it beyond the BRD; no transfer or referral of renewal accounts between units with acceptance in
+    the iNXT BrokerVerse platform edition.
+  ootb: 'Not available: No transfer or referral of renewal accounts between units with acceptance.'
+  effort:
+  - 1.5
+  - 4
+  - 2
+  - 2
+  - 0.5
+  complexity: Medium
+  priority: Medium
+  type: Enhancement
+  dependencies: BDOI confirms the point is in scope (Change Request Register)
+  assumptions: Prepared for BIBS in this project; the effort is the value of the change for the missing part
+  evidence: not found (no transfer or referral of renewals between units)
+- id: CR-RN-003
+  frrn: FRRN.002.02.01
+  frs: FRRN.002.02.01
+  title: Marketing dashboard metrics (budget, pipeline, closing ratio, top deals, persistency, product mix)
+  brd: Not in BRD (BRD 1.009.7 (accounts per officer))
+  source: BDOI's FRS
+  feature: RNW-032; ACC-023
+  ootb_status: Partial
+  built: 'Yes'
+  why: BDOI's FRS asks for it beyond the BRD; renewal dashboards are standard; the budget, closing ratio, top deals, persistency
+    and product mix metrics of BDOI are not in the iNXT BrokerVerse platform edition.
+  ootb: 'Partial: Renewal dashboards are standard; the budget, closing ratio, top deals, persistency and product mix metrics
+    of BDOI are not.'
+  effort:
+  - 1
+  - 3
+  - 3
+  - 2
+  - 0.5
+  complexity: Medium
+  priority: Medium
+  type: Enhancement
+  dependencies: BDOI confirms the point is in scope (Change Request Register)
+  assumptions: Prepared for BIBS in this project; the effort is the value of the change for the missing part
+  evidence: Renewal Queue dashboard counters (total, due soon, at risk, grace); no budget, closing ratio, persistency or product
+    mix
+- id: CR-RN-004
+  frrn: FRRN.003.02
+  frs: FRRN.003.02
+  title: Processing dashboard cards and drill-downs
+  brd: Not in BRD (BRD 3.010.7)
+  source: BDOI's FRS
+  feature: QPL-032
+  ootb_status: Partial
+  built: 'Yes'
+  why: BDOI's FRS asks for it beyond the BRD; placement reports exist; the processing cards and drill-downs of BDOI are not
+    in the iNXT BrokerVerse platform edition.
+  ootb: 'Partial: Placement reports exist; the processing cards and drill-downs of BDOI are not.'
+  effort:
+  - 1
+  - 3
+  - 3
+  - 2
+  - 0.5
+  complexity: Medium
+  priority: Medium
+  type: Enhancement
+  dependencies: BDOI confirms the point is in scope (Change Request Register)
+  assumptions: Prepared for BIBS in this project; the effort is the value of the change for the missing part
+  evidence: Placement screens without processing cards or drill-downs
+- id: CR-RN-005
+  frrn: FRRN.042.01
+  frs: FRRN.042.01
+  title: Annual renewal budget maintenance, upload, inquiry and history
+  brd: Not in BRD (BRD 1.009.7 (dashboard))
+  source: BDOI's FRS
+  feature: ACC-023
+  ootb_status: Not available
+  built: 'Yes'
+  why: BDOI's FRS asks for it beyond the BRD; no budget maintenance, upload, inquiry or history in the iNXT BrokerVerse platform
+    edition.
+  ootb: 'Not available: No budget maintenance, upload, inquiry or history.'
+  effort:
+  - 1.5
+  - 4
+  - 3
+  - 2
+  - 0.5
+  complexity: Medium
+  priority: Medium
+  type: Enhancement
+  dependencies: BDOI confirms the point is in scope (Change Request Register)
+  assumptions: Prepared for BIBS in this project; the effort is the value of the change for the missing part
+  evidence: not found (budget exists only on win-back campaigns)
+- id: CR-RN-006
+  frrn: FRRN.039.02
+  frs: FRRN.039.02
+  title: KYC monitoring statuses, history and dashboard
+  brd: Not in BRD (BRRN.028 (KYC flag))
+  source: BDOI's FRS
+  feature: RNW-010; CRM-010
+  ootb_status: Partial
+  built: 'Yes'
+  why: BDOI's FRS asks for it beyond the BRD; a periodic KYC review list is standard; the KYC monitoring statuses, history
+    and dashboard of Renewal are not in the iNXT BrokerVerse platform edition.
+  ootb: 'Partial: A periodic KYC review list is standard; the KYC monitoring statuses, history and dashboard of Renewal are
+    not.'
+  effort:
+  - 1
+  - 3
+  - 2
+  - 2
+  - 0.5
+  complexity: Medium
+  priority: Medium
+  type: Enhancement
+  dependencies: BDOI confirms the point is in scope (Change Request Register)
+  assumptions: Prepared for BIBS in this project; the effort is the value of the change for the missing part
+  evidence: 'AML: KYC refresh due list; no renewal KYC monitoring statuses or dashboard'
+- id: CR-RN-008
+  frrn: FRRN.009.01
+  frs: FRRN.009.01
+  title: CBG Motor automatic update (depreciation, BI / PD tiers, Auto Promo to Regular)
+  brd: Not in BRD (BRRN.039)
+  source: BDOI's FRS (Annexes D, E)
+  feature: Not in the feature list
+  ootb_status: BDOI-specific
+  built: 'Yes'
+  why: BDOI's FRS (Annexes D, E) asks for it beyond the BRD; bDOI rules for CBG Motor renewals (Annexes D, E) in the iNXT
+    BrokerVerse platform edition.
+  ootb: 'BDOI-specific: BDOI rules for CBG Motor renewals (Annexes D, E).'
+  effort:
+  - 2
+  - 5
+  - 1
+  - 3
+  - 0.5
+  complexity: High
+  priority: High
+  type: Enhancement
+  dependencies: BDOI confirms the point is in scope (Change Request Register)
+  assumptions: Prepared for BIBS in this project; the effort is the value of the change for the missing part
+  evidence: not found
+- id: CR-RN-010
+  frrn: FRRN.014.05
+  frs: FRRN.014.05
+  title: Direct-to-Insurer Payment approval (blanket or Unit Head)
+  brd: Not in BRD (BRRN.040)
+  source: BDOI's FRS
+  feature: POL-016; REM-019
+  ootb_status: Partial
+  built: 'Yes'
+  why: BDOI's FRS asks for it beyond the BRD; direct-payment accounts are standard; the blanket or Unit Head approval of the
+    renewal is not in the iNXT BrokerVerse platform edition.
+  ootb: 'Partial: Direct-payment accounts are standard; the blanket or Unit Head approval of the renewal is not.'
+  effort:
+  - 1
+  - 2
+  - 1
+  - 1.5
+  - 0.5
+  complexity: Low
+  priority: Medium
+  type: Enhancement
+  dependencies: BDOI confirms the point is in scope (Change Request Register)
+  assumptions: Prepared for BIBS in this project; the effort is the value of the change for the missing part
+  evidence: not found (direct payment only in commission computation)
+- id: CR-RN-011
+  frrn: FRRN.036.03
+  frs: FRRN.036.03
+  title: Hold cover automation (CBG at 75 days, extensions, CBG Home on the 15th)
+  brd: Not in BRD (BRRN.042)
+  source: BDOI's FRS
+  feature: RNW-028
+  ootb_status: Partial
+  built: 'Yes'
+  why: BDOI's FRS asks for it beyond the BRD; cover notes of 30 days are standard; automatic CBG requests at 75 days, extensions
+    and insurer batches are not in the iNXT BrokerVerse platform edition.
+  ootb: 'Partial: Cover notes of 30 days are standard; automatic CBG requests at 75 days, extensions and insurer batches are
+    not.'
+  effort:
+  - 2
+  - 6
+  - 3
+  - 3
+  - 1
+  complexity: High
+  priority: High
+  type: Enhancement
+  dependencies: BDOI confirms the point is in scope (Change Request Register)
+  assumptions: Prepared for BIBS in this project; the effort is the value of the change for the missing part
+  evidence: Cover notes of 30 days from an accepted quotation (Cover Notes); no automatic CBG requests, extensions or batches
+- id: CR-RN-014
+  frrn: FRRN.033.01
+  frs: FRRN.033.01
+  title: E-policy batch processing (summary file and ZIP)
+  brd: Not in BRD (BRRN.040)
+  source: BDOI's FRS
+  feature: POL-009
+  ootb_status: Partial
+  built: 'Yes'
+  why: BDOI's FRS asks for it beyond the BRD; protected e-policy dispatch is partly standard; the summary file and ZIP receipt,
+    matching and batch sending are not in the iNXT BrokerVerse platform edition.
+  ootb: 'Partial: Protected e-policy dispatch is partly standard; the summary file and ZIP receipt, matching and batch sending
+    are not.'
+  effort:
+  - 1.5
+  - 4
+  - 2
+  - 2.5
+  - 0.5
+  complexity: Medium
+  priority: Medium
+  type: Enhancement
+  dependencies: BDOI confirms the point is in scope (Change Request Register)
+  assumptions: Prepared for BIBS in this project; the effort is the value of the change for the missing part
+  evidence: E-policy issue for packages; no summary file and ZIP receipt or batch sending
+- id: CR-RN-015
+  frrn: FRRN.29.05
+  frs: FRRN.29.05
+  title: Placement turnaround time (business days, With Issue, resolution date)
+  brd: Not in BRD (BRRN.040)
+  source: BDOI's FRS
+  feature: QPL-032 (no TAT feature)
+  ootb_status: Not available
+  built: 'Yes'
+  why: BDOI's FRS asks for it beyond the BRD; no placement turnaround time in business days with With Issue and resolution
+    date in the iNXT BrokerVerse platform edition.
+  ootb: 'Not available: No placement turnaround time in business days with With Issue and resolution date.'
+  effort:
+  - 1
+  - 3
+  - 1.5
+  - 2
+  - 0.5
+  complexity: Medium
+  priority: Medium
+  type: Enhancement
+  dependencies: BDOI confirms the point is in scope (Change Request Register)
+  assumptions: Prepared for BIBS in this project; the effort is the value of the change for the missing part
+  evidence: not found
+- id: CR-RN-016
+  frrn: FRRN.26.01
+  frs: FRRN.26.01
+  title: Second approval after acceptance
+  brd: Not in BRD (BRRN.040 (no delay))
+  source: BDOI's FRS
+  feature: RNW-016
+  ootb_status: Partial
+  built: 'Yes'
+  why: BDOI's FRS asks for it beyond the BRD; maker-checker on renewal terms is standard; Submitted for Approval after acceptance
+    is not in the iNXT BrokerVerse platform edition.
+  ootb: 'Partial: Maker-checker on renewal terms is standard; Submitted for Approval after acceptance is not.'
+  effort:
+  - 1
+  - 2
+  - 1.5
+  - 1.5
+  - 0.5
+  complexity: Low
+  priority: Medium
+  type: Enhancement
+  dependencies: BDOI confirms the point is in scope (Change Request Register)
+  assumptions: Prepared for BIBS in this project; the effort is the value of the change for the missing part
+  evidence: Maker-checker on other masters; no Submitted for Approval of an accepted renewal
+- id: CR-RN-017
+  frrn: FRRN.013.02
+  frs: FRRN.013.02
+  title: Nine insurer disposition values
+  brd: Not in BRD (BRRN.035 (three outcomes))
+  source: BDOI's FRS
+  feature: RNW-021
+  ootb_status: BDOI-specific
+  built: 'Yes'
+  why: BDOI's FRS asks for it beyond the BRD; bDOI's nine insurer values and their mapping to the BRD outcomes in the iNXT
+    BrokerVerse platform edition.
+  ootb: 'BDOI-specific: BDOI''s nine insurer values and their mapping to the BRD outcomes.'
+  effort:
+  - 1
+  - 2
+  - 1
+  - 1.5
+  - 0.5
+  complexity: Low
+  priority: Medium
+  type: Enhancement
+  dependencies: BDOI confirms the point is in scope (Change Request Register)
+  assumptions: Prepared for BIBS in this project; the effort is the value of the change for the missing part
+  evidence: not found (insurer responses not recorded as dispositions)
+- id: CR-RN-018
+  frrn: FRRN.006.01
+  frs: FRRN.006.01
+  title: Duplicate criteria per line and segment (Annex B)
+  brd: Not in BRD (BRRN.005)
+  source: BDOI's FRS
+  feature: POL-003
+  ootb_status: Partial
+  built: 'Yes'
+  why: BDOI's FRS asks for it beyond the BRD; duplicate account prevention is partly standard; criteria per line and segment
+    (Annex B) are not in the iNXT BrokerVerse platform edition.
+  ootb: 'Partial: Duplicate account prevention is partly standard; criteria per line and segment (Annex B) are not.'
+  effort:
+  - 1
+  - 2
+  - 0.5
+  - 1.5
+  - 0.5
+  complexity: Low
+  priority: Medium
+  type: Enhancement
+  dependencies: BDOI confirms the point is in scope (Change Request Register)
+  assumptions: Prepared for BIBS in this project; the effort is the value of the change for the missing part
+  evidence: Duplicate checks on journals and data load; none per line and segment on renewals
+- id: CR-RN-020
+  frrn: FRRN.024.01
+  frs: FRRN.024.01
+  title: Password convention of protected files
+  brd: Not in BRD (BRRN.010 (encrypt and add password))
+  source: BDOI's FRS
+  feature: RNW-023; QPL-031
+  ootb_status: Not available
+  built: 'Yes'
+  why: BDOI's FRS asks for it beyond the BRD; documents are sent as plain PDF; no password convention in the iNXT BrokerVerse
+    platform edition.
+  ootb: 'Not available: Documents are sent as plain PDF; no password convention.'
+  effort:
+  - 0.5
+  - 2
+  - 0.5
+  - 1
+  - 0.5
+  complexity: Low
+  priority: High
+  type: Enhancement
+  dependencies: BDOI confirms the point is in scope (Change Request Register)
+  assumptions: Prepared for BIBS in this project; the effort is the value of the change for the missing part
+  evidence: not found (documents sent as plain PDF)
+- id: CR-RN-022
+  frrn: FRRN.041.01
+  frs: FRRN.041.01
+  title: RMU Account Officer maintenance
+  brd: Not in BRD (BRRN.029)
+  source: BDOI's FRS
+  feature: RNW-009; INT-009
+  ootb_status: BDOI-specific
+  built: 'Yes'
+  why: BDOI's FRS asks for it beyond the BRD; bank-specific RMU Account Officer codes in the iNXT BrokerVerse platform edition.
+  ootb: 'BDOI-specific: Bank-specific RMU Account Officer codes.'
+  effort:
+  - 0.5
+  - 1.5
+  - 1.5
+  - 1
+  - 0.5
+  complexity: Low
+  priority: Low
+  type: Enhancement
+  dependencies: BDOI confirms the point is in scope (Change Request Register)
+  assumptions: Prepared for BIBS in this project; the effort is the value of the change for the missing part
+  evidence: not found
+- id: CR-RN-024
+  match: WCAG 2.2
+  frs: Annex AJ RN-NFR-16
+  title: Accessibility conformance (WCAG 2.2 level AA) of the Renewal screens
+  brd: Not in BRD
+  source: Programme register of non-functional requirements (NFR-ACC-01); market practice for bank systems
+  why: The BRD has no accessibility requirement; BDO's policies and the programme register expect screens usable with the
+    keyboard and a screen reader, with sufficient contrast. A conformance claim needs a check of every Renewal screen and
+    the corrections it finds.
+  ootb: 'Partly: the screens have labelled fields, keyboard navigation and the programme colours; no conformance check of
+    the Renewal screens against WCAG 2.2 AA and no conformance statement.'
+  effort:
+  - 2.0
+  - 0.0
+  - 12.0
+  - 4.0
+  - 2.0
+  complexity: Medium
+  priority: Medium
+  type: Enhancement
+  dependencies: BDOI confirms the accessibility standard (WCAG 2.2 AA or BDO's own); shared screen components of the programme
+  assumptions: 16 Renewal screens and their dialogs; corrections in the shared components benefit every module and are counted
+    once here; no change to the business rules
+  feature: NFR-021
+  ootb_status: Partial
+  built: 'No'
+  evidence: 'Partial: ARIA labels on many screens; no WCAG 2.2 AA conformance check or statement'
+programme_nfr:
+- - RN-NFR-17
+  - One session per device
+  - '"Limit the number of concurrent sessions to a single device; an opened session on a different device prompts a log-off
+    of the previous device session" (Collections addendum NFR 10.07; the same programme rule for every module)'
+  - 'Every sign-in is recorded in the session log; the single-device rule is a programme setting that BDOI confirms for all
+    modules (programme change CR-0025; discrepancy DCR-044: NFR 9.02 allows concurrent sessions)'
+  - FRRN.001.01
+  - NFR-SEC-05
+- - RN-NFR-18
+  - Audit source
+  - Each audit entry records the source of the event (workstation, device or IP address; behind a load balancer the original
+    address) (Claims, Collections and Reinsurance addenda NFR 4.03)
+  - Audit entries with the user, time, action and source address; read-only for every user
+  - FRRN.043.01
+  - NFR-AUD-01, NFR-AUD-02
+concept_paper:
+  intro: The signed Concept Paper proposed an early release of Renewal before the core cut-over. BDOI decided on 26-Sep-2026
+    that every module goes live together in January 2028; the points of the Concept Paper are traced below with that decision.
+  header:
+  - Concept Paper point
+  - Where in this FRS
+  - Status
+  rows:
+  - - Renewal intake and pipeline tracking; RMEL extract ingestion and validation
+    - FRRN.002, FRRN.004, FRRN.045
+    - Covered
+  - - Data sanitation and enrichment; RMEL data quality with exception handling (Annex C risk)
+    - FRRN.006 to FRRN.009, FRRN.040.02; Annex AC.4
+    - Covered
+  - - Disposition management
+    - FRRN.014 to FRRN.016, FRRN.020
+    - Covered
+  - - Proposal / quotation generation; TSU quotation capability
+    - FRRN.017 to FRRN.019 (Product Maintenance and New Business FRS for the quotation)
+    - Covered; TSU functions in their own FRS
+  - - Insurer engagement and approval tracking
+    - FRRN.013, FRRN.021, FRRN.029
+    - Covered
+  - - Renewal Advice generation; NAL and NRL processing
+    - FRRN.022 to FRRN.024; Annex AE
+    - Covered
+  - - Pre-placement adjustments
+    - FRRN.018.02, FRRN.025
+    - Covered
+  - - Submitted Policy and Free First Year renewal processing
+    - FRRN.048.01; FRRN.27.01
+    - Covered
+  - - 'Package remapping: design decision on upload or sanitation'
+    - FRRN.046.01 (at sanitation); Annex AO
+    - Covered; BDOI confirms (Concept Paper decision owner)
+  - - Early migration of the Client Master and reference data (LOV, MIS, insurer, branch, product)
+    - Annex AK
+    - Covered
+  - - 'User readiness: role-based training and a pilot or batch dry run'
+    - Annex AQ; walkthrough users workbook (Annex AL)
+    - Covered by the programme's training and UAT plan
+  - - Early release by 15-Aug-2027 for January to May 2028 expiries; no placement or booking before the January 2028 cut-over
+    - FRRN.045 (go-live take-over of expiries to 31-May-2028)
+    - 'Superseded by BDOI''s decision of 26-Sep-2026: single go-live in January 2028, so no pre-cut-over placement rule is
+      needed'
+integration:
+- id: CR-RN-007
+  frrn: FRRN.012.06
+  title: BDOFC and SOLD uploads and matching
+  scope: Integration scope
+  interface: BDOFC and BDOSOLD reports of BDO systems
+  brd: Not in BRD (BRRN.029)
+  note: 'Interface to an external system: delivered and costed in the Integration scope (Annex AH), not a change request'
+- id: CR-RN-012
+  frrn: FRRN.022.02
+  match: Through CCM when in scope
+  title: Delivery through CCM
+  scope: Integration scope
+  interface: CCM of BDO (client communications)
+  brd: Not in BRD (BRRN.010 (sending))
+  note: 'Interface to an external system: delivered and costed in the Integration scope (Annex AH), not a change request'
+- id: CR-RN-013
+  frrn: FRRN.29.03
+  title: MFT exchange with insurers
+  scope: Integration scope
+  interface: MFT with the insurers
+  brd: Not in BRD (BRRN.040)
+  note: 'Interface to an external system: delivered and costed in the Integration scope (Annex AH), not a change request'
+- id: CR-RN-021
+  frrn: FRRN.27.01
+  title: Scheduled CLPC billing (CBG Home, FFY Motor) and the e-mail of Annex S
+  scope: Integration scope
+  interface: CLPC billing files to BDO CBG Loan Services (LMS)
+  brd: Not in BRD (BRRN.040)
+  note: 'Interface to an external system: delivered and costed in the Integration scope (Annex AH), not a change request'
+data_migration: []
+labels:
+  integration: '[Integration scope]'
+  data_migration: '[Data Migration scope]'
+  colour: '616161'
+  blue: 1565C0
+best_practice:
+- id: BP-RN-01
+  practice: 'Suitability review at renewal: the officer confirms the client''s needs and covers are still adequate and records
+    the advice given'
+  why: Fair treatment of clients and market-conduct expectations of the Insurance Commission for intermediaries; protects
+    the broker against claims of poor advice
+  priority: High
+  effort: 6.0
+- id: BP-RN-02
+  practice: 'Remarketing check: renewals above a premium threshold or with a large premium increase are quoted with at least
+    one other insurer before the renewal is accepted'
+  why: The broker acts for the client (Insurance Code); shows best terms were sought, especially on hardening rates
+  priority: Medium
+  effort: 5.0
+- id: BP-RN-03
+  practice: 'Sum-insured adequacy prompt: property and motor renewals flag values not reviewed for two years or below an indexed
+    value'
+  why: Avoids underinsurance and average at claim time, a common cause of client disputes
+  priority: Medium
+  effort: 4.0
+- id: BP-RN-04
+  practice: 'Key-account renewal plan: accounts above a premium threshold get a stewardship review 120 days before expiry
+    with claims, service and market summary'
+  why: Retention of the largest corporate accounts; market practice of corporate brokers
+  priority: Low
+  effort: 5.0
+- id: BP-RN-05
+  practice: 'Remuneration disclosure on request: the Renewal Advice states that the commission or fee earned on the policy
+    is disclosed on request'
+  why: Transparency expected of intermediaries by the Insurance Commission and good conduct practice
+  priority: Low
+  effort: 2.0

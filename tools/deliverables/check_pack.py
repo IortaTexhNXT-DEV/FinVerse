@@ -135,6 +135,8 @@ TECHNICAL: list[tuple[str, re.Pattern]] = [(label, re.compile(pat, re.I)) for la
 # Phrases a client document may contain although they hold a technical term, each with its reason.
 TECHNICAL_ALLOWED: list[tuple[re.Pattern, str]] = [(re.compile(pat), why) for pat, why in [
     (r"Negative List Database System", "Name of the BDO system NLDS (BRD-10), not a technical term"),
+    (r"https://dev\.brokerverse\.cloud", "Address of the BIBS DEV environment where the Business Unit runs the "
+                                         "walkthroughs (product owner request of 11-Oct-2026); no other address"),
 ]]
 # Sources of the client documents in src/ (per BRD folder and the drop closure folders).
 CLIENT_SOURCES = ("FRS_*.md", "TP_*.md", "START_HERE_*.md", "HANDBOOK_*.md", "*_cases.yaml", "pack/*.yaml",

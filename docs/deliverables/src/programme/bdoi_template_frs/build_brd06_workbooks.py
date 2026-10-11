@@ -1,8 +1,8 @@
-"""The review workbooks of BRD-06 Renewal that go with the FRS in BDOI's template v1.1.
+"""The review workbooks of BRD-06 Renewal that go with the FRS in BDOI's template v1.2.
 
     python docs/deliverables/src/programme/bdoi_template_frs/build_brd06_workbooks.py
 
-Builds the FRS v1.1 in memory first (build_brd06_bdoi_frs.build_review), so that every number of the workbooks is the
+Builds the FRS v1.2 in memory first (build_brd06_bdoi_frs.build_review), so that every number of the workbooks is the
 number of the document, then writes:
 
   BDOI_Template_FRS/BRD-06_Renewal/
@@ -11,6 +11,7 @@ number of the document, then writes:
     BIBS_CR_BRD-06_Change_Request_Register_v1.0.xlsx                    change control, candidates, decision log
     BIBS_RTM_BRD-06_Test_Cases_and_Traceability_v1.0.xlsx               traceability and test cases
     BIBS_UAT_BRD-06_Business_Unit_Walkthrough_Users_v1.0.xlsx           walkthrough users and script
+    BIBS_CR_BRD-06_Effort_Estimate_v1.0.xlsx                            effort of the change requests (orange points)
   Quality/
     BIBS_Coverage_BRD-06_FRS_Coverage_in_BIBS_v1.0.xlsx                 internal: FRS coverage in the BIBS environment
 
@@ -42,6 +43,12 @@ import brd_common_final as final  # noqa: E402
 import build_brd06_bdoi_frs as frs  # noqa: E402
 from brd11_xlsx import Column, ReviewWorkbook  # noqa: E402
 
+V12 = frs.V12
+GREEN_OF = {g["cr"]: g for g in V12["green"]}
+ORANGE_OF = {o["id"]: o for o in V12["orange"]}
+INTEG_OF = {x["id"]: x for x in V12["integration"] + (V12.get("data_migration") or [])}
+FEATURE_XLSX = frs.REPO / "docs" / "deliverables" / "out" / "Programme" / "Feature_List" / "BIBS_BDOI_FeatureList_vs_OOTB_and_Best_Practice_v1.0.xlsx"
+ACTIVITIES = ["Analysis and design", "Back end", "Front end", "Testing", "Documentation and UAT support"]
 REPO = frs.REPO
 RN = frs.RN
 OUT = REPO / "docs" / "deliverables" / "out"
@@ -190,7 +197,7 @@ class Data:
                              f"the acceptance criterion and observe the result.",
                     "data": "TD-RN-01 Test users per Renewal role", "expected": ac,
                     "type": "Negative" if neg else "Positive", "priority": "High",
-                    "source": "Acceptance criterion of the FRS v1.1"})
+                    "source": "Acceptance criterion of the FRS v1.2"})
         if len(out) != self.b.stats["ac"]:
             raise SystemExit("acceptance criteria count differs from the FRS")
         return out
@@ -243,7 +250,7 @@ def rc_cols():
         {"key": "id", "header": "ID", "width": 12, "mandatory": True, "format": "Text", "what": "Reference of the item (kept from the BDOI inputs workbook where it exists)"},
         {"key": "item", "header": "Item", "width": 28, "mandatory": True, "what": "What the item is about"},
         {"key": "brd", "header": "BRD ID", "width": 14, "what": "BRD requirement the item serves"},
-        {"key": "frs", "header": "FRS reference", "width": 18, "what": "FR item or annex of the FRS v1.1"},
+        {"key": "frs", "header": "FRS reference", "width": 18, "what": "FR item or annex of the FRS v1.2"},
         {"key": "need", "header": "What is needed", "width": 44, "mandatory": True, "what": "What the Business Unit provides or decides"},
         {"key": "fmt", "header": "Format of the answer", "width": 26, "mandatory": True, "what": "How to answer"},
         {"key": "example", "header": "Example", "width": 24, "what": "An example of an answer"},
@@ -270,7 +277,7 @@ def input_row(data: Data, ref, item, brd, frsref, fmt, example, default_due, nee
 def build_requirements(data: Data):
     wb = ReviewWorkbook("Business Unit Requirements Collection", doc_type="Requirements collection", brd=BRD,
                         version=META["version"], subtitle="BRD-06 Renewal - what the Business Unit provides for the "
-                                                          "FRS v1.1")
+                                                          "FRS v1.2")
     wb.cover_notes = ["Fill in the column BU response and set the Status of each row; questions go to the sheet "
                       "Questions and comments. Items keep the IDs of the BDOI Requirements and Inputs by BRD v1.2 "
                       "workbook where they exist."]
@@ -415,7 +422,7 @@ def build_requirements(data: Data):
     for name, rows in sheets.items():
         ex = dict(rows[0], resp=rows[0]["example"] or "Confirmed", status="Received")
         wb.template_sheet(name, f"{name} – BRD-06 Renewal",
-                          [("Purpose", f"Items of the kind '{name}' the FRS v1.1 needs from the Business Unit."),
+                          [("Purpose", f"Items of the kind '{name}' the FRS v1.2 needs from the Business Unit."),
                            ("Who fills it in", owner[name]),
                            ("How it is used", "The project applies each confirmed answer to the FRS, the configuration or "
                                               "the templates; data go through the upload templates v1.2."),
@@ -431,7 +438,7 @@ def build_requirements(data: Data):
         {"key": "answer", "header": "Answer of the project", "width": 50, "what": "Filled in by iorta TechNXT"},
         {"key": "status", "header": "Status", "width": 12, "values": STATUS, "what": "Open, Received, Confirmed"}]
     wb.template_sheet("Questions and comments", "Questions and comments", [
-        ("Purpose", "Any question or comment of the Business Unit on the items or on the FRS v1.1."),
+        ("Purpose", "Any question or comment of the Business Unit on the items or on the FRS v1.2."),
         ("Who fills it in", "Any reviewer; the project answers."), ("How it is used", "Answered within 3 working days."),
         ("Due", "Before the sign-off of the FRS."), ("Depends on", "-")], q_cols, [],
         {"no": 1, "ref": "AE.22", "q": "Can the Renewal Advice e-mail also go to the Account Officer?",
@@ -508,9 +515,9 @@ def build_fitgap(data: Data):
         Column("id", "BRD ID", 18, "BRD requirement ID (RN-NFR-nn for the usage requirements)"),
         Column("text", "BRD text", 44, "Requirement as printed in the BRD"),
         Column("group", "Function", 24, "Function of the BRD"),
-        Column("frrn", "FR item (BDOI format)", 22, "FR items of the FRS v1.1"),
+        Column("frrn", "FR item (BDOI format)", 22, "FR items of the FRS v1.2"),
         Column("features", "Feature list reference", 40, "Rows of the BIBS Feature List vs OOTB workbook"),
-        Column("ootb", "What BIBS offers out of the box", 46, "Standard capability or configuration"),
+        Column("ootb", "What iNXT BrokerVerse offers out of the box", 46, "Standard capability or configuration of the iNXT BrokerVerse platform edition"),
         Column("best", "Insurance-broking best practice", 46, "Practice of the Philippine market and international broking"),
         Column("fit", "Fit", 16, "Fit class", values=WB["fit_values"], status=True),
         Column("rec", "Recommendation", 40, "What to do"),
@@ -526,18 +533,46 @@ def build_fitgap(data: Data):
 # ------------------------------------------------------------------------------------------------- 3 change requests
 def build_cr(data: Data):
     wb = ReviewWorkbook("Change Request Register", doc_type="Change control", brd=BRD, version=META["version"],
-                        subtitle="BRD-06 Renewal - after the sign-off of the FRS v1.1")
+                        subtitle="BRD-06 Renewal - after the sign-off of the FRS v1.2")
     steps = [{"step": s[0], "what": s[1], "who": s[2], "record": s[3]} for s in REV["change_control"]["steps"]]
     wb.sheet("How to use", [Column("step", "Step", 12, "Step of the process"), Column("what", "What happens", 60, ""),
                             Column("who", "Who", 36, ""), Column("record", "Record in this workbook", 36, "")],
              steps, description="Raise -> assess -> approve -> schedule -> test -> close (FRS Annex AP)")
     rows = []
     for k, c in enumerate(WB["cr_candidates"], 1):
-        rows.append({"no": f"CR-RN-{k:03d}", "date": "09-Oct-2026", "by": "iorta TechNXT Project Team", "brd": c[1],
+        no = f"CR-RN-{k:03d}"
+        g = GREEN_OF.get(no) or ORANGE_OF.get(no) or INTEG_OF.get(no)
+        if g is None or g["frrn"] != c[0]:
+            raise SystemExit(f"{no}: not in brd06_v12.yaml")
+        orange = no in ORANGE_OF
+        if no in INTEG_OF:
+            rows.append({"no": no, "date": "09-Oct-2026", "by": "iorta TechNXT Project Team", "brd": c[1], "frs": c[0],
+                         "desc": f"{c[2]}: {c[3]}", "reason": c[4], "type": "Integration", "scope": g["interface"],
+                         "schedule": "Integration plan", "cost": f"Not a CR - {g['scope']}", "other": c[9],
+                         "tests": c[10], "priority": c[11], "feature": "-", "colour": f"Grey label ({g['scope']})",
+                         "status": "Candidate - for decision", "decision": "", "approved": "", "ddate": "", "drop": "",
+                         "linked": ", ".join(data.cases_of_item(c[0])[:5])})
+            continue
+        rows.append({"no": no, "date": "09-Oct-2026", "by": "iorta TechNXT Project Team", "brd": c[1],
                      "frs": c[0], "desc": f"{c[2]}: {c[3]}", "reason": c[4], "type": c[5], "scope": c[6],
-                     "schedule": c[7], "cost": c[8], "other": c[9], "tests": c[10], "priority": c[11],
+                     "schedule": "To plan" if orange else "None",
+                     "cost": f"{sum(g['effort']):.1f} man-days (CR Effort Estimate)" if orange else "None - out of the box",
+                     "other": c[9], "tests": c[10], "priority": g["priority"] if orange else c[11],
+                     "feature": f"{g['feature']}: {g['ootb_status']}",
+                     "colour": "Orange" if orange else f"Green ({g['id']})",
                      "status": "Candidate - for decision", "decision": "", "approved": "", "ddate": "", "drop": "",
                      "linked": ", ".join(data.cases_of_item(c[0])[:5])})
+    for o in V12["orange"]:
+        if o["id"] in {r["no"] for r in rows}:
+            continue
+        md = sum(o["effort"])
+        rows.append({"no": o["id"], "date": "11-Oct-2026", "by": "iorta TechNXT Project Team", "brd": o["brd"],
+                     "frs": o["frs"], "desc": o["title"], "reason": " ".join(o["why"].split()), "type": o["type"],
+                     "scope": "Renewal screens", "schedule": "To plan", "cost": f"{md:.1f} man-days (CR Effort Estimate)",
+                     "other": "Shared screen components", "tests": "New accessibility checks", "priority": o["priority"],
+                     "feature": f"{o['feature']}: {o['ootb_status']}",
+                     "colour": "Orange", "status": "Candidate - for decision", "decision": "", "approved": "",
+                     "ddate": "", "drop": "", "linked": "-"})
     wb.sheet("Register", [
         Column("no", "CR No.", 12, "Change request number"), Column("date", "Date raised", 12, "dd-Mmm-yyyy"),
         Column("by", "Raised by", 18, "Name and role"), Column("brd", "BRD ID", 16, "BRD requirement"),
@@ -546,11 +581,13 @@ def build_cr(data: Data):
         Column("scope", "Impact on scope", 22, ""), Column("schedule", "Impact on schedule", 14, ""),
         Column("cost", "Impact on cost", 12, ""), Column("other", "Impact on other BRDs", 18, ""),
         Column("tests", "Impact on tests", 18, ""), Column("priority", "Priority", 10, "", values=["High", "Medium", "Low"]),
+        Column("feature", "Feature List ID / OOTB status", 22, "Feature List vs OOTB, column OOTB platform"),
+        Column("colour", "FRS colour", 14, "Green: beyond the BRD, out of the box (no cost); Orange: change request with effort; Grey: Integration or Data Migration scope"),
         Column("status", "Status", 20, "", values=WB["cr_status"], status=True),
         Column("decision", "Decision", 24, "Decision of the approvers"), Column("approved", "Approved by", 18, ""),
         Column("ddate", "Decision date", 12, ""), Column("drop", "Target drop", 12, ""),
         Column("linked", "Linked test cases", 30, "Test cases of the Test Cases and Traceability workbook")],
-        rows, description="Candidate changes known at v1.1 (status Candidate - for decision) and new requests")
+        rows, description="Candidate changes known at v1.2: green (out of the box, no cost) and orange (effort in the CR Effort Estimate workbook)")
     form_cols = [
         {"key": "field", "header": "Field", "width": 30, "mandatory": True, "what": "Part of the assessment"},
         {"key": "value", "header": "Assessment", "width": 70, "mandatory": True, "what": "Filled in by the project"},
@@ -571,7 +608,7 @@ def build_cr(data: Data):
     if len(dec) != data.b.stats["observations"]:
         raise SystemExit("decision log differs from Annex AO")
     wb.sheet("Decisions log", [
-        Column("no", "Annex AO No.", 14, "Row of Annex AO of the FRS v1.1"), Column("section", "Section", 8, ""),
+        Column("no", "Annex AO No.", 14, "Row of Annex AO of the FRS v1.2"), Column("section", "Section", 8, ""),
         Column("topic", "Topic", 26, ""), Column("proposal", "Proposed in the FRS", 60, ""),
         Column("by", "Decision by", 26, ""), Column("decision", "Decision", 30, "Adopt proposal / Keep BDOI text / Other"),
         Column("dby", "Decided by (name)", 18, ""), Column("ddate", "Date", 12, ""),
@@ -631,9 +668,10 @@ def build_rtm(data: Data):
         if not ids:
             raise SystemExit(f"{it['id']} has no test case")
         item_rows.append({"id": it["id"], "title": it["title"], "origin": it["origin"], "ac": len(it["ac"]),
+                          "scope": scope_of(it["id"]),
                           "n": len(ids), "cases": ", ".join(ids[:12]) + (" ..." if len(ids) > 12 else "")})
     wb = ReviewWorkbook("Test Cases and Traceability", doc_type="Requirements traceability", brd=BRD,
-                        version=META["version"], subtitle="BRD-06 Renewal - FRS in BDOI's template v1.1")
+                        version=META["version"], subtitle="BRD-06 Renewal - FRS in BDOI's template v1.2")
     n_brrn = len(data.brrn)
     summary = [
         {"what": "BRD requirement IDs (42 BRRN and the lines of the main BRD)", "n": len(data.brd_ids),
@@ -654,15 +692,16 @@ def build_rtm(data: Data):
              summary, description="Counts and the proof that every BRD ID and every FR item is covered")
     wb.sheet("Traceability", [
         Column("id", "BRD ID", 18, "BRD requirement ID"), Column("text", "BRD requirement", 44, ""),
-        Column("frrn", "FR item (BDOI format)", 26, "FR items of the FRS v1.1"),
+        Column("frrn", "FR item (BDOI format)", 26, "FR items of the FRS v1.2"),
         Column("n", "Test cases", 10, "Count"),
         Column("cases", "Test case IDs", 60, "Sheet Test cases"), Column("screens", "Screen", 30, "Screen of the FR"),
         Column("steps", "Walkthrough steps", 26, "Steps of the walkthrough users workbook")],
         trace_rows, description="BRD ID -> FR item -> test cases -> screen -> walkthrough step")
     wb.sheet("FR items", [Column("id", "FR item", 16, ""), Column("title", "Title", 44, ""), Column("origin", "Origin", 16, ""),
+                          Column("scope", "Scope (FRS colour)", 26, "BRD; or beyond the BRD: green G-nn (out of the box) / orange CR"),
                           Column("ac", "Acceptance criteria", 12, ""), Column("n", "Test cases", 10, ""),
                           Column("cases", "Test case IDs", 70, "")],
-             item_rows, description="Every FR item of the FRS v1.1 with its test cases")
+             item_rows, description="Every FR item of the FRS v1.2 with its test cases")
     case_cols = [
         Column("id", "Test case ID", 26, "TC-RN-nnn.c-ss: case ss of test condition nnn.c; TC-FRRN-...-ACnn: acceptance criterion"),
         Column("title", "Title", 36, ""), Column("brd", "BRD ID", 22, ""), Column("frrn", "FR item", 18, ""),
@@ -677,7 +716,7 @@ def build_rtm(data: Data):
         Column("source", "Source", 22, "")]
     for c in cases:
         c.update({"result": "Not run", "tester": "", "date": "", "obs": "", "remarks": ""})
-    wb.sheet("Test cases", case_cols, cases, description="Test cases of the FRS v1.1 with the execution columns")
+    wb.sheet("Test cases", case_cols, cases, description="Test cases of the FRS v1.2 with the execution columns")
     ans = answered_rows(data)
     wb.sheet("Answered in the BDOI FRS", [
         Column("ref", "Reference", 14, "RQ, CLR-RN, A-RN, D-RN, DMQ"), Column("q", "Question or assumption", 60, ""),
@@ -691,6 +730,145 @@ def build_rtm(data: Data):
              crit, description="UAT entry and exit criteria of BRD-06")
     path = wb.save(FOLDER / "BIBS_RTM_BRD-06_Test_Cases_and_Traceability_v1.0.xlsx")
     return path, {"trace": len(trace_rows), "cases": len(cases), "answered": len(ans), "items": len(item_rows)}
+
+
+def scope_of(item: str) -> str:
+    for g in V12["green"]:
+        if g.get("frrn") == item:
+            return f"Beyond BRD - out of the box ({g['id']}; {g['cr']})"
+    for o in V12["orange"]:
+        if o.get("frrn") == item:
+            return f"Beyond BRD - change request {o['id']} ({o['feature']}: {o['ootb_status']})"
+    for x in V12["integration"] + (V12.get("data_migration") or []):
+        if x.get("frrn") == item:
+            return f"Beyond BRD - {x['scope']} ({x['id']})"
+    return "BRD"
+
+
+# ------------------------------------------------------------------------------------------------- 3b CR effort
+def brd_items_to_deliver() -> list[dict]:
+    """The Renewal features of the Feature List that BDOI's BRD requires and the platform edition does not fully
+    offer: in-scope delivery work (planning), not change requests."""
+    wb = openpyxl.load_workbook(FEATURE_XLSX, read_only=True)
+    out = []
+    for r in wb["Feature Comparison"].iter_rows(min_row=5, values_only=True):
+        if r[0] and str(r[0]).startswith("RNW-") and str(r[5]).startswith(("Required", "Partly")) \
+                and r[8] != "Available":
+            refs = re.sub(r"[;,]?\s*FR-[A-Z]{2}-\d{3}(?:\s*(?:to|,)\s*FR-[A-Z]{2}-\d{3})*", "", str(r[6] or "")).strip(" ;,")
+            out.append({"id": r[0], "feature": r[3], "refs": refs or "-", "ootb": r[8], "note": r[10] or "-",
+                        "assessment": r[13]})
+    wb.close()
+    return out
+
+
+def build_effort(data: Data):  # noqa: ARG001
+    from openpyxl.styles import Font  # noqa: PLC0415
+    wb = ReviewWorkbook("CR Effort Estimate", doc_type="Change control", brd=BRD, version="1.0",
+                        subtitle="BRD-06 Renewal - change requests of the FRS v1.2 (orange points)")
+    first = 5
+    rows = []
+    for k, o in enumerate(V12["orange"]):
+        r = first + k
+        rows.append({"no": o["id"], "title": o["title"], "frs": o["frs"], "brd": o["brd"], "source": o["source"],
+                     "feature": f"{o['feature']}: {o['ootb_status']}", "evidence": o["evidence"], "built": o["built"],
+                     "why": " ".join(o["why"].split()),
+                     "a1": o["effort"][0], "a2": o["effort"][1], "a3": o["effort"][2], "a4": o["effort"][3],
+                     "a5": o["effort"][4], "total": f"=SUM(J{r}:N{r})", "cost": f"=O{r}*DayRate",
+                     "complexity": o["complexity"], "priority": o["priority"], "deps": o["dependencies"],
+                     "assume": o["assumptions"]})
+    last = first + len(rows) - 1
+    cols = [Column("no", "CR No.", 12, "Change request number of the register"), Column("title", "Title", 36, ""),
+            Column("frs", "FRS reference", 16, "Where the orange point is stated"),
+            Column("brd", "BRD reference", 22, "Not in BRD (what the BRD asks)"), Column("source", "Source", 20, ""),
+            Column("feature", "Feature List ID / OOTB status", 20, "Feature List vs OOTB, column OOTB platform"),
+            Column("evidence", "OOTB evidence (iNXT BrokerVerse)", 40, "Screen or module of the platform edition, or not found"),
+            Column("built", "Prepared for BIBS?", 10, "Prepared for BIBS in this project; the effort is still the value of the change"),
+            Column("why", "Why needed", 40, "")]
+    cols += [Column(f"a{i}", f"{a} (man-days)", 12, "Estimate in man-days", kind="percent") for i, a in
+             enumerate(ACTIVITIES, 1)]
+    cols += [Column("total", "Total man-days", 12, "Sum of the activities", kind="percent"),
+             Column("cost", "Cost (man-days x DayRate)", 16, "Total x the daily rate of sheet Assumptions", kind="amount"),
+             Column("complexity", "Complexity", 12, "", values=["Low", "Medium", "High"]),
+             Column("priority", "Priority", 10, "", values=["High", "Medium", "Low"]),
+             Column("deps", "Dependencies", 30, ""), Column("assume", "Assumptions", 40, "")]
+    # Summary first (formulas refer to the sheets written after it)
+    summ = [{"item": "Change requests (orange points)", "value": f"=COUNTA('CR Effort'!A{first}:A{last})"}]
+    for i, a in enumerate(ACTIVITIES):
+        letter = "JKLMN"[i]
+        summ.append({"item": f"{a} (man-days)", "value": f"=SUM('CR Effort'!{letter}{first}:{letter}{last})"})
+    summ += [{"item": "Total man-days of the change requests", "value": f"=SUM('CR Effort'!O{first}:O{last})"},
+             {"item": "Low estimate (-20%)", "value": f"=B{first + 6}*(1-Accuracy)"},
+             {"item": "High estimate (+20%)", "value": f"=B{first + 6}*(1+Accuracy)"},
+             {"item": "Cost at the daily rate", "value": f"=B{first + 6}*DayRate"},
+             {"item": "Green points (beyond the BRD, out of the box, no cost)", "value": len(V12["green"])},
+             {"item": "Integration and Data Migration scope (not change requests)",
+              "value": len(V12["integration"]) + len(V12.get("data_migration") or [])},
+             {"item": "Best practice (blue), indicative man-days - not in the totals",
+              "value": sum(x["effort"] for x in V12["best_practice"])}]
+    ws = wb.sheet("Summary", [Column("item", "Item", 56, ""), Column("value", "Value", 18, "", kind="percent")], summ,
+                  description="Totals of BRD-06 Renewal: change requests (orange), green, integration and best practice")
+    ws.cell(row=first + 9, column=2).number_format = "#,##0.00"
+    wb.sheet("CR Effort", cols, rows, description="One row per orange point of the FRS v1.2 (not in the BRD, not in the "
+                                                 "iNXT BrokerVerse platform edition), effort by activity")
+    green = [{"id": g["id"], "frrn": g.get("frrn", "-"), "title": g["title"], "brd": g["brd"], "source": g["source"],
+              "feature": f"{g['feature']}: {g['ootb_status']}", "evidence": g["evidence"], "cr": g["cr"], "cost": 0}
+             for g in V12["green"]]
+    wb.sheet("Beyond the BRD - OOTB", [
+        Column("id", "No.", 8, ""), Column("frrn", "FR item", 16, ""), Column("title", "Point", 44, ""),
+        Column("brd", "BRD (what it asks)", 30, ""), Column("source", "Source", 18, ""),
+        Column("feature", "Feature List ID / OOTB status", 20, "Feature List vs OOTB, column OOTB platform"),
+        Column("evidence", "OOTB evidence (iNXT BrokerVerse)", 50, "Screen or module of the platform edition"),
+        Column("cr", "Register", 12, "Candidate of the Change Request Register"),
+        Column("cost", "Man-days", 10, "Zero: out of the box", kind="percent")], green,
+        description="Points beyond the BRD that the iNXT BrokerVerse platform offers out of the box (green; no cost)")
+    integ = [{"id": x["id"], "frrn": x.get("frrn", "-"), "title": x["title"], "interface": x["interface"],
+              "scope": x["scope"], "note": x["note"]} for x in V12["integration"] + (V12.get("data_migration") or [])]
+    wb.sheet("Integration & DM scope", [
+        Column("id", "Register", 12, ""), Column("frrn", "FR item", 16, ""), Column("title", "Point", 40, ""),
+        Column("interface", "Interface or data", 40, ""), Column("scope", "Covered by", 20, ""),
+        Column("note", "Note", 60, "")], integ,
+        description="Points delivered in the Integration or Data Migration scope (grey label in the FRS): no CR cost here")
+    bp = [{"id": x["id"], "practice": x["practice"], "why": x["why"], "priority": x["priority"], "effort": x["effort"]}
+          for x in V12["best_practice"]]
+    wb.sheet("Best practice (blue)", [
+        Column("id", "ID", 10, ""), Column("practice", "Practice", 56, ""), Column("why", "Why it matters for a broker", 56, ""),
+        Column("priority", "Suggested priority", 12, "", values=["High", "Medium", "Low"]),
+        Column("effort", "Indicative man-days", 12, "Excluded from the CR totals", kind="percent")], bp,
+        description="Insurance-broking renewal practices not in the BRD, the FRS or the platform (Annex AP.2); recommendations")
+    deliver = brd_items_to_deliver()
+    wb.sheet("BRD items to deliver", [
+        Column("id", "Feature List ID", 12, ""), Column("feature", "Feature (BRD requirement)", 50, ""),
+        Column("refs", "BRD and FRS references", 40, ""), Column("ootb", "OOTB platform", 14, ""),
+        Column("note", "What the platform offers", 50, ""), Column("assessment", "Assessment", 14, "")], deliver,
+        description="BRD requirements not fully in the platform edition: in-scope delivery work for planning, not change requests")
+    assum = [{"item": "Hours per man-day", "value": 8},
+             {"item": "Daily rate (fill in, currency of the contract) - name DayRate", "value": 0},
+             {"item": "Estimate accuracy (plus or minus) - name Accuracy", "value": 0.2},
+             {"item": "Out of the box", "value": "The iNXT BrokerVerse platform edition (its code and manual), cross-checked "
+                                                  "with the Feature List vs OOTB workbook (column OOTB platform); the work "
+                                                  "prepared for BIBS in this project is not out of the box"},
+             {"item": "Basis", "value": "Effort for the missing part only, sized on the size of the Renewal work "
+                                         "prepared for BIBS (about 55,700 lines of rules and services, 83 screen "
+                                         "components)"},
+             {"item": "Not included", "value": "Integration and Data Migration scopes, infrastructure, licences, BDOI's "
+                                                "own testing time and travel"},
+             {"item": "Validity", "value": "Until the FRS is signed; re-estimated in the impact assessment form of "
+                                            "the Change Request Register"}]
+    ws = wb.sheet("Assumptions", [Column("item", "Assumption", 50, ""), Column("value", "Value", 70, "")], assum,
+                  description="Assumptions of the estimate; the daily rate (DayRate, B6) drives the cost columns")
+    ws["B6"].number_format = "#,##0.00"
+    ws["B6"].font = Font(bold=True, color="E65100")
+    ws["B7"].number_format = "0%"
+    from openpyxl.workbook.defined_name import DefinedName  # noqa: PLC0415
+    for name, ref in (("DayRate", "Assumptions!$B$6"), ("Accuracy", "Assumptions!$B$7")):
+        dn = DefinedName(name, attr_text=ref)
+        try:
+            wb.wb.defined_names[name] = dn
+        except TypeError:
+            wb.wb.defined_names.append(dn)
+    path = wb.save(FOLDER / "BIBS_CR_BRD-06_Effort_Estimate_v1.0.xlsx")
+    return path, {"orange": len(rows), "green": len(green), "integration": len(integ), "best_practice": len(bp),
+                  "deliver": len(deliver), "mandays": sum(sum(o["effort"]) for o in V12["orange"])}
 
 
 # ------------------------------------------------------------------------------------------------- 5 UAT users
@@ -816,7 +994,7 @@ def build_coverage(data: Data):
                      "in": ci["No"], "ipct": yi, "ippct": pi, "acs": len(ar), "ay": ca["Yes"], "ap": ca["Partly"],
                      "an": ca["No"], "apct": ya, "appct": pa})
     wb = ReviewWorkbook("FRS Coverage in BIBS", doc_type="Internal coverage", brd=BRD, version=META["version"],
-                        subtitle="BRD-06 Renewal - FRS in BDOI's template v1.1 (internal)",
+                        subtitle="BRD-06 Renewal - FRS in BDOI's template v1.2 (internal)",
                         classification="Internal - iorta TechNXT")
     wb.legend = [("Yes", "Available in the BIBS environment"), ("Partly", "Partly available (reason in the note)"),
                  ("No", "Planned for a later release (reason in the note)")]
@@ -826,18 +1004,18 @@ def build_coverage(data: Data):
                          num("ippct", "% items available or partly", 16), num("acs", "Acceptance criteria", 14),
                          num("ay", "Yes"), num("ap", "Partly"), num("an", "No"), num("apct", "% criteria available", 14),
                          num("appct", "% criteria available or partly", 16)],
-             summ, description="Coverage of the FRS v1.1 in the BIBS environment, by item count and by acceptance criterion")
+             summ, description="Coverage of the FRS v1.2 in the BIBS environment, by item count and by acceptance criterion")
     st = ["Yes", "Partly", "No"]
     wb.sheet("FR items", [Column("group", "FR group", 12, ""), Column("id", "FR item", 16, ""), Column("title", "Title", 40, ""),
                           Column("origin", "Origin", 14, ""), Column("refs", "BIBS reference FR", 22, ""),
                           Column("status", "Available", 12, "", values=st, status=True),
                           Column("evidence", "Evidence", 60, ""), Column("note", "Note", 60, "")],
-             item_rows, description="Every FR item and sub-item of the FRS v1.1")
+             item_rows, description="Every FR item and sub-item of the FRS v1.2")
     wb.sheet("Acceptance criteria", [Column("group", "FR group", 12, ""), Column("id", "FR item", 16, ""),
                                      Column("no", "AC", 6, ""), Column("ac", "Acceptance criterion", 60, ""),
                                      Column("status", "Available", 12, "", values=st, status=True),
                                      Column("evidence", "Test case", 28, ""), Column("note", "Note", 50, "")],
-             ac_rows, description="Every acceptance criterion of the FRS v1.1")
+             ac_rows, description="Every acceptance criterion of the FRS v1.2")
     path = wb.save(QUALITY / "BIBS_Coverage_BRD-06_FRS_Coverage_in_BIBS_v1.0.xlsx")
     return path, {"items": len(item_rows), "acs": len(ac_rows), "all": summ[0]}
 
@@ -845,7 +1023,7 @@ def build_coverage(data: Data):
 def main() -> int:
     data = Data()
     FOLDER.mkdir(parents=True, exist_ok=True)
-    for name, fn in (("requirements", build_requirements), ("fitgap", build_fitgap), ("cr", build_cr),
+    for name, fn in (("requirements", build_requirements), ("fitgap", build_fitgap), ("cr", build_cr), ("effort", build_effort),
                      ("rtm", build_rtm), ("uat", build_uat), ("coverage", build_coverage)):
         path, stats = fn(data)
         print(f"wrote {path.relative_to(REPO)} ({path.stat().st_size // 1024} KB): {stats}")

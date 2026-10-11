@@ -48,7 +48,8 @@ def figure_elements(b, figs: dict[str, Path], fid: str, max_h=8.4) -> list:
     spec = next(f for f in FLOWS if f["id"] == fid)
     n = figure_numbers()[fid]
     b.stats["figures_added"] += 1
-    return [b.picture(figs[fid], max_w=7.0, max_h=max_h),
+    from build_brd06_bdoi_frs import keep_with_next  # noqa: PLC0415
+    return [keep_with_next(b.picture(figs[fid], max_w=7.0, max_h=max_h)),
             b.para(f"Figure {n} - {spec['caption']}", italic=True, size=8.5, jc="center", space_after=40),
             b.para(f"How to read it: {spec['read']} Traces to: {spec['brd']}.", size=8.5, space_after=160)]
 
@@ -202,7 +203,7 @@ def add_summary(b, figs):
     els = [h2(intro["references_title"]), body(intro["references_intro"]),
            b.table(["Document", "Owner", "Use in this FRS"], intro["references"], [3.6, 1.5, 2.3], size=8),
            b.para("")]
-    els += [h2("Summary for the Business Unit Review", page=True), body(s["intro"])]
+    els += [h2("Summary for the Business Unit Review", page=False), body(s["intro"])]
     els += [sub("Scope on a page"), b.table(s["scope_header"], s["scope"], [2.7, 2.2, 2.5], size=8), b.para("")]
     els += [sub("The process from end to end")] + figure_elements(b, figs, "brd06_fig_e2e", max_h=8.0)
     els += [sub("Key numbers"), body(s["numbers_intro"]),
@@ -387,7 +388,12 @@ class NewAnnexes:
         a = self.a
         a.h1("Annex AJ – Non-functional Requirements")
         a.p(" ".join(x["intro"].split()))
-        a.table(x["header"], x["rows"], [0.7, 0.8, 2.1, 1.9, 0.9, 1.0], size=7)
+        from build_brd06_bdoi_frs import V12  # noqa: PLC0415
+        rows = x["rows"] + V12["programme_nfr"]
+        new = set(range(len(x["rows"]) + 1, len(rows) + 1))
+        a.els.append(self.b.table(x["header"], rows, [0.7, 0.8, 2.1, 1.9, 0.9, 1.0], size=7, shade_rows=new))
+        a.els.append(self.b.para("", space_after=0))
+        x = dict(x, rows=rows)
         reg = openpyxl.load_workbook(OUT_PROG / "Requirements" /
                                      "BIBS_NFR_BRD-00_Non_Functional_Requirements_Register_v1.0.xlsx", read_only=True)
         ids = {r[0] for r in reg["NFR register"].iter_rows(min_row=5, values_only=True) if r[0]}
@@ -453,7 +459,68 @@ class NewAnnexes:
         a.p(" ".join(c["not_frozen"].split()))
         a.p("How a change is raised and decided", bold=True, keep_next=True)
         a.table(c["steps_header"], c["steps"], [0.8, 4.2, 2.6, 2.4], size=8)
-        a.p(" ".join(c["candidates"].split()))
+        self.beyond_brd()
+
+    def beyond_brd(self):
+        """AP.1 (version 1.2): the points of this FRS beyond the BRD, green (out of the box) and orange (change
+        request with its effort)."""
+        from build_brd06_bdoi_frs import V12, v12  # noqa: PLC0415
+        a, b = self.a, self.b
+        col = V12["colours"]
+        with v12(b):
+            a.h2("AP.1 Points beyond the BRD: out of the box and change requests")
+            a.p("The points of this FRS that are not in the Renewal BRD or the signed Concept Paper are coloured where "
+                "they are stated (see How to read this document). Out of the box means the iNXT BrokerVerse platform "
+                "edition: its code and manual, cross-checked with the Feature List vs OOTB and Best Practice workbook "
+                "(column OOTB platform); the work prepared for BIBS in this project is not out of the box. Green points "
+                "are offered by the platform and cost nothing. Orange points are not in the platform, or only in part: "
+                "each is a change request whose effort (for the missing part) is in the CR Effort Estimate workbook "
+                "(one man-day = 8 hours, estimate within plus or minus 20 percent), also where the point is already "
+                "prepared for BIBS. Interfaces with external systems are delivered in the Integration scope and are "
+                "not change requests. All of them stay in the Change Request Register for BDOI's decision.")
+            a.p("Green - beyond the BRD, out of the box", bold=True, keep_next=True, color=col["green"])
+            rows = [[g["id"], g.get("frrn", "-"), g["title"], f"{g['feature']}: {g['ootb_status']}", g["brd"],
+                     g["evidence"], g["cr"]] for g in V12["green"]]
+            a.table(["No.", "FR item", "Point", "Feature List / OOTB", "BRD (what it asks)",
+                     "Offered by iNXT BrokerVerse (screen)", "Register"], rows, [0.5, 1.0, 1.9, 1.2, 1.4, 2.6, 0.8],
+                    size=7.5)
+            from build_brd06_bdoi_frs import colour_runs  # noqa: PLC0415
+            for tr in a.els[-2].findall(qn("w:tr"))[1:]:
+                colour_runs(tr, col["green"])
+            a.p("Orange - change requests", bold=True, keep_next=True, color=col["orange"])
+            rows, total = [], 0.0
+            for o in V12["orange"]:
+                md = sum(o["effort"])
+                total += md
+                rows.append([o["id"], o["frs"], o["title"], f"{o['feature']}: {o['ootb_status']}",
+                             " ".join(o["ootb"].split()), o["built"], f"{md:.1f}", o["priority"]])
+            a.table(["CR No.", "FRS reference", "Change", "Feature List / OOTB", "What is missing in the platform "
+                     "edition", "Prepared for BIBS", "Man-days", "Priority"], rows,
+                    [0.8, 1.0, 1.9, 1.3, 2.8, 0.7, 0.6, 0.6], size=7.5)
+            for tr in a.els[-2].findall(qn("w:tr"))[1:]:
+                colour_runs(tr, col["orange"])
+            a.p(f"Total of the change requests: {total:.1f} man-days ({len(rows)} change request"
+                f"{'s' if len(rows) != 1 else ''}). The requirements of other BRDs of the programme that also apply "
+                "to Renewal (Annex AJ, RN-NFR-17 and RN-NFR-18) are BRD requirements and are not change requests of "
+                "Renewal.", size=9)
+            lab = V12["labels"]
+            a.p("Grey - covered by the Integration and Data Migration scopes (not change requests)", bold=True,
+                keep_next=True, color=lab["colour"])
+            rows = [[x["id"], x.get("frrn", "-"), x["title"], x["interface"], x["scope"]]
+                    for x in V12["integration"] + V12.get("data_migration", [])]
+            a.table(["Register", "FR item", "Point", "Interface", "Covered by"], rows, [0.9, 1.0, 2.6, 3.0, 1.4],
+                    size=7.5)
+            a.h2("AP.2 Best-practice recommendations (not in the BRD, this FRS or the platform)")
+            blue = lab["blue"]
+            a.p("Insurance-broking practices for renewals that neither the BRD, this FRS nor the iNXT BrokerVerse "
+                "platform covers. They are recommendations for BDOI's consideration, with an indicative effort; they "
+                "are not commitments and are not in the change request totals.", color=blue)
+            rows = [[x["id"], x["practice"], x["why"], x["priority"], f"{x['effort']:.1f}"] for x in V12["best_practice"]]
+            a.table(["ID", "Practice", "Why it matters for a broker", "Suggested priority", "Indicative man-days"],
+                    rows, [0.8, 3.2, 3.6, 0.9, 0.9], size=7.5)
+            for tr in a.els[-2].findall(qn("w:tr"))[1:]:
+                colour_runs(tr, blue)
+        b.stats["cr_mandays"] = total
 
     # AQ
     def checklist(self):

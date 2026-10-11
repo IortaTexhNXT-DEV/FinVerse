@@ -623,12 +623,239 @@ def finalise_docx(path: Path) -> dict:
                                qn("w:tcPrChange"), qn("w:sectPrChange"))):
         mark.getparent().remove(mark)
         accepted += 1
+    layout = polish_layout(doc)
     doc.save(str(path))
-    return {"guidance_removed": removed, "tables_fitted": fitted, "header_rows_repeated": headers,
+    return {"layout": layout, "guidance_removed": removed, "tables_fitted": fitted, "header_rows_repeated": headers,
             "figures_kept_with_caption": kept, "columns_widened": widened,
             "blank_pages_removed": blanks, "pictures_scaled": shrunk, "changes_accepted": accepted,
             "row_heights_removed": heights, "section_rows_numbered": numbered, "table_intros_kept": intros,
             "trailing_rows_removed": trailing, "trailing_breaks_removed": breaks}
+
+
+# ------------------------------------------------------------------------------------------- uniform layout
+# Order of the children of w:pPr (schema), so that an added property lands where Word expects it.
+_PPR_ORDER = ["pStyle", "keepNext", "keepLines", "pageBreakBefore", "framePr", "widowControl", "numPr",
+              "suppressLineNumbers", "pBdr", "shd", "tabs", "suppressAutoHyphens", "kinsoku", "wordWrap",
+              "overflowPunct", "topLinePunct", "autoSpaceDE", "autoSpaceDN", "bidi", "adjustRightInd", "snapToGrid",
+              "spacing", "ind", "contextualSpacing", "mirrorIndents", "suppressOverlap", "jc", "textDirection",
+              "textAlignment", "textboxTightWrap", "outlineLvl", "divId", "cnfStyle", "rPr", "sectPr", "pPrChange"]
+_RPR_ORDER = ["rStyle", "rFonts", "b", "bCs", "i", "iCs", "caps", "smallCaps", "strike", "dstrike", "outline",
+              "shadow", "emboss", "imprint", "noProof", "snapToGrid", "vanish", "webHidden", "color", "spacing", "w",
+              "kern", "position", "sz", "szCs", "highlight", "u", "effect", "bdr", "shd", "fitText", "vertAlign",
+              "rtl", "cs", "em", "lang", "eastAsianLayout", "specVanish", "oMath"]
+CAPTION_RE = re.compile(r"^\s*(?:Figure|Table|Screenshot)\s+[A-Z]{0,2}\.?\d+(?:\.\d+)*\s*(?:[-–:]|\()")
+CAPTION_SIZE = 17       # half-points: every caption at 8.5 pt, italic, centred, under its figure
+CELL_SPACE = "20"       # twips before and after each paragraph of a table cell
+PICTURE_SPACE = ("120", "60")
+
+
+def _set_child(parent, name: str, order: list[str], attrs: dict | None = None, replace: bool = True):
+    """The child w:name of parent (created in schema order when absent); its attributes set from attrs."""
+    from docx.oxml.ns import qn  # noqa: PLC0415
+
+    el = parent.find(qn(f"w:{name}"))
+    if el is None:
+        el = parent.makeelement(qn(f"w:{name}"), {})
+        pos = order.index(name)
+        for child in parent:
+            cname = child.tag.split("}")[1]
+            if cname in order and order.index(cname) > pos:
+                child.addprevious(el)
+                break
+        else:
+            parent.append(el)
+    elif not replace:
+        return el
+    for k, v in (attrs or {}).items():
+        el.set(qn(f"w:{k}"), v)
+    return el
+
+
+def _ppr(p):
+    from docx.oxml.ns import qn  # noqa: PLC0415
+
+    ppr = p.find(qn("w:pPr"))
+    if ppr is None:
+        ppr = p.makeelement(qn("w:pPr"), {})
+        p.insert(0, ppr)
+    return ppr
+
+
+def body_font(doc) -> str | None:
+    """The font family of the template's text: the font most runs of the body text (outside tables) name, else the
+    font of the Normal style or of the document defaults."""
+    from collections import Counter  # noqa: PLC0415
+
+    from docx.oxml.ns import qn  # noqa: PLC0415
+
+    seen: Counter = Counter()
+    for p in doc.element.body.findall(qn("w:p")):
+        for r in p.findall(qn("w:r")):
+            rf = r.find(f"{qn('w:rPr')}/{qn('w:rFonts')}")
+            if rf is not None and rf.get(qn("w:ascii")):
+                seen[rf.get(qn("w:ascii"))] += len("".join(t.text or "" for t in r.findall(qn("w:t"))))
+    if seen:
+        return seen.most_common(1)[0][0]
+    styles = doc.styles.element
+    for st in styles.findall(qn("w:style")):
+        if st.get(qn("w:styleId")) == "Normal":
+            f = st.find(f"{qn('w:rPr')}/{qn('w:rFonts')}")
+            if f is not None and f.get(qn("w:ascii")):
+                return f.get(qn("w:ascii"))
+    f = styles.find(f"{qn('w:docDefaults')}/{qn('w:rPrDefault')}/{qn('w:rPr')}/{qn('w:rFonts')}")
+    return f.get(qn("w:ascii")) if f is not None and f.get(qn("w:ascii")) else None
+
+
+def polish_layout(doc) -> dict:
+    """One look for the whole document, whatever part of it a builder added:
+
+    - one font family: a table run in Calibri (the font of the added tables) takes the font of the template's text;
+    - table cells: the same small spacing above and below every line; header rows bold and centred vertically;
+    - tables narrower than the text width and not indented are centred;
+    - headings kept with the next paragraph and never split, so that no heading is left alone at a page foot;
+    - pictures centred with the same space around them; captions (Figure / Table n ...) italic 8.5 pt, centred,
+      kept on one page with their picture;
+    - list paragraphs of the text with the same space after them.
+    """
+    from docx.oxml.ns import qn  # noqa: PLC0415
+
+    body = doc.element.body
+    font = body_font(doc)
+    out = {"fonts": 0, "cells": 0, "headers": 0, "tables_centred": 0, "headings_kept": 0, "pictures": 0,
+           "captions": 0, "lists": 0}
+
+    def text(el):
+        return "".join(x.text or "" for x in el.iter(qn("w:t")))
+
+    for tbl in body.iter(qn("w:tbl")):
+        rows = tbl.findall(qn("w:tr"))
+        tblpr = tbl.find(qn("w:tblPr"))
+        for p in tbl.iter(qn("w:p")):
+            ppr = _ppr(p)
+            sp = ppr.find(qn("w:spacing"))
+            if sp is None or (sp.get(qn("w:after")) in (None, "0") and sp.get(qn("w:before")) in (None, "0")):
+                _set_child(ppr, "spacing", _PPR_ORDER, {"before": CELL_SPACE, "after": CELL_SPACE})
+                out["cells"] += 1
+            for r in p.iter(qn("w:r")):
+                rf = r.find(f"{qn('w:rPr')}/{qn('w:rFonts')}")
+                if font and font != "Calibri" and rf is not None and rf.get(qn("w:ascii")) == "Calibri":
+                    for a in ("ascii", "hAnsi", "cs"):
+                        rf.set(qn(f"w:{a}"), font)
+                    out["fonts"] += 1
+        if rows:
+            head = rows[0]
+            trpr = head.find(qn("w:trPr"))
+            if trpr is not None and trpr.find(qn("w:tblHeader")) is not None and len(rows) > 1:
+                for tc in head.findall(qn("w:tc")):
+                    tcpr = tc.find(qn("w:tcPr"))
+                    if tcpr is not None:
+                        _set_child(tcpr, "vAlign", ["tcW", "gridSpan", "vMerge", "tcBorders", "shd", "noWrap",
+                                                    "tcMar", "textDirection", "tcFitText", "vAlign", "hideMark"],
+                                   {"val": "center"})
+                    for r in tc.iter(qn("w:r")):
+                        if r.find(qn("w:t")) is None:
+                            continue
+                        rpr = r.find(qn("w:rPr"))
+                        if rpr is None:
+                            rpr = r.makeelement(qn("w:rPr"), {})
+                            r.insert(0, rpr)
+                        _set_child(rpr, "b", _RPR_ORDER, replace=False)
+                out["headers"] += 1
+        if tblpr is not None and tblpr.find(qn("w:tblInd")) is None and tblpr.find(qn("w:jc")) is None \
+                and tblpr.find(qn("w:tblStyle")) is None and tbl.getparent() is body:
+            jc = tblpr.makeelement(qn("w:jc"), {qn("w:val"): "center"})
+            after = [c for c in tblpr if c.tag.split("}")[1] in ("tblCellSpacing", "tblInd", "tblBorders", "shd",
+                                                                  "tblLayout", "tblCellMar", "tblLook")]
+            (after[0].addprevious(jc) if after else tblpr.append(jc))
+            out["tables_centred"] += 1
+
+    # an empty paragraph between a table and a page that starts anew (a heading with a page break before it, or a
+    # section break) is made one point high, so that it never spills alone onto a blank page
+    out["spacers"] = 0
+    out["breaks_moved"] = 0
+    # a paragraph holding only a page break, before a paragraph of text: the break becomes "page break before" of
+    # that paragraph, so that a page filled to its foot is not followed by a blank page
+    for p in list(body.findall(qn("w:p"))):
+        if text(p).strip() or p.find(f".//{qn('w:drawing')}") is not None or p.find(f".//{qn('w:sectPr')}") is not None:
+            continue
+        brs = list(p.iter(qn("w:br")))
+        if not brs or not all(b.get(qn("w:type")) == "page" for b in brs):
+            continue
+        nxt = p.getnext()
+        while nxt is not None and nxt.tag == qn("w:p") and not text(nxt).strip() \
+                and nxt.find(f".//{qn('w:drawing')}") is None and nxt.find(f".//{qn('w:sectPr')}") is None \
+                and nxt.find(f".//{qn('w:br')}") is None:
+            nxt = nxt.getnext()
+        if nxt is None or nxt.tag != qn("w:p") or not text(nxt).strip():
+            continue
+        _set_child(_ppr(nxt), "pageBreakBefore", _PPR_ORDER, replace=False)
+        body.remove(p)
+        out["breaks_moved"] += 1
+    for tbl in body.findall(qn("w:tbl")):
+        p = tbl.getnext()
+        if p is None or p.tag != qn("w:p") or text(p).strip() or p.find(f".//{qn('w:drawing')}") is not None:
+            continue
+        nxt = p.getnext()
+        starts_page = p.find(f"{qn('w:pPr')}/{qn('w:sectPr')}") is not None or (
+            nxt is not None and nxt.tag == qn("w:p") and (
+                nxt.find(f"{qn('w:pPr')}/{qn('w:pageBreakBefore')}") is not None
+                or nxt.find(f"{qn('w:pPr')}/{qn('w:sectPr')}") is not None
+                or any(b.get(qn("w:type")) == "page" for b in nxt.iter(qn("w:br")))))
+        if not starts_page:
+            continue
+        ppr = _ppr(p)
+        _set_child(ppr, "spacing", _PPR_ORDER, {"before": "0", "after": "0", "line": "20", "lineRule": "exact"})
+        rpr = _set_child(ppr, "rPr", _PPR_ORDER, replace=False)
+        _set_child(rpr, "sz", _RPR_ORDER, {"val": "2"})
+        out["spacers"] += 1
+
+    for p in body.iter(qn("w:p")):
+        ppr = p.find(qn("w:pPr"))
+        ps = ppr.find(qn("w:pStyle")) if ppr is not None else None
+        style = (ps.get(qn("w:val")) or "") if ps is not None else ""
+        in_table = any(a.tag == qn("w:tc") for a in p.iterancestors())
+        if style.lower().startswith("heading") and not in_table:
+            ppr = _ppr(p)
+            _set_child(ppr, "keepNext", _PPR_ORDER, replace=False)
+            _set_child(ppr, "keepLines", _PPR_ORDER, replace=False)
+            out["headings_kept"] += 1
+            continue
+        if p.find(f".//{qn('w:drawing')}") is not None and not in_table and not text(p).strip():
+            ppr = _ppr(p)
+            _set_child(ppr, "spacing", _PPR_ORDER, {"before": PICTURE_SPACE[0], "after": PICTURE_SPACE[1]})
+            _set_child(ppr, "jc", _PPR_ORDER, {"val": "center"})
+            out["pictures"] += 1
+            continue
+        t = text(p)
+        if not in_table and len(t) < 400 and CAPTION_RE.match(t):
+            prev = p.getprevious()
+            under_picture = prev is not None and prev.tag == qn("w:p") and prev.find(f".//{qn('w:drawing')}") is not None
+            if not under_picture:
+                continue
+            ppr = _ppr(p)
+            _set_child(ppr, "keepLines", _PPR_ORDER, replace=False)
+            _set_child(ppr, "spacing", _PPR_ORDER, {"before": "40", "after": "160"})
+            _set_child(ppr, "jc", _PPR_ORDER, {"val": "center"})
+            for r in p.iter(qn("w:r")):
+                if r.find(qn("w:t")) is None:
+                    continue
+                rpr = r.find(qn("w:rPr"))
+                if rpr is None:
+                    rpr = r.makeelement(qn("w:rPr"), {})
+                    r.insert(0, rpr)
+                _set_child(rpr, "i", _RPR_ORDER, replace=False)
+                _set_child(rpr, "sz", _RPR_ORDER, {"val": str(CAPTION_SIZE)})
+                _set_child(rpr, "szCs", _RPR_ORDER, {"val": str(CAPTION_SIZE)})
+            out["captions"] += 1
+            continue
+        if style == "ListParagraph" and not in_table:
+            ppr = _ppr(p)
+            sp = ppr.find(qn("w:spacing"))
+            if sp is None or sp.get(qn("w:after")) is None:
+                _set_child(ppr, "spacing", _PPR_ORDER, {"after": "60"})
+                _set_child(ppr, "contextualSpacing", _PPR_ORDER, replace=False)
+                out["lists"] += 1
+    return out
 
 
 MAX_PICTURE_H = 7.9  # inches: no picture taller than this, so that its caption stays on its page

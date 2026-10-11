@@ -47,6 +47,7 @@ summary:
     - ["Business Unit Requirements Collection", "What the Business Unit provides: templates and print formats, e-mail wordings to confirm, schedules, parameters, lists, master data, approvers and users, inputs of BDOI IT, open decisions"]
     - ["BRD vs Out-of-the-Box vs Best Practice", "Every BRD requirement against what the system offers and insurance-broking practice, with the fit"]
     - ["Change Request Register", "How a change is raised after sign-off, the candidate changes and the decision log of Annex AO"]
+    - ["CR Effort Estimate", "The effort of each change request (orange points) by activity, the totals and the green points at no cost (Annex AP.1)"]
     - ["Test Cases and Traceability", "BRD ID to FR item to test cases, screens and walkthrough steps; the test cases; the questions answered in BDOI's FRS"]
     - ["Business Unit Walkthrough Users", "The users of the walkthrough with their sign-in IDs, menus and the walkthrough script"]
 

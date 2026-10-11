@@ -1,5 +1,5 @@
 import { BarChart3, History, Headset, UserRound } from 'lucide-react';
-import { lazy } from 'react';
+import { lazyWithRetry } from '@/app/loadRecovery';
 import type { FeatureModule } from '@/navigation/types';
 import { CSF_SECTION } from './csfCodes';
 
@@ -17,7 +17,7 @@ export const csfModule: FeatureModule = {
       label: 'Customer Search',
       icon: Headset,
       permission: 'CSF_VIEW',
-      component: lazy(() => import('./search/CustomerSearchPage')),
+      component: lazyWithRetry(() => import('./search/CustomerSearchPage')),
     },
     {
       path: '/csf/changes',
@@ -25,21 +25,21 @@ export const csfModule: FeatureModule = {
       icon: History,
       permission: 'CSF_REPORT_VIEW',
       alsoPermissions: ['CSF_CONTACT_UPDATE'],
-      component: lazy(() => import('./changes/ContactChangesPage')),
+      component: lazyWithRetry(() => import('./changes/ContactChangesPage')),
     },
     {
       path: '/csf/reports',
       label: 'Customer Service Reports',
       icon: BarChart3,
       permission: 'CSF_REPORT_VIEW',
-      component: lazy(() => import('./reports/CsfReportsPage')),
+      component: lazyWithRetry(() => import('./reports/CsfReportsPage')),
     },
     {
       path: '/csf/clients/:clientId',
       label: 'Servicing View',
       icon: UserRound,
       permission: 'CSF_VIEW',
-      component: lazy(() => import('./view/ServicingViewPage')),
+      component: lazyWithRetry(() => import('./view/ServicingViewPage')),
       hidden: true,
     },
   ],

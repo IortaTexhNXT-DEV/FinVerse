@@ -1,5 +1,5 @@
 import { FileWarning, FolderSearch, History, ShieldAlert, ShieldX, UserSearch } from 'lucide-react';
-import { lazy } from 'react';
+import { lazyWithRetry } from '@/app/loadRecovery';
 import type { FeatureModule } from '@/navigation/types';
 
 /**
@@ -17,14 +17,14 @@ export const screeningModule: FeatureModule = {
       label: 'Screening Home',
       icon: ShieldAlert,
       permission: 'SCR_VIEW',
-      component: lazy(() => import('./ScreeningHomePage')),
+      component: lazyWithRetry(() => import('./ScreeningHomePage')),
     },
     {
       path: '/screening/cases',
       label: 'Cases',
       icon: FolderSearch,
       permission: 'SCR_VIEW',
-      component: lazy(() => import('./cases/CasesPage')),
+      component: lazyWithRetry(() => import('./cases/CasesPage')),
     },
     {
       path: '/screening/cases/:id',
@@ -32,28 +32,28 @@ export const screeningModule: FeatureModule = {
       icon: FolderSearch,
       permission: 'SCR_VIEW',
       hidden: true,
-      component: lazy(() => import('./cases/CasePage')),
+      component: lazyWithRetry(() => import('./cases/CasePage')),
     },
     {
       path: '/screening/matches',
       label: 'Matches',
       icon: UserSearch,
       permission: 'SCR_VIEW',
-      component: lazy(() => import('./matches/MatchesPage')),
+      component: lazyWithRetry(() => import('./matches/MatchesPage')),
     },
     {
       path: '/screening/runs',
       label: 'Screening Runs',
       icon: History,
       permission: 'SCR_VIEW',
-      component: lazy(() => import('./matches/RunsPage')),
+      component: lazyWithRetry(() => import('./matches/RunsPage')),
     },
     {
       path: '/screening/high-risk',
       label: 'High-risk Clients',
       icon: ShieldX,
       permission: 'SCR_VIEW',
-      component: lazy(() => import('./cases/HighRiskPage')),
+      component: lazyWithRetry(() => import('./cases/HighRiskPage')),
     },
     {
       path: '/screening/str',
@@ -61,7 +61,7 @@ export const screeningModule: FeatureModule = {
       icon: FileWarning,
       permission: 'SCR_COMPLIANCE_REVIEW',
       alsoPermissions: ['SCR_STR_EXTRACT', 'SCR_AUDIT_VIEW'],
-      component: lazy(() => import('./str/StrPage')),
+      component: lazyWithRetry(() => import('./str/StrPage')),
     },
   ],
 };

@@ -1,5 +1,5 @@
 import { FilePlus2, FileText, Inbox, Upload } from 'lucide-react';
-import { lazy } from 'react';
+import { lazyWithRetry } from '@/app/loadRecovery';
 import type { FeatureModule } from '@/navigation/types';
 
 /**
@@ -15,28 +15,28 @@ export const quotationsModule: FeatureModule = {
       label: 'Quotations',
       icon: FileText,
       permission: 'QUOTE_VIEW',
-      component: lazy(() => import('./QuotationsPage')),
+      component: lazyWithRetry(() => import('./QuotationsPage')),
     },
     {
       path: '/quotations/new',
       label: 'New Quotation',
       icon: FilePlus2,
       permission: 'QUOTE_MAINTAIN',
-      component: lazy(() => import('./QuotationWizardPage')),
+      component: lazyWithRetry(() => import('./QuotationWizardPage')),
     },
     {
       path: '/quotations/requests',
       label: 'Quotation Requests',
       icon: Inbox,
       permission: 'QUOTE_VIEW',
-      component: lazy(() => import('./RequestsPage')),
+      component: lazyWithRetry(() => import('./RequestsPage')),
     },
     {
       path: '/quotations/:id',
       label: 'Quotation',
       icon: FileText,
       permission: 'QUOTE_VIEW',
-      component: lazy(() => import('./QuotationDetailPage')),
+      component: lazyWithRetry(() => import('./QuotationDetailPage')),
       hidden: true,
     },
     {
@@ -44,7 +44,7 @@ export const quotationsModule: FeatureModule = {
       label: 'Edit Quotation',
       icon: FilePlus2,
       permission: 'QUOTE_MAINTAIN',
-      component: lazy(() => import('./QuotationWizardPage')),
+      component: lazyWithRetry(() => import('./QuotationWizardPage')),
       hidden: true,
     },
     {
@@ -53,7 +53,7 @@ export const quotationsModule: FeatureModule = {
       label: 'Bulk Quotations',
       icon: Upload,
       permission: 'BULK_PROCESS',
-      component: lazy(() => import('./QuotationBulkPage')),
+      component: lazyWithRetry(() => import('./QuotationBulkPage')),
       hidden: true,
     },
     {
@@ -61,7 +61,7 @@ export const quotationsModule: FeatureModule = {
       label: 'Bulk Quotation Acceptance',
       icon: Upload,
       permission: 'BULK_PROCESS',
-      component: lazy(() => import('./AcceptanceBulkPage')),
+      component: lazyWithRetry(() => import('./AcceptanceBulkPage')),
       hidden: true,
     },
   ],

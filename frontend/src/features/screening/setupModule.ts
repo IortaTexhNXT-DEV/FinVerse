@@ -1,5 +1,5 @@
 import { FileText, ListChecks, SlidersHorizontal, UploadCloud } from 'lucide-react';
-import { lazy } from 'react';
+import { lazyWithRetry } from '@/app/loadRecovery';
 import type { FeatureModule } from '@/navigation/types';
 
 /**
@@ -18,7 +18,7 @@ export const screeningSetupModule: FeatureModule = {
       icon: SlidersHorizontal,
       permission: 'SCR_CONFIG_MAINTAIN',
       alsoPermissions: ['SCR_CONFIG_APPROVE', 'SCR_LIST_MAINTAIN', 'SCR_LIST_APPROVE'],
-      component: lazy(() => import('./setup/ConfigVersionsPage')),
+      component: lazyWithRetry(() => import('./setup/ConfigVersionsPage')),
     },
     {
       path: '/screening-setup/templates',
@@ -26,7 +26,7 @@ export const screeningSetupModule: FeatureModule = {
       icon: FileText,
       permission: 'SCR_CONFIG_MAINTAIN',
       alsoPermissions: ['SCR_CONFIG_APPROVE'],
-      component: lazy(() => import('./setup/TemplatesPage')),
+      component: lazyWithRetry(() => import('./setup/TemplatesPage')),
     },
     {
       path: '/screening-setup/watchlist',
@@ -34,7 +34,7 @@ export const screeningSetupModule: FeatureModule = {
       icon: ListChecks,
       permission: 'SCR_VIEW',
       alsoPermissions: ['SCR_LIST_MAINTAIN', 'SCR_LIST_APPROVE'],
-      component: lazy(() => import('./setup/WatchlistPage')),
+      component: lazyWithRetry(() => import('./setup/WatchlistPage')),
     },
     {
       path: '/screening-setup/sources',
@@ -43,7 +43,7 @@ export const screeningSetupModule: FeatureModule = {
       permission: 'SCR_LIST_MAINTAIN',
       // The list maker and checker only (design 11.2); SCR_VIEW alone showed it to every persona.
       alsoPermissions: ['SCR_LIST_APPROVE'],
-      component: lazy(() => import('./setup/SourcesPage')),
+      component: lazyWithRetry(() => import('./setup/SourcesPage')),
     },
   ],
 };

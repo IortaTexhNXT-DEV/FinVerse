@@ -1,5 +1,5 @@
 import { Eraser, FilePen, FilePlus2, FileText, Layers, Upload } from 'lucide-react';
-import { lazy } from 'react';
+import { lazyWithRetry } from '@/app/loadRecovery';
 import type { FeatureModule } from '@/navigation/types';
 
 /**
@@ -17,7 +17,7 @@ export const adjustmentModule: FeatureModule = {
       icon: FilePen,
       permission: 'ADJ_PROCESS',
       alsoPermissions: ['ADJ_REQUEST', 'ADJ_APPROVE', 'ADJ_POST'],
-      component: lazy(() => import('./AdjustmentHomePage')),
+      component: lazyWithRetry(() => import('./AdjustmentHomePage')),
     },
     {
       path: '/adjustment/new',
@@ -25,7 +25,7 @@ export const adjustmentModule: FeatureModule = {
       icon: FilePlus2,
       permission: 'ADJ_REQUEST',
       alsoPermissions: ['ADJ_PROCESS'],
-      component: lazy(() => import('./NewRequestPage')),
+      component: lazyWithRetry(() => import('./NewRequestPage')),
     },
     {
       path: '/adjustment/requests/:id',
@@ -33,7 +33,7 @@ export const adjustmentModule: FeatureModule = {
       icon: FileText,
       permission: 'ADJ_PROCESS',
       alsoPermissions: ['ADJ_REQUEST', 'ADJ_APPROVE', 'ADJ_POST', 'OPS_VIEW'],
-      component: lazy(() => import('./RequestDetailPage')),
+      component: lazyWithRetry(() => import('./RequestDetailPage')),
       hidden: true,
     },
     {
@@ -42,7 +42,7 @@ export const adjustmentModule: FeatureModule = {
       icon: FilePen,
       permission: 'ADJ_REQUEST',
       alsoPermissions: ['ADJ_PROCESS'],
-      component: lazy(() => import('./NewRequestPage')),
+      component: lazyWithRetry(() => import('./NewRequestPage')),
       hidden: true,
     },
     {
@@ -50,21 +50,21 @@ export const adjustmentModule: FeatureModule = {
       label: 'Posting Batches',
       icon: Layers,
       permission: 'ADJ_POST',
-      component: lazy(() => import('./PostingBatchesPage')),
+      component: lazyWithRetry(() => import('./PostingBatchesPage')),
     },
     {
       path: '/adjustment/upload',
       label: 'Batch Request Upload',
       icon: Upload,
       permission: 'ADJ_POST',
-      component: lazy(() => import('./BatchUploadPage')),
+      component: lazyWithRetry(() => import('./BatchUploadPage')),
     },
     {
       path: '/adjustment/minimal-balance',
       label: 'Minimal Balance File',
       icon: Eraser,
       permission: 'ADJ_POST',
-      component: lazy(() => import('./MinimalBalancePage')),
+      component: lazyWithRetry(() => import('./MinimalBalancePage')),
     },
   ],
 };

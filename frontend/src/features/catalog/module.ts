@@ -10,7 +10,7 @@ import {
   Package,
   Percent,
 } from 'lucide-react';
-import { lazy } from 'react';
+import { lazyWithRetry } from '@/app/loadRecovery';
 import type { FeatureModule } from '@/navigation/types';
 
 /**
@@ -31,7 +31,7 @@ export const catalogModule: FeatureModule = {
       icon: Package,
       permission: 'PRODUCT_VIEW',
       alsoPermissions: ['MASTER_VIEW'],
-      component: lazy(() => import('./ProductsPage')),
+      component: lazyWithRetry(() => import('./ProductsPage')),
     },
     {
       path: '/catalog/products/:code',
@@ -39,7 +39,7 @@ export const catalogModule: FeatureModule = {
       icon: Package,
       permission: 'PRODUCT_VIEW',
       alsoPermissions: ['MASTER_VIEW'],
-      component: lazy(() => import('./ProductDetailPage')),
+      component: lazyWithRetry(() => import('./ProductDetailPage')),
       hidden: true,
     },
     {
@@ -48,7 +48,7 @@ export const catalogModule: FeatureModule = {
       icon: Layers,
       permission: 'PRODUCT_VIEW',
       alsoPermissions: ['MASTER_VIEW', 'PRODUCT_MAINTAIN', 'PRODUCT_VALIDATE'],
-      component: lazy(() => import('./VersionEditorPage')),
+      component: lazyWithRetry(() => import('./VersionEditorPage')),
       hidden: true,
     },
     {
@@ -57,7 +57,7 @@ export const catalogModule: FeatureModule = {
       icon: BadgePercent,
       permission: 'PRODUCT_VIEW',
       alsoPermissions: ['MASTER_VIEW', 'QUOTE_VIEW', 'ACCOUNT_VIEW', 'PRODUCT_AUTHORIZE'],
-      component: lazy(() => import('./RateExceptionPage')),
+      component: lazyWithRetry(() => import('./RateExceptionPage')),
       hidden: true,
     },
     {
@@ -65,7 +65,7 @@ export const catalogModule: FeatureModule = {
       label: 'Validation Queue',
       icon: BadgeCheck,
       permission: 'PRODUCT_VALIDATE',
-      component: lazy(() => import('./ValidationQueuePage')),
+      component: lazyWithRetry(() => import('./ValidationQueuePage')),
     },
     {
       path: '/catalog/coverages',
@@ -73,7 +73,7 @@ export const catalogModule: FeatureModule = {
       icon: ListChecks,
       permission: 'PRODUCT_VIEW',
       alsoPermissions: ['MASTER_VIEW'],
-      component: lazy(() => import('./CoveragesPage')),
+      component: lazyWithRetry(() => import('./CoveragesPage')),
     },
     {
       path: '/catalog/incentives',
@@ -81,21 +81,21 @@ export const catalogModule: FeatureModule = {
       icon: Gift,
       permission: 'PRODUCT_VIEW',
       alsoPermissions: ['INCENTIVE_CRITERIA_MAINTAIN'],
-      component: lazy(() => import('./IncentivesPage')),
+      component: lazyWithRetry(() => import('./IncentivesPage')),
     },
     {
       path: '/catalog/insurers',
       label: 'Insurers',
       icon: Building2,
       permission: 'MASTER_VIEW',
-      component: lazy(() => import('./InsurersPage')),
+      component: lazyWithRetry(() => import('./InsurersPage')),
     },
     {
       path: '/catalog/insurers/:id',
       label: 'Insurer',
       icon: Building2,
       permission: 'MASTER_VIEW',
-      component: lazy(() => import('./InsurerDetailPage')),
+      component: lazyWithRetry(() => import('./InsurerDetailPage')),
       hidden: true,
     },
     {
@@ -103,21 +103,21 @@ export const catalogModule: FeatureModule = {
       label: 'Rates & Taxes',
       icon: Percent,
       permission: 'MASTER_VIEW',
-      component: lazy(() => import('./RatesPage')),
+      component: lazyWithRetry(() => import('./RatesPage')),
     },
     {
       path: '/catalog/sales-organisation',
       label: 'Sales Organisation',
       icon: Network,
       permission: 'MASTER_VIEW',
-      component: lazy(() => import('./SalesOrganisationPage')),
+      component: lazyWithRetry(() => import('./SalesOrganisationPage')),
     },
     {
       path: '/catalog/calculator',
       label: 'Premium Calculator',
       icon: Calculator,
       permission: 'ACCOUNT_VIEW',
-      component: lazy(() => import('./PremiumCalculatorPage')),
+      component: lazyWithRetry(() => import('./PremiumCalculatorPage')),
     },
   ],
 };

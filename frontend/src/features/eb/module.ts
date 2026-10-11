@@ -9,7 +9,7 @@ import {
   Settings2,
   UsersRound,
 } from 'lucide-react';
-import { lazy } from 'react';
+import { lazyWithRetry } from '@/app/loadRecovery';
 import type { FeatureModule } from '@/navigation/types';
 
 /**
@@ -29,28 +29,28 @@ export const ebModule: FeatureModule = {
       label: 'EB Home',
       icon: HeartPulse,
       permission: 'EB_VIEW',
-      component: lazy(() => import('./home/EbHomePage')),
+      component: lazyWithRetry(() => import('./home/EbHomePage')),
     },
     {
       path: '/eb/programmes',
       label: 'Programmes',
       icon: ClipboardList,
       permission: 'EB_VIEW',
-      component: lazy(() => import('./programmes/ProgrammesPage')),
+      component: lazyWithRetry(() => import('./programmes/ProgrammesPage')),
     },
     {
       path: '/eb/programmes/new',
       label: 'New Programme',
       icon: FilePlus2,
       permission: 'EB_MARKET',
-      component: lazy(() => import('./programmes/NewProgrammePage')),
+      component: lazyWithRetry(() => import('./programmes/NewProgrammePage')),
     },
     {
       path: '/eb/programmes/:id',
       label: 'Programme',
       icon: FileText,
       permission: 'EB_VIEW',
-      component: lazy(() => import('./programmes/ProgrammePage')),
+      component: lazyWithRetry(() => import('./programmes/ProgrammePage')),
       hidden: true,
     },
     {
@@ -58,7 +58,7 @@ export const ebModule: FeatureModule = {
       label: 'Comparative',
       icon: Scale,
       permission: 'EB_VIEW',
-      component: lazy(() => import('./comparative/ComparativePage')),
+      component: lazyWithRetry(() => import('./comparative/ComparativePage')),
       hidden: true,
     },
     {
@@ -66,14 +66,14 @@ export const ebModule: FeatureModule = {
       label: 'Member Changes',
       icon: UsersRound,
       permission: 'EB_VIEW',
-      component: lazy(() => import('./members/MemberChangesPage')),
+      component: lazyWithRetry(() => import('./members/MemberChangesPage')),
     },
     {
       path: '/eb/pending-items',
       label: 'Pending Items',
       icon: ClipboardCheck,
       permission: 'EB_VIEW',
-      component: lazy(() => import('./pending/PendingItemsPage')),
+      component: lazyWithRetry(() => import('./pending/PendingItemsPage')),
     },
     {
       path: '/eb/soa',
@@ -81,14 +81,14 @@ export const ebModule: FeatureModule = {
       icon: Receipt,
       permission: 'EB_PROCESS',
       alsoPermissions: ['EB_COLLECT'],
-      component: lazy(() => import('./soa/SoaRegisterPage')),
+      component: lazyWithRetry(() => import('./soa/SoaRegisterPage')),
     },
     {
       path: '/eb/setup',
       label: 'EB Setup',
       icon: Settings2,
       permission: 'EB_SETUP',
-      component: lazy(() => import('./setup/EbSetupPage')),
+      component: lazyWithRetry(() => import('./setup/EbSetupPage')),
     },
   ],
 };

@@ -10,6 +10,9 @@ import './styles/patterns.css';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './App';
+import { installPreloadErrorHandler } from './app/loadRecovery';
+
+installPreloadErrorHandler();
 
 const root = document.getElementById('root');
 if (root === null) {

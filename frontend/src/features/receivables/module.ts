@@ -8,7 +8,7 @@ import {
   ReceiptText,
   ScrollText,
 } from 'lucide-react';
-import { lazy } from 'react';
+import { lazyWithRetry } from '@/app/loadRecovery';
 import type { FeatureModule } from '@/navigation/types';
 
 const RECEIPT_VIEW = 'JOURNAL_VIEW';
@@ -23,21 +23,21 @@ export const receivablesModule: FeatureModule = {
       label: 'Receipts',
       icon: ReceiptText,
       permission: RECEIPT_VIEW,
-      component: lazy(() => import('./ReceiptsPage')),
+      component: lazyWithRetry(() => import('./ReceiptsPage')),
     },
     {
       path: '/receivables/receipts/new',
       label: 'New Receipt',
       icon: FilePlus2,
       permission: 'RECEIPT_PAYMENT_MAINTAIN',
-      component: lazy(() => import('./ReceiptEntryPage')),
+      component: lazyWithRetry(() => import('./ReceiptEntryPage')),
     },
     {
       path: '/receivables/receipts/:id',
       label: 'Receipt',
       icon: ReceiptText,
       permission: RECEIPT_VIEW,
-      component: lazy(() => import('./ReceiptDetailPage')),
+      component: lazyWithRetry(() => import('./ReceiptDetailPage')),
       hidden: true,
     },
     {
@@ -45,14 +45,14 @@ export const receivablesModule: FeatureModule = {
       label: 'Receipt Approvals',
       icon: BadgeCheck,
       permission: RECEIPT_APPROVE,
-      component: lazy(() => import('./ReceiptsPage')),
+      component: lazyWithRetry(() => import('./ReceiptsPage')),
     },
     {
       path: '/receivables/approvals/:id',
       label: 'Receipt',
       icon: ReceiptText,
       permission: RECEIPT_APPROVE,
-      component: lazy(() => import('./ReceiptDetailPage')),
+      component: lazyWithRetry(() => import('./ReceiptDetailPage')),
       hidden: true,
     },
     {
@@ -60,35 +60,35 @@ export const receivablesModule: FeatureModule = {
       label: 'Cheques & Deposits',
       icon: Landmark,
       permission: RECEIPT_VIEW,
-      component: lazy(() => import('./DepositsPage')),
+      component: lazyWithRetry(() => import('./DepositsPage')),
     },
     {
       path: '/receivables/pdcs',
       label: 'PDC Received',
       icon: CalendarClock,
       permission: RECEIPT_VIEW,
-      component: lazy(() => import('./PdcPage')),
+      component: lazyWithRetry(() => import('./PdcPage')),
     },
     {
       path: '/receivables/bank-statements',
       label: 'Bank Statements',
       icon: FileSpreadsheet,
       permission: 'RECONCILIATION_MANAGE',
-      component: lazy(() => import('./BankStatementsPage')),
+      component: lazyWithRetry(() => import('./BankStatementsPage')),
     },
     {
       path: '/receivables/bank-reconciliation',
       label: 'Bank Reconciliation',
       icon: ArrowLeftRight,
       permission: 'RECONCILIATION_MANAGE',
-      component: lazy(() => import('./BankReconciliationPage')),
+      component: lazyWithRetry(() => import('./BankReconciliationPage')),
     },
     {
       path: '/receivables/reports',
       label: 'Receivables Reports',
       icon: ScrollText,
       permission: 'REPORT_FINANCIAL',
-      component: lazy(() => import('./ReceivablesReportsPage')),
+      component: lazyWithRetry(() => import('./ReceivablesReportsPage')),
     },
   ],
 };

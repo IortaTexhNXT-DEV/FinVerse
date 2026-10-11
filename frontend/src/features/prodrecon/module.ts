@@ -1,5 +1,5 @@
 import { CalendarClock, FileSpreadsheet, FileUp, Layers, Scale, SearchX } from 'lucide-react';
-import { lazy } from 'react';
+import { lazyWithRetry } from '@/app/loadRecovery';
 import type { FeatureModule } from '@/navigation/types';
 
 const PROCESS = 'RECON_PROCESS';
@@ -20,7 +20,7 @@ export const prodreconModule: FeatureModule = {
       icon: Scale,
       permission: PROCESS,
       alsoPermissions: SEND,
-      component: lazy(() => import('./ProdReconHomePage')),
+      component: lazyWithRetry(() => import('./ProdReconHomePage')),
     },
     {
       path: '/prodrecon/cycles',
@@ -28,7 +28,7 @@ export const prodreconModule: FeatureModule = {
       icon: Layers,
       permission: PROCESS,
       alsoPermissions: SEND,
-      component: lazy(() => import('./ReconCyclesPage')),
+      component: lazyWithRetry(() => import('./ReconCyclesPage')),
     },
     {
       path: '/prodrecon/cycles/:id',
@@ -36,7 +36,7 @@ export const prodreconModule: FeatureModule = {
       icon: Layers,
       permission: PROCESS,
       alsoPermissions: SEND,
-      component: lazy(() => import('./ReconCyclePage')),
+      component: lazyWithRetry(() => import('./ReconCyclePage')),
       hidden: true,
     },
     {
@@ -45,7 +45,7 @@ export const prodreconModule: FeatureModule = {
       icon: FileSpreadsheet,
       permission: PROCESS,
       alsoPermissions: SEND,
-      component: lazy(() => import('./ReconExtractsPage')),
+      component: lazyWithRetry(() => import('./ReconExtractsPage')),
     },
     {
       path: '/prodrecon/uploads',
@@ -53,7 +53,7 @@ export const prodreconModule: FeatureModule = {
       icon: FileUp,
       permission: PROCESS,
       alsoPermissions: SEND,
-      component: lazy(() => import('./ReconUploadsPage')),
+      component: lazyWithRetry(() => import('./ReconUploadsPage')),
     },
     {
       path: '/prodrecon/unbooked',
@@ -61,7 +61,7 @@ export const prodreconModule: FeatureModule = {
       icon: SearchX,
       permission: PROCESS,
       alsoPermissions: SEND,
-      component: lazy(() => import('./UnbookedPage')),
+      component: lazyWithRetry(() => import('./UnbookedPage')),
     },
     {
       path: '/prodrecon/schedules',
@@ -69,7 +69,7 @@ export const prodreconModule: FeatureModule = {
       icon: CalendarClock,
       permission: PROCESS,
       alsoPermissions: SEND,
-      component: lazy(() => import('./ReconSchedulesPage')),
+      component: lazyWithRetry(() => import('./ReconSchedulesPage')),
     },
   ],
 };

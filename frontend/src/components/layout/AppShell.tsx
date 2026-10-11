@@ -1,5 +1,7 @@
 import { Suspense } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
+import { LoadErrorBoundary } from '@/components/ui/LoadErrorBoundary';
+import { SlowLoadingFallback } from '@/components/ui/SlowLoadingFallback';
 import { WordCopyOffer } from '@/components/broking/WordCopyOffer';
 import { Header } from './Header';
 import { Sidebar } from './Sidebar';
@@ -9,14 +11,23 @@ import { Sidebar } from './Sidebar';
  * offer of downloaded documents.
  */
 export function AppShell() {
+  const { pathname } = useLocation();
   return (
     <div className="app-shell">
       <Header />
       <Sidebar />
       <main className="app-main" id="main-content">
-        <Suspense fallback={<span className="spinner" aria-label="Loading screen" />}>
-          <Outlet />
-        </Suspense>
+        <LoadErrorBoundary resetKey={pathname}>
+          <Suspense
+            fallback={
+              <SlowLoadingFallback>
+                <span className="spinner" aria-label="Loading screen" />
+              </SlowLoadingFallback>
+            }
+          >
+            <Outlet />
+          </Suspense>
+        </LoadErrorBoundary>
       </main>
       <WordCopyOffer />
     </div>

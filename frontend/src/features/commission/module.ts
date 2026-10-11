@@ -10,7 +10,7 @@ import {
   Percent,
   Undo2,
 } from 'lucide-react';
-import { lazy } from 'react';
+import { lazyWithRetry } from '@/app/loadRecovery';
 import type { FeatureModule } from '@/navigation/types';
 
 const PROCESS = 'COMMREC_PROCESS';
@@ -34,7 +34,7 @@ export const commissionModule: FeatureModule = {
       icon: HandCoins,
       permission: PROCESS,
       alsoPermissions: ['COMMREC_APPROVE', 'INCENTIVE_MANAGE', 'BIR_CERT_SUBMIT', 'BIR_CERT_ACK'],
-      component: lazy(() => import('./CommissionHomePage')),
+      component: lazyWithRetry(() => import('./CommissionHomePage')),
     },
     {
       path: '/commission/dp/lists',
@@ -42,7 +42,7 @@ export const commissionModule: FeatureModule = {
       icon: FileInput,
       permission: PROCESS,
       alsoPermissions: READERS,
-      component: lazy(() => import('./DpListsPage')),
+      component: lazyWithRetry(() => import('./DpListsPage')),
     },
     {
       path: '/commission/dp/items',
@@ -50,7 +50,7 @@ export const commissionModule: FeatureModule = {
       icon: ListChecks,
       permission: PROCESS,
       alsoPermissions: READERS,
-      component: lazy(() => import('./DpItemsPage')),
+      component: lazyWithRetry(() => import('./DpItemsPage')),
     },
     {
       path: '/commission/dp/billings',
@@ -58,7 +58,7 @@ export const commissionModule: FeatureModule = {
       icon: FileStack,
       permission: PROCESS,
       alsoPermissions: READERS,
-      component: lazy(() => import('./DpBillingsPage')),
+      component: lazyWithRetry(() => import('./DpBillingsPage')),
     },
     {
       path: '/commission/dp/billings/:id',
@@ -66,7 +66,7 @@ export const commissionModule: FeatureModule = {
       icon: FileStack,
       permission: PROCESS,
       alsoPermissions: READERS,
-      component: lazy(() => import('./DpBillingPage')),
+      component: lazyWithRetry(() => import('./DpBillingPage')),
       hidden: true,
     },
     {
@@ -75,7 +75,7 @@ export const commissionModule: FeatureModule = {
       icon: MailQuestionMark,
       permission: PROCESS,
       alsoPermissions: READERS,
-      component: lazy(() => import('./DpResponsesPage')),
+      component: lazyWithRetry(() => import('./DpResponsesPage')),
     },
     {
       path: '/commission/incentives/schemes',
@@ -83,7 +83,7 @@ export const commissionModule: FeatureModule = {
       icon: Gift,
       permission: PROCESS,
       alsoPermissions: INCENTIVE_READERS,
-      component: lazy(() => import('./IncentiveSchemesPage')),
+      component: lazyWithRetry(() => import('./IncentiveSchemesPage')),
     },
     {
       path: '/commission/incentives/runs',
@@ -91,7 +91,7 @@ export const commissionModule: FeatureModule = {
       icon: Calculator,
       permission: PROCESS,
       alsoPermissions: INCENTIVE_READERS,
-      component: lazy(() => import('./IncentiveRunsPage')),
+      component: lazyWithRetry(() => import('./IncentiveRunsPage')),
     },
     {
       path: '/commission/certificates',
@@ -99,7 +99,7 @@ export const commissionModule: FeatureModule = {
       icon: FileCheck,
       permission: CERT,
       alsoPermissions: CERT_READERS,
-      component: lazy(() => import('./CertificatesPage')),
+      component: lazyWithRetry(() => import('./CertificatesPage')),
     },
     {
       path: '/commission/certificates/:id',
@@ -107,7 +107,7 @@ export const commissionModule: FeatureModule = {
       icon: FileCheck,
       permission: CERT,
       alsoPermissions: CERT_READERS,
-      component: lazy(() => import('./CertificatePage')),
+      component: lazyWithRetry(() => import('./CertificatePage')),
       hidden: true,
     },
     {
@@ -116,7 +116,7 @@ export const commissionModule: FeatureModule = {
       icon: Undo2,
       permission: 'LEGACY_REVERSAL_REQUEST',
       alsoPermissions: ['LEGACY_REVERSAL_APPROVE'],
-      component: lazy(() => import('./DpprBatchesPage')),
+      component: lazyWithRetry(() => import('./DpprBatchesPage')),
     },
     {
       path: '/commission/dppr-batches/:batchNo',
@@ -124,7 +124,7 @@ export const commissionModule: FeatureModule = {
       icon: Undo2,
       permission: 'LEGACY_REVERSAL_REQUEST',
       alsoPermissions: ['LEGACY_REVERSAL_APPROVE'],
-      component: lazy(() => import('./DpprBatchPage')),
+      component: lazyWithRetry(() => import('./DpprBatchPage')),
       hidden: true,
     },
     {
@@ -133,7 +133,7 @@ export const commissionModule: FeatureModule = {
       icon: Percent,
       permission: PROCESS,
       alsoPermissions: READERS,
-      component: lazy(() => import('./EstimatedItemsPage')),
+      component: lazyWithRetry(() => import('./EstimatedItemsPage')),
     },
   ],
 };

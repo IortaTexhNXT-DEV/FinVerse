@@ -1,5 +1,5 @@
 import { Siren, SlidersHorizontal } from 'lucide-react';
-import { lazy } from 'react';
+import { lazyWithRetry } from '@/app/loadRecovery';
 import type { ScreenDef } from '@/navigation/types';
 
 /**
@@ -12,14 +12,14 @@ export const ESCALATION_SCREENS: ScreenDef[] = [
     label: 'Escalations',
     icon: Siren,
     permission: 'CLX_VIEW',
-    component: lazy(() => import('./EscalationsPage')),
+    component: lazyWithRetry(() => import('./EscalationsPage')),
   },
   {
     path: '/collections/escalations/:id',
     label: 'Escalation',
     icon: Siren,
     permission: 'CLX_VIEW',
-    component: lazy(() => import('./EscalationDetailPage')),
+    component: lazyWithRetry(() => import('./EscalationDetailPage')),
     hidden: true,
   },
   {
@@ -28,6 +28,6 @@ export const ESCALATION_SCREENS: ScreenDef[] = [
     icon: SlidersHorizontal,
     permission: 'CLX_SETUP',
     alsoPermissions: ['MASTER_AUTHORIZE', 'CLX_ESCALATION_HANDLE'],
-    component: lazy(() => import('./EscalationRulesPage')),
+    component: lazyWithRetry(() => import('./EscalationRulesPage')),
   },
 ];

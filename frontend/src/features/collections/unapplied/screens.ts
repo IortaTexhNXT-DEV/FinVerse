@@ -1,5 +1,5 @@
 import { Send, Wallet } from 'lucide-react';
-import { lazy } from 'react';
+import { lazyWithRetry } from '@/app/loadRecovery';
 import type { ScreenDef } from '@/navigation/types';
 
 /**
@@ -13,7 +13,7 @@ export const UNAPPLIED_SCREENS: ScreenDef[] = [
     icon: Wallet,
     permission: 'CLX_VIEW',
     alsoPermissions: ['CLX_UNAPPLIED_WORK'],
-    component: lazy(() => import('./UnappliedPaymentsPage')),
+    component: lazyWithRetry(() => import('./UnappliedPaymentsPage')),
   },
   {
     path: '/collections/unapplied/requests',
@@ -21,7 +21,7 @@ export const UNAPPLIED_SCREENS: ScreenDef[] = [
     icon: Send,
     permission: 'CLX_VIEW',
     alsoPermissions: ['CLX_UNAPPLIED_WORK'],
-    component: lazy(() => import('./UnappliedRequestsPage')),
+    component: lazyWithRetry(() => import('./UnappliedRequestsPage')),
   },
   {
     path: '/collections/unapplied/:ref',
@@ -29,7 +29,7 @@ export const UNAPPLIED_SCREENS: ScreenDef[] = [
     icon: Wallet,
     permission: 'CLX_VIEW',
     alsoPermissions: ['CLX_UNAPPLIED_WORK'],
-    component: lazy(() => import('./UnappliedDetailPage')),
+    component: lazyWithRetry(() => import('./UnappliedDetailPage')),
     hidden: true,
   },
 ];

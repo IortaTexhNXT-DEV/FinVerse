@@ -1,5 +1,5 @@
 import { ClipboardList, FilePlus2, FileSignature, Wrench } from 'lucide-react';
-import { lazy } from 'react';
+import { lazyWithRetry } from '@/app/loadRecovery';
 import type { FeatureModule } from '@/navigation/types';
 
 /**
@@ -16,14 +16,14 @@ export const proposalsModule: FeatureModule = {
       icon: ClipboardList,
       permission: 'PROPOSAL_REQUEST',
       alsoPermissions: ['PROPOSAL_APPROVE', 'TSU_PROCESS', 'TSU_APPROVE'],
-      component: lazy(() => import('./ProposalsPage')),
+      component: lazyWithRetry(() => import('./ProposalsPage')),
     },
     {
       path: '/proposals/new',
       label: 'New Proposal Request',
       icon: FilePlus2,
       permission: 'PROPOSAL_REQUEST',
-      component: lazy(() => import('./ProposalFormPage')),
+      component: lazyWithRetry(() => import('./ProposalFormPage')),
     },
     {
       path: '/proposals/tsu',
@@ -31,7 +31,7 @@ export const proposalsModule: FeatureModule = {
       icon: Wrench,
       permission: 'TSU_PROCESS',
       alsoPermissions: ['TSU_APPROVE'],
-      component: lazy(() => import('./TsuWorkbenchPage')),
+      component: lazyWithRetry(() => import('./TsuWorkbenchPage')),
     },
     {
       path: '/proposals/:id',
@@ -39,7 +39,7 @@ export const proposalsModule: FeatureModule = {
       icon: FileSignature,
       permission: 'PROPOSAL_REQUEST',
       alsoPermissions: ['PROPOSAL_APPROVE', 'TSU_PROCESS', 'TSU_APPROVE'],
-      component: lazy(() => import('./ProposalDetailPage')),
+      component: lazyWithRetry(() => import('./ProposalDetailPage')),
       hidden: true,
     },
     {
@@ -48,7 +48,7 @@ export const proposalsModule: FeatureModule = {
       icon: FilePlus2,
       permission: 'PROPOSAL_REQUEST',
       alsoPermissions: ['TSU_PROCESS'],
-      component: lazy(() => import('./ProposalFormPage')),
+      component: lazyWithRetry(() => import('./ProposalFormPage')),
       hidden: true,
     },
   ],

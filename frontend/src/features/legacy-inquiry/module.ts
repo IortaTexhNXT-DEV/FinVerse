@@ -1,5 +1,5 @@
 import { FileSearch, ScrollText } from 'lucide-react';
-import { lazy } from 'react';
+import { lazyWithRetry } from '@/app/loadRecovery';
 import type { FeatureModule } from '@/navigation/types';
 
 /**
@@ -16,14 +16,14 @@ export const legacyInquiryModule: FeatureModule = {
       label: 'Legacy Inquiry',
       icon: FileSearch,
       permission: 'LEGACY_INQUIRY_VIEW',
-      component: lazy(() => import('./LegacyInquiryPage')),
+      component: lazyWithRetry(() => import('./LegacyInquiryPage')),
     },
     {
       path: '/legacy-inquiry/access-log',
       label: 'Access Log',
       icon: ScrollText,
       permission: 'LEGACY_ACCESS_LOG_VIEW',
-      component: lazy(() => import('./AccessLogPage')),
+      component: lazyWithRetry(() => import('./AccessLogPage')),
     },
   ],
 };

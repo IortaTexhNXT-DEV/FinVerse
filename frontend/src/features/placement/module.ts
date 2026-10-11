@@ -1,5 +1,5 @@
 import { FileOutput, Gauge, Landmark, LayoutList, Receipt, ShieldCheck } from 'lucide-react';
-import { lazy } from 'react';
+import { lazyWithRetry } from '@/app/loadRecovery';
 import type { FeatureModule } from '@/navigation/types';
 
 /**
@@ -16,7 +16,7 @@ export const placementModule: FeatureModule = {
       icon: LayoutList,
       permission: 'ACCOUNT_VIEW',
       alsoPermissions: ['PLACEMENT_MANAGE', 'BILLING_MANAGE'],
-      component: lazy(() => import('./PlacementWorkbenchPage')),
+      component: lazyWithRetry(() => import('./PlacementWorkbenchPage')),
     },
     {
       path: '/placement/processing-dashboard',
@@ -24,7 +24,7 @@ export const placementModule: FeatureModule = {
       icon: Gauge,
       permission: 'PLACEMENT_MANAGE',
       alsoPermissions: ['BOOKING_PROCESS', 'EPOLICY_MANAGE'],
-      component: lazy(() => import('../renewal/dashboard/ProcessingDashboardPage')),
+      component: lazyWithRetry(() => import('../renewal/dashboard/ProcessingDashboardPage')),
     },
     {
       path: '/placement/slips',
@@ -32,21 +32,21 @@ export const placementModule: FeatureModule = {
       icon: FileOutput,
       permission: 'ACCOUNT_VIEW',
       alsoPermissions: ['PLACEMENT_MANAGE'],
-      component: lazy(() => import('./SlipsPage')),
+      component: lazyWithRetry(() => import('./SlipsPage')),
     },
     {
       path: '/placement/billing',
       label: 'CLPC Billing',
       icon: Landmark,
       permission: 'BILLING_MANAGE',
-      component: lazy(() => import('./BillingPage')),
+      component: lazyWithRetry(() => import('./BillingPage')),
     },
     {
       path: '/placement/billing/reports/:id',
       label: 'Payment Report',
       icon: Receipt,
       permission: 'BILLING_MANAGE',
-      component: lazy(() => import('./PaymentReportPage')),
+      component: lazyWithRetry(() => import('./PaymentReportPage')),
       hidden: true,
     },
     {
@@ -55,7 +55,7 @@ export const placementModule: FeatureModule = {
       icon: ShieldCheck,
       permission: 'ACCOUNT_VIEW',
       alsoPermissions: ['PLACEMENT_MANAGE', 'BILLING_MANAGE'],
-      component: lazy(() => import('./AccountPlacementPage')),
+      component: lazyWithRetry(() => import('./AccountPlacementPage')),
       hidden: true,
     },
   ],

@@ -1,5 +1,5 @@
 import { BookCheck, FilePen, History, ReceiptText, Settings2, Upload } from 'lucide-react';
-import { lazy } from 'react';
+import { lazyWithRetry } from '@/app/loadRecovery';
 import type { FeatureModule } from '@/navigation/types';
 
 const VIEW = 'BOOKING_PROCESS';
@@ -20,14 +20,14 @@ export const bookingModule: FeatureModule = {
       icon: BookCheck,
       permission: VIEW,
       alsoPermissions: ADJUST,
-      component: lazy(() => import('./BookingWorkbenchPage')),
+      component: lazyWithRetry(() => import('./BookingWorkbenchPage')),
     },
     {
       path: '/booking/book/:arn',
       label: 'Pre-booking Confirmation',
       icon: BookCheck,
       permission: VIEW,
-      component: lazy(() => import('./BookingConfirmPage')),
+      component: lazyWithRetry(() => import('./BookingConfirmPage')),
       hidden: true,
     },
     {
@@ -36,7 +36,7 @@ export const bookingModule: FeatureModule = {
       icon: ReceiptText,
       permission: VIEW,
       alsoPermissions: ADJUST,
-      component: lazy(() => import('./InvoiceDetailPage')),
+      component: lazyWithRetry(() => import('./InvoiceDetailPage')),
       hidden: true,
     },
     {
@@ -45,7 +45,7 @@ export const bookingModule: FeatureModule = {
       icon: ReceiptText,
       permission: VIEW,
       alsoPermissions: ADJUST,
-      component: lazy(() => import('./InvoiceByNoPage')),
+      component: lazyWithRetry(() => import('./InvoiceByNoPage')),
       hidden: true,
     },
     {
@@ -54,7 +54,7 @@ export const bookingModule: FeatureModule = {
       icon: FilePen,
       permission: VIEW,
       alsoPermissions: ADJUST,
-      component: lazy(() => import('./EndorsementsPage')),
+      component: lazyWithRetry(() => import('./EndorsementsPage')),
     },
     {
       path: '/booking/endorsements/new',
@@ -62,7 +62,7 @@ export const bookingModule: FeatureModule = {
       icon: FilePen,
       permission: VIEW,
       alsoPermissions: ADJUST,
-      component: lazy(() => import('./EndorsementEntryPage')),
+      component: lazyWithRetry(() => import('./EndorsementEntryPage')),
       hidden: true,
     },
     {
@@ -71,7 +71,7 @@ export const bookingModule: FeatureModule = {
       icon: ReceiptText,
       permission: VIEW,
       alsoPermissions: ADJUST,
-      component: lazy(() => import('./ServiceInvoicesPage')),
+      component: lazyWithRetry(() => import('./ServiceInvoicesPage')),
     },
     {
       path: '/booking/service-invoices/:id',
@@ -79,7 +79,7 @@ export const bookingModule: FeatureModule = {
       icon: ReceiptText,
       permission: VIEW,
       alsoPermissions: ADJUST,
-      component: lazy(() => import('./ServiceInvoiceDetailPage')),
+      component: lazyWithRetry(() => import('./ServiceInvoiceDetailPage')),
       hidden: true,
     },
     {
@@ -88,7 +88,7 @@ export const bookingModule: FeatureModule = {
       icon: History,
       permission: VIEW,
       alsoPermissions: ADJUST,
-      component: lazy(() => import('./BatchRunsPage')),
+      component: lazyWithRetry(() => import('./BatchRunsPage')),
     },
     {
       path: '/booking/batch-runs/:runNo',
@@ -96,7 +96,7 @@ export const bookingModule: FeatureModule = {
       icon: History,
       permission: VIEW,
       alsoPermissions: ADJUST,
-      component: lazy(() => import('./BatchRunDetailPage')),
+      component: lazyWithRetry(() => import('./BatchRunDetailPage')),
       hidden: true,
     },
     {
@@ -105,7 +105,7 @@ export const bookingModule: FeatureModule = {
       icon: Settings2,
       permission: VIEW,
       alsoPermissions: ['BOOKING_ADJUST', 'MASTER_VIEW'],
-      component: lazy(() => import('./BookingSetupPage')),
+      component: lazyWithRetry(() => import('./BookingSetupPage')),
     },
     {
       // More specific than /bulk/:handler so the menu keeps the Booking section open.
@@ -113,7 +113,7 @@ export const bookingModule: FeatureModule = {
       label: 'Upload Bookings',
       icon: Upload,
       permission: 'BULK_PROCESS',
-      component: lazy(() => import('./BookingUploadPage')),
+      component: lazyWithRetry(() => import('./BookingUploadPage')),
       hidden: true,
     },
   ],

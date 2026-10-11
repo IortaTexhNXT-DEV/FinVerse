@@ -1,5 +1,5 @@
 import { FileUp, Repeat } from 'lucide-react';
-import { lazy } from 'react';
+import { lazyWithRetry } from '@/app/loadRecovery';
 import type { FeatureModule, ScreenDef } from '@/navigation/types';
 
 const journalAutomation: ScreenDef[] = [
@@ -8,14 +8,14 @@ const journalAutomation: ScreenDef[] = [
     label: 'Recurring Journals',
     icon: Repeat,
     permission: 'JOURNAL_VIEW',
-    component: lazy(() => import('./RecurringJournalsPage')),
+    component: lazyWithRetry(() => import('./RecurringJournalsPage')),
   },
   {
     path: '/gl/upload',
     label: 'Journal Upload',
     icon: FileUp,
     permission: 'JOURNAL_CREATE',
-    component: lazy(() => import('./JournalUploadPage')),
+    component: lazyWithRetry(() => import('./JournalUploadPage')),
   },
 ];
 

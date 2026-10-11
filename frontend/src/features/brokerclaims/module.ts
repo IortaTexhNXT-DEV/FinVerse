@@ -9,7 +9,7 @@ import {
   Settings2,
   ShieldCheck,
 } from 'lucide-react';
-import { lazy } from 'react';
+import { lazyWithRetry } from '@/app/loadRecovery';
 import type { FeatureModule } from '@/navigation/types';
 
 /**
@@ -29,28 +29,28 @@ export const brokerClaimsModule: FeatureModule = {
       label: 'Claims Home',
       icon: ClipboardList,
       permission: 'BCL_VIEW',
-      component: lazy(() => import('./home/ClaimsHomePage')),
+      component: lazyWithRetry(() => import('./home/ClaimsHomePage')),
     },
     {
       path: '/claims-handling/worklist',
       label: 'Claims Worklist',
       icon: ListChecks,
       permission: 'BCL_VIEW',
-      component: lazy(() => import('./worklist/WorklistPage')),
+      component: lazyWithRetry(() => import('./worklist/WorklistPage')),
     },
     {
       path: '/claims-handling/new',
       label: 'Record Claim',
       icon: FilePlus2,
       permission: 'BCL_RECORD',
-      component: lazy(() => import('./record/RecordClaimPage')),
+      component: lazyWithRetry(() => import('./record/RecordClaimPage')),
     },
     {
       path: '/claims-handling/:id',
       label: 'Claim',
       icon: FileText,
       permission: 'BCL_VIEW',
-      component: lazy(() => import('./record/ClaimPage')),
+      component: lazyWithRetry(() => import('./record/ClaimPage')),
       hidden: true,
     },
     {
@@ -58,21 +58,21 @@ export const brokerClaimsModule: FeatureModule = {
       label: 'Cover Lookup',
       icon: ShieldCheck,
       permission: 'BCL_COVER_VIEW',
-      component: lazy(() => import('./cover/CoverLookupPage')),
+      component: lazyWithRetry(() => import('./cover/CoverLookupPage')),
     },
     {
       path: '/claims-handling/diary',
       label: 'My Diary',
       icon: NotebookPen,
       permission: 'BCL_VIEW',
-      component: lazy(() => import('./diary/DiaryPage')),
+      component: lazyWithRetry(() => import('./diary/DiaryPage')),
     },
     {
       path: '/claims-handling/location-refs',
       label: 'Insurer Location References',
       icon: MapPin,
       permission: 'BCL_LOCATION_REF_MAINTAIN',
-      component: lazy(() => import('./location/LocationRefsPage')),
+      component: lazyWithRetry(() => import('./location/LocationRefsPage')),
     },
     {
       path: '/claims-handling/reports',
@@ -80,14 +80,14 @@ export const brokerClaimsModule: FeatureModule = {
       icon: BarChart3,
       permission: 'BCL_REPORT_VIEW',
       alsoPermissions: ['BCL_DATA_EXTRACT'],
-      component: lazy(() => import('./reports/ClaimsReportsPage')),
+      component: lazyWithRetry(() => import('./reports/ClaimsReportsPage')),
     },
     {
       path: '/claims-handling/setup',
       label: 'Claims Setup',
       icon: Settings2,
       permission: 'BCL_SETUP',
-      component: lazy(() => import('./setup/ClaimsSetupPage')),
+      component: lazyWithRetry(() => import('./setup/ClaimsSetupPage')),
     },
   ],
 };

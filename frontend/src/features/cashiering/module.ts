@@ -19,7 +19,7 @@ import {
   Upload,
   Wallet,
 } from 'lucide-react';
-import { lazy } from 'react';
+import { lazyWithRetry } from '@/app/loadRecovery';
 import type { FeatureModule } from '@/navigation/types';
 
 const CASH_ALL = [
@@ -48,14 +48,14 @@ export const cashieringModule: FeatureModule = {
       icon: Banknote,
       permission: 'CASH_RECEIPT',
       alsoPermissions: [...CASH_ALL, 'CWT_TAG'],
-      component: lazy(() => import('./CashieringHomePage')),
+      component: lazyWithRetry(() => import('./CashieringHomePage')),
     },
     {
       path: '/cashiering/records/new',
       label: 'Create AR/OR',
       icon: FilePlus2,
       permission: 'CASH_RECEIPT',
-      component: lazy(() => import('./RecordFormPage')),
+      component: lazyWithRetry(() => import('./RecordFormPage')),
     },
     {
       path: '/cashiering/records/:id/edit',
@@ -63,7 +63,7 @@ export const cashieringModule: FeatureModule = {
       icon: FilePlus2,
       permission: 'CASH_RECEIPT',
       alsoPermissions: ['CASH_CANCEL', 'CASH_REINSTATE'],
-      component: lazy(() => import('./RecordFormPage')),
+      component: lazyWithRetry(() => import('./RecordFormPage')),
       hidden: true,
     },
     {
@@ -72,7 +72,7 @@ export const cashieringModule: FeatureModule = {
       icon: ClipboardCheck,
       permission: 'CASH_RECEIPT',
       alsoPermissions: CASH_ALL,
-      component: lazy(() => import('./RecordDetailPage')),
+      component: lazyWithRetry(() => import('./RecordDetailPage')),
       hidden: true,
     },
     {
@@ -81,14 +81,14 @@ export const cashieringModule: FeatureModule = {
       icon: ClipboardCheck,
       permission: 'CASH_APPROVE',
       alsoPermissions: ['CASH_RECEIPT', 'CASH_CANCEL', 'CASH_REINSTATE'],
-      component: lazy(() => import('./PostingListPage')),
+      component: lazyWithRetry(() => import('./PostingListPage')),
     },
     {
       path: '/cashiering/receive',
       label: 'Receive Payment',
       icon: HandCoins,
       permission: 'CASH_RECEIPT',
-      component: lazy(() => import('./ReceivePaymentPage')),
+      component: lazyWithRetry(() => import('./ReceivePaymentPage')),
     },
     {
       path: '/cashiering/receipts',
@@ -96,7 +96,7 @@ export const cashieringModule: FeatureModule = {
       icon: Receipt,
       permission: 'CASH_RECEIPT',
       alsoPermissions: CASH_ALL,
-      component: lazy(() => import('./ReceiptsPage')),
+      component: lazyWithRetry(() => import('./ReceiptsPage')),
     },
     {
       path: '/cashiering/receipts/:id',
@@ -104,7 +104,7 @@ export const cashieringModule: FeatureModule = {
       icon: Receipt,
       permission: 'CASH_RECEIPT',
       alsoPermissions: CASH_ALL,
-      component: lazy(() => import('./ReceiptDetailPage')),
+      component: lazyWithRetry(() => import('./ReceiptDetailPage')),
       hidden: true,
     },
     {
@@ -113,7 +113,7 @@ export const cashieringModule: FeatureModule = {
       icon: Wallet,
       permission: 'CASH_DISPOSITION',
       alsoPermissions: ['CASH_APPROVE', 'CASH_APPLY', 'CASH_RECEIPT'],
-      component: lazy(() => import('./UnappliedPage')),
+      component: lazyWithRetry(() => import('./UnappliedPage')),
     },
     {
       path: '/cashiering/day-end',
@@ -121,7 +121,7 @@ export const cashieringModule: FeatureModule = {
       icon: ClipboardCheck,
       permission: 'CASH_RECEIPT',
       alsoPermissions: CASH_ALL,
-      component: lazy(() => import('./DayEndListPage')),
+      component: lazyWithRetry(() => import('./DayEndListPage')),
     },
     {
       path: '/cashiering/search-log',
@@ -129,7 +129,7 @@ export const cashieringModule: FeatureModule = {
       icon: ClipboardCheck,
       permission: 'CASH_APPROVE',
       alsoPermissions: ['OPS_REPORT_VIEW'],
-      component: lazy(() => import('./SearchLogPage')),
+      component: lazyWithRetry(() => import('./SearchLogPage')),
     },
     {
       path: '/cashiering/unapplied-inquiry',
@@ -137,7 +137,7 @@ export const cashieringModule: FeatureModule = {
       icon: Wallet,
       permission: 'CASH_RECEIPT',
       alsoPermissions: [...CASH_ALL, 'CLX_UNAPPLIED_WORK'],
-      component: lazy(() => import('./UnappliedInquiryPage')),
+      component: lazyWithRetry(() => import('./UnappliedInquiryPage')),
     },
     {
       path: '/cashiering/unapplied/:id',
@@ -145,7 +145,7 @@ export const cashieringModule: FeatureModule = {
       icon: Wallet,
       permission: 'CASH_DISPOSITION',
       alsoPermissions: ['CASH_APPROVE', 'CASH_APPLY', 'CASH_RECEIPT'],
-      component: lazy(() => import('./UnappliedDetailPage')),
+      component: lazyWithRetry(() => import('./UnappliedDetailPage')),
       hidden: true,
     },
     {
@@ -154,7 +154,7 @@ export const cashieringModule: FeatureModule = {
       icon: Send,
       permission: 'CASH_DISPOSITION',
       alsoPermissions: ['CASH_APPROVE', 'CASH_DISPOSITION_APPROVE', 'CASH_APPLY'],
-      component: lazy(() => import('./CashieringRequestsPage')),
+      component: lazyWithRetry(() => import('./CashieringRequestsPage')),
     },
     {
       path: '/cashiering/prebooked',
@@ -162,14 +162,14 @@ export const cashieringModule: FeatureModule = {
       icon: Hourglass,
       permission: 'CASH_APPLY',
       alsoPermissions: ['CASH_RECEIPT', 'CASH_APPROVE'],
-      component: lazy(() => import('./PrebookedPage')),
+      component: lazyWithRetry(() => import('./PrebookedPage')),
     },
     {
       path: '/cashiering/uploads',
       label: 'Payment Uploads',
       icon: Upload,
       permission: 'CASH_UPLOAD',
-      component: lazy(() => import('./PaymentUploadsPage')),
+      component: lazyWithRetry(() => import('./PaymentUploadsPage')),
     },
     {
       path: '/cashiering/payment-files',
@@ -177,7 +177,7 @@ export const cashieringModule: FeatureModule = {
       icon: FolderInput,
       permission: 'CASH_UPLOAD',
       alsoPermissions: ['CASH_RECEIPT', 'CASH_APPROVE'],
-      component: lazy(() => import('./PaymentFilesPage')),
+      component: lazyWithRetry(() => import('./PaymentFilesPage')),
     },
     {
       path: '/cashiering/settlement-ors',
@@ -185,7 +185,7 @@ export const cashieringModule: FeatureModule = {
       icon: ReceiptText,
       permission: 'CASH_RECEIPT',
       alsoPermissions: CASH_ALL,
-      component: lazy(() => import('./SettlementOrsPage')),
+      component: lazyWithRetry(() => import('./SettlementOrsPage')),
     },
     {
       path: '/cashiering/pdc',
@@ -193,7 +193,7 @@ export const cashieringModule: FeatureModule = {
       icon: CalendarClock,
       permission: 'CASH_UPLOAD',
       alsoPermissions: ['CASH_RECEIPT', 'CASH_APPROVE'],
-      component: lazy(() => import('./PdcWarehousePage')),
+      component: lazyWithRetry(() => import('./PdcWarehousePage')),
     },
     {
       path: '/cashiering/pickups',
@@ -201,14 +201,14 @@ export const cashieringModule: FeatureModule = {
       icon: Truck,
       permission: 'CASH_RECEIPT',
       alsoPermissions: ['CASH_PRINT'],
-      component: lazy(() => import('./CheckPickupPage')),
+      component: lazyWithRetry(() => import('./CheckPickupPage')),
     },
     {
       path: '/cashiering/print',
       label: 'Batch Print',
       icon: Printer,
       permission: 'CASH_PRINT',
-      component: lazy(() => import('./BatchPrintPage')),
+      component: lazyWithRetry(() => import('./BatchPrintPage')),
     },
     {
       path: '/cashiering/cwt',
@@ -216,7 +216,7 @@ export const cashieringModule: FeatureModule = {
       icon: FileStack,
       permission: 'CWT_PROCESS',
       alsoPermissions: ['CWT_TAG', 'DISB_PROCESS'],
-      component: lazy(() => import('./Cwt2307Page')),
+      component: lazyWithRetry(() => import('./Cwt2307Page')),
     },
     {
       path: '/cashiering/unapplied-income',
@@ -224,7 +224,7 @@ export const cashieringModule: FeatureModule = {
       icon: Landmark,
       permission: 'CASH_UPP_INCOME_REQUEST',
       alsoPermissions: ['CASH_UPP_INCOME_APPROVE', 'CASH_DISPOSITION_APPROVE'],
-      component: lazy(() => import('./UnappliedIncomePage')),
+      component: lazyWithRetry(() => import('./UnappliedIncomePage')),
     },
     {
       path: '/cashiering/legacy-pr2307',
@@ -232,7 +232,7 @@ export const cashieringModule: FeatureModule = {
       icon: Undo2,
       permission: 'LEGACY_REVERSAL_REQUEST',
       alsoPermissions: ['LEGACY_REVERSAL_APPROVE'],
-      component: lazy(() => import('./LegacyPr2307Page')),
+      component: lazyWithRetry(() => import('./LegacyPr2307Page')),
     },
     {
       path: '/cashiering/legacy-batches/:batchNo',
@@ -245,7 +245,7 @@ export const cashieringModule: FeatureModule = {
         'LEGACY_REVERSAL_REQUEST',
         'LEGACY_REVERSAL_APPROVE',
       ],
-      component: lazy(() => import('./LegacyBatchPage')),
+      component: lazyWithRetry(() => import('./LegacyBatchPage')),
       hidden: true,
     },
     {
@@ -254,7 +254,7 @@ export const cashieringModule: FeatureModule = {
       icon: ReceiptText,
       permission: 'CASH_UPLOAD',
       alsoPermissions: ['CASH_RECEIPT'],
-      component: lazy(() => import('./CommissionOrsPage')),
+      component: lazyWithRetry(() => import('./CommissionOrsPage')),
     },
     {
       path: '/cashiering/receipt-forms',
@@ -262,7 +262,7 @@ export const cashieringModule: FeatureModule = {
       icon: FileStack,
       permission: 'CASH_SERIES_MANAGE',
       alsoPermissions: ['MASTER_AUTHORIZE', 'CASH_PRINT'],
-      component: lazy(() => import('./ReceiptFormsPage')),
+      component: lazyWithRetry(() => import('./ReceiptFormsPage')),
     },
     {
       path: '/cashiering/series',
@@ -270,7 +270,7 @@ export const cashieringModule: FeatureModule = {
       icon: Hash,
       permission: 'CASH_SERIES_MANAGE',
       alsoPermissions: ['MASTER_AUTHORIZE', 'CASH_RECEIPT'],
-      component: lazy(() => import('./ReceiptSeriesPage')),
+      component: lazyWithRetry(() => import('./ReceiptSeriesPage')),
     },
     {
       path: '/cashiering/setup',
@@ -278,7 +278,7 @@ export const cashieringModule: FeatureModule = {
       icon: Settings2,
       permission: 'CASH_APPROVE',
       alsoPermissions: ['CASH_RECEIPT'],
-      component: lazy(() => import('./CashieringSetupPage')),
+      component: lazyWithRetry(() => import('./CashieringSetupPage')),
     },
   ],
 };

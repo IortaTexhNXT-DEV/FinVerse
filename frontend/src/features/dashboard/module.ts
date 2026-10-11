@@ -1,5 +1,5 @@
 import { LayoutDashboard } from 'lucide-react';
-import { lazy } from 'react';
+import { lazyWithRetry } from '@/app/loadRecovery';
 import type { FeatureModule } from '@/navigation/types';
 
 export const dashboardModule: FeatureModule = {
@@ -11,7 +11,7 @@ export const dashboardModule: FeatureModule = {
       label: 'Dashboard',
       icon: LayoutDashboard,
       permission: 'DASHBOARD_VIEW',
-      component: lazy(() => import('./DashboardPage')),
+      component: lazyWithRetry(() => import('./DashboardPage')),
     },
   ],
 };

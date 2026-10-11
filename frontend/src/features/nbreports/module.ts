@@ -1,5 +1,5 @@
 import { FileBarChart2, Gauge, Target } from 'lucide-react';
-import { lazy } from 'react';
+import { lazyWithRetry } from '@/app/loadRecovery';
 import type { FeatureModule } from '@/navigation/types';
 
 /** Route of the New Business dashboard, the landing page of the broking roles (BRNB.012). */
@@ -15,7 +15,7 @@ export const nbDashboardModule: FeatureModule = {
       label: 'NB Dashboard',
       icon: Gauge,
       permission: 'WORK_VIEW',
-      component: lazy(() => import('./NbDashboardPage')),
+      component: lazyWithRetry(() => import('./NbDashboardPage')),
     },
   ],
 };
@@ -30,7 +30,7 @@ export const nbReportsModule: FeatureModule = {
       label: 'New Business Reports',
       icon: FileBarChart2,
       permission: 'REPORT_VIEW',
-      component: lazy(() => import('./NbReportsPage')),
+      component: lazyWithRetry(() => import('./NbReportsPage')),
     },
     {
       path: '/nb/targets',
@@ -38,7 +38,7 @@ export const nbReportsModule: FeatureModule = {
       icon: Target,
       permission: 'WORK_ASSIGN',
       alsoPermissions: ['MASTER_VIEW'],
-      component: lazy(() => import('./SalesTargetsPage')),
+      component: lazyWithRetry(() => import('./SalesTargetsPage')),
     },
   ],
 };

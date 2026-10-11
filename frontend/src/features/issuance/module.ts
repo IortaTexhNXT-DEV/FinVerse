@@ -1,5 +1,5 @@
 import { FileBadge, FileSearch, FileUp, LayoutList, MailCheck, Send } from 'lucide-react';
-import { lazy } from 'react';
+import { lazyWithRetry } from '@/app/loadRecovery';
 import type { FeatureModule } from '@/navigation/types';
 
 /**
@@ -16,14 +16,14 @@ export const issuanceModule: FeatureModule = {
       icon: LayoutList,
       permission: 'ACCOUNT_VIEW',
       alsoPermissions: ['EPOLICY_MANAGE', 'EPOLICY_SEND'],
-      component: lazy(() => import('./IssuanceWorkbenchPage')),
+      component: lazyWithRetry(() => import('./IssuanceWorkbenchPage')),
     },
     {
       path: '/issuance/upload',
       label: 'E-policy Upload',
       icon: FileUp,
       permission: 'EPOLICY_MANAGE',
-      component: lazy(() => import('./EpolicyUploadPage')),
+      component: lazyWithRetry(() => import('./EpolicyUploadPage')),
     },
     {
       path: '/issuance/epolicies/:id',
@@ -31,7 +31,7 @@ export const issuanceModule: FeatureModule = {
       icon: FileSearch,
       permission: 'ACCOUNT_VIEW',
       alsoPermissions: ['EPOLICY_MANAGE', 'EPOLICY_SEND'],
-      component: lazy(() => import('./ExtractionReviewPage')),
+      component: lazyWithRetry(() => import('./ExtractionReviewPage')),
       hidden: true,
     },
     {
@@ -40,7 +40,7 @@ export const issuanceModule: FeatureModule = {
       icon: FileBadge,
       permission: 'ACCOUNT_VIEW',
       alsoPermissions: ['EPOLICY_MANAGE', 'EPOLICY_SEND'],
-      component: lazy(() => import('./InsuranceAdvicePage')),
+      component: lazyWithRetry(() => import('./InsuranceAdvicePage')),
     },
     {
       path: '/issuance/advice-recipients',
@@ -48,7 +48,7 @@ export const issuanceModule: FeatureModule = {
       icon: MailCheck,
       permission: 'MASTER_VIEW',
       alsoPermissions: ['LOV_MANAGE', 'MASTER_AUTHORIZE', 'EPOLICY_MANAGE', 'EPOLICY_SEND'],
-      component: lazy(() => import('./AdviceRecipientsPage')),
+      component: lazyWithRetry(() => import('./AdviceRecipientsPage')),
     },
     {
       path: '/issuance/dispatch',
@@ -56,7 +56,7 @@ export const issuanceModule: FeatureModule = {
       icon: Send,
       permission: 'EPOLICY_SEND',
       alsoPermissions: ['EPOLICY_MANAGE'],
-      component: lazy(() => import('./DispatchPage')),
+      component: lazyWithRetry(() => import('./DispatchPage')),
     },
   ],
 };

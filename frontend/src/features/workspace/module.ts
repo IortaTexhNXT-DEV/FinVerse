@@ -1,5 +1,5 @@
 import { Bell, ListTodo } from 'lucide-react';
-import { lazy } from 'react';
+import { lazyWithRetry } from '@/app/loadRecovery';
 import type { FeatureModule } from '@/navigation/types';
 
 /** My Work: the broking work queues (docs/architecture/BROKING_ARCHITECTURE.md section 5). */
@@ -12,14 +12,14 @@ export const workspaceModule: FeatureModule = {
       label: 'My Work',
       icon: ListTodo,
       permission: 'WORK_VIEW',
-      component: lazy(() => import('./MyWorkPage')),
+      component: lazyWithRetry(() => import('./MyWorkPage')),
     },
     {
       path: '/notifications',
       label: 'Notifications',
       icon: Bell,
       hidden: true,
-      component: lazy(() => import('./NotificationsPage')),
+      component: lazyWithRetry(() => import('./NotificationsPage')),
     },
   ],
 };

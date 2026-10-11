@@ -55,7 +55,7 @@ summary:
     - ["BRD vs Out-of-the-Box vs Best Practice", "For every BRD requirement: what the system offers as standard, broking best practice, fit and recommendation"]
     - ["Change Request Register", "How a change after sign-off is raised and decided; candidate changes; the decision log of every Appendix R observation"]
     - ["Test Cases and Traceability", "BRD ID to FR item, test cases, screens and walkthrough steps; the questions answered in BDOI's FRS; UAT entry and exit criteria"]
-    - ["Business Unit Walkthrough Users", "The sign-in ID of every persona for the walkthrough in the BIBS UAT environment and the walkthrough script"]
+    - ["Business Unit Walkthrough Users", "The sign-in ID of every persona for the walkthrough in the BIBS DEV environment and the walkthrough script"]
 
 # ------------------------------------------------------------------------------------- Appendix C introduction
 annex_c:
@@ -674,7 +674,7 @@ walkthrough:
   id: WT-E
   title: A Cashiering day for the Business Unit walkthrough
   summary: >-
-    The walkthrough of this FRS for the Business Unit in the BIBS UAT environment: the receipt series, a payment file
+    The walkthrough of this FRS for the Business Unit in the BIBS DEV environment: the receipt series, a payment file
     of the day, the pre-booked and unapplied payments, a post-dated check, an OR of Head Office, an AR of a branch,
     the printing of the day's receipts and the reports. The steps follow the screens of Appendix E as they are today;
     the posting step of BDOI's FRS (Appendix R, C1) is walked through once it is decided.

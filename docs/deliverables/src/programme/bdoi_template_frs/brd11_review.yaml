@@ -61,7 +61,7 @@ summary:
     - ["BRD vs Out-of-the-Box vs Best Practice", "For every BRD requirement: what the system offers as standard, broking best practice, fit and recommendation"]
     - ["Change Request Register", "How a change after sign-off is raised and decided; candidate changes; the decision log of every Annex Q observation"]
     - ["Test Cases and Traceability", "BRD ID to FR item, test cases, screens and walkthrough steps; the questions answered in BDOI's FRS; UAT entry and exit criteria"]
-    - ["Business Unit Walkthrough Users", "The sign-in ID of every persona for the walkthrough in the BIBS UAT environment and the walkthrough script"]
+    - ["Business Unit Walkthrough Users", "The sign-in ID of every persona for the walkthrough in the BIBS DEV environment and the walkthrough script"]
 
 # ------------------------------------------------------------------------------------- Annex A additions (figures)
 annex_a:

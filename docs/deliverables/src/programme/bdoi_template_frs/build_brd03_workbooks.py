@@ -51,7 +51,7 @@ CONFORMANCE = PROG / "Quality" / "BIBS_Conformance_BRD-00_End-to-End_Conformance
 CMP = REPO / "docs" / "deliverables" / "src" / "programme" / "comparisons" / "brd03_frs_comparison.yaml"
 DATE = "9 October 2026"
 PW_TEXT = "Issued separately by the iorta TechNXT Project Team"
-ENVIRONMENT = "BIBS UAT environment: https://uat.brokerverse.cloud"
+ENVIRONMENT = "BIBS DEV environment: https://dev.brokerverse.cloud"
 ITEMS = v12.ITEMS
 V12 = v12.V12
 
@@ -750,7 +750,7 @@ def build_uat() -> tuple[Path, int, int]:
                       "workbook."]
     wb.sheet("Users", [
         Column("persona", "Persona", 20, "Business role in the FRS"), Column("name", "Name", 24, "User name"),
-        Column("id", "Sign-in ID", 11, "User ID in the BIBS UAT environment"),
+        Column("id", "Sign-in ID", 11, "User ID in the BIBS DEV environment"),
         Column("profile", "Role / group profile", 26, "Group profile of the user"),
         Column("unit", "Company / branch / unit", 30, "Where the user belongs"),
         Column("does", "What the user does in the walkthrough", 36, "Responsibilities"),

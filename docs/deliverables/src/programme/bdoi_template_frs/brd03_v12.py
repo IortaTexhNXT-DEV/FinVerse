@@ -477,7 +477,7 @@ def menu_page(a):
     with this_round(b):
         a.h2(f"G.{g} Navigation: menu by persona")
         a.p("The Product Maintenance entries of the menu (Client & Policy › Product Maintenance) that each persona "
-            "sees, with the sign-in ID of the persona in the BIBS UAT environment. A green cell means the persona "
+            "sees, with the sign-in ID of the persona in the BIBS DEV environment. A green cell means the persona "
             "sees the entry; the actions inside each screen follow the role (Annex J.5). The screen standards "
             "(layout, tables with row action menus, dates dd-MMM-yyyy, formatted amounts, messages) are those of "
             "the programme screen standards and are not repeated here.")
@@ -507,7 +507,7 @@ def glossary_add(a):
              ["Maker-checker", "A record is made by one user and authorized by another (four eyes)"],
              ["NFR", "Non-functional requirement (Annex T)"],
              ["Service level", "Target hours of a workflow stage; amber from 80%, red once passed"],
-             ["Sign-in ID", "The user ID of a reviewer in the BIBS UAT environment (walkthrough users workbook)"]]
+             ["Sign-in ID", "The user ID of a reviewer in the BIBS DEV environment (walkthrough users workbook)"]]
     with this_round(b):
         a.h2("N.2 Terms added in version 1.2")
         a.table(["Term", "Meaning"], terms, [1.8, 5.4], size=9)
@@ -608,7 +608,7 @@ def annex_q(a):
         img = _image(x["image"])
         if img:
             a.els.append(final.document_image(b, img))
-            a.els.append(caption(b, f"Figure Q.{x['id'][3:]} – {x['name']}: current layout in the BIBS UAT environment"))
+            a.els.append(caption(b, f"Figure Q.{x['id'][3:]} – {x['name']}: current layout in the BIBS DEV environment"))
             b.stats["doc_images"] += 1
         else:
             a.els.append(b.para("", space_after=0))

@@ -426,10 +426,10 @@ def build(m: Model) -> Path:
                                                   "of each persona")
     lock = m.params.get("LOGIN_MAX_FAILED_ATTEMPTS", "3")
     wb.cover_notes = [
-        "Sign-in IDs: every persona of each BRD has a sign-in ID in the UAT environment, listed on the sheet of the "
+        "Sign-in IDs: every persona of each BRD has a sign-in ID in the DEV environment, listed on the sheet of the "
         "BRD in the order of the business flow (maker before checker). The Walkthrough Script sheet gives the steps "
         "with the sign-in ID of each step; All Users lists every SIT/UAT user of the environment.",
-        "Password: all SIT/UAT users share the seed password of the UAT environment. The system administrator sets "
+        "Password: all SIT/UAT users share the seed password of the DEV environment. The system administrator sets "
         "it in the hosting variables of the UAT back end (BROKERVERSE_SEED_PASSWORD) and gives it to the testers "
         "separately; it is never written in this workbook or any other document.",
         "First sign-in: as delivered (BROKERVERSE_SEED_PASSWORD_MUST_CHANGE = false) testers sign in with the seed "
@@ -442,7 +442,7 @@ def build(m: Model) -> Path:
         "\"Invalid user name or password\". The System Administrator (sign-in ID admin) unlocks it on Setup & "
         "Administration › Administration › Users: Status Locked, then Unlock on the row of the user. Where testers "
         "chose personal passwords, a forgotten one is reset through Forgot password? on the Login page or by the "
-        "System Administrator; a reload of the UAT environment gives every SIT/UAT user the seed password again.",
+        "System Administrator; a reload of the DEV environment gives every SIT/UAT user the seed password again.",
         "Group profiles are shown by name; the Group profile code column is for the system administrator.",
     ]
     persona_cols = [
@@ -501,7 +501,7 @@ def build(m: Model) -> Path:
         Column("name", "User name", 28, "Name of the SIT/UAT user"),
         Column("profiles", "Group profiles", 40, "Names of the group profiles the user holds"),
         Column("place", "Company / branch", 34, "Company and home branch"),
-        Column("status", "Status", 10, "Active, Disabled or Locked in a fresh UAT environment",
+        Column("status", "Status", 10, "Active, Disabled or Locked in a fresh DEV environment",
                values=["Active", "Disabled", "Locked"]),
         Column("limit", "Authorisation limit", 18, "Approval limit of the user, where set"),
         Column("scope", "Data scope", 24, "Companies and branches the user works for"),
@@ -509,7 +509,7 @@ def build(m: Model) -> Path:
         Column("password", "Password", 22, "Never written here: the UAT seed password is provided separately"),
         Column("codes", "Group profile code", 26, "Codes of the group profiles, for the system administrator"),
     ], [{**r, "password": spec["password_text"]} for r in all_rows],
-        description="Every SIT/UAT user of the UAT environment, as loaded by the seed data")
+        description="Every SIT/UAT user of the DEV environment, as loaded by the seed data")
     script_rows = []
     for b in m.brds:
         for r in b["script"]:

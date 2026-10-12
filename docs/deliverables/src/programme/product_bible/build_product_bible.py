@@ -42,7 +42,7 @@ STATUS = ["In both", "OOTB only", "BIBS only", "Neither - market product to conf
 LOB_STATUS = ["Covered", "Partial", "Missing"]
 MAP_STATUS = ["Mapped", "Needs new product", "Needs confirmation", "Retire"]
 LEGACY = ["Ebix", "QPS", "Broker", "iSys", "Other"]
-SRC_KIND = ["BDOI document", "BIBS configuration", "OOTB reference", "Market practice (to confirm with BDOI)"]
+SRC_KIND = ["BDOI BRD/FRS", "BIBS (TechNXT Dev Environment)", "OOTB (iNXT BrokerVerse)", "Market practice (to confirm with BDOI)"]
 
 # Colours of the new status values (in-process only; brand.py is not changed).
 for k, v in {"COVERED": "FIT", "IN BOTH": "FIT", "MAPPED": "FIT", "STANDARD": "FIT",
@@ -95,7 +95,7 @@ def bibs_rows(cat):
     lines, covers, products, coverages, clauses = cat
     lob = D.BIBS_LINE_LOB
     rows = []
-    src = "BIBS catalogue configuration"
+    src = "BIBS (TechNXT Dev Environment) catalogue"
     for ln in lines:
         rows.append(dict(lob=lob[ln["code"]], level="Product line", code=ln["code"], name=ln["name"], parent="-",
                          pk="n/a", rate="n/a", comm="n/a", minp="n/a",
@@ -155,7 +155,7 @@ def main() -> Path:
         "product catalogue (Data Migration BRD BRID_MIG 3.1).",
         "The BIBS and OOTB product sets list configuration codes (catalogue reference data); they do not describe "
         "system behaviour.",
-        "Source legend: 'BDOI document' rows come from BDOI's BRDs / FRS; 'Market practice (to confirm with BDOI)' rows "
+        "Source legend: 'BDOI BRD/FRS' rows come from BDOI's BRDs / FRS; 'Market practice (to confirm with BDOI)' rows "
         "are Philippine non-life market practice and need BDOI confirmation. No BDOI-specific fact is assumed.",
     ]
     wb.legend = [("In both", "Product in the OOTB set and in the BIBS catalogue"),
@@ -168,7 +168,7 @@ def main() -> Path:
 
     # 1 OOTB product set
     ootb = [dict(lob=r[0], level=r[1], code=r[2], name=r[3], parent=r[4], detail=r[5],
-                 src="OOTB reference data (read 12-Oct-2026)") for r in D.OOTB_ROWS]
+                 src="OOTB (iNXT BrokerVerse), read 12-Oct-2026") for r in D.OOTB_ROWS]
     order = {n: i for i, n in enumerate(D.LOB_NAMES + ["All lines"])}
     ootb.sort(key=lambda r: order[r["lob"]])
     wb.sheet("OOTB product set", [
@@ -240,7 +240,7 @@ def main() -> Path:
         Column("oc", "In OOTB (code)", 26, "OOTB code(s); '-' when absent"),
         Column("bc", "In BIBS (code)", 40, "BIBS line / cover type (risk products) or coverage codes; '-' when absent"),
         Column("st", "Status", 18, "In both / OOTB only / BIBS only / Neither - market product to confirm", values=STATUS, status=True),
-        Column("src", "Product source", 24, "Where the product comes from: BDOI document, BIBS configuration or market practice"),
+        Column("src", "Product source", 24, "Where the product comes from: BDOI BRD/FRS, BIBS (TechNXT Dev Environment), OOTB or market practice"),
         Column("kind", "Source type", 18, "Source legend", values=SRC_KIND, status=True),
         Column("rem", "Remarks / action for BDOI", 40, "Confirmation needed, product to add, legacy codes to map"),
     ], comp, description="One row per BDOI LOB and product: OOTB vs BIBS; gaps are flagged for BDOI confirmation, not as certain gaps")
@@ -415,7 +415,7 @@ def main() -> Path:
     sq += [dict(t="Open question for BDOI", item=q, use="BDOI answer needed before the mapping is signed off") for q in L.QUESTIONS]
     wb.sheet("Sources & questions", [
         Column("t", "Type", 22, "Source document, programme deliverable, configuration, assumption or open question",
-               values=["Source document", "Programme deliverable", "BIBS configuration", "OOTB reference", "Market practice",
+               values=["Source document", "Programme deliverable", "BIBS (TechNXT Dev Environment)", "OOTB (iNXT BrokerVerse)", "Market practice",
                        "Assumption (market practice)", "Open question for BDOI"]),
         Column("item", "Item", 80, "Source, assumption or question"), Column("use", "Used for / action", 46, "Where it is used or what is needed"),
     ], sq, description="Every source used, every market-practice assumption and the open questions for BDOI")

@@ -385,8 +385,8 @@ SOURCES = [
     ("Source document", "00 - BRD BDOI Core Replacement v01.pdf (BRD-00)", "Programme scope"),
     ("Source document", "Sanction Screening and Risk Profiling BRD", "KYC / sanction screening reference"),
     ("Programme deliverable", "BIBS FRS-BDOI BRD-03 Product Maintenance v1.3 pack (Programme/BDOI_Template_FRS/BRD-03_Product_Maintenance)", "Product / package / coverage levels and package versions"),
-    ("BIBS configuration", "BIBS New Business catalogue: product lines, cover types, risk products (Annex I, Appendix B), coverages / perils, clauses, package versions, Employee Benefits lines, business-line lookups", "BIBS product set (read 12-Oct-2026)"),
-    ("OOTB reference", "iNXT BrokerVerse platform (branch brokerverse-platform): line-of-business, product category, product, policy type, cover, risk section, taxation masters and product templates", "OOTB product set (read 12-Oct-2026)"),
+    ("BIBS (TechNXT Dev Environment)", "BIBS New Business catalogue: product lines, cover types, risk products (Annex I, Appendix B), coverages / perils, clauses, package versions, Employee Benefits lines, business-line lookups", "BIBS product set (read 12-Oct-2026)"),
+    ("OOTB (iNXT BrokerVerse)", "iNXT BrokerVerse platform (branch brokerverse-platform): line-of-business, product category, product, policy type, cover, risk section, taxation masters and product templates", "OOTB product set (read 12-Oct-2026)"),
     ("Market practice", "Philippine non-life market practice: Insurance Code (PD 612 as amended by RA 10607), IC circulars, NIRC, RA 9514, Local Government Code, standard wordings", "Product library rows marked 'Market practice (to confirm with BDOI)'"),
 ]
 ASSUMPTIONS = [

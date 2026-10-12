@@ -34,6 +34,7 @@ describe the BIBS build for the iorta TechNXT Project Team. They are not part of
 | BIBS Jira Import Drop-0 | - | Backlog | - | [`Backlog/jira/BIBS_Jira_Import_Drop-0.csv`](Backlog/jira/BIBS_Jira_Import_Drop-0.csv) |
 | BIBS Jira Import Drop-1 | - | Backlog | - | [`Backlog/jira/BIBS_Jira_Import_Drop-1.csv`](Backlog/jira/BIBS_Jira_Import_Drop-1.csv) |
 | BIBS Jira Import Drop-2 | - | Backlog | - | [`Backlog/jira/BIBS_Jira_Import_Drop-2.csv`](Backlog/jira/BIBS_Jira_Import_Drop-2.csv) |
+| BIBS Product Bible BDOI LOB Library v1.0 | - | Product_Bible | - | [`Product_Bible/BIBS_Product_Bible_BDOI_LOB_Library_v1.0.xlsx`](Product_Bible/BIBS_Product_Bible_BDOI_LOB_Library_v1.0.xlsx) |
 | Core Replacement | BRD-00 | FRS | 1.1 | [`FRS/BIBS_FRS_BRD-00_Core_Replacement_v1.1.docx`](FRS/BIBS_FRS_BRD-00_Core_Replacement_v1.1.docx) |
 | Master Data Upload Guide | BRD-00 | BDOI_Inputs | 1.2 | [`BDOI_Inputs/BIBS_Templates_BRD-00_Master_Data_Upload_Guide_v1.2.docx`](BDOI_Inputs/BIBS_Templates_BRD-00_Master_Data_Upload_Guide_v1.2.docx) |
 | Master Data and Configuration Upload Templates | BRD-00 | BDOI_Inputs | 1.2 | [`BDOI_Inputs/BIBS_Templates_BRD-00_Master_Data_and_Configuration_Upload_Templates_v1.2.xlsx`](BDOI_Inputs/BIBS_Templates_BRD-00_Master_Data_and_Configuration_Upload_Templates_v1.2.xlsx) |

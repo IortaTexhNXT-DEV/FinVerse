@@ -232,6 +232,12 @@ def write_index(key: str) -> Path:
         *([""] + ["Internal records: the workbooks FRS Coverage in BIBS (Quality/) and BDOI FRS vs BIBS FRS (Comparisons/)",
                   "describe the BIBS build for the iorta TechNXT Project Team. They are not part of the BDOI-template FRS packs",
                   "(BDOI_Template_FRS/) sent to BDOI, and nothing in those packs links to them."] if key == "Programme" else []),
+        *([""] + ["Database design (`Database_Design/`, 13-Oct-2026): the default database design of the iNXT BrokerVerse",
+                  "OOTB platform (copies of its 02 Database Design and 03 Database Inventory, unchanged) and of BIBS (Database",
+                  "Design and Database Inventory, read from the schema of 13-Oct-2026). For the physical design the BIBS pair",
+                  "supersedes the Data Dictionary and the Entity Relationship Diagrams of 08-Oct-2026 in `Data/`; the Data",
+                  "Architecture stays current for the conceptual model, lineage, audit and retention."]
+          if key == "Programme" else []),
         "",
         "| Document | BRD | Kind | Version | File |",
         "|---|---|---|---|---|",

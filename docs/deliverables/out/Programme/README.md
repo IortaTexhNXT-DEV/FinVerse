@@ -20,9 +20,19 @@ Internal records: the workbooks FRS Coverage in BIBS (Quality/) and BDOI FRS vs 
 describe the BIBS build for the iorta TechNXT Project Team. They are not part of the BDOI-template FRS packs
 (BDOI_Template_FRS/) sent to BDOI, and nothing in those packs links to them.
 
+Database design (`Database_Design/`, 13-Oct-2026): the default database design of the iNXT BrokerVerse
+OOTB platform (copies of its 02 Database Design and 03 Database Inventory, unchanged) and of BIBS (Database
+Design and Database Inventory, read from the schema of 13-Oct-2026). For the physical design the BIBS pair
+supersedes the Data Dictionary and the Entity Relationship Diagrams of 08-Oct-2026 in `Data/`; the Data
+Architecture stays current for the conceptual model, lineage, audit and retention.
+
 | Document | BRD | Kind | Version | File |
 |---|---|---|---|---|
 | BIBS BDOI FeatureList vs OOTB and Best Practice v1.0 | - | Feature_List | - | [`Feature_List/BIBS_BDOI_FeatureList_vs_OOTB_and_Best_Practice_v1.0.xlsx`](Feature_List/BIBS_BDOI_FeatureList_vs_OOTB_and_Best_Practice_v1.0.xlsx) |
+| BIBS DB BIBS Database Design v1.0 | - | Database_Design | - | [`Database_Design/BIBS_DB_BIBS_Database_Design_v1.0.docx`](Database_Design/BIBS_DB_BIBS_Database_Design_v1.0.docx) |
+| BIBS DB BIBS Database Inventory v1.0 | - | Database_Design | - | [`Database_Design/BIBS_DB_BIBS_Database_Inventory_v1.0.xlsx`](Database_Design/BIBS_DB_BIBS_Database_Inventory_v1.0.xlsx) |
+| BIBS DB OOTB iNXT BrokerVerse Database Design v1.0 | - | Database_Design | - | [`Database_Design/BIBS_DB_OOTB_iNXT_BrokerVerse_Database_Design_v1.0.docx`](Database_Design/BIBS_DB_OOTB_iNXT_BrokerVerse_Database_Design_v1.0.docx) |
+| BIBS DB OOTB iNXT BrokerVerse Database Inventory v1.0 | - | Database_Design | - | [`Database_Design/BIBS_DB_OOTB_iNXT_BrokerVerse_Database_Inventory_v1.0.docx`](Database_Design/BIBS_DB_OOTB_iNXT_BrokerVerse_Database_Inventory_v1.0.docx) |
 | BIBS FRS-BDOI BRD-02 Operations Cashiering v3.3 | - | BDOI_Template_FRS | - | [`BDOI_Template_FRS/BRD-02_Operations_Cashiering/BIBS_FRS-BDOI_BRD-02_Operations_Cashiering_v3.3.docx`](BDOI_Template_FRS/BRD-02_Operations_Cashiering/BIBS_FRS-BDOI_BRD-02_Operations_Cashiering_v3.3.docx) |
 | BIBS FRS-BDOI BRD-02 Operations Cashiering v3.3 Changes Highlighted | - | BDOI_Template_FRS | - | [`BDOI_Template_FRS/BRD-02_Operations_Cashiering/BIBS_FRS-BDOI_BRD-02_Operations_Cashiering_v3.3_Changes_Highlighted.docx`](BDOI_Template_FRS/BRD-02_Operations_Cashiering/BIBS_FRS-BDOI_BRD-02_Operations_Cashiering_v3.3_Changes_Highlighted.docx) |
 | BIBS FRS-BDOI BRD-03 Product Maintenance v1.3 | - | BDOI_Template_FRS | - | [`BDOI_Template_FRS/BRD-03_Product_Maintenance/BIBS_FRS-BDOI_BRD-03_Product_Maintenance_v1.3.docx`](BDOI_Template_FRS/BRD-03_Product_Maintenance/BIBS_FRS-BDOI_BRD-03_Product_Maintenance_v1.3.docx) |

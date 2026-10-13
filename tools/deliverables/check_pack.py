@@ -119,6 +119,10 @@ BUILD_STATUS_ALLOWED: list[tuple[Path, str, re.Pattern, str]] = [
      "BDOI's Operations Cashiering FRS v3.1 keeps BDOI's Trade payment file sample word for word, whose Remarks read "
      "'(part of 900,000 /LIM/FIRE)'; every other path stays refused there"),
 ]
+# Copies of the iNXT BrokerVerse OOTB platform documents (Programme/Database_Design/BIBS_DB_OOTB_*), kept word for word
+# as issued with the platform (product owner request of 13-Oct-2026): the build-status wording check does not apply to
+# them, nor the restricted-word check (the platform documents name its demo data, sandbox and source host).
+VENDOR_COPY = re.compile(r"^BIBS_DB_OOTB_")
 # Technical terms that a business sign-off set does not contain (client decision of 28-Sep-2026). (label, pattern);
 # whole-word and case-insensitive.
 TECHNICAL: list[tuple[str, re.Pattern]] = [(label, re.compile(pat, re.I)) for label, pat in [
@@ -327,6 +331,8 @@ def build_status() -> list[str]:
     for p in files(brand.OUT_DIR):
         if p.suffix not in OFFICE_SUFFIXES | {".zip"}:
             continue
+        if VENDOR_COPY.match(p.name):
+            continue
         hits: dict[str, set[str]] = defaultdict(set)
         for line in document_lines(p):
             for label, pattern in BUILD_STATUS:
@@ -420,6 +426,8 @@ def restricted_words() -> list[str]:
     out: list[str] = []
     candidates = list(files(brand.DELIVERABLES / "src")) + list(files(brand.OUT_DIR))
     for p in candidates:
+        if VENDOR_COPY.match(p.name):
+            continue
         if p.suffix in TEXT_SUFFIXES:
             text = p.read_text(encoding="utf-8", errors="ignore")
         elif p.suffix in OFFICE_SUFFIXES:

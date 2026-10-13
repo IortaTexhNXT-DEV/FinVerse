@@ -30,14 +30,14 @@ domains:
     sheet: D01 Security and Access
     brd: BRD-11
     owner: BDOI Information Security (policy); Business Administration (user access requests); System Administrator (role implementation)
-    packages: [security, nbadmin]
+    packages: [security, nbadmin, identity]
     summary: Users, roles, permissions, data scope (companies and branches), sign-in sessions, second factor, single sign-on requests and tickets, password history, user access requests with their approvers and events, separation-of-duties rules, access change log and the retention rules of the broking records.
   - id: D02
     name: Platform Services
     sheet: D02 Platform Services
     brd: BRD-00
     owner: BDOI IT (platform operation); System Administrator (parameters, jobs, templates)
-    packages: [system, sharedstate, audit, lov, workflow, approval, messaging, alert, bulk, attachment, docgen, storage, report, events, common]
+    packages: [system, sharedstate, audit, lov, workflow, approval, messaging, alert, bulk, attachment, docgen, storage, report, events, common, configpromo]
     summary: System parameters and scheduled jobs, the insert-only audit trail, lists of values, workflow cases and history, notifications and messages, alerts, bulk uploads, attachments and file metadata, document templates and renditions, the report framework, the transactional outbox of integration events and the document number sequences.
   - id: D03
     name: Organisation and Reference Data

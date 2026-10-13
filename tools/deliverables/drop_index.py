@@ -289,6 +289,8 @@ def write_index(key: str) -> Path:
 
 
 def main() -> int:
+    import doc_metadata  # noqa: PLC0415
+    doc_metadata.main()
     for key in brand.DROPS:
         root = brand.OUT_DIR / brand.DROPS[key]["folder"]
         root.mkdir(parents=True, exist_ok=True)

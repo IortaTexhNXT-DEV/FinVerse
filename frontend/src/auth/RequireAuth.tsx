@@ -4,7 +4,7 @@ import { StatusPage } from '@/components/ui/StatusPage';
 import { mayOpen } from '@/navigation/access';
 import { useAuth } from './authContext';
 import { ForcedPasswordChange } from './ForcedPasswordChange';
-import { LoadingPanel } from '@/components/ui/LoadingPanel';
+import { AppSplash } from '@/components/ui/AppSplash';
 import { hasTimedOut } from '@/session/timedOut';
 
 /**
@@ -17,7 +17,7 @@ export function RequireAuth({ children }: Readonly<{ children: ReactNode }>) {
   const { user, loading, passwordChange } = useAuth();
   const location = useLocation();
   if (loading) {
-    return <LoadingPanel />;
+    return <AppSplash />;
   }
   if (user === null) {
     if (hasTimedOut()) {

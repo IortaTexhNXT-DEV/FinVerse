@@ -11,6 +11,8 @@ export const BRAND = {
   client: pack.client,
   clientShortName: pack.clientShortName,
   groupName: pack.groupName,
+  /** Release of the system shown on About (country, system, major.minor, year). */
+  release: 'PH-BIBS-V1.0.2026',
   platform: 'iNXT BrokerVerse',
   vendor: 'iorta TechNXT',
   clientLogo: pack.clientLogo,

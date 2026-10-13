@@ -13,7 +13,7 @@ import { landingPath } from '@/navigation/access';
 import { MODULES } from '@/navigation/modules';
 import type { ScreenDef } from '@/navigation/types';
 import { createQueryClient } from '@/queryClient';
-import { LoadingPanel } from '@/components/ui/LoadingPanel';
+import { AppSplash } from '@/components/ui/AppSplash';
 import { LoadErrorBoundary } from '@/components/ui/LoadErrorBoundary';
 import { SlowLoadingFallback } from '@/components/ui/SlowLoadingFallback';
 
@@ -55,7 +55,7 @@ export function App() {
               <Suspense
                 fallback={
                   <SlowLoadingFallback>
-                    <LoadingPanel />
+                    <AppSplash />
                   </SlowLoadingFallback>
                 }
               >

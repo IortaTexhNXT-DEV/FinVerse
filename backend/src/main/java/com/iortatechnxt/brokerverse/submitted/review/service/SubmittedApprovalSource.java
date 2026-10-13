@@ -181,7 +181,7 @@ public class SubmittedApprovalSource implements PendingApprovalSource {
             d.getCreatedBy(),
             d.getSubmittedAt(),
             d.getCompanyId(),
-            DocumentApprovals.linkOf(doc, d)));
+            DocumentApprovals.linkOf(doc)));
   }
 
   private static RecordFacts facts(

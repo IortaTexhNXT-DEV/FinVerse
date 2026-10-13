@@ -240,7 +240,7 @@ public class IaafService {
         DocumentApprovals.IAAF,
         i,
         p.getAssured().assuredName(),
-        DocumentApprovals.linkOf(DocumentApprovals.IAAF, i));
+        DocumentApprovals.linkOf(DocumentApprovals.IAAF));
     history.note(
         p,
         IAAF_TOPIC,

@@ -16,6 +16,7 @@ import { Tabs } from '@/components/ui/Tabs';
 import { NotificationItem } from './NotificationItem';
 import { groupByDay, kindOf } from './notificationLogic';
 import type { NotificationKind } from './notificationLogic';
+import { useOpenableLink } from '@/navigation/openable';
 
 type View = 'all' | 'unread';
 
@@ -94,12 +95,14 @@ export default function NotificationsPage() {
     );
 
   const shown = matching(list.data?.content ?? [], kind, text);
+  const openable = useOpenableLink();
   const open = (n: AppNotification) => {
     if (!n.read) {
       read.mutate(n.id);
     }
-    if (n.link) {
-      void navigate(n.link);
+    const link = openable(n.link);
+    if (link) {
+      void navigate(link);
     }
   };
   const chips = activeFilters(kind, text, (key) => set(key, ''));

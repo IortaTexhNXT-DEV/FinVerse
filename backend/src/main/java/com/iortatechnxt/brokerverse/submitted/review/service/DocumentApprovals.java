@@ -148,7 +148,6 @@ public class DocumentApprovals {
    * Submits a document to its first level and notifies its approvers.
    *
    * @param doc IAAF or TOR
-   * @param d document
    * @param levels levels of the document
    * @param subject what is approved (for the notice)
    */
@@ -162,7 +161,6 @@ public class DocumentApprovals {
    * Approves the current level of a document by the current user and signs it.
    *
    * @param doc IAAF or TOR
-   * @param d document
    * @param levels levels of the document
    * @param subject what is approved (for the notice)
    * @return true when the last level was approved
@@ -211,7 +209,6 @@ public class DocumentApprovals {
    * Returns a document to its preparer.
    *
    * @param doc IAAF or TOR
-   * @param d document
    * @param reasonCode reason (LOV SBM_RETURN_REASON)
    * @param comment comment
    */
@@ -227,7 +224,7 @@ public class DocumentApprovals {
         new Notice(
             d.number() + " returned",
             d.getReturnReason(),
-            linkOf(doc, d),
+            linkOf(doc),
             entityOf(doc),
             d.getId().toString()));
   }
@@ -236,7 +233,6 @@ public class DocumentApprovals {
    * Moves the work case (system action: the services check the permissions).
    *
    * @param doc IAAF or TOR
-   * @param d document
    * @param action action
    * @param note reason and comment
    */
@@ -247,7 +243,6 @@ public class DocumentApprovals {
   /**
    * Whether a user may approve the current level of a document (approval inbox).
    *
-   * @param d document
    * @param levels levels of the document
    * @param username user
    * @param authorities user's permissions
@@ -285,7 +280,7 @@ public class DocumentApprovals {
         new Notice(
             label(doc) + " " + d.number() + " to approve (level " + level.getLevel() + ")",
             subject,
-            linkOf(doc, d),
+            linkOf(doc),
             entityOf(doc),
             d.getId().toString());
     String event = IAAF.equals(doc) ? "SBM_IAAF_PENDING" : "SBM_TOR_PENDING";
@@ -304,14 +299,14 @@ public class DocumentApprovals {
   }
 
   /**
-   * The frontend route of a document.
+   * The frontend screen of a document: the IAAF reviews or the Terms of Reference list, where the
+   * approver acts on it.
    *
    * @param doc IAAF or TOR
-   * @param d document
    * @return route
    */
-  public static String linkOf(String doc, SbmApprovable d) {
-    return (IAAF.equals(doc) ? "/submitted/iaaf/" : "/submitted/tor/") + d.getId();
+  public static String linkOf(String doc) {
+    return IAAF.equals(doc) ? "/submitted/reviews" : "/submitted/tors";
   }
 
   /**

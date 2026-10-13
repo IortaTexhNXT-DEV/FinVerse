@@ -6,6 +6,7 @@ import { messagingApi } from '@/api/messaging';
 import type { AppNotification } from '@/api/messaging';
 import { NotificationItem } from '@/features/workspace/NotificationItem';
 import { groupByDay } from '@/features/workspace/notificationLogic';
+import { useOpenableLink } from '@/navigation/openable';
 
 const REFRESH_MS = 60_000;
 
@@ -56,14 +57,16 @@ export function NotificationBell() {
     };
   }, [open]);
 
+  const openable = useOpenableLink();
   const unread = count.data?.unread ?? 0;
   const openItem = (n: AppNotification) => {
     if (!n.read) {
       read.mutate(n.id);
     }
     setOpen(false);
-    if (n.link) {
-      void navigate(n.link);
+    const link = openable(n.link);
+    if (link) {
+      void navigate(link);
     }
   };
   const groups = groupByDay(list.data?.content ?? []);

@@ -156,7 +156,7 @@ public class TorService {
         DocumentApprovals.TOR,
         t,
         p.getAssured().assuredName(),
-        DocumentApprovals.linkOf(DocumentApprovals.TOR, t));
+        DocumentApprovals.linkOf(DocumentApprovals.TOR));
     history.note(
         p, "TOR", "TOR " + t.getTorNo() + " generated", SbmHistorySource.MANUAL, t.getTorNo());
     audit.record(ENTITY, t.getTorNo(), AuditAction.CREATE, "TOR of " + p.getSbmNo());
@@ -222,7 +222,7 @@ public class TorService {
           new Notice(
               "TOR " + t.getTorNo() + " approved",
               p.getAssured().assuredName() + ": open or download the Terms of Reference",
-              DocumentApprovals.linkOf(DocumentApprovals.TOR, t),
+              DocumentApprovals.linkOf(DocumentApprovals.TOR),
               ENTITY,
               t.getId().toString()),
           "SBM_TOR_RELEASED");

@@ -16,6 +16,7 @@ import type { QueueView } from './queueParams';
 import { QueueTable } from './QueueTable';
 import { QueueToolbar } from './QueueToolbar';
 import { StageTiles, WorkSummary } from './WorkTiles';
+import { useOpenableLink } from '@/navigation/openable';
 
 /**
  * My Work (BRNB.096/115/080): the queues of the stages your team works, with open, overdue and
@@ -58,9 +59,11 @@ export default function MyWorkPage() {
     setParams((current) => queueParamsOf({ ...queueViewOf(current), ...patch }));
   };
   const stageCounts = counts.data ?? [];
+  const openable = useOpenableLink();
   const openItem = (item: WorkItem) => {
-    if (item.link) {
-      void navigate(item.link);
+    const link = openable(item.link);
+    if (link) {
+      void navigate(link);
     }
   };
 
@@ -82,7 +85,7 @@ export default function MyWorkPage() {
           onSearch={() => setPage(0)}
         />
         <QueueTable
-          items={queue.data?.content ?? []}
+          items={(queue.data?.content ?? []).map((i) => ({ ...i, link: openable(i.link) }))}
           loading={queue.isLoading}
           canAssign={can('WORK_ASSIGN')}
           claiming={claim.isPending}

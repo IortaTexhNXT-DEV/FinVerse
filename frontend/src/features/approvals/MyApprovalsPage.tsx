@@ -16,6 +16,7 @@ import { countOf, formatDateTime, titleCase } from '@/utils/format';
 import { ageInDays, oldestAge } from './age';
 import { UserName } from '@/components/ui/UserName';
 import { moduleLabel } from '@/utils/businessLabels';
+import { useOpenableLink } from '@/navigation/openable';
 
 /**
  * Universal approval inbox: everything waiting for the signed-in user's authorization across
@@ -24,6 +25,7 @@ import { moduleLabel } from '@/utils/businessLabels';
 export default function MyApprovalsPage() {
   const companyId = useCompanyId();
   const navigate = useNavigate();
+  const openable = useOpenableLink();
   const [allCompanies, setAllCompanies] = useState(false);
   const scope = allCompanies ? undefined : companyId || undefined;
   const inbox = useQuery({
@@ -78,8 +80,9 @@ export default function MyApprovalsPage() {
           rowKey={(i) => `${i.module}:${i.type}:${i.reference}`}
           emptyMessage="Nothing is waiting for your approval."
           onRowClick={(i) => {
-            if (i.link !== undefined) {
-              void navigate(i.link);
+            const link = openable(i.link);
+            if (link !== undefined) {
+              void navigate(link);
             }
           }}
           columns={[

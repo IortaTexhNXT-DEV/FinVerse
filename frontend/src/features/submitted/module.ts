@@ -129,6 +129,23 @@ export const submittedModule: FeatureModule = {
       component: lazyWithRetry(() => import('./record/PolicyPage')),
       hidden: true,
     },
+    {
+      path: '/submitted/iaaf/:id',
+      label: 'Reviews & IAAF',
+      icon: ClipboardCheck,
+      permission: 'SBM_VIEW',
+      component: lazyWithRetry(() => import('./reviews/IaafRedirect')),
+      hidden: true,
+    },
+    {
+      path: '/submitted/tor/:id',
+      label: 'Terms of Reference',
+      icon: FileSignature,
+      permission: 'SBM_VIEW',
+      alsoPermissions: ['TOR_APPROVE'],
+      component: lazyWithRetry(() => import('./reviews/TorRedirect')),
+      hidden: true,
+    },
   ],
 };
 

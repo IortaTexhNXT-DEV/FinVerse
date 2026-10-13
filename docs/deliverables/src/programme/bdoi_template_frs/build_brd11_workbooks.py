@@ -826,8 +826,52 @@ def answered_rows(data: Data) -> list[dict]:
     return out
 
 
+# The test cases name the people by role and by the fictitious names of FRS Annex O (UAT_USERS), never by sign-in
+# IDs, and refer to the test data prepared for the walkthrough (not to SIT/UAT or seed data).
+_TD = "test data prepared for the walkthrough"
+_WHO = {"requestor": "Rhea Santiago (Requestor)", "uamapprover": "Ulysses Abad (Approver)",
+        "secapprover": "Selina Reyes (Second Approver)", "approver": "Andres Bautista (another approver)",
+        "badmin": "Bea Villanueva (Business Administrator)", "admin": "Samuel Cruz (System Administrator)",
+        "auditor": "Audrey Lim (Auditor)", "infosec": "the Information Security Officer",
+        "ao": "Maria Santos (business user)", "requestor2": "a second Requestor", "uamapprover2": "a second Approver",
+        "a013000196": "Isabel Navarro", "a013000101": "Maria Santos"}
+_ROLE_PAREN = (r"( \((?:Requestor|Approver|Second approver|Second Approver|Business Administrator|System Administrator|"
+               r"Auditor|Information Security Officer|New Business approver[^)]*|Business user[^)]*)\))?")
+
+
+def plain_people(text):
+    """Sign-in IDs -> role and fictitious name; SIT/UAT and seed data -> the test data prepared for the walkthrough."""
+    if not isinstance(text, str):
+        return text
+    w = _WHO
+    t = re.sub(r"(Message: (?:Row \d+: )?User )(\w+)( already exists| is already active)", r"\1<user ID>\3", text)
+    t = re.sub(r"Message: \w+ cannot approve", "Message: <user> cannot approve", t)
+    t = re.sub(r"Message: \w+ is already an approver", "Message: <user> is already an approver", t)
+    t = t.replace("UAT User One", "Isabel Navarro")
+    t = t.replace("Enrol user ID approver", "Enrol the user ID of " + w["approver"])
+    t = re.sub(r"(?<![Tt]he )\b(requestor2|uamapprover2|requestor|uamapprover|secapprover|badmin|infosec|ao)\b" + _ROLE_PAREN,
+               lambda m: w[m.group(1)], t)
+    t = re.sub(r"(?<![Tt]he )(?<!-)\b(admin|auditor)\b" + _ROLE_PAREN, lambda m: w[m.group(1)], t)
+    t = re.sub(r"(?<!user )\b(As|as|then|and) approver\b", lambda m: f"{m.group(1)} {w['approver']}", t)
+    t = re.sub(r"(^|[;.] |\d\. )approver\b(?= (?:has|is never|returns|checks|is notified only after))",
+               lambda m: m.group(1) + w["approver"], t)
+    t = t.replace("for example a013000196", "for example a999999999")
+    t = re.sub(r"\b(a013000196|a013000101)\b", lambda m: w[m.group(1)], t)
+    t = re.sub(r"\bthree users a0130\d+ to a0130\d+", "three new users", t)
+    t = re.sub(r"(?<!for example )\b(?:user (?:ID )?)?a0130\d{5}\b", "a test user", t)
+    t = t.replace("BDO\\uat.joiner", "the joiner's directory account")
+    t = re.sub(r"\bthe SIT/UAT data", "the " + _TD, t)
+    t = re.sub(r"SIT/UAT (users|data)", r"\1 of the " + _TD, t)
+    t = re.sub(r"\bSeed (?!data)(\w)", lambda m: m.group(1).upper(), t)
+    t = re.sub(r"Seed data( of the SIT environment)?", _TD[0].upper() + _TD[1:], t)
+    t = re.sub(r"(the |a )?seed( data)?", "the " + _TD, t)
+    return t.replace("the the ", "the ")
+
+
 def build_rtm(data: Data) -> tuple[Path, dict]:
-    cases = data.acc_cases + data.bibs_cases
+    cases = [{**c, **{k: plain_people(c.get(k)) for k in ("title", "pre", "steps", "data", "expected")},
+              "user": _WHO.get(c.get("user"), "-").split(" (")[0].replace("the ", "")}
+             for c in data.acc_cases + data.bibs_cases]
     case_ids_by_fr = defaultdict(list)
     for c in data.bibs_cases:
         case_ids_by_fr[c["fr"]].append(c["id"])
@@ -903,7 +947,7 @@ def build_rtm(data: Data) -> tuple[Path, dict]:
         Column("id", "Test case ID", 26, "TC-UA-nnn.c-ss: test condition c and its case ss; TC-FRUM-...-ACnn: acceptance criterion"),
         Column("title", "Title", 36, ""), Column("brd", "BRD ID", 22, ""), Column("frum", "FR item", 18, ""),
         Column("persona", "Persona", 18, ""),
-        Column("user", "Sign-in ID", 12, "The password is issued separately by the iorta TechNXT Project Team"),
+        Column("user", "User (FRS Annex O)", 16, "Fictitious user of the persona (FRS Annex O)"),
         Column("screen", "Screen", 22, ""), Column("pre", "Preconditions", 30, ""), Column("steps", "Steps", 50, ""),
         Column("data", "Test data", 22, ""), Column("expected", "Expected result", 50, ""),
         Column("type", "Type", 10, "", values=["Positive", "Negative"]),
@@ -921,7 +965,8 @@ def build_rtm(data: Data) -> tuple[Path, dict]:
         Column("title", "Title", 36, ""), Column("frs", "FRS reference", 28, ""), Column("brd", "BRD reference", 30, ""),
         Column("status", "Status", 20, ""), Column("cases", "Linked test cases", 60, "")],
         cr_rows, description="Every change request of the register with its FRS and BRD references and test cases")
-    ans = answered_rows(data)
+    ans = [{k: v.replace("example a013000196", "example a999999999") if isinstance(v, str) else v
+            for k, v in r.items()} for r in answered_rows(data)]
     wb.sheet("Answered in the BDOI FRS", [
         Column("ref", "Reference", 14, "CLR-UA, UQ, IQ, UA-Q, A-UA"), Column("q", "Question or assumption", 60, ""),
         Column("clause", "BDOI FRS clause", 30, ""), Column("answer", "Answer in BDOI's FRS", 60, ""),

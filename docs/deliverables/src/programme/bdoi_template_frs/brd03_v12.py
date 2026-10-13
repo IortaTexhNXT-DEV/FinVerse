@@ -587,6 +587,9 @@ def _image(ref: str) -> Path | None:
     if not ref:
         return None
     brd, slug = ref.split(":")
+    import brd03_bdoi  # noqa: PLC0415
+    if ref in (brd03_bdoi.BDOI.get("documents") or {}):   # BRD-01 documents printed on the same realistic data
+        return brd03_bdoi.shot(brd03_bdoi.BDOI["documents"][ref])
     if brd == "BRD-03":   # retaken with the full-page screenshots, realistic fictitious data (brd03_v13_bdoi.yaml)
         import brd03_bdoi  # noqa: PLC0415
         if slug in (brd03_bdoi.BDOI.get("documents") or {}):

@@ -335,6 +335,13 @@ const docs = {
     const id = ctx.one("select id from doc_attachment where entity_type = 'PackageRequest' and document_type = 'PKG_ADVISORY' and not deleted order by id desc limit 1");
     return download(ctx, 'tsu', `/attachments/${id}/content`, out, 'pdf');
   },
+  // The two BRD-01 documents of Annex Q (non-package quotation slip and proposal slip), printed as in the BRD-01
+  // recipe (brd01_documents.cjs) on the same realistic capture database, so that every document image of Annex Q
+  // shows the same data.
+  'doc-nb-quotation-slip': (ctx, out) => download(ctx, 'tsu',
+    `/proposals/${ctx.one('select id from npk_proposal where qs_no is not null order by id desc limit 1')}/quotation-slip.pdf`, out),
+  'doc-nb-proposal-slip': (ctx, out) => download(ctx, 'ao',
+    `/proposals/${ctx.one('select id from npk_proposal where ps_no is not null order by id desc limit 1')}/proposal-slip.pdf`, out),
 };
 
 // ------------------------------------------------------------------ callout scopes

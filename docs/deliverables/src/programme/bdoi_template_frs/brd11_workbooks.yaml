@@ -222,9 +222,9 @@ coverage_acs:
 uat_criteria:
   entry:
     - "The FRS v1.4 is signed, or the open decisions of Annex Q that affect the cases are recorded."
-    - "The UAT environment is ready with the users of the walkthrough users workbook and the SIT/UAT data."
+    - "The UAT environment is ready with the users of the walkthrough users workbook and the test data prepared for the walkthrough."
     - "The SIT exit report shows no open severity 1 or 2 finding on User Access Maintenance."
-    - "The testers are named (TD-11) and have their sign-in IDs; the passwords are issued separately by the iorta TechNXT Project Team."
+    - "The testers are named (TD-11) and receive their user IDs and passwords separately from the iorta TechNXT Project Team."
     - "The test cases of this workbook are approved by the Process Owner (SO-11-2)."
   exit:
     - "Every test case of priority High is run and passed, or its observation is accepted by the Process Owner."

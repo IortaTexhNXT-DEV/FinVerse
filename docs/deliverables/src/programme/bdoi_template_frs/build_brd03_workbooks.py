@@ -731,8 +731,53 @@ def build_estimate() -> tuple[Path, float]:
 
 
 # ============================================================================================= 4. RTM and test cases
+# The test cases name the people by role and by the fictitious names of FRS Annex K, never by sign-in IDs, and refer
+# to the test data prepared for the walkthrough (not to SIT/UAT or seed data).
+_TD = "test data prepared for the walkthrough"
+
+
+def _who() -> dict[str, str]:
+    import brd03_bdoi as pmv  # noqa: PLC0415
+    people = pmv.BDOI["people"]
+    roles = {"ao": "Marketing AO", "mkttl": "Marketing TL / TH / UH", "tsu": "TSU Officer", "tsulead": "TSU Team Lead",
+             "tsuhead": "TSU Head", "mbs": "Marketing Business Services", "mancom": "ManCom member",
+             "mancompres": "ManCom President", "badmin": "Business Administrator",
+             "approver": "New Business approver"}
+    who = {k: f"{people[r]} ({r})" for k, r in roles.items()}
+    who.update({"admin": "the System Administrator", "auditor": "the Auditor"})
+    return who
+
+
+def plain_people(text, who: dict[str, str]):
+    """Sign-in IDs -> role and fictitious name; SIT/UAT and seed data -> the test data prepared for the walkthrough."""
+    if not isinstance(text, str):
+        return text
+    t = text.replace("the users ao and ao2", "two Marketing AO users")
+    t = re.sub(r"\bao2\b", "another Marketing AO", t)
+    t = t.replace("SIT/UAT data of the test plan", "the " + _TD)
+    t = re.sub(r"Enter user ID (\w+) and [Tt]he SIT/UAT password",
+               lambda m: f"Enter the user ID and password of {who.get(m.group(1), m.group(1))}", t)
+    t = re.sub(r"Enter user ID (\w+)", lambda m: f"Enter the user ID of {who.get(m.group(1), m.group(1))}", t)
+    t = re.sub(r"\b(ao|mkttl|tsu|tsulead|tsuhead|mbs|mancom|mancompres|badmin)\b( \([^)]*\))?",
+               lambda m: who[m.group(1)], t)
+    t = re.sub(r"\b([Aa]s|[Bb]y) (admin|auditor|approver)\b( \([^)]*\))?",
+               lambda m: f"{m.group(1)} {who[m.group(2)]}", t)
+    t = re.sub(r"\badmin end-dates", f"{who['admin']} end-dates", t)
+    t = t.replace("approver approver", f"approver {who['approver']}")
+    t = re.sub(r"SIT/UAT users and roles", "users and roles of the " + _TD, t)
+    t = re.sub(r"(the )?SIT/UAT data", "the " + _TD, t)
+    t = re.sub(r"\bSeed (?!data)(\w)", lambda m: m.group(1).upper(), t)
+    t = re.sub(r"Seed data( of the SIT environment)?", _TD[0].upper() + _TD[1:], t)
+    t = re.sub(r"(the |a )?(finance )?seed( data)?( of the SIT environment)?", "the " + _TD, t)
+    t = re.sub(r"\bin SIT and UAT\b", "in the test environment", t)
+    return t.replace("the the ", "the ").replace("The the ", "The ")
+
+
 def build_rtm() -> tuple[Path, dict]:
-    tcs = v12.test_cases()
+    who = _who()
+    tcs = [{**t, **{k: plain_people(t[k], who) for k in ("title", "pre", "steps", "data", "expected")},
+            "signin": who.get(t["signin"], "-").split(" (")[0].replace("the ", "")
+            if t["signin"] not in ("-", None) else "-"} for t in v12.test_cases()]
     items = v12.frpm_items()
     m = v12.brd_mapping()
     trace = []
@@ -814,7 +859,7 @@ def build_rtm() -> tuple[Path, dict]:
         Column("id", "Test case ID", 20, "Test case"), Column("title", "Title", 34, "What is tested"),
         Column("brd", "BRD ID", 12, "BRD requirement(s)"), Column("frpm", "FR item (BDOI)", 16, "FRPM sub-item(s)"),
         Column("persona", "Persona", 18, "Who tests"),
-        Column("signin", "Sign-in ID", 10, "UAT sign-in ID (walkthrough users workbook)"),
+        Column("signin", "User (FRS Annex K)", 16, "Fictitious user of the persona (FRS Annex K)"),
         Column("pre", "Preconditions", 28, "Before the test"), Column("steps", "Steps", 46, "Steps"),
         Column("data", "Test data", 16, "Data sets of the test plan"),
         Column("expected", "Expected result", 40, "What the tester should see"),

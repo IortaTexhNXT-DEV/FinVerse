@@ -33,7 +33,7 @@ SPEC = {
                     B("", ["Requested terms, coverages, rate scheme, package dates and target insurers",
                            "Mandatory fields and documents checked on submission",
                            "Minimums: 20 policies, PHP 5,000,000.00 basic premium"]),
-                    B("", ["Non-package quotation requests, slips and proposals with New Business " + INT], "ret"))]},
+                    B("", ["Non-package quotation requests, slips and proposals with New Business (specified in the New Business FRS)"], "ret"))]},
         {"no": "2", "title": "Approval: Marketing and TSU", "sub": "Service levels per stage (Annex J.4)",
          "grid": (5, 1, 4, 1), "colour": "#5E35B1", "fill": "#F7F4FD",
          "body": [F(B("Marketing approval", ["One approval by the TL, TH or UH, or the three in order (setting)",

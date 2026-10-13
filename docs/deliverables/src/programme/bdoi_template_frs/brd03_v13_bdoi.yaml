@@ -50,9 +50,11 @@ screens:
   SCR-PM-27: [scr-pm-27-01-list, "Audit Logs of Product Maintenance for a period"]
   SCR-PM-28: [scr-pm-28-01-table, "Comparative Table with the options of each insurer and the Final Terms for Proposal"]
   SCR-PM-29: [scr-pm-29-01-tab, "Routing & Approvals tab with the ManCom approvers to select"]
-# Document images of Annex Q taken on the same database (the BRD-01 documents keep their images of the New Business
-# FRS).
+# Document images of Annex Q taken on the same database; the two BRD-01 documents (non-package quotation slip and
+# proposal slip) are printed on the same realistic capture database (tools/screenshots/packs/brd03.cjs doc-nb-*).
 documents:
+  "BRD-01:doc-quotation-slip": doc-nb-quotation-slip
+  "BRD-01:doc-proposal-slip": doc-nb-proposal-slip
   doc-request-form: doc-request-form
   doc-quotation-slip: doc-quotation-slip
   doc-comparative: doc-comparative

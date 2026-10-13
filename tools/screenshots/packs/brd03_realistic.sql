@@ -2,7 +2,7 @@
 -- (capture_pack.cjs with FULL_PAGE=1): run once on the fresh capture database before the shots, as brd11_realistic.sql.
 -- The persona and test users of the seed get a first name and a surname (no role words, no "SIT"), their e-mail
 -- addresses follow the first name and surname on the DEV domain, and the numbers of the seeded package requests and
--- quotation slips lose the 9000nn test series (PKR-2026-000101 onwards; the number series continue after them). The
+-- quotation slips (and of the seeded non-package proposals and their slips) lose the 9000nn test series (PKR-2026-000101 onwards; the number series continue after them). The
 -- sign-in IDs (usernames) do not change. Every text column of the schema that holds an old value is updated (audit
 -- and history copies included).
 create temp table rn (old text primary key, new text not null);
@@ -46,6 +46,9 @@ where u.email is not null
 on conflict do nothing;
 insert into rn select old, new from re on conflict do nothing;
 insert into rn values ('PKR-2026-9000', 'PKR-2026-0001'), ('PQS-2026-9000', 'PQS-2026-0001'),
+                      -- the seeded non-package proposals of New Business (the BRD-01 slips of Annex Q)
+                      ('PRF-2026-9000', 'PRF-2026-0001'), ('QS-2026-9000', 'QS-2026-0001'),
+                      ('PS-2026-9000', 'PS-2026-0001'), ('ARN-2026-9200', 'ARN-2026-0002'),
                       ('@uat.brokerverse.cloud', '@dev.brokerverse.cloud')
 on conflict do nothing;
 

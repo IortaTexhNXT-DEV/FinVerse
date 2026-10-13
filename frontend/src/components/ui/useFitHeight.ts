@@ -13,6 +13,9 @@ export interface FitMeasures {
   min: number;
 }
 
+/** Shortfall (px) under the least height within which a capped list stays capped. */
+const FLICKER_MARGIN = 48;
+
 /**
  * The height cap of a list that scrolls inside its card (BDO style guide), or null for none: the
  * list is as high as its rows unless the page would then scroll too, in which case it takes just
@@ -25,10 +28,10 @@ export function fittedHeight(m: FitMeasures): number | null {
     return null;
   }
   if (target < m.min) {
-    // Too little room for a capped list. A list that is already capped keeps the least height:
-    // releasing it would make the page overflow again, the next measure would cap it again, and
-    // the list would flicker between the two. A list not capped stays so; the page scrolls.
-    return m.wrap < m.table ? m.min : null;
+    // Too little room for a capped list: the page scrolls as a whole. A capped list only a few
+    // pixels short keeps the least height instead: releasing it would make the page overflow again,
+    // the next measure would cap it again, and the list would flicker between the two.
+    return m.wrap < m.table && m.min - target <= FLICKER_MARGIN ? m.min : null;
   }
   return Math.floor(target);
 }

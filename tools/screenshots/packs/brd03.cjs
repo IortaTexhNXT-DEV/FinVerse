@@ -15,7 +15,10 @@ function click(name) {
 }
 
 const companyId = (ctx) => Number(ctx.one("select id from org_company where code = 'FVI'"));
-const requestId = (ctx, no) => ctx.one(`select id from pm_request where request_no = '${no}'`);
+// A seeded request by its number; on the full-page capture database (brd03_realistic.sql) the 9000nn test series
+// is renumbered from 000101.
+const seedNo = (no) => no.replace(/-9000(\d\d)$/, '-0001$1');
+const requestId = (ctx, no) => ctx.one(`select id from pm_request where request_no in ('${no}', '${seedNo(no)}') order by id limit 1`);
 const requestByTitle = (ctx, title) => ctx.sql(`select id from pm_request where title = '${title}' order by id desc limit 1`)[0]?.[0];
 
 /** Terms of the requests the recipe prepares (fictitious values). */

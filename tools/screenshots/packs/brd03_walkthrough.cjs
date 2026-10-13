@@ -18,7 +18,8 @@ function requestA(ctx) {
   return row[0];
 }
 
-const seedRequest = (ctx, no) => ctx.one(`select id from pm_request where request_no = '${no}'`);
+// A seeded request by its number (renumbered from 000101 on the full-page capture database, brd03_realistic.sql).
+const seedRequest = (ctx, no) => ctx.one(`select id from pm_request where request_no in ('${no}', '${no.replace(/-9000(\d\d)$/, '-0001$1')}') order by id limit 1`);
 
 async function openRequest(ctx, user, id, tabName) {
   const page = await go(ctx, user, `${REQUESTS}/${id}`);
@@ -198,7 +199,8 @@ const steps = {
     await act(page, /^submit requirements for mancom sign-off$/i);
     // BDOI's routing: TSU selects the ManCom approvers (the President approves last).
     page = await openRequest(ctx, 'tsu', id, 'Routing');
-    for (const approver of ['Manuel ManCom Member', 'Patricia ManCom President']) {
+    // The first names of the two ManCom users (their surnames differ on the full-page capture database).
+    for (const approver of ['Manuel ', 'Patricia ']) {
       await page.getByLabel(new RegExp(`^${approver}`)).check();
     }
     await button(page, /^send for mancom approval$/i).click();

@@ -459,14 +459,13 @@ def menu_page(a):
     pack = signoff_pack._pack(PM / "pack" / "pack.yaml")
     menus = pack.menus()
     roles = [r for r in menus if any(x["own"] == "Yes" for x in menus[r])]
-    cases = yaml.safe_load((PM / "brd03_cases.yaml").read_text(encoding="utf-8"))["personas"]
     screens = list(OrderedDict.fromkeys(x["screen"] for r in roles for x in menus[r] if x["own"] == "Yes"))
     has = {(r, x["screen"]) for r in roles for x in menus[r] if x["own"] == "Yes"}
 
     def esc(s):
         return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
     head = "".join(f'<TD BGCOLOR="#014EA9"><FONT COLOR="white" POINT-SIZE="9">{esc(pack.persona_label(r))}'
-                   f'<BR/>({esc(str(cases.get(r, {}).get("user", "-")))})</FONT></TD>' for r in roles)
+                   f'</FONT></TD>' for r in roles)
     body = ""
     for i, sc in enumerate(screens):
         bg = "#F2F6FC" if i % 2 else "#FFFFFF"
@@ -481,7 +480,7 @@ def menu_page(a):
     with this_round(b):
         a.h2(f"G.{g} Navigation: menu by persona")
         a.p("The Product Maintenance entries of the menu (Client & Policy › Product Maintenance) that each persona "
-            "sees, with the sign-in ID of the persona in the BIBS DEV environment. A green cell means the persona "
+            "sees. A green cell means the persona "
             "sees the entry; the actions inside each screen follow the role (Annex J.5). The screen standards "
             "(layout, tables with row action menus, dates dd-MMM-yyyy, formatted amounts, messages) are those of "
             "the programme screen standards and are not repeated here.")
@@ -510,8 +509,7 @@ def glossary_add(a):
              ["KPI", "Key performance indicator shown on the dashboard"],
              ["Maker-checker", "A record is made by one user and authorized by another (four eyes)"],
              ["NFR", "Non-functional requirement (Annex T)"],
-             ["Service level", "Target hours of a workflow stage; amber from 80%, red once passed"],
-             ["Sign-in ID", "The user ID of a reviewer in the BIBS DEV environment (walkthrough users workbook)"]]
+             ["Service level", "Target hours of a workflow stage; amber from 80%, red once passed"]]
     with this_round(b):
         a.h2("N.2 Terms added in version 1.2")
         a.table(["Term", "Meaning"], terms, [1.8, 5.4], size=9)
@@ -589,6 +587,10 @@ def _image(ref: str) -> Path | None:
     if not ref:
         return None
     brd, slug = ref.split(":")
+    if brd == "BRD-03":   # retaken with the full-page screenshots, realistic fictitious data (brd03_v13_bdoi.yaml)
+        import brd03_bdoi  # noqa: PLC0415
+        if slug in (brd03_bdoi.BDOI.get("documents") or {}):
+            return brd03_bdoi.shot(brd03_bdoi.BDOI["documents"][slug])
     folder = PM if brd == "BRD-03" else NB
     p = folder / "screenshots" / f"{slug}.png"
     return p if p.exists() else None

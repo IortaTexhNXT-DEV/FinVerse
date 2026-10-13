@@ -799,7 +799,7 @@ checklist:
     - ["Observations and points for decision", "Annex M", "Decision recorded on each point", "Product Owner; System Analyst"]
     - ["Screens and messages", "Annex G; Annex H", "Screens, fields and messages as expected", "Heads of TSU, MBS and Retail Marketing"]
     - ["Change control after sign-off", "Annex W", "Process and approvers", "Product Owner; Program Manager BPS"]
-    - ["Walkthrough users and sign-in", "Walkthrough users workbook (BIBS_UAT_BRD-03)", "Each reviewer has a sign-in ID for the walkthrough", "Product Owner"]
+    - ["Walkthrough users and sign-in", "Walkthrough users workbook (BIBS_UAT_BRD-03)", "Each reviewer has a persona account for the walkthrough", "Product Owner"]
 
 # ------------------------------------------------------------------------------------------------ Annex M, M.5
 observations:

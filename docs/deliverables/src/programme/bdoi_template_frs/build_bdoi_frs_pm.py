@@ -60,9 +60,11 @@ sys.path.insert(0, str(HERE))
 import brd03_v12 as v12  # noqa: E402
 import brd03_v13 as v13  # noqa: E402
 import brd_common_final as final  # noqa: E402
+import brd03_bdoi as pmv  # noqa: E402  (BDOI view: full-page screenshots, business walkthroughs)
 
 v12.bind(sys.modules[__name__])
 v13.bind(sys.modules[__name__], v12)
+pmv.bind(sys.modules[__name__])
 SRC = REPO / "docs" / "deliverables" / "src"
 PM = SRC / "BRD-03_Product_Maintenance"
 NB = SRC / "BRD-01_New_Business"
@@ -781,23 +783,43 @@ class Annexes:
     def p(self, text, **kw):
         self.els.append(self.b.para(text, **kw))
 
-    def bullets(self, texts):
+    def bullets(self, texts, size=None):
         n = self.b.new_num()
         for t in texts:
-            self.els.append(self.b.para(t, style="ListParagraph", num=(n, 0)))
+            self.els.append(self.b.para(t, style="ListParagraph", num=(n, 0), size=size))
 
     def table(self, header, rows, widths, size=8.5):
         self.els.append(self.b.table(header, rows, widths, size=size))
         self.els.append(self.b.para("", space_after=0))
 
+    def keep_tail(self, start: int) -> None:
+        """The last rows of the last table from self.els[start:] and every paragraph after it are kept with what
+        follows, so that a short tail (rules, notes) never ends alone on a page before a page that starts anew."""
+        tail = self.els[start:]
+        tbls = [i for i, el in enumerate(tail) if el.tag == qn("w:tbl")]
+        if not tbls:
+            return
+        k = tbls[-1]
+        targets = []
+        for tr in tail[k].findall(qn("w:tr"))[-2:]:
+            targets += list(tr.iter(qn("w:p")))
+        targets += [el for el in tail[k + 1:-1] if el.tag == qn("w:p")]
+        for p in targets:
+            ppr = p.find(qn("w:pPr"))
+            if ppr is None:
+                ppr = OxmlElement("w:pPr")
+                p.insert(0, ppr)
+            if ppr.find(qn("w:keepNext")) is None:
+                ppr_insert(ppr, OxmlElement("w:keepNext"))
+
     # Annex G – screens
     def screens(self):
         self.h1("Annex G – Screen Specifications")
         self.p("This annex specifies the Product Maintenance screens: the purpose of each screen, how the user reaches "
-               "it, its fields with type, format, mandatory marker, list or source and validation, its actions with who "
-               "may perform them and what happens, its rules, and one screenshot of the screen. Mandatory: Y = "
-               "mandatory, N = optional, Cond. = mandatory when the condition stated applies. Dates are shown as "
-               "dd-MMM-yyyy and amounts with thousands separators.")
+               "it, the requirements it serves, one screenshot, its fields with type, format, mandatory marker, list or "
+               "source and validation, its actions with who may perform them and what happens, and its rules. "
+               + " ".join(pmv.BDOI["screen_note"].split()))
+        model = self.b.doc.sections[-1]._sectPr
         files = sorted((PM / "pack" / "screens").glob("*.yaml"))
         k = 0
         frs_titles = {}
@@ -807,21 +829,20 @@ class Annexes:
                 self.b.hl = self.b.highlight and v12.SHADE and s["id"] in SCREENS_V12
                 frpm = sorted({x for fr in s.get("frs", []) for x in self.b.fr_to_frpm.get(fr, [])})
                 frs_titles[s["id"]] = s["title"]
+                start = len(self.els)
                 self.h2(f"G.{k} {s['title']} ({s['id']})")
                 self.p("Purpose: " + self.refs(" ".join(str(s["purpose"]).split())))
                 if s.get("entry"):
                     self.p("Access: " + clean("; ".join(s["entry"])))
                 if frpm:
                     self.p("Requirements: " + ", ".join(frpm))
-                shots = s.get("shots") or []
-                if shots:
-                    n = int(s["id"].split("-")[-1])
-                    png = PM / "screenshots" / f"scr-pm-{n:02d}-01-{shots[0]['state']}.png"
-                    if png.exists():
-                        self.els.extend(final.screenshot(self.b, png))
-                        self.p(f"Figure G.{k}: {clean(shots[0].get('caption', s['title']))}", italic=True, size=8,
-                               jc="center")
-                        self.b.stats["screenshots"] += 1
+                fig = pmv.BDOI["screens"].get(s["id"])
+                if not fig:
+                    raise SystemExit(f"no full-page screenshot named for {s['id']} (brd03_v13_bdoi.yaml)")
+                intro = self.els[start:]
+                del self.els[start:]
+                self.els.extend(pmv.figure_with_intro(self.b, model, intro, pmv.shot(fig[0]), f"Figure G.{k}: {fig[1]}"))
+                self.b.stats["screenshots"] += 1
                 rows = []
                 for line in s.get("fields", []):
                     c = [x.strip() for x in str(line).split(" | ")]
@@ -844,7 +865,8 @@ class Annexes:
                                acts, [1.25, 1.35, 1.2, 2.5, 1.0], size=8)
                 if s.get("rules"):
                     self.p("Rules:", bold=True, keep_next=True)
-                    self.bullets([self.refs(r) for r in s["rules"]])
+                    self.bullets([self.refs(r) for r in s["rules"]], size=9)
+                self.keep_tail(start)
                 self.b.hl = False
         self.b.stats["screens"] = k
         return frs_titles
@@ -937,30 +959,36 @@ class Annexes:
 
     # Annex K – walkthroughs
     def walkthroughs(self, screen_titles):
-        cases = yaml.safe_load((PM / "brd03_cases.yaml").read_text(encoding="utf-8"))
-        personas = {k: v["name"] for k, v in cases["personas"].items()}
-        data = yaml.safe_load((PM / "pack" / "walkthroughs.yaml").read_text(encoding="utf-8"))["walkthroughs"]
+        """Annex K: the business walkthroughs of brd03_v13_bdoi.yaml, each step with its full-page screenshot."""
+        data = pmv.BDOI["walkthroughs"]
         self.h1("Annex K – Process Walkthroughs")
-        self.p("End-to-end walkthroughs of the Product Maintenance process, step by step (storyboard): who acts, on "
-               "which screen, what the user does, what the user sees and the result. The screens are specified in "
-               "Annex G.")
+        with v12.this_round(self.b):
+            self.p(" ".join(pmv.BDOI["walk_intro"].split()))
+        model = self.b.doc.sections[-1]._sectPr
         total = 0
+        fig_no = 0
         for w in data:
             self.h2(f"{w['id']} {clean(w['title'])}")
             self.p(self.refs(" ".join(str(w["summary"]).split())))
             if w.get("data"):
                 self.p(clean(w["data"]), italic=True, size=9)
-            rows = []
+            start = len(self.els)
+            rows, figs = [], []
             for i, s in enumerate(w["steps"], 1):
-                rows.append([f"{w['id']}.{i}", personas.get(s[0], clean(s[0])),
-                             f"{screen_titles.get(s[1], s[1])} ({s[1]})", self.refs(s[2]), self.refs(s[3]), clean(s[4])])
+                fig_no += 1
+                rows.append([f"{w['id']}.{i}", s[0], f"{screen_titles.get(s[1], s[1])} ({s[1]})", self.refs(s[2]),
+                             self.refs(s[3]), f"{clean(s[4])} (Figure K.{fig_no})"])
+                figs.append((pmv.shot(s[5]), f"Figure K.{fig_no}: {w['id']}.{i} {s[0]} \u2013 {clean(s[4])}"))
             total += len(rows)
             self.table(["Step", "Persona", "Screen", "What the user does", "What the user sees", "Result"], rows,
                        [0.65, 0.85, 1.1, 1.9, 1.7, 1.0], size=7.5)
             if w.get("downstream"):
                 self.p("Afterwards:", bold=True, keep_next=True)
-                self.bullets([self.refs(x) for x in w["downstream"]])
+                self.bullets([self.refs(x) for x in w["downstream"]], size=9)
+            self.keep_tail(start)
+            self.els.extend(pmv.figure_run(self.b, model, figs))
         self.b.stats["walk_steps"] = total
+        self.b.stats["walk_figures"] = fig_no
 
     # Annex L – traceability
     def traceability(self, our, nb):
@@ -1391,6 +1419,8 @@ def build(highlight: bool, our, nb, ids) -> Builder:
         v13.change_summary(b)
     import bdoi_view  # noqa: PLC0415  (no description of the BIBS build: product owner, 11-Oct-2026)
     b.stats.update(bdoi_view.apply_docx(b.doc, bdoi_view.source_texts(REPO / DOC["meta"]["source"])))
+    b.stats.update(pmv.apply_docx(b, bdoi_view.source_texts(REPO / DOC["meta"]["source"])))
+    b.stats["breaks_after_sections"] = pmv.drop_breaks_after_sections(b)
     set_update_fields(b)
     check_words(b)
     problems = v12.self_checks(b, " ".join(b.added_text)) + v13.self_checks(b)

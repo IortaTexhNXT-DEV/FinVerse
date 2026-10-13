@@ -8,7 +8,7 @@ Writes, in docs/deliverables/out/Programme/BDOI_Template_FRS/BRD-03_Product_Main
   BIBS_CR_BRD-03_Change_Request_Register_v1.0.xlsx                    change requests after sign-off, decisions log
   BIBS_CR_BRD-03_Effort_Estimate_v1.0.xlsx                            change requests of the FRS v1.3 with effort
   BIBS_RTM_BRD-03_Test_Cases_and_Traceability_v1.0.xlsx               BRD ID -> FRPM -> test cases; answered items
-  BIBS_UAT_BRD-03_Business_Unit_Walkthrough_Users_v1.0.xlsx           users, sign-in IDs and the walkthrough script
+  BIBS_UAT_BRD-03_Business_Unit_Walkthrough_Users_v1.0.xlsx           persona users and the walkthrough script of FRS Annex K
 and, internal, in docs/deliverables/out/Programme/Quality/:
   BIBS_Coverage_BRD-03_FRS_Coverage_in_BIBS_v1.0.xlsx                 availability of every FRPM item and criterion
 
@@ -840,8 +840,9 @@ def build_rtm() -> tuple[Path, dict]:
     crit = [
         {"k": "Entry", "c": "The FRS v1.3 and this workbook are signed off; open decisions affecting the tested "
                             "steps are decided (FRS Annex V, Annex M)."},
-        {"k": "Entry", "c": "The BIBS UAT environment is available with the SIT/UAT data and the users of the "
-                            "walkthrough users workbook; passwords issued by the iorta TechNXT Project Team."},
+        {"k": "Entry", "c": "The UAT environment is available with the test data of the test plan and the persona "
+                            "users of the walkthrough users workbook; passwords issued by the iorta TechNXT Project "
+                            "Team."},
         {"k": "Entry", "c": "Configuration of Annex U loaded for the lines tested (lists, parameters, products, "
                             "insurers, templates)."},
         {"k": "Entry", "c": "Business Unit testers named for each role (RC-APR-07, TD-03)."},
@@ -874,52 +875,82 @@ def build_rtm() -> tuple[Path, dict]:
 
 # =============================================================================================== 5. UAT users
 def build_uat() -> tuple[Path, int, int]:
-    sys.path.insert(0, str(REPO / "docs" / "deliverables" / "src" / "programme" / "uat"))
-    import build_uat_users as uat  # noqa: PLC0415
-    model = uat.Model()
-    b = next(x for x in model.brds if x["brd"] == "BRD-03")
+    """Built from the walkthroughs of FRS Annex K (brd03_v13_bdoi.yaml): the same steps, personas, screens and
+    fictitious users."""
+    import brd03_bdoi as pmv  # noqa: PLC0415
     sys.path.insert(0, str(REPO / "docs" / "deliverables" / "src" / "signoff"))
     import signoff_pack  # noqa: PLC0415
-    pack = signoff_pack._pack(REPO / "docs" / "deliverables" / "src" / "BRD-03_Product_Maintenance" / "pack" /
-                              "pack.yaml")
+    pm_src = REPO / "docs" / "deliverables" / "src" / "BRD-03_Product_Maintenance"
+    pack = signoff_pack._pack(pm_src / "pack" / "pack.yaml")
     menus = pack.menus()
+    personas = yaml.safe_load((pm_src / "brd03_cases.yaml").read_text(encoding="utf-8"))["personas"]
+    code_of = {v["name"]: k for k, v in personas.items()}
+    titles = {}
+    for f in sorted((pm_src / "pack" / "screens").glob("*.yaml")):
+        for x in yaml.safe_load(f.read_text(encoding="utf-8"))["screens"]:
+            titles[x["id"]] = core.clean(x["title"])
+    people = pmv.BDOI["people"]
+    extra = {"ManCom member": [("ManCom President", "mancompres")]}   # the President approves last (WT-A.14)
+    script, steps_of, first_screen = [], OrderedDict(), {}
+    for w in pmv.BDOI["walkthroughs"]:
+        for i, st in enumerate(w["steps"], 1):
+            persona = st[0]
+            if persona not in code_of or persona not in people:
+                raise SystemExit(f"persona of FRS Annex K without a walkthrough user: {persona}")
+            code = code_of[persona]
+            sid = f"{w['id']}.{i}"
+            screen = f"{titles.get(st[1], st[1])} ({st[1]})"
+            steps_of.setdefault(persona, []).append(sid)
+            first_screen.setdefault(persona, screen)
+            script.append({"step": sid, "flow": f"{w['id']} {core.clean(w['title'])}", "persona": persona,
+                           "user": people[persona], "id": personas[code]["user"], "screen": screen,
+                           "action": st[2], "expected": st[3], "outcome": core.clean(st[4]), "result": "Not run",
+                           "by": None, "date": None, "remarks": None})
+    n_steps = sum(len(w["steps"]) for w in pmv.BDOI["walkthroughs"])
+    if len(script) != n_steps:
+        raise SystemExit("walkthrough script differs from FRS Annex K")
     users = []
-    for r in uat.brd_rows(model, b):
-        own = [x["screen"] for x in menus.get(r["code"], []) if x["own"] == "Yes"]
-        users.append({"persona": r["persona"], "name": r["name"], "id": r["id"], "profile": r["profile"],
-                      "unit": r["place"], "does": r["does"], "menu": r["menu"],
-                      "menus": "Product Maintenance › " + ", ".join(own) if own else "-", "steps": r["steps"],
-                      "scope": r["scope"], "env": ENVIRONMENT, "password": PW_TEXT, "remarks": r["remarks"]})
-    script = [{"step": s["step"], "flow": s["flow"], "persona": s["persona"], "id": ", ".join(s["users"]) or "-",
-               "action": s["action"], "expected": s["result"], "result": "Not run", "by": None, "date": None,
-               "remarks": None} for s in b["script"]]
+    for persona, steps in steps_of.items():
+        code = code_of[persona]
+        rows = [(persona, people[persona], personas[code]["user"], code)]
+        rows += [(p, people[p], uid, code) for p, uid in extra.get(persona, [])]
+        for label, name, uid, c in rows:
+            own = [x["screen"] for x in menus.get(c, []) if x["own"] == "Yes"]
+            acts = sorted({x["outcome"] for x in script if x["step"] in steps})
+            users.append({"persona": label, "name": name, "id": uid, "profile": pack.persona_label(c),
+                          "unit": "BDO Insurance and Reinsurance Brokers, Inc. / Head Office",
+                          "does": "; ".join(acts), "menu": first_screen[persona],
+                          "menus": "Product Maintenance › " + ", ".join(own) if own else "-",
+                          "steps": ", ".join(steps), "env": ENVIRONMENT, "password": PW_TEXT})
     results = ["Not run", "Passed", "Failed", "Blocked"]
     wb = Book("Business Unit Walkthrough Users", doc_type="UAT users", brd="BRD-03", version="1.0", date=DATE,
-              subtitle="BRD-03 Product Maintenance – who signs in for the walkthrough")
-    wb.cover_notes = [f"Environment: {ENVIRONMENT}.", f"Passwords: {PW_TEXT}; no password is written in this "
-                      "workbook."]
+              subtitle="BRD-03 Product Maintenance – persona users for the walkthroughs")
+    wb.cover_notes = [f"Environment: {ENVIRONMENT}.", "The passwords are issued separately by the iorta TechNXT "
+                      "Project Team; no password is written in this workbook.", "The steps, personas, screens and users are those of FRS Annex K (Process "
+                      "Walkthroughs); the people named are fictitious."]
     wb.sheet("Users", [
-        Column("persona", "Persona", 20, "Business role in the FRS"), Column("name", "Name", 24, "User name"),
-        Column("id", "Sign-in ID", 11, "User ID in the BIBS DEV environment"),
+        Column("persona", "Persona", 22, "Persona of FRS Annex K"), Column("name", "User name", 20,
+                                                                          "Fictitious user of FRS Annex K"),
+        Column("id", "Sign-in ID", 11, "User ID to type on the Login page"),
         Column("profile", "Role / group profile", 26, "Group profile of the user"),
         Column("unit", "Company / branch / unit", 30, "Where the user belongs"),
-        Column("does", "What the user does in the walkthrough", 36, "Responsibilities"),
-        Column("menu", "Menu path to start", 34, "Where the user starts"),
+        Column("does", "What the user does in the walkthroughs", 40, "Results of the user's steps"),
+        Column("menu", "Screen of the first step", 30, "Where the user starts"),
         Column("menus", "Product Maintenance menus the user should see", 40, "Entries of the menu"),
-        Column("steps", "Walkthrough steps", 24, "Steps of the script"),
-        Column("scope", "Limits or data scope", 24, "Approval limits and data scope"),
-        Column("env", "Environment", 26, "Where to sign in"), Column("password", "Password", 26, "How the password "
-                                                                     "is issued"),
-        Column("remarks", "Remarks", 26, "Remarks")], users,
-        description="The users of BRD-03 for the Business Unit walkthrough, with their sign-in IDs")
+        Column("steps", "Walkthrough steps", 24, "Steps of the sheet Walkthrough script"),
+        Column("env", "Environment", 26, "Where to sign in"),
+        Column("password", "Password", 26, "Never written here")], users,
+        description=f"{ENVIRONMENT}. The passwords are issued separately by the iorta TechNXT Project Team")
     wb.sheet("Walkthrough script", [
-        Column("step", "Step", 9, "Step number"), Column("flow", "Walkthrough", 30, "Walkthrough"),
-        Column("persona", "Persona", 20, "Who acts"), Column("id", "Sign-in ID", 11, "User ID"),
-        Column("action", "Action", 50, "What the user does"), Column("expected", "Expected result", 40,
-                                                                     "What the user sees"),
+        Column("flow", "Walkthrough", 30, "Walkthrough of FRS Annex K"), Column("step", "Step", 9, "Step number"),
+        Column("persona", "Persona", 20, "Who acts"), Column("user", "User", 16, "Fictitious user"),
+        Column("id", "Sign-in ID", 11, "User ID"), Column("screen", "Screen", 26, "Screen of the step"),
+        Column("action", "What the user does", 50, "As in FRS Annex K"),
+        Column("expected", "What the user sees", 44, "As in FRS Annex K"),
+        Column("outcome", "Result expected", 22, "As in FRS Annex K"),
         Column("result", "Result", 11, "Result", values=results, status=True), Column("by", "Done by", 16, "Name"),
         Column("date", "Date", 12, "dd-MMM-yyyy", kind="date"), Column("remarks", "Remarks", 26, "Remarks")], script,
-        description="The walkthrough of BRD-03 step by step, with the sign-in ID of each step")
+        description="The walkthroughs of BRD-03 for the Business Unit, step by step as in FRS Annex K")
     path = wb.save(OUT_DIR / "BIBS_UAT_BRD-03_Business_Unit_Walkthrough_Users_v1.0.xlsx")
     return path, len(users), len(script)
 

@@ -30,7 +30,7 @@ how_to_read:
     - [grey, "[Integration scope] / [Data Migration scope]", "Grey label on an interface with another system or on a data load at go-live: covered by the Integration scope or the Data Migration scope (BRD-13), not a change request.", "Listed in Annex Y.5"]
     - [blue, "Blue table", "Insurance-broking best practice for this area that is not in the BRD, this FRS or the OOTB platform: a recommendation with an indicative effort, not a commitment.", "Annex Y.6; not in the change request total"]
     - [orange, "Orange text", "Not in the BRD and not available, or only partly available, in the iNXT BrokerVerse OOTB platform edition: a change request (CR-PM-1nn). It is delivered only if the Business Unit approves it.", "Effort in Annex Y.2 and the CR effort workbook"]
-  after: "In the end-to-end process flow (Figure 2) the change requests are tagged: yellow for a change request not in any BRD, blue for a change request that extends a BRD requirement, green for a point that is already a BRD requirement (for example the programme NFRs 10.07 and 4.03). The walkthroughs of Annex K and the screenshots of Annex G use the BIBS DEV environment: https://dev.brokerverse.cloud."
+  after: "In the end-to-end process flow (Figure 2) the change requests are tagged: yellow for a change request not in any BRD, blue for a change request that extends a BRD requirement, green for a point that is already a BRD requirement (for example the programme NFRs 10.07 and 4.03). The screenshots of Annex G and of the walkthroughs of Annex K show the screens with realistic, fictitious data, so that the reader can picture each function and flow (BIBS DEV environment: https://dev.brokerverse.cloud)."
 
 figures:
   simple:

@@ -21,10 +21,14 @@ export interface FitMeasures {
  */
 export function fittedHeight(m: FitMeasures): number | null {
   const target = m.wrap - m.overflow;
-  if (target >= m.table || target < m.min) {
-    // The rows fit, or the room left is under the least list height: a capped list would then
-    // scroll inside a page that scrolls too (two scroll bars), so the page scrolls as a whole.
+  if (target >= m.table) {
     return null;
+  }
+  if (target < m.min) {
+    // Too little room for a capped list. A list that is already capped keeps the least height:
+    // releasing it would make the page overflow again, the next measure would cap it again, and
+    // the list would flicker between the two. A list not capped stays so; the page scrolls.
+    return m.wrap < m.table ? m.min : null;
   }
   return Math.floor(target);
 }

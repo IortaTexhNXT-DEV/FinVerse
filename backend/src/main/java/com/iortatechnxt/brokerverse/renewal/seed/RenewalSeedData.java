@@ -13,11 +13,14 @@ import com.iortatechnxt.brokerverse.renewal.domain.RenewalStage;
 import com.iortatechnxt.brokerverse.renewal.extraction.service.ExtractionService;
 import com.iortatechnxt.brokerverse.renewal.insurer.service.InsurerBatchService;
 import com.iortatechnxt.brokerverse.renewal.insurer.service.RenewalInsurerResponseService;
+import com.iortatechnxt.brokerverse.renewal.letter.service.LetterService;
 import com.iortatechnxt.brokerverse.renewal.marketing.service.RenewalAssignmentService;
 import com.iortatechnxt.brokerverse.renewal.marketing.service.RenewalDispositionService;
+import com.iortatechnxt.brokerverse.renewal.marketing.service.ReviewService;
 import com.iortatechnxt.brokerverse.renewal.marketing.service.TransferService;
 import com.iortatechnxt.brokerverse.renewal.processing.service.ProcessingService;
 import com.iortatechnxt.brokerverse.renewal.rules.service.InitiationService;
+import com.iortatechnxt.brokerverse.renewal.service.BatchOutcome;
 import com.iortatechnxt.brokerverse.renewal.service.port.LegacyPolicySource.LegacyHeader;
 import com.iortatechnxt.brokerverse.renewal.service.port.LegacyPolicySource.LegacyParties;
 import com.iortatechnxt.brokerverse.renewal.service.port.LegacyPolicySource.LegacyPolicy;
@@ -38,7 +41,8 @@ import org.springframework.stereotype.Component;
  * extracted and seven migrated policies of the go-live window are taken over, then the renewals are
  * taken through the real services to fill every list - unassigned, for disposition, Team Leader
  * review, transfer pending, straight-through processing with the renewal account, with the insurer,
- * RA ready, letter pending, and the Exception bucket with a package choice waiting for approval.
+ * RA ready, letter pending, a Not for Renewal letter sent, and the Exception bucket with a package
+ * choice waiting for approval.
  */
 @Component
 @Profile("seed")
@@ -155,6 +159,8 @@ public class RenewalSeedData implements ApplicationRunner {
   private final InsurerBatchService batches;
   private final RenewalInsurerResponseService responses;
   private final PackageChoiceService choices;
+  private final LetterService letters;
+  private final ReviewService reviews;
 
   /**
    * Creates the loader.
@@ -172,6 +178,8 @@ public class RenewalSeedData implements ApplicationRunner {
    * @param batches insurer batches
    * @param responses insurer responses
    * @param choices package choices
+   * @param letters renewal letters
+   * @param reviews Team Leader review
    */
   @SuppressWarnings({"java:S107", "PMD.ExcessiveParameterList"}) // constructor injection
   public RenewalSeedData(
@@ -187,7 +195,9 @@ public class RenewalSeedData implements ApplicationRunner {
       ProcessingService processing,
       InsurerBatchService batches,
       RenewalInsurerResponseService responses,
-      PackageChoiceService choices) {
+      PackageChoiceService choices,
+      LetterService letters,
+      ReviewService reviews) {
     this.users = users;
     this.companies = companies;
     this.candidates = candidates;
@@ -201,6 +211,8 @@ public class RenewalSeedData implements ApplicationRunner {
     this.batches = batches;
     this.responses = responses;
     this.choices = choices;
+    this.letters = letters;
+    this.reviews = reviews;
   }
 
   @Override
@@ -223,6 +235,7 @@ public class RenewalSeedData implements ApplicationRunner {
     }
     marketing(co, legacy);
     processing(co);
+    step("not for renewal letter", () -> notRenewed(co, legacy));
     step(
         "package choice",
         () ->
@@ -231,7 +244,7 @@ public class RenewalSeedData implements ApplicationRunner {
                 () ->
                     choices.propose(
                         co,
-                        legacy.get(1),
+                        legacy.get(UNMAPPED),
                         "PAR01",
                         1,
                         "Home package withdrawn; renews on the standard fire package")));
@@ -365,6 +378,51 @@ public class RenewalSeedData implements ApplicationRunner {
                             null,
                             "Renewed on the same terms"),
                         false)));
+  }
+
+  /**
+   * The AO tags the first unassigned migrated renewal of the Team Leader's unit Not for Renewal
+   * (unit sold), the Team Leader posts it and the Not for Renewal letter is generated and sent, so
+   * the letter dispatch report has a row from day one.
+   */
+  private void notRenewed(Long co, List<String> legacy) {
+    List<String> unassigned =
+        candidates.findByCompanyIdAndStageIn(co, List.of(RenewalStage.UNASSIGNED)).stream()
+            .map(RenewalCandidate::getRenewalRef)
+            .filter(ref -> legacy.contains(ref) && !ref.equals(legacy.get(UNMAPPED)))
+            .sorted()
+            .toList();
+    for (String ref : unassigned) {
+      List<BatchOutcome> assigned = new java.util.ArrayList<>();
+      users.run(TL, () -> assigned.add(assignments.assign(co, List.of(ref), AO, null)));
+      if (!assigned.get(0).done().isEmpty()) {
+        closeNotRenewed(co, ref);
+        return;
+      }
+    }
+  }
+
+  private void closeNotRenewed(Long co, String ref) {
+    users.run(AO, () -> history.open(co, ref));
+    users.run(
+        AO,
+        () ->
+            dispositions.save(
+                co,
+                ref,
+                new RenewalDispositionService.Input(
+                    RenewalDisposition.NOT_FOR_RENEWAL,
+                    "UNIT_SOLD",
+                    null,
+                    null,
+                    "Client sold the unit; no renewal needed")));
+    List<BatchOutcome> outcomes = new java.util.ArrayList<>();
+    users.run(AO, () -> outcomes.add(dispositions.push(co, List.of(ref))));
+    users.run(TL, () -> outcomes.add(reviews.post(co, List.of(ref))));
+    users.run(TL, () -> outcomes.add(letters.closingLetters(co, List.of(ref))));
+    outcomes.stream()
+        .filter(o -> !o.refused().isEmpty())
+        .forEach(o -> LOG.warn("Not for Renewal letter of {}: {}", ref, o.refused()));
   }
 
   private static void step(String what, Runnable work) {

@@ -42,6 +42,7 @@ public class SeedDebitNotes {
   private static final int DAY_SPREAD = 3;
   private static final int DAY_RANGE = 20;
   private static final int USD_DAY = 5;
+  private static final int OPEN_DOLLAR_NOTE = 900;
   private static final int MONTH_FACTOR = 31;
   private static final int PARTY_FACTOR = 17;
   private static final int MIN_OPEN = 30;
@@ -115,6 +116,22 @@ public class SeedDebitNotes {
       }
     }
     return created;
+  }
+
+  /**
+   * A US dollar debit note left open after the collections of the seed (the quarterly notes are
+   * collected), so the statement of outstanding in a foreign currency has an item from day one.
+   *
+   * @param ctx seed context
+   */
+  public void openDollarNote(SeedContext ctx) {
+    create(
+        ctx,
+        OPEN_DOLLAR_NOTE,
+        USD_PARTY,
+        SeedContext.LAST_DATE,
+        USD,
+        premium(MONTHS, PHP_PARTIES.size()).movePointLeft(2));
   }
 
   private static BigDecimal premium(int month, int party) {

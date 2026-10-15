@@ -57,6 +57,9 @@ public class BrokerClaimsSeedData implements ApplicationRunner {
   private static final String FIRE = "FIRE";
   private static final int LOSS_DAYS_AGO = 3;
 
+  /** Days before the seed date a claim was reported to stay outstanding past due (BRCLM.031). */
+  private static final int PAST_DUE_REPORTED_DAYS_AGO = 95;
+
   private final CompanyRepository companies;
   private final BrokerClaimRepository claims;
   private final ClaimRecordingService recording;
@@ -120,6 +123,7 @@ public class BrokerClaimsSeedData implements ApplicationRunner {
       step("reopened claim", () -> story.reopened(id, reopenedFire(id).getId()));
       step("claim awaiting remittance", () -> story.awaitingRemittance(id, awaiting(id).getId()));
       step("newly filed claim", () -> story.newlyFiled(id, liability(id).getId()));
+      step("past-due claim", () -> pastDue(id));
     }
   }
 
@@ -234,6 +238,30 @@ public class BrokerClaimsSeedData implements ApplicationRunner {
         "ARN-2026-940007",
         ClaimSource.BROKER_NOTICE,
         loss(FIRE, "Kitchen fire spread to the dining area", "Kapitolyo, Pasig City"),
+        List.of(),
+        List.of());
+  }
+
+  /**
+   * A claim reported 95 days before the seed date and still new, so the report of outstanding
+   * claims 90 days past due has a row from day one.
+   */
+  private Claim pastDue(Long companyId) {
+    LocalDate reported = BusinessClock.today(clock).minusDays(PAST_DUE_REPORTED_DAYS_AGO);
+    return record(
+        OFFICER,
+        companyId,
+        "ARN-2026-940001",
+        ClaimSource.BROKER_NOTICE,
+        new LossDetails.Loss(
+            reported.minusDays(2),
+            reported,
+            MOTOR,
+            MOTOR,
+            "Windshield cracked by a stone on SLEX; repair estimate awaited",
+            "SLEX Alabang, Muntinlupa",
+            null,
+            null),
         List.of(),
         List.of());
   }

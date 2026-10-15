@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
  * Loads the receivables seed data set (seed profile only, idempotent): debit notes when the
  * underwriting seed did not create any, about 80 receipts January-September 2026, weekly deposit
  * slips, a bounced cheque, post-dated cheques, rent cheques, the bank statements of account 1111
- * and a finalized August bank reconciliation.
+ * and a finalized August bank reconciliation; a US dollar debit note stays open.
  *
  * <p>Runs after the underwriting seed (order 45) so that its debit notes are collected first.
  */
@@ -80,6 +80,7 @@ public class ReceivablesSeedData implements ApplicationRunner {
     banking.bounceOne(created);
     int pdcs = banking.processPdcs(ctx);
     collections.applyOnAccount(APPLICATION_DATE);
+    debitNotes.openDollarNote(ctx);
     banking.payRent(ctx);
     statements.run(ctx);
     LOG.info(

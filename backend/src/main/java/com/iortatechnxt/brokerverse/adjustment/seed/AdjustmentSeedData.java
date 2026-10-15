@@ -56,7 +56,7 @@ public class AdjustmentSeedData implements ApplicationRunner {
   private static final String REQUESTER = "mktcoll";
   private static final String PROCESSOR = "adjust";
   private static final int DAYS_AFTER_INCEPTION = 30;
-  private static final BigDecimal RATE_INCREASE = new BigDecimal("1500.00");
+  static final BigDecimal RATE_INCREASE = new BigDecimal("1500.00");
 
   private final EndorsementRequestService requests;
   private final RequestWorkflowService workflow;
@@ -205,7 +205,7 @@ public class AdjustmentSeedData implements ApplicationRunner {
         + (Math.floorMod(type.hashCode(), REF_SPAN) + REF_BASE);
   }
 
-  private static RequestTerms terms(
+  static RequestTerms terms(
       OpsInvoice invoice, String type, String requestType, String reason, String description) {
     boolean cancellation = reason != null;
     return new RequestTerms(

@@ -12,11 +12,15 @@ import com.iortatechnxt.brokerverse.opsledger.api.dto.OpsInvoiceSummaryResponse;
 import com.iortatechnxt.brokerverse.opsledger.api.dto.StatusChangeResponse;
 import com.iortatechnxt.brokerverse.opsledger.domain.FlowInEnums.Trigger;
 import com.iortatechnxt.brokerverse.opsledger.domain.FlowInRun;
+import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.service.Invoice360Service;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceFeedReplayService;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
+import com.iortatechnxt.brokerverse.opsledger.service.InvoiceMasterFacts;
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.Map;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -39,6 +43,7 @@ public class OpsInvoiceController {
   private final InvoiceLedgerQueryService ledger;
   private final Invoice360Service views;
   private final InvoiceFeedReplayService replay;
+  private final InvoiceMasterFacts masterFacts;
 
   /**
    * Creates the controller.
@@ -46,12 +51,17 @@ public class OpsInvoiceController {
    * @param ledger ledger reads
    * @param views invoice 360
    * @param replay booking feed replay
+   * @param masterFacts Invoice Master List values of the accounts
    */
   public OpsInvoiceController(
-      InvoiceLedgerQueryService ledger, Invoice360Service views, InvoiceFeedReplayService replay) {
+      InvoiceLedgerQueryService ledger,
+      Invoice360Service views,
+      InvoiceFeedReplayService replay,
+      InvoiceMasterFacts masterFacts) {
     this.ledger = ledger;
     this.views = views;
     this.replay = replay;
+    this.masterFacts = masterFacts;
   }
 
   /**
@@ -75,8 +85,11 @@ public class OpsInvoiceController {
             Math.max(page, 0),
             Math.min(Math.max(size, 1), OpsAccess.MAX_PAGE),
             Sort.by(Sort.Direction.DESC, "classification.bookingDate", "id"));
+    Page<OpsInvoice> found = ledger.searchLoaded(params.toSearch(companyId), pageable);
+    Map<Long, InvoiceMasterFacts.Facts> master =
+        masterFacts.of(found.map(OpsInvoice::getAccountId).getContent());
     return PageResponse.of(
-        ledger.searchLoaded(params.toSearch(companyId), pageable), OpsInvoiceSummaryResponse::from);
+        found, i -> OpsInvoiceSummaryResponse.from(i, master.get(i.getAccountId())));
   }
 
   /**

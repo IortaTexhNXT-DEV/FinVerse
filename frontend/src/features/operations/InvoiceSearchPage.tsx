@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { opsApi } from '@/api/operations';
 import type { InvoiceSearch } from '@/api/operations';
+import { useAuth } from '@/auth/authContext';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
@@ -16,7 +17,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { PageFooter } from '@/components/ui/Pager';
 import { Tabs } from '@/components/ui/Tabs';
 import { useCompanyId } from '@/context/workspaceContext';
-import { INVOICE_COLUMNS } from './invoiceColumns';
+import { AUDIT_COLUMN, INVOICE_COLUMNS } from './invoiceColumns';
 import {
   FILTER_FIELDS,
   SEARCH_TABS,
@@ -95,11 +96,14 @@ function Filters({
  * Invoice search of the Operations ledger (RMTID.026, ADJID.024, DIS 3.27.2): every booked invoice
  * and endorsement with its outstanding premium, payment and remittance status and flags, filtered by
  * insurer, assured, account officer, booking and inception dates and origin (open legacy invoices
- * migrated at cut-over carry a LEGACY badge); open one for its invoice 360.
+ * migrated at cut-over carry a LEGACY badge); open one for its invoice 360. Columns adds the values
+ * of the Invoice Master List (cover and version, assignees, placement, approval, cancellation) and,
+ * for the users who read the audit trail, the link to the invoice's audit trail.
  */
 export default function InvoiceSearchPage() {
   const companyId = useCompanyId();
   const navigate = useNavigate();
+  const { can } = useAuth();
   const [params] = useSearchParams();
   const [search, setSearch] = useState<InvoiceSearch>(() => searchFromParams(params));
   const [text, setText] = useState(search.q ?? '');
@@ -169,7 +173,7 @@ export default function InvoiceSearchPage() {
           )}
           <DataTable
             caption="Operations invoices"
-            columns={INVOICE_COLUMNS}
+            columns={can('AUDIT_VIEW') ? [...INVOICE_COLUMNS, AUDIT_COLUMN] : INVOICE_COLUMNS}
             rows={rows.data?.content ?? []}
             rowKey={(i) => i.invoiceNo}
             loading={rows.isLoading}

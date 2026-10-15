@@ -30,6 +30,7 @@ export const OPERATIONS_HELP: HelpSection = {
         'Search by invoice number, ARN, policy number, client code or assured name, or pick a tab (Outstanding, Paid Not Extracted, On Hold, Locked, Direct Payment).',
         'Filters narrow the list by insurer, name of assured, account officer, booking date and inception date.',
         'The Invoice Family tab lists the original booking with its endorsements and cancellation under one root invoice number, with the family totals (DIS 3.27.2).',
+        'Columns adds the values of the Invoice Master List: cover and version number, the Marketing and Processing assignees, the placement status, the approval by Processing and the cancellation; users who read the audit trail also get the Audit Trail link of each invoice.',
       ],
       controls: [
         'Balances are booked + adjusted - applied + reversed - remitted - written off, per component.',

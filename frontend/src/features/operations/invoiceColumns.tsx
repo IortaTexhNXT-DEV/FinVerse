@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { InsurerName } from '@/components/broking/LovLabel';
 import type { OpsInvoiceSummary } from '@/api/operations';
 import { Amount } from '@/components/ui/Amount';
@@ -5,7 +6,8 @@ import type { Column } from '@/components/ui/DataTable';
 import { OriginBadge } from '@/components/ui/OriginBadge';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { UserName } from '@/components/ui/UserName';
-import { formatDate } from '@/utils/format';
+import { Link } from 'react-router-dom';
+import { formatDate, formatDateTime } from '@/utils/format';
 import { FlagChips } from './OpsParts';
 
 /** Columns of Invoice Search: one value per cell with its second line muted under it. */
@@ -86,4 +88,92 @@ export const INVOICE_COLUMNS: Column<OpsInvoiceSummary>[] = [
     ),
   },
   { key: 'flags', header: 'Flags', render: (i) => <FlagChips flags={i.flags} /> },
+  // The Invoice Master List values of the account (BR-175, FR-CR-090), chosen with Columns.
+  {
+    key: 'cover',
+    header: 'Cover / Version',
+    defaultHidden: true,
+    render: (i) => (
+      <>
+        {i.master?.coverNo ?? '—'}
+        <div className="ops-muted">
+          {i.master?.versionNo === undefined || i.master.versionNo === null
+            ? '—'
+            : `Version ${i.master.versionNo}`}
+        </div>
+      </>
+    ),
+  },
+  {
+    key: 'assignees',
+    header: 'Marketing / Processing',
+    defaultHidden: true,
+    width: '180px',
+    render: (i) => (
+      <>
+        <UserName login={i.master?.marketing} truncate />
+        <div className="ops-muted">
+          <UserName login={i.master?.processing} truncate />
+        </div>
+      </>
+    ),
+  },
+  {
+    key: 'placement',
+    header: 'Placement Status',
+    kind: 'status',
+    defaultHidden: true,
+    render: (i) =>
+      i.master?.placementStatus ? <StatusBadge status={i.master.placementStatus} /> : '—',
+  },
+  {
+    key: 'approved',
+    header: 'Approved by Processing',
+    defaultHidden: true,
+    render: (i) => (i.master?.approvedAt ? formatDateTime(i.master.approvedAt) : '—'),
+  },
+  {
+    key: 'cancellation',
+    header: 'Cancellation',
+    defaultHidden: true,
+    render: (i) => cancellation(i),
+  },
 ];
+
+/** "In force", or the cancellation of the invoice or its cover with the date and the reason. */
+function cancellation(i: OpsInvoiceSummary): ReactNode {
+  const on = i.master?.cancelledOn;
+  if (!i.flags.cancelled && (on === undefined || on === null)) {
+    return <>In force</>;
+  }
+  return (
+    <>
+      {on ? `Cancelled ${formatDate(on)}` : 'Cancelled'}
+      {i.master?.cancellationReason && (
+        <div className="ops-muted">{i.master.cancellationReason}</div>
+      )}
+    </>
+  );
+}
+
+/** The audit trail of an invoice since its booking (Administration > Audit Trail). */
+export function invoiceAuditLink(i: OpsInvoiceSummary): string {
+  const params = new URLSearchParams({
+    entityType: 'OpsInvoice',
+    entityId: i.invoiceNo,
+    from: i.bookingDate,
+  });
+  return `/admin/audit?${params.toString()}`;
+}
+
+/** Link to the audit trail of the invoice, for the users who may read the audit trail. */
+export const AUDIT_COLUMN: Column<OpsInvoiceSummary> = {
+  key: 'audit',
+  header: 'Audit Trail',
+  defaultHidden: true,
+  render: (i) => (
+    <Link to={invoiceAuditLink(i)} onClick={(e) => e.stopPropagation()}>
+      Audit Trail
+    </Link>
+  ),
+};

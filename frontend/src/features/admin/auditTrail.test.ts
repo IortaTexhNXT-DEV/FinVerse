@@ -1,7 +1,28 @@
 import { describe, expect, it } from 'vitest';
-import { AUDIT_ACTIONS, dateRangeError, exportParams } from './auditTrail';
+import { AUDIT_ACTIONS, dateRangeError, exportParams, initialFilters } from './auditTrail';
 
 describe('audit trail filters', () => {
+  it("opens on today's entries, or on the record a link names", () => {
+    const day = '2026-10-15';
+    expect(initialFilters(new URLSearchParams(), undefined, day)).toMatchObject({
+      from: day,
+      to: day,
+      entityType: '',
+      entityId: '',
+    });
+    expect(
+      initialFilters(
+        new URLSearchParams('entityType=OpsInvoice&entityId=BI-1&from=2026-01-05'),
+        undefined,
+        day,
+      ),
+    ).toMatchObject({ from: '2026-01-05', to: day, entityType: 'OpsInvoice', entityId: 'BI-1' });
+    expect(initialFilters(new URLSearchParams('from=2027-01-01'), 'Claim', day)).toMatchObject({
+      from: day,
+      entityType: 'Claim',
+    });
+  });
+
   it('refuses an end date before the start date with BDOI message', () => {
     expect(dateRangeError('2026-10-09', '2026-10-01')).toBe(
       'The end date must be on or after the start date',

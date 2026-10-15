@@ -111,7 +111,14 @@ class OperationsFoundationApiIT {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.content[0].invoiceNo").value(no))
         .andExpect(jsonPath("$.content[0].paymentStatus").value("UNPAID"))
-        .andExpect(jsonPath("$.content[0].flags.directPayment").value(false));
+        .andExpect(jsonPath("$.content[0].flags.directPayment").value(false))
+        // The Invoice Master List values of the account (BR-175).
+        .andExpect(jsonPath("$.content[0].master.placementStatus").value("BOOKED"))
+        .andExpect(jsonPath("$.content[0].master.versionNo").value(1))
+        .andExpect(jsonPath("$.content[0].master.marketing").value("ao"))
+        .andExpect(jsonPath("$.content[0].master.processing").value("proc"))
+        .andExpect(jsonPath("$.content[0].master.approvedAt").isString())
+        .andExpect(jsonPath("$.content[0].master.cancelledOn").doesNotExist());
     api.doGet("cashier", "/api/v1/ops/invoices/" + no)
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.invoice.keys.invoiceNo").value(no))

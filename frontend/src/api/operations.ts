@@ -93,6 +93,25 @@ export interface OpsInvoiceSummary extends InvoiceOriginFields {
   aoUsername?: string;
   /** Root of the invoice family (DIS 3.27.2). */
   rootInvoiceNo?: string;
+  /** Invoice Master List values of the account (BR-175); absent for an invoice without account. */
+  master?: InvoiceMasterFacts | null;
+}
+
+/** The values of the Invoice Master List that belong to the account of an invoice (BR-175). */
+export interface InvoiceMasterFacts {
+  /** Cover number of an account taken over from the legacy system. */
+  coverNo?: string | null;
+  versionNo?: number | null;
+  /** Marketing assignee (account officer). */
+  marketing?: string | null;
+  /** Processing assignee: who approved the account, else who holds its case. */
+  processing?: string | null;
+  /** Account status (placement stage). */
+  placementStatus?: string | null;
+  /** Approval of the account by Processing. */
+  approvedAt?: string | null;
+  cancelledOn?: string | null;
+  cancellationReason?: string | null;
 }
 
 export interface InvoiceComponentRow {

@@ -32,6 +32,26 @@ export interface AuditFilters {
   action: string;
 }
 
+/**
+ * The filters a screen opens with: today's entries, or the entries of one record when a link names
+ * it (`?entityType=OpsInvoice&entityId=...&from=...`, e.g. from the invoice ledger).
+ */
+export function initialFilters(
+  params: URLSearchParams,
+  scope: string | undefined,
+  day: string,
+): AuditFilters {
+  const from = params.get('from') ?? '';
+  return {
+    from: /^\d{4}-\d{2}-\d{2}$/.test(from) && from <= day ? from : day,
+    to: day,
+    username: '',
+    entityType: scope ?? params.get('entityType') ?? '',
+    entityId: params.get('entityId') ?? '',
+    action: '',
+  };
+}
+
 /** The message of a date range whose end is before its start, or null. */
 export function dateRangeError(from: string, to: string): string | null {
   return from !== '' && to !== '' && to < from

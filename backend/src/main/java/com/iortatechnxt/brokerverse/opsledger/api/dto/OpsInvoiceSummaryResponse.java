@@ -5,6 +5,7 @@ import com.iortatechnxt.brokerverse.booking.domain.InvoiceKind;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.domain.PaymentStatus;
 import com.iortatechnxt.brokerverse.opsledger.domain.RemittanceStatus;
+import com.iortatechnxt.brokerverse.opsledger.service.InvoiceMasterFacts;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -28,6 +29,7 @@ import java.time.LocalDate;
  * @param inceptionDate period start
  * @param aoUsername account officer
  * @param rootInvoiceNo root of the invoice family (DIS 3.27.2)
+ * @param master Invoice Master List values of the account (BR-175), null when not read
  * @param origin BIBS or MIGRATED with the legacy facts (unwrapped)
  */
 public record OpsInvoiceSummaryResponse(
@@ -48,6 +50,7 @@ public record OpsInvoiceSummaryResponse(
     LocalDate inceptionDate,
     String aoUsername,
     String rootInvoiceNo,
+    InvoiceMasterFacts.Facts master,
     @JsonUnwrapped InvoiceOriginResponse origin) {
 
   /**
@@ -57,6 +60,17 @@ public record OpsInvoiceSummaryResponse(
    * @return response
    */
   public static OpsInvoiceSummaryResponse from(OpsInvoice i) {
+    return from(i, null);
+  }
+
+  /**
+   * Maps an invoice of the Invoice Master List (components loaded) with its account values.
+   *
+   * @param i invoice
+   * @param master account values, null when the invoice has no account
+   * @return response
+   */
+  public static OpsInvoiceSummaryResponse from(OpsInvoice i, InvoiceMasterFacts.Facts master) {
     return new OpsInvoiceSummaryResponse(
         i.getInvoiceNo(),
         i.getArn(),
@@ -75,6 +89,7 @@ public record OpsInvoiceSummaryResponse(
         i.getClassification().inceptionDate(),
         i.getClassification().aoUsername(),
         i.getRootInvoiceNo(),
+        master,
         InvoiceOriginResponse.from(i));
   }
 }

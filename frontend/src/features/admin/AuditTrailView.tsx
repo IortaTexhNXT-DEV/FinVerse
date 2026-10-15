@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { adminApi } from '@/api/admin';
 import type { AuditEntry } from '@/api/admin';
 import type { ExportFormat } from '@/api/reports';
@@ -18,7 +19,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { UserName } from '@/components/ui/UserName';
 import { formatDateTime, today } from '@/utils/format';
 import { AuditExportButtons } from './AuditExportButtons';
-import { AUDIT_ACTIONS, dateRangeError } from './auditTrail';
+import { AUDIT_ACTIONS, dateRangeError, initialFilters } from './auditTrail';
 import type { AuditFilters } from './auditTrail';
 
 interface AuditTrailViewProps {
@@ -45,14 +46,10 @@ export function AuditTrailView({
   scope,
   formats,
 }: Readonly<AuditTrailViewProps>) {
-  const [filters, setFilters] = useState<AuditFilters>({
-    from: today(),
-    to: today(),
-    username: '',
-    entityType: scope ?? '',
-    entityId: '',
-    action: '',
-  });
+  const [params] = useSearchParams();
+  const [filters, setFilters] = useState<AuditFilters>(() =>
+    initialFilters(params, scope, today()),
+  );
   const [page, setPage] = useState(0);
   const [sort, setSort] = useState<SortState>(DEFAULT_SORT);
   const rangeError = dateRangeError(filters.from, filters.to);

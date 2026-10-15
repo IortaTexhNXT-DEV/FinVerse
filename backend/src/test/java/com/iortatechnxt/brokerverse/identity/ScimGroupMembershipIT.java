@@ -295,7 +295,8 @@ class ScimGroupMembershipIT {
     as.run(
         "admin",
         () -> {
-          admin.createRole(new RoleRequest(requester, "Requester", Set.of(Permission.UAM_ENROLL)));
+          admin.createRole(
+              new RoleRequest(requester, "Requester", Set.of(Permission.UAM_GROUP_REQUEST)));
           return admin.createRole(
               new RoleRequest(approver, "Approver", Set.of(Permission.UAM_SOD_AUTHORIZE)));
         });
@@ -305,9 +306,9 @@ class ScimGroupMembershipIT {
             () ->
                 sodRules.create(
                     SodRuleKind.PERMISSIONS,
-                    "UAM_ENROLL",
+                    "UAM_GROUP_REQUEST",
                     "UAM_SOD_AUTHORIZE",
-                    "Enrol or authorise"));
+                    "Propose or authorise"));
     as.run("infosec", () -> sodRules.authorize(rule.getId()));
     try {
       String userId = joiner();

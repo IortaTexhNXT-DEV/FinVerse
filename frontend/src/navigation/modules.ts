@@ -30,7 +30,7 @@ import { helpModule } from '@/features/help/module';
 import { issuanceModule } from '@/features/issuance/module';
 import { legacyInquiryModule } from '@/features/legacy-inquiry/module';
 import { migrationModule } from '@/features/migration/module';
-import { userAccessModule } from '@/features/nbadmin/userAccessModule';
+import { userAccessModule } from '@/features/useraccess/module';
 import { nbDashboardModule, nbReportsModule } from '@/features/nbreports/module';
 import { operationsModule } from '@/features/operations/module';
 import { withJournalAutomation } from '@/features/journaltools/module';

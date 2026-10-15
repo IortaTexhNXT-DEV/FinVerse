@@ -7,11 +7,8 @@ import com.iortatechnxt.brokerverse.nbadmin.api.dto.AccessRequestRequest;
 import com.iortatechnxt.brokerverse.nbadmin.api.dto.AccessRequestResponse;
 import com.iortatechnxt.brokerverse.nbadmin.api.dto.AccessSettingsResponse;
 import com.iortatechnxt.brokerverse.nbadmin.api.dto.AccessSubmitRequest;
-import com.iortatechnxt.brokerverse.nbadmin.api.dto.ApproverResponse;
 import com.iortatechnxt.brokerverse.nbadmin.api.dto.UserAccessResponse;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequest;
-import com.iortatechnxt.brokerverse.nbadmin.domain.AccessUserType;
-import com.iortatechnxt.brokerverse.nbadmin.service.AccessApprovers;
 import com.iortatechnxt.brokerverse.nbadmin.service.AccessRequestDescriber;
 import com.iortatechnxt.brokerverse.nbadmin.service.AccessRequestService;
 import com.iortatechnxt.brokerverse.nbadmin.service.AccessSettings;
@@ -35,28 +32,26 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * User access requests (BRNB.085; BRD 1.002-1.009, 3.002): work lists, drafts, submission, history,
- * the approver drop-down, and the users and roles of the request form. The decisions are in {@link
- * AccessDecisionController}.
+ * Group-profile changes (BRD 3.002): the proposals of the maker with drafts, submission, history,
+ * and the users and group profiles the User Access screens show. Any checker other than the maker
+ * decides a change ({@link AccessDecisionController}). Users and their group profiles come from
+ * UIDM-ISC; the requests about users raised before remain readable here.
  */
 @RestController
 @RequestMapping("/api/v1/nbadmin")
 public class AccessRequestController {
 
-  /** Anyone taking part in access requests. */
+  /** Anyone taking part in group-profile changes, and their reviewers. */
   static final String VIEW =
-      "hasAnyAuthority('UAM_VIEW', 'ACCESS_REQUEST', 'ACCESS_APPROVE', 'UAM_SECOND_APPROVE',"
-          + " 'ROLE_MANAGE', 'AUDIT_VIEW')";
+      "hasAnyAuthority('UAM_VIEW', 'ACCESS_REQUEST', 'UAM_GROUP_REQUEST', 'ACCESS_APPROVE',"
+          + " 'UAM_SECOND_APPROVE', 'ROLE_MANAGE', 'AUDIT_VIEW')";
 
-  /** Any request function (the type-specific permission is checked by the service). */
-  static final String REQUEST =
-      "hasAnyAuthority('ACCESS_REQUEST', 'UAM_ENROLL', 'UAM_MODIFY', 'UAM_DEACTIVATE',"
-          + " 'UAM_REACTIVATE', 'UAM_GROUP_REQUEST', 'UAM_CORRECT')";
+  /** The makers of a group-profile change. */
+  static final String REQUEST = "hasAnyAuthority('ACCESS_REQUEST', 'UAM_GROUP_REQUEST')";
 
   private static final int PAGE_SIZE = 25;
 
   private final AccessRequestService requests;
-  private final AccessApprovers approvers;
   private final AccessSettings settings;
   private final UserAdminService userAdmin;
   private final AccessRequestDescriber describer;
@@ -66,7 +61,6 @@ public class AccessRequestController {
    * Creates the controller.
    *
    * @param requests access requests
-   * @param approvers eligible approvers
    * @param settings parameters
    * @param userAdmin users and roles
    * @param describer descriptions of the requests
@@ -74,7 +68,6 @@ public class AccessRequestController {
    */
   public AccessRequestController(
       AccessRequestService requests,
-      AccessApprovers approvers,
       AccessSettings settings,
       UserAdminService userAdmin,
       AccessRequestDescriber describer,
@@ -82,7 +75,6 @@ public class AccessRequestController {
     this.describer = describer;
     this.modules = modules;
     this.requests = requests;
-    this.approvers = approvers;
     this.settings = settings;
     this.userAdmin = userAdmin;
   }
@@ -128,8 +120,8 @@ public class AccessRequestController {
   }
 
   /**
-   * Creates a request: a draft ({@code draft=true}), or submitted at once (the approvers of the
-   * body; without approvers any approver decides, as the one-step submission of PMADD05).
+   * Creates a group-profile change: a draft ({@code draft=true}), or submitted at once to any
+   * checker.
    *
    * @param request request
    * @param draft true to save a draft
@@ -141,13 +133,11 @@ public class AccessRequestController {
   public AccessRequestResponse create(
       @Valid @RequestBody AccessRequestRequest request,
       @RequestParam(defaultValue = "false") boolean draft) {
-    List<String> chosen =
-        request.approvers() == null || request.approvers().isEmpty() ? null : request.approvers();
-    return view(requests.create(request.content(), draft, chosen));
+    return view(requests.create(request.content(), draft, null));
   }
 
   /**
-   * Edits a draft (keeping the approvers chosen so far) or corrects a returned request (creator).
+   * Edits a draft or corrects a returned change (maker).
    *
    * @param id request
    * @param request new content
@@ -157,36 +147,21 @@ public class AccessRequestController {
   @PreAuthorize(REQUEST)
   public AccessRequestResponse edit(
       @PathVariable Long id, @Valid @RequestBody AccessRequestRequest request) {
-    return view(requests.edit(id, request.content(), request.approvers()));
+    return view(requests.edit(id, request.content()));
   }
 
   /**
-   * Submits a draft or resubmits a corrected request to the chosen approvers (creator).
+   * Submits a draft or resubmits a corrected change to the checkers (maker).
    *
    * @param id request
-   * @param body approvers and remarks
+   * @param body remarks
    * @return the pending request
    */
   @PostMapping("/access-requests/{id}/submit")
   @PreAuthorize(REQUEST)
   public AccessRequestResponse submit(
       @PathVariable Long id, @Valid @RequestBody AccessSubmitRequest body) {
-    return view(requests.submit(id, body.approvers(), body.remarks()));
-  }
-
-  /**
-   * Eligible approvers of a request by the current user (FR-UA-015).
-   *
-   * @param userType INTERNAL or EXTERNAL
-   * @param subject user the request is about (excluded)
-   * @return approvers
-   */
-  @GetMapping("/approvers")
-  @PreAuthorize(REQUEST)
-  public List<ApproverResponse> approvers(
-      @RequestParam(defaultValue = "INTERNAL") AccessUserType userType,
-      @RequestParam(required = false) String subject) {
-    return approvers.eligible(userType, subject).stream().map(ApproverResponse::from).toList();
+    return view(requests.submit(id, null, body.remarks()));
   }
 
   /**

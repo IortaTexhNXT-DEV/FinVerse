@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.nbadmin.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.access.prepost.PreAuthorize;
 
@@ -16,7 +17,7 @@ class SodRuleControllerAccessTest {
         .contains("'UAM_SOD_MAINTAIN'", "'UAM_SOD_AUTHORIZE'", "'AUDIT_VIEW'");
     for (var method : SodRuleController.class.getDeclaredMethods()) {
       PreAuthorize rule = method.getAnnotation(PreAuthorize.class);
-      if (rule != null && !"list".equals(method.getName())) {
+      if (rule != null && !Set.of("list", "violations").contains(method.getName())) {
         assertThat(rule.value()).doesNotContain("UAM_VIEW").doesNotContain("ACCESS_APPROVE");
       }
     }

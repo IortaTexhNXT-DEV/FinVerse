@@ -35,7 +35,7 @@ public class SodRuleService {
   public static final String AUTHORIZE = "UAM_SOD_AUTHORIZE";
 
   /** Screen of the rules. */
-  public static final String SCREEN = "/user-access/sod-rules";
+  public static final String SCREEN = "/access/separation-of-duties";
 
   private final SodRuleRepository rules;
   private final RoleRepository roles;

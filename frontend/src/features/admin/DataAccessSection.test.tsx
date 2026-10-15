@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { dataScopeApi } from '@/api/dataScope';
 import type { CompanyUnit, DataScopeValue } from '@/api/dataScope';
 import { ebWrapper } from '@/features/eb/testWrapper';
-import { DataAccessDialog } from './DataAccessDialog';
+import { DataAccessPanel } from '@/features/useraccess/DataAccessPanel';
 import { DataAccessSection } from './DataAccessSection';
 
 const UNITS: CompanyUnit[] = [
@@ -77,35 +77,10 @@ describe('Data access section', () => {
   });
 });
 
-describe('Data access dialog', () => {
+describe('Data access panel of a user', () => {
   afterEach(() => vi.restoreAllMocks());
 
-  it('is read-only without the direct edit and offers a request instead', async () => {
-    vi.spyOn(dataScopeApi, 'units').mockResolvedValue(UNITS);
-    vi.spyOn(dataScopeApi, 'ofUser').mockResolvedValue({
-      allCompanies: true,
-      companies: [],
-      description: 'All companies',
-    });
-    const raise = vi.fn();
-    render(
-      ebWrapper(new Set(['UAM_VIEW']))(
-        <DataAccessDialog
-          user={{ id: 5, username: 'maker1' }}
-          editable={false}
-          onRaiseRequest={raise}
-          onClose={() => undefined}
-        />,
-      ),
-    );
-    expect(await screen.findByText('Head Company')).toBeInTheDocument();
-    expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
-    expect(screen.getByText('All companies')).toBeInTheDocument();
-    await userEvent.click(screen.getByRole('button', { name: 'Raise Request' }));
-    expect(raise).toHaveBeenCalled();
-  });
-
-  it('saves a narrowed scope in the emergency direct edit', async () => {
+  it('saves a narrowed scope', async () => {
     vi.spyOn(dataScopeApi, 'units').mockResolvedValue(UNITS);
     vi.spyOn(dataScopeApi, 'ofUser').mockResolvedValue({
       allCompanies: true,
@@ -118,17 +93,10 @@ describe('Data access dialog', () => {
       description: 'SUB (all branches)',
     });
     render(
-      ebWrapper(new Set(['USER_MANAGE']))(
-        <DataAccessDialog
-          user={{ id: 5, username: 'maker1' }}
-          editable
-          onRaiseRequest={() => undefined}
-          onClose={() => undefined}
-        />,
-      ),
+      ebWrapper(new Set(['USER_MANAGE']))(<DataAccessPanel user={{ id: 5, username: 'maker1' }} />),
     );
     await screen.findByText('Subsidiary');
-    const save = screen.getByRole('button', { name: 'Save' });
+    const save = screen.getByRole('button', { name: 'Save Data Access' });
     expect(save).toBeDisabled();
     await userEvent.click(screen.getByRole('checkbox', { name: /All companies/ }));
     expect(

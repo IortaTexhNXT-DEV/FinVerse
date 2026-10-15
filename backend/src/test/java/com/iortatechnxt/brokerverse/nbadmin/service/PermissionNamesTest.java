@@ -10,7 +10,7 @@ class PermissionNamesTest {
 
   @Test
   void theModulePrefixAndTheAcronymsAreReadable() {
-    assertThat(PermissionNames.name("UAM_ENROLL")).isEqualTo("User access enroll");
+    assertThat(PermissionNames.name("UAM_VIEW")).isEqualTo("User access view");
     assertThat(PermissionNames.name("PKG_TSU_APPROVE")).isEqualTo("Package TSU approve");
     assertThat(PermissionNames.name("AUDIT_VIEW")).isEqualTo("Audit view");
     assertThat(PermissionNames.name("UAM_SOD_AUTHORIZE")).isEqualTo("User access SOD authorize");

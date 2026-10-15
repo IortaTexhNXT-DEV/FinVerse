@@ -271,7 +271,7 @@ public class AccessRequestNotifier {
                 + days
                 + " days were deactivated: "
                 + String.join(", ", deactivated),
-            AccessRequestService.SCREEN,
+            AccessRequestService.USERS_SCREEN,
             AccessRequestService.ENTITY,
             null),
         DORMANT_DEACTIVATED);

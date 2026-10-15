@@ -20,6 +20,7 @@ import { Notice } from '@/components/ui/Notice';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { UserName } from '@/components/ui/UserName';
 import { ConfigUploadButton } from '@/features/configpromo/ConfigUploadButton';
+import { UAM_SETTING_KEYS } from '@/features/useraccess/uamSettings';
 
 type Tab = 'parameters' | 'configuration';
 
@@ -169,7 +170,8 @@ function PendingDialog({
 /**
  * System parameters: editable business parameters (validated by type, audited) and a read-only
  * view of the non-secret runtime configuration. A change of a security parameter waits until
- * another user approves it (SECURITY_PARAMETER_APPROVE).
+ * another user approves it (SECURITY_PARAMETER_APPROVE). The user access settings (sessions,
+ * dormancy, local test accounts, synchronisation) are maintained on UAM Settings.
  */
 export default function SystemParametersPage() {
   const { can, user } = useAuth();
@@ -215,7 +217,7 @@ export default function SystemParametersPage() {
       <PageHeader
         section="Administration"
         title="System Parameters"
-        description="Business parameters used across modules."
+        description="Business parameters used across modules; the user access settings are on User Access › UAM Settings."
         actions={<ConfigUploadButton types={['CFG_SECURITY_PARAMETER', 'CFG_PM_LIST_PARAMETER']} />}
       />
       <Tabs tabs={TABS} active={tab} onChange={setTab} />
@@ -225,7 +227,7 @@ export default function SystemParametersPage() {
           <ErrorAlert error={parameters.error} />
           <DataTable<SystemParameter>
             loading={parameters.isLoading}
-            rows={parameters.data ?? []}
+            rows={(parameters.data ?? []).filter((p) => !UAM_SETTING_KEYS.includes(p.key))}
             rowKey={(p) => p.key}
             onRowClick={canEdit || canApprove ? open : undefined}
             columns={[

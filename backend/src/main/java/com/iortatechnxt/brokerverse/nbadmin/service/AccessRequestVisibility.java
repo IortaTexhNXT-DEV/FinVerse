@@ -48,11 +48,12 @@ public class AccessRequestVisibility {
   /**
    * Whether the viewer sees every request (not the drafts of others).
    *
-   * @return true with ACCESS_APPROVE, USER_MANAGE or AUDIT_VIEW
+   * @return true with ACCESS_APPROVE, USER_MANAGE, UAM_VIEW or AUDIT_VIEW
    */
   public boolean seesAll() {
     return currentUser.hasAuthority(AccessApprovers.ACCESS_APPROVE)
         || currentUser.hasAuthority("USER_MANAGE")
+        || currentUser.hasAuthority("UAM_VIEW")
         || currentUser.hasAuthority("AUDIT_VIEW");
   }
 

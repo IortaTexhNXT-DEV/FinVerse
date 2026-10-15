@@ -3,25 +3,27 @@ package com.iortatechnxt.brokerverse.nbadmin;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.iortatechnxt.brokerverse.approval.service.ApprovalInboxService;
-import com.iortatechnxt.brokerverse.approval.service.PendingApproval;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequest;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestContent;
-import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestStatus;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestType;
+import com.iortatechnxt.brokerverse.nbadmin.domain.RequestedRole;
+import com.iortatechnxt.brokerverse.nbadmin.domain.RolePermissionChange;
+import com.iortatechnxt.brokerverse.nbadmin.service.AccessImplementationService;
 import com.iortatechnxt.brokerverse.nbadmin.service.AccessMatrix;
 import com.iortatechnxt.brokerverse.nbadmin.service.AccessMatrixService;
 import com.iortatechnxt.brokerverse.nbadmin.service.AccessRequestService;
-import com.iortatechnxt.brokerverse.nbadmin.service.AccessRequestService.Decision;
-import com.iortatechnxt.brokerverse.security.domain.AppUser;
+import com.iortatechnxt.brokerverse.security.api.dto.RoleRequest;
+import com.iortatechnxt.brokerverse.security.domain.Permission;
+import com.iortatechnxt.brokerverse.security.domain.RoleRepository;
 import com.iortatechnxt.brokerverse.security.service.UserAdminService;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 @IntegrationTest
 class AccessRequestIT {
@@ -29,8 +31,9 @@ class AccessRequestIT {
   @Autowired private AccessRequestService requests;
   @Autowired private AccessMatrixService matrix;
   @Autowired private UserAdminService users;
-  @Autowired private ApprovalInboxService inbox;
-  @Autowired private PasswordEncoder encoder;
+  @Autowired private AccessImplementationService implementations;
+  @Autowired private RoleRepository roles;
+  @Autowired private JdbcTemplate jdbc;
   @Autowired private AsUser as;
 
   /** A new user ID in the BDOI format (USER_ID_PATTERN a999999999). */
@@ -38,170 +41,66 @@ class AccessRequestIT {
     return String.format("u%09d", Math.floorMod(System.nanoTime(), 1_000_000_000L));
   }
 
+  /**
+   * A proposal of a new group profile with a unique code (a change any test can raise).
+   *
+   * @param justification reason
+   * @return content
+   */
+  static AccessRequestContent newProfile(String justification) {
+    String code = "UAM_T" + Math.floorMod(System.nanoTime(), 1_000_000_000L);
+    return AccessRequestContent.groupProfile(
+        AccessRequestType.CREATE_ROLE,
+        new RolePermissionChange(code, Set.of("REPORT_VIEW"), Set.of()),
+        new RequestedRole("Test profile " + code, null, null),
+        justification);
+  }
+
   private AccessRequest submit(String user, AccessRequestContent content) {
     return as.run(user, () -> requests.submit(content));
   }
 
-  @Test
-  void createdUserIsAppliedOnApprovalWithATemporaryPassword() {
-    String name = username();
-    AccessRequest request =
-        submit(
-            "badmin",
-            new AccessRequestContent(
-                AccessRequestType.CREATE_USER,
-                name,
-                "New Account Officer",
-                name + "@example.ph",
-                Set.of(),
-                null,
-                "Joined Marketing"));
-    assertThat(request.getStatus()).isEqualTo(AccessRequestStatus.PENDING);
-    assertThat(request.getRequestNo()).startsWith("AR-");
-    assertThat(as.run("approver", () -> inbox.inbox(null)))
-        .extracting(PendingApproval::reference)
-        .contains(request.getRequestNo());
-    assertThat(as.run("badmin", () -> inbox.inbox(null)))
-        .extracting(PendingApproval::reference)
-        .doesNotContain(request.getRequestNo());
+  @ParameterizedTest
+  @EnumSource(
+      value = AccessRequestType.class,
+      names = {"CREATE_USER", "MODIFY_ROLES", "MODIFY_USER", "DISABLE_USER", "ENABLE_USER"})
+  void usersAreMaintainedInUidmIscNotByRequest(AccessRequestType type) {
     assertThatThrownBy(
             () ->
                 submit(
                     "badmin",
-                    new AccessRequestContent(
-                        AccessRequestType.CREATE_USER, name, "Twice", null, Set.of(), null, "x")))
+                    new AccessRequestContent(type, "ao2", "Name", null, Set.of(), null, "x")))
         .extracting("code")
-        .isEqualTo("ACCESS_REQUEST_PENDING");
-
-    Decision decision = as.run("approver", () -> requests.approve(request.getId(), "welcome"));
-    assertThat(decision.request().getStatus()).isEqualTo(AccessRequestStatus.APPROVED);
-    assertThat(decision.request().getDecidedBy()).isEqualTo("approver");
-    assertThat(decision.temporaryPassword()).hasSize(14);
-    assertThat(decision.toString()).doesNotContain(decision.temporaryPassword());
-    AppUser created = users.getByUsername(name);
-    assertThat(encoder.matches(decision.temporaryPassword(), created.getPasswordHash())).isTrue();
-    assertThat(created.getRoles()).isEmpty();
-    assertThatThrownBy(() -> as.run("approver", () -> requests.approve(request.getId(), null)))
-        .extracting("code")
-        .isEqualTo("ACCESS_REQUEST_DECIDED");
-
-    modifyDisableAndEnable(name);
+        .isEqualTo("ACCESS_USERS_BY_UIDM");
   }
 
-  private void modifyDisableAndEnable(String name) {
-    // the group profiles of a user are assigned through UIDM-ISC, never by a request
-    for (AccessRequestType type :
-        new AccessRequestType[] {AccessRequestType.MODIFY_ROLES, AccessRequestType.MODIFY_USER}) {
-      assertThatThrownBy(
-              () ->
-                  submit(
-                      "badmin",
-                      new AccessRequestContent(
-                          type, name, null, null, Set.of("MKT_AO", "TSU"), null, "Covers TSU")))
-          .extracting("code")
-          .isEqualTo("ACCESS_GROUP_PROFILES_BY_UIDM");
-    }
-    assertThat(users.getByUsername(name).getRoles()).isEmpty();
-
-    AccessRequest disable =
+  @Test
+  void aWithdrawnPermissionInAnApprovedChangeIsSkippedWithAnAuditNote() {
+    String role = "UAM_TEST_" + System.nanoTime();
+    as.run(
+        "admin",
+        () ->
+            users.createRole(
+                new RoleRequest(role, "Withdrawn test", Set.of(Permission.REPORT_VIEW))));
+    AccessRequest change =
         submit(
             "badmin",
-            new AccessRequestContent(
-                AccessRequestType.DISABLE_USER, name, null, null, null, null, "Left"));
-    as.run("approver", () -> requests.approve(disable.getId(), null));
-    assertThat(users.getByUsername(name).isEnabled()).isFalse();
-
-    AccessRequest enable =
-        submit(
-            "badmin",
-            new AccessRequestContent(
-                AccessRequestType.ENABLE_USER, name, null, null, null, null, "Back"));
-    assertThatThrownBy(() -> as.run("approver", () -> requests.reject(enable.getId(), " ")))
-        .extracting("code")
-        .isEqualTo("ACCESS_REJECT_REASON");
-    Decision rejected = as.run("approver", () -> requests.reject(enable.getId(), "Not yet"));
-    assertThat(rejected.request().getStatus()).isEqualTo(AccessRequestStatus.REJECTED);
-    assertThat(rejected.temporaryPassword()).isNull();
-    assertThat(users.getByUsername(name).isEnabled()).isFalse();
+            AccessRequestContent.rolePermissions(
+                new RolePermissionChange(role, Set.of("AUDIT_VIEW"), Set.of()), "Audit"));
+    as.run("approver", () -> requests.approve(change.getId(), "ok"));
+    // A permission withdrawn while the change waited for its implementation.
+    jdbc.update(
+        "update nba_access_request set permissions_added = 'AUDIT_VIEW,UAM_ENROLL' where id = ?",
+        change.getId());
+    as.run("admin", () -> implementations.implement(change.getId()));
+    assertThat(roles.findByCode(role).orElseThrow().getPermissions())
+        .containsExactlyInAnyOrder(Permission.REPORT_VIEW, Permission.AUDIT_VIEW);
     assertThat(
-            as.run(
-                "approver",
-                () ->
-                    requests.search(
-                        AccessRequestStatus.REJECTED,
-                        AccessRequestType.ENABLE_USER,
-                        name,
-                        Pageable.ofSize(5))))
-        .extracting(AccessRequest::getId)
-        .containsExactly(enable.getId());
-  }
-
-  @Test
-  void requestsAreValidatedAndDecidedUnderFourEyes() {
-    assertThatThrownBy(
-            () ->
-                submit(
-                    "badmin",
-                    new AccessRequestContent(
-                        AccessRequestType.CREATE_USER, "mkttl", "Dup", null, Set.of(), null, "x")))
-        .extracting("code")
-        .isEqualTo("ACCESS_USER_EXISTS");
-    assertThatThrownBy(
-            () ->
-                submit(
-                    "badmin",
-                    new AccessRequestContent(
-                        AccessRequestType.DISABLE_USER, username(), null, null, null, null, "x")))
-        .extracting("code")
-        .isEqualTo("ACCESS_UNKNOWN_USER");
-    assertThatThrownBy(
-            () ->
-                submit(
-                    "badmin",
-                    new AccessRequestContent(
-                        AccessRequestType.CREATE_USER,
-                        username(),
-                        "N",
-                        null,
-                        Set.of("NOPE"),
-                        null,
-                        "x")))
-        .extracting("code")
-        .isEqualTo("ACCESS_GROUP_PROFILES_BY_UIDM");
-    assertThatThrownBy(
-            () ->
-                submit(
-                    "badmin",
-                    new AccessRequestContent(
-                        AccessRequestType.CREATE_USER, username(), " ", null, Set.of(), null, "x")))
-        .extracting("code")
-        .isEqualTo("ACCESS_FULL_NAME");
-    assertThatThrownBy(
-            () ->
-                submit(
-                    "badmin",
-                    new AccessRequestContent(
-                        AccessRequestType.MODIFY_ROLES, "ao2", null, null, Set.of(), null, "x")))
-        .extracting("code")
-        .isEqualTo("ACCESS_GROUP_PROFILES_BY_UIDM");
-    assertThatThrownBy(
-            () ->
-                submit(
-                    "badmin",
-                    new AccessRequestContent(
-                        AccessRequestType.DISABLE_USER, "x", null, null, null, null, "x")))
-        .extracting("code")
-        .isEqualTo("ACCESS_USERNAME");
-
-    AccessRequest own =
-        submit(
-            "badmin",
-            new AccessRequestContent(
-                AccessRequestType.CREATE_USER, username(), "Self Made", null, Set.of(), null, "x"));
-    assertThatThrownBy(() -> as.run("badmin", () -> requests.approve(own.getId(), null)))
-        .extracting("code")
-        .isEqualTo("ACCESS_FOUR_EYES");
-    as.run("uamapprover", () -> requests.reject(own.getId(), "Withdrawn"));
+            jdbc.queryForObject(
+                "select count(*) from audit_log where entity_type = 'AccessRequest'"
+                    + " and entity_id = ? and summary like '%UAM_ENROLL%'",
+                Integer.class, change.getRequestNo()))
+        .isEqualTo(1);
   }
 
   @Test

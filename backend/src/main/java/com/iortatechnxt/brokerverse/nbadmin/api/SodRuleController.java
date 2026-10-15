@@ -7,6 +7,7 @@ import com.iortatechnxt.brokerverse.nbadmin.domain.SodRule;
 import com.iortatechnxt.brokerverse.nbadmin.domain.SodRuleKind;
 import com.iortatechnxt.brokerverse.nbadmin.service.AccessRequestDescriber;
 import com.iortatechnxt.brokerverse.nbadmin.service.SodRuleService;
+import com.iortatechnxt.brokerverse.nbadmin.service.SodViolations;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -40,14 +41,18 @@ public class SodRuleController {
 
   private final SodRuleService rules;
   private final AccessRequestDescriber describer;
+  private final SodViolations violations;
 
   /**
    * Creates the controller.
    *
    * @param rules rules
    * @param describer profile names
+   * @param violations current breaches of the rules
    */
-  public SodRuleController(SodRuleService rules, AccessRequestDescriber describer) {
+  public SodRuleController(
+      SodRuleService rules, AccessRequestDescriber describer, SodViolations violations) {
+    this.violations = violations;
     this.rules = rules;
     this.describer = describer;
   }
@@ -62,6 +67,17 @@ public class SodRuleController {
   @PreAuthorize(LIST)
   public List<SodRuleResponse> list() {
     return rules.list().stream().map(this::view).toList();
+  }
+
+  /**
+   * The active users whose access breaches an active rule (Violations tab).
+   *
+   * @return breaches by rule and user
+   */
+  @GetMapping("/violations")
+  @PreAuthorize(LIST)
+  public List<SodViolations.Violation> violations() {
+    return violations.current();
   }
 
   /**

@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api/v1/nbadmin/access-matrix")
-@PreAuthorize("hasAnyAuthority('ACCESS_REQUEST', 'ACCESS_APPROVE', 'ROLE_MANAGE', 'AUDIT_VIEW')")
+@PreAuthorize("hasAuthority('UAM_REPORT_VIEW')")
 public class AccessMatrixController {
 
   private static final MediaType XLSX =

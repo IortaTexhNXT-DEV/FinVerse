@@ -20,6 +20,9 @@ import { EMPTY_SOD_RULE, pendingText, RULE_KINDS, ruleErrors } from './sodRules'
 import { permissionLabel } from '@/utils/permissionLabel';
 import { CellStack } from '@/components/ui/CellStack';
 import { ConfigUploadButton } from '@/features/configpromo/ConfigUploadButton';
+import { Tabs } from '@/components/ui/Tabs';
+import { useTabParam } from '@/components/ui/useTabParam';
+import { SodViolationsTab } from '@/features/useraccess/SodViolationsTab';
 
 function NewRuleDialog({ onClose }: Readonly<{ onClose: () => void }>) {
   const toast = useToast();
@@ -141,13 +144,24 @@ function NewRuleDialog({ onClose }: Readonly<{ onClose: () => void }>) {
   );
 }
 
+const TABS = [
+  { id: 'rules', label: 'Rules' },
+  { id: 'violations', label: 'Violations' },
+] as const;
+type Tab = (typeof TABS)[number]['id'];
+
 /**
- * Separation of Duties (BRD-11 permissions matrix; V1065): the pairs of group profiles one user
- * may not hold together. The Business Administrator adds and deactivates rules; Information
- * Security authorises each change (maker-checker). Every user request and bulk line is checked
- * against the active rules.
+ * Separation of Duties (BRD-11 permissions matrix; V1065): the pairs of group profiles or
+ * permissions one user may not hold together. The Business Administrator adds and deactivates rules;
+ * Information Security authorises each change (maker-checker). Group-profile changes are checked
+ * against the active rules; the Violations tab lists the users who breach one (UIDM-ISC corrects
+ * their group profiles) with its export.
  */
 export default function SodRulesPage() {
+  const [tab, setTab] = useTabParam<Tab>(
+    TABS.map((t) => t.id),
+    'rules',
+  );
   const { can, user } = useAuth();
   const toast = useToast();
   const queryClient = useQueryClient();
@@ -242,7 +256,7 @@ export default function SodRulesPage() {
       <PageHeader
         section="User Access"
         title="Separation of Duties"
-        description="Group profiles one user may not hold together. Requests and bulk lines that break an active rule are refused."
+        description="Group profiles or permissions one user may not hold together, and the users who breach them."
         actions={
           <>
             <ConfigUploadButton types={['CFG_SOD_RULE']} />
@@ -254,51 +268,57 @@ export default function SodRulesPage() {
           </>
         }
       />
-      <ErrorAlert error={rules.error} />
-      <ErrorAlert error={act.error} title="Cannot change the rule" />
-      <Card flush>
-        <DataTable<SodRule>
-          caption="Separation-of-duties rules"
-          loading={rules.isLoading}
-          rows={rules.data ?? []}
-          rowKey={(r) => r.id}
-          emptyMessage="No separation-of-duties rule yet."
-          columns={[
-            { key: 'c', header: 'Rule', kind: 'code', render: (r) => r.ruleCode },
-            {
-              key: 't',
-              header: 'Type',
-              render: (r) => (r.kind === 'PERMISSIONS' ? 'Permissions' : 'Group profiles'),
-            },
-            { key: 'a', header: 'Group Profile / Permission', render: (r) => r.profileAName },
-            { key: 'b', header: 'May Not Be Held With', render: (r) => r.profileBName },
-            { key: 'd', header: 'Reason', render: (r) => r.description },
-            {
-              key: 's',
-              header: 'Status',
-              kind: 'status',
-              render: (r) => (
-                <CellStack main={<StatusBadge status={r.status} />} sub={pendingText(r)} />
-              ),
-            },
-            { key: 'm', header: 'Maker', render: (r) => <UserName login={r.maker} /> },
-            {
-              key: 'z',
-              header: 'Authorised',
-              render: (r) =>
-                r.authorizedBy ? (
-                  <CellStack
-                    main={<UserName login={r.authorizedBy} />}
-                    sub={formatDateTime(r.authorizedAt)}
-                  />
-                ) : (
-                  ''
-                ),
-            },
-            { key: 'x', header: '', kind: 'actions', render: actions },
-          ]}
-        />
-      </Card>
+      <Tabs tabs={TABS} active={tab} onChange={setTab} />
+      {tab === 'violations' && <SodViolationsTab />}
+      {tab === 'rules' && (
+        <>
+          <ErrorAlert error={rules.error} />
+          <ErrorAlert error={act.error} title="Cannot change the rule" />
+          <Card flush>
+            <DataTable<SodRule>
+              caption="Separation-of-duties rules"
+              loading={rules.isLoading}
+              rows={rules.data ?? []}
+              rowKey={(r) => r.id}
+              emptyMessage="No separation-of-duties rule yet."
+              columns={[
+                { key: 'c', header: 'Rule', kind: 'code', render: (r) => r.ruleCode },
+                {
+                  key: 't',
+                  header: 'Type',
+                  render: (r) => (r.kind === 'PERMISSIONS' ? 'Permissions' : 'Group profiles'),
+                },
+                { key: 'a', header: 'Group Profile / Permission', render: (r) => r.profileAName },
+                { key: 'b', header: 'May Not Be Held With', render: (r) => r.profileBName },
+                { key: 'd', header: 'Reason', render: (r) => r.description },
+                {
+                  key: 's',
+                  header: 'Status',
+                  kind: 'status',
+                  render: (r) => (
+                    <CellStack main={<StatusBadge status={r.status} />} sub={pendingText(r)} />
+                  ),
+                },
+                { key: 'm', header: 'Maker', render: (r) => <UserName login={r.maker} /> },
+                {
+                  key: 'z',
+                  header: 'Authorised',
+                  render: (r) =>
+                    r.authorizedBy ? (
+                      <CellStack
+                        main={<UserName login={r.authorizedBy} />}
+                        sub={formatDateTime(r.authorizedAt)}
+                      />
+                    ) : (
+                      ''
+                    ),
+                },
+                { key: 'x', header: '', kind: 'actions', render: actions },
+              ]}
+            />
+          </Card>
+        </>
+      )}
       {adding && <NewRuleDialog onClose={() => setAdding(false)} />}
     </div>
   );

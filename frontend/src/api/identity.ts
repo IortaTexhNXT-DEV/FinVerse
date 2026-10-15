@@ -77,6 +77,8 @@ export interface IdentitySettings {
 /** Filters of the events. */
 export interface IdentityEventFilter {
   status?: string;
+  /** Only the events not dismissed. */
+  open?: boolean;
   windowsId?: string;
   from?: string;
   to?: string;

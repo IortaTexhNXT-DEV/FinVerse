@@ -23,8 +23,8 @@ class UserAccessApiIT {
   @Autowired private Api api;
 
   @Test
-  void requestsAreDraftedSubmittedAndReadOverHttp() throws Exception {
-    String name = AccessRequestIT.username();
+  void groupProfileChangesAreDraftedSubmittedAndReadOverHttp() throws Exception {
+    String code = "UAM_API_" + Math.floorMod(System.nanoTime(), 1_000_000_000L);
     long id =
         api.read(
                 api.doPost(
@@ -32,16 +32,16 @@ class UserAccessApiIT {
                         "/api/v1/nbadmin/access-requests?draft=true",
                         Json.of(
                             "type",
-                            "CREATE_USER",
-                            "username",
-                            name,
-                            "fullName",
+                            "CREATE_ROLE",
+                            "roleCode",
+                            code,
+                            "roleName",
                             "Api Draft",
-                            "windowsId",
-                            "WA" + name))
+                            "permissionsAdded",
+                            List.of("REPORT_VIEW")))
                     .andExpect(status().isCreated())
                     .andExpect(jsonPath("$.status").value("DRAFT"))
-                    .andExpect(jsonPath("$.details.windowsId").value("WA" + name)))
+                    .andExpect(jsonPath("$.roleCode").value(code)))
             .get("id")
             .asLong();
     String base = "/api/v1/nbadmin/access-requests/" + id;
@@ -50,25 +50,23 @@ class UserAccessApiIT {
             base,
             Json.of(
                 "type",
-                "CREATE_USER",
-                "username",
-                name,
-                "fullName",
+                "CREATE_ROLE",
+                "roleCode",
+                code,
+                "roleName",
                 "Api Draft",
+                "permissionsAdded",
+                List.of("REPORT_VIEW"),
                 "justification",
-                "Joined Marketing"))
-        .andExpect(jsonPath("$.justification").value("Joined Marketing"));
+                "Reports for Marketing"))
+        .andExpect(jsonPath("$.justification").value("Reports for Marketing"));
     api.doGet("badmin", base).andExpect(status().isForbidden());
-    api.doGet(REQUESTOR, "/api/v1/nbadmin/approvers?subject=" + name)
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$[?(@.username == 'uamapprover')].fullName").exists());
-    api.doPost(
-            REQUESTOR, base + "/submit", Json.of("approvers", List.of(APPROVER), "remarks", "Go"))
-        .andExpect(jsonPath("$.status").value("PENDING"))
-        .andExpect(jsonPath("$.lifecycle.assignedApprover").value(APPROVER));
-    api.doGet(REQUESTOR, "/api/v1/nbadmin/access-requests?scope=MINE&text=" + name)
+    api.doGet(REQUESTOR, "/api/v1/nbadmin/approvers").andExpect(status().isNotFound());
+    api.doPost(REQUESTOR, base + "/submit", Json.of("remarks", "Go"))
+        .andExpect(jsonPath("$.status").value("PENDING"));
+    api.doGet(REQUESTOR, "/api/v1/nbadmin/access-requests?scope=MINE&text=" + code)
         .andExpect(jsonPath("$.content[0].id").value(id));
-    api.doGet(APPROVER, "/api/v1/nbadmin/access-requests?scope=ASSIGNED&text=" + name)
+    api.doGet(APPROVER, "/api/v1/nbadmin/access-requests?scope=ALL&text=" + code)
         .andExpect(jsonPath("$.content[0].id").value(id));
     api.doGet(REQUESTOR, base + "/history")
         .andExpect(jsonPath("$[0].action").value("SAVE"))
@@ -79,28 +77,19 @@ class UserAccessApiIT {
     api.doPost(REQUESTOR, base + "/cancel", Json.of("comment", "Wrong unit"))
         .andExpect(jsonPath("$.status").value("CANCELLED"))
         .andExpect(jsonPath("$.lifecycle.cancelReason").value("Wrong unit"));
-    api.doGet(REQUESTOR, "/api/v1/nbadmin/access-settings")
-        .andExpect(jsonPath("$.directRoleEdit").value(false))
-        .andExpect(jsonPath("$.roleApplyOnApproval").value(false));
     api.doGet("ao", "/api/v1/nbadmin/access-requests").andExpect(status().isForbidden());
   }
 
   @Test
-  void aRequestCarriesNoGroupProfilesAndTheBulkRequestsAreGone() throws Exception {
-    api.doPost(
-            REQUESTOR,
-            "/api/v1/nbadmin/access-requests?draft=true",
-            Json.of(
-                "type",
-                "MODIFY_ROLES",
-                "username",
-                "mkttl",
-                "roleCodes",
-                List.of("MKT_AO"),
-                "justification",
-                "Covers Marketing"))
-        .andExpect(status().isUnprocessableEntity())
-        .andExpect(jsonPath("$.code").value("ACCESS_GROUP_PROFILES_BY_UIDM"));
+  void aRequestAboutAUserIsRefusedAndTheBulkRequestsAreGone() throws Exception {
+    for (String type : List.of("CREATE_USER", "MODIFY_USER", "DISABLE_USER", "ENABLE_USER")) {
+      api.doPost(
+              REQUESTOR,
+              "/api/v1/nbadmin/access-requests?draft=true",
+              Json.of("type", type, "justification", "Covers Marketing"))
+          .andExpect(status().isUnprocessableEntity())
+          .andExpect(jsonPath("$.code").value("ACCESS_USERS_BY_UIDM"));
+    }
     api.doGet(REQUESTOR, "/api/v1/nbadmin/access-batches").andExpect(status().isNotFound());
   }
 }

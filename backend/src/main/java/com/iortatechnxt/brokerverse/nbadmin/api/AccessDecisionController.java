@@ -118,7 +118,7 @@ public class AccessDecisionController {
    * @return the pending request
    */
   @PostMapping("/{id}/resubmit")
-  @PreAuthorize("hasAnyAuthority('ACCESS_REQUEST', 'UAM_CORRECT')")
+  @PreAuthorize("hasAnyAuthority('ACCESS_REQUEST', 'UAM_GROUP_REQUEST')")
   public AccessRequestResponse resubmit(
       @PathVariable Long id, @Valid @RequestBody DecisionRequest body) {
     return view(returns.resubmit(id, body.comment()));

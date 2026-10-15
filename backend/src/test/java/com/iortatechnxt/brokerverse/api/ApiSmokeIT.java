@@ -208,13 +208,21 @@ class ApiSmokeIT {
     "uamapprover, /api/v1/nbadmin/access-requests?scope=ASSIGNED",
     "secapprover, /api/v1/nbadmin/access-requests?scope=SECOND",
     "admin, /api/v1/nbadmin/access-requests?scope=IMPLEMENTATION&groupProfiles=true",
-    "requestor, /api/v1/nbadmin/approvers",
-    "badmin, /api/v1/nbadmin/approvers?userType=INTERNAL&subject=a013000101",
     "requestor, /api/v1/nbadmin/access-settings",
     "uamapprover, /api/v1/nbadmin/users",
     "uamapprover, /api/v1/nbadmin/roles",
     "uamapprover, /api/v1/nbadmin/access-matrix",
     "uamapprover, /api/v1/nbadmin/access-matrix/by-action",
+    "uamadmin, /api/v1/admin/users",
+    "uamadmin, /api/v1/admin/users/1/group-profiles",
+    "uamadmin, /api/v1/admin/users/1/access-history",
+    "uamadmin, /api/v1/admin/identity/status",
+    "uamadmin, /api/v1/admin/identity/reconciliation",
+    "uamadmin, /api/v1/admin/identity/reconciliation?open=false",
+    "uamadmin, /api/v1/admin/identity/events?status=REFUSED&open=true",
+    "infosec, /api/v1/nbadmin/sod-rules/violations",
+    "infosec, /api/v1/nbadmin/certification/extracts",
+    "auditor, /api/v1/nbadmin/access-matrix",
   })
   void screeningAndUserAccessListsRespondOk(String user, String url) throws Exception {
     mvc.perform(

@@ -8,15 +8,12 @@ import com.iortatechnxt.brokerverse.approval.service.BulkApprovalService.Item;
 import com.iortatechnxt.brokerverse.approval.service.BulkApprovalService.Outcome;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequest;
-import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestContent;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestStatus;
-import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestType;
 import com.iortatechnxt.brokerverse.nbadmin.service.AccessRequestReturnService;
 import com.iortatechnxt.brokerverse.nbadmin.service.AccessRequestService;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import java.util.List;
-import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -29,27 +26,13 @@ class AccessRequestReturnIT {
   @Autowired private BulkApprovalService bulk;
   @Autowired private AsUser as;
 
-  private AccessRequest submit(AccessRequestType type, String name) {
-    return as.run(
-        "badmin",
-        () ->
-            requests.submit(
-                new AccessRequestContent(
-                    type,
-                    name,
-                    "Returned Request User",
-                    name + "@example.ph",
-                    Set.of(),
-                    null,
-                    "Joined Marketing")));
+  private AccessRequest submit(String justification) {
+    return as.run("badmin", () -> requests.submit(AccessRequestIT.newProfile(justification)));
   }
 
   @Test
   void returnedRequestIsResubmittedAndApprovedInBulk() {
-    String name = AccessRequestIT.username();
-    AccessRequest created = submit(AccessRequestType.CREATE_USER, name);
-    as.run("approver", () -> requests.approve(created.getId(), null));
-    AccessRequest request = submit(AccessRequestType.DISABLE_USER, name);
+    AccessRequest request = submit("Reports for the officers");
 
     assertThatThrownBy(() -> as.run("approver", () -> returns.returnRequest(request.getId(), " ")))
         .isInstanceOf(BusinessRuleException.class);
@@ -69,12 +52,11 @@ class AccessRequestReturnIT {
         .isEqualTo("ACCESS_NOT_REQUESTER");
 
     AccessRequest again =
-        as.run("badmin", () -> returns.resubmit(request.getId(), "Joined Marketing, HR memo 12"));
+        as.run("badmin", () -> returns.resubmit(request.getId(), "Reports, HR memo 12"));
     assertThat(again.getStatus()).isEqualTo(AccessRequestStatus.PENDING);
     assertThat(again.getJustification()).contains("HR memo 12");
 
-    String other = AccessRequestIT.username();
-    AccessRequest newUser = submit(AccessRequestType.CREATE_USER, other);
+    AccessRequest other = submit("Second profile");
     List<Outcome> outcomes =
         as.run(
             "approver",
@@ -82,11 +64,9 @@ class AccessRequestReturnIT {
                 bulk.approve(
                     List.of(
                         new Item("BROKING_ADMIN", "Access request", again.getRequestNo(), null),
-                        new Item(
-                            "BROKING_ADMIN", "Access request", newUser.getRequestNo(), null))));
-    assertThat(outcomes.get(0).approved()).isTrue();
-    assertThat(outcomes.get(1).approved()).isFalse();
-    assertThat(outcomes.get(1).message()).contains("temporary password");
-    assertThat(requests.get(again.getId()).getStatus()).isEqualTo(AccessRequestStatus.APPROVED);
+                        new Item("BROKING_ADMIN", "Access request", other.getRequestNo(), null))));
+    assertThat(outcomes).allMatch(Outcome::approved);
+    assertThat(requests.get(again.getId()).getStatus())
+        .isIn(AccessRequestStatus.APPROVED, AccessRequestStatus.FOR_IMPLEMENTATION);
   }
 }

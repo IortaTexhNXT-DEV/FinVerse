@@ -69,8 +69,9 @@ class ScreeningUserAccessFoundationIT {
     List<String> screening = permissionsStartingWith("SCR_");
     List<String> userAccess = permissionsStartingWith("UAM_");
     assertThat(screening).hasSize(14);
-    // + UAM_SOD_MAINTAIN and UAM_SOD_AUTHORIZE (separation-of-duties rules, V1065)
-    assertThat(userAccess).hasSize(12);
+    // + UAM_SOD_MAINTAIN and UAM_SOD_AUTHORIZE (separation-of-duties rules, V1065); the request
+    // functions for users went in V2826 (UIDM-ISC maintains the users)
+    assertThat(userAccess).hasSize(7);
     assertThat(granted).containsAll(screening).containsAll(userAccess);
     assertThat(
             jdbc.queryForList(
@@ -103,20 +104,17 @@ class ScreeningUserAccessFoundationIT {
     assertThat(rolePermissions("AML_COMMITTEE")).contains("SCR_COMMITTEE");
     assertThat(rolePermissions("UNIT_COMPLIANCE_COORD")).contains("SCR_CASE_ASSIGN");
     assertThat(rolePermissions("UAM_REQUESTOR"))
+        // V2826: the Group Profile Maker; users come from UIDM-ISC.
         .containsExactlyInAnyOrder(
-            "UAM_ENROLL",
-            "UAM_MODIFY",
-            "UAM_DEACTIVATE",
-            "UAM_REACTIVATE",
-            "UAM_CORRECT",
-            "UAM_CANCEL",
-            "UAM_VIEW",
-            // V1062 (U1-A): bulk request files go through the bulk upload framework (BRD 1.009).
-            "BULK_PROCESS");
+            "UAM_CANCEL", "UAM_VIEW", "UAM_GROUP_REQUEST", "UAM_REPORT_VIEW");
+    assertThat(rolePermissions("UAM_ADMINISTRATOR"))
+        .containsExactlyInAnyOrder(
+            "USER_MANAGE", "UAM_VIEW", "UAM_REPORT_VIEW", "AUDIT_VIEW", "REPORT_VIEW");
     assertThat(rolePermissions("UAM_APPROVER")).contains("ACCESS_APPROVE", "UAM_REPORT_VIEW");
     assertThat(rolePermissions("UAM_SECOND_APPROVER")).contains("UAM_SECOND_APPROVE");
     assertThat(authorities("badmin"))
-        .contains("ACCESS_REQUEST", "UAM_ENROLL", "UAM_GROUP_REQUEST", "UAM_REPORT_VIEW");
+        .contains("ACCESS_REQUEST", "UAM_GROUP_REQUEST", "UAM_REPORT_VIEW")
+        .doesNotContain("UAM_ENROLL");
     assertThat(authorities("approver")).contains("ACCESS_APPROVE", "UAM_VIEW");
     assertThat(authorities("auditor")).contains("SCR_AUDIT_VIEW", "UAM_REPORT_VIEW");
     assertThat(authorities("admin")).contains("SCR_VIEW", "UAM_VIEW", "ROLE_MANAGE");
@@ -225,7 +223,9 @@ class ScreeningUserAccessFoundationIT {
         .doesNotContain("UAM_BREAK_GLASS_SIGN_IN")
         // + the identity reconciliation mismatch notice (V2824)
         .contains("UAM_RECONCILIATION_MISMATCH")
-        .hasSize(24);
+        // + the separation-of-duties breach and certification extract notices (V2829)
+        .contains("UAM_SOD_VIOLATION", "UAM_CERTIFICATION_EXTRACT")
+        .hasSize(26);
     assertThat(
             jdbc.queryForList(
                 "select record_type from nba_retention_rule where years_online = 5"

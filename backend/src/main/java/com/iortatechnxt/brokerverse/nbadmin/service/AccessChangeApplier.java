@@ -1,5 +1,7 @@
 package com.iortatechnxt.brokerverse.nbadmin.service;
 
+import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
+import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequest;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestType;
@@ -16,8 +18,10 @@ import com.iortatechnxt.brokerverse.security.domain.RoleRepository;
 import com.iortatechnxt.brokerverse.security.service.ChangeAuthority;
 import com.iortatechnxt.brokerverse.security.service.DataScopeService;
 import com.iortatechnxt.brokerverse.security.service.UserAdminService;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Set;
+import java.util.TreeSet;
 import org.springframework.stereotype.Component;
 
 /**
@@ -26,7 +30,9 @@ import org.springframework.stereotype.Component;
  * 4.003.1) apply as for a change made on the Users or Roles screen. A role-permission change
  * (PMADD05) adds and removes the requested permissions on the role as it is when applied. External
  * (portal) users are provisioned through {@link ExternalUserProvisioner} (decision D7). A requested
- * data scope (V1240) is applied with the user data, on the same authority.
+ * data scope (V1240) is applied with the user data, on the same authority. A permission the request
+ * names that the system no longer has (withdrawn after the request was raised) is skipped and the
+ * skip is written to the audit trail of the request; the rest of the change applies.
  */
 @Component
 public class AccessChangeApplier {
@@ -36,6 +42,7 @@ public class AccessChangeApplier {
   private final TemporaryPasswords passwords;
   private final ExternalUserApplier externalUsers;
   private final DataScopeService dataScopes;
+  private final AuditTrailService audit;
 
   /**
    * Creates the applier.
@@ -45,13 +52,16 @@ public class AccessChangeApplier {
    * @param passwords temporary password generator
    * @param externalUsers external (portal) users
    * @param dataScopes data scope administration
+   * @param audit audit trail (permissions skipped)
    */
   public AccessChangeApplier(
       UserAdminService userAdmin,
       RoleRepository roles,
       TemporaryPasswords passwords,
       ExternalUserApplier externalUsers,
-      DataScopeService dataScopes) {
+      DataScopeService dataScopes,
+      AuditTrailService audit) {
+    this.audit = audit;
     this.userAdmin = userAdmin;
     this.roles = roles;
     this.passwords = passwords;
@@ -148,7 +158,7 @@ public class AccessChangeApplier {
     RolePermissionChange change = r.permissionChange();
     RequestedRole data = r.getRole();
     Set<Permission> permissions = EnumSet.noneOf(Permission.class);
-    change.added().forEach(p -> permissions.add(Permission.valueOf(p)));
+    permissions.addAll(known(r, change.added()));
     userAdmin.createRole(
         new RoleRequest(
             change.roleCode(), data.name(), permissions, data.description(), data.privilegeLevel()),
@@ -161,8 +171,8 @@ public class AccessChangeApplier {
     Role role = role(change.roleCode());
     Set<Permission> permissions = EnumSet.noneOf(Permission.class);
     permissions.addAll(role.getPermissions());
-    change.added().forEach(p -> permissions.add(Permission.valueOf(p)));
-    change.removed().forEach(p -> permissions.remove(Permission.valueOf(p)));
+    permissions.addAll(known(r, change.added()));
+    permissions.removeAll(known(r, change.removed()));
     RequestedRole data = r.getRole();
     userAdmin.updateRole(
         role.getId(),
@@ -184,6 +194,29 @@ public class AccessChangeApplier {
       userAdmin.deactivateRole(role.getId(), authority);
     }
     return null;
+  }
+
+  /**
+   * The permissions of a request that the system still has; the others are skipped with a note in
+   * the audit trail of the request.
+   */
+  private Set<Permission> known(AccessRequest r, Set<String> codes) {
+    Set<Permission> found = EnumSet.noneOf(Permission.class);
+    Set<String> withdrawn = new TreeSet<>();
+    for (String code : codes) {
+      Arrays.stream(Permission.values())
+          .filter(p -> p.name().equals(code))
+          .findFirst()
+          .ifPresentOrElse(found::add, () -> withdrawn.add(code));
+    }
+    if (!withdrawn.isEmpty()) {
+      audit.record(
+          AccessRequestService.ENTITY,
+          r.getRequestNo(),
+          AuditAction.UPDATE,
+          "Permissions no longer in the system skipped: " + String.join(", ", withdrawn));
+    }
+    return found;
   }
 
   private Role role(String code) {

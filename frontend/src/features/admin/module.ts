@@ -8,11 +8,9 @@ import {
   History,
   LayoutDashboard,
   Server,
-  ShieldCheck,
   SlidersHorizontal,
   Timer,
   TriangleAlert,
-  Users,
 } from 'lucide-react';
 import { lazyWithRetry } from '@/app/loadRecovery';
 import type { FeatureModule } from '@/navigation/types';
@@ -21,27 +19,6 @@ export const adminModule: FeatureModule = {
   id: 'admin',
   section: 'Administration',
   screens: [
-    {
-      path: '/admin/users',
-      label: 'Users',
-      icon: Users,
-      permission: 'USER_MANAGE',
-      component: lazyWithRetry(() => import('./UsersPage')),
-    },
-    {
-      path: '/admin/identity-sync',
-      label: 'Identity Synchronisation',
-      icon: FolderSync,
-      permission: 'USER_MANAGE',
-      component: lazyWithRetry(() => import('./IdentitySyncPage')),
-    },
-    {
-      path: '/admin/roles',
-      label: 'Roles & Permissions',
-      icon: ShieldCheck,
-      permission: 'ROLE_MANAGE',
-      component: lazyWithRetry(() => import('./RolesPage')),
-    },
     {
       path: '/admin/audit',
       label: 'Audit Trail',

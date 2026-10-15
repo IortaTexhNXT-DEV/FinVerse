@@ -2,9 +2,12 @@ package com.iortatechnxt.brokerverse.identity.service;
 
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.identity.domain.IdentityEvent;
+import com.iortatechnxt.brokerverse.identity.domain.IdentityEventDismissal;
 import com.iortatechnxt.brokerverse.identity.domain.IdentityEventRepository;
 import com.iortatechnxt.brokerverse.identity.domain.IdentityEventStatus;
 import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -67,6 +70,12 @@ public class IdentityEventQuery {
       if (f.to() != null) {
         where.add(cb.lessThan(root.get("receivedAt"), BusinessClock.startOf(f.to().plusDays(1))));
       }
+      if (f.open() && query != null) {
+        Subquery<Long> dismissed = query.subquery(Long.class);
+        Root<IdentityEventDismissal> d = dismissed.from(IdentityEventDismissal.class);
+        dismissed.select(d.get("eventId")).where(cb.equal(d.get("eventId"), root.get("id")));
+        where.add(cb.not(cb.exists(dismissed)));
+      }
       return cb.and(where.toArray(Predicate[]::new));
     };
   }
@@ -78,7 +87,8 @@ public class IdentityEventQuery {
    * @param windowsId part of the Windows ID
    * @param from first date received
    * @param to last date received
+   * @param open only the events not dismissed
    */
   public record Filter(
-      IdentityEventStatus status, String windowsId, LocalDate from, LocalDate to) {}
+      IdentityEventStatus status, String windowsId, LocalDate from, LocalDate to, boolean open) {}
 }

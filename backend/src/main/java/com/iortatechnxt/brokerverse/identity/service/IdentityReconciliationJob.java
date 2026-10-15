@@ -8,6 +8,7 @@ import com.iortatechnxt.brokerverse.security.domain.AppUserRepository;
 import com.iortatechnxt.brokerverse.security.domain.Role;
 import com.iortatechnxt.brokerverse.system.service.JobOutcome;
 import com.iortatechnxt.brokerverse.system.service.ManagedJob;
+import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -31,7 +32,9 @@ import org.springframework.transaction.support.TransactionTemplate;
  * that differs (active in one, not in the other), or group profiles that differ when the directory
  * names them. Nothing is changed here: UIDM-ISC corrects the user with an event. The holders of the
  * user-management permission are told of the mismatches found (in the system and by e-mail as each
- * prefers). Daily at 01:40 PHT ({@code brokerverse.jobs.identity-reconciliation-cron}).
+ * prefers). Daily at 01:40 PHT ({@code brokerverse.jobs.identity-reconciliation-cron}); a scheduled
+ * run compares every {@value #INTERVAL} days and skips the other days, a run started by a user
+ * always compares.
  */
 @Component
 public class IdentityReconciliationJob implements ManagedJob {
@@ -54,7 +57,11 @@ public class IdentityReconciliationJob implements ManagedJob {
   private static final Logger LOG = LoggerFactory.getLogger(IdentityReconciliationJob.class);
   private static final int DETAIL = 500;
 
+  /** Days between two reconciliations (1 = daily, 0 = never). */
+  public static final String INTERVAL = "UAM_RECONCILIATION_INTERVAL_DAYS";
+
   private final AppUserRepository users;
+  private final SystemParameterService parameters;
   private final EnterpriseDirectory directory;
   private final NoticeDelivery notices;
   private final JdbcTemplate jdbc;
@@ -72,6 +79,7 @@ public class IdentityReconciliationJob implements ManagedJob {
    * @param transactions transaction manager
    * @param clock clock
    * @param cron schedule
+   * @param parameters the reconciliation interval
    */
   public IdentityReconciliationJob(
       AppUserRepository users,
@@ -80,7 +88,9 @@ public class IdentityReconciliationJob implements ManagedJob {
       JdbcTemplate jdbc,
       PlatformTransactionManager transactions,
       Clock clock,
-      @Value("${brokerverse.jobs.identity-reconciliation-cron:0 40 17 * * *}") String cron) {
+      @Value("${brokerverse.jobs.identity-reconciliation-cron:0 40 17 * * *}") String cron,
+      SystemParameterService parameters) {
+    this.parameters = parameters;
     this.users = users;
     this.directory = directory;
     this.notices = notices;
@@ -108,6 +118,10 @@ public class IdentityReconciliationJob implements ManagedJob {
 
   @Override
   public JobOutcome execute(LocalDate businessDate) {
+    String notDue = startedByUser() ? null : notDue(businessDate);
+    if (notDue != null) {
+      return new JobOutcome(0, notDue);
+    }
     List<Snapshot> snapshots = tx.execute(s -> snapshots());
     List<Mismatch> mismatches = new ArrayList<>();
     int compared = 0;
@@ -149,6 +163,40 @@ public class IdentityReconciliationJob implements ManagedJob {
             + (unavailable > 0
                 ? ", " + unavailable + " not compared (directory unavailable)"
                 : ""));
+  }
+
+  /** Why a scheduled run does not compare today, or null when it is due. */
+  private String notDue(LocalDate businessDate) {
+    int interval = parameters.intValue(INTERVAL, 1);
+    if (interval <= 0) {
+      return "Reconciliation is switched off (" + INTERVAL + " = 0)";
+    }
+    LocalDate last = lastComparedOn();
+    return last != null && last.plusDays(interval).isAfter(businessDate)
+        ? "Not due: last reconciliation on " + last + ", every " + interval + " day(s)"
+        : null;
+  }
+
+  /** Whether this run was started by a user (Synchronise Now / Run Now): it always compares. */
+  private boolean startedByUser() {
+    List<String> triggers =
+        jdbc.queryForList(
+            "select trigger_type from sys_job_run where job_name = ? and status = 'RUNNING'"
+                + " order by started_at desc limit 1",
+            String.class,
+            JOB_NAME);
+    return !triggers.isEmpty() && "MANUAL".equals(triggers.get(0));
+  }
+
+  /** The business date of the last run that compared users. */
+  private LocalDate lastComparedOn() {
+    java.sql.Timestamp last =
+        jdbc.queryForObject(
+            "select max(started_at) from sys_job_run where job_name = ? and status = 'SUCCEEDED'"
+                + " and items_processed > 0",
+            java.sql.Timestamp.class,
+            JOB_NAME);
+    return last == null ? null : BusinessClock.dateOf(last.toInstant());
   }
 
   private List<Snapshot> snapshots() {

@@ -135,7 +135,7 @@ class PermissionCombinationIT {
                               false,
                               List.of(APPROVER))))
           .extracting("code")
-          .isEqualTo("ACCESS_GROUP_PROFILES_BY_UIDM");
+          .isEqualTo("ACCESS_USERS_BY_UIDM");
     } finally {
       as.run(BADMIN, () -> rules.requestDeactivation(rule.getId()));
       as.run(INFOSEC, () -> rules.authorize(rule.getId()));

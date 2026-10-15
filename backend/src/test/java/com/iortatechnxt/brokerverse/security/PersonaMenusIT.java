@@ -45,12 +45,14 @@ class PersonaMenusIT {
               "/api/v1/screening/config/versions?companyId={c}&type=TEMPLATE"),
           Map.entry("/screening-setup/watchlist", "/api/v1/screening/watchlist/entries"),
           Map.entry("/screening-setup/sources", "/api/v1/screening/watchlist/sources"),
-          Map.entry("/user-access/requests", "/api/v1/nbadmin/access-requests"),
-          Map.entry(
-              "/user-access/group-profiles", "/api/v1/nbadmin/access-requests?groupProfiles=true"),
-          Map.entry("/user-access/matrix", "/api/v1/nbadmin/access-matrix"),
-          Map.entry("/user-access/sod-rules", "/api/v1/nbadmin/sod-rules"),
-          Map.entry("/user-access/reports", "/api/v1/reports"),
+          Map.entry("/access/users", "/api/v1/admin/users"),
+          Map.entry("/access/group-profiles", "/api/v1/nbadmin/roles"),
+          Map.entry("/access/identity-sync", "/api/v1/admin/identity/status"),
+          Map.entry("/access/separation-of-duties", "/api/v1/nbadmin/sod-rules"),
+          Map.entry("/access/matrix", "/api/v1/nbadmin/access-matrix"),
+          Map.entry("/access/reports", "/api/v1/nbadmin/certification/extracts"),
+          Map.entry("/access/audit", "/api/v1/audit-logs?from=2026-01-01&to=2026-01-02"),
+          Map.entry("/access/settings", "/api/v1/nbadmin/uam-settings"),
           Map.entry("/claims-handling", "/api/v1/broker-claims/home?companyId={c}"),
           Map.entry("/claims-handling/worklist", "/api/v1/broker-claims/worklist?companyId={c}"),
           Map.entry("/claims-handling/new", "/api/v1/broker-claims/covers?companyId={c}&q=ARN"),
@@ -154,7 +156,7 @@ class PersonaMenusIT {
   @Test
   void everyRoleHoldsExactlyThePermissionsTheMenuIsBuiltFrom() throws Exception {
     Map<String, Persona> personas = PersonaMenus.load();
-    assertThat(personas).hasSize(49);
+    assertThat(personas).hasSize(50);
     for (Persona p : personas.values()) {
       assertThat(p.inScope(granted(p.role()))).as(p.role()).isEqualTo(p.permissions());
       JsonNode me = api.read(api.doGet(p.seedUser(), "/api/v1/auth/me"));
@@ -205,11 +207,10 @@ class PersonaMenusIT {
 
   @Test
   void theUserAccessMatrixIsNotOfferedToRolesItRefuses() throws Exception {
-    // The matrix used to be in the menu of every UAM_VIEW holder, but its endpoint refuses the
-    // Requestor and the Second Approver: the entry is now shown to the endpoint's permissions only.
-    for (String user : new String[] {"requestor", "secapprover"}) {
-      api.doGet(user, "/api/v1/nbadmin/access-matrix").andExpect(status().isForbidden());
-    }
+    // The matrix is shown to the holders of UAM_REPORT_VIEW only, the permission of its endpoint:
+    // the Second Approver holds UAM_VIEW alone and is refused.
+    api.doGet("secapprover", "/api/v1/nbadmin/access-matrix").andExpect(status().isForbidden());
+    api.doGet("requestor", "/api/v1/nbadmin/access-matrix").andExpect(status().isOk());
     api.doGet("uamapprover", "/api/v1/nbadmin/access-matrix").andExpect(status().isOk());
   }
 }

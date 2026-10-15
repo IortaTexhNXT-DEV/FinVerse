@@ -1,15 +1,11 @@
-import { Navigate, useSearchParams } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 
-/** The old Broking Setup route of the access requests: opens the User Access screen. */
+/** The old Broking Setup route of the access requests: opens the Group Profiles of User Access. */
 export function AccessRequestsRedirect() {
-  const [params] = useSearchParams();
-  const id = params.get('id');
-  return (
-    <Navigate to={id === null ? '/user-access/requests' : `/user-access/requests/${id}`} replace />
-  );
+  return <Navigate to="/access/group-profiles" replace />;
 }
 
 /** The old Broking Setup route of the user access matrix. */
 export function AccessMatrixRedirect() {
-  return <Navigate to="/user-access/matrix" replace />;
+  return <Navigate to="/access/matrix" replace />;
 }

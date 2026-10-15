@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -20,7 +21,6 @@ import com.iortatechnxt.brokerverse.support.PersonaMenus;
 import com.iortatechnxt.brokerverse.support.TestData;
 import java.nio.charset.StandardCharsets;
 import java.time.Clock;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -32,90 +32,75 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 /**
- * User Access Maintenance (BRD-11) end to end through the HTTP API with the SIT/UAT users (wave
- * U2): the Requestor enrols a new user as Screening Investigator and the Approver approves; the
- * user signs in with the temporary password, must change it, and holds exactly the investigator's
- * permissions, given by UIDM-ISC through the provisioning interface (the menu of the web client is
- * built from them); a change of the user submitted outside working hours needs the Second Approver;
- * UIDM-ISC changes the user's group profiles at once; the Business Administrator's group-profile
- * request is implemented by the System Administrator; the deactivation ends the user's sessions at
- * once; the User Access Audit Log shows each change with its from and to values and request number
- * (BRD 1.002-1.008, 2.002, 3.002, 3.003, 4.003.1; UAM-NFR-35, 36, 40).
+ * User Access Maintenance (BRD-11) end to end through the HTTP API with the SIT/UAT users: UIDM-ISC
+ * creates a user (joiner) and makes it a Screening Investigator over the provisioning interface
+ * (SCIM); the user signs in with a password set by the administrator (local test account), must
+ * change it, and holds exactly the investigator's permissions (the menu of the web client is built
+ * from them); a group-profile change proposed outside working hours needs the Second Approver; a
+ * new group profile is approved and implemented; UIDM-ISC changes the user's group profiles at once
+ * and deactivates the user (leaver), which ends the user's sessions at once; the User Access Audit
+ * Log shows each change with its from and to values, request number and who did it (BRD 3.002,
+ * 3.003, 4.003.1; UAM-NFR-35, 36, 40).
  */
 @IntegrationTest
 class UserAccessEndToEndApiIT {
 
   private static final String REQUESTS = "/api/v1/nbadmin/access-requests";
-  private static final String REQUESTOR = "requestor";
+  private static final String SCIM_USERS = "/integration/v1/scim/v2/Users";
+  private static final String MAKER = "badmin";
   private static final String APPROVER = "uamapprover";
   private static final String SECOND = "secapprover";
   private static final String HOURS = "/api/v1/system/parameters/UAM_WORKING_HOURS";
+  private static final String TEMPORARY = "Temporary!Passw0rd1";
   private static final String NEW_PASSWORD = "Access!Passw0rd9";
   private static final String BEARER = "Bearer ";
-  private static final ZoneId MANILA = ZoneId.of("Asia/Manila");
 
   @Autowired private Api api;
   @Autowired private MockMvc mvc;
   @Autowired private ObjectMapper json;
   @Autowired private TestData data;
+  @Autowired private JdbcTemplate jdbc;
 
   private static String newUserId() {
     return String.format(
         "e%09d", ThreadLocalRandom.current().nextLong(100_000_000L, 1_000_000_000L));
   }
 
-  @Test
-  void aUserIsEnrolledSignsInChangesAndIsDeactivated() throws Exception {
-    String userId = newUserId();
+  private static MockHttpServletRequestBuilder uidm(MockHttpServletRequestBuilder request) {
+    return request.with(
+        jwt()
+            .jwt(j -> j.subject("uidm-isc"))
+            .authorities(new SimpleGrantedAuthority("SCOPE_identity.provision")));
+  }
 
-    // Enrolment request by the Requestor, approved by the chosen Approver.
-    long enrolId =
-        submit(
-            REQUESTOR,
-            Json.of(
-                "type",
-                "CREATE_USER",
-                "username",
-                userId,
-                "fullName",
-                "End To End Investigator",
-                "email",
-                userId + "@example.ph",
-                "windowsId",
-                "W" + userId,
-                "justification",
-                "Joins the screening investigators"));
-    api.doPost(REQUESTOR, REQUESTS + "/" + enrolId + "/approve", Json.of())
-        .andExpect(status().isForbidden());
-    String temporary =
-        api.read(
-                api.doPost(
-                        APPROVER, REQUESTS + "/" + enrolId + "/approve", Json.of("comment", "ok"))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.request.status").value("APPROVED")))
-            .get("temporaryPassword")
-            .asText();
-    assertThat(temporary).isNotBlank();
-    // UIDM-ISC, which orchestrates the membership, makes the user a Screening Investigator.
+  @Test
+  void aUserFromUidmIscSignsInChangesProfilesAndIsDeactivated() throws Exception {
+    String userId = newUserId();
+    joiner(userId);
     uidmAdds("SCR_INVESTIGATOR", userId, "UIDM-E2E-" + userId + "-1");
 
-    // First sign-in: the temporary password must be changed; the token carries the role's rights.
-    JsonNode first = login(userId, temporary);
+    // A local test account: the administrator sets a password that must be changed.
+    Long id = jdbc.queryForObject("select id from sec_user where username = ?", Long.class, userId);
+    api.doPost(
+            "admin",
+            "/api/v1/admin/users/" + id + "/reset-password",
+            Json.of("newPassword", TEMPORARY))
+        .andExpect(status().isNoContent());
+    JsonNode first = login(userId, TEMPORARY);
     assertThat(first.get("mustChangePassword").asBoolean()).isTrue();
-    assertThat(first.get("passwordChangeReason").asText()).isEqualTo("RESET");
     bearer(
             post("/api/v1/auth/change-password"),
             first.get("accessToken").asText(),
-            Json.of("currentPassword", temporary, "newPassword", NEW_PASSWORD))
+            Json.of("currentPassword", TEMPORARY, "newPassword", NEW_PASSWORD))
         .andExpect(status().isNoContent());
-    JsonNode second = login(userId, NEW_PASSWORD);
-    assertThat(second.get("mustChangePassword").asBoolean()).isFalse();
-    String token = second.get("accessToken").asText();
+    String token = login(userId, NEW_PASSWORD).get("accessToken").asText();
     assertThat(permissionsOf(token))
         .isEqualTo(PersonaMenus.load().get("SCR_INVESTIGATOR").permissions());
     bearer(get("/api/v1/screening/cases?companyId=" + data.company().getId()), token, null)
@@ -123,66 +108,65 @@ class UserAccessEndToEndApiIT {
     bearer(get("/api/v1/screening/str?companyId=" + data.company().getId()), token, null)
         .andExpect(status().isForbidden());
     bearer(get(REQUESTS), token, null).andExpect(status().isForbidden());
-    api.doGet("admin", "/api/v1/admin/sessions?open=true&username=" + userId)
+    api.doGet("uamadmin", "/api/v1/admin/sessions?open=true&username=" + userId)
         .andExpect(jsonPath("$.content.length()", greaterThan(0)));
 
-    String modifyNo = modifyOutsideWorkingHours(userId);
+    String outsideNo = profileChangeOutsideWorkingHours();
     uidmAdds("UNIT_COMPLIANCE_COORD", userId, "UIDM-E2E-" + userId + "-2");
     assertThat(permissionsOf(login(userId, NEW_PASSWORD).get("accessToken").asText()))
         .contains("SCR_CASE_ASSIGN", "SCR_REPORT_VIEW");
     String profileNo = groupProfileImplemented();
 
-    // Deactivation: approved, applied, and every open session ends at once.
-    long disableId =
-        submit(
-            REQUESTOR,
-            Json.of(
-                "type", "DISABLE_USER",
-                "username", userId,
-                "reasonCode", "RESIGNED",
-                "justification", "Resigned"));
-    String disableNo =
-        api.read(
-                api.doPost(
-                        APPROVER, REQUESTS + "/" + disableId + "/approve", Json.of("comment", "ok"))
-                    .andExpect(jsonPath("$.request.status").value("APPROVED")))
-            .get("request")
-            .get("requestNo")
-            .asText();
-    api.doGet("admin", "/api/v1/admin/sessions?open=true&username=" + userId)
+    // Leaver: UIDM-ISC deactivates the user and every open session ends at once.
+    mvc.perform(uidm(delete(SCIM_USERS + "/" + userId))).andExpect(status().isNoContent());
+    api.doGet("uamadmin", "/api/v1/admin/sessions?open=true&username=" + userId)
         .andExpect(jsonPath("$.content.length()").value(0));
-    api.doGet("admin", "/api/v1/admin/sessions?username=" + userId)
-        .andExpect(jsonPath("$.content[*].endReason", hasItem("ADMIN_ENDED")));
     bearer(get("/api/v1/auth/me"), token, null).andExpect(status().isUnauthorized());
     // A deactivated user gets the one sign-in failure message (the audit trail has the reason),
     // and the attempt does not count towards the lock-out.
     assertThat(login(userId, NEW_PASSWORD, status().isUnauthorized()).get("detail").asText())
         .isEqualTo("Invalid user name or password");
 
-    assertTheAuditLog(userId, modifyNo, disableNo);
-    assertThat(auditLog(null)).contains(profileNo);
+    assertTheAuditLog(userId);
+    assertThat(auditLog(null)).contains(profileNo, outsideNo);
   }
 
-  /** A change of the user submitted outside UAM_WORKING_HOURS needs a second approval. */
-  private String modifyOutsideWorkingHours(String userId) throws Exception {
+  /** UIDM-ISC creates the user (joiner) over the provisioning interface. */
+  private void joiner(String userId) throws Exception {
+    mvc.perform(
+            uidm(post(SCIM_USERS))
+                .contentType("application/scim+json")
+                .content(
+                    json.writeValueAsString(
+                        Map.of(
+                            "schemas",
+                            List.of("urn:ietf:params:scim:schemas:core:2.0:User"),
+                            "userName",
+                            userId,
+                            "name",
+                            Map.of("givenName", "End To End", "familyName", "Investigator"),
+                            "emails",
+                            List.of(Map.of("value", userId + "@bdo.test", "primary", true)),
+                            "active",
+                            true,
+                            "urn:bibs:params:scim:schemas:extension:bdo:2.0:User",
+                            Map.of(
+                                "windowsId",
+                                "BDO\\w" + userId,
+                                "uidmRequestNo",
+                                "UIDM-E2E-" + userId)))))
+        .andExpect(status().isCreated());
+  }
+
+  /** A group-profile change proposed outside UAM_WORKING_HOURS needs a second approval. */
+  private String profileChangeOutsideWorkingHours() throws Exception {
     String hours = parameter("UAM_WORKING_HOURS");
     String tomorrow =
         BusinessClock.today(Clock.systemUTC()).plusDays(1).getDayOfWeek().name().substring(0, 3);
     setHours("00:00-24:00," + tomorrow);
     try {
-      long id =
-          submit(
-              REQUESTOR,
-              Json.of(
-                  "type",
-                  "MODIFY_USER",
-                  "username",
-                  userId,
-                  "email",
-                  "moved." + userId + "@example.ph",
-                  "justification",
-                  "Moves to the unit coordinator desk"));
-      api.doGet(REQUESTOR, REQUESTS + "/" + id)
+      long id = submit(newProfile("Moves the coordinators to read-only screening"));
+      api.doGet(MAKER, REQUESTS + "/" + id)
           .andExpect(jsonPath("$.lifecycle.riskFlags", hasItem("OUTSIDE_HOURS")))
           .andExpect(jsonPath("$.lifecycle.secondApprovalRequired").value(true));
       api.doPost(APPROVER, REQUESTS + "/" + id + "/approve", Json.of("comment", "ok"))
@@ -193,31 +177,36 @@ class UserAccessEndToEndApiIT {
       api.doGet(SECOND, "/api/v1/approvals/inbox")
           .andExpect(jsonPath("$[*].reference", hasItem(requestNo)));
       api.doPost(SECOND, REQUESTS + "/" + id + "/second-approve", Json.of("comment", "Checked"))
-          .andExpect(status().isOk())
-          .andExpect(jsonPath("$.request.status").value("APPROVED"));
+          .andExpect(status().isOk());
       return requestNo;
     } finally {
       setHours(hours == null ? "00:00-24:00,MON-SUN" : hours);
     }
   }
 
-  /** The Business Administrator's new profile, approved and implemented (BRD 3.002). */
-  private String groupProfileImplemented() throws Exception {
+  private static Map<String, Object> newProfile(String justification) {
     String code = "E2E_PROFILE_" + ThreadLocalRandom.current().nextInt(100_000, 999_999);
-    long id =
-        submit(
-            "badmin",
-            Json.of(
-                "type", "CREATE_ROLE",
-                "roleCode", code,
-                "roleName", "End-to-end profile",
-                "privilegeLevel", "STANDARD",
-                "permissionsAdded", List.of("SCR_VIEW", "REPORT_VIEW"),
-                "justification", "Read-only screening profile"));
+    return Json.of(
+        "type",
+        "CREATE_ROLE",
+        "roleCode",
+        code,
+        "roleName",
+        "End-to-end profile " + code,
+        "privilegeLevel",
+        "STANDARD",
+        "permissionsAdded",
+        List.of("SCR_VIEW", "REPORT_VIEW"),
+        "justification",
+        justification);
+  }
+
+  /** The maker's new profile, approved and implemented (BRD 3.002). */
+  private String groupProfileImplemented() throws Exception {
+    long id = submit(newProfile("Read-only screening profile"));
     api.doPost(APPROVER, REQUESTS + "/" + id + "/approve", Json.of("comment", "ok"))
         .andExpect(jsonPath("$.request.status").value("FOR_IMPLEMENTATION"));
-    api.doPost("badmin", REQUESTS + "/" + id + "/implement", null)
-        .andExpect(status().isForbidden());
+    api.doPost(MAKER, REQUESTS + "/" + id + "/implement", null).andExpect(status().isForbidden());
     return api.read(
             api.doPost("admin", REQUESTS + "/" + id + "/implement", null)
                 .andExpect(status().isOk())
@@ -226,8 +215,7 @@ class UserAccessEndToEndApiIT {
         .asText();
   }
 
-  private void assertTheAuditLog(String userId, String modifyNo, String disableNo)
-      throws Exception {
+  private void assertTheAuditLog(String userId) throws Exception {
     List<JsonNode> rows = new ArrayList<>();
     json.readTree(auditLog(userId))
         .get("rows")
@@ -249,14 +237,8 @@ class UserAccessEndToEndApiIT {
     assertThat(rows)
         .anySatisfy(
             r -> {
-              assertThat(r.path("requestNo").asText()).isEqualTo(modifyNo);
-              assertThat(r.path("approvedBy").asText()).isIn(APPROVER, SECOND);
-            });
-    assertThat(rows)
-        .anySatisfy(
-            r -> {
               assertThat(r.path("activity").asText()).startsWith("Deactivate User");
-              assertThat(r.path("requestNo").asText()).isEqualTo(disableNo);
+              assertThat(r.path("doneBy").asText()).isEqualTo("UIDM-ISC");
             });
   }
 
@@ -295,11 +277,10 @@ class UserAccessEndToEndApiIT {
         .andExpect(status().isOk());
   }
 
-  /** Creates and submits a request to the seed Approver; returns its id. */
-  private long submit(String user, Map<String, Object> body) throws Exception {
-    body.put("approvers", List.of(APPROVER));
+  /** The maker submits a group-profile change to the checkers; returns its id. */
+  private long submit(Map<String, Object> body) throws Exception {
     return api.read(
-            api.doPost(user, REQUESTS, body)
+            api.doPost(MAKER, REQUESTS, body)
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.status").value("PENDING")))
         .get("id")

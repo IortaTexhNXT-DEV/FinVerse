@@ -34,8 +34,11 @@ public class AccessRequestService {
   /** Audit entity type. */
   public static final String ENTITY = "AccessRequest";
 
-  /** Frontend route of the access requests screen. */
-  public static final String SCREEN = "/user-access/requests";
+  /** Frontend route of the Group Profiles screen (the changes of a group profile). */
+  public static final String SCREEN = "/access/group-profiles";
+
+  /** The Users screen of User Access (requests about a user raised before UIDM-ISC). */
+  public static final String USERS_SCREEN = "/access/users";
 
   private final AccessRequestRepository requests;
   private final AccessRequestValidator validator;
@@ -359,13 +362,15 @@ public class AccessRequestService {
   }
 
   /**
-   * Link to the request detail.
+   * Link to the request: the pending change of its group profile, or the Users screen.
    *
    * @param r request
    * @return frontend route
    */
   static String link(AccessRequest r) {
-    return SCREEN + "/" + r.getId();
+    return r.getRequestType().isGroupProfile() && r.getRoleCode() != null
+        ? SCREEN + "/" + r.getRoleCode() + "?tab=pending"
+        : USERS_SCREEN;
   }
 
   static String note(String comment) {

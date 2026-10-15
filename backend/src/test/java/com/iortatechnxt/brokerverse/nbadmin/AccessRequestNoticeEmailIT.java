@@ -3,15 +3,12 @@ package com.iortatechnxt.brokerverse.nbadmin;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequest;
-import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestContent;
-import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestType;
 import com.iortatechnxt.brokerverse.nbadmin.service.AccessRequestNotifier;
 import com.iortatechnxt.brokerverse.nbadmin.service.AccessRequestReturnService;
 import com.iortatechnxt.brokerverse.nbadmin.service.AccessRequestService;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
-import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -30,25 +27,14 @@ class AccessRequestNoticeEmailIT {
   @Autowired private JdbcTemplate jdbc;
   @Autowired private SystemParameterService parameters;
 
-  private AccessRequest submit(String name) {
-    return as.run(
-        "badmin",
-        () ->
-            requests.submit(
-                new AccessRequestContent(
-                    AccessRequestType.CREATE_USER,
-                    name,
-                    "Notice Copy User",
-                    name + "@example.ph",
-                    Set.of(),
-                    null,
-                    "Joined Marketing")));
+  private AccessRequest submit() {
+    return as.run("badmin", () -> requests.submit(AccessRequestIT.newProfile("Reports")));
   }
 
   @Test
   void aReturnedRequestIsAlsoEmailedToTheRequesterWithTheRemarks() {
     int before = returnedMails();
-    AccessRequest request = submit(AccessRequestIT.username());
+    AccessRequest request = submit();
     as.run("approver", () -> returns.returnRequest(request.getId(), "Attach the HR memo number"));
     assertThat(returnedMails()).isGreaterThan(before);
     assertThat(
@@ -64,7 +50,7 @@ class AccessRequestNoticeEmailIT {
     as.run("admin", () -> parameters.update(AccessRequestNotifier.EMAIL_COPY, "false"));
     try {
       int before = returnedMails();
-      AccessRequest request = submit(AccessRequestIT.username());
+      AccessRequest request = submit();
       as.run("approver", () -> returns.returnRequest(request.getId(), "Wrong unit"));
       assertThat(returnedMails()).isEqualTo(before);
     } finally {

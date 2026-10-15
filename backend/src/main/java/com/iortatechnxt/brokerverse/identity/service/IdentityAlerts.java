@@ -20,7 +20,7 @@ public class IdentityAlerts {
   public static final String CODE = "UAM_IDENTITY_REFUSED";
 
   /** Screen of the events. */
-  public static final String SCREEN = "/admin/identity-sync";
+  public static final String SCREEN = "/access/identity-sync";
 
   private final NoticeDelivery notices;
   private final AlertService alerts;

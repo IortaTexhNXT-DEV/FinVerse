@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.nbadmin.service;
 
 import com.iortatechnxt.brokerverse.security.service.AuthPasswordService;
 import com.iortatechnxt.brokerverse.security.service.AuthPasswordService.PasswordExpiry;
+import com.iortatechnxt.brokerverse.security.service.LocalPasswordSignIn;
 import com.iortatechnxt.brokerverse.system.service.JobOutcome;
 import com.iortatechnxt.brokerverse.system.service.ManagedJob;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
@@ -15,11 +16,12 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
 /**
- * Job {@code PASSWORD_EXPIRY_NOTICE} (UAM-NFR-36; FR-UA-005; USER_ACCESS_DESIGN section 8): LOCAL
- * sign-in only, tells the users whose password expires within the days of parameter {@value
- * #NOTICE_DAYS}, in the app and by e-mail. Daily at 06:00 PHT ({@code
- * brokerverse.jobs.password-expiry-notice-cron}). Each user is told in a transaction of its own, so
- * one failure does not stop the others.
+ * Job {@code PASSWORD_EXPIRY_NOTICE} (UAM-NFR-36; FR-UA-005; USER_ACCESS_DESIGN section 8): tells
+ * the local test accounts whose password expires within the days of parameter {@value
+ * #NOTICE_DAYS}, in the app and by e-mail. The users of the bank sign in at Microsoft Entra ID,
+ * which keeps their password; where local passwords are not used (production) the job tells nobody.
+ * Daily at 06:00 PHT ({@code brokerverse.jobs.password-expiry-notice-cron}). Each user is told in a
+ * transaction of its own, so one failure does not stop the others.
  */
 @Component
 public class PasswordExpiryNoticeJob implements ManagedJob {
@@ -36,6 +38,7 @@ public class PasswordExpiryNoticeJob implements ManagedJob {
   private final PasswordNoticeMailer mailer;
   private final TransactionTemplate transaction;
   private final SystemParameterService parameters;
+  private final LocalPasswordSignIn localPasswords;
   private final String cron;
 
   /**
@@ -46,13 +49,16 @@ public class PasswordExpiryNoticeJob implements ManagedJob {
    * @param transactionManager transaction manager (a transaction per user)
    * @param parameters business parameters (notice days)
    * @param cron schedule
+   * @param localPasswords whether local passwords are used in this deployment
    */
   public PasswordExpiryNoticeJob(
       AuthPasswordService passwords,
       PasswordNoticeMailer mailer,
       PlatformTransactionManager transactionManager,
       SystemParameterService parameters,
-      @Value("${brokerverse.jobs.password-expiry-notice-cron:0 0 22 * * *}") String cron) {
+      @Value("${brokerverse.jobs.password-expiry-notice-cron:0 0 22 * * *}") String cron,
+      LocalPasswordSignIn localPasswords) {
+    this.localPasswords = localPasswords;
     this.passwords = passwords;
     this.parameters = parameters;
     this.mailer = mailer;
@@ -67,7 +73,7 @@ public class PasswordExpiryNoticeJob implements ManagedJob {
 
   @Override
   public String description() {
-    return "Tells users whose password expires within the notice days (LOCAL sign-in)";
+    return "Tells the local test accounts whose password expires within the notice days";
   }
 
   @Override
@@ -77,6 +83,9 @@ public class PasswordExpiryNoticeJob implements ManagedJob {
 
   @Override
   public JobOutcome execute(LocalDate businessDate) {
+    if (!localPasswords.allowed()) {
+      return new JobOutcome(0, "Local passwords are not used: users sign in at Microsoft Entra ID");
+    }
     List<PasswordExpiry> expiring = passwords.expiringWithin(parameters.requiredInt(NOTICE_DAYS));
     int told = 0;
     for (PasswordExpiry expiry : expiring) {

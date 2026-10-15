@@ -107,4 +107,22 @@ public class AuthSessionService {
         "Session ended by administrator " + currentUser.username());
     return session;
   }
+
+  /**
+   * Ends every open session of a user as an administrator: the tokens are refused from now on, on
+   * every instance.
+   *
+   * @param username user
+   * @return the number of sessions ended
+   */
+  public int endAllOf(String username) {
+    List<UserSession> ended = sessions.endAll(username, SessionEndReason.ADMIN_ENDED);
+    ended.forEach(s -> revocations.revoke(s.getSessionId(), s.getUsername(), s.getExpiresAt()));
+    audit.record(
+        ENTITY,
+        username,
+        AuditAction.LOGOUT,
+        ended.size() + " session(s) ended by administrator " + currentUser.username());
+    return ended.size();
+  }
 }

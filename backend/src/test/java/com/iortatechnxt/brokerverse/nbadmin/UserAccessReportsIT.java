@@ -212,7 +212,7 @@ class UserAccessReportsIT {
   @Test
   void onlyHoldersOfTheReportPermissionRunThem() throws Exception {
     assertThatThrownBy(
-            () -> as.run("requestor", () -> reports.run(UserAccessReport.CODE, Map.of())))
+            () -> as.run("secapprover", () -> reports.run(UserAccessReport.CODE, Map.of())))
         .isInstanceOf(AccessDeniedException.class);
     api.doPost("uamapprover", "/api/v1/reports/" + GroupMembersReport.CODE + "/run", Map.of())
         .andExpect(status().isOk());

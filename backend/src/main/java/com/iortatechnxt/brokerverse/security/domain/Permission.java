@@ -276,21 +276,17 @@ public enum Permission {
   SCR_AUDIT_VIEW,
 
   // User Access Maintenance (BDOI BRD-11, BRD 4.002.2). See
-  // docs/architecture/USER_ACCESS_DESIGN.md section 6.1 and V1060. ACCESS_REQUEST and
-  // ACCESS_APPROVE (above) stay: the umbrella request permission and the approver permission.
-  // 1-4. Enroll, modify, deactivate and reactivate users by request
-  UAM_ENROLL,
-  UAM_MODIFY,
-  UAM_DEACTIVATE,
-  UAM_REACTIVATE,
-  // 5. Apply a correction to a returned request; 6. cancel a request
-  UAM_CORRECT,
+  // docs/architecture/USER_ACCESS_DESIGN.md section 6.1. Users and their group profiles come from
+  // UIDM-ISC; the request functions for users (enroll, modify, deactivate, reactivate, correct)
+  // were withdrawn by V2826. ACCESS_REQUEST and ACCESS_APPROVE (above) stay: the umbrella request
+  // permission and the checker permission of a group-profile change.
+  // Cancel a group-profile change
   UAM_CANCEL,
-  // 7. View requests
+  // View users, group profiles and their changes
   UAM_VIEW,
-  // 9. Group-profile (role) requests
+  // Propose a group-profile change (maker)
   UAM_GROUP_REQUEST,
-  // 10. User access reports
+  // User access reports, the access matrix and the certification extract
   UAM_REPORT_VIEW,
   // Second approval of privileged or out-of-hours changes (UAM-NFR-40)
   UAM_SECOND_APPROVE,

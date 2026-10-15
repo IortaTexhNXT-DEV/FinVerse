@@ -5,13 +5,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.iortatechnxt.brokerverse.common.security.UserDataScope;
-import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequest;
-import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestContent;
-import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestType;
-import com.iortatechnxt.brokerverse.nbadmin.domain.RequestedUserData;
 import com.iortatechnxt.brokerverse.nbadmin.service.AccessRequestService;
-import com.iortatechnxt.brokerverse.security.domain.AppUser;
 import com.iortatechnxt.brokerverse.security.service.DataScopeService;
 import com.iortatechnxt.brokerverse.security.service.UserAdminService;
 import com.iortatechnxt.brokerverse.support.Api;
@@ -20,7 +14,6 @@ import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.support.Json;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -272,44 +265,5 @@ class DataScopeIT {
     JsonNode units = api.read(api.doGet(narrowAdmin, "/api/v1/admin/data-scope/units"));
     assertThat(units.findValuesAsText("id"))
         .containsExactly(String.valueOf(companyA), String.valueOf(branchA1));
-  }
-
-  @Test
-  void anAccessRequestCarriesTheScopeAndAppliesItOnApproval() {
-    // A new user ID in the format of the user ID pattern (a letter and nine digits).
-    String name = String.format("u%09d", Math.floorMod(System.nanoTime(), 1_000_000_000L));
-    String scope = companyA + ":" + branchA1;
-    AccessRequestContent enrol =
-        new AccessRequestContent(
-                AccessRequestType.CREATE_USER,
-                name,
-                "Scoped User",
-                name + "@example.ph",
-                Set.of(),
-                null,
-                "Joined the branch")
-            .withUserData(new RequestedUserData(null, null, null, null, false, null, scope));
-    AccessRequest r =
-        as.run("requestor", () -> requests.create(enrol, false, List.of("uamapprover")));
-    as.run("uamapprover", () -> requests.approve(r.getId(), null));
-    AppUser created = users.getByUsername(name);
-    assertThat(scopes.scopeOf(created.getId()).text()).isEqualTo(scope);
-
-    AccessRequestContent widen =
-        new AccessRequestContent(
-                AccessRequestType.MODIFY_USER, name, null, null, Set.of(), null, "Head office")
-            .withUserData(
-                new RequestedUserData(null, null, null, null, false, null, UserDataScope.ALL_TEXT));
-    AccessRequest change =
-        as.run("requestor", () -> requests.create(widen, false, List.of("uamapprover")));
-    as.run("uamapprover", () -> requests.approve(change.getId(), null));
-    assertThat(scopes.scopeOf(created.getId())).isEqualTo(UserDataScope.ALL);
-    assertThat(
-            jdbc.queryForObject(
-                "select count(*) from sec_access_change_log where lower(subject) = lower(?)"
-                    + " and activity = 'DATA_SCOPE_CHANGED' and request_no is not null",
-                Integer.class,
-                name))
-        .isEqualTo(2);
   }
 }

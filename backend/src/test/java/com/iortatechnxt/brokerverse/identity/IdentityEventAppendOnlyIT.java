@@ -58,7 +58,10 @@ class IdentityEventAppendOnlyIT {
     assertThatThrownBy(() -> jdbc.update("delete from idn_identity_event where id = ?", id))
         .isInstanceOf(DataAccessException.class)
         .hasMessageContaining(REFUSED);
+    // The dismissals reference the events (V2828), so a truncate is refused before the guard runs.
     assertThatThrownBy(() -> jdbc.execute("truncate idn_identity_event"))
+        .isInstanceOf(DataAccessException.class);
+    assertThatThrownBy(() -> jdbc.execute("truncate idn_identity_event cascade"))
         .isInstanceOf(DataAccessException.class)
         .hasMessageContaining(REFUSED);
   }

@@ -1,4 +1,3 @@
-import type { DataScopeValue } from './dataScope';
 import { api, toQuery } from './client';
 import type { PageResponse } from './types';
 
@@ -102,32 +101,16 @@ export interface AccessRequest {
   lifecycle: AccessRequestLifecycle;
 }
 
+/** A group-profile change as proposed by the maker (users are maintained in UIDM-ISC). */
 export interface AccessRequestInput {
   type: AccessRequestType;
-  username?: string;
-  fullName?: string;
-  email?: string;
-  roleCodes?: string[];
-  homeBranchId?: number;
   justification?: string;
   roleCode?: string;
   permissionsAdded?: string[];
   permissionsRemoved?: string[];
-  windowsId?: string;
-  businessUnitCode?: string;
-  userLevel?: string;
-  reasonCode?: string;
-  unlock?: boolean;
   roleName?: string;
   roleDescription?: string;
   privilegeLevel?: PrivilegeLevel;
-  partyKind?: 'INSURER' | 'CLIENT';
-  partyCode?: string;
-  portalRole?: string;
-  effectiveFrom?: string;
-  authorizationLimit?: number;
-  dataScope?: DataScopeValue;
-  approvers?: string[];
 }
 
 export interface AccessDecision {
@@ -157,11 +140,6 @@ export interface AccessRequestEvent {
   remarks?: string;
   actor: string;
   occurredAt: string;
-}
-
-export interface ApproverOption {
-  username: string;
-  fullName: string;
 }
 
 export interface AccessSettings {
@@ -302,7 +280,7 @@ const SOD = '/nbadmin/sod-rules';
 const REQUESTS = '/nbadmin/access-requests';
 const one = (id: number) => `${REQUESTS}/${String(id)}`;
 
-/** Broking administration: access requests, access matrix, data retention (nbadmin module). */
+/** Broking administration: group-profile changes, access matrix, data retention (nbadmin module). */
 export const nbadminApi = {
   requests: (f: AccessRequestFilters) =>
     api.get<PageResponse<AccessRequest>>(`${REQUESTS}${toQuery({ ...f })}`),
@@ -312,8 +290,8 @@ export const nbadminApi = {
     api.post<AccessRequest>(`${REQUESTS}${toQuery({ draft })}`, body),
   submit: (body: AccessRequestInput) => api.post<AccessRequest>(REQUESTS, body),
   edit: (id: number, body: AccessRequestInput) => api.put<AccessRequest>(one(id), body),
-  submitSaved: (id: number, approvers: string[], remarks?: string) =>
-    api.post<AccessRequest>(`${one(id)}/submit`, { approvers, remarks }),
+  submitSaved: (id: number, remarks?: string) =>
+    api.post<AccessRequest>(`${one(id)}/submit`, { remarks }),
   approve: (id: number, comment?: string) =>
     api.post<AccessDecision>(`${one(id)}/approve`, { comment }),
   secondApprove: (id: number, comment?: string) =>
@@ -325,8 +303,6 @@ export const nbadminApi = {
   cancel: (id: number, comment: string) =>
     api.post<AccessRequest>(`${one(id)}/cancel`, { comment }),
   implement: (id: number) => api.post<AccessRequest>(`${one(id)}/implement`),
-  approvers: (userType: AccessUserType, subject?: string) =>
-    api.get<ApproverOption[]>(`/nbadmin/approvers${toQuery({ userType, subject })}`),
   settings: () => api.get<AccessSettings>('/nbadmin/access-settings'),
   users: () => api.get<UserAccess[]>('/nbadmin/users'),
   roles: () => api.get<RoleInfo[]>('/nbadmin/roles'),

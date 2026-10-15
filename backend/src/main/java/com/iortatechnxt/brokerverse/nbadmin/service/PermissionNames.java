@@ -8,8 +8,8 @@ import java.util.stream.Collectors;
 
 /**
  * Readable names of permission codes for users (notices, descriptions): the module prefix in words
- * and the rest in lower case, for example UAM_ENROLL becomes "User access enroll" and
- * PKG_TSU_APPROVE "Package TSU approve". The screens use the same rule (frontend permissionLabel).
+ * and the rest in lower case, for example UAM_VIEW becomes "User access view" and PKG_TSU_APPROVE
+ * "Package TSU approve". The screens use the same rule (frontend permissionLabel).
  */
 public final class PermissionNames {
 

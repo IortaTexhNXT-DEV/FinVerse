@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.security.service.AuthSessionService;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -76,5 +77,16 @@ public class UserSessionController {
   @PostMapping("/{sessionId}/end")
   public SessionResponse end(@PathVariable String sessionId) {
     return SessionResponse.from(sessions.end(sessionId), clock.instant());
+  }
+
+  /**
+   * Ends every open session of a user.
+   *
+   * @param username user
+   * @return the number of sessions ended
+   */
+  @PostMapping("/users/{username}/end")
+  public Map<String, Integer> endAll(@PathVariable String username) {
+    return Map.of("ended", sessions.endAllOf(username));
   }
 }

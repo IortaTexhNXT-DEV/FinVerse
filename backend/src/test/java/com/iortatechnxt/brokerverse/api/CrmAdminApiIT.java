@@ -13,6 +13,7 @@ import com.iortatechnxt.brokerverse.support.Api;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.support.TestData;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import org.hamcrest.Matchers;
@@ -65,14 +66,14 @@ class CrmAdminApiIT {
     "ao, /api/v1/crm/kyc-reviews?companyId={c}",
     "ao, /api/v1/crm/kyc-reviews?companyId={c}&bank=ALL&riskRating=HIGH&marketSegment=RETAIL&dueBy=2030-12-31",
     "badmin, /api/v1/nbadmin/access-requests",
-    "approver, /api/v1/nbadmin/access-requests?status=PENDING&type=CREATE_USER&text=u",
+    "approver, /api/v1/nbadmin/access-requests?status=PENDING&type=CREATE_ROLE&text=u",
     "badmin, /api/v1/nbadmin/users",
     "badmin, /api/v1/nbadmin/roles",
     "badmin, /api/v1/nbadmin/access-matrix",
     "badmin, /api/v1/nbadmin/access-matrix/by-action",
-    "approver, /api/v1/nbadmin/access-matrix/by-action?area=PACKAGE_REQUEST",
+    "badmin, /api/v1/nbadmin/access-matrix/by-action?area=PACKAGE_REQUEST",
     "approver, /api/v1/nbadmin/access-requests?type=MODIFY_ROLE_PERMISSIONS&text=MBS",
-    "approver, /api/v1/nbadmin/access-matrix/export",
+    "badmin, /api/v1/nbadmin/access-matrix/export",
     "badmin, /api/v1/nbadmin/retention/rules",
     "badmin, /api/v1/nbadmin/retention/rules/{rule}/eligible?limit=5",
     "badmin, /api/v1/system/session-policy",
@@ -216,17 +217,18 @@ class CrmAdminApiIT {
 
   @Test
   void accessRequestsAndRetentionOverHttp() throws Exception {
-    String name = String.format("a%09d", Math.floorMod(System.nanoTime(), 1_000_000_000L));
+    String code = "API_" + Math.floorMod(System.nanoTime(), 1_000_000_000L);
     JsonNode submitted =
         api.read(
             api.doPost(
                     "badmin",
                     "/api/v1/nbadmin/access-requests",
                     Map.of(
-                        "type", "CREATE_USER",
-                        "username", name,
-                        "fullName", "Api User",
-                        "justification", "New TSU analyst"))
+                        "type", "CREATE_ROLE",
+                        "roleCode", code,
+                        "roleName", "Api Profile",
+                        "permissionsAdded", List.of("REPORT_VIEW"),
+                        "justification", "New TSU analysts"))
                 .andExpect(status().isCreated()));
     long id = submitted.get("id").asLong();
     api.doGet("approver", "/api/v1/nbadmin/access-requests/" + id)
@@ -237,10 +239,10 @@ class CrmAdminApiIT {
             "approver",
             "/api/v1/nbadmin/access-requests/" + id + "/approve",
             Map.of("comment", "ok"))
-        .andExpect(jsonPath("$.request.status").value("APPROVED"))
-        .andExpect(jsonPath("$.temporaryPassword").isString());
+        .andExpect(jsonPath("$.request.decidedBy").value("approver"));
     api.doPost("badmin", "/api/v1/nbadmin/access-requests", Map.of("type", "CREATE_USER"))
-        .andExpect(status().isUnprocessableEntity());
+        .andExpect(status().isUnprocessableEntity())
+        .andExpect(jsonPath("$.code").value("ACCESS_USERS_BY_UIDM"));
     api.doGet("ao", "/api/v1/nbadmin/access-requests").andExpect(status().isForbidden());
 
     String rule = rules.findAll().get(0).getId().toString();

@@ -7,53 +7,6 @@ export const ADMIN_HELP: HelpSection = {
   intro: 'Security, configuration and monitoring (administrators).',
   screens: [
     {
-      name: 'Users',
-      path: '/admin/users',
-      summary:
-        'User accounts with their Windows ID, group profiles, business unit, user level, status (Active, Disabled, Locked), last sign-in and authorization limit: the base-currency amount a user may approve on journals, payments and claims (blank = unlimited).',
-      workflow: [
-        'Search by user ID, name or Windows ID and filter by status.',
-        'Raise Request opens a new access request; a row opens a Modify user request for that user. Users are enrolled and changed only through approved requests.',
-      ],
-      controls: [
-        'Accounts lock after the number of failed sign-ins set in the parameter LOGIN_MAX_FAILED_ATTEMPTS (a wrong code of the second factor counts too); an administrator unlocks them or resets the password.',
-        'The direct create and edit of users is kept for the System Administrator while the emergency path UAM_DIRECT_ROLE_EDIT is open.',
-        'Group profiles are shown read-only: UIDM-ISC assigns them through the provisioning interface, and the Users screen cannot change them.',
-        'Every change to a user is recorded in the audit trail and the access change log.',
-      ],
-    },
-    {
-      name: 'Identity Synchronisation',
-      path: '/admin/identity-sync',
-      summary:
-        'Joiner, mover, leaver and status events received from UIDM-ISC and the Enterprise SSO platform, with their outcome (Applied, Refused, Failed, No Change), and the on-demand synchronisation of a user.',
-      workflow: [
-        'Filter the events by date, source, type and outcome; open an event to read the details that were received.',
-        'Reprocess a refused or failed event once the cause is fixed; Synchronise User reads the Enterprise SSO account of one user again.',
-        'Create from Enterprise SSO creates the user of an active account that has no user yet.',
-        'In SIT and UAT the simulator tab holds the directory accounts and sends their events.',
-      ],
-      controls: [
-        'An inactive, disabled, locked or deactivated account deactivates the user and ends the open sessions; an active account reactivates the user with the group profiles held before.',
-        'UIDM-ISC assigns group profiles through group membership; the create and update user events also carry them when the setting UAM_PROVISIONING_ROLES is on.',
-        'Every change is written to the access change log with the source and the UIDM request number.',
-      ],
-    },
-    {
-      name: 'Roles & Permissions',
-      path: '/admin/roles',
-      summary:
-        'The permissions of each group profile (role) with its privilege level and active flag. Keep makers, checkers, administrators and auditors in different roles (segregation of duties).',
-      workflow: [
-        'Approved Requests to Implement lists the approved group-profile requests: Implement Request applies the approved change and the request becomes IMPLEMENTED.',
-        'While the emergency path UAM_DIRECT_ROLE_EDIT is open, tick or clear permissions in the matrix and save the role.',
-      ],
-      controls: [
-        'A profile changes only by implementing an approved request; the implementer is never the requester.',
-        'Every direct edit is audited and raises an alert; every change is in the access change log.',
-      ],
-    },
-    {
       name: 'Audit Trail',
       path: '/admin/audit',
       summary:
@@ -70,7 +23,8 @@ export const ADMIN_HELP: HelpSection = {
         'Business parameters such as session timeout, ageing buckets, report footer and suspense accounts, plus a read-only view of the runtime configuration.',
       controls: [
         'Values are validated by type and every change is audited.',
-        'A change of a security setting (sign-in, password, lock-out, session and access settings, the emergency direct edit of roles among them) waits until Information Security approves it; the user who requested it cannot approve it.',
+        'A change of a security setting waits until Information Security approves it; the user who requested it cannot approve it.',
+        'The user access settings (sessions, dormancy, local test accounts, synchronisation, group-profile switches) are maintained on User Access › UAM Settings.',
       ],
     },
     {

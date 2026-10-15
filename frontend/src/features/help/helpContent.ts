@@ -27,7 +27,7 @@ import { GL_HELP } from '@/features/gl/help';
 import { ISSUANCE_HELP } from '@/features/issuance/help';
 import { LEGACY_INQUIRY_HELP } from '@/features/legacy-inquiry/help';
 import { MIGRATION_HELP } from '@/features/migration/help';
-import { USER_ACCESS_HELP } from '@/features/nbadmin/help';
+import { USER_ACCESS_HELP } from '@/features/useraccess/help';
 import { NB_DASHBOARD_HELP, NB_REPORTS_HELP } from '@/features/nbreports/help';
 import { OPERATIONS_HELP } from '@/features/operations/help';
 import { PAYABLES_HELP } from '@/features/payables/help';

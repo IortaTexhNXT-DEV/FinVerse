@@ -15,7 +15,6 @@ import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestContent;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestRepository;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestStatus;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestType;
-import com.iortatechnxt.brokerverse.nbadmin.domain.RequestedUserData;
 import com.iortatechnxt.brokerverse.nbadmin.domain.RolePermissionChange;
 import com.iortatechnxt.brokerverse.nbadmin.domain.SodRule;
 import com.iortatechnxt.brokerverse.nbadmin.service.AccessImplementationService;
@@ -24,6 +23,7 @@ import com.iortatechnxt.brokerverse.nbadmin.service.AccessSettings;
 import com.iortatechnxt.brokerverse.nbadmin.service.DormantUserJob;
 import com.iortatechnxt.brokerverse.nbadmin.service.SodRuleService;
 import com.iortatechnxt.brokerverse.security.api.dto.RoleRequest;
+import com.iortatechnxt.brokerverse.security.api.dto.UserRequest;
 import com.iortatechnxt.brokerverse.security.domain.AppUser;
 import com.iortatechnxt.brokerverse.security.domain.Permission;
 import com.iortatechnxt.brokerverse.security.service.AuthService;
@@ -99,26 +99,23 @@ class UamSignoffControlsIT {
     }
   }
 
-  private static AccessRequestContent enrol(String user, Set<String> profiles, BigDecimal limit) {
-    return new AccessRequestContent(
-            AccessRequestType.CREATE_USER,
-            user,
-            "Controls User",
-            user + "@example.ph",
-            profiles,
-            null,
-            "Joined")
-        .withUserData(new RequestedUserData(null, null, null, null, false, limit));
-  }
+  private static final String PASSWORD = "Controls#2026pw";
 
-  private AccessRequestService.Decision enrolAndApprove(String user, Set<String> profiles) {
-    AccessRequest r =
-        as.run(
-            REQUESTOR,
-            () ->
-                requests.create(
-                    enrol(user, profiles, BigDecimal.valueOf(50_000)), false, List.of(APPROVER)));
-    return as.run(APPROVER, () -> requests.approve(r.getId(), null));
+  /** A user as UIDM-ISC provisions it (created directly, without group profiles). */
+  private AppUser provision(String user) {
+    return as.run(
+        "admin",
+        () ->
+            users.createUserWithoutRoles(
+                new UserRequest(
+                    user,
+                    "Controls User",
+                    user + "@example.ph",
+                    null,
+                    BigDecimal.valueOf(50_000),
+                    Set.of(),
+                    true),
+                PASSWORD));
   }
 
   @Test
@@ -170,51 +167,23 @@ class UamSignoffControlsIT {
   }
 
   @Test
-  void limitIsSetByRequestAndDeactivatedUserIsRefusedWithoutCount() {
+  void aDeactivatedUserIsRefusedWithoutCount() {
     String name = AccessRequestIT.username();
-    String password = enrolAndApprove(name, Set.of()).temporaryPassword();
-    assertThat(users.getByUsername(name).getAuthorizationLimit()).isEqualByComparingTo("50000");
-
-    AccessRequest change =
-        as.run(
-            REQUESTOR,
-            () ->
-                requests.create(
-                    new AccessRequestContent(
-                            AccessRequestType.MODIFY_USER,
-                            name,
-                            null,
-                            null,
-                            Set.of(),
-                            null,
-                            "Higher limit")
-                        .withUserData(
-                            new RequestedUserData(
-                                null, null, null, null, false, BigDecimal.valueOf(75_000))),
-                    false,
-                    List.of(APPROVER)));
-    as.run(APPROVER, () -> requests.approve(change.getId(), null));
-    assertThat(users.getByUsername(name).getAuthorizationLimit()).isEqualByComparingTo("75000");
-
-    AccessRequest off =
-        as.run(
-            REQUESTOR,
-            () ->
-                requests.create(
-                    new AccessRequestContent(
-                            AccessRequestType.DISABLE_USER,
-                            name,
-                            null,
-                            null,
-                            Set.of(),
-                            null,
-                            "Resigned")
-                        .withUserData(
-                            new RequestedUserData(null, null, null, "RESIGNED", false, null)),
-                    false,
-                    List.of(APPROVER)));
-    as.run(APPROVER, () -> requests.approve(off.getId(), null));
-    assertThatThrownBy(() -> auth.login(name, password))
+    AppUser user = provision(name);
+    as.run(
+        "admin",
+        () ->
+            users.updateUserKeepingRoles(
+                user.getId(),
+                new UserRequest(
+                    name,
+                    user.getFullName(),
+                    user.getEmail(),
+                    null,
+                    user.getAuthorizationLimit(),
+                    Set.of(),
+                    false)));
+    assertThatThrownBy(() -> auth.login(name, PASSWORD))
         .isInstanceOf(BadCredentialsException.class)
         .hasMessage(LocalPasswordAuthenticator.INVALID);
     assertThatThrownBy(() -> auth.login(name, "wrong")).isInstanceOf(BadCredentialsException.class);
@@ -225,9 +194,9 @@ class UamSignoffControlsIT {
   @Test
   void dormantUsersAreWarnedThenDeactivatedByRequest() {
     String dormant = AccessRequestIT.username();
-    enrolAndApprove(dormant, Set.of());
+    provision(dormant);
     String soon = AccessRequestIT.username();
-    enrolAndApprove(soon, Set.of());
+    provision(soon);
     LocalDate today = BusinessClock.today(Clock.systemUTC());
     backdate(dormant, today.minusDays(800));
     backdate(soon, today.minusDays(723));
@@ -265,7 +234,7 @@ class UamSignoffControlsIT {
   void membersAreToldWhenTheirGroupProfileIsDeactivated() {
     String profile = newProfile();
     String member = AccessRequestIT.username();
-    enrolAndApprove(member, Set.of());
+    provision(member);
     // UIDM-ISC gives the user the group profile
     jdbc.update(
         "insert into sec_user_role (user_id, role_id) select u.id, r.id from sec_user u, sec_role r"

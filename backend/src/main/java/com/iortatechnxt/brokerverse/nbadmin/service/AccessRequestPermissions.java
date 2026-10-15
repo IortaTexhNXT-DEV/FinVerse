@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.nbadmin.service;
 
+import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequest;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestContent;
@@ -8,20 +9,23 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 
 /**
- * The request functions of the current user (BRD 4.002.2.1-9; USER_ACCESS_DESIGN section 6.1): each
- * request type needs its own permission, or ACCESS_REQUEST (compatibility); a correction needs
- * UAM_CORRECT. A request for an external (portal) user needs the portal request function of
- * decision D7, {@value #PORTAL_USER_REQUEST}: it comes with the parked partner portal and no role
- * holds it until then, so only ACCESS_REQUEST reaches the check that refuses external users.
+ * The request functions of the current user (USER_ACCESS_DESIGN section 6.1). Users and their group
+ * profiles are maintained in UIDM-ISC and reach the system over the provisioning interface, so a
+ * request about a user is refused ({@value #USERS_BY_UIDM}); the dormant-user job deactivates on
+ * its own authority. A group-profile change needs UAM_GROUP_REQUEST or the umbrella ACCESS_REQUEST,
+ * and so does the correction of a returned change.
  */
 @Component
 public class AccessRequestPermissions {
 
-  /** Request function for external (portal) users (decision D7), parked with the partner portal. */
-  static final String PORTAL_USER_REQUEST = "PORTAL_USER_REQUEST";
-
   /** Umbrella of the request functions. */
   public static final String ACCESS_REQUEST = "ACCESS_REQUEST";
+
+  /** Request function of a group-profile change (maker). */
+  public static final String GROUP_REQUEST = "UAM_GROUP_REQUEST";
+
+  /** Code of the refusal of a request about a user. */
+  public static final String USERS_BY_UIDM = "ACCESS_USERS_BY_UIDM";
 
   private final CurrentUser currentUser;
 
@@ -35,47 +39,35 @@ public class AccessRequestPermissions {
   }
 
   /**
-   * Requires the request function of the type.
+   * Requires a group-profile change and the request function to propose it.
    *
    * @param c request content
+   * @throws BusinessRuleException ACCESS_USERS_BY_UIDM for a request about a user
    */
   public void requireRequestPermission(AccessRequestContent c) {
-    if (!holds(requestPermission(c))) {
-      throw new AccessDeniedException("Not permitted to raise this access request");
+    if (c.external() != null || c.type() != null && !c.type().isGroupProfile()) {
+      throw new BusinessRuleException(
+          USERS_BY_UIDM,
+          "Users are created, changed, deactivated and reactivated in UIDM-ISC; the change"
+              + " reaches this system over the provisioning interface");
+    }
+    if (!holds()) {
+      throw new AccessDeniedException("Not permitted to propose a group-profile change");
     }
   }
 
   /**
-   * Requires the correction function for a returned request (BRD 1.006; UAM_CORRECT).
+   * Requires the request function to correct a returned change.
    *
    * @param r request
    */
   public void requireCorrectionRight(AccessRequest r) {
-    if (r.getStatus() == AccessRequestStatus.RETURNED && !holds("UAM_CORRECT")) {
-      throw new AccessDeniedException("Not permitted to correct access requests");
+    if (r.getStatus() == AccessRequestStatus.RETURNED && !holds()) {
+      throw new AccessDeniedException("Not permitted to correct group-profile changes");
     }
   }
 
-  private boolean holds(String permission) {
-    return currentUser.hasAuthority(permission) || currentUser.hasAuthority(ACCESS_REQUEST);
-  }
-
-  /**
-   * The permission of the request function of a request.
-   *
-   * @param c request content
-   * @return permission name
-   */
-  static String requestPermission(AccessRequestContent c) {
-    if (c.external() != null) {
-      return PORTAL_USER_REQUEST;
-    }
-    return switch (c.type()) {
-      case CREATE_USER -> "UAM_ENROLL";
-      case MODIFY_ROLES, MODIFY_USER -> "UAM_MODIFY";
-      case DISABLE_USER -> "UAM_DEACTIVATE";
-      case ENABLE_USER -> "UAM_REACTIVATE";
-      default -> "UAM_GROUP_REQUEST";
-    };
+  private boolean holds() {
+    return currentUser.hasAuthority(GROUP_REQUEST) || currentUser.hasAuthority(ACCESS_REQUEST);
   }
 }

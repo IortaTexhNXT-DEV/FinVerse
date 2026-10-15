@@ -126,7 +126,8 @@ public class AuthController {
         mode.name(),
         mode.singleSignOn(),
         mode.singleSignOn() ? sso.label() : null,
-        !mode.singleSignOn(),
+        !mode.singleSignOn() && resetRules.localPasswords(),
+        resetRules.localPasswords(),
         resetRules.selfServiceOffered(),
         environment);
   }

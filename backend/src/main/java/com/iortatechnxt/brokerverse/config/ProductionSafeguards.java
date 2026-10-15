@@ -180,14 +180,8 @@ public final class ProductionSafeguards implements EnvironmentPostProcessor, Ord
       requireSecrets(environment, problems);
       requireSharedEnvironmentSettings(environment, problems);
     }
-    if (production
-        && Boolean.parseBoolean(
-            environment.getProperty("brokerverse.security.local-password-sign-in", "").trim())) {
-      problems.add(
-          "local-password sign-in is switched on in production; remove"
-              + " BROKERVERSE_LOCAL_PASSWORD_SIGN_IN (users sign in at the identity provider)");
-    }
     if (production) {
+      refuseLocalPasswords(environment, problems);
       requireSeparateDatabaseRoles(environment, problems);
       requireEncryptionInTransit(environment, problems);
       requireIntegrationTokens(environment, problems);
@@ -351,6 +345,15 @@ public final class ProductionSafeguards implements EnvironmentPostProcessor, Ord
           "spring.kafka.properties.sasl.jaas.config",
           "BROKERVERSE_KAFKA_SASL_JAAS_CONFIG",
           problems);
+    }
+  }
+
+  private static void refuseLocalPasswords(Environment env, List<String> problems) {
+    if (Boolean.parseBoolean(
+        env.getProperty("brokerverse.security.local-password-sign-in", "").trim())) {
+      problems.add(
+          "local-password sign-in is switched on in production; remove"
+              + " BROKERVERSE_LOCAL_PASSWORD_SIGN_IN (users sign in at the identity provider)");
     }
   }
 

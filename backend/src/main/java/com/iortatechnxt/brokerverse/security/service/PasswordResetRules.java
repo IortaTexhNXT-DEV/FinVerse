@@ -66,10 +66,19 @@ public class PasswordResetRules {
   /**
    * Whether "Forgot password?" is offered on the Login page.
    *
-   * @return true only for local sign-in under the earlier rules
+   * @return true only for local sign-in under the earlier rules, outside production
    */
   public boolean selfServiceOffered() {
-    return policy.mode() == AuthMode.LOCAL && !bdoiRules();
+    return localSignIn.allowed() && policy.mode() == AuthMode.LOCAL && !bdoiRules();
+  }
+
+  /**
+   * Whether local passwords (the test accounts) may be used in this deployment.
+   *
+   * @return false in production
+   */
+  public boolean localPasswords() {
+    return localSignIn.allowed();
   }
 
   /**

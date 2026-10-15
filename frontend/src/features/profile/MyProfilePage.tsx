@@ -49,6 +49,16 @@ function ChangePassword({ status }: Readonly<{ status: PasswordStatus | undefine
       void queries.invalidateQueries({ queryKey: ['password-status'] });
     },
   });
+  if (status !== undefined && !status.localPassword) {
+    return (
+      <Card title="Password">
+        <Notice tone="info">
+          You sign in with your organisation&apos;s account (Microsoft Entra ID). Your password and
+          second factor are managed there, not here.
+        </Notice>
+      </Card>
+    );
+  }
   if (status?.authMode === 'DIRECTORY') {
     return (
       <Card title="Password">
@@ -59,15 +69,13 @@ function ChangePassword({ status }: Readonly<{ status: PasswordStatus | undefine
       </Card>
     );
   }
-  const singleSignOn = signsInThroughOrganisation(status);
   const dates = passwordDates(status);
   return (
     <Card title="Change password">
       <div className="stack">
-        {singleSignOn && (
+        {signsInThroughOrganisation(status) && (
           <Notice tone="info">
-            You sign in through your organisation. This password is used only by the emergency
-            administrators.
+            This is a test account: its password is used only outside production.
           </Notice>
         )}
         {dates.length > 0 && <p className="muted">{dates.join(' ')}</p>}

@@ -15,6 +15,7 @@ describe('SessionTimedOutPage', () => {
       mode: 'LOCAL',
       singleSignOn: false,
       passwordSignIn: true,
+      localPasswordSignIn: true,
       passwordReset: false,
       environment: 'sit',
     });

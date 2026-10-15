@@ -10,8 +10,10 @@ export interface SignInOptions {
   mode: 'LOCAL' | 'DIRECTORY' | 'OIDC' | 'SAML';
   singleSignOn: boolean;
   providerLabel?: string;
-  /** The password form is the main sign-in (otherwise only for the break-glass administrators). */
+  /** The password form is the main sign-in. */
   passwordSignIn: boolean;
+  /** The password form of the test accounts is offered at all (never in production). */
+  localPasswordSignIn: boolean;
   passwordReset: boolean;
   /** Kind of environment (local, sit, uat, training, preprod, production). */
   environment?: string;
@@ -39,6 +41,8 @@ export interface PasswordStatus {
   passwordExpiresAt?: string;
   changeDue: boolean;
   changeReason?: PasswordChangeReason;
+  /** The user keeps a password here (a test account outside production). */
+  localPassword: boolean;
 }
 
 /** Why the password must be changed before working: set by an administrator, or too old. */

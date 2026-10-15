@@ -108,6 +108,7 @@ public class AuthPasswordService {
    * @param newPassword new password (length and complexity checked on the request)
    */
   public void changeOwnPassword(String currentPassword, String newPassword) {
+    requireLocalPasswords();
     policy.requireLocalMode();
     AppUser user = currentUserEntity();
     if (currentPassword == null || !encoder.matches(currentPassword, user.getPasswordHash())) {
@@ -140,7 +141,8 @@ public class AuthPasswordService {
         user.getPasswordChangedAt(),
         settings.mode() == AuthMode.LOCAL ? policy.expiresAt(user).orElse(null) : null,
         reason != null,
-        reason);
+        reason,
+        ownPassword);
   }
 
   /**
@@ -152,12 +154,23 @@ public class AuthPasswordService {
    * @param userId user name
    */
   public void requestReset(String userId) {
-    if (userId != null && !userId.isBlank() && policy.mode() == AuthMode.LOCAL) {
+    if (localSignIn.allowed()
+        && userId != null
+        && !userId.isBlank()
+        && policy.mode() == AuthMode.LOCAL) {
       users
           .findByUsernameIgnoreCase(userId.trim())
           .filter(u -> u.isEnabled() && u.getEmail() != null && !u.getEmail().isBlank())
           .filter(u -> limits.tryAcquireResetLink(u.getUsername()))
           .ifPresent(this::issueLink);
+    }
+  }
+
+  private void requireLocalPasswords() {
+    if (!localSignIn.allowed()) {
+      throw new BusinessRuleException(
+          "PASSWORD_MANAGED_BY_ORGANISATION",
+          "Your password is managed by your organisation's sign-in service; change it there");
     }
   }
 
@@ -202,6 +215,7 @@ public class AuthPasswordService {
    * @param newPassword new password (length and complexity checked on the request)
    */
   public void resetWithLink(String token, String newPassword) {
+    requireLocalPasswords();
     policy.requireLocalMode();
     PasswordResetToken link = usableLink(token);
     AppUser user =

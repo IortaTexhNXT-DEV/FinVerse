@@ -14,6 +14,8 @@ import java.time.Instant;
  * @param passwordExpiresAt expiry, null when it never expires
  * @param changeDue whether the password must be changed now
  * @param changeReason RESET or EXPIRED when a change is due
+ * @param localPassword whether the user keeps a password here (a test account outside production);
+ *     false when the password is kept by the organisation's sign-in service
  */
 public record PasswordStatusResponse(
     String authMode,
@@ -23,4 +25,5 @@ public record PasswordStatusResponse(
     Instant passwordChangedAt,
     Instant passwordExpiresAt,
     boolean changeDue,
-    String changeReason) {}
+    String changeReason,
+    boolean localPassword) {}

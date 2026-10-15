@@ -6,8 +6,10 @@ package com.iortatechnxt.brokerverse.security.api.dto;
  * @param mode LOCAL, DIRECTORY, OIDC or SAML
  * @param singleSignOn whether the users sign in at an identity provider
  * @param providerLabel name of the identity provider on the button, null without single sign-on
- * @param passwordSignIn whether the password form is the main sign-in (LOCAL, DIRECTORY); in single
- *     sign-on mode the form stays available for the break-glass administrators
+ * @param passwordSignIn whether the password form is the main sign-in (LOCAL, DIRECTORY outside
+ *     production)
+ * @param localPasswordSignIn whether the password form is offered at all: the test accounts of DEV,
+ *     SIT and UAT; never in production
  * @param passwordReset whether "Forgot password?" is offered
  * @param environment kind of environment (local, sit, uat, training, preprod, production), shown on
  *     the sign-in page outside production so that testers never mistake it for the live system
@@ -17,5 +19,6 @@ public record SignInOptionsResponse(
     boolean singleSignOn,
     String providerLabel,
     boolean passwordSignIn,
+    boolean localPasswordSignIn,
     boolean passwordReset,
     String environment) {}

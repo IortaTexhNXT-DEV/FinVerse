@@ -199,11 +199,12 @@ interface ChoicesProps {
 }
 
 /**
- * The ways to sign in: the password form, or with single sign-on the provider's button and the
- * password form of the break-glass administrators behind "Administrator sign-in".
+ * The ways to sign in: the password form, or with single sign-on the provider's button and, outside
+ * production only, the password form of the test accounts behind "Test account sign-in".
  */
 function SignInChoices({ options, mode, onForgot, onSecondFactor }: Readonly<ChoicesProps>) {
-  const [adminSignIn, setAdminSignIn] = useState(false);
+  const [testSignIn, setTestSignIn] = useState(false);
+  const localPasswords = options?.localPasswordSignIn ?? true;
   const form = (
     <PasswordForm
       mode={mode}
@@ -213,17 +214,27 @@ function SignInChoices({ options, mode, onForgot, onSecondFactor }: Readonly<Cho
     />
   );
   if (options?.singleSignOn !== true) {
-    return form;
+    return localPasswords ? (
+      form
+    ) : (
+      <Notice tone="info">
+        Password sign-in is not used in this environment. Ask your System Administrator how to sign
+        in.
+      </Notice>
+    );
+  }
+  if (!localPasswords) {
+    return <SingleSignOnButton options={options} />;
   }
   return (
     <>
       <SingleSignOnButton options={options} />
-      {adminSignIn ? (
+      {testSignIn ? (
         form
       ) : (
         <div className="login-links">
-          <Button variant="ghost" className="login-link" onClick={() => setAdminSignIn(true)}>
-            Administrator sign-in
+          <Button variant="ghost" className="login-link" onClick={() => setTestSignIn(true)}>
+            Test account sign-in
           </Button>
         </div>
       )}
@@ -234,7 +245,8 @@ function SignInChoices({ options, mode, onForgot, onSecondFactor }: Readonly<Cho
 /**
  * Sign-in screen: brand panel and the sign-in form, with "Forgot password?" (UAM-NFR-37; FR-UA-005)
  * where the passwords are held by the system. With single sign-on the main button opens the
- * identity provider and the password form stays for the break-glass administrators. After the
+ * identity provider (Microsoft Entra ID); outside production the password form stays for the test
+ * accounts, and production offers no password form at all. After the
  * password the second factor is asked for when required (code of the authenticator app, or its
  * enrolment at the first sign-in).
  */

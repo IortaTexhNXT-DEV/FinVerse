@@ -14,6 +14,9 @@ public enum Permission {
   // Product module switches of the deployment: request (system administrator) and approve (V1160)
   MODULE_SWITCH_MANAGE,
   MODULE_SWITCH_APPROVE,
+  // Home-page widgets of each role: request (system administrator) and approve (V2820)
+  ROLE_HOME_MANAGE,
+  ROLE_HOME_APPROVE,
 
   // Master data (maker / checker)
   MASTER_VIEW,

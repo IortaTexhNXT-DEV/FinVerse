@@ -166,6 +166,7 @@
             "MFA_RESET_APPROVE",
             "MODULE_SWITCH_APPROVE",
             "REPORT_VIEW",
+            "ROLE_HOME_APPROVE",
             "SECURITY_PARAMETER_APPROVE",
             "UAM_REPORT_VIEW",
             "UAM_SOD_AUTHORIZE"

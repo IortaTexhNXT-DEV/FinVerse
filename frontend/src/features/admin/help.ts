@@ -157,6 +157,21 @@ export const ADMIN_HELP: HelpSection = {
       ],
     },
     {
+      name: 'Role Home Set-up',
+      path: '/admin/role-homes',
+      summary:
+        'The widgets of the home page (Home > Dashboard) of each role, in display order: headline figures, my workload, collections, payables, cash position, budget and the income and expense charts.',
+      workflow: [
+        'The System Administrator chooses Change Widgets in the row menu of a role, ticks the widgets, orders them with the arrows and gives the reason.',
+        'Another user with the approval right approves or rejects the change from the row menu; the requester may withdraw it.',
+      ],
+      controls: [
+        'A role not set up shows the delivered widgets. A user with several roles sees the widgets of the roles that are set up, each once, in the order of the first role that shows it.',
+        'A widget of a switched-off product module is not shown, and a widget never counts a record its list would not show the user.',
+        'Every request, approval and rejection is recorded in the audit trail.',
+      ],
+    },
+    {
       name: 'Integration Events',
       path: '/admin/integration-events',
       summary:

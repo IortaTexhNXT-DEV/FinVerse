@@ -7,6 +7,7 @@ import {
   FolderSync,
   History,
   KeyRound,
+  LayoutDashboard,
   Server,
   ShieldCheck,
   SlidersHorizontal,
@@ -126,6 +127,14 @@ export const adminModule: FeatureModule = {
       permission: 'MODULE_SWITCH_MANAGE',
       alsoPermissions: ['MODULE_SWITCH_APPROVE', 'SYSTEM_MONITOR'],
       component: lazyWithRetry(() => import('@/features/system/ProductModulesPage')),
+    },
+    {
+      path: '/admin/role-homes',
+      label: 'Role Home Set-up',
+      icon: LayoutDashboard,
+      permission: 'ROLE_HOME_MANAGE',
+      alsoPermissions: ['ROLE_HOME_APPROVE'],
+      component: lazyWithRetry(() => import('./RoleHomeSetupPage')),
     },
     {
       path: '/admin/info',

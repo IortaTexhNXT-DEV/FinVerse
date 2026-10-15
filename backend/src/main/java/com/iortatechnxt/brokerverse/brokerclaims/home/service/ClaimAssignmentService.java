@@ -151,7 +151,9 @@ public class ClaimAssignmentService {
     notifications.notifyUser(
         target,
         new Notice(
-            claimNos.size() + " claim(s) assigned to you",
+            claimNos.size() == 1
+                ? "Claim assigned to you"
+                : claimNos.size() + " claims assigned to you",
             String.join(", ", claimNos),
             "/claims-handling/worklist?tab=MINE",
             ClaimCodes.ENTITY_TYPE,

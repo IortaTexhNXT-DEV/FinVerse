@@ -184,7 +184,11 @@ class ClaimsWorkIT {
                 String.class,
                 String.valueOf(open)))
         .isEqualTo("clmofficer2");
-    assertThat(notifications("clmofficer2", "2 claims assigned")).isPositive();
+    assertThat(notifications("clmofficer2", "2 claims assigned to you")).isEqualTo(1);
+    // A single claim: the bell shows the event wording, the TL who reassigns is not notified.
+    as.run(TL, () -> assignments.reassign(company, List.of(open), "clmofficer", null));
+    assertThat(notifications("clmofficer", "Claim assigned to you")).isEqualTo(1);
+    assertThat(notifications(TL, "assigned to you")).isZero();
   }
 
   private List<WorklistRow> search(Tab tab, String text) {

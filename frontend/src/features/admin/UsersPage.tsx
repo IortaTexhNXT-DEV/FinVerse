@@ -16,8 +16,6 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { PageHeader } from '@/components/ui/PageHeader';
-import { ProfilePicker } from '@/components/broking/ProfilePicker';
-import { useSodRules } from '@/components/broking/useSodRules';
 import { RowActionMenu } from '@/components/ui/RowActionMenu';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
@@ -99,7 +97,8 @@ const EMPTY: UserInput = { username: '', fullName: '', email: '', roleCodes: [],
  * access (companies and branches, DATA_SCOPE_DESIGN.md) and status; unlock, sessions and data
  * access in the row menu. Creating and changing users is done through access requests
  * ("Raise Request"); the direct edit stays for the System Administrator in an emergency
- * (UAM_DIRECT_ROLE_EDIT).
+ * (UAM_DIRECT_ROLE_EDIT). Group profiles are shown read-only: UIDM-ISC assigns them over the
+ * provisioning interface, and the API refuses a change (ROLES_BY_UIDM).
  */
 /** The profiles a user holds now (none for a new user). */
 function heldRoles(users: readonly UserProfile[] | undefined, id: number | undefined): string[] {
@@ -118,7 +117,6 @@ export default function UsersPage() {
   const [dataAccessOf, setDataAccessOf] = useState<UserProfile | null>(null);
   const [directoryOf, setDirectoryOf] = useState<string | null>(null);
   const users = useQuery({ queryKey: ['users'], queryFn: adminApi.users });
-  const sodRules = useSodRules();
   const onlineUsers = useQuery({
     queryKey: ['online-users'],
     queryFn: authApi.online,
@@ -164,8 +162,6 @@ export default function UsersPage() {
       },
     });
 
-  const setRoles = (roleCodes: string[]) =>
-    editing && setEditing({ ...editing, user: { ...editing.user, roleCodes } });
   const held = heldRoles(users.data, editing?.id);
 
   return (
@@ -389,14 +385,15 @@ export default function UsersPage() {
                 </Field>
               )}
             </div>
-            <ProfilePicker
-              legend="Group Profiles"
-              profiles={roles.data ?? []}
-              selected={editing.user.roleCodes}
-              current={held}
-              rules={sodRules}
-              onChange={setRoles}
-            />
+            <fieldset className="stack" aria-label="Group Profiles">
+              <legend>Group Profiles</legend>
+              <p className="muted">
+                {held.length === 0 ? 'None' : held.map(profileName).join(', ')}
+              </p>
+              <p className="muted">
+                Group profiles are assigned through UIDM-ISC and cannot be changed here.
+              </p>
+            </fieldset>
             <label className="checkbox">
               <input
                 type="checkbox"

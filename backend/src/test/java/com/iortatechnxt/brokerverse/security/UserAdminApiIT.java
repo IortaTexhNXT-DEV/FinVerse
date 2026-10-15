@@ -8,12 +8,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.iortatechnxt.brokerverse.support.Api;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.support.Json;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -24,6 +26,7 @@ class UserAdminApiIT {
 
   @Autowired private Api api;
   @Autowired private MockMvc mvc;
+  @Autowired private JdbcTemplate jdbc;
 
   private static Map<String, Object> user(String username, List<String> roles) {
     return Json.of(
@@ -59,18 +62,28 @@ class UserAdminApiIT {
                     "/api/v1/admin/users",
                     Json.of(
                         "user",
-                        user(username, List.of("ACCOUNTANT")),
+                        user(username, List.of()),
                         "initialPassword",
                         Json.of("newPassword", STRONG)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.roles[0]").value("ACCOUNTANT")));
+                .andExpect(jsonPath("$.roles.length()").value(0)));
     long id = created.get("id").asLong();
+    // Group profiles come from UIDM-ISC (here: seed SQL standing in for it).
+    jdbc.update(
+        "insert into sec_user_role (user_id, role_id) select ?, id from sec_role where code = ?",
+        id,
+        "ACCOUNTANT");
 
     api.doPut(
             "admin", "/api/v1/admin/users/" + id, user(username, List.of("ACCOUNTANT", "AUDITOR")))
-        .andExpect(jsonPath("$.roles.length()").value(2));
-    api.doPut("admin", "/api/v1/admin/users/" + id, user(username, List.of("NO_SUCH_ROLE")))
-        .andExpect(jsonPath("$.code").value("UNKNOWN_ROLE"));
+        .andExpect(status().isUnprocessableEntity())
+        .andExpect(jsonPath("$.code").value("ROLES_BY_UIDM"));
+    api.doPut("admin", "/api/v1/admin/users/" + id, user(username, List.of("ACCOUNTANT")))
+        .andExpect(jsonPath("$.roles[0]").value("ACCOUNTANT"));
+    Map<String, Object> noRoles = new HashMap<>(user(username, List.of()));
+    noRoles.remove("roleCodes");
+    api.doPut("admin", "/api/v1/admin/users/" + id, noRoles)
+        .andExpect(jsonPath("$.roles.length()").value(1));
 
     // LOGIN_MAX_FAILED_ATTEMPTS = 3 (BDOI NFR, V1000): the third failure locks the account.
     for (int i = 0; i < 3; i++) {
@@ -96,7 +109,7 @@ class UserAdminApiIT {
             "/api/v1/admin/users",
             Json.of(
                 "user",
-                user("weakling", List.of("READ_ONLY")),
+                user("weakling", List.of()),
                 "initialPassword",
                 Json.of("newPassword", "short")))
         .andExpect(status().isBadRequest());
@@ -105,14 +118,14 @@ class UserAdminApiIT {
             "/api/v1/admin/users",
             Json.of(
                 "user",
-                user("checker", List.of("READ_ONLY")),
+                user("checker", List.of()),
                 "initialPassword",
                 Json.of("newPassword", STRONG)))
         .andExpect(status().isConflict());
   }
 
   @Test
-  void administratorCannotChangeOwnRoles() throws Exception {
+  void usersScreenRefusesAnyRoleChange() throws Exception {
     long adminId = api.read(api.doGet("admin", "/api/v1/auth/me")).get("id").asLong();
     api.doPut(
             "admin",
@@ -126,7 +139,7 @@ class UserAdminApiIT {
                 List.of("SYSADMIN", "FIN_MANAGER"),
                 "enabled",
                 true))
-        .andExpect(jsonPath("$.code").value("SELF_ROLE_CHANGE"));
+        .andExpect(jsonPath("$.code").value("ROLES_BY_UIDM"));
   }
 
   /**

@@ -45,7 +45,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(propagation = Propagation.MANDATORY)
 public class IdentityUserChanges {
 
-  /** Setting: the group profiles of a UIDM-ISC event are given to the user (option b). */
+  /**
+   * Setting: the group profiles of a UIDM-ISC create / update user event are given to the user
+   * (option b). Kept alongside the MEMBERSHIP events of the groups interface: both come from
+   * UIDM-ISC, the single source of group-profile membership, so they do not conflict (the Users
+   * screen no longer assigns roles). Off by default; with it on, the last event wins.
+   */
   public static final String ROLES_SETTING = "UAM_PROVISIONING_ROLES";
 
   private static final String USER_ID_PATTERN = "USER_ID_PATTERN";

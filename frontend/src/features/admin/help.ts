@@ -18,6 +18,7 @@ export const ADMIN_HELP: HelpSection = {
       controls: [
         'Accounts lock after the number of failed sign-ins set in the parameter LOGIN_MAX_FAILED_ATTEMPTS (a wrong code of the second factor counts too); an administrator unlocks them or resets the password.',
         'The direct create and edit of users is kept for the System Administrator while the emergency path UAM_DIRECT_ROLE_EDIT is open.',
+        'Group profiles are shown read-only: UIDM-ISC assigns them through the provisioning interface, and the Users screen cannot change them.',
         'Every change to a user is recorded in the audit trail and the access change log.',
       ],
     },
@@ -34,7 +35,7 @@ export const ADMIN_HELP: HelpSection = {
       ],
       controls: [
         'An inactive, disabled, locked or deactivated account deactivates the user and ends the open sessions; an active account reactivates the user with the group profiles held before.',
-        'Group profiles come from UIDM-ISC only when the setting UAM_PROVISIONING_ROLES is on.',
+        'UIDM-ISC assigns group profiles through group membership; the create and update user events also carry them when the setting UAM_PROVISIONING_ROLES is on.',
         'Every change is written to the access change log with the source and the UIDM request number.',
       ],
     },

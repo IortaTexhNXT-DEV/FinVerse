@@ -53,6 +53,10 @@ public class UserAdminService {
   private static final String USER_LABEL = "User";
   private static final String ROLE = "Role";
   private static final String ROLES_ATTRIBUTE = "roles";
+
+  /** Error code: the Users screen does not assign group profiles (UIDM-ISC does). */
+  public static final String ROLES_BY_UIDM = "ROLES_BY_UIDM";
+
   private static final String ENABLED_ATTRIBUTE = "enabled";
 
   private final AppUserRepository users;
@@ -166,6 +170,44 @@ public class UserAdminService {
         AuditAction.CREATE,
         "Created user with roles " + request.roleCodes() + requestText(authority));
     return saved;
+  }
+
+  /**
+   * Creates a user from the Users screen: without group profiles, which UIDM-ISC assigns over the
+   * provisioning interface (break-glass and seed accounts get theirs from seed SQL).
+   *
+   * @param request request (no role codes)
+   * @param initialPassword initial password (user must change it)
+   * @return user
+   */
+  public AppUser createUserWithoutRoles(UserRequest request, String initialPassword) {
+    if (request.roleCodes() != null && !request.roleCodes().isEmpty()) {
+      throw rolesByUidm();
+    }
+    return createUser(request.withRoleCodes(Set.of()), initialPassword);
+  }
+
+  /**
+   * Updates a user from the Users screen: data and status, never the group profiles (UIDM-ISC
+   * assigns them). The current role codes may be sent back unchanged.
+   *
+   * @param id id
+   * @param request request
+   * @return user
+   */
+  public AppUser updateUserKeepingRoles(Long id, UserRequest request) {
+    AppUser user =
+        users.findById(id).orElseThrow(() -> new ResourceNotFoundException(USER_LABEL, id));
+    Set<String> held = roleCodes(user);
+    if (request.roleCodes() != null && !request.roleCodes().equals(held)) {
+      throw rolesByUidm();
+    }
+    return updateUser(id, request.withRoleCodes(held));
+  }
+
+  private static BusinessRuleException rolesByUidm() {
+    return new BusinessRuleException(
+        ROLES_BY_UIDM, "Group profiles are assigned through UIDM-ISC, not on the Users screen");
   }
 
   /**

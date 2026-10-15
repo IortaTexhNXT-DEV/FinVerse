@@ -75,7 +75,8 @@ public class UserAdminController {
   }
 
   /**
-   * Creates a user. The initial password is supplied in a separate object and never echoed.
+   * Creates a user without group profiles (UIDM-ISC assigns them; role codes are refused with
+   * {@code ROLES_BY_UIDM}). The initial password is supplied in a separate object and never echoed.
    *
    * @param request user data
    * @return user
@@ -85,11 +86,12 @@ public class UserAdminController {
   @PreAuthorize(USERS)
   public UserProfileResponse create(@Valid @RequestBody CreateUserRequest request) {
     return UserProfileResponse.from(
-        service.createUser(request.user(), request.initialPassword().newPassword()));
+        service.createUserWithoutRoles(request.user(), request.initialPassword().newPassword()));
   }
 
   /**
-   * Updates a user.
+   * Updates a user's data and status; a change of group profiles is refused with {@code
+   * ROLES_BY_UIDM} (UIDM-ISC assigns them).
    *
    * @param id id
    * @param request request
@@ -99,7 +101,7 @@ public class UserAdminController {
   @PreAuthorize(USERS)
   public UserProfileResponse update(
       @PathVariable Long id, @Valid @RequestBody UserRequest request) {
-    return UserProfileResponse.from(service.updateUser(id, request));
+    return UserProfileResponse.from(service.updateUserKeepingRoles(id, request));
   }
 
   /**

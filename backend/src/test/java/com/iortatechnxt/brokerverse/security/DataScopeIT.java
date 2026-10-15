@@ -100,19 +100,21 @@ class DataScopeIT {
                     Json.of(
                         "user",
                         Json.of(
-                            "username",
-                            username,
-                            "fullName",
-                            "Scope " + username,
-                            "roleCodes",
-                            List.of("ACCOUNTANT"),
-                            "enabled",
-                            true),
+                            "username", username, "fullName", "Scope " + username, "enabled", true),
                         "initialPassword",
                         Json.of("newPassword", STRONG)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.allCompanies").value(true)));
-    return created.get("id").asLong();
+    return grant(created.get("id").asLong(), "ACCOUNTANT");
+  }
+
+  /** Group profiles come from UIDM-ISC, not the Users screen: seed SQL stands in for it here. */
+  private long grant(long userId, String role) {
+    jdbc.update(
+        "insert into sec_user_role (user_id, role_id) select ?, id from sec_role where code = ?",
+        userId,
+        role);
+    return userId;
   }
 
   private static String username() {
@@ -254,18 +256,12 @@ class DataScopeIT {
                     Json.of(
                         "user",
                         Json.of(
-                            "username",
-                            narrowAdmin,
-                            "fullName",
-                            "Scope admin",
-                            "roleCodes",
-                            List.of("SYSADMIN"),
-                            "enabled",
-                            true),
+                            "username", narrowAdmin, "fullName", "Scope admin", "enabled", true),
                         "initialPassword",
                         Json.of("newPassword", STRONG))))
             .get("id")
             .asLong();
+    grant(narrowId, "SYSADMIN");
     api.doPut(ADMIN, "/api/v1/admin/users/" + narrowId + "/data-scope", onlyBranchA1())
         .andExpect(status().isOk());
     long target = newUser(username());

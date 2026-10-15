@@ -3,7 +3,6 @@ package com.iortatechnxt.brokerverse.security.api.dto;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
@@ -19,7 +18,8 @@ import java.util.Set;
  * @param email email
  * @param homeBranchId home branch
  * @param authorizationLimit authorization limit (null = unlimited)
- * @param roleCodes roles
+ * @param roleCodes roles (group profiles); the Users screen sends none or the current ones, since
+ *     UIDM-ISC assigns them (null keeps the current roles)
  * @param enabled enabled flag
  * @param windowsId Windows ID used for directory sign-in (unique)
  * @param businessUnitCode business unit group (list of values UAM_BUSINESS_UNIT)
@@ -31,7 +31,7 @@ public record UserRequest(
     @Email @Size(max = 120) String email,
     Long homeBranchId,
     @DecimalMin("0") BigDecimal authorizationLimit,
-    @NotEmpty Set<String> roleCodes,
+    Set<String> roleCodes,
     boolean enabled,
     @Size(max = 50) @Pattern(regexp = "[a-zA-Z0-9.@\\\\_-]*") String windowsId,
     @Size(max = 40) String businessUnitCode,
@@ -67,5 +67,25 @@ public record UserRequest(
         null,
         null,
         null);
+  }
+
+  /**
+   * The same request with other roles.
+   *
+   * @param codes role codes
+   * @return the request
+   */
+  public UserRequest withRoleCodes(Set<String> codes) {
+    return new UserRequest(
+        username,
+        fullName,
+        email,
+        homeBranchId,
+        authorizationLimit,
+        codes,
+        enabled,
+        windowsId,
+        businessUnitCode,
+        userLevel);
   }
 }

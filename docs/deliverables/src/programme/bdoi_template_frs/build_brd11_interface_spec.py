@@ -543,7 +543,7 @@ def write_docx(out_path: Path) -> list[str]:
     ])
     h2("All or Nothing")
     s.para("Group profiles are checked before anything is applied: the profile exists, it is active, the "
-           "profiles of the user break no separation-of-duties rule and combine no conflicting permissions.")
+           "profiles of the user violate no separation-of-duties rule and combine no conflicting permissions.")
     s.bullets([
         "On a joiner or mover with groups: when a check fails, neither the user change nor the group change is "
         "applied.",
@@ -618,13 +618,13 @@ def write_docx(out_path: Path) -> list[str]:
     s.para("Access in BIBS comes only from the group profiles UIDM-ISC gives through the SCIM service. Entra ID "
            "groups and app roles are not read for authorisation. BIBS offers an optional group check at sign-in; "
            "it stays off for BDOI.")
-    h2("Leavers and Break-glass Accounts")
+    h2("Leavers and Local Passwords")
     s.bullets([
         "A leaver or a disabled user is deactivated in BIBS by the SCIM call. A later sign-in is refused even "
         "when Entra ID still issues a token.",
         "A user unknown to BIBS is refused. No account is created at sign-in.",
-        "Named break-glass System Administrators keep a local password with a second factor, for use when Entra "
-        "ID is unavailable (OP-10).",
+        "Every user signs in through Microsoft Entra ID, System Administrators included. Local passwords exist "
+        "only for test accounts in DEV, SIT and UAT. Production refuses sign-in with a local password.",
     ])
 
     # 12 ------------------------------------------------------------------------------------------- NFR

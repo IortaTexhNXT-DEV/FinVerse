@@ -385,7 +385,7 @@ ACTORS = [
     ("BIBS", "BDO Insure Brokering System", "SCIM service provider for Users and Groups; OpenID Connect "
      "client; keeps the identity event log, the access change log and the audit trail."),
     ("BIBS System Administrator", "BDOI user of BIBS", "Reviews refused events and reconciliation mismatches in "
-     "Identity Synchronisation; keeps a break-glass password."),
+     "Identity Synchronisation. Signs in through Microsoft Entra ID like every user."),
     ("Requester, approver, certifier", "BDOI users", "Work in UIDM-ISC only."),
 ]
 
@@ -483,8 +483,6 @@ OPEN_POINTS = [
      "UIDM-ISC team", "Before UAT"),
     ("OP-09", "Network path and allow-listing between the gateway and BIBS; TLS certificates", "BDOI IT",
      "Before SIT connection"),
-    ("OP-10", "Names of the break-glass System Administrators who keep a local password", "BDOI Information "
-     "Security", "Before production"),
 ]
 
 GLOSSARY = [
@@ -492,8 +490,8 @@ GLOSSARY = [
      "the UIDM request number"),
     ("AD status", "Status of the account in the directory: ACTIVE, INACTIVE, LOCKED, DISABLED or DEACTIVATED"),
     ("API gateway", "BDOI component that authenticates UIDM-ISC, issues its token and forwards the calls"),
-    ("Break-glass administrator", "Named System Administrator who keeps a local password with a second factor "
-     "for use when single sign-on is unavailable"),
+    ("Local password", "Password kept in BIBS; only for test accounts in DEV, SIT and UAT. Production refuses "
+     "sign-in with a local password"),
     ("Entra ID", "Microsoft Entra ID, the BDO enterprise identity provider (EIAM)"),
     ("Group profile", "BIBS role: a named set of permissions given to users"),
     ("Identity event", "One call of UIDM-ISC as recorded in BIBS with its type and outcome"),

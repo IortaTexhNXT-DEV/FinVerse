@@ -229,6 +229,7 @@ datasets:
   - {code: SBM_LIMIT_RULE, name: Insurer limit rules, group: RENEWAL_SUBMITTED, module: submitted, table: sbm_limit_rule, key: [company_id, insurer_code, segment, line, attribute]}
   - {code: SBM_APPROVAL_MATRIX, name: Approval matrix of submitted policies, group: RENEWAL_SUBMITTED, module: submitted, table: sbm_approval_matrix, key: [company_id, document, segment, tsi_from, level], userColumns: [approver_username]}
   - {code: SBM_NOMINATED_RATE, name: Nominated rates of the insurers, group: RENEWAL_SUBMITTED, module: submitted, table: sbm_nominated_rate, key: [company_id, segment, vehicle_type, insurer_code, effective_from]}
+  - {code: SBM_NOTIFICATION_RECIPIENT, name: Notification recipients of submitted policies, group: RENEWAL_SUBMITTED, module: submitted, table: sbm_notification_recipient, key: [company_id, event_code, segment, recipient_type, recipient]}
   - {code: SBM_USER_SCOPE, name: Segments of the submitted policy users, group: USERS, module: submitted, table: sbm_user_scope, key: [company_id, username], users: true}
 
   # ---------- Claims and employee benefits rules ---------------------------------------------------
@@ -287,6 +288,7 @@ datasets:
   - {code: SEC_ROLE, name: Group profiles, group: SECURITY, module: security, table: sec_role, key: [code], exclude: [deactivated_at, deactivated_by]}
   - {code: SEC_ROLE_PERMISSION, name: Permission grants of the group profiles, group: SECURITY, module: security, table: sec_role_permission, key: [role_id, permission], parent: role_id}
   - {code: SEC_PERMISSION_ACTION, name: Action classes of the permissions, group: SECURITY, module: security, table: sec_permission_action, key: [permission, action]}
+  - {code: SYS_ROLE_HOME, name: Home page widgets of the group profiles, group: SECURITY, module: system, table: sys_role_home, key: [role_code], exclude: [pending_widgets, pending_reason, pending_by, pending_at]}
   - {code: NBA_SOD_RULE, name: Separation-of-duties rules, group: SECURITY, module: nbadmin, table: nba_sod_rule, key: [rule_code]}
 
   # ---------- Users (optional, off by default) -----------------------------------------------------

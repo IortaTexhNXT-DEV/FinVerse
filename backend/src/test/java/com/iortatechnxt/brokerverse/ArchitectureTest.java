@@ -136,6 +136,29 @@ final class ArchitectureTest {
           call ->
               "now".equals(call.getName()) && DATE_TYPES.contains(call.getTargetOwner().getName()));
 
+  /** Text SQL run without bound parameters, or a sort taken unchecked into the query text. */
+  private static final DescribedPredicate<JavaMethodCall> UNBOUND_SQL_CALL =
+      DescribedPredicate.describe(
+          "Statement.execute*/addBatch(String), Connection.createStatement or JpaSort.unsafe",
+          call -> {
+            String owner = call.getTargetOwner().getName();
+            String name = call.getName();
+            return switch (owner) {
+              case "java.sql.Statement" -> name.startsWith("execute") || "addBatch".equals(name);
+              case "java.sql.Connection" -> "createStatement".equals(name);
+              case "org.springframework.data.jpa.domain.JpaSort" -> "unsafe".equals(name);
+              default -> false;
+            };
+          });
+
+  private static final ArchRule SQL_VALUES_ARE_BOUND_PARAMETERS =
+      noClasses()
+          .should()
+          .callMethodWhere(UNBOUND_SQL_CALL)
+          .because(
+              "values reach SQL as bound parameters (PreparedStatement, JdbcTemplate arguments,"
+                  + " named parameters) and sort keys through a whitelist, never as query text");
+
   private static final ArchRule BUSINESS_DATES_COME_FROM_THE_BUSINESS_CLOCK =
       noClasses()
           .that()
@@ -278,6 +301,11 @@ final class ArchitectureTest {
   @Test
   void businessDatesComeFromTheBusinessClock() {
     BUSINESS_DATES_COME_FROM_THE_BUSINESS_CLOCK.check(classes);
+  }
+
+  @Test
+  void sqlValuesAreBoundParameters() {
+    SQL_VALUES_ARE_BOUND_PARAMETERS.check(classes);
   }
 
   @Test

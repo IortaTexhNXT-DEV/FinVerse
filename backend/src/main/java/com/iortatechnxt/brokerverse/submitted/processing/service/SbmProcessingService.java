@@ -176,7 +176,7 @@ public class SbmProcessingService {
           new Notice(
               "Processing run " + run.getRunNo() + ": " + run.getFallout() + " in fallout",
               "Open the run to resolve the fallout.",
-              "/submitted/runs/" + run.getId(),
+              "/submitted/runs",
               RUN_ENTITY,
               run.getRunNo()),
           SubmittedCodes.EVT_FALLOUT);

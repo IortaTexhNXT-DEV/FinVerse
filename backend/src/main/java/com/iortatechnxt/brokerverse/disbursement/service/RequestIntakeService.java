@@ -262,7 +262,7 @@ public class RequestIntakeService {
         new Notice(
             "Payment request " + r.getRequestNo() + ": payee not maintained",
             reason,
-            "/disbursement/requests",
+            "/disbursement?tab=NO_PAYEE",
             DisbursementSettings.REQUEST,
             r.getRequestNo());
     notifications.notifyPermission(DisbursementSettings.PAYEE_MAINTAIN, notice);

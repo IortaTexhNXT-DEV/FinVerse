@@ -1,4 +1,4 @@
-import { api, toQuery } from './client';
+import { api } from './client';
 import type { LoginResponse } from './types';
 
 /** An enrolment of an authenticator app in progress. */
@@ -28,34 +28,7 @@ export interface MyMfaStatus {
   rememberDeviceDays: number;
 }
 
-/** A user and the state of the second factor (administrators). */
-export interface UserSecondFactor {
-  username: string;
-  fullName: string;
-  enabled: boolean;
-  privileged: boolean;
-  enrolled: boolean;
-  enrolledAt?: string;
-  lastUsedAt?: string;
-  resetPending: boolean;
-}
-
-export type MfaResetStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'WITHDRAWN';
-
-/** A request to reset a user's second factor (four eyes). */
-export interface MfaResetRequest {
-  id: number;
-  username: string;
-  reason: string;
-  status: MfaResetStatus;
-  requestedBy: string;
-  requestedAt: string;
-  decidedBy?: string;
-  decidedAt?: string;
-  decisionNote?: string;
-}
-
-/** The second factor: the sign-in step, My Profile and the administrators' reset. */
+/** The second factor of the local test accounts: the sign-in step and My Profile. */
 export const mfaApi = {
   verify: (challenge: string, code: string, rememberDevice: boolean) =>
     api.post<LoginResponse>('/auth/mfa/verify', { challenge, code, rememberDevice }),
@@ -67,13 +40,4 @@ export const mfaApi = {
   startMine: () => api.post<MfaEnrolment>('/auth/mfa/me/enrolment/start'),
   confirmMine: (code: string) => api.post<MfaEnrolled>('/auth/mfa/me/enrolment/confirm', { code }),
   newRecoveryCodes: (code: string) => api.post<string[]>('/auth/mfa/me/recovery-codes', { code }),
-  users: () => api.get<UserSecondFactor[]>('/admin/mfa/users'),
-  resetRequests: (status?: MfaResetStatus) =>
-    api.get<MfaResetRequest[]>(`/admin/mfa/reset-requests${toQuery({ status })}`),
-  requestReset: (username: string, reason: string) =>
-    api.post<MfaResetRequest>('/admin/mfa/reset-requests', { username, reason }),
-  approveReset: (id: number) =>
-    api.post<MfaResetRequest>(`/admin/mfa/reset-requests/${id}/approve`),
-  rejectReset: (id: number, reason: string) =>
-    api.post<MfaResetRequest>(`/admin/mfa/reset-requests/${id}/reject`, { reason }),
 };

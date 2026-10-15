@@ -61,7 +61,7 @@ const PROFILES = [
   profile('SYSADMIN', 'System Administrator', ['USER_MANAGE', 'ROLE_MANAGE', 'LOV_MANAGE'], {
     privilegeLevel: 'ADMIN',
   }),
-  profile('INFOSEC', 'Information Security Officer', ['AUDIT_VIEW', 'MFA_RESET_APPROVE']),
+  profile('INFOSEC', 'Information Security Officer', ['AUDIT_VIEW', 'SECURITY_PARAMETER_APPROVE']),
   profile('OLD', 'Old Profile', ['CLIENT_MAINTAIN'], { active: false }),
 ];
 

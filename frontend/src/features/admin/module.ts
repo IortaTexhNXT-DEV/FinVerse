@@ -6,7 +6,6 @@ import {
   FileLock,
   FolderSync,
   History,
-  KeyRound,
   LayoutDashboard,
   Server,
   ShieldCheck,
@@ -42,15 +41,6 @@ export const adminModule: FeatureModule = {
       icon: ShieldCheck,
       permission: 'ROLE_MANAGE',
       component: lazyWithRetry(() => import('./RolesPage')),
-    },
-    {
-      path: '/admin/second-factor',
-      label: 'Second Factor',
-      icon: KeyRound,
-      permission: 'MFA_RESET',
-      // The approvers of a reset open the screen to approve it.
-      alsoPermissions: ['MFA_RESET_APPROVE'],
-      component: lazyWithRetry(() => import('./SecondFactorPage')),
     },
     {
       path: '/admin/audit',

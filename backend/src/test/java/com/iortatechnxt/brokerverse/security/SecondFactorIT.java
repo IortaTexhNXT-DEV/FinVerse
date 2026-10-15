@@ -17,7 +17,6 @@ import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.time.Instant;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
@@ -216,45 +215,6 @@ class SecondFactorIT {
     assertThat(login(privileged).get("accessToken").asText()).isNotBlank();
     setPolicy("SOMETHING_ELSE");
     assertThat(login(standard).get("mfaStep").asText()).isEqualTo("ENROL");
-  }
-
-  @Test
-  void anAdministratorResetNeedsASecondAdministrator() throws Exception {
-    String username = newUser("AUDITOR");
-    enrol(username);
-    String approver = "infosec";
-    Map<String, Object> body = new HashMap<>();
-    body.put("username", username);
-    body.put("reason", "Phone lost");
-    JsonNode request =
-        api.read(
-            api.doPost("admin", "/api/v1/admin/mfa/reset-requests", body)
-                .andExpect(status().isCreated()));
-    long id = request.get("id").asLong();
-    api.doPost("admin", "/api/v1/admin/mfa/reset-requests", body)
-        .andExpect(jsonPath("$.code").value("MFA_RESET_PENDING"));
-    api.doPost("admin", "/api/v1/admin/mfa/reset-requests/" + id + "/approve", null)
-        .andExpect(status().isForbidden());
-    // An approver gives the reason of a rejection.
-    api.doPost(approver, "/api/v1/admin/mfa/reset-requests/" + id + "/reject", Map.of())
-        .andExpect(jsonPath("$.code").value("REASON_REQUIRED"));
-    api.doGet(approver, "/api/v1/admin/mfa/users")
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$[?(@.username == '" + username + "')].resetPending").value(true));
-    api.doPost(approver, "/api/v1/admin/mfa/reset-requests/" + id + "/approve", null)
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.status").value("APPROVED"));
-    assertThat(
-            jdbc.queryForObject(
-                "select count(*) from sec_user_mfa where username = ?", Integer.class, username))
-        .isZero();
-    assertThat(login(username).get("mfaStep").asText()).isEqualTo("ENROL");
-    assertThat(
-            jdbc.queryForObject(
-                "select count(*) from audit_log where entity_id = ? and summary like"
-                    + " 'Approved the reset of the second factor%'",
-                Integer.class, username))
-        .isEqualTo(1);
   }
 
   private static byte[] base32(String text) {

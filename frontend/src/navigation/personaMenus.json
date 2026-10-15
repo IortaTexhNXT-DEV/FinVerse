@@ -163,7 +163,6 @@
           "permissions": [
             "AUDIT_VIEW",
             "FILE_QUARANTINE_VIEW",
-            "MFA_RESET_APPROVE",
             "MODULE_SWITCH_APPROVE",
             "REPORT_VIEW",
             "ROLE_HOME_APPROVE",

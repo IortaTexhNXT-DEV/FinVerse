@@ -217,15 +217,15 @@ class ScreeningUserAccessFoundationIT {
                 String.class))
         .contains("SCR_CASE_ASSIGNED", "SCR_NO_POLICY_HIT", "UAM_REQUEST_TO_APPROVE")
         // + PASSWORD_EXPIRY_NOTICE (U1-B, V1063); + the dormant-user, security setting and
-        // separation-of-duties notices (V1065); + the second factor reset notices
-        // MFA_RESET_TO_APPROVE and MFA_RESET_DONE (V1181)
-        .contains("MFA_RESET_TO_APPROVE", "MFA_RESET_DONE")
+        // separation-of-duties notices (V1065); the second factor reset notices of V1181 went in
+        // V2825 (Microsoft Entra ID keeps the second factor)
+        .doesNotContain("MFA_RESET_TO_APPROVE", "MFA_RESET_DONE")
         // + the refused identity event notice (V2702; the break-glass notice went in V2822)
         .contains("UAM_IDENTITY_REFUSED")
         .doesNotContain("UAM_BREAK_GLASS_SIGN_IN")
         // + the identity reconciliation mismatch notice (V2824)
         .contains("UAM_RECONCILIATION_MISMATCH")
-        .hasSize(26);
+        .hasSize(24);
     assertThat(
             jdbc.queryForList(
                 "select record_type from nba_retention_rule where years_online = 5"

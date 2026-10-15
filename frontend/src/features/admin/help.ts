@@ -54,21 +54,6 @@ export const ADMIN_HELP: HelpSection = {
       ],
     },
     {
-      name: 'Second Factor',
-      path: '/admin/second-factor',
-      summary:
-        'The authenticator app of each user (the second factor asked after the password): whether it is set up, when it was last used and whether the user holds a privileged role. Who must use it is the parameter MFA_POLICY (all users, privileged users or off).',
-      workflow: [
-        'Request Reset on a user whose phone is lost or replaced, with the reason.',
-        'Another administrator approves or rejects the reset in the table of resets waiting for approval (or in My Approvals).',
-        'Once approved, the app and the recovery codes are removed, the user is signed out and sets the app up again at the next sign-in.',
-      ],
-      controls: [
-        'The requester never approves the reset; nobody approves the reset of their own second factor.',
-        'Requests, approvals and rejections are recorded in the audit trail.',
-      ],
-    },
-    {
       name: 'Audit Trail',
       path: '/admin/audit',
       summary:

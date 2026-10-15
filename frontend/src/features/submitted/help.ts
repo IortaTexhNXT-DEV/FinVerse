@@ -169,11 +169,15 @@ export const SUBMITTED_HELP: HelpSection = {
       name: 'Submitted Policies Setup',
       path: '/submitted/setup',
       summary:
-        'Rule sets of the processing steps, insurer limits, insurer assignment, letter rules, the approval matrix, the source register, the legacy status map and the user scopes.',
+        'Rule sets of the processing steps, insurer limits, insurer assignment, letter rules, the approval matrix, the notification recipients, the source register, the legacy status map and the user scopes.',
       workflow: [
         'Changes wait for a checker; a rule set is submitted and approved before it applies.',
+        'Notification Recipients: for an event (nearing expiry, renewal started, ready for placement, placed, hold cover of an unbooked renewal) and a segment (blank for all), choose who is told - every user of a role, a named user, the assigned handler, the account officer, an outside e-mail address of the bank counterpart - or Nobody to switch the event off.',
       ],
-      controls: ['The maker cannot approve a change.'],
+      controls: [
+        'The maker cannot approve a change.',
+        'An event without an approved recipient tells the handler and the account officer of the record; users are told in the app and by e-mail as each chose in the notification preferences.',
+      ],
     },
   ],
 };

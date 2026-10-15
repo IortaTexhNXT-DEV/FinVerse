@@ -21,6 +21,7 @@ import com.iortatechnxt.brokerverse.submitted.domain.SbmIaafReview;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmLimitRule;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmLoan;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmMarks;
+import com.iortatechnxt.brokerverse.submitted.domain.SbmNotificationRecipient;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmPolicy;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmPolicyData;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmPolicyStatus;
@@ -41,6 +42,7 @@ import com.iortatechnxt.brokerverse.submitted.review.service.ReviewSlaCheck;
 import com.iortatechnxt.brokerverse.submitted.review.service.TorService;
 import com.iortatechnxt.brokerverse.submitted.service.SubmittedRetentionProvider;
 import com.iortatechnxt.brokerverse.submitted.service.port.RenewalHandOff;
+import com.iortatechnxt.brokerverse.submitted.setup.service.NotificationRecipientService;
 import com.iortatechnxt.brokerverse.submitted.setup.service.SetupService;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
@@ -54,6 +56,7 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  * Submitted Policies (BRD-12): intake into the masterlist, a processing run with its step results
@@ -78,6 +81,8 @@ class SubmittedPoliciesIT {
   @Autowired private RenewalCandidateRepository candidates;
   @Autowired private HandlingFeeService fees;
   @Autowired private SetupService setup;
+  @Autowired private NotificationRecipientService recipients;
+  @Autowired private JdbcTemplate jdbc;
   @Autowired private ReportService reports;
   @Autowired private SubmittedRetentionProvider retention;
   @Autowired private ReviewSlaCheck sla;
@@ -251,6 +256,77 @@ class SubmittedPoliciesIT {
         .contains(f.getFeeNo());
     SbmHandlingFee cancelled = as.run("sbmfee", () -> fees.cancel(f.getId(), "Billed twice"));
     assertThat(cancelled.getStatus()).isEqualTo(SbmHandlingFee.CANCELLED);
+  }
+
+  private SbmNotificationRecipient recipient(String type, String who) {
+    SbmNotificationRecipient r =
+        as.run(
+            TL,
+            () ->
+                recipients.save(
+                    company(),
+                    null,
+                    new SbmNotificationRecipient.Row(
+                        "SBM_RENEWAL_STARTED", "NONCBG_RETAIL", type, who, "IT")));
+    as.run("mkttl", () -> setup.authorize("RECIPIENT", r.getId()));
+    return r;
+  }
+
+  private int told(String user, String sbmNo) {
+    Integer n =
+        jdbc.queryForObject(
+            "select count(*) from msg_notification where lower(recipient) = ? and title = ?",
+            Integer.class,
+            user,
+            "Renewal of " + sbmNo + " started");
+    return n == null ? 0 : n;
+  }
+
+  @Test
+  void theRecipientsSetUpForAnEventAreToldOfIt() {
+    assertThatThrownBy(() -> recipient("ROLE", "NO_SUCH_ROLE"))
+        .isInstanceOf(BusinessRuleException.class)
+        .hasMessage("No active role NO_SUCH_ROLE");
+    assertThatThrownBy(() -> recipient("EMAIL", "not-an-address"))
+        .isInstanceOf(BusinessRuleException.class);
+    // Pending approval, a recipient is not used yet.
+    SbmNotificationRecipient pending =
+        as.run(
+            TL,
+            () ->
+                recipients.save(
+                    company(),
+                    null,
+                    new SbmNotificationRecipient.Row(
+                        "SBM_RENEWAL_STARTED", null, "USER", "sanitation", null)));
+    assertThat(pending.getRecordStatus()).isNotEqualTo(RecordStatus.ACTIVE);
+    List<SbmNotificationRecipient> made =
+        List.of(
+            recipient("USER", "mkttl"),
+            recipient("HANDLER", null),
+            recipient("EMAIL", "counterpart@bank.example.ph"));
+    try {
+      SbmPolicy p = processed(intake("NONCBG_RETAIL", pn("PN-N"), "INS-LAC", "900000"));
+      as.run(TL, () -> handOff.renewByHand(p.getId()));
+      assertThat(told("mkttl", p.getSbmNo())).isEqualTo(1);
+      assertThat(told("sanitation", p.getSbmNo())).isZero();
+      assertThat(
+              jdbc.queryForObject(
+                  "select count(*) from msg_outbound where purpose = 'SBM_RENEWAL_STARTED'"
+                      + " and recipients like '%counterpart@bank.example.ph%'",
+                  Integer.class))
+          .isPositive();
+
+      // Switched off for the segment, the event tells nobody.
+      SbmNotificationRecipient off = recipient("OFF", null);
+      SbmPolicy q = processed(intake("NONCBG_RETAIL", pn("PN-O"), "INS-LAC", "900000"));
+      as.run(TL, () -> handOff.renewByHand(q.getId()));
+      assertThat(told("mkttl", q.getSbmNo())).isZero();
+      as.run(TL, () -> setup.deactivate("RECIPIENT", off.getId()));
+    } finally {
+      made.forEach(r -> as.run(TL, () -> setup.deactivate("RECIPIENT", r.getId())));
+      as.run(TL, () -> setup.deactivate("RECIPIENT", pending.getId()));
+    }
   }
 
   @Test

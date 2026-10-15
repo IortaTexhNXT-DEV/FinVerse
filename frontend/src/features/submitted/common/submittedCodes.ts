@@ -17,6 +17,25 @@ export const SBM_LOV = {
   returnReason: 'SBM_RETURN_REASON',
 } as const;
 
+/** The lifecycle events whose recipients are set up on Notification Recipients (FR-SP-082). */
+export const SBM_RECIPIENT_EVENTS: Record<string, string> = {
+  SBM_EXPIRY_NEAR: 'Submitted policy nearing expiry',
+  SBM_RENEWAL_STARTED: 'Renewal of a submitted policy started',
+  SBM_PLACEMENT_READY: 'Renewal ready for placement',
+  SBM_PLACEMENT_SENT: 'Renewal placed with the insurer',
+  SBM_HOLD_COVER_UNBOOKED: 'Hold cover of an unbooked renewal',
+};
+
+/** Who a recipient row tells. */
+export const SBM_RECIPIENT_TYPES: Record<string, string> = {
+  ROLE: 'Every user of a role',
+  USER: 'Named user',
+  HANDLER: 'Assigned handler',
+  AO: 'Account officer',
+  EMAIL: 'Outside e-mail address (bank counterpart)',
+  OFF: 'Nobody (event switched off)',
+};
+
 /** Masterlist tabs (design section 12). */
 export const MASTERLIST_TABS: readonly { id: MasterlistTab; label: string }[] = [
   { id: 'ALL', label: 'All' },

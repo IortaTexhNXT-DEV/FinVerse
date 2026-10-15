@@ -1,6 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
 import { submittedApi } from '@/api/submitted';
-import type { Controlled, InsurerRule, LetterRule, LimitRule, MatrixRow } from '@/api/submitted';
+import type {
+  Controlled,
+  InsurerRule,
+  LetterRule,
+  LimitRule,
+  MatrixRow,
+  RecipientRow,
+} from '@/api/submitted';
 import { InsurerName, LovLabel } from '@/components/broking/LovLabel';
 import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
@@ -10,7 +17,13 @@ import { Tabs } from '@/components/ui/Tabs';
 import { useTabParam } from '@/components/ui/useTabParam';
 import { UserName } from '@/components/ui/UserName';
 import { formatAmount, humanize } from '@/utils/format';
-import { SBM_LOV, SOURCE_LABELS, SUBMITTED_SECTION } from '../common/submittedCodes';
+import {
+  SBM_LOV,
+  SBM_RECIPIENT_EVENTS,
+  SBM_RECIPIENT_TYPES,
+  SOURCE_LABELS,
+  SUBMITTED_SECTION,
+} from '../common/submittedCodes';
 import { ControlledTable } from './ControlledTable';
 import { RuleSets } from './RuleSets';
 import { Scopes } from './Scopes';
@@ -22,6 +35,7 @@ const TABS = [
   { id: 'insurers', label: 'Insurer Assignment' },
   { id: 'letters', label: 'Letter Rules' },
   { id: 'matrix', label: 'Approval Matrix' },
+  { id: 'recipients', label: 'Notification Recipients' },
   { id: 'sources', label: 'Sources' },
   { id: 'scopes', label: 'User Scopes' },
 ] as const;
@@ -32,6 +46,14 @@ const money = (v: number | null) => (v === null ? '—' : formatAmount(v));
 
 const limitOf = (r: Controlled<LimitRule>) => r.limits ?? r.row;
 const rowOf = <T,>(r: Controlled<T>) => r.row ?? r.limits;
+
+/** The role, user or address a recipient row names. */
+function RecipientName({ row }: Readonly<{ row: RecipientRow | undefined }>) {
+  if (row?.recipient === undefined || row.recipient === null) {
+    return <>—</>;
+  }
+  return row.recipientType === 'USER' ? <UserName login={row.recipient} /> : <>{row.recipient}</>;
+}
 
 function Body({ tab }: Readonly<{ tab: TabId }>) {
   const sources = useQuery({
@@ -186,6 +208,45 @@ function Body({ tab }: Readonly<{ tab: TabId }>) {
                   '—'
                 ),
             },
+          ]}
+        />
+      );
+    case 'recipients':
+      return (
+        <ControlledTable<RecipientRow>
+          kind="recipients"
+          title="New Notification Recipient"
+          load={submittedApi.recipients}
+          columns={[
+            {
+              key: 'event',
+              header: 'Event',
+              render: (r) => {
+                const code = rowOf(r)?.eventCode ?? '';
+                return SBM_RECIPIENT_EVENTS[code] ?? code;
+              },
+            },
+            {
+              key: 'segment',
+              header: 'Segment',
+              render: (r) => (
+                <LovLabel type={SBM_LOV.segment} code={rowOf(r)?.segment} empty="All" />
+              ),
+            },
+            {
+              key: 'type',
+              header: 'Recipient',
+              render: (r) => {
+                const type = rowOf(r)?.recipientType ?? '';
+                return SBM_RECIPIENT_TYPES[type] ?? type;
+              },
+            },
+            {
+              key: 'who',
+              header: 'Role, User or Address',
+              render: (r) => <RecipientName row={rowOf(r)} />,
+            },
+            { key: 'desc', header: 'Description', render: (r) => rowOf(r)?.description ?? '—' },
           ]}
         />
       );

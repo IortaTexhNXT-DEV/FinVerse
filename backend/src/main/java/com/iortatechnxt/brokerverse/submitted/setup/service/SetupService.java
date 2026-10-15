@@ -17,6 +17,7 @@ import com.iortatechnxt.brokerverse.submitted.domain.SbmLetterRule;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmLetterRuleRepository;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmLimitRule;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmLimitRuleRepository;
+import com.iortatechnxt.brokerverse.submitted.domain.SbmNotificationRecipientRepository;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmPolicyStatus;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmSource;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmSourceRepository;
@@ -35,10 +36,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Submitted Policies Setup (FRS section 9.3): the limit rules, insurer rules, letter rules and
- * approval matrix levels with maker and checker ({@code SBM_RULE_MAINTAIN}, {@code
- * SBM_RULE_APPROVE}), and the source register, legacy status map and user scopes maintained
- * directly. Every change is audited.
+ * Submitted Policies Setup (FRS section 9.3): the limit rules, insurer rules, letter rules,
+ * approval matrix levels and notification recipients with maker and checker ({@code
+ * SBM_RULE_MAINTAIN}, {@code SBM_RULE_APPROVE}), and the source register, legacy status map and
+ * user scopes maintained directly. Every change is audited.
  */
 @Service
 @Transactional
@@ -55,6 +56,7 @@ public class SetupService {
   private final SbmSourceRepository sources;
   private final SbmStatusMapRepository statusMap;
   private final SbmUserScopeRepository scopes;
+  private final SbmNotificationRecipientRepository recipients;
   private final LovService lovs;
   private final AuditTrailService audit;
   private final CurrentUser currentUser;
@@ -70,6 +72,7 @@ public class SetupService {
    * @param sources sources
    * @param statusMap legacy status map
    * @param scopes user scopes
+   * @param recipients notification recipients
    * @param lovs lists of values
    * @param audit audit trail
    * @param currentUser current user
@@ -84,6 +87,7 @@ public class SetupService {
       SbmSourceRepository sources,
       SbmStatusMapRepository statusMap,
       SbmUserScopeRepository scopes,
+      SbmNotificationRecipientRepository recipients,
       LovService lovs,
       AuditTrailService audit,
       CurrentUser currentUser,
@@ -95,6 +99,7 @@ public class SetupService {
     this.sources = sources;
     this.statusMap = statusMap;
     this.scopes = scopes;
+    this.recipients = recipients;
     this.lovs = lovs;
     this.audit = audit;
     this.currentUser = currentUser;
@@ -252,7 +257,7 @@ public class SetupService {
   /**
    * Approves a pending record of a kind (not by its maker).
    *
-   * @param kind LIMIT, INSURER, LETTER or MATRIX
+   * @param kind LIMIT, INSURER, LETTER, MATRIX or RECIPIENT
    * @param id record
    * @return the record
    */
@@ -267,7 +272,7 @@ public class SetupService {
   /**
    * Deactivates a record of a kind.
    *
-   * @param kind LIMIT, INSURER, LETTER or MATRIX
+   * @param kind LIMIT, INSURER, LETTER, MATRIX or RECIPIENT
    * @param id record
    * @return the record
    */
@@ -286,6 +291,7 @@ public class SetupService {
           case "INSURER" -> insurers;
           case "LETTER" -> letters;
           case "MATRIX" -> matrix;
+          case "RECIPIENT" -> recipients;
           default -> throw new BusinessRuleException("SBM_SETUP_KIND", "Unknown setup record");
         };
     return repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Setup record", id));

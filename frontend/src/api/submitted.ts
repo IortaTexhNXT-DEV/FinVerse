@@ -30,6 +30,7 @@ import type {
   LetterView,
   LimitRule,
   MatrixRow,
+  RecipientRow,
   NoTouchBatch,
   NoTouchLine,
   PrintBatchView,
@@ -210,8 +211,10 @@ export const submittedApi = {
     api.get<Controlled<LetterRule>[]>(`${B}/setup/letters${co(companyId)}`),
   matrix: (companyId: number) =>
     api.get<Controlled<MatrixRow>[]>(`${B}/setup/matrix${co(companyId)}`),
+  recipients: (companyId: number) =>
+    api.get<Controlled<RecipientRow>[]>(`${B}/setup/recipients${co(companyId)}`),
   saveSetup: (
-    kind: 'limits' | 'insurers' | 'letters' | 'matrix',
+    kind: 'limits' | 'insurers' | 'letters' | 'matrix' | 'recipients',
     companyId: number,
     body: unknown,
   ) => api.post<{ id: number }>(`${B}/setup/${kind}${co(companyId)}`, body),

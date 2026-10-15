@@ -244,6 +244,17 @@ export interface InsurerRule {
   description: string | null;
 }
 
+/** A recipient of a lifecycle event of submitted policies (Notification Recipients, FR-SP-082). */
+export interface RecipientRow {
+  eventCode: string;
+  /** Segment, null for every segment. */
+  segment: string | null;
+  recipientType: 'ROLE' | 'USER' | 'HANDLER' | 'AO' | 'EMAIL' | 'OFF';
+  /** Role code, user name or e-mail address; null for HANDLER, AO and OFF. */
+  recipient: string | null;
+  description: string | null;
+}
+
 export interface LetterRule {
   letterType: string;
   segment: string | null;

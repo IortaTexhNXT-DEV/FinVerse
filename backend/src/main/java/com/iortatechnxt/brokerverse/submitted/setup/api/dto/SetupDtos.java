@@ -5,6 +5,7 @@ import com.iortatechnxt.brokerverse.submitted.domain.SbmApprovalMatrix;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmInsurerRule;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmLetterRule;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmLimitRule;
+import com.iortatechnxt.brokerverse.submitted.domain.SbmNotificationRecipient;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmPolicyStatus;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmSource;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmStatusMap;
@@ -286,4 +287,32 @@ public final class SetupDtos {
    * @param control state
    */
   public record ControlView(Long id, Control control) {}
+
+  /**
+   * A notification recipient.
+   *
+   * @param id id
+   * @param row recipient
+   * @param control maker-checker state
+   */
+  public record RecipientView(Long id, SbmNotificationRecipient.Row row, Control control) {
+
+    /**
+     * Maps a recipient.
+     *
+     * @param r recipient
+     * @return view
+     */
+    public static RecipientView from(SbmNotificationRecipient r) {
+      return new RecipientView(
+          r.getId(),
+          new SbmNotificationRecipient.Row(
+              r.getEventCode(),
+              r.getSegment(),
+              r.getRecipientType(),
+              r.getRecipient(),
+              r.getDescription()),
+          Control.of(r));
+    }
+  }
 }

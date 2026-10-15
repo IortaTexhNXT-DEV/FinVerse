@@ -1,8 +1,8 @@
 import type { FormField } from './RowForm';
-import { SBM_LOV } from '../common/submittedCodes';
+import { SBM_LOV, SBM_RECIPIENT_EVENTS, SBM_RECIPIENT_TYPES } from '../common/submittedCodes';
 
 /** A setup record kind kept with maker and checker. */
-export type Kind = 'limits' | 'insurers' | 'letters' | 'matrix';
+export type Kind = 'limits' | 'insurers' | 'letters' | 'matrix' | 'recipients';
 
 /** The fields of a new setup record of each kind. */
 export const FORMS: Record<Kind, readonly FormField[]> = {
@@ -66,5 +66,24 @@ export const FORMS: Record<Kind, readonly FormField[]> = {
       required: true,
     },
     { key: 'signatoryTitle', label: 'Signatory Title', kind: 'text', required: true },
+  ],
+  recipients: [
+    {
+      key: 'eventCode',
+      label: 'Event',
+      kind: 'choice',
+      choices: SBM_RECIPIENT_EVENTS,
+      required: true,
+    },
+    { key: 'segment', label: 'Segment', kind: 'lov', lov: SBM_LOV.segment },
+    {
+      key: 'recipientType',
+      label: 'Recipient',
+      kind: 'choice',
+      choices: SBM_RECIPIENT_TYPES,
+      required: true,
+    },
+    { key: 'recipient', label: 'Role Code, User ID or E-mail Address', kind: 'text' },
+    { key: 'description', label: 'Description', kind: 'text' },
   ],
 };

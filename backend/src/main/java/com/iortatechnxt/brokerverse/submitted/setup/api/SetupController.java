@@ -5,18 +5,21 @@ import com.iortatechnxt.brokerverse.submitted.domain.SbmApprovalMatrix;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmInsurerRule;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmLetterRule;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmLimitRule;
+import com.iortatechnxt.brokerverse.submitted.domain.SbmNotificationRecipient;
 import com.iortatechnxt.brokerverse.submitted.setup.api.dto.SetupDtos.Control;
 import com.iortatechnxt.brokerverse.submitted.setup.api.dto.SetupDtos.ControlView;
 import com.iortatechnxt.brokerverse.submitted.setup.api.dto.SetupDtos.InsurerView;
 import com.iortatechnxt.brokerverse.submitted.setup.api.dto.SetupDtos.LetterView;
 import com.iortatechnxt.brokerverse.submitted.setup.api.dto.SetupDtos.LimitView;
 import com.iortatechnxt.brokerverse.submitted.setup.api.dto.SetupDtos.MatrixView;
+import com.iortatechnxt.brokerverse.submitted.setup.api.dto.SetupDtos.RecipientView;
 import com.iortatechnxt.brokerverse.submitted.setup.api.dto.SetupDtos.ScopeRequest;
 import com.iortatechnxt.brokerverse.submitted.setup.api.dto.SetupDtos.ScopeView;
 import com.iortatechnxt.brokerverse.submitted.setup.api.dto.SetupDtos.SourceRequest;
 import com.iortatechnxt.brokerverse.submitted.setup.api.dto.SetupDtos.SourceView;
 import com.iortatechnxt.brokerverse.submitted.setup.api.dto.SetupDtos.StatusMapRequest;
 import com.iortatechnxt.brokerverse.submitted.setup.api.dto.SetupDtos.StatusMapView;
+import com.iortatechnxt.brokerverse.submitted.setup.service.NotificationRecipientService;
 import com.iortatechnxt.brokerverse.submitted.setup.service.SetupService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -45,14 +48,17 @@ public class SetupController {
   private static final String APPROVE = "hasAuthority('SBM_RULE_APPROVE')";
 
   private final SetupService setup;
+  private final NotificationRecipientService recipients;
 
   /**
    * Creates the controller.
    *
    * @param setup setup
+   * @param recipients notification recipients
    */
-  public SetupController(SetupService setup) {
+  public SetupController(SetupService setup, NotificationRecipientService recipients) {
     this.setup = setup;
+    this.recipients = recipients;
   }
 
   /**
@@ -183,9 +189,38 @@ public class SetupController {
   }
 
   /**
+   * Notification recipients.
+   *
+   * @param companyId company
+   * @return recipients
+   */
+  @GetMapping("/recipients")
+  @PreAuthorize(READ)
+  public List<RecipientView> recipients(@RequestParam Long companyId) {
+    return recipients.list(companyId).stream().map(RecipientView::from).toList();
+  }
+
+  /**
+   * Adds or changes a notification recipient.
+   *
+   * @param companyId company
+   * @param id recipient, absent for a new one
+   * @param row recipient
+   * @return recipient
+   */
+  @PostMapping("/recipients")
+  @PreAuthorize(MAINTAIN)
+  public RecipientView saveRecipient(
+      @RequestParam Long companyId,
+      @RequestParam(required = false) Long id,
+      @RequestBody SbmNotificationRecipient.Row row) {
+    return RecipientView.from(recipients.save(companyId, id, row));
+  }
+
+  /**
    * Approves a pending setup record.
    *
-   * @param kind limits, insurers, letters or matrix
+   * @param kind limits, insurers, letters, matrix or recipients
    * @param id record
    * @return state
    */
@@ -198,7 +233,7 @@ public class SetupController {
   /**
    * Deactivates a setup record.
    *
-   * @param kind limits, insurers, letters or matrix
+   * @param kind limits, insurers, letters, matrix or recipients
    * @param id record
    * @return state
    */
@@ -291,6 +326,7 @@ public class SetupController {
       case "insurers" -> "INSURER";
       case "letters" -> "LETTER";
       case "matrix" -> "MATRIX";
+      case "recipients" -> "RECIPIENT";
       default -> path.toUpperCase(Locale.ROOT);
     };
   }

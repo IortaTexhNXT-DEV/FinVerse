@@ -3,16 +3,17 @@ package com.iortatechnxt.brokerverse.submitted.renewal.service;
 import com.iortatechnxt.brokerverse.lov.domain.LovValue;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import com.iortatechnxt.brokerverse.messaging.domain.Notice;
-import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmPolicy;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmPolicyRepository;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmPolicyStatus;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmRenewal;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmRenewalRepository;
+import com.iortatechnxt.brokerverse.submitted.service.SbmNotifier;
 import com.iortatechnxt.brokerverse.submitted.service.SbmParameters;
 import com.iortatechnxt.brokerverse.submitted.service.SubmittedCodes;
 import com.iortatechnxt.brokerverse.submitted.service.port.RenewalHandOff;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
@@ -34,7 +35,7 @@ public class ExpiryScanService {
   private final HandOffService handOffs;
   private final SbmParameters parameters;
   private final LovService lovs;
-  private final NotificationService notifications;
+  private final SbmNotifier notifier;
 
   /**
    * Creates the service.
@@ -44,7 +45,7 @@ public class ExpiryScanService {
    * @param handOffs hand-off
    * @param parameters parameters
    * @param lovs lists of values (segments)
-   * @param notifications notifications
+   * @param notifier recipients of the events
    */
   public ExpiryScanService(
       SbmPolicyRepository policies,
@@ -52,13 +53,13 @@ public class ExpiryScanService {
       HandOffService handOffs,
       SbmParameters parameters,
       LovService lovs,
-      NotificationService notifications) {
+      SbmNotifier notifier) {
     this.policies = policies;
     this.renewals = renewals;
     this.handOffs = handOffs;
     this.parameters = parameters;
     this.lovs = lovs;
-    this.notifications = notifications;
+    this.notifier = notifier;
   }
 
   /**
@@ -118,11 +119,8 @@ public class ExpiryScanService {
             SubmittedCodes.link(p.getId()),
             SubmittedCodes.ENTITY,
             p.getId().toString());
-    for (String user : new String[] {p.getHandlerUsername(), p.getAoUsername()}) {
-      if (user != null) {
-        notifications.notifyUser(user, notice, "SBM_EXPIRY_NEAR");
-      }
-    }
+    notifier.notify(
+        p, "SBM_EXPIRY_NEAR", notice, Arrays.asList(p.getHandlerUsername(), p.getAoUsername()));
   }
 
   /**

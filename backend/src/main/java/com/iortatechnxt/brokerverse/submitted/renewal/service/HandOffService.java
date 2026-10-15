@@ -6,7 +6,6 @@ import com.iortatechnxt.brokerverse.common.domain.RecordStatus;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.messaging.domain.Notice;
-import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmHistorySource;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmInsurerRule;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmInsurerRuleRepository;
@@ -16,6 +15,7 @@ import com.iortatechnxt.brokerverse.submitted.domain.SbmRenewal;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmRenewalRepository;
 import com.iortatechnxt.brokerverse.submitted.masterlist.service.MasterlistService;
 import com.iortatechnxt.brokerverse.submitted.service.SbmHistoryService;
+import com.iortatechnxt.brokerverse.submitted.service.SbmNotifier;
 import com.iortatechnxt.brokerverse.submitted.service.SbmPolicyFlow;
 import com.iortatechnxt.brokerverse.submitted.service.SubmittedCodes;
 import com.iortatechnxt.brokerverse.submitted.service.port.RenewalHandOff;
@@ -29,6 +29,7 @@ import com.iortatechnxt.brokerverse.submitted.service.port.RenewalHandOff.Renewa
 import com.iortatechnxt.brokerverse.submitted.service.port.RenewalHandOff.Risk;
 import com.iortatechnxt.brokerverse.workflow.service.TransitionNote;
 import java.time.Clock;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
@@ -53,7 +54,7 @@ public class HandOffService {
   private final MasterlistService masterlist;
   private final SbmPolicyFlow flow;
   private final SbmHistoryService history;
-  private final NotificationService notifications;
+  private final SbmNotifier notifier;
   private final AuditTrailService audit;
   private final CurrentUser currentUser;
   private final Clock clock;
@@ -67,7 +68,7 @@ public class HandOffService {
    * @param masterlist masterlist
    * @param flow work case
    * @param history record history
-   * @param notifications notifications
+   * @param notifier recipients of the events
    * @param audit audit trail
    * @param currentUser current user
    * @param clock clock
@@ -80,7 +81,7 @@ public class HandOffService {
       MasterlistService masterlist,
       SbmPolicyFlow flow,
       SbmHistoryService history,
-      NotificationService notifications,
+      SbmNotifier notifier,
       AuditTrailService audit,
       CurrentUser currentUser,
       Clock clock) {
@@ -90,7 +91,7 @@ public class HandOffService {
     this.masterlist = masterlist;
     this.flow = flow;
     this.history = history;
-    this.notifications = notifications;
+    this.notifier = notifier;
     this.audit = audit;
     this.currentUser = currentUser;
     this.clock = clock;
@@ -221,11 +222,8 @@ public class HandOffService {
             SubmittedCodes.link(p.getId()),
             SubmittedCodes.ENTITY,
             p.getId().toString());
-    for (String user : new String[] {p.getHandlerUsername(), p.getAoUsername()}) {
-      if (user != null) {
-        notifications.notifyUser(user, notice, "SBM_RENEWAL_STARTED");
-      }
-    }
+    notifier.notify(
+        p, "SBM_RENEWAL_STARTED", notice, Arrays.asList(p.getHandlerUsername(), p.getAoUsername()));
   }
 
   /**

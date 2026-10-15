@@ -244,6 +244,19 @@ function mockApis() {
     },
   ]);
   vi.spyOn(submittedApi, 'matrix').mockResolvedValue([]);
+  vi.spyOn(submittedApi, 'recipients').mockResolvedValue([
+    {
+      id: 2,
+      control: CONTROL,
+      row: {
+        eventCode: 'SBM_RENEWAL_STARTED',
+        segment: null,
+        recipientType: 'EMAIL',
+        recipient: 'counterpart@bank.example.ph',
+        description: 'Bank counterpart',
+      },
+    },
+  ]);
   vi.spyOn(submittedApi, 'scopes').mockResolvedValue([]);
   vi.spyOn(workflowApi, 'byRecord').mockRejectedValue(new Error('no case'));
 }
@@ -369,6 +382,18 @@ describe('Submitted Policies screens', () => {
   it('shows the insurer limits of Setup with the approval', async () => {
     show(<SetupPage />, '/?tab=limits', ALL, 'mkttl');
     expect(await screen.findByText('Motor limit')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Approve' })).toBeInTheDocument();
+  });
+
+  it('shows the notification recipients of each event with the approval', async () => {
+    show(<SetupPage />, '/?tab=recipients', ALL, 'mkttl');
+    expect(await screen.findByText('counterpart@bank.example.ph')).toBeInTheDocument();
+    expect(
+      screen.getByRole('cell', { name: 'Renewal of a submitted policy started' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('cell', { name: 'Outside e-mail address (bank counterpart)' }),
+    ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Approve' })).toBeInTheDocument();
   });
 });

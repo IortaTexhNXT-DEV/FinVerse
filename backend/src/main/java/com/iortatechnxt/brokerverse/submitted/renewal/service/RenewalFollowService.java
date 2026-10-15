@@ -24,6 +24,7 @@ import com.iortatechnxt.brokerverse.submitted.domain.SbmRenewal;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmRenewalRepository;
 import com.iortatechnxt.brokerverse.submitted.masterlist.service.MasterlistService;
 import com.iortatechnxt.brokerverse.submitted.service.SbmHistoryService;
+import com.iortatechnxt.brokerverse.submitted.service.SbmNotifier;
 import com.iortatechnxt.brokerverse.submitted.service.SbmParameters;
 import com.iortatechnxt.brokerverse.submitted.service.SbmPolicyFlow;
 import com.iortatechnxt.brokerverse.submitted.service.SubmittedCodes;
@@ -32,6 +33,7 @@ import com.iortatechnxt.brokerverse.submitted.service.port.RenewalHandOff.HandOf
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
@@ -65,6 +67,7 @@ public class RenewalFollowService {
   private final SbmParameters parameters;
   private final LovService lovs;
   private final NotificationService notifications;
+  private final SbmNotifier notifier;
   private final AlertService alerts;
   private final AuditTrailService audit;
   private final Clock clock;
@@ -83,6 +86,7 @@ public class RenewalFollowService {
    * @param parameters parameters
    * @param lovs lists of values
    * @param notifications notifications
+   * @param notifier recipients of the events
    * @param alerts alerts
    * @param audit audit trail
    * @param clock clock
@@ -100,6 +104,7 @@ public class RenewalFollowService {
       SbmParameters parameters,
       LovService lovs,
       NotificationService notifications,
+      SbmNotifier notifier,
       AlertService alerts,
       AuditTrailService audit,
       Clock clock) {
@@ -114,6 +119,7 @@ public class RenewalFollowService {
     this.parameters = parameters;
     this.lovs = lovs;
     this.notifications = notifications;
+    this.notifier = notifier;
     this.alerts = alerts;
     this.audit = audit;
     this.clock = clock;
@@ -356,7 +362,7 @@ public class RenewalFollowService {
   }
 
   private void notifyHandler(SbmPolicy p, String title, String event) {
-    if (p.getHandlerUsername() == null) {
+    if (event == null && p.getHandlerUsername() == null) {
       return;
     }
     Notice notice =
@@ -369,7 +375,7 @@ public class RenewalFollowService {
     if (event == null) {
       notifications.notifyUser(p.getHandlerUsername(), notice);
     } else {
-      notifications.notifyUser(p.getHandlerUsername(), notice, event);
+      notifier.notify(p, event, notice, Collections.singletonList(p.getHandlerUsername()));
     }
   }
 

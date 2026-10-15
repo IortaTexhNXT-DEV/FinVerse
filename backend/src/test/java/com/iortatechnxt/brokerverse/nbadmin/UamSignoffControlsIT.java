@@ -6,6 +6,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.iortatechnxt.brokerverse.approval.service.ApprovalInboxService;
 import com.iortatechnxt.brokerverse.approval.service.PendingApproval;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.identity.service.GroupProfileChecks;
+import com.iortatechnxt.brokerverse.identity.service.IdentityRefused;
 import com.iortatechnxt.brokerverse.messaging.domain.Notification;
 import com.iortatechnxt.brokerverse.messaging.domain.NotificationRepository;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequest;
@@ -49,9 +51,10 @@ import org.springframework.security.authentication.BadCredentialsException;
 
 /**
  * The controls built for the BRD-11 sign-off (V1065): separation-of-duties rules under
- * maker-checker and their check on requests; the authorisation limit through a request; the refusal
- * of a deactivated user without a lock-out count; the dormant-user job; the notice to the members
- * of a deactivated group profile; the second approval of the security parameters.
+ * maker-checker and their check on the group profiles UIDM-ISC gives a user; the authorisation
+ * limit through a request; the refusal of a deactivated user without a lock-out count; the
+ * dormant-user job; the notice to the members of a deactivated group profile; the second approval
+ * of the security parameters.
  */
 @IntegrationTest
 class UamSignoffControlsIT {
@@ -74,6 +77,7 @@ class UamSignoffControlsIT {
   @Autowired private NotificationRepository notifications;
   @Autowired private JdbcTemplate jdbc;
   @Autowired private AsUser as;
+  @Autowired private GroupProfileChecks membership;
 
   private String newProfile() {
     String code = "SOD_T_" + ThreadLocalRandom.current().nextInt(1_000_000, 9_999_999);
@@ -83,6 +87,16 @@ class UamSignoffControlsIT {
             users.createRole(
                 new RoleRequest(code, "Profile " + code, Set.of(Permission.REPORT_VIEW))));
     return code;
+  }
+
+  /** The code of the refusal of UIDM-ISC giving one user the group profiles, null when given. */
+  private String membershipRefusal(Set<String> profiles) {
+    try {
+      membership.groups(profiles);
+      return null;
+    } catch (IdentityRefused ex) {
+      return ex.getCode();
+    }
   }
 
   private static AccessRequestContent enrol(String user, Set<String> profiles, BigDecimal limit) {
@@ -129,29 +143,10 @@ class UamSignoffControlsIT {
         .isEqualTo("MAKER_CHECKER_VIOLATION");
 
     // Pending: not yet enforced.
-    assertThat(
-            as.run(
-                    REQUESTOR,
-                    () ->
-                        requests.create(
-                            enrol(AccessRequestIT.username(), Set.of(a, b), null),
-                            false,
-                            List.of(APPROVER)))
-                .getStatus())
-        .isEqualTo(AccessRequestStatus.PENDING);
+    assertThat(membershipRefusal(Set.of(a, b))).isNull();
 
     assertThat(as.run(INFOSEC, () -> sodRules.authorize(rule.getId())).isActive()).isTrue();
-    assertThatThrownBy(
-            () ->
-                as.run(
-                    REQUESTOR,
-                    () ->
-                        requests.create(
-                            enrol(AccessRequestIT.username(), Set.of(a, b), null),
-                            false,
-                            List.of(APPROVER))))
-        .extracting("code")
-        .isEqualTo("ACCESS_SOD_CONFLICT");
+    assertThat(membershipRefusal(Set.of(a, b))).isEqualTo("GROUP_CONFLICT");
 
     as.run(BADMIN, () -> sodRules.requestDeactivation(rule.getId()));
     assertThat(inboxOf(INFOSEC)).contains(rule.getRuleCode());
@@ -165,16 +160,7 @@ class UamSignoffControlsIT {
         .matches(SodRule::isActive);
     as.run(BADMIN, () -> sodRules.requestDeactivation(rule.getId()));
     as.run(INFOSEC, () -> sodRules.authorize(rule.getId()));
-    assertThat(
-            as.run(
-                    REQUESTOR,
-                    () ->
-                        requests.create(
-                            enrol(AccessRequestIT.username(), Set.of(a, b), null),
-                            false,
-                            List.of(APPROVER)))
-                .getStatus())
-        .isEqualTo(AccessRequestStatus.PENDING);
+    assertThat(membershipRefusal(Set.of(a, b))).isNull();
 
     SodRule refused = as.run(BADMIN, () -> sodRules.create(a, b, "Asked again"));
     assertThat(
@@ -186,7 +172,7 @@ class UamSignoffControlsIT {
   @Test
   void limitIsSetByRequestAndDeactivatedUserIsRefusedWithoutCount() {
     String name = AccessRequestIT.username();
-    String password = enrolAndApprove(name, Set.of("MKT_AO")).temporaryPassword();
+    String password = enrolAndApprove(name, Set.of()).temporaryPassword();
     assertThat(users.getByUsername(name).getAuthorizationLimit()).isEqualByComparingTo("50000");
 
     AccessRequest change =
@@ -239,9 +225,9 @@ class UamSignoffControlsIT {
   @Test
   void dormantUsersAreWarnedThenDeactivatedByRequest() {
     String dormant = AccessRequestIT.username();
-    enrolAndApprove(dormant, Set.of("MKT_AO"));
+    enrolAndApprove(dormant, Set.of());
     String soon = AccessRequestIT.username();
-    enrolAndApprove(soon, Set.of("MKT_AO"));
+    enrolAndApprove(soon, Set.of());
     LocalDate today = BusinessClock.today(Clock.systemUTC());
     backdate(dormant, today.minusDays(800));
     backdate(soon, today.minusDays(723));
@@ -279,7 +265,13 @@ class UamSignoffControlsIT {
   void membersAreToldWhenTheirGroupProfileIsDeactivated() {
     String profile = newProfile();
     String member = AccessRequestIT.username();
-    enrolAndApprove(member, Set.of(profile));
+    enrolAndApprove(member, Set.of());
+    // UIDM-ISC gives the user the group profile
+    jdbc.update(
+        "insert into sec_user_role (user_id, role_id) select u.id, r.id from sec_user u, sec_role r"
+            + " where u.username = ? and r.code = ?",
+        member,
+        profile);
     AccessRequest off =
         as.run(
             BADMIN,

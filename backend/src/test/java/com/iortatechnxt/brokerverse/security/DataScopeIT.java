@@ -289,7 +289,7 @@ class DataScopeIT {
                 name,
                 "Scoped User",
                 name + "@example.ph",
-                Set.of("MKT_AO"),
+                Set.of(),
                 null,
                 "Joined the branch")
             .withUserData(new RequestedUserData(null, null, null, null, false, null, scope));

@@ -1,11 +1,4 @@
-import {
-  FileBarChart,
-  FileSpreadsheet,
-  Grid3x3,
-  Scale,
-  ShieldCheck,
-  UserCheck,
-} from 'lucide-react';
+import { FileBarChart, Grid3x3, Scale, ShieldCheck, UserCheck } from 'lucide-react';
 import { lazyWithRetry } from '@/app/loadRecovery';
 import type { FeatureModule } from '@/navigation/types';
 
@@ -81,23 +74,6 @@ export const userAccessModule: FeatureModule = {
       permission: 'UAM_GROUP_REQUEST',
       alsoPermissions: VIEW,
       component: lazyWithRetry(() => import('./GroupProfileRequestsPage')),
-    },
-    {
-      path: '/user-access/bulk',
-      label: 'Bulk Request',
-      icon: FileSpreadsheet,
-      permission: 'UAM_ENROLL',
-      alsoPermissions: ['UAM_MODIFY', 'ACCESS_APPROVE'],
-      component: lazyWithRetry(() => import('./BulkRequestPage')),
-    },
-    {
-      path: '/user-access/bulk/:id',
-      label: 'Bulk Request Batch',
-      icon: FileSpreadsheet,
-      permission: 'UAM_ENROLL',
-      alsoPermissions: ['UAM_MODIFY', 'ACCESS_APPROVE', 'UAM_VIEW'],
-      component: lazyWithRetry(() => import('./AccessBatchPage')),
-      hidden: true,
     },
     {
       path: '/user-access/matrix',

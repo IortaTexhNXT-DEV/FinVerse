@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { DIRECTORY_STATUS_LABELS, EVENT_STATUS_LABELS, identityApi } from '@/api/identity';
-import type { DirectoryAccount, IdentityEventType } from '@/api/identity';
+import type { DirectoryAccount, IdentityEvent, IdentityEventType } from '@/api/identity';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
@@ -13,10 +13,12 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { EMPTY_ACCOUNT, SIMULATED_EVENTS } from './identitySync';
 import { SimulatorAccountDialog } from './SimulatorAccountDialog';
+import { SimulatorMembershipDialog } from './SimulatorMembershipDialog';
 
 /**
  * The Enterprise SSO simulator of SIT and UAT: the accounts of the simulated directory and the
- * events UIDM-ISC would send for them, applied as the real interface applies them.
+ * events UIDM-ISC would send for them (the group profiles too), applied as the real interface
+ * applies them.
  */
 export function SimulatorTab() {
   const toast = useToast();
@@ -24,6 +26,7 @@ export function SimulatorTab() {
   const [editing, setEditing] = useState<{ account: DirectoryAccount; isNew: boolean } | null>(
     null,
   );
+  const [membership, setMembership] = useState<DirectoryAccount | null>(null);
   const accounts = useQuery({
     queryKey: ['identity-simulator'],
     queryFn: identityApi.simulatorAccounts,
@@ -32,18 +35,19 @@ export function SimulatorTab() {
     void client.invalidateQueries({ queryKey: ['identity-simulator'] });
     void client.invalidateQueries({ queryKey: ['identity-events'] });
   };
+  const sent = (event: IdentityEvent) => {
+    const outcome = `${EVENT_STATUS_LABELS[event.status]}: ${event.message ?? ''}`;
+    if (event.status === 'APPLIED' || event.status === 'NO_CHANGE') {
+      toast.success(outcome);
+    } else {
+      toast.warning(outcome);
+    }
+    refresh();
+  };
   const send = useMutation({
     mutationFn: ({ windowsId, type }: { windowsId: string; type: IdentityEventType }) =>
       identityApi.sendSimulatorEvent(windowsId, type),
-    onSuccess: (event) => {
-      const outcome = `${EVENT_STATUS_LABELS[event.status]}: ${event.message ?? ''}`;
-      if (event.status === 'APPLIED' || event.status === 'NO_CHANGE') {
-        toast.success(outcome);
-      } else {
-        toast.warning(outcome);
-      }
-      refresh();
-    },
+    onSuccess: sent,
     onError: (error) => toast.error(error.message),
   });
   return (
@@ -100,6 +104,7 @@ export function SimulatorTab() {
                       label: e.label,
                       onSelect: () => send.mutate({ windowsId: a.windowsId, type: e.type }),
                     })),
+                    { label: 'Send group profiles', onSelect: () => setMembership(a) },
                   ]}
                 />
               ),
@@ -107,6 +112,13 @@ export function SimulatorTab() {
           ]}
         />
       </Card>
+      {membership !== null && (
+        <SimulatorMembershipDialog
+          account={membership}
+          onClose={() => setMembership(null)}
+          onSent={sent}
+        />
+      )}
       {editing !== null && (
         <SimulatorAccountDialog
           account={editing.account}

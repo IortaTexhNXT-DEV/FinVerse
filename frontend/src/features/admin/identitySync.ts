@@ -65,3 +65,12 @@ export const SIMULATOR_STATUSES: readonly DirectoryStatus[] = [
   'DISABLED',
   'DEACTIVATED',
 ];
+
+/** The codes of the group profiles typed for a membership event: upper case, without blanks. */
+export function groupCodes(text: string): string[] {
+  const codes = text
+    .split(/[\s,;]+/)
+    .map((c) => c.trim().toUpperCase())
+    .filter((c) => c !== '');
+  return [...new Set(codes)];
+}

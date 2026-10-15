@@ -211,7 +211,6 @@ class ApiSmokeIT {
     "requestor, /api/v1/nbadmin/approvers",
     "badmin, /api/v1/nbadmin/approvers?userType=INTERNAL&subject=a013000101",
     "requestor, /api/v1/nbadmin/access-settings",
-    "requestor, /api/v1/nbadmin/access-batches",
     "uamapprover, /api/v1/nbadmin/users",
     "uamapprover, /api/v1/nbadmin/roles",
     "uamapprover, /api/v1/nbadmin/access-matrix",

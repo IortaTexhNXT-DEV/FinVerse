@@ -14,21 +14,19 @@ import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestContent;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestEvent;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestStatus;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestType;
-import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRiskFlag;
 import com.iortatechnxt.brokerverse.nbadmin.domain.ExternalParty;
 import com.iortatechnxt.brokerverse.nbadmin.domain.ExternalPartyKind;
 import com.iortatechnxt.brokerverse.nbadmin.domain.RequestedUserData;
-import com.iortatechnxt.brokerverse.nbadmin.service.AccessDecisionService;
 import com.iortatechnxt.brokerverse.nbadmin.service.AccessRequestReturnService;
 import com.iortatechnxt.brokerverse.nbadmin.service.AccessRequestSearch;
 import com.iortatechnxt.brokerverse.nbadmin.service.AccessRequestSearch.Scope;
 import com.iortatechnxt.brokerverse.nbadmin.service.AccessRequestService;
 import com.iortatechnxt.brokerverse.nbadmin.service.AccessRequestService.Decision;
 import com.iortatechnxt.brokerverse.nbadmin.service.AccessScheduledChanges;
+import com.iortatechnxt.brokerverse.nbadmin.service.UserRequestValidator;
 import com.iortatechnxt.brokerverse.security.domain.AccessChangeLog;
 import com.iortatechnxt.brokerverse.security.domain.AccessChangeLogRepository;
 import com.iortatechnxt.brokerverse.security.domain.AppUser;
-import com.iortatechnxt.brokerverse.security.domain.Role;
 import com.iortatechnxt.brokerverse.security.service.UserAdminService;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
@@ -44,8 +42,8 @@ import org.springframework.security.access.AccessDeniedException;
 
 /**
  * User access request lifecycle (BRD 1.002-1.008, 2.002; UAM-NFR-14, 40): draft, submit to the
- * chosen approver, return, correction, approval and application; the effective-date job; the second
- * approval; cancellation.
+ * chosen approver, return, correction, approval and application; the effective-date job;
+ * cancellation; a request never changes the group profiles of a user (they come from UIDM-ISC).
  */
 @IntegrationTest
 class UserAccessLifecycleIT {
@@ -54,7 +52,6 @@ class UserAccessLifecycleIT {
   private static final String APPROVER = "uamapprover";
 
   @Autowired private AccessRequestService requests;
-  @Autowired private AccessDecisionService decisions;
   @Autowired private AccessRequestReturnService returns;
   @Autowired private AccessScheduledChanges scheduled;
   @Autowired private ApprovalInboxService inbox;
@@ -70,7 +67,7 @@ class UserAccessLifecycleIT {
             user,
             "Lifecycle User",
             user + "@example.ph",
-            Set.of("MKT_AO"),
+            Set.of(),
             null,
             "Joined Marketing")
         .withUserData(new RequestedUserData("W" + user, null, null, null, false));
@@ -268,49 +265,29 @@ class UserAccessLifecycleIT {
   }
 
   @Test
-  void privilegedChangeNeedsASecondApprovalByAnotherApprover() {
+  void aRequestNeverChangesTheGroupProfilesOfAUser() {
     AppUser user = newUser();
-    AccessRequest request =
-        as.run(
-            REQUESTOR,
-            () ->
-                requests.create(
-                    new AccessRequestContent(
-                        AccessRequestType.MODIFY_USER,
-                        user.getUsername(),
-                        null,
-                        null,
-                        Set.of("MKT_AO", "SYSADMIN"),
-                        null,
-                        "Back-up administrator"),
-                    false,
-                    List.of(APPROVER)));
-    assertThat(request.riskFlags()).containsExactly(AccessRiskFlag.PRIVILEGE_INCREASE);
     assertThatThrownBy(
-            () -> as.run(user.getUsername(), () -> decisions.approve(request.getId(), null)))
-        .extracting("code")
-        .isEqualTo("ACCESS_SUBJECT_DECIDES");
-    as.run(APPROVER, () -> requests.approve(request.getId(), null));
-    assertThat(requests.get(request.getId()).getStatus())
-        .isEqualTo(AccessRequestStatus.PENDING_SECOND);
-    assertThat(inboxOf("secapprover")).contains(request.getRequestNo());
-    assertThatThrownBy(() -> as.run(APPROVER, () -> decisions.secondApprove(request.getId(), null)))
-        .isInstanceOf(AccessDeniedException.class);
-    assertThatThrownBy(() -> as.run(APPROVER, () -> decisions.approve(request.getId(), null)))
-        .extracting("code")
-        .isEqualTo("ACCESS_SECOND_APPROVAL_PENDING");
-
-    as.run("secapprover", () -> decisions.secondApprove(request.getId(), "Checked with IT"));
-    assertThat(requests.get(request.getId()).getStatus()).isEqualTo(AccessRequestStatus.APPROVED);
-    assertThat(users.getByUsername(user.getUsername()).getRoles())
-        .extracting(Role::getCode)
-        .contains("SYSADMIN");
-    assertThat(
-            jdbc.queryForObject(
-                "select count(*) from alt_alert where dedup_key = ?",
-                Integer.class,
-                "UAM_PRIVILEGED_CHANGE:" + request.getRequestNo()))
-        .isEqualTo(1);
+            () ->
+                as.run(
+                    REQUESTOR,
+                    () ->
+                        requests.create(
+                            new AccessRequestContent(
+                                AccessRequestType.MODIFY_USER,
+                                user.getUsername(),
+                                null,
+                                null,
+                                Set.of("MKT_AO", "SYSADMIN"),
+                                null,
+                                "Back-up administrator"),
+                            false,
+                            List.of(APPROVER))))
+        .extracting("code", "message")
+        .containsExactly(
+            UserRequestValidator.GROUP_PROFILES_BY_UIDM,
+            UserRequestValidator.GROUP_PROFILES_BY_UIDM_TEXT);
+    assertThat(users.getByUsername(user.getUsername()).getRoles()).isEmpty();
   }
 
   @Test
@@ -343,7 +320,7 @@ class UserAccessLifecycleIT {
     assertCode(
         new AccessRequestContent(
             AccessRequestType.MODIFY_USER, REQUESTOR, null, null, Set.of("TSU"), null, "Own"),
-        "SELF_ROLE_CHANGE");
+        UserRequestValidator.GROUP_PROFILES_BY_UIDM);
     assertThatThrownBy(
             () ->
                 as.run(

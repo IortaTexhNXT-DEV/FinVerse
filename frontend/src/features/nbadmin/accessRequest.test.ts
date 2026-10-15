@@ -40,10 +40,9 @@ describe('user access request validation', () => {
     });
   });
 
-  it('needs the new user data, a group profile, the remarks and the approver to submit', () => {
+  it('needs the new user data, the remarks and the approver to submit (no group profile)', () => {
     expect(validateAccessRequest(form({ username: 'a013000196' }), SUBMIT)).toEqual({
       fullName: 'Enter the full name of the new user',
-      roleCodes: 'Select at least one role',
       justification: 'Enter the justification',
       approvers: 'Select the approver',
     });
@@ -62,7 +61,6 @@ describe('user access request validation', () => {
         form({
           username: 'a013000196',
           fullName: 'UAT User One',
-          roleCodes: ['MKT_AO'],
           justification: 'Joined',
           approvers: ['uamapprover'],
         }),
@@ -182,7 +180,6 @@ describe('access request mapping', () => {
     ).toEqual({
       type: 'DISABLE_USER',
       username: 'aileen',
-      roleCodes: undefined,
       reasonCode: 'RESIGNED',
       unlock: undefined,
       effectiveFrom: '2026-09-30',
@@ -200,7 +197,8 @@ describe('access request mapping', () => {
     );
     expect(create.homeBranchId).toBe(3);
     expect(create.windowsId).toBe('W1');
-    expect(create.roleCodes).toEqual(['TSU']);
+    // the group profiles of a user come from UIDM-ISC: a request never sends them
+    expect(create.roleCodes).toBeUndefined();
     const external = toAccessRequest(
       form({ userType: 'EXTERNAL', username: 'hr', partyKind: 'CLIENT', partyCode: 'C1' }),
     );
@@ -321,7 +319,6 @@ describe('editing a saved draft', () => {
       username: 'a013000196',
       fullName: 'Nora Santos',
       email: 'nora.santos@example.ph',
-      roleCodes: ['MKT_AO'],
       homeBranchId: 3,
       windowsId: 'BDO\\nsantos',
       businessUnitCode: 'MKT',
@@ -331,6 +328,7 @@ describe('editing a saved draft', () => {
       justification: 'New account officer',
       approvers: ['uamapprover'],
     });
+    expect(toAccessRequest(edited).roleCodes).toBeUndefined();
   });
 });
 

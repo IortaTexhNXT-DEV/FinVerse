@@ -17,8 +17,8 @@ import java.util.List;
  * @param hierarchy team leader, team head, section head and unit head names
  * @param organisation unit / segment, department and location
  * @param uidmRequestNo UIDM request number
- * @param groupProfiles group profiles (role codes) named by UIDM-ISC, used only with the setting
- *     UAM_PROVISIONING_ROLES
+ * @param groupProfiles group profiles (role codes) named by UIDM-ISC: those a membership event
+ *     gives the user, otherwise used only with the setting UAM_PROVISIONING_ROLES
  */
 public record DirectoryAccount(
     String windowsId,
@@ -75,6 +75,29 @@ public record DirectoryAccount(
         organisation,
         uidmRequestNo,
         groupProfiles);
+  }
+
+  /**
+   * The same account with the group profiles of a membership event.
+   *
+   * @param groups codes of the group profiles the user holds after the event
+   * @param requestNo UIDM request number, may be null
+   * @return account
+   */
+  public DirectoryAccount withMembership(List<String> groups, String requestNo) {
+    return new DirectoryAccount(
+        windowsId,
+        userId,
+        email,
+        firstName,
+        lastName,
+        displayName,
+        adGroup,
+        status,
+        hierarchy,
+        organisation,
+        requestNo == null || requestNo.isBlank() ? null : requestNo.trim(),
+        groups);
   }
 
   /**

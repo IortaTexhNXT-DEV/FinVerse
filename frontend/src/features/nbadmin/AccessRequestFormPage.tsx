@@ -338,9 +338,7 @@ export default function AccessRequestFormPage() {
     return error ? <ErrorAlert error={error} /> : <LoadingPanel />;
   }
   const initial =
-    request.data === undefined
-      ? initialForm(search, users.data)
-      : fromAccessRequest(request.data, roles.data);
+    request.data === undefined ? initialForm(search) : fromAccessRequest(request.data, roles.data);
   return (
     <RequestEditor
       key={id ?? 'new'}

@@ -40,7 +40,7 @@ class AccessRequestNoticeEmailIT {
                     name,
                     "Notice Copy User",
                     name + "@example.ph",
-                    Set.of("MKT_AO"),
+                    Set.of(),
                     null,
                     "Joined Marketing")));
   }

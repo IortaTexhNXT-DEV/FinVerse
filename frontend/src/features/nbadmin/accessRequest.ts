@@ -84,7 +84,7 @@ export const REQUEST_TYPE_LABELS: Record<AccessRequestType, string> = {
   MODIFY_USER: 'Modify user',
   DISABLE_USER: 'Deactivate user',
   ENABLE_USER: 'Reactivate user',
-  MODIFY_ROLES: 'Change roles',
+  MODIFY_ROLES: 'Change group profiles (before UIDM-ISC)',
   CREATE_ROLE: 'New group profile',
   MODIFY_ROLE_PERMISSIONS: 'Modify group profile',
   DEACTIVATE_ROLE: 'Deactivate group profile',
@@ -114,11 +114,6 @@ const EXTERNAL_TYPES: AccessRequestType[] = ['CREATE_USER', 'DISABLE_USER', 'ENA
 
 export function isGroupProfile(type: AccessRequestType): boolean {
   return GROUP_TYPES.includes(type);
-}
-
-/** Types whose request carries the group profiles of a user. */
-export function carriesUserRoles(type: AccessRequestType): boolean {
-  return type === 'CREATE_USER' || type === 'MODIFY_ROLES' || type === 'MODIFY_USER';
 }
 
 export function allowsExternal(type: AccessRequestType): boolean {
@@ -215,10 +210,6 @@ function userErrors(f: AccessRequestForm, ctx: ValidationContext): AccessRequest
   }
   if (f.type === 'CREATE_USER' && f.fullName.trim() === '') {
     errors.fullName = 'Enter the full name of the new user';
-  }
-  const rolesNeeded = f.type === 'CREATE_USER' || f.type === 'MODIFY_ROLES';
-  if (f.userType === 'INTERNAL' && rolesNeeded && f.roleCodes.length === 0) {
-    errors.roleCodes = 'Select at least one role';
   }
   errors.authorizationLimit = limitError(f.authorizationLimit);
   errors.dataScope = f.dataScope === undefined ? undefined : scopeError(f.dataScope, []);
@@ -374,7 +365,6 @@ function userInput(f: AccessRequestForm): AccessRequestInput {
     username: f.username.trim(),
     ...userDataInput(f),
     ...externalInput(f),
-    roleCodes: carriesUserRoles(f.type) && f.userType === 'INTERNAL' ? f.roleCodes : undefined,
     reasonCode: f.type === 'DISABLE_USER' ? text(f.reasonCode) : undefined,
     unlock: f.type === 'ENABLE_USER' ? f.unlock : undefined,
     effectiveFrom: text(f.effectiveFrom),
@@ -449,12 +439,11 @@ export function fromAccessRequest(r: AccessRequest, roles: RoleInfo[]): AccessRe
 }
 
 /** A new request, preset from the link (Users screen: ?type=MODIFY_USER&user=...). */
-export function initialForm(search: URLSearchParams, users: UserAccess[]): AccessRequestForm {
+export function initialForm(search: URLSearchParams): AccessRequestForm {
   const preset = search.get('type') as AccessRequestType | null;
   const fallback: AccessRequestType =
     search.get('kind') === 'group' ? 'CREATE_ROLE' : 'CREATE_USER';
-  const type = preset !== null && preset in REQUEST_TYPE_LABELS ? preset : fallback;
-  const username = search.get('user') ?? '';
-  const user = users.find((u) => u.username === username);
-  return { ...EMPTY_ACCESS_REQUEST, type, username, roleCodes: user?.roleCodes ?? [] };
+  const offered = [...USER_TYPES, ...GROUP_TYPES];
+  const type = preset !== null && offered.includes(preset) ? preset : fallback;
+  return { ...EMPTY_ACCESS_REQUEST, type, username: search.get('user') ?? '' };
 }

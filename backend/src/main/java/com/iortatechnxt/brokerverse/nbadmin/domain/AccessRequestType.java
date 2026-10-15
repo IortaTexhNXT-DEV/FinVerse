@@ -8,11 +8,14 @@ package com.iortatechnxt.brokerverse.nbadmin.domain;
  * applies them at approval (UQ03).
  */
 public enum AccessRequestType {
-  /** Create (enrol) a user with roles and home branch (BRD 1.002). */
+  /** Create (enrol) a user with home branch; the group profiles come from UIDM-ISC (BRD 1.002). */
   CREATE_USER,
-  /** Replace the roles of an existing user (kept for compatibility; see MODIFY_USER). */
+  /**
+   * Replace the roles of an existing user: no longer requested, kept for the history; the group
+   * profiles of a user are assigned through UIDM-ISC.
+   */
   MODIFY_ROLES,
-  /** Change the data and / or the roles of an existing user in one request (BRD 1.003). */
+  /** Change the data of an existing user; the group profiles come from UIDM-ISC (BRD 1.003). */
   MODIFY_USER,
   /** Disable (deactivate) an existing user (BRD 1.004). */
   DISABLE_USER,
@@ -40,7 +43,8 @@ public enum AccessRequestType {
   }
 
   /**
-   * Whether the request sets the roles of a user.
+   * Whether the request sets the details of a user (the roles of a request made before UIDM-ISC
+   * assigned the group profiles, and the data scope).
    *
    * @return true for a creation or a modification of a user
    */

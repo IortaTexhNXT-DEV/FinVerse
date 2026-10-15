@@ -226,7 +226,6 @@ class CrmAdminApiIT {
                         "type", "CREATE_USER",
                         "username", name,
                         "fullName", "Api User",
-                        "roleCodes", new String[] {"TSU"},
                         "justification", "New TSU analyst"))
                 .andExpect(status().isCreated()));
     long id = submitted.get("id").asLong();

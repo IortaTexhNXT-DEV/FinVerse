@@ -5,6 +5,7 @@ import com.iortatechnxt.brokerverse.identity.api.dto.IdentityEventResponse;
 import com.iortatechnxt.brokerverse.identity.domain.IdentityEventType;
 import com.iortatechnxt.brokerverse.identity.service.IdentitySimulator;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
@@ -22,7 +23,8 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * The accounts of the Enterprise SSO simulator and the events UIDM-ISC would send for them (SIT and
  * UAT only): the System Administrator adds a joiner, changes details or status, and sends the
- * joiner, mover, leaver, rehire or status event to the system.
+ * joiner, mover, leaver, rehire or status event, or the group profiles of the user (membership), to
+ * the system.
  */
 @RestController
 @RequestMapping("/api/v1/admin/identity/simulator")
@@ -83,9 +85,31 @@ public class IdentitySimulatorController {
    * @param type JOINER, MOVER, LEAVER, REHIRE or STATUS
    * @return the event with its outcome
    */
-  @PostMapping("/accounts/events/{type}")
+  @PostMapping("/accounts/events/{type:JOINER|MOVER|LEAVER|REHIRE|STATUS}")
   public IdentityEventResponse send(
       @RequestParam String windowsId, @PathVariable IdentityEventType type) {
     return IdentityEventResponse.from(simulator.send(windowsId, type));
   }
+
+  /**
+   * Sends the group profiles of an account to the system (membership event of UIDM-ISC).
+   *
+   * @param windowsId Windows ID
+   * @param membership the group profiles and the UIDM request number
+   * @return the event with its outcome
+   */
+  @PostMapping("/accounts/events/MEMBERSHIP")
+  public IdentityEventResponse sendMembership(
+      @RequestParam String windowsId, @Valid @RequestBody MembershipRequest membership) {
+    return IdentityEventResponse.from(
+        simulator.sendMembership(windowsId, membership.groups(), membership.uidmRequestNo()));
+  }
+
+  /**
+   * The group profiles UIDM-ISC sends for a user.
+   *
+   * @param groups codes of the group profiles the user holds after the event (empty: none)
+   * @param uidmRequestNo UIDM request number, may be null
+   */
+  public record MembershipRequest(@NotNull List<String> groups, String uidmRequestNo) {}
 }

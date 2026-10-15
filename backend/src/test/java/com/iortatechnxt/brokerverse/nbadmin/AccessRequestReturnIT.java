@@ -39,7 +39,7 @@ class AccessRequestReturnIT {
                     name,
                     "Returned Request User",
                     name + "@example.ph",
-                    Set.of("MKT_AO"),
+                    Set.of(),
                     null,
                     "Joined Marketing")));
   }
@@ -49,7 +49,7 @@ class AccessRequestReturnIT {
     String name = AccessRequestIT.username();
     AccessRequest created = submit(AccessRequestType.CREATE_USER, name);
     as.run("approver", () -> requests.approve(created.getId(), null));
-    AccessRequest request = submit(AccessRequestType.MODIFY_ROLES, name);
+    AccessRequest request = submit(AccessRequestType.DISABLE_USER, name);
 
     assertThatThrownBy(() -> as.run("approver", () -> returns.returnRequest(request.getId(), " ")))
         .isInstanceOf(BusinessRuleException.class);

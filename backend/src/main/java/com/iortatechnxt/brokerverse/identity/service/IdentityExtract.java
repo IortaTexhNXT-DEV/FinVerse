@@ -90,15 +90,50 @@ public class IdentityExtract {
   public List<Group> groups() {
     return roles.findAll().stream()
         .sorted(Comparator.comparing(Role::getCode))
-        .map(
-            r ->
-                new Group(
-                    r.getCode(),
-                    r.getName(),
-                    r.isActive(),
-                    r.getPermissions().stream().map(Permission::name).sorted().toList(),
-                    users.findEnabledUsernamesWithRole(r.getCode())))
+        .map(this::group)
         .toList();
+  }
+
+  /**
+   * One group profile with its permissions and members (the SCIM Group resource id is the code).
+   *
+   * @param code code
+   * @return group profile, empty when none has the code
+   */
+  public Optional<Group> group(String code) {
+    return code == null ? Optional.empty() : roles.findByCode(code.trim()).map(this::group);
+  }
+
+  /**
+   * Every user holding a group profile, enabled or not (the membership UIDM-ISC replaces).
+   *
+   * @param code code of the group profile
+   * @return user names
+   */
+  public List<String> holders(String code) {
+    return users.findUsernamesWithRole(code);
+  }
+
+  /**
+   * The group profiles a user holds.
+   *
+   * @param username user
+   * @return codes, empty when no user has the name
+   */
+  public List<String> groupsOf(String username) {
+    return users
+        .findByUsernameIgnoreCase(username)
+        .map(u -> u.getRoles().stream().map(Role::getCode).sorted().toList())
+        .orElse(List.of());
+  }
+
+  private Group group(Role r) {
+    return new Group(
+        r.getCode(),
+        r.getName(),
+        r.isActive(),
+        r.getPermissions().stream().map(Permission::name).sorted().toList(),
+        users.findEnabledUsernamesWithRole(r.getCode()));
   }
 
   private static Account account(AppUser user, DirectoryProfile p) {

@@ -131,7 +131,8 @@ public class DirectoryProfile {
   }
 
   /**
-   * Takes the details of the account and the event that brought them.
+   * Takes the details of the account and the event that brought them (a membership event only
+   * records the event).
    *
    * @param account account
    * @param event the event
@@ -139,6 +140,15 @@ public class DirectoryProfile {
    * @param by actor
    */
   public void synchronise(DirectoryAccount account, IdentityEvent event, Instant at, String by) {
+    if (event.getEventType() == IdentityEventType.MEMBERSHIP) {
+      // a membership event changes the group profiles only, never the directory details
+      this.lastEventType = event.getEventType();
+      this.lastEventAt = event.getReceivedAt();
+      this.lastEventSource = event.getSource();
+      this.updatedAt = at;
+      this.updatedBy = by;
+      return;
+    }
     this.windowsId = account.windowsId();
     this.adEmail = account.email();
     this.adGroup = account.adGroup();

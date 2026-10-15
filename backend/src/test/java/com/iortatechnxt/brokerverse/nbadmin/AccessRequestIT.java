@@ -14,12 +14,10 @@ import com.iortatechnxt.brokerverse.nbadmin.service.AccessMatrixService;
 import com.iortatechnxt.brokerverse.nbadmin.service.AccessRequestService;
 import com.iortatechnxt.brokerverse.nbadmin.service.AccessRequestService.Decision;
 import com.iortatechnxt.brokerverse.security.domain.AppUser;
-import com.iortatechnxt.brokerverse.security.domain.Role;
 import com.iortatechnxt.brokerverse.security.service.UserAdminService;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -55,7 +53,7 @@ class AccessRequestIT {
                 name,
                 "New Account Officer",
                 name + "@example.ph",
-                Set.of("MKT_AO"),
+                Set.of(),
                 null,
                 "Joined Marketing"));
     assertThat(request.getStatus()).isEqualTo(AccessRequestStatus.PENDING);
@@ -71,13 +69,7 @@ class AccessRequestIT {
                 submit(
                     "badmin",
                     new AccessRequestContent(
-                        AccessRequestType.CREATE_USER,
-                        name,
-                        "Twice",
-                        null,
-                        Set.of("MKT_AO"),
-                        null,
-                        "x")))
+                        AccessRequestType.CREATE_USER, name, "Twice", null, Set.of(), null, "x")))
         .extracting("code")
         .isEqualTo("ACCESS_REQUEST_PENDING");
 
@@ -88,7 +80,7 @@ class AccessRequestIT {
     assertThat(decision.toString()).doesNotContain(decision.temporaryPassword());
     AppUser created = users.getByUsername(name);
     assertThat(encoder.matches(decision.temporaryPassword(), created.getPasswordHash())).isTrue();
-    assertThat(created.getRoles()).extracting(Role::getCode).containsExactly("MKT_AO");
+    assertThat(created.getRoles()).isEmpty();
     assertThatThrownBy(() -> as.run("approver", () -> requests.approve(request.getId(), null)))
         .extracting("code")
         .isEqualTo("ACCESS_REQUEST_DECIDED");
@@ -97,23 +89,19 @@ class AccessRequestIT {
   }
 
   private void modifyDisableAndEnable(String name) {
-    AccessRequest roles =
-        submit(
-            "badmin",
-            new AccessRequestContent(
-                AccessRequestType.MODIFY_ROLES,
-                name,
-                null,
-                null,
-                Set.of("MKT_AO", "TSU"),
-                null,
-                "Covers TSU"));
-    as.run("approver", () -> requests.approve(roles.getId(), null));
-    assertThat(
-            users.getByUsername(name).getRoles().stream()
-                .map(Role::getCode)
-                .collect(Collectors.toSet()))
-        .containsExactlyInAnyOrder("MKT_AO", "TSU");
+    // the group profiles of a user are assigned through UIDM-ISC, never by a request
+    for (AccessRequestType type :
+        new AccessRequestType[] {AccessRequestType.MODIFY_ROLES, AccessRequestType.MODIFY_USER}) {
+      assertThatThrownBy(
+              () ->
+                  submit(
+                      "badmin",
+                      new AccessRequestContent(
+                          type, name, null, null, Set.of("MKT_AO", "TSU"), null, "Covers TSU")))
+          .extracting("code")
+          .isEqualTo("ACCESS_GROUP_PROFILES_BY_UIDM");
+    }
+    assertThat(users.getByUsername(name).getRoles()).isEmpty();
 
     AccessRequest disable =
         submit(
@@ -155,13 +143,7 @@ class AccessRequestIT {
                 submit(
                     "badmin",
                     new AccessRequestContent(
-                        AccessRequestType.CREATE_USER,
-                        "mkttl",
-                        "Dup",
-                        null,
-                        Set.of("MKT_AO"),
-                        null,
-                        "x")))
+                        AccessRequestType.CREATE_USER, "mkttl", "Dup", null, Set.of(), null, "x")))
         .extracting("code")
         .isEqualTo("ACCESS_USER_EXISTS");
     assertThatThrownBy(
@@ -169,13 +151,7 @@ class AccessRequestIT {
                 submit(
                     "badmin",
                     new AccessRequestContent(
-                        AccessRequestType.MODIFY_ROLES,
-                        username(),
-                        null,
-                        null,
-                        Set.of("MKT_AO"),
-                        null,
-                        "x")))
+                        AccessRequestType.DISABLE_USER, username(), null, null, null, null, "x")))
         .extracting("code")
         .isEqualTo("ACCESS_UNKNOWN_USER");
     assertThatThrownBy(
@@ -191,19 +167,13 @@ class AccessRequestIT {
                         null,
                         "x")))
         .extracting("code")
-        .isEqualTo("ACCESS_UNKNOWN_ROLE");
+        .isEqualTo("ACCESS_GROUP_PROFILES_BY_UIDM");
     assertThatThrownBy(
             () ->
                 submit(
                     "badmin",
                     new AccessRequestContent(
-                        AccessRequestType.CREATE_USER,
-                        username(),
-                        " ",
-                        null,
-                        Set.of("TSU"),
-                        null,
-                        "x")))
+                        AccessRequestType.CREATE_USER, username(), " ", null, Set.of(), null, "x")))
         .extracting("code")
         .isEqualTo("ACCESS_FULL_NAME");
     assertThatThrownBy(
@@ -213,7 +183,7 @@ class AccessRequestIT {
                     new AccessRequestContent(
                         AccessRequestType.MODIFY_ROLES, "ao2", null, null, Set.of(), null, "x")))
         .extracting("code")
-        .isEqualTo("ACCESS_ROLES");
+        .isEqualTo("ACCESS_GROUP_PROFILES_BY_UIDM");
     assertThatThrownBy(
             () ->
                 submit(
@@ -227,13 +197,7 @@ class AccessRequestIT {
         submit(
             "badmin",
             new AccessRequestContent(
-                AccessRequestType.CREATE_USER,
-                username(),
-                "Self Made",
-                null,
-                Set.of("TSU"),
-                null,
-                "x"));
+                AccessRequestType.CREATE_USER, username(), "Self Made", null, Set.of(), null, "x"));
     assertThatThrownBy(() -> as.run("badmin", () -> requests.approve(own.getId(), null)))
         .extracting("code")
         .isEqualTo("ACCESS_FOUR_EYES");

@@ -9,12 +9,14 @@ import com.iortatechnxt.brokerverse.identity.domain.DirectoryStatus;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 /**
  * The SCIM 2.0 User resource of the provisioning interface (the standard user-provisioning
  * interface of UIDM-ISC): the core schema, the enterprise extension (department, manager) and the
  * extension of the system for the Windows ID, the AD group and status, the hierarchy names, the
- * unit / segment, the location and the UIDM request number.
+ * unit / segment, the location and the UIDM request number. The {@code groups} of a User are the
+ * group profiles it holds; sent on a create or a replace, they replace the group profiles at once.
  */
 public final class ScimUsers {
 
@@ -37,6 +39,7 @@ public final class ScimUsers {
   private static final String VALUE = "value";
   private static final String WINDOWS_ID = "windowsId";
   private static final String DISPLAY_NAME = "displayName";
+  private static final String GROUPS = "groups";
 
   private ScimUsers() {}
 
@@ -74,6 +77,41 @@ public final class ScimUsers {
             text(ext.path("location"))),
         text(ext.path("uidmRequestNo")),
         groups);
+  }
+
+  /**
+   * The group profiles a SCIM User resource gives the user: the {@code value} (or the text) of
+   * every item of {@code groups}.
+   *
+   * @param user the resource
+   * @return codes of the group profiles, empty when the resource has no {@code groups} (unchanged)
+   */
+  public static Optional<List<String>> groups(JsonNode user) {
+    JsonNode groups = user.path(GROUPS);
+    if (groups.isMissingNode() || groups.isNull()) {
+      return Optional.empty();
+    }
+    if (!groups.isArray()) {
+      throw new IdentityRefused("INVALID_SCIM", "groups is not a list");
+    }
+    return Optional.of(values(groups));
+  }
+
+  /**
+   * The values of a list of SCIM references ({@code [{"value": "x"}]}) or of plain texts.
+   *
+   * @param items the list
+   * @return values, without blanks
+   */
+  public static List<String> values(JsonNode items) {
+    List<String> values = new ArrayList<>();
+    for (JsonNode item : items) {
+      String value = text(item.isObject() ? item.path(VALUE) : item);
+      if (value != null) {
+        values.add(value);
+      }
+    }
+    return values;
   }
 
   /**
@@ -115,6 +153,8 @@ public final class ScimUsers {
     ext.put("uidmRequestNo", account.uidmRequestNo());
     ArrayNode groups = ext.putArray("groupProfiles");
     groupProfiles.forEach(groups::add);
+    ArrayNode held = user.putArray(GROUPS);
+    groupProfiles.forEach(g -> held.addObject().put(VALUE, g));
     return user;
   }
 

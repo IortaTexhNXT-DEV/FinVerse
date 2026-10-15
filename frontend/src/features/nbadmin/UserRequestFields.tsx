@@ -2,9 +2,8 @@ import { useQuery } from '@tanstack/react-query';
 import { nbadminApi } from '@/api/nbadmin';
 import type { UserAccess } from '@/api/nbadmin';
 import { LovSelect } from '@/components/broking/LovSelect';
-import { ProfilePicker } from '@/components/broking/ProfilePicker';
-import { useSodRules } from '@/components/broking/useSodRules';
 import { Field } from '@/components/ui/Field';
+import { Notice } from '@/components/ui/Notice';
 import { useWorkspace, useBaseCurrency } from '@/context/workspaceContext';
 import { formatAmount } from '@/utils/format';
 import { usersFor } from './accessUsers';
@@ -44,8 +43,7 @@ function UserField({ form, set, errors, users, userIdFormatText }: Readonly<Fiel
             className="select"
             value={form.username}
             onChange={(e) => {
-              const user = users.find((u) => u.username === e.target.value);
-              set({ username: e.target.value, roleCodes: user?.roleCodes ?? [] });
+              set({ username: e.target.value });
             }}
           >
             <option value="">Select a user…</option>
@@ -157,24 +155,28 @@ function DataFields({ form, set, errors, users }: Readonly<FieldsProps>) {
   );
 }
 
-function RolePicker({ form, set, errors, users }: Readonly<FieldsProps>) {
+/**
+ * The group profiles of the user, read only: UIDM-ISC assigns them through the provisioning
+ * interface, and a request does not give, change or remove them.
+ */
+function CurrentGroupProfiles({ form, users }: Readonly<FieldsProps>) {
   const roles = useQuery({ queryKey: ['nbadmin', 'roles'], queryFn: nbadminApi.roles });
-  const rules = useSodRules();
   const held =
     form.type === 'MODIFY_USER'
       ? (users.find((u) => u.username === form.username)?.roleCodes ?? [])
       : [];
+  const names = held.map((code) => roles.data?.find((r) => r.code === code)?.name ?? code);
   return (
-    <ProfilePicker
-      legend="Group Profiles"
-      required={form.type === 'CREATE_USER'}
-      profiles={roles.data ?? []}
-      selected={form.roleCodes}
-      current={held}
-      rules={rules}
-      onChange={(roleCodes) => set({ roleCodes })}
-      error={errors.roleCodes}
-    />
+    <fieldset className="stack">
+      <legend>Group Profiles</legend>
+      {form.type === 'MODIFY_USER' && (
+        <p>{names.length > 0 ? names.join(', ') : 'No group profile'}</p>
+      )}
+      <Notice tone="info">
+        The group profiles of a user are assigned through UIDM-ISC; this request does not give,
+        change or remove them.
+      </Notice>
+    </fieldset>
   );
 }
 
@@ -255,8 +257,9 @@ function StateFields({ form, set, users }: Readonly<FieldsProps>) {
 
 /**
  * The fields of a user request (BRD 1.002-1.005; FR-UA-011 to FR-UA-014): the user, the new data
- * with the current values, the group profiles, the data access (companies and branches), the reason of a deactivation, the unlock of a
- * reactivation, or the party of an external (portal) user.
+ * with the current values, the group profiles held (read only: UIDM-ISC assigns them), the data
+ * access (companies and branches), the reason of a deactivation, the unlock of a reactivation, or
+ * the party of an external (portal) user.
  */
 export function UserRequestFields(props: Readonly<FieldsProps>) {
   const { form } = props;
@@ -269,7 +272,7 @@ export function UserRequestFields(props: Readonly<FieldsProps>) {
       </div>
       {!internal && <ExternalParty {...props} />}
       {withData && <DataFields {...props} />}
-      {withData && internal && <RolePicker {...props} />}
+      {withData && internal && <CurrentGroupProfiles {...props} />}
       {withData && internal && <DataAccessFields {...props} />}
       {(form.type === 'DISABLE_USER' || form.type === 'ENABLE_USER') && internal && (
         <StateFields {...props} />

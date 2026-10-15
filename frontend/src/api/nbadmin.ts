@@ -175,32 +175,6 @@ export interface AccessSettings {
   externalUsers: boolean;
 }
 
-export type AccessBatchStatus =
-  'DRAFT' | 'PENDING' | 'RETURNED' | 'CANCELLED' | 'REJECTED' | 'APPROVED' | 'PARTIAL';
-
-export interface AccessBatch {
-  id: number;
-  batchNo: string;
-  lines: number;
-  status: AccessBatchStatus;
-  remarks?: string;
-  createdBy: string;
-  createdAt: string;
-}
-
-export interface AccessBatchLineOutcome {
-  requestNo?: string;
-  username?: string;
-  status?: AccessRequestStatus;
-  temporaryPassword?: string;
-  error?: string;
-}
-
-export interface AccessBatchDecision {
-  batch: AccessBatch;
-  lines: AccessBatchLineOutcome[];
-}
-
 export interface UserAccess {
   /** User id (Data access of the user). */
   id?: number;
@@ -326,9 +300,7 @@ export interface SodRuleInput {
 
 const SOD = '/nbadmin/sod-rules';
 const REQUESTS = '/nbadmin/access-requests';
-const BATCHES = '/nbadmin/access-batches';
 const one = (id: number) => `${REQUESTS}/${String(id)}`;
-const batch = (id: number) => `${BATCHES}/${String(id)}`;
 
 /** Broking administration: access requests, access matrix, data retention (nbadmin module). */
 export const nbadminApi = {
@@ -356,19 +328,6 @@ export const nbadminApi = {
   approvers: (userType: AccessUserType, subject?: string) =>
     api.get<ApproverOption[]>(`/nbadmin/approvers${toQuery({ userType, subject })}`),
   settings: () => api.get<AccessSettings>('/nbadmin/access-settings'),
-  batches: (page = 0) => api.get<PageResponse<AccessBatch>>(`${BATCHES}${toQuery({ page })}`),
-  batch: (id: number) => api.get<AccessBatch>(batch(id)),
-  batchLines: (id: number) => api.get<AccessRequest[]>(`${batch(id)}/lines`),
-  submitBatch: (id: number, approver: string, remarks: string) =>
-    api.post<AccessBatch>(`${batch(id)}/submit`, { approver, remarks }),
-  approveBatch: (id: number, comment?: string) =>
-    api.post<AccessBatchDecision>(`${batch(id)}/approve`, { comment }),
-  rejectBatch: (id: number, comment: string) =>
-    api.post<AccessBatch>(`${batch(id)}/reject`, { comment }),
-  returnBatch: (id: number, comment: string) =>
-    api.post<AccessBatch>(`${batch(id)}/return`, { comment }),
-  cancelBatch: (id: number, comment: string) =>
-    api.post<AccessBatch>(`${batch(id)}/cancel`, { comment }),
   users: () => api.get<UserAccess[]>('/nbadmin/users'),
   roles: () => api.get<RoleInfo[]>('/nbadmin/roles'),
   matrix: () => api.get<AccessMatrix>('/nbadmin/access-matrix'),

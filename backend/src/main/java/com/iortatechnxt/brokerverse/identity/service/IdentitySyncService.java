@@ -33,6 +33,8 @@ import org.springframework.transaction.support.TransactionTemplate;
  * then applied in its own transaction; a refused or failed event stays recorded with its reason, is
  * alerted to the System Administrators and can be reprocessed. Also the on-demand synchronisation
  * of a user and the creation of a user from an active Enterprise SSO account (FRUM.002.01).
+ * UIDM-ISC orchestrates the membership of the group profiles: a membership event replaces the group
+ * profiles of a user at once, without an approval in the system, and is recorded like any event.
  */
 @Service
 public class IdentitySyncService {
@@ -305,6 +307,7 @@ public class IdentitySyncService {
       AppUser created = changes.create(account, source);
       return new Outcome(created, true, "Created user " + created.getUsername());
     }
+    changes.check(type, account);
     AppUser user = existing(account);
     String name = user.getUsername();
     return switch (type) {
@@ -320,6 +323,11 @@ public class IdentitySyncService {
         int n = changes.update(user, account.withStatus(DirectoryStatus.ACTIVE), source);
         yield new Outcome(
             user, n > 0, "Reactivated user " + name + " with the group profiles held before");
+      }
+      case MEMBERSHIP -> {
+        IdentityUserChanges.Change change =
+            changes.replaceGroups(user, account.groupProfiles(), source);
+        yield new Outcome(user, change.changed(), change.text());
       }
       case STATUS -> {
         int n = changes.applyStatus(user, account.status(), source);

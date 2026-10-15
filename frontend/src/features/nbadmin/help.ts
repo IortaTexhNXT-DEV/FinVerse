@@ -41,14 +41,14 @@ export const USER_ACCESS_HELP: HelpSection = {
   id: 'user-access',
   module: 'User Access',
   intro:
-    'User Access Maintenance: every change to a user or a group profile (role) is made through an approved request with a chosen approver and four eyes; each applied change is kept attribute by attribute in the access change log with its request number, who did it and who approved it.',
+    'User Access Maintenance: every change to a user or a group profile (role) is made through an approved request with a chosen approver and four eyes; the group profiles a user holds are assigned by UIDM-ISC through the provisioning interface and apply at once. Each applied change is kept attribute by attribute in the access change log with its request number, who did it and who approved it.',
   screens: [
     {
       name: 'Access Requests',
       path: '/user-access/requests',
       summary: `Requests to enrol, modify, deactivate and reactivate users (internal ${BRAND.product} users, or portal users of insurers and clients), by tab: My Requests, Assigned to Me, Second Approval, For Implementation and All. A row opens the request with its current and requested values, approvers and history.`,
       workflow: [
-        'New Request: choose the type, the user and the new data or group profiles, an optional effective date, the approver and the remarks. Save Draft keeps it for later (only you see it); Submit runs the full checks and notifies the approver.',
+        'New Request: choose the type, the user and the new data, an optional effective date, the approver and the remarks. Save Draft keeps it for later (only you see it); Submit runs the full checks and notifies the approver.',
         "The approver opens the request from My Approvals or Assigned to Me and clicks Approve and Apply, Return (remarks mandatory) or Reject (reason mandatory). A new user's temporary password is shown once.",
         'A returned request is corrected with Edit Request and resubmitted with a correction remark; the history keeps every round.',
         'A request with an effective date is SCHEDULED after approval and applied by a daily job on that date.',
@@ -56,7 +56,8 @@ export const USER_ACCESS_HELP: HelpSection = {
       ],
       controls: [
         'The requester and the user a request is about never decide it; only the chosen approver decides unless UAM_ANY_APPROVER is true.',
-        'A change that raises a user to a High or Admin group profile, or that is submitted or approved outside UAM_WORKING_HOURS, needs a second approval by another approver.',
+        'A request does not give, change or remove the group profiles of a user: UIDM-ISC assigns them, and the request shows those the user holds.',
+        'A request submitted or approved outside UAM_WORKING_HOURS needs a second approval by another approver.',
         'User IDs of new users follow USER_ID_PATTERN; one open request per user; every step is in the history and the audit trail.',
       ],
     },
@@ -74,21 +75,6 @@ export const USER_ACCESS_HELP: HelpSection = {
         'The implementer is never the requester. A deactivated profile grants nothing to its members until it is reactivated; SYSADMIN cannot be deactivated.',
         'Roles are edited directly on the Roles screen only through the emergency path UAM_DIRECT_ROLE_EDIT (off by default); every such edit is audited and raises an alert.',
         'With UAM_ROLE_APPLY_ON_APPROVAL true the change applies at the last approval.',
-      ],
-    },
-    {
-      name: 'Bulk Request',
-      path: '/user-access/bulk',
-      summary:
-        'Many user requests in one file (template UAM_ACCESS_REQUEST): one row per user with the action ENROL, MODIFY, DEACTIVATE or REACTIVATE. Every row is checked as a single request before the batch is created.',
-      workflow: [
-        'Download the template, fill one row per user and upload it; correct the rows reported and upload again.',
-        'Commit the valid rows: they become the draft lines of a batch. Open the batch, choose the approver, enter the remarks and submit.',
-        'The approver approves the batch: each line is applied on its own; a line that fails is listed with its reason and the others stand.',
-      ],
-      controls: [
-        'Each line follows every rule of a single request (user ID format, one open request per user, four eyes).',
-        'The batch is decided as a whole; temporary passwords of new users are shown once to the approver.',
       ],
     },
     {

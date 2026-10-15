@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.identity.service;
 
 import com.iortatechnxt.brokerverse.identity.domain.DirectoryAccount;
 import com.iortatechnxt.brokerverse.identity.domain.DirectoryStatus;
+import com.iortatechnxt.brokerverse.identity.domain.IdentityEventType;
 import com.iortatechnxt.brokerverse.security.domain.AccessChange;
 import com.iortatechnxt.brokerverse.security.domain.AccessChangeActivity;
 import com.iortatechnxt.brokerverse.security.domain.AccessChangeLog;
@@ -18,6 +19,7 @@ import com.iortatechnxt.brokerverse.security.service.UserSessionLog;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.time.Clock;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -35,7 +37,9 @@ import org.springframework.transaction.annotation.Transactional;
  * keeps the group profiles, deactivates the user of a leaver or of an inactive, disabled, locked or
  * deactivated account and ends the open sessions, and reactivates the user of an active account
  * with the group profiles held before. Every changed attribute is written to the access change log
- * with the source as the actor and the UIDM request number as the reference.
+ * with the source as the actor and the UIDM request number as the reference. UIDM-ISC orchestrates
+ * the membership of the group profiles: the group profiles it sends replace those of the user at
+ * once, after the checks of the group profiles and of the separation-of-duties rules.
  */
 @Component
 @Transactional(propagation = Propagation.MANDATORY)
@@ -53,6 +57,7 @@ public class IdentityUserChanges {
   private final AccessChangeLogRepository log;
   private final UserSessionLog sessions;
   private final SystemParameterService parameters;
+  private final GroupProfileChecks groupChecks;
   private final Clock clock;
 
   /**
@@ -64,8 +69,10 @@ public class IdentityUserChanges {
    * @param log access change log
    * @param sessions session log (a deactivated user's sessions end at once)
    * @param parameters business parameters
+   * @param groupChecks checks of the group profiles UIDM-ISC gives a user
    * @param clock clock
    */
+  @SuppressWarnings("java:S107") // collaborators of the changes
   public IdentityUserChanges(
       AppUserRepository users,
       RoleRepository roles,
@@ -73,6 +80,7 @@ public class IdentityUserChanges {
       AccessChangeLogRepository log,
       UserSessionLog sessions,
       SystemParameterService parameters,
+      GroupProfileChecks groupChecks,
       Clock clock) {
     this.users = users;
     this.roles = roles;
@@ -80,6 +88,7 @@ public class IdentityUserChanges {
     this.log = log;
     this.sessions = sessions;
     this.parameters = parameters;
+    this.groupChecks = groupChecks;
     this.clock = clock;
   }
 
@@ -171,6 +180,50 @@ public class IdentityUserChanges {
     user.setEnabled(false);
     sessions.endAll(user.getUsername(), SessionEndReason.ADMIN_ENDED);
     return 1;
+  }
+
+  /**
+   * Checks an event before the user is looked up: the group profiles of a membership event.
+   *
+   * @param type the event
+   * @param a the account
+   * @throws IdentityRefused when a group profile is refused
+   */
+  public void check(IdentityEventType type, DirectoryAccount a) {
+    if (type == IdentityEventType.MEMBERSHIP) {
+      groupChecks.groups(a.groupProfiles());
+    }
+  }
+
+  /**
+   * Replaces the group profiles of a user with those UIDM-ISC sends (no approval in the system).
+   *
+   * @param user the user
+   * @param codes codes of the group profiles the user holds after the change
+   * @param source actor and reference
+   * @return whether the group profiles changed, with the change in words
+   */
+  public Change replaceGroups(AppUser user, Collection<String> codes, Source source) {
+    Set<Role> given = groupChecks.groups(codes);
+    String before = codes(user.getRoles());
+    String after = codes(given);
+    String name = "Group profiles of user " + user.getUsername();
+    if (before.equals(after)) {
+      return new Change(false, name + " unchanged: " + words(before));
+    }
+    record(
+        source,
+        user,
+        AccessChangeActivity.ROLES_CHANGED,
+        "roles",
+        before.isEmpty() ? null : before,
+        after.isEmpty() ? null : after);
+    user.replaceRoles(given);
+    return new Change(true, name + " changed from " + words(before) + " to " + words(after));
+  }
+
+  private static String words(String codes) {
+    return codes.isEmpty() ? "(none)" : codes.replace(",", ", ");
   }
 
   private void checkNewUser(DirectoryAccount a) {
@@ -270,4 +323,12 @@ public class IdentityUserChanges {
    * @param reference UIDM request number, or the number of the event
    */
   public record Source(String actor, String reference) {}
+
+  /**
+   * What a change of the group profiles did.
+   *
+   * @param changed whether the group profiles changed
+   * @param text the change in words
+   */
+  public record Change(boolean changed, String text) {}
 }

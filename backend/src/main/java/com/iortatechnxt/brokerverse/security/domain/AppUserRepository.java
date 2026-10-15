@@ -67,6 +67,17 @@ public interface AppUserRepository extends JpaRepository<AppUser, Long> {
   List<String> findEnabledUsernamesWithRole(@Param("roleCode") String roleCode);
 
   /**
+   * User names of every user holding a role, enabled or not (membership of a group profile).
+   *
+   * @param roleCode role code
+   * @return user names, sorted
+   */
+  @Query(
+      "select distinct u.username from AppUser u join u.roles r"
+          + " where r.code = :roleCode order by u.username")
+  List<String> findUsernamesWithRole(@Param("roleCode") String roleCode);
+
+  /**
    * Finds a user by Windows ID (directory sign-in, AUTH_MODE = DIRECTORY; UAM-NFR-11).
    *
    * @param windowsId Windows ID

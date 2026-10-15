@@ -5,7 +5,7 @@ import type { PageResponse } from './types';
 export type DirectoryStatus = 'ACTIVE' | 'INACTIVE' | 'LOCKED' | 'DISABLED' | 'DEACTIVATED';
 
 /** What a provisioning event asks for. */
-export type IdentityEventType = 'JOINER' | 'MOVER' | 'LEAVER' | 'REHIRE' | 'STATUS';
+export type IdentityEventType = 'JOINER' | 'MOVER' | 'LEAVER' | 'REHIRE' | 'STATUS' | 'MEMBERSHIP';
 
 /** Outcome of a provisioning event. */
 export type IdentityEventStatus = 'APPLIED' | 'NO_CHANGE' | 'REFUSED' | 'FAILED';
@@ -109,6 +109,12 @@ export const identityApi = {
     ),
   sendSimulatorEvent: (windowsId: string, type: IdentityEventType) =>
     api.post<IdentityEvent>(`${BASE}/simulator/accounts/events/${type}${toQuery({ windowsId })}`),
+  /** The group profiles UIDM-ISC sends for the user of an account (membership event). */
+  sendSimulatorMembership: (windowsId: string, groups: string[], uidmRequestNo?: string) =>
+    api.post<IdentityEvent>(
+      `${BASE}/simulator/accounts/events/MEMBERSHIP${toQuery({ windowsId })}`,
+      { groups, uidmRequestNo },
+    ),
 };
 
 /** Event types in words. */
@@ -118,6 +124,7 @@ export const EVENT_TYPE_LABELS: Record<IdentityEventType, string> = {
   LEAVER: 'Leaver',
   REHIRE: 'Rehire',
   STATUS: 'Status change',
+  MEMBERSHIP: 'Group profiles',
 };
 
 /** Outcomes in words. */

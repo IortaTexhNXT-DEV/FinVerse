@@ -11,5 +11,7 @@ public enum IdentityEventType {
   /** A user back (reactivate with the roles held before). */
   REHIRE,
   /** A status change (Active reactivates; Inactive, Disabled, Locked, Deactivated deactivate). */
-  STATUS
+  STATUS,
+  /** The group profiles of a user (membership orchestrated by UIDM-ISC, applied as sent). */
+  MEMBERSHIP
 }

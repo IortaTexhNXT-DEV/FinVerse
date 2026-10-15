@@ -48,7 +48,6 @@ class PersonaMenusIT {
           Map.entry("/user-access/requests", "/api/v1/nbadmin/access-requests"),
           Map.entry(
               "/user-access/group-profiles", "/api/v1/nbadmin/access-requests?groupProfiles=true"),
-          Map.entry("/user-access/bulk", "/api/v1/nbadmin/access-batches"),
           Map.entry("/user-access/matrix", "/api/v1/nbadmin/access-matrix"),
           Map.entry("/user-access/sod-rules", "/api/v1/nbadmin/sod-rules"),
           Map.entry("/user-access/reports", "/api/v1/reports"),

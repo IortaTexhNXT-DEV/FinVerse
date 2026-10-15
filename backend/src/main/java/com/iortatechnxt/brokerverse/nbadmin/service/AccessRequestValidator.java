@@ -115,6 +115,9 @@ public class AccessRequestValidator {
       }
     } else {
       UserRequestValidator.requireUsername(c.username());
+      if (c.external() == null) {
+        UserRequestValidator.requireNoRoles(c);
+      }
     }
     requireEffectiveDate(c);
     return c.withJustification(trimmed(c.justification()));

@@ -1,37 +1,25 @@
 package com.iortatechnxt.brokerverse.nbadmin.service;
 
-import com.iortatechnxt.brokerverse.common.domain.RecordStatus;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
-import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestContent;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestType;
 import com.iortatechnxt.brokerverse.nbadmin.domain.RequestedUserData;
-import com.iortatechnxt.brokerverse.nbadmin.domain.SodRule;
-import com.iortatechnxt.brokerverse.nbadmin.domain.SodRuleKind;
-import com.iortatechnxt.brokerverse.nbadmin.domain.SodRuleRepository;
 import com.iortatechnxt.brokerverse.security.domain.AppUser;
 import com.iortatechnxt.brokerverse.security.domain.AppUserRepository;
-import com.iortatechnxt.brokerverse.security.domain.Role;
-import com.iortatechnxt.brokerverse.security.domain.RoleRepository;
 import com.iortatechnxt.brokerverse.security.service.DataScopeService;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
-import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Full checks of a request about an internal user on submission and again at approval (BRD
  * 1.002-1.005; FR-UA-011 to FR-UA-014): the user ID format for a new user (USER_ID_PATTERN), the
- * user exists or not, is enabled or not, the group profiles exist and are active, the Windows ID is
- * free, a modification changes something, nobody requests a change of their own roles, the group
- * profiles break no active separation-of-duties rule (V1065), and a requested data scope names
- * known companies and branches within the scope of the requester or approver (V1240).
+ * user exists or not, is enabled or not, the Windows ID is free, a modification changes something,
+ * and a requested data scope names known companies and branches within the scope of the requester
+ * or approver (V1240). A request carries no group profiles: UIDM-ISC orchestrates the membership of
+ * the group profiles, applied through the provisioning interface (decision option A).
  */
 @Component
 @Transactional(readOnly = true)
@@ -40,42 +28,32 @@ public class UserRequestValidator {
   /** Letters, digits, dots, dashes and underscores (the user name rule of the platform). */
   static final Pattern USERNAME = Pattern.compile("[a-zA-Z0-9._-]{3,50}");
 
+  /** Error code of group profiles on a request about a user. */
+  public static final String GROUP_PROFILES_BY_UIDM = "ACCESS_GROUP_PROFILES_BY_UIDM";
+
+  /** The group profiles of a user come from UIDM-ISC (decision option A). */
+  public static final String GROUP_PROFILES_BY_UIDM_TEXT =
+      "The group profiles of a user are assigned through UIDM-ISC; a request does not give,"
+          + " change or remove them";
+
   private static final String USER = "User ";
 
   private final AppUserRepository users;
-  private final RoleRepository roles;
   private final AccessSettings settings;
-  private final CurrentUser currentUser;
-  private final SodRuleRepository sodRules;
   private final DataScopeService dataScopes;
-  private final PermissionConflicts conflicts;
 
   /**
    * Creates the validator.
    *
    * @param users users
-   * @param roles roles
    * @param settings parameters (user ID format)
-   * @param currentUser current user (the requester)
-   * @param sodRules separation-of-duties rules
    * @param dataScopes data scope administration
-   * @param conflicts conflicting permission combinations across the user's group profiles
    */
   public UserRequestValidator(
-      AppUserRepository users,
-      RoleRepository roles,
-      AccessSettings settings,
-      CurrentUser currentUser,
-      SodRuleRepository sodRules,
-      DataScopeService dataScopes,
-      PermissionConflicts conflicts) {
-    this.conflicts = conflicts;
-    this.sodRules = sodRules;
+      AppUserRepository users, AccessSettings settings, DataScopeService dataScopes) {
     this.dataScopes = dataScopes;
     this.users = users;
-    this.roles = roles;
     this.settings = settings;
-    this.currentUser = currentUser;
   }
 
   /**
@@ -93,7 +71,7 @@ public class UserRequestValidator {
       UserStateRules.requireState(c.type(), username, user);
       username = user.getUsername();
     }
-    Set<String> roleCodes = requireRoles(c);
+    Set<String> roleCodes = requireNoRoles(c);
     requireFreeWindowsId(c.userData(), user);
     RequestedUserData data = RequestedScopeRule.check(c.type(), c.userData(), dataScopes);
     AccessRequestContent clean =
@@ -111,7 +89,6 @@ public class UserRequestValidator {
             null,
             c.effectiveFrom());
     if (user != null) {
-      requireNotOwnRoles(clean, user);
       UserStateRules.requireChange(clean, user, dataScopes.scopeOf(user.getId()));
     }
     return clean;
@@ -155,67 +132,18 @@ public class UserRequestValidator {
     }
   }
 
-  private Set<String> requireRoles(AccessRequestContent c) {
-    if (!c.type().carriesUserRoles()) {
-      return Set.of();
-    }
-    boolean required = c.type() != AccessRequestType.MODIFY_USER;
-    if (c.roleCodes().isEmpty()) {
-      if (required) {
-        throw new BusinessRuleException("ACCESS_ROLES", "Select at least one role");
-      }
-      return Set.of();
-    }
-    List<Role> found = roles.findByCodeIn(c.roleCodes());
-    Set<String> unknown = new TreeSet<>(c.roleCodes());
-    found.forEach(r -> unknown.remove(r.getCode()));
-    if (!unknown.isEmpty()) {
-      throw new BusinessRuleException("ACCESS_UNKNOWN_ROLE", "Unknown role(s): " + unknown);
-    }
-    found.stream()
-        .filter(r -> !r.isActive())
-        .findFirst()
-        .ifPresent(
-            r -> {
-              throw new BusinessRuleException(
-                  "ACCESS_ROLE_INACTIVE", "Group profile " + r.getName() + " is not active");
-            });
-    Set<String> codes = new TreeSet<>(c.roleCodes());
-    requireNoSodConflict(codes, found);
-    conflicts.checkUser(found);
-    return codes;
-  }
-
   /**
-   * Refuses group profiles that one user may not hold together (an active separation-of-duties
-   * rule).
+   * Refuses group profiles on a request about a user: UIDM-ISC orchestrates the membership of the
+   * group profiles, which reaches the system through the provisioning interface.
    *
-   * @param codes group profiles the user would hold
-   * @param found the group profiles, for their names
+   * @param c request content
+   * @return no group profiles
    */
-  private void requireNoSodConflict(Set<String> codes, List<Role> found) {
-    if (codes.size() < 2) {
-      return;
+  static Set<String> requireNoRoles(AccessRequestContent c) {
+    if (c.type() == AccessRequestType.MODIFY_ROLES || !c.roleCodes().isEmpty()) {
+      throw new BusinessRuleException(GROUP_PROFILES_BY_UIDM, GROUP_PROFILES_BY_UIDM_TEXT);
     }
-    Map<String, String> names =
-        found.stream().collect(Collectors.toMap(Role::getCode, Role::getName, (a, b) -> a));
-    Function<String, String> name = code -> names.getOrDefault(code, code);
-    for (SodRule rule : sodRules.findByRecordStatus(RecordStatus.ACTIVE)) {
-      if (rule.getKind() == SodRuleKind.PROFILES && rule.forbids(codes)) {
-        String profile = name.apply(rule.getProfileA());
-        String otherProfile = name.apply(rule.getProfileB());
-        String ruleCode = rule.getRuleCode();
-        throw new BusinessRuleException(
-            "ACCESS_SOD_CONFLICT",
-            "One user may not hold both "
-                + profile
-                + " and "
-                + otherProfile
-                + " (separation-of-duties rule "
-                + ruleCode
-                + ")");
-      }
-    }
+    return Set.of();
   }
 
   private void requireFreeWindowsId(RequestedUserData data, AppUser user) {
@@ -230,15 +158,6 @@ public class UserRequestValidator {
     if (used) {
       throw new BusinessRuleException(
           "ACCESS_WINDOWS_ID_IN_USE", "Windows ID " + windowsId + " belongs to another user");
-    }
-  }
-
-  private void requireNotOwnRoles(AccessRequestContent c, AppUser user) {
-    if (c.type().carriesUserRoles()
-        && !c.roleCodes().isEmpty()
-        && CurrentUser.sameUser(currentUser.username(), user.getUsername())
-        && !c.roleCodes().equals(UserStateRules.roleCodes(user))) {
-      throw new BusinessRuleException("SELF_ROLE_CHANGE", "You cannot change your own roles");
     }
   }
 

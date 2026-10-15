@@ -26,9 +26,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * BDOI FRS FRUM.006.03 (conflict C16): a rule of two permissions, authorised by Information
- * Security, refuses a group-profile request that would give one profile both permissions, and a
- * user request that would give one user both through two profiles; a permission both added and
- * removed in one request is refused as before.
+ * Security, refuses a group-profile request that would give one profile both permissions (the group
+ * profiles of a user come from UIDM-ISC, where the provisioning interface refuses the combination
+ * for one user); a permission both added and removed in one request is refused as before.
  */
 @IntegrationTest
 class PermissionCombinationIT {
@@ -135,7 +135,7 @@ class PermissionCombinationIT {
                               false,
                               List.of(APPROVER))))
           .extracting("code")
-          .isEqualTo("ACCESS_PERMISSION_COMBINATION");
+          .isEqualTo("ACCESS_GROUP_PROFILES_BY_UIDM");
     } finally {
       as.run(BADMIN, () -> rules.requestDeactivation(rule.getId()));
       as.run(INFOSEC, () -> rules.authorize(rule.getId()));

@@ -3,7 +3,9 @@ package com.iortatechnxt.brokerverse.api;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasItem;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -30,6 +32,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -37,11 +40,12 @@ import org.springframework.test.web.servlet.ResultActions;
  * User Access Maintenance (BRD-11) end to end through the HTTP API with the SIT/UAT users (wave
  * U2): the Requestor enrols a new user as Screening Investigator and the Approver approves; the
  * user signs in with the temporary password, must change it, and holds exactly the investigator's
- * permissions (the menu of the web client is built from them); a change of the user's group
- * profiles submitted outside working hours needs the Second Approver; the Business Administrator's
- * group-profile request is implemented by the System Administrator; the deactivation ends the
- * user's sessions at once; the User Access Audit Log shows each change with its from and to values
- * and request number (BRD 1.002-1.008, 2.002, 3.002, 3.003, 4.003.1; UAM-NFR-35, 36, 40).
+ * permissions, given by UIDM-ISC through the provisioning interface (the menu of the web client is
+ * built from them); a change of the user submitted outside working hours needs the Second Approver;
+ * UIDM-ISC changes the user's group profiles at once; the Business Administrator's group-profile
+ * request is implemented by the System Administrator; the deactivation ends the user's sessions at
+ * once; the User Access Audit Log shows each change with its from and to values and request number
+ * (BRD 1.002-1.008, 2.002, 3.002, 3.003, 4.003.1; UAM-NFR-35, 36, 40).
  */
 @IntegrationTest
 class UserAccessEndToEndApiIT {
@@ -82,8 +86,6 @@ class UserAccessEndToEndApiIT {
                 "End To End Investigator",
                 "email",
                 userId + "@example.ph",
-                "roleCodes",
-                List.of("SCR_INVESTIGATOR"),
                 "windowsId",
                 "W" + userId,
                 "justification",
@@ -99,6 +101,8 @@ class UserAccessEndToEndApiIT {
             .get("temporaryPassword")
             .asText();
     assertThat(temporary).isNotBlank();
+    // UIDM-ISC, which orchestrates the membership, makes the user a Screening Investigator.
+    uidmAdds("SCR_INVESTIGATOR", userId, "UIDM-E2E-" + userId + "-1");
 
     // First sign-in: the temporary password must be changed; the token carries the role's rights.
     JsonNode first = login(userId, temporary);
@@ -123,6 +127,7 @@ class UserAccessEndToEndApiIT {
         .andExpect(jsonPath("$.content.length()", greaterThan(0)));
 
     String modifyNo = modifyOutsideWorkingHours(userId);
+    uidmAdds("UNIT_COMPLIANCE_COORD", userId, "UIDM-E2E-" + userId + "-2");
     assertThat(permissionsOf(login(userId, NEW_PASSWORD).get("accessToken").asText()))
         .contains("SCR_CASE_ASSIGN", "SCR_REPORT_VIEW");
     String profileNo = groupProfileImplemented();
@@ -158,7 +163,7 @@ class UserAccessEndToEndApiIT {
     assertThat(auditLog(null)).contains(profileNo);
   }
 
-  /** A group-profile change submitted outside UAM_WORKING_HOURS needs a second approval. */
+  /** A change of the user submitted outside UAM_WORKING_HOURS needs a second approval. */
   private String modifyOutsideWorkingHours(String userId) throws Exception {
     String hours = parameter("UAM_WORKING_HOURS");
     String tomorrow =
@@ -173,10 +178,10 @@ class UserAccessEndToEndApiIT {
                   "MODIFY_USER",
                   "username",
                   userId,
-                  "roleCodes",
-                  List.of("SCR_INVESTIGATOR", "UNIT_COMPLIANCE_COORD"),
+                  "email",
+                  "moved." + userId + "@example.ph",
                   "justification",
-                  "Covers the unit coordinator desk"));
+                  "Moves to the unit coordinator desk"));
       api.doGet(REQUESTOR, REQUESTS + "/" + id)
           .andExpect(jsonPath("$.lifecycle.riskFlags", hasItem("OUTSIDE_HOURS")))
           .andExpect(jsonPath("$.lifecycle.secondApprovalRequired").value(true));
@@ -235,17 +240,23 @@ class UserAccessEndToEndApiIT {
     assertThat(rows)
         .anySatisfy(
             r -> {
-              assertThat(r.get("activity").asText()).startsWith("Modify User Group Profile");
-              assertThat(r.get("fromValue").asText()).isEqualTo("Screening Investigator");
-              assertThat(r.get("toValue").asText()).contains("Unit Compliance Coordinator");
-              assertThat(r.get("requestNo").asText()).isEqualTo(modifyNo);
-              assertThat(r.get("approvedBy").asText()).isIn(APPROVER, SECOND);
+              assertThat(r.path("activity").asText()).startsWith("Modify User Group Profile");
+              assertThat(r.path("fromValue").asText()).isEqualTo("Screening Investigator");
+              assertThat(r.path("toValue").asText()).contains("Unit Compliance Coordinator");
+              assertThat(r.path("requestNo").asText()).isEqualTo("UIDM-E2E-" + userId + "-2");
+              assertThat(r.path("doneBy").asText()).isEqualTo("UIDM-ISC");
             });
     assertThat(rows)
         .anySatisfy(
             r -> {
-              assertThat(r.get("activity").asText()).startsWith("Deactivate User");
-              assertThat(r.get("requestNo").asText()).isEqualTo(disableNo);
+              assertThat(r.path("requestNo").asText()).isEqualTo(modifyNo);
+              assertThat(r.path("approvedBy").asText()).isIn(APPROVER, SECOND);
+            });
+    assertThat(rows)
+        .anySatisfy(
+            r -> {
+              assertThat(r.path("activity").asText()).startsWith("Deactivate User");
+              assertThat(r.path("requestNo").asText()).isEqualTo(disableNo);
             });
   }
 
@@ -260,6 +271,28 @@ class UserAccessEndToEndApiIT {
         .andReturn()
         .getResponse()
         .getContentAsString(StandardCharsets.UTF_8);
+  }
+
+  /** UIDM-ISC adds the user to a group profile through the provisioning interface (SCIM). */
+  private void uidmAdds(String group, String userId, String requestNo) throws Exception {
+    mvc.perform(
+            patch("/integration/v1/scim/v2/Groups/" + group)
+                .with(
+                    jwt()
+                        .jwt(j -> j.subject("uidm-isc"))
+                        .authorities(new SimpleGrantedAuthority("SCOPE_identity.provision")))
+                .header("X-UIDM-Request-No", requestNo)
+                .contentType("application/scim+json")
+                .content(
+                    json.writeValueAsString(
+                        Map.of(
+                            "Operations",
+                            List.of(
+                                Map.of(
+                                    "op", "add",
+                                    "path", "members",
+                                    "value", List.of(Map.of("value", userId))))))))
+        .andExpect(status().isOk());
   }
 
   /** Creates and submits a request to the seed Approver; returns its id. */

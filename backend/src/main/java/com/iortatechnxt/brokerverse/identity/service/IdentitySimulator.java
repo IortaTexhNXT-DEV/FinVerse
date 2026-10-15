@@ -18,8 +18,9 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * The Enterprise SSO simulator of SIT and UAT: its accounts (the directory) and the events UIDM-ISC
- * would send for them (joiner, mover, leaver, rehire, status), applied through the same intake as
- * the provisioning interface, so the flows run end to end before the real platform is connected.
+ * would send for them (joiner, mover, leaver, rehire, status, membership of the group profiles),
+ * applied through the same intake as the provisioning interface, so the flows run end to end before
+ * the real platform is connected.
  */
 @Service
 @ConditionalOnProperty(name = "brokerverse.identity.simulator", havingValue = "true")
@@ -27,6 +28,7 @@ public class IdentitySimulator {
 
   private final SimulatedAccountRepository accounts;
   private final IdentitySyncService sync;
+  private final IdentityMemberships memberships;
   private final TransactionTemplate tx;
   private final Clock clock;
 
@@ -35,16 +37,19 @@ public class IdentitySimulator {
    *
    * @param accounts simulator accounts
    * @param sync intake of the events
+   * @param memberships intake of the membership events
    * @param transactions transaction manager
    * @param clock clock
    */
   public IdentitySimulator(
       SimulatedAccountRepository accounts,
       IdentitySyncService sync,
+      IdentityMemberships memberships,
       PlatformTransactionManager transactions,
       Clock clock) {
     this.accounts = accounts;
     this.sync = sync;
+    this.memberships = memberships;
     this.tx = new TransactionTemplate(transactions);
     this.clock = clock;
   }
@@ -102,6 +107,10 @@ public class IdentitySimulator {
    * @return the event with its outcome
    */
   public IdentityEvent send(String windowsId, IdentityEventType type) {
+    if (type == IdentityEventType.MEMBERSHIP) {
+      throw new IdentityRefused(
+          "MEMBERSHIP_GROUPS", "A membership event is sent with the group profiles of the user");
+    }
     DirectoryAccount account = tx.execute(s -> find(windowsId).toAccount());
     DirectoryAccount sent =
         switch (type) {
@@ -117,6 +126,21 @@ public class IdentitySimulator {
             ? IdentityEventSource.ENTERPRISE_SSO
             : IdentityEventSource.UIDM_ISC;
     return sync.receive(sent, type, source);
+  }
+
+  /**
+   * Sends the group profiles of an account to the system, as UIDM-ISC would (membership event):
+   * they replace the group profiles of the user at once, after the same checks as the interface.
+   *
+   * @param windowsId Windows ID
+   * @param groups codes of the group profiles the user holds after the event
+   * @param requestNo UIDM request number, may be null
+   * @return the event with its outcome
+   */
+  public IdentityEvent sendMembership(String windowsId, List<String> groups, String requestNo) {
+    DirectoryAccount sent =
+        tx.execute(s -> find(windowsId).toAccount()).withMembership(groups, requestNo);
+    return memberships.send(sent, IdentityEventSource.UIDM_ISC);
   }
 
   private SimulatedAccount find(String windowsId) {

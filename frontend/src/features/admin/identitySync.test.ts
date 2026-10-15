@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { IdentityEvent } from '@/api/identity';
 import {
   EMPTY_ACCOUNT,
+  groupCodes,
   missingAccountFields,
   outcomeStatus,
   SIMULATED_EVENTS,
@@ -54,5 +55,10 @@ describe('identity synchronisation helpers', () => {
       'REHIRE',
       'STATUS',
     ]);
+  });
+
+  it('reads the group profile codes of a membership event', () => {
+    expect(groupCodes(' mkt_ao, TSU;tsu  auditor ')).toEqual(['MKT_AO', 'TSU', 'AUDITOR']);
+    expect(groupCodes('  ')).toEqual([]);
   });
 });

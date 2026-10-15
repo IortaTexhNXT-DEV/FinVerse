@@ -141,7 +141,7 @@
             "UAM_REACTIVATE",
             "UAM_VIEW"
           ],
-          "screens": ["/user-access/requests", "/user-access/bulk"]
+          "screens": ["/user-access/requests"]
         },
         "UAM_APPROVER": {
           "seedUser": "uamapprover",
@@ -149,7 +149,6 @@
           "screens": [
             "/user-access/requests",
             "/user-access/group-profiles",
-            "/user-access/bulk",
             "/user-access/matrix",
             "/user-access/reports"
           ]

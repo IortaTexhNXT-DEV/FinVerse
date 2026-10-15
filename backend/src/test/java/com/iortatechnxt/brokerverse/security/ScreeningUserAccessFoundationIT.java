@@ -223,7 +223,9 @@ class ScreeningUserAccessFoundationIT {
         // + the refused identity event notice (V2702; the break-glass notice went in V2822)
         .contains("UAM_IDENTITY_REFUSED")
         .doesNotContain("UAM_BREAK_GLASS_SIGN_IN")
-        .hasSize(25);
+        // + the identity reconciliation mismatch notice (V2824)
+        .contains("UAM_RECONCILIATION_MISMATCH")
+        .hasSize(26);
     assertThat(
             jdbc.queryForList(
                 "select record_type from nba_retention_rule where years_online = 5"

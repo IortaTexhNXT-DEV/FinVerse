@@ -64,6 +64,8 @@ export default defineConfig({
       reporter: ['text-summary', 'lcov'],
       include: ['src/**/*.{ts,tsx}'],
       exclude: ['src/main.tsx', 'src/test/**', 'src/**/*.d.ts'],
+      // Just under the measured coverage (65.4 / 68.8 / 50.5 / 65.6 %): a drop fails the build.
+      thresholds: { statements: 64, branches: 67, functions: 49, lines: 64 },
     },
   },
 });

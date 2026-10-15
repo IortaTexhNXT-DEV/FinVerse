@@ -100,7 +100,6 @@ export default tseslint.config(
   {
     files: ['**/*.test.{ts,tsx}', 'src/test/**'],
     rules: {
-      'sonarjs/no-hardcoded-passwords': 'off',
       '@typescript-eslint/no-non-null-assertion': 'off',
     },
   },

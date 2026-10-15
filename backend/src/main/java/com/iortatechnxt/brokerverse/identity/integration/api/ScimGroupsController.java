@@ -14,7 +14,6 @@ import com.iortatechnxt.brokerverse.identity.service.ScimUsers;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -52,6 +51,10 @@ public class ScimGroupsController {
   private static final String MEMBERS = "members";
   private static final Pattern MEMBER_FILTER =
       Pattern.compile("members\\[\\s*value\\s+eq\\s+\"([^\"]+)\"\\s*]", Pattern.CASE_INSENSITIVE);
+  private static final Pattern MEMBERS_PATH = Pattern.compile(MEMBERS, Pattern.CASE_INSENSITIVE);
+
+  /** The PATCH operations, matched without regard to case as SCIM allows. */
+  private static final List<String> VERBS = List.of("add", "remove", "replace");
 
   private final IdentityMemberships memberships;
   private final IdentityExtract extract;
@@ -188,7 +191,7 @@ public class ScimGroupsController {
       }
       Matcher filter = MEMBER_FILTER.matcher(path);
       boolean filtered = filter.matches();
-      if (!filtered && !MEMBERS.equalsIgnoreCase(path)) {
+      if (!filtered && !MEMBERS_PATH.matcher(path).matches()) {
         return answers.error(
             HttpStatus.BAD_REQUEST, "invalidPath", "Only the members of a group profile change");
       }
@@ -197,7 +200,12 @@ public class ScimGroupsController {
       if (unknown != null) {
         return unknown;
       }
-      String verb = op.path("op").asText("").trim().toLowerCase(Locale.ROOT);
+      String sent = op.path("op").asText("").trim();
+      String verb =
+          VERBS.stream()
+              .filter(v -> Pattern.compile(v, Pattern.CASE_INSENSITIVE).matcher(sent).matches())
+              .findFirst()
+              .orElse(sent);
       return change(verb, members, filtered)
           ? null
           : answers.error(HttpStatus.BAD_REQUEST, "invalidSyntax", "Unknown operation " + verb);

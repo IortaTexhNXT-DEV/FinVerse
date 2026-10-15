@@ -11,6 +11,7 @@ import com.iortatechnxt.brokerverse.identity.domain.SimulatedAccount;
 import com.iortatechnxt.brokerverse.identity.domain.SimulatedAccountRepository;
 import java.time.Clock;
 import java.util.List;
+import java.util.Objects;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -139,7 +140,8 @@ public class IdentitySimulator {
    */
   public IdentityEvent sendMembership(String windowsId, List<String> groups, String requestNo) {
     DirectoryAccount sent =
-        tx.execute(s -> find(windowsId).toAccount()).withMembership(groups, requestNo);
+        Objects.requireNonNull(tx.execute(s -> find(windowsId).toAccount()))
+            .withMembership(groups, requestNo);
     return memberships.send(sent, IdentityEventSource.UIDM_ISC);
   }
 

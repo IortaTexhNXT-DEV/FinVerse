@@ -125,8 +125,9 @@ Roles screen applies the approved change and marks the request IMPLEMENTED.
   Windows ID; its adapter is parked, so DIRECTORY refuses every sign-in until it exists. OIDC or SAML:
   single sign-on at the client's identity provider (configured per deployment, CONFIGURATION.md
   "Authentication and session security"); the identity is linked to an existing active user only
-  (never created); only the break-glass administrators (`BROKERVERSE_SSO_BREAK_GLASS_USERS`) keep a
-  local password, with the second factor always required.
+  (never created). There is no break-glass account. Local passwords are kept only for the test
+  accounts of DEV, SIT and UAT; production refuses every local-password sign-in, password change and
+  reset (`LocalPasswordSignIn`, start-up check in `ProductionSafeguards`).
 - Lockout after `LOGIN_MAX_FAILED_ATTEMPTS` failed sign-ins (a wrong password or a wrong second-factor
   code; the value is the client's parameter); the last one ends the user's sessions. A wrong password,
   a locked and a deactivated account get the same message ("Invalid user name or password"); the

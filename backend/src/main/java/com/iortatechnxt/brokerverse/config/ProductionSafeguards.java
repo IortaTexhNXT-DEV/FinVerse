@@ -48,6 +48,10 @@ import org.springframework.core.env.Profiles;
  *       plaintext: PostgreSQL without {@code sslmode=verify-full} (or {@code verify-ca}), Valkey
  *       without TLS, Kafka without {@code SASL_SSL}, the HTTP listener without TLS ({@code
  *       server.ssl.enabled}).
+ *   <li><b>Local passwords.</b> A production start is refused when {@code
+ *       brokerverse.security.local-password-sign-in} is set to true: production users sign in at
+ *       the identity provider only, and a local-password sign-in is refused at run time whatever
+ *       the setting ({@link #localPasswordSignIn(Environment)}).
  *   <li><b>Integration tokens.</b> A production instance serving {@code /integration/**} (runtime
  *       role {@code integration} or {@code all}) needs the API gateway's key set, issuer and
  *       audience.
@@ -176,6 +180,13 @@ public final class ProductionSafeguards implements EnvironmentPostProcessor, Ord
       requireSecrets(environment, problems);
       requireSharedEnvironmentSettings(environment, problems);
     }
+    if (production
+        && Boolean.parseBoolean(
+            environment.getProperty("brokerverse.security.local-password-sign-in", "").trim())) {
+      problems.add(
+          "local-password sign-in is switched on in production; remove"
+              + " BROKERVERSE_LOCAL_PASSWORD_SIGN_IN (users sign in at the identity provider)");
+    }
     if (production) {
       requireSeparateDatabaseRoles(environment, problems);
       requireEncryptionInTransit(environment, problems);
@@ -194,6 +205,19 @@ public final class ProductionSafeguards implements EnvironmentPostProcessor, Ord
     String kind = environment.getProperty(ENVIRONMENT_PROPERTY, "");
     return environment.acceptsProfiles(Profiles.of(PROD_PROFILE))
         || PRODUCTION_KIND.matcher(kind.trim()).matches();
+  }
+
+  /**
+   * Tells whether a password held by BrokerVerse may be used to sign in: never in production (the
+   * users sign in at the identity provider), elsewhere unless {@code
+   * brokerverse.security.local-password-sign-in} is false (test accounts of the seed data).
+   *
+   * @param environment resolved environment
+   * @return true when local-password sign-in is allowed
+   */
+  public static boolean localPasswordSignIn(Environment environment) {
+    return !isProduction(environment)
+        && enabled(environment, "brokerverse.security.local-password-sign-in", true);
   }
 
   /**

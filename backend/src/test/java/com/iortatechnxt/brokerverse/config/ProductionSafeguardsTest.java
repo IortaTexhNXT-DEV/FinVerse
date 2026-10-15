@@ -342,4 +342,41 @@ class ProductionSafeguardsTest {
     assertThat(ProductionSafeguards.problems(env))
         .noneMatch(p -> p.contains("TLS") || p.contains("SASL_SSL") || p.contains("sslmode"));
   }
+
+  @Test
+  void productionNeverAllowsALocalPasswordSignIn() {
+    assertThat(ProductionSafeguards.localPasswordSignIn(completeProduction())).isFalse();
+    assertThat(
+            ProductionSafeguards.localPasswordSignIn(
+                new MockEnvironment().withProperty("brokerverse.environment", "PRODUCTION")))
+        .isFalse();
+    MockEnvironment prodProfile = new MockEnvironment();
+    prodProfile.setActiveProfiles(ProductionSafeguards.PROD_PROFILE);
+    assertThat(ProductionSafeguards.localPasswordSignIn(prodProfile)).isFalse();
+  }
+
+  @Test
+  void testEnvironmentsKeepLocalPasswordsUnlessSwitchedOff() {
+    assertThat(ProductionSafeguards.localPasswordSignIn(new MockEnvironment())).isTrue();
+    MockEnvironment uat = new MockEnvironment().withProperty("brokerverse.environment", "uat");
+    uat.setActiveProfiles(ProductionSafeguards.SEED_PROFILE);
+    assertThat(ProductionSafeguards.localPasswordSignIn(uat)).isTrue();
+    assertThat(
+            ProductionSafeguards.localPasswordSignIn(
+                new MockEnvironment()
+                    .withProperty("brokerverse.environment", "sit")
+                    .withProperty("brokerverse.security.local-password-sign-in", "false")))
+        .isFalse();
+  }
+
+  @Test
+  void productionRefusesToStartWithLocalPasswordSignInSwitchedOn() {
+    assertThat(
+            ProductionSafeguards.problems(
+                completeProduction()
+                    .withProperty("brokerverse.security.local-password-sign-in", "true")))
+        .anyMatch(p -> p.contains("local-password sign-in is switched on in production"));
+    assertThat(ProductionSafeguards.problems(completeProduction()))
+        .noneMatch(p -> p.contains("local-password"));
+  }
 }

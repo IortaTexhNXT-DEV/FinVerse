@@ -12,7 +12,6 @@ import com.iortatechnxt.brokerverse.security.domain.PasswordHistoryRepository;
 import com.iortatechnxt.brokerverse.security.domain.PasswordResetToken;
 import com.iortatechnxt.brokerverse.security.domain.PasswordResetTokenRepository;
 import com.iortatechnxt.brokerverse.security.service.directory.AuthMode;
-import com.iortatechnxt.brokerverse.security.service.sso.SsoProperties;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
@@ -51,7 +50,7 @@ public class AuthPasswordService {
   private final Clock clock;
   private final String resetUrl;
   private final LoginRateLimiter limits;
-  private final SsoProperties sso;
+  private final LocalPasswordSignIn localSignIn;
 
   /**
    * Creates the service.
@@ -70,7 +69,7 @@ public class AuthPasswordService {
    *     required outside local by the start-up safeguards); blank on a developer's machine = the
    *     first allowed origin + {@value #RESET_PATH}
    * @param limits reset links per user and window
-   * @param sso single sign-on (break-glass administrators keep their password)
+   * @param localSignIn whether local passwords may be used in this deployment
    */
   @SuppressWarnings("java:S107") // collaborators of the password functions
   public AuthPasswordService(
@@ -86,9 +85,9 @@ public class AuthPasswordService {
       SecurityProperties properties,
       @Value("${brokerverse.security.password-reset-url:}") String resetUrl,
       LoginRateLimiter limits,
-      SsoProperties sso) {
+      LocalPasswordSignIn localSignIn) {
     this.limits = limits;
-    this.sso = sso;
+    this.localSignIn = localSignIn;
     this.users = users;
     this.history = history;
     this.links = links;
@@ -131,7 +130,7 @@ public class AuthPasswordService {
   public PasswordStatusResponse status() {
     AppUser user = currentUserEntity();
     AuthPasswordPolicy.Settings settings = policy.settings();
-    boolean ownPassword = !settings.mode().singleSignOn() || sso.isBreakGlass(user.getUsername());
+    boolean ownPassword = localSignIn.allowed();
     String reason = ownPassword ? policy.changeReason(user, clock.instant()).orElse(null) : null;
     return new PasswordStatusResponse(
         settings.mode().name(),

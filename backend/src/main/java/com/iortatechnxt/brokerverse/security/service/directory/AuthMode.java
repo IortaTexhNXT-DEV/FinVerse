@@ -13,8 +13,7 @@ import java.util.Arrays;
  *   <li>OIDC and SAML sign the users in at the client's identity provider (OpenID Connect with the
  *       authorisation code and PKCE, or SAML 2.0), configured per deployment ({@code
  *       brokerverse.security.sso.*}); the identity is linked to an existing user only. Local
- *       passwords stay for the break-glass administrators ({@code
- *       brokerverse.security.sso.break-glass-users}).
+ *       passwords are kept only for the test accounts of non-production environments.
  * </ul>
  */
 public enum AuthMode {

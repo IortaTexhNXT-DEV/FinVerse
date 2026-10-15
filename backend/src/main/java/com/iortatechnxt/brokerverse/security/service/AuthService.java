@@ -9,7 +9,6 @@ import com.iortatechnxt.brokerverse.security.domain.SessionEndReason;
 import com.iortatechnxt.brokerverse.security.service.directory.AuthMode;
 import com.iortatechnxt.brokerverse.security.service.directory.DirectoryAuthenticators;
 import com.iortatechnxt.brokerverse.security.service.directory.DirectoryResult;
-import com.iortatechnxt.brokerverse.security.service.sso.SsoProperties;
 import java.time.Clock;
 import java.util.Optional;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -32,11 +31,11 @@ import org.springframework.transaction.annotation.Transactional;
  * <p>The password is checked by the {@link
  * com.iortatechnxt.brokerverse.security.service.directory.DirectoryAuthenticator} of the sign-in
  * mode {@code AUTH_MODE} (FR-UA-003): LOCAL finds the user by user name, DIRECTORY by Windows ID.
- * In OIDC and SAML mode the users sign in at the identity provider and only the break-glass
- * administrators ({@code brokerverse.security.sso.break-glass-users}) may use their local password.
- * After the password, {@link SignInCompletion} asks for the second factor or opens the session;
- * logout revokes the access token, ends the session (its refresh token stops working) and is
- * audited (UAM-NFR-35).
+ * In OIDC and SAML mode the users sign in at the identity provider. A local password is accepted
+ * only where {@link LocalPasswordSignIn} allows it (the test accounts of the development, SIT and
+ * UAT environments); production refuses every local-password sign-in. After the password, {@link
+ * SignInCompletion} asks for the second factor or opens the session; logout revokes the access
+ * token, ends the session (its refresh token stops working) and is audited (UAM-NFR-35).
  */
 @Service
 public class AuthService {
@@ -51,7 +50,7 @@ public class AuthService {
   private final TokenRevocationStore revocations;
   private final UserSessionLog sessions;
   private final SignInCompletion completion;
-  private final SsoProperties sso;
+  private final LocalPasswordSignIn localSignIn;
   private final SecurityStoreAlarm alarm;
 
   /**
@@ -65,7 +64,7 @@ public class AuthService {
    * @param revocations token denylist
    * @param sessions session log
    * @param completion second factor and session
-   * @param sso single sign-on settings (break-glass administrators)
+   * @param localSignIn whether local passwords may be used in this deployment
    * @param alarm reports an unreachable denylist at sign-out
    */
   @SuppressWarnings("java:S107") // collaborators of the sign-in
@@ -78,7 +77,7 @@ public class AuthService {
       TokenRevocationStore revocations,
       UserSessionLog sessions,
       SignInCompletion completion,
-      SsoProperties sso,
+      LocalPasswordSignIn localSignIn,
       SecurityStoreAlarm alarm) {
     this.authenticators = authenticators;
     this.users = users;
@@ -88,7 +87,7 @@ public class AuthService {
     this.revocations = revocations;
     this.sessions = sessions;
     this.completion = completion;
-    this.sso = sso;
+    this.localSignIn = localSignIn;
     this.alarm = alarm;
   }
 
@@ -194,9 +193,11 @@ public class AuthService {
     AppUser user =
         findUser(mode, username)
             .orElseThrow(() -> completion.refuse(username, "Unknown user" + suffix(mode)));
-    if (mode.singleSignOn() && !sso.isBreakGlass(user.getUsername())) {
+    if (!localSignIn.allowed()) {
       throw completion.refuse(
-          username, "Password sign-in refused: the users sign in at the identity provider");
+          username,
+          "Password sign-in refused: local passwords are not used in this environment; the users"
+              + " sign in at the identity provider");
     }
     completion.refuseLockedOrDeactivated(user, username);
     return user;

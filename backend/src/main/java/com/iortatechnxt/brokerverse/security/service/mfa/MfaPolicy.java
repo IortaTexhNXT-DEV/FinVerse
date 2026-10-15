@@ -21,9 +21,8 @@ import org.springframework.stereotype.Component;
  *   <li>{@code ALL}: every user; {@code PRIVILEGED} (as delivered): users holding an active role of
  *       privilege level HIGH or ADMIN; {@code OFF}: nobody. An unknown value counts as ALL.
  *   <li>A user who enrolled an authenticator app is always asked for a code, whatever the policy.
- *   <li>In OIDC or SAML mode the break-glass administrators always need the second factor; users
- *       signed in by the identity provider only when {@code
- *       brokerverse.security.sso.require-local-mfa} is on (the provider enforces its own).
+ *   <li>Users signed in by the identity provider need the BrokerVerse second factor only when
+ *       {@code brokerverse.security.sso.require-local-mfa} is on (the provider enforces its own).
  * </ul>
  *
  * <p>On a developer's machine without the key of the secrets ({@code
@@ -54,7 +53,7 @@ public class MfaPolicy {
    * Creates the policy.
    *
    * @param parameters business parameters
-   * @param sso single sign-on settings (break-glass administrators)
+   * @param sso single sign-on settings
    * @param cipher key of the secrets
    * @param environment kind of environment
    */
@@ -106,9 +105,6 @@ public class MfaPolicy {
     }
     if (singleSignOn) {
       return sso.requireLocalMfa();
-    }
-    if (mode.singleSignOn() && sso.isBreakGlass(user.getUsername())) {
-      return true;
     }
     return switch (level()) {
       case ALL -> true;

@@ -70,7 +70,6 @@ class SingleSignOnIT {
   static void provider(DynamicPropertyRegistry registry) {
     registry.add("brokerverse.security.sso.base-url", () -> BASE);
     registry.add("brokerverse.security.sso.label", () -> "Test Directory");
-    registry.add("brokerverse.security.sso.break-glass-users", () -> "ssobreakglass");
     registry.add("brokerverse.security.sso.groups-claim", () -> "groups");
     registry.add("brokerverse.security.sso.oidc.issuer", OIDC::issuer);
     registry.add("brokerverse.security.sso.oidc.client-id", () -> OidcTestProvider.CLIENT_ID);
@@ -258,22 +257,10 @@ class SingleSignOnIT {
   }
 
   @Test
-  void inSingleSignOnModeOnlyTheBreakGlassAdministratorsUseAPassword() throws Exception {
+  void outsideProductionALocalTestAccountKeepsItsPasswordInSingleSignOnMode() throws Exception {
     String user = newUser("ssop" + IDS.incrementAndGet());
-    newUserIfMissing("ssobreakglass");
     mode(AuthMode.OIDC);
-    assertThat(passwordLogin(user).getResponse().getStatus()).isEqualTo(401);
-    JsonNode breakGlass =
-        json.readTree(passwordLogin("ssobreakglass").getResponse().getContentAsString());
-    assertThat(breakGlass.get("mfaStep").asText()).isEqualTo("ENROL");
-  }
-
-  private void newUserIfMissing(String username) {
-    try {
-      newUser(username);
-    } catch (RuntimeException ex) {
-      // created by an earlier run on the same database
-    }
+    assertThat(passwordLogin(user).getResponse().getStatus()).isEqualTo(200);
   }
 
   private MvcResult passwordLogin(String username) throws Exception {

@@ -1,6 +1,5 @@
 package com.iortatechnxt.brokerverse.security.service;
 
-import com.iortatechnxt.brokerverse.audit.domain.ActorContext;
 import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.security.api.dto.LoginResponse;
@@ -16,7 +15,6 @@ import java.time.Clock;
 import java.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
@@ -59,7 +57,6 @@ public class SignInCompletion {
   private final AuthPasswordPolicy passwordPolicy;
   private final AuditTrailService audit;
   private final Clock clock;
-  private final ApplicationEventPublisher events;
 
   /**
    * Creates the service.
@@ -75,7 +72,6 @@ public class SignInCompletion {
    * @param passwordPolicy password rules (a due change)
    * @param audit audit trail
    * @param clock clock
-   * @param events the break-glass sign-in (alert to Information Security)
    */
   @SuppressWarnings("java:S107") // collaborators of the sign-in
   public SignInCompletion(
@@ -89,9 +85,7 @@ public class SignInCompletion {
       SecurityProperties properties,
       AuthPasswordPolicy passwordPolicy,
       AuditTrailService audit,
-      Clock clock,
-      ApplicationEventPublisher events) {
-    this.events = events;
+      Clock clock) {
     this.sessions = sessions;
     this.sessionLog = sessionLog;
     this.mfaPolicy = mfaPolicy;
@@ -165,10 +159,6 @@ public class SignInCompletion {
         user.getUsername(),
         AuditAction.LOGIN,
         "Logged in" + suffix(method, secondFactor));
-    if (SignInMethod.PASSWORD.equals(method) && passwordPolicy.mode().singleSignOn()) {
-      events.publishEvent(
-          new BreakGlassSignedIn(user.getUsername(), clock.instant(), ActorContext.address()));
-    }
     SignInSessions.Tokens issued = sessions.open(user.getUsername(), method, secondFactor);
     String changeReason =
         SignInMethod.PASSWORD.equals(method)

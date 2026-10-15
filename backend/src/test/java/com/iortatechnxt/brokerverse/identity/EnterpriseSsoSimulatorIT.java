@@ -4,10 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.iortatechnxt.brokerverse.security.api.dto.UserRequest;
-import com.iortatechnxt.brokerverse.security.service.UserAdminService;
 import com.iortatechnxt.brokerverse.security.service.directory.AuthMode;
-import com.iortatechnxt.brokerverse.security.service.mfa.Totp;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
@@ -22,7 +19,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -59,14 +55,11 @@ class EnterpriseSsoSimulatorIT {
   private static final String BASE = "http://127.0.0.1:" + PORT;
   private static final String CLIENT_ID = "bibs-sit";
   private static final String CLIENT_SECRET = "simulator-client-credential-0123456789";
-  private static final String BREAK_GLASS = "eiambreakglass";
-  private static final String PASSWORD = "Initial!Passw0rd";
 
   @Autowired private ObjectMapper json;
   @Autowired private JdbcTemplate jdbc;
   @Autowired private AsUser as;
   @Autowired private SystemParameterService parameters;
-  @Autowired private UserAdminService admin;
 
   private HttpClient browser;
 
@@ -75,7 +68,6 @@ class EnterpriseSsoSimulatorIT {
     registry.add("server.port", () -> PORT);
     registry.add("brokerverse.security.sso.base-url", () -> BASE);
     registry.add("brokerverse.security.sso.label", () -> "BDO EIAM");
-    registry.add("brokerverse.security.sso.break-glass-users", () -> BREAK_GLASS);
     registry.add("brokerverse.security.sso.oidc.issuer", () -> BASE + "/eiam-simulator");
     registry.add("brokerverse.security.sso.oidc.client-id", () -> CLIENT_ID);
     registry.add("brokerverse.security.sso.oidc.client-secret", () -> CLIENT_SECRET);
@@ -160,51 +152,6 @@ class EnterpriseSsoSimulatorIT {
     assertThat(asked.body()).contains("name=\"windowsId\"");
   }
 
-  @Test
-  void aBreakGlassAdministratorSignsInWithTheSecondFactorAndInformationSecurityIsAlerted()
-      throws Exception {
-    if (jdbc.queryForList("select 1 from sec_user where username = ?", BREAK_GLASS).isEmpty()) {
-      as.run(
-          "admin",
-          () ->
-              admin.createUser(
-                  new UserRequest(
-                      BREAK_GLASS,
-                      "Break-glass Administrator",
-                      null,
-                      null,
-                      null,
-                      Set.of("SYSADMIN"),
-                      true),
-                  PASSWORD));
-    }
-    jdbc.update("delete from sec_user_mfa where username = ?", BREAK_GLASS);
-    int mails =
-        count("select count(*) from msg_outbound where purpose = 'UAM_BREAK_GLASS_SIGN_IN'");
-    int notices =
-        count("select count(*) from msg_notification where title = 'Break-glass sign-in'");
-    JsonNode first =
-        post("/api/v1/auth/login", Map.of("username", BREAK_GLASS, "password", PASSWORD));
-    assertThat(first.path("mfaStep").asText()).isEqualTo("ENROL");
-    String challenge = first.path("mfaChallenge").asText();
-    JsonNode enrolment = post("/api/v1/auth/mfa/enrolment/start", Map.of("challenge", challenge));
-    byte[] secret = base32(enrolment.path("secret").asText().replace(" ", ""));
-    JsonNode confirmed =
-        post(
-            "/api/v1/auth/mfa/enrolment/confirm",
-            Map.of("challenge", challenge, "code", Totp.code(secret, Totp.step(Instant.now()))));
-    assertThat(confirmed.path("signIn").path("accessToken").asText()).isNotBlank();
-    assertThat(count("select count(*) from msg_outbound where purpose = 'UAM_BREAK_GLASS_SIGN_IN'"))
-        .isGreaterThan(mails);
-    assertThat(count("select count(*) from msg_notification where title = 'Break-glass sign-in'"))
-        .isGreaterThan(notices);
-  }
-
-  private int count(String sql) {
-    Integer n = jdbc.queryForObject(sql, Integer.class);
-    return n == null ? 0 : n;
-  }
-
   private Map<String, String> start() throws Exception {
     JsonNode start = json.readTree(get(BASE + "/api/v1/auth/sso/start").body());
     URI authorize = URI.create(start.path("redirectUrl").asText());
@@ -284,22 +231,5 @@ class EnterpriseSsoSimulatorIT {
           URLDecoder.decode(pair.substring(eq + 1), StandardCharsets.UTF_8));
     }
     return values;
-  }
-
-  private static byte[] base32(String text) {
-    String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
-    byte[] out = new byte[text.length() * 5 / 8];
-    int buffer = 0;
-    int bits = 0;
-    int index = 0;
-    for (char c : text.toCharArray()) {
-      buffer = (buffer << 5) | alphabet.indexOf(c);
-      bits += 5;
-      if (bits >= 8) {
-        out[index++] = (byte) (buffer >> (bits - 8));
-        bits -= 8;
-      }
-    }
-    return out;
   }
 }

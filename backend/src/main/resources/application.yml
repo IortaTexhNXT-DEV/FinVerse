@@ -217,7 +217,6 @@ brokerverse:
       base-url: ${BROKERVERSE_SSO_BASE_URL:}
       label: ${BROKERVERSE_SSO_LABEL:}
       # Emergency administrators who keep a local password (comma-separated user names).
-      break-glass-users: ${BROKERVERSE_SSO_BREAK_GLASS_USERS:}
       username-claim: ${BROKERVERSE_SSO_USERNAME_CLAIM:}
       groups-claim: ${BROKERVERSE_SSO_GROUPS_CLAIM:}
       require-local-mfa: ${BROKERVERSE_SSO_REQUIRE_LOCAL_MFA:false}

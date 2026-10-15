@@ -5,7 +5,6 @@ import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.security.domain.AppUser;
 import com.iortatechnxt.brokerverse.security.domain.AppUserRepository;
 import com.iortatechnxt.brokerverse.security.service.directory.AuthMode;
-import com.iortatechnxt.brokerverse.security.service.sso.SsoProperties;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +28,7 @@ public class PasswordResetRules {
 
   private final SystemParameterService parameters;
   private final AuthPasswordPolicy policy;
-  private final SsoProperties sso;
+  private final LocalPasswordSignIn localSignIn;
   private final CurrentUser currentUser;
   private final AppUserRepository users;
 
@@ -38,20 +37,20 @@ public class PasswordResetRules {
    *
    * @param parameters business parameters
    * @param policy sign-in mode
-   * @param sso break-glass administrators
+   * @param localSignIn whether local passwords may be used in this deployment
    * @param currentUser the administrator
    * @param users users
    */
   public PasswordResetRules(
       SystemParameterService parameters,
       AuthPasswordPolicy policy,
-      SsoProperties sso,
+      LocalPasswordSignIn localSignIn,
       CurrentUser currentUser,
       AppUserRepository users) {
     this.users = users;
     this.parameters = parameters;
     this.policy = policy;
-    this.sso = sso;
+    this.localSignIn = localSignIn;
     this.currentUser = currentUser;
   }
 
@@ -97,7 +96,7 @@ public class PasswordResetRules {
           "OWN_PASSWORD_RESET",
           "Your own password is reset by another System Administrator; change it from My Profile");
     }
-    if (policy.mode().singleSignOn() && !sso.isBreakGlass(user.getUsername())) {
+    if (!localSignIn.allowed()) {
       throw new BusinessRuleException(
           "SSO_PASSWORD_RESET",
           "The password of "

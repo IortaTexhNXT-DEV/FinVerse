@@ -20,7 +20,6 @@ data:
   # ---- Single sign-on (AUTH_MODE OIDC or SAML); leave empty while the passwords are held here ----
   BROKERVERSE_SSO_BASE_URL: "https://<BIBS_HOST>"
   BROKERVERSE_SSO_LABEL: ""
-  BROKERVERSE_SSO_BREAK_GLASS_USERS: ""
   BROKERVERSE_OIDC_ISSUER: ""
   BROKERVERSE_OIDC_CLIENT_ID: ""
   BROKERVERSE_SAML_IDP_ENTITY_ID: ""

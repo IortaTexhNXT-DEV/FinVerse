@@ -1,10 +1,7 @@
 package com.iortatechnxt.brokerverse.security.service.sso;
 
 import java.time.Duration;
-import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
@@ -16,8 +13,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  *     redirect URI of OpenID Connect and the assertion consumer service of SAML are built on it,
  *     and the web client is reached at {@code <baseUrl>/sso/callback}
  * @param label name of the identity provider on the sign-in page
- * @param breakGlassUsers user names that keep a local password in OIDC or SAML mode (emergency
- *     administrators; the second factor is always required for them)
  * @param usernameClaim claim (OIDC) or attribute (SAML) holding the BrokerVerse user name; {@code
  *     sub} / the NameID when blank
  * @param groupsClaim claim (OIDC) or attribute (SAML) holding the user's groups, for {@code
@@ -36,7 +31,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public record SsoProperties(
     String baseUrl,
     String label,
-    List<String> breakGlassUsers,
     String usernameClaim,
     String groupsClaim,
     Map<String, String> groupRoles,
@@ -51,28 +45,10 @@ public record SsoProperties(
   /** Applies the defaults. */
   public SsoProperties {
     label = label == null || label.isBlank() ? "your organisation" : label.trim();
-    breakGlassUsers =
-        breakGlassUsers == null
-            ? List.of()
-            : breakGlassUsers.stream()
-                .filter(Objects::nonNull)
-                .map(u -> u.trim().toLowerCase(Locale.ROOT))
-                .filter(u -> !u.isEmpty())
-                .toList();
     groupRoles = groupRoles == null ? Map.of() : Map.copyOf(groupRoles);
     clockSkew = clockSkew == null ? Duration.ofMinutes(2) : clockSkew;
     oidc = oidc == null ? new Oidc(null, null, null, null, null, null, null, null) : oidc;
     saml = saml == null ? new Saml(null, null, null, null, null) : saml;
-  }
-
-  /**
-   * Whether a user keeps a local password in OIDC or SAML mode.
-   *
-   * @param username user name
-   * @return true for a break-glass administrator
-   */
-  public boolean isBreakGlass(String username) {
-    return username != null && breakGlassUsers.contains(username.trim().toLowerCase(Locale.ROOT));
   }
 
   private static boolean present(String value) {

@@ -209,8 +209,7 @@ class ScreeningUserAccessFoundationIT {
             "UAM_PRIVILEGED_CHANGE",
             "UAM_SCHEDULED_APPLY_FAILED",
             "UAM_DIRECT_ROLE_EDIT",
-            "UAM_IDENTITY_REFUSED",
-            "UAM_BREAK_GLASS_SIGN_IN");
+            "UAM_IDENTITY_REFUSED");
     assertThat(
             jdbc.queryForList(
                 "select code from msg_notification_event where module in ('SCREENING',"
@@ -221,9 +220,10 @@ class ScreeningUserAccessFoundationIT {
         // separation-of-duties notices (V1065); + the second factor reset notices
         // MFA_RESET_TO_APPROVE and MFA_RESET_DONE (V1181)
         .contains("MFA_RESET_TO_APPROVE", "MFA_RESET_DONE")
-        // + the refused identity event and break-glass sign-in notices (V2702)
-        .contains("UAM_IDENTITY_REFUSED", "UAM_BREAK_GLASS_SIGN_IN")
-        .hasSize(26);
+        // + the refused identity event notice (V2702; the break-glass notice went in V2822)
+        .contains("UAM_IDENTITY_REFUSED")
+        .doesNotContain("UAM_BREAK_GLASS_SIGN_IN")
+        .hasSize(25);
     assertThat(
             jdbc.queryForList(
                 "select record_type from nba_retention_rule where years_online = 5"

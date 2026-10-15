@@ -37,8 +37,8 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
  * the user of a joiner with the UIDM request number, refuses a Windows ID held by another user and
  * alerts the System Administrators, updates a mover and keeps the group profiles, deactivates a
  * leaver and ends the open sessions, reactivates a rehire with the group profiles held before; the
- * monitoring reprocesses a refused event; a user is created from an active Enterprise SSO account
- * of the simulator and synchronised on demand.
+ * monitoring reprocesses a refused event; a joiner of the simulator is created and synchronised on
+ * demand, and no user is created outside the directory events.
  */
 @IntegrationTest
 class IdentityProvisioningIT {
@@ -304,20 +304,17 @@ class IdentityProvisioningIT {
   }
 
   @Test
-  void aUserIsCreatedFromAnActiveEnterpriseSsoAccountAndSynchronisedOnDemand() throws Exception {
+  void aJoinerFromTheDirectoryIsCreatedAndSynchronisedOnDemand() throws Exception {
     jdbc.update(
         "update idn_sim_directory_account set user_id = ?, windows_id = ? where windows_id = ?",
         "a013000301",
         "BDO\\bsantos",
         "BDO\\bsantos");
-    api.doGet("admin", "/api/v1/admin/identity/directory?windowsId=BDO\\bsantos")
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.displayName").value("Bea Santos"));
     if (jdbc.queryForList("select 1 from sec_user where username = 'a013000301'").isEmpty()) {
       api.doPost(
               "admin",
-              "/api/v1/admin/identity/users/from-directory",
-              Map.of("windowsId", "BDO\\bsantos"))
+              "/api/v1/admin/identity/simulator/accounts/events/JOINER?windowsId=BDO\\bsantos",
+              null)
           .andExpect(status().isOk())
           .andExpect(jsonPath("$.status").value("APPLIED"))
           .andExpect(jsonPath("$.username").value("a013000301"));
@@ -329,10 +326,7 @@ class IdentityProvisioningIT {
             "admin",
             "/api/v1/admin/identity/users/from-directory",
             Map.of("windowsId", "BDO\\dlim"))
-        .andExpect(status().isUnprocessableEntity())
-        .andExpect(
-            jsonPath("$.detail")
-                .value("The user cannot be created from this Enterprise SSO account"));
+        .andExpect(status().is4xxClientError());
     api.doPost("admin", "/api/v1/admin/identity/users/a013000101/sync", null)
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.source").value("ON_DEMAND"));

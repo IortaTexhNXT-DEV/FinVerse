@@ -34,7 +34,7 @@ class UserAccessLifecycleIT {
   @Test
   void aDraftIsSubmittedReturnedCorrectedAndApprovedByAnotherUser() {
     AccessRequestContent proposal = AccessRequestIT.newProfile("Reports for the officers");
-    AccessRequest draft = as.run(MAKER, () -> requests.create(proposal, true, null));
+    AccessRequest draft = as.run(MAKER, () -> requests.create(proposal, true));
     assertThat(draft.getStatus()).isEqualTo(AccessRequestStatus.DRAFT);
     assertThatThrownBy(() -> as.run(CHECKER, () -> requests.view(draft.getId())))
         .isInstanceOf(AccessDeniedException.class);
@@ -42,7 +42,7 @@ class UserAccessLifecycleIT {
         .extracting("code")
         .isEqualTo("ACCESS_NOT_REQUESTER");
 
-    AccessRequest pending = as.run(MAKER, () -> requests.submit(draft.getId(), null, "Please"));
+    AccessRequest pending = as.run(MAKER, () -> requests.submit(draft.getId(), "Please"));
     assertThat(pending.getStatus()).isEqualTo(AccessRequestStatus.PENDING);
     assertThat(pending.getAssignedApprover()).isNull();
     assertThatThrownBy(() -> as.run(MAKER, () -> requests.approve(draft.getId(), null)))
@@ -51,13 +51,13 @@ class UserAccessLifecycleIT {
     AccessRequest returned =
         as.run(CHECKER, () -> returns.returnRequest(draft.getId(), "Name the reports"));
     assertThat(returned.getStatus()).isEqualTo(AccessRequestStatus.RETURNED);
-    assertThatThrownBy(() -> as.run(MAKER, () -> requests.submit(draft.getId(), null, " ")))
+    assertThatThrownBy(() -> as.run(MAKER, () -> requests.submit(draft.getId(), " ")))
         .extracting("code")
         .isEqualTo("ACCESS_CORRECTION_REMARKS");
     as.run(
         MAKER,
         () -> requests.edit(draft.getId(), proposal.withJustification("Production reports")));
-    as.run(MAKER, () -> requests.submit(draft.getId(), null, "Reports named"));
+    as.run(MAKER, () -> requests.submit(draft.getId(), "Reports named"));
 
     AccessRequest decided =
         as.run(CHECKER, () -> requests.approve(draft.getId(), "Agreed")).request();

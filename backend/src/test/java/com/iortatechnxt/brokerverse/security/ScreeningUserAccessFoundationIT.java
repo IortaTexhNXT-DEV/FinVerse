@@ -236,8 +236,7 @@ class ScreeningUserAccessFoundationIT {
         .isEqualTo("0 0 17 * * *");
     assertThat(environment.getProperty("brokerverse.jobs.scr-ingest-error-digest-cron"))
         .isEqualTo("0 0 23 * * SUN-THU");
-    assertThat(environment.getProperty("brokerverse.jobs.uam-effective-changes-cron"))
-        .isEqualTo("0 5 16 * * *");
+    assertThat(environment.getProperty("brokerverse.jobs.uam-effective-changes-cron")).isNull();
     ReportMetadata compliance = ReportMetadata.compliance("SCR-TEST", "Test", "Test", List.of());
     assertThat(compliance.category()).isEqualTo(ReportCategory.COMPLIANCE);
     assertThat(compliance.category().label()).isEqualTo("Compliance");

@@ -61,7 +61,7 @@ public class AccessRequestApprovalSource implements PendingApprovalSource {
   private static boolean waitsFor(AccessRequest r, ApprovalViewer viewer, boolean anyApprover) {
     return switch (r.getStatus()) {
       case PENDING ->
-          viewer.can(AccessApprovers.approvalPermission(r.getUserType()))
+          viewer.can(AccessApprovers.ACCESS_APPROVE)
               && (viewer.systemView()
                   || anyApprover
                   || r.getAssignedApprover() == null

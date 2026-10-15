@@ -37,7 +37,6 @@ import org.springframework.transaction.support.TransactionTemplate;
  * profiles of a user at once, without an approval in the system, and is recorded like any event.
  */
 @Service
-@SuppressWarnings("PMD.GodClass") // the one entry point of every provisioning event and its outcome
 public class IdentitySyncService {
 
   /** Setting: users from the Enterprise SSO platform / UIDM-ISC (conflict C01 option a). */
@@ -45,10 +44,6 @@ public class IdentitySyncService {
 
   /** Record type of the events in the audit trail. */
   public static final String ENTITY = "IdentityEvent";
-
-  /** The generic answer to an Enterprise SSO account that cannot be used (no clues). */
-  public static final String CANNOT_CREATE =
-      "The user cannot be created from this Enterprise SSO account";
 
   private static final Logger LOG = LoggerFactory.getLogger(IdentitySyncService.class);
 
@@ -183,39 +178,6 @@ public class IdentitySyncService {
       return notFound(user);
     }
     return receive(account.get(), IdentityEventType.MOVER, IdentityEventSource.ON_DEMAND);
-  }
-
-  /**
-   * The account of a Windows ID, when it exists and is active (FRUM.002.01: validate the account
-   * before creating the user). Any other case gets the same answer, which gives no clue.
-   *
-   * @param windowsId Windows ID
-   * @return the account
-   */
-  public DirectoryAccount activeAccount(String windowsId) {
-    if (windowsId == null || windowsId.isBlank()) {
-      throw new IdentityRefused("SSO_ACCOUNT_INVALID", CANNOT_CREATE);
-    }
-    return directory
-        .find(windowsId.trim())
-        .filter(a -> a.status() == DirectoryStatus.ACTIVE)
-        .orElseThrow(() -> new IdentityRefused("SSO_ACCOUNT_INVALID", CANNOT_CREATE));
-  }
-
-  /**
-   * Creates a user from an existing and active Enterprise SSO account, with the details retrieved
-   * from the platform (FRUM.002.01). The group profiles are given through a request.
-   *
-   * @param windowsId Windows ID
-   * @return the event of the creation
-   */
-  public IdentityEvent createFromDirectory(String windowsId) {
-    DirectoryAccount account = activeAccount(windowsId);
-    IdentityEvent event = receive(account, IdentityEventType.JOINER, IdentityEventSource.ON_DEMAND);
-    if (event.getStatus() != IdentityEventStatus.APPLIED) {
-      throw new IdentityRefused("USER_NOT_CREATED", event.getMessage());
-    }
-    return event;
   }
 
   /**

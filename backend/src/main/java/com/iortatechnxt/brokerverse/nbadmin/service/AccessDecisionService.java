@@ -5,7 +5,6 @@ import com.iortatechnxt.brokerverse.alert.service.AlertService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
-import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequest;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestAction;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestRepository;
@@ -106,7 +105,7 @@ public class AccessDecisionService {
     AccessRequestStatus from = r.getStatus();
     if (r.recordApproval(approver, clock.instant(), note)) {
       history.record(r, AccessRequestAction.APPROVE, from, note);
-      notifier.toApprove(r, AccessApprovers.approvalPermission(r.getUserType()));
+      notifier.toApprove(r, AccessApprovers.ACCESS_APPROVE);
       return new Decision(r, null);
     }
     r.addRiskFlags(risks.evaluate(r.content()));
@@ -189,19 +188,13 @@ public class AccessDecisionService {
       notifier.decided(r, "approved, for implementation");
       return new Decision(r, null);
     }
-    if (r.getEffectiveFrom() != null && r.getEffectiveFrom().isAfter(BusinessClock.today(clock))) {
-      r.approve(AccessRequestStatus.SCHEDULED, approver, clock.instant(), note);
-      history.record(r, action, from, note);
-      notifier.decided(r, AccessRequestNotifier.appliesOn(r.getEffectiveFrom()));
-      return new Decision(r, null);
-    }
     r.approve(AccessRequestStatus.APPROVED, approver, clock.instant(), note);
     history.record(r, action, from, note);
-    String password = applier.apply(r);
+    applier.apply(r);
     history.record(r, AccessRequestAction.APPLY, AccessRequestStatus.APPROVED, null);
     notifier.decided(r, "approved");
     notifier.accessChanged(r);
-    return new Decision(r, password);
+    return new Decision(r, null);
   }
 
   /**
@@ -237,7 +230,7 @@ public class AccessDecisionService {
   }
 
   private void requireChosenApprover(AccessRequest r, String me) {
-    if (!currentUser.hasAuthority(AccessApprovers.approvalPermission(r.getUserType()))) {
+    if (!currentUser.hasAuthority(AccessApprovers.ACCESS_APPROVE)) {
       throw new AccessDeniedException("Not permitted to approve access requests");
     }
     String assigned = r.getAssignedApprover();

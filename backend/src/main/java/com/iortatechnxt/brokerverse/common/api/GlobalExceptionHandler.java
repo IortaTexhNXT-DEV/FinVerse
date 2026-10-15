@@ -21,6 +21,8 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -181,6 +183,32 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(NoResourceFoundException.class)
   public ProblemDetail handleNoRoute(NoResourceFoundException ex) {
     return problem(HttpStatus.NOT_FOUND, "NOT_FOUND", "No such endpoint: " + ex.getResourcePath());
+  }
+
+  /**
+   * Handles a method the endpoint does not offer (for example a POST on a read-only resource).
+   *
+   * @param ex exception
+   * @return problem detail (405)
+   */
+  @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+  public ProblemDetail handleMethodNotAllowed(HttpRequestMethodNotSupportedException ex) {
+    return problem(
+        HttpStatus.METHOD_NOT_ALLOWED,
+        "METHOD_NOT_ALLOWED",
+        "Method " + ex.getMethod() + " is not supported here");
+  }
+
+  /**
+   * Handles a request body of a type the endpoint does not read.
+   *
+   * @param ex exception
+   * @return problem detail (415)
+   */
+  @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+  public ProblemDetail handleMediaType(HttpMediaTypeNotSupportedException ex) {
+    return problem(
+        HttpStatus.UNSUPPORTED_MEDIA_TYPE, "UNSUPPORTED_MEDIA_TYPE", "Content type not supported");
   }
 
   /**

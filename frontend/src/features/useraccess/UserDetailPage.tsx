@@ -28,6 +28,7 @@ import { SessionsTable } from '@/features/profile/SessionsTable';
 import { formatDateTime, humanize } from '@/utils/format';
 import { DataAccessPanel } from './DataAccessPanel';
 import { USER_STATUS_LABELS, statusOf } from './userStatus';
+import { useAuth } from '@/auth/authContext';
 
 const TABS = [
   { id: 'profile', label: 'Profile' },
@@ -214,6 +215,8 @@ export default function UserDetailPage() {
     'profile',
   );
   const [pending, setPending] = useState<Pending>(null);
+  const { can } = useAuth();
+  const manage = can('USER_MANAGE');
   const users = useQuery({ queryKey: ['users'], queryFn: adminApi.users });
   const user = users.data?.find((u) => String(u.id) === id);
   const done = async (text: string) => {
@@ -252,24 +255,26 @@ export default function UserDetailPage() {
         description="Users and their group profiles are maintained in UIDM-ISC."
         backTo="/access/users"
         actions={
-          <>
-            <Button
-              variant="secondary"
-              icon={<LogOut size={16} />}
-              onClick={() => setPending('end')}
-            >
-              End Sessions
-            </Button>
-            {user.locked && (
+          manage && (
+            <>
               <Button
-                variant="accent"
-                icon={<Unlock size={16} />}
-                onClick={() => setPending('unlock')}
+                variant="secondary"
+                icon={<LogOut size={16} />}
+                onClick={() => setPending('end')}
               >
-                Unlock
+                End Sessions
               </Button>
-            )}
-          </>
+              {user.locked && (
+                <Button
+                  variant="accent"
+                  icon={<Unlock size={16} />}
+                  onClick={() => setPending('unlock')}
+                >
+                  Unlock
+                </Button>
+              )}
+            </>
+          )
         }
       />
       <div className="row" style={{ gap: 'var(--space-2)' }}>

@@ -8,6 +8,8 @@ package com.iortatechnxt.brokerverse.security.domain;
 public enum Permission {
   // Administration
   USER_MANAGE,
+  // Reads the users and their access in User Access, without any change (V2831)
+  USER_VIEW,
   ROLE_MANAGE,
   SYSTEM_PARAMETER_MANAGE,
   AUDIT_VIEW,
@@ -516,8 +518,5 @@ public enum Permission {
   CONFIG_BASELINE_MANAGE;
 
   // The portal permissions of design 6.1 (PORTAL_USER_REQUEST, PORTAL_USER_APPROVE, PORTAL_ADMIN)
-  // are parked with the partner portal (BDOI Drop 2 "Employee Benefits (No Portal Feature)"):
-  // adding
-  // PORTAL_USER_APPROVE switches the approver of EXTERNAL access requests (AccessApprovers), so it
-  // comes with the portal wave.
+  // are parked with the partner portal (BDOI Drop 2 "Employee Benefits (No Portal Feature)").
 }

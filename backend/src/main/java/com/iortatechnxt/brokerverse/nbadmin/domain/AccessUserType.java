@@ -4,6 +4,6 @@ package com.iortatechnxt.brokerverse.nbadmin.domain;
 public enum AccessUserType {
   /** A BIBS user ({@code sec_user}). */
   INTERNAL,
-  /** A portal user of an insurer or client, provisioned through {@code ExternalUserProvisioner}. */
+  /** A portal user of an insurer or client (requests raised before UIDM-ISC). */
   EXTERNAL
 }

@@ -97,10 +97,6 @@ export const identityApi = {
     api.post<IdentityEvent>(`${BASE}/users/${encodeURIComponent(username)}/sync`),
   profile: (username: string) =>
     api.get<DirectoryProfile | undefined>(`${BASE}/users/${encodeURIComponent(username)}/profile`),
-  lookup: (windowsId: string) =>
-    api.get<DirectoryAccount>(`${BASE}/directory${toQuery({ windowsId })}`),
-  createFromDirectory: (windowsId: string) =>
-    api.post<IdentityEvent>(`${BASE}/users/from-directory`, { windowsId }),
   simulatorAccounts: () => api.get<DirectoryAccount[]>(`${BASE}/simulator/accounts`),
   addSimulatorAccount: (account: DirectoryAccount) =>
     api.post<DirectoryAccount>(`${BASE}/simulator/accounts`, account),

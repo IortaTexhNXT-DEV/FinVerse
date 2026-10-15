@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class DataScopeController {
 
   private static final String READ =
-      "hasAnyAuthority('USER_MANAGE','UAM_VIEW','ACCESS_REQUEST','ACCESS_APPROVE')";
+      "hasAnyAuthority('USER_MANAGE','USER_VIEW','UAM_VIEW','ACCESS_REQUEST','ACCESS_APPROVE')";
 
   private final DataScopeService service;
   private final OrganizationUnits units;

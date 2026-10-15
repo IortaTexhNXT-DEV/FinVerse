@@ -3,7 +3,7 @@
   "suites": [
     {
       "id": "BRD-10/11",
-      "description": "Sanction Screening and User Access Maintenance (V1050, V1060, V1062, V1063, V1065, V1130, V2826)",
+      "description": "Sanction Screening and User Access Maintenance (V1050, V1060, V1062, V1063, V1065, V1130, V2826, V2831)",
       "sections": ["screening", "screening-setup", "user-access"],
       "sharedGroups": ["home", "client-policy", "reports"],
       "sharedModules": ["help", "admin", "config-promotion"],
@@ -184,6 +184,19 @@
             "/access/reports",
             "/access/audit",
             "/access/settings"
+          ]
+        },
+        "AUDITOR": {
+          "role": "UAM_AUDITOR",
+          "seedUser": "uamauditor",
+          "permissions": ["AUDIT_VIEW", "UAM_REPORT_VIEW", "UAM_VIEW", "USER_VIEW"],
+          "screens": [
+            "/access/users",
+            "/access/group-profiles",
+            "/access/separation-of-duties",
+            "/access/matrix",
+            "/access/reports",
+            "/access/audit"
           ]
         }
       }

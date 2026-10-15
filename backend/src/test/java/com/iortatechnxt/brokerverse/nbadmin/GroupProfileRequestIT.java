@@ -31,8 +31,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Group-profile requests (BRD 3.002.1-4; FR-UA-040 to FR-UA-045): approvers in order, return
- * restarting the chain, FOR_IMPLEMENTATION and the implementation by the System Administrator.
+ * Group-profile requests (BRD 3.002.1-4; FR-UA-040 to FR-UA-045): another holder of the approval
+ * right decides, return and resubmission, FOR_IMPLEMENTATION and the implementation by the System
+ * Administrator.
  */
 @IntegrationTest
 class GroupProfileRequestIT {
@@ -62,28 +63,22 @@ class GroupProfileRequestIT {
         "New profile for the Makati branch");
   }
 
-  private AccessRequest submit(AccessRequestContent content, List<String> approvers) {
-    return as.run(BADMIN, () -> requests.create(content, false, approvers));
+  private AccessRequest submit(AccessRequestContent content) {
+    return as.run(BADMIN, () -> requests.create(content, false));
   }
 
   @Test
-  void approversDecideInOrderAndTheAdministratorImplements() {
+  void anotherUserApprovesAndTheAdministratorImplements() {
     String code = code();
-    AccessRequest request = submit(create(code, Set.of("REPORT_VIEW")), List.of(FIRST, SECOND));
-    assertThat(request.getAssignedApprover()).isEqualTo(FIRST);
-    assertThat(inboxOf(SECOND)).doesNotContain(request.getRequestNo());
-    as.run(FIRST, () -> requests.approve(request.getId(), null));
-    assertThat(requests.get(request.getId()).getAssignedApprover()).isEqualTo(SECOND);
+    AccessRequest request = submit(create(code, Set.of("REPORT_VIEW")));
+    assertThat(inboxOf(FIRST)).contains(request.getRequestNo());
     assertThat(inboxOf(SECOND)).contains(request.getRequestNo());
 
     as.run(SECOND, () -> returns.returnRequest(request.getId(), "Add AUDIT_VIEW"));
     as.run(
         BADMIN,
         () -> requests.edit(request.getId(), create(code, Set.of("REPORT_VIEW", "AUDIT_VIEW"))));
-    AccessRequest again =
-        as.run(BADMIN, () -> requests.submit(request.getId(), List.of(FIRST, SECOND), "Added"));
-    assertThat(again.getAssignedApprover()).isEqualTo(FIRST);
-    as.run(FIRST, () -> requests.approve(request.getId(), null));
+    as.run(BADMIN, () -> requests.submit(request.getId(), "Added"));
     as.run(SECOND, () -> requests.approve(request.getId(), null));
     assertThat(requests.get(request.getId()).getStatus())
         .isEqualTo(AccessRequestStatus.FOR_IMPLEMENTATION);
@@ -113,8 +108,7 @@ class GroupProfileRequestIT {
                 AccessRequestType.DEACTIVATE_ROLE,
                 new RolePermissionChange(code, Set.of(), Set.of()),
                 null,
-                "No longer used"),
-            List.of(FIRST));
+                "No longer used"));
     as.run(FIRST, () -> requests.approve(off.getId(), null));
     as.run("admin", () -> implementations.implement(off.getId()));
     assertThat(roles.findByCode(code).orElseThrow().isActive()).isFalse();
@@ -125,8 +119,7 @@ class GroupProfileRequestIT {
                         AccessRequestType.DEACTIVATE_ROLE,
                         new RolePermissionChange(code, Set.of(), Set.of()),
                         null,
-                        "Again"),
-                    List.of(FIRST)))
+                        "Again")))
         .extracting("code")
         .isEqualTo("ACCESS_ROLE_ALREADY_INACTIVE");
     AccessRequest on =
@@ -135,8 +128,7 @@ class GroupProfileRequestIT {
                 AccessRequestType.REACTIVATE_ROLE,
                 new RolePermissionChange(code, Set.of(), Set.of()),
                 null,
-                "Needed again"),
-            List.of(FIRST));
+                "Needed again"));
     as.run(FIRST, () -> requests.approve(on.getId(), null));
     as.run("admin", () -> implementations.implement(on.getId()));
     assertThat(roles.findByCode(code).orElseThrow().isActive()).isTrue();
@@ -144,19 +136,15 @@ class GroupProfileRequestIT {
 
   @Test
   void groupProfileRequestsAreChecked() {
-    assertCode(create(code(), Set.of("REPORT_VIEW")), List.of(), "ACCESS_APPROVER_REQUIRED");
-    assertCode(
-        create(code(), Set.of("REPORT_VIEW")), List.of(FIRST, FIRST), "ACCESS_APPROVER_TWICE");
-    assertCode(create(code(), Set.of()), List.of(FIRST), "ACCESS_NO_PERMISSION");
-    assertCode(create("MKT_AO", Set.of("REPORT_VIEW")), List.of(FIRST), "DUPLICATE");
-    assertCode(create("bad code", Set.of("REPORT_VIEW")), List.of(FIRST), "ACCESS_ROLE_CODE");
+    assertCode(create(code(), Set.of()), "ACCESS_NO_PERMISSION");
+    assertCode(create("MKT_AO", Set.of("REPORT_VIEW")), "DUPLICATE");
+    assertCode(create("bad code", Set.of("REPORT_VIEW")), "ACCESS_ROLE_CODE");
     assertCode(
         AccessRequestContent.groupProfile(
             AccessRequestType.DEACTIVATE_ROLE,
             new RolePermissionChange("SYSADMIN", Set.of(), Set.of()),
             null,
             "x"),
-        List.of(FIRST),
         "ACCESS_ROLE_PROTECTED");
     assertCode(
         AccessRequestContent.groupProfile(
@@ -164,14 +152,13 @@ class GroupProfileRequestIT {
             new RolePermissionChange("MKT_TL", Set.of(), Set.of()),
             null,
             "x"),
-        List.of(FIRST),
         "ACCESS_ROLE_ALREADY_ACTIVE");
   }
 
   @Test
   void roleChangeAppliesAtApprovalWhenConfigured() {
     String code = code();
-    AccessRequest created = submit(create(code, Set.of("REPORT_VIEW")), List.of(FIRST));
+    AccessRequest created = submit(create(code, Set.of("REPORT_VIEW")));
     as.run(FIRST, () -> requests.approve(created.getId(), null));
     as.run("admin", () -> implementations.implement(created.getId()));
     as.run("admin", () -> parameters.update(AccessSettings.ROLE_APPLY_ON_APPROVAL, "true"));
@@ -179,8 +166,7 @@ class GroupProfileRequestIT {
       AccessRequest change =
           submit(
               AccessRequestContent.rolePermissions(
-                  new RolePermissionChange(code, Set.of("AUDIT_VIEW"), Set.of()), "Audit"),
-              List.of(FIRST));
+                  new RolePermissionChange(code, Set.of("AUDIT_VIEW"), Set.of()), "Audit"));
       as.run(FIRST, () -> requests.approve(change.getId(), null));
       assertThat(requests.get(change.getId()).getStatus()).isEqualTo(AccessRequestStatus.APPROVED);
       assertThat(roles.findByCode(code).orElseThrow().getPermissions())
@@ -190,8 +176,8 @@ class GroupProfileRequestIT {
     }
   }
 
-  private void assertCode(AccessRequestContent content, List<String> approvers, String code) {
-    assertThatThrownBy(() -> submit(content, approvers)).extracting("code").isEqualTo(code);
+  private void assertCode(AccessRequestContent content, String code) {
+    assertThatThrownBy(() -> submit(content)).extracting("code").isEqualTo(code);
   }
 
   private List<String> inboxOf(String user) {

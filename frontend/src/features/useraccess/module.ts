@@ -53,6 +53,7 @@ export const userAccessModule: FeatureModule = {
       label: 'Users',
       icon: Users,
       permission: 'USER_MANAGE',
+      alsoPermissions: ['USER_VIEW'],
       component: lazyWithRetry(() => import('./UsersPage')),
     },
     {
@@ -60,6 +61,7 @@ export const userAccessModule: FeatureModule = {
       label: 'User',
       icon: Users,
       permission: 'USER_MANAGE',
+      alsoPermissions: ['USER_VIEW'],
       component: lazyWithRetry(() => import('./UserDetailPage')),
       hidden: true,
     },

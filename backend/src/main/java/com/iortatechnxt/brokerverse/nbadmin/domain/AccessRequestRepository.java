@@ -1,6 +1,5 @@
 package com.iortatechnxt.brokerverse.nbadmin.domain;
 
-import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -28,17 +27,6 @@ public interface AccessRequestRepository
   List<AccessRequest> findByStatusInOrderByIdAsc(Collection<AccessRequestStatus> statuses);
 
   /**
-   * Whether another open request exists for a user (R3: one open request per user).
-   *
-   * @param username user
-   * @param statuses open statuses
-   * @param id the request itself (excluded)
-   * @return true when one exists
-   */
-  boolean existsByUsernameIgnoreCaseAndStatusInAndIdNot(
-      String username, Collection<AccessRequestStatus> statuses, Long id);
-
-  /**
    * Whether another open request exists for a role (R3: one open request per group profile).
    *
    * @param roleCode role
@@ -58,23 +46,12 @@ public interface AccessRequestRepository
   Optional<AccessRequest> findByRequestNo(String requestNo);
 
   /**
-   * Scheduled requests due on a date (UAM-NFR-14), oldest first.
+   * The latest applied request of a type about a user (a reactivation raised before UIDM-ISC).
    *
-   * @param status SCHEDULED
-   * @param date business date
-   * @return requests
+   * @param username user
+   * @param type request type
+   * @return the request if any
    */
-  List<AccessRequest> findByStatusAndEffectiveFromLessThanEqualOrderByIdAsc(
-      AccessRequestStatus status, LocalDate date);
-
-  /**
-   * The lines of a bulk batch, in row order.
-   *
-   * @param batchId batch
-   * @return line requests
-   */
-  List<AccessRequest> findByBatchIdOrderByIdAsc(Long batchId);
-
   Optional<AccessRequest>
       findFirstByUsernameIgnoreCaseAndRequestTypeAndAppliedAtNotNullOrderByAppliedAtDesc(
           String username, AccessRequestType type);

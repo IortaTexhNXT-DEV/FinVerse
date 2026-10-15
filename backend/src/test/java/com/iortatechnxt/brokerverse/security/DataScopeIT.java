@@ -6,6 +6,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.iortatechnxt.brokerverse.nbadmin.service.AccessRequestService;
+import com.iortatechnxt.brokerverse.security.api.dto.UserRequest;
+import com.iortatechnxt.brokerverse.security.domain.AppUser;
 import com.iortatechnxt.brokerverse.security.service.DataScopeService;
 import com.iortatechnxt.brokerverse.security.service.UserAdminService;
 import com.iortatechnxt.brokerverse.support.Api;
@@ -14,6 +16,7 @@ import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.support.Json;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -84,21 +87,19 @@ class DataScopeIT {
         "select id from org_branch where company_id = ? and code = ?", Long.class, companyId, code);
   }
 
-  private long newUser(String username) throws Exception {
-    JsonNode created =
-        api.read(
-            api.doPost(
-                    ADMIN,
-                    "/api/v1/admin/users",
-                    Json.of(
-                        "user",
-                        Json.of(
-                            "username", username, "fullName", "Scope " + username, "enabled", true),
-                        "initialPassword",
-                        Json.of("newPassword", STRONG)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.allCompanies").value(true)));
-    return grant(created.get("id").asLong(), "ACCOUNTANT");
+  private long localAccount(String username, String fullName) {
+    AppUser created =
+        as.run(
+            ADMIN,
+            () ->
+                users.createUser(
+                    new UserRequest(username, fullName, null, null, null, Set.of(), true), STRONG));
+    assertThat(created.isAllCompanies()).isTrue();
+    return created.getId();
+  }
+
+  private long newUser(String username) {
+    return grant(localAccount(username, "Scope " + username), "ACCOUNTANT");
   }
 
   /** Group profiles come from UIDM-ISC, not the Users screen: seed SQL stands in for it here. */
@@ -241,19 +242,7 @@ class DataScopeIT {
   @Test
   void aRestrictedAdministratorGrantsOnlyInsideHisScope() throws Exception {
     String narrowAdmin = username();
-    long narrowId =
-        api.read(
-                api.doPost(
-                    ADMIN,
-                    "/api/v1/admin/users",
-                    Json.of(
-                        "user",
-                        Json.of(
-                            "username", narrowAdmin, "fullName", "Scope admin", "enabled", true),
-                        "initialPassword",
-                        Json.of("newPassword", STRONG))))
-            .get("id")
-            .asLong();
+    long narrowId = localAccount(narrowAdmin, "Scope admin");
     grant(narrowId, "SYSADMIN");
     api.doPut(ADMIN, "/api/v1/admin/users/" + narrowId + "/data-scope", onlyBranchA1())
         .andExpect(status().isOk());

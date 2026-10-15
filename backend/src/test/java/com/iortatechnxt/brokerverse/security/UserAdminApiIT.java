@@ -5,12 +5,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.iortatechnxt.brokerverse.security.api.dto.UserRequest;
+import com.iortatechnxt.brokerverse.security.service.UserAdminService;
 import com.iortatechnxt.brokerverse.support.Api;
+import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.support.Json;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,22 +30,8 @@ class UserAdminApiIT {
   @Autowired private Api api;
   @Autowired private MockMvc mvc;
   @Autowired private JdbcTemplate jdbc;
-
-  private static Map<String, Object> user(String username, List<String> roles) {
-    return Json.of(
-        "username",
-        username,
-        "fullName",
-        "Test " + username,
-        "email",
-        username + "@example.ph",
-        "authorizationLimit",
-        100000,
-        "roleCodes",
-        roles,
-        "enabled",
-        true);
-  }
+  @Autowired private UserAdminService users;
+  @Autowired private AsUser as;
 
   private void login(String username, String password, int expectedStatus) throws Exception {
     mvc.perform(
@@ -52,38 +41,33 @@ class UserAdminApiIT {
         .andExpect(status().is(expectedStatus));
   }
 
+  /** A local test account as UIDM-ISC provisions it: without group profiles. */
+  private long testAccount(String username) {
+    return as.run(
+            "admin",
+            () ->
+                users.createUser(
+                    new UserRequest(
+                        username,
+                        "Test " + username,
+                        username + "@example.ph",
+                        null,
+                        null,
+                        Set.of(),
+                        true),
+                    STRONG))
+        .getId();
+  }
+
   @Test
-  void userLifecycleLockoutUnlockAndPasswordReset() throws Exception {
+  void lockoutUnlockAndPasswordResetOfALocalTestAccount() throws Exception {
     String username = "tester" + ThreadLocalRandom.current().nextInt(1000, 9999);
-    var created =
-        api.read(
-            api.doPost(
-                    "admin",
-                    "/api/v1/admin/users",
-                    Json.of(
-                        "user",
-                        user(username, List.of()),
-                        "initialPassword",
-                        Json.of("newPassword", STRONG)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.roles.length()").value(0)));
-    long id = created.get("id").asLong();
-    // Group profiles come from UIDM-ISC (here: seed SQL standing in for it).
+    long id = testAccount(username);
+    // Group profiles come from UIDM-ISC (here: SQL standing in for it).
     jdbc.update(
         "insert into sec_user_role (user_id, role_id) select ?, id from sec_role where code = ?",
         id,
         "ACCOUNTANT");
-
-    api.doPut(
-            "admin", "/api/v1/admin/users/" + id, user(username, List.of("ACCOUNTANT", "AUDITOR")))
-        .andExpect(status().isUnprocessableEntity())
-        .andExpect(jsonPath("$.code").value("ROLES_BY_UIDM"));
-    api.doPut("admin", "/api/v1/admin/users/" + id, user(username, List.of("ACCOUNTANT")))
-        .andExpect(jsonPath("$.roles[0]").value("ACCOUNTANT"));
-    Map<String, Object> noRoles = new HashMap<>(user(username, List.of()));
-    noRoles.remove("roleCodes");
-    api.doPut("admin", "/api/v1/admin/users/" + id, noRoles)
-        .andExpect(jsonPath("$.roles.length()").value(1));
 
     // LOGIN_MAX_FAILED_ATTEMPTS = 3 (BDOI NFR, V1000): the third failure locks the account.
     for (int i = 0; i < 3; i++) {
@@ -97,36 +81,28 @@ class UserAdminApiIT {
     api.doPost(
             "admin",
             "/api/v1/admin/users/" + id + "/reset-password",
+            Json.of("newPassword", "short"))
+        .andExpect(status().isBadRequest());
+    api.doPost(
+            "admin",
+            "/api/v1/admin/users/" + id + "/reset-password",
             Json.of("newPassword", "N3w!Password99"))
         .andExpect(status().isNoContent());
     login(username, "N3w!Password99", 200);
   }
 
   @Test
-  void passwordPolicyAndDuplicatesAreEnforced() throws Exception {
+  void usersAreNotCreatedNorChangedThroughTheApi() throws Exception {
+    long adminId = api.read(api.doGet("admin", "/api/v1/auth/me")).get("id").asLong();
     api.doPost(
             "admin",
             "/api/v1/admin/users",
             Json.of(
                 "user",
-                user("weakling", List.of()),
-                "initialPassword",
-                Json.of("newPassword", "short")))
-        .andExpect(status().isBadRequest());
-    api.doPost(
-            "admin",
-            "/api/v1/admin/users",
-            Json.of(
-                "user",
-                user("checker", List.of()),
+                Json.of("username", "direct", "fullName", "Direct", "enabled", true),
                 "initialPassword",
                 Json.of("newPassword", STRONG)))
-        .andExpect(status().isConflict());
-  }
-
-  @Test
-  void usersScreenRefusesAnyRoleChange() throws Exception {
-    long adminId = api.read(api.doGet("admin", "/api/v1/auth/me")).get("id").asLong();
+        .andExpect(status().is4xxClientError());
     api.doPut(
             "admin",
             "/api/v1/admin/users/" + adminId,
@@ -139,7 +115,11 @@ class UserAdminApiIT {
                 List.of("SYSADMIN", "FIN_MANAGER"),
                 "enabled",
                 true))
-        .andExpect(jsonPath("$.code").value("ROLES_BY_UIDM"));
+        .andExpect(status().is4xxClientError());
+    assertThat(
+            jdbc.queryForObject(
+                "select count(*) from sec_user where username = 'direct'", Integer.class))
+        .isZero();
   }
 
   /**

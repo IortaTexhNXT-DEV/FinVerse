@@ -13,7 +13,6 @@ import com.iortatechnxt.brokerverse.messaging.domain.NotificationRepository;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequest;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestContent;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestRepository;
-import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestStatus;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestType;
 import com.iortatechnxt.brokerverse.nbadmin.domain.RolePermissionChange;
 import com.iortatechnxt.brokerverse.nbadmin.domain.SodRule;
@@ -106,7 +105,7 @@ class UamSignoffControlsIT {
     return as.run(
         "admin",
         () ->
-            users.createUserWithoutRoles(
+            users.createUser(
                 new UserRequest(
                     user,
                     "Controls User",
@@ -173,7 +172,7 @@ class UamSignoffControlsIT {
     as.run(
         "admin",
         () ->
-            users.updateUserKeepingRoles(
+            users.updateUser(
                 user.getId(),
                 new UserRequest(
                     name,
@@ -192,7 +191,7 @@ class UamSignoffControlsIT {
   }
 
   @Test
-  void dormantUsersAreWarnedThenDeactivatedByRequest() {
+  void dormantUsersAreWarnedThenDeactivatedDirectly() {
     String dormant = AccessRequestIT.username();
     provision(dormant);
     String soon = AccessRequestIT.username();
@@ -211,16 +210,13 @@ class UamSignoffControlsIT {
     assertThat(off.isEnabled()).isFalse();
     assertThat(users.getByUsername(soon).isEnabled()).isTrue();
     assertThat(users.getByUsername("admin").isEnabled()).isTrue();
-    AccessRequest request =
-        requestRepository.findAll().stream()
-            .filter(r -> dormant.equals(r.getUsername()))
-            .filter(r -> r.getRequestType() == AccessRequestType.DISABLE_USER)
-            .findFirst()
-            .orElseThrow();
-    assertThat(request.getStatus()).isEqualTo(AccessRequestStatus.APPROVED);
-    assertThat(request.getUserData().reasonCode()).isEqualTo(DormantUserJob.REASON);
+    assertThat(requestRepository.findAll())
+        .noneMatch(
+            r ->
+                dormant.equals(r.getUsername())
+                    && r.getRequestType() == AccessRequestType.DISABLE_USER);
     assertThat(titlesOf(soon)).contains("Your account will be deactivated");
-    assertThat(titlesOf(dormant)).contains("Your access changed");
+    assertThat(titlesOf("admin")).contains("Dormant users deactivated");
 
     as.run("admin", () -> parameters.update(AccessSettings.DORMANT_DAYS, "0"));
     try {
@@ -251,8 +247,7 @@ class UamSignoffControlsIT {
                         new RolePermissionChange(profile, Set.of(), Set.of()),
                         null,
                         "No longer used"),
-                    false,
-                    List.of(APPROVER)));
+                    false));
     as.run(APPROVER, () -> requests.approve(off.getId(), null));
     as.run("admin", () -> implementations.implement(off.getId()));
     assertThat(

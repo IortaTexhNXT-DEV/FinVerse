@@ -4,7 +4,6 @@ import com.iortatechnxt.brokerverse.security.api.dto.PasswordChangeRequest;
 import com.iortatechnxt.brokerverse.security.api.dto.RoleRequest;
 import com.iortatechnxt.brokerverse.security.api.dto.RoleResponse;
 import com.iortatechnxt.brokerverse.security.api.dto.UserProfileResponse;
-import com.iortatechnxt.brokerverse.security.api.dto.UserRequest;
 import com.iortatechnxt.brokerverse.security.domain.Permission;
 import com.iortatechnxt.brokerverse.security.domain.Role;
 import com.iortatechnxt.brokerverse.security.service.ChangeAuthority;
@@ -28,15 +27,17 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Security administration: users, roles and permissions. Role creation and changes are guarded
- * (PQ17, {@link RoleEditGuard}): they carry the number of an approved group-profile request, or use
- * the audited emergency path {@code UAM_DIRECT_ROLE_EDIT}.
+ * Security administration: the users (read, unlock, the password of a local test account), roles
+ * and permissions. Users are created and changed by UIDM-ISC over SCIM. Role creation and changes
+ * are guarded (PQ17, {@link RoleEditGuard}): they carry the number of an approved group-profile
+ * request, or use the audited emergency path {@code UAM_DIRECT_ROLE_EDIT}.
  */
 @RestController
 @RequestMapping("/api/v1/admin")
 public class UserAdminController {
 
   private static final String USERS = "hasAuthority('USER_MANAGE')";
+  private static final String READ_USERS = "hasAnyAuthority('USER_MANAGE','USER_VIEW')";
   private static final String ROLES = "hasAuthority('ROLE_MANAGE')";
 
   private final UserAdminService service;
@@ -69,39 +70,9 @@ public class UserAdminController {
    * @return users
    */
   @GetMapping("/users")
-  @PreAuthorize(USERS)
+  @PreAuthorize(READ_USERS)
   public List<UserProfileResponse> users() {
     return service.listUsers().stream().map(UserProfileResponse::from).toList();
-  }
-
-  /**
-   * Creates a user without group profiles (UIDM-ISC assigns them; role codes are refused with
-   * {@code ROLES_BY_UIDM}). The initial password is supplied in a separate object and never echoed.
-   *
-   * @param request user data
-   * @return user
-   */
-  @PostMapping("/users")
-  @ResponseStatus(HttpStatus.CREATED)
-  @PreAuthorize(USERS)
-  public UserProfileResponse create(@Valid @RequestBody CreateUserRequest request) {
-    return UserProfileResponse.from(
-        service.createUserWithoutRoles(request.user(), request.initialPassword().newPassword()));
-  }
-
-  /**
-   * Updates a user's data and status; a change of group profiles is refused with {@code
-   * ROLES_BY_UIDM} (UIDM-ISC assigns them).
-   *
-   * @param id id
-   * @param request request
-   * @return user
-   */
-  @PutMapping("/users/{id}")
-  @PreAuthorize(USERS)
-  public UserProfileResponse update(
-      @PathVariable Long id, @Valid @RequestBody UserRequest request) {
-    return UserProfileResponse.from(service.updateUserKeepingRoles(id, request));
   }
 
   /**
@@ -117,8 +88,8 @@ public class UserAdminController {
   }
 
   /**
-   * Resets a user's password; with BDOI's rules only another System Administrator resets it, and
-   * with single sign-on only for a break-glass account.
+   * Resets the password of a local test account: refused where local passwords are not used (in
+   * production; {@code SSO_PASSWORD_RESET}) and for the administrator's own password.
    *
    * @param id id
    * @param request new password
@@ -138,7 +109,7 @@ public class UserAdminController {
    * @return roles
    */
   @GetMapping("/roles")
-  @PreAuthorize("hasAnyAuthority('ROLE_MANAGE','USER_MANAGE')")
+  @PreAuthorize("hasAnyAuthority('ROLE_MANAGE','USER_MANAGE','USER_VIEW')")
   public List<RoleResponse> roles() {
     return service.listRoles().stream()
         .map(r -> RoleResponse.from(r, modules.moduleOfProfile(permissionCodes(r))))
@@ -200,15 +171,6 @@ public class UserAdminController {
     }
     return updated;
   }
-
-  /**
-   * User creation payload.
-   *
-   * @param user user data
-   * @param initialPassword initial password (validated against the password policy)
-   */
-  public record CreateUserRequest(
-      @Valid UserRequest user, @Valid PasswordChangeRequest initialPassword) {}
 
   private static List<String> permissionCodes(Role role) {
     return role.getPermissions().stream().map(Enum::name).toList();

@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { ALL_COMPANIES, dataScopeApi, scopeOfView } from '@/api/dataScope';
 import type { DataScopeValue } from '@/api/dataScope';
+import { useAuth } from '@/auth/authContext';
 import { Button } from '@/components/ui/Button';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Notice } from '@/components/ui/Notice';
@@ -17,6 +18,7 @@ import { describeScope, scopeError } from '@/features/admin/dataAccess';
 export function DataAccessPanel({ user }: Readonly<{ user: { id: number; username: string } }>) {
   const toast = useToast();
   const queries = useQueryClient();
+  const { can } = useAuth();
   const units = useQuery({ queryKey: ['data-scope', 'units'], queryFn: dataScopeApi.units });
   const current = useQuery({
     queryKey: ['data-scope', 'user', user.id],
@@ -51,23 +53,25 @@ export function DataAccessPanel({ user }: Readonly<{ user: { id: number; usernam
         onChange={setEdited}
         caption={`Data access of ${user.username}`}
       />
-      <div className="row" style={{ justifyContent: 'flex-end', gap: 'var(--space-2)' }}>
-        <Button
-          variant="secondary"
-          disabled={edited === undefined}
-          onClick={() => setEdited(undefined)}
-        >
-          Discard Changes
-        </Button>
-        <Button
-          variant="accent"
-          busy={save.isPending}
-          disabled={edited === undefined || missing !== undefined}
-          onClick={() => edited && save.mutate(edited)}
-        >
-          Save Data Access
-        </Button>
-      </div>
+      {can('USER_MANAGE') && (
+        <div className="row" style={{ justifyContent: 'flex-end', gap: 'var(--space-2)' }}>
+          <Button
+            variant="secondary"
+            disabled={edited === undefined}
+            onClick={() => setEdited(undefined)}
+          >
+            Discard Changes
+          </Button>
+          <Button
+            variant="accent"
+            busy={save.isPending}
+            disabled={edited === undefined || missing !== undefined}
+            onClick={() => edited && save.mutate(edited)}
+          >
+            Save Data Access
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

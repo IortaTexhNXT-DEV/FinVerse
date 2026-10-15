@@ -48,6 +48,7 @@ public class UserSessionController {
    * @return sessions
    */
   @GetMapping
+  @PreAuthorize("hasAnyAuthority('USER_MANAGE','USER_VIEW')")
   public PageResponse<SessionResponse> list(
       @RequestParam(required = false) String username,
       @RequestParam(defaultValue = "false") boolean open,

@@ -62,7 +62,7 @@ class UamOversightIT {
         as.run(
             "admin",
             () ->
-                users.createUserWithoutRoles(
+                users.createUser(
                     new UserRequest(name, "Oversight User", null, null, null, Set.of(), true),
                     "Oversight#2026pw"));
     for (String profile : profiles) {

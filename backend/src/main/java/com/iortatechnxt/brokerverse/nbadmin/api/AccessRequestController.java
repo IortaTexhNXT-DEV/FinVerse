@@ -133,7 +133,7 @@ public class AccessRequestController {
   public AccessRequestResponse create(
       @Valid @RequestBody AccessRequestRequest request,
       @RequestParam(defaultValue = "false") boolean draft) {
-    return view(requests.create(request.content(), draft, null));
+    return view(requests.create(request.content(), draft));
   }
 
   /**
@@ -161,7 +161,7 @@ public class AccessRequestController {
   @PreAuthorize(REQUEST)
   public AccessRequestResponse submit(
       @PathVariable Long id, @Valid @RequestBody AccessSubmitRequest body) {
-    return view(requests.submit(id, null, body.remarks()));
+    return view(requests.submit(id, body.remarks()));
   }
 
   /**

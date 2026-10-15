@@ -27,7 +27,7 @@ class JobFailureMailerTest {
 
   private static JobRun failedRun() {
     return new JobRun(
-        "UAM_EFFECTIVE_CHANGES",
+        "UAM_DORMANT_USERS",
         JobTrigger.SCHEDULED,
         "SYSTEM",
         Instant.parse("2026-09-25T16:05:00Z"));
@@ -42,7 +42,7 @@ class JobFailureMailerTest {
     verify(messages).queueEmail(mail.capture());
     assertThat(mail.getValue().to()).containsExactly("ops@bdo-insure.ph");
     assertThat(mail.getValue().purpose()).isEqualTo(JobFailureMailer.PURPOSE);
-    assertThat(mail.getValue().subject()).isEqualTo("BIBS: batch job UAM_EFFECTIVE_CHANGES failed");
+    assertThat(mail.getValue().subject()).isEqualTo("BIBS: batch job UAM_DORMANT_USERS failed");
     assertThat(mail.getValue().body()).contains("26 Sep 2026 00:05:00");
   }
 

@@ -53,10 +53,6 @@ public class UserAdminService {
   private static final String USER_LABEL = "User";
   private static final String ROLE = "Role";
   private static final String ROLES_ATTRIBUTE = "roles";
-
-  /** Error code: the Users screen does not assign group profiles (UIDM-ISC does). */
-  public static final String ROLES_BY_UIDM = "ROLES_BY_UIDM";
-
   private static final String ENABLED_ATTRIBUTE = "enabled";
 
   private final AppUserRepository users;
@@ -173,44 +169,6 @@ public class UserAdminService {
   }
 
   /**
-   * Creates a user from the Users screen: without group profiles, which UIDM-ISC assigns over the
-   * provisioning interface (break-glass and seed accounts get theirs from seed SQL).
-   *
-   * @param request request (no role codes)
-   * @param initialPassword initial password (user must change it)
-   * @return user
-   */
-  public AppUser createUserWithoutRoles(UserRequest request, String initialPassword) {
-    if (request.roleCodes() != null && !request.roleCodes().isEmpty()) {
-      throw rolesByUidm();
-    }
-    return createUser(request.withRoleCodes(Set.of()), initialPassword);
-  }
-
-  /**
-   * Updates a user from the Users screen: data and status, never the group profiles (UIDM-ISC
-   * assigns them). The current role codes may be sent back unchanged.
-   *
-   * @param id id
-   * @param request request
-   * @return user
-   */
-  public AppUser updateUserKeepingRoles(Long id, UserRequest request) {
-    AppUser user =
-        users.findById(id).orElseThrow(() -> new ResourceNotFoundException(USER_LABEL, id));
-    Set<String> held = roleCodes(user);
-    if (request.roleCodes() != null && !request.roleCodes().equals(held)) {
-      throw rolesByUidm();
-    }
-    return updateUser(id, request.withRoleCodes(held));
-  }
-
-  private static BusinessRuleException rolesByUidm() {
-    return new BusinessRuleException(
-        ROLES_BY_UIDM, "Group profiles are assigned through UIDM-ISC, not on the Users screen");
-  }
-
-  /**
    * Updates a user (a direct change).
    *
    * @param id id
@@ -266,6 +224,33 @@ public class UserAdminService {
         AuditAction.UPDATE,
         "Updated user; roles " + request.roleCodes() + requestText(authority));
     return user;
+  }
+
+  /**
+   * Deactivates a user directly, without a request (the dormant-user job): the user is signed out
+   * everywhere, and the change log and the audit trail keep the reason.
+   *
+   * @param user the user
+   * @param reason why the user is deactivated
+   * @return whether the user was active before
+   */
+  public boolean deactivate(AppUser user, String reason) {
+    if (!user.isEnabled()) {
+      return false;
+    }
+    user.setEnabled(false);
+    sessions.endAll(user.getUsername(), SessionEndReason.ADMIN_ENDED);
+    changes.record(
+        new AccessChange(
+            AccessSubjectType.USER,
+            user.getUsername(),
+            AccessChangeActivity.DISABLE_USER,
+            ENABLED_ATTRIBUTE,
+            Boolean.TRUE.toString(),
+            Boolean.FALSE.toString()),
+        ChangeAuthority.DIRECT);
+    audit.record(USER, user.getUsername(), AuditAction.UPDATE, "Deactivated: " + reason);
+    return true;
   }
 
   /**

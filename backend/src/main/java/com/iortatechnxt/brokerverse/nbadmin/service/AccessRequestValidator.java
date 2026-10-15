@@ -1,65 +1,34 @@
 package com.iortatechnxt.brokerverse.nbadmin.service;
 
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
-import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestContent;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestRepository;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestStatus;
-import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestType;
-import com.iortatechnxt.brokerverse.nbadmin.domain.ExternalParty;
-import com.iortatechnxt.brokerverse.nbadmin.service.ExternalUserProvisioner.ExternalUserAction;
-import java.time.Clock;
-import java.util.EnumSet;
-import java.util.Set;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Checks an access request (FR-UA-010): light checks (formats only) when a draft is saved, full
- * checks on submission and again at approval. Internal users are checked by {@link
- * UserRequestValidator}, group profiles by {@link GroupProfileRequestValidator}, external (portal)
- * users by the port {@link ExternalUserProvisioner} (decision D7).
+ * checks on submission and again at approval by {@link GroupProfileRequestValidator}. Users are
+ * maintained in UIDM-ISC: a request about a user is refused ({@code ACCESS_USERS_BY_UIDM}).
  */
 @Component
 @Transactional(readOnly = true)
 public class AccessRequestValidator {
 
-  private static final Set<AccessRequestType> EXTERNAL_TYPES =
-      EnumSet.of(
-          AccessRequestType.CREATE_USER,
-          AccessRequestType.DISABLE_USER,
-          AccessRequestType.ENABLE_USER);
-
-  private final UserRequestValidator users;
   private final GroupProfileRequestValidator groupProfiles;
-  private final ExternalUserProvisioner externalUsers;
-  private final AccessSettings settings;
   private final AccessRequestRepository requests;
-  private final Clock clock;
 
   /**
    * Creates the validator.
    *
-   * @param users internal user checks
    * @param groupProfiles group-profile checks
-   * @param externalUsers external (portal) users (port)
-   * @param settings parameters (external users switched on)
-   * @param requests requests (one open request per user or role)
-   * @param clock clock
+   * @param requests requests (one open request per group profile)
    */
   public AccessRequestValidator(
-      UserRequestValidator users,
-      GroupProfileRequestValidator groupProfiles,
-      ExternalUserProvisioner externalUsers,
-      AccessSettings settings,
-      AccessRequestRepository requests,
-      Clock clock) {
-    this.settings = settings;
-    this.users = users;
+      GroupProfileRequestValidator groupProfiles, AccessRequestRepository requests) {
     this.groupProfiles = groupProfiles;
-    this.externalUsers = externalUsers;
     this.requests = requests;
-    this.clock = clock;
   }
 
   /**
@@ -109,17 +78,10 @@ public class AccessRequestValidator {
     if (c.type() == null) {
       throw new BusinessRuleException("ACCESS_TYPE", "Choose the type of request");
     }
-    if (c.type().isGroupProfile()) {
-      if (c.roleCode() == null || c.roleCode().isBlank()) {
-        throw new BusinessRuleException("ACCESS_ROLE", "Select the role to change");
-      }
-    } else {
-      UserRequestValidator.requireUsername(c.username());
-      if (c.external() == null) {
-        UserRequestValidator.requireNoRoles(c);
-      }
+    requireGroupProfile(c);
+    if (c.roleCode() == null || c.roleCode().isBlank()) {
+      throw new BusinessRuleException("ACCESS_ROLE", "Select the role to change");
     }
-    requireEffectiveDate(c);
     return c.withJustification(trimmed(c.justification()));
   }
 
@@ -127,90 +89,25 @@ public class AccessRequestValidator {
     if (c.justification() == null || c.justification().isBlank()) {
       throw new BusinessRuleException("ACCESS_JUSTIFICATION", "Enter the justification");
     }
-    requireEffectiveDate(c);
-    AccessRequestContent trimmedContent = c.withJustification(c.justification().trim());
-    if (c.type().isGroupProfile()) {
-      return groupProfiles.validate(trimmedContent);
-    }
-    if (c.external() != null) {
-      return external(trimmedContent);
-    }
-    return users.validate(trimmedContent);
+    requireGroupProfile(c);
+    return groupProfiles.validate(c.withJustification(c.justification().trim()));
   }
 
-  private AccessRequestContent external(AccessRequestContent c) {
-    if (!settings.externalUsers()) {
+  private static void requireGroupProfile(AccessRequestContent c) {
+    if (!c.type().isGroupProfile()) {
       throw new BusinessRuleException(
-          ExternalUserProvisioner.NOT_AVAILABLE,
-          "Requests for external (portal) users are switched off: no portal is installed");
-    }
-    ExternalParty party = c.external();
-    if (!EXTERNAL_TYPES.contains(c.type())) {
-      throw new BusinessRuleException(
-          "ACCESS_EXTERNAL_TYPE", "External users are created, disabled or enabled only");
-    }
-    if (party.kind() == null || party.code() == null) {
-      throw new BusinessRuleException(
-          "ACCESS_EXTERNAL_PARTY", "Select the insurer or client of the external user");
-    }
-    String username = UserRequestValidator.requireUsername(c.username());
-    externalUsers.validate(
-        action(c.type()),
-        new ExternalUserAccount(
-            null,
-            username,
-            c.fullName(),
-            c.email(),
-            party.kind(),
-            party.code(),
-            party.portalRole(),
-            null));
-    return c;
-  }
-
-  /**
-   * The provisioner action of an external request.
-   *
-   * @param type CREATE_USER, DISABLE_USER or ENABLE_USER
-   * @return action
-   */
-  static ExternalUserAction action(AccessRequestType type) {
-    return switch (type) {
-      case DISABLE_USER -> ExternalUserAction.DISABLE;
-      case ENABLE_USER -> ExternalUserAction.ENABLE;
-      default -> ExternalUserAction.CREATE;
-    };
-  }
-
-  private void requireEffectiveDate(AccessRequestContent c) {
-    if (c.effectiveFrom() == null) {
-      return;
-    }
-    if (c.type().isGroupProfile()) {
-      throw new BusinessRuleException(
-          "ACCESS_EFFECTIVE_DATE_USER_ONLY",
-          "An effective date applies to user requests; group profiles are implemented");
-    }
-    if (c.effectiveFrom().isBefore(BusinessClock.today(clock))) {
-      throw new BusinessRuleException(
-          "ACCESS_EFFECTIVE_DATE", "The effective date cannot be before today");
+          AccessRequestPermissions.USERS_BY_UIDM,
+          "Users are maintained in UIDM-ISC; only group-profile changes are requested here");
     }
   }
 
   private void requireNoOpenRequest(AccessRequestContent clean, Long requestId) {
     Long self = requestId == null ? Long.valueOf(-1L) : requestId;
-    boolean groupProfile = clean.type().isGroupProfile();
-    boolean open =
-        groupProfile
-            ? requests.existsByRoleCodeAndStatusInAndIdNot(
-                clean.roleCode(), AccessRequestStatus.OPEN, self)
-            : requests.existsByUsernameIgnoreCaseAndStatusInAndIdNot(
-                clean.username(), AccessRequestStatus.OPEN, self);
-    if (open) {
-      String subject = groupProfile ? "role " + clean.roleCode() : "user " + clean.username();
+    if (requests.existsByRoleCodeAndStatusInAndIdNot(
+        clean.roleCode(), AccessRequestStatus.OPEN, self)) {
       throw new BusinessRuleException(
           "ACCESS_REQUEST_PENDING",
-          "A request for " + subject + " is already waiting for approval");
+          "A request for role " + clean.roleCode() + " is already waiting for approval");
     }
   }
 

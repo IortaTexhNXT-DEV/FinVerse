@@ -1,25 +1,18 @@
 package com.iortatechnxt.brokerverse.nbadmin.service;
 
-import com.iortatechnxt.brokerverse.common.security.CurrentUser;
-import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequest;
-import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestAction;
-import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestContent;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestRepository;
-import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestStatus;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestType;
-import com.iortatechnxt.brokerverse.nbadmin.domain.RequestedUserData;
 import com.iortatechnxt.brokerverse.security.domain.AppUser;
 import com.iortatechnxt.brokerverse.security.domain.AppUserRepository;
+import com.iortatechnxt.brokerverse.security.service.UserAdminService;
 import com.iortatechnxt.brokerverse.system.service.JobOutcome;
 import com.iortatechnxt.brokerverse.system.service.ManagedJob;
-import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,12 +24,13 @@ import org.springframework.transaction.support.TransactionTemplate;
 /**
  * Job {@code UAM_DORMANT_USERS}: deactivates the users who have not signed in for {@code
  * UAM_DORMANT_DAYS} days (0 = never), counted from the last sign-in, or from the creation or the
- * last reactivation when later. Each deactivation is an access request of type Deactivate user with
- * the reason "No sign-in for the dormancy period", approved and applied by the system, so it has
- * the request history, the change log and the notice to the user like any other request. {@code
- * UAM_DORMANT_NOTICE_DAYS} days before, the user is told to sign in (in the app and by e-mail). The
- * holders of the System Administrator profile are never deactivated by the job. Daily at 00:15 PHT
- * ({@code brokerverse.jobs.uam-dormant-users-cron}); each user in a transaction of its own.
+ * last reactivation when later. The user is deactivated directly (UIDM-ISC keeps the users, so no
+ * access request is raised): the sessions end, and the change log and the audit trail keep the
+ * reason; the User Access Administrators (USER_MANAGE) are told, so that UIDM-ISC disables the
+ * account too. {@code UAM_DORMANT_NOTICE_DAYS} days before, the user is told to sign in (in the app
+ * and by e-mail). The holders of the System Administrator profile are never deactivated by the job.
+ * Daily at 00:15 PHT ({@code brokerverse.jobs.uam-dormant-users-cron}); each user in a transaction
+ * of its own.
  */
 @Component
 public class DormantUserJob implements ManagedJob {
@@ -54,54 +48,38 @@ public class DormantUserJob implements ManagedJob {
 
   private final AppUserRepository users;
   private final AccessRequestRepository requests;
-  private final DocumentNumberService numbers;
-  private final AccessRequestValidator validator;
-  private final AccessChangeApplier applier;
-  private final AccessRequestHistory history;
+  private final UserAdminService userAdmin;
   private final AccessRequestNotifier notifier;
   private final AccessSettings settings;
   private final TransactionTemplate tx;
-  private final Clock clock;
   private final String cron;
 
   /**
    * Creates the job.
    *
    * @param users users
-   * @param requests access requests
-   * @param numbers request numbers
-   * @param validator request checks
-   * @param applier applies the deactivation
-   * @param history request history
+   * @param requests access requests (reactivations raised before UIDM-ISC)
+   * @param userAdmin deactivates the user
    * @param notifier notices
    * @param settings parameters
    * @param transactions transaction manager (a transaction per user)
-   * @param clock clock
    * @param cron schedule
    */
   public DormantUserJob(
       AppUserRepository users,
       AccessRequestRepository requests,
-      DocumentNumberService numbers,
-      AccessRequestValidator validator,
-      AccessChangeApplier applier,
-      AccessRequestHistory history,
+      UserAdminService userAdmin,
       AccessRequestNotifier notifier,
       AccessSettings settings,
       PlatformTransactionManager transactions,
-      Clock clock,
       @Value("${brokerverse.jobs.uam-dormant-users-cron:0 15 16 * * *}") String cron) {
     this.users = users;
     this.requests = requests;
-    this.numbers = numbers;
-    this.validator = validator;
-    this.applier = applier;
-    this.history = history;
+    this.userAdmin = userAdmin;
     this.notifier = notifier;
     this.settings = settings;
     this.tx = new TransactionTemplate(transactions);
     this.tx.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
-    this.clock = clock;
     this.cron = cron;
   }
 
@@ -204,28 +182,7 @@ public class DormantUserJob implements ManagedJob {
   }
 
   private void deactivate(AppUser user, int days) {
-    Instant now = clock.instant();
-    AccessRequestContent content =
-        validator.recheck(
-            new AccessRequestContent(
-                    AccessRequestType.DISABLE_USER,
-                    user.getUsername(),
-                    null,
-                    null,
-                    Set.of(),
-                    null,
-                    "No sign-in for " + days + " days (dormant-user job)")
-                .withUserData(new RequestedUserData(null, null, null, REASON, false, null)));
-    AccessRequest r =
-        requests.save(
-            new AccessRequest(
-                numbers.next("AR-" + BusinessClock.today(clock).getYear()), content, null));
-    r.submit(List.of(), Set.of(), CurrentUser.SYSTEM, now);
-    history.record(r, AccessRequestAction.SUBMIT, null, null);
-    r.approve(AccessRequestStatus.APPROVED, CurrentUser.SYSTEM, now, null);
-    applier.apply(r);
-    history.record(r, AccessRequestAction.APPLY, AccessRequestStatus.PENDING, null);
-    notifier.accessChanged(r);
+    userAdmin.deactivate(user, "no sign-in for " + days + " days (dormant-user job)");
   }
 
   /** What the job did for one user. */

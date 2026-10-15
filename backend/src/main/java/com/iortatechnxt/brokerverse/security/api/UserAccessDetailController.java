@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api/v1/admin/users/{id}")
-@PreAuthorize("hasAuthority('USER_MANAGE')")
+@PreAuthorize("hasAnyAuthority('USER_MANAGE','USER_VIEW')")
 public class UserAccessDetailController {
 
   private final UserAccessDetail detail;

@@ -14,11 +14,13 @@ import org.springframework.stereotype.Component;
  *
  * <ul>
  *   <li>true (BDOI's FRS, delivered): no forgotten-password link on the Login page; a password is
- *       reset only by a System Administrator other than its holder, and with single sign-on only
- *       for the break-glass accounts (the others have no password in the system);
+ *       reset only by a System Administrator other than its holder;
  *   <li>false (the earlier behaviour): the self-service reset link for local accounts and the
  *       administrator reset of any local account.
  * </ul>
+ *
+ * <p>Either way an administrator reset applies only to the local test accounts, where local
+ * passwords may be used (never in production): the other users sign in with Microsoft Entra ID.
  */
 @Component
 public class PasswordResetRules {
@@ -84,7 +86,7 @@ public class PasswordResetRules {
   /**
    * Checks that the current administrator may reset the password of a user.
    *
-   * @param userId id of the holder of the password; an unknown id is left to the reset
+   * @param userId id of the holder of the password; an unknown id is left to the reset (not found)
    */
   public void checkAdministratorReset(Long userId) {
     users.findById(userId).ifPresent(this::checkAdministratorReset);
@@ -97,20 +99,17 @@ public class PasswordResetRules {
    * @throws BusinessRuleException OWN_PASSWORD_RESET or SSO_PASSWORD_RESET
    */
   public void checkAdministratorReset(AppUser user) {
-    if (!bdoiRules()) {
-      return;
-    }
-    if (CurrentUser.sameUser(currentUser.username(), user.getUsername())) {
-      throw new BusinessRuleException(
-          "OWN_PASSWORD_RESET",
-          "Your own password is reset by another System Administrator; change it from My Profile");
-    }
     if (!localSignIn.allowed()) {
       throw new BusinessRuleException(
           "SSO_PASSWORD_RESET",
           "The password of "
               + user.getFullName()
               + " is kept by the organisation's sign-in service and is reset there");
+    }
+    if (bdoiRules() && CurrentUser.sameUser(currentUser.username(), user.getUsername())) {
+      throw new BusinessRuleException(
+          "OWN_PASSWORD_RESET",
+          "Your own password is reset by another System Administrator; change it from My Profile");
     }
   }
 }

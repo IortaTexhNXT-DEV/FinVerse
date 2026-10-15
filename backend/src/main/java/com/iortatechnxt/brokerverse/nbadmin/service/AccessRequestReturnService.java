@@ -4,10 +4,8 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequest;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestAction;
-import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestApprover;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestStatus;
 import java.time.Clock;
-import java.util.List;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -77,8 +75,8 @@ public class AccessRequestReturnService {
   }
 
   /**
-   * Resubmits a returned request with a corrected justification to the same approvers (the
-   * compatible correction of BASAU 2.6.x; requester only).
+   * Resubmits a returned request with a corrected justification (the compatible correction of BASAU
+   * 2.6.x; requester only).
    *
    * @param id request
    * @param justification justification answering the remarks
@@ -99,9 +97,7 @@ public class AccessRequestReturnService {
       throw new BusinessRuleException("ACCESS_JUSTIFICATION", "Enter the justification");
     }
     r.edit(r.content().withJustification(justification.trim()));
-    List<String> approvers =
-        r.getApprovers().stream().map(AccessRequestApprover::getApprover).toList();
-    return requests.submit(id, approvers.isEmpty() ? null : approvers, justification.trim());
+    return requests.submit(id, justification.trim());
   }
 
   /**

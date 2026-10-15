@@ -142,17 +142,6 @@ public class AccessRequestNotifier {
   }
 
   /**
-   * The outcome of an approval that applies on a later date, for example "approved, applies on
-   * 27-Oct-2026".
-   *
-   * @param date effective date
-   * @return outcome text
-   */
-  public static String appliesOn(LocalDate date) {
-    return "approved, applies on " + DisplayFormat.date(date);
-  }
-
-  /**
    * Tells the requester that the request was returned, with the remarks (BRD 1.006.1.1).
    *
    * @param r request
@@ -239,7 +228,7 @@ public class AccessRequestNotifier {
             + BrandAssets.SYSTEM_NAME
             + " for a long time. Sign in before "
             + DisplayFormat.date(deactivationDate)
-            + ", or your account is deactivated and a new access request is needed.";
+            + ", or your account is deactivated and UIDM-ISC has to reactivate it.";
     notifications.notifyUser(
         username,
         new Notice("Your account will be deactivated", body, PROFILE, "AppUser", username),
@@ -253,7 +242,8 @@ public class AccessRequestNotifier {
   }
 
   /**
-   * Tells the requesters of access which dormant users were deactivated (dormant-user job).
+   * Tells the User Access Administrators (USER_MANAGE) which dormant users were deactivated, so
+   * that UIDM-ISC disables their accounts too (dormant-user job).
    *
    * @param deactivated user names
    * @param days dormancy period in days
@@ -263,14 +253,15 @@ public class AccessRequestNotifier {
       return;
     }
     notifications.notifyPermission(
-        "ACCESS_REQUEST",
+        "USER_MANAGE",
         new Notice(
             "Dormant users deactivated",
             deactivated.size()
                 + " user(s) without a sign-in for "
                 + days
                 + " days were deactivated: "
-                + String.join(", ", deactivated),
+                + String.join(", ", deactivated)
+                + ". Disable their accounts in UIDM-ISC as well.",
             AccessRequestService.USERS_SCREEN,
             AccessRequestService.ENTITY,
             null),

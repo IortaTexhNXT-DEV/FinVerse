@@ -1,7 +1,6 @@
 package com.iortatechnxt.brokerverse.identity.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
-import com.iortatechnxt.brokerverse.identity.api.dto.DirectoryAccountDto;
 import com.iortatechnxt.brokerverse.identity.api.dto.DirectoryProfileResponse;
 import com.iortatechnxt.brokerverse.identity.api.dto.IdentityEventResponse;
 import com.iortatechnxt.brokerverse.identity.domain.IdentityEventStatus;
@@ -194,32 +193,11 @@ public class IdentityAdminController {
    * @return details, 204 when the user was never synchronised
    */
   @GetMapping("/users/{username}/profile")
+  @PreAuthorize("hasAnyAuthority('USER_MANAGE','USER_VIEW')")
   public ResponseEntity<DirectoryProfileResponse> profile(@PathVariable String username) {
     return sync.profile(username)
         .map(p -> ResponseEntity.ok(DirectoryProfileResponse.from(p)))
         .orElseGet(() -> ResponseEntity.noContent().build());
-  }
-
-  /**
-   * The details of an active Enterprise SSO account, before a user is created from it.
-   *
-   * @param windowsId Windows ID
-   * @return the account
-   */
-  @GetMapping("/directory")
-  public DirectoryAccountDto lookup(@RequestParam String windowsId) {
-    return DirectoryAccountDto.from(sync.activeAccount(windowsId));
-  }
-
-  /**
-   * Creates a user from an existing and active Enterprise SSO account.
-   *
-   * @param request Windows ID
-   * @return the event of the creation
-   */
-  @PostMapping("/users/from-directory")
-  public IdentityEventResponse createFromDirectory(@Valid @RequestBody FromDirectory request) {
-    return IdentityEventResponse.from(sync.createFromDirectory(request.windowsId()));
   }
 
   /**
@@ -228,13 +206,6 @@ public class IdentityAdminController {
    * @param remark remark
    */
   public record Remark(@NotBlank @Size(max = 500) String remark) {}
-
-  /**
-   * Request of a creation from the directory.
-   *
-   * @param windowsId Windows ID of the account
-   */
-  public record FromDirectory(@NotBlank String windowsId) {}
 
   /**
    * How users are provisioned.

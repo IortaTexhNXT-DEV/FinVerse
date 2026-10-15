@@ -18,7 +18,6 @@ import com.iortatechnxt.brokerverse.security.domain.PrivilegeLevel;
 import com.iortatechnxt.brokerverse.security.service.UserAdminService;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import org.junit.jupiter.api.Test;
@@ -36,7 +35,6 @@ class PermissionCombinationIT {
   private static final String BADMIN = "badmin";
   private static final String INFOSEC = "infosec";
   private static final String REQUESTOR = "requestor";
-  private static final String APPROVER = "uamapprover";
 
   @Autowired private SodRuleService rules;
   @Autowired private AccessRequestService requests;
@@ -86,8 +84,7 @@ class PermissionCombinationIT {
                                       requester, Set.of("ACCESS_APPROVE"), Set.of()),
                                   null,
                                   "Let the requesters approve"),
-                              false,
-                              List.of(APPROVER))))
+                              false)))
           .extracting("code", "message")
           .containsExactly(
               "ACCESS_PERMISSION_COMBINATION",
@@ -114,8 +111,7 @@ class PermissionCombinationIT {
                                       Set.of()),
                                   new RequestedRole("Both", "Both", PrivilegeLevel.STANDARD),
                                   "One profile for both"),
-                              false,
-                              List.of(APPROVER))))
+                              false)))
           .extracting("code")
           .isEqualTo("ACCESS_PERMISSION_COMBINATION");
       assertThatThrownBy(
@@ -132,8 +128,7 @@ class PermissionCombinationIT {
                                   Set.of(requester, approver),
                                   null,
                                   "Joined"),
-                              false,
-                              List.of(APPROVER))))
+                              false)))
           .extracting("code")
           .isEqualTo("ACCESS_USERS_BY_UIDM");
     } finally {
@@ -157,8 +152,7 @@ class PermissionCombinationIT {
                                     code, Set.of("AUDIT_VIEW"), Set.of("AUDIT_VIEW")),
                                 null,
                                 "Undecided"),
-                            false,
-                            List.of(APPROVER))))
+                            false)))
         .extracting("code")
         .isEqualTo("ACCESS_PERMISSION_CONFLICT");
   }

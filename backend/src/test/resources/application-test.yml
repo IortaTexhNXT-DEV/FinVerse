@@ -9,6 +9,10 @@ brokerverse:
   # The flows of the Enterprise SSO platform run against its simulator in the tests.
   identity:
     simulator: true
+  # The SCIM tests call /integration/** many times from one address; the limit has its own tests.
+  integration:
+    rate-limit:
+      requests-per-minute: 100000
   # The product master changes are delivered to the simulated receiving system in the tests.
   product-master:
     simulator: true

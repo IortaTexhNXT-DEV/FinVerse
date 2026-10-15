@@ -37,6 +37,7 @@ import org.springframework.transaction.support.TransactionTemplate;
  * profiles of a user at once, without an approval in the system, and is recorded like any event.
  */
 @Service
+@SuppressWarnings("PMD.GodClass") // the one entry point of every provisioning event and its outcome
 public class IdentitySyncService {
 
   /** Setting: users from the Enterprise SSO platform / UIDM-ISC (conflict C01 option a). */
@@ -127,12 +128,17 @@ public class IdentitySyncService {
    */
   public IdentityEvent receive(
       DirectoryAccount account, IdentityEventType type, IdentityEventSource source) {
+    String payload = payload(account);
+    Optional<IdentityEvent> repeated =
+        IdentityEventReplay.repeated(events, account, type, source, payload);
+    if (repeated.isPresent()) {
+      return repeated.get();
+    }
     Long id =
         tx.execute(
             s ->
                 events
-                    .save(
-                        new IdentityEvent(clock.instant(), source, type, account, payload(account)))
+                    .save(new IdentityEvent(clock.instant(), source, type, account, payload))
                     .getId());
     return process(id);
   }

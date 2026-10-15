@@ -172,6 +172,11 @@ brokerverse:
         identity-provisioning:
           path: /integration/v1/scim/v2/**
           scopes: ${BROKERVERSE_INTEGRATION_IDENTITY_SCOPES:identity.provision}
+    # Largest body and requests per client address and minute (IntegrationRequestGuard; 0: no
+    # limit). The API gateway applies its own quota in front.
+    max-body-size: ${BROKERVERSE_INTEGRATION_MAX_BODY_SIZE:256KB}
+    rate-limit:
+      requests-per-minute: ${BROKERVERSE_INTEGRATION_RATE_LIMIT:300}
   # ---- Product master changes for the other BDOI systems (ProductMasterProperties) ----
   product-master:
     # true: the receiving system is simulated (SIT and UAT; refused in production).

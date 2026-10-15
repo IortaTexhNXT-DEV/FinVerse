@@ -239,6 +239,44 @@ class IdentityProvisioningIT {
   }
 
   @Test
+  void anAccountMadeInactiveLosesItsOpenSessionAtOnce() throws Exception {
+    String userId = userId();
+    as.run(
+        "admin",
+        () ->
+            admin.createUser(
+                new UserRequest(
+                    userId, "Inactive Tester", null, null, null, Set.of("AUDITOR"), true),
+                PASSWORD));
+    String login =
+        mvc.perform(
+                post("/api/v1/auth/login")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        json.writeValueAsString(Map.of("username", userId, "password", PASSWORD))))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+    String token = JsonPath.read(login, "$.accessToken");
+    mvc.perform(get("/api/v1/auth/me").header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+        .andExpect(status().isOk());
+
+    mvc.perform(
+            uidm(patch(USERS + "/" + userId))
+                .contentType(SCIM)
+                .content(
+                    "{\"schemas\":[\"urn:ietf:params:scim:api:messages:2.0:PatchOp\"],"
+                        + "\"Operations\":[{\"op\":\"replace\",\"path\":\"active\","
+                        + "\"value\":false}]}"))
+        .andExpect(status().isOk());
+    TestSecurityContextHolder.clearContext();
+    mvc.perform(get("/api/v1/auth/me").header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+        .andExpect(status().isUnauthorized());
+    assertThat(enabled(userId)).isFalse();
+  }
+
+  @Test
   void aRefusedEventIsReprocessedOnceTheDataIsCorrected() throws Exception {
     String userId = userId();
     String taken = "BDO\\r" + userId;

@@ -10,6 +10,7 @@ import com.iortatechnxt.brokerverse.identity.domain.IdentityEventSource;
 import com.iortatechnxt.brokerverse.identity.service.GroupProfileChecks;
 import com.iortatechnxt.brokerverse.identity.service.IdentityExtract;
 import com.iortatechnxt.brokerverse.identity.service.IdentityMemberships;
+import com.iortatechnxt.brokerverse.identity.service.ScimInput;
 import com.iortatechnxt.brokerverse.identity.service.ScimUsers;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -125,6 +126,9 @@ public class ScimGroupsController {
       @PathVariable String id,
       @RequestBody JsonNode body,
       @RequestHeader(value = REQUEST_NO, required = false) String requestNo) {
+    ScimInput.checkId(id);
+    ScimInput.checkRequestNo(requestNo);
+    ScimInput.checkOperations(body);
     Optional<IdentityExtract.Group> found = extract.group(id);
     if (found.isEmpty()) {
       return answers.error(HttpStatus.NOT_FOUND, null, GroupProfileChecks.NO_GROUP + id);
@@ -208,7 +212,7 @@ public class ScimGroupsController {
               .orElse(sent);
       return change(verb, members, filtered)
           ? null
-          : answers.error(HttpStatus.BAD_REQUEST, "invalidSyntax", "Unknown operation " + verb);
+          : answers.error(HttpStatus.BAD_REQUEST, "invalidSyntax", "Unknown operation");
     }
 
     /** A member that is no user of {@code GET /Users}: a refused membership event. */

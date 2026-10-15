@@ -149,6 +149,41 @@ class IntegrationApiSecurityIT {
   }
 
   @Test
+  void theProvisioningInterfaceChecksIssuerAudienceAndTheProvisioningScope() throws Exception {
+    String users = "/integration/v1/scim/v2/Users";
+    mvc.perform(get(users).header(HttpHeaders.AUTHORIZATION, BEARER + token(claims())))
+        .andExpect(status().isForbidden());
+    mvc.perform(
+            get(users)
+                .header(
+                    HttpHeaders.AUTHORIZATION,
+                    BEARER
+                        + token(
+                            claims()
+                                .issuer("https://someone-else.example")
+                                .claim("scope", "identity.provision")
+                                .build())))
+        .andExpect(status().isUnauthorized());
+    mvc.perform(
+            get(users)
+                .header(
+                    HttpHeaders.AUTHORIZATION,
+                    BEARER
+                        + token(
+                            claims()
+                                .audience("another-system")
+                                .claim("scope", "identity.provision")
+                                .build())))
+        .andExpect(status().isUnauthorized());
+    mvc.perform(
+            get(users)
+                .header(
+                    HttpHeaders.AUTHORIZATION,
+                    BEARER + token(claims().claim("scope", "identity.provision").build())))
+        .andExpect(status().isOk());
+  }
+
+  @Test
   void aPathWithoutRuleIsRefusedEvenWithAValidToken() throws Exception {
     mvc.perform(
             get("/integration/v1/unlisted")

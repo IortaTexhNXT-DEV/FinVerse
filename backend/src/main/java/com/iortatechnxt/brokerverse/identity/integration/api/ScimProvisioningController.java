@@ -13,6 +13,7 @@ import com.iortatechnxt.brokerverse.identity.service.IdentityExtract;
 import com.iortatechnxt.brokerverse.identity.service.IdentityMemberships;
 import com.iortatechnxt.brokerverse.identity.service.IdentityRefused;
 import com.iortatechnxt.brokerverse.identity.service.IdentitySyncService;
+import com.iortatechnxt.brokerverse.identity.service.ScimInput;
 import com.iortatechnxt.brokerverse.identity.service.ScimUsers;
 import java.util.List;
 import java.util.Optional;
@@ -84,7 +85,7 @@ public class ScimProvisioningController {
   @PostMapping("/Users")
   public ResponseEntity<JsonNode> create(@RequestBody JsonNode body) {
     DirectoryAccount account = read(body);
-    return provision(account, ScimUsers.groups(body), IdentityEventType.JOINER, HttpStatus.CREATED);
+    return provision(account, groups(body), IdentityEventType.JOINER, HttpStatus.CREATED);
   }
 
   /**
@@ -97,12 +98,13 @@ public class ScimProvisioningController {
    */
   @PutMapping("/Users/{id}")
   public ResponseEntity<JsonNode> replace(@PathVariable String id, @RequestBody JsonNode body) {
+    ScimInput.checkId(id);
     DirectoryAccount account = read(body);
     if (account.windowsId() == null) {
       account =
           withWindowsId(account, extract.account(id).map(a -> a.account().windowsId()).orElse(id));
     }
-    return provision(account, ScimUsers.groups(body), IdentityEventType.MOVER, HttpStatus.OK);
+    return provision(account, groups(body), IdentityEventType.MOVER, HttpStatus.OK);
   }
 
   /**
@@ -115,6 +117,8 @@ public class ScimProvisioningController {
    */
   @PatchMapping("/Users/{id}")
   public ResponseEntity<JsonNode> patch(@PathVariable String id, @RequestBody JsonNode body) {
+    ScimInput.checkId(id);
+    ScimInput.checkOperations(body);
     DirectoryStatus status = patchedStatus(body);
     DirectoryAccount current =
         extract
@@ -136,6 +140,7 @@ public class ScimProvisioningController {
    */
   @DeleteMapping("/Users/{id}")
   public ResponseEntity<JsonNode> leaver(@PathVariable String id) {
+    ScimInput.checkId(id);
     DirectoryAccount current =
         extract
             .account(id)
@@ -221,7 +226,16 @@ public class ScimProvisioningController {
     if (body == null || !body.isObject()) {
       throw new IdentityRefused("INVALID_SCIM", "The body is not a SCIM User");
     }
-    return ScimUsers.read(body);
+    ScimInput.checkAttributes(body);
+    DirectoryAccount account = ScimUsers.read(body);
+    ScimInput.check(account);
+    return account;
+  }
+
+  private static Optional<List<String>> groups(JsonNode body) {
+    Optional<List<String>> groups = ScimUsers.groups(body);
+    groups.ifPresent(ScimInput::groups);
+    return groups;
   }
 
   private static DirectoryStatus patchedStatus(JsonNode body) {

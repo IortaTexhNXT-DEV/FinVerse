@@ -94,11 +94,12 @@ def client_path(path: str) -> str:
     segs = path.split("/") if path else []
     out = []
     for i, s in enumerate(segs):
-        m = re.fullmatch(r"\{(\w+)\}", s)
+        m = re.fullmatch(r"\{(\w+)\}(\.\w+)?", s)  # a file path ends in {name}.pdf
         if m:
             name = kebab(m.group(1))
             prev = singular(segs[i - 1]) if i else "item"
-            out.append("{" + (f"{prev}-id" if name == "id" else name if "-" in name else f"{prev}-{name}") + "}")
+            out.append("{" + (f"{prev}-id" if name == "id" else name if "-" in name else f"{prev}-{name}") + "}"
+                       + (m.group(2) or ""))
         else:
             out.append(s)
     return "/".join(out)
@@ -298,8 +299,11 @@ def record_fields(name: str, near: str | None = None) -> list[RecordField]:
 
 @lru_cache(maxsize=None)
 def enum_values(name: str) -> list[str]:
+    """Constants of an enumeration; "package/Name" looks only under that backend package (two enumerations of one
+    name)."""
+    root, _, name = name.rpartition("/")
     name = re.sub(r"<.*", "", name).split(".")[-1]
-    for p in JAVA.rglob("*.java"):
+    for p in (JAVA / root if root else JAVA).rglob("*.java"):
         t = p.read_text(encoding="utf-8")
         m = re.search(r"\benum\s+" + re.escape(name) + r"\b[^{]*\{", t)
         if m:

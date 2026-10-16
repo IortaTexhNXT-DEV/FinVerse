@@ -196,7 +196,7 @@ LOG = [
     ("D-011", "16 Oct 2026", "Decision", "All", "Standard document set per BRD", "Each BRD pack holds FRS, BPS, UXD, "
      "RNO, ICD (where interfaces exist), DSP, DDI, USR and the review workbooks, plus a How to read this pack note; "
      "NFR, glossary and decisions are kept once at programme level.", "Product Owner", "BRD-11 first; BRD-03, "
-     "BRD-06 and BRD-02 follow.", "Open: BRD-03, BRD-06, BRD-02 to complete", "Document Register"),
+     "BRD-06 and BRD-02 follow.", "Open: BRD-06, BRD-02 to complete (BRD-03 complete)", "Document Register"),
     ("O-001", "16 Oct 2026", "Observation", "All", "Number of named users", "NFR-CAP-01 states 1,344 named users; "
      "the User Access sizing uses 530.", "iorta TechNXT", "BDOI to confirm the figure; capacity targets follow.",
      "Open", "NFR"),
@@ -214,8 +214,9 @@ LOG = [
     ("O-006", "16 Oct 2026", "Observation", "All", "References to the NFR register", "The System Requirements "
      "Specification and the Test Strategy v1.0 name the NFR document v1.0 and its register.", "iorta TechNXT",
      "They refer to this NFR v2.0 at their next issue.", "Open", "SRS, Test Strategy"),
-    ("O-007", "16 Oct 2026", "Observation", "BRD-03, BRD-06, BRD-02", "Packs to complete", "These BRDs have the FRS "
-     "and the review workbooks; BPS, UXD, RNO, DSP, DDI, USR and the How to read note are to be issued.",
+    ("O-007", "16 Oct 2026", "Observation", "BRD-06, BRD-02", "Packs to complete", "These BRDs have the FRS "
+     "and the review workbooks; BPS, UXD, RNO, DSP, DDI, USR and the How to read note are to be issued. BRD-03 "
+     "was completed on 16 Oct 2026.",
      "iorta TechNXT", "Issue with the reusable builders of BRD-11.", "Open", "Document Register"),
 ]
 

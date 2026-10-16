@@ -26,6 +26,21 @@ def _label(code: str, K) -> str:
     return K.ENUM_LABELS.get(code) or code.replace("_", " ").capitalize()
 
 
+def _parameter_labels(K) -> tuple[dict, list, str, str]:
+    """Labels of the parameters on their settings screen, the keys of that screen and the maker-checker wording.
+    A content module gives PARAMETER_LABELS (key -> label), SETTINGS_SCREEN_KEYS and PARAMETER_MAKER_CHECKER; without
+    them the User Access settings screen of BRD-11 is read."""
+    if hasattr(K, "PARAMETER_LABELS"):
+        special_text, other_text = K.PARAMETER_MAKER_CHECKER
+        return K.PARAMETER_LABELS, list(getattr(K, "SETTINGS_SCREEN_KEYS", [])), special_text, other_text
+    ui = (REPO / "frontend" / "src" / "features" / "useraccess" / "uamSettings.ts").read_text(encoding="utf-8")
+    labels = dict(re.findall(r"^\s+(\w+): '((?:[^'\\]|\\.)*)',$", ui, re.M)) | dict(
+        re.findall(r'^\s+(\w+): "([^"]*)",$', ui, re.M))
+    uam_keys = re.findall(r"^\s+'([A-Z_]+)',$", ui.split("UAM_SETTING_KEYS")[1].split("];")[0], re.M)
+    return labels, uam_keys, "Yes: UAM Settings, approved by Information Security", \
+        "Yes: System Parameters, approved by another user"
+
+
 def write(K, out: Path) -> tuple[Path, dict]:
     tables = [t["name"] for t in sf.tables(K.TABLE_PATTERN)]
     unknown = [t for t in tables if t not in K.TABLES]
@@ -97,12 +112,7 @@ def write(K, out: Path) -> tuple[Path, dict]:
                            "lb": _label(v, K), "a": "No" if v in K.INACTIVE_CODES else "Yes"})
     # parameters
     p_rows = []
-    labels = {}
-    import brd11_v15_content as C  # noqa: PLC0415  (labels of the FRS, by position of the UAM settings list)
-    ui = (REPO / "frontend" / "src" / "features" / "useraccess" / "uamSettings.ts").read_text(encoding="utf-8")
-    labels = dict(re.findall(r"^\s+(\w+): '((?:[^'\\]|\\.)*)',$", ui, re.M)) | dict(
-        re.findall(r'^\s+(\w+): "([^"]*)",$', ui, re.M))
-    uam_keys = re.findall(r"^\s+'([A-Z_]+)',$", ui.split("UAM_SETTING_KEYS")[1].split("];")[0], re.M)
+    labels, special, special_text, other_text = _parameter_labels(K)
     for r in sf.rows(f"select param_key, param_value, value_type, category, description, min_value, max_value "
                      f"from sys_parameter where {K.PARAMETER_FILTER} order by param_key"):
         rng = "-"
@@ -113,15 +123,18 @@ def write(K, out: Path) -> tuple[Path, dict]:
             rng = "true / false"
         p_rows.append({"k": r["param_key"], "lb": labels.get(r["param_key"], "-"), "ty": r["value_type"],
                        "d": r["param_value"] or "(empty)", "r": rng,
-                       "mc": "Yes: UAM Settings, approved by Information Security" if r["param_key"] in uam_keys
-                       else "Yes: System Parameters, approved by another user",
+                       "mc": special_text if r["param_key"] in special else other_text,
                        "ds": sd.upper_identifiers(r["description"])})
-    missing = [k for k in uam_keys if k not in {p["k"] for p in p_rows}]
+    missing = [k for k in special if k not in {p["k"] for p in p_rows}]
     if missing:
-        raise SystemExit(f"data dictionary: UAM settings without a parameter row: {missing}")
+        raise SystemExit(f"data dictionary: settings of the screen without a parameter row: {missing}")
     # status models
     s_rows = []
-    for entity, rows in C.STATUSES.items():
+    statuses = getattr(K, "STATUSES", None)
+    if statuses is None:
+        import brd11_v15_content as C  # noqa: PLC0415
+        statuses = C.STATUSES
+    for entity, rows in statuses.items():
         for status, meaning, nxt in rows:
             s_rows.append({"e": entity, "s": status, "m": meaning, "n": nxt})
     for entity, (enum, rows) in K.WORKFLOWS.items():
@@ -133,7 +146,7 @@ def write(K, out: Path) -> tuple[Path, dict]:
     wb.sheet("Tables", [Column("t", "Table", 30), Column("m", "Module", 20), Column("p", "Purpose", 60),
                         Column("pk", "Primary key", 18), Column("n", "Columns", 9, kind="number"),
                         Column("v0", "Rows at go-live", 14), Column("v1", "Rows after one year", 16)], t_rows,
-             description="Every table of the module, with the estimated volume for about 530 users.")
+             description=getattr(K, "VOLUME_NOTE", "Every table of the module, with the estimated volume for about 530 users."))
     wb.sheet("Columns", [Column("t", "Table", 28), Column("c", "Column", 28), Column("dt", "Data type", 14),
                          Column("len", "Length / precision", 12), Column("null", "Null", 7),
                          Column("def", "Default", 20), Column("chk", "Constraints and allowed values", 40),

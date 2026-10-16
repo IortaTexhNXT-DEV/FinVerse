@@ -103,7 +103,7 @@ class Facts:
                 continue
             if m.code in ("code",) or not re.fullmatch(r"[A-Z][A-Z0-9_]+", m.code):
                 continue
-            if "Simulator" in m.cls or "Retention" in m.cls or "Mfa" in m.cls:
+            if any(w in m.cls for w in TEXT["omit_classes"]):
                 continue
             keep.append(m)
         self.messages: dict[str, list] = {}
@@ -118,12 +118,14 @@ class Facts:
             self.calls[s["id"]] = self._screen_calls(s)
         self.grants = self._grants()
 
-    @staticmethod
-    def _raw_calls(s) -> list[af.ClientCall]:
+    def _raw_calls(self, s) -> list[af.ClientCall]:
         feat, page = s["page"]
         calls = af.screen_calls(feat, page)
         for f2, p2 in s.get("extra", []):
             calls += [c for c in af.screen_calls(f2, p2) if c not in calls]
+        fix = getattr(self.K, "fix_call", None)  # a content module corrects or drops calls the reader cannot resolve
+        if fix:
+            calls = [x for x in (fix(c) for c in calls) if x is not None]
         return calls
 
     def _screen_calls(self, s) -> list[tuple[str, af.Operation | None]]:
@@ -179,6 +181,22 @@ class Facts:
 
 
 PREFIXES: tuple[str, ...] = ()
+CLIENT_CREDENTIAL = "UIDM-ISC client credential"
+
+# Wording of the developer specification that depends on the BRD; a content module overrides an entry with DSP_TEXT.
+TEXT = {
+    "requirement_ids": "FRUM, BR-UA",
+    "screen_ids": "SCR-UA",
+    "interfaces": "SCIM 2.0 and OpenID Connect detail",
+    "integration_prefix": "integration/",
+    "service_ops": "The SCIM operations are detailed in the Interface Specification.",
+    "status_note": "Separation-of-duties rules and UAM settings follow the maker-checker statuses of the data "
+                   "dictionary (sheet Status models).",
+    "jobs_note": "Synchronise Now on Identity Sync starts UAM_IDENTITY_RECONCILIATION.",
+    "audit_note": "Group-profile changes also keep their own history (who did what, when).",
+    "security_note": "The SCIM service accepts only the UIDM-ISC client credential issued by the API gateway.",
+    "omit_classes": ("Simulator", "Retention", "Mfa"),
+}
 
 
 def _perm(op: af.Operation) -> str:
@@ -190,8 +208,8 @@ def _perm(op: af.Operation) -> str:
         return "Signed-in user"
     if "permitAll" in op.permission:
         return "Public"
-    if op.path.startswith("integration/"):
-        return "UIDM-ISC client credential"
+    if TEXT["integration_prefix"] and op.path.startswith(TEXT["integration_prefix"]):
+        return CLIENT_CREDENTIAL
     return op.permission or "-"
 
 
@@ -202,6 +220,7 @@ def _route(path: str) -> str:
 def write(K, out: Path, tmp: Path, pdf: bool = True) -> tuple[Path, int, dict]:
     global PREFIXES
     PREFIXES = K.PERMISSION_PREFIXES
+    TEXT.update(getattr(K, "DSP_TEXT", {}))
     facts = Facts(K)
     problems = facts.check()
     if problems:
@@ -223,9 +242,9 @@ def write(K, out: Path, tmp: Path, pdf: bool = True) -> tuple[Path, int, dict]:
            "the audit records and the permission behind each action. Requirements and rules are stated in the FRS; "
            "this document refers to them by ID.")
     d.kv([("Release described", K.DATE),
-          ("Requirements", f"{K.file_name('FRS')[:-5]} (FRUM, BR-UA)"),
-          ("Screens", f"{K.file_name('UXD')[:-5]} (SCR-UA)"),
-          ("Interfaces", f"{K.file_name('ICD')[:-5]}: SCIM 2.0 and OpenID Connect detail"),
+          ("Requirements", f"{K.file_name('FRS')[:-5]} ({TEXT['requirement_ids']})"),
+          ("Screens", f"{K.file_name('UXD')[:-5]} ({TEXT['screen_ids']})"),
+          ("Interfaces", f"{K.file_name('ICD')[:-5]}: {TEXT['interfaces']}"),
           ("Data", f"{K.file_name('DDI')[:-5]}: tables, columns, lists, parameters"),
           ("Paths", "Relative to the service base address of the environment, version 1. Path variables are "
                     "written {name}."),
@@ -319,7 +338,7 @@ def write(K, out: Path, tmp: Path, pdf: bool = True) -> tuple[Path, int, dict]:
     d.h1("Service Operations")
     d.para("Every operation of the module, by area. Request fields list the checks of the service; response fields "
            "name what is returned. The business codes of an operation are listed with the screen that calls it "
-           "(section 3) and in Annex A. The SCIM operations are detailed in the Interface Specification.")
+           "(section 3) and in Annex A. " + TEXT["service_ops"])
     for area, prefixes, _ in K.AREAS:
         ops = [o for o in facts.ops if o.path.startswith(prefixes)]
         if not ops:
@@ -378,8 +397,7 @@ def write(K, out: Path, tmp: Path, pdf: bool = True) -> tuple[Path, int, dict]:
             raise SystemExit(f"status model {entity}: codes without a row: {missing}")
         d.table(["Code", "Status", "Reached by", "Next"], [list(r) for r in rows], [2.2, 1.8, 3.4, 2.4],
                 caption=f"{entity}")
-    d.para("Separation-of-duties rules and UAM settings follow the maker-checker statuses of the data dictionary "
-           "(sheet Status models).")
+    d.para(TEXT["status_note"])
 
     # 7 Jobs -------------------------------------------------------------------------------------------------------
     d.h1("Jobs and Schedules")
@@ -387,8 +405,7 @@ def write(K, out: Path, tmp: Path, pdf: bool = True) -> tuple[Path, int, dict]:
             [[j.name, j.cron_utc, j.time_pht, K.JOBS.get(j.name, _clean(j.summary))] for j in jobs],
             [2.8, 1.6, 1.4, 3.6], caption="Jobs (cron: second minute hour day month weekday)")
     d.para("Every run is recorded with its start, end, outcome and counts, and can be started at once from "
-           "Operations › Jobs by a user with the job permission. Synchronise Now on Identity Sync starts "
-           "UAM_IDENTITY_RECONCILIATION.")
+           "Operations › Jobs by a user with the job permission. " + TEXT["jobs_note"])
 
     # 8 Audit ------------------------------------------------------------------------------------------------------
     d.h1("Audit Records")
@@ -404,8 +421,7 @@ def write(K, out: Path, tmp: Path, pdf: bool = True) -> tuple[Path, int, dict]:
     d.table(["Record", "Action", "Meaning"], [list(r) for r in rows], [3.2, 2.2, 3.8],
             caption="Audit records written by the module")
     d.para("Each record holds the user, time (UTC), source address, record and, for a change, the values before and "
-           "after. Group-profile changes also keep their own history (who did what, when). The audit trail is "
-           "insert-only.")
+           "after. " + TEXT["audit_note"] + " The audit trail is insert-only.")
 
     # 9 Security ---------------------------------------------------------------------------------------------------
     d.h1("Security: Permission per Action")
@@ -418,12 +434,11 @@ def write(K, out: Path, tmp: Path, pdf: bool = True) -> tuple[Path, int, dict]:
         rows.append([f"{o.verb} {o.path}", ", ".join(o.permissions), ", ".join(holders) or "-"])
     d.table(["Operation", "Permission (any of)", "Personas holding it"], rows, [3.6, 2.8, 2.8],
             caption="Permission checked by the service, and the walkthrough personas that hold it")
-    d.table(["Persona", "Group profile", "User Access permissions"],
+    d.table(["Persona", "Group profile", f"{K.SHORT} permissions"],
             [[p, r, ", ".join(sorted(facts.grants[r]))] for p, r in K.PERSONA_ROLES], [2.4, 2.4, 4.4],
             caption="Personas of the walkthroughs")
     d.para("The menu shows a screen only to a user holding its permission; the service checks the permission again "
-           "on every call, and every list and record is limited to the user's data access. The SCIM service "
-           "accepts only the UIDM-ISC client credential issued by the API gateway.")
+           "on every call, and every list and record is limited to the user's data access. " + TEXT["security_note"])
 
     # Annex --------------------------------------------------------------------------------------------------------
     d.h1("Annex A: Message Catalogue")

@@ -25,8 +25,8 @@ sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(HERE.parents[4] / "tools" / "deliverables"))
 import pack_common as pc  # noqa: E402
 
-CONTENT = {"BRD-11": "brd11_pack"}
-FIX_VERSION = {"BRD-11": "Drop 0"}
+CONTENT = {"BRD-11": "brd11_pack", "BRD-03": "brd03_pack"}
+FIX_VERSION = {"BRD-11": "Drop 0", "BRD-03": "Drop 0"}
 
 
 def main() -> int:

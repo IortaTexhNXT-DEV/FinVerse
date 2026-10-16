@@ -412,7 +412,7 @@ excluded:
   LIST_CONTENT:
     [scr_watchlist_alias, scr_watchlist_change, scr_watchlist_entry]
   LOG:
-    [acc_event_log, audit_log, bcl_claim_event, bcl_status_history, cat_version_validation_check,
+    [acc_event_log, audit_log, master_change_log, bcl_claim_event, bcl_status_history, cat_version_validation_check,
      crm_client_note_history, csf_activity, csh_search_log, dsb_instrument_event, eb_activity_log,
      mig_access_log, mig_batch_log, nba_access_request_event, nba_retention_run,
      npk_insurer_response_history, ops_invoice_status_change, pay_pdc_event,

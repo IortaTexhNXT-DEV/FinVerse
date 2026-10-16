@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.crm.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.BaseEntity;
+import com.iortatechnxt.brokerverse.common.domain.ChangeTracked;
 import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.crm.domain.ClientDetails.Contact;
@@ -26,7 +27,7 @@ import java.util.stream.Stream;
  */
 @Entity
 @Table(name = "crm_client")
-public class Client extends BaseEntity {
+public class Client extends BaseEntity implements ChangeTracked {
 
   private static final String CLIENT_INACTIVE = "CLIENT_INACTIVE";
 

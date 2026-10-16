@@ -20,6 +20,7 @@ import { ClientProposalsTab } from '@/features/proposals/ClientProposalsTab';
 import { ClientQuotationsTab } from '@/features/quotations/ClientQuotationsTab';
 import { ClientScreeningTab } from '@/features/screening/cases/ClientScreeningTab';
 import { formatDate, humanize } from '@/utils/format';
+import { ChangeHistory } from '@/components/history/ChangeHistory';
 import { ClientActionsBar } from './ClientActionsBar';
 import { ClientDetailsTab } from './ClientDetailsTab';
 import { ClientHistoryTab } from './ClientHistoryTab';
@@ -30,7 +31,15 @@ import { LovLabel } from '@/components/broking/LovLabel';
 import { groupLabel } from '@/context/clientNames';
 
 type TabId =
-  'details' | 'kyc' | 'notes' | 'quotations' | 'proposals' | 'records' | 'screening' | 'history';
+  | 'details'
+  | 'kyc'
+  | 'notes'
+  | 'quotations'
+  | 'proposals'
+  | 'records'
+  | 'screening'
+  | 'history'
+  | 'changes';
 
 const TABS: readonly { id: TabId; label: string }[] = [
   { id: 'details', label: 'Details' },
@@ -41,6 +50,7 @@ const TABS: readonly { id: TabId; label: string }[] = [
   { id: 'records', label: 'Linked Records' },
   { id: 'screening', label: 'Screening' },
   { id: 'history', label: 'History' },
+  { id: 'changes', label: 'Field Changes' },
 ];
 
 /** Profile fields counted by the completeness indicator of the client header. */
@@ -125,6 +135,8 @@ function TabContent({ tab, client }: Readonly<{ tab: TabId; client: ClientDetail
       return <LinkedRecordsTab clientId={client.id} />;
     case 'screening':
       return <ClientScreeningTab clientId={client.id} />;
+    case 'changes':
+      return <ChangeHistory entityType="Client" entityId={client.id} makerChecker={false} />;
     case 'history':
       return <ClientHistoryTab clientId={client.id} />;
     default:

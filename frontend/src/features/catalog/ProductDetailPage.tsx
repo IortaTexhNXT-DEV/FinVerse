@@ -28,6 +28,7 @@ import type { RuleKind } from './RuleEditorModal';
 import { CoverTypeLabel, LovLabel, LovLabels } from '@/components/broking/LovLabel';
 import { LoadingPanel } from '@/components/ui/LoadingPanel';
 import { DeactivatePackageButton } from '@/features/productmaint/workspace/DeactivatePackageButton';
+import { ChangeHistory } from '@/components/history/ChangeHistory';
 import { RecordAuditLog } from '@/features/productmaint/workspace/RecordAuditLog';
 
 const yes = (flag: boolean) => (flag ? 'Yes' : 'No');
@@ -37,6 +38,7 @@ const TABS = [
   { id: 'features', label: 'Features' },
   { id: 'rules', label: 'Field Rules & Documents' },
   { id: 'audit', label: 'Audit Logs' },
+  { id: 'changes', label: 'Change History' },
 ] as const;
 
 type TabId = (typeof TABS)[number]['id'];
@@ -257,6 +259,7 @@ export default function ProductDetailPage() {
       )}
       {tab === 'rules' && <Rules detail={d} maintain={maintain} />}
       {tab === 'audit' && <RecordAuditLog reference={d.product.code} />}
+      {tab === 'changes' && <ChangeHistory entityType="RiskProduct" entityId={d.product.id} />}
       {editing && (
         <ProductEditorModal initial={productFormOf(d.product)} onClose={() => setEditing(false)} />
       )}

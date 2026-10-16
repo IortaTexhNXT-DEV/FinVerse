@@ -13,6 +13,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useCompanyId } from '@/context/workspaceContext';
 import { formatDate, formatRate } from '@/utils/format';
+import { ChangeHistory } from '@/components/history/ChangeHistory';
 import { DetailList } from './DetailList';
 import { InsurerEditorModal } from './InsurerEditorModal';
 import { BranchModal, CommissionModal } from './InsurerRatesModals';
@@ -166,6 +167,7 @@ export default function InsurerDetailPage() {
       <Card title="Commission rates" flush actions={add('commission', 'Add rate')}>
         <Commissions rows={d.commissions} />
       </Card>
+      <ChangeHistory entityType="InsurerProfile" entityId={d.insurer.id} />
       {dialog === 'edit' && (
         <InsurerEditorModal companyId={companyId} insurer={d.insurer} onClose={close} />
       )}

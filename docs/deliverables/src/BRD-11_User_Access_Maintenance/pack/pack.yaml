@@ -25,6 +25,8 @@ personas:
   AUDITOR: {name: Auditor, user: auditor}
   INFOSEC_OFFICER: {name: Information Security Officer, user: infosec}
   NB_APPROVER: {name: New Business Approver (keeps the access approval right), user: approver}
+  UAM_ADMINISTRATOR: {name: User Access Administrator, user: uamadmin}
+  UAM_AUDITOR: {name: User Access Auditor, user: uamauditor}
 
 # The other personas whose sidebar the set shows: every persona of the persona suites of the menu check
 # (menu_suites). Signing BRD-11 signs the role matrix, so each persona's menu is a table of the FRS and a sheet of

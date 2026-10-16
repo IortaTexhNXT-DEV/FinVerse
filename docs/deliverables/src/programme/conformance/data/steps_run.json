@@ -2,19 +2,24 @@
  {
   "brd": "BRD-00",
   "step": "J1.1",
-  "user": "requestor",
+  "user": "uamadmin",
   "checks": [
    {
-    "screen": "/user-access/requests",
-    "url": "/access/group-profiles",
-    "ok": false,
+    "screen": "/access/identity-sync",
+    "url": "/access/identity-sync",
+    "ok": true,
     "problem": null,
-    "missing": [
-     "New Request"
-    ]
+    "missing": []
+   },
+   {
+    "screen": "/access/users",
+    "url": "/access/users",
+    "ok": true,
+    "problem": null,
+    "missing": []
    }
   ],
-  "status": "fail"
+  "status": "pass"
  },
  {
   "brd": "BRD-00",

@@ -6,7 +6,7 @@
 # Read by run_steps.cjs and build_conformance.py.
 
 BRD-00:
-  J1.1: {refs: [BRD-11/WT-A], checks: [[/user-access/requests, null, [New Request]]]}
+  J1.1: {refs: [BRD-11/WT-A], checks: [[/access/identity-sync, null, [Events, Refused, Reconciliation, Simulator]], [/access/users, null, []]], user: uamadmin}
   J1.2: {refs: [BRD-03/WT-A], checks: [[/product-maintenance/tsu, null, []]]}
   J1.3: {checks: [[/broking-setup/lists, null, []], [/catalog/insurers/:id, /catalog/insurers, [Profile, Branches, Commission rates]]]}
   J2.1: {refs: [BRD-01/WT-A.1-4], checks: [[/crm/clients/new, null, [Save as Prospect]], [/screening, null, []]]}

@@ -12,7 +12,7 @@ Inputs (this folder):
   data/screen_labels.json    the menu name of every screen (persona_expected.py)
   step_checks.yaml           the screens of each step of the script and the blocked steps
   data/bdoi_map.json         the requirements of the FRS (FR-XX-nnn) behind each requirement of the BDOI-template FRS
-                             of BRD-02, BRD-03, BRD-06 and BRD-11 (from the FRS Coverage workbooks of Programme/Quality)
+                             of BRD-02, BRD-03, BRD-06 and BRD-11 (taken from the former FRS Coverage workbooks, now withdrawn)
   assessment.yaml            the review of the results: step notes, requirement decisions, the fixes made, the open
                              gaps with their proposals and the corrections of the FRS texts
 
@@ -499,6 +499,7 @@ def main() -> None:
     tot = {k: sum(r[k] for r in summary_rows) for k in ("frs", "acs", "ok", "partly", "nok", "nt", "steps", "pass", "fail", "blocked")}
     summary_rows.append({"brd": "Total", "module": "Programme", **tot, "why": ""})
     prev = assess.get("previous") or {}
+    pv = str(assess.get("previous_version", "1.0"))
     baselines = assess.get("baselines") or {}
     for r in summary_rows:
         r["pct"] = round(100 * r["ok"] / r["frs"], 1) if r["frs"] else 0
@@ -508,7 +509,7 @@ def main() -> None:
         if p:
             p_pct = 100 * p["ok"] / p["frs"]
             p_pct_p = 100 * (p["ok"] + p["partly"]) / p["frs"]
-            text = (f"v1.0: {p['frs']} FRs, {p_pct:.1f}% full, {p_pct_p:.1f}% incl. partly; "
+            text = (f"v{pv}: {p['frs']} FRs, {p_pct:.1f}% full, {p_pct_p:.1f}% incl. partly; "
                     f"now {r['pct'] - p_pct:+.1f} / {r['pct_p'] - p_pct_p:+.1f} points")
             note = (assess.get("changes") or {}).get(r["brd"])
             r["change"] = text + (f". {note}" if note else "")
@@ -527,7 +528,7 @@ def main() -> None:
         Column("pct_p", "% incl. partly", 11, "Conformant and partly conformant requirements in % of the FRs",
                kind="number"),
         Column("frs_label", "Requirement baseline", 14, "FRS whose requirements are counted"),
-        Column("change", "Change since v1.0", 50, "Results of version 1.0 and the change in percentage points"),
+        Column("change", f"Change since v{pv}", 50, f"Results of version {pv} and the change in percentage points"),
         Column("why", "Why not testable yet", 50, "The main reasons, with the number of requirements"),
         Column("steps", "Walkthrough steps", 11, "Steps of the walkthrough script of the BRD", kind="number"),
         Column("pass", "Passed", 9, "Steps that passed", kind="number"),

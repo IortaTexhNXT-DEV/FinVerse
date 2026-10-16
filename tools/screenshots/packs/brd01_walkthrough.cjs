@@ -306,24 +306,46 @@ async function tab(page, name) {
   await settle(page, 600);
 }
 
-/** Uploads one typed document in a documents panel (document type drop-down, file, upload button). */
+/**
+ * Uploads one typed document in a documents panel (document type drop-down, file, upload button). The document type
+ * is a list of values that loads after the form shows; `type` is matched against its entries.
+ */
 async function uploadDocument(page, type, file, uploadButton) {
   const scope = page.locator('main');
   const select = scope.getByLabel(/^Document type/).first();
-  const options = await select.locator('option').allTextContents();
-  await select.selectOption({ label: options.find((o) => new RegExp(type, 'i').test(o)) });
+  await select.waitFor({ state: 'visible', timeout: 10000 });
+  await chooseOption(page, select, type instanceof RegExp ? type : new RegExp(type, 'i'));
   await scope.locator('input[type=file]').first().setInputFiles(file);
   await page.waitForTimeout(500);
   await button(page, uploadButton).click();
   await settle(page, 1200);
 }
 
-/** Attaches a file in the documents panel of a record (document type, then the file). */
+const escapeRx = (t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+/**
+ * The KYC checklist of a client (KYC & Documents tab): uploads one document for every mandatory item still missing,
+ * choosing the item's document type in the upload form, so the checklist reads Complete.
+ */
+async function completeKycChecklist(ctx, page, id, who) {
+  const checklist = await ctx.api('ao', 'GET', `/crm/clients/${id}/kyc-checklist`);
+  for (const item of checklist.items.filter((i) => i.required && i.documents.length === 0)) {
+    const name = `${item.documentType.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.pdf`;
+    await uploadDocument(page, new RegExp(`^\\s*${escapeRx(item.label)}\\s*$`, 'i'),
+      pdf(name, item.label, [`Client: ${who}`, 'Seed data for the SIT environment']), 'Upload KYC Document');
+  }
+  await page.getByText(/^Complete$/).first().waitFor({ state: 'visible', timeout: 10000 });
+}
+
+/**
+ * Attaches a file in the documents panel of a record: the document type (a list of values that loads after the panel
+ * shows), then the file.
+ */
 async function attachDocument(page, type, file) {
   const panel = page.locator('main');
-  const select = panel.locator('select').filter({ has: page.locator('option', { hasText: 'Document type (optional)' }) }).first();
-  const options = await select.locator('option').allTextContents();
-  await select.selectOption({ label: options.find((o) => new RegExp(type, 'i').test(o)) });
+  const select = panel.getByLabel(/^Document type$/).last();
+  await select.waitFor({ state: 'visible', timeout: 10000 });
+  await chooseOption(page, select, new RegExp(type, 'i'));
   await panel.locator('input[type=file]').last().setInputFiles(file);
   await settle(page, 1500);
 }
@@ -377,15 +399,12 @@ const steps = {
     await settle(page, 1500);
     return page;
   },
-  // 2. KYC documents uploaded and the KYC submitted.
+  // 2. KYC checklist completed (one document per mandatory item) and the KYC submitted.
   'wt-a-02': async (ctx) => {
-    const page = await go(ctx, 'ao', `/crm/clients/${clientId(ctx)}?tab=kyc`);
+    const id = clientId(ctx);
+    const page = await go(ctx, 'ao', `/crm/clients/${id}?tab=kyc`);
     const p = person(ctx);
-    const who = `${p.first} ${p.middle} ${p.last}`;
-    await uploadDocument(page, 'KYC form', pdf('kyc-form.pdf', 'Client information sheet / KYC form',
-      [`Client: ${who}`, 'Seed data for the SIT environment']), 'Upload KYC Document');
-    await uploadDocument(page, '^Valid ID', pdf('valid-id.pdf', 'Valid ID (passport)',
-      [`Holder: ${who}`, `Passport no. ${p.id}`, 'Seed data for the SIT environment']), 'Upload KYC Document');
+    await completeKycChecklist(ctx, page, id, `${p.first} ${p.middle} ${p.last}`);
     await act(page, 'Submit KYC');
     return page;
   },

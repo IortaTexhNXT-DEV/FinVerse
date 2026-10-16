@@ -1622,7 +1622,7 @@ The umbrella FRS has no screens of its own. Its storyboard is the journey index 
 | Frame | Persona | Step | Screen or document | Outcome | FR |
 |---|---|---|---|---|---|
 | **J1** | | **Access and set-up** | | | |
-| J1.1 | UAM requestor, approver, implementer | Enrol a new user and give the persona its menus | FRS BRD-11 walkthrough WT-A (A.1-A.8) | The user signs in and sees only the menus of the persona | FR-CR-001, FR-CR-070 |
+| J1.1 | User Access Administrator, new user | UIDM-ISC (in SIT and UAT the SCIM simulator of Identity Sync) sends the joiner and the group profile of the persona over SCIM; the new user signs in through Microsoft Entra ID | FRS BRD-11 walkthrough WT-A (A.1-A.6) | The user is created Active with the group profile, signs in and sees only the menus of the persona | FR-CR-001, FR-CR-070 |
 | J1.2 | TSU Officer | Capability 20 Product Maintenance: a new package from request to first quotation | FRS BRD-3 walkthrough WT-A | Package released and used by New Business | FR-CR-060 |
 | J1.3 | Business Administrator | Capability 17 Data Management: lists of values, insurer record, MIS fields, change log | Lists of Values; insurer page (FR-CR-031, 060 to 062) | Master data maintained with approval and a change log | FR-CR-031, FR-CR-060, FR-CR-061, FR-CR-062 |
 | **J2** | | **New business** | | | |

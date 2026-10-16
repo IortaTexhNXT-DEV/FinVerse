@@ -66,21 +66,17 @@ classify:
   scr-ua-18-02-approve: pending-approval
   scr-ua-19-01-list: pending-approval
   scr-ua-19-02-new: default
-  wt-a-03: pending-approval
+  wt-a-03: read-only
   wt-a-05: default
-  wt-a-07: default
-  wt-a-08: read-only
-  wt-b-05: pending-approval
-  wt-b-06: success
-  wt-b-10: read-only
-  wt-c-06: validation-error
-  wt-c-07: validation-error
-  wt-c-08: success
-  wt-d-01: read-only
+  wt-b-01: pending-approval
+  wt-b-03: success
+  wt-b-04: success
+  wt-c-01: validation-error
+  wt-c-04: pending-approval
+  wt-c-05: success
+  wt-d-01: success
   wt-d-02: read-only
   wt-d-03: read-only
-  wt-d-04: read-only
-  wt-d-05: default
 
 states:
   - {screen: SCR-UA-06, state: empty, user: requestor, ux: empty, nocallouts: true, caption: "A search that finds no access request"}

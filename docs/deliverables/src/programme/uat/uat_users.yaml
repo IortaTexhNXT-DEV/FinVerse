@@ -19,8 +19,8 @@
 # against seed_users.yaml (the users and group profiles of a fresh seed environment) by the builder, and by the
 # backend integration test UatWalkthroughUsersIT.
 
-version: "1.0"
-date: 08 October 2026
+version: "1.1"
+date: 16 October 2026
 password_text: UAT seed password (provided separately)
 
 units:
@@ -140,10 +140,12 @@ brds:
          does: "Places and lifts the legal hold on stored documents"}
       - {persona: Records approver (legal hold), role: RECORDS_HOLD_APPROVER, users: [holdapprover],
          does: "Approves the legal hold placed or lifted by the records officer"}
+      - {persona: User Access Administrator, role: UAM_ADMINISTRATOR, users: [uamadmin],
+         does: "Sends the UIDM-ISC joiner and group profile of a new user from the SCIM simulator of SIT and UAT and checks the user (journey J1.1)"}
       - {persona: Auditor, role: AUDITOR, users: [auditor],
          does: "Read access to the records, the audit logs and the reports of every module"}
     aliases:
-      "UAM requestor, approver, implementer": [requestor, uamapprover, admin]
+      "User Access Administrator, new user": [uamadmin]
       "TSU Officer": [tsu]
       "Marketing AO": [ao]
       "Processing Officer": [proc]
@@ -165,7 +167,7 @@ brds:
       approver: "My Approvals"
       adjust: "Client & Policy › Adjustment › Adjustment Workbench"
       badmin: "Setup & Administration › Broking Setup › Lists of Values"
-      admin: "Setup & Administration › Administration › Users"
+      admin: "Setup & Administration › User Access › Users"
       auditor: "Reports › Reports › Report Centre"
     personas:
       - persona: Marketing AO
@@ -291,7 +293,7 @@ brds:
       fmanager: "Setup & Administration › Setup › Employees"
       checker: "My Approvals"
       badmin: "Setup & Administration › Broking Setup › Lists of Values"
-      admin: "Setup & Administration › Administration › Users"
+      admin: "Setup & Administration › User Access › Users"
       auditor: "Reports › Reports › Report Centre"
     personas:
       - {persona: GL Officer (FRBS Processor), role: FRBS_PROCESSOR, users: [glofficer]}
@@ -327,7 +329,7 @@ brds:
     drop: Drop 1
     menus:
       lamd: "Client & Policy › Renewal › LAMD Reports"
-      admin: "Setup & Administration › Administration › Roles & Permissions"
+      admin: "Setup & Administration › User Access › Group Profiles"
     personas:
       - persona: Marketing Team Leader
         role: MKT_TL
@@ -389,7 +391,7 @@ brds:
     module: Customer Servicing Facility
     drop: Drop 1
     menus:
-      admin: "Setup & Administration › Administration › Users"
+      admin: "Setup & Administration › User Access › Users"
     personas:
       - persona: BDO Insure Contact Center Agent
         role: CSF_AGENT
@@ -432,29 +434,31 @@ brds:
       a013000103: "Client & Policy › Clients › Clients"
       a013000104: "Client & Policy › Clients › Clients"
     personas:
-      - {persona: Requestor, role: UAM_REQUESTOR, users: [requestor]}
-      - {persona: Approver, role: UAM_APPROVER, users: [uamapprover]}
+      - {persona: User Access Administrator, role: UAM_ADMINISTRATOR, users: [uamadmin],
+         does: "Sends the UIDM-ISC events from the Enterprise SSO simulator of SIT and UAT, watches Identity Sync and resolves refused events and reconciliation mismatches"}
+      - {persona: Requestor, role: UAM_REQUESTOR, users: [requestor],
+         does: "Group Profile Maker: proposes the change of a group profile with its reason"}
+      - {persona: Approver, role: UAM_APPROVER, users: [uamapprover],
+         does: "Group Profile Checker: approves, returns or rejects the change of a group profile"}
       - {persona: Approver (New Business Approver, keeps its approval right), role: NB_APPROVER, users: [approver],
-         does: "Approves the access and group-profile requests assigned to him or her, as the second approver in order"}
+         does: "Checker of a group-profile change when the Approver is absent"}
       - {persona: Second approver, role: UAM_SECOND_APPROVER, users: [secapprover]}
       - {persona: Business Administrator, role: BUSINESS_ADMIN, users: [badmin]}
-      - {persona: System Administrator, role: SYSADMIN, users: [admin]}
+      - {persona: System Administrator, role: SYSADMIN, users: [admin],
+         does: "Implements the approved change of a group profile"}
       - {persona: Information Security Officer, role: INFOSEC_OFFICER, users: [infosec]}
+      - {persona: User Access Auditor, role: UAM_AUDITOR, users: [uamauditor],
+         does: "Reads the history of the group profiles, takes the certification extract and reads the audit log and the access matrix"}
       - {persona: Auditor, role: AUDITOR, users: [auditor]}
-      - persona: Subject users of the requests (Marketing AO)
+      - persona: Users synchronised from UIDM-ISC (Marketing AO)
         role: MKT_AO
         users: [a013000101, a013000102, a013000103, a013000104]
-        does: "Users whose access the requests enrol, change, deactivate or unlock; a013000101 is locked and unlocked in walkthrough C"
+        does: "Users created by UIDM-ISC; the joiner of walkthrough A (a013000196) signs in through Microsoft Entra ID"
     created_in_walkthrough: [a013000196]
     step_users:
       WT-A.5: [a013000196]
-      WT-A.6: [a013000196]
-      WT-A.7: [a013000196]
-      WT-C.8: [a013000101]
-      WT-C.10: [a013000196]
-    exclude_steps: [WT-D.4, WT-D.5]
     titles:
-      WT-D: The evidence of access
+      WT-D: The evidence of access and the certification extract
 
   - brd: BRD-12
     module: Submitted Policies
@@ -493,7 +497,7 @@ brds:
       accountant: "Finance › Receivables & Banking › Bank Reconciliation"
       remit: "Finance › Remittance › Extraction"
       recon: "Client & Policy › Production Reconciliation › Reconciliation Workbench"
-      clmofficer: "Claims & Insurance › Claims Handling › Claims Worklist"
+      clmofficer: "Claims › Claims Handling › Claims Worklist"
       proc: "Client & Policy › Placement & Booking › Placement Workbench"
     personas:
       - {persona: Data Migration Lead, role: DATA_MIGRATION_LEAD, users: [miglead]}

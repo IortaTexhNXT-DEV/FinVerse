@@ -254,6 +254,22 @@ LOG = [
      "FRUM.009 and FRUM.011 withdrawn, FRUM.014 new); the other BRDs on their BIBS FRS. Gaps G03 (except TAX-SLS and "
      "the two FY2027 true-up reports), G07, G10, G12 and G13 closed with evidence.", "iorta TechNXT",
      "Register v1.1 issued; v1.0 superseded.", "Closed", "Conformance Register v1.1"),
+    ("O-011", "16 Oct 2026", "Decision", "BRD-04", "Statement of account before the due date of a cycle (gap G16)",
+     "BRCLXN.058 asks for an SOA per applicable billing cycle and sets no earliest date; FR-CL-060 bills a single "
+     "cycle from its plan and limits only the billing run to the cycles due in its period. Rule recorded as FR-CL-060 "
+     "R6: the Operations billing user (CLX_SOA_ISSUE) may generate the SOA of a cycle still Not Due. No platform "
+     "change; walkthrough D of BRD-04 now performed by the Cashiering Team Leader.", "iorta TechNXT",
+     "FRS BRD-04 rule R6 added; walkthrough D passes.", "Closed", "Conformance Register v1.2"),
+    ("O-012", "16 Oct 2026", "Decision", "BRD-00", "End-to-End Conformance Register v1.2", "Walkthroughs of BRD-01, "
+     "BRD-04 and BRD-11 and journey step J1.1 run again on a fresh SIT/UAT environment with the updated recipes; the "
+     "BRD-11 walkthroughs and J1.1 follow the UIDM-ISC and Entra ID model of FRS v1.6. Gaps G14, G15 and G16 closed "
+     "with evidence. UAT Walkthrough Users and Sign-in v1.1 issued with the rewritten BRD-11 script.", "iorta TechNXT",
+     "Register v1.2 issued; v1.1 superseded.", "Closed", "Conformance Register v1.2"),
+    ("O-013", "16 Oct 2026", "Decision", "BRD-00", "Superseded internal records withdrawn", "The FRS comparison "
+     "workbooks of BRD-02, BRD-03, BRD-06 and BRD-11 and the FRS Coverage workbooks of the same BRDs are replaced by "
+     "the BDOI-template FRS packs (Fit-Gap, RTM, change register) and the Conformance Register; they are withdrawn "
+     "with their builders, and the builders of the earlier BDOI-template FRS versions are removed.", "iorta TechNXT",
+     "Files removed from the release folders.", "Closed", "Document Register"),
 ]
 
 # Document register: BRD folders, the owner on the BDOI side, and the standard documents expected in each pack.

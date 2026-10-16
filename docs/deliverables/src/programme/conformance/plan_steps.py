@@ -16,7 +16,7 @@ import openpyxl
 
 ROOT = Path(__file__).resolve().parents[5]
 HERE = Path(__file__).resolve().parent
-WORKBOOK = ROOT / "docs/deliverables/out/Programme/UAT/BIBS_UAT_BRD-00_Walkthrough_Users_and_Sign-in_v1.0.xlsx"
+WORKBOOK = ROOT / "docs/deliverables/out/Programme/UAT/BIBS_UAT_BRD-00_Walkthrough_Users_and_Sign-in_v1.1.xlsx"
 FEATURES = ROOT / "frontend/src/features"
 STOP = {"the", "a", "an", "of", "and", "or", "to", "on", "for", "in", "with", "page", "screen", "tab", "list",
         "record", "brd", "frs", "walkthrough", "storyboard"}

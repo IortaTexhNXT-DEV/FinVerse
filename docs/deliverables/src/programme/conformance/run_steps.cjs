@@ -5,6 +5,7 @@
 //
 // Usage (seed profile running; the password of the SIT/UAT users in SEED_PASSWORD, never written to a file):
 //   SEED_PASSWORD=... BASE=http://localhost:5173 SHOTS=<folder> PLAYWRIGHT_MODULE=... node run_steps.cjs [step-regex]
+// With a step-regex only the matching steps run; the results of the other steps are kept from the previous run.
 const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
@@ -152,7 +153,12 @@ async function check(page, c, shotName) {
   }
   await browser.close();
   const out = path.join(HERE, 'data', 'steps_run.json');
-  fs.writeFileSync(out, JSON.stringify(results, null, 1));
+  // A run of some steps (step-regex) keeps the results of the other steps from the previous run.
+  const kept = ONLY && fs.existsSync(out)
+    ? JSON.parse(fs.readFileSync(out, 'utf8')).filter((r) => !ONLY.test(`${r.brd} ${r.step}`)) : [];
+  const order = new Map(plan.map((s, i) => [`${s.brd} ${s.step}`, i]));
+  const all = [...kept, ...results].sort((a, b) => (order.get(`${a.brd} ${a.step}`) ?? 1e9) - (order.get(`${b.brd} ${b.step}`) ?? 1e9));
+  fs.writeFileSync(out, JSON.stringify(all, null, 1));
 })().catch((e) => {
   console.error(e);
   process.exit(1);

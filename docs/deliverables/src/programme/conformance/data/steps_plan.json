@@ -3,11 +3,11 @@
   "brd": "BRD-00",
   "walkthrough": "J1 Access and set-up",
   "step": "J1.1",
-  "persona": "UAM requestor, approver, implementer",
-  "user": "requestor",
-  "users": "requestor, uamapprover, admin",
-  "action": "Enrol a new user and give the persona its menus (FRS BRD-11 walkthrough WT-A (A.1-A.8))",
-  "expected": "The user signs in and sees only the menus of the persona",
+  "persona": "User Access Administrator, new user",
+  "user": "uamadmin",
+  "users": "uamadmin",
+  "action": "UIDM-ISC (in SIT and UAT the SCIM simulator of Identity Sync) sends the joiner and the group profile of the persona over SCIM; the new user signs in through Microsoft Entra ID (FRS BRD-11 walkthrough WT-A (A.1-A.6))",
+  "expected": "The user is created Active with the group profile, signs in and sees only the menus of the persona",
   "checks": [],
   "buttons": []
  },
@@ -1343,12 +1343,13 @@
   "persona": "TSU Officer",
   "user": "tsu",
   "users": "tsu",
-  "action": "Enters the computation basis, clicks Save Requirements, downloads the Package Slip, uploads the signed slip on the Documents tab as Package slip (signed), and clicks Submit requirements for ManCom sign-off",
-  "expected": "The checklist reads The requirements pack is complete.; the stage becomes For ManCom sign-off",
+  "action": "Enters the computation basis, clicks Save Requirements, downloads the Package Slip, uploads the signed slip on the Documents tab as Package slip (signed), clicks Submit requirements for ManCom sign-off, then on the Routing & Approvals tab ticks the ManCom member and the President and clicks Send for ManCom Approval",
+  "expected": "The checklist reads The requirements pack is complete.; the stage becomes For ManCom sign-off; the ManCom Approval table lists the member Pending Approval and the President Waiting for the others",
   "checks": [],
   "buttons": [
    "Save Requirements",
-   "Submit"
+   "Submit",
+   "Send"
   ]
  },
  {
@@ -1358,11 +1359,12 @@
   "persona": "ManCom",
   "user": "mancom",
   "users": "mancom",
-  "action": "Reviews the proposed terms and clicks Sign off and send to MBS",
-  "expected": "ManCom decisions lists MC-PKR-yyyy-nnnnnn Signed; the slips show Locked; the stage becomes With MBS for set-up",
+  "action": "The ManCom member reviews the proposed terms and clicks Approve on the Routing & Approvals tab; the President, asked once the member approved, clicks Approve",
+  "expected": "The ManCom Approval table shows both Approved; ManCom decisions lists MC-PKR-yyyy-nnnnnn Signed; the slips show Locked; the stage becomes With MBS for set-up (forwarding automatic)",
   "checks": [],
   "buttons": [
-   "Sign"
+   "Approve",
+   "Approve"
   ]
  },
  {
@@ -4222,134 +4224,104 @@
  },
  {
   "brd": "BRD-11",
-  "walkthrough": "WT-A A new user from the enrolment request to the first sign-in with the menus of the persona",
+  "walkthrough": "WT-A A joiner from UIDM-ISC to the first sign-in with the menus of the persona",
   "step": "WT-A.1",
-  "persona": "Requestor",
-  "user": "requestor",
-  "users": "requestor",
-  "action": "Opens User Access \u203a Access Requests \u203a New Request, keeps Enrol new user, enters the user ID a013000196, the full name, e-mail, Windows ID and home branch, ticks Marketing Account Officer, chooses the approver Ulysses Access Approver, writes the justification and clicks Save Draft",
-  "expected": "Toast: AR-yyyy-nnnnnn saved as a draft; the request opens as Draft with Approver Chosen on submission",
+  "persona": "User Access Administrator",
+  "user": "uamadmin",
+  "users": "uamadmin",
+  "action": "Opens Identity Sync \u203a Simulator, adds the Enterprise SSO account BDO\\inavarro (user ID a013000196, Isabel Navarro, e-mail, unit, location, UIDM request UIDM-2026-005196) and chooses Send joiner on its row",
+  "expected": "Toast: Applied: user a013000196 created; the account is listed Active",
   "checks": [],
-  "buttons": [
-   "Save Draft"
-  ]
+  "buttons": []
  },
  {
   "brd": "BRD-11",
-  "walkthrough": "WT-A A new user from the enrolment request to the first sign-in with the menus of the persona",
+  "walkthrough": "WT-A A joiner from UIDM-ISC to the first sign-in with the menus of the persona",
   "step": "WT-A.2",
-  "persona": "Requestor",
-  "user": "requestor",
-  "users": "requestor",
-  "action": "Clicks Edit Request, checks the data and clicks Submit",
-  "expected": "Toast: AR-yyyy-nnnnnn submitted; the status is Pending Approval and the History tab lists Saved and Submitted",
+  "persona": "User Access Administrator",
+  "user": "uamadmin",
+  "users": "uamadmin",
+  "action": "Chooses Send group profiles on the row of BDO\\inavarro with the code MKT_AO and the UIDM request UIDM-2026-005196, and clicks Send",
+  "expected": "Toast: Applied: group profiles of a013000196 set to MKT_AO",
   "checks": [],
   "buttons": [
-   "Edit Request",
-   "Submit"
+   "Send"
   ]
  },
  {
   "brd": "BRD-11",
-  "walkthrough": "WT-A A new user from the enrolment request to the first sign-in with the menus of the persona",
+  "walkthrough": "WT-A A joiner from UIDM-ISC to the first sign-in with the menus of the persona",
   "step": "WT-A.3",
-  "persona": "Approver",
-  "user": "uamapprover",
-  "users": "uamapprover",
-  "action": "Opens the notice Access request AR-yyyy-nnnnnn to approve, or User Access \u203a Access Requests",
-  "expected": "The request is on the Assigned to Me tab with its change: Create user a013000196 with group profiles Marketing Account Officer",
+  "persona": "User Access Administrator",
+  "user": "uamadmin",
+  "users": "uamadmin",
+  "action": "Opens the Events tab",
+  "expected": "The joiner and the group-profile event of BDO\\inavarro, both Applied, with the UIDM request number",
   "checks": [],
   "buttons": []
  },
  {
   "brd": "BRD-11",
-  "walkthrough": "WT-A A new user from the enrolment request to the first sign-in with the menus of the persona",
+  "walkthrough": "WT-A A joiner from UIDM-ISC to the first sign-in with the menus of the persona",
   "step": "WT-A.4",
-  "persona": "Approver",
-  "user": "uamapprover",
-  "users": "uamapprover",
-  "action": "Opens the request, reads the Details tab (current and requested values), clicks Approve and Apply, adds a comment and confirms",
-  "expected": "User a013000196 was created, with the temporary password shown once to be given through a secure channel; the status is Approved",
+  "persona": "User Access Administrator",
+  "user": "uamadmin",
+  "users": "uamadmin",
+  "action": "Opens Users, searches a013000196 and opens the Group Profiles tab of the user",
+  "expected": "Isabel Navarro is Active; Marketing Account Officer is held with the source UIDM-ISC, the date and the request number",
   "checks": [],
-  "buttons": [
-   "Approve"
-  ]
+  "buttons": []
  },
  {
   "brd": "BRD-11",
-  "walkthrough": "WT-A A new user from the enrolment request to the first sign-in with the menus of the persona",
+  "walkthrough": "WT-A A joiner from UIDM-ISC to the first sign-in with the menus of the persona",
   "step": "WT-A.5",
-  "persona": "Subject users of the requests (Marketing AO)",
+  "persona": "Users synchronised from UIDM-ISC (Marketing AO)",
   "user": "a013000196",
   "users": "a013000196",
-  "action": "The new user opens BIBS and signs in with a013000196 and the temporary password",
-  "expected": "Change Your Password: Your password was set by an administrator. Choose your own password to continue.",
+  "action": "The new user opens BIBS and clicks Sign in with Microsoft Entra ID; the simulator of the test environment stands in for Entra ID",
+  "expected": "The home page opens with only the menus of the Marketing Account Officer",
   "checks": [],
-  "buttons": []
+  "buttons": [
+   "Sign"
+  ]
  },
  {
   "brd": "BRD-11",
-  "walkthrough": "WT-A A new user from the enrolment request to the first sign-in with the menus of the persona",
+  "walkthrough": "WT-A A joiner from UIDM-ISC to the first sign-in with the menus of the persona",
   "step": "WT-A.6",
-  "persona": "Subject users of the requests (Marketing AO)",
-  "user": "a013000196",
-  "users": "a013000196",
-  "action": "Enters the temporary password as the current password and a personal password twice, and clicks Change Password",
-  "expected": "Toast: Password changed; the home page opens",
-  "checks": [],
-  "buttons": [
-   "Change Password"
-  ]
- },
- {
-  "brd": "BRD-11",
-  "walkthrough": "WT-A A new user from the enrolment request to the first sign-in with the menus of the persona",
-  "step": "WT-A.7",
-  "persona": "Subject users of the requests (Marketing AO)",
-  "user": "a013000196",
-  "users": "a013000196",
-  "action": "Opens the sidebar and My Profile",
-  "expected": "The sidebar holds exactly the entries of the Marketing Account Officer (chapter 12); My Profile lists the group profile Marketing Account Officer and its permissions, and the first session",
+  "persona": "User Access Administrator",
+  "user": "uamadmin",
+  "users": "uamadmin",
+  "action": "Opens the Sessions tab of a013000196",
+  "expected": "One open session of the user with its sign-in time",
   "checks": [],
   "buttons": []
  },
  {
   "brd": "BRD-11",
-  "walkthrough": "WT-A A new user from the enrolment request to the first sign-in with the menus of the persona",
-  "step": "WT-A.8",
-  "persona": "Auditor",
-  "user": "auditor",
-  "users": "auditor",
-  "action": "Opens User Access Reports \u203a User Access Audit Log for today, ticks Include Log-ins and Log-outs and clicks Run Report",
-  "expected": "Enroll New User a013000196 with the from and to values of the full name, e-mail and profiles, Done By and Approved By the Approver, the request number, and the Log-in of the new user",
-  "checks": [],
-  "buttons": [
-   "Run Report"
-  ]
- },
- {
-  "brd": "BRD-11",
-  "walkthrough": "WT-B A change and a revocation under four eyes, and a group-profile change approved in order and implemented",
+  "walkthrough": "WT-B A group-profile change under maker-checker, implemented by the System Administrator",
   "step": "WT-B.1",
   "persona": "Requestor",
   "user": "requestor",
   "users": "requestor",
-  "action": "Opens a New Request of type Modify user for a013000196, ticks Marketing Team Leader / Head (approver) besides the current profile, chooses the approver, writes the justification and clicks Submit",
-  "expected": "The Group Profiles show (current) after Marketing Account Officer; toast AR-yyyy-nnnnnn submitted",
+  "action": "Opens Group Profiles \u203a Marketing Account Officer and clicks Propose Change, ticks one permission, enters the reason and clicks Submit for Approval",
+  "expected": "Toast: AR-yyyy-nnnnnn sent for approval; the Pending Change tab shows the change Pending with the maker and no decision button for the maker: Another user with the approval right decides your change",
   "checks": [],
   "buttons": [
+   "Propose Change",
    "Submit"
   ]
  },
  {
   "brd": "BRD-11",
-  "walkthrough": "WT-B A change and a revocation under four eyes, and a group-profile change approved in order and implemented",
+  "walkthrough": "WT-B A group-profile change under maker-checker, implemented by the System Administrator",
   "step": "WT-B.2",
   "persona": "Approver",
   "user": "uamapprover",
   "users": "uamapprover",
-  "action": "Opens the request: the Details tab shows the group profiles added; clicks Approve and Apply",
-  "expected": "The status is Approved; the user receives Your access changed in the app and by e-mail",
+  "action": "Opens the Pending Change tab, clicks Approve, enters the remark and confirms",
+  "expected": "Toast: AR-yyyy-nnnnnn: For Implementation",
   "checks": [],
   "buttons": [
    "Approve"
@@ -4357,301 +4329,139 @@
  },
  {
   "brd": "BRD-11",
-  "walkthrough": "WT-B A change and a revocation under four eyes, and a group-profile change approved in order and implemented",
+  "walkthrough": "WT-B A group-profile change under maker-checker, implemented by the System Administrator",
   "step": "WT-B.3",
-  "persona": "Second approver",
-  "user": "secapprover",
-  "users": "secapprover",
-  "action": "Opens AR-2026-900008 from the Second Approval tab: the tag Privilege increase, first approved by the Approver; clicks Second Approval and confirms",
-  "expected": "The status is Approved; the alert Privileged access change stays in the Alert inbox as evidence",
+  "persona": "System Administrator",
+  "user": "admin",
+  "users": "admin",
+  "action": "Opens the Pending Change tab of the profile, clicks Implement and confirms",
+  "expected": "Toast: AR-yyyy-nnnnnn: Implemented; the permission is in the profile",
   "checks": [],
   "buttons": [
-   "Second Approval"
+   "Implement"
   ]
  },
  {
   "brd": "BRD-11",
-  "walkthrough": "WT-B A change and a revocation under four eyes, and a group-profile change approved in order and implemented",
+  "walkthrough": "WT-B A group-profile change under maker-checker, implemented by the System Administrator",
   "step": "WT-B.4",
-  "persona": "Business Administrator",
-  "user": "badmin",
-  "users": "badmin",
-  "action": "Opens Group Profile Requests \u203a New Group Profile Request, enters the code RENEWAL_ENQUIRY, the name and description, keeps the level Standard, ticks two permissions, adds the approvers Ulysses Access Approver then the New Business Approver, writes the justification and clicks Submit",
-  "expected": "Toast: AR-yyyy-nnnnnn submitted; the Approvers tab lists the two approvers in order",
-  "checks": [],
-  "buttons": [
-   "Submit"
-  ]
- },
- {
-  "brd": "BRD-11",
-  "walkthrough": "WT-B A change and a revocation under four eyes, and a group-profile change approved in order and implemented",
-  "step": "WT-B.5",
-  "persona": "Approver",
-  "user": "uamapprover",
-  "users": "uamapprover",
-  "action": "Approves the group-profile request",
-  "expected": "The status stays Pending Approval; the request moves to the New Business Approver, who receives the notice",
+  "persona": "User Access Auditor",
+  "user": "uamauditor",
+  "users": "uamauditor",
+  "action": "Opens the History tab of the profile",
+  "expected": "The change with its number, maker, checker, date and status",
   "checks": [],
   "buttons": []
  },
  {
   "brd": "BRD-11",
-  "walkthrough": "WT-B A change and a revocation under four eyes, and a group-profile change approved in order and implemented",
-  "step": "WT-B.6",
-  "persona": "Approver (New Business Approver",
-  "user": "approver",
-  "users": "approver",
-  "action": "Opens the request from My Approvals and approves it",
-  "expected": "The status is For Implementation; the System Administrators receive Access request AR-yyyy-nnnnnn to implement",
-  "checks": [],
-  "buttons": []
- },
- {
-  "brd": "BRD-11",
-  "walkthrough": "WT-B A change and a revocation under four eyes, and a group-profile change approved in order and implemented",
-  "step": "WT-B.7",
-  "persona": "System Administrator",
-  "user": "admin",
-  "users": "admin",
-  "action": "Opens Roles & Permissions, finds the request under Approved Requests to Implement, clicks Implement Request and confirms",
-  "expected": "Toast: AR-yyyy-nnnnnn implemented; the profile appears in the matrix with its two permissions",
-  "checks": [],
-  "buttons": [
-   "Implement Request"
-  ]
- },
- {
-  "brd": "BRD-11",
-  "walkthrough": "WT-B A change and a revocation under four eyes, and a group-profile change approved in order and implemented",
-  "step": "WT-B.8",
-  "persona": "Requestor",
-  "user": "requestor",
-  "users": "requestor",
-  "action": "Opens a New Request of type Deactivate user for a013000196, chooses the reason Resigned, leaves the effective date blank, chooses the approver and clicks Submit",
-  "expected": "Toast: AR-yyyy-nnnnnn submitted",
-  "checks": [],
-  "buttons": [
-   "Submit"
-  ]
- },
- {
-  "brd": "BRD-11",
-  "walkthrough": "WT-B A change and a revocation under four eyes, and a group-profile change approved in order and implemented",
-  "step": "WT-B.9",
-  "persona": "Approver",
-  "user": "uamapprover",
-  "users": "uamapprover",
-  "action": "Approves the deactivation",
-  "expected": "The status is Approved; the user is Disabled and every open session of the user has ended",
-  "checks": [],
-  "buttons": []
- },
- {
-  "brd": "BRD-11",
-  "walkthrough": "WT-B A change and a revocation under four eyes, and a group-profile change approved in order and implemented",
-  "step": "WT-B.10",
-  "persona": "System Administrator",
-  "user": "admin",
-  "users": "admin",
-  "action": "Opens Administration \u203a Users with the status Disabled",
-  "expected": "a013000196 is listed Disabled with the profiles it held; Sessions shows the last session ended by the administrator",
-  "checks": [],
-  "buttons": []
- },
- {
-  "brd": "BRD-11",
-  "walkthrough": "WT-C Refused cases and the messages the user sees",
+  "walkthrough": "WT-C A refused event and the daily reconciliation with UIDM-ISC",
   "step": "WT-C.1",
-  "persona": "Requestor",
-  "user": "requestor",
-  "users": "requestor",
-  "action": "Opens New Request, enters the user ID ab and clicks Submit without a full name, profile, approver or justification",
-  "expected": "Under the fields: Use 3 to 50 letters, digits, dots, dashes or underscores; Enter the full name of the new user; Select at least one role; Select the approver; Enter the justification. Nothing is saved",
+  "persona": "User Access Administrator",
+  "user": "uamadmin",
+  "users": "uamadmin",
+  "action": "On Identity Sync \u203a Simulator, sends the group profiles MKT_AO and MKT_SUPERVISOR for BDO\\inavarro with UIDM-2026-005262",
+  "expected": "Toast: Refused, naming the group profile MKT_SUPERVISOR that BIBS does not hold",
   "checks": [],
-  "buttons": [
-   "Submit"
-  ]
+  "buttons": []
  },
  {
   "brd": "BRD-11",
-  "walkthrough": "WT-C Refused cases and the messages the user sees",
+  "walkthrough": "WT-C A refused event and the daily reconciliation with UIDM-ISC",
   "step": "WT-C.2",
-  "persona": "Requestor",
-  "user": "requestor",
-  "users": "requestor",
-  "action": "Enters the user ID a01300019X with the other fields complete and clicks Submit",
-  "expected": "Under the user ID: The user ID must be a letter followed by nine digits, for example a013000196",
+  "persona": "User Access Administrator",
+  "user": "uamadmin",
+  "users": "uamadmin",
+  "action": "Opens the Refused tab",
+  "expected": "The refused event of BDO\\inavarro with its reason, to review",
   "checks": [],
-  "buttons": [
-   "Submit"
-  ]
+  "buttons": []
  },
  {
   "brd": "BRD-11",
-  "walkthrough": "WT-C Refused cases and the messages the user sees",
+  "walkthrough": "WT-C A refused event and the daily reconciliation with UIDM-ISC",
   "step": "WT-C.3",
-  "persona": "Requestor",
-  "user": "requestor",
-  "users": "requestor",
-  "action": "Raises a Modify user request for a013000101, which already has a pending request, and clicks Submit",
-  "expected": "A request for user a013000101 is already waiting for approval, with its reference",
+  "persona": "User Access Administrator",
+  "user": "uamadmin",
+  "users": "uamadmin",
+  "action": "Chooses Dismiss on the event, enters the remark that UIDM-ISC corrected the request and confirms",
+  "expected": "Toast: Event dismissed; the Refused tab no longer lists it",
   "checks": [],
-  "buttons": [
-   "Submit"
-  ]
+  "buttons": []
  },
  {
   "brd": "BRD-11",
-  "walkthrough": "WT-C Refused cases and the messages the user sees",
+  "walkthrough": "WT-C A refused event and the daily reconciliation with UIDM-ISC",
   "step": "WT-C.4",
-  "persona": "Requestor",
-  "user": "requestor",
-  "users": "requestor",
-  "action": "Raises a Modify user request for himself (requestor), ticks an additional profile and clicks Submit",
-  "expected": "You cannot change your own roles",
+  "persona": "User Access Administrator",
+  "user": "uamadmin",
+  "users": "uamadmin",
+  "action": "After the account of BDO\\inavarro is made inactive in the directory, opens Reconciliation and clicks Run Now",
+  "expected": "A mismatch Status differs for a013000196, open",
   "checks": [],
   "buttons": [
-   "Submit"
+   "Run Now"
   ]
  },
  {
   "brd": "BRD-11",
-  "walkthrough": "WT-C Refused cases and the messages the user sees",
+  "walkthrough": "WT-C A refused event and the daily reconciliation with UIDM-ISC",
   "step": "WT-C.5",
-  "persona": "Requestor",
-  "user": "requestor",
-  "users": "requestor",
-  "action": "Enrols a new user with both the User Access Requestor and the User Access Approver profiles and clicks Submit",
-  "expected": "One user may not hold both User Access Requestor and User Access Approver (separation-of-duties rule SOD-900001): the rule authorised by Information Security",
+  "persona": "User Access Administrator",
+  "user": "uamadmin",
+  "users": "uamadmin",
+  "action": "Sends the leaver of BDO\\inavarro from the Simulator, then chooses Resolve on the mismatch with the remark and confirms",
+  "expected": "Toast: Mismatch resolved; the user a013000196 is Inactive and its sessions are ended",
   "checks": [],
-  "buttons": [
-   "Submit"
-  ]
+  "buttons": []
  },
  {
   "brd": "BRD-11",
-  "walkthrough": "WT-C Refused cases and the messages the user sees",
+  "walkthrough": "WT-C A refused event and the daily reconciliation with UIDM-ISC",
   "step": "WT-C.6",
-  "persona": "Approver (New Business Approver",
-  "user": "approver",
-  "users": "approver",
-  "action": "Opens AR-2026-900002, assigned to Ulysses Access Approver",
-  "expected": "The request shows no decision button for this approver; a decision would be refused: Request AR-2026-900002 is assigned to uamapprover for approval",
+  "persona": "User Access Administrator",
+  "user": "uamadmin",
+  "users": "uamadmin",
+  "action": "Opens the Status tab",
+  "expected": "Connection with UIDM-ISC: last call, last successful event, errors, refused events to review and mismatches to resolve",
   "checks": [],
   "buttons": []
  },
  {
   "brd": "BRD-11",
-  "walkthrough": "WT-C Refused cases and the messages the user sees",
-  "step": "WT-C.7",
-  "persona": "System Administrator",
-  "user": "admin",
-  "users": "admin",
-  "action": "Clicks Implement Request on a group-profile request he raised himself",
-  "expected": "A request is implemented by someone other than its requester",
-  "checks": [],
-  "buttons": [
-   "Implement Request"
-  ]
- },
- {
-  "brd": "BRD-11",
-  "walkthrough": "WT-C Refused cases and the messages the user sees",
-  "step": "WT-C.8",
-  "persona": "Subject users of the requests (Marketing AO)",
-  "user": "a013000101",
-  "users": "a013000101",
-  "action": "User a013000101 enters a wrong password three times, then the right one",
-  "expected": "Invalid user name or password each time, also for the right password: a locked account is refused with the same message as a wrong password; Users shows the lock to the System Administrator",
-  "checks": [],
-  "buttons": []
- },
- {
-  "brd": "BRD-11",
-  "walkthrough": "WT-C Refused cases and the messages the user sees",
-  "step": "WT-C.9",
-  "persona": "System Administrator",
-  "user": "admin",
-  "users": "admin",
-  "action": "Opens Users with the status Locked and clicks Unlock on a013000101",
-  "expected": "The user is Active again; the unlock is in the access change log",
-  "checks": [],
-  "buttons": [
-   "Unlock"
-  ]
- },
- {
-  "brd": "BRD-11",
-  "walkthrough": "WT-C Refused cases and the messages the user sees",
-  "step": "WT-C.10",
-  "persona": "Subject users of the requests (Marketing AO)",
-  "user": "a013000196",
-  "users": "a013000196",
-  "action": "The deactivated user a013000196 tries to sign in",
-  "expected": "Invalid user name or password, the same message as a wrong password; the attempt does not count towards the lock-out",
-  "checks": [],
-  "buttons": []
- },
- {
-  "brd": "BRD-11",
-  "walkthrough": "WT-C Refused cases and the messages the user sees",
-  "step": "WT-C.11",
-  "persona": "Requestor",
-  "user": "requestor",
-  "users": "requestor",
-  "action": "On My Profile, types a new password that is too short and has no symbol",
-  "expected": "Still needed: At least 10 characters; A symbol; Change Password stays disabled",
-  "checks": [],
-  "buttons": []
- },
- {
-  "brd": "BRD-11",
-  "walkthrough": "WT-C Refused cases and the messages the user sees",
-  "step": "WT-C.12",
-  "persona": "Requestor",
-  "user": "requestor",
-  "users": "requestor",
-  "action": "Enters the current password as the new password and clicks Change Password",
-  "expected": "You used this password recently. Choose another one",
-  "checks": [],
-  "buttons": [
-   "Change Password"
-  ]
- },
- {
-  "brd": "BRD-11",
-  "walkthrough": "WT-D The evidence of access",
+  "walkthrough": "WT-D The evidence of access and the certification extract",
   "step": "WT-D.1",
-  "persona": "Auditor",
-  "user": "auditor",
-  "users": "auditor",
-  "action": "Opens User Access \u203a User Access Matrix, By Action, and searches USER ACCESS",
-  "expected": "The User Access area by action class, with the permissions each profile holds: the Requestor creates and amends, the Approver approves, the Second Approver gives the second approval",
+  "persona": "User Access Auditor",
+  "user": "uamauditor",
+  "users": "uamauditor",
+  "action": "Opens Reports & Certification, clicks Extract XLSX and confirms Take Extract",
+  "expected": "Toast: the file saved; Information Security is told; Extracts taken lists the file with its rows and SHA-256",
   "checks": [],
-  "buttons": []
+  "buttons": [
+   "Extract XLSX"
+  ]
  },
  {
   "brd": "BRD-11",
-  "walkthrough": "WT-D The evidence of access",
+  "walkthrough": "WT-D The evidence of access and the certification extract",
   "step": "WT-D.2",
-  "persona": "Auditor",
-  "user": "auditor",
-  "users": "auditor",
-  "action": "Runs the User Group Profile Report for the profile UAM_APPROVER",
-  "expected": "The modules and tasks of the Approver with With Access, and the dates and actors of its creation and last change",
+  "persona": "User Access Auditor",
+  "user": "uamauditor",
+  "users": "uamauditor",
+  "action": "Opens Audit Log",
+  "expected": "The user access events of the day with who, when and the from and to values",
   "checks": [],
   "buttons": []
  },
  {
   "brd": "BRD-11",
-  "walkthrough": "WT-D The evidence of access",
+  "walkthrough": "WT-D The evidence of access and the certification extract",
   "step": "WT-D.3",
-  "persona": "Auditor",
-  "user": "auditor",
-  "users": "auditor",
-  "action": "Runs Group Profile Membership for MKT_AO as of today",
-  "expected": "The members of the Marketing Account Officer profile with who added each and when",
+  "persona": "User Access Auditor",
+  "user": "uamauditor",
+  "users": "uamauditor",
+  "action": "Opens Access Matrix",
+  "expected": "Each group profile against the permissions it grants, exportable",
   "checks": [],
   "buttons": []
  },

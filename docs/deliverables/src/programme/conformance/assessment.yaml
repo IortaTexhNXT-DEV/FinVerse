@@ -1,7 +1,7 @@
 # Review of the end-to-end conformance run (read by build_conformance.py): the decisions on requirements that the
 # evidence alone cannot give, notes on walkthrough steps checked by hand, the cycle steps of each requirement, the
 # fixes made during the run, the open gaps with their proposals and the corrections of the FRS texts.
-version: "1.1"
+version: "1.2"
 date: 16 October 2026
 scope: >-
   Run on a fresh SIT/UAT environment (seed data of the release) on 09-Oct-2026: the 367 steps of the UAT walkthrough
@@ -11,7 +11,10 @@ scope: >-
   script and the walkthroughs of the sign-off packs run again on a fresh SIT/UAT environment after the fixes since version 1.0
   (gaps G03, G07, G10, G12 and G13 closed); BRD-02, BRD-03, BRD-06 and BRD-11 measured against the requirements of
   their re-baselined BDOI-template FRS (v3.4, v1.4, v1.3 and v1.6; BRD-11 on the UIDM-ISC and Entra ID model), the
-  other BRDs against their FRS as before.
+  other BRDs against their FRS as before. Version 1.2 (16-Oct-2026): the walkthroughs of BRD-01, BRD-04 and BRD-11 and
+  journey step J1.1 run again on a fresh SIT/UAT environment with the updated recipes (KYC checklist, statement of
+  account by the Operations billing user, BRD-11 walkthroughs and J1.1 rewritten on the UIDM-ISC and Entra ID model
+  of FRS v1.6); gaps G14, G15 and G16 closed; the other results are carried over from version 1.1.
 
 # The FRS whose requirements are counted, per BRD (Summary); BIBS FRS when not listed.
 baselines:
@@ -20,39 +23,35 @@ baselines:
   BRD-06: BDOI FRS v1.3
   BRD-11: BDOI FRS v1.6
 
-# Results of version 1.0 (Summary, Change since v1.0).
+# Results of the previous version (Summary, Change since v<previous_version>).
+previous_version: "1.1"
 previous:
-  BRD-00: {frs: 25, ok: 13, partly: 4, nok: 5, nt: 3}
-  BRD-01: {frs: 95, ok: 70, partly: 22, nok: 0, nt: 3}
-  BRD-02: {frs: 82, ok: 69, partly: 12, nok: 0, nt: 1}
-  BRD-03: {frs: 39, ok: 26, partly: 12, nok: 0, nt: 1}
-  BRD-04: {frs: 52, ok: 36, partly: 13, nok: 0, nt: 3}
+  BRD-00: {frs: 25, ok: 15, partly: 2, nok: 5, nt: 3}
+  BRD-01: {frs: 95, ok: 60, partly: 33, nok: 0, nt: 2}
+  BRD-02: {frs: 28, ok: 16, partly: 12, nok: 0, nt: 0}
+  BRD-03: {frs: 30, ok: 19, partly: 10, nok: 0, nt: 1}
+  BRD-04: {frs: 52, ok: 33, partly: 16, nok: 0, nt: 3}
   BRD-05: {frs: 119, ok: 66, partly: 52, nok: 0, nt: 1}
-  BRD-06: {frs: 58, ok: 40, partly: 18, nok: 0, nt: 0}
-  BRD-07: {frs: 39, ok: 23, partly: 14, nok: 0, nt: 2}
+  BRD-06: {frs: 49, ok: 27, partly: 22, nok: 0, nt: 0}
+  BRD-07: {frs: 39, ok: 27, partly: 10, nok: 0, nt: 2}
   BRD-08: {frs: 39, ok: 15, partly: 12, nok: 0, nt: 12}
   BRD-09: {frs: 29, ok: 6, partly: 7, nok: 12, nt: 4}
   BRD-10: {frs: 44, ok: 33, partly: 10, nok: 0, nt: 1}
-  BRD-11: {frs: 40, ok: 25, partly: 14, nok: 0, nt: 1}
-  BRD-12: {frs: 35, ok: 12, partly: 21, nok: 0, nt: 2}
+  BRD-11: {frs: 12, ok: 4, partly: 8, nok: 0, nt: 0}
+  BRD-12: {frs: 35, ok: 13, partly: 20, nok: 0, nt: 2}
   BRD-13: {frs: 48, ok: 18, partly: 19, nok: 0, nt: 11}
-  Total: {frs: 744, ok: 452, partly: 230, nok: 17, nt: 45}
+  Total: {frs: 644, ok: 352, partly: 233, nok: 17, nt: 42}
 
-# What changed since version 1.0, per BRD (Summary).
+# What changed since the previous version, per BRD (Summary).
 changes:
-  BRD-00: Role Home Set-up (G07) and the Invoice Master List columns of the invoice ledger (G10) added; 11 of the 14
-    empty standard reports return rows on day one (G03).
-  BRD-01: Lower full conformance because the automated walkthroughs A.2 to A.17, C.5 and C.6 did not run (recipe out
-    of date, gap G14); the requirements they showed in v1.0 rest on automated checks only. No requirement is missing.
-  BRD-02: Counted on the 28 requirements of the BDOI FRS v3.4 (v1.0 counted the 82 of the BIBS FRS).
-  BRD-03: Counted on the 30 requirements of the BDOI FRS v1.4 (v1.0 counted the 39 of the BIBS FRS).
-  BRD-04: Steps D.2 to D.4 of the installment plan walkthrough fail (statement of account of a cycle not yet due, gap
-    G16).
-  BRD-06: Counted on the 49 requirements of the BDOI FRS v1.3 (v1.0 counted the 58 of the BIBS FRS).
-  BRD-07: The new handler's notice after a reassignment confirmed (G13).
-  BRD-11: Counted on the 12 active requirements of the BDOI FRS v1.6 on the UIDM-ISC and Entra ID model (FRUM.009 and
-    FRUM.011 withdrawn, FRUM.014 new); v1.0 counted the 40 of the BIBS FRS.
-  BRD-12: Notification Recipients on Submitted Policies Setup (G12).
+  BRD-00: Journey step J1.1 rewritten on the UIDM-ISC joiner (SCIM simulator of SIT and UAT) and the first sign-in
+    through Entra ID (G15); it passes.
+  BRD-01: The recipe uploads one document per item of the KYC checklist and chooses the document type of the account
+    documents from its list of values (G14); walkthroughs A, B and C pass in full.
+  BRD-04: Steps D.2 to D.4 performed by the Operations billing user (CLR-CL-32); the statement of account of a cycle
+    not yet due is generated from its plan (FR-CL-060 R6, G16); walkthrough D passes.
+  BRD-11: Walkthroughs rewritten on the FRS v1.6 storyboards (joiner and first sign-in, group-profile change under
+    maker-checker, refused event and reconciliation, certification extract; G15); the 19 steps pass.
 
 # Decisions on requirement items of the BDOI-template FRS (by item or group id): result, reason, evidence.
 bdoi_decisions:
@@ -76,6 +75,14 @@ bdoi_decisions:
     result: Conformant
     reason: ""
     evidence: Automated checks of the SCIM leaver event (user deactivated, open sessions ended).
+  FRUM.010:
+    result: Conformant
+    reason: ""
+    evidence: >-
+      Walkthrough WT-B of the BRD-11 pack run on 16-Oct-2026 (FRS v1.6 storyboard SB-3): the maker proposes the change
+      of a group profile and cannot decide it, the checker approves with a remark and the System Administrator
+      implements it (steps B.1 to B.3 pass); automated checks of the group-profile maker-checker. The approval of user
+      requests behind FR-UA-030 to FR-UA-034 is withdrawn in FRS v1.6 (users come from UIDM-ISC).
   FRRN.027:
     result: Partly conformant
     reason: The CLPC billing job, its files per product line and the LMS directory are in place; no automated check
@@ -196,233 +203,7 @@ step_gaps:
   SBM-MANUAL: A policy cannot yet be created or edited by hand on the screens (open gap G11)
 
 # Walkthrough steps checked by hand after the run: "BRD step" -> result, observed, evidence.
-step_notes:
-  "BRD-00 J1.1":
-    outside: true
-    result: Blocked
-    observed: >-
-      Access Requests no longer offers New Request: under the BRD-11 FRS v1.6 users are enrolled by UIDM-ISC over
-      SCIM (FRUM.002), not by a request in BIBS; the journey step is to be rewritten on the joiner event (open gap G15).
-    evidence: Scope of the FRS v1.6
-  "BRD-01 WT-A.2":
-    outside: true
-    result: Fail
-    observed: >-
-      The automated walkthrough stopped at the upload of the KYC documents: the KYC & Documents tab is now a KYC checklist and the recipe still looks for the former document type drop-down (open gap G14).
-    evidence: Walkthrough performed on the SIT/UAT data by the persona
-  "BRD-01 WT-A.3":
-    outside: true
-    result: Fail
-    observed: >-
-      Not reached: the KYC of the walkthrough client was not submitted at step A.2 (open gap G14).
-    evidence: Walkthrough performed on the SIT/UAT data by the persona
-  "BRD-01 WT-A.4":
-    outside: true
-    result: Fail
-    observed: >-
-      Not reached: the KYC of the walkthrough client was not submitted at step A.2 (open gap G14).
-    evidence: Walkthrough performed on the SIT/UAT data by the persona
-  "BRD-01 WT-A.9":
-    outside: true
-    result: Fail
-    observed: >-
-      Not reached: the walkthrough client was not confirmed at step A.4, so no account was created for it (open gap G14).
-    evidence: Walkthrough performed on the SIT/UAT data by the persona
-  "BRD-01 WT-A.10":
-    outside: true
-    result: Fail
-    observed: >-
-      Not reached: the walkthrough client was not confirmed at step A.4, so no account was created for it (open gap G14).
-    evidence: Walkthrough performed on the SIT/UAT data by the persona
-  "BRD-01 WT-A.11":
-    outside: true
-    result: Fail
-    observed: >-
-      Not reached: the walkthrough client was not confirmed at step A.4, so no account was created for it (open gap G14).
-    evidence: Walkthrough performed on the SIT/UAT data by the persona
-  "BRD-01 WT-A.12":
-    outside: true
-    result: Fail
-    observed: >-
-      Not reached: the walkthrough client was not confirmed at step A.4, so no account was created for it (open gap G14).
-    evidence: Walkthrough performed on the SIT/UAT data by the persona
-  "BRD-01 WT-A.13":
-    outside: true
-    result: Fail
-    observed: >-
-      Not reached: the walkthrough client was not confirmed at step A.4, so no account was created for it (open gap G14).
-    evidence: Walkthrough performed on the SIT/UAT data by the persona
-  "BRD-01 WT-A.14":
-    outside: true
-    result: Fail
-    observed: >-
-      Not reached: the walkthrough client was not confirmed at step A.4, so no account was created for it (open gap G14).
-    evidence: Walkthrough performed on the SIT/UAT data by the persona
-  "BRD-01 WT-A.15":
-    outside: true
-    result: Fail
-    observed: >-
-      Not reached: the walkthrough client was not confirmed at step A.4, so no account was created for it (open gap G14).
-    evidence: Walkthrough performed on the SIT/UAT data by the persona
-  "BRD-01 WT-A.16":
-    outside: true
-    result: Fail
-    observed: >-
-      Not reached: the walkthrough client was not confirmed at step A.4, so no account was created for it (open gap G14).
-    evidence: Walkthrough performed on the SIT/UAT data by the persona
-  "BRD-01 WT-A.17":
-    outside: true
-    result: Fail
-    observed: >-
-      Not reached: the walkthrough client was not confirmed at step A.4, so no account was created for it (open gap G14).
-    evidence: Walkthrough performed on the SIT/UAT data by the persona
-  "BRD-01 WT-C.5":
-    outside: true
-    result: Fail
-    observed: >-
-      The automated walkthrough did not find the drop-down of the return reason in the time allowed; the step is to be performed again with the updated recipe (open gap G14).
-    evidence: Walkthrough performed on the SIT/UAT data by the persona
-  "BRD-01 WT-C.6":
-    outside: true
-    result: Fail
-    observed: >-
-      Not reached: the account was not returned at step C.5 and still offers Submit to Processing (open gap G14).
-    evidence: Walkthrough performed on the SIT/UAT data by the persona
-  "BRD-04 WT-D.2":
-    result: Fail
-    observed: >-
-      The installment plan of the walkthrough opens with its four quarterly cycles, but the row of the first cycle (Not Due) offers only Record Promise, not Generate SOA, so the statement of account of the cycle could not be generated ahead of its due date (open gap G16).
-    evidence: Walkthrough performed on the SIT/UAT data by the persona
-  "BRD-04 WT-D.3":
-    result: Fail
-    observed: >-
-      Not reached: no statement of account was generated at step D.2 (open gap G16).
-    evidence: Walkthrough performed on the SIT/UAT data by the persona
-  "BRD-04 WT-D.4":
-    result: Fail
-    observed: >-
-      Not reached: no statement of account was generated at step D.2 (open gap G16).
-    evidence: Walkthrough performed on the SIT/UAT data by the persona
-  "BRD-11 WT-A.1":
-    outside: true
-    result: Blocked
-    observed: >-
-      Step of the access-request lifecycle of FRS v1.4, withdrawn in the BRD-11 FRS v1.6 (FRUM.009, FRUM.011): users are enrolled, changed and deactivated by UIDM-ISC over SCIM and BIBS no longer offers the request screens; the step is replaced by the joiner, mover and leaver events of the FRS v1.6 walkthroughs (open gap G15).
-    evidence: Scope of the FRS v1.6
-  "BRD-11 WT-A.2":
-    outside: true
-    result: Blocked
-    observed: >-
-      Step of the access-request lifecycle of FRS v1.4, withdrawn in the BRD-11 FRS v1.6 (FRUM.009, FRUM.011): users are enrolled, changed and deactivated by UIDM-ISC over SCIM and BIBS no longer offers the request screens; the step is replaced by the joiner, mover and leaver events of the FRS v1.6 walkthroughs (open gap G15).
-    evidence: Scope of the FRS v1.6
-  "BRD-11 WT-A.4":
-    outside: true
-    result: Blocked
-    observed: >-
-      Step of the access-request lifecycle of FRS v1.4, withdrawn in the BRD-11 FRS v1.6 (FRUM.009, FRUM.011): users are enrolled, changed and deactivated by UIDM-ISC over SCIM and BIBS no longer offers the request screens; the step is replaced by the joiner, mover and leaver events of the FRS v1.6 walkthroughs (open gap G15).
-    evidence: Scope of the FRS v1.6
-  "BRD-11 WT-A.5":
-    outside: true
-    result: Blocked
-    observed: >-
-      Step of the access-request lifecycle of FRS v1.4, withdrawn in the BRD-11 FRS v1.6 (FRUM.009, FRUM.011): users are enrolled, changed and deactivated by UIDM-ISC over SCIM and BIBS no longer offers the request screens; the step is replaced by the joiner, mover and leaver events of the FRS v1.6 walkthroughs (open gap G15).
-    evidence: Scope of the FRS v1.6
-  "BRD-11 WT-A.6":
-    outside: true
-    result: Blocked
-    observed: >-
-      Step of the access-request lifecycle of FRS v1.4, withdrawn in the BRD-11 FRS v1.6 (FRUM.009, FRUM.011): users are enrolled, changed and deactivated by UIDM-ISC over SCIM and BIBS no longer offers the request screens; the step is replaced by the joiner, mover and leaver events of the FRS v1.6 walkthroughs (open gap G15).
-    evidence: Scope of the FRS v1.6
-  "BRD-11 WT-A.7":
-    outside: true
-    result: Blocked
-    observed: >-
-      Step of the access-request lifecycle of FRS v1.4, withdrawn in the BRD-11 FRS v1.6 (FRUM.009, FRUM.011): users are enrolled, changed and deactivated by UIDM-ISC over SCIM and BIBS no longer offers the request screens; the step is replaced by the joiner, mover and leaver events of the FRS v1.6 walkthroughs (open gap G15).
-    evidence: Scope of the FRS v1.6
-  "BRD-11 WT-B.1":
-    outside: true
-    result: Blocked
-    observed: >-
-      Step of the access-request lifecycle of FRS v1.4, withdrawn in the BRD-11 FRS v1.6 (FRUM.009, FRUM.011): users are enrolled, changed and deactivated by UIDM-ISC over SCIM and BIBS no longer offers the request screens; the step is replaced by the joiner, mover and leaver events of the FRS v1.6 walkthroughs (open gap G15).
-    evidence: Scope of the FRS v1.6
-  "BRD-11 WT-B.2":
-    outside: true
-    result: Blocked
-    observed: >-
-      Step of the access-request lifecycle of FRS v1.4, withdrawn in the BRD-11 FRS v1.6 (FRUM.009, FRUM.011): users are enrolled, changed and deactivated by UIDM-ISC over SCIM and BIBS no longer offers the request screens; the step is replaced by the joiner, mover and leaver events of the FRS v1.6 walkthroughs (open gap G15).
-    evidence: Scope of the FRS v1.6
-  "BRD-11 WT-B.8":
-    outside: true
-    result: Blocked
-    observed: >-
-      Step of the access-request lifecycle of FRS v1.4, withdrawn in the BRD-11 FRS v1.6 (FRUM.009, FRUM.011): users are enrolled, changed and deactivated by UIDM-ISC over SCIM and BIBS no longer offers the request screens; the step is replaced by the joiner, mover and leaver events of the FRS v1.6 walkthroughs (open gap G15).
-    evidence: Scope of the FRS v1.6
-  "BRD-11 WT-B.9":
-    outside: true
-    result: Blocked
-    observed: >-
-      Step of the access-request lifecycle of FRS v1.4, withdrawn in the BRD-11 FRS v1.6 (FRUM.009, FRUM.011): users are enrolled, changed and deactivated by UIDM-ISC over SCIM and BIBS no longer offers the request screens; the step is replaced by the joiner, mover and leaver events of the FRS v1.6 walkthroughs (open gap G15).
-    evidence: Scope of the FRS v1.6
-  "BRD-11 WT-B.10":
-    outside: true
-    result: Blocked
-    observed: >-
-      Step of the access-request lifecycle of FRS v1.4, withdrawn in the BRD-11 FRS v1.6 (FRUM.009, FRUM.011): users are enrolled, changed and deactivated by UIDM-ISC over SCIM and BIBS no longer offers the request screens; the step is replaced by the joiner, mover and leaver events of the FRS v1.6 walkthroughs (open gap G15).
-    evidence: Scope of the FRS v1.6
-  "BRD-11 WT-C.1":
-    outside: true
-    result: Blocked
-    observed: >-
-      Step of the access-request lifecycle of FRS v1.4, withdrawn in the BRD-11 FRS v1.6 (FRUM.009, FRUM.011): users are enrolled, changed and deactivated by UIDM-ISC over SCIM and BIBS no longer offers the request screens; the step is replaced by the joiner, mover and leaver events of the FRS v1.6 walkthroughs (open gap G15).
-    evidence: Scope of the FRS v1.6
-  "BRD-11 WT-C.2":
-    outside: true
-    result: Blocked
-    observed: >-
-      Step of the access-request lifecycle of FRS v1.4, withdrawn in the BRD-11 FRS v1.6 (FRUM.009, FRUM.011): users are enrolled, changed and deactivated by UIDM-ISC over SCIM and BIBS no longer offers the request screens; the step is replaced by the joiner, mover and leaver events of the FRS v1.6 walkthroughs (open gap G15).
-    evidence: Scope of the FRS v1.6
-  "BRD-11 WT-C.3":
-    outside: true
-    result: Blocked
-    observed: >-
-      Step of the access-request lifecycle of FRS v1.4, withdrawn in the BRD-11 FRS v1.6 (FRUM.009, FRUM.011): users are enrolled, changed and deactivated by UIDM-ISC over SCIM and BIBS no longer offers the request screens; the step is replaced by the joiner, mover and leaver events of the FRS v1.6 walkthroughs (open gap G15).
-    evidence: Scope of the FRS v1.6
-  "BRD-11 WT-C.4":
-    outside: true
-    result: Blocked
-    observed: >-
-      Step of the access-request lifecycle of FRS v1.4, withdrawn in the BRD-11 FRS v1.6 (FRUM.009, FRUM.011): users are enrolled, changed and deactivated by UIDM-ISC over SCIM and BIBS no longer offers the request screens; the step is replaced by the joiner, mover and leaver events of the FRS v1.6 walkthroughs (open gap G15).
-    evidence: Scope of the FRS v1.6
-  "BRD-11 WT-C.5":
-    outside: true
-    result: Blocked
-    observed: >-
-      Step of the access-request lifecycle of FRS v1.4, withdrawn in the BRD-11 FRS v1.6 (FRUM.009, FRUM.011): users are enrolled, changed and deactivated by UIDM-ISC over SCIM and BIBS no longer offers the request screens; the step is replaced by the joiner, mover and leaver events of the FRS v1.6 walkthroughs (open gap G15).
-    evidence: Scope of the FRS v1.6
-  "BRD-11 WT-B.4":
-    outside: true
-    result: Fail
-    observed: >-
-      The automated walkthrough of the group-profile request did not find the fields or buttons of the former screen in the time allowed; the group-profile path stays in the FRS v1.6 (FRUM.005, FRUM.006, FRUM.010) and is covered by automated checks; the walkthrough is to be rewritten (open gap G15).
-    evidence: Walkthrough performed on the SIT/UAT data by the persona
-  "BRD-11 WT-B.5":
-    outside: true
-    result: Fail
-    observed: >-
-      The automated walkthrough of the group-profile request did not find the fields or buttons of the former screen in the time allowed; the group-profile path stays in the FRS v1.6 (FRUM.005, FRUM.006, FRUM.010) and is covered by automated checks; the walkthrough is to be rewritten (open gap G15).
-    evidence: Walkthrough performed on the SIT/UAT data by the persona
-  "BRD-11 WT-B.6":
-    outside: true
-    result: Fail
-    observed: >-
-      The automated walkthrough of the group-profile request did not find the fields or buttons of the former screen in the time allowed; the group-profile path stays in the FRS v1.6 (FRUM.005, FRUM.006, FRUM.010) and is covered by automated checks; the walkthrough is to be rewritten (open gap G15).
-    evidence: Walkthrough performed on the SIT/UAT data by the persona
-  "BRD-11 WT-C.7":
-    outside: true
-    result: Fail
-    observed: >-
-      The automated walkthrough of the group-profile request did not find the fields or buttons of the former screen in the time allowed; the group-profile path stays in the FRS v1.6 (FRUM.005, FRUM.006, FRUM.010) and is covered by automated checks; the walkthrough is to be rewritten (open gap G15).
-    evidence: Walkthrough performed on the SIT/UAT data by the persona
+step_notes: {}
 
 fixes:
   - id: F01
@@ -677,6 +458,9 @@ gaps:
     proposal: Update the recipe of the BRD-1 pack (upload on the KYC checklist, return reason) and run the
       walkthroughs again on a fresh SIT/UAT environment.
     size: Small
+    status: Closed
+    closed: >-
+      Recipe updated: walkthrough A step 2 uploads one document per mandatory item of the KYC checklist (document type chosen from its list of values) and submits the KYC; the account documents of step C.5 choose the document type from its list of values. Run again on the fresh SIT/UAT environment of 16-Oct-2026: steps A.1 to A.17, B.1 to B.9 and C.1 to C.9 pass (35 of 35); the walkthrough client is confirmed with KYC verified and booked, C.5 shows Client PR-2026-900004 is not yet confirmed and C.6 returns the account to Marketing.
   - id: G15
     brd: BRD-11
     frs_text: Walkthroughs WT-A to WT-C of the BRD-11 sign-off pack; steps J1.1 and the BRD-11 steps of the walkthrough script
@@ -689,6 +473,9 @@ gaps:
     proposal: Rewrite the BRD-11 walkthroughs and the UAT walkthrough script on the FRS v1.6 storyboards (SCIM joiner,
       mover, leaver; refused event; Identity Sync; reconciliation; group-profile maker-checker) and update the recipe.
     size: Medium
+    status: Closed
+    closed: >-
+      The BRD-11 walkthroughs are rewritten on the storyboards SB-1 to SB-5 of the BPS v1.6 (A: joiner and group profile sent from the SCIM simulator, first sign-in through Entra ID; B: group-profile change under maker-checker and implementation; C: refused event dismissed, reconciliation mismatch resolved after the leaver; D: certification extract, audit log, access matrix), with the recipe and the UAT walkthrough script (v1.1); journey step J1.1 follows the joiner. Run on the fresh SIT/UAT environment of 16-Oct-2026: the 19 steps and J1.1 pass.
   - id: G16
     brd: BRD-04
     frs_text: Walkthrough WT-D of the BRD-4 sign-off pack (statement of account of an installment cycle)
@@ -699,6 +486,9 @@ gaps:
     proposal: Confirm with BDOI whether a statement of account may be generated before the due date of the cycle;
       either offer Generate SOA on a cycle not yet due or correct the walkthrough to generate it on a due cycle.
     size: Small
+    status: Closed
+    closed: >-
+      Rule checked: BRCLXN.058 asks for a statement of account per applicable billing cycle and sets no earliest date; FRS FR-CL-060 bills a single cycle from its plan (alternate flow) and limits only the billing run to the cycles due in its period, and gives Generate SOA to the Operations billing user (CLX_SOA_ISSUE, CLR-CL-32), not to the Collection Handler. The platform already offers Generate SOA on a cycle not yet due to that user; the walkthrough had signed in as the Collection Handler. The walkthrough now performs D.2 to D.4 as the Cashiering Team Leader and the rule is recorded as FR-CL-060 R6. Run again: SOA-2026-000004 of cycle 1 (due 01-Nov-2026, Not Due) generated and sent; D.1 to D.4 pass.
 frs_corrections:
   - id: C01
     brd: BRD-07

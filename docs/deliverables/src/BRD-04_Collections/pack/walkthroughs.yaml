@@ -64,8 +64,9 @@ walkthroughs:
       creates the plan on the invoice. The Operations billing user generates the statement of account of the first
       cycle and sends it to the client by e-mail, the PDF protected by a password sent separately; the Collection
       Handler sees the statement on the plan, read only. Billing statements are produced by Operations under the
-      minutes of 27 April 2026 (CLR-CL-32); in the screenshots of steps 2 to 4 the seed user of the Collection
-      Handler generated and sent the statement.
+      minutes of 27 April 2026 (CLR-CL-32); steps 2 to 4 are performed by the seed user of the Cashiering Team
+      Leader. A cycle is billed from its plan whatever its due date (FR-CL-060, one cycle): the first cycle is
+      generated while it is still Not Due.
     data: "Seed data: the invoice of walkthrough A; the client's e-mail address from the client profile"
     steps:
       - [MKT_COLLECTION, SCR-CL-05, "Clicks New Installment Plan: installments of one invoice, the invoice, the first due date, 4 installments, Quarterly", "Message: <plan> created with 4 installments; the plan opens with its installments", Plan active, wt-d-01]

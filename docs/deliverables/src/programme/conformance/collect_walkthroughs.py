@@ -8,6 +8,9 @@ outcome is on the screen (yes, partly, no). The screenshot of a failed step is c
 The run folder holds <brd>.log (capture output), text/<brd>/<shot>.json (the text of the screen after each step,
 WT_TEXT_DIR of capture_pack) and fail/<brd>/capture-pack-failed-<shot>-<user>.png.
 
+A run of some BRDs only is merged with the results already in data/wt_results.json: the BRDs with a log in the run
+folder are replaced, the others are kept as they were.
+
 Usage: python3 collect_walkthroughs.py <run folder>
 """
 
@@ -105,6 +108,10 @@ def main(run: Path) -> None:
                                 "screen": head, "observed": line, "wording": wording, "error": error,
                                 "screenshot": shot})
     out = HERE / "data" / "wt_results.json"
+    run_brds = {r["brd"] for r in results}
+    if out.exists():
+        kept = [r for r in json.loads(out.read_text(encoding="utf-8")) if r["brd"] not in run_brds]
+        results = sorted(kept + results, key=lambda r: (r["brd"], r["walkthrough"], r["step"]))
     out.write_text(json.dumps(results, indent=1), encoding="utf-8")
     counts: dict[str, int] = {}
     for r in results:

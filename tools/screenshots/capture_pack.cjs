@@ -737,6 +737,16 @@ async function cropOf(page, shot, recipe) {
         toasts.slice(0, -1).forEach((t) => { t.style.display = 'none'; });
         window.scrollTo(0, 0);
       });
+      if (shot.state === 'walkthrough' && process.env.WT_TEXT_DIR) {
+        // The text of the screen after the step (dialog, message and content), for the conformance register.
+        const seen = await page.evaluate(() => ({
+          url: location.pathname + location.search,
+          text: [...document.querySelectorAll('[role=dialog], dialog[open], .toast-region, main')].map((e) => e.innerText).join('\n----\n'),
+        }));
+        const dir = path.join(process.env.WT_TEXT_DIR, brd);
+        fs.mkdirSync(dir, { recursive: true });
+        fs.writeFileSync(path.join(dir, `${shot.slug}.json`), JSON.stringify(seen));
+      }
       // A walkthrough step shows the top of the page (record header, stepper, the message of the step) at a
       // size that stays readable next to its text; the recipe sets `tall` for a step that needs the whole page.
       // A step cropped to a named region (recipe.crops) gets the whole page, so the region is in view.
@@ -781,7 +791,7 @@ async function cropOf(page, shot, recipe) {
     } catch (e) {
       // The page as it was when the shot failed, for the person running the capture (not kept in the pack).
       for (const [user, p] of pages.entries()) {
-        await p.screenshot({ path: path.join(os.tmpdir(), `capture-pack-failed-${shot.slug}-${user}.png`) })
+        await p.screenshot({ path: path.join(process.env.FAIL_DIR || os.tmpdir(), `capture-pack-failed-${shot.slug}-${user}.png`) })
           .catch(() => {});
         if (process.env.TRACE_DIR) {
           await p.context().tracing.stop({ path: path.join(process.env.TRACE_DIR, `trace-${shot.slug}-${user}.zip`) }).catch(() => {});

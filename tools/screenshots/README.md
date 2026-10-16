@@ -84,14 +84,20 @@ this order, BRD-01 first:
 |---|---|
 | brd01 | `'^wt-(a|b)-|^wt-c-01$'`, then `'^(scr|doc)-'` (the KYC approval shot needs the client that step C-01 submits), then `'^wt-c-(0[2-9]|1)'` |
 | brd03 | `'^wt-a-'`, then `'^(scr|doc)-'` (the set-up shot needs the seed request that walkthrough B returns), then `'^wt-b-'` |
-| brd11 | `'^scr-ua-08-03'` (the seeded request waiting for its second approval, which walkthrough B approves), then `'^wt-'`, then the other `'^(scr|doc)-'` shots, then `'^ux-'` |
+| brd11 | `'^wt-'` (walkthroughs A to D in order: B, C and D use the user created in A), then the `'^(scr|doc)-'` shots, then `'^ux-'` |
 
 A run with a slug filter keeps the other images; a run without a filter deletes the images that are no longer in the
-pack. Recipes exist for `brd01`, `brd03` and `brd11` (`packs/brdNN.cjs`). The BRD-11 recipe also signs in users that are
-not seed personas (the user enrolled in walkthrough A, a user whose password the administrator set), locks a seed
-subject user through failed sign-ins, and moves the browser clock (Playwright `page.clock`) to show the inactivity
-warning; its walkthroughs run in order (A before B, C and D).
+pack. Recipes exist for `brd01`, `brd03` and `brd11` (`packs/brdNN.cjs`). The BRD-11 walkthroughs follow the UIDM-ISC and
+Microsoft Entra ID model of the BRD-11 FRS v1.6: the joiner, leaver and group-profile events are sent from the
+Enterprise SSO simulator of Identity Sync, and step A.5 signs the new user in through the simulator. For that step the
+backend runs with the simulator as its OpenID Connect provider (`BROKERVERSE_SSO_BASE_URL` = the web client address,
+`BROKERVERSE_OIDC_ISSUER` = `<web client>/eiam-simulator`, `BROKERVERSE_OIDC_AUTHORIZATION_URI`, `_TOKEN_URI` and
+`_JWK_SET_URI` = `<API>/eiam-simulator/authorize`, `/token` and `/jwks`, and a client id and secret); the recipe
+switches the parameter `AUTH_MODE` to `OIDC` for the step (System Administrator, approved by the Information Security
+Officer) and back to `LOCAL` after it.
 
 The script needs `psql` (read-only queries that find the records), LibreOffice and `pdftoppm` (document pages) and
 Python with Pillow (PNG optimisation). It lists the shots it could not take and exits with code 1; the page at the
-moment of a failure is saved as `capture-pack-failed-<slug>-<user>.png` in the temporary folder.
+moment of a failure is saved as `capture-pack-failed-<slug>-<user>.png` in the temporary folder (or in `FAIL_DIR`).
+With `WT_TEXT_DIR` set, the text of the screen after each walkthrough step is written to
+`<WT_TEXT_DIR>/<brd>/<slug>.json`, read by the conformance register (`collect_walkthroughs.py`).

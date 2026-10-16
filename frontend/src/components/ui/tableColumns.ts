@@ -1,16 +1,13 @@
 /**
- * Column choice of a wide list (DataTable): which columns show, in which order, and the row
- * density, saved per user in the browser. Hidden columns stay in the chooser (and in the Excel
+ * Column choice of a list with optional columns (DataTable): which columns show and in which
+ * order, saved per user in the browser. Hidden columns stay in the chooser (and in the Excel
  * export, which the server builds with every column).
  */
-
-export type Density = 'comfortable' | 'compact';
 
 /** The saved choice of one list. */
 export interface ColumnChoice {
   order: string[];
   hidden: string[];
-  density: Density;
 }
 
 /** What the chooser needs of a column. */
@@ -37,7 +34,6 @@ export function defaultChoice(columns: readonly ChoosableColumn[]): ColumnChoice
   return {
     order: columns.map((c) => c.key),
     hidden: columns.filter((c) => c.defaultHidden === true).map((c) => c.key),
-    density: 'comfortable',
   };
 }
 
@@ -72,7 +68,6 @@ export function mergeChoice(
   return {
     order,
     hidden: [...new Set(hidden)],
-    density: saved.density === 'compact' ? 'compact' : 'comfortable',
   };
 }
 

@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowUp, Columns3, Rows3, Rows4 } from 'lucide-react';
+import { ArrowDown, ArrowUp, Columns3 } from 'lucide-react';
 import { useEffect, useId, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { moveColumn, toggleColumn } from './tableColumns';
@@ -87,11 +87,11 @@ function Chooser({
 }
 
 /**
- * The tools of a wide list, right-aligned above it: Compact / Comfortable rows and the column
- * chooser (show, hide and order the columns; saved per user in the browser, with a reset).
+ * The tool of a list with optional columns, right-aligned above it: the column chooser (show, hide
+ * and order the columns; saved per user in the browser, with a reset).
  */
 export function TableTools(props: Readonly<TableToolsProps>) {
-  const { choice, onChange, columns, locked } = props;
+  const { choice, columns, locked } = props;
   const [open, setOpen] = useState(false);
   const id = useId();
   const root = useRef<HTMLDivElement>(null);
@@ -119,19 +119,8 @@ export function TableTools(props: Readonly<TableToolsProps>) {
     };
   }, [open]);
   const hidden = columns.filter((c) => !locked.has(c.key) && choice.hidden.includes(c.key)).length;
-  const compact = choice.density === 'compact';
   return (
     <div className="table-tools" ref={root}>
-      <button
-        type="button"
-        className="btn btn-ghost btn-sm"
-        aria-pressed={compact}
-        title={compact ? 'Comfortable rows' : 'Compact rows'}
-        onClick={() => onChange({ ...choice, density: compact ? 'comfortable' : 'compact' })}
-      >
-        {compact ? <Rows3 size={16} aria-hidden="true" /> : <Rows4 size={16} aria-hidden="true" />}
-        {compact ? 'Comfortable' : 'Compact'}
-      </button>
       <button
         type="button"
         className="btn btn-ghost btn-sm"

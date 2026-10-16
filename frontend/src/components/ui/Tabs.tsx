@@ -22,7 +22,7 @@ const NEXT_KEYS: Record<string, number> = {
 };
 
 /**
- * Accessible tab strip (BDO boxed tabs) with optional counts. Keyboard: the arrow keys move
+ * Accessible tab strip (flat, the active tab underlined) with optional counts. Keyboard: the arrow keys move
  * between tabs, Home and End go to the first and last; only the active tab is in the tab order.
  */
 export function Tabs<T extends string>({ tabs, active, onChange }: Readonly<TabsProps<T>>) {

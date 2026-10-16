@@ -1731,7 +1731,7 @@ a.card.kpi:focus-visible .kpi-label {
 }
 
 .card-body.flush .tab {
-  padding: var(--space-2) var(--space-4);
+  padding: var(--space-2) var(--space-1);
 }
 
 /* ---------- Table header labels may wrap between words ------------------------------------- */
@@ -1767,7 +1767,7 @@ a.card.kpi:focus-visible .kpi-label {
   padding-right: 10px;
 }
 
-/* ---------- Wide lists: tools, sticky first column, compact rows ------------------------------ */
+/* ---------- Wide lists: column chooser, sticky first column ---------------------------------- */
 .table-tools {
   position: relative;
   display: flex;
@@ -1856,17 +1856,6 @@ a.card.kpi:focus-visible .kpi-label {
 /* A thin rule on the right of the sticky column while the list scrolls sideways */
 .table-sticky .sticky-last {
   box-shadow: inset -1px 0 0 var(--color-border);
-}
-
-.table-compact th,
-.table-compact td {
-  padding-top: 5px;
-  padding-bottom: 5px;
-  font-size: 13px;
-}
-
-.table-compact .cell-stack > .muted {
-  font-size: 12px;
 }
 
 /* ---------- Dialog standard (Modal, ConfirmDialog, ActionDialog) ------------------------- */

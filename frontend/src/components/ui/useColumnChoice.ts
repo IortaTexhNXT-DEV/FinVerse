@@ -11,13 +11,13 @@ import {
 } from './tableColumns';
 import type { ChoosableColumn, ColumnChoice } from './tableColumns';
 
-/** Lists with this many columns or more get the column chooser and the density toggle. */
-export const CHOOSER_FROM = 8;
+/** Lists with this many columns or more keep their reference column in view (sticky). */
+export const WIDE_FROM = 8;
 
 /**
- * The column choice of a list (DataTable): the columns to show in their order and the density,
- * kept per user in the browser under the list's name. Lists with fewer columns and no column
- * hidden by default have no chooser and show every column.
+ * The column choice of a list (DataTable): the columns to show and their order, kept per user in
+ * the browser under the list's name. Only a list with optional columns (hidden by default) gets the
+ * chooser; every other list shows all its columns and no tools.
  */
 export function useColumnChoice<C extends ChoosableColumn & { kind?: string }>(
   columns: readonly C[],
@@ -25,8 +25,7 @@ export function useColumnChoice<C extends ChoosableColumn & { kind?: string }>(
   enabled: boolean | undefined,
 ) {
   const user = useContext(AuthContext)?.user?.username ?? 'guest';
-  const on =
-    enabled ?? (columns.length >= CHOOSER_FROM || columns.some((c) => c.defaultHidden === true));
+  const on = enabled ?? columns.some((c) => c.defaultHidden === true);
   const name = list ?? columns.map((c) => c.key).join('-');
   const key = choiceKey(user, name);
   const fresh = useMemo(() => defaultChoice(columns), [columns]);
@@ -40,6 +39,7 @@ export function useColumnChoice<C extends ChoosableColumn & { kind?: string }>(
   };
   return {
     on,
+    wide: on || columns.length >= WIDE_FROM,
     choice,
     locked,
     visible: on ? visibleColumns(columns, choice, locked) : [...columns],

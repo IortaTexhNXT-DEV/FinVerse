@@ -63,7 +63,7 @@ describe('column choice', () => {
 describe('wide list tools', () => {
   beforeEach(() => window.localStorage.clear());
 
-  it('offers the column chooser, compact rows and a sticky reference column', () => {
+  it('offers the column chooser and a sticky reference column', () => {
     const { container } = render(
       <DataTable rows={[{ id: 1 }]} rowKey={(r) => r.id} columns={COLUMNS} list="test-list" />,
     );
@@ -82,8 +82,8 @@ describe('wide list tools', () => {
     fireEvent.click(within(chooser).getByRole('button', { name: 'Reset to Default' }));
     expect(screen.getByRole('columnheader', { name: 'Client' })).toBeTruthy();
     expect(window.localStorage.getItem('bibs.columns.guest.test-list')).toBeNull();
-    fireEvent.click(screen.getByRole('button', { name: /Compact/ }));
-    expect(container.querySelector('table')).toHaveClass('table-compact');
+    // One comfortable density everywhere: no per-list density control.
+    expect(screen.queryByRole('button', { name: /Compact|Comfortable/ })).toBeNull();
   });
 
   it('leaves short lists as they are', () => {
@@ -92,5 +92,18 @@ describe('wide list tools', () => {
     );
     expect(screen.queryByRole('button', { name: /Columns/ })).toBeNull();
     expect(container.querySelector('.sticky-col')).toBeNull();
+  });
+
+  it('keeps a wide list without optional columns free of tools, its reference column sticky', () => {
+    const { container } = render(
+      <DataTable
+        rows={[{ id: 1 }]}
+        rowKey={(r) => r.id}
+        columns={COLUMNS.filter((c) => c.defaultHidden !== true)}
+      />,
+    );
+    expect(screen.queryByRole('button', { name: /Columns/ })).toBeNull();
+    expect(container.querySelector('.table-tools')).toBeNull();
+    expect(container.querySelector('td.sticky-col-1')?.textContent).toBe('REF-1');
   });
 });

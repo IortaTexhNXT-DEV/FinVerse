@@ -74,9 +74,9 @@ interface DataTableProps<T> {
   /** Keys of the expanded rows. */
   expanded?: ReadonlySet<string | number>;
   /**
-   * Name of the list under which the user's column choice is kept (defaults to the callout). Lists
-   * of eight columns or more, or with a column hidden by default, get the column chooser, the
-   * density toggle and a sticky first column; `chooser` forces them on or off.
+   * Name of the list under which the user's column choice is kept (defaults to the callout). A list
+   * with a column hidden by default gets the column chooser; lists of eight columns or more keep
+   * their reference column sticky. `chooser` forces the chooser on or off.
    */
   list?: string;
   chooser?: boolean;
@@ -194,14 +194,6 @@ function footerPlace(
     return 'none';
   }
   return isPagerFooter(footer) ? 'below' : 'table';
-}
-
-/** The class of the table: sticky first column and compact rows for a list with the chooser. */
-function tableClassOf(chooser: boolean, density: string): string {
-  if (!chooser) {
-    return 'table';
-  }
-  return density === 'compact' ? 'table table-sticky table-compact' : 'table table-sticky';
 }
 
 /** The name of a column in the chooser: its header text, else its label, else its key. */
@@ -404,9 +396,9 @@ export function DataTable<T>({
   useFitHeight(ref);
   const choice = useColumnChoice(columns, list ?? callout, chooser);
   const shown = choice.visible;
-  const sticky = choice.on ? stickyCount(shown) : 0;
+  const sticky = choice.wide ? stickyCount(shown) : 0;
   useStickyOffsets(ref, sticky);
-  const tableClass = tableClassOf(choice.on, choice.choice.density);
+  const tableClass = choice.wide ? 'table table-sticky' : 'table';
   const place = footerPlace(footer, loading, rows.length);
   return (
     <>

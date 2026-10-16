@@ -38,6 +38,7 @@ import re
 import secrets
 import string
 import sys
+import time
 import urllib.error
 import urllib.request
 from collections import Counter
@@ -273,6 +274,17 @@ class Api:
         bearer = token or self.token
         if bearer:
             req.add_header("Authorization", "Bearer " + bearer)
+        for attempt in range(4):
+            try:
+                return self._send(req)
+            except (urllib.error.URLError, TimeoutError, ConnectionError) as e:
+                if isinstance(e, urllib.error.HTTPError) or attempt == 3:
+                    raise
+                time.sleep(5 * (attempt + 1))  # dropped connection: wait and send again
+        raise RuntimeError("unreachable")
+
+    @staticmethod
+    def _send(req):
         try:
             with urllib.request.urlopen(req, timeout=300) as resp:
                 raw = resp.read()

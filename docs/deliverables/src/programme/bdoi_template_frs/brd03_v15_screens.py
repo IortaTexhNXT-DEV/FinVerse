@@ -1,6 +1,6 @@
 """Screens of Product Maintenance in BIBS (UX Design v1.4, BRD-03): purpose, access, requirements, rules and
 states, fields (field, type, mandatory, format and source, validation and message) and actions (action, who,
-available when, what happens, resulting status). Read by build_brd03_v14.py and brd03_pack.py.
+available when, what happens, resulting status). Read by build_brd03_v15.py and brd03_pack.py.
 """
 
 SCREENS = [{'id': 'SCR-PM-01',
@@ -1725,7 +1725,7 @@ SCREENS = [{'id': 'SCR-PM-01',
              'use this panel. A new insurer also creates its business partner for the ledger; both are authorised '
              'together.',
   'access': 'Sidebar entry Insurers',
-  'frpm': 'FRPM.003.02, FRPM.023.01',
+  'frpm': 'FRPM.003.02, FRPM.023.01, FRPM.023.02, FRPM.021.03',
   'rules': ['Only authorised, active insurers are offered in package requests, package versions and quotation slips '
             '(FRPM.003.02, FRPM.012.01).',
             'The insurer master is maintained under New Business rules (BRD-1, insurer panel); Product Maintenance '
@@ -1787,9 +1787,10 @@ SCREENS = [{'id': 'SCR-PM-01',
               ('[Open a row]', 'Every user of the screen', 'Always', 'Opens the insurer record', '-')]},
  {'id': 'SCR-PM-18',
   'name': 'Insurer Record',
-  'purpose': 'One insurer: its profile (partner code, accreditation, placement channel and e-mails, credit days, '
-             'maker and authoriser), its branches with the local government tax rate, and its commission rates by '
-             'product.',
+  'purpose': 'One insurer, in tabs: its profile (partner code, accreditation, placement channel and e-mails, credit '
+             'days, maker and authoriser), contact persons, payment terms and remittance details, bank accounts, '
+             'the products linked, its branches with the local government tax rate and its commission rates, and '
+             'the field-level change history.',
   'access': 'Insurers › a row',
   'frpm': 'FRPM.003.02, FRPM.023.01',
   'rules': ["The commission rate in force on the account's period start applies; without an insurer rate, the "
@@ -1802,6 +1803,32 @@ SCREENS = [{'id': 'SCR-PM-01',
               '-',
               'As entered; Insurer master',
               '-'),
+             ('Contacts: Handles / Name / Position / E-mail / Phone / Status',
+              'Column',
+              '-',
+              'Contact persons of the insurer; Insurer contacts',
+              'No contact recorded.'),
+             ('Payment & Remittance: Payment terms / Credit days / Remittance cycle / Remittance mode / Remittance '
+              'advice e-mail / Remittance currency',
+              'Detail',
+              '-',
+              'Cycle: Daily, Weekly, Twice a month, Monthly; Mode: Check, Fund transfer, Online banking',
+              '-'),
+             ('Bank Accounts: Purpose / Bank / Branch / Account number / Account name / Currency / Primary / Status',
+              'Column',
+              '-',
+              'Purpose: Premium remittance, Refunds, Commissions; Insurer bank accounts',
+              'No bank account recorded.'),
+             ('Products: Product / Role / Latest version / Own commission rate',
+              'Column',
+              '-',
+              'Package versions naming the insurer and product commission rates',
+              'No product is linked to this insurer.'),
+             ('Change History: Field / Old value / New value / Maker / Changed / Checker / Authorized',
+              'Column',
+              '-',
+              'Master change log, latest first',
+              'No change recorded yet.'),
              ('Branches: Code / Name / City / LGT % / Placement e-mail / Status',
               'Column',
               '-',

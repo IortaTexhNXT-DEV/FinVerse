@@ -1,6 +1,6 @@
 """Content of the Product Maintenance document set v1.4 (BRD-03) in BDOI's template: the FRS, the process and
 storyboards (BPS), the UX design (UXD), the reports, notifications and outputs (RNO) and the interface specification
-(ICD). Read by build_brd03_v14.py, brd03_pack.py and build_brd03_v14_workbooks.py. Business wording only.
+(ICD). Read by build_brd03_v15.py, brd03_pack.py and build_brd03_v15_workbooks.py. Business wording only.
 
 Colour of a point: "k" black (in the BRD, BRD-00 or a programme NFR), "g" green (not in the BRD, offered by the
 iNXT BrokerVerse OOTB platform), "o" orange (change request), "b" blue (best practice, separate table). A label
@@ -9,8 +9,8 @@ iNXT BrokerVerse OOTB platform), "o" orange (change request), "b" blue (best pra
 
 from __future__ import annotations
 
-VERSION = "1.4"
-WB_VERSION = "1.1"
+VERSION = "1.5"
+WB_VERSION = "1.2"
 DATE = "16 Oct 2026"
 DATE_US = "10/16/2026"
 AUTHOR = "iorta TechNXT Project Team (drafting support); for review by the BDOI Product Owner"
@@ -52,9 +52,16 @@ REVISIONS = [
      "glossary and decisions to the programme documents. Status names follow the stages of the system. Names of "
      "persons removed.", AUTHOR),
 ]
+REVISIONS.append(
+    ("16 Oct 2026", "1.5", "Insurer page completed: contacts, payment terms and remittance details, bank accounts and "
+     "linked products under maker-checker (FRPM.023.02, Conformance Register gap G08). Field-level change history of "
+     "the master records with maker and checker, read by the Auditor (FRPM.021.03, gap G05).", AUTHOR))
 REVISION_COMPANION = [
     (DATE, "1.4", "First issue as a separate document of the Product Maintenance set (taken out of the annexes of the "
      "FRS v1.3 and aligned with the system delivered). Numbered 1.4 to match the FRS.", AUTHOR),
+    ("16 Oct 2026", "1.5", "Insurer Record (SCR-PM-18) with its tabs: details, contacts, payment terms and "
+     "remittance, bank accounts, products, branches and commissions, change history; Change History tab on the "
+     "product record. Numbered 1.5 to match the FRS.", AUTHOR),
 ]
 
 # ================================================================================================ shared facts
@@ -437,6 +444,11 @@ FRUM = [
             "action, description, old and new value, user and remarks, filtered by date, action, reference and user, "
             "and exported as Audit Logs_MMDDYYYY. No one can change or delete an entry.", "BR-PM-05", "-"),
          _r("FRPM.021.02", "Each record shows its own audit and workflow history in time order.", "-", "-"),
+         _r("FRPM.021.03", "Every change of a master record (product, insurer, insurer branch, contact and bank "
+            "account, commission rate, coverage, clause, rule, rate, list of values) is kept field by field: field, "
+            "old value, new value, maker and time of the change, checker and time of the authorization. The insurer "
+            "and product pages show it in a Change History tab; the Auditor reads it and nobody changes it.",
+            "BR-PM-01, BR-PM-05", "A change waiting for authorization shows Pending authorization.", "g"),
      ]},
     {"id": "FRPM.022", "component": "Product Matrix", "capability": "Product hierarchy and clause library",
      "status": "Kept", "brd": "PMADD01, PMADD02", "was": "Same", "reqs": [
@@ -453,6 +465,12 @@ FRUM = [
             "and coverage, inclusion, limit, deductible and clauses. Shares total 100% and every insurer has terms "
             "for each included coverage before submission. New business with an insurer outside the panel is "
             "refused.", "BR-PM-04", "-"),
+         _r("FRPM.023.02", "The insurer page shows the profile, the contact persons by role, the payment terms "
+            "and remittance details (cycle, mode, advice e-mail, currency), the bank accounts by purpose, the "
+            "products linked through package versions and commission rates, the branches with LGT and the "
+            "commission rates. Each addition or change of the profile, a contact or a bank account is saved for "
+            "authorization by another user.", "BR-PM-01",
+            "An account number already recorded for the insurer is refused.", "g"),
      ]},
     {"id": "FRPM.024", "component": "Package Version", "capability": "Package versions and latest approved rate "
      "scheme", "status": "Kept", "brd": "BRPM.007", "was": "Same", "reqs": [

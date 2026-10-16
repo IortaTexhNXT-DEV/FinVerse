@@ -1,7 +1,7 @@
 # Review of the end-to-end conformance run (read by build_conformance.py): the decisions on requirements that the
 # evidence alone cannot give, notes on walkthrough steps checked by hand, the cycle steps of each requirement, the
 # fixes made during the run, the open gaps with their proposals and the corrections of the FRS texts.
-version: "1.2"
+version: "1.3"
 date: 16 October 2026
 scope: >-
   Run on a fresh SIT/UAT environment (seed data of the release) on 09-Oct-2026: the 367 steps of the UAT walkthrough
@@ -14,7 +14,10 @@ scope: >-
   other BRDs against their FRS as before. Version 1.2 (16-Oct-2026): the walkthroughs of BRD-01, BRD-04 and BRD-11 and
   journey step J1.1 run again on a fresh SIT/UAT environment with the updated recipes (KYC checklist, statement of
   account by the Operations billing user, BRD-11 walkthroughs and J1.1 rewritten on the UIDM-ISC and Entra ID model
-  of FRS v1.6); gaps G14, G15 and G16 closed; the other results are carried over from version 1.1.
+  of FRS v1.6); gaps G14, G15 and G16 closed; the other results are carried over from version 1.1. Version 1.3
+  (16-Oct-2026): gaps G04 (report scheduling and subscriptions), G05 (master data change log), G08 (full
+  insurer page) and G09 (daily service-invoice batch per insurer) closed on the automated checks of the release; the
+  walkthrough and persona results are carried over from version 1.2.
 
 # The FRS whose requirements are counted, per BRD (Summary); BIBS FRS when not listed.
 baselines:
@@ -24,13 +27,13 @@ baselines:
   BRD-11: BDOI FRS v1.6
 
 # Results of the previous version (Summary, Change since v<previous_version>).
-previous_version: "1.1"
+previous_version: "1.2"
 previous:
   BRD-00: {frs: 25, ok: 15, partly: 2, nok: 5, nt: 3}
-  BRD-01: {frs: 95, ok: 60, partly: 33, nok: 0, nt: 2}
+  BRD-01: {frs: 95, ok: 69, partly: 24, nok: 0, nt: 2}
   BRD-02: {frs: 28, ok: 16, partly: 12, nok: 0, nt: 0}
   BRD-03: {frs: 30, ok: 19, partly: 10, nok: 0, nt: 1}
-  BRD-04: {frs: 52, ok: 33, partly: 16, nok: 0, nt: 3}
+  BRD-04: {frs: 52, ok: 36, partly: 13, nok: 0, nt: 3}
   BRD-05: {frs: 119, ok: 66, partly: 52, nok: 0, nt: 1}
   BRD-06: {frs: 49, ok: 27, partly: 22, nok: 0, nt: 0}
   BRD-07: {frs: 39, ok: 27, partly: 10, nok: 0, nt: 2}
@@ -40,18 +43,13 @@ previous:
   BRD-11: {frs: 12, ok: 4, partly: 8, nok: 0, nt: 0}
   BRD-12: {frs: 35, ok: 13, partly: 20, nok: 0, nt: 2}
   BRD-13: {frs: 48, ok: 18, partly: 19, nok: 0, nt: 11}
-  Total: {frs: 644, ok: 352, partly: 233, nok: 17, nt: 42}
+  Total: {frs: 644, ok: 364, partly: 221, nok: 17, nt: 42}
 
 # What changed since the previous version, per BRD (Summary).
 changes:
-  BRD-00: Journey step J1.1 rewritten on the UIDM-ISC joiner (SCIM simulator of SIT and UAT) and the first sign-in
-    through Entra ID (G15); it passes.
-  BRD-01: The recipe uploads one document per item of the KYC checklist and chooses the document type of the account
-    documents from its list of values (G14); walkthroughs A, B and C pass in full.
-  BRD-04: Steps D.2 to D.4 performed by the Operations billing user (CLR-CL-32); the statement of account of a cycle
-    not yet due is generated from its plan (FR-CL-060 R6, G16); walkthrough D passes.
-  BRD-11: Walkthroughs rewritten on the FRS v1.6 storyboards (joiner and first sign-in, group-profile change under
-    maker-checker, refused event and reconciliation, certification extract; G15); the 19 steps pass.
+  BRD-00: Gaps closed on the automated checks of the release - report subscriptions (G04), master data
+    change log (G05), full insurer page (G08) and the daily service-invoice batch per insurer (G09).
+  BRD-03: Insurer page and field-level change history (FRS BRD-03 v1.5, FRPM.023.02 and FRPM.021.03).
 
 # Decisions on requirement items of the BDOI-template FRS (by item or group id): result, reason, evidence.
 bdoi_decisions:
@@ -123,11 +121,13 @@ extra_checks:
   FR-CR-041: [NbReportApiIT, ConfigCatalogueSchemaIT]
   FR-CR-050: [DocTemplateServiceIT, DocumentWordIT]
   FR-CR-060: [LovServiceIT]
-  FR-CR-061: [CatalogIT]
+  FR-CR-031: [MasterChangeLogIT, MasterChangesTest]
+  FR-CR-043: [ReportSubscriptionIT, ReportSubscriptionScheduleTest]
+  FR-CR-061: [CatalogIT, InsurerPageIT]
   FR-CR-070: [UserAdminApiIT, LoginProtectionTest, SignInTokensIT]
   FR-CR-071: [DocumentProtectorTest]
   FR-CR-080: [WorkflowServiceIT]
-  FR-CR-081: [ServiceInvoiceIT]
+  FR-CR-081: [ServiceInvoiceIT, SiBatchIT]
   FR-CR-083: [BulkServiceIT, BulkExtensionsIT, AdvisoryJobLockIT]
   FR-CR-090: [InvoiceLedgerIT]
   FR-CR-091: [CurrencyAndDimensionApiIT]
@@ -330,6 +330,16 @@ gaps:
       Subscriptions under Reports; a scheduled job runs the variant with the owner's access, stores the file in the
       report archive and e-mails it, password protected when the report is confidential.
     size: Medium
+    status: Closed
+    closed: >-
+      Delivered in the release of 16-Oct-2026: Subscribe on the report screen (parameters of the screen, daily, weekly on a
+      day or monthly on a day with the last day of a shorter month, file format, e-mail recipients) and My Report
+      Subscriptions under Reports with the runs of each subscription and Stop. The REPORT_SUBSCRIPTIONS job runs the
+      subscriptions due on the business date as their subscriber, checks the export permission and the data scope of
+      the parameters at run time (a refused run is recorded as denied), archives the file in the report archive and
+      e-mails it; one run per subscription and date. The automated checks of the
+      subscriptions pass. Not in this release: the run time of day (the job runs once a day), the last working day option and
+      the password protection of confidential reports.
   - id: G05
     brd: BRD-00
     frs: [FR-CR-031]
@@ -343,6 +353,15 @@ gaps:
       Master Data Change Log screen under Setup & Administration with filters by data, record, user and date and an
       export.
     size: Medium
+    status: Closed
+    closed: >-
+      Delivered in the release of 16-Oct-2026: every insert and update of a maker-checker master record (products, insurers
+      and their branches, contacts, bank accounts and commission rates, rates, coverages, clauses, rules, lists of
+      values, parties and the other authorizable masters) and of a client writes one row per changed field (field,
+      old value, new value, maker, time) in the same transaction; the authorization adds the checker and its time.
+      The history is shown in a Change History tab on the insurer, product and client records and read by the
+      Auditor (AUDIT_VIEW, MASTER_VIEW). The automated checks of the change log pass. Not in this release:
+      the programme-wide Master Data Change Log screen with filters and export (the history is read per record).
   - id: G06
     brd: BRD-00
     frs: [FR-CR-042, FR-CR-062]
@@ -381,6 +400,15 @@ gaps:
     proposal: Add the Contacts, Payment Terms and Remittance, Products and Packages and Accounts sections to the
       insurer page with the catalog maker-checker; add Risk Participation when BDOI confirms CRQ08.
     size: Medium
+    status: Closed
+    closed: >-
+      Delivered in the release of 16-Oct-2026: the insurer page has the tabs Details, Contacts, Payment & Remittance (payment
+      terms, remittance cycle, mode, advice e-mail and currency), Bank Accounts, Products (package versions and
+      commission rates naming the insurer), Branches & Commissions and Change History; contacts and bank accounts are
+      maker-checker masters authorized from the approval inbox, and a change of the remittance details sends the
+      insurer back for authorization. The automated checks of the insurer page pass. Not in this release: Risk
+      Participation (waits for CRQ08) and the read-only view of the insurer's GL and sub-ledger accounts (kept on the
+      accounting screens).
   - id: G09
     brd: BRD-00
     frs: [FR-CR-081]
@@ -392,6 +420,14 @@ gaps:
       per insurer (merged PDF or ZIP with a manifest), stores it, sends it through the insurer's channel (e-mail;
       file transfer when BDOI supplies the addresses, CRQ18) and lists each batch in a delivery report.
     size: Medium
+    status: Closed
+    closed: >-
+      Delivered in the release of 16-Oct-2026: the SI_DAILY_BATCH job (21:30 Philippine time by default) makes one batch per
+      company, insurer and date of the service invoices issued that day, unique so that a rerun leaves the existing
+      batches unchanged, and e-mails it to the insurer's billing address with each service invoice attached and the
+      list in the body. Service Invoice Batches under Booking lists the batches with totals and delivery status
+      (generated, sent, failed with the reason, retried) and sends a failed batch again. The automated checks of the batches pass. Not
+      in this release: the merged PDF or ZIP with a manifest and the file-transfer channel (CRQ18).
   - id: G10
     brd: BRD-00
     frs: [FR-CR-090]

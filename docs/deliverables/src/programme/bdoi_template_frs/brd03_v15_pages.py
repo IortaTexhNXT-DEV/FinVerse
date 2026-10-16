@@ -1,6 +1,6 @@
 """Process, storyboard, screen-shot and output content of the Product Maintenance document set v1.4 (BRD-03): the
 journey, to-be processes and storyboards (BPS), the screenshots of each screen (UXD) and the reports, documents,
-exports, notices and jobs (RNO). Read by build_brd03_v14.py, brd03_pack.py and build_brd03_v14_workbooks.py.
+exports, notices and jobs (RNO). Read by build_brd03_v15.py, brd03_pack.py and build_brd03_v15_workbooks.py.
 The screenshots are in figures/brd03_v14_screens (flows/brd03/shots_v14.sh).
 """
 

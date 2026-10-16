@@ -270,6 +270,17 @@ LOG = [
      "the BDOI-template FRS packs (Fit-Gap, RTM, change register) and the Conformance Register; they are withdrawn "
      "with their builders, and the builders of the earlier BDOI-template FRS versions are removed.", "iorta TechNXT",
      "Files removed from the release folders.", "Closed", "Document Register"),
+    ("O-014", "16 Oct 2026", "Decision", "BRD-00", "End-to-End Conformance Register v1.3: gaps G04, G05, "
+     "G08 and G09", "Report subscriptions with run-time permission and data-scope checks (G04), field-level master "
+     "data change log with maker and checker read per record by the Auditor (G05), the full insurer page with "
+     "contacts, payment terms and remittance, bank accounts and linked products under maker-checker (G08) and the "
+     "daily service-invoice batch per insurer with its delivery status and re-send (G09) are delivered and closed "
+     "on the automated checks of the release. Remaining parts recorded on each gap: report run time and password "
+     "protection, the programme-wide change log screen, Risk Participation (CRQ08) and the insurer accounts view, the "
+     "merged batch file and file-transfer channel (CRQ18).", "iorta TechNXT",
+     "Register v1.3 issued; v1.2 superseded. Product Maintenance FRS, UX Design, Process and Storyboards and Reports "
+     "v1.5, Developer Specification v1.2, Data Dictionary v1.1, User Stories v1.1 and review workbooks v1.2 issued.",
+     "Closed", "Conformance Register v1.3"),
 ]
 
 # Document register: BRD folders, the owner on the BDOI side, and the standard documents expected in each pack.

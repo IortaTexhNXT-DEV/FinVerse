@@ -1,6 +1,6 @@
-"""BRD-03 Product Maintenance: content of the standard document set that is not already in brd03_v14_content.py,
-brd03_v14_pages.py and brd03_v14_screens.py. Read by build_pack.py (developer specification DSP, data dictionary DDI,
-user stories USR, the "How to read this pack" note) and by build_brd03_v14_workbooks.py (traceability).
+"""BRD-03 Product Maintenance: content of the standard document set that is not already in brd03_v15_content.py,
+brd03_v15_pages.py and brd03_v15_screens.py. Read by build_pack.py (developer specification DSP, data dictionary DDI,
+user stories USR, the "How to read this pack" note) and by build_brd03_v15_workbooks.py (traceability).
 
 The facts of the services, screens and tables are read from the sources by tools/deliverables/api_facts.py and
 schema_facts.py; this module says which of them belong to Product Maintenance and gives them their business wording.
@@ -9,8 +9,8 @@ schema_facts.py; this module says which of them belong to Product Maintenance an
 from __future__ import annotations
 
 import api_facts as af
-import brd03_v14_content as C
-import brd03_v14_screens as UX
+import brd03_v15_content as C
+import brd03_v15_screens as UX
 
 BRD = "BRD-03"
 NAME = "Product Maintenance"
@@ -36,12 +36,12 @@ SET = [
      "notices, e-mails and jobs.", "BDOI Business Unit owners; Internal Audit"),
     ("ICD", "ICD-BDOI", "Product_Maintenance_Interface_Specification", C.ICD_VERSION, "Product master transfer file "
      "and e-mail channel.", "BDOI IT (integration, mail)"),
-    ("DSP", "DSP-BDOI", "Product_Maintenance_Developer_Specification", "1.1", "Screens, service operations, field "
+    ("DSP", "DSP-BDOI", "Product_Maintenance_Developer_Specification", "1.2", "Screens, service operations, field "
      "validations, rules, states, jobs, audit events and permissions, as the system works.", "BDOI IT; iorta "
      "TechNXT developers and testers"),
-    ("DDI", "DDI-BDOI", "Product_Maintenance_Data_Dictionary", "1.0", "Tables, columns, lists of values, parameters, "
+    ("DDI", "DDI-BDOI", "Product_Maintenance_Data_Dictionary", "1.1", "Tables, columns, lists of values, parameters, "
      "status models and indexes.", "BDOI IT (database administration); Data Migration"),
-    ("USR", "USR-BDOI", "Product_Maintenance_User_Stories", "1.0", "User stories with acceptance criteria, ready to "
+    ("USR", "USR-BDOI", "Product_Maintenance_User_Stories", "1.1", "User stories with acceptance criteria, ready to "
      "import into the backlog tool.", "BDOI Product Owner; UAT lead"),
     ("RTM", "RTM", "Test_Cases_and_Traceability", C.WB_VERSION, "Test cases and the trace BRD, FRPM, user story, "
      "screen, test case.", "UAT lead; Internal Audit"),
@@ -75,6 +75,10 @@ DSP_REVISIONS = [
     (DATE, "1.1", "Permissions of the service operations corrected: the request routing, quotation rounds, responses "
      "and comparative outputs are checked against PRODUCT_VIEW or PKG_REPORT_VIEW, not JOURNAL_VIEW (Decision Log "
      "O-009).", PREPARED),
+    ("16 October 2026", "1.2", "Insurer page completed (Conformance Register gap G08): contact persons, payment "
+     "terms and remittance details, bank accounts and the products linked, each change maker-checker. Field-level "
+     "change history of the master records (gap G05): old and new value, maker, checker and their times, shown on "
+     "the insurer and product pages and readable by the Auditor.", PREPARED),
 ]
 
 DOCS = {
@@ -100,6 +104,7 @@ CONTROLLERS = [_PM + c for c in (
         "InsurerController.java", "RateTableController.java", "OtherChargeController.java", "RatingController.java",
         "RateSchemeExceptionController.java", "SalesOrganisationController.java")]
 SHARED_CONTROLLERS = ["workflow/api/WorkflowController.java", "report/api/ReportController.java",
+                      "audit/api/ChangeHistoryController.java",
                       "attachment/api/AttachmentController.java", "nonpackage/api/ProposalController.java"]
 OMIT_OPS: set[str] = set()
 
@@ -128,7 +133,8 @@ AREAS = [
     ("Workspace, reports and audit", ("product-maintenance/matrix", "product-maintenance/quotation-requests",
                                       "product-maintenance/dashboard", "product-maintenance/home",
                                       "product-maintenance/placement", "product-maintenance/audit",
-                                      "product-maintenance/master-changes", "reports/", "attachments/"),
+                                      "product-maintenance/master-changes", "reports/", "attachments/",
+                                      "change-history"),
      "Landing page, dashboard, Placement Update Reports, audit logs, product master transfers."),
     ("Product catalogue", ("catalog/",), "Lines, cover types, products, versions, coverages, clauses, rules, "
      "insurers, rates, incentive criteria, rate exceptions, sales organisation, rating."),
@@ -351,6 +357,8 @@ AUDIT_LABELS = {
     "CatalogKind.CLAUSE.label()": "Clause", "CatalogKind.COVERAGE.label()": "Coverage",
     "CatalogKind.DOCUMENT_RULE.label()": "Document rule", "CatalogKind.FIELD_RULE.label()": "Field rule",
     "CatalogKind.INSURER.label()": "Insurer", "CatalogKind.INSURER_BRANCH.label()": "Insurer branch",
+    "CatalogKind.INSURER_CONTACT.label()": "Insurer contact",
+    "CatalogKind.INSURER_BANK_ACCOUNT.label()": "Insurer bank account",
     "CatalogKind.OTHER_CHARGE.label()": "Other charge", "CatalogKind.PRODUCT.label()": "Product",
     "CatalogKind.RATE_SCHEME_EXCEPTION.label()": "Rate exception", "CatalogKind.SALES_OFFICER.label()":
     "Sales officer", "CatalogKind.SALES_UNIT.label()": "Sales unit", "CatalogKind.TSU_RULE.label()": "TSU rule",
@@ -363,7 +371,7 @@ AUDIT_OMIT: set[str] = set()
 ACTION_WORDS = {"CREATE": "Created", "UPDATE": "Changed", "DEACTIVATE": "Deactivated", "SUBMIT": "Submitted",
                 "AUTHORIZE": "Authorised", "REJECT": "Rejected", "EXPORT": "Exported", "RUN": "Run",
                 "APPROVE": "Approved", "DELETE": "Removed", "SEND": "Sent"}
-JOBS = {j[0]: j[2] for j in __import__("brd03_v14_pages").JOBS}
+JOBS = {j[0]: j[2] for j in __import__("brd03_v15_pages").JOBS}
 JOB_OMIT: set[str] = set()
 
 # ================================================================================================ data dictionary
@@ -380,9 +388,13 @@ TABLES = {
                        "250"),
     "cat_incentive_criteria": ("Product catalogue", "Incentive eligibility criteria, effective-dated.", "20", "40"),
     "cat_incentive_criteria_product": ("Product catalogue", "Products of each incentive criterion.", "200", "400"),
-    "cat_insurer": ("Product catalogue", "Insurer profiles: placement channel and e-mails, tax status, credit days.",
-                    "60", "65"),
+    "cat_insurer": ("Product catalogue", "Insurer profiles: placement channel and e-mails, tax status, credit days, "
+                    "payment terms and remittance details.", "60", "65"),
+    "cat_insurer_bank_account": ("Product catalogue", "Bank accounts of each insurer by purpose (remittance, refunds, "
+                                 "commissions), maker-checker.", "120", "130"),
     "cat_insurer_branch": ("Product catalogue", "Branches of each insurer.", "150", "160"),
+    "cat_insurer_contact": ("Product catalogue", "Contact persons of each insurer by role, maker-checker.", "300",
+                            "330"),
     "cat_motor_limit": ("Product catalogue", "Motor liability limits and premiums.", "40", "40"),
     "cat_other_charge": ("Product catalogue", "Other charges billed with the premium (switched off by default).", "10",
                          "10"),
@@ -605,6 +617,16 @@ STORIES = [
      "I can trace who did what and when",
      [("a version is released", "I open Audit Logs", "I see each step with user, time, old and new values")],
      "FRPM.021.01, FRPM.021.02", "BR-PM-05", "SCR-PM-27", "High", 2),
+    ("US-PM-034", "EP-PM-07", "Auditor", "the field-level change history of a master record",
+     "I can see what changed, who made it and who authorized it",
+     [("an insurer's credit days changed from 30 to 45 and were authorized", "I open its Change History",
+       "I see Credit days, 30, 45, the maker, the checker and both times")],
+     "FRPM.021.03", "BR-PM-01, BR-PM-05", "SCR-PM-18", "High", 3),
+    ("US-PM-035", "EP-PM-01", "Business Administrator", "the full insurer page: contacts, payment terms and "
+     "remittance, bank accounts, products", "the insurer's data is kept in BIBS under maker-checker",
+     [("I add a bank account", "I save it", "it is pending until another user authorizes it"),
+      ("the account number is already recorded for the insurer", "I save", "it is refused")],
+     "FRPM.023.02", "BR-PM-01", "SCR-PM-18", "Medium", 5),
     ("US-PM-031", "EP-PM-07", "MBS", "product master changes sent to the other BDOI systems",
      "other systems know which packages are on sale",
      [("a version is released", "the transfer runs", "the change is in the file and marked sent"),

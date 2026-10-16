@@ -364,7 +364,7 @@ def bdoi_baselines(assess: dict) -> dict[str, dict]:
     """The requirements of the re-baselined BDOI-template FRS (BRD-02 v3.4, BRD-03 v1.4, BRD-06 v1.3, BRD-11 v1.6):
     {brd: {"frs": label, "groups": [{id, title, status, items: [(id, text, colour, label)]}]}}."""
     sys.path.insert(0, str(BDOI_SRC))
-    import brd03_v14_content as b03  # noqa: E402
+    import brd03_v15_content as b03  # noqa: E402
     import brd11_v15_content as b11  # noqa: E402
 
     def from_py(rows):

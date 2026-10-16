@@ -1,12 +1,12 @@
-"""The review workbooks v1.1 of BRD-03 Product Maintenance, aligned with the document set v1.4.
+"""The review workbooks v1.2 of BRD-03 Product Maintenance, aligned with the document set v1.5.
 
-    python docs/deliverables/src/programme/bdoi_template_frs/build_brd03_v14_workbooks.py
+    python docs/deliverables/src/programme/bdoi_template_frs/build_brd03_v15_workbooks.py
 
 Writes in docs/deliverables/out/Programme/BDOI_Template_FRS/BRD-03_Product_Maintenance/: the Test Cases and
 Traceability (with the Trace sheet BRD, FRPM, user story, screen, test case), the Fit-Gap, the Change Request Register
-and Effort Estimate, the Business Unit Requirements Collection and the Walkthrough Users, all v1.1.
+and Effort Estimate, the Business Unit Requirements Collection and the Walkthrough Users, all v1.2.
 
-Content from brd03_v14_content.py, brd03_v14_pages.py and brd03_pack.py, so that every number agrees with the FRS v1.4.
+Content from brd03_v15_content.py, brd03_v15_pages.py and brd03_pack.py, so that every number agrees with the FRS v1.5.
 No password is written. Self-checks: every FRPM requirement has a user story and a test case; every BRD row of the
 mapping has test cases; every open change request has an effort.
 """
@@ -20,8 +20,8 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(HERE.parents[4] / "tools" / "deliverables"))
 import brd03_pack as K  # noqa: E402
-import brd03_v14_content as C  # noqa: E402
-import brd03_v14_pages as P  # noqa: E402
+import brd03_v15_content as C  # noqa: E402
+import brd03_v15_pages as P  # noqa: E402
 import pack_common as pc  # noqa: E402
 import pack_usr  # noqa: E402
 from brd11_xlsx import Column, ReviewWorkbook  # noqa: E402
@@ -111,7 +111,7 @@ def build_rtm():
     wb.sheet("Trace", [Column("brd", "BRD", 22), Column("frum", "FRPM", 13), Column("req", "Requirement", 50),
                        Column("story", "User story", 18), Column("screen", "Screen", 32),
                        Column("tc", "Test case", 16)], trace,
-             description="BRD to FRPM requirement to user story (User Stories v1.0) to screen (UX Design "
+             description="BRD to FRPM requirement to user story (User Stories v1.1) to screen (UX Design "
              f"v{C.VERSION}) to test case, one row per requirement.")
     return _save(wb, "RTM"), len(tcs)
 
@@ -153,7 +153,9 @@ def build_cr():
     wb.sheet("Decision Log", [Column("d", "Date", 14), Column("id", "Item", 22), Column("e", "Decision", 70)],
              [{"d": "11 Oct 2026", "id": "Register v1.0", "e": "One change request (CR-PM-101) after the product "
                "owner review."},
-              {"d": "16 Oct 2026", "id": "Register v1.1", "e": "No change; aligned with the FRS v1.4."}])
+              {"d": "16 Oct 2026", "id": "Register v1.1", "e": "No change; aligned with the FRS v1.4."},
+              {"d": "16 Oct 2026", "id": "Register v1.2", "e": "No change request: the insurer page (FRPM.023.02) "
+               "and the change history (FRPM.021.03) are delivered as best practice; aligned with the FRS v1.5."}])
     return _save(wb, "CRR"), len(rows)
 
 

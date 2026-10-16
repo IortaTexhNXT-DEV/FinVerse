@@ -233,7 +233,8 @@ LOG = [
      "NFR-REC-03"),
     ("O-006", "16 Oct 2026", "Observation", "All", "References to the NFR register", "The System Requirements "
      "Specification and the Test Strategy v1.0 name the NFR document v1.0 and its register.", "iorta TechNXT",
-     "They refer to this NFR v2.0 at their next issue.", "Open", "SRS, Test Strategy"),
+     "The SRS, the Test Strategy and the traceability matrix v1.1 refer to this NFR v2.0 and its register.",
+     "Closed", "SRS, Test Strategy, RTM v1.1"),
     ("O-007", "16 Oct 2026", "Observation", "BRD-02", "Packs to complete", "The BRD-02 pack is complete: FRS, BPS, "
      "UXD and RNO v3.4, ICD, DSP, DDI, USR and How to read v1.0, workbooks v1.1.", "iorta TechNXT",
      "None.", "Closed", "Document Register"),
@@ -245,7 +246,8 @@ LOG = [
     ("O-009", "16 Oct 2026", "Observation", "BRD-03", "Permissions in the Developer Specification", "A few "
      "operations of the BRD-03 Developer Specification v1.0 show the permission JOURNAL_VIEW where the service checks "
      "PRODUCT_VIEW or PKG_REPORT_VIEW (shared constant name read from another class).", "iorta TechNXT",
-     "Corrected at the next issue of the BRD-03 Developer Specification.", "Open", "DSP BRD-03 v1.0"),
+     "Corrected in the BRD-03 Developer Specification v1.1: every operation shows the permission its service "
+     "checks.", "Closed", "DSP BRD-03 v1.1"),
 ]
 
 # Document register: BRD folders, the owner on the BDOI side, and the standard documents expected in each pack.

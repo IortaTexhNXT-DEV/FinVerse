@@ -36,7 +36,7 @@ SET = [
      "notices, e-mails and jobs.", "BDOI Business Unit owners; Internal Audit"),
     ("ICD", "ICD-BDOI", "Product_Maintenance_Interface_Specification", C.ICD_VERSION, "Product master transfer file "
      "and e-mail channel.", "BDOI IT (integration, mail)"),
-    ("DSP", "DSP-BDOI", "Product_Maintenance_Developer_Specification", "1.0", "Screens, service operations, field "
+    ("DSP", "DSP-BDOI", "Product_Maintenance_Developer_Specification", "1.1", "Screens, service operations, field "
      "validations, rules, states, jobs, audit events and permissions, as the system works.", "BDOI IT; iorta "
      "TechNXT developers and testers"),
     ("DDI", "DDI-BDOI", "Product_Maintenance_Data_Dictionary", "1.0", "Tables, columns, lists of values, parameters, "
@@ -67,6 +67,15 @@ def file_name(key: str) -> str:
 def version(key: str) -> str:
     return next(v for k, _, _, v, *_ in SET if k == key)
 
+
+# Revisions of the Developer Specification (pack_dsp.py).
+DSP_REVISIONS = [
+    (DATE, "1.0", "First issue. Describes the screens, service operations, validations, rules, states, jobs, audit "
+     f"records and permissions of the release of {DATE}.", PREPARED),
+    (DATE, "1.1", "Permissions of the service operations corrected: the request routing, quotation rounds, responses "
+     "and comparative outputs are checked against PRODUCT_VIEW or PKG_REPORT_VIEW, not JOURNAL_VIEW (Decision Log "
+     "O-009).", PREPARED),
+]
 
 DOCS = {
     "DSP": {"cover": "Product Maintenance: Developer Specification", "header_left": "Developer Specification",

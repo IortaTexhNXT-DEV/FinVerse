@@ -39,7 +39,7 @@ Status: **Met**, **Partly** (met in part, or met by configuration still to be co
 | 1.2.4 | Access disabled after three invalid tries | Met | Entra ID; test accounts: `LOGIN_MAX_FAILED_ATTEMPTS` = 3 (V1060), sign-in rate limit (`LoginRateLimitFilter`) |
 | 1.2.5 | Minimum length 8; 12 for administrator accounts | Partly | Entra ID policy in production. Test accounts: 10 characters for every account (`PasswordChangeRequest`), so administrator test accounts are below 12. The BDO Password Protection Guidelines (Sep 2026) ask 15 for single-factor and privileged access |
 | 1.2.6 | Complex passwords (letters, digits, symbols; upper and lower case) | Met | `PasswordChangeRequest.COMPLEXITY` |
-| 1.2.7 | Last eight passwords not reused | Met | `PASSWORD_HISTORY_COUNT` = 8 (`AuthPasswordPolicy`). The 2026 guidelines ask 10 for internal systems: raise the parameter |
+| 1.2.7 | Last eight passwords not reused | Met | `PASSWORD_HISTORY_COUNT` = 10 (`AuthPasswordPolicy`; set by migration V2700), so the last ten passwords are refused. This also meets the 10 the 2026 guidelines ask for internal systems |
 | 1.2.8 | Minimum password age of one day | Met | `PASSWORD_MIN_AGE_DAYS` = 1 (`AuthPasswordPolicy`) |
 | 1.2.9 | Old password and confirmation required to change | Met | `AuthController.changePassword` checks the current password; new password entered twice on the screen |
 | 1.2.10 | Reset verifies the requester out of band | Met | `PASSWORD_RESET_BDOI_RULES` = true: no self-service link; reset only by another System Administrator; Entra ID in production |
@@ -184,7 +184,6 @@ No on the ASR cover).
 | Item | Action |
 |---|---|
 | 1.2.5 / 1.2.14 minimum length fixed at 10 | Make the minimum length a business parameter (`PASSWORD_MIN_LENGTH`) so test accounts can follow 12 (administrators) or the 15 of the 2026 guidelines; production passwords are governed by Entra ID |
-| 1.2.7 history 8 vs 10 in the 2026 guidelines | Set `PASSWORD_HISTORY_COUNT` = 10 |
 | 1.5.2 access to the audit log | Log the opening and extracts of the audit log screens |
 | 1.7.6 database least privilege | Separate migration account; application account with DML only |
 | 1.8.6 quantum-resistant TLS | Plan hybrid key exchange with BDO IT (load balancer, JDK) |

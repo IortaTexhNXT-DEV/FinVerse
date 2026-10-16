@@ -224,7 +224,9 @@ def write(K, out: Path, tmp: Path, pdf: bool = True) -> tuple[Path, int, dict]:
     global PREFIXES
     PREFIXES = K.PERMISSION_PREFIXES
     TEXT.update(getattr(K, "DSP_TEXT", {}))
-    af.CLASS_FIRST = getattr(K, "CLASS_FIRST_CONSTANTS", False)
+    # A qualified constant (ProductAccess.VIEW) is read from its own class: a name shared by several classes would
+    # otherwise give the permission of another module.
+    af.CLASS_FIRST = getattr(K, "CLASS_FIRST_CONSTANTS", True)
     facts = Facts(K)
     problems = facts.check()
     if problems:
@@ -232,9 +234,10 @@ def write(K, out: Path, tmp: Path, pdf: bool = True) -> tuple[Path, int, dict]:
     meta = DocMeta(file=K.file_name("DSP"), cover=K.DOCS["DSP"]["cover"], header_left=K.DOCS["DSP"]["header_left"],
                    header_right=K.HEADER_RIGHT, doc_no=K.DOCS["DSP"]["doc_no"], version=K.version("DSP"),
                    date_us=K.DATE_US, created_us=K.DATE_US,
-                   revisions=[(K.DATE, K.version("DSP"), "First issue. Describes the screens, service operations, "
-                               "validations, rules, states, jobs, audit records and permissions of the release of "
-                               f"{K.DATE}.", K.PREPARED)])
+                   revisions=getattr(K, "DSP_REVISIONS", None) or [
+                       (K.DATE, K.version("DSP"), "First issue. Describes the screens, service operations, "
+                        "validations, rules, states, jobs, audit records and permissions of the release of "
+                        f"{K.DATE}.", K.PREPARED)])
     d = PackDoc(meta)
     screen_map = {s["id"]: s for s in K.SCREENS}
     menu = {sc.path.lstrip("/"): sc for _, _, sc in cf.all_screens()}

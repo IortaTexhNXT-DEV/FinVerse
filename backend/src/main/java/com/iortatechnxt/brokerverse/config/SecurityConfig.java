@@ -48,7 +48,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
  *
  * <p>Headers: HSTS (one year, sub-domains) on every HTTPS answer; a Content Security Policy that
  * allows nothing ({@code default-src 'none'}) on the API answers and the API documentation's own
- * resources on {@code /swagger-ui} (local and dev only); no referrer; framing refused.
+ * resources on {@code /swagger-ui} (local and dev only); no referrer; framing refused; no device
+ * features (Permissions-Policy).
  *
  * <p>Actuator: health and info are open; the metrics need METRICS_VIEW on the application port, and
  * are open on the separate management port ({@link ManagementPort}), which only the monitoring
@@ -62,6 +63,12 @@ public class SecurityConfig {
   private static final String BEARER_PREFIX = "Bearer ";
   private static final long HSTS_SECONDS = 31_536_000L;
   private static final String CSP = "Content-Security-Policy";
+  private static final String PERMISSIONS_POLICY = "Permissions-Policy";
+
+  /** No camera, microphone, location, payment or USB for any page or response of the API. */
+  private static final String NO_DEVICE_FEATURES =
+      "camera=(), microphone=(), geolocation=(), payment=(), usb=()";
+
   private static final String API_CSP =
       "default-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'";
   private static final String DOCS_CSP =
@@ -188,6 +195,8 @@ public class SecurityConfig {
                             new NegatedRequestMatcher(
                                 new OrRequestMatcher(API_DOCS, EIAM_SIMULATOR)),
                             new StaticHeadersWriter(CSP, API_CSP)))
+                    .addHeaderWriter(
+                        new StaticHeadersWriter(PERMISSIONS_POLICY, NO_DEVICE_FEATURES))
                     .referrerPolicy(
                         r -> r.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.NO_REFERRER)))
         .authorizeHttpRequests(

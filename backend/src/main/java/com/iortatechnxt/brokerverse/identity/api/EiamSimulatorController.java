@@ -23,6 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,8 +38,12 @@ import org.springframework.web.util.HtmlUtils;
  * only): discovery, the sign-in page (account and device), the token endpoint, the key set and the
  * sign-out page. With {@code AUTH_MODE} OIDC and the issuer set to {@code
  * <address>/eiam-simulator}, the single sign-on of the system runs end to end against it.
+ *
+ * <p>Public like any identity provider (the browser reaches it before any sign-in); production
+ * refuses to start with the simulator on ({@code ProductionSafeguards}).
  */
 @RestController
+@PreAuthorize("permitAll()")
 @RequestMapping(EiamSimulator.PATH)
 @ConditionalOnProperty(name = "brokerverse.identity.simulator", havingValue = "true")
 public class EiamSimulatorController {

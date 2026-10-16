@@ -20,6 +20,7 @@ import com.tngtech.archunit.lang.ArchCondition;
 import com.tngtech.archunit.lang.ArchRule;
 import com.tngtech.archunit.lang.ConditionEvents;
 import com.tngtech.archunit.lang.SimpleConditionEvent;
+import jakarta.persistence.Entity;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -36,8 +37,16 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -256,6 +265,97 @@ final class ArchitectureTest {
           .arePublic()
           .should(CHECK_THE_DATA_SCOPE)
           .because("a user may act only for the companies and branches of his data scope");
+
+  /** Request mappings of Spring MVC. */
+  private static final Set<String> MAPPINGS =
+      Set.of(
+          RequestMapping.class.getName(),
+          GetMapping.class.getName(),
+          PostMapping.class.getName(),
+          PutMapping.class.getName(),
+          PatchMapping.class.getName(),
+          DeleteMapping.class.getName());
+
+  private static final ArchCondition<JavaMethod> DECLARE_WHO_MAY_CALL =
+      new ArchCondition<>("declare who may call it with @PreAuthorize") {
+        @Override
+        public void check(JavaMethod item, ConditionEvents events) {
+          boolean endpoint =
+              item.getAnnotations().stream()
+                  .anyMatch(a -> MAPPINGS.contains(a.getRawType().getName()));
+          boolean declared =
+              item.isAnnotatedWith(PreAuthorize.class)
+                  || item.getOwner().isAnnotatedWith(PreAuthorize.class);
+          if (endpoint && !declared) {
+            events.add(
+                SimpleConditionEvent.violated(
+                    item,
+                    item.getFullName()
+                        + " is an endpoint without @PreAuthorize on the method or its class;"
+                        + " name the permission, or mark a public endpoint permitAll()"));
+          }
+        }
+      };
+
+  /**
+   * Every endpoint of the user APIs declares who may call it: a permission, a signed-in user, or
+   * explicitly anyone ({@code permitAll()}). The system-to-system APIs under {@code
+   * /integration/**} are authorised by their own chain (token scopes, deny by default) and are left
+   * out.
+   */
+  private static final ArchRule ENDPOINTS_DECLARE_WHO_MAY_CALL =
+      methods()
+          .that()
+          .areDeclaredInClassesThat()
+          .areAnnotatedWith(RestController.class)
+          .and()
+          .areDeclaredInClassesThat()
+          .resideOutsideOfPackage("..integration..")
+          .and()
+          .arePublic()
+          .should(DECLARE_WHO_MAY_CALL)
+          .because("no endpoint may be reachable by accident (OWASP A01, API5)");
+
+  private static final ArchCondition<JavaMethod> TAKE_A_REQUEST_RECORD =
+      new ArchCondition<>("take its request body as a request type, not as a stored entity") {
+        @Override
+        public void check(JavaMethod item, ConditionEvents events) {
+          item.getParameters().stream()
+              .filter(p -> p.isAnnotatedWith(RequestBody.class))
+              .filter(p -> p.getRawType().isAnnotatedWith(Entity.class))
+              .forEach(
+                  p ->
+                      events.add(
+                          SimpleConditionEvent.violated(
+                              item,
+                              item.getFullName()
+                                  + " binds the request body to the entity "
+                                  + p.getRawType().getName()
+                                  + "; bind a request record listing the fields a caller may set")));
+        }
+      };
+
+  /**
+   * A request body is never bound to an entity (mass assignment, OWASP API3): a caller could set
+   * the id, the version, the owner or the status.
+   */
+  private static final ArchRule REQUEST_BODIES_ARE_NOT_ENTITIES =
+      methods()
+          .that()
+          .areDeclaredInClassesThat()
+          .areAnnotatedWith(RestController.class)
+          .should(TAKE_A_REQUEST_RECORD)
+          .because("only the fields of the request type can be set by a caller");
+
+  @Test
+  void requestBodiesAreNotEntities() {
+    REQUEST_BODIES_ARE_NOT_ENTITIES.check(classes);
+  }
+
+  @Test
+  void endpointsDeclareWhoMayCall() {
+    ENDPOINTS_DECLARE_WHO_MAY_CALL.check(classes);
+  }
 
   @Test
   void companyEndpointsAreDataScoped() {

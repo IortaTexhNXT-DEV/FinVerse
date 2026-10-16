@@ -85,7 +85,7 @@ class MasterChangeLogIT {
   }
 
   @Test
-  @WithMockUser(authorities = "AUDIT_VIEW")
+  @WithMockUser(username = "admin", authorities = "AUDIT_VIEW")
   void auditorsReadTheHistory() throws Exception {
     mvc.perform(get("/api/v1/change-history?entityType=InsurerProfile&entityId=1"))
         .andExpect(status().isOk());

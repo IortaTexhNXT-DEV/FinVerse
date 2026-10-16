@@ -1,10 +1,15 @@
 package com.iortatechnxt.brokerverse.audit.service;
 
+import com.iortatechnxt.brokerverse.audit.service.RecordOwnership.Owner;
+import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.common.security.DataScope;
+import com.iortatechnxt.brokerverse.common.security.UserDataScope;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,14 +27,51 @@ public class MasterChangeLog {
           + " where entity_type = ? and entity_id = ? order by made_at desc, id desc limit ?";
 
   private final JdbcTemplate jdbc;
+  private final RecordOwnership ownership;
+  private final DataScope dataScope;
 
   /**
    * Creates the service.
    *
    * @param jdbc JDBC
+   * @param ownership owner of a logged record
+   * @param dataScope data scope of the signed-in user
    */
-  public MasterChangeLog(JdbcTemplate jdbc) {
+  public MasterChangeLog(JdbcTemplate jdbc, RecordOwnership ownership, DataScope dataScope) {
     this.jdbc = jdbc;
+    this.ownership = ownership;
+    this.dataScope = dataScope;
+  }
+
+  /**
+   * The history of a record for the signed-in user: refused as not found when the record belongs to
+   * a company or branch outside the user's data scope, or, for a user with a narrowed scope, when
+   * its owner cannot be resolved (an unknown type or a removed record).
+   *
+   * @param entityType record type
+   * @param entityId record id
+   * @return entries, latest first
+   * @throws ResourceNotFoundException when the record is outside the data scope
+   */
+  public List<Entry> scopedHistory(String entityType, Long entityId) {
+    UserDataScope scope = dataScope.allowed();
+    if (!scope.allCompanies() && !visible(scope, ownership.ownerOf(entityType, entityId))) {
+      throw new ResourceNotFoundException("change history", entityType + " " + entityId);
+    }
+    return history(entityType, entityId);
+  }
+
+  private static boolean visible(UserDataScope scope, Optional<Owner> owner) {
+    if (owner.isEmpty()) {
+      return false;
+    }
+    Owner o = owner.get();
+    if (o.company() == null) {
+      return true;
+    }
+    return o.branch() == null
+        ? scope.allowsCompany(o.company())
+        : scope.allowsBranch(o.company(), o.branch());
   }
 
   /**

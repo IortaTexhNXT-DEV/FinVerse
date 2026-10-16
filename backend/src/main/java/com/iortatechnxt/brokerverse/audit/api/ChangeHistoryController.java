@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.audit.api;
 
 import com.iortatechnxt.brokerverse.audit.service.MasterChangeLog;
 import com.iortatechnxt.brokerverse.audit.service.MasterChangeLog.Entry;
+import com.iortatechnxt.brokerverse.common.security.CompanyScoped;
 import jakarta.validation.constraints.Pattern;
 import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -13,7 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Field-level change history of a master record (G05): old and new value, maker, checker and their
- * times, read-only, for the master data viewers, the client viewers and the auditors.
+ * times, read-only, for the master data viewers, the client viewers and the auditors. The history
+ * of a record owned by a company or branch outside the caller's data scope is answered as not
+ * found, so its existence is not disclosed.
  */
 @RestController
 @Validated
@@ -44,9 +47,10 @@ public class ChangeHistoryController {
    */
   @GetMapping
   @PreAuthorize(READ)
+  @CompanyScoped("MasterChangeLog.scopedHistory resolves the owner of the record")
   public List<Entry> history(
       @RequestParam @Pattern(regexp = "[A-Za-z]{1,80}") String entityType,
       @RequestParam Long entityId) {
-    return log.history(entityType, entityId);
+    return log.scopedHistory(entityType, entityId);
   }
 }
